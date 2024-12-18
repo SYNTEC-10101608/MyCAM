@@ -81,12 +81,12 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ImprotExport\ImprotExport.csproj">
-      <Project>{860d7699-15f5-439e-8ba2-22c1fff45c5d}</Project>
-      <Name>ImprotExport</Name>
+    <ProjectReference Include="..\ImportExport\ImportExport.csproj">
+      <Project>{e365bb82-69d0-4624-9b9d-c8ce19bded62}</Project>
+      <Name>ImportExport</Name>
     </ProjectReference>
     <ProjectReference Include="..\OCCViewer\OCCViewer.csproj">
-      <Project>{3b8504ec-8c68-4f17-ac80-9d581ec8cda6}</Project>
+      <Project>{b70d417c-8417-49ee-ac5f-dc0bcfd2e38e}</Project>
       <Name>OCCViewer</Name>
     </ProjectReference>
   </ItemGroup>
