@@ -172,37 +172,25 @@ namespace MyCAM
 			if( sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL ) {
 				faceGroupList.Add( TopoDS.ToShell( sewResult ) );
 			}
-			else {
 
-				// get all shells
-				TopExp_Explorer shellExp = new TopExp_Explorer( sewResult, TopAbs_ShapeEnum.TopAbs_SHELL );
-				while( shellExp.More() ) {
-					faceGroupList.Add( TopoDS.ToShell( shellExp.Current() ) );
-					shellExp.Next();
-				}
-
-				// get faces not belong to any shell
-				List<TopoDS_Shape> freeFaceList = new List<TopoDS_Shape>();
-				TopExp_Explorer faceExp = new TopExp_Explorer( sewResult, TopAbs_ShapeEnum.TopAbs_FACE );
-				while( faceExp.More() ) {
-					TopoDS_Face face = TopoDS.ToFace( faceExp.Current() );
-
-					// the face is not in any shell
-					bool bInShell = false;
-					foreach( TopoDS_Shape shell in faceGroupList ) {
-						if( shell.elementsAsList.Contains( face ) ) {
-							bInShell = true;
-							break;
-						}
-					}
-					if( !bInShell ) {
-						freeFaceList.Add( face );
-					}
-					faceExp.Next();
-				}
-				faceGroupList.AddRange( freeFaceList );
+			// only one face is selected
+			else if( sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_FACE ) {
+				faceGroupList.Add( TopoDS.ToFace( sewResult ) );
 			}
 
+			// some shell and free face exist
+			else {
+				foreach( TopoDS_Shape shape in sewResult.elementsAsList ) {
+					if( shape.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL ) {
+						faceGroupList.Add( TopoDS.ToShell( shape ) );
+					}
+					else if( shape.shapeType == TopAbs_ShapeEnum.TopAbs_FACE ) {
+						faceGroupList.Add( TopoDS.ToFace( shape ) );
+					}
+				}
+			}
+
+			// get free boundary wires
 			List<TopoDS_Wire> wireList = new List<TopoDS_Wire>();
 			foreach( TopoDS_Shape faceGroup in faceGroupList ) {
 				ShapeAnalysis_FreeBounds freeBounds = new ShapeAnalysis_FreeBounds( faceGroup );
