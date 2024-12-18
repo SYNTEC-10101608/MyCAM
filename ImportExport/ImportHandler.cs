@@ -19,27 +19,18 @@ namespace ImportExport
 		public static void ImportModel( ModelFormat format, out TopoDS_Shape theShape )
 		{
 			theShape = null;
-
-			//int theformat = 10;
 			OpenFileDialog openDialog = new OpenFileDialog();
 
-			// file dialog settings
-			//string DataDir = Environment.GetEnvironmentVariable( "CSF_OCCTDataPath" );
+			// file dialog filter
 			string filter = "";
 			switch( format ) {
 				case ModelFormat.BREP:
-					//openDialog.InitialDirectory = ( DataDir + "\\occ" );
-					//theformat = 0;
 					filter = "BREP Files (*.brep *.rle)|*.brep; *.rle";
 					break;
 				case ModelFormat.STEP:
-					//openDialog.InitialDirectory = ( DataDir + "\\step" );
-					//theformat = 1;
 					filter = "STEP Files (*.stp *.step)|*.stp; *.step";
 					break;
 				case ModelFormat.IGES:
-					//openDialog.InitialDirectory = ( DataDir + "\\iges" );
-					//theformat = 2;
 					filter = "IGES Files (*.igs *.iges)|*.igs; *.iges";
 					break;
 				default:
@@ -58,7 +49,7 @@ namespace ImportExport
 				return;
 			}
 
-			// transfer model
+			// read the file
 			XSControl_Reader Reader;
 			switch( format ) {
 				case ModelFormat.BREP:
