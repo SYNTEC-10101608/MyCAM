@@ -128,17 +128,14 @@ namespace MyCAM
 			// sew the faces
 			TopoDS_Shape sewResult = SewShape( faceList.Cast<TopoDS_Shape>().ToList() );
 			List<TopoDS_Wire> boundaryWireList = GetAllFreeBound( sewResult );
-			m_viewer.GetAISContext().RemoveAll( false );
-
-			TopTools_IndexedDataMapOfShapeListOfShape map = new TopTools_IndexedDataMapOfShapeListOfShape();
-			TopExp.MapShapesAndAncestors( sewResult, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref map );
 
 			// display the faces
-			AIS_Shape faceAIS = new AIS_Shape( sewResult );
-			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			faceAIS.SetMaterial( aspect );
-			faceAIS.SetDisplayMode( 1 );
-			m_viewer.GetAISContext().Display( faceAIS, false );
+			//m_viewer.GetAISContext().RemoveAll( false );
+			//AIS_Shape faceAIS = new AIS_Shape( sewResult );
+			//Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			//faceAIS.SetMaterial( aspect );
+			//faceAIS.SetDisplayMode( 1 );
+			//m_viewer.GetAISContext().Display( faceAIS, false );
 
 			// display the boundary wires
 			foreach( TopoDS_Wire wire in boundaryWireList ) {
@@ -164,29 +161,21 @@ namespace MyCAM
 			return sewing.SewedShape();
 		}
 
+		// TODO: the grouping method is not robust
 		List<TopoDS_Wire> GetAllFreeBound( TopoDS_Shape sewResult )
 		{
 			List<TopoDS_Shape> faceGroupList = new List<TopoDS_Shape>();
 
-			// all selected faces are in the same shell
-			if( sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL ) {
-				faceGroupList.Add( TopoDS.ToShell( sewResult ) );
-			}
-
-			// only one face is selected
-			else if( sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_FACE ) {
-				faceGroupList.Add( TopoDS.ToFace( sewResult ) );
+			// single shell or single face
+			if( sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL
+				|| sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_FACE ) {
+				faceGroupList.Add( sewResult );
 			}
 
 			// some shell and free face exist
 			else {
 				foreach( TopoDS_Shape shape in sewResult.elementsAsList ) {
-					if( shape.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL ) {
-						faceGroupList.Add( TopoDS.ToShell( shape ) );
-					}
-					else if( shape.shapeType == TopAbs_ShapeEnum.TopAbs_FACE ) {
-						faceGroupList.Add( TopoDS.ToFace( shape ) );
-					}
+					faceGroupList.Add( shape );
 				}
 			}
 
