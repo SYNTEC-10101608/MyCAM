@@ -1,7 +1,11 @@
 ﻿using ImportExport;
 using OCC.AIS;
+using OCC.BRepBuilderAPI;
 using OCC.Graphic3d;
+using OCC.Quantity;
+using OCC.ShapeAnalysis;
 using OCC.TopAbs;
+using OCC.TopExp;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
@@ -124,17 +128,71 @@ namespace MyCAM
 
 		void ShowExtrctedFace()
 		{
+			// get selected face
 			List<TopoDS_Face> faceList = GetSelectedFace();
 			if( faceList.Count == 0 ) {
 				MessageBox.Show( "No face is selected" );
 				return;
 			}
+
+			// split the faces into shells
+			double SewTolerance = 0.001;
+			BRepBuilderAPI_Sewing sewer = new BRepBuilderAPI_Sewing( SewTolerance );
+			foreach( TopoDS_Face face in faceList ) {
+				sewer.Add( face );
+			}
+			sewer.Perform();
+			TopoDS_Shape theShape = sewer.SewedShape();
+			List<TopoDS_Shape> shellList = new List<TopoDS_Shape>();
+			if( theShape.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL ) {
+
+				// all selected faces are in the same shell
+				shellList.Add( TopoDS.ToShell( theShape ) );
+			}
+			else {
+				TopExp_Explorer shellExp = new TopExp_Explorer( theShape, TopAbs_ShapeEnum.TopAbs_SHELL );
+				while( shellExp.More() ) {
+					shellList.Add( TopoDS.ToShell( shellExp.Current() ) );
+					shellExp.Next();
+				}
+
+				// get faces not belong to any shell
+				List<TopoDS_Shape> freeFaceList = new List<TopoDS_Shape>();
+				TopExp_Explorer faceExp = new TopExp_Explorer( theShape, TopAbs_ShapeEnum.TopAbs_FACE );
+				while( faceExp.More() ) {
+					TopoDS_Face face = TopoDS.ToFace( faceExp.Current() );
+					if( !shellList.Exists( shell => shell.elementsAsList.Contains( face ) ) ) {
+						freeFaceList.Add( face );
+					}
+					faceExp.Next();
+				}
+				shellList.AddRange( freeFaceList );
+			}
+
+			// get all bondary wire of the extracted faces
+			List<TopoDS_Wire> wireList = new List<TopoDS_Wire>();
+			foreach( TopoDS_Shape shell in shellList ) {
+				ShapeAnalysis_FreeBounds freeBounds = new ShapeAnalysis_FreeBounds( shell );
+				TopExp_Explorer wireExp = new TopExp_Explorer( freeBounds.GetClosedWires(), TopAbs_ShapeEnum.TopAbs_WIRE );
+				while( wireExp.More() ) {
+					wireList.Add( TopoDS.ToWire( wireExp.Current() ) );
+					wireExp.Next();
+				}
+			}
+
 			m_viewer.GetAISContext().RemoveAll( false );
 			foreach( TopoDS_Face face in faceList ) {
 				AIS_Shape aisShape = new AIS_Shape( face );
 				Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 				aisShape.SetMaterial( aspect );
 				aisShape.SetDisplayMode( 1 );
+				m_viewer.GetAISContext().Display( aisShape, false );
+			}
+			foreach( TopoDS_Wire wire in wireList ) {
+				AIS_Shape aisShape = new AIS_Shape( wire );
+				Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+				aisShape.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+				aisShape.SetWidth( 3 );
 				m_viewer.GetAISContext().Display( aisShape, false );
 			}
 			m_viewer.AxoView();
@@ -201,6 +259,7 @@ namespace MyCAM
 
 						// extract the face
 						ShowExtrctedFace();
+						ActionMode = EActionMode.None;
 					}
 					break;
 				default:
