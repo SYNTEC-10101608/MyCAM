@@ -30,15 +30,17 @@
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiImportFile = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiImportBRep = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiImportIges = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiImportStep = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiImportIges = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiExtractFace = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// menuStrip1
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiImportFile});
+            this.m_tsmiImportFile,
+            this.m_tsmiExtractFace});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(584, 24);
@@ -62,6 +64,13 @@
 			this.m_tsmiImportBRep.Text = "BRep";
 			this.m_tsmiImportBRep.Click += new System.EventHandler(this.m_tsmiImportBRep_Click);
 			// 
+			// m_tsmiImportStep
+			// 
+			this.m_tsmiImportStep.Name = "m_tsmiImportStep";
+			this.m_tsmiImportStep.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportStep.Text = "Step";
+			this.m_tsmiImportStep.Click += new System.EventHandler(this.m_tsmiImportStep_Click);
+			// 
 			// m_tsmiImportIges
 			// 
 			this.m_tsmiImportIges.Name = "m_tsmiImportIges";
@@ -69,12 +78,12 @@
 			this.m_tsmiImportIges.Text = "Iges";
 			this.m_tsmiImportIges.Click += new System.EventHandler(this.m_tsmiImportIges_Click);
 			// 
-			// m_tsmiImportStep
+			// m_tsmiExtractFace
 			// 
-			this.m_tsmiImportStep.Name = "m_tsmiImportStep";
-			this.m_tsmiImportStep.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiImportStep.Text = "Step";
-			this.m_tsmiImportStep.Click += new System.EventHandler(this.m_tsmiImportStep_Click);
+			this.m_tsmiExtractFace.Name = "m_tsmiExtractFace";
+			this.m_tsmiExtractFace.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiExtractFace.Text = "抽殼";
+			this.m_tsmiExtractFace.Click += new System.EventHandler(this.m_tsmiExtractFace_Click);
 			// 
 			// StartupForm
 			// 
@@ -99,6 +108,7 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportBRep;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportIges;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportStep;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiExtractFace;
 	}
 }
 
