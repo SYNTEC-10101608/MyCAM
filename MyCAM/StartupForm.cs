@@ -59,17 +59,23 @@ namespace MyCAM
 
 		void ImportModel( ModelFormat format )
 		{
-			ImportHandler.ImportModel( format, out TopoDS_Shape theShape );
+			if( ImportHandler.ImportModel( format, out TopoDS_Shape theShape ) == false ) {
+				return;
+			}
 			if( theShape == null ) {
 				MessageBox.Show( ToString() + "Error: Import Model" );
 				return;
 			}
 
 			// sew the shape
-			theShape = Sew.SewShape( new List<TopoDS_Shape>() { theShape } );
+			theShape = SewTool.SewShape( new List<TopoDS_Shape>() { theShape } );
 			m_ModelShape = theShape;
 			ShowModel( theShape );
 			m_tsmiExtractFace.Enabled = true;
+
+			// start face selection mode
+			m_OCCViewer.GetAISContext().Activate( 4 /*face mode*/ );
+			m_panViewer.Focus();
 		}
 
 		void ShowModel( TopoDS_Shape theShape )
@@ -85,10 +91,6 @@ namespace MyCAM
 			m_OCCViewer.GetAISContext().Display( aisShape, true );
 			m_OCCViewer.AxoView();
 			m_OCCViewer.ZoomAllView();
-
-			// start face selection mode
-			m_OCCViewer.GetAISContext().Activate( 4 /*face mode*/ );
-			m_panViewer.Focus();
 		}
 
 		// extract face
@@ -98,8 +100,9 @@ namespace MyCAM
 			if( extractedFaceList.Count == 0 ) {
 				return;
 			}
-			CAMEditModel model = new CAMEditModel();
-			if( model.Init( m_ModelShape, extractedFaceList ) == false ) {
+			CAMEditModel model = new CAMEditModel( m_ModelShape, extractedFaceList );
+			if( model.CAMDataList.Count == 0 ) {
+				MessageBox.Show( ToString() + "Error: No Valid Pattern" );
 				return;
 			}
 			CAMEditForm camEditForm = new CAMEditForm();

@@ -1,11 +1,7 @@
 ﻿using OCC.AIS;
 using OCC.Graphic3d;
 using OCC.Quantity;
-using OCC.ShapeAnalysis;
-using OCC.TopAbs;
-using OCC.TopExp;
 using OCC.TopoDS;
-using OCCTool;
 using OCCViewer;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +35,7 @@ namespace MyCAM
 				return false;
 			}
 			m_Model = model;
-			ShowExtrctedFace();
+			ShowModel();
 			return true;
 		}
 
@@ -51,10 +47,10 @@ namespace MyCAM
 		CAMEditModel m_Model;
 
 		// init
-		void ShowExtrctedFace()
+		void ShowModel()
 		{
 			// get boundary wires
-			List<TopoDS_Wire> boundaryWireList = m_Model.CADDataList.Select( x => x.Contour ).ToList();
+			List<TopoDS_Wire> boundaryWireList = m_Model.CAMDataList.Select( x => x.CADData.Contour ).ToList();
 			if( boundaryWireList == null || boundaryWireList.Count == 0 ) {
 				return;
 			}

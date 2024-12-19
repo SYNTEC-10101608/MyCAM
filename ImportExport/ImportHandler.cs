@@ -16,7 +16,7 @@ namespace ImportExport
 
 	public class ImportHandler
 	{
-		public static void ImportModel( ModelFormat format, out TopoDS_Shape theShape )
+		public static bool ImportModel( ModelFormat format, out TopoDS_Shape theShape )
 		{
 			theShape = null;
 			OpenFileDialog openDialog = new OpenFileDialog();
@@ -40,13 +40,13 @@ namespace ImportExport
 
 			// show file dialog
 			if( openDialog.ShowDialog() != DialogResult.OK ) {
-				return;
+				return false;
 			}
 
 			// get the file name
 			string szFileName = openDialog.FileName;
 			if( string.IsNullOrEmpty( szFileName ) ) {
-				return;
+				return false;
 			}
 
 			// read the file
@@ -62,19 +62,21 @@ namespace ImportExport
 					Reader = new IGESControl_Reader();
 					break;
 				default:
-					return;
+					Reader = new XSControl_Reader();
+					break;
 			}
 			IFSelect_ReturnStatus status = Reader.ReadFile( szFileName );
 			if( status != IFSelect_ReturnStatus.IFSelect_RetDone ) {
-				return;
+				return true;
 			}
 			Reader.TransferRoots();
 
 			// prevent from empty shape
 			if( Reader.NbShapes() == 0 ) {
-				return;
+				return true;
 			}
 			theShape = Reader.OneShape();
+			return true;
 		}
 	}
 }

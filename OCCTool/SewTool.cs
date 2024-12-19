@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace OCCTool
 {
-	public class Sew
+	public class SewTool
 	{
 		public static TopoDS_Shape SewShape( List<TopoDS_Shape> shapeList )
 		{

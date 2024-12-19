@@ -1,7 +1,9 @@
-﻿using OCC.ShapeAnalysis;
+﻿using OCC.gp;
+using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
+using OCC.TopTools;
 using OCCTool;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,33 +13,114 @@ namespace MyCAM
 {
 	public class CADData
 	{
+		public CADData( TopoDS_Wire contour,
+			TopTools_IndexedDataMapOfShapeListOfShape shellMap,
+			TopTools_IndexedDataMapOfShapeListOfShape solidMap )
+		{
+			Contour = contour;
+			ShellMap = shellMap;
+			SolidMap = solidMap;
+		}
+
 		public TopoDS_Wire Contour
 		{
+			get; private set;
+		}
+
+		public TopTools_IndexedDataMapOfShapeListOfShape ShellMap
+		{
+			get; private set;
+		}
+
+		public TopTools_IndexedDataMapOfShapeListOfShape SolidMap
+		{
+			get; private set;
+		}
+	}
+
+	public class CAMData
+	{
+		public CAMData( CADData cadData )
+		{
+			CADData = cadData;
+			BuildToolVecList();
+		}
+
+		public List<CAMPoint> CAMPointList
+		{
 			get; set;
+		}
+
+		public CADData CADData
+		{
+			get; private set;
+		}
+
+		void BuildToolVecList()
+		{
+			CAMPointList = new List<CAMPoint>();
+			TopExp_Explorer edgeExp = new TopExp_Explorer( CADData.Contour, TopAbs_ShapeEnum.TopAbs_EDGE );
+
+			// go through the contour edges
+			while( edgeExp.More() ) {
+				TopoDS_Shape edge = edgeExp.Current();
+				edgeExp.Next();
+
+				// get the solid face which the edge belongs to
+				List<TopoDS_Shape> shellFaceList = CADData.ShellMap.FindFromKey( edge ).elementsAsList;
+				List<TopoDS_Shape> solidFaceList = CADData.SolidMap.FindFromKey( edge ).elementsAsList;
+				if( shellFaceList == null || solidFaceList == null ) {
+					continue;
+				}
+				solidFaceList.Remove( shellFaceList[ 0 ] );
+				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
+
+				// break the edge into segment points by 0.1
+				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), 0.1, out List<gp_Pnt> pointList );
+
+				// get tool vector for each point
+				foreach( gp_Pnt point in pointList ) {
+					gp_Dir normal = VectorTool.GetFaceNormalVec( solidFace, point );
+					gp_Dir tangent = VectorTool.GetEdgeTangentVec( TopoDS.ToEdge( edge ), point );
+					gp_Dir toolVec = VectorTool.CrossProduct( normal, tangent );
+					CAMPointList.Add( new CAMPoint( point, toolVec ) );
+				}
+			}
+		}
+	}
+
+	public class CAMPoint
+	{
+		public CAMPoint( gp_Pnt point, gp_Dir toolVec )
+		{
+			Point = point;
+			ToolVec = toolVec;
+		}
+
+		public gp_Pnt Point
+		{
+			get; private set;
+		}
+
+		public gp_Dir ToolVec
+		{
+			get; private set;
 		}
 	}
 
 	public class CAMEditModel
 	{
-		public CAMEditModel()
-		{
-		}
-
-		public bool Init( TopoDS_Shape model, List<TopoDS_Face> extractedFaceList )
+		public CAMEditModel( TopoDS_Shape model, List<TopoDS_Face> extractedFaceList )
 		{
 			if( model == null || extractedFaceList == null ) {
-				return false;
+				throw new System.ArgumentException( ToString() + "Constructior: Null Ref" );
 			}
 			if( extractedFaceList.Count == 0 ) {
-				return false;
+				throw new System.ArgumentException( ToString() + "Constructior: Empty Collection" );
 			}
 			m_ModelShape = model;
 			m_EtractedFaceList = extractedFaceList;
-
-			if( !BuildCADData() ) {
-				return false;
-			}
-			return true;
+			BuildCADData();
 		}
 
 		public TopoDS_Shape ModelShape
@@ -48,23 +131,23 @@ namespace MyCAM
 			}
 		}
 
-		public List<CADData> CADDataList
+		public List<CAMData> CAMDataList
 		{
 			get
 			{
-				return m_CADDataList;
+				return m_CAMDataList;
 			}
 		}
 
 		// fields
 		TopoDS_Shape m_ModelShape = null;
 		List<TopoDS_Face> m_EtractedFaceList = null;
-		List<CADData> m_CADDataList = new List<CADData>();
+		List<CAMData> m_CAMDataList = new List<CAMData>();
 
 		bool BuildCADData()
 		{
 			// sew the faces
-			TopoDS_Shape sewResult = Sew.SewShape( m_EtractedFaceList.Cast<TopoDS_Shape>().ToList() );
+			TopoDS_Shape sewResult = SewTool.SewShape( m_EtractedFaceList.Cast<TopoDS_Shape>().ToList() );
 
 			// get free boundary wires
 			List<TopoDS_Wire> boundaryWireList = GetAllFreeBound( sewResult );
@@ -73,12 +156,31 @@ namespace MyCAM
 				return false;
 			}
 
-			// build CAD data
-			m_CADDataList.Clear();
+			// map the edges to faces
+			TopTools_IndexedDataMapOfShapeListOfShape shellMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+			TopExp.MapShapesAndAncestors( sewResult, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref shellMap );
+			TopTools_IndexedDataMapOfShapeListOfShape solidMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+			TopExp.MapShapesAndAncestors( m_ModelShape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref solidMap );
+
+			// build CAD CAM data
+			m_CAMDataList.Clear();
 			foreach( TopoDS_Wire wire in boundaryWireList ) {
-				CADData cadData = new CADData();
-				cadData.Contour = wire;
-				m_CADDataList.Add( cadData );
+
+				// split the map by edges in wire
+				TopTools_IndexedDataMapOfShapeListOfShape oneShellMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+				TopTools_IndexedDataMapOfShapeListOfShape oneSolidMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+				foreach( TopoDS_Shape edge in wire.elementsAsList ) {
+					TopTools_ListOfShape shellFaceList = shellMap.FindFromKey( edge );
+					TopTools_ListOfShape solidFaceList = solidMap.FindFromKey( edge );
+					if( shellFaceList != null && solidFaceList != null ) {
+						oneShellMap.Add( edge, shellFaceList );
+						oneSolidMap.Add( edge, solidFaceList );
+					}
+				}
+
+				CADData cadData = new CADData( wire, oneShellMap, oneSolidMap );
+				CAMData camData = new CAMData( cadData );
+				m_CAMDataList.Add( camData );
 			}
 			return true;
 		}
