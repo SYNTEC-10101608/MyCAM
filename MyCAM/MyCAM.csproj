@@ -57,6 +57,7 @@
     <Compile Include="CAMEditForm.Designer.cs">
       <DependentUpon>CAMEditForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="CAMEditModel.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>

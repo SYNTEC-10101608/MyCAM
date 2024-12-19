@@ -18,9 +18,9 @@ namespace MyCAM
 			InitializeComponent();
 
 			// create the viewer
-			bool bSucess = m_viewer.InitViewer( m_panViewer );
+			bool bSucess = m_OCCViewer.InitViewer( m_panViewer );
 			if( !bSucess ) {
-				MessageBox.Show( "Error: Init Viewer" );
+				MessageBox.Show( ToString() + "Init Error: Init Viewer" );
 				return;
 			}
 			Controls.Add( m_panViewer );
@@ -36,10 +36,10 @@ namespace MyCAM
 
 		// viewer
 		Panel m_panViewer = new Panel();
-		Viewer m_viewer = new Viewer();
+		Viewer m_OCCViewer = new Viewer();
 
 		// import model
-		TopoDS_Shape m_modelShape = null;
+		TopoDS_Shape m_ModelShape = null;
 
 		// import model
 		void m_tsmiImportBRep_Click( object sender, EventArgs e )
@@ -61,13 +61,13 @@ namespace MyCAM
 		{
 			ImportHandler.ImportModel( format, out TopoDS_Shape theShape );
 			if( theShape == null ) {
-				MessageBox.Show( "Error: Import Model" );
+				MessageBox.Show( ToString() + "Error: Import Model" );
 				return;
 			}
 
 			// sew the shape
 			theShape = Sew.SewShape( new List<TopoDS_Shape>() { theShape } );
-			m_modelShape = theShape;
+			m_ModelShape = theShape;
 			ShowModel( theShape );
 			m_tsmiExtractFace.Enabled = true;
 		}
@@ -81,13 +81,13 @@ namespace MyCAM
 			aisShape.SetDisplayMode( 1 );
 
 			// display the shape
-			m_viewer.GetAISContext().RemoveAll( false );
-			m_viewer.GetAISContext().Display( aisShape, true );
-			m_viewer.AxoView();
-			m_viewer.ZoomAllView();
+			m_OCCViewer.GetAISContext().RemoveAll( false );
+			m_OCCViewer.GetAISContext().Display( aisShape, true );
+			m_OCCViewer.AxoView();
+			m_OCCViewer.ZoomAllView();
 
 			// start face selection mode
-			m_viewer.GetAISContext().Activate( 4 /*face mode*/ );
+			m_OCCViewer.GetAISContext().Activate( 4 /*face mode*/ );
 			m_panViewer.Focus();
 		}
 
@@ -96,24 +96,29 @@ namespace MyCAM
 		{
 			List<TopoDS_Face> extractedFaceList = GetSelectedFace();
 			if( extractedFaceList.Count == 0 ) {
-				MessageBox.Show( "Error: No face selected" );
+				return;
+			}
+			CAMEditModel model = new CAMEditModel();
+			if( model.Init( m_ModelShape, extractedFaceList ) == false ) {
 				return;
 			}
 			CAMEditForm camEditForm = new CAMEditForm();
-			camEditForm.Init( m_modelShape, GetSelectedFace() );
+			if( camEditForm.Init( model ) == false ) {
+				return;
+			}
 			camEditForm.ShowDialog();
 		}
 
 		List<TopoDS_Face> GetSelectedFace()
 		{
 			List<TopoDS_Face> lstFace = new List<TopoDS_Face>();
-			m_viewer.GetAISContext().InitSelected();
-			while( m_viewer.GetAISContext().MoreSelected() ) {
-				TopoDS_Shape theShape = m_viewer.GetAISContext().SelectedShape();
+			m_OCCViewer.GetAISContext().InitSelected();
+			while( m_OCCViewer.GetAISContext().MoreSelected() ) {
+				TopoDS_Shape theShape = m_OCCViewer.GetAISContext().SelectedShape();
 				if( theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_FACE ) {
 					lstFace.Add( TopoDS.ToFace( theShape ) );
 				}
-				m_viewer.GetAISContext().NextSelected();
+				m_OCCViewer.GetAISContext().NextSelected();
 			}
 			return lstFace;
 		}
@@ -124,14 +129,14 @@ namespace MyCAM
 			if( e.Button == MouseButtons.Left ) {
 
 				// select the face
-				m_viewer.ShiftSelect();
+				m_OCCViewer.ShiftSelect();
 			}
 		}
 
 		void ViewerKeyDown( object sender, PreviewKeyDownEventArgs e )
 		{
 			if( e.KeyCode == Keys.Escape ) {
-				m_viewer.GetAISContext().ClearSelected( true );
+				m_OCCViewer.GetAISContext().ClearSelected( true );
 			}
 		}
 	}
