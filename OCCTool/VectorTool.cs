@@ -29,7 +29,11 @@ namespace OCCTool
 			if( !props.IsNormalDefined() ) {
 				return new gp_Dir();
 			}
-			return props.Normal();
+			gp_Dir normal = props.Normal();
+			if( face.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				normal.Reverse();
+			}
+			return normal;
 		}
 
 		public static gp_Dir GetEdgeTangentVec( TopoDS_Edge edge, gp_Pnt point )
@@ -41,6 +45,8 @@ namespace OCCTool
 
 			// Project the point onto the curve to get the u parameter
 			GeomAPI_ProjectPointOnCurve proj = new GeomAPI_ProjectPointOnCurve( point, curve );
+
+			// u might be out of range if the curve is periodic
 			double u = proj.LowerDistanceParameter();
 
 			// get tangent vector

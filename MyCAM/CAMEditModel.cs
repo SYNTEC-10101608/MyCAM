@@ -92,14 +92,6 @@ namespace MyCAM
 					gp_Dir normal = VectorTool.GetFaceNormalVec( solidFace, point );
 					gp_Dir tangent = VectorTool.GetEdgeTangentVec( TopoDS.ToEdge( edge ), point );
 					gp_Dir toolVec = VectorTool.CrossProduct( normal, tangent );
-
-					// TODO: not robust
-					gp_Pnt massCenter = new gp_Pnt( 0, 50, 0 );
-					gp_Vec vec = new gp_Vec( point, massCenter );
-					if( vec.Dot( new gp_Vec( toolVec ) ) > 0 ) {
-						toolVec.Reverse();
-					}
-
 					CAMPointList.Add( new CAMPoint( point, toolVec, normal, tangent ) );
 				}
 			}
