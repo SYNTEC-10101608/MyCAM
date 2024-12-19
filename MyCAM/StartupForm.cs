@@ -68,7 +68,7 @@ namespace MyCAM
 			}
 
 			// sew the shape
-			theShape = SewTool.SewShape( new List<TopoDS_Shape>() { theShape } );
+			theShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { theShape } );
 			m_ModelShape = theShape;
 			ShowModel( theShape );
 			m_tsmiExtractFace.Enabled = true;

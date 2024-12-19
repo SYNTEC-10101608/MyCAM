@@ -1,4 +1,6 @@
 ﻿using OCC.AIS;
+using OCC.BRepBuilderAPI;
+using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Quantity;
 using OCC.TopoDS;
@@ -49,9 +51,15 @@ namespace MyCAM
 		// init
 		void ShowModel()
 		{
-			// get boundary wires
-			List<TopoDS_Wire> boundaryWireList = m_Model.CAMDataList.Select( x => x.CADData.Contour ).ToList();
-			if( boundaryWireList == null || boundaryWireList.Count == 0 ) {
+			// get contour list
+			List<TopoDS_Wire> contourList = m_Model.CAMDataList.Select( x => x.CADData.Contour ).ToList();
+			if( contourList == null || contourList.Count == 0 ) {
+				return;
+			}
+
+			// get CAM point list
+			List<CAMPoint> camPointList = m_Model.CAMDataList.SelectMany( x => x.CAMPointList ).ToList();
+			if( camPointList == null || camPointList.Count == 0 ) {
 				return;
 			}
 
@@ -71,13 +79,50 @@ namespace MyCAM
 			modelAIS.SetDisplayMode( 1 );
 			m_OCCViewer.GetAISContext().Display( modelAIS, false );
 
-			// display the boundary wires
-			foreach( TopoDS_Wire wire in boundaryWireList ) {
-				AIS_Shape oneWireAIS = new AIS_Shape( wire );
-				oneWireAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-				oneWireAIS.SetWidth( 3 );
-				m_OCCViewer.GetAISContext().Display( oneWireAIS, false );
+			// display the contours
+			//foreach( TopoDS_Wire contour in contourList ) {
+			//	AIS_Shape contourAIS = new AIS_Shape( contour );
+			//	contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			//	contourAIS.SetWidth( 3 );
+			//	m_OCCViewer.GetAISContext().Display( contourAIS, false );
+			//}
+
+			// display tool vectors
+			foreach( CAMPoint camPoint in camPointList ) {
+				gp_Pnt point = camPoint.Point;
+				gp_Dir toolVec = camPoint.ToolVec;
+				gp_Pnt endPoint = new gp_Pnt( point.XYZ() + toolVec.XYZ() * 2 );
+				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
+				AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
+				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+				lineAIS.SetWidth( 2 );
+				m_OCCViewer.GetAISContext().Display( lineAIS, false );
 			}
+
+			// display tangent vectors
+			foreach( CAMPoint camPoint in camPointList ) {
+				gp_Pnt point = camPoint.Point;
+				gp_Dir tangentVec = camPoint.TangentVec;
+				gp_Pnt endPoint = new gp_Pnt( point.XYZ() + tangentVec.XYZ() * 2 );
+				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
+				AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
+				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+				lineAIS.SetWidth( 2 );
+				m_OCCViewer.GetAISContext().Display( lineAIS, false );
+			}
+
+			// display normal vectors
+			foreach( CAMPoint camPoint in camPointList ) {
+				gp_Pnt point = camPoint.Point;
+				gp_Dir normalVec = camPoint.NormalVec;
+				gp_Pnt endPoint = new gp_Pnt( point.XYZ() + normalVec.XYZ() * 2 );
+				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
+				AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
+				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+				lineAIS.SetWidth( 2 );
+				m_OCCViewer.GetAISContext().Display( lineAIS, false );
+			}
+
 			m_OCCViewer.AxoView();
 			m_OCCViewer.ZoomAllView();
 			m_OCCViewer.UpdateView();

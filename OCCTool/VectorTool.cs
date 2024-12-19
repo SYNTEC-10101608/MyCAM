@@ -3,6 +3,7 @@ using OCC.Geom;
 using OCC.GeomAPI;
 using OCC.GeomLProp;
 using OCC.gp;
+using OCC.TopAbs;
 using OCC.TopoDS;
 
 namespace OCCTool
@@ -39,7 +40,7 @@ namespace OCCTool
 			Geom_Curve curve = BRep_Tool.Curve( edge, ref dStartU, ref dEndU );
 
 			// Project the point onto the curve to get the u parameter
-			GeomAPI_ProjectPointOnCurve proj = new GeomAPI_ProjectPointOnCurve( point, curve, dStartU, dEndU );
+			GeomAPI_ProjectPointOnCurve proj = new GeomAPI_ProjectPointOnCurve( point, curve );
 			double u = proj.LowerDistanceParameter();
 
 			// get tangent vector
@@ -49,12 +50,20 @@ namespace OCCTool
 			}
 			gp_Dir tangent = new gp_Dir();
 			props.Tangent( ref tangent );
+			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				tangent.Reverse();
+			}
 			return tangent;
 		}
 
 		public static gp_Dir CrossProduct( gp_Dir vec1, gp_Dir vec2 )
 		{
 			return vec1.Crossed( vec2 );
+		}
+
+		public static gp_Vec GetVec( gp_Pnt point1, gp_Pnt point2 )
+		{
+			return new gp_Vec( point1, point2 );
 		}
 	}
 }

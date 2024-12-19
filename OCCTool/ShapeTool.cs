@@ -1,10 +1,13 @@
 ﻿using OCC.BRepBuilderAPI;
+using OCC.BRepGProp;
+using OCC.gp;
+using OCC.GProp;
 using OCC.TopoDS;
 using System.Collections.Generic;
 
 namespace OCCTool
 {
-	public class SewTool
+	public class ShapeTool
 	{
 		public static TopoDS_Shape SewShape( List<TopoDS_Shape> shapeList )
 		{
@@ -16,6 +19,14 @@ namespace OCCTool
 			}
 			sewing.Perform();
 			return sewing.SewedShape();
+		}
+
+		public static gp_Pnt GetFaceGeometryCenter( TopoDS_Face face )
+		{
+			GProp_GProps props = new GProp_GProps();
+			BRepGProp.SurfaceProperties( face, ref props );
+			gp_Pnt center = props.CentreOfMass();
+			return center;
 		}
 	}
 }

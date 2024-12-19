@@ -43,7 +43,7 @@ namespace MyCAM
 		public CAMData( CADData cadData )
 		{
 			CADData = cadData;
-			BuildToolVecList();
+			BuildCAMPointList();
 		}
 
 		public List<CAMPoint> CAMPointList
@@ -56,7 +56,7 @@ namespace MyCAM
 			get; private set;
 		}
 
-		void BuildToolVecList()
+		void BuildCAMPointList()
 		{
 			CAMPointList = new List<CAMPoint>();
 			TopExp_Explorer edgeExp = new TopExp_Explorer( CADData.Contour, TopAbs_ShapeEnum.TopAbs_EDGE );
@@ -72,18 +72,35 @@ namespace MyCAM
 				if( shellFaceList == null || solidFaceList == null ) {
 					continue;
 				}
-				solidFaceList.Remove( shellFaceList[ 0 ] );
+				if( shellFaceList.Count != 1 || solidFaceList.Count != 2 ) {
+					throw new System.ArgumentException( ToString() + "BuildToolVecList: Mapping Error" );
+				}
+				for( int i = 0; i < solidFaceList.Count; i++ ) {
+					if( solidFaceList[ i ].IsEqual( shellFaceList[ 0 ] ) ) {
+						solidFaceList.RemoveAt( i );
+						break;
+					}
+				}
 				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
 
-				// break the edge into segment points by 0.1
-				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), 0.1, out List<gp_Pnt> pointList );
+				// break the edge into segment points by interval
+				const double dSegmentLength = 2;
+				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, true, false, out List<gp_Pnt> pointList );
 
 				// get tool vector for each point
 				foreach( gp_Pnt point in pointList ) {
 					gp_Dir normal = VectorTool.GetFaceNormalVec( solidFace, point );
 					gp_Dir tangent = VectorTool.GetEdgeTangentVec( TopoDS.ToEdge( edge ), point );
 					gp_Dir toolVec = VectorTool.CrossProduct( normal, tangent );
-					CAMPointList.Add( new CAMPoint( point, toolVec ) );
+
+					// TODO: not robust
+					gp_Pnt massCenter = new gp_Pnt( 0, 50, 0 );
+					gp_Vec vec = new gp_Vec( point, massCenter );
+					if( vec.Dot( new gp_Vec( toolVec ) ) > 0 ) {
+						toolVec.Reverse();
+					}
+
+					CAMPointList.Add( new CAMPoint( point, toolVec, normal, tangent ) );
 				}
 			}
 		}
@@ -91,10 +108,12 @@ namespace MyCAM
 
 	public class CAMPoint
 	{
-		public CAMPoint( gp_Pnt point, gp_Dir toolVec )
+		public CAMPoint( gp_Pnt point, gp_Dir toolVec, gp_Dir normalVec, gp_Dir tangentVec )
 		{
 			Point = point;
 			ToolVec = toolVec;
+			NormalVec = normalVec;
+			TangentVec = tangentVec;
 		}
 
 		public gp_Pnt Point
@@ -103,6 +122,16 @@ namespace MyCAM
 		}
 
 		public gp_Dir ToolVec
+		{
+			get; private set;
+		}
+
+		public gp_Dir NormalVec
+		{
+			get; private set;
+		}
+
+		public gp_Dir TangentVec
 		{
 			get; private set;
 		}
@@ -147,7 +176,7 @@ namespace MyCAM
 		bool BuildCADData()
 		{
 			// sew the faces
-			TopoDS_Shape sewResult = SewTool.SewShape( m_EtractedFaceList.Cast<TopoDS_Shape>().ToList() );
+			TopoDS_Shape sewResult = ShapeTool.SewShape( m_EtractedFaceList.Cast<TopoDS_Shape>().ToList() );
 
 			// get free boundary wires
 			List<TopoDS_Wire> boundaryWireList = GetAllFreeBound( sewResult );

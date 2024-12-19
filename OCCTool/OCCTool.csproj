@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SegmentTool.cs" />
-    <Compile Include="SewTool.cs" />
+    <Compile Include="ShapeTool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VectorTool.cs" />
   </ItemGroup>
