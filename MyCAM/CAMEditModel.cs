@@ -43,7 +43,7 @@ namespace MyCAM
 		public CAMData( CADData cadData )
 		{
 			CADData = cadData;
-			//BuildToolVecList();
+			BuildToolVecList();
 		}
 
 		public List<CAMPoint> CAMPointList
@@ -72,7 +72,12 @@ namespace MyCAM
 				if( shellFaceList == null || solidFaceList == null ) {
 					continue;
 				}
-				solidFaceList.Remove( shellFaceList[ 0 ] );
+				for( int i = solidFaceList.Count - 1; i > 0; i-- ) {
+					if( solidFaceList[ i ].IsEqual( shellFaceList[ 0 ] ) ) {
+						solidFaceList.RemoveAt( i );
+						break;
+					}
+				}
 				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by 0.1
@@ -150,15 +155,13 @@ namespace MyCAM
 			TopoDS_Shape sewResult = ShapeTool.SewShape( m_EtractedFaceList.Cast<TopoDS_Shape>().ToList() );
 
 			// get free boundary wires
-			List<TopoDS_Wire> boundaryWireList = GetAllFreeBound();
+			List<TopoDS_Wire> boundaryWireList = GetAllPatternContour( out TopTools_IndexedDataMapOfShapeListOfShape faceMap );
 			if( boundaryWireList.Count == 0 ) {
 				MessageBox.Show( ToString() + "Error: No boundary wire" );
 				return false;
 			}
 
 			// map the edges to faces
-			TopTools_IndexedDataMapOfShapeListOfShape shellMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-			TopExp.MapShapesAndAncestors( sewResult, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref shellMap );
 			TopTools_IndexedDataMapOfShapeListOfShape solidMap = new TopTools_IndexedDataMapOfShapeListOfShape();
 			TopExp.MapShapesAndAncestors( m_ModelShape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref solidMap );
 
@@ -170,7 +173,7 @@ namespace MyCAM
 				TopTools_IndexedDataMapOfShapeListOfShape oneShellMap = new TopTools_IndexedDataMapOfShapeListOfShape();
 				TopTools_IndexedDataMapOfShapeListOfShape oneSolidMap = new TopTools_IndexedDataMapOfShapeListOfShape();
 				foreach( TopoDS_Shape edge in wire.elementsAsList ) {
-					TopTools_ListOfShape shellFaceList = shellMap.FindFromKey( edge );
+					TopTools_ListOfShape shellFaceList = faceMap.FindFromKey( edge );
 					TopTools_ListOfShape solidFaceList = solidMap.FindFromKey( edge );
 					if( shellFaceList != null && solidFaceList != null ) {
 						oneShellMap.Add( edge, shellFaceList );
@@ -185,12 +188,12 @@ namespace MyCAM
 			return true;
 		}
 
-		List<TopoDS_Wire> GetAllFreeBound()
+		List<TopoDS_Wire> GetAllPatternContour( out TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap )
 		{
 			TopoDS_Compound faceCompound = ShapeTool.MakeCompound( m_EtractedFaceList.Cast<TopoDS_Shape>().ToList() );
 
 			// get the free boundary edges form extracted faces
-			TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+			edgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
 			TopExp.MapShapesAndAncestors( faceCompound, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref edgeFaceMap );
 			List<TopoDS_Edge> freeEdgeList = new List<TopoDS_Edge>();
 			TopExp_Explorer edgeExp = new TopExp_Explorer( faceCompound, TopAbs_ShapeEnum.TopAbs_EDGE );

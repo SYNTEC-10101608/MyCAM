@@ -36,39 +36,38 @@ namespace OCCTool
 		//TODO: refine this method
 		public static List<List<TopoDS_Edge>> SortEdgeList( List<TopoDS_Edge> originalEdgeList )
 		{
-			int nNumOfSegments = originalEdgeList.Count;
-			List<List<TopoDS_Edge>> sortedEdgeList = new List<List<TopoDS_Edge>>();
-			sortedEdgeList.Add( originalEdgeList );
+			// Result list to store grouped wires
+			var sortedEdgeList = new List<List<TopoDS_Edge>>();
 
-			bool bCanFitInWire = false;
-			int nLastIndex = 0;
+			// Use a queue for unprocessed edges
+			var edgeQueue = new Queue<TopoDS_Edge>( originalEdgeList );
 
-			// add edges in same wire to other list
-			for( int i = 0; i < nNumOfSegments; i++ ) {
+			while( edgeQueue.Count > 0 ) {
+				// Start a new wire group
+				var currentWire = new List<TopoDS_Edge>();
+				currentWire.Add( edgeQueue.Dequeue() );
 
-				if( bCanFitInWire == false ) {
-					sortedEdgeList.Add( new List<TopoDS_Edge>() );
-					sortedEdgeList[ nLastIndex + 1 ].Add( sortedEdgeList[ 0 ][ 0 ] );
-					sortedEdgeList[ 0 ].RemoveAt( 0 );
-					nLastIndex = sortedEdgeList.Count - 1;
-				}
+				bool addedEdge;
+				do {
+					addedEdge = false;
+					int queueCount = edgeQueue.Count;
 
-				for( int j = 0; j < sortedEdgeList[ 0 ].Count; j++ ) {
+					for( int i = 0; i < queueCount; i++ ) {
+						var targetEdge = edgeQueue.Dequeue();
 
-					TopoDS_Edge targetEdge = sortedEdgeList[ 0 ][ j ];
-					bCanFitInWire = CheckEdgeCanFitInWire( sortedEdgeList[ nLastIndex ], ref targetEdge );
-
-					if( bCanFitInWire ) {
-						sortedEdgeList[ 0 ].RemoveAt( j );
-						j--;
-						break;
+						if( CheckEdgeCanFitInWire( currentWire, ref targetEdge ) ) {
+							addedEdge = true;
+						}
+						else {
+							// Put back unconnected edge
+							edgeQueue.Enqueue( targetEdge );
+						}
 					}
-				}
-				if( sortedEdgeList[ 0 ].Count == 0 ) {
-					break;
-				}
+				} while( addedEdge );
+
+				// Add completed wire to the result
+				sortedEdgeList.Add( currentWire );
 			}
-			sortedEdgeList.RemoveAt( 0 );
 
 			return sortedEdgeList;
 		}
