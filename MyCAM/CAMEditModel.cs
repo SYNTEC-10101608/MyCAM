@@ -1,5 +1,5 @@
-﻿using OCC.gp;
-using OCC.ShapeAnalysis;
+﻿using OCC.BRepBuilderAPI;
+using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
@@ -43,7 +43,7 @@ namespace MyCAM
 		public CAMData( CADData cadData )
 		{
 			CADData = cadData;
-			BuildToolVecList();
+			//BuildToolVecList();
 		}
 
 		public List<CAMPoint> CAMPointList
@@ -147,10 +147,10 @@ namespace MyCAM
 		bool BuildCADData()
 		{
 			// sew the faces
-			TopoDS_Shape sewResult = SewTool.SewShape( m_EtractedFaceList.Cast<TopoDS_Shape>().ToList() );
+			TopoDS_Shape sewResult = ShapeTool.SewShape( m_EtractedFaceList.Cast<TopoDS_Shape>().ToList() );
 
 			// get free boundary wires
-			List<TopoDS_Wire> boundaryWireList = GetAllFreeBound( sewResult );
+			List<TopoDS_Wire> boundaryWireList = GetAllFreeBound();
 			if( boundaryWireList.Count == 0 ) {
 				MessageBox.Show( ToString() + "Error: No boundary wire" );
 				return false;
@@ -185,33 +185,37 @@ namespace MyCAM
 			return true;
 		}
 
-		// TODO: the grouping method is tricky, need to be improved
-		List<TopoDS_Wire> GetAllFreeBound( TopoDS_Shape sewResult )
+		List<TopoDS_Wire> GetAllFreeBound()
 		{
-			List<TopoDS_Shape> faceGroupList = new List<TopoDS_Shape>();
+			TopoDS_Compound faceCompound = ShapeTool.MakeCompound( m_EtractedFaceList.Cast<TopoDS_Shape>().ToList() );
 
-			// single shell or single face
-			if( sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL
-				|| sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_FACE ) {
-				faceGroupList.Add( sewResult );
-			}
+			// get the free boundary edges form extracted faces
+			TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+			TopExp.MapShapesAndAncestors( faceCompound, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref edgeFaceMap );
+			List<TopoDS_Edge> freeEdgeList = new List<TopoDS_Edge>();
+			TopExp_Explorer edgeExp = new TopExp_Explorer( faceCompound, TopAbs_ShapeEnum.TopAbs_EDGE );
+			while( edgeExp.More() ) {
+				TopoDS_Shape edge = edgeExp.Current();
+				edgeExp.Next();
 
-			// some shell and free face exist
-			else {
-				foreach( TopoDS_Shape shape in sewResult.elementsAsList ) {
-					faceGroupList.Add( shape );
+				// if the edge is only shared by one face, it is a free edge
+				if( edgeFaceMap.FindFromKey( edge ) != null && edgeFaceMap.FindFromKey( edge ).Count() == 1 ) {
+					freeEdgeList.Add( TopoDS.ToEdge( edge ) );
 				}
 			}
 
-			// get free boundary wires
+			// group the free edges into wires
 			List<TopoDS_Wire> wireList = new List<TopoDS_Wire>();
-			foreach( TopoDS_Shape faceGroup in faceGroupList ) {
-				ShapeAnalysis_FreeBounds freeBounds = new ShapeAnalysis_FreeBounds( faceGroup );
-				TopExp_Explorer wireExp = new TopExp_Explorer( freeBounds.GetClosedWires(), TopAbs_ShapeEnum.TopAbs_WIRE );
-				while( wireExp.More() ) {
-					wireList.Add( TopoDS.ToWire( wireExp.Current() ) );
-					wireExp.Next();
+			List<List<TopoDS_Edge>> sortedEdgeList = ShapeTool.SortEdgeList( freeEdgeList );
+			foreach( List<TopoDS_Edge> edgeList in sortedEdgeList ) {
+				BRepBuilderAPI_MakeWire wireMaker = new BRepBuilderAPI_MakeWire();
+				foreach( TopoDS_Edge edge in edgeList ) {
+					wireMaker.Add( edge );
 				}
+				if( wireMaker.IsDone() == false ) {
+					continue;
+				}
+				wireList.Add( wireMaker.Wire() );
 			}
 			return wireList;
 		}
