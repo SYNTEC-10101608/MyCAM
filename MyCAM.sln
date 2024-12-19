@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCCViewer", "OCCViewer\OCCV
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportExport", "ImportExport\ImportExport.csproj", "{E365BB82-69D0-4624-9B9D-C8CE19BDED62}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCCTool", "OCCTool\OCCTool.csproj", "{E9C0AB57-4558-4BAF-B154-B20169A256FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{E365BB82-69D0-4624-9B9D-C8CE19BDED62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E365BB82-69D0-4624-9B9D-C8CE19BDED62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E365BB82-69D0-4624-9B9D-C8CE19BDED62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9C0AB57-4558-4BAF-B154-B20169A256FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9C0AB57-4558-4BAF-B154-B20169A256FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9C0AB57-4558-4BAF-B154-B20169A256FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9C0AB57-4558-4BAF-B154-B20169A256FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

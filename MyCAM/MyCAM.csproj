@@ -51,6 +51,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CAMEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CAMEditForm.Designer.cs">
+      <DependentUpon>CAMEditForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -59,6 +65,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="CAMEditForm.resx">
+      <DependentUpon>CAMEditForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="StartupForm.resx">
       <DependentUpon>StartupForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -88,6 +97,10 @@
     <ProjectReference Include="..\ImportExport\ImportExport.csproj">
       <Project>{e365bb82-69d0-4624-9b9d-c8ce19bded62}</Project>
       <Name>ImportExport</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OCCTool\OCCTool.csproj">
+      <Project>{e9c0ab57-4558-4baf-b154-b20169a256fe}</Project>
+      <Name>OCCTool</Name>
     </ProjectReference>
     <ProjectReference Include="..\OCCViewer\OCCViewer.csproj">
       <Project>{b70d417c-8417-49ee-ac5f-dc0bcfd2e38e}</Project>
