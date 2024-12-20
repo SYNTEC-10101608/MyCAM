@@ -62,11 +62,6 @@ namespace OCCTool
 			return tangent;
 		}
 
-		public static gp_Dir CrossProduct( gp_Dir vec1, gp_Dir vec2 )
-		{
-			return vec1.Crossed( vec2 );
-		}
-
 		public static gp_Vec GetVec( gp_Pnt point1, gp_Pnt point2 )
 		{
 			return new gp_Vec( point1, point2 );

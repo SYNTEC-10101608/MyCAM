@@ -21,7 +21,7 @@ namespace OCCTool
 			return sewing.SewedShape();
 		}
 
-		public static gp_Pnt GetFaceGeometryCenter( TopoDS_Face face )
+		public static gp_Pnt GetFaceCenter( TopoDS_Face face )
 		{
 			GProp_GProps props = new GProp_GProps();
 			BRepGProp.SurfaceProperties( face, ref props );

@@ -48,7 +48,7 @@ namespace MyCAM
 
 		public List<CAMPoint> CAMPointList
 		{
-			get; set;
+			get; private set;
 		}
 
 		public CADData CADData
@@ -84,15 +84,15 @@ namespace MyCAM
 				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by interval
-				const double dSegmentLength = 2;
+				const double dSegmentLength = 2.5;
 				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, true, false, out List<gp_Pnt> pointList );
 
 				// get tool vector for each point
 				foreach( gp_Pnt point in pointList ) {
-					gp_Dir normal = VectorTool.GetFaceNormalVec( solidFace, point );
-					gp_Dir tangent = VectorTool.GetEdgeTangentVec( TopoDS.ToEdge( edge ), point );
-					gp_Dir toolVec = VectorTool.CrossProduct( normal, tangent );
-					CAMPointList.Add( new CAMPoint( point, toolVec, normal, tangent ) );
+					gp_Dir normalVec = VectorTool.GetFaceNormalVec( solidFace, point );
+					gp_Dir tangentVec = VectorTool.GetEdgeTangentVec( TopoDS.ToEdge( edge ), point );
+					gp_Dir toolVec = normalVec.Crossed( tangentVec );
+					CAMPointList.Add( new CAMPoint( point, toolVec, normalVec, tangentVec ) );
 				}
 			}
 		}
@@ -118,6 +118,7 @@ namespace MyCAM
 			get; private set;
 		}
 
+		// the normal and tangent is temporary reserved for testing
 		public gp_Dir NormalVec
 		{
 			get; private set;
@@ -141,7 +142,7 @@ namespace MyCAM
 			}
 			m_ModelShape = model;
 			m_EtractedFaceList = extractedFaceList;
-			BuildCADData();
+			BuildCAMData();
 		}
 
 		public TopoDS_Shape ModelShape
@@ -165,13 +166,13 @@ namespace MyCAM
 		List<TopoDS_Face> m_EtractedFaceList = null;
 		List<CAMData> m_CAMDataList = new List<CAMData>();
 
-		bool BuildCADData()
+		bool BuildCAMData()
 		{
 			// sew the faces
 			TopoDS_Shape sewResult = ShapeTool.SewShape( m_EtractedFaceList.Cast<TopoDS_Shape>().ToList() );
 
 			// get free boundary wires
-			List<TopoDS_Wire> boundaryWireList = GetAllFreeBound( sewResult );
+			List<TopoDS_Wire> boundaryWireList = GetAllCADContour( sewResult );
 			if( boundaryWireList.Count == 0 ) {
 				MessageBox.Show( ToString() + "Error: No boundary wire" );
 				return false;
@@ -207,7 +208,7 @@ namespace MyCAM
 		}
 
 		// TODO: the grouping method is tricky, need to be improved
-		List<TopoDS_Wire> GetAllFreeBound( TopoDS_Shape sewResult )
+		List<TopoDS_Wire> GetAllCADContour( TopoDS_Shape sewResult )
 		{
 			List<TopoDS_Shape> faceGroupList = new List<TopoDS_Shape>();
 
