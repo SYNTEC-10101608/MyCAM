@@ -95,9 +95,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ImportExport\ImportExport.csproj">
-      <Project>{e365bb82-69d0-4624-9b9d-c8ce19bded62}</Project>
-      <Name>ImportExport</Name>
+    <ProjectReference Include="..\ExtractPattern\ExtractPattern.csproj">
+      <Project>{6834c5e6-b49f-4a87-bdc3-592bebbae526}</Project>
+      <Name>ExtractPattern</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ImportModel\ImportModel.csproj">
+      <Project>{b1933d18-070f-426e-aabf-047953cfab9b}</Project>
+      <Name>ImportModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\OCCTool\OCCTool.csproj">
       <Project>{e9c0ab57-4558-4baf-b154-b20169a256fe}</Project>
