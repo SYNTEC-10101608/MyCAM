@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4CB64D75-A76D-4B75-8D20-6668700C4208}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <RootNamespace>MyCAM</RootNamespace>
-    <AssemblyName>MyCAM</AssemblyName>
+    <ProjectGuid>{A9964C8E-32E4-43F1-ADC4-13524752E113}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CAMEdit</RootNamespace>
+    <AssemblyName>CAMEdit</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,10 +21,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -34,69 +31,36 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OCCCSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="OCCCSharp">
       <HintPath>..\reference\OCCCSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="StartupForm.cs">
+    <Compile Include="CAMEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="StartupForm.Designer.cs">
-      <DependentUpon>StartupForm.cs</DependentUpon>
+    <Compile Include="CAMEditForm.Designer.cs">
+      <DependentUpon>CAMEditForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="CAMEditModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="StartupForm.resx">
-      <DependentUpon>StartupForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <EmbeddedResource Include="CAMEditForm.resx">
+      <DependentUpon>CAMEditForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CAMEdit\CAMEdit.csproj">
-      <Project>{a9964c8e-32e4-43f1-adc4-13524752e113}</Project>
-      <Name>CAMEdit</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ExtractPattern\ExtractPattern.csproj">
-      <Project>{6834c5e6-b49f-4a87-bdc3-592bebbae526}</Project>
-      <Name>ExtractPattern</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ImportModel\ImportModel.csproj">
-      <Project>{b1933d18-070f-426e-aabf-047953cfab9b}</Project>
-      <Name>ImportModel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\OCCTool\OCCTool.csproj">
       <Project>{e9c0ab57-4558-4baf-b154-b20169a256fe}</Project>
       <Name>OCCTool</Name>

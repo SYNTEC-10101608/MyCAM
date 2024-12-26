@@ -1,5 +1,8 @@
-﻿using ImportModel;
+﻿using CAMEdit;
+using ExtractPattern;
+using ImportModel;
 using OCC.TopoDS;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -21,10 +24,19 @@ namespace MyCAM
 		void ImportOK( TopoDS_Shape shape )
 		{
 			ExtractPatternForm f = new ExtractPatternForm( shape );
+			f.ExtractOK += ExtractOK;
 			ShowChild( f );
 		}
 
-		void ShowChild( Form formToShow)
+		void ExtractOK( TopoDS_Shape modelShape, List<TopoDS_Face> extractPattern )
+		{
+			CAMEditForm f = new CAMEditForm();
+			CAMEditModel camEditModel = new CAMEditModel( modelShape, extractPattern );
+			f.Init( camEditModel );
+			ShowChild( f );
+		}
+
+		void ShowChild( Form formToShow )
 		{
 			foreach( Form f in MdiChildren ) {
 				f.Hide();

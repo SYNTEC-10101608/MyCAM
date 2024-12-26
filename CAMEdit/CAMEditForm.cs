@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace MyCAM
+namespace CAMEdit
 {
 	public partial class CAMEditForm : Form
 	{

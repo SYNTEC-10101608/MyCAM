@@ -1,4 +1,4 @@
-﻿namespace ImportModel
+﻿namespace ExtractPattern
 {
 	partial class ExtractPatternForm
 	{
@@ -57,7 +57,7 @@
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "ExtractPatternForm";
-			this.Text = "StartupForm";
+			this.Text = "ExtrcatPatternForm";
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.ResumeLayout(false);

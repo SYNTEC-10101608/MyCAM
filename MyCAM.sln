@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportModel", "ImportModel\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractPattern", "ExtractPattern\ExtractPattern.csproj", "{6834C5E6-B49F-4A87-BDC3-592BEBBAE526}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CAMEdit", "CAMEdit\CAMEdit.csproj", "{A9964C8E-32E4-43F1-ADC4-13524752E113}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{6834C5E6-B49F-4A87-BDC3-592BEBBAE526}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6834C5E6-B49F-4A87-BDC3-592BEBBAE526}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6834C5E6-B49F-4A87-BDC3-592BEBBAE526}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9964C8E-32E4-43F1-ADC4-13524752E113}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9964C8E-32E4-43F1-ADC4-13524752E113}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9964C8E-32E4-43F1-ADC4-13524752E113}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9964C8E-32E4-43F1-ADC4-13524752E113}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

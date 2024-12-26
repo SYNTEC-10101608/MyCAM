@@ -7,11 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace ImportModel
+namespace ExtractPattern
 {
 	public partial class ExtractPatternForm : Form
 	{
-		public Action<List<TopoDS_Face>> ExtractOK = null;
+		public Action<TopoDS_Shape, List<TopoDS_Face>> ExtractOK = null;
 
 		public ExtractPatternForm( TopoDS_Shape modelShape )
 		{
@@ -33,13 +33,13 @@ namespace ImportModel
 			m_ModelShape = modelShape;
 			ShowModel();
 
-			// start face selection mode
-			m_OCCViewer.GetAISContext().Activate( 4 /*face mode*/ );
-			m_panViewer.Focus();
-
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
 			m_panViewer.PreviewKeyDown += ViewerKeyDown;
+
+			// start face selection mode
+			m_OCCViewer.GetAISContext().Activate( 4 /*face mode*/ );
+			m_panViewer.Focus();
 		}
 
 		// viewer
@@ -71,7 +71,7 @@ namespace ImportModel
 			if( extractedFaceList.Count == 0 ) {
 				return;
 			}
-			ExtractOK?.Invoke( extractedFaceList );
+			ExtractOK?.Invoke( m_ModelShape, extractedFaceList );
 		}
 
 		List<TopoDS_Face> GetSelectedFace()

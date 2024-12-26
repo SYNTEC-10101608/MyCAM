@@ -1,4 +1,4 @@
-﻿namespace MyCAM
+﻿namespace CAMEdit
 {
 	partial class CAMEditForm
 	{
