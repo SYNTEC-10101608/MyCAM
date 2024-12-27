@@ -1,4 +1,5 @@
-﻿using OCC.AIS;
+﻿using DataStructure;
+using OCC.AIS;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.Graphic3d;

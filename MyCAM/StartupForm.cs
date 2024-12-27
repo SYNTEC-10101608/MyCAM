@@ -1,4 +1,5 @@
 ﻿using CAMEdit;
+using DataStructure;
 using ExtractPattern;
 using ImportModel;
 using OCC.TopoDS;
@@ -21,17 +22,17 @@ namespace MyCAM
 			ShowChild( f );
 		}
 
-		void ImportOK( TopoDS_Shape shape )
+		void ImportOK( TopoDS_Shape modelShape )
 		{
-			ExtractPatternForm f = new ExtractPatternForm( shape );
+			ExtractPatternForm f = new ExtractPatternForm( modelShape );
 			f.ExtractOK += ExtractOK;
 			ShowChild( f );
 		}
 
-		void ExtractOK( TopoDS_Shape modelShape, List<TopoDS_Face> extractPattern )
+		void ExtractOK( TopoDS_Shape modelShape, List<CADData> cadDataList )
 		{
 			CAMEditForm f = new CAMEditForm();
-			CAMEditModel camEditModel = new CAMEditModel( modelShape, extractPattern );
+			CAMEditModel camEditModel = new CAMEditModel( modelShape, cadDataList );
 			f.Init( camEditModel );
 			ShowChild( f );
 		}
