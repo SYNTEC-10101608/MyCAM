@@ -93,7 +93,7 @@
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "ImportModelForm";
-			this.Text = "ImportModelForm";
+			this.Text = "導入圖檔";
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.ResumeLayout(false);

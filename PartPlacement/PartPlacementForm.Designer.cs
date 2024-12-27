@@ -28,15 +28,34 @@
 		private void InitializeComponent()
 		{
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+			this.m_tsmiSetting = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// menuStrip1
 			// 
+			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiSetting,
+            this.m_tsmiOK});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(584, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
+			// 
+			// m_tsmiSetting
+			// 
+			this.m_tsmiSetting.Name = "m_tsmiSetting";
+			this.m_tsmiSetting.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiSetting.Text = "設置";
+			this.m_tsmiSetting.Click += new System.EventHandler(this.m_tsmiSetting_Click);
+			// 
+			// m_tsmiOK
+			// 
+			this.m_tsmiOK.Name = "m_tsmiOK";
+			this.m_tsmiOK.Size = new System.Drawing.Size(36, 20);
+			this.m_tsmiOK.Text = "OK";
 			// 
 			// PartPlacementForm
 			// 
@@ -47,6 +66,8 @@
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "PartPlacementForm";
 			this.Text = "放置零件";
+			this.menuStrip1.ResumeLayout(false);
+			this.menuStrip1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -55,6 +76,8 @@
 		#endregion
 
 		private System.Windows.Forms.MenuStrip menuStrip1;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiSetting;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiOK;
 	}
 }
 

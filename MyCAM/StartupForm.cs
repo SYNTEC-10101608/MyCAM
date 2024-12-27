@@ -3,6 +3,7 @@ using DataStructure;
 using ExtractPattern;
 using ImportModel;
 using OCC.TopoDS;
+using PartPlacement;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -24,8 +25,11 @@ namespace MyCAM
 
 		void ImportOK( TopoDS_Shape modelShape )
 		{
-			ExtractPatternForm f = new ExtractPatternForm( modelShape );
-			f.ExtractOK += ExtractOK;
+			//ExtractPatternForm f = new ExtractPatternForm( modelShape );
+			//f.ExtractOK += ExtractOK;
+			//ShowChild( f );
+
+			PartPlacementForm f = new PartPlacementForm( modelShape );
 			ShowChild( f );
 		}
 

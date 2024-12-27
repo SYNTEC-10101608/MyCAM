@@ -36,7 +36,7 @@
 			this.AutoSize = true;
 			this.ClientSize = new System.Drawing.Size(584, 561);
 			this.Name = "StartupForm";
-			this.Text = "StartupForm";
+			this.Text = "五軸切";
 			this.ResumeLayout(false);
 
 		}
