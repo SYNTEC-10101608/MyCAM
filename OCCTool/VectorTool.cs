@@ -62,6 +62,16 @@ namespace OCCTool
 			return tangent;
 		}
 
+		public static gp_Pnt OffsetPoint( gp_Pnt point, gp_Vec vec )
+		{
+			return new gp_Pnt( point.XYZ() + vec.XYZ() );
+		}
+
+		public static gp_Pnt OffsetPoint( gp_Pnt point, gp_Dir dir, double distance )
+		{
+			return new gp_Pnt( point.XYZ() + dir.XYZ() * distance );
+		}
+
 		public static gp_Vec GetVec( gp_Pnt point1, gp_Pnt point2 )
 		{
 			return new gp_Vec( point1, point2 );
