@@ -80,14 +80,7 @@ namespace CAMEdit
 			modelAIS.SetMaterial( aspect );
 			modelAIS.SetDisplayMode( 1 );
 			m_OCCViewer.GetAISContext().Display( modelAIS, false );
-
-			// display the contours
-			//foreach( TopoDS_Wire contour in contourList ) {
-			//	AIS_Shape contourAIS = new AIS_Shape( contour );
-			//	contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-			//	contourAIS.SetWidth( 3 );
-			//	m_OCCViewer.GetAISContext().Display( contourAIS, false );
-			//}
+			m_OCCViewer.GetAISContext().Deactivate( modelAIS );
 
 			// display tool vectors
 			foreach( CAMPoint camPoint in camPointList ) {
@@ -99,6 +92,7 @@ namespace CAMEdit
 				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
 				lineAIS.SetWidth( 2 );
 				m_OCCViewer.GetAISContext().Display( lineAIS, false );
+				m_OCCViewer.GetAISContext().Deactivate( lineAIS );
 			}
 
 			// display tangent vectors
@@ -111,6 +105,7 @@ namespace CAMEdit
 				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 				lineAIS.SetWidth( 2 );
 				m_OCCViewer.GetAISContext().Display( lineAIS, false );
+				m_OCCViewer.GetAISContext().Deactivate( lineAIS );
 			}
 
 			// display normal vectors
@@ -123,6 +118,15 @@ namespace CAMEdit
 				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
 				lineAIS.SetWidth( 2 );
 				m_OCCViewer.GetAISContext().Display( lineAIS, false );
+				m_OCCViewer.GetAISContext().Deactivate( lineAIS );
+			}
+
+			// display the contours
+			foreach( TopoDS_Wire contour in contourList ) {
+				AIS_Shape contourAIS = new AIS_Shape( contour );
+				contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+				contourAIS.SetWidth( 1 );
+				m_OCCViewer.GetAISContext().Display( contourAIS, false );
 			}
 
 			m_OCCViewer.AxoView();

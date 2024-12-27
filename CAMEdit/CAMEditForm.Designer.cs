@@ -35,7 +35,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(584, 561);
 			this.Name = "CAMEditForm";
-			this.Text = "CAMEditForm";
+			this.Text = "CAM編修";
 			this.ResumeLayout(false);
 
 		}

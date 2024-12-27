@@ -78,6 +78,7 @@ namespace ExtractPattern
 			m_OCCViewer.ZoomAllView();
 
 			// start face selection mode
+			m_OCCViewer.GetAISContext().Deactivate();
 			m_OCCViewer.GetAISContext().Activate( 4 /*face mode*/ );
 		}
 

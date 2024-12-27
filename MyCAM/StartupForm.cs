@@ -2,6 +2,7 @@
 using DataStructure;
 using ExtractPattern;
 using ImportModel;
+using OCC.gp;
 using OCC.TopoDS;
 using PartPlacement;
 using System.Collections.Generic;
@@ -12,6 +13,9 @@ namespace MyCAM
 {
 	public partial class StartupForm : Form
 	{
+		gp_Trsf m_PartTrsf = new gp_Trsf();
+		gp_Trsf m_G54Trsf = new gp_Trsf();
+
 		public StartupForm()
 		{
 			InitializeComponent();
@@ -25,11 +29,20 @@ namespace MyCAM
 
 		void ImportOK( TopoDS_Shape modelShape )
 		{
-			//ExtractPatternForm f = new ExtractPatternForm( modelShape );
-			//f.ExtractOK += ExtractOK;
-			//ShowChild( f );
-
 			PartPlacementForm f = new PartPlacementForm( modelShape );
+			f.PlaceOK += ( partTrsf, G54Trsf ) =>
+			{
+				m_PartTrsf = partTrsf;
+				m_G54Trsf = G54Trsf;
+				PlaceOK( modelShape );
+			};
+			ShowChild( f );
+		}
+
+		void PlaceOK( TopoDS_Shape modelShape )
+		{
+			ExtractPatternForm f = new ExtractPatternForm( modelShape );
+			f.ExtractOK += ExtractOK;
 			ShowChild( f );
 		}
 

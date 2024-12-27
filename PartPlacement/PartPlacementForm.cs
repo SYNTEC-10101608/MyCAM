@@ -14,7 +14,7 @@ namespace PartPlacement
 {
 	public partial class PartPlacementForm : Form
 	{
-		public Action<TopoDS_Shape> ImportOK;
+		public Action<gp_Trsf, gp_Trsf> PlaceOK;
 
 		public PartPlacementForm( TopoDS_Shape modelShape )
 		{
@@ -116,6 +116,11 @@ namespace PartPlacement
 			m_OCCViewer.GetAISContext().RemoveAll( false );
 			ShowMachineFrame();
 			ShowModel();
+		}
+
+		void m_tsmiOK_Click( object sender, EventArgs e )
+		{
+			PlaceOK?.Invoke( m_TransformParamForm.TrsfPart, m_TransformParamForm.TrsfG54 );
 		}
 	}
 }

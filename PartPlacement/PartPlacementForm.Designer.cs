@@ -48,7 +48,7 @@
 			// 
 			this.m_tsmiSetting.Name = "m_tsmiSetting";
 			this.m_tsmiSetting.Size = new System.Drawing.Size(43, 20);
-			this.m_tsmiSetting.Text = "設置";
+			this.m_tsmiSetting.Text = "放置";
 			this.m_tsmiSetting.Click += new System.EventHandler(this.m_tsmiSetting_Click);
 			// 
 			// m_tsmiOK
@@ -56,6 +56,7 @@
 			this.m_tsmiOK.Name = "m_tsmiOK";
 			this.m_tsmiOK.Size = new System.Drawing.Size(36, 20);
 			this.m_tsmiOK.Text = "OK";
+			this.m_tsmiOK.Click += new System.EventHandler(this.m_tsmiOK_Click);
 			// 
 			// PartPlacementForm
 			// 
