@@ -1,4 +1,5 @@
-﻿using OCC.BRepBuilderAPI;
+﻿using OCC.BRep;
+using OCC.BRepBuilderAPI;
 using OCC.BRepGProp;
 using OCC.gp;
 using OCC.GProp;
@@ -27,6 +28,18 @@ namespace OCCTool
 			BRepGProp.SurfaceProperties( face, ref props );
 			gp_Pnt center = props.CentreOfMass();
 			return center;
+		}
+
+		public static TopoDS_Shape MakeCompound( List<TopoDS_Shape> shapeList )
+		{
+			TopoDS_Compound compound = new TopoDS_Compound();
+			TopoDS_Shape compoundShape = compound;
+			BRep_Builder builder = new BRep_Builder();
+			builder.MakeCompound( ref compound );
+			foreach( TopoDS_Shape shape in shapeList ) {
+				builder.Add( ref compoundShape, shape );
+			}
+			return compound;
 		}
 	}
 }
