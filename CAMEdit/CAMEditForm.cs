@@ -25,6 +25,7 @@ namespace CAMEdit
 			}
 			Controls.Add( m_panViewer );
 			m_panViewer.Dock = DockStyle.Fill;
+			m_OCCViewer.UpdateView();
 
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;

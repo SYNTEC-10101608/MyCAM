@@ -36,6 +36,7 @@ namespace ImportModel
 			}
 			Controls.Add( m_panViewer );
 			m_panViewer.Dock = DockStyle.Fill;
+			m_OCCViewer.UpdateView();
 
 			// menu items
 			m_tsmiOK.Enabled = false;
@@ -48,7 +49,6 @@ namespace ImportModel
 		// import model
 		TopoDS_Shape m_ModelShape = null;
 
-		// import model
 		void m_tsmiImportBRep_Click( object sender, EventArgs e )
 		{
 			ImportModel( ModelFormat.BREP );
@@ -62,6 +62,11 @@ namespace ImportModel
 		void m_tsmiImportIges_Click( object sender, EventArgs e )
 		{
 			ImportModel( ModelFormat.IGES );
+		}
+
+		void m_tsmiOK_Click( object sender, EventArgs e )
+		{
+			ImportOK?.Invoke( m_ModelShape );
 		}
 
 		void ImportModel( ModelFormat format )
@@ -156,11 +161,6 @@ namespace ImportModel
 			m_OCCViewer.GetAISContext().Display( aisShape, true );
 			m_OCCViewer.AxoView();
 			m_OCCViewer.ZoomAllView();
-		}
-
-		void m_tsmiOK_Click( object sender, EventArgs e )
-		{
-			ImportOK?.Invoke( m_ModelShape );
 		}
 	}
 }

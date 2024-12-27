@@ -1,5 +1,6 @@
 ﻿using OCC.AIS;
 using OCC.Graphic3d;
+using OCC.Prs3d;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCViewer;
@@ -11,7 +12,7 @@ namespace ExtractPattern
 {
 	public partial class ExtractPatternForm : Form
 	{
-		public Action<TopoDS_Shape, List<TopoDS_Face>> ExtractOK = null;
+		public Action<TopoDS_Shape, List<TopoDS_Face>> ExtractOK;
 
 		public ExtractPatternForm( TopoDS_Shape modelShape )
 		{
@@ -25,6 +26,14 @@ namespace ExtractPattern
 			}
 			Controls.Add( m_panViewer );
 			m_panViewer.Dock = DockStyle.Fill;
+			m_OCCViewer.UpdateView();
+
+			// set AIS selction style
+			Prs3d_Drawer d = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected );
+			d.SetColor( new OCC.Quantity.Quantity_Color( OCC.Quantity.Quantity_NameOfColor.Quantity_NOC_RED ) );
+			d.SetTransparency( 0.5f );
+			d.SetDisplayMode( 1 );
+			m_OCCViewer.GetAISContext().SetHighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected, d );
 
 			// set model
 			if( modelShape == null ) {
@@ -37,9 +46,8 @@ namespace ExtractPattern
 			m_panViewer.MouseDown += ViewerMouseDown;
 			m_panViewer.PreviewKeyDown += ViewerKeyDown;
 
-			// start face selection mode
-			m_OCCViewer.GetAISContext().Activate( 4 /*face mode*/ );
-			m_panViewer.Focus();
+			// TODO: panel key down does not work
+			PreviewKeyDown += ViewerKeyDown;
 		}
 
 		// viewer
@@ -62,6 +70,9 @@ namespace ExtractPattern
 			m_OCCViewer.GetAISContext().Display( aisShape, true );
 			m_OCCViewer.AxoView();
 			m_OCCViewer.ZoomAllView();
+
+			// start face selection mode
+			m_OCCViewer.GetAISContext().Activate( 4 /*face mode*/ );
 		}
 
 		// extract face
@@ -101,6 +112,8 @@ namespace ExtractPattern
 		void ViewerKeyDown( object sender, PreviewKeyDownEventArgs e )
 		{
 			if( e.KeyCode == Keys.Escape ) {
+
+				// clear the selected face
 				m_OCCViewer.GetAISContext().ClearSelected( true );
 			}
 		}
