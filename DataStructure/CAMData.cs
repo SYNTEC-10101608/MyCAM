@@ -62,6 +62,9 @@ namespace DataStructure
 			CAMPointList = new List<CAMPoint>();
 			TopExp_Explorer edgeExp = new TopExp_Explorer( CADData.Contour, TopAbs_ShapeEnum.TopAbs_EDGE );
 
+			// TEST: for checking if the point is the same as the last point
+			gp_Pnt lastPoint = new gp_Pnt();
+
 			// go through the contour edges
 			while( edgeExp.More() ) {
 				TopoDS_Shape edge = edgeExp.Current();
@@ -86,14 +89,33 @@ namespace DataStructure
 
 				// break the edge into segment points by interval
 				const double dSegmentLength = 2.5;
-				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, true, false, out List<gp_Pnt> pointList );
+				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, true, true, out List<gp_Pnt> pointList );
+
+				// TEST: get the first point
+				if( CAMPointList.Count == 0 ) {
+					lastPoint = pointList[ pointList.Count - 1 ];
+				}
 
 				// get tool vector for each point
 				foreach( gp_Pnt point in pointList ) {
 					gp_Dir normalVec = VectorTool.GetFaceNormalVec( solidFace, point );
 					gp_Dir tangentVec = VectorTool.GetEdgeTangentVec( TopoDS.ToEdge( edge ), point );
 					gp_Dir toolVec = normalVec.Crossed( tangentVec );
+
+					// check if the point is the same as the last point
+					gp_Vec disToLast = new gp_Vec( point.XYZ() - lastPoint.XYZ() );
+					if( CAMPointList.Count > 0 && disToLast.Magnitude() < 0.001 ) {
+
+						// using the average vectors
+						normalVec = new gp_Dir( ( normalVec.XYZ() + CAMPointList[ CAMPointList.Count - 1 ].NormalVec.XYZ() ) / 2 );
+						tangentVec = new gp_Dir( ( tangentVec.XYZ() + CAMPointList[ CAMPointList.Count - 1 ].TangentVec.XYZ() ) / 2 );
+						toolVec = new gp_Dir( ( toolVec.XYZ() + CAMPointList[ CAMPointList.Count - 1 ].ToolVec.XYZ() ) / 2 );
+
+						// remove the last point
+						CAMPointList.RemoveAt( CAMPointList.Count - 1 );
+					}
 					CAMPointList.Add( new CAMPoint( point, toolVec, normalVec, tangentVec ) );
+					lastPoint = point;
 				}
 			}
 
