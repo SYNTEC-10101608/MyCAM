@@ -92,7 +92,7 @@ namespace DataStructure
 				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by interval
-				const double dSegmentLength = 0.2;
+				const double dSegmentLength = 1;
 				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, true, true, out List<gp_Pnt> pointList );
 
 				// get tool vector for each point
@@ -123,18 +123,17 @@ namespace DataStructure
 				gp_Pnt p2 = CAMPointList[ ( i + 1 ) % CAMPointList.Count ].Point;
 
 				// if p1 is equal to p2, skip
-				if( p1.IsEqual( p2, 0.001 ) ) {
+				if( p1.IsEqual( p2, 1e-6 ) ) { // TODO: tolerance
 					continue;
 				}
 
 				// calculate average normal vector
 				gp_Dir p1Normal = CAMPointList[ i ].NormalVec;
 				gp_Dir p2Normal = CAMPointList[ ( i + 1 ) % CAMPointList.Count ].NormalVec;
-				gp_Dir normal = new gp_Dir( ( p1Normal.XYZ() + p2Normal.XYZ() ) / 2 );
 
 				// offset the point by normal vector
-				gp_Pnt p1Offset = new gp_Pnt( p1.XYZ() + normal.XYZ() * dOffset );
-				gp_Pnt p2Offset = new gp_Pnt( p2.XYZ() + normal.XYZ() * dOffset );
+				gp_Pnt p1Offset = new gp_Pnt( p1.XYZ() + p1Normal.XYZ() * dOffset );
+				gp_Pnt p2Offset = new gp_Pnt( p2.XYZ() + p2Normal.XYZ() * dOffset );
 				CAMPoint p1CAMOffset = new CAMPoint( p1Offset, CAMPointList[ i ].ToolVec, CAMPointList[ i ].NormalVec, CAMPointList[ i ].TangentVec );
 				CAMPoint p2CAMOffset = new CAMPoint( p2Offset,
 					CAMPointList[ ( i + 1 ) % CAMPointList.Count ].ToolVec,
@@ -146,10 +145,6 @@ namespace DataStructure
 					OffsetPoint = new Tuple<CAMPoint, CAMPoint>( p1CAMOffset, p2CAMOffset )
 				} );
 			}
-			//CAMPointList = new List<CAMPoint>();
-			//for( int i = 0; i < offsetLines.Count; i++ ) {
-			//	CAMPointList.Add( offsetLines[ i ].Item1 );
-			//}
 
 			// clip the offset lines
 			bool bNeedClip = true;
@@ -169,22 +164,11 @@ namespace DataStructure
 					gp_Pnt p2 = new gp_Pnt( ( line2.Item1.Point.XYZ() + line2.Item2.Point.XYZ() ) / 2 );
 					gp_Pnt offsetP2 = new gp_Pnt( ( offsetLine2.Item1.Point.XYZ() + offsetLine2.Item2.Point.XYZ() ) / 2 );
 					FindIntersectPoint( p1, offsetP1, p2, offsetP2, out IntersectType typeV1, out IntersectType typeV2 );
-					if( ( typeV1 != IntersectType.Extend && typeV1 != IntersectType.NoIntersect )
-						|| ( typeV2 != IntersectType.ReverseExtend && typeV2 != IntersectType.NoIntersect ) ) {
-						lineRecordList.Remove( lineRecord1 );
-						lineRecordList.Remove( lineRecord2 );
-						bNeedClip = true;
-						break;
-					}
-
-					// find the intersect point
-					FindIntersectPoint( offsetLine1.Item1.Point, offsetLine1.Item2.Point, offsetLine2.Item1.Point, offsetLine2.Item2.Point,
-						out IntersectType TypeL1, out IntersectType TypeL2 );
-					if( TypeL2 == IntersectType.ReverseExtend ) {
+					if( typeV1 == IntersectType.Inbetween ) {
 						lineRecordList.Remove( lineRecord2 );
 						bNeedClip = true;
 					}
-					if( TypeL1 == IntersectType.ReverseExtend ) {
+					if( typeV2 == IntersectType.Inbetween ) {
 						lineRecordList.Remove( lineRecord1 );
 						bNeedClip = true;
 					}
@@ -199,10 +183,11 @@ namespace DataStructure
 			for( int i = 0; i < lineRecordList.Count; i++ ) {
 				int indexL1 = i;
 				int indexL2 = ( i + 1 ) % lineRecordList.Count;
-				gp_Pnt intersectPoint = FindIntersectPoint( lineRecordList[ indexL1 ].OffsetPoint.Item1.Point,
+				gp_Pnt intersectPoint = FindIntersectPoint(
+					lineRecordList[ indexL1 ].OffsetPoint.Item1.Point,
 					lineRecordList[ indexL1 ].OffsetPoint.Item2.Point,
-					lineRecordList[ indexL2 ].OffsetPoint.Item1.Point,
 					lineRecordList[ indexL2 ].OffsetPoint.Item2.Point,
+					lineRecordList[ indexL2 ].OffsetPoint.Item1.Point,
 					out _, out _ );
 
 				// get average tagent, normal and tool vector
@@ -236,7 +221,7 @@ namespace DataStructure
 
 			// Denominator for solving t and s
 			double denominator = a * c - b * b;
-			if( Math.Abs( denominator ) < 0.001 ) {
+			if( Math.Abs( denominator ) < 1e-6 ) { //TODO: tolerance
 				TypeL1 = IntersectType.NoIntersect;
 				TypeL2 = IntersectType.NoIntersect;
 				return new gp_Pnt( ( p2.XYZ() + p3.XYZ() ) / 2 );
@@ -251,20 +236,20 @@ namespace DataStructure
 
 			// Compute the midpoint of the shortest segment
 			gp_Pnt midpoint = new gp_Pnt( ( closestPointOnLine1.XYZ() + closestPointOnLine2.XYZ() ) / 2 );
-			if( t < 0 ) {
+			if( t <= 0 ) {
 				TypeL1 = IntersectType.ReverseExtend;
 			}
-			else if( t > 1 ) {
+			else if( t >= 1 ) {
 				TypeL1 = IntersectType.Extend;
 			}
 			else {
 				TypeL1 = IntersectType.Inbetween;
 			}
-			if( s < 0 ) {
-				TypeL2 = IntersectType.Extend;
-			}
-			else if( s > 1 ) {
+			if( s <= 0 ) {
 				TypeL2 = IntersectType.ReverseExtend;
+			}
+			else if( s >= 1 ) {
+				TypeL2 = IntersectType.Extend;
 			}
 			else {
 				TypeL2 = IntersectType.Inbetween;

@@ -83,23 +83,23 @@ namespace CAMEdit
 			m_OCCViewer.GetAISContext().Deactivate( modelAIS );
 
 			// display tool vectors
-			//foreach( CAMPoint camPoint in camPointList ) {
-			//	gp_Pnt point = camPoint.Point;
-			//	gp_Dir toolVec = camPoint.ToolVec;
-			//	gp_Pnt endPoint = new gp_Pnt( point.XYZ() + toolVec.XYZ() * 0.5 );
-			//	BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
-			//	AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
-			//	lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
-			//	lineAIS.SetWidth( 2 );
-			//	m_OCCViewer.GetAISContext().Display( lineAIS, false );
-			//	m_OCCViewer.GetAISContext().Deactivate( lineAIS );
-			//}
+			foreach( CAMPoint camPoint in camPointList ) {
+				gp_Pnt point = camPoint.Point;
+				gp_Dir toolVec = camPoint.ToolVec;
+				gp_Pnt endPoint = new gp_Pnt( point.XYZ() + toolVec.XYZ() * 0.5 );
+				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
+				AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
+				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+				lineAIS.SetWidth( 2 );
+				m_OCCViewer.GetAISContext().Display( lineAIS, false );
+				m_OCCViewer.GetAISContext().Deactivate( lineAIS );
+			}
 
 			// display tangent vectors
 			foreach( CAMPoint camPoint in camPointList ) {
 				gp_Pnt point = camPoint.Point;
 				gp_Dir tangentVec = camPoint.TangentVec;
-				gp_Pnt endPoint = new gp_Pnt( point.XYZ() + tangentVec.XYZ() * 0.1 );
+				gp_Pnt endPoint = new gp_Pnt( point.XYZ() + tangentVec.XYZ() * 0.5 );
 				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
 				AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
 				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
@@ -112,7 +112,7 @@ namespace CAMEdit
 			foreach( CAMPoint camPoint in camPointList ) {
 				gp_Pnt point = camPoint.Point;
 				gp_Dir normalVec = camPoint.NormalVec;
-				gp_Pnt endPoint = new gp_Pnt( point.XYZ() + normalVec.XYZ() * 0.1 );
+				gp_Pnt endPoint = new gp_Pnt( point.XYZ() + normalVec.XYZ() * 0.5 );
 				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
 				AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
 				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );

@@ -25,7 +25,7 @@ namespace OCCTool
 			proj.LowerDistanceParameters( ref u, ref v );
 
 			// get normal vector
-			GeomLProp_SLProps props = new GeomLProp_SLProps( surface, u, v, 1, 0.01 );
+			GeomLProp_SLProps props = new GeomLProp_SLProps( surface, u, v, 1, 0.001 );
 			if( !props.IsNormalDefined() ) {
 				return new gp_Dir();
 			}
@@ -50,7 +50,7 @@ namespace OCCTool
 			double u = proj.LowerDistanceParameter();
 
 			// get tangent vector
-			GeomLProp_CLProps props = new GeomLProp_CLProps( curve, u, 1, 0.01 );
+			GeomLProp_CLProps props = new GeomLProp_CLProps( curve, u, 1, 0.001 );
 			if( !props.IsTangentDefined() ) {
 				return new gp_Dir();
 			}
