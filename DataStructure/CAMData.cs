@@ -92,7 +92,7 @@ namespace DataStructure
 				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by interval
-				const double dSegmentLength = 0.1;
+				const double dSegmentLength = 5;
 				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, true, true, out List<gp_Pnt> pointList );
 
 				// get tool vector for each point
@@ -105,7 +105,7 @@ namespace DataStructure
 			}
 
 			// TEST: offset
-			//Offset();
+			Offset();
 		}
 
 		void Offset()
@@ -113,7 +113,6 @@ namespace DataStructure
 			if( CAMPointList.Count == 0 ) {
 				return;
 			}
-
 			const double dOffset = 3;
 
 			// get line by points and offset the line
@@ -146,11 +145,12 @@ namespace DataStructure
 				} );
 			}
 
-			// clip the offset lines
+			// clip the offset lines and get the intersect points
+			CAMPointList = new List<CAMPoint>();
 			for( int i = 0; i < lineRecordList.Count + 1; i++ ) {
-				IntersectType typeV1 = IntersectType.Inbetween;
-				IntersectType typeV2 = IntersectType.Inbetween;
-				while( typeV1 == IntersectType.Inbetween || typeV2 == IntersectType.Inbetween ) {
+				bool bClip = true;
+				while( bClip ) {
+					bClip = false;
 					bool wraped = false;
 					if( i == lineRecordList.Count - 1 ) {
 						wraped = true;
@@ -169,8 +169,9 @@ namespace DataStructure
 					gp_Pnt offsetP2 = new gp_Pnt( ( offsetLine2.Item1.Point.XYZ() + offsetLine2.Item2.Point.XYZ() ) / 2 );
 
 					// check if the offset vector is intersect
-					FindIntersectPoint( p1, offsetP1, p2, offsetP2, out typeV1, out typeV2 );
+					FindIntersectPoint( p1, offsetP1, p2, offsetP2, out IntersectType typeV1, out IntersectType typeV2 );
 					if( typeV1 == IntersectType.Inbetween ) {
+						bClip = true;
 						lineRecordList.Remove( lineRecord2 );
 
 						// if the removed index is wraped, the index should be decreased
@@ -179,6 +180,7 @@ namespace DataStructure
 						}
 					}
 					if( typeV2 == IntersectType.Inbetween ) {
+						bClip = true;
 						lineRecordList.Remove( lineRecord1 );
 						i--;
 
@@ -187,27 +189,66 @@ namespace DataStructure
 							i--;
 						}
 					}
+					if(bClip ) {
+						continue;
+					}
+
+					// find the intersect point of the offset lines
+					gp_Pnt intersectPoint = FindIntersectPoint(
+						offsetLine1.Item1.Point,
+						offsetLine1.Item2.Point,
+						offsetLine2.Item2.Point,
+						offsetLine2.Item1.Point,
+						out IntersectType typeL1, out IntersectType typeL2 );
+					if( typeL1 == IntersectType.ReverseExtend ) {
+						bClip = true;
+						lineRecordList.Remove( lineRecord1 );
+
+						// if the removed index is wraped, the index should be decreased
+						if( wraped ) {
+							i--;
+						}
+					}
+					if( typeL2 == IntersectType.ReverseExtend ) {
+						bClip = true;
+						lineRecordList.Remove( lineRecord2 );
+						i--;
+
+						// if the removed index is wraped, the index should be decreased
+						if( wraped ) {
+							i--;
+						}
+					}
+					if( bClip ) {
+						continue;
+					}
+
+					// get average tagent, normal and tool vector
+					gp_Dir tangentVec = new gp_Dir( lineRecord1.OriPoint.Item2.TangentVec.XYZ() + lineRecord2.OriPoint.Item1.TangentVec.XYZ() );
+					gp_Dir normalVec = new gp_Dir( lineRecord1.OriPoint.Item2.NormalVec.XYZ() + lineRecord2.OriPoint.Item1.NormalVec.XYZ() );
+					gp_Dir toolVec = new gp_Dir( lineRecord1.OriPoint.Item2.ToolVec.XYZ() + lineRecord2.OriPoint.Item1.ToolVec.XYZ() );
+					CAMPointList.Add( new CAMPoint( intersectPoint, toolVec, normalVec, tangentVec ) );
 				}
 			}
 
 			// update the CAM point list
-			CAMPointList = new List<CAMPoint>();
-			for( int i = 0; i < lineRecordList.Count; i++ ) {
-				int indexL1 = i;
-				int indexL2 = ( i + 1 ) % lineRecordList.Count;
-				gp_Pnt intersectPoint = FindIntersectPoint(
-					lineRecordList[ indexL1 ].OffsetPoint.Item1.Point,
-					lineRecordList[ indexL1 ].OffsetPoint.Item2.Point,
-					lineRecordList[ indexL2 ].OffsetPoint.Item2.Point,
-					lineRecordList[ indexL2 ].OffsetPoint.Item1.Point,
-					out _, out _ );
+			//CAMPointList = new List<CAMPoint>();
+			//for( int i = 0; i < lineRecordList.Count; i++ ) {
+			//	int indexL1 = i;
+			//	int indexL2 = ( i + 1 ) % lineRecordList.Count;
+			//	gp_Pnt intersectPoint = FindIntersectPoint(
+			//		lineRecordList[ indexL1 ].OffsetPoint.Item1.Point,
+			//		lineRecordList[ indexL1 ].OffsetPoint.Item2.Point,
+			//		lineRecordList[ indexL2 ].OffsetPoint.Item2.Point,
+			//		lineRecordList[ indexL2 ].OffsetPoint.Item1.Point,
+			//		out _, out _ );
 
-				// get average tagent, normal and tool vector
-				gp_Dir tangentVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.TangentVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.TangentVec.XYZ() );
-				gp_Dir normalVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.NormalVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.NormalVec.XYZ() );
-				gp_Dir toolVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.ToolVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.ToolVec.XYZ() );
-				CAMPointList.Add( new CAMPoint( intersectPoint, toolVec, normalVec, tangentVec ) );
-			}
+			//	// get average tagent, normal and tool vector
+			//	gp_Dir tangentVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.TangentVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.TangentVec.XYZ() );
+			//	gp_Dir normalVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.NormalVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.NormalVec.XYZ() );
+			//	gp_Dir toolVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.ToolVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.ToolVec.XYZ() );
+			//	CAMPointList.Add( new CAMPoint( intersectPoint, toolVec, normalVec, tangentVec ) );
+			//}
 		}
 
 		enum IntersectType
