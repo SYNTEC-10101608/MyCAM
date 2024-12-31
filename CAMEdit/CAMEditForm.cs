@@ -4,6 +4,7 @@ using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Quantity;
+using OCC.TCollection;
 using OCC.TopoDS;
 using OCCViewer;
 using System.Collections.Generic;
@@ -50,18 +51,19 @@ namespace CAMEdit
 		// model
 		CAMEditModel m_Model;
 
+		enum EvecType
+		{
+			ToolVec,
+			TangentVec,
+			NormalVec,
+		}
+
 		// init
 		void ShowModel()
 		{
-			// get contour list
-			List<TopoDS_Wire> contourList = m_Model.CAMDataList.Select( x => x.CADData.Contour ).ToList();
-			if( contourList == null || contourList.Count == 0 ) {
-				return;
-			}
-
-			// get CAM point list
-			List<CAMPoint> camPointList = m_Model.CAMDataList.SelectMany( x => x.CAMPointList ).ToList();
-			if( camPointList == null || camPointList.Count == 0 ) {
+			// get cam data list
+			List<CAMData> camDataList = m_Model.CAMDataList;
+			if( camDataList == null || camDataList.Count == 0 ) {
 				return;
 			}
 
@@ -82,43 +84,37 @@ namespace CAMEdit
 			m_OCCViewer.GetAISContext().Display( modelAIS, false );
 			m_OCCViewer.GetAISContext().Deactivate( modelAIS );
 
-			// display tool vectors
-			foreach( CAMPoint camPoint in camPointList ) {
-				gp_Pnt point = camPoint.Point;
-				gp_Dir toolVec = camPoint.ToolVec;
-				gp_Pnt endPoint = new gp_Pnt( point.XYZ() + toolVec.XYZ() * 0.5 );
-				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
-				AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
-				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
-				lineAIS.SetWidth( 2 );
-				m_OCCViewer.GetAISContext().Display( lineAIS, false );
-				m_OCCViewer.GetAISContext().Deactivate( lineAIS );
-			}
+			// display cam data
+			for( int i = 0; i < camDataList.Count; i++ ) {
 
-			// display tangent vectors
-			foreach( CAMPoint camPoint in camPointList ) {
-				gp_Pnt point = camPoint.Point;
-				gp_Dir tangentVec = camPoint.TangentVec;
-				gp_Pnt endPoint = new gp_Pnt( point.XYZ() + tangentVec.XYZ() * 0.5 );
-				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
-				AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
-				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-				lineAIS.SetWidth( 2 );
-				m_OCCViewer.GetAISContext().Display( lineAIS, false );
-				m_OCCViewer.GetAISContext().Deactivate( lineAIS );
-			}
+				// display vectors
+				foreach( CAMPoint camPoint in camDataList[ i ].CAMPointList ) {
 
-			// display normal vectors
-			foreach( CAMPoint camPoint in camPointList ) {
-				gp_Pnt point = camPoint.Point;
-				gp_Dir normalVec = camPoint.NormalVec;
-				gp_Pnt endPoint = new gp_Pnt( point.XYZ() + normalVec.XYZ() * 0.5 );
-				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
-				AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
-				lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
-				lineAIS.SetWidth( 2 );
-				m_OCCViewer.GetAISContext().Display( lineAIS, false );
-				m_OCCViewer.GetAISContext().Deactivate( lineAIS );
+					// tool vector
+					AIS_Shape toolVecAIS = GetVecAIS( camPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
+					m_OCCViewer.GetAISContext().Display( toolVecAIS, false );
+					m_OCCViewer.GetAISContext().Deactivate( toolVecAIS );
+
+					// tangent vector
+					AIS_Shape tangentVecAIS = GetVecAIS( camPoint.Point, camPoint.TangentVec, EvecType.TangentVec );
+					m_OCCViewer.GetAISContext().Display( tangentVecAIS, false );
+					m_OCCViewer.GetAISContext().Deactivate( tangentVecAIS );
+
+					// normal vector
+					AIS_Shape normalVecAIS = GetVecAIS( camPoint.Point, camPoint.NormalVec, EvecType.NormalVec );
+					m_OCCViewer.GetAISContext().Display( normalVecAIS, false );
+					m_OCCViewer.GetAISContext().Deactivate( normalVecAIS );
+				}
+
+				// display index
+				gp_Pnt indexPoint = camDataList[ i ].CAMPointList.First().Point;
+				AIS_TextLabel indexText = new AIS_TextLabel();
+				indexText.SetText( new TCollection_ExtendedString( i.ToString() ) );
+				indexText.SetPosition( indexPoint );
+				indexText.SetHeight( 20 );
+				indexText.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+				m_OCCViewer.GetAISContext().Display( indexText, false );
+				m_OCCViewer.GetAISContext().Deactivate( indexText );
 			}
 
 			// display the contours
@@ -132,6 +128,26 @@ namespace CAMEdit
 			m_OCCViewer.AxoView();
 			m_OCCViewer.ZoomAllView();
 			m_OCCViewer.UpdateView();
+		}
+
+		AIS_Shape GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
+		{
+			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 0.5 );
+			BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
+			AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
+			switch( vecType ) {
+				case EvecType.ToolVec:
+					lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+					break;
+				case EvecType.TangentVec:
+					lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+					break;
+				case EvecType.NormalVec:
+					lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+					break;
+			}
+			lineAIS.SetWidth( 2 );
+			return lineAIS;
 		}
 
 		// viewer action
