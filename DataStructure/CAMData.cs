@@ -92,7 +92,7 @@ namespace DataStructure
 				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by interval
-				const double dSegmentLength = 1;
+				const double dSegmentLength = 0.1;
 				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, true, true, out List<gp_Pnt> pointList );
 
 				// get tool vector for each point
@@ -105,7 +105,7 @@ namespace DataStructure
 			}
 
 			// TEST: offset
-			Offset();
+			//Offset();
 		}
 
 		void Offset()
@@ -116,7 +116,7 @@ namespace DataStructure
 
 			const double dOffset = 3;
 
-			// offset each point
+			// get line by points and offset the line
 			List<LineRecord> lineRecordList = new List<LineRecord>();
 			for( int i = 0; i < CAMPointList.Count; i++ ) {
 				gp_Pnt p1 = CAMPointList[ i ].Point;
@@ -147,12 +147,16 @@ namespace DataStructure
 			}
 
 			// clip the offset lines
-			bool bNeedClip = true;
-			while( bNeedClip ) {
-				bNeedClip = false;
-				for( int i = 0; i < lineRecordList.Count; i++ ) {
-					LineRecord lineRecord1 = lineRecordList[ i ];
-					LineRecord lineRecord2 = lineRecordList[ ( i + 1 ) % lineRecordList.Count ];
+			for( int i = 0; i < lineRecordList.Count + 1; i++ ) {
+				IntersectType typeV1 = IntersectType.Inbetween;
+				IntersectType typeV2 = IntersectType.Inbetween;
+				while( typeV1 == IntersectType.Inbetween || typeV2 == IntersectType.Inbetween ) {
+					bool wraped = false;
+					if( i == lineRecordList.Count - 1 ) {
+						wraped = true;
+					}
+					LineRecord lineRecord1 = lineRecordList[ ( i + lineRecordList.Count ) % lineRecordList.Count ];
+					LineRecord lineRecord2 = lineRecordList[ ( i + 1 + lineRecordList.Count ) % lineRecordList.Count ];
 					Tuple<CAMPoint, CAMPoint> line1 = lineRecord1.OriPoint;
 					Tuple<CAMPoint, CAMPoint> line2 = lineRecord2.OriPoint;
 					Tuple<CAMPoint, CAMPoint> offsetLine1 = lineRecord1.OffsetPoint;
@@ -163,17 +167,25 @@ namespace DataStructure
 					gp_Pnt offsetP1 = new gp_Pnt( ( offsetLine1.Item1.Point.XYZ() + offsetLine1.Item2.Point.XYZ() ) / 2 );
 					gp_Pnt p2 = new gp_Pnt( ( line2.Item1.Point.XYZ() + line2.Item2.Point.XYZ() ) / 2 );
 					gp_Pnt offsetP2 = new gp_Pnt( ( offsetLine2.Item1.Point.XYZ() + offsetLine2.Item2.Point.XYZ() ) / 2 );
-					FindIntersectPoint( p1, offsetP1, p2, offsetP2, out IntersectType typeV1, out IntersectType typeV2 );
+
+					// check if the offset vector is intersect
+					FindIntersectPoint( p1, offsetP1, p2, offsetP2, out typeV1, out typeV2 );
 					if( typeV1 == IntersectType.Inbetween ) {
 						lineRecordList.Remove( lineRecord2 );
-						bNeedClip = true;
+
+						// if the removed index is wraped, the index should be decreased
+						if( wraped ) {
+							i--;
+						}
 					}
 					if( typeV2 == IntersectType.Inbetween ) {
 						lineRecordList.Remove( lineRecord1 );
-						bNeedClip = true;
-					}
-					if( bNeedClip ) {
-						break;
+						i--;
+
+						// if the removed index is wraped, the index should be decreased
+						if( wraped ) {
+							i--;
+						}
 					}
 				}
 			}
