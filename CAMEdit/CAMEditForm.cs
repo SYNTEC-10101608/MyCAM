@@ -132,7 +132,7 @@ namespace CAMEdit
 
 		AIS_Shape GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
 		{
-			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 0.5 );
+			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 0.05 );
 			BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
 			AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
 			switch( vecType ) {
