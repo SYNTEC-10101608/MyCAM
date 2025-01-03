@@ -154,7 +154,7 @@ namespace ImportModel
 			AIS_Shape aisShape = new AIS_Shape( m_ModelShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			aisShape.SetMaterial( aspect );
-			aisShape.SetDisplayMode( 1 );
+			aisShape.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
 
 			// display the shape
 			m_OCCViewer.GetAISContext().RemoveAll( false );

@@ -6,6 +6,7 @@ using OCC.Graphic3d;
 using OCC.Quantity;
 using OCC.TCollection;
 using OCC.TopoDS;
+using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace CAMEdit
 {
 	public partial class CAMEditForm : Form
 	{
-		public Action<TopoDS_Shape, List<CuttingProcessData>> CADEditOK;
+		public Action<TopoDS_Shape, List<IProcessData>> CADEditOK;
 
 		public CAMEditForm()
 		{
@@ -83,7 +84,7 @@ namespace CAMEdit
 			AIS_Shape modelAIS = new AIS_Shape( modelShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			modelAIS.SetMaterial( aspect );
-			modelAIS.SetDisplayMode( 1 );
+			modelAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
 			m_OCCViewer.GetAISContext().Display( modelAIS, false );
 			m_OCCViewer.GetAISContext().Deactivate( modelAIS );
 
@@ -116,6 +117,7 @@ namespace CAMEdit
 				indexText.SetPosition( indexPoint );
 				indexText.SetHeight( 20 );
 				indexText.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+				indexText.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
 				m_OCCViewer.GetAISContext().Display( indexText, false );
 				m_OCCViewer.GetAISContext().Deactivate( indexText );
 			}
@@ -164,8 +166,8 @@ namespace CAMEdit
 
 		void m_btnOK_Click( object sender, EventArgs e )
 		{
-			List<CuttingProcessData> cuttingProcessDataList =
-				m_Model.CAMDataList.Select( camData => new CuttingProcessData( camData ) ).ToList();
+			List<IProcessData> cuttingProcessDataList =
+				m_Model.CAMDataList.Select( camData => new CuttingProcessData( camData ) ).Cast<IProcessData>().ToList();
 			CADEditOK?.Invoke( m_Model.ModelShape, cuttingProcessDataList );
 		}
 	}

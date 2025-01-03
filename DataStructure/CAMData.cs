@@ -105,7 +105,7 @@ namespace DataStructure
 			}
 
 			// TEST: offset
-			Offset();
+			//Offset();
 		}
 
 		void Offset()

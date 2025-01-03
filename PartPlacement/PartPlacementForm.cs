@@ -6,6 +6,7 @@ using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Quantity;
 using OCC.TopoDS;
+using OCCTool;
 using OCCViewer;
 using System;
 using System.Windows.Forms;
@@ -58,7 +59,7 @@ namespace PartPlacement
 			gp_Pnt negPole = new gp_Pnt( -nSize / 2, -nSize / 2, -nSize / 2 );
 			BRepPrimAPI_MakeBox makeBox = new BRepPrimAPI_MakeBox( negPole, nSize, nSize, nSize );
 			AIS_Shape machineFrameAIS = new AIS_Shape( makeBox.Shape() );
-			machineFrameAIS.SetDisplayMode( 0 );
+			machineFrameAIS.SetDisplayMode( (int)AISDisplayMode.AIS_WireFrame );
 
 			// make a cone for cutter
 			BRepPrimAPI_MakeCone makeCone = new BRepPrimAPI_MakeCone( 0, 10, 50 );
@@ -66,7 +67,7 @@ namespace PartPlacement
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			cutterAIS.SetMaterial( aspect );
 			cutterAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-			cutterAIS.SetDisplayMode( 1 );
+			cutterAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
 
 			//m_OCCViewer.GetAISContext().Display( machineFrameAIS, false );
 			m_OCCViewer.GetAISContext().Display( cutterAIS, false );
@@ -87,7 +88,7 @@ namespace PartPlacement
 			AIS_Shape aisShape = new AIS_Shape( partTransform.Shape() );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			aisShape.SetMaterial( aspect );
-			aisShape.SetDisplayMode( 1 );
+			aisShape.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
 
 			// make G54 coordinate
 			gp_Ax2 G54 = new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );

@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConstantDefine.cs" />
     <Compile Include="GeometryTool.cs" />
     <Compile Include="SegmentTool.cs" />
     <Compile Include="ShapeTool.cs" />
