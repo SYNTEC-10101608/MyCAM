@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="CADData.cs" />
     <Compile Include="CAMData.cs" />
+    <Compile Include="IProcessData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

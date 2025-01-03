@@ -5,6 +5,7 @@ using ImportModel;
 using OCC.gp;
 using OCC.TopoDS;
 using PartPlacement;
+using ProcessEdit;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -50,7 +51,16 @@ namespace MyCAM
 		{
 			CAMEditForm f = new CAMEditForm();
 			CAMEditModel camEditModel = new CAMEditModel( modelShape, cadDataList );
+			f.CADEditOK += CAMEditOK;
 			f.Init( camEditModel );
+			ShowChild( f );
+		}
+
+		void CAMEditOK( TopoDS_Shape shape, List<CuttingProcessData> processDataList )
+		{
+			ProcessEditForm f = new ProcessEditForm();
+			ProcessEditModel processEditModel = new ProcessEditModel( shape, processDataList );
+			f.Init( processEditModel );
 			ShowChild( f );
 		}
 

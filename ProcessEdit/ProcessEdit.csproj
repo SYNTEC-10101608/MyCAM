@@ -52,6 +52,7 @@
     <Compile Include="ProcessEditForm.Designer.cs">
       <DependentUpon>ProcessEditForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ProcessEditModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

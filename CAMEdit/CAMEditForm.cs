@@ -7,6 +7,7 @@ using OCC.Quantity;
 using OCC.TCollection;
 using OCC.TopoDS;
 using OCCViewer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -15,6 +16,8 @@ namespace CAMEdit
 {
 	public partial class CAMEditForm : Form
 	{
+		public Action<TopoDS_Shape, List<CuttingProcessData>> CADEditOK;
+
 		public CAMEditForm()
 		{
 			InitializeComponent();
@@ -132,7 +135,7 @@ namespace CAMEdit
 
 		AIS_Shape GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
 		{
-			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 0.05 );
+			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 0.2 );
 			BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
 			AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
 			switch( vecType ) {
@@ -157,6 +160,13 @@ namespace CAMEdit
 
 		void ViewerMouseDown( object sender, MouseEventArgs e )
 		{
+		}
+
+		void m_btnOK_Click( object sender, EventArgs e )
+		{
+			List<CuttingProcessData> cuttingProcessDataList =
+				m_Model.CAMDataList.Select( camData => new CuttingProcessData( camData ) ).ToList();
+			CADEditOK?.Invoke( m_Model.ModelShape, cuttingProcessDataList );
 		}
 	}
 }
