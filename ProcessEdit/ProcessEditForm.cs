@@ -19,8 +19,6 @@ namespace ProcessEdit
 {
 	public partial class ProcessEditForm : Form
 	{
-		public Action<TopoDS_Shape, List<CADData>> ExtractOK;
-
 		public ProcessEditForm()
 		{
 			InitializeComponent();
@@ -34,14 +32,6 @@ namespace ProcessEdit
 			Controls.Add( m_panViewer );
 			m_panViewer.Dock = DockStyle.Fill;
 			m_OCCViewer.UpdateView();
-
-			// menu strip
-			m_msOrder.Visible = false;
-
-			// set AIS selction style
-			Prs3d_Drawer d = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected );
-			d.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-			d.SetDisplayMode( (int)AISDisplayMode.AIS_WireFrame );
 
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
@@ -58,6 +48,11 @@ namespace ProcessEdit
 			}
 			m_Model = model;
 			ShowModel();
+
+			// create order form
+			m_OrderForm.Init( m_Model );
+			m_OrderForm.OrderDone += OrderDone;
+			m_OrderForm.OrderCancel += () => { actionMode = ActionMode.None; };
 			return true;
 		}
 
@@ -71,10 +66,10 @@ namespace ProcessEdit
 		// view context
 		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>();
 		List<AIS_Shape> m_TraverseList = new List<AIS_Shape>();
-		List<AIS_Shape> m_ContourList = new List<AIS_Shape>();
 
-		// order map
-		Dictionary<TopoDS_Wire, int> m_OrderMap = new Dictionary<TopoDS_Wire, int>();
+		// order
+		OrderForm m_OrderForm = new OrderForm();
+
 
 		// viewer action
 		enum ActionMode
@@ -132,14 +127,8 @@ namespace ProcessEdit
 				AIS_Shape contourAIS = new AIS_Shape( contour );
 				contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
 				contourAIS.SetWidth( 2 );
-				m_ContourList.Add( contourAIS );
-				m_OrderMap.Add( contour, i );
-			}
-
-			// display contour
-			foreach( AIS_Shape contour in m_ContourList ) {
-				m_OCCViewer.GetAISContext().Display( contour, false );
-				m_OCCViewer.GetAISContext().Deactivate( contour );
+				m_OCCViewer.GetAISContext().Display( contourAIS, false );
+				m_OCCViewer.GetAISContext().Deactivate( contourAIS );
 			}
 		}
 
@@ -244,65 +233,29 @@ namespace ProcessEdit
 
 		void m_tsmiTraverse_Click( object sender, EventArgs e )
 		{
-
 		}
 
-		void m_tsmiSiftUp_Click( object sender, EventArgs e )
+		void OrderDone()
 		{
-			// get selected contour
-			m_OCCViewer.GetAISContext().InitSelected();
-		}
-
-		void m_tsmiSiftDown_Click( object sender, EventArgs e )
-		{
-
+			ShowIndex();
+			ShowTraverseLine();
 		}
 
 		// viewer action
 		void ViewerMouseDown( object sender, MouseEventArgs e )
 		{
-			switch( m_ActionMode ) {
-				case ActionMode.Order:
-					if( e.Button == MouseButtons.Left ) {
-
-						// select the contour
-						m_OCCViewer.Select();
-					}
-					break;
-				default:
-					break;
-			}
 		}
 
 		void ViewerKeyDown( object sender, PreviewKeyDownEventArgs e )
 		{
-			switch( m_ActionMode ) {
-				case ActionMode.Order:
-					if( e.KeyCode == Keys.Escape ) {
-
-						// exit the order mode
-						actionMode = ActionMode.None;
-					}
-					break;
-				default:
-					break;
-			}
 		}
 
 		void OnEndAction()
 		{
 			switch( m_ActionMode ) {
 				case ActionMode.Order:
-					m_msOrder.Visible = false;
-					menuStrip1.Visible = true;
-
-					// deactive contour selection
-					foreach( AIS_Shape contour in m_ContourList ) {
-						m_OCCViewer.GetAISContext().Deactivate( contour );
-					}
-
-					// clear all selection
-					m_OCCViewer.GetAISContext().ClearSelected( true );
+					menuStrip1.Enabled = true;
+					m_OrderForm.Hide();
 					break;
 				default:
 					break;
@@ -313,13 +266,8 @@ namespace ProcessEdit
 		{
 			switch( m_ActionMode ) {
 				case ActionMode.Order:
-					m_msOrder.Visible = true;
-					menuStrip1.Visible = false;
-
-					// active contour selection
-					foreach( AIS_Shape contour in m_ContourList ) {
-						m_OCCViewer.GetAISContext().Activate( contour, (int)AISActiveMode.Wire );
-					}
+					menuStrip1.Enabled = false;
+					m_OrderForm.Show();
 					break;
 				default:
 					break;
