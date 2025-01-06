@@ -236,10 +236,16 @@ namespace ProcessEdit
 			foreach( AIS_InteractiveObject process in m_ProcessList ) {
 				process.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
 			}
+			foreach( AIS_TextLabel textLabel in m_IndexList ) {
+				textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			}
 
 			// highlight the selected
 			if( nIndex >= 0 && nIndex < m_ProcessList.Count ) {
 				m_ProcessList[ nIndex ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			}
+			if( nIndex >= 0 && nIndex < m_IndexList.Count ) {
+				m_IndexList[ nIndex ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			}
 			m_OCCViewer.UpdateView();
 		}
