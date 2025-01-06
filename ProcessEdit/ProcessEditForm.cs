@@ -30,13 +30,6 @@ namespace ProcessEdit
 			Controls.Add( m_panViewer );
 			m_panViewer.Dock = DockStyle.Fill;
 			m_OCCViewer.UpdateView();
-
-			// viewer action
-			m_panViewer.MouseDown += ViewerMouseDown;
-			m_panViewer.PreviewKeyDown += ViewerKeyDown;
-
-			// TODO: panel key down does not work
-			PreviewKeyDown += ViewerKeyDown;
 		}
 
 		public bool Init( ProcessEditModel model )
@@ -49,9 +42,9 @@ namespace ProcessEdit
 
 			// create order form
 			m_OrderForm.Init( m_Model );
-			m_OrderForm.OrderDone += OrderDone;
-			m_OrderForm.OrderCancel += () => { actionMode = ActionMode.None; };
-			m_OrderForm.TreeNodePick += TreeNodePick;
+			m_OrderForm.PropertyChanged += OnPropertyChanged;
+			m_OrderForm.ItemPick += OnItemPick;
+			m_OrderForm.Show();
 			return true;
 		}
 
@@ -63,35 +56,12 @@ namespace ProcessEdit
 		ProcessEditModel m_Model;
 
 		// view context
+		List<AIS_InteractiveObject> m_ProcessList = new List<AIS_InteractiveObject>();
 		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>();
 		List<AIS_Shape> m_TraverseList = new List<AIS_Shape>();
 
-		// GUI process map
-		Dictionary<IProcessData, AIS_InteractiveObject> m_ProcessMap = new Dictionary<IProcessData, AIS_InteractiveObject>();
-
 		// order
 		OrderForm m_OrderForm = new OrderForm();
-
-		// viewer action
-		enum ActionMode
-		{
-			None,
-			Order,
-		}
-		ActionMode m_ActionMode = ActionMode.None;
-		ActionMode actionMode
-		{
-			get
-			{
-				return m_ActionMode;
-			}
-			set
-			{
-				OnEndAction();
-				m_ActionMode = value;
-				OnStartAction();
-			}
-		}
 
 		void ShowModel()
 		{
@@ -119,6 +89,12 @@ namespace ProcessEdit
 
 		void ShowProcess()
 		{
+			// clear the previous process
+			foreach( AIS_InteractiveObject process in m_ProcessList ) {
+				m_OCCViewer.GetAISContext().Remove( process, false );
+			}
+			m_ProcessList.Clear();
+
 			foreach( IProcessData processData in m_Model.ProcessDataList ) {
 
 				// show path contour if it is cutting process
@@ -128,9 +104,7 @@ namespace ProcessEdit
 					contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
 					Prs3d_LineAspect aspect = contourAIS.Attributes().WireAspect();
 					aspect.SetWidth( 2 );
-					m_OCCViewer.GetAISContext().Display( contourAIS, false );
-					m_OCCViewer.GetAISContext().Deactivate( contourAIS );
-					m_ProcessMap.Add( processData, contourAIS );
+					m_ProcessList.Add( contourAIS );
 				}
 
 				// show "+" at traverse point if it is traverse process
@@ -139,14 +113,19 @@ namespace ProcessEdit
 					AIS_TextLabel textLabel = new AIS_TextLabel();
 					textLabel.SetText( new TCollection_ExtendedString( "+" ) );
 					textLabel.SetPosition( traverseData.Point_MCS );
-					textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+					textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
 					textLabel.SetHeight( 20 );
 					textLabel.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
-					m_OCCViewer.GetAISContext().Display( textLabel, false );
-					m_OCCViewer.GetAISContext().Deactivate( textLabel );
-					m_ProcessMap.Add( processData, textLabel );
+					m_ProcessList.Add( textLabel );
 				}
 			}
+
+			// display process
+			foreach( AIS_InteractiveObject process in m_ProcessList ) {
+				m_OCCViewer.GetAISContext().Display( process, false );
+				m_OCCViewer.GetAISContext().Deactivate( process );
+			}
+
 			m_OCCViewer.UpdateView();
 		}
 
@@ -164,8 +143,8 @@ namespace ProcessEdit
 				gp_Pnt location = GetKeyPoint( data, true );
 				string szIndex = string.Empty;
 				if( data.ProcessType == EProcessType.ProcessType_Cutting ) {
-					szIndex = nCurrentIndex.ToString();
 					nCurrentIndex++;
+					szIndex = nCurrentIndex.ToString();
 				}
 				else if( data.ProcessType == EProcessType.ProcessType_Traverse ) {
 					szIndex = nCurrentIndex.ToString() + ".5";
@@ -205,7 +184,7 @@ namespace ProcessEdit
 				AIS_Shape line = new AIS_Shape( makeEdge.Edge() );
 				line.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
 				Prs3d_LineAspect aspect = line.Attributes().WireAspect();
-				aspect.SetWidth( 2 );
+				aspect.SetWidth( 1 );
 				aspect.SetTypeOfLine( Aspect_TypeOfLine.Aspect_TOL_DASH );
 				aspect.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
 				m_TraverseList.Add( line );
@@ -244,68 +223,25 @@ namespace ProcessEdit
 		{
 		}
 
-		// order
-		void m_tsmiOrder_Click( object sender, EventArgs e )
+		void OnPropertyChanged()
 		{
-			actionMode = ActionMode.Order;
-		}
-
-		void OrderDone()
-		{
+			ShowProcess();
 			ShowIndex();
 			ShowTraverseLine();
 		}
 
-		void TreeNodePick( IProcessData data )
+		void OnItemPick( int nIndex )
 		{
 			// dehighlight the previous selected
-			foreach( AIS_InteractiveObject obj in m_ProcessMap.Values ) {
-				obj.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			foreach( AIS_InteractiveObject process in m_ProcessList ) {
+				process.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
 			}
 
 			// highlight the selected
-			if( m_ProcessMap.ContainsKey( data ) ) {
-				m_ProcessMap[ data ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			if( nIndex >= 0 && nIndex < m_ProcessList.Count ) {
+				m_ProcessList[ nIndex ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			}
 			m_OCCViewer.UpdateView();
-		}
-
-		// traverse
-		void m_tsmiTraverse_Click( object sender, EventArgs e )
-		{
-		}
-
-		// viewer action
-		void ViewerMouseDown( object sender, MouseEventArgs e )
-		{
-		}
-
-		void ViewerKeyDown( object sender, PreviewKeyDownEventArgs e )
-		{
-		}
-
-		void OnEndAction()
-		{
-			switch( m_ActionMode ) {
-				case ActionMode.Order:
-					menuStrip1.Enabled = true;
-					m_OrderForm.Hide();
-					break;
-				default:
-					break;
-			}
-		}
-
-		void OnStartAction()
-		{
-			switch( m_ActionMode ) {
-				case ActionMode.Order:
-					menuStrip1.Enabled = false;
-					m_OrderForm.Show();
-					break;
-				default:
-					break;
-			}
 		}
 	}
 }

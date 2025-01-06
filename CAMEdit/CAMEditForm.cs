@@ -113,7 +113,7 @@ namespace CAMEdit
 				// display index
 				gp_Pnt indexPoint = camDataList[ i ].CAMPointList.First().Point;
 				AIS_TextLabel indexText = new AIS_TextLabel();
-				indexText.SetText( new TCollection_ExtendedString( i.ToString() ) );
+				indexText.SetText( new TCollection_ExtendedString( ( i + 1 ).ToString() ) );
 				indexText.SetPosition( indexPoint );
 				indexText.SetHeight( 20 );
 				indexText.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
