@@ -17,6 +17,8 @@ namespace ProcessEdit
 {
 	public partial class ProcessEditForm : Form
 	{
+		public Action<List<IProcessData>> EditOK;
+
 		public ProcessEditForm()
 		{
 			InitializeComponent();
@@ -221,6 +223,7 @@ namespace ProcessEdit
 		// edit ok
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
+
 		}
 
 		void OnPropertyChanged()

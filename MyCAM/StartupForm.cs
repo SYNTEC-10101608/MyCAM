@@ -56,12 +56,18 @@ namespace MyCAM
 			ShowChild( f );
 		}
 
-		void CAMEditOK( TopoDS_Shape shape, List<IProcessData> processDataList )
+		void CAMEditOK( TopoDS_Shape modelShape, List<IProcessData> processDataList )
 		{
 			ProcessEditForm f = new ProcessEditForm();
-			ProcessEditModel processEditModel = new ProcessEditModel( shape, processDataList );
+			ProcessEditModel processEditModel = new ProcessEditModel( modelShape, processDataList );
+			f.EditOK += ProcessEditOK;
 			f.Init( processEditModel );
 			ShowChild( f );
+		}
+
+		void ProcessEditOK( List<IProcessData> list )
+		{
+
 		}
 
 		void ShowChild( Form formToShow )
