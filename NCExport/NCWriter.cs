@@ -62,8 +62,14 @@ namespace NCExport
 			gp_Dir ToolVec_MCS = ToolVec_G54.Transformed( m_PartTrsf );
 
 			// calculate the A and C angle
-			dA_MCS_deg = Math.Atan2( ToolVec_MCS.Y(), ToolVec_MCS.X() ) * 180 / Math.PI;
-			dC_MCS_deg = Math.Asin( ToolVec_MCS.Z() ) * 180 / Math.PI;
+			if( ToolVec_G54.X() < 1e-6 && ToolVec_G54.X() > -1e-6
+				|| ToolVec_G54.Y() < 1e-6 && ToolVec_G54.Y() > -1e-6 ) {
+				dA_MCS_deg = 0;
+			}
+			else {
+				dA_MCS_deg = Math.Atan2( ToolVec_MCS.Y(), ToolVec_MCS.X() ) * 180 / Math.PI;
+			}
+			dC_MCS_deg = 180 - Math.Asin( ToolVec_MCS.Z() ) * 180 / Math.PI;
 		}
 
 		void WriteTraverse( TraverseProcessData traverseProcessData )
