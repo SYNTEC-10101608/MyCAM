@@ -1,7 +1,7 @@
 ﻿using CAMEdit;
 using DataStructure;
 using ExtractPattern;
-using ImportModel;
+using Import;
 using OCC.gp;
 using OCC.TopoDS;
 using PartPlacement;
@@ -23,7 +23,7 @@ namespace MyCAM
 			IsMdiContainer = true;
 
 			// show the import form in dock fill
-			ImportModelForm f = new ImportModelForm();
+			ImportForm f = new ImportForm();
 			f.ImportOK += ImportOK;
 			ShowChild( f );
 		}

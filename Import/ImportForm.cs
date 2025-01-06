@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace ImportModel
+namespace Import
 {
 	public enum ModelFormat
 	{
@@ -20,11 +20,11 @@ namespace ImportModel
 		IGES = 2
 	}
 
-	public partial class ImportModelForm : Form
+	public partial class ImportForm : Form
 	{
 		public Action<TopoDS_Shape> ImportOK;
 
-		public ImportModelForm()
+		public ImportForm()
 		{
 			InitializeComponent();
 
@@ -51,17 +51,17 @@ namespace ImportModel
 
 		void m_tsmiImportBRep_Click( object sender, EventArgs e )
 		{
-			ImportModel( ModelFormat.BREP );
+			DoImport( ModelFormat.BREP );
 		}
 
 		void m_tsmiImportStep_Click( object sender, EventArgs e )
 		{
-			ImportModel( ModelFormat.STEP );
+			DoImport( ModelFormat.STEP );
 		}
 
 		void m_tsmiImportIges_Click( object sender, EventArgs e )
 		{
-			ImportModel( ModelFormat.IGES );
+			DoImport( ModelFormat.IGES );
 		}
 
 		void m_tsmiOK_Click( object sender, EventArgs e )
@@ -69,7 +69,7 @@ namespace ImportModel
 			ImportOK?.Invoke( m_ModelShape );
 		}
 
-		void ImportModel( ModelFormat format )
+		void DoImport( ModelFormat format )
 		{
 			OpenFileDialog openDialog = new OpenFileDialog();
 

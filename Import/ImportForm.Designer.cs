@@ -1,6 +1,6 @@
-﻿namespace ImportModel
+﻿namespace Import
 {
-	partial class ImportModelForm
+	partial class ImportForm
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -85,14 +85,14 @@
 			this.m_tsmiOK.Text = "OK";
 			this.m_tsmiOK.Click += new System.EventHandler(this.m_tsmiOK_Click);
 			// 
-			// ImportModelForm
+			// ImportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(584, 561);
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
-			this.Name = "ImportModelForm";
+			this.Name = "ImportForm";
 			this.Text = "導入圖檔";
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
