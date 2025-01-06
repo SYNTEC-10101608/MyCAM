@@ -61,7 +61,7 @@ namespace ProcessEdit
 		List<AIS_Shape> m_TraverseList = new List<AIS_Shape>();
 
 		// order
-		OrderForm m_OrderForm = new OrderForm();
+		ObjectForm m_OrderForm = new ObjectForm();
 
 		void ShowModel()
 		{

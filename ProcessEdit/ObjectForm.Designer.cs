@@ -1,6 +1,6 @@
 ﻿namespace ProcessEdit
 {
-	partial class OrderForm
+	partial class ObjectForm
 	{
 		/// <summary>
 		/// Required designer variable.

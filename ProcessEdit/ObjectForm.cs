@@ -5,12 +5,12 @@ using System.Windows.Forms;
 
 namespace ProcessEdit
 {
-	public partial class OrderForm : Form
+	public partial class ObjectForm : Form
 	{
 		public Action PropertyChanged;
 		public Action<int> ItemPick;
 
-		public OrderForm()
+		public ObjectForm()
 		{
 			InitializeComponent();
 
