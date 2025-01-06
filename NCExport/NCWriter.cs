@@ -51,6 +51,10 @@ namespace NCExport
 				string szZ = camPoint.Point.Z().ToString( "F3" );
 				string szA = dA_MCS.ToString( "F3" );
 				string szC = dC_MCS.ToString( "F3" );
+				string szI = camPoint.ToolVec.X().ToString( "F3" );
+				string szJ = camPoint.ToolVec.Y().ToString( "F3" );
+				string szK = camPoint.ToolVec.Z().ToString( "F3" );
+				//m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} I{szI} J{szJ} K{szK}" );
 				m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A{szA} C{szC}" );
 			}
 		}
@@ -59,17 +63,16 @@ namespace NCExport
 		void ConvertIJKToABC( gp_Dir ToolVec_G54, out double dA_MCS_deg, out double dC_MCS_deg )
 		{
 			// rotate the tool vector to the part coordinate system
-			gp_Dir ToolVec_MCS = ToolVec_G54.Transformed( m_PartTrsf );
+			//gp_Dir ToolVec_MCS = ToolVec_G54.Transformed( m_PartTrsf );
 
 			// calculate the A and C angle
-			if( ToolVec_G54.X() < 1e-6 && ToolVec_G54.X() > -1e-6
-				|| ToolVec_G54.Y() < 1e-6 && ToolVec_G54.Y() > -1e-6 ) {
-				dA_MCS_deg = 0;
+			if( Math.Abs( ToolVec_G54.X() ) < 1e-3 && Math.Abs( ToolVec_G54.Y() ) < 1e-3 ) {
+				dC_MCS_deg = 0;
 			}
 			else {
-				dA_MCS_deg = Math.Atan2( ToolVec_MCS.Y(), ToolVec_MCS.X() ) * 180 / Math.PI;
+				dC_MCS_deg = ( ( Math.Atan2( ToolVec_G54.Y(), ToolVec_G54.X() ) * 180 / Math.PI ) + 90 + 360 ) % 360;
 			}
-			dC_MCS_deg = 180 - Math.Asin( ToolVec_MCS.Z() ) * 180 / Math.PI;
+			dA_MCS_deg = Math.Acos( ToolVec_G54.Z() ) * 180 / Math.PI;
 		}
 
 		void WriteTraverse( TraverseProcessData traverseProcessData )
