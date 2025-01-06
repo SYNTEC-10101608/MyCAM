@@ -3,26 +3,25 @@ using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NCExport
 {
 	public class NCWriter
 	{
-		public NCWriter( List<IProcessData> processDataList )
+		public NCWriter( List<IProcessData> processDataList, gp_Trsf partTrsf )
 		{
 			m_ProcessDataList = processDataList;
-			Convert();
+			m_PartTrsf = partTrsf;
 		}
 
 		List<IProcessData> m_ProcessDataList;
+		gp_Trsf m_PartTrsf;
 		StreamWriter m_StreamWriter;
 
-		void Convert()
+		public void Convert()
 		{
-			m_StreamWriter = new StreamWriter( "TEST000.nc" );
+			m_StreamWriter = new StreamWriter( "0000.nc" );
+			m_StreamWriter.WriteLine( "G43.4" );
 			foreach( IProcessData processData in m_ProcessDataList ) {
 				switch( processData.ProcessType ) {
 					case EProcessType.ProcessType_Cutting:
@@ -37,26 +36,45 @@ namespace NCExport
 						break;
 				}
 			}
+			m_StreamWriter.WriteLine( "M30" );
 			m_StreamWriter.Close();
 		}
 
 		void WriteCutting( CuttingProcessData cuttingProcessData )
 		{
 			// write each cam data point
+			m_StreamWriter.WriteLine( "// Cutting" );
 			foreach( CAMPoint camPoint in cuttingProcessData.CAMData.CAMPointList ) {
-				m_StreamWriter.WriteLine( "G01 X{0} Y{1} Z{2}", camPoint.Point.X(), camPoint.Point.Y(), camPoint.Point.Z() );
+				ConvertIJKToABC( camPoint.ToolVec, out double dA_MCS, out double dC_MCS );
+				string szX = camPoint.Point.X().ToString( "F3" );
+				string szY = camPoint.Point.Y().ToString( "F3" );
+				string szZ = camPoint.Point.Z().ToString( "F3" );
+				string szA = dA_MCS.ToString( "F3" );
+				string szC = dC_MCS.ToString( "F3" );
+				m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A{szA} C{szC}" );
 			}
 		}
 
-		void ConvertIJKToABC( gp_Dir vec, out double dA, out double dB, out double dC )
+		// TODO: currently for spindle-spindle C-A Type only
+		void ConvertIJKToABC( gp_Dir ToolVec_G54, out double dA_MCS_deg, out double dC_MCS_deg )
 		{
-			dA = 0;
-			dB = 0;
-			dC = 0;
+			// rotate the tool vector to the part coordinate system
+			gp_Dir ToolVec_MCS = ToolVec_G54.Transformed( m_PartTrsf );
+
+			// calculate the A and C angle
+			dA_MCS_deg = Math.Atan2( ToolVec_MCS.Y(), ToolVec_MCS.X() ) * 180 / Math.PI;
+			dC_MCS_deg = Math.Asin( ToolVec_MCS.Z() ) * 180 / Math.PI;
 		}
 
 		void WriteTraverse( TraverseProcessData traverseProcessData )
 		{
+			m_StreamWriter.WriteLine( "// Traverse" );
+			string szX = traverseProcessData.Point_MCS.X().ToString( "F3" );
+			string szY = traverseProcessData.Point_MCS.Y().ToString( "F3" );
+			string szZ = traverseProcessData.Point_MCS.Z().ToString( "F3" );
+
+			// TODO: add tool vector
+			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A0 C0" );
 		}
 	}
 }

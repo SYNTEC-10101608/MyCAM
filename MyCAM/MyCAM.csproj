@@ -101,6 +101,10 @@
       <Project>{b1933d18-070f-426e-aabf-047953cfab9b}</Project>
       <Name>Import</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NCExport\NCExport.csproj">
+      <Project>{6fca8b19-5ee5-471d-9dbd-2cf039610520}</Project>
+      <Name>NCExport</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OCCTool\OCCTool.csproj">
       <Project>{e9c0ab57-4558-4baf-b154-b20169a256fe}</Project>
       <Name>OCCTool</Name>

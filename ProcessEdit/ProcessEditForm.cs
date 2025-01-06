@@ -223,7 +223,7 @@ namespace ProcessEdit
 		// edit ok
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
-
+			EditOK?.Invoke( m_Model.ProcessDataList );
 		}
 
 		void OnPropertyChanged()

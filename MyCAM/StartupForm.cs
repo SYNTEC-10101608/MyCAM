@@ -2,6 +2,7 @@
 using DataStructure;
 using ExtractPattern;
 using Import;
+using NCExport;
 using OCC.gp;
 using OCC.TopoDS;
 using PartPlacement;
@@ -67,7 +68,8 @@ namespace MyCAM
 
 		void ProcessEditOK( List<IProcessData> list )
 		{
-
+			NCWriter w = new NCWriter( list, m_PartTrsf );
+			w.Convert();
 		}
 
 		void ShowChild( Form formToShow )
