@@ -7,12 +7,10 @@ using OCC.Graphic3d;
 using OCC.Prs3d;
 using OCC.Quantity;
 using OCC.TCollection;
-using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace ProcessEdit
@@ -53,6 +51,7 @@ namespace ProcessEdit
 			m_OrderForm.Init( m_Model );
 			m_OrderForm.OrderDone += OrderDone;
 			m_OrderForm.OrderCancel += () => { actionMode = ActionMode.None; };
+			m_OrderForm.TreeNodePick += TreeNodePick;
 			return true;
 		}
 
@@ -67,9 +66,11 @@ namespace ProcessEdit
 		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>();
 		List<AIS_Shape> m_TraverseList = new List<AIS_Shape>();
 
+		// GUI process map
+		Dictionary<IProcessData, AIS_InteractiveObject> m_ProcessMap = new Dictionary<IProcessData, AIS_InteractiveObject>();
+
 		// order
 		OrderForm m_OrderForm = new OrderForm();
-
 
 		// viewer action
 		enum ActionMode
@@ -103,7 +104,7 @@ namespace ProcessEdit
 			m_OCCViewer.GetAISContext().Deactivate( modelAIS );
 
 			// show contour
-			ShowContour();
+			ShowProcess();
 
 			// show index
 			ShowIndex();
@@ -116,20 +117,37 @@ namespace ProcessEdit
 			m_OCCViewer.ZoomAllView();
 		}
 
-		void ShowContour()
+		void ShowProcess()
 		{
-			// create contour
-			List<TopoDS_Wire> contourList = m_Model.ProcessDataList.
-				Where( p => p.ProcessType == EProcessType.ProcessType_Cutting ).
-				Select( x => ( (CuttingProcessData)x ).CAMData.CADData.Contour ).ToList();
-			for( int i = 0; i < contourList.Count; i++ ) {
-				TopoDS_Wire contour = contourList[ i ];
-				AIS_Shape contourAIS = new AIS_Shape( contour );
-				contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-				contourAIS.SetWidth( 2 );
-				m_OCCViewer.GetAISContext().Display( contourAIS, false );
-				m_OCCViewer.GetAISContext().Deactivate( contourAIS );
+			foreach( IProcessData processData in m_Model.ProcessDataList ) {
+
+				// show path contour if it is cutting process
+				if( processData.ProcessType == EProcessType.ProcessType_Cutting ) {
+					CuttingProcessData cuttingData = (CuttingProcessData)processData;
+					AIS_Shape contourAIS = new AIS_Shape( cuttingData.CAMData.CADData.Contour );
+					contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+					Prs3d_LineAspect aspect = contourAIS.Attributes().WireAspect();
+					aspect.SetWidth( 2 );
+					m_OCCViewer.GetAISContext().Display( contourAIS, false );
+					m_OCCViewer.GetAISContext().Deactivate( contourAIS );
+					m_ProcessMap.Add( processData, contourAIS );
+				}
+
+				// show "+" at traverse point if it is traverse process
+				else if( processData.ProcessType == EProcessType.ProcessType_Traverse ) {
+					TraverseProcessData traverseData = (TraverseProcessData)processData;
+					AIS_TextLabel textLabel = new AIS_TextLabel();
+					textLabel.SetText( new TCollection_ExtendedString( "+" ) );
+					textLabel.SetPosition( traverseData.Point_MCS );
+					textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+					textLabel.SetHeight( 20 );
+					textLabel.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
+					m_OCCViewer.GetAISContext().Display( textLabel, false );
+					m_OCCViewer.GetAISContext().Deactivate( textLabel );
+					m_ProcessMap.Add( processData, textLabel );
+				}
 			}
+			m_OCCViewer.UpdateView();
 		}
 
 		void ShowIndex()
@@ -226,19 +244,35 @@ namespace ProcessEdit
 		{
 		}
 
+		// order
 		void m_tsmiOrder_Click( object sender, EventArgs e )
 		{
 			actionMode = ActionMode.Order;
-		}
-
-		void m_tsmiTraverse_Click( object sender, EventArgs e )
-		{
 		}
 
 		void OrderDone()
 		{
 			ShowIndex();
 			ShowTraverseLine();
+		}
+
+		void TreeNodePick( IProcessData data )
+		{
+			// dehighlight the previous selected
+			foreach( AIS_InteractiveObject obj in m_ProcessMap.Values ) {
+				obj.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			}
+
+			// highlight the selected
+			if( m_ProcessMap.ContainsKey( data ) ) {
+				m_ProcessMap[ data ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			}
+			m_OCCViewer.UpdateView();
+		}
+
+		// traverse
+		void m_tsmiTraverse_Click( object sender, EventArgs e )
+		{
 		}
 
 		// viewer action
