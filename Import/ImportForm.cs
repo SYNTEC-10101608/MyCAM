@@ -66,6 +66,9 @@ namespace Import
 
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
+			if( m_ModelShape == null ) {
+				return;
+			}
 			ImportOK?.Invoke( m_ModelShape );
 		}
 
