@@ -2,6 +2,7 @@
 using OCC.AIS;
 using OCC.Graphic3d;
 using OCC.Prs3d;
+using OCC.Quantity;
 using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopExp;
@@ -36,9 +37,13 @@ namespace ExtractPattern
 
 			// set AIS selction style
 			Prs3d_Drawer d = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected );
-			d.SetColor( new OCC.Quantity.Quantity_Color( OCC.Quantity.Quantity_NameOfColor.Quantity_NOC_RED ) );
+			d.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			d.SetTransparency( 0.5f );
 			d.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			Prs3d_Drawer d1 = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected );
+			d1.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			d1.SetTransparency( 0.5f );
+			d1.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
 
 			// set model
 			if( modelShape == null ) {
