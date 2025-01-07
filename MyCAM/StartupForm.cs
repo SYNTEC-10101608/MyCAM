@@ -31,24 +31,24 @@ namespace MyCAM
 
 		void ImportOK( TopoDS_Shape modelShape )
 		{
-			PartPlacementForm f = new PartPlacementForm( modelShape );
-			f.PlaceOK += ( partTrsf, G54Trsf ) =>
-			{
-				m_PartTrsf = partTrsf;
-				m_G54Trsf = G54Trsf;
-				PlaceOK( modelShape );
-			};
-			ShowChild( f );
-		}
-
-		void PlaceOK( TopoDS_Shape modelShape )
-		{
 			ExtractPatternForm f = new ExtractPatternForm( modelShape );
 			f.ExtractOK += ExtractOK;
 			ShowChild( f );
 		}
 
 		void ExtractOK( TopoDS_Shape modelShape, List<CADData> cadDataList )
+		{
+			PartPlacementForm f = new PartPlacementForm( modelShape );
+			f.PlaceOK += ( partTrsf, G54Trsf ) =>
+			{
+				m_PartTrsf = partTrsf;
+				m_G54Trsf = G54Trsf;
+				PlaceOK( modelShape, cadDataList );
+			};
+			ShowChild( f );
+		}
+
+		void PlaceOK( TopoDS_Shape modelShape, List<CADData> cadDataList )
 		{
 			CAMEditForm f = new CAMEditForm();
 			CAMEditModel camEditModel = new CAMEditModel( modelShape, cadDataList );
