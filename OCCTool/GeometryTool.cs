@@ -1,4 +1,9 @@
-﻿using OCC.gp;
+﻿using OCC.BRep;
+using OCC.BRepGProp;
+using OCC.gp;
+using OCC.GProp;
+using OCC.ShapeAnalysis;
+using OCC.TopoDS;
 using System;
 
 namespace OCCTool
@@ -63,6 +68,31 @@ namespace OCCTool
 			}
 
 			return midpoint;
+		}
+
+		public static bool IsApproximatelyLinear( TopoDS_Edge edge )
+		{
+			// get edge length
+			GProp_GProps system = new GProp_GProps();
+			BRepGProp.LinearProperties( edge, ref system );
+			double dEdgeLength = system.Mass();
+
+			// get distance between start and end points of edge
+			TopoDS_Vertex v1 = new TopoDS_Vertex();
+			TopoDS_Vertex v2 = new TopoDS_Vertex();
+			ShapeAnalysis.FindBounds( edge, ref v1, ref v2 );
+			gp_Pnt p1 = BRep_Tool.Pnt( v1 );
+			gp_Pnt p2 = BRep_Tool.Pnt( v2 );
+			double dDistance = p1.Distance( p2 );
+
+			// compare edge length and distance
+			const double dToleranceRatio = 0.001; // TODO: tolerance
+			if( Math.Abs( ( dEdgeLength - dDistance ) / dDistance ) < dToleranceRatio ) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 	}
 }

@@ -3,6 +3,7 @@ using OCC.BRepGProp;
 using OCC.Geom;
 using OCC.gp;
 using OCC.GProp;
+using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using System;
@@ -12,9 +13,21 @@ namespace OCCTool
 {
 	public class SegmentTool
 	{
-		public static void GetEdgeSegmentPoints( TopoDS_Edge edge, double dSegmentLength, bool bStartPoint, bool bEndPoint, out List<gp_Pnt> vertexList )
+		public static void GetEdgeSegmentPoints( TopoDS_Edge edge, double dSegmentLength, bool bSimplify, out List<gp_Pnt> vertexList )
 		{
 			vertexList = new List<gp_Pnt>();
+
+			// check linear edge
+			if( bSimplify && GeometryTool.IsApproximatelyLinear( edge ) ) {
+				TopoDS_Vertex v1 = new TopoDS_Vertex();
+				TopoDS_Vertex v2 = new TopoDS_Vertex();
+				ShapeAnalysis.FindBounds( edge, ref v1, ref v2 );
+				gp_Pnt p1 = BRep_Tool.Pnt( v1 );
+				gp_Pnt p2 = BRep_Tool.Pnt( v2 );
+				vertexList.Add( p1 );
+				vertexList.Add( p2 );
+				return;
+			}
 
 			// get target edge length
 			GProp_GProps system = new GProp_GProps();
@@ -38,11 +51,9 @@ namespace OCCTool
 
 			// get increment value
 			double dIncrement = ( dEndU - dStartU ) / nSegments;
-			int nStartIndex = bStartPoint ? 0 : 1;
-			int nEndIndex = bEndPoint ? nSegments : nSegments - 1;
 
 			// get points
-			for( int i = nStartIndex; i <= nEndIndex; i++ ) {
+			for( int i = 0; i <= nSegments; i++ ) {
 				double U = dStartU + dIncrement * i;
 				vertexList.Add( oneGeomCurve.Value( U ) );
 			}

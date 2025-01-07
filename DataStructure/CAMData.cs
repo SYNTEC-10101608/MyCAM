@@ -93,7 +93,7 @@ namespace DataStructure
 
 				// break the edge into segment points by interval
 				const double dSegmentLength = 0.5;
-				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, true, true, out List<gp_Pnt> pointList );
+				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, true, out List<gp_Pnt> pointList );
 
 				// get tool vector for each point
 				foreach( gp_Pnt point in pointList ) {
@@ -105,7 +105,7 @@ namespace DataStructure
 			}
 
 			// TEST: offset
-			//Offset();
+			Offset();
 		}
 
 		void Offset()
@@ -113,7 +113,7 @@ namespace DataStructure
 			if( CAMPointList.Count == 0 ) {
 				return;
 			}
-			const double dOffset = 0.5;
+			const double dOffset = 1;
 
 			// get line by points and offset the line
 			List<LineRecord> lineRecordList = new List<LineRecord>();
