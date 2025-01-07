@@ -3,6 +3,7 @@ using DataStructure;
 using ExtractPattern;
 using Import;
 using NCExport;
+using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopoDS;
 using PartPlacement;
@@ -16,7 +17,6 @@ namespace MyCAM
 	public partial class StartupForm : Form
 	{
 		gp_Trsf m_PartTrsf = new gp_Trsf();
-		gp_Trsf m_G54Trsf = new gp_Trsf();
 
 		public StartupForm()
 		{
@@ -31,24 +31,31 @@ namespace MyCAM
 
 		void ImportOK( TopoDS_Shape modelShape )
 		{
-			ExtractPatternForm f = new ExtractPatternForm( modelShape );
+			PartPlacementForm f = new PartPlacementForm( modelShape );
+			f.PlaceOK += ( partTrsf ) =>
+			{
+				m_PartTrsf = partTrsf;
+				PlaceOK( modelShape );
+			};
+			ShowChild( f );
+
+		}
+
+		void PlaceOK( TopoDS_Shape modelShape )
+		{
+			// transform the model
+			gp_Quaternion q = m_PartTrsf.GetRotation();
+			gp_Trsf trsf = new gp_Trsf();
+			trsf.SetRotation( q );
+			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( modelShape, trsf, true );
+			TopoDS_Shape transformedShape = transform.Shape();
+
+			ExtractPatternForm f = new ExtractPatternForm( transformedShape );
 			f.ExtractOK += ExtractOK;
 			ShowChild( f );
 		}
 
 		void ExtractOK( TopoDS_Shape modelShape, List<CADData> cadDataList )
-		{
-			PartPlacementForm f = new PartPlacementForm( modelShape );
-			f.PlaceOK += ( partTrsf, G54Trsf ) =>
-			{
-				m_PartTrsf = partTrsf;
-				m_G54Trsf = G54Trsf;
-				PlaceOK( modelShape, cadDataList );
-			};
-			ShowChild( f );
-		}
-
-		void PlaceOK( TopoDS_Shape modelShape, List<CADData> cadDataList )
 		{
 			CAMEditForm f = new CAMEditForm();
 			CAMEditModel camEditModel = new CAMEditModel( modelShape, cadDataList );

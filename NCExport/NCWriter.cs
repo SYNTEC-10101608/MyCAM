@@ -51,9 +51,11 @@ namespace NCExport
 				string szZ = camPoint.Point.Z().ToString( "F3" );
 				string szA = dA_MCS.ToString( "F3" );
 				string szC = dC_MCS.ToString( "F3" );
-				string szI = camPoint.ToolVec.X().ToString( "F3" );
-				string szJ = camPoint.ToolVec.Y().ToString( "F3" );
-				string szK = camPoint.ToolVec.Z().ToString( "F3" );
+
+				// TEST
+				//string szI = camPoint.ToolVec.X().ToString( "F3" );
+				//string szJ = camPoint.ToolVec.Y().ToString( "F3" );
+				//string szK = camPoint.ToolVec.Z().ToString( "F3" );
 				//m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} I{szI} J{szJ} K{szK}" );
 				m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A{szA} C{szC}" );
 			}
@@ -62,9 +64,6 @@ namespace NCExport
 		// TODO: currently for spindle-spindle C-A Type only
 		void ConvertIJKToABC( gp_Dir ToolVec_G54, out double dA_MCS_deg, out double dC_MCS_deg )
 		{
-			// rotate the tool vector to the part coordinate system
-			//gp_Dir ToolVec_MCS = ToolVec_G54.Transformed( m_PartTrsf );
-
 			// calculate the A and C angle
 			if( Math.Abs( ToolVec_G54.X() ) < 1e-3 && Math.Abs( ToolVec_G54.Y() ) < 1e-3 ) {
 				dC_MCS_deg = 0;
@@ -78,9 +77,9 @@ namespace NCExport
 		void WriteTraverse( TraverseProcessData traverseProcessData )
 		{
 			m_StreamWriter.WriteLine( "// Traverse" );
-			string szX = traverseProcessData.Point_MCS.X().ToString( "F3" );
-			string szY = traverseProcessData.Point_MCS.Y().ToString( "F3" );
-			string szZ = traverseProcessData.Point_MCS.Z().ToString( "F3" );
+			string szX = traverseProcessData.Point.X().ToString( "F3" );
+			string szY = traverseProcessData.Point.Y().ToString( "F3" );
+			string szZ = traverseProcessData.Point.Z().ToString( "F3" );
 
 			// TODO: add tool vector
 			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A0 C0" );

@@ -114,7 +114,7 @@ namespace ProcessEdit
 					TraverseProcessData traverseData = (TraverseProcessData)processData;
 					AIS_TextLabel textLabel = new AIS_TextLabel();
 					textLabel.SetText( new TCollection_ExtendedString( "+" ) );
-					textLabel.SetPosition( traverseData.Point_MCS );
+					textLabel.SetPosition( traverseData.Point );
 					textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
 					textLabel.SetHeight( 20 );
 					textLabel.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
@@ -215,7 +215,7 @@ namespace ProcessEdit
 			}
 			else if( data.ProcessType == EProcessType.ProcessType_Traverse ) {
 				TraverseProcessData traverseData = (TraverseProcessData)data;
-				return traverseData.Point_MCS;
+				return traverseData.Point;
 			}
 			return new gp_Pnt();
 		}

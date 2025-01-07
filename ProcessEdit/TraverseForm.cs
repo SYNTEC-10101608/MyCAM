@@ -11,9 +11,9 @@ namespace ProcessEdit
 			InitializeComponent();
 
 			// set data
-			m_dX = traverseProcessData.Point_MCS.X();
-			m_dY = traverseProcessData.Point_MCS.Y();
-			m_dZ = traverseProcessData.Point_MCS.Z();
+			m_dX = traverseProcessData.Point.X();
+			m_dY = traverseProcessData.Point.Y();
+			m_dZ = traverseProcessData.Point.Z();
 
 			// init text box
 			m_tbxX.Text = m_dX.ToString( "F3" );

@@ -15,7 +15,7 @@ namespace PartPlacement
 {
 	public partial class PartPlacementForm : Form
 	{
-		public Action<gp_Trsf, gp_Trsf> PlaceOK;
+		public Action<gp_Trsf> PlaceOK;
 
 		public PartPlacementForm( TopoDS_Shape modelShape )
 		{
@@ -31,27 +31,25 @@ namespace PartPlacement
 			m_panViewer.Dock = DockStyle.Fill;
 			m_OCCViewer.UpdateView();
 
-			// show machine frame
-			ShowMachineFrame();
-
 			// show model
 			m_RawModelShape = modelShape;
 			if( m_RawModelShape == null ) {
 				return;
 			}
-			ShowModel();
+			RefreshViewer();
 		}
 
 		// viewer
 		Panel m_panViewer = new Panel();
 		Viewer m_OCCViewer = new Viewer();
 
-		// import model
+		// model
 		TopoDS_Shape m_RawModelShape;
 
 		// transform param
 		TransformParamForm m_TransformParamForm = new TransformParamForm();
 
+		// TODO: the machine frame does not need to refresh
 		void ShowMachineFrame()
 		{
 			// make a box for machine frame
@@ -60,6 +58,8 @@ namespace PartPlacement
 			BRepPrimAPI_MakeBox makeBox = new BRepPrimAPI_MakeBox( negPole, nSize, nSize, nSize );
 			AIS_Shape machineFrameAIS = new AIS_Shape( makeBox.Shape() );
 			machineFrameAIS.SetDisplayMode( (int)AISDisplayMode.AIS_WireFrame );
+			//m_OCCViewer.GetAISContext().Display( machineFrameAIS, false );
+			//m_OCCViewer.GetAISContext().Deactivate( machineFrameAIS );
 
 			// make a cone for cutter
 			BRepPrimAPI_MakeCone makeCone = new BRepPrimAPI_MakeCone( 0, 10, 50 );
@@ -68,21 +68,14 @@ namespace PartPlacement
 			cutterAIS.SetMaterial( aspect );
 			cutterAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			cutterAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
-
-			//m_OCCViewer.GetAISContext().Display( machineFrameAIS, false );
 			m_OCCViewer.GetAISContext().Display( cutterAIS, false );
-			m_OCCViewer.UpdateView();
+			m_OCCViewer.GetAISContext().Deactivate( cutterAIS );
 		}
 
 		void ShowModel()
 		{
-			// get the transform matrix
-			gp_Trsf trsfPart = m_TransformParamForm.TrsfPart;
-			gp_Trsf trsfG54 = m_TransformParamForm.TrsfG54;
-			gp_Trsf trsfPartG54 = trsfPart.Multiplied( trsfG54 );
-
 			// transform the model
-			BRepBuilderAPI_Transform partTransform = new BRepBuilderAPI_Transform( m_RawModelShape, trsfPartG54, true );
+			BRepBuilderAPI_Transform partTransform = new BRepBuilderAPI_Transform( m_RawModelShape, m_TransformParamForm.TrsfPart, true );
 
 			// create model AIS_Shape
 			AIS_Shape aisShape = new AIS_Shape( partTransform.Shape() );
@@ -90,9 +83,9 @@ namespace PartPlacement
 			aisShape.SetMaterial( aspect );
 			aisShape.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
 
-			// make G54 coordinate
+			// get G54 from translation part of part transform
 			gp_Ax2 G54 = new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
-			G54.Transform( trsfG54 );
+			G54.Translate( new gp_Vec( m_TransformParamForm.TrsfPart.TranslationPart() ) );
 
 			// make a Trihedron indicate G54
 			AIS_Trihedron aisTrihedron = new AIS_Trihedron( new Geom_Axis2Placement( G54 ) );
@@ -100,28 +93,33 @@ namespace PartPlacement
 
 			// display the shape
 			m_OCCViewer.GetAISContext().Display( aisShape, false );
+			m_OCCViewer.GetAISContext().Deactivate( aisShape );
 			m_OCCViewer.GetAISContext().Display( aisTrihedron, false );
+			m_OCCViewer.GetAISContext().Deactivate( aisTrihedron );
+		}
+
+		void RefreshViewer()
+		{
+			m_OCCViewer.GetAISContext().RemoveAll( false );
+			ShowModel();
+			ShowMachineFrame();
 			m_OCCViewer.UpdateView();
 			m_OCCViewer.AxoView();
 			m_OCCViewer.ZoomAllView();
 		}
 
-		void m_tsmiSetting_Click( object sender, EventArgs e )
+		void m_tsmiSetPart_Click( object sender, EventArgs e )
 		{
 			m_TransformParamForm.ShowDialog();
 			if( m_TransformParamForm.DialogResult != DialogResult.OK ) {
 				return;
 			}
-
-			// refresh the viewer
-			m_OCCViewer.GetAISContext().RemoveAll( false );
-			ShowMachineFrame();
-			ShowModel();
+			RefreshViewer();
 		}
 
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
-			PlaceOK?.Invoke( m_TransformParamForm.TrsfPart, m_TransformParamForm.TrsfG54 );
+			PlaceOK?.Invoke( m_TransformParamForm.TrsfPart );
 		}
 	}
 }
