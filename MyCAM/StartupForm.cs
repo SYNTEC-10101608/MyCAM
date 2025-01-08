@@ -29,25 +29,25 @@ namespace MyCAM
 			ShowChild( f );
 		}
 
-		void ImportOK( TopoDS_Shape modelShape )
+		void ImportOK( TopoDS_Shape partShape )
 		{
-			PartPlacementForm f = new PartPlacementForm( modelShape );
+			PartPlacementForm f = new PartPlacementForm( partShape );
 			f.PlaceOK += ( partTrsf ) =>
 			{
 				m_PartTrsf = partTrsf;
-				PlaceOK( modelShape );
+				PlaceOK( partShape );
 			};
 			ShowChild( f );
 
 		}
 
-		void PlaceOK( TopoDS_Shape modelShape )
+		void PlaceOK( TopoDS_Shape partShape )
 		{
-			// transform the model
+			// transform the part
 			gp_Quaternion q = m_PartTrsf.GetRotation();
 			gp_Trsf trsf = new gp_Trsf();
 			trsf.SetRotation( q );
-			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( modelShape, trsf, true );
+			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( partShape, trsf, true );
 			TopoDS_Shape transformedShape = transform.Shape();
 
 			ExtractPatternForm f = new ExtractPatternForm( transformedShape );
@@ -55,19 +55,19 @@ namespace MyCAM
 			ShowChild( f );
 		}
 
-		void ExtractOK( TopoDS_Shape modelShape, List<CADData> cadDataList )
+		void ExtractOK( TopoDS_Shape partShape, List<CADData> cadDataList )
 		{
 			CAMEditForm f = new CAMEditForm();
-			CAMEditModel camEditModel = new CAMEditModel( modelShape, cadDataList );
+			CAMEditModel camEditModel = new CAMEditModel( partShape, cadDataList );
 			f.CADEditOK += CAMEditOK;
 			f.Init( camEditModel );
 			ShowChild( f );
 		}
 
-		void CAMEditOK( TopoDS_Shape modelShape, List<IProcessData> processDataList )
+		void CAMEditOK( TopoDS_Shape partShape, List<IProcessData> processDataList )
 		{
 			ProcessEditForm f = new ProcessEditForm();
-			ProcessEditModel processEditModel = new ProcessEditModel( modelShape, processDataList );
+			ProcessEditModel processEditModel = new ProcessEditModel( partShape, processDataList );
 			f.EditOK += ProcessEditOK;
 			f.Init( processEditModel );
 			ShowChild( f );

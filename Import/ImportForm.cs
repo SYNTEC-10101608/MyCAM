@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace Import
 {
-	public enum ModelFormat
+	public enum Format
 	{
 		BREP = 0,
 		STEP = 1,
@@ -46,46 +46,46 @@ namespace Import
 		Panel m_panViewer = new Panel();
 		Viewer m_OCCViewer = new Viewer();
 
-		// import model
-		TopoDS_Shape m_ModelShape = null;
+		// import part
+		TopoDS_Shape m_PartShape = null;
 
 		void m_tsmiImportBRep_Click( object sender, EventArgs e )
 		{
-			DoImport( ModelFormat.BREP );
+			DoImport( Format.BREP );
 		}
 
 		void m_tsmiImportStep_Click( object sender, EventArgs e )
 		{
-			DoImport( ModelFormat.STEP );
+			DoImport( Format.STEP );
 		}
 
 		void m_tsmiImportIges_Click( object sender, EventArgs e )
 		{
-			DoImport( ModelFormat.IGES );
+			DoImport( Format.IGES );
 		}
 
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
-			if( m_ModelShape == null ) {
+			if( m_PartShape == null ) {
 				return;
 			}
-			ImportOK?.Invoke( m_ModelShape );
+			ImportOK?.Invoke( m_PartShape );
 		}
 
-		void DoImport( ModelFormat format )
+		void DoImport( Format format )
 		{
 			OpenFileDialog openDialog = new OpenFileDialog();
 
 			// file dialog filter
 			string filter = "";
 			switch( format ) {
-				case ModelFormat.BREP:
+				case Format.BREP:
 					filter = "BREP Files (*.brep *.rle)|*.brep; *.rle";
 					break;
-				case ModelFormat.STEP:
+				case Format.STEP:
 					filter = "STEP Files (*.stp *.step)|*.stp; *.step";
 					break;
-				case ModelFormat.IGES:
+				case Format.IGES:
 					filter = "IGES Files (*.igs *.iges)|*.igs; *.iges";
 					break;
 				default:
@@ -107,13 +107,13 @@ namespace Import
 			// read the file
 			XSControl_Reader Reader;
 			switch( format ) {
-				case ModelFormat.BREP:
+				case Format.BREP:
 					Reader = new XSControl_Reader();
 					break;
-				case ModelFormat.STEP:
+				case Format.STEP:
 					Reader = new STEPControl_Reader();
 					break;
-				case ModelFormat.IGES:
+				case Format.IGES:
 					Reader = new IGESControl_Reader();
 					break;
 				default:
@@ -124,37 +124,37 @@ namespace Import
 
 			// check the status
 			if( status != IFSelect_ReturnStatus.IFSelect_RetDone ) {
-				MessageBox.Show( ToString() + "Error: Import Model" );
+				MessageBox.Show( ToString() + "Error: Import" );
 				return;
 			}
 			Reader.TransferRoots();
 
 			// prevent from empty shape or null shape
 			if( Reader.NbShapes() == 0 ) {
-				MessageBox.Show( ToString() + "Error: Import Model" );
+				MessageBox.Show( ToString() + "Error: Import" );
 				return;
 			}
 			TopoDS_Shape theShape = Reader.OneShape();
 			if( theShape == null ) {
-				MessageBox.Show( ToString() + "Error: Import Model" );
+				MessageBox.Show( ToString() + "Error: Import" );
 				return;
 			}
 
 			// sew the shape
 			theShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { theShape } );
 
-			// show the model
-			m_ModelShape = theShape;
-			ShowModel();
+			// show the part
+			m_PartShape = theShape;
+			ShowPart();
 
 			// enable the OK button
 			m_tsmiOK.Enabled = true;
 		}
 
-		void ShowModel()
+		void ShowPart()
 		{
 			// create AIS_Shape
-			AIS_Shape aisShape = new AIS_Shape( m_ModelShape );
+			AIS_Shape aisShape = new AIS_Shape( m_PartShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			aisShape.SetMaterial( aspect );
 			aisShape.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );

@@ -7,24 +7,24 @@ namespace CAMEdit
 
 	public class CAMEditModel
 	{
-		public CAMEditModel( TopoDS_Shape model, List<CADData> rawCADDataList )
+		public CAMEditModel( TopoDS_Shape partShape, List<CADData> rawCADDataList )
 		{
-			if( model == null || rawCADDataList == null ) {
+			if( partShape == null || rawCADDataList == null ) {
 				throw new System.ArgumentException( ToString() + "Constructior: Null Ref" );
 			}
 			if( rawCADDataList.Count == 0 ) {
 				throw new System.ArgumentException( ToString() + "Constructior: Empty Collection" );
 			}
-			m_ModelShape = model;
+			m_PartShape = partShape;
 			m_RawCADDataList = rawCADDataList;
 			BuildCAMData();
 		}
 
-		public TopoDS_Shape ModelShape
+		public TopoDS_Shape PartShape
 		{
 			get
 			{
-				return m_ModelShape;
+				return m_PartShape;
 			}
 		}
 
@@ -37,7 +37,7 @@ namespace CAMEdit
 		}
 
 		// fields
-		TopoDS_Shape m_ModelShape = null;
+		TopoDS_Shape m_PartShape = null;
 		List<CADData> m_RawCADDataList = new List<CADData>();
 		List<CAMData> m_CAMDataList = new List<CAMData>();
 

@@ -71,22 +71,22 @@ namespace CAMEdit
 				return;
 			}
 
-			// get model shape
-			TopoDS_Shape modelShape = m_Model.ModelShape;
-			if( modelShape == null ) {
+			// get part shape
+			TopoDS_Shape partShape = m_Model.PartShape;
+			if( partShape == null ) {
 				return;
 			}
 
 			// clear the viewer
 			m_OCCViewer.GetAISContext().RemoveAll( false );
 
-			// display the model
-			AIS_Shape modelAIS = new AIS_Shape( modelShape );
+			// display the part
+			AIS_Shape partAIS = new AIS_Shape( partShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			modelAIS.SetMaterial( aspect );
-			modelAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
-			m_OCCViewer.GetAISContext().Display( modelAIS, false );
-			m_OCCViewer.GetAISContext().Deactivate( modelAIS );
+			partAIS.SetMaterial( aspect );
+			partAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			m_OCCViewer.GetAISContext().Display( partAIS, false );
+			m_OCCViewer.GetAISContext().Deactivate( partAIS );
 
 			// display cam data
 			for( int i = 0; i < camDataList.Count; i++ ) {
@@ -168,7 +168,7 @@ namespace CAMEdit
 		{
 			List<IProcessData> cuttingProcessDataList =
 				m_Model.CAMDataList.Select( camData => new CuttingProcessData( camData ) ).Cast<IProcessData>().ToList();
-			CADEditOK?.Invoke( m_Model.ModelShape, cuttingProcessDataList );
+			CADEditOK?.Invoke( m_Model.PartShape, cuttingProcessDataList );
 		}
 	}
 }

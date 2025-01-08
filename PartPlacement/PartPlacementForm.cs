@@ -17,7 +17,7 @@ namespace PartPlacement
 	{
 		public Action<gp_Trsf> PlaceOK;
 
-		public PartPlacementForm( TopoDS_Shape modelShape )
+		public PartPlacementForm( TopoDS_Shape partShape )
 		{
 			InitializeComponent();
 
@@ -31,9 +31,9 @@ namespace PartPlacement
 			m_panViewer.Dock = DockStyle.Fill;
 			m_OCCViewer.UpdateView();
 
-			// show model
-			m_RawModelShape = modelShape;
-			if( m_RawModelShape == null ) {
+			// show part
+			m_RawPartShape = partShape;
+			if( m_RawPartShape == null ) {
 				return;
 			}
 			RefreshViewer();
@@ -43,8 +43,8 @@ namespace PartPlacement
 		Panel m_panViewer = new Panel();
 		Viewer m_OCCViewer = new Viewer();
 
-		// model
-		TopoDS_Shape m_RawModelShape;
+		// raw part
+		TopoDS_Shape m_RawPartShape;
 
 		// transform param
 		TransformParamForm m_TransformParamForm = new TransformParamForm();
@@ -72,16 +72,16 @@ namespace PartPlacement
 			m_OCCViewer.GetAISContext().Deactivate( cutterAIS );
 		}
 
-		void ShowModel()
+		void ShowPart()
 		{
-			// transform the model
-			BRepBuilderAPI_Transform partTransform = new BRepBuilderAPI_Transform( m_RawModelShape, m_TransformParamForm.TrsfPart, true );
+			// transform the part
+			BRepBuilderAPI_Transform partTransform = new BRepBuilderAPI_Transform( m_RawPartShape, m_TransformParamForm.TrsfPart, true );
 
-			// create model AIS_Shape
-			AIS_Shape aisShape = new AIS_Shape( partTransform.Shape() );
+			// create part AIS_Shape
+			AIS_Shape partAIS = new AIS_Shape( partTransform.Shape() );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			aisShape.SetMaterial( aspect );
-			aisShape.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			partAIS.SetMaterial( aspect );
+			partAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
 
 			// get G54 from translation part of part transform
 			gp_Ax2 G54 = new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
@@ -92,8 +92,8 @@ namespace PartPlacement
 			aisTrihedron.SetSize( 10 );
 
 			// display the shape
-			m_OCCViewer.GetAISContext().Display( aisShape, false );
-			m_OCCViewer.GetAISContext().Deactivate( aisShape );
+			m_OCCViewer.GetAISContext().Display( partAIS, false );
+			m_OCCViewer.GetAISContext().Deactivate( partAIS );
 			m_OCCViewer.GetAISContext().Display( aisTrihedron, false );
 			m_OCCViewer.GetAISContext().Deactivate( aisTrihedron );
 		}
@@ -101,7 +101,7 @@ namespace PartPlacement
 		void RefreshViewer()
 		{
 			m_OCCViewer.GetAISContext().RemoveAll( false );
-			ShowModel();
+			ShowPart();
 			ShowMachineFrame();
 			m_OCCViewer.UpdateView();
 			m_OCCViewer.AxoView();

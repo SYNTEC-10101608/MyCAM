@@ -21,7 +21,7 @@ namespace ExtractPattern
 	{
 		public Action<TopoDS_Shape, List<CADData>> ExtractOK;
 
-		public ExtractPatternForm( TopoDS_Shape modelShape )
+		public ExtractPatternForm( TopoDS_Shape partShape )
 		{
 			InitializeComponent();
 
@@ -45,12 +45,12 @@ namespace ExtractPattern
 			d1.SetTransparency( 0.5f );
 			d1.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
 
-			// set model
-			if( modelShape == null ) {
+			// set part
+			if( partShape == null ) {
 				return;
 			}
-			m_ModelShape = modelShape;
-			ShowModel();
+			m_PartShape = partShape;
+			ShowPart();
 
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
@@ -64,13 +64,13 @@ namespace ExtractPattern
 		Panel m_panViewer = new Panel();
 		Viewer m_OCCViewer = new Viewer();
 
-		// import model
-		TopoDS_Shape m_ModelShape = null;
+		// import part
+		TopoDS_Shape m_PartShape = null;
 
-		void ShowModel()
+		void ShowPart()
 		{
 			// create AIS_Shape
-			AIS_Shape aisShape = new AIS_Shape( m_ModelShape );
+			AIS_Shape aisShape = new AIS_Shape( m_PartShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			aisShape.SetMaterial( aspect );
 			aisShape.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
@@ -100,7 +100,7 @@ namespace ExtractPattern
 				MessageBox.Show( ToString() + "Error: No Pattern Found" );
 				return;
 			}
-			ExtractOK?.Invoke( m_ModelShape, cadDataList );
+			ExtractOK?.Invoke( m_PartShape, cadDataList );
 		}
 
 		List<TopoDS_Face> GetSelectedFace()
@@ -132,7 +132,7 @@ namespace ExtractPattern
 			TopTools_IndexedDataMapOfShapeListOfShape shellMap = new TopTools_IndexedDataMapOfShapeListOfShape();
 			TopExp.MapShapesAndAncestors( sewResult, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref shellMap );
 			TopTools_IndexedDataMapOfShapeListOfShape solidMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-			TopExp.MapShapesAndAncestors( m_ModelShape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref solidMap );
+			TopExp.MapShapesAndAncestors( m_PartShape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref solidMap );
 
 			// build CAD data
 			foreach( TopoDS_Wire wire in boundaryWireList ) {

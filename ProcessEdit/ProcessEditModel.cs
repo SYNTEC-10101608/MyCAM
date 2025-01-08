@@ -6,17 +6,17 @@ namespace ProcessEdit
 {
 	public class ProcessEditModel
 	{
-		public ProcessEditModel( TopoDS_Shape modelShape, List<IProcessData> processDataList )
+		public ProcessEditModel( TopoDS_Shape partShape, List<IProcessData> processDataList )
 		{
-			m_ModelShape = modelShape;
+			m_PartShape = partShape;
 			m_ProcessDataList = processDataList;
 		}
 
-		public TopoDS_Shape ModelShape
+		public TopoDS_Shape PartShape
 		{
 			get
 			{
-				return m_ModelShape;
+				return m_PartShape;
 			}
 		}
 
@@ -28,7 +28,7 @@ namespace ProcessEdit
 			}
 		}
 
-		TopoDS_Shape m_ModelShape;
+		TopoDS_Shape m_PartShape;
 		List<IProcessData> m_ProcessDataList;
 	}
 }

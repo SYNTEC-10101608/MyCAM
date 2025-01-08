@@ -40,7 +40,7 @@ namespace ProcessEdit
 				return false;
 			}
 			m_Model = model;
-			ShowModel();
+			ShowPart();
 
 			// create order form
 			m_OrderForm.Init( m_Model );
@@ -65,15 +65,15 @@ namespace ProcessEdit
 		// order
 		ObjectForm m_OrderForm = new ObjectForm();
 
-		void ShowModel()
+		void ShowPart()
 		{
-			// show the model shape
-			AIS_Shape modelAIS = new AIS_Shape( m_Model.ModelShape );
+			// show the part shape
+			AIS_Shape partAIS = new AIS_Shape( m_Model.PartShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			modelAIS.SetMaterial( aspect );
-			modelAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
-			m_OCCViewer.GetAISContext().Display( modelAIS, false );
-			m_OCCViewer.GetAISContext().Deactivate( modelAIS );
+			partAIS.SetMaterial( aspect );
+			partAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			m_OCCViewer.GetAISContext().Display( partAIS, false );
+			m_OCCViewer.GetAISContext().Deactivate( partAIS );
 
 			// show contour
 			ShowProcess();
