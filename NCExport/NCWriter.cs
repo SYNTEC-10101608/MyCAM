@@ -43,22 +43,22 @@ namespace NCExport
 		void WriteCutting( CuttingProcessData cuttingProcessData )
 		{
 			// write each cam data point
-			m_StreamWriter.WriteLine( "// Cutting" );
-			foreach( CAMPoint camPoint in cuttingProcessData.CAMData.CAMPointList ) {
-				ConvertIJKToABC( camPoint.ToolVec, out double dA_MCS, out double dC_MCS );
-				string szX = camPoint.Point.X().ToString( "F3" );
-				string szY = camPoint.Point.Y().ToString( "F3" );
-				string szZ = camPoint.Point.Z().ToString( "F3" );
-				string szA = dA_MCS.ToString( "F3" );
-				string szC = dC_MCS.ToString( "F3" );
+			//m_StreamWriter.WriteLine( "// Cutting" );
+			//foreach( CAMPoint camPoint in cuttingProcessData.CAMData.CADPointList ) {
+			//	ConvertIJKToABC( camPoint.ToolVec, out double dA_MCS, out double dC_MCS );
+			//	string szX = camPoint.Point.X().ToString( "F3" );
+			//	string szY = camPoint.Point.Y().ToString( "F3" );
+			//	string szZ = camPoint.Point.Z().ToString( "F3" );
+			//	string szA = dA_MCS.ToString( "F3" );
+			//	string szC = dC_MCS.ToString( "F3" );
 
-				// TEST
-				//string szI = camPoint.ToolVec.X().ToString( "F3" );
-				//string szJ = camPoint.ToolVec.Y().ToString( "F3" );
-				//string szK = camPoint.ToolVec.Z().ToString( "F3" );
-				//m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} I{szI} J{szJ} K{szK}" );
-				m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A{szA} C{szC}" );
-			}
+			//	// TEST
+			//	//string szI = camPoint.ToolVec.X().ToString( "F3" );
+			//	//string szJ = camPoint.ToolVec.Y().ToString( "F3" );
+			//	//string szK = camPoint.ToolVec.Z().ToString( "F3" );
+			//	//m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} I{szI} J{szJ} K{szK}" );
+			//	m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A{szA} C{szC}" );
+			//}
 		}
 
 		// TODO: currently for spindle-spindle C-A Type only

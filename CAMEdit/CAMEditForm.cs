@@ -92,12 +92,12 @@ namespace CAMEdit
 			for( int i = 0; i < camDataList.Count; i++ ) {
 
 				// display vectors
-				foreach( CAMPoint camPoint in camDataList[ i ].CAMPointList ) {
+				foreach( CADPoint camPoint in camDataList[ i ].CADPointList ) {
 
 					// tool vector
-					AIS_Shape toolVecAIS = GetVecAIS( camPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					m_OCCViewer.GetAISContext().Display( toolVecAIS, false );
-					m_OCCViewer.GetAISContext().Deactivate( toolVecAIS );
+					//AIS_Shape toolVecAIS = GetVecAIS( camPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
+					//m_OCCViewer.GetAISContext().Display( toolVecAIS, false );
+					//m_OCCViewer.GetAISContext().Deactivate( toolVecAIS );
 
 					// tangent vector
 					AIS_Shape tangentVecAIS = GetVecAIS( camPoint.Point, camPoint.TangentVec, EvecType.TangentVec );
@@ -111,7 +111,7 @@ namespace CAMEdit
 				}
 
 				// display index
-				gp_Pnt indexPoint = camDataList[ i ].CAMPointList.First().Point;
+				gp_Pnt indexPoint = camDataList[ i ].CADPointList.First().Point;
 				AIS_TextLabel indexText = new AIS_TextLabel();
 				indexText.SetText( new TCollection_ExtendedString( ( i + 1 ).ToString() ) );
 				indexText.SetPosition( indexPoint );
