@@ -211,7 +211,20 @@ namespace DataStructure
 
 		void BuildCAMPointList()
 		{
-			CAMPointList = new List<CAMPoint>();
+			m_CAMPointList = new List<CAMPoint>();
+
+			// rearrange cad points to start from the strt index
+			List<CADPoint> rearrangedCADPointList = new List<CADPoint>();
+			for( int i = 0; i < CADPointList.Count; i++ ) {
+				rearrangedCADPointList.Add( CADPointList[ ( i + StartPoint ) % CADPointList.Count ] );
+			}
+
+			// reverse the cad points if needed
+			if( IsReverse ) {
+				rearrangedCADPointList.Reverse();
+			}
+
+			// build cam points
 			for( int i = 0; i < CADPointList.Count; i++ ) {
 
 				// calculate tool vector
@@ -224,22 +237,15 @@ namespace DataStructure
 						break;
 					case ToolVectorType.CrossOfNormals:
 
-						// get average of cross of neighbor normals
-						int lastIndex = i == 0 ? CADPointList.Count - 1 : i - 1;
-						int nextIndex = i == CADPointList.Count - 1 ? 0 : i + 1;
-						gp_Dir lastNormalVec = CADPointList[ lastIndex ].NormalVec;
-						gp_Dir nextNormalVec = CADPointList[ nextIndex ].NormalVec;
-						gp_Dir TooV1 = lastNormalVec.Crossed( cadPoint.NormalVec );
-						gp_Dir TooV2 = cadPoint.NormalVec.Crossed( nextNormalVec );
-						ToolVec = new gp_Dir( ( TooV1.X() + TooV2.X() ) / 2, ( TooV1.Y() + TooV2.Y() ) / 2, ( TooV1.Z() + TooV2.Z() ) / 2 );
+						// TODO: implement this
+						ToolVec = new gp_Dir( 0, 0, 1 );
 						break;
 					case ToolVectorType.TowardZ:
 						ToolVec = new gp_Dir( 0, 0, 1 );
 						break;
 				}
-
-				CAMPoint camPoint = new CAMPoint( cadPoint, new gp_Dir() );
-				CAMPointList.Add( camPoint );
+				CAMPoint camPoint = new CAMPoint( cadPoint, ToolVec );
+				m_CAMPointList.Add( camPoint );
 			}
 		}
 	}

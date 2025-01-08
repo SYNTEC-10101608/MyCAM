@@ -142,7 +142,7 @@ namespace CAMEdit
 				contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
 				contourAIS.SetWidth( 1 );
 				m_OCCViewer.GetAISContext().Display( contourAIS, false );
-				m_OCCViewer.GetAISContext().Activate( contourAIS, (int)AISActiveMode.Wire );
+				m_OCCViewer.GetAISContext().Activate( contourAIS, (int)AISActiveMode.Vertex );
 			}
 		}
 
@@ -203,7 +203,7 @@ namespace CAMEdit
 			foreach( TopoDS_Wire camWire in camWireList ) {
 				AIS_Shape camAIS = new AIS_Shape( camWire );
 				camAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-				camAIS.SetWidth( 2 );
+				camAIS.SetWidth( 1 );
 				Prs3d_LineAspect aspect = camAIS.Attributes().WireAspect();
 				aspect.SetTypeOfLine( Aspect_TypeOfLine.Aspect_TOL_DASH );
 				m_OCCViewer.GetAISContext().Display( camAIS, false );
@@ -236,7 +236,7 @@ namespace CAMEdit
 
 		AIS_Shape GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
 		{
-			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 0.2 );
+			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 1 );
 			BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
 			AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
 			switch( vecType ) {
