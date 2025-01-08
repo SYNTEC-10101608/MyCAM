@@ -2,6 +2,7 @@
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.BRepBuilderAPI;
+using OCC.BRepPrimAPI;
 using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Prs3d;
@@ -65,6 +66,7 @@ namespace CAMEdit
 		// for viewer resource handle
 		List<AIS_Shape> m_CAMContourAISList = new List<AIS_Shape>();
 		List<AIS_Shape> m_ToolVecAISList = new List<AIS_Shape>();
+		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>();
 
 		enum EvecType
 		{
@@ -149,7 +151,8 @@ namespace CAMEdit
 		void ShowCAMData()
 		{
 			ShowCAMContour();
-			ShowToolVec();
+			//ShowToolVec();
+			ShowOrientation();
 		}
 
 		void ShowCAMContour()
@@ -234,6 +237,32 @@ namespace CAMEdit
 			}
 		}
 
+		void ShowOrientation()
+		{
+			// clear the previous orientation
+			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
+				m_OCCViewer.GetAISContext().Remove( orientationAIS, false );
+			}
+
+			// build orientation
+			foreach( CAMData camData in m_Model.CAMDataList ) {
+				int nDataCount = camData.CAMPointList.Count;
+				int nShowIndex = (int)Math.Floor( nDataCount * 0.1 );
+				gp_Pnt showPoint = camData.CAMPointList[ nShowIndex ].Point;
+
+				// the direction of the orientation is vector to the next point
+				gp_Dir orientationDir = new gp_Dir( camData.CAMPointList[ nShowIndex + 1 ].Point.XYZ() - showPoint.XYZ() );
+				AIS_Shape orientationAIS = GetOrientationAIS( showPoint, orientationDir );
+				m_OrientationAISList.Add( orientationAIS );
+			}
+
+			// display the orientation
+			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
+				m_OCCViewer.GetAISContext().Display( orientationAIS, false );
+				m_OCCViewer.GetAISContext().Deactivate( orientationAIS );
+			}
+		}
+
 		AIS_Shape GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
 		{
 			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 1 );
@@ -252,6 +281,20 @@ namespace CAMEdit
 			}
 			lineAIS.SetWidth( 2 );
 			return lineAIS;
+		}
+
+		AIS_Shape GetOrientationAIS( gp_Pnt point, gp_Dir dir )
+		{
+			// draw a cone to indicate the orientation
+			gp_Ax2 coneAx2 = new gp_Ax2( point, dir );
+			BRepPrimAPI_MakeCone coneMaker = new BRepPrimAPI_MakeCone( coneAx2, 0.5, 0, 2 );
+			AIS_Shape coneAIS = new AIS_Shape( coneMaker.Shape() );
+			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			coneAIS.SetMaterial( aspect );
+			coneAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			coneAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			coneAIS.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
+			return coneAIS;
 		}
 
 		// viewer action
