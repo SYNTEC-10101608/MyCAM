@@ -185,10 +185,9 @@ namespace ProcessEdit
 				BRepBuilderAPI_MakeEdge makeEdge = new BRepBuilderAPI_MakeEdge( start, end );
 				AIS_Shape line = new AIS_Shape( makeEdge.Edge() );
 				line.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+				line.SetWidth( 2 );
 				Prs3d_LineAspect aspect = line.Attributes().WireAspect();
-				aspect.SetWidth( 1 );
 				aspect.SetTypeOfLine( Aspect_TypeOfLine.Aspect_TOL_DASH );
-				aspect.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
 				m_TraverseList.Add( line );
 			}
 

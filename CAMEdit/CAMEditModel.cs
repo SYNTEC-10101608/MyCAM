@@ -17,7 +17,7 @@ namespace CAMEdit
 			}
 			m_PartShape = partShape;
 			m_RawCADDataList = rawCADDataList;
-			BuildCAMData();
+			BuildCAMDataList();
 		}
 
 		public TopoDS_Shape PartShape
@@ -41,7 +41,7 @@ namespace CAMEdit
 		List<CADData> m_RawCADDataList = new List<CADData>();
 		List<CAMData> m_CAMDataList = new List<CAMData>();
 
-		void BuildCAMData()
+		void BuildCAMDataList()
 		{
 			m_CAMDataList.Clear();
 			foreach( CADData cadData in m_RawCADDataList ) {

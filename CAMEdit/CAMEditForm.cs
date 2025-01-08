@@ -1,10 +1,11 @@
 ﻿using DataStructure;
 using OCC.AIS;
+using OCC.Aspect;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.Graphic3d;
+using OCC.Prs3d;
 using OCC.Quantity;
-using OCC.TCollection;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
@@ -44,7 +45,9 @@ namespace CAMEdit
 				return false;
 			}
 			m_Model = model;
-			ShowModel();
+			ShowPart();
+			ShowCADContour();
+			ShowCAMData();
 			return true;
 		}
 
@@ -55,6 +58,14 @@ namespace CAMEdit
 		// model
 		CAMEditModel m_Model;
 
+		// for UI action
+		Dictionary<TopoDS_Vertex, Tuple<CAMData, int>> m_VertexMap = new Dictionary<TopoDS_Vertex, Tuple<CAMData, int>>();
+		Dictionary<TopoDS_Wire, CAMData> m_ContourMap = new Dictionary<TopoDS_Wire, CAMData>();
+
+		// for viewer resource handle
+		List<AIS_Shape> m_CAMContourAISList = new List<AIS_Shape>();
+		List<AIS_Shape> m_ToolVecAISList = new List<AIS_Shape>();
+
 		enum EvecType
 		{
 			ToolVec,
@@ -62,23 +73,13 @@ namespace CAMEdit
 			NormalVec,
 		}
 
-		// init
-		void ShowModel()
+		void ShowPart()
 		{
-			// get cam data list
-			List<CAMData> camDataList = m_Model.CAMDataList;
-			if( camDataList == null || camDataList.Count == 0 ) {
-				return;
-			}
-
 			// get part shape
 			TopoDS_Shape partShape = m_Model.PartShape;
 			if( partShape == null ) {
 				return;
 			}
-
-			// clear the viewer
-			m_OCCViewer.GetAISContext().RemoveAll( false );
 
 			// display the part
 			AIS_Shape partAIS = new AIS_Shape( partShape );
@@ -88,51 +89,149 @@ namespace CAMEdit
 			m_OCCViewer.GetAISContext().Display( partAIS, false );
 			m_OCCViewer.GetAISContext().Deactivate( partAIS );
 
-			// display cam data
-			for( int i = 0; i < camDataList.Count; i++ ) {
-
-				// display vectors
-				foreach( CADPoint camPoint in camDataList[ i ].CADPointList ) {
-
-					// tool vector
-					//AIS_Shape toolVecAIS = GetVecAIS( camPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					//m_OCCViewer.GetAISContext().Display( toolVecAIS, false );
-					//m_OCCViewer.GetAISContext().Deactivate( toolVecAIS );
-
-					// tangent vector
-					AIS_Shape tangentVecAIS = GetVecAIS( camPoint.Point, camPoint.TangentVec, EvecType.TangentVec );
-					m_OCCViewer.GetAISContext().Display( tangentVecAIS, false );
-					m_OCCViewer.GetAISContext().Deactivate( tangentVecAIS );
-
-					// normal vector
-					AIS_Shape normalVecAIS = GetVecAIS( camPoint.Point, camPoint.NormalVec, EvecType.NormalVec );
-					m_OCCViewer.GetAISContext().Display( normalVecAIS, false );
-					m_OCCViewer.GetAISContext().Deactivate( normalVecAIS );
-				}
-
-				// display index
-				gp_Pnt indexPoint = camDataList[ i ].CADPointList.First().Point;
-				AIS_TextLabel indexText = new AIS_TextLabel();
-				indexText.SetText( new TCollection_ExtendedString( ( i + 1 ).ToString() ) );
-				indexText.SetPosition( indexPoint );
-				indexText.SetHeight( 20 );
-				indexText.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-				indexText.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
-				m_OCCViewer.GetAISContext().Display( indexText, false );
-				m_OCCViewer.GetAISContext().Deactivate( indexText );
-			}
-
-			// display the contours
-			//foreach( TopoDS_Wire contour in contourList ) {
-			//	AIS_Shape contourAIS = new AIS_Shape( contour );
-			//	contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			//	contourAIS.SetWidth( 1 );
-			//	m_OCCViewer.GetAISContext().Display( contourAIS, false );
-			//}
-
+			// update the viewer
 			m_OCCViewer.AxoView();
 			m_OCCViewer.ZoomAllView();
 			m_OCCViewer.UpdateView();
+		}
+
+		void ShowCADContour()
+		{
+			for( int i = 0; i < m_Model.CAMDataList.Count; i++ ) {
+
+				// build wire from cad points
+				CAMData camData = m_Model.CAMDataList[ i ];
+				TopoDS_Vertex lastVertex = null;
+				List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
+
+				// add vertex to map and build edges
+				for( int j = 0; j < camData.CADPointList.Count; j++ ) {
+					BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( camData.CADPointList[ j ].Point );
+					TopoDS_Vertex vertex = vertexMaker.Vertex();
+
+					// first vertex
+					if( j == 0 || lastVertex == null ) {
+						m_VertexMap.Add( vertex, new Tuple<CAMData, int>( camData, j ) );
+						lastVertex = vertex;
+						continue;
+					}
+
+					// check distance of two points
+					double dDistance = camData.CADPointList[ j - 1 ].Point.Distance( camData.CADPointList[ j ].Point );
+					if( dDistance < 1e-6 ) {
+						continue;
+					}
+					BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( lastVertex, vertex );
+					edgeList.Add( edgeMaker.Edge() );
+					m_VertexMap.Add( vertex, new Tuple<CAMData, int>( camData, j ) );
+					lastVertex = vertex;
+				}
+
+				// build wire
+				BRepBuilderAPI_MakeWire wireMaker = new BRepBuilderAPI_MakeWire();
+				foreach( TopoDS_Edge edge in edgeList ) {
+					wireMaker.Add( edge );
+				}
+				TopoDS_Wire wire = wireMaker.Wire();
+				m_ContourMap.Add( wire, camData );
+			}
+
+			// display the contour
+			foreach( TopoDS_Wire contour in m_ContourMap.Keys ) {
+				AIS_Shape contourAIS = new AIS_Shape( contour );
+				contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+				contourAIS.SetWidth( 1 );
+				m_OCCViewer.GetAISContext().Display( contourAIS, false );
+				m_OCCViewer.GetAISContext().Activate( contourAIS, (int)AISActiveMode.Wire );
+			}
+		}
+
+		void ShowCAMData()
+		{
+			ShowCAMContour();
+			ShowToolVec();
+		}
+
+		void ShowCAMContour()
+		{
+			// clear the previous cam data
+			foreach( AIS_Shape camAIS in m_CAMContourAISList ) {
+				m_OCCViewer.GetAISContext().Remove( camAIS, false );
+			}
+			m_CAMContourAISList.Clear();
+
+			// build cam data
+			List<TopoDS_Wire> camWireList = new List<TopoDS_Wire>();
+			for( int i = 0; i < m_Model.CAMDataList.Count; i++ ) {
+
+				// build wire from cam points
+				CAMData camData = m_Model.CAMDataList[ i ];
+				TopoDS_Vertex lastVertex = null;
+				List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
+
+				// build edges
+				for( int j = 0; j < camData.CADPointList.Count; j++ ) {
+					BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( camData.CADPointList[ j ].Point );
+					TopoDS_Vertex vertex = vertexMaker.Vertex();
+
+					// first vertex
+					if( j == 0 || lastVertex == null ) {
+						lastVertex = vertex;
+						continue;
+					}
+
+					// check distance of two points
+					double dDistance = camData.CADPointList[ j - 1 ].Point.Distance( camData.CADPointList[ j ].Point );
+					if( dDistance < 1e-6 ) {
+						continue;
+					}
+					BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( lastVertex, vertex );
+					edgeList.Add( edgeMaker.Edge() );
+					lastVertex = vertex;
+				}
+
+				// build wire
+				BRepBuilderAPI_MakeWire wireMaker = new BRepBuilderAPI_MakeWire();
+				foreach( TopoDS_Edge edge in edgeList ) {
+					wireMaker.Add( edge );
+				}
+				TopoDS_Wire wire = wireMaker.Wire();
+				camWireList.Add( wire );
+			}
+
+			// display the cam data
+			foreach( TopoDS_Wire camWire in camWireList ) {
+				AIS_Shape camAIS = new AIS_Shape( camWire );
+				camAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+				camAIS.SetWidth( 2 );
+				Prs3d_LineAspect aspect = camAIS.Attributes().WireAspect();
+				aspect.SetTypeOfLine( Aspect_TypeOfLine.Aspect_TOL_DASH );
+				m_OCCViewer.GetAISContext().Display( camAIS, false );
+				m_OCCViewer.GetAISContext().Deactivate( camAIS );
+				m_CAMContourAISList.Add( camAIS );
+			}
+		}
+
+		void ShowToolVec()
+		{
+			// clear the previous tool vec
+			foreach( AIS_Shape toolVecAIS in m_ToolVecAISList ) {
+				m_OCCViewer.GetAISContext().Remove( toolVecAIS, false );
+			}
+
+			// build tool vec
+			foreach( CAMData camData in m_Model.CAMDataList ) {
+				foreach( CAMPoint camPoint in camData.CAMPointList ) {
+					AIS_Shape toolVecAIS = GetVecAIS( camPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
+					m_ToolVecAISList.Add( toolVecAIS );
+				}
+			}
+
+			// display the tool vec
+			foreach( AIS_Shape toolVecAIS in m_ToolVecAISList ) {
+				m_OCCViewer.GetAISContext().Display( toolVecAIS, false );
+				m_OCCViewer.GetAISContext().Deactivate( toolVecAIS );
+			}
 		}
 
 		AIS_Shape GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
