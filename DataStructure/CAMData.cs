@@ -60,17 +60,10 @@ namespace DataStructure
 
 	public class CAMData
 	{
+		// CAD property
 		public CAMData( CADData cadData )
 		{
 			CADData = cadData;
-
-			// initialize fields
-			CADPointList = new List<CADPoint>();
-			CAMPointList = new List<CAMPoint>();
-			ToolVectorType = ToolVectorType.NormalXTangent;
-			IsReverse = false;
-			StartPoint = 0;
-			Offset = 0;
 
 			// build raw data
 			BuildCADPointList();
@@ -87,34 +80,95 @@ namespace DataStructure
 			get; private set;
 		}
 
+		// CAM property
 		public List<CAMPoint> CAMPointList
 		{
-			get; private set;
+			get
+			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
+				return m_CAMPointList;
+			}
 		}
 
 		public ToolVectorType ToolVectorType
 		{
-			get; set;
+			get
+			{
+				return m_ToolVectorType;
+			}
+			set
+			{
+				if( m_ToolVectorType != value ) {
+					m_ToolVectorType = value;
+					m_IsDirty = true;
+				}
+			}
 		}
 
 		public bool IsReverse
 		{
-			get; set;
+			get
+			{
+				return m_IsReverse;
+			}
+			set
+			{
+				if( m_IsReverse != value ) {
+					m_IsReverse = value;
+					m_IsDirty = true;
+				}
+			}
 		}
 
 		public int StartPoint
 		{
-			get; set;
+			get
+			{
+				return m_StartPoint;
+			}
+			set
+			{
+				if( m_StartPoint != value ) {
+					m_StartPoint = value;
+					m_IsDirty = true;
+				}
+			}
 		}
 
 		public double Offset
 		{
-			get; set;
+			get
+			{
+				return m_Offset;
+			}
+			set
+			{
+				if( m_Offset != value ) {
+					m_Offset = value;
+					m_IsDirty = true;
+				}
+			}
 		}
+
+		// backing fields
+		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
+		ToolVectorType m_ToolVectorType = ToolVectorType.NormalXTangent;
+		bool m_IsReverse = false;
+		int m_StartPoint = 0;
+		double m_Offset = 0;
+
+		// dirty flag
+		bool m_IsDirty = false;
 
 		void BuildCADPointList()
 		{
 			CADPointList = new List<CADPoint>();
+			if( CADData == null || CADData.Contour == null ) {
+				return;
+			}
 			TopExp_Explorer edgeExp = new TopExp_Explorer( CADData.Contour, TopAbs_ShapeEnum.TopAbs_EDGE );
 
 			// go through the contour edges
@@ -123,6 +177,9 @@ namespace DataStructure
 				edgeExp.Next();
 
 				// get the solid face which the edge belongs to
+				if( CADData.ShellMap == null || CADData.SolidMap == null ) {
+					continue;
+				}
 				List<TopoDS_Shape> shellFaceList = CADData.ShellMap.FindFromKey( edge ).elementsAsList;
 				List<TopoDS_Shape> solidFaceList = CADData.SolidMap.FindFromKey( edge ).elementsAsList;
 				if( shellFaceList == null || solidFaceList == null ) {
