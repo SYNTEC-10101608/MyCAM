@@ -7,6 +7,7 @@ using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Prs3d;
 using OCC.Quantity;
+using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
@@ -35,6 +36,16 @@ namespace CAMEdit
 			m_panViewer.Dock = DockStyle.Fill;
 			m_OCCViewer.UpdateView();
 
+			// set AIS selction style
+			Prs3d_Drawer d = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected );
+			d.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			d.SetTransparency( 0.5f );
+			d.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			Prs3d_Drawer d1 = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected );
+			d1.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			d1.SetTransparency( 0.5f );
+			d1.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
 			m_panViewer.PreviewKeyDown += ViewerKeyDown;
@@ -49,6 +60,7 @@ namespace CAMEdit
 			ShowPart();
 			ShowCADContour();
 			ShowCAMData();
+			editMode = EditMode.None;
 			return true;
 		}
 
@@ -62,8 +74,28 @@ namespace CAMEdit
 		// for UI action
 		Dictionary<TopoDS_Vertex, Tuple<CAMData, int>> m_VertexMap = new Dictionary<TopoDS_Vertex, Tuple<CAMData, int>>();
 		Dictionary<TopoDS_Wire, CAMData> m_ContourMap = new Dictionary<TopoDS_Wire, CAMData>();
+		enum EditMode
+		{
+			None,
+			StartPoint,
+		}
+		EditMode m_EditMode = EditMode.None;
+		EditMode editMode
+		{
+			get
+			{
+				return m_EditMode;
+			}
+			set
+			{
+				EndAction();
+				m_EditMode = value;
+				StartAction();
+			}
+		}
 
 		// for viewer resource handle
+		List<AIS_Shape> m_CADContourAISList = new List<AIS_Shape>();
 		List<AIS_Shape> m_CAMContourAISList = new List<AIS_Shape>();
 		List<AIS_Shape> m_ToolVecAISList = new List<AIS_Shape>();
 		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>();
@@ -144,7 +176,8 @@ namespace CAMEdit
 				contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
 				contourAIS.SetWidth( 1 );
 				m_OCCViewer.GetAISContext().Display( contourAIS, false );
-				m_OCCViewer.GetAISContext().Activate( contourAIS, (int)AISActiveMode.Vertex );
+				m_OCCViewer.GetAISContext().Deactivate( contourAIS );
+				m_CADContourAISList.Add( contourAIS );
 			}
 		}
 
@@ -153,6 +186,7 @@ namespace CAMEdit
 			ShowCAMContour();
 			//ShowToolVec();
 			ShowOrientation();
+			m_OCCViewer.UpdateView();
 		}
 
 		void ShowCAMContour()
@@ -221,6 +255,7 @@ namespace CAMEdit
 			foreach( AIS_Shape toolVecAIS in m_ToolVecAISList ) {
 				m_OCCViewer.GetAISContext().Remove( toolVecAIS, false );
 			}
+			m_ToolVecAISList.Clear();
 
 			// build tool vec
 			foreach( CAMData camData in m_Model.CAMDataList ) {
@@ -243,11 +278,12 @@ namespace CAMEdit
 			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
 				m_OCCViewer.GetAISContext().Remove( orientationAIS, false );
 			}
+			m_OrientationAISList.Clear();
 
 			// build orientation
 			foreach( CAMData camData in m_Model.CAMDataList ) {
 				int nDataCount = camData.CAMPointList.Count;
-				int nShowIndex = (int)Math.Floor( nDataCount * 0.1 );
+				int nShowIndex = 0;
 				gp_Pnt showPoint = camData.CAMPointList[ nShowIndex ].Point;
 
 				// the direction of the orientation is vector to the next point
@@ -297,13 +333,44 @@ namespace CAMEdit
 			return coneAIS;
 		}
 
-		// viewer action
-		void ViewerKeyDown( object sender, PreviewKeyDownEventArgs e )
+		void m_tsmiStartPoint_Click( object sender, EventArgs e )
 		{
+			editMode = EditMode.StartPoint;
 		}
 
-		void ViewerMouseDown( object sender, MouseEventArgs e )
+		void m_tsmiReverse_Click( object sender, EventArgs e )
 		{
+			CAMData camData = GetSelectedCAMData();
+			if( camData == null ) {
+				return;
+			}
+			camData.IsReverse = !camData.IsReverse;
+			ShowCAMData();
+		}
+
+		void m_tsmiTV_Default_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		void m_tsmiTV_Intersecting_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		void m_tsmiTV_Z_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		void m_tsmiOffset_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		void m_tsmiLead_Click( object sender, EventArgs e )
+		{
+
 		}
 
 		void m_btnOK_Click( object sender, EventArgs e )
@@ -311,6 +378,89 @@ namespace CAMEdit
 			List<IProcessData> cuttingProcessDataList =
 				m_Model.CAMDataList.Select( camData => new CuttingProcessData( camData ) ).Cast<IProcessData>().ToList();
 			CADEditOK?.Invoke( m_Model.PartShape, cuttingProcessDataList );
+		}
+
+		// viewer action
+		void ViewerKeyDown( object sender, PreviewKeyDownEventArgs e )
+		{
+			switch( editMode ) {
+				case EditMode.StartPoint:
+					break;
+				case EditMode.None:
+				default:
+					break;
+			}
+		}
+
+		void ViewerMouseDown( object sender, MouseEventArgs e )
+		{
+			switch( editMode ) {
+				case EditMode.StartPoint:
+					break;
+				case EditMode.None:
+				default:
+					if( e.Button != MouseButtons.Left ) {
+						return;
+					}
+					m_OCCViewer.Select();
+					break;
+			}
+		}
+
+		CAMData GetSelectedCAMData()
+		{
+			m_OCCViewer.GetAISContext().InitSelected();
+			if( !m_OCCViewer.GetAISContext().MoreSelected() ) {
+				return null;
+			}
+			TopoDS_Shape selectedShape = m_OCCViewer.GetAISContext().SelectedShape();
+			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_WIRE ) {
+				return null;
+			}
+
+			// TODO: try use OCC map
+			foreach( TopoDS_Wire wire in m_ContourMap.Keys ) {
+				if( wire.IsEqual( selectedShape ) ) {
+					return m_ContourMap[ wire ];
+				}
+			}
+			return null;
+		}
+
+		void StartAction()
+		{
+			switch( editMode ) {
+				case EditMode.StartPoint:
+
+					// activate the contour CAD vertex selection
+					foreach( AIS_Shape oneShape in m_CADContourAISList ) {
+						m_OCCViewer.GetAISContext().Activate( oneShape, (int)AISActiveMode.Vertex );
+					}
+					break;
+				case EditMode.None:
+				default:
+
+					// activate the contour CAD wire selection
+					foreach( AIS_Shape oneShape in m_CADContourAISList ) {
+						m_OCCViewer.GetAISContext().Activate( oneShape, (int)AISActiveMode.Wire );
+					}
+					break;
+			}
+		}
+
+		void EndAction()
+		{
+			switch( editMode ) {
+				case EditMode.StartPoint:
+				case EditMode.None:
+				default:
+
+					// deactivate the contour CAD wire selection
+					foreach( AIS_Shape oneShape in m_CADContourAISList ) {
+						m_OCCViewer.GetAISContext().Deactivate( oneShape );
+					}
+					break;
+			}
 		}
 	}
 }

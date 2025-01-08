@@ -9,8 +9,8 @@ namespace DataStructure
 {
 	public enum ToolVectorType
 	{
-		NormalXTangent,
-		CrossOfNormals,
+		Default,
+		Intersecting,
 		TowardZ,
 	}
 
@@ -155,7 +155,7 @@ namespace DataStructure
 
 		// backing fields
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
-		ToolVectorType m_ToolVectorType = ToolVectorType.NormalXTangent;
+		ToolVectorType m_ToolVectorType = ToolVectorType.Default;
 		bool m_IsReverse = false;
 		int m_StartPoint = 0;
 		double m_Offset = 0;
@@ -225,17 +225,17 @@ namespace DataStructure
 			}
 
 			// build cam points
-			for( int i = 0; i < CADPointList.Count; i++ ) {
+			for( int i = 0; i < rearrangedCADPointList.Count; i++ ) {
 
 				// calculate tool vector
-				CADPoint cadPoint = CADPointList[ i ];
+				CADPoint cadPoint = rearrangedCADPointList[ i ];
 				gp_Dir ToolVec;
 				switch( ToolVectorType ) {
-					case ToolVectorType.NormalXTangent:
+					case ToolVectorType.Default:
 					default:
 						ToolVec = cadPoint.NormalVec.Crossed( cadPoint.TangentVec );
 						break;
-					case ToolVectorType.CrossOfNormals:
+					case ToolVectorType.Intersecting:
 
 						// TODO: implement this
 						ToolVec = new gp_Dir( 0, 0, 1 );
