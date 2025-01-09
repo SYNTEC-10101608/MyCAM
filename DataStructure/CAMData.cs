@@ -93,6 +93,18 @@ namespace DataStructure
 			}
 		}
 
+		public List<CAMPoint> OffsetCAMPointList
+		{
+			get
+			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
+				return m_OffsetCAMPointList;
+			}
+		}
+
 		public ToolVectorType ToolVectorType
 		{
 			get
@@ -155,6 +167,7 @@ namespace DataStructure
 
 		// backing fields
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
+		List<CAMPoint> m_OffsetCAMPointList = new List<CAMPoint>();
 		ToolVectorType m_ToolVectorType = ToolVectorType.Default;
 		bool m_IsReverse = false;
 		int m_StartPoint = 0;

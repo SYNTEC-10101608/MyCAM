@@ -184,7 +184,7 @@ namespace CAMEdit
 		void ShowCAMData()
 		{
 			ShowCAMContour();
-			//ShowToolVec();
+			ShowToolVec();
 			ShowOrientation();
 			m_OCCViewer.UpdateView();
 		}
@@ -350,17 +350,27 @@ namespace CAMEdit
 
 		void m_tsmiTV_Default_Click( object sender, EventArgs e )
 		{
-
+			OnToolVecTypeChanged( ToolVectorType.Default );
 		}
 
 		void m_tsmiTV_Intersecting_Click( object sender, EventArgs e )
 		{
-
+			OnToolVecTypeChanged( ToolVectorType.Intersecting );
 		}
 
 		void m_tsmiTV_Z_Click( object sender, EventArgs e )
 		{
+			OnToolVecTypeChanged( ToolVectorType.TowardZ );
+		}
 
+		void OnToolVecTypeChanged( ToolVectorType toolVecType )
+		{
+			CAMData camData = GetSelectedCAMData();
+			if( camData == null ) {
+				return;
+			}
+			camData.ToolVectorType = toolVecType;
+			ShowCAMData();
 		}
 
 		void m_tsmiOffset_Click( object sender, EventArgs e )
