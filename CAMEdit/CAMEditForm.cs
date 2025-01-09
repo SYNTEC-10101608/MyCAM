@@ -153,13 +153,10 @@ namespace CAMEdit
 						lastVertex = vertex;
 						continue;
 					}
-
-					// check distance of two points
-					double dDistance = camData.CADPointList[ j - 1 ].Point.Distance( camData.CADPointList[ j ].Point );
-					if( dDistance < 1e-6 ) {
+					BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( lastVertex, vertex );
+					if( edgeMaker.IsDone() == false ) {
 						continue;
 					}
-					BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( lastVertex, vertex );
 					edgeList.Add( edgeMaker.Edge() );
 					m_VertexMap.Add( vertex, new Tuple<CAMData, int>( camData, j ) );
 					lastVertex = vertex;
@@ -169,6 +166,9 @@ namespace CAMEdit
 				BRepBuilderAPI_MakeWire wireMaker = new BRepBuilderAPI_MakeWire();
 				foreach( TopoDS_Edge edge in edgeList ) {
 					wireMaker.Add( edge );
+				}
+				if( wireMaker.IsDone() == false ) {
+					continue;
 				}
 				TopoDS_Wire wire = wireMaker.Wire();
 				m_ContourMap.Add( wire, camData );
@@ -211,8 +211,8 @@ namespace CAMEdit
 				List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
 
 				// build edges
-				for( int j = 0; j < camData.CADPointList.Count; j++ ) {
-					BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( camData.CADPointList[ j ].Point );
+				for( int j = 0; j < camData.OffsetCAMPointList.Count; j++ ) {
+					BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( camData.OffsetCAMPointList[ j ].CADPoint.Point );
 					TopoDS_Vertex vertex = vertexMaker.Vertex();
 
 					// first vertex
@@ -220,13 +220,10 @@ namespace CAMEdit
 						lastVertex = vertex;
 						continue;
 					}
-
-					// check distance of two points
-					double dDistance = camData.CADPointList[ j - 1 ].Point.Distance( camData.CADPointList[ j ].Point );
-					if( dDistance < 1e-6 ) {
+					BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( lastVertex, vertex );
+					if( edgeMaker.IsDone() == false ) {
 						continue;
 					}
-					BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( lastVertex, vertex );
 					edgeList.Add( edgeMaker.Edge() );
 					lastVertex = vertex;
 				}
@@ -236,6 +233,9 @@ namespace CAMEdit
 				foreach( TopoDS_Edge edge in edgeList ) {
 					wireMaker.Add( edge );
 				}
+				if( wireMaker.IsDone() == false ) {
+					continue;
+				}
 				TopoDS_Wire wire = wireMaker.Wire();
 				camWireList.Add( wire );
 			}
@@ -243,7 +243,7 @@ namespace CAMEdit
 			// display the cam data
 			foreach( TopoDS_Wire camWire in camWireList ) {
 				AIS_Shape camAIS = new AIS_Shape( camWire );
-				camAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+				camAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_YELLOW ) );
 				camAIS.SetWidth( 1 );
 				Prs3d_LineAspect aspect = camAIS.Attributes().WireAspect();
 				aspect.SetTypeOfLine( Aspect_TypeOfLine.Aspect_TOL_DASH );
@@ -264,7 +264,7 @@ namespace CAMEdit
 			// build tool vec
 			foreach( CAMData camData in m_Model.CAMDataList ) {
 				foreach( CAMPoint camPoint in camData.CAMPointList ) {
-					AIS_Shape toolVecAIS = GetVecAIS( camPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
+					AIS_Shape toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
 					m_ToolVecAISList.Add( toolVecAIS );
 				}
 			}
@@ -288,10 +288,10 @@ namespace CAMEdit
 			foreach( CAMData camData in m_Model.CAMDataList ) {
 				int nDataCount = camData.CAMPointList.Count;
 				int nShowIndex = 0;
-				gp_Pnt showPoint = camData.CAMPointList[ nShowIndex ].Point;
+				gp_Pnt showPoint = camData.CAMPointList[ nShowIndex ].CADPoint.Point;
 
 				// the direction of the orientation is vector to the next point
-				gp_Dir orientationDir = new gp_Dir( camData.CAMPointList[ nShowIndex + 1 ].Point.XYZ() - showPoint.XYZ() );
+				gp_Dir orientationDir = new gp_Dir( camData.CAMPointList[ nShowIndex + 1 ].CADPoint.Point.XYZ() - showPoint.XYZ() );
 				AIS_Shape orientationAIS = GetOrientationAIS( showPoint, orientationDir );
 				m_OrientationAISList.Add( orientationAIS );
 			}
@@ -379,7 +379,19 @@ namespace CAMEdit
 
 		void m_tsmiOffset_Click( object sender, EventArgs e )
 		{
+			GetSelectedWireInfo( out CAMData camData, out _ );
+			if( camData == null ) {
+				return;
+			}
 
+			// TODO: implement this
+			if( camData.Offset == 0 ) {
+				camData.Offset = 1;
+			}
+			else {
+				camData.Offset = 0;
+			}
+			ShowCAMData();
 		}
 
 		void m_tsmiLead_Click( object sender, EventArgs e )
@@ -514,8 +526,8 @@ namespace CAMEdit
 					m_tsmiLead.Enabled = false;
 					m_tsmiOK.Enabled = false;
 
-					// check the start point tsmi
-					m_tsmiStartPoint.Checked = true;
+					// highlight the start point tsmi
+					m_tsmiStartPoint.BackColor = System.Drawing.Color.Yellow;
 					break;
 				case EditMode.None:
 				default:
@@ -548,8 +560,8 @@ namespace CAMEdit
 					m_tsmiLead.Enabled = true;
 					m_tsmiOK.Enabled = true;
 
-					// uncheck the start point tsmi
-					m_tsmiStartPoint.Checked = false;
+					// restore the start point tsmi to system control color
+					m_tsmiStartPoint.BackColor = System.Drawing.SystemColors.Control;
 					break;
 				case EditMode.None:
 				default:
