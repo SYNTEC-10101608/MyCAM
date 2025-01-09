@@ -36,7 +36,7 @@ namespace OCCTool
 			if( Math.Abs( denominator ) < 1e-6 ) { //TODO: tolerance
 				TypeL1 = IntersectType.NoIntersect;
 				TypeL2 = IntersectType.NoIntersect;
-				return new gp_Pnt( ( p2.XYZ() + p3.XYZ() ) / 2 );
+				return new gp_Pnt( ( p2.XYZ() + p4.XYZ() ) / 2 );
 			}
 
 			double t = ( b * e - c * d ) / denominator; // Parameter t for line 1

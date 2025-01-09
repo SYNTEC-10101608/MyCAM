@@ -5,6 +5,7 @@ using OCC.TopoDS;
 using OCCTool;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DataStructure
 {
@@ -236,6 +237,9 @@ namespace DataStructure
 			// reverse the cad points if needed
 			if( IsReverse ) {
 				rearrangedCADPointList.Reverse();
+				CADPoint lastPoint = rearrangedCADPointList.Last();
+				rearrangedCADPointList.Remove( lastPoint );
+				rearrangedCADPointList.Insert( 0, lastPoint );
 			}
 
 			// build cam points
@@ -274,6 +278,7 @@ namespace DataStructure
 		void BuildOffsetPointList()
 		{
 			if( m_CAMPointList.Count == 0 ) {
+				m_OffsetCAMPointList = new List<CAMPoint>();
 				return;
 			}
 
@@ -378,6 +383,10 @@ namespace DataStructure
 				gp_Dir toolVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.ToolVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.ToolVec.XYZ() );
 				m_OffsetCAMPointList.Add( new CAMPoint( new CADPoint( intersectPoint, normalVec, tangentVec ), toolVec ) );
 			}
+
+			CAMPoint lastPoint = m_OffsetCAMPointList.Last();
+			m_OffsetCAMPointList.Remove( lastPoint );
+			m_OffsetCAMPointList.Insert( 0, lastPoint );
 		}
 	}
 }

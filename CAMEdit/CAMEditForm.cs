@@ -263,7 +263,7 @@ namespace CAMEdit
 
 			// build tool vec
 			foreach( CAMData camData in m_Model.CAMDataList ) {
-				foreach( CAMPoint camPoint in camData.CAMPointList ) {
+				foreach( CAMPoint camPoint in camData.OffsetCAMPointList ) {
 					AIS_Shape toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
 					m_ToolVecAISList.Add( toolVecAIS );
 				}
@@ -286,12 +286,11 @@ namespace CAMEdit
 
 			// build orientation
 			foreach( CAMData camData in m_Model.CAMDataList ) {
-				int nDataCount = camData.CAMPointList.Count;
-				int nShowIndex = 0;
-				gp_Pnt showPoint = camData.CAMPointList[ nShowIndex ].CADPoint.Point;
+				gp_Pnt showPoint = camData.OffsetCAMPointList[ 0 ].CADPoint.Point;
+				gp_Pnt endPoint = camData.OffsetCAMPointList[ 1 ].CADPoint.Point;
 
 				// the direction of the orientation is vector to the next point
-				gp_Dir orientationDir = new gp_Dir( camData.CAMPointList[ nShowIndex + 1 ].CADPoint.Point.XYZ() - showPoint.XYZ() );
+				gp_Dir orientationDir = new gp_Dir( endPoint.XYZ() - showPoint.XYZ() );
 				AIS_Shape orientationAIS = GetOrientationAIS( showPoint, orientationDir );
 				m_OrientationAISList.Add( orientationAIS );
 			}
