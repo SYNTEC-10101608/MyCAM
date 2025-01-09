@@ -1,6 +1,7 @@
 ﻿using DataStructure;
 using OCC.AIS;
 using OCC.Aspect;
+using OCC.BRep;
 using OCC.BRepBuilderAPI;
 using OCC.BRepPrimAPI;
 using OCC.gp;
@@ -49,6 +50,9 @@ namespace CAMEdit
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
 			m_panViewer.PreviewKeyDown += ViewerKeyDown;
+
+			// TODO: panel key down does not work
+			PreviewKeyDown += ViewerKeyDown;
 		}
 
 		public bool Init( CAMEditModel model )
@@ -95,10 +99,10 @@ namespace CAMEdit
 		}
 
 		// for viewer resource handle
-		List<AIS_Shape> m_CADContourAISList = new List<AIS_Shape>();
-		List<AIS_Shape> m_CAMContourAISList = new List<AIS_Shape>();
-		List<AIS_Shape> m_ToolVecAISList = new List<AIS_Shape>();
-		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>();
+		List<AIS_Shape> m_CADContourAISList = new List<AIS_Shape>(); // for active only, no need refresh
+		List<AIS_Shape> m_CAMContourAISList = new List<AIS_Shape>(); // need refresh
+		List<AIS_Shape> m_ToolVecAISList = new List<AIS_Shape>(); // need refresh
+		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh
 
 		enum EvecType
 		{
@@ -174,7 +178,7 @@ namespace CAMEdit
 			foreach( TopoDS_Wire contour in m_ContourMap.Keys ) {
 				AIS_Shape contourAIS = new AIS_Shape( contour );
 				contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-				contourAIS.SetWidth( 1 );
+				contourAIS.SetWidth( 1.5 );
 				m_OCCViewer.GetAISContext().Display( contourAIS, false );
 				m_OCCViewer.GetAISContext().Deactivate( contourAIS );
 				m_CADContourAISList.Add( contourAIS );
@@ -340,7 +344,7 @@ namespace CAMEdit
 
 		void m_tsmiReverse_Click( object sender, EventArgs e )
 		{
-			CAMData camData = GetSelectedCAMData();
+			GetSelectedWireInfo( out CAMData camData, out _ );
 			if( camData == null ) {
 				return;
 			}
@@ -365,7 +369,7 @@ namespace CAMEdit
 
 		void OnToolVecTypeChanged( ToolVectorType toolVecType )
 		{
-			CAMData camData = GetSelectedCAMData();
+			GetSelectedWireInfo( out CAMData camData, out _ );
 			if( camData == null ) {
 				return;
 			}
@@ -383,7 +387,7 @@ namespace CAMEdit
 
 		}
 
-		void m_btnOK_Click( object sender, EventArgs e )
+		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
 			List<IProcessData> cuttingProcessDataList =
 				m_Model.CAMDataList.Select( camData => new CuttingProcessData( camData ) ).Cast<IProcessData>().ToList();
@@ -395,6 +399,9 @@ namespace CAMEdit
 		{
 			switch( editMode ) {
 				case EditMode.StartPoint:
+					if( e.KeyCode == Keys.Escape ) {
+						editMode = EditMode.None;
+					}
 					break;
 				case EditMode.None:
 				default:
@@ -406,6 +413,16 @@ namespace CAMEdit
 		{
 			switch( editMode ) {
 				case EditMode.StartPoint:
+					if( e.Button != MouseButtons.Left ) {
+						return;
+					}
+					m_OCCViewer.Select();
+					GetSelectedVertexInfo( out CAMData camData, out int nIndex );
+					if( camData == null || nIndex == -1 ) {
+						return;
+					}
+					camData.StartPoint = nIndex;
+					ShowCAMData();
 					break;
 				case EditMode.None:
 				default:
@@ -417,35 +434,88 @@ namespace CAMEdit
 			}
 		}
 
-		CAMData GetSelectedCAMData()
+		void GetSelectedWireInfo( out CAMData camData, out AIS_InteractiveObject selectedAIS )
 		{
+			camData = null;
+			selectedAIS = null;
 			m_OCCViewer.GetAISContext().InitSelected();
 			if( !m_OCCViewer.GetAISContext().MoreSelected() ) {
-				return null;
-			}
-			TopoDS_Shape selectedShape = m_OCCViewer.GetAISContext().SelectedShape();
-			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_WIRE ) {
-				return null;
+				return;
 			}
 
-			// TODO: try use OCC map
+			// get the sleected AIS shape
+			selectedAIS = m_OCCViewer.GetAISContext().SelectedInteractive();
+			if( selectedAIS == null ) {
+				return;
+			}
+
+			// get the selected shape
+			TopoDS_Shape selectedShape = m_OCCViewer.GetAISContext().SelectedShape();
+			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_WIRE ) {
+				return;
+			}
+
+			// TODO: the mapping method is not good, try use OCC map or other method later
 			foreach( TopoDS_Wire wire in m_ContourMap.Keys ) {
 				if( wire.IsEqual( selectedShape ) ) {
-					return m_ContourMap[ wire ];
+					camData = m_ContourMap[ wire ];
+					return;
 				}
 			}
-			return null;
+		}
+
+		void GetSelectedVertexInfo( out CAMData camData, out int nIndex )
+		{
+			camData = null;
+			nIndex = -1;
+			m_OCCViewer.GetAISContext().InitSelected();
+			if( !m_OCCViewer.GetAISContext().MoreSelected() ) {
+				return;
+			}
+
+			// get the selected vertex
+			TopoDS_Shape selectedShape = m_OCCViewer.GetAISContext().SelectedShape();
+			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
+				return;
+			}
+
+			// TODO: the mapping method is not good, try use OCC map or other method later
+			foreach( TopoDS_Vertex vertex in m_VertexMap.Keys ) {
+
+				// using distance threadhold to find the selected vertex
+				gp_Pnt p1 = BRep_Tool.Pnt( vertex );
+				gp_Pnt p2 = BRep_Tool.Pnt( TopoDS.ToVertex( selectedShape ) );
+				double dDistance = p1.Distance( p2 );
+				if( dDistance < 1e-6 ) {
+					camData = m_VertexMap[ vertex ].Item1;
+					nIndex = m_VertexMap[ vertex ].Item2;
+					return;
+				}
+			}
 		}
 
 		void StartAction()
 		{
 			switch( editMode ) {
 				case EditMode.StartPoint:
-
-					// activate the contour CAD vertex selection
-					foreach( AIS_Shape oneShape in m_CADContourAISList ) {
-						m_OCCViewer.GetAISContext().Activate( oneShape, (int)AISActiveMode.Vertex );
+					GetSelectedWireInfo( out CAMData camData, out AIS_InteractiveObject selectedAIS );
+					if( camData == null || selectedAIS == null ) {
+						editMode = EditMode.None;
+						return;
 					}
+
+					// activate the selected contour
+					m_OCCViewer.GetAISContext().Activate( selectedAIS, (int)AISActiveMode.Vertex );
+
+					// disable all other tsmi
+					m_tsmiReverse.Enabled = false;
+					m_tsmiToolVec.Enabled = false;
+					m_tsmiOffset.Enabled = false;
+					m_tsmiLead.Enabled = false;
+					m_tsmiOK.Enabled = false;
+
+					// check the start point tsmi
+					m_tsmiStartPoint.Checked = true;
 					break;
 				case EditMode.None:
 				default:
@@ -462,6 +532,25 @@ namespace CAMEdit
 		{
 			switch( editMode ) {
 				case EditMode.StartPoint:
+
+					// clear all selected
+					m_OCCViewer.GetAISContext().ClearSelected( true );
+
+					// deactivate the contour CAD wire selection
+					foreach( AIS_Shape oneShape in m_CADContourAISList ) {
+						m_OCCViewer.GetAISContext().Deactivate( oneShape );
+					}
+
+					// enable all other tsmi
+					m_tsmiReverse.Enabled = true;
+					m_tsmiToolVec.Enabled = true;
+					m_tsmiOffset.Enabled = true;
+					m_tsmiLead.Enabled = true;
+					m_tsmiOK.Enabled = true;
+
+					// uncheck the start point tsmi
+					m_tsmiStartPoint.Checked = false;
+					break;
 				case EditMode.None:
 				default:
 
