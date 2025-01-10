@@ -237,6 +237,8 @@ namespace DataStructure
 			// reverse the cad points if needed
 			if( IsReverse ) {
 				rearrangedCADPointList.Reverse();
+
+				// modify index
 				CADPoint lastPoint = rearrangedCADPointList.Last();
 				rearrangedCADPointList.Remove( lastPoint );
 				rearrangedCADPointList.Insert( 0, lastPoint );
@@ -384,9 +386,16 @@ namespace DataStructure
 				m_OffsetCAMPointList.Add( new CAMPoint( new CADPoint( intersectPoint, normalVec, tangentVec ), toolVec ) );
 			}
 
+			// modify index
 			CAMPoint lastPoint = m_OffsetCAMPointList.Last();
 			m_OffsetCAMPointList.Remove( lastPoint );
 			m_OffsetCAMPointList.Insert( 0, lastPoint );
+
+			// add a point to close polygon
+			CAMPoint closePoint = new CAMPoint(
+				new CADPoint( lastPoint.CADPoint.Point, lastPoint.CADPoint.NormalVec, lastPoint.CADPoint.TangentVec ),
+				lastPoint.ToolVec );
+			m_OffsetCAMPointList.Add( closePoint );
 		}
 	}
 }
