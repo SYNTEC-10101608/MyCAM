@@ -228,27 +228,11 @@ namespace DataStructure
 		{
 			m_CAMPointList = new List<CAMPoint>();
 
-			// rearrange cad points to start from the strt index
-			List<CADPoint> rearrangedCADPointList = new List<CADPoint>();
-			for( int i = 0; i < CADPointList.Count; i++ ) {
-				rearrangedCADPointList.Add( CADPointList[ ( i + StartPoint ) % CADPointList.Count ] );
-			}
-
-			// reverse the cad points if needed
-			if( IsReverse ) {
-				rearrangedCADPointList.Reverse();
-
-				// modify index
-				CADPoint lastPoint = rearrangedCADPointList.Last();
-				rearrangedCADPointList.Remove( lastPoint );
-				rearrangedCADPointList.Insert( 0, lastPoint );
-			}
-
 			// build cam points
-			for( int i = 0; i < rearrangedCADPointList.Count; i++ ) {
+			for( int i = 0; i < CADPointList.Count; i++ ) {
 
 				// calculate tool vector
-				CADPoint cadPoint = rearrangedCADPointList[ i ];
+				CADPoint cadPoint = CADPointList[ i ];
 				gp_Dir ToolVec;
 				switch( ToolVectorType ) {
 					case ToolVectorType.Default:
@@ -257,8 +241,19 @@ namespace DataStructure
 						break;
 					case ToolVectorType.Intersecting:
 
-						// TODO: implement this
-						ToolVec = new gp_Dir( 0, 0, 1 );
+						// get average of cross of neighbor normals
+						int lastIndex = i == 0 ? CADPointList.Count - 1 : i - 1;
+						int nextIndex = i == CADPointList.Count - 1 ? 0 : i + 1;
+						gp_Dir lastNormalVec = CADPointList[ lastIndex ].NormalVec;
+						gp_Dir nextNormalVec = CADPointList[ nextIndex ].NormalVec;
+						if( CADPointList[ i ].NormalVec.IsParallel( lastNormalVec, 1e-6 ) || CADPointList[ i ].NormalVec.IsParallel( nextNormalVec, 1e-6 ) ) {
+							ToolVec = null;
+						}
+						else {
+							gp_Dir ToolVec1 = cadPoint.NormalVec.Crossed( lastNormalVec );
+							gp_Dir ToolVec2 = nextNormalVec.Crossed( cadPoint.NormalVec );
+							ToolVec = new gp_Dir( ( ToolVec1.XYZ() + ToolVec2.XYZ() ) / 2 );
+						}
 						break;
 					case ToolVectorType.TowardZ:
 						ToolVec = new gp_Dir( 0, 0, 1 );
@@ -266,6 +261,42 @@ namespace DataStructure
 				}
 				CAMPoint camPoint = new CAMPoint( cadPoint, ToolVec );
 				m_CAMPointList.Add( camPoint );
+			}
+
+			// modify invalid tool vector with previous valid tool vector
+			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
+				if( m_CAMPointList[ i ].ToolVec == null ) {
+					int stepIndex = 1;
+					while( true ) {
+						gp_Dir validVec = m_CAMPointList[ ( i - stepIndex + m_CAMPointList.Count ) % m_CAMPointList.Count ].ToolVec;
+						if( validVec == null ) {
+							stepIndex++;
+						}
+						else {
+							m_CAMPointList[ i ] = new CAMPoint( m_CAMPointList[ i ].CADPoint, validVec );
+							break;
+						}
+					}
+				}
+			}
+
+			// rearrange cam points to start from the strt index
+			if( StartPoint != 0 ) {
+				List<CAMPoint> newCAMPointList = new List<CAMPoint>();
+				for( int i = 0; i < m_CAMPointList.Count; i++ ) {
+					newCAMPointList.Add( m_CAMPointList[ ( i + StartPoint ) % m_CAMPointList.Count ] );
+				}
+				m_CAMPointList = newCAMPointList;
+			}
+
+			// reverse the cad points if needed
+			if( IsReverse ) {
+				m_CAMPointList.Reverse();
+
+				// modify index
+				CAMPoint lastPoint = m_CAMPointList.Last();
+				m_CAMPointList.Remove( lastPoint );
+				m_CAMPointList.Insert( 0, lastPoint );
 			}
 			BuildOffsetPointList();
 		}
