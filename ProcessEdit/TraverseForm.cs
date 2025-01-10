@@ -1,4 +1,5 @@
 ﻿using DataStructure;
+using OCC.gp;
 using System;
 using System.Windows.Forms;
 
@@ -6,6 +7,10 @@ namespace ProcessEdit
 {
 	public partial class TraverseForm : Form
 	{
+		public TraverseForm() : this( new TraverseProcessData( new gp_Pnt() ) )
+		{
+		}
+
 		public TraverseForm( TraverseProcessData traverseProcessData )
 		{
 			InitializeComponent();

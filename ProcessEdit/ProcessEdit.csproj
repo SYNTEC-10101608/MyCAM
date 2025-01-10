@@ -52,12 +52,6 @@
     <Compile Include="TraverseForm.Designer.cs">
       <DependentUpon>TraverseForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ObjectForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ObjectForm.Designer.cs">
-      <DependentUpon>ObjectForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="ProcessEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -70,9 +64,6 @@
   <ItemGroup>
     <EmbeddedResource Include="TraverseForm.resx">
       <DependentUpon>TraverseForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ObjectForm.resx">
-      <DependentUpon>ObjectForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProcessEditForm.resx">
       <DependentUpon>ProcessEditForm.cs</DependentUpon>

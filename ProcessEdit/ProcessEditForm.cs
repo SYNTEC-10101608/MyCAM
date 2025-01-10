@@ -2,6 +2,7 @@
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.BRepBuilderAPI;
+using OCC.BRepPrimAPI;
 using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Prs3d;
@@ -32,6 +33,23 @@ namespace ProcessEdit
 			Controls.Add( m_panViewer );
 			m_panViewer.Dock = DockStyle.Fill;
 			m_OCCViewer.UpdateView();
+
+			// set AIS selction style
+			Prs3d_Drawer d = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected );
+			d.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			d.SetTransparency( 0.5f );
+			d.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			Prs3d_Drawer d1 = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected );
+			d1.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			d1.SetTransparency( 0.5f );
+			d1.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+
+			// viewer action
+			m_panViewer.MouseDown += ViewerMouseDown;
+			m_panViewer.PreviewKeyDown += ViewerKeyDown;
+
+			// TODO: panel key down does not work
+			PreviewKeyDown += ViewerKeyDown;
 		}
 
 		public bool Init( ProcessEditModel model )
@@ -41,12 +59,6 @@ namespace ProcessEdit
 			}
 			m_Model = model;
 			ShowPart();
-
-			// create order form
-			m_OrderForm.Init( m_Model );
-			m_OrderForm.PropertyChanged += OnPropertyChanged;
-			m_OrderForm.ItemPick += OnItemPick;
-			m_OrderForm.Show();
 			return true;
 		}
 
@@ -58,12 +70,10 @@ namespace ProcessEdit
 		ProcessEditModel m_Model;
 
 		// view context
-		List<AIS_InteractiveObject> m_ProcessList = new List<AIS_InteractiveObject>();
+		Dictionary<AIS_InteractiveObject, IProcessData> m_ProcessList = new Dictionary<AIS_InteractiveObject, IProcessData>();
 		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>();
 		List<AIS_Shape> m_TraverseList = new List<AIS_Shape>();
-
-		// order
-		ObjectForm m_OrderForm = new ObjectForm();
+		IProcessData m_SelectedProcess = null;
 
 		void ShowPart()
 		{
@@ -75,14 +85,8 @@ namespace ProcessEdit
 			m_OCCViewer.GetAISContext().Display( partAIS, false );
 			m_OCCViewer.GetAISContext().Deactivate( partAIS );
 
-			// show contour
-			ShowProcess();
-
-			// show index
-			ShowIndex();
-
-			// show traverse line
-			ShowTraverseLine();
+			// show process
+			RefreshViewer();
 
 			// arrange the view
 			m_OCCViewer.AxoView();
@@ -92,7 +96,7 @@ namespace ProcessEdit
 		void ShowProcess()
 		{
 			// clear the previous process
-			foreach( AIS_InteractiveObject process in m_ProcessList ) {
+			foreach( AIS_InteractiveObject process in m_ProcessList.Keys ) {
 				m_OCCViewer.GetAISContext().Remove( process, false );
 			}
 			m_ProcessList.Clear();
@@ -103,32 +107,30 @@ namespace ProcessEdit
 				if( processData.ProcessType == EProcessType.ProcessType_Cutting ) {
 					CuttingProcessData cuttingData = (CuttingProcessData)processData;
 					AIS_Shape contourAIS = new AIS_Shape( cuttingData.CAMData.CADData.Contour );
-					contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-					Prs3d_LineAspect aspect = contourAIS.Attributes().WireAspect();
-					aspect.SetWidth( 2 );
-					m_ProcessList.Add( contourAIS );
+					contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+					contourAIS.SetWidth( 1.5 );
+					m_ProcessList.Add( contourAIS, processData );
 				}
 
 				// show "+" at traverse point if it is traverse process
 				else if( processData.ProcessType == EProcessType.ProcessType_Traverse ) {
 					TraverseProcessData traverseData = (TraverseProcessData)processData;
-					AIS_TextLabel textLabel = new AIS_TextLabel();
-					textLabel.SetText( new TCollection_ExtendedString( "+" ) );
-					textLabel.SetPosition( traverseData.Point );
-					textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
-					textLabel.SetHeight( 20 );
-					textLabel.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
-					m_ProcessList.Add( textLabel );
+					BRepPrimAPI_MakeSphere makeSphere = new BRepPrimAPI_MakeSphere( traverseData.Point, 0.5 );
+					AIS_Shape sphereAIS = new AIS_Shape( makeSphere.Shape() );
+					sphereAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+					sphereAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+					m_ProcessList.Add( sphereAIS, processData );
 				}
 			}
 
 			// display process
-			foreach( AIS_InteractiveObject process in m_ProcessList ) {
+			foreach( AIS_InteractiveObject process in m_ProcessList.Keys ) {
 				m_OCCViewer.GetAISContext().Display( process, false );
-				m_OCCViewer.GetAISContext().Deactivate( process );
+				m_OCCViewer.GetAISContext().Activate( process );
+				if( m_SelectedProcess != null && m_SelectedProcess == m_ProcessList[ process ] ) {
+					m_OCCViewer.GetAISContext().SetSelected( process, true );
+				}
 			}
-
-			m_OCCViewer.UpdateView();
 		}
 
 		void ShowIndex()
@@ -167,7 +169,6 @@ namespace ProcessEdit
 				m_OCCViewer.GetAISContext().Display( textLabel, false );
 				m_OCCViewer.GetAISContext().Deactivate( textLabel );
 			}
-			m_OCCViewer.UpdateView();
 		}
 
 		void ShowTraverseLine()
@@ -196,7 +197,6 @@ namespace ProcessEdit
 				m_OCCViewer.GetAISContext().Display( line, false );
 				m_OCCViewer.GetAISContext().Deactivate( line );
 			}
-			m_OCCViewer.UpdateView();
 		}
 
 		gp_Pnt GetKeyPoint( IProcessData data, bool bStart )
@@ -225,31 +225,128 @@ namespace ProcessEdit
 			EditOK?.Invoke( m_Model.ProcessDataList );
 		}
 
-		void OnPropertyChanged()
+		void RefreshViewer()
 		{
 			ShowProcess();
 			ShowIndex();
 			ShowTraverseLine();
+			m_OCCViewer.UpdateView();
 		}
 
-		void OnItemPick( int nIndex )
+		// viewer action
+		void ViewerKeyDown( object sender, PreviewKeyDownEventArgs e )
 		{
-			// dehighlight the previous selected
-			foreach( AIS_InteractiveObject process in m_ProcessList ) {
-				process.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			}
-			foreach( AIS_TextLabel textLabel in m_IndexList ) {
-				textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			}
+		}
 
-			// highlight the selected
-			if( nIndex >= 0 && nIndex < m_ProcessList.Count ) {
-				m_ProcessList[ nIndex ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+		void ViewerMouseDown( object sender, MouseEventArgs e )
+		{
+			if( e.Button == MouseButtons.Left ) {
+				m_OCCViewer.Select();
 			}
-			if( nIndex >= 0 && nIndex < m_IndexList.Count ) {
-				m_IndexList[ nIndex ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+		}
+
+		void GetSelectedProcess()
+		{
+			m_SelectedProcess = null;
+			foreach( AIS_InteractiveObject process in m_ProcessList.Keys ) {
+				if( m_OCCViewer.GetAISContext().IsSelected( process ) ) {
+					m_SelectedProcess = m_ProcessList[ process ];
+					break;
+				}
 			}
-			m_OCCViewer.UpdateView();
+		}
+
+		void m_tsmiMoveUp_Click( object sender, EventArgs e )
+		{
+			GetSelectedProcess();
+			if( m_SelectedProcess == null ) {
+				return;
+			}
+			int nIndex = m_Model.ProcessDataList.IndexOf( m_SelectedProcess );
+			if( nIndex == -1 ) {
+				return;
+			}
+			MoveProcess( nIndex, true );
+		}
+
+		void m_tsmiMoveDown_Click( object sender, EventArgs e )
+		{
+			GetSelectedProcess();
+			if( m_SelectedProcess == null ) {
+				return;
+			}
+			int nIndex = m_Model.ProcessDataList.IndexOf( m_SelectedProcess );
+			if( nIndex == -1 ) {
+				return;
+			}
+			MoveProcess( nIndex, false );
+		}
+
+		void MoveProcess( int nIndex, bool bUp )
+		{
+			if( nIndex < 0 || nIndex > m_Model.ProcessDataList.Count - 1
+				|| bUp && nIndex == 0
+				|| !bUp && nIndex == m_Model.ProcessDataList.Count - 1 ) {
+				return;
+			}
+			IProcessData data = m_Model.ProcessDataList[ nIndex ];
+			m_Model.ProcessDataList.RemoveAt( nIndex );
+			if( bUp ) {
+				m_Model.ProcessDataList.Insert( nIndex - 1, data );
+			}
+			else {
+				m_Model.ProcessDataList.Insert( nIndex + 1, data );
+			}
+			RefreshViewer();
+		}
+
+		void m_tsmiAddTraverse_Click( object sender, EventArgs e )
+		{
+			GetSelectedProcess();
+			if( m_SelectedProcess == null ) {
+				return;
+			}
+			int nIndex = m_Model.ProcessDataList.IndexOf( m_SelectedProcess );
+			if( nIndex == -1 ) {
+				return;
+			}
+			TraverseForm form = new TraverseForm();
+			if( form.ShowDialog() != DialogResult.OK ) {
+				return;
+			}
+			TraverseProcessData traverseData = new TraverseProcessData( new gp_Pnt( form.X, form.Y, form.Z ) );
+			m_Model.ProcessDataList.Insert( nIndex + 1, traverseData );
+			RefreshViewer();
+		}
+
+		void m_tsmiEdit_Click( object sender, EventArgs e )
+		{
+			GetSelectedProcess();
+			if( m_SelectedProcess == null ) {
+				return;
+			}
+			if( m_SelectedProcess.ProcessType == EProcessType.ProcessType_Cutting ) {
+				return;
+			}
+			else if( m_SelectedProcess.ProcessType == EProcessType.ProcessType_Traverse ) {
+				TraverseProcessData traverseData = (TraverseProcessData)m_SelectedProcess;
+				TraverseForm form = new TraverseForm( traverseData );
+				if( form.ShowDialog() != DialogResult.OK ) {
+					return;
+				}
+				m_Model.ProcessDataList[ m_Model.ProcessDataList.IndexOf( m_SelectedProcess ) ] = new TraverseProcessData( new gp_Pnt( form.X, form.Y, form.Z ) );
+			}
+			RefreshViewer();
+		}
+
+		void m_tsmiRemove_Click( object sender, EventArgs e )
+		{
+			GetSelectedProcess();
+			if( m_SelectedProcess == null ) {
+				return;
+			}
+			m_Model.ProcessDataList.Remove( m_SelectedProcess );
+			RefreshViewer();
 		}
 	}
 }
