@@ -72,6 +72,7 @@ namespace DataStructure
 
 			// build raw data
 			BuildCADPointList();
+			GetIntersectingDir();
 			BuildCAMPointList();
 		}
 
@@ -165,6 +166,9 @@ namespace DataStructure
 		int m_StartPoint = 0;
 		double m_Offset = 0;
 
+		// intersecting direction
+		gp_Dir m_IntersectingDir = new gp_Dir( 0, 0, 1 );
+
 		// dirty flag
 		bool m_IsDirty = false;
 
@@ -238,20 +242,7 @@ namespace DataStructure
 						ToolVec = cadPoint.NormalVec.Crossed( cadPoint.TangentVec );
 						break;
 					case ToolVectorType.Intersecting:
-
-						// get average of cross of neighbor normals
-						int lastIndex = i == 0 ? CADPointList.Count - 1 : i - 1;
-						int nextIndex = i == CADPointList.Count - 1 ? 0 : i + 1;
-						gp_Dir lastNormalVec = CADPointList[ lastIndex ].NormalVec;
-						gp_Dir nextNormalVec = CADPointList[ nextIndex ].NormalVec;
-						if( CADPointList[ i ].NormalVec.IsParallel( lastNormalVec, 1e-6 ) || CADPointList[ i ].NormalVec.IsParallel( nextNormalVec, 1e-6 ) ) {
-							ToolVec = null;
-						}
-						else {
-							gp_Dir ToolVec1 = cadPoint.NormalVec.Crossed( lastNormalVec );
-							gp_Dir ToolVec2 = nextNormalVec.Crossed( cadPoint.NormalVec );
-							ToolVec = new gp_Dir( ( ToolVec1.XYZ() + ToolVec2.XYZ() ) / 2 );
-						}
+						ToolVec = m_IntersectingDir;
 						break;
 					case ToolVectorType.TowardZ:
 						ToolVec = new gp_Dir( 0, 0, 1 );
@@ -260,23 +251,35 @@ namespace DataStructure
 				CAMPoint camPoint = new CAMPoint( cadPoint, ToolVec );
 				m_CAMPointList.Add( camPoint );
 			}
+		}
 
-			// modify invalid tool vector with previous valid tool vector
-			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
-				if( m_CAMPointList[ i ].ToolVec == null ) {
-					int stepIndex = 1;
-					while( true ) {
-						gp_Dir validVec = m_CAMPointList[ ( i - stepIndex + m_CAMPointList.Count ) % m_CAMPointList.Count ].ToolVec;
-						if( validVec == null ) {
-							stepIndex++;
-						}
-						else {
-							m_CAMPointList[ i ] = new CAMPoint( m_CAMPointList[ i ].CADPoint, validVec );
-							break;
-						}
-					}
+		void GetIntersectingDir()
+		{
+			// get two non-parallel normal vectors if possible
+			gp_Dir normalVec1 = CADPointList[ 0 ].NormalVec;
+			gp_Dir normalVec2 = null;
+			for( int i = 1; i < CADPointList.Count; i++ ) {
+				gp_Dir temp = CADPointList[ i ].NormalVec;
+				if( !temp.IsParallel( normalVec1, 1e-6 ) ) { // TODO: tolerance
+					normalVec2 = temp;
+					break;
 				}
 			}
+			if( normalVec2 == null ) {
+				return;
+			}
+
+			// assume the intersecting direction is the cross product of the two normal vectors
+			gp_Dir tempIntersectingDir = normalVec2.Crossed( normalVec1 );
+
+			// check is all normal vectors are perpendicular to the intersecting direction
+			for( int i = 0; i < CADPointList.Count; i++ ) {
+				if( !CADPointList[ i ].NormalVec.IsNormal( tempIntersectingDir, 1e-6 ) ) { // TODO: tolerance
+					return;
+				}
+			}
+			m_IntersectingDir = tempIntersectingDir;
+			m_ToolVectorType = ToolVectorType.Intersecting;
 		}
 
 		void SetStartPoint()
