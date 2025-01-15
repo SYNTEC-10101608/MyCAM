@@ -330,15 +330,16 @@ namespace DataStructure
 					continue;
 				}
 
-				// calculate average normal vector
-				gp_Dir p1Normal = m_CAMPointList[ i ].CADPoint.NormalVec;
-				gp_Dir p2Normal = m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.NormalVec;
+				// calculate the offset direction by cross of tangent and tool vector
+				gp_Dir p1OffsetDir = m_CAMPointList[ i ].CADPoint.TangentVec.Crossed( m_CAMPointList[ i ].ToolVec );
+				gp_Dir p2OffsetDir = m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.TangentVec
+					.Crossed( m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].ToolVec );
 
-				// offset the point by normal vector
-				gp_Pnt p1Offset = new gp_Pnt( p1.XYZ() + p1Normal.XYZ() * Offset );
-				gp_Pnt p2Offset = new gp_Pnt( p2.XYZ() + p2Normal.XYZ() * Offset );
-				CAMPoint p1CAMOffset = new CAMPoint( new CADPoint( p1Offset, p1Normal, m_CAMPointList[ i ].CADPoint.TangentVec ), m_CAMPointList[ i ].ToolVec );
-				CAMPoint p2CAMOffset = new CAMPoint( new CADPoint( p2Offset, p2Normal, m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.TangentVec ),
+				// offset the point by offset vector
+				gp_Pnt p1Offset = new gp_Pnt( p1.XYZ() + p1OffsetDir.XYZ() * Offset );
+				gp_Pnt p2Offset = new gp_Pnt( p2.XYZ() + p2OffsetDir.XYZ() * Offset );
+				CAMPoint p1CAMOffset = new CAMPoint( new CADPoint( p1Offset, p1OffsetDir, m_CAMPointList[ i ].CADPoint.TangentVec ), m_CAMPointList[ i ].ToolVec );
+				CAMPoint p2CAMOffset = new CAMPoint( new CADPoint( p2Offset, p2OffsetDir, m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.TangentVec ),
 					m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].ToolVec );
 				lineRecordList.Add( new LineRecord()
 				{
@@ -422,6 +423,7 @@ namespace DataStructure
 				new CADPoint( lastPoint.CADPoint.Point, lastPoint.CADPoint.NormalVec, lastPoint.CADPoint.TangentVec ),
 				lastPoint.ToolVec );
 			offsetCAMPointList.Add( closePoint );
+			m_CAMPointList = offsetCAMPointList;
 		}
 
 		void SetLead()
