@@ -52,15 +52,6 @@ namespace PartPlacement
 		// TODO: the machine frame does not need to refresh
 		void ShowMachineFrame()
 		{
-			// make a box for machine frame
-			const int nSize = 500;
-			gp_Pnt negPole = new gp_Pnt( -nSize / 2, -nSize / 2, -nSize / 2 );
-			BRepPrimAPI_MakeBox makeBox = new BRepPrimAPI_MakeBox( negPole, nSize, nSize, nSize );
-			AIS_Shape machineFrameAIS = new AIS_Shape( makeBox.Shape() );
-			machineFrameAIS.SetDisplayMode( (int)AISDisplayMode.AIS_WireFrame );
-			//m_OCCViewer.GetAISContext().Display( machineFrameAIS, false );
-			//m_OCCViewer.GetAISContext().Deactivate( machineFrameAIS );
-
 			// make a cone for cutter
 			BRepPrimAPI_MakeCone makeCone = new BRepPrimAPI_MakeCone( 0, 10, 50 );
 			AIS_Shape cutterAIS = new AIS_Shape( makeCone.Shape() );

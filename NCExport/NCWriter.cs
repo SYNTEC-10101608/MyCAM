@@ -44,7 +44,7 @@ namespace NCExport
 		{
 			// write each cam data point
 			m_StreamWriter.WriteLine( "// Cutting" );
-			foreach( CAMPoint camPoint in cuttingProcessData.CAMData.OffsetCAMPointList ) {
+			foreach( CAMPoint camPoint in cuttingProcessData.CAMData.CAMPointList ) {
 				ConvertIJKToABC( camPoint.ToolVec, out double dA_MCS, out double dC_MCS );
 				string szX = camPoint.CADPoint.Point.X().ToString( "F3" );
 				string szY = camPoint.CADPoint.Point.Y().ToString( "F3" );

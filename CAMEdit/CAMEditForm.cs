@@ -211,8 +211,8 @@ namespace CAMEdit
 				List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
 
 				// build edges
-				for( int j = 0; j < camData.OffsetCAMPointList.Count; j++ ) {
-					BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( camData.OffsetCAMPointList[ j ].CADPoint.Point );
+				for( int j = 0; j < camData.CAMPointList.Count; j++ ) {
+					BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( camData.CAMPointList[ j ].CADPoint.Point );
 					TopoDS_Vertex vertex = vertexMaker.Vertex();
 
 					// first vertex
@@ -263,7 +263,7 @@ namespace CAMEdit
 
 			// build tool vec
 			foreach( CAMData camData in m_Model.CAMDataList ) {
-				foreach( CAMPoint camPoint in camData.OffsetCAMPointList ) {
+				foreach( CAMPoint camPoint in camData.CAMPointList ) {
 					AIS_Shape toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
 					m_ToolVecAISList.Add( toolVecAIS );
 				}
@@ -286,8 +286,8 @@ namespace CAMEdit
 
 			// build orientation
 			foreach( CAMData camData in m_Model.CAMDataList ) {
-				gp_Pnt showPoint = camData.OffsetCAMPointList[ 0 ].CADPoint.Point;
-				gp_Pnt endPoint = camData.OffsetCAMPointList[ 1 ].CADPoint.Point;
+				gp_Pnt showPoint = camData.CAMPointList[ 0 ].CADPoint.Point;
+				gp_Pnt endPoint = camData.CAMPointList[ 1 ].CADPoint.Point;
 
 				// the direction of the orientation is vector to the next point
 				gp_Dir orientationDir = new gp_Dir( endPoint.XYZ() - showPoint.XYZ() );

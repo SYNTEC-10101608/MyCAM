@@ -38,7 +38,6 @@ namespace MyCAM
 				PlaceOK( partShape );
 			};
 			ShowChild( f );
-
 		}
 
 		void PlaceOK( TopoDS_Shape partShape )

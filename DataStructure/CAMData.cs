@@ -30,17 +30,20 @@ namespace DataStructure
 			get; private set;
 		}
 
+		// normal vector on co-face
 		public gp_Dir NormalVec
 		{
 			get; private set;
 		}
 
+		// tangent vector on path
 		public gp_Dir TangentVec
 		{
 			get; private set;
 		}
 	}
 
+	// currently assuming CAM = CAD + ToolVec
 	public class CAMPoint
 	{
 		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
@@ -92,18 +95,6 @@ namespace DataStructure
 					m_IsDirty = false;
 				}
 				return m_CAMPointList;
-			}
-		}
-
-		public List<CAMPoint> OffsetCAMPointList
-		{
-			get
-			{
-				if( m_IsDirty ) {
-					BuildCAMPointList();
-					m_IsDirty = false;
-				}
-				return m_OffsetCAMPointList;
 			}
 		}
 
@@ -169,7 +160,6 @@ namespace DataStructure
 
 		// backing fields
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
-		List<CAMPoint> m_OffsetCAMPointList = new List<CAMPoint>();
 		ToolVectorType m_ToolVectorType = ToolVectorType.Default;
 		bool m_IsReverse = false;
 		int m_StartPoint = 0;
@@ -226,9 +216,17 @@ namespace DataStructure
 
 		void BuildCAMPointList()
 		{
+			m_IsDirty = false;
 			m_CAMPointList = new List<CAMPoint>();
+			SetToolVec();
+			SetStartPoint();
+			SetOrientation();
+			DoOffset();
+			SetLead();
+		}
 
-			// build cam points
+		void SetToolVec()
+		{
 			for( int i = 0; i < CADPointList.Count; i++ ) {
 
 				// calculate tool vector
@@ -279,7 +277,10 @@ namespace DataStructure
 					}
 				}
 			}
+		}
 
+		void SetStartPoint()
+		{
 			// rearrange cam points to start from the strt index
 			if( StartPoint != 0 ) {
 				List<CAMPoint> newCAMPointList = new List<CAMPoint>();
@@ -288,8 +289,11 @@ namespace DataStructure
 				}
 				m_CAMPointList = newCAMPointList;
 			}
+		}
 
-			// reverse the cad points if needed
+		void SetOrientation()
+		{
+			// reverse the cad points if is reverse
 			if( IsReverse ) {
 				m_CAMPointList.Reverse();
 
@@ -298,7 +302,6 @@ namespace DataStructure
 				m_CAMPointList.Remove( lastPoint );
 				m_CAMPointList.Insert( 0, lastPoint );
 			}
-			BuildOffsetPointList();
 		}
 
 		class LineRecord
@@ -307,11 +310,9 @@ namespace DataStructure
 			public Tuple<CAMPoint, CAMPoint> OffsetPoint;
 		}
 
-		// TODO: code need refine
-		void BuildOffsetPointList()
+		void DoOffset()
 		{
 			if( m_CAMPointList.Count == 0 ) {
-				m_OffsetCAMPointList = new List<CAMPoint>();
 				return;
 			}
 
@@ -334,8 +335,7 @@ namespace DataStructure
 				gp_Pnt p1Offset = new gp_Pnt( p1.XYZ() + p1Normal.XYZ() * Offset );
 				gp_Pnt p2Offset = new gp_Pnt( p2.XYZ() + p2Normal.XYZ() * Offset );
 				CAMPoint p1CAMOffset = new CAMPoint( new CADPoint( p1Offset, p1Normal, m_CAMPointList[ i ].CADPoint.TangentVec ), m_CAMPointList[ i ].ToolVec );
-				CAMPoint p2CAMOffset = new CAMPoint( new CADPoint( p2Offset, p2Normal,
-					m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.TangentVec ),
+				CAMPoint p2CAMOffset = new CAMPoint( new CADPoint( p2Offset, p2Normal, m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.TangentVec ),
 					m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].ToolVec );
 				lineRecordList.Add( new LineRecord()
 				{
@@ -345,7 +345,7 @@ namespace DataStructure
 			}
 
 			// clip the offset lines and get the intersect points
-			m_OffsetCAMPointList = new List<CAMPoint>();
+			List<CAMPoint> offsetCAMPointList = new List<CAMPoint>();
 			for( int i = 0; i < lineRecordList.Count + 1; i++ ) {
 				bool bClip = true;
 				while( bClip ) {
@@ -356,19 +356,11 @@ namespace DataStructure
 					}
 					LineRecord lineRecord1 = lineRecordList[ ( i + lineRecordList.Count ) % lineRecordList.Count ];
 					LineRecord lineRecord2 = lineRecordList[ ( i + 1 + lineRecordList.Count ) % lineRecordList.Count ];
-					Tuple<CAMPoint, CAMPoint> line1 = lineRecord1.OriPoint;
-					Tuple<CAMPoint, CAMPoint> line2 = lineRecord2.OriPoint;
 					Tuple<CAMPoint, CAMPoint> offsetLine1 = lineRecord1.OffsetPoint;
 					Tuple<CAMPoint, CAMPoint> offsetLine2 = lineRecord2.OffsetPoint;
 
-					// check if the offset vector is intersect
-					gp_Pnt p1 = new gp_Pnt( ( line1.Item1.CADPoint.Point.XYZ() + line1.Item2.CADPoint.Point.XYZ() ) / 2 );
-					gp_Pnt offsetP1 = new gp_Pnt( ( offsetLine1.Item1.CADPoint.Point.XYZ() + offsetLine1.Item2.CADPoint.Point.XYZ() ) / 2 );
-					gp_Pnt p2 = new gp_Pnt( ( line2.Item1.CADPoint.Point.XYZ() + line2.Item2.CADPoint.Point.XYZ() ) / 2 );
-					gp_Pnt offsetP2 = new gp_Pnt( ( offsetLine2.Item1.CADPoint.Point.XYZ() + offsetLine2.Item2.CADPoint.Point.XYZ() ) / 2 );
-
 					// find the intersect point of the offset lines
-					gp_Pnt intersectPoint = GeometryTool.FindIntersectPoint(
+					GeometryTool.FindIntersectPoint(
 						offsetLine1.Item1.CADPoint.Point,
 						offsetLine1.Item2.CADPoint.Point,
 						offsetLine2.Item2.CADPoint.Point,
@@ -414,19 +406,24 @@ namespace DataStructure
 				gp_Dir tangentVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.CADPoint.TangentVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.CADPoint.TangentVec.XYZ() );
 				gp_Dir normalVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.CADPoint.NormalVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.CADPoint.NormalVec.XYZ() );
 				gp_Dir toolVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.ToolVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.ToolVec.XYZ() );
-				m_OffsetCAMPointList.Add( new CAMPoint( new CADPoint( intersectPoint, normalVec, tangentVec ), toolVec ) );
+				offsetCAMPointList.Add( new CAMPoint( new CADPoint( intersectPoint, normalVec, tangentVec ), toolVec ) );
 			}
 
 			// modify index
-			CAMPoint lastPoint = m_OffsetCAMPointList.Last();
-			m_OffsetCAMPointList.Remove( lastPoint );
-			m_OffsetCAMPointList.Insert( 0, lastPoint );
+			CAMPoint lastPoint = offsetCAMPointList.Last();
+			offsetCAMPointList.Remove( lastPoint );
+			offsetCAMPointList.Insert( 0, lastPoint );
 
 			// add a point to close polygon
 			CAMPoint closePoint = new CAMPoint(
 				new CADPoint( lastPoint.CADPoint.Point, lastPoint.CADPoint.NormalVec, lastPoint.CADPoint.TangentVec ),
 				lastPoint.ToolVec );
-			m_OffsetCAMPointList.Add( closePoint );
+			offsetCAMPointList.Add( closePoint );
+		}
+
+		void SetLead()
+		{
+
 		}
 	}
 }
