@@ -209,7 +209,7 @@ namespace ProcessEdit
 					return cuttingData.CAMData.CAMPointList[ 0 ].CADPoint.Point;
 				}
 				else {
-					return cuttingData.CAMData.CAMPointList[ cuttingData.CAMData.CADPointList.Count - 1 ].CADPoint.Point;
+					return cuttingData.CAMData.CAMPointList[ cuttingData.CAMData.CAMPointList.Count - 1 ].CADPoint.Point;
 				}
 			}
 			else if( data.ProcessType == EProcessType.ProcessType_Traverse ) {
