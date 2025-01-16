@@ -162,6 +162,7 @@ namespace Import
 			// display the shape
 			m_OCCViewer.GetAISContext().RemoveAll( false );
 			m_OCCViewer.GetAISContext().Display( aisShape, true );
+			m_OCCViewer.GetAISContext().Deactivate( aisShape );
 			m_OCCViewer.AxoView();
 			m_OCCViewer.ZoomAllView();
 		}

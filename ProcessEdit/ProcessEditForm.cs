@@ -206,10 +206,10 @@ namespace ProcessEdit
 				// TODO: using start point API later
 				CuttingProcessData cuttingData = (CuttingProcessData)data;
 				if( bStart ) {
-					return cuttingData.CAMData.CADPointList[ 0 ].Point;
+					return cuttingData.CAMData.CAMPointList[ 0 ].CADPoint.Point;
 				}
 				else {
-					return cuttingData.CAMData.CADPointList[ cuttingData.CAMData.CADPointList.Count - 1 ].Point;
+					return cuttingData.CAMData.CAMPointList[ cuttingData.CAMData.CADPointList.Count - 1 ].CADPoint.Point;
 				}
 			}
 			else if( data.ProcessType == EProcessType.ProcessType_Traverse ) {
