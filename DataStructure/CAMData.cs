@@ -206,7 +206,7 @@ namespace DataStructure
 				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by interval
-				const double dSegmentLength = 1;
+				const double dSegmentLength = 0.5;
 				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, false, out List<gp_Pnt> pointList );
 
 				// get tool vector for each point

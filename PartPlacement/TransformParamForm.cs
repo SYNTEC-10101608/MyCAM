@@ -24,11 +24,11 @@ namespace PartPlacement
 
 		// part transform param
 		double m_dX_Part = 0;
-		double m_dY_Part = -100;
-		double m_dZ_Part = 0;
-		double m_dXR_Part = 90;
+		double m_dY_Part = -50;
+		double m_dZ_Part = -25;
+		double m_dXR_Part = 0;
 		double m_dYR_Part = 0;
-		double m_dZR_Part = 0;
+		double m_dZR_Part = 90;
 
 		// transform matrix
 		gp_Trsf m_TrsfPart = new gp_Trsf();
