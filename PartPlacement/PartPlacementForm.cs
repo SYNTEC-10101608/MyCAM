@@ -79,6 +79,7 @@ namespace PartPlacement
 
 			// create manipulator
 			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Scaling, false );
+			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_TranslationPlane, false );
 			m_Manipulator.Attach( partAIS );
 			m_Manipulator.SetModeActivationOnDetection( true );
 		}
