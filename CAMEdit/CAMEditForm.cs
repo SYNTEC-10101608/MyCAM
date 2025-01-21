@@ -41,11 +41,11 @@ namespace CAMEdit
 			Prs3d_Drawer d = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected );
 			d.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			d.SetTransparency( 0.5f );
-			d.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			d.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			Prs3d_Drawer d1 = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected );
 			d1.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			d1.SetTransparency( 0.5f );
-			d1.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			d1.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
@@ -120,7 +120,7 @@ namespace CAMEdit
 			AIS_Shape partAIS = new AIS_Shape( partShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			partAIS.SetMaterial( aspect );
-			partAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			partAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			m_OCCViewer.GetAISContext().Display( partAIS, false );
 			m_OCCViewer.GetAISContext().Deactivate( partAIS );
 
@@ -328,7 +328,7 @@ namespace CAMEdit
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			coneAIS.SetMaterial( aspect );
 			coneAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			coneAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			coneAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			coneAIS.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
 			return coneAIS;
 		}

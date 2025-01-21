@@ -39,11 +39,11 @@ namespace ExtractPattern
 			Prs3d_Drawer d = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected );
 			d.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			d.SetTransparency( 0.5f );
-			d.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			d.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			Prs3d_Drawer d1 = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected );
 			d1.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			d1.SetTransparency( 0.5f );
-			d1.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			d1.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 
 			// set part
 			if( partShape == null ) {
@@ -70,7 +70,7 @@ namespace ExtractPattern
 			AIS_Shape aisShape = new AIS_Shape( m_PartShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			aisShape.SetMaterial( aspect );
-			aisShape.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 
 			// display the shape
 			m_OCCViewer.GetAISContext().RemoveAll( false );

@@ -60,7 +60,7 @@ namespace PartPlacement
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			cutterAIS.SetMaterial( aspect );
 			cutterAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-			cutterAIS.SetDisplayMode( (int)OCCTool.AISDisplayMode.AIS_Shaded );
+			cutterAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			m_OCCViewer.GetAISContext().Display( cutterAIS, false );
 			m_OCCViewer.GetAISContext().Deactivate( cutterAIS );
 		}
@@ -71,7 +71,7 @@ namespace PartPlacement
 			AIS_Shape partAIS = new AIS_Shape( m_RawPartShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			partAIS.SetMaterial( aspect );
-			partAIS.SetDisplayMode( (int)OCCTool.AISDisplayMode.AIS_Shaded );
+			partAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 
 			// display the shape
 			m_OCCViewer.GetAISContext().Display( partAIS, false );

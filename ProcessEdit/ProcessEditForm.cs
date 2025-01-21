@@ -38,11 +38,11 @@ namespace ProcessEdit
 			Prs3d_Drawer d = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected );
 			d.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			d.SetTransparency( 0.5f );
-			d.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			d.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			Prs3d_Drawer d1 = m_OCCViewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected );
 			d1.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			d1.SetTransparency( 0.5f );
-			d1.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			d1.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
@@ -78,7 +78,7 @@ namespace ProcessEdit
 			AIS_Shape partAIS = new AIS_Shape( m_Model.PartShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			partAIS.SetMaterial( aspect );
-			partAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			partAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			m_OCCViewer.GetAISContext().Display( partAIS, false );
 			m_OCCViewer.GetAISContext().Deactivate( partAIS );
 
@@ -115,7 +115,7 @@ namespace ProcessEdit
 					BRepPrimAPI_MakeSphere makeSphere = new BRepPrimAPI_MakeSphere( traverseData.Point, 0.5 );
 					AIS_Shape sphereAIS = new AIS_Shape( makeSphere.Shape() );
 					sphereAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-					sphereAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+					sphereAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 					m_ProcessList.Add( sphereAIS, processData );
 				}
 			}

@@ -1,11 +1,5 @@
 ﻿namespace OCCTool
 {
-	public enum AISDisplayMode
-	{
-		AIS_WireFrame = 0,
-		AIS_Shaded = 1,
-	}
-
 	public enum AISActiveMode
 	{
 		Default = 0,
