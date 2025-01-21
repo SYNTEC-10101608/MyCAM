@@ -47,9 +47,6 @@ namespace ProcessEdit
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
 			m_panViewer.PreviewKeyDown += ViewerKeyDown;
-
-			// TODO: panel key down does not work
-			PreviewKeyDown += ViewerKeyDown;
 		}
 
 		public bool Init( ProcessEditModel model )
@@ -240,6 +237,7 @@ namespace ProcessEdit
 
 		void ViewerMouseDown( object sender, MouseEventArgs e )
 		{
+			m_panViewer.Focus();
 			if( e.Button == MouseButtons.Left ) {
 				m_OCCViewer.Select();
 			}

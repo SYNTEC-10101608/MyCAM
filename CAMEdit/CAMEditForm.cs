@@ -50,9 +50,6 @@ namespace CAMEdit
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
 			m_panViewer.PreviewKeyDown += ViewerKeyDown;
-
-			// TODO: panel key down does not work
-			PreviewKeyDown += ViewerKeyDown;
 		}
 
 		public bool Init( CAMEditModel model )
@@ -422,6 +419,7 @@ namespace CAMEdit
 
 		void ViewerMouseDown( object sender, MouseEventArgs e )
 		{
+			m_panViewer.Focus();
 			switch( editMode ) {
 				case EditMode.StartPoint:
 					if( e.Button != MouseButtons.Left ) {

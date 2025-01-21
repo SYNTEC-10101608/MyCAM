@@ -55,9 +55,6 @@ namespace ExtractPattern
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
 			m_panViewer.PreviewKeyDown += ViewerKeyDown;
-
-			// TODO: panel key down does not work
-			PreviewKeyDown += ViewerKeyDown;
 		}
 
 		// viewer
@@ -192,6 +189,7 @@ namespace ExtractPattern
 		// viewer action
 		void ViewerMouseDown( object sender, MouseEventArgs e )
 		{
+			m_panViewer.Focus();
 			if( e.Button == MouseButtons.Left ) {
 
 				// select the face

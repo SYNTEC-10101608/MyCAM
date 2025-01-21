@@ -37,6 +37,10 @@ namespace PartPlacement
 				return;
 			}
 			RefreshViewer();
+
+			// viewer action
+			m_panViewer.MouseDown += ViewerMouseDown;
+			m_panViewer.PreviewKeyDown += ViewerKeyDown;
 		}
 
 		// viewer
@@ -111,6 +115,20 @@ namespace PartPlacement
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
 			PlaceOK?.Invoke( m_TransformParamForm.TrsfPart );
+		}
+
+		// viewer action
+		void ViewerMouseDown( object sender, MouseEventArgs e )
+		{
+			m_panViewer.Focus();
+			if( e.Button == MouseButtons.Left ) {
+			}
+		}
+
+		void ViewerKeyDown( object sender, PreviewKeyDownEventArgs e )
+		{
+			if( e.KeyCode == Keys.Escape ) {
+			}
 		}
 	}
 }

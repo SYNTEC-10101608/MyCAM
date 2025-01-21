@@ -85,6 +85,7 @@ namespace OCCViewer
 			cref.Ptr.NbMsaaSamples = 10000;
 
 			// viewer mouse action
+			MouseActionEnable = true;
 			control.MouseWheel += ( sender, e ) => MouseWheel( e );
 			control.MouseDown += ( sender, e ) => MouseDown( e );
 			control.MouseMove += ( sender, e ) => MouseMove( e );
@@ -401,8 +402,17 @@ namespace OCCViewer
 		int m_nYMousePosition = 0;
 		const double ZOOM_Ratio = 0.0002;
 
+		public bool MouseActionEnable
+		{
+			get; set;
+		}
+
 		void MouseWheel( MouseEventArgs e )
 		{
+			if( !MouseActionEnable ) {
+				return;
+			}
+
 			// zoom viewer at start point
 			StartZoomAtPoint( e.X, e.Y );
 
@@ -415,6 +425,9 @@ namespace OCCViewer
 
 		void MouseDown( MouseEventArgs e )
 		{
+			if( !MouseActionEnable ) {
+				return;
+			}
 			switch( e.Button ) {
 
 				// press down middle button, then start translate the viewer
@@ -434,8 +447,10 @@ namespace OCCViewer
 
 		void MouseMove( MouseEventArgs e )
 		{
+			if( !MouseActionEnable ) {
+				return;
+			}
 			MoveTo( e.X, e.Y );
-
 			switch( e.Button ) {
 
 				// translate the viewer
