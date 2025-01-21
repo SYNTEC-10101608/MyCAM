@@ -85,7 +85,7 @@ namespace OCCViewer
 			cref.Ptr.NbMsaaSamples = 10000;
 
 			// viewer mouse action
-			MouseActionEnable = true;
+			MouseActionEnabled = true;
 			control.MouseWheel += ( sender, e ) => MouseWheel( e );
 			control.MouseDown += ( sender, e ) => MouseDown( e );
 			control.MouseMove += ( sender, e ) => MouseMove( e );
@@ -402,14 +402,14 @@ namespace OCCViewer
 		int m_nYMousePosition = 0;
 		const double ZOOM_Ratio = 0.0002;
 
-		public bool MouseActionEnable
+		public bool MouseActionEnabled
 		{
 			get; set;
 		}
 
 		void MouseWheel( MouseEventArgs e )
 		{
-			if( !MouseActionEnable ) {
+			if( !MouseActionEnabled ) {
 				return;
 			}
 
@@ -425,7 +425,7 @@ namespace OCCViewer
 
 		void MouseDown( MouseEventArgs e )
 		{
-			if( !MouseActionEnable ) {
+			if( !MouseActionEnabled ) {
 				return;
 			}
 			switch( e.Button ) {
@@ -447,7 +447,7 @@ namespace OCCViewer
 
 		void MouseMove( MouseEventArgs e )
 		{
-			if( !MouseActionEnable ) {
+			if( !MouseActionEnabled ) {
 				return;
 			}
 			MoveTo( e.X, e.Y );
