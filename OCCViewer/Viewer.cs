@@ -98,6 +98,11 @@ namespace OCCViewer
 			Dispose();
 		}
 
+		public V3d_View GetView()
+		{
+			return myView;
+		}
+
 		public virtual void Dispose()
 		{
 			myAISContext?.Dispose();

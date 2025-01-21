@@ -1,12 +1,9 @@
 ﻿using OCC.AIS;
-using OCC.BRepBuilderAPI;
 using OCC.BRepPrimAPI;
-using OCC.Geom;
 using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Quantity;
 using OCC.TopoDS;
-using OCCTool;
 using OCCViewer;
 using System;
 using System.Windows.Forms;
@@ -40,7 +37,9 @@ namespace PartPlacement
 
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
+			m_panViewer.MouseUp += ViewerMouseUp;
 			m_panViewer.PreviewKeyDown += ViewerKeyDown;
+			m_panViewer.MouseMove += ViewerMouseMove;
 		}
 
 		// viewer
@@ -50,10 +49,9 @@ namespace PartPlacement
 		// raw part
 		TopoDS_Shape m_RawPartShape;
 
-		// transform param
-		TransformParamForm m_TransformParamForm = new TransformParamForm();
+		// transform
+		AIS_Manipulator m_Manipulator = new AIS_Manipulator();
 
-		// TODO: the machine frame does not need to refresh
 		void ShowMachineFrame()
 		{
 			// make a cone for cutter
@@ -62,35 +60,27 @@ namespace PartPlacement
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			cutterAIS.SetMaterial( aspect );
 			cutterAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-			cutterAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
+			cutterAIS.SetDisplayMode( (int)OCCTool.AISDisplayMode.AIS_Shaded );
 			m_OCCViewer.GetAISContext().Display( cutterAIS, false );
 			m_OCCViewer.GetAISContext().Deactivate( cutterAIS );
 		}
 
 		void ShowPart()
 		{
-			// transform the part
-			BRepBuilderAPI_Transform partTransform = new BRepBuilderAPI_Transform( m_RawPartShape, m_TransformParamForm.TrsfPart, true );
-
 			// create part AIS_Shape
-			AIS_Shape partAIS = new AIS_Shape( partTransform.Shape() );
+			AIS_Shape partAIS = new AIS_Shape( m_RawPartShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			partAIS.SetMaterial( aspect );
-			partAIS.SetDisplayMode( (int)AISDisplayMode.AIS_Shaded );
-
-			// get G54 from translation part of part transform
-			gp_Ax2 G54 = new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
-			G54.Translate( new gp_Vec( m_TransformParamForm.TrsfPart.TranslationPart() ) );
-
-			// make a Trihedron indicate G54
-			AIS_Trihedron aisTrihedron = new AIS_Trihedron( new Geom_Axis2Placement( G54 ) );
-			aisTrihedron.SetSize( 10 );
+			partAIS.SetDisplayMode( (int)OCCTool.AISDisplayMode.AIS_Shaded );
 
 			// display the shape
 			m_OCCViewer.GetAISContext().Display( partAIS, false );
 			m_OCCViewer.GetAISContext().Deactivate( partAIS );
-			m_OCCViewer.GetAISContext().Display( aisTrihedron, false );
-			m_OCCViewer.GetAISContext().Deactivate( aisTrihedron );
+
+			// create manipulator
+			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Scaling, false );
+			m_Manipulator.Attach( partAIS );
+			m_Manipulator.SetModeActivationOnDetection( true );
 		}
 
 		void RefreshViewer()
@@ -103,18 +93,9 @@ namespace PartPlacement
 			m_OCCViewer.ZoomAllView();
 		}
 
-		void m_tsmiSetPart_Click( object sender, EventArgs e )
-		{
-			m_TransformParamForm.ShowDialog();
-			if( m_TransformParamForm.DialogResult != DialogResult.OK ) {
-				return;
-			}
-			RefreshViewer();
-		}
-
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
-			PlaceOK?.Invoke( m_TransformParamForm.TrsfPart );
+			PlaceOK?.Invoke( m_Manipulator.LocalTransformation() );
 		}
 
 		// viewer action
@@ -122,6 +103,30 @@ namespace PartPlacement
 		{
 			m_panViewer.Focus();
 			if( e.Button == MouseButtons.Left ) {
+				if( m_Manipulator.HasActiveMode() ) {
+					m_Manipulator.StartTransform( e.X, e.Y, m_OCCViewer.GetView() );
+					m_Manipulator.SetModeActivationOnDetection( false );
+				}
+			}
+		}
+
+		void ViewerMouseUp( object sender, MouseEventArgs e )
+		{
+			if( e.Button == MouseButtons.Left ) {
+				if( m_Manipulator.HasActiveMode() ) {
+					m_Manipulator.StopTransform( true );
+					m_Manipulator.SetModeActivationOnDetection( true );
+				}
+			}
+		}
+
+		void ViewerMouseMove( object sender, MouseEventArgs e )
+		{
+			if( e.Button == MouseButtons.Left ) {
+				if( m_Manipulator.HasActiveMode() ) {
+					m_Manipulator.Transform( e.X, e.Y, m_OCCViewer.GetView() );
+					m_OCCViewer.UpdateView();
+				}
 			}
 		}
 
