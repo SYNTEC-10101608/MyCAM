@@ -307,6 +307,7 @@ namespace DataStructure
 				CAMPoint camPoint = new CAMPoint( cadPoint, ToolVec );
 				m_CAMPointList.Add( camPoint );
 			}
+			ModifyToolVec();
 		}
 
 		void ModifyToolVec()
@@ -347,6 +348,19 @@ namespace DataStructure
 			}
 
 			// modify the tool vector
+			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
+				CAMPoint camPoint = m_CAMPointList[ i ];
+				Tuple<double, double> modifyData = modifyDataList[ i ];
+				gp_Dir x = camPoint.CADPoint.TangentVec;
+				gp_Dir z = camPoint.ToolVec;
+				gp_Dir y = z.Crossed( x );
+
+				// X:Y:Z = tanA:tanB:1
+				double dRA_rad = modifyData.Item1 * Math.PI / 180;
+				double dRB_rad = modifyData.Item2 * Math.PI / 180;
+				gp_Dir toolVec = new gp_Dir( x.XYZ() * Math.Tan( dRA_rad ) + y.XYZ() * Math.Tan( dRB_rad ) + z.XYZ() );
+				m_CAMPointList[ i ] = new CAMPoint( camPoint.CADPoint, toolVec );
+			}
 		}
 
 		void SetStartPoint()

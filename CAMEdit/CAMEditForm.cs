@@ -301,7 +301,7 @@ namespace CAMEdit
 
 		AIS_Shape GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
 		{
-			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 1 );
+			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 10 );
 			BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
 			AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
 			switch( vecType ) {
@@ -380,13 +380,17 @@ namespace CAMEdit
 				return;
 			}
 
-			// TODO: implement this
-			if( camData.Offset == 0 ) {
-				camData.Offset = 1;
-			}
-			else {
-				camData.Offset = 0;
-			}
+			//// TODO: implement this
+			//if( camData.Offset == 0 ) {
+			//	camData.Offset = 1;
+			//}
+			//else {
+			//	camData.Offset = 0;
+			//}
+			camData.SetToolVecModify( 20, 0, 45 );
+			camData.SetToolVecModify( 40, 0, 0 );
+			camData.SetToolVecModify( 60, 0, 45 );
+			camData.SetToolVecModify( 80, 0, 0 );
 			ShowCAMData();
 		}
 
