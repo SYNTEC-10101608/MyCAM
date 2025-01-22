@@ -69,7 +69,7 @@ namespace NCExport
 				dC_MCS_deg = 0;
 			}
 			else {
-				dC_MCS_deg = ( ( Math.Atan2( ToolVec_G54.Y(), ToolVec_G54.X() ) * 180 / Math.PI ) + 90 + 360 ) % 360;
+				dC_MCS_deg = ( ( Math.Atan2( ToolVec_G54.X(), -ToolVec_G54.Y() ) * 180 / Math.PI ) + 360 ) % 360;
 			}
 			dA_MCS_deg = Math.Acos( ToolVec_G54.Z() ) * 180 / Math.PI;
 		}
