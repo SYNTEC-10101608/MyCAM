@@ -160,9 +160,33 @@ namespace DataStructure
 			}
 		}
 
+		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg )
+		{
+			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
+				m_ToolVecModifyMap[ index ] = new Tuple<double, double>( dRA_deg, dRB_deg );
+			}
+			else {
+				m_ToolVecModifyMap.Add( index, new Tuple<double, double>( dRA_deg, dRB_deg ) );
+			}
+			m_IsDirty = true;
+		}
+
+		public void GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
+		{
+			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
+				dRA_deg = m_ToolVecModifyMap[ index ].Item1;
+				dRB_deg = m_ToolVecModifyMap[ index ].Item2;
+			}
+			else {
+				dRA_deg = 0;
+				dRB_deg = 0;
+			}
+		}
+
 		// backing fields
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
 		ToolVectorType m_ToolVectorType = ToolVectorType.Default;
+		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsReverse = false;
 		int m_StartPoint = 0;
 		double m_Offset = 0;
@@ -283,6 +307,46 @@ namespace DataStructure
 				CAMPoint camPoint = new CAMPoint( cadPoint, ToolVec );
 				m_CAMPointList.Add( camPoint );
 			}
+		}
+
+		void ModifyToolVec()
+		{
+			if( m_ToolVecModifyMap.Count == 0 ) {
+				return;
+			}
+			List<Tuple<double, double>> modifyDataList;
+			if( m_ToolVecModifyMap.Count == 1 ) {
+
+				// all modify data is set to be the only data
+				modifyDataList = Enumerable.Repeat( m_ToolVecModifyMap.First().Value, m_CAMPointList.Count ).ToList();
+			}
+			else {
+				// sort the modify data by index
+				List<int> indexInOrder = m_ToolVecModifyMap.Keys.ToList();
+				indexInOrder.Sort();
+				modifyDataList = Enumerable.Repeat( new Tuple<double, double>( 0, 0 ), m_CAMPointList.Count ).ToList();
+				for( int i = 0; i < m_ToolVecModifyMap.Count; i++ ) {
+
+					// get the interval of the modify data
+					int indexStart = indexInOrder[ i ];
+					int indexEnd = indexInOrder[ ( i + 1 ) % m_ToolVecModifyMap.Count ];
+
+					// get the modify data in interval by linear interpolation
+					double dRA_degStart = m_ToolVecModifyMap[ indexStart ].Item1;
+					double dRB_degStart = m_ToolVecModifyMap[ indexStart ].Item2;
+					double dRA_degEnd = m_ToolVecModifyMap[ indexEnd ].Item1;
+					double dRB_degEnd = m_ToolVecModifyMap[ indexEnd ].Item2;
+					double dRA_degIncrement = ( dRA_degEnd - dRA_degStart ) / ( indexEnd - indexStart );
+					double dRB_degIncrement = ( dRB_degEnd - dRB_degStart ) / ( indexEnd - indexStart );
+					for( int j = indexStart; j < indexEnd; j++ ) {
+						double dRA_deg = dRA_degStart + dRA_degIncrement * ( j - indexStart );
+						double dRB_deg = dRB_degStart + dRB_degIncrement * ( j - indexStart );
+						modifyDataList[ j ] = new Tuple<double, double>( dRA_deg, dRB_deg );
+					}
+				}
+			}
+
+			// modify the tool vector
 		}
 
 		void SetStartPoint()
