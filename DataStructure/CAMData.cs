@@ -81,6 +81,7 @@ namespace DataStructure
 			get; private set;
 		}
 
+		// TODO: this should move to CADData
 		public List<CADPoint> CADPointList
 		{
 			get; private set;
@@ -222,35 +223,13 @@ namespace DataStructure
 		{
 			m_IsDirty = false;
 			m_CAMPointList = new List<CAMPoint>();
+
+			// TODO: this can be after start and orientation
 			SetToolVec();
 			SetStartPoint();
 			SetOrientation();
 			DoOffset();
 			SetLead();
-		}
-
-		void SetToolVec()
-		{
-			for( int i = 0; i < CADPointList.Count; i++ ) {
-
-				// calculate tool vector
-				CADPoint cadPoint = CADPointList[ i ];
-				gp_Dir ToolVec;
-				switch( ToolVectorType ) {
-					case ToolVectorType.Default:
-					default:
-						ToolVec = cadPoint.NormalVec.Crossed( cadPoint.TangentVec );
-						break;
-					case ToolVectorType.Intersecting:
-						ToolVec = m_IntersectingDir;
-						break;
-					case ToolVectorType.TowardZ:
-						ToolVec = new gp_Dir( 0, 0, 1 );
-						break;
-				}
-				CAMPoint camPoint = new CAMPoint( cadPoint, ToolVec );
-				m_CAMPointList.Add( camPoint );
-			}
 		}
 
 		void GetIntersectingDir()
@@ -280,6 +259,30 @@ namespace DataStructure
 			}
 			m_IntersectingDir = tempIntersectingDir;
 			m_ToolVectorType = ToolVectorType.Intersecting;
+		}
+
+		void SetToolVec()
+		{
+			for( int i = 0; i < CADPointList.Count; i++ ) {
+
+				// calculate tool vector
+				CADPoint cadPoint = CADPointList[ i ];
+				gp_Dir ToolVec;
+				switch( ToolVectorType ) {
+					case ToolVectorType.Default:
+					default:
+						ToolVec = cadPoint.NormalVec.Crossed( cadPoint.TangentVec );
+						break;
+					case ToolVectorType.Intersecting:
+						ToolVec = m_IntersectingDir;
+						break;
+					case ToolVectorType.TowardZ:
+						ToolVec = new gp_Dir( 0, 0, 1 );
+						break;
+				}
+				CAMPoint camPoint = new CAMPoint( cadPoint, ToolVec );
+				m_CAMPointList.Add( camPoint );
+			}
 		}
 
 		void SetStartPoint()
