@@ -85,7 +85,7 @@ namespace OCCTool
 			gp_Pnt p2 = BRep_Tool.Pnt( v2 );
 			double dDistance = p1.Distance( p2 );
 
-			// compare edge length and distance
+			// compare edge length and distance (arc and sine)
 			const double dToleranceRatio = 1e-6;
 			if( Math.Abs( ( dEdgeLength - dDistance ) / dDistance ) < dToleranceRatio ) {
 				return true;

@@ -22,14 +22,6 @@ namespace OCCTool
 			return sewing.SewedShape();
 		}
 
-		public static gp_Pnt GetFaceCenter( TopoDS_Face face )
-		{
-			GProp_GProps props = new GProp_GProps();
-			BRepGProp.SurfaceProperties( face, ref props );
-			gp_Pnt center = props.CentreOfMass();
-			return center;
-		}
-
 		public static TopoDS_Shape MakeCompound( List<TopoDS_Shape> shapeList )
 		{
 			TopoDS_Compound compound = new TopoDS_Compound();
