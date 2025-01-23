@@ -310,6 +310,7 @@ namespace DataStructure
 			ModifyToolVec();
 		}
 
+		// TODO: algorithm optimization
 		void ModifyToolVec()
 		{
 			if( m_ToolVecModifyMap.Count == 0 ) {
@@ -337,12 +338,15 @@ namespace DataStructure
 					double dRB_degStart = m_ToolVecModifyMap[ indexStart ].Item2;
 					double dRA_degEnd = m_ToolVecModifyMap[ indexEnd ].Item1;
 					double dRB_degEnd = m_ToolVecModifyMap[ indexEnd ].Item2;
+					if( indexStart > indexEnd ) {
+						indexEnd += m_CAMPointList.Count;
+					}
 					double dRA_degIncrement = ( dRA_degEnd - dRA_degStart ) / ( indexEnd - indexStart );
 					double dRB_degIncrement = ( dRB_degEnd - dRB_degStart ) / ( indexEnd - indexStart );
 					for( int j = indexStart; j < indexEnd; j++ ) {
 						double dRA_deg = dRA_degStart + dRA_degIncrement * ( j - indexStart );
 						double dRB_deg = dRB_degStart + dRB_degIncrement * ( j - indexStart );
-						modifyDataList[ j ] = new Tuple<double, double>( dRA_deg, dRB_deg );
+						modifyDataList[ j % m_CAMPointList.Count ] = new Tuple<double, double>( dRA_deg, dRB_deg );
 					}
 				}
 			}

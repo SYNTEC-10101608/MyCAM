@@ -79,6 +79,7 @@ namespace CAMEdit
 		{
 			None,
 			StartPoint,
+			TooVec,
 		}
 		EditMode m_EditMode = EditMode.None;
 		EditMode editMode
@@ -380,17 +381,13 @@ namespace CAMEdit
 				return;
 			}
 
-			//// TODO: implement this
-			//if( camData.Offset == 0 ) {
-			//	camData.Offset = 1;
-			//}
-			//else {
-			//	camData.Offset = 0;
-			//}
-			camData.SetToolVecModify( 20, 0, 45 );
-			camData.SetToolVecModify( 40, 0, 0 );
-			camData.SetToolVecModify( 60, 0, 45 );
-			camData.SetToolVecModify( 80, 0, 0 );
+			// TODO: implement this
+			if( camData.Offset == 0 ) {
+				camData.Offset = 1;
+			}
+			else {
+				camData.Offset = 0;
+			}
 			ShowCAMData();
 		}
 
