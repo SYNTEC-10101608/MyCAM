@@ -8,14 +8,12 @@ namespace NCExport
 {
 	public class NCWriter
 	{
-		public NCWriter( List<IProcessData> processDataList, gp_Trsf partTrsf )
+		public NCWriter( List<IProcessData> processDataList )
 		{
 			m_ProcessDataList = processDataList;
-			m_PartTrsf = partTrsf;
 		}
 
 		List<IProcessData> m_ProcessDataList;
-		gp_Trsf m_PartTrsf;
 		StreamWriter m_StreamWriter;
 
 		public void Convert()
@@ -52,7 +50,7 @@ namespace NCExport
 				string szA = dA_MCS.ToString( "F3" );
 				string szC = dC_MCS.ToString( "F3" );
 
-				// TEST
+				// for G43.5 test
 				//string szI = camPoint.ToolVec.X().ToString( "F3" );
 				//string szJ = camPoint.ToolVec.Y().ToString( "F3" );
 				//string szK = camPoint.ToolVec.Z().ToString( "F3" );
@@ -61,7 +59,6 @@ namespace NCExport
 			}
 		}
 
-		// TODO: currently for spindle-spindle C-A Type only
 		void ConvertIJKToABC( gp_Dir ToolVec_G54, out double dA_MCS_deg, out double dC_MCS_deg )
 		{
 			// calculate the A and C angle
@@ -80,8 +77,6 @@ namespace NCExport
 			string szX = traverseProcessData.Point.X().ToString( "F3" );
 			string szY = traverseProcessData.Point.Y().ToString( "F3" );
 			string szZ = traverseProcessData.Point.Z().ToString( "F3" );
-
-			// TODO: add tool vector
 			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A0 C0" );
 		}
 	}

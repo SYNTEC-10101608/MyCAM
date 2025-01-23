@@ -74,7 +74,7 @@ namespace MyCAM
 
 		void ProcessEditOK( List<IProcessData> list )
 		{
-			NCWriter w = new NCWriter( list, m_PartTrsf );
+			NCWriter w = new NCWriter( list );
 			w.Convert();
 		}
 
