@@ -380,8 +380,6 @@ namespace CAMEdit
 			if( camData == null ) {
 				return;
 			}
-
-			// TODO: implement this
 			if( camData.Offset == 0 ) {
 				camData.Offset = 1;
 			}
@@ -464,8 +462,6 @@ namespace CAMEdit
 			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_WIRE ) {
 				return;
 			}
-
-			// TODO: the mapping method is not good, try use OCC map or other method later
 			foreach( TopoDS_Wire wire in m_ContourMap.Keys ) {
 				if( wire.IsEqual( selectedShape ) ) {
 					camData = m_ContourMap[ wire ];
@@ -488,8 +484,6 @@ namespace CAMEdit
 			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
 				return;
 			}
-
-			// TODO: the mapping method is not good, try use OCC map or other method later
 			foreach( TopoDS_Vertex vertex in m_VertexMap.Keys ) {
 
 				// using distance threadhold to find the selected vertex

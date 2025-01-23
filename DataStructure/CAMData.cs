@@ -81,7 +81,6 @@ namespace DataStructure
 			get; private set;
 		}
 
-		// TODO: this should move to CADData
 		public List<CADPoint> CADPointList
 		{
 			get; private set;
@@ -247,8 +246,6 @@ namespace DataStructure
 		{
 			m_IsDirty = false;
 			m_CAMPointList = new List<CAMPoint>();
-
-			// TODO: this can be after start and orientation
 			SetToolVec();
 			SetStartPoint();
 			SetOrientation();
@@ -310,7 +307,6 @@ namespace DataStructure
 			ModifyToolVec();
 		}
 
-		// TODO: algorithm optimization
 		void ModifyToolVec()
 		{
 			if( m_ToolVecModifyMap.Count == 0 ) {
