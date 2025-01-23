@@ -65,7 +65,7 @@ namespace NCExport
 		void ConvertIJKToABC( gp_Dir ToolVec_G54, out double dA_MCS_deg, out double dC_MCS_deg )
 		{
 			// calculate the A and C angle
-			if( Math.Abs( ToolVec_G54.X() ) < 1e-3 && Math.Abs( ToolVec_G54.Y() ) < 1e-3 ) {
+			if( Math.Abs( ToolVec_G54.X() ) < 1e-6 && Math.Abs( ToolVec_G54.Y() ) < 1e-6 ) {
 				dC_MCS_deg = 0;
 			}
 			else {

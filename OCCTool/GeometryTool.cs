@@ -33,7 +33,7 @@ namespace OCCTool
 
 			// Denominator for solving t and s
 			double denominator = a * c - b * b;
-			if( Math.Abs( denominator ) < 1e-6 ) { //TODO: tolerance
+			if( Math.Abs( denominator ) < 1e-6 ) {
 				TypeL1 = IntersectType.NoIntersect;
 				TypeL2 = IntersectType.NoIntersect;
 				return new gp_Pnt( ( p2.XYZ() + p4.XYZ() ) / 2 );
@@ -86,7 +86,7 @@ namespace OCCTool
 			double dDistance = p1.Distance( p2 );
 
 			// compare edge length and distance
-			const double dToleranceRatio = 0.001; // TODO: tolerance
+			const double dToleranceRatio = 1e-6;
 			if( Math.Abs( ( dEdgeLength - dDistance ) / dDistance ) < dToleranceRatio ) {
 				return true;
 			}

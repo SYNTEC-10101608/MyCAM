@@ -49,7 +49,6 @@
     <Compile Include="SegmentTool.cs" />
     <Compile Include="ShapeTool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TransformTool.cs" />
     <Compile Include="VectorTool.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

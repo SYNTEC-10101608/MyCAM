@@ -263,7 +263,7 @@ namespace DataStructure
 			gp_Dir normalVec2 = null;
 			for( int i = 1; i < CADPointList.Count; i++ ) {
 				gp_Dir temp = CADPointList[ i ].NormalVec;
-				if( !temp.IsParallel( normalVec1, 1e-6 ) ) { // TODO: tolerance
+				if( !temp.IsParallel( normalVec1, 1e-6 ) ) {
 					normalVec2 = temp;
 					break;
 				}
@@ -277,7 +277,7 @@ namespace DataStructure
 
 			// check is all normal vectors are perpendicular to the intersecting direction
 			for( int i = 0; i < CADPointList.Count; i++ ) {
-				if( !CADPointList[ i ].NormalVec.IsNormal( tempIntersectingDir, 1e-6 ) ) { // TODO: tolerance
+				if( !CADPointList[ i ].NormalVec.IsNormal( tempIntersectingDir, 1e-6 ) ) {
 					return;
 				}
 			}
@@ -411,7 +411,7 @@ namespace DataStructure
 				gp_Pnt p2 = m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.Point;
 
 				// if p1 is equal to p2, skip
-				if( p1.IsEqual( p2, 1e-6 ) ) { // TODO: tolerance
+				if( p1.IsEqual( p2, 1e-6 ) ) {
 					continue;
 				}
 

@@ -13,7 +13,7 @@ namespace OCCTool
 		public static TopoDS_Shape SewShape( List<TopoDS_Shape> shapeList )
 		{
 			// split the faces into shells
-			double dSewingTolerance = 0.001; // TODO: set the tolerance
+			double dSewingTolerance = 1e-3;
 			BRepBuilderAPI_Sewing sewing = new BRepBuilderAPI_Sewing( dSewingTolerance );
 			foreach( TopoDS_Shape shape in shapeList ) {
 				sewing.Add( shape );

@@ -25,7 +25,7 @@ namespace OCCTool
 			proj.LowerDistanceParameters( ref u, ref v );
 
 			// get normal vector
-			GeomLProp_SLProps props = new GeomLProp_SLProps( surface, u, v, 1, 0.001 );
+			GeomLProp_SLProps props = new GeomLProp_SLProps( surface, u, v, 1, 1e-3 );
 			if( !props.IsNormalDefined() ) {
 				return new gp_Dir();
 			}
@@ -50,7 +50,7 @@ namespace OCCTool
 			double u = proj.LowerDistanceParameter();
 
 			// get tangent vector
-			GeomLProp_CLProps props = new GeomLProp_CLProps( curve, u, 1, 0.001 );
+			GeomLProp_CLProps props = new GeomLProp_CLProps( curve, u, 1, 1e-3 );
 			if( !props.IsTangentDefined() ) {
 				return new gp_Dir();
 			}
@@ -60,21 +60,6 @@ namespace OCCTool
 				tangent.Reverse();
 			}
 			return tangent;
-		}
-
-		public static gp_Pnt OffsetPoint( gp_Pnt point, gp_Vec vec )
-		{
-			return new gp_Pnt( point.XYZ() + vec.XYZ() );
-		}
-
-		public static gp_Pnt OffsetPoint( gp_Pnt point, gp_Dir dir, double distance )
-		{
-			return new gp_Pnt( point.XYZ() + dir.XYZ() * distance );
-		}
-
-		public static gp_Vec GetVec( gp_Pnt point1, gp_Pnt point2 )
-		{
-			return new gp_Vec( point1, point2 );
 		}
 	}
 }
