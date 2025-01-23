@@ -199,8 +199,6 @@ namespace ProcessEdit
 		gp_Pnt GetKeyPoint( IProcessData data, bool bStart )
 		{
 			if( data.ProcessType == EProcessType.ProcessType_Cutting ) {
-
-				// TODO: using start point API later
 				CuttingProcessData cuttingData = (CuttingProcessData)data;
 				if( bStart ) {
 					return cuttingData.CAMData.CAMPointList[ 0 ].CADPoint.Point;

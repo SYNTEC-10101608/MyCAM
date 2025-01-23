@@ -45,7 +45,6 @@ namespace DataStructure
 
 	public class TraverseProcessData : IProcessData
 	{
-		// TODO: use AX1 to present the location and direction
 		public TraverseProcessData( gp_Pnt point )
 		{
 			m_Point = point;
