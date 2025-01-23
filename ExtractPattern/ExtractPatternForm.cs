@@ -153,7 +153,6 @@ namespace ExtractPattern
 			return cadDataList;
 		}
 
-		// TODO: the grouping method is tricky, need to be improved
 		List<TopoDS_Wire> GetAllCADContour( List<TopoDS_Face> extractedFaceList, out TopoDS_Shape sewResult )
 		{
 			// sew the faces
