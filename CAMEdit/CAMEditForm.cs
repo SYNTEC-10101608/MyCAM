@@ -4,6 +4,7 @@ using OCC.Aspect;
 using OCC.BRep;
 using OCC.BRepBuilderAPI;
 using OCC.BRepPrimAPI;
+using OCC.Geom;
 using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Prs3d;
@@ -99,7 +100,7 @@ namespace CAMEdit
 		// for viewer resource handle
 		List<AIS_Shape> m_CADContourAISList = new List<AIS_Shape>(); // for active only, no need refresh
 		List<AIS_Shape> m_CAMContourAISList = new List<AIS_Shape>(); // need refresh
-		List<AIS_Shape> m_ToolVecAISList = new List<AIS_Shape>(); // need refresh
+		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh
 		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh
 
 		enum EvecType
@@ -137,38 +138,16 @@ namespace CAMEdit
 
 				// build wire from cad points
 				CAMData camData = m_Model.CAMDataList[ i ];
-				TopoDS_Vertex lastVertex = null;
-				List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
+				BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
 
-				// add vertex to map and build edges
+				// add points to the polygon
 				for( int j = 0; j < camData.CADPointList.Count; j++ ) {
-					BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( camData.CADPointList[ j ].Point );
-					TopoDS_Vertex vertex = vertexMaker.Vertex();
-
-					// first vertex
-					if( j == 0 || lastVertex == null ) {
-						m_VertexMap.Add( vertex, new Tuple<CAMData, int>( camData, j ) );
-						lastVertex = vertex;
-						continue;
-					}
-					BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( lastVertex, vertex );
-					if( edgeMaker.IsDone() == false ) {
-						continue;
-					}
-					edgeList.Add( edgeMaker.Edge() );
-					m_VertexMap.Add( vertex, new Tuple<CAMData, int>( camData, j ) );
-					lastVertex = vertex;
+					polygonMaker.Add( camData.CADPointList[ j ].Point );
 				}
-
-				// build wire
-				BRepBuilderAPI_MakeWire wireMaker = new BRepBuilderAPI_MakeWire();
-				foreach( TopoDS_Edge edge in edgeList ) {
-					wireMaker.Add( edge );
-				}
-				if( wireMaker.IsDone() == false ) {
+				if( polygonMaker.IsDone() == false ) {
 					continue;
 				}
-				TopoDS_Wire wire = wireMaker.Wire();
+				TopoDS_Wire wire = polygonMaker.Wire();
 				m_ContourMap.Add( wire, camData );
 			}
 
@@ -199,42 +178,22 @@ namespace CAMEdit
 			}
 			m_CAMContourAISList.Clear();
 
-			// build cam data
+
 			List<TopoDS_Wire> camWireList = new List<TopoDS_Wire>();
 			for( int i = 0; i < m_Model.CAMDataList.Count; i++ ) {
 
 				// build wire from cam points
 				CAMData camData = m_Model.CAMDataList[ i ];
-				TopoDS_Vertex lastVertex = null;
-				List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
+				BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
 
 				// build edges
 				for( int j = 0; j < camData.CAMPointList.Count; j++ ) {
-					BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( camData.CAMPointList[ j ].CADPoint.Point );
-					TopoDS_Vertex vertex = vertexMaker.Vertex();
-
-					// first vertex
-					if( j == 0 || lastVertex == null ) {
-						lastVertex = vertex;
-						continue;
-					}
-					BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( lastVertex, vertex );
-					if( edgeMaker.IsDone() == false ) {
-						continue;
-					}
-					edgeList.Add( edgeMaker.Edge() );
-					lastVertex = vertex;
+					polygonMaker.Add( camData.CAMPointList[ j ].CADPoint.Point );
 				}
-
-				// build wire
-				BRepBuilderAPI_MakeWire wireMaker = new BRepBuilderAPI_MakeWire();
-				foreach( TopoDS_Edge edge in edgeList ) {
-					wireMaker.Add( edge );
-				}
-				if( wireMaker.IsDone() == false ) {
+				if( polygonMaker.IsDone() == false ) {
 					continue;
 				}
-				TopoDS_Wire wire = wireMaker.Wire();
+				TopoDS_Wire wire = polygonMaker.Wire();
 				camWireList.Add( wire );
 			}
 
@@ -254,7 +213,7 @@ namespace CAMEdit
 		void ShowToolVec()
 		{
 			// clear the previous tool vec
-			foreach( AIS_Shape toolVecAIS in m_ToolVecAISList ) {
+			foreach( AIS_Line toolVecAIS in m_ToolVecAISList ) {
 				m_OCCViewer.GetAISContext().Remove( toolVecAIS, false );
 			}
 			m_ToolVecAISList.Clear();
@@ -262,13 +221,13 @@ namespace CAMEdit
 			// build tool vec
 			foreach( CAMData camData in m_Model.CAMDataList ) {
 				foreach( CAMPoint camPoint in camData.CAMPointList ) {
-					AIS_Shape toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
+					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
 					m_ToolVecAISList.Add( toolVecAIS );
 				}
 			}
 
 			// display the tool vec
-			foreach( AIS_Shape toolVecAIS in m_ToolVecAISList ) {
+			foreach( AIS_Line toolVecAIS in m_ToolVecAISList ) {
 				m_OCCViewer.GetAISContext().Display( toolVecAIS, false );
 				m_OCCViewer.GetAISContext().Deactivate( toolVecAIS );
 			}
@@ -300,11 +259,10 @@ namespace CAMEdit
 			}
 		}
 
-		AIS_Shape GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
+		AIS_Line GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
 		{
 			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 10 );
-			BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( point, endPoint );
-			AIS_Shape lineAIS = new AIS_Shape( edgeMaker.Shape() );
+			AIS_Line lineAIS = new AIS_Line( new Geom_CartesianPoint( point ), new Geom_CartesianPoint( endPoint ) );
 			switch( vecType ) {
 				case EvecType.ToolVec:
 					lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
