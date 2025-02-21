@@ -182,6 +182,15 @@ namespace DataStructure
 			}
 		}
 
+		public HashSet<int> GetToolVecModifyIndex()
+		{
+			HashSet<int> result = new HashSet<int>();
+			foreach( int nIndex in m_ToolVecModifyMap.Keys ) {
+				result.Add( nIndex );
+			}
+			return result;
+		}
+
 		// backing fields
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
 		ToolVectorType m_ToolVectorType = ToolVectorType.Default;

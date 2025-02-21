@@ -50,7 +50,11 @@ namespace CAMEdit
 
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
+			m_panViewer.MouseMove += ViewerMouseMove;
 			m_panViewer.PreviewKeyDown += ViewerKeyDown;
+
+			m_ToolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			m_ToolVecAIS.SetWidth( 2 );
 		}
 
 		public bool Init( CAMEditModel model )
@@ -74,7 +78,7 @@ namespace CAMEdit
 		CAMEditModel m_Model;
 
 		// for UI action
-		Dictionary<TopoDS_Vertex, Tuple<CAMData, int>> m_VertexMap = new Dictionary<TopoDS_Vertex, Tuple<CAMData, int>>();
+		Dictionary<gp_Pnt, Tuple<CAMData, int>> m_VertexMap = new Dictionary<gp_Pnt, Tuple<CAMData, int>>();
 		Dictionary<TopoDS_Wire, CAMData> m_ContourMap = new Dictionary<TopoDS_Wire, CAMData>();
 		enum EditMode
 		{
@@ -96,6 +100,10 @@ namespace CAMEdit
 				StartAction();
 			}
 		}
+		gp_Ax2 m_ToolVecAx2;
+		CAMData m_SelectedCAMData = null;
+		int m_SelectedIndex = -1;
+		AIS_Line m_ToolVecAIS = new AIS_Line( new Geom_CartesianPoint( new gp_Pnt( 0, 0, 0 ) ), new Geom_CartesianPoint( new gp_Pnt( 0, 0, 10 ) ) );
 
 		// for viewer resource handle
 		List<AIS_Shape> m_CADContourAISList = new List<AIS_Shape>(); // for active only, no need refresh
@@ -143,6 +151,7 @@ namespace CAMEdit
 				// add points to the polygon
 				for( int j = 0; j < camData.CADPointList.Count; j++ ) {
 					polygonMaker.Add( camData.CADPointList[ j ].Point );
+					m_VertexMap.Add( camData.CADPointList[ j ].Point, new Tuple<CAMData, int>( camData, j ) );
 				}
 				if( polygonMaker.IsDone() == false ) {
 					continue;
@@ -387,8 +396,23 @@ namespace CAMEdit
 					if( camData == null || nIndex == -1 ) {
 						return;
 					}
-					camData.StartPoint = nIndex;
-					ShowCAMData();
+					//camData.StartPoint = nIndex;
+					//ShowCAMData();
+
+					// record point tangent and normal vec ax2
+					CADPoint cadPoint = camData.CADPointList[ nIndex ];
+					m_ToolVecAx2 = new gp_Ax2( cadPoint.Point, cadPoint.NormalVec.Crossed( cadPoint.TangentVec ), cadPoint.TangentVec );
+					m_SelectedCAMData = camData;
+					m_SelectedIndex = nIndex;
+					editMode = EditMode.TooVec;
+
+					break;
+				case EditMode.TooVec:
+					if( e.Button != MouseButtons.Left ) {
+						return;
+					}
+					editMode = EditMode.StartPoint;
+
 					break;
 				case EditMode.None:
 				default:
@@ -396,6 +420,54 @@ namespace CAMEdit
 						return;
 					}
 					m_OCCViewer.Select();
+					break;
+			}
+		}
+
+		void ViewerMouseMove( object sender, MouseEventArgs e )
+		{
+			switch( editMode ) {
+				case EditMode.TooVec:
+					if( m_ToolVecAx2 == null ) {
+						return;
+					}
+
+					if( m_ToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
+						return;
+					}
+
+					// convert the mouse position to 3D point
+					double x = 0;
+					double y = 0;
+					double z = 0;
+					m_OCCViewer.Convert( e.X, e.Y, ref x, ref y, ref z );
+
+					// get vector from the start point to the mouse point
+					gp_Pnt startPoint = m_ToolVecAx2.Location();
+					gp_Pnt endPoint = new gp_Pnt( x, y, z );
+					gp_Dir dir = new gp_Dir( endPoint.XYZ() - startPoint.XYZ() );
+
+					// project the vector to the ax2
+					double X = dir.Dot( m_ToolVecAx2.XDirection() );
+					double Y = dir.Dot( m_ToolVecAx2.YDirection() );
+					double Z = dir.Dot( m_ToolVecAx2.Direction() );
+
+					// get angle A is atan2 Z/X
+					double angleA = Math.Atan2( X, Z ) * 180 / Math.PI;
+
+					// get angle B is atan2 Z/Y
+					double angleB = Math.Atan2( Y, Z ) * 180 / Math.PI;
+					m_SelectedCAMData.SetToolVecModify( m_SelectedIndex, angleA, angleB );
+					ShowCAMData();
+
+					// get vector from the start point to the mouse point
+					endPoint = startPoint.Translated( new gp_Vec( dir.XYZ() * 10 ) );
+					m_ToolVecAIS.SetPoints( new Geom_CartesianPoint( startPoint ), new Geom_CartesianPoint( endPoint ) );
+					m_OCCViewer.GetAISContext().Redisplay( m_ToolVecAIS, true );
+
+					break;
+				case EditMode.None:
+				default:
 					break;
 			}
 		}
@@ -442,10 +514,10 @@ namespace CAMEdit
 			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
 				return;
 			}
-			foreach( TopoDS_Vertex vertex in m_VertexMap.Keys ) {
+			foreach( gp_Pnt vertex in m_VertexMap.Keys ) {
 
 				// using distance threadhold to find the selected vertex
-				gp_Pnt p1 = BRep_Tool.Pnt( vertex );
+				gp_Pnt p1 = vertex;
 				gp_Pnt p2 = BRep_Tool.Pnt( TopoDS.ToVertex( selectedShape ) );
 				double dDistance = p1.Distance( p2 );
 				if( dDistance < 1e-6 ) {
@@ -478,6 +550,9 @@ namespace CAMEdit
 
 					// highlight the start point tsmi
 					m_tsmiStartPoint.BackColor = System.Drawing.Color.Yellow;
+					break;
+				case EditMode.TooVec:
+					m_OCCViewer.GetAISContext().Display( m_ToolVecAIS, true );
 					break;
 				case EditMode.None:
 				default:
@@ -512,6 +587,9 @@ namespace CAMEdit
 
 					// restore the start point tsmi to system control color
 					m_tsmiStartPoint.BackColor = System.Drawing.SystemColors.Control;
+					break;
+				case EditMode.TooVec:
+					m_OCCViewer.GetAISContext().Remove( m_ToolVecAIS, true );
 					break;
 				case EditMode.None:
 				default:
