@@ -279,6 +279,16 @@ namespace OCCViewer
 			}
 		}
 
+		public gp_Dir GetViewDir()
+		{
+			if( myView != null ) {
+				double x = 0, y = 0, z = 0;
+				myView.Proj( ref x, ref y, ref z );
+				return new gp_Dir( x, y, z );
+			}
+			return new gp_Dir( 0, 0, 0 );
+		}
+
 		public double Scale()
 		{
 			if( myView != null ) {

@@ -5,6 +5,7 @@ using OCC.BRep;
 using OCC.BRepBuilderAPI;
 using OCC.BRepPrimAPI;
 using OCC.Geom;
+using OCC.GeomAPI;
 using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Prs3d;
@@ -52,9 +53,6 @@ namespace CAMEdit
 			m_panViewer.MouseDown += ViewerMouseDown;
 			m_panViewer.MouseMove += ViewerMouseMove;
 			m_panViewer.PreviewKeyDown += ViewerKeyDown;
-
-			m_ToolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			m_ToolVecAIS.SetWidth( 2 );
 		}
 
 		public bool Init( CAMEditModel model )
@@ -103,7 +101,6 @@ namespace CAMEdit
 		gp_Ax2 m_ToolVecAx2;
 		CAMData m_SelectedCAMData = null;
 		int m_SelectedIndex = -1;
-		AIS_Line m_ToolVecAIS = new AIS_Line( new Geom_CartesianPoint( new gp_Pnt( 0, 0, 0 ) ), new Geom_CartesianPoint( new gp_Pnt( 0, 0, 10 ) ) );
 
 		// for viewer resource handle
 		List<AIS_Shape> m_CADContourAISList = new List<AIS_Shape>(); // for active only, no need refresh
@@ -229,9 +226,14 @@ namespace CAMEdit
 
 			// build tool vec
 			foreach( CAMData camData in m_Model.CAMDataList ) {
+				int nIndex = 0;
 				foreach( CAMPoint camPoint in camData.CAMPointList ) {
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
+					if( camData.GetToolVecModifyIndex().Contains( nIndex ) ) {
+						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+					}
 					m_ToolVecAISList.Add( toolVecAIS );
+					nIndex++;
 				}
 			}
 
@@ -377,6 +379,18 @@ namespace CAMEdit
 						editMode = EditMode.None;
 					}
 					break;
+				case EditMode.TooVec:
+					if( e.KeyCode != Keys.Escape ) {
+						return;
+					}
+					if( m_ToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
+						return;
+					}
+					m_SelectedCAMData.SetToolVecModify( m_SelectedIndex, 0, 0 );
+					ShowCAMData();
+					editMode = EditMode.None;
+
+					break;
 				case EditMode.None:
 				default:
 					break;
@@ -411,7 +425,7 @@ namespace CAMEdit
 					if( e.Button != MouseButtons.Left ) {
 						return;
 					}
-					editMode = EditMode.StartPoint;
+					editMode = EditMode.None;
 
 					break;
 				case EditMode.None:
@@ -428,24 +442,53 @@ namespace CAMEdit
 		{
 			switch( editMode ) {
 				case EditMode.TooVec:
-					if( m_ToolVecAx2 == null ) {
-						return;
-					}
-
 					if( m_ToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
 						return;
 					}
 
 					// convert the mouse position to 3D point
-					double x = 0;
-					double y = 0;
-					double z = 0;
-					m_OCCViewer.Convert( e.X, e.Y, ref x, ref y, ref z );
+					double xp = 0;
+					double yp = 0;
+					double zp = 0;
+					m_OCCViewer.Convert( e.X, e.Y, ref xp, ref yp, ref zp );
 
-					// get vector from the start point to the mouse point
-					gp_Pnt startPoint = m_ToolVecAx2.Location();
-					gp_Pnt endPoint = new gp_Pnt( x, y, z );
-					gp_Dir dir = new gp_Dir( endPoint.XYZ() - startPoint.XYZ() );
+					// make a sphere for direction control
+					gp_Sphere sphere = new gp_Sphere();
+					sphere.SetLocation( m_ToolVecAx2.Location() );
+					sphere.SetRadius( 10 );
+					Geom_SphericalSurface sphereG = new Geom_SphericalSurface( sphere );
+
+					// make line representing view direction
+					gp_Pnt mousePoint = new gp_Pnt( xp, yp, zp );
+					gp_Lin viewLine = new gp_Lin( mousePoint, m_OCCViewer.GetViewDir() );
+					Geom_Line viewLineG = new Geom_Line( viewLine );
+
+					// get intersection point of the line and the sphere
+					GeomAPI_IntCS intCS = new GeomAPI_IntCS( viewLineG, sphereG );
+					gp_Pnt ps = new gp_Pnt();
+					if( intCS.NbPoints() == 0 ) {
+
+						// get closet point of the line and the sphere center
+						GeomAPI_ProjectPointOnCurve projectPoint = new GeomAPI_ProjectPointOnCurve( m_ToolVecAx2.Location(), viewLineG );
+						double u = projectPoint.LowerDistanceParameter();
+						ps = viewLineG.Value( u );
+					}
+					else {
+
+						// get the point closet to the mouse point
+						double dMin = double.MaxValue;
+						for( int i = 1; i <= intCS.NbPoints(); i++ ) {
+							gp_Pnt p = intCS.Point( i );
+							double d = p.Distance( mousePoint );
+							if( d < dMin ) {
+								dMin = d;
+								ps = p;
+							}
+						}
+					}
+
+					// get direction of the line
+					gp_Dir dir = new gp_Dir( ps.XYZ() - m_ToolVecAx2.Location().XYZ() );
 
 					// project the vector to the ax2
 					double X = dir.Dot( m_ToolVecAx2.XDirection() );
@@ -459,12 +502,6 @@ namespace CAMEdit
 					double angleB = Math.Atan2( Y, Z ) * 180 / Math.PI;
 					m_SelectedCAMData.SetToolVecModify( m_SelectedIndex, angleA, angleB );
 					ShowCAMData();
-
-					// get vector from the start point to the mouse point
-					endPoint = startPoint.Translated( new gp_Vec( dir.XYZ() * 10 ) );
-					m_ToolVecAIS.SetPoints( new Geom_CartesianPoint( startPoint ), new Geom_CartesianPoint( endPoint ) );
-					m_OCCViewer.GetAISContext().Redisplay( m_ToolVecAIS, true );
-
 					break;
 				case EditMode.None:
 				default:
@@ -552,7 +589,7 @@ namespace CAMEdit
 					m_tsmiStartPoint.BackColor = System.Drawing.Color.Yellow;
 					break;
 				case EditMode.TooVec:
-					m_OCCViewer.GetAISContext().Display( m_ToolVecAIS, true );
+					//m_OCCViewer.SetViewDir( m_ToolVecAx2.YDirection().Reversed() );
 					break;
 				case EditMode.None:
 				default:
@@ -589,7 +626,6 @@ namespace CAMEdit
 					m_tsmiStartPoint.BackColor = System.Drawing.SystemColors.Control;
 					break;
 				case EditMode.TooVec:
-					m_OCCViewer.GetAISContext().Remove( m_ToolVecAIS, true );
 					break;
 				case EditMode.None:
 				default:
