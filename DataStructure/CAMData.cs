@@ -321,62 +321,64 @@ namespace DataStructure
 			if( m_ToolVecModifyMap.Count == 0 ) {
 				return;
 			}
-			List<Tuple<double, double>> modifyDataList;
-			if( m_ToolVecModifyMap.Count == 1 ) {
 
-				// all modify data is set to be the only data
-				modifyDataList = Enumerable.Repeat( m_ToolVecModifyMap.First().Value, m_CAMPointList.Count ).ToList();
-			}
-			else {
-				// sort the modify data by index
-				List<int> indexInOrder = m_ToolVecModifyMap.Keys.ToList();
-				indexInOrder.Sort();
-				modifyDataList = Enumerable.Repeat( new Tuple<double, double>( 0, 0 ), m_CAMPointList.Count ).ToList();
-				for( int i = 0; i < m_ToolVecModifyMap.Count; i++ ) {
-
-					// get the interval of the modify data
-					int indexStart = indexInOrder[ i ];
-					int indexEnd = indexInOrder[ ( i + 1 ) % m_ToolVecModifyMap.Count ];
-
-					// get the modify data in interval by linear interpolation
-					double dRA_degStart = m_ToolVecModifyMap[ indexStart ].Item1;
-					double dRB_degStart = m_ToolVecModifyMap[ indexStart ].Item2;
-					double dRA_degEnd = m_ToolVecModifyMap[ indexEnd ].Item1;
-					double dRB_degEnd = m_ToolVecModifyMap[ indexEnd ].Item2;
-					if( indexStart > indexEnd ) {
-						indexEnd += m_CAMPointList.Count;
-					}
-					double dRA_degIncrement = ( dRA_degEnd - dRA_degStart ) / ( indexEnd - indexStart );
-					double dRB_degIncrement = ( dRB_degEnd - dRB_degStart ) / ( indexEnd - indexStart );
-					for( int j = indexStart; j < indexEnd; j++ ) {
-						double dRA_deg = dRA_degStart + dRA_degIncrement * ( j - indexStart );
-						double dRB_deg = dRB_degStart + dRB_degIncrement * ( j - indexStart );
-						modifyDataList[ j % m_CAMPointList.Count ] = new Tuple<double, double>( dRA_deg, dRB_deg );
-					}
-				}
-			}
+			// sort the modify data by index
+			List<int> indexInOrder = m_ToolVecModifyMap.Keys.ToList();
+			indexInOrder.Sort();
 
 			// modify the tool vector
-			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
-				CAMPoint camPoint = m_CAMPointList[ i ];
-				double dRA_rad = modifyDataList[ i ].Item1 * Math.PI / 180;
-				double dRB_rad = modifyDataList[ i ].Item2 * Math.PI / 180;
-				if( dRA_rad == 0 && dRB_rad == 0 ) {
-					continue;
+			for( int i = 0; i < indexInOrder.Count; i++ ) {
+
+				// get start and end index
+				int nStartIndex = indexInOrder[ i ];
+				int nEndIndex = indexInOrder[ ( i + 1 ) % indexInOrder.Count ];
+				int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + m_CAMPointList.Count : nEndIndex;
+
+				// get start and end quaternion
+				gp_Quaternion qStart = GetQuaternionFromAB(
+					m_CAMPointList[ nStartIndex % m_CAMPointList.Count ],
+					m_ToolVecModifyMap[ nStartIndex ].Item1 * Math.PI / 180,
+					m_ToolVecModifyMap[ nStartIndex ].Item2 * Math.PI / 180 );
+				gp_Quaternion qEnd = GetQuaternionFromAB(
+					m_CAMPointList[ nEndIndex % m_CAMPointList.Count ],
+					m_ToolVecModifyMap[ nEndIndex ].Item1 * Math.PI / 180,
+					m_ToolVecModifyMap[ nEndIndex ].Item2 * Math.PI / 180 );
+
+				// do slerp from start to end
+				gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( qStart, qEnd );
+				for( int j = nStartIndex; j < nEndIndexModify; j++ ) {
+					double t = ( j - nStartIndex ) / (double)( nEndIndexModify - nStartIndex );
+					gp_Quaternion q = new gp_Quaternion();
+					slerp.Interpolate( t, ref q );
+					gp_Trsf trsf = new gp_Trsf();
+					trsf.SetRotation( q );
+					gp_Dir toolVec = m_CAMPointList[ j % m_CAMPointList.Count ].ToolVec.Transformed( trsf );
+					m_CAMPointList[ j % m_CAMPointList.Count ] = new CAMPoint( m_CAMPointList[ j % m_CAMPointList.Count ].CADPoint, toolVec );
 				}
-
-				// get the x, y, z direction
-				gp_Dir x = camPoint.CADPoint.TangentVec;
-				gp_Dir z = camPoint.ToolVec;
-				gp_Dir y = z.Crossed( x );
-
-				// X:Y:Z = tanA:tanB:1
-				double X = dRA_rad < 0 ? -1 : 1;
-				double Z = X / Math.Tan( dRA_rad );
-				double Y = Z * Math.Tan( dRB_rad );
-				gp_Dir toolVec = new gp_Dir( x.XYZ() * X + y.XYZ() * Y + z.XYZ() * Z );
-				m_CAMPointList[ i ] = new CAMPoint( camPoint.CADPoint, toolVec );
 			}
+		}
+
+		gp_Quaternion GetQuaternionFromAB(CAMPoint camPoint, double dRA_rad, double dRB_rad )
+		{
+			if( dRA_rad == 0 && dRB_rad == 0 ) {
+				return new gp_Quaternion();
+			}
+
+			// get the x, y, z direction
+			gp_Dir x = camPoint.CADPoint.TangentVec;
+			gp_Dir z = camPoint.ToolVec;
+			gp_Dir y = z.Crossed( x );
+
+			// X:Y:Z = tanA:tanB:1
+			double X = dRA_rad < 0 ? -1 : 1;
+			double Z = X / Math.Tan( dRA_rad );
+			double Y = Z * Math.Tan( dRB_rad );
+			gp_Dir dir1 = new gp_Dir( x.XYZ() * X + y.XYZ() * Y + z.XYZ() * Z );
+
+			// get the quaternion
+			gp_Vec v0 = new gp_Vec( camPoint.ToolVec );
+			gp_Vec v1 = new gp_Vec( dir1.XYZ() );
+			return new gp_Quaternion( v0, v1 );
 		}
 
 		void SetStartPoint()
