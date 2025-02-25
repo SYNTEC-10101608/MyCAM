@@ -360,6 +360,7 @@ namespace DataStructure
 
 		gp_Quaternion GetQuaternionFromAB(CAMPoint camPoint, double dRA_rad, double dRB_rad )
 		{
+			// TDOD: RA == 0 || RB == 0
 			if( dRA_rad == 0 && dRB_rad == 0 ) {
 				return new gp_Quaternion();
 			}
