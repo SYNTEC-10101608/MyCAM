@@ -86,6 +86,7 @@ namespace MyCAM
 			formToShow.MdiParent = this;
 			formToShow.StartPosition = FormStartPosition.Manual;
 			formToShow.Location = new Point( 0, 0 );
+			formToShow.Size = new Size( 800, 800 );
 			ClientSize = new Size( formToShow.Width + SystemInformation.BorderSize.Width * 2,
 			formToShow.Height + SystemInformation.CaptionHeight + SystemInformation.BorderSize.Height * 2 );
 			formToShow.Show();
