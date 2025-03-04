@@ -72,7 +72,7 @@ namespace DataStructure
 
 			// build raw data
 			BuildCADPointList();
-			GetIntersectingDir();
+			//GetIntersectingDir();
 			BuildCAMPointList();
 		}
 
