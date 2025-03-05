@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constraint.cs" />
     <Compile Include="PartPlacementForm.cs">
       <SubType>Form</SubType>
     </Compile>

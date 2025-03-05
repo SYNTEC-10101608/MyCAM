@@ -1,5 +1,7 @@
 ﻿using OCC.BRep;
+using OCC.BRepAdaptor;
 using OCC.BRepGProp;
+using OCC.GeomAbs;
 using OCC.gp;
 using OCC.GProp;
 using OCC.ShapeAnalysis;
@@ -72,6 +74,82 @@ namespace OCCTool
 
 		public static bool IsApproximatelyLinear( TopoDS_Edge edge )
 		{
+			return IsApproximatelyLinear( edge, out _, out _ );
+		}
+
+		public static bool IsPlane( TopoDS_Face face, out gp_Pnt p, out gp_Dir dir )
+		{
+			p = new gp_Pnt();
+			dir = new gp_Dir();
+			BRepAdaptor_Surface surface = new BRepAdaptor_Surface( face );
+			if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_Plane ) {
+				p = surface.Plane().Location();
+				dir = surface.Plane().Axis().Direction();
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		public static bool IsLine( TopoDS_Edge edge, out gp_Pnt p, out gp_Dir dir )
+		{
+			p = new gp_Pnt();
+			dir = new gp_Dir();
+			BRepAdaptor_Curve curve = new BRepAdaptor_Curve( edge );
+			if( curve.GetCurveType() == GeomAbs_CurveType.GeomAbs_Line ) {
+				p = curve.Line().Location();
+				dir = curve.Line().Direction();
+				return true;
+			}
+			else if( IsApproximatelyLinear( edge, out gp_Pnt p2, out gp_Pnt p1 ) ) {
+				p = p1;
+				dir = new gp_Dir( new gp_Vec( p1, p2 ) );
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		public static bool IsAxialSymmetry( TopoDS_Face face, out gp_Pnt p, out gp_Dir dir )
+		{
+			p = new gp_Pnt();
+			dir = new gp_Dir();
+			BRepAdaptor_Surface surface = new BRepAdaptor_Surface( face );
+			if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_Cylinder ) {
+				p = surface.Cylinder().Location();
+				dir = surface.Cylinder().Axis().Direction();
+				return true;
+			}
+			else if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_Cone ) {
+				p = surface.Cone().Location();
+				dir = surface.Cone().Axis().Direction();
+				return true;
+			}
+			else if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_Sphere ) {
+				p = surface.Sphere().Location();
+				dir = surface.Sphere().Position().Direction();
+				return true;
+			}
+			else if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_Torus ) {
+				p = surface.Torus().Location();
+				dir = surface.Torus().Axis().Direction();
+				return true;
+			}
+			else if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution ) {
+				p = surface.AxeOfRevolution().Location();
+				dir = surface.AxeOfRevolution().Direction();
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		// private
+		static bool IsApproximatelyLinear( TopoDS_Edge edge, out gp_Pnt p2, out gp_Pnt p1 )
+		{
 			// get edge length
 			GProp_GProps system = new GProp_GProps();
 			BRepGProp.LinearProperties( edge, ref system );
@@ -81,8 +159,8 @@ namespace OCCTool
 			TopoDS_Vertex v1 = new TopoDS_Vertex();
 			TopoDS_Vertex v2 = new TopoDS_Vertex();
 			ShapeAnalysis.FindBounds( edge, ref v1, ref v2 );
-			gp_Pnt p1 = BRep_Tool.Pnt( v1 );
-			gp_Pnt p2 = BRep_Tool.Pnt( v2 );
+			p1 = BRep_Tool.Pnt( v1 );
+			p2 = BRep_Tool.Pnt( v2 );
 			double dDistance = p1.Distance( p2 );
 
 			// compare edge length and distance (arc and sine)

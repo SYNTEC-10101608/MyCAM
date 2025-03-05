@@ -1,7 +1,5 @@
 ﻿using OCC.AIS;
-using OCC.BRepAdaptor;
 using OCC.BRepBuilderAPI;
-using OCC.GeomAbs;
 using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Quantity;
@@ -11,6 +9,7 @@ using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace PartPlacement
@@ -38,7 +37,9 @@ namespace PartPlacement
 			if( m_RawPartShape == null ) {
 				return;
 			}
+			MakeG54Coord();
 			RefreshViewer();
+			DisableAllConstraintMenu();
 
 			// viewer action
 			m_panViewer.MouseDown += ViewerMouseDown;
@@ -55,60 +56,103 @@ namespace PartPlacement
 		TopoDS_Shape m_RawPartShape;
 
 		// G54
-		TopoDS_Face m_G54PlaneXY;
-		TopoDS_Face m_G54PlaneYZ;
-		TopoDS_Face m_G54PlaneXZ;
+		TopoDS_Shape m_G54Shape;
+		List<AIS_Shape> m_G54AISList;
 
-		void ShowG54Coord()
+		void MakeG54Coord()
 		{
-			// make 3 plane representing XY YZ XZ
-			const int SIZE = 10;
-			gp_Pnt p1 = new gp_Pnt( SIZE, SIZE, 0 );
-			gp_Pnt p2 = new gp_Pnt( -SIZE, SIZE, 0 );
-			gp_Pnt p3 = new gp_Pnt( -SIZE, -SIZE, 0 );
-			gp_Pnt p4 = new gp_Pnt( SIZE, -SIZE, 0 );
+			List<TopoDS_Shape> shapeList = new List<TopoDS_Shape>();
+			m_G54AISList = new List<AIS_Shape>();
+
+			// XY plane
+			const int SIZE = 20;
+			gp_Pnt p1 = new gp_Pnt( SIZE / 2, SIZE / 2, 0 );
+			gp_Pnt p2 = new gp_Pnt( -SIZE / 2, SIZE / 2, 0 );
+			gp_Pnt p3 = new gp_Pnt( -SIZE / 2, -SIZE / 2, 0 );
+			gp_Pnt p4 = new gp_Pnt( SIZE / 2, -SIZE / 2, 0 );
 			BRepBuilderAPI_MakeEdge edge12 = new BRepBuilderAPI_MakeEdge( p1, p2 );
 			BRepBuilderAPI_MakeEdge edge23 = new BRepBuilderAPI_MakeEdge( p2, p3 );
 			BRepBuilderAPI_MakeEdge edge34 = new BRepBuilderAPI_MakeEdge( p3, p4 );
 			BRepBuilderAPI_MakeEdge edge41 = new BRepBuilderAPI_MakeEdge( p4, p1 );
 			BRepBuilderAPI_MakeWire wire = new BRepBuilderAPI_MakeWire( edge12.Edge(), edge23.Edge(), edge34.Edge(), edge41.Edge() );
 			BRepBuilderAPI_MakeFace faceXY = new BRepBuilderAPI_MakeFace( wire.Wire() );
-
-			// XY plane
-			m_G54PlaneXY = faceXY.Face();
+			shapeList.Add( faceXY.Face() );
 
 			// YZ plane
 			gp_Trsf trsfYZ = new gp_Trsf();
 			trsfYZ.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 1, 0 ) ), Math.PI / 2 );
 			BRepBuilderAPI_Transform trasformYZ = new BRepBuilderAPI_Transform( faceXY.Face(), trsfYZ );
-			m_G54PlaneYZ = TopoDS.ToFace( trasformYZ.Shape() );
+			shapeList.Add( trasformYZ.Shape() );
 
 			// XZ plane
 			gp_Trsf trsfXZ = new gp_Trsf();
-			trsfXZ.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) ), Math.PI / 2 );
+			trsfXZ.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( -1, 0, 0 ) ), Math.PI / 2 );
 			BRepBuilderAPI_Transform trasformXZ = new BRepBuilderAPI_Transform( faceXY.Face(), trsfXZ );
-			m_G54PlaneXZ = TopoDS.ToFace( trasformXZ.Shape() );
+			shapeList.Add( trasformXZ.Shape() );
 
-			// display XY
-			AIS_Shape aisXY = new AIS_Shape( m_G54PlaneXY );
-			aisXY.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			// X axis
+			gp_Pnt pX0 = new gp_Pnt( 0, 0, 0 );
+			gp_Pnt pX1 = new gp_Pnt( SIZE, 0, 0 );
+			BRepBuilderAPI_MakeEdge edgeX = new BRepBuilderAPI_MakeEdge( pX0, pX1 );
+			shapeList.Add( edgeX.Edge() );
+
+			// Y axis
+			gp_Pnt pY0 = new gp_Pnt( 0, 0, 0 );
+			gp_Pnt pY1 = new gp_Pnt( 0, SIZE, 0 );
+			BRepBuilderAPI_MakeEdge edgeY = new BRepBuilderAPI_MakeEdge( pY0, pY1 );
+			shapeList.Add( edgeY.Edge() );
+
+			// Z axis
+			gp_Pnt pZ0 = new gp_Pnt( 0, 0, 0 );
+			gp_Pnt pZ1 = new gp_Pnt( 0, 0, SIZE );
+			BRepBuilderAPI_MakeEdge edgeZ = new BRepBuilderAPI_MakeEdge( pZ0, pZ1 );
+			shapeList.Add( edgeZ.Edge() );
+
+			// make G54 shape
+			m_G54Shape = ShapeTool.MakeCompound( shapeList );
+
+			// XY AIS
+			AIS_Shape aisXY = new AIS_Shape( faceXY.Face() );
 			aisXY.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
-			aisXY.SetTransparency( 0.9f );
-			m_OCCViewer.GetAISContext().Display( aisXY, false );
+			m_G54AISList.Add( aisXY );
 
-			// display YZ
-			AIS_Shape aisYZ = new AIS_Shape( m_G54PlaneYZ );
-			aisYZ.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			// YZ AIS
+			AIS_Shape aisYZ = new AIS_Shape( trasformYZ.Shape() );
 			aisYZ.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-			aisYZ.SetTransparency( 0.9f );
-			m_OCCViewer.GetAISContext().Display( aisYZ, false );
+			m_G54AISList.Add( aisYZ );
 
-			// display XZ
-			AIS_Shape aisXZ = new AIS_Shape( m_G54PlaneXZ );
-			aisXZ.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			// XZ AIS
+			AIS_Shape aisXZ = new AIS_Shape( trasformXZ.Shape() );
 			aisXZ.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
-			aisXZ.SetTransparency( 0.9f );
-			m_OCCViewer.GetAISContext().Display( aisXZ, false );
+			m_G54AISList.Add( aisXZ );
+
+			// X AIS
+			AIS_Shape aisX = new AIS_Shape( edgeX.Edge() );
+			aisX.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			m_G54AISList.Add( aisX );
+
+			// Y AIS
+			AIS_Shape aisY = new AIS_Shape( edgeY.Edge() );
+			aisY.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+			m_G54AISList.Add( aisY );
+
+			// Z AIS
+			AIS_Shape aisZ = new AIS_Shape( edgeZ.Edge() );
+			aisZ.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+			m_G54AISList.Add( aisZ );
+
+			// set properties
+			foreach( AIS_Shape ais in m_G54AISList ) {
+				ais.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+				ais.SetTransparency( 0.9f );
+			}
+		}
+
+		void ShowG54Coord()
+		{
+			foreach( AIS_Shape ais in m_G54AISList ) {
+				m_OCCViewer.GetAISContext().Display( ais, false );
+			}
 		}
 
 		void ShowPart()
@@ -146,75 +190,8 @@ namespace PartPlacement
 			m_panViewer.Focus();
 			if( e.Button == MouseButtons.Left ) {
 				m_OCCViewer.ShiftSelect();
+				UpdateConstraintMenu();
 			}
-		}
-
-		bool IsObjectPlane( TopoDS_Shape shape, out gp_Pnt p, out gp_Dir d )
-		{
-			p = new gp_Pnt();
-			d = new gp_Dir();
-			TopExp_Explorer explorer = new TopExp_Explorer( m_RawPartShape, TopAbs_ShapeEnum.TopAbs_FACE );
-			while( explorer.More() ) {
-				if( shape.IsEqual( explorer.Current() ) ) {
-					BRepAdaptor_Surface surface = new BRepAdaptor_Surface( TopoDS.ToFace( shape ) );
-					if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_Plane ) {
-						p = surface.Plane().Location();
-						d = surface.Plane().Axis().Direction();
-						return true;
-					}
-				}
-				explorer.Next();
-			}
-			return false;
-		}
-
-		bool IsReferencePlane( TopoDS_Shape shape, out gp_Pnt p, out gp_Dir d )
-		{
-			p = new gp_Pnt();
-			d = new gp_Dir();
-			if( shape.IsEqual( m_G54PlaneXY ) ) {
-				p = new gp_Pnt( 0, 0, 0 );
-				d = new gp_Dir( 0, 0, 1 );
-				return true;
-			}
-			else if( shape.IsEqual( m_G54PlaneYZ ) ) {
-				p = new gp_Pnt( 0, 0, 0 );
-				d = new gp_Dir( 1, 0, 0 );
-				return true;
-			}
-			else if( shape.IsEqual( m_G54PlaneXZ ) ) {
-				p = new gp_Pnt( 0, 0, 0 );
-				d = new gp_Dir( 0, 1, 0 );
-				return true;
-			}
-			return false;
-		}
-
-		bool IsValidSelection( out gp_Pnt pO, out gp_Dir dO, out gp_Pnt pR, out gp_Dir dR )
-		{
-			pO = new gp_Pnt();
-			dO = new gp_Dir();
-			pR = new gp_Pnt();
-			dR = new gp_Dir();
-			m_OCCViewer.GetAISContext().InitSelected();
-			TopoDS_Shape[] shapes = new TopoDS_Shape[ 2 ];
-			int count = 0;
-			while( m_OCCViewer.GetAISContext().MoreSelected() ) {
-				if( count >= 2 ) {
-					return false;
-				}
-				shapes[ count ] = m_OCCViewer.GetAISContext().SelectedShape();
-				count++;
-				m_OCCViewer.GetAISContext().NextSelected();
-			}
-			if( count != 2 ) {
-				return false;
-			}
-			if( IsObjectPlane( shapes[ 0 ], out pO, out dO ) && IsReferencePlane( shapes[ 1 ], out pR, out dR )
-				|| IsObjectPlane( shapes[ 1 ], out pO, out dO ) && IsReferencePlane( shapes[ 0 ], out pR, out dR ) ) {
-				return true;
-			}
-			return false;
 		}
 
 		void ViewerMouseUp( object sender, MouseEventArgs e )
@@ -230,34 +207,203 @@ namespace PartPlacement
 			if( e.KeyCode == Keys.Escape ) {
 				m_OCCViewer.GetAISContext().ClearSelected( true );
 			}
-			else if( e.KeyCode == Keys.Enter || e.KeyCode == Keys.R ) {
-				if( !IsValidSelection( out gp_Pnt pO, out gp_Dir dO, out gp_Pnt pR, out gp_Dir dR ) ) {
+		}
+
+		void UpdateConstraintMenu()
+		{
+			DisableAllConstraintMenu();
+			GetRefAndMoveObject( out TopoDS_Shape refShape, out TopoDS_Shape moveShape );
+			if( refShape == null || moveShape == null ) {
+				return;
+			}
+			AxialConstraint ac = new AxialConstraint( refShape, moveShape, false );
+			if( ac.IsValid() ) {
+				m_tsmiAxial.Enabled = true;
+				m_tsmiAxial_R.Enabled = true;
+			}
+			AxialParallelConstraint apc = new AxialParallelConstraint( refShape, moveShape, false );
+			if( apc.IsValid() ) {
+				m_tsmiAxialPar.Enabled = true;
+				m_tsmiAxialPar_R.Enabled = true;
+			}
+			PlaneConstraint pc = new PlaneConstraint( refShape, moveShape, false );
+			if( pc.IsValid() ) {
+				m_tsmiPlane.Enabled = true;
+				m_tsmiPlane_R.Enabled = true;
+			}
+			PlaneParallelConstraint ppc = new PlaneParallelConstraint( refShape, moveShape, false );
+			if( ppc.IsValid() ) {
+				m_tsmiPlanePar.Enabled = true;
+				m_tsmiPlanePar_R.Enabled = true;
+			}
+		}
+
+		void GetRefAndMoveObject( out TopoDS_Shape refShape, out TopoDS_Shape moveShape )
+		{
+			refShape = null;
+			moveShape = null;
+			m_OCCViewer.GetAISContext().InitSelected();
+			int test = m_OCCViewer.GetAISContext().NbSelected();
+			int nCount = 0;
+			List<TopoDS_Shape> selectedShapeList = new List<TopoDS_Shape>();
+			while( m_OCCViewer.GetAISContext().MoreSelected() ) {
+				nCount++;
+				if( nCount > 2 ) {
 					return;
 				}
-				if( e.KeyCode == Keys.R ) {
-					dR.Reverse();
-				}
-
-				// calculate the rotation to make the object plane parallel with the reference plane
-				gp_Trsf trsfR = new gp_Trsf();
-				gp_Vec vO = new gp_Vec( dO );
-				gp_Vec vR = new gp_Vec( dR );
-				gp_Quaternion q = new gp_Quaternion( vO, vR );
-				trsfR.SetRotation( q );
-
-				// calculate the translation to make the object plane coincident with the reference plane
-				gp_Trsf trsfT = new gp_Trsf();
-				gp_Pnt p1 = pO.Transformed( trsfR );
-				gp_Vec dP = new gp_Vec( p1, pR );
-				gp_Vec move = new gp_Vec( dR );
-				move.Scale( dP.Dot( move ) );
-				trsfT.SetTranslation( move );
-				gp_Trsf T = trsfT.Multiplied( trsfR );
-				BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( m_RawPartShape, T );
-				m_RawPartShape = transform.Shape();
-				m_OCCViewer.GetAISContext().ClearSelected( false );
-				RefreshViewer();
+				selectedShapeList.Add( m_OCCViewer.GetAISContext().SelectedShape() );
+				m_OCCViewer.GetAISContext().NextSelected();
 			}
+			if( nCount != 2 ) {
+				return;
+			}
+			CheckRefOrMoveObject( selectedShapeList[ 0 ], out bool isRef1, out bool isMove1 );
+			CheckRefOrMoveObject( selectedShapeList[ 1 ], out bool isRef2, out bool isMove2 );
+			if( isRef1 && isMove2 ) {
+				refShape = selectedShapeList[ 0 ];
+				moveShape = selectedShapeList[ 1 ];
+			}
+			else if( isRef2 && isMove1 ) {
+				refShape = selectedShapeList[ 1 ];
+				moveShape = selectedShapeList[ 0 ];
+			}
+			else {
+				return;
+			}
+		}
+
+		void CheckRefOrMoveObject( TopoDS_Shape sel, out bool isRef, out bool isMove )
+		{
+			isRef = false;
+			isMove = false;
+			if( sel == null ) {
+				return;
+			}
+			if( sel.ShapeType() == TopAbs_ShapeEnum.TopAbs_FACE ) {
+				TopExp_Explorer expRef = new TopExp_Explorer( m_G54Shape, TopAbs_ShapeEnum.TopAbs_FACE );
+				while( expRef.More() ) {
+					TopoDS_Shape face = expRef.Current();
+					if( sel.IsEqual( face ) ) {
+						isRef = true;
+						return;
+					}
+					expRef.Next();
+				}
+				TopExp_Explorer expMove = new TopExp_Explorer( m_RawPartShape, TopAbs_ShapeEnum.TopAbs_FACE );
+				while( expMove.More() ) {
+					TopoDS_Shape face = expMove.Current();
+					if( sel.IsEqual( face ) ) {
+						isMove = true;
+						return;
+					}
+					expMove.Next();
+				}
+			}
+			else if( sel.ShapeType() == TopAbs_ShapeEnum.TopAbs_EDGE ) {
+				TopExp_Explorer expRef = new TopExp_Explorer( m_G54Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
+				while( expRef.More() ) {
+					TopoDS_Shape face = expRef.Current();
+					if( sel.IsEqual( face ) ) {
+						isRef = true;
+						return;
+					}
+					expRef.Next();
+				}
+				TopExp_Explorer expMove = new TopExp_Explorer( m_RawPartShape, TopAbs_ShapeEnum.TopAbs_EDGE );
+				while( expMove.More() ) {
+					TopoDS_Shape face = expMove.Current();
+					if( sel.IsEqual( face ) ) {
+						isMove = true;
+						return;
+					}
+					expMove.Next();
+				}
+			}
+		}
+
+		void DisableAllConstraintMenu()
+		{
+			m_tsmiAxial.Enabled = false;
+			m_tsmiAxial_R.Enabled = false;
+			m_tsmiAxialPar.Enabled = false;
+			m_tsmiAxialPar_R.Enabled = false;
+			m_tsmiPlane.Enabled = false;
+			m_tsmiPlane_R.Enabled = false;
+			m_tsmiPlanePar.Enabled = false;
+			m_tsmiPlanePar_R.Enabled = false;
+		}
+
+		void m_tsmiAxial_Click( object sender, EventArgs e )
+		{
+			SetConstraint( EConstraintType.Axial, false );
+		}
+
+		void m_tsmiAxial_R_Click( object sender, EventArgs e )
+		{
+			SetConstraint( EConstraintType.Axial, true );
+		}
+
+		void m_tsmiAxialPar_Click( object sender, EventArgs e )
+		{
+			SetConstraint( EConstraintType.AxialParallel, false );
+		}
+
+		void m_tsmiAxialPar_R_Click( object sender, EventArgs e )
+		{
+			SetConstraint( EConstraintType.AxialParallel, true );
+		}
+
+		void m_tsmiPlane_Click( object sender, EventArgs e )
+		{
+			SetConstraint( EConstraintType.Plane, false );
+		}
+
+		void m_tsmiPlane_R_Click( object sender, EventArgs e )
+		{
+			SetConstraint( EConstraintType.Plane, true );
+		}
+
+		void m_tsmiPlanePar_Click( object sender, EventArgs e )
+		{
+			SetConstraint( EConstraintType.PlaneParallel, false );
+		}
+
+		void m_tsmiPlanePar_R_Click( object sender, EventArgs e )
+		{
+			SetConstraint( EConstraintType.PlaneParallel, true );
+		}
+
+		void SetConstraint( EConstraintType type, bool isReverse )
+		{
+			GetRefAndMoveObject( out TopoDS_Shape refShape, out TopoDS_Shape moveShape );
+			if( refShape == null || moveShape == null ) {
+				return;
+			}
+
+			// create constraint
+			IConstraint c = null;
+			switch( type ) {
+				case EConstraintType.Axial:
+					c = new AxialConstraint( refShape, moveShape, isReverse );
+					break;
+				case EConstraintType.AxialParallel:
+					c = new AxialParallelConstraint( refShape, moveShape, isReverse );
+					break;
+				case EConstraintType.Plane:
+					c = new PlaneConstraint( refShape, moveShape, isReverse );
+					break;
+				case EConstraintType.PlaneParallel:
+					c = new PlaneParallelConstraint( refShape, moveShape, isReverse );
+					break;
+				default:
+					return;
+			}
+
+			// transform and update
+			gp_Trsf trsf = c.SolveConstraint();
+			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( m_RawPartShape, trsf );
+			m_RawPartShape = transform.Shape();
+			RefreshViewer();
 		}
 	}
 }
