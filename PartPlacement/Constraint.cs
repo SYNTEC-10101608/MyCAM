@@ -245,7 +245,7 @@ namespace PartPlacement
 			else if( type == EConstraintType.Plane ) {
 				trsfT.SetTranslation( vecAlong );
 			}
-			return trsfR.Multiplied( trsfT );
+			return trsfT.Multiplied( trsfR );
 		}
 	}
 }

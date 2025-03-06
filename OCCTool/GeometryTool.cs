@@ -5,6 +5,7 @@ using OCC.GeomAbs;
 using OCC.gp;
 using OCC.GProp;
 using OCC.ShapeAnalysis;
+using OCC.TopAbs;
 using OCC.TopoDS;
 using System;
 
@@ -85,6 +86,9 @@ namespace OCCTool
 			if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_Plane ) {
 				p = surface.Plane().Location();
 				dir = surface.Plane().Axis().Direction();
+				if( face.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+					dir.Reverse();
+				}
 				return true;
 			}
 			else {

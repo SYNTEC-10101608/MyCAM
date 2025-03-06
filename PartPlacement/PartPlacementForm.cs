@@ -39,6 +39,8 @@ namespace PartPlacement
 			}
 			MakeG54Coord();
 			RefreshViewer();
+			m_OCCViewer.AxoView();
+			m_OCCViewer.ZoomAllView();
 			DisableAllConstraintMenu();
 
 			// viewer action
@@ -175,8 +177,6 @@ namespace PartPlacement
 			ShowPart();
 			ShowG54Coord();
 			m_OCCViewer.UpdateView();
-			m_OCCViewer.AxoView();
-			m_OCCViewer.ZoomAllView();
 		}
 
 		void m_tsmiOK_Click( object sender, EventArgs e )
