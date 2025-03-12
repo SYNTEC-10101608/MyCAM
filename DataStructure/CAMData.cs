@@ -334,35 +334,42 @@ namespace DataStructure
 				int nEndIndex = indexInOrder[ ( i + 1 ) % indexInOrder.Count ];
 				int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + m_CAMPointList.Count : nEndIndex;
 
-				// get start and end quaternion
-				gp_Quaternion qStart = GetQuaternionFromAB(
-					m_CAMPointList[ nStartIndex % m_CAMPointList.Count ],
-					m_ToolVecModifyMap[ nStartIndex ].Item1 * Math.PI / 180,
-					m_ToolVecModifyMap[ nStartIndex ].Item2 * Math.PI / 180 );
-				gp_Quaternion qEnd = GetQuaternionFromAB(
-					m_CAMPointList[ nEndIndex % m_CAMPointList.Count ],
-					m_ToolVecModifyMap[ nEndIndex ].Item1 * Math.PI / 180,
-					m_ToolVecModifyMap[ nEndIndex ].Item2 * Math.PI / 180 );
-
 				// do slerp from start to end
-				gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( qStart, qEnd );
-				for( int j = nStartIndex; j < nEndIndexModify; j++ ) {
+				gp_Vec startVec = GetVecFromAB( m_CAMPointList[ nStartIndex ], m_ToolVecModifyMap[ nStartIndex ].Item1, m_ToolVecModifyMap[ nStartIndex ].Item2 );
+				gp_Vec endVec = GetVecFromAB( m_CAMPointList[ nEndIndex ], m_ToolVecModifyMap[ nEndIndex ].Item1, m_ToolVecModifyMap[ nEndIndex ].Item2 );
+				gp_Quaternion q12 = new gp_Quaternion( startVec, endVec );
+				gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
+				m_CAMPointList[ nStartIndex ] = new CAMPoint( m_CAMPointList[ nStartIndex ].CADPoint, new gp_Dir( startVec ) );
+				for( int j = nStartIndex + 1; j < nEndIndexModify; j++ ) {
 					double t = ( j - nStartIndex ) / (double)( nEndIndexModify - nStartIndex );
 					gp_Quaternion q = new gp_Quaternion();
 					slerp.Interpolate( t, ref q );
 					gp_Trsf trsf = new gp_Trsf();
 					trsf.SetRotation( q );
-					gp_Dir toolVec = m_CAMPointList[ j % m_CAMPointList.Count ].ToolVec.Transformed( trsf );
+					gp_Dir toolVec = new gp_Dir( startVec.Transformed( trsf ) );
 					m_CAMPointList[ j % m_CAMPointList.Count ] = new CAMPoint( m_CAMPointList[ j % m_CAMPointList.Count ].CADPoint, toolVec );
 				}
 			}
 		}
 
-		gp_Quaternion GetQuaternionFromAB(CAMPoint camPoint, double dRA_rad, double dRB_rad )
+		gp_Quaternion GetQuaternionFromAB( CAMPoint camPoint, double dRA_rad, double dRB_rad )
 		{
 			// TDOD: RA == 0 || RB == 0
 			if( dRA_rad == 0 && dRB_rad == 0 ) {
 				return new gp_Quaternion();
+			}
+
+			// get the quaternion
+			gp_Vec v0 = new gp_Vec( camPoint.ToolVec );
+			gp_Vec v1 = GetVecFromAB( camPoint, dRA_rad, dRB_rad );
+			return new gp_Quaternion( v0, v1 );
+		}
+
+		gp_Vec GetVecFromAB( CAMPoint camPoint, double dRA_rad, double dRB_rad )
+		{
+			// TDOD: RA == 0 || RB == 0
+			if( dRA_rad == 0 && dRB_rad == 0 ) {
+				return new gp_Vec( camPoint.ToolVec );
 			}
 
 			// get the x, y, z direction
@@ -375,11 +382,7 @@ namespace DataStructure
 			double Z = X / Math.Tan( dRA_rad );
 			double Y = Z * Math.Tan( dRB_rad );
 			gp_Dir dir1 = new gp_Dir( x.XYZ() * X + y.XYZ() * Y + z.XYZ() * Z );
-
-			// get the quaternion
-			gp_Vec v0 = new gp_Vec( camPoint.ToolVec );
-			gp_Vec v1 = new gp_Vec( dir1.XYZ() );
-			return new gp_Quaternion( v0, v1 );
+			return new gp_Vec( dir1.XYZ() );
 		}
 
 		void SetStartPoint()
