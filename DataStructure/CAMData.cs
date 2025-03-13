@@ -335,8 +335,12 @@ namespace DataStructure
 				int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + m_CAMPointList.Count : nEndIndex;
 
 				// do slerp from start to end
-				gp_Vec startVec = GetVecFromAB( m_CAMPointList[ nStartIndex ], m_ToolVecModifyMap[ nStartIndex ].Item1, m_ToolVecModifyMap[ nStartIndex ].Item2 );
-				gp_Vec endVec = GetVecFromAB( m_CAMPointList[ nEndIndex ], m_ToolVecModifyMap[ nEndIndex ].Item1, m_ToolVecModifyMap[ nEndIndex ].Item2 );
+				gp_Vec startVec = GetVecFromAB( m_CAMPointList[ nStartIndex ],
+					m_ToolVecModifyMap[ nStartIndex ].Item1 * Math.PI / 180,
+					m_ToolVecModifyMap[ nStartIndex ].Item2 * Math.PI / 180 );
+				gp_Vec endVec = GetVecFromAB( m_CAMPointList[ nEndIndex ],
+					m_ToolVecModifyMap[ nEndIndex ].Item1 * Math.PI / 180,
+					m_ToolVecModifyMap[ nEndIndex ].Item2 * Math.PI / 180 );
 				gp_Quaternion q12 = new gp_Quaternion( startVec, endVec );
 				gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
 				m_CAMPointList[ nStartIndex ] = new CAMPoint( m_CAMPointList[ nStartIndex ].CADPoint, new gp_Dir( startVec ) );
