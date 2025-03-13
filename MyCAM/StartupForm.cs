@@ -43,10 +43,7 @@ namespace MyCAM
 		void PlaceOK( TopoDS_Shape partShape )
 		{
 			// transform the part
-			gp_Quaternion q = m_PartTrsf.GetRotation();
-			gp_Trsf trsf = new gp_Trsf();
-			trsf.SetRotation( q );
-			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( partShape, trsf, true );
+			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( partShape, m_PartTrsf, true );
 			TopoDS_Shape transformedShape = transform.Shape();
 
 			ExtractPatternForm f = new ExtractPatternForm( transformedShape );
