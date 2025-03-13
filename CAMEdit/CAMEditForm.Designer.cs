@@ -30,10 +30,6 @@
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiStartPoint = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiReverse = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiToolVec = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiTV_Default = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiTV_Intersecting = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiTV_Z = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiOffset = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiLead = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiOK = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,7 +41,6 @@
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsmiStartPoint,
             this.m_tsmiReverse,
-            this.m_tsmiToolVec,
             this.m_tsmiOffset,
             this.m_tsmiLead,
             this.m_tsmiOK});
@@ -68,37 +63,6 @@
 			this.m_tsmiReverse.Size = new System.Drawing.Size(43, 20);
 			this.m_tsmiReverse.Text = "反向";
 			this.m_tsmiReverse.Click += new System.EventHandler(this.m_tsmiReverse_Click);
-			// 
-			// m_tsmiToolVec
-			// 
-			this.m_tsmiToolVec.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiTV_Default,
-            this.m_tsmiTV_Intersecting,
-            this.m_tsmiTV_Z});
-			this.m_tsmiToolVec.Name = "m_tsmiToolVec";
-			this.m_tsmiToolVec.Size = new System.Drawing.Size(67, 20);
-			this.m_tsmiToolVec.Text = "刀具向量";
-			// 
-			// m_tsmiTV_Default
-			// 
-			this.m_tsmiTV_Default.Name = "m_tsmiTV_Default";
-			this.m_tsmiTV_Default.Size = new System.Drawing.Size(147, 22);
-			this.m_tsmiTV_Default.Text = "默認";
-			this.m_tsmiTV_Default.Click += new System.EventHandler(this.m_tsmiTV_Default_Click);
-			// 
-			// m_tsmiTV_Intersecting
-			// 
-			this.m_tsmiTV_Intersecting.Name = "m_tsmiTV_Intersecting";
-			this.m_tsmiTV_Intersecting.Size = new System.Drawing.Size(147, 22);
-			this.m_tsmiTV_Intersecting.Text = "相貫線 (beta)";
-			this.m_tsmiTV_Intersecting.Click += new System.EventHandler(this.m_tsmiTV_Intersecting_Click);
-			// 
-			// m_tsmiTV_Z
-			// 
-			this.m_tsmiTV_Z.Name = "m_tsmiTV_Z";
-			this.m_tsmiTV_Z.Size = new System.Drawing.Size(147, 22);
-			this.m_tsmiTV_Z.Text = "Z方向";
-			this.m_tsmiTV_Z.Click += new System.EventHandler(this.m_tsmiTV_Z_Click);
 			// 
 			// m_tsmiOffset
 			// 
@@ -143,10 +107,6 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiOK;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiStartPoint;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiReverse;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiToolVec;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiTV_Default;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiTV_Intersecting;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiTV_Z;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiOffset;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiLead;
 	}

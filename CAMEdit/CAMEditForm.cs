@@ -318,31 +318,6 @@ namespace CAMEdit
 			ShowCAMData();
 		}
 
-		void m_tsmiTV_Default_Click( object sender, EventArgs e )
-		{
-			OnToolVecTypeChanged( ToolVectorType.Default );
-		}
-
-		void m_tsmiTV_Intersecting_Click( object sender, EventArgs e )
-		{
-			OnToolVecTypeChanged( ToolVectorType.Intersecting );
-		}
-
-		void m_tsmiTV_Z_Click( object sender, EventArgs e )
-		{
-			OnToolVecTypeChanged( ToolVectorType.TowardZ );
-		}
-
-		void OnToolVecTypeChanged( ToolVectorType toolVecType )
-		{
-			GetSelectedWireInfo( out CAMData camData, out _ );
-			if( camData == null ) {
-				return;
-			}
-			camData.ToolVectorType = toolVecType;
-			ShowCAMData();
-		}
-
 		void m_tsmiOffset_Click( object sender, EventArgs e )
 		{
 			GetSelectedWireInfo( out CAMData camData, out _ );
@@ -580,7 +555,6 @@ namespace CAMEdit
 
 					// disable all other tsmi
 					m_tsmiReverse.Enabled = false;
-					m_tsmiToolVec.Enabled = false;
 					m_tsmiOffset.Enabled = false;
 					m_tsmiLead.Enabled = false;
 					m_tsmiOK.Enabled = false;
@@ -617,7 +591,6 @@ namespace CAMEdit
 
 					// enable all other tsmi
 					m_tsmiReverse.Enabled = true;
-					m_tsmiToolVec.Enabled = true;
 					m_tsmiOffset.Enabled = true;
 					m_tsmiLead.Enabled = true;
 					m_tsmiOK.Enabled = true;

@@ -99,21 +99,6 @@ namespace DataStructure
 			}
 		}
 
-		public ToolVectorType ToolVectorType
-		{
-			get
-			{
-				return m_ToolVectorType;
-			}
-			set
-			{
-				if( m_ToolVectorType != value ) {
-					m_ToolVectorType = value;
-					m_IsDirty = true;
-				}
-			}
-		}
-
 		public bool IsReverse
 		{
 			get
@@ -193,7 +178,6 @@ namespace DataStructure
 
 		// backing fields
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
-		ToolVectorType m_ToolVectorType = ToolVectorType.Default;
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsReverse = false;
 		int m_StartPoint = 0;
@@ -262,55 +246,14 @@ namespace DataStructure
 			//SetLead();
 		}
 
-		void GetIntersectingDir()
-		{
-			// get two non-parallel normal vectors if possible
-			gp_Dir normalVec1 = CADPointList[ 0 ].NormalVec;
-			gp_Dir normalVec2 = null;
-			for( int i = 1; i < CADPointList.Count; i++ ) {
-				gp_Dir temp = CADPointList[ i ].NormalVec;
-				if( !temp.IsParallel( normalVec1, 1e-6 ) ) {
-					normalVec2 = temp;
-					break;
-				}
-			}
-			if( normalVec2 == null ) {
-				return;
-			}
-
-			// assume the intersecting direction is the cross product of the two normal vectors
-			gp_Dir tempIntersectingDir = normalVec2.Crossed( normalVec1 );
-
-			// check is all normal vectors are perpendicular to the intersecting direction
-			for( int i = 0; i < CADPointList.Count; i++ ) {
-				if( !CADPointList[ i ].NormalVec.IsNormal( tempIntersectingDir, 1e-6 ) ) {
-					return;
-				}
-			}
-			m_IntersectingDir = tempIntersectingDir;
-			m_ToolVectorType = ToolVectorType.Intersecting;
-		}
-
 		void SetToolVec()
 		{
 			for( int i = 0; i < CADPointList.Count; i++ ) {
 
 				// calculate tool vector
 				CADPoint cadPoint = CADPointList[ i ];
-				gp_Dir ToolVec;
-				switch( ToolVectorType ) {
-					case ToolVectorType.Default:
-					default:
-						ToolVec = cadPoint.NormalVec.Crossed( cadPoint.TangentVec );
-						break;
-					case ToolVectorType.Intersecting:
-						ToolVec = m_IntersectingDir;
-						break;
-					case ToolVectorType.TowardZ:
-						ToolVec = new gp_Dir( 0, 0, 1 );
-						break;
-				}
-				CAMPoint camPoint = new CAMPoint( cadPoint, ToolVec );
+				gp_Dir toolVec = cadPoint.NormalVec.Crossed( cadPoint.TangentVec );
+				CAMPoint camPoint = new CAMPoint( cadPoint, toolVec );
 				m_CAMPointList.Add( camPoint );
 			}
 			ModifyToolVec();
