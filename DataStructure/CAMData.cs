@@ -378,7 +378,7 @@ namespace DataStructure
 
 			// get the x, y, z direction
 			gp_Dir x = camPoint.CADPoint.TangentVec;
-			gp_Dir z = camPoint.ToolVec;
+			gp_Dir z = camPoint.CADPoint.NormalVec.Crossed( camPoint.CADPoint.TangentVec );
 			gp_Dir y = z.Crossed( x );
 
 			// X:Y:Z = tanA:tanB:1
