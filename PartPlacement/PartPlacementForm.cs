@@ -56,6 +56,7 @@ namespace PartPlacement
 
 		// raw part
 		TopoDS_Shape m_RawPartShape;
+		gp_Trsf m_PartTrsf = new gp_Trsf();
 
 		// G54
 		TopoDS_Shape m_G54Shape;
@@ -181,7 +182,7 @@ namespace PartPlacement
 
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
-			PlaceOK?.Invoke( new gp_Trsf() );
+			PlaceOK?.Invoke( m_PartTrsf );
 		}
 
 		// viewer action
@@ -403,6 +404,7 @@ namespace PartPlacement
 			gp_Trsf trsf = c.SolveConstraint();
 			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( m_RawPartShape, trsf );
 			m_RawPartShape = transform.Shape();
+			m_PartTrsf.Multiply( trsf );
 			RefreshViewer();
 		}
 	}
