@@ -2,6 +2,7 @@
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.BRep;
+using OCC.BRepAlgoAPI;
 using OCC.BRepBuilderAPI;
 using OCC.BRepPrimAPI;
 using OCC.Geom;
@@ -64,7 +65,7 @@ namespace CAMEdit
 			ShowPart();
 			ShowCADContour();
 			ShowCAMData();
-			MakeHead();
+			MakeSimulationData();
 			editMode = EditMode.None;
 			return true;
 		}
@@ -111,9 +112,12 @@ namespace CAMEdit
 
 		// for simulation
 		TopoDS_Shape m_HeadA;
+		TopoDS_Shape m_HeadC;
 		AIS_Shape m_HeadAAIS;
+		AIS_Shape m_HeadCAIS;
 		bool m_bSimulation = true;
 		int m_SimulationIndex = 0;
+		List<Tuple<double, double>> m_SimulationCAData = new List<Tuple<double, double>>();
 
 		enum EvecType
 		{
@@ -180,6 +184,7 @@ namespace CAMEdit
 			ShowCAMContour();
 			ShowToolVec();
 			ShowOrientation();
+			ConvertIJKToABC();
 			m_OCCViewer.UpdateView();
 		}
 
@@ -394,20 +399,20 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Down ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex++;
+					m_SimulationIndex += 3;
 					if( m_SimulationIndex >= m_Model.CAMDataList[ 0 ].CAMPointList.Count ) {
 						m_SimulationIndex = 0;
 					}
-					ShowHead();
+					UpdateHead();
 				}
 			}
 			if( e.KeyCode == Keys.Up ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex--;
+					m_SimulationIndex -= 3;
 					if( m_SimulationIndex < 0 ) {
 						m_SimulationIndex = m_Model.CAMDataList[ 0 ].CAMPointList.Count - 1;
 					}
-					ShowHead();
+					UpdateHead();
 				}
 			}
 		}
@@ -889,30 +894,129 @@ namespace CAMEdit
 		}
 
 		// simulation
-		void MakeHead()
+		void MakeSimulationData()
 		{
-			// make a cone to indicate the head
-			BRepPrimAPI_MakeCone coneMaker = new BRepPrimAPI_MakeCone( 0, 10, 20 );
-			m_HeadA = coneMaker.Shape();
+			// the HeadC
+			BRepPrimAPI_MakeBox outBoxMakerC = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -50, -50 ), 100, 100, 100 );
+			BRepPrimAPI_MakeBox inBoxMakerC = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -50, -50 ), 90, 100, 90 );
+			BRepAlgoAPI_Cut cutMakerC = new BRepAlgoAPI_Cut( outBoxMakerC.Shape(), inBoxMakerC.Shape() );
+			m_HeadC = cutMakerC.Shape();
+			m_HeadCAIS = new AIS_Shape( m_HeadC );
+			Graphic3d_MaterialAspect aspectA = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			m_HeadCAIS.SetMaterial( aspectA );
+			m_HeadCAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+			m_HeadCAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			m_HeadCAIS.SetTransparency( 0.8 );
+			m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
+
+			// the HeadA
+			BRepPrimAPI_MakeBox boxMakerA = new BRepPrimAPI_MakeBox( new gp_Pnt( -30, -30, -30 ), 60, 60, 60 );
+			BRepPrimAPI_MakeCylinder cylinderMakerA = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -30 ), new gp_Dir( 0, 0, -1 ) ), 20, 40 );
+			BRepPrimAPI_MakeCone coneMakeA = new BRepPrimAPI_MakeCone( new gp_Ax2( new gp_Pnt( 0, 0, -70 ), new gp_Dir( 0, 0, -1 ) ), 5, 0, 40 );
+			BRepAlgoAPI_Fuse fuseMakerA1 = new BRepAlgoAPI_Fuse( boxMakerA.Shape(), cylinderMakerA.Shape() );
+			BRepAlgoAPI_Fuse fuseMakerA2 = new BRepAlgoAPI_Fuse( fuseMakerA1.Shape(), coneMakeA.Shape() );
+			m_HeadA = fuseMakerA2.Shape();
 			m_HeadAAIS = new AIS_Shape( m_HeadA );
+			Graphic3d_MaterialAspect aspectC = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			m_HeadAAIS.SetMaterial( aspectC );
+			m_HeadAAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			m_HeadAAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			m_HeadAAIS.SetTransparency( 0.6 );
 			m_OCCViewer.GetAISContext().Display( m_HeadAAIS, false );
+
+			// convert the IJK to ABC
+			ConvertIJKToABC();
+		}
+
+		void UpdateHead()
+		{
+			// get the target location and orientation
+			gp_Pnt p = m_Model.CAMDataList[ 0 ].CAMPointList[ m_SimulationIndex ].CADPoint.Point;
+			gp_Dir d = m_Model.CAMDataList[ 0 ].CAMPointList[ m_SimulationIndex ].ToolVec;
+
+			// calculate the A and C angle
+			double dC = m_SimulationCAData[ m_SimulationIndex ].Item1;
+			double dA = m_SimulationCAData[ m_SimulationIndex ].Item2;
+			gp_Trsf trsfC = new gp_Trsf();
+			trsfC.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), dC );
+			gp_Trsf trsfA = new gp_Trsf();
+			trsfA.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) ), dA );
+			gp_Trsf trsfCA = trsfC.Multiplied( trsfA );
+
+			// move the head to the target location
+			gp_Pnt tcp0 = new gp_Pnt( 0, 0, -110 );
+			gp_Pnt tcp1 = tcp0.Transformed( trsfCA );
+			gp_Trsf trsfT = new gp_Trsf();
+			trsfT.SetTranslation( new gp_Vec( p.XYZ() - tcp1.XYZ() ) );
+			m_HeadCAIS.SetLocalTransformation( trsfT.Multiplied( trsfC ) );
+			m_HeadAAIS.SetLocalTransformation( trsfT.Multiplied( trsfCA ) );
+			m_OCCViewer.UpdateView();
+		}
+
+		void ConvertIJKToABC()
+		{
+			List<gp_Dir> toolVecList = m_Model.CAMDataList[ 0 ].CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList();
+			m_SimulationCAData = new List<Tuple<double, double>>();
+			List<bool> singularPointList = new List<bool>();
+			double dC = 0;
+
+			// calculate the A and C angle
+			for( int i = 0; i < toolVecList.Count; i++ ) {
+				bool bCPlus = true;
+				if( Math.Abs( toolVecList[ i ].X() ) < 1e-6 && Math.Abs( toolVecList[ i ].Y() ) < 1e-6 ) {
+
+					// the singular case
+					singularPointList.Add( true );
+				}
+				else {
+					double dC1 = ( ( Math.Atan2( toolVecList[ i ].X(), -toolVecList[ i ].Y() ) ) + 2 * Math.PI ) % ( 2 * Math.PI );
+					double dC2 = ( ( Math.Atan2( -toolVecList[ i ].X(), toolVecList[ i ].Y() ) ) + 2 * Math.PI ) % ( 2 * Math.PI );
+					if( Math.Abs( dC1 - dC ) <= Math.Abs( dC2 - dC ) ) {
+						dC = dC1;
+						bCPlus = true;
+					}
+					else {
+						dC = dC2;
+						bCPlus = false;
+					}
+					singularPointList.Add( false );
+				}
+				double dA = Math.Acos( toolVecList[ i ].Z() );
+				if( !bCPlus ) {
+					dA *= -1;
+				}
+				m_SimulationCAData.Add( new Tuple<double, double>( dC, dA ) );
+			}
+
+			// refine the singular case
+			int index = 0;
+			while( index < m_SimulationCAData.Count ) {
+				int index0 = index;
+				while( index < m_SimulationCAData.Count - 1 && singularPointList[ index ] ) {
+					index++;
+				}
+
+				// interpolate C from index0 to index
+				double diffC = m_SimulationCAData[ index ].Item1 - m_SimulationCAData[ index0 ].Item1;
+				for( int i = index0; i < index; i++ ) {
+					m_SimulationCAData[ i ] = new Tuple<double, double>( m_SimulationCAData[ i ].Item1 + diffC / ( index - index0 ) * ( i - index0 ), 0 );
+				}
+				index++;
+			}
 		}
 
 		void ShowHead()
 		{
-			// trasform to the simulation position
-			gp_Pnt p = m_Model.CAMDataList[ 0 ].CAMPointList[ m_SimulationIndex ].CADPoint.Point;
-			gp_Dir d = m_Model.CAMDataList[ 0 ].CAMPointList[ m_SimulationIndex ].ToolVec;
-			gp_Ax2 ax2 = new gp_Ax2( p, d );
-			BRepPrimAPI_MakeCone coneMaker = new BRepPrimAPI_MakeCone( ax2, 0, 10, 20 );
-			m_HeadA = coneMaker.Shape();
-			m_HeadAAIS.Set( m_HeadA );
-			m_OCCViewer.GetAISContext().Redisplay( m_HeadAAIS, true );
+			m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
+			m_OCCViewer.GetAISContext().Display( m_HeadAAIS, false );
+			m_OCCViewer.UpdateView();
 		}
 
 		void HideHead()
 		{
-			m_OCCViewer.GetAISContext().Remove( m_HeadAAIS, true );
+			m_OCCViewer.GetAISContext().Remove( m_HeadCAIS, false );
+			m_OCCViewer.GetAISContext().Remove( m_HeadAAIS, false );
+			m_OCCViewer.UpdateView();
 		}
 	}
 }
