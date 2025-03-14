@@ -817,16 +817,12 @@ namespace CAMEdit
 
 		private static double AngularDeviationSqrd( gp_Dir v, gp_Dir v1, gp_Dir v2 )
 		{
-			// Compute bisector of the two directions
-			gp_Dir bisector = new gp_Dir( v1.XYZ() + v2.XYZ() ); // Midpoint approach
-			double dot = v.XYZ().Dot( bisector.XYZ() ); // Dot product
-
-			// Clamping to avoid NaN from numerical issues
-			dot = Math.Max( -1.0, Math.Min( 1.0, dot ) );
-
-			// Compute squared angle deviation
-			double theta = Math.Acos( dot ); // Angle in radians
-			return theta * theta;
+			if( v.IsParallel( v1, 1e-6 ) && v1.IsParallel( v2, 1e-6 ) && v2.IsParallel( v, 1e-6 ) ) {
+				return 0;
+			}
+			else {
+				return double.MaxValue;
+			}
 		}
 
 		private static double PerpendicDistFromLineSqrd( gp_Pnt pt, gp_Pnt line1, gp_Pnt line2 )
