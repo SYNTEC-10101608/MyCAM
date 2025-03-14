@@ -64,6 +64,7 @@ namespace CAMEdit
 			ShowPart();
 			ShowCADContour();
 			ShowCAMData();
+			MakeHead();
 			editMode = EditMode.None;
 			return true;
 		}
@@ -107,6 +108,12 @@ namespace CAMEdit
 		List<AIS_Shape> m_CAMContourAISList = new List<AIS_Shape>(); // need refresh
 		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh
 		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh
+
+		// for simulation
+		TopoDS_Shape m_HeadA;
+		AIS_Shape m_HeadAAIS;
+		bool m_bSimulation = true;
+		int m_SimulationIndex = 0;
 
 		enum EvecType
 		{
@@ -371,6 +378,38 @@ namespace CAMEdit
 				default:
 					break;
 			}
+			if( e.KeyCode == Keys.F5 ) {
+				m_OCCViewer.AxoView();
+				m_OCCViewer.ZoomAllView();
+				m_OCCViewer.UpdateView();
+			}
+			if( e.KeyCode == Keys.F1 ) {
+				m_bSimulation = !m_bSimulation;
+				if( m_bSimulation ) {
+					ShowHead();
+				}
+				else {
+					HideHead();
+				}
+			}
+			if( e.KeyCode == Keys.Down ) {
+				if( m_bSimulation ) {
+					m_SimulationIndex++;
+					if( m_SimulationIndex >= m_Model.CAMDataList[ 0 ].CAMPointList.Count ) {
+						m_SimulationIndex = 0;
+					}
+					ShowHead();
+				}
+			}
+			if( e.KeyCode == Keys.Up ) {
+				if( m_bSimulation ) {
+					m_SimulationIndex--;
+					if( m_SimulationIndex < 0 ) {
+						m_SimulationIndex = m_Model.CAMDataList[ 0 ].CAMPointList.Count - 1;
+					}
+					ShowHead();
+				}
+			}
 		}
 
 		void ViewerMouseDown( object sender, MouseEventArgs e )
@@ -612,6 +651,7 @@ namespace CAMEdit
 			}
 		}
 
+		// path filtering
 		List<CAMPoint> PathFiltering( List<CAMPoint> camPointList )
 		{
 			List<CAMPoint> filteredList = new List<CAMPoint>();
@@ -850,6 +890,33 @@ namespace CAMEdit
 				--current;
 			}
 			return current;
+		}
+
+		// simulation
+		void MakeHead()
+		{
+			// make a cone to indicate the head
+			BRepPrimAPI_MakeCone coneMaker = new BRepPrimAPI_MakeCone( 0, 10, 20 );
+			m_HeadA = coneMaker.Shape();
+			m_HeadAAIS = new AIS_Shape( m_HeadA );
+			m_OCCViewer.GetAISContext().Display( m_HeadAAIS, false );
+		}
+
+		void ShowHead()
+		{
+			// trasform to the simulation position
+			gp_Pnt p = m_Model.CAMDataList[ 0 ].CAMPointList[ m_SimulationIndex ].CADPoint.Point;
+			gp_Dir d = m_Model.CAMDataList[ 0 ].CAMPointList[ m_SimulationIndex ].ToolVec;
+			gp_Ax2 ax2 = new gp_Ax2( p, d );
+			BRepPrimAPI_MakeCone coneMaker = new BRepPrimAPI_MakeCone( ax2, 0, 10, 20 );
+			m_HeadA = coneMaker.Shape();
+			m_HeadAAIS.Set( m_HeadA );
+			m_OCCViewer.GetAISContext().Redisplay( m_HeadAAIS, true );
+		}
+
+		void HideHead()
+		{
+			m_OCCViewer.GetAISContext().Remove( m_HeadAAIS, true );
 		}
 	}
 }
