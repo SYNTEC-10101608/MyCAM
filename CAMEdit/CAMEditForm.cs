@@ -227,7 +227,8 @@ namespace CAMEdit
 			// build tool vec
 			foreach( CAMData camData in m_Model.CAMDataList ) {
 				int nIndex = 0;
-				foreach( CAMPoint camPoint in camData.CAMPointList ) {
+				List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
+				foreach( CAMPoint camPoint in filteredPath ) {
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
 					if( camData.GetToolVecModifyIndex().Contains( nIndex ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
@@ -609,6 +610,246 @@ namespace CAMEdit
 					}
 					break;
 			}
+		}
+
+		List<CAMPoint> PathFiltering( List<CAMPoint> camPointList )
+		{
+			List<CAMPoint> filteredList = new List<CAMPoint>();
+
+			// filtering by location
+			List<gp_Pnt> path = camPointList.Select( camPoint => camPoint.CADPoint.Point ).ToList();
+			bool[] flagsL = SimplifyPathByLocation( path, 1e-6 );
+
+			// filtering by orientation
+			List<gp_Dir> orientation = camPointList.Select( camPoint => camPoint.ToolVec ).ToList();
+			bool[] flagsO = SimplifyPathByOrientation( orientation, 1e-6 );
+
+			// combine the two filtering results
+			for( int i = 0; i < path.Count; i++ ) {
+				if( /*!flagsL[ i ] ||*/ !flagsO[ i ] ) {
+					filteredList.Add( camPointList[ i ] );
+				}
+			}
+			return filteredList;
+		}
+
+		public static bool[] SimplifyPathByLocation( List<gp_Pnt> path, double epsilon, bool isClosedPath = true )
+		{
+			int len = path.Count, high = len - 1;
+			double epsSqr = epsilon * epsilon;
+
+			// Not enough points to simplify
+			if( len < 4 ) {
+				return new bool[ len ];
+			}
+
+			bool[] flags = new bool[ len ];
+			double[] dsq = new double[ len ];
+			int curr = 0;
+
+			// Compute initial distances
+			if( isClosedPath ) {
+				dsq[ 0 ] = PerpendicDistFromLineSqrd( path[ 0 ], path[ high ], path[ 1 ] );
+				dsq[ high ] = PerpendicDistFromLineSqrd( path[ high ], path[ 0 ], path[ high - 1 ] );
+			}
+			else {
+				dsq[ 0 ] = double.MaxValue;
+				dsq[ high ] = double.MaxValue;
+			}
+
+			for( int i = 1; i < high; ++i ) {
+				dsq[ i ] = PerpendicDistFromLineSqrd( path[ i ], path[ i - 1 ], path[ i + 1 ] );
+			}
+
+			// Main simplification loop
+			while( true ) {
+				if( dsq[ curr ] > epsSqr ) {
+					int start = curr;
+					do {
+						curr = GetNext( curr, high, ref flags );
+					} while( curr != start && dsq[ curr ] > epsSqr );
+					if( curr == start ) {
+						break;
+					}
+				}
+
+				int prev = GetPrior( curr, high, ref flags );
+				int next = GetNext( curr, high, ref flags );
+				if( next == prev ) {
+					break;
+				}
+
+				int prior2;
+				if( dsq[ next ] < dsq[ curr ] ) {
+					prior2 = prev;
+					prev = curr;
+					curr = next;
+					next = GetNext( next, high, ref flags );
+				}
+				else {
+					prior2 = GetPrior( prev, high, ref flags );
+				}
+
+				flags[ curr ] = true;
+				curr = next;
+				next = GetNext( next, high, ref flags );
+
+				if( isClosedPath || ( ( curr != high ) && ( curr != 0 ) ) ) {
+					dsq[ curr ] = PerpendicDistFromLineSqrd( path[ curr ], path[ prev ], path[ next ] );
+				}
+				if( isClosedPath || ( ( prev != 0 ) && ( prev != high ) ) ) {
+					dsq[ prev ] = PerpendicDistFromLineSqrd( path[ prev ], path[ prior2 ], path[ curr ] );
+				}
+			}
+			return flags;
+		}
+
+		public static bool[] SimplifyPathByOrientation( List<gp_Dir> toolpath, double angleEpsilon, bool isClosedPath = true )
+		{
+			int len = toolpath.Count, high = len - 1;
+			double epsSqr = angleEpsilon * angleEpsilon;
+
+			// Not enough orientations to simplify
+			if( len < 4 ) {
+				return new bool[ len ];
+			}
+
+			bool[] flags = new bool[ len ];
+			double[] dsq = new double[ len ];
+			int curr = 0;
+
+			// Compute initial angular deviations
+			if( isClosedPath ) {
+				dsq[ 0 ] = AngularDeviationSqrd( toolpath[ 0 ], toolpath[ high ], toolpath[ 1 ] );
+				dsq[ high ] = AngularDeviationSqrd( toolpath[ high ], toolpath[ 0 ], toolpath[ high - 1 ] );
+			}
+			else {
+				dsq[ 0 ] = double.MaxValue;
+				dsq[ high ] = double.MaxValue;
+			}
+
+			for( int i = 1; i < high; ++i ) {
+				dsq[ i ] = AngularDeviationSqrd( toolpath[ i ], toolpath[ i - 1 ], toolpath[ i + 1 ] );
+			}
+
+			// Main simplification loop
+			while( true ) {
+				if( dsq[ curr ] > epsSqr ) {
+					int start = curr;
+					do {
+						curr = GetNext( curr, high, ref flags );
+					} while( curr != start && dsq[ curr ] > epsSqr );
+					if( curr == start ) {
+						break;
+					}
+				}
+
+				int prev = GetPrior( curr, high, ref flags );
+				int next = GetNext( curr, high, ref flags );
+				if( next == prev ) {
+					break;
+				}
+
+				int prior2;
+				if( dsq[ next ] < dsq[ curr ] ) {
+					prior2 = prev;
+					prev = curr;
+					curr = next;
+					next = GetNext( next, high, ref flags );
+				}
+				else {
+					prior2 = GetPrior( prev, high, ref flags );
+				}
+
+				flags[ curr ] = true;
+				curr = next;
+				next = GetNext( next, high, ref flags );
+
+				if( isClosedPath || ( ( curr != high ) && ( curr != 0 ) ) ) {
+					dsq[ curr ] = AngularDeviationSqrd( toolpath[ curr ], toolpath[ prev ], toolpath[ next ] );
+				}
+				if( isClosedPath || ( ( prev != 0 ) && ( prev != high ) ) ) {
+					dsq[ prev ] = AngularDeviationSqrd( toolpath[ prev ], toolpath[ prior2 ], toolpath[ curr ] );
+				}
+			}
+			return flags;
+		}
+
+		private static double AngularDeviationSqrd( gp_Dir v, gp_Dir v1, gp_Dir v2 )
+		{
+			// Compute bisector of the two directions
+			gp_Dir bisector = new gp_Dir( v1.XYZ() + v2.XYZ() ); // Midpoint approach
+			double dot = v.XYZ().Dot( bisector.XYZ() ); // Dot product
+
+			// Clamping to avoid NaN from numerical issues
+			dot = Math.Max( -1.0, Math.Min( 1.0, dot ) );
+
+			// Compute squared angle deviation
+			double theta = Math.Acos( dot ); // Angle in radians
+			return theta * theta;
+		}
+
+		private static double PerpendicDistFromLineSqrd( gp_Pnt pt, gp_Pnt line1, gp_Pnt line2 )
+		{
+			double ax = pt.X() - line1.X();
+			double ay = pt.Y() - line1.Y();
+			double az = pt.Z() - line1.Z();
+
+			double bx = line2.X() - line1.X();
+			double by = line2.Y() - line1.Y();
+			double bz = line2.Z() - line1.Z();
+
+			// Cross product of (P - A) and (B - A)
+			double crossX = ay * bz - az * by;
+			double crossY = az * bx - ax * bz;
+			double crossZ = ax * by - ay * bx;
+
+			// Squared magnitude of cross product
+			double crossMagSq = crossX * crossX + crossY * crossY + crossZ * crossZ;
+
+			// Squared magnitude of (B - A)
+			double lineMagSq = bx * bx + by * by + bz * bz;
+			if( lineMagSq == 0 ) {
+				return 0; // Avoid division by zero (degenerate case)
+			}
+			return crossMagSq / lineMagSq;
+		}
+
+		private static int GetNext( int current, int high, ref bool[] flags )
+		{
+			++current;
+			while( current <= high && flags[ current ] ) {
+				++current;
+			}
+			if( current <= high ) {
+				return current;
+			}
+			current = 0;
+			while( flags[ current ] ) {
+				++current;
+			}
+			return current;
+		}
+
+		private static int GetPrior( int current, int high, ref bool[] flags )
+		{
+			if( current == 0 ) {
+				current = high;
+			}
+			else {
+				--current;
+			}
+			while( current > 0 && flags[ current ] ) {
+				--current;
+			}
+			if( !flags[ current ] ) {
+				return current;
+			}
+			current = high;
+			while( flags[ current ] ) {
+				--current;
+			}
+			return current;
 		}
 	}
 }
