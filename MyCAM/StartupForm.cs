@@ -1,92 +1,35 @@
-﻿using CAMEdit;
-using DataStructure;
-using ExtractPattern;
-using Import;
-using NCExport;
-using OCC.BRepBuilderAPI;
-using OCC.gp;
-using OCC.TopoDS;
-using PartPlacement;
-using ProcessEdit;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace MyCAM
 {
 	public partial class StartupForm : Form
 	{
-		gp_Trsf m_PartTrsf = new gp_Trsf();
-
 		public StartupForm()
 		{
 			InitializeComponent();
-			IsMdiContainer = true;
-
-			// show the import form in dock fill
-			ImportForm f = new ImportForm();
-			f.ImportOK += ImportOK;
-			ShowChild( f );
+			myOCCTProxy = new OCCTProxy();
+			myOCCTProxy.InitOCCTProxy();
+			InitV3D();
 		}
 
-		void ImportOK( TopoDS_Shape partShape )
+		void InitV3D()
 		{
-			PartPlacementForm f = new PartPlacementForm( partShape );
-			f.PlaceOK += ( partTrsf ) =>
-			{
-				m_PartTrsf = partTrsf;
-				PlaceOK( partShape );
-			};
-			ShowChild( f );
+			if( !myOCCTProxy.InitViewer( this.Handle ) )
+				MessageBox.Show( "Fatal Error during the graphic initialisation", "Error!",
+						MessageBoxButtons.OK, MessageBoxIcon.Error );
 		}
 
-		void PlaceOK( TopoDS_Shape partShape )
+		void StartupForm_Paint( object sender, PaintEventArgs e )
 		{
-			// transform the part
-			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( partShape, m_PartTrsf, true );
-			TopoDS_Shape transformedShape = transform.Shape();
-
-			ExtractPatternForm f = new ExtractPatternForm( transformedShape );
-			f.ExtractOK += ExtractOK;
-			ShowChild( f );
+			myOCCTProxy.RedrawView();
+			myOCCTProxy.UpdateView();
 		}
 
-		void ExtractOK( TopoDS_Shape partShape, List<CADData> cadDataList )
+		void StartupForm_SizeChanged( object sender, System.EventArgs e )
 		{
-			CAMEditForm f = new CAMEditForm();
-			CAMEditModel camEditModel = new CAMEditModel( partShape, cadDataList );
-			f.CADEditOK += CAMEditOK;
-			f.Init( camEditModel );
-			ShowChild( f );
+			myOCCTProxy.UpdateView();
 		}
 
-		void CAMEditOK( TopoDS_Shape partShape, List<IProcessData> processDataList )
-		{
-			ProcessEditForm f = new ProcessEditForm();
-			ProcessEditModel processEditModel = new ProcessEditModel( partShape, processDataList );
-			f.EditOK += ProcessEditOK;
-			f.Init( processEditModel );
-			ShowChild( f );
-		}
-
-		void ProcessEditOK( List<IProcessData> list )
-		{
-			NCWriter w = new NCWriter( list );
-			w.Convert();
-		}
-
-		void ShowChild( Form formToShow )
-		{
-			foreach( Form f in MdiChildren ) {
-				f.Hide();
-			}
-			formToShow.MdiParent = this;
-			formToShow.StartPosition = FormStartPosition.Manual;
-			formToShow.Location = new Point( 0, 0 );
-			formToShow.Size = new Size( 800, 800 );
-			ClientSize = new Size( formToShow.Width + SystemInformation.BorderSize.Width * 2,
-			formToShow.Height + SystemInformation.CaptionHeight + SystemInformation.BorderSize.Height * 2 );
-			formToShow.Show();
-		}
+		OCCTProxy myOCCTProxy;
 	}
 }

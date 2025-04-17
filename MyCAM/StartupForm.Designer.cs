@@ -37,6 +37,8 @@
 			this.ClientSize = new System.Drawing.Size(584, 561);
 			this.Name = "StartupForm";
 			this.Text = "五軸切";
+			this.SizeChanged += new System.EventHandler(this.StartupForm_SizeChanged);
+			this.Paint += new System.Windows.Forms.PaintEventHandler(this.StartupForm_Paint);
 			this.ResumeLayout(false);
 
 		}
