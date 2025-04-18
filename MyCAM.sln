@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCExport", "NCExport\NCExpo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bridge", "Bridge\Bridge.vcxproj", "{05F5F591-BFF0-433A-A8DB-C840B9019DB4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CADCore", "CADCore\CADCore.vcxproj", "{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -167,8 +169,23 @@ Global
 		{05F5F591-BFF0-433A-A8DB-C840B9019DB4}.Release|x64.Build.0 = Release|x64
 		{05F5F591-BFF0-433A-A8DB-C840B9019DB4}.Release|x86.ActiveCfg = Release|Win32
 		{05F5F591-BFF0-433A-A8DB-C840B9019DB4}.Release|x86.Build.0 = Release|Win32
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Debug|Any CPU.Build.0 = Debug|x64
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Debug|x64.ActiveCfg = Debug|x64
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Debug|x64.Build.0 = Debug|x64
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Debug|x86.ActiveCfg = Debug|Win32
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Debug|x86.Build.0 = Debug|Win32
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Release|Any CPU.ActiveCfg = Release|x64
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Release|Any CPU.Build.0 = Release|x64
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Release|x64.ActiveCfg = Release|x64
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Release|x64.Build.0 = Release|x64
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Release|x86.ActiveCfg = Release|Win32
+		{0FDBFD11-E9A3-427D-8F94-0647D3A6D23E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B4DDBEEA-B4FE-446E-8302-EC4C14BE2674}
 	EndGlobalSection
 EndGlobal
