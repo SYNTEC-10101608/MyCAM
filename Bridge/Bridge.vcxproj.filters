@@ -20,7 +20,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ViewerBridge.cpp">
+    <ClCompile Include="OCCTProxy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
