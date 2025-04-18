@@ -1,8 +1,10 @@
 #pragma once
+
+#include "CADCoreCommon.h"
 #include <string>
 
 namespace Core {
-	class Import
+	class CADCORE_API Import
 	{
 	public:
 		bool ImportFile(const std::string& filePath, int format);

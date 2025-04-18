@@ -51,6 +51,10 @@
 #pragma comment(lib, "TKDEVRML.lib")
 #pragma comment(lib, "TKLCAF.lib")
 
+#include "Import.h"
+
+using namespace Core;
+
 //! Auxiliary tool for converting C# string into UTF-8 string.
 static TCollection_AsciiString toAsciiString(String^ theString)
 {
@@ -1039,6 +1043,14 @@ public:
 		myViewer() = NULL;
 		myView() = NULL;
 		myAISContext() = NULL;
+	}
+
+	bool ImportFile(String^ _filePath, int format) {
+
+		// Convert the managed string to a native string
+		TCollection_AsciiString s = toAsciiString(_filePath);
+		Import import;
+		return import.ImportFile(s.ToCString(), format);
 	}
 
 private:
