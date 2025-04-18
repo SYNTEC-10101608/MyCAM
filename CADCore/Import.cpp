@@ -22,81 +22,39 @@ TopoDS_Shape g_ImportedShape;
 
 bool Import::ImportFile(const Standard_CString filename, int format)
 {
-	switch (format)
-	{
-	case 0: // BREP
-		return ImportBrep(filename);
-	case 1: // STEP
-		return ImportStep(filename);
-	case 2: // IGES
-		return ImportIges(filename);
+	std::unique_ptr<XSControl_Reader> reader;
+	switch (format) {
+	case 1:
+		reader = std::make_unique<STEPControl_Reader>();
+		break;
+	case 2:
+		reader = std::make_unique<IGESControl_Reader>();
+		break;
 	default:
-		return false;
+		reader = std::make_unique<XSControl_Reader>();
+		break;
 	}
-}
+	IFSelect_ReturnStatus status = reader->ReadFile(filename);
 
-bool Import::ImportBrep(const Standard_CString filename)
-{
-	// Import BREP file
-	BRep_Builder builder;
-	TopoDS_Shape shape;
-	if (!BRepTools::Read(shape, filename, builder))
-	{
-		return false;
-	}
-
-	// sew the shape
-	std::vector<TopoDS_Shape> shapes = { shape };
-	g_ImportedShape = ShapeTool::SewShape(shapes);
-	return true;
-}
-
-bool Import::ImportStep(const Standard_CString filename)
-{
-	// Import STEP file
-	STEPControl_Reader reader;
-	IFSelect_ReturnStatus status = reader.ReadFile(filename);
+	// check the status
 	if (status != IFSelect_RetDone)
 	{
 		return false;
 	}
-	reader.TransferRoots();
-	if (reader.NbShapes() == 0)
+	reader->TransferRoots();
+
+	// prevent from empty shape or null shape
+	if (reader->NbShapes() == 0)
 	{
 		return false;
 	}
-	if (reader.OneShape().IsNull())
+	if (reader->OneShape().IsNull())
 	{
 		return false;
 	}
 
 	// sew the shape
-	std::vector<TopoDS_Shape> shapes = { reader.OneShape() };
-	g_ImportedShape = ShapeTool::SewShape(shapes);
-	return true;
-}
-
-bool Import::ImportIges(const Standard_CString filename)
-{
-	// Import IGES file
-	IGESControl_Reader reader;
-	IFSelect_ReturnStatus status = reader.ReadFile(filename);
-	if (status != IFSelect_RetDone)
-	{
-		return false;
-	}
-	reader.TransferRoots();
-	if (reader.NbShapes() == 0)
-	{
-		return false;
-	}
-	if (reader.OneShape().IsNull())
-	{
-		return false;
-	}
-
-	// sew the shape
-	std::vector<TopoDS_Shape> shapes = { reader.OneShape() };
+	std::vector<TopoDS_Shape> shapes = { reader->OneShape() };
 	g_ImportedShape = ShapeTool::SewShape(shapes);
 	return true;
 }

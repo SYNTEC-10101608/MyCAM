@@ -8,10 +8,5 @@ namespace Core {
 	{
 	public:
 		bool ImportFile(const Standard_CString filename, int format);
-
-	private:
-		bool ImportBrep(const Standard_CString filename);
-		bool ImportStep(const Standard_CString filename);
-		bool ImportIges(const Standard_CString filename);
 	};
 }
