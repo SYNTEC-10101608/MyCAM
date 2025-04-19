@@ -20,13 +20,13 @@ namespace MyCAM
 
 		void StartupForm_Paint( object sender, PaintEventArgs e )
 		{
-			//myBridge.RedrawView();
-			//myBridge.UpdateView();
+			myBridge.RedrawView();
+			myBridge.UpdateView();
 		}
 
 		void StartupForm_SizeChanged( object sender, System.EventArgs e )
 		{
-			//myBridge.UpdateView();
+			myBridge.UpdateView();
 		}
 
 		AppBridge myBridge;

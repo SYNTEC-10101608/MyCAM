@@ -154,11 +154,13 @@
     <ClInclude Include="CoreCommon.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Import.h" />
+    <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyViewer.h" />
     <ClInclude Include="ShapeTool.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Import.cpp" />
+    <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyViewer.cpp" />
     <ClCompile Include="ShapeTool.cpp" />
   </ItemGroup>

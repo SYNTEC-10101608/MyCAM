@@ -28,3 +28,13 @@ bool MyViewer::InitViewer(Handle(WNT_Window) theWnd) {
 	myView->MustBeResized();
 	return true;
 }
+
+void MyViewer::RedrawView() {
+	if (myView.IsNull()) { return; }
+	myView->Redraw();
+}
+
+void MyViewer::UpdateView() {
+	if (myView.IsNull()) { return; }
+	myView->Update();
+}

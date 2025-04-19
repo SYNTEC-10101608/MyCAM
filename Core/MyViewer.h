@@ -17,6 +17,8 @@ namespace Core {
 	class CORE_API MyViewer {
 	public:
 		bool InitViewer(Handle(WNT_Window) theWnd);
+		void RedrawView();
+		void UpdateView();
 
 	private:
 		// fields
