@@ -7,30 +7,29 @@ namespace MyCAM
 		public StartupForm()
 		{
 			InitializeComponent();
-			myOCCTProxy = new OCCTProxy();
-			myOCCTProxy.InitOCCTProxy();
+			myBridge = new AppBridge();
 			InitV3D();
 		}
 
 		void InitV3D()
 		{
-			if( !myOCCTProxy.InitViewer( this.Handle ) )
+			if( !myBridge.InitViewer( this.Handle ) )
 				MessageBox.Show( "Fatal Error during the graphic initialisation", "Error!",
 						MessageBoxButtons.OK, MessageBoxIcon.Error );
 		}
 
 		void StartupForm_Paint( object sender, PaintEventArgs e )
 		{
-			myOCCTProxy.RedrawView();
-			myOCCTProxy.UpdateView();
+			//myBridge.RedrawView();
+			//myBridge.UpdateView();
 		}
 
 		void StartupForm_SizeChanged( object sender, System.EventArgs e )
 		{
-			myOCCTProxy.UpdateView();
+			//myBridge.UpdateView();
 		}
 
-		OCCTProxy myOCCTProxy;
+		AppBridge myBridge;
 
 		void m_tsmiImportSTEP_Click( object sender, System.EventArgs e )
 		{
@@ -79,7 +78,7 @@ namespace MyCAM
 			}
 
 			// call the bridge  
-			bool bImportSucess = myOCCTProxy.ImportFile( szFileName, (int)format );
+			bool bImportSucess = myBridge.ImportFile( szFileName, (int)format );
 			if( !bImportSucess ) {
 				MessageBox.Show( "Error: Import" );
 				return;

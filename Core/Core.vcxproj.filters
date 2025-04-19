@@ -27,12 +27,18 @@
     <ClInclude Include="ShapeTool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MyViewer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Import.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ShapeTool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

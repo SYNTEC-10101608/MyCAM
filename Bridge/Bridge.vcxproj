@@ -78,7 +78,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;BRIDGE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;BRIDGE_EXPORTS;_WINDOWS;_USRDLL;OCCT_NO_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -89,6 +89,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>C:\occt-vc144-64\win64\vc14\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>TKBRep.lib;TKGeomBase.lib;TKG3d.lib;TKG2d.lib;TKernel.lib;TKMath.lib;TKBO.lib;TKBool.lib;TKFeat.lib;TKFillet.lib;TKGeomAlgo.lib;TKHLR.lib;TKMesh.lib;TKOffset.lib;TKPrim.lib;TKShHealing.lib;TKTopAlgo.lib;TKXMesh.lib;TKDESTEP.lib;TKDEIGES.lib;TKXSBase.lib;TKV3d.lib;TKService.lib;TKOpenGl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -97,7 +98,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;BRIDGE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;BRIDGE_EXPORTS;_WINDOWS;_USRDLL;OCCT_NO_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -110,13 +111,14 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>C:\occt-vc144-64\win64\vc14\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>TKBRep.lib;TKGeomBase.lib;TKG3d.lib;TKG2d.lib;TKernel.lib;TKMath.lib;TKBO.lib;TKBool.lib;TKFeat.lib;TKFillet.lib;TKGeomAlgo.lib;TKHLR.lib;TKMesh.lib;TKOffset.lib;TKPrim.lib;TKShHealing.lib;TKTopAlgo.lib;TKXMesh.lib;TKDESTEP.lib;TKDEIGES.lib;TKXSBase.lib;TKV3d.lib;TKService.lib;TKOpenGl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;BRIDGE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;BRIDGE_EXPORTS;_WINDOWS;_USRDLL;OCCT_NO_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -127,6 +129,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>C:\occt-vc144-64\win64\vc14\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>TKBRep.lib;TKGeomBase.lib;TKG3d.lib;TKG2d.lib;TKernel.lib;TKMath.lib;TKBO.lib;TKBool.lib;TKFeat.lib;TKFillet.lib;TKGeomAlgo.lib;TKHLR.lib;TKMesh.lib;TKOffset.lib;TKPrim.lib;TKShHealing.lib;TKTopAlgo.lib;TKXMesh.lib;TKDESTEP.lib;TKDEIGES.lib;TKXSBase.lib;TKV3d.lib;TKService.lib;TKOpenGl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,7 +138,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;BRIDGE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;BRIDGE_EXPORTS;_WINDOWS;_USRDLL;OCCT_NO_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -148,13 +151,14 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>C:\occt-vc144-64\win64\vc14\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>TKBRep.lib;TKGeomBase.lib;TKG3d.lib;TKG2d.lib;TKernel.lib;TKMath.lib;TKBO.lib;TKBool.lib;TKFeat.lib;TKFillet.lib;TKGeomAlgo.lib;TKHLR.lib;TKMesh.lib;TKOffset.lib;TKPrim.lib;TKShHealing.lib;TKTopAlgo.lib;TKXMesh.lib;TKDESTEP.lib;TKDEIGES.lib;TKXSBase.lib;TKV3d.lib;TKService.lib;TKOpenGl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="OCCTProxy.cpp" />
+    <ClCompile Include="AppBridge.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
