@@ -13,18 +13,20 @@
 #include <OpenGl_GraphicDriver.hxx>
 
 
-namespace Core {
-	class CORE_API MyViewer {
+namespace Core
+{
+	class CORE_API MyViewer
+	{
 	public:
-		bool InitViewer(Handle(WNT_Window) theWnd);
+		bool InitViewer( Handle( WNT_Window ) theWnd );
 		void RedrawView();
 		void UpdateView();
 
 	private:
 		// fields
-		Handle(V3d_Viewer) myViewer;
-		Handle(V3d_View) myView;
-		Handle(AIS_InteractiveContext) myAISContext;
-		Handle(OpenGl_GraphicDriver) myGraphicDriver;
+		Handle( V3d_Viewer ) myViewer;
+		Handle( V3d_View ) myView;
+		Handle( AIS_InteractiveContext ) myAISContext;
+		Handle( OpenGl_GraphicDriver ) myGraphicDriver;
 	};
 }

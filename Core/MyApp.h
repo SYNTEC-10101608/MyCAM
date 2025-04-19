@@ -9,14 +9,14 @@ using namespace Core;
 class CORE_API MyApp
 {
 public:
-	bool InitViewer(Handle(WNT_Window) theWnd)
+	bool InitViewer( Handle( WNT_Window ) theWnd )
 	{
-		return myViewer.InitViewer(theWnd);
+		return myViewer.InitViewer( theWnd );
 	}
 
-	bool ImportFile(const Standard_CString filename, int format)
+	bool ImportFile( const Standard_CString filename, int format )
 	{
-		return import.ImportFile(filename, format);
+		return import.ImportFile( filename, format );
 	}
 
 	// viewer

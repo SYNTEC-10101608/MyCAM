@@ -14,25 +14,24 @@ public:
 
 	~AppBridge()
 	{
-		if (myApp != nullptr)
-		{
+		if( myApp != nullptr ) {
 			delete myApp;
 			myApp = nullptr;
 		}
 	}
 
-	bool InitViewer(System::IntPtr theWnd)
+	bool InitViewer( System::IntPtr theWnd )
 	{
 		// convert the IntPtr to a HWND
-		Handle(WNT_Window) aWNTWindow = new WNT_Window(reinterpret_cast<HWND> (theWnd.ToPointer()));
-		return myApp->InitViewer(aWNTWindow);
+		Handle( WNT_Window ) aWNTWindow = new WNT_Window( reinterpret_cast< HWND > ( theWnd.ToPointer() ) );
+		return myApp->InitViewer( aWNTWindow );
 	}
 
-	bool ImportFile(System::String^ _filePath, int format)
+	bool ImportFile( System::String ^_filePath, int format )
 	{
 		// convert the managed string to a native string
-		TCollection_AsciiString s = toAsciiString(_filePath);
-		return myApp->ImportFile(s.ToCString(), format);
+		TCollection_AsciiString s = toAsciiString( _filePath );
+		return myApp->ImportFile( s.ToCString(), format );
 	}
 
 	// viewer
@@ -47,21 +46,19 @@ public:
 	}
 
 private:
-	TCollection_AsciiString toAsciiString(System::String^ theString)
+	TCollection_AsciiString toAsciiString( System::String ^theString )
 	{
-		if (theString == nullptr)
-		{
+		if( theString == nullptr ) {
 			return TCollection_AsciiString();
 		}
-		pin_ptr<const wchar_t> aPinChars = PtrToStringChars(theString);
-		const wchar_t* aWCharPtr = aPinChars;
-		if (aWCharPtr == NULL
-			|| *aWCharPtr == L'\0')
-		{
+		pin_ptr<const wchar_t> aPinChars = PtrToStringChars( theString );
+		const wchar_t *aWCharPtr = aPinChars;
+		if( aWCharPtr == NULL
+			|| *aWCharPtr == L'\0' ) {
 			return TCollection_AsciiString();
 		}
-		return TCollection_AsciiString(aWCharPtr);
+		return TCollection_AsciiString( aWCharPtr );
 	}
 
-	MyApp* myApp;
+	MyApp *myApp;
 };

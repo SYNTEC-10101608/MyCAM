@@ -3,10 +3,11 @@
 #include "CoreCommon.h"
 #include <string>
 
-namespace Core {
+namespace Core
+{
 	class CORE_API Import
 	{
 	public:
-		bool ImportFile(const Standard_CString filename, int format);
+		bool ImportFile( const Standard_CString filename, int format );
 	};
 }

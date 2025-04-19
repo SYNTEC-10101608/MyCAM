@@ -20,10 +20,10 @@ using namespace Core;
 
 TopoDS_Shape g_ImportedShape;
 
-bool Import::ImportFile(const Standard_CString filename, int format)
+bool Import::ImportFile( const Standard_CString filename, int format )
 {
 	std::unique_ptr<XSControl_Reader> reader;
-	switch (format) {
+	switch( format ) {
 	case 1:
 		reader = std::make_unique<STEPControl_Reader>();
 		break;
@@ -34,27 +34,24 @@ bool Import::ImportFile(const Standard_CString filename, int format)
 		reader = std::make_unique<XSControl_Reader>();
 		break;
 	}
-	IFSelect_ReturnStatus status = reader->ReadFile(filename);
+	IFSelect_ReturnStatus status = reader->ReadFile( filename );
 
 	// check the status
-	if (status != IFSelect_RetDone)
-	{
+	if( status != IFSelect_RetDone ) {
 		return false;
 	}
 	reader->TransferRoots();
 
 	// prevent from empty shape or null shape
-	if (reader->NbShapes() == 0)
-	{
+	if( reader->NbShapes() == 0 ) {
 		return false;
 	}
-	if (reader->OneShape().IsNull())
-	{
+	if( reader->OneShape().IsNull() ) {
 		return false;
 	}
 
 	// sew the shape
 	std::vector<TopoDS_Shape> shapes = { reader->OneShape() };
-	g_ImportedShape = ShapeTool::SewShape(shapes);
+	g_ImportedShape = ShapeTool::SewShape( shapes );
 	return true;
 }
