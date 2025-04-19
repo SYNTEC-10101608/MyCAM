@@ -18,13 +18,13 @@
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CoreCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Import.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ShapeTool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CADCoreCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -82,7 +82,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\CADCore;C:\occt-vc144-64\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Core;C:\occt-vc144-64\inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -101,7 +101,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\CADCore;C:\occt-vc144-64\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Core;C:\occt-vc144-64\inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -120,7 +120,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\CADCore;C:\occt-vc144-64\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Core;C:\occt-vc144-64\inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,7 +139,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\CADCore;C:\occt-vc144-64\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Core;C:\occt-vc144-64\inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -157,8 +157,8 @@
     <ClCompile Include="OCCTProxy.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CADCore\CADCore.vcxproj">
-      <Project>{0fdbfd11-e9a3-427d-8f94-0647d3a6d23e}</Project>
+    <ProjectReference Include="..\Core\Core.vcxproj">
+      <Project>{72187dc9-bea0-4462-8501-5b3a8a996cf1}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
