@@ -45,6 +45,51 @@ public:
 		myApp->UpdateView();
 	}
 
+	void Zoom( int theX1, int theY1, int theX2, int theY2 )
+	{
+		myApp->Zoom( theX1, theY1, theX2, theY2 );
+	}
+
+	void ZoomAtPoint( int theX1, int theY1, int theX2, int theY2 )
+	{
+
+	}
+
+	void StartZoomAtPoint( int theX, int theY )
+	{
+		myApp->StartZoomAtPoint( theX, theY );
+	}
+
+	void Pan( int theX, int theY )
+	{
+		myApp->Pan( theX, theY );
+	}
+
+	void Rotation( int theX, int theY )
+	{
+		myApp->Rotation( theX, theY );
+	}
+
+	void StartRotation( int theX, int theY )
+	{
+		myApp->StartRotation( theX, theY );
+	}
+
+	void ZoomAllView()
+	{
+		myApp->ZoomAllView();
+	}
+
+	void MoveTo( int theX, int theY )
+	{
+		myApp->MoveTo( theX, theY );
+	}
+
+	void UpdateCurrentViewer()
+	{
+		myApp->UpdateCurrentViewer();
+	}
+
 private:
 	TCollection_AsciiString toAsciiString( System::String ^theString )
 	{

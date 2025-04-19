@@ -29,16 +29,83 @@ bool MyViewer::InitViewer( Handle( WNT_Window ) theWnd )
 
 void MyViewer::RedrawView()
 {
-	if( myView.IsNull() ) {
-		return;
+	if( !myView.IsNull() ) {
+		myView->Redraw();
 	}
-	myView->Redraw();
 }
 
 void MyViewer::UpdateView()
 {
-	if( myView.IsNull() ) {
-		return;
+	if( !myView.IsNull() ) {
+		myView->Update();
 	}
-	myView->Update();
+}
+
+void MyViewer::Zoom( int theX1, int theY1, int theX2, int theY2 )
+{
+	if( !myView.IsNull() ) {
+		myView->Zoom( theX1, theY1, theX2, theY2 );
+	}
+}
+
+void MyViewer::ZoomAtPoint( int theX1, int theY1, int theX2, int theY2 )
+{
+	if( !myView.IsNull() ) {
+		myView->ZoomAtPoint( theX1, theY1, theX2, theY2 );
+	}
+}
+
+void MyViewer::StartZoomAtPoint( int theX, int theY )
+{
+	if( !myView.IsNull() ) {
+		myView->StartZoomAtPoint( theX, theY );
+	}
+}
+
+void MyViewer::Pan( int theX, int theY )
+{
+	if( !myView.IsNull() ) {
+		myView->Pan( theX, theY );
+	}
+}
+
+void MyViewer::Rotation( int theX, int theY )
+{
+	if( !myView.IsNull() ) {
+		myView->Rotation( theX, theY );
+	}
+}
+
+void MyViewer::StartRotation( int theX, int theY )
+{
+	if( !myView.IsNull() ) {
+		myView->StartRotation( theX, theY );
+	}
+}
+
+void MyViewer::ZoomAllView()
+{
+	if( !myView.IsNull() ) {
+		myView->FitAll();
+		myView->ZFitAll();
+	}
+}
+
+void MyViewer::MoveTo( int theX, int theY )
+{
+	if( !myAISContext.IsNull() ) {
+		myAISContext->MoveTo( theX, theY, myView, true );
+	}
+}
+
+void MyViewer::UpdateCurrentViewer()
+{
+	if( !myAISContext.IsNull() ) {
+		myAISContext->UpdateCurrentViewer();
+	}
+}
+
+Handle( AIS_InteractiveContext ) MyViewer::GetAISContext()
+{
+	return myAISContext;
 }

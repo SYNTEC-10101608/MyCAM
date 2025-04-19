@@ -60,26 +60,26 @@
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+			this.toolStripSeparator1.Size = new System.Drawing.Size(101, 6);
 			// 
 			// m_tsmiImportSTEP
 			// 
 			this.m_tsmiImportSTEP.Name = "m_tsmiImportSTEP";
-			this.m_tsmiImportSTEP.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportSTEP.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportSTEP.Text = "STEP";
 			this.m_tsmiImportSTEP.Click += new System.EventHandler(this.m_tsmiImportSTEP_Click);
 			// 
 			// m_tsmiImportIGES
 			// 
 			this.m_tsmiImportIGES.Name = "m_tsmiImportIGES";
-			this.m_tsmiImportIGES.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportIGES.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportIGES.Text = "IGES";
 			this.m_tsmiImportIGES.Click += new System.EventHandler(this.m_tsmiImportIGES_Click);
 			// 
 			// m_tsmiImportBRep
 			// 
 			this.m_tsmiImportBRep.Name = "m_tsmiImportBRep";
-			this.m_tsmiImportBRep.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportBRep.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportBRep.Text = "BRep";
 			this.m_tsmiImportBRep.Click += new System.EventHandler(this.m_tsmiImportBRep_Click);
 			// 

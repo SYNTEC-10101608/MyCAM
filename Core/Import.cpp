@@ -18,8 +18,6 @@
 using namespace Core::Tool;
 using namespace Core;
 
-TopoDS_Shape g_ImportedShape;
-
 bool Import::ImportFile( const Standard_CString filename, int format )
 {
 	std::unique_ptr<XSControl_Reader> reader;
@@ -52,6 +50,11 @@ bool Import::ImportFile( const Standard_CString filename, int format )
 
 	// sew the shape
 	std::vector<TopoDS_Shape> shapes = { reader->OneShape() };
-	g_ImportedShape = ShapeTool::SewShape( shapes );
+	m_ImportedShape = ShapeTool::SewShape( shapes );
 	return true;
+}
+
+TopoDS_Shape Import::GetImportedShape()
+{
+	return m_ImportedShape;
 }
