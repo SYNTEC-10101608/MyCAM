@@ -32,7 +32,8 @@ public:
 		if( !isImportSucess || import.GetImportedShape().IsNull() ) {
 			return false;
 		}
-		ShowPart( import.GetImportedShape() );
+		m_PartShape = import.GetImportedShape();
+		ShowPart();
 	}
 
 	// viewer
@@ -94,10 +95,10 @@ public:
 private:
 	// private methods
 	// import file
-	void ShowPart( const TopoDS_Shape &partShape )
+	void ShowPart()
 	{
 		// create AIS shape
-		Handle( AIS_Shape ) aisShape = new AIS_Shape( partShape );
+		Handle( AIS_Shape ) aisShape = new AIS_Shape( m_PartShape );
 		Graphic3d_MaterialAspect aspect( Graphic3d_NameOfMaterial::Graphic3d_NOM_STEEL );
 		aisShape->SetMaterial( aspect );
 		aisShape->SetDisplayMode( 1 );
