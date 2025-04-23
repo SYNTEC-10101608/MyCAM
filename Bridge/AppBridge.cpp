@@ -9,14 +9,14 @@ public ref class AppBridge
 public:
 	AppBridge()
 	{
-		myApp = new MyApp();
+		m_pApp = new MyApp();
 	}
 
 	~AppBridge()
 	{
-		if( myApp != nullptr ) {
-			delete myApp;
-			myApp = nullptr;
+		if( m_pApp != nullptr ) {
+			delete m_pApp;
+			m_pApp = nullptr;
 		}
 	}
 
@@ -24,70 +24,70 @@ public:
 	{
 		// convert the IntPtr to a HWND
 		Handle( WNT_Window ) aWNTWindow = new WNT_Window( reinterpret_cast<HWND> (theWnd.ToPointer()) );
-		return myApp->InitViewer( aWNTWindow );
+		return m_pApp->InitViewer( aWNTWindow );
 	}
 
 	bool ImportFile( System::String ^_filePath, int format )
 	{
 		// convert the managed string to a native string
 		TCollection_AsciiString s = toAsciiString( _filePath );
-		return myApp->ImportFile( s.ToCString(), format );
+		return m_pApp->ImportFile( s.ToCString(), format );
 	}
 
 	// viewer
 	void RedrawView()
 	{
-		myApp->RedrawView();
+		m_pApp->RedrawView();
 	}
 
 	void UpdateView()
 	{
-		myApp->UpdateView();
+		m_pApp->UpdateView();
 	}
 
 	void Zoom( int theX1, int theY1, int theX2, int theY2 )
 	{
-		myApp->Zoom( theX1, theY1, theX2, theY2 );
+		m_pApp->Zoom( theX1, theY1, theX2, theY2 );
 	}
 
 	void ZoomAtPoint( int theX1, int theY1, int theX2, int theY2 )
 	{
-		myApp->ZoomAtPoint( theX1, theY1, theX2, theY2 );
+		m_pApp->ZoomAtPoint( theX1, theY1, theX2, theY2 );
 	}
 
 	void StartZoomAtPoint( int theX, int theY )
 	{
-		myApp->StartZoomAtPoint( theX, theY );
+		m_pApp->StartZoomAtPoint( theX, theY );
 	}
 
 	void Pan( int theX, int theY )
 	{
-		myApp->Pan( theX, theY );
+		m_pApp->Pan( theX, theY );
 	}
 
 	void Rotation( int theX, int theY )
 	{
-		myApp->Rotation( theX, theY );
+		m_pApp->Rotation( theX, theY );
 	}
 
 	void StartRotation( int theX, int theY )
 	{
-		myApp->StartRotation( theX, theY );
+		m_pApp->StartRotation( theX, theY );
 	}
 
 	void ZoomAllView()
 	{
-		myApp->ZoomAllView();
+		m_pApp->ZoomAllView();
 	}
 
 	void MoveTo( int theX, int theY )
 	{
-		myApp->MoveTo( theX, theY );
+		m_pApp->MoveTo( theX, theY );
 	}
 
 	void UpdateCurrentViewer()
 	{
-		myApp->UpdateCurrentViewer();
+		m_pApp->UpdateCurrentViewer();
 	}
 
 private:
@@ -105,5 +105,5 @@ private:
 		return TCollection_AsciiString( aWCharPtr );
 	}
 
-	MyApp *myApp;
+	MyApp *m_pApp;
 };

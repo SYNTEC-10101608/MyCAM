@@ -54,7 +54,7 @@ bool Import::ImportFile( const Standard_CString filename, int format )
 	return true;
 }
 
-TopoDS_Shape Import::GetImportedShape()
+const TopoDS_Shape &Import::GetImportedShape() const
 {
 	return m_ImportedShape;
 }

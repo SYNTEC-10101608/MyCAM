@@ -9,7 +9,7 @@ namespace Core
 	{
 	public:
 		bool ImportFile( const Standard_CString filename, int format );
-		TopoDS_Shape GetImportedShape();
+		const TopoDS_Shape &GetImportedShape() const;
 
 	private:
 

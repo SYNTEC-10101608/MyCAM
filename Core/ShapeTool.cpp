@@ -5,12 +5,12 @@ using namespace Core::Tool;
 TopoDS_Shape ShapeTool::SewShape( const std::vector<TopoDS_Shape> &shapeList )
 {
 	const double dSewingTolerance = 1e-3;
-	BRepBuilderAPI_Sewing sewing( dSewingTolerance );
+	Handle( BRepBuilderAPI_Sewing ) pSewing = new BRepBuilderAPI_Sewing( dSewingTolerance );
 	for( const auto &shape : shapeList ) {
-		sewing.Add( shape );
+		pSewing->Add( shape );
 	}
-	sewing.Perform();
-	return sewing.SewedShape();
+	pSewing->Perform();
+	return pSewing->SewedShape();
 }
 
 TopoDS_Shape ShapeTool::MakeCompound( const std::vector<TopoDS_Shape> &shapeList )

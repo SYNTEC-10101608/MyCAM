@@ -14,9 +14,15 @@ using namespace Core;
 class CORE_API MyApp
 {
 public:
-	bool InitViewer( Handle( WNT_Window ) theWnd )
+	MyApp()
+		: m_pViewer( std::make_unique<MyViewer>() )
+		, m_PartShape()
 	{
-		return myViewer.InitViewer( theWnd );
+	}
+
+	bool InitViewer( const Handle( WNT_Window ) theWnd )
+	{
+		return m_pViewer->InitViewer( theWnd );
 	}
 
 	bool ImportFile( const Standard_CString filename, int format )
@@ -32,62 +38,63 @@ public:
 	// viewer
 	void RedrawView()
 	{
-		myViewer.RedrawView();
+		m_pViewer->RedrawView();
 	}
 
 	void UpdateView()
 	{
-		myViewer.UpdateView();
+		m_pViewer->UpdateView();
 	}
 
 	void Zoom( int theX1, int theY1, int theX2, int theY2 )
 	{
-		myViewer.Zoom( theX1, theY1, theX2, theY2 );
+		m_pViewer->Zoom( theX1, theY1, theX2, theY2 );
 	}
 
 	void ZoomAtPoint( int theX1, int theY1, int theX2, int theY2 )
 	{
-		myViewer.ZoomAtPoint( theX1, theY1, theX2, theY2 );
+		m_pViewer->ZoomAtPoint( theX1, theY1, theX2, theY2 );
 	}
 
 	void StartZoomAtPoint( int theX, int theY )
 	{
-		myViewer.StartZoomAtPoint( theX, theY );
+		m_pViewer->StartZoomAtPoint( theX, theY );
 	}
 
 	void Pan( int theX, int theY )
 	{
-		myViewer.Pan( theX, theY );
+		m_pViewer->Pan( theX, theY );
 	}
 
 	void Rotation( int theX, int theY )
 	{
-		myViewer.Rotation( theX, theY );
+		m_pViewer->Rotation( theX, theY );
 	}
 
 	void StartRotation( int theX, int theY )
 	{
-		myViewer.StartRotation( theX, theY );
+		m_pViewer->StartRotation( theX, theY );
 	}
 
 	void ZoomAllView()
 	{
-		myViewer.ZoomAllView();
+		m_pViewer->ZoomAllView();
 	}
 
 	void MoveTo( int theX, int theY )
 	{
-		myViewer.MoveTo( theX, theY );
+		m_pViewer->MoveTo( theX, theY );
 	}
 
 	void UpdateCurrentViewer()
 	{
-		myViewer.UpdateCurrentViewer();
+		m_pViewer->UpdateCurrentViewer();
 	}
 
 private:
-	// show part
-	void ShowPart( TopoDS_Shape partShape )
+	// private methods
+	// import file
+	void ShowPart( const TopoDS_Shape &partShape )
 	{
 		// create AIS shape
 		Handle( AIS_Shape ) aisShape = new AIS_Shape( partShape );
@@ -96,11 +103,16 @@ private:
 		aisShape->SetDisplayMode( 1 );
 
 		// display the shape
-		myViewer.GetAISContext()->Display( aisShape, false );
-		myViewer.GetAISContext()->UpdateCurrentViewer();
-		myViewer.ZoomAllView();
+		m_pViewer->GetAISContext()->Display( aisShape, false );
+		m_pViewer->GetAISContext()->UpdateCurrentViewer();
+		m_pViewer->ZoomAllView();
 	}
 
-	// fields
-	MyViewer myViewer;
+private:
+	// privaye fields
+	// viewer
+	std::unique_ptr<MyViewer> m_pViewer;
+
+	// part
+	TopoDS_Shape m_PartShape;
 };

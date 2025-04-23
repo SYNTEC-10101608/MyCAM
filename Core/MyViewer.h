@@ -18,7 +18,7 @@ namespace Core
 	class CORE_API MyViewer
 	{
 	public:
-		bool InitViewer( Handle( WNT_Window ) theWnd );
+		bool InitViewer( const Handle( WNT_Window ) &theWnd );
 		void RedrawView();
 		void UpdateView();
 		void Zoom( int theX1, int theY1, int theX2, int theY2 );
@@ -30,13 +30,13 @@ namespace Core
 		void ZoomAllView();
 		void MoveTo( int theX, int theY );
 		void UpdateCurrentViewer();
-		Handle( AIS_InteractiveContext ) GetAISContext();
+		const Handle( AIS_InteractiveContext ) &GetAISContext();
 
 	private:
 		// fields
-		Handle( V3d_Viewer ) myViewer;
-		Handle( V3d_View ) myView;
-		Handle( AIS_InteractiveContext ) myAISContext;
-		Handle( OpenGl_GraphicDriver ) myGraphicDriver;
+		Handle( V3d_Viewer ) m_Viewer;
+		Handle( V3d_View ) m_View;
+		Handle( AIS_InteractiveContext ) m_AISContext;
+		Handle( OpenGl_GraphicDriver ) m_GraphicDriver;
 	};
 }
