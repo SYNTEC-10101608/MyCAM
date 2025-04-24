@@ -7,6 +7,11 @@
 
 namespace Core
 {
+	// mouse button
+	constexpr  int MOUSE_LEFT = 0x100000;
+	constexpr  int MOUSE_RIGHT = 0x200000;
+	constexpr  int MOUSE_MID = 0x400000;
+
 	class CORE_API AppPhaseBase : public IAppPhase
 	{
 	public:

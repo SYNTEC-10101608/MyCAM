@@ -25,13 +25,13 @@ void AppPhaseBase::MouseDown( int button, int x, int y )
 	switch( button ) {
 
 		// press down middle button, then start translate the viewer
-	case 0x400000: // mid button
+	case MOUSE_MID: // mid button
 		m_nXMousePosition = x;
 		m_nYMousePosition = y;
 		break;
 
 		// press down right button, then start rotatae the viewer
-	case 0x200000: // right button
+	case MOUSE_RIGHT: // right button
 		m_pViewer->StartRotation( x, y );
 		break;
 	default:
@@ -48,14 +48,14 @@ void AppPhaseBase::MouseMove( int button, int x, int y )
 	switch( button ) {
 
 		// translate the viewer
-	case 0x400000: // mid button
+	case MOUSE_MID: // mid button
 		m_pViewer->Pan( x - m_nXMousePosition, m_nYMousePosition - y );
 		m_nXMousePosition = x;
 		m_nYMousePosition = y;
 		break;
 
 		// rotate the viewer
-	case 0x200000: // right button
+	case MOUSE_RIGHT: // right button
 		m_pViewer->Rotation( x, y );
 		break;
 	default:
@@ -68,8 +68,8 @@ void AppPhaseBase::MouseWheel( int delta, int x, int y )
 	// zoom viewer at start point
 	m_pViewer->StartZoomAtPoint( x, y );
 
-	int endX = ( int )( x + x * delta * ZOOM_Ratio );
-	int endY = ( int )( y + y * delta * ZOOM_Ratio );
+	int endX = (int)(x + x * delta * ZOOM_Ratio);
+	int endY = (int)(y + y * delta * ZOOM_Ratio);
 
 	// zoom viewer with mouse wheel delta and scaling ratio
 	m_pViewer->ZoomAtPoint( x, y, endX, endY );

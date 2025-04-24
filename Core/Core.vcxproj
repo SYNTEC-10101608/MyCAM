@@ -152,7 +152,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AppPhaseBase.h" />
+    <ClInclude Include="CADData.h" />
     <ClInclude Include="CoreCommon.h" />
+    <ClInclude Include="ExtractPattern.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="IAppPhase.h" />
     <ClInclude Include="Import.h" />
@@ -162,6 +164,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppPhaseBase.cpp" />
+    <ClCompile Include="CADData.cpp" />
+    <ClCompile Include="ExtractPattern.cpp" />
     <ClCompile Include="Import.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyViewer.cpp" />

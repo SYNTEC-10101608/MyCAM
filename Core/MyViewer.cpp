@@ -105,6 +105,21 @@ void MyViewer::UpdateCurrentViewer()
 	}
 }
 
+void MyViewer::AxoView()
+{
+	if( !m_View.IsNull() ) {
+		m_View->SetProj( V3d_XposYnegZpos );
+	}
+}
+
+void MyViewer::ShiftSelect()
+{
+	if( !m_AISContext.IsNull() ) {
+		m_AISContext->SelectDetected( AIS_SelectionScheme_XOR );
+		m_AISContext->UpdateCurrentViewer();
+	}
+}
+
 const Handle( AIS_InteractiveContext ) &MyViewer::GetAISContext()
 {
 	return m_AISContext;

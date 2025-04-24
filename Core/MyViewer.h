@@ -31,6 +31,8 @@ namespace Core
 		void MoveTo( int theX, int theY );
 		void UpdateCurrentViewer();
 		const Handle( AIS_InteractiveContext ) &GetAISContext();
+		void AxoView();
+		void ShiftSelect();
 
 	private:
 		// fields
