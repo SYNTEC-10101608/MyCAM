@@ -151,14 +151,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AppPhaseBase.h" />
     <ClInclude Include="CoreCommon.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="IAppPhase.h" />
     <ClInclude Include="Import.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyViewer.h" />
     <ClInclude Include="ShapeTool.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AppPhaseBase.cpp" />
     <ClCompile Include="Import.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyViewer.cpp" />

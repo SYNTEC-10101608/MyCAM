@@ -33,6 +33,12 @@
     <ClInclude Include="MyApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IAppPhase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AppPhaseBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Import.cpp">
@@ -45,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MyApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AppPhaseBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
