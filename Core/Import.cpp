@@ -6,6 +6,7 @@
 #include <IGESControl_Reader.hxx>
 #include <XSControl_Reader.hxx>
 #include <IFSelect_ReturnStatus.hxx>
+#include<AIS_Shape.hxx>
 
 // c++ headers
 #include <vector>
@@ -17,6 +18,12 @@
 
 using namespace Core::Tool;
 using namespace Core;
+
+Import::Import( std::shared_ptr<MyViewer> pViewer )
+	: AppPhaseBase( pViewer )
+	, m_ImportedShape()
+{
+}
 
 bool Import::ImportFile( const Standard_CString filename, int format )
 {
@@ -51,10 +58,25 @@ bool Import::ImportFile( const Standard_CString filename, int format )
 	// sew the shape
 	std::vector<TopoDS_Shape> shapes = { reader->OneShape() };
 	m_ImportedShape = ShapeTool::SewShape( shapes );
+	ShowPart();
 	return true;
 }
 
 const TopoDS_Shape &Import::GetImportedShape() const
 {
 	return m_ImportedShape;
+}
+
+void Import::ShowPart() const
+{
+	// create AIS shape
+	Handle( AIS_Shape ) aisShape = new AIS_Shape( m_ImportedShape );
+	Graphic3d_MaterialAspect aspect( Graphic3d_NameOfMaterial::Graphic3d_NOM_STEEL );
+	aisShape->SetMaterial( aspect );
+	aisShape->SetDisplayMode( 1 );
+
+	// display the shape
+	m_pViewer->GetAISContext()->Display( aisShape, false );
+	m_pViewer->GetAISContext()->UpdateCurrentViewer();
+	m_pViewer->ZoomAllView();
 }

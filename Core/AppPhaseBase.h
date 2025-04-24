@@ -25,8 +25,10 @@ namespace Core
 		// key events
 		void KeyDown( int key, int x, int y ) override;
 
-	private:
+	protected:
 		std::shared_ptr<MyViewer> m_pViewer;
+
+	private:
 		int m_nXMousePosition;
 		int m_nYMousePosition;
 		const double ZOOM_Ratio = 0.0002;
