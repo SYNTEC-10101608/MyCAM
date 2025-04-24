@@ -50,6 +50,11 @@ public:
 		m_pApp->MouseWheel( delta, x, y );
 	}
 
+	void KeyDown( int key )
+	{
+		m_pApp->KeyDown( key );
+	}
+
 	void RedrawView()
 	{
 		m_pApp->RedrawView();

@@ -75,7 +75,7 @@ void AppPhaseBase::MouseWheel( int delta, int x, int y )
 	m_pViewer->ZoomAtPoint( x, y, endX, endY );
 }
 
-void AppPhaseBase::KeyDown( int key, int x, int y )
+void AppPhaseBase::KeyDown( int key )
 {
 	// Handle key down event
 }

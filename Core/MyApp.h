@@ -8,6 +8,7 @@
 #include "CoreCommon.h"
 #include "MyViewer.h"
 #include "Import.h"
+#include "ExtractPattern.h"
 
 using namespace Core;
 
@@ -34,6 +35,8 @@ public:
 		if( !isImportSucess || pImport->GetImportedShape().IsNull() ) {
 			return false;
 		}
+		std::shared_ptr<ExtractPattern> pExtract = std::make_shared<ExtractPattern>( pImport->GetImportedShape(), m_pViewer );
+		m_pAppPhase = pExtract;
 	}
 
 	// viewer
@@ -56,6 +59,13 @@ public:
 			return;
 		}
 		m_pAppPhase->MouseWheel( delta, x, y );
+	}
+
+	void KeyDown( int key ) {
+		if( m_pAppPhase == nullptr ) {
+			return;
+		}
+		m_pAppPhase->KeyDown( key );
 	}
 
 	void RedrawView()

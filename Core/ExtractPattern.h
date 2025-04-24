@@ -23,6 +23,9 @@ namespace Core
 		// override mousedown event
 		void MouseDown( int button, int x, int y ) override;
 
+		// override keydown event
+		void KeyDown( int key ) override;
+
 	private:
 		TopoDS_Shape m_partShape;
 		std::shared_ptr<MyViewer> m_pViewer;

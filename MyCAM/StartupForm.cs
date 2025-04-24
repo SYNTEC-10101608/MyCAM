@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 
 namespace MyCAM
 {
@@ -13,6 +14,7 @@ namespace MyCAM
 			m_panView.MouseWheel += OnMouseWheel;
 			m_panView.MouseDown += OnMouseDown;
 			m_panView.MouseMove += OnMouseMove;
+			m_panView.PreviewKeyDown += OnKeyDown;
 		}
 
 		// viewer
@@ -41,7 +43,13 @@ namespace MyCAM
 
 		void OnMouseDown( object sender, MouseEventArgs e )
 		{
+			m_panView.Focus();
 			m_Bridge.MouseDown( (int)e.Button, e.X, e.Y );
+		}
+
+		void OnKeyDown( object sender, PreviewKeyDownEventArgs e )
+		{
+			m_Bridge.KeyDown( (int)e.KeyCode );
 		}
 
 		void OnMouseWheel( object sender, MouseEventArgs e )

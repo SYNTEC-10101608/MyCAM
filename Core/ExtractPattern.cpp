@@ -86,6 +86,16 @@ void ExtractPattern::MouseDown( int button, int x, int y )
 	m_pViewer->ShiftSelect();
 }
 
+void ExtractPattern::KeyDown( int key )
+{
+	if( m_pViewer == nullptr ) {
+		return;
+	}
+	if( key == KEY_ENTER ) {
+		OnExtractOK();
+	}
+}
+
 std::vector<TopoDS_Face> ExtractPattern::GetSelectedFaces()
 {
 	std::vector<TopoDS_Face> faces;

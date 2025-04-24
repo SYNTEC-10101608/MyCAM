@@ -18,6 +18,6 @@ namespace Core
 		virtual void MouseWheel( int delta, int x, int y ) = 0;
 
 		// key events
-		virtual void KeyDown( int key, int x, int y ) = 0;
+		virtual void KeyDown( int key ) = 0;
 	};
 }
