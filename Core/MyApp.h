@@ -16,6 +16,7 @@ class CORE_API MyApp
 public:
 	MyApp()
 		: m_pViewer( std::make_unique<MyViewer>() )
+		, m_pAppPhase( std::make_unique<AppPhaseBase>( m_pViewer ) )
 		, m_PartShape()
 	{
 	}
@@ -27,13 +28,12 @@ public:
 
 	bool ImportFile( const Standard_CString filename, int format )
 	{
-		Import import;
-		bool isImportSucess = import.ImportFile( filename, format );
-		if( !isImportSucess || import.GetImportedShape().IsNull() ) {
+		std::shared_ptr<Import> pImport = std::make_shared<Import>( m_pViewer );
+		m_pAppPhase = pImport;
+		bool isImportSucess = pImport->ImportFile( filename, format );
+		if( !isImportSucess || pImport->GetImportedShape().IsNull() ) {
 			return false;
 		}
-		m_PartShape = import.GetImportedShape();
-		ShowPart();
 	}
 
 	// viewer
@@ -112,7 +112,10 @@ private:
 private:
 	// privaye fields
 	// viewer
-	std::unique_ptr<MyViewer> m_pViewer;
+	std::shared_ptr<MyViewer> m_pViewer;
+
+	// AppPhas
+	std::shared_ptr<AppPhaseBase> m_pAppPhase;
 
 	// part
 	TopoDS_Shape m_PartShape;
