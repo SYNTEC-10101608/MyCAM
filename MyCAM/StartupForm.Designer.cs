@@ -33,6 +33,7 @@
 			this.m_tsmiImportSTEP = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiImportIGES = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiImportBRep = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_panView = new System.Windows.Forms.Panel();
 			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -83,18 +84,27 @@
 			this.m_tsmiImportBRep.Text = "BRep";
 			this.m_tsmiImportBRep.Click += new System.EventHandler(this.m_tsmiImportBRep_Click);
 			// 
+			// m_panView
+			// 
+			this.m_panView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_panView.Location = new System.Drawing.Point(0, 24);
+			this.m_panView.Name = "m_panView";
+			this.m_panView.Size = new System.Drawing.Size(584, 537);
+			this.m_panView.TabIndex = 1;
+			this.m_panView.SizeChanged += new System.EventHandler(this.m_panView_SizeChanged);
+			this.m_panView.Paint += new System.Windows.Forms.PaintEventHandler(this.m_panView_Paint);
+			// 
 			// StartupForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.ClientSize = new System.Drawing.Size(584, 561);
+			this.Controls.Add(this.m_panView);
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "StartupForm";
 			this.Text = "五軸切";
-			this.SizeChanged += new System.EventHandler(this.StartupForm_SizeChanged);
-			this.Paint += new System.Windows.Forms.PaintEventHandler(this.StartupForm_Paint);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.ResumeLayout(false);
@@ -110,6 +120,7 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportSTEP;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportIGES;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportBRep;
+		private System.Windows.Forms.Panel m_panView;
 	}
 }
 

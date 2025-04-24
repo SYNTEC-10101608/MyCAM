@@ -7,48 +7,48 @@ namespace MyCAM
 		public StartupForm()
 		{
 			InitializeComponent();
-			myBridge = new AppBridge();
+			m_Bridge = new AppBridge();
 			InitV3D();
 
-			MouseWheel += OnMouseWheel;
-			MouseDown += OnMouseDown;
-			MouseMove += OnMouseMove;
+			m_panView.MouseWheel += OnMouseWheel;
+			m_panView.MouseDown += OnMouseDown;
+			m_panView.MouseMove += OnMouseMove;
 		}
 
 		// viewer
 		void InitV3D()
 		{
-			if( !myBridge.InitViewer( this.Handle ) )
+			if( !m_Bridge.InitViewer( m_panView.Handle ) )
 				MessageBox.Show( "Fatal Error during the graphic initialisation", "Error!",
 						MessageBoxButtons.OK, MessageBoxIcon.Error );
 		}
 
-		void StartupForm_Paint( object sender, PaintEventArgs e )
+		void m_panView_Paint( object sender, PaintEventArgs e )
 		{
-			myBridge.RedrawView();
-			myBridge.UpdateView();
+			m_Bridge.RedrawView();
+			m_Bridge.UpdateView();
 		}
 
-		void StartupForm_SizeChanged( object sender, System.EventArgs e )
+		void m_panView_SizeChanged( object sender, System.EventArgs e )
 		{
-			myBridge.UpdateView();
+			m_Bridge.UpdateView();
 		}
 
 		void OnMouseMove( object sender, MouseEventArgs e )
 		{
-			myBridge.MoveTo( e.X, e.Y );
+			m_Bridge.MoveTo( e.X, e.Y );
 			switch( e.Button ) {
 
 				// translate the viewer
 				case MouseButtons.Middle:
-					myBridge.Pan( e.X - m_nXMousePosition, m_nYMousePosition - e.Y );
+					m_Bridge.Pan( e.X - m_nXMousePosition, m_nYMousePosition - e.Y );
 					m_nXMousePosition = e.X;
 					m_nYMousePosition = e.Y;
 					break;
 
 				// rotate the viewer
 				case MouseButtons.Right:
-					myBridge.Rotation( e.X, e.Y );
+					m_Bridge.Rotation( e.X, e.Y );
 					break;
 				default:
 					break;
@@ -67,7 +67,7 @@ namespace MyCAM
 
 				// press down right button, then start rotatae the viewer
 				case MouseButtons.Right:
-					myBridge.StartRotation( e.X, e.Y );
+					m_Bridge.StartRotation( e.X, e.Y );
 					break;
 				default:
 					break;
@@ -77,13 +77,13 @@ namespace MyCAM
 		void OnMouseWheel( object sender, MouseEventArgs e )
 		{
 			// zoom viewer at start point
-			myBridge.StartZoomAtPoint( e.X, e.Y );
+			m_Bridge.StartZoomAtPoint( e.X, e.Y );
 
 			int nEndX = (int)( e.X + e.X * e.Delta * ZOOM_Ratio );
 			int nEndY = (int)( e.Y + e.Y * e.Delta * ZOOM_Ratio );
 
 			// zoom viewer with mouse wheel delta and scaling ratio
-			myBridge.ZoomAtPoint( e.X, e.Y, nEndX, nEndY );
+			m_Bridge.ZoomAtPoint( e.X, e.Y, nEndX, nEndY );
 		}
 
 		// import
@@ -134,7 +134,7 @@ namespace MyCAM
 			}
 
 			// call the bridge  
-			bool bImportSucess = myBridge.ImportFile( szFileName, (int)format );
+			bool bImportSucess = m_Bridge.ImportFile( szFileName, (int)format );
 			if( !bImportSucess ) {
 				MessageBox.Show( "Error: Import" );
 				return;
@@ -142,7 +142,7 @@ namespace MyCAM
 		}
 
 		// fields
-		AppBridge myBridge;
+		AppBridge m_Bridge;
 
 		// view action
 		int m_nXMousePosition;
