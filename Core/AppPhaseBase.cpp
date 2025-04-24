@@ -2,8 +2,10 @@
 
 using namespace Core;
 
-AppPhaseBase::AppPhaseBase( std::unique_ptr<MyViewer> pViewer )
-	: m_pViewer( std::move( pViewer ) )
+AppPhaseBase::AppPhaseBase( std::shared_ptr<MyViewer> pViewer )
+	: m_pViewer( pViewer )
+	, m_nXMousePosition( 0 )
+	, m_nYMousePosition( 0 )
 {
 	// Constructor implementation
 }

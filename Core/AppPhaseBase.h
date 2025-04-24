@@ -10,7 +10,7 @@ namespace Core
 	class CORE_API AppPhaseBase : public IAppPhase
 	{
 	public:
-		AppPhaseBase( std::unique_ptr<MyViewer> pViewer );
+		AppPhaseBase( std::shared_ptr<MyViewer> pViewer );
 		//virtual ~AppPhaseBase() override = default;
 
 		// IAppPhase interface
@@ -26,9 +26,9 @@ namespace Core
 		void KeyDown( int key, int x, int y ) override;
 
 	private:
-		std::unique_ptr<MyViewer> m_pViewer;
-		int m_nXMousePosition = 0;
-		int m_nYMousePosition = 0;
+		std::shared_ptr<MyViewer> m_pViewer;
+		int m_nXMousePosition;
+		int m_nYMousePosition;
 		const double ZOOM_Ratio = 0.0002;
 	};
 }
