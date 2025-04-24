@@ -63,7 +63,7 @@ void AppPhaseBase::MouseMove( int button, int x, int y )
 	}
 }
 
-void AppPhaseBase::MouseWeel( int delta, int x, int y )
+void AppPhaseBase::MouseWheel( int delta, int x, int y )
 {
 	// zoom viewer at start point
 	m_pViewer->StartZoomAtPoint( x, y );

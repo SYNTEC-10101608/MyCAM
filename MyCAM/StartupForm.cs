@@ -36,54 +36,17 @@ namespace MyCAM
 
 		void OnMouseMove( object sender, MouseEventArgs e )
 		{
-			m_Bridge.MoveTo( e.X, e.Y );
-			switch( e.Button ) {
-
-				// translate the viewer
-				case MouseButtons.Middle:
-					m_Bridge.Pan( e.X - m_nXMousePosition, m_nYMousePosition - e.Y );
-					m_nXMousePosition = e.X;
-					m_nYMousePosition = e.Y;
-					break;
-
-				// rotate the viewer
-				case MouseButtons.Right:
-					m_Bridge.Rotation( e.X, e.Y );
-					break;
-				default:
-					break;
-			}
+			m_Bridge.MouseMove( (int)e.Button, e.X, e.Y );
 		}
 
 		void OnMouseDown( object sender, MouseEventArgs e )
 		{
-			switch( e.Button ) {
-
-				// press down middle button, then start translate the viewer
-				case MouseButtons.Middle:
-					m_nXMousePosition = e.X;
-					m_nYMousePosition = e.Y;
-					break;
-
-				// press down right button, then start rotatae the viewer
-				case MouseButtons.Right:
-					m_Bridge.StartRotation( e.X, e.Y );
-					break;
-				default:
-					break;
-			}
+			m_Bridge.MouseDown( (int)e.Button, e.X, e.Y );
 		}
 
 		void OnMouseWheel( object sender, MouseEventArgs e )
 		{
-			// zoom viewer at start point
-			m_Bridge.StartZoomAtPoint( e.X, e.Y );
-
-			int nEndX = (int)( e.X + e.X * e.Delta * ZOOM_Ratio );
-			int nEndY = (int)( e.Y + e.Y * e.Delta * ZOOM_Ratio );
-
-			// zoom viewer with mouse wheel delta and scaling ratio
-			m_Bridge.ZoomAtPoint( e.X, e.Y, nEndX, nEndY );
+			m_Bridge.MouseWheel( e.Delta, e.X, e.Y );
 		}
 
 		// import

@@ -20,7 +20,7 @@ namespace Core
 		// mouse events
 		void MouseDown( int button, int x, int y ) override;
 		void MouseMove( int button, int x, int y ) override;
-		void MouseWeel( int delta, int x, int y ) override;
+		void MouseWheel( int delta, int x, int y ) override;
 
 		// key events
 		void KeyDown( int key, int x, int y ) override;

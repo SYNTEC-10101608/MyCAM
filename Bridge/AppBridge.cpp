@@ -35,6 +35,21 @@ public:
 	}
 
 	// viewer
+	void MouseDown( int button, int x, int y )
+	{
+		m_pApp->MouseDown( button, x, y );
+	}
+
+	void MouseMove( int button, int x, int y )
+	{
+		m_pApp->MouseMove( button, x, y );
+	}
+
+	void MouseWheel( int delta, int x, int y )
+	{
+		m_pApp->MouseWheel( delta, x, y );
+	}
+
 	void RedrawView()
 	{
 		m_pApp->RedrawView();
@@ -45,44 +60,9 @@ public:
 		m_pApp->UpdateView();
 	}
 
-	void Zoom( int theX1, int theY1, int theX2, int theY2 )
-	{
-		m_pApp->Zoom( theX1, theY1, theX2, theY2 );
-	}
-
-	void ZoomAtPoint( int theX1, int theY1, int theX2, int theY2 )
-	{
-		m_pApp->ZoomAtPoint( theX1, theY1, theX2, theY2 );
-	}
-
-	void StartZoomAtPoint( int theX, int theY )
-	{
-		m_pApp->StartZoomAtPoint( theX, theY );
-	}
-
-	void Pan( int theX, int theY )
-	{
-		m_pApp->Pan( theX, theY );
-	}
-
-	void Rotation( int theX, int theY )
-	{
-		m_pApp->Rotation( theX, theY );
-	}
-
-	void StartRotation( int theX, int theY )
-	{
-		m_pApp->StartRotation( theX, theY );
-	}
-
 	void ZoomAllView()
 	{
 		m_pApp->ZoomAllView();
-	}
-
-	void MoveTo( int theX, int theY )
-	{
-		m_pApp->MoveTo( theX, theY );
 	}
 
 	void UpdateCurrentViewer()

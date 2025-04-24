@@ -15,7 +15,7 @@ namespace Core
 		// mouse events
 		virtual void MouseDown( int button, int x, int y ) = 0;
 		virtual void MouseMove( int button, int x, int y ) = 0;
-		virtual void MouseWeel( int delta, int x, int y ) = 0;
+		virtual void MouseWheel( int delta, int x, int y ) = 0;
 
 		// key events
 		virtual void KeyDown( int key, int x, int y ) = 0;
