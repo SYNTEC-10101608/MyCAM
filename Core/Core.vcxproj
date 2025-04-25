@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="AppPhaseBase.h" />
     <ClInclude Include="CADData.h" />
+    <ClInclude Include="CAMData.h" />
     <ClInclude Include="CoreCommon.h" />
     <ClInclude Include="ExtractPattern.h" />
     <ClInclude Include="framework.h" />
@@ -168,6 +169,7 @@
   <ItemGroup>
     <ClCompile Include="AppPhaseBase.cpp" />
     <ClCompile Include="CADData.cpp" />
+    <ClCompile Include="CAMData.cpp" />
     <ClCompile Include="ExtractPattern.cpp" />
     <ClCompile Include="GeometryTool.cpp" />
     <ClCompile Include="Import.cpp" />

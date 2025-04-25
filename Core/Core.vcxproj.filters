@@ -75,6 +75,9 @@
     <ClInclude Include="SegmentTool.h">
       <Filter>Header Files\Tool</Filter>
     </ClInclude>
+    <ClInclude Include="CAMData.h">
+      <Filter>Header Files\DataStructure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyViewer.cpp">
@@ -106,6 +109,9 @@
     </ClCompile>
     <ClCompile Include="SegmentTool.cpp">
       <Filter>Source Files\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="CAMData.cpp">
+      <Filter>Source Files\DataStructure</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
