@@ -66,6 +66,15 @@
     <ClInclude Include="CoreCommon.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
+    <ClInclude Include="GeometryTool.h">
+      <Filter>Header Files\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorTool.h">
+      <Filter>Header Files\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="SegmentTool.h">
+      <Filter>Header Files\Tool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyViewer.cpp">
@@ -88,6 +97,15 @@
     </ClCompile>
     <ClCompile Include="CADData.cpp">
       <Filter>Source Files\DataStructure</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryTool.cpp">
+      <Filter>Source Files\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorTool.cpp">
+      <Filter>Source Files\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="SegmentTool.cpp">
+      <Filter>Source Files\Tool</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

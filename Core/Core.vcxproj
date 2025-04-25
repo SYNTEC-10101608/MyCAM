@@ -156,20 +156,26 @@
     <ClInclude Include="CoreCommon.h" />
     <ClInclude Include="ExtractPattern.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GeometryTool.h" />
     <ClInclude Include="IAppPhase.h" />
     <ClInclude Include="Import.h" />
     <ClInclude Include="MyApp.h" />
     <ClInclude Include="MyViewer.h" />
+    <ClInclude Include="SegmentTool.h" />
     <ClInclude Include="ShapeTool.h" />
+    <ClInclude Include="VectorTool.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppPhaseBase.cpp" />
     <ClCompile Include="CADData.cpp" />
     <ClCompile Include="ExtractPattern.cpp" />
+    <ClCompile Include="GeometryTool.cpp" />
     <ClCompile Include="Import.cpp" />
     <ClCompile Include="MyApp.cpp" />
     <ClCompile Include="MyViewer.cpp" />
+    <ClCompile Include="SegmentTool.cpp" />
     <ClCompile Include="ShapeTool.cpp" />
+    <ClCompile Include="VectorTool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
