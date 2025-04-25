@@ -2,9 +2,6 @@
 
 #include "CoreCommon.h"
 #include <TopoDS_Shape.hxx>
-#include <TopoDS_Compound.hxx>
-#include <BRep_Builder.hxx>
-#include <BRepBuilderAPI_Sewing.hxx>
 #include <vector>
 
 namespace Core

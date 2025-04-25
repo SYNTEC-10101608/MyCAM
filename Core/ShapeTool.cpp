@@ -1,3 +1,7 @@
+#include <TopoDS_Compound.hxx>
+#include <BRep_Builder.hxx>
+#include <BRepBuilderAPI_Sewing.hxx>
+
 #include "ShapeTool.h"
 
 using namespace Core::Tool;

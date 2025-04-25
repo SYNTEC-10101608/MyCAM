@@ -4,7 +4,6 @@
 #include <gp_Dir.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
-#include <Standard_TypeDef.hxx>
 
 namespace Core
 {
