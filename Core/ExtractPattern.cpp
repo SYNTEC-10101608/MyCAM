@@ -20,56 +20,29 @@
 using namespace Core;
 using namespace Core::Tool;
 
-ExtractPattern::ExtractPattern( const TopoDS_Shape &partShape, std::shared_ptr<MyViewer> pViewer )
+ExtractPattern::ExtractPattern( std::shared_ptr<MyViewer> pViewer )
 	: AppPhaseBase( pViewer )
-	, m_partShape( partShape )
+	, m_partShape()
 	, m_pViewer( pViewer )
+	, m_callback( nullptr )
 {
-	m_callback = nullptr;
+}
+
+AppPhaseType ExtractPattern::GetType() const
+{
+	return AppPhaseType::ExtractPattern;
+}
+
+void ExtractPattern::Init( const TopoDS_Shape &partShape )
+{
+	m_partShape = partShape;
 	SetupViewerStyle();
 	ShowPart();
 }
 
-void ExtractPattern::SetupViewerStyle()
+void ExtractPattern::SetExtractOKCallback( const ExtractOK &callback )
 {
-	Handle( Prs3d_Drawer ) d = m_pViewer->GetAISContext()->HighlightStyle( Prs3d_TypeOfHighlight_LocalSelected );
-	d->SetColor( Quantity_Color( Quantity_NOC_RED ) );
-	d->SetTransparency( 0.5f );
-	d->SetDisplayMode( AIS_Shaded );
-
-	Handle( Prs3d_Drawer ) d1 = m_pViewer->GetAISContext()->HighlightStyle( Prs3d_TypeOfHighlight_Selected );
-	d1->SetColor( Quantity_Color( Quantity_NOC_RED ) );
-	d1->SetTransparency( 0.5f );
-	d1->SetDisplayMode( AIS_Shaded );
-}
-
-void ExtractPattern::ShowPart()
-{
-	Handle( AIS_Shape ) aisShape = new AIS_Shape( m_partShape );
-	aisShape->SetMaterial( Graphic3d_MaterialAspect( Graphic3d_NOM_STEEL ) );
-	aisShape->SetDisplayMode( AIS_Shaded );
-
-	auto ctx = m_pViewer->GetAISContext();
-	ctx->RemoveAll( false );
-	ctx->Display( aisShape, true );
-	//m_pViewer->AxoView();
-	m_pViewer->ZoomAllView();
-
-	ctx->Deactivate();
-	ctx->Activate( AIS_Shape::SelectionMode( TopAbs_FACE ) );
-}
-
-void ExtractPattern::OnExtractOK()
-{
-	auto selectedFaces = GetSelectedFaces();
-	if( selectedFaces.empty() ) return;
-
-	auto cadDataList = BuildCADData( selectedFaces );
-	if( cadDataList.empty() ) {
-		// handle error: No Pattern Found
-		return;
-	}
-	if( m_callback ) m_callback( m_partShape, cadDataList );
+	m_callback = callback;
 }
 
 void ExtractPattern::MouseDown( int button, int x, int y )
@@ -96,10 +69,56 @@ void ExtractPattern::KeyDown( int key )
 	}
 }
 
+void ExtractPattern::OnExtractOK()
+{
+	auto selectedFaces = GetSelectedFaces();
+	if( selectedFaces.empty() ) {
+		return;
+	}
+	auto cadDataList = BuildCADData( selectedFaces );
+	if( cadDataList.empty() ) {
+		return;
+	}
+	if( m_callback ) {
+		m_callback( m_partShape, cadDataList );
+	}
+}
+
+void ExtractPattern::SetupViewerStyle()
+{
+	Handle( AIS_InteractiveContext ) ctx = m_pViewer->GetAISContext();
+	Handle( Prs3d_Drawer ) d = ctx->HighlightStyle( Prs3d_TypeOfHighlight_LocalSelected );
+	d->SetColor( Quantity_Color( Quantity_NOC_RED ) );
+	d->SetTransparency( 0.5f );
+	d->SetDisplayMode( AIS_Shaded );
+
+	Handle( Prs3d_Drawer ) d1 = ctx->HighlightStyle( Prs3d_TypeOfHighlight_Selected );
+	d1->SetColor( Quantity_Color( Quantity_NOC_RED ) );
+	d1->SetTransparency( 0.5f );
+	d1->SetDisplayMode( AIS_Shaded );
+}
+
+void ExtractPattern::ShowPart()
+{
+	Handle( AIS_Shape ) aisShape = new AIS_Shape( m_partShape );
+	aisShape->SetMaterial( Graphic3d_MaterialAspect( Graphic3d_NOM_STEEL ) );
+	aisShape->SetDisplayMode( AIS_Shaded );
+
+	Handle( AIS_InteractiveContext ) ctx = m_pViewer->GetAISContext();
+	ctx->RemoveAll( false );
+	ctx->Display( aisShape, false );
+	ctx->UpdateCurrentViewer();
+	m_pViewer->AxoView();
+	m_pViewer->ZoomAllView();
+
+	ctx->Deactivate();
+	ctx->Activate( AIS_Shape::SelectionMode( TopAbs_FACE ) );
+}
+
 std::vector<TopoDS_Face> ExtractPattern::GetSelectedFaces()
 {
 	std::vector<TopoDS_Face> faces;
-	auto ctx = m_pViewer->GetAISContext();
+	Handle( AIS_InteractiveContext ) ctx = m_pViewer->GetAISContext();
 	ctx->InitSelected();
 	while( ctx->MoreSelected() ) {
 		TopoDS_Shape shape = ctx->SelectedShape();

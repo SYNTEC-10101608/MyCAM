@@ -10,6 +10,11 @@ AppPhaseBase::AppPhaseBase( std::shared_ptr<MyViewer> pViewer )
 	// Constructor implementation
 }
 
+AppPhaseType AppPhaseBase::GetType() const
+{
+	return AppPhaseType::None;
+}
+
 void AppPhaseBase::Enter()
 {
 	// Initialize the phase
@@ -68,8 +73,8 @@ void AppPhaseBase::MouseWheel( int delta, int x, int y )
 	// zoom viewer at start point
 	m_pViewer->StartZoomAtPoint( x, y );
 
-	int endX = (int)(x + x * delta * ZOOM_Ratio);
-	int endY = (int)(y + y * delta * ZOOM_Ratio);
+	int endX = ( int )( x + x * delta * ZOOM_Ratio );
+	int endY = ( int )( y + y * delta * ZOOM_Ratio );
 
 	// zoom viewer with mouse wheel delta and scaling ratio
 	m_pViewer->ZoomAtPoint( x, y, endX, endY );

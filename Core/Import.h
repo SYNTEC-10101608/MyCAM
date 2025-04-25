@@ -10,16 +10,21 @@ namespace Core
 	class CORE_API Import : public AppPhaseBase
 	{
 	public:
+		using ImportOK = std::function<void( const TopoDS_Shape & )>;
+
 		Import( std::shared_ptr<MyViewer> pViewer );
+		AppPhaseType GetType() const override;
+		void SetImportOKCallback( const ImportOK &callback );
 		bool ImportFile( const Standard_CString filename, int format );
-		const TopoDS_Shape &GetImportedShape() const;
+
+		// override keydown event
+		void KeyDown( int key ) override;
 
 	private:
-
-		// imported shape
 		TopoDS_Shape m_ImportedShape;
+		ImportOK m_Callback;
 
-		// method
-		void ShowPart() const;
+		void OnImportOK();
+		void ShowPart();
 	};
 }

@@ -21,8 +21,19 @@ using namespace Core;
 
 Import::Import( std::shared_ptr<MyViewer> pViewer )
 	: AppPhaseBase( pViewer )
+	, m_Callback( nullptr )
 	, m_ImportedShape()
 {
+}
+
+AppPhaseType Import::GetType() const
+{
+	return AppPhaseType::Import;
+}
+
+void Import::SetImportOKCallback( const ImportOK &callback )
+{
+	m_Callback = callback;
 }
 
 bool Import::ImportFile( const Standard_CString filename, int format )
@@ -62,12 +73,24 @@ bool Import::ImportFile( const Standard_CString filename, int format )
 	return true;
 }
 
-const TopoDS_Shape &Import::GetImportedShape() const
+void Import::KeyDown( int key )
 {
-	return m_ImportedShape;
+	if( m_ImportedShape.IsNull() ) {
+		return;
+	}
+	if( key == KEY_ENTER ) {
+		OnImportOK();
+	}
 }
 
-void Import::ShowPart() const
+void Import::OnImportOK()
+{
+	if( m_Callback ) {
+		m_Callback( m_ImportedShape );
+	}
+}
+
+void Import::ShowPart()
 {
 	// create AIS shape
 	Handle( AIS_Shape ) aisShape = new AIS_Shape( m_ImportedShape );
@@ -76,7 +99,9 @@ void Import::ShowPart() const
 	aisShape->SetDisplayMode( 1 );
 
 	// display the shape
-	m_pViewer->GetAISContext()->Display( aisShape, false );
-	m_pViewer->GetAISContext()->UpdateCurrentViewer();
+	Handle( AIS_InteractiveContext ) ctx = m_pViewer->GetAISContext();
+	ctx->RemoveAll( false );
+	ctx->Display( aisShape, false );
+	ctx->UpdateCurrentViewer();
 	m_pViewer->ZoomAllView();
 }

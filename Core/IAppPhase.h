@@ -4,10 +4,18 @@
 
 namespace Core
 {
+	enum class AppPhaseType
+	{
+		None,
+		Import,
+		ExtractPattern,
+	};
+
 	class CORE_API IAppPhase
 	{
 	public:
 		//virtual ~IAppPhase() = default;
+		virtual AppPhaseType GetType() const = 0;
 
 		virtual void Enter() = 0;
 		virtual void Exit() = 0;

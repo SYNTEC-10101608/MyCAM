@@ -17,8 +17,10 @@ namespace Core
 	public:
 		using ExtractOK = std::function<void( const TopoDS_Shape &, const std::vector<CADData> & )>;
 
-		ExtractPattern( const TopoDS_Shape &partShape, std::shared_ptr<MyViewer> pViewer );
-		void OnExtractOK();
+		ExtractPattern( std::shared_ptr<MyViewer> pViewer );
+		AppPhaseType GetType() const override;
+		void Init( const TopoDS_Shape &partShape );
+		void SetExtractOKCallback( const ExtractOK &callback );
 
 		// override mousedown event
 		void MouseDown( int button, int x, int y ) override;
@@ -31,6 +33,7 @@ namespace Core
 		std::shared_ptr<MyViewer> m_pViewer;
 		ExtractOK m_callback;
 
+		void OnExtractOK();
 		void SetupViewerStyle();
 		void ShowPart();
 		std::vector<TopoDS_Face> GetSelectedFaces();

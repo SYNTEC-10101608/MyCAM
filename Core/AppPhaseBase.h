@@ -19,6 +19,7 @@ namespace Core
 	public:
 		AppPhaseBase( std::shared_ptr<MyViewer> pViewer );
 		//virtual ~AppPhaseBase() override = default;
+		AppPhaseType GetType() const override;
 
 		// IAppPhase interface
 		void Enter() override;
