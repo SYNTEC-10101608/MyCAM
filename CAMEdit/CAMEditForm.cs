@@ -435,7 +435,7 @@ namespace CAMEdit
 
 					// record point tangent and normal vec ax2
 					CADPoint cadPoint = camData.CADPointList[ nIndex ];
-					m_ToolVecAx2 = new gp_Ax2( cadPoint.Point, cadPoint.NormalVec.Crossed( cadPoint.TangentVec ), cadPoint.TangentVec );
+					m_ToolVecAx2 = new gp_Ax2( cadPoint.Point, cadPoint.NormalVec_2nd.Crossed( cadPoint.TangentVec ), cadPoint.TangentVec );
 					m_SelectedCAMData = camData;
 					m_SelectedIndex = nIndex;
 					editMode = EditMode.TooVec;

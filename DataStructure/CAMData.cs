@@ -18,10 +18,11 @@ namespace DataStructure
 
 	public class CADPoint
 	{
-		public CADPoint( gp_Pnt point, gp_Dir normalVec, gp_Dir tangentVec )
+		public CADPoint( gp_Pnt point, gp_Dir normalVec_1st, gp_Dir normalVec_2nd, gp_Dir tangentVec )
 		{
 			Point = point;
-			NormalVec = normalVec;
+			NormalVec_1st = normalVec_1st;
+			NormalVec_2nd = normalVec_2nd;
 			TangentVec = tangentVec;
 		}
 
@@ -30,8 +31,13 @@ namespace DataStructure
 			get; private set;
 		}
 
+		public gp_Dir NormalVec_1st
+		{
+			get; private set;
+		}
+
 		// normal vector on co-face
-		public gp_Dir NormalVec
+		public gp_Dir NormalVec_2nd
 		{
 			get; private set;
 		}
@@ -220,6 +226,7 @@ namespace DataStructure
 						break;
 					}
 				}
+				TopoDS_Face shellDace = TopoDS.ToFace( shellFaceList[ 0 ] );
 				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by interval
@@ -228,9 +235,10 @@ namespace DataStructure
 
 				// get tool vector for each point
 				foreach( gp_Pnt point in pointList ) {
-					gp_Dir normalVec = VectorTool.GetFaceNormalVec( solidFace, point );
+					gp_Dir normalVec_1st = VectorTool.GetFaceNormalVec( shellDace, point );
+					gp_Dir normalVec_2nd = VectorTool.GetFaceNormalVec( solidFace, point );
 					gp_Dir tangentVec = VectorTool.GetEdgeTangentVec( TopoDS.ToEdge( edge ), point );
-					CADPointList.Add( new CADPoint( point, normalVec, tangentVec ) );
+					CADPointList.Add( new CADPoint( point, normalVec_1st, normalVec_2nd, tangentVec ) );
 				}
 			}
 		}
@@ -242,7 +250,7 @@ namespace DataStructure
 			SetToolVec();
 			SetStartPoint();
 			SetOrientation();
-			//DoOffset();
+			DoOffset();
 			//SetLead();
 		}
 
@@ -252,8 +260,8 @@ namespace DataStructure
 
 				// calculate tool vector
 				CADPoint cadPoint = CADPointList[ i ];
-				gp_Dir toolVec = cadPoint.NormalVec.Crossed( cadPoint.TangentVec );
-				CAMPoint camPoint = new CAMPoint( cadPoint, toolVec );
+				//gp_Dir toolVec = cadPoint.NormalVec_2nd.Crossed( cadPoint.TangentVec );
+				CAMPoint camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st );
 				m_CAMPointList.Add( camPoint );
 			}
 			ModifyToolVec();
@@ -321,7 +329,7 @@ namespace DataStructure
 
 			// get the x, y, z direction
 			gp_Dir x = camPoint.CADPoint.TangentVec;
-			gp_Dir z = camPoint.CADPoint.NormalVec.Crossed( camPoint.CADPoint.TangentVec );
+			gp_Dir z = camPoint.CADPoint.NormalVec_2nd.Crossed( camPoint.CADPoint.TangentVec );
 			gp_Dir y = z.Crossed( x );
 
 			// X:Y:Z = tanA:tanB:1
@@ -365,40 +373,46 @@ namespace DataStructure
 
 		void DoOffset()
 		{
-			if( m_CAMPointList.Count == 0 ) {
+			if( m_CAMPointList.Count == 0 || m_Offset == 0 ) {
 				return;
 			}
 
 			// get line by points and offset the line
 			List<LineRecord> lineRecordList = new List<LineRecord>();
 			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
+				int i1 = i;
+				int i2 = ( i + 1 ) % m_CAMPointList.Count;
 				gp_Pnt p1 = m_CAMPointList[ i ].CADPoint.Point;
-				gp_Pnt p2 = m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.Point;
+				gp_Pnt p2 = m_CAMPointList[ i2 ].CADPoint.Point;
 
-				// if p1 is equal to p2, skip
+				// if p1 is equal to p2, skip, this will result a "milter"
 				if( p1.IsEqual( p2, 1e-6 ) ) {
 					continue;
 				}
 
 				// calculate the offset direction by cross of tangent and tool vector
 				gp_Dir p1OffsetDir = m_CAMPointList[ i ].CADPoint.TangentVec.Crossed( m_CAMPointList[ i ].ToolVec );
-				gp_Dir p2OffsetDir = m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.TangentVec
-					.Crossed( m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].ToolVec );
+				gp_Dir p2OffsetDir = m_CAMPointList[ i2 ].CADPoint.TangentVec.Crossed( m_CAMPointList[ i2 ].ToolVec );
 
 				// offset the point by offset vector
 				gp_Pnt p1Offset = new gp_Pnt( p1.XYZ() + p1OffsetDir.XYZ() * Offset );
 				gp_Pnt p2Offset = new gp_Pnt( p2.XYZ() + p2OffsetDir.XYZ() * Offset );
-				CAMPoint p1CAMOffset = new CAMPoint( new CADPoint( p1Offset, p1OffsetDir, m_CAMPointList[ i ].CADPoint.TangentVec ), m_CAMPointList[ i ].ToolVec );
-				CAMPoint p2CAMOffset = new CAMPoint( new CADPoint( p2Offset, p2OffsetDir, m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.TangentVec ),
-					m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].ToolVec );
+				if( p1Offset.IsEqual( p2Offset, 1e-6 ) ) {
+					continue;
+				}
+				CAMPoint p1CAMOffset = new CAMPoint( OffsetCADPoint( m_CAMPointList[ i ].CADPoint, p1Offset ), m_CAMPointList[ i ].ToolVec );
+				CAMPoint p2CAMOffset = new CAMPoint( OffsetCADPoint( m_CAMPointList[ i2 ].CADPoint, p2Offset ), m_CAMPointList[ i2 ].ToolVec );
 				lineRecordList.Add( new LineRecord()
 				{
-					OriPoint = new Tuple<CAMPoint, CAMPoint>( m_CAMPointList[ i ], m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ] ),
+					OriPoint = new Tuple<CAMPoint, CAMPoint>( m_CAMPointList[ i ], m_CAMPointList[ i2 ] ),
 					OffsetPoint = new Tuple<CAMPoint, CAMPoint>( p1CAMOffset, p2CAMOffset )
 				} );
 			}
+			if( lineRecordList.Count == 0 ) {
+				return;
+			}
 
-			// clip the offset lines and get the intersect points
+			// clip the self-intersecting lines
 			List<CAMPoint> offsetCAMPointList = new List<CAMPoint>();
 			for( int i = 0; i < lineRecordList.Count + 1; i++ ) {
 				bool bClip = true;
@@ -439,13 +453,10 @@ namespace DataStructure
 							i--;
 						}
 					}
-					if( bClip ) {
-						continue;
-					}
 				}
 			}
 
-			// update the CAM point list
+			// serialize the offset lines
 			for( int i = 0; i < lineRecordList.Count; i++ ) {
 				int indexL1 = i;
 				int indexL2 = ( i + 1 ) % lineRecordList.Count;
@@ -458,9 +469,10 @@ namespace DataStructure
 
 				// get average tagent, normal and tool vector
 				gp_Dir tangentVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.CADPoint.TangentVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.CADPoint.TangentVec.XYZ() );
-				gp_Dir normalVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.CADPoint.NormalVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.CADPoint.NormalVec.XYZ() );
+				gp_Dir normalVec_1st = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.CADPoint.NormalVec_1st.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.CADPoint.NormalVec_1st.XYZ() );
+				gp_Dir normalVec_2nd = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.CADPoint.NormalVec_2nd.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.CADPoint.NormalVec_2nd.XYZ() );
 				gp_Dir toolVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.ToolVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.ToolVec.XYZ() );
-				offsetCAMPointList.Add( new CAMPoint( new CADPoint( intersectPoint, normalVec, tangentVec ), toolVec ) );
+				offsetCAMPointList.Add( new CAMPoint( new CADPoint( intersectPoint, normalVec_1st, normalVec_2nd, tangentVec ), toolVec ) );
 			}
 
 			// modify index
@@ -470,10 +482,20 @@ namespace DataStructure
 
 			// add a point to close polygon
 			CAMPoint closePoint = new CAMPoint(
-				new CADPoint( lastPoint.CADPoint.Point, lastPoint.CADPoint.NormalVec, lastPoint.CADPoint.TangentVec ),
-				lastPoint.ToolVec );
+				new CADPoint( lastPoint.CADPoint.Point,
+				lastPoint.CADPoint.NormalVec_1st,
+				lastPoint.CADPoint.NormalVec_2nd,
+				lastPoint.CADPoint.TangentVec ), lastPoint.ToolVec );
 			offsetCAMPointList.Add( closePoint );
 			m_CAMPointList = offsetCAMPointList;
+		}
+
+		CADPoint OffsetCADPoint( CADPoint originalPoint, gp_Pnt newLocation )
+		{
+			return new CADPoint( newLocation,
+				originalPoint.NormalVec_1st,
+				originalPoint.NormalVec_2nd,
+				originalPoint.TangentVec );
 		}
 
 		void SetLead()
