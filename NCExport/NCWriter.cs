@@ -1,8 +1,10 @@
 ﻿using DataStructure;
 using OCC.gp;
+using OCCTool;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace NCExport
 {
@@ -38,24 +40,44 @@ namespace NCExport
 			m_StreamWriter.Close();
 		}
 
+		//void WriteCutting( CuttingProcessData cuttingProcessData )
+		//{
+		//	// write each cam data point
+		//	m_StreamWriter.WriteLine( "// Cutting" );
+		//	foreach( CAMPoint camPoint in cuttingProcessData.CAMData.CAMPointList ) {
+		//		ConvertIJKToABC( camPoint.ToolVec, out double dA_MCS, out double dC_MCS );
+		//		string szX = camPoint.CADPoint.Point.X().ToString( "F3" );
+		//		string szY = camPoint.CADPoint.Point.Y().ToString( "F3" );
+		//		string szZ = camPoint.CADPoint.Point.Z().ToString( "F3" );
+		//		string szA = dA_MCS.ToString( "F3" );
+		//		string szC = dC_MCS.ToString( "F3" );
+
+		//		// for G43.5 test
+		//		//string szI = camPoint.ToolVec.X().ToString( "F3" );
+		//		//string szJ = camPoint.ToolVec.Y().ToString( "F3" );
+		//		//string szK = camPoint.ToolVec.Z().ToString( "F3" );
+		//		//m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} I{szI} J{szJ} K{szK}" );
+		//		m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A{szA} C{szC}" );
+		//	}
+		//}
+
 		void WriteCutting( CuttingProcessData cuttingProcessData )
 		{
+			List<Tuple<double, double>> rotaryAxisPosList = PostTool.ConvertIJKToABC( cuttingProcessData.CAMData.CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList() );
+
 			// write each cam data point
 			m_StreamWriter.WriteLine( "// Cutting" );
-			foreach( CAMPoint camPoint in cuttingProcessData.CAMData.CAMPointList ) {
-				ConvertIJKToABC( camPoint.ToolVec, out double dA_MCS, out double dC_MCS );
-				string szX = camPoint.CADPoint.Point.X().ToString( "F3" );
-				string szY = camPoint.CADPoint.Point.Y().ToString( "F3" );
-				string szZ = camPoint.CADPoint.Point.Z().ToString( "F3" );
-				string szA = dA_MCS.ToString( "F3" );
-				string szC = dC_MCS.ToString( "F3" );
-
-				// for G43.5 test
-				//string szI = camPoint.ToolVec.X().ToString( "F3" );
-				//string szJ = camPoint.ToolVec.Y().ToString( "F3" );
-				//string szK = camPoint.ToolVec.Z().ToString( "F3" );
-				//m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} I{szI} J{szJ} K{szK}" );
+			int i = 0;
+			foreach( var pos in rotaryAxisPosList ) {
+				double dA_MCS_deg = pos.Item2 * 180 / Math.PI;
+				double dC_MCS_deg = pos.Item1 * 180 / Math.PI;
+				string szX = cuttingProcessData.CAMData.CAMPointList[ i ].CADPoint.Point.X().ToString( "F3" );
+				string szY = cuttingProcessData.CAMData.CAMPointList[ i ].CADPoint.Point.Y().ToString( "F3" );
+				string szZ = cuttingProcessData.CAMData.CAMPointList[ i ].CADPoint.Point.Z().ToString( "F3" );
+				string szA = dA_MCS_deg.ToString( "F3" );
+				string szC = dC_MCS_deg.ToString( "F3" );
 				m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A{szA} C{szC}" );
+				i++;
 			}
 		}
 

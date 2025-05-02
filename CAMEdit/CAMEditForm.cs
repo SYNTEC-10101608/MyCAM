@@ -105,6 +105,7 @@ namespace CAMEdit
 		int m_SelectedIndex = -1;
 
 		// for viewer resource handle
+		AIS_Shape m_PartAIS = null; // for part shape
 		List<AIS_Shape> m_CADContourAISList = new List<AIS_Shape>(); // for active only, no need refresh
 		List<AIS_Shape> m_CAMContourAISList = new List<AIS_Shape>(); // need refresh
 		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh
@@ -113,8 +114,14 @@ namespace CAMEdit
 		// for simulation
 		TopoDS_Shape m_HeadA;
 		TopoDS_Shape m_HeadC;
+		TopoDS_Shape m_TableA;
+		TopoDS_Shape m_TableC;
+		TopoDS_Shape m_Machine;
 		AIS_Shape m_HeadAAIS;
 		AIS_Shape m_HeadCAIS;
+		AIS_Shape m_TableAAIS;
+		AIS_Shape m_TableCAIS;
+		AIS_Shape m_MachineAIS;
 		bool m_bSimulation = true;
 		int m_SimulationIndex = 0;
 		List<Tuple<double, double>> m_SimulationCAData = new List<Tuple<double, double>>();
@@ -135,12 +142,12 @@ namespace CAMEdit
 			}
 
 			// display the part
-			AIS_Shape partAIS = new AIS_Shape( partShape );
+			m_PartAIS = new AIS_Shape( partShape );
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			partAIS.SetMaterial( aspect );
-			partAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_OCCViewer.GetAISContext().Display( partAIS, false );
-			m_OCCViewer.GetAISContext().Deactivate( partAIS );
+			m_PartAIS.SetMaterial( aspect );
+			m_PartAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			m_OCCViewer.GetAISContext().Display( m_PartAIS, false );
+			m_OCCViewer.GetAISContext().Deactivate( m_PartAIS );
 
 			// update the viewer
 			m_OCCViewer.AxoView();
@@ -184,7 +191,7 @@ namespace CAMEdit
 			ShowCAMContour();
 			ShowToolVec();
 			ShowOrientation();
-			ConvertIJKToABC();
+			m_SimulationCAData = PostTool.ConvertIJKToABC( m_Model.CAMDataList[ 0 ].CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList() );
 			m_OCCViewer.UpdateView();
 		}
 
@@ -399,7 +406,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Down ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex += 3;
+					m_SimulationIndex += 2;
 					if( m_SimulationIndex >= m_Model.CAMDataList[ 0 ].CAMPointList.Count ) {
 						m_SimulationIndex = 0;
 					}
@@ -408,7 +415,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Up ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex -= 3;
+					m_SimulationIndex -= 2;
 					if( m_SimulationIndex < 0 ) {
 						m_SimulationIndex = m_Model.CAMDataList[ 0 ].CAMPointList.Count - 1;
 					}
@@ -896,126 +903,134 @@ namespace CAMEdit
 		// simulation
 		void MakeSimulationData()
 		{
+			// the machine
+			BRepPrimAPI_MakeBox outBoxMakerMachine = new BRepPrimAPI_MakeBox( new gp_Pnt( -170, -120, -200 ), 340, 240, 240 );
+			BRepPrimAPI_MakeBox inBoxMakerMachine = new BRepPrimAPI_MakeBox( new gp_Pnt( -150, -120, -180 ), 300, 240, 220 );
+			BRepAlgoAPI_Cut cutMakerMachine = new BRepAlgoAPI_Cut( outBoxMakerMachine.Shape(), inBoxMakerMachine.Shape() );
+			m_Machine = cutMakerMachine.Shape();
+			m_MachineAIS = new AIS_Shape( m_Machine );
+			Graphic3d_MaterialAspect aspectMachine = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			m_MachineAIS.SetMaterial( aspectMachine );
+			m_MachineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			m_MachineAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			m_OCCViewer.GetAISContext().Display( m_MachineAIS, false );
+
 			// the HeadC
-			BRepPrimAPI_MakeBox outBoxMakerC = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -50, -50 ), 100, 100, 100 );
-			BRepPrimAPI_MakeBox inBoxMakerC = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -50, -50 ), 90, 100, 90 );
-			BRepAlgoAPI_Cut cutMakerC = new BRepAlgoAPI_Cut( outBoxMakerC.Shape(), inBoxMakerC.Shape() );
-			m_HeadC = cutMakerC.Shape();
-			m_HeadCAIS = new AIS_Shape( m_HeadC );
-			Graphic3d_MaterialAspect aspectA = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			m_HeadCAIS.SetMaterial( aspectA );
-			m_HeadCAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
-			m_HeadCAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_HeadCAIS.SetTransparency( 0.8 );
-			m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
+			//BRepPrimAPI_MakeBox outBoxMakerHeadC = new BRepPrimAPI_MakeBox( new gp_Pnt( -70, -70, 0 ), 140, 140, 120 );
+			//BRepPrimAPI_MakeBox inBoxMakerHeadC = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -70, 0 ), 100, 140, 100 );
+			//BRepAlgoAPI_Cut cutMakerHeadC = new BRepAlgoAPI_Cut( outBoxMakerHeadC.Shape(), inBoxMakerHeadC.Shape() );
+			//m_HeadC = cutMakerHeadC.Shape();
+			//m_HeadCAIS = new AIS_Shape( m_HeadC );
+			//Graphic3d_MaterialAspect aspectHeadC = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			//m_HeadCAIS.SetMaterial( aspectHeadC );
+			//m_HeadCAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+			//m_HeadCAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			//m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
 
 			// the HeadA
-			BRepPrimAPI_MakeBox boxMakerA = new BRepPrimAPI_MakeBox( new gp_Pnt( -30, -30, -30 ), 60, 60, 60 );
-			BRepPrimAPI_MakeCylinder cylinderMakerA = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -30 ), new gp_Dir( 0, 0, -1 ) ), 20, 40 );
-			BRepPrimAPI_MakeCone coneMakeA = new BRepPrimAPI_MakeCone( new gp_Ax2( new gp_Pnt( 0, 0, -70 ), new gp_Dir( 0, 0, -1 ) ), 5, 0, 40 );
-			BRepAlgoAPI_Fuse fuseMakerA1 = new BRepAlgoAPI_Fuse( boxMakerA.Shape(), cylinderMakerA.Shape() );
-			BRepAlgoAPI_Fuse fuseMakerA2 = new BRepAlgoAPI_Fuse( fuseMakerA1.Shape(), coneMakeA.Shape() );
-			m_HeadA = fuseMakerA2.Shape();
+			BRepPrimAPI_MakeBox boxMakerHeadA = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -50, -100 ), 100, 100, 150 );
+			BRepPrimAPI_MakeCone coneMakeHeadA = new BRepPrimAPI_MakeCone( new gp_Ax2( new gp_Pnt( 0, 0, -100 ), new gp_Dir( 0, 0, -1 ) ), 5, 0, 50 );
+			BRepAlgoAPI_Fuse fuseMakerHeadA = new BRepAlgoAPI_Fuse( boxMakerHeadA.Shape(), coneMakeHeadA.Shape() );
+			m_HeadA = fuseMakerHeadA.Shape();
 			m_HeadAAIS = new AIS_Shape( m_HeadA );
-			Graphic3d_MaterialAspect aspectC = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			m_HeadAAIS.SetMaterial( aspectC );
+			Graphic3d_MaterialAspect aspectHeadA = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			m_HeadAAIS.SetMaterial( aspectHeadA );
 			m_HeadAAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			m_HeadAAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_HeadAAIS.SetTransparency( 0.6 );
 			m_OCCViewer.GetAISContext().Display( m_HeadAAIS, false );
 
+			// the TableA
+			BRepPrimAPI_MakeBox outBoxMakerTableA = new BRepPrimAPI_MakeBox( new gp_Pnt( -150, -120, -40 ), 300, 240, 60 );
+			BRepPrimAPI_MakeBox inBoxMakerTableA = new BRepPrimAPI_MakeBox( new gp_Pnt( -130, -120, -20 ), 260, 240, 40 );
+			BRepAlgoAPI_Cut cutMakerTableA = new BRepAlgoAPI_Cut( outBoxMakerTableA.Shape(), inBoxMakerTableA.Shape() );
+			m_TableA = cutMakerTableA.Shape();
+			m_TableAAIS = new AIS_Shape( m_TableA );
+			Graphic3d_MaterialAspect aspectTableA1 = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			m_TableAAIS.SetMaterial( aspectTableA1 );
+			m_TableAAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+			m_TableAAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			m_OCCViewer.GetAISContext().Display( m_TableAAIS, false );
+
+			// the TableC
+			BRepPrimAPI_MakeCylinder boxMakerTableC = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -20 ), new gp_Dir( 0, 0, 1 ) ), 100, 20 );
+			BRepPrimAPI_MakeBox inBoxMakerTableC = new BRepPrimAPI_MakeBox( new gp_Pnt( -5, -120, -20 ), 10, 240, 20 );
+			BRepAlgoAPI_Cut cutMakerTableC = new BRepAlgoAPI_Cut( boxMakerTableC.Shape(), inBoxMakerTableC.Shape() );
+			m_TableC = cutMakerTableC.Shape();
+			m_TableCAIS = new AIS_Shape( m_TableC );
+			Graphic3d_MaterialAspect aspectTableC = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			m_TableCAIS.SetMaterial( aspectTableC );
+			m_TableCAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+			m_TableCAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			m_OCCViewer.GetAISContext().Display( m_TableCAIS, false );
+
 			// convert the IJK to ABC
-			ConvertIJKToABC();
+			m_SimulationCAData = PostTool.ConvertIJKToABC( m_Model.CAMDataList[ 0 ].CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList() );
 		}
 
 		void UpdateHead()
 		{
 			// get the target location and orientation
 			gp_Pnt p = m_Model.CAMDataList[ 0 ].CAMPointList[ m_SimulationIndex ].CADPoint.Point;
-			gp_Dir d = m_Model.CAMDataList[ 0 ].CAMPointList[ m_SimulationIndex ].ToolVec;
 
 			// calculate the A and C angle
 			double dC = m_SimulationCAData[ m_SimulationIndex ].Item1;
 			double dA = m_SimulationCAData[ m_SimulationIndex ].Item2;
 			gp_Trsf trsfC = new gp_Trsf();
-			trsfC.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), dC );
+			trsfC.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), -dC );
 			gp_Trsf trsfA = new gp_Trsf();
-			trsfA.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) ), dA );
+			trsfA.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) ), -dA );
 			gp_Trsf trsfCA = trsfC.Multiplied( trsfA );
+			gp_Trsf trsfAC = trsfA.Multiplied( trsfC );
 
 			// move the head to the target location
-			gp_Pnt tcp0 = new gp_Pnt( 0, 0, -110 );
-			gp_Pnt tcp1 = tcp0.Transformed( trsfCA );
+			//gp_Pnt tcp0 = new gp_Pnt( 0, 0, -150 );
+			//gp_Pnt tcp1 = tcp0.Transformed( trsfCA );
+			//gp_Trsf trsfT = new gp_Trsf();
+			//trsfT.SetTranslation( new gp_Vec( p.XYZ() - tcp1.XYZ() ) );
+			//m_HeadCAIS.SetLocalTransformation( trsfT.Multiplied( trsfC ) );
+			//m_HeadAAIS.SetLocalTransformation( trsfT.Multiplied( trsfCA ) );
+
+			// move the table and part to the target location
+			gp_Pnt tcp0 = new gp_Pnt( 0, 0, -150 );
+			gp_Pnt p1 = p.Transformed( trsfAC );
 			gp_Trsf trsfT = new gp_Trsf();
-			trsfT.SetTranslation( new gp_Vec( p.XYZ() - tcp1.XYZ() ) );
-			m_HeadCAIS.SetLocalTransformation( trsfT.Multiplied( trsfC ) );
-			m_HeadAAIS.SetLocalTransformation( trsfT.Multiplied( trsfCA ) );
+			trsfT.SetTranslation( new gp_Vec( tcp0.XYZ() - p1.XYZ() ) );
+			m_MachineAIS.SetLocalTransformation( trsfT );
+			m_TableAAIS.SetLocalTransformation( trsfT.Multiplied( trsfA ) );
+			gp_Trsf trsfPart = trsfT.Multiplied( trsfAC );
+			m_TableCAIS.SetLocalTransformation( trsfPart );
+			m_PartAIS.SetLocalTransformation( trsfPart );
+
+			// move the CADCAM to the target location
+			foreach( AIS_Line lineAIS in m_ToolVecAISList ) {
+				lineAIS.SetLocalTransformation( trsfPart );
+			}
+			foreach( AIS_Shape oneShape in m_CADContourAISList ) {
+				oneShape.SetLocalTransformation( trsfPart );
+			}
+			foreach( AIS_Shape oneShape in m_CAMContourAISList ) {
+				oneShape.SetLocalTransformation( trsfPart );
+			}
 			m_OCCViewer.UpdateView();
-		}
-
-		void ConvertIJKToABC()
-		{
-			List<gp_Dir> toolVecList = m_Model.CAMDataList[ 0 ].CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList();
-			m_SimulationCAData = new List<Tuple<double, double>>();
-			List<bool> singularPointList = new List<bool>();
-			double dC = 0;
-
-			// calculate the A and C angle
-			for( int i = 0; i < toolVecList.Count; i++ ) {
-				bool bCPlus = true;
-				if( Math.Abs( toolVecList[ i ].X() ) < 1e-6 && Math.Abs( toolVecList[ i ].Y() ) < 1e-6 ) {
-
-					// the singular case
-					singularPointList.Add( true );
-				}
-				else {
-					double dC1 = ( ( Math.Atan2( toolVecList[ i ].X(), -toolVecList[ i ].Y() ) ) + 2 * Math.PI ) % ( 2 * Math.PI );
-					double dC2 = ( ( Math.Atan2( -toolVecList[ i ].X(), toolVecList[ i ].Y() ) ) + 2 * Math.PI ) % ( 2 * Math.PI );
-					if( Math.Abs( dC1 - dC ) <= Math.Abs( dC2 - dC ) ) {
-						dC = dC1;
-						bCPlus = true;
-					}
-					else {
-						dC = dC2;
-						bCPlus = false;
-					}
-					singularPointList.Add( false );
-				}
-				double dA = Math.Acos( toolVecList[ i ].Z() );
-				if( !bCPlus ) {
-					dA *= -1;
-				}
-				m_SimulationCAData.Add( new Tuple<double, double>( dC, dA ) );
-			}
-
-			// refine the singular case
-			int index = 0;
-			while( index < m_SimulationCAData.Count ) {
-				int index0 = index;
-				while( index < m_SimulationCAData.Count - 1 && singularPointList[ index ] ) {
-					index++;
-				}
-
-				// interpolate C from index0 to index
-				double diffC = m_SimulationCAData[ index ].Item1 - m_SimulationCAData[ index0 ].Item1;
-				for( int i = index0; i < index; i++ ) {
-					m_SimulationCAData[ i ] = new Tuple<double, double>( m_SimulationCAData[ i ].Item1 + diffC / ( index - index0 ) * ( i - index0 ), 0 );
-				}
-				index++;
-			}
 		}
 
 		void ShowHead()
 		{
-			m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
+			m_OCCViewer.GetAISContext().Display( m_MachineAIS, false );
+			//m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
 			m_OCCViewer.GetAISContext().Display( m_HeadAAIS, false );
+			m_OCCViewer.GetAISContext().Display( m_TableAAIS, false );
+			m_OCCViewer.GetAISContext().Display( m_TableCAIS, false );
 			m_OCCViewer.UpdateView();
 		}
 
 		void HideHead()
 		{
-			m_OCCViewer.GetAISContext().Remove( m_HeadCAIS, false );
+			m_OCCViewer.GetAISContext().Remove( m_MachineAIS, false );
+			//m_OCCViewer.GetAISContext().Remove( m_HeadCAIS, false );
 			m_OCCViewer.GetAISContext().Remove( m_HeadAAIS, false );
+			m_OCCViewer.GetAISContext().Remove( m_TableAAIS, false );
+			m_OCCViewer.GetAISContext().Remove( m_TableCAIS, false );
 			m_OCCViewer.UpdateView();
 		}
 	}
