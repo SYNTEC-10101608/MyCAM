@@ -904,28 +904,28 @@ namespace CAMEdit
 		void MakeSimulationData()
 		{
 			// the machine
-			BRepPrimAPI_MakeBox outBoxMakerMachine = new BRepPrimAPI_MakeBox( new gp_Pnt( -170, -120, -200 ), 340, 240, 240 );
-			BRepPrimAPI_MakeBox inBoxMakerMachine = new BRepPrimAPI_MakeBox( new gp_Pnt( -150, -120, -180 ), 300, 240, 220 );
-			BRepAlgoAPI_Cut cutMakerMachine = new BRepAlgoAPI_Cut( outBoxMakerMachine.Shape(), inBoxMakerMachine.Shape() );
-			m_Machine = cutMakerMachine.Shape();
-			m_MachineAIS = new AIS_Shape( m_Machine );
-			Graphic3d_MaterialAspect aspectMachine = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			m_MachineAIS.SetMaterial( aspectMachine );
-			m_MachineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			m_MachineAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_OCCViewer.GetAISContext().Display( m_MachineAIS, false );
+			//BRepPrimAPI_MakeBox outBoxMakerMachine = new BRepPrimAPI_MakeBox( new gp_Pnt( -170, -120, -200 ), 340, 240, 240 );
+			//BRepPrimAPI_MakeBox inBoxMakerMachine = new BRepPrimAPI_MakeBox( new gp_Pnt( -150, -120, -180 ), 300, 240, 220 );
+			//BRepAlgoAPI_Cut cutMakerMachine = new BRepAlgoAPI_Cut( outBoxMakerMachine.Shape(), inBoxMakerMachine.Shape() );
+			//m_Machine = cutMakerMachine.Shape();
+			//m_MachineAIS = new AIS_Shape( m_Machine );
+			//Graphic3d_MaterialAspect aspectMachine = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			//m_MachineAIS.SetMaterial( aspectMachine );
+			//m_MachineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			//m_MachineAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			//m_OCCViewer.GetAISContext().Display( m_MachineAIS, false );
 
 			// the HeadC
-			//BRepPrimAPI_MakeBox outBoxMakerHeadC = new BRepPrimAPI_MakeBox( new gp_Pnt( -70, -70, 0 ), 140, 140, 120 );
-			//BRepPrimAPI_MakeBox inBoxMakerHeadC = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -70, 0 ), 100, 140, 100 );
-			//BRepAlgoAPI_Cut cutMakerHeadC = new BRepAlgoAPI_Cut( outBoxMakerHeadC.Shape(), inBoxMakerHeadC.Shape() );
-			//m_HeadC = cutMakerHeadC.Shape();
-			//m_HeadCAIS = new AIS_Shape( m_HeadC );
-			//Graphic3d_MaterialAspect aspectHeadC = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			//m_HeadCAIS.SetMaterial( aspectHeadC );
-			//m_HeadCAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
-			//m_HeadCAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			//m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
+			BRepPrimAPI_MakeBox outBoxMakerHeadC = new BRepPrimAPI_MakeBox( new gp_Pnt( -70, -70, 0 ), 140, 140, 120 );
+			BRepPrimAPI_MakeBox inBoxMakerHeadC = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -70, 0 ), 100, 140, 100 );
+			BRepAlgoAPI_Cut cutMakerHeadC = new BRepAlgoAPI_Cut( outBoxMakerHeadC.Shape(), inBoxMakerHeadC.Shape() );
+			m_HeadC = cutMakerHeadC.Shape();
+			m_HeadCAIS = new AIS_Shape( m_HeadC );
+			Graphic3d_MaterialAspect aspectHeadC = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			m_HeadCAIS.SetMaterial( aspectHeadC );
+			m_HeadCAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+			m_HeadCAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
 
 			// the HeadA
 			BRepPrimAPI_MakeBox boxMakerHeadA = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -50, -100 ), 100, 100, 150 );
@@ -940,28 +940,28 @@ namespace CAMEdit
 			m_OCCViewer.GetAISContext().Display( m_HeadAAIS, false );
 
 			// the TableA
-			BRepPrimAPI_MakeBox outBoxMakerTableA = new BRepPrimAPI_MakeBox( new gp_Pnt( -150, -120, -40 ), 300, 240, 60 );
-			BRepPrimAPI_MakeBox inBoxMakerTableA = new BRepPrimAPI_MakeBox( new gp_Pnt( -130, -120, -20 ), 260, 240, 40 );
-			BRepAlgoAPI_Cut cutMakerTableA = new BRepAlgoAPI_Cut( outBoxMakerTableA.Shape(), inBoxMakerTableA.Shape() );
-			m_TableA = cutMakerTableA.Shape();
-			m_TableAAIS = new AIS_Shape( m_TableA );
-			Graphic3d_MaterialAspect aspectTableA1 = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			m_TableAAIS.SetMaterial( aspectTableA1 );
-			m_TableAAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
-			m_TableAAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_OCCViewer.GetAISContext().Display( m_TableAAIS, false );
+			//BRepPrimAPI_MakeBox outBoxMakerTableA = new BRepPrimAPI_MakeBox( new gp_Pnt( -150, -120, -40 ), 300, 240, 60 );
+			//BRepPrimAPI_MakeBox inBoxMakerTableA = new BRepPrimAPI_MakeBox( new gp_Pnt( -130, -120, -20 ), 260, 240, 40 );
+			//BRepAlgoAPI_Cut cutMakerTableA = new BRepAlgoAPI_Cut( outBoxMakerTableA.Shape(), inBoxMakerTableA.Shape() );
+			//m_TableA = cutMakerTableA.Shape();
+			//m_TableAAIS = new AIS_Shape( m_TableA );
+			//Graphic3d_MaterialAspect aspectTableA1 = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			//m_TableAAIS.SetMaterial( aspectTableA1 );
+			//m_TableAAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+			//m_TableAAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			//m_OCCViewer.GetAISContext().Display( m_TableAAIS, false );
 
 			// the TableC
-			BRepPrimAPI_MakeCylinder boxMakerTableC = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -20 ), new gp_Dir( 0, 0, 1 ) ), 100, 20 );
-			BRepPrimAPI_MakeBox inBoxMakerTableC = new BRepPrimAPI_MakeBox( new gp_Pnt( -5, -120, -20 ), 10, 240, 20 );
-			BRepAlgoAPI_Cut cutMakerTableC = new BRepAlgoAPI_Cut( boxMakerTableC.Shape(), inBoxMakerTableC.Shape() );
-			m_TableC = cutMakerTableC.Shape();
-			m_TableCAIS = new AIS_Shape( m_TableC );
-			Graphic3d_MaterialAspect aspectTableC = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			m_TableCAIS.SetMaterial( aspectTableC );
-			m_TableCAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
-			m_TableCAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_OCCViewer.GetAISContext().Display( m_TableCAIS, false );
+			//BRepPrimAPI_MakeCylinder boxMakerTableC = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -20 ), new gp_Dir( 0, 0, 1 ) ), 100, 20 );
+			//BRepPrimAPI_MakeBox inBoxMakerTableC = new BRepPrimAPI_MakeBox( new gp_Pnt( -5, -120, -20 ), 10, 240, 20 );
+			//BRepAlgoAPI_Cut cutMakerTableC = new BRepAlgoAPI_Cut( boxMakerTableC.Shape(), inBoxMakerTableC.Shape() );
+			//m_TableC = cutMakerTableC.Shape();
+			//m_TableCAIS = new AIS_Shape( m_TableC );
+			//Graphic3d_MaterialAspect aspectTableC = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			//m_TableCAIS.SetMaterial( aspectTableC );
+			//m_TableCAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+			//m_TableCAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			//m_OCCViewer.GetAISContext().Display( m_TableCAIS, false );
 
 			// convert the IJK to ABC
 			m_SimulationCAData = PostTool.ConvertIJKToABC( m_Model.CAMDataList[ 0 ].CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList() );
@@ -976,61 +976,62 @@ namespace CAMEdit
 			double dC = m_SimulationCAData[ m_SimulationIndex ].Item1;
 			double dA = m_SimulationCAData[ m_SimulationIndex ].Item2;
 			gp_Trsf trsfC = new gp_Trsf();
-			trsfC.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), -dC );
+			trsfC.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), dC );
 			gp_Trsf trsfA = new gp_Trsf();
-			trsfA.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) ), -dA );
-			gp_Trsf trsfCA = trsfC.Multiplied( trsfA );
-			gp_Trsf trsfAC = trsfA.Multiplied( trsfC );
+			trsfA.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) ), dA );
+			gp_Trsf trsfCA = trsfC;
+			trsfCA.Multiply( trsfA );
+			//gp_Trsf trsfAC = trsfA.Multiplied( trsfC );
 
 			// move the head to the target location
-			//gp_Pnt tcp0 = new gp_Pnt( 0, 0, -150 );
-			//gp_Pnt tcp1 = tcp0.Transformed( trsfCA );
-			//gp_Trsf trsfT = new gp_Trsf();
-			//trsfT.SetTranslation( new gp_Vec( p.XYZ() - tcp1.XYZ() ) );
-			//m_HeadCAIS.SetLocalTransformation( trsfT.Multiplied( trsfC ) );
-			//m_HeadAAIS.SetLocalTransformation( trsfT.Multiplied( trsfCA ) );
+			gp_Pnt tcp0 = new gp_Pnt( 0, 0, -150 );
+			gp_Pnt tcp1 = tcp0.Transformed( trsfCA );
+			gp_Trsf trsfT = new gp_Trsf();
+			trsfT.SetTranslation( new gp_Vec( p.XYZ() - tcp1.XYZ() ) );
+			m_HeadCAIS.SetLocalTransformation( trsfT.Multiplied( trsfC ) );
+			m_HeadAAIS.SetLocalTransformation( trsfT.Multiplied( trsfCA ) );
 
 			// move the table and part to the target location
-			gp_Pnt tcp0 = new gp_Pnt( 0, 0, -150 );
-			gp_Pnt p1 = p.Transformed( trsfAC );
-			gp_Trsf trsfT = new gp_Trsf();
-			trsfT.SetTranslation( new gp_Vec( tcp0.XYZ() - p1.XYZ() ) );
-			m_MachineAIS.SetLocalTransformation( trsfT );
-			m_TableAAIS.SetLocalTransformation( trsfT.Multiplied( trsfA ) );
-			gp_Trsf trsfPart = trsfT.Multiplied( trsfAC );
-			m_TableCAIS.SetLocalTransformation( trsfPart );
-			m_PartAIS.SetLocalTransformation( trsfPart );
+			//gp_Pnt tcp0 = new gp_Pnt( 0, 0, -150 );
+			//gp_Pnt p1 = p.Transformed( trsfAC );
+			//gp_Trsf trsfT = new gp_Trsf();
+			//trsfT.SetTranslation( new gp_Vec( tcp0.XYZ() - p1.XYZ() ) );
+			//m_MachineAIS.SetLocalTransformation( trsfT );
+			//m_TableAAIS.SetLocalTransformation( trsfT.Multiplied( trsfA ) );
+			//gp_Trsf trsfPart = trsfT.Multiplied( trsfAC );
+			//m_TableCAIS.SetLocalTransformation( trsfPart );
+			//m_PartAIS.SetLocalTransformation( trsfPart );
 
 			// move the CADCAM to the target location
-			foreach( AIS_Line lineAIS in m_ToolVecAISList ) {
-				lineAIS.SetLocalTransformation( trsfPart );
-			}
-			foreach( AIS_Shape oneShape in m_CADContourAISList ) {
-				oneShape.SetLocalTransformation( trsfPart );
-			}
-			foreach( AIS_Shape oneShape in m_CAMContourAISList ) {
-				oneShape.SetLocalTransformation( trsfPart );
-			}
+			//foreach( AIS_Line lineAIS in m_ToolVecAISList ) {
+			//	lineAIS.SetLocalTransformation( trsfPart );
+			//}
+			//foreach( AIS_Shape oneShape in m_CADContourAISList ) {
+			//	oneShape.SetLocalTransformation( trsfPart );
+			//}
+			//foreach( AIS_Shape oneShape in m_CAMContourAISList ) {
+			//	oneShape.SetLocalTransformation( trsfPart );
+			//}
 			m_OCCViewer.UpdateView();
 		}
 
 		void ShowHead()
 		{
-			m_OCCViewer.GetAISContext().Display( m_MachineAIS, false );
-			//m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
+			//m_OCCViewer.GetAISContext().Display( m_MachineAIS, false );
+			m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
 			m_OCCViewer.GetAISContext().Display( m_HeadAAIS, false );
-			m_OCCViewer.GetAISContext().Display( m_TableAAIS, false );
-			m_OCCViewer.GetAISContext().Display( m_TableCAIS, false );
+			//m_OCCViewer.GetAISContext().Display( m_TableAAIS, false );
+			//m_OCCViewer.GetAISContext().Display( m_TableCAIS, false );
 			m_OCCViewer.UpdateView();
 		}
 
 		void HideHead()
 		{
-			m_OCCViewer.GetAISContext().Remove( m_MachineAIS, false );
-			//m_OCCViewer.GetAISContext().Remove( m_HeadCAIS, false );
+			//m_OCCViewer.GetAISContext().Remove( m_MachineAIS, false );
+			m_OCCViewer.GetAISContext().Remove( m_HeadCAIS, false );
 			m_OCCViewer.GetAISContext().Remove( m_HeadAAIS, false );
-			m_OCCViewer.GetAISContext().Remove( m_TableAAIS, false );
-			m_OCCViewer.GetAISContext().Remove( m_TableCAIS, false );
+			//m_OCCViewer.GetAISContext().Remove( m_TableAAIS, false );
+			//m_OCCViewer.GetAISContext().Remove( m_TableCAIS, false );
 			m_OCCViewer.UpdateView();
 		}
 	}

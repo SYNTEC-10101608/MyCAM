@@ -44,7 +44,7 @@ namespace CAMEdit
 		void BuildCAMDataList()
 		{
 			m_CAMDataList.Clear();
-			for(int i = 0; i < m_RawCADDataList.Count; i++ ) {
+			for(int i = 0; i < 1; i++ ) {
 				CADData cadData = m_RawCADDataList[ i ];
 				CAMData camData = new CAMData( cadData );
 				m_CAMDataList.Add( camData );
