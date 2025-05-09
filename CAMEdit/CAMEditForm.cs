@@ -962,9 +962,6 @@ namespace CAMEdit
 			//m_TableCAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
 			//m_TableCAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			//m_OCCViewer.GetAISContext().Display( m_TableCAIS, false );
-
-			// convert the IJK to ABC
-			m_SimulationCAData = PostTool.ConvertIJKToABC( m_Model.CAMDataList[ 0 ].CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList() );
 		}
 
 		void UpdateHead()

@@ -18,10 +18,28 @@ namespace OCCTool
 			for( int i = 0; i < toolVecList.Count; i++ ) {
 
 				double[] ToolDirection = new double[ 3 ] { toolVecList[ i ].X(), toolVecList[ i ].Y(), toolVecList[ i ].Z() };
-				IKSolverWrapper.IJKtoMS( ToolDirection, ToolDirectionAtZero, DirectOfFirstRotAxis, DirectOfSecondRotAxis,
+				int solveResult =  IKSolverWrapper.IJKtoMS( ToolDirection, ToolDirectionAtZero, DirectOfFirstRotAxis, DirectOfSecondRotAxis,
 					dC, dA, out double dC1, out double dA1, out double dC2, out double dA2 );
 
+				// sigular case, master has infinite solution
+				if( solveResult == 2 ) {
+					singularPointList.Add( true );
+				}
+				else {
+					singularPointList.Add( false );
+				}
 
+				// choose the closest solution
+				double diff1 = Math.Abs( dC - dC1 ) + Math.Abs( dA - dA1 );
+				double diff2 = Math.Abs( dC - dC2 ) + Math.Abs( dA - dA2 );
+				if( diff1 < diff2 ) {
+					dC = dC1;
+					dA = dA1;
+				}
+				else {
+					dC = dC2;
+					dA = dA2;
+				}
 				result.Add( new Tuple<double, double>( dC, dA ) );
 			}
 
