@@ -52,5 +52,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VectorTool.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PostToolBridge\PostToolBridge.vcxproj">
+      <Project>{37a0e137-0795-bbd7-e7bf-f0cb1057bd79}</Project>
+      <Name>PostToolBridge</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
