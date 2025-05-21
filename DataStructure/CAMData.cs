@@ -417,6 +417,9 @@ namespace DataStructure
 			for( int i = 0; i < lineRecordList.Count + 1; i++ ) {
 				bool bClip = true;
 				while( bClip ) {
+					if( lineRecordList.Count == 0 ) {
+						return;
+					}
 					bClip = false;
 					bool wraped = false;
 					if( i == lineRecordList.Count - 1 ) {
@@ -443,6 +446,8 @@ namespace DataStructure
 							i--;
 						}
 					}
+					else {
+					}
 					if( typeL2 == IntersectType.ReverseExtend ) {
 						bClip = true;
 						lineRecordList.Remove( lineRecord2 );
@@ -453,7 +458,14 @@ namespace DataStructure
 							i--;
 						}
 					}
+					else {
+					}
 				}
+			}
+
+			// cant construct a loop
+			if( lineRecordList.Count < 3 ) {
+				return;
 			}
 
 			// serialize the offset lines
