@@ -246,7 +246,8 @@ namespace CAMEdit
 			// build tool vec
 			foreach( CAMData camData in m_Model.CAMDataList ) {
 				int nIndex = 0;
-				List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
+				//List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
+				List<CAMPoint> filteredPath = camData.CAMPointList;
 				foreach( CAMPoint camPoint in filteredPath ) {
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
 					if( camData.GetToolVecModifyIndex().Contains( nIndex ) ) {
@@ -345,7 +346,7 @@ namespace CAMEdit
 				return;
 			}
 			if( camData.Offset == 0 ) {
-				camData.Offset = 1;
+				camData.Offset = 2;
 			}
 			else {
 				camData.Offset = 0;
@@ -360,6 +361,12 @@ namespace CAMEdit
 
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
+			// path filtering
+			foreach( CAMData camData in m_Model.CAMDataList ) {
+				List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
+				camData.CAMPointList.Clear();
+				camData.CAMPointList.AddRange( filteredPath );
+			}
 			List<IProcessData> cuttingProcessDataList =
 				m_Model.CAMDataList.Select( camData => new CuttingProcessData( camData ) ).Cast<IProcessData>().ToList();
 			CADEditOK?.Invoke( m_Model.PartShape, cuttingProcessDataList );
@@ -678,7 +685,7 @@ namespace CAMEdit
 
 			// combine the two filtering results
 			for( int i = 0; i < path.Count; i++ ) {
-				if( /*!flagsL[ i ] ||*/ !flagsO[ i ] ) {
+				if( !flagsL[ i ] || !flagsO[ i ] ) {
 					filteredList.Add( camPointList[ i ] );
 				}
 			}
@@ -731,7 +738,7 @@ namespace CAMEdit
 					break;
 				}
 
-				int prior2;
+				int prior2; 
 				if( dsq[ next ] < dsq[ curr ] ) {
 					prior2 = prev;
 					prev = curr;
@@ -976,9 +983,8 @@ namespace CAMEdit
 			trsfC.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), dC );
 			gp_Trsf trsfA = new gp_Trsf();
 			trsfA.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) ), dA );
-			gp_Trsf trsfCA = trsfC;
-			trsfCA.Multiply( trsfA );
-			//gp_Trsf trsfAC = trsfA.Multiplied( trsfC );
+			gp_Trsf trsfCA = trsfC.Multiplied( trsfA );
+			gp_Trsf trsfAC = trsfA.Multiplied( trsfC );
 
 			// move the head to the target location
 			gp_Pnt tcp0 = new gp_Pnt( 0, 0, -150 );
