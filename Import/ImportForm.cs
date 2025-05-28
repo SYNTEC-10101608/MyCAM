@@ -25,6 +25,9 @@ namespace Import
 		public ImportForm()
 		{
 			InitializeComponent();
+			Controls.Add( m_panBackground );
+			m_panBackground.Dock = DockStyle.Fill;
+			m_panBackground.SizeChanged += BackGroundSizeChanged;
 
 			// create the viewer
 			bool bSucess = m_OCCViewer.InitViewer( m_panViewer );
@@ -32,14 +35,34 @@ namespace Import
 				MessageBox.Show( ToString() + "Init Error: Init Viewer" );
 				return;
 			}
-			Controls.Add( m_panViewer );
-			m_panViewer.Dock = DockStyle.Fill;
+			m_panBackground.Controls.Add( m_panViewer );
+			m_panViewer.Dock = DockStyle.Right;
+			m_OCCViewer.UpdateView();
+
+			// create the tree view
+			m_panBackground.Controls.Add( m_panTreeView );
+			m_panTreeView.Dock = DockStyle.Left;
+			m_panTreeView.Controls.Add( m_treeView );
+			m_treeView.Dock = DockStyle.Fill;
+		}
+
+		void BackGroundSizeChanged( object sender, EventArgs e )
+		{
+			m_panViewer.Width = (int)( m_panBackground.Width * 0.8 );
+			m_panTreeView.Width = m_panBackground.Width - m_panViewer.Width;
 			m_OCCViewer.UpdateView();
 		}
+
+		// background
+		Panel m_panBackground = new Panel();
 
 		// viewer
 		Panel m_panViewer = new Panel();
 		Viewer m_OCCViewer = new Viewer();
+
+		// tree view
+		Panel m_panTreeView = new Panel();
+		TreeView m_treeView = new TreeView();
 
 		// manager
 		CADManager m_CADManager = new CADManager();
