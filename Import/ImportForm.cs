@@ -1,11 +1,9 @@
-﻿using OCC.AIS;
-using OCC.Graphic3d;
-using OCC.IFSelect;
+﻿using OCC.IFSelect;
 using OCC.IGESControl;
 using OCC.STEPControl;
+using OCC.TopAbs;
 using OCC.TopoDS;
 using OCC.XSControl;
-using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -37,42 +35,32 @@ namespace Import
 			Controls.Add( m_panViewer );
 			m_panViewer.Dock = DockStyle.Fill;
 			m_OCCViewer.UpdateView();
-
-			// menu items
-			m_tsmiOK.Enabled = false;
 		}
 
 		// viewer
 		Panel m_panViewer = new Panel();
 		Viewer m_OCCViewer = new Viewer();
 
-		// import part
-		TopoDS_Shape m_PartShape = null;
+		// manager
+		CADManager m_CADManager = new CADManager();
 
+		// import part
 		void m_tsmiImportBRep_Click( object sender, EventArgs e )
 		{
-			DoImport( Format.BREP );
+			ImportFile( Format.BREP );
 		}
 
 		void m_tsmiImportStep_Click( object sender, EventArgs e )
 		{
-			DoImport( Format.STEP );
+			ImportFile( Format.STEP );
 		}
 
 		void m_tsmiImportIges_Click( object sender, EventArgs e )
 		{
-			DoImport( Format.IGES );
+			ImportFile( Format.IGES );
 		}
 
-		void m_tsmiOK_Click( object sender, EventArgs e )
-		{
-			if( m_PartShape == null ) {
-				return;
-			}
-			ImportOK?.Invoke( m_PartShape );
-		}
-
-		void DoImport( Format format )
+		void ImportFile( Format format )
 		{
 			OpenFileDialog openDialog = new OpenFileDialog();
 
@@ -103,7 +91,11 @@ namespace Import
 			if( string.IsNullOrEmpty( szFileName ) ) {
 				return;
 			}
+			ReadFileData( format, szFileName );
+		}
 
+		void ReadFileData( Format format, string szFileName )
+		{
 			// read the file
 			XSControl_Reader Reader;
 			switch( format ) {
@@ -134,37 +126,40 @@ namespace Import
 				MessageBox.Show( ToString() + "Error: Import" );
 				return;
 			}
-			TopoDS_Shape theShape = Reader.OneShape();
-			if( theShape == null ) {
+			TopoDS_Shape oneShape = Reader.OneShape();
+			if( oneShape == null || oneShape.IsNull() ) {
 				MessageBox.Show( ToString() + "Error: Import" );
 				return;
 			}
 
-			// sew the shape
-			theShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { theShape } );
-
-			// show the part
-			m_PartShape = theShape;
-			ShowPart();
-
-			// enable the OK button
-			m_tsmiOK.Enabled = true;
+			// add the read shape to the manager
+			AddToManager( oneShape );
 		}
 
-		void ShowPart()
+		void AddToManager( TopoDS_Shape oneShape )
 		{
-			// create AIS_Shape
-			AIS_Shape aisShape = new AIS_Shape( m_PartShape );
-			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			aisShape.SetMaterial( aspect );
-			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			List<TopoDS_Shape> shapeList = ArrangeShapeData( oneShape );
+			foreach( TopoDS_Shape shape in shapeList ) {
+				if( shape == null || shape.IsNull() ) {
+					continue;
+				}
+				m_CADManager.AddCADModel( shape );
+			}
+		}
 
-			// display the shape
-			m_OCCViewer.GetAISContext().RemoveAll( false );
-			m_OCCViewer.GetAISContext().Display( aisShape, true );
-			m_OCCViewer.GetAISContext().Deactivate( aisShape );
-			m_OCCViewer.AxoView();
-			m_OCCViewer.ZoomAllView();
+		List<TopoDS_Shape> ArrangeShapeData( TopoDS_Shape oneShape )
+		{
+			if( oneShape == null || oneShape.IsNull() ) {
+				return new List<TopoDS_Shape>();
+			}
+			if( oneShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_COMPOUND ) {
+				return new List<TopoDS_Shape>() { oneShape };
+			}
+			List<TopoDS_Shape> result = new List<TopoDS_Shape>();
+			foreach( TopoDS_Shape subShape in oneShape.elementsAsList ) {
+				result.AddRange( ArrangeShapeData( subShape ) );
+			}
+			return result;
 		}
 	}
 }

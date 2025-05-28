@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CADManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ImportForm.cs">
       <SubType>Form</SubType>
