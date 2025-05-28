@@ -32,6 +32,7 @@
 			this.m_tsmiImportBRep = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiImportStep = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiImportIges = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_panBackGround = new System.Windows.Forms.Panel();
 			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -76,11 +77,20 @@
 			this.m_tsmiImportIges.Text = "Iges";
 			this.m_tsmiImportIges.Click += new System.EventHandler(this.m_tsmiImportIges_Click);
 			// 
+			// m_panBackGround
+			// 
+			this.m_panBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_panBackGround.Location = new System.Drawing.Point(0, 24);
+			this.m_panBackGround.Name = "m_panBackGround";
+			this.m_panBackGround.Size = new System.Drawing.Size(584, 537);
+			this.m_panBackGround.TabIndex = 1;
+			// 
 			// ImportForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(584, 561);
+			this.Controls.Add(this.m_panBackGround);
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "ImportForm";
@@ -99,6 +109,7 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportBRep;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportIges;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportStep;
+		private System.Windows.Forms.Panel m_panBackGround;
 	}
 }
 

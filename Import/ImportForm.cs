@@ -1,4 +1,5 @@
-﻿using OCC.IFSelect;
+﻿using OCC.AIS;
+using OCC.IFSelect;
 using OCC.IGESControl;
 using OCC.STEPControl;
 using OCC.TopAbs;
@@ -25,9 +26,7 @@ namespace Import
 		public ImportForm()
 		{
 			InitializeComponent();
-			Controls.Add( m_panBackground );
-			m_panBackground.Dock = DockStyle.Fill;
-			m_panBackground.SizeChanged += BackGroundSizeChanged;
+			m_panBackGround.SizeChanged += BackGroundSizeChanged;
 
 			// create the viewer
 			bool bSucess = m_OCCViewer.InitViewer( m_panViewer );
@@ -35,34 +34,52 @@ namespace Import
 				MessageBox.Show( ToString() + "Init Error: Init Viewer" );
 				return;
 			}
-			m_panBackground.Controls.Add( m_panViewer );
+			m_panBackGround.Controls.Add( m_panViewer );
 			m_panViewer.Dock = DockStyle.Right;
 			m_OCCViewer.UpdateView();
 
+			m_panViewer.MouseDown += ViewerMoseDown;
+			m_panViewer.PreviewKeyDown += ViewerKeyDown;
+
 			// create the tree view
-			m_panBackground.Controls.Add( m_panTreeView );
+			m_panBackGround.Controls.Add( m_panTreeView );
 			m_panTreeView.Dock = DockStyle.Left;
-			m_panTreeView.Controls.Add( m_treeView );
-			m_treeView.Dock = DockStyle.Fill;
+			m_panTreeView.Controls.Add( m_TreeView );
+			m_TreeView.Dock = DockStyle.Fill;
+
+			m_TreeView.AfterSelect += TreeViewAfterSelect;
+			m_TreeView.KeyDown += TreeViewKeyDown;
+
+			// manager events
+			m_CADManager.AddCADModelDone += OnAddCADModelDone;
 		}
 
 		void BackGroundSizeChanged( object sender, EventArgs e )
 		{
-			m_panViewer.Width = (int)( m_panBackground.Width * 0.8 );
-			m_panTreeView.Width = m_panBackground.Width - m_panViewer.Width;
+			m_panViewer.Width = (int)( m_panBackGround.Width * 0.8 );
+			m_panTreeView.Width = m_panBackGround.Width - m_panViewer.Width;
 			m_OCCViewer.UpdateView();
 		}
 
-		// background
-		Panel m_panBackground = new Panel();
-
-		// viewer
+		// viewer property
 		Panel m_panViewer = new Panel();
 		Viewer m_OCCViewer = new Viewer();
+		class ViewObject
+		{
+			public ViewObject( AIS_Shape shape )
+			{
+				AISHandle = shape;
+			}
 
-		// tree view
+			public bool Visible { get; set; } = true;
+
+			public AIS_Shape AISHandle { get; private set; } = null;
+		}
+		Dictionary<string, ViewObject> m_viewObjectMap = new Dictionary<string, ViewObject>();
+
+		// tree view property
 		Panel m_panTreeView = new Panel();
-		TreeView m_treeView = new TreeView();
+		TreeView m_TreeView = new TreeView();
 
 		// manager
 		CADManager m_CADManager = new CADManager();
@@ -183,6 +200,51 @@ namespace Import
 				result.AddRange( ArrangeShapeData( subShape ) );
 			}
 			return result;
+		}
+
+		// viewer events
+		void ViewerKeyDown( object sender, PreviewKeyDownEventArgs e )
+		{
+			if( e.KeyCode == Keys.F5 ) {
+				m_OCCViewer.AxoView();
+				m_OCCViewer.ZoomAllView();
+				m_OCCViewer.UpdateView();
+			}
+		}
+
+		void ViewerMoseDown( object sender, MouseEventArgs e )
+		{
+			m_panViewer.Focus();
+		}
+
+		// tree view events
+		void TreeViewKeyDown( object sender, KeyEventArgs e )
+		{
+			//throw new NotImplementedException();
+		}
+
+		void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
+		{
+			//throw new NotImplementedException();
+		}
+
+		// manager events
+		void OnAddCADModelDone( string szUID, TopoDS_Shape shape )
+		{
+			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() ) {
+				return;
+			}
+
+			// update the tree view
+			TreeNode newNode = new TreeNode( szUID );
+			m_TreeView.Nodes.Add( newNode );
+			m_TreeView.SelectedNode = newNode;
+
+			// update the viewer
+			AIS_Shape aisShape = new AIS_Shape( shape );
+			m_viewObjectMap[ szUID ] = new ViewObject( aisShape );
+			m_OCCViewer.GetAISContext().Display( aisShape, true );
+			m_OCCViewer.UpdateView();
 		}
 	}
 }

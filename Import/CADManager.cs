@@ -32,7 +32,7 @@ namespace Import
 
 	internal class CADManager
 	{
-		Action<string, TopoDS_Shape> AddCADModelDone;
+		public Action<string, TopoDS_Shape> AddCADModelDone;
 
 		public void AddCADModel( TopoDS_Shape newShape )
 		{
