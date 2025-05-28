@@ -225,7 +225,24 @@ namespace Import
 
 		void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
 		{
-			//throw new NotImplementedException();
+			// synchronize the viewer with the selected node
+			if( e.Node == null || string.IsNullOrEmpty( e.Node.Text ) ) {
+				return;
+			}
+			string szUID = e.Node.Text;
+			if( !m_viewObjectMap.ContainsKey( szUID ) ) {
+				return;
+			}
+			ViewObject viewObject = m_viewObjectMap[ szUID ];
+			if( viewObject == null || viewObject.AISHandle == null ) {
+				return;
+			}
+
+			// clear viewer slection
+			m_OCCViewer.GetAISContext().ClearSelected(false);
+
+			// select the shape in the viewer
+			m_OCCViewer.GetAISContext().SetSelected( viewObject.AISHandle, true );
 		}
 
 		// manager events
