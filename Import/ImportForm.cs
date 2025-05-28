@@ -220,7 +220,42 @@ namespace Import
 		// tree view events
 		void TreeViewKeyDown( object sender, KeyEventArgs e )
 		{
-			//throw new NotImplementedException();
+			if( e.KeyCode == Keys.Delete ) {
+				RemoveObject();
+			}
+			else if( e.KeyCode == Keys.Space ) {
+				ChangeObjectVisibility();
+			}
+		}
+
+		void ChangeObjectVisibility()
+		{
+			// toggle the visibility of the selected object
+			TreeNode selectedNode = m_TreeView.SelectedNode;
+			if( selectedNode == null || string.IsNullOrEmpty( selectedNode.Text ) ) {
+				return;
+			}
+			string szUID = m_TreeView.SelectedNode.Text;
+			if( !m_viewObjectMap.ContainsKey( szUID ) ) {
+				return;
+			}
+			ViewObject viewObject = m_viewObjectMap[ szUID ];
+			if( viewObject == null || viewObject.AISHandle == null ) {
+				return;
+			}
+
+			// toggle visibility
+			viewObject.Visible = !viewObject.Visible;
+			if( viewObject.Visible ) {
+				m_OCCViewer.GetAISContext().Display( viewObject.AISHandle, true );
+			}
+			else {
+				m_OCCViewer.GetAISContext().Erase( viewObject.AISHandle, true );
+			}
+		}
+
+		void RemoveObject()
+		{
 		}
 
 		void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
@@ -239,7 +274,7 @@ namespace Import
 			}
 
 			// clear viewer slection
-			m_OCCViewer.GetAISContext().ClearSelected(false);
+			m_OCCViewer.GetAISContext().ClearSelected( false );
 
 			// select the shape in the viewer
 			m_OCCViewer.GetAISContext().SetSelected( viewObject.AISHandle, true );
