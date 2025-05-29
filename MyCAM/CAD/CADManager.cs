@@ -32,7 +32,7 @@ namespace MyCAM.CAD
 
 	internal class CADManager
 	{
-		public Action<string, TopoDS_Shape> AddCADModelDone;
+		public Action<CADModel> AddCADModelDone;
 
 		public void AddCADModel( TopoDS_Shape newShape )
 		{
@@ -74,7 +74,20 @@ namespace MyCAM.CAD
 			CADModel model = new CADModel( szUID, szName, newShape );
 			m_CADModelContainer.Add( model );
 			m_CADModelMap.Add( szUID, model );
-			AddCADModelDone?.Invoke( szUID, newShape );
+			AddCADModelDone?.Invoke( model );
+		}
+
+		public string GetUIDByShape( TopoDS_Shape shape )
+		{
+			if( shape == null || shape.IsNull() ) {
+				return string.Empty;
+			}
+			foreach( var model in m_CADModelContainer ) {
+				if( model.ShapeData.IsEqual( shape ) ) {
+					return model.UID;
+				}
+			}
+			return string.Empty;
 		}
 
 		List<CADModel> m_CADModelContainer = new List<CADModel>();

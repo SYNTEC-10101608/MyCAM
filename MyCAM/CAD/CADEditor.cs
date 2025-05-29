@@ -33,9 +33,7 @@ namespace MyCAM.CAD
 			m_TreeView = treeView;
 
 			// viewer events
-			viewer.MouseWheel += ViewerMouseWheel;
 			viewer.MouseDown += ViewerMouseDown;
-			viewer.MouseMove += ViewerMouseMove;
 			viewer.KeyDown += ViewerKeyDown;
 
 			// tree view events
@@ -60,29 +58,33 @@ namespace MyCAM.CAD
 
 			public AIS_InteractiveObject AISHandle { get; set; } = null;
 		}
-		Dictionary<string, ViewObject> m_viewObjectMap = new Dictionary<string, ViewObject>();
+		Dictionary<string, ViewObject> m_ViewObjectMap = new Dictionary<string, ViewObject>();
 
 		// tree view properties
 		TreeView m_TreeView;
+		Dictionary<string, TreeNode> m_TreeNodeMap = new Dictionary<string, TreeNode>();
+		bool m_bSuppressTreeViewSync = false;
 
 		// CAD manager
 		CADManager m_CADManager;
 
 		// viewer events
-		void ViewerMouseWheel( MouseEventArgs e )
-		{
-		}
 
 		void ViewerMouseDown( MouseEventArgs e )
 		{
-		}
-
-		void ViewerMouseMove( MouseEventArgs e )
-		{
+			// select
+			if( e.Button == MouseButtons.Left ) {
+				m_Viewer.GetAISContext().SelectDetected();
+				m_Viewer.UpdateView();
+				SyncSelectionFromViewToTree();
+			}
 		}
 
 		void ViewerKeyDown( KeyEventArgs e )
 		{
+			if( e.KeyCode == Keys.Space ) {
+				ChangeObjectVisibility();
+			}
 		}
 
 		// tree view events
@@ -95,24 +97,14 @@ namespace MyCAM.CAD
 
 		void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
 		{
-			// synchronize the viewer with the selected node
-			if( e.Node == null || string.IsNullOrEmpty( e.Node.Text ) ) {
+			foreach( TreeNode node in m_TreeView.Nodes ) {
+				node.BackColor = System.Drawing.Color.White;
+			}
+			if( e.Node == null ) {
 				return;
 			}
-			string szUID = e.Node.Text;
-			if( !m_viewObjectMap.ContainsKey( szUID ) ) {
-				return;
-			}
-			ViewObject viewObject = m_viewObjectMap[ szUID ];
-			if( viewObject == null || viewObject.AISHandle == null ) {
-				return;
-			}
-
-			// clear viewer slection
-			m_Viewer.GetAISContext().ClearSelected( false );
-
-			// select the shape in the viewer
-			m_Viewer.GetAISContext().SetSelected( viewObject.AISHandle, true );
+			e.Node.BackColor = System.Drawing.Color.Cyan;
+			SyncSelectionFromTreeToView();
 		}
 
 		// APIs
@@ -175,20 +167,22 @@ namespace MyCAM.CAD
 		}
 
 		// manager events
-		void OnAddCADModelDone( string szUID, TopoDS_Shape shape )
+		void OnAddCADModelDone( CADModel model )
 		{
+			string szUID = model.UID;
+			TopoDS_Shape shape = model.ShapeData;
 			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() ) {
 				return;
 			}
 
 			// update the tree view
 			TreeNode newNode = new TreeNode( szUID );
+			m_TreeNodeMap[ szUID ] = newNode;
 			m_TreeView.Nodes.Add( newNode );
-			m_TreeView.SelectedNode = newNode;
 
 			// update the viewer
 			AIS_Shape aisShape = CreateAIS( shape );
-			m_viewObjectMap[ szUID ] = new ViewObject( aisShape );
+			m_ViewObjectMap[ szUID ] = new ViewObject( aisShape );
 			m_Viewer.GetAISContext().Display( aisShape, true );
 			m_Viewer.UpdateView();
 		}
@@ -267,10 +261,10 @@ namespace MyCAM.CAD
 		{
 			// toggle the visibility of the selected object
 
-			if( !m_viewObjectMap.ContainsKey( szUID ) ) {
+			if( !m_ViewObjectMap.ContainsKey( szUID ) ) {
 				return;
 			}
-			ViewObject viewObject = m_viewObjectMap[ szUID ];
+			ViewObject viewObject = m_ViewObjectMap[ szUID ];
 			if( viewObject == null || viewObject.AISHandle == null ) {
 				return;
 			}
@@ -299,6 +293,68 @@ namespace MyCAM.CAD
 			aisShape.Attributes().SetFaceBoundaryDraw( true );
 			aisShape.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			return aisShape;
+		}
+
+		void SyncSelectionFromTreeToView()
+		{
+			if( m_bSuppressTreeViewSync ) {
+				return;
+			}
+
+			// clear viewer slection
+			m_Viewer.GetAISContext().ClearSelected( false );
+
+			// get the selected node
+			TreeNode node = m_TreeView.SelectedNode;
+			if( node == null || string.IsNullOrEmpty( node.Text ) ) {
+				return;
+			}
+			string szUID = node.Text;
+
+			// find the corresponding view object
+			if( !m_ViewObjectMap.ContainsKey( szUID ) ) {
+				return;
+			}
+			ViewObject viewObject = m_ViewObjectMap[ szUID ];
+			if( viewObject == null || viewObject.AISHandle == null ) {
+				return;
+			}
+
+			// select the shape in the viewer
+			m_Viewer.GetAISContext().SetSelected( viewObject.AISHandle, true );
+		}
+
+		void SyncSelectionFromViewToTree()
+		{
+			// clear tree view selection
+			m_TreeView.SelectedNode = null;
+			foreach( TreeNode node in m_TreeView.Nodes ) {
+				node.BackColor = System.Drawing.Color.White;
+			}
+
+			// get the selected shape
+			m_Viewer.GetAISContext().InitSelected();
+			if( !m_Viewer.GetAISContext().MoreSelected() ) {
+				return;
+			}
+			TopoDS_Shape selectedShape = m_Viewer.GetAISContext().SelectedShape();
+			if( selectedShape == null || selectedShape.IsNull() ) {
+				return;
+			}
+
+			// find the corresponding UID
+			string szUID = m_CADManager.GetUIDByShape( selectedShape );
+			if( string.IsNullOrEmpty( szUID ) ) {
+				return;
+			}
+
+			// find the node in the tree view
+			if( !m_TreeNodeMap.ContainsKey( szUID ) ) {
+				return;
+			}
+			m_bSuppressTreeViewSync = true;
+			m_TreeView.SelectedNode = m_TreeNodeMap[ szUID ];
+			m_bSuppressTreeViewSync = false;
 		}
 	}
 }
