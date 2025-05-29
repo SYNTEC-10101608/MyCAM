@@ -1,10 +1,13 @@
 ﻿using OCC.AIS;
+using OCC.Graphic3d;
 using OCC.IFSelect;
 using OCC.IGESControl;
+using OCC.Quantity;
 using OCC.STEPControl;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCC.XSControl;
+using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -48,14 +51,14 @@ namespace MyCAM.CAD
 		Viewer m_Viewer;
 		class ViewObject
 		{
-			public ViewObject( AIS_Shape shape )
+			public ViewObject( AIS_InteractiveObject shape )
 			{
 				AISHandle = shape;
 			}
 
 			public bool Visible { get; set; } = true;
 
-			public AIS_Shape AISHandle { get; private set; } = null;
+			public AIS_InteractiveObject AISHandle { get; set; } = null;
 		}
 		Dictionary<string, ViewObject> m_viewObjectMap = new Dictionary<string, ViewObject>();
 
@@ -85,10 +88,7 @@ namespace MyCAM.CAD
 		// tree view events
 		void TreeViewKeyDown( object sender, KeyEventArgs e )
 		{
-			if( e.KeyCode == Keys.Delete ) {
-				RemoveObject();
-			}
-			else if( e.KeyCode == Keys.Space ) {
+			if( e.KeyCode == Keys.Space ) {
 				ChangeObjectVisibility();
 			}
 		}
@@ -115,37 +115,7 @@ namespace MyCAM.CAD
 			m_Viewer.GetAISContext().SetSelected( viewObject.AISHandle, true );
 		}
 
-		void ChangeObjectVisibility()
-		{
-			// toggle the visibility of the selected object
-			TreeNode selectedNode = m_TreeView.SelectedNode;
-			if( selectedNode == null || string.IsNullOrEmpty( selectedNode.Text ) ) {
-				return;
-			}
-			string szUID = m_TreeView.SelectedNode.Text;
-			if( !m_viewObjectMap.ContainsKey( szUID ) ) {
-				return;
-			}
-			ViewObject viewObject = m_viewObjectMap[ szUID ];
-			if( viewObject == null || viewObject.AISHandle == null ) {
-				return;
-			}
-
-			// toggle visibility
-			viewObject.Visible = !viewObject.Visible;
-			if( viewObject.Visible ) {
-				m_Viewer.GetAISContext().Display( viewObject.AISHandle, true );
-			}
-			else {
-				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, true );
-			}
-		}
-
-		void RemoveObject()
-		{
-		}
-
-		// import part
+		// APIs
 		public void ImportFile( FileFormat format )
 		{
 			OpenFileDialog openDialog = new OpenFileDialog();
@@ -180,6 +150,50 @@ namespace MyCAM.CAD
 			ReadFileData( format, szFileName );
 		}
 
+		public void ChangeObjectVisibility()
+		{
+			TreeNode selectedNode = m_TreeView.SelectedNode;
+			if( selectedNode == null || string.IsNullOrEmpty( selectedNode.Text ) ) {
+				return;
+			}
+			string szUID = selectedNode.Text;
+			ChangeObjectVisibility( szUID );
+		}
+
+		public void RemoveObject()
+		{
+			TreeNode selectedNode = m_TreeView.SelectedNode;
+			if( selectedNode == null || string.IsNullOrEmpty( selectedNode.Text ) ) {
+				return;
+			}
+			string szUID = selectedNode.Text;
+			RemoveObject( szUID );
+		}
+
+		public void ExtractFace()
+		{
+		}
+
+		// manager events
+		void OnAddCADModelDone( string szUID, TopoDS_Shape shape )
+		{
+			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() ) {
+				return;
+			}
+
+			// update the tree view
+			TreeNode newNode = new TreeNode( szUID );
+			m_TreeView.Nodes.Add( newNode );
+			m_TreeView.SelectedNode = newNode;
+
+			// update the viewer
+			AIS_Shape aisShape = CreateAIS( shape );
+			m_viewObjectMap[ szUID ] = new ViewObject( aisShape );
+			m_Viewer.GetAISContext().Display( aisShape, true );
+			m_Viewer.UpdateView();
+		}
+
+		// private methods
 		void ReadFileData( FileFormat format, string szFileName )
 		{
 			// read the file
@@ -217,6 +231,7 @@ namespace MyCAM.CAD
 				MessageBox.Show( ToString() + "Error: Import" );
 				return;
 			}
+			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape }/*, 1e-1*/ );
 
 			// add the read shape to the manager
 			AddToManager( oneShape );
@@ -248,23 +263,42 @@ namespace MyCAM.CAD
 			return result;
 		}
 
-		// manager events
-		void OnAddCADModelDone( string szUID, TopoDS_Shape shape )
+		void ChangeObjectVisibility( string szUID )
 		{
-			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() ) {
+			// toggle the visibility of the selected object
+
+			if( !m_viewObjectMap.ContainsKey( szUID ) ) {
+				return;
+			}
+			ViewObject viewObject = m_viewObjectMap[ szUID ];
+			if( viewObject == null || viewObject.AISHandle == null ) {
 				return;
 			}
 
-			// update the tree view
-			TreeNode newNode = new TreeNode( szUID );
-			m_TreeView.Nodes.Add( newNode );
-			m_TreeView.SelectedNode = newNode;
+			// toggle visibility
+			viewObject.Visible = !viewObject.Visible;
+			if( viewObject.Visible ) {
+				m_Viewer.GetAISContext().Display( viewObject.AISHandle, true );
+			}
+			else {
+				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, true );
+			}
+		}
 
-			// update the viewer
+		void RemoveObject( string szUID )
+		{
+			throw new NotImplementedException( "RemoveObject method is not implemented yet." );
+		}
+
+		AIS_Shape CreateAIS( TopoDS_Shape shape )
+		{
 			AIS_Shape aisShape = new AIS_Shape( shape );
-			m_viewObjectMap[ szUID ] = new ViewObject( aisShape );
-			m_Viewer.GetAISContext().Display( aisShape, true );
-			m_Viewer.UpdateView();
+			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			aisShape.SetMaterial( aspect );
+			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			aisShape.Attributes().SetFaceBoundaryDraw( true );
+			aisShape.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+			return aisShape;
 		}
 	}
 }
