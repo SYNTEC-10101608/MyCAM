@@ -260,7 +260,6 @@ namespace MyCAM.CAD
 		void ChangeObjectVisibility( string szUID )
 		{
 			// toggle the visibility of the selected object
-
 			if( !m_ViewObjectMap.ContainsKey( szUID ) ) {
 				return;
 			}
@@ -268,13 +267,22 @@ namespace MyCAM.CAD
 			if( viewObject == null || viewObject.AISHandle == null ) {
 				return;
 			}
+			if( !m_TreeNodeMap.ContainsKey( szUID ) ) {
+				return;
+			}
+			TreeNode node = m_TreeNodeMap[ szUID ];
+			if( node == null ) {
+				return;
+			}
 
 			// toggle visibility
 			viewObject.Visible = !viewObject.Visible;
 			if( viewObject.Visible ) {
+				node.ForeColor = System.Drawing.Color.Black;
 				m_Viewer.GetAISContext().Display( viewObject.AISHandle, true );
 			}
 			else {
+				node.ForeColor = System.Drawing.Color.LightGray;
 				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, true );
 			}
 		}
