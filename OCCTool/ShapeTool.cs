@@ -1,8 +1,5 @@
 ﻿using OCC.BRep;
 using OCC.BRepBuilderAPI;
-using OCC.BRepGProp;
-using OCC.gp;
-using OCC.GProp;
 using OCC.TopoDS;
 using System.Collections.Generic;
 
@@ -10,10 +7,8 @@ namespace OCCTool
 {
 	public class ShapeTool
 	{
-		public static TopoDS_Shape SewShape( List<TopoDS_Shape> shapeList )
+		public static TopoDS_Shape SewShape( List<TopoDS_Shape> shapeList, double dSewingTolerance = 1e-3 )
 		{
-			// split the faces into shells
-			double dSewingTolerance = 1e-3;
 			BRepBuilderAPI_Sewing sewing = new BRepBuilderAPI_Sewing( dSewingTolerance );
 			foreach( TopoDS_Shape shape in shapeList ) {
 				sewing.Add( shape );
