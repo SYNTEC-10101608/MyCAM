@@ -1,92 +1,49 @@
-﻿using CAMEdit;
-using DataStructure;
-using ExtractPattern;
-using Import;
-using NCExport;
-using OCC.BRepBuilderAPI;
-using OCC.gp;
-using OCC.TopoDS;
-using PartPlacement;
-using ProcessEdit;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using MyCAM.CAD;
+using OCCViewer;
+using System;
 using System.Windows.Forms;
 
 namespace MyCAM
 {
 	public partial class StartupForm : Form
 	{
-		gp_Trsf m_PartTrsf = new gp_Trsf();
-
 		public StartupForm()
 		{
 			InitializeComponent();
-			IsMdiContainer = true;
 
-			// show the import form in dock fill
-			ImportForm f = new ImportForm();
-			f.ImportOK += ImportOK;
-			ShowChild( f );
-		}
-
-		void ImportOK( TopoDS_Shape partShape )
-		{
-			PartPlacementForm f = new PartPlacementForm( partShape );
-			f.PlaceOK += ( partTrsf ) =>
-			{
-				m_PartTrsf = partTrsf;
-				PlaceOK( partShape );
-			};
-			ShowChild( f );
-		}
-
-		void PlaceOK( TopoDS_Shape partShape )
-		{
-			// transform the part
-			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( partShape, m_PartTrsf, true );
-			TopoDS_Shape transformedShape = transform.Shape();
-
-			ExtractPatternForm f = new ExtractPatternForm( transformedShape );
-			f.ExtractOK += ExtractOK;
-			ShowChild( f );
-		}
-
-		void ExtractOK( TopoDS_Shape partShape, List<CADData> cadDataList )
-		{
-			CAMEditForm f = new CAMEditForm();
-			CAMEditModel camEditModel = new CAMEditModel( partShape, cadDataList );
-			f.CADEditOK += CAMEditOK;
-			f.Init( camEditModel );
-			ShowChild( f );
-		}
-
-		void CAMEditOK( TopoDS_Shape partShape, List<IProcessData> processDataList )
-		{
-			ProcessEditForm f = new ProcessEditForm();
-			ProcessEditModel processEditModel = new ProcessEditModel( partShape, processDataList );
-			f.EditOK += ProcessEditOK;
-			f.Init( processEditModel );
-			ShowChild( f );
-		}
-
-		void ProcessEditOK( List<IProcessData> list )
-		{
-			NCWriter w = new NCWriter( list );
-			w.Convert();
-		}
-
-		void ShowChild( Form formToShow )
-		{
-			foreach( Form f in MdiChildren ) {
-				f.Hide();
+			// create the viewer
+			m_Viewer = new Viewer();
+			bool bSucess = m_Viewer.InitViewer( m_panViewer );
+			if( !bSucess ) {
+				MessageBox.Show( ToString() + "Init Error: Init Viewer" );
+				return;
 			}
-			formToShow.MdiParent = this;
-			formToShow.StartPosition = FormStartPosition.Manual;
-			formToShow.Location = new Point( 0, 0 );
-			formToShow.Size = new Size( 800, 800 );
-			ClientSize = new Size( formToShow.Width + SystemInformation.BorderSize.Width * 2,
-			formToShow.Height + SystemInformation.CaptionHeight + SystemInformation.BorderSize.Height * 2 );
-			formToShow.Show();
+			m_Viewer.UpdateView();
+
+			// CAD Editor
+			m_CADEditor = new CADEditor( m_Viewer, m_TreeView );
+		}
+
+		// app properties
+		Viewer m_Viewer;
+
+		// CAD properties
+		CADEditor m_CADEditor;
+
+		// import part
+		void m_tsmiImportBRep_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ImportFile( FileFormat.BREP );
+		}
+
+		void m_tsmiImportStep_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ImportFile( FileFormat.STEP );
+		}
+
+		void m_tsmiImportIges_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ImportFile( FileFormat.IGES );
 		}
 	}
 }

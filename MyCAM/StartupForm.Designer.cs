@@ -27,21 +27,126 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+			this.m_tsmiImport = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiImportBRep = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiImportStep = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiImportIges = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_panViewer = new System.Windows.Forms.Panel();
+			this.m_panTreeView = new System.Windows.Forms.Panel();
+			this.m_TreeView = new System.Windows.Forms.TreeView();
+			this.m_panBackGround = new System.Windows.Forms.Panel();
+			this.menuStrip1.SuspendLayout();
+			this.m_panTreeView.SuspendLayout();
+			this.m_panBackGround.SuspendLayout();
 			this.SuspendLayout();
+			// 
+			// menuStrip1
+			// 
+			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiImport});
+			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+			this.menuStrip1.Name = "menuStrip1";
+			this.menuStrip1.Size = new System.Drawing.Size(1184, 24);
+			this.menuStrip1.TabIndex = 1;
+			this.menuStrip1.Text = "menuStrip1";
+			// 
+			// m_tsmiImport
+			// 
+			this.m_tsmiImport.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiImportBRep,
+            this.m_tsmiImportStep,
+            this.m_tsmiImportIges});
+			this.m_tsmiImport.Name = "m_tsmiImport";
+			this.m_tsmiImport.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiImport.Text = "導入";
+			// 
+			// m_tsmiImportBRep
+			// 
+			this.m_tsmiImportBRep.Name = "m_tsmiImportBRep";
+			this.m_tsmiImportBRep.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportBRep.Text = "BRep";
+			this.m_tsmiImportBRep.Click += new System.EventHandler(this.m_tsmiImportBRep_Click);
+			// 
+			// m_tsmiImportStep
+			// 
+			this.m_tsmiImportStep.Name = "m_tsmiImportStep";
+			this.m_tsmiImportStep.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportStep.Text = "Step";
+			this.m_tsmiImportStep.Click += new System.EventHandler(this.m_tsmiImportStep_Click);
+			// 
+			// m_tsmiImportIges
+			// 
+			this.m_tsmiImportIges.Name = "m_tsmiImportIges";
+			this.m_tsmiImportIges.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportIges.Text = "Iges";
+			this.m_tsmiImportIges.Click += new System.EventHandler(this.m_tsmiImportIges_Click);
+			// 
+			// m_panViewer
+			// 
+			this.m_panViewer.Dock = System.Windows.Forms.DockStyle.Right;
+			this.m_panViewer.Location = new System.Drawing.Point(384, 0);
+			this.m_panViewer.Name = "m_panViewer";
+			this.m_panViewer.Size = new System.Drawing.Size(800, 737);
+			this.m_panViewer.TabIndex = 1;
+			// 
+			// m_panTreeView
+			// 
+			this.m_panTreeView.Controls.Add(this.m_TreeView);
+			this.m_panTreeView.Dock = System.Windows.Forms.DockStyle.Left;
+			this.m_panTreeView.Location = new System.Drawing.Point(0, 0);
+			this.m_panTreeView.Name = "m_panTreeView";
+			this.m_panTreeView.Size = new System.Drawing.Size(400, 737);
+			this.m_panTreeView.TabIndex = 0;
+			// 
+			// m_TreeView
+			// 
+			this.m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_TreeView.Location = new System.Drawing.Point(0, 0);
+			this.m_TreeView.Name = "m_TreeView";
+			this.m_TreeView.Size = new System.Drawing.Size(400, 737);
+			this.m_TreeView.TabIndex = 0;
+			// 
+			// m_panBackGround
+			// 
+			this.m_panBackGround.Controls.Add(this.m_panTreeView);
+			this.m_panBackGround.Controls.Add(this.m_panViewer);
+			this.m_panBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_panBackGround.Location = new System.Drawing.Point(0, 24);
+			this.m_panBackGround.Name = "m_panBackGround";
+			this.m_panBackGround.Size = new System.Drawing.Size(1184, 737);
+			this.m_panBackGround.TabIndex = 0;
 			// 
 			// StartupForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(584, 561);
+			this.ClientSize = new System.Drawing.Size(1184, 761);
+			this.Controls.Add(this.m_panBackGround);
+			this.Controls.Add(this.menuStrip1);
+			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "StartupForm";
 			this.Text = "五軸切";
+			this.menuStrip1.ResumeLayout(false);
+			this.menuStrip1.PerformLayout();
+			this.m_panTreeView.ResumeLayout(false);
+			this.m_panBackGround.ResumeLayout(false);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
 		#endregion
+		private System.Windows.Forms.MenuStrip menuStrip1;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiImport;
+		private System.Windows.Forms.Panel m_panViewer;
+		private System.Windows.Forms.Panel m_panTreeView;
+		private System.Windows.Forms.Panel m_panBackGround;
+		private System.Windows.Forms.TreeView m_TreeView;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportBRep;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportStep;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportIges;
 	}
 }
 

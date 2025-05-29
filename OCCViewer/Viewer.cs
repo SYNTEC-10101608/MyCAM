@@ -85,10 +85,15 @@ namespace OCCViewer
 			cref.Ptr.NbMsaaSamples = 10000;
 
 			// viewer mouse action
-			MouseActionEnabled = true;
-			control.MouseWheel += ( sender, e ) => MouseWheel( e );
-			control.MouseDown += ( sender, e ) => MouseDown( e );
-			control.MouseMove += ( sender, e ) => MouseMove( e );
+			KeyMouseActionEnabled = true;
+			control.MouseWheel += ( sender, e ) => OnMouseWheel( e );
+			control.MouseDown += ( sender, e ) =>
+			{
+				control.Focus();
+				OnMouseDown( e );
+			};
+			control.MouseMove += ( sender, e ) => OnMouseMove( e );
+			control.KeyDown += ( sender, e ) => OnKeyDown( e );
 			control.Paint += ( sender, e ) => UpdateView();
 			return true;
 		}
@@ -417,14 +422,15 @@ namespace OCCViewer
 		int m_nYMousePosition = 0;
 		const double ZOOM_Ratio = 0.0002;
 
-		public bool MouseActionEnabled
+		public bool KeyMouseActionEnabled
 		{
 			get; set;
 		}
 
-		void MouseWheel( MouseEventArgs e )
+		void OnMouseWheel( MouseEventArgs e )
 		{
-			if( !MouseActionEnabled ) {
+			MouseWheel?.Invoke( e );
+			if( !KeyMouseActionEnabled ) {
 				return;
 			}
 
@@ -438,9 +444,10 @@ namespace OCCViewer
 			ZoomAtPoint( e.X, e.Y, nEndX, nEndY );
 		}
 
-		void MouseDown( MouseEventArgs e )
+		void OnMouseDown( MouseEventArgs e )
 		{
-			if( !MouseActionEnabled ) {
+			MouseDown?.Invoke( e );
+			if( !KeyMouseActionEnabled ) {
 				return;
 			}
 			switch( e.Button ) {
@@ -460,9 +467,10 @@ namespace OCCViewer
 			}
 		}
 
-		void MouseMove( MouseEventArgs e )
+		void OnMouseMove( MouseEventArgs e )
 		{
-			if( !MouseActionEnabled ) {
+			MouseMove?.Invoke( e );
+			if( !KeyMouseActionEnabled ) {
 				return;
 			}
 			MoveTo( e.X, e.Y );
@@ -483,5 +491,27 @@ namespace OCCViewer
 					break;
 			}
 		}
+
+		void OnKeyDown( KeyEventArgs e )
+		{
+			KeyDown?.Invoke( e );
+			if( !KeyMouseActionEnabled ) {
+				return;
+			}
+
+			// handle key down events
+			switch( e.KeyCode ) {
+				case Keys.F5:
+					AxoView();
+					ZoomAllView();
+					UpdateView();
+					break;
+			}
+		}
+
+		public Action<MouseEventArgs> MouseWheel;
+		public Action<MouseEventArgs> MouseDown;
+		public Action<MouseEventArgs> MouseMove;
+		public Action<KeyEventArgs> KeyDown;
 	}
 }
