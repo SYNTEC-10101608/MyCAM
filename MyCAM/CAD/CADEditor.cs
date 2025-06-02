@@ -24,8 +24,8 @@ namespace MyCAM.CAD
 
 	public enum AddPointType
 	{
-		ArcCenter = 0,
-		EdgeCenter = 1,
+		CircArcCenter = 0,
+		EdgeMidPoint = 1,
 	}
 
 	internal class ViewObject
@@ -55,8 +55,8 @@ namespace MyCAM.CAD
 			m_CADManager.AddCADModelDone += OnAddCADModelDone;
 
 			// default action
-			m_CADAction = new CADActionDefault( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap );
-			m_CADAction.Start();
+			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap );
+			m_DefaultAction.Start();
 		}
 
 		// viewer properties
@@ -71,7 +71,7 @@ namespace MyCAM.CAD
 		CADManager m_CADManager;
 
 		// action
-		ICADAction m_CADAction;
+		ICADAction m_DefaultAction;
 
 		// APIs
 		public void ImportFile( FileFormat format )
@@ -110,7 +110,9 @@ namespace MyCAM.CAD
 
 		public void AddPoint( AddPointType type )
 		{
-
+			m_DefaultAction.End();
+			AddPointAction action = new AddPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap, type );
+			action.Start();
 		}
 
 		// manager events

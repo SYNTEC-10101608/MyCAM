@@ -49,12 +49,12 @@ namespace MyCAM
 		// add feature
 		void m_tsmiAddPoint_AcrCenter_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.AddPoint( AddPointType.ArcCenter );
+			m_CADEditor.AddPoint( AddPointType.CircArcCenter );
 		}
 
 		void m_tsmiAddPoint_EdgeCenter_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.AddPoint( AddPointType.EdgeCenter );
+			m_CADEditor.AddPoint( AddPointType.EdgeMidPoint );
 		}
 	}
 }

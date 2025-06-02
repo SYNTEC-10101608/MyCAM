@@ -96,27 +96,7 @@ namespace OCCTool
 			}
 		}
 
-		public static bool IsLine( TopoDS_Edge edge, out gp_Pnt p, out gp_Dir dir )
-		{
-			p = new gp_Pnt();
-			dir = new gp_Dir();
-			BRepAdaptor_Curve curve = new BRepAdaptor_Curve( edge );
-			if( curve.GetCurveType() == GeomAbs_CurveType.GeomAbs_Line ) {
-				p = curve.Line().Location();
-				dir = curve.Line().Direction();
-				return true;
-			}
-			else if( IsApproximatelyLinear( edge, out gp_Pnt p2, out gp_Pnt p1 ) ) {
-				p = p1;
-				dir = new gp_Dir( new gp_Vec( p1, p2 ) );
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-
-		public static bool IsAxialSymmetry( TopoDS_Face face, out gp_Pnt p, out gp_Dir dir )
+		public static bool IsAxialSymmetrySurface( TopoDS_Face face, out gp_Pnt p, out gp_Dir dir )
 		{
 			p = new gp_Pnt();
 			dir = new gp_Dir();
@@ -149,6 +129,57 @@ namespace OCCTool
 			else {
 				return false;
 			}
+		}
+
+		public static bool IsLine( TopoDS_Edge edge, out gp_Pnt p, out gp_Dir dir )
+		{
+			p = new gp_Pnt();
+			dir = new gp_Dir();
+			BRepAdaptor_Curve curve = new BRepAdaptor_Curve( edge );
+			if( curve.GetCurveType() == GeomAbs_CurveType.GeomAbs_Line ) {
+				p = curve.Line().Location();
+				dir = curve.Line().Direction();
+				return true;
+			}
+			else if( IsApproximatelyLinear( edge, out gp_Pnt p2, out gp_Pnt p1 ) ) {
+				p = p1;
+				dir = new gp_Dir( new gp_Vec( p1, p2 ) );
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		public static bool IsCircularArc( TopoDS_Edge edge, out gp_Pnt p, out double r, out gp_Dir dir )
+		{
+			p = new gp_Pnt();
+			dir = new gp_Dir();
+			r = 0;
+			BRepAdaptor_Curve curve = new BRepAdaptor_Curve( edge );
+			if( curve.GetCurveType() == GeomAbs_CurveType.GeomAbs_Circle ) {
+				p = curve.Circle().Location();
+				dir = curve.Circle().Axis().Direction();
+				r = curve.Circle().Radius();
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		public static bool GetEdgeMidPoint( TopoDS_Edge edge, out gp_Pnt mid )
+		{
+			mid = new gp_Pnt();
+			if( edge == null || edge.IsNull() ) {
+				return false;
+			}
+			BRepAdaptor_Curve curve = new BRepAdaptor_Curve( edge );
+			double dStartU = curve.FirstParameter();
+			double dEndU = curve.LastParameter();
+			double dMidU = ( dStartU + dEndU ) / 2;
+			mid = curve.Value( dMidU );
+			return true;
 		}
 
 		// private

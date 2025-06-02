@@ -183,7 +183,7 @@ namespace PartPlacement
 			}
 			bool isValid1 = false;
 			if( refShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_FACE ) {
-				if( GeometryTool.IsAxialSymmetry( TopoDS.ToFace( refShape ), out pR, out dR ) ) {
+				if( GeometryTool.IsAxialSymmetrySurface( TopoDS.ToFace( refShape ), out pR, out dR ) ) {
 					isValid1 = true;
 				}
 				isValid1 = true;
@@ -195,7 +195,7 @@ namespace PartPlacement
 			}
 			bool isValid2 = false;
 			if( moveShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_FACE ) {
-				if( GeometryTool.IsAxialSymmetry( TopoDS.ToFace( moveShape ), out pM, out dM ) ) {
+				if( GeometryTool.IsAxialSymmetrySurface( TopoDS.ToFace( moveShape ), out pM, out dM ) ) {
 					isValid2 = true;
 				}
 			}

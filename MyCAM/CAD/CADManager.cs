@@ -34,7 +34,7 @@ namespace MyCAM.CAD
 	{
 		public Action<CADModel> AddCADModelDone;
 
-		public void AddCADModel( TopoDS_Shape newShape )
+		public void AddCADModel( TopoDS_Shape newShape, string szPrefix = "" )
 		{
 			if( newShape == null || newShape.IsNull() ) {
 				return;
@@ -69,7 +69,7 @@ namespace MyCAM.CAD
 				default:
 					return; // not a valid shape type
 			}
-			string szUID = szType + nID.ToString();
+			string szUID = szPrefix + "_" + szType + "_" + nID.ToString();
 			string szName = szUID;
 			CADModel model = new CADModel( szUID, szName, newShape );
 			m_CADModelContainer.Add( model );
