@@ -27,6 +27,11 @@ namespace MyCAM.CAD
 		void Start();
 
 		void End();
+
+		Action<ICADAction> EndAction
+		{
+			get; set;
+		}
 	}
 
 	internal class CADACtionBase : ICADAction
@@ -71,6 +76,12 @@ namespace MyCAM.CAD
 			m_Viewer.KeyDown -= ViewerKeyDown;
 			m_TreeView.AfterSelect -= TreeViewAfterSelect;
 			m_TreeView.KeyDown -= TreeViewKeyDown;
+			EndAction?.Invoke( this );
+		}
+
+		public Action<ICADAction> EndAction
+		{
+			get; set;
 		}
 
 		protected virtual void ViewerMouseDown( MouseEventArgs e )
@@ -122,15 +133,22 @@ namespace MyCAM.CAD
 			base.Start();
 			m_Viewer.GetAISContext().ClearSelected( false );
 			m_Viewer.UpdateView();
+			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
+				m_Viewer.GetAISContext().Activate( viewObject.AISHandle );
+			}
 			m_bSuppressTreeViewSync = false;
+			SyncSelectionFromTreeToView();
 		}
 
 		public override void End()
 		{
-			base.End();
 			m_Viewer.GetAISContext().ClearSelected( false );
 			m_Viewer.UpdateView();
+			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
+				m_Viewer.GetAISContext().Deactivate();
+			}
 			m_bSuppressTreeViewSync = false;
+			base.End();
 		}
 
 		protected override void ViewerMouseDown( MouseEventArgs e )
@@ -305,7 +323,6 @@ namespace MyCAM.CAD
 
 		public override void End()
 		{
-			base.End();
 			m_Viewer.GetAISContext().ClearSelected( false );
 			m_Viewer.UpdateView();
 
@@ -316,6 +333,7 @@ namespace MyCAM.CAD
 			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Deactivate();
 			}
+			base.End();
 		}
 
 		public override CADActionType ActionType

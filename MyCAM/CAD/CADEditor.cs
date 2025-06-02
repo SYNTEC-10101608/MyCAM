@@ -112,7 +112,7 @@ namespace MyCAM.CAD
 		{
 			m_DefaultAction.End();
 			AddPointAction action = new AddPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap, type );
-			action.Start();
+			EditActionStart( action );
 		}
 
 		// manager events
@@ -217,5 +217,20 @@ namespace MyCAM.CAD
 			return aisShape;
 		}
 
+		void EditActionStart( ICADAction action )
+		{
+			m_DefaultAction.End();
+			action.Start();
+			action.EndAction += EditActionEnd;
+		}
+
+		void EditActionEnd( ICADAction action )
+		{
+			if( action == null
+				|| action.ActionType == CADActionType.None || action.ActionType == CADActionType.Default ) {
+				return;
+			}
+			m_DefaultAction.Start();
+		}
 	}
 }
