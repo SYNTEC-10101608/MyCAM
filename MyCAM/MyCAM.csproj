@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CAD\CADAction\ICADAction.cs" />
     <Compile Include="CAD\CADEditor.cs" />
     <Compile Include="CAD\CADManager.cs" />
     <Compile Include="StartupForm.cs">

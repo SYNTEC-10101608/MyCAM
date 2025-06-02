@@ -22,6 +22,24 @@ namespace MyCAM.CAD
 		IGES = 2
 	}
 
+	public enum AddPointType
+	{
+		ArcCenter = 0,
+		EdgeCenter = 1,
+	}
+
+	internal class ViewObject
+	{
+		public ViewObject( AIS_InteractiveObject shape )
+		{
+			AISHandle = shape;
+		}
+
+		public bool Visible { get; set; } = true;
+
+		public AIS_InteractiveObject AISHandle { get; set; } = null;
+	}
+
 	internal class CADEditor
 	{
 		public CADEditor( Viewer viewer, TreeView treeView )
@@ -32,80 +50,28 @@ namespace MyCAM.CAD
 			m_Viewer = viewer;
 			m_TreeView = treeView;
 
-			// viewer events
-			viewer.MouseDown += ViewerMouseDown;
-			viewer.KeyDown += ViewerKeyDown;
-
-			// tree view events
-			treeView.AfterSelect += TreeViewAfterSelect;
-			treeView.KeyDown += TreeViewKeyDown;
-
 			// CAD manager
 			m_CADManager = new CADManager();
 			m_CADManager.AddCADModelDone += OnAddCADModelDone;
+
+			// default action
+			m_CADAction = new CADActionDefault( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap );
+			m_CADAction.Start();
 		}
 
 		// viewer properties
 		Viewer m_Viewer;
-		class ViewObject
-		{
-			public ViewObject( AIS_InteractiveObject shape )
-			{
-				AISHandle = shape;
-			}
-
-			public bool Visible { get; set; } = true;
-
-			public AIS_InteractiveObject AISHandle { get; set; } = null;
-		}
 		Dictionary<string, ViewObject> m_ViewObjectMap = new Dictionary<string, ViewObject>();
 
 		// tree view properties
 		TreeView m_TreeView;
 		Dictionary<string, TreeNode> m_TreeNodeMap = new Dictionary<string, TreeNode>();
-		bool m_bSuppressTreeViewSync = false;
 
 		// CAD manager
 		CADManager m_CADManager;
 
-		// viewer events
-
-		void ViewerMouseDown( MouseEventArgs e )
-		{
-			// select
-			if( e.Button == MouseButtons.Left ) {
-				m_Viewer.GetAISContext().SelectDetected();
-				m_Viewer.UpdateView();
-				SyncSelectionFromViewToTree();
-			}
-		}
-
-		void ViewerKeyDown( KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Space ) {
-				ChangeObjectVisibility();
-			}
-		}
-
-		// tree view events
-		void TreeViewKeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Space ) {
-				ChangeObjectVisibility();
-			}
-		}
-
-		void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			foreach( TreeNode node in m_TreeView.Nodes ) {
-				node.BackColor = System.Drawing.Color.White;
-			}
-			if( e.Node == null ) {
-				return;
-			}
-			e.Node.BackColor = System.Drawing.Color.Cyan;
-			SyncSelectionFromTreeToView();
-		}
+		// action
+		ICADAction m_CADAction;
 
 		// APIs
 		public void ImportFile( FileFormat format )
@@ -142,28 +108,9 @@ namespace MyCAM.CAD
 			ReadFileData( format, szFileName );
 		}
 
-		public void ChangeObjectVisibility()
+		public void AddPoint( AddPointType type )
 		{
-			TreeNode selectedNode = m_TreeView.SelectedNode;
-			if( selectedNode == null || string.IsNullOrEmpty( selectedNode.Text ) ) {
-				return;
-			}
-			string szUID = selectedNode.Text;
-			ChangeObjectVisibility( szUID );
-		}
 
-		public void RemoveObject()
-		{
-			TreeNode selectedNode = m_TreeView.SelectedNode;
-			if( selectedNode == null || string.IsNullOrEmpty( selectedNode.Text ) ) {
-				return;
-			}
-			string szUID = selectedNode.Text;
-			RemoveObject( szUID );
-		}
-
-		public void ExtractFace()
-		{
 		}
 
 		// manager events
@@ -257,41 +204,6 @@ namespace MyCAM.CAD
 			return result;
 		}
 
-		void ChangeObjectVisibility( string szUID )
-		{
-			// toggle the visibility of the selected object
-			if( !m_ViewObjectMap.ContainsKey( szUID ) ) {
-				return;
-			}
-			ViewObject viewObject = m_ViewObjectMap[ szUID ];
-			if( viewObject == null || viewObject.AISHandle == null ) {
-				return;
-			}
-			if( !m_TreeNodeMap.ContainsKey( szUID ) ) {
-				return;
-			}
-			TreeNode node = m_TreeNodeMap[ szUID ];
-			if( node == null ) {
-				return;
-			}
-
-			// toggle visibility
-			viewObject.Visible = !viewObject.Visible;
-			if( viewObject.Visible ) {
-				node.ForeColor = System.Drawing.Color.Black;
-				m_Viewer.GetAISContext().Display( viewObject.AISHandle, true );
-			}
-			else {
-				node.ForeColor = System.Drawing.Color.LightGray;
-				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, true );
-			}
-		}
-
-		void RemoveObject( string szUID )
-		{
-			throw new NotImplementedException( "RemoveObject method is not implemented yet." );
-		}
-
 		AIS_Shape CreateAIS( TopoDS_Shape shape )
 		{
 			AIS_Shape aisShape = new AIS_Shape( shape );
@@ -303,66 +215,5 @@ namespace MyCAM.CAD
 			return aisShape;
 		}
 
-		void SyncSelectionFromTreeToView()
-		{
-			if( m_bSuppressTreeViewSync ) {
-				return;
-			}
-
-			// clear viewer slection
-			m_Viewer.GetAISContext().ClearSelected( false );
-
-			// get the selected node
-			TreeNode node = m_TreeView.SelectedNode;
-			if( node == null || string.IsNullOrEmpty( node.Text ) ) {
-				return;
-			}
-			string szUID = node.Text;
-
-			// find the corresponding view object
-			if( !m_ViewObjectMap.ContainsKey( szUID ) ) {
-				return;
-			}
-			ViewObject viewObject = m_ViewObjectMap[ szUID ];
-			if( viewObject == null || viewObject.AISHandle == null ) {
-				return;
-			}
-
-			// select the shape in the viewer
-			m_Viewer.GetAISContext().SetSelected( viewObject.AISHandle, true );
-		}
-
-		void SyncSelectionFromViewToTree()
-		{
-			// clear tree view selection
-			m_TreeView.SelectedNode = null;
-			foreach( TreeNode node in m_TreeView.Nodes ) {
-				node.BackColor = System.Drawing.Color.White;
-			}
-
-			// get the selected shape
-			m_Viewer.GetAISContext().InitSelected();
-			if( !m_Viewer.GetAISContext().MoreSelected() ) {
-				return;
-			}
-			TopoDS_Shape selectedShape = m_Viewer.GetAISContext().SelectedShape();
-			if( selectedShape == null || selectedShape.IsNull() ) {
-				return;
-			}
-
-			// find the corresponding UID
-			string szUID = m_CADManager.GetUIDByShape( selectedShape );
-			if( string.IsNullOrEmpty( szUID ) ) {
-				return;
-			}
-
-			// find the node in the tree view
-			if( !m_TreeNodeMap.ContainsKey( szUID ) ) {
-				return;
-			}
-			m_bSuppressTreeViewSync = true;
-			m_TreeView.SelectedNode = m_TreeNodeMap[ szUID ];
-			m_bSuppressTreeViewSync = false;
-		}
 	}
 }

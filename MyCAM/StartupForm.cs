@@ -45,5 +45,16 @@ namespace MyCAM
 		{
 			m_CADEditor.ImportFile( FileFormat.IGES );
 		}
+
+		// add feature
+		void m_tsmiAddPoint_AcrCenter_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.AddPoint( AddPointType.ArcCenter );
+		}
+
+		void m_tsmiAddPoint_EdgeCenter_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.AddPoint( AddPointType.EdgeCenter );
+		}
 	}
 }

@@ -32,10 +32,14 @@
 			this.m_tsmiImportBRep = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiImportStep = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiImportIges = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiAddFeature = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiAddPoint = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
 			this.m_panBackGround = new System.Windows.Forms.Panel();
+			this.m_tsmiAddPoint_AcrCenter = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiAddPoint_EdgeCenter = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -44,7 +48,8 @@
 			// menuStrip1
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiImport});
+            this.m_tsmiImport,
+            this.m_tsmiAddFeature});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(1184, 24);
@@ -64,23 +69,40 @@
 			// m_tsmiImportBRep
 			// 
 			this.m_tsmiImportBRep.Name = "m_tsmiImportBRep";
-			this.m_tsmiImportBRep.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportBRep.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportBRep.Text = "BRep";
 			this.m_tsmiImportBRep.Click += new System.EventHandler(this.m_tsmiImportBRep_Click);
 			// 
 			// m_tsmiImportStep
 			// 
 			this.m_tsmiImportStep.Name = "m_tsmiImportStep";
-			this.m_tsmiImportStep.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportStep.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportStep.Text = "Step";
 			this.m_tsmiImportStep.Click += new System.EventHandler(this.m_tsmiImportStep_Click);
 			// 
 			// m_tsmiImportIges
 			// 
 			this.m_tsmiImportIges.Name = "m_tsmiImportIges";
-			this.m_tsmiImportIges.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportIges.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportIges.Text = "Iges";
 			this.m_tsmiImportIges.Click += new System.EventHandler(this.m_tsmiImportIges_Click);
+			// 
+			// m_tsmiAddFeature
+			// 
+			this.m_tsmiAddFeature.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiAddPoint});
+			this.m_tsmiAddFeature.Name = "m_tsmiAddFeature";
+			this.m_tsmiAddFeature.Size = new System.Drawing.Size(67, 20);
+			this.m_tsmiAddFeature.Text = "建立特徵";
+			// 
+			// m_tsmiAddPoint
+			// 
+			this.m_tsmiAddPoint.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiAddPoint_AcrCenter,
+            this.m_tsmiAddPoint_EdgeCenter});
+			this.m_tsmiAddPoint.Name = "m_tsmiAddPoint";
+			this.m_tsmiAddPoint.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiAddPoint.Text = "參考點";
 			// 
 			// m_panViewer
 			// 
@@ -117,6 +139,20 @@
 			this.m_panBackGround.Size = new System.Drawing.Size(1184, 737);
 			this.m_panBackGround.TabIndex = 0;
 			// 
+			// m_tsmiAddPoint_AcrCenter
+			// 
+			this.m_tsmiAddPoint_AcrCenter.Name = "m_tsmiAddPoint_AcrCenter";
+			this.m_tsmiAddPoint_AcrCenter.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiAddPoint_AcrCenter.Text = "圓弧中心";
+			this.m_tsmiAddPoint_AcrCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_AcrCenter_Click);
+			// 
+			// m_tsmiAddPoint_EdgeCenter
+			// 
+			this.m_tsmiAddPoint_EdgeCenter.Name = "m_tsmiAddPoint_EdgeCenter";
+			this.m_tsmiAddPoint_EdgeCenter.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiAddPoint_EdgeCenter.Text = "線段中心";
+			this.m_tsmiAddPoint_EdgeCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_EdgeCenter_Click);
+			// 
 			// StartupForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -147,6 +183,10 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportBRep;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportStep;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportIges;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddFeature;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_AcrCenter;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_EdgeCenter;
 	}
 }
 
