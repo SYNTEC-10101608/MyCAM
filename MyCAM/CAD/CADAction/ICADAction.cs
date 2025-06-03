@@ -1,9 +1,4 @@
-﻿using OCC.BRepBuilderAPI;
-using OCC.gp;
-using OCC.TopAbs;
-using OCC.TopoDS;
-using OCCTool;
-using OCCViewer;
+﻿using OCCViewer;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;

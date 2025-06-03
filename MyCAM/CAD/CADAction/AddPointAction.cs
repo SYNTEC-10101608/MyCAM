@@ -14,7 +14,7 @@ namespace MyCAM.CAD
 		public AddPointAction( Viewer viewer, TreeView treeView,
 			CADManager cadManager, Dictionary<string, ViewObject> viewObjectMap, Dictionary<string, TreeNode> treeNodeMap,
 			AddPointType addPointType )
-			: base( viewer, treeView, cadManager, viewObjectMap, treeNodeMap  )
+			: base( viewer, treeView, cadManager, viewObjectMap, treeNodeMap )
 		{
 			m_AddPointType = addPointType;
 		}
