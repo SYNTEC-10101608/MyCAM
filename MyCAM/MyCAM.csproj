@@ -51,6 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CAD\CADAction\AddPointAction.cs" />
+    <Compile Include="CAD\CADAction\DefaultAction.cs" />
     <Compile Include="CAD\CADAction\ICADAction.cs" />
     <Compile Include="CAD\CADEditor.cs" />
     <Compile Include="CAD\CADManager.cs" />

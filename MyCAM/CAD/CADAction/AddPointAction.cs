@@ -1,0 +1,141 @@
+﻿using OCC.BRepBuilderAPI;
+using OCC.gp;
+using OCC.TopAbs;
+using OCC.TopoDS;
+using OCCTool;
+using OCCViewer;
+using System.Collections.Generic;
+using System.Windows.Forms;
+
+namespace MyCAM.CAD
+{
+	internal class AddPointAction : CADACtionBase
+	{
+		public AddPointAction( Viewer viewer, TreeView treeView,
+			CADManager cadManager, Dictionary<string, ViewObject> viewObjectMap,
+			Dictionary<string, TreeNode> treeNodeMap,
+			AddPointType addPointType )
+			: base( viewer, treeView, viewObjectMap, treeNodeMap, cadManager )
+		{
+			m_AddPointType = addPointType;
+		}
+
+		public override void Start()
+		{
+			base.Start();
+			m_Viewer.GetAISContext().ClearSelected( false );
+			m_Viewer.UpdateView();
+
+			// disable tree view
+			m_TreeView.Enabled = false;
+
+			// activate edge slection mode
+			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
+				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Edge );
+			}
+		}
+
+		public override void End()
+		{
+			m_Viewer.GetAISContext().ClearSelected( false );
+			m_Viewer.UpdateView();
+
+			// enable tree view
+			m_TreeView.Enabled = true;
+
+			// deactivate
+			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
+				m_Viewer.GetAISContext().Deactivate();
+			}
+			base.End();
+		}
+
+		public override CADActionType ActionType
+		{
+			get
+			{
+				return CADActionType.AddPoint;
+			}
+		}
+
+		protected override void ViewerMouseDown( MouseEventArgs e )
+		{
+			if( e.Button != MouseButtons.Left ) {
+				return;
+			}
+
+			// get selection edge
+			m_Viewer.GetAISContext().SelectDetected();
+			m_Viewer.GetAISContext().InitSelected();
+			if( !m_Viewer.GetAISContext().MoreSelected() ) {
+				return;
+			}
+			TopoDS_Shape selectedShape = m_Viewer.GetAISContext().SelectedShape();
+
+			// validate the edge
+			if( selectedShape == null || selectedShape.IsNull() ) {
+				return;
+			}
+			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_EDGE ) {
+				return;
+			}
+			TopoDS_Edge edge = TopoDS.ToEdge( selectedShape );
+
+			// add the point
+			bool isAdded = false;
+			if( m_AddPointType == AddPointType.CircArcCenter ) {
+				isAdded = AddCircArcCenter( edge );
+			}
+			else if( m_AddPointType == AddPointType.EdgeMidPoint ) {
+				isAdded = AddEdgeMidPoint( edge );
+			}
+
+			// end action if the point is added
+			if( isAdded ) {
+				End();
+			}
+		}
+
+		protected override void ViewerKeyDown( KeyEventArgs e )
+		{
+			if( e.KeyCode == Keys.Escape ) {
+				End();
+			}
+		}
+
+		bool AddCircArcCenter( TopoDS_Edge edge )
+		{
+			bool isValidCircle = GeometryTool.IsCircularArc( edge, out gp_Pnt center, out _, out _ );
+			if( !isValidCircle ) {
+				MessageBox.Show( "Bad Arc" );
+				return false;
+			}
+			AddToManager( center );
+			return true;
+		}
+
+		bool AddEdgeMidPoint( TopoDS_Edge edge )
+		{
+			bool isValidEdge = GeometryTool.GetEdgeMidPoint( edge, out gp_Pnt midPoint );
+			if( !isValidEdge ) {
+				MessageBox.Show( "Bad Edge" );
+				return false;
+			}
+			AddToManager( midPoint );
+			return true;
+		}
+
+		void AddToManager( gp_Pnt pointToAdd )
+		{
+			// create the vertex to add
+			BRepBuilderAPI_MakeVertex makeVertex = new BRepBuilderAPI_MakeVertex( pointToAdd );
+			if( !makeVertex.IsDone() ) {
+				return;
+			}
+			TopoDS_Vertex vertex = makeVertex.Vertex();
+			m_CADManager.AddCADModel( vertex, "AddPoint" );
+		}
+
+		AddPointType m_AddPointType;
+	}
+}

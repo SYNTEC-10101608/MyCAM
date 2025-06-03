@@ -34,12 +34,14 @@
 			this.m_tsmiImportIges = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAddFeature = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAddPoint = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiAddPoint_AcrCenter = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiAddPoint_EdgeCenter = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmi3PCoord = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiTransform = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
 			this.m_panBackGround = new System.Windows.Forms.Panel();
-			this.m_tsmiAddPoint_AcrCenter = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiAddPoint_EdgeCenter = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -49,7 +51,9 @@
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsmiImport,
-            this.m_tsmiAddFeature});
+            this.m_tsmiAddFeature,
+            this.m_tsmi3PCoord,
+            this.m_tsmiTransform});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(1184, 24);
@@ -101,15 +105,41 @@
             this.m_tsmiAddPoint_AcrCenter,
             this.m_tsmiAddPoint_EdgeCenter});
 			this.m_tsmiAddPoint.Name = "m_tsmiAddPoint";
-			this.m_tsmiAddPoint.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiAddPoint.Size = new System.Drawing.Size(110, 22);
 			this.m_tsmiAddPoint.Text = "參考點";
+			// 
+			// m_tsmiAddPoint_AcrCenter
+			// 
+			this.m_tsmiAddPoint_AcrCenter.Name = "m_tsmiAddPoint_AcrCenter";
+			this.m_tsmiAddPoint_AcrCenter.Size = new System.Drawing.Size(122, 22);
+			this.m_tsmiAddPoint_AcrCenter.Text = "圓弧中心";
+			this.m_tsmiAddPoint_AcrCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_AcrCenter_Click);
+			// 
+			// m_tsmiAddPoint_EdgeCenter
+			// 
+			this.m_tsmiAddPoint_EdgeCenter.Name = "m_tsmiAddPoint_EdgeCenter";
+			this.m_tsmiAddPoint_EdgeCenter.Size = new System.Drawing.Size(122, 22);
+			this.m_tsmiAddPoint_EdgeCenter.Text = "線段中心";
+			this.m_tsmiAddPoint_EdgeCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_EdgeCenter_Click);
+			// 
+			// m_tsmi3PCoord
+			// 
+			this.m_tsmi3PCoord.Name = "m_tsmi3PCoord";
+			this.m_tsmi3PCoord.Size = new System.Drawing.Size(67, 20);
+			this.m_tsmi3PCoord.Text = "三點座標";
+			// 
+			// m_tsmiTransform
+			// 
+			this.m_tsmiTransform.Name = "m_tsmiTransform";
+			this.m_tsmiTransform.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiTransform.Text = "轉換";
 			// 
 			// m_panViewer
 			// 
 			this.m_panViewer.Dock = System.Windows.Forms.DockStyle.Right;
-			this.m_panViewer.Location = new System.Drawing.Point(384, 0);
+			this.m_panViewer.Location = new System.Drawing.Point(284, 0);
 			this.m_panViewer.Name = "m_panViewer";
-			this.m_panViewer.Size = new System.Drawing.Size(800, 737);
+			this.m_panViewer.Size = new System.Drawing.Size(900, 737);
 			this.m_panViewer.TabIndex = 1;
 			// 
 			// m_panTreeView
@@ -118,7 +148,7 @@
 			this.m_panTreeView.Dock = System.Windows.Forms.DockStyle.Left;
 			this.m_panTreeView.Location = new System.Drawing.Point(0, 0);
 			this.m_panTreeView.Name = "m_panTreeView";
-			this.m_panTreeView.Size = new System.Drawing.Size(400, 737);
+			this.m_panTreeView.Size = new System.Drawing.Size(300, 737);
 			this.m_panTreeView.TabIndex = 0;
 			// 
 			// m_TreeView
@@ -126,7 +156,7 @@
 			this.m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_TreeView.Location = new System.Drawing.Point(0, 0);
 			this.m_TreeView.Name = "m_TreeView";
-			this.m_TreeView.Size = new System.Drawing.Size(400, 737);
+			this.m_TreeView.Size = new System.Drawing.Size(300, 737);
 			this.m_TreeView.TabIndex = 0;
 			// 
 			// m_panBackGround
@@ -138,20 +168,6 @@
 			this.m_panBackGround.Name = "m_panBackGround";
 			this.m_panBackGround.Size = new System.Drawing.Size(1184, 737);
 			this.m_panBackGround.TabIndex = 0;
-			// 
-			// m_tsmiAddPoint_AcrCenter
-			// 
-			this.m_tsmiAddPoint_AcrCenter.Name = "m_tsmiAddPoint_AcrCenter";
-			this.m_tsmiAddPoint_AcrCenter.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiAddPoint_AcrCenter.Text = "圓弧中心";
-			this.m_tsmiAddPoint_AcrCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_AcrCenter_Click);
-			// 
-			// m_tsmiAddPoint_EdgeCenter
-			// 
-			this.m_tsmiAddPoint_EdgeCenter.Name = "m_tsmiAddPoint_EdgeCenter";
-			this.m_tsmiAddPoint_EdgeCenter.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiAddPoint_EdgeCenter.Text = "線段中心";
-			this.m_tsmiAddPoint_EdgeCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_EdgeCenter_Click);
 			// 
 			// StartupForm
 			// 
@@ -187,6 +203,8 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_AcrCenter;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_EdgeCenter;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmi3PCoord;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiTransform;
 	}
 }
 

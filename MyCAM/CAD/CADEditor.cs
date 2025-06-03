@@ -110,7 +110,6 @@ namespace MyCAM.CAD
 
 		public void AddPoint( AddPointType type )
 		{
-			m_DefaultAction.End();
 			AddPointAction action = new AddPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap, type );
 			EditActionStart( action );
 		}
@@ -217,6 +216,7 @@ namespace MyCAM.CAD
 			return aisShape;
 		}
 
+		// edit actions
 		void EditActionStart( ICADAction action )
 		{
 			m_DefaultAction.End();
