@@ -8,9 +8,8 @@ namespace MyCAM.CAD
 	internal class DefaultAction : CADACtionBase
 	{
 		public DefaultAction( Viewer viewer, TreeView treeView,
-			CADManager cadManager, Dictionary<string, ViewObject> viewObjectMap,
-			Dictionary<string, TreeNode> treeNodeMap )
-			: base( viewer, treeView, viewObjectMap, treeNodeMap, cadManager )
+			CADManager cadManager, Dictionary<string, ViewObject> viewObjectMap, Dictionary<string, TreeNode> treeNodeMap )
+			: base( viewer, treeView, cadManager, viewObjectMap, treeNodeMap )
 		{
 		}
 
@@ -37,8 +36,7 @@ namespace MyCAM.CAD
 		public override void End()
 		{
 			// clear selection
-			m_Viewer.GetAISContext().ClearSelected( false );
-			m_Viewer.UpdateView();
+			m_Viewer.GetAISContext().ClearSelected( true );
 
 			// reset activation mode
 			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
@@ -167,7 +165,7 @@ namespace MyCAM.CAD
 			}
 
 			// clear viewer slection
-			m_Viewer.GetAISContext().ClearSelected( false );
+			m_Viewer.GetAISContext().ClearSelected( true );
 
 			// get the selected node
 			TreeNode node = m_TreeView.SelectedNode;

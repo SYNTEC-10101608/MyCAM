@@ -12,10 +12,9 @@ namespace MyCAM.CAD
 	internal class AddPointAction : CADACtionBase
 	{
 		public AddPointAction( Viewer viewer, TreeView treeView,
-			CADManager cadManager, Dictionary<string, ViewObject> viewObjectMap,
-			Dictionary<string, TreeNode> treeNodeMap,
+			CADManager cadManager, Dictionary<string, ViewObject> viewObjectMap, Dictionary<string, TreeNode> treeNodeMap,
 			AddPointType addPointType )
-			: base( viewer, treeView, viewObjectMap, treeNodeMap, cadManager )
+			: base( viewer, treeView, cadManager, viewObjectMap, treeNodeMap  )
 		{
 			m_AddPointType = addPointType;
 		}
@@ -25,8 +24,7 @@ namespace MyCAM.CAD
 			base.Start();
 
 			// clear selection
-			m_Viewer.GetAISContext().ClearSelected( false );
-			m_Viewer.UpdateView();
+			m_Viewer.GetAISContext().ClearSelected( true );
 
 			// disable tree view
 			m_TreeView.Enabled = false;

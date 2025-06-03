@@ -15,6 +15,7 @@ namespace MyCAM.CAD
 		None = 0,
 		Default = 1,
 		AddPoint = 2,
+		Create3PCS = 3,
 	}
 
 	internal interface ICADAction
@@ -37,13 +38,12 @@ namespace MyCAM.CAD
 	internal class CADACtionBase : ICADAction
 	{
 		public CADACtionBase( Viewer viewer, TreeView treeView,
-			Dictionary<string, ViewObject> viewObjectMap, Dictionary<string, TreeNode> treeNodeMap,
-			CADManager cadManager )
+			CADManager cadManager, Dictionary<string, ViewObject> viewObjectMap, Dictionary<string, TreeNode> treeNodeMap )
 		{
 			if( viewer == null || treeView == null
 				|| viewObjectMap == null || treeNodeMap == null
 				|| cadManager == null ) {
-				throw new ArgumentNullException( "Action constructing argument null" );
+				throw new ArgumentNullException( "Action constructing argument null - Base" );
 			}
 			m_Viewer = viewer;
 			m_TreeView = treeView;

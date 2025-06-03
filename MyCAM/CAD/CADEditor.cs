@@ -1,4 +1,6 @@
 ﻿using OCC.AIS;
+using OCC.Geom;
+using OCC.gp;
 using OCC.Graphic3d;
 using OCC.IFSelect;
 using OCC.IGESControl;
@@ -57,6 +59,12 @@ namespace MyCAM.CAD
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap );
 			m_DefaultAction.Start();
+
+			// global coordinate system
+			m_CoordinateSystemMap[ "Global" ] = m_GlobalCS;
+			AIS_Trihedron GlobalCSAIS = CreateTrihedron( m_GlobalCS, true );
+			m_Viewer.GetAISContext().Display( GlobalCSAIS, true );
+			m_Viewer.GetAISContext().Deactivate( GlobalCSAIS );
 		}
 
 		// viewer properties
@@ -69,6 +77,10 @@ namespace MyCAM.CAD
 
 		// CAD manager
 		CADManager m_CADManager;
+
+		// coordinate system
+		gp_Ax3 m_GlobalCS = new gp_Ax3( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
+		Dictionary<string, gp_Ax3> m_CoordinateSystemMap = new Dictionary<string, gp_Ax3>();
 
 		// action
 		ICADAction m_DefaultAction;
@@ -111,6 +123,12 @@ namespace MyCAM.CAD
 		public void AddPoint( AddPointType type )
 		{
 			AddPointAction action = new AddPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap, type );
+			EditActionStart( action );
+		}
+
+		public void Create3PCoordSystem()
+		{
+			Create3PCSAction action = new Create3PCSAction( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap, m_CoordinateSystemMap );
 			EditActionStart( action );
 		}
 
@@ -213,6 +231,23 @@ namespace MyCAM.CAD
 			aisShape.Attributes().SetFaceBoundaryDraw( true );
 			aisShape.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			return aisShape;
+		}
+
+		AIS_Trihedron CreateTrihedron( gp_Ax3 ax3, bool global = false )
+		{
+			AIS_Trihedron trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax3.Ax2() ) );
+			if( global ) {
+				trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+				trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+				trihedron.SetSize( 100.0 );
+			}
+			else {
+				trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+				trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+				trihedron.SetSize( 10.0 );
+			}
+			trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			return trihedron;
 		}
 
 		// edit actions

@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CAD\CADAction\Create3PCSAction.cs" />
     <Compile Include="CAD\CADAction\AddPointAction.cs" />
     <Compile Include="CAD\CADAction\DefaultAction.cs" />
     <Compile Include="CAD\CADAction\ICADAction.cs" />

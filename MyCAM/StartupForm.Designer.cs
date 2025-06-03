@@ -36,12 +36,14 @@
 			this.m_tsmiAddPoint = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAddPoint_AcrCenter = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAddPoint_EdgeCenter = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmi3PCoord = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiTransform = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
 			this.m_panBackGround = new System.Windows.Forms.Panel();
+			this.m_tsmi_Coordinate = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCreate3PCS = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiModifyCS = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -52,7 +54,7 @@
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsmiImport,
             this.m_tsmiAddFeature,
-            this.m_tsmi3PCoord,
+            this.m_tsmi_Coordinate,
             this.m_tsmiTransform});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
@@ -122,12 +124,6 @@
 			this.m_tsmiAddPoint_EdgeCenter.Text = "線段中心";
 			this.m_tsmiAddPoint_EdgeCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_EdgeCenter_Click);
 			// 
-			// m_tsmi3PCoord
-			// 
-			this.m_tsmi3PCoord.Name = "m_tsmi3PCoord";
-			this.m_tsmi3PCoord.Size = new System.Drawing.Size(67, 20);
-			this.m_tsmi3PCoord.Text = "三點座標";
-			// 
 			// m_tsmiTransform
 			// 
 			this.m_tsmiTransform.Name = "m_tsmiTransform";
@@ -169,6 +165,29 @@
 			this.m_panBackGround.Size = new System.Drawing.Size(1184, 737);
 			this.m_panBackGround.TabIndex = 0;
 			// 
+			// m_tsmi_Coordinate
+			// 
+			this.m_tsmi_Coordinate.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiCreate3PCS,
+            this.m_tsmiModifyCS});
+			this.m_tsmi_Coordinate.Name = "m_tsmi_Coordinate";
+			this.m_tsmi_Coordinate.Size = new System.Drawing.Size(55, 20);
+			this.m_tsmi_Coordinate.Text = "座標系";
+			// 
+			// m_tsmiCreate3PCS
+			// 
+			this.m_tsmiCreate3PCS.Name = "m_tsmiCreate3PCS";
+			this.m_tsmiCreate3PCS.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiCreate3PCS.Text = "建立三點座標系";
+			this.m_tsmiCreate3PCS.Click += new System.EventHandler(this.m_tsmiCreate3PCS_Click);
+			// 
+			// m_tsmiModifyCS
+			// 
+			this.m_tsmiModifyCS.Name = "m_tsmiModifyCS";
+			this.m_tsmiModifyCS.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiModifyCS.Text = "修改座標系";
+			this.m_tsmiModifyCS.Click += new System.EventHandler(this.m_tsmiModifyCS_Click);
+			// 
 			// StartupForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -203,8 +222,10 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_AcrCenter;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_EdgeCenter;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmi3PCoord;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiTransform;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmi_Coordinate;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiCreate3PCS;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiModifyCS;
 	}
 }
 

@@ -56,5 +56,16 @@ namespace MyCAM
 		{
 			m_CADEditor.AddPoint( AddPointType.EdgeMidPoint );
 		}
+
+		// coordinate system
+		void m_tsmiCreate3PCS_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.Create3PCoordSystem();
+		}
+
+		void m_tsmiModifyCS_Click( object sender, EventArgs e )
+		{
+			throw new NotImplementedException( "Modify Coordinate System is not implemented yet." );
+		}
 	}
 }
