@@ -132,7 +132,6 @@ namespace MyCAM.CAD
 			AIS_Shape aisShape = CreateAIS( shape );
 			m_ViewObjectMap[ szUID ] = new ViewObject( aisShape );
 			m_Viewer.GetAISContext().Display( aisShape, true );
-			m_Viewer.UpdateView();
 		}
 
 		// private methods

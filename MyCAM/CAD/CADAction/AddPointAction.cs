@@ -23,6 +23,8 @@ namespace MyCAM.CAD
 		public override void Start()
 		{
 			base.Start();
+
+			// clear selection
 			m_Viewer.GetAISContext().ClearSelected( false );
 			m_Viewer.UpdateView();
 
@@ -37,6 +39,7 @@ namespace MyCAM.CAD
 
 		public override void End()
 		{
+			// clear selection
 			m_Viewer.GetAISContext().ClearSelected( false );
 			m_Viewer.UpdateView();
 
