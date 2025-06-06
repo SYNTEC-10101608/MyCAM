@@ -67,5 +67,11 @@ namespace MyCAM
 		{
 			throw new NotImplementedException( "Modify Coordinate System is not implemented yet." );
 		}
+
+		void m_tsmiTransform_Click( object sender, EventArgs e )
+		{
+			m_msCAD_Transform.Visible = true;
+
+		}
 	}
 }

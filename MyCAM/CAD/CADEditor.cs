@@ -30,6 +30,14 @@ namespace MyCAM.CAD
 		EdgeMidPoint = 1,
 	}
 
+	public enum ETransformType
+	{
+		Axial,
+		AxialParallel,
+		Plane,
+		PlaneParallel,
+	}
+
 	internal class CADEditor
 	{
 		public CADEditor( Viewer viewer, TreeView treeView )
@@ -46,6 +54,7 @@ namespace MyCAM.CAD
 
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager );
+			m_CurrentAction = m_DefaultAction;
 			m_DefaultAction.Start();
 		}
 
@@ -58,6 +67,7 @@ namespace MyCAM.CAD
 
 		// action
 		ICADAction m_DefaultAction;
+		ICADAction m_CurrentAction;
 
 		// APIs
 		public void ImportFile( FileFormat format )
@@ -102,6 +112,28 @@ namespace MyCAM.CAD
 		public void Create3PCoordSystem()
 		{
 			throw new NotImplementedException( "Create 3P coordinate system is not implemented yet." );
+		}
+
+		public void StartTransform()
+		{
+			TransformAction action = new TransformAction( m_Viewer, m_TreeView, m_CADManager );
+			EditActionStart( action );
+		}
+
+		public void ApplyTransform( ETransformType type, bool bReverse = false )
+		{
+			if( m_CurrentAction.ActionType != CADActionType.Transform ) {
+				return;
+			}
+			( (TransformAction)m_CurrentAction ).ApplyTransform( type, bReverse );
+		}
+
+		public void EndTransform()
+		{
+			if( m_CurrentAction.ActionType != CADActionType.Transform ) {
+				return;
+			}
+			m_CurrentAction.End();
 		}
 
 		// manager events
@@ -226,8 +258,9 @@ namespace MyCAM.CAD
 		void EditActionStart( ICADAction action )
 		{
 			m_DefaultAction.End();
-			action.Start();
-			action.EndAction += EditActionEnd;
+			m_CurrentAction = action;
+			m_CurrentAction.Start();
+			m_CurrentAction.EndAction += EditActionEnd;
 		}
 
 		void EditActionEnd( ICADAction action )
@@ -237,6 +270,7 @@ namespace MyCAM.CAD
 				return;
 			}
 			m_DefaultAction.Start();
+			m_CurrentAction = m_DefaultAction;
 		}
 	}
 }
