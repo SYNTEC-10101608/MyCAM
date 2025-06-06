@@ -49,9 +49,6 @@ namespace Import
 
 			m_TreeView.AfterSelect += TreeViewAfterSelect;
 			m_TreeView.KeyDown += TreeViewKeyDown;
-
-			// manager events
-			m_CADManager.AddCADModelDone += OnAddCADModelDone;
 		}
 
 		void BackGroundSizeChanged( object sender, EventArgs e )
@@ -80,9 +77,6 @@ namespace Import
 		// tree view property
 		Panel m_panTreeView = new Panel();
 		TreeView m_TreeView = new TreeView();
-
-		// manager
-		CADManager m_CADManager = new CADManager();
 
 		// import part
 		void m_tsmiImportBRep_Click( object sender, EventArgs e )
@@ -170,20 +164,6 @@ namespace Import
 			if( oneShape == null || oneShape.IsNull() ) {
 				MessageBox.Show( ToString() + "Error: Import" );
 				return;
-			}
-
-			// add the read shape to the manager
-			AddToManager( oneShape );
-		}
-
-		void AddToManager( TopoDS_Shape oneShape )
-		{
-			List<TopoDS_Shape> shapeList = ArrangeShapeData( oneShape );
-			foreach( TopoDS_Shape shape in shapeList ) {
-				if( shape == null || shape.IsNull() ) {
-					continue;
-				}
-				m_CADManager.AddCADModel( shape );
 			}
 		}
 
