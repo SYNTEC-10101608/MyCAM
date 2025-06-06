@@ -15,10 +15,9 @@ namespace MyCAM.CAD
 {
 	internal class Create3PCSAction : CADACtionBase
 	{
-		public Create3PCSAction( Viewer viewer, TreeView treeView,
-			CADManager cadManager, Dictionary<string, ViewObject> viewObjectMap, Dictionary<string, TreeNode> treeNodeMap,
+		public Create3PCSAction( Viewer viewer, TreeView treeView, CADManager cadManager,
 			Dictionary<string, gp_Ax3> coordSystemMap )
-			: base( viewer, treeView, cadManager, viewObjectMap, treeNodeMap )
+			: base( viewer, treeView, cadManager )
 		{
 			if( coordSystemMap == null ) {
 				throw new System.ArgumentNullException( "Action constructing argument null - Create 3P CS" );
@@ -54,7 +53,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = false;
 
 			// activate vertex selection mode
-			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Vertex );
 			}
 			m_ActionStage = EActionStage.P1;
@@ -74,7 +73,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = true;
 
 			// deactivate
-			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Deactivate();
 			}
 			base.End();

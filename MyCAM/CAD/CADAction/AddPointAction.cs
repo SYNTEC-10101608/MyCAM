@@ -4,17 +4,15 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.CAD
 {
 	internal class AddPointAction : CADACtionBase
 	{
-		public AddPointAction( Viewer viewer, TreeView treeView,
-			CADManager cadManager, Dictionary<string, ViewObject> viewObjectMap, Dictionary<string, TreeNode> treeNodeMap,
+		public AddPointAction( Viewer viewer, TreeView treeView, CADManager cadManager,
 			AddPointType addPointType )
-			: base( viewer, treeView, cadManager, viewObjectMap, treeNodeMap )
+			: base( viewer, treeView, cadManager )
 		{
 			m_AddPointType = addPointType;
 		}
@@ -30,7 +28,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = false;
 
 			// activate edge slection mode
-			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Edge );
 			}
 		}
@@ -45,7 +43,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = true;
 
 			// deactivate
-			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Deactivate();
 			}
 			base.End();

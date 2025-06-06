@@ -1,17 +1,19 @@
-﻿using OCC.TopAbs;
+﻿using OCC.AIS;
+using OCC.TopAbs;
 using OCC.TopoDS;
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace MyCAM.CAD
 {
-	internal class CADModel
+	internal class ShapeData
 	{
-		public CADModel( string szUID, string szName, TopoDS_Shape shapeData )
+		public ShapeData( string szUID, string szName, TopoDS_Shape shapeData )
 		{
 			UID = szUID;
 			Name = szName;
-			ShapeData = shapeData;
+			Shape = shapeData;
 		}
 
 		public string UID
@@ -24,15 +26,55 @@ namespace MyCAM.CAD
 			get; set;
 		}
 
-		public TopoDS_Shape ShapeData
+		public TopoDS_Shape Shape
 		{
 			get; set;
 		}
 	}
 
+	internal class ViewObject
+	{
+		public ViewObject( AIS_InteractiveObject shape )
+		{
+			AISHandle = shape;
+		}
+
+		public bool Visible { get; set; } = true;
+
+		public AIS_InteractiveObject AISHandle { get; set; } = null;
+	}
+
 	internal class CADManager
 	{
-		public Action<CADModel> AddCADModelDone;
+		public Action<ShapeData> AddCADModelDone;
+
+		public CADManager()
+		{
+			ShapeDataContainer = new List<ShapeData>();
+			ShapeDataMap = new Dictionary<string, ShapeData>();
+			ViewObjectMap = new Dictionary<string, ViewObject>();
+			TreeNodeMap = new Dictionary<string, TreeNode>();
+		}
+
+		public List<ShapeData> ShapeDataContainer
+		{
+			get; private set;
+		}
+
+		public Dictionary<string, ShapeData> ShapeDataMap
+		{
+			get; private set;
+		}
+
+		public Dictionary<string, ViewObject> ViewObjectMap
+		{
+			get; private set;
+		}
+
+		public Dictionary<string, TreeNode> TreeNodeMap
+		{
+			get; private set;
+		}
 
 		public void AddCADModel( TopoDS_Shape newShape, string szPrefix = "" )
 		{
@@ -71,9 +113,9 @@ namespace MyCAM.CAD
 			}
 			string szUID = szPrefix + "_" + szType + "_" + nID.ToString();
 			string szName = szUID;
-			CADModel model = new CADModel( szUID, szName, newShape );
-			m_CADModelContainer.Add( model );
-			m_CADModelMap.Add( szUID, model );
+			ShapeData model = new ShapeData( szUID, szName, newShape );
+			ShapeDataContainer.Add( model );
+			ShapeDataMap.Add( szUID, model );
 			AddCADModelDone?.Invoke( model );
 		}
 
@@ -82,16 +124,14 @@ namespace MyCAM.CAD
 			if( shape == null || shape.IsNull() ) {
 				return string.Empty;
 			}
-			foreach( var model in m_CADModelContainer ) {
-				if( model.ShapeData.IsEqual( shape ) ) {
+			foreach( var model in ShapeDataContainer ) {
+				if( model.Shape.IsEqual( shape ) ) {
 					return model.UID;
 				}
 			}
 			return string.Empty;
 		}
 
-		List<CADModel> m_CADModelContainer = new List<CADModel>();
-		Dictionary<string, CADModel> m_CADModelMap = new Dictionary<string, CADModel>();
 
 		int m_SolidID = 0;
 		int m_ShellID = 0;

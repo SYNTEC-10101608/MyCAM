@@ -1,15 +1,13 @@
 ﻿using OCC.TopoDS;
 using OCCViewer;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.CAD
 {
 	internal class DefaultAction : CADACtionBase
 	{
-		public DefaultAction( Viewer viewer, TreeView treeView,
-			CADManager cadManager, Dictionary<string, ViewObject> viewObjectMap, Dictionary<string, TreeNode> treeNodeMap )
-			: base( viewer, treeView, cadManager, viewObjectMap, treeNodeMap )
+		public DefaultAction( Viewer viewer, TreeView treeView, CADManager cadManager )
+			: base( viewer, treeView, cadManager )
 		{
 		}
 
@@ -26,7 +24,7 @@ namespace MyCAM.CAD
 			base.Start();
 
 			// reset activation mode
-			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Activate( viewObject.AISHandle );
 			}
 			m_bSuppressTreeViewSync = false;
@@ -39,7 +37,7 @@ namespace MyCAM.CAD
 			m_Viewer.GetAISContext().ClearSelected( true );
 
 			// reset activation mode
-			foreach( ViewObject viewObject in m_ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Deactivate();
 			}
 			m_bSuppressTreeViewSync = false;
@@ -98,17 +96,17 @@ namespace MyCAM.CAD
 		void ChangeObjectVisibility( string szUID )
 		{
 			// toggle the visibility of the selected object
-			if( !m_ViewObjectMap.ContainsKey( szUID ) ) {
+			if( !m_CADManager.ViewObjectMap.ContainsKey( szUID ) ) {
 				return;
 			}
-			ViewObject viewObject = m_ViewObjectMap[ szUID ];
+			ViewObject viewObject = m_CADManager.ViewObjectMap[ szUID ];
 			if( viewObject == null || viewObject.AISHandle == null ) {
 				return;
 			}
-			if( !m_TreeNodeMap.ContainsKey( szUID ) ) {
+			if( !m_CADManager.TreeNodeMap.ContainsKey( szUID ) ) {
 				return;
 			}
-			TreeNode node = m_TreeNodeMap[ szUID ];
+			TreeNode node = m_CADManager.TreeNodeMap[ szUID ];
 			if( node == null ) {
 				return;
 			}
@@ -150,11 +148,11 @@ namespace MyCAM.CAD
 			}
 
 			// find the node in the tree view
-			if( !m_TreeNodeMap.ContainsKey( szUID ) ) {
+			if( !m_CADManager.TreeNodeMap.ContainsKey( szUID ) ) {
 				return;
 			}
 			m_bSuppressTreeViewSync = true;
-			m_TreeView.SelectedNode = m_TreeNodeMap[ szUID ];
+			m_TreeView.SelectedNode = m_CADManager.TreeNodeMap[ szUID ];
 			m_bSuppressTreeViewSync = false;
 		}
 
@@ -175,10 +173,10 @@ namespace MyCAM.CAD
 			string szUID = node.Text;
 
 			// find the corresponding view object
-			if( !m_ViewObjectMap.ContainsKey( szUID ) ) {
+			if( !m_CADManager.ViewObjectMap.ContainsKey( szUID ) ) {
 				return;
 			}
-			ViewObject viewObject = m_ViewObjectMap[ szUID ];
+			ViewObject viewObject = m_CADManager.ViewObjectMap[ szUID ];
 			if( viewObject == null || viewObject.AISHandle == null ) {
 				return;
 			}

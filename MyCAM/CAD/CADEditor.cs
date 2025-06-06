@@ -30,18 +30,6 @@ namespace MyCAM.CAD
 		EdgeMidPoint = 1,
 	}
 
-	internal class ViewObject
-	{
-		public ViewObject( AIS_InteractiveObject shape )
-		{
-			AISHandle = shape;
-		}
-
-		public bool Visible { get; set; } = true;
-
-		public AIS_InteractiveObject AISHandle { get; set; } = null;
-	}
-
 	internal class CADEditor
 	{
 		public CADEditor( Viewer viewer, TreeView treeView )
@@ -57,30 +45,16 @@ namespace MyCAM.CAD
 			m_CADManager.AddCADModelDone += OnAddCADModelDone;
 
 			// default action
-			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap );
+			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager );
 			m_DefaultAction.Start();
-
-			// global coordinate system
-			m_CoordinateSystemMap[ "Global" ] = m_GlobalCS;
-			AIS_Trihedron GlobalCSAIS = CreateTrihedron( m_GlobalCS, true );
-			m_Viewer.GetAISContext().Display( GlobalCSAIS, true );
-			m_Viewer.GetAISContext().Deactivate( GlobalCSAIS );
 		}
 
-		// viewer properties
+		// user interface
 		Viewer m_Viewer;
-		Dictionary<string, ViewObject> m_ViewObjectMap = new Dictionary<string, ViewObject>();
-
-		// tree view properties
 		TreeView m_TreeView;
-		Dictionary<string, TreeNode> m_TreeNodeMap = new Dictionary<string, TreeNode>();
 
 		// CAD manager
 		CADManager m_CADManager;
-
-		// coordinate system
-		gp_Ax3 m_GlobalCS = new gp_Ax3( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
-		Dictionary<string, gp_Ax3> m_CoordinateSystemMap = new Dictionary<string, gp_Ax3>();
 
 		// action
 		ICADAction m_DefaultAction;
@@ -122,33 +96,31 @@ namespace MyCAM.CAD
 
 		public void AddPoint( AddPointType type )
 		{
-			AddPointAction action = new AddPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap, type );
-			EditActionStart( action );
+			throw new NotImplementedException( "Add point action is not implemented yet." );
 		}
 
 		public void Create3PCoordSystem()
 		{
-			Create3PCSAction action = new Create3PCSAction( m_Viewer, m_TreeView, m_CADManager, m_ViewObjectMap, m_TreeNodeMap, m_CoordinateSystemMap );
-			EditActionStart( action );
+			throw new NotImplementedException( "Create 3P coordinate system is not implemented yet." );
 		}
 
 		// manager events
-		void OnAddCADModelDone( CADModel model )
+		void OnAddCADModelDone( ShapeData model )
 		{
 			string szUID = model.UID;
-			TopoDS_Shape shape = model.ShapeData;
+			TopoDS_Shape shape = model.Shape;
 			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() ) {
 				return;
 			}
 
 			// update the tree view
 			TreeNode newNode = new TreeNode( szUID );
-			m_TreeNodeMap[ szUID ] = newNode;
+			m_CADManager.TreeNodeMap[ szUID ] = newNode;
 			m_TreeView.Nodes.Add( newNode );
 
 			// update the viewer
 			AIS_Shape aisShape = CreateAIS( shape );
-			m_ViewObjectMap[ szUID ] = new ViewObject( aisShape );
+			m_CADManager.ViewObjectMap[ szUID ] = new ViewObject( aisShape );
 			m_Viewer.GetAISContext().Display( aisShape, true );
 		}
 

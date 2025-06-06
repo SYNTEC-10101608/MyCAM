@@ -1,6 +1,5 @@
 ﻿using OCCViewer;
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.CAD
@@ -32,18 +31,13 @@ namespace MyCAM.CAD
 
 	internal class CADACtionBase : ICADAction
 	{
-		public CADACtionBase( Viewer viewer, TreeView treeView,
-			CADManager cadManager, Dictionary<string, ViewObject> viewObjectMap, Dictionary<string, TreeNode> treeNodeMap )
+		public CADACtionBase( Viewer viewer, TreeView treeView, CADManager cadManager )
 		{
-			if( viewer == null || treeView == null
-				|| viewObjectMap == null || treeNodeMap == null
-				|| cadManager == null ) {
+			if( viewer == null || treeView == null || cadManager == null ) {
 				throw new ArgumentNullException( "Action constructing argument null - Base" );
 			}
 			m_Viewer = viewer;
 			m_TreeView = treeView;
-			m_ViewObjectMap = viewObjectMap;
-			m_TreeNodeMap = treeNodeMap;
 			m_CADManager = cadManager;
 		}
 
@@ -103,8 +97,6 @@ namespace MyCAM.CAD
 
 		protected Viewer m_Viewer;
 		protected TreeView m_TreeView;
-		protected Dictionary<string, ViewObject> m_ViewObjectMap;
-		protected Dictionary<string, TreeNode> m_TreeNodeMap;
 		protected CADManager m_CADManager;
 	}
 }
