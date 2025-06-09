@@ -73,6 +73,7 @@ namespace MyCAM
 		void m_tsmiTransform_Click( object sender, EventArgs e )
 		{
 			m_msCAD_Transform.Visible = true;
+			m_msCAD.Enabled = false;
 			m_CADEditor.StartTransform();
 		}
 
@@ -118,8 +119,9 @@ namespace MyCAM
 
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.EndTransform();
 			m_msCAD_Transform.Visible = false;
+			m_msCAD.Enabled = true;
+			m_CADEditor.EndTransform();
 		}
 	}
 }
