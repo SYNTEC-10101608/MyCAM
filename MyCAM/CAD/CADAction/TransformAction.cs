@@ -107,6 +107,18 @@ namespace MyCAM.CAD
 
 		public void TransformDone()
 		{
+			foreach( var oneData in m_CADManager.ShapeDataMap ) {
+				BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( oneData.Value.Shape, m_TotalTrsf );
+				oneData.Value.Shape = transform.Shape();
+				if( m_CADManager.ViewObjectMap.ContainsKey( oneData.Key ) ) {
+					AIS_Shape oneAIS = AIS_Shape.DownCast( m_CADManager.ViewObjectMap[ oneData.Key ].AISHandle );
+					if( oneAIS == null || oneAIS.IsNull()) {
+						continue;
+					}
+					oneAIS.SetShape( oneData.Value.Shape );
+				}
+			}
+			End();
 		}
 
 		void MakePartShape()
