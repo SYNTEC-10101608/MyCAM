@@ -1,9 +1,6 @@
 ﻿using OCC.AIS;
-using OCC.Geom;
-using OCC.gp;
 using OCC.IFSelect;
 using OCC.IGESControl;
-using OCC.Quantity;
 using OCC.STEPControl;
 using OCC.TopAbs;
 using OCC.TopoDS;
@@ -223,23 +220,6 @@ namespace MyCAM.CAD
 				result.AddRange( ArrangeShapeData( subShape ) );
 			}
 			return result;
-		}
-
-		AIS_Trihedron CreateTrihedron( gp_Ax3 ax3, bool global = false )
-		{
-			AIS_Trihedron trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax3.Ax2() ) );
-			if( global ) {
-				trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-				trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-				trihedron.SetSize( 100.0 );
-			}
-			else {
-				trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-				trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-				trihedron.SetSize( 10.0 );
-			}
-			trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			return trihedron;
 		}
 
 		// edit actions
