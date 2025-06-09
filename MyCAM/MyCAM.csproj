@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CAD\CADAction\TransformConstraints.cs" />
     <Compile Include="CAD\CADAction\Create3PCSAction.cs" />
     <Compile Include="CAD\CADAction\AddPointAction.cs" />
     <Compile Include="CAD\CADAction\DefaultAction.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="CAD\CADAction\TransformAction.cs" />
     <Compile Include="CAD\CADEditor.cs" />
     <Compile Include="CAD\CADManager.cs" />
+    <Compile Include="CAD\ViewHelper.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>

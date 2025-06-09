@@ -68,10 +68,58 @@ namespace MyCAM
 			throw new NotImplementedException( "Modify Coordinate System is not implemented yet." );
 		}
 
+		// transform
+
 		void m_tsmiTransform_Click( object sender, EventArgs e )
 		{
 			m_msCAD_Transform.Visible = true;
+			m_CADEditor.StartTransform();
+		}
 
+		void m_tsmiPlane_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ApplyTransform( EConstraintType.Plane, false );
+		}
+
+		void m_tsmiPlane_R_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ApplyTransform( EConstraintType.Plane, true );
+		}
+
+		void m_tsmiPlanePar_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ApplyTransform( EConstraintType.PlaneParallel, false );
+		}
+
+		void m_tsmiPlanePar_R_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ApplyTransform( EConstraintType.PlaneParallel, true );
+		}
+
+		void m_tsmiAxial_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ApplyTransform( EConstraintType.Axial, false );
+		}
+
+		void m_tsmiAxial_R_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ApplyTransform( EConstraintType.Axial, true );
+		}
+
+		void m_tsmiAxialPar_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ApplyTransform( EConstraintType.AxialParallel, false );
+		}
+
+		void m_tsmiAxialPar_R_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ApplyTransform( EConstraintType.AxialParallel, true );
+		}
+
+		void m_tsmiOK_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.EndTransform();
+			m_msCAD_Transform.Visible = false;
 		}
 	}
 }

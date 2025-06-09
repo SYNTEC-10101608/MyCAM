@@ -226,54 +226,63 @@
 			this.m_tsmiPlane.Name = "m_tsmiPlane";
 			this.m_tsmiPlane.Size = new System.Drawing.Size(55, 20);
 			this.m_tsmiPlane.Text = "面重合";
+			this.m_tsmiPlane.Click += new System.EventHandler(this.m_tsmiPlane_Click);
 			// 
 			// m_tsmiPlane_R
 			// 
 			this.m_tsmiPlane_R.Name = "m_tsmiPlane_R";
 			this.m_tsmiPlane_R.Size = new System.Drawing.Size(74, 20);
 			this.m_tsmiPlane_R.Text = "面重合 (R)";
+			this.m_tsmiPlane_R.Click += new System.EventHandler(this.m_tsmiPlane_R_Click);
 			// 
 			// m_tsmiPlanePar
 			// 
 			this.m_tsmiPlanePar.Name = "m_tsmiPlanePar";
 			this.m_tsmiPlanePar.Size = new System.Drawing.Size(55, 20);
 			this.m_tsmiPlanePar.Text = "面平行";
+			this.m_tsmiPlanePar.Click += new System.EventHandler(this.m_tsmiPlanePar_Click);
 			// 
 			// m_tsmiPlanePar_R
 			// 
 			this.m_tsmiPlanePar_R.Name = "m_tsmiPlanePar_R";
 			this.m_tsmiPlanePar_R.Size = new System.Drawing.Size(74, 20);
 			this.m_tsmiPlanePar_R.Text = "面平行 (R)";
+			this.m_tsmiPlanePar_R.Click += new System.EventHandler(this.m_tsmiPlanePar_R_Click);
 			// 
 			// m_tsmiAxial
 			// 
 			this.m_tsmiAxial.Name = "m_tsmiAxial";
 			this.m_tsmiAxial.Size = new System.Drawing.Size(55, 20);
 			this.m_tsmiAxial.Text = "軸重合";
+			this.m_tsmiAxial.Click += new System.EventHandler(this.m_tsmiAxial_Click);
 			// 
 			// m_tsmiAxial_R
 			// 
 			this.m_tsmiAxial_R.Name = "m_tsmiAxial_R";
 			this.m_tsmiAxial_R.Size = new System.Drawing.Size(74, 20);
 			this.m_tsmiAxial_R.Text = "軸重合 (R)";
+			this.m_tsmiAxial_R.Click += new System.EventHandler(this.m_tsmiAxial_R_Click);
 			// 
 			// m_tsmiAxialPar
 			// 
 			this.m_tsmiAxialPar.Name = "m_tsmiAxialPar";
 			this.m_tsmiAxialPar.Size = new System.Drawing.Size(55, 20);
 			this.m_tsmiAxialPar.Text = "軸平行";
+			this.m_tsmiAxialPar.Click += new System.EventHandler(this.m_tsmiAxialPar_Click);
 			// 
 			// m_tsmiAxialPar_R
 			// 
 			this.m_tsmiAxialPar_R.Name = "m_tsmiAxialPar_R";
 			this.m_tsmiAxialPar_R.Size = new System.Drawing.Size(74, 20);
 			this.m_tsmiAxialPar_R.Text = "軸平行 (R)";
+			this.m_tsmiAxialPar_R.Click += new System.EventHandler(this.m_tsmiAxialPar_R_Click);
 			// 
 			// m_tsmiOK
 			// 
 			this.m_tsmiOK.Name = "m_tsmiOK";
 			this.m_tsmiOK.Size = new System.Drawing.Size(36, 20);
 			this.m_tsmiOK.Text = "OK";
+			this.m_tsmiOK.Click += new System.EventHandler(this.m_tsmiOK_Click);
 			// 
 			// StartupForm
 			// 

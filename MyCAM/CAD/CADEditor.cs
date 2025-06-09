@@ -1,7 +1,6 @@
 ﻿using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
-using OCC.Graphic3d;
 using OCC.IFSelect;
 using OCC.IGESControl;
 using OCC.Quantity;
@@ -30,7 +29,7 @@ namespace MyCAM.CAD
 		EdgeMidPoint = 1,
 	}
 
-	public enum ETransformType
+	public enum EConstraintType
 	{
 		Axial,
 		AxialParallel,
@@ -120,7 +119,7 @@ namespace MyCAM.CAD
 			EditActionStart( action );
 		}
 
-		public void ApplyTransform( ETransformType type, bool bReverse = false )
+		public void ApplyTransform( EConstraintType type, bool bReverse = false )
 		{
 			if( m_CurrentAction.ActionType != CADActionType.Transform ) {
 				return;
@@ -133,7 +132,7 @@ namespace MyCAM.CAD
 			if( m_CurrentAction.ActionType != CADActionType.Transform ) {
 				return;
 			}
-			m_CurrentAction.End();
+			( (TransformAction)m_CurrentAction ).TransformDone();
 		}
 
 		// manager events
@@ -151,7 +150,7 @@ namespace MyCAM.CAD
 			m_TreeView.Nodes.Add( newNode );
 
 			// update the viewer
-			AIS_Shape aisShape = CreateAIS( shape );
+			AIS_Shape aisShape = ViewHelper.CreatePartAIS( shape );
 			m_CADManager.ViewObjectMap[ szUID ] = new ViewObject( aisShape );
 			m_Viewer.GetAISContext().Display( aisShape, true );
 		}
@@ -224,17 +223,6 @@ namespace MyCAM.CAD
 				result.AddRange( ArrangeShapeData( subShape ) );
 			}
 			return result;
-		}
-
-		AIS_Shape CreateAIS( TopoDS_Shape shape )
-		{
-			AIS_Shape aisShape = new AIS_Shape( shape );
-			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			aisShape.SetMaterial( aspect );
-			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			aisShape.Attributes().SetFaceBoundaryDraw( true );
-			aisShape.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
-			return aisShape;
 		}
 
 		AIS_Trihedron CreateTrihedron( gp_Ax3 ax3, bool global = false )
