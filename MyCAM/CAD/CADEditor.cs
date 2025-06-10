@@ -132,6 +132,28 @@ namespace MyCAM.CAD
 			( (TransformAction)m_CurrentAction ).TransformDone();
 		}
 
+		public void StartSelectFace()
+		{
+			SelectFaceAction action = new SelectFaceAction( m_Viewer, m_TreeView, m_CADManager );
+			EditActionStart( action );
+		}
+
+		public void SelectD1ContFace()
+		{
+			if( m_CurrentAction.ActionType != CADActionType.SelectFace ) {
+				return;
+			}
+			( (SelectFaceAction)m_CurrentAction ).SelectD1ContFace();
+		}
+
+		public void EndSelectFace()
+		{
+			if( m_CurrentAction.ActionType != CADActionType.SelectFace ) {
+				return;
+			}
+			( (SelectFaceAction)m_CurrentAction ).SelectDone();
+		}
+
 		// manager events
 		void OnAddCADModelDone( ShapeData model )
 		{

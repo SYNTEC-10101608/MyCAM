@@ -123,5 +123,24 @@ namespace MyCAM
 			m_msCAD.Enabled = true;
 			m_CADEditor.EndTransform();
 		}
+
+		void m_tsmiSelectFace_Click( object sender, EventArgs e )
+		{
+			m_msCAD_SelectFace.Visible = true;
+			m_msCAD.Enabled = false;
+			m_CADEditor.StartSelectFace();
+		}
+
+		void m_tsmiSelectD1ContFace_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.SelectD1ContFace();
+		}
+
+		void m_tsmiSelectFaceOK_Click( object sender, EventArgs e )
+		{
+			m_msCAD_SelectFace.Visible = false;
+			m_msCAD.Enabled = true;
+			m_CADEditor.EndSelectFace();
+		}
 	}
 }

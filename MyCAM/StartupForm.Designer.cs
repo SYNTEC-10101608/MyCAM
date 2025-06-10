@@ -54,10 +54,15 @@
 			this.m_tsmiAxialPar = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAxialPar_R = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiSelectFace = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_msCAD_SelectFace = new System.Windows.Forms.MenuStrip();
+			this.m_tsmiSelectD1ContFace = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiSelectFaceOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
 			this.m_msCAD_Transform.SuspendLayout();
+			this.m_msCAD_SelectFace.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// m_msCAD
@@ -66,7 +71,8 @@
             this.m_tsmiImport,
             this.m_tsmiAddFeature,
             this.m_tsmi_Coordinate,
-            this.m_tsmiTransform});
+            this.m_tsmiTransform,
+            this.m_tsmiSelectFace});
 			this.m_msCAD.Location = new System.Drawing.Point(0, 0);
 			this.m_msCAD.Name = "m_msCAD";
 			this.m_msCAD.Size = new System.Drawing.Size(1184, 24);
@@ -284,12 +290,46 @@
 			this.m_tsmiOK.Text = "OK";
 			this.m_tsmiOK.Click += new System.EventHandler(this.m_tsmiOK_Click);
 			// 
+			// m_tsmiSelectFace
+			// 
+			this.m_tsmiSelectFace.Name = "m_tsmiSelectFace";
+			this.m_tsmiSelectFace.Size = new System.Drawing.Size(79, 20);
+			this.m_tsmiSelectFace.Text = "選取特徵面";
+			this.m_tsmiSelectFace.Click += new System.EventHandler(this.m_tsmiSelectFace_Click);
+			// 
+			// m_msCAD_SelectFace
+			// 
+			this.m_msCAD_SelectFace.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiSelectD1ContFace,
+            this.m_tsmiSelectFaceOK});
+			this.m_msCAD_SelectFace.Location = new System.Drawing.Point(0, 24);
+			this.m_msCAD_SelectFace.Name = "m_msCAD_SelectFace";
+			this.m_msCAD_SelectFace.Size = new System.Drawing.Size(1184, 24);
+			this.m_msCAD_SelectFace.TabIndex = 0;
+			this.m_msCAD_SelectFace.Text = "menuStrip1";
+			this.m_msCAD_SelectFace.Visible = false;
+			// 
+			// m_tsmiSelectD1ContFace
+			// 
+			this.m_tsmiSelectD1ContFace.Name = "m_tsmiSelectD1ContFace";
+			this.m_tsmiSelectD1ContFace.Size = new System.Drawing.Size(62, 20);
+			this.m_tsmiSelectD1ContFace.Text = "D1 連續";
+			this.m_tsmiSelectD1ContFace.Click += new System.EventHandler(this.m_tsmiSelectD1ContFace_Click);
+			// 
+			// m_tsmiSelectFaceOK
+			// 
+			this.m_tsmiSelectFaceOK.Name = "m_tsmiSelectFaceOK";
+			this.m_tsmiSelectFaceOK.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiSelectFaceOK.Text = "完成";
+			this.m_tsmiSelectFaceOK.Click += new System.EventHandler(this.m_tsmiSelectFaceOK_Click);
+			// 
 			// StartupForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.ClientSize = new System.Drawing.Size(1184, 761);
+			this.Controls.Add(this.m_msCAD_SelectFace);
 			this.Controls.Add(this.m_panBackGround);
 			this.Controls.Add(this.m_msCAD_Transform);
 			this.Controls.Add(this.m_msCAD);
@@ -302,6 +342,8 @@
 			this.m_panBackGround.ResumeLayout(false);
 			this.m_msCAD_Transform.ResumeLayout(false);
 			this.m_msCAD_Transform.PerformLayout();
+			this.m_msCAD_SelectFace.ResumeLayout(false);
+			this.m_msCAD_SelectFace.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -335,6 +377,10 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAxialPar;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAxialPar_R;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiOK;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectFace;
+		private System.Windows.Forms.MenuStrip m_msCAD_SelectFace;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectD1ContFace;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectFaceOK;
 	}
 }
 
