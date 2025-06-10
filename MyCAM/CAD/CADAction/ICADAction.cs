@@ -11,6 +11,7 @@ namespace MyCAM.CAD
 		AddPoint = 2,
 		Create3PCS = 3,
 		Transform = 4,
+		SelectFace = 5,
 	}
 
 	internal interface ICADAction
