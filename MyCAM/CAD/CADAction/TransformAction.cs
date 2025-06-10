@@ -131,7 +131,7 @@ namespace MyCAM.CAD
 			}
 			m_PartShape = ShapeTool.MakeCompound( visibleShapeList );
 			if( m_PartShape == null || m_PartShape.IsNull() ) {
-				throw new ArgumentNullException( "TransformAction: Raw part shape is null." );
+				throw new ArgumentNullException( "TransformAction part shape is null." );
 			}
 			m_PartAIS = ViewHelper.CreatePartAIS( m_PartShape );
 		}

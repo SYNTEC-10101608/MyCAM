@@ -39,7 +39,7 @@ namespace MyCAM.CAD
 		public CADEditor( Viewer viewer, TreeView treeView )
 		{
 			if( viewer == null || treeView == null ) {
-				throw new ArgumentNullException( "Viewer and TreeView cannot be null." );
+				throw new ArgumentNullException( "CADEditor consturcting argument null." );
 			}
 			m_Viewer = viewer;
 			m_TreeView = treeView;

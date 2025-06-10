@@ -36,7 +36,7 @@ namespace MyCAM.CAD
 		public CADACtionBase( Viewer viewer, TreeView treeView, CADManager cadManager )
 		{
 			if( viewer == null || treeView == null || cadManager == null ) {
-				throw new ArgumentNullException( "Action constructing argument null - Base" );
+				throw new ArgumentNullException( "CADACtionBase constructing argument null" );
 			}
 			m_Viewer = viewer;
 			m_TreeView = treeView;

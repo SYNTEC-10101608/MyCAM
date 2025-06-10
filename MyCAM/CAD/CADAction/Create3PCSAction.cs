@@ -13,6 +13,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.CAD
 {
+	// TODO: implement Create3PCSAction
 	internal class Create3PCSAction : CADACtionBase
 	{
 		public Create3PCSAction( Viewer viewer, TreeView treeView, CADManager cadManager,
@@ -20,7 +21,7 @@ namespace MyCAM.CAD
 			: base( viewer, treeView, cadManager )
 		{
 			if( coordSystemMap == null ) {
-				throw new System.ArgumentNullException( "Action constructing argument null - Create 3P CS" );
+				throw new System.ArgumentNullException( "" );
 			}
 			m_CoordinateSystemMap = coordSystemMap;
 			m_ActionStage = EActionStage.P1;
