@@ -1,5 +1,4 @@
 ﻿using OCC.AIS;
-using OCC.Prs3d;
 using OCC.Quantity;
 using OCC.TopAbs;
 using OCC.TopExp;
@@ -15,7 +14,7 @@ namespace MyCAM.CAD
 {
 	internal class SelectFaceAction : CADACtionBase
 	{
-		class FaceAISPair
+		class FaceHandle
 		{
 			public TopoDS_Face Face
 			{
@@ -28,30 +27,11 @@ namespace MyCAM.CAD
 			}
 		}
 
-		class HLStyleBackup
-		{
-			public Quantity_Color Color
-			{
-				get; set;
-			}
-
-			public float Transparency
-			{
-				get; set;
-			}
-
-			public int DisplayMode
-			{
-				get; set;
-			}
-		}
-
 		public SelectFaceAction( Viewer viewer, TreeView treeView, CADManager cadManager )
 			: base( viewer, treeView, cadManager )
 		{
 			List<TopoDS_Shape> visibleShapeList = new List<TopoDS_Shape>();
-			m_VisibleFaceList = new List<TopoDS_Face>();
-			m_VisibleFaceAISPairList = new List<FaceAISPair>();
+			m_VisibleFaceAISPairList = new List<FaceHandle>();
 			foreach( var oneShapeData in m_CADManager.ShapeDataContainer ) {
 				if( m_CADManager.ViewObjectMap.ContainsKey( oneShapeData.UID ) && m_CADManager.ViewObjectMap[ oneShapeData.UID ].Visible ) {
 
@@ -62,9 +42,8 @@ namespace MyCAM.CAD
 					TopExp_Explorer exp = new TopExp_Explorer( oneShapeData.Shape, TopAbs_ShapeEnum.TopAbs_FACE );
 					for( ; exp.More(); exp.Next() ) {
 						TopoDS_Face face = TopoDS.ToFace( exp.Current() );
-						AIS_Shape aisShape = ViewHelper.CreatePartAIS( face );
-						m_VisibleFaceList.Add( face );
-						m_VisibleFaceAISPairList.Add( new FaceAISPair() { Face = face, AIS = aisShape } );
+						AIS_Shape aisShape = ViewHelper.CreateFaceAIS( face );
+						m_VisibleFaceAISPairList.Add( new FaceHandle() { Face = face, AIS = aisShape } );
 					}
 				}
 			}
@@ -72,7 +51,7 @@ namespace MyCAM.CAD
 			// create a compound shape to slect face
 			TopoDS_Shape visiblePart = ShapeTool.MakeCompound( visibleShapeList );
 			if( visiblePart == null || visiblePart.IsNull() ) {
-				throw new System.ArgumentNullException( "SelectFaceAction part shape is null." );
+				throw new ArgumentNullException( "SelectFaceAction part shape is null." );
 			}
 
 			// map visible edge and face
@@ -94,18 +73,6 @@ namespace MyCAM.CAD
 
 			// disable tree view
 			m_TreeView.Enabled = false;
-
-			// backup highlight style
-			Prs3d_Drawer d1 = m_Viewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected );
-			m_HLStyleBackup = new HLStyleBackup();
-			m_HLStyleBackup.Color = d1.Color();
-			m_HLStyleBackup.Transparency = d1.Transparency();
-			m_HLStyleBackup.DisplayMode = d1.DisplayMode();
-
-			// set highlight style
-			d1.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-			d1.SetTransparency( 0.5f );
-			d1.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 
 			// hide all shape
 			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
@@ -130,12 +97,6 @@ namespace MyCAM.CAD
 			// enable tree view
 			m_TreeView.Enabled = true;
 
-			// restore highlight style
-			Prs3d_Drawer d1 = m_Viewer.GetAISContext().HighlightStyle( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected );
-			d1.SetColor( m_HLStyleBackup.Color );
-			d1.SetTransparency( m_HLStyleBackup.Transparency );
-			d1.SetDisplayMode( m_HLStyleBackup.DisplayMode );
-
 			// hide part and G54 coordinate system
 			HidePart();
 
@@ -155,7 +116,25 @@ namespace MyCAM.CAD
 			if( e.Button == MouseButtons.Left ) {
 
 				// select the face
-				m_Viewer.ShiftSelect();
+				AIS_InteractiveObject ais = m_Viewer.GetAISContext().DetectedInteractive();
+				if( ais == null || ais.IsNull() ) {
+					return;
+				}
+
+				// arrange the colors
+				Quantity_Color color = new Quantity_Color();
+				ais.Color( ref color );
+
+				// toggle color
+				if( color.Name() == COLOR_DEFAULT ) {
+					ais.SetColor( new Quantity_Color( COLOR_SELECTED ) );
+				}
+				else {
+					ais.SetColor( new Quantity_Color( COLOR_DEFAULT ) );
+				}
+				ais.Attributes().SetFaceBoundaryDraw( true );
+				ais.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+				m_Viewer.UpdateView();
 			}
 		}
 
@@ -220,33 +199,29 @@ namespace MyCAM.CAD
 			}
 
 			// select all D1 continuous faces
-			m_Viewer.GetAISContext().ClearSelected( false );
-			foreach( TopoDS_Face face in allD1ContFaceList ) {
-
-				// find the AIS for the face
-				FaceAISPair faceAISPair = m_VisibleFaceAISPairList.Find( pair => pair.Face.IsEqual( face ) );
-				if( faceAISPair != null ) {
-					m_Viewer.GetAISContext().AddOrRemoveSelected( faceAISPair.AIS, false );
+			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
+				bool isD1Cont = false;
+				foreach( TopoDS_Face oneFace in allD1ContFaceList ) {
+					if( faceAISPair.Face.IsEqual( oneFace ) ) {
+						isD1Cont = true;
+						break;
+					}
 				}
+				if( isD1Cont ) {
+					faceAISPair.AIS.SetColor( new Quantity_Color( COLOR_SELECTED ) );
+				}
+				else {
+					faceAISPair.AIS.SetColor( new Quantity_Color( COLOR_DEFAULT ) );
+				}
+				faceAISPair.AIS.Attributes().SetFaceBoundaryDraw( true );
+				faceAISPair.AIS.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			}
-			m_Viewer.GetAISContext().InitSelected();
-			int test = 0;
-			while( m_Viewer.GetAISContext().MoreSelected() ) {
-				test++;
-				m_Viewer.GetAISContext().NextSelected();
-			}
-			//m_Viewer.GetAISContext().HilightSelected( false );
 			m_Viewer.UpdateView();
 		}
 
 		public void SelectDone()
 		{
-			m_Viewer.GetAISContext().InitSelected();
-			int test = 0;
-			while( m_Viewer.GetAISContext().MoreSelected() ) {
-				test++;
-				m_Viewer.GetAISContext().NextSelected();
-			}
+			GetSelectedFace();
 		}
 
 		void ShowPart()
@@ -265,22 +240,21 @@ namespace MyCAM.CAD
 
 		List<TopoDS_Face> GetSelectedFace()
 		{
-			List<TopoDS_Face> lstFace = new List<TopoDS_Face>();
-			m_Viewer.GetAISContext().InitSelected();
-			while( m_Viewer.GetAISContext().MoreSelected() ) {
-				TopoDS_Shape theShape = m_Viewer.GetAISContext().SelectedShape();
-				if( theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_FACE ) {
-					lstFace.Add( TopoDS.ToFace( theShape ) );
+			List<TopoDS_Face> selectedFaceList = new List<TopoDS_Face>();
+			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
+				Quantity_Color color = new Quantity_Color();
+				faceAISPair.AIS.Color( ref color );
+				if( color.Name() == COLOR_SELECTED ) {
+					selectedFaceList.Add( faceAISPair.Face );
 				}
-				m_Viewer.GetAISContext().NextSelected();
 			}
-			return lstFace;
+			return selectedFaceList;
 		}
 
-		List<TopoDS_Face> m_VisibleFaceList;
-		List<FaceAISPair> m_VisibleFaceAISPairList;
+		List<FaceHandle> m_VisibleFaceAISPairList;
 		TopTools_IndexedDataMapOfShapeListOfShape m_EdgeFaceMap;
 
-		HLStyleBackup m_HLStyleBackup;
+		const Quantity_NameOfColor COLOR_SELECTED = Quantity_NameOfColor.Quantity_NOC_RED;
+		const Quantity_NameOfColor COLOR_DEFAULT = Quantity_NameOfColor.Quantity_NOC_GRAY50;
 	}
 }
