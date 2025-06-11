@@ -159,6 +159,10 @@ namespace MyCAM.CAD
 
 			// BFS all D1 continuous faces
 			List<TopoDS_Face> allD1ContFaceList = new List<TopoDS_Face>( faceBFSQueue );
+			TopTools_MapOfShape visitedFaceMap = new TopTools_MapOfShape();
+			foreach( TopoDS_Face oneFace in faceBFSQueue ) {
+				visitedFaceMap.Add( oneFace );
+			}
 			while( faceBFSQueue.Count > 0 ) {
 
 				// get the first face in the queue
@@ -178,19 +182,13 @@ namespace MyCAM.CAD
 						TopoDS_Face oneConnectedFace = TopoDS.ToFace( _oneConnectedFace );
 
 						// check visited
-						bool isVisited = false;
-						foreach( TopoDS_Face visitedFace in allD1ContFaceList ) {
-							if( visitedFace.IsEqual( oneConnectedFace ) ) {
-								isVisited = true;
-								break;
-							}
-						}
-						if( isVisited ) {
+						if( visitedFaceMap.Contains( oneConnectedFace ) ) {
 							continue;
 						}
 
 						// check D1 continuity
 						if( GeometryTool.IsD1Cont( currentFace, oneConnectedFace, oneEdge ) ) {
+							visitedFaceMap.Add( oneConnectedFace );
 							allD1ContFaceList.Add( oneConnectedFace );
 							faceBFSQueue.Add( oneConnectedFace );
 						}
