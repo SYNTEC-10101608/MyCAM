@@ -1,11 +1,13 @@
 ﻿using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.BRepGProp;
+using OCC.Geom;
 using OCC.GeomAbs;
 using OCC.gp;
 using OCC.GProp;
 using OCC.ShapeAnalysis;
 using OCC.TopAbs;
+using OCC.TopExp;
 using OCC.TopoDS;
 using System;
 
@@ -180,6 +182,48 @@ namespace OCCTool
 			double dMidU = ( dStartU + dEndU ) / 2;
 			mid = curve.Value( dMidU );
 			return true;
+		}
+
+		public static bool IsD1Cont( TopoDS_Face f1, TopoDS_Face f2, TopoDS_Edge sharingEdge )
+		{
+			if( f1 == null || f2 == null || sharingEdge == null
+				|| f1.IsNull() || f2.IsNull() || sharingEdge.IsNull() ) {
+				return false;
+			}
+
+			// check if the edge is shared by both faces
+			if( !IsEdgeBelongFace( sharingEdge, f1 ) || !IsEdgeBelongFace( sharingEdge, f2 ) ) {
+				return false;
+			}
+
+			// get the middle point on the edge
+			double dStartU = 0;
+			double dEndU = 0;
+			Geom_Curve oneGeomCurve = BRep_Tool.Curve( sharingEdge, ref dStartU, ref dEndU );
+			gp_Pnt pMiddle = oneGeomCurve.Value( ( dStartU + dEndU ) / 2 );
+
+			// get the surface normals at the middle point on both faces
+			gp_Dir d1 = VectorTool.GetFaceNormalVec( f1, pMiddle );
+			gp_Dir d2 = VectorTool.GetFaceNormalVec( f2, pMiddle );
+
+			// check if the normals are parallel or reversed
+			return d1.IsParallel( d2, 1e-3 );
+		}
+
+		public static bool IsEdgeBelongFace( TopoDS_Edge edge, TopoDS_Face face )
+		{
+			if( edge == null || face == null || edge.IsNull() || face.IsNull() ) {
+				return false;
+			}
+
+			// check if the edge is shared by the face
+			TopExp_Explorer exp = new TopExp_Explorer( face, TopAbs_ShapeEnum.TopAbs_EDGE );
+			for( ; exp.More(); exp.Next() ) {
+				if( exp.Current().IsSame( edge ) ) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		// private
