@@ -36,9 +36,6 @@
 			this.m_tsmiAddPoint = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAddPoint_AcrCenter = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAddPoint_EdgeCenter = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmi_Coordinate = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiCreate3PCS = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiModifyCS = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiTransform = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelectFace = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_panViewer = new System.Windows.Forms.Panel();
@@ -58,6 +55,8 @@
 			this.m_msCAD_SelectFace = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiSelectD1ContFace = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelectFaceOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiManualTransform = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmi3PointTransform = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -70,7 +69,6 @@
 			this.m_msCAD.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsmiImport,
             this.m_tsmiAddFeature,
-            this.m_tsmi_Coordinate,
             this.m_tsmiTransform,
             this.m_tsmiSelectFace});
 			this.m_msCAD.Location = new System.Drawing.Point(0, 0);
@@ -92,21 +90,21 @@
 			// m_tsmiImportBRep
 			// 
 			this.m_tsmiImportBRep.Name = "m_tsmiImportBRep";
-			this.m_tsmiImportBRep.Size = new System.Drawing.Size(104, 22);
+			this.m_tsmiImportBRep.Size = new System.Drawing.Size(180, 22);
 			this.m_tsmiImportBRep.Text = "BRep";
 			this.m_tsmiImportBRep.Click += new System.EventHandler(this.m_tsmiImportBRep_Click);
 			// 
 			// m_tsmiImportStep
 			// 
 			this.m_tsmiImportStep.Name = "m_tsmiImportStep";
-			this.m_tsmiImportStep.Size = new System.Drawing.Size(104, 22);
+			this.m_tsmiImportStep.Size = new System.Drawing.Size(180, 22);
 			this.m_tsmiImportStep.Text = "Step";
 			this.m_tsmiImportStep.Click += new System.EventHandler(this.m_tsmiImportStep_Click);
 			// 
 			// m_tsmiImportIges
 			// 
 			this.m_tsmiImportIges.Name = "m_tsmiImportIges";
-			this.m_tsmiImportIges.Size = new System.Drawing.Size(104, 22);
+			this.m_tsmiImportIges.Size = new System.Drawing.Size(180, 22);
 			this.m_tsmiImportIges.Text = "Iges";
 			this.m_tsmiImportIges.Click += new System.EventHandler(this.m_tsmiImportIges_Click);
 			// 
@@ -130,47 +128,25 @@
 			// m_tsmiAddPoint_AcrCenter
 			// 
 			this.m_tsmiAddPoint_AcrCenter.Name = "m_tsmiAddPoint_AcrCenter";
-			this.m_tsmiAddPoint_AcrCenter.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiAddPoint_AcrCenter.Size = new System.Drawing.Size(122, 22);
 			this.m_tsmiAddPoint_AcrCenter.Text = "圓弧中心";
 			this.m_tsmiAddPoint_AcrCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_AcrCenter_Click);
 			// 
 			// m_tsmiAddPoint_EdgeCenter
 			// 
 			this.m_tsmiAddPoint_EdgeCenter.Name = "m_tsmiAddPoint_EdgeCenter";
-			this.m_tsmiAddPoint_EdgeCenter.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiAddPoint_EdgeCenter.Size = new System.Drawing.Size(122, 22);
 			this.m_tsmiAddPoint_EdgeCenter.Text = "線段中心";
 			this.m_tsmiAddPoint_EdgeCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_EdgeCenter_Click);
 			// 
-			// m_tsmi_Coordinate
-			// 
-			this.m_tsmi_Coordinate.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiCreate3PCS,
-            this.m_tsmiModifyCS});
-			this.m_tsmi_Coordinate.Name = "m_tsmi_Coordinate";
-			this.m_tsmi_Coordinate.Size = new System.Drawing.Size(55, 20);
-			this.m_tsmi_Coordinate.Text = "座標系";
-			this.m_tsmi_Coordinate.Visible = false;
-			// 
-			// m_tsmiCreate3PCS
-			// 
-			this.m_tsmiCreate3PCS.Name = "m_tsmiCreate3PCS";
-			this.m_tsmiCreate3PCS.Size = new System.Drawing.Size(158, 22);
-			this.m_tsmiCreate3PCS.Text = "建立三點座標系";
-			this.m_tsmiCreate3PCS.Click += new System.EventHandler(this.m_tsmiCreate3PCS_Click);
-			// 
-			// m_tsmiModifyCS
-			// 
-			this.m_tsmiModifyCS.Name = "m_tsmiModifyCS";
-			this.m_tsmiModifyCS.Size = new System.Drawing.Size(158, 22);
-			this.m_tsmiModifyCS.Text = "修改座標系";
-			this.m_tsmiModifyCS.Click += new System.EventHandler(this.m_tsmiModifyCS_Click);
-			// 
 			// m_tsmiTransform
 			// 
+			this.m_tsmiTransform.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiManualTransform,
+            this.m_tsmi3PointTransform});
 			this.m_tsmiTransform.Name = "m_tsmiTransform";
 			this.m_tsmiTransform.Size = new System.Drawing.Size(43, 20);
 			this.m_tsmiTransform.Text = "轉換";
-			this.m_tsmiTransform.Click += new System.EventHandler(this.m_tsmiTransform_Click);
 			// 
 			// m_tsmiSelectFace
 			// 
@@ -322,6 +298,20 @@
 			this.m_tsmiSelectFaceOK.Text = "完成";
 			this.m_tsmiSelectFaceOK.Click += new System.EventHandler(this.m_tsmiSelectFaceOK_Click);
 			// 
+			// m_tsmiManualTransform
+			// 
+			this.m_tsmiManualTransform.Name = "m_tsmiManualTransform";
+			this.m_tsmiManualTransform.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiManualTransform.Text = "手動轉換";
+			this.m_tsmiManualTransform.Click += new System.EventHandler(this.m_tsmiManualTransform_Click);
+			// 
+			// m_tsmi3PointTransform
+			// 
+			this.m_tsmi3PointTransform.Name = "m_tsmi3PointTransform";
+			this.m_tsmi3PointTransform.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmi3PointTransform.Text = "三點轉換";
+			this.m_tsmi3PointTransform.Click += new System.EventHandler(this.m_tsmi3PointTransform_Click);
+			// 
 			// StartupForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -363,9 +353,6 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_AcrCenter;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_EdgeCenter;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiTransform;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmi_Coordinate;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiCreate3PCS;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiModifyCS;
 		private System.Windows.Forms.MenuStrip m_msCAD_Transform;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiPlane;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiPlane_R;
@@ -380,6 +367,8 @@
 		private System.Windows.Forms.MenuStrip m_msCAD_SelectFace;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectD1ContFace;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectFaceOK;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiManualTransform;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmi3PointTransform;
 	}
 }
 

@@ -107,18 +107,17 @@ namespace MyCAM.CAD
 			EditActionStart( action );
 		}
 
-		public void Create3PCoordSystem()
+		public void ThreePointTransform()
 		{
-			throw new NotImplementedException( "Create 3P coordinate system is not implemented yet." );
 		}
 
-		public void StartTransform()
+		public void StartManaulTransform()
 		{
 			TransformAction action = new TransformAction( m_Viewer, m_TreeView, m_CADManager );
 			EditActionStart( action );
 		}
 
-		public void ApplyTransform( EConstraintType type, bool bReverse = false )
+		public void ApplyManualTransform( EConstraintType type, bool bReverse = false )
 		{
 			if( m_CurrentAction.ActionType != CADActionType.Transform ) {
 				return;
@@ -126,7 +125,7 @@ namespace MyCAM.CAD
 			( (TransformAction)m_CurrentAction ).ApplyTransform( type, bReverse );
 		}
 
-		public void EndTransform()
+		public void EndManualTransform()
 		{
 			if( m_CurrentAction.ActionType != CADActionType.Transform ) {
 				return;

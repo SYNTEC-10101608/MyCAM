@@ -220,6 +220,7 @@ namespace MyCAM.CAD
 		public void SelectDone()
 		{
 			GetSelectedFace();
+			End();
 		}
 
 		void ShowPart()

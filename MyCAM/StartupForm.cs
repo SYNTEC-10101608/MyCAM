@@ -57,73 +57,68 @@ namespace MyCAM
 			m_CADEditor.AddPoint( AddPointType.EdgeMidPoint );
 		}
 
-		// coordinate system
-		void m_tsmiCreate3PCS_Click( object sender, EventArgs e )
-		{
-			m_CADEditor.Create3PCoordSystem();
-		}
-
-		void m_tsmiModifyCS_Click( object sender, EventArgs e )
-		{
-			throw new NotImplementedException( "Modify Coordinate System is not implemented yet." );
-		}
-
-		// transform
-
-		void m_tsmiTransform_Click( object sender, EventArgs e )
+		// manual transform
+		void m_tsmiManualTransform_Click( object sender, EventArgs e )
 		{
 			m_msCAD_Transform.Visible = true;
 			m_msCAD.Enabled = false;
-			m_CADEditor.StartTransform();
+			m_CADEditor.StartManaulTransform();
 		}
 
 		void m_tsmiPlane_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyTransform( EConstraintType.Plane, false );
+			m_CADEditor.ApplyManualTransform( EConstraintType.Plane, false );
 		}
 
 		void m_tsmiPlane_R_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyTransform( EConstraintType.Plane, true );
+			m_CADEditor.ApplyManualTransform( EConstraintType.Plane, true );
 		}
 
 		void m_tsmiPlanePar_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyTransform( EConstraintType.PlaneParallel, false );
+			m_CADEditor.ApplyManualTransform( EConstraintType.PlaneParallel, false );
 		}
 
 		void m_tsmiPlanePar_R_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyTransform( EConstraintType.PlaneParallel, true );
+			m_CADEditor.ApplyManualTransform( EConstraintType.PlaneParallel, true );
 		}
 
 		void m_tsmiAxial_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyTransform( EConstraintType.Axial, false );
+			m_CADEditor.ApplyManualTransform( EConstraintType.Axial, false );
 		}
 
 		void m_tsmiAxial_R_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyTransform( EConstraintType.Axial, true );
+			m_CADEditor.ApplyManualTransform( EConstraintType.Axial, true );
 		}
 
 		void m_tsmiAxialPar_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyTransform( EConstraintType.AxialParallel, false );
+			m_CADEditor.ApplyManualTransform( EConstraintType.AxialParallel, false );
 		}
 
 		void m_tsmiAxialPar_R_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyTransform( EConstraintType.AxialParallel, true );
+			m_CADEditor.ApplyManualTransform( EConstraintType.AxialParallel, true );
 		}
 
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
 			m_msCAD_Transform.Visible = false;
 			m_msCAD.Enabled = true;
-			m_CADEditor.EndTransform();
+			m_CADEditor.EndManualTransform();
 		}
 
+		// 3 point transform
+		void m_tsmi3PointTransform_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ThreePointTransform();
+		}
+
+		// select face
 		void m_tsmiSelectFace_Click( object sender, EventArgs e )
 		{
 			m_msCAD_SelectFace.Visible = true;
