@@ -40,6 +40,7 @@
 			this.m_tsmiCreate3PCS = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiModifyCS = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiTransform = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiSelectFace = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
@@ -54,7 +55,6 @@
 			this.m_tsmiAxialPar = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAxialPar_R = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiOK = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiSelectFace = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD_SelectFace = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiSelectD1ContFace = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelectFaceOK = new System.Windows.Forms.ToolStripMenuItem();
@@ -117,7 +117,6 @@
 			this.m_tsmiAddFeature.Name = "m_tsmiAddFeature";
 			this.m_tsmiAddFeature.Size = new System.Drawing.Size(67, 20);
 			this.m_tsmiAddFeature.Text = "建立特徵";
-			this.m_tsmiAddFeature.Visible = false;
 			// 
 			// m_tsmiAddPoint
 			// 
@@ -125,20 +124,20 @@
             this.m_tsmiAddPoint_AcrCenter,
             this.m_tsmiAddPoint_EdgeCenter});
 			this.m_tsmiAddPoint.Name = "m_tsmiAddPoint";
-			this.m_tsmiAddPoint.Size = new System.Drawing.Size(110, 22);
+			this.m_tsmiAddPoint.Size = new System.Drawing.Size(180, 22);
 			this.m_tsmiAddPoint.Text = "參考點";
 			// 
 			// m_tsmiAddPoint_AcrCenter
 			// 
 			this.m_tsmiAddPoint_AcrCenter.Name = "m_tsmiAddPoint_AcrCenter";
-			this.m_tsmiAddPoint_AcrCenter.Size = new System.Drawing.Size(122, 22);
+			this.m_tsmiAddPoint_AcrCenter.Size = new System.Drawing.Size(180, 22);
 			this.m_tsmiAddPoint_AcrCenter.Text = "圓弧中心";
 			this.m_tsmiAddPoint_AcrCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_AcrCenter_Click);
 			// 
 			// m_tsmiAddPoint_EdgeCenter
 			// 
 			this.m_tsmiAddPoint_EdgeCenter.Name = "m_tsmiAddPoint_EdgeCenter";
-			this.m_tsmiAddPoint_EdgeCenter.Size = new System.Drawing.Size(122, 22);
+			this.m_tsmiAddPoint_EdgeCenter.Size = new System.Drawing.Size(180, 22);
 			this.m_tsmiAddPoint_EdgeCenter.Text = "線段中心";
 			this.m_tsmiAddPoint_EdgeCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_EdgeCenter_Click);
 			// 
@@ -172,6 +171,13 @@
 			this.m_tsmiTransform.Size = new System.Drawing.Size(43, 20);
 			this.m_tsmiTransform.Text = "轉換";
 			this.m_tsmiTransform.Click += new System.EventHandler(this.m_tsmiTransform_Click);
+			// 
+			// m_tsmiSelectFace
+			// 
+			this.m_tsmiSelectFace.Name = "m_tsmiSelectFace";
+			this.m_tsmiSelectFace.Size = new System.Drawing.Size(79, 20);
+			this.m_tsmiSelectFace.Text = "選取特徵面";
+			this.m_tsmiSelectFace.Click += new System.EventHandler(this.m_tsmiSelectFace_Click);
 			// 
 			// m_panViewer
 			// 
@@ -289,13 +295,6 @@
 			this.m_tsmiOK.Size = new System.Drawing.Size(36, 20);
 			this.m_tsmiOK.Text = "OK";
 			this.m_tsmiOK.Click += new System.EventHandler(this.m_tsmiOK_Click);
-			// 
-			// m_tsmiSelectFace
-			// 
-			this.m_tsmiSelectFace.Name = "m_tsmiSelectFace";
-			this.m_tsmiSelectFace.Size = new System.Drawing.Size(79, 20);
-			this.m_tsmiSelectFace.Text = "選取特徵面";
-			this.m_tsmiSelectFace.Click += new System.EventHandler(this.m_tsmiSelectFace_Click);
 			// 
 			// m_msCAD_SelectFace
 			// 

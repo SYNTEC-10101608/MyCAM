@@ -103,7 +103,8 @@ namespace MyCAM.CAD
 
 		public void AddPoint( AddPointType type )
 		{
-			throw new NotImplementedException( "Add point action is not implemented yet." );
+			AddPointAction action = new AddPointAction( m_Viewer, m_TreeView, m_CADManager, type );
+			EditActionStart( action );
 		}
 
 		public void Create3PCoordSystem()
@@ -248,7 +249,7 @@ namespace MyCAM.CAD
 		// edit actions
 		void EditActionStart( ICADAction action )
 		{
-			m_DefaultAction.End();
+			m_CurrentAction.End();
 			m_CurrentAction = action;
 			m_CurrentAction.Start();
 			m_CurrentAction.EndAction += EditActionEnd;
@@ -260,8 +261,8 @@ namespace MyCAM.CAD
 				|| action.ActionType == CADActionType.None || action.ActionType == CADActionType.Default ) {
 				return;
 			}
-			m_DefaultAction.Start();
 			m_CurrentAction = m_DefaultAction;
+			m_CurrentAction.Start();
 		}
 	}
 }
