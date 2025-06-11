@@ -113,7 +113,7 @@ namespace MyCAM.CAD
 
 		public void StartManaulTransform()
 		{
-			TransformAction action = new TransformAction( m_Viewer, m_TreeView, m_CADManager );
+			ManualTransformAction action = new ManualTransformAction( m_Viewer, m_TreeView, m_CADManager );
 			EditActionStart( action );
 		}
 
@@ -122,7 +122,7 @@ namespace MyCAM.CAD
 			if( m_CurrentAction.ActionType != CADActionType.Transform ) {
 				return;
 			}
-			( (TransformAction)m_CurrentAction ).ApplyTransform( type, bReverse );
+			( (ManualTransformAction)m_CurrentAction ).ApplyTransform( type, bReverse );
 		}
 
 		public void EndManualTransform()
@@ -130,7 +130,7 @@ namespace MyCAM.CAD
 			if( m_CurrentAction.ActionType != CADActionType.Transform ) {
 				return;
 			}
-			( (TransformAction)m_CurrentAction ).TransformDone();
+			( (ManualTransformAction)m_CurrentAction ).TransformDone();
 		}
 
 		public void StartSelectFace()

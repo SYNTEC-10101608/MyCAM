@@ -13,9 +13,9 @@ using System.Windows.Forms;
 
 namespace MyCAM.CAD
 {
-	internal class TransformAction : CADACtionBase
+	internal class ManualTransformAction : CADACtionBase
 	{
-		public TransformAction( Viewer viewer, TreeView treeView, CADManager cadManager )
+		public ManualTransformAction( Viewer viewer, TreeView treeView, CADManager cadManager )
 			: base( viewer, treeView, cadManager )
 		{
 			// make a coordinate system as reference
