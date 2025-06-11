@@ -14,9 +14,9 @@ using System.Windows.Forms;
 namespace MyCAM.CAD
 {
 	// TODO: implement Create3PCSAction
-	internal class Create3PCSAction : CADACtionBase
+	internal class ThreePtTransformAction : CADACtionBase
 	{
-		public Create3PCSAction( Viewer viewer, TreeView treeView, CADManager cadManager,
+		public ThreePtTransformAction( Viewer viewer, TreeView treeView, CADManager cadManager,
 			Dictionary<string, gp_Ax3> coordSystemMap )
 			: base( viewer, treeView, cadManager )
 		{

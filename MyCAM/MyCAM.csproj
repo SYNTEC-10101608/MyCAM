@@ -53,7 +53,7 @@
   <ItemGroup>
     <Compile Include="CAD\CADAction\SelectFaceAction.cs" />
     <Compile Include="CAD\CADAction\TransformConstraints.cs" />
-    <Compile Include="CAD\CADAction\Create3PCSAction.cs" />
+    <Compile Include="CAD\CADAction\ThreePtTransformAction.cs" />
     <Compile Include="CAD\CADAction\AddPointAction.cs" />
     <Compile Include="CAD\CADAction\DefaultAction.cs" />
     <Compile Include="CAD\CADAction\ICADAction.cs" />
