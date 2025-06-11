@@ -2,11 +2,6 @@
 using OCC.Graphic3d;
 using OCC.Quantity;
 using OCC.TopoDS;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyCAM.CAD
 {

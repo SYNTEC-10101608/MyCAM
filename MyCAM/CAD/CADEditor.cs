@@ -1,6 +1,7 @@
 ﻿using OCC.AIS;
 using OCC.IFSelect;
 using OCC.IGESControl;
+using OCC.NCollection;
 using OCC.STEPControl;
 using OCC.TopAbs;
 using OCC.TopoDS;
