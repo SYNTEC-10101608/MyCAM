@@ -109,6 +109,8 @@ namespace MyCAM.CAD
 
 		public void ThreePointTransform()
 		{
+			ThreePtTransformAction action = new ThreePtTransformAction( m_Viewer, m_TreeView, m_CADManager );
+			EditActionStart( action );
 		}
 
 		public void StartManaulTransform()

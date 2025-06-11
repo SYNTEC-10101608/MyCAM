@@ -8,28 +8,23 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.CAD
 {
-	// TODO: implement Create3PCSAction
 	internal class ThreePtTransformAction : CADACtionBase
 	{
-		public ThreePtTransformAction( Viewer viewer, TreeView treeView, CADManager cadManager,
-			Dictionary<string, gp_Ax3> coordSystemMap )
+		public ThreePtTransformAction( Viewer viewer, TreeView treeView, CADManager cadManager )
 			: base( viewer, treeView, cadManager )
 		{
-			if( coordSystemMap == null ) {
-				throw new System.ArgumentNullException( "" );
-			}
-			m_CoordinateSystemMap = coordSystemMap;
 			m_ActionStage = EActionStage.P1;
 
 			// create labels
+			m_LabelO = new AIS_TextLabel();
 			m_LabelX.SetText( new TCollection_ExtendedString( "X" ) );
 			m_LabelX.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			m_LabelX.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
+			m_LabelO = new AIS_TextLabel();
 			m_LabelO.SetText( new TCollection_ExtendedString( "O" ) );
 			m_LabelO.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			m_LabelO.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
@@ -104,19 +99,18 @@ namespace MyCAM.CAD
 					m_Viewer.GetAISContext().Display( m_LabelX, true );
 					m_ActionStage = EActionStage.P3;
 				}
-				else {
+				else if( m_ActionStage == EActionStage.P3 ) {
 					if( slectedPoint.IsEqual( m_1stPoint, 1e-6 ) || slectedPoint.IsEqual( m_2ndPoint, 1e-6 ) ) {
 						MessageBox.Show( "point coincident 3rd" );
 						return;
 					}
 					m_3rdPoint = slectedPoint;
-					bool isValid = CreateCoordSystem( out gp_Ax3 coordSys );
+					bool isValid = CreateCoordSystem();
 					if( !isValid ) {
 						MessageBox.Show( "3 points are colinear" );
-						m_ActionStage = EActionStage.P1;
 						return;
 					}
-					AddCoordSystem( coordSys );
+					ShowCoordSystem();
 					End();
 				}
 			}
@@ -148,26 +142,22 @@ namespace MyCAM.CAD
 			return true;
 		}
 
-		bool CreateCoordSystem( out gp_Ax3 coordSys )
+		bool CreateCoordSystem()
 		{
-			coordSys = new gp_Ax3();
 			gp_Vec v12 = new gp_Vec( m_1stPoint, m_2ndPoint );
 			gp_Vec v13 = new gp_Vec( m_1stPoint, m_3rdPoint );
 			gp_Vec vZ = v12.Crossed( v13 );
 			if( vZ.Magnitude() < 1e-6 ) {
 				return false; // points are collinear
 			}
-			coordSys = new gp_Ax3( m_1stPoint, new gp_Dir( vZ ), new gp_Dir( v12 ) );
+			m_3PCoordSys = new gp_Ax3( m_1stPoint, new gp_Dir( vZ ), new gp_Dir( v12 ) );
 			return true;
 		}
 
-		void AddCoordSystem( gp_Ax3 ax3 )
+		void ShowCoordSystem()
 		{
-			// add to map
-			m_CoordinateSystemMap[ "LocalCS" + "_" + m_CoordinateSystemMap.Count.ToString() ] = ax3;
-
 			// create AIS Trihedron
-			AIS_Trihedron trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax3.Ax2() ) );
+			AIS_Trihedron trihedron = new AIS_Trihedron( new Geom_Axis2Placement( m_3PCoordSys.Ax2() ) );
 			trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
 			trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
 			trihedron.SetSize( 10.0 );
@@ -185,11 +175,11 @@ namespace MyCAM.CAD
 			P3 = 2,
 		}
 		EActionStage m_ActionStage;
-		gp_Pnt m_1stPoint = new gp_Pnt();
-		gp_Pnt m_2ndPoint = new gp_Pnt();
-		gp_Pnt m_3rdPoint = new gp_Pnt();
-		AIS_TextLabel m_LabelO = new AIS_TextLabel();
-		AIS_TextLabel m_LabelX = new AIS_TextLabel();
-		Dictionary<string, gp_Ax3> m_CoordinateSystemMap = new Dictionary<string, gp_Ax3>();
+		gp_Pnt m_1stPoint;
+		gp_Pnt m_2ndPoint;
+		gp_Pnt m_3rdPoint;
+		gp_Ax3 m_3PCoordSys;
+		AIS_TextLabel m_LabelO;
+		AIS_TextLabel m_LabelX;
 	}
 }
