@@ -1,6 +1,6 @@
 ﻿using OCC.AIS;
 using OCC.BRep;
-using OCC.Geom;
+using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.Quantity;
 using OCC.TCollection;
@@ -20,7 +20,7 @@ namespace MyCAM.CAD
 			m_ActionStage = EActionStage.P1;
 
 			// create labels
-			m_LabelO = new AIS_TextLabel();
+			m_LabelX = new AIS_TextLabel();
 			m_LabelX.SetText( new TCollection_ExtendedString( "X" ) );
 			m_LabelX.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			m_LabelX.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
@@ -90,6 +90,8 @@ namespace MyCAM.CAD
 					m_ActionStage = EActionStage.P2;
 				}
 				else if( m_ActionStage == EActionStage.P2 ) {
+
+					// check point coincidence
 					if( slectedPoint.IsEqual( m_1stPoint, 1e-6 ) ) {
 						MessageBox.Show( "point coincident 2nd" );
 						return;
@@ -100,17 +102,31 @@ namespace MyCAM.CAD
 					m_ActionStage = EActionStage.P3;
 				}
 				else if( m_ActionStage == EActionStage.P3 ) {
+
+					// check point coincidence
 					if( slectedPoint.IsEqual( m_1stPoint, 1e-6 ) || slectedPoint.IsEqual( m_2ndPoint, 1e-6 ) ) {
 						MessageBox.Show( "point coincident 3rd" );
 						return;
 					}
 					m_3rdPoint = slectedPoint;
-					bool isValid = CreateCoordSystem();
-					if( !isValid ) {
+
+					// check point colinearity
+					gp_Vec v12 = new gp_Vec( m_1stPoint, m_2ndPoint );
+					gp_Vec v13 = new gp_Vec( m_1stPoint, m_3rdPoint );
+					if( v12.IsParallel( v13, 1e-3 ) ) {
 						MessageBox.Show( "3 points are colinear" );
 						return;
 					}
-					ShowCoordSystem();
+
+					// create 3-point coordinate system
+					VectorTool.Create3PCoordSystem( m_1stPoint, m_2ndPoint, m_3rdPoint, out m_3PCoordSys );
+					if( !Show3PtTransformDialog() ) {
+						End();
+						return;
+					}
+
+					// final transformation
+					TransformPart();
 					End();
 				}
 			}
@@ -142,30 +158,49 @@ namespace MyCAM.CAD
 			return true;
 		}
 
-		bool CreateCoordSystem()
+		bool Show3PtTransformDialog()
 		{
-			gp_Vec v12 = new gp_Vec( m_1stPoint, m_2ndPoint );
-			gp_Vec v13 = new gp_Vec( m_1stPoint, m_3rdPoint );
-			gp_Vec vZ = v12.Crossed( v13 );
-			if( vZ.Magnitude() < 1e-6 ) {
-				return false; // points are collinear
+			// Create and show the 3-point transform dialog
+			ThreePtTransformDlg dialog = new ThreePtTransformDlg( m_1stPoint, m_2ndPoint, m_3rdPoint );
+			dialog.ShowDialog();
+			if( dialog.DialogResult != DialogResult.OK ) {
+				return false;
 			}
-			m_3PCoordSys = new gp_Ax3( m_1stPoint, new gp_Dir( vZ ), new gp_Dir( v12 ) );
+
+			// get point from dialog
+			bool isValid = dialog.GetMachinePoint( out gp_Pnt machineP1, out gp_Pnt machineP2, out gp_Pnt machineP3 );
+			if( !isValid ) {
+				MessageBox.Show( "Invalid machine points.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				return false;
+			}
+
+			// create 3-point coordinate system
+			if( !VectorTool.Create3PCoordSystem( machineP1, machineP2, machineP3, out gp_Ax3 machineCoordSys ) ) {
+				MessageBox.Show( "Failed to create 3-point coordinate system.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				return false;
+			}
+
+			// create transformation
+			m_3PTransform = new gp_Trsf();
+			m_3PTransform.SetDisplacement( m_3PCoordSys, machineCoordSys );
 			return true;
 		}
 
-		void ShowCoordSystem()
+		void TransformPart()
 		{
-			// create AIS Trihedron
-			AIS_Trihedron trihedron = new AIS_Trihedron( new Geom_Axis2Placement( m_3PCoordSys.Ax2() ) );
-			trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			trihedron.SetSize( 10.0 );
-			trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-
-			// display the trihedron
-			m_Viewer.GetAISContext().Display( trihedron, true );
-			m_Viewer.GetAISContext().Deactivate( trihedron );
+			foreach( var oneData in m_CADManager.ShapeDataMap ) {
+				BRepBuilderAPI_Transform oneTransform = new BRepBuilderAPI_Transform( oneData.Value.Shape, m_3PTransform );
+				oneData.Value.Shape = oneTransform.Shape();
+				if( m_CADManager.ViewObjectMap.ContainsKey( oneData.Key ) ) {
+					AIS_Shape oneAIS = AIS_Shape.DownCast( m_CADManager.ViewObjectMap[ oneData.Key ].AISHandle );
+					if( oneAIS == null || oneAIS.IsNull() ) {
+						continue;
+					}
+					oneAIS.SetShape( oneData.Value.Shape );
+					m_Viewer.GetAISContext().Redisplay( oneAIS, false );
+				}
+			}
+			m_Viewer.UpdateView();
 		}
 
 		enum EActionStage
@@ -179,6 +214,7 @@ namespace MyCAM.CAD
 		gp_Pnt m_2ndPoint;
 		gp_Pnt m_3rdPoint;
 		gp_Ax3 m_3PCoordSys;
+		gp_Trsf m_3PTransform;
 		AIS_TextLabel m_LabelO;
 		AIS_TextLabel m_LabelX;
 	}

@@ -61,5 +61,18 @@ namespace OCCTool
 			}
 			return tangent;
 		}
+
+		public static bool Create3PCoordSystem( gp_Pnt p1, gp_Pnt p2, gp_Pnt p3, out gp_Ax3 coordSys )
+		{
+			coordSys = new gp_Ax3();
+			gp_Vec v12 = new gp_Vec( p1, p2 );
+			gp_Vec v13 = new gp_Vec( p1, p3 );
+			gp_Vec vZ = v12.Crossed( v13 );
+			if( vZ.Magnitude() < 1e-3 ) {
+				return false;
+			}
+			coordSys = new gp_Ax3( p1, new gp_Dir( vZ ), new gp_Dir( v12 ) );
+			return true;
+		}
 	}
 }

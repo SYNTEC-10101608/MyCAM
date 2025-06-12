@@ -60,6 +60,12 @@
     <Compile Include="CAD\CADAction\ManualTransformAction.cs" />
     <Compile Include="CAD\CADEditor.cs" />
     <Compile Include="CAD\CADManager.cs" />
+    <Compile Include="CAD\Dialog\ThreePtTransformDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CAD\Dialog\ThreePtTransformDlg.Designer.cs">
+      <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -68,6 +74,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="CAD\Dialog\ThreePtTransformDlg.resx">
+      <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="StartupForm.resx">
       <DependentUpon>StartupForm.cs</DependentUpon>
     </EmbeddedResource>
