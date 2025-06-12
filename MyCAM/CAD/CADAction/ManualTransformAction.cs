@@ -23,9 +23,6 @@ namespace MyCAM.CAD
 
 			// make a compound shape as transform target
 			MakePartShape();
-
-			// make default coordinate system to transform
-			m_TotalTrsf = new gp_Trsf();
 		}
 
 		public override CADActionType ActionType
@@ -108,8 +105,6 @@ namespace MyCAM.CAD
 		public void TransformDone()
 		{
 			foreach( var oneData in m_CADManager.ShapeDataMap ) {
-				BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( oneData.Value.Shape, m_TotalTrsf );
-				oneData.Value.Shape = transform.Shape();
 				if( m_CADManager.ViewObjectMap.ContainsKey( oneData.Key ) ) {
 					AIS_Shape oneAIS = AIS_Shape.DownCast( m_CADManager.ViewObjectMap[ oneData.Key ].AISHandle );
 					if( oneAIS == null || oneAIS.IsNull()) {
@@ -362,11 +357,17 @@ namespace MyCAM.CAD
 				return;
 			}
 
-			// transform
+			// transform preview shape
 			gp_Trsf trsf = c.SolveConstraint();
 			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( m_PartShape, trsf );
 			m_PartShape = transform.Shape();
-			m_TotalTrsf.Multiply( trsf );
+
+			// transform all CAD shapes
+			// TODO: u can transform it when action end, but the transform matrix chain matter, I cant handle it well so far
+			foreach( var oneData in m_CADManager.ShapeDataMap ) {
+				BRepBuilderAPI_Transform oneTransform = new BRepBuilderAPI_Transform( oneData.Value.Shape, trsf );
+				oneData.Value.Shape = oneTransform.Shape();
+			}
 
 			// update view
 			m_PartAIS.SetShape( m_PartShape );
@@ -379,6 +380,5 @@ namespace MyCAM.CAD
 		TopoDS_Shape m_PartShape;
 		List<AIS_Shape> m_G54AISList;
 		AIS_Shape m_PartAIS;
-		gp_Trsf m_TotalTrsf;
 	}
 }
