@@ -34,7 +34,7 @@ namespace MyCAM.CAD
 		{
 			get
 			{
-				return CADActionType.Create3PCS;
+				return CADActionType.ThreePtTransform;
 			}
 		}
 

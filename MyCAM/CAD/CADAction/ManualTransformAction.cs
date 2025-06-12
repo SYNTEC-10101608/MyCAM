@@ -29,7 +29,7 @@ namespace MyCAM.CAD
 		{
 			get
 			{
-				return CADActionType.Transform;
+				return CADActionType.ManualTransform;
 			}
 		}
 

@@ -149,7 +149,7 @@ namespace MyCAM.CAD
 
 		public void ApplyManualTransform( EConstraintType type, bool bReverse = false )
 		{
-			if( m_CurrentAction.ActionType != CADActionType.Transform ) {
+			if( m_CurrentAction.ActionType != CADActionType.ManualTransform ) {
 				return;
 			}
 			( (ManualTransformAction)m_CurrentAction ).ApplyTransform( type, bReverse );
@@ -157,7 +157,7 @@ namespace MyCAM.CAD
 
 		public void EndManualTransform()
 		{
-			if( m_CurrentAction.ActionType != CADActionType.Transform ) {
+			if( m_CurrentAction.ActionType != CADActionType.ManualTransform ) {
 				return;
 			}
 			( (ManualTransformAction)m_CurrentAction ).TransformDone();

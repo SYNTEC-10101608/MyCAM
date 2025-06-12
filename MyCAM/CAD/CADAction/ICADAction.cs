@@ -9,8 +9,8 @@ namespace MyCAM.CAD
 		None = 0,
 		Default = 1,
 		AddPoint = 2,
-		Create3PCS = 3,
-		Transform = 4,
+		ThreePtTransform = 3,
+		ManualTransform = 4,
 		SelectFace = 5,
 	}
 
