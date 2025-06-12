@@ -60,7 +60,6 @@
     <Compile Include="CAD\CADAction\ManualTransformAction.cs" />
     <Compile Include="CAD\CADEditor.cs" />
     <Compile Include="CAD\CADManager.cs" />
-    <Compile Include="CAD\ViewHelper.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>
