@@ -52,9 +52,9 @@ namespace NCExport
 				string szX = cuttingProcessData.CAMData.CAMPointList[ i ].CADPoint.Point.X().ToString( "F3" );
 				string szY = cuttingProcessData.CAMData.CAMPointList[ i ].CADPoint.Point.Y().ToString( "F3" );
 				string szZ = cuttingProcessData.CAMData.CAMPointList[ i ].CADPoint.Point.Z().ToString( "F3" );
-				string szB = dS_MCS_deg.ToString( "F3" );
+				string szA = dS_MCS_deg.ToString( "F3" );
 				string szC = dM_MCS_deg.ToString( "F3" );
-				m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} B{szB} C{szC}" );
+				m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A{szA} C{szC}" );
 				i++;
 			}
 		}

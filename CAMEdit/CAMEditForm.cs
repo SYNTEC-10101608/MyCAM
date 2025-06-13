@@ -192,11 +192,10 @@ namespace CAMEdit
 
 		void ShowCAMData()
 		{
-			ShowCAMContour();
+			//ShowCAMContour();
 			ShowToolVec();
 			ShowOrientation();
 			ShowIndex();
-			m_SimulationCAData = PostTool.ConvertIJKToABC( m_Model.CAMDataList[ 0 ].CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList() );
 			m_OCCViewer.UpdateView();
 		}
 
@@ -252,7 +251,7 @@ namespace CAMEdit
 			foreach( CAMData camData in m_Model.CAMDataList ) {
 				//List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
 				List<CAMPoint> filteredPath = camData.CAMPointList;
-				for( int i = 0; i < filteredPath.Count; i++ ) {
+				for( int i = 0; i < filteredPath.Count; i += 10 ) {
 					CAMPoint camPoint = filteredPath[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
 					if( camData.GetToolVecModifyIndex().Contains( ( i + camData.CAMPointList.Count + camData.StartPoint ) % camData.CAMPointList.Count ) ) {
@@ -491,6 +490,7 @@ namespace CAMEdit
 			if( e.KeyCode == Keys.F1 ) {
 				m_bSimulation = !m_bSimulation;
 				if( m_bSimulation ) {
+					m_SimulationCAData = PostTool.ConvertIJKToABC( m_Model.CAMDataList[ 0 ].CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList() );
 					ShowHead();
 				}
 				else {

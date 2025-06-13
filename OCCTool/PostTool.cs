@@ -63,6 +63,6 @@ namespace OCCTool
 
 		static double[] ToolDirectionAtZero = new double[ 3 ] { 0, 0, 1 };
 		static double[] DirectOfFirstRotAxis = new double[ 3 ] { 0, 0, 1 };
-		static double[] DirectOfSecondRotAxis = new double[ 3 ] { 0, 1, 0 };
+		static double[] DirectOfSecondRotAxis = new double[ 3 ] { 1, 0, 0 };
 	}
 }
