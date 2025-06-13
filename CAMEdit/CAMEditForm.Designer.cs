@@ -34,6 +34,8 @@
 			this.m_tsmiLead = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiToolVec = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiMoveUp = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiMoveDown = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -45,6 +47,8 @@
             this.m_tsmiOffset,
             this.m_tsmiToolVec,
             this.m_tsmiLead,
+            this.m_tsmiMoveUp,
+            this.m_tsmiMoveDown,
             this.m_tsmiOK});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
@@ -95,6 +99,20 @@
 			this.m_tsmiOK.Text = "OK";
 			this.m_tsmiOK.Click += new System.EventHandler(this.m_tsmiOK_Click);
 			// 
+			// m_tsmiMoveUp
+			// 
+			this.m_tsmiMoveUp.Name = "m_tsmiMoveUp";
+			this.m_tsmiMoveUp.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiMoveUp.Text = "上移";
+			this.m_tsmiMoveUp.Click += new System.EventHandler(this.m_tsmiMoveUp_Click);
+			// 
+			// m_tsmiMoveDown
+			// 
+			this.m_tsmiMoveDown.Name = "m_tsmiMoveDown";
+			this.m_tsmiMoveDown.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiMoveDown.Text = "下移";
+			this.m_tsmiMoveDown.Click += new System.EventHandler(this.m_tsmiMoveDown_Click);
+			// 
 			// CAMEditForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -120,5 +138,7 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiOffset;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiLead;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiToolVec;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiMoveUp;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiMoveDown;
 	}
 }

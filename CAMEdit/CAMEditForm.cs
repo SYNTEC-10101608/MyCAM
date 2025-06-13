@@ -1,4 +1,5 @@
 ﻿using DataStructure;
+using NCExport;
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.BRep;
@@ -11,6 +12,7 @@ using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Prs3d;
 using OCC.Quantity;
+using OCC.TCollection;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
@@ -111,6 +113,7 @@ namespace CAMEdit
 		List<AIS_Shape> m_CAMContourAISList = new List<AIS_Shape>(); // need refresh, need activate
 		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh, need activate
 		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
+		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>(); // need refresh, no need activate
 
 		// for simulation
 		TopoDS_Shape m_HeadA;
@@ -192,6 +195,7 @@ namespace CAMEdit
 			ShowCAMContour();
 			ShowToolVec();
 			ShowOrientation();
+			ShowIndex();
 			m_SimulationCAData = PostTool.ConvertIJKToABC( m_Model.CAMDataList[ 0 ].CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList() );
 			m_OCCViewer.UpdateView();
 		}
@@ -246,16 +250,15 @@ namespace CAMEdit
 
 			// build tool vec
 			foreach( CAMData camData in m_Model.CAMDataList ) {
-				int nIndex = 0;
 				//List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
 				List<CAMPoint> filteredPath = camData.CAMPointList;
-				foreach( CAMPoint camPoint in filteredPath ) {
+				for( int i = 0; i < filteredPath.Count; i++ ) {
+					CAMPoint camPoint = filteredPath[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					if( camData.GetToolVecModifyIndex().Contains( ( nIndex + camData.CAMPointList.Count + camData.StartPoint ) % camData.CAMPointList.Count ) ) {
+					if( camData.GetToolVecModifyIndex().Contains( ( i + camData.CAMPointList.Count + camData.StartPoint ) % camData.CAMPointList.Count ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 					}
 					m_ToolVecAISList.Add( toolVecAIS );
-					nIndex++;
 				}
 			}
 
@@ -289,6 +292,37 @@ namespace CAMEdit
 			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
 				m_OCCViewer.GetAISContext().Display( orientationAIS, false );
 				m_OCCViewer.GetAISContext().Deactivate( orientationAIS );
+			}
+		}
+
+		void ShowIndex()
+		{
+			// clear the previous text label
+			foreach( AIS_TextLabel textLabel in m_IndexList ) {
+				m_OCCViewer.GetAISContext().Remove( textLabel, false );
+			}
+			m_IndexList.Clear();
+
+			// create text label
+			int nCurrentIndex = 0;
+			foreach( CAMData camData in m_Model.CAMDataList ) {
+				gp_Pnt location = camData.CAMPointList[ 0 ].CADPoint.Point;
+				string szIndex = nCurrentIndex++.ToString();
+
+				// create text label ais
+				AIS_TextLabel textLabel = new AIS_TextLabel();
+				textLabel.SetText( new TCollection_ExtendedString( szIndex ) );
+				textLabel.SetPosition( location );
+				textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+				textLabel.SetHeight( 20 );
+				textLabel.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
+				m_IndexList.Add( textLabel );
+			}
+
+			// display text label
+			foreach( AIS_TextLabel textLabel in m_IndexList ) {
+				m_OCCViewer.GetAISContext().Display( textLabel, false );
+				m_OCCViewer.GetAISContext().Deactivate( textLabel );
 			}
 		}
 
@@ -365,6 +399,50 @@ namespace CAMEdit
 
 		}
 
+		void m_tsmiMoveUp_Click( object sender, EventArgs e )
+		{
+			GetSelectedWireInfo( out CAMData camData, out AIS_InteractiveObject selectedAIS );
+			if( camData == null ) {
+				return;
+			}
+			int nIndex = m_Model.CAMDataList.IndexOf( camData );
+			if( nIndex == -1 ) {
+				return;
+			}
+			MoveProcess( nIndex, true );
+		}
+
+		void m_tsmiMoveDown_Click( object sender, EventArgs e )
+		{
+			GetSelectedWireInfo( out CAMData camData, out AIS_InteractiveObject selectedAIS );
+			if( camData == null ) {
+				return;
+			}
+			int nIndex = m_Model.CAMDataList.IndexOf( camData );
+			if( nIndex == -1 ) {
+				return;
+			}
+			MoveProcess( nIndex, false );
+		}
+
+		void MoveProcess( int nIndex, bool bUp )
+		{
+			if( nIndex < 0 || nIndex > m_Model.CAMDataList.Count - 1
+				|| bUp && nIndex == 0
+				|| !bUp && nIndex == m_Model.CAMDataList.Count - 1 ) {
+				return;
+			}
+			CAMData data = m_Model.CAMDataList[ nIndex ];
+			m_Model.CAMDataList.RemoveAt( nIndex );
+			if( bUp ) {
+				m_Model.CAMDataList.Insert( nIndex - 1, data );
+			}
+			else {
+				m_Model.CAMDataList.Insert( nIndex + 1, data );
+			}
+			ShowCAMData();
+		}
+
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
 			// path filtering
@@ -375,7 +453,8 @@ namespace CAMEdit
 			}
 			List<IProcessData> cuttingProcessDataList =
 				m_Model.CAMDataList.Select( camData => new CuttingProcessData( camData ) ).Cast<IProcessData>().ToList();
-			CADEditOK?.Invoke( m_Model.PartShape, cuttingProcessDataList );
+			NCWriter w = new NCWriter( cuttingProcessDataList );
+			w.Convert();
 		}
 
 		// viewer action
@@ -629,15 +708,7 @@ namespace CAMEdit
 
 					// activate the selected contour
 					m_OCCViewer.GetAISContext().Activate( selectedAIS, (int)AISActiveMode.Vertex );
-
-					// disable all other tsmi
-					m_tsmiReverse.Enabled = false;
-					m_tsmiOffset.Enabled = false;
-					m_tsmiToolVec.Enabled = false;
-					m_tsmiLead.Enabled = false;
-					m_tsmiOK.Enabled = false;
-
-					// highlight the start point tsmi
+					DisableAllToolStripMenuItems();
 					m_tsmiStartPoint.BackColor = System.Drawing.Color.Yellow;
 					break;
 				case EditMode.ToolVecSelect:
@@ -648,15 +719,7 @@ namespace CAMEdit
 
 					// activate the selected contour
 					m_OCCViewer.GetAISContext().Activate( selectedAIS, (int)AISActiveMode.Vertex );
-
-					// disable all other tsmi
-					m_tsmiStartPoint.Enabled = false;
-					m_tsmiReverse.Enabled = false;
-					m_tsmiOffset.Enabled = false;
-					m_tsmiLead.Enabled = false;
-					m_tsmiOK.Enabled = false;
-
-					// highlight the tool vector tsmi
+					DisableAllToolStripMenuItems();
 					m_tsmiToolVec.BackColor = System.Drawing.Color.Yellow;
 					break;
 				case EditMode.None:
@@ -682,15 +745,7 @@ namespace CAMEdit
 					foreach( AIS_Shape oneShape in m_CADContourAISList ) {
 						m_OCCViewer.GetAISContext().Deactivate( oneShape );
 					}
-
-					// enable all other tsmi
-					m_tsmiReverse.Enabled = true;
-					m_tsmiOffset.Enabled = true;
-					m_tsmiToolVec.Enabled = true;
-					m_tsmiLead.Enabled = true;
-					m_tsmiOK.Enabled = true;
-
-					// restore the start point tsmi to system control color
+					EnableAllToolStripMenuItems();
 					m_tsmiStartPoint.BackColor = System.Drawing.SystemColors.Control;
 					break;
 				case EditMode.ToolVecSelect:
@@ -702,15 +757,7 @@ namespace CAMEdit
 					foreach( AIS_Shape oneShape in m_CADContourAISList ) {
 						m_OCCViewer.GetAISContext().Deactivate( oneShape );
 					}
-
-					// enable all other tsmi
-					m_tsmiStartPoint.Enabled = true;
-					m_tsmiReverse.Enabled = true;
-					m_tsmiOffset.Enabled = true;
-					m_tsmiLead.Enabled = true;
-					m_tsmiOK.Enabled = true;
-
-					// restore the tool vector tsmi to system control color
+					EnableAllToolStripMenuItems();
 					m_tsmiToolVec.BackColor = System.Drawing.SystemColors.Control;
 					break;
 				case EditMode.None:
@@ -722,6 +769,30 @@ namespace CAMEdit
 					}
 					break;
 			}
+		}
+
+		void EnableAllToolStripMenuItems()
+		{
+			m_tsmiStartPoint.Enabled = true;
+			m_tsmiReverse.Enabled = true;
+			m_tsmiOffset.Enabled = true;
+			m_tsmiToolVec.Enabled = true;
+			m_tsmiLead.Enabled = true;
+			m_tsmiMoveUp.Enabled = true;
+			m_tsmiMoveDown.Enabled = true;
+			m_tsmiOK.Enabled = true;
+		}
+
+		void DisableAllToolStripMenuItems()
+		{
+			m_tsmiStartPoint.Enabled = false;
+			m_tsmiReverse.Enabled = false;
+			m_tsmiOffset.Enabled = false;
+			m_tsmiToolVec.Enabled = false;
+			m_tsmiLead.Enabled = false;
+			m_tsmiMoveUp.Enabled = false;
+			m_tsmiMoveDown.Enabled = false;
+			m_tsmiOK.Enabled = false;
 		}
 
 		// path filtering
