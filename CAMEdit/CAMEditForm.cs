@@ -101,16 +101,16 @@ namespace CAMEdit
 				StartAction();
 			}
 		}
-		gp_Ax2 m_ToolVecAx2;
+		gp_Ax2 m_SelectedToolVecAx2;
 		CAMData m_SelectedCAMData = null;
 		int m_SelectedIndex = -1;
 
 		// for viewer resource handle
 		AIS_Shape m_PartAIS = null; // for part shape
-		List<AIS_Shape> m_CADContourAISList = new List<AIS_Shape>(); // for active only, no need refresh
-		List<AIS_Shape> m_CAMContourAISList = new List<AIS_Shape>(); // need refresh
-		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh
-		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh
+		List<AIS_Shape> m_CADContourAISList = new List<AIS_Shape>(); // no need refresh, need activate
+		List<AIS_Shape> m_CAMContourAISList = new List<AIS_Shape>(); // need refresh, need activate
+		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh, need activate
+		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
 
 		// for simulation
 		TopoDS_Shape m_HeadA;
@@ -251,7 +251,7 @@ namespace CAMEdit
 				List<CAMPoint> filteredPath = camData.CAMPointList;
 				foreach( CAMPoint camPoint in filteredPath ) {
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					if( camData.GetToolVecModifyIndex().Contains( nIndex ) ) {
+					if( camData.GetToolVecModifyIndex().Contains( ( nIndex + camData.CAMPointList.Count + camData.StartPoint ) % camData.CAMPointList.Count ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 					}
 					m_ToolVecAISList.Add( toolVecAIS );
@@ -392,7 +392,7 @@ namespace CAMEdit
 					if( e.KeyCode != Keys.Escape ) {
 						return;
 					}
-					if( m_ToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
+					if( m_SelectedToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
 						return;
 					}
 					m_SelectedCAMData.SetToolVecModify( m_SelectedIndex, 0, 0 );
@@ -467,7 +467,7 @@ namespace CAMEdit
 
 					// record point tangent and normal vec ax2
 					CADPoint cadPoint = camData_ToolVec.CADPointList[ nIndex_ToolVec ];
-					m_ToolVecAx2 = new gp_Ax2( cadPoint.Point, cadPoint.NormalVec_2nd.Crossed( cadPoint.TangentVec ), cadPoint.TangentVec );
+					m_SelectedToolVecAx2 = new gp_Ax2( cadPoint.Point, cadPoint.NormalVec_2nd.Crossed( cadPoint.TangentVec ), cadPoint.TangentVec );
 					m_SelectedCAMData = camData_ToolVec;
 					m_SelectedIndex = nIndex_ToolVec;
 					editMode = EditMode.TooVecEdit;
@@ -494,7 +494,7 @@ namespace CAMEdit
 		{
 			switch( editMode ) {
 				case EditMode.TooVecEdit:
-					if( m_ToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
+					if( m_SelectedToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
 						return;
 					}
 
@@ -506,7 +506,7 @@ namespace CAMEdit
 
 					// make a sphere for direction control
 					gp_Sphere sphere = new gp_Sphere();
-					sphere.SetLocation( m_ToolVecAx2.Location() );
+					sphere.SetLocation( m_SelectedToolVecAx2.Location() );
 					sphere.SetRadius( 10 );
 					Geom_SphericalSurface sphereG = new Geom_SphericalSurface( sphere );
 
@@ -521,7 +521,7 @@ namespace CAMEdit
 					if( intCS.NbPoints() == 0 ) {
 
 						// get closet point of the line and the sphere center
-						GeomAPI_ProjectPointOnCurve projectPoint = new GeomAPI_ProjectPointOnCurve( m_ToolVecAx2.Location(), viewLineG );
+						GeomAPI_ProjectPointOnCurve projectPoint = new GeomAPI_ProjectPointOnCurve( m_SelectedToolVecAx2.Location(), viewLineG );
 						double u = projectPoint.LowerDistanceParameter();
 						ps = viewLineG.Value( u );
 					}
@@ -540,12 +540,12 @@ namespace CAMEdit
 					}
 
 					// get direction of the line
-					gp_Dir dir = new gp_Dir( ps.XYZ() - m_ToolVecAx2.Location().XYZ() );
+					gp_Dir dir = new gp_Dir( ps.XYZ() - m_SelectedToolVecAx2.Location().XYZ() );
 
 					// project the vector to the ax2
-					double X = dir.Dot( m_ToolVecAx2.XDirection() );
-					double Y = dir.Dot( m_ToolVecAx2.YDirection() );
-					double Z = dir.Dot( m_ToolVecAx2.Direction() );
+					double X = dir.Dot( m_SelectedToolVecAx2.XDirection() );
+					double Y = dir.Dot( m_SelectedToolVecAx2.YDirection() );
+					double Z = dir.Dot( m_SelectedToolVecAx2.Direction() );
 
 					// get angle A is atan2 Z/X
 					double angleA = Math.Atan2( X, Z ) * 180 / Math.PI;
