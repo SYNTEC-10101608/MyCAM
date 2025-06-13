@@ -123,7 +123,7 @@ namespace CAMEdit
 		AIS_Shape m_TableAAIS;
 		AIS_Shape m_TableCAIS;
 		AIS_Shape m_MachineAIS;
-		bool m_bSimulation = true;
+		bool m_bSimulation = false;
 		int m_SimulationIndex = 0;
 		List<Tuple<double, double>> m_SimulationCAData = new List<Tuple<double, double>>();
 
@@ -355,14 +355,14 @@ namespace CAMEdit
 			ShowCAMData();
 		}
 
-		void m_tsmiLead_Click( object sender, EventArgs e )
-		{
-
-		}
-
 		void m_tsmiToolVec_Click( object sender, EventArgs e )
 		{
 			editMode = EditMode.ToolVecSelect;
+		}
+
+		void m_tsmiLead_Click( object sender, EventArgs e )
+		{
+
 		}
 
 		void m_tsmiOK_Click( object sender, EventArgs e )
@@ -467,7 +467,7 @@ namespace CAMEdit
 
 					// record point tangent and normal vec ax2
 					CADPoint cadPoint = camData_ToolVec.CADPointList[ nIndex_ToolVec ];
-					m_SelectedToolVecAx2 = new gp_Ax2( cadPoint.Point, cadPoint.NormalVec_2nd.Crossed( cadPoint.TangentVec ), cadPoint.TangentVec );
+					m_SelectedToolVecAx2 = new gp_Ax2( cadPoint.Point, cadPoint.NormalVec_1st, cadPoint.TangentVec );
 					m_SelectedCAMData = camData_ToolVec;
 					m_SelectedIndex = nIndex_ToolVec;
 					editMode = EditMode.TooVecEdit;
@@ -633,8 +633,8 @@ namespace CAMEdit
 					// disable all other tsmi
 					m_tsmiReverse.Enabled = false;
 					m_tsmiOffset.Enabled = false;
-					m_tsmiLead.Enabled = false;
 					m_tsmiToolVec.Enabled = false;
+					m_tsmiLead.Enabled = false;
 					m_tsmiOK.Enabled = false;
 
 					// highlight the start point tsmi
@@ -656,11 +656,8 @@ namespace CAMEdit
 					m_tsmiLead.Enabled = false;
 					m_tsmiOK.Enabled = false;
 
-					// highlight the start point tsmi
+					// highlight the tool vector tsmi
 					m_tsmiToolVec.BackColor = System.Drawing.Color.Yellow;
-					break;
-				case EditMode.TooVecEdit:
-					//m_OCCViewer.SetViewDir( m_ToolVecAx2.YDirection().Reversed() );
 					break;
 				case EditMode.None:
 				default:
@@ -689,8 +686,8 @@ namespace CAMEdit
 					// enable all other tsmi
 					m_tsmiReverse.Enabled = true;
 					m_tsmiOffset.Enabled = true;
-					m_tsmiLead.Enabled = true;
 					m_tsmiToolVec.Enabled = true;
+					m_tsmiLead.Enabled = true;
 					m_tsmiOK.Enabled = true;
 
 					// restore the start point tsmi to system control color
@@ -713,10 +710,8 @@ namespace CAMEdit
 					m_tsmiLead.Enabled = true;
 					m_tsmiOK.Enabled = true;
 
-					// restore the start point tsmi to system control color
+					// restore the tool vector tsmi to system control color
 					m_tsmiToolVec.BackColor = System.Drawing.SystemColors.Control;
-					break;
-				case EditMode.TooVecEdit:
 					break;
 				case EditMode.None:
 				default:
@@ -991,7 +986,7 @@ namespace CAMEdit
 			m_HeadCAIS.SetMaterial( aspectHeadC );
 			m_HeadCAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
 			m_HeadCAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
+			//m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
 
 			// the HeadA
 			BRepPrimAPI_MakeBox boxMakerHeadA = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -50, -100 ), 100, 100, 150 );
@@ -1003,7 +998,7 @@ namespace CAMEdit
 			m_HeadAAIS.SetMaterial( aspectHeadA );
 			m_HeadAAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 			m_HeadAAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_OCCViewer.GetAISContext().Display( m_HeadAAIS, false );
+			//m_OCCViewer.GetAISContext().Display( m_HeadAAIS, false );
 
 			// the TableA
 			//BRepPrimAPI_MakeBox outBoxMakerTableA = new BRepPrimAPI_MakeBox( new gp_Pnt( -150, -120, -40 ), 300, 240, 60 );
