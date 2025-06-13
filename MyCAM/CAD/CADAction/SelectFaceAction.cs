@@ -117,6 +117,7 @@ namespace MyCAM.CAD
 
 		protected override void ViewerMouseDown( MouseEventArgs e )
 		{
+			// TODO: figure how OCCT slect work, dont do shit like this
 			if( e.Button == MouseButtons.Left ) {
 
 				// select the face

@@ -97,17 +97,12 @@ namespace MyCAM.CAD
 			SetConstraint( type, bReverse );
 		}
 
-		class Foo
-		{
-			public int Bar { get; set; } = 0;
-		}
-
 		public void TransformDone()
 		{
 			foreach( var oneData in m_CADManager.ShapeDataMap ) {
 				if( m_CADManager.ViewObjectMap.ContainsKey( oneData.Key ) ) {
 					AIS_Shape oneAIS = AIS_Shape.DownCast( m_CADManager.ViewObjectMap[ oneData.Key ].AISHandle );
-					if( oneAIS == null || oneAIS.IsNull()) {
+					if( oneAIS == null || oneAIS.IsNull() ) {
 						continue;
 					}
 					oneAIS.SetShape( oneData.Value.Shape );
@@ -118,6 +113,7 @@ namespace MyCAM.CAD
 
 		void MakePartShape()
 		{
+			// TODO: u may not need to make a extra part, use the raw shape directly
 			List<TopoDS_Shape> visibleShapeList = new List<TopoDS_Shape>();
 			foreach( var oneData in m_CADManager.ShapeDataMap ) {
 				if( m_CADManager.ViewObjectMap.ContainsKey( oneData.Key ) && m_CADManager.ViewObjectMap[ oneData.Key ].Visible ) {
@@ -363,7 +359,6 @@ namespace MyCAM.CAD
 			m_PartShape = transform.Shape();
 
 			// transform all CAD shapes
-			// TODO: u can transform it when action end, but the transform matrix chain matter, I cant handle it well so far
 			foreach( var oneData in m_CADManager.ShapeDataMap ) {
 				BRepBuilderAPI_Transform oneTransform = new BRepBuilderAPI_Transform( oneData.Value.Shape, trsf );
 				oneData.Value.Shape = oneTransform.Shape();
