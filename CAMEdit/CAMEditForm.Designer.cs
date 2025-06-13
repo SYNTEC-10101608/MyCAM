@@ -33,6 +33,7 @@
 			this.m_tsmiOffset = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiLead = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiToolVec = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -43,6 +44,7 @@
             this.m_tsmiReverse,
             this.m_tsmiOffset,
             this.m_tsmiLead,
+            this.m_tsmiToolVec,
             this.m_tsmiOK});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
@@ -85,6 +87,13 @@
 			this.m_tsmiOK.Text = "OK";
 			this.m_tsmiOK.Click += new System.EventHandler(this.m_tsmiOK_Click);
 			// 
+			// m_tsmiToolVec
+			// 
+			this.m_tsmiToolVec.Name = "m_tsmiToolVec";
+			this.m_tsmiToolVec.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiToolVec.Text = "姿態";
+			this.m_tsmiToolVec.Click += new System.EventHandler(this.m_tsmiToolVec_Click);
+			// 
 			// CAMEditForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -109,5 +118,6 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiReverse;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiOffset;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiLead;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiToolVec;
 	}
 }

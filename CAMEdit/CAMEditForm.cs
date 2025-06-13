@@ -84,7 +84,8 @@ namespace CAMEdit
 		{
 			None,
 			StartPoint,
-			TooVec,
+			ToolVecSelect,
+			TooVecEdit,
 		}
 		EditMode m_EditMode = EditMode.None;
 		EditMode editMode
@@ -359,6 +360,11 @@ namespace CAMEdit
 
 		}
 
+		void m_tsmiToolVec_Click( object sender, EventArgs e )
+		{
+			editMode = EditMode.ToolVecSelect;
+		}
+
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
 			// path filtering
@@ -376,12 +382,13 @@ namespace CAMEdit
 		void ViewerKeyDown( object sender, PreviewKeyDownEventArgs e )
 		{
 			switch( editMode ) {
+				case EditMode.ToolVecSelect:
 				case EditMode.StartPoint:
 					if( e.KeyCode == Keys.Escape ) {
 						editMode = EditMode.None;
 					}
 					break;
-				case EditMode.TooVec:
+				case EditMode.TooVecEdit:
 					if( e.KeyCode != Keys.Escape ) {
 						return;
 					}
@@ -440,22 +447,33 @@ namespace CAMEdit
 						return;
 					}
 					m_OCCViewer.Select();
-					GetSelectedVertexInfo( out CAMData camData, out int nIndex );
-					if( camData == null || nIndex == -1 ) {
+					GetSelectedVertexInfo( out CAMData camData_StartPoint, out int nIndex_StartPoint );
+					if( camData_StartPoint == null || nIndex_StartPoint == -1 ) {
 						return;
 					}
-					//camData.StartPoint = nIndex;
-					//ShowCAMData();
-
-					// record point tangent and normal vec ax2
-					CADPoint cadPoint = camData.CADPointList[ nIndex ];
-					m_ToolVecAx2 = new gp_Ax2( cadPoint.Point, cadPoint.NormalVec_2nd.Crossed( cadPoint.TangentVec ), cadPoint.TangentVec );
-					m_SelectedCAMData = camData;
-					m_SelectedIndex = nIndex;
-					editMode = EditMode.TooVec;
+					camData_StartPoint.StartPoint = nIndex_StartPoint;
+					ShowCAMData();
 
 					break;
-				case EditMode.TooVec:
+				case EditMode.ToolVecSelect:
+					if( e.Button != MouseButtons.Left ) {
+						return;
+					}
+					m_OCCViewer.Select();
+					GetSelectedVertexInfo( out CAMData camData_ToolVec, out int nIndex_ToolVec );
+					if( camData_ToolVec == null || nIndex_ToolVec == -1 ) {
+						return;
+					}
+
+					// record point tangent and normal vec ax2
+					CADPoint cadPoint = camData_ToolVec.CADPointList[ nIndex_ToolVec ];
+					m_ToolVecAx2 = new gp_Ax2( cadPoint.Point, cadPoint.NormalVec_2nd.Crossed( cadPoint.TangentVec ), cadPoint.TangentVec );
+					m_SelectedCAMData = camData_ToolVec;
+					m_SelectedIndex = nIndex_ToolVec;
+					editMode = EditMode.TooVecEdit;
+
+					break;
+				case EditMode.TooVecEdit:
 					if( e.Button != MouseButtons.Left ) {
 						return;
 					}
@@ -475,7 +493,7 @@ namespace CAMEdit
 		void ViewerMouseMove( object sender, MouseEventArgs e )
 		{
 			switch( editMode ) {
-				case EditMode.TooVec:
+				case EditMode.TooVecEdit:
 					if( m_ToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
 						return;
 					}
@@ -601,9 +619,9 @@ namespace CAMEdit
 
 		void StartAction()
 		{
+			GetSelectedWireInfo( out CAMData camData, out AIS_InteractiveObject selectedAIS );
 			switch( editMode ) {
 				case EditMode.StartPoint:
-					GetSelectedWireInfo( out CAMData camData, out AIS_InteractiveObject selectedAIS );
 					if( camData == null || selectedAIS == null ) {
 						editMode = EditMode.None;
 						return;
@@ -616,12 +634,32 @@ namespace CAMEdit
 					m_tsmiReverse.Enabled = false;
 					m_tsmiOffset.Enabled = false;
 					m_tsmiLead.Enabled = false;
+					m_tsmiToolVec.Enabled = false;
 					m_tsmiOK.Enabled = false;
 
 					// highlight the start point tsmi
 					m_tsmiStartPoint.BackColor = System.Drawing.Color.Yellow;
 					break;
-				case EditMode.TooVec:
+				case EditMode.ToolVecSelect:
+					if( camData == null || selectedAIS == null ) {
+						editMode = EditMode.None;
+						return;
+					}
+
+					// activate the selected contour
+					m_OCCViewer.GetAISContext().Activate( selectedAIS, (int)AISActiveMode.Vertex );
+
+					// disable all other tsmi
+					m_tsmiStartPoint.Enabled = false;
+					m_tsmiReverse.Enabled = false;
+					m_tsmiOffset.Enabled = false;
+					m_tsmiLead.Enabled = false;
+					m_tsmiOK.Enabled = false;
+
+					// highlight the start point tsmi
+					m_tsmiToolVec.BackColor = System.Drawing.Color.Yellow;
+					break;
+				case EditMode.TooVecEdit:
 					//m_OCCViewer.SetViewDir( m_ToolVecAx2.YDirection().Reversed() );
 					break;
 				case EditMode.None:
@@ -652,12 +690,33 @@ namespace CAMEdit
 					m_tsmiReverse.Enabled = true;
 					m_tsmiOffset.Enabled = true;
 					m_tsmiLead.Enabled = true;
+					m_tsmiToolVec.Enabled = true;
 					m_tsmiOK.Enabled = true;
 
 					// restore the start point tsmi to system control color
 					m_tsmiStartPoint.BackColor = System.Drawing.SystemColors.Control;
 					break;
-				case EditMode.TooVec:
+				case EditMode.ToolVecSelect:
+
+					// clear all selected
+					m_OCCViewer.GetAISContext().ClearSelected( true );
+
+					// deactivate the contour CAD wire selection
+					foreach( AIS_Shape oneShape in m_CADContourAISList ) {
+						m_OCCViewer.GetAISContext().Deactivate( oneShape );
+					}
+
+					// enable all other tsmi
+					m_tsmiStartPoint.Enabled = true;
+					m_tsmiReverse.Enabled = true;
+					m_tsmiOffset.Enabled = true;
+					m_tsmiLead.Enabled = true;
+					m_tsmiOK.Enabled = true;
+
+					// restore the start point tsmi to system control color
+					m_tsmiToolVec.BackColor = System.Drawing.SystemColors.Control;
+					break;
+				case EditMode.TooVecEdit:
 					break;
 				case EditMode.None:
 				default:
@@ -738,7 +797,7 @@ namespace CAMEdit
 					break;
 				}
 
-				int prior2; 
+				int prior2;
 				if( dsq[ next ] < dsq[ curr ] ) {
 					prior2 = prev;
 					prev = curr;

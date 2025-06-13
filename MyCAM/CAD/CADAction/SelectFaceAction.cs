@@ -1,5 +1,8 @@
-﻿using OCC.AIS;
+﻿using CAMEdit;
+using DataStructure;
+using OCC.AIS;
 using OCC.Quantity;
+using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
@@ -8,6 +11,7 @@ using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.CAD
@@ -49,14 +53,14 @@ namespace MyCAM.CAD
 			}
 
 			// create a compound shape to slect face
-			TopoDS_Shape visiblePart = ShapeTool.MakeCompound( visibleShapeList );
-			if( visiblePart == null || visiblePart.IsNull() ) {
+			m_VisiblePart = ShapeTool.MakeCompound( visibleShapeList );
+			if( m_VisiblePart == null || m_VisiblePart.IsNull() ) {
 				throw new ArgumentNullException( "SelectFaceAction part shape is null." );
 			}
 
 			// map visible edge and face
 			m_EdgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-			TopExp.MapShapesAndAncestors( visiblePart, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref m_EdgeFaceMap );
+			TopExp.MapShapesAndAncestors( m_VisiblePart, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref m_EdgeFaceMap );
 		}
 
 		public override CADActionType ActionType
@@ -160,6 +164,7 @@ namespace MyCAM.CAD
 			// BFS all D1 continuous faces
 			List<TopoDS_Face> allD1ContFaceList = new List<TopoDS_Face>( faceBFSQueue );
 			TopTools_MapOfShape visitedFaceMap = new TopTools_MapOfShape();
+			TopTools_MapOfShape visitedEdgeMap = new TopTools_MapOfShape();
 			foreach( TopoDS_Face oneFace in faceBFSQueue ) {
 				visitedFaceMap.Add( oneFace );
 			}
@@ -173,20 +178,24 @@ namespace MyCAM.CAD
 				List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
 				TopExp_Explorer exp = new TopExp_Explorer( currentFace, TopAbs_ShapeEnum.TopAbs_EDGE );
 				for( ; exp.More(); exp.Next() ) {
+					if( visitedEdgeMap.Contains( exp.Current() ) ) {
+						continue;
+					}
 					edgeList.Add( TopoDS.ToEdge( exp.Current() ) );
+					visitedEdgeMap.Add( exp.Current() );
 				}
 
 				// find all D1 continuous faces
 				foreach( TopoDS_Edge oneEdge in edgeList ) {
 					foreach( TopoDS_Shape _oneConnectedFace in m_EdgeFaceMap.FindFromKey( oneEdge ) ) {
-						TopoDS_Face oneConnectedFace = TopoDS.ToFace( _oneConnectedFace );
 
 						// check visited
-						if( visitedFaceMap.Contains( oneConnectedFace ) ) {
+						if( visitedFaceMap.Contains( _oneConnectedFace ) ) {
 							continue;
 						}
 
 						// check D1 continuity
+						TopoDS_Face oneConnectedFace = TopoDS.ToFace( _oneConnectedFace );
 						if( GeometryTool.IsD1Cont( currentFace, oneConnectedFace, oneEdge ) ) {
 							visitedFaceMap.Add( oneConnectedFace );
 							allD1ContFaceList.Add( oneConnectedFace );
@@ -219,8 +228,24 @@ namespace MyCAM.CAD
 
 		public void SelectDone()
 		{
-			GetSelectedFace();
-			End();
+			List<TopoDS_Face> extractedFaceList = GetSelectedFace();
+			if( extractedFaceList.Count == 0 ) {
+				return;
+			}
+
+			// build CAD data
+			List<CADData> cadDataList = BuildCADData( extractedFaceList );
+			if( cadDataList.Count == 0 ) {
+				MessageBox.Show( ToString() + "Error: No Pattern Found" );
+				return;
+			}
+
+			// show CAMEditForm
+			CAMEditForm camEditForm = new CAMEditForm();
+			camEditForm.Size = new System.Drawing.Size( 1200, 800 );
+			CAMEditModel camEditModel = new CAMEditModel( m_VisiblePart, cadDataList );
+			camEditForm.Init( camEditModel );
+			camEditForm.ShowDialog();
 		}
 
 		void ShowPart()
@@ -250,7 +275,79 @@ namespace MyCAM.CAD
 			return selectedFaceList;
 		}
 
+		List<CADData> BuildCADData( List<TopoDS_Face> extractedFaceList )
+		{
+			List<CADData> cadDataList = new List<CADData>();
+
+			// get free boundary wires
+			List<TopoDS_Wire> boundaryWireList = GetAllCADContour( extractedFaceList, out TopoDS_Shape sewResult );
+			if( boundaryWireList.Count == 0 ) {
+				MessageBox.Show( ToString() + "Error: No boundary wire" );
+				return cadDataList;
+			}
+
+			// map the edges to faces
+			TopTools_IndexedDataMapOfShapeListOfShape shellMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+			TopExp.MapShapesAndAncestors( sewResult, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref shellMap );
+			TopTools_IndexedDataMapOfShapeListOfShape solidMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+			TopExp.MapShapesAndAncestors( m_VisiblePart, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref solidMap );
+
+			// build CAD data
+			foreach( TopoDS_Wire wire in boundaryWireList ) {
+
+				// split the map by edges in wire
+				TopTools_IndexedDataMapOfShapeListOfShape oneShellMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+				TopTools_IndexedDataMapOfShapeListOfShape oneSolidMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+				foreach( TopoDS_Shape edge in wire.elementsAsList ) {
+					TopTools_ListOfShape shellFaceList = shellMap.FindFromKey( edge );
+					TopTools_ListOfShape solidFaceList = solidMap.FindFromKey( edge );
+					if( shellFaceList != null && solidFaceList != null ) {
+						oneShellMap.Add( edge, shellFaceList );
+						oneSolidMap.Add( edge, solidFaceList );
+					}
+				}
+
+				// create CAD data
+				CADData cadData = new CADData( wire, oneShellMap, oneSolidMap );
+				cadDataList.Add( cadData );
+			}
+			return cadDataList;
+		}
+
+		List<TopoDS_Wire> GetAllCADContour( List<TopoDS_Face> extractedFaceList, out TopoDS_Shape sewResult )
+		{
+			// sew the faces
+			sewResult = ShapeTool.SewShape( extractedFaceList.Cast<TopoDS_Shape>().ToList() );
+			List<TopoDS_Shape> faceGroupList = new List<TopoDS_Shape>();
+
+			// single shell or single face
+			if( sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL
+				|| sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_FACE ) {
+				faceGroupList.Add( sewResult );
+			}
+
+			// some shell and free face exist
+			else {
+				foreach( TopoDS_Shape shape in sewResult.elementsAsList ) {
+					faceGroupList.Add( shape );
+				}
+			}
+
+			// get free boundary wires
+			List<TopoDS_Wire> wireList = new List<TopoDS_Wire>();
+			foreach( TopoDS_Shape faceGroup in faceGroupList ) {
+				ShapeAnalysis_FreeBounds freeBounds = new ShapeAnalysis_FreeBounds( faceGroup );
+				TopExp_Explorer wireExp = new TopExp_Explorer( freeBounds.GetClosedWires(), TopAbs_ShapeEnum.TopAbs_WIRE );
+				while( wireExp.More() ) {
+					wireList.Add( TopoDS.ToWire( wireExp.Current() ) );
+					wireExp.Next();
+				}
+			}
+			return wireList;
+		}
+
 		List<FaceHandle> m_VisibleFaceAISPairList;
+		TopoDS_Shape m_VisiblePart;
 		TopTools_IndexedDataMapOfShapeListOfShape m_EdgeFaceMap;
 
 		const Quantity_NameOfColor COLOR_SELECTED = Quantity_NameOfColor.Quantity_NOC_RED;
