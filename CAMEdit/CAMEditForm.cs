@@ -499,7 +499,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Down ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex += 2;
+					m_SimulationIndex += 50;
 					if( m_SimulationIndex >= m_Model.CAMDataList[ 0 ].CAMPointList.Count ) {
 						m_SimulationIndex = 0;
 					}
@@ -508,7 +508,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Up ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex -= 2;
+					m_SimulationIndex -= 50;
 					if( m_SimulationIndex < 0 ) {
 						m_SimulationIndex = m_Model.CAMDataList[ 0 ].CAMPointList.Count - 1;
 					}
