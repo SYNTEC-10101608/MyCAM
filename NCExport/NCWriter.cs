@@ -1,5 +1,4 @@
 ﻿using DataStructure;
-using OCC.gp;
 using OCCTool;
 using System;
 using System.Collections.Generic;
@@ -40,27 +39,6 @@ namespace NCExport
 			m_StreamWriter.Close();
 		}
 
-		//void WriteCutting( CuttingProcessData cuttingProcessData )
-		//{
-		//	// write each cam data point
-		//	m_StreamWriter.WriteLine( "// Cutting" );
-		//	foreach( CAMPoint camPoint in cuttingProcessData.CAMData.CAMPointList ) {
-		//		ConvertIJKToABC( camPoint.ToolVec, out double dA_MCS, out double dC_MCS );
-		//		string szX = camPoint.CADPoint.Point.X().ToString( "F3" );
-		//		string szY = camPoint.CADPoint.Point.Y().ToString( "F3" );
-		//		string szZ = camPoint.CADPoint.Point.Z().ToString( "F3" );
-		//		string szA = dA_MCS.ToString( "F3" );
-		//		string szC = dC_MCS.ToString( "F3" );
-
-		//		// for G43.5 test
-		//		//string szI = camPoint.ToolVec.X().ToString( "F3" );
-		//		//string szJ = camPoint.ToolVec.Y().ToString( "F3" );
-		//		//string szK = camPoint.ToolVec.Z().ToString( "F3" );
-		//		//m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} I{szI} J{szJ} K{szK}" );
-		//		m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A{szA} C{szC}" );
-		//	}
-		//}
-
 		void WriteCutting( CuttingProcessData cuttingProcessData )
 		{
 			List<Tuple<double, double>> rotaryAxisPosList = PostTool.ConvertIJKToABC( cuttingProcessData.CAMData.CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList() );
@@ -69,28 +47,16 @@ namespace NCExport
 			m_StreamWriter.WriteLine( "// Cutting" );
 			int i = 0;
 			foreach( var pos in rotaryAxisPosList ) {
-				double dA_MCS_deg = pos.Item2 * 180 / Math.PI;
-				double dC_MCS_deg = pos.Item1 * 180 / Math.PI;
+				double dM_MCS_deg = pos.Item1 * 180 / Math.PI;
+				double dS_MCS_deg = pos.Item2 * 180 / Math.PI;
 				string szX = cuttingProcessData.CAMData.CAMPointList[ i ].CADPoint.Point.X().ToString( "F3" );
 				string szY = cuttingProcessData.CAMData.CAMPointList[ i ].CADPoint.Point.Y().ToString( "F3" );
 				string szZ = cuttingProcessData.CAMData.CAMPointList[ i ].CADPoint.Point.Z().ToString( "F3" );
-				string szA = dA_MCS_deg.ToString( "F3" );
-				string szC = dC_MCS_deg.ToString( "F3" );
-				m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A{szA} C{szC}" );
+				string szB = dS_MCS_deg.ToString( "F3" );
+				string szC = dM_MCS_deg.ToString( "F3" );
+				m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} B{szB} C{szC}" );
 				i++;
 			}
-		}
-
-		void ConvertIJKToABC( gp_Dir ToolVec_G54, out double dA_MCS_deg, out double dC_MCS_deg )
-		{
-			// calculate the A and C angle
-			if( Math.Abs( ToolVec_G54.X() ) < 1e-6 && Math.Abs( ToolVec_G54.Y() ) < 1e-6 ) {
-				dC_MCS_deg = 0;
-			}
-			else {
-				dC_MCS_deg = ( ( Math.Atan2( ToolVec_G54.X(), -ToolVec_G54.Y() ) * 180 / Math.PI ) + 360 ) % 360;
-			}
-			dA_MCS_deg = Math.Acos( ToolVec_G54.Z() ) * 180 / Math.PI;
 		}
 
 		void WriteTraverse( TraverseProcessData traverseProcessData )
