@@ -230,7 +230,7 @@ namespace DataStructure
 				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by interval
-				const double dSegmentLength = 0.1;
+				const double dSegmentLength = 1;
 				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, false, out List<gp_Pnt> pointList );
 
 				// get tool vector for each point
@@ -329,13 +329,22 @@ namespace DataStructure
 
 			// get the x, y, z direction
 			gp_Dir x = camPoint.CADPoint.TangentVec;
-			gp_Dir z = camPoint.CADPoint.NormalVec_2nd.Crossed( camPoint.CADPoint.TangentVec );
+			gp_Dir z = camPoint.CADPoint.NormalVec_1st;
 			gp_Dir y = z.Crossed( x );
 
 			// X:Y:Z = tanA:tanB:1
-			double X = dRA_rad < 0 ? -1 : 1;
-			double Z = X / Math.Tan( dRA_rad );
-			double Y = Z * Math.Tan( dRB_rad );
+			double X = 0;
+			double Y = 0;
+			double Z = 0;
+			if( dRA_rad == 0 ) {
+				X = 0;
+				Z = 1;
+			}
+			else {
+				X = dRA_rad < 0 ? -1 : 1;
+				Z = X / Math.Tan( dRA_rad );
+			}
+			Y = Z * Math.Tan( dRB_rad );
 			gp_Dir dir1 = new gp_Dir( x.XYZ() * X + y.XYZ() * Y + z.XYZ() * Z );
 			return new gp_Vec( dir1.XYZ() );
 		}

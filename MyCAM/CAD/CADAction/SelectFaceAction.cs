@@ -247,6 +247,10 @@ namespace MyCAM.CAD
 			CAMEditModel camEditModel = new CAMEditModel( m_VisiblePart, cadDataList );
 			camEditForm.Init( camEditModel );
 			camEditForm.ShowDialog();
+			if( camEditForm.DialogResult != DialogResult.OK ) {
+				End();
+				return;
+			}
 		}
 
 		void ShowPart()

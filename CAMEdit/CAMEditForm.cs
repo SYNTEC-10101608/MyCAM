@@ -7,7 +7,6 @@ using OCC.BRepAlgoAPI;
 using OCC.BRepBuilderAPI;
 using OCC.BRepPrimAPI;
 using OCC.Geom;
-using OCC.GeomAPI;
 using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Prs3d;
@@ -251,7 +250,7 @@ namespace CAMEdit
 			foreach( CAMData camData in m_Model.CAMDataList ) {
 				//List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
 				List<CAMPoint> filteredPath = camData.CAMPointList;
-				for( int i = 0; i < filteredPath.Count; i += 10 ) {
+				for( int i = 0; i < filteredPath.Count; i++ ) {
 					CAMPoint camPoint = filteredPath[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
 					if( camData.GetToolVecModifyIndex().Contains( ( i + camData.CAMPointList.Count + camData.StartPoint ) % camData.CAMPointList.Count ) ) {
@@ -466,18 +465,18 @@ namespace CAMEdit
 						editMode = EditMode.None;
 					}
 					break;
-				case EditMode.TooVecEdit:
-					if( e.KeyCode != Keys.Escape ) {
-						return;
-					}
-					if( m_SelectedToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
-						return;
-					}
-					m_SelectedCAMData.SetToolVecModify( m_SelectedIndex, 0, 0 );
-					ShowCAMData();
-					editMode = EditMode.None;
+				//case EditMode.TooVecEdit:
+				//	if( e.KeyCode != Keys.Escape ) {
+				//		return;
+				//	}
+				//	if( m_SelectedToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
+				//		return;
+				//	}
+				//	m_SelectedCAMData.SetToolVecModify( m_SelectedIndex, 0, 0 );
+				//	ShowCAMData();
+				//	editMode = EditMode.None;
 
-					break;
+				//	break;
 				case EditMode.None:
 				default:
 					break;
@@ -499,7 +498,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Down ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex += 50;
+					m_SimulationIndex += 5;
 					if( m_SimulationIndex >= m_Model.CAMDataList[ 0 ].CAMPointList.Count ) {
 						m_SimulationIndex = 0;
 					}
@@ -508,7 +507,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Up ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex -= 50;
+					m_SimulationIndex -= 5;
 					if( m_SimulationIndex < 0 ) {
 						m_SimulationIndex = m_Model.CAMDataList[ 0 ].CAMPointList.Count - 1;
 					}
@@ -546,19 +545,24 @@ namespace CAMEdit
 
 					// record point tangent and normal vec ax2
 					CADPoint cadPoint = camData_ToolVec.CADPointList[ nIndex_ToolVec ];
-					m_SelectedToolVecAx2 = new gp_Ax2( cadPoint.Point, cadPoint.NormalVec_1st, cadPoint.TangentVec );
-					m_SelectedCAMData = camData_ToolVec;
-					m_SelectedIndex = nIndex_ToolVec;
-					editMode = EditMode.TooVecEdit;
-
-					break;
-				case EditMode.TooVecEdit:
-					if( e.Button != MouseButtons.Left ) {
+					camData_ToolVec.GetToolVecModify( nIndex_ToolVec, out double angleA_deg, out double angleB_deg );
+					ToolVecForm form = new ToolVecForm( angleA_deg, angleB_deg );
+					DialogResult result = form.ShowDialog();
+					if( result != DialogResult.OK ) {
 						return;
 					}
+					form.GetAngleValue( out double newAngleA_deg, out double newAnfleB_deg );
+					camData_ToolVec.SetToolVecModify( nIndex_ToolVec, newAngleA_deg, newAnfleB_deg );
+					ShowCAMData();
 					editMode = EditMode.None;
-
 					break;
+				//case EditMode.TooVecEdit:
+				//	if( e.Button != MouseButtons.Left ) {
+				//		return;
+				//	}
+				//	editMode = EditMode.None;
+
+				//	break;
 				case EditMode.None:
 				default:
 					if( e.Button != MouseButtons.Left ) {
@@ -572,68 +576,68 @@ namespace CAMEdit
 		void ViewerMouseMove( object sender, MouseEventArgs e )
 		{
 			switch( editMode ) {
-				case EditMode.TooVecEdit:
-					if( m_SelectedToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
-						return;
-					}
+				//case EditMode.TooVecEdit:
+				//	if( m_SelectedToolVecAx2 == null || m_SelectedCAMData == null || m_SelectedIndex == -1 ) {
+				//		return;
+				//	}
 
-					// convert the mouse position to 3D point
-					double xp = 0;
-					double yp = 0;
-					double zp = 0;
-					m_OCCViewer.Convert( e.X, e.Y, ref xp, ref yp, ref zp );
+				//	// convert the mouse position to 3D point
+				//	double xp = 0;
+				//	double yp = 0;
+				//	double zp = 0;
+				//	m_OCCViewer.Convert( e.X, e.Y, ref xp, ref yp, ref zp );
 
-					// make a sphere for direction control
-					gp_Sphere sphere = new gp_Sphere();
-					sphere.SetLocation( m_SelectedToolVecAx2.Location() );
-					sphere.SetRadius( 10 );
-					Geom_SphericalSurface sphereG = new Geom_SphericalSurface( sphere );
+				//	// make a sphere for direction control
+				//	gp_Sphere sphere = new gp_Sphere();
+				//	sphere.SetLocation( m_SelectedToolVecAx2.Location() );
+				//	sphere.SetRadius( 10 );
+				//	Geom_SphericalSurface sphereG = new Geom_SphericalSurface( sphere );
 
-					// make line representing view direction
-					gp_Pnt mousePoint = new gp_Pnt( xp, yp, zp );
-					gp_Lin viewLine = new gp_Lin( mousePoint, m_OCCViewer.GetViewDir() );
-					Geom_Line viewLineG = new Geom_Line( viewLine );
+				//	// make line representing view direction
+				//	gp_Pnt mousePoint = new gp_Pnt( xp, yp, zp );
+				//	gp_Lin viewLine = new gp_Lin( mousePoint, m_OCCViewer.GetViewDir() );
+				//	Geom_Line viewLineG = new Geom_Line( viewLine );
 
-					// get intersection point of the line and the sphere
-					GeomAPI_IntCS intCS = new GeomAPI_IntCS( viewLineG, sphereG );
-					gp_Pnt ps = new gp_Pnt();
-					if( intCS.NbPoints() == 0 ) {
+				//	// get intersection point of the line and the sphere
+				//	GeomAPI_IntCS intCS = new GeomAPI_IntCS( viewLineG, sphereG );
+				//	gp_Pnt ps = new gp_Pnt();
+				//	if( intCS.NbPoints() == 0 ) {
 
-						// get closet point of the line and the sphere center
-						GeomAPI_ProjectPointOnCurve projectPoint = new GeomAPI_ProjectPointOnCurve( m_SelectedToolVecAx2.Location(), viewLineG );
-						double u = projectPoint.LowerDistanceParameter();
-						ps = viewLineG.Value( u );
-					}
-					else {
+				//		// get closet point of the line and the sphere center
+				//		GeomAPI_ProjectPointOnCurve projectPoint = new GeomAPI_ProjectPointOnCurve( m_SelectedToolVecAx2.Location(), viewLineG );
+				//		double u = projectPoint.LowerDistanceParameter();
+				//		ps = viewLineG.Value( u );
+				//	}
+				//	else {
 
-						// get the point closet to the mouse point
-						double dMin = double.MaxValue;
-						for( int i = 1; i <= intCS.NbPoints(); i++ ) {
-							gp_Pnt p = intCS.Point( i );
-							double d = p.Distance( mousePoint );
-							if( d < dMin ) {
-								dMin = d;
-								ps = p;
-							}
-						}
-					}
+				//		// get the point closet to the mouse point
+				//		double dMin = double.MaxValue;
+				//		for( int i = 1; i <= intCS.NbPoints(); i++ ) {
+				//			gp_Pnt p = intCS.Point( i );
+				//			double d = p.Distance( mousePoint );
+				//			if( d < dMin ) {
+				//				dMin = d;
+				//				ps = p;
+				//			}
+				//		}
+				//	}
 
-					// get direction of the line
-					gp_Dir dir = new gp_Dir( ps.XYZ() - m_SelectedToolVecAx2.Location().XYZ() );
+				//	// get direction of the line
+				//	gp_Dir dir = new gp_Dir( ps.XYZ() - m_SelectedToolVecAx2.Location().XYZ() );
 
-					// project the vector to the ax2
-					double X = dir.Dot( m_SelectedToolVecAx2.XDirection() );
-					double Y = dir.Dot( m_SelectedToolVecAx2.YDirection() );
-					double Z = dir.Dot( m_SelectedToolVecAx2.Direction() );
+				//	// project the vector to the ax2
+				//	double X = dir.Dot( m_SelectedToolVecAx2.XDirection() );
+				//	double Y = dir.Dot( m_SelectedToolVecAx2.YDirection() );
+				//	double Z = dir.Dot( m_SelectedToolVecAx2.Direction() );
 
-					// get angle A is atan2 Z/X
-					double angleA = Math.Atan2( X, Z ) * 180 / Math.PI;
+				//	// get angle A is atan2 Z/X
+				//	double angleA = Math.Atan2( X, Z ) * 180 / Math.PI;
 
-					// get angle B is atan2 Z/Y
-					double angleB = Math.Atan2( Y, Z ) * 180 / Math.PI;
-					m_SelectedCAMData.SetToolVecModify( m_SelectedIndex, angleA, angleB );
-					ShowCAMData();
-					break;
+				//	// get angle B is atan2 Z/Y
+				//	double angleB = Math.Atan2( Y, Z ) * 180 / Math.PI;
+				//	m_SelectedCAMData.SetToolVecModify( m_SelectedIndex, angleA, angleB );
+				//	ShowCAMData();
+				//	break;
 				case EditMode.None:
 				default:
 					break;
