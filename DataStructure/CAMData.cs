@@ -241,6 +241,14 @@ namespace DataStructure
 					CADPointList.Add( new CADPoint( point, normalVec_1st, normalVec_2nd, tangentVec ) );
 				}
 			}
+
+			// filter the coincident points
+			for( int i = 0; i < CADPointList.Count - 1; i++ ) {
+				if( CADPointList[ i ].Point.IsEqual( CADPointList[ i + 1 ].Point, 1e-3 ) ) {
+					CADPointList.RemoveAt( i );
+					i--;
+				}
+			}
 		}
 
 		void BuildCAMPointList()
