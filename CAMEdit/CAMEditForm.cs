@@ -255,6 +255,7 @@ namespace CAMEdit
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
 					if( camData.GetToolVecModifyIndex().Contains( ( i + camData.CAMPointList.Count + camData.StartPoint ) % camData.CAMPointList.Count ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+						toolVecAIS.SetWidth( 5 );
 					}
 					m_ToolVecAISList.Add( toolVecAIS );
 				}
