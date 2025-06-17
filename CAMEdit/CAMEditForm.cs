@@ -1056,7 +1056,10 @@ namespace CAMEdit
 			BRepPrimAPI_MakeBox outBoxMakerHeadC = new BRepPrimAPI_MakeBox( new gp_Pnt( -70, -70, 0 ), 140, 140, 120 );
 			BRepPrimAPI_MakeBox inBoxMakerHeadC = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -70, 0 ), 100, 140, 100 );
 			BRepAlgoAPI_Cut cutMakerHeadC = new BRepAlgoAPI_Cut( outBoxMakerHeadC.Shape(), inBoxMakerHeadC.Shape() );
-			m_HeadC = cutMakerHeadC.Shape();
+			gp_Trsf rotateZ90 = new gp_Trsf();
+			rotateZ90.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), Math.PI / 2 );
+			BRepBuilderAPI_Transform transformCZ90 = new BRepBuilderAPI_Transform( cutMakerHeadC.Shape(), rotateZ90 );
+			m_HeadC = transformCZ90.Shape();
 			m_HeadCAIS = new AIS_Shape( m_HeadC );
 			Graphic3d_MaterialAspect aspectHeadC = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			m_HeadCAIS.SetMaterial( aspectHeadC );
@@ -1112,7 +1115,7 @@ namespace CAMEdit
 			gp_Trsf trsfC = new gp_Trsf();
 			trsfC.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), dC );
 			gp_Trsf trsfA = new gp_Trsf();
-			trsfA.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) ), dA );
+			trsfA.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 1, 0 ) ), dA );
 			gp_Trsf trsfCA = trsfC.Multiplied( trsfA );
 			gp_Trsf trsfAC = trsfA.Multiplied( trsfC );
 
