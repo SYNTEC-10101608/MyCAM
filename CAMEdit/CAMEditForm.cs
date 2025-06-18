@@ -519,7 +519,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Down ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex += 1;
+					m_SimulationIndex += 100;
 					if( m_SimulationIndex >= m_Model.CAMDataList[ 0 ].CAMPointList.Count ) {
 						m_SimulationIndex = 0;
 					}
@@ -528,7 +528,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Up ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex -= 1;
+					m_SimulationIndex -= 100;
 					if( m_SimulationIndex < 0 ) {
 						m_SimulationIndex = m_Model.CAMDataList[ 0 ].CAMPointList.Count - 1;
 					}
@@ -1075,10 +1075,12 @@ namespace CAMEdit
 			// the HeadC
 			BRepPrimAPI_MakeBox outBoxMakerHeadC = new BRepPrimAPI_MakeBox( new gp_Pnt( -70, -70, 0 ), 140, 140, 120 );
 			BRepPrimAPI_MakeBox inBoxMakerHeadC = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -70, 0 ), 100, 140, 100 );
-			BRepAlgoAPI_Cut cutMakerHeadC = new BRepAlgoAPI_Cut( outBoxMakerHeadC.Shape(), inBoxMakerHeadC.Shape() );
+			BRepPrimAPI_MakeCylinder inCyMakerHeadC = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 50, 0 ), new gp_Dir( 0, 0, 1 ) ), 10, 200 );
+			BRepAlgoAPI_Cut cutMakerHeadC1 = new BRepAlgoAPI_Cut( outBoxMakerHeadC.Shape(), inBoxMakerHeadC.Shape() );
+			BRepAlgoAPI_Cut cutMakerHeadC2 = new BRepAlgoAPI_Cut( cutMakerHeadC1.Shape(), inCyMakerHeadC.Shape() );
 			gp_Trsf rotateZ90 = new gp_Trsf();
 			rotateZ90.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), Math.PI / 2 );
-			BRepBuilderAPI_Transform transformCZ90 = new BRepBuilderAPI_Transform( cutMakerHeadC.Shape(), rotateZ90 );
+			BRepBuilderAPI_Transform transformCZ90 = new BRepBuilderAPI_Transform( cutMakerHeadC2.Shape(), rotateZ90 );
 			m_HeadC = transformCZ90.Shape();
 			m_HeadCAIS = new AIS_Shape( m_HeadC );
 			Graphic3d_MaterialAspect aspectHeadC = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
@@ -1088,10 +1090,12 @@ namespace CAMEdit
 			//m_OCCViewer.GetAISContext().Display( m_HeadCAIS, false );
 
 			// the HeadA
-			BRepPrimAPI_MakeBox boxMakerHeadA = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -50, -100 ), 100, 100, 150 );
-			BRepPrimAPI_MakeCone coneMakeHeadA = new BRepPrimAPI_MakeCone( new gp_Ax2( new gp_Pnt( 0, 0, -100 ), new gp_Dir( 0, 0, -1 ) ), 5, 0, 50 );
-			BRepAlgoAPI_Fuse fuseMakerHeadA = new BRepAlgoAPI_Fuse( boxMakerHeadA.Shape(), coneMakeHeadA.Shape() );
-			m_HeadA = fuseMakerHeadA.Shape();
+			BRepPrimAPI_MakeCylinder cyMakerHeadA = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 50 ), new gp_Dir( 0, 0, -1 ) ), 50, 200 );
+			BRepPrimAPI_MakeCone coneMakeHeadA1 = new BRepPrimAPI_MakeCone( new gp_Ax2( new gp_Pnt( 0, 0, -150 ), new gp_Dir( 0, 0, -1 ) ), 50,10, 100 );
+			BRepPrimAPI_MakeCone coneMakeHeadA2 = new BRepPrimAPI_MakeCone( new gp_Ax2( new gp_Pnt( 0, 0, -250 ), new gp_Dir( 0, 0, -1 ) ), 5, 0, 50 );
+			BRepAlgoAPI_Fuse fuseMakerHeadA1 = new BRepAlgoAPI_Fuse( cyMakerHeadA.Shape(), coneMakeHeadA1.Shape() );
+			BRepAlgoAPI_Fuse fuseMakerHeadA2 = new BRepAlgoAPI_Fuse( fuseMakerHeadA1.Shape(), coneMakeHeadA2.Shape() );
+			m_HeadA = fuseMakerHeadA2.Shape();
 			m_HeadAAIS = new AIS_Shape( m_HeadA );
 			Graphic3d_MaterialAspect aspectHeadA = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			m_HeadAAIS.SetMaterial( aspectHeadA );
@@ -1140,7 +1144,7 @@ namespace CAMEdit
 			gp_Trsf trsfAC = trsfA.Multiplied( trsfC );
 
 			// move the head to the target location
-			gp_Pnt tcp0 = new gp_Pnt( 0, 0, -150 );
+			gp_Pnt tcp0 = new gp_Pnt( 0, 0, -300 );
 			gp_Pnt tcp1 = tcp0.Transformed( trsfCA );
 			gp_Trsf trsfT = new gp_Trsf();
 			trsfT.SetTranslation( new gp_Vec( p.XYZ() - tcp1.XYZ() ) );
