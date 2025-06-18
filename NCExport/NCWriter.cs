@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace NCExport
 {
@@ -20,7 +21,8 @@ namespace NCExport
 		public void Convert()
 		{
 			m_StreamWriter = new StreamWriter( "0000.nc" );
-			m_StreamWriter.WriteLine( "G43.4" );
+			m_StreamWriter.WriteLine( "%@MACRO" );
+			m_StreamWriter.WriteLine( "G43.4;" );
 			foreach( IProcessData processData in m_ProcessDataList ) {
 				switch( processData.ProcessType ) {
 					case EProcessType.ProcessType_Cutting:
@@ -35,7 +37,7 @@ namespace NCExport
 						break;
 				}
 			}
-			m_StreamWriter.WriteLine( "M30" );
+			m_StreamWriter.WriteLine( "M30;" );
 			m_StreamWriter.Close();
 		}
 
@@ -54,7 +56,7 @@ namespace NCExport
 				string szZ = cuttingProcessData.CAMData.CAMPointList[ i ].CADPoint.Point.Z().ToString( "F3" );
 				string szB = dS_MCS_deg.ToString( "F3" );
 				string szC = dM_MCS_deg.ToString( "F3" );
-				m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} B{szB} C{szC}" );
+				m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} B{szB} C{szC};" );
 				i++;
 			}
 		}
