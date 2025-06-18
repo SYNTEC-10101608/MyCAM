@@ -253,7 +253,7 @@ namespace CAMEdit
 				for( int i = 0; i < filteredPath.Count; i++ ) {
 					CAMPoint camPoint = filteredPath[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					if( camData.GetToolVecModifyIndex().Contains( ( i + camData.CAMPointList.Count + camData.StartPoint ) % camData.CAMPointList.Count ) ) {
+					if( camData.GetToolVecModifyIndex().Contains( ( i + camData.CAMPointList.Count + camData.StartPoint ) % camData.CAMPointList.Count ) && !camData.IsReverse ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 5 );
 					}
@@ -499,7 +499,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Down ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex += 5;
+					m_SimulationIndex += 1;
 					if( m_SimulationIndex >= m_Model.CAMDataList[ 0 ].CAMPointList.Count ) {
 						m_SimulationIndex = 0;
 					}
@@ -508,7 +508,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Up ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex -= 5;
+					m_SimulationIndex -= 1;
 					if( m_SimulationIndex < 0 ) {
 						m_SimulationIndex = m_Model.CAMDataList[ 0 ].CAMPointList.Count - 1;
 					}
