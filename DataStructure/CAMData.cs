@@ -1,4 +1,8 @@
-﻿using OCC.gp;
+﻿using OCC.BOPTools;
+using OCC.BRep;
+using OCC.Geom;
+using OCC.GeomAPI;
+using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
@@ -246,7 +250,7 @@ namespace DataStructure
 						break;
 					}
 				}
-				TopoDS_Face shellDace = TopoDS.ToFace( shellFaceList[ 0 ] );
+				TopoDS_Face shellFace = TopoDS.ToFace( shellFaceList[ 0 ] );
 				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by interval
@@ -256,8 +260,29 @@ namespace DataStructure
 				// get tool vector for each point
 				for( int i = 0; i < pointList.Count; i++ ) {
 					gp_Pnt point = pointList[ i ];
-					gp_Dir normalVec_1st = VectorTool.GetFaceNormalVec( shellDace, point );
-					gp_Dir normalVec_2nd = VectorTool.GetFaceNormalVec( solidFace, point );
+					// get curve from edge
+					double dStartU = 0;
+					double dEndU = 0;
+					Geom_Curve curve = BRep_Tool.Curve( TopoDS.ToEdge(edge), ref dStartU, ref dEndU );
+
+					// Project the point onto the curve to get the u parameter
+					GeomAPI_ProjectPointOnCurve proj = new GeomAPI_ProjectPointOnCurve( point, curve );
+
+					// u might be out of range if the curve is periodic
+					double u = proj.LowerDistanceParameter();
+					gp_Dir normalVec_1st = new gp_Dir();
+					gp_Dir normalVec_2nd = new gp_Dir();
+						BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( TopoDS.ToEdge( edge ), shellFace, u, ref normalVec_1st );
+					if( shellFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+						normalVec_1st.Reverse();
+					}
+					BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( TopoDS.ToEdge( edge ), solidFace, u, ref normalVec_2nd );
+					if( solidFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+						normalVec_2nd.Reverse();
+					}
+
+					//gp_Dir normalVec_1st = VectorTool.GetFaceNormalVec( shellDace, point );
+					//gp_Dir normalVec_2nd = VectorTool.GetFaceNormalVec( solidFace, point );
 					gp_Dir tangentVec = VectorTool.GetEdgeTangentVec( TopoDS.ToEdge( edge ), point );
 					CADPointList.Add( new CADPoint( point, normalVec_1st, normalVec_2nd, tangentVec ) );
 					if( i == 0 ) {
