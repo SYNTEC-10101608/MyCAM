@@ -466,6 +466,9 @@ namespace CAMEdit
 				List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
 				camData.CAMPointList.Clear();
 				camData.CAMPointList.AddRange( filteredPath );
+
+				// add the start point to close the loop
+				camData.CAMPointList.Add( camData.CAMPointList[ 0 ].Clone() );
 			}
 			List<IProcessData> cuttingProcessDataList =
 				m_Model.CAMDataList.Select( camData => new CuttingProcessData( camData ) ).Cast<IProcessData>().ToList();

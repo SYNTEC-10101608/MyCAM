@@ -47,6 +47,11 @@ namespace DataStructure
 		{
 			get; private set;
 		}
+
+		public CADPoint Clone()
+		{
+			return new CADPoint( Point, NormalVec_1st, NormalVec_2nd, TangentVec );
+		}
 	}
 
 	// currently assuming CAM = CAD + ToolVec
@@ -66,6 +71,11 @@ namespace DataStructure
 		public gp_Dir ToolVec
 		{
 			get; private set;
+		}
+
+		public CAMPoint Clone()
+		{
+			return new CAMPoint( CADPoint.Clone(), new gp_Dir( ToolVec.XYZ() ) );
 		}
 	}
 
