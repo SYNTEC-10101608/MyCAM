@@ -105,6 +105,7 @@ namespace CAMEdit
 		gp_Ax2 m_SelectedToolVecAx2;
 		CAMData m_SelectedCAMData = null;
 		int m_SelectedIndex = -1;
+		int m_nGap = 100;
 
 		// for viewer resource handle
 		AIS_Shape m_PartAIS = null; // for part shape
@@ -168,8 +169,12 @@ namespace CAMEdit
 
 				// add points to the polygon
 				for( int j = 0; j < camData.CADPointList.Count; j++ ) {
-					polygonMaker.Add( camData.CADPointList[ j ].Point );
-					m_VertexMap.Add( camData.CADPointList[ j ].Point, new Tuple<CAMData, int>( camData, j ) );
+
+					// only add key index to the polygon to save the performance
+					if( camData.EdgeStartIndex.Contains( j ) || j % m_nGap == 0 ) {
+						polygonMaker.Add( camData.CADPointList[ j ].Point );
+						m_VertexMap.Add( camData.CADPointList[ j ].Point, new Tuple<CAMData, int>( camData, j ) );
+					}
 				}
 				if( polygonMaker.IsDone() == false ) {
 					continue;
@@ -251,13 +256,15 @@ namespace CAMEdit
 				//List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
 				List<CAMPoint> filteredPath = camData.CAMPointList;
 				for( int i = 0; i < filteredPath.Count; i++ ) {
-					CAMPoint camPoint = filteredPath[ i ];
-					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					if( camData.GetToolVecModifyIndex().Contains( ( i + camData.CAMPointList.Count + camData.StartPoint ) % camData.CAMPointList.Count ) && !camData.IsReverse ) {
-						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-						toolVecAIS.SetWidth( 5 );
+					if( IsKeyIndex( i, camData, out bool bHL ) ) {
+						CAMPoint camPoint = filteredPath[ i ];
+						AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
+						if( bHL ) {
+							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+							toolVecAIS.SetWidth( 5 );
+						}
+						m_ToolVecAISList.Add( toolVecAIS );
 					}
-					m_ToolVecAISList.Add( toolVecAIS );
 				}
 			}
 
@@ -323,6 +330,16 @@ namespace CAMEdit
 				m_OCCViewer.GetAISContext().Display( textLabel, false );
 				m_OCCViewer.GetAISContext().Deactivate( textLabel );
 			}
+		}
+
+		bool IsKeyIndex( int index, CAMData camData, out bool isToolVecMod )
+		{
+			int modifiedIndex = camData.IsReverse
+				? ( camData.CAMPointList.Count - 1 - index + camData.StartPoint ) % camData.CAMPointList.Count
+				: ( index + camData.StartPoint ) % camData.CAMPointList.Count;
+			bool isEdgeStart = camData.EdgeStartIndex.Contains( modifiedIndex );
+			isToolVecMod = camData.GetToolVecModifyIndex().Contains( modifiedIndex );
+			return index % m_nGap == 0 || isEdgeStart || isToolVecMod;
 		}
 
 		AIS_Line GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )

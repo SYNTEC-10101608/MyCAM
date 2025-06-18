@@ -182,12 +182,21 @@ namespace DataStructure
 			return result;
 		}
 
+		// view testing
+		public List<int> EdgeStartIndex
+		{
+			get; private set;
+		}
+
 		// backing fields
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsReverse = false;
 		int m_StartPoint = 0;
 		double m_Offset = 0;
+
+		// CADCAM index map
+		Dictionary<int, int> m_IndexMap = new Dictionary<int, int>();
 
 		// intersecting direction
 		gp_Dir m_IntersectingDir = new gp_Dir( 0, 0, 1 );
@@ -198,6 +207,7 @@ namespace DataStructure
 		void BuildCADPointList()
 		{
 			CADPointList = new List<CADPoint>();
+			EdgeStartIndex = new List<int>();
 			if( CADData == null || CADData.Contour == null ) {
 				return;
 			}
@@ -230,15 +240,19 @@ namespace DataStructure
 				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by interval
-				const double dSegmentLength = 1;
+				const double dSegmentLength = 0.01;
 				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, false, out List<gp_Pnt> pointList );
 
 				// get tool vector for each point
-				foreach( gp_Pnt point in pointList ) {
+				for( int i = 0; i < pointList.Count; i++ ) {
+					gp_Pnt point = pointList[ i ];
 					gp_Dir normalVec_1st = VectorTool.GetFaceNormalVec( shellDace, point );
 					gp_Dir normalVec_2nd = VectorTool.GetFaceNormalVec( solidFace, point );
 					gp_Dir tangentVec = VectorTool.GetEdgeTangentVec( TopoDS.ToEdge( edge ), point );
 					CADPointList.Add( new CADPoint( point, normalVec_1st, normalVec_2nd, tangentVec ) );
+					if( i == 0 ) {
+						EdgeStartIndex.Add( CADPointList.Count - 1 );
+					}
 				}
 			}
 
