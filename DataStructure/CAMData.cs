@@ -249,6 +249,7 @@ namespace DataStructure
 					i--;
 				}
 			}
+			CADPointList.RemoveAt( CADPointList.Count - 1 );
 		}
 
 		void BuildCAMPointList()
