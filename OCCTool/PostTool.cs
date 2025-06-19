@@ -1,10 +1,27 @@
 ﻿using OCC.gp;
-using PostToolBridge;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace OCCTool
 {
+	public static class IKSolverInterop
+	{
+		[DllImport( "PostTool.dll", CallingConvention = CallingConvention.StdCall )]
+		public static extern int IKSolver_IJKtoMS(
+			double[] ToolDirection,
+			double[] ToolDirectionAtZero,
+			double[] DirectOfFirstRotAxis,
+			double[] DirectOfSecondRotAxis,
+			double LastMasterRotAngle,
+			double LastSlaveRotAngle,
+			out double MRotAngle1,
+			out double SRotAngle1,
+			out double MRotAngle2,
+			out double SRotAngle2
+		);
+	}
+
 	public class PostTool
 	{
 		public static List<Tuple<double, double>> ConvertIJKToABC( List<gp_Dir> toolVecList )
@@ -18,7 +35,7 @@ namespace OCCTool
 			for( int i = 0; i < toolVecList.Count; i++ ) {
 
 				double[] ToolDirection = new double[ 3 ] { toolVecList[ i ].X(), toolVecList[ i ].Y(), toolVecList[ i ].Z() };
-				int solveResult = IKSolverWrapper.IJKtoMS( ToolDirection, ToolDirectionAtZero, DirectOfFirstRotAxis, DirectOfSecondRotAxis,
+				int solveResult = IKSolverInterop.IKSolver_IJKtoMS( ToolDirection, ToolDirectionAtZero, DirectOfFirstRotAxis, DirectOfSecondRotAxis,
 					dM, dS, out double dM1, out double dS1, out double dM2, out double dS2 );
 
 				// sigular case, master has infinite solution

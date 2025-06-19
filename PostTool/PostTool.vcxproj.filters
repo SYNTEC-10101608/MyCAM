@@ -29,5 +29,8 @@
     <ClCompile Include="IKSolverCore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IKSolverWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
