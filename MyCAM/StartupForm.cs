@@ -27,6 +27,8 @@ namespace MyCAM
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_Viewer, m_TreeView );
 			ShowG54Trihedron();
+			m_CADEditor.StartProcess += StartProcess;
+			m_CADEditor.EndProcess += EndProcess;
 		}
 
 		// app properties
@@ -153,6 +155,17 @@ namespace MyCAM
 			m_msCAD_SelectFace.Visible = false;
 			m_msCAD.Enabled = true;
 			m_CADEditor.EndSelectFace();
+		}
+
+		// process
+		void StartProcess()
+		{
+			this.Enabled = false;
+		}
+
+		void EndProcess()
+		{
+			this.Enabled = true;
 		}
 	}
 }

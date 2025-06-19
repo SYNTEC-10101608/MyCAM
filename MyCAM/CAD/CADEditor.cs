@@ -95,6 +95,9 @@ namespace MyCAM.CAD
 		ICADAction m_CurrentAction;
 
 		// APIs
+		public Action StartProcess;
+		public Action EndProcess;
+
 		public void ImportFile( FileFormat format )
 		{
 			OpenFileDialog openDialog = new OpenFileDialog();
@@ -126,7 +129,19 @@ namespace MyCAM.CAD
 			if( string.IsNullOrEmpty( szFileName ) ) {
 				return;
 			}
-			ReadFileData( format, szFileName );
+
+			// read file data and show a progress form
+			using( var progressForm = new ProgressForm() ) {
+				StartProcess?.Invoke();
+				progressForm.StartPosition = FormStartPosition.CenterParent;
+				progressForm.Show();
+				Application.DoEvents();
+
+				// read the file data
+				ReadFileData( format, szFileName );
+				progressForm.Close();
+				EndProcess?.Invoke();
+			}
 		}
 
 		public void AddPoint( AddPointType type )
