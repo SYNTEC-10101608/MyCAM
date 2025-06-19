@@ -1,8 +1,9 @@
 ﻿using OCC.BOPTools;
 using OCC.BRep;
+using OCC.BRepGProp;
 using OCC.Geom;
-using OCC.GeomAPI;
 using OCC.gp;
+using OCC.GProp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
@@ -255,50 +256,69 @@ namespace DataStructure
 
 				// break the edge into segment points by interval
 				const double dSegmentLength = 0.01;
-				SegmentTool.GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), dSegmentLength, false, out List<gp_Pnt> pointList );
+				EdgeStartIndex.Add( CADPointList.Count );
+				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, dSegmentLength ) );
+			}
+		}
 
-				// get tool vector for each point
-				for( int i = 0; i < pointList.Count; i++ ) {
-					gp_Pnt point = pointList[ i ];
-					// get curve from edge
-					double dStartU = 0;
-					double dEndU = 0;
-					Geom_Curve curve = BRep_Tool.Curve( TopoDS.ToEdge(edge), ref dStartU, ref dEndU );
+		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace,
+			double dSegmentLength )
+		{
+			List<CADPoint> result = new List<CADPoint>();
 
-					// Project the point onto the curve to get the u parameter
-					GeomAPI_ProjectPointOnCurve proj = new GeomAPI_ProjectPointOnCurve( point, curve );
+			// get target edge length
+			GProp_GProps system = new GProp_GProps();
+			BRepGProp.LinearProperties( edge, ref system );
+			double dEdgeLength = system.Mass();
 
-					// u might be out of range if the curve is periodic
-					double u = proj.LowerDistanceParameter();
-					gp_Dir normalVec_1st = new gp_Dir();
-					gp_Dir normalVec_2nd = new gp_Dir();
-						BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( TopoDS.ToEdge( edge ), shellFace, u, ref normalVec_1st );
-					if( shellFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-						normalVec_1st.Reverse();
-					}
-					BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( TopoDS.ToEdge( edge ), solidFace, u, ref normalVec_2nd );
-					if( solidFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-						normalVec_2nd.Reverse();
-					}
+			// get segment count
+			int nSegments = (int)Math.Ceiling( dEdgeLength / dSegmentLength );
 
-					//gp_Dir normalVec_1st = VectorTool.GetFaceNormalVec( shellDace, point );
-					//gp_Dir normalVec_2nd = VectorTool.GetFaceNormalVec( solidFace, point );
-					gp_Dir tangentVec = VectorTool.GetEdgeTangentVec( TopoDS.ToEdge( edge ), point );
-					CADPointList.Add( new CADPoint( point, normalVec_1st, normalVec_2nd, tangentVec ) );
-					if( i == 0 ) {
-						EdgeStartIndex.Add( CADPointList.Count - 1 );
-					}
-				}
+			// get curve parameters
+			double dStartU = 0;
+			double dEndU = 0;
+			Geom_Curve oneGeomCurve = BRep_Tool.Curve( edge, ref dStartU, ref dEndU );
+
+			// swap when reversed
+			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				(dEndU, dStartU) = (dStartU, dEndU);
 			}
 
-			// filter the coincident points
-			for( int i = 0; i < CADPointList.Count - 1; i++ ) {
-				if( CADPointList[ i ].Point.IsEqual( CADPointList[ i + 1 ].Point, 1e-3 ) ) {
-					CADPointList.RemoveAt( i );
-					i--;
+			// get increment value
+			double dIncrement = ( dEndU - dStartU ) / nSegments;
+			for( int i = 0; i < nSegments; i++ ) {
+				double U = dStartU + dIncrement * i;
+
+				// get point
+				gp_Pnt point = oneGeomCurve.Value( U );
+
+				// get shell normal (1st)
+				gp_Dir normalVec_1st = new gp_Dir();
+				BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, shellFace, U, ref normalVec_1st );
+				if( shellFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+					normalVec_1st.Reverse();
 				}
+
+				// get solid normal (2nd)
+				gp_Dir normalVec_2nd = new gp_Dir();
+				BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, solidFace, U, ref normalVec_2nd );
+				if( solidFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+					normalVec_2nd.Reverse();
+				}
+
+				// get tangent
+				gp_Vec tangentVec = new gp_Vec();
+				gp_Pnt _p = new gp_Pnt();
+				oneGeomCurve.D1( U, ref _p, ref tangentVec );
+				if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+					tangentVec.Reverse();
+				}
+
+				// build
+				CADPoint cadPoint = new CADPoint( point, normalVec_1st, normalVec_2nd, new gp_Dir( tangentVec ) );
+				result.Add( cadPoint );
 			}
-			CADPointList.RemoveAt( CADPointList.Count - 1 );
+			return result;
 		}
 
 		void BuildCAMPointList()
