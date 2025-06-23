@@ -100,7 +100,7 @@ namespace NCExport
 			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} A0 C0" );
 		}
 
-		const int SAFE_PLANE_Z = 150;
+		const int SAFE_PLANE_Z = 300;
 		const int G00_APPROACH_LENGTH = 40;
 		const int G01_APPROACH_LENGTH = 3;
 	}
