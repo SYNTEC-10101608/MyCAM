@@ -242,9 +242,9 @@ namespace DataStructure
 				if( shellFaceList == null || solidFaceList == null ) {
 					continue;
 				}
-				if( shellFaceList.Count != 1 || solidFaceList.Count != 2 ) {
-					throw new System.ArgumentException( ToString() + "BuildToolVecList: Mapping Error" );
-				}
+				//if( shellFaceList.Count != 1 || solidFaceList.Count != 2 ) {
+				//	throw new System.ArgumentException( ToString() + "BuildToolVecList: Mapping Error" );
+				//}
 				for( int i = 0; i < solidFaceList.Count; i++ ) {
 					if( solidFaceList[ i ].IsEqual( shellFaceList[ 0 ] ) ) {
 						solidFaceList.RemoveAt( i );
@@ -252,7 +252,7 @@ namespace DataStructure
 					}
 				}
 				TopoDS_Face shellFace = TopoDS.ToFace( shellFaceList[ 0 ] );
-				TopoDS_Face solidFace = TopoDS.ToFace( solidFaceList[ 0 ] );
+				TopoDS_Face solidFace = solidFaceList.Count == 0 ? null : TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by interval
 				const double dSegmentLength = 0.01;
@@ -301,9 +301,11 @@ namespace DataStructure
 
 				// get solid normal (2nd)
 				gp_Dir normalVec_2nd = new gp_Dir();
-				BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, solidFace, U, ref normalVec_2nd );
-				if( solidFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-					normalVec_2nd.Reverse();
+				if( solidFace != null ) {
+					BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, solidFace, U, ref normalVec_2nd );
+					if( solidFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+						normalVec_2nd.Reverse();
+					}
 				}
 
 				// get tangent
