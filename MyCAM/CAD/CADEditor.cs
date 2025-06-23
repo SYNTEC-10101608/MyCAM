@@ -131,17 +131,18 @@ namespace MyCAM.CAD
 			}
 
 			// read file data and show a progress form
-			using( var progressForm = new ProgressForm() ) {
-				StartProcess?.Invoke();
-				progressForm.StartPosition = FormStartPosition.CenterParent;
-				progressForm.Show();
-				Application.DoEvents();
+			ReadFileData( format, szFileName );
+			//using( var progressForm = new ProgressForm() ) {
+			//	StartProcess?.Invoke();
+			//	progressForm.StartPosition = FormStartPosition.CenterParent;
+			//	progressForm.Show();
+			//	Application.DoEvents();
 
-				// read the file data
-				ReadFileData( format, szFileName );
-				progressForm.Close();
-				EndProcess?.Invoke();
-			}
+			//	// read the file data
+			//	ReadFileData( format, szFileName );
+			//	progressForm.Close();
+			//	EndProcess?.Invoke();
+			//}
 		}
 
 		public void AddPoint( AddPointType type )
