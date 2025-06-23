@@ -1,10 +1,14 @@
 ﻿using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.BRepGProp;
+using OCC.ElCLib;
+using OCC.gce;
 using OCC.Geom;
 using OCC.GeomAbs;
+using OCC.GeomAdaptor;
 using OCC.gp;
 using OCC.GProp;
+using OCC.Precision;
 using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopExp;
@@ -158,16 +162,25 @@ namespace OCCTool
 			p = new gp_Pnt();
 			dir = new gp_Dir();
 			r = 0;
-			BRepAdaptor_Curve curve = new BRepAdaptor_Curve( edge );
-			if( curve.GetCurveType() == GeomAbs_CurveType.GeomAbs_Circle ) {
-				p = curve.Circle().Location();
-				dir = curve.Circle().Axis().Direction();
-				r = curve.Circle().Radius();
+			BRepAdaptor_Curve adCurve = new BRepAdaptor_Curve( edge );
+			if( adCurve.GetCurveType() == GeomAbs_CurveType.GeomAbs_Circle ) {
+				p = adCurve.Circle().Location();
+				dir = adCurve.Circle().Axis().Direction();
+				r = adCurve.Circle().Radius();
 				return true;
 			}
-			else {
-				return false;
+			double dStartU = 0;
+			double dEndU = 0;
+			Geom_Curve geomCurve = BRep_Tool.Curve( edge, ref dStartU, ref dEndU );
+			Geom_Circle geom_Circle = ComputeCircle( geomCurve, 1e-3, dStartU, dEndU,
+				out double cf, out double cl, out double deviation );
+			if( geom_Circle != null ) {
+				p = geom_Circle.Location();
+				dir = geom_Circle.Axis().Direction();
+				r = geom_Circle.Radius();
+				return true;
 			}
+			return false;
 		}
 
 		public static bool GetEdgeMidPoint( TopoDS_Edge edge, out gp_Pnt mid )
@@ -250,6 +263,101 @@ namespace OCCTool
 			else {
 				return false;
 			}
+		}
+
+		static Geom_Circle ComputeCircle(
+		Geom_Curve c3d,
+		double tol,
+		double c1,
+		double c2,
+		out double cf,
+		out double cl,
+		out double deviation )
+		{
+			cf = c1;
+			cl = c2;
+			deviation = 0.0;
+
+			// If already a circle
+			GeomAdaptor_Curve adC = new GeomAdaptor_Curve( c3d );
+			if( adC.GetCurveType() == GeomAbs_CurveType.GeomAbs_Circle ) {
+				deviation = 0.0;
+				return Geom_Circle.DownCast( c3d );
+			}
+
+			// Sample 3 points
+			gp_Pnt P0 = c3d.Value( c1 );
+			gp_Pnt P1 = c3d.Value( ( 2 * c1 + c2 ) / 3.0 );
+			gp_Pnt P2 = c3d.Value( ( c1 + 2 * c2 ) / 3.0 );
+
+			// Try to make a circle from these points
+			if( !GetCircle( out gp_Circ gpCircle, P0, P1, P2 ) ) {
+				return null;
+			}
+
+			// Validate that all points on the curve lie close to the circle
+			double maxDeviation = 0.0;
+			int nbSamples = 20;
+			double du = ( c2 - c1 ) / nbSamples;
+			for( int i = 0; i <= nbSamples; ++i ) {
+				double u = c1 + i * du;
+				gp_Pnt pt = c3d.Value( u );
+				double dist = gpCircle.Distance( pt );
+				if( dist > tol ) {
+					return null; // too far, not a circle
+				}
+				if( dist > maxDeviation ) {
+					maxDeviation = dist;
+				}
+			}
+			deviation = maxDeviation;
+
+			// Set parameter values on the circle
+			double PI2 = 2.0 * Math.PI;
+			cf = ElCLib.Parameter( gpCircle, c3d.Value( c1 ) );
+			cf = ElCLib.InPeriod( cf, 0.0, PI2 );
+			if( Math.Abs( cf ) < Precision.Confusion() || Math.Abs( PI2 - cf ) < Precision.Confusion() ) {
+				cf = 0.0;
+			}
+			double cm = ElCLib.Parameter( gpCircle, c3d.Value( ( c1 + c2 ) / 2.0 ) );
+			cm = ElCLib.InPeriod( cm, cf, cf + PI2 );
+			cl = ElCLib.Parameter( gpCircle, c3d.Value( c2 ) );
+			cl = ElCLib.InPeriod( cl, cm, cm + PI2 );
+			return new Geom_Circle( gpCircle );
+		}
+
+		static bool GetCircle( out gp_Circ crc, gp_Pnt P0, gp_Pnt P1, gp_Pnt P2 )
+		{
+			crc = null;
+
+			// Step 1: Check point coordinates against "infinite"
+			double maxCoord = Math.Sqrt( Precision.Infinite() );
+			foreach( var p in new[] { P0, P1, P2 } ) {
+				if( Math.Abs( p.X() ) > maxCoord || Math.Abs( p.Y() ) > maxCoord || Math.Abs( p.Z() ) > maxCoord ) {
+					return false;
+				}
+			}
+
+			// Step 2: Try to make the circle using 3 points
+			var mkc = new gce_MakeCirc( P0, P1, P2 );
+			if( !mkc.IsDone() ) {
+				return false;
+			}
+			crc = mkc.Value();
+
+			// Step 3: Reject if radius is too small
+			if( crc.Radius() < gp.Resolution() ) {
+				return false;
+			}
+
+			// Step 4: Reorient circle so X direction points from center to P0
+			gp_Pnt center = crc.Location();
+			gp_Ax2 axis = crc.Position();
+			gp_Vec vx = new gp_Vec( center, P0 );
+			axis.SetXDirection( new gp_Dir( vx ) );
+			crc.SetPosition( axis );
+
+			return true;
 		}
 	}
 }
