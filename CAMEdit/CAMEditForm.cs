@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using OCC.StlAPI;
 
 namespace CAMEdit
 {
@@ -105,7 +106,8 @@ namespace CAMEdit
 		gp_Ax2 m_SelectedToolVecAx2;
 		CAMData m_SelectedCAMData = null;
 		int m_SelectedIndex = -1;
-		int m_nGap = 100;
+		int m_nGap = 10;
+		int m_nSimGap = 20;
 
 		// for viewer resource handle
 		AIS_Shape m_PartAIS = null; // for part shape
@@ -519,7 +521,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Down ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex += 100;
+					m_SimulationIndex += m_nSimGap;
 					if( m_SimulationIndex >= m_Model.CAMDataList[ 0 ].CAMPointList.Count ) {
 						m_SimulationIndex = 0;
 					}
@@ -528,7 +530,7 @@ namespace CAMEdit
 			}
 			if( e.KeyCode == Keys.Up ) {
 				if( m_bSimulation ) {
-					m_SimulationIndex -= 100;
+					m_SimulationIndex -= m_nSimGap;
 					if( m_SimulationIndex < 0 ) {
 						m_SimulationIndex = m_Model.CAMDataList[ 0 ].CAMPointList.Count - 1;
 					}
@@ -827,11 +829,11 @@ namespace CAMEdit
 
 			// filtering by location
 			List<gp_Pnt> path = camPointList.Select( camPoint => camPoint.CADPoint.Point ).ToList();
-			bool[] flagsL = SimplifyPathByLocation( path, 1e-6 );
+			bool[] flagsL = SimplifyPathByLocation( path, 1e-3 );
 
 			// filtering by orientation
 			List<gp_Dir> orientation = camPointList.Select( camPoint => camPoint.ToolVec ).ToList();
-			bool[] flagsO = SimplifyPathByOrientation( orientation, 1e-6 );
+			bool[] flagsO = SimplifyPathByOrientation( orientation, 1e-3 );
 
 			// combine the two filtering results
 			for( int i = 0; i < path.Count; i++ ) {
@@ -1057,9 +1059,61 @@ namespace CAMEdit
 			return current;
 		}
 
+		// sorting
+		void SortProcess()
+		{
+			List<CAMData> sortResult = new List<CAMData>();
+
+			// the initial point is assume to be <0,0,0>
+			gp_Pnt startPoint = new gp_Pnt( 0, 0, 0 );
+
+			// sort the process using shortest distance algorithm greedily
+			while( m_Model.CAMDataList.Count > 0 ) {
+				double minDistance = double.MaxValue;
+				int minIndex = -1;
+				for( int i = 0; i < m_Model.CAMDataList.Count; i++ ) {
+					CAMData oneCAMData = m_Model.CAMDataList[ i ];
+					double distance = startPoint.Distance( oneCAMData.CAMPointList[ 0 ].CADPoint.Point );
+					if( distance < minDistance ) {
+						minDistance = distance;
+						minIndex = i;
+					}
+				}
+				if( minIndex >= 0 ) {
+
+					// update the start point
+					CAMData shortestDisCAMData = m_Model.CAMDataList[ minIndex ];
+					startPoint = shortestDisCAMData.CAMPointList[ 0 ].CADPoint.Point;
+					sortResult.Add( shortestDisCAMData );
+					m_Model.CAMDataList.RemoveAt( minIndex );
+				}
+			}
+			m_Model.CAMDataList.Clear();
+			m_Model.CAMDataList.AddRange( sortResult );
+			ShowCAMData();
+		}
+
 		// simulation
 		void MakeSimulationData()
 		{
+			//StlAPI_Reader headCReader = new StlAPI_Reader();
+			//m_HeadC = new TopoDS_Shape();
+			//headCReader.Read( ref m_HeadC, "C.stl" );
+			//m_HeadCAIS = new AIS_Shape( m_HeadC );
+			//Graphic3d_MaterialAspect aspectHeadC = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			//m_HeadCAIS.SetMaterial( aspectHeadC );
+			//m_HeadCAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			//m_HeadCAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+
+			//StlAPI_Reader headAReader = new StlAPI_Reader();
+			//m_HeadA = new TopoDS_Shape();
+			//headAReader.Read( ref m_HeadA, "B.stl" );
+			//m_HeadAAIS = new AIS_Shape( m_HeadA );
+			//Graphic3d_MaterialAspect aspectHeadA = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
+			//m_HeadAAIS.SetMaterial( aspectHeadA );
+			//m_HeadAAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			//m_HeadAAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+
 			// the machine
 			//BRepPrimAPI_MakeBox outBoxMakerMachine = new BRepPrimAPI_MakeBox( new gp_Pnt( -170, -120, -200 ), 340, 240, 240 );
 			//BRepPrimAPI_MakeBox inBoxMakerMachine = new BRepPrimAPI_MakeBox( new gp_Pnt( -150, -120, -180 ), 300, 240, 220 );
@@ -1091,7 +1145,7 @@ namespace CAMEdit
 
 			// the HeadA
 			BRepPrimAPI_MakeCylinder cyMakerHeadA = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 50 ), new gp_Dir( 0, 0, -1 ) ), 50, 200 );
-			BRepPrimAPI_MakeCone coneMakeHeadA1 = new BRepPrimAPI_MakeCone( new gp_Ax2( new gp_Pnt( 0, 0, -150 ), new gp_Dir( 0, 0, -1 ) ), 50,10, 100 );
+			BRepPrimAPI_MakeCone coneMakeHeadA1 = new BRepPrimAPI_MakeCone( new gp_Ax2( new gp_Pnt( 0, 0, -150 ), new gp_Dir( 0, 0, -1 ) ), 50, 10, 100 );
 			BRepPrimAPI_MakeCone coneMakeHeadA2 = new BRepPrimAPI_MakeCone( new gp_Ax2( new gp_Pnt( 0, 0, -250 ), new gp_Dir( 0, 0, -1 ) ), 5, 0, 50 );
 			BRepAlgoAPI_Fuse fuseMakerHeadA1 = new BRepAlgoAPI_Fuse( cyMakerHeadA.Shape(), coneMakeHeadA1.Shape() );
 			BRepAlgoAPI_Fuse fuseMakerHeadA2 = new BRepAlgoAPI_Fuse( fuseMakerHeadA1.Shape(), coneMakeHeadA2.Shape() );
@@ -1137,14 +1191,14 @@ namespace CAMEdit
 			double dC = m_SimulationCAData[ m_SimulationIndex ].Item1;
 			double dA = m_SimulationCAData[ m_SimulationIndex ].Item2;
 			gp_Trsf trsfC = new gp_Trsf();
-			trsfC.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), dC );
+			trsfC.SetRotation( new gp_Ax1( new gp_Pnt( 0, -128.2, 0 ), new gp_Dir( 0, 0, 1 ) ), dC );
 			gp_Trsf trsfA = new gp_Trsf();
-			trsfA.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 1, 0 ) ), dA );
+			trsfA.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 203.5 ), new gp_Dir( 0, 1, 0 ) ), dA );
 			gp_Trsf trsfCA = trsfC.Multiplied( trsfA );
-			gp_Trsf trsfAC = trsfA.Multiplied( trsfC );
+			//gp_Trsf trsfAC = trsfA.Multiplied( trsfC );
 
 			// move the head to the target location
-			gp_Pnt tcp0 = new gp_Pnt( 0, 0, -300 );
+			gp_Pnt tcp0 = new gp_Pnt( 0, 0, -5 );
 			gp_Pnt tcp1 = tcp0.Transformed( trsfCA );
 			gp_Trsf trsfT = new gp_Trsf();
 			trsfT.SetTranslation( new gp_Vec( p.XYZ() - tcp1.XYZ() ) );
@@ -1193,6 +1247,11 @@ namespace CAMEdit
 			//m_OCCViewer.GetAISContext().Remove( m_TableAAIS, false );
 			//m_OCCViewer.GetAISContext().Remove( m_TableCAIS, false );
 			m_OCCViewer.UpdateView();
+		}
+
+		void m_tsmiSort_Click( object sender, EventArgs e )
+		{
+			SortProcess();
 		}
 	}
 }
