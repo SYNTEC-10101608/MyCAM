@@ -255,7 +255,7 @@ namespace DataStructure
 				TopoDS_Face solidFace = solidFaceList.Count == 0 ? null : TopoDS.ToFace( solidFaceList[ 0 ] );
 
 				// break the edge into segment points by interval
-				const double dSegmentLength = 0.01;
+				const double dSegmentLength = 0.1;
 				EdgeStartIndex.Add( CADPointList.Count );
 				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, dSegmentLength ) );
 			}
