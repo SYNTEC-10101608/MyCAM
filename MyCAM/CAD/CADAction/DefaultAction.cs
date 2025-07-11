@@ -61,13 +61,9 @@ namespace MyCAM.CAD
 
 		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
 		{
-			foreach( TreeNode node in m_TreeView.Nodes ) {
-				node.BackColor = System.Drawing.Color.White;
-			}
 			if( e.Node == null ) {
 				return;
 			}
-			e.Node.BackColor = System.Drawing.Color.Cyan;
 			SyncSelectionFromTreeToView();
 		}
 
@@ -127,9 +123,6 @@ namespace MyCAM.CAD
 		{
 			// clear tree view selection, this set does not trigger the AfterSelect event
 			m_TreeView.SelectedNode = null;
-			foreach( TreeNode node in m_TreeView.Nodes ) {
-				node.BackColor = System.Drawing.Color.White;
-			}
 
 			// get the selected shape
 			m_Viewer.GetAISContext().InitSelected();

@@ -69,14 +69,19 @@ namespace MyCAM.CAD
 			if( viewer == null || treeView == null ) {
 				throw new ArgumentNullException( "CADEditor consturcting argument null." );
 			}
-			m_Viewer = viewer;
-			m_TreeView = treeView;
-			m_PartNode = new TreeNode( "Part" );
-			m_TreeView.Nodes.Add( m_PartNode );
 
 			// CAD manager
 			m_CADManager = new CADManager();
 			m_CADManager.PartChanged += OnPartChanged;
+
+			// user interface
+			m_Viewer = viewer;
+			m_TreeView = treeView;
+			m_CADManager.PartNode = new TreeNode( "Part" );
+			m_TreeView.Nodes.Add( m_CADManager.PartNode );
+
+			// this is to keep highlighted selected node when tree view looses focus
+			m_TreeView.HideSelection = false;
 
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager );
@@ -87,7 +92,6 @@ namespace MyCAM.CAD
 		// user interface
 		Viewer m_Viewer;
 		TreeView m_TreeView;
-		TreeNode m_PartNode;
 
 		// CAD manager
 		CADManager m_CADManager;
@@ -200,18 +204,27 @@ namespace MyCAM.CAD
 			}
 
 			// clear the tree view and viewer
-			m_PartNode.Nodes.Clear();
+			m_CADManager.PartNode.Nodes.Clear();
 			m_Viewer.GetAISContext().RemoveAll( false );
 
+			// clear view manager data
+			m_CADManager.ViewObjectMap.Clear();
+			m_CADManager.TreeNodeMap.Clear();
 			foreach( var data in m_CADManager.ShapeDataContainer ) {
 
-				// update the tree view
-				m_PartNode.Nodes.Add( data.UID );
+				// add node to the tree view
+				TreeNode node = new TreeNode( data.UID );
+				m_CADManager.PartNode.Nodes.Add( node );
+				m_CADManager.TreeNodeMap.Add( data.UID, node );
 
-				// update the viewer
+				// add shape to the viewer
 				AIS_Shape aisShape = ViewHelper.CreatePartAIS( data.Shape );
+				m_CADManager.ViewObjectMap.Add( data.UID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false );
 			}
+
+			// update tree view and viewer
+			m_CADManager.PartNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
 

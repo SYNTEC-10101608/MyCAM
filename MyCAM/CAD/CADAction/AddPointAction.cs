@@ -132,7 +132,7 @@ namespace MyCAM.CAD
 				return;
 			}
 			TopoDS_Vertex vertex = makeVertex.Vertex();
-			m_CADManager.AddPart( vertex, "AddPoint" );
+			m_CADManager.AddPart( vertex );
 		}
 
 		AddPointType m_AddPointType;

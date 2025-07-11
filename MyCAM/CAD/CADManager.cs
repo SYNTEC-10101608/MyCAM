@@ -38,6 +38,7 @@ namespace MyCAM.CAD
 		public AIS_InteractiveObject AISHandle { get; set; } = null;
 	}
 
+	// TODO: extract view manager to a separate class
 	internal class CADManager
 	{
 		public Action PartChanged;
@@ -47,6 +48,8 @@ namespace MyCAM.CAD
 			PartShape = null;
 			ShapeDataContainer = new List<ShapeData>();
 			ShapeDataMap = new Dictionary<string, ShapeData>();
+
+			// view manager
 			ViewObjectMap = new Dictionary<string, ViewObject>();
 			TreeNodeMap = new Dictionary<string, TreeNode>();
 		}
@@ -66,16 +69,6 @@ namespace MyCAM.CAD
 			get; private set;
 		}
 
-		public Dictionary<string, ViewObject> ViewObjectMap
-		{
-			get; private set;
-		}
-
-		public Dictionary<string, TreeNode> TreeNodeMap
-		{
-			get; private set;
-		}
-
 		public void AddPart( TopoDS_Shape newShape )
 		{
 			if( newShape == null || newShape.IsNull() ) {
@@ -84,19 +77,6 @@ namespace MyCAM.CAD
 			PartShape = newShape;
 			ShapeDataContainer = ArrangeShapeData( newShape );
 			PartChanged?.Invoke();
-		}
-
-		public string GetUIDByShape( TopoDS_Shape shape )
-		{
-			if( shape == null || shape.IsNull() ) {
-				return string.Empty;
-			}
-			foreach( var model in ShapeDataContainer ) {
-				if( model.Shape.IsEqual( shape ) ) {
-					return model.UID;
-				}
-			}
-			return string.Empty;
 		}
 
 		List<ShapeData> ArrangeShapeData( TopoDS_Shape oneShape )
@@ -157,5 +137,34 @@ namespace MyCAM.CAD
 		int m_WireID = 0;
 		int m_EdgeID = 0;
 		int m_VertexID = 0;
+
+		// view manager
+		public Dictionary<string, ViewObject> ViewObjectMap
+		{
+			get; private set;
+		}
+
+		public Dictionary<string, TreeNode> TreeNodeMap
+		{
+			get; private set;
+		}
+
+		public TreeNode PartNode
+		{
+			get; set;
+		}
+
+		public string GetUIDByShape( TopoDS_Shape shape )
+		{
+			if( shape == null || shape.IsNull() ) {
+				return string.Empty;
+			}
+			foreach( var model in ShapeDataContainer ) {
+				if( model.Shape.IsEqual( shape ) ) {
+					return model.UID;
+				}
+			}
+			return string.Empty;
+		}
 	}
 }
