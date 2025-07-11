@@ -338,7 +338,7 @@ namespace MyCAM.CAD
 
 		void ApplyTransform( gp_Trsf trsf )
 		{
-			// transform shape
+			// transform part shape
 			foreach( var shapeData in m_CADManager.ShapeDataContainer ) {
 				BRepBuilderAPI_Transform oneTransform = new BRepBuilderAPI_Transform( shapeData.Shape, trsf );
 				if( oneTransform.IsDone() ) {
