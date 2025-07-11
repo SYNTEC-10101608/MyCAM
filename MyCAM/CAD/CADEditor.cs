@@ -199,10 +199,6 @@ namespace MyCAM.CAD
 		// manager events
 		void OnPartChanged()
 		{
-			if( m_CADManager.PartShape == null || m_CADManager.PartShape.IsNull() ) {
-				return;
-			}
-
 			// clear the tree view and viewer
 			m_CADManager.PartNode.Nodes.Clear();
 			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {

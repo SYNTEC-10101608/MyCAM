@@ -20,9 +20,6 @@ namespace MyCAM.CAD
 		{
 			// make a coordinate system as reference
 			MakeG54Coord();
-
-			// make a compound shape as transform target
-			MakePartShape();
 		}
 
 		public override CADActionType ActionType
@@ -37,43 +34,38 @@ namespace MyCAM.CAD
 		{
 			base.Start();
 
+			// clear selection
+			m_Viewer.GetAISContext().ClearSelected( false );
+
 			// disable tree view
 			m_TreeView.Enabled = false;
 
-			// hide all shape
+			// activate
 			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Remove( viewObject.AISHandle, false );
+				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Edge );
+				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Face );
 			}
 
 			// show transform part and G54 coordinate system
-			ShowPart();
 			ShowG54Coord();
-
-			// activate edge and face selection
-			m_Viewer.GetAISContext().Activate( m_PartAIS, (int)AISActiveMode.Edge );
-			m_Viewer.GetAISContext().Activate( m_PartAIS, (int)AISActiveMode.Face );
 			m_Viewer.UpdateView();
 		}
 
 		public override void End()
 		{
 			// clear selection
-			m_Viewer.GetAISContext().ClearSelected( true );
+			m_Viewer.GetAISContext().ClearSelected( false );
 
 			// enable tree view
 			m_TreeView.Enabled = true;
 
-			// hide part and G54 coordinate system
-			HidePart();
-			HideG54Coord();
-
-			// show all shape
+			// deactivate
 			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
-				if( !viewObject.Visible ) {
-					m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
-				}
+				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
 			}
+
+			// hide part and G54 coordinate system
+			HideG54Coord();
 			m_Viewer.UpdateView();
 			base.End();
 		}
@@ -109,22 +101,6 @@ namespace MyCAM.CAD
 				}
 			}
 			End();
-		}
-
-		void MakePartShape()
-		{
-			// TODO: u may not need to make a extra part, use the raw shape directly
-			List<TopoDS_Shape> visibleShapeList = new List<TopoDS_Shape>();
-			foreach( var oneData in m_CADManager.ShapeDataMap ) {
-				if( m_CADManager.ViewObjectMap.ContainsKey( oneData.Key ) && m_CADManager.ViewObjectMap[ oneData.Key ].Visible ) {
-					visibleShapeList.Add( oneData.Value.Shape );
-				}
-			}
-			m_PartShape = ShapeTool.MakeCompound( visibleShapeList );
-			if( m_PartShape == null || m_PartShape.IsNull() ) {
-				throw new ArgumentNullException( "TransformAction part shape is null." );
-			}
-			m_PartAIS = ViewHelper.CreatePartAIS( m_PartShape );
 		}
 
 		void MakeG54Coord()
@@ -216,16 +192,6 @@ namespace MyCAM.CAD
 			}
 		}
 
-		void ShowPart()
-		{
-			m_Viewer.GetAISContext().Display( m_PartAIS, false );
-		}
-
-		void HidePart()
-		{
-			m_Viewer.GetAISContext().Remove( m_PartAIS, false );
-		}
-
 		void ShowG54Coord()
 		{
 			foreach( AIS_Shape ais in m_G54AISList ) {
@@ -291,14 +257,21 @@ namespace MyCAM.CAD
 					}
 					expRef.Next();
 				}
-				TopExp_Explorer expMove = new TopExp_Explorer( m_PartShape, TopAbs_ShapeEnum.TopAbs_FACE );
-				while( expMove.More() ) {
-					TopoDS_Shape face = expMove.Current();
-					if( sel.IsEqual( face ) ) {
-						isMove = true;
-						return;
+				foreach( var oneObject in m_CADManager.ViewObjectMap ) {
+
+					// skip invisible objects
+					if( oneObject.Value.Visible == false || m_CADManager.ShapeDataMap.ContainsKey( oneObject.Key ) == false ) {
+						continue;
 					}
-					expMove.Next();
+					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ oneObject.Key ].Shape, TopAbs_ShapeEnum.TopAbs_FACE );
+					while( expMove.More() ) {
+						TopoDS_Shape face = expMove.Current();
+						if( sel.IsEqual( face ) ) {
+							isMove = true;
+							return;
+						}
+						expMove.Next();
+					}
 				}
 			}
 			else if( sel.ShapeType() == TopAbs_ShapeEnum.TopAbs_EDGE ) {
@@ -311,14 +284,21 @@ namespace MyCAM.CAD
 					}
 					expRef.Next();
 				}
-				TopExp_Explorer expMove = new TopExp_Explorer( m_PartShape, TopAbs_ShapeEnum.TopAbs_EDGE );
-				while( expMove.More() ) {
-					TopoDS_Shape face = expMove.Current();
-					if( sel.IsEqual( face ) ) {
-						isMove = true;
-						return;
+				foreach( var oneObject in m_CADManager.ViewObjectMap ) {
+
+					// skip invisible objects
+					if( oneObject.Value.Visible == false || m_CADManager.ShapeDataMap.ContainsKey( oneObject.Key ) == false ) {
+						continue;
 					}
-					expMove.Next();
+					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ oneObject.Key ].Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
+					while( expMove.More() ) {
+						TopoDS_Shape face = expMove.Current();
+						if( sel.IsEqual( face ) ) {
+							isMove = true;
+							return;
+						}
+						expMove.Next();
+					}
 				}
 			}
 		}
@@ -352,28 +332,31 @@ namespace MyCAM.CAD
 				MessageBox.Show( "Invalid constraint. Please select valid ref and move objects." );
 				return;
 			}
-
-			// transform preview shape
 			gp_Trsf trsf = c.SolveConstraint();
-			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( m_PartShape, trsf );
-			m_PartShape = transform.Shape();
+			ApplyTransform( trsf );
+		}
 
-			// transform all CAD shapes
-			foreach( var oneData in m_CADManager.ShapeDataMap ) {
-				BRepBuilderAPI_Transform oneTransform = new BRepBuilderAPI_Transform( oneData.Value.Shape, trsf );
-				oneData.Value.Shape = oneTransform.Shape();
+		void ApplyTransform( gp_Trsf trsf )
+		{
+			// transform shape
+			foreach( var shapeData in m_CADManager.ShapeDataContainer ) {
+				BRepBuilderAPI_Transform oneTransform = new BRepBuilderAPI_Transform( shapeData.Shape, trsf );
+				if( oneTransform.IsDone() ) {
+					shapeData.Shape = oneTransform.Shape();
+				}
 			}
 
 			// update view
-			m_PartAIS.SetShape( m_PartShape );
-			m_Viewer.GetAISContext().Redisplay( m_PartAIS, false );
+			foreach( var oneObject in m_CADManager.ViewObjectMap ) {
+				AIS_Shape oneAIS = AIS_Shape.DownCast( oneObject.Value.AISHandle );
+				oneAIS.SetShape( m_CADManager.ShapeDataMap[ oneObject.Key ].Shape );
+				m_Viewer.GetAISContext().Redisplay( oneAIS, false );
+			}
 			m_Viewer.GetAISContext().ClearSelected( false );
 			m_Viewer.UpdateView();
 		}
 
 		TopoDS_Shape m_G54Shape;
-		TopoDS_Shape m_PartShape;
 		List<AIS_Shape> m_G54AISList;
-		AIS_Shape m_PartAIS;
 	}
 }

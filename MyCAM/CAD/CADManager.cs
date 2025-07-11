@@ -1,4 +1,6 @@
 ﻿using OCC.AIS;
+using OCC.BRepBuilderAPI;
+using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using System;
@@ -45,18 +47,12 @@ namespace MyCAM.CAD
 
 		public CADManager()
 		{
-			PartShape = null;
 			ShapeDataContainer = new List<ShapeData>();
 			ShapeDataMap = new Dictionary<string, ShapeData>();
 
 			// view manager
 			ViewObjectMap = new Dictionary<string, ViewObject>();
 			TreeNodeMap = new Dictionary<string, TreeNode>();
-		}
-
-		public TopoDS_Shape PartShape
-		{
-			get; private set;
 		}
 
 		public List<ShapeData> ShapeDataContainer
@@ -74,8 +70,11 @@ namespace MyCAM.CAD
 			if( newShape == null || newShape.IsNull() ) {
 				return;
 			}
-			PartShape = newShape;
 			ShapeDataContainer = ArrangeShapeData( newShape );
+			ShapeDataMap.Clear();
+			foreach( var shapeData in ShapeDataContainer ) {
+				ShapeDataMap[ shapeData.UID ] = shapeData;
+			}
 			PartChanged?.Invoke();
 		}
 
