@@ -205,7 +205,10 @@ namespace MyCAM.CAD
 
 			// clear the tree view and viewer
 			m_CADManager.PartNode.Nodes.Clear();
-			m_Viewer.GetAISContext().RemoveAll( false );
+			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+				m_Viewer.GetAISContext().Remove( viewObject.AISHandle, false );
+			}
+			m_CADManager.ViewObjectMap.Clear();
 
 			// clear view manager data
 			m_CADManager.ViewObjectMap.Clear();
