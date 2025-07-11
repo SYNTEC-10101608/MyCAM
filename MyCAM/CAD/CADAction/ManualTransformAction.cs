@@ -173,16 +173,19 @@ namespace MyCAM.CAD
 			// X AIS
 			AIS_Shape aisX = new AIS_Shape( edgeX.Edge() );
 			aisX.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			aisX.SetWidth( 2.0f ); // make X axis thicker
 			m_G54AISList.Add( aisX );
 
 			// Y AIS
 			AIS_Shape aisY = new AIS_Shape( edgeY.Edge() );
 			aisY.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+			aisY.SetWidth( 2.0f ); // make Y axis thicker
 			m_G54AISList.Add( aisY );
 
 			// Z AIS
 			AIS_Shape aisZ = new AIS_Shape( edgeZ.Edge() );
 			aisZ.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+			aisZ.SetWidth( 2.0f ); // make Z axis thicker
 			m_G54AISList.Add( aisZ );
 
 			// set properties
