@@ -4,7 +4,6 @@ using OCC.IFSelect;
 using OCC.IGESControl;
 using OCC.Quantity;
 using OCC.STEPControl;
-using OCC.TopAbs;
 using OCC.TopoDS;
 using OCC.XSControl;
 using OCCTool;
@@ -72,10 +71,12 @@ namespace MyCAM.CAD
 			}
 			m_Viewer = viewer;
 			m_TreeView = treeView;
+			m_PartNode = new TreeNode( "Part" );
+			m_TreeView.Nodes.Add( m_PartNode );
 
 			// CAD manager
 			m_CADManager = new CADManager();
-			m_CADManager.AddCADModelDone += OnAddCADModelDone;
+			m_CADManager.PartChanged += OnPartChanged;
 
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager );
@@ -86,6 +87,7 @@ namespace MyCAM.CAD
 		// user interface
 		Viewer m_Viewer;
 		TreeView m_TreeView;
+		TreeNode m_PartNode;
 
 		// CAD manager
 		CADManager m_CADManager;
@@ -132,17 +134,6 @@ namespace MyCAM.CAD
 
 			// read file data and show a progress form
 			ReadFileData( format, szFileName );
-			//using( var progressForm = new ProgressForm() ) {
-			//	StartProcess?.Invoke();
-			//	progressForm.StartPosition = FormStartPosition.CenterParent;
-			//	progressForm.Show();
-			//	Application.DoEvents();
-
-			//	// read the file data
-			//	ReadFileData( format, szFileName );
-			//	progressForm.Close();
-			//	EndProcess?.Invoke();
-			//}
 		}
 
 		public void AddPoint( AddPointType type )
@@ -202,23 +193,26 @@ namespace MyCAM.CAD
 		}
 
 		// manager events
-		void OnAddCADModelDone( ShapeData model )
+		void OnPartChanged()
 		{
-			string szUID = model.UID;
-			TopoDS_Shape shape = model.Shape;
-			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() ) {
+			if( m_CADManager.PartShape == null || m_CADManager.PartShape.IsNull() ) {
 				return;
 			}
 
-			// update the tree view
-			TreeNode newNode = new TreeNode( szUID );
-			m_CADManager.TreeNodeMap[ szUID ] = newNode;
-			m_TreeView.Nodes.Add( newNode );
+			// clear the tree view and viewer
+			m_PartNode.Nodes.Clear();
+			m_Viewer.GetAISContext().RemoveAll( false );
 
-			// update the viewer
-			AIS_Shape aisShape = ViewHelper.CreatePartAIS( shape );
-			m_CADManager.ViewObjectMap[ szUID ] = new ViewObject( aisShape );
-			m_Viewer.GetAISContext().Display( aisShape, true );
+			foreach( var data in m_CADManager.ShapeDataContainer ) {
+
+				// update the tree view
+				m_PartNode.Nodes.Add( data.UID );
+
+				// update the viewer
+				AIS_Shape aisShape = ViewHelper.CreatePartAIS( data.Shape );
+				m_Viewer.GetAISContext().Display( aisShape, false );
+			}
+			m_Viewer.UpdateView();
 		}
 
 		// private methods
@@ -262,33 +256,7 @@ namespace MyCAM.CAD
 			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape }/*, 1e-1*/ );
 
 			// add the read shape to the manager
-			AddToManager( oneShape );
-		}
-
-		void AddToManager( TopoDS_Shape oneShape )
-		{
-			List<TopoDS_Shape> shapeList = ArrangeShapeData( oneShape );
-			foreach( TopoDS_Shape shape in shapeList ) {
-				if( shape == null || shape.IsNull() ) {
-					continue;
-				}
-				m_CADManager.AddCADModel( shape );
-			}
-		}
-
-		List<TopoDS_Shape> ArrangeShapeData( TopoDS_Shape oneShape )
-		{
-			if( oneShape == null || oneShape.IsNull() ) {
-				return new List<TopoDS_Shape>();
-			}
-			if( oneShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_COMPOUND ) {
-				return new List<TopoDS_Shape>() { oneShape };
-			}
-			List<TopoDS_Shape> result = new List<TopoDS_Shape>();
-			foreach( TopoDS_Shape subShape in oneShape.elementsAsList ) {
-				result.AddRange( ArrangeShapeData( subShape ) );
-			}
-			return result;
+			m_CADManager.AddPart( oneShape );
 		}
 
 		// edit actions
