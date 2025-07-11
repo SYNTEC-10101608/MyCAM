@@ -44,6 +44,7 @@ namespace MyCAM.CAD
 	internal class CADManager
 	{
 		public Action PartChanged;
+		public Action<string> FeatureAdded;
 
 		public CADManager()
 		{
@@ -70,12 +71,21 @@ namespace MyCAM.CAD
 			if( newShape == null || newShape.IsNull() ) {
 				return;
 			}
+			ResetShapeIDs();
 			ShapeDataContainer = ArrangeShapeData( newShape );
 			ShapeDataMap.Clear();
 			foreach( var shapeData in ShapeDataContainer ) {
 				ShapeDataMap[ shapeData.UID ] = shapeData;
 			}
 			PartChanged?.Invoke();
+		}
+
+		public void AddReferenceFeature( TopoDS_Shape newFeature )
+		{
+			string szID = GetNewShapeID( newFeature );
+			ShapeDataContainer.Add( new ShapeData( szID, newFeature ) );
+			ShapeDataMap[ szID ] = new ShapeData( szID, newFeature );
+			FeatureAdded?.Invoke( szID );
 		}
 
 		List<ShapeData> ArrangeShapeData( TopoDS_Shape oneShape )
@@ -127,6 +137,16 @@ namespace MyCAM.CAD
 					return szType; // not a valid shape type
 			}
 			return szType + "_" + nID.ToString();
+		}
+
+		void ResetShapeIDs()
+		{
+			m_SolidID = 0;
+			m_ShellID = 0;
+			m_FaceID = 0;
+			m_WireID = 0;
+			m_EdgeID = 0;
+			m_VertexID = 0;
 		}
 
 		// data ID

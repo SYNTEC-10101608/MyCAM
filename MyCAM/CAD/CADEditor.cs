@@ -1,5 +1,4 @@
 ﻿using OCC.AIS;
-using OCC.Graphic3d;
 using OCC.IFSelect;
 using OCC.IGESControl;
 using OCC.Quantity;
@@ -40,14 +39,20 @@ namespace MyCAM.CAD
 		public static AIS_Shape CreatePartAIS( TopoDS_Shape shape )
 		{
 			AIS_Shape aisShape = new AIS_Shape( shape );
-			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			aisShape.SetMaterial( aspect );
 			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			aisShape.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY50 ) );
 			aisShape.Attributes().SetFaceBoundaryDraw( true );
 			aisShape.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
-			Quantity_Color color = new Quantity_Color();
-			aisShape.Color( ref color );
-			Quantity_NameOfColor colorName = color.Name();
+			return aisShape;
+		}
+
+		public static AIS_Shape CreateReferenceAIS( TopoDS_Shape shape )
+		{
+			AIS_Shape aisShape = new AIS_Shape( shape );
+			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_WireFrame );
+			aisShape.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_YELLOW ) );
+			aisShape.Attributes().SetFaceBoundaryDraw( true );
+			aisShape.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			return aisShape;
 		}
 
@@ -73,6 +78,7 @@ namespace MyCAM.CAD
 			// CAD manager
 			m_CADManager = new CADManager();
 			m_CADManager.PartChanged += OnPartChanged;
+			m_CADManager.FeatureAdded += OnFeatureAdded;
 
 			// user interface
 			m_Viewer = viewer;
@@ -221,6 +227,28 @@ namespace MyCAM.CAD
 				m_CADManager.ViewObjectMap.Add( data.UID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false );
 			}
+
+			// update tree view and viewer
+			m_CADManager.PartNode.ExpandAll();
+			m_Viewer.UpdateView();
+		}
+
+		void OnFeatureAdded( string szID )
+		{
+			if( string.IsNullOrEmpty( szID ) ) {
+				return;
+			}
+
+			// add a new node to the tree view
+			TreeNode node = new TreeNode( szID );
+			m_CADManager.PartNode.Nodes.Add( node );
+			m_CADManager.TreeNodeMap.Add( szID, node );
+
+			// add a new shape to the viewer
+			ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
+			AIS_Shape aisShape = ViewHelper.CreateReferenceAIS( shapeData.Shape );
+			m_CADManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
+			m_Viewer.GetAISContext().Display( aisShape, false );
 
 			// update tree view and viewer
 			m_CADManager.PartNode.ExpandAll();
