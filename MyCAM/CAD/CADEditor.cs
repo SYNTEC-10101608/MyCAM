@@ -149,19 +149,19 @@ namespace MyCAM.CAD
 		public void AddPoint( AddPointType type )
 		{
 			AddPointAction action = new AddPointAction( m_Viewer, m_TreeView, m_CADManager, type );
-			EditActionStart( action );
+			StartEditAction( action );
 		}
 
 		public void ThreePointTransform()
 		{
 			ThreePtTransformAction action = new ThreePtTransformAction( m_Viewer, m_TreeView, m_CADManager );
-			EditActionStart( action );
+			StartEditAction( action );
 		}
 
 		public void StartManaulTransform()
 		{
 			ManualTransformAction action = new ManualTransformAction( m_Viewer, m_TreeView, m_CADManager );
-			EditActionStart( action );
+			StartEditAction( action );
 		}
 
 		public void ApplyManualTransform( EConstraintType type, bool bReverse = false )
@@ -183,7 +183,7 @@ namespace MyCAM.CAD
 		public void StartSelectFace()
 		{
 			SelectFaceAction action = new SelectFaceAction( m_Viewer, m_TreeView, m_CADManager );
-			EditActionStart( action );
+			StartEditAction( action );
 		}
 
 		public void SelectD1ContFace()
@@ -300,22 +300,30 @@ namespace MyCAM.CAD
 		}
 
 		// edit actions
-		void EditActionStart( ICADAction action )
+		void StartEditAction( ICADAction action )
 		{
+			// to prevent from non-necessary default action start
+			m_IsNextAction = true;
+
+			// end the current action
 			m_CurrentAction.End();
+			m_IsNextAction = false;
+
+			// start the action
 			m_CurrentAction = action;
 			m_CurrentAction.Start();
-			m_CurrentAction.EndAction += EditActionEnd;
+			m_CurrentAction.EndAction += OnEditActionEnd;
 		}
 
-		void EditActionEnd( ICADAction action )
+		void OnEditActionEnd( ICADAction action )
 		{
-			if( action == null
-				|| action.ActionType == CADActionType.None || action.ActionType == CADActionType.Default ) {
-				return;
+			// start default action if all edit actions are done
+			if( !m_IsNextAction ) {
+				m_CurrentAction = m_DefaultAction;
+				m_CurrentAction.Start();
 			}
-			m_CurrentAction = m_DefaultAction;
-			m_CurrentAction.Start();
 		}
+
+		bool m_IsNextAction = false;
 	}
 }
