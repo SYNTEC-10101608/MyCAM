@@ -3,6 +3,7 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.CAD
@@ -69,15 +70,17 @@ namespace MyCAM.CAD
 	internal class CADManager
 	{
 		public Action PartChanged;
-		public Action<string> FeatureAdded;
+		public Action<List<string>, EFeatureType> FeatureAdded;
 
 		public CADManager()
 		{
 			ShapeDataContainer = new List<ShapeData>();
 			ShapeDataMap = new Dictionary<string, ShapeData>();
+			ComponetFaceID = new HashSet<string>();
 
 			// view manager
 			PartNode = new TreeNode( "Part" );
+			ComponentFaceNode = new TreeNode( "Component Face" );
 			ViewObjectMap = new Dictionary<string, ViewObject>();
 			TreeNodeMap = new Dictionary<string, TreeNode>();
 		}
@@ -92,6 +95,11 @@ namespace MyCAM.CAD
 			get; private set;
 		}
 
+		public HashSet<string> ComponetFaceID
+		{
+			get; private set;
+		}
+
 		public void AddPart( TopoDS_Shape newShape )
 		{
 			if( newShape == null || newShape.IsNull() ) {
@@ -101,6 +109,7 @@ namespace MyCAM.CAD
 			// clear all datas
 			ResetShapeIDs();
 			ShapeDataMap.Clear();
+			ComponetFaceID.Clear();
 
 			// update all datas
 			ShapeDataContainer = ArrangeShapeData( newShape );
@@ -115,7 +124,18 @@ namespace MyCAM.CAD
 			string szID = GetNewShapeID( newFeature );
 			ShapeDataContainer.Add( new ShapeData( szID, newFeature ) );
 			ShapeDataMap[ szID ] = new ShapeData( szID, newFeature );
-			FeatureAdded?.Invoke( szID );
+			FeatureAdded?.Invoke( new List<string>() { szID }, EFeatureType.Reference );
+		}
+
+		public void AddComponentFaceFeature( List<TopoDS_Shape> newFaces )
+		{
+			foreach( var newFace in newFaces ) {
+				string szID = GetNewShapeID( newFace );
+				ShapeDataContainer.Add( new ShapeData( szID, newFace ) );
+				ShapeDataMap[ szID ] = new ShapeData( szID, newFace );
+				ComponetFaceID.Add( szID );
+			}
+			FeatureAdded?.Invoke( ComponetFaceID.ToList(), EFeatureType.ComponentFace );
 		}
 
 		List<ShapeData> ArrangeShapeData( TopoDS_Shape oneShape )
@@ -199,6 +219,11 @@ namespace MyCAM.CAD
 		}
 
 		public TreeNode PartNode
+		{
+			get; private set;
+		}
+
+		public TreeNode ComponentFaceNode
 		{
 			get; private set;
 		}

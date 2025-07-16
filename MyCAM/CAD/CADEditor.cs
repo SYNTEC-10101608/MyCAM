@@ -34,6 +34,13 @@ namespace MyCAM.CAD
 		PlaneParallel,
 	}
 
+	public enum EFeatureType
+	{
+		Reference = 0,
+		ComponentFace = 1,
+		Path = 2,
+	}
+
 	internal static class ViewHelper
 	{
 		public static AIS_Shape CreatePartAIS( TopoDS_Shape shape )
@@ -46,7 +53,7 @@ namespace MyCAM.CAD
 			return aisShape;
 		}
 
-		public static AIS_Shape CreateReferenceAIS( TopoDS_Shape shape )
+		public static AIS_Shape CreateFeatureAIS( TopoDS_Shape shape )
 		{
 			AIS_Shape aisShape = new AIS_Shape( shape );
 			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
@@ -74,6 +81,7 @@ namespace MyCAM.CAD
 			m_Viewer = viewer;
 			m_TreeView = treeView;
 			m_TreeView.Nodes.Add( m_CADManager.PartNode );
+			m_TreeView.Nodes.Add( m_CADManager.ComponentFaceNode );
 
 			// this is to keep highlighted selected node when tree view looses focus
 			m_TreeView.HideSelection = false;
@@ -196,6 +204,7 @@ namespace MyCAM.CAD
 		{
 			// clear the tree view and viewer
 			m_CADManager.PartNode.Nodes.Clear();
+			m_CADManager.ComponentFaceNode.Nodes.Clear();
 			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Remove( viewObject.AISHandle, false );
 			}
@@ -221,25 +230,33 @@ namespace MyCAM.CAD
 			m_Viewer.UpdateView();
 		}
 
-		void OnFeatureAdded( string szID )
+		void OnFeatureAdded( List<string> newFeatureIDs, EFeatureType type )
 		{
-			if( string.IsNullOrEmpty( szID ) ) {
-				return;
+			foreach( string szID in newFeatureIDs ) {
+				if( string.IsNullOrEmpty( szID ) ) {
+					return;
+				}
+
+				// add a new node to the tree view
+				TreeNode node = new TreeNode( szID );
+				if( type == EFeatureType.Reference ) {
+					m_CADManager.PartNode.Nodes.Add( node );
+				}
+				else if( type == EFeatureType.ComponentFace ) {
+					m_CADManager.ComponentFaceNode.Nodes.Add( node );
+				}
+				m_CADManager.TreeNodeMap.Add( szID, node );
+
+				// add a new shape to the viewer
+				ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
+				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( shapeData.Shape );
+				m_CADManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
+				m_Viewer.GetAISContext().Display( aisShape, false );
 			}
-
-			// add a new node to the tree view
-			TreeNode node = new TreeNode( szID );
-			m_CADManager.PartNode.Nodes.Add( node );
-			m_CADManager.TreeNodeMap.Add( szID, node );
-
-			// add a new shape to the viewer
-			ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
-			AIS_Shape aisShape = ViewHelper.CreateReferenceAIS( shapeData.Shape );
-			m_CADManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
-			m_Viewer.GetAISContext().Display( aisShape, false );
 
 			// update tree view and viewer
 			m_CADManager.PartNode.ExpandAll();
+			m_CADManager.ComponentFaceNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
 

@@ -234,9 +234,7 @@ namespace MyCAM.CAD
 			}
 
 			// update datas
-			foreach( var oneComponentFace in faceGroupList ) {
-				m_CADManager.AddReferenceFeature( oneComponentFace );
-			}
+			m_CADManager.AddComponentFaceFeature( faceGroupList );
 			End();
 		}
 
