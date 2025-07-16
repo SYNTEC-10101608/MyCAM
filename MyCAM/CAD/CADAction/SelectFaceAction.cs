@@ -1,15 +1,11 @@
-﻿using CAMEdit;
-using DataStructure;
-using OCC.AIS;
+﻿using OCC.AIS;
 using OCC.Quantity;
-using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -34,33 +30,23 @@ namespace MyCAM.CAD
 		public SelectFaceAction( Viewer viewer, TreeView treeView, CADManager cadManager )
 			: base( viewer, treeView, cadManager )
 		{
-			List<TopoDS_Shape> visibleShapeList = new List<TopoDS_Shape>();
 			m_VisibleFaceAISPairList = new List<FaceHandle>();
+			m_EdgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
 			foreach( var oneShapeData in m_CADManager.ShapeDataContainer ) {
-				if( m_CADManager.ViewObjectMap.ContainsKey( oneShapeData.UID ) && m_CADManager.ViewObjectMap[ oneShapeData.UID ].Visible ) {
-
-					// add shape to make compound
-					visibleShapeList.Add( oneShapeData.Shape );
+				if( m_CADManager.ViewObjectMap[ oneShapeData.UID ].Visible ) {
 
 					// collect all faces
 					TopExp_Explorer exp = new TopExp_Explorer( oneShapeData.Shape, TopAbs_ShapeEnum.TopAbs_FACE );
 					for( ; exp.More(); exp.Next() ) {
 						TopoDS_Face face = TopoDS.ToFace( exp.Current() );
-						AIS_Shape aisShape = ViewHelper.CreateFaceAIS( face );
+						AIS_Shape aisShape = ViewHelper.CreatePartAIS( face );
 						m_VisibleFaceAISPairList.Add( new FaceHandle() { Face = face, AIS = aisShape } );
 					}
+
+					// add into map
+					TopExp.MapShapesAndAncestors( oneShapeData.Shape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref m_EdgeFaceMap );
 				}
 			}
-
-			// create a compound shape to slect face
-			m_VisiblePart = ShapeTool.MakeCompound( visibleShapeList );
-			if( m_VisiblePart == null || m_VisiblePart.IsNull() ) {
-				throw new ArgumentNullException( "SelectFaceAction part shape is null." );
-			}
-
-			// map visible edge and face
-			m_EdgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-			TopExp.MapShapesAndAncestors( m_VisiblePart, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref m_EdgeFaceMap );
 		}
 
 		public override CADActionType ActionType
@@ -74,6 +60,9 @@ namespace MyCAM.CAD
 		public override void Start()
 		{
 			base.Start();
+
+			// clear selection
+			m_Viewer.GetAISContext().ClearSelected( true );
 
 			// disable tree view
 			m_TreeView.Enabled = false;
@@ -144,14 +133,6 @@ namespace MyCAM.CAD
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
-		{
-		}
-
-		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-		}
-
-		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
 		{
 		}
 
@@ -231,26 +212,32 @@ namespace MyCAM.CAD
 		{
 			List<TopoDS_Face> extractedFaceList = GetSelectedFace();
 			if( extractedFaceList.Count == 0 ) {
-				return;
-			}
-
-			// build CAD data
-			List<CADData> cadDataList = BuildCADData( extractedFaceList );
-			if( cadDataList.Count == 0 ) {
-				MessageBox.Show( ToString() + "Error: No Pattern Found" );
-				return;
-			}
-
-			// show CAMEditForm
-			CAMEditForm camEditForm = new CAMEditForm();
-			camEditForm.Size = new System.Drawing.Size( 1200, 800 );
-			CAMEditModel camEditModel = new CAMEditModel( m_VisiblePart, cadDataList );
-			camEditForm.Init( camEditModel );
-			camEditForm.ShowDialog();
-			if( camEditForm.DialogResult != DialogResult.OK ) {
 				End();
 				return;
 			}
+
+			// sew the faces
+			TopoDS_Shape sewResult = ShapeTool.SewShape( extractedFaceList.Cast<TopoDS_Shape>().ToList() );
+			List<TopoDS_Shape> faceGroupList = new List<TopoDS_Shape>();
+
+			// single shell or single face
+			if( sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL
+				|| sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_FACE ) {
+				faceGroupList.Add( sewResult );
+			}
+
+			// some shell and free face exist
+			else {
+				foreach( TopoDS_Shape shape in sewResult.elementsAsList ) {
+					faceGroupList.Add( shape );
+				}
+			}
+
+			// update datas
+			foreach( var oneComponentFace in faceGroupList ) {
+				m_CADManager.AddReferenceFeature( oneComponentFace );
+			}
+			End();
 		}
 
 		void ShowPart()
@@ -280,79 +267,7 @@ namespace MyCAM.CAD
 			return selectedFaceList;
 		}
 
-		List<CADData> BuildCADData( List<TopoDS_Face> extractedFaceList )
-		{
-			List<CADData> cadDataList = new List<CADData>();
-
-			// get free boundary wires
-			List<TopoDS_Wire> boundaryWireList = GetAllCADContour( extractedFaceList, out TopoDS_Shape sewResult );
-			if( boundaryWireList.Count == 0 ) {
-				MessageBox.Show( ToString() + "Error: No boundary wire" );
-				return cadDataList;
-			}
-
-			// map the edges to faces
-			TopTools_IndexedDataMapOfShapeListOfShape shellMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-			TopExp.MapShapesAndAncestors( sewResult, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref shellMap );
-			TopTools_IndexedDataMapOfShapeListOfShape solidMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-			TopExp.MapShapesAndAncestors( m_VisiblePart, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref solidMap );
-
-			// build CAD data
-			foreach( TopoDS_Wire wire in boundaryWireList ) {
-
-				// split the map by edges in wire
-				TopTools_IndexedDataMapOfShapeListOfShape oneShellMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-				TopTools_IndexedDataMapOfShapeListOfShape oneSolidMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-				foreach( TopoDS_Shape edge in wire.elementsAsList ) {
-					TopTools_ListOfShape shellFaceList = shellMap.FindFromKey( edge );
-					TopTools_ListOfShape solidFaceList = solidMap.FindFromKey( edge );
-					if( shellFaceList != null && solidFaceList != null ) {
-						oneShellMap.Add( edge, shellFaceList );
-						oneSolidMap.Add( edge, solidFaceList );
-					}
-				}
-
-				// create CAD data
-				CADData cadData = new CADData( wire, oneShellMap, oneSolidMap );
-				cadDataList.Add( cadData );
-			}
-			return cadDataList;
-		}
-
-		List<TopoDS_Wire> GetAllCADContour( List<TopoDS_Face> extractedFaceList, out TopoDS_Shape sewResult )
-		{
-			// sew the faces
-			sewResult = ShapeTool.SewShape( extractedFaceList.Cast<TopoDS_Shape>().ToList() );
-			List<TopoDS_Shape> faceGroupList = new List<TopoDS_Shape>();
-
-			// single shell or single face
-			if( sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL
-				|| sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_FACE ) {
-				faceGroupList.Add( sewResult );
-			}
-
-			// some shell and free face exist
-			else {
-				foreach( TopoDS_Shape shape in sewResult.elementsAsList ) {
-					faceGroupList.Add( shape );
-				}
-			}
-
-			// get free boundary wires
-			List<TopoDS_Wire> wireList = new List<TopoDS_Wire>();
-			foreach( TopoDS_Shape faceGroup in faceGroupList ) {
-				ShapeAnalysis_FreeBounds freeBounds = new ShapeAnalysis_FreeBounds( faceGroup );
-				TopExp_Explorer wireExp = new TopExp_Explorer( freeBounds.GetClosedWires(), TopAbs_ShapeEnum.TopAbs_WIRE );
-				while( wireExp.More() ) {
-					wireList.Add( TopoDS.ToWire( wireExp.Current() ) );
-					wireExp.Next();
-				}
-			}
-			return wireList;
-		}
-
 		List<FaceHandle> m_VisibleFaceAISPairList;
-		TopoDS_Shape m_VisiblePart;
 		TopTools_IndexedDataMapOfShapeListOfShape m_EdgeFaceMap;
 
 		const Quantity_NameOfColor COLOR_SELECTED = Quantity_NameOfColor.Quantity_NOC_RED;
