@@ -1,6 +1,4 @@
 ﻿using OCC.AIS;
-using OCC.BRepBuilderAPI;
-using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using System;
@@ -9,6 +7,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.CAD
 {
+	// part data, reference data, component face data
 	internal class ShapeData
 	{
 		public ShapeData( string szUID, TopoDS_Shape shapeData )
@@ -23,6 +22,32 @@ namespace MyCAM.CAD
 		}
 
 		public TopoDS_Shape Shape
+		{
+			get; set;
+		}
+	}
+
+	internal class PathData
+	{
+		internal class PathFacePair
+		{
+			public TopoDS_Edge PathEdge
+			{
+				get; set;
+			}
+
+			public TopoDS_Face ComponentFace
+			{
+				get; set;
+			}
+		}
+
+		public string UID
+		{
+			get; set;
+		}
+
+		public List<PathFacePair> PathElements
 		{
 			get; set;
 		}
@@ -52,6 +77,7 @@ namespace MyCAM.CAD
 			ShapeDataMap = new Dictionary<string, ShapeData>();
 
 			// view manager
+			PartNode = new TreeNode( "Part" );
 			ViewObjectMap = new Dictionary<string, ViewObject>();
 			TreeNodeMap = new Dictionary<string, TreeNode>();
 		}
@@ -71,9 +97,13 @@ namespace MyCAM.CAD
 			if( newShape == null || newShape.IsNull() ) {
 				return;
 			}
+
+			// clear all datas
 			ResetShapeIDs();
-			ShapeDataContainer = ArrangeShapeData( newShape );
 			ShapeDataMap.Clear();
+
+			// update all datas
+			ShapeDataContainer = ArrangeShapeData( newShape );
 			foreach( var shapeData in ShapeDataContainer ) {
 				ShapeDataMap[ shapeData.UID ] = shapeData;
 			}
@@ -170,7 +200,7 @@ namespace MyCAM.CAD
 
 		public TreeNode PartNode
 		{
-			get; set;
+			get; private set;
 		}
 
 		public string GetUIDByShape( TopoDS_Shape shape )

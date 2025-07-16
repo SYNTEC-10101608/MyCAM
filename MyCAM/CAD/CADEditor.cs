@@ -83,7 +83,6 @@ namespace MyCAM.CAD
 			// user interface
 			m_Viewer = viewer;
 			m_TreeView = treeView;
-			m_CADManager.PartNode = new TreeNode( "Part" );
 			m_TreeView.Nodes.Add( m_CADManager.PartNode );
 
 			// this is to keep highlighted selected node when tree view looses focus
@@ -210,7 +209,6 @@ namespace MyCAM.CAD
 			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Remove( viewObject.AISHandle, false );
 			}
-			m_CADManager.ViewObjectMap.Clear();
 
 			// clear view manager data
 			m_CADManager.ViewObjectMap.Clear();
