@@ -37,7 +37,13 @@
 			this.m_tsmiAddPoint_AcrCenter = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAddPoint_EdgeCenter = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiTransform = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiManualTransform = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmi3PointTransform = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelectFace = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiSelectPath = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiSelPath_AllFace = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiSelPath_SelFace = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiSelPath_Manual = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
@@ -55,8 +61,6 @@
 			this.m_msCAD_SelectFace = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiSelectD1ContFace = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelectFaceOK = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiManualTransform = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmi3PointTransform = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -70,7 +74,8 @@
             this.m_tsmiImport,
             this.m_tsmiAddFeature,
             this.m_tsmiTransform,
-            this.m_tsmiSelectFace});
+            this.m_tsmiSelectFace,
+            this.m_tsmiSelectPath});
 			this.m_msCAD.Location = new System.Drawing.Point(0, 0);
 			this.m_msCAD.Name = "m_msCAD";
 			this.m_msCAD.Size = new System.Drawing.Size(1184, 24);
@@ -90,21 +95,21 @@
 			// m_tsmiImportBRep
 			// 
 			this.m_tsmiImportBRep.Name = "m_tsmiImportBRep";
-			this.m_tsmiImportBRep.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportBRep.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportBRep.Text = "BRep";
 			this.m_tsmiImportBRep.Click += new System.EventHandler(this.m_tsmiImportBRep_Click);
 			// 
 			// m_tsmiImportStep
 			// 
 			this.m_tsmiImportStep.Name = "m_tsmiImportStep";
-			this.m_tsmiImportStep.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportStep.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportStep.Text = "Step";
 			this.m_tsmiImportStep.Click += new System.EventHandler(this.m_tsmiImportStep_Click);
 			// 
 			// m_tsmiImportIges
 			// 
 			this.m_tsmiImportIges.Name = "m_tsmiImportIges";
-			this.m_tsmiImportIges.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportIges.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportIges.Text = "Iges";
 			this.m_tsmiImportIges.Click += new System.EventHandler(this.m_tsmiImportIges_Click);
 			// 
@@ -122,7 +127,7 @@
             this.m_tsmiAddPoint_AcrCenter,
             this.m_tsmiAddPoint_EdgeCenter});
 			this.m_tsmiAddPoint.Name = "m_tsmiAddPoint";
-			this.m_tsmiAddPoint.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiAddPoint.Size = new System.Drawing.Size(110, 22);
 			this.m_tsmiAddPoint.Text = "參考點";
 			// 
 			// m_tsmiAddPoint_AcrCenter
@@ -148,12 +153,57 @@
 			this.m_tsmiTransform.Size = new System.Drawing.Size(43, 20);
 			this.m_tsmiTransform.Text = "轉換";
 			// 
+			// m_tsmiManualTransform
+			// 
+			this.m_tsmiManualTransform.Name = "m_tsmiManualTransform";
+			this.m_tsmiManualTransform.Size = new System.Drawing.Size(122, 22);
+			this.m_tsmiManualTransform.Text = "手動轉換";
+			this.m_tsmiManualTransform.Click += new System.EventHandler(this.m_tsmiManualTransform_Click);
+			// 
+			// m_tsmi3PointTransform
+			// 
+			this.m_tsmi3PointTransform.Name = "m_tsmi3PointTransform";
+			this.m_tsmi3PointTransform.Size = new System.Drawing.Size(122, 22);
+			this.m_tsmi3PointTransform.Text = "三點轉換";
+			this.m_tsmi3PointTransform.Click += new System.EventHandler(this.m_tsmi3PointTransform_Click);
+			// 
 			// m_tsmiSelectFace
 			// 
 			this.m_tsmiSelectFace.Name = "m_tsmiSelectFace";
 			this.m_tsmiSelectFace.Size = new System.Drawing.Size(79, 20);
 			this.m_tsmiSelectFace.Text = "選取特徵面";
 			this.m_tsmiSelectFace.Click += new System.EventHandler(this.m_tsmiSelectFace_Click);
+			// 
+			// m_tsmiSelectPath
+			// 
+			this.m_tsmiSelectPath.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiSelPath_AllFace,
+            this.m_tsmiSelPath_SelFace,
+            this.m_tsmiSelPath_Manual});
+			this.m_tsmiSelectPath.Name = "m_tsmiSelectPath";
+			this.m_tsmiSelectPath.Size = new System.Drawing.Size(67, 20);
+			this.m_tsmiSelectPath.Text = "選取路徑";
+			// 
+			// m_tsmiSelPath_AllFace
+			// 
+			this.m_tsmiSelPath_AllFace.Name = "m_tsmiSelPath_AllFace";
+			this.m_tsmiSelPath_AllFace.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiSelPath_AllFace.Text = "所有面邊界";
+			this.m_tsmiSelPath_AllFace.Click += new System.EventHandler(this.m_tsmiSelPath_AllFace_Click);
+			// 
+			// m_tsmiSelPath_SelFace
+			// 
+			this.m_tsmiSelPath_SelFace.Name = "m_tsmiSelPath_SelFace";
+			this.m_tsmiSelPath_SelFace.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiSelPath_SelFace.Text = "指定面邊界";
+			this.m_tsmiSelPath_SelFace.Click += new System.EventHandler(this.m_tsmiSelPath_SelFace_Click);
+			// 
+			// m_tsmiSelPath_Manual
+			// 
+			this.m_tsmiSelPath_Manual.Name = "m_tsmiSelPath_Manual";
+			this.m_tsmiSelPath_Manual.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiSelPath_Manual.Text = "手動選取";
+			this.m_tsmiSelPath_Manual.Click += new System.EventHandler(this.m_tsmiSelPath_Manual_Click);
 			// 
 			// m_panViewer
 			// 
@@ -298,20 +348,6 @@
 			this.m_tsmiSelectFaceOK.Text = "完成";
 			this.m_tsmiSelectFaceOK.Click += new System.EventHandler(this.m_tsmiSelectFaceOK_Click);
 			// 
-			// m_tsmiManualTransform
-			// 
-			this.m_tsmiManualTransform.Name = "m_tsmiManualTransform";
-			this.m_tsmiManualTransform.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiManualTransform.Text = "手動轉換";
-			this.m_tsmiManualTransform.Click += new System.EventHandler(this.m_tsmiManualTransform_Click);
-			// 
-			// m_tsmi3PointTransform
-			// 
-			this.m_tsmi3PointTransform.Name = "m_tsmi3PointTransform";
-			this.m_tsmi3PointTransform.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmi3PointTransform.Text = "三點轉換";
-			this.m_tsmi3PointTransform.Click += new System.EventHandler(this.m_tsmi3PointTransform_Click);
-			// 
 			// StartupForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -369,6 +405,10 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectFaceOK;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiManualTransform;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmi3PointTransform;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectPath;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelPath_AllFace;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelPath_SelFace;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelPath_Manual;
 	}
 }
 
