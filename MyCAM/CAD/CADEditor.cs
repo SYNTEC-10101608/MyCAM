@@ -2,8 +2,12 @@
 using OCC.IFSelect;
 using OCC.IGESControl;
 using OCC.Quantity;
+using OCC.ShapeAnalysis;
 using OCC.STEPControl;
+using OCC.TopAbs;
+using OCC.TopExp;
 using OCC.TopoDS;
+using OCC.TopTools;
 using OCC.XSControl;
 using OCCTool;
 using OCCViewer;
@@ -82,6 +86,7 @@ namespace MyCAM.CAD
 			m_TreeView = treeView;
 			m_TreeView.Nodes.Add( m_CADManager.PartNode );
 			m_TreeView.Nodes.Add( m_CADManager.ComponentFaceNode );
+			m_TreeView.Nodes.Add( m_CADManager.PathNode );
 
 			// this is to keep highlighted selected node when tree view looses focus
 			m_TreeView.HideSelection = false;
@@ -199,12 +204,37 @@ namespace MyCAM.CAD
 			( (SelectFaceAction)m_CurrentAction ).SelectDone();
 		}
 
+		public void SelectPath_AllFace()
+		{
+			// get path from free boundaries
+			List<TopoDS_Wire> pathWireList = new List<TopoDS_Wire>();
+			TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+			foreach( string szComponentFaceID in m_CADManager.ComponetFaceIDList ) {
+
+				// get one component face
+				TopoDS_Shape oneFace = m_CADManager.ShapeDataMap[ szComponentFaceID ].Shape;
+				ShapeAnalysis_FreeBounds freeBounds = new ShapeAnalysis_FreeBounds( oneFace );
+
+				// add to map
+				TopExp.MapShapesAndAncestors( oneFace, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref edgeFaceMap );
+
+				// get all closed wires
+				TopExp_Explorer wireExp = new TopExp_Explorer( freeBounds.GetClosedWires(), TopAbs_ShapeEnum.TopAbs_WIRE );
+				while( wireExp.More() ) {
+					pathWireList.Add( TopoDS.ToWire( wireExp.Current() ) );
+					wireExp.Next();
+				}
+			}
+			m_CADManager.AddPath( pathWireList, edgeFaceMap );
+		}
+
 		// manager events
 		void OnPartChanged()
 		{
 			// clear the tree view and viewer
 			m_CADManager.PartNode.Nodes.Clear();
 			m_CADManager.ComponentFaceNode.Nodes.Clear();
+			m_CADManager.PathNode.Nodes.Clear();
 			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Remove( viewObject.AISHandle, false );
 			}
@@ -245,11 +275,20 @@ namespace MyCAM.CAD
 				else if( type == EFeatureType.ComponentFace ) {
 					m_CADManager.ComponentFaceNode.Nodes.Add( node );
 				}
+				else if( type == EFeatureType.Path ) {
+					m_CADManager.PathNode.Nodes.Add( node );
+				}
+				else {
+					continue; // unknown type
+				}
 				m_CADManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
 				ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
 				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( shapeData.Shape );
+				if( type == EFeatureType.Path ) {
+					aisShape.SetWidth( 2.0 ); // TEST
+				}
 				m_CADManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false );
 			}
@@ -257,6 +296,7 @@ namespace MyCAM.CAD
 			// update tree view and viewer
 			m_CADManager.PartNode.ExpandAll();
 			m_CADManager.ComponentFaceNode.ExpandAll();
+			m_CADManager.PathNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
 

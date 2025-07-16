@@ -160,7 +160,7 @@ namespace MyCAM
 		// select path
 		void m_tsmiSelPath_AllFace_Click( object sender, EventArgs e )
 		{
-
+			m_CADEditor.SelectPath_AllFace();
 		}
 
 		void m_tsmiSelPath_SelFace_Click( object sender, EventArgs e )

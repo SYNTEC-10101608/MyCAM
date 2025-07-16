@@ -1,9 +1,10 @@
 ﻿using OCC.AIS;
 using OCC.TopAbs;
+using OCC.TopExp;
 using OCC.TopoDS;
+using OCC.TopTools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.CAD
@@ -28,27 +29,28 @@ namespace MyCAM.CAD
 		}
 	}
 
-	internal class PathData
+	internal class PathData : ShapeData
 	{
-		internal class PathFacePair
+		public PathData( string szUID, TopoDS_Shape shapeData, List<PathFacePair> pathElementList )
+			: base( szUID, shapeData )
 		{
-			public TopoDS_Edge PathEdge
-			{
-				get; set;
-			}
-
-			public TopoDS_Face ComponentFace
-			{
-				get; set;
-			}
+			PathElementList = pathElementList;
 		}
 
-		public string UID
+		public List<PathFacePair> PathElementList
+		{
+			get; private set;
+		}
+	}
+
+	internal class PathFacePair
+	{
+		public TopoDS_Edge PathEdge
 		{
 			get; set;
 		}
 
-		public List<PathFacePair> PathElements
+		public TopoDS_Face ComponentFace
 		{
 			get; set;
 		}
@@ -76,11 +78,13 @@ namespace MyCAM.CAD
 		{
 			ShapeDataContainer = new List<ShapeData>();
 			ShapeDataMap = new Dictionary<string, ShapeData>();
-			ComponetFaceID = new HashSet<string>();
+			ComponetFaceIDList = new HashSet<string>();
+			PathIDList = new HashSet<string>();
 
 			// view manager
 			PartNode = new TreeNode( "Part" );
 			ComponentFaceNode = new TreeNode( "Component Face" );
+			PathNode = new TreeNode( "Path" );
 			ViewObjectMap = new Dictionary<string, ViewObject>();
 			TreeNodeMap = new Dictionary<string, TreeNode>();
 		}
@@ -95,7 +99,12 @@ namespace MyCAM.CAD
 			get; private set;
 		}
 
-		public HashSet<string> ComponetFaceID
+		public HashSet<string> ComponetFaceIDList
+		{
+			get; private set;
+		}
+
+		public HashSet<string> PathIDList
 		{
 			get; private set;
 		}
@@ -109,7 +118,8 @@ namespace MyCAM.CAD
 			// clear all datas
 			ResetShapeIDs();
 			ShapeDataMap.Clear();
-			ComponetFaceID.Clear();
+			ComponetFaceIDList.Clear();
+			PathIDList.Clear();
 
 			// update all datas
 			ShapeDataContainer = ArrangeShapeData( newShape );
@@ -122,20 +132,52 @@ namespace MyCAM.CAD
 		public void AddReferenceFeature( TopoDS_Shape newFeature )
 		{
 			string szID = GetNewShapeID( newFeature );
-			ShapeDataContainer.Add( new ShapeData( szID, newFeature ) );
-			ShapeDataMap[ szID ] = new ShapeData( szID, newFeature );
+			ShapeData newData = new ShapeData( szID, newFeature );
+			ShapeDataContainer.Add( newData );
+			ShapeDataMap[ szID ] = newData;
 			FeatureAdded?.Invoke( new List<string>() { szID }, EFeatureType.Reference );
 		}
 
 		public void AddComponentFaceFeature( List<TopoDS_Shape> newFaces )
 		{
+			List<string> newComponetFaceIDList = new List<string>();
 			foreach( var newFace in newFaces ) {
 				string szID = GetNewShapeID( newFace );
-				ShapeDataContainer.Add( new ShapeData( szID, newFace ) );
-				ShapeDataMap[ szID ] = new ShapeData( szID, newFace );
-				ComponetFaceID.Add( szID );
+				ShapeData newData = new ShapeData( szID, newFace );
+				ShapeDataContainer.Add( newData );
+				ShapeDataMap[ szID ] = newData;
+				newComponetFaceIDList.Add( szID );
 			}
-			FeatureAdded?.Invoke( ComponetFaceID.ToList(), EFeatureType.ComponentFace );
+			ComponetFaceIDList.UnionWith( newComponetFaceIDList );
+			FeatureAdded?.Invoke( newComponetFaceIDList, EFeatureType.ComponentFace );
+		}
+
+		public void AddPath( List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape edgeMap )
+		{
+			List<string> newPathIDList = new List<string>();
+			foreach( var pathWire in pathWireList ) {
+				string szID = GetNewShapeID( pathWire );
+
+				// explore the path wire to get edges and component faces
+				TopExp_Explorer exp = new TopExp_Explorer( pathWire, TopAbs_ShapeEnum.TopAbs_EDGE );
+				List<PathFacePair> pathElements = new List<PathFacePair>();
+				while( exp.More() ) {
+					TopoDS_Edge oneEdge = TopoDS.ToEdge( exp.Current() );
+					if( edgeMap.Contains( oneEdge ) && edgeMap.FindFromKey( oneEdge ).Size() != 0 ) {
+						TopoDS_Face oneFace = TopoDS.ToFace( edgeMap.FindFromKey( oneEdge ).First().Ptr );
+						pathElements.Add( new PathFacePair() { PathEdge = oneEdge, ComponentFace = oneFace } );
+					}
+					exp.Next();
+				}
+				if( pathElements.Count > 0 ) {
+					PathData pathData = new PathData( szID, pathWire, pathElements );
+					ShapeDataContainer.Add( pathData );
+					ShapeDataMap[ szID ] = pathData;
+					newPathIDList.Add( szID );
+				}
+			}
+			PathIDList.UnionWith( newPathIDList );
+			FeatureAdded?.Invoke( newPathIDList, EFeatureType.Path );
 		}
 
 		List<ShapeData> ArrangeShapeData( TopoDS_Shape oneShape )
@@ -224,6 +266,11 @@ namespace MyCAM.CAD
 		}
 
 		public TreeNode ComponentFaceNode
+		{
+			get; private set;
+		}
+
+		public TreeNode PathNode
 		{
 			get; private set;
 		}
