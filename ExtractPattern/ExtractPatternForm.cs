@@ -147,8 +147,8 @@ namespace ExtractPattern
 				}
 
 				// create CAD data
-				CADData cadData = new CADData( wire, oneShellMap, oneSolidMap );
-				cadDataList.Add( cadData );
+				//CADData cadData = new CADData( wire, oneShellMap, oneSolidMap );
+				//cadDataList.Add( cadData );
 			}
 			return cadDataList;
 		}

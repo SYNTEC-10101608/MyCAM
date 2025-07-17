@@ -1,4 +1,6 @@
-﻿using OCC.AIS;
+﻿using CAMEdit;
+using DataStructure;
+using OCC.AIS;
 using OCC.IFSelect;
 using OCC.IGESControl;
 using OCC.Quantity;
@@ -228,6 +230,31 @@ namespace MyCAM.CAD
 			m_CADManager.AddPath( pathWireList, edgeFaceMap );
 		}
 
+		public void GoToCAM()
+		{
+			// build CAD data
+			List<CADData> cadDataList = new List<CADData>();
+			foreach( string szID in m_CADManager.PathIDList ) {
+				PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szID ];
+				List<Tuple<TopoDS_Edge, TopoDS_Face>> pathDataList = new List<Tuple<TopoDS_Edge, TopoDS_Face>>();
+				foreach( var pair in pathData.PathElementList ) {
+					pathDataList.Add( new Tuple<TopoDS_Edge, TopoDS_Face>( pair.PathEdge, pair.ComponentFace ) );
+				}
+				CADData cadData = new CADData( TopoDS.ToWire( pathData.Shape ), pathDataList );
+				cadDataList.Add( cadData );
+			}
+
+			// show CAMEditForm
+			CAMEditForm camEditForm = new CAMEditForm();
+			camEditForm.Size = new System.Drawing.Size( 1200, 800 );
+			CAMEditModel camEditModel = new CAMEditModel( m_CADManager.PartShape, cadDataList );
+			camEditForm.Init( camEditModel );
+			camEditForm.ShowDialog();
+			if( camEditForm.DialogResult != DialogResult.OK ) {
+				return;
+			}
+		}
+
 		// manager events
 		void OnPartChanged()
 		{
@@ -343,6 +370,8 @@ namespace MyCAM.CAD
 			// add the read shape to the manager
 			m_CADManager.AddPart( oneShape );
 		}
+
+
 
 		// edit actions
 		void StartEditAction( ICADAction action )

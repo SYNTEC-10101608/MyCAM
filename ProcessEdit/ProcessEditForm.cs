@@ -103,7 +103,7 @@ namespace ProcessEdit
 				// show path contour if it is cutting process
 				if( processData.ProcessType == EProcessType.ProcessType_Cutting ) {
 					CuttingProcessData cuttingData = (CuttingProcessData)processData;
-					AIS_Shape contourAIS = new AIS_Shape( cuttingData.CAMData.CADData.Contour );
+					AIS_Shape contourAIS = new AIS_Shape( cuttingData.CAMData.CADData.PathWire );
 					contourAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
 					contourAIS.SetWidth( 1.5 );
 					m_ProcessList.Add( contourAIS, processData );

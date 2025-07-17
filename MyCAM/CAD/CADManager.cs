@@ -80,6 +80,7 @@ namespace MyCAM.CAD
 			ShapeDataMap = new Dictionary<string, ShapeData>();
 			ComponetFaceIDList = new HashSet<string>();
 			PathIDList = new HashSet<string>();
+			PartShape = null;
 
 			// view manager
 			PartNode = new TreeNode( "Part" );
@@ -109,6 +110,11 @@ namespace MyCAM.CAD
 			get; private set;
 		}
 
+		public TopoDS_Shape PartShape
+		{
+			get; private set;
+		}
+
 		public void AddPart( TopoDS_Shape newShape )
 		{
 			if( newShape == null || newShape.IsNull() ) {
@@ -122,6 +128,7 @@ namespace MyCAM.CAD
 			PathIDList.Clear();
 
 			// update all datas
+			PartShape = newShape;
 			ShapeDataContainer = ArrangeShapeData( newShape );
 			foreach( var shapeData in ShapeDataContainer ) {
 				ShapeDataMap[ shapeData.UID ] = shapeData;

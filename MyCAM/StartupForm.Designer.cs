@@ -61,6 +61,7 @@
 			this.m_msCAD_SelectFace = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiSelectD1ContFace = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelectFaceOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCADOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -75,7 +76,8 @@
             this.m_tsmiAddFeature,
             this.m_tsmiTransform,
             this.m_tsmiSelectFace,
-            this.m_tsmiSelectPath});
+            this.m_tsmiSelectPath,
+            this.m_tsmiCADOK});
 			this.m_msCAD.Location = new System.Drawing.Point(0, 0);
 			this.m_msCAD.Name = "m_msCAD";
 			this.m_msCAD.Size = new System.Drawing.Size(1184, 24);
@@ -187,21 +189,21 @@
 			// m_tsmiSelPath_AllFace
 			// 
 			this.m_tsmiSelPath_AllFace.Name = "m_tsmiSelPath_AllFace";
-			this.m_tsmiSelPath_AllFace.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiSelPath_AllFace.Size = new System.Drawing.Size(134, 22);
 			this.m_tsmiSelPath_AllFace.Text = "所有面邊界";
 			this.m_tsmiSelPath_AllFace.Click += new System.EventHandler(this.m_tsmiSelPath_AllFace_Click);
 			// 
 			// m_tsmiSelPath_SelFace
 			// 
 			this.m_tsmiSelPath_SelFace.Name = "m_tsmiSelPath_SelFace";
-			this.m_tsmiSelPath_SelFace.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiSelPath_SelFace.Size = new System.Drawing.Size(134, 22);
 			this.m_tsmiSelPath_SelFace.Text = "指定面邊界";
 			this.m_tsmiSelPath_SelFace.Click += new System.EventHandler(this.m_tsmiSelPath_SelFace_Click);
 			// 
 			// m_tsmiSelPath_Manual
 			// 
 			this.m_tsmiSelPath_Manual.Name = "m_tsmiSelPath_Manual";
-			this.m_tsmiSelPath_Manual.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiSelPath_Manual.Size = new System.Drawing.Size(134, 22);
 			this.m_tsmiSelPath_Manual.Text = "手動選取";
 			this.m_tsmiSelPath_Manual.Click += new System.EventHandler(this.m_tsmiSelPath_Manual_Click);
 			// 
@@ -348,6 +350,13 @@
 			this.m_tsmiSelectFaceOK.Text = "完成";
 			this.m_tsmiSelectFaceOK.Click += new System.EventHandler(this.m_tsmiSelectFaceOK_Click);
 			// 
+			// m_tsmiCADOK
+			// 
+			this.m_tsmiCADOK.Name = "m_tsmiCADOK";
+			this.m_tsmiCADOK.Size = new System.Drawing.Size(36, 20);
+			this.m_tsmiCADOK.Text = "OK";
+			this.m_tsmiCADOK.Click += new System.EventHandler(this.m_tsmiCADOK_Click);
+			// 
 			// StartupForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -409,6 +418,7 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelPath_AllFace;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelPath_SelFace;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelPath_Manual;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiCADOK;
 	}
 }
 

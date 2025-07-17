@@ -1,32 +1,25 @@
 ﻿using OCC.TopoDS;
-using OCC.TopTools;
+using System;
+using System.Collections.Generic;
 
 namespace DataStructure
 {
 	public class CADData
 	{
-		public CADData( TopoDS_Wire contour,
-			TopTools_IndexedDataMapOfShapeListOfShape shellMap,
-			TopTools_IndexedDataMapOfShapeListOfShape solidMap )
+		public CADData( TopoDS_Wire pathWire, List<Tuple<TopoDS_Edge, TopoDS_Face>> pathDataList )
 		{
-			Contour = contour;
-			ShellMap = shellMap;
-			SolidMap = solidMap;
+			PathWire = pathWire;
+			PathDataList = pathDataList;
 		}
 
-		public TopoDS_Wire Contour
+		public TopoDS_Wire PathWire
 		{
-			get; private set;
+			get; set;
 		}
 
-		public TopTools_IndexedDataMapOfShapeListOfShape ShellMap
+		public List<Tuple<TopoDS_Edge, TopoDS_Face>> PathDataList
 		{
-			get; private set;
-		}
-
-		public TopTools_IndexedDataMapOfShapeListOfShape SolidMap
-		{
-			get; private set;
+			get; set;
 		}
 	}
 }

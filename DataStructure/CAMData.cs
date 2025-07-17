@@ -5,7 +5,6 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.GProp;
 using OCC.TopAbs;
-using OCC.TopExp;
 using OCC.TopoDS;
 using OCCTool;
 using System;
@@ -223,36 +222,15 @@ namespace DataStructure
 		{
 			CADPointList = new List<CADPoint>();
 			EdgeStartIndex = new List<int>();
-			if( CADData == null || CADData.Contour == null ) {
+			if( CADData == null || CADData.PathWire == null || CADData.PathWire.IsNull() ) {
 				return;
 			}
-			TopExp_Explorer edgeExp = new TopExp_Explorer( CADData.Contour, TopAbs_ShapeEnum.TopAbs_EDGE );
 
 			// go through the contour edges
-			while( edgeExp.More() ) {
-				TopoDS_Shape edge = edgeExp.Current();
-				edgeExp.Next();
-
-				// get the solid face which the edge belongs to
-				if( CADData.ShellMap == null || CADData.SolidMap == null ) {
-					continue;
-				}
-				List<TopoDS_Shape> shellFaceList = CADData.ShellMap.FindFromKey( edge ).elementsAsList;
-				List<TopoDS_Shape> solidFaceList = CADData.SolidMap.FindFromKey( edge ).elementsAsList;
-				if( shellFaceList == null || solidFaceList == null ) {
-					continue;
-				}
-				//if( shellFaceList.Count != 1 || solidFaceList.Count != 2 ) {
-				//	throw new System.ArgumentException( ToString() + "BuildToolVecList: Mapping Error" );
-				//}
-				for( int i = 0; i < solidFaceList.Count; i++ ) {
-					if( solidFaceList[ i ].IsEqual( shellFaceList[ 0 ] ) ) {
-						solidFaceList.RemoveAt( i );
-						break;
-					}
-				}
-				TopoDS_Face shellFace = TopoDS.ToFace( shellFaceList[ 0 ] );
-				TopoDS_Face solidFace = solidFaceList.Count == 0 ? null : TopoDS.ToFace( solidFaceList[ 0 ] );
+			for( int i = 0; i < CADData.PathDataList.Count; i++ ) {
+				TopoDS_Edge edge = CADData.PathDataList[ i ].Item1;
+				TopoDS_Face shellFace = CADData.PathDataList[ i ].Item2;
+				TopoDS_Face solidFace = CADData.PathDataList[ i ].Item2;
 
 				// break the edge into segment points by interval
 				const double dSegmentLength = 0.1;

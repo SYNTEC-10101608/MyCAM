@@ -173,6 +173,12 @@ namespace MyCAM
 
 		}
 
+		// go to CAM
+		void m_tsmiCADOK_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.GoToCAM();
+		}
+
 		// process
 		void StartProcess()
 		{
