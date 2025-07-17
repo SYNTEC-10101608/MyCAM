@@ -237,7 +237,6 @@ namespace DataStructure
 				const double dSegmentLength = 0.1;
 				EdgeStartIndex.Add( CADPointList.Count );
 				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, transform, dSegmentLength ) );
-				Console.WriteLine( i );
 			}
 		}
 
