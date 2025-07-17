@@ -170,7 +170,7 @@ namespace MyCAM
 
 		void m_tsmiSelPath_Manual_Click( object sender, EventArgs e )
 		{
-
+			m_CADEditor.StartSelectPath_Manual();
 		}
 
 		// go to CAM

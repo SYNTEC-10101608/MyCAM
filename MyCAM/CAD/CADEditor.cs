@@ -230,6 +230,12 @@ namespace MyCAM.CAD
 			m_CADManager.AddPath( pathWireList, edgeFaceMap );
 		}
 
+		public void StartSelectPath_Manual()
+		{
+			SelectPathAction action = new SelectPathAction( m_Viewer, m_TreeView, m_CADManager );
+			StartEditAction( action );
+		}
+
 		public void GoToCAM()
 		{
 			// build CAD data

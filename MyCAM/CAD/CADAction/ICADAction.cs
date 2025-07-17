@@ -12,6 +12,7 @@ namespace MyCAM.CAD
 		ThreePtTransform = 3,
 		ManualTransform = 4,
 		SelectFace = 5,
+		SelectPath = 6,
 	}
 
 	internal interface ICADAction
