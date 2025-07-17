@@ -228,9 +228,9 @@ namespace DataStructure
 
 			// go through the contour edges
 			for( int i = 0; i < CADData.PathDataList.Count; i++ ) {
-				TopoDS_Edge edge = CADData.PathDataList[ i ].Item1;
-				TopoDS_Face shellFace = CADData.PathDataList[ i ].Item2;
-				TopoDS_Face solidFace = CADData.PathDataList[ i ].Item2;
+				TopoDS_Edge edge = CADData.PathDataList[ i ].PathEdge;
+				TopoDS_Face shellFace = CADData.PathDataList[ i ].ComponentFace;
+				TopoDS_Face solidFace = CADData.PathDataList[ i ].ComponentFace;
 
 				// break the edge into segment points by interval
 				const double dSegmentLength = 0.1;

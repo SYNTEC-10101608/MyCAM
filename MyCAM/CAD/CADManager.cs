@@ -1,4 +1,5 @@
-﻿using OCC.AIS;
+﻿using DataStructure;
+using OCC.AIS;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
@@ -31,28 +32,15 @@ namespace MyCAM.CAD
 
 	internal class PathData : ShapeData
 	{
-		public PathData( string szUID, TopoDS_Shape shapeData, List<PathFacePair> pathElementList )
+		public PathData( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathElementList )
 			: base( szUID, shapeData )
 		{
 			PathElementList = pathElementList;
 		}
 
-		public List<PathFacePair> PathElementList
+		public List<PathEdge5D> PathElementList
 		{
 			get; private set;
-		}
-	}
-
-	internal class PathFacePair
-	{
-		public TopoDS_Edge PathEdge
-		{
-			get; set;
-		}
-
-		public TopoDS_Face ComponentFace
-		{
-			get; set;
 		}
 	}
 
@@ -167,12 +155,12 @@ namespace MyCAM.CAD
 
 				// explore the path wire to get edges and component faces
 				TopExp_Explorer exp = new TopExp_Explorer( pathWire, TopAbs_ShapeEnum.TopAbs_EDGE );
-				List<PathFacePair> pathElements = new List<PathFacePair>();
+				List<PathEdge5D> pathElements = new List<PathEdge5D>();
 				while( exp.More() ) {
 					TopoDS_Edge oneEdge = TopoDS.ToEdge( exp.Current() );
 					if( edgeMap.Contains( oneEdge ) && edgeMap.FindFromKey( oneEdge ).Size() != 0 ) {
 						TopoDS_Face oneFace = TopoDS.ToFace( edgeMap.FindFromKey( oneEdge ).First().Ptr );
-						pathElements.Add( new PathFacePair() { PathEdge = oneEdge, ComponentFace = oneFace } );
+						pathElements.Add( new PathEdge5D() { PathEdge = oneEdge, ComponentFace = oneFace } );
 					}
 					exp.Next();
 				}
