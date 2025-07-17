@@ -236,7 +236,7 @@ namespace MyCAM.CAD
 			List<CADData> cadDataList = new List<CADData>();
 			foreach( string szID in m_CADManager.PathIDList ) {
 				PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szID ];
-				CADData cadData = new CADData( TopoDS.ToWire( pathData.Shape ), pathData.PathElementList );
+				CADData cadData = new CADData( TopoDS.ToWire( pathData.Shape ), pathData.Edge5DList );
 				cadDataList.Add( cadData );
 			}
 

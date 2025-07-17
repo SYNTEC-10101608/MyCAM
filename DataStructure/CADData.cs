@@ -5,14 +5,20 @@ namespace DataStructure
 {
 	public class PathEdge5D
 	{
+		public PathEdge5D( TopoDS_Edge pathEdge, TopoDS_Face componentFace )
+		{
+			PathEdge = pathEdge;
+			ComponentFace = componentFace;
+		}
+
 		public TopoDS_Edge PathEdge
 		{
-			get; set;
+			get; private set;
 		}
 
 		public TopoDS_Face ComponentFace
 		{
-			get; set;
+			get; private set;
 		}
 	}
 
@@ -26,12 +32,12 @@ namespace DataStructure
 
 		public TopoDS_Wire PathWire
 		{
-			get; set;
+			get; private set;
 		}
 
 		public List<PathEdge5D> PathDataList
 		{
-			get; set;
+			get; private set;
 		}
 	}
 }

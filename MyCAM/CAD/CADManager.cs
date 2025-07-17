@@ -30,15 +30,16 @@ namespace MyCAM.CAD
 		}
 	}
 
+	// path data
 	internal class PathData : ShapeData
 	{
 		public PathData( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathElementList )
 			: base( szUID, shapeData )
 		{
-			PathElementList = pathElementList;
+			Edge5DList = pathElementList;
 		}
 
-		public List<PathEdge5D> PathElementList
+		public List<PathEdge5D> Edge5DList
 		{
 			get; private set;
 		}
@@ -98,6 +99,7 @@ namespace MyCAM.CAD
 			get; private set;
 		}
 
+		// TODO: we may dont need this later
 		public TopoDS_Shape PartShape
 		{
 			get; private set;
@@ -108,16 +110,21 @@ namespace MyCAM.CAD
 			if( newShape == null || newShape.IsNull() ) {
 				return;
 			}
+			List<ShapeData> newShapeData = ArrangeShapeData( newShape );
+			if( newShapeData.Count == 0 ) {
+				return; // no valid shape data
+			}
 
 			// clear all datas
 			ResetShapeIDs();
+			ShapeDataContainer.Clear();
 			ShapeDataMap.Clear();
 			ComponetFaceIDList.Clear();
 			PathIDList.Clear();
 
 			// update all datas
 			PartShape = newShape;
-			ShapeDataContainer = ArrangeShapeData( newShape );
+			ShapeDataContainer.AddRange( newShapeData );
 			foreach( var shapeData in ShapeDataContainer ) {
 				ShapeDataMap[ shapeData.UID ] = shapeData;
 			}
@@ -126,51 +133,79 @@ namespace MyCAM.CAD
 
 		public void AddReferenceFeature( TopoDS_Shape newFeature )
 		{
-			string szID = GetNewShapeID( newFeature );
+			if( newFeature == null || newFeature.IsNull() ) {
+				return;
+			}
+			string szID = "Ref_" + GetNewShapeID( newFeature );
 			ShapeData newData = new ShapeData( szID, newFeature );
 			ShapeDataContainer.Add( newData );
 			ShapeDataMap[ szID ] = newData;
 			FeatureAdded?.Invoke( new List<string>() { szID }, EFeatureType.Reference );
 		}
 
-		public void AddComponentFaceFeature( List<TopoDS_Shape> newFaces )
+		public void AddComponentFaceFeature( List<TopoDS_Shape> newFaceList )
 		{
+			if( newFaceList == null || newFaceList.Count == 0 ) {
+				return;
+			}
 			List<string> newComponetFaceIDList = new List<string>();
-			foreach( var newFace in newFaces ) {
-				string szID = GetNewShapeID( newFace );
-				ShapeData newData = new ShapeData( szID, newFace );
+			foreach( var oneNewFace in newFaceList ) {
+				if( oneNewFace == null || oneNewFace.IsNull() ) {
+					continue;
+				}
+				string szID = "ComponentFace_" + GetNewShapeID( oneNewFace );
+				ShapeData newData = new ShapeData( szID, oneNewFace );
 				ShapeDataContainer.Add( newData );
 				ShapeDataMap[ szID ] = newData;
 				newComponetFaceIDList.Add( szID );
 			}
+
+			// add to component face ID list
 			ComponetFaceIDList.UnionWith( newComponetFaceIDList );
 			FeatureAdded?.Invoke( newComponetFaceIDList, EFeatureType.ComponentFace );
 		}
 
-		public void AddPath( List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape edgeMap )
+		// the edge map contains all edges in all wire to be add
+		public void AddPath( List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap )
 		{
+			if( pathWireList == null || pathWireList.Count == 0 || allEdgeMap == null ) {
+				return;
+			}
 			List<string> newPathIDList = new List<string>();
 			foreach( var pathWire in pathWireList ) {
-				string szID = GetNewShapeID( pathWire );
 
 				// explore the path wire to get edges and component faces
 				TopExp_Explorer exp = new TopExp_Explorer( pathWire, TopAbs_ShapeEnum.TopAbs_EDGE );
 				List<PathEdge5D> pathElements = new List<PathEdge5D>();
+				bool isValidPath = true;
 				while( exp.More() ) {
 					TopoDS_Edge oneEdge = TopoDS.ToEdge( exp.Current() );
-					if( edgeMap.Contains( oneEdge ) && edgeMap.FindFromKey( oneEdge ).Size() != 0 ) {
-						TopoDS_Face oneFace = TopoDS.ToFace( edgeMap.FindFromKey( oneEdge ).First().Ptr );
-						pathElements.Add( new PathEdge5D() { PathEdge = oneEdge, ComponentFace = oneFace } );
+
+					// edge not found in the edge map
+					if( !allEdgeMap.Contains( oneEdge ) || allEdgeMap.FindFromKey( oneEdge ).Size() == 0 ) {
+						isValidPath = false;
+						break;
 					}
+
+					// pick the first face from map, and it should be only one face
+					if( allEdgeMap.FindFromKey( oneEdge ).Size() != 1 ) {
+						isValidPath = false;
+						break;
+					}
+					TopoDS_Face oneFace = TopoDS.ToFace( allEdgeMap.FindFromKey( oneEdge ).First().Ptr );
+					pathElements.Add( new PathEdge5D( oneEdge, oneFace ) );
 					exp.Next();
 				}
-				if( pathElements.Count > 0 ) {
+				if( isValidPath ) {
+					string szID = "Path_" + GetNewShapeID( pathWire );
 					PathData pathData = new PathData( szID, pathWire, pathElements );
 					ShapeDataContainer.Add( pathData );
 					ShapeDataMap[ szID ] = pathData;
 					newPathIDList.Add( szID );
 				}
 			}
+
+			// add to path ID list
 			PathIDList.UnionWith( newPathIDList );
 			FeatureAdded?.Invoke( newPathIDList, EFeatureType.Path );
 		}
