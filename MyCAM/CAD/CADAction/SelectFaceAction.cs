@@ -69,16 +69,11 @@ namespace MyCAM.CAD
 
 			// hide all shape
 			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Remove( viewObject.AISHandle, false );
+				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
 			}
 
-			// show transform part and G54 coordinate system
+			// show part for selction
 			ShowPart();
-
-			// activate face selection
-			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
-				m_Viewer.GetAISContext().Activate( faceAISPair.AIS, (int)AISActiveMode.Face );
-			}
 			m_Viewer.UpdateView();
 		}
 
@@ -90,16 +85,15 @@ namespace MyCAM.CAD
 			// enable tree view
 			m_TreeView.Enabled = true;
 
-			// hide part and G54 coordinate system
-			HidePart();
-
 			// show all shape
 			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
-				if( !viewObject.Visible ) {
-					m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
+				if( viewObject.Visible ) {
+					m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
 				}
 			}
+
+			// hide part for selction
+			HidePart();
 			m_Viewer.UpdateView();
 			base.End();
 		}
@@ -110,7 +104,15 @@ namespace MyCAM.CAD
 			if( e.Button == MouseButtons.Left ) {
 
 				// select the face
-				AIS_InteractiveObject ais = m_Viewer.GetAISContext().DetectedInteractive();
+				AIS_InteractiveObject ais = null;
+
+				// the program will crash if nothing detected
+				try {
+					ais = m_Viewer.GetAISContext().DetectedInteractive();
+				}
+				catch {
+					return;
+				}
 				if( ais == null || ais.IsNull() ) {
 					return;
 				}
@@ -242,6 +244,7 @@ namespace MyCAM.CAD
 		{
 			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
 				m_Viewer.GetAISContext().Display( faceAISPair.AIS, false );
+				m_Viewer.GetAISContext().Activate( faceAISPair.AIS, (int)AISActiveMode.Face );
 			}
 		}
 
