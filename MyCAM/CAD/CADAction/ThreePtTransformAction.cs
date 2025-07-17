@@ -1,6 +1,5 @@
 ﻿using OCC.AIS;
 using OCC.BRep;
-using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.Quantity;
 using OCC.TCollection;
@@ -126,7 +125,8 @@ namespace MyCAM.CAD
 					}
 
 					// final transformation
-					TransformPart();
+					TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, m_3PTransform );
+					transformHelper.TransformData();
 					End();
 				}
 			}
@@ -184,23 +184,6 @@ namespace MyCAM.CAD
 			m_3PTransform = new gp_Trsf();
 			m_3PTransform.SetDisplacement( m_3PCoordSys, machineCoordSys );
 			return true;
-		}
-
-		void TransformPart()
-		{
-			foreach( var oneData in m_CADManager.ShapeDataMap ) {
-				BRepBuilderAPI_Transform oneTransform = new BRepBuilderAPI_Transform( oneData.Value.Shape, m_3PTransform );
-				oneData.Value.Shape = oneTransform.Shape();
-				if( m_CADManager.ViewObjectMap.ContainsKey( oneData.Key ) ) {
-					AIS_Shape oneAIS = AIS_Shape.DownCast( m_CADManager.ViewObjectMap[ oneData.Key ].AISHandle );
-					if( oneAIS == null || oneAIS.IsNull() ) {
-						continue;
-					}
-					oneAIS.SetShape( oneData.Value.Shape );
-					m_Viewer.GetAISContext().Redisplay( oneAIS, false );
-				}
-			}
-			m_Viewer.UpdateView();
 		}
 
 		enum EActionStage

@@ -231,15 +231,17 @@ namespace DataStructure
 				TopoDS_Edge edge = CADData.PathDataList[ i ].PathEdge;
 				TopoDS_Face shellFace = CADData.PathDataList[ i ].ComponentFace;
 				TopoDS_Face solidFace = CADData.PathDataList[ i ].ComponentFace;
+				gp_Trsf transform = CADData.InnerTrsf;
 
 				// break the edge into segment points by interval
 				const double dSegmentLength = 0.1;
 				EdgeStartIndex.Add( CADPointList.Count );
-				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, dSegmentLength ) );
+				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, transform, dSegmentLength ) );
+				Console.WriteLine( i );
 			}
 		}
 
-		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace,
+		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace, gp_Trsf transform,
 			double dSegmentLength )
 		{
 			List<CADPoint> result = new List<CADPoint>();
@@ -278,13 +280,13 @@ namespace DataStructure
 				}
 
 				// get solid normal (2nd)
-				gp_Dir normalVec_2nd = new gp_Dir();
-				if( solidFace != null ) {
-					BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, solidFace, U, ref normalVec_2nd );
-					if( solidFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-						normalVec_2nd.Reverse();
-					}
-				}
+				gp_Dir normalVec_2nd = new gp_Dir( normalVec_1st.XYZ() );
+				//if( solidFace != null ) {
+				//	BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, solidFace, U, ref normalVec_2nd );
+				//	if( solidFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				//		normalVec_2nd.Reverse();
+				//	}
+				//}
 
 				// get tangent
 				gp_Vec tangentVec = new gp_Vec();
@@ -293,6 +295,12 @@ namespace DataStructure
 				if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
 					tangentVec.Reverse();
 				}
+
+				// apply the transformation
+				point.Transform( transform );
+				normalVec_1st.Transform( transform );
+				normalVec_2nd.Transform( transform );
+				tangentVec.Transform( transform );
 
 				// build
 				CADPoint cadPoint = new CADPoint( point, normalVec_1st, normalVec_2nd, new gp_Dir( tangentVec ) );

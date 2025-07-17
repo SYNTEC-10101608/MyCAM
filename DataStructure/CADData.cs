@@ -1,4 +1,5 @@
-﻿using OCC.TopoDS;
+﻿using OCC.gp;
+using OCC.TopoDS;
 using System.Collections.Generic;
 
 namespace DataStructure
@@ -24,10 +25,11 @@ namespace DataStructure
 
 	public class CADData
 	{
-		public CADData( TopoDS_Wire pathWire, List<PathEdge5D> pathDataList )
+		public CADData( TopoDS_Wire pathWire, List<PathEdge5D> pathDataList, gp_Trsf innerTrsf )
 		{
 			PathWire = pathWire;
 			PathDataList = pathDataList;
+			InnerTrsf = innerTrsf;
 		}
 
 		public TopoDS_Wire PathWire
@@ -36,6 +38,11 @@ namespace DataStructure
 		}
 
 		public List<PathEdge5D> PathDataList
+		{
+			get; private set;
+		}
+
+		public gp_Trsf InnerTrsf
 		{
 			get; private set;
 		}

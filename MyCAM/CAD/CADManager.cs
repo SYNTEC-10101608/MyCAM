@@ -1,5 +1,7 @@
 ﻿using DataStructure;
 using OCC.AIS;
+using OCC.BRepBuilderAPI;
+using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
@@ -21,12 +23,18 @@ namespace MyCAM.CAD
 
 		public string UID
 		{
-			get; set;
+			get; private set;
 		}
 
 		public TopoDS_Shape Shape
 		{
-			get; set;
+			get; private set;
+		}
+
+		public virtual void DoTransform( gp_Trsf transform )
+		{
+			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
+			Shape = shapeTransform.Shape();
 		}
 	}
 
@@ -43,6 +51,22 @@ namespace MyCAM.CAD
 		{
 			get; private set;
 		}
+
+		public gp_Trsf Transform
+		{
+			get
+			{
+				return m_Trsf;
+			}
+		}
+
+		public override void DoTransform( gp_Trsf transform )
+		{
+			base.DoTransform( transform );
+			m_Trsf.Multiply( transform );
+		}
+
+		gp_Trsf m_Trsf = new gp_Trsf();
 	}
 
 	internal class ViewObject
@@ -102,7 +126,7 @@ namespace MyCAM.CAD
 		// TODO: we may dont need this later
 		public TopoDS_Shape PartShape
 		{
-			get; private set;
+			get; set;
 		}
 
 		public void AddPart( TopoDS_Shape newShape )

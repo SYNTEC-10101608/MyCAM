@@ -341,22 +341,8 @@ namespace MyCAM.CAD
 
 		void ApplyTransform( gp_Trsf trsf )
 		{
-			// transform part shape
-			foreach( var shapeData in m_CADManager.ShapeDataContainer ) {
-				BRepBuilderAPI_Transform oneTransform = new BRepBuilderAPI_Transform( shapeData.Shape, trsf );
-				if( oneTransform.IsDone() ) {
-					shapeData.Shape = oneTransform.Shape();
-				}
-			}
-
-			// update view
-			foreach( var oneObject in m_CADManager.ViewObjectMap ) {
-				AIS_Shape oneAIS = AIS_Shape.DownCast( oneObject.Value.AISHandle );
-				oneAIS.SetShape( m_CADManager.ShapeDataMap[ oneObject.Key ].Shape );
-				m_Viewer.GetAISContext().Redisplay( oneAIS, false );
-			}
-			m_Viewer.GetAISContext().ClearSelected( false );
-			m_Viewer.UpdateView();
+			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, trsf );
+			transformHelper.TransformData();
 		}
 
 		TopoDS_Shape m_G54Shape;

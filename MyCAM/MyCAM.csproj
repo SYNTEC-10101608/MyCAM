@@ -59,6 +59,7 @@
     <Compile Include="CAD\CADAction\DefaultAction.cs" />
     <Compile Include="CAD\CADAction\ICADAction.cs" />
     <Compile Include="CAD\CADAction\ManualTransformAction.cs" />
+    <Compile Include="CAD\CADAction\TransformHelper.cs" />
     <Compile Include="CAD\CADEditor.cs" />
     <Compile Include="CAD\CADManager.cs" />
     <Compile Include="CAD\Dialog\ProgressForm.cs">

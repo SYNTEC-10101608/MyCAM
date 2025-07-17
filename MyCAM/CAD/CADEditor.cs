@@ -236,7 +236,7 @@ namespace MyCAM.CAD
 			List<CADData> cadDataList = new List<CADData>();
 			foreach( string szID in m_CADManager.PathIDList ) {
 				PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szID ];
-				CADData cadData = new CADData( TopoDS.ToWire( pathData.Shape ), pathData.Edge5DList );
+				CADData cadData = new CADData( TopoDS.ToWire( pathData.Shape ), pathData.Edge5DList, pathData.Transform );
 				cadDataList.Add( cadData );
 			}
 
@@ -366,8 +366,6 @@ namespace MyCAM.CAD
 			// add the read shape to the manager
 			m_CADManager.AddPart( oneShape );
 		}
-
-
 
 		// edit actions
 		void StartEditAction( ICADAction action )
