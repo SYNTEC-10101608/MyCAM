@@ -44,6 +44,7 @@
 			this.m_tsmiSelPath_AllFace = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelPath_SelFace = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelPath_Manual = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCADOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
@@ -61,7 +62,6 @@
 			this.m_msCAD_SelectFace = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiSelectD1ContFace = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelectFaceOK = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiCADOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -207,12 +207,19 @@
 			this.m_tsmiSelPath_Manual.Text = "手動選取";
 			this.m_tsmiSelPath_Manual.Click += new System.EventHandler(this.m_tsmiSelPath_Manual_Click);
 			// 
+			// m_tsmiCADOK
+			// 
+			this.m_tsmiCADOK.Name = "m_tsmiCADOK";
+			this.m_tsmiCADOK.Size = new System.Drawing.Size(36, 20);
+			this.m_tsmiCADOK.Text = "OK";
+			this.m_tsmiCADOK.Click += new System.EventHandler(this.m_tsmiCADOK_Click);
+			// 
 			// m_panViewer
 			// 
 			this.m_panViewer.Dock = System.Windows.Forms.DockStyle.Right;
 			this.m_panViewer.Location = new System.Drawing.Point(284, 0);
 			this.m_panViewer.Name = "m_panViewer";
-			this.m_panViewer.Size = new System.Drawing.Size(900, 737);
+			this.m_panViewer.Size = new System.Drawing.Size(900, 761);
 			this.m_panViewer.TabIndex = 1;
 			// 
 			// m_panTreeView
@@ -221,7 +228,7 @@
 			this.m_panTreeView.Dock = System.Windows.Forms.DockStyle.Left;
 			this.m_panTreeView.Location = new System.Drawing.Point(0, 0);
 			this.m_panTreeView.Name = "m_panTreeView";
-			this.m_panTreeView.Size = new System.Drawing.Size(300, 737);
+			this.m_panTreeView.Size = new System.Drawing.Size(300, 761);
 			this.m_panTreeView.TabIndex = 0;
 			// 
 			// m_TreeView
@@ -229,7 +236,7 @@
 			this.m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_TreeView.Location = new System.Drawing.Point(0, 0);
 			this.m_TreeView.Name = "m_TreeView";
-			this.m_TreeView.Size = new System.Drawing.Size(300, 737);
+			this.m_TreeView.Size = new System.Drawing.Size(300, 761);
 			this.m_TreeView.TabIndex = 0;
 			// 
 			// m_panBackGround
@@ -237,9 +244,9 @@
 			this.m_panBackGround.Controls.Add(this.m_panTreeView);
 			this.m_panBackGround.Controls.Add(this.m_panViewer);
 			this.m_panBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panBackGround.Location = new System.Drawing.Point(0, 24);
+			this.m_panBackGround.Location = new System.Drawing.Point(0, 0);
 			this.m_panBackGround.Name = "m_panBackGround";
-			this.m_panBackGround.Size = new System.Drawing.Size(1184, 737);
+			this.m_panBackGround.Size = new System.Drawing.Size(1184, 761);
 			this.m_panBackGround.TabIndex = 0;
 			// 
 			// m_msCAD_Transform
@@ -350,13 +357,6 @@
 			this.m_tsmiSelectFaceOK.Text = "完成";
 			this.m_tsmiSelectFaceOK.Click += new System.EventHandler(this.m_tsmiSelectFaceOK_Click);
 			// 
-			// m_tsmiCADOK
-			// 
-			this.m_tsmiCADOK.Name = "m_tsmiCADOK";
-			this.m_tsmiCADOK.Size = new System.Drawing.Size(36, 20);
-			this.m_tsmiCADOK.Text = "OK";
-			this.m_tsmiCADOK.Click += new System.EventHandler(this.m_tsmiCADOK_Click);
-			// 
 			// StartupForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -364,9 +364,9 @@
 			this.AutoSize = true;
 			this.ClientSize = new System.Drawing.Size(1184, 761);
 			this.Controls.Add(this.m_msCAD_SelectFace);
-			this.Controls.Add(this.m_panBackGround);
 			this.Controls.Add(this.m_msCAD_Transform);
 			this.Controls.Add(this.m_msCAD);
+			this.Controls.Add(this.m_panBackGround);
 			this.MainMenuStrip = this.m_msCAD;
 			this.Name = "StartupForm";
 			this.Text = "五軸切";
