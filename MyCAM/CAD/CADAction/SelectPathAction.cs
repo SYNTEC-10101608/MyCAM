@@ -161,9 +161,6 @@ namespace MyCAM.CAD
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
-			if( e.KeyCode == Keys.Enter ) {
-				SelectDone();
-			}
 		}
 
 		public void SelectDone()

@@ -170,7 +170,16 @@ namespace MyCAM
 
 		void m_tsmiSelPath_Manual_Click( object sender, EventArgs e )
 		{
+			m_msCAD_ManualSelectPath.Visible = true;
+			m_msCAD.Enabled = false;
 			m_CADEditor.StartSelectPath_Manual();
+		}
+
+		void m_tsmiManualSelectPathOK_Click( object sender, EventArgs e )
+		{
+			m_msCAD_ManualSelectPath.Visible = false;
+			m_msCAD.Enabled = true;
+			m_CADEditor.EndSelectPath_Manual();
 		}
 
 		// go to CAM

@@ -236,6 +236,14 @@ namespace MyCAM.CAD
 			StartEditAction( action );
 		}
 
+		public void EndSelectPath_Manual()
+		{
+			if( m_CurrentAction.ActionType != CADActionType.SelectPath ) {
+				return;
+			}
+			( (SelectPathAction)m_CurrentAction ).SelectDone();
+		}
+
 		public void GoToCAM()
 		{
 			// build CAD data
