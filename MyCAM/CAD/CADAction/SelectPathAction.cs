@@ -1,12 +1,14 @@
 ﻿using OCC.AIS;
+using OCC.BRepBuilderAPI;
 using OCC.Quantity;
+using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
+using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.CAD
@@ -30,16 +32,40 @@ namespace MyCAM.CAD
 			: base( viewer, treeView, cadManager )
 		{
 			m_VisibleEdgeAISPairList = new List<EdgeHandle>();
+			m_EdgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+			m_FreeBoundWireList = new List<List<TopoDS_Edge>>();
 			foreach( var oneShapeData in m_CADManager.ShapeDataContainer ) {
 				if( m_CADManager.ViewObjectMap[ oneShapeData.UID ].Visible
 					&& m_CADManager.ComponetFaceIDList.Contains( oneShapeData.UID ) ) {
 
-					// collect all edge
-					TopExp_Explorer exp = new TopExp_Explorer( oneShapeData.Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
-					for( ; exp.More(); exp.Next() ) {
-						TopoDS_Edge edge = TopoDS.ToEdge( exp.Current() );
-						AIS_Shape aisShape = ViewHelper.CreatePartAIS( edge );
-						m_VisibleEdgeAISPairList.Add( new EdgeHandle() { Edge = edge, AIS = aisShape } );
+					// map edge and face
+					TopExp.MapShapesAndAncestors( oneShapeData.Shape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref m_EdgeFaceMap );
+
+					// get free boundary on face
+					ShapeAnalysis_FreeBounds sfb = new ShapeAnalysis_FreeBounds( oneShapeData.Shape );
+					TopoDS_Shape closedWires = sfb.GetClosedWires();
+					if( closedWires.IsNull() ) {
+						continue;
+					}
+
+					// collect all free boundary wires
+					TopExp_Explorer allWireExp = new TopExp_Explorer( closedWires, TopAbs_ShapeEnum.TopAbs_WIRE );
+					for( ; allWireExp.More(); allWireExp.Next() ) {
+						TopoDS_Wire wire = TopoDS.ToWire( allWireExp.Current() );
+						List<TopoDS_Edge> oneFreeBoundWire = new List<TopoDS_Edge>();
+
+						// collect all edge
+						TopExp_Explorer oneWireExp = new TopExp_Explorer( wire, TopAbs_ShapeEnum.TopAbs_EDGE );
+						for( ; oneWireExp.More(); oneWireExp.Next() ) {
+							TopoDS_Edge edge = TopoDS.ToEdge( oneWireExp.Current() );
+							AIS_Shape aisShape = ViewHelper.CreatePartAIS( edge );
+							aisShape.SetWidth( 2.0 );
+							m_VisibleEdgeAISPairList.Add( new EdgeHandle() { Edge = edge, AIS = aisShape } );
+							oneFreeBoundWire.Add( edge );
+						}
+						if( oneFreeBoundWire.Count > 0 ) {
+							m_FreeBoundWireList.Add( oneFreeBoundWire );
+						}
 					}
 				}
 			}
@@ -102,19 +128,17 @@ namespace MyCAM.CAD
 			// TODO: figure how OCCT slect work, dont do shit like this
 			if( e.Button == MouseButtons.Left ) {
 
-				// select the edge
-				AIS_InteractiveObject ais = null;
-
-				// the program will crash if nothing detected
-				try {
-					ais = m_Viewer.GetAISContext().DetectedInteractive();
-				}
-				catch {
+				// the program will crash if nothing detected, so dont use detected interactive API
+				m_Viewer.Select();
+				m_Viewer.GetAISContext().InitSelected();
+				if( !m_Viewer.GetAISContext().MoreSelected() ) {
 					return;
 				}
+				AIS_InteractiveObject ais = m_Viewer.GetAISContext().SelectedInteractive();
 				if( ais == null || ais.IsNull() ) {
 					return;
 				}
+				m_Viewer.GetAISContext().ClearSelected( false );
 
 				// arrange the colors
 				Quantity_Color color = new Quantity_Color();
@@ -123,11 +147,11 @@ namespace MyCAM.CAD
 				// toggle color
 				if( color.Name() == COLOR_DEFAULT ) {
 					ais.SetColor( new Quantity_Color( COLOR_SELECTED ) );
-					ais.SetWidth( 2.0 );
+					ais.SetWidth( 4.0 );
 				}
 				else {
 					ais.SetColor( new Quantity_Color( COLOR_DEFAULT ) );
-					ais.SetWidth( 1.0 );
+					ais.SetWidth( 2.0 );
 				}
 				ais.Attributes().SetFaceBoundaryDraw( true );
 				ais.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
@@ -137,36 +161,89 @@ namespace MyCAM.CAD
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
+			if( e.KeyCode == Keys.Enter ) {
+				SelectDone();
+			}
 		}
 
 		public void SelectDone()
 		{
-			List<TopoDS_Edge> extractedFaceList = GetSelectedEdge();
-			if( extractedFaceList.Count == 0 ) {
+			// get selected edge
+			TopTools_MapOfShape extractedEdgeSet = GetSelectedEdge();
+			if( extractedEdgeSet.Size() == 0 ) {
 				End();
 				return;
 			}
 
-			// sew the faces
-			TopoDS_Shape sewResult = ShapeTool.SewShape( extractedFaceList.Cast<TopoDS_Shape>().ToList() );
-			List<TopoDS_Shape> faceGroupList = new List<TopoDS_Shape>();
-
-			// single shell or single face
-			if( sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL
-				|| sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_FACE ) {
-				faceGroupList.Add( sewResult );
+			// series the selected edge if possible
+			List<List<TopoDS_Edge>> edgeGroupList = new List<List<TopoDS_Edge>>();
+			foreach( var oneFreeBound in m_FreeBoundWireList ) {
+				List<List<TopoDS_Edge>> subWire = FindSubWires( oneFreeBound, extractedEdgeSet );
+				if( subWire.Count > 0 ) {
+					edgeGroupList.AddRange( subWire );
+				}
 			}
 
-			// some shell and free face exist
-			else {
-				foreach( TopoDS_Shape shape in sewResult.elementsAsList ) {
-					faceGroupList.Add( shape );
+			// make wire
+			List<TopoDS_Wire> pathWireList = new List<TopoDS_Wire>();
+			foreach( var oneEdgeGroup in edgeGroupList ) {
+				if( oneEdgeGroup.Count == 0 ) {
+					continue;
+				}
+				BRepBuilderAPI_MakeWire wireMaker = new BRepBuilderAPI_MakeWire();
+				foreach( var oneEdge in oneEdgeGroup ) {
+					wireMaker.Add( oneEdge );
+					if( !wireMaker.IsDone() ) {
+						break;
+					}
+				}
+				if( wireMaker.IsDone() ) {
+					pathWireList.Add( wireMaker.Wire() );
 				}
 			}
 
 			// update datas
-			m_CADManager.AddComponentFaceFeature( faceGroupList );
+			m_CADManager.AddPath( pathWireList, m_EdgeFaceMap );
 			End();
+		}
+
+		public static List<List<TopoDS_Edge>> FindSubWires( List<TopoDS_Edge> wire, TopTools_MapOfShape extractedEdgeSet )
+		{
+			var allSubWires = new List<List<TopoDS_Edge>>();
+			int n = wire.Count;
+			int i = 0;
+
+			while( i < n ) {
+				if( extractedEdgeSet.Contains( wire[ i ] ) ) {
+					var oneSubWire = new List<TopoDS_Edge>();
+					while( i < n && extractedEdgeSet.Contains( wire[ i ] ) ) {
+						oneSubWire.Add( wire[ i ] );
+						i++;
+					}
+					allSubWires.Add( oneSubWire );
+				}
+				else {
+					i++;
+				}
+			}
+
+			// Check for circular join: last run touches end, and first run starts at 0
+			if( allSubWires.Count >= 2 &&
+				extractedEdgeSet.Contains( wire[ 0 ] ) &&
+				extractedEdgeSet.Contains( wire[ n - 1 ] ) ) {
+				var first = allSubWires[ 0 ];
+				var last = allSubWires[ allSubWires.Count - 1 ];
+
+				// Combine last + first
+				var circularWire = new List<TopoDS_Edge>( last );
+				circularWire.AddRange( first );
+
+				// Replace runs
+				allSubWires[ 0 ] = circularWire;
+				allSubWires.RemoveAt( allSubWires.Count - 1 );
+			}
+
+			return allSubWires;
 		}
 
 		void ShowPart()
@@ -184,20 +261,22 @@ namespace MyCAM.CAD
 			}
 		}
 
-		List<TopoDS_Edge> GetSelectedEdge()
+		TopTools_MapOfShape GetSelectedEdge()
 		{
-			List<TopoDS_Edge> selectedFaceList = new List<TopoDS_Edge>();
+			TopTools_MapOfShape selectedEdgeSet = new TopTools_MapOfShape();
 			foreach( var faceAISPair in m_VisibleEdgeAISPairList ) {
 				Quantity_Color color = new Quantity_Color();
 				faceAISPair.AIS.Color( ref color );
 				if( color.Name() == COLOR_SELECTED ) {
-					selectedFaceList.Add( faceAISPair.Edge );
+					selectedEdgeSet.Add( faceAISPair.Edge );
 				}
 			}
-			return selectedFaceList;
+			return selectedEdgeSet;
 		}
 
 		List<EdgeHandle> m_VisibleEdgeAISPairList;
+		TopTools_IndexedDataMapOfShapeListOfShape m_EdgeFaceMap;
+		List<List<TopoDS_Edge>> m_FreeBoundWireList;
 
 		const Quantity_NameOfColor COLOR_SELECTED = Quantity_NameOfColor.Quantity_NOC_RED;
 		const Quantity_NameOfColor COLOR_DEFAULT = Quantity_NameOfColor.Quantity_NOC_GRAY50;

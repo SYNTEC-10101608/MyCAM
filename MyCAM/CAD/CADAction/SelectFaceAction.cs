@@ -103,19 +103,17 @@ namespace MyCAM.CAD
 			// TODO: figure how OCCT slect work, dont do shit like this
 			if( e.Button == MouseButtons.Left ) {
 
-				// select the face
-				AIS_InteractiveObject ais = null;
-
-				// the program will crash if nothing detected
-				try {
-					ais = m_Viewer.GetAISContext().DetectedInteractive();
-				}
-				catch {
+				// the program will crash if nothing detected, so dont use detected interactive API
+				m_Viewer.Select();
+				m_Viewer.GetAISContext().InitSelected();
+				if( !m_Viewer.GetAISContext().MoreSelected() ) {
 					return;
 				}
+				AIS_InteractiveObject ais = m_Viewer.GetAISContext().SelectedInteractive();
 				if( ais == null || ais.IsNull() ) {
 					return;
 				}
+				m_Viewer.GetAISContext().ClearSelected( false );
 
 				// arrange the colors
 				Quantity_Color color = new Quantity_Color();
