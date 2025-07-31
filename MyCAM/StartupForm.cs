@@ -150,28 +150,18 @@ namespace MyCAM
 			m_CADEditor.SelectD1ContFace();
 		}
 
-		void m_tsmiSelectFaceOK_Click( object sender, EventArgs e )
+		// select path
+		void m_tsmiSelPath_FreeBound_Click( object sender, EventArgs e )
 		{
 			m_msCAD_SelectFace.Visible = false;
 			m_msCAD.Enabled = true;
-			m_CADEditor.EndSelectFace();
-		}
-
-		// select path
-		void m_tsmiSelPath_AllFace_Click( object sender, EventArgs e )
-		{
-			m_CADEditor.SelectPath_AllFace();
-		}
-
-		void m_tsmiSelPath_SelFace_Click( object sender, EventArgs e )
-		{
-
+			m_CADEditor.SelectPath_FreeBound();
 		}
 
 		void m_tsmiSelPath_Manual_Click( object sender, EventArgs e )
 		{
+			m_msCAD_SelectFace.Visible = false;
 			m_msCAD_ManualSelectPath.Visible = true;
-			m_msCAD.Enabled = false;
 			m_CADEditor.StartSelectPath_Manual();
 		}
 

@@ -198,23 +198,24 @@ namespace MyCAM.CAD
 			( (SelectFaceAction)m_CurrentAction ).SelectD1ContFace();
 		}
 
-		public void EndSelectFace()
+		public void SelectPath_FreeBound()
 		{
+			// get selected face group from select face action
 			if( m_CurrentAction.ActionType != CADActionType.SelectFace ) {
 				return;
 			}
-			( (SelectFaceAction)m_CurrentAction ).SelectDone();
-		}
+			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
 
-		public void SelectPath_AllFace()
-		{
+			// stay in select face action if no face is selected
+			if( selectedFaceGroupList.Count == 0 ) {
+				return;
+			}
+			m_CurrentAction.End();
+
 			// get path from free boundaries
 			List<TopoDS_Wire> pathWireList = new List<TopoDS_Wire>();
 			TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-			foreach( string szComponentFaceID in m_CADManager.ComponetFaceIDList ) {
-
-				// get one component face
-				TopoDS_Shape oneFace = m_CADManager.ShapeDataMap[ szComponentFaceID ].Shape;
+			foreach( TopoDS_Shape oneFace in selectedFaceGroupList ) {
 				ShapeAnalysis_FreeBounds freeBounds = new ShapeAnalysis_FreeBounds( oneFace );
 
 				// add to map
@@ -232,7 +233,17 @@ namespace MyCAM.CAD
 
 		public void StartSelectPath_Manual()
 		{
-			SelectPathAction action = new SelectPathAction( m_Viewer, m_TreeView, m_CADManager );
+			// get selected face group from select face action
+			if( m_CurrentAction.ActionType != CADActionType.SelectFace ) {
+				return;
+			}
+			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
+
+			// stay in select face action if no face is selected
+			if( selectedFaceGroupList.Count == 0 ) {
+				return;
+			}
+			SelectPathAction action = new SelectPathAction( m_Viewer, m_TreeView, m_CADManager, selectedFaceGroupList );
 			StartEditAction( action );
 		}
 

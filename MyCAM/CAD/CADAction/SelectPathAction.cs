@@ -28,44 +28,58 @@ namespace MyCAM.CAD
 			}
 		}
 
-		public SelectPathAction( Viewer viewer, TreeView treeView, CADManager cadManager )
+		public SelectPathAction( Viewer viewer, TreeView treeView, CADManager cadManager, List<TopoDS_Shape> faceGroupList )
 			: base( viewer, treeView, cadManager )
 		{
-			m_VisibleEdgeAISPairList = new List<EdgeHandle>();
+			// get face group list from select face action
+			if( faceGroupList == null || faceGroupList.Count == 0 ) {
+				m_FaceGroupList = new List<TopoDS_Shape>();
+			}
+			else {
+				m_FaceGroupList = faceGroupList;
+			}
+
+			// init data
 			m_EdgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+			m_EdgeAISPairList = new List<EdgeHandle>();
 			m_FreeBoundWireList = new List<List<TopoDS_Edge>>();
-			foreach( var oneShapeData in m_CADManager.ShapeDataContainer ) {
-				if( m_CADManager.ViewObjectMap[ oneShapeData.UID ].Visible
-					&& m_CADManager.ComponetFaceIDList.Contains( oneShapeData.UID ) ) {
+			m_FaceGroupAISList = new List<AIS_Shape>();
 
-					// map edge and face
-					TopExp.MapShapesAndAncestors( oneShapeData.Shape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref m_EdgeFaceMap );
+			// collect all free boundary from face group
+			foreach( var oneShape in m_FaceGroupList ) {
 
-					// get free boundary on face
-					ShapeAnalysis_FreeBounds sfb = new ShapeAnalysis_FreeBounds( oneShapeData.Shape );
-					TopoDS_Shape closedWires = sfb.GetClosedWires();
-					if( closedWires.IsNull() ) {
-						continue;
+				// create face AIS
+				AIS_Shape faceAIS = ViewHelper.CreatePartAIS( oneShape );
+				faceAIS.Attributes().SetFaceBoundaryDraw( false );
+				m_FaceGroupAISList.Add( faceAIS );
+
+				// map edge and face
+				TopExp.MapShapesAndAncestors( oneShape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref m_EdgeFaceMap );
+
+				// get free boundary on face
+				ShapeAnalysis_FreeBounds sfb = new ShapeAnalysis_FreeBounds( oneShape );
+				TopoDS_Shape closedWires = sfb.GetClosedWires();
+				if( closedWires.IsNull() ) {
+					continue;
+				}
+
+				// collect all free boundary wires
+				TopExp_Explorer allWireExp = new TopExp_Explorer( closedWires, TopAbs_ShapeEnum.TopAbs_WIRE );
+				for( ; allWireExp.More(); allWireExp.Next() ) {
+					TopoDS_Wire wire = TopoDS.ToWire( allWireExp.Current() );
+					List<TopoDS_Edge> oneFreeBoundWire = new List<TopoDS_Edge>();
+
+					// collect all edge
+					TopExp_Explorer oneWireExp = new TopExp_Explorer( wire, TopAbs_ShapeEnum.TopAbs_EDGE );
+					for( ; oneWireExp.More(); oneWireExp.Next() ) {
+						TopoDS_Edge edge = TopoDS.ToEdge( oneWireExp.Current() );
+						AIS_Shape aisShape = ViewHelper.CreatePartAIS( edge );
+						aisShape.SetWidth( 2.0 );
+						m_EdgeAISPairList.Add( new EdgeHandle() { Edge = edge, AIS = aisShape } );
+						oneFreeBoundWire.Add( edge );
 					}
-
-					// collect all free boundary wires
-					TopExp_Explorer allWireExp = new TopExp_Explorer( closedWires, TopAbs_ShapeEnum.TopAbs_WIRE );
-					for( ; allWireExp.More(); allWireExp.Next() ) {
-						TopoDS_Wire wire = TopoDS.ToWire( allWireExp.Current() );
-						List<TopoDS_Edge> oneFreeBoundWire = new List<TopoDS_Edge>();
-
-						// collect all edge
-						TopExp_Explorer oneWireExp = new TopExp_Explorer( wire, TopAbs_ShapeEnum.TopAbs_EDGE );
-						for( ; oneWireExp.More(); oneWireExp.Next() ) {
-							TopoDS_Edge edge = TopoDS.ToEdge( oneWireExp.Current() );
-							AIS_Shape aisShape = ViewHelper.CreatePartAIS( edge );
-							aisShape.SetWidth( 2.0 );
-							m_VisibleEdgeAISPairList.Add( new EdgeHandle() { Edge = edge, AIS = aisShape } );
-							oneFreeBoundWire.Add( edge );
-						}
-						if( oneFreeBoundWire.Count > 0 ) {
-							m_FreeBoundWireList.Add( oneFreeBoundWire );
-						}
+					if( oneFreeBoundWire.Count > 0 ) {
+						m_FreeBoundWireList.Add( oneFreeBoundWire );
 					}
 				}
 			}
@@ -89,16 +103,13 @@ namespace MyCAM.CAD
 			// disable tree view
 			m_TreeView.Enabled = false;
 
-			// deactivate all shape and hide non-component-face shape
-			foreach( var viewObject in m_CADManager.ViewObjectMap ) {
-				m_Viewer.GetAISContext().Deactivate( viewObject.Value.AISHandle );
-				if( !m_CADManager.ComponetFaceIDList.Contains( viewObject.Key ) ) {
-					m_Viewer.GetAISContext().Erase( viewObject.Value.AISHandle, false );
-				}
+			// hide all shape
+			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
 			}
 
-			// show part for selction
-			ShowPart();
+			// show element for selction
+			ShowElement();
 			m_Viewer.UpdateView();
 		}
 
@@ -117,8 +128,8 @@ namespace MyCAM.CAD
 				}
 			}
 
-			// hide part for selection
-			HidePart();
+			// hide element for selection
+			HideElement();
 			m_Viewer.UpdateView();
 			base.End();
 		}
@@ -243,25 +254,32 @@ namespace MyCAM.CAD
 			return allSubWires;
 		}
 
-		void ShowPart()
+		void ShowElement()
 		{
-			foreach( var faceAISPair in m_VisibleEdgeAISPairList ) {
-				m_Viewer.GetAISContext().Display( faceAISPair.AIS, false );
-				m_Viewer.GetAISContext().Activate( faceAISPair.AIS, (int)AISActiveMode.Edge );
+			foreach( var faceAIS in m_FaceGroupAISList ) {
+				m_Viewer.GetAISContext().Display( faceAIS, false );
+				m_Viewer.GetAISContext().Deactivate( faceAIS );
+			}
+			foreach( var edgeAISPair in m_EdgeAISPairList ) {
+				m_Viewer.GetAISContext().Display( edgeAISPair.AIS, false );
+				m_Viewer.GetAISContext().Activate( edgeAISPair.AIS, (int)AISActiveMode.Edge );
 			}
 		}
 
-		void HidePart()
+		void HideElement()
 		{
-			foreach( var faceAISPair in m_VisibleEdgeAISPairList ) {
-				m_Viewer.GetAISContext().Remove( faceAISPair.AIS, false );
+			foreach( var faceAIS in m_FaceGroupAISList ) {
+				m_Viewer.GetAISContext().Remove( faceAIS, false );
+			}
+			foreach( var edgeAISPair in m_EdgeAISPairList ) {
+				m_Viewer.GetAISContext().Remove( edgeAISPair.AIS, false );
 			}
 		}
 
 		TopTools_MapOfShape GetSelectedEdge()
 		{
 			TopTools_MapOfShape selectedEdgeSet = new TopTools_MapOfShape();
-			foreach( var faceAISPair in m_VisibleEdgeAISPairList ) {
+			foreach( var faceAISPair in m_EdgeAISPairList ) {
 				Quantity_Color color = new Quantity_Color();
 				faceAISPair.AIS.Color( ref color );
 				if( color.Name() == COLOR_SELECTED ) {
@@ -271,9 +289,11 @@ namespace MyCAM.CAD
 			return selectedEdgeSet;
 		}
 
-		List<EdgeHandle> m_VisibleEdgeAISPairList;
+		List<TopoDS_Shape> m_FaceGroupList;
 		TopTools_IndexedDataMapOfShapeListOfShape m_EdgeFaceMap;
+		List<EdgeHandle> m_EdgeAISPairList;
 		List<List<TopoDS_Edge>> m_FreeBoundWireList;
+		List<AIS_Shape> m_FaceGroupAISList;
 
 		const Quantity_NameOfColor COLOR_SELECTED = Quantity_NameOfColor.Quantity_NOC_RED;
 		const Quantity_NameOfColor COLOR_DEFAULT = Quantity_NameOfColor.Quantity_NOC_GRAY50;

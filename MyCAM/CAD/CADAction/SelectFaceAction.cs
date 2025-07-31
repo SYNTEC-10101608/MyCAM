@@ -208,17 +208,16 @@ namespace MyCAM.CAD
 			m_Viewer.UpdateView();
 		}
 
-		public void SelectDone()
+		public List<TopoDS_Shape> GetResult()
 		{
 			List<TopoDS_Face> extractedFaceList = GetSelectedFace();
+			List<TopoDS_Shape> faceGroupList = new List<TopoDS_Shape>();
 			if( extractedFaceList.Count == 0 ) {
-				End();
-				return;
+				return faceGroupList;
 			}
 
 			// sew the faces
 			TopoDS_Shape sewResult = ShapeTool.SewShape( extractedFaceList.Cast<TopoDS_Shape>().ToList() );
-			List<TopoDS_Shape> faceGroupList = new List<TopoDS_Shape>();
 
 			// single shell or single face
 			if( sewResult.shapeType == TopAbs_ShapeEnum.TopAbs_SHELL
@@ -232,10 +231,7 @@ namespace MyCAM.CAD
 					faceGroupList.Add( shape );
 				}
 			}
-
-			// update datas
-			m_CADManager.AddComponentFaceFeature( faceGroupList );
-			End();
+			return faceGroupList;
 		}
 
 		void ShowPart()
