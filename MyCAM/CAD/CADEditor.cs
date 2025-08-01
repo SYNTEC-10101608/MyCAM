@@ -205,14 +205,12 @@ namespace MyCAM.CAD
 				return;
 			}
 			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
-
-			// stay in select face action if no face is selected
-			if( selectedFaceGroupList.Count == 0 ) {
-				return;
-			}
 			m_CurrentAction.End();
 
 			// get path from free boundaries
+			if( selectedFaceGroupList.Count == 0 ) {
+				return;
+			}
 			List<TopoDS_Wire> pathWireList = new List<TopoDS_Wire>();
 			TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
 			foreach( TopoDS_Shape oneFace in selectedFaceGroupList ) {
@@ -239,8 +237,9 @@ namespace MyCAM.CAD
 			}
 			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
 
-			// stay in select face action if no face is selected
+			// end all actions if no face is selected
 			if( selectedFaceGroupList.Count == 0 ) {
+				m_CurrentAction.End();
 				return;
 			}
 			SelectPathAction action = new SelectPathAction( m_Viewer, m_TreeView, m_CADManager, selectedFaceGroupList );
