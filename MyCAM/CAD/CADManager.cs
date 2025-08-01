@@ -104,6 +104,7 @@ namespace MyCAM.CAD
 			TreeNodeMap = new Dictionary<string, TreeNode>();
 		}
 
+		// TODO: it is not good to giving out the pointer of field
 		public List<ShapeData> ShapeDataContainer
 		{
 			get; private set;
