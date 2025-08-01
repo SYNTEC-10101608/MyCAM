@@ -6,7 +6,6 @@ using OCC.gp;
 using OCC.GProp;
 using OCC.TopAbs;
 using OCC.TopoDS;
-using OCCTool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -142,21 +141,6 @@ namespace DataStructure
 			}
 		}
 
-		public double Offset
-		{
-			get
-			{
-				return m_Offset;
-			}
-			set
-			{
-				if( m_Offset != value ) {
-					m_Offset = value;
-					m_IsDirty = true;
-				}
-			}
-		}
-
 		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg )
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
@@ -200,7 +184,6 @@ namespace DataStructure
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsReverse = false;
 		int m_StartPoint = 0;
-		double m_Offset = 0;
 
 		// dirty flag
 		bool m_IsDirty = false;
@@ -302,8 +285,6 @@ namespace DataStructure
 			SetToolVec();
 			SetStartPoint();
 			SetOrientation();
-			DoOffset();
-			//SetLead();
 		}
 
 		void SetToolVec()
@@ -411,151 +392,6 @@ namespace DataStructure
 				m_CAMPointList.Remove( lastPoint );
 				m_CAMPointList.Insert( 0, lastPoint );
 			}
-		}
-
-		class LineRecord
-		{
-			public Tuple<CAMPoint, CAMPoint> OriPoint;
-			public Tuple<CAMPoint, CAMPoint> OffsetPoint;
-		}
-
-		void DoOffset()
-		{
-			if( m_CAMPointList.Count == 0 || m_Offset == 0 ) {
-				return;
-			}
-
-			// get line by points and offset the line
-			List<LineRecord> lineRecordList = new List<LineRecord>();
-			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
-				int i1 = i;
-				int i2 = ( i + 1 ) % m_CAMPointList.Count;
-				gp_Pnt p1 = m_CAMPointList[ i ].CADPoint.Point;
-				gp_Pnt p2 = m_CAMPointList[ i2 ].CADPoint.Point;
-
-				// if p1 is equal to p2, skip, this will result a "milter"
-				if( p1.IsEqual( p2, 1e-6 ) ) {
-					continue;
-				}
-
-				// calculate the offset direction by cross of tangent and tool vector
-				gp_Dir p1OffsetDir = m_CAMPointList[ i ].CADPoint.TangentVec.Crossed( m_CAMPointList[ i ].ToolVec );
-				gp_Dir p2OffsetDir = m_CAMPointList[ i2 ].CADPoint.TangentVec.Crossed( m_CAMPointList[ i2 ].ToolVec );
-
-				// offset the point by offset vector
-				gp_Pnt p1Offset = new gp_Pnt( p1.XYZ() + p1OffsetDir.XYZ() * Offset );
-				gp_Pnt p2Offset = new gp_Pnt( p2.XYZ() + p2OffsetDir.XYZ() * Offset );
-				if( p1Offset.IsEqual( p2Offset, 1e-6 ) ) {
-					continue;
-				}
-				CAMPoint p1CAMOffset = new CAMPoint( OffsetCADPoint( m_CAMPointList[ i ].CADPoint, p1Offset ), m_CAMPointList[ i ].ToolVec );
-				CAMPoint p2CAMOffset = new CAMPoint( OffsetCADPoint( m_CAMPointList[ i2 ].CADPoint, p2Offset ), m_CAMPointList[ i2 ].ToolVec );
-				lineRecordList.Add( new LineRecord()
-				{
-					OriPoint = new Tuple<CAMPoint, CAMPoint>( m_CAMPointList[ i ], m_CAMPointList[ i2 ] ),
-					OffsetPoint = new Tuple<CAMPoint, CAMPoint>( p1CAMOffset, p2CAMOffset )
-				} );
-			}
-			if( lineRecordList.Count == 0 ) {
-				return;
-			}
-
-			// clip the self-intersecting lines
-			List<CAMPoint> offsetCAMPointList = new List<CAMPoint>();
-			for( int i = 0; i < lineRecordList.Count + 1; i++ ) {
-				bool bClip = true;
-				while( bClip ) {
-					if( lineRecordList.Count == 0 ) {
-						return;
-					}
-					bClip = false;
-					bool wraped = false;
-					if( i == lineRecordList.Count - 1 ) {
-						wraped = true;
-					}
-					LineRecord lineRecord1 = lineRecordList[ ( i + lineRecordList.Count ) % lineRecordList.Count ];
-					LineRecord lineRecord2 = lineRecordList[ ( i + 1 + lineRecordList.Count ) % lineRecordList.Count ];
-					Tuple<CAMPoint, CAMPoint> offsetLine1 = lineRecord1.OffsetPoint;
-					Tuple<CAMPoint, CAMPoint> offsetLine2 = lineRecord2.OffsetPoint;
-
-					// find the intersect point of the offset lines
-					GeometryTool.FindIntersectPoint(
-						offsetLine1.Item1.CADPoint.Point,
-						offsetLine1.Item2.CADPoint.Point,
-						offsetLine2.Item2.CADPoint.Point,
-						offsetLine2.Item1.CADPoint.Point,
-						out IntersectType typeL1, out IntersectType typeL2 );
-					if( typeL1 == IntersectType.ReverseExtend ) {
-						bClip = true;
-						lineRecordList.Remove( lineRecord1 );
-
-						// if the removed index is wraped, the index should be decreased
-						if( wraped ) {
-							i--;
-						}
-					}
-					else {
-					}
-					if( typeL2 == IntersectType.ReverseExtend ) {
-						bClip = true;
-						lineRecordList.Remove( lineRecord2 );
-						i--;
-
-						// if the removed index is wraped, the index should be decreased
-						if( wraped ) {
-							i--;
-						}
-					}
-					else {
-					}
-				}
-			}
-
-			// cant construct a loop
-			if( lineRecordList.Count < 3 ) {
-				return;
-			}
-
-			// serialize the offset lines
-			for( int i = 0; i < lineRecordList.Count; i++ ) {
-				int indexL1 = i;
-				int indexL2 = ( i + 1 ) % lineRecordList.Count;
-				gp_Pnt intersectPoint = GeometryTool.FindIntersectPoint(
-					lineRecordList[ indexL1 ].OffsetPoint.Item1.CADPoint.Point,
-					lineRecordList[ indexL1 ].OffsetPoint.Item2.CADPoint.Point,
-					lineRecordList[ indexL2 ].OffsetPoint.Item2.CADPoint.Point,
-					lineRecordList[ indexL2 ].OffsetPoint.Item1.CADPoint.Point,
-					out _, out _ );
-
-				// get average tagent, normal and tool vector
-				gp_Dir tangentVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.CADPoint.TangentVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.CADPoint.TangentVec.XYZ() );
-				gp_Dir normalVec_1st = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.CADPoint.NormalVec_1st.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.CADPoint.NormalVec_1st.XYZ() );
-				gp_Dir normalVec_2nd = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.CADPoint.NormalVec_2nd.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.CADPoint.NormalVec_2nd.XYZ() );
-				gp_Dir toolVec = new gp_Dir( lineRecordList[ indexL1 ].OriPoint.Item2.ToolVec.XYZ() + lineRecordList[ indexL2 ].OriPoint.Item1.ToolVec.XYZ() );
-				offsetCAMPointList.Add( new CAMPoint( new CADPoint( intersectPoint, normalVec_1st, normalVec_2nd, tangentVec ), toolVec ) );
-			}
-
-			// modify index
-			CAMPoint lastPoint = offsetCAMPointList.Last();
-			offsetCAMPointList.Remove( lastPoint );
-			offsetCAMPointList.Insert( 0, lastPoint );
-
-			// add a point to close polygon
-			CAMPoint closePoint = new CAMPoint(
-				new CADPoint( lastPoint.CADPoint.Point,
-				lastPoint.CADPoint.NormalVec_1st,
-				lastPoint.CADPoint.NormalVec_2nd,
-				lastPoint.CADPoint.TangentVec ), lastPoint.ToolVec );
-			offsetCAMPointList.Add( closePoint );
-			m_CAMPointList = offsetCAMPointList;
-		}
-
-		CADPoint OffsetCADPoint( CADPoint originalPoint, gp_Pnt newLocation )
-		{
-			return new CADPoint( newLocation,
-				originalPoint.NormalVec_1st,
-				originalPoint.NormalVec_2nd,
-				originalPoint.TangentVec );
 		}
 	}
 }

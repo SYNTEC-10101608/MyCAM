@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using OCC.StlAPI;
 
 namespace CAMEdit
 {
@@ -389,21 +388,6 @@ namespace CAMEdit
 				return;
 			}
 			camData.IsReverse = !camData.IsReverse;
-			ShowCAMData();
-		}
-
-		void m_tsmiOffset_Click( object sender, EventArgs e )
-		{
-			GetSelectedWireInfo( out CAMData camData, out _ );
-			if( camData == null ) {
-				return;
-			}
-			if( camData.Offset == 0 ) {
-				camData.Offset = 2;
-			}
-			else {
-				camData.Offset = 0;
-			}
 			ShowCAMData();
 		}
 
@@ -802,7 +786,6 @@ namespace CAMEdit
 		{
 			m_tsmiStartPoint.Enabled = true;
 			m_tsmiReverse.Enabled = true;
-			m_tsmiOffset.Enabled = true;
 			m_tsmiToolVec.Enabled = true;
 			m_tsmiLead.Enabled = true;
 			m_tsmiMoveUp.Enabled = true;
@@ -814,7 +797,6 @@ namespace CAMEdit
 		{
 			m_tsmiStartPoint.Enabled = false;
 			m_tsmiReverse.Enabled = false;
-			m_tsmiOffset.Enabled = false;
 			m_tsmiToolVec.Enabled = false;
 			m_tsmiLead.Enabled = false;
 			m_tsmiMoveUp.Enabled = false;
