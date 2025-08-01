@@ -13,13 +13,6 @@ using System.Linq;
 
 namespace DataStructure
 {
-	public enum ToolVectorType
-	{
-		Default,
-		Intersecting,
-		TowardZ,
-	}
-
 	public class CADPoint
 	{
 		public CADPoint( gp_Pnt point, gp_Dir normalVec_1st, gp_Dir normalVec_2nd, gp_Dir tangentVec )
@@ -209,12 +202,6 @@ namespace DataStructure
 		int m_StartPoint = 0;
 		double m_Offset = 0;
 
-		// CADCAM index map
-		Dictionary<int, int> m_IndexMap = new Dictionary<int, int>();
-
-		// intersecting direction
-		gp_Dir m_IntersectingDir = new gp_Dir( 0, 0, 1 );
-
 		// dirty flag
 		bool m_IsDirty = false;
 
@@ -370,19 +357,6 @@ namespace DataStructure
 					m_CAMPointList[ j % m_CAMPointList.Count ] = new CAMPoint( m_CAMPointList[ j % m_CAMPointList.Count ].CADPoint, toolVec );
 				}
 			}
-		}
-
-		gp_Quaternion GetQuaternionFromAB( CAMPoint camPoint, double dRA_rad, double dRB_rad )
-		{
-			// TDOD: RA == 0 || RB == 0
-			if( dRA_rad == 0 && dRB_rad == 0 ) {
-				return new gp_Quaternion();
-			}
-
-			// get the quaternion
-			gp_Vec v0 = new gp_Vec( camPoint.ToolVec );
-			gp_Vec v1 = GetVecFromAB( camPoint, dRA_rad, dRB_rad );
-			return new gp_Quaternion( v0, v1 );
 		}
 
 		gp_Vec GetVecFromAB( CAMPoint camPoint, double dRA_rad, double dRB_rad )
@@ -582,11 +556,6 @@ namespace DataStructure
 				originalPoint.NormalVec_1st,
 				originalPoint.NormalVec_2nd,
 				originalPoint.TangentVec );
-		}
-
-		void SetLead()
-		{
-
 		}
 	}
 }
