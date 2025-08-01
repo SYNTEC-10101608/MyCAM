@@ -84,7 +84,6 @@ namespace DataStructure
 
 			// build raw data
 			BuildCADPointList();
-			//GetIntersectingDir();
 			BuildCAMPointList();
 		}
 
@@ -192,7 +191,7 @@ namespace DataStructure
 		{
 			CADPointList = new List<CADPoint>();
 			EdgeStartIndex = new List<int>();
-			if( CADData == null || CADData.PathWire == null || CADData.PathWire.IsNull() ) {
+			if( CADData == null ) {
 				return;
 			}
 
@@ -200,11 +199,11 @@ namespace DataStructure
 			for( int i = 0; i < CADData.PathDataList.Count; i++ ) {
 				TopoDS_Edge edge = CADData.PathDataList[ i ].PathEdge;
 				TopoDS_Face shellFace = CADData.PathDataList[ i ].ComponentFace;
-				TopoDS_Face solidFace = CADData.PathDataList[ i ].ComponentFace;
+				TopoDS_Face solidFace = CADData.PathDataList[ i ].ComponentFace; // TODO: set solid face
 				gp_Trsf transform = CADData.InnerTrsf;
 
 				// break the edge into segment points by interval
-				const double dSegmentLength = 0.1;
+				const double dSegmentLength = 0.01;
 				EdgeStartIndex.Add( CADPointList.Count );
 				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, transform, dSegmentLength ) );
 			}
@@ -235,6 +234,8 @@ namespace DataStructure
 
 			// get increment value
 			double dIncrement = ( dEndU - dStartU ) / nSegments;
+
+			// TODO: this is equal U but not equal length
 			for( int i = 0; i < nSegments; i++ ) {
 				double U = dStartU + dIncrement * i;
 
@@ -248,14 +249,8 @@ namespace DataStructure
 					normalVec_1st.Reverse();
 				}
 
-				// get solid normal (2nd)
+				// TODO: get solid normal (2nd)
 				gp_Dir normalVec_2nd = new gp_Dir( normalVec_1st.XYZ() );
-				//if( solidFace != null ) {
-				//	BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, solidFace, U, ref normalVec_2nd );
-				//	if( solidFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-				//		normalVec_2nd.Reverse();
-				//	}
-				//}
 
 				// get tangent
 				gp_Vec tangentVec = new gp_Vec();
@@ -293,7 +288,6 @@ namespace DataStructure
 
 				// calculate tool vector
 				CADPoint cadPoint = CADPointList[ i ];
-				//gp_Dir toolVec = cadPoint.NormalVec_2nd.Crossed( cadPoint.TangentVec );
 				CAMPoint camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st );
 				m_CAMPointList.Add( camPoint );
 			}
