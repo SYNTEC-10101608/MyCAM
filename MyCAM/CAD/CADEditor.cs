@@ -43,8 +43,7 @@ namespace MyCAM.CAD
 	public enum EFeatureType
 	{
 		Reference = 0,
-		ComponentFace = 1,
-		Path = 2,
+		Path = 1,
 	}
 
 	internal static class ViewHelper
@@ -87,7 +86,6 @@ namespace MyCAM.CAD
 			m_Viewer = viewer;
 			m_TreeView = treeView;
 			m_TreeView.Nodes.Add( m_CADManager.PartNode );
-			m_TreeView.Nodes.Add( m_CADManager.ComponentFaceNode );
 			m_TreeView.Nodes.Add( m_CADManager.PathNode );
 
 			// this is to keep highlighted selected node when tree view looses focus
@@ -280,7 +278,6 @@ namespace MyCAM.CAD
 		{
 			// clear the tree view and viewer
 			m_CADManager.PartNode.Nodes.Clear();
-			m_CADManager.ComponentFaceNode.Nodes.Clear();
 			m_CADManager.PathNode.Nodes.Clear();
 			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Remove( viewObject.AISHandle, false );
@@ -319,9 +316,6 @@ namespace MyCAM.CAD
 				if( type == EFeatureType.Reference ) {
 					m_CADManager.PartNode.Nodes.Add( node );
 				}
-				else if( type == EFeatureType.ComponentFace ) {
-					m_CADManager.ComponentFaceNode.Nodes.Add( node );
-				}
 				else if( type == EFeatureType.Path ) {
 					m_CADManager.PathNode.Nodes.Add( node );
 				}
@@ -334,7 +328,7 @@ namespace MyCAM.CAD
 				ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
 				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( shapeData.Shape );
 				if( type == EFeatureType.Path ) {
-					aisShape.SetWidth( 2.0 ); // TEST
+					aisShape.SetWidth( 2.0 ); // TODO: this should be done by AIS maker
 				}
 				m_CADManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false );
@@ -342,7 +336,6 @@ namespace MyCAM.CAD
 
 			// update tree view and viewer
 			m_CADManager.PartNode.ExpandAll();
-			m_CADManager.ComponentFaceNode.ExpandAll();
 			m_CADManager.PathNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
