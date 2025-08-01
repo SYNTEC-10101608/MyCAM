@@ -39,7 +39,7 @@ namespace MyCAM.CAD
 					TopExp_Explorer exp = new TopExp_Explorer( oneShapeData.Shape, TopAbs_ShapeEnum.TopAbs_FACE );
 					for( ; exp.More(); exp.Next() ) {
 						TopoDS_Face face = TopoDS.ToFace( exp.Current() );
-						AIS_Shape aisShape = ViewHelper.CreatePartAIS( face );
+						AIS_Shape aisShape = SelectViewHelper.CreateFaceAIS( face );
 						m_VisibleFaceAISPairList.Add( new FaceHandle() { Face = face, AIS = aisShape } );
 					}
 
@@ -120,11 +120,11 @@ namespace MyCAM.CAD
 				ais.Color( ref color );
 
 				// toggle color
-				if( color.Name() == COLOR_DEFAULT ) {
-					ais.SetColor( new Quantity_Color( COLOR_SELECTED ) );
+				if( color.Name() == SelectViewHelper.COLOR_DEFAULT ) {
+					ais.SetColor( new Quantity_Color( SelectViewHelper.COLOR_SELECTED ) );
 				}
 				else {
-					ais.SetColor( new Quantity_Color( COLOR_DEFAULT ) );
+					ais.SetColor( new Quantity_Color( SelectViewHelper.COLOR_DEFAULT ) );
 				}
 				ais.Attributes().SetFaceBoundaryDraw( true );
 				ais.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
@@ -197,10 +197,10 @@ namespace MyCAM.CAD
 					}
 				}
 				if( isD1Cont ) {
-					faceAISPair.AIS.SetColor( new Quantity_Color( COLOR_SELECTED ) );
+					faceAISPair.AIS.SetColor( new Quantity_Color( SelectViewHelper.COLOR_SELECTED ) );
 				}
 				else {
-					faceAISPair.AIS.SetColor( new Quantity_Color( COLOR_DEFAULT ) );
+					faceAISPair.AIS.SetColor( new Quantity_Color( SelectViewHelper.COLOR_DEFAULT ) );
 				}
 				faceAISPair.AIS.Attributes().SetFaceBoundaryDraw( true );
 				faceAISPair.AIS.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
@@ -255,7 +255,7 @@ namespace MyCAM.CAD
 			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
 				Quantity_Color color = new Quantity_Color();
 				faceAISPair.AIS.Color( ref color );
-				if( color.Name() == COLOR_SELECTED ) {
+				if( color.Name() == SelectViewHelper.COLOR_SELECTED ) {
 					selectedFaceList.Add( faceAISPair.Face );
 				}
 			}
@@ -264,8 +264,5 @@ namespace MyCAM.CAD
 
 		List<FaceHandle> m_VisibleFaceAISPairList;
 		TopTools_IndexedDataMapOfShapeListOfShape m_EdgeFaceMap;
-
-		const Quantity_NameOfColor COLOR_SELECTED = Quantity_NameOfColor.Quantity_NOC_RED;
-		const Quantity_NameOfColor COLOR_DEFAULT = Quantity_NameOfColor.Quantity_NOC_GRAY50;
 	}
 }

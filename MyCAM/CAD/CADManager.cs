@@ -88,7 +88,8 @@ namespace MyCAM.CAD
 	internal class CADManager
 	{
 		public Action PartChanged;
-		public Action<List<string>, EFeatureType> FeatureAdded;
+		public Action<List<string>> FeatureAdded;
+		public Action<List<string>> PathAdded;
 
 		public CADManager()
 		{
@@ -160,7 +161,7 @@ namespace MyCAM.CAD
 			ShapeData newData = new ShapeData( szID, newFeature );
 			ShapeDataContainer.Add( newData );
 			ShapeDataMap[ szID ] = newData;
-			FeatureAdded?.Invoke( new List<string>() { szID }, EFeatureType.Reference );
+			FeatureAdded?.Invoke( new List<string>() { szID } );
 		}
 
 		// the edge map contains all edges in all wire to be add
@@ -207,7 +208,7 @@ namespace MyCAM.CAD
 
 			// add to path ID list
 			PathIDList.UnionWith( newPathIDList );
-			FeatureAdded?.Invoke( newPathIDList, EFeatureType.Path );
+			PathAdded?.Invoke( newPathIDList );
 		}
 
 		List<ShapeData> ArrangeShapeData( TopoDS_Shape oneShape )

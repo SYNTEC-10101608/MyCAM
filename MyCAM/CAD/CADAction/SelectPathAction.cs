@@ -49,8 +49,7 @@ namespace MyCAM.CAD
 			foreach( var oneShape in m_FaceGroupList ) {
 
 				// create face AIS
-				AIS_Shape faceAIS = ViewHelper.CreatePartAIS( oneShape );
-				faceAIS.Attributes().SetFaceBoundaryDraw( false );
+				AIS_Shape faceAIS = SelectViewHelper.CreateFaceAIS( oneShape );
 				m_FaceGroupAISList.Add( faceAIS );
 
 				// map edge and face
@@ -73,8 +72,7 @@ namespace MyCAM.CAD
 					TopExp_Explorer oneWireExp = new TopExp_Explorer( wire, TopAbs_ShapeEnum.TopAbs_EDGE );
 					for( ; oneWireExp.More(); oneWireExp.Next() ) {
 						TopoDS_Edge edge = TopoDS.ToEdge( oneWireExp.Current() );
-						AIS_Shape aisShape = ViewHelper.CreatePartAIS( edge );
-						aisShape.SetWidth( 2.0 );
+						AIS_Shape aisShape = SelectViewHelper.CreateEdgeAIS( edge );
 						m_EdgeAISPairList.Add( new EdgeHandle() { Edge = edge, AIS = aisShape } );
 						oneFreeBoundWire.Add( edge );
 					}
@@ -156,13 +154,11 @@ namespace MyCAM.CAD
 				ais.Color( ref color );
 
 				// toggle color
-				if( color.Name() == COLOR_DEFAULT ) {
-					ais.SetColor( new Quantity_Color( COLOR_SELECTED ) );
-					ais.SetWidth( 4.0 );
+				if( color.Name() == SelectViewHelper.COLOR_DEFAULT ) {
+					ais.SetColor( new Quantity_Color( SelectViewHelper.COLOR_SELECTED ) );
 				}
 				else {
-					ais.SetColor( new Quantity_Color( COLOR_DEFAULT ) );
-					ais.SetWidth( 2.0 );
+					ais.SetColor( new Quantity_Color( SelectViewHelper.COLOR_DEFAULT ) );
 				}
 				ais.Attributes().SetFaceBoundaryDraw( true );
 				ais.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
@@ -282,7 +278,7 @@ namespace MyCAM.CAD
 			foreach( var faceAISPair in m_EdgeAISPairList ) {
 				Quantity_Color color = new Quantity_Color();
 				faceAISPair.AIS.Color( ref color );
-				if( color.Name() == COLOR_SELECTED ) {
+				if( color.Name() == SelectViewHelper.COLOR_SELECTED ) {
 					selectedEdgeSet.Add( faceAISPair.Edge );
 				}
 			}
@@ -294,8 +290,5 @@ namespace MyCAM.CAD
 		List<EdgeHandle> m_EdgeAISPairList;
 		List<List<TopoDS_Edge>> m_FreeBoundWireList;
 		List<AIS_Shape> m_FaceGroupAISList;
-
-		const Quantity_NameOfColor COLOR_SELECTED = Quantity_NameOfColor.Quantity_NOC_RED;
-		const Quantity_NameOfColor COLOR_DEFAULT = Quantity_NameOfColor.Quantity_NOC_GRAY50;
 	}
 }

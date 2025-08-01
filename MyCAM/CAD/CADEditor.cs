@@ -40,12 +40,6 @@ namespace MyCAM.CAD
 		PlaneParallel,
 	}
 
-	public enum EFeatureType
-	{
-		Reference = 0,
-		Path = 1,
-	}
-
 	internal static class ViewHelper
 	{
 		public static AIS_Shape CreatePartAIS( TopoDS_Shape shape )
@@ -55,6 +49,7 @@ namespace MyCAM.CAD
 			aisShape.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY50 ) );
 			aisShape.Attributes().SetFaceBoundaryDraw( true );
 			aisShape.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+			aisShape.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
 			return aisShape;
 		}
 
@@ -63,10 +58,43 @@ namespace MyCAM.CAD
 			AIS_Shape aisShape = new AIS_Shape( shape );
 			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			aisShape.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_YELLOW ) );
-			aisShape.Attributes().SetFaceBoundaryDraw( true );
-			aisShape.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			return aisShape;
 		}
+
+		public static AIS_Shape CreatePathAIS( TopoDS_Shape shape )
+		{
+			AIS_Shape aisShape = new AIS_Shape( shape );
+			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			aisShape.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+			aisShape.SetWidth( 2.0 );
+			return aisShape;
+		}
+	}
+
+	internal static class SelectViewHelper
+	{
+		public static AIS_Shape CreateFaceAIS( TopoDS_Shape shape )
+		{
+			AIS_Shape aisShape = new AIS_Shape( shape );
+			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			aisShape.SetColor( new Quantity_Color( COLOR_DEFAULT ) );
+			aisShape.Attributes().SetFaceBoundaryDraw( true );
+			aisShape.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+			aisShape.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
+			return aisShape;
+		}
+
+		public static AIS_Shape CreateEdgeAIS( TopoDS_Shape shape )
+		{
+			AIS_Shape aisShape = new AIS_Shape( shape );
+			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			aisShape.SetColor( new Quantity_Color( COLOR_DEFAULT ) );
+			aisShape.SetWidth( 2.0 );
+			return aisShape;
+		}
+
+		public const Quantity_NameOfColor COLOR_SELECTED = Quantity_NameOfColor.Quantity_NOC_RED;
+		public const Quantity_NameOfColor COLOR_DEFAULT = Quantity_NameOfColor.Quantity_NOC_GRAY50;
 	}
 
 	internal class CADEditor
@@ -81,6 +109,7 @@ namespace MyCAM.CAD
 			m_CADManager = new CADManager();
 			m_CADManager.PartChanged += OnPartChanged;
 			m_CADManager.FeatureAdded += OnFeatureAdded;
+			m_CADManager.PathAdded += OnPathAdded;
 
 			// user interface
 			m_Viewer = viewer;
@@ -304,7 +333,7 @@ namespace MyCAM.CAD
 			m_Viewer.UpdateView();
 		}
 
-		void OnFeatureAdded( List<string> newFeatureIDs, EFeatureType type )
+		void OnFeatureAdded( List<string> newFeatureIDs )
 		{
 			foreach( string szID in newFeatureIDs ) {
 				if( string.IsNullOrEmpty( szID ) ) {
@@ -313,29 +342,41 @@ namespace MyCAM.CAD
 
 				// add a new node to the tree view
 				TreeNode node = new TreeNode( szID );
-				if( type == EFeatureType.Reference ) {
-					m_CADManager.PartNode.Nodes.Add( node );
-				}
-				else if( type == EFeatureType.Path ) {
-					m_CADManager.PathNode.Nodes.Add( node );
-				}
-				else {
-					continue; // unknown type
-				}
+				m_CADManager.PartNode.Nodes.Add( node );
 				m_CADManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
 				ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
 				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( shapeData.Shape );
-				if( type == EFeatureType.Path ) {
-					aisShape.SetWidth( 2.0 ); // TODO: this should be done by AIS maker
-				}
 				m_CADManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false );
 			}
 
 			// update tree view and viewer
 			m_CADManager.PartNode.ExpandAll();
+			m_Viewer.UpdateView();
+		}
+
+		void OnPathAdded( List<string> newPathIDs )
+		{
+			foreach( string szID in newPathIDs ) {
+				if( string.IsNullOrEmpty( szID ) ) {
+					return;
+				}
+
+				// add a new node to the tree view
+				TreeNode node = new TreeNode( szID );
+				m_CADManager.PathNode.Nodes.Add( node );
+				m_CADManager.TreeNodeMap.Add( szID, node );
+
+				// add a new shape to the viewer
+				ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
+				AIS_Shape aisShape = ViewHelper.CreatePathAIS( shapeData.Shape );
+				m_CADManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
+				m_Viewer.GetAISContext().Display( aisShape, false );
+			}
+
+			// update tree view and viewer
 			m_CADManager.PathNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
