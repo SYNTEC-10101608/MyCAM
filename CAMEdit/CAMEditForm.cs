@@ -463,7 +463,6 @@ namespace CAMEdit
 					form.GetAngleValue( out double newAngleA_deg, out double newAnfleB_deg );
 					camData_ToolVec.SetToolVecModify( nIndex_ToolVec, newAngleA_deg, newAnfleB_deg );
 					ShowCAMData();
-					editMode = EditMode.None;
 					break;
 				//case EditMode.TooVecEdit:
 				//	if( e.Button != MouseButtons.Left ) {
