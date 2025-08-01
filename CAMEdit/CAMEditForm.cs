@@ -1,7 +1,6 @@
 ﻿using DataStructure;
 using NCExport;
 using OCC.AIS;
-using OCC.Aspect;
 using OCC.BRep;
 using OCC.BRepBuilderAPI;
 using OCC.BRepPrimAPI;
@@ -179,51 +178,10 @@ namespace CAMEdit
 
 		void ShowCAMData()
 		{
-			//ShowCAMContour();
 			ShowToolVec();
 			ShowOrientation();
 			ShowIndex();
 			m_OCCViewer.UpdateView();
-		}
-
-		void ShowCAMContour()
-		{
-			// clear the previous cam data
-			foreach( AIS_Shape camAIS in m_CAMContourAISList ) {
-				m_OCCViewer.GetAISContext().Remove( camAIS, false );
-			}
-			m_CAMContourAISList.Clear();
-
-
-			List<TopoDS_Wire> camWireList = new List<TopoDS_Wire>();
-			for( int i = 0; i < m_Model.CAMDataList.Count; i++ ) {
-
-				// build wire from cam points
-				CAMData camData = m_Model.CAMDataList[ i ];
-				BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
-
-				// build edges
-				for( int j = 0; j < camData.CAMPointList.Count; j++ ) {
-					polygonMaker.Add( camData.CAMPointList[ j ].CADPoint.Point );
-				}
-				if( polygonMaker.IsDone() == false ) {
-					continue;
-				}
-				TopoDS_Wire wire = polygonMaker.Wire();
-				camWireList.Add( wire );
-			}
-
-			// display the cam data
-			foreach( TopoDS_Wire camWire in camWireList ) {
-				AIS_Shape camAIS = new AIS_Shape( camWire );
-				camAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_YELLOW ) );
-				camAIS.SetWidth( 1 );
-				Prs3d_LineAspect aspect = camAIS.Attributes().WireAspect();
-				aspect.SetTypeOfLine( Aspect_TypeOfLine.Aspect_TOL_DASH );
-				m_OCCViewer.GetAISContext().Display( camAIS, false );
-				m_OCCViewer.GetAISContext().Deactivate( camAIS );
-				m_CAMContourAISList.Add( camAIS );
-			}
 		}
 
 		void ShowToolVec()
@@ -236,15 +194,14 @@ namespace CAMEdit
 
 			// build tool vec
 			foreach( CAMData camData in m_Model.CAMDataList ) {
-				//List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
 				List<CAMPoint> filteredPath = camData.CAMPointList;
 				for( int i = 0; i < filteredPath.Count; i++ ) {
-					if( IsKeyIndex( i, camData, out bool bHL ) ) {
+					if( IsKeyToolVecIndex( i, camData, out bool bHL ) ) {
 						CAMPoint camPoint = filteredPath[ i ];
 						AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
 						if( bHL ) {
 							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-							toolVecAIS.SetWidth( 5 );
+							toolVecAIS.SetWidth( 4 );
 						}
 						m_ToolVecAISList.Add( toolVecAIS );
 					}
@@ -269,10 +226,10 @@ namespace CAMEdit
 			// build orientation
 			foreach( CAMData camData in m_Model.CAMDataList ) {
 				gp_Pnt showPoint = camData.CAMPointList[ 0 ].CADPoint.Point;
-				gp_Pnt endPoint = camData.CAMPointList[ 1 ].CADPoint.Point;
-
-				// the direction of the orientation is vector to the next point
-				gp_Dir orientationDir = new gp_Dir( endPoint.XYZ() - showPoint.XYZ() );
+				gp_Dir orientationDir = camData.CAMPointList[ 0 ].CADPoint.TangentVec;
+				if( camData.IsReverse ) {
+					orientationDir.Reverse();
+				}
 				AIS_Shape orientationAIS = GetOrientationAIS( showPoint, orientationDir );
 				m_OrientationAISList.Add( orientationAIS );
 			}
@@ -315,13 +272,18 @@ namespace CAMEdit
 			}
 		}
 
-		bool IsKeyIndex( int index, CAMData camData, out bool isToolVecMod )
+		bool IsKeyToolVecIndex( int index, CAMData camData, out bool isToolVecMod )
 		{
+			// map CAD and CAM point index
 			int modifiedIndex = camData.IsReverse
 				? ( camData.CAMPointList.Count - 1 - index + camData.StartPoint ) % camData.CAMPointList.Count
 				: ( index + camData.StartPoint ) % camData.CAMPointList.Count;
-			bool isEdgeStart = camData.EdgeStartIndex.Contains( modifiedIndex );
+
+			// need highlight if the index is modified index
 			isToolVecMod = camData.GetToolVecModifyIndex().Contains( modifiedIndex );
+
+			// need to show if the index is key index
+			bool isEdgeStart = camData.EdgeStartIndex.Contains( modifiedIndex );
 			return index % m_nGap == 0 || isEdgeStart || isToolVecMod;
 		}
 
@@ -340,7 +302,7 @@ namespace CAMEdit
 					lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
 					break;
 			}
-			lineAIS.SetWidth( 2 );
+			lineAIS.SetWidth( 1 );
 			return lineAIS;
 		}
 
@@ -358,6 +320,7 @@ namespace CAMEdit
 			return coneAIS;
 		}
 
+		// CAM edit action
 		void m_tsmiStartPoint_Click( object sender, EventArgs e )
 		{
 			editMode = EditMode.StartPoint;
