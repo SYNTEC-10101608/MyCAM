@@ -102,7 +102,7 @@ namespace CAMEdit
 		gp_Ax2 m_SelectedToolVecAx2;
 		CAMData m_SelectedCAMData = null;
 		int m_SelectedIndex = -1;
-		int m_nGap = 10;
+		int m_nGap = 100;
 
 		// for viewer resource handle
 		AIS_Shape m_PartAIS = null; // for part shape
@@ -225,7 +225,7 @@ namespace CAMEdit
 			// build orientation
 			foreach( CAMData camData in m_Model.CAMDataList ) {
 				gp_Pnt showPoint = camData.CAMPointList[ 0 ].CADPoint.Point;
-				gp_Dir orientationDir = camData.CAMPointList[ 0 ].CADPoint.TangentVec;
+				gp_Dir orientationDir = new gp_Dir( camData.CAMPointList[ 0 ].CADPoint.TangentVec.XYZ() );
 				if( camData.IsReverse ) {
 					orientationDir.Reverse();
 				}
@@ -713,11 +713,11 @@ namespace CAMEdit
 
 			// filtering by location
 			List<gp_Pnt> path = camPointList.Select( camPoint => camPoint.CADPoint.Point ).ToList();
-			bool[] flagsL = SimplifyPathByLocation( path, 1e-3 );
+			bool[] flagsL = SimplifyPathByLocation( path, 0.01 );
 
 			// filtering by orientation
 			List<gp_Dir> orientation = camPointList.Select( camPoint => camPoint.ToolVec ).ToList();
-			bool[] flagsO = SimplifyPathByOrientation( orientation, 1e-3 );
+			bool[] flagsO = SimplifyPathByOrientation( orientation, 1 );
 
 			// combine the two filtering results
 			for( int i = 0; i < path.Count; i++ ) {
