@@ -63,7 +63,7 @@ namespace MyCAM.CAD
 		public override void DoTransform( gp_Trsf transform )
 		{
 			base.DoTransform( transform );
-			m_Trsf.Multiply( transform );
+			m_Trsf.PreMultiply( transform );
 		}
 
 		gp_Trsf m_Trsf = new gp_Trsf();
