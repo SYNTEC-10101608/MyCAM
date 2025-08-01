@@ -57,11 +57,11 @@
 			this.m_tsmiTransformOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD_SelectFace = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiSelectD1ContFace = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_msCAD_ManualSelectPath = new System.Windows.Forms.MenuStrip();
-			this.m_tsmiManualSelectPathOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelectPath = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelPath_FreeBound = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSelPath_Manual = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_msCAD_ManualSelectPath = new System.Windows.Forms.MenuStrip();
+			this.m_tsmiManualSelectPathOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -319,6 +319,29 @@
 			this.m_tsmiSelectD1ContFace.Text = "D1 連續";
 			this.m_tsmiSelectD1ContFace.Click += new System.EventHandler(this.m_tsmiSelectD1ContFace_Click);
 			// 
+			// m_tsmiSelectPath
+			// 
+			this.m_tsmiSelectPath.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiSelPath_FreeBound,
+            this.m_tsmiSelPath_Manual});
+			this.m_tsmiSelectPath.Name = "m_tsmiSelectPath";
+			this.m_tsmiSelectPath.Size = new System.Drawing.Size(67, 20);
+			this.m_tsmiSelectPath.Text = "選取路徑";
+			// 
+			// m_tsmiSelPath_FreeBound
+			// 
+			this.m_tsmiSelPath_FreeBound.Name = "m_tsmiSelPath_FreeBound";
+			this.m_tsmiSelPath_FreeBound.Size = new System.Drawing.Size(134, 22);
+			this.m_tsmiSelPath_FreeBound.Text = "所有面邊界";
+			this.m_tsmiSelPath_FreeBound.Click += new System.EventHandler(this.m_tsmiSelPath_FreeBound_Click);
+			// 
+			// m_tsmiSelPath_Manual
+			// 
+			this.m_tsmiSelPath_Manual.Name = "m_tsmiSelPath_Manual";
+			this.m_tsmiSelPath_Manual.Size = new System.Drawing.Size(134, 22);
+			this.m_tsmiSelPath_Manual.Text = "手動選取";
+			this.m_tsmiSelPath_Manual.Click += new System.EventHandler(this.m_tsmiSelPath_Manual_Click);
+			// 
 			// m_msCAD_ManualSelectPath
 			// 
 			this.m_msCAD_ManualSelectPath.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -336,29 +359,6 @@
 			this.m_tsmiManualSelectPathOK.Size = new System.Drawing.Size(36, 20);
 			this.m_tsmiManualSelectPathOK.Text = "OK";
 			this.m_tsmiManualSelectPathOK.Click += new System.EventHandler(this.m_tsmiManualSelectPathOK_Click);
-			// 
-			// m_tsmiSelectPath
-			// 
-			this.m_tsmiSelectPath.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiSelPath_FreeBound,
-            this.m_tsmiSelPath_Manual});
-			this.m_tsmiSelectPath.Name = "m_tsmiSelectPath";
-			this.m_tsmiSelectPath.Size = new System.Drawing.Size(67, 20);
-			this.m_tsmiSelectPath.Text = "選取路徑";
-			// 
-			// m_tsmiSelPath_FreeBound
-			// 
-			this.m_tsmiSelPath_FreeBound.Name = "m_tsmiSelPath_FreeBound";
-			this.m_tsmiSelPath_FreeBound.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiSelPath_FreeBound.Text = "所有面邊界";
-			this.m_tsmiSelPath_FreeBound.Click += new System.EventHandler(this.m_tsmiSelPath_FreeBound_Click);
-			// 
-			// m_tsmiSelPath_Manual
-			// 
-			this.m_tsmiSelPath_Manual.Name = "m_tsmiSelPath_Manual";
-			this.m_tsmiSelPath_Manual.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiSelPath_Manual.Text = "手動選取";
-			this.m_tsmiSelPath_Manual.Click += new System.EventHandler(this.m_tsmiSelPath_Manual_Click);
 			// 
 			// StartupForm
 			// 
