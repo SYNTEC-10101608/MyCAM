@@ -39,8 +39,7 @@
 			this.m_tsmiTransform = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiManualTransform = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmi3PointTransform = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiSelectFace = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiCADOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiAddPath = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
@@ -62,12 +61,16 @@
 			this.m_tsmiSelPath_Manual = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD_ManualSelectPath = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiManualSelectPathOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_msMain = new System.Windows.Forms.MenuStrip();
+			this.m_tsmiFile = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCAM = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
 			this.m_msCAD_Transform.SuspendLayout();
 			this.m_msCAD_SelectFace.SuspendLayout();
 			this.m_msCAD_ManualSelectPath.SuspendLayout();
+			this.m_msMain.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// m_msCAD
@@ -76,9 +79,8 @@
             this.m_tsmiImport,
             this.m_tsmiAddFeature,
             this.m_tsmiTransform,
-            this.m_tsmiSelectFace,
-            this.m_tsmiCADOK});
-			this.m_msCAD.Location = new System.Drawing.Point(0, 0);
+            this.m_tsmiAddPath});
+			this.m_msCAD.Location = new System.Drawing.Point(0, 24);
 			this.m_msCAD.Name = "m_msCAD";
 			this.m_msCAD.Size = new System.Drawing.Size(1184, 24);
 			this.m_msCAD.TabIndex = 1;
@@ -97,21 +99,21 @@
 			// m_tsmiImportBRep
 			// 
 			this.m_tsmiImportBRep.Name = "m_tsmiImportBRep";
-			this.m_tsmiImportBRep.Size = new System.Drawing.Size(104, 22);
+			this.m_tsmiImportBRep.Size = new System.Drawing.Size(180, 22);
 			this.m_tsmiImportBRep.Text = "BRep";
 			this.m_tsmiImportBRep.Click += new System.EventHandler(this.m_tsmiImportBRep_Click);
 			// 
 			// m_tsmiImportStep
 			// 
 			this.m_tsmiImportStep.Name = "m_tsmiImportStep";
-			this.m_tsmiImportStep.Size = new System.Drawing.Size(104, 22);
+			this.m_tsmiImportStep.Size = new System.Drawing.Size(180, 22);
 			this.m_tsmiImportStep.Text = "Step";
 			this.m_tsmiImportStep.Click += new System.EventHandler(this.m_tsmiImportStep_Click);
 			// 
 			// m_tsmiImportIges
 			// 
 			this.m_tsmiImportIges.Name = "m_tsmiImportIges";
-			this.m_tsmiImportIges.Size = new System.Drawing.Size(104, 22);
+			this.m_tsmiImportIges.Size = new System.Drawing.Size(180, 22);
 			this.m_tsmiImportIges.Text = "Iges";
 			this.m_tsmiImportIges.Click += new System.EventHandler(this.m_tsmiImportIges_Click);
 			// 
@@ -169,19 +171,12 @@
 			this.m_tsmi3PointTransform.Text = "三點轉換";
 			this.m_tsmi3PointTransform.Click += new System.EventHandler(this.m_tsmi3PointTransform_Click);
 			// 
-			// m_tsmiSelectFace
+			// m_tsmiAddPath
 			// 
-			this.m_tsmiSelectFace.Name = "m_tsmiSelectFace";
-			this.m_tsmiSelectFace.Size = new System.Drawing.Size(79, 20);
-			this.m_tsmiSelectFace.Text = "選取特徵面";
-			this.m_tsmiSelectFace.Click += new System.EventHandler(this.m_tsmiSelectFace_Click);
-			// 
-			// m_tsmiCADOK
-			// 
-			this.m_tsmiCADOK.Name = "m_tsmiCADOK";
-			this.m_tsmiCADOK.Size = new System.Drawing.Size(36, 20);
-			this.m_tsmiCADOK.Text = "OK";
-			this.m_tsmiCADOK.Click += new System.EventHandler(this.m_tsmiCADOK_Click);
+			this.m_tsmiAddPath.Name = "m_tsmiAddPath";
+			this.m_tsmiAddPath.Size = new System.Drawing.Size(67, 20);
+			this.m_tsmiAddPath.Text = "新增路徑";
+			this.m_tsmiAddPath.Click += new System.EventHandler(this.m_tsmiAddPath_Click);
 			// 
 			// m_panViewer
 			// 
@@ -298,7 +293,7 @@
 			this.m_tsmiTransformOK.Name = "m_tsmiTransformOK";
 			this.m_tsmiTransformOK.Size = new System.Drawing.Size(36, 20);
 			this.m_tsmiTransformOK.Text = "OK";
-			this.m_tsmiTransformOK.Click += new System.EventHandler(this.m_tsmiOK_Click);
+			this.m_tsmiTransformOK.Click += new System.EventHandler(this.m_tsmiTransformOK_Click);
 			// 
 			// m_msCAD_SelectFace
 			// 
@@ -360,6 +355,29 @@
 			this.m_tsmiManualSelectPathOK.Text = "OK";
 			this.m_tsmiManualSelectPathOK.Click += new System.EventHandler(this.m_tsmiManualSelectPathOK_Click);
 			// 
+			// m_msMain
+			// 
+			this.m_msMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiFile,
+            this.m_tsmiCAM});
+			this.m_msMain.Location = new System.Drawing.Point(0, 0);
+			this.m_msMain.Name = "m_msMain";
+			this.m_msMain.Size = new System.Drawing.Size(1184, 24);
+			this.m_msMain.TabIndex = 3;
+			this.m_msMain.Text = "menuStrip1";
+			// 
+			// m_tsmiFile
+			// 
+			this.m_tsmiFile.Name = "m_tsmiFile";
+			this.m_tsmiFile.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiFile.Text = "檔案";
+			// 
+			// m_tsmiCAM
+			// 
+			this.m_tsmiCAM.Name = "m_tsmiCAM";
+			this.m_tsmiCAM.Size = new System.Drawing.Size(47, 20);
+			this.m_tsmiCAM.Text = "CAM";
+			// 
 			// StartupForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -371,6 +389,7 @@
 			this.Controls.Add(this.m_msCAD_ManualSelectPath);
 			this.Controls.Add(this.m_msCAD_Transform);
 			this.Controls.Add(this.m_msCAD);
+			this.Controls.Add(this.m_msMain);
 			this.MainMenuStrip = this.m_msCAD;
 			this.Name = "StartupForm";
 			this.Text = "五軸切";
@@ -384,6 +403,8 @@
 			this.m_msCAD_SelectFace.PerformLayout();
 			this.m_msCAD_ManualSelectPath.ResumeLayout(false);
 			this.m_msCAD_ManualSelectPath.PerformLayout();
+			this.m_msMain.ResumeLayout(false);
+			this.m_msMain.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -414,17 +435,19 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAxialPar;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAxialPar_R;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiTransformOK;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectFace;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPath;
 		private System.Windows.Forms.MenuStrip m_msCAD_SelectFace;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectD1ContFace;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiManualTransform;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmi3PointTransform;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiCADOK;
 		private System.Windows.Forms.MenuStrip m_msCAD_ManualSelectPath;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiManualSelectPathOK;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectPath;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelPath_FreeBound;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelPath_Manual;
+		private System.Windows.Forms.MenuStrip m_msMain;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiFile;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiCAM;
 	}
 }
 

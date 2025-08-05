@@ -137,9 +137,6 @@ namespace MyCAM.CAD
 		ICADAction m_CurrentAction;
 
 		// APIs
-		public Action StartProcess;
-		public Action EndProcess;
-
 		public void ImportFile( FileFormat format )
 		{
 			OpenFileDialog openDialog = new OpenFileDialog();

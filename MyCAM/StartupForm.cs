@@ -30,8 +30,6 @@ namespace MyCAM
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_Viewer, m_TreeView );
 			ShowG54Trihedron();
-			m_CADEditor.StartProcess += StartProcess;
-			m_CADEditor.EndProcess += EndProcess;
 		}
 
 		// app properties
@@ -127,7 +125,7 @@ namespace MyCAM
 			m_CADEditor.ApplyManualTransform( EConstraintType.AxialParallel, true );
 		}
 
-		void m_tsmiOK_Click( object sender, EventArgs e )
+		void m_tsmiTransformOK_Click( object sender, EventArgs e )
 		{
 			m_msCAD_Transform.Visible = false;
 			m_msCAD.Enabled = true;
@@ -140,8 +138,8 @@ namespace MyCAM
 			m_CADEditor.ThreePointTransform();
 		}
 
-		// select face
-		void m_tsmiSelectFace_Click( object sender, EventArgs e )
+		// add path
+		void m_tsmiAddPath_Click( object sender, EventArgs e )
 		{
 			m_msCAD_SelectFace.Visible = true;
 			m_msCAD.Enabled = false;
@@ -153,7 +151,6 @@ namespace MyCAM
 			m_CADEditor.SelectD1ContFace();
 		}
 
-		// select path
 		void m_tsmiSelPath_FreeBound_Click( object sender, EventArgs e )
 		{
 			m_msCAD_SelectFace.Visible = false;
@@ -179,17 +176,6 @@ namespace MyCAM
 		void m_tsmiCADOK_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.GoToCAM();
-		}
-
-		// process
-		void StartProcess()
-		{
-			this.Enabled = false;
-		}
-
-		void EndProcess()
-		{
-			this.Enabled = true;
 		}
 	}
 }
