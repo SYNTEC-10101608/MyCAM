@@ -24,6 +24,9 @@ namespace MyCAM
 			}
 			m_Viewer.UpdateView();
 
+			// this is to keep highlighted selected node when tree view looses focus
+			m_TreeView.HideSelection = false;
+
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_Viewer, m_TreeView );
 			ShowG54Trihedron();

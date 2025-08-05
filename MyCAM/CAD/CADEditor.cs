@@ -119,9 +119,6 @@ namespace MyCAM.CAD
 			m_TreeView.Nodes.Add( m_CADManager.PartNode );
 			m_TreeView.Nodes.Add( m_CADManager.PathNode );
 
-			// this is to keep highlighted selected node when tree view looses focus
-			m_TreeView.HideSelection = false;
-
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager );
 			m_CurrentAction = m_DefaultAction;
