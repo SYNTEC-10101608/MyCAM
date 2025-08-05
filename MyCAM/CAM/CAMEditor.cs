@@ -9,7 +9,7 @@ namespace MyCAM.CAM
 		public CAMEditor( Viewer viewer, TreeView treeView )
 		{
 			if( viewer == null || treeView == null ) {
-				throw new ArgumentNullException( "CADEditor consturcting argument null." );
+				throw new ArgumentNullException( "CAMEditor consturcting argument null." );
 			}
 
 			// CAD manager
