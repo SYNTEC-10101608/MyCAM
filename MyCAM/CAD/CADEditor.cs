@@ -116,13 +116,9 @@ namespace MyCAM.CAD
 			// user interface
 			m_Viewer = viewer;
 			m_TreeView = treeView;
-			m_TreeView.Nodes.Add( m_CADManager.PartNode );
-			m_TreeView.Nodes.Add( m_CADManager.PathNode );
 
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager );
-			m_CurrentAction = m_DefaultAction;
-			m_DefaultAction.Start();
 		}
 
 		// user interface
@@ -135,6 +131,22 @@ namespace MyCAM.CAD
 		// action
 		ICADAction m_DefaultAction;
 		ICADAction m_CurrentAction;
+
+		// editor
+		public void EditStart()
+		{
+			// init tree
+			m_TreeView.Nodes.Add( m_CADManager.PartNode );
+			m_TreeView.Nodes.Add( m_CADManager.PathNode );
+
+			// start default action
+			m_CurrentAction = m_DefaultAction;
+			m_DefaultAction.Start();
+		}
+
+		public void EditEnd()
+		{
+		}
 
 		// APIs
 		public void ImportFile( FileFormat format )

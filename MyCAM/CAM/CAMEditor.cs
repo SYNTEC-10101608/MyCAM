@@ -1,4 +1,5 @@
-﻿using OCCViewer;
+﻿using MyCAM.CAD;
+using OCCViewer;
 using System;
 using System.Windows.Forms;
 
@@ -18,7 +19,6 @@ namespace MyCAM.CAM
 			// user interface
 			m_Viewer = viewer;
 			m_TreeView = treeView;
-			m_TreeView.Nodes.Add( m_CAMManager.PathNode );
 		}
 
 		// user interface
@@ -27,5 +27,20 @@ namespace MyCAM.CAM
 
 		// CAD manager
 		CAMManager m_CAMManager;
+
+		// editor
+		public void SwitchIn()
+		{
+			// init tree
+			m_TreeView.Nodes.Add( m_CAMManager.PathNode );
+
+			// start default action
+			//m_CurrentAction = m_DefaultAction;
+			//m_DefaultAction.Start();
+		}
+
+		public void SwitchOut()
+		{
+		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using MyCAM.CAD;
+using MyCAM.CAM;
 using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
@@ -27,16 +28,23 @@ namespace MyCAM
 			// this is to keep highlighted selected node when tree view looses focus
 			m_TreeView.HideSelection = false;
 
+			// show G54
+			ShowG54Trihedron();
+
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_Viewer, m_TreeView );
-			ShowG54Trihedron();
+			m_CADEditor.EditStart();
+
+			// CAM Editor
+			m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView );
 		}
 
 		// app properties
 		Viewer m_Viewer;
 
-		// CAD properties
+		// editors
 		CADEditor m_CADEditor;
+		CAMEditor m_CAMEditor;
 
 		void ShowG54Trihedron()
 		{
@@ -172,10 +180,10 @@ namespace MyCAM
 			m_CADEditor.EndSelectPath_Manual();
 		}
 
-		// go to CAM
-		void m_tsmiCADOK_Click( object sender, EventArgs e )
+		// go to CAM editor
+		void m_tsmiCAM_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.GoToCAM();
+
 		}
 	}
 }

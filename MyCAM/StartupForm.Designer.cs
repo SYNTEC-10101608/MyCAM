@@ -99,21 +99,21 @@
 			// m_tsmiImportBRep
 			// 
 			this.m_tsmiImportBRep.Name = "m_tsmiImportBRep";
-			this.m_tsmiImportBRep.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportBRep.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportBRep.Text = "BRep";
 			this.m_tsmiImportBRep.Click += new System.EventHandler(this.m_tsmiImportBRep_Click);
 			// 
 			// m_tsmiImportStep
 			// 
 			this.m_tsmiImportStep.Name = "m_tsmiImportStep";
-			this.m_tsmiImportStep.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportStep.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportStep.Text = "Step";
 			this.m_tsmiImportStep.Click += new System.EventHandler(this.m_tsmiImportStep_Click);
 			// 
 			// m_tsmiImportIges
 			// 
 			this.m_tsmiImportIges.Name = "m_tsmiImportIges";
-			this.m_tsmiImportIges.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportIges.Size = new System.Drawing.Size(104, 22);
 			this.m_tsmiImportIges.Text = "Iges";
 			this.m_tsmiImportIges.Click += new System.EventHandler(this.m_tsmiImportIges_Click);
 			// 
@@ -377,6 +377,7 @@
 			this.m_tsmiCAM.Name = "m_tsmiCAM";
 			this.m_tsmiCAM.Size = new System.Drawing.Size(47, 20);
 			this.m_tsmiCAM.Text = "CAM";
+			this.m_tsmiCAM.Click += new System.EventHandler(this.m_tsmiCAM_Click);
 			// 
 			// StartupForm
 			// 
