@@ -89,12 +89,14 @@ namespace MyCAM.CAD
 			AIS_Shape aisShape = new AIS_Shape( shape );
 			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			aisShape.SetColor( new Quantity_Color( COLOR_DEFAULT ) );
-			aisShape.SetWidth( 2.0 );
+			aisShape.SetWidth( LINE_WIDTH_DEFAULT );
 			return aisShape;
 		}
 
 		public const Quantity_NameOfColor COLOR_SELECTED = Quantity_NameOfColor.Quantity_NOC_RED;
 		public const Quantity_NameOfColor COLOR_DEFAULT = Quantity_NameOfColor.Quantity_NOC_GRAY50;
+		public const int LINE_WIDTH_SELECT = 2;
+		public const int LINE_WIDTH_DEFAULT = 1;
 	}
 
 	internal class CADEditor

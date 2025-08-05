@@ -156,9 +156,11 @@ namespace MyCAM.CAD
 				// toggle color
 				if( color.Name() == SelectViewHelper.COLOR_DEFAULT ) {
 					ais.SetColor( new Quantity_Color( SelectViewHelper.COLOR_SELECTED ) );
+					ais.SetWidth( SelectViewHelper.LINE_WIDTH_SELECT );
 				}
 				else {
 					ais.SetColor( new Quantity_Color( SelectViewHelper.COLOR_DEFAULT ) );
+					ais.SetWidth( SelectViewHelper.LINE_WIDTH_DEFAULT );
 				}
 				ais.Attributes().SetFaceBoundaryDraw( true );
 				ais.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
