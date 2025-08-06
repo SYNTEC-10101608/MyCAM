@@ -101,14 +101,14 @@ namespace MyCAM.CAD
 
 	internal class CADEditor
 	{
-		public CADEditor( Viewer viewer, TreeView treeView )
+		public CADEditor( Viewer viewer, TreeView treeView, CADManager cadManager )
 		{
-			if( viewer == null || treeView == null ) {
+			if( viewer == null || treeView == null || cadManager == null ) {
 				throw new ArgumentNullException( "CADEditor consturcting argument null." );
 			}
 
 			// CAD manager
-			m_CADManager = new CADManager();
+			m_CADManager = cadManager;
 			m_CADManager.PartChanged += OnPartChanged;
 			m_CADManager.FeatureAdded += OnFeatureAdded;
 			m_CADManager.PathAdded += OnPathAdded;

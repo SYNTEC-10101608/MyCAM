@@ -31,16 +31,22 @@ namespace MyCAM
 			// show G54
 			ShowG54Trihedron();
 
+			// CAD manager
+			m_CADManager = new CADManager();
+
 			// CAD Editor
-			m_CADEditor = new CADEditor( m_Viewer, m_TreeView );
+			m_CADEditor = new CADEditor( m_Viewer, m_TreeView, m_CADManager );
 			m_CADEditor.EditStart();
 
 			// CAM Editor
-			m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView );
+			//m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView, m_CADManager );
 		}
 
 		// app properties
 		Viewer m_Viewer;
+
+		// data manager
+		CADManager m_CADManager;
 
 		// editors
 		CADEditor m_CADEditor;
