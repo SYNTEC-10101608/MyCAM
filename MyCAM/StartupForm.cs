@@ -44,8 +44,8 @@ namespace MyCAM
 			// CAM Editor
 			m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
 
-			// init menu
-			m_msCAM.Visible = false;
+			// init menu strip
+			m_msCAM.Enabled = false;
 		}
 
 		// view properties
@@ -159,11 +159,20 @@ namespace MyCAM
 			m_CADEditor.ThreePointTransform();
 		}
 
+		// go to CAM editor
+		void m_tsmiCAM_Click( object sender, EventArgs e )
+		{
+			m_msCAM.Enabled = true;
+			m_msCAD.Enabled = false;
+			m_CADEditor.EditEnd();
+			m_CAMEditor.EditStart();
+		}
+
 		// add path
 		void m_tsmiAddPath_Click( object sender, EventArgs e )
 		{
 			m_msCAD_SelectFace.Visible = true;
-			m_msCAD.Enabled = false;
+			m_msCAM.Enabled = false;
 			m_CAMEditor.StartSelectFace();
 		}
 
@@ -175,31 +184,22 @@ namespace MyCAM
 		void m_tsmiSelPath_FreeBound_Click( object sender, EventArgs e )
 		{
 			m_msCAD_SelectFace.Visible = false;
-			m_msCAD.Enabled = true;
+			m_msCAM.Enabled = true;
 			m_CAMEditor.SelectPath_FreeBound();
 		}
 
 		void m_tsmiSelPath_Manual_Click( object sender, EventArgs e )
 		{
-			m_msCAD_SelectFace.Visible = false;
 			m_msCAD_ManualSelectPath.Visible = true;
+			m_msCAD_SelectFace.Visible = false;
 			m_CAMEditor.StartSelectPath_Manual();
 		}
 
 		void m_tsmiManualSelectPathOK_Click( object sender, EventArgs e )
 		{
 			m_msCAD_ManualSelectPath.Visible = false;
-			m_msCAD.Enabled = true;
+			m_msCAM.Enabled = true;
 			m_CAMEditor.EndSelectPath_Manual();
-		}
-
-		// go to CAM editor
-		void m_tsmiCAM_Click( object sender, EventArgs e )
-		{
-			m_msCAD.Visible = false;
-			m_msCAM.Visible = true;
-			m_CADEditor.EditEnd();
-			m_CAMEditor.EditStart();
 		}
 	}
 }

@@ -187,7 +187,7 @@
 			this.m_panTreeView.Location = new System.Drawing.Point(0, 0);
 			this.m_panTreeView.Name = "m_panTreeView";
 			this.m_panTreeView.Size = new System.Drawing.Size(300, 689);
-			this.m_panTreeView.TabIndex = 0;
+			this.m_panTreeView.TabIndex = 1;
 			// 
 			// m_TreeView
 			// 
@@ -195,7 +195,7 @@
 			this.m_TreeView.Location = new System.Drawing.Point(0, 0);
 			this.m_TreeView.Name = "m_TreeView";
 			this.m_TreeView.Size = new System.Drawing.Size(300, 689);
-			this.m_TreeView.TabIndex = 0;
+			this.m_TreeView.TabIndex = 1;
 			// 
 			// m_panBackGround
 			// 
@@ -219,10 +219,10 @@
             this.m_tsmiAxialPar,
             this.m_tsmiAxialPar_R,
             this.m_tsmiTransformOK});
-			this.m_msCAD_Transform.Location = new System.Drawing.Point(0, 24);
+			this.m_msCAD_Transform.Location = new System.Drawing.Point(0, 72);
 			this.m_msCAD_Transform.Name = "m_msCAD_Transform";
 			this.m_msCAD_Transform.Size = new System.Drawing.Size(1184, 24);
-			this.m_msCAD_Transform.TabIndex = 2;
+			this.m_msCAD_Transform.TabIndex = 1;
 			this.m_msCAD_Transform.Text = "menuStrip2";
 			this.m_msCAD_Transform.Visible = false;
 			// 
@@ -294,7 +294,7 @@
 			this.m_msCAD_SelectFace.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsmiSelectD1ContFace,
             this.m_tsmiSelectPath});
-			this.m_msCAD_SelectFace.Location = new System.Drawing.Point(0, 24);
+			this.m_msCAD_SelectFace.Location = new System.Drawing.Point(0, 72);
 			this.m_msCAD_SelectFace.Name = "m_msCAD_SelectFace";
 			this.m_msCAD_SelectFace.Size = new System.Drawing.Size(1184, 24);
 			this.m_msCAD_SelectFace.TabIndex = 0;
@@ -335,7 +335,7 @@
 			// 
 			this.m_msCAD_ManualSelectPath.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsmiManualSelectPathOK});
-			this.m_msCAD_ManualSelectPath.Location = new System.Drawing.Point(0, 24);
+			this.m_msCAD_ManualSelectPath.Location = new System.Drawing.Point(0, 72);
 			this.m_msCAD_ManualSelectPath.Name = "m_msCAD_ManualSelectPath";
 			this.m_msCAD_ManualSelectPath.Size = new System.Drawing.Size(1184, 24);
 			this.m_msCAD_ManualSelectPath.TabIndex = 1;
@@ -357,7 +357,7 @@
 			this.m_msMain.Location = new System.Drawing.Point(0, 0);
 			this.m_msMain.Name = "m_msMain";
 			this.m_msMain.Size = new System.Drawing.Size(1184, 24);
-			this.m_msMain.TabIndex = 3;
+			this.m_msMain.TabIndex = 1;
 			this.m_msMain.Text = "menuStrip1";
 			// 
 			// m_tsmiFile
@@ -380,7 +380,7 @@
 			this.m_msCAM.Location = new System.Drawing.Point(0, 48);
 			this.m_msCAM.Name = "m_msCAM";
 			this.m_msCAM.Size = new System.Drawing.Size(1184, 24);
-			this.m_msCAM.TabIndex = 4;
+			this.m_msCAM.TabIndex = 1;
 			this.m_msCAM.Text = "menuStrip1";
 			// 
 			// m_tsmiAddPath
