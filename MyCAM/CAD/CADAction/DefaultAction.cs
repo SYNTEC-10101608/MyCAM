@@ -4,11 +4,19 @@ using System.Windows.Forms;
 
 namespace MyCAM.CAD
 {
+	internal enum ESelectObjectType
+	{
+		Part,
+		Path,
+	}
+
 	internal class DefaultAction : CADACtionBase
 	{
-		public DefaultAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
+		public DefaultAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager,
+			ESelectObjectType type )
 			: base( viewer, treeView, cadManager, viewManager )
 		{
+			m_SelectType = type;
 		}
 
 		public override CADActionType ActionType
@@ -24,8 +32,11 @@ namespace MyCAM.CAD
 			base.Start();
 
 			// reset activation mode
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Activate( viewObject.AISHandle );
+			foreach( var viewObjectData in m_ViewManager.ViewObjectMap ) {
+				if( ( m_SelectType == ESelectObjectType.Part && m_CADManager.PartIDList.Contains( viewObjectData.Key ) )
+					|| ( m_SelectType == ESelectObjectType.Path && m_CADManager.PathIDList.Contains( viewObjectData.Key ) ) ) {
+					m_Viewer.GetAISContext().Activate( viewObjectData.Value.AISHandle );
+				}
 			}
 			m_bSuppressTreeViewSync = false;
 			SyncSelectionFromTreeToView();
@@ -179,5 +190,6 @@ namespace MyCAM.CAD
 		}
 
 		bool m_bSuppressTreeViewSync = false;
+		ESelectObjectType m_SelectType;
 	}
 }

@@ -124,6 +124,7 @@ namespace MyCAM.CAD
 			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				if( viewObject.Visible ) {
 					m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
+					m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
 				}
 			}
 

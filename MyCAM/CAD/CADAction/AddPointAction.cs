@@ -28,8 +28,11 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = false;
 
 			// activate edge slection mode
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Edge );
+			foreach( var viewObjectData in m_ViewManager.ViewObjectMap ) {
+				if( viewObjectData.Value.Visible == false || m_CADManager.PartIDList.Contains( viewObjectData.Key ) == false ) {
+					continue;
+				}
+				m_Viewer.GetAISContext().Activate( viewObjectData.Value.AISHandle, (int)AISActiveMode.Edge );
 			}
 		}
 

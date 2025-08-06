@@ -48,8 +48,11 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = false;
 
 			// activate vertex selection mode
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Vertex );
+			foreach( var viewObjectData in m_ViewManager.ViewObjectMap ) {
+				if( viewObjectData.Value.Visible == false || m_CADManager.PartIDList.Contains( viewObjectData.Key ) == false ) {
+					continue;
+				}
+				m_Viewer.GetAISContext().Activate( viewObjectData.Value.AISHandle, (int)AISActiveMode.Vertex );
 			}
 			m_ActionStage = EActionStage.P1;
 		}
@@ -125,7 +128,7 @@ namespace MyCAM.CAD
 					}
 
 					// final transformation
-					TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager,m_ViewManager, m_3PTransform );
+					TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, m_ViewManager, m_3PTransform );
 					transformHelper.TransformData();
 					End();
 				}

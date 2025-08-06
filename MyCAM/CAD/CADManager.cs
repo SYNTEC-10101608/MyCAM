@@ -74,6 +74,7 @@ namespace MyCAM.CAD
 		{
 			ShapeDataContainer = new List<ShapeData>();
 			ShapeDataMap = new Dictionary<string, ShapeData>();
+			PartIDList = new HashSet<string>();
 			PathIDList = new HashSet<string>();
 			PartShape = null;
 		}
@@ -85,6 +86,11 @@ namespace MyCAM.CAD
 		}
 
 		public Dictionary<string, ShapeData> ShapeDataMap
+		{
+			get; private set;
+		}
+
+		public HashSet<string> PartIDList
 		{
 			get; private set;
 		}
@@ -114,6 +120,7 @@ namespace MyCAM.CAD
 			ResetShapeIDs();
 			ShapeDataContainer.Clear();
 			ShapeDataMap.Clear();
+			PartIDList.Clear();
 			PathIDList.Clear();
 
 			// update all datas
@@ -121,6 +128,7 @@ namespace MyCAM.CAD
 			ShapeDataContainer.AddRange( newShapeData );
 			foreach( var shapeData in ShapeDataContainer ) {
 				ShapeDataMap[ shapeData.UID ] = shapeData;
+				PartIDList.Add( shapeData.UID );
 			}
 			PartChanged?.Invoke();
 		}
@@ -134,6 +142,7 @@ namespace MyCAM.CAD
 			ShapeData newData = new ShapeData( szID, newFeature );
 			ShapeDataContainer.Add( newData );
 			ShapeDataMap[ szID ] = newData;
+			PartIDList.Add( szID );
 			FeatureAdded?.Invoke( new List<string>() { szID } );
 		}
 

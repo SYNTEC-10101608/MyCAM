@@ -41,9 +41,12 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = false;
 
 			// activate
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Edge );
-				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Face );
+			foreach( var viewObjectData in m_ViewManager.ViewObjectMap ) {
+				if( viewObjectData.Value.Visible == false || m_CADManager.PartIDList.Contains( viewObjectData.Key ) == false ) {
+					continue;
+				}
+				m_Viewer.GetAISContext().Activate( viewObjectData.Value.AISHandle, (int)AISActiveMode.Edge );
+				m_Viewer.GetAISContext().Activate( viewObjectData.Value.AISHandle, (int)AISActiveMode.Face );
 			}
 
 			// show transform part and G54 coordinate system
@@ -91,15 +94,6 @@ namespace MyCAM.CAD
 
 		public void TransformDone()
 		{
-			foreach( var oneData in m_CADManager.ShapeDataMap ) {
-				if( m_ViewManager.ViewObjectMap.ContainsKey( oneData.Key ) ) {
-					AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ oneData.Key ].AISHandle );
-					if( oneAIS == null || oneAIS.IsNull() ) {
-						continue;
-					}
-					oneAIS.SetShape( oneData.Value.Shape );
-				}
-			}
 			End();
 		}
 
@@ -263,7 +257,7 @@ namespace MyCAM.CAD
 				foreach( var oneObject in m_ViewManager.ViewObjectMap ) {
 
 					// skip invisible objects
-					if( oneObject.Value.Visible == false || m_CADManager.ShapeDataMap.ContainsKey( oneObject.Key ) == false ) {
+					if( oneObject.Value.Visible == false || m_CADManager.PartIDList.Contains( oneObject.Key ) == false ) {
 						continue;
 					}
 					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ oneObject.Key ].Shape, TopAbs_ShapeEnum.TopAbs_FACE );
@@ -290,7 +284,7 @@ namespace MyCAM.CAD
 				foreach( var oneObject in m_ViewManager.ViewObjectMap ) {
 
 					// skip invisible objects
-					if( oneObject.Value.Visible == false || m_CADManager.ShapeDataMap.ContainsKey( oneObject.Key ) == false ) {
+					if( oneObject.Value.Visible == false || m_CADManager.PartIDList.Contains( oneObject.Key ) == false ) {
 						continue;
 					}
 					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ oneObject.Key ].Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
@@ -343,6 +337,7 @@ namespace MyCAM.CAD
 		{
 			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, m_ViewManager, trsf );
 			transformHelper.TransformData();
+			m_Viewer.GetAISContext().ClearSelected( true );
 		}
 
 		TopoDS_Shape m_G54Shape;

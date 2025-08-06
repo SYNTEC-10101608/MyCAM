@@ -14,9 +14,9 @@ namespace MyCAM.CAM
 {
 	internal class CAMEditor
 	{
-		public CAMEditor( Viewer viewer, TreeView treeView, CADManager cadManager )
+		public CAMEditor( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
 		{
-			if( viewer == null || treeView == null || cadManager == null ) {
+			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
 				throw new ArgumentNullException( "CAMEditor consturcting argument null." );
 			}
 
@@ -27,10 +27,10 @@ namespace MyCAM.CAM
 			// user interface
 			m_Viewer = viewer;
 			m_TreeView = treeView;
-			m_ViewManager = new ViewManager();
+			m_ViewManager = viewManager;
 
 			// default action
-			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Path );
 		}
 
 		// data manager
@@ -49,13 +49,12 @@ namespace MyCAM.CAM
 		// editor
 		public void EditStart()
 		{
-			//// init tree
-			//m_TreeView.Nodes.Add( m_CADManager.PartNode );
-			//m_TreeView.Nodes.Add( m_CADManager.PathNode );
+			// init tree
+			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
 
-			//// start default action
-			//m_CurrentAction = m_DefaultAction;
-			//m_DefaultAction.Start();
+			// start default action
+			m_CurrentAction = m_DefaultAction;
+			m_DefaultAction.Start();
 		}
 
 		public void EditEnd()

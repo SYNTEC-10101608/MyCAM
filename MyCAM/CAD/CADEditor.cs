@@ -37,9 +37,9 @@ namespace MyCAM.CAD
 
 	internal class CADEditor
 	{
-		public CADEditor( Viewer viewer, TreeView treeView, CADManager cadManager )
+		public CADEditor( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
 		{
-			if( viewer == null || treeView == null || cadManager == null ) {
+			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
 				throw new ArgumentNullException( "CADEditor consturcting argument null." );
 			}
 
@@ -51,10 +51,10 @@ namespace MyCAM.CAD
 			// user interface
 			m_Viewer = viewer;
 			m_TreeView = treeView;
-			m_ViewManager = new ViewManager();
+			m_ViewManager = viewManager;
 
 			// default action
-			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Part );
 		}
 
 		// user interface
@@ -74,7 +74,6 @@ namespace MyCAM.CAD
 		{
 			// init tree
 			m_TreeView.Nodes.Add( m_ViewManager.PartNode );
-			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
 
 			// start default action
 			m_CurrentAction = m_DefaultAction;
@@ -86,9 +85,14 @@ namespace MyCAM.CAD
 			// clear tree
 			m_TreeView.Nodes.Clear();
 
-			// end the current action and end default action
-			m_CurrentAction.End();
-			m_DefaultAction.End();
+			// end all action
+			if( m_CurrentAction.ActionType == CADActionType.Default ) {
+				m_CurrentAction.End();
+			}
+			else {
+				m_CurrentAction.End();
+				m_DefaultAction.End();
+			}
 		}
 
 		// APIs
@@ -206,7 +210,7 @@ namespace MyCAM.CAD
 				// add shape to the viewer
 				AIS_Shape aisShape = ViewHelper.CreatePartAIS( data.Shape );
 				m_ViewManager.ViewObjectMap.Add( data.UID, new ViewObject( aisShape ) );
-				m_Viewer.GetAISContext().Display( aisShape, false );
+				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
 
 			// update tree view and viewer
@@ -227,10 +231,9 @@ namespace MyCAM.CAD
 				m_ViewManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
-				ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
-				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( shapeData.Shape );
+				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( m_CADManager.ShapeDataMap[ szID ].Shape );
 				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
-				m_Viewer.GetAISContext().Display( aisShape, false );
+				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
 
 			// update tree view and viewer

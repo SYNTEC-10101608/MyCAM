@@ -11,6 +11,7 @@ namespace MyCAM.CAD
 		{
 			m_Viewer = viewer;
 			m_CADManager = cadManager;
+			m_ViewManager = viewManager;
 			m_3PTransform = trsf;
 		}
 
