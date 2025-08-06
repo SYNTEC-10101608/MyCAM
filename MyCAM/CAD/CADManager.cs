@@ -84,6 +84,37 @@ namespace MyCAM.CAD
 		}
 	}
 
+	internal class ViewManager
+	{
+		public ViewManager()
+		{
+			ViewObjectMap = new Dictionary<string, ViewObject>();
+			TreeNodeMap = new Dictionary<string, TreeNode>();
+			PartNode = new TreeNode( "Part" );
+			PathNode = new TreeNode( "Path" );
+		}
+
+		public Dictionary<string, ViewObject> ViewObjectMap
+		{
+			get; private set;
+		}
+
+		public Dictionary<string, TreeNode> TreeNodeMap
+		{
+			get; private set;
+		}
+
+		public TreeNode PartNode
+		{
+			get; private set;
+		}
+
+		public TreeNode PathNode
+		{
+			get; private set;
+		}
+	}
+
 	// TODO: extract view manager to a separate class
 	internal class CADManager
 	{
@@ -97,12 +128,6 @@ namespace MyCAM.CAD
 			ShapeDataMap = new Dictionary<string, ShapeData>();
 			PathIDList = new HashSet<string>();
 			PartShape = null;
-
-			// view manager
-			PartNode = new TreeNode( "Part" );
-			PathNode = new TreeNode( "Path" );
-			ViewObjectMap = new Dictionary<string, ViewObject>();
-			TreeNodeMap = new Dictionary<string, TreeNode>();
 		}
 
 		// TODO: it is not good to giving out the pointer of field
@@ -279,27 +304,6 @@ namespace MyCAM.CAD
 		int m_WireID = 0;
 		int m_EdgeID = 0;
 		int m_VertexID = 0;
-
-		// view manager
-		public Dictionary<string, ViewObject> ViewObjectMap
-		{
-			get; private set;
-		}
-
-		public Dictionary<string, TreeNode> TreeNodeMap
-		{
-			get; private set;
-		}
-
-		public TreeNode PartNode
-		{
-			get; private set;
-		}
-
-		public TreeNode PathNode
-		{
-			get; private set;
-		}
 
 		public string GetUIDByShape( TopoDS_Shape shape )
 		{

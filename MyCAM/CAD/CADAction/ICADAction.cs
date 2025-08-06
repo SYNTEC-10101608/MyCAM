@@ -34,13 +34,14 @@ namespace MyCAM.CAD
 
 	internal class CADACtionBase : ICADAction
 	{
-		public CADACtionBase( Viewer viewer, TreeView treeView, CADManager cadManager )
+		public CADACtionBase( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
 		{
-			if( viewer == null || treeView == null || cadManager == null ) {
+			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
 				throw new ArgumentNullException( "CADACtionBase constructing argument null" );
 			}
 			m_Viewer = viewer;
 			m_TreeView = treeView;
+			m_ViewManager = viewManager;
 			m_CADManager = cadManager;
 		}
 
@@ -100,6 +101,7 @@ namespace MyCAM.CAD
 
 		protected Viewer m_Viewer;
 		protected TreeView m_TreeView;
+		protected ViewManager m_ViewManager;
 		protected CADManager m_CADManager;
 	}
 }

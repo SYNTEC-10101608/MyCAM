@@ -27,9 +27,10 @@ namespace MyCAM.CAM
 			// user interface
 			m_Viewer = viewer;
 			m_TreeView = treeView;
+			m_ViewManager = new ViewManager();
 
 			// default action
-			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager );
+			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
 		}
 
 		// data manager
@@ -38,6 +39,7 @@ namespace MyCAM.CAM
 		// user interface
 		Viewer m_Viewer;
 		TreeView m_TreeView;
+		ViewManager m_ViewManager;
 
 		// action
 		ICADAction m_DefaultAction;
@@ -63,7 +65,7 @@ namespace MyCAM.CAM
 		// APIs
 		public void StartSelectFace()
 		{
-			SelectFaceAction action = new SelectFaceAction( m_Viewer, m_TreeView, m_CADManager );
+			SelectFaceAction action = new SelectFaceAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
 			StartEditAction( action );
 		}
 
@@ -119,7 +121,7 @@ namespace MyCAM.CAM
 				m_CurrentAction.End();
 				return;
 			}
-			SelectPathAction action = new SelectPathAction( m_Viewer, m_TreeView, m_CADManager, selectedFaceGroupList );
+			SelectPathAction action = new SelectPathAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, selectedFaceGroupList );
 			StartEditAction( action );
 		}
 
@@ -140,18 +142,18 @@ namespace MyCAM.CAM
 
 				// add a new node to the tree view
 				TreeNode node = new TreeNode( szID );
-				m_CADManager.PathNode.Nodes.Add( node );
-				m_CADManager.TreeNodeMap.Add( szID, node );
+				m_ViewManager.PathNode.Nodes.Add( node );
+				m_ViewManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
 				ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
 				AIS_Shape aisShape = ViewHelper.CreatePathAIS( shapeData.Shape );
-				m_CADManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
+				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false );
 			}
 
 			// update tree view and viewer
-			m_CADManager.PathNode.ExpandAll();
+			m_ViewManager.PathNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
 

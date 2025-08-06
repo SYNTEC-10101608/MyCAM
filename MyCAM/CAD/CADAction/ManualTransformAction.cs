@@ -15,8 +15,8 @@ namespace MyCAM.CAD
 {
 	internal class ManualTransformAction : CADACtionBase
 	{
-		public ManualTransformAction( Viewer viewer, TreeView treeView, CADManager cadManager )
-			: base( viewer, treeView, cadManager )
+		public ManualTransformAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
+			: base( viewer, treeView, cadManager, viewManager )
 		{
 			// make a coordinate system as reference
 			MakeG54Coord();
@@ -41,7 +41,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = false;
 
 			// activate
-			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Edge );
 				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Face );
 			}
@@ -60,7 +60,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = true;
 
 			// deactivate
-			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
 			}
 
@@ -92,8 +92,8 @@ namespace MyCAM.CAD
 		public void TransformDone()
 		{
 			foreach( var oneData in m_CADManager.ShapeDataMap ) {
-				if( m_CADManager.ViewObjectMap.ContainsKey( oneData.Key ) ) {
-					AIS_Shape oneAIS = AIS_Shape.DownCast( m_CADManager.ViewObjectMap[ oneData.Key ].AISHandle );
+				if( m_ViewManager.ViewObjectMap.ContainsKey( oneData.Key ) ) {
+					AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ oneData.Key ].AISHandle );
 					if( oneAIS == null || oneAIS.IsNull() ) {
 						continue;
 					}
@@ -260,7 +260,7 @@ namespace MyCAM.CAD
 					}
 					expRef.Next();
 				}
-				foreach( var oneObject in m_CADManager.ViewObjectMap ) {
+				foreach( var oneObject in m_ViewManager.ViewObjectMap ) {
 
 					// skip invisible objects
 					if( oneObject.Value.Visible == false || m_CADManager.ShapeDataMap.ContainsKey( oneObject.Key ) == false ) {
@@ -287,7 +287,7 @@ namespace MyCAM.CAD
 					}
 					expRef.Next();
 				}
-				foreach( var oneObject in m_CADManager.ViewObjectMap ) {
+				foreach( var oneObject in m_ViewManager.ViewObjectMap ) {
 
 					// skip invisible objects
 					if( oneObject.Value.Visible == false || m_CADManager.ShapeDataMap.ContainsKey( oneObject.Key ) == false ) {
@@ -341,7 +341,7 @@ namespace MyCAM.CAD
 
 		void ApplyTransform( gp_Trsf trsf )
 		{
-			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, trsf );
+			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, m_ViewManager, trsf );
 			transformHelper.TransformData();
 		}
 

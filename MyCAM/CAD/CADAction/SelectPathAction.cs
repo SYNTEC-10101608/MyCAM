@@ -28,8 +28,9 @@ namespace MyCAM.CAD
 			}
 		}
 
-		public SelectPathAction( Viewer viewer, TreeView treeView, CADManager cadManager, List<TopoDS_Shape> faceGroupList )
-			: base( viewer, treeView, cadManager )
+		public SelectPathAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager,
+			List<TopoDS_Shape> faceGroupList )
+			: base( viewer, treeView, cadManager, viewManager )
 		{
 			// get face group list from select face action
 			if( faceGroupList == null || faceGroupList.Count == 0 ) {
@@ -102,7 +103,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = false;
 
 			// hide all shape
-			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
 			}
 
@@ -120,7 +121,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = true;
 
 			// show all shape
-			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				if( viewObject.Visible ) {
 					m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
 				}

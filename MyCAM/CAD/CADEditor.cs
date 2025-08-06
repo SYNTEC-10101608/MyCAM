@@ -111,14 +111,16 @@ namespace MyCAM.CAD
 			// user interface
 			m_Viewer = viewer;
 			m_TreeView = treeView;
+			m_ViewManager = new ViewManager();
 
 			// default action
-			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager );
+			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
 		}
 
 		// user interface
 		Viewer m_Viewer;
 		TreeView m_TreeView;
+		ViewManager m_ViewManager;
 
 		// data manager
 		CADManager m_CADManager;
@@ -131,8 +133,8 @@ namespace MyCAM.CAD
 		public void EditStart()
 		{
 			// init tree
-			m_TreeView.Nodes.Add( m_CADManager.PartNode );
-			m_TreeView.Nodes.Add( m_CADManager.PathNode );
+			m_TreeView.Nodes.Add( m_ViewManager.PartNode );
+			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
 
 			// start default action
 			m_CurrentAction = m_DefaultAction;
@@ -188,19 +190,19 @@ namespace MyCAM.CAD
 
 		public void AddPoint( AddPointType type )
 		{
-			AddPointAction action = new AddPointAction( m_Viewer, m_TreeView, m_CADManager, type );
+			AddPointAction action = new AddPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, type );
 			StartEditAction( action );
 		}
 
 		public void ThreePointTransform()
 		{
-			ThreePtTransformAction action = new ThreePtTransformAction( m_Viewer, m_TreeView, m_CADManager );
+			ThreePtTransformAction action = new ThreePtTransformAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void StartManaulTransform()
 		{
-			ManualTransformAction action = new ManualTransformAction( m_Viewer, m_TreeView, m_CADManager );
+			ManualTransformAction action = new ManualTransformAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
 			StartEditAction( action );
 		}
 
@@ -245,30 +247,30 @@ namespace MyCAM.CAD
 		void OnPartChanged()
 		{
 			// clear the tree view and viewer
-			m_CADManager.PartNode.Nodes.Clear();
-			m_CADManager.PathNode.Nodes.Clear();
-			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+			m_ViewManager.PartNode.Nodes.Clear();
+			m_ViewManager.PathNode.Nodes.Clear();
+			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Remove( viewObject.AISHandle, false );
 			}
 
 			// clear view manager data
-			m_CADManager.ViewObjectMap.Clear();
-			m_CADManager.TreeNodeMap.Clear();
+			m_ViewManager.ViewObjectMap.Clear();
+			m_ViewManager.TreeNodeMap.Clear();
 			foreach( var data in m_CADManager.ShapeDataContainer ) {
 
 				// add node to the tree view
 				TreeNode node = new TreeNode( data.UID );
-				m_CADManager.PartNode.Nodes.Add( node );
-				m_CADManager.TreeNodeMap.Add( data.UID, node );
+				m_ViewManager.PartNode.Nodes.Add( node );
+				m_ViewManager.TreeNodeMap.Add( data.UID, node );
 
 				// add shape to the viewer
 				AIS_Shape aisShape = ViewHelper.CreatePartAIS( data.Shape );
-				m_CADManager.ViewObjectMap.Add( data.UID, new ViewObject( aisShape ) );
+				m_ViewManager.ViewObjectMap.Add( data.UID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false );
 			}
 
 			// update tree view and viewer
-			m_CADManager.PartNode.ExpandAll();
+			m_ViewManager.PartNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
 
@@ -281,18 +283,18 @@ namespace MyCAM.CAD
 
 				// add a new node to the tree view
 				TreeNode node = new TreeNode( szID );
-				m_CADManager.PartNode.Nodes.Add( node );
-				m_CADManager.TreeNodeMap.Add( szID, node );
+				m_ViewManager.PartNode.Nodes.Add( node );
+				m_ViewManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
 				ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
 				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( shapeData.Shape );
-				m_CADManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
+				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false );
 			}
 
 			// update tree view and viewer
-			m_CADManager.PartNode.ExpandAll();
+			m_ViewManager.PartNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
 

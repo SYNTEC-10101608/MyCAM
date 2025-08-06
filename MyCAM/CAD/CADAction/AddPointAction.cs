@@ -10,9 +10,9 @@ namespace MyCAM.CAD
 {
 	internal class AddPointAction : CADACtionBase
 	{
-		public AddPointAction( Viewer viewer, TreeView treeView, CADManager cadManager,
+		public AddPointAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager,
 			AddPointType addPointType )
-			: base( viewer, treeView, cadManager )
+			: base( viewer, treeView, cadManager, viewManager )
 		{
 			m_AddPointType = addPointType;
 		}
@@ -28,7 +28,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = false;
 
 			// activate edge slection mode
-			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Edge );
 			}
 		}
@@ -43,7 +43,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = true;
 
 			// deactivate
-			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Deactivate();
 			}
 			base.End();

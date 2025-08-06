@@ -7,7 +7,7 @@ namespace MyCAM.CAD
 {
 	internal class TransformHelper
 	{
-		public TransformHelper( Viewer viewer, CADManager cadManager, gp_Trsf trsf )
+		public TransformHelper( Viewer viewer, CADManager cadManager, ViewManager viewManager, gp_Trsf trsf )
 		{
 			m_Viewer = viewer;
 			m_CADManager = cadManager;
@@ -20,7 +20,7 @@ namespace MyCAM.CAD
 			m_CADManager.PartShape = partTr.Shape();
 			foreach( var oneData in m_CADManager.ShapeDataMap ) {
 				oneData.Value.DoTransform( m_3PTransform );
-				AIS_Shape oneAIS = AIS_Shape.DownCast( m_CADManager.ViewObjectMap[ oneData.Key ].AISHandle );
+				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ oneData.Key ].AISHandle );
 				if( oneAIS == null || oneAIS.IsNull() ) {
 					continue;
 				}
@@ -32,6 +32,7 @@ namespace MyCAM.CAD
 
 		Viewer m_Viewer;
 		CADManager m_CADManager;
+		ViewManager m_ViewManager;
 		gp_Trsf m_3PTransform;
 	}
 }

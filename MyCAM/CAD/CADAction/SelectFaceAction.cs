@@ -27,13 +27,13 @@ namespace MyCAM.CAD
 			}
 		}
 
-		public SelectFaceAction( Viewer viewer, TreeView treeView, CADManager cadManager )
-			: base( viewer, treeView, cadManager )
+		public SelectFaceAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
+			: base( viewer, treeView, cadManager, viewManager )
 		{
 			m_VisibleFaceAISPairList = new List<FaceHandle>();
 			m_EdgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
 			foreach( var oneShapeData in m_CADManager.ShapeDataContainer ) {
-				if( m_CADManager.ViewObjectMap[ oneShapeData.UID ].Visible ) {
+				if( m_ViewManager.ViewObjectMap[ oneShapeData.UID ].Visible ) {
 
 					// collect all faces
 					TopExp_Explorer exp = new TopExp_Explorer( oneShapeData.Shape, TopAbs_ShapeEnum.TopAbs_FACE );
@@ -68,7 +68,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = false;
 
 			// hide all shape
-			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
 			}
 
@@ -86,7 +86,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = true;
 
 			// show all shape
-			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				if( viewObject.Visible ) {
 					m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
 				}

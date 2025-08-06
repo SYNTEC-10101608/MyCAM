@@ -13,8 +13,8 @@ namespace MyCAM.CAD
 {
 	internal class ThreePtTransformAction : CADACtionBase
 	{
-		public ThreePtTransformAction( Viewer viewer, TreeView treeView, CADManager cadManager )
-			: base( viewer, treeView, cadManager )
+		public ThreePtTransformAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
+			: base( viewer, treeView, cadManager, viewManager )
 		{
 			m_ActionStage = EActionStage.P1;
 
@@ -48,7 +48,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = false;
 
 			// activate vertex selection mode
-			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Activate( viewObject.AISHandle, (int)AISActiveMode.Vertex );
 			}
 			m_ActionStage = EActionStage.P1;
@@ -68,7 +68,7 @@ namespace MyCAM.CAD
 			m_TreeView.Enabled = true;
 
 			// deactivate
-			foreach( ViewObject viewObject in m_CADManager.ViewObjectMap.Values ) {
+			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
 				m_Viewer.GetAISContext().Deactivate();
 			}
 			base.End();
@@ -125,7 +125,7 @@ namespace MyCAM.CAD
 					}
 
 					// final transformation
-					TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, m_3PTransform );
+					TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager,m_ViewManager, m_3PTransform );
 					transformHelper.TransformData();
 					End();
 				}
