@@ -39,7 +39,10 @@ namespace MyCAM
 			m_CADEditor.EditStart();
 
 			// CAM Editor
-			//m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView, m_CADManager );
+			m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView, m_CADManager );
+
+			// init menu
+			m_msCAM.Visible = false;
 		}
 
 		// app properties
@@ -157,39 +160,42 @@ namespace MyCAM
 		{
 			m_msCAD_SelectFace.Visible = true;
 			m_msCAD.Enabled = false;
-			m_CADEditor.StartSelectFace();
+			m_CAMEditor.StartSelectFace();
 		}
 
 		void m_tsmiSelectD1ContFace_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.SelectD1ContFace();
+			m_CAMEditor.SelectD1ContFace();
 		}
 
 		void m_tsmiSelPath_FreeBound_Click( object sender, EventArgs e )
 		{
 			m_msCAD_SelectFace.Visible = false;
 			m_msCAD.Enabled = true;
-			m_CADEditor.SelectPath_FreeBound();
+			m_CAMEditor.SelectPath_FreeBound();
 		}
 
 		void m_tsmiSelPath_Manual_Click( object sender, EventArgs e )
 		{
 			m_msCAD_SelectFace.Visible = false;
 			m_msCAD_ManualSelectPath.Visible = true;
-			m_CADEditor.StartSelectPath_Manual();
+			m_CAMEditor.StartSelectPath_Manual();
 		}
 
 		void m_tsmiManualSelectPathOK_Click( object sender, EventArgs e )
 		{
 			m_msCAD_ManualSelectPath.Visible = false;
 			m_msCAD.Enabled = true;
-			m_CADEditor.EndSelectPath_Manual();
+			m_CAMEditor.EndSelectPath_Manual();
 		}
 
 		// go to CAM editor
 		void m_tsmiCAM_Click( object sender, EventArgs e )
 		{
-
+			m_msCAD.Visible = false;
+			m_msCAM.Visible = true;
+			m_CADEditor.EditEnd();
+			m_CAMEditor.EditStart();
 		}
 	}
 }

@@ -4,12 +4,8 @@ using OCC.AIS;
 using OCC.IFSelect;
 using OCC.IGESControl;
 using OCC.Quantity;
-using OCC.ShapeAnalysis;
 using OCC.STEPControl;
-using OCC.TopAbs;
-using OCC.TopExp;
 using OCC.TopoDS;
-using OCC.TopTools;
 using OCC.XSControl;
 using OCCTool;
 using OCCViewer;
@@ -107,11 +103,10 @@ namespace MyCAM.CAD
 				throw new ArgumentNullException( "CADEditor consturcting argument null." );
 			}
 
-			// CAD manager
+			// data manager
 			m_CADManager = cadManager;
 			m_CADManager.PartChanged += OnPartChanged;
 			m_CADManager.FeatureAdded += OnFeatureAdded;
-			m_CADManager.PathAdded += OnPathAdded;
 
 			// user interface
 			m_Viewer = viewer;
@@ -125,7 +120,7 @@ namespace MyCAM.CAD
 		Viewer m_Viewer;
 		TreeView m_TreeView;
 
-		// CAD manager
+		// data manager
 		CADManager m_CADManager;
 
 		// action
@@ -146,6 +141,12 @@ namespace MyCAM.CAD
 
 		public void EditEnd()
 		{
+			// clear tree
+			m_TreeView.Nodes.Clear();
+
+			// end the current action and end default action
+			m_CurrentAction.End();
+			m_DefaultAction.End();
 		}
 
 		// APIs
@@ -217,76 +218,6 @@ namespace MyCAM.CAD
 				return;
 			}
 			( (ManualTransformAction)m_CurrentAction ).TransformDone();
-		}
-
-		public void StartSelectFace()
-		{
-			SelectFaceAction action = new SelectFaceAction( m_Viewer, m_TreeView, m_CADManager );
-			StartEditAction( action );
-		}
-
-		public void SelectD1ContFace()
-		{
-			if( m_CurrentAction.ActionType != CADActionType.SelectFace ) {
-				return;
-			}
-			( (SelectFaceAction)m_CurrentAction ).SelectD1ContFace();
-		}
-
-		public void SelectPath_FreeBound()
-		{
-			// get selected face group from select face action
-			if( m_CurrentAction.ActionType != CADActionType.SelectFace ) {
-				return;
-			}
-			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
-			m_CurrentAction.End();
-
-			// get path from free boundaries
-			if( selectedFaceGroupList.Count == 0 ) {
-				return;
-			}
-			List<TopoDS_Wire> pathWireList = new List<TopoDS_Wire>();
-			TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-			foreach( TopoDS_Shape oneFace in selectedFaceGroupList ) {
-				ShapeAnalysis_FreeBounds freeBounds = new ShapeAnalysis_FreeBounds( oneFace );
-
-				// add to map
-				TopExp.MapShapesAndAncestors( oneFace, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref edgeFaceMap );
-
-				// get all closed wires
-				TopExp_Explorer wireExp = new TopExp_Explorer( freeBounds.GetClosedWires(), TopAbs_ShapeEnum.TopAbs_WIRE );
-				while( wireExp.More() ) {
-					pathWireList.Add( TopoDS.ToWire( wireExp.Current() ) );
-					wireExp.Next();
-				}
-			}
-			m_CADManager.AddPath( pathWireList, edgeFaceMap );
-		}
-
-		public void StartSelectPath_Manual()
-		{
-			// get selected face group from select face action
-			if( m_CurrentAction.ActionType != CADActionType.SelectFace ) {
-				return;
-			}
-			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
-
-			// end all actions if no face is selected
-			if( selectedFaceGroupList.Count == 0 ) {
-				m_CurrentAction.End();
-				return;
-			}
-			SelectPathAction action = new SelectPathAction( m_Viewer, m_TreeView, m_CADManager, selectedFaceGroupList );
-			StartEditAction( action );
-		}
-
-		public void EndSelectPath_Manual()
-		{
-			if( m_CurrentAction.ActionType != CADActionType.SelectPath ) {
-				return;
-			}
-			( (SelectPathAction)m_CurrentAction ).SelectDone();
 		}
 
 		public void GoToCAM()
@@ -362,30 +293,6 @@ namespace MyCAM.CAD
 
 			// update tree view and viewer
 			m_CADManager.PartNode.ExpandAll();
-			m_Viewer.UpdateView();
-		}
-
-		void OnPathAdded( List<string> newPathIDs )
-		{
-			foreach( string szID in newPathIDs ) {
-				if( string.IsNullOrEmpty( szID ) ) {
-					return;
-				}
-
-				// add a new node to the tree view
-				TreeNode node = new TreeNode( szID );
-				m_CADManager.PathNode.Nodes.Add( node );
-				m_CADManager.TreeNodeMap.Add( szID, node );
-
-				// add a new shape to the viewer
-				ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( shapeData.Shape );
-				m_CADManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
-				m_Viewer.GetAISContext().Display( aisShape, false );
-			}
-
-			// update tree view and viewer
-			m_CADManager.PathNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
 
