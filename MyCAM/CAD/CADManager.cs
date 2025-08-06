@@ -63,7 +63,6 @@ namespace MyCAM.CAD
 		}
 	}
 
-	// TODO: extract view manager to a separate class
 	internal class CADManager
 	{
 		public Action PartChanged;
