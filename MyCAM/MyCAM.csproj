@@ -75,6 +75,7 @@
     <Compile Include="CAD\Dialog\ThreePtTransformDlg.Designer.cs">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="CAD\ViewManager.cs" />
     <Compile Include="CAM\CAMData.cs" />
     <Compile Include="CAM\CAMEditor.cs" />
     <Compile Include="StartupForm.cs">

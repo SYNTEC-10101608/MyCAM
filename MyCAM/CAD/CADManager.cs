@@ -1,5 +1,4 @@
 ﻿using DataStructure;
-using OCC.AIS;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopAbs;
@@ -8,7 +7,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace MyCAM.CAD
 {
@@ -62,56 +60,6 @@ namespace MyCAM.CAD
 		{
 			base.DoTransform( transform );
 			Transform.PreMultiply( transform );
-		}
-	}
-
-	internal class ViewObject
-	{
-		public ViewObject( AIS_InteractiveObject shape )
-		{
-			AISHandle = shape;
-			Visible = true;
-		}
-
-		public bool Visible
-		{
-			get; set;
-		}
-
-		public AIS_InteractiveObject AISHandle
-		{
-			get; set;
-		}
-	}
-
-	internal class ViewManager
-	{
-		public ViewManager()
-		{
-			ViewObjectMap = new Dictionary<string, ViewObject>();
-			TreeNodeMap = new Dictionary<string, TreeNode>();
-			PartNode = new TreeNode( "Part" );
-			PathNode = new TreeNode( "Path" );
-		}
-
-		public Dictionary<string, ViewObject> ViewObjectMap
-		{
-			get; private set;
-		}
-
-		public Dictionary<string, TreeNode> TreeNodeMap
-		{
-			get; private set;
-		}
-
-		public TreeNode PartNode
-		{
-			get; private set;
-		}
-
-		public TreeNode PathNode
-		{
-			get; private set;
 		}
 	}
 
