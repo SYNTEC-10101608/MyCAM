@@ -13,7 +13,7 @@ namespace MyCAM.Editor
 
 	internal class DefaultAction : CADACtionBase
 	{
-		public DefaultAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager,
+		public DefaultAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			ESelectObjectType type )
 			: base( viewer, treeView, cadManager, viewManager )
 		{

@@ -11,7 +11,7 @@ namespace MyCAM.Editor
 {
 	internal class AddPointAction : CADACtionBase
 	{
-		public AddPointAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager,
+		public AddPointAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			AddPointType addPointType )
 			: base( viewer, treeView, cadManager, viewManager )
 		{

@@ -8,13 +8,13 @@ using System.Collections.Generic;
 namespace MyCAM.Data
 {
 	// part data, reference data
-	internal class CADManager
+	internal class DataManager
 	{
 		public Action PartChanged;
 		public Action<List<string>> FeatureAdded;
 		public Action<List<string>> PathAdded;
 
-		public CADManager()
+		public DataManager()
 		{
 			ShapeDataMap = new Dictionary<string, ShapeData>();
 			PartIDList = new List<string>();

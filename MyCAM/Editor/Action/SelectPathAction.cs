@@ -29,7 +29,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public SelectPathAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager,
+		public SelectPathAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			List<TopoDS_Shape> faceGroupList )
 			: base( viewer, treeView, cadManager, viewManager )
 		{

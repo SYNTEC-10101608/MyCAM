@@ -35,7 +35,7 @@ namespace MyCAM
 			m_ViewManager = new ViewManager();
 
 			// CAD manager
-			m_CADManager = new CADManager();
+			m_CADManager = new DataManager();
 
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
@@ -53,7 +53,7 @@ namespace MyCAM
 		ViewManager m_ViewManager;
 
 		// data manager
-		CADManager m_CADManager;
+		DataManager m_CADManager;
 
 		// editors
 		CADEditor m_CADEditor;

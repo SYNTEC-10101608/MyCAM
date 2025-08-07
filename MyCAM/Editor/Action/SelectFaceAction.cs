@@ -28,7 +28,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public SelectFaceAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
+		public SelectFaceAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 			: base( viewer, treeView, cadManager, viewManager )
 		{
 			m_VisibleFaceAISPairList = new List<FaceHandle>();

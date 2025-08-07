@@ -35,7 +35,7 @@ namespace MyCAM.Editor
 
 	internal class CADACtionBase : IEditorAction
 	{
-		public CADACtionBase( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
+		public CADACtionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 		{
 			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
 				throw new ArgumentNullException( "CADACtionBase constructing argument null" );
@@ -103,6 +103,6 @@ namespace MyCAM.Editor
 		protected Viewer m_Viewer;
 		protected TreeView m_TreeView;
 		protected ViewManager m_ViewManager;
-		protected CADManager m_CADManager;
+		protected DataManager m_CADManager;
 	}
 }

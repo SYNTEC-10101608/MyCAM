@@ -14,7 +14,7 @@ namespace MyCAM.Editor
 {
 	internal class ThreePtTransformAction : CADACtionBase
 	{
-		public ThreePtTransformAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
+		public ThreePtTransformAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 			: base( viewer, treeView, cadManager, viewManager )
 		{
 			m_ActionStage = EActionStage.P1;

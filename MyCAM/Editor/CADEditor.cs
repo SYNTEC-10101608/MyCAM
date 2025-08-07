@@ -36,7 +36,7 @@ namespace MyCAM.Editor
 
 	internal class CADEditor
 	{
-		public CADEditor( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
+		public CADEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 		{
 			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
 				throw new ArgumentNullException( "CADEditor consturcting argument null." );
@@ -62,7 +62,7 @@ namespace MyCAM.Editor
 		ViewManager m_ViewManager;
 
 		// data manager
-		CADManager m_CADManager;
+		DataManager m_CADManager;
 
 		// action
 		IEditorAction m_DefaultAction;

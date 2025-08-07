@@ -8,7 +8,7 @@ namespace MyCAM.Editor
 {
 	internal class TransformHelper
 	{
-		public TransformHelper( Viewer viewer, CADManager cadManager, ViewManager viewManager, gp_Trsf trsf )
+		public TransformHelper( Viewer viewer, DataManager cadManager, ViewManager viewManager, gp_Trsf trsf )
 		{
 			m_Viewer = viewer;
 			m_CADManager = cadManager;
@@ -31,7 +31,7 @@ namespace MyCAM.Editor
 		}
 
 		Viewer m_Viewer;
-		CADManager m_CADManager;
+		DataManager m_CADManager;
 		ViewManager m_ViewManager;
 		gp_Trsf m_3PTransform;
 	}

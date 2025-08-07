@@ -62,7 +62,7 @@
     <Compile Include="Editor\Action\ManualTransformAction.cs" />
     <Compile Include="Editor\Action\TransformHelper.cs" />
     <Compile Include="Editor\CADEditor.cs" />
-    <Compile Include="Data\CADManager.cs" />
+    <Compile Include="Data\DataManager.cs" />
     <Compile Include="Editor\Dialog\ThreePtTransformDlg.cs">
       <SubType>Form</SubType>
     </Compile>

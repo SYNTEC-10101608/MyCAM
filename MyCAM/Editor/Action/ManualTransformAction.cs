@@ -16,7 +16,7 @@ namespace MyCAM.Editor
 {
 	internal class ManualTransformAction : CADACtionBase
 	{
-		public ManualTransformAction( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
+		public ManualTransformAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 			: base( viewer, treeView, cadManager, viewManager )
 		{
 			// make a coordinate system as reference
