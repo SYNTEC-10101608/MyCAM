@@ -60,24 +60,11 @@ namespace MyCAM.CAD
 		public PathData( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathElementList )
 			: base( szUID, shapeData )
 		{
-			Edge5DList = pathElementList;
-			Transform = new gp_Trsf(); // initialize to identity transform
-		}
-
-		public List<PathEdge5D> Edge5DList
-		{
-			get; private set;
-		}
-
-		public gp_Trsf Transform
-		{
-			get; private set;
 		}
 
 		public override void DoTransform( gp_Trsf transform )
 		{
 			base.DoTransform( transform );
-			Transform.PreMultiply( transform );
 		}
 	}
 
