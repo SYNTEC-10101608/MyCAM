@@ -1,10 +1,8 @@
 ﻿using OCC.BOPTools;
-using OCC.BRep;
+using OCC.BRepAdaptor;
 using OCC.BRepBuilderAPI;
-using OCC.BRepGProp;
-using OCC.Geom;
+using OCC.GCPnts;
 using OCC.gp;
-using OCC.GProp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using System;
@@ -276,7 +274,8 @@ namespace MyCAM.Data
 		bool m_IsDirty = false;
 
 		// precision
-		const double PRECISION = 1;
+		const double PRECISION_DEFLECTION = 0.01;
+		const double PRECISION_MAX_LENGTH = 1;
 
 		void BuildCADPointList()
 		{
@@ -293,44 +292,48 @@ namespace MyCAM.Data
 				TopoDS_Face solidFace = PathDataList[ i ].ComponentFace; // TODO: set solid face
 
 				// break the edge into segment points by interval
-				
 				EdgeStartIndex.Add( CADPointList.Count );
-				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, PRECISION ) );
+				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace ) );
 			}
 		}
 
-		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace,
-			double dSegmentLength )
+		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace )
 		{
 			List<CADPoint> result = new List<CADPoint>();
 
-			// get target edge length
-			GProp_GProps system = new GProp_GProps();
-			BRepGProp.LinearProperties( edge, ref system );
-			double dEdgeLength = system.Mass();
-
-			// get segment count
-			int nSegments = (int)Math.Ceiling( dEdgeLength / dSegmentLength );
-
 			// get curve parameters
-			double dStartU = 0;
-			double dEndU = 0;
-			Geom_Curve oneGeomCurve = BRep_Tool.Curve( edge, ref dStartU, ref dEndU );
+			BRepAdaptor_Curve adC = new BRepAdaptor_Curve( edge, shellFace );
+			double dStartU = adC.FirstParameter();
+			double dEndU = adC.LastParameter();
 
 			// swap when reversed
 			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
 				(dEndU, dStartU) = (dStartU, dEndU);
 			}
 
-			// get increment value
-			double dIncrement = ( dEndU - dStartU ) / nSegments;
+			// break the curve into segments with given deflection precision
+			GCPnts_QuasiUniformDeflection qUD = new GCPnts_QuasiUniformDeflection( adC, PRECISION_DEFLECTION, dStartU, dEndU );
 
-			// TODO: this is equal U but not equal length
-			for( int i = 0; i < nSegments; i++ ) {
-				double U = dStartU + dIncrement * i;
+			// break the curve into segments with given max length
+			List<double> segmentParamList = new List<double>();
+			for( int i = 1; i < qUD.NbPoints(); i++ ) {
+				segmentParamList.Add( qUD.Parameter( i ) );
+				double dLength = GCPnts_AbscissaPoint.Length( adC, qUD.Parameter( i ), qUD.Parameter( i + 1 ) );
+				if( dLength > PRECISION_MAX_LENGTH ) {
+					int nSubSegmentCount = (int)Math.Ceiling( dLength / PRECISION_MAX_LENGTH );
+					double dSubSegmentLength = ( qUD.Parameter( i + 1 ) - qUD.Parameter( i ) ) / nSubSegmentCount;
+					for( int j = 1; j < nSubSegmentCount; j++ ) {
+						segmentParamList.Add( qUD.Parameter( i ) + j * dSubSegmentLength );
+					}
+				}
+			}
+			segmentParamList.Add( qUD.Parameter( qUD.NbPoints() ) );
+
+			for( int i = 0; i < segmentParamList.Count; i++ ) {
+				double U = segmentParamList[ i ];
 
 				// get point
-				gp_Pnt point = oneGeomCurve.Value( U );
+				gp_Pnt point = adC.Value( U );
 
 				// get shell normal (1st)
 				gp_Dir normalVec_1st = new gp_Dir();
@@ -345,7 +348,7 @@ namespace MyCAM.Data
 				// get tangent
 				gp_Vec tangentVec = new gp_Vec();
 				gp_Pnt _p = new gp_Pnt();
-				oneGeomCurve.D1( U, ref _p, ref tangentVec );
+				adC.D1( U, ref _p, ref tangentVec );
 				if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
 					tangentVec.Reverse();
 				}
