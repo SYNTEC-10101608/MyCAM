@@ -165,7 +165,8 @@ namespace MyCAM.Editor
 			if( pathData.CAMData.IsClosed == false ) {
 				return;
 			}
-			StartPointAction action = new StartPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, szPathID );
+			StartPointAction action = new StartPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
+			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
 

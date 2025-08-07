@@ -1,72 +1,40 @@
 ﻿using MyCAM.Data;
-using OCC.AIS;
-using OCC.BRepBuilderAPI;
-using OCC.gp;
-using OCC.TopoDS;
-using OCCTool;
 using OCCViewer;
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class StartPointAction : EditActionBase
+	internal class StartPointAction : PathIndexSelectAction
 	{
 		public StartPointAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
-			string szPathID )
-			: base( viewer, treeView, cadManager, viewManager )
+			CAMData camData )
+			: base( viewer, treeView, cadManager, viewManager, camData )
 		{
-			if( string.IsNullOrEmpty( szPathID ) ) {
-				throw new ArgumentNullException( "StartPointAction constructing argument null" );
-			}
-			m_PathID = szPathID;
-			m_VertexMap = new Dictionary<gp_Pnt, Tuple<CAMData, int>>();
-			MakeSelectPoint();
 		}
 
 		public override EditActionType ActionType
 		{
 			get
 			{
-				return EditActionType.Default;
+				return EditActionType.StartPoint;
 			}
 		}
 
-		public override void Start()
-		{
-			base.Start();
-
-			// clear selection
-			m_Viewer.GetAISContext().ClearSelected( true );
-
-			// disable tree view
-			m_TreeView.Enabled = false;
-
-			// deactivate all
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
-			}
-
-			// show select point
-			ShowSelectPoint();
-		}
-
-		public override void End()
-		{
-			// clear selection
-			m_Viewer.GetAISContext().ClearSelected( true );
-
-			// enable tree view
-			m_TreeView.Enabled = true;
-
-			// hide select point
-			HideSelectPoint();
-			base.End();
-		}
+		public Action PropertyChanged;
 
 		protected override void ViewerMouseDown( MouseEventArgs e )
 		{
+			if( e.Button != MouseButtons.Left ) {
+				return;
+			}
+			int nIndex = GetSelectIndex();
+			if( nIndex == -1 ) {
+				return;
+			}
+			m_CAMData.StartPoint = nIndex;
+			PropertyChanged?.Invoke();
+			m_Viewer.GetAISContext().ClearSelected( true );
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
@@ -76,44 +44,5 @@ namespace MyCAM.Editor
 				End();
 			}
 		}
-
-		void MakeSelectPoint()
-		{
-			// build wire from cad points
-			CAMData camData = ( (PathData)m_CADManager.ShapeDataMap[ m_PathID ] ).CAMData;
-			BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
-
-			// add points to the polygon, we do not add the last point
-			for( int i = 0; i < camData.CADPointList.Count - 1; i++ ) {
-				polygonMaker.Add( camData.CADPointList[ i ].Point );
-				m_VertexMap.Add( camData.CADPointList[ i ].Point, new Tuple<CAMData, int>( camData, i ) );
-
-			}
-			if( polygonMaker.IsDone() == false ) {
-				return;
-			}
-			TopoDS_Wire wire = polygonMaker.Wire();
-			m_SelectedPointAIS = new AIS_Shape( wire );
-
-			// set invisible
-			m_SelectedPointAIS.SetWidth( 0.0 );
-		}
-
-		void ShowSelectPoint()
-		{
-			m_Viewer.GetAISContext().Display( m_SelectedPointAIS, true );
-			m_Viewer.GetAISContext().Activate( m_SelectedPointAIS, (int)AISActiveMode.Vertex );
-		}
-
-		void HideSelectPoint()
-		{
-			m_Viewer.GetAISContext().Remove( m_SelectedPointAIS, true );
-		}
-
-		string m_PathID;
-
-		// map point on view to index on CAMData
-		Dictionary<gp_Pnt, Tuple<CAMData, int>> m_VertexMap;
-		AIS_Shape m_SelectedPointAIS;
 	}
 }

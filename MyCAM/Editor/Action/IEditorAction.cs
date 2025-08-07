@@ -14,6 +14,7 @@ namespace MyCAM.Editor
 		ManualTransform = 4,
 		SelectFace = 5,
 		SelectPath = 6,
+		StartPoint = 7,
 	}
 
 	internal interface IEditorAction

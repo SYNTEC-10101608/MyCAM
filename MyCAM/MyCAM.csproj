@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Editor\Action\PathIndexSelectAction.cs" />
     <Compile Include="Editor\Action\SelectFaceAction.cs" />
     <Compile Include="Editor\Action\SelectPathAction.cs" />
     <Compile Include="Editor\Action\StartPointAction.cs" />
