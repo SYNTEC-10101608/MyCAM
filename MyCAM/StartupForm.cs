@@ -1,5 +1,5 @@
-﻿using MyCAM.CAD;
-using MyCAM.CAM;
+﻿using MyCAM.Data;
+using MyCAM.Editor;
 using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;

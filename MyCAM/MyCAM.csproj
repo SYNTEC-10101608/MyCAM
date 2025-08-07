@@ -63,20 +63,14 @@
     <Compile Include="Editor\Action\TransformHelper.cs" />
     <Compile Include="Editor\CADEditor.cs" />
     <Compile Include="Data\CADManager.cs" />
-    <Compile Include="Editor\Dialog\ProgressForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editor\Dialog\ProgressForm.Designer.cs">
-      <DependentUpon>ProgressForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Editor\Dialog\ThreePtTransformDlg.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Editor\Dialog\ThreePtTransformDlg.Designer.cs">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Data\ViewManager.cs" />
-    <Compile Include="Data\CAMData.cs" />
+    <Compile Include="Editor\ViewManager.cs" />
+    <Compile Include="Data\DataStructure.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
@@ -86,9 +80,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Editor\Dialog\ProgressForm.resx">
-      <DependentUpon>ProgressForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\ThreePtTransformDlg.resx">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
     </EmbeddedResource>

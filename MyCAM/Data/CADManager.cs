@@ -1,73 +1,13 @@
-﻿using OCC.BRepBuilderAPI;
-using OCC.gp;
-using OCC.TopAbs;
+﻿using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
 using System;
 using System.Collections.Generic;
 
-namespace MyCAM.CAD
+namespace MyCAM.Data
 {
 	// part data, reference data
-	internal class ShapeData
-	{
-		public ShapeData( string szUID, TopoDS_Shape shapeData )
-		{
-			UID = szUID;
-			Shape = shapeData;
-		}
-
-		public string UID
-		{
-			get; private set;
-		}
-
-		public TopoDS_Shape Shape
-		{
-			get; private set;
-		}
-
-		public virtual void DoTransform( gp_Trsf transform )
-		{
-			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
-			Shape = shapeTransform.Shape();
-		}
-	}
-
-	internal class PathEdge5D
-	{
-		public PathEdge5D( TopoDS_Edge pathEdge, TopoDS_Face componentFace )
-		{
-			PathEdge = pathEdge;
-			ComponentFace = componentFace;
-		}
-
-		public TopoDS_Edge PathEdge
-		{
-			get; private set;
-		}
-
-		public TopoDS_Face ComponentFace
-		{
-			get; private set;
-		}
-	}
-
-	// path data
-	internal class PathData : ShapeData
-	{
-		public PathData( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathElementList )
-			: base( szUID, shapeData )
-		{
-		}
-
-		public override void DoTransform( gp_Trsf transform )
-		{
-			base.DoTransform( transform );
-		}
-	}
-
 	internal class CADManager
 	{
 		public Action PartChanged;

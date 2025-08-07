@@ -1,4 +1,5 @@
-﻿using OCC.AIS;
+﻿using MyCAM.Data;
+using OCC.AIS;
 using OCC.BRep;
 using OCC.gp;
 using OCC.Quantity;
@@ -9,7 +10,7 @@ using OCCTool;
 using OCCViewer;
 using System.Windows.Forms;
 
-namespace MyCAM.CAD
+namespace MyCAM.Editor
 {
 	internal class ThreePtTransformAction : CADACtionBase
 	{

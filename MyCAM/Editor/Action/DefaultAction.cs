@@ -1,8 +1,9 @@
-﻿using OCC.TopoDS;
+﻿using MyCAM.Data;
+using OCC.TopoDS;
 using OCCViewer;
 using System.Windows.Forms;
 
-namespace MyCAM.CAD
+namespace MyCAM.Editor
 {
 	internal enum ESelectObjectType
 	{

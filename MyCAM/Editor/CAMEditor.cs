@@ -1,4 +1,4 @@
-﻿using MyCAM.CAD;
+﻿using MyCAM.Data;
 using OCC.AIS;
 using OCC.ShapeAnalysis;
 using OCC.TopAbs;
@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace MyCAM.CAM
+namespace MyCAM.Editor
 {
 	internal class CAMEditor
 	{

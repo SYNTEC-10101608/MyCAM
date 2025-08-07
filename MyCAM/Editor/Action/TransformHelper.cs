@@ -2,8 +2,9 @@
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCCViewer;
+using MyCAM.Data;
 
-namespace MyCAM.CAD
+namespace MyCAM.Editor
 {
 	internal class TransformHelper
 	{

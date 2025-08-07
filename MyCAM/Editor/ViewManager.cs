@@ -4,27 +4,8 @@ using OCC.TopoDS;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace MyCAM.CAD
+namespace MyCAM.Editor
 {
-	internal class ViewObject
-	{
-		public ViewObject( AIS_InteractiveObject shape )
-		{
-			AISHandle = shape;
-			Visible = true;
-		}
-
-		public bool Visible
-		{
-			get; set;
-		}
-
-		public AIS_InteractiveObject AISHandle
-		{
-			get; set;
-		}
-	}
-
 	internal static class ViewHelper
 	{
 		public static AIS_Shape CreatePartAIS( TopoDS_Shape shape )
@@ -82,6 +63,25 @@ namespace MyCAM.CAD
 		public const Quantity_NameOfColor COLOR_DEFAULT = Quantity_NameOfColor.Quantity_NOC_GRAY50;
 		public const int LINE_WIDTH_SELECT = 2;
 		public const int LINE_WIDTH_DEFAULT = 1;
+	}
+
+	internal class ViewObject
+	{
+		public ViewObject( AIS_InteractiveObject shape )
+		{
+			AISHandle = shape;
+			Visible = true;
+		}
+
+		public bool Visible
+		{
+			get; set;
+		}
+
+		public AIS_InteractiveObject AISHandle
+		{
+			get; set;
+		}
 	}
 
 	internal class ViewManager

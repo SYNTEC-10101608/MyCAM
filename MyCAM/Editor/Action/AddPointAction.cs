@@ -1,4 +1,5 @@
-﻿using OCC.BRepBuilderAPI;
+﻿using MyCAM.Data;
+using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
@@ -6,7 +7,7 @@ using OCCTool;
 using OCCViewer;
 using System.Windows.Forms;
 
-namespace MyCAM.CAD
+namespace MyCAM.Editor
 {
 	internal class AddPointAction : CADACtionBase
 	{

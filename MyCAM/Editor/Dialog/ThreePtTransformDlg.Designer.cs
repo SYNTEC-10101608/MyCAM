@@ -1,4 +1,4 @@
-﻿namespace MyCAM.CAD
+﻿namespace MyCAM.Editor
 {
 	partial class ThreePtTransformDlg
 	{

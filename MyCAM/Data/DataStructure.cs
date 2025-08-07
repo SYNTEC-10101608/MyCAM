@@ -1,6 +1,6 @@
-﻿using MyCAM.CAD;
-using OCC.BOPTools;
+﻿using OCC.BOPTools;
 using OCC.BRep;
+using OCC.BRepBuilderAPI;
 using OCC.BRepGProp;
 using OCC.Geom;
 using OCC.gp;
@@ -11,8 +11,66 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MyCAM.CAM
+namespace MyCAM.Data
 {
+	internal class ShapeData
+	{
+		public ShapeData( string szUID, TopoDS_Shape shapeData )
+		{
+			UID = szUID;
+			Shape = shapeData;
+		}
+
+		public string UID
+		{
+			get; private set;
+		}
+
+		public TopoDS_Shape Shape
+		{
+			get; private set;
+		}
+
+		public virtual void DoTransform( gp_Trsf transform )
+		{
+			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
+			Shape = shapeTransform.Shape();
+		}
+	}
+
+	internal class PathEdge5D
+	{
+		public PathEdge5D( TopoDS_Edge pathEdge, TopoDS_Face componentFace )
+		{
+			PathEdge = pathEdge;
+			ComponentFace = componentFace;
+		}
+
+		public TopoDS_Edge PathEdge
+		{
+			get; private set;
+		}
+
+		public TopoDS_Face ComponentFace
+		{
+			get; private set;
+		}
+	}
+
+	// path data
+	internal class PathData : ShapeData
+	{
+		public PathData( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathElementList )
+			: base( szUID, shapeData )
+		{
+		}
+
+		public override void DoTransform( gp_Trsf transform )
+		{
+			base.DoTransform( transform );
+		}
+	}
+
 	public class CADPoint
 	{
 		public CADPoint( gp_Pnt point, gp_Dir normalVec_1st, gp_Dir normalVec_2nd, gp_Dir tangentVec )

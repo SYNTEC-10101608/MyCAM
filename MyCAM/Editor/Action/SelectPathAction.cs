@@ -1,4 +1,5 @@
-﻿using OCC.AIS;
+﻿using MyCAM.Data;
+using OCC.AIS;
 using OCC.BRepBuilderAPI;
 using OCC.Quantity;
 using OCC.ShapeAnalysis;
@@ -11,7 +12,7 @@ using OCCViewer;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace MyCAM.CAD
+namespace MyCAM.Editor
 {
 	internal class SelectPathAction : CADACtionBase
 	{

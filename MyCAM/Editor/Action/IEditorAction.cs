@@ -1,8 +1,9 @@
-﻿using OCCViewer;
+﻿using MyCAM.Data;
+using OCCViewer;
 using System;
 using System.Windows.Forms;
 
-namespace MyCAM.CAD
+namespace MyCAM.Editor
 {
 	public enum CADActionType
 	{

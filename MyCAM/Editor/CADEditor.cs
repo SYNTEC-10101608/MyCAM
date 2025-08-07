@@ -1,4 +1,4 @@
-﻿using CAMEdit;
+﻿using MyCAM.Data;
 using OCC.AIS;
 using OCC.IFSelect;
 using OCC.IGESControl;
@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace MyCAM.CAD
+namespace MyCAM.Editor
 {
 	public enum FileFormat
 	{

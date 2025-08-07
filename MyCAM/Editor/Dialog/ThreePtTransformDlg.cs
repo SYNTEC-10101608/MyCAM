@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace MyCAM.CAD
+namespace MyCAM.Editor
 {
 	public partial class ThreePtTransformDlg : Form
 	{

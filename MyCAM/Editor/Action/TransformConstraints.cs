@@ -3,7 +3,7 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 
-namespace MyCAM.CAD
+namespace MyCAM.Editor
 {
 	internal interface IConstraint
 	{

@@ -1,4 +1,5 @@
-﻿using OCC.AIS;
+﻿using MyCAM.Data;
+using OCC.AIS;
 using OCC.Quantity;
 using OCC.TopAbs;
 using OCC.TopExp;
@@ -10,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace MyCAM.CAD
+namespace MyCAM.Editor
 {
 	internal class SelectFaceAction : CADACtionBase
 	{
