@@ -275,6 +275,9 @@ namespace MyCAM.Data
 		// dirty flag
 		bool m_IsDirty = false;
 
+		// precision
+		const double PRECISION = 1;
+
 		void BuildCADPointList()
 		{
 			CADPointList = new List<CADPoint>();
@@ -288,16 +291,15 @@ namespace MyCAM.Data
 				TopoDS_Edge edge = PathDataList[ i ].PathEdge;
 				TopoDS_Face shellFace = PathDataList[ i ].ComponentFace;
 				TopoDS_Face solidFace = PathDataList[ i ].ComponentFace; // TODO: set solid face
-				gp_Trsf transform = new gp_Trsf();
 
 				// break the edge into segment points by interval
-				const double dSegmentLength = 0.01;
+				
 				EdgeStartIndex.Add( CADPointList.Count );
-				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, transform, dSegmentLength ) );
+				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, PRECISION ) );
 			}
 		}
 
-		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace, gp_Trsf transform,
+		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace,
 			double dSegmentLength )
 		{
 			List<CADPoint> result = new List<CADPoint>();
@@ -347,12 +349,6 @@ namespace MyCAM.Data
 				if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
 					tangentVec.Reverse();
 				}
-
-				// apply the transformation
-				point.Transform( transform );
-				normalVec_1st.Transform( transform );
-				normalVec_2nd.Transform( transform );
-				tangentVec.Transform( transform );
 
 				// build
 				CADPoint cadPoint = new CADPoint( point, normalVec_1st, normalVec_2nd, new gp_Dir( tangentVec ) );
