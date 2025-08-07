@@ -156,6 +156,18 @@ namespace MyCAM.Editor
 
 		public void SetReverse()
 		{
+			if( m_CurrentAction.ActionType != CADActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+
+			// toggle reverse state
+			pathData.CAMData.IsReverse = !pathData.CAMData.IsReverse;
+			ShowCAMData();
 		}
 
 		public void SetToolVec()
@@ -338,6 +350,16 @@ namespace MyCAM.Editor
 				camDataList.Add( ( (PathData)m_CADManager.ShapeDataMap[ pathID ] ).CAMData );
 			}
 			return camDataList;
+		}
+
+		// methods
+		string GetSelectedPathID()
+		{
+			TreeNode selectedNode = m_TreeView.SelectedNode;
+			if( selectedNode == null || string.IsNullOrEmpty( selectedNode.Text ) ) {
+				return string.Empty;
+			}
+			return selectedNode.Text;
 		}
 
 		// edit actions
