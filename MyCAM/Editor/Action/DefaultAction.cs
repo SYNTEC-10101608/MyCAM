@@ -33,10 +33,20 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// reset activation mode
-			foreach( var viewObjectData in m_ViewManager.ViewObjectMap ) {
-				if( ( m_SelectType == ESelectObjectType.Part && m_CADManager.PartIDList.Contains( viewObjectData.Key ) )
-					|| ( m_SelectType == ESelectObjectType.Path && m_CADManager.PathIDList.Contains( viewObjectData.Key ) ) ) {
-					m_Viewer.GetAISContext().Activate( viewObjectData.Value.AISHandle );
+			if( m_SelectType == ESelectObjectType.Part ) {
+				foreach( var partID in m_CADManager.PartIDList ) {
+					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
+						continue;
+					}
+					m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle );
+				}
+			}
+			else if( m_SelectType == ESelectObjectType.Path ) {
+				foreach( var partID in m_CADManager.PathIDList ) {
+					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
+						continue;
+					}
+					m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle );
 				}
 			}
 			m_bSuppressTreeViewSync = false;

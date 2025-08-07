@@ -196,10 +196,11 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( viewObject.AISHandle, false );
 			}
 
-			// clear view manager data
+			// update view manager data
 			m_ViewManager.ViewObjectMap.Clear();
 			m_ViewManager.TreeNodeMap.Clear();
-			foreach( var data in m_CADManager.ShapeDataContainer ) {
+			foreach( var szNewDataID in m_CADManager.PartIDList ) {
+				ShapeData data = m_CADManager.ShapeDataMap[ szNewDataID ];
 
 				// add node to the tree view
 				TreeNode node = new TreeNode( data.UID );

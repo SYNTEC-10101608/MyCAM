@@ -163,10 +163,9 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
-				ShapeData shapeData = m_CADManager.ShapeDataMap[ szID ];
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( shapeData.Shape );
+				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_CADManager.ShapeDataMap[ szID ].Shape );
 				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
-				m_Viewer.GetAISContext().Display( aisShape, false );
+				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
 
 			// update tree view and viewer
@@ -324,12 +323,7 @@ namespace MyCAM.Editor
 		{
 			List<CAMData> camDataList = new List<CAMData>();
 			foreach( string pathID in m_CADManager.PathIDList ) {
-				if( m_CADManager.ShapeDataMap.TryGetValue( pathID, out ShapeData shapeData ) ) {
-					CAMData camData = ( (PathData)shapeData ).CAMData;
-					if( camData != null ) {
-						camDataList.Add( camData );
-					}
-				}
+				camDataList.Add( ( (PathData)m_CADManager.ShapeDataMap[ pathID ] ).CAMData );
 			}
 			return camDataList;
 		}

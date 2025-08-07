@@ -18,8 +18,6 @@ namespace MyCAM.Editor
 
 		public void TransformData()
 		{
-			BRepBuilderAPI_Transform partTr = new BRepBuilderAPI_Transform( m_CADManager.PartShape, m_3PTransform );
-			m_CADManager.PartShape = partTr.Shape();
 			foreach( var oneData in m_CADManager.ShapeDataMap ) {
 				oneData.Value.DoTransform( m_3PTransform );
 				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ oneData.Key ].AISHandle );

@@ -33,21 +33,24 @@ namespace MyCAM.Editor
 		{
 			m_VisibleFaceAISPairList = new List<FaceHandle>();
 			m_EdgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-			foreach( var oneShapeData in m_CADManager.ShapeDataContainer ) {
-				if( m_CADManager.PartIDList.Contains( oneShapeData.UID ) && m_ViewManager.ViewObjectMap[ oneShapeData.UID ].Visible ) {
-
-					// collect all faces
-					TopExp_Explorer exp = new TopExp_Explorer( oneShapeData.Shape, TopAbs_ShapeEnum.TopAbs_FACE );
-					for( ; exp.More(); exp.Next() ) {
-						TopoDS_Face face = TopoDS.ToFace( exp.Current() );
-						AIS_Shape aisShape = SelectViewHelper.CreateFaceAIS( face );
-						m_VisibleFaceAISPairList.Add( new FaceHandle() { Face = face, AIS = aisShape } );
-					}
-
-					// add into map
-					TopExp.MapShapesAndAncestors( oneShapeData.Shape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref m_EdgeFaceMap );
+			foreach( var partID in m_CADManager.PartIDList ) {
+				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
+					continue;
 				}
+				TopoDS_Shape oneshape = m_CADManager.ShapeDataMap[ partID ].Shape;
+
+				// collect all faces
+				TopExp_Explorer exp = new TopExp_Explorer( oneshape, TopAbs_ShapeEnum.TopAbs_FACE );
+				for( ; exp.More(); exp.Next() ) {
+					TopoDS_Face face = TopoDS.ToFace( exp.Current() );
+					AIS_Shape aisShape = SelectViewHelper.CreateFaceAIS( face );
+					m_VisibleFaceAISPairList.Add( new FaceHandle() { Face = face, AIS = aisShape } );
+				}
+
+				// add into map
+				TopExp.MapShapesAndAncestors( oneshape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref m_EdgeFaceMap );
 			}
+
 		}
 
 		public override CADActionType ActionType

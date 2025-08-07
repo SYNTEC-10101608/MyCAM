@@ -42,12 +42,12 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = false;
 
 			// activate
-			foreach( var viewObjectData in m_ViewManager.ViewObjectMap ) {
-				if( viewObjectData.Value.Visible == false || m_CADManager.PartIDList.Contains( viewObjectData.Key ) == false ) {
+			foreach( var partID in m_CADManager.PartIDList ) {
+				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
 				}
-				m_Viewer.GetAISContext().Activate( viewObjectData.Value.AISHandle, (int)AISActiveMode.Edge );
-				m_Viewer.GetAISContext().Activate( viewObjectData.Value.AISHandle, (int)AISActiveMode.Face );
+				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Edge );
+				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Face );
 			}
 
 			// show transform part and G54 coordinate system
@@ -255,13 +255,13 @@ namespace MyCAM.Editor
 					}
 					expRef.Next();
 				}
-				foreach( var oneObject in m_ViewManager.ViewObjectMap ) {
+				foreach( var partID in m_CADManager.PartIDList ) {
 
 					// skip invisible objects
-					if( oneObject.Value.Visible == false || m_CADManager.PartIDList.Contains( oneObject.Key ) == false ) {
+					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ oneObject.Key ].Shape, TopAbs_ShapeEnum.TopAbs_FACE );
+					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_FACE );
 					while( expMove.More() ) {
 						TopoDS_Shape face = expMove.Current();
 						if( sel.IsEqual( face ) ) {
@@ -282,13 +282,13 @@ namespace MyCAM.Editor
 					}
 					expRef.Next();
 				}
-				foreach( var oneObject in m_ViewManager.ViewObjectMap ) {
+				foreach( var partID in m_CADManager.PartIDList ) {
 
 					// skip invisible objects
-					if( oneObject.Value.Visible == false || m_CADManager.PartIDList.Contains( oneObject.Key ) == false ) {
+					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ oneObject.Key ].Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
+					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
 					while( expMove.More() ) {
 						TopoDS_Shape face = expMove.Current();
 						if( sel.IsEqual( face ) ) {
