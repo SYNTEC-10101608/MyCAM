@@ -209,5 +209,32 @@ namespace MyCAM
 			m_msCAM.Enabled = true;
 			m_CAMEditor.EndSelectPath_Manual();
 		}
+
+		// CAM property
+		void m_tsmiStartPoint_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetStartPoint();
+		}
+
+		void m_tsmiReverse_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetReverse();
+		}
+
+		void m_tsmiSetLead_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		void m_tsmiOverCut_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		// tool vector
+		void m_tsmiToolVec_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetToolVec();
+		}
 	}
 }

@@ -39,6 +39,7 @@
 			this.m_tsmiTransform = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiManualTransform = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmi3PointTransform = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCADOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
@@ -65,7 +66,11 @@
 			this.m_tsmiCAM = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAM = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiAddPath = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiCADOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiStartPoint = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiSetLead = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiReverse = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiOverCut = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiToolVec = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -173,6 +178,13 @@
 			this.m_tsmi3PointTransform.Size = new System.Drawing.Size(122, 22);
 			this.m_tsmi3PointTransform.Text = "三點轉換";
 			this.m_tsmi3PointTransform.Click += new System.EventHandler(this.m_tsmi3PointTransform_Click);
+			// 
+			// m_tsmiCADOK
+			// 
+			this.m_tsmiCADOK.Name = "m_tsmiCADOK";
+			this.m_tsmiCADOK.Size = new System.Drawing.Size(36, 20);
+			this.m_tsmiCADOK.Text = "OK";
+			this.m_tsmiCADOK.Click += new System.EventHandler(this.m_tsmiCADOK_Click);
 			// 
 			// m_panViewer
 			// 
@@ -379,7 +391,12 @@
 			// m_msCAM
 			// 
 			this.m_msCAM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiAddPath});
+            this.m_tsmiAddPath,
+            this.m_tsmiStartPoint,
+            this.m_tsmiReverse,
+            this.m_tsmiSetLead,
+            this.m_tsmiOverCut,
+            this.m_tsmiToolVec});
 			this.m_msCAM.Location = new System.Drawing.Point(0, 24);
 			this.m_msCAM.Name = "m_msCAM";
 			this.m_msCAM.Size = new System.Drawing.Size(1184, 24);
@@ -393,12 +410,40 @@
 			this.m_tsmiAddPath.Text = "新增路徑";
 			this.m_tsmiAddPath.Click += new System.EventHandler(this.m_tsmiAddPath_Click);
 			// 
-			// m_tsmiCADOK
+			// m_tsmiStartPoint
 			// 
-			this.m_tsmiCADOK.Name = "m_tsmiCADOK";
-			this.m_tsmiCADOK.Size = new System.Drawing.Size(36, 20);
-			this.m_tsmiCADOK.Text = "OK";
-			this.m_tsmiCADOK.Click += new System.EventHandler(this.m_tsmiCADOK_Click);
+			this.m_tsmiStartPoint.Name = "m_tsmiStartPoint";
+			this.m_tsmiStartPoint.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiStartPoint.Text = "起點";
+			this.m_tsmiStartPoint.Click += new System.EventHandler(this.m_tsmiStartPoint_Click);
+			// 
+			// m_tsmiSetLead
+			// 
+			this.m_tsmiSetLead.Name = "m_tsmiSetLead";
+			this.m_tsmiSetLead.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiSetLead.Text = "引線";
+			this.m_tsmiSetLead.Click += new System.EventHandler(this.m_tsmiSetLead_Click);
+			// 
+			// m_tsmiReverse
+			// 
+			this.m_tsmiReverse.Name = "m_tsmiReverse";
+			this.m_tsmiReverse.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiReverse.Text = "反向";
+			this.m_tsmiReverse.Click += new System.EventHandler(this.m_tsmiReverse_Click);
+			// 
+			// m_tsmiOverCut
+			// 
+			this.m_tsmiOverCut.Name = "m_tsmiOverCut";
+			this.m_tsmiOverCut.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiOverCut.Text = "過切";
+			this.m_tsmiOverCut.Click += new System.EventHandler(this.m_tsmiOverCut_Click);
+			// 
+			// m_tsmiToolVec
+			// 
+			this.m_tsmiToolVec.Name = "m_tsmiToolVec";
+			this.m_tsmiToolVec.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiToolVec.Text = "姿態";
+			this.m_tsmiToolVec.Click += new System.EventHandler(this.m_tsmiToolVec_Click);
 			// 
 			// StartupForm
 			// 
@@ -475,6 +520,11 @@
 		private System.Windows.Forms.MenuStrip m_msCAM;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPath;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiCADOK;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiStartPoint;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiReverse;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiSetLead;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiOverCut;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiToolVec;
 	}
 }
 

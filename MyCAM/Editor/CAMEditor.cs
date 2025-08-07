@@ -150,6 +150,18 @@ namespace MyCAM.Editor
 			( (SelectPathAction)m_CurrentAction ).SelectDone();
 		}
 
+		public void SetStartPoint()
+		{
+		}
+
+		public void SetReverse()
+		{
+		}
+
+		public void SetToolVec()
+		{
+		}
+
 		void OnPathAdded( List<string> newPathIDs )
 		{
 			foreach( string szID in newPathIDs ) {
