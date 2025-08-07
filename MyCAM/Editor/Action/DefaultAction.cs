@@ -11,7 +11,7 @@ namespace MyCAM.Editor
 		Path,
 	}
 
-	internal class DefaultAction : CADACtionBase
+	internal class DefaultAction : EditActionBase
 	{
 		public DefaultAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			ESelectObjectType type )

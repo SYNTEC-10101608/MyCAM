@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class ThreePtTransformAction : CADACtionBase
+	internal class ThreePtTransformAction : EditActionBase
 	{
 		public ThreePtTransformAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 			: base( viewer, treeView, cadManager, viewManager )

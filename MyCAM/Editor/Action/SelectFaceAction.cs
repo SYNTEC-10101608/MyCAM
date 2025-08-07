@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class SelectFaceAction : CADACtionBase
+	internal class SelectFaceAction : EditActionBase
 	{
 		class FaceHandle
 		{

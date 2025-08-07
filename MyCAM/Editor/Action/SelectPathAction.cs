@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class SelectPathAction : CADACtionBase
+	internal class SelectPathAction : EditActionBase
 	{
 		class EdgeHandle
 		{
