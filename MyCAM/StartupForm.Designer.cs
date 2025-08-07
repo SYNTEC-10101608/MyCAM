@@ -65,6 +65,7 @@
 			this.m_tsmiCAM = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAM = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiAddPath = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCADOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -80,8 +81,9 @@
 			this.m_msCAD.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsmiImport,
             this.m_tsmiAddFeature,
-            this.m_tsmiTransform});
-			this.m_msCAD.Location = new System.Drawing.Point(0, 24);
+            this.m_tsmiTransform,
+            this.m_tsmiCADOK});
+			this.m_msCAD.Location = new System.Drawing.Point(0, 0);
 			this.m_msCAD.Name = "m_msCAD";
 			this.m_msCAD.Size = new System.Drawing.Size(1184, 24);
 			this.m_msCAD.TabIndex = 1;
@@ -177,7 +179,7 @@
 			this.m_panViewer.Dock = System.Windows.Forms.DockStyle.Right;
 			this.m_panViewer.Location = new System.Drawing.Point(284, 0);
 			this.m_panViewer.Name = "m_panViewer";
-			this.m_panViewer.Size = new System.Drawing.Size(900, 689);
+			this.m_panViewer.Size = new System.Drawing.Size(900, 713);
 			this.m_panViewer.TabIndex = 1;
 			// 
 			// m_panTreeView
@@ -186,7 +188,7 @@
 			this.m_panTreeView.Dock = System.Windows.Forms.DockStyle.Left;
 			this.m_panTreeView.Location = new System.Drawing.Point(0, 0);
 			this.m_panTreeView.Name = "m_panTreeView";
-			this.m_panTreeView.Size = new System.Drawing.Size(300, 689);
+			this.m_panTreeView.Size = new System.Drawing.Size(300, 713);
 			this.m_panTreeView.TabIndex = 1;
 			// 
 			// m_TreeView
@@ -194,7 +196,7 @@
 			this.m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_TreeView.Location = new System.Drawing.Point(0, 0);
 			this.m_TreeView.Name = "m_TreeView";
-			this.m_TreeView.Size = new System.Drawing.Size(300, 689);
+			this.m_TreeView.Size = new System.Drawing.Size(300, 713);
 			this.m_TreeView.TabIndex = 1;
 			// 
 			// m_panBackGround
@@ -202,9 +204,9 @@
 			this.m_panBackGround.Controls.Add(this.m_panTreeView);
 			this.m_panBackGround.Controls.Add(this.m_panViewer);
 			this.m_panBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panBackGround.Location = new System.Drawing.Point(0, 72);
+			this.m_panBackGround.Location = new System.Drawing.Point(0, 48);
 			this.m_panBackGround.Name = "m_panBackGround";
-			this.m_panBackGround.Size = new System.Drawing.Size(1184, 689);
+			this.m_panBackGround.Size = new System.Drawing.Size(1184, 713);
 			this.m_panBackGround.TabIndex = 0;
 			// 
 			// m_msCAD_Transform
@@ -359,6 +361,7 @@
 			this.m_msMain.Size = new System.Drawing.Size(1184, 24);
 			this.m_msMain.TabIndex = 1;
 			this.m_msMain.Text = "menuStrip1";
+			this.m_msMain.Visible = false;
 			// 
 			// m_tsmiFile
 			// 
@@ -377,7 +380,7 @@
 			// 
 			this.m_msCAM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsmiAddPath});
-			this.m_msCAM.Location = new System.Drawing.Point(0, 48);
+			this.m_msCAM.Location = new System.Drawing.Point(0, 24);
 			this.m_msCAM.Name = "m_msCAM";
 			this.m_msCAM.Size = new System.Drawing.Size(1184, 24);
 			this.m_msCAM.TabIndex = 1;
@@ -389,6 +392,13 @@
 			this.m_tsmiAddPath.Size = new System.Drawing.Size(67, 20);
 			this.m_tsmiAddPath.Text = "新增路徑";
 			this.m_tsmiAddPath.Click += new System.EventHandler(this.m_tsmiAddPath_Click);
+			// 
+			// m_tsmiCADOK
+			// 
+			this.m_tsmiCADOK.Name = "m_tsmiCADOK";
+			this.m_tsmiCADOK.Size = new System.Drawing.Size(36, 20);
+			this.m_tsmiCADOK.Text = "OK";
+			this.m_tsmiCADOK.Click += new System.EventHandler(this.m_tsmiCADOK_Click);
 			// 
 			// StartupForm
 			// 
@@ -464,6 +474,7 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiCAM;
 		private System.Windows.Forms.MenuStrip m_msCAM;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPath;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiCADOK;
 	}
 }
 

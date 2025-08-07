@@ -168,6 +168,14 @@ namespace MyCAM
 			m_CAMEditor.EditStart();
 		}
 
+		void m_tsmiCADOK_Click( object sender, EventArgs e )
+		{
+			m_msCAM.Enabled = true;
+			m_msCAD.Enabled = false;
+			m_CADEditor.EditEnd();
+			m_CAMEditor.EditStart();
+		}
+
 		// add path
 		void m_tsmiAddPath_Click( object sender, EventArgs e )
 		{
