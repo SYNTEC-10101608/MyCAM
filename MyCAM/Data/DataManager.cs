@@ -118,6 +118,15 @@ namespace MyCAM.Data
 			PathAdded?.Invoke( newPathIDList );
 		}
 
+		public List<CAMData> GetCAMDataList()
+		{
+			List<CAMData> camDataList = new List<CAMData>();
+			foreach( string pathID in PathIDList ) {
+				camDataList.Add( ( (PathData)ShapeDataMap[ pathID ] ).CAMData );
+			}
+			return camDataList;
+		}
+
 		List<ShapeData> ArrangeShapeData( TopoDS_Shape oneShape )
 		{
 			if( oneShape == null || oneShape.IsNull() ) {

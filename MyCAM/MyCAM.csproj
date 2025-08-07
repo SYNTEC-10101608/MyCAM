@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Editor\Action\SelectFaceAction.cs" />
     <Compile Include="Editor\Action\SelectPathAction.cs" />
+    <Compile Include="Editor\Action\StartPointAction.cs" />
     <Compile Include="Editor\Action\TransformConstraints.cs" />
     <Compile Include="Editor\Action\ThreePtTransformAction.cs" />
     <Compile Include="Editor\Action\AddPointAction.cs" />

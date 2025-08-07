@@ -152,6 +152,21 @@ namespace MyCAM.Editor
 
 		public void SetStartPoint()
 		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+
+			// skip non-closed path
+			if( pathData.CAMData.IsClosed == false ) {
+				return;
+			}
+			StartPointAction action = new StartPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, szPathID );
+			StartEditAction( action );
 		}
 
 		public void SetReverse()
@@ -216,7 +231,7 @@ namespace MyCAM.Editor
 			m_ToolVecAISList.Clear();
 
 			// build tool vec
-			foreach( CAMData camData in GetCAMDataList() ) {
+			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
 				List<CAMPoint> filteredPath = camData.CAMPointList;
 				for( int i = 0; i < filteredPath.Count; i++ ) {
 					if( IsKeyToolVecIndex( i, camData, out bool bHL ) ) {
@@ -247,7 +262,7 @@ namespace MyCAM.Editor
 			m_OrientationAISList.Clear();
 
 			// build orientation
-			foreach( CAMData camData in GetCAMDataList() ) {
+			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
 				gp_Pnt showPoint = camData.CAMPointList[ 0 ].CADPoint.Point;
 				gp_Dir orientationDir = new gp_Dir( camData.CAMPointList[ 0 ].CADPoint.TangentVec.XYZ() );
 				if( camData.IsReverse ) {
@@ -274,7 +289,7 @@ namespace MyCAM.Editor
 
 			// create text label
 			int nCurrentIndex = 0;
-			foreach( CAMData camData in GetCAMDataList() ) {
+			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
 				gp_Pnt location = camData.CAMPointList[ 0 ].CADPoint.Point;
 				string szIndex = nCurrentIndex++.ToString();
 
@@ -341,15 +356,6 @@ namespace MyCAM.Editor
 			coneAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			coneAIS.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
 			return coneAIS;
-		}
-
-		List<CAMData> GetCAMDataList()
-		{
-			List<CAMData> camDataList = new List<CAMData>();
-			foreach( string pathID in m_CADManager.PathIDList ) {
-				camDataList.Add( ( (PathData)m_CADManager.ShapeDataMap[ pathID ] ).CAMData );
-			}
-			return camDataList;
 		}
 
 		// methods
