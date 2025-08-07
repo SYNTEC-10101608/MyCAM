@@ -492,10 +492,12 @@ namespace MyCAM.Data
 			if( IsReverse ) {
 				m_CAMPointList.Reverse();
 
-				// modify index
-				CAMPoint lastPoint = m_CAMPointList.Last();
-				m_CAMPointList.Remove( lastPoint );
-				m_CAMPointList.Insert( 0, lastPoint );
+				// modify start point index for closed path
+				if( IsClosed ) {
+					CAMPoint lastPoint = m_CAMPointList.Last();
+					m_CAMPointList.Remove( lastPoint );
+					m_CAMPointList.Insert( 0, lastPoint );
+				}
 			}
 		}
 	}
