@@ -53,11 +53,11 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		public override CADActionType ActionType
+		public override EditActionType ActionType
 		{
 			get
 			{
-				return CADActionType.AddPoint;
+				return EditActionType.AddPoint;
 			}
 		}
 

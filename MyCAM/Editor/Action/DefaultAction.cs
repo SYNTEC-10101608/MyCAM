@@ -20,11 +20,11 @@ namespace MyCAM.Editor
 			m_SelectType = type;
 		}
 
-		public override CADActionType ActionType
+		public override EditActionType ActionType
 		{
 			get
 			{
-				return CADActionType.Default;
+				return EditActionType.Default;
 			}
 		}
 

@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public enum CADActionType
+	public enum EditActionType
 	{
 		None = 0,
 		Default = 1,
@@ -18,7 +18,7 @@ namespace MyCAM.Editor
 
 	internal interface IEditorAction
 	{
-		CADActionType ActionType
+		EditActionType ActionType
 		{
 			get;
 		}
@@ -46,11 +46,11 @@ namespace MyCAM.Editor
 			m_CADManager = cadManager;
 		}
 
-		public virtual CADActionType ActionType
+		public virtual EditActionType ActionType
 		{
 			get
 			{
-				return CADActionType.None;
+				return EditActionType.None;
 			}
 		}
 

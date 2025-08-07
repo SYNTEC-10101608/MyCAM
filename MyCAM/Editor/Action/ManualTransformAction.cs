@@ -23,11 +23,11 @@ namespace MyCAM.Editor
 			MakeG54Coord();
 		}
 
-		public override CADActionType ActionType
+		public override EditActionType ActionType
 		{
 			get
 			{
-				return CADActionType.ManualTransform;
+				return EditActionType.ManualTransform;
 			}
 		}
 

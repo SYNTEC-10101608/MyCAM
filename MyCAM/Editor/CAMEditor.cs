@@ -88,7 +88,7 @@ namespace MyCAM.Editor
 
 		public void SelectD1ContFace()
 		{
-			if( m_CurrentAction.ActionType != CADActionType.SelectFace ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectFace ) {
 				return;
 			}
 			( (SelectFaceAction)m_CurrentAction ).SelectD1ContFace();
@@ -97,7 +97,7 @@ namespace MyCAM.Editor
 		public void SelectPath_FreeBound()
 		{
 			// get selected face group from select face action
-			if( m_CurrentAction.ActionType != CADActionType.SelectFace ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectFace ) {
 				return;
 			}
 			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
@@ -128,7 +128,7 @@ namespace MyCAM.Editor
 		public void StartSelectPath_Manual()
 		{
 			// get selected face group from select face action
-			if( m_CurrentAction.ActionType != CADActionType.SelectFace ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectFace ) {
 				return;
 			}
 			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
@@ -144,7 +144,7 @@ namespace MyCAM.Editor
 
 		public void EndSelectPath_Manual()
 		{
-			if( m_CurrentAction.ActionType != CADActionType.SelectPath ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectPath ) {
 				return;
 			}
 			( (SelectPathAction)m_CurrentAction ).SelectDone();
@@ -156,7 +156,7 @@ namespace MyCAM.Editor
 
 		public void SetReverse()
 		{
-			if( m_CurrentAction.ActionType != CADActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
 				return;
 			}
 			string szPathID = GetSelectedPathID();

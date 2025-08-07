@@ -30,11 +30,11 @@ namespace MyCAM.Editor
 			m_LabelO.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
 		}
 
-		public override CADActionType ActionType
+		public override EditActionType ActionType
 		{
 			get
 			{
-				return CADActionType.ThreePtTransform;
+				return EditActionType.ThreePtTransform;
 			}
 		}
 

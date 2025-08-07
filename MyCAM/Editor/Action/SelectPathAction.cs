@@ -85,11 +85,11 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public override CADActionType ActionType
+		public override EditActionType ActionType
 		{
 			get
 			{
-				return CADActionType.SelectPath;
+				return EditActionType.SelectPath;
 			}
 		}
 
