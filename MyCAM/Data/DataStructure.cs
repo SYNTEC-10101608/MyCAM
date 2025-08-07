@@ -1,9 +1,11 @@
 ﻿using OCC.BOPTools;
+using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.BRepBuilderAPI;
 using OCC.GCPnts;
 using OCC.gp;
 using OCC.TopAbs;
+using OCC.TopExp;
 using OCC.TopoDS;
 using System;
 using System.Collections.Generic;
@@ -42,7 +44,14 @@ namespace MyCAM.Data
 		public PathData( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathElementList )
 			: base( szUID, shapeData )
 		{
-			m_CAMData = new CAMData( pathElementList );
+			TopoDS_Vertex startVertex = new TopoDS_Vertex();
+			TopoDS_Vertex endVertex = new TopoDS_Vertex();
+			TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
+			gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
+			gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
+			bool isClosed = startPoint.IsEqual( endPoint, 1e-3 );
+
+			m_CAMData = new CAMData( pathElementList, isClosed );
 		}
 
 		public CAMData CAMData
@@ -164,9 +173,10 @@ namespace MyCAM.Data
 	internal class CAMData
 	{
 		//CAD property
-		public CAMData( List<PathEdge5D> pathDataList )
+		public CAMData( List<PathEdge5D> pathDataList, bool isClosed )
 		{
 			PathDataList = pathDataList;
+			IsClosed = isClosed;
 
 			// build raw data
 			BuildCADPointList();
@@ -226,6 +236,11 @@ namespace MyCAM.Data
 			}
 		}
 
+		public bool IsClosed
+		{
+			get; private set;
+		}
+
 		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg )
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
@@ -269,6 +284,7 @@ namespace MyCAM.Data
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsReverse = false;
 		int m_StartPoint = 0;
+		Dictionary<CADPoint, CADPoint> m_ConnectPointMap = new Dictionary<CADPoint, CADPoint>();
 
 		// dirty flag
 		bool m_IsDirty = false;
@@ -293,11 +309,11 @@ namespace MyCAM.Data
 
 				// break the edge into segment points by interval
 				EdgeStartIndex.Add( CADPointList.Count );
-				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace ) );
+				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, i > 0 ) );
 			}
 		}
 
-		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace )
+		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace, bool isConnect )
 		{
 			List<CADPoint> result = new List<CADPoint>();
 
@@ -305,11 +321,6 @@ namespace MyCAM.Data
 			BRepAdaptor_Curve adC = new BRepAdaptor_Curve( edge, shellFace );
 			double dStartU = adC.FirstParameter();
 			double dEndU = adC.LastParameter();
-
-			// swap when reversed
-			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-				(dEndU, dStartU) = (dStartU, dEndU);
-			}
 
 			// break the curve into segments with given deflection precision
 			GCPnts_QuasiUniformDeflection qUD = new GCPnts_QuasiUniformDeflection( adC, PRECISION_DEFLECTION, dStartU, dEndU );
@@ -328,6 +339,9 @@ namespace MyCAM.Data
 				}
 			}
 			segmentParamList.Add( qUD.Parameter( qUD.NbPoints() ) );
+			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				segmentParamList.Reverse();
+			}
 
 			for( int i = 0; i < segmentParamList.Count; i++ ) {
 				double U = segmentParamList[ i ];
@@ -355,7 +369,17 @@ namespace MyCAM.Data
 
 				// build
 				CADPoint cadPoint = new CADPoint( point, normalVec_1st, normalVec_2nd, new gp_Dir( tangentVec ) );
-				result.Add( cadPoint );
+
+				// map the start point to the last point of the previous edge
+				if( isConnect && i == 0 && result.Count > 0 ) {
+					CADPoint lastPoint = result.Last();
+					m_ConnectPointMap[ lastPoint ] = cadPoint;
+				}
+
+				// add the point to the list
+				else {
+					result.Add( cadPoint );
+				}
 			}
 			return result;
 		}
