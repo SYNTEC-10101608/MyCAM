@@ -52,32 +52,32 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CAD\CADAction\SelectFaceAction.cs" />
-    <Compile Include="CAD\CADAction\SelectPathAction.cs" />
-    <Compile Include="CAD\CADAction\TransformConstraints.cs" />
-    <Compile Include="CAD\CADAction\ThreePtTransformAction.cs" />
-    <Compile Include="CAD\CADAction\AddPointAction.cs" />
-    <Compile Include="CAD\CADAction\DefaultAction.cs" />
-    <Compile Include="CAD\CADAction\ICADAction.cs" />
-    <Compile Include="CAD\CADAction\ManualTransformAction.cs" />
-    <Compile Include="CAD\CADAction\TransformHelper.cs" />
-    <Compile Include="CAD\CADEditor.cs" />
-    <Compile Include="CAD\CADManager.cs" />
-    <Compile Include="CAD\Dialog\ProgressForm.cs">
+    <Compile Include="Editor\Action\SelectFaceAction.cs" />
+    <Compile Include="Editor\Action\SelectPathAction.cs" />
+    <Compile Include="Editor\Action\TransformConstraints.cs" />
+    <Compile Include="Editor\Action\ThreePtTransformAction.cs" />
+    <Compile Include="Editor\Action\AddPointAction.cs" />
+    <Compile Include="Editor\Action\DefaultAction.cs" />
+    <Compile Include="Editor\Action\IEditorAction.cs" />
+    <Compile Include="Editor\Action\ManualTransformAction.cs" />
+    <Compile Include="Editor\Action\TransformHelper.cs" />
+    <Compile Include="Editor\CADEditor.cs" />
+    <Compile Include="Data\CADManager.cs" />
+    <Compile Include="Editor\Dialog\ProgressForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CAD\Dialog\ProgressForm.Designer.cs">
+    <Compile Include="Editor\Dialog\ProgressForm.Designer.cs">
       <DependentUpon>ProgressForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CAD\Dialog\ThreePtTransformDlg.cs">
+    <Compile Include="Editor\Dialog\ThreePtTransformDlg.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CAD\Dialog\ThreePtTransformDlg.Designer.cs">
+    <Compile Include="Editor\Dialog\ThreePtTransformDlg.Designer.cs">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="CAD\ViewManager.cs" />
-    <Compile Include="CAM\CAMData.cs" />
-    <Compile Include="CAM\CAMEditor.cs" />
+    <Compile Include="Data\ViewManager.cs" />
+    <Compile Include="Data\CAMData.cs" />
+    <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,10 +86,10 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="CAD\Dialog\ProgressForm.resx">
+    <EmbeddedResource Include="Editor\Dialog\ProgressForm.resx">
       <DependentUpon>ProgressForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CAD\Dialog\ThreePtTransformDlg.resx">
+    <EmbeddedResource Include="Editor\Dialog\ThreePtTransformDlg.resx">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="StartupForm.resx">

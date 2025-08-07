@@ -65,8 +65,8 @@ namespace MyCAM.CAD
 		CADManager m_CADManager;
 
 		// action
-		ICADAction m_DefaultAction;
-		ICADAction m_CurrentAction;
+		IEditorAction m_DefaultAction;
+		IEditorAction m_CurrentAction;
 
 		// editor
 		public void EditStart()
@@ -285,7 +285,7 @@ namespace MyCAM.CAD
 		}
 
 		// edit actions
-		void StartEditAction( ICADAction action )
+		void StartEditAction( IEditorAction action )
 		{
 			// to prevent from non-necessary default action start
 			m_IsNextAction = true;
@@ -300,7 +300,7 @@ namespace MyCAM.CAD
 			m_CurrentAction.EndAction += OnEditActionEnd;
 		}
 
-		void OnEditActionEnd( ICADAction action )
+		void OnEditActionEnd( IEditorAction action )
 		{
 			// start default action if all edit actions are done
 			if( !m_IsNextAction ) {

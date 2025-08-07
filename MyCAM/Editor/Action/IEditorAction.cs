@@ -15,7 +15,7 @@ namespace MyCAM.CAD
 		SelectPath = 6,
 	}
 
-	internal interface ICADAction
+	internal interface IEditorAction
 	{
 		CADActionType ActionType
 		{
@@ -26,13 +26,13 @@ namespace MyCAM.CAD
 
 		void End();
 
-		Action<ICADAction> EndAction
+		Action<IEditorAction> EndAction
 		{
 			get; set;
 		}
 	}
 
-	internal class CADACtionBase : ICADAction
+	internal class CADACtionBase : IEditorAction
 	{
 		public CADACtionBase( Viewer viewer, TreeView treeView, CADManager cadManager, ViewManager viewManager )
 		{
@@ -74,7 +74,7 @@ namespace MyCAM.CAD
 			EndAction?.Invoke( this );
 		}
 
-		public Action<ICADAction> EndAction
+		public Action<IEditorAction> EndAction
 		{
 			get; set;
 		}
