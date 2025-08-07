@@ -122,10 +122,6 @@
       <Project>{a9964c8e-32e4-43f1-adc4-13524752e113}</Project>
       <Name>CAMEdit</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DataStructure\DataStructure.csproj">
-      <Project>{501926ec-0186-4f2a-b7d2-224ca7185a19}</Project>
-      <Name>DataStructure</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ExtractPattern\ExtractPattern.csproj">
       <Project>{6834c5e6-b49f-4a87-bdc3-592bebbae526}</Project>
       <Name>ExtractPattern</Name>

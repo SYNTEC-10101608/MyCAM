@@ -1,5 +1,4 @@
-﻿using DataStructure;
-using OCC.BRepBuilderAPI;
+﻿using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
@@ -33,6 +32,25 @@ namespace MyCAM.CAD
 		{
 			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
 			Shape = shapeTransform.Shape();
+		}
+	}
+
+	internal class PathEdge5D
+	{
+		public PathEdge5D( TopoDS_Edge pathEdge, TopoDS_Face componentFace )
+		{
+			PathEdge = pathEdge;
+			ComponentFace = componentFace;
+		}
+
+		public TopoDS_Edge PathEdge
+		{
+			get; private set;
+		}
+
+		public TopoDS_Face ComponentFace
+		{
+			get; private set;
 		}
 	}
 
