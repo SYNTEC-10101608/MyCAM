@@ -51,7 +51,7 @@
 			this.tableLayoutPanel1.Controls.Add(this.m_btnRemove, 1, 2);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-			this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
 			this.tableLayoutPanel1.RowCount = 5;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
@@ -85,7 +85,7 @@
 			// m_tbxAngleA
 			// 
 			this.m_tbxAngleA.Location = new System.Drawing.Point(54, 2);
-			this.m_tbxAngleA.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.m_tbxAngleA.Margin = new System.Windows.Forms.Padding(2);
 			this.m_tbxAngleA.Name = "m_tbxAngleA";
 			this.m_tbxAngleA.Size = new System.Drawing.Size(48, 22);
 			this.m_tbxAngleA.TabIndex = 2;
@@ -93,7 +93,7 @@
 			// m_tbxAngleB
 			// 
 			this.m_tbxAngleB.Location = new System.Drawing.Point(54, 26);
-			this.m_tbxAngleB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.m_tbxAngleB.Margin = new System.Windows.Forms.Padding(2);
 			this.m_tbxAngleB.Name = "m_tbxAngleB";
 			this.m_tbxAngleB.Size = new System.Drawing.Size(48, 22);
 			this.m_tbxAngleB.TabIndex = 3;
@@ -101,7 +101,7 @@
 			// m_btnOK
 			// 
 			this.m_btnOK.Location = new System.Drawing.Point(54, 74);
-			this.m_btnOK.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.m_btnOK.Margin = new System.Windows.Forms.Padding(2);
 			this.m_btnOK.Name = "m_btnOK";
 			this.m_btnOK.Size = new System.Drawing.Size(48, 18);
 			this.m_btnOK.TabIndex = 4;
@@ -125,7 +125,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(122, 111);
 			this.Controls.Add(this.tableLayoutPanel1);
-			this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.Margin = new System.Windows.Forms.Padding(2);
 			this.Name = "ToolVecForm";
 			this.Text = "ToolVecForm";
 			this.tableLayoutPanel1.ResumeLayout(false);
