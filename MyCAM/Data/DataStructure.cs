@@ -160,7 +160,7 @@ namespace MyCAM.Data
 			{
 				return new gp_Dir( m_ToolVec.XYZ() );
 			}
-			private set
+			set
 			{
 				m_ToolVec = new gp_Dir( value.XYZ() );
 			}
@@ -427,37 +427,26 @@ namespace MyCAM.Data
 				return;
 			}
 
-			// sort the modify data by index
-			List<int> indexInOrder = m_ToolVecModifyMap.Keys.ToList();
-			indexInOrder.Sort();
+			// all tool vector are modified to the same value, no need to do interpolation
+			if( m_ToolVecModifyMap.Count == 1 ) {
+				gp_Vec newVec = GetVecFromAB( m_CAMPointList[ m_ToolVecModifyMap.Keys.First() ],
+					m_ToolVecModifyMap.Values.First().Item1 * Math.PI / 180,
+					m_ToolVecModifyMap.Values.First().Item2 * Math.PI / 180 );
+				foreach( CAMPoint camPoint in m_CAMPointList ) {
+					camPoint.ToolVec = new gp_Dir( newVec.XYZ() );
+				}
+			}
+
+			// get the interpolate interval list
+			List<Tuple<int, int>> interpolateIntervalList = GetInterpolateIntervalList();
 
 			// modify the tool vector
-			for( int i = 0; i < indexInOrder.Count; i++ ) {
+			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
 
 				// get start and end index
-				int nStartIndex = indexInOrder[ i ];
-				int nEndIndex = indexInOrder[ ( i + 1 ) % indexInOrder.Count ];
-				int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + m_CAMPointList.Count : nEndIndex;
-
-				// do slerp from start to end
-				gp_Vec startVec = GetVecFromAB( m_CAMPointList[ nStartIndex ],
-					m_ToolVecModifyMap[ nStartIndex ].Item1 * Math.PI / 180,
-					m_ToolVecModifyMap[ nStartIndex ].Item2 * Math.PI / 180 );
-				gp_Vec endVec = GetVecFromAB( m_CAMPointList[ nEndIndex ],
-					m_ToolVecModifyMap[ nEndIndex ].Item1 * Math.PI / 180,
-					m_ToolVecModifyMap[ nEndIndex ].Item2 * Math.PI / 180 );
-				gp_Quaternion q12 = new gp_Quaternion( startVec, endVec );
-				gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
-				m_CAMPointList[ nStartIndex ] = new CAMPoint( m_CAMPointList[ nStartIndex ].CADPoint, new gp_Dir( startVec ) );
-				for( int j = nStartIndex + 1; j < nEndIndexModify; j++ ) {
-					double t = ( j - nStartIndex ) / (double)( nEndIndexModify - nStartIndex );
-					gp_Quaternion q = new gp_Quaternion();
-					slerp.Interpolate( t, ref q );
-					gp_Trsf trsf = new gp_Trsf();
-					trsf.SetRotation( q );
-					gp_Dir toolVec = new gp_Dir( startVec.Transformed( trsf ) );
-					m_CAMPointList[ j % m_CAMPointList.Count ] = new CAMPoint( m_CAMPointList[ j % m_CAMPointList.Count ].CADPoint, toolVec );
-				}
+				int nStartIndex = interpolateIntervalList[ i ].Item1;
+				int nEndIndex = interpolateIntervalList[ i ].Item2;
+				InterpolateToolVec( nStartIndex, nEndIndex );
 			}
 		}
 
@@ -488,6 +477,54 @@ namespace MyCAM.Data
 			Y = Z * Math.Tan( dRB_rad );
 			gp_Dir dir1 = new gp_Dir( x.XYZ() * X + y.XYZ() * Y + z.XYZ() * Z );
 			return new gp_Vec( dir1.XYZ() );
+		}
+
+		List<Tuple<int, int>> GetInterpolateIntervalList()
+		{
+			// sort the modify data by index
+			List<int> indexInOrder = m_ToolVecModifyMap.Keys.ToList();
+			indexInOrder.Sort();
+			List<Tuple<int, int>> intervalList = new List<Tuple<int, int>>();
+			if( IsClosed ) {
+
+				// for closed path, the index is wrapped
+				for( int i = 0; i < indexInOrder.Count; i++ ) {
+					int nextIndex = ( i + 1 ) % indexInOrder.Count;
+					intervalList.Add( new Tuple<int, int>( indexInOrder[ i ], indexInOrder[ nextIndex ] ) );
+				}
+			}
+			else {
+				for( int i = 0; i < indexInOrder.Count - 1; i++ ) {
+					intervalList.Add( new Tuple<int, int>( indexInOrder[ i ], indexInOrder[ i + 1 ] ) );
+				}
+			}
+			return intervalList;
+		}
+
+		void InterpolateToolVec( int nStartIndex, int nEndIndex )
+		{
+			// consider wrapped
+			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + m_CAMPointList.Count : nEndIndex;
+
+			// get the start and end tool vector
+			gp_Vec startVec = GetVecFromAB( m_CAMPointList[ nStartIndex ],
+				m_ToolVecModifyMap[ nStartIndex ].Item1 * Math.PI / 180,
+				m_ToolVecModifyMap[ nStartIndex ].Item2 * Math.PI / 180 );
+			gp_Vec endVec = GetVecFromAB( m_CAMPointList[ nEndIndex ],
+				m_ToolVecModifyMap[ nEndIndex ].Item1 * Math.PI / 180,
+				m_ToolVecModifyMap[ nEndIndex ].Item2 * Math.PI / 180 );
+
+			// get the quaternion for interpolation
+			gp_Quaternion q12 = new gp_Quaternion( startVec, endVec );
+			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
+			for( int i = nStartIndex; i <= nEndIndexModify; i++ ) {
+				double t = ( i - nStartIndex ) / (double)( nEndIndexModify - nStartIndex );
+				gp_Quaternion q = new gp_Quaternion();
+				slerp.Interpolate( t, ref q );
+				gp_Trsf trsf = new gp_Trsf();
+				trsf.SetRotation( q );
+				m_CAMPointList[ i % m_CAMPointList.Count ].ToolVec = new gp_Dir( startVec.Transformed( trsf ) );
+			}
 		}
 
 		void SetStartPoint()

@@ -244,17 +244,14 @@ namespace MyCAM.Editor
 
 			// build tool vec
 			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
-				List<CAMPoint> filteredPath = camData.CAMPointList;
-				for( int i = 0; i < filteredPath.Count; i++ ) {
-					if( IsKeyToolVecIndex( i, camData, out bool bHL ) ) {
-						CAMPoint camPoint = filteredPath[ i ];
-						AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-						if( bHL ) {
-							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-							toolVecAIS.SetWidth( 4 );
-						}
-						m_ToolVecAISList.Add( toolVecAIS );
+				for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
+					CAMPoint camPoint = camData.CAMPointList[ i ];
+					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
+					if( IsModifiedToolVecIndex( i, camData ) ) {
+						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+						toolVecAIS.SetWidth( 4 );
 					}
+					m_ToolVecAISList.Add( toolVecAIS );
 				}
 			}
 
@@ -322,21 +319,15 @@ namespace MyCAM.Editor
 			}
 		}
 
-		bool IsKeyToolVecIndex( int index, CAMData camData, out bool isToolVecMod )
+		bool IsModifiedToolVecIndex( int index, CAMData camData )
 		{
-			//// map CAD and CAM point index
-			//int modifiedIndex = camData.IsReverse
-			//	? ( camData.CAMPointList.Count - 1 - index + camData.StartPoint ) % camData.CAMPointList.Count
-			//	: ( index + camData.StartPoint ) % camData.CAMPointList.Count;
+			// map CAD and CAM point index
+			int modifiedIndex = camData.IsReverse
+				? ( camData.CAMPointList.Count - 1 - index + camData.StartPoint ) % camData.CAMPointList.Count
+				: ( index + camData.StartPoint ) % camData.CAMPointList.Count;
 
-			//// need highlight if the index is modified index
-			//isToolVecMod = camData.GetToolVecModifyIndex().Contains( modifiedIndex );
-
-			//// need to show if the index is key index
-			//bool isEdgeStart = camData.EdgeStartIndex.Contains( modifiedIndex );
-			//return index % m_nGap == 0 || isEdgeStart || isToolVecMod;
-			isToolVecMod = false;
-			return false;
+			// need highlight if the index is modified index
+			return camData.GetToolVecModifyIndex().Contains( modifiedIndex );
 		}
 
 		AIS_Line GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )

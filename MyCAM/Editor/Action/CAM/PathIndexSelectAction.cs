@@ -1,15 +1,12 @@
 ﻿using MyCAM.Data;
 using OCC.AIS;
-using OCC.BRep;
 using OCC.BRepBuilderAPI;
-using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -94,8 +91,8 @@ namespace MyCAM.Editor
 			// build wire from cad points
 			BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
 
-			// add points to the polygon, we do not add the last point
-			for( int i = 0; i < m_CAMData.CADPointList.Count - 1; i++ ) {
+			// add points to the polygon
+			for( int i = 0; i < m_CAMData.CADPointList.Count; i++ ) {
 				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_CAMData.CADPointList[ i ].Point );
 				polygonMaker.Add( vertexMaker.Vertex() );
 				m_VertexMap.Bind( vertexMaker.Vertex(), i );
