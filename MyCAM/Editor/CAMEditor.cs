@@ -324,17 +324,19 @@ namespace MyCAM.Editor
 
 		bool IsKeyToolVecIndex( int index, CAMData camData, out bool isToolVecMod )
 		{
-			// map CAD and CAM point index
-			int modifiedIndex = camData.IsReverse
-				? ( camData.CAMPointList.Count - 1 - index + camData.StartPoint ) % camData.CAMPointList.Count
-				: ( index + camData.StartPoint ) % camData.CAMPointList.Count;
+			//// map CAD and CAM point index
+			//int modifiedIndex = camData.IsReverse
+			//	? ( camData.CAMPointList.Count - 1 - index + camData.StartPoint ) % camData.CAMPointList.Count
+			//	: ( index + camData.StartPoint ) % camData.CAMPointList.Count;
 
-			// need highlight if the index is modified index
-			isToolVecMod = camData.GetToolVecModifyIndex().Contains( modifiedIndex );
+			//// need highlight if the index is modified index
+			//isToolVecMod = camData.GetToolVecModifyIndex().Contains( modifiedIndex );
 
-			// need to show if the index is key index
-			bool isEdgeStart = camData.EdgeStartIndex.Contains( modifiedIndex );
-			return index % m_nGap == 0 || isEdgeStart || isToolVecMod;
+			//// need to show if the index is key index
+			//bool isEdgeStart = camData.EdgeStartIndex.Contains( modifiedIndex );
+			//return index % m_nGap == 0 || isEdgeStart || isToolVecMod;
+			isToolVecMod = false;
+			return false;
 		}
 
 		AIS_Line GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )

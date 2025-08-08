@@ -273,30 +273,23 @@ namespace MyCAM.Data
 			return result;
 		}
 
-		// view testing
-		public List<int> EdgeStartIndex
-		{
-			get; private set;
-		}
-
 		// backing fields
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsReverse = false;
 		int m_StartPoint = 0;
-		Dictionary<CADPoint, CADPoint> m_ConnectPointMap = new Dictionary<CADPoint, CADPoint>();
 
 		// dirty flag
 		bool m_IsDirty = false;
 
-		// precision
+		// Discretize parameters
+		Dictionary<CADPoint, CADPoint> m_ConnectPointMap = new Dictionary<CADPoint, CADPoint>();
 		const double PRECISION_DEFLECTION = 0.01;
 		const double PRECISION_MAX_LENGTH = 1;
 
 		void BuildCADPointList()
 		{
 			CADPointList = new List<CADPoint>();
-			EdgeStartIndex = new List<int>();
 			if( PathDataList == null ) {
 				return;
 			}
@@ -306,16 +299,15 @@ namespace MyCAM.Data
 				TopoDS_Edge edge = PathDataList[ i ].PathEdge;
 				TopoDS_Face shellFace = PathDataList[ i ].ComponentFace;
 				TopoDS_Face solidFace = PathDataList[ i ].ComponentFace; // TODO: set solid face
-
-				// break the edge into segment points by interval
-				EdgeStartIndex.Add( CADPointList.Count );
-				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, i > 0 ) );
+				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace,
+					i == 0, i == PathDataList.Count - 1 ) );
 			}
 		}
 
-		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace, bool isConnect )
+		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace,
+			bool bFirst, bool bLast )
 		{
-			List<CADPoint> result = new List<CADPoint>();
+			List<CADPoint> oneSegmentPointList = new List<CADPoint>();
 
 			// get curve parameters
 			BRepAdaptor_Curve adC = new BRepAdaptor_Curve( edge, shellFace );
@@ -330,15 +322,21 @@ namespace MyCAM.Data
 			for( int i = 1; i < qUD.NbPoints(); i++ ) {
 				segmentParamList.Add( qUD.Parameter( i ) );
 				double dLength = GCPnts_AbscissaPoint.Length( adC, qUD.Parameter( i ), qUD.Parameter( i + 1 ) );
+
+				// add sub-segments if the length is greater than max length
 				if( dLength > PRECISION_MAX_LENGTH ) {
 					int nSubSegmentCount = (int)Math.Ceiling( dLength / PRECISION_MAX_LENGTH );
 					double dSubSegmentLength = ( qUD.Parameter( i + 1 ) - qUD.Parameter( i ) ) / nSubSegmentCount;
+
+					// using equal parameter to break the segment
 					for( int j = 1; j < nSubSegmentCount; j++ ) {
 						segmentParamList.Add( qUD.Parameter( i ) + j * dSubSegmentLength );
 					}
 				}
 			}
 			segmentParamList.Add( qUD.Parameter( qUD.NbPoints() ) );
+
+			// reverse the segment parameters if the edge is reversed
 			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
 				segmentParamList.Reverse();
 			}
@@ -370,18 +368,31 @@ namespace MyCAM.Data
 				// build
 				CADPoint cadPoint = new CADPoint( point, normalVec_1st, normalVec_2nd, new gp_Dir( tangentVec ) );
 
-				// map the start point to the last point of the previous edge
-				if( isConnect && i == 0 && CADPointList.Count > 0 ) {
+				// map the last point of the previous edge to the start point, and use current start point to present
+				if( !bFirst && i == 0 && CADPointList.Count > 0 ) {
 					CADPoint lastPoint = CADPointList.Last();
-					m_ConnectPointMap[ lastPoint ] = cadPoint;
+					CADPointList.RemoveAt( CADPointList.Count - 1 );
+					m_ConnectPointMap[ cadPoint ] = lastPoint;
+					oneSegmentPointList.Add( cadPoint );
 				}
+				else if( bLast && i == segmentParamList.Count - 1 && CADPointList.Count > 0 ) {
 
-				// add the point to the list
+					// map the last point to the start point
+					if( IsClosed ) {
+						CADPoint firstPoint = CADPointList[ 0 ];
+						m_ConnectPointMap[ firstPoint ] = cadPoint;
+					}
+
+					// add the last point
+					else {
+						oneSegmentPointList.Add( cadPoint );
+					}
+				}
 				else {
-					result.Add( cadPoint );
+					oneSegmentPointList.Add( cadPoint );
 				}
 			}
-			return result;
+			return oneSegmentPointList;
 		}
 
 		void BuildCAMPointList()
