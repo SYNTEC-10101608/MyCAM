@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\CAMData.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
     <Compile Include="Editor\Action\CAM\SelectFaceAction.cs" />
     <Compile Include="Editor\Action\CAM\SelectPathAction.cs" />
@@ -79,7 +80,7 @@
       <DependentUpon>ToolVecForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\ViewManager.cs" />
-    <Compile Include="Data\DataStructure.cs" />
+    <Compile Include="Data\BasicData.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="StartupForm.cs">

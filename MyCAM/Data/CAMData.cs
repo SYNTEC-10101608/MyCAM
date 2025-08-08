@@ -1,11 +1,8 @@
 ﻿using OCC.BOPTools;
-using OCC.BRep;
 using OCC.BRepAdaptor;
-using OCC.BRepBuilderAPI;
 using OCC.GCPnts;
 using OCC.gp;
 using OCC.TopAbs;
-using OCC.TopExp;
 using OCC.TopoDS;
 using System;
 using System.Collections.Generic;
@@ -13,82 +10,6 @@ using System.Linq;
 
 namespace MyCAM.Data
 {
-	internal class ShapeData
-	{
-		public ShapeData( string szUID, TopoDS_Shape shapeData )
-		{
-			UID = szUID;
-			Shape = shapeData;
-		}
-
-		public string UID
-		{
-			get; private set;
-		}
-
-		public TopoDS_Shape Shape
-		{
-			get; private set;
-		}
-
-		public virtual void DoTransform( gp_Trsf transform )
-		{
-			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
-			Shape = shapeTransform.Shape();
-		}
-	}
-
-	// path data
-	internal class PathData : ShapeData
-	{
-		public PathData( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathElementList )
-			: base( szUID, shapeData )
-		{
-			TopoDS_Vertex startVertex = new TopoDS_Vertex();
-			TopoDS_Vertex endVertex = new TopoDS_Vertex();
-			TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
-			gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
-			gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
-			bool isClosed = startPoint.IsEqual( endPoint, 1e-3 );
-
-			m_CAMData = new CAMData( pathElementList, isClosed );
-		}
-
-		public CAMData CAMData
-		{
-			get
-			{
-				return m_CAMData;
-			}
-		}
-
-		public override void DoTransform( gp_Trsf transform )
-		{
-			base.DoTransform( transform );
-		}
-
-		CAMData m_CAMData;
-	}
-
-	internal class PathEdge5D
-	{
-		public PathEdge5D( TopoDS_Edge pathEdge, TopoDS_Face componentFace )
-		{
-			PathEdge = pathEdge;
-			ComponentFace = componentFace;
-		}
-
-		public TopoDS_Edge PathEdge
-		{
-			get; private set;
-		}
-
-		public TopoDS_Face ComponentFace
-		{
-			get; private set;
-		}
-	}
-
 	public class CADPoint
 	{
 		public CADPoint( gp_Pnt point, gp_Dir normalVec_1st, gp_Dir normalVec_2nd, gp_Dir tangentVec )
@@ -131,6 +52,14 @@ namespace MyCAM.Data
 			{
 				return new gp_Dir( m_TangentVec.XYZ() );
 			}
+		}
+
+		public void Transform( gp_Trsf transform )
+		{
+			m_Point.Transform( transform );
+			m_NormalVec_1st.Transform( transform );
+			m_NormalVec_2nd.Transform( transform );
+			m_TangentVec.Transform( transform );
 		}
 
 		public CADPoint Clone()
@@ -185,17 +114,12 @@ namespace MyCAM.Data
 		//CAD property
 		public CAMData( List<PathEdge5D> pathDataList, bool isClosed )
 		{
-			PathDataList = pathDataList;
+			m_PathEdge5DList = pathDataList;
 			IsClosed = isClosed;
 
 			// build raw data
 			BuildCADPointList();
 			BuildCAMPointList();
-		}
-
-		public List<PathEdge5D> PathDataList
-		{
-			get; private set;
 		}
 
 		public List<CADPoint> CADPointList
@@ -293,7 +217,17 @@ namespace MyCAM.Data
 			return result;
 		}
 
+		public void Transform( gp_Trsf transform )
+		{
+			// transform CAD points
+			foreach( CADPoint cadPoint in CADPointList ) {
+				cadPoint.Transform( transform );
+			}
+			m_IsDirty = true;
+		}
+
 		// backing fields
+		List<PathEdge5D> m_PathEdge5DList;
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsReverse = false;
@@ -310,17 +244,17 @@ namespace MyCAM.Data
 		void BuildCADPointList()
 		{
 			CADPointList = new List<CADPoint>();
-			if( PathDataList == null ) {
+			if( m_PathEdge5DList == null ) {
 				return;
 			}
 
 			// go through the contour edges
-			for( int i = 0; i < PathDataList.Count; i++ ) {
-				TopoDS_Edge edge = PathDataList[ i ].PathEdge;
-				TopoDS_Face shellFace = PathDataList[ i ].ComponentFace;
-				TopoDS_Face solidFace = PathDataList[ i ].ComponentFace; // TODO: set solid face
+			for( int i = 0; i < m_PathEdge5DList.Count; i++ ) {
+				TopoDS_Edge edge = m_PathEdge5DList[ i ].PathEdge;
+				TopoDS_Face shellFace = m_PathEdge5DList[ i ].ComponentFace;
+				TopoDS_Face solidFace = m_PathEdge5DList[ i ].ComponentFace; // TODO: set solid face
 				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace,
-					i == 0, i == PathDataList.Count - 1 ) );
+					i == 0, i == m_PathEdge5DList.Count - 1 ) );
 			}
 		}
 
