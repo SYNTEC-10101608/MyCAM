@@ -322,9 +322,10 @@ namespace MyCAM.Editor
 		bool IsModifiedToolVecIndex( int index, CAMData camData )
 		{
 			// map CAD and CAM point index
+			int nLength = camData.CADPointList.Count;
 			int modifiedIndex = camData.IsReverse
-				? ( camData.CAMPointList.Count - 1 - index + camData.StartPoint ) % camData.CAMPointList.Count
-				: ( index + camData.StartPoint ) % camData.CAMPointList.Count;
+				? ( nLength - ( camData.IsClosed ? 0 : 1 ) - index + camData.StartPoint ) % nLength
+				: ( index + camData.StartPoint ) % nLength;
 
 			// need highlight if the index is modified index
 			return camData.GetToolVecModifyIndex().Contains( modifiedIndex );
