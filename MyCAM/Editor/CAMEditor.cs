@@ -291,6 +291,7 @@ namespace MyCAM.Editor
 		// view
 		void ShowCAMData()
 		{
+			// TODO: we dont always need to refresh such many things
 			ShowToolVec();
 			ShowOrientation();
 			ShowIndex();
