@@ -63,7 +63,6 @@ namespace MyCAM.Editor
 			TangentVec,
 			NormalVec,
 		}
-		int m_nGap = 1;
 
 		// editor
 		public void EditStart()
