@@ -371,8 +371,8 @@ namespace MyCAM.Data
 				CADPoint cadPoint = new CADPoint( point, normalVec_1st, normalVec_2nd, new gp_Dir( tangentVec ) );
 
 				// map the start point to the last point of the previous edge
-				if( isConnect && i == 0 && result.Count > 0 ) {
-					CADPoint lastPoint = result.Last();
+				if( isConnect && i == 0 && CADPointList.Count > 0 ) {
+					CADPoint lastPoint = CADPointList.Last();
 					m_ConnectPointMap[ lastPoint ] = cadPoint;
 				}
 
