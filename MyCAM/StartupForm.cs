@@ -259,6 +259,15 @@ namespace MyCAM
 			m_CAMEditor.AutoSortProcess();
 		}
 
+		// back to CAD editor
+		void m_tsmiBackToCAD_Click( object sender, EventArgs e )
+		{
+			m_msCAM.Enabled = false;
+			m_msCAD.Enabled = true;
+			m_CAMEditor.EditEnd();
+			m_CADEditor.EditStart();
+		}
+
 		// convert NC
 		void m_tsmiCAMOK_Click( object sender, EventArgs e )
 		{

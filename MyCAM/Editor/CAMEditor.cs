@@ -70,6 +70,9 @@ namespace MyCAM.Editor
 			// init tree
 			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
 
+			// init viewer
+			ShowCAMData();
+
 			// start default action
 			m_CurrentAction = m_DefaultAction;
 			m_DefaultAction.Start();
@@ -77,6 +80,20 @@ namespace MyCAM.Editor
 
 		public void EditEnd()
 		{
+			// clear tree
+			m_TreeView.Nodes.Clear();
+
+			// clear viewer
+			HideCAMData();
+
+			// end all action
+			if( m_CurrentAction.ActionType == EditActionType.Default ) {
+				m_CurrentAction.End();
+			}
+			else {
+				m_CurrentAction.End();
+				m_DefaultAction.End();
+			}
 		}
 
 		// APIs
@@ -381,6 +398,25 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Display( textLabel, false );
 				m_Viewer.GetAISContext().Deactivate( textLabel );
 			}
+		}
+
+		void HideCAMData()
+		{
+			// hide tool vec
+			foreach( AIS_Line toolVecAIS in m_ToolVecAISList ) {
+				m_Viewer.GetAISContext().Remove( toolVecAIS, false );
+			}
+
+			// hide orientation
+			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
+				m_Viewer.GetAISContext().Remove( orientationAIS, false );
+			}
+
+			// hide index
+			foreach( AIS_TextLabel textLabel in m_IndexList ) {
+				m_Viewer.GetAISContext().Remove( textLabel, false );
+			}
+			m_Viewer.UpdateView();
 		}
 
 		bool IsModifiedToolVecIndex( int index, CAMData camData )

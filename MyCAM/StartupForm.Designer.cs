@@ -76,6 +76,7 @@
 			this.m_tsmiMoveDown = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAutoSort = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiCAMOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiBackToCAD = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -406,6 +407,7 @@
             this.m_tsmiMoveUp,
             this.m_tsmiMoveDown,
             this.m_tsmiAutoSort,
+            this.m_tsmiBackToCAD,
             this.m_tsmiCAMOK});
 			this.m_msCAM.Location = new System.Drawing.Point(0, 24);
 			this.m_msCAM.Name = "m_msCAM";
@@ -489,6 +491,13 @@
 			this.m_tsmiCAMOK.Size = new System.Drawing.Size(36, 20);
 			this.m_tsmiCAMOK.Text = "OK";
 			this.m_tsmiCAMOK.Click += new System.EventHandler(this.m_tsmiCAMOK_Click);
+			// 
+			// m_tsmiBackToCAD
+			// 
+			this.m_tsmiBackToCAD.Name = "m_tsmiBackToCAD";
+			this.m_tsmiBackToCAD.Size = new System.Drawing.Size(71, 20);
+			this.m_tsmiBackToCAD.Text = "回到 CAD";
+			this.m_tsmiBackToCAD.Click += new System.EventHandler(this.m_tsmiBackToCAD_Click);
 			// 
 			// StartupForm
 			// 
@@ -575,6 +584,7 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiMoveDown;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAutoSort;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiRemovePath;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiBackToCAD;
 	}
 }
 
