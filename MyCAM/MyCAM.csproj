@@ -126,10 +126,6 @@
       <Project>{a9964c8e-32e4-43f1-adc4-13524752e113}</Project>
       <Name>CAMEdit</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NCExport\NCExport.csproj">
-      <Project>{6fca8b19-5ee5-471d-9dbd-2cf039610520}</Project>
-      <Name>NCExport</Name>
-    </ProjectReference>
     <ProjectReference Include="..\OCCTool\OCCTool.csproj">
       <Project>{e9c0ab57-4558-4baf-b154-b20169a256fe}</Project>
       <Name>OCCTool</Name>

@@ -1,5 +1,4 @@
 ﻿using DataStructure;
-using NCExport;
 using OCC.AIS;
 using OCC.BRep;
 using OCC.BRepBuilderAPI;
@@ -378,19 +377,19 @@ namespace CAMEdit
 
 		void m_tsmiOK_Click( object sender, EventArgs e )
 		{
-			// path filtering
-			foreach( CAMData camData in m_Model.CAMDataList ) {
-				List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
-				camData.CAMPointList.Clear();
-				camData.CAMPointList.AddRange( filteredPath );
+			//// path filtering
+			//foreach( CAMData camData in m_Model.CAMDataList ) {
+			//	List<CAMPoint> filteredPath = PathFiltering( camData.CAMPointList );
+			//	camData.CAMPointList.Clear();
+			//	camData.CAMPointList.AddRange( filteredPath );
 
-				// add the start point to close the loop
-				camData.CAMPointList.Add( camData.CAMPointList[ 0 ].Clone() );
-			}
-			List<IProcessData> cuttingProcessDataList =
-				m_Model.CAMDataList.Select( camData => new CuttingProcessData( camData ) ).Cast<IProcessData>().ToList();
-			NCWriter w = new NCWriter( cuttingProcessDataList );
-			w.Convert();
+			//	// add the start point to close the loop
+			//	camData.CAMPointList.Add( camData.CAMPointList[ 0 ].Clone() );
+			//}
+			//List<IProcessData> cuttingProcessDataList =
+			//	m_Model.CAMDataList.Select( camData => new CuttingProcessData( camData ) ).Cast<IProcessData>().ToList();
+			//NCWriter w = new NCWriter( cuttingProcessDataList );
+			//w.Convert();
 		}
 
 		// viewer action
