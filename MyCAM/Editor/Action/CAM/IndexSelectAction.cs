@@ -11,9 +11,9 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class PathIndexSelectAction : EditActionBase
+	internal class IndexSelectAction : EditActionBase
 	{
-		public PathIndexSelectAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		public IndexSelectAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			CAMData camData )
 			: base( viewer, treeView, cadManager, viewManager )
 		{

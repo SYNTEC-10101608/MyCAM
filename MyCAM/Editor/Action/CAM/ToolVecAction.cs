@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class ToolVecAction : PathIndexSelectAction
+	internal class ToolVecAction : IndexSelectAction
 	{
 		public ToolVecAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			CAMData camData )

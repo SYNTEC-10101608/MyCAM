@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class StartPointAction : PathIndexSelectAction
+	internal class StartPointAction : IndexSelectAction
 	{
 		public StartPointAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			CAMData camData )
