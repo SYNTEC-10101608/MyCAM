@@ -40,7 +40,6 @@ namespace MyCAM.Editor
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Escape ) {
-				// end action
 				End();
 			}
 		}

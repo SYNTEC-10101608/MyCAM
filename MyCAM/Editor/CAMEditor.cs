@@ -188,6 +188,17 @@ namespace MyCAM.Editor
 
 		public void SetToolVec()
 		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+			ToolVecAction action = new ToolVecAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
 		}
 
 		void OnPathAdded( List<string> newPathIDs )

@@ -1,13 +1,15 @@
 ﻿using MyCAM.Data;
 using OCC.AIS;
+using OCC.BRep;
 using OCC.BRepBuilderAPI;
+using OCC.gp;
 using OCC.TopAbs;
-using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -22,7 +24,7 @@ namespace MyCAM.Editor
 				throw new ArgumentNullException( "PathIndexSelectAction constructing argument camData null" );
 			}
 			m_CAMData = camData;
-			m_VertexMap = new TopTools_IndexedMapOfShape();
+			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}
 
@@ -62,11 +64,18 @@ namespace MyCAM.Editor
 		{
 			m_Viewer.Select();
 			m_Viewer.GetAISContext().InitSelected();
+			if( !m_Viewer.GetAISContext().MoreSelected() ) {
+				return -1;
+			}
 			TopoDS_Shape selectedShape = m_Viewer.GetAISContext().SelectedShape();
 			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
 				return -1;
 			}
-			return m_VertexMap.FindIndex( selectedShape ) - 1;
+			TopoDS_Vertex selectedVertex = TopoDS.ToVertex( selectedShape );
+			if( m_VertexMap.IsBound( selectedVertex ) == false ) {
+				return -1;
+			}
+			return m_VertexMap.Find( selectedVertex );
 		}
 
 		protected void ShowSelectPoint()
@@ -87,15 +96,14 @@ namespace MyCAM.Editor
 
 			// add points to the polygon, we do not add the last point
 			for( int i = 0; i < m_CAMData.CADPointList.Count - 1; i++ ) {
-				polygonMaker.Add( m_CAMData.CADPointList[ i ].Point );
+				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_CAMData.CADPointList[ i ].Point );
+				polygonMaker.Add( vertexMaker.Vertex() );
+				m_VertexMap.Bind( vertexMaker.Vertex(), i );
 			}
 			if( polygonMaker.IsDone() == false ) {
 				return;
 			}
 			TopoDS_Wire wire = polygonMaker.Wire();
-
-			// TODO: this is tricky but it works well
-			TopExp.MapShapes( wire, TopAbs_ShapeEnum.TopAbs_VERTEX, ref m_VertexMap );
 			m_SelectedPointAIS = new AIS_Shape( wire );
 
 			// set invisible
@@ -105,7 +113,7 @@ namespace MyCAM.Editor
 		protected CAMData m_CAMData;
 
 		// map point on view to index on CAMData
-		protected TopTools_IndexedMapOfShape m_VertexMap;
+		protected TopTools_DataMapOfShapeInteger m_VertexMap;
 		protected AIS_Shape m_SelectedPointAIS;
 
 	}

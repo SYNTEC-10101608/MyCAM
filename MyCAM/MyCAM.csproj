@@ -59,6 +59,7 @@
     <Compile Include="Editor\Action\CAD\TransformConstraints.cs" />
     <Compile Include="Editor\Action\CAD\ThreePtTransformAction.cs" />
     <Compile Include="Editor\Action\CAD\AddPointAction.cs" />
+    <Compile Include="Editor\Action\CAM\ToolVecAction.cs" />
     <Compile Include="Editor\Action\DefaultAction.cs" />
     <Compile Include="Editor\Action\IEditorAction.cs" />
     <Compile Include="Editor\Action\CAD\ManualTransformAction.cs" />
@@ -70,6 +71,12 @@
     </Compile>
     <Compile Include="Editor\Dialog\ThreePtTransformDlg.Designer.cs">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Dialog\ToolVecForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\ToolVecForm.Designer.cs">
+      <DependentUpon>ToolVecForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\ViewManager.cs" />
     <Compile Include="Data\DataStructure.cs" />
@@ -84,6 +91,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Editor\Dialog\ThreePtTransformDlg.resx">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\ToolVecForm.resx">
+      <DependentUpon>ToolVecForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="StartupForm.resx">
       <DependentUpon>StartupForm.cs</DependentUpon>
