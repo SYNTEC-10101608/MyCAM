@@ -72,6 +72,9 @@
 			this.m_tsmiOverCut = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiToolVec = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiCAMOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiMoveUp = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiMoveDown = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiAutoSort = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -398,6 +401,9 @@
             this.m_tsmiSetLead,
             this.m_tsmiOverCut,
             this.m_tsmiToolVec,
+            this.m_tsmiMoveUp,
+            this.m_tsmiMoveDown,
+            this.m_tsmiAutoSort,
             this.m_tsmiCAMOK});
 			this.m_msCAM.Location = new System.Drawing.Point(0, 24);
 			this.m_msCAM.Name = "m_msCAM";
@@ -453,6 +459,27 @@
 			this.m_tsmiCAMOK.Size = new System.Drawing.Size(36, 20);
 			this.m_tsmiCAMOK.Text = "OK";
 			this.m_tsmiCAMOK.Click += new System.EventHandler(this.m_tsmiCAMOK_Click);
+			// 
+			// m_tsmiMoveUp
+			// 
+			this.m_tsmiMoveUp.Name = "m_tsmiMoveUp";
+			this.m_tsmiMoveUp.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiMoveUp.Text = "上移";
+			this.m_tsmiMoveUp.Click += new System.EventHandler(this.m_tsmiMoveUp_Click);
+			// 
+			// m_tsmiMoveDown
+			// 
+			this.m_tsmiMoveDown.Name = "m_tsmiMoveDown";
+			this.m_tsmiMoveDown.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiMoveDown.Text = "下移";
+			this.m_tsmiMoveDown.Click += new System.EventHandler(this.m_tsmiMoveDown_Click);
+			// 
+			// m_tsmiAutoSort
+			// 
+			this.m_tsmiAutoSort.Name = "m_tsmiAutoSort";
+			this.m_tsmiAutoSort.Size = new System.Drawing.Size(67, 20);
+			this.m_tsmiAutoSort.Text = "自動排序";
+			this.m_tsmiAutoSort.Click += new System.EventHandler(this.m_tsmiAutoSort_Click);
 			// 
 			// StartupForm
 			// 
@@ -535,6 +562,9 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiOverCut;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiToolVec;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiCAMOK;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiMoveUp;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiMoveDown;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiAutoSort;
 	}
 }
 

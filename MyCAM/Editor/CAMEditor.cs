@@ -202,12 +202,45 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		// TODO: refresh tree
+		public void MoveProcess( bool bUp )
+		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+			int nIndex = m_CADManager.PathIDList.IndexOf( szPathID );
+			if( nIndex < 0 || nIndex > m_CADManager.PathIDList.Count - 1
+				|| bUp && nIndex == 0
+				|| !bUp && nIndex == m_CADManager.PathIDList.Count - 1 ) {
+				return;
+			}
+			m_CADManager.PathIDList.RemoveAt( nIndex );
+			if( bUp ) {
+				m_CADManager.PathIDList.Insert( nIndex - 1, szPathID );
+			}
+			else {
+				m_CADManager.PathIDList.Insert( nIndex + 1, szPathID );
+			}
+			ShowCAMData();
+		}
+
+		// TODO: implement it and refresh tree
+		public void AutoSortProcess()
+		{
+
+		}
+
 		public void ConvertNC()
 		{
 			NCWriter w = new NCWriter( m_CADManager.GetCAMDataList() );
 			w.Convert();
 		}
 
+		// path added
 		void OnPathAdded( List<string> newPathIDs )
 		{
 			foreach( string szID in newPathIDs ) {

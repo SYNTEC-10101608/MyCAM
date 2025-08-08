@@ -237,6 +237,22 @@ namespace MyCAM
 			m_CAMEditor.SetToolVec();
 		}
 
+		// sort
+		void m_tsmiMoveUp_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.MoveProcess( true );
+		}
+
+		void m_tsmiMoveDown_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.MoveProcess( false );
+		}
+
+		void m_tsmiAutoSort_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.AutoSortProcess();
+		}
+
 		// convert NC
 		void m_tsmiCAMOK_Click( object sender, EventArgs e )
 		{
