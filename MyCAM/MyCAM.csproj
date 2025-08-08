@@ -52,17 +52,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Editor\Action\PathIndexSelectAction.cs" />
-    <Compile Include="Editor\Action\SelectFaceAction.cs" />
-    <Compile Include="Editor\Action\SelectPathAction.cs" />
-    <Compile Include="Editor\Action\StartPointAction.cs" />
-    <Compile Include="Editor\Action\TransformConstraints.cs" />
-    <Compile Include="Editor\Action\ThreePtTransformAction.cs" />
-    <Compile Include="Editor\Action\AddPointAction.cs" />
+    <Compile Include="Editor\Action\CAM\PathIndexSelectAction.cs" />
+    <Compile Include="Editor\Action\CAM\SelectFaceAction.cs" />
+    <Compile Include="Editor\Action\CAM\SelectPathAction.cs" />
+    <Compile Include="Editor\Action\CAM\StartPointAction.cs" />
+    <Compile Include="Editor\Action\CAD\TransformConstraints.cs" />
+    <Compile Include="Editor\Action\CAD\ThreePtTransformAction.cs" />
+    <Compile Include="Editor\Action\CAD\AddPointAction.cs" />
     <Compile Include="Editor\Action\DefaultAction.cs" />
     <Compile Include="Editor\Action\IEditorAction.cs" />
-    <Compile Include="Editor\Action\ManualTransformAction.cs" />
-    <Compile Include="Editor\Action\TransformHelper.cs" />
+    <Compile Include="Editor\Action\CAD\ManualTransformAction.cs" />
+    <Compile Include="Editor\Action\CAD\TransformHelper.cs" />
     <Compile Include="Editor\CADEditor.cs" />
     <Compile Include="Data\DataManager.cs" />
     <Compile Include="Editor\Dialog\ThreePtTransformDlg.cs">
