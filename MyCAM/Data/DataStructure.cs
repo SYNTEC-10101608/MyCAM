@@ -262,15 +262,25 @@ namespace MyCAM.Data
 			m_IsDirty = true;
 		}
 
-		public void GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
+		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
 				dRA_deg = m_ToolVecModifyMap[ index ].Item1;
 				dRB_deg = m_ToolVecModifyMap[ index ].Item2;
+				return true;
 			}
 			else {
 				dRA_deg = 0;
 				dRB_deg = 0;
+				return false;
+			}
+		}
+
+		public void RemoveToolVecModify( int index )
+		{
+			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
+				m_ToolVecModifyMap.Remove( index );
+				m_IsDirty = true;
 			}
 		}
 

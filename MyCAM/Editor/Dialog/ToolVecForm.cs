@@ -5,14 +5,19 @@ namespace MyCAM.Editor
 {
 	public partial class ToolVecForm : Form
 	{
-		public ToolVecForm( double angleA_deg, double angleB_deg )
+		public ToolVecForm( bool bModified, double angleA_deg, double angleB_deg )
 		{
 			InitializeComponent();
 
 			// initialize textbox
 			m_tbxAngleA.Text = angleA_deg.ToString();
 			m_tbxAngleB.Text = angleB_deg.ToString();
+
+			// initialize button
+			m_btnRemove.Visible = bModified;
 		}
+
+		public Action RemoveEditData;
 
 		public void GetAngleValue( out double angleA_deg, out double angleB_deg )
 		{
@@ -34,6 +39,13 @@ namespace MyCAM.Editor
 				return;
 			}
 			DialogResult = DialogResult.OK;
+			Close();
+		}
+
+		void m_btnRemove_Click( object sender, EventArgs e )
+		{
+			RemoveEditData?.Invoke();
+			DialogResult = DialogResult.Cancel;
 			Close();
 		}
 

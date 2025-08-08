@@ -34,10 +34,18 @@ namespace MyCAM.Editor
 			}
 
 			// modify tool vector
-			m_CAMData.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
-			ToolVecForm form = new ToolVecForm( angleA_deg, angleB_deg );
+			bool isModified = m_CAMData.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
+			ToolVecForm form = new ToolVecForm( isModified, angleA_deg, angleB_deg );
+			form.RemoveEditData = () =>
+			{
+				// for remove edited data
+				m_CAMData.RemoveToolVecModify( nIndex );
+				PropertyChanged?.Invoke();
+				m_Viewer.GetAISContext().ClearSelected( true );
+			};
 			DialogResult result = form.ShowDialog();
 			if( result != DialogResult.OK ) {
+				m_Viewer.GetAISContext().ClearSelected( true );
 				return;
 			}
 			form.GetAngleValue( out double newAngleA_deg, out double newAnfleB_deg );
