@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using MyCAM.Post;
 using OCC.AIS;
 using OCC.BRepPrimAPI;
 using OCC.Geom;
@@ -199,6 +200,12 @@ namespace MyCAM.Editor
 			ToolVecAction action = new ToolVecAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
+		}
+
+		public void ConvertNC()
+		{
+			NCWriter w = new NCWriter( m_CADManager.GetCAMDataList() );
+			w.Convert();
 		}
 
 		void OnPathAdded( List<string> newPathIDs )

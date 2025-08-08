@@ -236,5 +236,11 @@ namespace MyCAM
 		{
 			m_CAMEditor.SetToolVec();
 		}
+
+		// convert NC
+		void m_tsmiCAMOK_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.ConvertNC();
+		}
 	}
 }

@@ -133,6 +133,11 @@ namespace MyCAM.Data
 			}
 		}
 
+		public CADPoint Clone()
+		{
+			return new CADPoint( Point, NormalVec_1st, NormalVec_2nd, TangentVec );
+		}
+
 		// using backing fields to prevent modified outside
 		gp_Pnt m_Point;
 		gp_Dir m_NormalVec_1st;
@@ -164,6 +169,11 @@ namespace MyCAM.Data
 			{
 				m_ToolVec = new gp_Dir( value.XYZ() );
 			}
+		}
+
+		public CAMPoint Clone()
+		{
+			return new CAMPoint( CADPoint.Clone(), ToolVec );
 		}
 
 		// using backing field to prevent modified outside
@@ -407,6 +417,11 @@ namespace MyCAM.Data
 			SetToolVec();
 			SetStartPoint();
 			SetOrientation();
+
+			// close the loop if is closed
+			if( IsClosed && m_CAMPointList.Count > 0 ) {
+				m_CAMPointList.Add( m_CAMPointList[ 0 ].Clone() );
+			}
 		}
 
 		void SetToolVec()

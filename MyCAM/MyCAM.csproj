@@ -81,6 +81,7 @@
     <Compile Include="Editor\ViewManager.cs" />
     <Compile Include="Data\DataStructure.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
+    <Compile Include="Post\NCWriter.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -67,10 +67,11 @@
 			this.m_msCAM = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiAddPath = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiStartPoint = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiSetLead = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiReverse = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiSetLead = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiOverCut = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiToolVec = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCAMOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -396,7 +397,8 @@
             this.m_tsmiReverse,
             this.m_tsmiSetLead,
             this.m_tsmiOverCut,
-            this.m_tsmiToolVec});
+            this.m_tsmiToolVec,
+            this.m_tsmiCAMOK});
 			this.m_msCAM.Location = new System.Drawing.Point(0, 24);
 			this.m_msCAM.Name = "m_msCAM";
 			this.m_msCAM.Size = new System.Drawing.Size(1184, 24);
@@ -417,19 +419,19 @@
 			this.m_tsmiStartPoint.Text = "起點";
 			this.m_tsmiStartPoint.Click += new System.EventHandler(this.m_tsmiStartPoint_Click);
 			// 
-			// m_tsmiSetLead
-			// 
-			this.m_tsmiSetLead.Name = "m_tsmiSetLead";
-			this.m_tsmiSetLead.Size = new System.Drawing.Size(43, 20);
-			this.m_tsmiSetLead.Text = "引線";
-			this.m_tsmiSetLead.Click += new System.EventHandler(this.m_tsmiSetLead_Click);
-			// 
 			// m_tsmiReverse
 			// 
 			this.m_tsmiReverse.Name = "m_tsmiReverse";
 			this.m_tsmiReverse.Size = new System.Drawing.Size(43, 20);
 			this.m_tsmiReverse.Text = "反向";
 			this.m_tsmiReverse.Click += new System.EventHandler(this.m_tsmiReverse_Click);
+			// 
+			// m_tsmiSetLead
+			// 
+			this.m_tsmiSetLead.Name = "m_tsmiSetLead";
+			this.m_tsmiSetLead.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiSetLead.Text = "引線";
+			this.m_tsmiSetLead.Click += new System.EventHandler(this.m_tsmiSetLead_Click);
 			// 
 			// m_tsmiOverCut
 			// 
@@ -444,6 +446,13 @@
 			this.m_tsmiToolVec.Size = new System.Drawing.Size(43, 20);
 			this.m_tsmiToolVec.Text = "姿態";
 			this.m_tsmiToolVec.Click += new System.EventHandler(this.m_tsmiToolVec_Click);
+			// 
+			// m_tsmiCAMOK
+			// 
+			this.m_tsmiCAMOK.Name = "m_tsmiCAMOK";
+			this.m_tsmiCAMOK.Size = new System.Drawing.Size(36, 20);
+			this.m_tsmiCAMOK.Text = "OK";
+			this.m_tsmiCAMOK.Click += new System.EventHandler(this.m_tsmiCAMOK_Click);
 			// 
 			// StartupForm
 			// 
@@ -525,6 +534,7 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSetLead;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiOverCut;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiToolVec;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiCAMOK;
 	}
 }
 
