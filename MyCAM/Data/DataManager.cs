@@ -118,6 +118,15 @@ namespace MyCAM.Data
 			PathAdded?.Invoke( newPathIDList );
 		}
 
+		public void RemovePath( string pathID )
+		{
+			if( string.IsNullOrEmpty( pathID ) || !PathIDList.Contains( pathID ) ) {
+				return;
+			}
+			PathIDList.Remove( pathID );
+			ShapeDataMap.Remove( pathID );
+		}
+
 		public List<CAMData> GetCAMDataList()
 		{
 			List<CAMData> camDataList = new List<CAMData>();

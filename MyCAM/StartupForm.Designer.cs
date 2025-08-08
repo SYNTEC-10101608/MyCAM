@@ -66,15 +66,16 @@
 			this.m_tsmiCAM = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAM = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiAddPath = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiRemovePath = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiStartPoint = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiReverse = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSetLead = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiOverCut = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiToolVec = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiCAMOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiMoveUp = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiMoveDown = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAutoSort = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCAMOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -396,6 +397,7 @@
 			// 
 			this.m_msCAM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsmiAddPath,
+            this.m_tsmiRemovePath,
             this.m_tsmiStartPoint,
             this.m_tsmiReverse,
             this.m_tsmiSetLead,
@@ -417,6 +419,13 @@
 			this.m_tsmiAddPath.Size = new System.Drawing.Size(67, 20);
 			this.m_tsmiAddPath.Text = "新增路徑";
 			this.m_tsmiAddPath.Click += new System.EventHandler(this.m_tsmiAddPath_Click);
+			// 
+			// m_tsmiRemovePath
+			// 
+			this.m_tsmiRemovePath.Name = "m_tsmiRemovePath";
+			this.m_tsmiRemovePath.Size = new System.Drawing.Size(67, 20);
+			this.m_tsmiRemovePath.Text = "刪除路徑";
+			this.m_tsmiRemovePath.Click += new System.EventHandler(this.m_tsmiRemovePath_Click);
 			// 
 			// m_tsmiStartPoint
 			// 
@@ -453,13 +462,6 @@
 			this.m_tsmiToolVec.Text = "姿態";
 			this.m_tsmiToolVec.Click += new System.EventHandler(this.m_tsmiToolVec_Click);
 			// 
-			// m_tsmiCAMOK
-			// 
-			this.m_tsmiCAMOK.Name = "m_tsmiCAMOK";
-			this.m_tsmiCAMOK.Size = new System.Drawing.Size(36, 20);
-			this.m_tsmiCAMOK.Text = "OK";
-			this.m_tsmiCAMOK.Click += new System.EventHandler(this.m_tsmiCAMOK_Click);
-			// 
 			// m_tsmiMoveUp
 			// 
 			this.m_tsmiMoveUp.Name = "m_tsmiMoveUp";
@@ -480,6 +482,13 @@
 			this.m_tsmiAutoSort.Size = new System.Drawing.Size(67, 20);
 			this.m_tsmiAutoSort.Text = "自動排序";
 			this.m_tsmiAutoSort.Click += new System.EventHandler(this.m_tsmiAutoSort_Click);
+			// 
+			// m_tsmiCAMOK
+			// 
+			this.m_tsmiCAMOK.Name = "m_tsmiCAMOK";
+			this.m_tsmiCAMOK.Size = new System.Drawing.Size(36, 20);
+			this.m_tsmiCAMOK.Text = "OK";
+			this.m_tsmiCAMOK.Click += new System.EventHandler(this.m_tsmiCAMOK_Click);
 			// 
 			// StartupForm
 			// 
@@ -565,6 +574,7 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiMoveUp;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiMoveDown;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAutoSort;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiRemovePath;
 	}
 }
 

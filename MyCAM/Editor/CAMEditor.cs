@@ -150,6 +150,30 @@ namespace MyCAM.Editor
 			( (SelectPathAction)m_CurrentAction ).SelectDone();
 		}
 
+		public void RemovePath()
+		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+
+			// remove from data manager
+			m_CADManager.RemovePath( szPathID );
+
+			// remove from viewer
+			m_Viewer.GetAISContext().Remove( m_ViewManager.ViewObjectMap[ szPathID ].AISHandle, false );
+			m_ViewManager.ViewObjectMap.Remove( szPathID );
+
+			// remove from tree view
+			TreeNode node = m_ViewManager.TreeNodeMap[ szPathID ];
+			m_TreeView.Nodes.Remove( node );
+			m_ViewManager.TreeNodeMap.Remove( szPathID );
+			ShowCAMData();
+		}
+
 		public void SetStartPoint()
 		{
 			if( m_CurrentAction.ActionType != EditActionType.Default ) {

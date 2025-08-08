@@ -210,6 +210,12 @@ namespace MyCAM
 			m_CAMEditor.EndSelectPath_Manual();
 		}
 
+		// remove path
+		void m_tsmiRemovePath_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.RemovePath();
+		}
+
 		// CAM property
 		void m_tsmiStartPoint_Click( object sender, EventArgs e )
 		{
