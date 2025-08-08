@@ -304,6 +304,11 @@ namespace MyCAM.Data
 			}
 		}
 
+		/// <summary>
+		/// each edge start point is map to the last point of the previous edge
+		/// for a open-loop, the last point of the last edge (end point) is added to the list
+		/// for a closed-loop, the last point of the last edge (end point) is mapped to the first point of the first edge (start point)
+		/// </summary>
 		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace,
 			bool bFirst, bool bLast )
 		{
