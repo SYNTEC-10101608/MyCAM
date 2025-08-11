@@ -1,4 +1,5 @@
-﻿using MyCAM.Data;
+﻿using MyCAM.App;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRep;
 using OCC.gp;
@@ -166,7 +167,7 @@ namespace MyCAM.Editor
 		{
 			// Create and show the 3-point transform dialog
 			ThreePtTransformDlg dialog = new ThreePtTransformDlg( m_1stPoint, m_2ndPoint, m_3rdPoint );
-			dialog.ShowDialog();
+			dialog.ShowDialog( MyApp.MainForm );
 			if( dialog.DialogResult != DialogResult.OK ) {
 				return false;
 			}
