@@ -1,4 +1,5 @@
-﻿using MyCAM.Data;
+﻿using MyCAM.App;
+using MyCAM.Data;
 using OCCViewer;
 using System;
 using System.Windows.Forms;
@@ -43,7 +44,7 @@ namespace MyCAM.Editor
 				PropertyChanged?.Invoke();
 				m_Viewer.GetAISContext().ClearSelected( true );
 			};
-			DialogResult result = form.ShowDialog();
+			DialogResult result = form.ShowDialog( MyApp.MainForm );
 			if( result != DialogResult.OK ) {
 				m_Viewer.GetAISContext().ClearSelected( true );
 				return;

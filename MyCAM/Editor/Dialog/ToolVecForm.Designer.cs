@@ -127,6 +127,7 @@
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.Margin = new System.Windows.Forms.Padding(2);
 			this.Name = "ToolVecForm";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "ToolVecForm";
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();

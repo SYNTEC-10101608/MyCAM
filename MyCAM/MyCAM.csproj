@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MyApp.cs" />
     <Compile Include="Data\CAMData.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
     <Compile Include="Editor\Action\CAM\SelectFaceAction.cs" />

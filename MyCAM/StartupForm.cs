@@ -1,4 +1,5 @@
-﻿using MyCAM.Data;
+﻿using MyCAM.App;
+using MyCAM.Data;
 using MyCAM.Editor;
 using OCC.AIS;
 using OCC.Geom;
@@ -14,6 +15,8 @@ namespace MyCAM
 	{
 		public StartupForm()
 		{
+			// app
+			MyApp.MainForm = this;
 			InitializeComponent();
 
 			// create the viewer
