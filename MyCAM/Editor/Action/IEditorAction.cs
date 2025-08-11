@@ -18,6 +18,7 @@ namespace MyCAM.Editor
 		ToolVec = 8,
 		AxisTransform = 9,
 		AddLine = 10,
+		SetLead = 11,
 	}
 
 	internal interface IEditorAction

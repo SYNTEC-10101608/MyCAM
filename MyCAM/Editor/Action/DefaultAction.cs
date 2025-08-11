@@ -1,7 +1,8 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Windows.Forms;
+using MyCAM.Data;
 using OCC.TopoDS;
 using OCCViewer;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -11,8 +12,16 @@ namespace MyCAM.Editor
 		Path,
 	}
 
+	internal enum EActionStatus
+	{
+		Start,
+		End
+	}
+
 	internal class DefaultAction : EditActionBase
 	{
+		public Action TreeSelectionChange;
+
 		public DefaultAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			ESelectObjectType type )
 			: base( viewer, treeView, cadManager, viewManager )
@@ -86,6 +95,9 @@ namespace MyCAM.Editor
 			if( e.Node == null ) {
 				return;
 			}
+
+			// tell CAMEditor tree select is change
+			TreeSelectionChange?.Invoke();
 			SyncSelectionFromTreeToView();
 		}
 

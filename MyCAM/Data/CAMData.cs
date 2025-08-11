@@ -1,12 +1,13 @@
-﻿using OCC.BOPTools;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyCAM.Manufactor;
+using OCC.BOPTools;
 using OCC.BRepAdaptor;
 using OCC.GCPnts;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -122,13 +123,14 @@ namespace MyCAM.Data
 			BuildCAMPointList();
 		}
 
-		public List<CADPoint> CADPointList
+		internal List<CADPoint> CADPointList
 		{
 			get; private set;
 		}
 
 		// CAM property
-		public List<CAMPoint> CAMPointList
+
+		internal List<CAMPoint> CAMPointList
 		{
 			get
 			{
@@ -137,6 +139,42 @@ namespace MyCAM.Data
 					m_IsDirty = false;
 				}
 				return m_CAMPointList;
+			}
+		}
+
+		internal List<CAMPoint> LeadInCAMPointList
+		{
+			get
+			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
+				return m_LeadInCAMPointList;
+			}
+		}
+
+		internal List<CAMPoint> LeadOutCAMPointList
+		{
+			get
+			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
+				return m_LeadOutCAMPointList;
+			}
+		}
+
+		internal List<CAMPoint> OverCutCAMPointList
+		{
+			get
+			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
+				return m_OverCutPointList;
 			}
 		}
 
@@ -150,6 +188,21 @@ namespace MyCAM.Data
 			{
 				if( m_IsReverse != value ) {
 					m_IsReverse = value;
+					m_IsDirty = true;
+				}
+			}
+		}
+
+		public bool IsToolVecReverse
+		{
+			get
+			{
+				return m_IsToolVecReverse;
+			}
+			set
+			{
+				if( m_IsToolVecReverse != value ) {
+					m_IsToolVecReverse = value;
 					m_IsDirty = true;
 				}
 			}
@@ -173,6 +226,36 @@ namespace MyCAM.Data
 		public bool IsClosed
 		{
 			get; private set;
+		}
+
+		public LeadData LeadLineParam
+		{
+			get
+			{
+				return m_LeadParam;
+			}
+			set
+			{
+				if( m_LeadParam != value ) {
+					m_LeadParam = value;
+					m_IsDirty = true;
+				}
+			}
+		}
+
+		public double OverCutLength
+		{
+			get
+			{
+				return m_OverCutLength;
+			}
+			set
+			{
+				if( m_OverCutLength != value ) {
+					m_OverCutLength = value;
+					m_IsDirty = true;
+				}
+			}
 		}
 
 		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg )
@@ -229,9 +312,17 @@ namespace MyCAM.Data
 		// backing fields
 		List<PathEdge5D> m_PathEdge5DList;
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
+		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
+		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
+		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsReverse = false;
+		bool m_IsToolVecReverse = false;
 		int m_StartPoint = 0;
+		double m_OverCutLength = 0;
+
+		// lead param
+		LeadData m_LeadParam = new LeadData( LeadType.LeadLineType.None, LeadType.LeadLineType.None, 0, 0, 0, 0, false );
 
 		// dirty flag
 		bool m_IsDirty = false;
@@ -240,6 +331,7 @@ namespace MyCAM.Data
 		Dictionary<CADPoint, CADPoint> m_ConnectPointMap = new Dictionary<CADPoint, CADPoint>();
 		const double PRECISION_DEFLECTION = 0.01;
 		const double PRECISION_MAX_LENGTH = 1;
+		const double PRECISION_MIN_ERROR = 0.001;
 
 		void BuildCADPointList()
 		{
@@ -264,7 +356,7 @@ namespace MyCAM.Data
 		/// for a closed-loop, the last point of the last edge (end point) is mapped to the first point of the first edge (start point)
 		/// </summary>
 		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace,
-			bool bFirst, bool bLast )
+					bool bFirst, bool bLast )
 		{
 			List<CADPoint> oneSegmentPointList = new List<CADPoint>();
 
@@ -366,6 +458,11 @@ namespace MyCAM.Data
 			if( IsClosed && m_CAMPointList.Count > 0 ) {
 				m_CAMPointList.Add( m_CAMPointList[ 0 ].Clone() );
 			}
+
+			// all CAM point are settled down, start set lead / overcut
+			SetOverCut();
+			SetLeadIn();
+			SetLeadout();
 		}
 
 		void SetToolVec()
@@ -374,7 +471,13 @@ namespace MyCAM.Data
 
 				// calculate tool vector
 				CADPoint cadPoint = CADPointList[ i ];
-				CAMPoint camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st );
+				CAMPoint camPoint;
+				if( m_IsToolVecReverse ) {
+					camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st.Reversed() );
+				}
+				else {
+					camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st );
+				}
 				m_CAMPointList.Add( camPoint );
 			}
 			ModifyToolVec();
@@ -489,10 +592,10 @@ namespace MyCAM.Data
 		void SetStartPoint()
 		{
 			// rearrange cam points to start from the strt index
-			if( StartPoint != 0 ) {
+			if( m_StartPoint != 0 ) {
 				List<CAMPoint> newCAMPointList = new List<CAMPoint>();
 				for( int i = 0; i < m_CAMPointList.Count; i++ ) {
-					newCAMPointList.Add( m_CAMPointList[ ( i + StartPoint ) % m_CAMPointList.Count ] );
+					newCAMPointList.Add( m_CAMPointList[ ( i + m_StartPoint ) % m_CAMPointList.Count ] );
 				}
 				m_CAMPointList = newCAMPointList;
 			}
@@ -501,7 +604,7 @@ namespace MyCAM.Data
 		void SetOrientation()
 		{
 			// reverse the cad points if is reverse
-			if( IsReverse ) {
+			if( m_IsReverse ) {
 				m_CAMPointList.Reverse();
 
 				// modify start point index for closed path
@@ -512,5 +615,172 @@ namespace MyCAM.Data
 				}
 			}
 		}
+
+		#region Over cut
+
+		void SetOverCut()
+		{
+			m_OverCutPointList.Clear();
+			if( m_CAMPointList.Count == 0 || m_OverCutLength == 0 || !IsClosed ) {
+				return;
+			}
+
+			double dTotalOverCutLength = 0;
+
+			// end point is the start of over cut
+			m_OverCutPointList.Add( m_CAMPointList.Last() );
+			for( int i = 0; i < m_CAMPointList.Count - 1; i++ ) {
+
+				// get this edge distance
+				double dDistance = m_CAMPointList[ i ].CADPoint.Point.Distance( m_CAMPointList[ i + 1 ].CADPoint.Point );
+				if( dTotalOverCutLength + dDistance < m_OverCutLength ) {
+
+					// still within overcut length → take next point directly
+					m_OverCutPointList.Add( m_CAMPointList[ i + 1 ].Clone() );
+					dTotalOverCutLength += dDistance;
+				}
+				else {
+
+					// need to stop inside this segment
+					double dRemain = m_OverCutLength - dTotalOverCutLength;
+					if( dRemain <= PRECISION_MIN_ERROR ) {
+						break;
+					}
+
+					// compute new point along segment
+					gp_Pnt overCutEndPoint = GetExactOverCutEndPoint( m_CAMPointList[ i ].CADPoint.Point, m_CAMPointList[ i + 1 ].CADPoint.Point, dRemain );
+
+					// interpolate tool vector
+					InterpolateToolAndTangentVecBetween2CAMPoint( m_CAMPointList[ i ], m_CAMPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
+
+					// create new cam poiont
+					CADPoint cadPoint = new CADPoint( overCutEndPoint, endPointToolVec, endPointToolVec, endPointTangentVec );
+					CAMPoint camPoint = new CAMPoint( cadPoint, endPointToolVec );
+					m_OverCutPointList.Add( camPoint );
+					break;
+				}
+			}
+		}
+
+		gp_Pnt GetExactOverCutEndPoint( gp_Pnt currentPoint, gp_Pnt nextPoint, double dDistanceMoveFromOverPoint )
+		{
+			// from currentPoint → nextOverLengthPoint
+			gp_Vec movingVec = new gp_Vec( currentPoint, nextPoint );
+
+			// normalize to unit vector
+			movingVec.Normalize();
+
+			gp_Vec moveVec = movingVec.Multiplied( dDistanceMoveFromOverPoint );
+
+			// shifted along the vector
+			return new gp_Pnt( currentPoint.XYZ() + moveVec.XYZ() );
+		}
+
+		gp_Dir InterpolateVecBetween2Vec( gp_Vec currentVec, gp_Vec nextVec, double interpolatePercent )
+		{
+			// if the paths are parallel, there are infinite possibilities
+			if( currentVec.IsOpposite( nextVec, PRECISION_MIN_ERROR ) ) {
+				return new gp_Dir( currentVec.XYZ() );
+			}
+
+			// get the quaternion for interpolation
+			gp_Quaternion q12 = new gp_Quaternion( currentVec, nextVec );
+			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
+
+			// calculate new point attitude
+			gp_Quaternion q = new gp_Quaternion();
+			slerp.Interpolate( interpolatePercent, ref q );
+			gp_Trsf trsf = new gp_Trsf();
+			trsf.SetRotation( q );
+			gp_Dir resultDir = new gp_Dir( currentVec.Transformed( trsf ) );
+			return resultDir;
+		}
+
+		void InterpolateToolAndTangentVecBetween2CAMPoint( CAMPoint currentCAMPoint, CAMPoint nextCAMPoint, gp_Pnt point, out gp_Dir toolDir, out gp_Dir tangentDir )
+		{
+			toolDir = new gp_Dir();
+			tangentDir = new gp_Dir();
+
+			// get current and next tool vector
+			gp_Vec currentVec = new gp_Vec( currentCAMPoint.ToolVec );
+			gp_Vec nextVec = new gp_Vec( nextCAMPoint.ToolVec );
+
+			// get current and next tangent vector
+			gp_Vec currentTangentVec = new gp_Vec( currentCAMPoint.CADPoint.TangentVec );
+			gp_Vec nextTangentVec = new gp_Vec( nextCAMPoint.CADPoint.TangentVec );
+
+			// calculate new point percentage
+			double dDistanceOfCAMPath2Point = currentCAMPoint.CADPoint.Point.Distance( nextCAMPoint.CADPoint.Point );
+			double dDistanceBetweenCurrentPoint2NewPoint = currentCAMPoint.CADPoint.Point.Distance( point );
+
+			// two point overlap
+			if( dDistanceOfCAMPath2Point <= PRECISION_MIN_ERROR ) {
+				toolDir = new gp_Dir( currentVec );
+				tangentDir = new gp_Dir( currentTangentVec );
+				return;
+			}
+			double interpolatePercent = dDistanceBetweenCurrentPoint2NewPoint / dDistanceOfCAMPath2Point;
+
+			// get new point dir
+			toolDir = InterpolateVecBetween2Vec( currentVec, nextVec, interpolatePercent );
+			tangentDir = InterpolateVecBetween2Vec( currentTangentVec, nextTangentVec, interpolatePercent );
+		}
+
+		#endregion
+
+		#region Lead function
+
+		void SetLeadIn()
+		{
+			m_LeadInCAMPointList.Clear();
+			if( m_CAMPointList.Count == 0 ) {
+				return;
+			}
+			List<CAMPoint> LeadInCAMPointList = new List<CAMPoint>();
+			switch( m_LeadParam.LeadIn.Type ) {
+				case LeadType.LeadLineType.Line:
+					LeadInCAMPointList = LeadManufactor.BuildStraightLeadLine( m_CAMPointList.First(), true, m_LeadParam.LeadIn.Length, m_LeadParam.LeadIn.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse );
+					m_LeadInCAMPointList.AddRange( LeadInCAMPointList );
+					break;
+				case LeadType.LeadLineType.Arc:
+					LeadInCAMPointList = LeadManufactor.BuildArcLeadLine( m_CAMPointList.First(), true, m_LeadParam.LeadIn.Length, m_LeadParam.LeadIn.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH );
+					m_LeadInCAMPointList.AddRange( LeadInCAMPointList );
+					break;
+				default:
+					break;
+			}
+		}
+
+		void SetLeadout()
+		{
+			m_LeadOutCAMPointList.Clear();
+			if( m_CAMPointList.Count == 0 ) {
+				return;
+			}
+
+			// with over cut means lead out first point is over cut last point
+			CAMPoint leadOutStartPoint;
+			if( m_OverCutLength > 0 && m_OverCutPointList.Count > 0 ) {
+				leadOutStartPoint = m_OverCutPointList.Last();
+			}
+			else {
+				leadOutStartPoint = m_CAMPointList.Last();
+			}
+			List<CAMPoint> LeadOutCAMPointList = new List<CAMPoint>();
+			switch( m_LeadParam.LeadOut.Type ) {
+				case LeadType.LeadLineType.Line:
+					LeadOutCAMPointList = LeadManufactor.BuildStraightLeadLine( leadOutStartPoint, false, m_LeadParam.LeadOut.Length, m_LeadParam.LeadOut.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse );
+					m_LeadOutCAMPointList.AddRange( LeadOutCAMPointList );
+					break;
+				case LeadType.LeadLineType.Arc:
+					LeadOutCAMPointList = LeadManufactor.BuildArcLeadLine( leadOutStartPoint, false, m_LeadParam.LeadOut.Length, m_LeadParam.LeadOut.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH );
+					m_LeadOutCAMPointList.AddRange( LeadOutCAMPointList );
+					break;
+				default:
+					break;
+			}
+		}
+
+		#endregion
 	}
 }

@@ -1,4 +1,8 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.Data;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.BRepPrimAPI;
@@ -14,14 +18,17 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
 	internal class CAMEditor
 	{
+		// to notice main form
+		public Action<EActionStatus> LeadActionStatusChange;
+		public Action<EActionStatus> OverCutActionStatusChange;
+		public Action<bool> CurrentPathWithLead;
+		public Action<bool> CurrentPathIsClosed;
+
 		public CAMEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 		{
 			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
@@ -39,6 +46,7 @@ namespace MyCAM.Editor
 
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Path );
+			( m_DefaultAction as DefaultAction ).TreeSelectionChange += OnTreeSelectionChange;
 		}
 
 		// data manager
@@ -57,6 +65,10 @@ namespace MyCAM.Editor
 		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh, no need activate
 		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
 		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>(); // need refresh, no need activate
+		List<AIS_Line> m_LeadAISList = new List<AIS_Line>(); // need refresh, no need activate
+		List<AIS_Shape> m_LeadOrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
+		List<AIS_Line> m_OverCutAISList = new List<AIS_Line>(); // need refresh, no need activate
+
 		enum EvecType
 		{
 			ToolVec,
@@ -191,6 +203,8 @@ namespace MyCAM.Editor
 			ShowCAMData();
 		}
 
+		#region Set CAM
+
 		public void SetStartPoint()
 		{
 			if( m_CurrentAction.ActionType != EditActionType.Default ) {
@@ -227,6 +241,78 @@ namespace MyCAM.Editor
 			ShowCAMData();
 		}
 
+		public void SetToolVecReverse()
+		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+
+			// toggle reverse state
+			pathData.CAMData.IsToolVecReverse = !pathData.CAMData.IsToolVecReverse;
+			ShowCAMData();
+		}
+
+		public void SetLeadLine()
+		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+			LeadSettingAction action = new LeadSettingAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData, ESelectObjectType.Path );
+			action.PropertyChanged += ShowCAMData;
+			action.LeadActionStatusChange += LeadActionStatusChange;
+
+			// after set lead line but haven't change path, change lead direction should be disable
+			action.PathWithLeadLine += CurrentPathWithLead;
+			StartEditAction( action );
+		}
+
+		public void ChangeLeadDirection()
+		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+
+			// nothing change
+			if( pathData.CAMData.LeadLineParam.LeadIn.Type == LeadType.LeadLineType.None && pathData.CAMData.LeadLineParam.LeadIn.Type == LeadType.LeadLineType.None ) {
+				pathData.CAMData.LeadLineParam.IsChangeLeadDirection = false;
+				return;
+			}
+			pathData.CAMData.LeadLineParam.IsChangeLeadDirection = !pathData.CAMData.LeadLineParam.IsChangeLeadDirection;
+			pathData.CAMData.LeadLineParam = pathData.CAMData.LeadLineParam.Clone();
+			ShowCAMData();
+		}
+
+		public void SetOverCut()
+		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+			OverCutAction action = new OverCutAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData, ESelectObjectType.Path );
+			action.PropertyChanged += ShowCAMData;
+			action.OverCutActionStatusChange += OverCutActionStatusChange;
+			StartEditAction( action );
+		}
+
 		public void SetToolVec()
 		{
 			if( m_CurrentAction.ActionType != EditActionType.Default ) {
@@ -241,6 +327,8 @@ namespace MyCAM.Editor
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
+
+		#endregion
 
 		// TODO: refresh tree
 		public void MoveProcess( bool bUp )
@@ -305,6 +393,8 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
+		#region Show CAM
+
 		// view
 		void ShowCAMData()
 		{
@@ -312,6 +402,9 @@ namespace MyCAM.Editor
 			ShowToolVec();
 			ShowOrientation();
 			ShowIndex();
+			ShowOverCut();
+			ShowLeadLine();
+			ShowLeadOrientation();
 			m_Viewer.UpdateView();
 		}
 
@@ -343,6 +436,45 @@ namespace MyCAM.Editor
 			}
 		}
 
+		void ShowLeadLine()
+		{
+			// clear the previous tool vec
+			foreach( AIS_Line toolVecAIS in m_LeadAISList ) {
+				m_Viewer.GetAISContext().Remove( toolVecAIS, false );
+			}
+			m_LeadAISList.Clear();
+
+			// build lead line AIS
+			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+
+				// draw lead in
+				if( camData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None ) {
+					for( int i = 0; i < camData.LeadInCAMPointList.Count - 1; i++ ) {
+						CAMPoint currentCAMPoint = camData.LeadInCAMPointList[ i ];
+						CAMPoint nextCAMPoint = camData.LeadInCAMPointList[ i + 1 ];
+						AIS_Line LeadAISLine = GetAISLine( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+						m_LeadAISList.Add( LeadAISLine );
+					}
+				}
+
+				// draw lead out
+				if( camData.LeadLineParam.LeadOut.Type != LeadType.LeadLineType.None ) {
+					for( int i = 0; i < camData.LeadOutCAMPointList.Count - 1; i++ ) {
+						CAMPoint currentCAMPoint = camData.LeadOutCAMPointList[ i ];
+						CAMPoint nextCAMPoint = camData.LeadOutCAMPointList[ i + 1 ];
+						AIS_Line LeadAISLine = GetAISLine( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+						m_LeadAISList.Add( LeadAISLine );
+					}
+				}
+			}
+
+			// display the lead line
+			foreach( AIS_Line toolVecAIS in m_LeadAISList ) {
+				m_Viewer.GetAISContext().Display( toolVecAIS, false );
+				m_Viewer.GetAISContext().Deactivate( toolVecAIS );
+			}
+		}
+
 		void ShowOrientation()
 		{
 			// clear the previous orientation
@@ -364,6 +496,47 @@ namespace MyCAM.Editor
 
 			// display the orientation
 			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
+				m_Viewer.GetAISContext().Display( orientationAIS, false );
+				m_Viewer.GetAISContext().Deactivate( orientationAIS );
+			}
+		}
+
+		void ShowLeadOrientation()
+		{
+			// clear the previous orientation
+			foreach( AIS_Shape orientationAIS in m_LeadOrientationAISList ) {
+				m_Viewer.GetAISContext().Remove( orientationAIS, false );
+			}
+			m_LeadOrientationAISList.Clear();
+
+			// build orientation
+			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+
+				// path with lead in
+				if( camData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None ) {
+					if( camData.LeadInCAMPointList.Count == 0 ) {
+						break;
+					}
+					gp_Pnt leadInStartPoint = camData.LeadInCAMPointList.First().CADPoint.Point;
+					gp_Dir leadInOrientationDir = new gp_Dir( camData.LeadInCAMPointList.First().CADPoint.TangentVec.XYZ() );
+					AIS_Shape orientationAIS = GetOrientationAIS( leadInStartPoint, leadInOrientationDir );
+					m_LeadOrientationAISList.Add( orientationAIS );
+				}
+
+				// path with lead out
+				if( camData.LeadLineParam.LeadOut.Type != LeadType.LeadLineType.None ) {
+					if( camData.LeadOutCAMPointList.Count == 0 ) {
+						break;
+					}
+					gp_Pnt leadOutEndPoint = camData.LeadOutCAMPointList.Last().CADPoint.Point;
+					gp_Dir leadOutOrientationDir = new gp_Dir( camData.LeadOutCAMPointList.Last().CADPoint.TangentVec.XYZ() );
+					AIS_Shape orientationAIS = GetOrientationAIS( leadOutEndPoint, leadOutOrientationDir );
+					m_LeadOrientationAISList.Add( orientationAIS );
+				}
+			}
+
+			// display the orientation
+			foreach( AIS_Shape orientationAIS in m_LeadOrientationAISList ) {
 				m_Viewer.GetAISContext().Display( orientationAIS, false );
 				m_Viewer.GetAISContext().Deactivate( orientationAIS );
 			}
@@ -400,6 +573,31 @@ namespace MyCAM.Editor
 			}
 		}
 
+		void ShowOverCut()
+		{
+			// clear the previous tool vec
+			foreach( AIS_Line overCutAIS in m_OverCutAISList ) {
+				m_Viewer.GetAISContext().Remove( overCutAIS, false );
+			}
+			m_OverCutAISList.Clear();
+
+			// build over cut
+			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+				if( camData.OverCutLength > 0 ) {
+					for( int i = 0; i < camData.OverCutCAMPointList.Count - 1; i++ ) {
+						AIS_Line OverCutAISLine = GetAISLine( camData.OverCutCAMPointList[ i ].CADPoint.Point, camData.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
+						m_OverCutAISList.Add( OverCutAISLine );
+					}
+				}
+			}
+
+			// display the tool vec
+			foreach( AIS_Line toolVecAIS in m_OverCutAISList ) {
+				m_Viewer.GetAISContext().Display( toolVecAIS, false );
+				m_Viewer.GetAISContext().Deactivate( toolVecAIS );
+			}
+		}
+
 		void HideCAMData()
 		{
 			// hide tool vec
@@ -416,8 +614,26 @@ namespace MyCAM.Editor
 			foreach( AIS_TextLabel textLabel in m_IndexList ) {
 				m_Viewer.GetAISContext().Remove( textLabel, false );
 			}
+
+			// hide over cut
+			foreach( AIS_Line overCutAIS in m_OverCutAISList ) {
+				m_Viewer.GetAISContext().Remove( overCutAIS, false );
+			}
+
+			// hide lead 
+			foreach( AIS_Line leadAIS in m_LeadAISList ) {
+				m_Viewer.GetAISContext().Remove( leadAIS, false );
+			}
+
+			// hide lead orientation
+			// hide orientation
+			foreach( AIS_Shape orientationAIS in m_LeadOrientationAISList ) {
+				m_Viewer.GetAISContext().Remove( orientationAIS, false );
+			}
 			m_Viewer.UpdateView();
 		}
+
+		#endregion
 
 		bool IsModifiedToolVecIndex( int index, CAMData camData )
 		{
@@ -446,6 +662,14 @@ namespace MyCAM.Editor
 					lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
 					break;
 			}
+			lineAIS.SetWidth( 1 );
+			return lineAIS;
+		}
+
+		AIS_Line GetAISLine( gp_Pnt leadStartPnt, gp_Pnt leadEndPnt, Quantity_NameOfColor color )
+		{
+			AIS_Line lineAIS = new AIS_Line( new Geom_CartesianPoint( leadStartPnt ), new Geom_CartesianPoint( leadEndPnt ) );
+			lineAIS.SetColor( new Quantity_Color( color ) );
 			lineAIS.SetWidth( 1 );
 			return lineAIS;
 		}
@@ -497,6 +721,22 @@ namespace MyCAM.Editor
 				m_CurrentAction = m_DefaultAction;
 				m_CurrentAction.Start();
 			}
+		}
+
+		void OnTreeSelectionChange()
+		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+
+			CurrentPathIsClosed?.Invoke( pathData.CAMData.IsClosed );
+			bool isPathWithLead = pathData.CAMData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None || pathData.CAMData.LeadLineParam.LeadOut.Type != LeadType.LeadLineType.None;
+			CurrentPathWithLead( isPathWithLead );
 		}
 
 		bool m_IsNextAction = false;

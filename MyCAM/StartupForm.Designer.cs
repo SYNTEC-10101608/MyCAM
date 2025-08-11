@@ -71,7 +71,10 @@
 			this.m_tsmiStartPoint = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiReverse = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSetLead = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiChangeLeadDirection = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiLeadSetting = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiOverCut = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiToolVecReverse = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiToolVec = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiMoveUp = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiMoveDown = new System.Windows.Forms.ToolStripMenuItem();
@@ -427,6 +430,7 @@
             this.m_tsmiReverse,
             this.m_tsmiSetLead,
             this.m_tsmiOverCut,
+            this.m_tsmiToolVecReverse,
             this.m_tsmiToolVec,
             this.m_tsmiMoveUp,
             this.m_tsmiMoveDown,
@@ -470,10 +474,26 @@
 			// 
 			// m_tsmiSetLead
 			// 
+			this.m_tsmiSetLead.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiChangeLeadDirection,
+            this.m_tsmiLeadSetting});
 			this.m_tsmiSetLead.Name = "m_tsmiSetLead";
 			this.m_tsmiSetLead.Size = new System.Drawing.Size(53, 23);
 			this.m_tsmiSetLead.Text = "引線";
-			this.m_tsmiSetLead.Click += new System.EventHandler(this.m_tsmiSetLead_Click);
+			// 
+			// m_tsmiChangeLeadDirection
+			// 
+			this.m_tsmiChangeLeadDirection.Name = "m_tsmiChangeLeadDirection";
+			this.m_tsmiChangeLeadDirection.Size = new System.Drawing.Size(152, 22);
+			this.m_tsmiChangeLeadDirection.Text = "更換引線方向";
+			this.m_tsmiChangeLeadDirection.Click += new System.EventHandler(this.m_tsmiChangeLeadDirection_Click);
+			// 
+			// m_tsmiLeadSetting
+			// 
+			this.m_tsmiLeadSetting.Name = "m_tsmiLeadSetting";
+			this.m_tsmiLeadSetting.Size = new System.Drawing.Size(152, 22);
+			this.m_tsmiLeadSetting.Text = "設置引線";
+			this.m_tsmiLeadSetting.Click += new System.EventHandler(this.m_tsmiLeadSetting_Click);
 			// 
 			// m_tsmiOverCut
 			// 
@@ -481,6 +501,13 @@
 			this.m_tsmiOverCut.Size = new System.Drawing.Size(53, 23);
 			this.m_tsmiOverCut.Text = "過切";
 			this.m_tsmiOverCut.Click += new System.EventHandler(this.m_tsmiOverCut_Click);
+			// 
+			// m_tsmiToolVecReverse
+			// 
+			this.m_tsmiToolVecReverse.Name = "m_tsmiToolVecReverse";
+			this.m_tsmiToolVecReverse.Size = new System.Drawing.Size(71, 20);
+			this.m_tsmiToolVecReverse.Text = "姿態反向";
+			this.m_tsmiToolVecReverse.Click += new System.EventHandler(this.m_tsmiToolVecReverse_Click);
 			// 
 			// m_tsmiToolVec
 			// 
@@ -612,6 +639,9 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_PointCenter;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddLine;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddLine_TwoVertexConnect;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiChangeLeadDirection;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiLeadSetting;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiToolVecReverse;
 	}
 }
 

@@ -64,6 +64,22 @@
       <DependentUpon>AxisTransformDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\EFunctionStatus.cs" />
+    <Compile Include="Data\LeadData.cs" />
+    <Compile Include="Editor\Action\CAM\LeadSettingAction.cs" />
+    <Compile Include="Editor\Action\CAM\OverCutAction.cs" />
+    <Compile Include="Editor\Dialog\LeadLineForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\LeadLineForm.Designer.cs">
+      <DependentUpon>LeadLineForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Dialog\OverCutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\OverCutForm.Designer.cs">
+      <DependentUpon>OverCutForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Manufactor\LeadManufactor.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Data\CAMData.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
@@ -108,6 +124,12 @@
     <EmbeddedResource Include="Editor\Dialog\AxisTransformDlg.resx">
       <DependentUpon>AxisTransformDlg.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\LeadLineForm.resx">
+      <DependentUpon>LeadLineForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\OverCutForm.resx">
+      <DependentUpon>OverCutForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\ThreePtTransformDlg.resx">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
     </EmbeddedResource>
@@ -149,5 +171,6 @@
       <Name>OCCViewer</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

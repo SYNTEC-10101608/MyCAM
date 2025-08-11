@@ -1,4 +1,6 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using OCC.AIS;
@@ -6,8 +8,7 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
-using System;
-using System.Windows.Forms;
+using static MyCAM.Editor.LeadSettingAction;
 
 namespace MyCAM
 {
@@ -47,6 +48,10 @@ namespace MyCAM
 
 			// CAM Editor
 			m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			m_CAMEditor.LeadActionStatusChange += OnLeadSettingActionStatusChange;
+			m_CAMEditor.CurrentPathWithLead += OnPathWithLead;
+			m_CAMEditor.CurrentPathIsClosed += OnPathIsClose;
+			m_CAMEditor.OverCutActionStatusChange += OnOverCutActionStatusChange;
 
 			// init menu strip
 			m_msCAM.Enabled = false;
@@ -242,20 +247,30 @@ namespace MyCAM
 			m_CAMEditor.SetReverse();
 		}
 
-		void m_tsmiSetLead_Click( object sender, EventArgs e )
-		{
-
-		}
-
 		void m_tsmiOverCut_Click( object sender, EventArgs e )
 		{
+			m_CAMEditor.SetOverCut();
+		}
 
+		void m_tsmiLeadSetting_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetLeadLine();
+		}
+
+		void m_tsmiChangeLeadDirection_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.ChangeLeadDirection();
 		}
 
 		// tool vector
 		void m_tsmiToolVec_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SetToolVec();
+		}
+
+		void m_tsmiToolVecReverse_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetToolVecReverse();
 		}
 
 		// sort
@@ -288,5 +303,39 @@ namespace MyCAM
 		{
 			m_CAMEditor.ConvertNC();
 		}
+
+		#region UI action 
+
+		void OnLeadSettingActionStatusChange( EActionStatus actionStatus )
+		{
+			if( actionStatus == EActionStatus.Start ) {
+				m_msCAM.Enabled = false;
+				return;
+			}
+			m_msCAM.Enabled = true;
+		}
+
+		void OnOverCutActionStatusChange( EActionStatus actionStatus )
+		{
+			if( actionStatus == EActionStatus.Start ) {
+				m_msCAM.Enabled = false;
+				return;
+			}
+			m_msCAM.Enabled = true;
+		}
+
+		void OnPathWithLead (bool isPathWithLead )
+		{
+			m_tsmiChangeLeadDirection.Enabled = isPathWithLead;
+		}
+
+		void OnPathIsClose(bool isClosePath )
+		{
+			m_tsmiStartPoint.Enabled = isClosePath;
+			m_tsmiSetLead.Enabled = isClosePath;
+			m_tsmiOverCut.Enabled = isClosePath;
+		}
+
+		#endregion
 	}
 }
