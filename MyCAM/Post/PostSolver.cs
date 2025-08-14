@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using MyCAM.Machine;
 using OCC.gp;
 using System;
 using System.Runtime.InteropServices;
@@ -139,21 +140,65 @@ namespace MyCAM.Post
 		double[] SlaveRotateDir;
 	}
 
-	internal class PostSolver
+	public class FKSolver
 	{
-		public PostSolver( MachineData machineData )
+		public FKSolver( gp_Vec mcsToSlave, gp_Vec slaveToMaster, gp_Vec toolVec, gp_Dir masterAxis, gp_Dir slaveAxis )
 		{
-			if( machineData == null ) {
-				throw new ArgumentNullException( "Machine data cannot be null." );
+			// give a defaul Z dir BC type
+			if( mcsToSlave == null ) {
+				mcsToSlave = new gp_Vec( 0, 0, 0 );
 			}
-			m_MachineData = machineData;
+			if( slaveToMaster == null ) {
+				slaveToMaster = new gp_Vec( 0, 0, 0 );
+			}
+			if( toolVec == null ) {
+				toolVec = new gp_Vec( 0, 0, 1 );
+			}
+			if( masterAxis == null ) {
+				masterAxis = new gp_Dir( 0, 0, 1 );
+			}
+			if( slaveAxis == null ) {
+				slaveAxis = new gp_Dir( 0, 1, 0 );
+			}
+			MCSToSlave = mcsToSlave;
+			SlaveToMaster = slaveToMaster;
+			ToolVec = toolVec;
+			MasterRotateDir = masterAxis;
+			SlaveRotateDir = slaveAxis;
 		}
 
-		public virtual PostFrameData Solve( CAMPoint G54Data )
+		public gp_Vec Solve( double masterAngle, double slaveAngle )
+		{
+			return new gp_Vec();
+		}
+
+		// machine properties
+		gp_Vec MCSToSlave;
+		gp_Vec SlaveToMaster;
+		gp_Vec ToolVec;
+		gp_Dir MasterRotateDir;
+		gp_Dir SlaveRotateDir;
+	}
+
+	internal interface IPostSolver
+	{
+		PostFrameData SolveFrame( CAMPoint G54Data );
+	}
+
+	internal class SpindlePostSolver : IPostSolver
+	{
+		public SpindlePostSolver( MachineData machineData )
+		{
+			if( machineData == null || machineData.FiveAxisType != FiveAxisType.Spindle ) {
+				throw new ArgumentException( "Invalid spindle machine data" );
+			}
+		}
+
+		public PostFrameData SolveFrame( CAMPoint G54Data )
 		{
 			return new PostFrameData();
 		}
 
-		MachineData m_MachineData;
+		IKSolver m_IKSolver;
 	}
 }
