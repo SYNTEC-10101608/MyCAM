@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Data\MachineData.cs" />
     <Compile Include="Data\PostFrameData.cs" />
+    <Compile Include="Editor\SimuEditor.cs" />
     <Compile Include="Machine\MachineDefine.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Data\CAMData.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Data\BasicData.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="Post\NCWriter.cs" />
+    <Compile Include="Post\PostSolver.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>
