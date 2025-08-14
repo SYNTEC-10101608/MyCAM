@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\MachineData.cs" />
-    <Compile Include="Machine\Define.cs" />
+    <Compile Include="Machine\MachineDefine.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Data\CAMData.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
