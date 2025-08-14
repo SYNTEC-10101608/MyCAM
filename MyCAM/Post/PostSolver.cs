@@ -51,7 +51,7 @@ namespace MyCAM.Post
 			SlaveRotateDir = new double[ 3 ] { slaveRotateDir.X(), slaveRotateDir.Y(), slaveRotateDir.Z() };
 		}
 
-		public IKSolveResult ConvertIJKToABC( gp_Dir toolVec_In, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
+		public IKSolveResult Solve( gp_Dir toolVec_In, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
 		{
 			// prevent from sigular area
 			if( toolVec_In.IsParallel( new gp_Dir( MasterRotateDir[ 0 ], MasterRotateDir[ 1 ], MasterRotateDir[ 2 ] ), 1e-1 ) ) {
@@ -142,7 +142,7 @@ namespace MyCAM.Post
 
 	public class FKSolver
 	{
-		public FKSolver( gp_Vec mcsToSlave, gp_Vec slaveToMaster, gp_Vec toolVec, gp_Dir masterAxis, gp_Dir slaveAxis )
+		public FKSolver( gp_Vec mcsToSlave, gp_Vec slaveToMaster, gp_Vec toolVec, gp_Dir masterRotateDir, gp_Dir slaveRotateDir )
 		{
 			// give a defaul Z dir BC type
 			if( mcsToSlave == null ) {
@@ -154,30 +154,46 @@ namespace MyCAM.Post
 			if( toolVec == null ) {
 				toolVec = new gp_Vec( 0, 0, 1 );
 			}
-			if( masterAxis == null ) {
-				masterAxis = new gp_Dir( 0, 0, 1 );
+			if( masterRotateDir == null ) {
+				masterRotateDir = new gp_Dir( 0, 0, 1 );
 			}
-			if( slaveAxis == null ) {
-				slaveAxis = new gp_Dir( 0, 1, 0 );
+			if( slaveRotateDir == null ) {
+				slaveRotateDir = new gp_Dir( 0, 1, 0 );
 			}
 			MCSToSlave = mcsToSlave;
 			SlaveToMaster = slaveToMaster;
 			ToolVec = toolVec;
-			MasterRotateDir = masterAxis;
-			SlaveRotateDir = slaveAxis;
+			MasterRotateDir = masterRotateDir;
+			SlaveRotateDir = slaveRotateDir;
 		}
 
 		public gp_Vec Solve( double masterAngle, double slaveAngle )
 		{
-			return new gp_Vec();
+			// the original TCP on master coordinate system
+			gp_Vec tcpOnMasterAtZero = ToolVec - MCSToSlave - SlaveToMaster;
+
+			// rotate slave
+			gp_Vec tcpOnSlave = ToolVec - MCSToSlave; // TCP on slave coordinate system
+			gp_Trsf slaveTrsf = new gp_Trsf();
+			slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), SlaveRotateDir ), slaveAngle );
+			tcpOnSlave.Transform( slaveTrsf );
+
+			// rotate master
+			gp_Vec tcpOnMaster = tcpOnSlave - SlaveToMaster; // TCP on master coordinate system
+			gp_Trsf masterTrsf = new gp_Trsf();
+			masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), MasterRotateDir ), masterAngle );
+			tcpOnMaster.Transform( masterTrsf );
+
+			// the result is the vector from new TCP to original TCP
+			return tcpOnMaster - tcpOnMasterAtZero;
 		}
 
 		// machine properties
-		gp_Vec MCSToSlave;
-		gp_Vec SlaveToMaster;
-		gp_Vec ToolVec;
-		gp_Dir MasterRotateDir;
-		gp_Dir SlaveRotateDir;
+		gp_Vec MCSToSlave; // DE
+		gp_Vec SlaveToMaster; // EF
+		gp_Vec ToolVec; // L (DT)
+		gp_Dir MasterRotateDir; // (abc)
+		gp_Dir SlaveRotateDir; // (def)
 	}
 
 	internal interface IPostSolver
