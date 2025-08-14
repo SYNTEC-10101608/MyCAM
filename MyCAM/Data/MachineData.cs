@@ -50,19 +50,24 @@ namespace MyCAM.Data
 			get; set;
 		}
 
-		public RotaryAxis RotaryAxis
+		public RotaryAxis MasterRotaryAxis
 		{
 			get; set;
 		}
 
-		public RotaryDirection RotaryDirection
+		public RotaryAxis SlaveRotaryAxis
 		{
 			get; set;
 		}
 
-		public MachineTreeNode RootNode
+		public RotaryDirection MasterRotaryDirection
 		{
-			get; private set;
+			get; set;
+		}
+
+		public RotaryDirection SlaveRotaryDirection
+		{
+			get; set;
 		}
 
 		public gp_XYZ MasterTiltedVec_deg
@@ -73,6 +78,16 @@ namespace MyCAM.Data
 		public gp_XYZ SlaveTiltedVec_deg
 		{
 			get; set;
+		}
+
+		public double ToolLength
+		{
+			get; set;
+		}
+
+		public MachineTreeNode RootNode
+		{
+			get; private set;
 		}
 	}
 

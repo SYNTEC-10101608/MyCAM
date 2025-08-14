@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\MachineData.cs" />
-    <Compile Include="Data\PostFrameData.cs" />
+    <Compile Include="Data\PostData.cs" />
     <Compile Include="Editor\SimuEditor.cs" />
     <Compile Include="Machine\MachineDefine.cs" />
     <Compile Include="MyApp.cs" />

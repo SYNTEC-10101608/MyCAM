@@ -2,6 +2,7 @@
 using MyCAM.Machine;
 using OCC.gp;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace MyCAM.Post
@@ -185,7 +186,7 @@ namespace MyCAM.Post
 			tcpOnMaster.Transform( masterTrsf );
 
 			// the result is the vector from new TCP to original TCP
-			return tcpOnMaster - tcpOnMasterAtZero;
+			return tcpOnMasterAtZero - tcpOnMaster;
 		}
 
 		// machine properties
@@ -196,25 +197,182 @@ namespace MyCAM.Post
 		gp_Dir SlaveRotateDir; // (def)
 	}
 
-	internal interface IPostSolver
+	internal class PostSolver<TMachineData> where TMachineData : MachineData
 	{
-		PostFrameData SolveFrame( CAMPoint G54Data );
-	}
-
-	internal class SpindlePostSolver : IPostSolver
-	{
-		public SpindlePostSolver( MachineData machineData )
+		public PostSolver( TMachineData machineData )
 		{
-			if( machineData == null || machineData.FiveAxisType != FiveAxisType.Spindle ) {
-				throw new ArgumentException( "Invalid spindle machine data" );
+			if( machineData == null ) {
+				throw new ArgumentException( "Invalid machine data" );
+			}
+			m_MachineData = machineData;
+			CalculateMasterRotateDir();
+			CalculateSlaveRotateDir();
+			CalculateToolDir();
+			BuildFKSolver();
+			BuildIKSolver();
+		}
+
+		public virtual bool Solve( CAMData camData,
+			out List<PostData> resultG54, out List<PostData> resultMCS )
+		{
+			resultG54 = new List<PostData>();
+			resultMCS = new List<PostData>();
+			if( camData == null ) {
+				return false;
+			}
+
+			// solve IK
+			List<Tuple<double, double>> rotateAngleList = new List<Tuple<double, double>>();
+			List<bool> sigularTagList = new List<bool>();
+			double dM = 0;
+			double dS = 0;
+			foreach( CAMPoint point in camData.CAMPointList ) {
+				IKSolveResult ikResult = m_IKSolver.Solve( point.ToolVec, dM, dS, out dM, out dS );
+				if( ikResult == IKSolveResult.NoError ) {
+					rotateAngleList.Add( new Tuple<double, double>( dM, dS ) );
+					sigularTagList.Add( false );
+				}
+				else if( ikResult == IKSolveResult.MasterInfinityOfSolution || ikResult == IKSolveResult.SlaveInfinityOfSolution ) {
+					rotateAngleList.Add( new Tuple<double, double>( dM, dS ) );
+					sigularTagList.Add( true );
+				}
+
+				// some point in the path is unsolvable
+				else {
+					return false;
+				}
+			}
+
+			// TODO: filter the sigular points
+			// solve FK
+			for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
+				gp_Pnt pointG54 = camData.CAMPointList[ i ].CADPoint.Point;
+				gp_Vec tcpOffset = m_FKSolver.Solve( rotateAngleList[ i ].Item1, rotateAngleList[ i ].Item2 );
+				gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
+
+				// add G54 frame data
+				PostData frameDataG54 = new PostData()
+				{
+					X = pointG54.X(),
+					Y = pointG54.Y(),
+					Z = pointG54.Z(),
+					Master = rotateAngleList[ i ].Item1,
+					Slave = rotateAngleList[ i ].Item2
+				};
+				resultG54.Add( frameDataG54 );
+
+				// add MCS frame data
+				PostData frameDataMCS = new PostData()
+				{
+					X = pointMCS.X(),
+					Y = pointMCS.Y(),
+					Z = pointMCS.Z(),
+					Master = rotateAngleList[ i ].Item1,
+					Slave = rotateAngleList[ i ].Item2
+				};
+				resultMCS.Add( frameDataMCS );
+			}
+			return true;
+		}
+
+		// TODO: cosider tilted
+		protected virtual void CalculateMasterRotateDir()
+		{
+			switch( m_MachineData.MasterRotaryAxis ) {
+				case RotaryAxis.X:
+					m_MasterRotateDir = new gp_Dir( 1, 0, 0 );
+					break;
+				case RotaryAxis.Y:
+					m_MasterRotateDir = new gp_Dir( 0, 1, 0 );
+					break;
+				case RotaryAxis.Z:
+					m_MasterRotateDir = new gp_Dir( 0, 0, 1 );
+					break;
+				default:
+					m_MasterRotateDir = new gp_Dir( 0, 0, 1 );
+					break;
 			}
 		}
 
-		public PostFrameData SolveFrame( CAMPoint G54Data )
+		// TODO: cosider tilted
+		protected virtual void CalculateSlaveRotateDir()
 		{
-			return new PostFrameData();
+			switch( m_MachineData.SlaveRotaryAxis ) {
+				case RotaryAxis.X:
+					m_SlaveRotateDir = new gp_Dir( 1, 0, 0 );
+					break;
+				case RotaryAxis.Y:
+					m_SlaveRotateDir = new gp_Dir( 0, 1, 0 );
+					break;
+				case RotaryAxis.Z:
+					m_SlaveRotateDir = new gp_Dir( 0, 0, 1 );
+					break;
+				default:
+					m_SlaveRotateDir = new gp_Dir( 0, 1, 0 );
+					break;
+			}
 		}
 
-		IKSolver m_IKSolver;
+		protected virtual void CalculateToolDir()
+		{
+			switch( m_MachineData.ToolDirection ) {
+				case ToolDirection.X:
+					m_ToolDir = new gp_Dir( 1, 0, 0 );
+					break;
+				case ToolDirection.Y:
+					m_ToolDir = new gp_Dir( 0, 1, 0 );
+					break;
+				case ToolDirection.Z:
+					m_ToolDir = new gp_Dir( 0, 0, 1 );
+					break;
+				default:
+					m_ToolDir = new gp_Dir( 0, 0, 1 );
+					break;
+			}
+		}
+
+		// hook
+		protected virtual void BuildFKSolver()
+		{
+			gp_Vec mcsToSlave = new gp_Vec();
+			gp_Vec slaveToMaster = new gp_Vec();
+			gp_Vec toolVec = new gp_Vec( m_ToolDir );
+			toolVec.Multiply( m_MachineData.ToolLength );
+			m_FKSolver = new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
+		}
+
+		// hook
+		protected virtual void BuildIKSolver()
+		{
+			m_IKSolver = new IKSolver( m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir );
+		}
+
+		protected TMachineData m_MachineData;
+		protected IKSolver m_IKSolver;
+		protected FKSolver m_FKSolver;
+		protected gp_Dir m_MasterRotateDir;
+		protected gp_Dir m_SlaveRotateDir;
+		protected gp_Dir m_ToolDir;
+	}
+
+	internal class SpindlePostSolver : PostSolver<SpindleTypeMachineData>
+	{
+		public SpindlePostSolver( SpindleTypeMachineData machineData ) : base( machineData )
+		{
+		}
+
+		protected override void BuildFKSolver()
+		{
+			gp_Vec mcsToSlave = new gp_Vec( m_MachineData.ToolToSlaveVec.XYZ() );
+			gp_Vec slaveToMaster = new gp_Vec( m_MachineData.SlaveToMasterVec.XYZ() );
+			gp_Vec toolVec = new gp_Vec( m_ToolDir );
+			toolVec.Multiply( m_MachineData.ToolLength );
+			m_FKSolver = new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
+		}
+
+		protected override void BuildIKSolver()
+		{
+			m_IKSolver = new IKSolver( m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir );
+		}
 	}
 }

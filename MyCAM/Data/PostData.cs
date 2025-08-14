@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Data
 {
-	internal class PostFrameData
+	internal class PostData
 	{
 		public double X
 		{
@@ -17,12 +17,12 @@
 			get; set;
 		}
 
-		public double Master_deg
+		public double Master
 		{
 			get; set;
 		}
 
-		public double Slave_deg
+		public double Slave
 		{
 			get; set;
 		}
