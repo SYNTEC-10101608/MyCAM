@@ -64,6 +64,16 @@ namespace MyCAM.Data
 		{
 			get; private set;
 		}
+
+		public gp_XYZ MasterTiltedVec_deg
+		{
+			get; set;
+		}
+
+		public gp_XYZ SlaveTiltedVec_deg
+		{
+			get; set;
+		}
 	}
 
 	internal class SpindleTypeMachineData : MachineData
