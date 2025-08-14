@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\MachineData.cs" />
+    <Compile Include="Data\PostFrameData.cs" />
     <Compile Include="Machine\MachineDefine.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Data\CAMData.cs" />
