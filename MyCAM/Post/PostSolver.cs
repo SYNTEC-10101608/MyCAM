@@ -197,7 +197,22 @@ namespace MyCAM.Post
 		gp_Dir SlaveRotateDir; // (def)
 	}
 
-	internal class PostSolver<TMachineData> where TMachineData : MachineData
+	internal interface IPostSolver
+	{
+		bool Solve( CAMData camData, out List<PostData> resultG54, out List<PostData> resultMCS );
+
+		gp_Dir MasterRotateDir
+		{
+			get;
+		}
+
+		gp_Dir SlaveRotateDir
+		{
+			get;
+		}
+	}
+
+	internal class PostSolver<TMachineData> : IPostSolver where TMachineData : MachineData
 	{
 		public PostSolver( TMachineData machineData )
 		{
@@ -345,6 +360,22 @@ namespace MyCAM.Post
 		protected virtual void BuildIKSolver()
 		{
 			m_IKSolver = new IKSolver( m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir );
+		}
+
+		public gp_Dir MasterRotateDir
+		{
+			get
+			{
+				return m_MasterRotateDir;
+			}
+		}
+
+		public gp_Dir SlaveRotateDir
+		{
+			get
+			{
+				return m_SlaveRotateDir;
+			}
 		}
 
 		protected TMachineData m_MachineData;

@@ -278,7 +278,11 @@ namespace MyCAM
 		// convert NC
 		void m_tsmiCAMOK_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.ConvertNC();
+			//m_CAMEditor.ConvertNC();
+			m_msCAD.Enabled = false;
+			m_msCAM.Enabled = false;
+			m_CAMEditor.EditEnd();
+			m_SimuEditor.EditStart();
 		}
 	}
 }
