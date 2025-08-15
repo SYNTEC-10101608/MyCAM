@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 namespace MyCAM.Post
 {
 	// P/INVOKE from C++ PostTool.dll
-	public static class IKSolverInterop
+	internal static class IKSolverInterop
 	{
 		[DllImport( "PostTool.dll", CallingConvention = CallingConvention.StdCall )]
 		public static extern int IKSolver_IJKtoMS(
@@ -33,7 +33,7 @@ namespace MyCAM.Post
 		SlaveInfinityOfSolution = 3,
 	}
 
-	public class IKSolver
+	internal class IKSolver
 	{
 		public IKSolver( gp_Dir toolDir, gp_Dir masterRotateDir, gp_Dir slaveRotateDir )
 		{
@@ -141,7 +141,7 @@ namespace MyCAM.Post
 		double[] SlaveRotateDir;
 	}
 
-	public class FKSolver
+	internal class FKSolver
 	{
 		public FKSolver( gp_Vec mcsToSlave, gp_Vec slaveToMaster, gp_Vec toolVec, gp_Dir masterRotateDir, gp_Dir slaveRotateDir )
 		{

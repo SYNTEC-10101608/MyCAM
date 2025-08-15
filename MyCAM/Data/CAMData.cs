@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace MyCAM.Data
 {
-	public class CADPoint
+	internal class CADPoint
 	{
 		public CADPoint( gp_Pnt point, gp_Dir normalVec_1st, gp_Dir normalVec_2nd, gp_Dir tangentVec )
 		{
@@ -75,7 +75,7 @@ namespace MyCAM.Data
 	}
 
 	// currently assuming CAM = CAD + ToolVec
-	public class CAMPoint
+	internal class CAMPoint
 	{
 		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
 		{
