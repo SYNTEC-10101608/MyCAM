@@ -1,4 +1,5 @@
-﻿using OCC.BRep;
+﻿using MyCAM.Machine;
+using OCC.BRep;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopExp;
@@ -79,6 +80,20 @@ namespace MyCAM.Data
 		}
 
 		public TopoDS_Face ComponentFace
+		{
+			get; private set;
+		}
+	}
+
+	internal class MachineComponentData : ShapeData
+	{
+		public MachineComponentData( string szUID, TopoDS_Shape shapeData, MachineComponentType type )
+			: base( szUID, shapeData )
+		{
+			Type = type;
+		}
+
+		public MachineComponentType Type
 		{
 			get; private set;
 		}
