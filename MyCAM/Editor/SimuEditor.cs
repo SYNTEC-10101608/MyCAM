@@ -2,7 +2,7 @@
 using MyCAM.Machine;
 using OCC.AIS;
 using OCC.gp;
-using OCC.StlAPI;
+using OCC.STEPControl;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
@@ -44,7 +44,6 @@ namespace MyCAM.Editor
 		// editor
 		public void EditStart()
 		{
-			BuildSimuData();
 		}
 
 		public void EditEnd()
@@ -102,47 +101,58 @@ namespace MyCAM.Editor
 			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
 			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
 			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-			machineData.RootNode.AddChild( XNode );
 			machineData.RootNode.AddChild( YNode );
-			XNode.AddChild( ZNode );
+			YNode.AddChild( ZNode );
 			ZNode.AddChild( MasterNode );
-			ZNode.AddChild( SlaveNode );
+			MasterNode.AddChild( SlaveNode );
 			SlaveNode.AddChild( ToolNode );
-			YNode.AddChild( WorkPieceNode );
+			machineData.RootNode.AddChild( XNode );
+			XNode.AddChild( WorkPieceNode );
+			m_ChainListMap.Clear();
+			BuildChainList( machineData.RootNode, new List<MachineComponentType>() );
 			m_WorkPieceChainSet.Clear();
-			BuildWorkPieceChain( machineData.RootNode );
+			foreach( var type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
+				m_WorkPieceChainSet.Add( type );
+			}
 
 			// TODO: we can read any type of 3D file, including stl
-			TopoDS_Shape shapeBase = new TopoDS_Shape();
-			TopoDS_Shape shapeX = new TopoDS_Shape();
-			TopoDS_Shape shapeY = new TopoDS_Shape();
-			TopoDS_Shape shapeZ = new TopoDS_Shape();
-			TopoDS_Shape shapeMaster = new TopoDS_Shape();
-			TopoDS_Shape shapeSlave = new TopoDS_Shape();
-			StlAPI_Reader reader = new StlAPI_Reader();
-			reader.Read( ref shapeBase, szFolderName + "Base.stl" );
-			reader.Read( ref shapeX, szFolderName + "X.stl" );
-			reader.Read( ref shapeY, szFolderName + "Y.stl" );
-			reader.Read( ref shapeZ, szFolderName + "Z.stl" );
-			reader.Read( ref shapeMaster, szFolderName + "Master.stl" );
-			reader.Read( ref shapeSlave, szFolderName + "Slave.stl" );
-		}
+			STEPControl_Reader readerBase = new STEPControl_Reader();
+			readerBase.ReadFile( szFolderName + "\\Base.stp" );
+			readerBase.TransferRoots();
+			TopoDS_Shape shapeBase = readerBase.OneShape();
+			STEPControl_Reader readerX = new STEPControl_Reader();
+			readerX.ReadFile( szFolderName + "\\X.stp" );
+			readerX.TransferRoots();
+			TopoDS_Shape shapeX = readerX.OneShape();
+			STEPControl_Reader readerY = new STEPControl_Reader();
+			readerY.ReadFile( szFolderName + "\\Y.stp" );
+			readerY.TransferRoots();
+			TopoDS_Shape shapeY = readerY.OneShape();
+			STEPControl_Reader readerZ = new STEPControl_Reader();
+			readerZ.ReadFile( szFolderName + "\\Z.stp" );
+			readerZ.TransferRoots();
+			TopoDS_Shape shapeZ = readerZ.OneShape();
+			STEPControl_Reader readerMaster = new STEPControl_Reader();
+			readerMaster.ReadFile( szFolderName + "\\Master.stp" );
+			readerMaster.TransferRoots();
+			TopoDS_Shape shapeMaster = readerMaster.OneShape();
+			STEPControl_Reader readerSlave = new STEPControl_Reader();
+			readerSlave.ReadFile( szFolderName + "\\Slave.stp" );
+			readerSlave.TransferRoots();
+			TopoDS_Shape shapeSlave = readerSlave.OneShape();
+			m_MachineShapeMap.Clear();
+			m_MachineShapeMap[ MachineComponentType.Base ] = new AIS_Shape( shapeBase );
+			m_MachineShapeMap[ MachineComponentType.XAxis ] = new AIS_Shape( shapeX );
+			m_MachineShapeMap[ MachineComponentType.YAxis ] = new AIS_Shape( shapeY );
+			m_MachineShapeMap[ MachineComponentType.ZAxis ] = new AIS_Shape( shapeZ );
+			m_MachineShapeMap[ MachineComponentType.Master ] = new AIS_Shape( shapeMaster );
+			m_MachineShapeMap[ MachineComponentType.Slave ] = new AIS_Shape( shapeSlave );
 
-		bool BuildWorkPieceChain( MachineTreeNode root )
-		{
-			if( root == null ) {
-				return false;
+			// try display
+			foreach( var pair in m_MachineShapeMap ) {
+				m_Viewer.GetAISContext().Display( pair.Value, false );
 			}
-			if( root.Type == MachineComponentType.WorkPiece ) {
-				return true;
-			}
-			foreach( MachineTreeNode child in root.Children ) {
-				if( BuildWorkPieceChain( child ) ) {
-					m_WorkPieceChainSet.Add( root.Type );
-					return true;
-				}
-			}
-			return false;
+			m_Viewer.UpdateView();
 		}
 
 		void BuildChainList( MachineTreeNode root, List<MachineComponentType> chainList )
@@ -152,7 +162,7 @@ namespace MyCAM.Editor
 			}
 			m_ChainListMap[ root.Type ] = chainList;
 			foreach( MachineTreeNode child in root.Children ) {
-				BuildChainList( child, new List<MachineComponentType>( chainList ) { child.Type } );
+				BuildChainList( child, new List<MachineComponentType>( chainList ) { root.Type } );
 			}
 		}
 	}
