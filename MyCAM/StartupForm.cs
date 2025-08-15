@@ -47,6 +47,9 @@ namespace MyCAM
 			// CAM Editor
 			m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
 
+			// Simu Editor
+			m_SimuEditor = new SimuEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+
 			// init menu strip
 			m_msCAM.Enabled = false;
 		}
@@ -61,6 +64,7 @@ namespace MyCAM
 		// editors
 		CADEditor m_CADEditor;
 		CAMEditor m_CAMEditor;
+		SimuEditor m_SimuEditor;
 
 		void ShowG54Trihedron()
 		{
