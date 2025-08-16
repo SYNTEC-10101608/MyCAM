@@ -29,19 +29,16 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal class MachineData
+	internal abstract class MachineData
 	{
-		public MachineData()
+		protected MachineData()
 		{
 			RootNode = new MachineTreeNode( MachineComponentType.Base );
 		}
 
-		public virtual FiveAxisType FiveAxisType
+		public abstract FiveAxisType FiveAxisType
 		{
-			get
-			{
-				return FiveAxisType.None;
-			}
+			get;
 		}
 
 		public ToolDirection ToolDirection
