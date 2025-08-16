@@ -55,7 +55,7 @@ namespace MyCAM.Post
 		public IKSolveResult Solve( gp_Dir toolVec_In, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
 		{
 			// prevent from sigular area
-			if( toolVec_In.IsParallel( new gp_Dir( MasterRotateDir[ 0 ], MasterRotateDir[ 1 ], MasterRotateDir[ 2 ] ), 1e-1 ) ) {
+			if( toolVec_In.IsParallel( new gp_Dir( MasterRotateDir[ 0 ], MasterRotateDir[ 1 ], MasterRotateDir[ 2 ] ), 1e-2 ) ) {
 
 				// just make it singular to prevent unexpected result
 				toolVec_In = new gp_Dir( MasterRotateDir[ 0 ], MasterRotateDir[ 1 ], MasterRotateDir[ 2 ] );
@@ -171,10 +171,10 @@ namespace MyCAM.Post
 		public gp_Vec Solve( double masterAngle, double slaveAngle )
 		{
 			// the original TCP on master coordinate system
-			gp_Vec tcpOnMasterAtZero = ToolVec - MCSToSlave - SlaveToMaster;
+			gp_Vec tcpOnMasterAtZero = new gp_Vec() - MCSToSlave - SlaveToMaster;
 
 			// rotate slave
-			gp_Vec tcpOnSlave = ToolVec - MCSToSlave; // TCP on slave coordinate system
+			gp_Vec tcpOnSlave = ToolVec.Reversed() - MCSToSlave; // TCP on slave coordinate system
 			gp_Trsf slaveTrsf = new gp_Trsf();
 			slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), SlaveRotateDir ), slaveAngle );
 			tcpOnSlave.Transform( slaveTrsf );
@@ -192,7 +192,7 @@ namespace MyCAM.Post
 		// machine properties
 		gp_Vec MCSToSlave; // DE
 		gp_Vec SlaveToMaster; // EF
-		gp_Vec ToolVec; // L (DT)
+		gp_Vec ToolVec; // -L (-DT)
 		gp_Dir MasterRotateDir; // (abc)
 		gp_Dir SlaveRotateDir; // (def)
 	}
