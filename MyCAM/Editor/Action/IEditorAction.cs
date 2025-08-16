@@ -35,9 +35,9 @@ namespace MyCAM.Editor
 		}
 	}
 
-	internal class EditActionBase : IEditorAction
+	internal abstract class EditActionBase : IEditorAction
 	{
-		public EditActionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
+		protected EditActionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 		{
 			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
 				throw new ArgumentNullException( "EditActionBase constructing argument null" );
@@ -48,12 +48,9 @@ namespace MyCAM.Editor
 			m_CADManager = cadManager;
 		}
 
-		public virtual EditActionType ActionType
+		public abstract EditActionType ActionType
 		{
-			get
-			{
-				return EditActionType.None;
-			}
+			get;
 		}
 
 		public virtual void Start()
