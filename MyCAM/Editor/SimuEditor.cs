@@ -1,5 +1,4 @@
 ﻿using MyCAM.Data;
-using MyCAM.Machine;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.BRepAlgoAPI;
@@ -344,7 +343,7 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Tool ], false );
 
 			// make workpiece
-			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 0 ] ].AISHandle as AIS_Shape;
+			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 1 ] ].AISHandle as AIS_Shape;
 
 			m_Viewer.UpdateView();
 		}

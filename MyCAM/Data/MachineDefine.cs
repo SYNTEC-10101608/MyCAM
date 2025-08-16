@@ -1,4 +1,4 @@
-﻿namespace MyCAM.Machine
+﻿namespace MyCAM.Data
 {
 	public enum FiveAxisType
 	{

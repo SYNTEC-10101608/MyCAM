@@ -1,5 +1,4 @@
-﻿using MyCAM.Machine;
-using OCC.BRep;
+﻿using OCC.BRep;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopExp;

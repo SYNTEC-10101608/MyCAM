@@ -46,8 +46,6 @@
   <ItemGroup>
     <Compile Include="ConstantDefine.cs" />
     <Compile Include="GeometryTool.cs" />
-    <Compile Include="PostTool.cs" />
-    <Compile Include="SegmentTool.cs" />
     <Compile Include="ShapeTool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VectorTool.cs" />

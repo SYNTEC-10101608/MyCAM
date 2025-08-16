@@ -1,6 +1,5 @@
 ﻿using MyCAM.Data;
 using OCC.gp;
-using OCCTool;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,7 +36,7 @@ namespace MyCAM.Post
 		void WriteCutting( CAMData cuttingProcessData, int index )
 		{
 			// get rotary axis
-			List<Tuple<double, double>> rotaryAxisPosList = PostTool.ConvertIJKToABC( cuttingProcessData.CAMPointList.Select( camPoint => camPoint.ToolVec ).ToList() );
+			List<Tuple<double, double>> rotaryAxisPosList = new List<Tuple<double, double>>();
 
 			// compute approach points
 			gp_Vec toolVec = new gp_Vec( cuttingProcessData.CAMPointList[ 0 ].ToolVec.XYZ() );

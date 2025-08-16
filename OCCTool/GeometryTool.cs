@@ -197,6 +197,7 @@ namespace OCCTool
 			return true;
 		}
 
+		// TODO: we have better method, check CAM data
 		public static bool IsD1Cont( TopoDS_Face f1, TopoDS_Face f2, TopoDS_Edge sharingEdge )
 		{
 			if( f1 == null || f2 == null || sharingEdge == null

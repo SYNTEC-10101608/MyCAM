@@ -1,5 +1,4 @@
-﻿using MyCAM.Machine;
-using OCC.gp;
+﻿using OCC.gp;
 using System.Collections.Generic;
 
 namespace MyCAM.Data

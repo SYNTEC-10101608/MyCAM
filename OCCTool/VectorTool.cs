@@ -36,32 +36,6 @@ namespace OCCTool
 			return normal;
 		}
 
-		public static gp_Dir GetEdgeTangentVec( TopoDS_Edge edge, gp_Pnt point )
-		{
-			// get curve from edge
-			double dStartU = 0;
-			double dEndU = 0;
-			Geom_Curve curve = BRep_Tool.Curve( edge, ref dStartU, ref dEndU );
-
-			// Project the point onto the curve to get the u parameter
-			GeomAPI_ProjectPointOnCurve proj = new GeomAPI_ProjectPointOnCurve( point, curve );
-
-			// u might be out of range if the curve is periodic
-			double u = proj.LowerDistanceParameter();
-
-			// get tangent vector
-			GeomLProp_CLProps props = new GeomLProp_CLProps( curve, u, 1, 1e-3 );
-			if( !props.IsTangentDefined() ) {
-				return new gp_Dir();
-			}
-			gp_Dir tangent = new gp_Dir();
-			props.Tangent( ref tangent );
-			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-				tangent.Reverse();
-			}
-			return tangent;
-		}
-
 		public static bool Create3PCoordSystem( gp_Pnt p1, gp_Pnt p2, gp_Pnt p3, out gp_Ax3 coordSys )
 		{
 			coordSys = new gp_Ax3();
