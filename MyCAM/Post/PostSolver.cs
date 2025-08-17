@@ -168,37 +168,42 @@ namespace MyCAM.Post
 			if( slaveRotateDir == null ) {
 				slaveRotateDir = new gp_Dir( 0, 1, 0 );
 			}
-			MCSToSlave = mcsToSlave;
-			SlaveToMaster = slaveToMaster;
+			MCSToMaster = mcsToSlave;
+			MasterToSlave = slaveToMaster;
 			ToolVec = toolVec;
 			MasterRotateDir = masterRotateDir;
 			SlaveRotateDir = slaveRotateDir;
 		}
 
-		public gp_Vec Solve( double masterAngle, double slaveAngle )
+		public gp_Vec Solve( double masterAngle, double slaveAngle, gp_Vec G54XYZ, gp_Vec G54Offset )
 		{
-			// the original TCP on master coordinate system
-			gp_Vec tcpOnMasterAtZero = new gp_Vec() - MCSToSlave - SlaveToMaster;
+			// original pt on slave coord
+			gp_Pnt ptOnSlave = new gp_Pnt();
+			ptOnSlave.Translate( MasterToSlave.Reversed() );
+			ptOnSlave.Translate( MCSToMaster.Reversed() );
+			ptOnSlave.Translate( G54XYZ );
+			ptOnSlave.Translated( G54Offset.Reversed() );
+			ptOnSlave.Translate( ToolVec.Reversed() );
 
-			// rotate slave
-			gp_Vec tcpOnSlave = ToolVec.Reversed() - MCSToSlave; // TCP on slave coordinate system
+			// original pt on master coord
+			gp_Pnt ptOnMaster0 = ptOnSlave.Translated( MasterToSlave );
+
+			// rotate the pt on slave coord
 			gp_Trsf slaveTrsf = new gp_Trsf();
 			slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), SlaveRotateDir ), slaveAngle );
-			tcpOnSlave.Transform( slaveTrsf );
-
-			// rotate master
-			gp_Vec tcpOnMaster = tcpOnSlave - SlaveToMaster; // TCP on master coordinate system
+			ptOnSlave.Transform( slaveTrsf );
+			gp_Pnt ptOnMaster1 = ptOnSlave.Translated( MasterToSlave );
 			gp_Trsf masterTrsf = new gp_Trsf();
 			masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), MasterRotateDir ), masterAngle );
-			tcpOnMaster.Transform( masterTrsf );
+			ptOnMaster1.Transform( masterTrsf );
 
-			// the result is the vector from new TCP to original TCP
-			return tcpOnMasterAtZero - tcpOnMaster;
+			// calculate the offset
+			return new gp_Vec( ptOnMaster1.XYZ() - ptOnMaster0.XYZ() );
 		}
 
 		// machine properties
-		gp_Vec MCSToSlave; // DE
-		gp_Vec SlaveToMaster; // EF
+		gp_Vec MCSToMaster; // DE
+		gp_Vec MasterToSlave; // EF
 		gp_Vec ToolVec; // -L (-DT)
 		gp_Dir MasterRotateDir; // (abc)
 		gp_Dir SlaveRotateDir; // (def)
@@ -313,7 +318,8 @@ namespace MyCAM.Post
 			// solve FK
 			for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
 				gp_Pnt pointG54 = camData.CAMPointList[ i ].CADPoint.Point;
-				gp_Vec tcpOffset = m_FKSolver.Solve( rotateAngleList[ i ].Item1, rotateAngleList[ i ].Item2 );
+				pointG54.Translate( new gp_Vec( 0, 0, 200 ) );
+				gp_Vec tcpOffset = m_FKSolver.Solve( -rotateAngleList[ i ].Item2, -rotateAngleList[ i ].Item1, new gp_Vec( pointG54.XYZ() ), new gp_Vec() );
 				gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
 
 				// add G54 frame data
@@ -333,8 +339,8 @@ namespace MyCAM.Post
 					X = pointMCS.X(),
 					Y = pointMCS.Y(),
 					Z = pointMCS.Z(),
-					Master = rotateAngleList[ i ].Item1,
-					Slave = rotateAngleList[ i ].Item2
+					Master = rotateAngleList[ i ].Item2,
+					Slave = rotateAngleList[ i ].Item1
 				};
 				resultMCS.Add( frameDataMCS );
 			}
@@ -470,11 +476,12 @@ namespace MyCAM.Post
 
 		public override FKSolver BuildFKSolver()
 		{
-			gp_Vec mcsToSlave = new gp_Vec( m_MachineData.ToolToSlaveVec.XYZ() ); // DE
-			gp_Vec slaveToMaster = new gp_Vec( m_MachineData.SlaveToMasterVec.XYZ() ); // EF
-			gp_Vec toolVec = new gp_Vec( m_ToolDir );
-			toolVec.Multiply( m_MachineData.ToolLength );
-			return new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
+			//gp_Vec mcsToSlave = new gp_Vec( m_MachineData.ToolToSlaveVec.XYZ() ); // DE
+			//gp_Vec slaveToMaster = new gp_Vec( m_MachineData.SlaveToMasterVec.XYZ() ); // EF
+			//gp_Vec toolVec = new gp_Vec( m_ToolDir );
+			//toolVec.Multiply( m_MachineData.ToolLength );
+			//return new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
+			return null;
 		}
 
 		public override IKSolver BuildIKSolver()
@@ -501,11 +508,11 @@ namespace MyCAM.Post
 
 		public override FKSolver BuildFKSolver()
 		{
-			gp_Vec mcsToSlave = new gp_Vec( m_MachineData.MCSToMasterVec.XYZ() ); // DE
-			gp_Vec slaveToMaster = new gp_Vec( m_MachineData.MasterToSlaveVec.XYZ() ); // EF
+			gp_Vec mcsToMaster = new gp_Vec( m_MachineData.MCSToMasterVec.XYZ() ); // DE
+			gp_Vec masterToSlave = new gp_Vec( m_MachineData.MasterToSlaveVec.XYZ() ); // EF
 			gp_Vec toolVec = new gp_Vec( m_ToolDir );
 			toolVec.Multiply( m_MachineData.ToolLength );
-			return new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
+			return new FKSolver( mcsToMaster, masterToSlave, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
 		}
 
 		public override IKSolver BuildIKSolver()
@@ -533,11 +540,12 @@ namespace MyCAM.Post
 
 		public override FKSolver BuildFKSolver()
 		{
-			gp_Vec mcsToSlave = new gp_Vec( m_MachineData.ToolToMasterVec.XYZ() ); // DE
-			gp_Vec slaveToMaster = m_MachineData.MCSToSlaveVec - m_MachineData.ToolToMasterVec; // EF = DF - DE
-			gp_Vec toolVec = new gp_Vec( m_ToolDir );
-			toolVec.Multiply( m_MachineData.ToolLength );
-			return new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
+			//gp_Vec mcsToSlave = new gp_Vec( m_MachineData.ToolToMasterVec.XYZ() ); // DE
+			//gp_Vec slaveToMaster = m_MachineData.MCSToSlaveVec - m_MachineData.ToolToMasterVec; // EF = DF - DE
+			//gp_Vec toolVec = new gp_Vec( m_ToolDir );
+			//toolVec.Multiply( m_MachineData.ToolLength );
+			//return new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
+			return null;
 		}
 
 		public override IKSolver BuildIKSolver()
