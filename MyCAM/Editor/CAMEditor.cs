@@ -72,6 +72,7 @@ namespace MyCAM.Editor
 
 			// init viewer
 			ShowCAMData();
+			ShowPath();
 
 			// start default action
 			m_CurrentAction = m_DefaultAction;
@@ -85,6 +86,7 @@ namespace MyCAM.Editor
 
 			// clear viewer
 			HideCAMData();
+			HidePath();
 
 			// end all action
 			if( m_CurrentAction.ActionType == EditActionType.Default ) {
@@ -415,6 +417,22 @@ namespace MyCAM.Editor
 			// hide index
 			foreach( AIS_TextLabel textLabel in m_IndexList ) {
 				m_Viewer.GetAISContext().Remove( textLabel, false );
+			}
+			m_Viewer.UpdateView();
+		}
+
+		void ShowPath()
+		{
+			foreach( string szPathID in m_CADManager.PathIDList ) {
+				m_Viewer.GetAISContext().Display( m_ViewManager.ViewObjectMap[ szPathID ].AISHandle, false );
+			}
+			m_Viewer.UpdateView();
+		}
+
+		void HidePath()
+		{
+			foreach( string szPathID in m_CADManager.PathIDList ) {
+				m_Viewer.GetAISContext().Remove( m_ViewManager.ViewObjectMap[ szPathID ].AISHandle, false );
 			}
 			m_Viewer.UpdateView();
 		}
