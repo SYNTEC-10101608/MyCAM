@@ -45,13 +45,13 @@ namespace MyCAM.Editor
 		HashSet<MachineComponentType> m_WorkPieceChainSet = new HashSet<MachineComponentType>();
 		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
 		Dictionary<MachineComponentType, AIS_Shape> m_MachineShapeMap = new Dictionary<MachineComponentType, AIS_Shape>();
-		MachineData m_MachineData;
 		PostSolver m_PostSolver;
-		List<PostData> m_MCSPostData;
+		List<PostData> m_SimuPostData;
 
 		// editor
 		public void EditStart()
 		{
+			BuildSimuData();
 		}
 
 		public void EditEnd()
@@ -83,28 +83,31 @@ namespace MyCAM.Editor
 
 		public void BuildSimuData()
 		{
+			if( m_CADManager.GetCAMDataList().Count == 0 || m_PostSolver == null ) {
+				return;
+			}
 			CAMData camData = m_CADManager.GetCAMDataList()[ 0 ];
-			m_PostSolver.Solve( camData, out _, out m_MCSPostData );
+			m_PostSolver.Solve( camData, out _, out m_SimuPostData );
 		}
 
 		void RefreshFrame()
 		{
-			if( m_MCSPostData == null ) {
+			if( m_SimuPostData == null ) {
 				return;
 			}
 			if( m_CurrentFrameIndex < 0 ) {
-				m_CurrentFrameIndex = m_MCSPostData.Count - 1;
+				m_CurrentFrameIndex = m_SimuPostData.Count - 1;
 			}
-			if( m_CurrentFrameIndex >= m_MCSPostData.Count ) {
+			if( m_CurrentFrameIndex >= m_SimuPostData.Count ) {
 				m_CurrentFrameIndex = 0;
 			}
 
-			double G54X = 1150;
-			double G54Y = -11;
-			double G54Z = -700;
+			double G54X = 0;
+			double G54Y = 0;
+			double G54Z = 0;
 
 			// gaet the post data
-			PostData postData = m_MCSPostData[ m_CurrentFrameIndex ];
+			PostData postData = m_SimuPostData[ m_CurrentFrameIndex ];
 
 			// set XYZ transform
 			Dictionary<MachineComponentType, gp_Trsf> transformMap = new Dictionary<MachineComponentType, gp_Trsf>();
@@ -114,12 +117,14 @@ namespace MyCAM.Editor
 				trsfX.Invert();
 			}
 			transformMap[ MachineComponentType.XAxis ] = trsfX;
+
 			gp_Trsf trsfY = new gp_Trsf();
 			trsfY.SetTranslation( new gp_Vec( 0, postData.Y + G54Y, 0 ) );
 			if( m_WorkPieceChainSet.Contains( MachineComponentType.YAxis ) ) {
 				trsfY.Invert();
 			}
 			transformMap[ MachineComponentType.YAxis ] = trsfY;
+
 			gp_Trsf trsfZ = new gp_Trsf();
 			trsfZ.SetTranslation( new gp_Vec( 0, 0, postData.Z + G54Z ) );
 			if( m_WorkPieceChainSet.Contains( MachineComponentType.ZAxis ) ) {
@@ -159,8 +164,7 @@ namespace MyCAM.Editor
 			}
 			trsfAllX.Multiply( trsfX );
 			m_MachineShapeMap[ MachineComponentType.XAxis ].SetLocalTransformation( trsfAllX );
-			gp_Pnt TestX = new gp_Pnt( 0, 0, 0 );
-			TestX.Transform( trsfAllX );
+
 			gp_Trsf trsfAllY = new gp_Trsf();
 			foreach( var parent in m_ChainListMap[ MachineComponentType.YAxis ] ) {
 				if( parent == MachineComponentType.Base ) {
@@ -172,8 +176,7 @@ namespace MyCAM.Editor
 			}
 			trsfAllY.Multiply( trsfY );
 			m_MachineShapeMap[ MachineComponentType.YAxis ].SetLocalTransformation( trsfAllY );
-			gp_Pnt TestY = new gp_Pnt( 0, 0, 0 );
-			TestY.Transform( trsfAllY );
+
 			gp_Trsf trsfAllZ = new gp_Trsf();
 			foreach( var parent in m_ChainListMap[ MachineComponentType.ZAxis ] ) {
 				if( parent == MachineComponentType.Base ) {
@@ -185,8 +188,7 @@ namespace MyCAM.Editor
 			}
 			trsfAllZ.Multiply( trsfZ );
 			m_MachineShapeMap[ MachineComponentType.ZAxis ].SetLocalTransformation( trsfAllZ );
-			gp_Pnt TestZ = new gp_Pnt( 0, 0, 0 );
-			TestZ.Transform( trsfAllZ );
+
 			gp_Trsf trsfAllMaster = new gp_Trsf();
 			foreach( var parent in m_ChainListMap[ MachineComponentType.Master ] ) {
 				if( parent == MachineComponentType.Base ) {
@@ -198,6 +200,7 @@ namespace MyCAM.Editor
 			}
 			trsfAllMaster.Multiply( trsfMaster );
 			m_MachineShapeMap[ MachineComponentType.Master ].SetLocalTransformation( trsfAllMaster );
+
 			gp_Trsf trsfAllSlave = new gp_Trsf();
 			foreach( var parent in m_ChainListMap[ MachineComponentType.Slave ] ) {
 				if( parent == MachineComponentType.Base ) {
@@ -234,24 +237,23 @@ namespace MyCAM.Editor
 				}
 			}
 			m_MachineShapeMap[ MachineComponentType.WorkPiece ].SetLocalTransformation( trsfWorkPiece );
-
 			m_Viewer.UpdateView();
 		}
 
 		// TODO: read machine data from file
 		void ReadMachineData( string szFolderName )
 		{
-			m_MachineData = new SpindleTypeMachineData();
-			m_MachineData.ToolDirection = ToolDirection.Z;
-			m_MachineData.MasterRotaryAxis = RotaryAxis.Z;
-			m_MachineData.SlaveRotaryAxis = RotaryAxis.Y;
-			m_MachineData.MasterRotaryDirection = RotaryDirection.RightHand;
-			m_MachineData.SlaveRotaryDirection = RotaryDirection.RightHand;
-			m_MachineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			m_MachineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			m_MachineData.ToolLength = 200.0;
-			( (SpindleTypeMachineData)m_MachineData ).ToolToSlaveVec = new gp_Vec( 0, 0, 360 );
-			( (SpindleTypeMachineData)m_MachineData ).SlaveToMasterVec = new gp_Vec( 0, 0, 0 );
+			MixTypeMachineData machineData = new MixTypeMachineData();
+			machineData.ToolDirection = ToolDirection.Z;
+			machineData.MasterRotaryAxis = RotaryAxis.Y;
+			machineData.SlaveRotaryAxis = RotaryAxis.Z;
+			machineData.MasterRotaryDirection = RotaryDirection.RightHand;
+			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
+			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.ToolLength = 200.0;
+			machineData.ToolToMasterVec = new gp_Vec( -14.26, -119.41, 242.00 );
+			machineData.MCSToSlaveVec = new gp_Vec( -835.82, 32.20, -529.45 );
 
 			// build machine tree
 			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
@@ -261,24 +263,24 @@ namespace MyCAM.Editor
 			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
 			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
 			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-			m_MachineData.RootNode.AddChild( YNode );
-			YNode.AddChild( ZNode );
-			ZNode.AddChild( MasterNode );
-			MasterNode.AddChild( SlaveNode );
-			SlaveNode.AddChild( ToolNode );
-			m_MachineData.RootNode.AddChild( XNode );
-			XNode.AddChild( WorkPieceNode );
+			machineData.RootNode.AddChild( ZNode );
+			ZNode.AddChild( YNode );
+			YNode.AddChild( MasterNode );
+			MasterNode.AddChild( ToolNode );
+			machineData.RootNode.AddChild( XNode );
+			XNode.AddChild( SlaveNode );
+			SlaveNode.AddChild( WorkPieceNode );
 
 			// build chain list
 			m_ChainListMap.Clear();
-			BuildChainList( m_MachineData.RootNode, new List<MachineComponentType>() );
+			BuildChainList( machineData.RootNode, new List<MachineComponentType>() );
 			m_WorkPieceChainSet.Clear();
 			foreach( var type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
 				m_WorkPieceChainSet.Add( type );
 			}
 
 			// build solver
-			m_PostSolver = new PostSolver( m_MachineData );
+			m_PostSolver = new PostSolver( machineData );
 
 			// TODO: we can read any type of 3D file, including stl
 			STEPControl_Reader readerBase = new STEPControl_Reader();
@@ -306,30 +308,36 @@ namespace MyCAM.Editor
 			readerSlave.TransferRoots();
 			TopoDS_Shape shapeSlave = readerSlave.OneShape();
 			m_MachineShapeMap.Clear();
-			m_MachineShapeMap[ MachineComponentType.Base ] = new AIS_Shape( shapeBase );
-			m_MachineShapeMap[ MachineComponentType.Base ].SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_MachineShapeMap[ MachineComponentType.Base ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Base ], false );
-			m_MachineShapeMap[ MachineComponentType.XAxis ] = new AIS_Shape( shapeX );
-			m_MachineShapeMap[ MachineComponentType.XAxis ].SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_MachineShapeMap[ MachineComponentType.XAxis ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.XAxis ], false );
-			m_MachineShapeMap[ MachineComponentType.YAxis ] = new AIS_Shape( shapeY );
-			m_MachineShapeMap[ MachineComponentType.YAxis ].SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_MachineShapeMap[ MachineComponentType.YAxis ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
-			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.YAxis ], false );
-			m_MachineShapeMap[ MachineComponentType.ZAxis ] = new AIS_Shape( shapeZ );
-			m_MachineShapeMap[ MachineComponentType.ZAxis ].SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_MachineShapeMap[ MachineComponentType.ZAxis ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
-			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.ZAxis ], false );
-			m_MachineShapeMap[ MachineComponentType.Master ] = new AIS_Shape( shapeMaster );
-			m_MachineShapeMap[ MachineComponentType.Master ].SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_MachineShapeMap[ MachineComponentType.Master ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_YELLOW ) );
-			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Master ], false );
-			m_MachineShapeMap[ MachineComponentType.Slave ] = new AIS_Shape( shapeSlave );
-			m_MachineShapeMap[ MachineComponentType.Slave ].SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_MachineShapeMap[ MachineComponentType.Slave ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
-			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Slave ], false );
+			AIS_Shape baseAIS = new AIS_Shape( shapeBase );
+			baseAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			baseAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			m_Viewer.GetAISContext().Display( baseAIS, false );
+			m_MachineShapeMap[ MachineComponentType.Base ] = baseAIS;
+			AIS_Shape xAIS = new AIS_Shape( shapeX );
+			xAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			xAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_HOTPINK ) );
+			m_Viewer.GetAISContext().Display( xAIS, false );
+			m_MachineShapeMap[ MachineComponentType.XAxis ] = xAIS;
+			AIS_Shape yAIS = new AIS_Shape( shapeY );
+			yAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			yAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+			m_Viewer.GetAISContext().Display( yAIS, false );
+			m_MachineShapeMap[ MachineComponentType.YAxis ] = yAIS;
+			AIS_Shape zAIS = new AIS_Shape( shapeZ );
+			zAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			zAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+			m_Viewer.GetAISContext().Display( zAIS, false );
+			m_MachineShapeMap[ MachineComponentType.ZAxis ] = zAIS;
+			AIS_Shape masterAIS = new AIS_Shape( shapeMaster );
+			masterAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			masterAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_YELLOW ) );
+			m_Viewer.GetAISContext().Display( masterAIS, false );
+			m_MachineShapeMap[ MachineComponentType.Master ] = masterAIS;
+			AIS_Shape slaveAIS = new AIS_Shape( shapeSlave );
+			slaveAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			slaveAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
+			m_Viewer.GetAISContext().Display( slaveAIS, false );
+			m_MachineShapeMap[ MachineComponentType.Slave ] = slaveAIS;
 
 			// make tool
 			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 10, 195 );
@@ -342,7 +350,6 @@ namespace MyCAM.Editor
 
 			// make workpiece
 			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 1 ] ].AISHandle as AIS_Shape;
-
 			m_Viewer.UpdateView();
 		}
 
