@@ -204,96 +204,6 @@ namespace MyCAM.Post
 		gp_Dir SlaveRotateDir; // (def)
 	}
 
-	internal abstract class WorkPieceToWorldSolver
-	{
-		public abstract gp_Trsf Solve( double masterAngle, double slaveAngle );
-
-		gp_Trsf m_Transform;
-	}
-
-	internal class SpindleTypeWorkPieceToWorldSolver : WorkPieceToWorldSolver
-	{
-		public override gp_Trsf Solve( double masterAngle, double slaveAngle )
-		{
-			return new gp_Trsf();
-		}
-	}
-
-	internal class TableTypeWorkPieceToWorldSolver : WorkPieceToWorldSolver
-	{
-		public TableTypeWorkPieceToWorldSolver( gp_Pnt ptOnMaster, gp_Pnt ptOnSlave, gp_Dir masterRotateDir, gp_Dir slaveRotateDir )
-		{
-			// give a default Z dir BC type
-			if( ptOnMaster == null ) {
-				ptOnMaster = new gp_Pnt( 0, 0, 0 );
-			}
-			if( ptOnSlave == null ) {
-				ptOnSlave = new gp_Pnt( 0, 0, 0 );
-			}
-			if( masterRotateDir == null ) {
-				masterRotateDir = new gp_Dir( 0, 0, 1 );
-			}
-			if( slaveRotateDir == null ) {
-				slaveRotateDir = new gp_Dir( 0, 1, 0 );
-			}
-			m_PtOnMaster = ptOnMaster;
-			m_PtOnSlave = ptOnSlave;
-			m_MasterRotateDir = masterRotateDir;
-			m_SlaveRotateDir = slaveRotateDir;
-		}
-
-		public override gp_Trsf Solve( double masterAngle, double slaveAngle )
-		{
-			// world coord
-			gp_Ax3 world = new gp_Ax3();
-
-			// workpiece coord
-			gp_Ax3 workpiece = new gp_Ax3();
-			gp_Ax1 masterRotateDir = new gp_Ax1( m_PtOnMaster, m_MasterRotateDir );
-			gp_Ax1 slaveRotateDir = new gp_Ax1( m_PtOnSlave, m_SlaveRotateDir );
-			gp_Trsf slaveTrsf = new gp_Trsf();
-			slaveTrsf.SetRotation( slaveRotateDir, slaveAngle );
-			workpiece.Transform( slaveTrsf );
-			gp_Trsf masterTrsf = new gp_Trsf();
-			masterTrsf.SetRotation( masterRotateDir, masterAngle );
-			workpiece.Transform( masterTrsf );
-
-			// calculate the transform from workpiece to world
-			gp_Trsf transform = new gp_Trsf();
-			transform.SetDisplacement( workpiece, world );
-			return transform;
-		}
-
-		gp_Pnt m_PtOnMaster;
-		gp_Pnt m_PtOnSlave;
-		gp_Dir m_MasterRotateDir;
-		gp_Dir m_SlaveRotateDir;
-	}
-
-	internal class MixTypeWorkPieceToWorldSolver : WorkPieceToWorldSolver
-	{
-		public MixTypeWorkPieceToWorldSolver( gp_Pnt ptOnSlave, gp_Dir slaveRotateDir )
-		{
-			// give a default Z dir BC type
-			if( ptOnSlave == null ) {
-				ptOnSlave = new gp_Pnt( 0, 0, 0 );
-			}
-			if( slaveRotateDir == null ) {
-				slaveRotateDir = new gp_Dir( 0, 1, 0 );
-			}
-			m_PtOnSlave = ptOnSlave;
-			m_SlaveRotateDir = slaveRotateDir;
-		}
-
-		public override gp_Trsf Solve( double masterAngle, double slaveAngle )
-		{
-			return new gp_Trsf();
-		}
-
-		gp_Pnt m_PtOnSlave;
-		gp_Dir m_SlaveRotateDir;
-	}
-
 	internal class RotaryAxisSolver
 	{
 		public RotaryAxisSolver( gp_Pnt ptOnMaster, gp_Pnt ptOnSlave, gp_Dir masterRotateDir, gp_Dir slaveRotateDir )
@@ -365,7 +275,6 @@ namespace MyCAM.Post
 			ISolverBuilder solverBuilder = CreateSolverBuilder( machineData );
 			m_FKSolver = solverBuilder.BuildFKSolver();
 			m_IKSolver = solverBuilder.BuildIKSolver();
-			m_WorkPieceToWorldSolver = solverBuilder.BuildWorkPieceToWorldSolver();
 			m_RotaryAxisSolver = solverBuilder.BuildRotaryAxisSolver();
 		}
 
@@ -405,7 +314,6 @@ namespace MyCAM.Post
 			for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
 				gp_Pnt pointG54 = camData.CAMPointList[ i ].CADPoint.Point;
 				gp_Vec tcpOffset = m_FKSolver.Solve( rotateAngleList[ i ].Item1, rotateAngleList[ i ].Item2 );
-				tcpOffset.Transform( m_WorkPieceToWorldSolver.Solve( -rotateAngleList[ i ].Item2, -rotateAngleList[ i ].Item1 ) );
 				gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
 
 				// add G54 frame data
@@ -425,8 +333,8 @@ namespace MyCAM.Post
 					X = pointMCS.X(),
 					Y = pointMCS.Y(),
 					Z = pointMCS.Z(),
-					Master = rotateAngleList[ i ].Item2,
-					Slave = rotateAngleList[ i ].Item1
+					Master = rotateAngleList[ i ].Item1,
+					Slave = rotateAngleList[ i ].Item2
 				};
 				resultMCS.Add( frameDataMCS );
 			}
@@ -461,7 +369,6 @@ namespace MyCAM.Post
 
 		IKSolver m_IKSolver;
 		FKSolver m_FKSolver;
-		WorkPieceToWorldSolver m_WorkPieceToWorldSolver;
 		RotaryAxisSolver m_RotaryAxisSolver;
 	}
 
@@ -470,8 +377,6 @@ namespace MyCAM.Post
 		FKSolver BuildFKSolver();
 
 		IKSolver BuildIKSolver();
-
-		WorkPieceToWorldSolver BuildWorkPieceToWorldSolver();
 
 		RotaryAxisSolver BuildRotaryAxisSolver();
 	}
@@ -493,8 +398,6 @@ namespace MyCAM.Post
 		public abstract FKSolver BuildFKSolver();
 
 		public abstract IKSolver BuildIKSolver();
-
-		public abstract WorkPieceToWorldSolver BuildWorkPieceToWorldSolver();
 
 		public abstract RotaryAxisSolver BuildRotaryAxisSolver();
 
@@ -579,11 +482,6 @@ namespace MyCAM.Post
 			return new IKSolver( m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir );
 		}
 
-		public override WorkPieceToWorldSolver BuildWorkPieceToWorldSolver()
-		{
-			return new SpindleTypeWorkPieceToWorldSolver();
-		}
-
 		public override RotaryAxisSolver BuildRotaryAxisSolver()
 		{
 			gp_Pnt ptOnSlave = new gp_Pnt();
@@ -607,22 +505,13 @@ namespace MyCAM.Post
 			gp_Vec slaveToMaster = new gp_Vec( m_MachineData.MasterToSlaveVec.XYZ() ); // EF
 			gp_Vec toolVec = new gp_Vec( m_ToolDir );
 			toolVec.Multiply( m_MachineData.ToolLength );
-			return new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_SlaveRotateDir, m_MasterRotateDir );
+			return new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
 		}
 
 		public override IKSolver BuildIKSolver()
 		{
 			// for table type, just exchange the master and slave axis
 			return new IKSolver( m_ToolDir, m_SlaveRotateDir, m_MasterRotateDir );
-		}
-
-		public override WorkPieceToWorldSolver BuildWorkPieceToWorldSolver()
-		{
-			gp_Pnt ptOnMaster = new gp_Pnt();
-			ptOnMaster.Translate( m_MachineData.MCSToMasterVec );
-			gp_Pnt ptOnSlave = new gp_Pnt( ptOnMaster.XYZ() );
-			ptOnSlave.Translate( m_MachineData.MasterToSlaveVec );
-			return new TableTypeWorkPieceToWorldSolver( ptOnMaster, ptOnSlave, m_MasterRotateDir, m_SlaveRotateDir );
 		}
 
 		public override RotaryAxisSolver BuildRotaryAxisSolver()
@@ -655,13 +544,6 @@ namespace MyCAM.Post
 		{
 			// for mix type, just exchange the master and slave axis
 			return new IKSolver( m_ToolDir, m_SlaveRotateDir, m_MasterRotateDir );
-		}
-
-		public override WorkPieceToWorldSolver BuildWorkPieceToWorldSolver()
-		{
-			gp_Pnt ptOnSlave = new gp_Pnt();
-			ptOnSlave.Translate( m_MachineData.ToolToMasterVec );
-			return new MixTypeWorkPieceToWorldSolver( ptOnSlave, m_SlaveRotateDir );
 		}
 
 		public override RotaryAxisSolver BuildRotaryAxisSolver()
