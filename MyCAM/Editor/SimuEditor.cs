@@ -46,7 +46,7 @@ namespace MyCAM.Editor
 		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
 		Dictionary<MachineComponentType, AIS_Shape> m_MachineShapeMap = new Dictionary<MachineComponentType, AIS_Shape>();
 		MachineData m_MachineData;
-		IPostSolver m_PostSolver;
+		PostSolver m_PostSolver;
 		List<PostData> m_MCSPostData;
 
 		// editor
@@ -128,11 +128,8 @@ namespace MyCAM.Editor
 			transformMap[ MachineComponentType.ZAxis ] = trsfZ;
 
 			// set master rotation
-			SpindleTypeMachineData spindleTypeMachineData = m_MachineData as SpindleTypeMachineData;
-			gp_Pnt ptOnSlave = new gp_Pnt();
-			ptOnSlave.Translate( spindleTypeMachineData.ToolToSlaveVec );
-			gp_Pnt ptOnMaster = ptOnSlave.Translated( spindleTypeMachineData.SlaveToMasterVec );
-			gp_Ax1 axisMaster = new gp_Ax1( ptOnMaster, m_PostSolver.MasterRotateDir );
+			gp_Pnt ptOnMaster = m_PostSolver.RotaryAxisSolver.PtOnMaster;
+			gp_Ax1 axisMaster = new gp_Ax1( ptOnMaster, m_PostSolver.RotaryAxisSolver.MasterRotateDir );
 			gp_Trsf trsfMaster = new gp_Trsf();
 			trsfMaster.SetRotation( axisMaster, postData.Master );
 			if( m_WorkPieceChainSet.Contains( MachineComponentType.Master ) ) {
@@ -141,7 +138,8 @@ namespace MyCAM.Editor
 			transformMap[ MachineComponentType.Master ] = trsfMaster;
 
 			// set slave rotation
-			gp_Ax1 axisSlave = new gp_Ax1( ptOnSlave, m_PostSolver.SlaveRotateDir );
+			gp_Pnt ptOnSlave = m_PostSolver.RotaryAxisSolver.PtOnSlave;
+			gp_Ax1 axisSlave = new gp_Ax1( ptOnSlave, m_PostSolver.RotaryAxisSolver.SlaveRotateDir );
 			gp_Trsf trsfSlave = new gp_Trsf();
 			trsfSlave.SetRotation( axisSlave, postData.Slave );
 			if( m_WorkPieceChainSet.Contains( MachineComponentType.Slave ) ) {
@@ -280,7 +278,7 @@ namespace MyCAM.Editor
 			}
 
 			// build solver
-			m_PostSolver = new SpindlePostSolver( (SpindleTypeMachineData)m_MachineData );
+			m_PostSolver = new PostSolver( m_MachineData );
 
 			// TODO: we can read any type of 3D file, including stl
 			STEPControl_Reader readerBase = new STEPControl_Reader();

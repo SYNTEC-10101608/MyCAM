@@ -32,6 +32,10 @@ namespace MyCAM.Post
 		SlaveInfinityOfSolution = 3,
 	}
 
+	/// <summary>
+	/// this is design based on spindle type
+	/// for table and mix type, just exchange the master and slave axis
+	/// </summary>
 	internal class IKSolver
 	{
 		public IKSolver( gp_Dir toolDir, gp_Dir masterRotateDir, gp_Dir slaveRotateDir )
@@ -140,6 +144,10 @@ namespace MyCAM.Post
 		double[] SlaveRotateDir;
 	}
 
+	/// <summary>
+	/// this is design based on spindle type
+	/// for table and mix type, just exchange the master and slave axis
+	/// </summary>
 	internal class FKSolver
 	{
 		public FKSolver( gp_Vec mcsToSlave, gp_Vec slaveToMaster, gp_Vec toolVec, gp_Dir masterRotateDir, gp_Dir slaveRotateDir )
@@ -196,37 +204,81 @@ namespace MyCAM.Post
 		gp_Dir SlaveRotateDir; // (def)
 	}
 
-	internal interface IPostSolver
+	internal class RotaryAxisSolver
 	{
-		bool Solve( CAMData camData, out List<PostData> resultG54, out List<PostData> resultMCS );
-
-		gp_Dir MasterRotateDir
+		public RotaryAxisSolver( gp_Pnt ptOnMaster, gp_Pnt ptOnSlave, gp_Dir masterRotateDir, gp_Dir slaveRotateDir )
 		{
-			get;
+			// give a default Z dir BC type
+			if( ptOnMaster == null ) {
+				ptOnMaster = new gp_Pnt( 0, 0, 0 );
+			}
+			if( ptOnSlave == null ) {
+				ptOnSlave = new gp_Pnt( 0, 0, 0 );
+			}
+			if( masterRotateDir == null ) {
+				masterRotateDir = new gp_Dir( 0, 0, 1 );
+			}
+			if( slaveRotateDir == null ) {
+				slaveRotateDir = new gp_Dir( 0, 1, 0 );
+			}
+			m_PtOnMaster = ptOnMaster;
+			m_PtOnSlave = ptOnSlave;
+			m_MasterRotateDir = masterRotateDir;
+			m_SlaveRotateDir = slaveRotateDir;
 		}
 
-		gp_Dir SlaveRotateDir
+		public gp_Dir MasterRotateDir
 		{
-			get;
+			get
+			{
+				return m_MasterRotateDir;
+			}
 		}
+
+		public gp_Dir SlaveRotateDir
+		{
+			get
+			{
+				return m_SlaveRotateDir;
+			}
+		}
+
+		public gp_Pnt PtOnMaster
+		{
+			get
+			{
+				return m_PtOnMaster;
+			}
+		}
+
+		public gp_Pnt PtOnSlave
+		{
+			get
+			{
+				return m_PtOnSlave;
+			}
+		}
+
+		gp_Pnt m_PtOnMaster;
+		gp_Pnt m_PtOnSlave;
+		gp_Dir m_MasterRotateDir;
+		gp_Dir m_SlaveRotateDir;
 	}
 
-	internal class PostSolver<TMachineData> : IPostSolver where TMachineData : MachineData
+	internal class PostSolver
 	{
-		public PostSolver( TMachineData machineData )
+		public PostSolver( MachineData machineData )
 		{
 			if( machineData == null ) {
 				throw new ArgumentException( "Invalid machine data" );
 			}
-			m_MachineData = machineData;
-			CalculateMasterRotateDir();
-			CalculateSlaveRotateDir();
-			CalculateToolDir();
-			BuildFKSolver();
-			BuildIKSolver();
+			ISolverBuilder solverBuilder = CreateSolverBuilder( machineData );
+			m_FKSolver = solverBuilder.BuildFKSolver();
+			m_IKSolver = solverBuilder.BuildIKSolver();
+			m_RotaryAxisSolver = solverBuilder.BuildRotaryAxisSolver();
 		}
 
-		public virtual bool Solve( CAMData camData,
+		public bool Solve( CAMData camData,
 			out List<PostData> resultG54, out List<PostData> resultMCS )
 		{
 			resultG54 = new List<PostData>();
@@ -289,7 +341,66 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		// TODO: cosider tilted
+		public RotaryAxisSolver RotaryAxisSolver
+		{
+			get
+			{
+				return m_RotaryAxisSolver;
+			}
+		}
+
+		// solver builder factory
+		ISolverBuilder CreateSolverBuilder( MachineData machineData )
+		{
+			if( machineData == null ) {
+				throw new ArgumentException( "Invalid machine data" );
+			}
+			switch( machineData.FiveAxisType ) {
+				case FiveAxisType.Spindle:
+					return new SpindleSolverBuilder( (SpindleTypeMachineData)machineData );
+				case FiveAxisType.Table:
+					return new TableSolverBuilder( (TableTypeMachineData)machineData );
+				case FiveAxisType.Mix:
+					return new MixSolverBuilder( (MixTypeMachineData)machineData );
+				default:
+					throw new NotSupportedException( "Unsupported machine type" );
+			}
+		}
+
+		IKSolver m_IKSolver;
+		FKSolver m_FKSolver;
+		RotaryAxisSolver m_RotaryAxisSolver;
+	}
+
+	internal interface ISolverBuilder
+	{
+		FKSolver BuildFKSolver();
+
+		IKSolver BuildIKSolver();
+
+		RotaryAxisSolver BuildRotaryAxisSolver();
+	}
+
+	internal abstract class SolverBuilderBase<TMachineData> : ISolverBuilder
+		where TMachineData : MachineData
+	{
+		protected SolverBuilderBase( TMachineData machineData )
+		{
+			if( machineData == null ) {
+				throw new ArgumentException( "Invalid machine data" );
+			}
+			m_MachineData = machineData;
+			CalculateMasterRotateDir();
+			CalculateSlaveRotateDir();
+			CalculateToolDir();
+		}
+
+		public abstract FKSolver BuildFKSolver();
+
+		public abstract IKSolver BuildIKSolver();
+
+		public abstract RotaryAxisSolver BuildRotaryAxisSolver();
+
 		protected virtual void CalculateMasterRotateDir()
 		{
 			switch( m_MachineData.MasterRotaryAxis ) {
@@ -308,7 +419,6 @@ namespace MyCAM.Post
 			}
 		}
 
-		// TODO: cosider tilted
 		protected virtual void CalculateSlaveRotateDir()
 		{
 			switch( m_MachineData.SlaveRotaryAxis ) {
@@ -345,64 +455,104 @@ namespace MyCAM.Post
 			}
 		}
 
-		// hook
-		protected virtual void BuildFKSolver()
-		{
-			gp_Vec mcsToSlave = new gp_Vec();
-			gp_Vec slaveToMaster = new gp_Vec();
-			gp_Vec toolVec = new gp_Vec( m_ToolDir );
-			toolVec.Multiply( m_MachineData.ToolLength );
-			m_FKSolver = new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
-		}
-
-		// hook
-		protected virtual void BuildIKSolver()
-		{
-			m_IKSolver = new IKSolver( m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir );
-		}
-
-		public gp_Dir MasterRotateDir
-		{
-			get
-			{
-				return m_MasterRotateDir;
-			}
-		}
-
-		public gp_Dir SlaveRotateDir
-		{
-			get
-			{
-				return m_SlaveRotateDir;
-			}
-		}
-
 		protected TMachineData m_MachineData;
-		protected IKSolver m_IKSolver;
-		protected FKSolver m_FKSolver;
 		protected gp_Dir m_MasterRotateDir;
 		protected gp_Dir m_SlaveRotateDir;
 		protected gp_Dir m_ToolDir;
 	}
 
-	internal class SpindlePostSolver : PostSolver<SpindleTypeMachineData>
+	internal class SpindleSolverBuilder : SolverBuilderBase<SpindleTypeMachineData>, ISolverBuilder
 	{
-		public SpindlePostSolver( SpindleTypeMachineData machineData ) : base( machineData )
+		public SpindleSolverBuilder( SpindleTypeMachineData machineData )
+			: base( machineData )
 		{
 		}
 
-		protected override void BuildFKSolver()
+		public override FKSolver BuildFKSolver()
 		{
-			gp_Vec mcsToSlave = new gp_Vec( m_MachineData.ToolToSlaveVec.XYZ() );
-			gp_Vec slaveToMaster = new gp_Vec( m_MachineData.SlaveToMasterVec.XYZ() );
+			gp_Vec mcsToSlave = new gp_Vec( m_MachineData.ToolToSlaveVec.XYZ() ); // DE
+			gp_Vec slaveToMaster = new gp_Vec( m_MachineData.SlaveToMasterVec.XYZ() ); // EF
 			gp_Vec toolVec = new gp_Vec( m_ToolDir );
 			toolVec.Multiply( m_MachineData.ToolLength );
-			m_FKSolver = new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
+			return new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
 		}
 
-		protected override void BuildIKSolver()
+		public override IKSolver BuildIKSolver()
 		{
-			m_IKSolver = new IKSolver( m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir );
+			return new IKSolver( m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir );
+		}
+
+		public override RotaryAxisSolver BuildRotaryAxisSolver()
+		{
+			gp_Pnt ptOnSlave = new gp_Pnt();
+			ptOnSlave.Translate( m_MachineData.ToolToSlaveVec );
+			gp_Pnt ptOnMaster = new gp_Pnt( ptOnSlave.XYZ() );
+			ptOnMaster.Translate( m_MachineData.SlaveToMasterVec );
+			return new RotaryAxisSolver( ptOnMaster, ptOnSlave, m_MasterRotateDir, m_SlaveRotateDir );
+		}
+	}
+
+	internal class TableSolverBuilder : SolverBuilderBase<TableTypeMachineData>, ISolverBuilder
+	{
+		public TableSolverBuilder( TableTypeMachineData machineData )
+			: base( machineData )
+		{
+		}
+
+		public override FKSolver BuildFKSolver()
+		{
+			gp_Vec mcsToSlave = new gp_Vec( m_MachineData.MCSToMasterVec.XYZ() ); // DE
+			gp_Vec slaveToMaster = new gp_Vec( m_MachineData.MasterToSlaveVec.XYZ() ); // EF
+			gp_Vec toolVec = new gp_Vec( m_ToolDir );
+			toolVec.Multiply( m_MachineData.ToolLength );
+			return new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
+		}
+
+		public override IKSolver BuildIKSolver()
+		{
+			// for table type, just exchange the master and slave axis
+			return new IKSolver( m_ToolDir, m_SlaveRotateDir, m_MasterRotateDir );
+		}
+
+		public override RotaryAxisSolver BuildRotaryAxisSolver()
+		{
+			gp_Pnt ptOnMaster = new gp_Pnt();
+			ptOnMaster.Translate( m_MachineData.MCSToMasterVec );
+			gp_Pnt ptOnSlave = new gp_Pnt( ptOnMaster.XYZ() );
+			ptOnSlave.Translate( m_MachineData.MasterToSlaveVec );
+			return new RotaryAxisSolver( ptOnMaster, ptOnSlave, m_MasterRotateDir, m_SlaveRotateDir );
+		}
+	}
+
+	internal class MixSolverBuilder : SolverBuilderBase<MixTypeMachineData>, ISolverBuilder
+	{
+		public MixSolverBuilder( MixTypeMachineData machineData )
+			: base( machineData )
+		{
+		}
+
+		public override FKSolver BuildFKSolver()
+		{
+			gp_Vec mcsToSlave = new gp_Vec( m_MachineData.ToolToMasterVec.XYZ() ); // DE
+			gp_Vec slaveToMaster = m_MachineData.MCSToSlaveVec - m_MachineData.ToolToMasterVec; // EF = DF - DE
+			gp_Vec toolVec = new gp_Vec( m_ToolDir );
+			toolVec.Multiply( m_MachineData.ToolLength );
+			return new FKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
+		}
+
+		public override IKSolver BuildIKSolver()
+		{
+			// for mix type, just exchange the master and slave axis
+			return new IKSolver( m_ToolDir, m_SlaveRotateDir, m_MasterRotateDir );
+		}
+
+		public override RotaryAxisSolver BuildRotaryAxisSolver()
+		{
+			gp_Pnt ptOnMaster = new gp_Pnt();
+			ptOnMaster.Translate( m_MachineData.ToolToMasterVec );
+			gp_Pnt ptOnSlave = new gp_Pnt();
+			ptOnSlave.Translate( m_MachineData.MCSToSlaveVec );
+			return new RotaryAxisSolver( ptOnMaster, ptOnSlave, m_MasterRotateDir, m_SlaveRotateDir );
 		}
 	}
 }
