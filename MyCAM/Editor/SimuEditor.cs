@@ -243,17 +243,17 @@ namespace MyCAM.Editor
 		// TODO: read machine data from file
 		void ReadMachineData( string szFolderName )
 		{
-			MixTypeMachineData machineData = new MixTypeMachineData();
+			TableTypeMachineData machineData = new TableTypeMachineData();
 			machineData.ToolDirection = ToolDirection.Z;
-			machineData.MasterRotaryAxis = RotaryAxis.Y;
+			machineData.MasterRotaryAxis = RotaryAxis.X;
 			machineData.SlaveRotaryAxis = RotaryAxis.Z;
-			machineData.MasterRotaryDirection = RotaryDirection.RightHand;
+			machineData.MasterRotaryDirection = RotaryDirection.LeftHand;
 			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
 			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
 			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
 			machineData.ToolLength = 200.0;
-			machineData.ToolToMasterVec = new gp_Vec( -14.26, -119.41, 242.00 );
-			machineData.MCSToSlaveVec = new gp_Vec( -835.82, 32.20, -529.45 );
+			machineData.MCSToMasterVec = new gp_Vec( 0, 100, -100 );
+			machineData.MasterToSlaveVec = new gp_Vec( 0, 0, 0 );
 
 			// build machine tree
 			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
@@ -263,12 +263,12 @@ namespace MyCAM.Editor
 			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
 			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
 			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-			machineData.RootNode.AddChild( ZNode );
-			ZNode.AddChild( YNode );
-			YNode.AddChild( MasterNode );
-			MasterNode.AddChild( ToolNode );
-			machineData.RootNode.AddChild( XNode );
-			XNode.AddChild( SlaveNode );
+			machineData.RootNode.AddChild( YNode );
+			YNode.AddChild( XNode );
+			XNode.AddChild( ZNode );
+			ZNode.AddChild( ToolNode );
+			machineData.RootNode.AddChild( MasterNode );
+			MasterNode.AddChild( SlaveNode );
 			SlaveNode.AddChild( WorkPieceNode );
 
 			// build chain list
@@ -349,7 +349,7 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Tool ], false );
 
 			// make workpiece
-			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 1 ] ].AISHandle as AIS_Shape;
+			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 0 ] ].AISHandle as AIS_Shape;
 			m_Viewer.UpdateView();
 		}
 
