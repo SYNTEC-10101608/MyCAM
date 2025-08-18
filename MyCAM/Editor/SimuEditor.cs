@@ -104,7 +104,7 @@ namespace MyCAM.Editor
 
 			double G54X = 0;
 			double G54Y = 0;
-			double G54Z = -450;
+			double G54Z = -850;
 
 			// gaet the post data
 			PostData postData = m_SimuPostData[ m_CurrentFrameIndex ];
@@ -245,44 +245,7 @@ namespace MyCAM.Editor
 		// TODO: read machine data from file
 		void ReadMachineData( string szFolderName )
 		{
-			TableTypeMachineData machineData = new TableTypeMachineData();
-			machineData.ToolDirection = ToolDirection.Z;
-			machineData.MasterRotaryAxis = RotaryAxis.X;
-			machineData.SlaveRotaryAxis = RotaryAxis.Z;
-			machineData.MasterRotaryDirection = RotaryDirection.LeftHand;
-			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
-			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.ToolLength = 200.0;
-			machineData.MCSToMasterVec = new gp_Vec( 500.00, 69.00, -422.50 );
-			machineData.MasterToSlaveVec = new gp_Vec( -501.00, -70.00, -70.00 );
-
-			// build machine tree
-			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
-			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
-			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
-			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
-			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
-			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
-			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-			machineData.RootNode.AddChild( YNode );
-			YNode.AddChild( XNode );
-			XNode.AddChild( ZNode );
-			ZNode.AddChild( ToolNode );
-			machineData.RootNode.AddChild( MasterNode );
-			MasterNode.AddChild( SlaveNode );
-			SlaveNode.AddChild( WorkPieceNode );
-
-			// build chain list
-			m_ChainListMap.Clear();
-			BuildChainList( machineData.RootNode, new List<MachineComponentType>() );
-			m_WorkPieceChainSet.Clear();
-			foreach( var type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
-				m_WorkPieceChainSet.Add( type );
-			}
-
-			// build solver
-			m_PostSolver = new PostSolver( machineData );
+			ReadSpindleTest();
 
 			// TODO: we can read any type of 3D file, including stl
 			STEPControl_Reader readerBase = new STEPControl_Reader();
@@ -351,8 +314,92 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Tool ], false );
 
 			// make workpiece
-			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 1 ] ].AISHandle as AIS_Shape;
+			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 0 ] ].AISHandle as AIS_Shape;
 			m_Viewer.UpdateView();
+		}
+
+		void ReadSpindleTest()
+		{
+			SpindleTypeMachineData machineData = new SpindleTypeMachineData();
+			machineData.ToolDirection = ToolDirection.Z;
+			machineData.MasterRotaryAxis = RotaryAxis.Z;
+			machineData.SlaveRotaryAxis = RotaryAxis.Y;
+			machineData.MasterRotaryDirection = RotaryDirection.RightHand;
+			machineData.SlaveRotaryDirection = RotaryDirection.RightHand;
+			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.ToolLength = 200.0;
+			machineData.ToolToSlaveVec = new gp_Vec( 0, 0, 360.00 );
+			machineData.SlaveToMasterVec = new gp_Vec( 0, 0, 466.5 );
+
+			// build machine tree
+			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
+			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
+			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
+			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
+			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
+			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
+			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
+			machineData.RootNode.AddChild( YNode );
+			YNode.AddChild( ZNode );
+			ZNode.AddChild( MasterNode );
+			MasterNode.AddChild( SlaveNode );
+			SlaveNode.AddChild( ToolNode );
+			machineData.RootNode.AddChild( XNode );
+			XNode.AddChild( WorkPieceNode );
+
+			// build chain list
+			m_ChainListMap.Clear();
+			BuildChainList( machineData.RootNode, new List<MachineComponentType>() );
+			m_WorkPieceChainSet.Clear();
+			foreach( var type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
+				m_WorkPieceChainSet.Add( type );
+			}
+
+			// build solver
+			m_PostSolver = new PostSolver( machineData );
+		}
+
+		void ReadTableTest()
+		{
+			TableTypeMachineData machineData = new TableTypeMachineData();
+			machineData.ToolDirection = ToolDirection.Z;
+			machineData.MasterRotaryAxis = RotaryAxis.X;
+			machineData.SlaveRotaryAxis = RotaryAxis.Z;
+			machineData.MasterRotaryDirection = RotaryDirection.LeftHand;
+			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
+			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.ToolLength = 200.0;
+			machineData.MCSToMasterVec = new gp_Vec( 500.00, 69.00, -422.50 );
+			machineData.MasterToSlaveVec = new gp_Vec( -501.00, -70.00, -70.00 );
+
+			// build machine tree
+			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
+			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
+			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
+			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
+			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
+			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
+			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
+			machineData.RootNode.AddChild( YNode );
+			YNode.AddChild( XNode );
+			XNode.AddChild( ZNode );
+			ZNode.AddChild( ToolNode );
+			machineData.RootNode.AddChild( MasterNode );
+			MasterNode.AddChild( SlaveNode );
+			SlaveNode.AddChild( WorkPieceNode );
+
+			// build chain list
+			m_ChainListMap.Clear();
+			BuildChainList( machineData.RootNode, new List<MachineComponentType>() );
+			m_WorkPieceChainSet.Clear();
+			foreach( var type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
+				m_WorkPieceChainSet.Add( type );
+			}
+
+			// build solver
+			m_PostSolver = new PostSolver( machineData );
 		}
 
 		void BuildChainList( MachineTreeNode root, List<MachineComponentType> chainList )

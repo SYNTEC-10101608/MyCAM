@@ -189,7 +189,25 @@ namespace MyCAM.Post
 
 		public gp_Vec Solve( double masterAngle, double slaveAngle, gp_Vec G54XYZ, gp_Vec G54Offset )
 		{
-			return new gp_Vec();
+			// original pt on slave coord
+			gp_Pnt ptOnSlave = new gp_Pnt();
+			ptOnSlave.Translate( m_ToolToSlave.Reversed() );
+
+			// original pt on master coord
+			gp_Pnt ptOnMaster0 = ptOnSlave.Translated( m_SlaveToMaster.Reversed() );
+
+			// rotate the pt on slave coord
+			ptOnSlave.Translate( m_ToolVec.Reversed() );
+			gp_Trsf slaveTrsf = new gp_Trsf();
+			slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_SlaveRotateDir ), slaveAngle );
+			ptOnSlave.Transform( slaveTrsf );
+			gp_Pnt ptOnMaster1 = ptOnSlave.Translated( m_SlaveToMaster.Reversed() );
+			gp_Trsf masterTrsf = new gp_Trsf();
+			masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), masterAngle );
+			ptOnMaster1.Transform( masterTrsf );
+
+			// calculate the offset
+			return new gp_Vec( ptOnMaster0.XYZ() - ptOnMaster1.XYZ() );
 		}
 
 		// machine properties
@@ -410,7 +428,7 @@ namespace MyCAM.Post
 			// solve FK
 			for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
 				gp_Pnt pointG54 = camData.CAMPointList[ i ].CADPoint.Point;
-				gp_Vec tcpOffset = m_FKSolver.Solve( rotateAngleList[ i ].Item1, rotateAngleList[ i ].Item2, new gp_Vec( pointG54.XYZ() ), new gp_Vec( 0, 0, -450 ) );
+				gp_Vec tcpOffset = m_FKSolver.Solve( rotateAngleList[ i ].Item1, rotateAngleList[ i ].Item2, new gp_Vec( pointG54.XYZ() ), new gp_Vec( 0, 0, -850 ) );
 				gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
 
 				// add G54 frame data
