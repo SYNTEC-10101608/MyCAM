@@ -120,7 +120,7 @@ namespace MyCAM.Post
 		{
 			// case when they are originally coterminal
 			if( Math.Abs( dM_In - dM ) % ( 2 * Math.PI ) < 1e-6 ) {
-				return dM;
+				return dM_In;
 			}
 
 			// find the closest coterminal angle
@@ -128,14 +128,14 @@ namespace MyCAM.Post
 			double valueN;
 			if( dM < dM_In ) {
 				valueP = dM;
-				while( valueP < dM ) {
+				while( valueP < dM_In ) {
 					valueP += 2 * Math.PI;
 				}
 				valueN = valueP - 2 * Math.PI;
 			}
 			else {
 				valueN = dM;
-				while( valueN > dM ) {
+				while( valueN > dM_In ) {
 					valueN -= 2 * Math.PI;
 				}
 				valueP = valueN + 2 * Math.PI;
