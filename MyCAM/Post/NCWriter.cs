@@ -9,13 +9,15 @@ namespace MyCAM.Post
 {
 	internal class NCWriter
 	{
-		public NCWriter( List<CAMData> processDataList )
+		public NCWriter( List<CAMData> processDataList, PostSolver postSolver )
 		{
 			m_ProcessDataList = processDataList;
+			m_PostSolver = postSolver;
 		}
 
 		List<CAMData> m_ProcessDataList;
 		StreamWriter m_StreamWriter;
+		PostSolver m_PostSolver;
 
 		public void Convert()
 		{
@@ -36,7 +38,7 @@ namespace MyCAM.Post
 		void WriteCutting( CAMData cuttingProcessData, int index )
 		{
 			// get rotary axis
-			List<Tuple<double, double>> rotaryAxisPosList = new List<Tuple<double, double>>();
+			m_PostSolver.Solve( cuttingProcessData, out List<PostData> postDataList, out _ );
 
 			// compute approach points
 			gp_Vec toolVec = new gp_Vec( cuttingProcessData.CAMPointList[ 0 ].ToolVec.XYZ() );
@@ -46,23 +48,23 @@ namespace MyCAM.Post
 			gp_Pnt safePlanePt = new gp_Pnt( approachPtG00.X(), approachPtG00.Y(), SAFE_PLANE_Z );
 
 			// write approach point (下刀)
-			WriteOnePoint( safePlanePt, rotaryAxisPosList[ 0 ].Item1, rotaryAxisPosList[ 0 ].Item2, true );
-			WriteOnePoint( approachPtG00, rotaryAxisPosList[ 0 ].Item1, rotaryAxisPosList[ 0 ].Item2, true );
-			WriteOnePoint( approachPtG01, rotaryAxisPosList[ 0 ].Item1, rotaryAxisPosList[ 0 ].Item2, true );
+			WriteOnePoint( safePlanePt, postDataList[ 0 ].Master, postDataList[ 0 ].Slave, true );
+			WriteOnePoint( approachPtG00, postDataList[ 0 ].Master, postDataList[ 0 ].Slave, true );
+			WriteOnePoint( approachPtG01, postDataList[ 0 ].Master, postDataList[ 0 ].Slave, true );
 
 			// write each cam data point
 			m_StreamWriter.WriteLine( "// Cutting" + index.ToString() );
 			m_StreamWriter.WriteLine( "N" + index.ToString() ); // N 碼
 			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\" H1;" ); // 開隨動
 			for( int i = 0; i < cuttingProcessData.CAMPointList.Count; i++ ) {
-				var pos = rotaryAxisPosList[ i ];
-				WriteOnePoint( cuttingProcessData.CAMPointList[ i ].CADPoint.Point, pos.Item1, pos.Item2 );
+				var pos = postDataList[ i ];
+				WriteOnePoint( cuttingProcessData.CAMPointList[ i ].CADPoint.Point, pos.Master, pos.Slave );
 			}
 			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" ); // 關隨動
 
 			// write approach point (抬刀，不需要抬到 G01 位置)
-			WriteOnePoint( approachPtG00, rotaryAxisPosList.Last().Item1, rotaryAxisPosList.Last().Item2, true );
-			WriteOnePoint( safePlanePt, rotaryAxisPosList.Last().Item1, rotaryAxisPosList.Last().Item2, true );
+			WriteOnePoint( approachPtG00, postDataList.Last().Master, postDataList.Last().Slave, true );
+			WriteOnePoint( safePlanePt, postDataList.Last().Master, postDataList.Last().Slave, true );
 		}
 
 		void WriteOnePoint( gp_Pnt point, double dM, double dS, bool G00 = false )
@@ -70,10 +72,10 @@ namespace MyCAM.Post
 			string szX = point.X().ToString( "F3" );
 			string szY = point.Y().ToString( "F3" );
 			string szZ = point.Z().ToString( "F3" );
-			string szB = ( dS * 180 / Math.PI ).ToString( "F3" );
-			string szC = ( dM * 180 / Math.PI ).ToString( "F3" );
+			string szA = ( dM * 180 / Math.PI ).ToString( "F3" );
+			string szC = ( dS * 180 / Math.PI ).ToString( "F3" );
 			string command = G00 ? "G00" : "G01";
-			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} B{szB} C{szC};" );
+			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} A{szA} C{szC};" );
 		}
 
 		const int SAFE_PLANE_Z = 300;

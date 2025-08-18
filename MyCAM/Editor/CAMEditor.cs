@@ -276,12 +276,6 @@ namespace MyCAM.Editor
 
 		}
 
-		public void ConvertNC()
-		{
-			NCWriter w = new NCWriter( m_CADManager.GetCAMDataList() );
-			w.Convert();
-		}
-
 		// path added
 		void OnPathAdded( List<string> newPathIDs )
 		{

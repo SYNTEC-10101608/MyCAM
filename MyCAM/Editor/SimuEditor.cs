@@ -104,7 +104,7 @@ namespace MyCAM.Editor
 
 			double G54X = 0;
 			double G54Y = 0;
-			double G54Z = 0;
+			double G54Z = -450;
 
 			// gaet the post data
 			PostData postData = m_SimuPostData[ m_CurrentFrameIndex ];
@@ -380,13 +380,19 @@ namespace MyCAM.Editor
 			}
 
 			// refresh frame
-			if( e.Control && e.KeyCode == Keys.Down ) {
+			if( e.KeyCode == Keys.Down ) {
 				m_CurrentFrameIndex += 2;
 				RefreshFrame();
 			}
-			if( e.Control && e.KeyCode == Keys.Up ) {
+			if( e.KeyCode == Keys.Up ) {
 				m_CurrentFrameIndex -= 2;
 				RefreshFrame();
+			}
+
+			// export NC
+			if( e.Control && e.KeyCode == Keys.E ) {
+				NCWriter writer = new NCWriter( m_CADManager.GetCAMDataList(), m_PostSolver );
+				writer.Convert();
 			}
 		}
 		int m_CurrentFrameIndex = 0;
