@@ -104,7 +104,7 @@ namespace MyCAM.Editor
 
 			double G54X = 0;
 			double G54Y = 0;
-			double G54Z = -450;
+			double G54Z = 100;
 
 			// gaet the post data
 			PostData postData = m_SimuPostData[ m_CurrentFrameIndex ];
@@ -245,7 +245,7 @@ namespace MyCAM.Editor
 		// TODO: read machine data from file
 		void ReadMachineData( string szFolderName )
 		{
-			ReadTableTest();
+			ReadSpindleTest();
 
 			// TODO: we can read any type of 3D file, including stl
 			STEPControl_Reader readerBase = new STEPControl_Reader();
@@ -276,7 +276,7 @@ namespace MyCAM.Editor
 			AIS_Shape baseAIS = new AIS_Shape( shapeBase );
 			baseAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			baseAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			m_Viewer.GetAISContext().Display( baseAIS, false );
+			//m_Viewer.GetAISContext().Display( baseAIS, false );
 			m_MachineShapeMap[ MachineComponentType.Base ] = baseAIS;
 			AIS_Shape xAIS = new AIS_Shape( shapeX );
 			xAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
@@ -305,8 +305,8 @@ namespace MyCAM.Editor
 			m_MachineShapeMap[ MachineComponentType.Slave ] = slaveAIS;
 
 			// make tool
-			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 10, 195 );
-			BRepPrimAPI_MakeCylinder makeTool2 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -195 ), new gp_Dir( 0, 0, -1 ) ), 1, 5 );
+			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 1, 1 );
+			BRepPrimAPI_MakeCylinder makeTool2 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -1 ), new gp_Dir( 0, 0, -1 ) ), 1, 1 );
 			BRepAlgoAPI_Fuse makeTool = new BRepAlgoAPI_Fuse( makeTool1.Shape(), makeTool2.Shape() );
 			m_MachineShapeMap[ MachineComponentType.Tool ] = new AIS_Shape( makeTool.Shape() );
 			m_MachineShapeMap[ MachineComponentType.Tool ].SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
@@ -314,7 +314,7 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Tool ], false );
 
 			// make workpiece
-			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 1 ] ].AISHandle as AIS_Shape;
+			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 0 ] ].AISHandle as AIS_Shape;
 			m_Viewer.UpdateView();
 		}
 
@@ -323,14 +323,14 @@ namespace MyCAM.Editor
 			SpindleTypeMachineData machineData = new SpindleTypeMachineData();
 			machineData.ToolDirection = ToolDirection.Z;
 			machineData.MasterRotaryAxis = RotaryAxis.Z;
-			machineData.SlaveRotaryAxis = RotaryAxis.Y;
+			machineData.SlaveRotaryAxis = RotaryAxis.X;
 			machineData.MasterRotaryDirection = RotaryDirection.RightHand;
 			machineData.SlaveRotaryDirection = RotaryDirection.RightHand;
 			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
 			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.ToolLength = 200.0;
-			machineData.ToolToSlaveVec = new gp_Vec( 0, 0, 360.00 );
-			machineData.SlaveToMasterVec = new gp_Vec( 0, 0, 466.5 );
+			machineData.ToolLength = 2.0;
+			machineData.ToolToSlaveVec = new gp_Vec( -101.20, -0.19, 169.43 );
+			machineData.SlaveToMasterVec = new gp_Vec( -252.70, 0, 362.98 ) - machineData.ToolToSlaveVec;
 
 			// build machine tree
 			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
@@ -340,13 +340,13 @@ namespace MyCAM.Editor
 			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
 			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
 			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-			machineData.RootNode.AddChild( YNode );
+			machineData.RootNode.AddChild( XNode );
+			XNode.AddChild( YNode );
 			YNode.AddChild( ZNode );
 			ZNode.AddChild( MasterNode );
 			MasterNode.AddChild( SlaveNode );
 			SlaveNode.AddChild( ToolNode );
-			machineData.RootNode.AddChild( XNode );
-			XNode.AddChild( WorkPieceNode );
+			machineData.RootNode.AddChild( WorkPieceNode );
 
 			// build chain list
 			m_ChainListMap.Clear();
@@ -364,15 +364,15 @@ namespace MyCAM.Editor
 		{
 			TableTypeMachineData machineData = new TableTypeMachineData();
 			machineData.ToolDirection = ToolDirection.Z;
-			machineData.MasterRotaryAxis = RotaryAxis.X;
+			machineData.MasterRotaryAxis = RotaryAxis.Y;
 			machineData.SlaveRotaryAxis = RotaryAxis.Z;
 			machineData.MasterRotaryDirection = RotaryDirection.LeftHand;
 			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
 			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
 			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.ToolLength = 200.0;
-			machineData.MCSToMasterVec = new gp_Vec( 500.00, 69.00, -422.50 );
-			machineData.MasterToSlaveVec = new gp_Vec( -501.00, -70.00, -70.00 );
+			machineData.ToolLength = 2.0;
+			machineData.MCSToMasterVec = new gp_Vec( -80.51, 73.81, -129.55 );
+			machineData.MasterToSlaveVec = new gp_Vec( -80.43, -71.67, -94.55 ) - machineData.MCSToMasterVec;
 
 			// build machine tree
 			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
@@ -384,11 +384,11 @@ namespace MyCAM.Editor
 			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
 			machineData.RootNode.AddChild( YNode );
 			YNode.AddChild( XNode );
-			XNode.AddChild( ZNode );
-			ZNode.AddChild( ToolNode );
-			machineData.RootNode.AddChild( MasterNode );
+			XNode.AddChild( MasterNode );
 			MasterNode.AddChild( SlaveNode );
 			SlaveNode.AddChild( WorkPieceNode );
+			machineData.RootNode.AddChild( ZNode );
+			ZNode.AddChild( ToolNode );
 
 			// build chain list
 			m_ChainListMap.Clear();
@@ -412,9 +412,9 @@ namespace MyCAM.Editor
 			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
 			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
 			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.ToolLength = 200.0;
-			machineData.ToolToMasterVec = new gp_Vec( 0, -118.20, 242.00 );
-			machineData.MCSToSlaveVec = new gp_Vec( -835.82, 32.20, -529.45 );
+			machineData.ToolLength = 2.0;
+			machineData.ToolToMasterVec = new gp_Vec( 0, 101.2, 169.48 );
+			machineData.MCSToSlaveVec = new gp_Vec( 40.81, -384.80, -665.67 );
 
 			// build machine tree
 			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
@@ -424,12 +424,12 @@ namespace MyCAM.Editor
 			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
 			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
 			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-			machineData.RootNode.AddChild( XNode );
-			XNode.AddChild( SlaveNode );
+			machineData.RootNode.AddChild( YNode );
+			YNode.AddChild( SlaveNode );
 			SlaveNode.AddChild( WorkPieceNode );
-			machineData.RootNode.AddChild( ZNode );
-			ZNode.AddChild( YNode );
-			YNode.AddChild( MasterNode );
+			machineData.RootNode.AddChild( XNode );
+			XNode.AddChild( ZNode );
+			ZNode.AddChild( MasterNode );
 			MasterNode.AddChild( ToolNode );
 
 			// build chain list
