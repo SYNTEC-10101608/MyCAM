@@ -1,8 +1,16 @@
 ﻿using MyCAM.Data;
 using OCC.AIS;
+using OCC.BRep;
+using OCC.BRepMesh;
+using OCC.BRepPrimAPI;
+using OCC.gp;
 using OCC.IFSelect;
 using OCC.IGESControl;
+using OCC.Poly;
 using OCC.STEPControl;
+using OCC.TopAbs;
+using OCC.TopExp;
+using OCC.TopLoc;
 using OCC.TopoDS;
 using OCC.XSControl;
 using OCCTool;
@@ -54,6 +62,122 @@ namespace MyCAM.Editor
 
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Part );
+
+			TestColDet();
+		}
+
+		// this is a temp function to test collision detection using bullet tool
+		void TestColDet()
+		{
+			// create a box as shapeA
+			BRepPrimAPI_MakeBox boxMaker = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -50, -50 ), 100, 100, 100 );
+			TopoDS_Shape shapeA = boxMaker.Shape();
+			AIS_Shape m_ShapeA = new AIS_Shape( shapeA );
+			m_Viewer.GetAISContext().Display( m_ShapeA, true );
+			MeshShape( shapeA, out List<double> vertexListA, out List<int> indexListA );
+
+			// create a sphere as shapeB
+			BRepPrimAPI_MakeSphere sphereMaker = new BRepPrimAPI_MakeSphere( new gp_Pnt( 0, 0, 0 ), 50 );
+			TopoDS_Shape shapeB = sphereMaker.Shape();
+			AIS_Shape m_ShapeB = new AIS_Shape( shapeB );
+			m_Viewer.GetAISContext().Display( m_ShapeB, true );
+			MeshShape( shapeB, out List<double> vertexListB, out List<int> indexListB );
+
+			// create a cylinder as shapeC
+			BRepPrimAPI_MakeCylinder cylinderMaker = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -50 ), new gp_Dir( 0, 0, 1 ) ), 50, 100 );
+			TopoDS_Shape shapeC = cylinderMaker.Shape();
+			AIS_Shape m_ShapeC = new AIS_Shape( shapeC );
+			m_Viewer.GetAISContext().Display( m_ShapeC, true );
+			MeshShape( shapeC, out List<double> vertexListC, out List<int> indexListC );
+
+			// create list of trsf presenting shape position on each frame
+			const int frameCount = 20;
+			List<gp_Trsf> trsfAList = new List<gp_Trsf>();
+			List<gp_Trsf> trsfBList = new List<gp_Trsf>();
+			List<gp_Trsf> trsfCList = new List<gp_Trsf>();
+			for( int i = 0; i <= frameCount; i++ ) {
+				double pos = -300 + i * 30;
+				gp_Trsf trsfA = new gp_Trsf();
+				trsfA.SetTranslation( new gp_Vec( pos, 0, 0 ) );
+				trsfAList.Add( trsfA );
+				gp_Trsf trsfB = new gp_Trsf();
+				trsfB.SetTranslation( new gp_Vec( 0, pos, 0 ) );
+				trsfBList.Add( trsfB );
+				gp_Trsf trsfC = new gp_Trsf();
+				trsfC.SetTranslation( new gp_Vec( pos + 75, pos - 75, 0 ) );
+				trsfCList.Add( trsfC );
+			}
+			m_Viewer.TopView();
+
+			// simulate frame by frame
+			m_Viewer.KeyDown += ( e ) =>
+			{
+				if( e.KeyCode == Keys.Up || e.KeyCode == Keys.Down ) {
+					if( e.KeyCode == Keys.Down ) {
+						m_FrameIndex++;
+						if( m_FrameIndex >= frameCount ) {
+							m_FrameIndex = 0;
+						}
+					}
+					else if( e.KeyCode == Keys.Up ) {
+						m_FrameIndex--;
+						if( m_FrameIndex < 0 ) {
+							m_FrameIndex = frameCount - 1;
+						}
+					}
+
+					// apply transformation to shapes
+					m_ShapeA.SetLocalTransformation( trsfAList[ m_FrameIndex ] );
+					m_ShapeB.SetLocalTransformation( trsfBList[ m_FrameIndex ] );
+					m_ShapeC.SetLocalTransformation( trsfCList[ m_FrameIndex ] );
+					m_Viewer.UpdateView();
+				}
+			};
+		}
+		int m_FrameIndex = 0;
+
+		void MeshShape( TopoDS_Shape shape, out List<double> vertexList, out List<int> indexList )
+		{
+			vertexList = new List<double>();
+			indexList = new List<int>();
+
+			// mesh the shape
+			BRepMesh_IncrementalMesh meshMaker = new BRepMesh_IncrementalMesh( shape, 0.01 );
+			meshMaker.Perform();
+			if( !meshMaker.IsDone() ) {
+				MessageBox.Show( "Error: Mesh shape failed." );
+				return;
+			}
+
+			// get the mesh data
+			TopExp_Explorer faceExp = new TopExp_Explorer( shape, TopAbs_ShapeEnum.TopAbs_FACE );
+			while( faceExp.More() ) {
+				TopoDS_Face face = TopoDS.ToFace( faceExp.Current() );
+
+				// get triangulation data
+				TopLoc_Location loc = new TopLoc_Location();
+				Poly_Triangulation tri = BRep_Tool.Triangulation( face, ref loc );
+				for( int i = 1; i <= tri.NbNodes(); i++ ) {
+					gp_Pnt p = tri.Node( i );
+					vertexList.Add( p.X() );
+					vertexList.Add( p.Y() );
+					vertexList.Add( p.Z() );
+				}
+
+				// the start vertex index of this face
+				int startIndex = vertexList.Count / 3;
+				for( int i = 1; i <= tri.NbTriangles(); i++ ) {
+					Poly_Triangle triangle = tri.Triangle( i );
+					int index1 = 0;
+					int index2 = 0;
+					int index3 = 0;
+					triangle.Get( ref index1, ref index2, ref index3 );
+					indexList.Add( startIndex + index1 - 1 ); // convert to zero-based index
+					indexList.Add( startIndex + index2 - 1 );
+					indexList.Add( startIndex + index3 - 1 );
+				}
+				faceExp.Next();
+			}
 		}
 
 		// user interface
