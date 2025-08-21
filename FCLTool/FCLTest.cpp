@@ -5,8 +5,9 @@
 using namespace fcl;
 
 void FCLTest::AddModel( const std::string &szID,
-	const int triCount, const int *const indexList,
-	const int vertexCount, const double *const vertexList ) {
+	const int triCount, const int *indexList,
+	const int vertexCount, const double *vertexList )
+{
 	std::vector<Vector3f> vertices;
 	std::vector<Triangle> triangles;
 	for( int i = 0; i < triCount; i++ ) {
@@ -28,7 +29,8 @@ void FCLTest::AddModel( const std::string &szID,
 }
 
 bool FCLTest::CheckCollision( const std::string &szID1, const std::string &szID2,
-	const double *const trsf1, const double *const trsf2 ) {
+	const double *trsf1, const double *trsf2 )
+{
 	auto it1 = m_ModelMap.find( szID1 );
 	auto it2 = m_ModelMap.find( szID2 );
 	if( it1 == m_ModelMap.end() || it2 == m_ModelMap.end() ) {
@@ -50,7 +52,8 @@ bool FCLTest::CheckCollision( const std::string &szID1, const std::string &szID2
 	return result.isCollision();
 }
 
-Transform3f FCLTest::CreateTransform( const double *const trsf ) {
+Transform3f FCLTest::CreateTransform( const double *trsf )
+{
 	Matrix3f R;
 	Vector3f T;
 	R << trsf[ 0 ], trsf[ 1 ], trsf[ 2 ],
