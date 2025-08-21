@@ -7,6 +7,7 @@ using OCC.gp;
 using OCC.IFSelect;
 using OCC.IGESControl;
 using OCC.Poly;
+using OCC.Quantity;
 using OCC.STEPControl;
 using OCC.TopAbs;
 using OCC.TopExp;
@@ -73,6 +74,9 @@ namespace MyCAM.Editor
 			BRepPrimAPI_MakeBox boxMaker = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -50, -50 ), 100, 100, 100 );
 			TopoDS_Shape shapeA = boxMaker.Shape();
 			AIS_Shape m_ShapeA = new AIS_Shape( shapeA );
+			m_ShapeA.SetColor( COLOR_DEFAULT );
+			m_ShapeA.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			m_ShapeA.SetTransparency( 0.5 );
 			m_Viewer.GetAISContext().Display( m_ShapeA, true );
 			MeshShape( shapeA, out List<double> vertexListA, out List<int> indexListA );
 
@@ -80,13 +84,19 @@ namespace MyCAM.Editor
 			BRepPrimAPI_MakeSphere sphereMaker = new BRepPrimAPI_MakeSphere( new gp_Pnt( 0, 0, 0 ), 50 );
 			TopoDS_Shape shapeB = sphereMaker.Shape();
 			AIS_Shape m_ShapeB = new AIS_Shape( shapeB );
+			m_ShapeB.SetColor( COLOR_DEFAULT );
+			m_ShapeB.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			m_ShapeB.SetTransparency( 0.5 );
 			m_Viewer.GetAISContext().Display( m_ShapeB, true );
 			MeshShape( shapeB, out List<double> vertexListB, out List<int> indexListB );
 
 			// create a cylinder as shapeC
-			BRepPrimAPI_MakeCylinder cylinderMaker = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -50 ), new gp_Dir( 0, 0, 1 ) ), 50, 100 );
+			BRepPrimAPI_MakeCylinder cylinderMaker = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -300 ), new gp_Dir( 0, 0, 1 ) ), 50, 600 );
 			TopoDS_Shape shapeC = cylinderMaker.Shape();
 			AIS_Shape m_ShapeC = new AIS_Shape( shapeC );
+			m_ShapeC.SetColor( COLOR_DEFAULT );
+			m_ShapeC.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			m_ShapeC.SetTransparency( 0.5 );
 			m_Viewer.GetAISContext().Display( m_ShapeC, true );
 			MeshShape( shapeC, out List<double> vertexListC, out List<int> indexListC );
 
@@ -98,18 +108,39 @@ namespace MyCAM.Editor
 			for( int i = 0; i <= frameCount; i++ ) {
 				double pos = -300 + i * 30;
 				gp_Trsf trsfA = new gp_Trsf();
-				trsfA.SetTranslation( new gp_Vec( pos, 0, 0 ) );
+				trsfA.SetTranslation( new gp_Vec( 0, 300, 0 ) );
 				trsfAList.Add( trsfA );
 				gp_Trsf trsfB = new gp_Trsf();
-				trsfB.SetTranslation( new gp_Vec( 0, pos, 0 ) );
+				trsfB.SetTranslation( new gp_Vec( 0, -300, 0 ) );
 				trsfBList.Add( trsfB );
 				gp_Trsf trsfC = new gp_Trsf();
-				trsfC.SetTranslation( new gp_Vec( pos + 75, pos - 75, 0 ) );
+				trsfC.SetRotation(new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) ), Math.PI * i / frameCount );
 				trsfCList.Add( trsfC );
 			}
-			m_Viewer.TopView();
+
+			// create collision detection tool
+			FCLTest fclTest = new FCLTest();
+			fclTest.AddModel( "ShapeA", indexListA.ToArray(), vertexListA.ToArray() );
+			fclTest.AddModel( "ShapeB", indexListB.ToArray(), vertexListB.ToArray() );
+			fclTest.AddModel( "ShapeC", indexListC.ToArray(), vertexListC.ToArray() );
+
+			// check collision at each frame
+			List<bool> colDetA = new List<bool>();
+			List<bool> colDetB = new List<bool>();
+			List<bool> colDetC = new List<bool>();
+			for( int i = 0; i < frameCount; i++ ) {
+
+				// check collision
+				bool bColAB = fclTest.CheckCollision( "ShapeA", "ShapeB", ConvertTransform( trsfAList[ i ] ), ConvertTransform( trsfBList[ i ] ) );
+				bool bColAC = fclTest.CheckCollision( "ShapeA", "ShapeC", ConvertTransform( trsfAList[ i ] ), ConvertTransform( trsfCList[ i ] ) );
+				bool bColBC = fclTest.CheckCollision( "ShapeB", "ShapeC", ConvertTransform( trsfBList[ i ] ), ConvertTransform( trsfCList[ i ] ) );
+				colDetA.Add( bColAB || bColAC );
+				colDetB.Add( bColAB || bColBC );
+				colDetC.Add( bColAC || bColBC );
+			}
 
 			// simulate frame by frame
+			m_Viewer.TopView();
 			m_Viewer.KeyDown += ( e ) =>
 			{
 				if( e.KeyCode == Keys.Up || e.KeyCode == Keys.Down ) {
@@ -130,11 +161,18 @@ namespace MyCAM.Editor
 					m_ShapeA.SetLocalTransformation( trsfAList[ m_FrameIndex ] );
 					m_ShapeB.SetLocalTransformation( trsfBList[ m_FrameIndex ] );
 					m_ShapeC.SetLocalTransformation( trsfCList[ m_FrameIndex ] );
+
+					// show color to indicate collision
+					m_ShapeA.SetColor( colDetA[ m_FrameIndex ] ? COLOR_COLDET : COLOR_DEFAULT );
+					m_ShapeB.SetColor( colDetB[ m_FrameIndex ] ? COLOR_COLDET : COLOR_DEFAULT );
+					m_ShapeC.SetColor( colDetC[ m_FrameIndex ] ? COLOR_COLDET : COLOR_DEFAULT );
 					m_Viewer.UpdateView();
 				}
 			};
 		}
 		int m_FrameIndex = 0;
+		readonly Quantity_Color COLOR_COLDET = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED );
+		readonly Quantity_Color COLOR_DEFAULT = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE );
 
 		void MeshShape( TopoDS_Shape shape, out List<double> vertexList, out List<int> indexList )
 		{
@@ -142,7 +180,7 @@ namespace MyCAM.Editor
 			indexList = new List<int>();
 
 			// mesh the shape
-			BRepMesh_IncrementalMesh meshMaker = new BRepMesh_IncrementalMesh( shape, 0.01 );
+			BRepMesh_IncrementalMesh meshMaker = new BRepMesh_IncrementalMesh( shape, 0.1 );
 			meshMaker.Perform();
 			if( !meshMaker.IsDone() ) {
 				MessageBox.Show( "Error: Mesh shape failed." );
@@ -153,6 +191,7 @@ namespace MyCAM.Editor
 			TopExp_Explorer faceExp = new TopExp_Explorer( shape, TopAbs_ShapeEnum.TopAbs_FACE );
 			while( faceExp.More() ) {
 				TopoDS_Face face = TopoDS.ToFace( faceExp.Current() );
+				int startIndexOfFace = vertexList.Count / 3;
 
 				// get triangulation data
 				TopLoc_Location loc = new TopLoc_Location();
@@ -165,19 +204,42 @@ namespace MyCAM.Editor
 				}
 
 				// the start vertex index of this face
-				int startIndex = vertexList.Count / 3;
 				for( int i = 1; i <= tri.NbTriangles(); i++ ) {
 					Poly_Triangle triangle = tri.Triangle( i );
 					int index1 = 0;
 					int index2 = 0;
 					int index3 = 0;
 					triangle.Get( ref index1, ref index2, ref index3 );
-					indexList.Add( startIndex + index1 - 1 ); // convert to zero-based index
-					indexList.Add( startIndex + index2 - 1 );
-					indexList.Add( startIndex + index3 - 1 );
+					indexList.Add( startIndexOfFace + index1 - 1 ); // convert to zero-based index
+					indexList.Add( startIndexOfFace + index2 - 1 );
+					indexList.Add( startIndexOfFace + index3 - 1 );
 				}
 				faceExp.Next();
 			}
+		}
+
+		double[] ConvertTransform( gp_Trsf trsf )
+		{
+			gp_Mat matR = trsf.GetRotation().GetMatrix();
+			gp_XYZ vecT = trsf.TranslationPart();
+			double[] result = new double[ 12 ];
+
+			// the rotation part
+			result[ 0 ] = matR.Value( 1, 1 );
+			result[ 1 ] = matR.Value( 1, 2 );
+			result[ 2 ] = matR.Value( 1, 3 );
+			result[ 3 ] = matR.Value( 2, 1 );
+			result[ 4 ] = matR.Value( 2, 2 );
+			result[ 5 ] = matR.Value( 2, 3 );
+			result[ 6 ] = matR.Value( 3, 1 );
+			result[ 7 ] = matR.Value( 3, 2 );
+			result[ 8 ] = matR.Value( 3, 3 );
+
+			// the translation part
+			result[ 9 ] = vecT.X();
+			result[ 10 ] = vecT.Y();
+			result[ 11 ] = vecT.Z();
+			return result;
 		}
 
 		// user interface
