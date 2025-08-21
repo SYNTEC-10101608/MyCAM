@@ -1,17 +1,8 @@
 ﻿using MyCAM.Data;
 using OCC.AIS;
-using OCC.BRep;
-using OCC.BRepMesh;
-using OCC.BRepPrimAPI;
-using OCC.gp;
 using OCC.IFSelect;
 using OCC.IGESControl;
-using OCC.Poly;
-using OCC.Quantity;
 using OCC.STEPControl;
-using OCC.TopAbs;
-using OCC.TopExp;
-using OCC.TopLoc;
 using OCC.TopoDS;
 using OCC.XSControl;
 using OCCTool;
@@ -19,7 +10,6 @@ using OCCViewer;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using OCC.RWStl;
 
 namespace MyCAM.Editor
 {
