@@ -3,7 +3,7 @@
 extern "C" {
 
 	// construct
-	FCLTOOL_API FCLTest __stdcall *FCLTest_Create()
+	FCLTOOL_API FCLTest *__stdcall FCLTest_Create()
 	{
 		return new FCLTest();
 	}
