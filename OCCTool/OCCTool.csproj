@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConstantDefine.cs" />
+    <Compile Include="FCLTool.cs" />
     <Compile Include="GeometryTool.cs" />
     <Compile Include="PostTool.cs" />
     <Compile Include="SegmentTool.cs" />
