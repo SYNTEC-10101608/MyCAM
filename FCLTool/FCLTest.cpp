@@ -25,7 +25,7 @@ void FCLTest::AddModel( const std::string &szID,
 	geom->beginModel();
 	geom->addSubModel( vertices, triangles );
 	geom->endModel();
-
+	m_ModelMap[ szID ] = geom;
 }
 
 bool FCLTest::CheckCollision( const std::string &szID1, const std::string &szID2,
