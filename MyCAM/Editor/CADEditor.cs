@@ -19,6 +19,7 @@ using OCCViewer;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using OCC.RWStl;
 
 namespace MyCAM.Editor
 {
@@ -64,7 +65,17 @@ namespace MyCAM.Editor
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Part );
 
-			TestColDet();
+			TestLoadSTL();
+			//TestColDet();
+		}
+
+		// this is a temp function to test load stl
+		void TestLoadSTL()
+		{
+			Poly_Triangulation tri =  RWStl.ReadFile( "Slave.stl" );
+			AIS_Triangulation triAIS = new AIS_Triangulation( tri );
+			m_Viewer.GetAISContext().Display( triAIS, true );
+			m_Viewer.UpdateView();
 		}
 
 		// this is a temp function to test collision detection using bullet tool
