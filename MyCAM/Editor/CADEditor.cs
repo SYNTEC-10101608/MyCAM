@@ -76,7 +76,7 @@ namespace MyCAM.Editor
 			AIS_Shape m_ShapeA = new AIS_Shape( shapeA );
 			m_ShapeA.SetColor( COLOR_DEFAULT );
 			m_ShapeA.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_ShapeA.SetTransparency( 0.5 );
+			//m_ShapeA.SetTransparency( 0.5 );
 			m_Viewer.GetAISContext().Display( m_ShapeA, true );
 			MeshShape( shapeA, out List<double> vertexListA, out List<int> indexListA );
 
@@ -86,7 +86,7 @@ namespace MyCAM.Editor
 			AIS_Shape m_ShapeB = new AIS_Shape( shapeB );
 			m_ShapeB.SetColor( COLOR_DEFAULT );
 			m_ShapeB.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_ShapeB.SetTransparency( 0.5 );
+			//m_ShapeB.SetTransparency( 0.5 );
 			m_Viewer.GetAISContext().Display( m_ShapeB, true );
 			MeshShape( shapeB, out List<double> vertexListB, out List<int> indexListB );
 
@@ -108,13 +108,15 @@ namespace MyCAM.Editor
 			for( int i = 0; i <= frameCount; i++ ) {
 				double pos = -300 + i * 30;
 				gp_Trsf trsfA = new gp_Trsf();
-				trsfA.SetTranslation( new gp_Vec( 0, 300, 0 ) );
+				trsfA.SetTranslation( new gp_Vec( -75, 300, 0 ) );
 				trsfAList.Add( trsfA );
 				gp_Trsf trsfB = new gp_Trsf();
-				trsfB.SetTranslation( new gp_Vec( 0, -300, 0 ) );
+				trsfB.SetTranslation( new gp_Vec( 75, -300, 0 ) );
 				trsfBList.Add( trsfB );
 				gp_Trsf trsfC = new gp_Trsf();
-				trsfC.SetRotation(new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) ), Math.PI * i / frameCount );
+				gp_Quaternion quat = new gp_Quaternion( new gp_Vec( 1, 0, 0), Math.PI * i / frameCount );
+				trsfC.SetRotationPart( quat );
+				trsfC.SetTranslationPart( new gp_Vec( pos, 0, 0 ) );
 				trsfCList.Add( trsfC );
 			}
 
