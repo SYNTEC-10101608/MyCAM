@@ -448,7 +448,7 @@ namespace MyCAM.Post
 			// solve FK
 			for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
 				gp_Pnt pointG54 = camData.CAMPointList[ i ].CADPoint.Point;
-				gp_Vec tcpOffset = m_FKSolver.Solve( rotateAngleList[ i ].Item1, rotateAngleList[ i ].Item2, new gp_Vec( pointG54.XYZ() ), new gp_Vec( 40, -385, -660 ) );
+				gp_Vec tcpOffset = m_FKSolver.Solve( rotateAngleList[ i ].Item1, rotateAngleList[ i ].Item2, new gp_Vec( pointG54.XYZ() ), m_G54Offset );
 				gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
 
 				// add G54 frame data
@@ -484,6 +484,14 @@ namespace MyCAM.Post
 			}
 		}
 
+		public gp_Vec G54Offset
+		{
+			set
+			{
+				m_G54Offset = new gp_Vec( value.X(), value.Y(), value.Z() );
+			}
+		}
+
 		// solver builder factory
 		ISolverBuilder CreateSolverBuilder( MachineData machineData )
 		{
@@ -505,6 +513,7 @@ namespace MyCAM.Post
 		IKSolver m_IKSolver;
 		FKSolver m_FKSolver;
 		RotaryAxisSolver m_RotaryAxisSolver;
+		gp_Vec m_G54Offset;
 	}
 
 	internal interface ISolverBuilder

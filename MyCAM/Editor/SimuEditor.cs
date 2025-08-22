@@ -1,9 +1,7 @@
 ﻿using MyCAM.Data;
 using MyCAM.Post;
 using OCC.AIS;
-using OCC.BRep;
 using OCC.BRepAlgoAPI;
-using OCC.BRepMesh;
 using OCC.BRepPrimAPI;
 using OCC.gp;
 using OCC.Graphic3d;
@@ -11,14 +9,11 @@ using OCC.Poly;
 using OCC.Quantity;
 using OCC.RWStl;
 using OCC.TColStd;
-using OCC.TopAbs;
-using OCC.TopExp;
-using OCC.TopLoc;
-using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -40,6 +35,26 @@ namespace MyCAM.Editor
 			m_ViewManager = viewManager;
 
 			m_Viewer.KeyDown += OnKeyDown;
+
+			// init frame transform map
+			m_FrameTransformMap[ MachineComponentType.Base ] = new List<gp_Trsf>();
+			m_FrameTransformMap[ MachineComponentType.XAxis ] = new List<gp_Trsf>();
+			m_FrameTransformMap[ MachineComponentType.YAxis ] = new List<gp_Trsf>();
+			m_FrameTransformMap[ MachineComponentType.ZAxis ] = new List<gp_Trsf>();
+			m_FrameTransformMap[ MachineComponentType.Master ] = new List<gp_Trsf>();
+			m_FrameTransformMap[ MachineComponentType.Slave ] = new List<gp_Trsf>();
+			m_FrameTransformMap[ MachineComponentType.Tool ] = new List<gp_Trsf>();
+			m_FrameTransformMap[ MachineComponentType.WorkPiece ] = new List<gp_Trsf>();
+
+			// init frame collision map
+			m_FrameCollisionMap[ MachineComponentType.Base ] = new List<bool>();
+			m_FrameCollisionMap[ MachineComponentType.XAxis ] = new List<bool>();
+			m_FrameCollisionMap[ MachineComponentType.YAxis ] = new List<bool>();
+			m_FrameCollisionMap[ MachineComponentType.ZAxis ] = new List<bool>();
+			m_FrameCollisionMap[ MachineComponentType.Master ] = new List<bool>();
+			m_FrameCollisionMap[ MachineComponentType.Slave ] = new List<bool>();
+			m_FrameCollisionMap[ MachineComponentType.Tool ] = new List<bool>();
+			m_FrameCollisionMap[ MachineComponentType.WorkPiece ] = new List<bool>();
 		}
 
 		// data manager
@@ -51,11 +66,15 @@ namespace MyCAM.Editor
 		ViewManager m_ViewManager;
 
 		// simulation properties
+		PostSolver m_PostSolver;
+		FCLTest m_FCLTest;
 		HashSet<MachineComponentType> m_WorkPieceChainSet = new HashSet<MachineComponentType>();
 		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
 		Dictionary<MachineComponentType, AIS_InteractiveObject> m_MachineShapeMap = new Dictionary<MachineComponentType, AIS_InteractiveObject>();
-		PostSolver m_PostSolver;
-		List<PostData> m_SimuPostData;
+		Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
+		Dictionary<MachineComponentType, List<bool>> m_FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
+		int m_FrameCount = 0;
+		int m_CurrentFrameIndex = 0;
 
 		// editor
 		public void EditStart()
@@ -96,159 +115,155 @@ namespace MyCAM.Editor
 				return;
 			}
 			CAMData camData = m_CADManager.GetCAMDataList()[ 0 ];
-			m_PostSolver.Solve( camData, out _, out m_SimuPostData );
+			gp_Vec G54Offset = new gp_Vec( 40, -385, -640 );
+			m_PostSolver.G54Offset = G54Offset;
+			m_PostSolver.Solve( camData, out _, out List<PostData> simuPostData );
+
+			// build frame by frame
+			foreach( var postData in simuPostData ) {
+
+				// set XYZ transform
+				Dictionary<MachineComponentType, gp_Trsf> transformMap = new Dictionary<MachineComponentType, gp_Trsf>();
+				gp_Trsf trsfX = new gp_Trsf();
+				trsfX.SetTranslation( new gp_Vec( postData.X + G54Offset.X(), 0, 0 ) );
+				if( m_WorkPieceChainSet.Contains( MachineComponentType.XAxis ) ) {
+					trsfX.Invert();
+				}
+				transformMap[ MachineComponentType.XAxis ] = trsfX;
+
+				gp_Trsf trsfY = new gp_Trsf();
+				trsfY.SetTranslation( new gp_Vec( 0, postData.Y + G54Offset.Y(), 0 ) );
+				if( m_WorkPieceChainSet.Contains( MachineComponentType.YAxis ) ) {
+					trsfY.Invert();
+				}
+				transformMap[ MachineComponentType.YAxis ] = trsfY;
+
+				gp_Trsf trsfZ = new gp_Trsf();
+				trsfZ.SetTranslation( new gp_Vec( 0, 0, postData.Z + G54Offset.Z() ) );
+				if( m_WorkPieceChainSet.Contains( MachineComponentType.ZAxis ) ) {
+					trsfZ.Invert();
+				}
+				transformMap[ MachineComponentType.ZAxis ] = trsfZ;
+
+				// set master rotation
+				gp_Pnt ptOnMaster = m_PostSolver.RotaryAxisSolver.PtOnMaster;
+				gp_Ax1 axisMaster = new gp_Ax1( ptOnMaster, m_PostSolver.RotaryAxisSolver.MasterRotateDir );
+				gp_Trsf trsfMaster = new gp_Trsf();
+				trsfMaster.SetRotation( axisMaster, postData.Master );
+				if( m_WorkPieceChainSet.Contains( MachineComponentType.Master ) ) {
+					trsfMaster.Invert();
+				}
+				transformMap[ MachineComponentType.Master ] = trsfMaster;
+
+				// set slave rotation
+				gp_Pnt ptOnSlave = m_PostSolver.RotaryAxisSolver.PtOnSlave;
+				gp_Ax1 axisSlave = new gp_Ax1( ptOnSlave, m_PostSolver.RotaryAxisSolver.SlaveRotateDir );
+				gp_Trsf trsfSlave = new gp_Trsf();
+				trsfSlave.SetRotation( axisSlave, postData.Slave );
+				if( m_WorkPieceChainSet.Contains( MachineComponentType.Slave ) ) {
+					trsfSlave.Invert();
+				}
+				transformMap[ MachineComponentType.Slave ] = trsfSlave;
+
+				// set tool and workpiece transform
+				transformMap[ MachineComponentType.Tool ] = new gp_Trsf();
+				gp_Trsf trsfWorkPiece = new gp_Trsf();
+				trsfWorkPiece.SetTranslation( G54Offset );
+				transformMap[ MachineComponentType.WorkPiece ] = trsfWorkPiece;
+
+				// set chain
+				gp_Trsf trsfAllX = GetComponentTrsf( transformMap, MachineComponentType.XAxis );
+				gp_Trsf trsfAllY = GetComponentTrsf( transformMap, MachineComponentType.YAxis );
+				gp_Trsf trsfAllZ = GetComponentTrsf( transformMap, MachineComponentType.ZAxis );
+				gp_Trsf trsfAllMaster = GetComponentTrsf( transformMap, MachineComponentType.Master );
+				gp_Trsf trsfAllSlave = GetComponentTrsf( transformMap, MachineComponentType.Slave );
+				gp_Trsf trsAllfTool = GetComponentTrsf( transformMap, MachineComponentType.Tool );
+				gp_Trsf trsfAllWorkPiece = GetComponentTrsf( transformMap, MachineComponentType.WorkPiece );
+				m_FrameTransformMap[ MachineComponentType.XAxis ].Add( trsfAllX );
+				m_FrameTransformMap[ MachineComponentType.YAxis ].Add( trsfAllY );
+				m_FrameTransformMap[ MachineComponentType.ZAxis ].Add( trsfAllZ );
+				m_FrameTransformMap[ MachineComponentType.Master ].Add( trsfAllMaster );
+				m_FrameTransformMap[ MachineComponentType.Slave ].Add( trsfAllSlave );
+				m_FrameTransformMap[ MachineComponentType.Tool ].Add( trsAllfTool );
+				m_FrameTransformMap[ MachineComponentType.WorkPiece ].Add( trsfAllWorkPiece );
+
+				// set collision
+				HashSet<MachineComponentType> collisionResiltSet = new HashSet<MachineComponentType>();
+				foreach( var compT in m_ChainListMap[ MachineComponentType.Tool ] ) {
+					if( compT == MachineComponentType.Base ) {
+						continue; // skip base
+					}
+					foreach( var compW in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
+						if( compW == MachineComponentType.Base ) {
+							continue; // skip base
+						}
+						if( m_FCLTest.CheckCollision( compT.ToString(), compW.ToString(),
+							ConvertTransform( m_FrameTransformMap[ compT ].Last() ),
+							ConvertTransform( m_FrameTransformMap[ compW ].Last() ) ) ) {
+							collisionResiltSet.Add( compT );
+							collisionResiltSet.Add( compW );
+						}
+					}
+				}
+				m_FrameCollisionMap[ MachineComponentType.XAxis ].Add( collisionResiltSet.Contains( MachineComponentType.XAxis ) );
+				m_FrameCollisionMap[ MachineComponentType.YAxis ].Add( collisionResiltSet.Contains( MachineComponentType.YAxis ) );
+				m_FrameCollisionMap[ MachineComponentType.ZAxis ].Add( collisionResiltSet.Contains( MachineComponentType.ZAxis ) );
+				m_FrameCollisionMap[ MachineComponentType.Master ].Add( collisionResiltSet.Contains( MachineComponentType.Master ) );
+				m_FrameCollisionMap[ MachineComponentType.Slave ].Add( collisionResiltSet.Contains( MachineComponentType.Slave ) );
+
+				m_FrameCount++;
+			}
+		}
+
+		gp_Trsf GetComponentTrsf( Dictionary<MachineComponentType, gp_Trsf> transformMap, MachineComponentType type )
+		{
+			gp_Trsf trsf = new gp_Trsf();
+			foreach( var parent in m_ChainListMap[ type ] ) {
+				if( parent == MachineComponentType.Base ) {
+					continue; // base is not transformed
+				}
+				if( transformMap.ContainsKey( parent ) ) {
+					trsf.Multiply( transformMap[ parent ] );
+				}
+			}
+			trsf.Multiply( transformMap[ type ] );
+			return trsf;
 		}
 
 		void RefreshFrame()
 		{
-			if( m_SimuPostData == null ) {
+			if( m_FrameCount == 0 ) {
 				return;
 			}
 			if( m_CurrentFrameIndex < 0 ) {
-				m_CurrentFrameIndex = m_SimuPostData.Count - 1;
+				m_CurrentFrameIndex = m_FrameCount - 1;
 			}
-			if( m_CurrentFrameIndex >= m_SimuPostData.Count ) {
+			if( m_CurrentFrameIndex >= m_FrameCount ) {
 				m_CurrentFrameIndex = 0;
 			}
 
-			double G54X = 40;
-			double G54Y = -385;
-			double G54Z = -660;
+			// refresh position
+			m_MachineShapeMap[ MachineComponentType.XAxis ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.XAxis ][ m_CurrentFrameIndex ] );
+			m_MachineShapeMap[ MachineComponentType.YAxis ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.YAxis ][ m_CurrentFrameIndex ] );
+			m_MachineShapeMap[ MachineComponentType.ZAxis ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.ZAxis ][ m_CurrentFrameIndex ] );
+			m_MachineShapeMap[ MachineComponentType.Master ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.Master ][ m_CurrentFrameIndex ] );
+			m_MachineShapeMap[ MachineComponentType.Slave ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.Slave ][ m_CurrentFrameIndex ] );
+			m_MachineShapeMap[ MachineComponentType.Tool ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.Tool ][ m_CurrentFrameIndex ] );
+			m_MachineShapeMap[ MachineComponentType.WorkPiece ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ] );
 
-			// gaet the post data
-			PostData postData = m_SimuPostData[ m_CurrentFrameIndex ];
-
-			// set XYZ transform
-			Dictionary<MachineComponentType, gp_Trsf> transformMap = new Dictionary<MachineComponentType, gp_Trsf>();
-			gp_Trsf trsfX = new gp_Trsf();
-			trsfX.SetTranslation( new gp_Vec( postData.X + G54X, 0, 0 ) );
-			if( m_WorkPieceChainSet.Contains( MachineComponentType.XAxis ) ) {
-				trsfX.Invert();
-			}
-			transformMap[ MachineComponentType.XAxis ] = trsfX;
-
-			gp_Trsf trsfY = new gp_Trsf();
-			trsfY.SetTranslation( new gp_Vec( 0, postData.Y + G54Y, 0 ) );
-			if( m_WorkPieceChainSet.Contains( MachineComponentType.YAxis ) ) {
-				trsfY.Invert();
-			}
-			transformMap[ MachineComponentType.YAxis ] = trsfY;
-
-			gp_Trsf trsfZ = new gp_Trsf();
-			trsfZ.SetTranslation( new gp_Vec( 0, 0, postData.Z + G54Z ) );
-			if( m_WorkPieceChainSet.Contains( MachineComponentType.ZAxis ) ) {
-				trsfZ.Invert();
-			}
-			transformMap[ MachineComponentType.ZAxis ] = trsfZ;
-
-			// set master rotation
-			gp_Pnt ptOnMaster = m_PostSolver.RotaryAxisSolver.PtOnMaster;
-			gp_Ax1 axisMaster = new gp_Ax1( ptOnMaster, m_PostSolver.RotaryAxisSolver.MasterRotateDir );
-			gp_Trsf trsfMaster = new gp_Trsf();
-			trsfMaster.SetRotation( axisMaster, postData.Master );
-			if( m_WorkPieceChainSet.Contains( MachineComponentType.Master ) ) {
-				trsfMaster.Invert();
-			}
-			transformMap[ MachineComponentType.Master ] = trsfMaster;
-
-			// set slave rotation
-			gp_Pnt ptOnSlave = m_PostSolver.RotaryAxisSolver.PtOnSlave;
-			gp_Ax1 axisSlave = new gp_Ax1( ptOnSlave, m_PostSolver.RotaryAxisSolver.SlaveRotateDir );
-			gp_Trsf trsfSlave = new gp_Trsf();
-			trsfSlave.SetRotation( axisSlave, postData.Slave );
-			if( m_WorkPieceChainSet.Contains( MachineComponentType.Slave ) ) {
-				trsfSlave.Invert();
-			}
-			transformMap[ MachineComponentType.Slave ] = trsfSlave;
-
-			// set chain
-			gp_Trsf trsfAllX = new gp_Trsf();
-			foreach( var parent in m_ChainListMap[ MachineComponentType.XAxis ] ) {
-				if( parent == MachineComponentType.Base ) {
-					continue; // base is not transformed
-				}
-				if( transformMap.ContainsKey( parent ) ) {
-					trsfAllX.Multiply( transformMap[ parent ] );
-				}
-			}
-			trsfAllX.Multiply( trsfX );
-			m_MachineShapeMap[ MachineComponentType.XAxis ].SetLocalTransformation( trsfAllX );
-
-			gp_Trsf trsfAllY = new gp_Trsf();
-			foreach( var parent in m_ChainListMap[ MachineComponentType.YAxis ] ) {
-				if( parent == MachineComponentType.Base ) {
-					continue; // base is not transformed
-				}
-				if( transformMap.ContainsKey( parent ) ) {
-					trsfAllY.Multiply( transformMap[ parent ] );
-				}
-			}
-			trsfAllY.Multiply( trsfY );
-			m_MachineShapeMap[ MachineComponentType.YAxis ].SetLocalTransformation( trsfAllY );
-
-			gp_Trsf trsfAllZ = new gp_Trsf();
-			foreach( var parent in m_ChainListMap[ MachineComponentType.ZAxis ] ) {
-				if( parent == MachineComponentType.Base ) {
-					continue; // base is not transformed
-				}
-				if( transformMap.ContainsKey( parent ) ) {
-					trsfAllZ.Multiply( transformMap[ parent ] );
-				}
-			}
-			trsfAllZ.Multiply( trsfZ );
-			m_MachineShapeMap[ MachineComponentType.ZAxis ].SetLocalTransformation( trsfAllZ );
-
-			gp_Trsf trsfAllMaster = new gp_Trsf();
-			foreach( var parent in m_ChainListMap[ MachineComponentType.Master ] ) {
-				if( parent == MachineComponentType.Base ) {
-					continue; // base is not transformed
-				}
-				if( transformMap.ContainsKey( parent ) ) {
-					trsfAllMaster.Multiply( transformMap[ parent ] );
-				}
-			}
-			trsfAllMaster.Multiply( trsfMaster );
-			m_MachineShapeMap[ MachineComponentType.Master ].SetLocalTransformation( trsfAllMaster );
-
-			gp_Trsf trsfAllSlave = new gp_Trsf();
-			foreach( var parent in m_ChainListMap[ MachineComponentType.Slave ] ) {
-				if( parent == MachineComponentType.Base ) {
-					continue; // base is not transformed
-				}
-				if( transformMap.ContainsKey( parent ) ) {
-					trsfAllSlave.Multiply( transformMap[ parent ] );
-				}
-			}
-			trsfAllSlave.Multiply( trsfSlave );
-			m_MachineShapeMap[ MachineComponentType.Slave ].SetLocalTransformation( trsfAllSlave );
-
-			// display tool
-			gp_Trsf trsfTool = new gp_Trsf();
-			foreach( var parent in m_ChainListMap[ MachineComponentType.Tool ] ) {
-				if( parent == MachineComponentType.Base ) {
-					continue; // base is not transformed
-				}
-				if( transformMap.ContainsKey( parent ) ) {
-					trsfTool.Multiply( transformMap[ parent ] );
-				}
-			}
-			m_MachineShapeMap[ MachineComponentType.Tool ].SetLocalTransformation( trsfTool );
-
-			// display workpiece
-			gp_Trsf trsfWorkPiece = new gp_Trsf();
-			foreach( var parent in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
-				if( parent == MachineComponentType.Base ) {
-					continue; // base is not transformed
-				}
-				if( transformMap.ContainsKey( parent ) ) {
-					trsfWorkPiece.Multiply( transformMap[ parent ] );
-				}
-			}
-			gp_Trsf trsfG54 = new gp_Trsf();
-			trsfG54.SetTranslation( new gp_Vec( G54X, G54Y, G54Z ) );
-			trsfWorkPiece.Multiply( trsfG54 );
-			m_MachineShapeMap[ MachineComponentType.WorkPiece ].SetLocalTransformation( trsfWorkPiece );
+			// refresh color
+			RefreshComponentColor( MachineComponentType.XAxis );
+			RefreshComponentColor( MachineComponentType.YAxis );
+			RefreshComponentColor( MachineComponentType.ZAxis );
+			RefreshComponentColor( MachineComponentType.Master );
+			RefreshComponentColor( MachineComponentType.Slave );
 			m_Viewer.UpdateView();
+		}
+
+		void RefreshComponentColor( MachineComponentType type )
+		{
+			SetMeshColor( m_MachineShapeMap[ type ] as AIS_Triangulation, type, m_FrameCollisionMap[ type ][ m_CurrentFrameIndex ] );
+			m_Viewer.GetAISContext().Redisplay( m_MachineShapeMap[ type ], false );
 		}
 
 		// TODO: read machine data from file
@@ -264,24 +279,36 @@ namespace MyCAM.Editor
 			Poly_Triangulation shapeSlave = RWStl.ReadFile( szFolderName + "\\Slave.stl" );
 
 			m_MachineShapeMap.Clear();
-			AIS_Triangulation baseAIS = CreateMeshAIS( shapeBase, Quantity_NameOfColor.Quantity_NOC_GRAY );
+			AIS_Triangulation baseAIS = CreateMeshAIS( shapeBase, MachineComponentType.Base );
 			m_Viewer.GetAISContext().Display( baseAIS, false );
 			m_MachineShapeMap[ MachineComponentType.Base ] = baseAIS;
-			AIS_Triangulation xAIS = CreateMeshAIS( shapeX, Quantity_NameOfColor.Quantity_NOC_PINK );
+			AIS_Triangulation xAIS = CreateMeshAIS( shapeX, MachineComponentType.XAxis );
 			m_Viewer.GetAISContext().Display( xAIS, false );
 			m_MachineShapeMap[ MachineComponentType.XAxis ] = xAIS;
-			AIS_Triangulation yAIS = CreateMeshAIS( shapeY, Quantity_NameOfColor.Quantity_NOC_GREEN );
+			AIS_Triangulation yAIS = CreateMeshAIS( shapeY, MachineComponentType.YAxis );
 			m_Viewer.GetAISContext().Display( yAIS, false );
 			m_MachineShapeMap[ MachineComponentType.YAxis ] = yAIS;
-			AIS_Triangulation zAIS = CreateMeshAIS( shapeZ, Quantity_NameOfColor.Quantity_NOC_BLUE );
+			AIS_Triangulation zAIS = CreateMeshAIS( shapeZ, MachineComponentType.ZAxis );
 			m_Viewer.GetAISContext().Display( zAIS, false );
 			m_MachineShapeMap[ MachineComponentType.ZAxis ] = zAIS;
-			AIS_Triangulation masterAIS = CreateMeshAIS( shapeMaster, Quantity_NameOfColor.Quantity_NOC_YELLOW );
+			AIS_Triangulation masterAIS = CreateMeshAIS( shapeMaster, MachineComponentType.Master );
 			m_Viewer.GetAISContext().Display( masterAIS, false );
 			m_MachineShapeMap[ MachineComponentType.Master ] = masterAIS;
-			AIS_Triangulation slaveAIS = CreateMeshAIS( shapeSlave, Quantity_NameOfColor.Quantity_NOC_PURPLE );
+			AIS_Triangulation slaveAIS = CreateMeshAIS( shapeSlave, MachineComponentType.Slave );
 			m_Viewer.GetAISContext().Display( slaveAIS, false );
 			m_MachineShapeMap[ MachineComponentType.Slave ] = slaveAIS;
+
+			m_FCLTest = new FCLTest();
+			MeshShape( shapeX, out List<double> vertexListX, out List<int> indexListX );
+			m_FCLTest.AddModel( MachineComponentType.XAxis.ToString(), indexListX.ToArray(), vertexListX.ToArray() );
+			MeshShape( shapeY, out List<double> vertexListY, out List<int> indexListY );
+			m_FCLTest.AddModel( MachineComponentType.YAxis.ToString(), indexListY.ToArray(), vertexListY.ToArray() );
+			MeshShape( shapeZ, out List<double> vertexListZ, out List<int> indexListZ );
+			m_FCLTest.AddModel( MachineComponentType.ZAxis.ToString(), indexListZ.ToArray(), vertexListZ.ToArray() );
+			MeshShape( shapeMaster, out List<double> vertexListMaster, out List<int> indexListMaster );
+			m_FCLTest.AddModel( MachineComponentType.Master.ToString(), indexListMaster.ToArray(), vertexListMaster.ToArray() );
+			MeshShape( shapeSlave, out List<double> vertexListSlave, out List<int> indexListSlave );
+			m_FCLTest.AddModel( MachineComponentType.Slave.ToString(), indexListSlave.ToArray(), vertexListSlave.ToArray() );
 
 			// make tool
 			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 0.2, 1 );
@@ -295,16 +322,52 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Tool ], false );
 
 			// make workpiece
-			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 1 ] ].AISHandle as AIS_Shape;
+			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 0 ] ].AISHandle as AIS_Shape;
 			m_Viewer.UpdateView();
 		}
 
-		AIS_Triangulation CreateMeshAIS( Poly_Triangulation mesh, Quantity_NameOfColor colorName )
+		AIS_Triangulation CreateMeshAIS( Poly_Triangulation mesh, MachineComponentType type )
 		{
 			AIS_Triangulation resultAIS = new AIS_Triangulation( mesh );
 
+			// set material aspect, this matter since the default material gives wrong color effect
+			Graphic3d_MaterialAspect baseAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_UserDefined );
+			resultAIS.SetMaterial( baseAspect );
+
+			// set color
+			SetMeshColor( resultAIS, type, false );
+			return resultAIS;
+		}
+
+		void SetMeshColor( AIS_Triangulation meshAIS, MachineComponentType type, bool isCollision )
+		{
 			// get color rgb
-			Quantity_Color color = new Quantity_Color( colorName );
+			Quantity_Color color;
+			if( isCollision ) {
+				color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED );
+			}
+			else {
+				switch( type ) {
+					case MachineComponentType.XAxis:
+						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PINK );
+						break;
+					case MachineComponentType.YAxis:
+						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN );
+						break;
+					case MachineComponentType.ZAxis:
+						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE );
+						break;
+					case MachineComponentType.Master:
+						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_YELLOW );
+						break;
+					case MachineComponentType.Slave:
+						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE );
+						break;
+					default:
+						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY );
+						break;
+				}
+			}
 			int R = (int)( color.Red() * 255 );
 			int G = (int)( color.Green() * 255 );
 			int B = (int)( color.Blue() * 255 );
@@ -312,13 +375,8 @@ namespace MyCAM.Editor
 			int colorValue = ( alpha << 24 ) | ( B << 16 ) | ( G << 8 ) | R;
 
 			// set mesh color
-			TColStd_HArray1OfInteger colorArray = new TColStd_HArray1OfInteger( 1, mesh.NbNodes(), colorValue );
-			resultAIS.SetColors( colorArray );
-
-			// set material aspect, this matter since the default material gives wrong color effect
-			Graphic3d_MaterialAspect baseAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_UserDefined );
-			resultAIS.SetMaterial( baseAspect );
-			return resultAIS;
+			TColStd_HArray1OfInteger colorArray = new TColStd_HArray1OfInteger( 1, meshAIS.GetTriangulation().NbNodes(), colorValue );
+			meshAIS.SetColors( colorArray );
 		}
 
 		void ReadSpindleTest()
@@ -458,166 +516,31 @@ namespace MyCAM.Editor
 			}
 		}
 
-		// this is a temp function to test load stl
-		void TestLoadSTL()
-		{
-			Poly_Triangulation tri = RWStl.ReadFile( "Slave.stl" );
-			AIS_Triangulation triAIS = new AIS_Triangulation( tri );
-			m_Viewer.GetAISContext().Display( triAIS, true );
-			m_Viewer.UpdateView();
-		}
-
-		// this is a temp function to test collision detection using bullet tool
-		void TestColDet()
-		{
-			// create a box as shapeA
-			BRepPrimAPI_MakeBox boxMaker = new BRepPrimAPI_MakeBox( new gp_Pnt( -50, -50, -50 ), 100, 100, 100 );
-			TopoDS_Shape shapeA = boxMaker.Shape();
-			AIS_Shape m_ShapeA = new AIS_Shape( shapeA );
-			m_ShapeA.SetColor( COLOR_DEFAULT );
-			m_ShapeA.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			//m_ShapeA.SetTransparency( 0.5 );
-			m_Viewer.GetAISContext().Display( m_ShapeA, true );
-			MeshShape( shapeA, out List<double> vertexListA, out List<int> indexListA );
-
-			// create a sphere as shapeB
-			BRepPrimAPI_MakeSphere sphereMaker = new BRepPrimAPI_MakeSphere( new gp_Pnt( 0, 0, 0 ), 50 );
-			TopoDS_Shape shapeB = sphereMaker.Shape();
-			AIS_Shape m_ShapeB = new AIS_Shape( shapeB );
-			m_ShapeB.SetColor( COLOR_DEFAULT );
-			m_ShapeB.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			//m_ShapeB.SetTransparency( 0.5 );
-			m_Viewer.GetAISContext().Display( m_ShapeB, true );
-			MeshShape( shapeB, out List<double> vertexListB, out List<int> indexListB );
-
-			// create a cylinder as shapeC
-			BRepPrimAPI_MakeCylinder cylinderMaker = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -300 ), new gp_Dir( 0, 0, 1 ) ), 50, 600 );
-			TopoDS_Shape shapeC = cylinderMaker.Shape();
-			AIS_Shape m_ShapeC = new AIS_Shape( shapeC );
-			m_ShapeC.SetColor( COLOR_DEFAULT );
-			m_ShapeC.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_ShapeC.SetTransparency( 0.5 );
-			m_Viewer.GetAISContext().Display( m_ShapeC, true );
-			MeshShape( shapeC, out List<double> vertexListC, out List<int> indexListC );
-
-			// create list of trsf presenting shape position on each frame
-			const int frameCount = 20;
-			List<gp_Trsf> trsfAList = new List<gp_Trsf>();
-			List<gp_Trsf> trsfBList = new List<gp_Trsf>();
-			List<gp_Trsf> trsfCList = new List<gp_Trsf>();
-			for( int i = 0; i <= frameCount; i++ ) {
-				double pos = -300 + i * 30;
-				gp_Trsf trsfA = new gp_Trsf();
-				trsfA.SetTranslation( new gp_Vec( -75, 300, 0 ) );
-				trsfAList.Add( trsfA );
-				gp_Trsf trsfB = new gp_Trsf();
-				trsfB.SetTranslation( new gp_Vec( 75, -300, 0 ) );
-				trsfBList.Add( trsfB );
-				gp_Trsf trsfC = new gp_Trsf();
-				gp_Quaternion quat = new gp_Quaternion( new gp_Vec( 1, 0, 0 ), Math.PI * i / frameCount );
-				trsfC.SetRotationPart( quat );
-				trsfC.SetTranslationPart( new gp_Vec( pos, 0, 0 ) );
-				trsfCList.Add( trsfC );
-			}
-
-			// create collision detection tool
-			FCLTest fclTest = new FCLTest();
-			fclTest.AddModel( "ShapeA", indexListA.ToArray(), vertexListA.ToArray() );
-			fclTest.AddModel( "ShapeB", indexListB.ToArray(), vertexListB.ToArray() );
-			fclTest.AddModel( "ShapeC", indexListC.ToArray(), vertexListC.ToArray() );
-
-			// check collision at each frame
-			List<bool> colDetA = new List<bool>();
-			List<bool> colDetB = new List<bool>();
-			List<bool> colDetC = new List<bool>();
-			for( int i = 0; i < frameCount; i++ ) {
-
-				// check collision
-				bool bColAB = fclTest.CheckCollision( "ShapeA", "ShapeB", ConvertTransform( trsfAList[ i ] ), ConvertTransform( trsfBList[ i ] ) );
-				bool bColAC = fclTest.CheckCollision( "ShapeA", "ShapeC", ConvertTransform( trsfAList[ i ] ), ConvertTransform( trsfCList[ i ] ) );
-				bool bColBC = fclTest.CheckCollision( "ShapeB", "ShapeC", ConvertTransform( trsfBList[ i ] ), ConvertTransform( trsfCList[ i ] ) );
-				colDetA.Add( bColAB || bColAC );
-				colDetB.Add( bColAB || bColBC );
-				colDetC.Add( bColAC || bColBC );
-			}
-
-			// simulate frame by frame
-			m_Viewer.TopView();
-			m_Viewer.KeyDown += ( e ) =>
-			{
-				if( e.KeyCode == Keys.Up || e.KeyCode == Keys.Down ) {
-					if( e.KeyCode == Keys.Down ) {
-						m_FrameIndex++;
-						if( m_FrameIndex >= frameCount ) {
-							m_FrameIndex = 0;
-						}
-					}
-					else if( e.KeyCode == Keys.Up ) {
-						m_FrameIndex--;
-						if( m_FrameIndex < 0 ) {
-							m_FrameIndex = frameCount - 1;
-						}
-					}
-
-					// apply transformation to shapes
-					m_ShapeA.SetLocalTransformation( trsfAList[ m_FrameIndex ] );
-					m_ShapeB.SetLocalTransformation( trsfBList[ m_FrameIndex ] );
-					m_ShapeC.SetLocalTransformation( trsfCList[ m_FrameIndex ] );
-
-					// show color to indicate collision
-					m_ShapeA.SetColor( colDetA[ m_FrameIndex ] ? COLOR_COLDET : COLOR_DEFAULT );
-					m_ShapeB.SetColor( colDetB[ m_FrameIndex ] ? COLOR_COLDET : COLOR_DEFAULT );
-					m_ShapeC.SetColor( colDetC[ m_FrameIndex ] ? COLOR_COLDET : COLOR_DEFAULT );
-					m_Viewer.UpdateView();
-				}
-			};
-		}
-		int m_FrameIndex = 0;
-		readonly Quantity_Color COLOR_COLDET = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED );
-		readonly Quantity_Color COLOR_DEFAULT = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE );
-
-		void MeshShape( TopoDS_Shape shape, out List<double> vertexList, out List<int> indexList )
+		void MeshShape( Poly_Triangulation tri, out List<double> vertexList, out List<int> indexList )
 		{
 			vertexList = new List<double>();
 			indexList = new List<int>();
 
-			// mesh the shape
-			BRepMesh_IncrementalMesh meshMaker = new BRepMesh_IncrementalMesh( shape, 0.1 );
-			meshMaker.Perform();
-			if( !meshMaker.IsDone() ) {
-				MessageBox.Show( "Error: Mesh shape failed." );
-				return;
+			// vertex
+			for( int i = 1; i <= tri.NbNodes(); i++ ) {
+				gp_Pnt p = tri.Node( i );
+				vertexList.Add( p.X() );
+				vertexList.Add( p.Y() );
+				vertexList.Add( p.Z() );
 			}
 
-			// get the mesh data
-			TopExp_Explorer faceExp = new TopExp_Explorer( shape, TopAbs_ShapeEnum.TopAbs_FACE );
-			while( faceExp.More() ) {
-				TopoDS_Face face = TopoDS.ToFace( faceExp.Current() );
-				int startIndexOfFace = vertexList.Count / 3;
-
-				// get triangulation data
-				TopLoc_Location loc = new TopLoc_Location();
-				Poly_Triangulation tri = BRep_Tool.Triangulation( face, ref loc );
-				for( int i = 1; i <= tri.NbNodes(); i++ ) {
-					gp_Pnt p = tri.Node( i );
-					vertexList.Add( p.X() );
-					vertexList.Add( p.Y() );
-					vertexList.Add( p.Z() );
-				}
-
-				// the start vertex index of this face
-				for( int i = 1; i <= tri.NbTriangles(); i++ ) {
-					Poly_Triangle triangle = tri.Triangle( i );
-					int index1 = 0;
-					int index2 = 0;
-					int index3 = 0;
-					triangle.Get( ref index1, ref index2, ref index3 );
-					indexList.Add( startIndexOfFace + index1 - 1 ); // convert to zero-based index
-					indexList.Add( startIndexOfFace + index2 - 1 );
-					indexList.Add( startIndexOfFace + index3 - 1 );
-				}
-				faceExp.Next();
+			// index
+			for( int i = 1; i <= tri.NbTriangles(); i++ ) {
+				Poly_Triangle triangle = tri.Triangle( i );
+				int index1 = 0;
+				int index2 = 0;
+				int index3 = 0;
+				triangle.Get( ref index1, ref index2, ref index3 );
+				indexList.Add( index1 - 1 ); // convert to zero-based index
+				indexList.Add( index2 - 1 );
+				indexList.Add( index3 - 1 );
 			}
+
 		}
 
 		double[] ConvertTransform( gp_Trsf trsf )
@@ -659,11 +582,11 @@ namespace MyCAM.Editor
 
 			// refresh frame
 			if( e.KeyCode == Keys.Down ) {
-				m_CurrentFrameIndex += 2;
+				m_CurrentFrameIndex += 1;
 				RefreshFrame();
 			}
 			if( e.KeyCode == Keys.Up ) {
-				m_CurrentFrameIndex -= 2;
+				m_CurrentFrameIndex -= 1;
 				RefreshFrame();
 			}
 
@@ -673,6 +596,5 @@ namespace MyCAM.Editor
 				writer.Convert();
 			}
 		}
-		int m_CurrentFrameIndex = 0;
 	}
 }
