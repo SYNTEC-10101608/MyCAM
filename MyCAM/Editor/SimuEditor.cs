@@ -6,10 +6,11 @@ using OCC.BRepAlgoAPI;
 using OCC.BRepMesh;
 using OCC.BRepPrimAPI;
 using OCC.gp;
+using OCC.Graphic3d;
 using OCC.Poly;
 using OCC.Quantity;
 using OCC.RWStl;
-using OCC.STEPControl;
+using OCC.TColStd;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopLoc;
@@ -52,7 +53,7 @@ namespace MyCAM.Editor
 		// simulation properties
 		HashSet<MachineComponentType> m_WorkPieceChainSet = new HashSet<MachineComponentType>();
 		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
-		Dictionary<MachineComponentType, AIS_Shape> m_MachineShapeMap = new Dictionary<MachineComponentType, AIS_Shape>();
+		Dictionary<MachineComponentType, AIS_InteractiveObject> m_MachineShapeMap = new Dictionary<MachineComponentType, AIS_InteractiveObject>();
 		PostSolver m_PostSolver;
 		List<PostData> m_SimuPostData;
 
@@ -110,9 +111,9 @@ namespace MyCAM.Editor
 				m_CurrentFrameIndex = 0;
 			}
 
-			double G54X = 0;
-			double G54Y = 0;
-			double G54Z = 100;
+			double G54X = 40;
+			double G54Y = -385;
+			double G54Z = -660;
 
 			// gaet the post data
 			PostData postData = m_SimuPostData[ m_CurrentFrameIndex ];
@@ -253,77 +254,71 @@ namespace MyCAM.Editor
 		// TODO: read machine data from file
 		void ReadMachineData( string szFolderName )
 		{
-			ReadSpindleTest();
+			ReadMixTest();
 
-			// TODO: we can read any type of 3D file, including stl
-			STEPControl_Reader readerBase = new STEPControl_Reader();
-			readerBase.ReadFile( szFolderName + "\\Base.stp" );
-			readerBase.TransferRoots();
-			TopoDS_Shape shapeBase = readerBase.OneShape();
-			STEPControl_Reader readerX = new STEPControl_Reader();
-			readerX.ReadFile( szFolderName + "\\X.stp" );
-			readerX.TransferRoots();
-			TopoDS_Shape shapeX = readerX.OneShape();
-			STEPControl_Reader readerY = new STEPControl_Reader();
-			readerY.ReadFile( szFolderName + "\\Y.stp" );
-			readerY.TransferRoots();
-			TopoDS_Shape shapeY = readerY.OneShape();
-			STEPControl_Reader readerZ = new STEPControl_Reader();
-			readerZ.ReadFile( szFolderName + "\\Z.stp" );
-			readerZ.TransferRoots();
-			TopoDS_Shape shapeZ = readerZ.OneShape();
-			STEPControl_Reader readerMaster = new STEPControl_Reader();
-			readerMaster.ReadFile( szFolderName + "\\Master.stp" );
-			readerMaster.TransferRoots();
-			TopoDS_Shape shapeMaster = readerMaster.OneShape();
-			STEPControl_Reader readerSlave = new STEPControl_Reader();
-			readerSlave.ReadFile( szFolderName + "\\Slave.stp" );
-			readerSlave.TransferRoots();
-			TopoDS_Shape shapeSlave = readerSlave.OneShape();
+			Poly_Triangulation shapeBase = RWStl.ReadFile( szFolderName + "\\Base.stl" );
+			Poly_Triangulation shapeX = RWStl.ReadFile( szFolderName + "\\X.stl" );
+			Poly_Triangulation shapeY = RWStl.ReadFile( szFolderName + "\\Y.stl" );
+			Poly_Triangulation shapeZ = RWStl.ReadFile( szFolderName + "\\Z.stl" );
+			Poly_Triangulation shapeMaster = RWStl.ReadFile( szFolderName + "\\Master.stl" );
+			Poly_Triangulation shapeSlave = RWStl.ReadFile( szFolderName + "\\Slave.stl" );
+
 			m_MachineShapeMap.Clear();
-			AIS_Shape baseAIS = new AIS_Shape( shapeBase );
-			baseAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			baseAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			//m_Viewer.GetAISContext().Display( baseAIS, false );
+			AIS_Triangulation baseAIS = CreateMeshAIS( shapeBase, Quantity_NameOfColor.Quantity_NOC_GRAY );
+			m_Viewer.GetAISContext().Display( baseAIS, false );
 			m_MachineShapeMap[ MachineComponentType.Base ] = baseAIS;
-			AIS_Shape xAIS = new AIS_Shape( shapeX );
-			xAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			xAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_HOTPINK ) );
+			AIS_Triangulation xAIS = CreateMeshAIS( shapeX, Quantity_NameOfColor.Quantity_NOC_PINK );
 			m_Viewer.GetAISContext().Display( xAIS, false );
 			m_MachineShapeMap[ MachineComponentType.XAxis ] = xAIS;
-			AIS_Shape yAIS = new AIS_Shape( shapeY );
-			yAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			yAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+			AIS_Triangulation yAIS = CreateMeshAIS( shapeY, Quantity_NameOfColor.Quantity_NOC_GREEN );
 			m_Viewer.GetAISContext().Display( yAIS, false );
 			m_MachineShapeMap[ MachineComponentType.YAxis ] = yAIS;
-			AIS_Shape zAIS = new AIS_Shape( shapeZ );
-			zAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			zAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+			AIS_Triangulation zAIS = CreateMeshAIS( shapeZ, Quantity_NameOfColor.Quantity_NOC_BLUE );
 			m_Viewer.GetAISContext().Display( zAIS, false );
 			m_MachineShapeMap[ MachineComponentType.ZAxis ] = zAIS;
-			AIS_Shape masterAIS = new AIS_Shape( shapeMaster );
-			masterAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			masterAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_YELLOW ) );
+			AIS_Triangulation masterAIS = CreateMeshAIS( shapeMaster, Quantity_NameOfColor.Quantity_NOC_YELLOW );
 			m_Viewer.GetAISContext().Display( masterAIS, false );
 			m_MachineShapeMap[ MachineComponentType.Master ] = masterAIS;
-			AIS_Shape slaveAIS = new AIS_Shape( shapeSlave );
-			slaveAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			slaveAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
+			AIS_Triangulation slaveAIS = CreateMeshAIS( shapeSlave, Quantity_NameOfColor.Quantity_NOC_PURPLE );
 			m_Viewer.GetAISContext().Display( slaveAIS, false );
 			m_MachineShapeMap[ MachineComponentType.Slave ] = slaveAIS;
 
 			// make tool
-			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 1, 1 );
-			BRepPrimAPI_MakeCylinder makeTool2 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -1 ), new gp_Dir( 0, 0, -1 ) ), 1, 1 );
+			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 0.2, 1 );
+			BRepPrimAPI_MakeCylinder makeTool2 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -1 ), new gp_Dir( 0, 0, -1 ) ), 0.2, 1 );
 			BRepAlgoAPI_Fuse makeTool = new BRepAlgoAPI_Fuse( makeTool1.Shape(), makeTool2.Shape() );
-			m_MachineShapeMap[ MachineComponentType.Tool ] = new AIS_Shape( makeTool.Shape() );
-			m_MachineShapeMap[ MachineComponentType.Tool ].SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			m_MachineShapeMap[ MachineComponentType.Tool ].SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
+			AIS_Shape toolAIS = new AIS_Shape( makeTool.Shape() );
+			toolAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			toolAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
+			toolAIS.SetTransparency( 0.8f );
+			m_MachineShapeMap[ MachineComponentType.Tool ] = toolAIS;
 			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Tool ], false );
 
 			// make workpiece
-			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 0 ] ].AISHandle as AIS_Shape;
+			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 1 ] ].AISHandle as AIS_Shape;
 			m_Viewer.UpdateView();
+		}
+
+		AIS_Triangulation CreateMeshAIS( Poly_Triangulation mesh, Quantity_NameOfColor colorName )
+		{
+			AIS_Triangulation resultAIS = new AIS_Triangulation( mesh );
+
+			// get color rgb
+			Quantity_Color color = new Quantity_Color( colorName );
+			int R = (int)( color.Red() * 255 );
+			int G = (int)( color.Green() * 255 );
+			int B = (int)( color.Blue() * 255 );
+			int alpha = 255;
+			int colorValue = ( alpha << 24 ) | ( B << 16 ) | ( G << 8 ) | R;
+
+			// set mesh color
+			TColStd_HArray1OfInteger colorArray = new TColStd_HArray1OfInteger( 1, mesh.NbNodes(), colorValue );
+			resultAIS.SetColors( colorArray );
+
+			// set material aspect, this matter since the default material gives wrong color effect
+			Graphic3d_MaterialAspect baseAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_UserDefined );
+			resultAIS.SetMaterial( baseAspect );
+			return resultAIS;
 		}
 
 		void ReadSpindleTest()

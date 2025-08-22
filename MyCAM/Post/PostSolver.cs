@@ -448,7 +448,7 @@ namespace MyCAM.Post
 			// solve FK
 			for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
 				gp_Pnt pointG54 = camData.CAMPointList[ i ].CADPoint.Point;
-				gp_Vec tcpOffset = m_FKSolver.Solve( rotateAngleList[ i ].Item1, rotateAngleList[ i ].Item2, new gp_Vec( pointG54.XYZ() ), new gp_Vec( 0, 0, -450 ) );
+				gp_Vec tcpOffset = m_FKSolver.Solve( rotateAngleList[ i ].Item1, rotateAngleList[ i ].Item2, new gp_Vec( pointG54.XYZ() ), new gp_Vec( 40, -385, -660 ) );
 				gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
 
 				// add G54 frame data
