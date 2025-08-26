@@ -52,6 +52,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\MachineData.cs" />
+    <Compile Include="Data\MachineDefine.cs" />
+    <Compile Include="Data\PostData.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Data\CAMData.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
@@ -84,6 +87,7 @@
     <Compile Include="Data\BasicData.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="Post\NCWriter.cs" />
+    <Compile Include="Post\PostSolver.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>
