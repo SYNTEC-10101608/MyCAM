@@ -85,6 +85,57 @@ namespace MyCAM.Data
 		{
 			get; private set;
 		}
+
+		public gp_Dir MasterRotateDir
+		{
+			get
+			{
+				switch( MasterRotaryAxis ) {
+					case RotaryAxis.X:
+						return new gp_Dir( 1, 0, 0 );
+					case RotaryAxis.Y:
+						return new gp_Dir( 0, 1, 0 );
+					case RotaryAxis.Z:
+						return new gp_Dir( 0, 0, 1 );
+					default:
+						return new gp_Dir( 0, 0, 1 );
+				}
+			}
+		}
+
+		public gp_Dir SlaveRotateDir
+		{
+			get
+			{
+				switch( SlaveRotaryAxis ) {
+					case RotaryAxis.X:
+						return new gp_Dir( 1, 0, 0 );
+					case RotaryAxis.Y:
+						return new gp_Dir( 0, 1, 0 );
+					case RotaryAxis.Z:
+						return new gp_Dir( 0, 0, 1 );
+					default:
+						return new gp_Dir( 0, 1, 0 );
+				}
+			}
+		}
+
+		public gp_Dir ToolDir
+		{
+			get
+			{
+				switch( ToolDirection ) {
+					case ToolDirection.X:
+						return new gp_Dir( 1, 0, 0 );
+					case ToolDirection.Y:
+						return new gp_Dir( 0, 1, 0 );
+					case ToolDirection.Z:
+						return new gp_Dir( 0, 0, 1 );
+					default:
+						return new gp_Dir( 0, 0, 1 );
+				}
+			}
+		}
 	}
 
 	internal class SpindleTypeMachineData : MachineData

@@ -338,67 +338,6 @@ namespace MyCAM.Post
 		gp_Dir m_SlaveRotateDir;
 	}
 
-	internal class RotaryAxisSolver
-	{
-		public RotaryAxisSolver( gp_Pnt ptOnMaster, gp_Pnt ptOnSlave, gp_Dir masterRotateDir, gp_Dir slaveRotateDir )
-		{
-			// give a default Z dir BC type
-			if( ptOnMaster == null ) {
-				ptOnMaster = new gp_Pnt( 0, 0, 0 );
-			}
-			if( ptOnSlave == null ) {
-				ptOnSlave = new gp_Pnt( 0, 0, 0 );
-			}
-			if( masterRotateDir == null ) {
-				masterRotateDir = new gp_Dir( 0, 0, 1 );
-			}
-			if( slaveRotateDir == null ) {
-				slaveRotateDir = new gp_Dir( 0, 1, 0 );
-			}
-			m_PtOnMaster = ptOnMaster;
-			m_PtOnSlave = ptOnSlave;
-			m_MasterRotateDir = masterRotateDir;
-			m_SlaveRotateDir = slaveRotateDir;
-		}
-
-		public gp_Dir MasterRotateDir
-		{
-			get
-			{
-				return m_MasterRotateDir;
-			}
-		}
-
-		public gp_Dir SlaveRotateDir
-		{
-			get
-			{
-				return m_SlaveRotateDir;
-			}
-		}
-
-		public gp_Pnt PtOnMaster
-		{
-			get
-			{
-				return m_PtOnMaster;
-			}
-		}
-
-		public gp_Pnt PtOnSlave
-		{
-			get
-			{
-				return m_PtOnSlave;
-			}
-		}
-
-		gp_Pnt m_PtOnMaster;
-		gp_Pnt m_PtOnSlave;
-		gp_Dir m_MasterRotateDir;
-		gp_Dir m_SlaveRotateDir;
-	}
-
 	internal class PostSolver
 	{
 		public PostSolver( MachineData machineData )
@@ -409,7 +348,6 @@ namespace MyCAM.Post
 			ISolverBuilder solverBuilder = CreateSolverBuilder( machineData );
 			m_FKSolver = solverBuilder.BuildFKSolver();
 			m_IKSolver = solverBuilder.BuildIKSolver();
-			m_RotaryAxisSolver = solverBuilder.BuildRotaryAxisSolver();
 		}
 
 		public bool Solve( CAMData camData,
@@ -476,14 +414,6 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		public RotaryAxisSolver RotaryAxisSolver
-		{
-			get
-			{
-				return m_RotaryAxisSolver;
-			}
-		}
-
 		public gp_Vec G54Offset
 		{
 			set
@@ -512,7 +442,6 @@ namespace MyCAM.Post
 
 		IKSolver m_IKSolver;
 		FKSolver m_FKSolver;
-		RotaryAxisSolver m_RotaryAxisSolver;
 		gp_Vec m_G54Offset;
 	}
 
@@ -521,8 +450,6 @@ namespace MyCAM.Post
 		FKSolver BuildFKSolver();
 
 		IKSolver BuildIKSolver();
-
-		RotaryAxisSolver BuildRotaryAxisSolver();
 	}
 
 	internal abstract class SolverBuilderBase<TMachineData> : ISolverBuilder
@@ -534,75 +461,13 @@ namespace MyCAM.Post
 				throw new ArgumentException( "Invalid machine data" );
 			}
 			m_MachineData = machineData;
-			CalculateMasterRotateDir();
-			CalculateSlaveRotateDir();
-			CalculateToolDir();
 		}
 
 		public abstract FKSolver BuildFKSolver();
 
 		public abstract IKSolver BuildIKSolver();
 
-		public abstract RotaryAxisSolver BuildRotaryAxisSolver();
-
-		protected virtual void CalculateMasterRotateDir()
-		{
-			switch( m_MachineData.MasterRotaryAxis ) {
-				case RotaryAxis.X:
-					m_MasterRotateDir = new gp_Dir( 1, 0, 0 );
-					break;
-				case RotaryAxis.Y:
-					m_MasterRotateDir = new gp_Dir( 0, 1, 0 );
-					break;
-				case RotaryAxis.Z:
-					m_MasterRotateDir = new gp_Dir( 0, 0, 1 );
-					break;
-				default:
-					m_MasterRotateDir = new gp_Dir( 0, 0, 1 );
-					break;
-			}
-		}
-
-		protected virtual void CalculateSlaveRotateDir()
-		{
-			switch( m_MachineData.SlaveRotaryAxis ) {
-				case RotaryAxis.X:
-					m_SlaveRotateDir = new gp_Dir( 1, 0, 0 );
-					break;
-				case RotaryAxis.Y:
-					m_SlaveRotateDir = new gp_Dir( 0, 1, 0 );
-					break;
-				case RotaryAxis.Z:
-					m_SlaveRotateDir = new gp_Dir( 0, 0, 1 );
-					break;
-				default:
-					m_SlaveRotateDir = new gp_Dir( 0, 1, 0 );
-					break;
-			}
-		}
-
-		protected virtual void CalculateToolDir()
-		{
-			switch( m_MachineData.ToolDirection ) {
-				case ToolDirection.X:
-					m_ToolDir = new gp_Dir( 1, 0, 0 );
-					break;
-				case ToolDirection.Y:
-					m_ToolDir = new gp_Dir( 0, 1, 0 );
-					break;
-				case ToolDirection.Z:
-					m_ToolDir = new gp_Dir( 0, 0, 1 );
-					break;
-				default:
-					m_ToolDir = new gp_Dir( 0, 0, 1 );
-					break;
-			}
-		}
-
 		protected TMachineData m_MachineData;
-		protected gp_Dir m_MasterRotateDir;
-		protected gp_Dir m_SlaveRotateDir;
-		protected gp_Dir m_ToolDir;
 	}
 
 	internal class SpindleSolverBuilder : SolverBuilderBase<SpindleTypeMachineData>, ISolverBuilder
@@ -616,23 +481,14 @@ namespace MyCAM.Post
 		{
 			gp_Vec mcsToSlave = new gp_Vec( m_MachineData.ToolToSlaveVec.XYZ() );
 			gp_Vec slaveToMaster = new gp_Vec( m_MachineData.SlaveToMasterVec.XYZ() );
-			gp_Vec toolVec = new gp_Vec( m_ToolDir );
+			gp_Vec toolVec = new gp_Vec( m_MachineData.ToolDir );
 			toolVec.Multiply( m_MachineData.ToolLength );
-			return new SpindleTypeFKSolver( mcsToSlave, slaveToMaster, toolVec, m_MasterRotateDir, m_SlaveRotateDir );
+			return new SpindleTypeFKSolver( mcsToSlave, slaveToMaster, toolVec, m_MachineData.MasterRotateDir, m_MachineData.SlaveRotateDir );
 		}
 
 		public override IKSolver BuildIKSolver()
 		{
-			return new IKSolver( m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir, false );
-		}
-
-		public override RotaryAxisSolver BuildRotaryAxisSolver()
-		{
-			gp_Pnt ptOnSlave = new gp_Pnt();
-			ptOnSlave.Translate( m_MachineData.ToolToSlaveVec );
-			gp_Pnt ptOnMaster = new gp_Pnt( ptOnSlave.XYZ() );
-			ptOnMaster.Translate( m_MachineData.SlaveToMasterVec );
-			return new RotaryAxisSolver( ptOnMaster, ptOnSlave, m_MasterRotateDir, m_SlaveRotateDir );
+			return new IKSolver( m_MachineData.ToolDir, m_MachineData.MasterRotateDir, m_MachineData.SlaveRotateDir, false );
 		}
 	}
 
@@ -647,26 +503,17 @@ namespace MyCAM.Post
 		{
 			gp_Vec mcsToMaster = new gp_Vec( m_MachineData.MCSToMasterVec.XYZ() );
 			gp_Vec masterToSlave = new gp_Vec( m_MachineData.MasterToSlaveVec.XYZ() );
-			gp_Vec toolVec = new gp_Vec( m_ToolDir );
+			gp_Vec toolVec = new gp_Vec( m_MachineData.ToolDir );
 			toolVec.Multiply( m_MachineData.ToolLength );
 
 			// the table follow left-hand rule
-			return new TableTypeFKSolver( mcsToMaster, masterToSlave, toolVec, m_MasterRotateDir.Reversed(), m_SlaveRotateDir.Reversed() );
+			return new TableTypeFKSolver( mcsToMaster, masterToSlave, toolVec, m_MachineData.MasterRotateDir.Reversed(), m_MachineData.SlaveRotateDir.Reversed() );
 		}
 
 		public override IKSolver BuildIKSolver()
 		{
 			// for table type, just exchange the master and slave axis
-			return new IKSolver( m_ToolDir, m_SlaveRotateDir, m_MasterRotateDir, true );
-		}
-
-		public override RotaryAxisSolver BuildRotaryAxisSolver()
-		{
-			gp_Pnt ptOnMaster = new gp_Pnt();
-			ptOnMaster.Translate( m_MachineData.MCSToMasterVec );
-			gp_Pnt ptOnSlave = new gp_Pnt( ptOnMaster.XYZ() );
-			ptOnSlave.Translate( m_MachineData.MasterToSlaveVec );
-			return new RotaryAxisSolver( ptOnMaster, ptOnSlave, m_MasterRotateDir, m_SlaveRotateDir );
+			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir, true );
 		}
 	}
 
@@ -681,26 +528,17 @@ namespace MyCAM.Post
 		{
 			gp_Vec toolToMaster = new gp_Vec( m_MachineData.ToolToMasterVec.XYZ() );
 			gp_Vec mcsToSLave = new gp_Vec( m_MachineData.MCSToSlaveVec.XYZ() );
-			gp_Vec toolVec = new gp_Vec( m_ToolDir );
+			gp_Vec toolVec = new gp_Vec( m_MachineData.ToolDir );
 			toolVec.Multiply( m_MachineData.ToolLength );
 
 			// the table follow left-hand rule
-			return new MixTypeFKSolver( toolToMaster, mcsToSLave, toolVec, m_MasterRotateDir, m_SlaveRotateDir.Reversed() );
+			return new MixTypeFKSolver( toolToMaster, mcsToSLave, toolVec, m_MachineData.MasterRotateDir, m_MachineData.SlaveRotateDir.Reversed() );
 		}
 
 		public override IKSolver BuildIKSolver()
 		{
 			// for mix type, just exchange the master and slave axis
-			return new IKSolver( m_ToolDir, m_SlaveRotateDir, m_MasterRotateDir, true );
-		}
-
-		public override RotaryAxisSolver BuildRotaryAxisSolver()
-		{
-			gp_Pnt ptOnMaster = new gp_Pnt();
-			ptOnMaster.Translate( m_MachineData.ToolToMasterVec );
-			gp_Pnt ptOnSlave = new gp_Pnt();
-			ptOnSlave.Translate( m_MachineData.MCSToSlaveVec );
-			return new RotaryAxisSolver( ptOnMaster, ptOnSlave, m_MasterRotateDir, m_SlaveRotateDir );
+			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir, true );
 		}
 	}
 }
