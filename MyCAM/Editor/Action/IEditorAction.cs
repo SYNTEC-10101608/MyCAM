@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public enum EditActionType
+	internal enum EditActionType
 	{
 		None = 0,
 		Default = 1,
@@ -16,6 +16,8 @@ namespace MyCAM.Editor
 		SelectPath = 6,
 		StartPoint = 7,
 		ToolVec = 8,
+		AxisTransform = 9,
+		AddLine = 10,
 	}
 
 	internal interface IEditorAction
@@ -33,11 +35,16 @@ namespace MyCAM.Editor
 		{
 			get; set;
 		}
+
+		Action<IEditorAction> StartAction
+		{
+			get; set;
+		}
 	}
 
-	internal class EditActionBase : IEditorAction
+	internal abstract class EditActionBase : IEditorAction
 	{
-		public EditActionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
+		protected EditActionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 		{
 			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
 				throw new ArgumentNullException( "EditActionBase constructing argument null" );
@@ -48,12 +55,9 @@ namespace MyCAM.Editor
 			m_CADManager = cadManager;
 		}
 
-		public virtual EditActionType ActionType
+		public abstract EditActionType ActionType
 		{
-			get
-			{
-				return EditActionType.None;
-			}
+			get;
 		}
 
 		public virtual void Start()
@@ -63,6 +67,9 @@ namespace MyCAM.Editor
 			m_Viewer.KeyDown += ViewerKeyDown;
 			m_TreeView.AfterSelect += TreeViewAfterSelect;
 			m_TreeView.KeyDown += TreeViewKeyDown;
+
+			// Invoke start action event
+			StartAction?.Invoke( this );
 		}
 
 		public virtual void End()
@@ -82,25 +89,18 @@ namespace MyCAM.Editor
 			get; set;
 		}
 
-		protected virtual void ViewerMouseDown( MouseEventArgs e )
+		public Action<IEditorAction> StartAction
 		{
-			// Default mouse down action
+			get; set;
 		}
 
-		protected virtual void ViewerKeyDown( KeyEventArgs e )
-		{
-			// Default key down action
-		}
+		protected abstract void ViewerMouseDown( MouseEventArgs e );
 
-		protected virtual void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			// Default tree view after select action
-		}
+		protected abstract void ViewerKeyDown( KeyEventArgs e );
 
-		protected virtual void TreeViewKeyDown( object sender, KeyEventArgs e )
-		{
-			// Default tree view key down action
-		}
+		protected abstract void TreeViewAfterSelect( object sender, TreeViewEventArgs e );
+
+		protected abstract void TreeViewKeyDown( object sender, KeyEventArgs e );
 
 		protected Viewer m_Viewer;
 		protected TreeView m_TreeView;

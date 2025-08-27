@@ -60,7 +60,7 @@ namespace MyCAM.Editor
 
 			// reset activation mode
 			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Deactivate();
+				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
 			}
 			m_bSuppressTreeViewSync = false;
 			base.End();

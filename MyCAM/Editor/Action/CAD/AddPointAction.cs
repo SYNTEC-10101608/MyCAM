@@ -1,10 +1,13 @@
 ﻿using MyCAM.Data;
+using OCC.AIS;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -33,7 +36,12 @@ namespace MyCAM.Editor
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
 				}
-				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Edge );
+				if( m_AddPointType == AddPointType.TwoVertexMidPoint ) {
+					m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Vertex );
+				}
+				else {
+					m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Edge );
+				}
 			}
 		}
 
@@ -48,7 +56,7 @@ namespace MyCAM.Editor
 
 			// deactivate
 			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Deactivate();
+				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
 			}
 			base.End();
 		}
@@ -67,30 +75,45 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// get selection edge
-			m_Viewer.GetAISContext().SelectDetected();
+			// get selection edge or vertex
+			m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_Add );
 			m_Viewer.GetAISContext().InitSelected();
-			if( !m_Viewer.GetAISContext().MoreSelected() ) {
+			if( m_AddPointType == AddPointType.TwoVertexMidPoint && m_Viewer.GetAISContext().NbSelected() != 2 ) {
+				m_Viewer.GetAISContext().UpdateCurrentViewer();
 				return;
 			}
-			TopoDS_Shape selectedShape = m_Viewer.GetAISContext().SelectedShape();
 
-			// validate the edge
-			if( selectedShape == null || selectedShape.IsNull() ) {
-				return;
+			List<TopoDS_Shape> selectedShapeList = new List<TopoDS_Shape>();
+			while( m_Viewer.GetAISContext().MoreSelected() ) {
+
+				var shape = m_Viewer.GetAISContext().SelectedShape();
+				if( shape.IsNull() ) {
+					return;
+				}
+				selectedShapeList.Add( m_Viewer.GetAISContext().SelectedShape() );
+				m_Viewer.GetAISContext().NextSelected();
 			}
-			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_EDGE ) {
-				return;
-			}
-			TopoDS_Edge edge = TopoDS.ToEdge( selectedShape );
 
 			// add the point
 			bool isAdded = false;
-			if( m_AddPointType == AddPointType.CircArcCenter ) {
-				isAdded = AddCircArcCenter( edge );
+			if( selectedShapeList.First().ShapeType() == TopAbs_ShapeEnum.TopAbs_EDGE ) {
+
+				TopoDS_Edge edge = TopoDS.ToEdge( selectedShapeList.First() );
+				if( m_AddPointType == AddPointType.CircArcCenter ) {
+					isAdded = AddCircArcCenter( edge );
+				}
+				else if( m_AddPointType == AddPointType.EdgeMidPoint ) {
+					isAdded = AddEdgeMidPoint( edge );
+				}
 			}
-			else if( m_AddPointType == AddPointType.EdgeMidPoint ) {
-				isAdded = AddEdgeMidPoint( edge );
+			else if( selectedShapeList.First().ShapeType() == TopAbs_ShapeEnum.TopAbs_VERTEX ) {
+
+				TopoDS_Vertex v1 = TopoDS.ToVertex( selectedShapeList.First() );
+				TopoDS_Vertex v2 = TopoDS.ToVertex( selectedShapeList.Last() );
+				if( v1.IsEqual( v2 ) ) {
+					return;
+				}
+				isAdded = AddTwoVertexMidPoint( v1, v2 );
 			}
 
 			// end action if the point is added
@@ -104,6 +127,16 @@ namespace MyCAM.Editor
 			if( e.KeyCode == Keys.Escape ) {
 				End();
 			}
+		}
+
+		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
+		{
+			// do nothing
 		}
 
 		bool AddCircArcCenter( TopoDS_Edge edge )
@@ -122,6 +155,20 @@ namespace MyCAM.Editor
 			bool isValidEdge = GeometryTool.GetEdgeMidPoint( edge, out gp_Pnt midPoint );
 			if( !isValidEdge ) {
 				MessageBox.Show( "Bad Edge" );
+				return false;
+			}
+			AddToManager( midPoint );
+			return true;
+		}
+
+		bool AddTwoVertexMidPoint( TopoDS_Vertex vertex1, TopoDS_Vertex vertex2 )
+		{
+			if( vertex1 == null || vertex2 == null ) {
+				return false;
+			}
+			bool isValidPoint = GeometryTool.GetTwoVertexMidPoint( vertex1, vertex2, out gp_Pnt midPoint );
+			if( !isValidPoint ) {
+				MessageBox.Show( "Valid Point" );
 				return false;
 			}
 			AddToManager( midPoint );

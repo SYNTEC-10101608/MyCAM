@@ -48,6 +48,7 @@ namespace MyCAM.Editor
 				}
 				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Edge );
 				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Face );
+				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Vertex );
 			}
 
 			// show transform part and G54 coordinate system
@@ -88,9 +89,19 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void ApplyTransform( EConstraintType type, bool bReverse = false )
+		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
 		{
-			SetConstraint( type, bReverse );
+			// do nothing
+		}
+
+		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
+		{
+			// do nothing
+		}
+
+		public void ApplyTransform( EConstraintType type )
+		{
+			SetConstraint( type );
 		}
 
 		public void TransformDone()
@@ -147,6 +158,11 @@ namespace MyCAM.Editor
 			BRepBuilderAPI_MakeEdge edgeZ = new BRepBuilderAPI_MakeEdge( pZ0, pZ1 );
 			shapeList.Add( edgeZ.Edge() );
 
+
+			gp_Pnt oriPnt = new gp_Pnt( 0, 0, 0 );
+			BRepBuilderAPI_MakeVertex oriVertex = new BRepBuilderAPI_MakeVertex( oriPnt );
+			shapeList.Add( oriVertex.Vertex() );
+
 			// make G54 shape
 			m_G54Shape = ShapeTool.MakeCompound( shapeList );
 
@@ -182,6 +198,10 @@ namespace MyCAM.Editor
 			aisZ.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
 			aisZ.SetWidth( 2.0f ); // make Z axis thicker
 			m_G54AISList.Add( aisZ );
+
+			AIS_Shape aisOri = new AIS_Shape( oriVertex.Vertex() );
+			aisOri.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_YELLOW ) );
+			m_G54AISList.Add( aisOri );
 
 			// set properties
 			foreach( AIS_Shape ais in m_G54AISList ) {
@@ -299,9 +319,36 @@ namespace MyCAM.Editor
 					}
 				}
 			}
+			else if( sel.ShapeType() == TopAbs_ShapeEnum.TopAbs_VERTEX ) {
+				TopExp_Explorer expRef = new TopExp_Explorer( m_G54Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
+				while( expRef.More() ) {
+					TopoDS_Shape vertex = expRef.Current();
+					if( sel.IsEqual( vertex ) ) {
+						isRef = true;
+						return;
+					}
+					expRef.Next();
+				}
+				foreach( var partID in m_CADManager.PartIDList ) {
+
+					// skip invisible objects
+					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
+						continue;
+					}
+					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
+					while( expMove.More() ) {
+						TopoDS_Shape vertex = expMove.Current();
+						if( sel.IsEqual( vertex ) ) {
+							isMove = true;
+							return;
+						}
+						expMove.Next();
+					}
+				}
+			}
 		}
 
-		void SetConstraint( EConstraintType type, bool isReverse )
+		void SetConstraint( EConstraintType type )
 		{
 			GetRefAndMoveObject( out TopoDS_Shape refShape, out TopoDS_Shape moveShape );
 			if( refShape == null || moveShape == null ) {
@@ -312,16 +359,19 @@ namespace MyCAM.Editor
 			IConstraint c = null;
 			switch( type ) {
 				case EConstraintType.Axial:
-					c = new AxialConstraint( refShape, moveShape, isReverse );
+					c = new AxialConstraint( refShape, moveShape );
 					break;
 				case EConstraintType.AxialParallel:
-					c = new AxialParallelConstraint( refShape, moveShape, isReverse );
+					c = new AxialParallelConstraint( refShape, moveShape );
 					break;
 				case EConstraintType.Plane:
-					c = new PlaneConstraint( refShape, moveShape, isReverse );
+					c = new PlaneConstraint( refShape, moveShape );
 					break;
 				case EConstraintType.PlaneParallel:
-					c = new PlaneParallelConstraint( refShape, moveShape, isReverse );
+					c = new PlaneParallelConstraint( refShape, moveShape );
+					break;
+				case EConstraintType.Point:
+					c = new PointConstraint( refShape, moveShape );
 					break;
 				default:
 					return;
@@ -332,13 +382,13 @@ namespace MyCAM.Editor
 			}
 			gp_Trsf trsf = c.SolveConstraint();
 			ApplyTransform( trsf );
+			m_Viewer.GetAISContext().ClearSelected( true );
 		}
 
 		void ApplyTransform( gp_Trsf trsf )
 		{
 			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, m_ViewManager, trsf );
 			transformHelper.TransformData();
-			m_Viewer.GetAISContext().ClearSelected( true );
 		}
 
 		TopoDS_Shape m_G54Shape;

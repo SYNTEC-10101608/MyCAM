@@ -11,9 +11,9 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class IndexSelectAction : EditActionBase
+	internal abstract class IndexSelectAction : EditActionBase
 	{
-		public IndexSelectAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		protected IndexSelectAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			CAMData camData )
 			: base( viewer, treeView, cadManager, viewManager )
 		{
@@ -112,6 +112,5 @@ namespace MyCAM.Editor
 		// map point on view to index on CAMData
 		protected TopTools_DataMapOfShapeInteger m_VertexMap;
 		protected AIS_Shape m_SelectedPointAIS;
-
 	}
 }

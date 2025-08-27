@@ -50,7 +50,6 @@ namespace MyCAM.Editor
 				// add into map
 				TopExp.MapShapesAndAncestors( oneshape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, ref m_EdgeFaceMap );
 			}
-
 		}
 
 		public override EditActionType ActionType
@@ -139,6 +138,17 @@ namespace MyCAM.Editor
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
+			// do nothing
+		}
+
+		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
+		{
+			// do nothing
 		}
 
 		public void SelectD1ContFace()

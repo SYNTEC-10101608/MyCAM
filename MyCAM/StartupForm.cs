@@ -43,6 +43,7 @@ namespace MyCAM
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
 			m_CADEditor.EditStart();
+			m_CADEditor.AxisTransformActionStausChanged += OnAxisTransformActionStausChanged;
 
 			// CAM Editor
 			m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
@@ -101,6 +102,16 @@ namespace MyCAM
 			m_CADEditor.AddPoint( AddPointType.EdgeMidPoint );
 		}
 
+		void m_tsmiAddPoint_PointCenter_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.AddPoint( AddPointType.TwoVertexMidPoint );
+		}
+
+		void m_tsmiAddLine_TwoVertexConnect_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.AddLine( AddLineType.TwoVertexConnectLine );
+		}
+
 		// manual transform
 		void m_tsmiManualTransform_Click( object sender, EventArgs e )
 		{
@@ -111,42 +122,27 @@ namespace MyCAM
 
 		void m_tsmiPlane_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.Plane, false );
-		}
-
-		void m_tsmiPlane_R_Click( object sender, EventArgs e )
-		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.Plane, true );
+			m_CADEditor.ApplyManualTransform( EConstraintType.Plane );
 		}
 
 		void m_tsmiPlanePar_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.PlaneParallel, false );
-		}
-
-		void m_tsmiPlanePar_R_Click( object sender, EventArgs e )
-		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.PlaneParallel, true );
+			m_CADEditor.ApplyManualTransform( EConstraintType.PlaneParallel );
 		}
 
 		void m_tsmiAxial_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.Axial, false );
-		}
-
-		void m_tsmiAxial_R_Click( object sender, EventArgs e )
-		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.Axial, true );
+			m_CADEditor.ApplyManualTransform( EConstraintType.Axial );
 		}
 
 		void m_tsmiAxialPar_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.AxialParallel, false );
+			m_CADEditor.ApplyManualTransform( EConstraintType.AxialParallel );
 		}
 
-		void m_tsmiAxialPar_R_Click( object sender, EventArgs e )
+		void m_tsmiPointCoincide_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.AxialParallel, true );
+			m_CADEditor.ApplyManualTransform( EConstraintType.Point );
 		}
 
 		void m_tsmiTransformOK_Click( object sender, EventArgs e )
@@ -160,6 +156,22 @@ namespace MyCAM
 		void m_tsmi3PointTransform_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ThreePointTransform();
+		}
+
+		// axis transform
+		void m_tsmiAxisTransform_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.StartAxisTransform();
+		}
+
+		void OnAxisTransformActionStausChanged( EFunctionStatus status )
+		{
+			if( status == EFunctionStatus.Open ) {
+				m_msCAD.Enabled = false;
+			}
+			else if( status == EFunctionStatus.Close ) {
+				m_msCAD.Enabled = true;
+			}
 		}
 
 		// go to CAM editor
