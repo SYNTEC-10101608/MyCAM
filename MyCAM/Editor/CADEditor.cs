@@ -13,25 +13,32 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public enum FileFormat
+	internal enum FileFormat
 	{
 		BREP = 0,
 		STEP = 1,
 		IGES = 2
 	}
 
-	public enum AddPointType
+	internal enum AddPointType
 	{
 		CircArcCenter = 0,
 		EdgeMidPoint = 1,
+		TwoVertexMidPoint = 2,
 	}
 
-	public enum EConstraintType
+	internal enum AddLineType
+	{
+		TwoVertexConnectLine = 0,
+	}
+
+	internal enum EConstraintType
 	{
 		Axial,
 		AxialParallel,
 		Plane,
 		PlaneParallel,
+		Point,
 	}
 
 	internal class CADEditor
@@ -55,6 +62,8 @@ namespace MyCAM.Editor
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Part );
 		}
+
+		public Action<EFunctionStatus> AxisTransformActionStausChanged;
 
 		// user interface
 		Viewer m_Viewer;
@@ -137,6 +146,12 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void AddLine( AddLineType type )
+		{
+			AddLineAction action = new AddLineAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, type );
+			StartEditAction( action );
+		}
+
 		public void ThreePointTransform()
 		{
 			ThreePtTransformAction action = new ThreePtTransformAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
@@ -149,12 +164,22 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void ApplyManualTransform( EConstraintType type, bool bReverse = false )
+		public void StartAxisTransform()
+		{
+			// need to use shape data to decide the cneter in the begin, so have to add this preotection
+			if( m_CADManager.PartIDList.Count == 0 ) {
+				return;
+			}
+			AxisTransformAction action = new AxisTransformAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			StartEditAction( action );
+		}
+
+		public void ApplyManualTransform( EConstraintType type )
 		{
 			if( m_CurrentAction.ActionType != EditActionType.ManualTransform ) {
 				return;
 			}
-			( (ManualTransformAction)m_CurrentAction ).ApplyTransform( type, bReverse );
+			( (ManualTransformAction)m_CurrentAction ).ApplyTransform( type );
 		}
 
 		public void EndManualTransform()
@@ -297,6 +322,7 @@ namespace MyCAM.Editor
 
 			// start the action
 			m_CurrentAction = action;
+			m_CurrentAction.StartAction += OnEditActionStart;
 			m_CurrentAction.Start();
 			m_CurrentAction.EndAction += OnEditActionEnd;
 		}
@@ -307,6 +333,17 @@ namespace MyCAM.Editor
 			if( !m_IsNextAction ) {
 				m_CurrentAction = m_DefaultAction;
 				m_CurrentAction.Start();
+			}
+
+			if( action.ActionType == EditActionType.AxisTransform ) {
+				AxisTransformActionStausChanged?.Invoke( EFunctionStatus.Close );
+			}
+		}
+
+		void OnEditActionStart( IEditorAction action )
+		{
+			if( action.ActionType == EditActionType.AxisTransform ) {
+				AxisTransformActionStausChanged?.Invoke( EFunctionStatus.Open );
 			}
 		}
 

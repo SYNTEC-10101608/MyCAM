@@ -1,5 +1,6 @@
 ﻿using OCC.BRep;
 using OCC.BRepAdaptor;
+using OCC.BRepBuilderAPI;
 using OCC.BRepGProp;
 using OCC.ElCLib;
 using OCC.gce;
@@ -197,6 +198,18 @@ namespace OCCTool
 			return true;
 		}
 
+		public static bool GetTwoVertexMidPoint( TopoDS_Vertex v1, TopoDS_Vertex v2, out gp_Pnt mid )
+		{
+			mid = new gp_Pnt();
+			if( v1 == null || v1.IsNull() || v2 == null || v2.IsNull() || v1.IsEqual( v2 ) ) {
+				return false;
+			}
+			gp_Pnt p1 = BRep_Tool.Pnt( v1 );
+			gp_Pnt p2 = BRep_Tool.Pnt( v2 );
+			mid = new gp_Pnt( ( p1.XYZ() + p2.XYZ() ) / 2 );
+			return true;
+		}
+
 		public static bool IsD1Cont( TopoDS_Face f1, TopoDS_Face f2, TopoDS_Edge sharingEdge )
 		{
 			if( f1 == null || f2 == null || sharingEdge == null
@@ -237,6 +250,22 @@ namespace OCCTool
 				}
 			}
 			return false;
+		}
+
+		public static bool CreateLineFromTwoVertex( TopoDS_Vertex v1, TopoDS_Vertex v2, out TopoDS_Edge edge )
+		{
+			edge = new TopoDS_Edge();
+			if( v1 == null || v1.IsNull() || v2 == null || v2.IsNull() || v1.IsEqual( v2 ) ) {
+				return false;
+			}
+			gp_Pnt p1 = BRep_Tool.Pnt( v1 );
+			gp_Pnt p2 = BRep_Tool.Pnt( v2 );
+			BRepBuilderAPI_MakeEdge brepEdge = new BRepBuilderAPI_MakeEdge( p1, p2 );
+			if( !brepEdge.IsDone() ) {
+				return false;
+			}
+			edge = brepEdge.Edge();
+			return true;
 		}
 
 		// private

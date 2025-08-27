@@ -43,5 +43,15 @@ namespace MyCAM.Editor
 				End();
 			}
 		}
+
+		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
+		{
+			// do nothing
+		}
 	}
 }

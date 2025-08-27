@@ -1,7 +1,9 @@
-﻿using OCC.gp;
+﻿using OCC.BRep;
+using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
+using System;
 
 namespace MyCAM.Editor
 {
@@ -19,11 +21,10 @@ namespace MyCAM.Editor
 
 	internal class ConstraintBase : IConstraint
 	{
-		public ConstraintBase( TopoDS_Shape refShape, TopoDS_Shape moveShape, bool isReverse )
+		public ConstraintBase( TopoDS_Shape refShape, TopoDS_Shape moveShape )
 		{
 			m_RefShape = refShape;
 			m_MoveShape = moveShape;
-			m_isReverse = isReverse;
 		}
 
 		public virtual EConstraintType Type
@@ -48,8 +49,8 @@ namespace MyCAM.Editor
 
 	internal class AxialConstraint : ConstraintBase
 	{
-		public AxialConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape, bool isReverse )
-			: base( refShape, moveShape, isReverse ) { }
+		public AxialConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape )
+			: base( refShape, moveShape ) { }
 
 		public override EConstraintType Type => EConstraintType.Axial;
 
@@ -64,14 +65,14 @@ namespace MyCAM.Editor
 				out gp_Pnt pR, out gp_Dir dR, out gp_Pnt pM, out gp_Dir dM ) ) {
 				return new gp_Trsf();
 			}
-			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.Axial, m_isReverse );
+			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.Axial );
 		}
 	}
 
 	internal class AxialParallelConstraint : ConstraintBase
 	{
-		public AxialParallelConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape, bool isReverse )
-			: base( refShape, moveShape, isReverse ) { }
+		public AxialParallelConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape )
+			: base( refShape, moveShape ) { }
 
 		public override EConstraintType Type => EConstraintType.AxialParallel;
 
@@ -86,15 +87,15 @@ namespace MyCAM.Editor
 				out gp_Pnt pR, out gp_Dir dR, out gp_Pnt pM, out gp_Dir dM ) ) {
 				return new gp_Trsf();
 			}
-			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.AxialParallel, m_isReverse );
+			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.AxialParallel );
 		}
 	}
 
 	// the plane constraint
 	internal class PlaneConstraint : ConstraintBase
 	{
-		public PlaneConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape, bool isReverse )
-			: base( refShape, moveShape, isReverse ) { }
+		public PlaneConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape )
+			: base( refShape, moveShape ) { }
 
 		public override EConstraintType Type => EConstraintType.Plane;
 
@@ -109,15 +110,15 @@ namespace MyCAM.Editor
 				out gp_Pnt pR, out gp_Dir dR, out gp_Pnt pM, out gp_Dir dM ) ) {
 				return new gp_Trsf();
 			}
-			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.Plane, m_isReverse );
+			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.Plane );
 		}
 	}
 
 	// the parallel plane constraint
 	internal class PlaneParallelConstraint : ConstraintBase
 	{
-		public PlaneParallelConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape, bool isReverse )
-			: base( refShape, moveShape, isReverse ) { }
+		public PlaneParallelConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape )
+			: base( refShape, moveShape ) { }
 
 		public override EConstraintType Type => EConstraintType.PlaneParallel;
 
@@ -132,7 +133,29 @@ namespace MyCAM.Editor
 				out gp_Pnt pR, out gp_Dir dR, out gp_Pnt pM, out gp_Dir dM ) ) {
 				return new gp_Trsf();
 			}
-			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.PlaneParallel, m_isReverse );
+			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.PlaneParallel );
+		}
+	}
+
+
+	internal class PointConstraint : ConstraintBase
+	{
+		public PointConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape )
+			: base( refShape, moveShape ) { }
+
+		public override EConstraintType Type => EConstraintType.Point;
+
+		public override bool IsValid()
+		{
+			return ConstraintHelper.IsPointValid( m_RefShape, m_MoveShape, out _, out _ );
+		}
+
+		public override gp_Trsf SolveConstraint()
+		{
+			if( !ConstraintHelper.IsPointValid( m_RefShape, m_MoveShape, out gp_Pnt pR, out gp_Pnt pM ) ) {
+				return new gp_Trsf();
+			}
+			return ConstraintHelper.SolveConstraint( pR, pM );
 		}
 	}
 
@@ -208,15 +231,35 @@ namespace MyCAM.Editor
 			return isValid1 && isValid2;
 		}
 
-		public static gp_Trsf SolveConstraint( gp_Pnt pR, gp_Pnt pM, gp_Dir dR, gp_Dir dM, EConstraintType type, bool isReverse )
+		public static bool IsPointValid( TopoDS_Shape refShape, TopoDS_Shape moveShape,
+			out gp_Pnt pR, out gp_Pnt pM )
 		{
-			if( isReverse ) {
-				dR.Reverse();
+			pR = new gp_Pnt();
+			pM = new gp_Pnt();
+			if( refShape == null || moveShape == null ) {
+				return false;
+			}
+
+			if( refShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX
+				|| moveShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
+				return false;
+			}
+			pR = BRep_Tool.Pnt( TopoDS.ToVertex( refShape ) );
+			pM = BRep_Tool.Pnt( TopoDS.ToVertex( moveShape ) );
+			return true;
+		}
+
+		public static gp_Trsf SolveConstraint( gp_Pnt pR, gp_Pnt pM, gp_Dir dR, gp_Dir dM, EConstraintType type )
+		{
+			gp_Vec vecR = new gp_Vec( dR );
+			gp_Vec vecM = new gp_Vec( dM );
+			double angle = vecR.Angle( vecM );
+
+			if( angle > Math.PI / 2 || angle < -( Math.PI / 2 ) ) {
+				vecM.Reverse();
 			}
 
 			// solve rotation
-			gp_Vec vecR = new gp_Vec( dR );
-			gp_Vec vecM = new gp_Vec( dM );
 			gp_Quaternion q = new gp_Quaternion( vecM, vecR );
 			gp_Trsf trsfR = new gp_Trsf();
 			trsfR.SetRotation( q );
@@ -247,6 +290,13 @@ namespace MyCAM.Editor
 				trsfT.SetTranslation( vecAlong );
 			}
 			return trsfT.Multiplied( trsfR );
+		}
+
+		public static gp_Trsf SolveConstraint( gp_Pnt pR, gp_Pnt pM )
+		{
+			gp_Trsf trsf = new gp_Trsf();
+			trsf.SetTranslation( new gp_Vec( pM, pR ) );
+			return trsf;
 		}
 	}
 }

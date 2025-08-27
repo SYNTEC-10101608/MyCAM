@@ -74,7 +74,7 @@ namespace MyCAM.Editor
 
 			// deactivate
 			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Deactivate();
+				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
 			}
 			base.End();
 		}
@@ -142,6 +142,16 @@ namespace MyCAM.Editor
 			if( e.KeyCode == Keys.Escape ) {
 				End();
 			}
+		}
+
+		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
+		{
+			// do nothing
 		}
 
 		bool GetSelectPoint( out gp_Pnt point )
