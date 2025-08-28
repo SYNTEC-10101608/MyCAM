@@ -24,8 +24,8 @@ namespace MyCAM.Editor
 	internal class CAMEditor
 	{
 		// to notice main form
-		public Action<EActionStatus> LeadActionStatusChange;
-		public Action<EActionStatus> OverCutActionStatusChange;
+		public Action<EFunctionStatus> LeadActionStatusChange;
+		public Action<EFunctionStatus> OverCutActionStatusChange;
 		public Action<bool> CurrentPathWithLead;
 		public Action<bool> CurrentPathIsClosed;
 

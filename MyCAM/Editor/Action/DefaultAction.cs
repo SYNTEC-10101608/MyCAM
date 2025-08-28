@@ -12,12 +12,6 @@ namespace MyCAM.Editor
 		Path,
 	}
 
-	internal enum EActionStatus
-	{
-		Start,
-		End
-	}
-
 	internal class DefaultAction : EditActionBase
 	{
 		public Action TreeSelectionChange;

@@ -9,7 +9,7 @@ namespace MyCAM.Editor
 {
 	internal class OverCutAction : DefaultAction
 	{
-		public Action<EActionStatus> OverCutActionStatusChange;
+		public Action<EFunctionStatus> OverCutActionStatusChange;
 
 		public OverCutAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 		CAMData camData, ESelectObjectType type )
@@ -49,7 +49,7 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			OverCutActionStatusChange?.Invoke( EActionStatus.Start );
+			OverCutActionStatusChange?.Invoke( EFunctionStatus.Open );
 			//// disable tree view
 			m_TreeView.Enabled = false;
 		}
@@ -58,7 +58,7 @@ namespace MyCAM.Editor
 		{
 			// enable tree view
 			m_TreeView.Enabled = true;
-			OverCutActionStatusChange?.Invoke( EActionStatus.End );
+			OverCutActionStatusChange?.Invoke( EFunctionStatus.Close );
 			base.End();
 		}
 

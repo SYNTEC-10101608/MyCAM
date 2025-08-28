@@ -9,7 +9,7 @@ namespace MyCAM.Editor
 {
 	internal class LeadSettingAction : DefaultAction
 	{
-		public Action<EActionStatus> LeadActionStatusChange;
+		public Action<EFunctionStatus> LeadActionStatusChange;
 		public Action<bool> PathWithLeadLine;
 
 		public LeadSettingAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
@@ -63,7 +63,7 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			LeadActionStatusChange?.Invoke( EActionStatus.Start );
+			LeadActionStatusChange?.Invoke( EFunctionStatus.Open );
 
 			// disable tree view
 			m_TreeView.Enabled = false;
@@ -73,7 +73,7 @@ namespace MyCAM.Editor
 		{
 			// enable tree view
 			m_TreeView.Enabled = true;
-			LeadActionStatusChange?.Invoke( EActionStatus.End );
+			LeadActionStatusChange?.Invoke( EFunctionStatus.Close );
 			base.End();
 		}
 

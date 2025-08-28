@@ -8,7 +8,6 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
-using static MyCAM.Editor.LeadSettingAction;
 
 namespace MyCAM
 {
@@ -306,30 +305,30 @@ namespace MyCAM
 
 		#region UI action 
 
-		void OnLeadSettingActionStatusChange( EActionStatus actionStatus )
+		void OnLeadSettingActionStatusChange( EFunctionStatus actionStatus )
 		{
-			if( actionStatus == EActionStatus.Start ) {
+			if( actionStatus == EFunctionStatus.Open ) {
 				m_msCAM.Enabled = false;
 				return;
 			}
 			m_msCAM.Enabled = true;
 		}
 
-		void OnOverCutActionStatusChange( EActionStatus actionStatus )
+		void OnOverCutActionStatusChange( EFunctionStatus actionStatus )
 		{
-			if( actionStatus == EActionStatus.Start ) {
+			if( actionStatus == EFunctionStatus.Open ) {
 				m_msCAM.Enabled = false;
 				return;
 			}
 			m_msCAM.Enabled = true;
 		}
 
-		void OnPathWithLead (bool isPathWithLead )
+		void OnPathWithLead( bool isPathWithLead )
 		{
 			m_tsmiChangeLeadDirection.Enabled = isPathWithLead;
 		}
 
-		void OnPathIsClose(bool isClosePath )
+		void OnPathIsClose( bool isClosePath )
 		{
 			m_tsmiStartPoint.Enabled = isClosePath;
 			m_tsmiSetLead.Enabled = isClosePath;
