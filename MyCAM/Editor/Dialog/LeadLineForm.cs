@@ -19,40 +19,36 @@ namespace MyCAM.Editor.Dialog
 			m_LeadParam = leadParam;
 
 			// lead in setting
+			m_tbxLeadInLength.Text = m_LeadParam.LeadIn.Length.ToString();
+			m_tbxLeadInAngle.Text = m_LeadParam.LeadIn.Angle.ToString();
+
+			// set lead type must be the last step, cause it will trigger event but u need need length and angle
 			switch( m_LeadParam.LeadIn.Type ) {
 				case LeadType.LeadLineType.Line:
 					m_cbxLeadInType.SelectedIndex = (int)LeadType.LeadLineType.Line;
-					m_tbxLeadInLength.Text = m_LeadParam.LeadIn.Length.ToString();
-					m_tbxLeadInAngle.Text = m_LeadParam.LeadIn.Angle.ToString();
 					break;
 				case LeadType.LeadLineType.Arc:
 					m_cbxLeadInType.SelectedIndex = (int)LeadType.LeadLineType.Arc;
-					m_tbxLeadInLength.Text = m_LeadParam.LeadIn.Length.ToString();
-					m_tbxLeadInAngle.Text = m_LeadParam.LeadIn.Angle.ToString();
 					break;
 				default:
 					m_cbxLeadInType.SelectedIndex = (int)LeadType.LeadLineType.None;
-					m_tbxLeadInLength.Text = DEFAULT_Value.ToString();
-					m_tbxLeadInAngle.Text = DEFAULT_Value.ToString();
 					break;
 			}
 
 			// lead out setting
+			m_tbxLeadOutLength.Text = m_LeadParam.LeadOut.Length.ToString();
+			m_tbxLeadOutAngle.Text = m_LeadParam.LeadOut.Angle.ToString();
+
+			// set lead type must be the last step, cause it will trigger event but u need need length and angle
 			switch( m_LeadParam.LeadOut.Type ) {
 				case LeadType.LeadLineType.Line:
 					m_cbxLeadOutType.SelectedIndex = (int)LeadType.LeadLineType.Line;
-					m_tbxLeadOutLength.Text = m_LeadParam.LeadOut.Length.ToString();
-					m_tbxLeadOutAngle.Text = m_LeadParam.LeadOut.Angle.ToString();
 					break;
 				case LeadType.LeadLineType.Arc:
 					m_cbxLeadOutType.SelectedIndex = (int)LeadType.LeadLineType.Arc;
-					m_tbxLeadOutLength.Text = m_LeadParam.LeadOut.Length.ToString();
-					m_tbxLeadOutAngle.Text = m_LeadParam.LeadOut.Angle.ToString();
 					break;
 				default:
 					m_cbxLeadOutType.SelectedIndex = (int)LeadType.LeadLineType.None;
-					m_tbxLeadOutLength.Text = DEFAULT_Value.ToString();
-					m_tbxLeadOutAngle.Text = DEFAULT_Value.ToString();
 					break;
 			}
 
