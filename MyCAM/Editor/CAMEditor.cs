@@ -266,10 +266,7 @@ namespace MyCAM.Editor
 			}
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
 			LeadSettingAction action = new LeadSettingAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
-			action.PropertyChanged += ShowCAMData;
-
-			// after set lead line but haven't change path, change lead direction should be disable
-			action.PathWithLeadLine += CurrentPathWithLead;
+			action.PropertyChanged += OnSetLeadPropertyChanged;
 			StartEditAction( action );
 		}
 
@@ -628,6 +625,14 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( orientationAIS, false );
 			}
 			m_Viewer.UpdateView();
+		}
+
+		void OnSetLeadPropertyChanged( bool isConfirm )
+		{
+			ShowCAMData();
+			if( isConfirm ) {
+				// TODO: publish event here
+			}
 		}
 
 		#endregion

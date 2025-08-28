@@ -9,8 +9,6 @@ namespace MyCAM.Editor
 {
 	internal class LeadSettingAction : EditActionBase
 	{
-		public Action<bool> PathWithLeadLine;
-
 		public LeadSettingAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			CAMData camData )
 			: base( viewer, treeView, cadManager, viewManager )
@@ -30,22 +28,20 @@ namespace MyCAM.Editor
 			leadDialog.Preview += () =>
 			{
 				SetLeadParam( leadDialog );
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( false );
 			};
 
 			// get prvious lead back
 			leadDialog.OnCancel += () =>
 			{
 				m_CAMData.LeadLineParam = backupLeadParam;
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( false );
 				End();
 			};
 			leadDialog.OnComfirm += () =>
 			{
 				SetLeadParam( leadDialog );
-				bool IsPathWithLead = m_CAMData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None || m_CAMData.LeadLineParam.LeadOut.Type != LeadType.LeadLineType.None;
-				PathWithLeadLine?.Invoke( IsPathWithLead );
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( true );
 				End();
 			};
 			leadDialog.Show( MyApp.MainForm );
@@ -74,7 +70,7 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		public Action PropertyChanged;
+		public Action<bool> PropertyChanged;
 
 		void SetLeadParam( LeadLineForm leadDialog )
 		{
