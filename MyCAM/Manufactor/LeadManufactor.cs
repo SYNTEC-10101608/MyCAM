@@ -11,6 +11,7 @@ namespace MyCAM.Manufactor
 {
 	internal static class LeadManufactor
 	{
+		// when isLeadIn, the input point is start of path, and is end of lead in
 		public static List<CAMPoint> BuildStraightLeadLine( CAMPoint StraightLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse )
 		{
 			List<CAMPoint> StraightLeadCAMPointList = new List<CAMPoint>();
@@ -83,6 +84,7 @@ namespace MyCAM.Manufactor
 			return StraightLeadCAMPointList;
 		}
 
+		// when isLeadIn, the input point is start of path, and is end of lead in
 		public static List<CAMPoint> BuildArcLeadLine( CAMPoint CurveLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, double dDeflection, double dMaxLength )
 		{
 			// protection
