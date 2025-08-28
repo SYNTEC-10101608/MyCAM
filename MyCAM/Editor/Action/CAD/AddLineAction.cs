@@ -70,7 +70,6 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_Add );
 			m_Viewer.GetAISContext().InitSelected();
 			if( m_Viewer.GetAISContext().NbSelected() != 2 ) {
-				m_Viewer.GetAISContext().UpdateCurrentViewer();
 				return;
 			}
 			List<TopoDS_Shape> selectedShapeList = new List<TopoDS_Shape>();
