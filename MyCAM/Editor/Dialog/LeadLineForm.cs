@@ -12,6 +12,9 @@ namespace MyCAM.Editor.Dialog
 
 		public LeadLineForm( LeadData leadParam )
 		{
+			if( leadParam == null ) {
+				leadParam = new LeadData();
+			}
 			InitializeComponent();
 			m_LeadParam = leadParam;
 

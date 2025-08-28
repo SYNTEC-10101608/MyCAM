@@ -232,10 +232,18 @@ namespace MyCAM.Data
 		{
 			get
 			{
+				// to prevent null value
+				if( m_LeadParam == null ) {
+					m_LeadParam = new LeadData();
+				}
 				return m_LeadParam;
 			}
 			set
 			{
+				// to prevent null value
+				if( value == null ) {
+					value = new LeadData();
+				}
 				if( m_LeadParam != value ) {
 					m_LeadParam = value;
 					m_IsDirty = true;
@@ -333,7 +341,7 @@ namespace MyCAM.Data
 		double m_OverCutLength = 0;
 
 		// lead param
-		LeadData m_LeadParam = new LeadData( LeadType.LeadLineType.None, LeadType.LeadLineType.None, 0, 0, 0, 0, false );
+		LeadData m_LeadParam = new LeadData();
 
 		// dirty flag
 		bool m_IsDirty = false;
