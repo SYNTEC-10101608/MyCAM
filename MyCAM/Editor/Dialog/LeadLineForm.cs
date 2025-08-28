@@ -252,10 +252,14 @@ namespace MyCAM.Editor.Dialog
 		// before set param need to check params are valid
 		void SetParam()
 		{
-			double.TryParse( m_tbxLeadInLength.Text, out m_LeadParam.LeadIn.Length );
-			double.TryParse( m_tbxLeadInAngle.Text, out m_LeadParam.LeadIn.Angle );
-			double.TryParse( m_tbxLeadOutLength.Text, out m_LeadParam.LeadOut.Length );
-			double.TryParse( m_tbxLeadOutAngle.Text, out m_LeadParam.LeadOut.Angle );
+			double.TryParse( m_tbxLeadInLength.Text, out double dLeadInLength );
+			double.TryParse( m_tbxLeadInAngle.Text, out double dLeadInAngle );
+			double.TryParse( m_tbxLeadOutLength.Text, out double dLeadOutLength );
+			double.TryParse( m_tbxLeadOutAngle.Text, out double dLeadOutAngle );
+			m_LeadParam.LeadIn.Length = dLeadInLength;
+			m_LeadParam.LeadIn.Angle = dLeadInAngle;
+			m_LeadParam.LeadOut.Length = dLeadOutLength;
+			m_LeadParam.LeadOut.Angle = dLeadOutAngle;
 			m_LeadParam.IsChangeLeadDirection = m_chkFlip.Checked;
 		}
 
