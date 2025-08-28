@@ -323,8 +323,8 @@ namespace MyCAM.Editor
 			// start the action
 			m_CurrentAction = action;
 			m_CurrentAction.StartAction += OnEditActionStart;
-			m_CurrentAction.Start();
 			m_CurrentAction.EndAction += OnEditActionEnd;
+			m_CurrentAction.Start();
 		}
 
 		void OnEditActionEnd( IEditorAction action )
