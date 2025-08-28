@@ -240,7 +240,7 @@ namespace MyCAM.Editor
 			ShowCAMData();
 		}
 
-		public void SetToolVecReverse()
+		public void SetOverCut()
 		{
 			if( m_CurrentAction.ActionType != EditActionType.Default ) {
 				return;
@@ -250,10 +250,9 @@ namespace MyCAM.Editor
 				return;
 			}
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-
-			// toggle reverse state
-			pathData.CAMData.IsToolVecReverse = !pathData.CAMData.IsToolVecReverse;
-			ShowCAMData();
+			OverCutAction action = new OverCutAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
 		}
 
 		public void SetLeadLine()
@@ -296,21 +295,6 @@ namespace MyCAM.Editor
 			ShowCAMData();
 		}
 
-		public void SetOverCut()
-		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
-				return;
-			}
-			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
-				return;
-			}
-			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-			OverCutAction action = new OverCutAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
-			action.PropertyChanged += ShowCAMData;
-			StartEditAction( action );
-		}
-
 		public void SetToolVec()
 		{
 			if( m_CurrentAction.ActionType != EditActionType.Default ) {
@@ -324,6 +308,22 @@ namespace MyCAM.Editor
 			ToolVecAction action = new ToolVecAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
+		}
+
+		public void SetToolVecReverse()
+		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+
+			// toggle reverse state
+			pathData.CAMData.IsToolVecReverse = !pathData.CAMData.IsToolVecReverse;
+			ShowCAMData();
 		}
 
 		#endregion
