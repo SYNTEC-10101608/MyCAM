@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using MyCAM.Manufactor;
+﻿using MyCAM.Manufactor;
 using OCC.BOPTools;
 using OCC.BRepAdaptor;
 using OCC.GCPnts;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -624,11 +624,10 @@ namespace MyCAM.Data
 			if( m_CAMPointList.Count == 0 || m_OverCutLength == 0 || !IsClosed ) {
 				return;
 			}
-
 			double dTotalOverCutLength = 0;
 
 			// end point is the start of over cut
-			m_OverCutPointList.Add( m_CAMPointList.Last() );
+			m_OverCutPointList.Add( m_CAMPointList.Last().Clone() );
 			for( int i = 0; i < m_CAMPointList.Count - 1; i++ ) {
 
 				// get this edge distance
@@ -644,7 +643,7 @@ namespace MyCAM.Data
 					// need to stop inside this segment
 					double dRemain = m_OverCutLength - dTotalOverCutLength;
 					if( dRemain <= PRECISION_MIN_ERROR ) {
-						break;
+						return;
 					}
 
 					// compute new point along segment
@@ -657,7 +656,7 @@ namespace MyCAM.Data
 					CADPoint cadPoint = new CADPoint( overCutEndPoint, endPointToolVec, endPointToolVec, endPointTangentVec );
 					CAMPoint camPoint = new CAMPoint( cadPoint, endPointToolVec );
 					m_OverCutPointList.Add( camPoint );
-					break;
+					return;
 				}
 			}
 		}
@@ -678,7 +677,7 @@ namespace MyCAM.Data
 
 		gp_Dir InterpolateVecBetween2Vec( gp_Vec currentVec, gp_Vec nextVec, double interpolatePercent )
 		{
-			// if the paths are parallel, there are infinite possibilities
+			// this case is unsolcvable, so just return current vec
 			if( currentVec.IsOpposite( nextVec, PRECISION_MIN_ERROR ) ) {
 				return new gp_Dir( currentVec.XYZ() );
 			}
@@ -698,8 +697,8 @@ namespace MyCAM.Data
 
 		void InterpolateToolAndTangentVecBetween2CAMPoint( CAMPoint currentCAMPoint, CAMPoint nextCAMPoint, gp_Pnt point, out gp_Dir toolDir, out gp_Dir tangentDir )
 		{
-			toolDir = new gp_Dir();
-			tangentDir = new gp_Dir();
+			toolDir = currentCAMPoint.ToolVec;
+			tangentDir = currentCAMPoint.CADPoint.TangentVec;
 
 			// get current and next tool vector
 			gp_Vec currentVec = new gp_Vec( currentCAMPoint.ToolVec );
@@ -715,8 +714,6 @@ namespace MyCAM.Data
 
 			// two point overlap
 			if( dDistanceOfCAMPath2Point <= PRECISION_MIN_ERROR ) {
-				toolDir = new gp_Dir( currentVec );
-				tangentDir = new gp_Dir( currentTangentVec );
 				return;
 			}
 			double interpolatePercent = dDistanceBetweenCurrentPoint2NewPoint / dDistanceOfCAMPath2Point;
