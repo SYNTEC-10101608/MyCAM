@@ -752,15 +752,12 @@ namespace MyCAM.Data
 			if( m_CAMPointList.Count == 0 ) {
 				return;
 			}
-			List<CAMPoint> LeadInCAMPointList = new List<CAMPoint>();
 			switch( m_LeadParam.LeadIn.Type ) {
 				case LeadType.LeadLineType.Line:
-					LeadInCAMPointList = LeadManufactor.BuildStraightLeadLine( m_CAMPointList.First(), true, m_LeadParam.LeadIn.Length, m_LeadParam.LeadIn.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse );
-					m_LeadInCAMPointList.AddRange( LeadInCAMPointList );
+					m_LeadInCAMPointList = LeadManufactor.BuildStraightLeadLine( m_CAMPointList.First(), true, m_LeadParam.LeadIn.Length, m_LeadParam.LeadIn.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse );
 					break;
 				case LeadType.LeadLineType.Arc:
-					LeadInCAMPointList = LeadManufactor.BuildArcLeadLine( m_CAMPointList.First(), true, m_LeadParam.LeadIn.Length, m_LeadParam.LeadIn.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH );
-					m_LeadInCAMPointList.AddRange( LeadInCAMPointList );
+					m_LeadInCAMPointList = LeadManufactor.BuildArcLeadLine( m_CAMPointList.First(), true, m_LeadParam.LeadIn.Length, m_LeadParam.LeadIn.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH );
 					break;
 				default:
 					break;
@@ -782,15 +779,12 @@ namespace MyCAM.Data
 			else {
 				leadOutStartPoint = m_CAMPointList.Last();
 			}
-			List<CAMPoint> LeadOutCAMPointList = new List<CAMPoint>();
 			switch( m_LeadParam.LeadOut.Type ) {
 				case LeadType.LeadLineType.Line:
-					LeadOutCAMPointList = LeadManufactor.BuildStraightLeadLine( leadOutStartPoint, false, m_LeadParam.LeadOut.Length, m_LeadParam.LeadOut.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse );
-					m_LeadOutCAMPointList.AddRange( LeadOutCAMPointList );
+					m_LeadOutCAMPointList = LeadManufactor.BuildStraightLeadLine( leadOutStartPoint, false, m_LeadParam.LeadOut.Length, m_LeadParam.LeadOut.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse );
 					break;
 				case LeadType.LeadLineType.Arc:
-					LeadOutCAMPointList = LeadManufactor.BuildArcLeadLine( leadOutStartPoint, false, m_LeadParam.LeadOut.Length, m_LeadParam.LeadOut.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH );
-					m_LeadOutCAMPointList.AddRange( LeadOutCAMPointList );
+					m_LeadOutCAMPointList = LeadManufactor.BuildArcLeadLine( leadOutStartPoint, false, m_LeadParam.LeadOut.Length, m_LeadParam.LeadOut.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH );
 					break;
 				default:
 					break;
