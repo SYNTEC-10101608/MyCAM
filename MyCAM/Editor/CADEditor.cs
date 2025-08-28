@@ -63,7 +63,7 @@ namespace MyCAM.Editor
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Part );
 		}
 
-		public Action<EFunctionStatus> AxisTransformActionStausChanged;
+		public Action<EActionStatus> AxisTransformActionStausChanged;
 
 		// user interface
 		Viewer m_Viewer;
@@ -336,14 +336,14 @@ namespace MyCAM.Editor
 			}
 
 			if( action.ActionType == EditActionType.AxisTransform ) {
-				AxisTransformActionStausChanged?.Invoke( EFunctionStatus.Close );
+				AxisTransformActionStausChanged?.Invoke( EActionStatus.End );
 			}
 		}
 
 		void OnEditActionStart( IEditorAction action )
 		{
 			if( action.ActionType == EditActionType.AxisTransform ) {
-				AxisTransformActionStausChanged?.Invoke( EFunctionStatus.Open );
+				AxisTransformActionStausChanged?.Invoke( EActionStatus.Start );
 			}
 		}
 
