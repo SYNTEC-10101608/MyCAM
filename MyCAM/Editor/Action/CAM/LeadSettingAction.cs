@@ -34,7 +34,8 @@ namespace MyCAM.Editor
 			// get prvious lead back
 			leadDialog.OnCancel += () =>
 			{
-				m_CAMData.LeadLineParam = backupLeadParam;
+				// need clone to trigger property changed event
+				m_CAMData.LeadLineParam = backupLeadParam.Clone();
 				PropertyChanged?.Invoke( false, false ); // the second param is not used here
 				End();
 			};
