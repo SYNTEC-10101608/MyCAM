@@ -307,7 +307,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-			OverCutAction action = new OverCutAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData, ESelectObjectType.Path );
+			OverCutAction action = new OverCutAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			action.OverCutActionStatusChange += OverCutActionStatusChange;
 			StartEditAction( action );

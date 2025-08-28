@@ -7,15 +7,14 @@ using OCCViewer;
 
 namespace MyCAM.Editor
 {
-	internal class OverCutAction : DefaultAction
+	internal class OverCutAction : EditActionBase
 	{
 		public Action<EFunctionStatus> OverCutActionStatusChange;
 
 		public OverCutAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
-		CAMData camData, ESelectObjectType type )
-		: base( viewer, treeView, cadManager, viewManager, type )
+		CAMData camData )
+		: base( viewer, treeView, cadManager, viewManager )
 		{
-
 			if( camData == null ) {
 				throw new ArgumentNullException( "PathIndexSelectAction constructing argument camData null" );
 			}
@@ -46,6 +45,14 @@ namespace MyCAM.Editor
 			overCutForm.Show( MyApp.MainForm );
 		}
 
+		public override EditActionType ActionType
+		{
+			get
+			{
+				return EditActionType.OverCut;
+			}
+		}
+
 		public override void Start()
 		{
 			base.Start();
@@ -62,9 +69,27 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
+		protected override void ViewerMouseDown( MouseEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void ViewerKeyDown( KeyEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
+		{
+			// do nothing
+		}
 
 		public Action PropertyChanged;
-
 		CAMData m_CAMData;
 	}
 }
