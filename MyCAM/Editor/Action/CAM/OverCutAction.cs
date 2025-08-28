@@ -57,7 +57,7 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 			OverCutActionStatusChange?.Invoke( EFunctionStatus.Open );
-			//// disable tree view
+			// disable tree view
 			m_TreeView.Enabled = false;
 		}
 
