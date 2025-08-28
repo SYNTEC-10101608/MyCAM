@@ -7,14 +7,14 @@ using OCCViewer;
 
 namespace MyCAM.Editor
 {
-	internal class LeadSettingAction : DefaultAction
+	internal class LeadSettingAction : EditActionBase
 	{
 		public Action<EFunctionStatus> LeadActionStatusChange;
 		public Action<bool> PathWithLeadLine;
 
 		public LeadSettingAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
-			CAMData camData, ESelectObjectType type )
-			: base( viewer, treeView, cadManager, viewManager, type )
+			CAMData camData )
+			: base( viewer, treeView, cadManager, viewManager )
 		{
 			if( camData == null ) {
 				throw new ArgumentNullException( "PathIndexSelectAction constructing argument camData null" );
@@ -82,6 +82,26 @@ namespace MyCAM.Editor
 		void SetLeadParam( LeadLineForm leadDialog )
 		{
 			m_CAMData.LeadLineParam = leadDialog.LeadLindParam.Clone();
+		}
+
+		protected override void ViewerMouseDown( MouseEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void ViewerKeyDown( KeyEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
+		{
+			// do nothing
 		}
 
 		CAMData m_CAMData;

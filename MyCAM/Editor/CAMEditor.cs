@@ -265,7 +265,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-			LeadSettingAction action = new LeadSettingAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData, ESelectObjectType.Path );
+			LeadSettingAction action = new LeadSettingAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			action.LeadActionStatusChange += LeadActionStatusChange;
 
