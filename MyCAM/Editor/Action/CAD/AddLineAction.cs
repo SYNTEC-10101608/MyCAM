@@ -116,7 +116,7 @@ namespace MyCAM.Editor
 			}
 			bool isValidPoint = GeometryTool.CreateLineFromTwoVertex( vertex1, vertex2, out TopoDS_Edge edge );
 			if( !isValidPoint ) {
-				MessageBox.Show( "Valid Point" );
+				MessageBox.Show( "Invalid Point" );
 				return false;
 			}
 			m_CADManager.AddReferenceFeature( edge );
