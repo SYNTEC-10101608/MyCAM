@@ -25,8 +25,7 @@ namespace MyCAM.Editor
 		// to notice main form
 		public Action<EFunctionStatus> LeadActionStatusChange;
 		public Action<EFunctionStatus> OverCutActionStatusChange;
-		public Action<bool> CurrentPathWithLead;
-		public Action<bool> CurrentPathIsClosed;
+		public Action<bool, bool> PathPropertyChanged; // isClosed, hasLead
 
 		public CAMEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 		{
@@ -752,10 +751,8 @@ namespace MyCAM.Editor
 				return;
 			}
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-
-			CurrentPathIsClosed?.Invoke( pathData.CAMData.IsClosed );
 			bool isPathWithLead = pathData.CAMData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None || pathData.CAMData.LeadLineParam.LeadOut.Type != LeadType.LeadLineType.None;
-			CurrentPathWithLead( isPathWithLead );
+			PathPropertyChanged?.Invoke( pathData.CAMData.IsClosed, isPathWithLead );
 		}
 
 		bool m_IsNextAction = false;

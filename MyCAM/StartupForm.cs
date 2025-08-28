@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using OCC.AIS;
@@ -8,6 +6,8 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
+using System;
+using System.Windows.Forms;
 
 namespace MyCAM
 {
@@ -47,10 +47,9 @@ namespace MyCAM
 
 			// CAM Editor
 			m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
-			m_CAMEditor.LeadActionStatusChange += OnLeadSettingActionStatusChange;
-			m_CAMEditor.CurrentPathWithLead += OnPathWithLead;
-			m_CAMEditor.CurrentPathIsClosed += OnPathIsClose;
 			m_CAMEditor.OverCutActionStatusChange += OnOverCutActionStatusChange;
+			m_CAMEditor.LeadActionStatusChange += OnLeadSettingActionStatusChange;
+			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
 
 			// init menu strip
 			m_msCAM.Enabled = false;
@@ -323,18 +322,23 @@ namespace MyCAM
 			m_msCAM.Enabled = true;
 		}
 
-		void OnPathWithLead( bool isPathWithLead )
+		void OnCAMPathPropertyChanged( bool isClosePath, bool isPathWithLead )
 		{
-			m_tsmiChangeLeadDirection.Enabled = isPathWithLead;
+			OnPathIsCloseChanged( isClosePath );
+			OnPathLeadChanged( isPathWithLead );
 		}
 
-		void OnPathIsClose( bool isClosePath )
+		void OnPathIsCloseChanged( bool isClosePath )
 		{
 			m_tsmiStartPoint.Enabled = isClosePath;
 			m_tsmiSetLead.Enabled = isClosePath;
 			m_tsmiOverCut.Enabled = isClosePath;
 		}
 
+		void OnPathLeadChanged( bool isPathWithLead )
+		{
+			m_tsmiChangeLeadDirection.Enabled = isPathWithLead;
+		}
 		#endregion
 	}
 }
