@@ -57,17 +57,8 @@ namespace MyCAM.Editor
 
 		public override void End()
 		{
-			// clear selection
-			m_Viewer.GetAISContext().ClearSelected( false );
-
 			// enable tree view
 			m_TreeView.Enabled = true;
-
-			// deactivate
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
-			}
-			m_Viewer.UpdateView();
 			base.End();
 		}
 
