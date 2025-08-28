@@ -286,6 +286,8 @@ namespace MyCAM.Editor
 				return;
 			}
 			pathData.CAMData.LeadLineParam.IsChangeLeadDirection = !pathData.CAMData.LeadLineParam.IsChangeLeadDirection;
+
+			// need clone to trigger property changed event
 			pathData.CAMData.LeadLineParam = pathData.CAMData.LeadLineParam.Clone();
 			ShowCAMData();
 		}
