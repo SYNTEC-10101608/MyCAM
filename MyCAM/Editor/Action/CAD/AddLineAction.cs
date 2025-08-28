@@ -68,11 +68,11 @@ namespace MyCAM.Editor
 				return;
 			}
 			m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_Add );
-			m_Viewer.GetAISContext().InitSelected();
 			if( m_Viewer.GetAISContext().NbSelected() != 2 ) {
 				return;
 			}
 			List<TopoDS_Shape> selectedShapeList = new List<TopoDS_Shape>();
+			m_Viewer.GetAISContext().InitSelected();
 			while( m_Viewer.GetAISContext().MoreSelected() ) {
 				var shape = m_Viewer.GetAISContext().SelectedShape();
 				if( shape.IsNull() || shape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
