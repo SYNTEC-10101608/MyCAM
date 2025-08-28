@@ -22,7 +22,7 @@ namespace MyCAM.Editor
 			LeadData backupLeadParam = m_CAMData.LeadLineParam.Clone();
 
 			// open lead setting form
-			LeadLineForm leadDialog = new LeadLineForm( m_CAMData.LeadLineParam );
+			LeadLineForm leadDialog = new LeadLineForm( m_CAMData.LeadLineParam.Clone() );
 
 			// preview will change viewer
 			leadDialog.Preview += () =>

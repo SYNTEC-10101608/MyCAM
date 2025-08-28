@@ -281,7 +281,7 @@ namespace MyCAM.Editor
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
 
 			// nothing change
-			if( pathData.CAMData.LeadLineParam.LeadIn.Type == LeadType.LeadLineType.None && pathData.CAMData.LeadLineParam.LeadIn.Type == LeadType.LeadLineType.None ) {
+			if( pathData.CAMData.IsHasLead  == false) {
 				pathData.CAMData.LeadLineParam.IsChangeLeadDirection = false;
 				return;
 			}
