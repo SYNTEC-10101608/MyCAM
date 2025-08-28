@@ -243,6 +243,17 @@ namespace MyCAM.Data
 			}
 		}
 
+		public bool IsHasLead
+		{
+			get
+			{
+				if( m_LeadParam == null ) {
+					return false;
+				}
+				return ( m_LeadParam.LeadIn.Type != LeadType.LeadLineType.None ) || ( m_LeadParam.LeadOut.Type != LeadType.LeadLineType.None );
+			}
+		}
+
 		public double OverCutLength
 		{
 			get

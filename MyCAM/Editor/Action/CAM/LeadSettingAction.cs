@@ -28,20 +28,20 @@ namespace MyCAM.Editor
 			leadDialog.Preview += () =>
 			{
 				SetLeadParam( leadDialog );
-				PropertyChanged?.Invoke( false );
+				PropertyChanged?.Invoke( false, false ); // the second param is not used here
 			};
 
 			// get prvious lead back
 			leadDialog.OnCancel += () =>
 			{
 				m_CAMData.LeadLineParam = backupLeadParam;
-				PropertyChanged?.Invoke( false );
+				PropertyChanged?.Invoke( false, false ); // the second param is not used here
 				End();
 			};
 			leadDialog.OnComfirm += () =>
 			{
 				SetLeadParam( leadDialog );
-				PropertyChanged?.Invoke( true );
+				PropertyChanged?.Invoke( true, m_CAMData.IsHasLead );
 				End();
 			};
 			leadDialog.Show( MyApp.MainForm );
@@ -70,7 +70,7 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		public Action<bool> PropertyChanged;
+		public Action<bool, bool> PropertyChanged; // isConfirm, isHasLead
 
 		void SetLeadParam( LeadLineForm leadDialog )
 		{

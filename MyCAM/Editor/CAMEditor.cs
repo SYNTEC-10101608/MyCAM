@@ -626,11 +626,11 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		void OnSetLeadPropertyChanged( bool isConfirm )
+		void OnSetLeadPropertyChanged( bool isConfirm, bool isHasLead )
 		{
 			ShowCAMData();
 			if( isConfirm ) {
-				// TODO: publish event here
+				PathPropertyChanged?.Invoke( ( (PathData)m_CADManager.ShapeDataMap[ GetSelectedPathID() ] ).CAMData.IsClosed, isHasLead );
 			}
 		}
 
@@ -751,8 +751,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-			bool isPathWithLead = pathData.CAMData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None || pathData.CAMData.LeadLineParam.LeadOut.Type != LeadType.LeadLineType.None;
-			PathPropertyChanged?.Invoke( pathData.CAMData.IsClosed, isPathWithLead );
+			PathPropertyChanged?.Invoke( pathData.CAMData.IsClosed, pathData.CAMData.IsHasLead );
 		}
 
 		bool m_IsNextAction = false;
