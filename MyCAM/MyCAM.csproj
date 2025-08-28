@@ -79,7 +79,7 @@
       <DependentUpon>OverCutForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\EFunctionStatus.cs" />
-    <Compile Include="Manafactor\LeadManufactor.cs" />
+    <Compile Include="Manufactor\LeadManufactor.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Data\CAMData.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
