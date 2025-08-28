@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using MyCAM.Data;
-using MyCAM.Post;
+﻿using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRepPrimAPI;
 using OCC.Geom;
@@ -18,6 +13,10 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -309,7 +308,6 @@ namespace MyCAM.Editor
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
 			OverCutAction action = new OverCutAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
-			action.OverCutActionStatusChange += OverCutActionStatusChange;
 			StartEditAction( action );
 		}
 
@@ -710,8 +708,9 @@ namespace MyCAM.Editor
 
 			// start the action
 			m_CurrentAction = action;
-			m_CurrentAction.Start();
+			m_CurrentAction.StartAction += OnEditActionStart;
 			m_CurrentAction.EndAction += OnEditActionEnd;
+			m_CurrentAction.Start();
 		}
 
 		void OnEditActionEnd( IEditorAction action )
@@ -720,6 +719,16 @@ namespace MyCAM.Editor
 			if( !m_IsNextAction ) {
 				m_CurrentAction = m_DefaultAction;
 				m_CurrentAction.Start();
+			}
+			if( action.ActionType == EditActionType.OverCut ) {
+				OverCutActionStatusChange?.Invoke( EFunctionStatus.Close );
+			}
+		}
+
+		void OnEditActionStart( IEditorAction action )
+		{
+			if( action.ActionType == EditActionType.OverCut ) {
+				OverCutActionStatusChange?.Invoke( EFunctionStatus.Open );
 			}
 		}
 

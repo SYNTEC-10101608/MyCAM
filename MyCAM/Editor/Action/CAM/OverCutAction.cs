@@ -1,16 +1,14 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using OCCViewer;
+using System;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
 	internal class OverCutAction : EditActionBase
 	{
-		public Action<EFunctionStatus> OverCutActionStatusChange;
-
 		public OverCutAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 		CAMData camData )
 		: base( viewer, treeView, cadManager, viewManager )
@@ -56,7 +54,7 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			OverCutActionStatusChange?.Invoke( EFunctionStatus.Open );
+
 			// disable tree view
 			m_TreeView.Enabled = false;
 		}
@@ -65,7 +63,6 @@ namespace MyCAM.Editor
 		{
 			// enable tree view
 			m_TreeView.Enabled = true;
-			OverCutActionStatusChange?.Invoke( EFunctionStatus.Close );
 			base.End();
 		}
 
