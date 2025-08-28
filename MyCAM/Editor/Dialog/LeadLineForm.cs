@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MyCAM.Data;
+using System;
 using System.Windows.Forms;
-using MyCAM.Data;
 
 namespace MyCAM.Editor.Dialog
 {
