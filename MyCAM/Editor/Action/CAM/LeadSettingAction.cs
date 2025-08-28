@@ -1,15 +1,14 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using OCCViewer;
+using System;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
 	internal class LeadSettingAction : EditActionBase
 	{
-		public Action<EFunctionStatus> LeadActionStatusChange;
 		public Action<bool> PathWithLeadLine;
 
 		public LeadSettingAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
@@ -63,7 +62,6 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			LeadActionStatusChange?.Invoke( EFunctionStatus.Open );
 
 			// disable tree view
 			m_TreeView.Enabled = false;
@@ -73,7 +71,6 @@ namespace MyCAM.Editor
 		{
 			// enable tree view
 			m_TreeView.Enabled = true;
-			LeadActionStatusChange?.Invoke( EFunctionStatus.Close );
 			base.End();
 		}
 

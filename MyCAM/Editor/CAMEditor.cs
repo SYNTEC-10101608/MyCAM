@@ -267,7 +267,6 @@ namespace MyCAM.Editor
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
 			LeadSettingAction action = new LeadSettingAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
-			action.LeadActionStatusChange += LeadActionStatusChange;
 
 			// after set lead line but haven't change path, change lead direction should be disable
 			action.PathWithLeadLine += CurrentPathWithLead;
@@ -723,12 +722,18 @@ namespace MyCAM.Editor
 			if( action.ActionType == EditActionType.OverCut ) {
 				OverCutActionStatusChange?.Invoke( EFunctionStatus.Close );
 			}
+			if( action.ActionType == EditActionType.SetLead ) {
+				LeadActionStatusChange?.Invoke( EFunctionStatus.Close );
+			}
 		}
 
 		void OnEditActionStart( IEditorAction action )
 		{
 			if( action.ActionType == EditActionType.OverCut ) {
 				OverCutActionStatusChange?.Invoke( EFunctionStatus.Open );
+			}
+			if( action.ActionType == EditActionType.SetLead ) {
+				LeadActionStatusChange?.Invoke( EFunctionStatus.Open );
 			}
 		}
 
