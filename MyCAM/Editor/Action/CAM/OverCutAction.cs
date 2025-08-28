@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using OCCViewer;
-using static MyCAM.Editor.LeadSettingAction;
 
 namespace MyCAM.Editor
 {
@@ -23,7 +21,6 @@ namespace MyCAM.Editor
 			}
 			m_CAMData = camData;
 			double dOverCutBackup = m_CAMData.OverCutLength;
-			// open over cut
 			OverCutForm overCutForm = new OverCutForm( m_CAMData.OverCutLength );
 
 			// preview will change viewer
@@ -52,8 +49,8 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			OverCutActionStatusChange?.Invoke(EActionStatus.Start);
-			// disable tree view
+			OverCutActionStatusChange?.Invoke( EActionStatus.Start );
+			//// disable tree view
 			m_TreeView.Enabled = false;
 		}
 
