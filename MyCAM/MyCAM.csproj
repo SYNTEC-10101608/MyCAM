@@ -63,7 +63,6 @@
     <Compile Include="Editor\Dialog\AxisTransformDlg.Designer.cs">
       <DependentUpon>AxisTransformDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\EFunctionStatus.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Data\CAMData.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
