@@ -68,12 +68,11 @@ namespace MyCAM.Editor
 				return;
 			}
 			m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_Add );
-			m_Viewer.GetAISContext().InitSelected();
 			if( m_Viewer.GetAISContext().NbSelected() != 2 ) {
-				m_Viewer.GetAISContext().UpdateCurrentViewer();
 				return;
 			}
 			List<TopoDS_Shape> selectedShapeList = new List<TopoDS_Shape>();
+			m_Viewer.GetAISContext().InitSelected();
 			while( m_Viewer.GetAISContext().MoreSelected() ) {
 				var shape = m_Viewer.GetAISContext().SelectedShape();
 				if( shape.IsNull() || shape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
@@ -117,7 +116,7 @@ namespace MyCAM.Editor
 			}
 			bool isValidPoint = GeometryTool.CreateLineFromTwoVertex( vertex1, vertex2, out TopoDS_Edge edge );
 			if( !isValidPoint ) {
-				MessageBox.Show( "Valid Point" );
+				MessageBox.Show( "Invalid Point" );
 				return false;
 			}
 			m_CADManager.AddReferenceFeature( edge );

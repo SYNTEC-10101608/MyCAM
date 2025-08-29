@@ -39,7 +39,7 @@ namespace MyCAM.Editor
 				if( m_AddPointType == AddPointType.TwoVertexMidPoint ) {
 					m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Vertex );
 				}
-				else {
+				else if( m_AddPointType == AddPointType.EdgeMidPoint || m_AddPointType == AddPointType.CircArcCenter ) {
 					m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Edge );
 				}
 			}
@@ -77,15 +77,13 @@ namespace MyCAM.Editor
 
 			// get selection edge or vertex
 			m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_Add );
-			m_Viewer.GetAISContext().InitSelected();
-			if( m_AddPointType == AddPointType.TwoVertexMidPoint && m_Viewer.GetAISContext().NbSelected() != 2 ) {
-				m_Viewer.GetAISContext().UpdateCurrentViewer();
+			if( ( m_AddPointType == AddPointType.TwoVertexMidPoint && m_Viewer.GetAISContext().NbSelected() != 2 )
+				|| m_Viewer.GetAISContext().NbSelected() == 0 ) {
 				return;
 			}
-
 			List<TopoDS_Shape> selectedShapeList = new List<TopoDS_Shape>();
+			m_Viewer.GetAISContext().InitSelected();
 			while( m_Viewer.GetAISContext().MoreSelected() ) {
-
 				var shape = m_Viewer.GetAISContext().SelectedShape();
 				if( shape.IsNull() ) {
 					return;
@@ -96,8 +94,11 @@ namespace MyCAM.Editor
 
 			// add the point
 			bool isAdded = false;
-			if( selectedShapeList.First().ShapeType() == TopAbs_ShapeEnum.TopAbs_EDGE ) {
-
+			if( m_AddPointType == AddPointType.CircArcCenter || m_AddPointType == AddPointType.EdgeMidPoint ) {
+				TopoDS_Shape theShape = selectedShapeList.First();
+				if( theShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_EDGE ) {
+					return;
+				}
 				TopoDS_Edge edge = TopoDS.ToEdge( selectedShapeList.First() );
 				if( m_AddPointType == AddPointType.CircArcCenter ) {
 					isAdded = AddCircArcCenter( edge );
@@ -106,8 +107,12 @@ namespace MyCAM.Editor
 					isAdded = AddEdgeMidPoint( edge );
 				}
 			}
-			else if( selectedShapeList.First().ShapeType() == TopAbs_ShapeEnum.TopAbs_VERTEX ) {
-
+			else if( m_AddPointType == AddPointType.TwoVertexMidPoint ) {
+				TopoDS_Shape theShape1 = selectedShapeList.First();
+				TopoDS_Shape theShape2 = selectedShapeList.Last();
+				if( theShape1.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX || theShape2.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
+					return;
+				}
 				TopoDS_Vertex v1 = TopoDS.ToVertex( selectedShapeList.First() );
 				TopoDS_Vertex v2 = TopoDS.ToVertex( selectedShapeList.Last() );
 				if( v1.IsEqual( v2 ) ) {
