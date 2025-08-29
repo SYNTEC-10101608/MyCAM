@@ -164,12 +164,12 @@ namespace MyCAM
 			m_CADEditor.StartAxisTransform();
 		}
 
-		void OnAxisTransformActionStausChanged( EFunctionStatus status )
+		void OnAxisTransformActionStausChanged( EActionStatus status )
 		{
-			if( status == EFunctionStatus.Open ) {
+			if( status == EActionStatus.Start ) {
 				m_msCAD.Enabled = false;
 			}
-			else if( status == EFunctionStatus.Close ) {
+			else if( status == EActionStatus.End ) {
 				m_msCAD.Enabled = true;
 			}
 		}
