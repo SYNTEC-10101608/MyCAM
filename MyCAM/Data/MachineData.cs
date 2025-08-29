@@ -136,6 +136,16 @@ namespace MyCAM.Data
 				}
 			}
 		}
+
+		public abstract gp_Pnt PtOnMaster
+		{
+			get;
+		}
+
+		public abstract gp_Pnt PtOnSlave
+		{
+			get;
+		}
 	}
 
 	internal class SpindleTypeMachineData : MachineData
@@ -156,6 +166,24 @@ namespace MyCAM.Data
 		public gp_Vec SlaveToMasterVec
 		{
 			get; set;
+		}
+
+		public override gp_Pnt PtOnMaster
+		{
+			get
+			{
+				gp_Pnt MCSPt = new gp_Pnt( 0, 0, 0 );
+				return MCSPt.Translated( ToolToSlaveVec + SlaveToMasterVec );
+			}
+		}
+
+		public override gp_Pnt PtOnSlave
+		{
+			get
+			{
+				gp_Pnt MCSPt = new gp_Pnt( 0, 0, 0 );
+				return MCSPt.Translated( ToolToSlaveVec );
+			}
 		}
 	}
 
@@ -178,6 +206,24 @@ namespace MyCAM.Data
 		{
 			get; set;
 		}
+
+		public override gp_Pnt PtOnMaster
+		{
+			get
+			{
+				gp_Pnt MCSPt = new gp_Pnt( 0, 0, 0 );
+				return MCSPt.Translated( MCSToMasterVec );
+			}
+		}
+
+		public override gp_Pnt PtOnSlave
+		{
+			get
+			{
+				gp_Pnt MCSPt = new gp_Pnt( 0, 0, 0 );
+				return MCSPt.Translated( MCSToMasterVec + MasterToSlaveVec );
+			}
+		}
 	}
 
 	internal class MixTypeMachineData : MachineData
@@ -198,6 +244,24 @@ namespace MyCAM.Data
 		public gp_Vec MCSToSlaveVec
 		{
 			get; set;
+		}
+
+		public override gp_Pnt PtOnMaster
+		{
+			get
+			{
+				gp_Pnt MCSPt = new gp_Pnt( 0, 0, 0 );
+				return MCSPt.Translated( ToolToMasterVec );
+			}
+		}
+
+		public override gp_Pnt PtOnSlave
+		{
+			get
+			{
+				gp_Pnt MCSPt = new gp_Pnt( 0, 0, 0 );
+				return MCSPt.Translated( MCSToSlaveVec );
+			}
 		}
 	}
 }

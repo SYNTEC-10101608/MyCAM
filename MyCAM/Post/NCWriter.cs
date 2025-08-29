@@ -38,7 +38,7 @@ namespace MyCAM.Post
 		void WriteCutting( CAMData cuttingProcessData, int index )
 		{
 			// get rotary axis
-			m_PostSolver.Solve( cuttingProcessData, out List<PostData> postDataList, out _ );
+			PostHelper.SolvePath( m_PostSolver, cuttingProcessData, out List<PostData> postDataList, out _ );
 
 			// compute approach points
 			gp_Vec toolVec = new gp_Vec( cuttingProcessData.CAMPointList[ 0 ].ToolVec.XYZ() );
@@ -72,10 +72,10 @@ namespace MyCAM.Post
 			string szX = point.X().ToString( "F3" );
 			string szY = point.Y().ToString( "F3" );
 			string szZ = point.Z().ToString( "F3" );
-			string szA = ( dM * 180 / Math.PI ).ToString( "F3" );
+			string szB = ( dM * 180 / Math.PI ).ToString( "F3" );
 			string szC = ( dS * 180 / Math.PI ).ToString( "F3" );
 			string command = G00 ? "G00" : "G01";
-			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} A{szA} C{szC};" );
+			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} B{szB} C{szC};" );
 		}
 
 		const int SAFE_PLANE_Z = 300;

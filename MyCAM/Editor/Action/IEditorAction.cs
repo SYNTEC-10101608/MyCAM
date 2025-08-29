@@ -5,6 +5,12 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
+	internal enum EActionStatus
+	{
+		Start,
+		End,
+	}
+
 	internal enum EditActionType
 	{
 		None = 0,
