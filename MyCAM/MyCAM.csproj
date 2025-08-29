@@ -97,6 +97,7 @@
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="Post\NCWriter.cs" />
+    <Compile Include="Post\PostHelper.cs" />
     <Compile Include="Post\PostSolver.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
