@@ -63,7 +63,7 @@
     <Compile Include="Editor\Dialog\AxisTransformDlg.Designer.cs">
       <DependentUpon>AxisTransformDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\EFunctionStatus.cs" />
+    <Compile Include="Editor\SimuEditor.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Data\CAMData.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
@@ -95,7 +95,9 @@
     <Compile Include="Editor\ViewManager.cs" />
     <Compile Include="Data\BasicData.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
+    <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="Post\NCWriter.cs" />
+    <Compile Include="Post\PostHelper.cs" />
     <Compile Include="Post\PostSolver.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>

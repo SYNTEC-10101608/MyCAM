@@ -1,6 +1,6 @@
 #pragma once
 #include "PostToolCommon.h"
-#include <Dense>
+#include <Eigen/Dense>
 
 namespace PostTool
 {

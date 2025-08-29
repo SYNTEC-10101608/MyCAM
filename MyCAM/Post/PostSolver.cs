@@ -1,7 +1,6 @@
 ﻿using MyCAM.Data;
 using OCC.gp;
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace MyCAM.Post
@@ -30,6 +29,7 @@ namespace MyCAM.Post
 		NoSolution = 1,
 		MasterInfinityOfSolution = 2,
 		SlaveInfinityOfSolution = 3,
+		IvalidInput = 4,
 	}
 
 	/// <summary>
@@ -350,68 +350,33 @@ namespace MyCAM.Post
 			m_IKSolver = solverBuilder.BuildIKSolver();
 		}
 
-		public bool Solve( CAMData camData,
-			out List<PostData> resultG54, out List<PostData> resultMCS )
+		public IKSolveResult SolveIK( CAMPoint point, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
 		{
-			resultG54 = new List<PostData>();
-			resultMCS = new List<PostData>();
-			if( camData == null ) {
-				return false;
+			dM_Out = 0;
+			dS_Out = 0;
+			if( point == null ) {
+				return IKSolveResult.IvalidInput;
 			}
 
-			// solve IK
-			List<Tuple<double, double>> rotateAngleList = new List<Tuple<double, double>>();
-			List<bool> sigularTagList = new List<bool>();
-			double dM = 0;
-			double dS = 0;
-			foreach( CAMPoint point in camData.CAMPointList ) {
-				IKSolveResult ikResult = m_IKSolver.Solve( point.ToolVec, dM, dS, out dM, out dS );
-
-				// swap the master and slave angle if needed
-				rotateAngleList.Add( m_IKSolver.IsReverseMS ? new Tuple<double, double>( dS, dM ) : new Tuple<double, double>( dM, dS ) );
-				if( ikResult == IKSolveResult.NoError ) {
-					sigularTagList.Add( false );
-				}
-				else if( ikResult == IKSolveResult.MasterInfinityOfSolution || ikResult == IKSolveResult.SlaveInfinityOfSolution ) {
-					sigularTagList.Add( true );
-				}
-
-				// some point in the path is unsolvable
-				else {
-					return false;
-				}
+			// swap the input master and slave axis if needed
+			if( m_IKSolver.IsReverseMS ) {
+				(dS_In, dM_In) = (dM_In, dS_In);
 			}
+			IKSolveResult ikResult = m_IKSolver.Solve( point.ToolVec, dM_In, dS_In, out dM_Out, out dS_Out );
 
-			// TODO: filter the sigular points
-			// solve FK
-			for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
-				gp_Pnt pointG54 = camData.CAMPointList[ i ].CADPoint.Point;
-				gp_Vec tcpOffset = m_FKSolver.Solve( rotateAngleList[ i ].Item1, rotateAngleList[ i ].Item2, new gp_Vec( pointG54.XYZ() ), m_G54Offset );
-				gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
-
-				// add G54 frame data
-				PostData frameDataG54 = new PostData()
-				{
-					X = pointG54.X(),
-					Y = pointG54.Y(),
-					Z = pointG54.Z(),
-					Master = rotateAngleList[ i ].Item1,
-					Slave = rotateAngleList[ i ].Item2
-				};
-				resultG54.Add( frameDataG54 );
-
-				// add MCS frame data
-				PostData frameDataMCS = new PostData()
-				{
-					X = pointMCS.X(),
-					Y = pointMCS.Y(),
-					Z = pointMCS.Z(),
-					Master = rotateAngleList[ i ].Item1,
-					Slave = rotateAngleList[ i ].Item2
-				};
-				resultMCS.Add( frameDataMCS );
+			// swap the output master and slave axis if needed
+			if( m_IKSolver.IsReverseMS ) {
+				(dS_Out, dM_Out) = (dM_Out, dS_Out);
 			}
-			return true;
+			return ikResult;
+		}
+
+		public gp_Vec SolveFK( double dM, double dS, gp_Pnt pointG54 )
+		{
+			if( pointG54 == null ) {
+				return new gp_Vec();
+			}
+			return m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54.XYZ() ), m_G54Offset );
 		}
 
 		public gp_Vec G54Offset
