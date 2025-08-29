@@ -1,10 +1,10 @@
-#include "FCLTest.h"
+#include "CollisionSolver.h"
 
 #pragma warning(disable:4146)
 
 using namespace fcl;
 
-void FCLTest::AddModel( const std::string &szID,
+void CollisionSolver::AddModel( const std::string &szID,
 	const int triCount, const int *indexList,
 	const int vertexCount, const double *vertexList )
 {
@@ -28,7 +28,7 @@ void FCLTest::AddModel( const std::string &szID,
 	m_ModelMap[ szID ] = geom;
 }
 
-bool FCLTest::CheckCollision( const std::string &szID1, const std::string &szID2,
+bool CollisionSolver::CheckCollision( const std::string &szID1, const std::string &szID2,
 	const double *trsf1, const double *trsf2 )
 {
 	auto it1 = m_ModelMap.find( szID1 );
@@ -52,7 +52,7 @@ bool FCLTest::CheckCollision( const std::string &szID1, const std::string &szID2
 	return result.isCollision();
 }
 
-Transform3f FCLTest::CreateTransform( const double *trsf )
+Transform3f CollisionSolver::CreateTransform( const double *trsf )
 {
 	Matrix3f R;
 	Vector3f T;

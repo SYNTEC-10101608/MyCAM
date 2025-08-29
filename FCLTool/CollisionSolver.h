@@ -3,9 +3,8 @@
 
 #include <fcl/fcl.h>
 
-class FCLTest
+class CollisionSolver
 {
-
 public:
 	void FCLTOOL_API AddModel( const std::string &szID,
 		const int triCount, const int *indexList,

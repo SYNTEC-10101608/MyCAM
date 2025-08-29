@@ -1,22 +1,22 @@
-#include "FCLTest.h"
+#include "CollisionSolver.h"
 
 extern "C" {
 
 	// construct
-	FCLTOOL_API FCLTest *__stdcall FCLTest_Create()
+	FCLTOOL_API CollisionSolver *__stdcall CollisionSolver_Create()
 	{
-		return new FCLTest();
+		return new CollisionSolver();
 	}
 
 	// destruct
-	FCLTOOL_API void __stdcall FCLTest_Destroy( FCLTest *obj )
+	FCLTOOL_API void __stdcall CollisionSolver_Destroy( CollisionSolver *obj )
 	{
 		delete obj;
 	}
 
 	// AddModel
-	FCLTOOL_API void __stdcall FCLTest_AddModel(
-		FCLTest *obj,
+	FCLTOOL_API void __stdcall CollisionSolver_AddModel(
+		CollisionSolver *obj,
 		const char *szID,
 		int triCount, const int *indexList,
 		int vertexCount, const double *vertexList )
@@ -28,8 +28,8 @@ extern "C" {
 	}
 
 	// CheckCollision
-	FCLTOOL_API bool __stdcall FCLTest_CheckCollision(
-		FCLTest *obj,
+	FCLTOOL_API bool __stdcall CollisionSolver_CheckCollision(
+		CollisionSolver *obj,
 		const char *szID1,
 		const char *szID2,
 		const double *trsf1,

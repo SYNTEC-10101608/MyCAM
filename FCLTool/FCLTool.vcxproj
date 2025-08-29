@@ -151,13 +151,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="FCLTest.h" />
+    <ClInclude Include="CollisionSolver.h" />
     <ClInclude Include="FCLToolCommon.h" />
     <ClInclude Include="framework.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FCLTest.cpp" />
-    <ClCompile Include="FCLTestWrapper.cpp" />
+    <ClCompile Include="CollisionSolver.cpp" />
+    <ClCompile Include="CollisionSolverWrapper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
