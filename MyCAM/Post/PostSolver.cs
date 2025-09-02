@@ -1,7 +1,7 @@
-﻿using MyCAM.Data;
-using OCC.gp;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
+using MyCAM.Data;
+using OCC.gp;
 
 namespace MyCAM.Post
 {
@@ -407,7 +407,7 @@ namespace MyCAM.Post
 
 		IKSolver m_IKSolver;
 		FKSolver m_FKSolver;
-		gp_Vec m_G54Offset;
+		gp_Vec m_G54Offset = new gp_Vec();
 	}
 
 	internal interface ISolverBuilder

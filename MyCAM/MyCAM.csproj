@@ -52,11 +52,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\LeadData.cs" />
     <Compile Include="Data\MachineData.cs" />
     <Compile Include="Data\MachineDefine.cs" />
     <Compile Include="Data\PostData.cs" />
     <Compile Include="Editor\Action\CAD\AddLineAction.cs" />
     <Compile Include="Editor\Action\CAD\AxisTransformAction.cs" />
+    <Compile Include="Editor\Action\CAM\LeadSettingAction.cs" />
+    <Compile Include="Editor\Action\CAM\OverCutAction.cs" />
     <Compile Include="Editor\Dialog\AxisTransformDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -64,6 +67,22 @@
       <DependentUpon>AxisTransformDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\SimuEditor.cs" />
+    <Compile Include="Data\LeadData.cs" />
+    <Compile Include="Editor\Action\CAM\LeadSettingAction.cs" />
+    <Compile Include="Editor\Action\CAM\OverCutAction.cs" />
+    <Compile Include="Editor\Dialog\LeadLineForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\LeadLineForm.Designer.cs">
+      <DependentUpon>LeadLineForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Dialog\OverCutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\OverCutForm.Designer.cs">
+      <DependentUpon>OverCutForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helper\LeadHelper.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Data\CAMData.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
@@ -109,6 +128,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Editor\Dialog\AxisTransformDlg.resx">
       <DependentUpon>AxisTransformDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\LeadLineForm.resx">
+      <DependentUpon>LeadLineForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\OverCutForm.resx">
+      <DependentUpon>OverCutForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\ThreePtTransformDlg.resx">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>

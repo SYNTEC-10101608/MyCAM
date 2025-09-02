@@ -1,9 +1,9 @@
-﻿using MyCAM.Data;
-using OCC.gp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MyCAM.Data;
+using OCC.gp;
 
 namespace MyCAM.Post
 {
@@ -11,6 +11,9 @@ namespace MyCAM.Post
 	{
 		public NCWriter( List<CAMData> processDataList, PostSolver postSolver )
 		{
+			if( processDataList == null || postSolver == null ) {
+				return;
+			}
 			m_ProcessDataList = processDataList;
 			m_PostSolver = postSolver;
 		}
@@ -37,34 +40,59 @@ namespace MyCAM.Post
 
 		void WriteCutting( CAMData cuttingProcessData, int index )
 		{
-			// get rotary axis
-			PostHelper.SolvePath( m_PostSolver, cuttingProcessData, out List<PostData> postDataList, out _ );
+			// solve master and slave angle
+			if( !PostHelper.SolvePath( m_PostSolver, cuttingProcessData, out _, out PostData currentPathPostData ) ) {
+				return;
+			}
+			PostPoint firstPointPostData, lastPointPostData = new PostPoint();
 
-			// compute approach points
-			gp_Vec toolVec = new gp_Vec( cuttingProcessData.CAMPointList[ 0 ].ToolVec.XYZ() );
-			gp_Pnt startPoint = cuttingProcessData.CAMPointList[ 0 ].CADPoint.Point;
+			// get first point on path
+			bool bWithLeadIn = cuttingProcessData.LeadInCAMPointList.Count > 0 && cuttingProcessData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None;
+			CAMPoint startCamPoint = bWithLeadIn ? cuttingProcessData.LeadInCAMPointList[ 0 ] : cuttingProcessData.CAMPointList[ 0 ];
+			firstPointPostData = bWithLeadIn ? currentPathPostData.LeadInPostPointList[ 0 ] : currentPathPostData.MainPathPostPointList[ 0 ];
+
+			// approaching
+			gp_Vec toolVec = new gp_Vec( startCamPoint.ToolVec.XYZ() );
+			gp_Pnt startPoint = startCamPoint.CADPoint.Point;
 			gp_Pnt approachPtG00 = startPoint.Translated( toolVec.Scaled( G00_APPROACH_LENGTH ) );
 			gp_Pnt approachPtG01 = startPoint.Translated( toolVec.Scaled( G01_APPROACH_LENGTH ) );
 			gp_Pnt safePlanePt = new gp_Pnt( approachPtG00.X(), approachPtG00.Y(), SAFE_PLANE_Z );
+			WriteOnePoint( safePlanePt, firstPointPostData.Master, firstPointPostData.Slave, true );
+			WriteOnePoint( approachPtG00, firstPointPostData.Master, firstPointPostData.Slave, true );
+			WriteOnePoint( approachPtG01, firstPointPostData.Master, firstPointPostData.Slave, true );
 
-			// write approach point (下刀)
-			WriteOnePoint( safePlanePt, postDataList[ 0 ].Master, postDataList[ 0 ].Slave, true );
-			WriteOnePoint( approachPtG00, postDataList[ 0 ].Master, postDataList[ 0 ].Slave, true );
-			WriteOnePoint( approachPtG01, postDataList[ 0 ].Master, postDataList[ 0 ].Slave, true );
+			// start cutting
+			m_StreamWriter.WriteLine( "// Cutting" + index );
+			m_StreamWriter.WriteLine( "N" + index );
+			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\" H1;" );
 
-			// write each cam data point
-			m_StreamWriter.WriteLine( "// Cutting" + index.ToString() );
-			m_StreamWriter.WriteLine( "N" + index.ToString() ); // N 碼
-			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\" H1;" ); // 開隨動
-			for( int i = 0; i < cuttingProcessData.CAMPointList.Count; i++ ) {
-				var pos = postDataList[ i ];
-				WriteOnePoint( cuttingProcessData.CAMPointList[ i ].CADPoint.Point, pos.Master, pos.Slave );
+			// write each process path
+			WriteOneProcessPath( cuttingProcessData.LeadInCAMPointList, currentPathPostData.LeadInPostPointList );
+			WriteOneProcessPath( cuttingProcessData.CAMPointList, currentPathPostData.MainPathPostPointList );
+			WriteOneProcessPath( cuttingProcessData.OverCutCAMPointList, currentPathPostData.OverCutPostPointList );
+			WriteOneProcessPath( cuttingProcessData.LeadOutCAMPointList, currentPathPostData.LeadOutPostPointList );
+
+			// end cutting
+			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" );
+
+			// find last post point for lifting
+			// with lead out
+			if( cuttingProcessData.LeadLineParam.LeadOut.Type != LeadType.LeadLineType.None && currentPathPostData.LeadOutPostPointList.Count > 0 ) {
+				lastPointPostData = currentPathPostData.LeadOutPostPointList.Last();
 			}
-			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" ); // 關隨動
 
-			// write approach point (抬刀，不需要抬到 G01 位置)
-			WriteOnePoint( approachPtG00, postDataList.Last().Master, postDataList.Last().Slave, true );
-			WriteOnePoint( safePlanePt, postDataList.Last().Master, postDataList.Last().Slave, true );
+			// with over cut but no lead out
+			else if( cuttingProcessData.OverCutCAMPointList.Count > 0 && currentPathPostData.OverCutPostPointList.Count > 0 ) {
+				lastPointPostData = currentPathPostData.OverCutPostPointList.Last();
+			}
+
+			// default main path
+			else {
+				lastPointPostData = currentPathPostData.MainPathPostPointList.Last();
+			}
+			WriteOnePoint( approachPtG00, lastPointPostData.Master, lastPointPostData.Slave, true );
+			WriteOnePoint( safePlanePt, lastPointPostData.Master, lastPointPostData.Slave, true );
+			return;
 		}
 
 		void WriteOnePoint( gp_Pnt point, double dM, double dS, bool G00 = false )
@@ -76,6 +104,18 @@ namespace MyCAM.Post
 			string szC = ( dS * 180 / Math.PI ).ToString( "F3" );
 			string command = G00 ? "G00" : "G01";
 			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} B{szB} C{szC};" );
+		}
+
+		void WriteOneProcessPath( List<CAMPoint> camList, List<PostPoint> postList )
+		{
+			// use cam point list to check is post point list length valid
+			if( camList == null || postList == null || camList.Count == 0 || postList.Count == 0 || camList.Count != postList.Count ) {
+				return;
+			}
+			for( int i = 0; i < camList.Count; i++ ) {
+				var pos = postList[ i ];
+				WriteOnePoint( new gp_Pnt( pos.X, pos.Y, pos.Z ), pos.Master, pos.Slave );
+			}
 		}
 
 		const int SAFE_PLANE_Z = 300;
