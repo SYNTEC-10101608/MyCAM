@@ -1,4 +1,8 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.Data;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.BRepAlgoAPI;
@@ -10,10 +14,6 @@ using OCC.Quantity;
 using OCC.RWStl;
 using OCC.TColStd;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -113,105 +113,113 @@ namespace MyCAM.Editor
 			if( m_CADManager.GetCAMDataList().Count == 0 || m_PostSolver == null ) {
 				return;
 			}
-			CAMData camData = m_CADManager.GetCAMDataList()[ 0 ];
-			gp_Vec G54Offset = new gp_Vec( 40, -385, -640 );
-			m_PostSolver.G54Offset = G54Offset;
-			PostHelper.SolvePath( m_PostSolver, camData, out _, out List<PostData> simuPostData );
-
-			// build frame by frame
-			foreach( var postData in simuPostData ) {
-
-				// set XYZ transform
-				Dictionary<MachineComponentType, gp_Trsf> transformMap = new Dictionary<MachineComponentType, gp_Trsf>();
-				gp_Trsf trsfX = new gp_Trsf();
-				trsfX.SetTranslation( new gp_Vec( postData.X + G54Offset.X(), 0, 0 ) );
-				if( m_WorkPieceChainSet.Contains( MachineComponentType.XAxis ) ) {
-					trsfX.Invert();
+			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+				gp_Vec G54Offset = new gp_Vec( 40, -385, -640 );
+				m_PostSolver.G54Offset = G54Offset;
+				if( PostHelper.SolvePath( m_PostSolver, camData, out PostData simuPostData, out _ ) == false ) {
+					continue;
 				}
-				transformMap[ MachineComponentType.XAxis ] = trsfX;
 
-				gp_Trsf trsfY = new gp_Trsf();
-				trsfY.SetTranslation( new gp_Vec( 0, postData.Y + G54Offset.Y(), 0 ) );
-				if( m_WorkPieceChainSet.Contains( MachineComponentType.YAxis ) ) {
-					trsfY.Invert();
-				}
-				transformMap[ MachineComponentType.YAxis ] = trsfY;
+				// connecting post points of all process paths
+				List<PostPoint> currentPathPostPointList = PostHelper.GetConcatenatedPostList( simuPostData );
 
-				gp_Trsf trsfZ = new gp_Trsf();
-				trsfZ.SetTranslation( new gp_Vec( 0, 0, postData.Z + G54Offset.Z() ) );
-				if( m_WorkPieceChainSet.Contains( MachineComponentType.ZAxis ) ) {
-					trsfZ.Invert();
-				}
-				transformMap[ MachineComponentType.ZAxis ] = trsfZ;
+				// build frame by frame
+				foreach( var postPoint in currentPathPostPointList ) {
 
-				// set master rotation
-				gp_Pnt ptOnMaster = m_MachineData.PtOnMaster;
-				gp_Ax1 axisMaster = new gp_Ax1( ptOnMaster, m_MachineData.MasterRotateDir );
-				gp_Trsf trsfMaster = new gp_Trsf();
-				trsfMaster.SetRotation( axisMaster, postData.Master );
-				if( m_WorkPieceChainSet.Contains( MachineComponentType.Master ) ) {
-					trsfMaster.Invert();
-				}
-				transformMap[ MachineComponentType.Master ] = trsfMaster;
-
-				// set slave rotation
-				gp_Pnt ptOnSlave = m_MachineData.PtOnSlave;
-				gp_Ax1 axisSlave = new gp_Ax1( ptOnSlave, m_MachineData.SlaveRotateDir );
-				gp_Trsf trsfSlave = new gp_Trsf();
-				trsfSlave.SetRotation( axisSlave, postData.Slave );
-				if( m_WorkPieceChainSet.Contains( MachineComponentType.Slave ) ) {
-					trsfSlave.Invert();
-				}
-				transformMap[ MachineComponentType.Slave ] = trsfSlave;
-
-				// set tool and workpiece transform
-				transformMap[ MachineComponentType.Tool ] = new gp_Trsf();
-				gp_Trsf trsfWorkPiece = new gp_Trsf();
-				trsfWorkPiece.SetTranslation( G54Offset );
-				transformMap[ MachineComponentType.WorkPiece ] = trsfWorkPiece;
-
-				// set chain
-				gp_Trsf trsfAllX = GetComponentTrsf( transformMap, MachineComponentType.XAxis );
-				gp_Trsf trsfAllY = GetComponentTrsf( transformMap, MachineComponentType.YAxis );
-				gp_Trsf trsfAllZ = GetComponentTrsf( transformMap, MachineComponentType.ZAxis );
-				gp_Trsf trsfAllMaster = GetComponentTrsf( transformMap, MachineComponentType.Master );
-				gp_Trsf trsfAllSlave = GetComponentTrsf( transformMap, MachineComponentType.Slave );
-				gp_Trsf trsAllfTool = GetComponentTrsf( transformMap, MachineComponentType.Tool );
-				gp_Trsf trsfAllWorkPiece = GetComponentTrsf( transformMap, MachineComponentType.WorkPiece );
-				m_FrameTransformMap[ MachineComponentType.XAxis ].Add( trsfAllX );
-				m_FrameTransformMap[ MachineComponentType.YAxis ].Add( trsfAllY );
-				m_FrameTransformMap[ MachineComponentType.ZAxis ].Add( trsfAllZ );
-				m_FrameTransformMap[ MachineComponentType.Master ].Add( trsfAllMaster );
-				m_FrameTransformMap[ MachineComponentType.Slave ].Add( trsfAllSlave );
-				m_FrameTransformMap[ MachineComponentType.Tool ].Add( trsAllfTool );
-				m_FrameTransformMap[ MachineComponentType.WorkPiece ].Add( trsfAllWorkPiece );
-
-				// set collision
-				HashSet<MachineComponentType> collisionResiltSet = new HashSet<MachineComponentType>();
-				foreach( var compT in m_ChainListMap[ MachineComponentType.Tool ] ) {
-					if( compT == MachineComponentType.Base ) {
-						continue; // skip base
+					// set XYZ transform
+					Dictionary<MachineComponentType, gp_Trsf> transformMap = new Dictionary<MachineComponentType, gp_Trsf>();
+					gp_Trsf trsfX = new gp_Trsf();
+					trsfX.SetTranslation( new gp_Vec( postPoint.X + G54Offset.X(), 0, 0 ) );
+					if( m_WorkPieceChainSet.Contains( MachineComponentType.XAxis ) ) {
+						trsfX.Invert();
 					}
-					foreach( var compW in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
-						if( compW == MachineComponentType.Base ) {
+					transformMap[ MachineComponentType.XAxis ] = trsfX;
+
+					gp_Trsf trsfY = new gp_Trsf();
+					trsfY.SetTranslation( new gp_Vec( 0, postPoint.Y + G54Offset.Y(), 0 ) );
+					if( m_WorkPieceChainSet.Contains( MachineComponentType.YAxis ) ) {
+						trsfY.Invert();
+					}
+					transformMap[ MachineComponentType.YAxis ] = trsfY;
+
+					gp_Trsf trsfZ = new gp_Trsf();
+					trsfZ.SetTranslation( new gp_Vec( 0, 0, postPoint.Z + G54Offset.Z() ) );
+					if( m_WorkPieceChainSet.Contains( MachineComponentType.ZAxis ) ) {
+						trsfZ.Invert();
+					}
+					transformMap[ MachineComponentType.ZAxis ] = trsfZ;
+
+					// set master rotation
+					gp_Pnt ptOnMaster = m_MachineData.PtOnMaster;
+					gp_Ax1 axisMaster = new gp_Ax1( ptOnMaster, m_MachineData.MasterRotateDir );
+					gp_Trsf trsfMaster = new gp_Trsf();
+					trsfMaster.SetRotation( axisMaster, postPoint.Master );
+					if( m_WorkPieceChainSet.Contains( MachineComponentType.Master ) ) {
+						trsfMaster.Invert();
+					}
+					transformMap[ MachineComponentType.Master ] = trsfMaster;
+
+					// set slave rotation
+					gp_Pnt ptOnSlave = m_MachineData.PtOnSlave;
+					gp_Ax1 axisSlave = new gp_Ax1( ptOnSlave, m_MachineData.SlaveRotateDir );
+					gp_Trsf trsfSlave = new gp_Trsf();
+					trsfSlave.SetRotation( axisSlave, postPoint.Slave );
+					if( m_WorkPieceChainSet.Contains( MachineComponentType.Slave ) ) {
+						trsfSlave.Invert();
+					}
+					transformMap[ MachineComponentType.Slave ] = trsfSlave;
+
+					// set tool and workpiece transform
+					transformMap[ MachineComponentType.Tool ] = new gp_Trsf();
+					gp_Trsf trsfWorkPiece = new gp_Trsf();
+					trsfWorkPiece.SetTranslation( G54Offset );
+					transformMap[ MachineComponentType.WorkPiece ] = trsfWorkPiece;
+
+					// set chain
+					gp_Trsf trsfAllX = GetComponentTrsf( transformMap, MachineComponentType.XAxis );
+					gp_Trsf trsfAllY = GetComponentTrsf( transformMap, MachineComponentType.YAxis );
+					gp_Trsf trsfAllZ = GetComponentTrsf( transformMap, MachineComponentType.ZAxis );
+					gp_Trsf trsfAllMaster = GetComponentTrsf( transformMap, MachineComponentType.Master );
+					gp_Trsf trsfAllSlave = GetComponentTrsf( transformMap, MachineComponentType.Slave );
+					gp_Trsf trsAllfTool = GetComponentTrsf( transformMap, MachineComponentType.Tool );
+					gp_Trsf trsfAllWorkPiece = GetComponentTrsf( transformMap, MachineComponentType.WorkPiece );
+					m_FrameTransformMap[ MachineComponentType.XAxis ].Add( trsfAllX );
+					m_FrameTransformMap[ MachineComponentType.YAxis ].Add( trsfAllY );
+					m_FrameTransformMap[ MachineComponentType.ZAxis ].Add( trsfAllZ );
+					m_FrameTransformMap[ MachineComponentType.Master ].Add( trsfAllMaster );
+					m_FrameTransformMap[ MachineComponentType.Slave ].Add( trsfAllSlave );
+					m_FrameTransformMap[ MachineComponentType.Tool ].Add( trsAllfTool );
+					m_FrameTransformMap[ MachineComponentType.WorkPiece ].Add( trsfAllWorkPiece );
+
+					// set collision
+					HashSet<MachineComponentType> collisionResiltSet = new HashSet<MachineComponentType>();
+					foreach( var compT in m_ChainListMap[ MachineComponentType.Tool ] ) {
+						if( compT == MachineComponentType.Base ) {
 							continue; // skip base
 						}
-						if( m_FCLTest.CheckCollision( compT.ToString(), compW.ToString(),
-							ConvertTransform( m_FrameTransformMap[ compT ].Last() ),
-							ConvertTransform( m_FrameTransformMap[ compW ].Last() ) ) ) {
-							collisionResiltSet.Add( compT );
-							collisionResiltSet.Add( compW );
+						foreach( var compW in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
+							if( compW == MachineComponentType.Base ) {
+								continue; // skip base
+							}
+							if( m_FCLTest.CheckCollision( compT.ToString(), compW.ToString(),
+								ConvertTransform( m_FrameTransformMap[ compT ].Last() ),
+								ConvertTransform( m_FrameTransformMap[ compW ].Last() ) ) ) {
+								collisionResiltSet.Add( compT );
+								collisionResiltSet.Add( compW );
+							}
 						}
 					}
-				}
-				m_FrameCollisionMap[ MachineComponentType.XAxis ].Add( collisionResiltSet.Contains( MachineComponentType.XAxis ) );
-				m_FrameCollisionMap[ MachineComponentType.YAxis ].Add( collisionResiltSet.Contains( MachineComponentType.YAxis ) );
-				m_FrameCollisionMap[ MachineComponentType.ZAxis ].Add( collisionResiltSet.Contains( MachineComponentType.ZAxis ) );
-				m_FrameCollisionMap[ MachineComponentType.Master ].Add( collisionResiltSet.Contains( MachineComponentType.Master ) );
-				m_FrameCollisionMap[ MachineComponentType.Slave ].Add( collisionResiltSet.Contains( MachineComponentType.Slave ) );
+					m_FrameCollisionMap[ MachineComponentType.XAxis ].Add( collisionResiltSet.Contains( MachineComponentType.XAxis ) );
+					m_FrameCollisionMap[ MachineComponentType.YAxis ].Add( collisionResiltSet.Contains( MachineComponentType.YAxis ) );
+					m_FrameCollisionMap[ MachineComponentType.ZAxis ].Add( collisionResiltSet.Contains( MachineComponentType.ZAxis ) );
+					m_FrameCollisionMap[ MachineComponentType.Master ].Add( collisionResiltSet.Contains( MachineComponentType.Master ) );
+					m_FrameCollisionMap[ MachineComponentType.Slave ].Add( collisionResiltSet.Contains( MachineComponentType.Slave ) );
 
-				m_FrameCount++;
+					m_FrameCount++;
+				}
 			}
+			// CAMData camData = m_CADManager.GetCAMDataList()[ 0 ];
+
 		}
 
 		gp_Trsf GetComponentTrsf( Dictionary<MachineComponentType, gp_Trsf> transformMap, MachineComponentType type )

@@ -19,7 +19,6 @@ namespace MyCAM.Data
 			ShapeDataMap = new Dictionary<string, ShapeData>();
 			PartIDList = new List<string>();
 			PathIDList = new List<string>();
-			PartTopoShape = new TopoDS_Shape();
 		}
 
 		public Dictionary<string, ShapeData> ShapeDataMap
@@ -33,11 +32,6 @@ namespace MyCAM.Data
 		}
 
 		public List<string> PathIDList
-		{
-			get; private set;
-		}
-
-		public TopoDS_Shape PartTopoShape
 		{
 			get; private set;
 		}
@@ -63,7 +57,6 @@ namespace MyCAM.Data
 				ShapeDataMap[ shapeData.UID ] = shapeData;
 				PartIDList.Add( shapeData.UID );
 			}
-			PartTopoShape = newShape;
 			PartChanged?.Invoke();
 		}
 

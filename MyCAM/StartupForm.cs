@@ -1,13 +1,14 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
+using MyCAM.Post;
 using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
-using System;
-using System.Windows.Forms;
 
 namespace MyCAM
 {
@@ -47,6 +48,9 @@ namespace MyCAM
 
 			// CAM Editor
 			m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			m_CAMEditor.OverCutActionStatusChange += OnOverCutActionStatusChange;
+			m_CAMEditor.LeadActionStatusChange += OnLeadSettingActionStatusChange;
+			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
 
 			// simu editor
 			m_SimuEditor = new SimuEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
@@ -246,20 +250,30 @@ namespace MyCAM
 			m_CAMEditor.SetReverse();
 		}
 
-		void m_tsmiSetLead_Click( object sender, EventArgs e )
-		{
-
-		}
-
 		void m_tsmiOverCut_Click( object sender, EventArgs e )
 		{
+			m_CAMEditor.SetOverCut();
+		}
 
+		void m_tsmiLeadSetting_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetLeadLine();
+		}
+
+		void m_tsmiChangeLeadDirection_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.ChangeLeadDirection();
 		}
 
 		// tool vector
 		void m_tsmiToolVec_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SetToolVec();
+		}
+
+		void m_tsmiToolVecReverse_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetToolVecReverse();
 		}
 
 		// sort
@@ -290,9 +304,64 @@ namespace MyCAM
 		// convert NC
 		void m_tsmiCAMOK_Click( object sender, EventArgs e )
 		{
-			//m_CAMEditor.ConvertNC();
-			m_CAMEditor.EditEnd();
-			m_SimuEditor.EditStart();
+			// default machine data
+			MixTypeMachineData machineData = new MixTypeMachineData();
+			machineData.ToolDirection = ToolDirection.Z;
+			machineData.MasterRotaryAxis = RotaryAxis.Y;
+			machineData.SlaveRotaryAxis = RotaryAxis.Z;
+			machineData.MasterRotaryDirection = RotaryDirection.RightHand;
+			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
+			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.ToolLength = 2.0;
+			machineData.ToolToMasterVec = new gp_Vec( 0, 101.2, 169.48 );
+			machineData.MCSToSlaveVec = new gp_Vec( 40.81, -384.80, -665.67 );
+			PostSolver temPostSolver = new PostSolver( machineData );
+			NCWriter writer = new NCWriter( m_CADManager.GetCAMDataList(), temPostSolver );
+			writer.Convert();
+
+			// simulation
+			// m_CAMEditor.EditEnd();
+			// m_SimuEditor.EditStart();
 		}
+
+		#region UI action 
+
+		void OnLeadSettingActionStatusChange( EActionStatus actionStatus )
+		{
+			if( actionStatus == EActionStatus.Start ) {
+				m_msCAM.Enabled = false;
+				return;
+			}
+			m_msCAM.Enabled = true;
+		}
+
+		void OnOverCutActionStatusChange( EActionStatus actionStatus )
+		{
+			if( actionStatus == EActionStatus.Start ) {
+				m_msCAM.Enabled = false;
+				return;
+			}
+			m_msCAM.Enabled = true;
+		}
+
+		void OnCAMPathPropertyChanged( bool isClosePath, bool isPathWithLead )
+		{
+			OnPathIsCloseChanged( isClosePath );
+			OnPathLeadChanged( isPathWithLead );
+		}
+
+		void OnPathIsCloseChanged( bool isClosePath )
+		{
+			m_tsmiStartPoint.Enabled = isClosePath;
+			m_tsmiSetLead.Enabled = isClosePath;
+			m_tsmiOverCut.Enabled = isClosePath;
+		}
+
+		void OnPathLeadChanged( bool isPathWithLead )
+		{
+			m_tsmiChangeLeadDirection.Enabled = isPathWithLead;
+		}
+		#endregion
 	}
 }
