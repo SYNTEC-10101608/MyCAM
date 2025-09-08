@@ -178,6 +178,42 @@ namespace MyCAM.Data
 			}
 		}
 
+		internal CAMPoint CutDownCAMPoint
+		{
+			get
+			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
+				return m_CutDownCAMPoint;
+			}
+		}
+
+		internal CAMPoint LiftUpCAMPoint
+		{
+			get
+			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
+				return m_LiftUpCAMPoint;
+			}
+		}
+
+		internal CAMPoint FollowSafeCAMPoint
+		{
+			get
+			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
+				return m_FollowSafeCAMPoint;
+			}
+		}
+
 		public bool IsReverse
 		{
 			get
@@ -246,6 +282,29 @@ namespace MyCAM.Data
 				}
 				if( m_LeadParam != value ) {
 					m_LeadParam = value;
+					m_IsDirty = true;
+				}
+			}
+		}
+
+		public TraverseData TraverseData
+		{
+			get
+			{
+				// to prevent null value
+				if( m_TraverseData == null ) {
+					m_TraverseData = new TraverseData();
+				}
+				return m_TraverseData;
+			}
+			set
+			{
+				// to prevent null value
+				if( value == null ) {
+					value = new TraverseData();
+				}
+				if( m_TraverseData != value ) {
+					m_TraverseData = value;
 					m_IsDirty = true;
 				}
 			}
@@ -328,12 +387,42 @@ namespace MyCAM.Data
 			m_IsDirty = true;
 		}
 
+		public CAMPoint GetProcessStartPoint()
+		{
+			CAMPoint camPoint = null;
+			if( m_LeadInCAMPointList.Count > 0 && m_LeadParam.LeadIn.Length > 0 ) {
+				camPoint = m_LeadInCAMPointList.First().Clone();
+			}
+			else if( m_CAMPointList.Count > 0 ) {
+				camPoint = m_CAMPointList.First().Clone();
+			}
+			return camPoint;
+		}
+
+		public CAMPoint GetProcessEndPoint()
+		{
+			CAMPoint camPoint = null;
+			if( m_LeadOutCAMPointList.Count > 0 && m_LeadParam.LeadOut.Length > 0 ) {
+				camPoint = m_LeadOutCAMPointList.Last().Clone();
+			}
+			else if( m_OverCutPointList.Count > 0 && m_OverCutLength > 0 ) {
+				camPoint = m_OverCutPointList.Last().Clone();
+			}
+			else if( m_CAMPointList.Count > 0 ) {
+				camPoint = m_CAMPointList.Last().Clone();
+			}
+			return camPoint;
+		}
+
 		// backing fields
 		List<PathEdge5D> m_PathEdge5DList;
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
+		CAMPoint m_FollowSafeCAMPoint = null;
+		CAMPoint m_CutDownCAMPoint = null;
+		CAMPoint m_LiftUpCAMPoint = null;
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsReverse = false;
 		bool m_IsToolVecReverse = false;
@@ -342,6 +431,7 @@ namespace MyCAM.Data
 
 		// lead param
 		LeadData m_LeadParam = new LeadData();
+		TraverseData m_TraverseData = new TraverseData();
 
 		// dirty flag
 		bool m_IsDirty = false;
@@ -482,6 +572,7 @@ namespace MyCAM.Data
 			SetOverCut();
 			SetLeadIn();
 			SetLeadout();
+			SetTraverse();
 		}
 
 		void SetToolVec()
@@ -792,5 +883,37 @@ namespace MyCAM.Data
 		}
 
 		#endregion
+
+		#region Traverse parameters setting
+
+		void SetTraverse()
+		{
+			if( m_CAMPointList.Count == 0 ) {
+				return;
+			}
+			SetFollowSafePoint();
+			SetCutDownPoint();
+			SetLiftUpPoint();
+		}
+
+		void SetFollowSafePoint()
+		{
+			CAMPoint processStartPoint = GetProcessStartPoint();
+			m_FollowSafeCAMPoint = TraverseHelper.GetFollowSafePoint( processStartPoint.Clone(), m_TraverseData.FollowSafeDistance );
+		}
+
+		void SetCutDownPoint()
+		{
+			CAMPoint processStartPoint = GetProcessStartPoint();
+			m_CutDownCAMPoint = TraverseHelper.GetCutDownPoint( processStartPoint.Clone(), m_TraverseData.CutDownDistance );
+		}
+
+		void SetLiftUpPoint()
+		{
+			CAMPoint processEndPoint = GetProcessEndPoint();
+			m_LiftUpCAMPoint = TraverseHelper.GetLiftUpPoint( processEndPoint.Clone(), m_TraverseData.LiftUpDistance );
+		}
+		#endregion
+
 	}
 }

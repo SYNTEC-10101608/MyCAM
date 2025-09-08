@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using MyCAM.Post;
@@ -9,6 +7,8 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
+using System;
+using System.Windows.Forms;
 
 namespace MyCAM
 {
@@ -51,6 +51,7 @@ namespace MyCAM
 			m_CAMEditor.OverCutActionStatusChange += OnOverCutActionStatusChange;
 			m_CAMEditor.LeadActionStatusChange += OnLeadSettingActionStatusChange;
 			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
+			m_CAMEditor.TraversePrarmSettingActionStausChanged += OnTraverseSettingActionStausChanged;
 
 			// simu editor
 			m_SimuEditor = new SimuEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
@@ -172,16 +173,6 @@ namespace MyCAM
 			m_CADEditor.StartAxisTransform();
 		}
 
-		void OnAxisTransformActionStausChanged( EActionStatus status )
-		{
-			if( status == EActionStatus.Start ) {
-				m_msCAD.Enabled = false;
-			}
-			else if( status == EActionStatus.End ) {
-				m_msCAD.Enabled = true;
-			}
-		}
-
 		// go to CAM editor
 		void m_tsmiCAM_Click( object sender, EventArgs e )
 		{
@@ -292,6 +283,12 @@ namespace MyCAM
 			m_CAMEditor.AutoSortProcess();
 		}
 
+		// post parameter setting
+		void m_tsmiTraverseParamSetting_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SeTraverseParam();
+		}
+
 		// back to CAD editor
 		void m_tsmiBackToCAD_Click( object sender, EventArgs e )
 		{
@@ -304,20 +301,7 @@ namespace MyCAM
 		// convert NC
 		void m_tsmiCAMOK_Click( object sender, EventArgs e )
 		{
-			// default machine data
-			MixTypeMachineData machineData = new MixTypeMachineData();
-			machineData.ToolDirection = ToolDirection.Z;
-			machineData.MasterRotaryAxis = RotaryAxis.Y;
-			machineData.SlaveRotaryAxis = RotaryAxis.Z;
-			machineData.MasterRotaryDirection = RotaryDirection.RightHand;
-			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
-			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.ToolLength = 2.0;
-			machineData.ToolToMasterVec = new gp_Vec( 0, 101.2, 169.48 );
-			machineData.MCSToSlaveVec = new gp_Vec( 40.81, -384.80, -665.67 );
-			PostSolver temPostSolver = new PostSolver( machineData );
-			NCWriter writer = new NCWriter( m_CADManager.GetCAMDataList(), temPostSolver );
+			NCWriter writer = new NCWriter( m_CADManager.GetCAMDataList(), m_CADManager.MachineData );
 			writer.Convert();
 
 			// simulation
@@ -361,6 +345,24 @@ namespace MyCAM
 		void OnPathLeadChanged( bool isPathWithLead )
 		{
 			m_tsmiChangeLeadDirection.Enabled = isPathWithLead;
+		}
+
+		void OnTraverseSettingActionStausChanged( EActionStatus actionStatus )
+		{
+			if( actionStatus == EActionStatus.Start ) {
+				m_msCAM.Enabled = false;
+				return;
+			}
+			m_msCAM.Enabled = true;
+		}
+
+		void OnAxisTransformActionStausChanged( EActionStatus actionStatus )
+		{
+			if( actionStatus == EActionStatus.Start ) {
+				m_msCAD.Enabled = false;
+				return;
+			}
+			m_msCAD.Enabled = true;
 		}
 		#endregion
 	}

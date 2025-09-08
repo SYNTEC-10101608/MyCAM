@@ -47,6 +47,8 @@ namespace MyCAM.Editor
 			( m_DefaultAction as DefaultAction ).TreeSelectionChange += OnTreeSelectionChange;
 		}
 
+		public Action<EActionStatus> TraversePrarmSettingActionStausChanged;
+
 		// data manager
 		DataManager m_CADManager;
 
@@ -66,6 +68,7 @@ namespace MyCAM.Editor
 		List<AIS_Line> m_LeadAISList = new List<AIS_Line>(); // need refresh, no need activate
 		List<AIS_Shape> m_LeadOrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
 		List<AIS_Line> m_OverCutAISList = new List<AIS_Line>(); // need refresh, no need activate
+		List<AIS_Line> m_TraverseAISList = new List<AIS_Line>();
 
 		enum EvecType
 		{
@@ -281,7 +284,7 @@ namespace MyCAM.Editor
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
 
 			// nothing change
-			if( pathData.CAMData.IsHasLead  == false) {
+			if( pathData.CAMData.IsHasLead == false ) {
 				pathData.CAMData.LeadLineParam.IsChangeLeadDirection = false;
 				return;
 			}
@@ -321,6 +324,16 @@ namespace MyCAM.Editor
 			// toggle reverse state
 			pathData.CAMData.IsToolVecReverse = !pathData.CAMData.IsToolVecReverse;
 			ShowCAMData();
+		}
+
+		public void SeTraverseParam()
+		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			TraverseSettingAction action = new TraverseSettingAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
 		}
 
 		#endregion
@@ -400,6 +413,7 @@ namespace MyCAM.Editor
 			ShowOverCut();
 			ShowLeadLine();
 			ShowLeadOrientation();
+			ShowTraversalPath();
 			m_Viewer.UpdateView();
 		}
 
@@ -593,6 +607,61 @@ namespace MyCAM.Editor
 			}
 		}
 
+		void ShowTraversalPath()
+		{
+			// Remove previous lines
+			foreach( AIS_Line traverseAIS in m_TraverseAISList ) {
+				m_Viewer.GetAISContext().Remove( traverseAIS, false );
+			}
+			m_TraverseAISList.Clear();
+			List<CAMData> camDataList = m_CADManager.GetCAMDataList();
+			if( camDataList == null || camDataList.Count == 0 ) {
+				return;
+			}
+			for( int i = 0; i < camDataList.Count; i++ ) {
+				var camData = camDataList[ i ];
+				if( camData == null ) {
+					continue;
+				}
+
+				// tool down point list + follow safe point list
+				List<CAMPoint> cutDownPointList = new List<CAMPoint>();
+
+				// the first path, only need cut down traverse path
+				if( i == 0 ) {
+					cutDownPointList.AddRange( GetCutDownList( camData ) );
+				}
+				else {
+
+					// not the first path, need to add from previous path lift up point
+					var prevCamData = camDataList[ i - 1 ];
+					if( prevCamData?.LiftUpCAMPoint != null ) {
+						cutDownPointList.Add( prevCamData.LiftUpCAMPoint );
+					}
+					cutDownPointList.AddRange( GetCutDownList( camData ) );
+				}
+
+				// tool up point list
+				List<CAMPoint> liftUpPointList = new List<CAMPoint>();
+				if( camData.GetProcessEndPoint() != null ) {
+					liftUpPointList.Add( camData.GetProcessEndPoint() );
+				}
+				if( camData.LiftUpCAMPoint != null ) {
+					liftUpPointList.Add( camData.LiftUpCAMPoint );
+				}
+
+				// tool down + follow safe + tool up AIS lines
+				m_TraverseAISList.AddRange( GetAISLineList( cutDownPointList, Quantity_NameOfColor.Quantity_NOC_WHITE, 1, 0.5 ) );
+				m_TraverseAISList.AddRange( GetAISLineList( liftUpPointList, Quantity_NameOfColor.Quantity_NOC_ORANGE, 1, 0.5 ) );
+			}
+
+			// Display all lines
+			foreach( AIS_Line rapidTraverseAIS in m_TraverseAISList ) {
+				m_Viewer.GetAISContext().Display( rapidTraverseAIS, false );
+				m_Viewer.GetAISContext().Deactivate( rapidTraverseAIS );
+			}
+		}
+
 		void HideCAMData()
 		{
 			// hide tool vec
@@ -620,6 +689,11 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( leadAIS, false );
 			}
 
+			// hide traverse path
+			foreach( AIS_Line traverseAIS in m_TraverseAISList ) {
+				m_Viewer.GetAISContext().Remove( traverseAIS, false );
+			}
+
 			// hide lead orientation
 			// hide orientation
 			foreach( AIS_Shape orientationAIS in m_LeadOrientationAISList ) {
@@ -637,6 +711,21 @@ namespace MyCAM.Editor
 		}
 
 		#endregion
+
+		List<CAMPoint> GetCutDownList( CAMData camData )
+		{
+			List<CAMPoint> cutDownPointList = new List<CAMPoint>();
+			if( camData.CutDownCAMPoint != null ) {
+				cutDownPointList.Add( camData.CutDownCAMPoint );
+			}
+			if( camData.FollowSafeCAMPoint != null ) {
+				cutDownPointList.Add( camData.FollowSafeCAMPoint );
+			}
+			if( camData.GetProcessStartPoint() != null ) {
+				cutDownPointList.Add( camData.GetProcessStartPoint() );
+			}
+			return cutDownPointList;
+		}
 
 		bool IsModifiedToolVecIndex( int index, CAMData camData )
 		{
@@ -669,11 +758,12 @@ namespace MyCAM.Editor
 			return lineAIS;
 		}
 
-		AIS_Line GetAISLine( gp_Pnt leadStartPnt, gp_Pnt leadEndPnt, Quantity_NameOfColor color )
+		AIS_Line GetAISLine( gp_Pnt leadStartPnt, gp_Pnt leadEndPnt, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1 )
 		{
 			AIS_Line lineAIS = new AIS_Line( new Geom_CartesianPoint( leadStartPnt ), new Geom_CartesianPoint( leadEndPnt ) );
 			lineAIS.SetColor( new Quantity_Color( color ) );
-			lineAIS.SetWidth( 1 );
+			lineAIS.SetWidth( lineWidth );
+			lineAIS.SetTransparency( dTransparancy );
 			return lineAIS;
 		}
 
@@ -689,6 +779,22 @@ namespace MyCAM.Editor
 			coneAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			coneAIS.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
 			return coneAIS;
+		}
+
+		List<AIS_Line> GetAISLineList( List<CAMPoint> points, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1 )
+		{
+			List<AIS_Line> newLines = new List<AIS_Line>();
+			if( points == null || points.Count < 2 ) {
+				return null;
+			}
+			for( int i = 0; i < points.Count - 1; i++ ) {
+				if( points[ i ].CADPoint.Point.IsEqual( points[ i + 1 ].CADPoint.Point, 0.001 ) ) {
+					continue;
+				}
+				var line = GetAISLine( points[ i ].CADPoint.Point, points[ i + 1 ].CADPoint.Point, color, lineWidth, dTransparancy );
+				newLines.Add( line );
+			}
+			return newLines;
 		}
 
 		// methods
@@ -731,6 +837,10 @@ namespace MyCAM.Editor
 			if( action.ActionType == EditActionType.SetLead ) {
 				LeadActionStatusChange?.Invoke( EActionStatus.End );
 			}
+
+			if( action.ActionType == EditActionType.SetTraverseParam ) {
+				TraversePrarmSettingActionStausChanged?.Invoke( EActionStatus.End );
+			}
 		}
 
 		void OnEditActionStart( IEditorAction action )
@@ -740,6 +850,9 @@ namespace MyCAM.Editor
 			}
 			if( action.ActionType == EditActionType.SetLead ) {
 				LeadActionStatusChange?.Invoke( EActionStatus.Start );
+			}
+			if( action.ActionType == EditActionType.SetTraverseParam ) {
+				TraversePrarmSettingActionStausChanged?.Invoke( EActionStatus.Start );
 			}
 		}
 

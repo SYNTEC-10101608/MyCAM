@@ -79,6 +79,7 @@
 			this.m_tsmiMoveUp = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiMoveDown = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiAutoSort = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiTraverseParamSetting = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiBackToCAD = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiCAMOK = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_msCAD.SuspendLayout();
@@ -113,7 +114,7 @@
             this.m_tsmiImportStep,
             this.m_tsmiImportIges});
 			this.m_tsmiImport.Name = "m_tsmiImport";
-			this.m_tsmiImport.Size = new System.Drawing.Size(53, 24);
+			this.m_tsmiImport.Size = new System.Drawing.Size(53, 23);
 			this.m_tsmiImport.Text = "導入";
 			// 
 			// m_tsmiImportBRep
@@ -143,7 +144,7 @@
             this.m_tsmiAddPoint,
             this.m_tsmiAddLine});
 			this.m_tsmiAddFeature.Name = "m_tsmiAddFeature";
-			this.m_tsmiAddFeature.Size = new System.Drawing.Size(83, 24);
+			this.m_tsmiAddFeature.Size = new System.Drawing.Size(83, 23);
 			this.m_tsmiAddFeature.Text = "建立特徵";
 			// 
 			// m_tsmiAddPoint
@@ -199,7 +200,7 @@
             this.m_tsmi3PointTransform,
             this.m_tsmiManipulatorTransform});
 			this.m_tsmiTransform.Name = "m_tsmiTransform";
-			this.m_tsmiTransform.Size = new System.Drawing.Size(53, 24);
+			this.m_tsmiTransform.Size = new System.Drawing.Size(53, 23);
 			this.m_tsmiTransform.Text = "轉換";
 			// 
 			// m_tsmiManualTransform
@@ -226,7 +227,7 @@
 			// m_tsmiCADOK
 			// 
 			this.m_tsmiCADOK.Name = "m_tsmiCADOK";
-			this.m_tsmiCADOK.Size = new System.Drawing.Size(44, 24);
+			this.m_tsmiCADOK.Size = new System.Drawing.Size(44, 23);
 			this.m_tsmiCADOK.Text = "OK";
 			this.m_tsmiCADOK.Click += new System.EventHandler(this.m_tsmiCADOK_Click);
 			// 
@@ -234,9 +235,9 @@
 			// 
 			this.m_panViewer.Dock = System.Windows.Forms.DockStyle.Right;
 			this.m_panViewer.Location = new System.Drawing.Point(379, 0);
-			this.m_panViewer.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_panViewer.Margin = new System.Windows.Forms.Padding(4);
 			this.m_panViewer.Name = "m_panViewer";
-			this.m_panViewer.Size = new System.Drawing.Size(1200, 897);
+			this.m_panViewer.Size = new System.Drawing.Size(1200, 896);
 			this.m_panViewer.TabIndex = 1;
 			// 
 			// m_panTreeView
@@ -244,18 +245,18 @@
 			this.m_panTreeView.Controls.Add(this.m_TreeView);
 			this.m_panTreeView.Dock = System.Windows.Forms.DockStyle.Left;
 			this.m_panTreeView.Location = new System.Drawing.Point(0, 0);
-			this.m_panTreeView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_panTreeView.Margin = new System.Windows.Forms.Padding(4);
 			this.m_panTreeView.Name = "m_panTreeView";
-			this.m_panTreeView.Size = new System.Drawing.Size(400, 897);
+			this.m_panTreeView.Size = new System.Drawing.Size(400, 896);
 			this.m_panTreeView.TabIndex = 1;
 			// 
 			// m_TreeView
 			// 
 			this.m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_TreeView.Location = new System.Drawing.Point(0, 0);
-			this.m_TreeView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_TreeView.Margin = new System.Windows.Forms.Padding(4);
 			this.m_TreeView.Name = "m_TreeView";
-			this.m_TreeView.Size = new System.Drawing.Size(400, 897);
+			this.m_TreeView.Size = new System.Drawing.Size(400, 896);
 			this.m_TreeView.TabIndex = 1;
 			// 
 			// m_panBackGround
@@ -263,10 +264,10 @@
 			this.m_panBackGround.Controls.Add(this.m_panTreeView);
 			this.m_panBackGround.Controls.Add(this.m_panViewer);
 			this.m_panBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panBackGround.Location = new System.Drawing.Point(0, 54);
-			this.m_panBackGround.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_panBackGround.Location = new System.Drawing.Point(0, 55);
+			this.m_panBackGround.Margin = new System.Windows.Forms.Padding(4);
 			this.m_panBackGround.Name = "m_panBackGround";
-			this.m_panBackGround.Size = new System.Drawing.Size(1579, 897);
+			this.m_panBackGround.Size = new System.Drawing.Size(1579, 896);
 			this.m_panBackGround.TabIndex = 0;
 			// 
 			// m_msCAD_Transform
@@ -290,42 +291,42 @@
 			// m_tsmiPlane
 			// 
 			this.m_tsmiPlane.Name = "m_tsmiPlane";
-			this.m_tsmiPlane.Size = new System.Drawing.Size(68, 26);
+			this.m_tsmiPlane.Size = new System.Drawing.Size(68, 24);
 			this.m_tsmiPlane.Text = "面重合";
 			this.m_tsmiPlane.Click += new System.EventHandler(this.m_tsmiPlane_Click);
 			// 
 			// m_tsmiPlanePar
 			// 
 			this.m_tsmiPlanePar.Name = "m_tsmiPlanePar";
-			this.m_tsmiPlanePar.Size = new System.Drawing.Size(68, 26);
+			this.m_tsmiPlanePar.Size = new System.Drawing.Size(68, 24);
 			this.m_tsmiPlanePar.Text = "面平行";
 			this.m_tsmiPlanePar.Click += new System.EventHandler(this.m_tsmiPlanePar_Click);
 			// 
 			// m_tsmiAxial
 			// 
 			this.m_tsmiAxial.Name = "m_tsmiAxial";
-			this.m_tsmiAxial.Size = new System.Drawing.Size(68, 26);
+			this.m_tsmiAxial.Size = new System.Drawing.Size(68, 24);
 			this.m_tsmiAxial.Text = "軸重合";
 			this.m_tsmiAxial.Click += new System.EventHandler(this.m_tsmiAxial_Click);
 			// 
 			// m_tsmiAxialPar
 			// 
 			this.m_tsmiAxialPar.Name = "m_tsmiAxialPar";
-			this.m_tsmiAxialPar.Size = new System.Drawing.Size(68, 26);
+			this.m_tsmiAxialPar.Size = new System.Drawing.Size(68, 24);
 			this.m_tsmiAxialPar.Text = "軸平行";
 			this.m_tsmiAxialPar.Click += new System.EventHandler(this.m_tsmiAxialPar_Click);
 			// 
 			// m_tsmiPointCoincide
 			// 
 			this.m_tsmiPointCoincide.Name = "m_tsmiPointCoincide";
-			this.m_tsmiPointCoincide.Size = new System.Drawing.Size(68, 26);
+			this.m_tsmiPointCoincide.Size = new System.Drawing.Size(68, 24);
 			this.m_tsmiPointCoincide.Text = "點重合";
 			this.m_tsmiPointCoincide.Click += new System.EventHandler(this.m_tsmiPointCoincide_Click);
 			// 
 			// m_tsmiTransformOK
 			// 
 			this.m_tsmiTransformOK.Name = "m_tsmiTransformOK";
-			this.m_tsmiTransformOK.Size = new System.Drawing.Size(44, 26);
+			this.m_tsmiTransformOK.Size = new System.Drawing.Size(44, 24);
 			this.m_tsmiTransformOK.Text = "OK";
 			this.m_tsmiTransformOK.Click += new System.EventHandler(this.m_tsmiTransformOK_Click);
 			// 
@@ -362,14 +363,14 @@
 			// m_tsmiSelPath_FreeBound
 			// 
 			this.m_tsmiSelPath_FreeBound.Name = "m_tsmiSelPath_FreeBound";
-			this.m_tsmiSelPath_FreeBound.Size = new System.Drawing.Size(167, 26);
+			this.m_tsmiSelPath_FreeBound.Size = new System.Drawing.Size(224, 26);
 			this.m_tsmiSelPath_FreeBound.Text = "所有面邊界";
 			this.m_tsmiSelPath_FreeBound.Click += new System.EventHandler(this.m_tsmiSelPath_FreeBound_Click);
 			// 
 			// m_tsmiSelPath_Manual
 			// 
 			this.m_tsmiSelPath_Manual.Name = "m_tsmiSelPath_Manual";
-			this.m_tsmiSelPath_Manual.Size = new System.Drawing.Size(167, 26);
+			this.m_tsmiSelPath_Manual.Size = new System.Drawing.Size(224, 26);
 			this.m_tsmiSelPath_Manual.Text = "手動選取";
 			this.m_tsmiSelPath_Manual.Click += new System.EventHandler(this.m_tsmiSelPath_Manual_Click);
 			// 
@@ -435,40 +436,41 @@
             this.m_tsmiMoveUp,
             this.m_tsmiMoveDown,
             this.m_tsmiAutoSort,
+            this.m_tsmiTraverseParamSetting,
             this.m_tsmiBackToCAD,
             this.m_tsmiCAMOK});
 			this.m_msCAM.Location = new System.Drawing.Point(0, 27);
 			this.m_msCAM.Name = "m_msCAM";
 			this.m_msCAM.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
-			this.m_msCAM.Size = new System.Drawing.Size(1579, 27);
+			this.m_msCAM.Size = new System.Drawing.Size(1579, 28);
 			this.m_msCAM.TabIndex = 1;
 			this.m_msCAM.Text = "menuStrip1";
 			// 
 			// m_tsmiAddPath
 			// 
 			this.m_tsmiAddPath.Name = "m_tsmiAddPath";
-			this.m_tsmiAddPath.Size = new System.Drawing.Size(83, 23);
+			this.m_tsmiAddPath.Size = new System.Drawing.Size(83, 24);
 			this.m_tsmiAddPath.Text = "新增路徑";
 			this.m_tsmiAddPath.Click += new System.EventHandler(this.m_tsmiAddPath_Click);
 			// 
 			// m_tsmiRemovePath
 			// 
 			this.m_tsmiRemovePath.Name = "m_tsmiRemovePath";
-			this.m_tsmiRemovePath.Size = new System.Drawing.Size(83, 23);
+			this.m_tsmiRemovePath.Size = new System.Drawing.Size(83, 24);
 			this.m_tsmiRemovePath.Text = "刪除路徑";
 			this.m_tsmiRemovePath.Click += new System.EventHandler(this.m_tsmiRemovePath_Click);
 			// 
 			// m_tsmiStartPoint
 			// 
 			this.m_tsmiStartPoint.Name = "m_tsmiStartPoint";
-			this.m_tsmiStartPoint.Size = new System.Drawing.Size(53, 23);
+			this.m_tsmiStartPoint.Size = new System.Drawing.Size(53, 24);
 			this.m_tsmiStartPoint.Text = "起點";
 			this.m_tsmiStartPoint.Click += new System.EventHandler(this.m_tsmiStartPoint_Click);
 			// 
 			// m_tsmiReverse
 			// 
 			this.m_tsmiReverse.Name = "m_tsmiReverse";
-			this.m_tsmiReverse.Size = new System.Drawing.Size(53, 23);
+			this.m_tsmiReverse.Size = new System.Drawing.Size(53, 24);
 			this.m_tsmiReverse.Text = "反向";
 			this.m_tsmiReverse.Click += new System.EventHandler(this.m_tsmiReverse_Click);
 			// 
@@ -478,76 +480,83 @@
             this.m_tsmiChangeLeadDirection,
             this.m_tsmiLeadSetting});
 			this.m_tsmiSetLead.Name = "m_tsmiSetLead";
-			this.m_tsmiSetLead.Size = new System.Drawing.Size(53, 23);
+			this.m_tsmiSetLead.Size = new System.Drawing.Size(53, 24);
 			this.m_tsmiSetLead.Text = "引線";
 			// 
 			// m_tsmiChangeLeadDirection
 			// 
 			this.m_tsmiChangeLeadDirection.Name = "m_tsmiChangeLeadDirection";
-			this.m_tsmiChangeLeadDirection.Size = new System.Drawing.Size(152, 22);
+			this.m_tsmiChangeLeadDirection.Size = new System.Drawing.Size(182, 26);
 			this.m_tsmiChangeLeadDirection.Text = "更換引線方向";
 			this.m_tsmiChangeLeadDirection.Click += new System.EventHandler(this.m_tsmiChangeLeadDirection_Click);
 			// 
 			// m_tsmiLeadSetting
 			// 
 			this.m_tsmiLeadSetting.Name = "m_tsmiLeadSetting";
-			this.m_tsmiLeadSetting.Size = new System.Drawing.Size(152, 22);
+			this.m_tsmiLeadSetting.Size = new System.Drawing.Size(182, 26);
 			this.m_tsmiLeadSetting.Text = "設置引線";
 			this.m_tsmiLeadSetting.Click += new System.EventHandler(this.m_tsmiLeadSetting_Click);
 			// 
 			// m_tsmiOverCut
 			// 
 			this.m_tsmiOverCut.Name = "m_tsmiOverCut";
-			this.m_tsmiOverCut.Size = new System.Drawing.Size(53, 23);
+			this.m_tsmiOverCut.Size = new System.Drawing.Size(53, 24);
 			this.m_tsmiOverCut.Text = "過切";
 			this.m_tsmiOverCut.Click += new System.EventHandler(this.m_tsmiOverCut_Click);
 			// 
 			// m_tsmiToolVecReverse
 			// 
 			this.m_tsmiToolVecReverse.Name = "m_tsmiToolVecReverse";
-			this.m_tsmiToolVecReverse.Size = new System.Drawing.Size(71, 20);
+			this.m_tsmiToolVecReverse.Size = new System.Drawing.Size(83, 24);
 			this.m_tsmiToolVecReverse.Text = "姿態反向";
 			this.m_tsmiToolVecReverse.Click += new System.EventHandler(this.m_tsmiToolVecReverse_Click);
 			// 
 			// m_tsmiToolVec
 			// 
 			this.m_tsmiToolVec.Name = "m_tsmiToolVec";
-			this.m_tsmiToolVec.Size = new System.Drawing.Size(53, 23);
+			this.m_tsmiToolVec.Size = new System.Drawing.Size(53, 24);
 			this.m_tsmiToolVec.Text = "姿態";
 			this.m_tsmiToolVec.Click += new System.EventHandler(this.m_tsmiToolVec_Click);
 			// 
 			// m_tsmiMoveUp
 			// 
 			this.m_tsmiMoveUp.Name = "m_tsmiMoveUp";
-			this.m_tsmiMoveUp.Size = new System.Drawing.Size(53, 23);
+			this.m_tsmiMoveUp.Size = new System.Drawing.Size(53, 24);
 			this.m_tsmiMoveUp.Text = "上移";
 			this.m_tsmiMoveUp.Click += new System.EventHandler(this.m_tsmiMoveUp_Click);
 			// 
 			// m_tsmiMoveDown
 			// 
 			this.m_tsmiMoveDown.Name = "m_tsmiMoveDown";
-			this.m_tsmiMoveDown.Size = new System.Drawing.Size(53, 23);
+			this.m_tsmiMoveDown.Size = new System.Drawing.Size(53, 24);
 			this.m_tsmiMoveDown.Text = "下移";
 			this.m_tsmiMoveDown.Click += new System.EventHandler(this.m_tsmiMoveDown_Click);
 			// 
 			// m_tsmiAutoSort
 			// 
 			this.m_tsmiAutoSort.Name = "m_tsmiAutoSort";
-			this.m_tsmiAutoSort.Size = new System.Drawing.Size(83, 23);
+			this.m_tsmiAutoSort.Size = new System.Drawing.Size(83, 24);
 			this.m_tsmiAutoSort.Text = "自動排序";
 			this.m_tsmiAutoSort.Click += new System.EventHandler(this.m_tsmiAutoSort_Click);
+			// 
+			// m_tsmiTraverseParamSetting
+			// 
+			this.m_tsmiTraverseParamSetting.Name = "m_tsmiTraverseParamSetting";
+			this.m_tsmiTraverseParamSetting.Size = new System.Drawing.Size(113, 24);
+			this.m_tsmiTraverseParamSetting.Text = "空移參數設定";
+			this.m_tsmiTraverseParamSetting.Click += new System.EventHandler(this.m_tsmiTraverseParamSetting_Click);
 			// 
 			// m_tsmiBackToCAD
 			// 
 			this.m_tsmiBackToCAD.Name = "m_tsmiBackToCAD";
-			this.m_tsmiBackToCAD.Size = new System.Drawing.Size(88, 23);
+			this.m_tsmiBackToCAD.Size = new System.Drawing.Size(88, 24);
 			this.m_tsmiBackToCAD.Text = "回到 CAD";
 			this.m_tsmiBackToCAD.Click += new System.EventHandler(this.m_tsmiBackToCAD_Click);
 			// 
 			// m_tsmiCAMOK
 			// 
 			this.m_tsmiCAMOK.Name = "m_tsmiCAMOK";
-			this.m_tsmiCAMOK.Size = new System.Drawing.Size(44, 23);
+			this.m_tsmiCAMOK.Size = new System.Drawing.Size(44, 24);
 			this.m_tsmiCAMOK.Text = "OK";
 			this.m_tsmiCAMOK.Click += new System.EventHandler(this.m_tsmiCAMOK_Click);
 			// 
@@ -558,14 +567,14 @@
 			this.AutoSize = true;
 			this.ClientSize = new System.Drawing.Size(1579, 951);
 			this.Controls.Add(this.m_panBackGround);
-			this.Controls.Add(this.m_msCAD_Transform);
 			this.Controls.Add(this.m_msCAD_SelectFace);
+			this.Controls.Add(this.m_msCAD_Transform);
 			this.Controls.Add(this.m_msCAD_ManualSelectPath);
 			this.Controls.Add(this.m_msCAM);
 			this.Controls.Add(this.m_msCAD);
 			this.Controls.Add(this.m_msMain);
 			this.MainMenuStrip = this.m_msCAD;
-			this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "StartupForm";
 			this.Text = "五軸切";
 			this.m_msCAD.ResumeLayout(false);
@@ -642,6 +651,7 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiChangeLeadDirection;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiLeadSetting;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiToolVecReverse;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiTraverseParamSetting;
 	}
 }
 
