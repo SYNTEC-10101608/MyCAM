@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.gp;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Post
 {
 	internal static class PostHelper
 	{
-
 		public static bool SolvePath( PostSolver postSolver, CAMData camData,
 			 out PostData pathMCSPostData, out PostData pathG54PostData )
 		{
@@ -64,6 +64,8 @@ namespace MyCAM.Post
 				pathMCSPostData.LeadOutPostPointList.AddRange( leadOutMCS );
 				pathG54PostData.LeadOutPostPointList.AddRange( leadOutPost );
 			}
+			AddCutDownAndFollowSafePoint( camData, ref pathMCSPostData, ref pathG54PostData );
+			AddLiftUpPostPoint( camData, ref pathMCSPostData, ref pathG54PostData );
 			return true;
 		}
 
@@ -143,5 +145,73 @@ namespace MyCAM.Post
 			return true;
 		}
 
+
+		#region Private methods
+		static PostPoint CreateTraversePoint( CAMPoint point, double master, double slave )
+		{
+			return new PostPoint
+			{
+				X = point.CADPoint.Point.X(),
+				Y = point.CADPoint.Point.Y(),
+				Z = point.CADPoint.Point.Z(),
+				Master = master,
+				Slave = slave
+			};
+		}
+
+		static void AddLiftUpPostPoint( CAMData camData, ref PostData pathMCSPostData, ref PostData pathG54PostData )
+		{
+			double master, slave;
+			if( pathG54PostData.LeadOutPostPointList.Count > 0 ) {
+				master = pathG54PostData.LeadOutPostPointList.Last().Master;
+				slave = pathG54PostData.LeadOutPostPointList.Last().Slave;
+			}
+			else if( pathG54PostData.OverCutPostPointList.Count > 0 ) {
+				master = pathG54PostData.OverCutPostPointList.Last().Master;
+				slave = pathG54PostData.OverCutPostPointList.Last().Slave;
+			}
+			else if( pathG54PostData.MainPathPostPointList.Count > 0 ) {
+				master = pathG54PostData.MainPathPostPointList.Last().Master;
+				slave = pathG54PostData.MainPathPostPointList.Last().Slave;
+			}
+			else {
+				return;
+			}
+
+			// lift up point
+			PostPoint liftUpPostPoint = CreateTraversePoint( camData.LiftUpCAMPoint, master, slave );
+
+			// add to post data
+			pathMCSPostData.LiftUpPostPoint = liftUpPostPoint;
+			pathG54PostData.LiftUpPostPoint = liftUpPostPoint;
+		}
+
+		static void AddCutDownAndFollowSafePoint( CAMData camData, ref PostData pathMCSPostData, ref PostData pathG54PostData )
+		{
+			double master, slave;
+			if( pathG54PostData.LeadInPostPointList.Count > 0 ) {
+				master = pathG54PostData.LeadInPostPointList.First().Master;
+				slave = pathG54PostData.LeadInPostPointList.First().Slave;
+			}
+			else if( pathG54PostData.MainPathPostPointList.Count > 0 ) {
+				master = pathG54PostData.MainPathPostPointList.First().Master;
+				slave = pathG54PostData.MainPathPostPointList.First().Slave;
+			}
+			else {
+				return;
+			}
+
+			// cut down points
+			PostPoint cutDownPostPoint = CreateTraversePoint( camData.CutDownCAMPoint, master, slave );
+			PostPoint followSafePoint = CreateTraversePoint( camData.FollowSafeCAMPoint, master, slave );
+
+			// add to post data
+			pathMCSPostData.CutDownPostPoint = cutDownPostPoint;
+			pathG54PostData.CutDownPostPoint = cutDownPostPoint;
+			pathMCSPostData.FollowSafePostPoint = followSafePoint;
+			pathG54PostData.FollowSafePostPoint = followSafePoint;
+		}
+
+		#endregion
 	}
 }

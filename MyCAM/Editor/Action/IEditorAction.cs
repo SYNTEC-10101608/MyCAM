@@ -26,6 +26,7 @@ namespace MyCAM.Editor
 		AddLine = 10,
 		SetLead = 11,
 		OverCut = 12,
+		SetTraverseParam = 13,
 	}
 
 	internal interface IEditorAction

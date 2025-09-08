@@ -1,4 +1,5 @@
-﻿using OCC.TopAbs;
+﻿using OCC.gp;
+using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
@@ -34,6 +35,37 @@ namespace MyCAM.Data
 		public List<string> PathIDList
 		{
 			get; private set;
+		}
+
+		public TraverseData TraverseData
+		{
+			get
+			{
+				return m_TraverseData;
+			}
+			set
+			{
+				if( value != null ) {
+					m_TraverseData = value;
+				}
+			}
+		}
+
+		public MachineData MachineData
+		{
+			get
+			{
+				if( m_MachineData == null ) {
+					return m_DefaultMachineData;
+				}
+				return m_MachineData;
+			}
+			private set
+			{
+				if( value != null ) {
+					m_MachineData = value;
+				}
+			}
 		}
 
 		public void AddPart( TopoDS_Shape newShape )
@@ -108,6 +140,7 @@ namespace MyCAM.Data
 				if( isValidPath ) {
 					string szID = "Path_" + ++m_PathID;
 					PathData pathData = new PathData( szID, pathWire, pathElements );
+					pathData.CAMData.TraverseData = TraverseData.Clone();
 					ShapeDataMap[ szID ] = pathData;
 					newPathIDList.Add( szID );
 				}
@@ -187,6 +220,19 @@ namespace MyCAM.Data
 			return szType + "_" + nID.ToString();
 		}
 
+		public string GetUIDByShape( TopoDS_Shape shape )
+		{
+			if( shape == null || shape.IsNull() ) {
+				return string.Empty;
+			}
+			foreach( var model in ShapeDataMap.Values ) {
+				if( model.Shape.IsEqual( shape ) ) {
+					return model.UID;
+				}
+			}
+			return string.Empty;
+		}
+
 		void ResetShapeIDs()
 		{
 			m_SolidID = 0;
@@ -207,17 +253,20 @@ namespace MyCAM.Data
 		int m_VertexID = 0;
 		int m_PathID = 0;
 
-		public string GetUIDByShape( TopoDS_Shape shape )
+		TraverseData m_TraverseData = new TraverseData();
+		MachineData m_MachineData = null;
+		MixTypeMachineData m_DefaultMachineData = new MixTypeMachineData()
 		{
-			if( shape == null || shape.IsNull() ) {
-				return string.Empty;
-			}
-			foreach( var model in ShapeDataMap.Values ) {
-				if( model.Shape.IsEqual( shape ) ) {
-					return model.UID;
-				}
-			}
-			return string.Empty;
-		}
+			ToolDirection = ToolDirection.Z,
+			MasterRotaryAxis = RotaryAxis.Y,
+			SlaveRotaryAxis = RotaryAxis.Z,
+			MasterRotaryDirection = RotaryDirection.RightHand,
+			SlaveRotaryDirection = RotaryDirection.LeftHand,
+			MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
+			SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
+			ToolLength = 2.0,
+			ToolToMasterVec = new gp_Vec( 0, 101.2, 169.48 ),
+			MCSToSlaveVec = new gp_Vec( 40.81, -384.80, -665.67 ),
+		};
 	}
 }
