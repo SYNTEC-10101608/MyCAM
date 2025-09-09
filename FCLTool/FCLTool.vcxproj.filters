@@ -18,18 +18,18 @@
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FCLTest.h">
+    <ClInclude Include="FCLToolCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FCLToolCommon.h">
+    <ClInclude Include="CollisionSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FCLTest.cpp">
+    <ClCompile Include="CollisionSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FCLTestWrapper.cpp">
+    <ClCompile Include="CollisionSolverWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
