@@ -1,13 +1,13 @@
-﻿using MyCAM.Helper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyCAM.Helper;
 using OCC.BOPTools;
 using OCC.BRepAdaptor;
 using OCC.GCPnts;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -120,6 +120,21 @@ namespace MyCAM.Data
 
 			// build raw data
 			BuildCADPointList();
+			BuildCAMPointList();
+		}
+
+		// for construct path by reading file
+		public CAMData( List<CADPoint> cadPointList, bool isClosed, int nStartPoint, LeadData leadData, bool isReverse, bool isToolVecReverse, double dOverCutLength, Dictionary<int, Tuple<double, double>> ToolVecModifyMap, TraverseData traverseData )
+		{
+			CADPointList = cadPointList;
+			IsClosed = isClosed;
+			m_StartPoint = nStartPoint;
+			m_LeadParam = leadData.Clone();
+			m_TraverseData = traverseData.Clone();
+			m_IsReverse = isReverse;
+			m_IsToolVecReverse = isToolVecReverse;
+			m_OverCutLength = dOverCutLength;
+			m_ToolVecModifyMap = ToolVecModifyMap;
 			BuildCAMPointList();
 		}
 
@@ -333,6 +348,14 @@ namespace MyCAM.Data
 					m_OverCutLength = value;
 					m_IsDirty = true;
 				}
+			}
+		}
+
+		public Dictionary<int, Tuple<double, double>> ToolVecModifyMap
+		{
+			get
+			{
+				return new Dictionary<int, Tuple<double, double>>( m_ToolVecModifyMap );
 			}
 		}
 

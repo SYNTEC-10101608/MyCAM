@@ -1,14 +1,17 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.IO;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
+using MyCAM.FileManager;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
-using System;
-using System.Windows.Forms;
 
 namespace MyCAM
 {
@@ -38,8 +41,14 @@ namespace MyCAM
 			// view manager
 			m_ViewManager = new ViewManager();
 
-			// CAD manager
-			m_CADManager = new DataManager();
+			// CAD Manager
+			if( GetMachineDataSuccess( out MachineData machineData ) ) {
+				m_CADManager = new DataManager( machineData );
+			}
+			else {
+				// get machine data fail, machine will be null(can't use)
+				m_CADManager = new DataManager();
+			}
 
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
@@ -98,6 +107,16 @@ namespace MyCAM
 		void m_tsmiImportIges_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ImportFile( FileFormat.IGES );
+		}
+
+		void m_tsmiOpenProjectFile_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.ImportProjectFile();
+		}
+
+		void m_tsmiSaveProjectFile_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.SaveProjectFile();
 		}
 
 		// add feature
@@ -364,6 +383,75 @@ namespace MyCAM
 			}
 			m_msCAD.Enabled = true;
 		}
+		#endregion
+
+		#region Get machine data
+
+		bool GetMachineDataSuccess( out MachineData machineData )
+		{
+			machineData = null;
+
+			// get exe directory
+			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+			string filePath = Path.Combine( exeDir, "MachineData.mac" );
+			if( !File.Exists( filePath ) ) {
+				Console.WriteLine( $"檔案不存在" );
+				return false;
+			}
+			try {
+				XmlSerializer serializer = new XmlSerializer( typeof( MachineDataDTOContainer ) );
+
+				// get DTO from xml file
+				using( FileStream fileStream = new FileStream( filePath, FileMode.Open ) ) {
+					MachineDataDTOContainer machineDataDTO = (MachineDataDTOContainer)serializer.Deserialize( fileStream );
+
+					// turn back to MachineData
+					machineData = MachineDataDTOManager.ToMachineData( machineDataDTO );
+					return true;
+				}
+			}
+			catch( Exception ex ) {
+				Console.WriteLine( $"讀取專案檔案失敗：\n{ex.Message}", "錯誤" );
+				return false;
+			}
+		}
+
+		void SaveMachineData()
+		{
+			// default machine data
+			MixTypeMachineData machineData = new MixTypeMachineData();
+			machineData.ToolDirection = ToolDirection.Z;
+			machineData.MasterRotaryAxis = RotaryAxis.Y;
+			machineData.SlaveRotaryAxis = RotaryAxis.Z;
+			machineData.MasterRotaryDirection = RotaryDirection.RightHand;
+			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
+			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.ToolLength = 2.0;
+			machineData.ToolToMasterVec = new gp_Vec( 0, 101.2, 169.48 );
+			machineData.MCSToSlaveVec = new gp_Vec( 40.81, -384.80, -665.67 );
+
+			// get exe directory
+			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+			string filePath = Path.Combine( exeDir, "MachineData.mac" );
+
+			// turn MachineData to DTOContainer
+			MachineDataDTOContainer machinDataDTOContainer = MachineDataDTOManager.ToDTOContainer( machineData );
+			if( machinDataDTOContainer == null ) {
+				throw new ArgumentNullException( "MachineData 轉換成 DTOContainer 失敗。" );
+			}
+			XmlSerializer serializer = new XmlSerializer( typeof( MachineDataDTOContainer ) );
+
+			// remove comment xmlns:xsd and xmlns:xsi
+			XmlSerializerNamespaces xmlNameSpace = new XmlSerializerNamespaces();
+			xmlNameSpace.Add( "", "" );
+
+			// write DTO to xml file
+			using( FileStream fileStream = new FileStream( filePath, FileMode.Create ) ) {
+				serializer.Serialize( fileStream, machinDataDTOContainer, xmlNameSpace );
+			}
+		}
+
 		#endregion
 	}
 }

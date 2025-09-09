@@ -1,9 +1,10 @@
-﻿using OCC.BRep;
+﻿using System;
+using System.Collections.Generic;
+using OCC.BRep;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopExp;
 using OCC.TopoDS;
-using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
@@ -46,6 +47,13 @@ namespace MyCAM.Data
 			bool isClosed = startPoint.IsEqual( endPoint, 1e-3 );
 
 			m_CAMData = new CAMData( pathElementList, isClosed );
+		}
+
+		// to get path data from file
+		public PathData( string szUID, TopoDS_Shape shapeData, CAMData camData)
+		: base( szUID, shapeData )
+		{
+			m_CAMData = camData;
 		}
 
 		public CAMData CAMData
