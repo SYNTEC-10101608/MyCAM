@@ -1,10 +1,10 @@
-﻿using OCC.gp;
+﻿using System;
+using System.Collections.Generic;
+using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
@@ -15,11 +15,58 @@ namespace MyCAM.Data
 		public Action<List<string>> FeatureAdded;
 		public Action<List<string>> PathAdded;
 
-		public DataManager()
+		public struct ShapeIDsStruct
+		{
+			public int Solid_ID;
+			public int Shell_ID;
+			public int Face_ID;
+			public int Wire_ID;
+			public int Edge_ID;
+			public int Vertex_ID;
+			public int Path_ID;
+		}
+
+		// TODO: this is temp solution
+		public DataManager( MachineData machineData = null )
 		{
 			ShapeDataMap = new Dictionary<string, ShapeData>();
 			PartIDList = new List<string>();
 			PathIDList = new List<string>();
+			m_MachineData = machineData ?? m_DefaultMachineData;
+		}
+
+		// to build manager from project filek
+		public DataManager( Dictionary<string, ShapeData> shapeDataMape, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct structShapeIDs )
+		{
+			ShapeDataMap = shapeDataMape;
+			PartIDList = partIDList;
+			PathIDList = pathIDList;
+			ResetShapeIDsByDTO( structShapeIDs );
+		}
+
+		public void ResetDataManger( Dictionary<string, ShapeData> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, TraverseData traverseData )
+		{
+			// check shape map is mach with partList & pathList
+			Dictionary<string, ShapeData> checkedShapeDataMap = new Dictionary<string, ShapeData>();
+			List<string> checkedPartIDList = new List<string>();
+			List<string> checkedPathIDList = new List<string>();
+			foreach( var shapeData in shapeDataMap ) {
+
+				// both data map and id list should contain the shape data
+				if( partIDList.Contains( shapeData.Key ) ) {
+					checkedShapeDataMap[ shapeData.Key ] = shapeData.Value;
+					checkedPartIDList.Add( shapeData.Key );
+				}
+				if( pathIDList.Contains( shapeData.Key ) ) {
+					checkedShapeDataMap[ shapeData.Key ] = shapeData.Value;
+					checkedPathIDList.Add( shapeData.Key );
+				}
+			}
+			ShapeDataMap = checkedShapeDataMap;
+			PartIDList = checkedPartIDList;
+			PathIDList = checkedPathIDList;
+			m_TraverseData = traverseData;
+			ResetShapeIDsByDTO( shapeIDs );
 		}
 
 		public Dictionary<string, ShapeData> ShapeDataMap
@@ -59,12 +106,6 @@ namespace MyCAM.Data
 					return m_DefaultMachineData;
 				}
 				return m_MachineData;
-			}
-			private set
-			{
-				if( value != null ) {
-					m_MachineData = value;
-				}
 			}
 		}
 
@@ -169,6 +210,31 @@ namespace MyCAM.Data
 			return camDataList;
 		}
 
+		public ShapeIDsStruct GetShapeIDsForDTO()
+		{
+			return new ShapeIDsStruct()
+			{
+				Solid_ID = m_SolidID,
+				Shell_ID = m_ShellID,
+				Face_ID = m_FaceID,
+				Wire_ID = m_WireID,
+				Edge_ID = m_EdgeID,
+				Vertex_ID = m_VertexID,
+				Path_ID = m_PathID,
+			};
+		}
+
+		void ResetShapeIDsByDTO( ShapeIDsStruct structShapeIDs )
+		{
+			m_SolidID = structShapeIDs.Solid_ID;
+			m_ShellID = structShapeIDs.Shell_ID;
+			m_FaceID = structShapeIDs.Face_ID;
+			m_WireID = structShapeIDs.Wire_ID;
+			m_EdgeID = structShapeIDs.Edge_ID;
+			m_VertexID = structShapeIDs.Vertex_ID;
+			m_PathID = structShapeIDs.Path_ID;
+		}
+
 		List<ShapeData> ArrangeShapeData( TopoDS_Shape oneShape )
 		{
 			if( oneShape == null || oneShape.IsNull() ) {
@@ -255,7 +321,7 @@ namespace MyCAM.Data
 
 		TraverseData m_TraverseData = new TraverseData();
 		MachineData m_MachineData = null;
-		MixTypeMachineData m_DefaultMachineData = new MixTypeMachineData()
+		readonly MixTypeMachineData m_DefaultMachineData = new MixTypeMachineData()
 		{
 			ToolDirection = ToolDirection.Z,
 			MasterRotaryAxis = RotaryAxis.Y,

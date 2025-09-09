@@ -52,7 +52,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\LeadData.cs" />
     <Compile Include="Data\MachineData.cs" />
     <Compile Include="Data\MachineDefine.cs" />
     <Compile Include="Data\PostData.cs" />
@@ -62,6 +61,8 @@
     <Compile Include="Editor\Action\CAM\LeadSettingAction.cs" />
     <Compile Include="Editor\Action\CAM\OverCutAction.cs" />
     <Compile Include="Editor\Action\CAM\TraverseSettingAction.cs" />
+    <Compile Include="Editor\Action\CAD\ReadProjectFileAction.cs" />
+    <Compile Include="Editor\Action\CAD\SaveProjectFileAction.cs" />
     <Compile Include="Editor\Dialog\AxisTransformDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -76,8 +77,6 @@
     </Compile>
     <Compile Include="Editor\SimuEditor.cs" />
     <Compile Include="Data\LeadData.cs" />
-    <Compile Include="Editor\Action\CAM\LeadSettingAction.cs" />
-    <Compile Include="Editor\Action\CAM\OverCutAction.cs" />
     <Compile Include="Editor\Dialog\LeadLineForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -91,7 +90,9 @@
       <DependentUpon>OverCutForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Helper\TraverseHelper.cs" />
+    <Compile Include="FileManager\MachineDataDTO.cs" />
     <Compile Include="Helper\LeadHelper.cs" />
+    <Compile Include="FileManager\DataManagerDTO.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Data\CAMData.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />

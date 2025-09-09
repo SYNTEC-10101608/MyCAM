@@ -1,7 +1,7 @@
-﻿using MyCAM.Data;
-using OCCViewer;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using MyCAM.Data;
+using OCCViewer;
 
 namespace MyCAM.Editor
 {
@@ -27,6 +27,8 @@ namespace MyCAM.Editor
 		SetLead = 11,
 		OverCut = 12,
 		SetTraverseParam = 13,
+		ImportProjectFile = 14,
+		SaveProjectFile = 15
 	}
 
 	internal interface IEditorAction

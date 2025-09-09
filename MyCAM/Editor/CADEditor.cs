@@ -1,4 +1,8 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.IFSelect;
 using OCC.IGESControl;
@@ -7,9 +11,6 @@ using OCC.TopoDS;
 using OCC.XSControl;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -138,6 +139,18 @@ namespace MyCAM.Editor
 
 			// read file data and show a progress form
 			ReadFileData( format, szFileName );
+		}
+
+		public void ImportProjectFile()
+		{
+			ReadProjectFileAction action = new ReadProjectFileAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			StartEditAction( action );
+		}
+
+		public void SaveProjectFile()
+		{
+			SaveProjectFileAction action = new SaveProjectFileAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			StartEditAction( action );
 		}
 
 		public void AddPoint( AddPointType type )
