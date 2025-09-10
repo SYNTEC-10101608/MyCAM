@@ -139,7 +139,7 @@ namespace MyCAM.Editor
 			using( OpenFileDialog fileDialog = new OpenFileDialog() ) {
 
 				// nly allow .saf files
-				fileDialog.Filter = "SAF Files (*.saf)|*.saf";
+				fileDialog.Filter = "SFA Files (*.sfa)|*.sfa";
 				fileDialog.Title = "開啟專案";
 
 				// only can choose one file

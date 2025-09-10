@@ -50,16 +50,20 @@ namespace MyCAM.Data
 			Dictionary<string, ShapeData> checkedShapeDataMap = new Dictionary<string, ShapeData>();
 			List<string> checkedPartIDList = new List<string>();
 			List<string> checkedPathIDList = new List<string>();
-			foreach( var shapeData in shapeDataMap ) {
 
-				// both data map and id list should contain the shape data
-				if( partIDList.Contains( shapeData.Key ) ) {
-					checkedShapeDataMap[ shapeData.Key ] = shapeData.Value;
-					checkedPartIDList.Add( shapeData.Key );
+			// read part in sequence
+			foreach( var partDataID in partIDList ) {
+				if( shapeDataMap.ContainsKey( partDataID ) ) {
+					checkedShapeDataMap[ partDataID ] = shapeDataMap[ partDataID ];
+					checkedPartIDList.Add( partDataID );
 				}
-				if( pathIDList.Contains( shapeData.Key ) ) {
-					checkedShapeDataMap[ shapeData.Key ] = shapeData.Value;
-					checkedPathIDList.Add( shapeData.Key );
+			}
+
+			// read path in sequence
+			foreach( var pathDataID in pathIDList ) {
+				if( shapeDataMap.ContainsKey( pathDataID ) ) {
+					checkedShapeDataMap[ pathDataID ] = shapeDataMap[ pathDataID ];
+					checkedPathIDList.Add( pathDataID );
 				}
 			}
 			ShapeDataMap = checkedShapeDataMap;

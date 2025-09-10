@@ -80,7 +80,7 @@ namespace MyCAM.Editor
 		static string GetProjectFileInfo()
 		{
 			using( SaveFileDialog fileDialog = new SaveFileDialog() ) {
-				fileDialog.Filter = "SAF Files (*.saf)|*.saf";
+				fileDialog.Filter = "SFA Files (*.sfa)|*.sfa";
 				fileDialog.FileName = "";
 				fileDialog.Title = "儲存專案";
 				fileDialog.OverwritePrompt = true;
