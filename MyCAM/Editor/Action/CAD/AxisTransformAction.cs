@@ -131,7 +131,7 @@ namespace MyCAM.Editor
 
 		public void TransformDone()
 		{
-			TransfromDisplayedShape( m_trsf.Inverted() );
+			ResetLocalTransformation();
 			ApplyTransform( m_trsf );
 			End();
 		}
@@ -151,6 +151,18 @@ namespace MyCAM.Editor
 				}
 				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szID ].AISHandle );
 				oneAIS.SetLocalTransformation( trsf.Multiplied( oneAIS.LocalTransformation() ) );
+			}
+		}
+
+		void ResetLocalTransformation()
+		{
+			foreach( string szID in m_CADManager.PartIDList ) {
+				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
+				if( viewObject.Visible == false ) {
+					continue;
+				}
+				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szID ].AISHandle );
+				oneAIS.ResetTransformation();
 			}
 		}
 

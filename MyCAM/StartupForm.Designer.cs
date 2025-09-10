@@ -585,11 +585,6 @@
 			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "StartupForm";
 			this.Text = "五軸切";
-			this.m_msCAD.ResumeLayout(false);
-			this.m_tsmiBackToCAD.Name = "m_tsmiBackToCAD";
-			this.m_tsmiBackToCAD.Size = new System.Drawing.Size(72, 20);
-			this.m_tsmiBackToCAD.Text = "回到 CAD";
-			this.m_tsmiBackToCAD.Click += new System.EventHandler(this.m_tsmiBackToCAD_Click);
 			// 
 			// m_tsmiCAMOK
 			// 
