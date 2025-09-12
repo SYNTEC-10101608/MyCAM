@@ -35,6 +35,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LicenseChecker, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\FALicenseChecker\bin\Debug\LicenseChecker.dll</HintPath>
+    </Reference>
     <Reference Include="OCCCSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\reference\OCCCSharp.dll</HintPath>
