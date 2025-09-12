@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCAM", "MyCAM\MyCAM.csproj", "{4CB64D75-A76D-4B75-8D20-6668700C4208}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E32A7B86-9B99-4CE4-ADF5-60134E7A4640} = {E32A7B86-9B99-4CE4-ADF5-60134E7A4640}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCCViewer", "OCCViewer\OCCViewer.csproj", "{B70D417C-8417-49EE-AC5F-DC0BCFD2E38E}"
 EndProject

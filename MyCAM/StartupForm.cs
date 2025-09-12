@@ -1,5 +1,4 @@
-﻿using FALicenseChecker;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using MyCAM.FileManager;
@@ -20,12 +19,12 @@ namespace MyCAM
 	{
 		public StartupForm()
 		{
-			//#if !DEBUG
-			if( LicenseChecker.IsLicenseActivated() == false ) {
+#if !DEBUG
+			if( FALicenseChecker.LicenseChecker.IsLicenseActivated() == false ) {
 				MessageBox.Show( "Authorization process is incorrect", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
 				Environment.Exit( 0 );
 			}
-			//#endif
+#endif
 
 			// app
 			MyApp.MainForm = this;

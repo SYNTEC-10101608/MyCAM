@@ -35,10 +35,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LicenseChecker, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\FALicenseChecker\bin\Debug\LicenseChecker.dll</HintPath>
-    </Reference>
     <Reference Include="OCCCSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\reference\OCCCSharp.dll</HintPath>
@@ -184,6 +180,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FALicenseChecker\FALicenseChecker.csproj">
+      <Project>{e32a7b86-9b99-4ce4-adf5-60134e7a4640}</Project>
+      <Name>FALicenseChecker</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OCCTool\OCCTool.csproj">
       <Project>{e9c0ab57-4558-4baf-b154-b20169a256fe}</Project>
       <Name>OCCTool</Name>
