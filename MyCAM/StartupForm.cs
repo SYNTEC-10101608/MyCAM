@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Windows.Forms;
-using System.Xml.Serialization;
+﻿using FALicenseChecker;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
@@ -12,6 +9,10 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
+using System;
+using System.IO;
+using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace MyCAM
 {
@@ -19,6 +20,13 @@ namespace MyCAM
 	{
 		public StartupForm()
 		{
+			//#if !DEBUG
+			if( LicenseChecker.IsLicenseActivated() == false ) {
+				MessageBox.Show( "Authorization process is incorrect", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				Environment.Exit( 0 );
+			}
+			//#endif
+
 			// app
 			MyApp.MainForm = this;
 			InitializeComponent();
