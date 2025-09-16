@@ -3,12 +3,8 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
-	public partial class OverCutForm : Form
+	public partial class OverCutForm : ActionDialogBase<double>
 	{
-		public Action Preview;
-		public Action OnComfirm;
-		public Action OnCancel;
-
 		public OverCutForm( double overCutLength )
 		{
 			InitializeComponent();
@@ -16,37 +12,29 @@ namespace MyCAM.Editor.Dialog
 			m_tbxOverCutLength.Text = m_OverCutLength.ToString();
 		}
 
-		public double OverCutLength
+		void m_tbxOverCutLength_Leave( object sender, EventArgs e )
 		{
-			get
-			{
-				return m_OverCutLength;
-			}
+			PreviewOverCutResult();
 		}
 
-		double m_OverCutLength = 0;
-		bool m_IsConfirmed = false;
+		void m_tbxOverCutLength_KeyDown( object sender, KeyEventArgs e )
+		{
+			if( e.KeyCode == Keys.Enter ) {
+				PreviewOverCutResult();
+			}
+		}
 
 		void m_btnSure_Click( object sender, EventArgs e )
 		{
 			if( IsValidParam() ) {
-				m_IsConfirmed = true;
-				OnComfirm?.Invoke();
-				Close();
-			}
-		}
-
-		void OverCutForm_FormClosing( object sender, FormClosingEventArgs e )
-		{
-			if( !m_IsConfirmed && e.CloseReason == CloseReason.UserClosing ) {
-				OnCancel?.Invoke();
+				RaiseConfirm( m_OverCutLength );
 			}
 		}
 
 		void PreviewOverCutResult()
 		{
 			if( IsValidParam() ) {
-				Preview?.Invoke();
+				RaisePreview( m_OverCutLength );
 			}
 		}
 
@@ -64,16 +52,6 @@ namespace MyCAM.Editor.Dialog
 			return true;
 		}
 
-		void m_tbxOverCutLength_Leave( object sender, EventArgs e )
-		{
-			PreviewOverCutResult();
-		}
-
-		void m_tbxOverCutLength_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				PreviewOverCutResult();
-			}
-		}
+		double m_OverCutLength = 0;
 	}
 }

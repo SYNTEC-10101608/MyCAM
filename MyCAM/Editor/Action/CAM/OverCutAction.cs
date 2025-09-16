@@ -11,33 +11,10 @@ namespace MyCAM.Editor
 		: base( cadManager, viewManager )
 		{
 			if( camData == null ) {
-				throw new ArgumentNullException( "PathIndexSelectAction constructing argument camData null" );
+				throw new ArgumentNullException( "OverCutAction constructing argument camData null" );
 			}
 			m_CAMData = camData;
-			double dOverCutBackup = m_CAMData.OverCutLength;
-			OverCutForm overCutForm = new OverCutForm( m_CAMData.OverCutLength );
-
-			// preview will change viewer
-			overCutForm.Preview += () =>
-			{
-				m_CAMData.OverCutLength = overCutForm.OverCutLength;
-				PropertyChanged?.Invoke();
-			};
-
-			// get prvious over cut back
-			overCutForm.OnCancel += () =>
-			{
-				m_CAMData.OverCutLength = dOverCutBackup;
-				PropertyChanged?.Invoke();
-				End();
-			};
-			overCutForm.OnComfirm += () =>
-			{
-				m_CAMData.OverCutLength = overCutForm.OverCutLength;
-				PropertyChanged?.Invoke();
-				End();
-			};
-			overCutForm.Show( MyApp.MainForm );
+			m_dOverCutBackup = m_CAMData.OverCutLength;
 		}
 
 		public override EditActionType ActionType
@@ -50,13 +27,35 @@ namespace MyCAM.Editor
 
 		public override void Start()
 		{
-		}
+			OverCutForm overCutForm = new OverCutForm( m_CAMData.OverCutLength );
 
-		public override void End()
-		{
+			// preview
+			overCutForm.Preview += ( overCutLength ) =>
+			{
+				m_CAMData.OverCutLength = overCutLength;
+				PropertyChanged?.Invoke();
+			};
+
+			// confirm
+			overCutForm.Confirm += ( overCutLength ) =>
+			{
+				m_CAMData.OverCutLength = overCutLength;
+				PropertyChanged?.Invoke();
+				End();
+			};
+
+			// cancel
+			overCutForm.Cancel += () =>
+			{
+				m_CAMData.OverCutLength = m_dOverCutBackup;
+				PropertyChanged?.Invoke();
+				End();
+			};
+			overCutForm.Show( MyApp.MainForm );
 		}
 
 		public Action PropertyChanged;
-		CAMData m_CAMData;
+		readonly CAMData m_CAMData;
+		readonly double m_dOverCutBackup;
 	}
 }
