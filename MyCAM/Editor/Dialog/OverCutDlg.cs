@@ -3,9 +3,9 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
-	public partial class OverCutForm : ActionDialogBase<double>
+	public partial class OverCutDlg : ActionDialogBase<double>
 	{
-		public OverCutForm( double overCutLength )
+		public OverCutDlg( double overCutLength )
 		{
 			InitializeComponent();
 			m_OverCutLength = overCutLength;

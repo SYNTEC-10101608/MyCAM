@@ -72,25 +72,25 @@
     <Compile Include="Editor\Dialog\AxisTransformDlg.Designer.cs">
       <DependentUpon>AxisTransformDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Dialog\TraverseParamSettingForm.cs">
+    <Compile Include="Editor\Dialog\TraverseDlg.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editor\Dialog\TraverseParamSettingForm.Designer.cs">
-      <DependentUpon>TraverseParamSettingForm.cs</DependentUpon>
+    <Compile Include="Editor\Dialog\TraverseDlg.Designer.cs">
+      <DependentUpon>TraverseDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\SimuEditor.cs" />
     <Compile Include="Data\LeadData.cs" />
-    <Compile Include="Editor\Dialog\LeadLineForm.cs">
+    <Compile Include="Editor\Dialog\LeadDlg.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editor\Dialog\LeadLineForm.Designer.cs">
-      <DependentUpon>LeadLineForm.cs</DependentUpon>
+    <Compile Include="Editor\Dialog\LeadDlg.Designer.cs">
+      <DependentUpon>LeadDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Dialog\OverCutForm.cs">
+    <Compile Include="Editor\Dialog\OverCutDlg.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editor\Dialog\OverCutForm.Designer.cs">
-      <DependentUpon>OverCutForm.cs</DependentUpon>
+    <Compile Include="Editor\Dialog\OverCutDlg.Designer.cs">
+      <DependentUpon>OverCutDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Helper\TraverseHelper.cs" />
     <Compile Include="FileManager\MachineDataDTO.cs" />
@@ -118,11 +118,11 @@
     <Compile Include="Editor\Dialog\ThreePtTransformDlg.Designer.cs">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Dialog\ToolVecForm.cs">
+    <Compile Include="Editor\Dialog\ToolVectorDlg.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editor\Dialog\ToolVecForm.Designer.cs">
-      <DependentUpon>ToolVecForm.cs</DependentUpon>
+    <Compile Include="Editor\Dialog\ToolVectorDlg.Designer.cs">
+      <DependentUpon>ToolVectorDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\ViewManager.cs" />
     <Compile Include="Data\BasicData.cs" />
@@ -142,20 +142,20 @@
     <EmbeddedResource Include="Editor\Dialog\AxisTransformDlg.resx">
       <DependentUpon>AxisTransformDlg.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editor\Dialog\TraverseParamSettingForm.resx">
-      <DependentUpon>TraverseParamSettingForm.cs</DependentUpon>
+    <EmbeddedResource Include="Editor\Dialog\TraverseDlg.resx">
+      <DependentUpon>TraverseDlg.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editor\Dialog\LeadLineForm.resx">
-      <DependentUpon>LeadLineForm.cs</DependentUpon>
+    <EmbeddedResource Include="Editor\Dialog\LeadDlg.resx">
+      <DependentUpon>LeadDlg.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editor\Dialog\OverCutForm.resx">
-      <DependentUpon>OverCutForm.cs</DependentUpon>
+    <EmbeddedResource Include="Editor\Dialog\OverCutDlg.resx">
+      <DependentUpon>OverCutDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\ThreePtTransformDlg.resx">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editor\Dialog\ToolVecForm.resx">
-      <DependentUpon>ToolVecForm.cs</DependentUpon>
+    <EmbeddedResource Include="Editor\Dialog\ToolVectorDlg.resx">
+      <DependentUpon>ToolVectorDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="StartupForm.resx">
       <DependentUpon>StartupForm.cs</DependentUpon>

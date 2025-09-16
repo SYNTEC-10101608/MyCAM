@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Editor
 {
-	partial class ToolVecForm
+	partial class ToolVectorDlg
 	{
 		/// <summary>
 		/// Required designer variable.

@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Editor.Dialog
 {
-	partial class OverCutForm
+	partial class OverCutDlg
 	{
 		/// <summary>
 		/// Required designer variable.

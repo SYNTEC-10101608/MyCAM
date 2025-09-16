@@ -32,7 +32,7 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			LeadLineForm leadDialog = new LeadLineForm( m_CAMData.LeadLineParam.Clone() );
+			LeadDlg leadDialog = new LeadDlg( m_CAMData.LeadLineParam.Clone() );
 
 			// preview
 			leadDialog.Preview += ( leadData ) =>

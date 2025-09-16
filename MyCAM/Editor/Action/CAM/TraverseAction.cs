@@ -24,7 +24,7 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			TraverseParamSettingForm traverseParamSettingFrom = new TraverseParamSettingForm( m_CADManager.TraverseData.Clone() );
+			TraverseDlg traverseParamSettingFrom = new TraverseDlg( m_CADManager.TraverseData.Clone() );
 			traverseParamSettingFrom.Confirm += ConfirmTraverseParam;
 			traverseParamSettingFrom.Preview += PreviewTraverseParam;
 			traverseParamSettingFrom.Cancel += CancelTraverseParam;

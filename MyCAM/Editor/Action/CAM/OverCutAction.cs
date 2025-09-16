@@ -28,7 +28,7 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			OverCutForm overCutForm = new OverCutForm( m_CAMData.OverCutLength );
+			OverCutDlg overCutForm = new OverCutDlg( m_CAMData.OverCutLength );
 
 			// preview
 			overCutForm.Preview += ( overCutLength ) =>

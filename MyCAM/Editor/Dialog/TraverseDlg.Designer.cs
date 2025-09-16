@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Editor
 {
-	partial class TraverseParamSettingForm
+	partial class TraverseDlg
 	{
 		/// <summary>
 		/// Required designer variable.

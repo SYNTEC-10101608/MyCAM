@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Editor.Dialog
 {
-	partial class LeadLineForm
+	partial class LeadDlg
 	{
 		/// <summary>
 		/// Required designer variable.

@@ -4,9 +4,9 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public partial class TraverseParamSettingForm : ActionDialogBase<TraverseData>
+	public partial class TraverseDlg : ActionDialogBase<TraverseData>
 	{
-		public TraverseParamSettingForm( TraverseData data )
+		public TraverseDlg( TraverseData data )
 		{
 			InitializeComponent();
 			InitializeControlValue( data );
