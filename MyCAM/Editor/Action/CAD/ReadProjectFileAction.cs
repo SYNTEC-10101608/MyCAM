@@ -13,9 +13,14 @@ namespace MyCAM.Editor
 {
 	internal class ReadProjectFileAction : EditActionBase
 	{
-		public ReadProjectFileAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public ReadProjectFileAction( DataManager dataManager, Viewer viewer, ViewManager viewManager )
+			: base( dataManager )
 		{
+			if( viewer == null || viewManager == null ) {
+				throw new ArgumentNullException( "ReadProjectFileAction constructing argument null" );
+			}
+			m_Viewer = viewer;
+			m_ViewManager = viewManager;
 		}
 
 		public override EditActionType ActionType
@@ -50,8 +55,8 @@ namespace MyCAM.Editor
 					dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out TraverseData traverseData );
 
 					// set back to data manager
-					m_CADManager.ResetDataManger( shapeDataMap, partIDList, pathIDList, shapeIDs, traverseData );
-					ChangeViewerManager();
+					m_DataManager.ResetDataManger( shapeDataMap, partIDList, pathIDList, shapeIDs, traverseData );
+					UpdateAllViewData();
 				}
 				catch( Exception ex ) {
 					MessageBox.Show(
@@ -65,37 +70,7 @@ namespace MyCAM.Editor
 			End();
 		}
 
-		protected override void ViewerMouseMove( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerMouseUp( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerMouseDown( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerKeyDown( KeyEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
-		{
-			// do nothing
-		}
-
-		void ChangeViewerManager()
+		void UpdateAllViewData()
 		{
 			// clear the tree view and viewer
 			m_ViewManager.PartNode.Nodes.Clear();
@@ -109,8 +84,8 @@ namespace MyCAM.Editor
 			m_ViewManager.TreeNodeMap.Clear();
 
 			// buill part tree
-			foreach( var szNewDataID in m_CADManager.PartIDList ) {
-				ShapeData data = m_CADManager.ShapeDataMap[ szNewDataID ];
+			foreach( var szNewDataID in m_DataManager.PartIDList ) {
+				ShapeData data = m_DataManager.ShapeDataMap[ szNewDataID ];
 
 				// add node to the tree view
 				TreeNode node = new TreeNode( data.UID );
@@ -123,10 +98,10 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
 
-			//build path tree
+			// build path tree
 			m_ViewManager.PathNode.Nodes.Clear();
-			foreach( var szNewPathDataID in m_CADManager.PathIDList ) {
-				ShapeData data = m_CADManager.ShapeDataMap[ szNewPathDataID ];
+			foreach( var szNewPathDataID in m_DataManager.PathIDList ) {
+				ShapeData data = m_DataManager.ShapeDataMap[ szNewPathDataID ];
 
 				// add a new node to the tree view
 				TreeNode node = new TreeNode( szNewPathDataID );
@@ -134,13 +109,14 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szNewPathDataID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_CADManager.ShapeDataMap[ szNewPathDataID ].Shape );
+				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ShapeDataMap[ szNewPathDataID ].Shape );
 				m_ViewManager.ViewObjectMap.Add( szNewPathDataID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
 
-			// update tree view and viewer (current is in cad mode so open part tree)
+			// update tree view and viewer
 			m_ViewManager.PartNode.ExpandAll();
+			m_ViewManager.PathNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
 
@@ -166,5 +142,8 @@ namespace MyCAM.Editor
 				}
 			}
 		}
+
+		Viewer m_Viewer;
+		ViewManager m_ViewManager;
 	}
 }

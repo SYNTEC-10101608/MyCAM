@@ -3,9 +3,9 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public partial class ToolVecForm : Form
+	public partial class ToolVectorDlg : Form
 	{
-		public ToolVecForm( bool bModified, double angleA_deg, double angleB_deg )
+		public ToolVectorDlg( bool bModified, double angleA_deg, double angleB_deg )
 		{
 			InitializeComponent();
 

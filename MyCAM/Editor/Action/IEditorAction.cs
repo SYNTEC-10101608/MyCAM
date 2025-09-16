@@ -1,7 +1,7 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCCViewer;
+using System;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -13,22 +13,28 @@ namespace MyCAM.Editor
 
 	internal enum EditActionType
 	{
-		None = 0,
-		Default = 1,
-		AddPoint = 2,
-		ThreePtTransform = 3,
-		ManualTransform = 4,
-		SelectFace = 5,
-		SelectPath = 6,
-		StartPoint = 7,
-		ToolVec = 8,
-		AxisTransform = 9,
-		AddLine = 10,
-		SetLead = 11,
-		OverCut = 12,
-		SetTraverseParam = 13,
-		ImportProjectFile = 14,
-		SaveProjectFile = 15
+		// default
+		Default,
+
+		// CAD
+		AddPoint,
+		AddLine,
+		ThreePtTransform,
+		ManualTransform,
+		AxisTransform,
+
+		// CAM
+		SelectFace,
+		SelectPath,
+		StartPoint,
+		ToolVec,
+		SetLead,
+		OverCut,
+		SetTraverseParam,
+
+		// File
+		ImportProjectFile,
+		SaveProjectFile,
 	}
 
 	internal interface IEditorAction
@@ -55,48 +61,17 @@ namespace MyCAM.Editor
 
 	internal abstract class EditActionBase : IEditorAction
 	{
-		protected EditActionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
+		protected EditActionBase( DataManager dataManager )
 		{
-			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
+			if( dataManager == null ) {
 				throw new ArgumentNullException( "EditActionBase constructing argument null" );
 			}
-			m_Viewer = viewer;
-			m_TreeView = treeView;
-			m_ViewManager = viewManager;
-			m_CADManager = cadManager;
+			m_DataManager = dataManager;
 		}
 
 		public abstract EditActionType ActionType
 		{
 			get;
-		}
-
-		public virtual void Start()
-		{
-			// Register events
-			m_Viewer.MouseDown += ViewerMouseDown;
-			m_Viewer.MouseMove += ViewerMouseMove;
-			m_Viewer.MouseUp += ViewerMouseUp;
-			m_Viewer.KeyDown += ViewerKeyDown;
-			m_TreeView.AfterSelect += TreeViewAfterSelect;
-			m_TreeView.KeyDown += TreeViewKeyDown;
-
-			// Invoke start action event
-			StartAction?.Invoke( this );
-		}
-
-		public virtual void End()
-		{
-			// Unregister events
-			m_Viewer.MouseDown -= ViewerMouseDown;
-			m_Viewer.MouseMove -= ViewerMouseMove;
-			m_Viewer.MouseUp -= ViewerMouseUp;
-			m_Viewer.KeyDown -= ViewerKeyDown;
-			m_TreeView.AfterSelect -= TreeViewAfterSelect;
-			m_TreeView.KeyDown -= TreeViewKeyDown;
-
-			// Invoke end action event
-			EndAction?.Invoke( this );
 		}
 
 		public Action<IEditorAction> EndAction
@@ -107,6 +82,62 @@ namespace MyCAM.Editor
 		public Action<IEditorAction> StartAction
 		{
 			get; set;
+		}
+
+		public virtual void Start()
+		{
+			StartAction?.Invoke( this );
+		}
+
+		public virtual void End()
+		{
+			EndAction?.Invoke( this );
+		}
+
+		protected DataManager m_DataManager;
+	}
+
+	internal abstract class KeyMouseActionBase : EditActionBase
+	{
+		protected KeyMouseActionBase( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager )
+		{
+			if( viewer == null || treeView == null || viewManager == null ) {
+				throw new ArgumentNullException( "KeyMouseActionBase constructing argument null" );
+			}
+			m_Viewer = viewer;
+			m_TreeView = treeView;
+			m_ViewManager = viewManager;
+		}
+
+		public override abstract EditActionType ActionType
+		{
+			get;
+		}
+
+		public override void Start()
+		{
+			base.Start();
+
+			// Register events
+			m_Viewer.MouseDown += ViewerMouseDown;
+			m_Viewer.MouseMove += ViewerMouseMove;
+			m_Viewer.MouseUp += ViewerMouseUp;
+			m_Viewer.KeyDown += ViewerKeyDown;
+			m_TreeView.AfterSelect += TreeViewAfterSelect;
+			m_TreeView.KeyDown += TreeViewKeyDown;
+		}
+
+		public override void End()
+		{
+			// Unregister events
+			m_Viewer.MouseDown -= ViewerMouseDown;
+			m_Viewer.MouseMove -= ViewerMouseMove;
+			m_Viewer.MouseUp -= ViewerMouseUp;
+			m_Viewer.KeyDown -= ViewerKeyDown;
+			m_TreeView.AfterSelect -= TreeViewAfterSelect;
+			m_TreeView.KeyDown -= TreeViewKeyDown;
+			base.End();
 		}
 
 		protected abstract void ViewerMouseDown( MouseEventArgs e );
@@ -124,6 +155,5 @@ namespace MyCAM.Editor
 		protected Viewer m_Viewer;
 		protected TreeView m_TreeView;
 		protected ViewManager m_ViewManager;
-		protected DataManager m_CADManager;
 	}
 }
