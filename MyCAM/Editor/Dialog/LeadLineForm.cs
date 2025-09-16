@@ -4,12 +4,8 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
-	internal partial class LeadLineForm : Form
+	internal partial class LeadLineForm : ActionDialogBase<LeadData>
 	{
-		public Action Preview;
-		public Action OnComfirm;
-		public Action OnCancel;
-
 		public LeadLineForm( LeadData leadParam )
 		{
 			if( leadParam == null ) {
@@ -64,183 +60,111 @@ namespace MyCAM.Editor.Dialog
 			}
 		}
 
-		bool m_IsConfirmed = false;
-		const double DEFAULT_Value = 0;
-		LeadData m_LeadParam;
-		const double DEFAULT_Angle = 45;
-		const double DEFAULT_Length = 3;
-
-
 		void m_btnOK_Click( object sender, EventArgs e )
 		{
 			if( IsValidParam() ) {
 				SetParam();
-				m_IsConfirmed = true;
-				OnComfirm?.Invoke();
-				Close();
+				RaiseConfirm( m_LeadParam );
 			}
 		}
 
 		void m_cbxLeadInType_SelectedIndexChanged( object sender, EventArgs e )
 		{
-			m_LeadParam.LeadIn.Type = (LeadType.LeadLineType)m_cbxLeadInType.SelectedIndex;
-			switch( m_LeadParam.LeadIn.Type ) {
-				case LeadType.LeadLineType.None:
-					m_tbxLeadInLength.Enabled = false;
-					m_tbxLeadInAngle.Enabled = false;
-					break;
-				default:
-					m_tbxLeadInLength.Enabled = true;
-					m_tbxLeadInAngle.Enabled = true;
-
-					// set length
-					if( !double.TryParse( m_tbxLeadInLength.Text, out double dLeadInLength ) || dLeadInLength <= 0 ) {
-						dLeadInLength = DEFAULT_Length;
-					}
-					m_LeadParam.LeadIn.Length = dLeadInLength;
-					m_tbxLeadInLength.Text = m_LeadParam.LeadIn.Length.ToString();
-
-					// default angle
-					double dLegalAngle = DEFAULT_Angle;
-
-					// get legal param
-					if( double.TryParse( m_tbxLeadInAngle.Text, out double dLeadInAngle ) ) {
-						if( ( m_LeadParam.LeadIn.Type == LeadType.LeadLineType.Arc && IsValidArcAngle( dLeadInAngle ) ) ||
-							( m_LeadParam.LeadIn.Type == LeadType.LeadLineType.Line && IsValidStraightLineAngle( dLeadInAngle ) ) ) {
-							dLegalAngle = dLeadInAngle;
-						}
-					}
-					m_LeadParam.LeadIn.Angle = dLegalAngle;
-					m_tbxLeadInAngle.Text = m_LeadParam.LeadIn.Angle.ToString();
-					break;
-			}
-
-			// combobox change means lead type changed 
-			Preview?.Invoke();
+			HandleLeadTypeChange( m_cbxLeadInType, m_tbxLeadInLength, m_tbxLeadInAngle, m_LeadParam.LeadIn );
 		}
 
 		void m_cbxLeadOutType_SelectedIndexChanged( object sender, EventArgs e )
 		{
-			m_LeadParam.LeadOut.Type = (LeadType.LeadLineType)m_cbxLeadOutType.SelectedIndex;
-			switch( m_LeadParam.LeadOut.Type ) {
+			HandleLeadTypeChange( m_cbxLeadOutType, m_tbxLeadOutLength, m_tbxLeadOutAngle, m_LeadParam.LeadOut );
+		}
+
+		void HandleLeadTypeChange( ComboBox comboBox, TextBox tbxLength, TextBox tbxAngle, LeadParam leadData )
+		{
+			leadData.Type = (LeadType.LeadLineType)comboBox.SelectedIndex;
+
+			switch( leadData.Type ) {
 				case LeadType.LeadLineType.None:
-					m_tbxLeadOutLength.Enabled = false;
-					m_tbxLeadOutAngle.Enabled = false;
+					tbxLength.Enabled = false;
+					tbxAngle.Enabled = false;
 					break;
 				default:
-					m_tbxLeadOutLength.Enabled = true;
-					m_tbxLeadOutAngle.Enabled = true;
+					tbxLength.Enabled = true;
+					tbxAngle.Enabled = true;
 
 					// set length
-					if( !double.TryParse( m_tbxLeadOutLength.Text, out double dLeadOutLength ) || dLeadOutLength <= 0 ) {
-						dLeadOutLength = DEFAULT_Length;
+					if( !double.TryParse( tbxLength.Text, out double dLength ) || dLength <= 0 ) {
+						dLength = DEFAULT_Length;
 					}
-					m_LeadParam.LeadOut.Length = dLeadOutLength;
-					m_tbxLeadOutLength.Text = m_LeadParam.LeadOut.Length.ToString();
+					leadData.Length = dLength;
+					tbxLength.Text = leadData.Length.ToString();
 
 					// default angle
 					double dLegalAngle = DEFAULT_Angle;
 
 					// get legal param
-					if( double.TryParse( m_tbxLeadOutAngle.Text, out double dLeadInAngle ) ) {
-						if( ( m_LeadParam.LeadOut.Type == LeadType.LeadLineType.Arc && IsValidArcAngle( dLeadInAngle ) ) ||
-							( m_LeadParam.LeadOut.Type == LeadType.LeadLineType.Line && IsValidStraightLineAngle( dLeadInAngle ) ) ) {
-							dLegalAngle = dLeadInAngle;
+					if( double.TryParse( tbxAngle.Text, out double dAngle ) ) {
+						if( ( leadData.Type == LeadType.LeadLineType.Arc && IsValidArcAngle( dAngle ) ) ||
+							( leadData.Type == LeadType.LeadLineType.Line && IsValidStraightLineAngle( dAngle ) ) ) {
+							dLegalAngle = dAngle;
 						}
 					}
-					m_LeadParam.LeadOut.Angle = dLegalAngle;
-					m_tbxLeadOutAngle.Text = m_LeadParam.LeadOut.Angle.ToString();
+					leadData.Angle = dLegalAngle;
+					tbxAngle.Text = leadData.Angle.ToString();
 					break;
 			}
 
-			// combobox change means lead type changed 
-			Preview?.Invoke();
+			// combobox change means lead type changed
+			RaisePreview( m_LeadParam );
 		}
 
 		void PreviewLeadResult()
 		{
 			if( IsValidParam() ) {
 				SetParam();
-				Preview?.Invoke();
+				RaisePreview( m_LeadParam );
 			}
 		}
 
 		bool IsValidParam()
 		{
-			m_LeadParam.IsChangeLeadDirection = m_chkFlip.Checked;
-
-			// check leadin param
-			if( m_LeadParam.LeadIn.Type == LeadType.LeadLineType.None ) {
-				m_LeadParam.LeadIn.Length = DEFAULT_Value;
-				m_LeadParam.LeadIn.Angle = DEFAULT_Value;
+			if( !ValidateLeadParam( m_LeadParam.LeadIn, m_tbxLeadInLength, m_tbxLeadInAngle, "LeadIn" ) ) {
+				return false;
 			}
-			else {
-
-				if( !double.TryParse( m_tbxLeadInLength.Text, out double dLeadInLength )
-					|| !double.TryParse( m_tbxLeadInAngle.Text, out double dLeadInAngle ) ) {
-					MessageBox.Show( "invalid string" );
-					return false;
-				}
-
-				if( dLeadInLength <= 0 ) {
-					MessageBox.Show( "length must be greater than 0" );
-					return false;
-				}
-
-				// check angle
-				switch( m_LeadParam.LeadIn.Type ) {
-					case LeadType.LeadLineType.Line:
-						if( !IsValidStraightLineAngle( dLeadInAngle ) ) {
-							MessageBox.Show( "angle must be in range (0 ~ 180)" );
-							return false;
-						}
-						break;
-					case LeadType.LeadLineType.Arc:
-						if( !IsValidArcAngle( dLeadInAngle ) ) {
-							MessageBox.Show( " angle needs to be greater than 0 and less than 180" );
-							return false;
-						}
-						break;
-					default:
-						break;
-				}
+			if( !ValidateLeadParam( m_LeadParam.LeadOut, m_tbxLeadOutLength, m_tbxLeadOutAngle, "LeadOut" ) ) {
+				return false;
 			}
+			return true;
+		}
 
-			// check leadout param
-			if( m_LeadParam.LeadOut.Type == LeadType.LeadLineType.None ) {
-				m_LeadParam.LeadOut.Length = DEFAULT_Value;
-				m_LeadParam.LeadOut.Angle = DEFAULT_Value;
+		bool ValidateLeadParam( LeadParam leadData, TextBox tbxLength, TextBox tbxAngle, string paramName )
+		{
+			if( leadData.Type == LeadType.LeadLineType.None ) {
+				leadData.Length = DEFAULT_Value;
+				leadData.Angle = DEFAULT_Value;
+				return true;
 			}
-			else {
-
-				if( !double.TryParse( m_tbxLeadOutLength.Text, out double dLeadOutLength )
-					|| !double.TryParse( m_tbxLeadOutAngle.Text, out double dLeadOutAngle ) ) {
-					MessageBox.Show( "invalid string" );
-					return false;
-				}
-
-				if( dLeadOutLength <= 0 ) {
-					MessageBox.Show( "length must be greater than 0" );
-					return false;
-				}
-
-				// check angle
-				switch( m_LeadParam.LeadOut.Type ) {
-					case LeadType.LeadLineType.Line:
-						if( !IsValidStraightLineAngle( dLeadOutAngle ) ) {
-							MessageBox.Show( "angle must be in range (0 ~ 180)" );
-							return false;
-						}
-						break;
-					case LeadType.LeadLineType.Arc:
-						if( !IsValidArcAngle( dLeadOutAngle ) ) {
-							MessageBox.Show( " angle needs to be greater than 0 and less than 180" );
-							return false;
-						}
-						break;
-					default:
-						break;
-				}
+			if( !double.TryParse( tbxLength.Text, out double dLength ) ||
+				!double.TryParse( tbxAngle.Text, out double dAngle ) ) {
+				MessageBox.Show( $"{paramName}: invalid number format" );
+				return false;
+			}
+			if( dLength <= 0 ) {
+				MessageBox.Show( $"{paramName}: length must be greater than 0" );
+				return false;
+			}
+			switch( leadData.Type ) {
+				case LeadType.LeadLineType.Line:
+					if( !IsValidStraightLineAngle( dAngle ) ) {
+						MessageBox.Show( $"{paramName}: angle must be in range (0 ~ 180)" );
+						return false;
+					}
+					break;
+				case LeadType.LeadLineType.Arc:
+					if( !IsValidArcAngle( dAngle ) ) {
+						MessageBox.Show( $"{paramName}: angle must be in range [0 ~ 180)" );
+						return false;
+					}
+					break;
 			}
 			return true;
 		}
@@ -257,13 +181,6 @@ namespace MyCAM.Editor.Dialog
 			m_LeadParam.LeadOut.Length = dLeadOutLength;
 			m_LeadParam.LeadOut.Angle = dLeadOutAngle;
 			m_LeadParam.IsChangeLeadDirection = m_chkFlip.Checked;
-		}
-
-		void LeadLineForm_FormClosing( object sender, FormClosingEventArgs e )
-		{
-			if( !m_IsConfirmed && e.CloseReason == CloseReason.UserClosing ) {
-				OnCancel?.Invoke();
-			}
 		}
 
 		#region key in event
@@ -338,5 +255,10 @@ namespace MyCAM.Editor.Dialog
 			}
 			return true;
 		}
+
+		const double DEFAULT_Value = 0;
+		const double DEFAULT_Angle = 45;
+		const double DEFAULT_Length = 3;
+		LeadData m_LeadParam;
 	}
 }

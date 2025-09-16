@@ -11,39 +11,15 @@ namespace MyCAM.Editor
 			: base( cadManager, viewManager )
 		{
 			if( camData == null ) {
-				throw new ArgumentNullException( "PathIndexSelectAction constructing argument camData null" );
+				throw new ArgumentNullException( "LeadSettingAction constructing argument camData null" );
 			}
 			m_CAMData = camData;
 
 			// when user cancel the lead setting, need to turn path back
-			LeadData backupLeadParam = m_CAMData.LeadLineParam.Clone();
-
-			// open lead setting form
-			LeadLineForm leadDialog = new LeadLineForm( m_CAMData.LeadLineParam.Clone() );
-
-			// preview will change viewer
-			leadDialog.Preview += () =>
-			{
-				SetLeadParam( leadDialog );
-				PropertyChanged?.Invoke( false, false ); // the second param is not used here
-			};
-
-			// get prvious lead back
-			leadDialog.OnCancel += () =>
-			{
-				// need clone to trigger property changed event
-				m_CAMData.LeadLineParam = backupLeadParam.Clone();
-				PropertyChanged?.Invoke( false, false ); // the second param is not used here
-				End();
-			};
-			leadDialog.OnComfirm += () =>
-			{
-				SetLeadParam( leadDialog );
-				PropertyChanged?.Invoke( true, m_CAMData.IsHasLead );
-				End();
-			};
-			leadDialog.Show( MyApp.MainForm );
+			m_BackupLeadParam = m_CAMData.LeadLineParam.Clone();
 		}
+
+		public Action<bool, bool> PropertyChanged; // isConfirm, isHasLead
 
 		public override EditActionType ActionType
 		{
@@ -55,19 +31,40 @@ namespace MyCAM.Editor
 
 		public override void Start()
 		{
+			// open lead setting form
+			LeadLineForm leadDialog = new LeadLineForm( m_CAMData.LeadLineParam.Clone() );
+
+			// preview
+			leadDialog.Preview += ( leadData ) =>
+			{
+				SetLeadParam( leadData );
+				PropertyChanged?.Invoke( false, false ); // the second param is not used here
+			};
+
+			// confirm
+			leadDialog.Confirm += ( leadData ) =>
+			{
+				SetLeadParam( leadData );
+				PropertyChanged?.Invoke( true, m_CAMData.IsHasLead );
+				End();
+			};
+
+			// cancel
+			leadDialog.Cancel += () =>
+			{
+				SetLeadParam( m_BackupLeadParam.Clone() );
+				PropertyChanged?.Invoke( false, false ); // the second param is not used here
+				End();
+			};
+			leadDialog.Show( MyApp.MainForm );
 		}
 
-		public override void End()
+		void SetLeadParam( LeadData leadData )
 		{
-		}
-
-		public Action<bool, bool> PropertyChanged; // isConfirm, isHasLead
-
-		void SetLeadParam( LeadLineForm leadDialog )
-		{
-			m_CAMData.LeadLineParam = leadDialog.LeadLindParam.Clone();
+			m_CAMData.LeadLineParam = leadData.Clone();
 		}
 
 		CAMData m_CAMData;
+		LeadData m_BackupLeadParam;
 	}
 }
