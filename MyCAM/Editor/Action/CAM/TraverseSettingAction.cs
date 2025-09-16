@@ -25,9 +25,9 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 			TraverseParamSettingForm traverseParamSettingFrom = new TraverseParamSettingForm( m_CADManager.TraverseData );
-			traverseParamSettingFrom.OnConfirm += ConfirmTraverseParam;
+			traverseParamSettingFrom.Confirm += ConfirmTraverseParam;
 			traverseParamSettingFrom.Preview += PreviewTraverseParam;
-			traverseParamSettingFrom.OnCancel += CancelTraverseParam;
+			traverseParamSettingFrom.Cancel += CancelTraverseParam;
 			traverseParamSettingFrom.Show( MyApp.MainForm );
 		}
 

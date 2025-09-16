@@ -4,17 +4,13 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public partial class TraverseParamSettingForm : Form
+	public partial class TraverseParamSettingForm : ActionDialogBase<TraverseData>
 	{
 		public TraverseParamSettingForm( TraverseData Data )
 		{
 			InitializeComponent();
 			InitializeControlValue( Data );
 		}
-
-		public Action<TraverseData> Preview;
-		public Action<TraverseData> OnConfirm;
-		public Action OnCancel;
 
 		void InitializeControlValue( TraverseData Data )
 		{
@@ -108,7 +104,7 @@ namespace MyCAM.Editor
 		void m_btnConfirm_Click( object sender, EventArgs e )
 		{
 			TraverseData traverseParamData = new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance );
-			OnConfirm?.Invoke( traverseParamData );
+			Confirm?.Invoke( traverseParamData );
 			m_ConfirmCheck = true;
 			Close();
 		}
@@ -116,13 +112,12 @@ namespace MyCAM.Editor
 		void TraverseParamSettingForm_FormClosing( object sender, FormClosingEventArgs e )
 		{
 			if( m_ConfirmCheck == false && e.CloseReason == CloseReason.UserClosing ) {
-				OnCancel?.Invoke();
+				Cancel?.Invoke();
 			}
 		}
 
 		double m_CutDownDistance = 0;
 		double m_FollowSafeDistance = 0;
 		double m_LifUpDistance = 0;
-		bool m_ConfirmCheck = false;
 	}
 }
