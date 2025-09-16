@@ -127,28 +127,39 @@ namespace MyCAM.Editor
 
 	internal abstract class DialogActionBase : IEditorAction
 	{
-		public EditActionType ActionType => throw new NotImplementedException();
+		protected DialogActionBase( DataManager cadManager, ViewManager viewManager )
+		{
+			if( cadManager == null || viewManager == null ) {
+				throw new ArgumentNullException( "EditActionBase constructing argument null" );
+			}
+			m_ViewManager = viewManager;
+			m_CADManager = cadManager;
+		}
+
+		public abstract EditActionType ActionType
+		{
+			get;
+		}
 
 		public Action<IEditorAction> EndAction
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get; set;
 		}
 
 		public Action<IEditorAction> StartAction
 		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
+			get; set;
 		}
 
-		public void End()
+		public virtual void Start()
 		{
-			throw new NotImplementedException();
 		}
 
-		public void Start()
+		public virtual void End()
 		{
-			throw new NotImplementedException();
 		}
+
+		protected ViewManager m_ViewManager;
+		protected DataManager m_CADManager;
 	}
 }

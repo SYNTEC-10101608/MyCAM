@@ -1,17 +1,14 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
-using OCCViewer;
 using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class OverCutAction : KeyMouseActionBase
+	internal class OverCutAction : DialogActionBase
 	{
-		public OverCutAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
-		CAMData camData )
-		: base( viewer, treeView, cadManager, viewManager )
+		public OverCutAction( DataManager cadManager, ViewManager viewManager, CAMData camData )
+		: base( cadManager, viewManager )
 		{
 			if( camData == null ) {
 				throw new ArgumentNullException( "PathIndexSelectAction constructing argument camData null" );
@@ -53,37 +50,10 @@ namespace MyCAM.Editor
 
 		public override void Start()
 		{
-			base.Start();
-
-			// disable tree view
-			m_TreeView.Enabled = false;
 		}
 
 		public override void End()
 		{
-			// enable tree view
-			m_TreeView.Enabled = true;
-			base.End();
-		}
-
-		protected override void ViewerMouseDown( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerKeyDown( KeyEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
-		{
-			// do nothing
 		}
 
 		public Action PropertyChanged;

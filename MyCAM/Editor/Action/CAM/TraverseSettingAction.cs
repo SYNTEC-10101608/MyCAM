@@ -1,15 +1,13 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
-using OCCViewer;
 using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class TraverseSettingAction : KeyMouseActionBase
+	internal class TraverseSettingAction : DialogActionBase
 	{
-		public TraverseSettingAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public TraverseSettingAction( DataManager cadManager, ViewManager viewManager )
+			: base( cadManager, viewManager )
 		{
 		}
 
@@ -64,26 +62,6 @@ namespace MyCAM.Editor
 			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
 				camData.TraverseData = data.Clone();
 			}
-		}
-
-		protected override void ViewerMouseDown( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerKeyDown( KeyEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
-		{
-			// do nothing
 		}
 	}
 }
