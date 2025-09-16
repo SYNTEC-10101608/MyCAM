@@ -6,9 +6,9 @@ using OCCViewer;
 
 namespace MyCAM.Editor
 {
-	internal class ToolVecAction : IndexSelectAction
+	internal class ToolVectorAction : IndexSelectAction
 	{
-		public ToolVecAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		public ToolVectorAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			CAMData camData )
 			: base( viewer, treeView, cadManager, viewManager, camData )
 		{

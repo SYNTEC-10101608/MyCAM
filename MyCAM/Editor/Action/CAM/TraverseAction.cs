@@ -4,9 +4,9 @@ using System;
 
 namespace MyCAM.Editor
 {
-	internal class TraverseSettingAction : DialogActionBase
+	internal class TraverseAction : DialogActionBase
 	{
-		public TraverseSettingAction( DataManager cadManager, ViewManager viewManager )
+		public TraverseAction( DataManager cadManager, ViewManager viewManager )
 			: base( cadManager, viewManager )
 		{
 		}

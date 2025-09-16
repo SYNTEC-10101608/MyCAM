@@ -5,9 +5,9 @@ using System;
 
 namespace MyCAM.Editor
 {
-	internal class LeadSettingAction : DialogActionBase
+	internal class LeadAction : DialogActionBase
 	{
-		public LeadSettingAction( DataManager cadManager, ViewManager viewManager, CAMData camData )
+		public LeadAction( DataManager cadManager, ViewManager viewManager, CAMData camData )
 			: base( cadManager, viewManager )
 		{
 			if( camData == null ) {
