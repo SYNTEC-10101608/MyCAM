@@ -1,7 +1,7 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCCViewer;
+using System;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -123,5 +123,32 @@ namespace MyCAM.Editor
 		protected TreeView m_TreeView;
 		protected ViewManager m_ViewManager;
 		protected DataManager m_CADManager;
+	}
+
+	internal abstract class DialogActionBase : IEditorAction
+	{
+		public EditActionType ActionType => throw new NotImplementedException();
+
+		public Action<IEditorAction> EndAction
+		{
+			get => throw new NotImplementedException();
+			set => throw new NotImplementedException();
+		}
+
+		public Action<IEditorAction> StartAction
+		{
+			get => throw new NotImplementedException();
+			set => throw new NotImplementedException();
+		}
+
+		public void End()
+		{
+			throw new NotImplementedException();
+		}
+
+		public void Start()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
