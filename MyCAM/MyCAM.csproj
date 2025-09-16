@@ -63,6 +63,7 @@
     <Compile Include="Editor\Action\CAM\TraverseSettingAction.cs" />
     <Compile Include="Editor\Action\CAD\ReadProjectFileAction.cs" />
     <Compile Include="Editor\Action\CAD\SaveProjectFileAction.cs" />
+    <Compile Include="Editor\Dialog\ActionDialogBase.cs" />
     <Compile Include="Editor\Dialog\AxisTransformDlg.cs">
       <SubType>Form</SubType>
     </Compile>
