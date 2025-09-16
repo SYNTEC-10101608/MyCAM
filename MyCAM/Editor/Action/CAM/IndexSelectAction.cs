@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal abstract class IndexSelectAction : EditActionBase
+	internal abstract class IndexSelectAction : KeyMouseActionBase
 	{
 		protected IndexSelectAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			CAMData camData )

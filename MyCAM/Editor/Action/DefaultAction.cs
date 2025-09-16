@@ -12,7 +12,7 @@ namespace MyCAM.Editor
 		Path,
 	}
 
-	internal class DefaultAction : EditActionBase
+	internal class DefaultAction : KeyMouseActionBase
 	{
 		public Action TreeSelectionChange;
 

@@ -20,7 +20,7 @@ namespace MyCAM.Editor
 		ZAxis,
 	}
 
-	internal class AxisTransformAction : EditActionBase
+	internal class AxisTransformAction : KeyMouseActionBase
 	{
 		public AxisTransformAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 			: base( viewer, treeView, cadManager, viewManager )

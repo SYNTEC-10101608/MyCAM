@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class ManualTransformAction : EditActionBase
+	internal class ManualTransformAction : KeyMouseActionBase
 	{
 		public ManualTransformAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 			: base( viewer, treeView, cadManager, viewManager )

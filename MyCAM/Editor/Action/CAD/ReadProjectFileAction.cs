@@ -11,7 +11,7 @@ using static MyCAM.Data.DataManager;
 
 namespace MyCAM.Editor
 {
-	internal class ReadProjectFileAction : EditActionBase
+	internal class ReadProjectFileAction : KeyMouseActionBase
 	{
 		public ReadProjectFileAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 			: base( viewer, treeView, cadManager, viewManager )

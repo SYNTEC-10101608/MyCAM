@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class TraverseSettingAction : EditActionBase
+	internal class TraverseSettingAction : KeyMouseActionBase
 	{
 		public TraverseSettingAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 			: base( viewer, treeView, cadManager, viewManager )

@@ -8,7 +8,7 @@ using OCCViewer;
 
 namespace MyCAM.Editor
 {
-	internal class SaveProjectFileAction : EditActionBase
+	internal class SaveProjectFileAction : KeyMouseActionBase
 	{
 		public SaveProjectFileAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 			: base( viewer, treeView, cadManager, viewManager )

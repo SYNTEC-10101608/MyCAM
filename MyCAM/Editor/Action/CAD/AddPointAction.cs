@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class AddPointAction : EditActionBase
+	internal class AddPointAction : KeyMouseActionBase
 	{
 		public AddPointAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			AddPointType addPointType )

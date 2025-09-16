@@ -59,9 +59,9 @@ namespace MyCAM.Editor
 		}
 	}
 
-	internal abstract class EditActionBase : IEditorAction
+	internal abstract class KeyMouseActionBase : IEditorAction
 	{
-		protected EditActionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
+		protected KeyMouseActionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 		{
 			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
 				throw new ArgumentNullException( "EditActionBase constructing argument null" );

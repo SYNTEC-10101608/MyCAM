@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class OverCutAction : EditActionBase
+	internal class OverCutAction : KeyMouseActionBase
 	{
 		public OverCutAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 		CAMData camData )

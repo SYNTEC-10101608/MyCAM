@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class LeadSettingAction : EditActionBase
+	internal class LeadSettingAction : KeyMouseActionBase
 	{
 		public LeadSettingAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			CAMData camData )

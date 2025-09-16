@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class AddLineAction : EditActionBase
+	internal class AddLineAction : KeyMouseActionBase
 	{
 		public AddLineAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
 			AddLineType addLineType )
