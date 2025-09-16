@@ -31,7 +31,7 @@ namespace MyCAM.Editor
 
 		public override void Start()
 		{
-			// open lead setting form
+			base.Start();
 			LeadLineForm leadDialog = new LeadLineForm( m_CAMData.LeadLineParam.Clone() );
 
 			// preview

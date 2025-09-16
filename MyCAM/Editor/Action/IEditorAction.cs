@@ -153,10 +153,12 @@ namespace MyCAM.Editor
 
 		public virtual void Start()
 		{
+			StartAction?.Invoke( this );
 		}
 
 		public virtual void End()
 		{
+			EndAction?.Invoke( this );
 		}
 
 		protected ViewManager m_ViewManager;
