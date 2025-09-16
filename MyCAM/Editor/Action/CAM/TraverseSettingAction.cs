@@ -36,18 +36,18 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
+		void PreviewTraverseParam( TraverseData data )
+		{
+			SetTraverseParam( data );
+			PropertyChanged?.Invoke();
+		}
+
 		void ConfirmTraverseParam( TraverseData data )
 		{
 			SetTraverseParam( data );
 			m_CADManager.TraverseData = data;
 			PropertyChanged?.Invoke();
 			End();
-		}
-
-		void PreviewTraverseParam( TraverseData data )
-		{
-			SetTraverseParam( data );
-			PropertyChanged?.Invoke();
 		}
 
 		void CancelTraverseParam()
