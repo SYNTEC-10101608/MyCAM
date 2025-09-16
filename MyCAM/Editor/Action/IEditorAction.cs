@@ -13,22 +13,28 @@ namespace MyCAM.Editor
 
 	internal enum EditActionType
 	{
-		None = 0,
-		Default = 1,
-		AddPoint = 2,
-		ThreePtTransform = 3,
-		ManualTransform = 4,
-		SelectFace = 5,
-		SelectPath = 6,
-		StartPoint = 7,
-		ToolVec = 8,
-		AxisTransform = 9,
-		AddLine = 10,
-		SetLead = 11,
-		OverCut = 12,
-		SetTraverseParam = 13,
-		ImportProjectFile = 14,
-		SaveProjectFile = 15
+		// default
+		Default,
+
+		// CAD
+		AddPoint,
+		AddLine,
+		ThreePtTransform,
+		ManualTransform,
+		AxisTransform,
+
+		// CAM
+		SelectFace,
+		SelectPath,
+		StartPoint,
+		ToolVec,
+		SetLead,
+		OverCut,
+		SetTraverseParam,
+
+		// File
+		ImportProjectFile,
+		SaveProjectFile,
 	}
 
 	internal interface IEditorAction
