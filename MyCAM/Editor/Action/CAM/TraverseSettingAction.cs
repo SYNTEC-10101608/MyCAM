@@ -31,11 +31,6 @@ namespace MyCAM.Editor
 			traverseParamSettingFrom.Show( MyApp.MainForm );
 		}
 
-		public override void End()
-		{
-			base.End();
-		}
-
 		void PreviewTraverseParam( TraverseData data )
 		{
 			SetTraverseParam( data );
