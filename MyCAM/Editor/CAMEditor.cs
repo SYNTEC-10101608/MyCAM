@@ -1,4 +1,8 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.BRepPrimAPI;
@@ -15,22 +19,17 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
 	internal class CAMEditor : EditorBase
 	{
 		// to notice main form
-		public Action<EActionStatus> LeadActionStatusChange;
-		public Action<EActionStatus> OverCutActionStatusChange;
-		public Action<EActionStatus> TraversePrarmSettingActionStausChanged;
 		public Action<EActionStatus> SelectFaceActionStausChanged;
 		public Action<EActionStatus> SelectPathActionStausChanged;
 		public Action<bool, bool> PathPropertyChanged; // isClosed, hasLead
+		public Action<EditActionType, EActionStatus> RaiseCAMActionStatusChange;
+		public Action<EActionStatus> RaiseWithDlgActionStatusChange;
 
 		public CAMEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
@@ -40,6 +39,13 @@ namespace MyCAM.Editor
 			// default action is select object action
 			m_DefaultAction = new SelectObjectAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Path );
 			( m_DefaultAction as SelectObjectAction ).TreeSelectionChange += OnTreeSelectionChange;
+		}
+
+		public void CheckOutCurrentAction()
+		{
+			if( m_CurrentAction != null && m_CurrentAction != m_DefaultAction ) {
+				m_CurrentAction.End();
+			}
 		}
 
 		// for viewer resource handle
@@ -101,6 +107,15 @@ namespace MyCAM.Editor
 		}
 
 		// APIs
+		public void SwitchAddPathStatus()
+		{
+			if( m_CurrentAction != null && ( m_CurrentAction.ActionType == EditActionType.SelectFace || m_CurrentAction.ActionType == EditActionType.SelectPath ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			StartSelectFace();
+		}
+
 		public void StartSelectFace()
 		{
 			SelectFaceAction action = new SelectFaceAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -144,6 +159,15 @@ namespace MyCAM.Editor
 				}
 			}
 			m_DataManager.AddPath( pathWireList, edgeFaceMap );
+		}
+
+		public void SwitchSelectPathStatus()
+		{
+			if( m_CurrentAction.ActionType == EditActionType.SelectPath ) {
+				EndSelectPath_Manual();
+				return;
+			}
+			StartSelectPath_Manual();
 		}
 
 		public void StartSelectPath_Manual()
@@ -812,40 +836,24 @@ namespace MyCAM.Editor
 		protected override void OnEditActionStart( IEditorAction action )
 		{
 			base.OnEditActionStart( action );
-			if( action.ActionType == EditActionType.OverCut ) {
-				OverCutActionStatusChange?.Invoke( EActionStatus.Start );
+			if( action.ActionType == EditActionType.OverCut ||
+				action.ActionType == EditActionType.SetLead ||
+				action.ActionType == EditActionType.SetTraverseParam ) {
+				RaiseWithDlgActionStatusChange?.Invoke( EActionStatus.Start );
 			}
-			if( action.ActionType == EditActionType.SetLead ) {
-				LeadActionStatusChange?.Invoke( EActionStatus.Start );
-			}
-			if( action.ActionType == EditActionType.SetTraverseParam ) {
-				TraversePrarmSettingActionStausChanged?.Invoke( EActionStatus.Start );
-			}
-			if( action.ActionType == EditActionType.SelectFace ) {
-				SelectFaceActionStausChanged?.Invoke( EActionStatus.Start );
-			}
-			if( action.ActionType == EditActionType.SelectPath ) {
-				SelectPathActionStausChanged?.Invoke( EActionStatus.Start );
-			}
+			RaiseCAMActionStatusChange( action.ActionType, EActionStatus.Start );
 		}
 
 		protected override void OnEditActionEnd( IEditorAction action )
 		{
-			if( action.ActionType == EditActionType.OverCut ) {
-				OverCutActionStatusChange?.Invoke( EActionStatus.End );
+			// these action will show dialog, need to lock ui
+			if( action.ActionType == EditActionType.OverCut ||
+				action.ActionType == EditActionType.SetLead ||
+				action.ActionType == EditActionType.SetTraverseParam
+				) {
+				RaiseWithDlgActionStatusChange?.Invoke( EActionStatus.End );
 			}
-			if( action.ActionType == EditActionType.SetLead ) {
-				LeadActionStatusChange?.Invoke( EActionStatus.End );
-			}
-			if( action.ActionType == EditActionType.SetTraverseParam ) {
-				TraversePrarmSettingActionStausChanged?.Invoke( EActionStatus.End );
-			}
-			if( action.ActionType == EditActionType.SelectFace ) {
-				SelectFaceActionStausChanged?.Invoke( EActionStatus.End );
-			}
-			if( action.ActionType == EditActionType.SelectPath ) {
-				SelectPathActionStausChanged?.Invoke( EActionStatus.End );
-			}
+			RaiseCAMActionStatusChange?.Invoke( action.ActionType, EActionStatus.End );
 			base.OnEditActionEnd( action );
 		}
 	}

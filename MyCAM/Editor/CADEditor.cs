@@ -1,4 +1,7 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.IFSelect;
 using OCC.IGESControl;
@@ -7,9 +10,6 @@ using OCC.TopoDS;
 using OCC.XSControl;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -22,6 +22,8 @@ namespace MyCAM.Editor
 
 	internal class CADEditor : EditorBase
 	{
+		public Action<EditActionType, EActionStatus> RaiseCADActionStatusChange;
+
 		public CADEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
@@ -31,9 +33,6 @@ namespace MyCAM.Editor
 			// default action is select object action
 			m_DefaultAction = new SelectObjectAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Part );
 		}
-
-		public Action<EActionStatus> AxisTransformActionStausChanged;
-		public Action<EActionStatus> ManualTransformActionStausChanged;
 
 		// editor
 		public override EEditorType Type
@@ -121,16 +120,46 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SwitchThreePointTransformStatus()
+		{
+			if( m_CurrentAction != null && m_CurrentAction.ActionType == EditActionType.ThreePtTransform ) {
+				EndCurrentAction();
+			}
+			else {
+				ThreePointTransform();
+			}
+		}
+
 		public void ThreePointTransform()
 		{
 			ThreePtTransformAction action = new ThreePtTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
+		public void SwitchManaulTransformStatus()
+		{
+			if( m_CurrentAction != null && m_CurrentAction.ActionType == EditActionType.ManualTransform ) {
+				EndCurrentAction();
+			}
+			else {
+				StartManaulTransform();
+			}
+		}
+
 		public void StartManaulTransform()
 		{
 			ManualTransformAction action = new ManualTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
+		}
+
+		public void SwitchAxisTransformStatus()
+		{
+			if( m_CurrentAction != null && m_CurrentAction.ActionType == EditActionType.AxisTransform ) {
+				EndCurrentAction();
+			}
+			else {
+				StartAxisTransform();
+			}
 		}
 
 		public void StartAxisTransform()
@@ -141,6 +170,36 @@ namespace MyCAM.Editor
 			}
 			AxisTransformAction action = new AxisTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
+		}
+
+		// ui can click other transform button, so need to end the current action first
+		public void EndCurrentAction()
+		{
+			if( m_CurrentAction is AxisTransformAction axisTransformAction ) {
+				axisTransformAction.TransformDone();
+				return;
+			}
+			if( m_CurrentAction is ThreePtTransformAction threePtTransformAction ) {
+				threePtTransformAction.End();
+				return;
+			}
+			if( m_CurrentAction is ManualTransformAction manualTransformAction ) {
+				EndManualTransform();
+				return;
+			}
+			if( m_CurrentAction is AddPointAction addPointAction ) {
+				addPointAction.End();
+				return;
+			}
+			if( m_CurrentAction is AddLineAction addLineAction ) {
+				addLineAction.End();
+				return;
+			}
+		}
+
+		public void CheckOutCurrentAction()
+		{
+			EndCurrentAction();
 		}
 
 		public void ApplyManualTransform( ETrsfConstraintType type )
@@ -262,9 +321,7 @@ namespace MyCAM.Editor
 		protected override void OnEditActionStart( IEditorAction action )
 		{
 			base.OnEditActionStart( action );
-			if( action.ActionType == EditActionType.AxisTransform ) {
-				AxisTransformActionStausChanged?.Invoke( EActionStatus.Start );
-			}
+			RaiseCADActionStatusChange?.Invoke( action.ActionType, EActionStatus.Start );
 			if( action.ActionType == EditActionType.ManualTransform ) {
 				ManualTransformActionStausChanged?.Invoke( EActionStatus.Start );
 			}
@@ -272,9 +329,7 @@ namespace MyCAM.Editor
 
 		protected override void OnEditActionEnd( IEditorAction action )
 		{
-			if( action.ActionType == EditActionType.AxisTransform ) {
-				AxisTransformActionStausChanged?.Invoke( EActionStatus.End );
-			}
+			RaiseCADActionStatusChange?.Invoke( action.ActionType, EActionStatus.End );
 			if( action.ActionType == EditActionType.ManualTransform ) {
 				ManualTransformActionStausChanged?.Invoke( EActionStatus.End );
 			}

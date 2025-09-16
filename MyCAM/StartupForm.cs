@@ -1,4 +1,10 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using MyCAM.Helper;
@@ -8,10 +14,6 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
-using System;
-using System.IO;
-using System.Windows.Forms;
-using System.Xml.Linq;
 
 namespace MyCAM
 {
@@ -29,6 +31,7 @@ namespace MyCAM
 			// app
 			MyApp.MainForm = this;
 			InitializeComponent();
+			UIListSetting();
 
 			// create the viewer
 			m_Viewer = new Viewer();
@@ -62,25 +65,20 @@ namespace MyCAM
 
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
-			m_CADEditor.AxisTransformActionStausChanged += OnAxisTransformActionStausChanged;
-			m_CADEditor.ManualTransformActionStausChanged += OnManualTransformStausChanged;
+			m_CADEditor.RaiseCADActionStatusChange += OnCADActionStatusChange;
 
 			// CAM Editor
 			m_CAMEditor = new CAMEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
-			m_CAMEditor.OverCutActionStatusChange += OnOverCutActionStatusChange;
-			m_CAMEditor.LeadActionStatusChange += OnLeadSettingActionStatusChange;
 			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
-			m_CAMEditor.TraversePrarmSettingActionStausChanged += OnTraverseSettingActionStausChanged;
-			m_CAMEditor.SelectFaceActionStausChanged += OnSelectFaceActionStausChanged;
-			m_CAMEditor.SelectPathActionStausChanged += OnSelectPathActionStausChanged;
+			m_CAMEditor.RaiseCAMActionStatusChange += OnCAMActionStatusChange;
+			m_CAMEditor.RaiseWithDlgActionStatusChange += OnCAMDlgActionStatusChange;
 
 			// simu editor
 			m_SimuEditor = new SimuEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 
 			// start with CAD editor
-			m_msCAD.Enabled = true;
-			m_msCAM.Enabled = false;
 			SwitchEditor( EEditorType.CAD );
+			DefaultUISetting();
 		}
 
 		// view properties
@@ -96,36 +94,57 @@ namespace MyCAM
 		SimuEditor m_SimuEditor;
 		IEditor m_CurrentEditor;
 
+		// UI list
+		Dictionary<EUIStatus, List<Control>> UIStatusDic;
+		List<ToolStripContainer> toolStripLevelList;
+		List<ToolStripButton> trnasformControlList;
+
+		// UI color
+		Color m_defaultBtnColor = SystemColors.Control;
+		Color m_buttonOnColor = Color.Yellow;
+
+		enum EUIStatus
+		{
+			CAD,
+			CAM,
+
+			// cad function
+			AddFeature,
+			TransForm,
+			ManualTransForm,
+			ThreePntTransForm,
+			AxisTransform,
+
+			// cam function
+			AddPath,
+			SelectPath,
+			SetLead,
+		}
+
 		void ShowG54Trihedron()
 		{
 			gp_Ax2 ax2 = new gp_Ax2();
 			AIS_Trihedron trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
-			trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+			trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
 			trihedron.SetSize( 100.0 );
-			trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
-			trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
-			trihedron.SetArrowColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+			trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
 			m_Viewer.GetAISContext().Display( trihedron, false );
 			m_Viewer.GetAISContext().Deactivate( trihedron );
 		}
 
 		// import part
-		void m_tsmiImportBRep_Click( object sender, EventArgs e )
-		{
-			m_CADEditor.ImportFile( FileFormat.BREP );
-		}
-
 		void m_tsmiImportStep_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ImportFile( FileFormat.STEP );
 		}
 
-		void m_tsmiImportIges_Click( object sender, EventArgs e )
+		void m_tsmiIMportIges_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ImportFile( FileFormat.IGES );
 		}
 
-		void m_tsmiOpenProjectFile_Click( object sender, EventArgs e )
+		void m_tsmiImportProjectFile_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ImportProjectFile();
 		}
@@ -136,195 +155,225 @@ namespace MyCAM
 		}
 
 		// add feature
-		void m_tsmiAddPoint_AcrCenter_Click( object sender, EventArgs e )
+		void m_tsbAddFeature_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.AddPoint( AddPointType.CircArcCenter );
+			CheckOutCADCurrentAction();
+			RefreshMainFormToolStrip( EUIStatus.AddFeature );
 		}
 
-		void m_tsmiAddPoint_EdgeCenter_Click( object sender, EventArgs e )
-		{
-			m_CADEditor.AddPoint( AddPointType.EdgeMidPoint );
-		}
-
-		void m_tsmiAddPoint_PointCenter_Click( object sender, EventArgs e )
-		{
-			m_CADEditor.AddPoint( AddPointType.TwoVertexMidPoint );
-		}
-
-		void m_tsmiAddLine_TwoVertexConnect_Click( object sender, EventArgs e )
+		void m_ddbAddLine_TwoVertexConnect_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.AddLine( AddLineType.TwoVertexConnectLine );
 		}
 
-		// manual transform
-		void m_tsmiManualTransform_Click( object sender, EventArgs e )
+		void m_ddbAddPoint_AcrCenter_Click( object sender, EventArgs e )
 		{
-
-			m_CADEditor.StartManaulTransform();
+			m_CADEditor.AddPoint( AddPointType.CircArcCenter );
 		}
 
-		void m_tsmiPlane_Click( object sender, EventArgs e )
+		void m_ddbAddPoint_EdgeCenter_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.AddPoint( AddPointType.EdgeMidPoint );
+		}
+
+		void m_ddbAddPoint_PointCenter_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.AddPoint( AddPointType.TwoVertexMidPoint );
+		}
+
+		// transform entrance
+		void m_tsbTransform_Click( object sender, EventArgs e )
+		{
+			// it might be in trnasform / add line / point action
+			CheckOutCADCurrentAction();
+			RefreshMainFormToolStrip( EUIStatus.TransForm );
+		}
+
+		// manual transform
+
+		void m_tsbManualTransform_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.SwitchManaulTransformStatus();
+		}
+
+		void m_tsbManualTransPlane_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.Plane );
 		}
 
-		void m_tsmiPlanePar_Click( object sender, EventArgs e )
+		void m_tsbManualTransPlanePar_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.PlaneParallel );
 		}
 
-		void m_tsmiAxial_Click( object sender, EventArgs e )
+		void m_tsbManualTransAxial_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.Axial );
 		}
 
-		void m_tsmiAxialPar_Click( object sender, EventArgs e )
+		void m_tsbManualTransAxialPar_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.AxialParallel );
 		}
 
-		void m_tsmiPointCoincide_Click( object sender, EventArgs e )
+		void m_tsbManualTransPointCoincide_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.Point );
 		}
 
-		void m_tsmiTransformOK_Click( object sender, EventArgs e )
+		void m_tsbManualTransDone_Click( object sender, EventArgs e )
 		{
-			m_msCAD_Transform.Visible = false;
-			m_msCAD.Enabled = true;
 			m_CADEditor.EndManualTransform();
 		}
 
 		// 3 point transform
-		void m_tsmi3PointTransform_Click( object sender, EventArgs e )
+		void m_tsb3PointTransform_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ThreePointTransform();
+			m_CADEditor.SwitchThreePointTransformStatus();
 		}
 
 		// axis transform
-		void m_tsmiAxisTransform_Click( object sender, EventArgs e )
+		void m_tsbAxisTransform_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.StartAxisTransform();
-		}
-
-		// go to CAM editor
-		void m_tsmiCAM_Click( object sender, EventArgs e )
-		{
-			m_msCAM.Enabled = true;
-			m_msCAD.Enabled = false;
-			m_CADEditor.EditEnd();
-			m_CAMEditor.EditStart();
-		}
-
-		void m_tsmiCADOK_Click( object sender, EventArgs e )
-		{
-			m_msCAM.Enabled = true;
-			m_msCAD.Enabled = false;
-			SwitchEditor( EEditorType.CAM );
+			m_CADEditor.SwitchAxisTransformStatus();
 		}
 
 		// add path
-		void m_tsmiAddPath_Click( object sender, EventArgs e )
+		void m_tsbAddPath_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.StartSelectFace();
+			RefreshCAMButtonLight();
+			m_CAMEditor.SwitchAddPathStatus();
 		}
 
-		void m_tsmiSelectD1ContFace_Click( object sender, EventArgs e )
+		void m_tsbSelectD1ContFace_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SelectD1ContFace();
 		}
 
-		void m_tsmiSelPath_FreeBound_Click( object sender, EventArgs e )
+		void m_tsbSelPath_FreeBound_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SelectPath_FreeBound();
 		}
 
-		void m_tsmiSelPath_Manual_Click( object sender, EventArgs e )
+		void m_tsbSelectPath_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.StartSelectPath_Manual();
+			RefreshMainFormToolStrip( EUIStatus.SelectPath );
 		}
 
-		void m_tsmiManualSelectPathOK_Click( object sender, EventArgs e )
+		void m_tsManualSelectPathOK_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.EndSelectPath_Manual();
 		}
 
-		// remove path
-		void m_tsmiRemovePath_Click( object sender, EventArgs e )
+		void m_tsbSelPath_Manual_Click( object sender, EventArgs e )
 		{
+			m_CAMEditor.SwitchSelectPathStatus();
+		}
+
+		// remove path
+		void m_tsbDeletePath_Click( object sender, EventArgs e )
+		{
+			ResetUIByCAMBtnClick( EUIStatus.CAM );
 			m_CAMEditor.RemovePath();
 		}
 
 		// CAM property
-		void m_tsmiStartPoint_Click( object sender, EventArgs e )
+		void m_tsbStartPoint_Click( object sender, EventArgs e )
 		{
+			// when is in start point action, click again to end start point action
+			if( m_tsbStartPoint.BackColor == m_buttonOnColor ) {
+				ResetUIByCAMBtnClick( EUIStatus.CAM );
+				return;
+			}
+			ResetUIByCAMBtnClick( EUIStatus.CAM );
 			m_CAMEditor.SetStartPoint();
 		}
 
-		void m_tsmiReverse_Click( object sender, EventArgs e )
+		void m_tsbReverse_Click( object sender, EventArgs e )
 		{
+			ResetUIByCAMBtnClick( EUIStatus.CAM );
 			m_CAMEditor.SetReverse();
 		}
 
-		void m_tsmiOverCut_Click( object sender, EventArgs e )
+		void m_tsbSetLead_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.SetOverCut();
+			// because this button won't trigger action swith , need to stop ex action (add path)
+			m_CAMEditor.CheckOutCurrentAction();
+
+			// later "RefreshCAMButtonLight" will turn all light off
+			bool isLightON = m_tsbSetLead.BackColor == m_buttonOnColor;
+			RefreshCAMButtonLight();
+			if( isLightON ) {
+				RefreshMainFormToolStrip( EUIStatus.CAM );
+				return;
+			}
+			m_tsbSetLead.BackColor = m_buttonOnColor;
+			RefreshMainFormToolStrip( EUIStatus.SetLead );
 		}
 
-		void m_tsmiLeadSetting_Click( object sender, EventArgs e )
+		void m_tsbLeadSetting_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SetLeadLine();
 		}
 
-		void m_tsmiChangeLeadDirection_Click( object sender, EventArgs e )
+		void m_tsbChangeLeadDirection_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.ChangeLeadDirection();
 		}
 
-		// tool vector
-		void m_tsmiToolVec_Click( object sender, EventArgs e )
+		void m_tsbOverCut_Click( object sender, EventArgs e )
 		{
+			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			m_CAMEditor.SetOverCut();
+		}
+
+		// tool vector
+		void m_tsbToolVec_Click( object sender, EventArgs e )
+		{
+			if( m_tsbToolVec.BackColor == m_buttonOnColor ) {
+				ResetUIByCAMBtnClick( EUIStatus.CAM );
+				return;
+			}
+			ResetUIByCAMBtnClick( EUIStatus.CAM );
 			m_CAMEditor.SetToolVec();
 		}
 
-		void m_tsmiToolVecReverse_Click( object sender, EventArgs e )
+		void m_tsbTooVecReverse_Click( object sender, EventArgs e )
 		{
+			ResetUIByCAMBtnClick( EUIStatus.CAM );
 			m_CAMEditor.SetToolVecReverse();
 		}
 
 		// sort
-		void m_tsmiMoveUp_Click( object sender, EventArgs e )
+		void m_tsbMoveUp_Click( object sender, EventArgs e )
 		{
+			ResetUIByCAMBtnClick( EUIStatus.CAM );
 			m_CAMEditor.MoveProcess( true );
 		}
 
-		void m_tsmiMoveDown_Click( object sender, EventArgs e )
+		void m_tsbMoveDown_Click( object sender, EventArgs e )
 		{
+			ResetUIByCAMBtnClick( EUIStatus.CAM );
 			m_CAMEditor.MoveProcess( false );
 		}
 
-		void m_tsmiAutoSort_Click( object sender, EventArgs e )
+		void m_tsbAutoOrder_Click( object sender, EventArgs e )
 		{
+			ResetUIByCAMBtnClick( EUIStatus.CAM );
 			m_CAMEditor.AutoSortProcess();
 		}
 
 		// post parameter setting
-		void m_tsmiTraverseParamSetting_Click( object sender, EventArgs e )
+		void m_tsbTraverseParamSetting_Click( object sender, EventArgs e )
 		{
+			ResetUIByCAMBtnClick( EUIStatus.CAM );
 			m_CAMEditor.SeTraverseParam();
 		}
 
-		// back to CAD editor
-		void m_tsmiBackToCAD_Click( object sender, EventArgs e )
-		{
-			m_msCAM.Enabled = false;
-			m_msCAD.Enabled = true;
-			SwitchEditor( EEditorType.CAD );
-		}
-
 		// convert NC
-		void m_tsmiCAMOK_Click( object sender, EventArgs e )
+		void m_tsbConvertNC_Click( object sender, EventArgs e )
 		{
+			ResetUIByCAMBtnClick( EUIStatus.CAM );
 			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
 			writer.Convert();
 
@@ -335,56 +384,27 @@ namespace MyCAM
 
 		#region UI action 
 
-		void OnManualTransformStausChanged( EActionStatus actionStatus )
+		void CheckOutCADCurrentAction()
 		{
-			if( actionStatus == EActionStatus.Start ) {
-				m_msCAD_Transform.Visible = true;
-				m_msCAD.Enabled = false;
-				return;
-			}
-			m_msCAD_Transform.Visible = false;
-			m_msCAD.Enabled = true;
+			m_CADEditor.CheckOutCurrentAction();
 		}
 
-		void OnSelectFaceActionStausChanged( EActionStatus actionStatus )
+		void CheckOutCAMCurrentAction()
 		{
-			if( actionStatus == EActionStatus.Start ) {
-				m_msCAD_SelectFace.Visible = true;
-				m_msCAM.Enabled = false;
-				return;
-			}
-			m_msCAD_SelectFace.Visible = false;
-			m_msCAM.Enabled = true;
+			m_CAMEditor.CheckOutCurrentAction();
 		}
 
-		void OnSelectPathActionStausChanged( EActionStatus actionStatus )
+		void OnCAMDlgActionStatusChange( EActionStatus actionStatus )
 		{
 			if( actionStatus == EActionStatus.Start ) {
-				m_msCAD_ManualSelectPath.Visible = true;
-				m_msCAD_SelectFace.Visible = false;
-				m_msCAM.Enabled = false;
+				m_tsCAMFunction.Enabled = false;
+				m_msMode.Enabled = false;
+				m_TreeView.Enabled = false;
 				return;
 			}
-			m_msCAD_ManualSelectPath.Visible = false;
-			m_msCAM.Enabled = true;
-		}
-
-		void OnLeadSettingActionStatusChange( EActionStatus actionStatus )
-		{
-			if( actionStatus == EActionStatus.Start ) {
-				m_msCAM.Enabled = false;
-				return;
-			}
-			m_msCAM.Enabled = true;
-		}
-
-		void OnOverCutActionStatusChange( EActionStatus actionStatus )
-		{
-			if( actionStatus == EActionStatus.Start ) {
-				m_msCAM.Enabled = false;
-				return;
-			}
-			m_msCAM.Enabled = true;
+			m_tsCAMFunction.Enabled = true;
+			m_msMode.Enabled = true;
+			m_TreeView.Enabled = true;
 		}
 
 		void OnCAMPathPropertyChanged( bool isClosePath, bool isPathWithLead )
@@ -395,33 +415,239 @@ namespace MyCAM
 
 		void OnPathIsCloseChanged( bool isClosePath )
 		{
-			m_tsmiStartPoint.Enabled = isClosePath;
-			m_tsmiSetLead.Enabled = isClosePath;
-			m_tsmiOverCut.Enabled = isClosePath;
+			m_tsbStartPoint.Enabled = isClosePath;
+			m_tsbSetLead.Enabled = isClosePath;
+			m_tsbOverCut.Enabled = isClosePath;
 		}
 
 		void OnPathLeadChanged( bool isPathWithLead )
 		{
-			m_tsmiChangeLeadDirection.Enabled = isPathWithLead;
+			m_tsbChangeLeadDirection.Enabled = isPathWithLead;
 		}
 
-		void OnTraverseSettingActionStausChanged( EActionStatus actionStatus )
+		void OnCADActionStatusChange( EditActionType action, EActionStatus actionStatus )
 		{
-			if( actionStatus == EActionStatus.Start ) {
-				m_msCAM.Enabled = false;
+			if( actionStatus == EActionStatus.End ) {
+				if( action == EditActionType.ManualTransform || action == EditActionType.AxisTransform || action == EditActionType.ThreePtTransform ) {
+					RefreshMainFormToolStrip( EUIStatus.TransForm );
+				}
+				if( action == EditActionType.ManualTransform || action == EditActionType.AxisTransform || action == EditActionType.ThreePtTransform ) {
+					foreach( ToolStripButton toolstripbutton in trnasformControlList ) {
+						if( toolstripbutton.BackColor != m_defaultBtnColor ) {
+							toolstripbutton.BackColor = m_defaultBtnColor;
+						}
+					}
+					return;
+				}
 				return;
 			}
-			m_msCAM.Enabled = true;
+
+			// start action
+			if( action == EditActionType.AxisTransform ) {
+				m_tsbAxisTransform.BackColor = m_buttonOnColor;
+				RefreshMainFormToolStrip( EUIStatus.AxisTransform );
+				return;
+			}
+			if( action == EditActionType.ThreePtTransform ) {
+				m_tsb3PntTransform.BackColor = m_buttonOnColor;
+				RefreshMainFormToolStrip( EUIStatus.ThreePntTransForm );
+				return;
+			}
+			if( action == EditActionType.ManualTransform ) {
+				m_tsbManualTransform.BackColor = m_buttonOnColor;
+				RefreshMainFormToolStrip( EUIStatus.ManualTransForm );
+				return;
+			}
 		}
 
-		void OnAxisTransformActionStausChanged( EActionStatus actionStatus )
+		void OnCAMActionStatusChange( EditActionType action, EActionStatus actionStatus )
 		{
-			if( actionStatus == EActionStatus.Start ) {
-				m_msCAD.Enabled = false;
+			if( actionStatus == EActionStatus.End ) {
+
+				// cam action is done, back to default cam lay out,
+				RefreshMainFormToolStrip( EUIStatus.CAM );
+				if( action == EditActionType.SelectPath ) {
+					m_tsbAddPath.BackColor = m_defaultBtnColor;
+					m_tsbSelPath_Manual.BackColor = m_defaultBtnColor;
+					return;
+				}
+				if( action == EditActionType.SelectFace ) {
+					m_tsbAddPath.BackColor = m_defaultBtnColor;
+					return;
+				}
+				if( action == EditActionType.StartPoint ) {
+					m_tsbStartPoint.BackColor = m_defaultBtnColor;
+					return;
+				}
+
+				if( action == EditActionType.SetLead ) {
+					m_tsbSetLead.BackColor = m_defaultBtnColor;
+					m_tsbLeadSetting.BackColor = m_defaultBtnColor;
+
+					// unlock form 
+					OnCAMDlgActionStatusChange( actionStatus );
+					return;
+				}
+				if( action == EditActionType.OverCut ) {
+					m_tsbOverCut.BackColor = m_defaultBtnColor;
+					OnCAMDlgActionStatusChange( actionStatus );
+					return;
+				}
+				if( action == EditActionType.ToolVec ) {
+					m_tsbToolVec.BackColor = m_defaultBtnColor;
+					return;
+				}
+				if( action == EditActionType.SetTraverseParam ) {
+					m_tsbTraverseParamSetting.BackColor = m_defaultBtnColor;
+				}
 				return;
 			}
-			m_msCAD.Enabled = true;
+			if( action == EditActionType.SelectFace ) {
+				m_tsbAddPath.BackColor = m_buttonOnColor;
+				RefreshMainFormToolStrip( EUIStatus.AddPath );
+				return;
+			}
+			if( action == EditActionType.SelectPath ) {
+
+				// add path still icon still need to light up
+				m_tsbAddPath.BackColor = m_buttonOnColor;
+				m_tsbSelPath_Manual.BackColor = m_buttonOnColor;
+				RefreshMainFormToolStrip( EUIStatus.SelectPath );
+				return;
+			}
+			if( action == EditActionType.StartPoint ) {
+				m_tsbStartPoint.BackColor = m_buttonOnColor;
+				RefreshMainFormToolStrip( EUIStatus.CAM );
+				return;
+			}
+			if( action == EditActionType.SetLead ) {
+				m_tsbSetLead.BackColor = m_buttonOnColor;
+				m_tsbLeadSetting.BackColor = m_buttonOnColor;
+				RefreshMainFormToolStrip( EUIStatus.SetLead );
+
+				// lock main from
+				OnCAMDlgActionStatusChange( actionStatus );
+				return;
+			}
+			if( action == EditActionType.OverCut ) {
+				m_tsbOverCut.BackColor = m_buttonOnColor;
+				RefreshMainFormToolStrip( EUIStatus.CAM );
+
+				// lock main from
+				OnCAMDlgActionStatusChange( actionStatus );
+				return;
+			}
+			if( action == EditActionType.ToolVec ) {
+				m_tsbToolVec.BackColor = m_buttonOnColor;
+				RefreshMainFormToolStrip( EUIStatus.CAM );
+				return;
+			}
+			if( action == EditActionType.SetTraverseParam ) {
+				m_tsbTraverseParamSetting.BackColor = m_buttonOnColor;
+			}
 		}
+
+		// some button light on not trigger by action start, when click other button need to turn if off
+		void RefreshCAMButtonLight()
+		{
+			foreach( ToolStripButton toolStripButton in m_tsCAMFunction.Items ) {
+				if( toolStripButton.BackColor != m_defaultBtnColor ) {
+					toolStripButton.BackColor = m_defaultBtnColor;
+				}
+			}
+		}
+
+		void RefreshMainFormToolStrip( EUIStatus uiStatus )
+		{
+			if( !UIStatusDic.ContainsKey( uiStatus ) ) {
+				return;
+			}
+			List<Control> controls = UIStatusDic[ uiStatus ];
+
+			// change tool strip container visible
+			int nContainerLayerToShow = controls.Count;
+			for( int i = 0; i < toolStripLevelList.Count; i++ ) {
+				toolStripLevelList[ i ].Visible = i < nContainerLayerToShow;
+			}
+
+			// change witch tool strip will be show
+			for( int i = 0; i < controls.Count; i++ ) {
+				if( i == 0 && toolStripLevelList[ i ].Visible != true ) {
+					toolStripLevelList[ i ].Visible = true;
+				}
+				List<ToolStrip> thisToolStrip = GetAllToolStrips( toolStripLevelList[ i ] );
+				foreach( ToolStrip toolStrip in thisToolStrip ) {
+					if( toolStrip == controls[ i ] ) {
+						if( toolStrip.Visible != true ) {
+							toolStrip.Visible = true;
+						}
+						continue;
+					}
+					toolStrip.Visible = false;
+				}
+			}
+
+			// visible will cause layout change need to make sure container layout order correct
+			UpdateUILayout();
+		}
+
+		List<ToolStrip> GetAllToolStrips( ToolStripContainer container )
+		{
+			var childToolStripList = new List<ToolStrip>();
+
+			// container with 5 panel
+			FindToolStrips( container.TopToolStripPanel, childToolStripList );
+			FindToolStrips( container.BottomToolStripPanel, childToolStripList );
+			FindToolStrips( container.LeftToolStripPanel, childToolStripList );
+			FindToolStrips( container.RightToolStripPanel, childToolStripList );
+			FindToolStrips( container.ContentPanel, childToolStripList );
+			return childToolStripList;
+		}
+
+		void FindToolStrips( Control parent, List<ToolStrip> totalToolStripList )
+		{
+			foreach( Control control in parent.Controls ) {
+				if( control is ToolStrip toolStrip ) {
+					totalToolStripList.Add( toolStrip );
+				}
+				else if( control.HasChildren ) {
+					FindToolStrips( control, totalToolStripList );
+				}
+			}
+		}
+
+		void ResetUIByCAMBtnClick( EUIStatus status )
+		{
+			CheckOutCAMCurrentAction();
+			RefreshCAMButtonLight();
+			RefreshMainFormToolStrip( status );
+		}
+
+		void UpdateUILayout()
+		{
+			// layout from bottom to top
+			int currentIndex = 0;
+
+			if( m_pnlLog.Visible ) {
+				Controls.SetChildIndex( m_pnlLog, currentIndex++ );
+			}
+			if( m_panBackGround.Visible ) {
+				Controls.SetChildIndex( m_pnlLog, currentIndex++ );
+			}
+			if( m_tscLevel3Container.Visible ) {
+				Controls.SetChildIndex( m_tscLevel3Container, currentIndex++ );
+			}
+			if( m_tscLevel2Container.Visible ) {
+				Controls.SetChildIndex( m_tscLevel2Container, currentIndex++ );
+			}
+			if( m_tscLevel1Container.Visible ) {
+				Controls.SetChildIndex( m_tscLevel1Container, currentIndex++ );
+			}
+			if( m_msMode.Visible ) {
+				Controls.SetChildIndex( m_msMode, currentIndex++ );
+			}
+		}
+
 		#endregion
 
 		// switch editor
@@ -606,6 +832,80 @@ namespace MyCAM
 		}
 	}
 
-	#endregion
+		#endregion
+
+		void m_tsmiFile_Click( object sender, EventArgs e )
+		{
+			if( m_CurrentEditor != null ) {
+				if( m_CADEditor == m_CADEditor ) {
+					m_CADEditor.CheckOutCurrentAction();
+					return;
+				}
+				m_CAMEditor.CheckOutCurrentAction();
+				return;
+			}
+		}
+
+		// back to CAD editor
+		void m_tsmiCAD_Click( object sender, EventArgs e )
+		{
+			// turn all cam button of and check out current action
+			ResetUIByCAMBtnClick( EUIStatus.CAD );
+			SwitchEditor( EEditorType.CAD );
+		}
+
+		// go to CAM editor
+		void m_tsmiCAM_Click( object sender, EventArgs e )
+		{
+			CheckOutCADCurrentAction();
+			SwitchEditor( EEditorType.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
+		}
+
+		void DefaultUISetting()
+		{
+			// hide tool strip container
+			m_tscLevel2Container.Visible = false;
+			m_tscLevel3Container.Visible = false;
+
+			// default is cad mode
+			RefreshMainFormToolStrip( EUIStatus.CAD );
+		}
+
+		void UIListSetting()
+		{
+			UIStatusDic = new Dictionary<EUIStatus, List<Control>>()
+			{
+				{ EUIStatus.CAD , new List<Control>() { m_tsCADFunction } },
+				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction }},
+
+				// cad function
+				{ EUIStatus.AddFeature, new List<Control>() { m_tsCADFunction , m_tsAddFeactureSubFunc }},
+				{ EUIStatus.TransForm, new List<Control>() { m_tsCADFunction , m_tsTransformSubFunc }},
+				{ EUIStatus.ManualTransForm, new List<Control>() { m_tsCADFunction , m_tsTransformSubFunc, m_tsManualTrans}},
+				{ EUIStatus.ThreePntTransForm, new List<Control>(){  m_tsCADFunction , m_tsTransformSubFunc} },
+				{ EUIStatus.AxisTransform , new List<Control>(){  m_tsCADFunction , m_tsTransformSubFunc} },
+				
+				// cam function
+				{ EUIStatus.SetLead, new List<Control> () { m_tsCAMFunction , m_tsLead} },
+				{ EUIStatus.AddPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc } },
+				{ EUIStatus.SelectPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc, m_tsSelectPath } }
+			};
+			toolStripLevelList = new List<ToolStripContainer>()
+			{
+				m_tscLevel1Container,
+				m_tscLevel2Container,
+				m_tscLevel3Container
+			};
+
+			// to reset transform button color
+			trnasformControlList = new List<ToolStripButton>()
+			{
+				m_tsbManualTransform,
+				m_tsb3PntTransform,
+				m_tsbAxisTransform,
+			};
+		}
+	}
 }
 
