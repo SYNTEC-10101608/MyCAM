@@ -19,9 +19,9 @@ namespace MyCAM.Editor
 			get;
 		}
 
-		void Start();
+		void EditStart();
 
-		void End();
+		void EditEnd();
 	}
 
 	internal abstract class EditorBase : IEditor
@@ -42,11 +42,11 @@ namespace MyCAM.Editor
 			get;
 		}
 
-		public virtual void Start()
+		public virtual void EditStart()
 		{
 		}
 
-		public virtual void End()
+		public virtual void EditEnd()
 		{
 		}
 
