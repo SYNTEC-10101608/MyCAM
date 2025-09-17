@@ -77,6 +77,11 @@ namespace MyCAM.Editor
 			m_CurrentAction.Start();
 		}
 
+		protected virtual void OnEditActionStart( IEditorAction action )
+		{
+			// currently for notifying main form
+		}
+
 		protected virtual void OnEditActionEnd( IEditorAction action )
 		{
 			// start default action if all edit actions are done
@@ -84,11 +89,6 @@ namespace MyCAM.Editor
 				m_CurrentAction = m_DefaultAction;
 				m_CurrentAction.Start();
 			}
-		}
-
-		protected virtual void OnEditActionStart( IEditorAction action )
-		{
-			// currently for notifying main form
 		}
 
 		// editor properties
