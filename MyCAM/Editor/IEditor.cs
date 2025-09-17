@@ -9,7 +9,7 @@ namespace MyCAM.Editor
 	{
 		CAD,
 		CAM,
-		Post,
+		Simulation,
 	}
 
 	internal interface IEditor
