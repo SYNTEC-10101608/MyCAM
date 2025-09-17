@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
-	public partial class OverCutDlg : ActionDialogBase<double>
+	public partial class OverCutDlg : EditDialogBase<double>
 	{
 		public OverCutDlg( double overCutLength )
 		{

@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public partial class TraverseDlg : ActionDialogBase<TraverseData>
+	public partial class TraverseDlg : EditDialogBase<TraverseData>
 	{
 		public TraverseDlg( TraverseData data )
 		{

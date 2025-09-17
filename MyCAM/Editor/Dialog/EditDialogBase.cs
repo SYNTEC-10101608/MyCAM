@@ -4,9 +4,9 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public class ActionDialogBase<TEditDataType> : Form
+	public class EditDialogBase<TEditDataType> : Form
 	{
-		protected ActionDialogBase()
+		protected EditDialogBase()
 		{
 			FormClosing += RaiseCancel;
 		}

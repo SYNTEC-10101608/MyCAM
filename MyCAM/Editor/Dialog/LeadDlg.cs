@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
-	internal partial class LeadDlg : ActionDialogBase<LeadData>
+	internal partial class LeadDlg : EditDialogBase<LeadData>
 	{
 		public LeadDlg( LeadData leadParam )
 		{
