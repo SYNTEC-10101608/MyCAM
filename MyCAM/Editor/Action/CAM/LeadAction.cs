@@ -5,7 +5,7 @@ using System;
 
 namespace MyCAM.Editor
 {
-	internal class LeadAction : DialogActionBase
+	internal class LeadAction : EditActionBase
 	{
 		public LeadAction( DataManager cadManager, ViewManager viewManager, CAMData camData )
 			: base( cadManager, viewManager )

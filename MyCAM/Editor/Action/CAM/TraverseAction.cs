@@ -4,7 +4,7 @@ using System;
 
 namespace MyCAM.Editor
 {
-	internal class TraverseAction : DialogActionBase
+	internal class TraverseAction : EditActionBase
 	{
 		public TraverseAction( DataManager cadManager, ViewManager viewManager )
 			: base( cadManager, viewManager )

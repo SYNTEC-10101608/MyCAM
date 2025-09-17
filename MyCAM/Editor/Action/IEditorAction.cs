@@ -59,75 +59,9 @@ namespace MyCAM.Editor
 		}
 	}
 
-	internal abstract class KeyMouseActionBase : IEditorAction
+	internal abstract class EditActionBase : IEditorAction
 	{
-		protected KeyMouseActionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-		{
-			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
-				throw new ArgumentNullException( "EditActionBase constructing argument null" );
-			}
-			m_Viewer = viewer;
-			m_TreeView = treeView;
-			m_ViewManager = viewManager;
-			m_CADManager = cadManager;
-		}
-
-		public abstract EditActionType ActionType
-		{
-			get;
-		}
-
-		public virtual void Start()
-		{
-			// Register events
-			m_Viewer.MouseDown += ViewerMouseDown;
-			m_Viewer.KeyDown += ViewerKeyDown;
-			m_TreeView.AfterSelect += TreeViewAfterSelect;
-			m_TreeView.KeyDown += TreeViewKeyDown;
-
-			// Invoke start action event
-			StartAction?.Invoke( this );
-		}
-
-		public virtual void End()
-		{
-			// Unregister events
-			m_Viewer.MouseDown -= ViewerMouseDown;
-			m_Viewer.KeyDown -= ViewerKeyDown;
-			m_TreeView.AfterSelect -= TreeViewAfterSelect;
-			m_TreeView.KeyDown -= TreeViewKeyDown;
-
-			// Invoke end action event
-			EndAction?.Invoke( this );
-		}
-
-		public Action<IEditorAction> EndAction
-		{
-			get; set;
-		}
-
-		public Action<IEditorAction> StartAction
-		{
-			get; set;
-		}
-
-		protected abstract void ViewerMouseDown( MouseEventArgs e );
-
-		protected abstract void ViewerKeyDown( KeyEventArgs e );
-
-		protected abstract void TreeViewAfterSelect( object sender, TreeViewEventArgs e );
-
-		protected abstract void TreeViewKeyDown( object sender, KeyEventArgs e );
-
-		protected Viewer m_Viewer;
-		protected TreeView m_TreeView;
-		protected ViewManager m_ViewManager;
-		protected DataManager m_CADManager;
-	}
-
-	internal abstract class DialogActionBase : IEditorAction
-	{
-		protected DialogActionBase( DataManager cadManager, ViewManager viewManager )
+		protected EditActionBase( DataManager cadManager, ViewManager viewManager )
 		{
 			if( cadManager == null || viewManager == null ) {
 				throw new ArgumentNullException( "EditActionBase constructing argument null" );
@@ -163,5 +97,55 @@ namespace MyCAM.Editor
 
 		protected ViewManager m_ViewManager;
 		protected DataManager m_CADManager;
+	}
+
+	internal abstract class KeyMouseActionBase : EditActionBase
+	{
+		protected KeyMouseActionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
+			: base( cadManager, viewManager )
+		{
+			if( viewer == null || treeView == null ) {
+				throw new ArgumentNullException( "KeyMouseActionBase constructing argument null" );
+			}
+			m_Viewer = viewer;
+			m_TreeView = treeView;
+		}
+
+		public override abstract EditActionType ActionType
+		{
+			get;
+		}
+
+		public override void Start()
+		{
+			base.Start();
+
+			// Register events
+			m_Viewer.MouseDown += ViewerMouseDown;
+			m_Viewer.KeyDown += ViewerKeyDown;
+			m_TreeView.AfterSelect += TreeViewAfterSelect;
+			m_TreeView.KeyDown += TreeViewKeyDown;
+		}
+
+		public override void End()
+		{
+			// Unregister events
+			m_Viewer.MouseDown -= ViewerMouseDown;
+			m_Viewer.KeyDown -= ViewerKeyDown;
+			m_TreeView.AfterSelect -= TreeViewAfterSelect;
+			m_TreeView.KeyDown -= TreeViewKeyDown;
+			base.End();
+		}
+
+		protected abstract void ViewerMouseDown( MouseEventArgs e );
+
+		protected abstract void ViewerKeyDown( KeyEventArgs e );
+
+		protected abstract void TreeViewAfterSelect( object sender, TreeViewEventArgs e );
+
+		protected abstract void TreeViewKeyDown( object sender, KeyEventArgs e );
+
+		protected Viewer m_Viewer;
+		protected TreeView m_TreeView;
 	}
 }

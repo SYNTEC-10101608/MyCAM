@@ -5,7 +5,7 @@ using System;
 
 namespace MyCAM.Editor
 {
-	internal class OverCutAction : DialogActionBase
+	internal class OverCutAction : EditActionBase
 	{
 		public OverCutAction( DataManager cadManager, ViewManager viewManager, CAMData camData )
 		: base( cadManager, viewManager )
