@@ -56,7 +56,6 @@ namespace MyCAM
 
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
-			m_CADEditor.EditStart();
 			m_CADEditor.AxisTransformActionStausChanged += OnAxisTransformActionStausChanged;
 
 			// CAM Editor
@@ -69,8 +68,10 @@ namespace MyCAM
 			// simu editor
 			m_SimuEditor = new SimuEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
 
-			// init menu strip
+			// start with CAD editor
+			m_msCAD.Enabled = true;
 			m_msCAM.Enabled = false;
+			SwitchEditor( EEditorType.CAD );
 		}
 
 		// view properties
@@ -84,6 +85,7 @@ namespace MyCAM
 		CADEditor m_CADEditor;
 		CAMEditor m_CAMEditor;
 		SimuEditor m_SimuEditor;
+		IEditor m_CurrentEditor;
 
 		void ShowG54Trihedron()
 		{
@@ -209,8 +211,7 @@ namespace MyCAM
 		{
 			m_msCAM.Enabled = true;
 			m_msCAD.Enabled = false;
-			m_CADEditor.EditEnd();
-			m_CAMEditor.EditStart();
+			SwitchEditor( EEditorType.CAM );
 		}
 
 		// add path
@@ -317,8 +318,7 @@ namespace MyCAM
 		{
 			m_msCAM.Enabled = false;
 			m_msCAD.Enabled = true;
-			m_CAMEditor.EditEnd();
-			m_CADEditor.EditStart();
+			SwitchEditor( EEditorType.CAD );
 		}
 
 		// convert NC
@@ -388,6 +388,42 @@ namespace MyCAM
 			m_msCAD.Enabled = true;
 		}
 		#endregion
+
+		// switch editor
+		void SwitchEditor( EEditorType type )
+		{
+			// no current editor
+			if( m_CurrentEditor == null ) {
+				m_CurrentEditor = GetEditor( type );
+				m_CurrentEditor?.EditStart();
+				return;
+			}
+			else {
+				// same editor
+				if( m_CurrentEditor.Type == type ) {
+					return;
+				}
+
+				// different editor
+				m_CurrentEditor.EditEnd();
+				m_CurrentEditor = GetEditor( type );
+				m_CurrentEditor?.EditStart();
+			}
+		}
+
+		IEditor GetEditor( EEditorType type )
+		{
+			switch( type ) {
+				case EEditorType.CAD:
+					return m_CADEditor;
+				case EEditorType.CAM:
+					return m_CAMEditor;
+				case EEditorType.Simulation:
+					return m_SimuEditor;
+				default:
+					return null;
+			}
+		}
 
 		#region Get machine data
 
