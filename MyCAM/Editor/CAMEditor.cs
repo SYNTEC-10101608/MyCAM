@@ -28,13 +28,13 @@ namespace MyCAM.Editor
 		public Action<EActionStatus> TraversePrarmSettingActionStausChanged;
 		public Action<bool, bool> PathPropertyChanged; // isClosed, hasLead
 
-		public CAMEditor( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
-			: base( cadManager, viewer, treeView, viewManager )
+		public CAMEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
-			m_CADManager.PathAdded += OnPathAdded;
+			m_DataManager.PathAdded += OnPathAdded;
 
 			// default action
-			m_DefaultAction = new DefaultAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Path );
+			m_DefaultAction = new DefaultAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Path );
 			( m_DefaultAction as DefaultAction ).TreeSelectionChange += OnTreeSelectionChange;
 		}
 
@@ -71,7 +71,7 @@ namespace MyCAM.Editor
 			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
 
 			// init viewer
-			foreach( var pathID in m_CADManager.PathIDList ) {
+			foreach( var pathID in m_DataManager.PathIDList ) {
 				if( m_ViewManager.ViewObjectMap[ pathID ].Visible == false ) {
 					continue;
 				}
@@ -87,7 +87,7 @@ namespace MyCAM.Editor
 			m_TreeView.Nodes.Clear();
 
 			// clear viewer
-			foreach( var pathID in m_CADManager.PathIDList ) {
+			foreach( var pathID in m_DataManager.PathIDList ) {
 				AIS_InteractiveObject obj = m_ViewManager.ViewObjectMap[ pathID ].AISHandle;
 				m_Viewer.GetAISContext().Remove( obj, false );
 			}
@@ -98,7 +98,7 @@ namespace MyCAM.Editor
 		// APIs
 		public void StartSelectFace()
 		{
-			SelectFaceAction action = new SelectFaceAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
+			SelectFaceAction action = new SelectFaceAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
@@ -138,7 +138,7 @@ namespace MyCAM.Editor
 					wireExp.Next();
 				}
 			}
-			m_CADManager.AddPath( pathWireList, edgeFaceMap );
+			m_DataManager.AddPath( pathWireList, edgeFaceMap );
 		}
 
 		public void StartSelectPath_Manual()
@@ -154,7 +154,7 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				return;
 			}
-			SelectPathAction action = new SelectPathAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, selectedFaceGroupList );
+			SelectPathAction action = new SelectPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, selectedFaceGroupList );
 			StartEditAction( action );
 		}
 
@@ -172,12 +172,12 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
 			}
 
 			// remove from data manager
-			m_CADManager.RemovePath( szPathID );
+			m_DataManager.RemovePath( szPathID );
 
 			// remove from viewer
 			m_Viewer.GetAISContext().Remove( m_ViewManager.ViewObjectMap[ szPathID ].AISHandle, false );
@@ -198,16 +198,16 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
 			}
-			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
 
 			// skip non-closed path
 			if( pathData.CAMData.IsClosed == false ) {
 				return;
 			}
-			StartPointAction action = new StartPointAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
+			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -218,10 +218,10 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
 			}
-			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
 
 			// toggle reverse state
 			pathData.CAMData.IsReverse = !pathData.CAMData.IsReverse;
@@ -234,11 +234,11 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
 			}
-			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-			OverCutAction action = new OverCutAction( m_CADManager, pathData.CAMData );
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			OverCutAction action = new OverCutAction( m_DataManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -249,11 +249,11 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
 			}
-			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-			LeadAction action = new LeadAction( m_CADManager, pathData.CAMData );
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			LeadAction action = new LeadAction( m_DataManager, pathData.CAMData );
 			action.PropertyChanged += OnSetLeadPropertyChanged;
 			StartEditAction( action );
 		}
@@ -264,10 +264,10 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
 			}
-			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
 
 			// nothing change
 			if( pathData.CAMData.IsHasLead == false ) {
@@ -287,11 +287,11 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
 			}
-			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-			ToolVectorAction action = new ToolVectorAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -302,10 +302,10 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
 			}
-			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
 
 			// toggle reverse state
 			pathData.CAMData.IsToolVecReverse = !pathData.CAMData.IsToolVecReverse;
@@ -317,7 +317,7 @@ namespace MyCAM.Editor
 			if( m_CurrentAction.ActionType != EditActionType.Default ) {
 				return;
 			}
-			TraverseAction action = new TraverseAction( m_CADManager );
+			TraverseAction action = new TraverseAction( m_DataManager );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -331,21 +331,21 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
 			}
-			int nIndex = m_CADManager.PathIDList.IndexOf( szPathID );
-			if( nIndex < 0 || nIndex > m_CADManager.PathIDList.Count - 1
+			int nIndex = m_DataManager.PathIDList.IndexOf( szPathID );
+			if( nIndex < 0 || nIndex > m_DataManager.PathIDList.Count - 1
 				|| bUp && nIndex == 0
-				|| !bUp && nIndex == m_CADManager.PathIDList.Count - 1 ) {
+				|| !bUp && nIndex == m_DataManager.PathIDList.Count - 1 ) {
 				return;
 			}
-			m_CADManager.PathIDList.RemoveAt( nIndex );
+			m_DataManager.PathIDList.RemoveAt( nIndex );
 			if( bUp ) {
-				m_CADManager.PathIDList.Insert( nIndex - 1, szPathID );
+				m_DataManager.PathIDList.Insert( nIndex - 1, szPathID );
 			}
 			else {
-				m_CADManager.PathIDList.Insert( nIndex + 1, szPathID );
+				m_DataManager.PathIDList.Insert( nIndex + 1, szPathID );
 			}
 			ShowCAMData();
 		}
@@ -376,7 +376,7 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_CADManager.ShapeDataMap[ szID ].Shape );
+				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ShapeDataMap[ szID ].Shape );
 				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
@@ -394,10 +394,10 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
 			}
-			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
 			PathPropertyChanged?.Invoke( pathData.CAMData.IsClosed, pathData.CAMData.IsHasLead );
 		}
 
@@ -424,7 +424,7 @@ namespace MyCAM.Editor
 			m_ToolVecAISList.Clear();
 
 			// build tool vec
-			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
 					CAMPoint camPoint = camData.CAMPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
@@ -452,7 +452,7 @@ namespace MyCAM.Editor
 			m_LeadAISList.Clear();
 
 			// build lead line AIS
-			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 
 				// draw lead in
 				if( camData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None ) {
@@ -491,7 +491,7 @@ namespace MyCAM.Editor
 			m_OrientationAISList.Clear();
 
 			// build orientation
-			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				gp_Pnt showPoint = camData.CAMPointList[ 0 ].CADPoint.Point;
 				gp_Dir orientationDir = new gp_Dir( camData.CAMPointList[ 0 ].CADPoint.TangentVec.XYZ() );
 				if( camData.IsReverse ) {
@@ -517,7 +517,7 @@ namespace MyCAM.Editor
 			m_LeadOrientationAISList.Clear();
 
 			// build orientation
-			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 
 				// path with lead in
 				if( camData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None ) {
@@ -559,7 +559,7 @@ namespace MyCAM.Editor
 
 			// create text label
 			int nCurrentIndex = 0;
-			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				gp_Pnt location = camData.CAMPointList[ 0 ].CADPoint.Point;
 				string szIndex = nCurrentIndex++.ToString();
 
@@ -589,7 +589,7 @@ namespace MyCAM.Editor
 			m_OverCutAISList.Clear();
 
 			// build over cut
-			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				if( camData.OverCutLength > 0 ) {
 					for( int i = 0; i < camData.OverCutCAMPointList.Count - 1; i++ ) {
 						AIS_Line OverCutAISLine = GetAISLine( camData.OverCutCAMPointList[ i ].CADPoint.Point, camData.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
@@ -612,7 +612,7 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( traverseAIS, false );
 			}
 			m_TraverseAISList.Clear();
-			List<CAMData> camDataList = m_CADManager.GetCAMDataList();
+			List<CAMData> camDataList = m_DataManager.GetCAMDataList();
 			if( camDataList == null || camDataList.Count == 0 ) {
 				return;
 			}
@@ -704,7 +704,7 @@ namespace MyCAM.Editor
 		{
 			ShowCAMData();
 			if( isConfirm ) {
-				PathPropertyChanged?.Invoke( ( (PathData)m_CADManager.ShapeDataMap[ GetSelectedPathID() ] ).CAMData.IsClosed, isHasLead );
+				PathPropertyChanged?.Invoke( ( (PathData)m_DataManager.ShapeDataMap[ GetSelectedPathID() ] ).CAMData.IsClosed, isHasLead );
 			}
 		}
 

@@ -7,8 +7,8 @@ namespace MyCAM.Editor
 {
 	internal class LeadAction : EditActionBase
 	{
-		public LeadAction( DataManager cadManager, CAMData camData )
-			: base( cadManager )
+		public LeadAction( DataManager dataManager, CAMData camData )
+			: base( dataManager )
 		{
 			if( camData == null ) {
 				throw new ArgumentNullException( "LeadSettingAction constructing argument camData null" );

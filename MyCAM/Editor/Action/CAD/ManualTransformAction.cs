@@ -25,8 +25,8 @@ namespace MyCAM.Editor
 
 	internal class ManualTransformAction : KeyMouseActionBase
 	{
-		public ManualTransformAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
-			: base( cadManager, viewer, treeView, viewManager )
+		public ManualTransformAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			// make a coordinate system as reference
 			MakeG54Coord();
@@ -51,7 +51,7 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = false;
 
 			// activate
-			foreach( var partID in m_CADManager.PartIDList ) {
+			foreach( var partID in m_DataManager.PartIDList ) {
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
 				}
@@ -284,13 +284,13 @@ namespace MyCAM.Editor
 					}
 					expRef.Next();
 				}
-				foreach( var partID in m_CADManager.PartIDList ) {
+				foreach( var partID in m_DataManager.PartIDList ) {
 
 					// skip invisible objects
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_FACE );
+					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_FACE );
 					while( expMove.More() ) {
 						TopoDS_Shape face = expMove.Current();
 						if( sel.IsEqual( face ) ) {
@@ -311,13 +311,13 @@ namespace MyCAM.Editor
 					}
 					expRef.Next();
 				}
-				foreach( var partID in m_CADManager.PartIDList ) {
+				foreach( var partID in m_DataManager.PartIDList ) {
 
 					// skip invisible objects
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
+					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
 					while( expMove.More() ) {
 						TopoDS_Shape face = expMove.Current();
 						if( sel.IsEqual( face ) ) {
@@ -338,13 +338,13 @@ namespace MyCAM.Editor
 					}
 					expRef.Next();
 				}
-				foreach( var partID in m_CADManager.PartIDList ) {
+				foreach( var partID in m_DataManager.PartIDList ) {
 
 					// skip invisible objects
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
+					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
 					while( expMove.More() ) {
 						TopoDS_Shape vertex = expMove.Current();
 						if( sel.IsEqual( vertex ) ) {
@@ -396,7 +396,7 @@ namespace MyCAM.Editor
 
 		void ApplyTransform( gp_Trsf trsf )
 		{
-			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, m_ViewManager, trsf );
+			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, trsf );
 			transformHelper.TransformData();
 		}
 

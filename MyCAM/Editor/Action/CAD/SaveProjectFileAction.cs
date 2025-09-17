@@ -9,8 +9,8 @@ namespace MyCAM.Editor
 {
 	internal class SaveProjectFileAction : EditActionBase
 	{
-		public SaveProjectFileAction( DataManager cadManager )
-			: base( cadManager )
+		public SaveProjectFileAction( DataManager dataManager )
+			: base( dataManager )
 		{
 		}
 
@@ -24,7 +24,7 @@ namespace MyCAM.Editor
 
 		public override void Start()
 		{
-			if( m_CADManager.PartIDList.Count == 0 ) {
+			if( m_DataManager.PartIDList.Count == 0 ) {
 				End();
 				return;
 			}
@@ -37,7 +37,7 @@ namespace MyCAM.Editor
 				// avoid writing error
 				try {
 					// turn data manager to dto
-					DataManagerDTO dataManagerDTO = new DataManagerDTO( m_CADManager );
+					DataManagerDTO dataManagerDTO = new DataManagerDTO( m_DataManager );
 
 					// serialize to XML
 					XmlSerializer serializer = new XmlSerializer( typeof( DataManagerDTO ) );

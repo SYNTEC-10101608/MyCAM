@@ -13,9 +13,9 @@ namespace MyCAM.Editor
 {
 	internal abstract class IndexSelectAction : KeyMouseActionBase
 	{
-		protected IndexSelectAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
+		protected IndexSelectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			CAMData camData )
-			: base( cadManager, viewer, treeView, viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			if( camData == null ) {
 				throw new ArgumentNullException( "PathIndexSelectAction constructing argument camData null" );

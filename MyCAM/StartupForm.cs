@@ -50,26 +50,26 @@ namespace MyCAM
 
 			// CAD Manager
 			if( GetMachineDataSuccess( out MachineData machineData ) ) {
-				m_CADManager = new DataManager( machineData );
+				m_DataManager = new DataManager( machineData );
 			}
 			else {
 				// get machine data fail, machine will be null(can't use)
-				m_CADManager = new DataManager();
+				m_DataManager = new DataManager();
 			}
 
 			// CAD Editor
-			m_CADEditor = new CADEditor( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
+			m_CADEditor = new CADEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			m_CADEditor.AxisTransformActionStausChanged += OnAxisTransformActionStausChanged;
 
 			// CAM Editor
-			m_CAMEditor = new CAMEditor( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
+			m_CAMEditor = new CAMEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			m_CAMEditor.OverCutActionStatusChange += OnOverCutActionStatusChange;
 			m_CAMEditor.LeadActionStatusChange += OnLeadSettingActionStatusChange;
 			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
 			m_CAMEditor.TraversePrarmSettingActionStausChanged += OnTraverseSettingActionStausChanged;
 
 			// simu editor
-			m_SimuEditor = new SimuEditor( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
+			m_SimuEditor = new SimuEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 
 			// start with CAD editor
 			m_msCAD.Enabled = true;
@@ -82,7 +82,7 @@ namespace MyCAM
 		ViewManager m_ViewManager;
 
 		// data manager
-		DataManager m_CADManager;
+		DataManager m_DataManager;
 
 		// editors
 		CADEditor m_CADEditor;
@@ -327,7 +327,7 @@ namespace MyCAM
 		// convert NC
 		void m_tsmiCAMOK_Click( object sender, EventArgs e )
 		{
-			NCWriter writer = new NCWriter( m_CADManager.GetCAMDataList(), m_CADManager.MachineData );
+			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
 			writer.Convert();
 
 			// simulation

@@ -22,8 +22,8 @@ namespace MyCAM.Editor
 
 	internal class AxisTransformAction : KeyMouseActionBase
 	{
-		public AxisTransformAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
-			: base( cadManager, viewer, treeView, viewManager )
+		public AxisTransformAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			CreateRotationCenter();
 		}
@@ -138,13 +138,13 @@ namespace MyCAM.Editor
 
 		void ApplyTransform( gp_Trsf trsf )
 		{
-			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, m_ViewManager, trsf );
+			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, trsf );
 			transformHelper.TransformData();
 		}
 
 		void TransfromDisplayedShape( gp_Trsf trsf )
 		{
-			foreach( string szID in m_CADManager.PartIDList ) {
+			foreach( string szID in m_DataManager.PartIDList ) {
 				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
 				if( viewObject.Visible == false ) {
 					continue;
@@ -156,7 +156,7 @@ namespace MyCAM.Editor
 
 		void ResetLocalTransformation()
 		{
-			foreach( string szID in m_CADManager.PartIDList ) {
+			foreach( string szID in m_DataManager.PartIDList ) {
 				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
 				if( viewObject.Visible == false ) {
 					continue;
@@ -169,12 +169,12 @@ namespace MyCAM.Editor
 		void CreateRotationCenter()
 		{
 			List<TopoDS_Shape> shpaeList = new List<TopoDS_Shape>();
-			foreach( string szID in m_CADManager.PartIDList ) {
+			foreach( string szID in m_DataManager.PartIDList ) {
 				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
 				if( viewObject.Visible == false ) {
 					continue;
 				}
-				shpaeList.Add( m_CADManager.ShapeDataMap[ szID ].Shape );
+				shpaeList.Add( m_DataManager.ShapeDataMap[ szID ].Shape );
 			}
 			if( shpaeList == null || shpaeList.Count == 0 ) {
 				return;

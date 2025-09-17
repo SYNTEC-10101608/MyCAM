@@ -29,9 +29,9 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public SelectPathAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
+		public SelectPathAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			List<TopoDS_Shape> faceGroupList )
-			: base( cadManager, viewer, treeView, viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			// get face group list from select face action
 			if( faceGroupList == null || faceGroupList.Count == 0 ) {
@@ -223,7 +223,7 @@ namespace MyCAM.Editor
 			}
 
 			// update datas
-			m_CADManager.AddPath( pathWireList, m_EdgeFaceMap );
+			m_DataManager.AddPath( pathWireList, m_EdgeFaceMap );
 			End();
 		}
 

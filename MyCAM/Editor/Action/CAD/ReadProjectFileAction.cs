@@ -13,8 +13,8 @@ namespace MyCAM.Editor
 {
 	internal class ReadProjectFileAction : KeyMouseActionBase
 	{
-		public ReadProjectFileAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
-			: base( cadManager, viewer, treeView, viewManager )
+		public ReadProjectFileAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 		}
 
@@ -50,7 +50,7 @@ namespace MyCAM.Editor
 					dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out TraverseData traverseData );
 
 					// set back to data manager
-					m_CADManager.ResetDataManger( shapeDataMap, partIDList, pathIDList, shapeIDs, traverseData );
+					m_DataManager.ResetDataManger( shapeDataMap, partIDList, pathIDList, shapeIDs, traverseData );
 					ChangeViewerManager();
 				}
 				catch( Exception ex ) {
@@ -99,8 +99,8 @@ namespace MyCAM.Editor
 			m_ViewManager.TreeNodeMap.Clear();
 
 			// buill part tree
-			foreach( var szNewDataID in m_CADManager.PartIDList ) {
-				ShapeData data = m_CADManager.ShapeDataMap[ szNewDataID ];
+			foreach( var szNewDataID in m_DataManager.PartIDList ) {
+				ShapeData data = m_DataManager.ShapeDataMap[ szNewDataID ];
 
 				// add node to the tree view
 				TreeNode node = new TreeNode( data.UID );
@@ -115,8 +115,8 @@ namespace MyCAM.Editor
 
 			//build path tree
 			m_ViewManager.PathNode.Nodes.Clear();
-			foreach( var szNewPathDataID in m_CADManager.PathIDList ) {
-				ShapeData data = m_CADManager.ShapeDataMap[ szNewPathDataID ];
+			foreach( var szNewPathDataID in m_DataManager.PathIDList ) {
+				ShapeData data = m_DataManager.ShapeDataMap[ szNewPathDataID ];
 
 				// add a new node to the tree view
 				TreeNode node = new TreeNode( szNewPathDataID );
@@ -124,7 +124,7 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szNewPathDataID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_CADManager.ShapeDataMap[ szNewPathDataID ].Shape );
+				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ShapeDataMap[ szNewPathDataID ].Shape );
 				m_ViewManager.ViewObjectMap.Add( szNewPathDataID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}

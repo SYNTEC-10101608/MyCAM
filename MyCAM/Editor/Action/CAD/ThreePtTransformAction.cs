@@ -15,8 +15,8 @@ namespace MyCAM.Editor
 {
 	internal class ThreePtTransformAction : KeyMouseActionBase
 	{
-		public ThreePtTransformAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
-			: base( cadManager, viewer, treeView, viewManager )
+		public ThreePtTransformAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			m_ActionStage = EActionStage.P1;
 
@@ -50,7 +50,7 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = false;
 
 			// activate vertex selection mode
-			foreach( var partID in m_CADManager.PartIDList ) {
+			foreach( var partID in m_DataManager.PartIDList ) {
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
 				}
@@ -130,7 +130,7 @@ namespace MyCAM.Editor
 					}
 
 					// final transformation
-					TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, m_ViewManager, m_3PTransform );
+					TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, m_3PTransform );
 					transformHelper.TransformData();
 					End();
 				}

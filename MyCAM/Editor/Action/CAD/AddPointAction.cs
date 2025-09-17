@@ -21,9 +21,9 @@ namespace MyCAM.Editor
 
 	internal class AddPointAction : KeyMouseActionBase
 	{
-		public AddPointAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
+		public AddPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			AddPointType addPointType )
-			: base( cadManager, viewer, treeView, viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			m_AddPointType = addPointType;
 		}
@@ -39,7 +39,7 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = false;
 
 			// activate edge slection mode
-			foreach( var partID in m_CADManager.PartIDList ) {
+			foreach( var partID in m_DataManager.PartIDList ) {
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
 				}
@@ -195,7 +195,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			TopoDS_Vertex vertex = makeVertex.Vertex();
-			m_CADManager.AddReferenceFeature( vertex );
+			m_DataManager.AddReferenceFeature( vertex );
 		}
 
 		AddPointType m_AddPointType;

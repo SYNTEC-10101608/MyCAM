@@ -22,14 +22,14 @@ namespace MyCAM.Editor
 
 	internal class CADEditor : EditorBase
 	{
-		public CADEditor( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
-			: base( cadManager, viewer, treeView, viewManager )
+		public CADEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
-			m_CADManager.PartChanged += OnPartChanged;
-			m_CADManager.FeatureAdded += OnFeatureAdded;
+			m_DataManager.PartChanged += OnPartChanged;
+			m_DataManager.FeatureAdded += OnFeatureAdded;
 
 			// default action
-			m_DefaultAction = new DefaultAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Part );
+			m_DefaultAction = new DefaultAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Part );
 		}
 
 		public Action<EActionStatus> AxisTransformActionStausChanged;
@@ -97,47 +97,47 @@ namespace MyCAM.Editor
 
 		public void ImportProjectFile()
 		{
-			ReadProjectFileAction action = new ReadProjectFileAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
+			ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void SaveProjectFile()
 		{
-			SaveProjectFileAction action = new SaveProjectFileAction( m_CADManager );
+			SaveProjectFileAction action = new SaveProjectFileAction( m_DataManager );
 			StartEditAction( action );
 		}
 
 		public void AddPoint( AddPointType type )
 		{
-			AddPointAction action = new AddPointAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, type );
+			AddPointAction action = new AddPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, type );
 			StartEditAction( action );
 		}
 
 		public void AddLine( AddLineType type )
 		{
-			AddLineAction action = new AddLineAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, type );
+			AddLineAction action = new AddLineAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, type );
 			StartEditAction( action );
 		}
 
 		public void ThreePointTransform()
 		{
-			ThreePtTransformAction action = new ThreePtTransformAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
+			ThreePtTransformAction action = new ThreePtTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void StartManaulTransform()
 		{
-			ManualTransformAction action = new ManualTransformAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
+			ManualTransformAction action = new ManualTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void StartAxisTransform()
 		{
 			// need to use shape data to decide the cneter in the begin, so have to add this preotection
-			if( m_CADManager.PartIDList.Count == 0 ) {
+			if( m_DataManager.PartIDList.Count == 0 ) {
 				return;
 			}
-			AxisTransformAction action = new AxisTransformAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
+			AxisTransformAction action = new AxisTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
@@ -170,8 +170,8 @@ namespace MyCAM.Editor
 			// update view manager data
 			m_ViewManager.ViewObjectMap.Clear();
 			m_ViewManager.TreeNodeMap.Clear();
-			foreach( var szNewDataID in m_CADManager.PartIDList ) {
-				ShapeData data = m_CADManager.ShapeDataMap[ szNewDataID ];
+			foreach( var szNewDataID in m_DataManager.PartIDList ) {
+				ShapeData data = m_DataManager.ShapeDataMap[ szNewDataID ];
 
 				// add node to the tree view
 				TreeNode node = new TreeNode( data.UID );
@@ -202,7 +202,7 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( m_CADManager.ShapeDataMap[ szID ].Shape );
+				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( m_DataManager.ShapeDataMap[ szID ].Shape );
 				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
@@ -253,7 +253,7 @@ namespace MyCAM.Editor
 			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape }/*, 1e-1*/ );
 
 			// add the read shape to the manager
-			m_CADManager.AddPart( oneShape );
+			m_DataManager.AddPart( oneShape );
 		}
 
 		// edit actions

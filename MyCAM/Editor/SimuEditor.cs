@@ -18,8 +18,8 @@ namespace MyCAM.Editor
 {
 	internal class SimuEditor : EditorBase
 	{
-		public SimuEditor( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
-			: base( cadManager, viewer, treeView, viewManager )
+		public SimuEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			// init frame transform map
 			m_FrameTransformMap[ MachineComponentType.Base ] = new List<gp_Trsf>();
@@ -104,10 +104,10 @@ namespace MyCAM.Editor
 
 		public void BuildSimuData()
 		{
-			if( m_CADManager.GetCAMDataList().Count == 0 || m_PostSolver == null ) {
+			if( m_DataManager.GetCAMDataList().Count == 0 || m_PostSolver == null ) {
 				return;
 			}
-			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				gp_Vec G54Offset = new gp_Vec( 40, -385, -640 );
 				m_PostSolver.G54Offset = G54Offset;
 				if( PostHelper.SolvePath( m_PostSolver, camData, out PostData simuPostData, out _ ) == false ) {
@@ -323,7 +323,7 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Tool ], false );
 
 			// make workpiece
-			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 0 ] ].AISHandle as AIS_Shape;
+			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_DataManager.PartIDList[ 0 ] ].AISHandle as AIS_Shape;
 			m_Viewer.UpdateView();
 		}
 
@@ -593,7 +593,7 @@ namespace MyCAM.Editor
 
 			// export NC
 			if( e.Control && e.KeyCode == Keys.E ) {
-				NCWriter writer = new NCWriter( m_CADManager.GetCAMDataList(), m_CADManager.MachineData );
+				NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
 				writer.Convert();
 			}
 		}
