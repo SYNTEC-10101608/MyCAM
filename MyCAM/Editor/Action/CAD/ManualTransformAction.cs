@@ -25,8 +25,8 @@ namespace MyCAM.Editor
 
 	internal class ManualTransformAction : KeyMouseActionBase
 	{
-		public ManualTransformAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public ManualTransformAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( cadManager, viewer, treeView, viewManager )
 		{
 			// make a coordinate system as reference
 			MakeG54Coord();

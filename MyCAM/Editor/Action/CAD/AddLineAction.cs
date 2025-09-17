@@ -17,9 +17,9 @@ namespace MyCAM.Editor
 
 	internal class AddLineAction : KeyMouseActionBase
 	{
-		public AddLineAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		public AddLineAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			AddLineType addLineType )
-			: base( viewer, treeView, cadManager, viewManager )
+			: base( cadManager, viewer, treeView, viewManager )
 		{
 			m_AddLineType = addLineType;
 		}

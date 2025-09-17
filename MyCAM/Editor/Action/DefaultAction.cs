@@ -16,9 +16,9 @@ namespace MyCAM.Editor
 	{
 		public Action TreeSelectionChange;
 
-		public DefaultAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		public DefaultAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			ESelectObjectType type )
-			: base( viewer, treeView, cadManager, viewManager )
+			: base( cadManager, viewer, treeView, viewManager )
 		{
 			m_SelectType = type;
 		}

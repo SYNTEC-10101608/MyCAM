@@ -28,8 +28,8 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public SelectFaceAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public SelectFaceAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( cadManager, viewer, treeView, viewManager )
 		{
 			m_VisibleFaceAISPairList = new List<FaceHandle>();
 			m_EdgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();

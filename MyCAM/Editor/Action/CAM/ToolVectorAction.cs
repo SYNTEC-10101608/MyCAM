@@ -8,9 +8,9 @@ namespace MyCAM.Editor
 {
 	internal class ToolVectorAction : IndexSelectAction
 	{
-		public ToolVectorAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		public ToolVectorAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			CAMData camData )
-			: base( viewer, treeView, cadManager, viewManager, camData )
+			: base( cadManager, viewer, treeView, viewManager, camData )
 		{
 		}
 

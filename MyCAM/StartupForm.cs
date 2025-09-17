@@ -58,18 +58,18 @@ namespace MyCAM
 			}
 
 			// CAD Editor
-			m_CADEditor = new CADEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			m_CADEditor = new CADEditor( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
 			m_CADEditor.AxisTransformActionStausChanged += OnAxisTransformActionStausChanged;
 
 			// CAM Editor
-			m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			m_CAMEditor = new CAMEditor( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
 			m_CAMEditor.OverCutActionStatusChange += OnOverCutActionStatusChange;
 			m_CAMEditor.LeadActionStatusChange += OnLeadSettingActionStatusChange;
 			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
 			m_CAMEditor.TraversePrarmSettingActionStausChanged += OnTraverseSettingActionStausChanged;
 
 			// simu editor
-			m_SimuEditor = new SimuEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			m_SimuEditor = new SimuEditor( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
 
 			// start with CAD editor
 			m_msCAD.Enabled = true;

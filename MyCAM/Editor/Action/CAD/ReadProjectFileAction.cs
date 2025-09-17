@@ -13,8 +13,8 @@ namespace MyCAM.Editor
 {
 	internal class ReadProjectFileAction : KeyMouseActionBase
 	{
-		public ReadProjectFileAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public ReadProjectFileAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( cadManager, viewer, treeView, viewManager )
 		{
 		}
 

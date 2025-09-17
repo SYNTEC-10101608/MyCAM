@@ -18,8 +18,8 @@ namespace MyCAM.Editor
 {
 	internal class SimuEditor : EditorBase
 	{
-		public SimuEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public SimuEditor( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( cadManager, viewer, treeView, viewManager )
 		{
 			// init frame transform map
 			m_FrameTransformMap[ MachineComponentType.Base ] = new List<gp_Trsf>();

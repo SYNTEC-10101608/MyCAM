@@ -22,8 +22,8 @@ namespace MyCAM.Editor
 
 	internal class AxisTransformAction : KeyMouseActionBase
 	{
-		public AxisTransformAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public AxisTransformAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( cadManager, viewer, treeView, viewManager )
 		{
 			CreateRotationCenter();
 		}

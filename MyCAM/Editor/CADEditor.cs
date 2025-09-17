@@ -22,14 +22,14 @@ namespace MyCAM.Editor
 
 	internal class CADEditor : EditorBase
 	{
-		public CADEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public CADEditor( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( cadManager, viewer, treeView, viewManager )
 		{
 			m_CADManager.PartChanged += OnPartChanged;
 			m_CADManager.FeatureAdded += OnFeatureAdded;
 
 			// default action
-			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Part );
+			m_DefaultAction = new DefaultAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Part );
 		}
 
 		public Action<EActionStatus> AxisTransformActionStausChanged;
@@ -97,7 +97,7 @@ namespace MyCAM.Editor
 
 		public void ImportProjectFile()
 		{
-			ReadProjectFileAction action = new ReadProjectFileAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			ReadProjectFileAction action = new ReadProjectFileAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
@@ -109,25 +109,25 @@ namespace MyCAM.Editor
 
 		public void AddPoint( AddPointType type )
 		{
-			AddPointAction action = new AddPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, type );
+			AddPointAction action = new AddPointAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, type );
 			StartEditAction( action );
 		}
 
 		public void AddLine( AddLineType type )
 		{
-			AddLineAction action = new AddLineAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, type );
+			AddLineAction action = new AddLineAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, type );
 			StartEditAction( action );
 		}
 
 		public void ThreePointTransform()
 		{
-			ThreePtTransformAction action = new ThreePtTransformAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			ThreePtTransformAction action = new ThreePtTransformAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void StartManaulTransform()
 		{
-			ManualTransformAction action = new ManualTransformAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			ManualTransformAction action = new ManualTransformAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
@@ -137,7 +137,7 @@ namespace MyCAM.Editor
 			if( m_CADManager.PartIDList.Count == 0 ) {
 				return;
 			}
-			AxisTransformAction action = new AxisTransformAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			AxisTransformAction action = new AxisTransformAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 

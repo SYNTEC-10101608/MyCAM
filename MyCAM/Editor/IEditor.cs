@@ -26,7 +26,7 @@ namespace MyCAM.Editor
 
 	internal abstract class EditorBase : IEditor
 	{
-		protected EditorBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
+		protected EditorBase( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 		{
 			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
 				throw new ArgumentNullException( "EditorBase consturcting argument null." );

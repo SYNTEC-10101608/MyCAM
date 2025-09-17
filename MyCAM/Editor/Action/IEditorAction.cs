@@ -99,7 +99,7 @@ namespace MyCAM.Editor
 
 	internal abstract class KeyMouseActionBase : EditActionBase
 	{
-		protected KeyMouseActionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
+		protected KeyMouseActionBase( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( cadManager )
 		{
 			if( viewer == null || treeView == null || viewManager == null ) {

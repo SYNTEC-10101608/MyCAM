@@ -21,9 +21,9 @@ namespace MyCAM.Editor
 
 	internal class AddPointAction : KeyMouseActionBase
 	{
-		public AddPointAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		public AddPointAction( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			AddPointType addPointType )
-			: base( viewer, treeView, cadManager, viewManager )
+			: base( cadManager, viewer, treeView, viewManager )
 		{
 			m_AddPointType = addPointType;
 		}

@@ -28,13 +28,13 @@ namespace MyCAM.Editor
 		public Action<EActionStatus> TraversePrarmSettingActionStausChanged;
 		public Action<bool, bool> PathPropertyChanged; // isClosed, hasLead
 
-		public CAMEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public CAMEditor( DataManager cadManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( cadManager, viewer, treeView, viewManager )
 		{
 			m_CADManager.PathAdded += OnPathAdded;
 
 			// default action
-			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Path );
+			m_DefaultAction = new DefaultAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Path );
 			( m_DefaultAction as DefaultAction ).TreeSelectionChange += OnTreeSelectionChange;
 		}
 
@@ -98,7 +98,7 @@ namespace MyCAM.Editor
 		// APIs
 		public void StartSelectFace()
 		{
-			SelectFaceAction action = new SelectFaceAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			SelectFaceAction action = new SelectFaceAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
@@ -154,7 +154,7 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				return;
 			}
-			SelectPathAction action = new SelectPathAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, selectedFaceGroupList );
+			SelectPathAction action = new SelectPathAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, selectedFaceGroupList );
 			StartEditAction( action );
 		}
 
@@ -207,7 +207,7 @@ namespace MyCAM.Editor
 			if( pathData.CAMData.IsClosed == false ) {
 				return;
 			}
-			StartPointAction action = new StartPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
+			StartPointAction action = new StartPointAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -291,7 +291,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-			ToolVectorAction action = new ToolVectorAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, pathData.CAMData );
+			ToolVectorAction action = new ToolVectorAction( m_CADManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
