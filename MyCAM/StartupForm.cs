@@ -39,9 +39,6 @@ namespace MyCAM
 			}
 			m_Viewer.UpdateView();
 
-			// this is to keep highlighted selected node when tree view looses focus
-			m_TreeView.HideSelection = false;
-
 			// show G54
 			ShowG54Trihedron();
 
