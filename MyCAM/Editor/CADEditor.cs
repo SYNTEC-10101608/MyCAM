@@ -103,7 +103,7 @@ namespace MyCAM.Editor
 
 		public void SaveProjectFile()
 		{
-			SaveProjectFileAction action = new SaveProjectFileAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			SaveProjectFileAction action = new SaveProjectFileAction( m_CADManager );
 			StartEditAction( action );
 		}
 

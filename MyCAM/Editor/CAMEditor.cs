@@ -238,7 +238,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-			OverCutAction action = new OverCutAction( m_CADManager, m_ViewManager, pathData.CAMData );
+			OverCutAction action = new OverCutAction( m_CADManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -253,7 +253,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-			LeadAction action = new LeadAction( m_CADManager, m_ViewManager, pathData.CAMData );
+			LeadAction action = new LeadAction( m_CADManager, pathData.CAMData );
 			action.PropertyChanged += OnSetLeadPropertyChanged;
 			StartEditAction( action );
 		}
@@ -317,7 +317,7 @@ namespace MyCAM.Editor
 			if( m_CurrentAction.ActionType != EditActionType.Default ) {
 				return;
 			}
-			TraverseAction action = new TraverseAction( m_CADManager, m_ViewManager );
+			TraverseAction action = new TraverseAction( m_CADManager );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}

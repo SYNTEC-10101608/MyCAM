@@ -61,12 +61,11 @@ namespace MyCAM.Editor
 
 	internal abstract class EditActionBase : IEditorAction
 	{
-		protected EditActionBase( DataManager cadManager, ViewManager viewManager )
+		protected EditActionBase( DataManager cadManager )
 		{
-			if( cadManager == null || viewManager == null ) {
+			if( cadManager == null ) {
 				throw new ArgumentNullException( "EditActionBase constructing argument null" );
 			}
-			m_ViewManager = viewManager;
 			m_CADManager = cadManager;
 		}
 
@@ -95,20 +94,20 @@ namespace MyCAM.Editor
 			EndAction?.Invoke( this );
 		}
 
-		protected ViewManager m_ViewManager;
 		protected DataManager m_CADManager;
 	}
 
 	internal abstract class KeyMouseActionBase : EditActionBase
 	{
 		protected KeyMouseActionBase( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( cadManager, viewManager )
+			: base( cadManager )
 		{
-			if( viewer == null || treeView == null ) {
+			if( viewer == null || treeView == null || viewManager == null ) {
 				throw new ArgumentNullException( "KeyMouseActionBase constructing argument null" );
 			}
 			m_Viewer = viewer;
 			m_TreeView = treeView;
+			m_ViewManager = viewManager;
 		}
 
 		public override abstract EditActionType ActionType
@@ -147,5 +146,6 @@ namespace MyCAM.Editor
 
 		protected Viewer m_Viewer;
 		protected TreeView m_TreeView;
+		protected ViewManager m_ViewManager;
 	}
 }

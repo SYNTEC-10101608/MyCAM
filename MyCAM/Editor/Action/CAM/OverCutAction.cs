@@ -7,8 +7,8 @@ namespace MyCAM.Editor
 {
 	internal class OverCutAction : EditActionBase
 	{
-		public OverCutAction( DataManager cadManager, ViewManager viewManager, CAMData camData )
-		: base( cadManager, viewManager )
+		public OverCutAction( DataManager cadManager, CAMData camData )
+		: base( cadManager )
 		{
 			if( camData == null ) {
 				throw new ArgumentNullException( "OverCutAction constructing argument camData null" );

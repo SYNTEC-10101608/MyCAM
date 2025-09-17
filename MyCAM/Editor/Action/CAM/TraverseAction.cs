@@ -6,8 +6,8 @@ namespace MyCAM.Editor
 {
 	internal class TraverseAction : EditActionBase
 	{
-		public TraverseAction( DataManager cadManager, ViewManager viewManager )
-			: base( cadManager, viewManager )
+		public TraverseAction( DataManager cadManager )
+			: base( cadManager )
 		{
 		}
 

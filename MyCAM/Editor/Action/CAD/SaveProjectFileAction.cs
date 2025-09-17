@@ -9,8 +9,8 @@ namespace MyCAM.Editor
 {
 	internal class SaveProjectFileAction : EditActionBase
 	{
-		public SaveProjectFileAction( DataManager cadManager, ViewManager viewManager )
-			: base( cadManager, viewManager )
+		public SaveProjectFileAction( DataManager cadManager )
+			: base( cadManager )
 		{
 		}
 
