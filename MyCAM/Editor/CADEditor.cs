@@ -97,7 +97,7 @@ namespace MyCAM.Editor
 
 		public void ImportProjectFile()
 		{
-			ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+			ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_ViewManager );
 			StartEditAction( action );
 		}
 

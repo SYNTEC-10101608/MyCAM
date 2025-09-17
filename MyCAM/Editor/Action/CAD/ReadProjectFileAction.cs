@@ -1,21 +1,26 @@
-﻿using System;
+﻿using MyCAM.Data;
+using MyCAM.FileManager;
+using OCC.AIS;
+using OCCViewer;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using MyCAM.Data;
-using MyCAM.FileManager;
-using OCC.AIS;
-using OCCViewer;
 using static MyCAM.Data.DataManager;
 
 namespace MyCAM.Editor
 {
-	internal class ReadProjectFileAction : KeyMouseActionBase
+	internal class ReadProjectFileAction : EditActionBase
 	{
-		public ReadProjectFileAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
-			: base( dataManager, viewer, treeView, viewManager )
+		public ReadProjectFileAction( DataManager dataManager, Viewer viewer, ViewManager viewManager )
+			: base( dataManager )
 		{
+			if( viewer == null || viewManager == null ) {
+				throw new ArgumentNullException( "ReadProjectFileAction constructing argument null" );
+			}
+			m_Viewer = viewer;
+			m_ViewManager = viewManager;
 		}
 
 		public override EditActionType ActionType
@@ -63,26 +68,6 @@ namespace MyCAM.Editor
 				}
 			}
 			End();
-		}
-
-		protected override void ViewerMouseDown( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerKeyDown( KeyEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
-		{
-			// do nothing
 		}
 
 		void ChangeViewerManager()
@@ -156,5 +141,8 @@ namespace MyCAM.Editor
 				}
 			}
 		}
+
+		Viewer m_Viewer;
+		ViewManager m_ViewManager;
 	}
 }
