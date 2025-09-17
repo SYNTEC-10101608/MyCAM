@@ -178,27 +178,6 @@ namespace MyCAM.Editor
 			( (ManualTransformAction)m_CurrentAction ).TransformDone();
 		}
 
-		public void GoToCAM()
-		{
-			//// build CAD data
-			//List<CADData> cadDataList = new List<CADData>();
-			//foreach( string szID in m_CADManager.PathIDList ) {
-			//	PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szID ];
-			//	CADData cadData = new CADData( TopoDS.ToWire( pathData.Shape ), pathData.Edge5DList, pathData.Transform );
-			//	cadDataList.Add( cadData );
-			//}
-
-			//// show CAMEditForm
-			//CAMEditForm camEditForm = new CAMEditForm();
-			//camEditForm.Size = new System.Drawing.Size( 1200, 800 );
-			//CAMEditModel camEditModel = new CAMEditModel( m_CADManager.PartShape, cadDataList );
-			//camEditForm.Init( camEditModel );
-			//camEditForm.ShowDialog();
-			//if( camEditForm.DialogResult != DialogResult.OK ) {
-			//	return;
-			//}
-		}
-
 		// manager events
 		void OnPartChanged()
 		{
