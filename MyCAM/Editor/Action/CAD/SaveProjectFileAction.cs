@@ -1,18 +1,25 @@
-﻿using System;
+﻿using MyCAM.Data;
+using MyCAM.FileManager;
+using System;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using MyCAM.Data;
-using MyCAM.FileManager;
-using OCCViewer;
 
 namespace MyCAM.Editor
 {
-	internal class SaveProjectFileAction : KeyMouseActionBase
+	internal class SaveProjectFileAction : EditActionBase
 	{
-		public SaveProjectFileAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public SaveProjectFileAction( DataManager cadManager, ViewManager viewManager )
+			: base( cadManager, viewManager )
 		{
+		}
+
+		public override EditActionType ActionType
+		{
+			get
+			{
+				return EditActionType.SaveProjectFile;
+			}
 		}
 
 		public override void Start()
@@ -47,34 +54,6 @@ namespace MyCAM.Editor
 				}
 			}
 			End();
-		}
-
-		public override EditActionType ActionType
-		{
-			get
-			{
-				return EditActionType.SaveProjectFile;
-			}
-		}
-
-		protected override void ViewerMouseDown( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerKeyDown( KeyEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
-		{
-			// do nothing
 		}
 
 		static string GetProjectFileInfo()
