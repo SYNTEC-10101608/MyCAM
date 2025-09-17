@@ -20,7 +20,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class CAMEditor
+	internal class CAMEditor : EditorBase
 	{
 		// to notice main form
 		public Action<EActionStatus> LeadActionStatusChange;
@@ -28,19 +28,9 @@ namespace MyCAM.Editor
 		public Action<bool, bool> PathPropertyChanged; // isClosed, hasLead
 
 		public CAMEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
+			: base( viewer, treeView, cadManager, viewManager )
 		{
-			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
-				throw new ArgumentNullException( "CAMEditor consturcting argument null." );
-			}
-
-			// data manager
-			m_CADManager = cadManager;
 			m_CADManager.PathAdded += OnPathAdded;
-
-			// user interface
-			m_Viewer = viewer;
-			m_TreeView = treeView;
-			m_ViewManager = viewManager;
 
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Path );
@@ -48,18 +38,6 @@ namespace MyCAM.Editor
 		}
 
 		public Action<EActionStatus> TraversePrarmSettingActionStausChanged;
-
-		// data manager
-		DataManager m_CADManager;
-
-		// user interface
-		Viewer m_Viewer;
-		TreeView m_TreeView;
-		ViewManager m_ViewManager;
-
-		// action
-		IEditorAction m_DefaultAction;
-		IEditorAction m_CurrentAction;
 
 		// for viewer resource handle
 		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh, no need activate
@@ -78,35 +56,33 @@ namespace MyCAM.Editor
 		}
 
 		// editor
-		public void EditStart()
+		public override EEditorType Type
 		{
+			get
+			{
+				return EEditorType.CAM;
+			}
+		}
+
+		public override void EditStart()
+		{
+			base.EditStart();
+
 			// init tree
 			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
 
 			// init viewer
 			ShowCAMData();
-
-			// start default action
-			m_CurrentAction = m_DefaultAction;
-			m_DefaultAction.Start();
 		}
 
-		public void EditEnd()
+		public override void EditEnd()
 		{
 			// clear tree
 			m_TreeView.Nodes.Clear();
 
 			// clear viewer
 			HideCAMData();
-
-			// end all action
-			if( m_CurrentAction.ActionType == EditActionType.Default ) {
-				m_CurrentAction.End();
-			}
-			else {
-				m_CurrentAction.End();
-				m_DefaultAction.End();
-			}
+			base.EditEnd();
 		}
 
 		// APIs
@@ -808,43 +784,9 @@ namespace MyCAM.Editor
 		}
 
 		// edit actions
-		void StartEditAction( IEditorAction action )
+		protected override void OnEditActionStart( IEditorAction action )
 		{
-			// to prevent from non-necessary default action start
-			m_IsNextAction = true;
-
-			// end the current action
-			m_CurrentAction.End();
-			m_IsNextAction = false;
-
-			// start the action
-			m_CurrentAction = action;
-			m_CurrentAction.StartAction += OnEditActionStart;
-			m_CurrentAction.EndAction += OnEditActionEnd;
-			m_CurrentAction.Start();
-		}
-
-		void OnEditActionEnd( IEditorAction action )
-		{
-			// start default action if all edit actions are done
-			if( !m_IsNextAction ) {
-				m_CurrentAction = m_DefaultAction;
-				m_CurrentAction.Start();
-			}
-			if( action.ActionType == EditActionType.OverCut ) {
-				OverCutActionStatusChange?.Invoke( EActionStatus.End );
-			}
-			if( action.ActionType == EditActionType.SetLead ) {
-				LeadActionStatusChange?.Invoke( EActionStatus.End );
-			}
-
-			if( action.ActionType == EditActionType.SetTraverseParam ) {
-				TraversePrarmSettingActionStausChanged?.Invoke( EActionStatus.End );
-			}
-		}
-
-		void OnEditActionStart( IEditorAction action )
-		{
+			base.OnEditActionStart( action );
 			if( action.ActionType == EditActionType.OverCut ) {
 				OverCutActionStatusChange?.Invoke( EActionStatus.Start );
 			}
@@ -854,6 +796,20 @@ namespace MyCAM.Editor
 			if( action.ActionType == EditActionType.SetTraverseParam ) {
 				TraversePrarmSettingActionStausChanged?.Invoke( EActionStatus.Start );
 			}
+		}
+
+		protected override void OnEditActionEnd( IEditorAction action )
+		{
+			if( action.ActionType == EditActionType.OverCut ) {
+				OverCutActionStatusChange?.Invoke( EActionStatus.End );
+			}
+			if( action.ActionType == EditActionType.SetLead ) {
+				LeadActionStatusChange?.Invoke( EActionStatus.End );
+			}
+			if( action.ActionType == EditActionType.SetTraverseParam ) {
+				TraversePrarmSettingActionStausChanged?.Invoke( EActionStatus.End );
+			}
+			base.OnEditActionEnd( action );
 		}
 
 		void OnTreeSelectionChange()
@@ -868,7 +824,5 @@ namespace MyCAM.Editor
 			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
 			PathPropertyChanged?.Invoke( pathData.CAMData.IsClosed, pathData.CAMData.IsHasLead );
 		}
-
-		bool m_IsNextAction = false;
 	}
 }
