@@ -25,6 +25,7 @@ namespace MyCAM.Editor
 		// to notice main form
 		public Action<EActionStatus> LeadActionStatusChange;
 		public Action<EActionStatus> OverCutActionStatusChange;
+		public Action<EActionStatus> TraversePrarmSettingActionStausChanged;
 		public Action<bool, bool> PathPropertyChanged; // isClosed, hasLead
 
 		public CAMEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
@@ -37,8 +38,6 @@ namespace MyCAM.Editor
 			( m_DefaultAction as DefaultAction ).TreeSelectionChange += OnTreeSelectionChange;
 		}
 
-		public Action<EActionStatus> TraversePrarmSettingActionStausChanged;
-
 		// for viewer resource handle
 		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh, no need activate
 		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
@@ -46,7 +45,7 @@ namespace MyCAM.Editor
 		List<AIS_Line> m_LeadAISList = new List<AIS_Line>(); // need refresh, no need activate
 		List<AIS_Shape> m_LeadOrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
 		List<AIS_Line> m_OverCutAISList = new List<AIS_Line>(); // need refresh, no need activate
-		List<AIS_Line> m_TraverseAISList = new List<AIS_Line>();
+		List<AIS_Line> m_TraverseAISList = new List<AIS_Line>(); // need refresh, no need activate
 
 		enum EvecType
 		{
@@ -377,9 +376,21 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		#region Show CAM
+		// tree selection changed
+		void OnTreeSelectionChange()
+		{
+			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+				return;
+			}
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				return;
+			}
+			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
+			PathPropertyChanged?.Invoke( pathData.CAMData.IsClosed, pathData.CAMData.IsHasLead );
+		}
 
-		// view
+		#region Show CAM
 		void ShowCAMData()
 		{
 			// TODO: we dont always need to refresh such many things
@@ -688,6 +699,7 @@ namespace MyCAM.Editor
 
 		#endregion
 
+		// methods
 		List<CAMPoint> GetCutDownList( CAMData camData )
 		{
 			List<CAMPoint> cutDownPointList = new List<CAMPoint>();
@@ -773,7 +785,6 @@ namespace MyCAM.Editor
 			return newLines;
 		}
 
-		// methods
 		string GetSelectedPathID()
 		{
 			TreeNode selectedNode = m_TreeView.SelectedNode;
@@ -810,19 +821,6 @@ namespace MyCAM.Editor
 				TraversePrarmSettingActionStausChanged?.Invoke( EActionStatus.End );
 			}
 			base.OnEditActionEnd( action );
-		}
-
-		void OnTreeSelectionChange()
-		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
-				return;
-			}
-			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_CADManager.ShapeDataMap.ContainsKey( szPathID ) ) {
-				return;
-			}
-			PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szPathID ];
-			PathPropertyChanged?.Invoke( pathData.CAMData.IsClosed, pathData.CAMData.IsHasLead );
 		}
 	}
 }
