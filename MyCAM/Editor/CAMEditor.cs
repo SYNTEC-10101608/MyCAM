@@ -80,6 +80,10 @@ namespace MyCAM.Editor
 			m_TreeView.Nodes.Clear();
 
 			// clear viewer
+			foreach( var pathID in m_CADManager.PathIDList ) {
+				AIS_InteractiveObject obj = m_ViewManager.ViewObjectMap[ pathID ].AISHandle;
+				m_Viewer.GetAISContext().Remove( obj, false );
+			}
 			HideCAMData();
 			base.EditEnd();
 		}
