@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
-using System.Windows.Forms;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.AIS;
 using OCC.IFSelect;
 using OCC.IGESControl;
@@ -11,6 +7,9 @@ using OCC.TopoDS;
 using OCC.XSControl;
 using OCCTool;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -42,23 +41,13 @@ namespace MyCAM.Editor
 		Point,
 	}
 
-	internal class CADEditor
+	internal class CADEditor : EditorBase
 	{
 		public CADEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
+			: base( viewer, treeView, cadManager, viewManager )
 		{
-			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
-				throw new ArgumentNullException( "CADEditor consturcting argument null." );
-			}
-
-			// data manager
-			m_CADManager = cadManager;
 			m_CADManager.PartChanged += OnPartChanged;
 			m_CADManager.FeatureAdded += OnFeatureAdded;
-
-			// user interface
-			m_Viewer = viewer;
-			m_TreeView = treeView;
-			m_ViewManager = viewManager;
 
 			// default action
 			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Part );
@@ -66,42 +55,28 @@ namespace MyCAM.Editor
 
 		public Action<EActionStatus> AxisTransformActionStausChanged;
 
-		// user interface
-		Viewer m_Viewer;
-		TreeView m_TreeView;
-		ViewManager m_ViewManager;
-
-		// data manager
-		DataManager m_CADManager;
-
-		// action
-		IEditorAction m_DefaultAction;
-		IEditorAction m_CurrentAction;
-
 		// editor
-		public void EditStart()
+		public override EEditorType Type
 		{
-			// init tree
-			m_TreeView.Nodes.Add( m_ViewManager.PartNode );
-
-			// start default action
-			m_CurrentAction = m_DefaultAction;
-			m_DefaultAction.Start();
+			get
+			{
+				return EEditorType.CAD;
+			}
 		}
 
-		public void EditEnd()
+		public override void EditStart()
+		{
+			base.EditStart();
+
+			// init tree
+			m_TreeView.Nodes.Add( m_ViewManager.PartNode );
+		}
+
+		public override void EditEnd()
 		{
 			// clear tree
 			m_TreeView.Nodes.Clear();
-
-			// end all action
-			if( m_CurrentAction.ActionType == EditActionType.Default ) {
-				m_CurrentAction.End();
-			}
-			else {
-				m_CurrentAction.End();
-				m_DefaultAction.End();
-			}
+			base.EditEnd();
 		}
 
 		// APIs
@@ -324,42 +299,20 @@ namespace MyCAM.Editor
 		}
 
 		// edit actions
-		void StartEditAction( IEditorAction action )
+		protected override void OnEditActionStart( IEditorAction action )
 		{
-			// to prevent from non-necessary default action start
-			m_IsNextAction = true;
-
-			// end the current action
-			m_CurrentAction.End();
-			m_IsNextAction = false;
-
-			// start the action
-			m_CurrentAction = action;
-			m_CurrentAction.StartAction += OnEditActionStart;
-			m_CurrentAction.EndAction += OnEditActionEnd;
-			m_CurrentAction.Start();
-		}
-
-		void OnEditActionEnd( IEditorAction action )
-		{
-			// start default action if all edit actions are done
-			if( !m_IsNextAction ) {
-				m_CurrentAction = m_DefaultAction;
-				m_CurrentAction.Start();
-			}
-
-			if( action.ActionType == EditActionType.AxisTransform ) {
-				AxisTransformActionStausChanged?.Invoke( EActionStatus.End );
-			}
-		}
-
-		void OnEditActionStart( IEditorAction action )
-		{
+			base.OnEditActionStart( action );
 			if( action.ActionType == EditActionType.AxisTransform ) {
 				AxisTransformActionStausChanged?.Invoke( EActionStatus.Start );
 			}
 		}
 
-		bool m_IsNextAction = false;
+		protected override void OnEditActionEnd( IEditorAction action )
+		{
+			if( action.ActionType == EditActionType.AxisTransform ) {
+				AxisTransformActionStausChanged?.Invoke( EActionStatus.End );
+			}
+			base.OnEditActionEnd( action );
+		}
 	}
 }

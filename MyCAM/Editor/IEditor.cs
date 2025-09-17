@@ -44,10 +44,51 @@ namespace MyCAM.Editor
 
 		public virtual void EditStart()
 		{
+			// start default action
+			m_CurrentAction = m_DefaultAction;
+			m_CurrentAction.Start();
 		}
 
 		public virtual void EditEnd()
 		{
+			// end all action
+			if( m_CurrentAction.ActionType == EditActionType.Default ) {
+				m_CurrentAction.End();
+			}
+			else {
+				m_CurrentAction.End();
+				m_DefaultAction.End();
+			}
+		}
+
+		protected virtual void StartEditAction( IEditorAction action )
+		{
+			// to prevent from non-necessary default action start
+			m_IsNextAction = true;
+
+			// end the current action
+			m_CurrentAction.End();
+			m_IsNextAction = false;
+
+			// start the action
+			m_CurrentAction = action;
+			m_CurrentAction.StartAction += OnEditActionStart;
+			m_CurrentAction.EndAction += OnEditActionEnd;
+			m_CurrentAction.Start();
+		}
+
+		protected virtual void OnEditActionEnd( IEditorAction action )
+		{
+			// start default action if all edit actions are done
+			if( !m_IsNextAction ) {
+				m_CurrentAction = m_DefaultAction;
+				m_CurrentAction.Start();
+			}
+		}
+
+		protected virtual void OnEditActionStart( IEditorAction action )
+		{
+			// currently for notifying main form
 		}
 
 		// editor properties
@@ -59,5 +100,6 @@ namespace MyCAM.Editor
 		// action properties
 		protected IEditorAction m_DefaultAction;
 		protected IEditorAction m_CurrentAction;
+		protected bool m_IsNextAction = false;
 	}
 }
