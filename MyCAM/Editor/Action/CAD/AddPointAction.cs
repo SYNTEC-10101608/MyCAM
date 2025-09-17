@@ -12,6 +12,13 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
+	internal enum AddPointType
+	{
+		CircArcCenter = 0,
+		EdgeMidPoint = 1,
+		TwoVertexMidPoint = 2,
+	}
+
 	internal class AddPointAction : KeyMouseActionBase
 	{
 		public AddPointAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,

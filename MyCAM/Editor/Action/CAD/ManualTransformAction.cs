@@ -14,6 +14,15 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
+	internal enum ETrsfConstraintType
+	{
+		Axial,
+		AxialParallel,
+		Plane,
+		PlaneParallel,
+		Point,
+	}
+
 	internal class ManualTransformAction : KeyMouseActionBase
 	{
 		public ManualTransformAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
@@ -99,7 +108,7 @@ namespace MyCAM.Editor
 			// do nothing
 		}
 
-		public void ApplyTransform( EConstraintType type )
+		public void ApplyTransform( ETrsfConstraintType type )
 		{
 			SetConstraint( type );
 		}
@@ -348,7 +357,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void SetConstraint( EConstraintType type )
+		void SetConstraint( ETrsfConstraintType type )
 		{
 			GetRefAndMoveObject( out TopoDS_Shape refShape, out TopoDS_Shape moveShape );
 			if( refShape == null || moveShape == null ) {
@@ -358,19 +367,19 @@ namespace MyCAM.Editor
 			// create constraint
 			IConstraint c = null;
 			switch( type ) {
-				case EConstraintType.Axial:
+				case ETrsfConstraintType.Axial:
 					c = new AxialConstraint( refShape, moveShape );
 					break;
-				case EConstraintType.AxialParallel:
+				case ETrsfConstraintType.AxialParallel:
 					c = new AxialParallelConstraint( refShape, moveShape );
 					break;
-				case EConstraintType.Plane:
+				case ETrsfConstraintType.Plane:
 					c = new PlaneConstraint( refShape, moveShape );
 					break;
-				case EConstraintType.PlaneParallel:
+				case ETrsfConstraintType.PlaneParallel:
 					c = new PlaneParallelConstraint( refShape, moveShape );
 					break;
-				case EConstraintType.Point:
+				case ETrsfConstraintType.Point:
 					c = new PointConstraint( refShape, moveShape );
 					break;
 				default:

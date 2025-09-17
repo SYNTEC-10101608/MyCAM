@@ -157,27 +157,27 @@ namespace MyCAM
 
 		void m_tsmiPlane_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.Plane );
+			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.Plane );
 		}
 
 		void m_tsmiPlanePar_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.PlaneParallel );
+			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.PlaneParallel );
 		}
 
 		void m_tsmiAxial_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.Axial );
+			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.Axial );
 		}
 
 		void m_tsmiAxialPar_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.AxialParallel );
+			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.AxialParallel );
 		}
 
 		void m_tsmiPointCoincide_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.Point );
+			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.Point );
 		}
 
 		void m_tsmiTransformOK_Click( object sender, EventArgs e )

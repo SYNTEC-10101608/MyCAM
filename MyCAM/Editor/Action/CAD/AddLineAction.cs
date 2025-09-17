@@ -10,6 +10,11 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
+	internal enum AddLineType
+	{
+		TwoVertexConnectLine = 0,
+	}
+
 	internal class AddLineAction : KeyMouseActionBase
 	{
 		public AddLineAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,

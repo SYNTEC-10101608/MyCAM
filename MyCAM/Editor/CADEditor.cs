@@ -20,27 +20,6 @@ namespace MyCAM.Editor
 		IGES = 2
 	}
 
-	internal enum AddPointType
-	{
-		CircArcCenter = 0,
-		EdgeMidPoint = 1,
-		TwoVertexMidPoint = 2,
-	}
-
-	internal enum AddLineType
-	{
-		TwoVertexConnectLine = 0,
-	}
-
-	internal enum EConstraintType
-	{
-		Axial,
-		AxialParallel,
-		Plane,
-		PlaneParallel,
-		Point,
-	}
-
 	internal class CADEditor : EditorBase
 	{
 		public CADEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
@@ -162,7 +141,7 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void ApplyManualTransform( EConstraintType type )
+		public void ApplyManualTransform( ETrsfConstraintType type )
 		{
 			if( m_CurrentAction.ActionType != EditActionType.ManualTransform ) {
 				return;
