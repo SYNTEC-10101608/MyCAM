@@ -56,7 +56,7 @@ namespace MyCAM.Editor
 
 					// set back to data manager
 					m_DataManager.ResetDataManger( shapeDataMap, partIDList, pathIDList, shapeIDs, traverseData );
-					ChangeViewerManager();
+					UpdateAllViewData();
 				}
 				catch( Exception ex ) {
 					MessageBox.Show(
@@ -70,7 +70,7 @@ namespace MyCAM.Editor
 			End();
 		}
 
-		void ChangeViewerManager()
+		void UpdateAllViewData()
 		{
 			// clear the tree view and viewer
 			m_ViewManager.PartNode.Nodes.Clear();
@@ -98,7 +98,7 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
 
-			//build path tree
+			// build path tree
 			m_ViewManager.PathNode.Nodes.Clear();
 			foreach( var szNewPathDataID in m_DataManager.PathIDList ) {
 				ShapeData data = m_DataManager.ShapeDataMap[ szNewPathDataID ];
@@ -114,8 +114,9 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
 
-			// update tree view and viewer (current is in cad mode so open part tree)
+			// update tree view and viewer
 			m_ViewManager.PartNode.ExpandAll();
+			m_ViewManager.PathNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
 
