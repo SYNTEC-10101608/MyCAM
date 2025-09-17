@@ -46,11 +46,17 @@ namespace MyCAM.Editor
 		MachineData m_MachineData;
 		PostSolver m_PostSolver;
 		CollisionSolver m_FCLTest;
+
+		// read from machine data
 		HashSet<MachineComponentType> m_WorkPieceChainSet = new HashSet<MachineComponentType>();
 		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
 		Dictionary<MachineComponentType, AIS_InteractiveObject> m_MachineShapeMap = new Dictionary<MachineComponentType, AIS_InteractiveObject>();
+
+		// calculated result
 		Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 		Dictionary<MachineComponentType, List<bool>> m_FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
+
+		// frame control
 		int m_FrameCount = 0;
 		int m_CurrentFrameIndex = 0;
 
@@ -562,7 +568,7 @@ namespace MyCAM.Editor
 			return result;
 		}
 
-		// TODO: this is temporary foe testing
+		// TODO: this is temporary for testing
 		void OnKeyDown( KeyEventArgs e )
 		{
 			// import
