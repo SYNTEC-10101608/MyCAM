@@ -71,6 +71,13 @@ namespace MyCAM.Editor
 			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
 
 			// init viewer
+			foreach( var pathID in m_CADManager.PathIDList ) {
+				if( m_ViewManager.ViewObjectMap[ pathID ].Visible == false ) {
+					continue;
+				}
+				AIS_InteractiveObject obj = m_ViewManager.ViewObjectMap[ pathID ].AISHandle;
+				m_Viewer.GetAISContext().Display( obj, false );
+			}
 			ShowCAMData();
 		}
 
