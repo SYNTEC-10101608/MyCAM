@@ -1,9 +1,11 @@
 ﻿using MyCAM.Data;
 using OCC.AIS;
+using OCC.Aspect;
 using OCC.BRepPrimAPI;
 using OCC.Geom;
 using OCC.gp;
 using OCC.Graphic3d;
+using OCC.Prs3d;
 using OCC.Quantity;
 using OCC.ShapeAnalysis;
 using OCC.TCollection;
@@ -751,12 +753,16 @@ namespace MyCAM.Editor
 			return lineAIS;
 		}
 
-		AIS_Line GetAISLine( gp_Pnt leadStartPnt, gp_Pnt leadEndPnt, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1 )
+		AIS_Line GetAISLine( gp_Pnt leadStartPnt, gp_Pnt leadEndPnt, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1, bool isDashLine = false )
 		{
 			AIS_Line lineAIS = new AIS_Line( new Geom_CartesianPoint( leadStartPnt ), new Geom_CartesianPoint( leadEndPnt ) );
 			lineAIS.SetColor( new Quantity_Color( color ) );
 			lineAIS.SetWidth( lineWidth );
 			lineAIS.SetTransparency( dTransparancy );
+			if( isDashLine ) {
+				Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( color ), Aspect_TypeOfLine.Aspect_TOL_DASH, lineWidth );
+				lineAIS.Attributes().SetLineAspect( prs3D_LineAspect );
+			}
 			return lineAIS;
 		}
 
@@ -774,7 +780,7 @@ namespace MyCAM.Editor
 			return coneAIS;
 		}
 
-		List<AIS_Line> GetAISLineList( List<CAMPoint> points, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1 )
+		List<AIS_Line> GetAISLineList( List<CAMPoint> points, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1, bool isDashLine = false )
 		{
 			List<AIS_Line> newLines = new List<AIS_Line>();
 			if( points == null || points.Count < 2 ) {
@@ -784,7 +790,7 @@ namespace MyCAM.Editor
 				if( points[ i ].CADPoint.Point.IsEqual( points[ i + 1 ].CADPoint.Point, 0.001 ) ) {
 					continue;
 				}
-				var line = GetAISLine( points[ i ].CADPoint.Point, points[ i + 1 ].CADPoint.Point, color, lineWidth, dTransparancy );
+				var line = GetAISLine( points[ i ].CADPoint.Point, points[ i + 1 ].CADPoint.Point, color, lineWidth, dTransparancy, isDashLine );
 				newLines.Add( line );
 			}
 			return newLines;
