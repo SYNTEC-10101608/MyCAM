@@ -137,31 +137,11 @@ namespace MyCAM.Editor
 			}
 		}
 
-		protected override void ViewerMouseMove( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerMouseUp( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Escape ) {
 				End();
 			}
-		}
-
-		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
-		{
-			// do nothing
 		}
 
 		bool GetSelectPoint( out gp_Pnt point )
