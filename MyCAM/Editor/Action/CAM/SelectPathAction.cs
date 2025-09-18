@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class SelectPathAction : EditActionBase
+	internal class SelectPathAction : KeyMouseActionBase
 	{
 		class EdgeHandle
 		{
@@ -29,9 +29,9 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public SelectPathAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		public SelectPathAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			List<TopoDS_Shape> faceGroupList )
-			: base( viewer, treeView, cadManager, viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			// get face group list from select face action
 			if( faceGroupList == null || faceGroupList.Count == 0 ) {
@@ -233,7 +233,7 @@ namespace MyCAM.Editor
 			}
 
 			// update datas
-			m_CADManager.AddPath( pathWireList, m_EdgeFaceMap );
+			m_DataManager.AddPath( pathWireList, m_EdgeFaceMap );
 			End();
 		}
 

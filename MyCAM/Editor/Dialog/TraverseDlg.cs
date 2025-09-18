@@ -4,17 +4,13 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public partial class TraverseParamSettingForm : Form
+	public partial class TraverseDlg : EditDialogBase<TraverseData>
 	{
-		public TraverseParamSettingForm( TraverseData Data )
+		public TraverseDlg( TraverseData data )
 		{
 			InitializeComponent();
-			InitializeControlValue( Data );
+			InitializeControlValue( data );
 		}
-
-		public Action<TraverseData> Preview;
-		public Action<TraverseData> OnConfirm;
-		public Action OnCancel;
 
 		void InitializeControlValue( TraverseData Data )
 		{
@@ -50,7 +46,7 @@ namespace MyCAM.Editor
 		{
 			if( double.TryParse( m_txbCutDownDistance.Text, out double toolUpDownDistance ) && toolUpDownDistance >= 0 && toolUpDownDistance < double.MaxValue && toolUpDownDistance >= m_FollowSafeDistance ) {
 				m_CutDownDistance = toolUpDownDistance;
-				Preview?.Invoke( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance ) );
+				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance ) );
 			}
 			else {
 				m_txbCutDownDistance.Text = m_CutDownDistance.ToString();
@@ -74,7 +70,7 @@ namespace MyCAM.Editor
 		{
 			if( double.TryParse( m_txbFollowSafeDistance.Text, out double followSafeDistance ) && followSafeDistance >= 0 && followSafeDistance < double.MaxValue && followSafeDistance <= m_CutDownDistance ) {
 				m_FollowSafeDistance = followSafeDistance;
-				Preview?.Invoke( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance ) );
+				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance ) );
 			}
 			else {
 				m_txbFollowSafeDistance.Text = m_FollowSafeDistance.ToString();
@@ -98,7 +94,7 @@ namespace MyCAM.Editor
 		{
 			if( double.TryParse( m_txbLiftUpDistance.Text, out double liftUpDistance ) && liftUpDistance >= 0 && liftUpDistance < double.MaxValue ) {
 				m_LifUpDistance = liftUpDistance;
-				Preview?.Invoke( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance ) );
+				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance ) );
 			}
 			else {
 				m_txbLiftUpDistance.Text = m_LifUpDistance.ToString();
@@ -107,22 +103,11 @@ namespace MyCAM.Editor
 
 		void m_btnConfirm_Click( object sender, EventArgs e )
 		{
-			TraverseData traverseParamData = new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance );
-			OnConfirm?.Invoke( traverseParamData );
-			m_ConfirmCheck = true;
-			Close();
-		}
-
-		void TraverseParamSettingForm_FormClosing( object sender, FormClosingEventArgs e )
-		{
-			if( m_ConfirmCheck == false && e.CloseReason == CloseReason.UserClosing ) {
-				OnCancel?.Invoke();
-			}
+			RaiseConfirm( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance ) );
 		}
 
 		double m_CutDownDistance = 0;
 		double m_FollowSafeDistance = 0;
 		double m_LifUpDistance = 0;
-		bool m_ConfirmCheck = false;
 	}
 }

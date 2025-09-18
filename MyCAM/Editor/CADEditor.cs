@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
-using System.Windows.Forms;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.AIS;
 using OCC.IFSelect;
 using OCC.IGESControl;
@@ -11,6 +7,9 @@ using OCC.TopoDS;
 using OCC.XSControl;
 using OCCTool;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -21,87 +20,42 @@ namespace MyCAM.Editor
 		IGES = 2
 	}
 
-	internal enum AddPointType
+	internal class CADEditor : EditorBase
 	{
-		CircArcCenter = 0,
-		EdgeMidPoint = 1,
-		TwoVertexMidPoint = 2,
-	}
-
-	internal enum AddLineType
-	{
-		TwoVertexConnectLine = 0,
-	}
-
-	internal enum EConstraintType
-	{
-		Axial,
-		AxialParallel,
-		Plane,
-		PlaneParallel,
-		Point,
-	}
-
-	internal class CADEditor
-	{
-		public CADEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
+		public CADEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
-			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
-				throw new ArgumentNullException( "CADEditor consturcting argument null." );
-			}
-
-			// data manager
-			m_CADManager = cadManager;
-			m_CADManager.PartChanged += OnPartChanged;
-			m_CADManager.FeatureAdded += OnFeatureAdded;
-
-			// user interface
-			m_Viewer = viewer;
-			m_TreeView = treeView;
-			m_ViewManager = viewManager;
+			m_DataManager.PartChanged += OnPartChanged;
+			m_DataManager.FeatureAdded += OnFeatureAdded;
 
 			// default action
-			m_DefaultAction = new DefaultAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, ESelectObjectType.Part );
+			m_DefaultAction = new DefaultAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Part );
 		}
 
 		public Action<EActionStatus> AxisTransformActionStausChanged;
 
-		// user interface
-		Viewer m_Viewer;
-		TreeView m_TreeView;
-		ViewManager m_ViewManager;
-
-		// data manager
-		DataManager m_CADManager;
-
-		// action
-		IEditorAction m_DefaultAction;
-		IEditorAction m_CurrentAction;
-
 		// editor
-		public void EditStart()
+		public override EEditorType Type
 		{
-			// init tree
-			m_TreeView.Nodes.Add( m_ViewManager.PartNode );
-
-			// start default action
-			m_CurrentAction = m_DefaultAction;
-			m_DefaultAction.Start();
+			get
+			{
+				return EEditorType.CAD;
+			}
 		}
 
-		public void EditEnd()
+		public override void EditStart()
+		{
+			base.EditStart();
+
+			// init tree
+			m_TreeView.Nodes.Add( m_ViewManager.PartNode );
+		}
+
+		public override void EditEnd()
 		{
 			// clear tree
 			m_TreeView.Nodes.Clear();
-
-			// end all action
-			if( m_CurrentAction.ActionType == EditActionType.Default ) {
-				m_CurrentAction.End();
-			}
-			else {
-				m_CurrentAction.End();
-				m_DefaultAction.End();
-			}
+			base.EditEnd();
 		}
 
 		// APIs
@@ -143,51 +97,51 @@ namespace MyCAM.Editor
 
 		public void ImportProjectFile()
 		{
-			ReadProjectFileAction action = new ReadProjectFileAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void SaveProjectFile()
 		{
-			SaveProjectFileAction action = new SaveProjectFileAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			SaveProjectFileAction action = new SaveProjectFileAction( m_DataManager );
 			StartEditAction( action );
 		}
 
 		public void AddPoint( AddPointType type )
 		{
-			AddPointAction action = new AddPointAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, type );
+			AddPointAction action = new AddPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, type );
 			StartEditAction( action );
 		}
 
 		public void AddLine( AddLineType type )
 		{
-			AddLineAction action = new AddLineAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager, type );
+			AddLineAction action = new AddLineAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, type );
 			StartEditAction( action );
 		}
 
 		public void ThreePointTransform()
 		{
-			ThreePtTransformAction action = new ThreePtTransformAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			ThreePtTransformAction action = new ThreePtTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void StartManaulTransform()
 		{
-			ManualTransformAction action = new ManualTransformAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			ManualTransformAction action = new ManualTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void StartAxisTransform()
 		{
 			// need to use shape data to decide the cneter in the begin, so have to add this preotection
-			if( m_CADManager.PartIDList.Count == 0 ) {
+			if( m_DataManager.PartIDList.Count == 0 ) {
 				return;
 			}
-			AxisTransformAction action = new AxisTransformAction( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			AxisTransformAction action = new AxisTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
-		public void ApplyManualTransform( EConstraintType type )
+		public void ApplyManualTransform( ETrsfConstraintType type )
 		{
 			if( m_CurrentAction.ActionType != EditActionType.ManualTransform ) {
 				return;
@@ -203,27 +157,6 @@ namespace MyCAM.Editor
 			( (ManualTransformAction)m_CurrentAction ).TransformDone();
 		}
 
-		public void GoToCAM()
-		{
-			//// build CAD data
-			//List<CADData> cadDataList = new List<CADData>();
-			//foreach( string szID in m_CADManager.PathIDList ) {
-			//	PathData pathData = (PathData)m_CADManager.ShapeDataMap[ szID ];
-			//	CADData cadData = new CADData( TopoDS.ToWire( pathData.Shape ), pathData.Edge5DList, pathData.Transform );
-			//	cadDataList.Add( cadData );
-			//}
-
-			//// show CAMEditForm
-			//CAMEditForm camEditForm = new CAMEditForm();
-			//camEditForm.Size = new System.Drawing.Size( 1200, 800 );
-			//CAMEditModel camEditModel = new CAMEditModel( m_CADManager.PartShape, cadDataList );
-			//camEditForm.Init( camEditModel );
-			//camEditForm.ShowDialog();
-			//if( camEditForm.DialogResult != DialogResult.OK ) {
-			//	return;
-			//}
-		}
-
 		// manager events
 		void OnPartChanged()
 		{
@@ -237,8 +170,8 @@ namespace MyCAM.Editor
 			// update view manager data
 			m_ViewManager.ViewObjectMap.Clear();
 			m_ViewManager.TreeNodeMap.Clear();
-			foreach( var szNewDataID in m_CADManager.PartIDList ) {
-				ShapeData data = m_CADManager.ShapeDataMap[ szNewDataID ];
+			foreach( var szNewDataID in m_DataManager.PartIDList ) {
+				ShapeData data = m_DataManager.ShapeDataMap[ szNewDataID ];
 
 				// add node to the tree view
 				TreeNode node = new TreeNode( data.UID );
@@ -269,7 +202,7 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( m_CADManager.ShapeDataMap[ szID ].Shape );
+				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( m_DataManager.ShapeDataMap[ szID ].Shape );
 				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
@@ -320,46 +253,24 @@ namespace MyCAM.Editor
 			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape }/*, 1e-1*/ );
 
 			// add the read shape to the manager
-			m_CADManager.AddPart( oneShape );
+			m_DataManager.AddPart( oneShape );
 		}
 
 		// edit actions
-		void StartEditAction( IEditorAction action )
+		protected override void OnEditActionStart( IEditorAction action )
 		{
-			// to prevent from non-necessary default action start
-			m_IsNextAction = true;
-
-			// end the current action
-			m_CurrentAction.End();
-			m_IsNextAction = false;
-
-			// start the action
-			m_CurrentAction = action;
-			m_CurrentAction.StartAction += OnEditActionStart;
-			m_CurrentAction.EndAction += OnEditActionEnd;
-			m_CurrentAction.Start();
-		}
-
-		void OnEditActionEnd( IEditorAction action )
-		{
-			// start default action if all edit actions are done
-			if( !m_IsNextAction ) {
-				m_CurrentAction = m_DefaultAction;
-				m_CurrentAction.Start();
-			}
-
-			if( action.ActionType == EditActionType.AxisTransform ) {
-				AxisTransformActionStausChanged?.Invoke( EActionStatus.End );
-			}
-		}
-
-		void OnEditActionStart( IEditorAction action )
-		{
+			base.OnEditActionStart( action );
 			if( action.ActionType == EditActionType.AxisTransform ) {
 				AxisTransformActionStausChanged?.Invoke( EActionStatus.Start );
 			}
 		}
 
-		bool m_IsNextAction = false;
+		protected override void OnEditActionEnd( IEditorAction action )
+		{
+			if( action.ActionType == EditActionType.AxisTransform ) {
+				AxisTransformActionStausChanged?.Invoke( EActionStatus.End );
+			}
+			base.OnEditActionEnd( action );
+		}
 	}
 }

@@ -11,10 +11,10 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class AxisTransformAction : EditActionBase
+	internal class AxisTransformAction : KeyMouseActionBase
 	{
-		public AxisTransformAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public AxisTransformAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 		}
 
@@ -99,7 +99,7 @@ namespace MyCAM.Editor
 
 		void ApplyTransform( gp_Trsf trsf )
 		{
-			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, m_ViewManager, trsf );
+			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, trsf );
 			transformHelper.TransformData();
 		}
 
@@ -118,7 +118,7 @@ namespace MyCAM.Editor
 		void CreateRotationCenter()
 		{
 			List<TopoDS_Shape> shpaeList = new List<TopoDS_Shape>();
-			foreach( string szID in m_CADManager.PartIDList ) {
+			foreach( string szID in m_DataManager.PartIDList ) {
 				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
 				if( viewObject.Visible == false ) {
 					continue;
@@ -128,7 +128,7 @@ namespace MyCAM.Editor
 				AIS_Shape visibleShape = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szID ].AISHandle );
 				m_Viewer.GetAISContext().Erase( visibleShape, false );
 
-				shpaeList.Add( m_CADManager.ShapeDataMap[ szID ].Shape );
+				shpaeList.Add( m_DataManager.ShapeDataMap[ szID ].Shape );
 			}
 			if( shpaeList == null || shpaeList.Count == 0 ) {
 				return;

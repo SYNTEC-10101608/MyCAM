@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Editor
 {
-	partial class TraverseParamSettingForm
+	partial class TraverseDlg
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -56,7 +56,7 @@
 			this.m_lblUnit1.Location = new System.Drawing.Point(299, 105);
 			this.m_lblUnit1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblUnit1.Name = "m_lblUnit1";
-			this.m_lblUnit1.Size = new System.Drawing.Size(42, 23);
+			this.m_lblUnit1.Size = new System.Drawing.Size(34, 18);
 			this.m_lblUnit1.TabIndex = 12;
 			this.m_lblUnit1.Text = "mm";
 			// 
@@ -66,7 +66,7 @@
 			this.m_lblUnit.Location = new System.Drawing.Point(299, 52);
 			this.m_lblUnit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblUnit.Name = "m_lblUnit";
-			this.m_lblUnit.Size = new System.Drawing.Size(42, 23);
+			this.m_lblUnit.Size = new System.Drawing.Size(34, 18);
 			this.m_lblUnit.TabIndex = 11;
 			this.m_lblUnit.Text = "mm";
 			// 
@@ -75,7 +75,7 @@
 			this.m_txbFollowSafeDistance.Location = new System.Drawing.Point(176, 98);
 			this.m_txbFollowSafeDistance.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.m_txbFollowSafeDistance.Name = "m_txbFollowSafeDistance";
-			this.m_txbFollowSafeDistance.Size = new System.Drawing.Size(115, 30);
+			this.m_txbFollowSafeDistance.Size = new System.Drawing.Size(115, 26);
 			this.m_txbFollowSafeDistance.TabIndex = 10;
 			this.m_txbFollowSafeDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbSafeDistance_KeyDown);
 			this.m_txbFollowSafeDistance.Leave += new System.EventHandler(this.m_txbFollowSafeDistance_Leave);
@@ -85,7 +85,7 @@
 			this.m_txbCutDownDistance.Location = new System.Drawing.Point(176, 49);
 			this.m_txbCutDownDistance.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.m_txbCutDownDistance.Name = "m_txbCutDownDistance";
-			this.m_txbCutDownDistance.Size = new System.Drawing.Size(115, 30);
+			this.m_txbCutDownDistance.Size = new System.Drawing.Size(115, 26);
 			this.m_txbCutDownDistance.TabIndex = 9;
 			this.m_txbCutDownDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbCutDownDistance_KeyDown);
 			this.m_txbCutDownDistance.Leave += new System.EventHandler(this.m_txbCutDownDistance_Leave);
@@ -96,7 +96,7 @@
 			this.m_lblFollowSaveDistance.Location = new System.Drawing.Point(15, 98);
 			this.m_lblFollowSaveDistance.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
 			this.m_lblFollowSaveDistance.Name = "m_lblFollowSaveDistance";
-			this.m_lblFollowSaveDistance.Size = new System.Drawing.Size(118, 23);
+			this.m_lblFollowSaveDistance.Size = new System.Drawing.Size(98, 18);
 			this.m_lblFollowSaveDistance.TabIndex = 8;
 			this.m_lblFollowSaveDistance.Text = "隨動安全距離";
 			// 
@@ -106,7 +106,7 @@
 			this.m_lblCutDownDistance.Location = new System.Drawing.Point(15, 49);
 			this.m_lblCutDownDistance.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
 			this.m_lblCutDownDistance.Name = "m_lblCutDownDistance";
-			this.m_lblCutDownDistance.Size = new System.Drawing.Size(82, 23);
+			this.m_lblCutDownDistance.Size = new System.Drawing.Size(68, 18);
 			this.m_lblCutDownDistance.TabIndex = 7;
 			this.m_lblCutDownDistance.Text = "下刀距離";
 			// 
@@ -116,7 +116,7 @@
 			this.m_lblUnit2.Location = new System.Drawing.Point(299, 157);
 			this.m_lblUnit2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblUnit2.Name = "m_lblUnit2";
-			this.m_lblUnit2.Size = new System.Drawing.Size(42, 23);
+			this.m_lblUnit2.Size = new System.Drawing.Size(34, 18);
 			this.m_lblUnit2.TabIndex = 16;
 			this.m_lblUnit2.Text = "mm";
 			// 
@@ -125,7 +125,7 @@
 			this.m_txbLiftUpDistance.Location = new System.Drawing.Point(172, 154);
 			this.m_txbLiftUpDistance.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.m_txbLiftUpDistance.Name = "m_txbLiftUpDistance";
-			this.m_txbLiftUpDistance.Size = new System.Drawing.Size(115, 30);
+			this.m_txbLiftUpDistance.Size = new System.Drawing.Size(115, 26);
 			this.m_txbLiftUpDistance.TabIndex = 15;
 			this.m_txbLiftUpDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbLiftUpDistance_KeyDown);
 			this.m_txbLiftUpDistance.Leave += new System.EventHandler(this.m_txbLiftUpDistance_Leave);
@@ -136,13 +136,13 @@
 			this.m_lblLiftUpDistance.Location = new System.Drawing.Point(15, 154);
 			this.m_lblLiftUpDistance.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
 			this.m_lblLiftUpDistance.Name = "m_lblLiftUpDistance";
-			this.m_lblLiftUpDistance.Size = new System.Drawing.Size(82, 23);
+			this.m_lblLiftUpDistance.Size = new System.Drawing.Size(68, 18);
 			this.m_lblLiftUpDistance.TabIndex = 14;
 			this.m_lblLiftUpDistance.Text = "抬刀距離";
 			// 
 			// TraverseParamSettingForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 23F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(349, 270);
 			this.Controls.Add(this.m_lblUnit2);
@@ -159,7 +159,6 @@
 			this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.Name = "TraverseParamSettingForm";
 			this.Text = "後處理參數設定";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TraverseParamSettingForm_FormClosing);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

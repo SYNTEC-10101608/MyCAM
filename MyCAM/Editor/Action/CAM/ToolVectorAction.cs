@@ -6,11 +6,11 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class ToolVecAction : IndexSelectAction
+	internal class ToolVectorAction : IndexSelectAction
 	{
-		public ToolVecAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		public ToolVectorAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			CAMData camData )
-			: base( viewer, treeView, cadManager, viewManager, camData )
+			: base( dataManager, viewer, treeView, viewManager, camData )
 		{
 		}
 
@@ -36,7 +36,7 @@ namespace MyCAM.Editor
 
 			// modify tool vector
 			bool isModified = m_CAMData.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
-			ToolVecForm form = new ToolVecForm( isModified, angleA_deg, angleB_deg );
+			ToolVectorDlg form = new ToolVectorDlg( isModified, angleA_deg, angleB_deg );
 			form.RemoveEditData = () =>
 			{
 				// for remove edited data

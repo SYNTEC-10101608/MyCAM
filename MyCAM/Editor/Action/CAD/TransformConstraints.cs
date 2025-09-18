@@ -9,7 +9,7 @@ namespace MyCAM.Editor
 {
 	internal interface IConstraint
 	{
-		EConstraintType Type
+		ETrsfConstraintType Type
 		{
 			get;
 		}
@@ -27,7 +27,7 @@ namespace MyCAM.Editor
 			m_MoveShape = moveShape;
 		}
 
-		public virtual EConstraintType Type
+		public virtual ETrsfConstraintType Type
 		{
 			get;
 		}
@@ -52,7 +52,7 @@ namespace MyCAM.Editor
 		public AxialConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape )
 			: base( refShape, moveShape ) { }
 
-		public override EConstraintType Type => EConstraintType.Axial;
+		public override ETrsfConstraintType Type => ETrsfConstraintType.Axial;
 
 		public override bool IsValid()
 		{
@@ -65,7 +65,7 @@ namespace MyCAM.Editor
 				out gp_Pnt pR, out gp_Dir dR, out gp_Pnt pM, out gp_Dir dM ) ) {
 				return new gp_Trsf();
 			}
-			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.Axial );
+			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, ETrsfConstraintType.Axial );
 		}
 	}
 
@@ -74,7 +74,7 @@ namespace MyCAM.Editor
 		public AxialParallelConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape )
 			: base( refShape, moveShape ) { }
 
-		public override EConstraintType Type => EConstraintType.AxialParallel;
+		public override ETrsfConstraintType Type => ETrsfConstraintType.AxialParallel;
 
 		public override bool IsValid()
 		{
@@ -87,7 +87,7 @@ namespace MyCAM.Editor
 				out gp_Pnt pR, out gp_Dir dR, out gp_Pnt pM, out gp_Dir dM ) ) {
 				return new gp_Trsf();
 			}
-			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.AxialParallel );
+			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, ETrsfConstraintType.AxialParallel );
 		}
 	}
 
@@ -97,7 +97,7 @@ namespace MyCAM.Editor
 		public PlaneConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape )
 			: base( refShape, moveShape ) { }
 
-		public override EConstraintType Type => EConstraintType.Plane;
+		public override ETrsfConstraintType Type => ETrsfConstraintType.Plane;
 
 		public override bool IsValid()
 		{
@@ -110,7 +110,7 @@ namespace MyCAM.Editor
 				out gp_Pnt pR, out gp_Dir dR, out gp_Pnt pM, out gp_Dir dM ) ) {
 				return new gp_Trsf();
 			}
-			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.Plane );
+			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, ETrsfConstraintType.Plane );
 		}
 	}
 
@@ -120,7 +120,7 @@ namespace MyCAM.Editor
 		public PlaneParallelConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape )
 			: base( refShape, moveShape ) { }
 
-		public override EConstraintType Type => EConstraintType.PlaneParallel;
+		public override ETrsfConstraintType Type => ETrsfConstraintType.PlaneParallel;
 
 		public override bool IsValid()
 		{
@@ -133,7 +133,7 @@ namespace MyCAM.Editor
 				out gp_Pnt pR, out gp_Dir dR, out gp_Pnt pM, out gp_Dir dM ) ) {
 				return new gp_Trsf();
 			}
-			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, EConstraintType.PlaneParallel );
+			return ConstraintHelper.SolveConstraint( pR, pM, dR, dM, ETrsfConstraintType.PlaneParallel );
 		}
 	}
 
@@ -143,7 +143,7 @@ namespace MyCAM.Editor
 		public PointConstraint( TopoDS_Shape refShape, TopoDS_Shape moveShape )
 			: base( refShape, moveShape ) { }
 
-		public override EConstraintType Type => EConstraintType.Point;
+		public override ETrsfConstraintType Type => ETrsfConstraintType.Point;
 
 		public override bool IsValid()
 		{
@@ -249,7 +249,7 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		public static gp_Trsf SolveConstraint( gp_Pnt pR, gp_Pnt pM, gp_Dir dR, gp_Dir dM, EConstraintType type )
+		public static gp_Trsf SolveConstraint( gp_Pnt pR, gp_Pnt pM, gp_Dir dR, gp_Dir dM, ETrsfConstraintType type )
 		{
 			gp_Vec vecR = new gp_Vec( dR );
 			gp_Vec vecM = new gp_Vec( dM );
@@ -265,7 +265,7 @@ namespace MyCAM.Editor
 			trsfR.SetRotation( q );
 
 			// return for parallel constraint
-			if( type == EConstraintType.AxialParallel || type == EConstraintType.PlaneParallel ) {
+			if( type == ETrsfConstraintType.AxialParallel || type == ETrsfConstraintType.PlaneParallel ) {
 				return trsfR;
 			}
 
@@ -283,10 +283,10 @@ namespace MyCAM.Editor
 
 			// solve translation by case
 			gp_Trsf trsfT = new gp_Trsf();
-			if( type == EConstraintType.Axial ) {
+			if( type == ETrsfConstraintType.Axial ) {
 				trsfT.SetTranslation( vecPerp );
 			}
-			else if( type == EConstraintType.Plane ) {
+			else if( type == ETrsfConstraintType.Plane ) {
 				trsfT.SetTranslation( vecAlong );
 			}
 			return trsfT.Multiplied( trsfR );

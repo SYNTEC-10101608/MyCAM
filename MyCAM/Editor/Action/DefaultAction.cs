@@ -12,13 +12,13 @@ namespace MyCAM.Editor
 		Path,
 	}
 
-	internal class DefaultAction : EditActionBase
+	internal class DefaultAction : KeyMouseActionBase
 	{
 		public Action TreeSelectionChange;
 
-		public DefaultAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		public DefaultAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			ESelectObjectType type )
-			: base( viewer, treeView, cadManager, viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			m_SelectType = type;
 		}
@@ -37,7 +37,7 @@ namespace MyCAM.Editor
 
 			// reset activation mode
 			if( m_SelectType == ESelectObjectType.Part ) {
-				foreach( var partID in m_CADManager.PartIDList ) {
+				foreach( var partID in m_DataManager.PartIDList ) {
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
@@ -45,7 +45,7 @@ namespace MyCAM.Editor
 				}
 			}
 			else if( m_SelectType == ESelectObjectType.Path ) {
-				foreach( var partID in m_CADManager.PathIDList ) {
+				foreach( var partID in m_DataManager.PathIDList ) {
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
@@ -173,7 +173,7 @@ namespace MyCAM.Editor
 			}
 
 			// find the corresponding UID
-			string szUID = m_CADManager.GetUIDByShape( selectedShape );
+			string szUID = m_DataManager.GetUIDByShape( selectedShape );
 			if( string.IsNullOrEmpty( szUID ) ) {
 				return;
 			}
