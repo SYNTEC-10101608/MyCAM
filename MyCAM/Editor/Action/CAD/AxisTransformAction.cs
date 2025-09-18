@@ -43,6 +43,7 @@ namespace MyCAM.Editor
 		{
 			// enable tree view
 			m_TreeView.Enabled = true;
+			FinalCanvasRefresh();
 			base.End();
 		}
 
@@ -96,7 +97,6 @@ namespace MyCAM.Editor
 
 		public void TransformDone()
 		{
-			FinalCanvasRefresh();
 			ApplyTransform( m_AccumulatedTrsf );
 			End();
 		}
@@ -111,12 +111,14 @@ namespace MyCAM.Editor
 		{
 			// remove manipulator and reference shape, show all hidden parts
 			m_Manipulator.Detach();
-			m_Viewer.GetAISContext().Erase( m_RefAISShape, false );
-			foreach( string szID in m_HidePartID ) {
+			m_Viewer.GetAISContext().Remove( m_RefAISShape, false );
+			foreach( string szID in m_DataManager.PartIDList ) {
 				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
-				viewObject.Visible = true;
-				m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
+				if( viewObject.Visible ) {
+					m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
+				}
 			}
+			m_Viewer.UpdateView();
 		}
 
 		void CreateRotationCenter()
@@ -127,11 +129,7 @@ namespace MyCAM.Editor
 				if( viewObject.Visible == false ) {
 					continue;
 				}
-				m_HidePartID.Add( szID );
-				m_ViewManager.ViewObjectMap[ szID ].Visible = false;
-				AIS_Shape visibleShape = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szID ].AISHandle );
-				m_Viewer.GetAISContext().Erase( visibleShape, false );
-
+				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
 				shpaeList.Add( m_DataManager.ShapeDataMap[ szID ].Shape );
 			}
 			if( shpaeList == null || shpaeList.Count == 0 ) {
@@ -160,8 +158,7 @@ namespace MyCAM.Editor
 
 		void CreateManipulator()
 		{
-			// create a manipulator for the selected object
-
+			// setting manipulator attributes
 			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Translation, true );
 			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Rotation, true );
 			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Scaling, false );
@@ -172,7 +169,7 @@ namespace MyCAM.Editor
 			m_Manipulator.SetRotationSteps( STEP_ROTATION_ANGLE_DEG * Math.PI / 180.0 );
 			m_Manipulator.Attach( m_RefAISShape );
 			m_Manipulator.SetModeActivationOnDetection( true );
-			m_Viewer.GetAISContext().UpdateCurrentViewer();
+			m_Viewer.UpdateView();
 		}
 
 		gp_Ax2 m_RotationCenter;
