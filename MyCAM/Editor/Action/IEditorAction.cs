@@ -75,6 +75,8 @@ namespace MyCAM.Editor
 		{
 			// Register events
 			m_Viewer.MouseDown += ViewerMouseDown;
+			m_Viewer.MouseMove += ViewerMouseMove;
+			m_Viewer.MouseUp += ViewerMouseUp;
 			m_Viewer.KeyDown += ViewerKeyDown;
 			m_TreeView.AfterSelect += TreeViewAfterSelect;
 			m_TreeView.KeyDown += TreeViewKeyDown;
@@ -87,6 +89,8 @@ namespace MyCAM.Editor
 		{
 			// Unregister events
 			m_Viewer.MouseDown -= ViewerMouseDown;
+			m_Viewer.MouseMove -= ViewerMouseMove;
+			m_Viewer.MouseUp -= ViewerMouseUp;
 			m_Viewer.KeyDown -= ViewerKeyDown;
 			m_TreeView.AfterSelect -= TreeViewAfterSelect;
 			m_TreeView.KeyDown -= TreeViewKeyDown;
@@ -106,6 +110,10 @@ namespace MyCAM.Editor
 		}
 
 		protected abstract void ViewerMouseDown( MouseEventArgs e );
+
+		protected abstract void ViewerMouseMove( MouseEventArgs e );
+
+		protected abstract void ViewerMouseUp( MouseEventArgs e );
 
 		protected abstract void ViewerKeyDown( KeyEventArgs e );
 

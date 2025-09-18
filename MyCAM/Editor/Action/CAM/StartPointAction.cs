@@ -37,6 +37,16 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().ClearSelected( true );
 		}
 
+		protected override void ViewerMouseMove( MouseEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void ViewerMouseUp( MouseEventArgs e )
+		{
+			// do nothing
+		}
+
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Escape ) {

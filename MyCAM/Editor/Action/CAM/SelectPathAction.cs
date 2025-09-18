@@ -171,6 +171,16 @@ namespace MyCAM.Editor
 			}
 		}
 
+		protected override void ViewerMouseMove( MouseEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void ViewerMouseUp( MouseEventArgs e )
+		{
+			// do nothing
+		}
+
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
 			// do nothing

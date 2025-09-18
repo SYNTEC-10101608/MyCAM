@@ -92,6 +92,7 @@ namespace OCCViewer
 				control.Focus();
 				OnMouseDown( e );
 			};
+			control.MouseUp += ( sender, e ) => OnMouseUp( e );
 			control.MouseMove += ( sender, e ) => OnMouseMove( e );
 			control.KeyDown += ( sender, e ) => OnKeyDown( e );
 			control.Paint += ( sender, e ) => UpdateView();
@@ -467,6 +468,11 @@ namespace OCCViewer
 			}
 		}
 
+		void OnMouseUp( MouseEventArgs e )
+		{
+			MouseUp?.Invoke( e );
+		}
+
 		void OnMouseMove( MouseEventArgs e )
 		{
 			MouseMove?.Invoke( e );
@@ -511,6 +517,7 @@ namespace OCCViewer
 
 		public Action<MouseEventArgs> MouseWheel;
 		public Action<MouseEventArgs> MouseDown;
+		public Action<MouseEventArgs> MouseUp;
 		public Action<MouseEventArgs> MouseMove;
 		public Action<KeyEventArgs> KeyDown;
 	}

@@ -63,12 +63,6 @@
     <Compile Include="Editor\Action\CAM\TraverseSettingAction.cs" />
     <Compile Include="Editor\Action\CAD\ReadProjectFileAction.cs" />
     <Compile Include="Editor\Action\CAD\SaveProjectFileAction.cs" />
-    <Compile Include="Editor\Dialog\AxisTransformDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editor\Dialog\AxisTransformDlg.Designer.cs">
-      <DependentUpon>AxisTransformDlg.cs</DependentUpon>
-    </Compile>
     <Compile Include="Editor\Dialog\TraverseParamSettingForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -136,9 +130,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Editor\Dialog\AxisTransformDlg.resx">
-      <DependentUpon>AxisTransformDlg.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\TraverseParamSettingForm.resx">
       <DependentUpon>TraverseParamSettingForm.cs</DependentUpon>
     </EmbeddedResource>
