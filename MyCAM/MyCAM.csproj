@@ -101,7 +101,7 @@
     <Compile Include="Editor\Action\CAD\ThreePtTransformAction.cs" />
     <Compile Include="Editor\Action\CAD\AddPointAction.cs" />
     <Compile Include="Editor\Action\CAM\ToolVectorAction.cs" />
-    <Compile Include="Editor\Action\DefaultAction.cs" />
+    <Compile Include="Editor\Action\SelectObjectAction.cs" />
     <Compile Include="Editor\Action\IEditorAction.cs" />
     <Compile Include="Editor\Action\CAD\ManualTransformAction.cs" />
     <Compile Include="Editor\Action\CAD\TransformHelper.cs" />
