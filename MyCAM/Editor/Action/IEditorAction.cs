@@ -13,8 +13,8 @@ namespace MyCAM.Editor
 
 	internal enum EditActionType
 	{
-		// default
-		Default,
+		// select object
+		SelectObject,
 
 		// CAD
 		AddPoint,

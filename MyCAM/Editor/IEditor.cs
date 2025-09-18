@@ -52,7 +52,7 @@ namespace MyCAM.Editor
 		public virtual void EditEnd()
 		{
 			// end all action
-			if( m_CurrentAction.ActionType == EditActionType.Default ) {
+			if( m_CurrentAction.ActionType == EditActionType.SelectObject ) {
 				m_CurrentAction.End();
 			}
 			else {

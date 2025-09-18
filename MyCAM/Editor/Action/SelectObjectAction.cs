@@ -12,11 +12,11 @@ namespace MyCAM.Editor
 		Path,
 	}
 
-	internal class DefaultAction : KeyMouseActionBase
+	internal class SelectObjectAction : KeyMouseActionBase
 	{
 		public Action TreeSelectionChange;
 
-		public DefaultAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
+		public SelectObjectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			ESelectObjectType type )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
@@ -27,7 +27,7 @@ namespace MyCAM.Editor
 		{
 			get
 			{
-				return EditActionType.Default;
+				return EditActionType.SelectObject;
 			}
 		}
 
