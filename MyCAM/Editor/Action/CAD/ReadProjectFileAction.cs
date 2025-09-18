@@ -1,12 +1,12 @@
-﻿using System;
+﻿using MyCAM.Data;
+using MyCAM.FileManager;
+using OCC.AIS;
+using OCCViewer;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using MyCAM.Data;
-using MyCAM.FileManager;
-using OCC.AIS;
-using OCCViewer;
 using static MyCAM.Data.DataManager;
 
 namespace MyCAM.Editor
@@ -63,6 +63,16 @@ namespace MyCAM.Editor
 				}
 			}
 			End();
+		}
+
+		protected override void ViewerMouseMove( MouseEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void ViewerMouseUp( MouseEventArgs e )
+		{
+			// do nothing
 		}
 
 		protected override void ViewerMouseDown( MouseEventArgs e )

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using MyCAM.Data;
+using MyCAM.FileManager;
+using OCCViewer;
+using System;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using MyCAM.Data;
-using MyCAM.FileManager;
-using OCCViewer;
 
 namespace MyCAM.Editor
 {
@@ -55,6 +55,16 @@ namespace MyCAM.Editor
 			{
 				return EditActionType.SaveProjectFile;
 			}
+		}
+
+		protected override void ViewerMouseMove( MouseEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void ViewerMouseUp( MouseEventArgs e )
+		{
+			// do nothing
 		}
 
 		protected override void ViewerMouseDown( MouseEventArgs e )

@@ -69,6 +69,7 @@ namespace MyCAM.Editor
 			}
 			m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_Add );
 			if( m_Viewer.GetAISContext().NbSelected() != 2 ) {
+				m_Viewer.UpdateView();
 				return;
 			}
 			List<TopoDS_Shape> selectedShapeList = new List<TopoDS_Shape>();
@@ -90,6 +91,16 @@ namespace MyCAM.Editor
 			if( isAdded ) {
 				End();
 			}
+		}
+
+		protected override void ViewerMouseMove( MouseEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void ViewerMouseUp( MouseEventArgs e )
+		{
+			// do nothing
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )

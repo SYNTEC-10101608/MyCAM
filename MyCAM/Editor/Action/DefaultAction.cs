@@ -1,8 +1,8 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.TopoDS;
 using OCCViewer;
+using System;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -77,6 +77,16 @@ namespace MyCAM.Editor
 				m_Viewer.UpdateView();
 				SyncSelectionFromViewToTree();
 			}
+		}
+
+		protected override void ViewerMouseMove( MouseEventArgs e )
+		{
+			// do nothing
+		}
+
+		protected override void ViewerMouseUp( MouseEventArgs e )
+		{
+			// do nothing
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )

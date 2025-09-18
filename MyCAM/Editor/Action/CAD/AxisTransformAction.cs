@@ -1,6 +1,4 @@
-﻿using MyCAM.App;
-using MyCAM.Data;
-using MyCAM.Editor.Dialog;
+﻿using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRep;
 using OCC.gp;
@@ -13,19 +11,11 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal enum EAxisTransformDirection
-	{
-		XAxis,
-		YAxis,
-		ZAxis,
-	}
-
 	internal class AxisTransformAction : EditActionBase
 	{
 		public AxisTransformAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
 			: base( viewer, treeView, cadManager, viewManager )
 		{
-			CreateRotationCenter();
 		}
 
 		public override EditActionType ActionType
@@ -42,17 +32,7 @@ namespace MyCAM.Editor
 
 			// disable tree view
 			m_TreeView.Enabled = false;
-
-			// new transform dialog
-			AxisTransformDlg axisTransformDlg = new AxisTransformDlg();
-			axisTransformDlg.Show( MyApp.MainForm );
-
-			// register event
-			axisTransformDlg.Displace += Displacement;
-			axisTransformDlg.Reset += Displacement;
-			axisTransformDlg.Rotate += Rotatation;
-			axisTransformDlg.ResetR += Rotatation;
-			axisTransformDlg.FormClose += TransformDone;
+			CreateRotationCenter();
 		}
 
 		public override void End()
@@ -62,61 +42,42 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		void Rotatation( decimal value, EAxisTransformDirection axis )
-		{
-			gp_Pnt position = m_RotationCenter.Location();
-			gp_Trsf trsf = new gp_Trsf();
-			gp_Dir dir = new gp_Dir();
-			switch( axis ) {
-				case EAxisTransformDirection.XAxis:
-					dir = new gp_Dir( 1, 0, 0 );
-					break;
-				case EAxisTransformDirection.YAxis:
-					dir = new gp_Dir( 0, 1, 0 );
-					break;
-				case EAxisTransformDirection.ZAxis:
-					dir = new gp_Dir( 0, 0, 1 );
-					break;
-				default:
-					dir = new gp_Dir( 1, 0, 0 );
-					break;
-			}
-			gp_Ax1 axl = new gp_Ax1( position, dir );
-			trsf.SetRotation( axl, (double)value * Math.PI / 180 );
-			PreviewAndAccumulateTransform( trsf );
-		}
-
-		void Displacement( decimal value, EAxisTransformDirection axis )
-		{
-			gp_Vec vec = new gp_Vec( 0, 0, 0 );
-			switch( axis ) {
-				case EAxisTransformDirection.XAxis:
-					vec = new gp_Vec( (double)value, 0, 0 );
-					break;
-				case EAxisTransformDirection.YAxis:
-					vec = new gp_Vec( 0, (double)value, 0 );
-					break;
-				case EAxisTransformDirection.ZAxis:
-					vec = new gp_Vec( 0, 0, (double)value );
-					break;
-				default:
-					vec = new gp_Vec( 1, 0, 0 );
-					break;
-			}
-			gp_Trsf trsf = new gp_Trsf();
-			trsf.SetTranslation( vec );
-			m_RotationCenter.Translate( vec );
-			PreviewAndAccumulateTransform( trsf );
-		}
-
 		protected override void ViewerMouseDown( MouseEventArgs e )
 		{
-			// do nothing
+			if( e.Button == MouseButtons.Left ) {
+				if( m_Manipulator.HasActiveMode() ) {
+					m_Manipulator.StartTransform( e.X, e.Y, m_Viewer.GetView() );
+					m_Manipulator.SetModeActivationOnDetection( false );
+				}
+			}
+		}
+
+		protected override void ViewerMouseMove( MouseEventArgs e )
+		{
+			if( e.Button == MouseButtons.Left ) {
+				if( m_Manipulator.HasActiveMode() ) {
+					m_OneTimeTrsf = m_Manipulator.CustomTransform( e.X, e.Y, m_Viewer.GetView() );
+					m_Viewer.GetView().Redraw();
+				}
+			}
+		}
+
+		protected override void ViewerMouseUp( MouseEventArgs e )
+		{
+			if( e.Button == MouseButtons.Left ) {
+				m_Manipulator.StopTransform( true );
+				m_Manipulator.SetModeActivationOnDetection( true );
+
+				// accumulate transform
+				m_AccumulatedTrsf.PreMultiply( m_OneTimeTrsf );
+			}
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
-			// do nothing
+			if( e.KeyCode == Keys.Escape ) {
+				TransformDone();
+			}
 		}
 
 		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
@@ -131,8 +92,8 @@ namespace MyCAM.Editor
 
 		public void TransformDone()
 		{
-			ResetLocalTransformation();
-			ApplyTransform( m_trsf );
+			FinalCanvasRefresh();
+			ApplyTransform( m_AccumulatedTrsf );
 			End();
 		}
 
@@ -142,27 +103,15 @@ namespace MyCAM.Editor
 			transformHelper.TransformData();
 		}
 
-		void TransfromDisplayedShape( gp_Trsf trsf )
+		void FinalCanvasRefresh()
 		{
-			foreach( string szID in m_CADManager.PartIDList ) {
+			// remove manipulator and reference shape, show all hidden parts
+			m_Manipulator.Detach();
+			m_Viewer.GetAISContext().Erase( m_RefAISShape, false );
+			foreach( string szID in m_HidePartID ) {
 				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
-				if( viewObject.Visible == false ) {
-					continue;
-				}
-				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szID ].AISHandle );
-				oneAIS.SetLocalTransformation( trsf.Multiplied( oneAIS.LocalTransformation() ) );
-			}
-		}
-
-		void ResetLocalTransformation()
-		{
-			foreach( string szID in m_CADManager.PartIDList ) {
-				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
-				if( viewObject.Visible == false ) {
-					continue;
-				}
-				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szID ].AISHandle );
-				oneAIS.ResetTransformation();
+				viewObject.Visible = true;
+				m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
 			}
 		}
 
@@ -174,11 +123,18 @@ namespace MyCAM.Editor
 				if( viewObject.Visible == false ) {
 					continue;
 				}
+				m_HidePartID.Add( szID );
+				m_ViewManager.ViewObjectMap[ szID ].Visible = false;
+				AIS_Shape visibleShape = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szID ].AISHandle );
+				m_Viewer.GetAISContext().Erase( visibleShape, false );
+
 				shpaeList.Add( m_CADManager.ShapeDataMap[ szID ].Shape );
 			}
 			if( shpaeList == null || shpaeList.Count == 0 ) {
 				return;
 			}
+
+			// create a compound shape for all visible shapes
 			TopoDS_Compound compound = new TopoDS_Compound();
 			TopoDS_Shape compoundShape = compound;
 			BRep_Builder builder = new BRep_Builder();
@@ -187,22 +143,40 @@ namespace MyCAM.Editor
 				builder.Add( ref compoundShape, shape );
 			}
 
-			// Set the manipulator position to the center of the bounding box
+			// set the manipulator position to the center of the bounding box
 			BoundingBox boundingBox = new BoundingBox( compoundShape );
 			m_RotationCenter = new gp_Ax2( new gp_Pnt( boundingBox.XCenter, boundingBox.YCenter, boundingBox.ZCenter ), new gp_Dir( 0, 0, 1 ) );
+
+			// display the compound shape as reference
+			m_RefAISShape = ViewHelper.CreatePartAIS( compound );
+			m_Viewer.GetAISContext().Display( m_RefAISShape, false );
+			m_Viewer.GetAISContext().Deactivate( m_RefAISShape );
+			CreateManipulator();
 		}
 
-		void PreviewAndAccumulateTransform( gp_Trsf trsf )
+		void CreateManipulator()
 		{
-			// just for instant preview
-			TransfromDisplayedShape( trsf );
-			m_Viewer.UpdateView();
-
-			// accumulate transform
-			m_trsf.PreMultiply( trsf );
+			// create a manipulator for the selected object
+			m_Manipulator = new AIS_Manipulator();
+			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Translation, true );
+			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Rotation, true );
+			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Scaling, false );
+			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_TranslationPlane, false );
+			m_Manipulator.SetPosition( m_RotationCenter );
+			m_Manipulator.EnableMode( AIS_ManipulatorMode.AIS_MM_Translation );
+			m_Manipulator.EnableMode( AIS_ManipulatorMode.AIS_MM_Rotation );
+			m_Manipulator.SetRotationSteps( STEP_ROTATION_ANGLE_DEG * Math.PI / 180.0 );
+			m_Manipulator.Attach( m_RefAISShape );
+			m_Manipulator.SetModeActivationOnDetection( true );
+			m_Viewer.GetAISContext().UpdateCurrentViewer();
 		}
 
+		List<string> m_HidePartID = new List<string>();
 		gp_Ax2 m_RotationCenter = new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
-		gp_Trsf m_trsf = new gp_Trsf();
+		gp_Trsf m_AccumulatedTrsf = new gp_Trsf();
+		gp_Trsf m_OneTimeTrsf = new gp_Trsf();
+		AIS_Manipulator m_Manipulator;
+		AIS_Shape m_RefAISShape;
+		const double STEP_ROTATION_ANGLE_DEG = 15;
 	}
 }
