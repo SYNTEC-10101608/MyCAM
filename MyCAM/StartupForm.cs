@@ -50,30 +50,31 @@ namespace MyCAM
 
 			// CAD Manager
 			if( GetMachineDataSuccess( out MachineData machineData ) ) {
-				m_CADManager = new DataManager( machineData );
+				m_DataManager = new DataManager( machineData );
 			}
 			else {
 				// get machine data fail, machine will be null(can't use)
-				m_CADManager = new DataManager();
+				m_DataManager = new DataManager();
 			}
 
 			// CAD Editor
-			m_CADEditor = new CADEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
-			m_CADEditor.EditStart();
+			m_CADEditor = new CADEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			m_CADEditor.AxisTransformActionStausChanged += OnAxisTransformActionStausChanged;
 
 			// CAM Editor
-			m_CAMEditor = new CAMEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			m_CAMEditor = new CAMEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			m_CAMEditor.OverCutActionStatusChange += OnOverCutActionStatusChange;
 			m_CAMEditor.LeadActionStatusChange += OnLeadSettingActionStatusChange;
 			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
 			m_CAMEditor.TraversePrarmSettingActionStausChanged += OnTraverseSettingActionStausChanged;
 
 			// simu editor
-			m_SimuEditor = new SimuEditor( m_Viewer, m_TreeView, m_CADManager, m_ViewManager );
+			m_SimuEditor = new SimuEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 
-			// init menu strip
+			// start with CAD editor
+			m_msCAD.Enabled = true;
 			m_msCAM.Enabled = false;
+			SwitchEditor( EEditorType.CAD );
 		}
 
 		// view properties
@@ -81,12 +82,13 @@ namespace MyCAM
 		ViewManager m_ViewManager;
 
 		// data manager
-		DataManager m_CADManager;
+		DataManager m_DataManager;
 
 		// editors
 		CADEditor m_CADEditor;
 		CAMEditor m_CAMEditor;
 		SimuEditor m_SimuEditor;
+		IEditor m_CurrentEditor;
 
 		void ShowG54Trihedron()
 		{
@@ -157,27 +159,27 @@ namespace MyCAM
 
 		void m_tsmiPlane_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.Plane );
+			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.Plane );
 		}
 
 		void m_tsmiPlanePar_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.PlaneParallel );
+			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.PlaneParallel );
 		}
 
 		void m_tsmiAxial_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.Axial );
+			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.Axial );
 		}
 
 		void m_tsmiAxialPar_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.AxialParallel );
+			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.AxialParallel );
 		}
 
 		void m_tsmiPointCoincide_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ApplyManualTransform( EConstraintType.Point );
+			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.Point );
 		}
 
 		void m_tsmiTransformOK_Click( object sender, EventArgs e )
@@ -212,8 +214,7 @@ namespace MyCAM
 		{
 			m_msCAM.Enabled = true;
 			m_msCAD.Enabled = false;
-			m_CADEditor.EditEnd();
-			m_CAMEditor.EditStart();
+			SwitchEditor( EEditorType.CAM );
 		}
 
 		// add path
@@ -320,14 +321,13 @@ namespace MyCAM
 		{
 			m_msCAM.Enabled = false;
 			m_msCAD.Enabled = true;
-			m_CAMEditor.EditEnd();
-			m_CADEditor.EditStart();
+			SwitchEditor( EEditorType.CAD );
 		}
 
 		// convert NC
 		void m_tsmiCAMOK_Click( object sender, EventArgs e )
 		{
-			NCWriter writer = new NCWriter( m_CADManager.GetCAMDataList(), m_CADManager.MachineData );
+			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
 			writer.Convert();
 
 			// simulation
@@ -391,6 +391,42 @@ namespace MyCAM
 			m_msCAD.Enabled = true;
 		}
 		#endregion
+
+		// switch editor
+		void SwitchEditor( EEditorType type )
+		{
+			// no current editor
+			if( m_CurrentEditor == null ) {
+				m_CurrentEditor = GetEditor( type );
+				m_CurrentEditor?.EditStart();
+				return;
+			}
+			else {
+				// same editor
+				if( m_CurrentEditor.Type == type ) {
+					return;
+				}
+
+				// different editor
+				m_CurrentEditor.EditEnd();
+				m_CurrentEditor = GetEditor( type );
+				m_CurrentEditor?.EditStart();
+			}
+		}
+
+		IEditor GetEditor( EEditorType type )
+		{
+			switch( type ) {
+				case EEditorType.CAD:
+					return m_CADEditor;
+				case EEditorType.CAM:
+					return m_CAMEditor;
+				case EEditorType.Simulation:
+					return m_SimuEditor;
+				default:
+					return null;
+			}
+		}
 
 		#region Get machine data
 

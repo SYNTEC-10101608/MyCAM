@@ -8,17 +8,17 @@ namespace MyCAM.Editor
 {
 	internal class TransformHelper
 	{
-		public TransformHelper( Viewer viewer, DataManager cadManager, ViewManager viewManager, gp_Trsf trsf )
+		public TransformHelper( Viewer viewer, DataManager dataManager, ViewManager viewManager, gp_Trsf trsf )
 		{
 			m_Viewer = viewer;
-			m_CADManager = cadManager;
+			m_DataManager = dataManager;
 			m_ViewManager = viewManager;
 			m_3PTransform = trsf;
 		}
 
 		public void TransformData()
 		{
-			foreach( var oneData in m_CADManager.ShapeDataMap ) {
+			foreach( var oneData in m_DataManager.ShapeDataMap ) {
 				oneData.Value.DoTransform( m_3PTransform );
 				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ oneData.Key ].AISHandle );
 				if( oneAIS == null || oneAIS.IsNull() ) {
@@ -31,7 +31,7 @@ namespace MyCAM.Editor
 		}
 
 		Viewer m_Viewer;
-		DataManager m_CADManager;
+		DataManager m_DataManager;
 		ViewManager m_ViewManager;
 		gp_Trsf m_3PTransform;
 	}

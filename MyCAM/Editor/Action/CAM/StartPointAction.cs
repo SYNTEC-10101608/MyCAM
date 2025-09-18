@@ -7,9 +7,9 @@ namespace MyCAM.Editor
 {
 	internal class StartPointAction : IndexSelectAction
 	{
-		public StartPointAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			CAMData camData )
-			: base( viewer, treeView, cadManager, viewManager, camData )
+			: base( dataManager, viewer, treeView, viewManager, camData )
 		{
 		}
 

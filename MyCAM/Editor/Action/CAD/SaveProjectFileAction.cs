@@ -1,6 +1,5 @@
 ﻿using MyCAM.Data;
 using MyCAM.FileManager;
-using OCCViewer;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -10,14 +9,22 @@ namespace MyCAM.Editor
 {
 	internal class SaveProjectFileAction : EditActionBase
 	{
-		public SaveProjectFileAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public SaveProjectFileAction( DataManager dataManager )
+			: base( dataManager )
 		{
+		}
+
+		public override EditActionType ActionType
+		{
+			get
+			{
+				return EditActionType.SaveProjectFile;
+			}
 		}
 
 		public override void Start()
 		{
-			if( m_CADManager.PartIDList.Count == 0 ) {
+			if( m_DataManager.PartIDList.Count == 0 ) {
 				End();
 				return;
 			}
@@ -30,7 +37,7 @@ namespace MyCAM.Editor
 				// avoid writing error
 				try {
 					// turn data manager to dto
-					DataManagerDTO dataManagerDTO = new DataManagerDTO( m_CADManager );
+					DataManagerDTO dataManagerDTO = new DataManagerDTO( m_DataManager );
 
 					// serialize to XML
 					XmlSerializer serializer = new XmlSerializer( typeof( DataManagerDTO ) );
@@ -47,44 +54,6 @@ namespace MyCAM.Editor
 				}
 			}
 			End();
-		}
-
-		public override EditActionType ActionType
-		{
-			get
-			{
-				return EditActionType.SaveProjectFile;
-			}
-		}
-
-		protected override void ViewerMouseMove( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerMouseUp( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerMouseDown( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerKeyDown( KeyEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
-		{
-			// do nothing
 		}
 
 		static string GetProjectFileInfo()

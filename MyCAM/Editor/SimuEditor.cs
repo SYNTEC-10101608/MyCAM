@@ -10,29 +10,17 @@ using OCC.Quantity;
 using OCC.RWStl;
 using OCC.TColStd;
 using OCCViewer;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class SimuEditor
+	internal class SimuEditor : EditorBase
 	{
-		public SimuEditor( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
+		public SimuEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
-			if( viewer == null || treeView == null || cadManager == null || viewManager == null ) {
-				throw new ArgumentNullException( "CAMEditor consturcting argument null." );
-			}
-
-			// data manager
-			m_CADManager = cadManager;
-
-			// user interface
-			m_Viewer = viewer;
-			m_TreeView = treeView;
-			m_ViewManager = viewManager;
-
 			// init frame transform map
 			m_FrameTransformMap[ MachineComponentType.Base ] = new List<gp_Trsf>();
 			m_FrameTransformMap[ MachineComponentType.XAxis ] = new List<gp_Trsf>();
@@ -54,33 +42,39 @@ namespace MyCAM.Editor
 			m_FrameCollisionMap[ MachineComponentType.WorkPiece ] = new List<bool>();
 		}
 
-		// data manager
-		DataManager m_CADManager;
-
-		// user interface
-		Viewer m_Viewer;
-		TreeView m_TreeView;
-		ViewManager m_ViewManager;
-
 		// simulation properties
 		MachineData m_MachineData;
 		PostSolver m_PostSolver;
 		CollisionSolver m_FCLTest;
+
+		// read from machine data
 		HashSet<MachineComponentType> m_WorkPieceChainSet = new HashSet<MachineComponentType>();
 		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
 		Dictionary<MachineComponentType, AIS_InteractiveObject> m_MachineShapeMap = new Dictionary<MachineComponentType, AIS_InteractiveObject>();
+
+		// calculated result
 		Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 		Dictionary<MachineComponentType, List<bool>> m_FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
+
+		// frame control
 		int m_FrameCount = 0;
 		int m_CurrentFrameIndex = 0;
 
 		// editor
-		public void EditStart()
+		public override EEditorType Type
+		{
+			get
+			{
+				return EEditorType.Simulation;
+			}
+		}
+
+		public override void EditStart()
 		{
 			m_Viewer.KeyDown += OnKeyDown;
 		}
 
-		public void EditEnd()
+		public override void EditEnd()
 		{
 			m_Viewer.KeyDown -= OnKeyDown;
 		}
@@ -110,10 +104,10 @@ namespace MyCAM.Editor
 
 		public void BuildSimuData()
 		{
-			if( m_CADManager.GetCAMDataList().Count == 0 || m_PostSolver == null ) {
+			if( m_DataManager.GetCAMDataList().Count == 0 || m_PostSolver == null ) {
 				return;
 			}
-			foreach( CAMData camData in m_CADManager.GetCAMDataList() ) {
+			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				gp_Vec G54Offset = new gp_Vec( 40, -385, -640 );
 				m_PostSolver.G54Offset = G54Offset;
 				if( PostHelper.SolvePath( m_PostSolver, camData, out PostData simuPostData, out _ ) == false ) {
@@ -329,7 +323,7 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Tool ], false );
 
 			// make workpiece
-			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_CADManager.PartIDList[ 0 ] ].AISHandle as AIS_Shape;
+			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_DataManager.PartIDList[ 0 ] ].AISHandle as AIS_Shape;
 			m_Viewer.UpdateView();
 		}
 
@@ -574,7 +568,7 @@ namespace MyCAM.Editor
 			return result;
 		}
 
-		// TODO: this is temporary foe testing
+		// TODO: this is temporary for testing
 		void OnKeyDown( KeyEventArgs e )
 		{
 			// import
@@ -599,7 +593,7 @@ namespace MyCAM.Editor
 
 			// export NC
 			if( e.Control && e.KeyCode == Keys.E ) {
-				NCWriter writer = new NCWriter( m_CADManager.GetCAMDataList(), m_CADManager.MachineData );
+				NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
 				writer.Convert();
 			}
 		}

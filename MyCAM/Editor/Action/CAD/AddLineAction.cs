@@ -10,11 +10,16 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class AddLineAction : EditActionBase
+	internal enum AddLineType
 	{
-		public AddLineAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager,
+		TwoVertexConnectLine = 0,
+	}
+
+	internal class AddLineAction : KeyMouseActionBase
+	{
+		public AddLineAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			AddLineType addLineType )
-			: base( viewer, treeView, cadManager, viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			m_AddLineType = addLineType;
 		}
@@ -30,7 +35,7 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = false;
 
 			// activate edge slection mode
-			foreach( var partID in m_CADManager.PartIDList ) {
+			foreach( var partID in m_DataManager.PartIDList ) {
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
 				}
@@ -130,7 +135,7 @@ namespace MyCAM.Editor
 				MessageBox.Show( "Invalid Point" );
 				return false;
 			}
-			m_CADManager.AddReferenceFeature( edge );
+			m_DataManager.AddReferenceFeature( edge );
 			return true;
 		}
 

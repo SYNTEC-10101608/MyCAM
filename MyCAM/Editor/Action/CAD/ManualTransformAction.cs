@@ -14,10 +14,19 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class ManualTransformAction : EditActionBase
+	internal enum ETrsfConstraintType
 	{
-		public ManualTransformAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		Axial,
+		AxialParallel,
+		Plane,
+		PlaneParallel,
+		Point,
+	}
+
+	internal class ManualTransformAction : KeyMouseActionBase
+	{
+		public ManualTransformAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			// make a coordinate system as reference
 			MakeG54Coord();
@@ -42,7 +51,7 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = false;
 
 			// activate
-			foreach( var partID in m_CADManager.PartIDList ) {
+			foreach( var partID in m_DataManager.PartIDList ) {
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
 				}
@@ -109,7 +118,7 @@ namespace MyCAM.Editor
 			// do nothing
 		}
 
-		public void ApplyTransform( EConstraintType type )
+		public void ApplyTransform( ETrsfConstraintType type )
 		{
 			SetConstraint( type );
 		}
@@ -285,13 +294,13 @@ namespace MyCAM.Editor
 					}
 					expRef.Next();
 				}
-				foreach( var partID in m_CADManager.PartIDList ) {
+				foreach( var partID in m_DataManager.PartIDList ) {
 
 					// skip invisible objects
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_FACE );
+					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_FACE );
 					while( expMove.More() ) {
 						TopoDS_Shape face = expMove.Current();
 						if( sel.IsEqual( face ) ) {
@@ -312,13 +321,13 @@ namespace MyCAM.Editor
 					}
 					expRef.Next();
 				}
-				foreach( var partID in m_CADManager.PartIDList ) {
+				foreach( var partID in m_DataManager.PartIDList ) {
 
 					// skip invisible objects
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
+					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
 					while( expMove.More() ) {
 						TopoDS_Shape face = expMove.Current();
 						if( sel.IsEqual( face ) ) {
@@ -339,13 +348,13 @@ namespace MyCAM.Editor
 					}
 					expRef.Next();
 				}
-				foreach( var partID in m_CADManager.PartIDList ) {
+				foreach( var partID in m_DataManager.PartIDList ) {
 
 					// skip invisible objects
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_CADManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
+					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
 					while( expMove.More() ) {
 						TopoDS_Shape vertex = expMove.Current();
 						if( sel.IsEqual( vertex ) ) {
@@ -358,7 +367,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void SetConstraint( EConstraintType type )
+		void SetConstraint( ETrsfConstraintType type )
 		{
 			GetRefAndMoveObject( out TopoDS_Shape refShape, out TopoDS_Shape moveShape );
 			if( refShape == null || moveShape == null ) {
@@ -368,19 +377,19 @@ namespace MyCAM.Editor
 			// create constraint
 			IConstraint c = null;
 			switch( type ) {
-				case EConstraintType.Axial:
+				case ETrsfConstraintType.Axial:
 					c = new AxialConstraint( refShape, moveShape );
 					break;
-				case EConstraintType.AxialParallel:
+				case ETrsfConstraintType.AxialParallel:
 					c = new AxialParallelConstraint( refShape, moveShape );
 					break;
-				case EConstraintType.Plane:
+				case ETrsfConstraintType.Plane:
 					c = new PlaneConstraint( refShape, moveShape );
 					break;
-				case EConstraintType.PlaneParallel:
+				case ETrsfConstraintType.PlaneParallel:
 					c = new PlaneParallelConstraint( refShape, moveShape );
 					break;
-				case EConstraintType.Point:
+				case ETrsfConstraintType.Point:
 					c = new PointConstraint( refShape, moveShape );
 					break;
 				default:
@@ -397,7 +406,7 @@ namespace MyCAM.Editor
 
 		void ApplyTransform( gp_Trsf trsf )
 		{
-			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_CADManager, m_ViewManager, trsf );
+			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, trsf );
 			transformHelper.TransformData();
 		}
 

@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class SelectFaceAction : EditActionBase
+	internal class SelectFaceAction : KeyMouseActionBase
 	{
 		class FaceHandle
 		{
@@ -28,16 +28,16 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public SelectFaceAction( Viewer viewer, TreeView treeView, DataManager cadManager, ViewManager viewManager )
-			: base( viewer, treeView, cadManager, viewManager )
+		public SelectFaceAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+			: base( dataManager, viewer, treeView, viewManager )
 		{
 			m_VisibleFaceAISPairList = new List<FaceHandle>();
 			m_EdgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-			foreach( var partID in m_CADManager.PartIDList ) {
+			foreach( var partID in m_DataManager.PartIDList ) {
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
 				}
-				TopoDS_Shape oneshape = m_CADManager.ShapeDataMap[ partID ].Shape;
+				TopoDS_Shape oneshape = m_DataManager.ShapeDataMap[ partID ].Shape;
 
 				// collect all faces
 				TopExp_Explorer exp = new TopExp_Explorer( oneshape, TopAbs_ShapeEnum.TopAbs_FACE );
