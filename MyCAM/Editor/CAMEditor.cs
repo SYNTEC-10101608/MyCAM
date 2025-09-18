@@ -645,8 +645,8 @@ namespace MyCAM.Editor
 				}
 
 				// tool down + follow safe + tool up AIS lines
-				m_TraverseAISList.AddRange( GetAISLineList( cutDownPointList, Quantity_NameOfColor.Quantity_NOC_WHITE, 1, 0.5 ) );
-				m_TraverseAISList.AddRange( GetAISLineList( liftUpPointList, Quantity_NameOfColor.Quantity_NOC_ORANGE, 1, 0.5 ) );
+				m_TraverseAISList.AddRange( GetAISLineList( cutDownPointList, Quantity_NameOfColor.Quantity_NOC_WHITE, 1, 0.5, true ) );
+				m_TraverseAISList.AddRange( GetAISLineList( liftUpPointList, Quantity_NameOfColor.Quantity_NOC_ORANGE, 1, 0.5, true ) );
 			}
 
 			// Display all lines
