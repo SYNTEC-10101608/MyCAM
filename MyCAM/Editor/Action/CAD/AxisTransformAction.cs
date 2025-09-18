@@ -16,6 +16,10 @@ namespace MyCAM.Editor
 		public AxisTransformAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
+			m_RotationCenter = new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
+			m_Manipulator = new AIS_Manipulator();
+			m_AccumulatedTrsf = new gp_Trsf();
+			m_OneTimeTrsf = new gp_Trsf();
 		}
 
 		public override EditActionType ActionType
@@ -157,7 +161,7 @@ namespace MyCAM.Editor
 		void CreateManipulator()
 		{
 			// create a manipulator for the selected object
-			m_Manipulator = new AIS_Manipulator();
+
 			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Translation, true );
 			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Rotation, true );
 			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Scaling, false );
@@ -171,10 +175,9 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().UpdateCurrentViewer();
 		}
 
-		List<string> m_HidePartID = new List<string>();
-		gp_Ax2 m_RotationCenter = new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
-		gp_Trsf m_AccumulatedTrsf = new gp_Trsf();
-		gp_Trsf m_OneTimeTrsf = new gp_Trsf();
+		gp_Ax2 m_RotationCenter;
+		gp_Trsf m_AccumulatedTrsf;
+		gp_Trsf m_OneTimeTrsf;
 		AIS_Manipulator m_Manipulator;
 		AIS_Shape m_RefAISShape;
 		const double STEP_ROTATION_ANGLE_DEG = 15;
