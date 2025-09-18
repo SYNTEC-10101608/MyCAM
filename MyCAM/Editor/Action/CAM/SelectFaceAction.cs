@@ -136,31 +136,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		protected override void ViewerMouseMove( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerMouseUp( MouseEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void ViewerKeyDown( KeyEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
-		{
-			// do nothing
-		}
-
 		public void SelectD1ContFace()
 		{
 			List<TopoDS_Face> faceBFSQueue = GetSelectedFace();

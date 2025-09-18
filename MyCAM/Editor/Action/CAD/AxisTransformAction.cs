@@ -80,16 +80,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			// do nothing
-		}
-
-		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
-		{
-			// do nothing
-		}
-
 		public void TransformDone()
 		{
 			FinalCanvasRefresh();
