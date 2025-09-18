@@ -111,12 +111,10 @@ namespace MyCAM.Editor
 				// add a new shape to the viewer
 				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ShapeDataMap[ szNewPathDataID ].Shape );
 				m_ViewManager.ViewObjectMap.Add( szNewPathDataID, new ViewObject( aisShape ) );
-				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
 
 			// update tree view and viewer
 			m_ViewManager.PartNode.ExpandAll();
-			m_ViewManager.PathNode.ExpandAll();
 			m_Viewer.UpdateView();
 		}
 

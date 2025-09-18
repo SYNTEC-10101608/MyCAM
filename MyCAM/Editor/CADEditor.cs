@@ -49,6 +49,7 @@ namespace MyCAM.Editor
 
 			// init tree
 			m_TreeView.Nodes.Add( m_ViewManager.PartNode );
+			m_ViewManager.PartNode.ExpandAll();
 		}
 
 		public override void EditEnd()
