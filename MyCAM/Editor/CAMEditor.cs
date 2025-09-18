@@ -69,6 +69,7 @@ namespace MyCAM.Editor
 
 			// init tree
 			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
+			m_ViewManager.PathNode.ExpandAll();
 
 			// init viewer
 			foreach( var pathID in m_DataManager.PathIDList ) {
