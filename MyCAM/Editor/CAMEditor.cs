@@ -33,9 +33,9 @@ namespace MyCAM.Editor
 		{
 			m_DataManager.PathAdded += OnPathAdded;
 
-			// default action
-			m_DefaultAction = new DefaultAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Path );
-			( m_DefaultAction as DefaultAction ).TreeSelectionChange += OnTreeSelectionChange;
+			// default action is select object action
+			m_DefaultAction = new SelectObjectAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Path );
+			( m_DefaultAction as SelectObjectAction ).TreeSelectionChange += OnTreeSelectionChange;
 		}
 
 		// for viewer resource handle
@@ -69,6 +69,7 @@ namespace MyCAM.Editor
 
 			// init tree
 			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
+			m_ViewManager.PathNode.ExpandAll();
 
 			// init viewer
 			foreach( var pathID in m_DataManager.PathIDList ) {
@@ -168,7 +169,7 @@ namespace MyCAM.Editor
 
 		public void RemovePath()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			string szPathID = GetSelectedPathID();
@@ -194,7 +195,7 @@ namespace MyCAM.Editor
 
 		public void SetStartPoint()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			string szPathID = GetSelectedPathID();
@@ -214,7 +215,7 @@ namespace MyCAM.Editor
 
 		public void SetReverse()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			string szPathID = GetSelectedPathID();
@@ -230,7 +231,7 @@ namespace MyCAM.Editor
 
 		public void SetOverCut()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			string szPathID = GetSelectedPathID();
@@ -245,7 +246,7 @@ namespace MyCAM.Editor
 
 		public void SetLeadLine()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			string szPathID = GetSelectedPathID();
@@ -260,7 +261,7 @@ namespace MyCAM.Editor
 
 		public void ChangeLeadDirection()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			string szPathID = GetSelectedPathID();
@@ -283,7 +284,7 @@ namespace MyCAM.Editor
 
 		public void SetToolVec()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			string szPathID = GetSelectedPathID();
@@ -298,7 +299,7 @@ namespace MyCAM.Editor
 
 		public void SetToolVecReverse()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			string szPathID = GetSelectedPathID();
@@ -314,7 +315,7 @@ namespace MyCAM.Editor
 
 		public void SeTraverseParam()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			TraverseAction action = new TraverseAction( m_DataManager );
@@ -327,7 +328,7 @@ namespace MyCAM.Editor
 		// TODO: refresh tree
 		public void MoveProcess( bool bUp )
 		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			string szPathID = GetSelectedPathID();
@@ -384,7 +385,7 @@ namespace MyCAM.Editor
 		// tree selection changed
 		void OnTreeSelectionChange()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.Default ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			string szPathID = GetSelectedPathID();
