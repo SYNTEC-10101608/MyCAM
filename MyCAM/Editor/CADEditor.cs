@@ -28,8 +28,8 @@ namespace MyCAM.Editor
 			m_DataManager.PartChanged += OnPartChanged;
 			m_DataManager.FeatureAdded += OnFeatureAdded;
 
-			// default action
-			m_DefaultAction = new DefaultAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Part );
+			// default action is select object action
+			m_DefaultAction = new SelectObjectAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Part );
 		}
 
 		public Action<EActionStatus> AxisTransformActionStausChanged;
@@ -49,6 +49,7 @@ namespace MyCAM.Editor
 
 			// init tree
 			m_TreeView.Nodes.Add( m_ViewManager.PartNode );
+			m_ViewManager.PartNode.ExpandAll();
 		}
 
 		public override void EditEnd()

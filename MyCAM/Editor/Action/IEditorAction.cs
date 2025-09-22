@@ -13,8 +13,8 @@ namespace MyCAM.Editor
 
 	internal enum EditActionType
 	{
-		// default
-		Default,
+		// select object
+		SelectObject,
 
 		// CAD
 		AddPoint,
@@ -140,17 +140,35 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		protected abstract void ViewerMouseDown( MouseEventArgs e );
+		protected virtual void ViewerMouseDown( MouseEventArgs e )
+		{
+			// do nothing and wait for hook
+		}
 
-		protected abstract void ViewerMouseMove( MouseEventArgs e );
+		protected virtual void ViewerMouseMove( MouseEventArgs e )
+		{
+			// do nothing and wait for hook
+		}
 
-		protected abstract void ViewerMouseUp( MouseEventArgs e );
+		protected virtual void ViewerMouseUp( MouseEventArgs e )
+		{
+			// do nothing and wait for hook
+		}
 
-		protected abstract void ViewerKeyDown( KeyEventArgs e );
+		protected virtual void ViewerKeyDown( KeyEventArgs e )
+		{
+			// do nothing and wait for hook
+		}
 
-		protected abstract void TreeViewAfterSelect( object sender, TreeViewEventArgs e );
+		protected virtual void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
+		{
+			// do nothing and wait for hook
+		}
 
-		protected abstract void TreeViewKeyDown( object sender, KeyEventArgs e );
+		protected virtual void TreeViewKeyDown( object sender, KeyEventArgs e )
+		{
+			// do nothing and wait for hook
+		}
 
 		protected Viewer m_Viewer;
 		protected TreeView m_TreeView;
