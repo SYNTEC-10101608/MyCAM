@@ -12,7 +12,7 @@ namespace MyCAM.FileManager
 		[XmlElement( "SpindleTypeMachineDataDTO", typeof( SpindleTypeMachineDataDTO ) )]
 		[XmlElement( "TableTypeMachineDataDTO", typeof( TableTypeMachineDataDTO ) )]
 		[XmlElement( "MixTypeMachineDataDTO", typeof( MixTypeMachineDataDTO ) )]
-		public MachineDataDTO machineDataDTO
+		public MachineDataDTO MachineDataDTO
 		{
 			get; set;
 		} = new MachineDataDTO();
@@ -44,15 +44,15 @@ namespace MyCAM.FileManager
 					machinDataDTO = new MachineDataDTO( machineData );
 					break;
 			}
-			return new MachineDataDTOContainer { machineDataDTO = machinDataDTO };
+			return new MachineDataDTOContainer { MachineDataDTO = machinDataDTO };
 		}
 
 		internal static MachineData ToMachineData( MachineDataDTOContainer container )
 		{
-			if( container == null || container.machineDataDTO == null ) {
+			if( container == null || container.MachineDataDTO == null ) {
 				throw new ArgumentNullException( "MachineDataDTOConatiner deserialization failed." );
 			}
-			switch( container.machineDataDTO ) {
+			switch( container.MachineDataDTO ) {
 				case SpindleTypeMachineDataDTO spindleDTO:
 					return spindleDTO.ToSpindleTypeMachineData();
 				case TableTypeMachineDataDTO tableDTO:

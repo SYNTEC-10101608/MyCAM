@@ -20,14 +20,14 @@ namespace MyCAM.Editor.Dialog
 
 			// set lead type must be the last step, cause it will trigger event but u need need length and angle
 			switch( m_LeadParam.LeadIn.Type ) {
-				case LeadType.LeadLineType.Line:
-					m_cbxLeadInType.SelectedIndex = (int)LeadType.LeadLineType.Line;
+				case LeadLineType.Line:
+					m_cbxLeadInType.SelectedIndex = (int)LeadLineType.Line;
 					break;
-				case LeadType.LeadLineType.Arc:
-					m_cbxLeadInType.SelectedIndex = (int)LeadType.LeadLineType.Arc;
+				case LeadLineType.Arc:
+					m_cbxLeadInType.SelectedIndex = (int)LeadLineType.Arc;
 					break;
 				default:
-					m_cbxLeadInType.SelectedIndex = (int)LeadType.LeadLineType.None;
+					m_cbxLeadInType.SelectedIndex = (int)LeadLineType.None;
 					break;
 			}
 
@@ -37,14 +37,14 @@ namespace MyCAM.Editor.Dialog
 
 			// set lead type must be the last step, cause it will trigger event but u need need length and angle
 			switch( m_LeadParam.LeadOut.Type ) {
-				case LeadType.LeadLineType.Line:
-					m_cbxLeadOutType.SelectedIndex = (int)LeadType.LeadLineType.Line;
+				case LeadLineType.Line:
+					m_cbxLeadOutType.SelectedIndex = (int)LeadLineType.Line;
 					break;
-				case LeadType.LeadLineType.Arc:
-					m_cbxLeadOutType.SelectedIndex = (int)LeadType.LeadLineType.Arc;
+				case LeadLineType.Arc:
+					m_cbxLeadOutType.SelectedIndex = (int)LeadLineType.Arc;
 					break;
 				default:
-					m_cbxLeadOutType.SelectedIndex = (int)LeadType.LeadLineType.None;
+					m_cbxLeadOutType.SelectedIndex = (int)LeadLineType.None;
 					break;
 			}
 
@@ -80,10 +80,10 @@ namespace MyCAM.Editor.Dialog
 
 		void HandleLeadTypeChange( ComboBox comboBox, TextBox tbxLength, TextBox tbxAngle, LeadParam leadData )
 		{
-			leadData.Type = (LeadType.LeadLineType)comboBox.SelectedIndex;
+			leadData.Type = (LeadLineType)comboBox.SelectedIndex;
 
 			switch( leadData.Type ) {
-				case LeadType.LeadLineType.None:
+				case LeadLineType.None:
 					tbxLength.Enabled = false;
 					tbxAngle.Enabled = false;
 					break;
@@ -103,8 +103,8 @@ namespace MyCAM.Editor.Dialog
 
 					// get legal param
 					if( double.TryParse( tbxAngle.Text, out double dAngle ) ) {
-						if( ( leadData.Type == LeadType.LeadLineType.Arc && IsValidArcAngle( dAngle ) ) ||
-							( leadData.Type == LeadType.LeadLineType.Line && IsValidStraightLineAngle( dAngle ) ) ) {
+						if( ( leadData.Type == LeadLineType.Arc && IsValidArcAngle( dAngle ) ) ||
+							( leadData.Type == LeadLineType.Line && IsValidStraightLineAngle( dAngle ) ) ) {
 							dLegalAngle = dAngle;
 						}
 					}
@@ -138,7 +138,7 @@ namespace MyCAM.Editor.Dialog
 
 		bool ValidateLeadParam( LeadParam leadData, TextBox tbxLength, TextBox tbxAngle, string paramName )
 		{
-			if( leadData.Type == LeadType.LeadLineType.None ) {
+			if( leadData.Type == LeadLineType.None ) {
 				leadData.Length = DEFAULT_Value;
 				leadData.Angle = DEFAULT_Value;
 				return true;
@@ -153,13 +153,13 @@ namespace MyCAM.Editor.Dialog
 				return false;
 			}
 			switch( leadData.Type ) {
-				case LeadType.LeadLineType.Line:
+				case LeadLineType.Line:
 					if( !IsValidStraightLineAngle( dAngle ) ) {
 						MessageBox.Show( $"{paramName}: angle must be in range (0 ~ 180)" );
 						return false;
 					}
 					break;
-				case LeadType.LeadLineType.Arc:
+				case LeadLineType.Arc:
 					if( !IsValidArcAngle( dAngle ) ) {
 						MessageBox.Show( $"{paramName}: angle must be in range [0 ~ 180)" );
 						return false;

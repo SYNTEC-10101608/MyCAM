@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using static MyCAM.Data.DataManager;
 
 namespace MyCAM.Editor
 {

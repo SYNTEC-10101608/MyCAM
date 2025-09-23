@@ -1,17 +1,17 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.IO;
+using System.Windows.Forms;
+using System.Xml.Linq;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
-using MyCAM.FileManager;
+using MyCAM.Helper;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
-using System;
-using System.IO;
-using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace MyCAM
 {
@@ -50,7 +50,10 @@ namespace MyCAM
 
 			// CAD Manager
 			if( GetMachineDataSuccess( out MachineData machineData ) ) {
-				m_DataManager = new DataManager( machineData );
+				m_DataManager = new DataManager
+				{
+					MachineData = machineData
+				};
 			}
 			else {
 				// get machine data fail, machine will be null(can't use)
@@ -438,23 +441,33 @@ namespace MyCAM
 			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
 			string filePath = Path.Combine( exeDir, "MachineData.mac" );
 			if( !File.Exists( filePath ) ) {
-				Console.WriteLine( $"檔案不存在" );
 				return false;
 			}
 			try {
-				XmlSerializer serializer = new XmlSerializer( typeof( MachineDataDTOContainer ) );
+				// load machine data document
+				XDocument machineDataDoc = XDocument.Load( filePath );
 
-				// get DTO from xml file
-				using( FileStream fileStream = new FileStream( filePath, FileMode.Open ) ) {
-					MachineDataDTOContainer machineDataDTO = (MachineDataDTOContainer)serializer.Deserialize( fileStream );
-
-					// turn back to MachineData
-					machineData = MachineDataDTOManager.ToMachineData( machineDataDTO );
-					return true;
+				// turn back to MachineData
+				machineData = MachineDataXMLHelper.ConvertMachineDataFileToMachineData( machineDataDoc, out EMachineDataLoadStatus status, out int nErrorPrIndex );
+				switch( status ) {
+					case EMachineDataLoadStatus.NullMachineDataNode:
+						MessageBox.Show( $"機構參數節點為空,使用默認機構參數", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						return false;
+					case EMachineDataLoadStatus.NullFile:
+						MessageBox.Show( $"機構檔案為空,使用默認機構參數", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						return false;
+					case EMachineDataLoadStatus.InvalidPrValue:
+						MessageBox.Show( $"機構參數錯誤(Pr:{nErrorPrIndex}),使用默認機構參數", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						return false;
+					case EMachineDataLoadStatus.TreeInvalid:
+						MessageBox.Show( $"機構樹結構錯誤,使用默認機構樹", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						return true;
+					default:
+						return true;
 				}
 			}
 			catch( Exception ex ) {
-				Console.WriteLine( $"讀取專案檔案失敗：\n{ex.Message}", "錯誤" );
+				MessageBox.Show( $"讀取機構檔案失敗：\n{ex.Message},使用默認機構參數", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
 				return false;
 			}
 		}
@@ -474,27 +487,96 @@ namespace MyCAM
 			machineData.ToolToMasterVec = new gp_Vec( 0, 101.2, 169.48 );
 			machineData.MCSToSlaveVec = new gp_Vec( 40.81, -384.80, -665.67 );
 
+			// build machine tree
+			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
+			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
+			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
+			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
+			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
+			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
+			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
+
+			machineData.RootNode.AddChild( YNode );
+			YNode.AddChild( SlaveNode );
+			SlaveNode.AddChild( WorkPieceNode );
+			machineData.RootNode.AddChild( XNode );
+			XNode.AddChild( ZNode );
+			ZNode.AddChild( MasterNode );
+			MasterNode.AddChild( ToolNode );
+
+
+			/*
+			SpindleTypeMachineData machineData = new SpindleTypeMachineData();
+			machineData.ToolDirection = ToolDirection.Z;
+			machineData.MasterRotaryAxis = RotaryAxis.Z;
+			machineData.SlaveRotaryAxis = RotaryAxis.X;
+			machineData.MasterRotaryDirection = RotaryDirection.RightHand;
+			machineData.SlaveRotaryDirection = RotaryDirection.RightHand;
+			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.ToolLength = 2.0;
+			machineData.ToolToSlaveVec = new gp_Vec( -101.20, -0.19, 169.43 );
+			machineData.SlaveToMasterVec = new gp_Vec( -252.70, 0, 362.98 ) - machineData.ToolToSlaveVec;
+			// build machine tree
+			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
+			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
+			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
+			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
+			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
+			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
+			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
+			machineData.RootNode.AddChild( XNode );
+			XNode.AddChild( YNode );
+			YNode.AddChild( ZNode );
+			ZNode.AddChild( MasterNode );
+			MasterNode.AddChild( SlaveNode );
+			SlaveNode.AddChild( ToolNode );
+			machineData.RootNode.AddChild( WorkPieceNode );
+			*/
+
+			/*
+			TableTypeMachineData machineData = new TableTypeMachineData();
+			machineData.ToolDirection = ToolDirection.Z;
+			machineData.MasterRotaryAxis = RotaryAxis.Y;
+			machineData.SlaveRotaryAxis = RotaryAxis.Z;
+			machineData.MasterRotaryDirection = RotaryDirection.LeftHand;
+			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
+			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
+			machineData.ToolLength = 2.0;
+			( machineData as TableTypeMachineData ).MCSToMasterVec = new gp_Vec( -80.51, 73.81, -129.55 );
+			( machineData as TableTypeMachineData ).MasterToSlaveVec = new gp_Vec( -80.43, -71.67, -94.55 ) - ( machineData as TableTypeMachineData ).MCSToMasterVec;
+
+			// build machine tree
+			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
+			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
+			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
+			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
+			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
+			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
+			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
+			machineData.RootNode.AddChild( YNode );
+			YNode.AddChild( XNode );
+			XNode.AddChild( MasterNode );
+			MasterNode.AddChild( SlaveNode );
+			SlaveNode.AddChild( WorkPieceNode );
+			machineData.RootNode.AddChild( ZNode );
+			ZNode.AddChild( ToolNode );
+			*/
+
 			// get exe directory
 			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
 			string filePath = Path.Combine( exeDir, "MachineData.mac" );
-
-			// turn MachineData to DTOContainer
-			MachineDataDTOContainer machinDataDTOContainer = MachineDataDTOManager.ToDTOContainer( machineData );
-			if( machinDataDTOContainer == null ) {
-				throw new ArgumentNullException( "MachineData 轉換成 DTOContainer 失敗。" );
+			try {
+				XDocument xmlDoc = MachineDataXMLHelper.ConvertMachineDataAndTree2XML( machineData );
+				xmlDoc.Save( filePath );
 			}
-			XmlSerializer serializer = new XmlSerializer( typeof( MachineDataDTOContainer ) );
-
-			// remove comment xmlns:xsd and xmlns:xsi
-			XmlSerializerNamespaces xmlNameSpace = new XmlSerializerNamespaces();
-			xmlNameSpace.Add( "", "" );
-
-			// write DTO to xml file
-			using( FileStream fileStream = new FileStream( filePath, FileMode.Create ) ) {
-				serializer.Serialize( fileStream, machinDataDTOContainer, xmlNameSpace );
+			catch( Exception ex ) {
+				MessageBox.Show( $"儲存機構檔案失敗：\n{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
 			}
 		}
-
-		#endregion
 	}
+
+	#endregion
 }
+

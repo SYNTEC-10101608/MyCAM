@@ -8,8 +8,6 @@ using OCC.BRep;
 using OCC.BRepTools;
 using OCC.gp;
 using OCC.TopoDS;
-using static MyCAM.Data.DataManager;
-using static MyCAM.Data.LeadType;
 
 namespace MyCAM.FileManager
 {

@@ -1,31 +1,55 @@
-<?xml version="1.0"?>
-<MachineDataDTO>
-  <TableTypeMachineDataDTO>
-    <ToolDirection>Z</ToolDirection>
-    <MasterRotaryAxis>Y</MasterRotaryAxis>
-    <SlaveRotaryAxis>Z</SlaveRotaryAxis>
-    <MasterRotaryDirection>LeftHand</MasterRotaryDirection>
-    <SlaveRotaryDirection>LeftHand</SlaveRotaryDirection>
-    <MasterTiltedVec_deg>
-      <X>0</X>
-      <Y>0</Y>
-      <Z>0</Z>
-    </MasterTiltedVec_deg>
-    <SlaveTiltedVec_deg>
-      <X>0</X>
-      <Y>0</Y>
-      <Z>0</Z>
-    </SlaveTiltedVec_deg>
-    <ToolLength>2</ToolLength>
-    <MasterToSlaveVec>
-      <X>0.0799999999999983</X>
-      <Y>-145.48000000000002</Y>
-      <Z>35.000000000000014</Z>
-    </MasterToSlaveVec>
-    <MCSToMasterVec>
-      <X>-80.51</X>
-      <Y>73.81</Y>
-      <Z>-129.55</Z>
-    </MCSToMasterVec>
-  </TableTypeMachineDataDTO>
-</MachineDataDTO>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<MachineDataFile>
+  <MachineData>
+    <Pr ID="3001" Value="2" />
+    <Pr ID="3002" Value="3" />
+    <Pr ID="3005" Value="2" />
+    <Pr ID="3006" Value="3" />
+    <Pr ID="3007" Value="2" />
+    <Pr ID="3008" Value="2" />
+    <Pr ID="3013" Value="2000" />
+    <Pr ID="3015" Value="0" />
+    <Pr ID="3016" Value="0" />
+    <Pr ID="3017" Value="0" />
+    <Pr ID="3018" Value="0" />
+    <Pr ID="3019" Value="0" />
+    <Pr ID="3020" Value="0" />
+    <!--Spindle Type-->
+    <Pr ID="3021" Value="0" />
+    <Pr ID="3022" Value="0" />
+    <Pr ID="3023" Value="0" />
+    <Pr ID="3024" Value="0" />
+    <Pr ID="3025" Value="0" />
+    <Pr ID="3026" Value="0" />
+    <!--Table Type-->
+    <Pr ID="3031" Value="79.9999999999983" />
+    <Pr ID="3032" Value="-145480.00000000003" />
+    <Pr ID="3033" Value="35000.000000000015" />
+    <Pr ID="3034" Value="-80510" />
+    <Pr ID="3035" Value="73810" />
+    <Pr ID="3036" Value="-129550.00000000001" />
+    <!--Mix Type-->
+    <Pr ID="3041" Value="0" />
+    <Pr ID="3042" Value="0" />
+    <Pr ID="3043" Value="0" />
+    <Pr ID="3044" Value="0" />
+    <Pr ID="3045" Value="0" />
+    <Pr ID="3046" Value="0" />
+  </MachineData>
+  <MachineTree>
+    <Child Type="Base">
+      <Child Type="YAxis">
+        <Child Type="XAxis">
+          <Child Type="Master">
+            <Child Type="Slave">
+              <Child Type="WorkPiece" />
+            </Child>
+          </Child>
+        </Child>
+      </Child>
+      <Child Type="ZAxis">
+        <Child Type="Tool" />
+      </Child>
+    </Child>
+  </MachineTree>
+</MachineDataFile>
