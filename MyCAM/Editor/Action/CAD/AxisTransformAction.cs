@@ -64,7 +64,6 @@ namespace MyCAM.Editor
 
 		protected override void ViewerMouseDown( MouseEventArgs e )
 		{
-			Console.WriteLine( m_Manipulator.ActiveMode().ToString() );
 			if( e.Button == MouseButtons.Left ) {
 				if( m_Manipulator.HasActiveMode() ) {
 					m_Manipulator.StartTransform( e.X, e.Y, m_Viewer.GetView() );
