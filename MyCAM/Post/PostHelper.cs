@@ -1,8 +1,8 @@
-﻿using MyCAM.Data;
-using OCC.gp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MyCAM.Data;
+using OCC.gp;
 
 namespace MyCAM.Post
 {
@@ -24,7 +24,7 @@ namespace MyCAM.Post
 			double dLastPointProcess_M = 0, dLastPointProcess_S = 0;
 
 			// lead-in
-			if( camData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None && camData.LeadInCAMPointList.Count > 0 ) {
+			if( camData.LeadLineParam.LeadIn.Type != LeadLineType.None && camData.LeadInCAMPointList.Count > 0 ) {
 				if( !SolveProcessPath( postSolver, camData.LeadInCAMPointList,
 					out List<PostPoint> leadInPost, out List<PostPoint> leadInMCS,
 					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
@@ -55,7 +55,7 @@ namespace MyCAM.Post
 			}
 
 			// lead-out
-			if( camData.LeadLineParam.LeadOut.Type != LeadType.LeadLineType.None && camData.LeadOutCAMPointList.Count > 0 ) {
+			if( camData.LeadLineParam.LeadOut.Type != LeadLineType.None && camData.LeadOutCAMPointList.Count > 0 ) {
 				if( !SolveProcessPath( postSolver, camData.LeadOutCAMPointList,
 					out List<PostPoint> leadOutPost, out List<PostPoint> leadOutMCS,
 					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {

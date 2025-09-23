@@ -450,7 +450,7 @@ namespace MyCAM.Editor
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 
 				// draw lead in
-				if( camData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None ) {
+				if( camData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
 					for( int i = 0; i < camData.LeadInCAMPointList.Count - 1; i++ ) {
 						CAMPoint currentCAMPoint = camData.LeadInCAMPointList[ i ];
 						CAMPoint nextCAMPoint = camData.LeadInCAMPointList[ i + 1 ];
@@ -460,7 +460,7 @@ namespace MyCAM.Editor
 				}
 
 				// draw lead out
-				if( camData.LeadLineParam.LeadOut.Type != LeadType.LeadLineType.None ) {
+				if( camData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
 					for( int i = 0; i < camData.LeadOutCAMPointList.Count - 1; i++ ) {
 						CAMPoint currentCAMPoint = camData.LeadOutCAMPointList[ i ];
 						CAMPoint nextCAMPoint = camData.LeadOutCAMPointList[ i + 1 ];
@@ -515,7 +515,7 @@ namespace MyCAM.Editor
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 
 				// path with lead in
-				if( camData.LeadLineParam.LeadIn.Type != LeadType.LeadLineType.None ) {
+				if( camData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
 					if( camData.LeadInCAMPointList.Count == 0 ) {
 						break;
 					}
@@ -526,7 +526,7 @@ namespace MyCAM.Editor
 				}
 
 				// path with lead out
-				if( camData.LeadLineParam.LeadOut.Type != LeadType.LeadLineType.None ) {
+				if( camData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
 					if( camData.LeadOutCAMPointList.Count == 0 ) {
 						break;
 					}

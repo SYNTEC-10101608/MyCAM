@@ -1,25 +1,22 @@
 ﻿namespace MyCAM.Data
 {
-	public class LeadType
+	public enum LeadLineType
 	{
-		public enum LeadLineType
-		{
-			None = 0,
-			Line,
-			Arc,
-		}
+		None = 0,
+		Line,
+		Arc,
 	}
 
 	public class LeadParam
 	{
-		public LeadParam( LeadType.LeadLineType type = LeadType.LeadLineType.None, double length = 0, double angle = 0 )
+		public LeadParam( LeadLineType type = LeadLineType.None, double length = 0, double angle = 0 )
 		{
 			Type = type;
 			Length = length;
 			Angle = angle;
 		}
 
-		public LeadType.LeadLineType Type
+		public LeadLineType Type
 		{
 			get; set;
 		}
@@ -37,7 +34,7 @@
 
 	public class LeadData
 	{
-		public LeadData( LeadType.LeadLineType leadInType = LeadType.LeadLineType.None, LeadType.LeadLineType leadOutType = LeadType.LeadLineType.None,
+		public LeadData( LeadLineType leadInType = LeadLineType.None, LeadLineType leadOutType = LeadLineType.None,
 			double dLeadInLength = 0, double dLeadInAngle = 0, double dLeadOutLength = 0, double dLeadOutAngle = 0, bool isChangeLeadDirection = false )
 		{
 			LeadIn = new LeadParam( leadInType, dLeadInLength, dLeadInAngle );

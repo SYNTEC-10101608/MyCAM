@@ -1,8 +1,11 @@
-﻿using OCC.gp;
+﻿using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
+using OCC.gp;
 
 namespace MyCAM.Data
 {
+	[Serializable]
 	internal class MachineTreeNode
 	{
 		public MachineTreeNode( MachineComponentType type )
@@ -11,11 +14,13 @@ namespace MyCAM.Data
 			Children = new List<MachineTreeNode>();
 		}
 
+		[XmlAttribute]
 		public MachineComponentType Type
 		{
 			get; private set;
 		}
 
+		[XmlElement( "Child" )]
 		public List<MachineTreeNode> Children
 		{
 			get; private set;
@@ -83,7 +88,7 @@ namespace MyCAM.Data
 
 		public MachineTreeNode RootNode
 		{
-			get; private set;
+			get; set;
 		}
 
 		public gp_Dir MasterRotateDir

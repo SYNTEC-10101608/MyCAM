@@ -8,6 +8,18 @@ using OCC.TopTools;
 
 namespace MyCAM.Data
 {
+	// TODO : temp struct for DTO transfer 
+	internal struct ShapeIDsStruct
+	{
+		public int Solid_ID;
+		public int Shell_ID;
+		public int Face_ID;
+		public int Wire_ID;
+		public int Edge_ID;
+		public int Vertex_ID;
+		public int Path_ID;
+	}
+
 	// part data, reference data
 	internal class DataManager
 	{
@@ -15,33 +27,13 @@ namespace MyCAM.Data
 		public Action<List<string>> FeatureAdded;
 		public Action<List<string>> PathAdded;
 
-		public struct ShapeIDsStruct
-		{
-			public int Solid_ID;
-			public int Shell_ID;
-			public int Face_ID;
-			public int Wire_ID;
-			public int Edge_ID;
-			public int Vertex_ID;
-			public int Path_ID;
-		}
-
 		// TODO: this is temp solution
-		public DataManager( MachineData machineData = null )
+		public DataManager()
 		{
 			ShapeDataMap = new Dictionary<string, ShapeData>();
 			PartIDList = new List<string>();
 			PathIDList = new List<string>();
-			m_MachineData = machineData ?? m_DefaultMachineData;
-		}
-
-		// to build manager from project filek
-		public DataManager( Dictionary<string, ShapeData> shapeDataMape, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct structShapeIDs )
-		{
-			ShapeDataMap = shapeDataMape;
-			PartIDList = partIDList;
-			PathIDList = pathIDList;
-			ResetShapeIDsByDTO( structShapeIDs );
+			m_MachineData = m_DefaultMachineData;
 		}
 
 		public void ResetDataManger( Dictionary<string, ShapeData> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, TraverseData traverseData )
@@ -110,6 +102,12 @@ namespace MyCAM.Data
 					return m_DefaultMachineData;
 				}
 				return m_MachineData;
+			}
+			set
+			{
+				if( value != null ) {
+					m_MachineData = value;
+				}
 			}
 		}
 

@@ -332,7 +332,7 @@ namespace MyCAM.Data
 				if( m_LeadParam == null ) {
 					return false;
 				}
-				return ( m_LeadParam.LeadIn.Type != LeadType.LeadLineType.None ) || ( m_LeadParam.LeadOut.Type != LeadType.LeadLineType.None );
+				return ( m_LeadParam.LeadIn.Type != LeadLineType.None ) || ( m_LeadParam.LeadOut.Type != LeadLineType.None );
 			}
 		}
 
@@ -867,10 +867,10 @@ namespace MyCAM.Data
 				return;
 			}
 			switch( m_LeadParam.LeadIn.Type ) {
-				case LeadType.LeadLineType.Line:
+				case LeadLineType.Line:
 					m_LeadInCAMPointList = LeadHelper.BuildStraightLeadLine( m_CAMPointList.First(), true, m_LeadParam.LeadIn.Length, m_LeadParam.LeadIn.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse );
 					break;
-				case LeadType.LeadLineType.Arc:
+				case LeadLineType.Arc:
 					m_LeadInCAMPointList = LeadHelper.BuildArcLeadLine( m_CAMPointList.First(), true, m_LeadParam.LeadIn.Length, m_LeadParam.LeadIn.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH );
 					break;
 				default:
@@ -894,10 +894,10 @@ namespace MyCAM.Data
 				leadOutStartPoint = m_CAMPointList.Last();
 			}
 			switch( m_LeadParam.LeadOut.Type ) {
-				case LeadType.LeadLineType.Line:
+				case LeadLineType.Line:
 					m_LeadOutCAMPointList = LeadHelper.BuildStraightLeadLine( leadOutStartPoint, false, m_LeadParam.LeadOut.Length, m_LeadParam.LeadOut.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse );
 					break;
-				case LeadType.LeadLineType.Arc:
+				case LeadLineType.Arc:
 					m_LeadOutCAMPointList = LeadHelper.BuildArcLeadLine( leadOutStartPoint, false, m_LeadParam.LeadOut.Length, m_LeadParam.LeadOut.Angle, m_LeadParam.IsChangeLeadDirection, m_IsReverse, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH );
 					break;
 				default:
