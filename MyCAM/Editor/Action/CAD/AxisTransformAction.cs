@@ -36,7 +36,7 @@ namespace MyCAM.Editor
 			// disable tree view
 			m_TreeView.Enabled = false;
 
-			List<TopoDS_Shape> shpaeList = new List<TopoDS_Shape>();
+			// hide all visible parts
 			foreach( string szID in m_DataManager.PartIDList ) {
 				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
 				if( viewObject.Visible == false ) {
@@ -44,6 +44,8 @@ namespace MyCAM.Editor
 				}
 				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
 			}
+			ShowManipulationShape();
+			m_Viewer.UpdateView();
 		}
 
 		public override void End()
@@ -51,14 +53,16 @@ namespace MyCAM.Editor
 			// enable tree view
 			m_TreeView.Enabled = true;
 
+			// show all visible parts
 			foreach( string szID in m_DataManager.PartIDList ) {
 				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
 				if( viewObject.Visible ) {
 					m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
+					m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
 				}
 			}
+			HideManipulationShape();
 			m_Viewer.UpdateView();
-
 			base.End();
 		}
 
@@ -116,8 +120,6 @@ namespace MyCAM.Editor
 
 		public void TransformDone()
 		{
-			m_Manipulator.Detach();
-			m_Viewer.GetAISContext().Remove( m_RefAISShape, false );
 			ApplyTransform( m_AccumulatedTrsf );
 			End();
 		}
@@ -126,6 +128,20 @@ namespace MyCAM.Editor
 		{
 			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, trsf );
 			transformHelper.TransformData();
+		}
+
+		void ShowManipulationShape()
+		{
+			m_Viewer.GetAISContext().Display( m_RefAISShape, false );
+			m_Viewer.GetAISContext().Deactivate( m_RefAISShape );
+			m_Manipulator.Attach( m_RefAISShape );
+			m_Manipulator.SetModeActivationOnDetection( true );
+		}
+
+		void HideManipulationShape()
+		{
+			m_Manipulator.Detach();
+			m_Viewer.GetAISContext().Remove( m_RefAISShape, false );
 		}
 
 		void CreateRotationCenter()
@@ -157,8 +173,6 @@ namespace MyCAM.Editor
 
 			// display the compound shape as reference
 			m_RefAISShape = ViewHelper.CreatePartAIS( compound );
-			m_Viewer.GetAISContext().Display( m_RefAISShape, false );
-			m_Viewer.GetAISContext().Deactivate( m_RefAISShape );
 		}
 
 		void CreateManipulator()
@@ -173,9 +187,6 @@ namespace MyCAM.Editor
 			m_Manipulator.EnableMode( AIS_ManipulatorMode.AIS_MM_Translation );
 			m_Manipulator.EnableMode( AIS_ManipulatorMode.AIS_MM_Rotation );
 			m_Manipulator.SetRotationSteps( STEP_ROTATION_ANGLE_DEG * Math.PI / 180.0 );
-			m_Manipulator.Attach( m_RefAISShape );
-			m_Manipulator.SetModeActivationOnDetection( true );
-			m_Viewer.UpdateView();
 		}
 
 		gp_Ax2 m_RotationCenter;
