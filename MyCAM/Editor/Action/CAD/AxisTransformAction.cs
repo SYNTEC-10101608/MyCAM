@@ -16,10 +16,9 @@ namespace MyCAM.Editor
 		public AxisTransformAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
-			m_RotationCenter = new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
-			m_Manipulator = new AIS_Manipulator();
 			m_AccumulatedTrsf = new gp_Trsf();
-			m_OneTimeTrsf = new gp_Trsf();
+			CreateRotationCenter();
+			CreateManipulator();
 		}
 
 		public override EditActionType ActionType
@@ -36,19 +35,36 @@ namespace MyCAM.Editor
 
 			// disable tree view
 			m_TreeView.Enabled = false;
-			CreateRotationCenter();
+
+			List<TopoDS_Shape> shpaeList = new List<TopoDS_Shape>();
+			foreach( string szID in m_DataManager.PartIDList ) {
+				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
+				if( viewObject.Visible == false ) {
+					continue;
+				}
+				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
+			}
 		}
 
 		public override void End()
 		{
 			// enable tree view
 			m_TreeView.Enabled = true;
-			FinalCanvasRefresh();
+
+			foreach( string szID in m_DataManager.PartIDList ) {
+				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
+				if( viewObject.Visible ) {
+					m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
+				}
+			}
+			m_Viewer.UpdateView();
+
 			base.End();
 		}
 
 		protected override void ViewerMouseDown( MouseEventArgs e )
 		{
+			Console.WriteLine( m_Manipulator.ActiveMode().ToString() );
 			if( e.Button == MouseButtons.Left ) {
 				if( m_Manipulator.HasActiveMode() ) {
 					m_Manipulator.StartTransform( e.X, e.Y, m_Viewer.GetView() );
@@ -61,7 +77,7 @@ namespace MyCAM.Editor
 		{
 			if( e.Button == MouseButtons.Left ) {
 				if( m_Manipulator.HasActiveMode() ) {
-					m_OneTimeTrsf = m_Manipulator.CustomTransform( e.X, e.Y, m_Viewer.GetView() );
+					m_OneTimeTrsf = m_Manipulator.StepsTransform( e.X, e.Y, m_Viewer.GetView() );
 					m_Viewer.GetView().Redraw();
 				}
 			}
@@ -70,11 +86,15 @@ namespace MyCAM.Editor
 		protected override void ViewerMouseUp( MouseEventArgs e )
 		{
 			if( e.Button == MouseButtons.Left ) {
-				m_Manipulator.StopTransform( true );
-				m_Manipulator.SetModeActivationOnDetection( true );
+				if( m_Manipulator.HasActiveMode() ) {
+					m_Manipulator.StopTransform( true );
+					m_Manipulator.SetModeActivationOnDetection( true );
+					m_Manipulator.DeactivateCurrentMode();
 
-				// accumulate transform
-				m_AccumulatedTrsf.PreMultiply( m_OneTimeTrsf );
+					// accumulate transform
+					m_AccumulatedTrsf.PreMultiply( m_OneTimeTrsf );
+					m_OneTimeTrsf = new gp_Trsf();
+				}
 			}
 		}
 
@@ -97,6 +117,8 @@ namespace MyCAM.Editor
 
 		public void TransformDone()
 		{
+			m_Manipulator.Detach();
+			m_Viewer.GetAISContext().Remove( m_RefAISShape, false );
 			ApplyTransform( m_AccumulatedTrsf );
 			End();
 		}
@@ -107,20 +129,6 @@ namespace MyCAM.Editor
 			transformHelper.TransformData();
 		}
 
-		void FinalCanvasRefresh()
-		{
-			// remove manipulator and reference shape, show all hidden parts
-			m_Manipulator.Detach();
-			m_Viewer.GetAISContext().Remove( m_RefAISShape, false );
-			foreach( string szID in m_DataManager.PartIDList ) {
-				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
-				if( viewObject.Visible ) {
-					m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
-				}
-			}
-			m_Viewer.UpdateView();
-		}
-
 		void CreateRotationCenter()
 		{
 			List<TopoDS_Shape> shpaeList = new List<TopoDS_Shape>();
@@ -129,7 +137,6 @@ namespace MyCAM.Editor
 				if( viewObject.Visible == false ) {
 					continue;
 				}
-				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
 				shpaeList.Add( m_DataManager.ShapeDataMap[ szID ].Shape );
 			}
 			if( shpaeList == null || shpaeList.Count == 0 ) {
@@ -153,12 +160,12 @@ namespace MyCAM.Editor
 			m_RefAISShape = ViewHelper.CreatePartAIS( compound );
 			m_Viewer.GetAISContext().Display( m_RefAISShape, false );
 			m_Viewer.GetAISContext().Deactivate( m_RefAISShape );
-			CreateManipulator();
 		}
 
 		void CreateManipulator()
 		{
 			// setting manipulator attributes
+			m_Manipulator = new AIS_Manipulator();
 			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Translation, true );
 			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Rotation, true );
 			m_Manipulator.SetPart( AIS_ManipulatorMode.AIS_MM_Scaling, false );
