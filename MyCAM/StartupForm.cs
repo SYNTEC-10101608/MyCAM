@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using System.Xml.Serialization;
+using System.Xml.Linq;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
@@ -618,7 +618,7 @@ namespace MyCAM
 
 		void ResetUIByCAMBtnClick( EUIStatus status )
 		{
-			CheckOutCAMCurrentAction();
+			// CheckOutCAMCurrentAction();
 			RefreshCAMButtonLight();
 			RefreshMainFormToolStrip( status );
 		}
@@ -830,7 +830,6 @@ namespace MyCAM
 				MessageBox.Show( $"儲存機構檔案失敗：\n{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
 			}
 		}
-	}
 
 		#endregion
 
@@ -857,7 +856,7 @@ namespace MyCAM
 		// go to CAM editor
 		void m_tsmiCAM_Click( object sender, EventArgs e )
 		{
-			CheckOutCADCurrentAction();
+			// CheckOutCADCurrentAction();
 			SwitchEditor( EEditorType.CAM );
 			RefreshMainFormToolStrip( EUIStatus.CAM );
 		}
