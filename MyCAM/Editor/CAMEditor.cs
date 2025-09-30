@@ -107,17 +107,18 @@ namespace MyCAM.Editor
 		}
 
 		// APIs
-		public void SwitchAddPathStatus()
+		public void StartSelectFace()
 		{
-			if( m_CurrentAction != null && ( m_CurrentAction.ActionType == EditActionType.SelectFace || m_CurrentAction.ActionType == EditActionType.SelectPath ) ) {
+			if( m_CurrentAction == null ) {
+				return;
+			}
+
+			// with on/off button, so can end current action first
+			if( IsSameAction( EditActionType.SelectFace ) || IsSameAction( EditActionType.SelectPath ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			StartSelectFace();
-		}
-
-		public void StartSelectFace()
-		{
+			m_CurrentAction.End();
 			SelectFaceAction action = new SelectFaceAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
@@ -161,21 +162,19 @@ namespace MyCAM.Editor
 			m_DataManager.AddPath( pathWireList, edgeFaceMap );
 		}
 
-		public void SwitchSelectPathStatus()
-		{
-			if( m_CurrentAction.ActionType == EditActionType.SelectPath ) {
-				EndSelectPath_Manual();
-				return;
-			}
-			StartSelectPath_Manual();
-		}
-
 		public void StartSelectPath_Manual()
 		{
-			// get selected face group from select face action
-			if( m_CurrentAction.ActionType != EditActionType.SelectFace ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
+
+			// with on/off button, so can end current action first
+			if( IsSameAction( EditActionType.SelectPath ) || m_CurrentAction.ActionType != EditActionType.SelectFace ) {
+				m_CurrentAction.End();
+				return;
+			}
+
+			// previous action is select face action
 			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
 
 			// end all actions if no face is selected
@@ -197,9 +196,10 @@ namespace MyCAM.Editor
 
 		public void RemovePath()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
+			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
@@ -223,9 +223,16 @@ namespace MyCAM.Editor
 
 		public void SetStartPoint()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
+
+			// with on/off button, so can end current action first
+			if( IsSameAction( EditActionType.StartPoint ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
@@ -243,9 +250,10 @@ namespace MyCAM.Editor
 
 		public void SetReverse()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
+			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
@@ -259,9 +267,16 @@ namespace MyCAM.Editor
 
 		public void SetOverCut()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
+
+			// with on/off button, so can end current action first
+			if( IsSameAction( EditActionType.OverCut ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
@@ -274,9 +289,16 @@ namespace MyCAM.Editor
 
 		public void SetLeadLine()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
+
+			// with on/off button, so can end current action first
+			if( IsSameAction( EditActionType.SetLead ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
@@ -289,9 +311,10 @@ namespace MyCAM.Editor
 
 		public void ChangeLeadDirection()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
+			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
@@ -312,9 +335,16 @@ namespace MyCAM.Editor
 
 		public void SetToolVec()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
+
+			// with on/off button, so can end current action first
+			if( IsSameAction( EditActionType.ToolVec ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
@@ -327,9 +357,16 @@ namespace MyCAM.Editor
 
 		public void SetToolVecReverse()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
+
+			// with on/off button, so can end current action first
+			if( IsSameAction( EditActionType.OverCut ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
@@ -343,9 +380,16 @@ namespace MyCAM.Editor
 
 		public void SeTraverseParam()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
+
+			// with on/off button, so can end current action first
+			if( IsSameAction( EditActionType.SetTraverseParam ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			m_CurrentAction.End();
 			TraverseAction action = new TraverseAction( m_DataManager );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
@@ -356,9 +400,10 @@ namespace MyCAM.Editor
 		// TODO: refresh tree
 		public void MoveProcess( bool bUp )
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
+			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
@@ -830,6 +875,14 @@ namespace MyCAM.Editor
 				return string.Empty;
 			}
 			return selectedNode.Text;
+		}
+
+		bool IsSameAction( EditActionType newActionType )
+		{
+			if( m_CurrentAction != null && m_CurrentAction.ActionType == newActionType ) {
+				return true;
+			}
+			return false;
 		}
 
 		// edit actions

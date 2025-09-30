@@ -42,6 +42,7 @@
 			this.m_tsbStartPoint = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbReverse = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSetLead = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbFlipLead = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbOverCut = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbTooVecReverse = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbToolVec = new System.Windows.Forms.ToolStripButton();
@@ -66,16 +67,13 @@
 			this.m_tsbAddFeature = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tscLevel2Container = new System.Windows.Forms.ToolStripContainer();
+			this.m_tsAddPathSubFunc = new System.Windows.Forms.ToolStrip();
+			this.m_tsbSelectD1ContFace = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbSelectPath = new System.Windows.Forms.ToolStripButton();
 			this.m_tsTransformSubFunc = new System.Windows.Forms.ToolStrip();
 			this.m_tsbManualTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsb3PntTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAxisTransform = new System.Windows.Forms.ToolStripButton();
-			this.m_tsLead = new System.Windows.Forms.ToolStrip();
-			this.m_tsbChangeLeadDirection = new System.Windows.Forms.ToolStripButton();
-			this.m_tsbLeadSetting = new System.Windows.Forms.ToolStripButton();
-			this.m_tsAddPathSubFunc = new System.Windows.Forms.ToolStrip();
-			this.m_tsbSelectD1ContFace = new System.Windows.Forms.ToolStripButton();
-			this.m_tsbSelectPath = new System.Windows.Forms.ToolStripButton();
 			this.m_pnlLog = new System.Windows.Forms.Panel();
 			this.m_tscLevel3Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsSelectPath = new System.Windows.Forms.ToolStrip();
@@ -99,9 +97,8 @@
 			this.m_tsCADFunction.SuspendLayout();
 			this.m_tscLevel2Container.ContentPanel.SuspendLayout();
 			this.m_tscLevel2Container.SuspendLayout();
-			this.m_tsTransformSubFunc.SuspendLayout();
-			this.m_tsLead.SuspendLayout();
 			this.m_tsAddPathSubFunc.SuspendLayout();
+			this.m_tsTransformSubFunc.SuspendLayout();
 			this.m_tscLevel3Container.ContentPanel.SuspendLayout();
 			this.m_tscLevel3Container.SuspendLayout();
 			this.m_tsSelectPath.SuspendLayout();
@@ -186,6 +183,7 @@
             this.m_tsbStartPoint,
             this.m_tsbReverse,
             this.m_tsbSetLead,
+            this.m_tsbFlipLead,
             this.m_tsbOverCut,
             this.m_tsbTooVecReverse,
             this.m_tsbToolVec,
@@ -249,6 +247,16 @@
 			this.m_tsbSetLead.Size = new System.Drawing.Size(44, 43);
 			this.m_tsbSetLead.Text = "引線";
 			this.m_tsbSetLead.Click += new System.EventHandler(this.m_tsbSetLead_Click);
+			// 
+			// m_tsbFlipLead
+			// 
+			this.m_tsbFlipLead.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbFlipLead.Image = global::MyCAM.Properties.Resources.FlipLead;
+			this.m_tsbFlipLead.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbFlipLead.Name = "m_tsbFlipLead";
+			this.m_tsbFlipLead.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbFlipLead.Text = "更換引線方向";
+			this.m_tsbFlipLead.Click += new System.EventHandler(this.m_tsbFlipLead_Click);
 			// 
 			// m_tsbOverCut
 			// 
@@ -486,10 +494,9 @@
 			// 
 			// m_tscLevel2Container.ContentPanel
 			// 
+			this.m_tscLevel2Container.ContentPanel.Controls.Add(this.m_tsAddPathSubFunc);
 			this.m_tscLevel2Container.ContentPanel.Controls.Add(this.m_tsTransformSubFunc);
 			this.m_tscLevel2Container.ContentPanel.Controls.Add(this.m_tsAddFeactureSubFunc);
-			this.m_tscLevel2Container.ContentPanel.Controls.Add(this.m_tsLead);
-			this.m_tscLevel2Container.ContentPanel.Controls.Add(this.m_tsAddPathSubFunc);
 			this.m_tscLevel2Container.ContentPanel.Size = new System.Drawing.Size(1065, 21);
 			this.m_tscLevel2Container.Dock = System.Windows.Forms.DockStyle.Top;
 			this.m_tscLevel2Container.Location = new System.Drawing.Point(0, 70);
@@ -498,6 +505,39 @@
 			this.m_tscLevel2Container.TabIndex = 6;
 			this.m_tscLevel2Container.Text = "toolStripContainer1";
 			this.m_tscLevel2Container.TopToolStripPanelVisible = false;
+			// 
+			// m_tsAddPathSubFunc
+			// 
+			this.m_tsAddPathSubFunc.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_tsAddPathSubFunc.ImageScalingSize = new System.Drawing.Size(24, 24);
+			this.m_tsAddPathSubFunc.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbSelectD1ContFace,
+            this.m_tsbSelectPath});
+			this.m_tsAddPathSubFunc.Location = new System.Drawing.Point(0, 0);
+			this.m_tsAddPathSubFunc.Name = "m_tsAddPathSubFunc";
+			this.m_tsAddPathSubFunc.Size = new System.Drawing.Size(1065, 21);
+			this.m_tsAddPathSubFunc.TabIndex = 5;
+			this.m_tsAddPathSubFunc.Text = "toolStrip2";
+			// 
+			// m_tsbSelectD1ContFace
+			// 
+			this.m_tsbSelectD1ContFace.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbSelectD1ContFace.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbSelectD1ContFace.Image")));
+			this.m_tsbSelectD1ContFace.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbSelectD1ContFace.Name = "m_tsbSelectD1ContFace";
+			this.m_tsbSelectD1ContFace.Size = new System.Drawing.Size(54, 18);
+			this.m_tsbSelectD1ContFace.Text = "D1 連續";
+			this.m_tsbSelectD1ContFace.Click += new System.EventHandler(this.m_tsbSelectD1ContFace_Click);
+			// 
+			// m_tsbSelectPath
+			// 
+			this.m_tsbSelectPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbSelectPath.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbSelectPath.Image")));
+			this.m_tsbSelectPath.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbSelectPath.Name = "m_tsbSelectPath";
+			this.m_tsbSelectPath.Size = new System.Drawing.Size(63, 18);
+			this.m_tsbSelectPath.Text = "選取路徑";
+			this.m_tsbSelectPath.Click += new System.EventHandler(this.m_tsbSelectPath_Click);
 			// 
 			// m_tsTransformSubFunc
 			// 
@@ -543,72 +583,6 @@
 			this.m_tsbAxisTransform.Size = new System.Drawing.Size(63, 18);
 			this.m_tsbAxisTransform.Text = "軸向轉換";
 			this.m_tsbAxisTransform.Click += new System.EventHandler(this.m_tsbAxisTransform_Click);
-			// 
-			// m_tsLead
-			// 
-			this.m_tsLead.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_tsLead.ImageScalingSize = new System.Drawing.Size(24, 24);
-			this.m_tsLead.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsbChangeLeadDirection,
-            this.m_tsbLeadSetting});
-			this.m_tsLead.Location = new System.Drawing.Point(0, 0);
-			this.m_tsLead.Name = "m_tsLead";
-			this.m_tsLead.Size = new System.Drawing.Size(1065, 21);
-			this.m_tsLead.TabIndex = 6;
-			this.m_tsLead.Text = "toolStrip1";
-			// 
-			// m_tsbChangeLeadDirection
-			// 
-			this.m_tsbChangeLeadDirection.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbChangeLeadDirection.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbChangeLeadDirection.Image")));
-			this.m_tsbChangeLeadDirection.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbChangeLeadDirection.Name = "m_tsbChangeLeadDirection";
-			this.m_tsbChangeLeadDirection.Size = new System.Drawing.Size(89, 18);
-			this.m_tsbChangeLeadDirection.Text = "更換引線方向";
-			this.m_tsbChangeLeadDirection.Click += new System.EventHandler(this.m_tsbChangeLeadDirection_Click);
-			// 
-			// m_tsbLeadSetting
-			// 
-			this.m_tsbLeadSetting.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbLeadSetting.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbLeadSetting.Image")));
-			this.m_tsbLeadSetting.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbLeadSetting.Name = "m_tsbLeadSetting";
-			this.m_tsbLeadSetting.Size = new System.Drawing.Size(63, 18);
-			this.m_tsbLeadSetting.Text = "設置引線";
-			this.m_tsbLeadSetting.Click += new System.EventHandler(this.m_tsbLeadSetting_Click);
-			// 
-			// m_tsAddPathSubFunc
-			// 
-			this.m_tsAddPathSubFunc.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_tsAddPathSubFunc.ImageScalingSize = new System.Drawing.Size(24, 24);
-			this.m_tsAddPathSubFunc.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsbSelectD1ContFace,
-            this.m_tsbSelectPath});
-			this.m_tsAddPathSubFunc.Location = new System.Drawing.Point(0, 0);
-			this.m_tsAddPathSubFunc.Name = "m_tsAddPathSubFunc";
-			this.m_tsAddPathSubFunc.Size = new System.Drawing.Size(1065, 21);
-			this.m_tsAddPathSubFunc.TabIndex = 5;
-			this.m_tsAddPathSubFunc.Text = "toolStrip2";
-			// 
-			// m_tsbSelectD1ContFace
-			// 
-			this.m_tsbSelectD1ContFace.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbSelectD1ContFace.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbSelectD1ContFace.Image")));
-			this.m_tsbSelectD1ContFace.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbSelectD1ContFace.Name = "m_tsbSelectD1ContFace";
-			this.m_tsbSelectD1ContFace.Size = new System.Drawing.Size(54, 18);
-			this.m_tsbSelectD1ContFace.Text = "D1 連續";
-			this.m_tsbSelectD1ContFace.Click += new System.EventHandler(this.m_tsbSelectD1ContFace_Click);
-			// 
-			// m_tsbSelectPath
-			// 
-			this.m_tsbSelectPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbSelectPath.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbSelectPath.Image")));
-			this.m_tsbSelectPath.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbSelectPath.Name = "m_tsbSelectPath";
-			this.m_tsbSelectPath.Size = new System.Drawing.Size(63, 18);
-			this.m_tsbSelectPath.Text = "選取路徑";
-			this.m_tsbSelectPath.Click += new System.EventHandler(this.m_tsbSelectPath_Click);
 			// 
 			// m_pnlLog
 			// 
@@ -793,12 +767,10 @@
 			this.m_tscLevel2Container.ContentPanel.PerformLayout();
 			this.m_tscLevel2Container.ResumeLayout(false);
 			this.m_tscLevel2Container.PerformLayout();
-			this.m_tsTransformSubFunc.ResumeLayout(false);
-			this.m_tsTransformSubFunc.PerformLayout();
-			this.m_tsLead.ResumeLayout(false);
-			this.m_tsLead.PerformLayout();
 			this.m_tsAddPathSubFunc.ResumeLayout(false);
 			this.m_tsAddPathSubFunc.PerformLayout();
+			this.m_tsTransformSubFunc.ResumeLayout(false);
+			this.m_tsTransformSubFunc.PerformLayout();
 			this.m_tscLevel3Container.ContentPanel.ResumeLayout(false);
 			this.m_tscLevel3Container.ContentPanel.PerformLayout();
 			this.m_tscLevel3Container.ResumeLayout(false);
@@ -869,11 +841,9 @@
 		private System.Windows.Forms.ToolStripButton m_tsbSelPath_Manual;
 		private System.Windows.Forms.ToolStripButton m_tsManualSelectPathOK;
 		private System.Windows.Forms.ToolStripButton m_tsbManualTransDone;
-		private System.Windows.Forms.ToolStrip m_tsLead;
-		private System.Windows.Forms.ToolStripButton m_tsbChangeLeadDirection;
-		private System.Windows.Forms.ToolStripButton m_tsbLeadSetting;
 		private System.Windows.Forms.ToolStripButton m_tsbTraverseParamSetting;
 		private System.Windows.Forms.ToolStripButton m_tsbConvertNC;
+		private System.Windows.Forms.ToolStripButton m_tsbFlipLead;
 	}
 }
 

@@ -14,6 +14,7 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace MyCAM
 {
@@ -118,7 +119,6 @@ namespace MyCAM
 			// cam function
 			AddPath,
 			SelectPath,
-			SetLead,
 		}
 
 		void ShowG54Trihedron()
@@ -241,8 +241,7 @@ namespace MyCAM
 		// add path
 		void m_tsbAddPath_Click( object sender, EventArgs e )
 		{
-			RefreshCAMButtonLight();
-			m_CAMEditor.SwitchAddPathStatus();
+			m_CAMEditor.StartSelectFace();
 		}
 
 		void m_tsbSelectD1ContFace_Click( object sender, EventArgs e )
@@ -267,113 +266,88 @@ namespace MyCAM
 
 		void m_tsbSelPath_Manual_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.SwitchSelectPathStatus();
+			m_CAMEditor.StartSelectPath_Manual();
 		}
 
 		// remove path
 		void m_tsbDeletePath_Click( object sender, EventArgs e )
 		{
-			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.RemovePath();
 		}
 
 		// CAM property
 		void m_tsbStartPoint_Click( object sender, EventArgs e )
 		{
-			// when is in start point action, click again to end start point action
-			if( m_tsbStartPoint.BackColor == m_buttonOnColor ) {
-				ResetUIByCAMBtnClick( EUIStatus.CAM );
-				return;
-			}
-			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SetStartPoint();
 		}
 
 		void m_tsbReverse_Click( object sender, EventArgs e )
 		{
-			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SetReverse();
 		}
 
 		void m_tsbSetLead_Click( object sender, EventArgs e )
 		{
-			// because this button won't trigger action swith , need to stop ex action (add path)
-			m_CAMEditor.CheckOutCurrentAction();
-
-			// later "RefreshCAMButtonLight" will turn all light off
-			bool isLightON = m_tsbSetLead.BackColor == m_buttonOnColor;
-			RefreshCAMButtonLight();
-			if( isLightON ) {
-				RefreshMainFormToolStrip( EUIStatus.CAM );
-				return;
-			}
-			m_tsbSetLead.BackColor = m_buttonOnColor;
-			RefreshMainFormToolStrip( EUIStatus.SetLead );
-		}
-
-		void m_tsbLeadSetting_Click( object sender, EventArgs e )
-		{
 			m_CAMEditor.SetLeadLine();
 		}
 
-		void m_tsbChangeLeadDirection_Click( object sender, EventArgs e )
+		void m_tsbFlipLead_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.ChangeLeadDirection();
 		}
 
 		void m_tsbOverCut_Click( object sender, EventArgs e )
 		{
-			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SetOverCut();
 		}
 
 		// tool vector
 		void m_tsbToolVec_Click( object sender, EventArgs e )
 		{
-			if( m_tsbToolVec.BackColor == m_buttonOnColor ) {
-				ResetUIByCAMBtnClick( EUIStatus.CAM );
-				return;
-			}
-			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SetToolVec();
 		}
 
 		void m_tsbTooVecReverse_Click( object sender, EventArgs e )
 		{
-			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SetToolVecReverse();
 		}
 
 		// sort
 		void m_tsbMoveUp_Click( object sender, EventArgs e )
 		{
-			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.MoveProcess( true );
 		}
 
 		void m_tsbMoveDown_Click( object sender, EventArgs e )
 		{
-			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.MoveProcess( false );
 		}
 
 		void m_tsbAutoOrder_Click( object sender, EventArgs e )
 		{
-			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.AutoSortProcess();
 		}
 
 		// post parameter setting
 		void m_tsbTraverseParamSetting_Click( object sender, EventArgs e )
 		{
-			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SeTraverseParam();
 		}
 
 		// convert NC
 		void m_tsbConvertNC_Click( object sender, EventArgs e )
 		{
-			ResetUIByCAMBtnClick( EUIStatus.CAM );
+			RefreshMainFormToolStrip( EUIStatus.CAM );
 			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
 			writer.Convert();
 
@@ -422,7 +396,7 @@ namespace MyCAM
 
 		void OnPathLeadChanged( bool isPathWithLead )
 		{
-			m_tsbChangeLeadDirection.Enabled = isPathWithLead;
+			m_tsbFlipLead.Enabled = isPathWithLead;
 		}
 
 		void OnCADActionStatusChange( EditActionType action, EActionStatus actionStatus )
@@ -482,7 +456,6 @@ namespace MyCAM
 
 				if( action == EditActionType.SetLead ) {
 					m_tsbSetLead.BackColor = m_defaultBtnColor;
-					m_tsbLeadSetting.BackColor = m_defaultBtnColor;
 
 					// unlock form 
 					OnCAMDlgActionStatusChange( actionStatus );
@@ -522,8 +495,7 @@ namespace MyCAM
 			}
 			if( action == EditActionType.SetLead ) {
 				m_tsbSetLead.BackColor = m_buttonOnColor;
-				m_tsbLeadSetting.BackColor = m_buttonOnColor;
-				RefreshMainFormToolStrip( EUIStatus.SetLead );
+				RefreshMainFormToolStrip( EUIStatus.CAM );
 
 				// lock main from
 				OnCAMDlgActionStatusChange( actionStatus );
@@ -544,16 +516,6 @@ namespace MyCAM
 			}
 			if( action == EditActionType.SetTraverseParam ) {
 				m_tsbTraverseParamSetting.BackColor = m_buttonOnColor;
-			}
-		}
-
-		// some button light on not trigger by action start, when click other button need to turn if off
-		void RefreshCAMButtonLight()
-		{
-			foreach( ToolStripButton toolStripButton in m_tsCAMFunction.Items ) {
-				if( toolStripButton.BackColor != m_defaultBtnColor ) {
-					toolStripButton.BackColor = m_defaultBtnColor;
-				}
 			}
 		}
 
@@ -614,13 +576,6 @@ namespace MyCAM
 					FindToolStrips( control, totalToolStripList );
 				}
 			}
-		}
-
-		void ResetUIByCAMBtnClick( EUIStatus status )
-		{
-			// CheckOutCAMCurrentAction();
-			RefreshCAMButtonLight();
-			RefreshMainFormToolStrip( status );
 		}
 
 		void UpdateUILayout()
@@ -836,7 +791,7 @@ namespace MyCAM
 		void m_tsmiFile_Click( object sender, EventArgs e )
 		{
 			if( m_CurrentEditor != null ) {
-				if( m_CADEditor == m_CADEditor ) {
+				if( m_CurrentEditor == m_CADEditor ) {
 					m_CADEditor.CheckOutCurrentAction();
 					return;
 				}
@@ -848,8 +803,7 @@ namespace MyCAM
 		// back to CAD editor
 		void m_tsmiCAD_Click( object sender, EventArgs e )
 		{
-			// turn all cam button of and check out current action
-			ResetUIByCAMBtnClick( EUIStatus.CAD );
+			RefreshMainFormToolStrip( EUIStatus.CAD );
 			SwitchEditor( EEditorType.CAD );
 		}
 
@@ -886,7 +840,6 @@ namespace MyCAM
 				{ EUIStatus.AxisTransform , new List<Control>(){  m_tsCADFunction , m_tsTransformSubFunc} },
 				
 				// cam function
-				{ EUIStatus.SetLead, new List<Control> () { m_tsCAMFunction , m_tsLead} },
 				{ EUIStatus.AddPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc } },
 				{ EUIStatus.SelectPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc, m_tsSelectPath } }
 			};
