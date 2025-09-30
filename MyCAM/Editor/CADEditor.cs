@@ -120,50 +120,44 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void SwitchThreePointTransformStatus()
-		{
-			if( m_CurrentAction != null && m_CurrentAction.ActionType == EditActionType.ThreePtTransform ) {
-				EndCurrentAction();
-			}
-			else {
-				ThreePointTransform();
-			}
-		}
-
 		public void ThreePointTransform()
 		{
+			if ( m_CurrentAction == null ) {
+				return;
+			}
+			if( m_CurrentAction.ActionType == EditActionType.ThreePtTransform ) {
+				m_CurrentAction.End();
+				return;
+			}
+			m_CurrentAction.End();
 			ThreePtTransformAction action = new ThreePtTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
-		public void SwitchManaulTransformStatus()
-		{
-			if( m_CurrentAction != null && m_CurrentAction.ActionType == EditActionType.ManualTransform ) {
-				EndCurrentAction();
-			}
-			else {
-				StartManaulTransform();
-			}
-		}
-
 		public void StartManaulTransform()
 		{
+			if( m_CurrentAction == null ) {
+				return;
+			}
+			if( m_CurrentAction.ActionType == EditActionType.ManualTransform ) {
+				m_CurrentAction.End();
+				return;
+			}
+			m_CurrentAction.End();
 			ManualTransformAction action = new ManualTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
-		public void SwitchAxisTransformStatus()
-		{
-			if( m_CurrentAction != null && m_CurrentAction.ActionType == EditActionType.AxisTransform ) {
-				EndCurrentAction();
-			}
-			else {
-				StartAxisTransform();
-			}
-		}
-
 		public void StartAxisTransform()
 		{
+			if (m_CurrentAction == null ) {
+				return;
+			}
+			if( m_CurrentAction.ActionType == EditActionType.AxisTransform ) {
+				m_CurrentAction.End();
+				return;
+			}
+			m_CurrentAction.End();
 			// need to use shape data to decide the cneter in the begin, so have to add this preotection
 			if( m_DataManager.PartIDList.Count == 0 ) {
 				return;
@@ -173,7 +167,7 @@ namespace MyCAM.Editor
 		}
 
 		// ui can click other transform button, so need to end the current action first
-		public void EndCurrentAction()
+		public void EndCurrentActionByEditorChange()
 		{
 			if( m_CurrentAction is AxisTransformAction axisTransformAction ) {
 				axisTransformAction.TransformDone();
@@ -199,7 +193,7 @@ namespace MyCAM.Editor
 
 		public void CheckOutCurrentAction()
 		{
-			EndCurrentAction();
+			EndCurrentActionByEditorChange();
 		}
 
 		public void ApplyManualTransform( ETrsfConstraintType type )

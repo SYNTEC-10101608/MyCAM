@@ -14,7 +14,6 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace MyCAM
 {
@@ -157,7 +156,6 @@ namespace MyCAM
 		// add feature
 		void m_tsbAddFeature_Click( object sender, EventArgs e )
 		{
-			CheckOutCADCurrentAction();
 			RefreshMainFormToolStrip( EUIStatus.AddFeature );
 		}
 
@@ -193,7 +191,7 @@ namespace MyCAM
 
 		void m_tsbManualTransform_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.SwitchManaulTransformStatus();
+			m_CADEditor.StartManaulTransform();
 		}
 
 		void m_tsbManualTransPlane_Click( object sender, EventArgs e )
@@ -229,13 +227,13 @@ namespace MyCAM
 		// 3 point transform
 		void m_tsb3PointTransform_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.SwitchThreePointTransformStatus();
+			m_CADEditor.ThreePointTransform();
 		}
 
 		// axis transform
 		void m_tsbAxisTransform_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.SwitchAxisTransformStatus();
+			m_CADEditor.StartAxisTransform();
 		}
 
 		// add path
@@ -361,11 +359,6 @@ namespace MyCAM
 		void CheckOutCADCurrentAction()
 		{
 			m_CADEditor.CheckOutCurrentAction();
-		}
-
-		void CheckOutCAMCurrentAction()
-		{
-			m_CAMEditor.CheckOutCurrentAction();
 		}
 
 		void OnCAMDlgActionStatusChange( EActionStatus actionStatus )
@@ -795,7 +788,7 @@ namespace MyCAM
 					m_CADEditor.CheckOutCurrentAction();
 					return;
 				}
-				m_CAMEditor.CheckOutCurrentAction();
+				SwitchEditor( EEditorType.CAD );
 				return;
 			}
 		}

@@ -41,13 +41,6 @@ namespace MyCAM.Editor
 			( m_DefaultAction as SelectObjectAction ).TreeSelectionChange += OnTreeSelectionChange;
 		}
 
-		public void CheckOutCurrentAction()
-		{
-			if( m_CurrentAction != null && m_CurrentAction != m_DefaultAction ) {
-				m_CurrentAction.End();
-			}
-		}
-
 		// for viewer resource handle
 		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh, no need activate
 		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
