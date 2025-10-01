@@ -67,10 +67,9 @@ namespace MyCAM.LogManager
 				Dock = DockStyle.Top
 			};
 
+			// make sure message is on the top of panel
 			m_PanelShowMessage.Controls.Add( lblStickOnPanel );
-
-			// put on the top
-			m_PanelShowMessage.Controls.SetChildIndex( lblStickOnPanel, 0 );
+			m_PanelShowMessage.ScrollControlIntoView( lblStickOnPanel );
 		}
 	}
 }

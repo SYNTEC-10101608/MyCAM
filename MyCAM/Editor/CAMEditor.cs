@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.Aspect;
@@ -135,6 +136,7 @@ namespace MyCAM.Editor
 
 			// get path from free boundaries
 			if( selectedFaceGroupList.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇面", MyApp.NoticeType.Hint );
 				return;
 			}
 			List<TopoDS_Wire> pathWireList = new List<TopoDS_Wire>();
@@ -172,6 +174,7 @@ namespace MyCAM.Editor
 
 			// end all actions if no face is selected
 			if( selectedFaceGroupList.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇面", MyApp.NoticeType.Hint );
 				m_CurrentAction.End();
 				return;
 			}
@@ -228,12 +231,14 @@ namespace MyCAM.Editor
 			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
 				return;
 			}
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
 
 			// skip non-closed path
 			if( pathData.CAMData.IsClosed == false ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]非封閉路徑不支援修改起點", MyApp.NoticeType.Hint );
 				return;
 			}
 			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
@@ -249,6 +254,7 @@ namespace MyCAM.Editor
 			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
 				return;
 			}
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
@@ -272,6 +278,7 @@ namespace MyCAM.Editor
 			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
 				return;
 			}
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
@@ -294,6 +301,7 @@ namespace MyCAM.Editor
 			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
 				return;
 			}
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
@@ -310,6 +318,7 @@ namespace MyCAM.Editor
 			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
 				return;
 			}
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
@@ -340,6 +349,7 @@ namespace MyCAM.Editor
 			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
 				return;
 			}
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
@@ -362,6 +372,7 @@ namespace MyCAM.Editor
 			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
 				return;
 			}
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
@@ -399,6 +410,7 @@ namespace MyCAM.Editor
 			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
 				return;
 			}
 			int nIndex = m_DataManager.PathIDList.IndexOf( szPathID );

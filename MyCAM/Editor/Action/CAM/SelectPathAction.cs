@@ -1,4 +1,7 @@
-﻿using MyCAM.Data;
+﻿using System.Collections.Generic;
+using System.Windows.Forms;
+using MyCAM.App;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
 using OCC.ShapeAnalysis;
@@ -8,8 +11,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -162,6 +163,7 @@ namespace MyCAM.Editor
 			// get selected edge
 			TopTools_MapOfShape extractedEdgeSet = GetSelectedEdge();
 			if( extractedEdgeSet.Size() == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]未選取任何路徑", MyApp.NoticeType.Hint );
 				End();
 				return;
 			}

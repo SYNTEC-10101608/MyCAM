@@ -8,7 +8,6 @@ using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using MyCAM.Helper;
-using MyCAM.LogManager;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.Geom;
@@ -167,7 +166,7 @@ namespace MyCAM
 		// add feature
 		void m_tsbAddFeature_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.AddFeature );
+			RefreshToolStripLayout( EUIStatus.AddFeature );
 		}
 
 		void m_ddbAddLine_TwoVertexConnect_Click( object sender, EventArgs e )
@@ -195,7 +194,7 @@ namespace MyCAM
 		{
 			// it might be in trnasform / add line / point action
 			CheckOutCADCurrentAction();
-			RefreshMainFormToolStrip( EUIStatus.TransForm );
+			RefreshToolStripLayout( EUIStatus.TransForm );
 		}
 
 		// manual transform
@@ -265,7 +264,7 @@ namespace MyCAM
 
 		void m_tsbSelectPath_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.SelectPath );
+			RefreshToolStripLayout( EUIStatus.SelectPath );
 		}
 
 		void m_tsManualSelectPathOK_Click( object sender, EventArgs e )
@@ -281,20 +280,17 @@ namespace MyCAM
 		// remove path
 		void m_tsbDeletePath_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.RemovePath();
 		}
 
 		// CAM property
 		void m_tsbStartPoint_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SetStartPoint();
 		}
 
 		void m_tsbReverse_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SetReverse();
 		}
 
@@ -310,53 +306,46 @@ namespace MyCAM
 
 		void m_tsbOverCut_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SetOverCut();
 		}
 
 		// tool vector
 		void m_tsbToolVec_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SetToolVec();
 		}
 
 		void m_tsbTooVecReverse_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SetToolVecReverse();
 		}
 
 		// sort
 		void m_tsbMoveUp_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.MoveProcess( true );
 		}
 
 		void m_tsbMoveDown_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.MoveProcess( false );
 		}
 
 		void m_tsbAutoOrder_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.AutoSortProcess();
 		}
 
 		// post parameter setting
 		void m_tsbTraverseParamSetting_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAM );
 			m_CAMEditor.SeTraverseParam();
 		}
 
 		// convert NC
 		void m_tsbConvertNC_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAM );
+			RefreshToolStripLayout( EUIStatus.CAM );
 			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
 			writer.Convert();
 
@@ -395,6 +384,7 @@ namespace MyCAM
 		{
 			m_tsbStartPoint.Enabled = isClosePath;
 			m_tsbSetLead.Enabled = isClosePath;
+			m_tsbFlipLead.Enabled = isClosePath;
 			m_tsbOverCut.Enabled = isClosePath;
 		}
 
@@ -407,9 +397,7 @@ namespace MyCAM
 		{
 			if( actionStatus == EActionStatus.End ) {
 				if( action == EditActionType.ManualTransform || action == EditActionType.AxisTransform || action == EditActionType.ThreePtTransform ) {
-					RefreshMainFormToolStrip( EUIStatus.TransForm );
-				}
-				if( action == EditActionType.ManualTransform || action == EditActionType.AxisTransform || action == EditActionType.ThreePtTransform ) {
+					RefreshToolStripLayout( EUIStatus.TransForm );
 					foreach( ToolStripButton toolstripbutton in trnasformControlList ) {
 						if( toolstripbutton.BackColor != m_defaultBtnColor ) {
 							toolstripbutton.BackColor = m_defaultBtnColor;
@@ -417,23 +405,22 @@ namespace MyCAM
 					}
 					return;
 				}
-				return;
 			}
 
 			// start action
 			if( action == EditActionType.AxisTransform ) {
 				m_tsbAxisTransform.BackColor = m_buttonOnColor;
-				RefreshMainFormToolStrip( EUIStatus.AxisTransform );
+				RefreshToolStripLayout( EUIStatus.AxisTransform );
 				return;
 			}
 			if( action == EditActionType.ThreePtTransform ) {
 				m_tsb3PntTransform.BackColor = m_buttonOnColor;
-				RefreshMainFormToolStrip( EUIStatus.ThreePntTransForm );
+				RefreshToolStripLayout( EUIStatus.ThreePntTransForm );
 				return;
 			}
 			if( action == EditActionType.ManualTransform ) {
 				m_tsbManualTransform.BackColor = m_buttonOnColor;
-				RefreshMainFormToolStrip( EUIStatus.ManualTransForm );
+				RefreshToolStripLayout( EUIStatus.ManualTransForm );
 				return;
 			}
 		}
@@ -443,9 +430,10 @@ namespace MyCAM
 			if( actionStatus == EActionStatus.End ) {
 
 				// cam action is done, back to default cam lay out,
-				RefreshMainFormToolStrip( EUIStatus.CAM );
+				RefreshToolStripLayout( EUIStatus.CAM );
 				if( action == EditActionType.SelectPath ) {
 					m_tsbAddPath.BackColor = m_defaultBtnColor;
+					m_tsManualSelectPathOK.Enabled = true;
 					m_tsbSelPath_Manual.BackColor = m_defaultBtnColor;
 					return;
 				}
@@ -481,7 +469,8 @@ namespace MyCAM
 			}
 			if( action == EditActionType.SelectFace ) {
 				m_tsbAddPath.BackColor = m_buttonOnColor;
-				RefreshMainFormToolStrip( EUIStatus.AddPath );
+				m_tsManualSelectPathOK.Enabled = false;
+				RefreshToolStripLayout( EUIStatus.AddPath );
 				return;
 			}
 			if( action == EditActionType.SelectPath ) {
@@ -489,17 +478,18 @@ namespace MyCAM
 				// add path still icon still need to light up
 				m_tsbAddPath.BackColor = m_buttonOnColor;
 				m_tsbSelPath_Manual.BackColor = m_buttonOnColor;
-				RefreshMainFormToolStrip( EUIStatus.SelectPath );
+				m_tsManualSelectPathOK.Enabled = true;
+				RefreshToolStripLayout( EUIStatus.SelectPath );
 				return;
 			}
 			if( action == EditActionType.StartPoint ) {
 				m_tsbStartPoint.BackColor = m_buttonOnColor;
-				RefreshMainFormToolStrip( EUIStatus.CAM );
+				RefreshToolStripLayout( EUIStatus.CAM );
 				return;
 			}
 			if( action == EditActionType.SetLead ) {
 				m_tsbSetLead.BackColor = m_buttonOnColor;
-				RefreshMainFormToolStrip( EUIStatus.CAM );
+				RefreshToolStripLayout( EUIStatus.CAM );
 
 				// lock main from
 				OnCAMDlgActionStatusChange( actionStatus );
@@ -507,7 +497,7 @@ namespace MyCAM
 			}
 			if( action == EditActionType.OverCut ) {
 				m_tsbOverCut.BackColor = m_buttonOnColor;
-				RefreshMainFormToolStrip( EUIStatus.CAM );
+				RefreshToolStripLayout( EUIStatus.CAM );
 
 				// lock main from
 				OnCAMDlgActionStatusChange( actionStatus );
@@ -515,7 +505,7 @@ namespace MyCAM
 			}
 			if( action == EditActionType.ToolVec ) {
 				m_tsbToolVec.BackColor = m_buttonOnColor;
-				RefreshMainFormToolStrip( EUIStatus.CAM );
+				RefreshToolStripLayout( EUIStatus.CAM );
 				return;
 			}
 			if( action == EditActionType.SetTraverseParam ) {
@@ -523,7 +513,7 @@ namespace MyCAM
 			}
 		}
 
-		void RefreshMainFormToolStrip( EUIStatus uiStatus )
+		void RefreshToolStripLayout( EUIStatus uiStatus )
 		{
 			if( !UIStatusDic.ContainsKey( uiStatus ) ) {
 				return;
@@ -532,7 +522,11 @@ namespace MyCAM
 
 			// change tool strip container visible
 			int nContainerLayerToShow = controls.Count;
+			bool bToolStirpShownCountChange = false;
 			for( int i = 0; i < toolStripLevelList.Count; i++ ) {
+				if( toolStripLevelList[ i ].Visible != ( i < nContainerLayerToShow ) ) {
+					bToolStirpShownCountChange = true;
+				}
 				toolStripLevelList[ i ].Visible = i < nContainerLayerToShow;
 			}
 
@@ -554,7 +548,9 @@ namespace MyCAM
 			}
 
 			// visible will cause layout change need to make sure container layout order correct
-			UpdateUILayout();
+			if( bToolStirpShownCountChange ) {
+				UpdateUILayout();
+			}
 		}
 
 		List<ToolStrip> GetAllToolStrips( ToolStripContainer container )
@@ -612,6 +608,8 @@ namespace MyCAM
 		// switch editor
 		void SwitchEditor( EEditorType type )
 		{
+			bool isOldEditorIsCAM = false;
+
 			// no current editor
 			if( m_CurrentEditor == null ) {
 				m_CurrentEditor = GetEditor( type );
@@ -625,9 +623,27 @@ namespace MyCAM
 				}
 
 				// different editor
+				isOldEditorIsCAM = m_CurrentEditor == m_CAMEditor;
 				m_CurrentEditor.EditEnd();
 				m_CurrentEditor = GetEditor( type );
 				m_CurrentEditor?.EditStart();
+			}
+
+			// need to enable all btn before check out cam editor
+			if( isOldEditorIsCAM ) {
+				foreach( ToolStripButton btn in m_tsCAMFunction.Items ) {
+					btn.Enabled = true;
+				}
+			}
+
+			// change UI
+			if( m_CurrentEditor == m_CADEditor ) {
+				RefreshToolStripLayout( EUIStatus.CAD );
+				return;
+			}
+			if( m_CurrentEditor == m_CAMEditor ) {
+				RefreshToolStripLayout( EUIStatus.CAM );
+				return;
 			}
 		}
 
@@ -807,16 +823,13 @@ namespace MyCAM
 		// back to CAD editor
 		void m_tsmiCAD_Click( object sender, EventArgs e )
 		{
-			RefreshMainFormToolStrip( EUIStatus.CAD );
 			SwitchEditor( EEditorType.CAD );
 		}
 
 		// go to CAM editor
 		void m_tsmiCAM_Click( object sender, EventArgs e )
 		{
-			// CheckOutCADCurrentAction();
 			SwitchEditor( EEditorType.CAM );
-			RefreshMainFormToolStrip( EUIStatus.CAM );
 		}
 
 		void DefaultUISetting()
@@ -826,7 +839,7 @@ namespace MyCAM
 			m_tscLevel3Container.Visible = false;
 
 			// default is cad mode
-			RefreshMainFormToolStrip( EUIStatus.CAD );
+			RefreshToolStripLayout( EUIStatus.CAD );
 		}
 
 		void UIListSetting()
