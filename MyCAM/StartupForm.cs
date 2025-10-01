@@ -106,9 +106,9 @@ namespace MyCAM
 		IEditor m_CurrentEditor;
 
 		// UI list
-		Dictionary<EUIStatus, List<Control>> UIStatusDic;
-		List<ToolStripContainer> toolStripLevelList;
-		List<ToolStripButton> trnasformControlList;
+		Dictionary<EUIStatus, List<Control>> m_UIStatusDic;
+		List<ToolStripContainer> m_ToolStripLevelList;
+		List<ToolStripButton> m_TransformControlList;
 
 		// UI color
 		Color m_defaultBtnColor = SystemColors.Control;
@@ -370,9 +370,15 @@ namespace MyCAM
 		// convert NC
 		void m_tsbConvertNC_Click( object sender, EventArgs e )
 		{
-			RefreshToolStripLayout( EUIStatus.CAM );
+			if (m_CurrentEditor == m_CAMEditor ) {
+				m_CAMEditor.EndCurrentAction();
+			}
 			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
-			writer.Convert();
+			bool bSuccess = writer.ConvertSuccess();
+			if( bSuccess ) {
+				MyApp.Logger.ShowOnLogPanel( "成功轉出NC", MyApp.NoticeType.Hint );
+			}
+
 
 			// simulation
 			// m_CAMEditor.EditEnd();
@@ -423,7 +429,7 @@ namespace MyCAM
 			if( actionStatus == EActionStatus.End ) {
 				if( action == EditActionType.ManualTransform || action == EditActionType.AxisTransform || action == EditActionType.ThreePtTransform ) {
 					RefreshToolStripLayout( EUIStatus.TransForm );
-					foreach( ToolStripButton toolstripbutton in trnasformControlList ) {
+					foreach( ToolStripButton toolstripbutton in m_TransformControlList ) {
 						if( toolstripbutton.BackColor != m_defaultBtnColor ) {
 							toolstripbutton.BackColor = m_defaultBtnColor;
 						}
@@ -540,27 +546,27 @@ namespace MyCAM
 
 		void RefreshToolStripLayout( EUIStatus uiStatus )
 		{
-			if( !UIStatusDic.ContainsKey( uiStatus ) ) {
+			if( !m_UIStatusDic.ContainsKey( uiStatus ) ) {
 				return;
 			}
-			List<Control> controls = UIStatusDic[ uiStatus ];
+			List<Control> controls = m_UIStatusDic[ uiStatus ];
 
 			// change tool strip container visible
 			int nContainerLayerToShow = controls.Count;
 			bool bToolStirpShownCountChange = false;
-			for( int i = 0; i < toolStripLevelList.Count; i++ ) {
-				if( toolStripLevelList[ i ].Visible != ( i < nContainerLayerToShow ) ) {
+			for( int i = 0; i < m_ToolStripLevelList.Count; i++ ) {
+				if( m_ToolStripLevelList[ i ].Visible != ( i < nContainerLayerToShow ) ) {
 					bToolStirpShownCountChange = true;
 				}
-				toolStripLevelList[ i ].Visible = i < nContainerLayerToShow;
+				m_ToolStripLevelList[ i ].Visible = i < nContainerLayerToShow;
 			}
 
 			// change witch tool strip will be show
 			for( int i = 0; i < controls.Count; i++ ) {
-				if( i == 0 && toolStripLevelList[ i ].Visible != true ) {
-					toolStripLevelList[ i ].Visible = true;
+				if( i == 0 && m_ToolStripLevelList[ i ].Visible != true ) {
+					m_ToolStripLevelList[ i ].Visible = true;
 				}
-				List<ToolStrip> thisToolStrip = GetAllToolStrips( toolStripLevelList[ i ] );
+				List<ToolStrip> thisToolStrip = GetAllToolStrips( m_ToolStripLevelList[ i ] );
 				foreach( ToolStrip toolStrip in thisToolStrip ) {
 					if( toolStrip == controls[ i ] ) {
 						if( toolStrip.Visible != true ) {
@@ -574,7 +580,7 @@ namespace MyCAM
 
 			// visible will cause layout change need to make sure container layout order correct
 			if( bToolStirpShownCountChange ) {
-				UpdateUILayout();
+				ReLayOutUIZorder();
 			}
 		}
 
@@ -583,31 +589,32 @@ namespace MyCAM
 			var childToolStripList = new List<ToolStrip>();
 
 			// container with 5 panel
-			FindToolStrips( container.TopToolStripPanel, childToolStripList );
-			FindToolStrips( container.BottomToolStripPanel, childToolStripList );
-			FindToolStrips( container.LeftToolStripPanel, childToolStripList );
-			FindToolStrips( container.RightToolStripPanel, childToolStripList );
-			FindToolStrips( container.ContentPanel, childToolStripList );
+			FindContainerAllToolStrips( container.TopToolStripPanel, childToolStripList );
+			FindContainerAllToolStrips( container.BottomToolStripPanel, childToolStripList );
+			FindContainerAllToolStrips( container.LeftToolStripPanel, childToolStripList );
+			FindContainerAllToolStrips( container.RightToolStripPanel, childToolStripList );
+			FindContainerAllToolStrips( container.ContentPanel, childToolStripList );
 			return childToolStripList;
 		}
 
-		void FindToolStrips( Control parent, List<ToolStrip> totalToolStripList )
+		void FindContainerAllToolStrips( Control parent, List<ToolStrip> totalToolStripList )
 		{
 			foreach( Control control in parent.Controls ) {
 				if( control is ToolStrip toolStrip ) {
 					totalToolStripList.Add( toolStrip );
 				}
 				else if( control.HasChildren ) {
-					FindToolStrips( control, totalToolStripList );
+					FindContainerAllToolStrips( control, totalToolStripList );
 				}
 			}
 		}
 
-		void UpdateUILayout()
+		// to make sure container disply order is 1 -> 3
+		void ReLayOutUIZorder()
 		{
-			// layout from bottom to top
 			int currentIndex = 0;
 
+			// layout from bottom to top
 			if( m_pnlLog.Visible ) {
 				Controls.SetChildIndex( m_pnlLog, currentIndex++ );
 			}
@@ -698,7 +705,7 @@ namespace MyCAM
 
 		void UIListSetting()
 		{
-			UIStatusDic = new Dictionary<EUIStatus, List<Control>>()
+			m_UIStatusDic = new Dictionary<EUIStatus, List<Control>>()
 			{
 				{ EUIStatus.CAD , new List<Control>() { m_tsCADFunction } },
 				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction }},
@@ -714,7 +721,7 @@ namespace MyCAM
 				{ EUIStatus.AddPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc } },
 				{ EUIStatus.SelectPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc, m_tsSelectPath } }
 			};
-			toolStripLevelList = new List<ToolStripContainer>()
+			m_ToolStripLevelList = new List<ToolStripContainer>()
 			{
 				m_tscLevel1Container,
 				m_tscLevel2Container,
@@ -722,7 +729,7 @@ namespace MyCAM
 			};
 
 			// to reset transform button color
-			trnasformControlList = new List<ToolStripButton>()
+			m_TransformControlList = new List<ToolStripButton>()
 			{
 				m_tsbManualTransform,
 				m_tsb3PntTransform,

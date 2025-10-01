@@ -101,6 +101,13 @@ namespace MyCAM.Editor
 		}
 
 		// APIs
+		public void EndCurrentAction()
+		{
+			if (m_CurrentAction != null ) {
+				m_CurrentAction.End();
+			}
+		}
+
 		public void StartSelectFace()
 		{
 			if( m_CurrentAction == null ) {

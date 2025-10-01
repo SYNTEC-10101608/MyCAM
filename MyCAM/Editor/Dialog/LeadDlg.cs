@@ -150,19 +150,19 @@ namespace MyCAM.Editor.Dialog
 				return false;
 			}
 			if( dLength <= 0 ) {
-				MyApp.Logger.ShowOnLogPanel( $"{paramName}:需要大於0", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( "長度需要大於0", MyApp.NoticeType.Warning );
 				return false;
 			}
 			switch( leadData.Type ) {
 				case LeadLineType.Line:
 					if( !IsValidStraightLineAngle( dAngle ) ) {
-						MyApp.Logger.ShowOnLogPanel( $"{paramName}:必須在0 ~ 180範圍內", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( "角度必須在0 ~ 180範圍內", MyApp.NoticeType.Warning );
 						return false;
 					}
 					break;
 				case LeadLineType.Arc:
 					if( !IsValidArcAngle( dAngle ) ) {
-						MyApp.Logger.ShowOnLogPanel( $"{paramName}:必須在0 ~ 180範圍內", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( "角度必須在0 ~ 180範圍內", MyApp.NoticeType.Warning );
 						return false;
 					}
 					break;

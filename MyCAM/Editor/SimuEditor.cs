@@ -594,7 +594,7 @@ namespace MyCAM.Editor
 			// export NC
 			if( e.Control && e.KeyCode == Keys.E ) {
 				NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
-				writer.Convert();
+				writer.ConvertSuccess();
 			}
 		}
 	}
