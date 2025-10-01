@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.LogManager;
 using OCC.AIS;
 using OCC.IFSelect;
 using OCC.IGESControl;
@@ -290,19 +292,19 @@ namespace MyCAM.Editor
 
 			// check the status
 			if( status != IFSelect_ReturnStatus.IFSelect_RetDone ) {
-				MessageBox.Show( ToString() + "Error: Import" );
+				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
 				return;
 			}
 			Reader.TransferRoots();
 
 			// prevent from empty shape or null shape
 			if( Reader.NbShapes() == 0 ) {
-				MessageBox.Show( ToString() + "Error: Import" );
+				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
 				return;
 			}
 			TopoDS_Shape oneShape = Reader.OneShape();
 			if( oneShape == null || oneShape.IsNull() ) {
-				MessageBox.Show( ToString() + "Error: Import" );
+				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
 				return;
 			}
 			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape }/*, 1e-1*/ );

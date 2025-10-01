@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using MyCAM.App;
 
 namespace MyCAM.LogManager
 {
-	internal enum NoticeType
-	{
-		Hint,
-		Warning,
-		Error
-	}
-
 	internal class LogHandler
 	{
 		public LogHandler( Panel panelControl )
@@ -18,18 +12,18 @@ namespace MyCAM.LogManager
 			m_PanelShowMessage = panelControl;
 		}
 
-		public void ShowOnLogPanel( string message, NoticeType type )
+		public void ShowOnLogPanel( string message, MyApp.NoticeType type )
 		{
 			switch( type ) {
-				case NoticeType.Error:
+				case MyApp.NoticeType.Error:
 					ShowError( message );
 					break;
 
-				case NoticeType.Warning:
+				case MyApp.NoticeType.Warning:
 					ShowWarning( message );
 					break;
 
-				case NoticeType.Hint:
+				case MyApp.NoticeType.Hint:
 				default:
 					AddLog( message, Color.Black );
 					break;
@@ -65,7 +59,7 @@ namespace MyCAM.LogManager
 		void AddLog( string message, Color color )
 		{
 
-			Label lbl = new Label
+			Label lblStickOnPanel = new Label
 			{
 				AutoSize = true,
 				ForeColor = color,
@@ -73,10 +67,10 @@ namespace MyCAM.LogManager
 				Dock = DockStyle.Top
 			};
 
-			m_PanelShowMessage.Controls.Add( lbl );
+			m_PanelShowMessage.Controls.Add( lblStickOnPanel );
 
 			// put on the top
-			m_PanelShowMessage.Controls.SetChildIndex( lbl, 0 );
+			m_PanelShowMessage.Controls.SetChildIndex( lblStickOnPanel, 0 );
 		}
 	}
 }

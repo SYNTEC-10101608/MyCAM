@@ -24,7 +24,7 @@ namespace MyCAM
 		{
 #if !DEBUG
 			if( FALicenseChecker.LicenseChecker.IsLicenseActivated() == false ) {
-				MessageBox.Show( "Authorization process is incorrect", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				MyApp.Logger.ShowOnLogPanel( "授權流程不正確", MyApp.NoticeType.Error);
 				Environment.Exit( 0 );
 			}
 #endif
@@ -40,7 +40,7 @@ namespace MyCAM
 			m_Viewer = new Viewer();
 			bool bSucess = m_Viewer.InitViewer( m_panViewer );
 			if( !bSucess ) {
-				MessageBox.Show( ToString() + "Init Error: Init Viewer" );
+				MyApp.Logger.ShowOnLogPanel( "初始化Viewer錯誤", MyApp.NoticeType.Error );
 				return;
 			}
 			m_Viewer.UpdateView();
@@ -665,23 +665,23 @@ namespace MyCAM
 				machineData = MachineDataXMLHelper.ConvertMachineDataFileToMachineData( machineDataDoc, out EMachineDataLoadStatus status, out int nErrorPrIndex );
 				switch( status ) {
 					case EMachineDataLoadStatus.NullMachineDataNode:
-						MyApp.Logger.ShowOnLogPanel( "機構參數節點為空,使用默認機構參數", NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( "機構參數節點為空,使用默認機構參數", MyApp.NoticeType.Warning );
 						return false;
 					case EMachineDataLoadStatus.NullFile:
-						MyApp.Logger.ShowOnLogPanel( "機構檔案為空,使用默認機構參數", NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( "機構檔案為空,使用默認機構參數", MyApp.NoticeType.Warning );
 						return false;
 					case EMachineDataLoadStatus.InvalidPrValue:
-						MyApp.Logger.ShowOnLogPanel( $"機構參數錯誤(Pr:{nErrorPrIndex}),使用默認機構參數", NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( $"機構參數錯誤(Pr:{nErrorPrIndex}),使用默認機構參數", MyApp.NoticeType.Warning );
 						return false;
 					case EMachineDataLoadStatus.TreeInvalid:
-						MyApp.Logger.ShowOnLogPanel( $"機構樹結構錯誤,使用默認機構樹", NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( "機構樹結構錯誤,使用默認機構樹", MyApp.NoticeType.Warning );
 						return true;
 					default:
 						return true;
 				}
 			}
 			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"讀取機構檔案失敗：\n{ex.Message},使用默認機構參數", NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( $"讀取機構檔案失敗：\n{ex.Message},使用默認機構參數", MyApp.NoticeType.Error );
 				return false;
 			}
 		}
@@ -786,7 +786,7 @@ namespace MyCAM
 				xmlDoc.Save( filePath );
 			}
 			catch( Exception ex ) {
-				MessageBox.Show( $"儲存機構檔案失敗：\n{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				MyApp.Logger.ShowOnLogPanel( $"儲存機構檔案失敗：\n{ex.Message}", MyApp.NoticeType.Error );
 			}
 		}
 

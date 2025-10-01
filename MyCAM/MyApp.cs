@@ -5,6 +5,13 @@ namespace MyCAM.App
 {
 	internal static class MyApp
 	{
+		public enum NoticeType
+		{
+			Hint,
+			Warning,
+			Error
+		}
+
 		public static Form MainForm
 		{
 			get => m_MainForm;
@@ -24,9 +31,9 @@ namespace MyCAM.App
 			get; private set;
 		}
 
-		static Panel LogPanel
+		public static Panel LogPanel
 		{
-			get; set;
+			get; private set;
 		}
 
 		static Form m_MainForm;
