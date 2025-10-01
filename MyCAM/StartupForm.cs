@@ -63,6 +63,7 @@ namespace MyCAM
 			else {
 				// get machine data fail, machine will be null(can't use)
 				m_DataManager = new DataManager();
+				MyApp.Logger.ShowOnLogPanel( "使用默認機構專案檔", MyApp.NoticeType.Hint );
 			}
 
 			// CAD Editor
@@ -140,6 +141,30 @@ namespace MyCAM
 			trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
 			m_Viewer.GetAISContext().Display( trihedron, false );
 			m_Viewer.GetAISContext().Deactivate( trihedron );
+		}
+
+		void m_tsmiFile_Click( object sender, EventArgs e )
+		{
+			if( m_CurrentEditor != null ) {
+				if( m_CurrentEditor == m_CADEditor ) {
+					m_CADEditor.CheckOutCurrentAction();
+					return;
+				}
+				SwitchEditor( EEditorType.CAD );
+				return;
+			}
+		}
+
+		// back to CAD editor
+		void m_tsmiCAD_Click( object sender, EventArgs e )
+		{
+			SwitchEditor( EEditorType.CAD );
+		}
+
+		// go to CAM editor
+		void m_tsmiCAM_Click( object sender, EventArgs e )
+		{
+			SwitchEditor( EEditorType.CAM );
 		}
 
 		// import part
@@ -661,6 +686,50 @@ namespace MyCAM
 			}
 		}
 
+		void DefaultUISetting()
+		{
+			// hide tool strip container
+			m_tscLevel2Container.Visible = false;
+			m_tscLevel3Container.Visible = false;
+
+			// default is cad mode
+			RefreshToolStripLayout( EUIStatus.CAD );
+		}
+
+		void UIListSetting()
+		{
+			UIStatusDic = new Dictionary<EUIStatus, List<Control>>()
+			{
+				{ EUIStatus.CAD , new List<Control>() { m_tsCADFunction } },
+				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction }},
+
+				// cad function
+				{ EUIStatus.AddFeature, new List<Control>() { m_tsCADFunction , m_tsAddFeactureSubFunc }},
+				{ EUIStatus.TransForm, new List<Control>() { m_tsCADFunction , m_tsTransformSubFunc }},
+				{ EUIStatus.ManualTransForm, new List<Control>() { m_tsCADFunction , m_tsTransformSubFunc, m_tsManualTrans}},
+				{ EUIStatus.ThreePntTransForm, new List<Control>(){  m_tsCADFunction , m_tsTransformSubFunc} },
+				{ EUIStatus.AxisTransform , new List<Control>(){  m_tsCADFunction , m_tsTransformSubFunc} },
+				
+				// cam function
+				{ EUIStatus.AddPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc } },
+				{ EUIStatus.SelectPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc, m_tsSelectPath } }
+			};
+			toolStripLevelList = new List<ToolStripContainer>()
+			{
+				m_tscLevel1Container,
+				m_tscLevel2Container,
+				m_tscLevel3Container
+			};
+
+			// to reset transform button color
+			trnasformControlList = new List<ToolStripButton>()
+			{
+				m_tsbManualTransform,
+				m_tsb3PntTransform,
+				m_tsbAxisTransform,
+			};
+		}
+
 		#region Get machine data
 
 		bool GetMachineDataSuccess( out MachineData machineData )
@@ -807,74 +876,6 @@ namespace MyCAM
 		}
 
 		#endregion
-
-		void m_tsmiFile_Click( object sender, EventArgs e )
-		{
-			if( m_CurrentEditor != null ) {
-				if( m_CurrentEditor == m_CADEditor ) {
-					m_CADEditor.CheckOutCurrentAction();
-					return;
-				}
-				SwitchEditor( EEditorType.CAD );
-				return;
-			}
-		}
-
-		// back to CAD editor
-		void m_tsmiCAD_Click( object sender, EventArgs e )
-		{
-			SwitchEditor( EEditorType.CAD );
-		}
-
-		// go to CAM editor
-		void m_tsmiCAM_Click( object sender, EventArgs e )
-		{
-			SwitchEditor( EEditorType.CAM );
-		}
-
-		void DefaultUISetting()
-		{
-			// hide tool strip container
-			m_tscLevel2Container.Visible = false;
-			m_tscLevel3Container.Visible = false;
-
-			// default is cad mode
-			RefreshToolStripLayout( EUIStatus.CAD );
-		}
-
-		void UIListSetting()
-		{
-			UIStatusDic = new Dictionary<EUIStatus, List<Control>>()
-			{
-				{ EUIStatus.CAD , new List<Control>() { m_tsCADFunction } },
-				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction }},
-
-				// cad function
-				{ EUIStatus.AddFeature, new List<Control>() { m_tsCADFunction , m_tsAddFeactureSubFunc }},
-				{ EUIStatus.TransForm, new List<Control>() { m_tsCADFunction , m_tsTransformSubFunc }},
-				{ EUIStatus.ManualTransForm, new List<Control>() { m_tsCADFunction , m_tsTransformSubFunc, m_tsManualTrans}},
-				{ EUIStatus.ThreePntTransForm, new List<Control>(){  m_tsCADFunction , m_tsTransformSubFunc} },
-				{ EUIStatus.AxisTransform , new List<Control>(){  m_tsCADFunction , m_tsTransformSubFunc} },
-				
-				// cam function
-				{ EUIStatus.AddPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc } },
-				{ EUIStatus.SelectPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc, m_tsSelectPath } }
-			};
-			toolStripLevelList = new List<ToolStripContainer>()
-			{
-				m_tscLevel1Container,
-				m_tscLevel2Container,
-				m_tscLevel3Container
-			};
-
-			// to reset transform button color
-			trnasformControlList = new List<ToolStripButton>()
-			{
-				m_tsbManualTransform,
-				m_tsb3PntTransform,
-				m_tsbAxisTransform,
-			};
-		}
 	}
 }
 

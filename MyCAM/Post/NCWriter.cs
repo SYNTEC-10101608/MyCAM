@@ -1,8 +1,9 @@
-﻿using MyCAM.Data;
-using OCC.gp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MyCAM.App;
+using MyCAM.Data;
+using OCC.gp;
 
 namespace MyCAM.Post
 {
@@ -41,6 +42,7 @@ namespace MyCAM.Post
 			}
 			m_StreamWriter.WriteLine( "M30;" ); // 程式結束
 			m_StreamWriter.Close();
+			MyApp.Logger.ShowOnLogPanel( "成功轉出NC", MyApp.NoticeType.Hint );
 		}
 
 		void WriteCutting( CAMData cuttingProcessData, int index )
