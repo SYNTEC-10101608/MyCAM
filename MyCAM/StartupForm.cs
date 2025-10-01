@@ -8,6 +8,7 @@ using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using MyCAM.Helper;
+using MyCAM.LogManager;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.Geom;
@@ -28,9 +29,11 @@ namespace MyCAM
 			}
 #endif
 
+			// need to init befor myapp because myapp will use LogPanel
+			InitializeComponent();
+
 			// app
 			MyApp.MainForm = this;
-			InitializeComponent();
 			UIListSetting();
 
 			// create the viewer
@@ -79,6 +82,14 @@ namespace MyCAM
 			// start with CAD editor
 			SwitchEditor( EEditorType.CAD );
 			DefaultUISetting();
+		}
+
+		public Panel GetLogPanel
+		{
+			get
+			{
+				return m_pnlLog;
+			}
 		}
 
 		// view properties
@@ -654,23 +665,23 @@ namespace MyCAM
 				machineData = MachineDataXMLHelper.ConvertMachineDataFileToMachineData( machineDataDoc, out EMachineDataLoadStatus status, out int nErrorPrIndex );
 				switch( status ) {
 					case EMachineDataLoadStatus.NullMachineDataNode:
-						MessageBox.Show( $"機構參數節點為空,使用默認機構參數", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						MyApp.Logger.ShowOnLogPanel( "機構參數節點為空,使用默認機構參數", NoticeType.Warning );
 						return false;
 					case EMachineDataLoadStatus.NullFile:
-						MessageBox.Show( $"機構檔案為空,使用默認機構參數", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						MyApp.Logger.ShowOnLogPanel( "機構檔案為空,使用默認機構參數", NoticeType.Warning );
 						return false;
 					case EMachineDataLoadStatus.InvalidPrValue:
-						MessageBox.Show( $"機構參數錯誤(Pr:{nErrorPrIndex}),使用默認機構參數", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						MyApp.Logger.ShowOnLogPanel( $"機構參數錯誤(Pr:{nErrorPrIndex}),使用默認機構參數", NoticeType.Warning );
 						return false;
 					case EMachineDataLoadStatus.TreeInvalid:
-						MessageBox.Show( $"機構樹結構錯誤,使用默認機構樹", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						MyApp.Logger.ShowOnLogPanel( $"機構樹結構錯誤,使用默認機構樹", NoticeType.Warning );
 						return true;
 					default:
 						return true;
 				}
 			}
 			catch( Exception ex ) {
-				MessageBox.Show( $"讀取機構檔案失敗：\n{ex.Message},使用默認機構參數", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				MyApp.Logger.ShowOnLogPanel( $"讀取機構檔案失敗：\n{ex.Message},使用默認機構參數", NoticeType.Error );
 				return false;
 			}
 		}
