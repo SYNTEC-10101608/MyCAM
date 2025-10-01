@@ -38,7 +38,6 @@ namespace MyCAM.Post
 					m_StreamWriter.WriteLine( "G53 Z0.;" ); // 機械軸復位
 					m_StreamWriter.WriteLine( "G53 " + m_MasterAxisName + "0. " + m_SlaveAxisName + "0." );
 					m_StreamWriter.WriteLine( "G43.4 P1;" ); // G43.4 新動程
-
 					for( int i = 0; i < m_ProcessDataList.Count; i++ ) {
 						WriteCutting( m_ProcessDataList[ i ], i + 1 );
 					}
