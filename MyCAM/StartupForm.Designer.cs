@@ -79,7 +79,7 @@
 			this.m_tsSelectPath = new System.Windows.Forms.ToolStrip();
 			this.m_tsbSelPath_FreeBound = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSelPath_Manual = new System.Windows.Forms.ToolStripButton();
-			this.m_tsManualSelectPathOK = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbManualSelectPathOK = new System.Windows.Forms.ToolStripButton();
 			this.m_tsManualTrans = new System.Windows.Forms.ToolStrip();
 			this.m_tsbManualTransPlane = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbManualTransPlanePar = new System.Windows.Forms.ToolStripButton();
@@ -620,7 +620,7 @@
 			this.m_tsSelectPath.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsbSelPath_FreeBound,
             this.m_tsbSelPath_Manual,
-            this.m_tsManualSelectPathOK});
+            this.m_tsbManualSelectPathOK});
 			this.m_tsSelectPath.Location = new System.Drawing.Point(0, 0);
 			this.m_tsSelectPath.Name = "m_tsSelectPath";
 			this.m_tsSelectPath.Size = new System.Drawing.Size(1065, 22);
@@ -649,13 +649,13 @@
 			// 
 			// m_tsManualSelectPathOK
 			// 
-			this.m_tsManualSelectPathOK.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsManualSelectPathOK.Image = ((System.Drawing.Image)(resources.GetObject("m_tsManualSelectPathOK.Image")));
-			this.m_tsManualSelectPathOK.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsManualSelectPathOK.Name = "m_tsManualSelectPathOK";
-			this.m_tsManualSelectPathOK.Size = new System.Drawing.Size(89, 19);
-			this.m_tsManualSelectPathOK.Text = "手動選取完成";
-			this.m_tsManualSelectPathOK.Click += new System.EventHandler(this.m_tsManualSelectPathOK_Click);
+			this.m_tsbManualSelectPathOK.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbManualSelectPathOK.Image = ((System.Drawing.Image)(resources.GetObject("m_tsManualSelectPathOK.Image")));
+			this.m_tsbManualSelectPathOK.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbManualSelectPathOK.Name = "m_tsManualSelectPathOK";
+			this.m_tsbManualSelectPathOK.Size = new System.Drawing.Size(89, 19);
+			this.m_tsbManualSelectPathOK.Text = "手動選取完成";
+			this.m_tsbManualSelectPathOK.Click += new System.EventHandler(this.m_tsbManualSelectPathOK_Click);
 			// 
 			// m_tsManualTrans
 			// 
@@ -840,7 +840,7 @@
 		private System.Windows.Forms.ToolStrip m_tsSelectPath;
 		private System.Windows.Forms.ToolStripButton m_tsbSelPath_FreeBound;
 		private System.Windows.Forms.ToolStripButton m_tsbSelPath_Manual;
-		private System.Windows.Forms.ToolStripButton m_tsManualSelectPathOK;
+		private System.Windows.Forms.ToolStripButton m_tsbManualSelectPathOK;
 		private System.Windows.Forms.ToolStripButton m_tsbManualTransDone;
 		private System.Windows.Forms.ToolStripButton m_tsbTraverseParamSetting;
 		private System.Windows.Forms.ToolStripButton m_tsbConvertNC;

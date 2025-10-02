@@ -293,7 +293,7 @@ namespace MyCAM
 			RefreshToolStripLayout( EUIStatus.SelectPath );
 		}
 
-		void m_tsManualSelectPathOK_Click( object sender, EventArgs e )
+		void m_tsbManualSelectPathOK_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.EndSelectPath_Manual();
 		}
@@ -464,7 +464,7 @@ namespace MyCAM
 				RefreshToolStripLayout( EUIStatus.CAM );
 				if( action == EditActionType.SelectPath ) {
 					m_tsbAddPath.BackColor = m_defaultBtnColor;
-					m_tsManualSelectPathOK.Enabled = true;
+					m_tsbManualSelectPathOK.Enabled = true;
 					m_tsbSelPath_Manual.BackColor = m_defaultBtnColor;
 					return;
 				}
@@ -500,7 +500,7 @@ namespace MyCAM
 			}
 			if( action == EditActionType.SelectFace ) {
 				m_tsbAddPath.BackColor = m_buttonOnColor;
-				m_tsManualSelectPathOK.Enabled = false;
+				m_tsbManualSelectPathOK.Enabled = false;
 				RefreshToolStripLayout( EUIStatus.AddPath );
 				return;
 			}
@@ -509,7 +509,7 @@ namespace MyCAM
 				// add path still icon still need to light up
 				m_tsbAddPath.BackColor = m_buttonOnColor;
 				m_tsbSelPath_Manual.BackColor = m_buttonOnColor;
-				m_tsManualSelectPathOK.Enabled = true;
+				m_tsbManualSelectPathOK.Enabled = true;
 				RefreshToolStripLayout( EUIStatus.SelectPath );
 				return;
 			}
