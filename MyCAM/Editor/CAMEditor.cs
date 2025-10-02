@@ -28,6 +28,8 @@ namespace MyCAM.Editor
 		public Action<EActionStatus> LeadActionStatusChange;
 		public Action<EActionStatus> OverCutActionStatusChange;
 		public Action<EActionStatus> TraversePrarmSettingActionStausChanged;
+		public Action<EActionStatus> SelectFaceActionStausChanged;
+		public Action<EActionStatus> SelectPathActionStausChanged;
 		public Action<bool, bool> PathPropertyChanged; // isClosed, hasLead
 
 		public CAMEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
@@ -373,7 +375,7 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ShapeDataMap[ szID ].Shape );
+				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ShapeDataMap[ szID ].Shape, 3.0 );
 				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
@@ -646,8 +648,8 @@ namespace MyCAM.Editor
 				}
 
 				// tool down + follow safe + tool up AIS lines
-				m_TraverseAISList.AddRange( GetAISLineList( cutDownPointList, Quantity_NameOfColor.Quantity_NOC_WHITE, 1, 0.5, true ) );
-				m_TraverseAISList.AddRange( GetAISLineList( liftUpPointList, Quantity_NameOfColor.Quantity_NOC_ORANGE, 1, 0.5, true ) );
+				m_TraverseAISList.AddRange( GetAISLineList( cutDownPointList, Quantity_NameOfColor.Quantity_NOC_RED, 1, 0.5, true ) );
+				m_TraverseAISList.AddRange( GetAISLineList( liftUpPointList, Quantity_NameOfColor.Quantity_NOC_RED, 1, 0.5, true ) );
 			}
 
 			// Display all lines
@@ -819,6 +821,12 @@ namespace MyCAM.Editor
 			if( action.ActionType == EditActionType.SetTraverseParam ) {
 				TraversePrarmSettingActionStausChanged?.Invoke( EActionStatus.Start );
 			}
+			if( action.ActionType == EditActionType.SelectFace ) {
+				SelectFaceActionStausChanged?.Invoke( EActionStatus.Start );
+			}
+			if( action.ActionType == EditActionType.SelectPath ) {
+				SelectPathActionStausChanged?.Invoke( EActionStatus.Start );
+			}
 		}
 
 		protected override void OnEditActionEnd( IEditorAction action )
@@ -831,6 +839,12 @@ namespace MyCAM.Editor
 			}
 			if( action.ActionType == EditActionType.SetTraverseParam ) {
 				TraversePrarmSettingActionStausChanged?.Invoke( EActionStatus.End );
+			}
+			if( action.ActionType == EditActionType.SelectFace ) {
+				SelectFaceActionStausChanged?.Invoke( EActionStatus.End );
+			}
+			if( action.ActionType == EditActionType.SelectPath ) {
+				SelectPathActionStausChanged?.Invoke( EActionStatus.End );
 			}
 			base.OnEditActionEnd( action );
 		}

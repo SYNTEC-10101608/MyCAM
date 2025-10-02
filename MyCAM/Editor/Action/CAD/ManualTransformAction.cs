@@ -1,5 +1,6 @@
 ﻿using MyCAM.Data;
 using OCC.AIS;
+using OCC.Aspect;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.Quantity;
@@ -87,14 +88,20 @@ namespace MyCAM.Editor
 		protected override void ViewerMouseDown( MouseEventArgs e )
 		{
 			if( e.Button == MouseButtons.Left ) {
-				m_Viewer.ShiftSelect();
+				if( ( Control.ModifierKeys & Keys.Control ) == Keys.Control ) {
+					m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_XOR );
+				}
+				else {
+					m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_Replace );
+				}
+				m_Viewer.UpdateView();
 			}
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Escape ) {
-				m_Viewer.GetAISContext().ClearSelected( true );
+				End();
 			}
 		}
 
@@ -168,16 +175,22 @@ namespace MyCAM.Editor
 			// XY AIS
 			AIS_Shape aisXY = new AIS_Shape( faceXY.Face() );
 			aisXY.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+			aisXY.Attributes().SetFaceBoundaryDraw( true );
+			aisXY.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			m_G54AISList.Add( aisXY );
 
 			// YZ AIS
 			AIS_Shape aisYZ = new AIS_Shape( trasformYZ.Shape() );
 			aisYZ.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+			aisYZ.Attributes().SetFaceBoundaryDraw( true );
+			aisYZ.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			m_G54AISList.Add( aisYZ );
 
 			// XZ AIS
 			AIS_Shape aisXZ = new AIS_Shape( trasformXZ.Shape() );
 			aisXZ.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+			aisXZ.Attributes().SetFaceBoundaryDraw( true );
+			aisXZ.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			m_G54AISList.Add( aisXZ );
 
 			// X AIS
@@ -198,14 +211,17 @@ namespace MyCAM.Editor
 			aisZ.SetWidth( 2.0f ); // make Z axis thicker
 			m_G54AISList.Add( aisZ );
 
+			// original
 			AIS_Shape aisOri = new AIS_Shape( oriVertex.Vertex() );
-			aisOri.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_YELLOW ) );
+			aisOri.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BROWN3 ) );
+			aisOri.Attributes().PointAspect().SetTypeOfMarker( Aspect_TypeOfMarker.Aspect_TOM_BALL );
+			aisOri.Attributes().PointAspect().SetScale( 3.0f );
 			m_G54AISList.Add( aisOri );
 
 			// set properties
 			foreach( AIS_Shape ais in m_G54AISList ) {
 				ais.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-				ais.SetTransparency( 0.9f );
+				ais.SetTransparency( 0.7f );
 			}
 		}
 
@@ -392,5 +408,6 @@ namespace MyCAM.Editor
 
 		TopoDS_Shape m_G54Shape;
 		List<AIS_Shape> m_G54AISList;
+		bool m_IsControlPress = false;
 	}
 }

@@ -86,6 +86,8 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_Add );
 			if( ( m_AddPointType == AddPointType.TwoVertexMidPoint && m_Viewer.GetAISContext().NbSelected() != 2 )
 				|| m_Viewer.GetAISContext().NbSelected() == 0 ) {
+
+				// update view to keep selection highlighted on the canvas
 				m_Viewer.UpdateView();
 				return;
 			}

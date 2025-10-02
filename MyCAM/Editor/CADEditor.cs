@@ -33,6 +33,7 @@ namespace MyCAM.Editor
 		}
 
 		public Action<EActionStatus> AxisTransformActionStausChanged;
+		public Action<EActionStatus> ManualTransformActionStausChanged;
 
 		// editor
 		public override EEditorType Type
@@ -264,12 +265,18 @@ namespace MyCAM.Editor
 			if( action.ActionType == EditActionType.AxisTransform ) {
 				AxisTransformActionStausChanged?.Invoke( EActionStatus.Start );
 			}
+			if( action.ActionType == EditActionType.ManualTransform ) {
+				ManualTransformActionStausChanged?.Invoke( EActionStatus.Start );
+			}
 		}
 
 		protected override void OnEditActionEnd( IEditorAction action )
 		{
 			if( action.ActionType == EditActionType.AxisTransform ) {
 				AxisTransformActionStausChanged?.Invoke( EActionStatus.End );
+			}
+			if( action.ActionType == EditActionType.ManualTransform ) {
+				ManualTransformActionStausChanged?.Invoke( EActionStatus.End );
 			}
 			base.OnEditActionEnd( action );
 		}

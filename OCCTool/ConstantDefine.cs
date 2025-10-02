@@ -18,4 +18,13 @@
 		Graphic3d_ZLayerId_TopOSD = -4,
 		Graphic3d_ZLayerId_BotOSD = -5
 	}
+
+	public enum HightlightDisplayMode
+	{
+		Undefine = -1,
+		WireFrame = 0,
+		Face = 1,
+		Cuboid = 2,
+		FaceAndWireFrame = 3,
+	}
 }

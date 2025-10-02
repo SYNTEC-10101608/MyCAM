@@ -24,10 +24,12 @@ using OCC.Aspect;
 using OCC.gp;
 using OCC.Graphic3d;
 using OCC.OpenGl;
+using OCC.Prs3d;
 using OCC.Quantity;
 using OCC.Standard;
 using OCC.V3d;
 using OCC.WNT;
+using OCCTool;
 using System;
 using System.Windows.Forms;
 
@@ -68,18 +70,30 @@ namespace OCCViewer
 			myView.MustBeResized();
 
 			// set background color to black
-			myView.SetBackgroundColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+			myView.SetBackgroundColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY90 ) );
 
 			// LASER-1073 make an Axis triedron which fixed on panel LEFT_LOWER
 			myView.ZBufferTriedronSetup( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ),
 										new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ),
 										new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE1 ), 0.8, 0.02, 20 );
 			myView.TriedronDisplay( Aspect_TypeOfTriedronPosition.Aspect_TOTP_LEFT_LOWER,
-									new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ),
+									new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ),
 									0.2, V3d_TypeOfVisualization.V3d_ZBUFFER );
 
 			// expand the range of clicking path
 			myAISContext.SelectionManager().Selector().SetPixelTolerance( SELECT_PixelTolerance );
+
+			// set detecting mode color and style
+			SetDrawerAttribute( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Dynamic, Quantity_NameOfColor.Quantity_NOC_ORANGE, 0.5f );
+
+			// set selection mode color and style
+			SetDrawerAttribute( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected, Quantity_NameOfColor.Quantity_NOC_GREEN );
+
+			// set local detecting mode color and style
+			SetDrawerAttribute( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalDynamic, Quantity_NameOfColor.Quantity_NOC_ORANGE, 0.5f, true, true );
+
+			// set local detecting mode color and style
+			SetDrawerAttribute( Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected, Quantity_NameOfColor.Quantity_NOC_GREEN, 0, true, true );
 
 			Graphic3d_RenderingParams.CRef cref = myView.ChangeRenderingParams();
 			cref.Ptr.NbMsaaSamples = 10000;
@@ -513,6 +527,23 @@ namespace OCCViewer
 					UpdateView();
 					break;
 			}
+		}
+
+		void SetDrawerAttribute( Prs3d_TypeOfHighlight type, Quantity_NameOfColor color, double transparency = 0, bool considerWire = false, bool considerPoint = false )
+		{
+			double WIRE_WIDTH = 2.0;
+			double POINT_SCALE = 3.0;
+			Prs3d_Drawer drawer = myAISContext.HighlightStyle( type );
+			drawer.SetDisplayMode( (int)HightlightDisplayMode.FaceAndWireFrame );
+			drawer.SetColor( new Quantity_Color( color ) );
+			drawer.SetTransparency( (float)transparency );
+			if( considerWire ) {
+				drawer.SetWireAspect( new Prs3d_LineAspect( new Quantity_Color( color ), Aspect_TypeOfLine.Aspect_TOL_SOLID, WIRE_WIDTH ) );
+			}
+			if( considerPoint ) {
+				drawer.SetPointAspect( new Prs3d_PointAspect( Aspect_TypeOfMarker.Aspect_TOM_BALL, new Quantity_Color( color ), POINT_SCALE ) );
+			}
+			myAISContext.SetHighlightStyle( type, drawer );
 		}
 
 		public Action<MouseEventArgs> MouseWheel;
