@@ -545,7 +545,7 @@ namespace MyCAM
 
 		void RefreshToolStripLayout( EUIStatus uiStatus )
 		{
-			if( !m_UIStatusDic.ContainsKey( uiStatus ) ) {
+			if( !m_UIStatusDic.ContainsKey( uiStatus ) || m_UIStatusDic[ uiStatus ] == null ) {
 				return;
 			}
 
