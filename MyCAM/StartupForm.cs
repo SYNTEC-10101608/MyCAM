@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Windows.Forms;
-using System.Xml.Linq;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using MyCAM.Helper;
@@ -12,6 +8,10 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
+using System;
+using System.IO;
+using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace MyCAM
 {
@@ -63,6 +63,7 @@ namespace MyCAM
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			m_CADEditor.AxisTransformActionStausChanged += OnAxisTransformActionStausChanged;
+			m_CADEditor.ManualTransformActionStausChanged += OnManualTransformStausChanged;
 
 			// CAM Editor
 			m_CAMEditor = new CAMEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -70,6 +71,8 @@ namespace MyCAM
 			m_CAMEditor.LeadActionStatusChange += OnLeadSettingActionStatusChange;
 			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
 			m_CAMEditor.TraversePrarmSettingActionStausChanged += OnTraverseSettingActionStausChanged;
+			m_CAMEditor.SelectFaceActionStausChanged += OnSelectFaceActionStausChanged;
+			m_CAMEditor.SelectPathActionStausChanged += OnSelectPathActionStausChanged;
 
 			// simu editor
 			m_SimuEditor = new SimuEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -97,10 +100,11 @@ namespace MyCAM
 		{
 			gp_Ax2 ax2 = new gp_Ax2();
 			AIS_Trihedron trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
-			trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			trihedron.SetSize( 100.0 );
-			trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+			trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+			trihedron.SetArrowColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			m_Viewer.GetAISContext().Display( trihedron, false );
 			m_Viewer.GetAISContext().Deactivate( trihedron );
 		}
@@ -155,8 +159,7 @@ namespace MyCAM
 		// manual transform
 		void m_tsmiManualTransform_Click( object sender, EventArgs e )
 		{
-			m_msCAD_Transform.Visible = true;
-			m_msCAD.Enabled = false;
+
 			m_CADEditor.StartManaulTransform();
 		}
 
@@ -223,8 +226,6 @@ namespace MyCAM
 		// add path
 		void m_tsmiAddPath_Click( object sender, EventArgs e )
 		{
-			m_msCAD_SelectFace.Visible = true;
-			m_msCAM.Enabled = false;
 			m_CAMEditor.StartSelectFace();
 		}
 
@@ -235,22 +236,16 @@ namespace MyCAM
 
 		void m_tsmiSelPath_FreeBound_Click( object sender, EventArgs e )
 		{
-			m_msCAD_SelectFace.Visible = false;
-			m_msCAM.Enabled = true;
 			m_CAMEditor.SelectPath_FreeBound();
 		}
 
 		void m_tsmiSelPath_Manual_Click( object sender, EventArgs e )
 		{
-			m_msCAD_ManualSelectPath.Visible = true;
-			m_msCAD_SelectFace.Visible = false;
 			m_CAMEditor.StartSelectPath_Manual();
 		}
 
 		void m_tsmiManualSelectPathOK_Click( object sender, EventArgs e )
 		{
-			m_msCAD_ManualSelectPath.Visible = false;
-			m_msCAM.Enabled = true;
 			m_CAMEditor.EndSelectPath_Manual();
 		}
 
@@ -339,6 +334,40 @@ namespace MyCAM
 		}
 
 		#region UI action 
+
+		void OnManualTransformStausChanged( EActionStatus actionStatus )
+		{
+			if( actionStatus == EActionStatus.Start ) {
+				m_msCAD_Transform.Visible = true;
+				m_msCAD.Enabled = false;
+				return;
+			}
+			m_msCAD_Transform.Visible = false;
+			m_msCAD.Enabled = true;
+		}
+
+		void OnSelectFaceActionStausChanged( EActionStatus actionStatus )
+		{
+			if( actionStatus == EActionStatus.Start ) {
+				m_msCAD_SelectFace.Visible = true;
+				m_msCAM.Enabled = false;
+				return;
+			}
+			m_msCAD_SelectFace.Visible = false;
+			m_msCAM.Enabled = true;
+		}
+
+		void OnSelectPathActionStausChanged( EActionStatus actionStatus )
+		{
+			if( actionStatus == EActionStatus.Start ) {
+				m_msCAD_ManualSelectPath.Visible = true;
+				m_msCAD_SelectFace.Visible = false;
+				m_msCAM.Enabled = false;
+				return;
+			}
+			m_msCAD_ManualSelectPath.Visible = false;
+			m_msCAM.Enabled = true;
+		}
 
 		void OnLeadSettingActionStatusChange( EActionStatus actionStatus )
 		{

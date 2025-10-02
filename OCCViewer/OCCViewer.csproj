@@ -48,5 +48,11 @@
     <Compile Include="Viewer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OCCTool\OCCTool.csproj">
+      <Project>{E9C0AB57-4558-4BAF-B154-B20169A256FE}</Project>
+      <Name>OCCTool</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

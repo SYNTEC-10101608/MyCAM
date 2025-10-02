@@ -1,6 +1,5 @@
 ﻿using MyCAM.Data;
 using OCC.AIS;
-using OCC.Quantity;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
@@ -104,35 +103,24 @@ namespace MyCAM.Editor
 
 		protected override void ViewerMouseDown( MouseEventArgs e )
 		{
-			// TODO: figure how OCCT slect work, dont do shit like this
 			if( e.Button == MouseButtons.Left ) {
-
-				// the program will crash if nothing detected, so dont use detected interactive API
-				m_Viewer.Select();
-				m_Viewer.GetAISContext().InitSelected();
-				if( !m_Viewer.GetAISContext().MoreSelected() ) {
+				if( m_Viewer.GetAISContext().DetectedOwner().IsNull()
+					|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
 					return;
 				}
-				AIS_InteractiveObject ais = m_Viewer.GetAISContext().SelectedInteractive();
-				if( ais == null || ais.IsNull() ) {
-					return;
+				AIS_InteractiveObject detectedObject = m_Viewer.GetAISContext().DetectedInteractive();
+				if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
+					m_Viewer.GetAISContext().ClearSelected( false );
 				}
-				m_Viewer.GetAISContext().ClearSelected( false );
-
-				// arrange the colors
-				Quantity_Color color = new Quantity_Color();
-				ais.Color( ref color );
-
-				// toggle color
-				if( color.Name() == SelectViewHelper.COLOR_DEFAULT ) {
-					ais.SetColor( new Quantity_Color( SelectViewHelper.COLOR_SELECTED ) );
-				}
-				else {
-					ais.SetColor( new Quantity_Color( SelectViewHelper.COLOR_DEFAULT ) );
-				}
-				ais.Attributes().SetFaceBoundaryDraw( true );
-				ais.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+				m_Viewer.GetAISContext().AddOrRemoveSelected( detectedObject, false );
 				m_Viewer.UpdateView();
+			}
+		}
+
+		protected override void ViewerKeyDown( KeyEventArgs e )
+		{
+			if( e.KeyCode == Keys.Escape ) {
+				End();
 			}
 		}
 
@@ -186,24 +174,15 @@ namespace MyCAM.Editor
 					}
 				}
 			}
+			m_Viewer.GetAISContext().ClearSelected( true );
 
 			// select all D1 continuous faces
 			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
-				bool isD1Cont = false;
 				foreach( TopoDS_Face oneFace in allD1ContFaceList ) {
 					if( faceAISPair.Face.IsEqual( oneFace ) ) {
-						isD1Cont = true;
-						break;
+						m_Viewer.GetAISContext().AddOrRemoveSelected( faceAISPair.AIS, true );
 					}
 				}
-				if( isD1Cont ) {
-					faceAISPair.AIS.SetColor( new Quantity_Color( SelectViewHelper.COLOR_SELECTED ) );
-				}
-				else {
-					faceAISPair.AIS.SetColor( new Quantity_Color( SelectViewHelper.COLOR_DEFAULT ) );
-				}
-				faceAISPair.AIS.Attributes().SetFaceBoundaryDraw( true );
-				faceAISPair.AIS.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			}
 			m_Viewer.UpdateView();
 		}
@@ -252,12 +231,14 @@ namespace MyCAM.Editor
 		List<TopoDS_Face> GetSelectedFace()
 		{
 			List<TopoDS_Face> selectedFaceList = new List<TopoDS_Face>();
-			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
-				Quantity_Color color = new Quantity_Color();
-				faceAISPair.AIS.Color( ref color );
-				if( color.Name() == SelectViewHelper.COLOR_SELECTED ) {
-					selectedFaceList.Add( faceAISPair.Face );
+			m_Viewer.GetAISContext().InitSelected();
+			while( m_Viewer.GetAISContext().MoreSelected() ) {
+				TopoDS_Shape shape = m_Viewer.GetAISContext().SelectedShape();
+				if( shape == null || shape.ShapeType() != TopAbs_ShapeEnum.TopAbs_FACE ) {
+					continue;
 				}
+				selectedFaceList.Add( TopoDS.ToFace( shape ) );
+				m_Viewer.GetAISContext().NextSelected();
 			}
 			return selectedFaceList;
 		}

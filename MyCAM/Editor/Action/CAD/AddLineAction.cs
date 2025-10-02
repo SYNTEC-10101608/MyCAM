@@ -74,6 +74,8 @@ namespace MyCAM.Editor
 			}
 			m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_Add );
 			if( m_Viewer.GetAISContext().NbSelected() != 2 ) {
+
+				// update view to keep selection highlighted on the canvas
 				m_Viewer.UpdateView();
 				return;
 			}
