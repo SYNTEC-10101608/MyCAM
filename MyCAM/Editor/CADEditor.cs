@@ -318,17 +318,11 @@ namespace MyCAM.Editor
 		{
 			base.OnEditActionStart( action );
 			RaiseCADActionStatusChange?.Invoke( action.ActionType, EActionStatus.Start );
-			if( action.ActionType == EditActionType.ManualTransform ) {
-				ManualTransformActionStausChanged?.Invoke( EActionStatus.Start );
-			}
 		}
 
 		protected override void OnEditActionEnd( IEditorAction action )
 		{
 			RaiseCADActionStatusChange?.Invoke( action.ActionType, EActionStatus.End );
-			if( action.ActionType == EditActionType.ManualTransform ) {
-				ManualTransformActionStausChanged?.Invoke( EActionStatus.End );
-			}
 			base.OnEditActionEnd( action );
 		}
 	}
