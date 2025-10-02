@@ -174,13 +174,13 @@ namespace MyCAM.Editor
 					}
 				}
 			}
-			m_Viewer.GetAISContext().ClearSelected( true );
+			m_Viewer.GetAISContext().ClearSelected( false );
 
 			// select all D1 continuous faces
 			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
 				foreach( TopoDS_Face oneFace in allD1ContFaceList ) {
 					if( faceAISPair.Face.IsEqual( oneFace ) ) {
-						m_Viewer.GetAISContext().AddOrRemoveSelected( faceAISPair.AIS, true );
+						m_Viewer.GetAISContext().AddOrRemoveSelected( faceAISPair.AIS, false );
 					}
 				}
 			}
