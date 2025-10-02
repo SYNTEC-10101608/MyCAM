@@ -26,8 +26,6 @@ namespace MyCAM.Editor
 	internal class CAMEditor : EditorBase
 	{
 		// to notice main form
-		public Action<EActionStatus> SelectFaceActionStausChanged;
-		public Action<EActionStatus> SelectPathActionStausChanged;
 		public Action<bool, bool> PathPropertyChanged; // isClosed, hasLead
 		public Action<EditActionType, EActionStatus> RaiseCAMActionStatusChange;
 		public Action<EActionStatus> RaiseWithDlgActionStatusChange;
