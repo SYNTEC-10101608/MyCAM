@@ -101,20 +101,15 @@ namespace MyCAM.Editor
 					// DeactivateCurrentMode and HasActiveMode do not work correctly together
 					m_OneTimeTrsf = new gp_Trsf();
 				}
+				ApplyTransform( m_AccumulatedTrsf );
 			}
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Escape ) {
-				TransformDone();
+				End();
 			}
-		}
-
-		public void TransformDone()
-		{
-			ApplyTransform( m_AccumulatedTrsf );
-			End();
 		}
 
 		void ApplyTransform( gp_Trsf trsf )

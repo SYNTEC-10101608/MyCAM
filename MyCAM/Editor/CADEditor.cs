@@ -172,7 +172,7 @@ namespace MyCAM.Editor
 		public void EndCurrentActionByEditorChange()
 		{
 			if( m_CurrentAction is AxisTransformAction axisTransformAction ) {
-				axisTransformAction.TransformDone();
+				axisTransformAction.End();
 				return;
 			}
 			if( m_CurrentAction is ThreePtTransformAction threePtTransformAction ) {
