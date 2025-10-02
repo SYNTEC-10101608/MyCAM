@@ -21,8 +21,12 @@ namespace MyCAM.App
 				m_MainForm = value;
 
 				if( value is StartupForm f ) {
+
+					// get main form log panel
 					m_LogPanel = f.GetLogPanel;
-					m_Logger = new LogHandler( LogPanel );
+
+					// send panel to logger
+					m_Logger = new LogHandler( m_LogPanel );
 				}
 			}
 		}
@@ -35,17 +39,6 @@ namespace MyCAM.App
 					throw new InvalidOperationException( "Logger還沒初始化，請先設定 MainForm。" );
 				}
 				return m_Logger;
-			}
-		}
-
-		public static Panel LogPanel
-		{
-			get
-			{
-				if( m_LogPanel == null ) {
-					throw new InvalidOperationException( "LogPanel還沒初始化，請先設定 MainForm。" );
-				}
-				return m_LogPanel;
 			}
 		}
 

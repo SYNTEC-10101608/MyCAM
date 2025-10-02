@@ -370,7 +370,7 @@ namespace MyCAM
 		// convert NC
 		void m_tsbConvertNC_Click( object sender, EventArgs e )
 		{
-			if (m_CurrentEditor == m_CAMEditor ) {
+			if( m_CurrentEditor == m_CAMEditor ) {
 				m_CAMEditor.EndCurrentAction();
 			}
 			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
