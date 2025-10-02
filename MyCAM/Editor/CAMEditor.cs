@@ -101,23 +101,18 @@ namespace MyCAM.Editor
 		// APIs
 		public void EndCurrentAction()
 		{
-			if (m_CurrentAction != null ) {
+			if( m_CurrentAction != null ) {
 				m_CurrentAction.End();
 			}
 		}
 
 		public void StartSelectFace()
 		{
-			if( m_CurrentAction == null ) {
-				return;
-			}
-
 			// with on/off button, so can end current action first
 			if( IsSameAction( EditActionType.SelectFace ) || IsSameAction( EditActionType.SelectPath ) ) {
-				m_CurrentAction.End();
+				m_CurrentAction?.End();
 				return;
 			}
-			m_CurrentAction.End();
 			SelectFaceAction action = new SelectFaceAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
@@ -137,7 +132,6 @@ namespace MyCAM.Editor
 				return;
 			}
 			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
-			m_CurrentAction.End();
 
 			// get path from free boundaries
 			if( selectedFaceGroupList.Count == 0 ) {
@@ -164,10 +158,6 @@ namespace MyCAM.Editor
 
 		public void StartSelectPath_Manual()
 		{
-			if( m_CurrentAction == null ) {
-				return;
-			}
-
 			// with on/off button, so can end current action first
 			if( IsSameAction( EditActionType.SelectPath ) || m_CurrentAction.ActionType != EditActionType.SelectFace ) {
 				m_CurrentAction.End();
@@ -197,12 +187,13 @@ namespace MyCAM.Editor
 
 		public void RemovePath()
 		{
-			if( m_CurrentAction == null ) {
-				return;
+			// default action do not need to stop
+			if( m_CurrentAction != m_DefaultAction ) {
+				m_CurrentAction?.End();
 			}
-			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
 				return;
 			}
 
@@ -217,6 +208,7 @@ namespace MyCAM.Editor
 			TreeNode node = m_ViewManager.TreeNodeMap[ szPathID ];
 			m_TreeView.Nodes.Remove( node );
 			m_ViewManager.TreeNodeMap.Remove( szPathID );
+
 			ShowCAMData();
 		}
 
@@ -224,39 +216,40 @@ namespace MyCAM.Editor
 
 		public void SetStartPoint()
 		{
-			if( m_CurrentAction == null ) {
-				return;
-			}
-
-			// with on/off button, so can end current action first
+			// is on/off button, so end it then return
 			if( IsSameAction( EditActionType.StartPoint ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
+
+				// do not need to stop default action
+				if( m_CurrentAction != m_DefaultAction ) {
+					m_CurrentAction?.End();
+				}
 				return;
 			}
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
 
 			// skip non-closed path
-			if( pathData.CAMData.IsClosed == false ) {
+			if( !pathData.CAMData.IsClosed ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]非封閉路徑不支援修改起點", MyApp.NoticeType.Hint );
 				return;
 			}
-			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
+
+			var action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
 
 		public void SetReverse()
 		{
-			if( m_CurrentAction == null ) {
-				return;
+			// is from other action, so need to stop it
+			if( m_CurrentAction != m_DefaultAction ) {
+				m_CurrentAction?.End();
 			}
-			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
@@ -271,19 +264,19 @@ namespace MyCAM.Editor
 
 		public void SetOverCut()
 		{
-			if( m_CurrentAction == null ) {
-				return;
-			}
-
-			// with on/off button, so can end current action first
+			// is on/off button, so end it then return
 			if( IsSameAction( EditActionType.OverCut ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
+
+				// default action do not need to stop
+				if( m_CurrentAction != m_DefaultAction ) {
+					m_CurrentAction?.End();
+				}
 				return;
 			}
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
@@ -294,19 +287,19 @@ namespace MyCAM.Editor
 
 		public void SetLeadLine()
 		{
-			if( m_CurrentAction == null ) {
-				return;
-			}
-
-			// with on/off button, so can end current action first
+			// is on/off button, so end it then return
 			if( IsSameAction( EditActionType.SetLead ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
+
+				// default action do not need to stop
+				if( m_CurrentAction != m_DefaultAction ) {
+					m_CurrentAction?.End();
+				}
 				return;
 			}
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
@@ -317,10 +310,10 @@ namespace MyCAM.Editor
 
 		public void ChangeLeadDirection()
 		{
-			if( m_CurrentAction == null ) {
-				return;
+			// default action do not need to stop
+			if( m_CurrentAction != m_DefaultAction ) {
+				m_CurrentAction?.End();
 			}
-			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
@@ -342,19 +335,19 @@ namespace MyCAM.Editor
 
 		public void SetToolVec()
 		{
-			if( m_CurrentAction == null ) {
-				return;
-			}
-
-			// with on/off button, so can end current action first
+			// is on/off button, so end it then return
 			if( IsSameAction( EditActionType.ToolVec ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
+
+				// default action do not need to stop
+				if( m_CurrentAction != m_DefaultAction ) {
+					m_CurrentAction?.End();
+				}
 				return;
 			}
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
@@ -365,16 +358,10 @@ namespace MyCAM.Editor
 
 		public void SetToolVecReverse()
 		{
-			if( m_CurrentAction == null ) {
-				return;
-			}
-
-			// with on/off button, so can end current action first
-			if( IsSameAction( EditActionType.OverCut ) ) {
+			// default action do not need to stop
+			if( m_CurrentAction != m_DefaultAction ) {
 				m_CurrentAction.End();
-				return;
 			}
-			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
@@ -389,16 +376,16 @@ namespace MyCAM.Editor
 
 		public void SeTraverseParam()
 		{
-			if( m_CurrentAction == null ) {
-				return;
-			}
-
-			// with on/off button, so can end current action first
+			// is on/off button, so end it then return
 			if( IsSameAction( EditActionType.SetTraverseParam ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			m_CurrentAction.End();
+
+			// default action do not need to stop
+			if( m_CurrentAction != m_DefaultAction ) {
+				m_CurrentAction?.End();
+			}
 			TraverseAction action = new TraverseAction( m_DataManager );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
@@ -409,10 +396,11 @@ namespace MyCAM.Editor
 		// TODO: refresh tree
 		public void MoveProcess( bool bUp )
 		{
-			if( m_CurrentAction == null ) {
-				return;
+			if( m_CurrentAction != m_DefaultAction ) {
+
+				// other not default action, so need to stop it
+				m_CurrentAction.End();
 			}
-			m_CurrentAction.End();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
