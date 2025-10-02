@@ -63,7 +63,7 @@ namespace MyCAM
 			else {
 				// get machine data fail, machine will be null(can't use)
 				m_DataManager = new DataManager();
-				MyApp.Logger.ShowOnLogPanel( "使用默認機構專案檔", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( "使用默認機構專案檔", MyApp.NoticeType.Warning );
 			}
 
 			// CAD Editor
@@ -377,7 +377,7 @@ namespace MyCAM
 			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
 			bool bSuccess = writer.ConvertSuccess();
 			if( bSuccess ) {
-				MyApp.Logger.ShowOnLogPanel( "成功轉出NC", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( "[操作提示]成功轉出NC", MyApp.NoticeType.Hint );
 			}
 
 			// simulation

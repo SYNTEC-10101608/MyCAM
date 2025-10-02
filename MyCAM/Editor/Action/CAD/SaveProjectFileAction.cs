@@ -27,7 +27,7 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			if( m_DataManager.PartIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "尚無工件能夠匯出專案檔", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( "尚無工件能夠匯出專案檔", MyApp.NoticeType.Warning );
 				End();
 				return;
 			}

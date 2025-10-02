@@ -446,8 +446,8 @@
 			// 
 			// m_tscLevel1Container.ContentPanel
 			// 
-			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCAMFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCADFunction);
+			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCAMFunction);
 			this.m_tscLevel1Container.ContentPanel.Size = new System.Drawing.Size(1065, 21);
 			this.m_tscLevel1Container.Dock = System.Windows.Forms.DockStyle.Top;
 			this.m_tscLevel1Container.Location = new System.Drawing.Point(0, 24);
@@ -486,7 +486,7 @@
 			this.m_tsbTransform.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbTransform.Name = "m_tsbTransform";
 			this.m_tsbTransform.Size = new System.Drawing.Size(44, 18);
-			this.m_tsbTransform.Text = "toolStripButton1";
+			this.m_tsbTransform.Text = "轉換";
 			this.m_tsbTransform.Click += new System.EventHandler(this.m_tsbTransform_Click);
 			// 
 			// m_tscLevel2Container
@@ -647,12 +647,12 @@
 			this.m_tsbSelPath_Manual.Text = "手動選取";
 			this.m_tsbSelPath_Manual.Click += new System.EventHandler(this.m_tsbSelPath_Manual_Click);
 			// 
-			// m_tsManualSelectPathOK
+			// m_tsbManualSelectPathOK
 			// 
 			this.m_tsbManualSelectPathOK.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbManualSelectPathOK.Image = ((System.Drawing.Image)(resources.GetObject("m_tsManualSelectPathOK.Image")));
+			this.m_tsbManualSelectPathOK.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualSelectPathOK.Image")));
 			this.m_tsbManualSelectPathOK.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbManualSelectPathOK.Name = "m_tsManualSelectPathOK";
+			this.m_tsbManualSelectPathOK.Name = "m_tsbManualSelectPathOK";
 			this.m_tsbManualSelectPathOK.Size = new System.Drawing.Size(89, 19);
 			this.m_tsbManualSelectPathOK.Text = "手動選取完成";
 			this.m_tsbManualSelectPathOK.Click += new System.EventHandler(this.m_tsbManualSelectPathOK_Click);
