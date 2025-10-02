@@ -379,7 +379,6 @@ namespace MyCAM
 				MyApp.Logger.ShowOnLogPanel( "成功轉出NC", MyApp.NoticeType.Hint );
 			}
 
-
 			// simulation
 			// m_CAMEditor.EditEnd();
 			// m_SimuEditor.EditStart();
@@ -549,12 +548,16 @@ namespace MyCAM
 			if( !m_UIStatusDic.ContainsKey( uiStatus ) ) {
 				return;
 			}
-			List<Control> controls = m_UIStatusDic[ uiStatus ];
+
+			// get which tool strip need to show on container
+			List<Control> ShownToolStripList = m_UIStatusDic[ uiStatus ];
 
 			// change tool strip container visible
-			int nContainerLayerToShow = controls.Count;
+			int nContainerLayerToShow = ShownToolStripList.Count;
 			bool bToolStirpShownCountChange = false;
 			for( int i = 0; i < m_ToolStripLevelList.Count; i++ ) {
+
+				// these container visible change
 				if( m_ToolStripLevelList[ i ].Visible != ( i < nContainerLayerToShow ) ) {
 					bToolStirpShownCountChange = true;
 				}
@@ -562,13 +565,17 @@ namespace MyCAM
 			}
 
 			// change witch tool strip will be show
-			for( int i = 0; i < controls.Count; i++ ) {
+			for( int i = 0; i < ShownToolStripList.Count; i++ ) {
+
+				// level 1 container always show on form
 				if( i == 0 && m_ToolStripLevelList[ i ].Visible != true ) {
 					m_ToolStripLevelList[ i ].Visible = true;
 				}
+
+				// change tool strip visible in this container
 				List<ToolStrip> thisToolStrip = GetAllToolStrips( m_ToolStripLevelList[ i ] );
 				foreach( ToolStrip toolStrip in thisToolStrip ) {
-					if( toolStrip == controls[ i ] ) {
+					if( toolStrip == ShownToolStripList[ i ] ) {
 						if( toolStrip.Visible != true ) {
 							toolStrip.Visible = true;
 						}
@@ -586,7 +593,7 @@ namespace MyCAM
 
 		List<ToolStrip> GetAllToolStrips( ToolStripContainer container )
 		{
-			var childToolStripList = new List<ToolStrip>();
+			List<ToolStrip> childToolStripList = new List<ToolStrip>();
 
 			// container with 5 panel
 			FindContainerAllToolStrips( container.TopToolStripPanel, childToolStripList );
@@ -609,7 +616,7 @@ namespace MyCAM
 			}
 		}
 
-		// to make sure container disply order is 1 -> 3
+		// to make sure container disply order is level 1 -> 3
 		void ReLayOutUIZorder()
 		{
 			int currentIndex = 0;
@@ -693,6 +700,7 @@ namespace MyCAM
 			}
 		}
 
+		// UI setting
 		void DefaultUISetting()
 		{
 			// hide tool strip container

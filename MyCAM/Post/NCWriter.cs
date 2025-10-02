@@ -46,11 +46,11 @@ namespace MyCAM.Post
 				return true;
 			}
 			catch( IOException ioEx ) {
-				MyApp.Logger.ShowOnLogPanel( $"IO Error: + {ioEx.Message} ", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( $"轉出專案檔失敗: {ioEx.Message} ", MyApp.NoticeType.Error );
 				return false;
 			}
 			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"IO Error: + {ex.Message} ", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( $"轉出專案檔失敗: {ex.Message} ", MyApp.NoticeType.Error );
 				return false;
 			}
 		}
