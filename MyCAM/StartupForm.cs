@@ -8,7 +8,6 @@ using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using MyCAM.Helper;
-using MyCAM.Post;
 using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
@@ -142,9 +141,6 @@ namespace MyCAM
 		void m_tsmiFile_Click( object sender, EventArgs e )
 		{
 			if( m_CurrentEditor != null ) {
-				if( m_CurrentEditor == m_CADEditor ) {
-					return;
-				}
 				SwitchEditor( EEditorType.CAD );
 				return;
 			}
@@ -348,40 +344,9 @@ namespace MyCAM
 			// m_SimuEditor.EditStart();
 		}
 
-		#region UI action 
-
-		void OnCAMDlgActionStatusChange( EActionStatus actionStatus )
-		{
-			if( actionStatus == EActionStatus.Start ) {
-				m_tsCAMFunction.Enabled = false;
-				m_msMode.Enabled = false;
-				m_TreeView.Enabled = false;
-				return;
-			}
-			m_tsCAMFunction.Enabled = true;
-			m_msMode.Enabled = true;
-			m_TreeView.Enabled = true;
-		}
-
-		void OnCAMPathPropertyChanged( bool isClosePath, bool isPathWithLead )
-		{
-			OnPathIsCloseChanged( isClosePath );
-			OnPathLeadChanged( isPathWithLead );
-		}
-
-		void OnPathIsCloseChanged( bool isClosePath )
-		{
-			m_tsbStartPoint.Enabled = isClosePath;
-			m_tsbSetLead.Enabled = isClosePath;
-			m_tsbFlipLead.Enabled = isClosePath;
-			m_tsbOverCut.Enabled = isClosePath;
-		}
-
-		void OnPathLeadChanged( bool isPathWithLead )
-		{
-			m_tsbFlipLead.Enabled = isPathWithLead;
-		}
-
+		#region UI action
+ 
+		// cad action change event
 		void OnCADActionStatusChange( EditActionType action, EActionStatus actionStatus )
 		{
 			if( actionStatus == EActionStatus.End ) {
@@ -444,6 +409,20 @@ namespace MyCAM
 					m_tsbManualTransform.BackColor = m_buttonOnColor;
 					return;
 			}
+		}
+
+		// cam action change event
+		void OnCAMDlgActionStatusChange( EActionStatus actionStatus )
+		{
+			if( actionStatus == EActionStatus.Start ) {
+				m_tsCAMFunction.Enabled = false;
+				m_msMode.Enabled = false;
+				m_TreeView.Enabled = false;
+				return;
+			}
+			m_tsCAMFunction.Enabled = true;
+			m_msMode.Enabled = true;
+			m_TreeView.Enabled = true;
 		}
 
 		void OnCAMActionStatusChange( EditActionType action, EActionStatus actionStatus )
@@ -536,6 +515,27 @@ namespace MyCAM
 			}
 		}
 
+		// path property change event
+		void OnCAMPathPropertyChanged( bool isClosePath, bool isPathWithLead )
+		{
+			OnPathIsCloseChanged( isClosePath );
+			OnPathLeadChanged( isPathWithLead );
+		}
+
+		void OnPathIsCloseChanged( bool isClosePath )
+		{
+			m_tsbStartPoint.Enabled = isClosePath;
+			m_tsbSetLead.Enabled = isClosePath;
+			m_tsbFlipLead.Enabled = isClosePath;
+			m_tsbOverCut.Enabled = isClosePath;
+		}
+
+		void OnPathLeadChanged( bool isPathWithLead )
+		{
+			m_tsbFlipLead.Enabled = isPathWithLead;
+		}
+
+		// ui display
 		void RefreshToolStripLayout( EUIStatus uiStatus )
 		{
 			if( !m_UIStatusDic.ContainsKey( uiStatus ) || m_UIStatusDic[ uiStatus ] == null ) {
@@ -636,13 +636,18 @@ namespace MyCAM
 			}
 		}
 
+		void EnableAllCAMEnterance()
+		{
+			foreach( ToolStripButton btn in m_tsCAMFunction.Items ) {
+				btn.Enabled = true;
+			}
+		}
+
 		#endregion
 
 		// switch editor
 		void SwitchEditor( EEditorType type )
 		{
-			bool isOldEditorIsCAM = false;
-
 			// no current editor
 			if( m_CurrentEditor == null ) {
 				m_CurrentEditor = GetEditor( type );
@@ -654,19 +659,9 @@ namespace MyCAM
 				if( m_CurrentEditor.Type == type ) {
 					return;
 				}
-
-				// different editor
-				isOldEditorIsCAM = m_CurrentEditor == m_CAMEditor;
 				m_CurrentEditor.EditEnd();
 				m_CurrentEditor = GetEditor( type );
 				m_CurrentEditor?.EditStart();
-			}
-
-			// need to enable all btn before check out cam editor
-			if( isOldEditorIsCAM ) {
-				foreach( ToolStripButton btn in m_tsCAMFunction.Items ) {
-					btn.Enabled = true;
-				}
 			}
 
 			// change UI
@@ -676,6 +671,7 @@ namespace MyCAM
 			}
 			if( m_CurrentEditor == m_CAMEditor ) {
 				RefreshToolStripLayout( EUIStatus.CAM );
+				EnableAllCAMEnterance();
 				return;
 			}
 		}
