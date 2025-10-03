@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
@@ -61,39 +62,33 @@ namespace MyCAM.Editor
 		}
 
 		// APIs
-		public void ImportFile( FileFormat format )
+		public void Import3DFile()
 		{
-			OpenFileDialog openDialog = new OpenFileDialog();
-
-			// file dialog filter
-			string filter = "";
-			switch( format ) {
-				case FileFormat.BREP:
-					filter = "BREP Files (*.brep *.rle)|*.brep; *.rle";
-					break;
-				case FileFormat.STEP:
-					filter = "STEP Files (*.stp *.step)|*.stp; *.step";
-					break;
-				case FileFormat.IGES:
-					filter = "IGES Files (*.igs *.iges)|*.igs; *.iges";
-					break;
-				default:
-					break;
+			if( m_CurrentAction != m_DefaultAction ) {
+				m_CurrentAction.End();
 			}
-			openDialog.Filter = filter + "|All files (*.*)|*.*";
+			OpenFileDialog openDialog = new OpenFileDialog();
+			string filter = "STEP Files (*.stp;*.step)|*.stp;*.step|" +
+							"IGES Files (*.igs;*.iges)|*.igs;*.iges|" +
+							"All files (*.*)|*.*";
+			openDialog.Filter = filter;
 
 			// show file dialog
-			if( openDialog.ShowDialog() != DialogResult.OK ) {
+			if( openDialog.ShowDialog() != DialogResult.OK )
 				return;
-			}
-
-			// get the file name
 			string szFileName = openDialog.FileName;
-			if( string.IsNullOrEmpty( szFileName ) ) {
+			if( string.IsNullOrEmpty( szFileName ) )
 				return;
-			}
 
-			// read file data and show a progress form
+			// get this file format
+			string szFileExtension = Path.GetExtension( szFileName ).ToLowerInvariant();
+			FileFormat format = FileFormat.STEP;
+			if( szFileExtension == ".igs" || szFileExtension == ".iges" ) {
+				format = FileFormat.IGES;
+			}
+			if( szFileExtension == ".stp" || szFileExtension == ".step" ) {
+				format = FileFormat.STEP;
+			}
 			ReadFileData( format, szFileName );
 		}
 

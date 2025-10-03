@@ -166,12 +166,7 @@ namespace MyCAM
 		// import part
 		void m_tsmiImportStep_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.ImportFile( FileFormat.STEP );
-		}
-
-		void m_tsmiIMportIges_Click( object sender, EventArgs e )
-		{
-			m_CADEditor.ImportFile( FileFormat.IGES );
+			m_CADEditor.Import3DFile();
 		}
 
 		void m_tsmiImportProjectFile_Click( object sender, EventArgs e )
