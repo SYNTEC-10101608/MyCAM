@@ -554,7 +554,7 @@
 			this.m_tsAddPathSubFunc.Name = "m_tsAddPathSubFunc";
 			this.m_tsAddPathSubFunc.Size = new System.Drawing.Size(1065, 21);
 			this.m_tsAddPathSubFunc.TabIndex = 5;
-			this.m_tsAddPathSubFunc.Text = "toolStrip2";
+			this.m_tsAddPathSubFunc.Text = "tsAddPathSubFunc";
 			// 
 			// m_tsbSelectD1ContFace
 			// 
@@ -616,7 +616,7 @@
 			this.m_tsSelectPath.Name = "m_tsSelectPath";
 			this.m_tsSelectPath.Size = new System.Drawing.Size(1065, 22);
 			this.m_tsSelectPath.TabIndex = 1;
-			this.m_tsSelectPath.Text = "toolStrip2";
+			this.m_tsSelectPath.Text = "SelectPath";
 			// 
 			// m_tsbSelPath_FreeBound
 			// 
