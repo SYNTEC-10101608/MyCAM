@@ -156,6 +156,7 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				return;
 			}
+
 			// need to use shape data to decide the cneter in the begin, so have to add this preotection
 			if( m_DataManager.PartIDList.Count == 0 ) {
 				return;
@@ -171,6 +172,7 @@ namespace MyCAM.Editor
 			}
 			( (ManualTransformAction)m_CurrentAction ).ApplyTransform( type );
 		}
+
 		// manager events
 		void OnPartChanged()
 		{
