@@ -64,9 +64,8 @@ namespace MyCAM.Editor
 		// APIs
 		public void Import3DFile()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
-				m_CurrentAction?.End();
-			}
+			// stop current action
+			EndActionIfNotDefault();
 			OpenFileDialog openDialog = new OpenFileDialog();
 			string filter = "STEP Files (*.stp;*.step)|*.stp;*.step|" +
 							"IGES Files (*.igs;*.iges)|*.igs;*.iges|" +
@@ -94,18 +93,16 @@ namespace MyCAM.Editor
 
 		public void ImportProjectFile()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
-				m_CurrentAction?.End();
-			}
+			// stop current action
+			EndActionIfNotDefault();
 			ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void SaveProjectFile()
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
-				m_CurrentAction?.End();
-			}
+			// stop current action
+			EndActionIfNotDefault();
 			SaveProjectFileAction action = new SaveProjectFileAction( m_DataManager );
 			StartEditAction( action );
 		}
@@ -271,6 +268,13 @@ namespace MyCAM.Editor
 
 			// add the read shape to the manager
 			m_DataManager.AddPart( oneShape );
+		}
+
+		void EndActionIfNotDefault()
+		{
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+				m_CurrentAction?.End();
+			}
 		}
 
 		// edit actions

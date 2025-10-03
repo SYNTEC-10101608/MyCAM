@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Post;
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.BRepPrimAPI;
@@ -190,10 +191,8 @@ namespace MyCAM.Editor
 
 		public void RemovePath()
 		{
-			// default action do not need to stop
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
-				m_CurrentAction?.End();
-			}
+			// stop current action
+			EndActionIfNotDefault();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
@@ -242,10 +241,8 @@ namespace MyCAM.Editor
 
 		public void SetReverse()
 		{
-			// is from other action, so need to stop it
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
-				m_CurrentAction?.End();
-			}
+			// stop current action
+			EndActionIfNotDefault();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
@@ -294,10 +291,8 @@ namespace MyCAM.Editor
 
 		public void ChangeLeadDirection()
 		{
-			// default action do not need to stop
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
-				m_CurrentAction?.End();
-			}
+			// stop current action
+			EndActionIfNotDefault();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
@@ -336,10 +331,8 @@ namespace MyCAM.Editor
 
 		public void SetToolVecReverse()
 		{
-			// default action do not need to stop
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
-				m_CurrentAction.End();
-			}
+			// stop current action
+			EndActionIfNotDefault();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
@@ -360,10 +353,8 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// default action do not need to stop
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
-				m_CurrentAction?.End();
-			}
+			// stop current action
+			EndActionIfNotDefault();
 			TraverseAction action = new TraverseAction( m_DataManager );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
@@ -374,11 +365,8 @@ namespace MyCAM.Editor
 		// TODO: refresh tree
 		public void MoveProcess( bool bUp )
 		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
-
-				// other not default action, so need to stop it
-				m_CurrentAction.End();
-			}
+			// stop current action
+			EndActionIfNotDefault();
 			string szPathID = GetSelectedPathID();
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
@@ -404,6 +392,20 @@ namespace MyCAM.Editor
 		public void AutoSortProcess()
 		{
 
+		}
+
+		public void ConverNC()
+		{
+			// stop current action
+			EndActionIfNotDefault();
+			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
+			bool bSuccess = writer.ConvertSuccess( out string szErrorMessage );
+			if( bSuccess ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提示]成功轉出NC", MyApp.NoticeType.Hint );
+			}
+			else {
+				MyApp.Logger.ShowOnLogPanel( $"轉出NC失敗: {szErrorMessage}", MyApp.NoticeType.Error );
+			}
 		}
 
 		// path added
@@ -861,6 +863,13 @@ namespace MyCAM.Editor
 			return false;
 		}
 
+		void EndActionIfNotDefault()
+		{
+			if(m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+				m_CurrentAction?.End();
+			}
+		}
+
 		bool ValidateSelectAndEndExAction( out string szPathID )
 		{
 			szPathID = GetSelectedPathID();
@@ -868,9 +877,7 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
 
 				// default action do not need to stop
-				if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
-					m_CurrentAction?.End();
-				}
+				EndActionIfNotDefault();
 				return false;
 			}
 			return true;
