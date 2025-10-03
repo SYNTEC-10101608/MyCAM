@@ -87,6 +87,7 @@
 			this.m_tsbManualTransAxialPar = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbManualTransPointCoincide = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbManualTransDone = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbAddPoint_AcrCenter = new System.Windows.Forms.ToolStripButton();
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_tsAddFeactureSubFunc.SuspendLayout();
@@ -462,7 +463,8 @@
 			this.m_tsCADFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
 			this.m_tsCADFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsbAddFeature,
-            this.m_tsbTransform});
+            this.m_tsbTransform,
+            this.m_tsbAddPoint_AcrCenter});
 			this.m_tsCADFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCADFunction.Name = "m_tsCADFunction";
 			this.m_tsCADFunction.Size = new System.Drawing.Size(1065, 21);
@@ -735,6 +737,15 @@
 			this.m_tsbManualTransDone.Text = "完成";
 			this.m_tsbManualTransDone.Click += new System.EventHandler(this.m_tsbManualTransDone_Click);
 			// 
+			// m_tsbAddPoint_AcrCenter
+			// 
+			this.m_tsbAddPoint_AcrCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbAddPoint_AcrCenter.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbAddPoint_AcrCenter.Image")));
+			this.m_tsbAddPoint_AcrCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbAddPoint_AcrCenter.Name = "m_tsbAddPoint_AcrCenter";
+			this.m_tsbAddPoint_AcrCenter.Size = new System.Drawing.Size(89, 18);
+			this.m_tsbAddPoint_AcrCenter.Text = "新增圓弧中心";
+			// 
 			// StartupForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -845,6 +856,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbTraverseParamSetting;
 		private System.Windows.Forms.ToolStripButton m_tsbConvertNC;
 		private System.Windows.Forms.ToolStripButton m_tsbFlipLead;
+		private System.Windows.Forms.ToolStripButton m_tsbAddPoint_AcrCenter;
 	}
 }
 

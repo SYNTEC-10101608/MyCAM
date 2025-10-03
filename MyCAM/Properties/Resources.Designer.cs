@@ -63,6 +63,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
+        internal static System.Drawing.Bitmap AcrCenter {
+            get {
+                object obj = ResourceManager.GetObject("AcrCenter", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
         internal static System.Drawing.Bitmap AddFeature {
             get {
                 object obj = ResourceManager.GetObject("AddFeature", resourceCulture);
@@ -96,6 +106,16 @@ namespace MyCAM.Properties {
         internal static System.Drawing.Bitmap DeletePath {
             get {
                 object obj = ResourceManager.GetObject("DeletePath", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap EdgeCenter {
+            get {
+                object obj = ResourceManager.GetObject("EdgeCenter", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -163,6 +183,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
+        internal static System.Drawing.Bitmap PointCenter {
+            get {
+                object obj = ResourceManager.GetObject("PointCenter", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
         internal static System.Drawing.Bitmap Reverse {
             get {
                 object obj = ResourceManager.GetObject("Reverse", resourceCulture);
@@ -216,6 +246,16 @@ namespace MyCAM.Properties {
         internal static System.Drawing.Bitmap TraverseParam {
             get {
                 object obj = ResourceManager.GetObject("TraverseParam", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap TwoVertexConnect {
+            get {
+                object obj = ResourceManager.GetObject("TwoVertexConnect", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
