@@ -417,12 +417,10 @@ namespace MyCAM
 			if( actionStatus == EActionStatus.Start ) {
 				m_tsCAMFunction.Enabled = false;
 				m_msMode.Enabled = false;
-				m_TreeView.Enabled = false;
 				return;
 			}
 			m_tsCAMFunction.Enabled = true;
 			m_msMode.Enabled = true;
-			m_TreeView.Enabled = true;
 		}
 
 		void OnCAMActionStatusChange( EditActionType action, EActionStatus actionStatus )

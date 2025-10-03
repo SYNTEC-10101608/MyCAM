@@ -890,8 +890,13 @@ namespace MyCAM.Editor
 			if( action.ActionType == EditActionType.OverCut ||
 				action.ActionType == EditActionType.SetLead ||
 				action.ActionType == EditActionType.SetTraverseParam ) {
+
+				// lock main form
+				m_TreeView.Enabled = false;
 				RaiseWithDlgActionStatusChange?.Invoke( EActionStatus.Start );
 			}
+
+			// chnage display
 			RaiseCAMActionStatusChange( action.ActionType, EActionStatus.Start );
 		}
 
@@ -902,6 +907,9 @@ namespace MyCAM.Editor
 				action.ActionType == EditActionType.SetLead ||
 				action.ActionType == EditActionType.SetTraverseParam
 				) {
+
+				// unlock main form
+				m_TreeView.Enabled = true;
 				RaiseWithDlgActionStatusChange?.Invoke( EActionStatus.End );
 			}
 			RaiseCAMActionStatusChange?.Invoke( action.ActionType, EActionStatus.End );
