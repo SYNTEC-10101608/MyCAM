@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Post;
 using OCC.AIS;
@@ -21,6 +17,10 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -42,6 +42,8 @@ namespace MyCAM.Editor
 			// default action is select object action
 			m_DefaultAction = new SelectObjectAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Path );
 			( m_DefaultAction as SelectObjectAction ).TreeSelectionChange += OnTreeSelectionChange;
+			( m_DefaultAction as SelectObjectAction ).RemovePath += RemovePath;
+			( m_DefaultAction as SelectObjectAction ).PathOrderMove += MoveProcess;
 		}
 
 		// for viewer resource handle
@@ -129,6 +131,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
+			m_CurrentAction.End();
 
 			// get path from free boundaries
 			if( selectedFaceGroupList.Count == 0 ) {

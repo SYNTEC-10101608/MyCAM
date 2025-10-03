@@ -15,6 +15,8 @@ namespace MyCAM.Editor
 	internal class SelectObjectAction : KeyMouseActionBase
 	{
 		public Action TreeSelectionChange;
+		public Action RemovePath;
+		public Action<bool> PathOrderMove;
 
 		public SelectObjectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
 			ESelectObjectType type )
@@ -114,6 +116,18 @@ namespace MyCAM.Editor
 		{
 			if( e.KeyCode == Keys.Space ) {
 				ChangeObjectVisibility();
+			}
+			if( e.KeyCode == Keys.Delete ) {
+				RemovePath?.Invoke();
+			}
+			if( e.Shift ) {
+				if( e.KeyCode == Keys.Up ) {
+					PathOrderMove?.Invoke( true );
+				}
+
+				if( e.KeyCode == Keys.Down ) {
+					PathOrderMove?.Invoke( false );
+				}
 			}
 		}
 
