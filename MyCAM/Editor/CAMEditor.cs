@@ -387,7 +387,53 @@ namespace MyCAM.Editor
 		// TODO: implement it and refresh tree
 		public void AutoSortProcess()
 		{
+			EndActionIfNotDefault();
+			string szPathID = GetSelectedPathID();
+			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
+				return;
+			}
+			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
+			m_DataManager.PathIDList.Clear();
+			m_DataManager.PathIDList.Add( szPathID );
 
+			// get start point
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			gp_Pnt currentPoint = pathData.CAMData.GetProcessStartPoint().CADPoint.Point;
+
+			// visited path recorded container
+			bool[] visited = new bool[ pathIDList.Count ];
+			int startIdx = pathIDList.IndexOf( szPathID );
+			visited[ startIdx ] = true;
+			int visitedCount = 1;
+			while( visitedCount < pathIDList.Count ) {
+				double minDistanceSq = double.MaxValue;
+				int nearestIdx = -1;
+				gp_Pnt nearestPoint = null;
+				for( int i = 0; i < pathIDList.Count; i++ ) {
+					if( visited[ i ] ) {
+						continue;
+					}
+					PathData nextPathData = (PathData)m_DataManager.ShapeDataMap[ pathIDList[ i ] ];
+					gp_Pnt nextStartPoint = nextPathData.CAMData.GetProcessStartPoint().CADPoint.Point;
+					double distanceSq = currentPoint.SquareDistance( nextStartPoint );
+					if( distanceSq < minDistanceSq ) {
+						minDistanceSq = distanceSq;
+						nearestPoint = nextStartPoint;
+						nearestIdx = i;
+					}
+				}
+				if( nearestIdx != -1 ) {
+					currentPoint = nearestPoint;
+					visited[ nearestIdx ] = true;
+					visitedCount++;
+					m_DataManager.PathIDList.Add( pathIDList[ nearestIdx ] );
+				}
+				else {
+					break;
+				}
+			}
+			ShowCAMData();
 		}
 
 		public void ConverNC()
