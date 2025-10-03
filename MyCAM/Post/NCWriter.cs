@@ -1,8 +1,8 @@
-﻿using System;
+﻿using MyCAM.Data;
+using OCC.gp;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using MyCAM.Data;
-using OCC.gp;
 
 namespace MyCAM.Post
 {
@@ -41,6 +41,7 @@ namespace MyCAM.Post
 					for( int i = 0; i < m_ProcessDataList.Count; i++ ) {
 						WriteCutting( m_ProcessDataList[ i ], i + 1 );
 					}
+					m_StreamWriter.WriteLine( "G65 P\"FileEnd\";" );
 					m_StreamWriter.WriteLine( "M30;" ); // 程式結束
 				}
 				return true;
