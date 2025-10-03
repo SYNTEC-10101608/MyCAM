@@ -64,7 +64,7 @@ namespace MyCAM.Editor
 		// APIs
 		public void Import3DFile()
 		{
-			if( m_CurrentAction != m_DefaultAction ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				m_CurrentAction?.End();
 			}
 			OpenFileDialog openDialog = new OpenFileDialog();
@@ -94,7 +94,7 @@ namespace MyCAM.Editor
 
 		public void ImportProjectFile()
 		{
-			if( m_CurrentAction != m_DefaultAction ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				m_CurrentAction?.End();
 			}
 			ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_ViewManager );
@@ -103,7 +103,7 @@ namespace MyCAM.Editor
 
 		public void SaveProjectFile()
 		{
-			if( m_CurrentAction != m_DefaultAction ) {
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				m_CurrentAction?.End();
 			}
 			SaveProjectFileAction action = new SaveProjectFileAction( m_DataManager );
