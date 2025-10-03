@@ -17,7 +17,9 @@ namespace MyCAM.Editor
 		SelectObject,
 
 		// CAD
-		AddPoint,
+		AddPoint_CircArcCenter,
+		AddPoint_EdgeMidPoint,
+		AddPoint_TwoVertexMidPoint,
 		AddLine,
 		ThreePtTransform,
 		ManualTransform,

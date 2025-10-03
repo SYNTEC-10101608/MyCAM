@@ -1,6 +1,7 @@
-﻿using MyCAM.Data;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using MyCAM.App;
+using MyCAM.Data;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -145,23 +146,23 @@ namespace MyCAM.Editor.Dialog
 			}
 			if( !double.TryParse( tbxLength.Text, out double dLength ) ||
 				!double.TryParse( tbxAngle.Text, out double dAngle ) ) {
-				MessageBox.Show( $"{paramName}: invalid number format" );
+				MyApp.Logger.ShowOnLogPanel( $"{paramName}:無效的數字格式", MyApp.NoticeType.Warning );
 				return false;
 			}
 			if( dLength <= 0 ) {
-				MessageBox.Show( $"{paramName}: length must be greater than 0" );
+				MyApp.Logger.ShowOnLogPanel( "長度需要大於0", MyApp.NoticeType.Warning );
 				return false;
 			}
 			switch( leadData.Type ) {
 				case LeadLineType.Line:
 					if( !IsValidStraightLineAngle( dAngle ) ) {
-						MessageBox.Show( $"{paramName}: angle must be in range (0 ~ 180)" );
+						MyApp.Logger.ShowOnLogPanel( "角度必須在0 ~ 180範圍內", MyApp.NoticeType.Warning );
 						return false;
 					}
 					break;
 				case LeadLineType.Arc:
 					if( !IsValidArcAngle( dAngle ) ) {
-						MessageBox.Show( $"{paramName}: angle must be in range [0 ~ 180)" );
+						MyApp.Logger.ShowOnLogPanel( "角度必須在0 ~ 180範圍內", MyApp.NoticeType.Warning );
 						return false;
 					}
 					break;

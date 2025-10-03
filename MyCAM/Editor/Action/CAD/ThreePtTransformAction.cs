@@ -1,4 +1,5 @@
-﻿using MyCAM.App;
+﻿using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRep;
@@ -9,7 +10,6 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -97,7 +97,7 @@ namespace MyCAM.Editor
 
 					// check point coincidence
 					if( slectedPoint.IsEqual( m_1stPoint, 1e-6 ) ) {
-						MessageBox.Show( "point coincident 2nd" );
+						MyApp.Logger.ShowOnLogPanel( "重合的第二個點", MyApp.NoticeType.Warning );
 						return;
 					}
 					m_2ndPoint = slectedPoint;
@@ -109,7 +109,7 @@ namespace MyCAM.Editor
 
 					// check point coincidence
 					if( slectedPoint.IsEqual( m_1stPoint, 1e-6 ) || slectedPoint.IsEqual( m_2ndPoint, 1e-6 ) ) {
-						MessageBox.Show( "point coincident 3rd" );
+						MyApp.Logger.ShowOnLogPanel( "重合的第三個點", MyApp.NoticeType.Warning );
 						return;
 					}
 					m_3rdPoint = slectedPoint;
@@ -118,7 +118,7 @@ namespace MyCAM.Editor
 					gp_Vec v12 = new gp_Vec( m_1stPoint, m_2ndPoint );
 					gp_Vec v13 = new gp_Vec( m_1stPoint, m_3rdPoint );
 					if( v12.IsParallel( v13, 1e-3 ) ) {
-						MessageBox.Show( "3 points are colinear" );
+						MyApp.Logger.ShowOnLogPanel( "3點共線", MyApp.NoticeType.Warning );
 						return;
 					}
 
@@ -175,13 +175,13 @@ namespace MyCAM.Editor
 			// get point from dialog
 			bool isValid = dialog.GetMachinePoint( out gp_Pnt machineP1, out gp_Pnt machineP2, out gp_Pnt machineP3 );
 			if( !isValid ) {
-				MessageBox.Show( "Invalid machine points.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				MyApp.Logger.ShowOnLogPanel( "無效的軸向參數", MyApp.NoticeType.Warning );
 				return false;
 			}
 
 			// create 3-point coordinate system
 			if( !VectorTool.Create3PCoordSystem( machineP1, machineP2, machineP3, out gp_Ax3 machineCoordSys ) ) {
-				MessageBox.Show( "Failed to create 3-point coordinate system.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				MyApp.Logger.ShowOnLogPanel( "無法創建三點座標系", MyApp.NoticeType.Warning );
 				return false;
 			}
 

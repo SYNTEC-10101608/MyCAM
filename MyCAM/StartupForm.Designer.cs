@@ -27,665 +27,725 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_msCAD = new System.Windows.Forms.MenuStrip();
-			this.m_tsmiImport = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiImportBRep = new System.Windows.Forms.ToolStripMenuItem();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StartupForm));
+			this.m_msMode = new System.Windows.Forms.MenuStrip();
+			this.m_tsmiFile = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiImportStep = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiImportIges = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiImportProjectFile = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSaveProjectFile = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiOpenProjectFile = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiAddFeature = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiAddPoint = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiAddPoint_AcrCenter = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiAddPoint_EdgeCenter = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiAddPoint_PointCenter = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiAddLine = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiAddLine_TwoVertexConnect = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiTransform = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiManualTransform = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmi3PointTransform = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiManipulatorTransform = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiCADOK = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCAD = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiCAM = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsCAMFunction = new System.Windows.Forms.ToolStrip();
+			this.m_tsbAddPath = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbDeletePath = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbStartPoint = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbReverse = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbSetLead = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbFlipLead = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbOverCut = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbTooVecReverse = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbToolVec = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbMoveUp = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbMoveDown = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbAutoOrder = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbTraverseParamSetting = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbConvertNC = new System.Windows.Forms.ToolStripButton();
+			this.m_panBackGround = new System.Windows.Forms.Panel();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
-			this.m_panBackGround = new System.Windows.Forms.Panel();
-			this.m_msCAD_Transform = new System.Windows.Forms.MenuStrip();
-			this.m_tsmiPlane = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiPlanePar = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiAxial = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiAxialPar = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiPointCoincide = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiTransformOK = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_msCAD_SelectFace = new System.Windows.Forms.MenuStrip();
-			this.m_tsmiSelectD1ContFace = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiSelectPath = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiSelPath_FreeBound = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiSelPath_Manual = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_msCAD_ManualSelectPath = new System.Windows.Forms.MenuStrip();
-			this.m_tsmiManualSelectPathOK = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_msMain = new System.Windows.Forms.MenuStrip();
-			this.m_tsmiFile = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiCAM = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_msCAM = new System.Windows.Forms.MenuStrip();
-			this.m_tsmiAddPath = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiRemovePath = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiStartPoint = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiReverse = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiSetLead = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiChangeLeadDirection = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiLeadSetting = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiOverCut = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiToolVecReverse = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiToolVec = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiMoveUp = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiMoveDown = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiAutoSort = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiTraverseParamSetting = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiBackToCAD = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiCAMOK = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_msCAD.SuspendLayout();
-			this.m_panTreeView.SuspendLayout();
+			this.m_tscLevel1Container = new System.Windows.Forms.ToolStripContainer();
+			this.m_tsCADFunction = new System.Windows.Forms.ToolStrip();
+			this.m_tsbAddPoint_AcrCenter = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbAddPoint_EdgeCenter = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbAddPoint_PointCenter = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbAddLine_TwoVertexConnect = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbManualTransform = new System.Windows.Forms.ToolStripButton();
+			this.m_tsb3PntTransform = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbAxisTransform = new System.Windows.Forms.ToolStripButton();
+			this.m_tscLevel2Container = new System.Windows.Forms.ToolStripContainer();
+			this.m_tsManualTrans = new System.Windows.Forms.ToolStrip();
+			this.m_tsbManualTransPlane = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbManualTransPlanePar = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbManualTransAxial = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbManualTransAxialPar = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbManualTransPointCoincide = new System.Windows.Forms.ToolStripButton();
+			this.m_tsAddPathSubFunc = new System.Windows.Forms.ToolStrip();
+			this.m_tsbSelectD1ContFace = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbSelectPath = new System.Windows.Forms.ToolStripButton();
+			this.m_pnlLog = new System.Windows.Forms.Panel();
+			this.m_tscLevel3Container = new System.Windows.Forms.ToolStripContainer();
+			this.m_tsSelectPath = new System.Windows.Forms.ToolStrip();
+			this.m_tsbSelPath_FreeBound = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbSelPath_Manual = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbManualSelectPathOK = new System.Windows.Forms.ToolStripButton();
+			this.m_msMode.SuspendLayout();
+			this.m_tsCAMFunction.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
-			this.m_msCAD_Transform.SuspendLayout();
-			this.m_msCAD_SelectFace.SuspendLayout();
-			this.m_msCAD_ManualSelectPath.SuspendLayout();
-			this.m_msMain.SuspendLayout();
-			this.m_msCAM.SuspendLayout();
+			this.m_panTreeView.SuspendLayout();
+			this.m_tscLevel1Container.ContentPanel.SuspendLayout();
+			this.m_tscLevel1Container.SuspendLayout();
+			this.m_tsCADFunction.SuspendLayout();
+			this.m_tscLevel2Container.ContentPanel.SuspendLayout();
+			this.m_tscLevel2Container.SuspendLayout();
+			this.m_tsManualTrans.SuspendLayout();
+			this.m_tsAddPathSubFunc.SuspendLayout();
+			this.m_tscLevel3Container.ContentPanel.SuspendLayout();
+			this.m_tscLevel3Container.SuspendLayout();
+			this.m_tsSelectPath.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// m_msCAD
+			// m_msMode
 			// 
-			this.m_msCAD.ImageScalingSize = new System.Drawing.Size(20, 20);
-			this.m_msCAD.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiImport,
-            this.m_tsmiAddFeature,
-            this.m_tsmiTransform,
-            this.m_tsmiCADOK});
-			this.m_msCAD.Location = new System.Drawing.Point(0, 0);
-			this.m_msCAD.Name = "m_msCAD";
-			this.m_msCAD.Size = new System.Drawing.Size(1184, 24);
-			this.m_msCAD.TabIndex = 1;
-			this.m_msCAD.Text = "menuStrip1";
+			this.m_msMode.ImageScalingSize = new System.Drawing.Size(20, 20);
+			this.m_msMode.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsmiFile,
+            this.m_tsmiCAD,
+            this.m_tsmiCAM});
+			this.m_msMode.Location = new System.Drawing.Point(0, 0);
+			this.m_msMode.Name = "m_msMode";
+			this.m_msMode.Size = new System.Drawing.Size(1065, 24);
+			this.m_msMode.TabIndex = 1;
+			this.m_msMode.Text = "menuStrip1";
 			// 
-			// m_tsmiImport
+			// m_tsmiFile
 			// 
-			this.m_tsmiImport.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiImportBRep,
+			this.m_tsmiFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsmiImportStep,
-            this.m_tsmiImportIges,
-            this.m_tsmiSaveProjectFile,
-            this.m_tsmiOpenProjectFile});
-			this.m_tsmiImport.Name = "m_tsmiImport";
-			this.m_tsmiImport.Size = new System.Drawing.Size(45, 20);
-			this.m_tsmiImport.Text = "導入";
-			// 
-			// m_tsmiImportBRep
-			// 
-			this.m_tsmiImportBRep.Name = "m_tsmiImportBRep";
-			this.m_tsmiImportBRep.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiImportBRep.Text = "BRep";
-			this.m_tsmiImportBRep.Click += new System.EventHandler(this.m_tsmiImportBRep_Click);
+            this.m_tsmiImportProjectFile,
+            this.m_tsmiSaveProjectFile});
+			this.m_tsmiFile.Name = "m_tsmiFile";
+			this.m_tsmiFile.Size = new System.Drawing.Size(45, 20);
+			this.m_tsmiFile.Text = "檔案";
+			this.m_tsmiFile.Click += new System.EventHandler(this.m_tsmiFile_Click);
 			// 
 			// m_tsmiImportStep
 			// 
 			this.m_tsmiImportStep.Name = "m_tsmiImportStep";
 			this.m_tsmiImportStep.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiImportStep.Text = "Step";
+			this.m_tsmiImportStep.Text = "匯入3D模型";
 			this.m_tsmiImportStep.Click += new System.EventHandler(this.m_tsmiImportStep_Click);
 			// 
-			// m_tsmiImportIges
+			// m_tsmiImportProjectFile
 			// 
-			this.m_tsmiImportIges.Name = "m_tsmiImportIges";
-			this.m_tsmiImportIges.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiImportIges.Text = "Iges";
-			this.m_tsmiImportIges.Click += new System.EventHandler(this.m_tsmiImportIges_Click);
+			this.m_tsmiImportProjectFile.Name = "m_tsmiImportProjectFile";
+			this.m_tsmiImportProjectFile.Size = new System.Drawing.Size(180, 22);
+			this.m_tsmiImportProjectFile.Text = "匯入專案檔";
+			this.m_tsmiImportProjectFile.Click += new System.EventHandler(this.m_tsmiImportProjectFile_Click);
 			// 
-			// m_tsmiSaveFile
+			// m_tsmiSaveProjectFile
 			// 
-			this.m_tsmiSaveProjectFile.Name = "m_tsmiSaveFile";
+			this.m_tsmiSaveProjectFile.Name = "m_tsmiSaveProjectFile";
 			this.m_tsmiSaveProjectFile.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiSaveProjectFile.Text = "儲存專案";
+			this.m_tsmiSaveProjectFile.Text = "儲存專案檔";
 			this.m_tsmiSaveProjectFile.Click += new System.EventHandler(this.m_tsmiSaveProjectFile_Click);
 			// 
-			// m_tsmiOpenFile
+			// m_tsmiCAD
 			// 
-			this.m_tsmiOpenProjectFile.Name = "m_tsmiOpenFile";
-			this.m_tsmiOpenProjectFile.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiOpenProjectFile.Text = "開啟專案";
-			this.m_tsmiOpenProjectFile.Click += new System.EventHandler(this.m_tsmiOpenProjectFile_Click);
+			this.m_tsmiCAD.Name = "m_tsmiCAD";
+			this.m_tsmiCAD.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiCAD.Text = "CAD";
+			this.m_tsmiCAD.Click += new System.EventHandler(this.m_tsmiCAD_Click);
 			// 
-			// m_tsmiAddFeature
+			// m_tsmiCAM
 			// 
-			this.m_tsmiAddFeature.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiAddPoint,
-            this.m_tsmiAddLine});
-			this.m_tsmiAddFeature.Name = "m_tsmiAddFeature";
-			this.m_tsmiAddFeature.Size = new System.Drawing.Size(71, 20);
-			this.m_tsmiAddFeature.Text = "建立特徵";
+			this.m_tsmiCAM.Name = "m_tsmiCAM";
+			this.m_tsmiCAM.Size = new System.Drawing.Size(46, 20);
+			this.m_tsmiCAM.Text = "CAM";
+			this.m_tsmiCAM.Click += new System.EventHandler(this.m_tsmiCAM_Click);
 			// 
-			// m_tsmiAddPoint
+			// m_tsCAMFunction
 			// 
-			this.m_tsmiAddPoint.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiAddPoint_AcrCenter,
-            this.m_tsmiAddPoint_EdgeCenter,
-            this.m_tsmiAddPoint_PointCenter});
-			this.m_tsmiAddPoint.Name = "m_tsmiAddPoint";
-			this.m_tsmiAddPoint.Size = new System.Drawing.Size(113, 22);
-			this.m_tsmiAddPoint.Text = "參考點";
+			this.m_tsCAMFunction.BackColor = System.Drawing.SystemColors.Control;
+			this.m_tsCAMFunction.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_tsCAMFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
+			this.m_tsCAMFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbAddPath,
+            this.m_tsbDeletePath,
+            this.m_tsbStartPoint,
+            this.m_tsbReverse,
+            this.m_tsbSetLead,
+            this.m_tsbFlipLead,
+            this.m_tsbOverCut,
+            this.m_tsbTooVecReverse,
+            this.m_tsbToolVec,
+            this.m_tsbMoveUp,
+            this.m_tsbMoveDown,
+            this.m_tsbAutoOrder,
+            this.m_tsbTraverseParamSetting,
+            this.m_tsbConvertNC});
+			this.m_tsCAMFunction.Location = new System.Drawing.Point(0, 0);
+			this.m_tsCAMFunction.Name = "m_tsCAMFunction";
+			this.m_tsCAMFunction.Size = new System.Drawing.Size(1065, 46);
+			this.m_tsCAMFunction.TabIndex = 2;
+			this.m_tsCAMFunction.Text = "toolStrip1";
 			// 
-			// m_tsmiAddPoint_AcrCenter
+			// m_tsbAddPath
 			// 
-			this.m_tsmiAddPoint_AcrCenter.Name = "m_tsmiAddPoint_AcrCenter";
-			this.m_tsmiAddPoint_AcrCenter.Size = new System.Drawing.Size(126, 22);
-			this.m_tsmiAddPoint_AcrCenter.Text = "圓弧中心";
-			this.m_tsmiAddPoint_AcrCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_AcrCenter_Click);
+			this.m_tsbAddPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAddPath.Image = global::MyCAM.Properties.Resources.AddPath;
+			this.m_tsbAddPath.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbAddPath.Name = "m_tsbAddPath";
+			this.m_tsbAddPath.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbAddPath.Text = "新增路徑";
+			this.m_tsbAddPath.Click += new System.EventHandler(this.m_tsbAddPath_Click);
 			// 
-			// m_tsmiAddPoint_EdgeCenter
+			// m_tsbDeletePath
 			// 
-			this.m_tsmiAddPoint_EdgeCenter.Name = "m_tsmiAddPoint_EdgeCenter";
-			this.m_tsmiAddPoint_EdgeCenter.Size = new System.Drawing.Size(126, 22);
-			this.m_tsmiAddPoint_EdgeCenter.Text = "線段中心";
-			this.m_tsmiAddPoint_EdgeCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_EdgeCenter_Click);
+			this.m_tsbDeletePath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbDeletePath.Image = global::MyCAM.Properties.Resources.DeletePath;
+			this.m_tsbDeletePath.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbDeletePath.Name = "m_tsbDeletePath";
+			this.m_tsbDeletePath.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbDeletePath.Text = "刪除路徑";
+			this.m_tsbDeletePath.Click += new System.EventHandler(this.m_tsbDeletePath_Click);
 			// 
-			// m_tsmiAddPoint_PointCenter
+			// m_tsbStartPoint
 			// 
-			this.m_tsmiAddPoint_PointCenter.Name = "m_tsmiAddPoint_PointCenter";
-			this.m_tsmiAddPoint_PointCenter.Size = new System.Drawing.Size(126, 22);
-			this.m_tsmiAddPoint_PointCenter.Text = "兩點中心";
-			this.m_tsmiAddPoint_PointCenter.Click += new System.EventHandler(this.m_tsmiAddPoint_PointCenter_Click);
+			this.m_tsbStartPoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbStartPoint.Image = global::MyCAM.Properties.Resources.StartPointSetting;
+			this.m_tsbStartPoint.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbStartPoint.Name = "m_tsbStartPoint";
+			this.m_tsbStartPoint.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbStartPoint.Text = "起點";
+			this.m_tsbStartPoint.Click += new System.EventHandler(this.m_tsbStartPoint_Click);
 			// 
-			// m_tsmiAddLine
+			// m_tsbReverse
 			// 
-			this.m_tsmiAddLine.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiAddLine_TwoVertexConnect});
-			this.m_tsmiAddLine.Name = "m_tsmiAddLine";
-			this.m_tsmiAddLine.Size = new System.Drawing.Size(113, 22);
-			this.m_tsmiAddLine.Text = "參考線";
+			this.m_tsbReverse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbReverse.Image = global::MyCAM.Properties.Resources.Reverse;
+			this.m_tsbReverse.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbReverse.Name = "m_tsbReverse";
+			this.m_tsbReverse.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbReverse.Text = "反向";
+			this.m_tsbReverse.Click += new System.EventHandler(this.m_tsbReverse_Click);
 			// 
-			// m_tsmiAddLine_TwoVertexConnect
+			// m_tsbSetLead
 			// 
-			this.m_tsmiAddLine_TwoVertexConnect.Name = "m_tsmiAddLine_TwoVertexConnect";
-			this.m_tsmiAddLine_TwoVertexConnect.Size = new System.Drawing.Size(126, 22);
-			this.m_tsmiAddLine_TwoVertexConnect.Text = "兩點連線";
-			this.m_tsmiAddLine_TwoVertexConnect.Click += new System.EventHandler(this.m_tsmiAddLine_TwoVertexConnect_Click);
+			this.m_tsbSetLead.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbSetLead.Image = global::MyCAM.Properties.Resources.Lead;
+			this.m_tsbSetLead.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbSetLead.Name = "m_tsbSetLead";
+			this.m_tsbSetLead.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbSetLead.Text = "引線";
+			this.m_tsbSetLead.Click += new System.EventHandler(this.m_tsbSetLead_Click);
 			// 
-			// m_tsmiTransform
+			// m_tsbFlipLead
 			// 
-			this.m_tsmiTransform.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiManualTransform,
-            this.m_tsmi3PointTransform,
-            this.m_tsmiManipulatorTransform});
-			this.m_tsmiTransform.Name = "m_tsmiTransform";
-			this.m_tsmiTransform.Size = new System.Drawing.Size(45, 20);
-			this.m_tsmiTransform.Text = "轉換";
+			this.m_tsbFlipLead.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbFlipLead.Image = global::MyCAM.Properties.Resources.FlipLead;
+			this.m_tsbFlipLead.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbFlipLead.Name = "m_tsbFlipLead";
+			this.m_tsbFlipLead.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbFlipLead.Text = "更換引線方向";
+			this.m_tsbFlipLead.Click += new System.EventHandler(this.m_tsbFlipLead_Click);
 			// 
-			// m_tsmiManualTransform
+			// m_tsbOverCut
 			// 
-			this.m_tsmiManualTransform.Name = "m_tsmiManualTransform";
-			this.m_tsmiManualTransform.Size = new System.Drawing.Size(126, 22);
-			this.m_tsmiManualTransform.Text = "手動轉換";
-			this.m_tsmiManualTransform.Click += new System.EventHandler(this.m_tsmiManualTransform_Click);
+			this.m_tsbOverCut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbOverCut.Image = global::MyCAM.Properties.Resources.Overcut;
+			this.m_tsbOverCut.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbOverCut.Name = "m_tsbOverCut";
+			this.m_tsbOverCut.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbOverCut.Text = "過切";
+			this.m_tsbOverCut.Click += new System.EventHandler(this.m_tsbOverCut_Click);
 			// 
-			// m_tsmi3PointTransform
+			// m_tsbTooVecReverse
 			// 
-			this.m_tsmi3PointTransform.Name = "m_tsmi3PointTransform";
-			this.m_tsmi3PointTransform.Size = new System.Drawing.Size(126, 22);
-			this.m_tsmi3PointTransform.Text = "三點轉換";
-			this.m_tsmi3PointTransform.Click += new System.EventHandler(this.m_tsmi3PointTransform_Click);
+			this.m_tsbTooVecReverse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbTooVecReverse.Image = global::MyCAM.Properties.Resources.ToolVecReverse;
+			this.m_tsbTooVecReverse.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbTooVecReverse.Name = "m_tsbTooVecReverse";
+			this.m_tsbTooVecReverse.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbTooVecReverse.Text = "姿態反向";
+			this.m_tsbTooVecReverse.Click += new System.EventHandler(this.m_tsbTooVecReverse_Click);
 			// 
-			// m_tsmiManipulatorTransform
+			// m_tsbToolVec
 			// 
-			this.m_tsmiManipulatorTransform.Name = "m_tsmiManipulatorTransform";
-			this.m_tsmiManipulatorTransform.Size = new System.Drawing.Size(126, 22);
-			this.m_tsmiManipulatorTransform.Text = "軸向轉換";
-			this.m_tsmiManipulatorTransform.Click += new System.EventHandler(this.m_tsmiAxisTransform_Click);
+			this.m_tsbToolVec.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbToolVec.Image = global::MyCAM.Properties.Resources.ToolVec;
+			this.m_tsbToolVec.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbToolVec.Name = "m_tsbToolVec";
+			this.m_tsbToolVec.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbToolVec.Text = "姿態";
+			this.m_tsbToolVec.Click += new System.EventHandler(this.m_tsbToolVec_Click);
 			// 
-			// m_tsmiCADOK
+			// m_tsbMoveUp
 			// 
-			this.m_tsmiCADOK.Name = "m_tsmiCADOK";
-			this.m_tsmiCADOK.Size = new System.Drawing.Size(35, 20);
-			this.m_tsmiCADOK.Text = "OK";
-			this.m_tsmiCADOK.Click += new System.EventHandler(this.m_tsmiCADOK_Click);
+			this.m_tsbMoveUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbMoveUp.Image = global::MyCAM.Properties.Resources.MoveUp;
+			this.m_tsbMoveUp.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbMoveUp.Name = "m_tsbMoveUp";
+			this.m_tsbMoveUp.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbMoveUp.Text = "上移";
+			this.m_tsbMoveUp.Click += new System.EventHandler(this.m_tsbMoveUp_Click);
+			// 
+			// m_tsbMoveDown
+			// 
+			this.m_tsbMoveDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbMoveDown.Image = global::MyCAM.Properties.Resources.MoveDown;
+			this.m_tsbMoveDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbMoveDown.Name = "m_tsbMoveDown";
+			this.m_tsbMoveDown.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbMoveDown.Text = "下移";
+			this.m_tsbMoveDown.Click += new System.EventHandler(this.m_tsbMoveDown_Click);
+			// 
+			// m_tsbAutoOrder
+			// 
+			this.m_tsbAutoOrder.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAutoOrder.Image = global::MyCAM.Properties.Resources.AutoOrder;
+			this.m_tsbAutoOrder.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbAutoOrder.Name = "m_tsbAutoOrder";
+			this.m_tsbAutoOrder.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbAutoOrder.Text = "自動排序";
+			this.m_tsbAutoOrder.Click += new System.EventHandler(this.m_tsbAutoOrder_Click);
+			// 
+			// m_tsbTraverseParamSetting
+			// 
+			this.m_tsbTraverseParamSetting.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbTraverseParamSetting.Image = global::MyCAM.Properties.Resources.TraverseParam;
+			this.m_tsbTraverseParamSetting.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbTraverseParamSetting.Name = "m_tsbTraverseParamSetting";
+			this.m_tsbTraverseParamSetting.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbTraverseParamSetting.Text = "空移參數設定";
+			this.m_tsbTraverseParamSetting.Click += new System.EventHandler(this.m_tsbTraverseParamSetting_Click);
+			// 
+			// m_tsbConvertNC
+			// 
+			this.m_tsbConvertNC.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbConvertNC.Image = global::MyCAM.Properties.Resources.NCFile;
+			this.m_tsbConvertNC.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbConvertNC.Name = "m_tsbConvertNC";
+			this.m_tsbConvertNC.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbConvertNC.Text = "轉出NC";
+			this.m_tsbConvertNC.Click += new System.EventHandler(this.m_tsbConvertNC_Click);
+			// 
+			// m_panBackGround
+			// 
+			this.m_panBackGround.Controls.Add(this.m_panViewer);
+			this.m_panBackGround.Controls.Add(this.m_panTreeView);
+			this.m_panBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_panBackGround.Location = new System.Drawing.Point(0, 113);
+			this.m_panBackGround.Name = "m_panBackGround";
+			this.m_panBackGround.Size = new System.Drawing.Size(1065, 705);
+			this.m_panBackGround.TabIndex = 4;
 			// 
 			// m_panViewer
 			// 
-			this.m_panViewer.Dock = System.Windows.Forms.DockStyle.Right;
-			this.m_panViewer.Location = new System.Drawing.Point(284, 0);
+			this.m_panViewer.BackColor = System.Drawing.SystemColors.Window;
+			this.m_panViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_panViewer.Location = new System.Drawing.Point(165, 0);
 			this.m_panViewer.Name = "m_panViewer";
-			this.m_panViewer.Size = new System.Drawing.Size(900, 713);
+			this.m_panViewer.Size = new System.Drawing.Size(900, 705);
 			this.m_panViewer.TabIndex = 1;
 			// 
 			// m_panTreeView
 			// 
+			this.m_panTreeView.BackColor = System.Drawing.SystemColors.ButtonHighlight;
 			this.m_panTreeView.Controls.Add(this.m_TreeView);
 			this.m_panTreeView.Dock = System.Windows.Forms.DockStyle.Left;
 			this.m_panTreeView.Location = new System.Drawing.Point(0, 0);
 			this.m_panTreeView.Name = "m_panTreeView";
-			this.m_panTreeView.Size = new System.Drawing.Size(300, 713);
-			this.m_panTreeView.TabIndex = 1;
+			this.m_panTreeView.Size = new System.Drawing.Size(165, 705);
+			this.m_panTreeView.TabIndex = 0;
 			// 
 			// m_TreeView
 			// 
 			this.m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_TreeView.Location = new System.Drawing.Point(0, 0);
 			this.m_TreeView.Name = "m_TreeView";
-			this.m_TreeView.Size = new System.Drawing.Size(300, 713);
-			this.m_TreeView.TabIndex = 1;
-			// 
-			// m_panBackGround
-			// 
-			this.m_panBackGround.Controls.Add(this.m_panTreeView);
-			this.m_panBackGround.Controls.Add(this.m_panViewer);
-			this.m_panBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_panBackGround.Location = new System.Drawing.Point(0, 48);
-			this.m_panBackGround.Name = "m_panBackGround";
-			this.m_panBackGround.Size = new System.Drawing.Size(1184, 713);
-			this.m_panBackGround.TabIndex = 0;
-			// 
-			// m_msCAD_Transform
-			// 
-			this.m_msCAD_Transform.ImageScalingSize = new System.Drawing.Size(20, 20);
-			this.m_msCAD_Transform.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiPlane,
-            this.m_tsmiPlanePar,
-            this.m_tsmiAxial,
-            this.m_tsmiAxialPar,
-            this.m_tsmiPointCoincide,
-            this.m_tsmiTransformOK});
-			this.m_msCAD_Transform.Location = new System.Drawing.Point(0, 43);
-			this.m_msCAD_Transform.Name = "m_msCAD_Transform";
-			this.m_msCAD_Transform.Size = new System.Drawing.Size(1184, 22);
-			this.m_msCAD_Transform.TabIndex = 1;
-			this.m_msCAD_Transform.Text = "menuStrip2";
-			this.m_msCAD_Transform.Visible = false;
-			// 
-			// m_tsmiPlane
-			// 
-			this.m_tsmiPlane.Name = "m_tsmiPlane";
-			this.m_tsmiPlane.Size = new System.Drawing.Size(58, 18);
-			this.m_tsmiPlane.Text = "面重合";
-			this.m_tsmiPlane.Click += new System.EventHandler(this.m_tsmiPlane_Click);
-			// 
-			// m_tsmiPlanePar
-			// 
-			this.m_tsmiPlanePar.Name = "m_tsmiPlanePar";
-			this.m_tsmiPlanePar.Size = new System.Drawing.Size(58, 18);
-			this.m_tsmiPlanePar.Text = "面平行";
-			this.m_tsmiPlanePar.Click += new System.EventHandler(this.m_tsmiPlanePar_Click);
-			// 
-			// m_tsmiAxial
-			// 
-			this.m_tsmiAxial.Name = "m_tsmiAxial";
-			this.m_tsmiAxial.Size = new System.Drawing.Size(58, 18);
-			this.m_tsmiAxial.Text = "軸重合";
-			this.m_tsmiAxial.Click += new System.EventHandler(this.m_tsmiAxial_Click);
-			// 
-			// m_tsmiAxialPar
-			// 
-			this.m_tsmiAxialPar.Name = "m_tsmiAxialPar";
-			this.m_tsmiAxialPar.Size = new System.Drawing.Size(58, 18);
-			this.m_tsmiAxialPar.Text = "軸平行";
-			this.m_tsmiAxialPar.Click += new System.EventHandler(this.m_tsmiAxialPar_Click);
-			// 
-			// m_tsmiPointCoincide
-			// 
-			this.m_tsmiPointCoincide.Name = "m_tsmiPointCoincide";
-			this.m_tsmiPointCoincide.Size = new System.Drawing.Size(58, 18);
-			this.m_tsmiPointCoincide.Text = "點重合";
-			this.m_tsmiPointCoincide.Click += new System.EventHandler(this.m_tsmiPointCoincide_Click);
-			// 
-			// m_tsmiTransformOK
-			// 
-			this.m_tsmiTransformOK.Name = "m_tsmiTransformOK";
-			this.m_tsmiTransformOK.Size = new System.Drawing.Size(35, 18);
-			this.m_tsmiTransformOK.Text = "OK";
-			this.m_tsmiTransformOK.Click += new System.EventHandler(this.m_tsmiTransformOK_Click);
-			// 
-			// m_msCAD_SelectFace
-			// 
-			this.m_msCAD_SelectFace.ImageScalingSize = new System.Drawing.Size(20, 20);
-			this.m_msCAD_SelectFace.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiSelectD1ContFace,
-            this.m_tsmiSelectPath});
-			this.m_msCAD_SelectFace.Location = new System.Drawing.Point(0, 43);
-			this.m_msCAD_SelectFace.Name = "m_msCAD_SelectFace";
-			this.m_msCAD_SelectFace.Size = new System.Drawing.Size(1184, 22);
-			this.m_msCAD_SelectFace.TabIndex = 0;
-			this.m_msCAD_SelectFace.Text = "menuStrip1";
-			this.m_msCAD_SelectFace.Visible = false;
-			// 
-			// m_tsmiSelectD1ContFace
-			// 
-			this.m_tsmiSelectD1ContFace.Name = "m_tsmiSelectD1ContFace";
-			this.m_tsmiSelectD1ContFace.Size = new System.Drawing.Size(62, 18);
-			this.m_tsmiSelectD1ContFace.Text = "D1 連續";
-			this.m_tsmiSelectD1ContFace.Click += new System.EventHandler(this.m_tsmiSelectD1ContFace_Click);
-			// 
-			// m_tsmiSelectPath
-			// 
-			this.m_tsmiSelectPath.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiSelPath_FreeBound,
-            this.m_tsmiSelPath_Manual});
-			this.m_tsmiSelectPath.Name = "m_tsmiSelectPath";
-			this.m_tsmiSelectPath.Size = new System.Drawing.Size(71, 18);
-			this.m_tsmiSelectPath.Text = "選取路徑";
-			// 
-			// m_tsmiSelPath_FreeBound
-			// 
-			this.m_tsmiSelPath_FreeBound.Name = "m_tsmiSelPath_FreeBound";
-			this.m_tsmiSelPath_FreeBound.Size = new System.Drawing.Size(139, 22);
-			this.m_tsmiSelPath_FreeBound.Text = "所有面邊界";
-			this.m_tsmiSelPath_FreeBound.Click += new System.EventHandler(this.m_tsmiSelPath_FreeBound_Click);
-			// 
-			// m_tsmiSelPath_Manual
-			// 
-			this.m_tsmiSelPath_Manual.Name = "m_tsmiSelPath_Manual";
-			this.m_tsmiSelPath_Manual.Size = new System.Drawing.Size(139, 22);
-			this.m_tsmiSelPath_Manual.Text = "手動選取";
-			this.m_tsmiSelPath_Manual.Click += new System.EventHandler(this.m_tsmiSelPath_Manual_Click);
-			// 
-			// m_msCAD_ManualSelectPath
-			// 
-			this.m_msCAD_ManualSelectPath.ImageScalingSize = new System.Drawing.Size(20, 20);
-			this.m_msCAD_ManualSelectPath.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiManualSelectPathOK});
-			this.m_msCAD_ManualSelectPath.Location = new System.Drawing.Point(0, 43);
-			this.m_msCAD_ManualSelectPath.Name = "m_msCAD_ManualSelectPath";
-			this.m_msCAD_ManualSelectPath.Size = new System.Drawing.Size(1184, 22);
-			this.m_msCAD_ManualSelectPath.TabIndex = 1;
-			this.m_msCAD_ManualSelectPath.Text = "menuStrip1";
-			this.m_msCAD_ManualSelectPath.Visible = false;
-			// 
-			// m_tsmiManualSelectPathOK
-			// 
-			this.m_tsmiManualSelectPathOK.Name = "m_tsmiManualSelectPathOK";
-			this.m_tsmiManualSelectPathOK.Size = new System.Drawing.Size(35, 18);
-			this.m_tsmiManualSelectPathOK.Text = "OK";
-			this.m_tsmiManualSelectPathOK.Click += new System.EventHandler(this.m_tsmiManualSelectPathOK_Click);
-			// 
-			// m_msMain
-			// 
-			this.m_msMain.ImageScalingSize = new System.Drawing.Size(20, 20);
-			this.m_msMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiFile,
-            this.m_tsmiCAM});
-			this.m_msMain.Location = new System.Drawing.Point(0, 0);
-			this.m_msMain.Name = "m_msMain";
-			this.m_msMain.Size = new System.Drawing.Size(1184, 22);
-			this.m_msMain.TabIndex = 1;
-			this.m_msMain.Text = "menuStrip1";
-			this.m_msMain.Visible = false;
-			// 
-			// m_tsmiFile
-			// 
-			this.m_tsmiFile.Name = "m_tsmiFile";
-			this.m_tsmiFile.Size = new System.Drawing.Size(45, 18);
-			this.m_tsmiFile.Text = "檔案";
-			// 
-			// m_tsmiCAM
-			// 
-			this.m_tsmiCAM.Name = "m_tsmiCAM";
-			this.m_tsmiCAM.Size = new System.Drawing.Size(46, 18);
-			this.m_tsmiCAM.Text = "CAM";
-			this.m_tsmiCAM.Click += new System.EventHandler(this.m_tsmiCAM_Click);
-			// 
-			// m_msCAM
-			// 
-			this.m_msCAM.ImageScalingSize = new System.Drawing.Size(20, 20);
-			this.m_msCAM.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiAddPath,
-            this.m_tsmiRemovePath,
-            this.m_tsmiStartPoint,
-            this.m_tsmiReverse,
-            this.m_tsmiSetLead,
-            this.m_tsmiOverCut,
-            this.m_tsmiToolVecReverse,
-            this.m_tsmiToolVec,
-            this.m_tsmiMoveUp,
-            this.m_tsmiMoveDown,
-            this.m_tsmiAutoSort,
-            this.m_tsmiTraverseParamSetting,
-            this.m_tsmiBackToCAD,
-            this.m_tsmiCAMOK});
-			this.m_msCAM.Location = new System.Drawing.Point(0, 24);
-			this.m_msCAM.Name = "m_msCAM";
-			this.m_msCAM.Size = new System.Drawing.Size(1184, 24);
-			this.m_msCAM.TabIndex = 1;
-			this.m_msCAM.Text = "menuStrip1";
-			// 
-			// m_tsmiAddPath
-			// 
-			this.m_tsmiAddPath.Name = "m_tsmiAddPath";
-			this.m_tsmiAddPath.Size = new System.Drawing.Size(71, 20);
-			this.m_tsmiAddPath.Text = "新增路徑";
-			this.m_tsmiAddPath.Click += new System.EventHandler(this.m_tsmiAddPath_Click);
-			// 
-			// m_tsmiRemovePath
-			// 
-			this.m_tsmiRemovePath.Name = "m_tsmiRemovePath";
-			this.m_tsmiRemovePath.Size = new System.Drawing.Size(71, 20);
-			this.m_tsmiRemovePath.Text = "刪除路徑";
-			this.m_tsmiRemovePath.Click += new System.EventHandler(this.m_tsmiRemovePath_Click);
-			// 
-			// m_tsmiStartPoint
-			// 
-			this.m_tsmiStartPoint.Name = "m_tsmiStartPoint";
-			this.m_tsmiStartPoint.Size = new System.Drawing.Size(45, 20);
-			this.m_tsmiStartPoint.Text = "起點";
-			this.m_tsmiStartPoint.Click += new System.EventHandler(this.m_tsmiStartPoint_Click);
-			// 
-			// m_tsmiReverse
-			// 
-			this.m_tsmiReverse.Name = "m_tsmiReverse";
-			this.m_tsmiReverse.Size = new System.Drawing.Size(45, 20);
-			this.m_tsmiReverse.Text = "反向";
-			this.m_tsmiReverse.Click += new System.EventHandler(this.m_tsmiReverse_Click);
-			// 
-			// m_tsmiSetLead
-			// 
-			this.m_tsmiSetLead.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiChangeLeadDirection,
-            this.m_tsmiLeadSetting});
-			this.m_tsmiSetLead.Name = "m_tsmiSetLead";
-			this.m_tsmiSetLead.Size = new System.Drawing.Size(45, 20);
-			this.m_tsmiSetLead.Text = "引線";
-			// 
-			// m_tsmiChangeLeadDirection
-			// 
-			this.m_tsmiChangeLeadDirection.Name = "m_tsmiChangeLeadDirection";
-			this.m_tsmiChangeLeadDirection.Size = new System.Drawing.Size(182, 26);
-			this.m_tsmiChangeLeadDirection.Text = "更換引線方向";
-			this.m_tsmiChangeLeadDirection.Click += new System.EventHandler(this.m_tsmiChangeLeadDirection_Click);
-			// 
-			// m_tsmiLeadSetting
-			// 
-			this.m_tsmiLeadSetting.Name = "m_tsmiLeadSetting";
-			this.m_tsmiLeadSetting.Size = new System.Drawing.Size(182, 26);
-			this.m_tsmiLeadSetting.Text = "設置引線";
-			this.m_tsmiLeadSetting.Click += new System.EventHandler(this.m_tsmiLeadSetting_Click);
-			// 
-			// m_tsmiOverCut
-			// 
-			this.m_tsmiOverCut.Name = "m_tsmiOverCut";
-			this.m_tsmiOverCut.Size = new System.Drawing.Size(45, 20);
-			this.m_tsmiOverCut.Text = "過切";
-			this.m_tsmiOverCut.Click += new System.EventHandler(this.m_tsmiOverCut_Click);
-			// 
-			// m_tsmiToolVecReverse
-			// 
-			this.m_tsmiToolVecReverse.Name = "m_tsmiToolVecReverse";
-			this.m_tsmiToolVecReverse.Size = new System.Drawing.Size(83, 24);
-			this.m_tsmiToolVecReverse.Text = "姿態反向";
-			this.m_tsmiToolVecReverse.Click += new System.EventHandler(this.m_tsmiToolVecReverse_Click);
-			// 
-			// m_tsmiToolVec
-			// 
-			this.m_tsmiToolVec.Name = "m_tsmiToolVec";
-			this.m_tsmiToolVec.Size = new System.Drawing.Size(45, 20);
-			this.m_tsmiToolVec.Text = "姿態";
-			this.m_tsmiToolVec.Click += new System.EventHandler(this.m_tsmiToolVec_Click);
-			// 
-			// m_tsmiMoveUp
-			// 
-			this.m_tsmiMoveUp.Name = "m_tsmiMoveUp";
-			this.m_tsmiMoveUp.Size = new System.Drawing.Size(45, 20);
-			this.m_tsmiMoveUp.Text = "上移";
-			this.m_tsmiMoveUp.Click += new System.EventHandler(this.m_tsmiMoveUp_Click);
-			// 
-			// m_tsmiMoveDown
-			// 
-			this.m_tsmiMoveDown.Name = "m_tsmiMoveDown";
-			this.m_tsmiMoveDown.Size = new System.Drawing.Size(45, 20);
-			this.m_tsmiMoveDown.Text = "下移";
-			this.m_tsmiMoveDown.Click += new System.EventHandler(this.m_tsmiMoveDown_Click);
-			// 
-			// m_tsmiAutoSort
-			// 
-			this.m_tsmiAutoSort.Name = "m_tsmiAutoSort";
-			this.m_tsmiAutoSort.Size = new System.Drawing.Size(71, 20);
-			this.m_tsmiAutoSort.Text = "自動排序";
-			this.m_tsmiAutoSort.Click += new System.EventHandler(this.m_tsmiAutoSort_Click);
-			// 
-			// m_tsmiTraverseParamSetting
-			// 
-			this.m_tsmiTraverseParamSetting.Name = "m_tsmiTraverseParamSetting";
-			this.m_tsmiTraverseParamSetting.Size = new System.Drawing.Size(113, 24);
-			this.m_tsmiTraverseParamSetting.Text = "空移參數設定";
-			this.m_tsmiTraverseParamSetting.Click += new System.EventHandler(this.m_tsmiTraverseParamSetting_Click);
-			// 
-			// m_tsmiBackToCAD
-			// 
-			this.m_tsmiBackToCAD.Name = "m_tsmiBackToCAD";
-			this.m_tsmiBackToCAD.Size = new System.Drawing.Size(88, 24);
-			this.m_tsmiBackToCAD.Text = "回到 CAD";
-			this.m_tsmiBackToCAD.Click += new System.EventHandler(this.m_tsmiBackToCAD_Click);
-			// 
-			// m_tsmiCAMOK
-			// 
-			this.m_tsmiCAMOK.Name = "m_tsmiCAMOK";
-			this.m_tsmiCAMOK.Size = new System.Drawing.Size(44, 24);
-			this.m_tsmiCAMOK.Text = "OK";
-			this.m_tsmiCAMOK.Click += new System.EventHandler(this.m_tsmiCAMOK_Click);
+			this.m_TreeView.Size = new System.Drawing.Size(165, 705);
+			this.m_TreeView.TabIndex = 0;
+			// 
+			// m_tscLevel1Container
+			// 
+			// 
+			// m_tscLevel1Container.ContentPanel
+			// 
+			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCADFunction);
+			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCAMFunction);
+			this.m_tscLevel1Container.ContentPanel.Size = new System.Drawing.Size(1065, 46);
+			this.m_tscLevel1Container.Dock = System.Windows.Forms.DockStyle.Top;
+			this.m_tscLevel1Container.Location = new System.Drawing.Point(0, 24);
+			this.m_tscLevel1Container.Name = "m_tscLevel1Container";
+			this.m_tscLevel1Container.Size = new System.Drawing.Size(1065, 46);
+			this.m_tscLevel1Container.TabIndex = 5;
+			this.m_tscLevel1Container.Text = "toolStripContainer1";
+			// 
+			// m_tsCADFunction
+			// 
+			this.m_tsCADFunction.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_tsCADFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
+			this.m_tsCADFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbAddPoint_AcrCenter,
+            this.m_tsbAddPoint_EdgeCenter,
+            this.m_tsbAddPoint_PointCenter,
+            this.m_tsbAddLine_TwoVertexConnect,
+            this.m_tsbManualTransform,
+            this.m_tsb3PntTransform,
+            this.m_tsbAxisTransform});
+			this.m_tsCADFunction.Location = new System.Drawing.Point(0, 0);
+			this.m_tsCADFunction.Name = "m_tsCADFunction";
+			this.m_tsCADFunction.Size = new System.Drawing.Size(1065, 46);
+			this.m_tsCADFunction.TabIndex = 3;
+			this.m_tsCADFunction.Text = "CAD功能";
+			// 
+			// m_tsbAddPoint_AcrCenter
+			// 
+			this.m_tsbAddPoint_AcrCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAddPoint_AcrCenter.Image = global::MyCAM.Properties.Resources.AcrCenter;
+			this.m_tsbAddPoint_AcrCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbAddPoint_AcrCenter.Name = "m_tsbAddPoint_AcrCenter";
+			this.m_tsbAddPoint_AcrCenter.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbAddPoint_AcrCenter.Text = "新增圓弧中心";
+			this.m_tsbAddPoint_AcrCenter.Click += new System.EventHandler(this.m_tsbAddPoint_AcrCenter_Click);
+			// 
+			// m_tsbAddPoint_EdgeCenter
+			// 
+			this.m_tsbAddPoint_EdgeCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAddPoint_EdgeCenter.Image = global::MyCAM.Properties.Resources.EdgeCenter;
+			this.m_tsbAddPoint_EdgeCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbAddPoint_EdgeCenter.Name = "m_tsbAddPoint_EdgeCenter";
+			this.m_tsbAddPoint_EdgeCenter.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbAddPoint_EdgeCenter.Text = "新增線段中心";
+			this.m_tsbAddPoint_EdgeCenter.Click += new System.EventHandler(this.m_tsbAddPoint_EdgeCenter_Click);
+			// 
+			// m_tsbAddPoint_PointCenter
+			// 
+			this.m_tsbAddPoint_PointCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAddPoint_PointCenter.Image = global::MyCAM.Properties.Resources.PointCenter;
+			this.m_tsbAddPoint_PointCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbAddPoint_PointCenter.Name = "m_tsbAddPoint_PointCenter";
+			this.m_tsbAddPoint_PointCenter.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbAddPoint_PointCenter.Text = "新增兩點中心";
+			this.m_tsbAddPoint_PointCenter.Click += new System.EventHandler(this.m_tsbAddPoint_PointCenter_Click);
+			// 
+			// m_tsbAddLine_TwoVertexConnect
+			// 
+			this.m_tsbAddLine_TwoVertexConnect.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAddLine_TwoVertexConnect.Image = global::MyCAM.Properties.Resources.TwoVertexConnect;
+			this.m_tsbAddLine_TwoVertexConnect.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbAddLine_TwoVertexConnect.Name = "m_tsbAddLine_TwoVertexConnect";
+			this.m_tsbAddLine_TwoVertexConnect.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbAddLine_TwoVertexConnect.Text = "新增兩點連線";
+			this.m_tsbAddLine_TwoVertexConnect.Click += new System.EventHandler(this.m_tsbAddLine_TwoVertexConnect_Click);
+			// 
+			// m_tsbManualTransform
+			// 
+			this.m_tsbManualTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbManualTransform.Image = global::MyCAM.Properties.Resources.ManualTransform;
+			this.m_tsbManualTransform.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbManualTransform.Name = "m_tsbManualTransform";
+			this.m_tsbManualTransform.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbManualTransform.Text = "手動轉換";
+			this.m_tsbManualTransform.Click += new System.EventHandler(this.m_tsbManualTransform_Click);
+			// 
+			// m_tsb3PntTransform
+			// 
+			this.m_tsb3PntTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsb3PntTransform.Image = ((System.Drawing.Image)(resources.GetObject("m_tsb3PntTransform.Image")));
+			this.m_tsb3PntTransform.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsb3PntTransform.Name = "m_tsb3PntTransform";
+			this.m_tsb3PntTransform.Size = new System.Drawing.Size(63, 43);
+			this.m_tsb3PntTransform.Text = "三點轉換";
+			this.m_tsb3PntTransform.Click += new System.EventHandler(this.m_tsb3PntTransform_Click);
+			// 
+			// m_tsbAxisTransform
+			// 
+			this.m_tsbAxisTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbAxisTransform.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbAxisTransform.Image")));
+			this.m_tsbAxisTransform.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbAxisTransform.Name = "m_tsbAxisTransform";
+			this.m_tsbAxisTransform.Size = new System.Drawing.Size(63, 43);
+			this.m_tsbAxisTransform.Text = "軸向轉換";
+			this.m_tsbAxisTransform.Click += new System.EventHandler(this.m_tsbAxisTransform_Click);
+			// 
+			// m_tscLevel2Container
+			// 
+			// 
+			// m_tscLevel2Container.ContentPanel
+			// 
+			this.m_tscLevel2Container.ContentPanel.Controls.Add(this.m_tsManualTrans);
+			this.m_tscLevel2Container.ContentPanel.Controls.Add(this.m_tsAddPathSubFunc);
+			this.m_tscLevel2Container.ContentPanel.Size = new System.Drawing.Size(1065, 21);
+			this.m_tscLevel2Container.Dock = System.Windows.Forms.DockStyle.Top;
+			this.m_tscLevel2Container.Location = new System.Drawing.Point(0, 70);
+			this.m_tscLevel2Container.Name = "m_tscLevel2Container";
+			this.m_tscLevel2Container.Size = new System.Drawing.Size(1065, 21);
+			this.m_tscLevel2Container.TabIndex = 6;
+			this.m_tscLevel2Container.Text = "toolStripContainer1";
+			this.m_tscLevel2Container.TopToolStripPanelVisible = false;
+			// 
+			// m_tsManualTrans
+			// 
+			this.m_tsManualTrans.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_tsManualTrans.ImageScalingSize = new System.Drawing.Size(24, 24);
+			this.m_tsManualTrans.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbManualTransPlane,
+            this.m_tsbManualTransPlanePar,
+            this.m_tsbManualTransAxial,
+            this.m_tsbManualTransAxialPar,
+            this.m_tsbManualTransPointCoincide});
+			this.m_tsManualTrans.Location = new System.Drawing.Point(0, 0);
+			this.m_tsManualTrans.Name = "m_tsManualTrans";
+			this.m_tsManualTrans.Size = new System.Drawing.Size(1065, 21);
+			this.m_tsManualTrans.TabIndex = 0;
+			this.m_tsManualTrans.Text = "toolStrip1";
+			// 
+			// m_tsbManualTransPlane
+			// 
+			this.m_tsbManualTransPlane.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbManualTransPlane.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualTransPlane.Image")));
+			this.m_tsbManualTransPlane.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbManualTransPlane.Name = "m_tsbManualTransPlane";
+			this.m_tsbManualTransPlane.RightToLeftAutoMirrorImage = true;
+			this.m_tsbManualTransPlane.Size = new System.Drawing.Size(50, 18);
+			this.m_tsbManualTransPlane.Text = "面重合";
+			this.m_tsbManualTransPlane.Click += new System.EventHandler(this.m_tsbManualTransPlane_Click);
+			// 
+			// m_tsbManualTransPlanePar
+			// 
+			this.m_tsbManualTransPlanePar.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbManualTransPlanePar.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualTransPlanePar.Image")));
+			this.m_tsbManualTransPlanePar.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbManualTransPlanePar.Name = "m_tsbManualTransPlanePar";
+			this.m_tsbManualTransPlanePar.Size = new System.Drawing.Size(50, 18);
+			this.m_tsbManualTransPlanePar.Text = "面平行";
+			this.m_tsbManualTransPlanePar.Click += new System.EventHandler(this.m_tsbManualTransPlanePar_Click);
+			// 
+			// m_tsbManualTransAxial
+			// 
+			this.m_tsbManualTransAxial.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbManualTransAxial.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualTransAxial.Image")));
+			this.m_tsbManualTransAxial.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbManualTransAxial.Name = "m_tsbManualTransAxial";
+			this.m_tsbManualTransAxial.Size = new System.Drawing.Size(50, 18);
+			this.m_tsbManualTransAxial.Text = "軸重合";
+			this.m_tsbManualTransAxial.Click += new System.EventHandler(this.m_tsbManualTransAxial_Click);
+			// 
+			// m_tsbManualTransAxialPar
+			// 
+			this.m_tsbManualTransAxialPar.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbManualTransAxialPar.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualTransAxialPar.Image")));
+			this.m_tsbManualTransAxialPar.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbManualTransAxialPar.Name = "m_tsbManualTransAxialPar";
+			this.m_tsbManualTransAxialPar.Size = new System.Drawing.Size(50, 18);
+			this.m_tsbManualTransAxialPar.Text = "軸平行";
+			this.m_tsbManualTransAxialPar.Click += new System.EventHandler(this.m_tsbManualTransAxialPar_Click);
+			// 
+			// m_tsbManualTransPointCoincide
+			// 
+			this.m_tsbManualTransPointCoincide.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbManualTransPointCoincide.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualTransPointCoincide.Image")));
+			this.m_tsbManualTransPointCoincide.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbManualTransPointCoincide.Name = "m_tsbManualTransPointCoincide";
+			this.m_tsbManualTransPointCoincide.Size = new System.Drawing.Size(50, 18);
+			this.m_tsbManualTransPointCoincide.Text = "點重合";
+			this.m_tsbManualTransPointCoincide.Click += new System.EventHandler(this.m_tsbManualTransPointCoincide_Click);
+			// 
+			// m_tsAddPathSubFunc
+			// 
+			this.m_tsAddPathSubFunc.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_tsAddPathSubFunc.ImageScalingSize = new System.Drawing.Size(24, 24);
+			this.m_tsAddPathSubFunc.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbSelectD1ContFace,
+            this.m_tsbSelectPath});
+			this.m_tsAddPathSubFunc.Location = new System.Drawing.Point(0, 0);
+			this.m_tsAddPathSubFunc.Name = "m_tsAddPathSubFunc";
+			this.m_tsAddPathSubFunc.Size = new System.Drawing.Size(1065, 21);
+			this.m_tsAddPathSubFunc.TabIndex = 5;
+			this.m_tsAddPathSubFunc.Text = "tsAddPathSubFunc";
+			// 
+			// m_tsbSelectD1ContFace
+			// 
+			this.m_tsbSelectD1ContFace.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbSelectD1ContFace.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbSelectD1ContFace.Image")));
+			this.m_tsbSelectD1ContFace.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbSelectD1ContFace.Name = "m_tsbSelectD1ContFace";
+			this.m_tsbSelectD1ContFace.Size = new System.Drawing.Size(54, 18);
+			this.m_tsbSelectD1ContFace.Text = "D1 連續";
+			this.m_tsbSelectD1ContFace.Click += new System.EventHandler(this.m_tsbSelectD1ContFace_Click);
+			// 
+			// m_tsbSelectPath
+			// 
+			this.m_tsbSelectPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbSelectPath.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbSelectPath.Image")));
+			this.m_tsbSelectPath.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbSelectPath.Name = "m_tsbSelectPath";
+			this.m_tsbSelectPath.Size = new System.Drawing.Size(63, 18);
+			this.m_tsbSelectPath.Text = "選取路徑";
+			this.m_tsbSelectPath.Click += new System.EventHandler(this.m_tsbSelectPath_Click);
+			// 
+			// m_pnlLog
+			// 
+			this.m_pnlLog.AutoScroll = true;
+			this.m_pnlLog.BackColor = System.Drawing.SystemColors.ActiveCaption;
+			this.m_pnlLog.Dock = System.Windows.Forms.DockStyle.Bottom;
+			this.m_pnlLog.Location = new System.Drawing.Point(0, 818);
+			this.m_pnlLog.Name = "m_pnlLog";
+			this.m_pnlLog.Size = new System.Drawing.Size(1065, 102);
+			this.m_pnlLog.TabIndex = 7;
+			// 
+			// m_tscLevel3Container
+			// 
+			this.m_tscLevel3Container.BottomToolStripPanelVisible = false;
+			// 
+			// m_tscLevel3Container.ContentPanel
+			// 
+			this.m_tscLevel3Container.ContentPanel.Controls.Add(this.m_tsSelectPath);
+			this.m_tscLevel3Container.ContentPanel.Size = new System.Drawing.Size(1065, 22);
+			this.m_tscLevel3Container.Dock = System.Windows.Forms.DockStyle.Top;
+			this.m_tscLevel3Container.LeftToolStripPanelVisible = false;
+			this.m_tscLevel3Container.Location = new System.Drawing.Point(0, 91);
+			this.m_tscLevel3Container.Name = "m_tscLevel3Container";
+			this.m_tscLevel3Container.RightToolStripPanelVisible = false;
+			this.m_tscLevel3Container.Size = new System.Drawing.Size(1065, 22);
+			this.m_tscLevel3Container.TabIndex = 8;
+			this.m_tscLevel3Container.Text = "toolStripContainer1";
+			this.m_tscLevel3Container.TopToolStripPanelVisible = false;
+			// 
+			// m_tsSelectPath
+			// 
+			this.m_tsSelectPath.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_tsSelectPath.ImageScalingSize = new System.Drawing.Size(24, 24);
+			this.m_tsSelectPath.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbSelPath_FreeBound,
+            this.m_tsbSelPath_Manual,
+            this.m_tsbManualSelectPathOK});
+			this.m_tsSelectPath.Location = new System.Drawing.Point(0, 0);
+			this.m_tsSelectPath.Name = "m_tsSelectPath";
+			this.m_tsSelectPath.Size = new System.Drawing.Size(1065, 22);
+			this.m_tsSelectPath.TabIndex = 1;
+			this.m_tsSelectPath.Text = "SelectPath";
+			// 
+			// m_tsbSelPath_FreeBound
+			// 
+			this.m_tsbSelPath_FreeBound.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbSelPath_FreeBound.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbSelPath_FreeBound.Image")));
+			this.m_tsbSelPath_FreeBound.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbSelPath_FreeBound.Name = "m_tsbSelPath_FreeBound";
+			this.m_tsbSelPath_FreeBound.Size = new System.Drawing.Size(76, 19);
+			this.m_tsbSelPath_FreeBound.Text = "所有面邊界";
+			this.m_tsbSelPath_FreeBound.Click += new System.EventHandler(this.m_tsbSelPath_FreeBound_Click);
+			// 
+			// m_tsbSelPath_Manual
+			// 
+			this.m_tsbSelPath_Manual.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbSelPath_Manual.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbSelPath_Manual.Image")));
+			this.m_tsbSelPath_Manual.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbSelPath_Manual.Name = "m_tsbSelPath_Manual";
+			this.m_tsbSelPath_Manual.Size = new System.Drawing.Size(63, 19);
+			this.m_tsbSelPath_Manual.Text = "手動選取";
+			this.m_tsbSelPath_Manual.Click += new System.EventHandler(this.m_tsbSelPath_Manual_Click);
+			// 
+			// m_tsbManualSelectPathOK
+			// 
+			this.m_tsbManualSelectPathOK.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbManualSelectPathOK.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualSelectPathOK.Image")));
+			this.m_tsbManualSelectPathOK.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbManualSelectPathOK.Name = "m_tsbManualSelectPathOK";
+			this.m_tsbManualSelectPathOK.Size = new System.Drawing.Size(89, 19);
+			this.m_tsbManualSelectPathOK.Text = "手動選取完成";
+			this.m_tsbManualSelectPathOK.Click += new System.EventHandler(this.m_tsbManualSelectPathOK_Click);
 			// 
 			// StartupForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1579, 951);
+			this.ClientSize = new System.Drawing.Size(1065, 920);
 			this.Controls.Add(this.m_panBackGround);
-			this.Controls.Add(this.m_msCAD_SelectFace);
-			this.Controls.Add(this.m_msCAD_Transform);
-			this.Controls.Add(this.m_msCAD_ManualSelectPath);
-			this.Controls.Add(this.m_msCAM);
-			this.Controls.Add(this.m_msCAD);
-			this.Controls.Add(this.m_msMain);
-			this.MainMenuStrip = this.m_msCAD;
+			this.Controls.Add(this.m_tscLevel3Container);
+			this.Controls.Add(this.m_tscLevel2Container);
+			this.Controls.Add(this.m_tscLevel1Container);
+			this.Controls.Add(this.m_msMode);
+			this.Controls.Add(this.m_pnlLog);
+			this.MainMenuStrip = this.m_msMode;
 			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "StartupForm";
 			this.Text = "五軸切";
-			// 
-			// m_tsmiCAMOK
-			// 
-			this.m_tsmiCAMOK.Name = "m_tsmiCAMOK";
-			this.m_tsmiCAMOK.Size = new System.Drawing.Size(35, 20);
-			this.m_tsmiCAMOK.Text = "OK";
-			this.m_tsmiCAMOK.Click += new System.EventHandler(this.m_tsmiCAMOK_Click);
-			// 
-			// StartupForm
-			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1184, 761);
-			this.Controls.Add(this.m_panBackGround);
-			this.Controls.Add(this.m_msCAD_Transform);
-			this.Controls.Add(this.m_msCAD_SelectFace);
-			this.Controls.Add(this.m_msCAD_ManualSelectPath);
-			this.Controls.Add(this.m_msCAM);
-			this.Controls.Add(this.m_msCAD);
-			this.Controls.Add(this.m_msMain);
-			this.MainMenuStrip = this.m_msCAD;
-			this.Name = "StartupForm";
-			this.Text = "五軸切";
-			this.m_msCAD.ResumeLayout(false);
-			this.m_msCAD.PerformLayout();
-			this.m_panTreeView.ResumeLayout(false);
+			this.m_msMode.ResumeLayout(false);
+			this.m_msMode.PerformLayout();
+			this.m_tsCAMFunction.ResumeLayout(false);
+			this.m_tsCAMFunction.PerformLayout();
 			this.m_panBackGround.ResumeLayout(false);
-			this.m_msCAD_Transform.ResumeLayout(false);
-			this.m_msCAD_Transform.PerformLayout();
-			this.m_msCAD_SelectFace.ResumeLayout(false);
-			this.m_msCAD_SelectFace.PerformLayout();
-			this.m_msCAD_ManualSelectPath.ResumeLayout(false);
-			this.m_msCAD_ManualSelectPath.PerformLayout();
-			this.m_msMain.ResumeLayout(false);
-			this.m_msMain.PerformLayout();
-			this.m_msCAM.ResumeLayout(false);
-			this.m_msCAM.PerformLayout();
+			this.m_panTreeView.ResumeLayout(false);
+			this.m_tscLevel1Container.ContentPanel.ResumeLayout(false);
+			this.m_tscLevel1Container.ContentPanel.PerformLayout();
+			this.m_tscLevel1Container.ResumeLayout(false);
+			this.m_tscLevel1Container.PerformLayout();
+			this.m_tsCADFunction.ResumeLayout(false);
+			this.m_tsCADFunction.PerformLayout();
+			this.m_tscLevel2Container.ContentPanel.ResumeLayout(false);
+			this.m_tscLevel2Container.ContentPanel.PerformLayout();
+			this.m_tscLevel2Container.ResumeLayout(false);
+			this.m_tscLevel2Container.PerformLayout();
+			this.m_tsManualTrans.ResumeLayout(false);
+			this.m_tsManualTrans.PerformLayout();
+			this.m_tsAddPathSubFunc.ResumeLayout(false);
+			this.m_tsAddPathSubFunc.PerformLayout();
+			this.m_tscLevel3Container.ContentPanel.ResumeLayout(false);
+			this.m_tscLevel3Container.ContentPanel.PerformLayout();
+			this.m_tscLevel3Container.ResumeLayout(false);
+			this.m_tscLevel3Container.PerformLayout();
+			this.m_tsSelectPath.ResumeLayout(false);
+			this.m_tsSelectPath.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
 		}
 
 		#endregion
-		private System.Windows.Forms.MenuStrip m_msCAD;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiImport;
-		private System.Windows.Forms.Panel m_panViewer;
-		private System.Windows.Forms.Panel m_panTreeView;
-		private System.Windows.Forms.Panel m_panBackGround;
-		private System.Windows.Forms.TreeView m_TreeView;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportBRep;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportStep;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportIges;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddFeature;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_AcrCenter;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_EdgeCenter;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiTransform;
-		private System.Windows.Forms.MenuStrip m_msCAD_Transform;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiPlane;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiPlanePar;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiAxial;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiAxialPar;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiTransformOK;
-		private System.Windows.Forms.MenuStrip m_msCAD_SelectFace;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectD1ContFace;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiManualTransform;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmi3PointTransform;
-		private System.Windows.Forms.MenuStrip m_msCAD_ManualSelectPath;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiManualSelectPathOK;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelectPath;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelPath_FreeBound;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiSelPath_Manual;
-		private System.Windows.Forms.MenuStrip m_msMain;
+		private System.Windows.Forms.MenuStrip m_msMode;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiFile;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiCAD;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiCAM;
-		private System.Windows.Forms.MenuStrip m_msCAM;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPath;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiCADOK;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiStartPoint;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiReverse;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiSetLead;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiOverCut;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiToolVec;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiCAMOK;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiMoveUp;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiMoveDown;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiAutoSort;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiRemovePath;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiBackToCAD;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiManipulatorTransform;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiPointCoincide;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddPoint_PointCenter;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddLine;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiAddLine_TwoVertexConnect;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiChangeLeadDirection;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiLeadSetting;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiToolVecReverse;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiTraverseParamSetting;
+		private System.Windows.Forms.ToolStrip m_tsCAMFunction;
+		private System.Windows.Forms.ToolStripButton m_tsbAddPath;
+		private System.Windows.Forms.Panel m_panBackGround;
+		private System.Windows.Forms.Panel m_panTreeView;
+		private System.Windows.Forms.Panel m_panViewer;
+		private System.Windows.Forms.TreeView m_TreeView;
+		private System.Windows.Forms.ToolStripButton m_tsbDeletePath;
+		private System.Windows.Forms.ToolStripButton m_tsbStartPoint;
+		private System.Windows.Forms.ToolStripButton m_tsbReverse;
+		private System.Windows.Forms.ToolStripButton m_tsbSetLead;
+		private System.Windows.Forms.ToolStripButton m_tsbOverCut;
+		private System.Windows.Forms.ToolStripButton m_tsbTooVecReverse;
+		private System.Windows.Forms.ToolStripButton m_tsbToolVec;
+		private System.Windows.Forms.ToolStripButton m_tsbMoveUp;
+		private System.Windows.Forms.ToolStripButton m_tsbMoveDown;
+		private System.Windows.Forms.ToolStripButton m_tsbAutoOrder;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportStep;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportProjectFile;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSaveProjectFile;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiOpenProjectFile;
+		private System.Windows.Forms.ToolStripContainer m_tscLevel1Container;
+		private System.Windows.Forms.ToolStripContainer m_tscLevel2Container;
+		private System.Windows.Forms.ToolStrip m_tsCADFunction;
+		private System.Windows.Forms.Panel m_pnlLog;
+		private System.Windows.Forms.ToolStripContainer m_tscLevel3Container;
+		private System.Windows.Forms.ToolStrip m_tsManualTrans;
+		private System.Windows.Forms.ToolStripButton m_tsbManualTransPlane;
+		private System.Windows.Forms.ToolStripButton m_tsbManualTransPlanePar;
+		private System.Windows.Forms.ToolStripButton m_tsbManualTransAxial;
+		private System.Windows.Forms.ToolStripButton m_tsbManualTransAxialPar;
+		private System.Windows.Forms.ToolStripButton m_tsbManualTransPointCoincide;
+		private System.Windows.Forms.ToolStrip m_tsAddPathSubFunc;
+		private System.Windows.Forms.ToolStripButton m_tsbSelectD1ContFace;
+		private System.Windows.Forms.ToolStripButton m_tsbSelectPath;
+		private System.Windows.Forms.ToolStrip m_tsSelectPath;
+		private System.Windows.Forms.ToolStripButton m_tsbSelPath_FreeBound;
+		private System.Windows.Forms.ToolStripButton m_tsbSelPath_Manual;
+		private System.Windows.Forms.ToolStripButton m_tsbManualSelectPathOK;
+		private System.Windows.Forms.ToolStripButton m_tsbTraverseParamSetting;
+		private System.Windows.Forms.ToolStripButton m_tsbConvertNC;
+		private System.Windows.Forms.ToolStripButton m_tsbFlipLead;
+		private System.Windows.Forms.ToolStripButton m_tsbAddPoint_AcrCenter;
+		private System.Windows.Forms.ToolStripButton m_tsbAddPoint_EdgeCenter;
+		private System.Windows.Forms.ToolStripButton m_tsbAddPoint_PointCenter;
+		private System.Windows.Forms.ToolStripButton m_tsbAddLine_TwoVertexConnect;
+		private System.Windows.Forms.ToolStripButton m_tsbManualTransform;
+		private System.Windows.Forms.ToolStripButton m_tsb3PntTransform;
+		private System.Windows.Forms.ToolStripButton m_tsbAxisTransform;
 	}
 }
 

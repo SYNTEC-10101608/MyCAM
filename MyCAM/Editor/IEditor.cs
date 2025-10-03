@@ -77,6 +77,13 @@ namespace MyCAM.Editor
 			m_CurrentAction.Start();
 		}
 
+		protected virtual void EndActionIfNotDefault()
+		{
+			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
+				m_CurrentAction?.End();
+			}
+		}
+
 		protected virtual void OnEditActionStart( IEditorAction action )
 		{
 			// currently for notifying main form

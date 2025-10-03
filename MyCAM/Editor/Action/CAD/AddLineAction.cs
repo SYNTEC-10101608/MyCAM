@@ -1,12 +1,13 @@
-﻿using MyCAM.Data;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.App;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -114,7 +115,7 @@ namespace MyCAM.Editor
 			}
 			bool isValidPoint = GeometryTool.CreateLineFromTwoVertex( vertex1, vertex2, out TopoDS_Edge edge );
 			if( !isValidPoint ) {
-				MessageBox.Show( "Invalid Point" );
+				MyApp.Logger.ShowOnLogPanel( "不合法的兩個點", MyApp.NoticeType.Warning );
 				return false;
 			}
 			m_DataManager.AddReferenceFeature( edge );
