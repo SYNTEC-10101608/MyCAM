@@ -239,7 +239,7 @@ namespace MyCAM
 		}
 
 		// axis transform
-		void m_tsbAxisTransform_Click_1( object sender, EventArgs e )
+		void m_tsbAxisTransform_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.StartAxisTransform();
 		}

@@ -458,7 +458,7 @@
 			this.m_tsbAxisTransform.Name = "m_tsbAxisTransform";
 			this.m_tsbAxisTransform.Size = new System.Drawing.Size(63, 43);
 			this.m_tsbAxisTransform.Text = "軸向轉換";
-			this.m_tsbAxisTransform.Click += new System.EventHandler(this.m_tsbAxisTransform_Click_1);
+			this.m_tsbAxisTransform.Click += new System.EventHandler(this.m_tsbAxisTransform_Click);
 			// 
 			// m_tscLevel2Container
 			// 
