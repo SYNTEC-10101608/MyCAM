@@ -1,4 +1,8 @@
-﻿using MyCAM.Data;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.App;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.TopAbs;
 using OCC.TopExp;
@@ -6,9 +10,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -128,6 +129,7 @@ namespace MyCAM.Editor
 		{
 			List<TopoDS_Face> faceBFSQueue = GetSelectedFace();
 			if( faceBFSQueue.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇面", MyApp.NoticeType.Hint );
 				return;
 			}
 

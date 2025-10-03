@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using MyCAM.App;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -41,11 +42,11 @@ namespace MyCAM.Editor.Dialog
 		bool IsValidParam()
 		{
 			if( !double.TryParse( m_tbxOverCutLength.Text, out double dOverCutLength ) ) {
-				MessageBox.Show( "invalid string" );
+				MyApp.Logger.ShowOnLogPanel( "無效字串", MyApp.NoticeType.Warning );
 				return false;
 			}
 			if( dOverCutLength < 0 ) {
-				MessageBox.Show( "length must longer than 0" );
+				MyApp.Logger.ShowOnLogPanel( "長度需要大於0", MyApp.NoticeType.Warning );
 				return false;
 			}
 			m_OverCutLength = dOverCutLength;

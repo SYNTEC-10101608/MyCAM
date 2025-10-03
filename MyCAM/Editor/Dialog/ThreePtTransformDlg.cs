@@ -1,6 +1,7 @@
-﻿using OCC.gp;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using MyCAM.App;
+using OCC.gp;
 
 namespace MyCAM.Editor
 {
@@ -48,7 +49,7 @@ namespace MyCAM.Editor
 				!double.TryParse( tbxMachineX3.Text, out double x3 ) ||
 				!double.TryParse( tbxMachineY3.Text, out double y3 ) ||
 				!double.TryParse( tbxMachineZ3.Text, out double z3 ) ) {
-				MessageBox.Show( "Invalid machine point coordinates.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				MyApp.Logger.ShowOnLogPanel( $"機械點座標無效", MyApp.NoticeType.Warning );
 				return;
 			}
 
@@ -61,7 +62,7 @@ namespace MyCAM.Editor
 			if( m_MachineP1.IsEqual( m_MachineP2, 1e-3 ) ||
 				m_MachineP1.IsEqual( m_MachineP3, 1e-3 ) ||
 				m_MachineP2.IsEqual( m_MachineP3, 1e-3 ) ) {
-				MessageBox.Show( "Machine points cannot be coincident.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				MyApp.Logger.ShowOnLogPanel( $"機械點不能重合", MyApp.NoticeType.Warning );
 				return;
 			}
 
@@ -69,7 +70,7 @@ namespace MyCAM.Editor
 			gp_Vec v12 = new gp_Vec( m_MachineP1, m_MachineP2 );
 			gp_Vec v13 = new gp_Vec( m_MachineP1, m_MachineP3 );
 			if( v12.IsParallel( v13, 1e-3 ) ) {
-				MessageBox.Show( "Machine points cannot be collinear.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				MyApp.Logger.ShowOnLogPanel( $"機械點不能共線", MyApp.NoticeType.Warning );
 				return;
 			}
 

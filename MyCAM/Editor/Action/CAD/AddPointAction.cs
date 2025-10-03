@@ -1,4 +1,8 @@
-﻿using MyCAM.Data;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.App;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
@@ -6,9 +10,6 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -72,7 +73,14 @@ namespace MyCAM.Editor
 		{
 			get
 			{
-				return EditActionType.AddPoint;
+				if( m_AddPointType == AddPointType.CircArcCenter ) {
+					return EditActionType.AddPoint_CircArcCenter;
+				}
+
+				if( m_AddPointType == AddPointType.EdgeMidPoint ) {
+					return EditActionType.AddPoint_EdgeMidPoint;
+				}
+				return EditActionType.AddPoint_TwoVertexMidPoint;
 			}
 		}
 
@@ -148,7 +156,7 @@ namespace MyCAM.Editor
 		{
 			bool isValidCircle = GeometryTool.IsCircularArc( edge, out gp_Pnt center, out _, out _ );
 			if( !isValidCircle ) {
-				MessageBox.Show( "Bad Arc" );
+				MyApp.Logger.ShowOnLogPanel( "非正圓弧", MyApp.NoticeType.Warning );
 				return false;
 			}
 			AddToManager( center );
@@ -159,7 +167,7 @@ namespace MyCAM.Editor
 		{
 			bool isValidEdge = GeometryTool.GetEdgeMidPoint( edge, out gp_Pnt midPoint );
 			if( !isValidEdge ) {
-				MessageBox.Show( "Bad Edge" );
+				MyApp.Logger.ShowOnLogPanel( "錯誤線段", MyApp.NoticeType.Warning );
 				return false;
 			}
 			AddToManager( midPoint );
@@ -173,7 +181,7 @@ namespace MyCAM.Editor
 			}
 			bool isValidPoint = GeometryTool.GetTwoVertexMidPoint( vertex1, vertex2, out gp_Pnt midPoint );
 			if( !isValidPoint ) {
-				MessageBox.Show( "Valid Point" );
+				MyApp.Logger.ShowOnLogPanel( "非法點位", MyApp.NoticeType.Warning );
 				return false;
 			}
 			AddToManager( midPoint );

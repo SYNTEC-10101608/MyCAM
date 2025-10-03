@@ -123,10 +123,16 @@
     <Compile Include="Editor\ViewManager.cs" />
     <Compile Include="Data\BasicData.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
+    <Compile Include="LogManager\LogHandler.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="Post\PostHelper.cs" />
     <Compile Include="Post\PostSolver.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -155,13 +161,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -188,6 +190,9 @@
       <Project>{b70d417c-8417-49ee-ac5f-dc0bcfd2e38e}</Project>
       <Name>OCCViewer</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resource\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

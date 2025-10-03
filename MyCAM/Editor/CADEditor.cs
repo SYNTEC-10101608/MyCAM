@@ -1,4 +1,9 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
+using MyCAM.App;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.IFSelect;
 using OCC.IGESControl;
@@ -7,9 +12,6 @@ using OCC.TopoDS;
 using OCC.XSControl;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -22,6 +24,8 @@ namespace MyCAM.Editor
 
 	internal class CADEditor : EditorBase
 	{
+		public Action<EditActionType, EActionStatus> RaiseCADActionStatusChange;
+
 		public CADEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
@@ -31,9 +35,6 @@ namespace MyCAM.Editor
 			// default action is select object action
 			m_DefaultAction = new SelectObjectAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Part );
 		}
-
-		public Action<EActionStatus> AxisTransformActionStausChanged;
-		public Action<EActionStatus> ManualTransformActionStausChanged;
 
 		// editor
 		public override EEditorType Type
@@ -61,80 +62,101 @@ namespace MyCAM.Editor
 		}
 
 		// APIs
-		public void ImportFile( FileFormat format )
+		public void Import3DFile()
 		{
+			// stop current action
+			EndActionIfNotDefault();
 			OpenFileDialog openDialog = new OpenFileDialog();
-
-			// file dialog filter
-			string filter = "";
-			switch( format ) {
-				case FileFormat.BREP:
-					filter = "BREP Files (*.brep *.rle)|*.brep; *.rle";
-					break;
-				case FileFormat.STEP:
-					filter = "STEP Files (*.stp *.step)|*.stp; *.step";
-					break;
-				case FileFormat.IGES:
-					filter = "IGES Files (*.igs *.iges)|*.igs; *.iges";
-					break;
-				default:
-					break;
-			}
-			openDialog.Filter = filter + "|All files (*.*)|*.*";
+			string filter = "STEP Files (*.stp;*.step)|*.stp;*.step|" +
+							"IGES Files (*.igs;*.iges)|*.igs;*.iges|" +
+							"All files (*.*)|*.*";
+			openDialog.Filter = filter;
 
 			// show file dialog
-			if( openDialog.ShowDialog() != DialogResult.OK ) {
+			if( openDialog.ShowDialog() != DialogResult.OK )
 				return;
-			}
-
-			// get the file name
 			string szFileName = openDialog.FileName;
-			if( string.IsNullOrEmpty( szFileName ) ) {
+			if( string.IsNullOrEmpty( szFileName ) )
 				return;
-			}
 
-			// read file data and show a progress form
+			// get this file format
+			string szFileExtension = Path.GetExtension( szFileName ).ToLowerInvariant();
+			FileFormat format = FileFormat.STEP;
+			if( szFileExtension == ".igs" || szFileExtension == ".iges" ) {
+				format = FileFormat.IGES;
+			}
+			if( szFileExtension == ".stp" || szFileExtension == ".step" ) {
+				format = FileFormat.STEP;
+			}
 			ReadFileData( format, szFileName );
 		}
 
 		public void ImportProjectFile()
 		{
+			// stop current action
+			EndActionIfNotDefault();
 			ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void SaveProjectFile()
 		{
+			// stop current action
+			EndActionIfNotDefault();
 			SaveProjectFileAction action = new SaveProjectFileAction( m_DataManager );
 			StartEditAction( action );
 		}
 
 		public void AddPoint( AddPointType type )
 		{
+			// user reclick same action enterace
+			if( ( m_CurrentAction.ActionType == EditActionType.AddPoint_CircArcCenter && type == AddPointType.CircArcCenter ) ||
+				( m_CurrentAction.ActionType == EditActionType.AddPoint_EdgeMidPoint && type == AddPointType.EdgeMidPoint ) ||
+				( m_CurrentAction.ActionType == EditActionType.AddPoint_TwoVertexMidPoint && type == AddPointType.TwoVertexMidPoint ) ) {
+				m_CurrentAction.End();
+				return;
+			}
 			AddPointAction action = new AddPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, type );
 			StartEditAction( action );
 		}
 
 		public void AddLine( AddLineType type )
 		{
+			if( m_CurrentAction.ActionType == EditActionType.AddLine ) {
+				m_CurrentAction.End();
+				return;
+			}
 			AddLineAction action = new AddLineAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, type );
 			StartEditAction( action );
 		}
 
 		public void ThreePointTransform()
 		{
+			if( m_CurrentAction.ActionType == EditActionType.ThreePtTransform ) {
+				m_CurrentAction.End();
+				return;
+			}
 			ThreePtTransformAction action = new ThreePtTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void StartManaulTransform()
 		{
+			if( m_CurrentAction.ActionType == EditActionType.ManualTransform ) {
+				m_CurrentAction.End();
+				return;
+			}
 			ManualTransformAction action = new ManualTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void StartAxisTransform()
 		{
+			if( m_CurrentAction.ActionType == EditActionType.AxisTransform ) {
+				m_CurrentAction.End();
+				return;
+			}
+
 			// need to use shape data to decide the cneter in the begin, so have to add this preotection
 			if( m_DataManager.PartIDList.Count == 0 ) {
 				return;
@@ -149,14 +171,6 @@ namespace MyCAM.Editor
 				return;
 			}
 			( (ManualTransformAction)m_CurrentAction ).ApplyTransform( type );
-		}
-
-		public void EndManualTransform()
-		{
-			if( m_CurrentAction.ActionType != EditActionType.ManualTransform ) {
-				return;
-			}
-			( (ManualTransformAction)m_CurrentAction ).TransformDone();
 		}
 
 		// manager events
@@ -237,19 +251,19 @@ namespace MyCAM.Editor
 
 			// check the status
 			if( status != IFSelect_ReturnStatus.IFSelect_RetDone ) {
-				MessageBox.Show( ToString() + "Error: Import" );
+				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
 				return;
 			}
 			Reader.TransferRoots();
 
 			// prevent from empty shape or null shape
 			if( Reader.NbShapes() == 0 ) {
-				MessageBox.Show( ToString() + "Error: Import" );
+				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
 				return;
 			}
 			TopoDS_Shape oneShape = Reader.OneShape();
 			if( oneShape == null || oneShape.IsNull() ) {
-				MessageBox.Show( ToString() + "Error: Import" );
+				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
 				return;
 			}
 			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape }/*, 1e-1*/ );
@@ -262,22 +276,12 @@ namespace MyCAM.Editor
 		protected override void OnEditActionStart( IEditorAction action )
 		{
 			base.OnEditActionStart( action );
-			if( action.ActionType == EditActionType.AxisTransform ) {
-				AxisTransformActionStausChanged?.Invoke( EActionStatus.Start );
-			}
-			if( action.ActionType == EditActionType.ManualTransform ) {
-				ManualTransformActionStausChanged?.Invoke( EActionStatus.Start );
-			}
+			RaiseCADActionStatusChange?.Invoke( action.ActionType, EActionStatus.Start );
 		}
 
 		protected override void OnEditActionEnd( IEditorAction action )
 		{
-			if( action.ActionType == EditActionType.AxisTransform ) {
-				AxisTransformActionStausChanged?.Invoke( EActionStatus.End );
-			}
-			if( action.ActionType == EditActionType.ManualTransform ) {
-				ManualTransformActionStausChanged?.Invoke( EActionStatus.End );
-			}
+			RaiseCADActionStatusChange?.Invoke( action.ActionType, EActionStatus.End );
 			base.OnEditActionEnd( action );
 		}
 	}

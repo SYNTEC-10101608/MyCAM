@@ -1,4 +1,7 @@
-﻿using MyCAM.Data;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.Data;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.BRepAlgoAPI;
@@ -10,9 +13,6 @@ using OCC.Quantity;
 using OCC.RWStl;
 using OCC.TColStd;
 using OCCViewer;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -594,7 +594,7 @@ namespace MyCAM.Editor
 			// export NC
 			if( e.Control && e.KeyCode == Keys.E ) {
 				NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
-				writer.Convert();
+				writer.ConvertSuccess( out string szErrorMessage );
 			}
 		}
 	}

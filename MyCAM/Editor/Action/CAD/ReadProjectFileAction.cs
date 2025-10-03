@@ -1,12 +1,13 @@
-﻿using MyCAM.Data;
-using MyCAM.FileManager;
-using OCC.AIS;
-using OCCViewer;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using MyCAM.App;
+using MyCAM.Data;
+using MyCAM.FileManager;
+using OCC.AIS;
+using OCCViewer;
 
 namespace MyCAM.Editor
 {
@@ -58,12 +59,7 @@ namespace MyCAM.Editor
 					UpdateAllViewData();
 				}
 				catch( Exception ex ) {
-					MessageBox.Show(
-						$"讀取專案檔案失敗：\n{ex.Message}",
-						"錯誤",
-						MessageBoxButtons.OK,
-						MessageBoxIcon.Error
-					);
+					MyApp.Logger.ShowOnLogPanel( $"讀取專案檔案失敗：\n{ex.Message}", MyApp.NoticeType.Error );
 				}
 			}
 			End();

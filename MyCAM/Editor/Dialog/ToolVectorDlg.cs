@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using MyCAM.App;
 
 namespace MyCAM.Editor
 {
@@ -30,12 +31,12 @@ namespace MyCAM.Editor
 			// get value from textbox
 			if( !double.TryParse( m_tbxAngleA.Text, out m_AngleA_deg )
 					|| !double.TryParse( m_tbxAngleB.Text, out m_AngleB_deg ) ) {
-				MessageBox.Show( "invalid string" );
+				MyApp.Logger.ShowOnLogPanel( "無效字串", MyApp.NoticeType.Warning );
 				return;
 			}
 			if( m_AngleA_deg <= -180 || m_AngleA_deg >= 180 ||
 			   m_AngleB_deg <= -180 || m_AngleB_deg >= 180 ) {
-				MessageBox.Show( "angle must be in range (-180, 180)" );
+				MyApp.Logger.ShowOnLogPanel( "角度必須在 -180~180 範圍內", MyApp.NoticeType.Warning );
 				return;
 			}
 			DialogResult = DialogResult.OK;

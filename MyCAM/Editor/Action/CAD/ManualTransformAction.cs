@@ -1,4 +1,8 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using MyCAM.App;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.BRepBuilderAPI;
@@ -9,9 +13,6 @@ using OCC.TopExp;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -392,7 +393,7 @@ namespace MyCAM.Editor
 					return;
 			}
 			if( !c.IsValid() ) {
-				MessageBox.Show( "Invalid constraint. Please select valid ref and move objects." );
+				MyApp.Logger.ShowOnLogPanel( "約束無效。請選擇有效的參考並移動工件", MyApp.NoticeType.Warning );
 				return;
 			}
 			gp_Trsf trsf = c.SolveConstraint();
