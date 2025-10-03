@@ -121,7 +121,6 @@ namespace MyCAM
 			// cad function			
 			ManualTransForm,
 
-
 			// cam function
 			AddPath,
 			SelectPath,
