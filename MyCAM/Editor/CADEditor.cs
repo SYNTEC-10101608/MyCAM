@@ -106,7 +106,7 @@ namespace MyCAM.Editor
 
 		public void AddPoint( AddPointType type )
 		{
-			// user reclick same anction enterace
+			// user reclick same action enterace
 			if( ( m_CurrentAction.ActionType == EditActionType.AddPoint_CircArcCenter && type == AddPointType.CircArcCenter ) ||
 				( m_CurrentAction.ActionType == EditActionType.AddPoint_EdgeMidPoint && type == AddPointType.EdgeMidPoint ) ||
 				( m_CurrentAction.ActionType == EditActionType.AddPoint_TwoVertexMidPoint && type == AddPointType.TwoVertexMidPoint ) ) {
@@ -119,65 +119,46 @@ namespace MyCAM.Editor
 
 		public void AddLine( AddLineType type )
 		{
+			if( m_CurrentAction.ActionType == EditActionType.AddLine ) {
+				m_CurrentAction.End();
+				return;
+			}
 			AddLineAction action = new AddLineAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, type );
 			StartEditAction( action );
 		}
 
 		public void ThreePointTransform()
 		{
-			if( m_CurrentAction == null ) {
-				return;
-			}
 			if( m_CurrentAction.ActionType == EditActionType.ThreePtTransform ) {
 				m_CurrentAction.End();
 				return;
 			}
-			m_CurrentAction.End();
 			ThreePtTransformAction action = new ThreePtTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void StartManaulTransform()
 		{
-			if( m_CurrentAction == null ) {
-				return;
-			}
 			if( m_CurrentAction.ActionType == EditActionType.ManualTransform ) {
 				m_CurrentAction.End();
 				return;
 			}
-			m_CurrentAction.End();
 			ManualTransformAction action = new ManualTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void StartAxisTransform()
 		{
-			if( m_CurrentAction == null ) {
-				return;
-			}
 			if( m_CurrentAction.ActionType == EditActionType.AxisTransform ) {
 				m_CurrentAction.End();
 				return;
 			}
-			m_CurrentAction.End();
 			// need to use shape data to decide the cneter in the begin, so have to add this preotection
 			if( m_DataManager.PartIDList.Count == 0 ) {
 				return;
 			}
 			AxisTransformAction action = new AxisTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
-		}
-
-		// ui can click other transform button, so need to end the current action first
-		public void EndCurrentActionByEditorChange()
-		{
-			m_CurrentAction.End();
-		}
-
-		public void CheckOutCurrentAction()
-		{
-			EndCurrentActionByEditorChange();
 		}
 
 		public void ApplyManualTransform( ETrsfConstraintType type )

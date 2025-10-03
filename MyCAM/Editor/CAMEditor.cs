@@ -108,7 +108,7 @@ namespace MyCAM.Editor
 
 		public void StartSelectFace()
 		{
-			// with on/off button, so can end current action first
+			// with on/off button, so end current action
 			if( IsSameAction( EditActionType.SelectFace ) || IsSameAction( EditActionType.SelectPath ) ) {
 				m_CurrentAction?.End();
 				return;
@@ -238,7 +238,6 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]非封閉路徑不支援修改起點", MyApp.NoticeType.Hint );
 				return;
 			}
-
 			var action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
