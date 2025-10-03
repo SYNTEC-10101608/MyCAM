@@ -18,11 +18,9 @@ namespace MyCAM.LogManager
 				case MyApp.NoticeType.Error:
 					ShowError( message );
 					break;
-
 				case MyApp.NoticeType.Warning:
-					ShowWarning( message );
+					AddLog( message, Color.OrangeRed );
 					break;
-
 				case MyApp.NoticeType.Hint:
 				default:
 					AddLog( message, Color.Black );
@@ -45,20 +43,8 @@ namespace MyCAM.LogManager
 			AddLog( message, Color.Red );
 		}
 
-		void ShowWarning( string message )
-		{
-			MessageBox.Show(
-				message,
-				"Warning",
-				MessageBoxButtons.OK,
-				MessageBoxIcon.Warning
-			);
-			AddLog( message, Color.OrangeRed );
-		}
-
 		void AddLog( string message, Color color )
 		{
-
 			Label lblStickOnPanel = new Label
 			{
 				AutoSize = true,
