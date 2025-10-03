@@ -108,7 +108,6 @@ namespace MyCAM
 		// UI list
 		Dictionary<EUIStatus, List<Control>> m_UIStatusDic;
 		List<ToolStripContainer> m_ToolStripLevelList;
-		List<ToolStripButton> m_TransformControlList;
 
 		// UI color
 		Color m_defaultBtnColor = SystemColors.Control;
@@ -119,12 +118,9 @@ namespace MyCAM
 			CAD,
 			CAM,
 
-			// cad function
-			AddFeature,
-			TransForm,
+			// cad function			
 			ManualTransForm,
-			ThreePntTransForm,
-			AxisTransform,
+
 
 			// cam function
 			AddPath,
@@ -148,7 +144,6 @@ namespace MyCAM
 		{
 			if( m_CurrentEditor != null ) {
 				if( m_CurrentEditor == m_CADEditor ) {
-					m_CADEditor.CheckOutCurrentAction();
 					return;
 				}
 				SwitchEditor( EEditorType.CAD );
@@ -190,41 +185,28 @@ namespace MyCAM
 		}
 
 		// add feature
-		void m_tsbAddFeature_Click( object sender, EventArgs e )
-		{
-			RefreshToolStripLayout( EUIStatus.AddFeature );
-		}
-
-		void m_ddbAddLine_TwoVertexConnect_Click( object sender, EventArgs e )
+		private void m_tsbAddLine_TwoVertexConnect_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.AddLine( AddLineType.TwoVertexConnectLine );
 		}
 
-		void m_ddbAddPoint_AcrCenter_Click( object sender, EventArgs e )
+		void m_tsbAddPoint_AcrCenter_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.AddPoint( AddPointType.CircArcCenter );
+
 		}
 
-		void m_ddbAddPoint_EdgeCenter_Click( object sender, EventArgs e )
+		void m_tsbAddPoint_EdgeCenter_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.AddPoint( AddPointType.EdgeMidPoint );
 		}
 
-		void m_ddbAddPoint_PointCenter_Click( object sender, EventArgs e )
+		void m_tsbAddPoint_PointCenter_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.AddPoint( AddPointType.TwoVertexMidPoint );
 		}
 
-		// transform entrance
-		void m_tsbTransform_Click( object sender, EventArgs e )
-		{
-			// it might be in trnasform / add line / point action
-			CheckOutCADCurrentAction();
-			RefreshToolStripLayout( EUIStatus.TransForm );
-		}
-
 		// manual transform
-
 		void m_tsbManualTransform_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.StartManaulTransform();
@@ -255,19 +237,14 @@ namespace MyCAM
 			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.Point );
 		}
 
-		void m_tsbManualTransDone_Click( object sender, EventArgs e )
-		{
-			m_CADEditor.EndManualTransform();
-		}
-
 		// 3 point transform
-		void m_tsb3PointTransform_Click( object sender, EventArgs e )
+		void m_tsb3PntTransform_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ThreePointTransform();
 		}
 
 		// axis transform
-		void m_tsbAxisTransform_Click( object sender, EventArgs e )
+		void m_tsbAxisTransform_Click_1( object sender, EventArgs e )
 		{
 			m_CADEditor.StartAxisTransform();
 		}
@@ -387,11 +364,6 @@ namespace MyCAM
 
 		#region UI action 
 
-		void CheckOutCADCurrentAction()
-		{
-			m_CADEditor.CheckOutCurrentAction();
-		}
-
 		void OnCAMDlgActionStatusChange( EActionStatus actionStatus )
 		{
 			if( actionStatus == EActionStatus.Start ) {
@@ -427,32 +399,62 @@ namespace MyCAM
 		void OnCADActionStatusChange( EditActionType action, EActionStatus actionStatus )
 		{
 			if( actionStatus == EActionStatus.End ) {
-				if( action == EditActionType.ManualTransform || action == EditActionType.AxisTransform || action == EditActionType.ThreePtTransform ) {
-					RefreshToolStripLayout( EUIStatus.TransForm );
-					foreach( ToolStripButton toolstripbutton in m_TransformControlList ) {
-						if( toolstripbutton.BackColor != m_defaultBtnColor ) {
-							toolstripbutton.BackColor = m_defaultBtnColor;
-						}
-					}
-					return;
+				RefreshToolStripLayout( EUIStatus.CAD );
+				switch( action ) {
+					case EditActionType.AddPoint_CircArcCenter:
+						m_tsbAddPoint_AcrCenter.BackColor = m_defaultBtnColor;
+						return;
+					case EditActionType.AddPoint_EdgeMidPoint:
+						m_tsbAddPoint_EdgeCenter.BackColor =  m_defaultBtnColor;
+						return;
+					case EditActionType.AddPoint_TwoVertexMidPoint:
+						m_tsbAddPoint_PointCenter.BackColor = m_defaultBtnColor;
+						return;
+					case EditActionType.AddLine:
+						m_tsbAddLine_TwoVertexConnect.BackColor = m_defaultBtnColor;
+						return;
+					case EditActionType.AxisTransform:
+						m_tsbAxisTransform.BackColor = m_defaultBtnColor;
+						return;
+					case EditActionType.ThreePtTransform:
+						m_tsb3PntTransform.BackColor = m_defaultBtnColor;
+						return;
+					case EditActionType.ManualTransform:
+						m_tsbManualTransform.BackColor = m_defaultBtnColor;
+						return;
 				}
 			}
 
-			// start action
-			if( action == EditActionType.AxisTransform ) {
-				m_tsbAxisTransform.BackColor = m_buttonOnColor;
-				RefreshToolStripLayout( EUIStatus.AxisTransform );
-				return;
-			}
-			if( action == EditActionType.ThreePtTransform ) {
-				m_tsb3PntTransform.BackColor = m_buttonOnColor;
-				RefreshToolStripLayout( EUIStatus.ThreePntTransForm );
-				return;
-			}
 			if( action == EditActionType.ManualTransform ) {
-				m_tsbManualTransform.BackColor = m_buttonOnColor;
 				RefreshToolStripLayout( EUIStatus.ManualTransForm );
-				return;
+			}
+			else {
+				RefreshToolStripLayout( EUIStatus.CAD );
+			}
+
+			// turn on light
+			switch( action ) {
+				case EditActionType.AddPoint_CircArcCenter:
+					m_tsbAddPoint_AcrCenter.BackColor = m_buttonOnColor;
+					return;
+				case EditActionType.AddPoint_EdgeMidPoint:
+					m_tsbAddPoint_EdgeCenter.BackColor = m_buttonOnColor;
+					return;
+				case EditActionType.AddPoint_TwoVertexMidPoint:
+					m_tsbAddPoint_PointCenter.BackColor = m_buttonOnColor;
+					return;
+				case EditActionType.AddLine:
+					m_tsbAddLine_TwoVertexConnect.BackColor = m_buttonOnColor;
+					return;
+				case EditActionType.AxisTransform:
+					m_tsbAxisTransform.BackColor = m_buttonOnColor;
+					return;
+				case EditActionType.ThreePtTransform:
+					m_tsb3PntTransform.BackColor = m_buttonOnColor;
+					return;
+				case EditActionType.ManualTransform:
+					m_tsbManualTransform.BackColor = m_buttonOnColor;
+					return;
 			}
 		}
 
@@ -720,11 +722,7 @@ namespace MyCAM
 				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction }},
 
 				// cad function
-				{ EUIStatus.AddFeature, new List<Control>() { m_tsCADFunction , m_tsAddFeactureSubFunc }},
-				{ EUIStatus.TransForm, new List<Control>() { m_tsCADFunction , m_tsTransformSubFunc }},
-				{ EUIStatus.ManualTransForm, new List<Control>() { m_tsCADFunction , m_tsTransformSubFunc, m_tsManualTrans}},
-				{ EUIStatus.ThreePntTransForm, new List<Control>(){  m_tsCADFunction , m_tsTransformSubFunc} },
-				{ EUIStatus.AxisTransform , new List<Control>(){  m_tsCADFunction , m_tsTransformSubFunc} },
+				{ EUIStatus.ManualTransForm, new List<Control>(){m_tsCADFunction, m_tsManualTrans } },
 				
 				// cam function
 				{ EUIStatus.AddPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc } },
@@ -735,14 +733,6 @@ namespace MyCAM
 				m_tscLevel1Container,
 				m_tscLevel2Container,
 				m_tscLevel3Container
-			};
-
-			// to reset transform button color
-			m_TransformControlList = new List<ToolStripButton>()
-			{
-				m_tsbManualTransform,
-				m_tsb3PntTransform,
-				m_tsbAxisTransform,
 			};
 		}
 

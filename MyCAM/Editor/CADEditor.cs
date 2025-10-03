@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
-using MyCAM.LogManager;
 using OCC.AIS;
 using OCC.IFSelect;
 using OCC.IGESControl;
@@ -112,6 +111,13 @@ namespace MyCAM.Editor
 
 		public void AddPoint( AddPointType type )
 		{
+			// user reclick same anction enterace
+			if( ( m_CurrentAction.ActionType == EditActionType.AddPoint_CircArcCenter && type == AddPointType.CircArcCenter ) ||
+				( m_CurrentAction.ActionType == EditActionType.AddPoint_EdgeMidPoint && type == AddPointType.EdgeMidPoint ) ||
+				( m_CurrentAction.ActionType == EditActionType.AddPoint_TwoVertexMidPoint && type == AddPointType.TwoVertexMidPoint ) ) {
+				m_CurrentAction.End();
+				return;
+			}
 			AddPointAction action = new AddPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, type );
 			StartEditAction( action );
 		}
@@ -124,7 +130,7 @@ namespace MyCAM.Editor
 
 		public void ThreePointTransform()
 		{
-			if ( m_CurrentAction == null ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
 			if( m_CurrentAction.ActionType == EditActionType.ThreePtTransform ) {
@@ -152,7 +158,7 @@ namespace MyCAM.Editor
 
 		public void StartAxisTransform()
 		{
-			if (m_CurrentAction == null ) {
+			if( m_CurrentAction == null ) {
 				return;
 			}
 			if( m_CurrentAction.ActionType == EditActionType.AxisTransform ) {
@@ -171,26 +177,7 @@ namespace MyCAM.Editor
 		// ui can click other transform button, so need to end the current action first
 		public void EndCurrentActionByEditorChange()
 		{
-			if( m_CurrentAction is AxisTransformAction axisTransformAction ) {
-				axisTransformAction.End();
-				return;
-			}
-			if( m_CurrentAction is ThreePtTransformAction threePtTransformAction ) {
-				threePtTransformAction.End();
-				return;
-			}
-			if( m_CurrentAction is ManualTransformAction manualTransformAction ) {
-				EndManualTransform();
-				return;
-			}
-			if( m_CurrentAction is AddPointAction addPointAction ) {
-				addPointAction.End();
-				return;
-			}
-			if( m_CurrentAction is AddLineAction addLineAction ) {
-				addLineAction.End();
-				return;
-			}
+			m_CurrentAction.End();
 		}
 
 		public void CheckOutCurrentAction()
@@ -205,15 +192,6 @@ namespace MyCAM.Editor
 			}
 			( (ManualTransformAction)m_CurrentAction ).ApplyTransform( type );
 		}
-
-		public void EndManualTransform()
-		{
-			if( m_CurrentAction.ActionType != EditActionType.ManualTransform ) {
-				return;
-			}
-			( (ManualTransformAction)m_CurrentAction ).TransformDone();
-		}
-
 		// manager events
 		void OnPartChanged()
 		{
