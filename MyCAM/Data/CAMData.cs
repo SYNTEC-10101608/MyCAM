@@ -719,10 +719,8 @@ namespace MyCAM.Data
 			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
 			double accumulatedDistance = 0;
 			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
-				if( i != nStartIndex ) {
-					accumulatedDistance += m_CAMPointList[ i % m_CAMPointList.Count ].CADPoint.Point.SquareDistance( m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.Point );
-				}
 				double t = accumulatedDistance / totaldistance;
+				accumulatedDistance += m_CAMPointList[ i % m_CAMPointList.Count ].CADPoint.Point.SquareDistance( m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.Point );
 				gp_Quaternion q = new gp_Quaternion();
 				slerp.Interpolate( t, ref q );
 				gp_Trsf trsf = new gp_Trsf();
