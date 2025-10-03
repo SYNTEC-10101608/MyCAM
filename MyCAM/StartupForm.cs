@@ -347,9 +347,12 @@ namespace MyCAM
 				m_CAMEditor.EndCurrentAction();
 			}
 			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
-			bool bSuccess = writer.ConvertSuccess();
+			bool bSuccess = writer.ConvertSuccess( out string szErrorMessage );
 			if( bSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提示]成功轉出NC", MyApp.NoticeType.Hint );
+			}
+			else {
+				MyApp.Logger.ShowOnLogPanel( $"轉出NC失敗: {szErrorMessage}", MyApp.NoticeType.Error );
 			}
 
 			// simulation
@@ -400,7 +403,7 @@ namespace MyCAM
 						m_tsbAddPoint_AcrCenter.BackColor = m_defaultBtnColor;
 						return;
 					case EditActionType.AddPoint_EdgeMidPoint:
-						m_tsbAddPoint_EdgeCenter.BackColor =  m_defaultBtnColor;
+						m_tsbAddPoint_EdgeCenter.BackColor = m_defaultBtnColor;
 						return;
 					case EditActionType.AddPoint_TwoVertexMidPoint:
 						m_tsbAddPoint_PointCenter.BackColor = m_defaultBtnColor;
@@ -418,8 +421,10 @@ namespace MyCAM
 						m_tsbManualTransform.BackColor = m_defaultBtnColor;
 						return;
 				}
+				return;
 			}
 
+			// action start, need to relay out
 			if( action == EditActionType.ManualTransform ) {
 				RefreshToolStripLayout( EUIStatus.ManualTransForm );
 			}
@@ -459,85 +464,87 @@ namespace MyCAM
 
 				// cam action is done, back to default cam lay out,
 				RefreshToolStripLayout( EUIStatus.CAM );
-				if( action == EditActionType.SelectPath ) {
-					m_tsbAddPath.BackColor = m_defaultBtnColor;
-					m_tsbManualSelectPathOK.Enabled = true;
-					m_tsbSelPath_Manual.BackColor = m_defaultBtnColor;
-					return;
-				}
-				if( action == EditActionType.SelectFace ) {
-					m_tsbAddPath.BackColor = m_defaultBtnColor;
-					return;
-				}
-				if( action == EditActionType.StartPoint ) {
-					m_tsbStartPoint.BackColor = m_defaultBtnColor;
-					return;
-				}
+				switch( action ) {
+					case EditActionType.SelectFace:
+						m_tsbAddPath.BackColor = m_defaultBtnColor;
+						break;
+					case EditActionType.SelectPath:
+						m_tsbManualSelectPathOK.Enabled = true;
+						m_tsbAddPath.BackColor = m_defaultBtnColor;
+						m_tsbSelPath_Manual.BackColor = m_defaultBtnColor;
+						break;
+					case EditActionType.StartPoint:
+						m_tsbStartPoint.BackColor = m_defaultBtnColor;
+						break;
+					case EditActionType.SetLead:
+						m_tsbSetLead.BackColor = m_defaultBtnColor;
 
-				if( action == EditActionType.SetLead ) {
-					m_tsbSetLead.BackColor = m_defaultBtnColor;
-
-					// unlock form 
-					OnCAMDlgActionStatusChange( actionStatus );
-					return;
-				}
-				if( action == EditActionType.OverCut ) {
-					m_tsbOverCut.BackColor = m_defaultBtnColor;
-					OnCAMDlgActionStatusChange( actionStatus );
-					return;
-				}
-				if( action == EditActionType.ToolVec ) {
-					m_tsbToolVec.BackColor = m_defaultBtnColor;
-					return;
-				}
-				if( action == EditActionType.SetTraverseParam ) {
-					m_tsbTraverseParamSetting.BackColor = m_defaultBtnColor;
+						// unlock form 
+						OnCAMDlgActionStatusChange( actionStatus );
+						break;
+					case EditActionType.OverCut:
+						m_tsbOverCut.BackColor = m_defaultBtnColor;
+						OnCAMDlgActionStatusChange( actionStatus );
+						break;
+					case EditActionType.ToolVec:
+						m_tsbToolVec.BackColor = m_defaultBtnColor;
+						break;
+					case EditActionType.SetTraverseParam:
+						m_tsbTraverseParamSetting.BackColor = m_defaultBtnColor;
+						OnCAMDlgActionStatusChange( actionStatus );
+						break;
+					default:
+						break;
 				}
 				return;
 			}
+
+			// action start, need to relay out
 			if( action == EditActionType.SelectFace ) {
-				m_tsbAddPath.BackColor = m_buttonOnColor;
-				m_tsbManualSelectPathOK.Enabled = false;
 				RefreshToolStripLayout( EUIStatus.AddPath );
-				return;
 			}
-			if( action == EditActionType.SelectPath ) {
-
-				// add path still icon still need to light up
-				m_tsbAddPath.BackColor = m_buttonOnColor;
-				m_tsbSelPath_Manual.BackColor = m_buttonOnColor;
-				m_tsbManualSelectPathOK.Enabled = true;
+			else if( action == EditActionType.SelectPath ) {
 				RefreshToolStripLayout( EUIStatus.SelectPath );
-				return;
 			}
-			if( action == EditActionType.StartPoint ) {
-				m_tsbStartPoint.BackColor = m_buttonOnColor;
+			else {
 				RefreshToolStripLayout( EUIStatus.CAM );
-				return;
 			}
-			if( action == EditActionType.SetLead ) {
-				m_tsbSetLead.BackColor = m_buttonOnColor;
-				RefreshToolStripLayout( EUIStatus.CAM );
+			switch( action ) {
+				case EditActionType.SelectFace:
+					m_tsbAddPath.BackColor = m_buttonOnColor;
 
-				// lock main from
-				OnCAMDlgActionStatusChange( actionStatus );
-				return;
-			}
-			if( action == EditActionType.OverCut ) {
-				m_tsbOverCut.BackColor = m_buttonOnColor;
-				RefreshToolStripLayout( EUIStatus.CAM );
+					// need to in select path mode can use this button
+					m_tsbManualSelectPathOK.Enabled = false;
+					break;
+				case EditActionType.SelectPath:
 
-				// lock main from
-				OnCAMDlgActionStatusChange( actionStatus );
-				return;
-			}
-			if( action == EditActionType.ToolVec ) {
-				m_tsbToolVec.BackColor = m_buttonOnColor;
-				RefreshToolStripLayout( EUIStatus.CAM );
-				return;
-			}
-			if( action == EditActionType.SetTraverseParam ) {
-				m_tsbTraverseParamSetting.BackColor = m_buttonOnColor;
+					// add path still icon still need to light up
+					m_tsbAddPath.BackColor = m_buttonOnColor;
+					m_tsbSelPath_Manual.BackColor = m_buttonOnColor;
+					m_tsbManualSelectPathOK.Enabled = true;
+					break;
+				case EditActionType.StartPoint:
+					m_tsbStartPoint.BackColor = m_buttonOnColor;
+					break;
+				case EditActionType.SetLead:
+					m_tsbSetLead.BackColor = m_buttonOnColor;
+					// lock main from
+					OnCAMDlgActionStatusChange( actionStatus );
+					break;
+				case EditActionType.OverCut:
+					m_tsbOverCut.BackColor = m_buttonOnColor;
+					// lock main from
+					OnCAMDlgActionStatusChange( actionStatus );
+					break;
+				case EditActionType.ToolVec:
+					m_tsbToolVec.BackColor = m_buttonOnColor;
+					break;
+				case EditActionType.SetTraverseParam:
+					m_tsbTraverseParamSetting.BackColor = m_buttonOnColor;
+					OnCAMDlgActionStatusChange( actionStatus );
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -602,6 +609,7 @@ namespace MyCAM
 			return childToolStripList;
 		}
 
+		// each container will include several tool strips, use this to know which tool strips are belong to this container
 		void FindContainerAllToolStrips( Control parent, List<ToolStrip> totalToolStripList )
 		{
 			foreach( Control control in parent.Controls ) {
@@ -709,6 +717,7 @@ namespace MyCAM
 			RefreshToolStripLayout( EUIStatus.CAD );
 		}
 
+		// this setting is for main form to know what situation ui need to refresh as what look like
 		void UIListSetting()
 		{
 			m_UIStatusDic = new Dictionary<EUIStatus, List<Control>>()

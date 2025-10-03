@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using MyCAM.App;
 using MyCAM.Data;
 using OCC.gp;
 
@@ -28,8 +27,9 @@ namespace MyCAM.Post
 		string m_MasterAxisName = string.Empty;
 		string m_SlaveAxisName = string.Empty;
 
-		public bool ConvertSuccess()
+		public bool ConvertSuccess( out string errorMessage )
 		{
+			errorMessage = string.Empty;
 			try {
 				using( m_StreamWriter = new StreamWriter( "0000.nc" ) ) {
 					m_StreamWriter.WriteLine( "G65 P\"FileStart\" X\"Material1\" Y\"1.0\" Q1;" ); // 三點校正
@@ -46,11 +46,11 @@ namespace MyCAM.Post
 				return true;
 			}
 			catch( IOException ioEx ) {
-				MyApp.Logger.ShowOnLogPanel( $"轉出專案檔失敗: {ioEx.Message} ", MyApp.NoticeType.Error );
+				errorMessage = ioEx.Message;
 				return false;
 			}
 			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"轉出專案檔失敗: {ex.Message} ", MyApp.NoticeType.Error );
+				errorMessage = ex.Message;
 				return false;
 			}
 		}

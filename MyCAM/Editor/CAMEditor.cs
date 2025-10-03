@@ -28,6 +28,9 @@ namespace MyCAM.Editor
 		// to notice main form
 		public Action<bool, bool> PathPropertyChanged; // isClosed, hasLead
 		public Action<EditActionType, EActionStatus> RaiseCAMActionStatusChange;
+
+		// action with dialog need to disable main form
+		// because other action enterance might close this action, but without closing this form
 		public Action<EActionStatus> RaiseWithDlgActionStatusChange;
 
 		public CAMEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
