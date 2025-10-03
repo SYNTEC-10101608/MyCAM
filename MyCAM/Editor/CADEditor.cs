@@ -65,7 +65,7 @@ namespace MyCAM.Editor
 		public void Import3DFile()
 		{
 			if( m_CurrentAction != m_DefaultAction ) {
-				m_CurrentAction.End();
+				m_CurrentAction?.End();
 			}
 			OpenFileDialog openDialog = new OpenFileDialog();
 			string filter = "STEP Files (*.stp;*.step)|*.stp;*.step|" +
@@ -94,12 +94,18 @@ namespace MyCAM.Editor
 
 		public void ImportProjectFile()
 		{
+			if( m_CurrentAction != m_DefaultAction ) {
+				m_CurrentAction?.End();
+			}
 			ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_ViewManager );
 			StartEditAction( action );
 		}
 
 		public void SaveProjectFile()
 		{
+			if( m_CurrentAction != m_DefaultAction ) {
+				m_CurrentAction?.End();
+			}
 			SaveProjectFileAction action = new SaveProjectFileAction( m_DataManager );
 			StartEditAction( action );
 		}
