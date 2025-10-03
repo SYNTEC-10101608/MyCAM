@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using MyCAM.Helper;
+﻿using MyCAM.Helper;
 using OCC.BOPTools;
 using OCC.BRepAdaptor;
 using OCC.GCPnts;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -709,11 +709,20 @@ namespace MyCAM.Data
 				m_ToolVecModifyMap[ nEndIndex ].Item1 * Math.PI / 180,
 				m_ToolVecModifyMap[ nEndIndex ].Item2 * Math.PI / 180 );
 
+			double totaldistance = 0;
+			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
+				totaldistance += m_CAMPointList[ i % m_CAMPointList.Count ].CADPoint.Point.SquareDistance( m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.Point );
+			}
+
 			// get the quaternion for interpolation
 			gp_Quaternion q12 = new gp_Quaternion( startVec, endVec );
 			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
-			for( int i = nStartIndex; i <= nEndIndexModify; i++ ) {
-				double t = ( i - nStartIndex ) / (double)( nEndIndexModify - nStartIndex );
+			double accumulatedDistance = 0;
+			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
+				if( i != nStartIndex ) {
+					accumulatedDistance += m_CAMPointList[ i % m_CAMPointList.Count ].CADPoint.Point.SquareDistance( m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.Point );
+				}
+				double t = accumulatedDistance / totaldistance;
 				gp_Quaternion q = new gp_Quaternion();
 				slerp.Interpolate( t, ref q );
 				gp_Trsf trsf = new gp_Trsf();
