@@ -35,7 +35,7 @@
 			this.m_tsmiCAM = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsCAMFunction = new System.Windows.Forms.ToolStrip();
 			this.m_panBackGround = new System.Windows.Forms.Panel();
-			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+			this.m_tsViewerToolBar = new System.Windows.Forms.ToolStrip();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
@@ -85,10 +85,11 @@
 			this.m_tsbAutoOrder = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbTraverseParamSetting = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbConvertNC = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbShowOrder = new System.Windows.Forms.ToolStripButton();
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
-			this.toolStrip1.SuspendLayout();
+			this.m_tsViewerToolBar.SuspendLayout();
 			this.m_panTreeView.SuspendLayout();
 			this.m_tscLevel1Container.ContentPanel.SuspendLayout();
 			this.m_tscLevel1Container.SuspendLayout();
@@ -165,7 +166,7 @@
 			// 
 			// m_panBackGround
 			// 
-			this.m_panBackGround.Controls.Add(this.toolStrip1);
+			this.m_panBackGround.Controls.Add(this.m_tsViewerToolBar);
 			this.m_panBackGround.Controls.Add(this.m_panViewer);
 			this.m_panBackGround.Controls.Add(this.m_panTreeView);
 			this.m_panBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -174,18 +175,20 @@
 			this.m_panBackGround.Size = new System.Drawing.Size(1065, 705);
 			this.m_panBackGround.TabIndex = 4;
 			// 
-			// toolStrip1
+			// m_tsViewerToolBar
 			// 
-			this.toolStrip1.BackColor = System.Drawing.SystemColors.Window;
-			this.toolStrip1.Dock = System.Windows.Forms.DockStyle.Left;
-			this.toolStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-			this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsbShowVec});
-			this.toolStrip1.Location = new System.Drawing.Point(165, 0);
-			this.toolStrip1.Name = "toolStrip1";
-			this.toolStrip1.Size = new System.Drawing.Size(29, 705);
-			this.toolStrip1.TabIndex = 2;
-			this.toolStrip1.Text = "toolStrip1";
+			this.m_tsViewerToolBar.BackColor = System.Drawing.SystemColors.Window;
+			this.m_tsViewerToolBar.Dock = System.Windows.Forms.DockStyle.Left;
+			this.m_tsViewerToolBar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+			this.m_tsViewerToolBar.ImageScalingSize = new System.Drawing.Size(24, 24);
+			this.m_tsViewerToolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbShowVec,
+            this.m_tsbShowOrder});
+			this.m_tsViewerToolBar.Location = new System.Drawing.Point(165, 0);
+			this.m_tsViewerToolBar.Name = "m_tsViewerToolBar";
+			this.m_tsViewerToolBar.Size = new System.Drawing.Size(29, 705);
+			this.m_tsViewerToolBar.TabIndex = 2;
+			this.m_tsViewerToolBar.Text = "toolStrip1";
 			// 
 			// m_panViewer
 			// 
@@ -355,8 +358,8 @@
 			this.m_tsbShowVec.Image = global::MyCAM.Properties.Resources.ShowVector;
 			this.m_tsbShowVec.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowVec.Name = "m_tsbShowVec";
-			this.m_tsbShowVec.Size = new System.Drawing.Size(26, 28);
-			this.m_tsbShowVec.Text = "toolStripButton1";
+			this.m_tsbShowVec.Size = new System.Drawing.Size(29, 28);
+			this.m_tsbShowVec.Text = "姿態";
 			// 
 			// m_tsbSelPath_FreeBound
 			// 
@@ -699,6 +702,15 @@
 			this.m_tsbConvertNC.Text = "轉出NC";
 			this.m_tsbConvertNC.Click += new System.EventHandler(this.m_tsbConvertNC_Click);
 			// 
+			// m_tsbShowOrder
+			// 
+			this.m_tsbShowOrder.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbShowOrder.Image = global::MyCAM.Properties.Resources.ShowOrder;
+			this.m_tsbShowOrder.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbShowOrder.Name = "m_tsbShowOrder";
+			this.m_tsbShowOrder.Size = new System.Drawing.Size(26, 28);
+			this.m_tsbShowOrder.Text = "順序";
+			// 
 			// StartupForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -720,8 +732,8 @@
 			this.m_tsCAMFunction.PerformLayout();
 			this.m_panBackGround.ResumeLayout(false);
 			this.m_panBackGround.PerformLayout();
-			this.toolStrip1.ResumeLayout(false);
-			this.toolStrip1.PerformLayout();
+			this.m_tsViewerToolBar.ResumeLayout(false);
+			this.m_tsViewerToolBar.PerformLayout();
 			this.m_panTreeView.ResumeLayout(false);
 			this.m_tscLevel1Container.ContentPanel.ResumeLayout(false);
 			this.m_tscLevel1Container.ContentPanel.PerformLayout();
@@ -803,10 +815,11 @@
 		private System.Windows.Forms.ToolStripButton m_tsbImport3DFile;
 		private System.Windows.Forms.ToolStripButton m_tsbReadProjectFile;
 		private System.Windows.Forms.ToolStripButton m_tsbSaveProjectFile;
-		private System.Windows.Forms.ToolStrip toolStrip1;
+		private System.Windows.Forms.ToolStrip m_tsViewerToolBar;
 		private System.Windows.Forms.ToolStripButton m_tsbShowVec;
 		private System.Windows.Forms.ToolTip toolTip1;
 		private System.Windows.Forms.ToolTip toolTip2;
+		private System.Windows.Forms.ToolStripButton m_tsbShowOrder;
 	}
 }
 
