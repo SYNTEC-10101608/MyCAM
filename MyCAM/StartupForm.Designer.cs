@@ -30,9 +30,6 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StartupForm));
 			this.m_msMode = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiFile = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiImportStep = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiImportProjectFile = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsmiSaveProjectFile = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiCAD = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiCAM = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsCAMFunction = new System.Windows.Forms.ToolStrip();
@@ -55,6 +52,10 @@
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
 			this.m_tscLevel1Container = new System.Windows.Forms.ToolStripContainer();
+			this.m_tsFileFunction = new System.Windows.Forms.ToolStrip();
+			this.m_tsbImport3DFile = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbReadProjectFile = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbSaveProjectFile = new System.Windows.Forms.ToolStripButton();
 			this.m_tsCADFunction = new System.Windows.Forms.ToolStrip();
 			this.m_tsbAddPoint_AcrCenter = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAddPoint_EdgeCenter = new System.Windows.Forms.ToolStripButton();
@@ -85,6 +86,7 @@
 			this.m_panTreeView.SuspendLayout();
 			this.m_tscLevel1Container.ContentPanel.SuspendLayout();
 			this.m_tscLevel1Container.SuspendLayout();
+			this.m_tsFileFunction.SuspendLayout();
 			this.m_tsCADFunction.SuspendLayout();
 			this.m_tscLevel2Container.ContentPanel.SuspendLayout();
 			this.m_tscLevel2Container.SuspendLayout();
@@ -110,35 +112,10 @@
 			// 
 			// m_tsmiFile
 			// 
-			this.m_tsmiFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsmiImportStep,
-            this.m_tsmiImportProjectFile,
-            this.m_tsmiSaveProjectFile});
 			this.m_tsmiFile.Name = "m_tsmiFile";
 			this.m_tsmiFile.Size = new System.Drawing.Size(45, 20);
 			this.m_tsmiFile.Text = "檔案";
 			this.m_tsmiFile.Click += new System.EventHandler(this.m_tsmiFile_Click);
-			// 
-			// m_tsmiImportStep
-			// 
-			this.m_tsmiImportStep.Name = "m_tsmiImportStep";
-			this.m_tsmiImportStep.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiImportStep.Text = "匯入3D模型";
-			this.m_tsmiImportStep.Click += new System.EventHandler(this.m_tsmiImportStep_Click);
-			// 
-			// m_tsmiImportProjectFile
-			// 
-			this.m_tsmiImportProjectFile.Name = "m_tsmiImportProjectFile";
-			this.m_tsmiImportProjectFile.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiImportProjectFile.Text = "匯入專案檔";
-			this.m_tsmiImportProjectFile.Click += new System.EventHandler(this.m_tsmiImportProjectFile_Click);
-			// 
-			// m_tsmiSaveProjectFile
-			// 
-			this.m_tsmiSaveProjectFile.Name = "m_tsmiSaveProjectFile";
-			this.m_tsmiSaveProjectFile.Size = new System.Drawing.Size(180, 22);
-			this.m_tsmiSaveProjectFile.Text = "儲存專案檔";
-			this.m_tsmiSaveProjectFile.Click += new System.EventHandler(this.m_tsmiSaveProjectFile_Click);
 			// 
 			// m_tsmiCAD
 			// 
@@ -362,6 +339,7 @@
 			// 
 			// m_tscLevel1Container.ContentPanel
 			// 
+			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsFileFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCADFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCAMFunction);
 			this.m_tscLevel1Container.ContentPanel.Size = new System.Drawing.Size(1065, 46);
@@ -371,6 +349,50 @@
 			this.m_tscLevel1Container.Size = new System.Drawing.Size(1065, 46);
 			this.m_tscLevel1Container.TabIndex = 5;
 			this.m_tscLevel1Container.Text = "toolStripContainer1";
+			// 
+			// m_tsFileFunction
+			// 
+			this.m_tsFileFunction.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_tsFileFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
+			this.m_tsFileFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbImport3DFile,
+            this.m_tsbReadProjectFile,
+            this.m_tsbSaveProjectFile});
+			this.m_tsFileFunction.Location = new System.Drawing.Point(0, 0);
+			this.m_tsFileFunction.Name = "m_tsFileFunction";
+			this.m_tsFileFunction.Size = new System.Drawing.Size(1065, 46);
+			this.m_tsFileFunction.TabIndex = 4;
+			this.m_tsFileFunction.Text = "匯入3D模型";
+			// 
+			// m_tsbImport3DFile
+			// 
+			this.m_tsbImport3DFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbImport3DFile.Image = global::MyCAM.Properties.Resources.Import3DFile;
+			this.m_tsbImport3DFile.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbImport3DFile.Name = "m_tsbImport3DFile";
+			this.m_tsbImport3DFile.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbImport3DFile.Text = "匯入3D模型";
+			this.m_tsbImport3DFile.Click += new System.EventHandler(this.m_tsbImport3DFile_Click);
+			// 
+			// m_tsbReadProjectFile
+			// 
+			this.m_tsbReadProjectFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbReadProjectFile.Image = global::MyCAM.Properties.Resources.ReadProjectFile;
+			this.m_tsbReadProjectFile.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbReadProjectFile.Name = "m_tsbReadProjectFile";
+			this.m_tsbReadProjectFile.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbReadProjectFile.Text = "匯入專案檔";
+			this.m_tsbReadProjectFile.Click += new System.EventHandler(this.m_tsbImportProjectFile_Click);
+			// 
+			// m_tsbSaveProjectFile
+			// 
+			this.m_tsbSaveProjectFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbSaveProjectFile.Image = global::MyCAM.Properties.Resources.SaveProjectFile;
+			this.m_tsbSaveProjectFile.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbSaveProjectFile.Name = "m_tsbSaveProjectFile";
+			this.m_tsbSaveProjectFile.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbSaveProjectFile.Text = "儲存專案檔";
+			this.m_tsbSaveProjectFile.Click += new System.EventHandler(this.m_tsbSaveProjectFile_Click);
 			// 
 			// m_tsCADFunction
 			// 
@@ -442,21 +464,21 @@
 			// 
 			// m_tsb3PntTransform
 			// 
-			this.m_tsb3PntTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsb3PntTransform.Image = ((System.Drawing.Image)(resources.GetObject("m_tsb3PntTransform.Image")));
+			this.m_tsb3PntTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsb3PntTransform.Image = global::MyCAM.Properties.Resources.ThreePntTrans;
 			this.m_tsb3PntTransform.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsb3PntTransform.Name = "m_tsb3PntTransform";
-			this.m_tsb3PntTransform.Size = new System.Drawing.Size(63, 43);
+			this.m_tsb3PntTransform.Size = new System.Drawing.Size(44, 43);
 			this.m_tsb3PntTransform.Text = "三點轉換";
 			this.m_tsb3PntTransform.Click += new System.EventHandler(this.m_tsb3PntTransform_Click);
 			// 
 			// m_tsbAxisTransform
 			// 
-			this.m_tsbAxisTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbAxisTransform.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbAxisTransform.Image")));
+			this.m_tsbAxisTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAxisTransform.Image = global::MyCAM.Properties.Resources.AxisTrans;
 			this.m_tsbAxisTransform.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAxisTransform.Name = "m_tsbAxisTransform";
-			this.m_tsbAxisTransform.Size = new System.Drawing.Size(63, 43);
+			this.m_tsbAxisTransform.Size = new System.Drawing.Size(44, 43);
 			this.m_tsbAxisTransform.Text = "軸向轉換";
 			this.m_tsbAxisTransform.Click += new System.EventHandler(this.m_tsbAxisTransform_Click);
 			// 
@@ -673,6 +695,8 @@
 			this.m_tscLevel1Container.ContentPanel.PerformLayout();
 			this.m_tscLevel1Container.ResumeLayout(false);
 			this.m_tscLevel1Container.PerformLayout();
+			this.m_tsFileFunction.ResumeLayout(false);
+			this.m_tsFileFunction.PerformLayout();
 			this.m_tsCADFunction.ResumeLayout(false);
 			this.m_tsCADFunction.PerformLayout();
 			this.m_tscLevel2Container.ContentPanel.ResumeLayout(false);
@@ -715,9 +739,6 @@
 		private System.Windows.Forms.ToolStripButton m_tsbMoveUp;
 		private System.Windows.Forms.ToolStripButton m_tsbMoveDown;
 		private System.Windows.Forms.ToolStripButton m_tsbAutoOrder;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportStep;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiImportProjectFile;
-		private System.Windows.Forms.ToolStripMenuItem m_tsmiSaveProjectFile;
 		private System.Windows.Forms.ToolStripContainer m_tscLevel1Container;
 		private System.Windows.Forms.ToolStripContainer m_tscLevel2Container;
 		private System.Windows.Forms.ToolStrip m_tsCADFunction;
@@ -746,6 +767,10 @@
 		private System.Windows.Forms.ToolStripButton m_tsbManualTransform;
 		private System.Windows.Forms.ToolStripButton m_tsb3PntTransform;
 		private System.Windows.Forms.ToolStripButton m_tsbAxisTransform;
+		private System.Windows.Forms.ToolStrip m_tsFileFunction;
+		private System.Windows.Forms.ToolStripButton m_tsbImport3DFile;
+		private System.Windows.Forms.ToolStripButton m_tsbReadProjectFile;
+		private System.Windows.Forms.ToolStripButton m_tsbSaveProjectFile;
 	}
 }
 

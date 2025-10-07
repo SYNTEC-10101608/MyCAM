@@ -103,6 +103,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
+        internal static System.Drawing.Bitmap AxisTrans {
+            get {
+                object obj = ResourceManager.GetObject("AxisTrans", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
         internal static System.Drawing.Bitmap DeletePath {
             get {
                 object obj = ResourceManager.GetObject("DeletePath", resourceCulture);
@@ -126,6 +136,16 @@ namespace MyCAM.Properties {
         internal static System.Drawing.Bitmap FlipLead {
             get {
                 object obj = ResourceManager.GetObject("FlipLead", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Import3DFile {
+            get {
+                object obj = ResourceManager.GetObject("Import3DFile", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -203,6 +223,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
+        internal static System.Drawing.Bitmap ReadProjectFile {
+            get {
+                object obj = ResourceManager.GetObject("ReadProjectFile", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
         internal static System.Drawing.Bitmap Reverse {
             get {
                 object obj = ResourceManager.GetObject("Reverse", resourceCulture);
@@ -213,9 +243,29 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
+        internal static System.Drawing.Bitmap SaveProjectFile {
+            get {
+                object obj = ResourceManager.GetObject("SaveProjectFile", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
         internal static System.Drawing.Bitmap StartPointSetting {
             get {
                 object obj = ResourceManager.GetObject("StartPointSetting", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap ThreePntTrans {
+            get {
+                object obj = ResourceManager.GetObject("ThreePntTrans", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

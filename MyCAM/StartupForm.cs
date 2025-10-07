@@ -114,6 +114,7 @@ namespace MyCAM
 
 		enum EUIStatus
 		{
+			File,
 			CAD,
 			CAM,
 
@@ -141,32 +142,38 @@ namespace MyCAM
 		void m_tsmiFile_Click( object sender, EventArgs e )
 		{
 			SwitchEditor( EEditorType.CAD );
+			RefreshToolStripLayout( EUIStatus.File );
 		}
 
 		// back to CAD editor
 		void m_tsmiCAD_Click( object sender, EventArgs e )
 		{
 			SwitchEditor( EEditorType.CAD );
+			RefreshToolStripLayout( EUIStatus.CAD );
 		}
 
 		// go to CAM editor
 		void m_tsmiCAM_Click( object sender, EventArgs e )
 		{
 			SwitchEditor( EEditorType.CAM );
+			RefreshToolStripLayout( EUIStatus.CAM );
+
+			// ex CAM edtior might lock some entrance
+			EnableAllCAMEnterance();
 		}
 
 		// import part
-		void m_tsmiImportStep_Click( object sender, EventArgs e )
+		void m_tsbImport3DFile_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.Import3DFile();
 		}
 
-		void m_tsmiImportProjectFile_Click( object sender, EventArgs e )
+		void m_tsbImportProjectFile_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.ImportProjectFile();
 		}
 
-		void m_tsmiSaveProjectFile_Click( object sender, EventArgs e )
+		void m_tsbSaveProjectFile_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.SaveProjectFile();
 		}
@@ -658,17 +665,6 @@ namespace MyCAM
 				m_CurrentEditor = GetEditor( type );
 				m_CurrentEditor?.EditStart();
 			}
-
-			// change UI
-			if( m_CurrentEditor == m_CADEditor ) {
-				RefreshToolStripLayout( EUIStatus.CAD );
-				return;
-			}
-			if( m_CurrentEditor == m_CAMEditor ) {
-				RefreshToolStripLayout( EUIStatus.CAM );
-				EnableAllCAMEnterance();
-				return;
-			}
 		}
 
 		IEditor GetEditor( EEditorType type )
@@ -693,7 +689,7 @@ namespace MyCAM
 			m_tscLevel3Container.Visible = false;
 
 			// default is cad mode
-			RefreshToolStripLayout( EUIStatus.CAD );
+			RefreshToolStripLayout( EUIStatus.File );
 		}
 
 		// this setting is for main form to know what situation ui need to refresh as what look like
@@ -701,8 +697,9 @@ namespace MyCAM
 		{
 			m_UIStatusDic = new Dictionary<EUIStatus, List<Control>>()
 			{
+				{ EUIStatus.File, new List<Control>() { m_tsFileFunction } },
 				{ EUIStatus.CAD , new List<Control>() { m_tsCADFunction } },
-				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction }},
+				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction } },
 
 				// cad function
 				{ EUIStatus.ManualTransForm, new List<Control>(){m_tsCADFunction, m_tsManualTrans } },

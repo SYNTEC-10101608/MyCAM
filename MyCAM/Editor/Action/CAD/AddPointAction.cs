@@ -73,14 +73,14 @@ namespace MyCAM.Editor
 		{
 			get
 			{
-				if( m_AddPointType == AddPointType.CircArcCenter ) {
-					return EditActionType.AddPoint_CircArcCenter;
+				switch( m_AddPointType ) {
+					case AddPointType.CircArcCenter:
+						return EditActionType.AddPoint_CircArcCenter;
+					case AddPointType.EdgeMidPoint:
+						return EditActionType.AddPoint_EdgeMidPoint;
+					default:
+						return EditActionType.AddPoint_TwoVertexMidPoint;
 				}
-
-				if( m_AddPointType == AddPointType.EdgeMidPoint ) {
-					return EditActionType.AddPoint_EdgeMidPoint;
-				}
-				return EditActionType.AddPoint_TwoVertexMidPoint;
 			}
 		}
 
