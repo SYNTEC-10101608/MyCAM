@@ -1,13 +1,13 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRep;
 using OCC.gp;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -16,7 +16,6 @@ namespace MyCAM.Editor
 		public AxisTransformAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
-			m_AccumulatedTrsf = new gp_Trsf();
 			CreateRotationCenter();
 			CreateManipulator();
 		}
@@ -93,15 +92,12 @@ namespace MyCAM.Editor
 					m_Manipulator.StopTransform( true );
 					m_Manipulator.SetModeActivationOnDetection( true );
 					m_Manipulator.DeactivateCurrentMode();
-
-					// accumulate transform
-					m_AccumulatedTrsf.PreMultiply( m_OneTimeTrsf );
-
-					// reset one time transform beacuse there is a bug in AIS_Manipulator class 
-					// DeactivateCurrentMode and HasActiveMode do not work correctly together
-					m_OneTimeTrsf = new gp_Trsf();
 				}
-				ApplyTransform( m_AccumulatedTrsf );
+				ApplyTransform( m_OneTimeTrsf );
+
+				// reset one time transform beacuse there is a bug in AIS_Manipulator class 
+				// DeactivateCurrentMode and HasActiveMode do not work correctly together
+				m_OneTimeTrsf = new gp_Trsf();
 			}
 		}
 
@@ -178,7 +174,6 @@ namespace MyCAM.Editor
 		}
 
 		gp_Ax2 m_RotationCenter;
-		gp_Trsf m_AccumulatedTrsf;
 		gp_Trsf m_OneTimeTrsf;
 		AIS_Manipulator m_Manipulator;
 		AIS_Shape m_RefAISShape;
