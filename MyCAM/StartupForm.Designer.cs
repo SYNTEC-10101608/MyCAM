@@ -239,7 +239,7 @@
 			// m_tsbTooVecReverse
 			// 
 			this.m_tsbTooVecReverse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_tsbTooVecReverse.Image = global::MyCAM.Properties.Resources.ToolVecReverse;
+			this.m_tsbTooVecReverse.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbTooVecReverse.Image")));
 			this.m_tsbTooVecReverse.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbTooVecReverse.Name = "m_tsbTooVecReverse";
 			this.m_tsbTooVecReverse.Size = new System.Drawing.Size(44, 43);
@@ -418,9 +418,9 @@
 			// 
 			// m_tscLevel1Container.ContentPanel
 			// 
-			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCADFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCAMFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsFileFunction);
+			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCADFunction);
 			this.m_tscLevel1Container.ContentPanel.Size = new System.Drawing.Size(1065, 46);
 			this.m_tscLevel1Container.Dock = System.Windows.Forms.DockStyle.Top;
 			this.m_tscLevel1Container.Location = new System.Drawing.Point(0, 24);
@@ -446,7 +446,7 @@
 			// m_tsbImport3DFile
 			// 
 			this.m_tsbImport3DFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_tsbImport3DFile.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbImport3DFile.Image")));
+			this.m_tsbImport3DFile.Image = global::MyCAM.Properties.Resources.Import3DFile;
 			this.m_tsbImport3DFile.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbImport3DFile.Name = "m_tsbImport3DFile";
 			this.m_tsbImport3DFile.Size = new System.Drawing.Size(44, 43);
