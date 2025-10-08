@@ -52,6 +52,8 @@
 			this.m_tsViewerToolBar = new System.Windows.Forms.ToolStrip();
 			this.m_tsbShowVec = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowOrder = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbShowOrientation = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbShowTraverse = new System.Windows.Forms.ToolStripButton();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
 			this.m_TreeView = new System.Windows.Forms.TreeView();
@@ -320,13 +322,15 @@
 			this.m_tsViewerToolBar.BackColor = System.Drawing.SystemColors.Window;
 			this.m_tsViewerToolBar.Dock = System.Windows.Forms.DockStyle.Left;
 			this.m_tsViewerToolBar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-			this.m_tsViewerToolBar.ImageScalingSize = new System.Drawing.Size(24, 24);
+			this.m_tsViewerToolBar.ImageScalingSize = new System.Drawing.Size(30, 30);
 			this.m_tsViewerToolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsbShowVec,
-            this.m_tsbShowOrder});
+            this.m_tsbShowOrder,
+            this.m_tsbShowOrientation,
+            this.m_tsbShowTraverse});
 			this.m_tsViewerToolBar.Location = new System.Drawing.Point(165, 0);
 			this.m_tsViewerToolBar.Name = "m_tsViewerToolBar";
-			this.m_tsViewerToolBar.Size = new System.Drawing.Size(29, 705);
+			this.m_tsViewerToolBar.Size = new System.Drawing.Size(35, 705);
 			this.m_tsViewerToolBar.TabIndex = 2;
 			this.m_tsViewerToolBar.Text = "toolStrip1";
 			// 
@@ -339,10 +343,9 @@
 			this.m_tsbShowVec.Image = global::MyCAM.Properties.Resources.ShowVector;
 			this.m_tsbShowVec.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowVec.Name = "m_tsbShowVec";
-			this.m_tsbShowVec.Size = new System.Drawing.Size(26, 28);
+			this.m_tsbShowVec.Size = new System.Drawing.Size(32, 34);
 			this.m_tsbShowVec.Text = "姿態";
 			this.m_tsbShowVec.CheckedChanged += new System.EventHandler(this.m_tsbShowVec_CheckedChanged);
-			this.m_tsbShowVec.Click += new System.EventHandler(this.m_tsbShowVec_Click);
 			// 
 			// m_tsbShowOrder
 			// 
@@ -353,8 +356,35 @@
 			this.m_tsbShowOrder.Image = global::MyCAM.Properties.Resources.ShowOrder;
 			this.m_tsbShowOrder.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowOrder.Name = "m_tsbShowOrder";
-			this.m_tsbShowOrder.Size = new System.Drawing.Size(26, 28);
+			this.m_tsbShowOrder.Size = new System.Drawing.Size(32, 34);
 			this.m_tsbShowOrder.Text = "順序";
+			this.m_tsbShowOrder.CheckedChanged += new System.EventHandler(this.m_tsbShowOrder_CheckedChanged);
+			// 
+			// m_tsbShowOrientation
+			// 
+			this.m_tsbShowOrientation.Checked = true;
+			this.m_tsbShowOrientation.CheckOnClick = true;
+			this.m_tsbShowOrientation.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.m_tsbShowOrientation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbShowOrientation.Image = global::MyCAM.Properties.Resources.ShowOrientation;
+			this.m_tsbShowOrientation.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbShowOrientation.Name = "m_tsbShowOrientation";
+			this.m_tsbShowOrientation.Size = new System.Drawing.Size(32, 34);
+			this.m_tsbShowOrientation.Text = "toolStripButton1";
+			this.m_tsbShowOrientation.CheckedChanged += new System.EventHandler(this.m_tsbShowOrientation_CheckedChanged);
+			// 
+			// m_tsbShowTraverse
+			// 
+			this.m_tsbShowTraverse.Checked = true;
+			this.m_tsbShowTraverse.CheckOnClick = true;
+			this.m_tsbShowTraverse.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.m_tsbShowTraverse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbShowTraverse.Image = global::MyCAM.Properties.Resources.TraverseParam;
+			this.m_tsbShowTraverse.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbShowTraverse.Name = "m_tsbShowTraverse";
+			this.m_tsbShowTraverse.Size = new System.Drawing.Size(32, 34);
+			this.m_tsbShowTraverse.Text = "toolStripButton1";
+			this.m_tsbShowTraverse.CheckedChanged += new System.EventHandler(this.m_tsbShowTraverse_CheckedChanged);
 			// 
 			// m_panViewer
 			// 
@@ -828,6 +858,8 @@
 		private System.Windows.Forms.ToolTip toolTip1;
 		private System.Windows.Forms.ToolTip toolTip2;
 		private System.Windows.Forms.ToolStripButton m_tsbShowOrder;
+		private System.Windows.Forms.ToolStripButton m_tsbShowOrientation;
+		private System.Windows.Forms.ToolStripButton m_tsbShowTraverse;
 	}
 }
 

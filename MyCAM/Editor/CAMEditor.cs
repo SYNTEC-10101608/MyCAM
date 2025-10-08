@@ -21,7 +21,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using static MyCAM.StartupForm;
 
 namespace MyCAM.Editor
 {
@@ -63,19 +62,11 @@ namespace MyCAM.Editor
 			NormalVec,
 		}
 
+		// CAM data show options
 		bool m_ShowToolVec = true;
-
-		public void OnToolBarButtonStatusChange( EBarBtn btn, bool IsBtnOn )
-		{
-			switch( btn ) {
-				case EBarBtn.ShowToolVec:
-					m_ShowToolVec = IsBtnOn;
-					ShowCAMData();
-					break;
-				default:
-					break;
-			}
-		}
+		bool m_ShowOrder = true;
+		bool m_ShowOrientation = true;
+		bool m_ShowTraversePath = true;
 
 		// editor
 		public override EEditorType Type
@@ -120,6 +111,31 @@ namespace MyCAM.Editor
 		}
 
 		// APIs
+
+		public void SetShowToolVec( bool isShowToolVec )
+		{
+			m_ShowToolVec = isShowToolVec;
+			ShowCAMData();
+		}
+
+		public void SetShowOrientation( bool isShowOrientation )
+		{
+			m_ShowOrientation = isShowOrientation;
+			ShowCAMData();
+		}
+
+		public void SetShowOrder( bool isShowOrder )
+		{
+			m_ShowOrder = isShowOrder;
+			ShowCAMData();
+		}
+
+		public void SetShowTraversePath( bool isShowTraversePath )
+		{
+			m_ShowTraversePath = isShowTraversePath;
+			ShowCAMData();
+		}
+
 		public void StartSelectFace()
 		{
 			// with on/off button, so end current action
@@ -508,17 +524,8 @@ namespace MyCAM.Editor
 		void ShowCAMData()
 		{
 			// TODO: we dont always need to refresh such many things
-			if( m_ShowToolVec ) {
-				ShowToolVec();
-			}
-			else {
-				// clear the previous tool vec
-				foreach( AIS_Line toolVecAIS in m_ToolVecAISList ) {
-					m_Viewer.GetAISContext().Remove( toolVecAIS, false );
-				}
-				m_ToolVecAISList.Clear();
-			}
-				ShowOrientation();
+			ShowToolVec();
+			ShowOrientation();
 			ShowIndex();
 			ShowOverCut();
 			ShowLeadLine();
@@ -534,6 +541,11 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( toolVecAIS, false );
 			}
 			m_ToolVecAISList.Clear();
+
+			// no need to show
+			if( m_ShowToolVec == false ) {
+				return;
+			}
 
 			// build tool vec
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
@@ -602,6 +614,11 @@ namespace MyCAM.Editor
 			}
 			m_OrientationAISList.Clear();
 
+			// no need to show
+			if( m_ShowOrientation == false ) {
+				return;
+			}
+
 			// build orientation
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				gp_Pnt showPoint = camData.CAMPointList[ 0 ].CADPoint.Point;
@@ -669,6 +686,11 @@ namespace MyCAM.Editor
 			}
 			m_IndexList.Clear();
 
+			// no need to show
+			if( m_ShowOrder == false ) {
+				return;
+			}
+
 			// create text label
 			int nCurrentIndex = 0;
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
@@ -724,6 +746,11 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( traverseAIS, false );
 			}
 			m_TraverseAISList.Clear();
+
+			// no need to show
+			if( m_ShowTraversePath == false ) {
+				return;
+			}
 			List<CAMData> camDataList = m_DataManager.GetCAMDataList();
 			if( camDataList == null || camDataList.Count == 0 ) {
 				return;

@@ -18,14 +18,10 @@ namespace MyCAM
 {
 	public partial class StartupForm : Form
 	{
-		public Action<EBarBtn, bool> RaiseToolBarBtnStatusChange;
-
-		public enum EBarBtn
-		{
-			ShowToolVec,
-			ShowIndex
-		}
-		
+		public Action<bool> RaiseShowVecStatusChange;
+		public Action<bool> RaiseShowOrderStatusChange;
+		public Action<bool> RaiseShowOrientStatusChange;
+		public Action<bool> RaiseShowTraverseStatusChange;
 
 		public StartupForm()
 		{
@@ -83,7 +79,10 @@ namespace MyCAM
 			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
 			m_CAMEditor.RaiseCAMActionStatusChange += OnCAMActionStatusChange;
 			m_CAMEditor.RaiseWithDlgActionStatusChange += OnCAMDlgActionStatusChange;
-			RaiseToolBarBtnStatusChange += m_CAMEditor.OnToolBarButtonStatusChange;
+			RaiseShowVecStatusChange += m_CAMEditor.SetShowToolVec;
+			RaiseShowOrderStatusChange += m_CAMEditor.SetShowOrder;
+			RaiseShowOrientStatusChange += m_CAMEditor.SetShowOrientation;
+			RaiseShowTraverseStatusChange += m_CAMEditor.SetShowTraversePath;
 
 			// simu editor
 			m_SimuEditor = new SimuEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -873,15 +872,24 @@ namespace MyCAM
 
 		#endregion
 
-		void m_tsbShowVec_Click( object sender, EventArgs e )
+		void m_tsbShowVec_CheckedChanged( object sender, EventArgs e )
 		{
-			RaiseToolBarBtnStatusChange(EBarBtn.ShowToolVec, false);
-		
+			RaiseShowVecStatusChange( m_tsbShowVec.Checked );
 		}
 
-		private void m_tsbShowVec_CheckedChanged( object sender, EventArgs e )
+		void m_tsbShowOrder_CheckedChanged( object sender, EventArgs e )
 		{
-			Console.WriteLine( m_tsbShowVec.Checked );
+			RaiseShowOrderStatusChange( m_tsbShowOrder.Checked );
+		}
+
+		void m_tsbShowOrientation_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseShowOrientStatusChange( m_tsbShowOrientation.Checked );
+		}
+
+		void m_tsbShowTraverse_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseShowTraverseStatusChange( m_tsbShowTraverse.Checked );
 		}
 	}
 }
