@@ -110,7 +110,7 @@ namespace MyCAM
 
 		// UI color
 		Color m_defaultBtnColor = SystemColors.Control;
-		Color m_buttonOnColor = Color.Yellow;
+		Color m_buttonOnColor = Color.FromArgb( 114, 155, 121 );
 
 		enum EUIStatus
 		{
