@@ -357,6 +357,30 @@ namespace MyCAM
 			// m_SimuEditor.EditStart();
 		}
 
+		#region Viewer tool bar click action
+
+		void m_tsbShowVec_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseShowVecStatusChange( m_tsbShowVec.Checked );
+		}
+
+		void m_tsbShowOrder_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseShowOrderStatusChange( m_tsbShowOrder.Checked );
+		}
+
+		void m_tsbShowOrientation_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseShowOrientStatusChange( m_tsbShowOrientation.Checked );
+		}
+
+		void m_tsbShowTraverse_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseShowTraverseStatusChange( m_tsbShowTraverse.Checked );
+		}
+
+		#endregion
+
 		#region UI action
 
 		// cad action change event
@@ -871,26 +895,6 @@ namespace MyCAM
 		}
 
 		#endregion
-
-		void m_tsbShowVec_CheckedChanged( object sender, EventArgs e )
-		{
-			RaiseShowVecStatusChange( m_tsbShowVec.Checked );
-		}
-
-		void m_tsbShowOrder_CheckedChanged( object sender, EventArgs e )
-		{
-			RaiseShowOrderStatusChange( m_tsbShowOrder.Checked );
-		}
-
-		void m_tsbShowOrientation_CheckedChanged( object sender, EventArgs e )
-		{
-			RaiseShowOrientStatusChange( m_tsbShowOrientation.Checked );
-		}
-
-		void m_tsbShowTraverse_CheckedChanged( object sender, EventArgs e )
-		{
-			RaiseShowTraverseStatusChange( m_tsbShowTraverse.Checked );
-		}
 	}
 }
 
