@@ -253,36 +253,6 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
-        internal static System.Drawing.Bitmap ShowOrder {
-            get {
-                object obj = ResourceManager.GetObject("ShowOrder", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
-        /// </summary>
-        internal static System.Drawing.Bitmap ShowOrientation {
-            get {
-                object obj = ResourceManager.GetObject("ShowOrientation", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
-        /// </summary>
-        internal static System.Drawing.Bitmap ShowVector {
-            get {
-                object obj = ResourceManager.GetObject("ShowVector", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
-        /// </summary>
         internal static System.Drawing.Bitmap StartPointSetting {
             get {
                 object obj = ResourceManager.GetObject("StartPointSetting", resourceCulture);
