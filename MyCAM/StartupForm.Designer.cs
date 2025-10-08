@@ -326,7 +326,7 @@
             this.m_tsbShowOrder});
 			this.m_tsViewerToolBar.Location = new System.Drawing.Point(165, 0);
 			this.m_tsViewerToolBar.Name = "m_tsViewerToolBar";
-			this.m_tsViewerToolBar.Size = new System.Drawing.Size(29, 705);
+			this.m_tsViewerToolBar.Size = new System.Drawing.Size(32, 705);
 			this.m_tsViewerToolBar.TabIndex = 2;
 			this.m_tsViewerToolBar.Text = "toolStrip1";
 			// 
@@ -336,8 +336,9 @@
 			this.m_tsbShowVec.Image = global::MyCAM.Properties.Resources.ShowVector;
 			this.m_tsbShowVec.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowVec.Name = "m_tsbShowVec";
-			this.m_tsbShowVec.Size = new System.Drawing.Size(26, 28);
+			this.m_tsbShowVec.Size = new System.Drawing.Size(29, 28);
 			this.m_tsbShowVec.Text = "姿態";
+			this.m_tsbShowVec.Click += new System.EventHandler(this.m_tsbShowVec_Click);
 			// 
 			// m_tsbShowOrder
 			// 

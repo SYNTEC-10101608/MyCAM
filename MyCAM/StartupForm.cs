@@ -18,6 +18,15 @@ namespace MyCAM
 {
 	public partial class StartupForm : Form
 	{
+		public Action<EBarBtn, bool> RaiseToolBarBtnStatusChange;
+
+		public enum EBarBtn
+		{
+			ShowToolVec,
+			ShowIndex
+		}
+		
+
 		public StartupForm()
 		{
 #if !DEBUG
@@ -74,6 +83,7 @@ namespace MyCAM
 			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
 			m_CAMEditor.RaiseCAMActionStatusChange += OnCAMActionStatusChange;
 			m_CAMEditor.RaiseWithDlgActionStatusChange += OnCAMDlgActionStatusChange;
+			RaiseToolBarBtnStatusChange += m_CAMEditor.OnToolBarButtonStatusChange;
 
 			// simu editor
 			m_SimuEditor = new SimuEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -862,6 +872,11 @@ namespace MyCAM
 		}
 
 		#endregion
+
+		void m_tsbShowVec_Click( object sender, EventArgs e )
+		{
+			RaiseToolBarBtnStatusChange(EBarBtn.ShowToolVec, false);
+		}
 	}
 }
 

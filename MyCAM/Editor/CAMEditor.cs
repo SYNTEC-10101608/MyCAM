@@ -1,4 +1,8 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Post;
 using OCC.AIS;
@@ -17,10 +21,7 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
+using static MyCAM.StartupForm;
 
 namespace MyCAM.Editor
 {
@@ -60,6 +61,20 @@ namespace MyCAM.Editor
 			ToolVec,
 			TangentVec,
 			NormalVec,
+		}
+
+		bool m_ShowToolVec = true;
+
+		public void OnToolBarButtonStatusChange( EBarBtn btn, bool IsBtnOn )
+		{
+			switch( btn ) {
+				case EBarBtn.ShowToolVec:
+					m_ShowToolVec = IsBtnOn;
+					ShowCAMData();
+					break;
+				default:
+					break;
+			}
 		}
 
 		// editor
@@ -493,8 +508,17 @@ namespace MyCAM.Editor
 		void ShowCAMData()
 		{
 			// TODO: we dont always need to refresh such many things
-			ShowToolVec();
-			ShowOrientation();
+			if( m_ShowToolVec ) {
+				ShowToolVec();
+			}
+			else {
+				// clear the previous tool vec
+				foreach( AIS_Line toolVecAIS in m_ToolVecAISList ) {
+					m_Viewer.GetAISContext().Remove( toolVecAIS, false );
+				}
+				m_ToolVecAISList.Clear();
+			}
+				ShowOrientation();
 			ShowIndex();
 			ShowOverCut();
 			ShowLeadLine();
