@@ -876,6 +876,12 @@ namespace MyCAM
 		void m_tsbShowVec_Click( object sender, EventArgs e )
 		{
 			RaiseToolBarBtnStatusChange(EBarBtn.ShowToolVec, false);
+		
+		}
+
+		private void m_tsbShowVec_CheckedChanged( object sender, EventArgs e )
+		{
+			Console.WriteLine( m_tsbShowVec.Checked );
 		}
 	}
 }
