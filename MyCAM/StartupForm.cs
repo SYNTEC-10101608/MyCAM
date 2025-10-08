@@ -152,6 +152,9 @@ namespace MyCAM
 		{
 			SwitchEditor( EEditorType.CAD );
 			RefreshToolStripLayout( EUIStatus.File );
+
+			// disable viewer tool bar
+			m_tsViewerToolBar.Enabled = false;
 		}
 
 		// back to CAD editor
@@ -159,6 +162,9 @@ namespace MyCAM
 		{
 			SwitchEditor( EEditorType.CAD );
 			RefreshToolStripLayout( EUIStatus.CAD );
+
+			// disable viewer tool bar
+			m_tsViewerToolBar.Enabled = false;
 		}
 
 		// go to CAM editor
@@ -169,6 +175,9 @@ namespace MyCAM
 
 			// ex CAM edtior might lock some entrance
 			EnableAllCAMEnterance();
+
+			// enable viewer tool bar
+			m_tsViewerToolBar.Enabled = true;
 		}
 
 		// import part
@@ -723,6 +732,7 @@ namespace MyCAM
 
 			// default is cad mode
 			RefreshToolStripLayout( EUIStatus.File );
+			m_tsViewerToolBar.Enabled = false;
 		}
 
 		// this setting is for main form to know what situation ui need to refresh as what look like
