@@ -153,7 +153,7 @@ namespace MyCAM
 			SwitchEditor( EEditorType.CAD );
 			RefreshToolStripLayout( EUIStatus.File );
 
-			// disable viewer tool bar
+			// not in cam editing viewer tool bar can be used
 			m_tsViewerToolBar.Enabled = false;
 		}
 
@@ -163,7 +163,7 @@ namespace MyCAM
 			SwitchEditor( EEditorType.CAD );
 			RefreshToolStripLayout( EUIStatus.CAD );
 
-			// disable viewer tool bar
+			// not in cam editing viewer tool bar can be used
 			m_tsViewerToolBar.Enabled = false;
 		}
 
@@ -176,7 +176,7 @@ namespace MyCAM
 			// ex CAM edtior might lock some entrance
 			EnableAllCAMEnterance();
 
-			// enable viewer tool bar
+			// during cam editing viewer tool bar can be used
 			m_tsViewerToolBar.Enabled = true;
 		}
 
