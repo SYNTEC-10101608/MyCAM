@@ -1,4 +1,8 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Post;
 using OCC.AIS;
@@ -17,10 +21,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -61,6 +61,12 @@ namespace MyCAM.Editor
 			TangentVec,
 			NormalVec,
 		}
+
+		// CAM data show options
+		bool m_ShowToolVec = true;
+		bool m_ShowOrder = true;
+		bool m_ShowOrientation = true;
+		bool m_ShowTraversePath = true;
 
 		// editor
 		public override EEditorType Type
@@ -105,6 +111,31 @@ namespace MyCAM.Editor
 		}
 
 		// APIs
+
+		public void SetShowToolVec( bool isShowToolVec )
+		{
+			m_ShowToolVec = isShowToolVec;
+			ShowCAMData();
+		}
+
+		public void SetShowOrientation( bool isShowOrientation )
+		{
+			m_ShowOrientation = isShowOrientation;
+			ShowCAMData();
+		}
+
+		public void SetShowOrder( bool isShowOrder )
+		{
+			m_ShowOrder = isShowOrder;
+			ShowCAMData();
+		}
+
+		public void SetShowTraversePath( bool isShowTraversePath )
+		{
+			m_ShowTraversePath = isShowTraversePath;
+			ShowCAMData();
+		}
+
 		public void StartSelectFace()
 		{
 			// with on/off button, so end current action
@@ -511,6 +542,11 @@ namespace MyCAM.Editor
 			}
 			m_ToolVecAISList.Clear();
 
+			// no need to show
+			if( m_ShowToolVec == false ) {
+				return;
+			}
+
 			// build tool vec
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
@@ -577,6 +613,11 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( orientationAIS, false );
 			}
 			m_OrientationAISList.Clear();
+
+			// no need to show
+			if( m_ShowOrientation == false ) {
+				return;
+			}
 
 			// build orientation
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
@@ -645,6 +686,11 @@ namespace MyCAM.Editor
 			}
 			m_IndexList.Clear();
 
+			// no need to show
+			if( m_ShowOrder == false ) {
+				return;
+			}
+
 			// create text label
 			int nCurrentIndex = 0;
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
@@ -700,6 +746,11 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( traverseAIS, false );
 			}
 			m_TraverseAISList.Clear();
+
+			// no need to show
+			if( m_ShowTraversePath == false ) {
+				return;
+			}
 			List<CAMData> camDataList = m_DataManager.GetCAMDataList();
 			if( camDataList == null || camDataList.Count == 0 ) {
 				return;
