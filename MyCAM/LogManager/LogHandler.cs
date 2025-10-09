@@ -19,16 +19,19 @@ namespace MyCAM.LogManager
 					ShowError( message );
 					break;
 				case MyApp.NoticeType.Warning:
-					AddLog( message, Color.OrangeRed );
+					AddLog( message, WARNING_Color );
 					break;
 				case MyApp.NoticeType.Hint:
 				default:
-					AddLog( message, Color.Black );
+					AddLog( message, NORMAL_HintColor );
 					break;
 			}
 		}
 
 		Panel m_PanelShowMessage;
+		readonly Color ERROR_Color = Color.FromArgb( 253, 99, 132 );
+		readonly Color WARNING_Color = Color.Yellow;
+		readonly Color NORMAL_HintColor = Color.White;
 
 		void ShowError( string message )
 		{
@@ -40,7 +43,7 @@ namespace MyCAM.LogManager
 			);
 
 			// sync to log panel
-			AddLog( message, Color.Red );
+			AddLog( message, ERROR_Color );
 		}
 
 		void AddLog( string message, Color color )

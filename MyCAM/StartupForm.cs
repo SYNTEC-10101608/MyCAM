@@ -18,6 +18,11 @@ namespace MyCAM
 {
 	public partial class StartupForm : Form
 	{
+		public Action<bool> RaiseShowVecStatusChange;
+		public Action<bool> RaiseShowOrderStatusChange;
+		public Action<bool> RaiseShowOrientStatusChange;
+		public Action<bool> RaiseShowTraverseStatusChange;
+
 		public StartupForm()
 		{
 #if !DEBUG
@@ -74,6 +79,10 @@ namespace MyCAM
 			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
 			m_CAMEditor.RaiseCAMActionStatusChange += OnCAMActionStatusChange;
 			m_CAMEditor.RaiseWithDlgActionStatusChange += OnCAMDlgActionStatusChange;
+			RaiseShowVecStatusChange += m_CAMEditor.SetShowToolVec;
+			RaiseShowOrderStatusChange += m_CAMEditor.SetShowOrder;
+			RaiseShowOrientStatusChange += m_CAMEditor.SetShowOrientation;
+			RaiseShowTraverseStatusChange += m_CAMEditor.SetShowTraversePath;
 
 			// simu editor
 			m_SimuEditor = new SimuEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -109,8 +118,8 @@ namespace MyCAM
 		List<ToolStripContainer> m_ToolStripLevelList;
 
 		// UI color
-		Color m_defaultBtnColor = SystemColors.Control;
-		Color m_buttonOnColor = Color.Yellow;
+		readonly Color DEFAULT_BtnColor = SystemColors.Control;
+		readonly Color ON_ButtonColor = Color.FromArgb( 233, 180, 159 );
 
 		enum EUIStatus
 		{
@@ -143,6 +152,9 @@ namespace MyCAM
 		{
 			SwitchEditor( EEditorType.CAD );
 			RefreshToolStripLayout( EUIStatus.File );
+
+			// not in cam editing viewer tool bar can't be used
+			m_tsViewerToolBar.Enabled = false;
 		}
 
 		// back to CAD editor
@@ -150,6 +162,9 @@ namespace MyCAM
 		{
 			SwitchEditor( EEditorType.CAD );
 			RefreshToolStripLayout( EUIStatus.CAD );
+
+			// not in cam editing viewer tool bar can't be used
+			m_tsViewerToolBar.Enabled = false;
 		}
 
 		// go to CAM editor
@@ -160,6 +175,9 @@ namespace MyCAM
 
 			// ex CAM edtior might lock some entrance
 			EnableAllCAMEnterance();
+
+			// during cam editing viewer tool bar can be used
+			m_tsViewerToolBar.Enabled = true;
 		}
 
 		// import part
@@ -348,6 +366,30 @@ namespace MyCAM
 			// m_SimuEditor.EditStart();
 		}
 
+		#region Viewer tool bar click action
+
+		void m_tsbShowVec_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseShowVecStatusChange( m_tsbShowVec.Checked );
+		}
+
+		void m_tsbShowOrder_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseShowOrderStatusChange( m_tsbShowOrder.Checked );
+		}
+
+		void m_tsbShowOrientation_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseShowOrientStatusChange( m_tsbShowOrientation.Checked );
+		}
+
+		void m_tsbShowTraverse_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseShowTraverseStatusChange( m_tsbShowTraverse.Checked );
+		}
+
+		#endregion
+
 		#region UI action
 
 		// cad action change event
@@ -357,25 +399,25 @@ namespace MyCAM
 				RefreshToolStripLayout( EUIStatus.CAD );
 				switch( action ) {
 					case EditActionType.AddPoint_CircArcCenter:
-						m_tsbAddPoint_AcrCenter.BackColor = m_defaultBtnColor;
+						m_tsbAddPoint_AcrCenter.BackColor = DEFAULT_BtnColor;
 						return;
 					case EditActionType.AddPoint_EdgeMidPoint:
-						m_tsbAddPoint_EdgeCenter.BackColor = m_defaultBtnColor;
+						m_tsbAddPoint_EdgeCenter.BackColor = DEFAULT_BtnColor;
 						return;
 					case EditActionType.AddPoint_TwoVertexMidPoint:
-						m_tsbAddPoint_PointCenter.BackColor = m_defaultBtnColor;
+						m_tsbAddPoint_PointCenter.BackColor = DEFAULT_BtnColor;
 						return;
 					case EditActionType.AddLine:
-						m_tsbAddLine_TwoVertexConnect.BackColor = m_defaultBtnColor;
+						m_tsbAddLine_TwoVertexConnect.BackColor = DEFAULT_BtnColor;
 						return;
 					case EditActionType.AxisTransform:
-						m_tsbAxisTransform.BackColor = m_defaultBtnColor;
+						m_tsbAxisTransform.BackColor = DEFAULT_BtnColor;
 						return;
 					case EditActionType.ThreePtTransform:
-						m_tsb3PntTransform.BackColor = m_defaultBtnColor;
+						m_tsb3PntTransform.BackColor = DEFAULT_BtnColor;
 						return;
 					case EditActionType.ManualTransform:
-						m_tsbManualTransform.BackColor = m_defaultBtnColor;
+						m_tsbManualTransform.BackColor = DEFAULT_BtnColor;
 						return;
 				}
 				return;
@@ -392,25 +434,25 @@ namespace MyCAM
 			// turn on light
 			switch( action ) {
 				case EditActionType.AddPoint_CircArcCenter:
-					m_tsbAddPoint_AcrCenter.BackColor = m_buttonOnColor;
+					m_tsbAddPoint_AcrCenter.BackColor = ON_ButtonColor;
 					return;
 				case EditActionType.AddPoint_EdgeMidPoint:
-					m_tsbAddPoint_EdgeCenter.BackColor = m_buttonOnColor;
+					m_tsbAddPoint_EdgeCenter.BackColor = ON_ButtonColor;
 					return;
 				case EditActionType.AddPoint_TwoVertexMidPoint:
-					m_tsbAddPoint_PointCenter.BackColor = m_buttonOnColor;
+					m_tsbAddPoint_PointCenter.BackColor = ON_ButtonColor;
 					return;
 				case EditActionType.AddLine:
-					m_tsbAddLine_TwoVertexConnect.BackColor = m_buttonOnColor;
+					m_tsbAddLine_TwoVertexConnect.BackColor = ON_ButtonColor;
 					return;
 				case EditActionType.AxisTransform:
-					m_tsbAxisTransform.BackColor = m_buttonOnColor;
+					m_tsbAxisTransform.BackColor = ON_ButtonColor;
 					return;
 				case EditActionType.ThreePtTransform:
-					m_tsb3PntTransform.BackColor = m_buttonOnColor;
+					m_tsb3PntTransform.BackColor = ON_ButtonColor;
 					return;
 				case EditActionType.ManualTransform:
-					m_tsbManualTransform.BackColor = m_buttonOnColor;
+					m_tsbManualTransform.BackColor = ON_ButtonColor;
 					return;
 			}
 		}
@@ -435,31 +477,31 @@ namespace MyCAM
 				RefreshToolStripLayout( EUIStatus.CAM );
 				switch( action ) {
 					case EditActionType.SelectFace:
-						m_tsbAddPath.BackColor = m_defaultBtnColor;
+						m_tsbAddPath.BackColor = DEFAULT_BtnColor;
 						break;
 					case EditActionType.SelectPath:
 						m_tsbManualSelectPathOK.Enabled = true;
-						m_tsbAddPath.BackColor = m_defaultBtnColor;
-						m_tsbSelPath_Manual.BackColor = m_defaultBtnColor;
+						m_tsbAddPath.BackColor = DEFAULT_BtnColor;
+						m_tsbSelPath_Manual.BackColor = DEFAULT_BtnColor;
 						break;
 					case EditActionType.StartPoint:
-						m_tsbStartPoint.BackColor = m_defaultBtnColor;
+						m_tsbStartPoint.BackColor = DEFAULT_BtnColor;
 						break;
 					case EditActionType.SetLead:
-						m_tsbSetLead.BackColor = m_defaultBtnColor;
+						m_tsbSetLead.BackColor = DEFAULT_BtnColor;
 
 						// unlock form 
 						OnCAMDlgActionStatusChange( actionStatus );
 						break;
 					case EditActionType.OverCut:
-						m_tsbOverCut.BackColor = m_defaultBtnColor;
+						m_tsbOverCut.BackColor = DEFAULT_BtnColor;
 						OnCAMDlgActionStatusChange( actionStatus );
 						break;
 					case EditActionType.ToolVec:
-						m_tsbToolVec.BackColor = m_defaultBtnColor;
+						m_tsbToolVec.BackColor = DEFAULT_BtnColor;
 						break;
 					case EditActionType.SetTraverseParam:
-						m_tsbTraverseParamSetting.BackColor = m_defaultBtnColor;
+						m_tsbTraverseParamSetting.BackColor = DEFAULT_BtnColor;
 						OnCAMDlgActionStatusChange( actionStatus );
 						break;
 					default:
@@ -480,7 +522,7 @@ namespace MyCAM
 			}
 			switch( action ) {
 				case EditActionType.SelectFace:
-					m_tsbAddPath.BackColor = m_buttonOnColor;
+					m_tsbAddPath.BackColor = ON_ButtonColor;
 
 					// need to in select path mode can use this button
 					m_tsbManualSelectPathOK.Enabled = false;
@@ -488,28 +530,28 @@ namespace MyCAM
 				case EditActionType.SelectPath:
 
 					// add path still icon still need to light up
-					m_tsbAddPath.BackColor = m_buttonOnColor;
-					m_tsbSelPath_Manual.BackColor = m_buttonOnColor;
+					m_tsbAddPath.BackColor = ON_ButtonColor;
+					m_tsbSelPath_Manual.BackColor = ON_ButtonColor;
 					m_tsbManualSelectPathOK.Enabled = true;
 					break;
 				case EditActionType.StartPoint:
-					m_tsbStartPoint.BackColor = m_buttonOnColor;
+					m_tsbStartPoint.BackColor = ON_ButtonColor;
 					break;
 				case EditActionType.SetLead:
-					m_tsbSetLead.BackColor = m_buttonOnColor;
+					m_tsbSetLead.BackColor = ON_ButtonColor;
 					// lock main from
 					OnCAMDlgActionStatusChange( actionStatus );
 					break;
 				case EditActionType.OverCut:
-					m_tsbOverCut.BackColor = m_buttonOnColor;
+					m_tsbOverCut.BackColor = ON_ButtonColor;
 					// lock main from
 					OnCAMDlgActionStatusChange( actionStatus );
 					break;
 				case EditActionType.ToolVec:
-					m_tsbToolVec.BackColor = m_buttonOnColor;
+					m_tsbToolVec.BackColor = ON_ButtonColor;
 					break;
 				case EditActionType.SetTraverseParam:
-					m_tsbTraverseParamSetting.BackColor = m_buttonOnColor;
+					m_tsbTraverseParamSetting.BackColor = ON_ButtonColor;
 					OnCAMDlgActionStatusChange( actionStatus );
 					break;
 				default:
@@ -690,6 +732,7 @@ namespace MyCAM
 
 			// default is cad mode
 			RefreshToolStripLayout( EUIStatus.File );
+			m_tsViewerToolBar.Enabled = false;
 		}
 
 		// this setting is for main form to know what situation ui need to refresh as what look like
