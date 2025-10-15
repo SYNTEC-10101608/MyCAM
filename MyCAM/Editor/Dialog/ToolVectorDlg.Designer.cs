@@ -89,6 +89,8 @@
 			this.m_tbxAngleA.Name = "m_tbxAngleA";
 			this.m_tbxAngleA.Size = new System.Drawing.Size(48, 22);
 			this.m_tbxAngleA.TabIndex = 2;
+			this.m_tbxAngleA.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxAngleA_KeyDown);
+			this.m_tbxAngleA.Leave += new System.EventHandler(this.m_tbxAngleA_Leave);
 			// 
 			// m_tbxAngleB
 			// 
@@ -97,6 +99,8 @@
 			this.m_tbxAngleB.Name = "m_tbxAngleB";
 			this.m_tbxAngleB.Size = new System.Drawing.Size(48, 22);
 			this.m_tbxAngleB.TabIndex = 3;
+			this.m_tbxAngleB.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxAngleB_KeyDown);
+			this.m_tbxAngleB.Leave += new System.EventHandler(this.m_tbxAngleB_Leave);
 			// 
 			// m_btnOK
 			// 
@@ -119,16 +123,20 @@
 			this.m_btnRemove.UseVisualStyleBackColor = true;
 			this.m_btnRemove.Click += new System.EventHandler(this.m_btnRemove_Click);
 			// 
-			// ToolVecForm
+			// ToolVectorDlg
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(122, 111);
 			this.Controls.Add(this.tableLayoutPanel1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Margin = new System.Windows.Forms.Padding(2);
-			this.Name = "ToolVecForm";
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
+			this.Name = "ToolVectorDlg";
+			this.ShowIcon = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "ToolVecForm";
+			this.Text = "姿態";
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
 			this.ResumeLayout(false);

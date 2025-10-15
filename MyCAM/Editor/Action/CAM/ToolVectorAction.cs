@@ -1,8 +1,13 @@
-﻿using MyCAM.App;
-using MyCAM.Data;
-using OCCViewer;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using MyCAM.App;
+using MyCAM.Data;
+using OCC.AIS;
+using OCC.Aspect;
+using OCC.Prs3d;
+using OCC.Quantity;
+using OCC.TopoDS;
+using OCCViewer;
 
 namespace MyCAM.Editor
 {
@@ -23,43 +28,129 @@ namespace MyCAM.Editor
 		}
 
 		public Action PropertyChanged;
+		public Action<EActionStatus> RaiseEditingToolVecDlg;
 
 		protected override void ViewerMouseDown( MouseEventArgs e )
 		{
+			// editing tool vector, do not allow other operation
+			if( IsPausedSelectMode ) {
+				return;
+			}
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			int nIndex = GetSelectIndex();
+			int nIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
 			if( nIndex == -1 ) {
 				return;
 			}
 
 			// modify tool vector
 			bool isModified = m_CAMData.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
-			ToolVectorDlg form = new ToolVectorDlg( isModified, angleA_deg, angleB_deg );
-			form.RemoveEditData = () =>
+			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg );
+
+			// back up old data
+			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg );
+			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam );
+			toolVecForm.Preview += ( ToolVec ) =>
 			{
-				// for remove edited data
-				m_CAMData.RemoveToolVecModify( nIndex );
+				SetToolVecParam( nIndex, ToolVec );
 				PropertyChanged?.Invoke();
-				m_Viewer.GetAISContext().ClearSelected( true );
 			};
-			DialogResult result = form.ShowDialog( MyApp.MainForm );
-			if( result != DialogResult.OK ) {
-				m_Viewer.GetAISContext().ClearSelected( true );
-				return;
-			}
-			form.GetAngleValue( out double newAngleA_deg, out double newAnfleB_deg );
-			m_CAMData.SetToolVecModify( nIndex, newAngleA_deg, newAnfleB_deg );
-			PropertyChanged?.Invoke();
-			m_Viewer.GetAISContext().ClearSelected( true );
+			toolVecForm.Confirm += ( ToolVec ) =>
+			{
+				SetToolVecParam( nIndex, ToolVec );
+				SetToolVecDone();
+			};
+			toolVecForm.Cancel += () =>
+			{
+				SetToolVecParam( nIndex, m_BackupToolVecParam );
+				SetToolVecDone();
+			};
+
+			// when editing a point lock the main form
+			RaiseEditingToolVecDlg?.Invoke( EActionStatus.Start );
+
+			// when editing a point, cannot select other points but still show selected point
+			LockSelectedVertexHighLight( selectedVertex );
+			toolVecForm.Show( MyApp.MainForm );
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
+			// editing tool vector, do not allow other operation
+			if( IsPausedSelectMode ) {
+				return;
+			}
 			if( e.KeyCode == Keys.Escape ) {
 				End();
 			}
 		}
+
+		void LockSelectedVertexHighLight( TopoDS_Shape selectedVertex )
+		{
+			if( selectedVertex == null || selectedVertex.IsNull()) {
+				return;
+			}
+
+			// show selected vertex on viewer, because pause select mode woud clear select
+			DrawVertexOnViewer( selectedVertex );
+			Pause();
+		}
+
+		void UnlockSelectedVertexHighLight()
+		{
+			// remove selected vertex which show on viewer
+			if( m_KeepedHighLightPoint != null ) {
+
+				// true means update viewer
+				m_Viewer.GetAISContext().Remove( m_KeepedHighLightPoint, true );
+				m_KeepedHighLightPoint = null;
+			}
+			Resume();
+		}
+
+		void SetToolVecDone()
+		{
+			// unlock main form
+			RaiseEditingToolVecDlg?.Invoke( EActionStatus.End );
+
+			// unlock viewer
+			UnlockSelectedVertexHighLight();
+			PropertyChanged?.Invoke();
+		}
+
+		void SetToolVecParam( int VecIndex, ToolVecParam toolVecParam )
+		{
+			if( !toolVecParam.IsModified ) {
+				m_CAMData.RemoveToolVecModify( VecIndex );
+				return;
+			}
+			m_CAMData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
+		}
+
+		void DrawVertexOnViewer( TopoDS_Shape selectedVertex )
+		{
+			if( selectedVertex != null ) {
+				m_KeepedHighLightPoint = new AIS_Shape( selectedVertex );
+
+				// set pointAspect
+				Prs3d_PointAspect pointAspect = new Prs3d_PointAspect(
+					Aspect_TypeOfMarker.Aspect_TOM_BALL,
+					new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ),
+					3.0f
+				);
+
+				// set high light attribute
+				m_KeepedHighLightPoint.Attributes().SetPointAspect( pointAspect );
+
+				// refresh viewer
+				m_Viewer.GetAISContext().Display( m_KeepedHighLightPoint, true );
+			}
+		}
+
+		ToolVecParam m_BackupToolVecParam;
+
+		// to storage which vertex keep show high light point on viewer
+		AIS_Shape m_KeepedHighLightPoint = null;
 	}
 }

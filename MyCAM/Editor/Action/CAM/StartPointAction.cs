@@ -28,7 +28,7 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			int nIndex = GetSelectIndex();
+			int nIndex = GetSelectIndex(out _);
 			if( nIndex == -1 ) {
 				return;
 			}

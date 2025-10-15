@@ -1,5 +1,4 @@
-﻿using MyCAM.Data;
-using System;
+﻿using System;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -35,7 +34,6 @@ namespace MyCAM.Editor
 				Cancel?.Invoke();
 			}
 		}
-
 		protected bool m_ConfirmCheck = false;
 	}
 }
