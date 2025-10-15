@@ -98,6 +98,8 @@ namespace MyCAM.Editor
 
 		public override void EditEnd()
 		{
+			base.EditEnd();
+
 			// clear tree
 			m_TreeView.Nodes.Clear();
 
@@ -107,7 +109,6 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( obj, false );
 			}
 			HideCAMData();
-			base.EditEnd();
 		}
 
 		// APIs
@@ -353,6 +354,12 @@ namespace MyCAM.Editor
 			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
+
+			// when editing tool vec dilog show/close, need disable/enable main form
+			action.RaiseEditingToolVecDlg += ( isStart ) =>
+			{
+				RaiseWithDlgActionStatusChange?.Invoke( isStart );
+			};
 			StartEditAction( action );
 		}
 

@@ -132,7 +132,7 @@ namespace MyCAM
 
 			// cam function
 			AddPath,
-			SelectPath,
+			ManualSelectPath,
 		}
 
 		void ShowG54Trihedron()
@@ -275,11 +275,6 @@ namespace MyCAM
 		void m_tsbSelPath_FreeBound_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SelectPath_FreeBound();
-		}
-
-		void m_tsbSelectPath_Click( object sender, EventArgs e )
-		{
-			RefreshToolStripLayout( EUIStatus.SelectPath );
 		}
 
 		void m_tsbManualSelectPathOK_Click( object sender, EventArgs e )
@@ -480,7 +475,8 @@ namespace MyCAM
 						m_tsbAddPath.BackColor = DEFAULT_BtnColor;
 						break;
 					case EditActionType.SelectPath:
-						m_tsbManualSelectPathOK.Enabled = true;
+						m_tsbSelectD1ContFace.Enabled = true;
+						m_tsbSelPath_FreeBound.Enabled = true;
 						m_tsbAddPath.BackColor = DEFAULT_BtnColor;
 						m_tsbSelPath_Manual.BackColor = DEFAULT_BtnColor;
 						break;
@@ -515,7 +511,7 @@ namespace MyCAM
 				RefreshToolStripLayout( EUIStatus.AddPath );
 			}
 			else if( action == EditActionType.SelectPath ) {
-				RefreshToolStripLayout( EUIStatus.SelectPath );
+				RefreshToolStripLayout( EUIStatus.ManualSelectPath );
 			}
 			else {
 				RefreshToolStripLayout( EUIStatus.CAM );
@@ -523,16 +519,14 @@ namespace MyCAM
 			switch( action ) {
 				case EditActionType.SelectFace:
 					m_tsbAddPath.BackColor = ON_ButtonColor;
-
-					// need to in select path mode can use this button
-					m_tsbManualSelectPathOK.Enabled = false;
 					break;
 				case EditActionType.SelectPath:
 
-					// add path still icon still need to light up
+					// add path icon still need to light up
 					m_tsbAddPath.BackColor = ON_ButtonColor;
 					m_tsbSelPath_Manual.BackColor = ON_ButtonColor;
-					m_tsbManualSelectPathOK.Enabled = true;
+					m_tsbSelectD1ContFace.Enabled = false;
+					m_tsbSelPath_FreeBound.Enabled = false;
 					break;
 				case EditActionType.StartPoint:
 					m_tsbStartPoint.BackColor = ON_ButtonColor;
@@ -748,8 +742,8 @@ namespace MyCAM
 				{ EUIStatus.ManualTransForm, new List<Control>(){m_tsCADFunction, m_tsManualTrans } },
 				
 				// cam function
-				{ EUIStatus.AddPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc } },
-				{ EUIStatus.SelectPath, new List<Control>(){m_tsCAMFunction, m_tsAddPathSubFunc, m_tsSelectPath } }
+				{ EUIStatus.AddPath, new List<Control>(){ m_tsCAMFunction, m_tsAddPathSubFunc } },
+				{ EUIStatus.ManualSelectPath, new List<Control>(){ m_tsCAMFunction, m_tsAddPathSubFunc, m_tsSelectPath } }
 			};
 			m_ToolStripLevelList = new List<ToolStripContainer>()
 			{

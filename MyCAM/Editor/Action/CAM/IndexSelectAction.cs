@@ -1,4 +1,6 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Windows.Forms;
+using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
 using OCC.TopAbs;
@@ -6,8 +8,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -57,14 +57,29 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		protected int GetSelectIndex()
+		public void Pause()
 		{
+			// stop active mode
+			HideSelectPoint();
+			IsPausedSelectMode = true;
+		}
+
+		public void Resume()
+		{
+			// open active mode
+			ShowSelectPoint();
+			IsPausedSelectMode = false;
+		}
+
+		protected int GetSelectIndex( out TopoDS_Shape selectedShape )
+		{
+			selectedShape = new TopoDS_Shape();
 			m_Viewer.Select();
 			m_Viewer.GetAISContext().InitSelected();
 			if( !m_Viewer.GetAISContext().MoreSelected() ) {
 				return -1;
 			}
-			TopoDS_Shape selectedShape = m_Viewer.GetAISContext().SelectedShape();
+			selectedShape = m_Viewer.GetAISContext().SelectedShape();
 			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
 				return -1;
 			}
@@ -112,5 +127,8 @@ namespace MyCAM.Editor
 		// map point on view to index on CAMData
 		protected TopTools_DataMapOfShapeInteger m_VertexMap;
 		protected AIS_Shape m_SelectedPointAIS;
+
+		// flag to check is pause mode or not
+		protected bool IsPausedSelectMode = false;
 	}
 }
