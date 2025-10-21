@@ -52,6 +52,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\ArcCADSegment.cs" />
+    <Compile Include="Data\LineCADSegment.cs" />
+    <Compile Include="Data\ArcCAMSegment.cs" />
+    <Compile Include="Data\LineCAMSegment.cs" />
+    <Compile Include="Data\ISegmentElement.cs" />
     <Compile Include="Data\MachineData.cs" />
     <Compile Include="Data\MachineDefine.cs" />
     <Compile Include="Data\PostData.cs" />
@@ -94,7 +99,9 @@
     <Compile Include="Editor\Dialog\OverCutDlg.Designer.cs">
       <DependentUpon>OverCutDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helper\BuildCAMSegmentHelper.cs" />
     <Compile Include="Helper\MachineDataXMLHelper.cs" />
+    <Compile Include="Helper\Pretreatment.cs" />
     <Compile Include="Helper\TraverseHelper.cs" />
     <Compile Include="FileManager\MachineDataDTO.cs" />
     <Compile Include="Helper\LeadHelper.cs" />

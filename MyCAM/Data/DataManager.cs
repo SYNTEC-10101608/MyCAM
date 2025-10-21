@@ -151,6 +151,7 @@ namespace MyCAM.Data
 		}
 
 		// the edge map contains all edges in all wire to be add
+		// pathWireList 一個index是一條完整的Path
 		public void AddPath( List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap )
 		{
 			if( pathWireList == null || pathWireList.Count == 0 || allEdgeMap == null ) {
@@ -163,6 +164,8 @@ namespace MyCAM.Data
 				TopExp_Explorer exp = new TopExp_Explorer( pathWire, TopAbs_ShapeEnum.TopAbs_EDGE );
 				List<PathEdge5D> pathElements = new List<PathEdge5D>();
 				bool isValidPath = true;
+
+				// path中的每條edge
 				while( exp.More() ) {
 					TopoDS_Edge oneEdge = TopoDS.ToEdge( exp.Current() );
 
@@ -183,6 +186,7 @@ namespace MyCAM.Data
 				}
 
 				// add valid path
+				// 建立這條Path
 				if( isValidPath ) {
 					string szID = "Path_" + ++m_PathID;
 					PathData pathData = new PathData( szID, pathWire, pathElements );

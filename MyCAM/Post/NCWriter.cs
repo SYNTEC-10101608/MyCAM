@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using MyCAM.Data;
+using MyCAM.Helper;
+using OCC.gp;
 
 namespace MyCAM.Post
 {
@@ -52,6 +55,7 @@ namespace MyCAM.Post
 							return false;
 						}
 						WriteCutting( postData, i + 1 );
+						WriteCutting_New( m_ProcessDataList[ i ], i + 1 );
 					}
 
 					// write exit
@@ -109,6 +113,46 @@ namespace MyCAM.Post
 		}
 
 		void WriteOneLinearTraverse( PostPoint postPoint, double followSafeDistance = 0 )
+		void WriteOneSegmentPath( PostPath segmentPostPath )
+		{
+			if( segmentPostPath is ArcPostPath arcPostPath ) {
+				WriteG02Path( arcPostPath );
+				return;
+			}
+			if( segmentPostPath is LinePostPath linePostPath ) {
+				WriteG01Path( linePostPath );
+			}
+		}
+
+		void WriteG01Path( LinePostPath linePostPath )
+		{
+			string szX = linePostPath.EndPoint.X.ToString( "F3" );
+			string szY = linePostPath.EndPoint.Y.ToString( "F3" );
+			string szZ = linePostPath.EndPoint.Z.ToString( "F3" );
+			string szM = ( linePostPath.EndPoint.Master * 180 / Math.PI ).ToString( "F3" );
+			string szS = ( linePostPath.EndPoint.Slave * 180 / Math.PI ).ToString( "F3" );
+			string command = "G01";
+			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} {m_MasterAxisName}{szM} {m_SlaveAxisName}{szS};" );
+		}
+
+		void WriteG02Path( ArcPostPath arcPostPath )
+		{
+			string szMidPointX = arcPostPath.MidPoint.X.ToString( "F3" );
+			string szMidPointY = arcPostPath.MidPoint.Y.ToString( "F3" );
+			string szMidPointZ = arcPostPath.MidPoint.Z.ToString( "F3" );
+			string szMidPointM = ( arcPostPath.MidPoint.Master * 180 / Math.PI ).ToString( "F3" );
+			string szMidPointS = ( arcPostPath.MidPoint.Slave * 180 / Math.PI ).ToString( "F3" );
+
+			// end point data
+			string szEndPointX = arcPostPath.EndPoint.X.ToString( "F3" );
+			string szEndPointY = arcPostPath.EndPoint.Y.ToString( "F3" );
+			string szEndPointZ = arcPostPath.EndPoint.Z.ToString( "F3" );
+			string szEndPointM = ( arcPostPath.EndPoint.Master * 180 / Math.PI ).ToString( "F3" );
+			string szEndPointS = ( arcPostPath.EndPoint.Slave * 180 / Math.PI ).ToString( "F3" );
+			m_StreamWriter.WriteLine( $"G65 P\"TPCI\" X1={szMidPointX} Y1={szMidPointY} Z1={szMidPointZ} {m_MasterAxisName}1={szMidPointM} {m_SlaveAxisName}1={szMidPointS} X2={szEndPointX} Y2={szEndPointY} Z2={szEndPointZ} {m_MasterAxisName}2={szEndPointM} {m_SlaveAxisName}2={szEndPointS};" );
+		}
+
+		void WriteOneProcessPath( List<PostPoint> postList, bool G00 = false )
 		{
 			if( postPoint == null ) {
 				return;
@@ -198,6 +242,57 @@ namespace MyCAM.Post
 			else {
 				WriteOneLinearTraverse( currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
 			}
+		}
+
+		void WriteOneProcessPath_New( List<PostPath> processPathSegmentPostPath )
+		{
+			PostPoint lastPostPoint = null;
+			for( int i = 0; i < processPathSegmentPostPath.Count; i++ ) {
+
+				// 第一條路要從安全距離下降到起點
+				if( i == 0 ) {
+					WriteOnePoint( new gp_Pnt( processPathSegmentPostPath[ i ].StartPoint.X, processPathSegmentPostPath[ i ].StartPoint.Y, processPathSegmentPostPath[ i ].StartPoint.Z ), processPathSegmentPostPath[ i ].StartPoint.Master, processPathSegmentPostPath[ i ].StartPoint.Slave );
+					lastPostPoint = processPathSegmentPostPath[ i ].StartPoint;
+				}
+				if( IsSamePostPoint( processPathSegmentPostPath[ i ].StartPoint, lastPostPoint ) == false ) {
+					return;
+				}
+				WriteOneSegmentPath( processPathSegmentPostPath[ i ] );
+				lastPostPoint = processPathSegmentPostPath[ i ].EndPoint;
+			}
+		}
+
+		bool IsSamePostPoint( PostPoint postPoint1, PostPoint postPoint2 )
+		{
+			if( postPoint1 == null || postPoint2 == null ) {
+				return false;
+			}
+			if( Math.Abs( postPoint1.X - postPoint2.X ) > 0.01 ) {
+				Console.WriteLine( $"P1.X = {postPoint1.X}" );
+				Console.WriteLine( $"P2.X = {postPoint2.X}" );
+				return false;
+			}
+			if( Math.Abs( postPoint1.Y - postPoint2.Y ) > 0.01 ) {
+				Console.WriteLine( $"P1.Y = {postPoint1.Y}" );
+				Console.WriteLine( $"P2.Y = {postPoint2.Y}" );
+				return false;
+			}
+			if( Math.Abs( postPoint1.Z - postPoint2.Z ) > 0.01 ) {
+				Console.WriteLine( $"P1.Z = {postPoint1.Z}" );
+				Console.WriteLine( $"P2.Z = {postPoint2.Z}" );
+				return false;
+			}
+			if( Math.Abs( postPoint1.Master - postPoint2.Master ) > 0.01 ) {
+				Console.WriteLine( $"P1.M = {postPoint1.Master}" );
+				Console.WriteLine( $"P2.M = {postPoint2.Master}" );
+				return false;
+			}
+			if( Math.Abs( postPoint1.Slave - postPoint2.Slave ) > 0.01 ) {
+				Console.WriteLine( $"P1.S = {postPoint1.Slave}" );
+				Console.WriteLine( $"P2.S = {postPoint2.Slave}" );
+				return false;
+			}
+			return true;
 		}
 
 		string ConvertRotaryAxisName( RotaryAxis axis )

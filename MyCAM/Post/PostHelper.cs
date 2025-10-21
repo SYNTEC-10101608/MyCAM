@@ -344,6 +344,102 @@ namespace MyCAM.Post
 			pathMCSPostData.FollowSafeDistance = currentCAMData.TraverseData.FollowSafeDistance;
 		}
 
+		public static bool SolvePathSegment( PostSolver postSolver, List<ICAMSegmentElement> pathSegmentList, out PathSegmentPostData pathSegmentPostData, out PathSegmentPostData pathMCSPostData )
+		{
+			// for simulation
+			pathMCSPostData = new PathSegmentPostData();
+
+			// for write NC file
+			pathSegmentPostData = new PathSegmentPostData();
+
+			if( postSolver == null || pathSegmentList == null ) {
+				return false;
+			}
+
+			// to ensure joint space continuity of process path
+			double dLastPointProcess_M = 0, dLastPointProcess_S = 0;
+
+
+			for( int i = 0; i < pathSegmentList.Count; i++ ) {
+				bool bSegmentTransSuccess = SolveSegmentPart( postSolver, pathSegmentList[ i ], out PostPath segmentPostPath, out PostPath MCSPostPath, ref dLastPointProcess_M, ref dLastPointProcess_S );
+				if( bSegmentTransSuccess == false ) {
+					return false;
+				}
+				pathSegmentPostData.MainPathPostPath.Add( segmentPostPath );
+				pathMCSPostData.MainPathPostPath.Add( MCSPostPath );
+			}
+			return true;
+		}
+
+		static bool SolveSegmentPart( PostSolver postSolver, ICAMSegmentElement processPathSegment, out PostPath SegmentG54PostPath, out PostPath MCSPostPath, ref double dLastProcessPathM, ref double dLastPointProcess_S )
+		{
+			SegmentG54PostPath = null;
+			MCSPostPath = null;
+			CAMPoint camStartPoint = processPathSegment.StartPoint;
+			CAMPoint camEndPoint = processPathSegment.EndPoint;
+			bool bGetStartPointSuccess = Solve1Point( postSolver, camStartPoint, out PostPoint StartPointG54, out PostPoint StartPointMCS, ref dLastProcessPathM, ref dLastPointProcess_S );
+			if( bGetStartPointSuccess == false ) {
+				return false;
+			}
+			bool bGetEndPointSuccess = Solve1Point( postSolver, camEndPoint, out PostPoint EndPointG54, out PostPoint EndPoitMCS, ref dLastProcessPathM, ref dLastPointProcess_S );
+			if( bGetEndPointSuccess == false ) {
+				return false;
+			}
+
+			if( processPathSegment is ArcCAMSegment arcSegment ) {
+				CAMPoint cadMidPoint = arcSegment.MidPoint;
+				bool bGetMidPointSuccess = Solve1Point( postSolver, cadMidPoint, out PostPoint MidPointG54, out PostPoint MidPointMCS, ref dLastProcessPathM, ref dLastPointProcess_S );
+				if( bGetEndPointSuccess == false ) {
+					return false;
+				}
+				SegmentG54PostPath = new ArcPostPath( StartPointG54, MidPointG54, EndPointG54 );
+				MCSPostPath = new ArcPostPath( StartPointMCS, MidPointMCS, EndPoitMCS );
+			}
+			else {
+				SegmentG54PostPath = new LinePostPath( StartPointG54, EndPointG54 );
+				MCSPostPath = new LinePostPath( StartPointMCS, EndPoitMCS );
+			}
+			return true;
+		}
+
+
+		static bool Solve1Point( PostSolver postSolver, CAMPoint camPoint, out PostPoint frameDataG54, out PostPoint frameDataMCS, ref double dLastProcessPathM, ref double dLastProcessPathS )
+		{
+			frameDataG54 = new PostPoint();
+			frameDataMCS = new PostPoint();
+
+			IKSolveResult ikResult = postSolver.SolveIK( camPoint, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
+			if( ikResult == IKSolveResult.IvalidInput || ikResult == IKSolveResult.NoSolution ) {
+				return false;
+			}
+			(double, double) rotateAngle = (dLastProcessPathM, dLastProcessPathS);
+			gp_Pnt startPointG54 = camPoint.CADPoint.Point;
+			gp_Vec statPointTcpOffset = postSolver.SolveFK( rotateAngle.Item1, rotateAngle.Item2, startPointG54 );
+			gp_Pnt pointMCS = startPointG54.Translated( statPointTcpOffset );
+
+			// G54 frame data
+			frameDataG54 = new PostPoint()
+			{
+				X = startPointG54.X(),
+				Y = startPointG54.Y(),
+				Z = startPointG54.Z(),
+				Master = rotateAngle.Item1,
+				Slave = rotateAngle.Item2
+			};
+
+			// MCS frame data
+			frameDataMCS = new PostPoint()
+			{
+				X = pointMCS.X(),
+				Y = pointMCS.Y(),
+				Z = pointMCS.Z(),
+				Master = rotateAngle.Item1,
+				Slave = rotateAngle.Item2
+			};
+			return true;
+		}
+
+
 		#endregion
 	}
 }

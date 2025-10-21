@@ -39,7 +39,11 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			int nIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
+			//int nIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
+
+			// 隔離中
+			int nIndex = -1;
+			TopoDS_Shape selectedVertex = null;
 			if( nIndex == -1 ) {
 				return;
 			}

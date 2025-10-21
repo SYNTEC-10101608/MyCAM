@@ -65,6 +65,131 @@ namespace MyCAM.Data
 		}
 	}
 
+	internal class PathSegmentPostData
+	{
+		public List<PostPath> LeadInPostPath
+		{
+			get; set;
+		}
+
+		public List<PostPath> MainPathPostPath
+		{
+			get; set;
+		}
+
+		public List<PostPath> OverCutPostPath
+		{
+			get; set;
+		}
+
+		public List<PostPath> LeadOutPostPath
+		{
+			get; set;
+		}
+
+		public PostPath CutDownPostPath
+		{
+			get; set;
+		}
+
+		public PostPath LiftUpPostPath
+		{
+			get; set;
+		}
+
+		public PostPath FollowSafePostPath
+		{
+			get; set;
+		}
+
+		public PathSegmentPostData()
+		{
+			LeadInPostPath = new List<PostPath>();
+			MainPathPostPath = new List<PostPath>();
+			OverCutPostPath = new List<PostPath>();
+			LeadOutPostPath = new List<PostPath>();
+			CutDownPostPath = null;
+			LiftUpPostPath = null;
+			FollowSafePostPath = null;
+		}
+	}
+
+
+	public enum EPostPathType
+	{
+		Line,
+		Arc
+	}
+
+	internal abstract class PostPath
+	{
+		public abstract EPostPathType PostPathType
+		{
+			get;
+		}
+
+		public PostPoint StartPoint
+		{
+			get;
+			protected set;
+		}
+
+		public PostPoint EndPoint
+		{
+			get;
+			protected set;
+		}
+
+		protected PostPath( PostPoint startPoint, PostPoint endPoint )
+		{
+			StartPoint = startPoint;
+			EndPoint = endPoint;
+		}
+	}
+
+	internal class LinePostPath : PostPath
+	{
+		public LinePostPath( PostPoint startPoint, PostPoint endPoint )
+			: base( startPoint, endPoint )
+		{
+			StartPoint = startPoint;
+			EndPoint = endPoint;
+		}
+
+		public override EPostPathType PostPathType
+		{
+			get
+			{
+				return EPostPathType.Line;
+			}
+		}
+	}
+
+	internal class ArcPostPath : PostPath
+	{
+		public ArcPostPath( PostPoint startPoint, PostPoint midPoint, PostPoint endPoint )
+			: base( startPoint, endPoint )
+		{
+			StartPoint = startPoint;
+			MidPoint = midPoint;
+			EndPoint = endPoint;
+		}
+
+		public override EPostPathType PostPathType
+		{
+			get
+			{
+				return EPostPathType.Line;
+			}
+		}
+
+		public PostPoint MidPoint
+		{
+			get;
+			private set;
+		}
+	}
+
 	internal class PostPoint
 	{
 		public double X

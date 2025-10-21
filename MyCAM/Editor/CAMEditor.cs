@@ -549,8 +549,8 @@ namespace MyCAM.Editor
 		void ShowCAMData()
 		{
 			// TODO: we dont always need to refresh such many things
-			ShowToolVec();
-			ShowOrientation();
+			ShowToolVec_New();
+			ShowOrientation_New();
 			ShowIndex();
 			ShowOverCut();
 			ShowLeadLine();
@@ -559,7 +559,7 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		void ShowToolVec()
+		void ShowToolVec_New()
 		{
 			// clear the previous tool vec
 			foreach( AIS_Line toolVecAIS in m_ToolVecAISList ) {
@@ -574,15 +574,9 @@ namespace MyCAM.Editor
 
 			// build tool vec
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
-				for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
-					CAMPoint camPoint = camData.CAMPointList[ i ];
-					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					if( IsModifiedToolVecIndex( i, camData ) ) {
-						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-						toolVecAIS.SetWidth( 4 );
-					}
-					m_ToolVecAISList.Add( toolVecAIS );
-				}
+				foreach(ICADSegmentElement cadSegment in camData.CADSegmentList ) {
+					DrawToolVec( cadSegment, camData );
+;				}
 			}
 
 			// display the tool vec
@@ -644,10 +638,43 @@ namespace MyCAM.Editor
 				return;
 			}
 
+
 			// build orientation
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				gp_Pnt showPoint = camData.CAMPointList[ 0 ].CADPoint.Point;
 				gp_Dir orientationDir = new gp_Dir( camData.CAMPointList[ 0 ].CADPoint.TangentVec.XYZ() );
+				if( camData.IsReverse ) {
+					orientationDir.Reverse();
+				}
+				AIS_Shape orientationAIS = GetOrientationAIS( showPoint, orientationDir );
+				m_OrientationAISList.Add( orientationAIS );
+			}
+
+			// display the orientation
+			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
+				m_Viewer.GetAISContext().Display( orientationAIS, false );
+				m_Viewer.GetAISContext().Deactivate( orientationAIS );
+			}
+		}
+
+		void ShowOrientation_New()
+		{
+			// clear the previous orientation
+			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
+				m_Viewer.GetAISContext().Remove( orientationAIS, false );
+			}
+			m_OrientationAISList.Clear();
+
+			// no need to show
+			if( m_ShowOrientation == false ) {
+				return;
+			}
+
+			// build orientation
+			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
+				(int, int) startPoint = camData.NewStartPoint;
+				gp_Pnt showPoint = camData.CADSegmentList[ startPoint.Item1 ].PointList[ startPoint.Item2 ].Point;
+				gp_Dir orientationDir = new gp_Dir( camData.CADSegmentList[ startPoint.Item1 ].PointList[ startPoint.Item2 ].TangentVec.XYZ() );
 				if( camData.IsReverse ) {
 					orientationDir.Reverse();
 				}
@@ -1038,6 +1065,34 @@ namespace MyCAM.Editor
 			}
 			RaiseCAMActionStatusChange?.Invoke( action.ActionType, EActionStatus.End );
 			base.OnEditActionEnd( action );
+		}
+
+		void DrawToolVec( ICADSegmentElement cadSegment, CAMData camData )
+		{
+
+			List<(gp_Pnt point, gp_Dir toolVec)> points = new List<(gp_Pnt point, gp_Dir toolVec)>();
+
+			switch( cadSegment ) {
+				case LineCADSegment lineSegment:
+					points.Add( (lineSegment.StartPoint.Point, lineSegment.StartPoint.NormalVec_1st) );
+					points.Add( (lineSegment.EndPoint.Point, lineSegment.EndPoint.NormalVec_1st) );
+					break;
+
+				case ArcCADSegment arcSegment:
+					points.Add( (arcSegment.StartPoint.Point, arcSegment.StartPoint.NormalVec_1st) );
+					points.Add( (arcSegment.EndPoint.Point, arcSegment.EndPoint.NormalVec_1st) );
+					points.Add( (arcSegment.MidPoint.Point, arcSegment.MidPoint.NormalVec_1st) );
+					break;
+
+				default:
+					return;
+			}
+
+			foreach( var (pnt, dir) in points ) {
+				gp_Dir finalDir = camData.IsToolVecReverse ? dir.Reversed() : dir;
+				AIS_Line vecAIS = GetVecAIS( pnt, finalDir, EvecType.ToolVec );
+				m_ToolVecAISList.Add( vecAIS );
+			}
 		}
 	}
 }

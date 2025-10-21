@@ -1,4 +1,5 @@
-﻿using OCC.BRep;
+﻿using System;
+using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.BRepBuilderAPI;
 using OCC.BRepGProp;
@@ -14,7 +15,6 @@ using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
-using System;
 
 namespace OCCTool
 {

@@ -1,13 +1,14 @@
-﻿using MyCAM.Helper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyCAM.Helper;
 using OCC.BOPTools;
 using OCC.BRepAdaptor;
 using OCC.GCPnts;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using OCCTool;
 
 namespace MyCAM.Data
 {
@@ -119,8 +120,8 @@ namespace MyCAM.Data
 			IsClosed = isClosed;
 
 			// build raw data
-			BuildCADPointList();
-			BuildCAMPointList();
+			BuildCADSegment();
+			BuildCAMPointList_New();
 		}
 
 		// for construct path by reading file
@@ -135,10 +136,15 @@ namespace MyCAM.Data
 			m_IsToolVecReverse = isToolVecReverse;
 			m_OverCutLength = dOverCutLength;
 			m_ToolVecModifyMap = ToolVecModifyMap;
-			BuildCAMPointList();
+			BuildCAMPointList_New();
 		}
 
 		internal List<CADPoint> CADPointList
+		{
+			get; private set;
+		}
+
+		internal List<ICADSegmentElement> CADSegmentList
 		{
 			get; private set;
 		}
@@ -150,7 +156,7 @@ namespace MyCAM.Data
 			get
 			{
 				if( m_IsDirty ) {
-					BuildCAMPointList();
+					BuildCAMPointList_New();
 					m_IsDirty = false;
 				}
 				return m_CAMPointList;
@@ -162,7 +168,7 @@ namespace MyCAM.Data
 			get
 			{
 				if( m_IsDirty ) {
-					BuildCAMPointList();
+					BuildCAMPointList_New();
 					m_IsDirty = false;
 				}
 				return m_LeadInCAMPointList;
@@ -174,7 +180,7 @@ namespace MyCAM.Data
 			get
 			{
 				if( m_IsDirty ) {
-					BuildCAMPointList();
+					BuildCAMPointList_New();
 					m_IsDirty = false;
 				}
 				return m_LeadOutCAMPointList;
@@ -186,7 +192,7 @@ namespace MyCAM.Data
 			get
 			{
 				if( m_IsDirty ) {
-					BuildCAMPointList();
+					BuildCAMPointList_New();
 					m_IsDirty = false;
 				}
 				return m_OverCutPointList;
@@ -234,6 +240,20 @@ namespace MyCAM.Data
 				if( m_StartPoint != value ) {
 					m_StartPoint = value;
 					m_IsDirty = true;
+				}
+			}
+		}
+
+		public (int, int) NewStartPoint
+		{
+			get
+			{
+				return m_NewStartPoint;
+			}
+			set
+			{
+				if( m_NewStartPoint != value ) {
+					m_NewStartPoint = value;
 				}
 			}
 		}
@@ -419,6 +439,7 @@ namespace MyCAM.Data
 		bool m_IsReverse = false;
 		bool m_IsToolVecReverse = false;
 		int m_StartPoint = 0;
+		(int, int) m_NewStartPoint = (0, 0);
 		double m_OverCutLength = 0;
 
 		// lead param
@@ -446,6 +467,49 @@ namespace MyCAM.Data
 				TopoDS_Edge edge = m_PathEdge5DList[ i ].PathEdge;
 				TopoDS_Face shellFace = m_PathEdge5DList[ i ].ComponentFace;
 				TopoDS_Face solidFace = m_PathEdge5DList[ i ].ComponentFace; // TODO: set solid face
+				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace,
+					i == 0, i == m_PathEdge5DList.Count - 1 ) );
+			}
+		}
+
+		void BuildCADSegment()
+		{
+			CADSegmentList = new List<ICADSegmentElement>();
+			CADPointList = new List<CADPoint>();
+			List<CADPoint> tempCADPointList = new List<CADPoint>();
+			if( m_PathEdge5DList == null ) {
+				return;
+			}
+
+			// go through the contour edges
+			for( int i = 0; i < m_PathEdge5DList.Count; i++ ) {
+				TopoDS_Edge edge = m_PathEdge5DList[ i ].PathEdge;
+				TopoDS_Face shellFace = m_PathEdge5DList[ i ].ComponentFace;
+				TopoDS_Face solidFace = m_PathEdge5DList[ i ].ComponentFace; // TODO: set solid face
+
+				// this curve is line use equal length split
+				if( GeometryTool.IsLine( edge, out _, out _ ) ) {
+					tempCADPointList = Pretreatment.GetSegmentPointsByEqualLength( edge, shellFace, PRECISION_MAX_LENGTH, false, out double dEdgeLength, out double dPointSpace );
+					LineCADSegment lineSegment = new LineCADSegment( tempCADPointList, dEdgeLength , dPointSpace );
+					CADSegmentList.Add( lineSegment );
+				}
+
+				// this curve is arc use equal length split
+				else if( GeometryTool.IsCircularArc( edge, out gp_Pnt circleCenter, out _, out gp_Dir centerDir ) ) {
+					tempCADPointList = Pretreatment.GetSegmentPointsByEqualLength( edge, shellFace, PRECISION_MAX_LENGTH, false, out double dEdgeLength, out double dPointSpace );
+					ArcCADSegment arcSegment = new ArcCADSegment( tempCADPointList, dEdgeLength, dPointSpace, circleCenter, centerDir );
+					CADSegmentList.Add( arcSegment );
+				}
+
+				// use chord error split
+				else {
+
+					// separate this bspline to several edge by chord error
+					List<TopoDS_Edge> segmentEdgeList = Pretreatment.GetBsplineToEdgeList( edge, shellFace );
+
+					// each edge use equal length split
+					CADSegmentList.AddRange( Pretreatment.GetCADSegmentLineFromShortEdge( segmentEdgeList, shellFace ) );
+				}
 				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace,
 					i == 0, i == m_PathEdge5DList.Count - 1 ) );
 			}
@@ -486,6 +550,8 @@ namespace MyCAM.Data
 					}
 				}
 			}
+
+			//這條wire中的這段edge的分割點
 			segmentParamList.Add( qUD.Parameter( qUD.NbPoints() ) );
 
 			// reverse the segment parameters if the edge is reversed
@@ -493,6 +559,7 @@ namespace MyCAM.Data
 				segmentParamList.Reverse();
 			}
 
+			// 要在這條wire中的這段edge開始分割點位
 			for( int i = 0; i < segmentParamList.Count; i++ ) {
 				double U = segmentParamList[ i ];
 
@@ -517,16 +584,26 @@ namespace MyCAM.Data
 					tangentVec.Reverse();
 				}
 
+				// 分割出一個點
 				// build
 				CADPoint cadPoint = new CADPoint( point, normalVec_1st, normalVec_2nd, new gp_Dir( tangentVec ) );
 
 				// map the last point of the previous edge to the start point, and use current start point to present
+				// 這不是這條wire中第一個edge,但是是這段edge的第一個點
 				if( !bFirst && i == 0 && CADPointList.Count > 0 ) {
+
+					// 找到上一段edge的最後一個點
 					CADPoint lastPoint = CADPointList.Last();
+
+					// 刪除上段EDGE的最後一個點,用這段EDGE的第一個點
 					CADPointList.RemoveAt( CADPointList.Count - 1 );
+
+					// 記住這個重複點的另一個分身(上一段的最後一個點)
 					m_ConnectPointMap[ cadPoint ] = lastPoint;
 					oneSegmentPointList.Add( cadPoint );
 				}
+
+				// 這是這條Wire的最後一個Edge,而且是這個Edge的最後一個點
 				else if( bLast && i == segmentParamList.Count - 1 && CADPointList.Count > 0 ) {
 
 					// map the last point to the start point
@@ -547,13 +624,12 @@ namespace MyCAM.Data
 			return oneSegmentPointList;
 		}
 
-		void BuildCAMPointList()
+		void BuildCAMPointList_New()
 		{
 			m_IsDirty = false;
 			m_CAMPointList = new List<CAMPoint>();
 			SetToolVec();
 			SetStartPoint();
-			SetOrientation();
 
 			// close the loop if is closed
 			if( IsClosed && m_CAMPointList.Count > 0 ) {
@@ -707,21 +783,6 @@ namespace MyCAM.Data
 					newCAMPointList.Add( m_CAMPointList[ ( i + m_StartPoint ) % m_CAMPointList.Count ] );
 				}
 				m_CAMPointList = newCAMPointList;
-			}
-		}
-
-		void SetOrientation()
-		{
-			// reverse the cad points if is reverse
-			if( m_IsReverse ) {
-				m_CAMPointList.Reverse();
-
-				// modify start point index for closed path
-				if( IsClosed ) {
-					CAMPoint lastPoint = m_CAMPointList.Last();
-					m_CAMPointList.Remove( lastPoint );
-					m_CAMPointList.Insert( 0, lastPoint );
-				}
 			}
 		}
 
