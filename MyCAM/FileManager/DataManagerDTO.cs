@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml.Serialization;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.BRep;
 using OCC.BRepTools;
 using OCC.gp;
 using OCC.TopoDS;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace MyCAM.FileManager
 {
@@ -398,6 +398,16 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public double FrogLeapDistance
+		{
+			get; set;
+		}
+
+		public bool EnableFrogLeap
+		{
+			get; set;
+		}
+
 		// parameterless constructor (for XmlSerializer)
 		internal TraverseDataDTO()
 		{
@@ -411,11 +421,13 @@ namespace MyCAM.FileManager
 			LiftUpDistance = traverseData.LiftUpDistance;
 			CutDownDistance = traverseData.CutDownDistance;
 			FollowSafeDistance = traverseData.FollowSafeDistance;
+			FrogLeapDistance = traverseData.FrogLeapDistance;
+			EnableFrogLeap = traverseData.EnableFrogLeap;
 		}
 
 		internal TraverseData ToTraverseData()
 		{
-			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance );
+			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance, EnableFrogLeap );
 		}
 	}
 
@@ -658,7 +670,8 @@ namespace MyCAM.FileManager
 			finally {
 
 				//  clean up the temporary file
-				if( File.Exists( tempFile ) ) File.Delete( tempFile );
+				if( File.Exists( tempFile ) )
+					File.Delete( tempFile );
 			}
 		}
 
@@ -690,7 +703,8 @@ namespace MyCAM.FileManager
 			}
 			finally {
 				// clean up the temporary file
-				if( File.Exists( tempFile ) ) File.Delete( tempFile );
+				if( File.Exists( tempFile ) )
+					File.Delete( tempFile );
 			}
 		}
 	}
