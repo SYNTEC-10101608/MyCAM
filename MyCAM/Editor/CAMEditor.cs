@@ -4,7 +4,9 @@ using MyCAM.Helper;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.Aspect;
+using OCC.BRepBuilderAPI;
 using OCC.BRepPrimAPI;
+using OCC.GC;
 using OCC.Geom;
 using OCC.gp;
 using OCC.Graphic3d;
@@ -55,6 +57,7 @@ namespace MyCAM.Editor
 		List<AIS_Shape> m_LeadOrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
 		List<AIS_Line> m_OverCutAISList = new List<AIS_Line>(); // need refresh, no need activate
 		List<AIS_Line> m_TraverseAISList = new List<AIS_Line>(); // need refresh, no need activate
+		List<AIS_Shape> m_FrogLeapAISList = new List<AIS_Shape>(); // need refresh, no need activate
 
 		enum EvecType
 		{
@@ -753,7 +756,11 @@ namespace MyCAM.Editor
 			foreach( AIS_Line traverseAIS in m_TraverseAISList ) {
 				m_Viewer.GetAISContext().Remove( traverseAIS, false );
 			}
+			foreach( AIS_Shape frogLeapAIS in m_FrogLeapAISList ) {
+				m_Viewer.GetAISContext().Remove( frogLeapAIS, false );
+			}
 			m_TraverseAISList.Clear();
+			m_FrogLeapAISList.Clear();
 
 			// no need to show
 			if( m_ShowTraversePath == false ) {
@@ -786,10 +793,16 @@ namespace MyCAM.Editor
 				// frog leap
 				if( currentCamData.TraverseData.EnableFrogLeap ) {
 					CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCamData.TraverseData.FrogLeapDistance );
-					AIS_Line line2a = GetLineAIS( p2.CADPoint.Point, p3.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
-					AIS_Line line2b = GetLineAIS( p3.CADPoint.Point, p4.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
-					m_TraverseAISList.Add( line2a );
-					m_TraverseAISList.Add( line2b );
+					GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( p2.CADPoint.Point, p3.CADPoint.Point, p4.CADPoint.Point );
+					Geom_TrimmedCurve arcCurve = makeCircle.Value();
+					BRepBuilderAPI_MakeEdge makeEdge = new BRepBuilderAPI_MakeEdge( arcCurve );
+					AIS_Shape arcAIS = new AIS_Shape( makeEdge.Shape() );
+					arcAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+					arcAIS.SetWidth( 1 );
+					arcAIS.SetTransparency( 1 );
+					Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_DASH, 1 );
+					arcAIS.Attributes().SetWireAspect( prs3D_LineAspect );
+					m_FrogLeapAISList.Add( arcAIS );
 				}
 
 				// normal traverse
@@ -808,6 +821,10 @@ namespace MyCAM.Editor
 				foreach( AIS_Line rapidTraverseAIS in m_TraverseAISList ) {
 					m_Viewer.GetAISContext().Display( rapidTraverseAIS, false );
 					m_Viewer.GetAISContext().Deactivate( rapidTraverseAIS );
+				}
+				foreach( AIS_Shape frogLeapAIS in m_FrogLeapAISList ) {
+					m_Viewer.GetAISContext().Display( frogLeapAIS, false );
+					m_Viewer.GetAISContext().Deactivate( frogLeapAIS );
 				}
 			}
 		}
