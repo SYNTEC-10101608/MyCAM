@@ -179,7 +179,8 @@ namespace MyCAM.Post
 			}
 
 			// lift up point
-			PostPoint liftUpPostPoint = CreateTraversePoint( camData.LiftUpCAMPoint, master, slave );
+			//PostPoint liftUpPostPoint = CreateTraversePoint( camData.LiftUpCAMPoint, master, slave );
+			PostPoint liftUpPostPoint = new PostPoint();
 
 			// add to post data
 			pathMCSPostData.LiftUpPostPoint = liftUpPostPoint;
@@ -202,8 +203,10 @@ namespace MyCAM.Post
 			}
 
 			// cut down points
-			PostPoint cutDownPostPoint = CreateTraversePoint( camData.CutDownCAMPoint, master, slave );
-			PostPoint followSafePoint = CreateTraversePoint( camData.FollowSafeCAMPoint, master, slave );
+			//PostPoint cutDownPostPoint = CreateTraversePoint( camData.CutDownCAMPoint, master, slave );
+			//PostPoint followSafePoint = CreateTraversePoint( camData.FollowSafeCAMPoint, master, slave );
+			PostPoint cutDownPostPoint = new PostPoint();
+			PostPoint followSafePoint = new PostPoint();
 
 			// add to post data
 			pathMCSPostData.CutDownPostPoint = cutDownPostPoint;
