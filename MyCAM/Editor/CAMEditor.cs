@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Helper;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.Aspect;
@@ -21,6 +18,10 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -590,7 +591,7 @@ namespace MyCAM.Editor
 					for( int i = 0; i < camData.LeadInCAMPointList.Count - 1; i++ ) {
 						CAMPoint currentCAMPoint = camData.LeadInCAMPointList[ i ];
 						CAMPoint nextCAMPoint = camData.LeadInCAMPointList[ i + 1 ];
-						AIS_Line LeadAISLine = GetAISLine( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
 						m_LeadAISList.Add( LeadAISLine );
 					}
 				}
@@ -600,7 +601,7 @@ namespace MyCAM.Editor
 					for( int i = 0; i < camData.LeadOutCAMPointList.Count - 1; i++ ) {
 						CAMPoint currentCAMPoint = camData.LeadOutCAMPointList[ i ];
 						CAMPoint nextCAMPoint = camData.LeadOutCAMPointList[ i + 1 ];
-						AIS_Line LeadAISLine = GetAISLine( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
 						m_LeadAISList.Add( LeadAISLine );
 					}
 				}
@@ -733,7 +734,7 @@ namespace MyCAM.Editor
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				if( camData.OverCutLength > 0 ) {
 					for( int i = 0; i < camData.OverCutCAMPointList.Count - 1; i++ ) {
-						AIS_Line OverCutAISLine = GetAISLine( camData.OverCutCAMPointList[ i ].CADPoint.Point, camData.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
+						AIS_Line OverCutAISLine = GetLineAIS( camData.OverCutCAMPointList[ i ].CADPoint.Point, camData.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
 						m_OverCutAISList.Add( OverCutAISLine );
 					}
 				}
@@ -759,50 +760,55 @@ namespace MyCAM.Editor
 				return;
 			}
 			List<CAMData> camDataList = m_DataManager.GetCAMDataList();
-			if( camDataList == null || camDataList.Count == 0 ) {
+			if( camDataList == null || camDataList.Count <= 1 ) {
 				return;
 			}
-			for( int i = 0; i < camDataList.Count; i++ ) {
-				var camData = camDataList[ i ];
-				if( camData == null ) {
-					continue;
+			for( int i = 1; i < camDataList.Count; i++ ) {
+				CAMData previousCamData = camDataList[ i - 1 ];
+				CAMData currentCamData = camDataList[ i ];
+
+				// p1: end of previous path
+				// p2: lift up point of previous path
+				// p3: frog leap middle point (if frog leap)
+				// p4: cut down point of current path
+				// p5: start of current path
+				CAMPoint p1 = previousCamData.GetProcessEndPoint();
+				CAMPoint p2 = TraverseHelper.GetLiftUpPoint( previousCamData.GetProcessEndPoint(), currentCamData.TraverseData.LiftUpDistance );
+				CAMPoint p4 = TraverseHelper.GetCutDownPoint( currentCamData.GetProcessStartPoint(), currentCamData.TraverseData.CutDownDistance );
+				CAMPoint p5 = currentCamData.GetProcessStartPoint();
+
+				// lift up
+				if( currentCamData.TraverseData.LiftUpDistance > 0 ) {
+					AIS_Line line1 = GetLineAIS( p1.CADPoint.Point, p2.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+					m_TraverseAISList.Add( line1 );
 				}
 
-				// tool down point list + follow safe point list
-				List<CAMPoint> cutDownPointList = new List<CAMPoint>();
-
-				// the first path, only need cut down traverse path
-				if( i == 0 ) {
-					cutDownPointList.AddRange( GetCutDownList( camData ) );
+				// frog leap
+				if( currentCamData.TraverseData.EnableFrogLeap ) {
+					CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCamData.TraverseData.FrogLeapDistance );
+					AIS_Line line2a = GetLineAIS( p2.CADPoint.Point, p3.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+					AIS_Line line2b = GetLineAIS( p3.CADPoint.Point, p4.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+					m_TraverseAISList.Add( line2a );
+					m_TraverseAISList.Add( line2b );
 				}
+
+				// normal traverse
 				else {
-
-					// not the first path, need to add from previous path lift up point
-					var prevCamData = camDataList[ i - 1 ];
-					if( prevCamData?.LiftUpCAMPoint != null ) {
-						cutDownPointList.Add( prevCamData.LiftUpCAMPoint );
-					}
-					cutDownPointList.AddRange( GetCutDownList( camData ) );
+					AIS_Line line2 = GetLineAIS( p2.CADPoint.Point, p4.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+					m_TraverseAISList.Add( line2 );
 				}
 
-				// tool up point list
-				List<CAMPoint> liftUpPointList = new List<CAMPoint>();
-				if( camData.GetProcessEndPoint() != null ) {
-					liftUpPointList.Add( camData.GetProcessEndPoint() );
-				}
-				if( camData.LiftUpCAMPoint != null ) {
-					liftUpPointList.Add( camData.LiftUpCAMPoint );
+				// cut down
+				if( currentCamData.TraverseData.CutDownDistance > 0 ) {
+					AIS_Line line3 = GetLineAIS( p4.CADPoint.Point, p5.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+					m_TraverseAISList.Add( line3 );
 				}
 
-				// tool down + follow safe + tool up AIS lines
-				m_TraverseAISList.AddRange( GetAISLineList( cutDownPointList, Quantity_NameOfColor.Quantity_NOC_RED, 1, 0.5, true ) );
-				m_TraverseAISList.AddRange( GetAISLineList( liftUpPointList, Quantity_NameOfColor.Quantity_NOC_RED, 1, 0.5, true ) );
-			}
-
-			// Display all lines
-			foreach( AIS_Line rapidTraverseAIS in m_TraverseAISList ) {
-				m_Viewer.GetAISContext().Display( rapidTraverseAIS, false );
-				m_Viewer.GetAISContext().Deactivate( rapidTraverseAIS );
+				// Display all lines
+				foreach( AIS_Line rapidTraverseAIS in m_TraverseAISList ) {
+					m_Viewer.GetAISContext().Display( rapidTraverseAIS, false );
+					m_Viewer.GetAISContext().Deactivate( rapidTraverseAIS );
+				}
 			}
 		}
 
@@ -857,21 +863,6 @@ namespace MyCAM.Editor
 		#endregion
 
 		// methods
-		List<CAMPoint> GetCutDownList( CAMData camData )
-		{
-			List<CAMPoint> cutDownPointList = new List<CAMPoint>();
-			if( camData.CutDownCAMPoint != null ) {
-				cutDownPointList.Add( camData.CutDownCAMPoint );
-			}
-			if( camData.FollowSafeCAMPoint != null ) {
-				cutDownPointList.Add( camData.FollowSafeCAMPoint );
-			}
-			if( camData.GetProcessStartPoint() != null ) {
-				cutDownPointList.Add( camData.GetProcessStartPoint() );
-			}
-			return cutDownPointList;
-		}
-
 		bool IsModifiedToolVecIndex( int index, CAMData camData )
 		{
 			// map CAD and CAM point index
@@ -903,9 +894,9 @@ namespace MyCAM.Editor
 			return lineAIS;
 		}
 
-		AIS_Line GetAISLine( gp_Pnt leadStartPnt, gp_Pnt leadEndPnt, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1, bool isDashLine = false )
+		AIS_Line GetLineAIS( gp_Pnt startPnt, gp_Pnt endPnt, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1, bool isDashLine = false )
 		{
-			AIS_Line lineAIS = new AIS_Line( new Geom_CartesianPoint( leadStartPnt ), new Geom_CartesianPoint( leadEndPnt ) );
+			AIS_Line lineAIS = new AIS_Line( new Geom_CartesianPoint( startPnt ), new Geom_CartesianPoint( endPnt ) );
 			lineAIS.SetColor( new Quantity_Color( color ) );
 			lineAIS.SetWidth( lineWidth );
 			lineAIS.SetTransparency( dTransparancy );
@@ -930,21 +921,21 @@ namespace MyCAM.Editor
 			return coneAIS;
 		}
 
-		List<AIS_Line> GetAISLineList( List<CAMPoint> points, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1, bool isDashLine = false )
-		{
-			List<AIS_Line> newLines = new List<AIS_Line>();
-			if( points == null || points.Count < 2 ) {
-				return null;
-			}
-			for( int i = 0; i < points.Count - 1; i++ ) {
-				if( points[ i ].CADPoint.Point.IsEqual( points[ i + 1 ].CADPoint.Point, 0.001 ) ) {
-					continue;
-				}
-				var line = GetAISLine( points[ i ].CADPoint.Point, points[ i + 1 ].CADPoint.Point, color, lineWidth, dTransparancy, isDashLine );
-				newLines.Add( line );
-			}
-			return newLines;
-		}
+		//List<AIS_Line> GetAISLineList( List<CAMPoint> points, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1, bool isDashLine = false )
+		//{
+		//	List<AIS_Line> newLines = new List<AIS_Line>();
+		//	if( points == null || points.Count < 2 ) {
+		//		return null;
+		//	}
+		//	for( int i = 0; i < points.Count - 1; i++ ) {
+		//		if( points[ i ].CADPoint.Point.IsEqual( points[ i + 1 ].CADPoint.Point, 0.001 ) ) {
+		//			continue;
+		//		}
+		//		var line = GetAISLine( points[ i ].CADPoint.Point, points[ i + 1 ].CADPoint.Point, color, lineWidth, dTransparancy, isDashLine );
+		//		newLines.Add( line );
+		//	}
+		//	return newLines;
+		//}
 
 		string GetSelectedPathID()
 		{
