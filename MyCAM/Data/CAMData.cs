@@ -193,42 +193,6 @@ namespace MyCAM.Data
 			}
 		}
 
-		internal CAMPoint CutDownCAMPoint
-		{
-			get
-			{
-				if( m_IsDirty ) {
-					BuildCAMPointList();
-					m_IsDirty = false;
-				}
-				return m_CutDownCAMPoint;
-			}
-		}
-
-		internal CAMPoint LiftUpCAMPoint
-		{
-			get
-			{
-				if( m_IsDirty ) {
-					BuildCAMPointList();
-					m_IsDirty = false;
-				}
-				return m_LiftUpCAMPoint;
-			}
-		}
-
-		internal CAMPoint FollowSafeCAMPoint
-		{
-			get
-			{
-				if( m_IsDirty ) {
-					BuildCAMPointList();
-					m_IsDirty = false;
-				}
-				return m_FollowSafeCAMPoint;
-			}
-		}
-
 		public bool IsReverse
 		{
 			get
@@ -443,9 +407,6 @@ namespace MyCAM.Data
 		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
-		CAMPoint m_FollowSafeCAMPoint = null;
-		CAMPoint m_CutDownCAMPoint = null;
-		CAMPoint m_LiftUpCAMPoint = null;
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsReverse = false;
 		bool m_IsToolVecReverse = false;
@@ -595,7 +556,6 @@ namespace MyCAM.Data
 			SetOverCut();
 			SetLeadIn();
 			SetLeadout();
-			SetTraverse();
 		}
 
 		void SetToolVec()
@@ -914,37 +874,5 @@ namespace MyCAM.Data
 		}
 
 		#endregion
-
-		#region Traverse parameters setting
-
-		void SetTraverse()
-		{
-			if( m_CAMPointList.Count == 0 ) {
-				return;
-			}
-			SetFollowSafePoint();
-			SetCutDownPoint();
-			SetLiftUpPoint();
-		}
-
-		void SetFollowSafePoint()
-		{
-			CAMPoint processStartPoint = GetProcessStartPoint();
-			m_FollowSafeCAMPoint = TraverseHelper.GetFollowSafePoint( processStartPoint.Clone(), m_TraverseData.FollowSafeDistance );
-		}
-
-		void SetCutDownPoint()
-		{
-			CAMPoint processStartPoint = GetProcessStartPoint();
-			m_CutDownCAMPoint = TraverseHelper.GetCutDownPoint( processStartPoint.Clone(), m_TraverseData.CutDownDistance );
-		}
-
-		void SetLiftUpPoint()
-		{
-			CAMPoint processEndPoint = GetProcessEndPoint();
-			m_LiftUpCAMPoint = TraverseHelper.GetLiftUpPoint( processEndPoint.Clone(), m_TraverseData.LiftUpDistance );
-		}
-		#endregion
-
 	}
 }
