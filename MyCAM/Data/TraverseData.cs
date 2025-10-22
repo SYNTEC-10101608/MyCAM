@@ -13,6 +13,11 @@
 
 		public TraverseData()
 		{
+			LiftUpDistance = LIFT_UP_DISTANCE;
+			CutDownDistance = CUT_DOWN_DISTANCE;
+			FollowSafeDistance = FOLLOW_SAFE_DISTANCE;
+			FrogLeapDistance = FROG_LEAP_DISTANCE;
+			EnableFrogLeap = ENABLE_FROG_LEAP;
 		}
 
 		public double LiftUpDistance
@@ -45,10 +50,10 @@
 			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance, EnableFrogLeap );
 		}
 
-		public static double LIFT_UP_DISTANCE = 200.0;
-		public static double CUT_DOWN_DISTANCE = 200.0;
+		public static double LIFT_UP_DISTANCE = 0.0;
+		public static double CUT_DOWN_DISTANCE = 0.0;
 		public static double FOLLOW_SAFE_DISTANCE = 5.0;
-		public static double FROG_LEAP_DISTANCE = 200.0;
+		public static double FROG_LEAP_DISTANCE = 10.0;
 		public static bool ENABLE_FROG_LEAP = true;
 	}
 }

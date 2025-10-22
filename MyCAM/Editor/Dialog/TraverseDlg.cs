@@ -145,10 +145,10 @@ namespace MyCAM.Editor
 			RaiseConfirm( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_bEnableFrogLeap ) );
 		}
 
-		double m_CutDownDistance = 0;
-		double m_FollowSafeDistance = 0;
-		double m_LifUpDistance = 0;
-		double m_FrogLeapDistance = 0;
-		bool m_bEnableFrogLeap = true;
+		double m_CutDownDistance = TraverseData.CUT_DOWN_DISTANCE;
+		double m_FollowSafeDistance = TraverseData.FOLLOW_SAFE_DISTANCE;
+		double m_LifUpDistance = TraverseData.LIFT_UP_DISTANCE;
+		double m_FrogLeapDistance = TraverseData.FROG_LEAP_DISTANCE;
+		bool m_bEnableFrogLeap = TraverseData.ENABLE_FROG_LEAP;
 	}
 }
