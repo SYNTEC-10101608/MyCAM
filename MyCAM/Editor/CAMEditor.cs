@@ -938,22 +938,6 @@ namespace MyCAM.Editor
 			return coneAIS;
 		}
 
-		//List<AIS_Line> GetAISLineList( List<CAMPoint> points, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1, bool isDashLine = false )
-		//{
-		//	List<AIS_Line> newLines = new List<AIS_Line>();
-		//	if( points == null || points.Count < 2 ) {
-		//		return null;
-		//	}
-		//	for( int i = 0; i < points.Count - 1; i++ ) {
-		//		if( points[ i ].CADPoint.Point.IsEqual( points[ i + 1 ].CADPoint.Point, 0.001 ) ) {
-		//			continue;
-		//		}
-		//		var line = GetAISLine( points[ i ].CADPoint.Point, points[ i + 1 ].CADPoint.Point, color, lineWidth, dTransparancy, isDashLine );
-		//		newLines.Add( line );
-		//	}
-		//	return newLines;
-		//}
-
 		string GetSelectedPathID()
 		{
 			TreeNode selectedNode = m_TreeView.SelectedNode;
