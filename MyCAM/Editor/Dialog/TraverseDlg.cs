@@ -31,7 +31,7 @@ namespace MyCAM.Editor
 			m_chkEnableFrogLeap.Checked = Data.EnableFrogLeap;
 
 			// set field value
-			m_CutDownDistance = Data.LiftUpDistance;
+			m_CutDownDistance = Data.CutDownDistance;
 			m_FollowSafeDistance = Data.FollowSafeDistance;
 			m_LifUpDistance = Data.LiftUpDistance;
 			m_FrogLeapDistance = Data.FrogLeapDistance;
