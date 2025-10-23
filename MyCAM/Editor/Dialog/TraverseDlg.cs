@@ -53,8 +53,8 @@ namespace MyCAM.Editor
 
 		void SetCutDownDistance()
 		{
-			if( double.TryParse( m_txbCutDownDistance.Text, out double toolUpDownDistance ) && toolUpDownDistance >= 0 && toolUpDownDistance < double.MaxValue && toolUpDownDistance >= m_FollowSafeDistance ) {
-				m_CutDownDistance = toolUpDownDistance;
+			if( double.TryParse( m_txbCutDownDistance.Text, out double cutDownDistance ) && cutDownDistance >= 0 && cutDownDistance < double.MaxValue ) {
+				m_CutDownDistance = cutDownDistance;
 				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_bEnableFrogLeap ) );
 			}
 			else {
@@ -77,7 +77,7 @@ namespace MyCAM.Editor
 
 		void SetFollowSafeDistance()
 		{
-			if( double.TryParse( m_txbFollowSafeDistance.Text, out double followSafeDistance ) && followSafeDistance >= 0 && followSafeDistance < double.MaxValue && followSafeDistance <= m_CutDownDistance ) {
+			if( double.TryParse( m_txbFollowSafeDistance.Text, out double followSafeDistance ) && followSafeDistance >= 0 && followSafeDistance < double.MaxValue ) {
 				m_FollowSafeDistance = followSafeDistance;
 				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_bEnableFrogLeap ) );
 			}
