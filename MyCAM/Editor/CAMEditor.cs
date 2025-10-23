@@ -390,10 +390,12 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				return;
 			}
-
-			// stop current action
-			EndActionIfNotDefault();
-			TraverseAction action = new TraverseAction( m_DataManager );
+			bool isGetIDSuccess = ValidateSelectAndEndExAction( out string szPathID );
+			if( isGetIDSuccess == false ) {
+				return;
+			}
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			TraverseAction action = new TraverseAction( m_DataManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}

@@ -71,16 +71,14 @@ namespace MyCAM.FileManager
 			ToPartIDListDTO( dataManager.PartIDList );
 			ToPathIDListDTO( dataManager.PathIDList );
 			ToShapeIDDTO( dataManager.GetShapeIDsForDTO() );
-			ToTraverseDataDTO( dataManager.TraverseData );
 		}
 
-		internal void DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out TraverseData traverseData )
+		internal void DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs )
 		{
 			shapeMap = ShapeMapDTOToShapeMap();
 			partIDList = PartIDListDTOToPartList();
 			pathIDList = PathIDListDTOToPathList();
 			shapeIDs = ShapeIDDTOToShapeIDStruct();
-			traverseData = TraverseDataDTOToTraverseData();
 		}
 
 		#region Generate DTO
@@ -131,11 +129,6 @@ namespace MyCAM.FileManager
 		void ToShapeIDDTO( ShapeIDsStruct shapeIDs )
 		{
 			ShapeIDList = new ShapeIDsDTO( shapeIDs );
-		}
-
-		void ToTraverseDataDTO( TraverseData traverseData )
-		{
-			TraverseData = new TraverseDataDTO( traverseData );
 		}
 
 		#endregion
@@ -192,11 +185,6 @@ namespace MyCAM.FileManager
 		ShapeIDsStruct ShapeIDDTOToShapeIDStruct()
 		{
 			return ShapeIDList.ToShapeIDStruct();
-		}
-
-		TraverseData TraverseDataDTOToTraverseData()
-		{
-			return TraverseData.ToTraverseData();
 		}
 
 		#endregion
