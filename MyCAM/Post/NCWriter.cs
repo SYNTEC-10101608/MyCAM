@@ -109,7 +109,7 @@ namespace MyCAM.Post
 			string szY = postPoint.Y.ToString( "F3" );
 			string szZ = postPoint.Z.ToString( "F3" );
 			string szRotaryAxisCommand = GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI );
-			string szFollow = followSafeDistance == 0 ? string.Empty : "S" + followSafeDistance.ToString( "F3" );
+			string szFollow = followSafeDistance == 0 ? string.Empty : FOLLOW_SAFE_DISTANCE_COMMAND + followSafeDistance.ToString( "F3" );
 			m_StreamWriter.WriteLine( $"G00 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand} {szFollow};" );
 		}
 
@@ -130,7 +130,7 @@ namespace MyCAM.Post
 			string szY2 = endPoint.Y.ToString( "F3" );
 			string szZ2 = endPoint.Z.ToString( "F3" );
 			string szRotaryAxisCommand2 = GetRotaryAxisCommand( endPoint.Master * 180 / Math.PI, endPoint.Slave * 180 / Math.PI, "2=" );
-			string szFollow = followSafeDistance == 0 ? string.Empty : "S" + followSafeDistance.ToString( "F3" );
+			string szFollow = followSafeDistance == 0 ? string.Empty : FOLLOW_SAFE_DISTANCE_COMMAND + followSafeDistance.ToString( "F3" );
 			m_StreamWriter.WriteLine( $"G65 P\"FROG_LEAP\" X1={szX1} Y1={szY1} Z1={szZ1} {szRotaryAxisCommand1} " +
 				$"X2={szX2} Y2={szY2} Z2={szZ2} {szRotaryAxisCommand2} {szFollow};" );
 		}
@@ -205,5 +205,7 @@ namespace MyCAM.Post
 					return "";
 			}
 		}
+
+		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";
 	}
 }
