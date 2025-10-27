@@ -1,5 +1,4 @@
 ﻿using MyCAM.Data;
-using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +9,7 @@ namespace MyCAM.Post
 	{
 		public NCWriter( List<CAMData> processDataList, MachineData machineData )
 		{
-			if( processDataList == null || machineData == null ) {
+			if( processDataList == null || processDataList.Count == 0 || machineData == null ) {
 				return;
 			}
 			m_ProcessDataList = processDataList;
@@ -38,8 +37,18 @@ namespace MyCAM.Post
 					m_StreamWriter.WriteLine( "G53 Z0.;" ); // 機械軸復位
 					m_StreamWriter.WriteLine( "G53 " + m_MasterAxisName + "0. " + m_SlaveAxisName + "0." );
 					m_StreamWriter.WriteLine( "G43.4 P1;" ); // G43.4 新動程
+
+					// to keep last point of previous path
+					PathEndInfo endInfoOfPreviousPath = new PathEndInfo();
 					for( int i = 0; i < m_ProcessDataList.Count; i++ ) {
-						WriteCutting( m_ProcessDataList[ i ], i + 1 );
+
+						// solve all post data of the path
+						if( !PostHelper.SolvePath( m_PostSolver, endInfoOfPreviousPath, m_ProcessDataList[ i ],
+							out _, out PostData postData, out endInfoOfPreviousPath ) ) {
+							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
+							return false;
+						}
+						WriteCutting( postData, i + 1 );
 					}
 					m_StreamWriter.WriteLine( "G65 P\"FileEnd\";" );
 					m_StreamWriter.WriteLine( "M30;" ); // 程式結束
@@ -56,20 +65,16 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteCutting( CAMData cuttingProcessData, int index )
+		void WriteCutting( PostData currentPathPostData, int N_Index )
 		{
-			// solve master and slave angle
-			if( !PostHelper.SolvePath( m_PostSolver, cuttingProcessData, out _, out PostData currentPathPostData ) ) {
-				return;
-			}
+			// the N code
+			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
+			m_StreamWriter.WriteLine( "N" + N_Index );
 
-			// tool down
-			WriteOnePoint( new gp_Pnt( currentPathPostData.CutDownPostPoint.X, currentPathPostData.CutDownPostPoint.Y, currentPathPostData.CutDownPostPoint.Z ), currentPathPostData.CutDownPostPoint.Master, currentPathPostData.CutDownPostPoint.Slave, true );
-			WriteOnePoint( new gp_Pnt( currentPathPostData.FollowSafePostPoint.X, currentPathPostData.FollowSafePostPoint.Y, currentPathPostData.FollowSafePostPoint.Z ), currentPathPostData.FollowSafePostPoint.Master, currentPathPostData.FollowSafePostPoint.Slave, true );
+			// traverse from previous path to current path
+			WriteTraverse( currentPathPostData );
 
 			// start cutting
-			m_StreamWriter.WriteLine( "// Cutting" + index );
-			m_StreamWriter.WriteLine( "N" + index );
 			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\" H1;" );
 
 			// write each process path
@@ -80,28 +85,110 @@ namespace MyCAM.Post
 
 			// end cutting
 			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" );
-
-			// tool up
-			WriteOnePoint( new gp_Pnt( currentPathPostData.LiftUpPostPoint.X, currentPathPostData.LiftUpPostPoint.Y, currentPathPostData.LiftUpPostPoint.Z ), currentPathPostData.LiftUpPostPoint.Master, currentPathPostData.LiftUpPostPoint.Slave, true );
 			return;
 		}
 
-		void WriteOnePoint( gp_Pnt point, double dM, double dS, bool G00 = false )
+		void WriteOnePoint( PostPoint postPoint )
 		{
-			string szX = point.X().ToString( "F3" );
-			string szY = point.Y().ToString( "F3" );
-			string szZ = point.Z().ToString( "F3" );
-			string szM = ( dM * 180 / Math.PI ).ToString( "F3" );
-			string szS = ( dS * 180 / Math.PI ).ToString( "F3" );
-			string command = G00 ? "G00" : "G01";
-			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} {m_MasterAxisName}{szM} {m_SlaveAxisName}{szS};" );
+			if( postPoint == null ) {
+				return;
+			}
+			string szX = postPoint.X.ToString( "F3" );
+			string szY = postPoint.Y.ToString( "F3" );
+			string szZ = postPoint.Z.ToString( "F3" );
+			string szRotaryAxisCommand = GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI );
+			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand};" );
 		}
 
-		void WriteOneProcessPath( List<PostPoint> postList, bool G00 = false )
+		void WriteOneLinearTraverse( PostPoint postPoint, double followSafeDistance = 0 )
 		{
-			for( int i = 0; i < postList.Count; i++ ) {
-				var pos = postList[ i ];
-				WriteOnePoint( new gp_Pnt( pos.X, pos.Y, pos.Z ), pos.Master, pos.Slave, G00 );
+			if( postPoint == null ) {
+				return;
+			}
+			string szX = postPoint.X.ToString( "F3" );
+			string szY = postPoint.Y.ToString( "F3" );
+			string szZ = postPoint.Z.ToString( "F3" );
+			string szRotaryAxisCommand = GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI );
+			string szFollow = followSafeDistance == 0 ? string.Empty : FOLLOW_SAFE_DISTANCE_COMMAND + followSafeDistance.ToString( "F3" );
+			m_StreamWriter.WriteLine( $"G00 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand} {szFollow};" );
+		}
+
+		void WriteOneFrogLeap( PostPoint midPoint, PostPoint endPoint, double followSafeDistance = 0 )
+		{
+			if( midPoint == null || endPoint == null ) {
+				return;
+			}
+
+			// mid point
+			string szX1 = midPoint.X.ToString( "F3" );
+			string szY1 = midPoint.Y.ToString( "F3" );
+			string szZ1 = midPoint.Z.ToString( "F3" );
+			string szRotaryAxisCommand1 = GetRotaryAxisCommand( midPoint.Master * 180 / Math.PI, midPoint.Slave * 180 / Math.PI, "1=" );
+
+			// end point
+			string szX2 = endPoint.X.ToString( "F3" );
+			string szY2 = endPoint.Y.ToString( "F3" );
+			string szZ2 = endPoint.Z.ToString( "F3" );
+			string szRotaryAxisCommand2 = GetRotaryAxisCommand( endPoint.Master * 180 / Math.PI, endPoint.Slave * 180 / Math.PI, "2=" );
+			string szFollow = followSafeDistance == 0 ? string.Empty : FOLLOW_SAFE_DISTANCE_COMMAND + followSafeDistance.ToString( "F3" );
+			m_StreamWriter.WriteLine( $"G65 P\"FROG_LEAP\" X1={szX1} Y1={szY1} Z1={szZ1} {szRotaryAxisCommand1} " +
+				$"X2={szX2} Y2={szY2} Z2={szZ2} {szRotaryAxisCommand2} {szFollow};" );
+		}
+
+		string GetRotaryAxisCommand( double master_deg, double slave_deg, string szAxisCommandFix = "" )
+		{
+			string szM = m_MasterAxisName + szAxisCommandFix + master_deg.ToString( "F3" );
+			string szS = m_SlaveAxisName + szAxisCommandFix + slave_deg.ToString( "F3" );
+			if( m_MachineData.MasterRotaryAxis < m_MachineData.SlaveRotaryAxis ) {
+				return szM + " " + szS;
+			}
+			else {
+				return szS + " " + szM;
+			}
+		}
+
+		void WriteOneProcessPath( List<PostPoint> postPointList )
+		{
+			if( postPointList == null || postPointList.Count == 0 ) {
+				return;
+			}
+			for( int i = 0; i < postPointList.Count; i++ ) {
+				var onePostPoint = postPointList[ i ];
+				WriteOnePoint( onePostPoint );
+			}
+		}
+
+		void WriteTraverse( PostData currentPathPostData )
+		{
+			// lift up
+			if( currentPathPostData.LiftUpPostPoint != null ) {
+				WriteOneLinearTraverse( currentPathPostData.LiftUpPostPoint );
+			}
+
+			// frog leap with cut down
+			if( currentPathPostData.FrogLeapMidPostPoint != null && currentPathPostData.CutDownPostPoint != null ) {
+				WriteOneFrogLeap( currentPathPostData.FrogLeapMidPostPoint, currentPathPostData.CutDownPostPoint );
+
+				// cut down
+				WriteOneLinearTraverse( currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
+			}
+
+			// form leap without cut down
+			else if( currentPathPostData.FrogLeapMidPostPoint != null && currentPathPostData.CutDownPostPoint == null ) {
+				WriteOneFrogLeap( currentPathPostData.FrogLeapMidPostPoint, currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
+			}
+
+			// no frog leap
+			else if( currentPathPostData.FrogLeapMidPostPoint == null && currentPathPostData.CutDownPostPoint != null ) {
+				WriteOneLinearTraverse( currentPathPostData.CutDownPostPoint );
+
+				// cut down
+				WriteOneLinearTraverse( currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
+			}
+
+			// no frog leap and no cut down
+			else {
+				WriteOneLinearTraverse( currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
 			}
 		}
 
@@ -118,5 +205,7 @@ namespace MyCAM.Post
 					return "";
 			}
 		}
+
+		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";
 	}
 }

@@ -2,66 +2,59 @@
 {
 	public class TraverseData
 	{
-		public TraverseData( double liftUpDistance, double cutDownDistance, double followSafeDistance )
+		public TraverseData( double liftUpDistance, double cutDownDistance, double followSafeDistance, double frogLeapDistance, bool enableFrogLeap )
 		{
-			m_LiftUpDistance = liftUpDistance;
-			m_FollowSafeDistance = followSafeDistance;
-			m_CutDownDistance = cutDownDistance;
+			LiftUpDistance = liftUpDistance;
+			CutDownDistance = cutDownDistance;
+			FollowSafeDistance = followSafeDistance;
+			FrogLeapDistance = frogLeapDistance;
+			EnableFrogLeap = enableFrogLeap;
 		}
 
 		public TraverseData()
 		{
-
+			LiftUpDistance = LIFT_UP_DISTANCE;
+			CutDownDistance = CUT_DOWN_DISTANCE;
+			FollowSafeDistance = FOLLOW_SAFE_DISTANCE;
+			FrogLeapDistance = FROG_LEAP_DISTANCE;
+			EnableFrogLeap = ENABLE_FROG_LEAP;
 		}
 
 		public double LiftUpDistance
 		{
-			get
-			{
-				return m_LiftUpDistance;
-			}
-			set
-			{
-				m_LiftUpDistance = value;
-			}
+			get; set;
 		}
 
 		public double CutDownDistance
 		{
-			get
-			{
-				return m_CutDownDistance;
-			}
-			set
-			{
-				m_CutDownDistance = value;
-			}
+			get; set;
 		}
 
 		public double FollowSafeDistance
 		{
-			get
-			{
-				return m_FollowSafeDistance;
-			}
-			set
-			{
-				m_FollowSafeDistance = value;
-			}
+			get; set;
+		}
+
+		public double FrogLeapDistance
+		{
+			get; set;
+		}
+
+		public bool EnableFrogLeap
+		{
+			get; set;
 		}
 
 		public TraverseData Clone()
 		{
-			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance );
+			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance, EnableFrogLeap );
 		}
 
-		public static double LIFT_UP_DISTANCE = 200.0;
-		public static double CUT_DOWN_DISTANCE = 200.0;
+		public static double LIFT_UP_DISTANCE = 0.0;
+		public static double CUT_DOWN_DISTANCE = 0.0;
 		public static double FOLLOW_SAFE_DISTANCE = 5.0;
-
-		double m_LiftUpDistance = LIFT_UP_DISTANCE;
-		double m_CutDownDistance = CUT_DOWN_DISTANCE;
-		double m_FollowSafeDistance = FOLLOW_SAFE_DISTANCE;
+		public static double FROG_LEAP_DISTANCE = 10.0;
+		public static bool ENABLE_FROG_LEAP = true;
 	}
 }
 
