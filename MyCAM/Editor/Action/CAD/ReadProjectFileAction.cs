@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
-using System.Xml.Serialization;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.FileManager;
 using OCC.AIS;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace MyCAM.Editor
 {
@@ -52,10 +52,10 @@ namespace MyCAM.Editor
 					}
 
 					// turn DTO to data
-					dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out TraverseData traverseData );
+					dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs );
 
 					// set back to data manager
-					m_DataManager.ResetDataManger( shapeDataMap, partIDList, pathIDList, shapeIDs, traverseData );
+					m_DataManager.ResetDataManger( shapeDataMap, partIDList, pathIDList, shapeIDs );
 					UpdateAllViewData();
 				}
 				catch( Exception ex ) {

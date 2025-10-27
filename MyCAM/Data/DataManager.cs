@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using OCC.gp;
+﻿using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
+using System;
+using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
@@ -36,7 +36,7 @@ namespace MyCAM.Data
 			m_MachineData = m_DefaultMachineData;
 		}
 
-		public void ResetDataManger( Dictionary<string, ShapeData> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, TraverseData traverseData )
+		public void ResetDataManger( Dictionary<string, ShapeData> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs )
 		{
 			// check shape map is mach with partList & pathList
 			Dictionary<string, ShapeData> checkedShapeDataMap = new Dictionary<string, ShapeData>();
@@ -61,7 +61,6 @@ namespace MyCAM.Data
 			ShapeDataMap = checkedShapeDataMap;
 			PartIDList = checkedPartIDList;
 			PathIDList = checkedPathIDList;
-			m_TraverseData = traverseData;
 			ResetShapeIDsByDTO( shapeIDs );
 		}
 
@@ -78,20 +77,6 @@ namespace MyCAM.Data
 		public List<string> PathIDList
 		{
 			get; private set;
-		}
-
-		public TraverseData TraverseData
-		{
-			get
-			{
-				return m_TraverseData;
-			}
-			set
-			{
-				if( value != null ) {
-					m_TraverseData = value;
-				}
-			}
 		}
 
 		public MachineData MachineData
@@ -183,7 +168,7 @@ namespace MyCAM.Data
 				if( isValidPath ) {
 					string szID = "Path_" + ++m_PathID;
 					PathData pathData = new PathData( szID, pathWire, pathElements );
-					pathData.CAMData.TraverseData = TraverseData.Clone();
+					pathData.CAMData.TraverseData = new TraverseData();
 					ShapeDataMap[ szID ] = pathData;
 					newPathIDList.Add( szID );
 				}
@@ -321,7 +306,6 @@ namespace MyCAM.Data
 		int m_VertexID = 0;
 		int m_PathID = 0;
 
-		TraverseData m_TraverseData = new TraverseData();
 		MachineData m_MachineData = null;
 		readonly MixTypeMachineData m_DefaultMachineData = new MixTypeMachineData()
 		{

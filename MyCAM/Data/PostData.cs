@@ -6,37 +6,61 @@ namespace MyCAM.Data
 	{
 		public List<PostPoint> LeadInPostPointList
 		{
-			get; set;
+			get; private set;
 		}
 
 		public List<PostPoint> MainPathPostPointList
 		{
-			get; set;
+			get; private set;
 		}
 
 		public List<PostPoint> OverCutPostPointList
 		{
-			get; set;
+			get; private set;
 		}
 
 		public List<PostPoint> LeadOutPostPointList
 		{
-			get; set;
+			get; private set;
 		}
 
-		public PostPoint CutDownPostPoint
-		{
-			get; set;
-		}
-
+		// lift up of previous path, null meaning lift up distance is 0
 		public PostPoint LiftUpPostPoint
 		{
 			get; set;
 		}
 
-		public PostPoint FollowSafePostPoint
+		// cut down of current path, null meaning cut down distance is 0
+		public PostPoint CutDownPostPoint
 		{
 			get; set;
+		}
+
+		public double FollowSafeDistance
+		{
+			get; set;
+		}
+
+		// the center and end point of frog leap
+		public PostPoint FrogLeapMidPostPoint
+		{
+			get; set;
+		}
+
+		public PostPoint ProcessStartPoint
+		{
+			get
+			{
+				if( LeadInPostPointList != null && LeadInPostPointList.Count > 0 ) {
+					return LeadInPostPointList[ 0 ];
+				}
+				else if( MainPathPostPointList != null && MainPathPostPointList.Count > 0 ) {
+					return MainPathPostPointList[ 0 ];
+				}
+				else {
+					return null;
+				}
+			}
 		}
 
 		public PostData()
@@ -45,9 +69,10 @@ namespace MyCAM.Data
 			MainPathPostPointList = new List<PostPoint>();
 			OverCutPostPointList = new List<PostPoint>();
 			LeadOutPostPointList = new List<PostPoint>();
-			CutDownPostPoint = new PostPoint();
-			LiftUpPostPoint = new PostPoint();
-			FollowSafePostPoint = new PostPoint();
+			CutDownPostPoint = null;
+			LiftUpPostPoint = null;
+			FollowSafeDistance = 0;
+			FrogLeapMidPostPoint = null;
 		}
 	}
 
@@ -76,6 +101,17 @@ namespace MyCAM.Data
 		public double Slave
 		{
 			get; set;
+		}
+
+		public PostPoint Clone()
+		{
+			PostPoint newPoint = new PostPoint();
+			newPoint.X = X;
+			newPoint.Y = Y;
+			newPoint.Z = Z;
+			newPoint.Master = Master;
+			newPoint.Slave = Slave;
+			return newPoint;
 		}
 	}
 }

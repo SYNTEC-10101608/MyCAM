@@ -6,9 +6,16 @@ namespace MyCAM.Editor
 {
 	internal class TraverseAction : EditActionBase
 	{
-		public TraverseAction( DataManager dataManager )
+		public TraverseAction( DataManager dataManager, CAMData camData )
 			: base( dataManager )
 		{
+			if( camData == null ) {
+				throw new ArgumentNullException( "TraverseAction constructing argument camData null" );
+			}
+			m_CAMData = camData;
+
+			// when user cancel the traverse setting, need to turn path back
+			m_BackupTraverseData = m_CAMData.TraverseData.Clone();
 		}
 
 		public Action PropertyChanged;
@@ -24,7 +31,7 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			TraverseDlg traverseParamSettingFrom = new TraverseDlg( m_DataManager.TraverseData.Clone() );
+			TraverseDlg traverseParamSettingFrom = new TraverseDlg( m_CAMData.TraverseData.Clone() );
 			traverseParamSettingFrom.Confirm += ConfirmTraverseParam;
 			traverseParamSettingFrom.Preview += PreviewTraverseParam;
 			traverseParamSettingFrom.Cancel += CancelTraverseParam;
@@ -40,23 +47,23 @@ namespace MyCAM.Editor
 		void ConfirmTraverseParam( TraverseData data )
 		{
 			SetTraverseParam( data );
-			m_DataManager.TraverseData = data;
 			PropertyChanged?.Invoke();
 			End();
 		}
 
 		void CancelTraverseParam()
 		{
-			SetTraverseParam( m_DataManager.TraverseData );
+			SetTraverseParam( m_BackupTraverseData );
 			PropertyChanged?.Invoke();
 			End();
 		}
 
 		void SetTraverseParam( TraverseData data )
 		{
-			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
-				camData.TraverseData = data.Clone();
-			}
+			m_CAMData.TraverseData = data;
 		}
+
+		CAMData m_CAMData;
+		TraverseData m_BackupTraverseData;
 	}
 }

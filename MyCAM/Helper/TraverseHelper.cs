@@ -57,29 +57,39 @@ namespace MyCAM.Helper
 			return liftUpCAMPoint;
 		}
 
-		public static CAMPoint GetFollowSafePoint( CAMPoint processPathStartPoint, double followSafeDistance )
+		public static CAMPoint GetFrogLeapMiddlePoint( CAMPoint frogLeapStartPoint, CAMPoint frogLeapEndPoint, double frogLeapDistance )
 		{
-			if( processPathStartPoint == null ) {
-				return null;
-			}
-			if( followSafeDistance == 0 ) {
-				return processPathStartPoint;
-			}
-			CAMPoint startCAMPoint = processPathStartPoint.Clone();
-			gp_Vec normalizedToolVec = new gp_Vec( startCAMPoint.ToolVec );
-			normalizedToolVec.Normalize();
-			gp_Vec scaledToolVec = normalizedToolVec.Scaled( followSafeDistance );
-			gp_Pnt safePnt = startCAMPoint.CADPoint.Point.Translated( scaledToolVec );
-
-			// create safe point info
-			CADPoint safeCAMPoint = new CADPoint(
-				safePnt,
-				startCAMPoint.CADPoint.TangentVec,
-				startCAMPoint.CADPoint.NormalVec_2nd,
-				startCAMPoint.ToolVec
+			// get middle point of frog leap
+			gp_Pnt moveMidP = new gp_Pnt(
+				( frogLeapStartPoint.CADPoint.Point.X() + frogLeapEndPoint.CADPoint.Point.X() ) / 2.0,
+				( frogLeapStartPoint.CADPoint.Point.Y() + frogLeapEndPoint.CADPoint.Point.Y() ) / 2.0,
+				( frogLeapStartPoint.CADPoint.Point.Z() + frogLeapEndPoint.CADPoint.Point.Z() ) / 2.0
 			);
-			CAMPoint followSafeCAMPoint = new CAMPoint( safeCAMPoint, startCAMPoint.ToolVec );
-			return followSafeCAMPoint;
+
+			// get moving direction vector by average of tool vector
+			gp_Dir arcMidDir = new gp_Dir(
+				( frogLeapStartPoint.ToolVec.X() + frogLeapEndPoint.ToolVec.X() ) / 2.0,
+				( frogLeapStartPoint.ToolVec.Y() + frogLeapEndPoint.ToolVec.Y() ) / 2.0,
+				( frogLeapStartPoint.ToolVec.Z() + frogLeapEndPoint.ToolVec.Z() ) / 2.0
+			);
+
+			// get frog leap middle point
+			gp_Vec moveToArcMidVec = new gp_Vec( arcMidDir );
+			moveToArcMidVec.Normalize();
+			gp_Vec scaledMoveToArcMidVec = moveToArcMidVec.Scaled( frogLeapDistance );
+			gp_Pnt frogLeapMidP = moveMidP.Translated( scaledMoveToArcMidVec );
+
+			// create frog leap middle point info
+			CAMPoint frogLeapMiddlePoint = new CAMPoint(
+				new CADPoint(
+					frogLeapMidP,
+					new gp_Dir(), // doesn't matter
+					new gp_Dir(), // doesn't matter
+					new gp_Dir() // doesn't matter
+				),
+				arcMidDir
+			);
+			return frogLeapMiddlePoint;
 		}
 	}
 }

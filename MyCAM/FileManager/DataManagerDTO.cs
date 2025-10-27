@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml.Serialization;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.BRep;
 using OCC.BRepTools;
 using OCC.gp;
 using OCC.TopoDS;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace MyCAM.FileManager
 {
@@ -71,16 +71,14 @@ namespace MyCAM.FileManager
 			ToPartIDListDTO( dataManager.PartIDList );
 			ToPathIDListDTO( dataManager.PathIDList );
 			ToShapeIDDTO( dataManager.GetShapeIDsForDTO() );
-			ToTraverseDataDTO( dataManager.TraverseData );
 		}
 
-		internal void DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out TraverseData traverseData )
+		internal void DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs )
 		{
 			shapeMap = ShapeMapDTOToShapeMap();
 			partIDList = PartIDListDTOToPartList();
 			pathIDList = PathIDListDTOToPathList();
 			shapeIDs = ShapeIDDTOToShapeIDStruct();
-			traverseData = TraverseDataDTOToTraverseData();
 		}
 
 		#region Generate DTO
@@ -131,11 +129,6 @@ namespace MyCAM.FileManager
 		void ToShapeIDDTO( ShapeIDsStruct shapeIDs )
 		{
 			ShapeIDList = new ShapeIDsDTO( shapeIDs );
-		}
-
-		void ToTraverseDataDTO( TraverseData traverseData )
-		{
-			TraverseData = new TraverseDataDTO( traverseData );
 		}
 
 		#endregion
@@ -192,11 +185,6 @@ namespace MyCAM.FileManager
 		ShapeIDsStruct ShapeIDDTOToShapeIDStruct()
 		{
 			return ShapeIDList.ToShapeIDStruct();
-		}
-
-		TraverseData TraverseDataDTOToTraverseData()
-		{
-			return TraverseData.ToTraverseData();
 		}
 
 		#endregion
@@ -398,6 +386,16 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public double FrogLeapDistance
+		{
+			get; set;
+		}
+
+		public bool EnableFrogLeap
+		{
+			get; set;
+		}
+
 		// parameterless constructor (for XmlSerializer)
 		internal TraverseDataDTO()
 		{
@@ -411,11 +409,13 @@ namespace MyCAM.FileManager
 			LiftUpDistance = traverseData.LiftUpDistance;
 			CutDownDistance = traverseData.CutDownDistance;
 			FollowSafeDistance = traverseData.FollowSafeDistance;
+			FrogLeapDistance = traverseData.FrogLeapDistance;
+			EnableFrogLeap = traverseData.EnableFrogLeap;
 		}
 
 		internal TraverseData ToTraverseData()
 		{
-			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance );
+			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance, EnableFrogLeap );
 		}
 	}
 
@@ -658,7 +658,8 @@ namespace MyCAM.FileManager
 			finally {
 
 				//  clean up the temporary file
-				if( File.Exists( tempFile ) ) File.Delete( tempFile );
+				if( File.Exists( tempFile ) )
+					File.Delete( tempFile );
 			}
 		}
 
@@ -690,7 +691,8 @@ namespace MyCAM.FileManager
 			}
 			finally {
 				// clean up the temporary file
-				if( File.Exists( tempFile ) ) File.Delete( tempFile );
+				if( File.Exists( tempFile ) )
+					File.Delete( tempFile );
 			}
 		}
 	}

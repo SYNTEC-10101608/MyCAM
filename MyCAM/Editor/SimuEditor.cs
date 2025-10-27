@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.BRepAlgoAPI;
@@ -13,6 +10,9 @@ using OCC.Quantity;
 using OCC.RWStl;
 using OCC.TColStd;
 using OCCViewer;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -110,7 +110,7 @@ namespace MyCAM.Editor
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				gp_Vec G54Offset = new gp_Vec( 40, -385, -640 );
 				m_PostSolver.G54Offset = G54Offset;
-				if( PostHelper.SolvePath( m_PostSolver, camData, out PostData simuPostData, out _ ) == false ) {
+				if( PostHelper.SolvePath( m_PostSolver, new PathEndInfo(), camData, out PostData simuPostData, out _, out _ ) == false ) {
 					continue;
 				}
 
