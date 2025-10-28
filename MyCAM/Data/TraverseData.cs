@@ -8,6 +8,12 @@
 			ExitDistance = exitDistance;
 		}
 
+		public EntryAndExitData()
+		{
+			EntryDistance = ENTRY_DISTANCE;
+			ExitDistance = EXIT_DISTANCE;
+		}
+
 		public double EntryDistance
 		{
 			get; set;
@@ -22,6 +28,9 @@
 		{
 			return new EntryAndExitData( EntryDistance, ExitDistance );
 		}
+
+		public static double ENTRY_DISTANCE = 100.0;
+		public static double EXIT_DISTANCE = 100.0;
 	}
 
 	public class TraverseData
@@ -81,6 +90,3 @@
 		public static bool ENABLE_FROG_LEAP = true;
 	}
 }
-
-
-
