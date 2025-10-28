@@ -818,16 +818,32 @@ namespace MyCAM.Editor
 					AIS_Line line3 = GetLineAIS( p4.CADPoint.Point, p5.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
 					m_TraverseAISList.Add( line3 );
 				}
+			}
 
-				// Display all lines
-				foreach( AIS_Line rapidTraverseAIS in m_TraverseAISList ) {
-					m_Viewer.GetAISContext().Display( rapidTraverseAIS, false );
-					m_Viewer.GetAISContext().Deactivate( rapidTraverseAIS );
-				}
-				foreach( AIS_Shape frogLeapAIS in m_FrogLeapAISList ) {
-					m_Viewer.GetAISContext().Display( frogLeapAIS, false );
-					m_Viewer.GetAISContext().Deactivate( frogLeapAIS );
-				}
+			// entry
+			CAMPoint firstPathStartPoint = camDataList.First().GetProcessStartPoint();
+			CAMPoint entryPoint = TraverseHelper.GetCutDownPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
+			if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
+				AIS_Line entryLine = GetLineAIS( entryPoint.CADPoint.Point, firstPathStartPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+				m_TraverseAISList.Insert( 0, entryLine );
+			}
+
+			// exit
+			CAMPoint lastPathEndPoint = camDataList.Last().GetProcessEndPoint();
+			CAMPoint exitPoint = TraverseHelper.GetLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
+			if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
+				AIS_Line exitLine = GetLineAIS( lastPathEndPoint.CADPoint.Point, exitPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+				m_TraverseAISList.Add( exitLine );
+			}
+
+			// Display all lines
+			foreach( AIS_Line rapidTraverseAIS in m_TraverseAISList ) {
+				m_Viewer.GetAISContext().Display( rapidTraverseAIS, false );
+				m_Viewer.GetAISContext().Deactivate( rapidTraverseAIS );
+			}
+			foreach( AIS_Shape frogLeapAIS in m_FrogLeapAISList ) {
+				m_Viewer.GetAISContext().Display( frogLeapAIS, false );
+				m_Viewer.GetAISContext().Deactivate( frogLeapAIS );
 			}
 		}
 
