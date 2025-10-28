@@ -96,6 +96,23 @@ namespace MyCAM.Data
 			}
 		}
 
+		public EntryAndExitData EntryAndExitData
+		{
+			get
+			{
+				if( m_EntryAndExitData == null ) {
+					m_EntryAndExitData = new EntryAndExitData();
+				}
+				return m_EntryAndExitData;
+			}
+			set
+			{
+				if( value != null ) {
+					m_EntryAndExitData = value;
+				}
+			}
+		}
+
 		public void AddPart( TopoDS_Shape newShape )
 		{
 			if( newShape == null || newShape.IsNull() ) {
@@ -306,6 +323,7 @@ namespace MyCAM.Data
 		int m_VertexID = 0;
 		int m_PathID = 0;
 
+		// machine data
 		MachineData m_MachineData = null;
 		readonly MixTypeMachineData m_DefaultMachineData = new MixTypeMachineData()
 		{
@@ -320,5 +338,8 @@ namespace MyCAM.Data
 			ToolToMasterVec = new gp_Vec( 0, 101.2, 169.48 ),
 			MCSToSlaveVec = new gp_Vec( 40.81, -384.80, -665.67 ),
 		};
+
+		// entry & exit data
+		EntryAndExitData m_EntryAndExitData = new EntryAndExitData();
 	}
 }
