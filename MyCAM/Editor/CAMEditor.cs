@@ -862,9 +862,11 @@ namespace MyCAM.Editor
 			foreach( AIS_Line traverseAIS in m_TraverseAISList ) {
 				m_Viewer.GetAISContext().Remove( traverseAIS, false );
 			}
+			foreach( AIS_Shape frogLeapAIS in m_FrogLeapAISList ) {
+				m_Viewer.GetAISContext().Remove( frogLeapAIS, false );
+			}
 
 			// hide lead orientation
-			// hide orientation
 			foreach( AIS_Shape orientationAIS in m_LeadOrientationAISList ) {
 				m_Viewer.GetAISContext().Remove( orientationAIS, false );
 			}
