@@ -376,6 +376,10 @@ namespace MyCAM.Data
 
 		public CAMPoint GetProcessStartPoint()
 		{
+			if( m_IsDirty ) {
+				BuildCAMPointList();
+				m_IsDirty = false;
+			}
 			CAMPoint camPoint = null;
 			if( m_LeadInCAMPointList.Count > 0 && m_LeadParam.LeadIn.Length > 0 ) {
 				camPoint = m_LeadInCAMPointList.First().Clone();
@@ -388,6 +392,10 @@ namespace MyCAM.Data
 
 		public CAMPoint GetProcessEndPoint()
 		{
+			if( m_IsDirty ) {
+				BuildCAMPointList();
+				m_IsDirty = false;
+			}
 			CAMPoint camPoint = null;
 			if( m_LeadOutCAMPointList.Count > 0 && m_LeadParam.LeadOut.Length > 0 ) {
 				camPoint = m_LeadOutCAMPointList.Last().Clone();
