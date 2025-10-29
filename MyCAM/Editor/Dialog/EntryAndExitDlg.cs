@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace MyCAM.Editor.Dialog
+namespace MyCAM.Editor
 {
 	public partial class EntryAndExitDlg : EditDialogBase<EntryAndExitData>
 	{
