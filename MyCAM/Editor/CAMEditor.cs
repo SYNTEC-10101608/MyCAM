@@ -400,6 +400,18 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetEntryAndExitParam()
+		{
+			// is on/off button, so end it then return
+			if( IsSameAction( EditActionType.SetEntryAndExitParam ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			EntryAndExitAction action = new EntryAndExitAction( m_DataManager );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
+		}
+
 		#endregion
 
 		// TODO: refresh tree
@@ -484,7 +496,7 @@ namespace MyCAM.Editor
 		{
 			// stop current action
 			EndActionIfNotDefault();
-			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData );
+			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData, m_DataManager.EntryAndExitData );
 			bool bSuccess = writer.ConvertSuccess( out string szErrorMessage );
 			if( bSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提示]成功轉出NC", MyApp.NoticeType.Hint );
@@ -782,8 +794,8 @@ namespace MyCAM.Editor
 				// p4: cut down point of current path
 				// p5: start of current path
 				CAMPoint p1 = previousCamData.GetProcessEndPoint();
-				CAMPoint p2 = TraverseHelper.GetLiftUpPoint( previousCamData.GetProcessEndPoint(), currentCamData.TraverseData.LiftUpDistance );
-				CAMPoint p4 = TraverseHelper.GetCutDownPoint( currentCamData.GetProcessStartPoint(), currentCamData.TraverseData.CutDownDistance );
+				CAMPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( previousCamData.GetProcessEndPoint(), currentCamData.TraverseData.LiftUpDistance );
+				CAMPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCamData.GetProcessStartPoint(), currentCamData.TraverseData.CutDownDistance );
 				CAMPoint p5 = currentCamData.GetProcessStartPoint();
 
 				// lift up
@@ -796,15 +808,22 @@ namespace MyCAM.Editor
 				if( currentCamData.TraverseData.EnableFrogLeap && currentCamData.TraverseData.FrogLeapDistance > 0 ) {
 					CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCamData.TraverseData.FrogLeapDistance );
 					GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( p2.CADPoint.Point, p3.CADPoint.Point, p4.CADPoint.Point );
-					Geom_TrimmedCurve arcCurve = makeCircle.Value();
-					BRepBuilderAPI_MakeEdge makeEdge = new BRepBuilderAPI_MakeEdge( arcCurve );
-					AIS_Shape arcAIS = new AIS_Shape( makeEdge.Shape() );
-					arcAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-					arcAIS.SetWidth( 1 );
-					arcAIS.SetTransparency( 1 );
-					Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_DASH, 1 );
-					arcAIS.Attributes().SetWireAspect( prs3D_LineAspect );
-					m_FrogLeapAISList.Add( arcAIS );
+					if( makeCircle.IsDone() ) {
+						Geom_TrimmedCurve arcCurve = makeCircle.Value();
+						BRepBuilderAPI_MakeEdge makeEdge = new BRepBuilderAPI_MakeEdge( arcCurve );
+						AIS_Shape arcAIS = new AIS_Shape( makeEdge.Shape() );
+						arcAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+						arcAIS.SetWidth( 1 );
+						arcAIS.SetTransparency( 1 );
+						Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_DASH, 1 );
+						arcAIS.Attributes().SetWireAspect( prs3D_LineAspect );
+						m_FrogLeapAISList.Add( arcAIS );
+					}
+					else {
+						// fallback to normal traverse line
+						AIS_Line line2 = GetLineAIS( p2.CADPoint.Point, p4.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+						m_TraverseAISList.Add( line2 );
+					}
 				}
 
 				// normal traverse
@@ -818,16 +837,32 @@ namespace MyCAM.Editor
 					AIS_Line line3 = GetLineAIS( p4.CADPoint.Point, p5.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
 					m_TraverseAISList.Add( line3 );
 				}
+			}
 
-				// Display all lines
-				foreach( AIS_Line rapidTraverseAIS in m_TraverseAISList ) {
-					m_Viewer.GetAISContext().Display( rapidTraverseAIS, false );
-					m_Viewer.GetAISContext().Deactivate( rapidTraverseAIS );
-				}
-				foreach( AIS_Shape frogLeapAIS in m_FrogLeapAISList ) {
-					m_Viewer.GetAISContext().Display( frogLeapAIS, false );
-					m_Viewer.GetAISContext().Deactivate( frogLeapAIS );
-				}
+			// entry
+			CAMPoint firstPathStartPoint = camDataList.First().GetProcessStartPoint();
+			CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
+			if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
+				AIS_Line entryLine = GetLineAIS( entryPoint.CADPoint.Point, firstPathStartPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+				m_TraverseAISList.Insert( 0, entryLine );
+			}
+
+			// exit
+			CAMPoint lastPathEndPoint = camDataList.Last().GetProcessEndPoint();
+			CAMPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
+			if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
+				AIS_Line exitLine = GetLineAIS( lastPathEndPoint.CADPoint.Point, exitPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+				m_TraverseAISList.Add( exitLine );
+			}
+
+			// Display all lines
+			foreach( AIS_Line rapidTraverseAIS in m_TraverseAISList ) {
+				m_Viewer.GetAISContext().Display( rapidTraverseAIS, false );
+				m_Viewer.GetAISContext().Deactivate( rapidTraverseAIS );
+			}
+			foreach( AIS_Shape frogLeapAIS in m_FrogLeapAISList ) {
+				m_Viewer.GetAISContext().Display( frogLeapAIS, false );
+				m_Viewer.GetAISContext().Deactivate( frogLeapAIS );
 			}
 		}
 
@@ -862,9 +897,11 @@ namespace MyCAM.Editor
 			foreach( AIS_Line traverseAIS in m_TraverseAISList ) {
 				m_Viewer.GetAISContext().Remove( traverseAIS, false );
 			}
+			foreach( AIS_Shape frogLeapAIS in m_FrogLeapAISList ) {
+				m_Viewer.GetAISContext().Remove( frogLeapAIS, false );
+			}
 
 			// hide lead orientation
-			// hide orientation
 			foreach( AIS_Shape orientationAIS in m_LeadOrientationAISList ) {
 				m_Viewer.GetAISContext().Remove( orientationAIS, false );
 			}

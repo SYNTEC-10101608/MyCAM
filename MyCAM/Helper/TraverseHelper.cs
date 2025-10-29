@@ -5,56 +5,29 @@ namespace MyCAM.Helper
 {
 	internal static class TraverseHelper
 	{
-		public static CAMPoint GetCutDownPoint( CAMPoint processPathStartPoint, double cutDownDistance )
+		public static CAMPoint GetCutDownOrLiftUpPoint( CAMPoint pathPoint, double dDistance )
 		{
-			if( processPathStartPoint == null ) {
+			if( pathPoint == null ) {
 				return null;
 			}
-			if( cutDownDistance == 0 ) {
-				return processPathStartPoint;
+			if( dDistance == 0 ) {
+				return pathPoint.Clone();
 			}
 
 			// get cut down point
-			CAMPoint startPoint = processPathStartPoint.Clone();
-			gp_Vec toolVec = new gp_Vec( startPoint.ToolVec );
+			gp_Vec toolVec = new gp_Vec( pathPoint.ToolVec );
 			toolVec.Normalize();
-			gp_Vec scaledToolVec = toolVec.Scaled( cutDownDistance );
-			gp_Pnt toolDownPnt = startPoint.CADPoint.Point.Translated( scaledToolVec );
+			gp_Vec scaledToolVec = toolVec.Scaled( dDistance );
+			gp_Pnt resultPoint = pathPoint.CADPoint.Point.Translated( scaledToolVec );
 
 			// create tool up/down point info
-			CADPoint cutDownCADPoint = new CADPoint(
-				toolDownPnt,
-				startPoint.CADPoint.TangentVec,
-				startPoint.CADPoint.NormalVec_2nd,
-				startPoint.ToolVec
+			CADPoint resultCAMPoint = new CADPoint(
+				resultPoint,
+				pathPoint.CADPoint.NormalVec_1st,
+				pathPoint.CADPoint.NormalVec_2nd,
+				pathPoint.CADPoint.TangentVec
 			);
-			CAMPoint cutDownCAMPoint = new CAMPoint( cutDownCADPoint, startPoint.ToolVec );
-			return cutDownCAMPoint;
-		}
-
-		public static CAMPoint GetLiftUpPoint( CAMPoint processPathEndPoint, double liftUpDistance )
-		{
-			if( processPathEndPoint == null ) {
-				return null;
-			}
-			if( liftUpDistance == 0 ) {
-				return processPathEndPoint;
-			}
-			CAMPoint startPoint = processPathEndPoint.Clone();
-			gp_Vec toolVec = new gp_Vec( startPoint.ToolVec );
-			toolVec.Normalize();
-			gp_Vec scaledToolVec = toolVec.Scaled( liftUpDistance );
-			gp_Pnt liftUpPnt = startPoint.CADPoint.Point.Translated( scaledToolVec );
-
-			// create tool up/down point info
-			CADPoint liftUpCADPoint = new CADPoint(
-				liftUpPnt,
-				startPoint.CADPoint.TangentVec,
-				startPoint.CADPoint.NormalVec_2nd,
-				startPoint.ToolVec
-			);
-			CAMPoint liftUpCAMPoint = new CAMPoint( liftUpCADPoint, startPoint.ToolVec );
-			return liftUpCAMPoint;
+			return new CAMPoint( resultCAMPoint, pathPoint.ToolVec );
 		}
 
 		public static CAMPoint GetFrogLeapMiddlePoint( CAMPoint frogLeapStartPoint, CAMPoint frogLeapEndPoint, double frogLeapDistance )
@@ -65,13 +38,21 @@ namespace MyCAM.Helper
 				( frogLeapStartPoint.CADPoint.Point.Y() + frogLeapEndPoint.CADPoint.Point.Y() ) / 2.0,
 				( frogLeapStartPoint.CADPoint.Point.Z() + frogLeapEndPoint.CADPoint.Point.Z() ) / 2.0
 			);
+			gp_Dir arcMidDir;
+
+			// if tool vectors are parallel, use Z axis as moving direction
+			if( frogLeapStartPoint.ToolVec.IsParallel( frogLeapEndPoint.ToolVec, 1e-6 ) ) {
+				arcMidDir = new gp_Dir( 0, 0, 1 );
+			}
 
 			// get moving direction vector by average of tool vector
-			gp_Dir arcMidDir = new gp_Dir(
+			else {
+				arcMidDir = new gp_Dir(
 				( frogLeapStartPoint.ToolVec.X() + frogLeapEndPoint.ToolVec.X() ) / 2.0,
 				( frogLeapStartPoint.ToolVec.Y() + frogLeapEndPoint.ToolVec.Y() ) / 2.0,
 				( frogLeapStartPoint.ToolVec.Z() + frogLeapEndPoint.ToolVec.Z() ) / 2.0
 			);
+			}
 
 			// get frog leap middle point
 			gp_Vec moveToArcMidVec = new gp_Vec( arcMidDir );

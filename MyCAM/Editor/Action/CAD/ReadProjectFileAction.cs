@@ -52,10 +52,10 @@ namespace MyCAM.Editor
 					}
 
 					// turn DTO to data
-					dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs );
+					dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData );
 
 					// set back to data manager
-					m_DataManager.ResetDataManger( shapeDataMap, partIDList, pathIDList, shapeIDs );
+					m_DataManager.ResetDataManger( shapeDataMap, partIDList, pathIDList, shapeIDs, entryAndExitData );
 					UpdateAllViewData();
 				}
 				catch( Exception ex ) {

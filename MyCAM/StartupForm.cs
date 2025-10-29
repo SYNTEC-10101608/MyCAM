@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
-using System.Xml.Linq;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using MyCAM.Helper;
@@ -13,6 +7,12 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace MyCAM
 {
@@ -352,6 +352,11 @@ namespace MyCAM
 			m_CAMEditor.SeTraverseParam();
 		}
 
+		void m_tsbEntryAndExitSetting_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetEntryAndExitParam();
+		}
+
 		// convert NC
 		void m_tsbConvertNC_Click( object sender, EventArgs e )
 		{
@@ -500,6 +505,10 @@ namespace MyCAM
 						m_tsbTraverseParamSetting.BackColor = DEFAULT_BtnColor;
 						OnCAMDlgActionStatusChange( actionStatus );
 						break;
+					case EditActionType.SetEntryAndExitParam:
+						m_tsbEntryAndExitSetting.BackColor = DEFAULT_BtnColor;
+						OnCAMDlgActionStatusChange( actionStatus );
+						break;
 					default:
 						break;
 				}
@@ -546,6 +555,10 @@ namespace MyCAM
 					break;
 				case EditActionType.SetTraverseParam:
 					m_tsbTraverseParamSetting.BackColor = ON_ButtonColor;
+					OnCAMDlgActionStatusChange( actionStatus );
+					break;
+				case EditActionType.SetEntryAndExitParam:
+					m_tsbEntryAndExitSetting.BackColor = ON_ButtonColor;
 					OnCAMDlgActionStatusChange( actionStatus );
 					break;
 				default:
