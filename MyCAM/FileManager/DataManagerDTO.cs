@@ -49,11 +49,11 @@ namespace MyCAM.FileManager
 			set;
 		} = new ShapeIDsDTO();
 
-		public TraverseDataDTO TraverseData
+		public EntryAndExitDataDTO EntryAndExitData
 		{
 			get;
 			set;
-		} = new TraverseDataDTO();
+		} = new EntryAndExitDataDTO();
 
 		#endregion
 
@@ -71,14 +71,16 @@ namespace MyCAM.FileManager
 			ToPartIDListDTO( dataManager.PartIDList );
 			ToPathIDListDTO( dataManager.PathIDList );
 			ToShapeIDDTO( dataManager.GetShapeIDsForDTO() );
+			ToEntryAndExitDataDTO( dataManager.EntryAndExitData );
 		}
 
-		internal void DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs )
+		internal void DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData )
 		{
 			shapeMap = ShapeMapDTOToShapeMap();
 			partIDList = PartIDListDTOToPartList();
 			pathIDList = PathIDListDTOToPathList();
 			shapeIDs = ShapeIDDTOToShapeIDStruct();
+			entryAndExitData = EntryAndExitDTOToEntryAndExitData();
 		}
 
 		#region Generate DTO
@@ -129,6 +131,11 @@ namespace MyCAM.FileManager
 		void ToShapeIDDTO( ShapeIDsStruct shapeIDs )
 		{
 			ShapeIDList = new ShapeIDsDTO( shapeIDs );
+		}
+
+		void ToEntryAndExitDataDTO( EntryAndExitData entryAndExitData )
+		{
+			EntryAndExitData = new EntryAndExitDataDTO( entryAndExitData );
 		}
 
 		#endregion
@@ -185,6 +192,11 @@ namespace MyCAM.FileManager
 		ShapeIDsStruct ShapeIDDTOToShapeIDStruct()
 		{
 			return ShapeIDList.ToShapeIDStruct();
+		}
+
+		EntryAndExitData EntryAndExitDTOToEntryAndExitData()
+		{
+			return EntryAndExitData.ToEntryAndExitData();
 		}
 
 		#endregion
@@ -416,6 +428,40 @@ namespace MyCAM.FileManager
 		internal TraverseData ToTraverseData()
 		{
 			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance, EnableFrogLeap );
+		}
+	}
+
+	public class EntryAndExitDataDTO
+	{
+		public double EntryDistance
+		{
+			get;
+			set;
+		}
+
+		public double ExitDistance
+		{
+			get;
+			set;
+		}
+
+		// parameterless constructor (for XmlSerializer)
+		internal EntryAndExitDataDTO()
+		{
+		}
+
+		internal EntryAndExitDataDTO( EntryAndExitData entryAndExitData )
+		{
+			if( entryAndExitData == null ) {
+				return;
+			}
+			EntryDistance = entryAndExitData.EntryDistance;
+			ExitDistance = entryAndExitData.ExitDistance;
+		}
+
+		internal EntryAndExitData ToEntryAndExitData()
+		{
+			return new EntryAndExitData( EntryDistance, ExitDistance );
 		}
 	}
 
@@ -658,8 +704,9 @@ namespace MyCAM.FileManager
 			finally {
 
 				//  clean up the temporary file
-				if( File.Exists( tempFile ) )
+				if( File.Exists( tempFile ) ) {
 					File.Delete( tempFile );
+				}
 			}
 		}
 

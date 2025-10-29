@@ -36,7 +36,7 @@ namespace MyCAM.Data
 			m_MachineData = m_DefaultMachineData;
 		}
 
-		public void ResetDataManger( Dictionary<string, ShapeData> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs )
+		public void ResetDataManger( Dictionary<string, ShapeData> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData )
 		{
 			// check shape map is mach with partList & pathList
 			Dictionary<string, ShapeData> checkedShapeDataMap = new Dictionary<string, ShapeData>();
@@ -61,6 +61,7 @@ namespace MyCAM.Data
 			ShapeDataMap = checkedShapeDataMap;
 			PartIDList = checkedPartIDList;
 			PathIDList = checkedPathIDList;
+			EntryAndExitData = entryAndExitData;
 			ResetShapeIDsByDTO( shapeIDs );
 		}
 
