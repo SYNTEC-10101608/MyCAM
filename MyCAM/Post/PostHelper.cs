@@ -33,7 +33,7 @@ namespace MyCAM.Post
 	{
 		public static bool SolvePath( PostSolver postSolver, CAMData currentCAMData, PathEndInfo endInfoOfPreviousPath,
 			bool isFirstPath, bool isLastPath, EntryAndExitData entryAndExitData,
-			out PostData pathG54PostData, out PostData pathMCSPostData, out PathEndInfo currenPathtEndInfo )
+			out PostData pathG54PostData, out PostData pathMCSPostData, out PathEndInfo currentPathtEndInfo )
 		{
 			// for simulation
 			pathMCSPostData = new PostData();
@@ -42,7 +42,7 @@ namespace MyCAM.Post
 			pathG54PostData = new PostData();
 
 			// to make solution continuous
-			currenPathtEndInfo = new PathEndInfo();
+			currentPathtEndInfo = new PathEndInfo();
 			if( postSolver == null || endInfoOfPreviousPath == null || currentCAMData == null ) {
 				return false;
 			}
@@ -118,7 +118,7 @@ namespace MyCAM.Post
 			}
 
 			// end info of current path
-			currenPathtEndInfo = new PathEndInfo()
+			currentPathtEndInfo = new PathEndInfo()
 			{
 				IsExist = true,
 				EndCAMPoint = currentCAMData.GetProcessEndPoint(),
