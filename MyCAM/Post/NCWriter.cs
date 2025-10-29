@@ -67,10 +67,6 @@ namespace MyCAM.Post
 				}
 				return true;
 			}
-			catch( IOException ioEx ) {
-				errorMessage = ioEx.Message;
-				return false;
-			}
 			catch( Exception ex ) {
 				errorMessage = ex.Message;
 				return false;
