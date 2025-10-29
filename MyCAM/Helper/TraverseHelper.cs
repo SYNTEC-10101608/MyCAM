@@ -38,13 +38,21 @@ namespace MyCAM.Helper
 				( frogLeapStartPoint.CADPoint.Point.Y() + frogLeapEndPoint.CADPoint.Point.Y() ) / 2.0,
 				( frogLeapStartPoint.CADPoint.Point.Z() + frogLeapEndPoint.CADPoint.Point.Z() ) / 2.0
 			);
+			gp_Dir arcMidDir;
+
+			// if tool vectors are parallel, use Z axis as moving direction
+			if( frogLeapStartPoint.ToolVec.IsParallel( frogLeapEndPoint.ToolVec, 1e-6 ) ) {
+				arcMidDir = new gp_Dir( 0, 0, 1 );
+			}
 
 			// get moving direction vector by average of tool vector
-			gp_Dir arcMidDir = new gp_Dir(
+			else {
+				arcMidDir = new gp_Dir(
 				( frogLeapStartPoint.ToolVec.X() + frogLeapEndPoint.ToolVec.X() ) / 2.0,
 				( frogLeapStartPoint.ToolVec.Y() + frogLeapEndPoint.ToolVec.Y() ) / 2.0,
 				( frogLeapStartPoint.ToolVec.Z() + frogLeapEndPoint.ToolVec.Z() ) / 2.0
 			);
+			}
 
 			// get frog leap middle point
 			gp_Vec moveToArcMidVec = new gp_Vec( arcMidDir );

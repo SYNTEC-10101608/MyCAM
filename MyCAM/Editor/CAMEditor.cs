@@ -796,15 +796,22 @@ namespace MyCAM.Editor
 				if( currentCamData.TraverseData.EnableFrogLeap && currentCamData.TraverseData.FrogLeapDistance > 0 ) {
 					CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCamData.TraverseData.FrogLeapDistance );
 					GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( p2.CADPoint.Point, p3.CADPoint.Point, p4.CADPoint.Point );
-					Geom_TrimmedCurve arcCurve = makeCircle.Value();
-					BRepBuilderAPI_MakeEdge makeEdge = new BRepBuilderAPI_MakeEdge( arcCurve );
-					AIS_Shape arcAIS = new AIS_Shape( makeEdge.Shape() );
-					arcAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-					arcAIS.SetWidth( 1 );
-					arcAIS.SetTransparency( 1 );
-					Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_DASH, 1 );
-					arcAIS.Attributes().SetWireAspect( prs3D_LineAspect );
-					m_FrogLeapAISList.Add( arcAIS );
+					if( makeCircle.IsDone() ) {
+						Geom_TrimmedCurve arcCurve = makeCircle.Value();
+						BRepBuilderAPI_MakeEdge makeEdge = new BRepBuilderAPI_MakeEdge( arcCurve );
+						AIS_Shape arcAIS = new AIS_Shape( makeEdge.Shape() );
+						arcAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+						arcAIS.SetWidth( 1 );
+						arcAIS.SetTransparency( 1 );
+						Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_DASH, 1 );
+						arcAIS.Attributes().SetWireAspect( prs3D_LineAspect );
+						m_FrogLeapAISList.Add( arcAIS );
+					}
+					else {
+						// fallback to normal traverse line
+						AIS_Line line2 = GetLineAIS( p2.CADPoint.Point, p4.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+						m_TraverseAISList.Add( line2 );
+					}
 				}
 
 				// normal traverse
