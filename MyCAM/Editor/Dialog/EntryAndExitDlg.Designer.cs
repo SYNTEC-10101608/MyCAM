@@ -1,4 +1,4 @@
-﻿namespace MyCAM.Editor.Dialog
+﻿namespace MyCAM.Editor
 {
 	partial class EntryAndExitDlg
 	{
