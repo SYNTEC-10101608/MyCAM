@@ -400,6 +400,18 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetEntryAndExitParam()
+		{
+			// is on/off button, so end it then return
+			if( IsSameAction( EditActionType.SetEntryAndExitParam ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			EntryAndExitAction action = new EntryAndExitAction( m_DataManager );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
+		}
+
 		#endregion
 
 		// TODO: refresh tree
