@@ -47,7 +47,7 @@ namespace MyCAM.Post
 						// solve all post data of the path
 						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessDataList[ i ],
 							endInfoOfPreviousPath, i == 0, i == m_ProcessDataList.Count - 1, m_EntryAndExitData,
-							out _, out PostData postData, out endInfoOfPreviousPath ) ) {
+							out PostData postData, out _, out endInfoOfPreviousPath ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 							return false;
 						}
@@ -58,7 +58,7 @@ namespace MyCAM.Post
 					if( m_ProcessDataList.Count > 0 ) {
 
 						// calculate exit point
-						PostHelper.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out _, out PostPoint exitPoint );
+						PostHelper.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out PostPoint exitPoint, out _ );
 						m_StreamWriter.WriteLine( "// Exit" );
 						WriteOneLinearTraverse( exitPoint );
 					}
