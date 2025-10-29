@@ -354,7 +354,7 @@ namespace MyCAM
 
 		void m_tsbEntryAndExitSetting_Click( object sender, EventArgs e )
 		{
-
+			m_CAMEditor.SetEntryAndExitParam();
 		}
 
 		// convert NC
