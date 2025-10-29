@@ -16,5 +16,30 @@ namespace MyCAM.Editor.Dialog
 		{
 			InitializeComponent();
 		}
+
+		private void m_btnConfirm_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void m_txbEntryDistance_KeyDown( object sender, KeyEventArgs e )
+		{
+
+		}
+
+		private void m_txbEntryDistance_Leave( object sender, EventArgs e )
+		{
+
+		}
+
+		private void m_txbExitDistance_KeyDown( object sender, KeyEventArgs e )
+		{
+
+		}
+
+		private void m_txbExitDistance_Leave( object sender, EventArgs e )
+		{
+
+		}
 	}
 }
