@@ -735,6 +735,7 @@
 			this.m_tsbEntryAndExitSetting.Name = "m_tsbEntryAndExitSetting";
 			this.m_tsbEntryAndExitSetting.Size = new System.Drawing.Size(44, 18);
 			this.m_tsbEntryAndExitSetting.Text = "進入/退出";
+			this.m_tsbEntryAndExitSetting.Click += new System.EventHandler(this.m_tsbEntryAndExitSetting_Click);
 			// 
 			// StartupForm
 			// 
