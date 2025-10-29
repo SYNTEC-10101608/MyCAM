@@ -58,6 +58,7 @@
     <Compile Include="Data\TraverseData.cs" />
     <Compile Include="Editor\Action\CAD\AddLineAction.cs" />
     <Compile Include="Editor\Action\CAD\AxisTransformAction.cs" />
+    <Compile Include="Editor\Action\CAM\EntryAndExitAction.cs" />
     <Compile Include="Editor\Action\CAM\LeadAction.cs" />
     <Compile Include="Editor\Action\CAM\OverCutAction.cs" />
     <Compile Include="Editor\Action\CAM\TraverseAction.cs" />
