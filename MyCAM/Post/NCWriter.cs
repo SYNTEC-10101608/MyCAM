@@ -7,9 +7,9 @@ namespace MyCAM.Post
 {
 	internal class NCWriter
 	{
-		public NCWriter( List<CAMData> processDataList, MachineData machineData )
+		public NCWriter( List<CAMData> processDataList, MachineData machineData, EntryAndExitData entryAndExitData )
 		{
-			if( processDataList == null || processDataList.Count == 0 || machineData == null ) {
+			if( processDataList == null || processDataList.Count == 0 || machineData == null || entryAndExitData == null ) {
 				return;
 			}
 			m_ProcessDataList = processDataList;
@@ -17,6 +17,7 @@ namespace MyCAM.Post
 			m_PostSolver = new PostSolver( machineData );
 			m_MasterAxisName = ConvertRotaryAxisName( m_MachineData.MasterRotaryAxis );
 			m_SlaveAxisName = ConvertRotaryAxisName( m_MachineData.SlaveRotaryAxis );
+			m_EntryAndExitData = entryAndExitData;
 		}
 
 		List<CAMData> m_ProcessDataList;
@@ -25,6 +26,7 @@ namespace MyCAM.Post
 		MachineData m_MachineData;
 		string m_MasterAxisName = string.Empty;
 		string m_SlaveAxisName = string.Empty;
+		EntryAndExitData m_EntryAndExitData;
 
 		public bool ConvertSuccess( out string errorMessage )
 		{
@@ -43,12 +45,22 @@ namespace MyCAM.Post
 					for( int i = 0; i < m_ProcessDataList.Count; i++ ) {
 
 						// solve all post data of the path
-						if( !PostHelper.SolvePath( m_PostSolver, endInfoOfPreviousPath, m_ProcessDataList[ i ],
+						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessDataList[ i ],
+							endInfoOfPreviousPath, i == 0, i == m_ProcessDataList.Count - 1, m_EntryAndExitData,
 							out _, out PostData postData, out endInfoOfPreviousPath ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 							return false;
 						}
 						WriteCutting( postData, i + 1 );
+					}
+
+					// write exit
+					if( m_ProcessDataList.Count > 0 ) {
+
+						// calculate exit point
+						PostHelper.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out _, out PostPoint exitPoint );
+						m_StreamWriter.WriteLine( "// Exit" );
+						WriteOneLinearTraverse( exitPoint );
 					}
 					m_StreamWriter.WriteLine( "G65 P\"FileEnd\";" );
 					m_StreamWriter.WriteLine( "M30;" ); // 程式結束
