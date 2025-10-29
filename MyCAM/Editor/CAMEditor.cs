@@ -782,8 +782,8 @@ namespace MyCAM.Editor
 				// p4: cut down point of current path
 				// p5: start of current path
 				CAMPoint p1 = previousCamData.GetProcessEndPoint();
-				CAMPoint p2 = TraverseHelper.GetLiftUpPoint( previousCamData.GetProcessEndPoint(), currentCamData.TraverseData.LiftUpDistance );
-				CAMPoint p4 = TraverseHelper.GetCutDownPoint( currentCamData.GetProcessStartPoint(), currentCamData.TraverseData.CutDownDistance );
+				CAMPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( previousCamData.GetProcessEndPoint(), currentCamData.TraverseData.LiftUpDistance );
+				CAMPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCamData.GetProcessStartPoint(), currentCamData.TraverseData.CutDownDistance );
 				CAMPoint p5 = currentCamData.GetProcessStartPoint();
 
 				// lift up
@@ -822,7 +822,7 @@ namespace MyCAM.Editor
 
 			// entry
 			CAMPoint firstPathStartPoint = camDataList.First().GetProcessStartPoint();
-			CAMPoint entryPoint = TraverseHelper.GetCutDownPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
+			CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
 			if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
 				AIS_Line entryLine = GetLineAIS( entryPoint.CADPoint.Point, firstPathStartPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
 				m_TraverseAISList.Insert( 0, entryLine );
@@ -830,7 +830,7 @@ namespace MyCAM.Editor
 
 			// exit
 			CAMPoint lastPathEndPoint = camDataList.Last().GetProcessEndPoint();
-			CAMPoint exitPoint = TraverseHelper.GetLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
+			CAMPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
 			if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
 				AIS_Line exitLine = GetLineAIS( lastPathEndPoint.CADPoint.Point, exitPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
 				m_TraverseAISList.Add( exitLine );

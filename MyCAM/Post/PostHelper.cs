@@ -131,7 +131,7 @@ namespace MyCAM.Post
 		public static void CalculateExit( PathEndInfo endInfoOfLastPath, EntryAndExitData entryAndExitData,
 			out PostPoint G54ExitPoint, out PostPoint MCSExitPoint )
 		{
-			CAMPoint exitPoint = TraverseHelper.GetLiftUpPoint( endInfoOfLastPath.EndCAMPoint, entryAndExitData.ExitDistance );
+			CAMPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfLastPath.EndCAMPoint, entryAndExitData.ExitDistance );
 
 			// G54
 			G54ExitPoint = new PostPoint()
@@ -237,8 +237,8 @@ namespace MyCAM.Post
 			// p4: cut down point of current path
 			// p5: start of current path (not used here)
 			CAMPoint p1 = endInfoOfPreviousPath.EndCAMPoint;
-			CAMPoint p2 = TraverseHelper.GetLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, currentCAMData.TraverseData.LiftUpDistance );
-			CAMPoint p4 = TraverseHelper.GetCutDownPoint( currentCAMData.GetProcessStartPoint(), currentCAMData.TraverseData.CutDownDistance );
+			CAMPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, currentCAMData.TraverseData.LiftUpDistance );
+			CAMPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCAMData.GetProcessStartPoint(), currentCAMData.TraverseData.CutDownDistance );
 			CAMPoint p5 = currentCAMData.GetProcessStartPoint();
 
 			// lift up
@@ -319,7 +319,7 @@ namespace MyCAM.Post
 
 		static void CalculateEntry( CAMData currentCAMData, EntryAndExitData entryAndExitData, ref PostData pathG54PostData, ref PostData pathMCSPostData )
 		{
-			CAMPoint entryPoint = TraverseHelper.GetCutDownPoint( currentCAMData.GetProcessStartPoint(), entryAndExitData.EntryDistance );
+			CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( currentCAMData.GetProcessStartPoint(), entryAndExitData.EntryDistance );
 
 			// G54
 			pathG54PostData.CutDownPostPoint = new PostPoint()
