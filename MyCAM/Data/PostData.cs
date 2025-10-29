@@ -49,18 +49,7 @@ namespace MyCAM.Data
 
 		public PostPoint ProcessStartPoint
 		{
-			get
-			{
-				if( LeadInPostPointList != null && LeadInPostPointList.Count > 0 ) {
-					return LeadInPostPointList[ 0 ];
-				}
-				else if( MainPathPostPointList != null && MainPathPostPointList.Count > 0 ) {
-					return MainPathPostPointList[ 0 ];
-				}
-				else {
-					return null;
-				}
-			}
+			get; set;
 		}
 
 		public PostData()

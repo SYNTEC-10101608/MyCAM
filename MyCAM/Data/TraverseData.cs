@@ -1,5 +1,38 @@
 ﻿namespace MyCAM.Data
 {
+	public class EntryAndExitData
+	{
+		public EntryAndExitData( double entryDistance, double exitDistance )
+		{
+			EntryDistance = entryDistance;
+			ExitDistance = exitDistance;
+		}
+
+		public EntryAndExitData()
+		{
+			EntryDistance = ENTRY_DISTANCE;
+			ExitDistance = EXIT_DISTANCE;
+		}
+
+		public double EntryDistance
+		{
+			get; set;
+		}
+
+		public double ExitDistance
+		{
+			get; set;
+		}
+
+		public EntryAndExitData Clone()
+		{
+			return new EntryAndExitData( EntryDistance, ExitDistance );
+		}
+
+		public static double ENTRY_DISTANCE = 100.0;
+		public static double EXIT_DISTANCE = 100.0;
+	}
+
 	public class TraverseData
 	{
 		public TraverseData( double liftUpDistance, double cutDownDistance, double followSafeDistance, double frogLeapDistance, bool enableFrogLeap )
@@ -57,6 +90,3 @@
 		public static bool ENABLE_FROG_LEAP = true;
 	}
 }
-
-
-

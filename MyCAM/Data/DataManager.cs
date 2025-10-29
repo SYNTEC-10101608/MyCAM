@@ -36,7 +36,7 @@ namespace MyCAM.Data
 			m_MachineData = m_DefaultMachineData;
 		}
 
-		public void ResetDataManger( Dictionary<string, ShapeData> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs )
+		public void ResetDataManger( Dictionary<string, ShapeData> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData )
 		{
 			// check shape map is mach with partList & pathList
 			Dictionary<string, ShapeData> checkedShapeDataMap = new Dictionary<string, ShapeData>();
@@ -61,6 +61,7 @@ namespace MyCAM.Data
 			ShapeDataMap = checkedShapeDataMap;
 			PartIDList = checkedPartIDList;
 			PathIDList = checkedPathIDList;
+			EntryAndExitData = entryAndExitData;
 			ResetShapeIDsByDTO( shapeIDs );
 		}
 
@@ -92,6 +93,23 @@ namespace MyCAM.Data
 			{
 				if( value != null ) {
 					m_MachineData = value;
+				}
+			}
+		}
+
+		public EntryAndExitData EntryAndExitData
+		{
+			get
+			{
+				if( m_EntryAndExitData == null ) {
+					m_EntryAndExitData = new EntryAndExitData();
+				}
+				return m_EntryAndExitData;
+			}
+			set
+			{
+				if( value != null ) {
+					m_EntryAndExitData = value;
 				}
 			}
 		}
@@ -306,6 +324,7 @@ namespace MyCAM.Data
 		int m_VertexID = 0;
 		int m_PathID = 0;
 
+		// machine data
 		MachineData m_MachineData = null;
 		readonly MixTypeMachineData m_DefaultMachineData = new MixTypeMachineData()
 		{
@@ -320,5 +339,8 @@ namespace MyCAM.Data
 			ToolToMasterVec = new gp_Vec( 0, 101.2, 169.48 ),
 			MCSToSlaveVec = new gp_Vec( 40.81, -384.80, -665.67 ),
 		};
+
+		// entry & exit data
+		EntryAndExitData m_EntryAndExitData = new EntryAndExitData();
 	}
 }

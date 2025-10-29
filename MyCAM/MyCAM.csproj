@@ -58,6 +58,7 @@
     <Compile Include="Data\TraverseData.cs" />
     <Compile Include="Editor\Action\CAD\AddLineAction.cs" />
     <Compile Include="Editor\Action\CAD\AxisTransformAction.cs" />
+    <Compile Include="Editor\Action\CAM\EntryAndExitAction.cs" />
     <Compile Include="Editor\Action\CAM\LeadAction.cs" />
     <Compile Include="Editor\Action\CAM\OverCutAction.cs" />
     <Compile Include="Editor\Action\CAM\TraverseAction.cs" />
@@ -65,6 +66,12 @@
     <Compile Include="Editor\Action\CAD\SaveProjectFileAction.cs" />
     <Compile Include="Editor\Dialog\EditDialogBase.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\EntryAndExitDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\EntryAndExitDlg.Designer.cs">
+      <DependentUpon>EntryAndExitDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Dialog\TraverseDlg.cs">
       <SubType>Form</SubType>
@@ -141,6 +148,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Editor\Dialog\EntryAndExitDlg.resx">
+      <DependentUpon>EntryAndExitDlg.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\TraverseDlg.resx">
       <DependentUpon>TraverseDlg.cs</DependentUpon>
     </EmbeddedResource>
