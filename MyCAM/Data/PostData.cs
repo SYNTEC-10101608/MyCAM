@@ -87,17 +87,30 @@ namespace MyCAM.Data
 			get; set;
 		}
 
-		public PostPath CutDownPostPath
+		// lift up of previous path, null meaning lift up distance is 0
+		public PostPoint LiftUpPostPoint
 		{
 			get; set;
 		}
 
-		public PostPath LiftUpPostPath
+		// cut down of current path, null meaning cut down distance is 0
+		public PostPoint CutDownPostPoint
 		{
 			get; set;
 		}
 
-		public PostPath FollowSafePostPath
+		public double FollowSafeDistance
+		{
+			get; set;
+		}
+
+		// the center and end point of frog leap
+		public PostPoint FrogLeapMidPostPoint
+		{
+			get; set;
+		}
+
+		public PostPoint ProcessStartPoint
 		{
 			get; set;
 		}
@@ -108,9 +121,10 @@ namespace MyCAM.Data
 			MainPathPostPath = new List<PostPath>();
 			OverCutPostPath = new List<PostPath>();
 			LeadOutPostPath = new List<PostPath>();
-			CutDownPostPath = null;
-			LiftUpPostPath = null;
-			FollowSafePostPath = null;
+			CutDownPostPoint = null;
+			LiftUpPostPoint = null;
+			FollowSafeDistance = 0;
+			FrogLeapMidPostPoint = null;
 		}
 	}
 

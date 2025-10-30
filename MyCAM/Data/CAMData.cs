@@ -397,7 +397,7 @@ namespace MyCAM.Data
 		public CAMPoint GetProcessStartPoint()
 		{
 			if( m_IsDirty ) {
-				BuildCAMPointList();
+				BuildCAMPointList_New();
 				m_IsDirty = false;
 			}
 			CAMPoint camPoint = null;
@@ -413,7 +413,7 @@ namespace MyCAM.Data
 		public CAMPoint GetProcessEndPoint()
 		{
 			if( m_IsDirty ) {
-				BuildCAMPointList();
+				BuildCAMPointList_New();
 				m_IsDirty = false;
 			}
 			CAMPoint camPoint = null;

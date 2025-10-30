@@ -1,5 +1,4 @@
-﻿using MyCAM.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using MyCAM.Data;
@@ -55,7 +54,60 @@ namespace MyCAM.Post
 							return false;
 						}
 						WriteCutting( postData, i + 1 );
-						WriteCutting_New( m_ProcessDataList[ i ], i + 1 );
+					}
+
+					// write exit
+					if( m_ProcessDataList.Count > 0 ) {
+
+						// calculate exit point
+						PostHelper.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out PostPoint exitPoint, out _ );
+						m_StreamWriter.WriteLine( "// Exit" );
+						WriteOneLinearTraverse( exitPoint );
+					}
+					m_StreamWriter.WriteLine( "G65 P\"FileEnd\";" );
+					m_StreamWriter.WriteLine( "M30;" ); // 程式結束
+				}
+				return true;
+			}
+			catch( Exception ex ) {
+				errorMessage = ex.Message;
+				return false;
+			}
+		}
+
+		public bool ConvertSuccess_New( out string errorMessage )
+		{
+			errorMessage = string.Empty;
+			try {
+				using( m_StreamWriter = new StreamWriter( "0000.nc" ) ) {
+					m_StreamWriter.WriteLine( "G65 P\"FileStart\" X\"Material1\" Y\"1.0\" Q1;" ); // 三點校正
+					m_StreamWriter.WriteLine( "G90;" ); // NC init
+					m_StreamWriter.WriteLine( "G17;" );
+					m_StreamWriter.WriteLine( "G53 Z0.;" ); // 機械軸復位
+					m_StreamWriter.WriteLine( "G53 " + m_MasterAxisName + "0. " + m_SlaveAxisName + "0." );
+					m_StreamWriter.WriteLine( "G43.4 P1;" ); // G43.4 新動程
+
+					// to keep last point of previous path
+					PathEndInfo endInfoOfPreviousPath = new PathEndInfo();
+
+					// 這條路
+					for( int i = 0; i < m_ProcessDataList.Count; i++ ) {
+
+						// 這條路的各段,現在只有Main
+						// solve master and slave angle
+						bool buildSuccess = BuildCAMSegmentHelper.BuildCAMSegment( m_ProcessDataList[ i ], out List<ICAMSegmentElement> camSegmentList );
+						if( buildSuccess == false ) {
+							return false;
+						}
+
+						// solve all post data of the path
+						if( !PostHelper.SolvePath_New( m_PostSolver, m_ProcessDataList[ i ], camSegmentList,
+							endInfoOfPreviousPath, i == 0, i == m_ProcessDataList.Count - 1, m_EntryAndExitData,
+							out PathSegmentPostData pathSegmentPostData, out _, out endInfoOfPreviousPath ) ) {
+							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
+							return false;
+						}
+						WriteCutting_New( pathSegmentPostData, i + 1 );
 					}
 
 					// write exit
@@ -99,6 +151,28 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" );
 			return;
 		}
+
+		void WriteCutting_New( PathSegmentPostData currentPathPostData, int N_Index )
+		{
+			// the N code
+			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
+			m_StreamWriter.WriteLine( "N" + N_Index );
+
+			// traverse from previous path to current path
+			WriteTraverse_New( currentPathPostData );
+
+			// start cutting
+			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\" H1;" );
+
+			// write each process path
+			WriteOneProcessPath_New( currentPathPostData.MainPathPostPath );
+
+			// end cutting
+			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" );
+			return;
+		}
+
+
 
 		void WriteOnePoint( PostPoint postPoint )
 		{
@@ -243,6 +317,40 @@ namespace MyCAM.Post
 			}
 		}
 
+		void WriteTraverse_New( PathSegmentPostData currentPathPostData )
+		{
+			// lift up
+			if( currentPathPostData.LiftUpPostPoint != null ) {
+				WriteOneLinearTraverse( currentPathPostData.LiftUpPostPoint );
+			}
+
+			// frog leap with cut down
+			if( currentPathPostData.FrogLeapMidPostPoint != null && currentPathPostData.CutDownPostPoint != null ) {
+				WriteOneFrogLeap( currentPathPostData.FrogLeapMidPostPoint, currentPathPostData.CutDownPostPoint );
+
+				// cut down
+				WriteOneLinearTraverse( currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
+			}
+
+			// form leap without cut down
+			else if( currentPathPostData.FrogLeapMidPostPoint != null && currentPathPostData.CutDownPostPoint == null ) {
+				WriteOneFrogLeap( currentPathPostData.FrogLeapMidPostPoint, currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
+			}
+
+			// no frog leap
+			else if( currentPathPostData.FrogLeapMidPostPoint == null && currentPathPostData.CutDownPostPoint != null ) {
+				WriteOneLinearTraverse( currentPathPostData.CutDownPostPoint );
+
+				// cut down
+				WriteOneLinearTraverse( currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
+			}
+
+			// no frog leap and no cut down
+			else {
+				WriteOneLinearTraverse( currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
+			}
+		}
+
 		void WriteOneProcessPath_New( List<PostPath> processPathSegmentPostPath )
 		{
 			PostPoint lastPostPoint = null;
@@ -260,6 +368,18 @@ namespace MyCAM.Post
 				lastPostPoint = processPathSegmentPostPath[ i ].EndPoint;
 			}
 		}
+
+		void WriteOnePoint( gp_Pnt point, double dM, double dS, bool G00 = false )
+		{
+			string szX = point.X().ToString( "F3" );
+			string szY = point.Y().ToString( "F3" );
+			string szZ = point.Z().ToString( "F3" );
+			string szM = ( dM * 180 / Math.PI ).ToString( "F3" );
+			string szS = ( dS * 180 / Math.PI ).ToString( "F3" );
+			string command = G00 ? "G00" : "G01";
+			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} {m_MasterAxisName}{szM} {m_SlaveAxisName}{szS};" );
+		}
+
 
 		bool IsSamePostPoint( PostPoint postPoint1, PostPoint postPoint2 )
 		{
