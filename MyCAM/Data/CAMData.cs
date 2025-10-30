@@ -354,11 +354,36 @@ namespace MyCAM.Data
 			m_IsDirty = true;
 		}
 
+		public void SetToolVecModify_New( (int,int) index, double dRA_deg, double dRB_deg )
+		{
+			if( m_ToolVecModifyMap_New.ContainsKey( index ) ) {
+				m_ToolVecModifyMap_New[ index ] = new Tuple<double, double>( dRA_deg, dRB_deg );
+			}
+			else {
+				m_ToolVecModifyMap_New.Add( index, new Tuple<double, double>( dRA_deg, dRB_deg ) );
+			}
+			m_IsDirty = true;
+		}
+
 		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
 				dRA_deg = m_ToolVecModifyMap[ index ].Item1;
 				dRB_deg = m_ToolVecModifyMap[ index ].Item2;
+				return true;
+			}
+			else {
+				dRA_deg = 0;
+				dRB_deg = 0;
+				return false;
+			}
+		}
+
+		public bool GetToolVecModify_New( (int, int) index, out double dRA_deg, out double dRB_deg )
+		{
+			if( m_ToolVecModifyMap_New.ContainsKey( index ) ) {
+				dRA_deg = m_ToolVecModifyMap_New[ index ].Item1;
+				dRB_deg = m_ToolVecModifyMap_New[ index ].Item2;
 				return true;
 			}
 			else {
@@ -375,6 +400,15 @@ namespace MyCAM.Data
 				m_IsDirty = true;
 			}
 		}
+
+		public void RemoveToolVecModify_New( (int,int) index )
+		{
+			if( m_ToolVecModifyMap_New.ContainsKey( index ) ) {
+				m_ToolVecModifyMap_New.Remove( index );
+				m_IsDirty = true;
+			}
+		}
+
 
 		public HashSet<int> GetToolVecModifyIndex()
 		{
@@ -402,10 +436,9 @@ namespace MyCAM.Data
 			}
 
 			// todo!!!
-			CAMPoint camPoint = null;
 			(int, int) startPointIndex = NewStartPoint;
 			CADPoint cadPoint = CADSegmentList[ startPointIndex.Item1 ].PointList[ startPointIndex.Item2 ];
-			camPoint = BuildCAMSegmentHelper.GetCAMPoint(cadPoint, m_IsToolVecReverse);
+			CAMPoint camPoint = BuildCAMSegmentHelper.GetCAMPoint( cadPoint, m_IsToolVecReverse );
 			return camPoint;
 		}
 
@@ -418,9 +451,8 @@ namespace MyCAM.Data
 
 			// todo!!!
 			(int, int) startPointIndex = NewStartPoint;
-			CAMPoint camPoint = null;
-			CADPoint cadPoint = CADSegmentList[ startPointIndex.Item1 ].PointList[startPointIndex.Item2];
-			camPoint = BuildCAMSegmentHelper.GetCAMPoint(cadPoint, m_IsToolVecReverse);
+			CADPoint cadPoint = CADSegmentList[ startPointIndex.Item1 ].PointList[ startPointIndex.Item2 ];
+			CAMPoint camPoint = BuildCAMSegmentHelper.GetCAMPoint( cadPoint, m_IsToolVecReverse );
 			return camPoint;
 		}
 
@@ -431,6 +463,9 @@ namespace MyCAM.Data
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
+
+		// tunple <segment, index> , tuple<RA, RB>
+		Dictionary<(int ,int), Tuple<double, double>> m_ToolVecModifyMap_New = new Dictionary<(int,int), Tuple<double, double>>();
 		bool m_IsReverse = false;
 		bool m_IsToolVecReverse = false;
 		int m_StartPoint = 0;
@@ -485,7 +520,7 @@ namespace MyCAM.Data
 				// this curve is line use equal length split
 				if( GeometryTool.IsLine( edge, out _, out _ ) ) {
 					tempCADPointList = Pretreatment.GetSegmentPointsByEqualLength( edge, shellFace, PRECISION_MAX_LENGTH, false, out double dEdgeLength, out double dPointSpace );
-					LineCADSegment lineSegment = new LineCADSegment( tempCADPointList, dEdgeLength , dPointSpace );
+					LineCADSegment lineSegment = new LineCADSegment( tempCADPointList, dEdgeLength, dPointSpace );
 					CADSegmentList.Add( lineSegment );
 				}
 

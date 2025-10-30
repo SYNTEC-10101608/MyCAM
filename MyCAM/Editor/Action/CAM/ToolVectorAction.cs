@@ -39,17 +39,14 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			//int nIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
+			(int,int) nSegmentAndPoint = GetSelectIndex( out TopoDS_Shape selectedVertex );
 
-			// 隔離中
-			int nIndex = -1;
-			TopoDS_Shape selectedVertex = null;
-			if( nIndex == -1 ) {
+			if( nSegmentAndPoint == (-1,-1) ) {
 				return;
 			}
 
 			// modify tool vector
-			bool isModified = m_CAMData.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
+			bool isModified = m_CAMData.GetToolVecModify_New( nSegmentAndPoint, out double angleA_deg, out double angleB_deg );
 			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg );
 
 			// back up old data
@@ -57,17 +54,17 @@ namespace MyCAM.Editor
 			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam );
 			toolVecForm.Preview += ( ToolVec ) =>
 			{
-				SetToolVecParam( nIndex, ToolVec );
+				SetToolVecParam_New( nSegmentAndPoint, ToolVec );
 				PropertyChanged?.Invoke();
 			};
 			toolVecForm.Confirm += ( ToolVec ) =>
 			{
-				SetToolVecParam( nIndex, ToolVec );
+				SetToolVecParam_New( nSegmentAndPoint, ToolVec );
 				SetToolVecDone();
 			};
 			toolVecForm.Cancel += () =>
 			{
-				SetToolVecParam( nIndex, m_BackupToolVecParam );
+				SetToolVecParam_New( nSegmentAndPoint, m_BackupToolVecParam );
 				SetToolVecDone();
 			};
 
@@ -130,6 +127,15 @@ namespace MyCAM.Editor
 				return;
 			}
 			m_CAMData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
+		}
+
+		void SetToolVecParam_New( (int,int) VecIndex, ToolVecParam toolVecParam )
+		{
+			if( !toolVecParam.IsModified ) {
+				m_CAMData.RemoveToolVecModify_New( VecIndex );
+				return;
+			}
+			m_CAMData.SetToolVecModify_New( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
 		}
 
 		void DrawVertexOnViewer( TopoDS_Shape selectedVertex )
