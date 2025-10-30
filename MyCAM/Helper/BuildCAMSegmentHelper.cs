@@ -22,6 +22,15 @@ namespace MyCAM.Helper
 			return true;
 		}
 
+		public static CAMPoint GetCAMPoint( CADPoint cadPoint, bool isToolVecReverse )
+		{
+			if( cadPoint == null ) {
+				return null;
+			}
+			gp_Dir toolDir = isToolVecReverse ? cadPoint.NormalVec_1st.Reversed() : cadPoint.NormalVec_1st;
+			CAMPoint camPoint = new CAMPoint( cadPoint, toolDir );
+			return camPoint;
+		}
 		static List<ICAMSegmentElement> GetOrderedSegment( CAMData camdata )
 		{
 			List<ICAMSegmentElement> camSegmentList = new List<ICAMSegmentElement>();
@@ -180,16 +189,6 @@ namespace MyCAM.Helper
 			CAMPoint EstimatedMidCAMPoint = GetCAMPoint( EstimatedMidCADPoint, isToolVecReverse );
 			camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, EstimatedMidCAMPoint );
 			return camArcSegment;
-		}
-
-		static CAMPoint GetCAMPoint( CADPoint cadPoint, bool isToolVecReverse )
-		{
-			if( cadPoint == null ) {
-				return null;
-			}
-			gp_Dir toolDir = isToolVecReverse ? cadPoint.NormalVec_1st.Reversed() : cadPoint.NormalVec_1st;
-			CAMPoint camPoint = new CAMPoint( cadPoint, toolDir );
-			return camPoint;
 		}
 
 		static CADPoint GetArcMidPoint( List<CADPoint> arcPointList )

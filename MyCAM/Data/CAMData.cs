@@ -400,13 +400,12 @@ namespace MyCAM.Data
 				BuildCAMPointList_New();
 				m_IsDirty = false;
 			}
+
+			// todo!!!
 			CAMPoint camPoint = null;
-			if( m_LeadInCAMPointList.Count > 0 && m_LeadParam.LeadIn.Length > 0 ) {
-				camPoint = m_LeadInCAMPointList.First().Clone();
-			}
-			else if( m_CAMPointList.Count > 0 ) {
-				camPoint = m_CAMPointList.First().Clone();
-			}
+			(int, int) startPointIndex = NewStartPoint;
+			CADPoint cadPoint = CADSegmentList[ startPointIndex.Item1 ].PointList[ startPointIndex.Item2 ];
+			camPoint = BuildCAMSegmentHelper.GetCAMPoint(cadPoint, m_IsToolVecReverse);
 			return camPoint;
 		}
 
@@ -416,16 +415,12 @@ namespace MyCAM.Data
 				BuildCAMPointList_New();
 				m_IsDirty = false;
 			}
+
+			// todo!!!
+			(int, int) startPointIndex = NewStartPoint;
 			CAMPoint camPoint = null;
-			if( m_LeadOutCAMPointList.Count > 0 && m_LeadParam.LeadOut.Length > 0 ) {
-				camPoint = m_LeadOutCAMPointList.Last().Clone();
-			}
-			else if( m_OverCutPointList.Count > 0 && m_OverCutLength > 0 ) {
-				camPoint = m_OverCutPointList.Last().Clone();
-			}
-			else if( m_CAMPointList.Count > 0 ) {
-				camPoint = m_CAMPointList.Last().Clone();
-			}
+			CADPoint cadPoint = CADSegmentList[ startPointIndex.Item1 ].PointList[startPointIndex.Item2];
+			camPoint = BuildCAMSegmentHelper.GetCAMPoint(cadPoint, m_IsToolVecReverse);
 			return camPoint;
 		}
 
