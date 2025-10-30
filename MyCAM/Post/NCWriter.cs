@@ -113,6 +113,18 @@ namespace MyCAM.Post
 		}
 
 		void WriteOneLinearTraverse( PostPoint postPoint, double followSafeDistance = 0 )
+		{
+			if( postPoint == null ) {
+				return;
+			}
+			string szX = postPoint.X.ToString( "F3" );
+			string szY = postPoint.Y.ToString( "F3" );
+			string szZ = postPoint.Z.ToString( "F3" );
+			string szRotaryAxisCommand = GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI );
+			string szFollow = followSafeDistance == 0 ? string.Empty : FOLLOW_SAFE_DISTANCE_COMMAND + followSafeDistance.ToString( "F3" );
+			m_StreamWriter.WriteLine( $"G00 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand} {szFollow};" );
+		}
+
 		void WriteOneSegmentPath( PostPath segmentPostPath )
 		{
 			if( segmentPostPath is ArcPostPath arcPostPath ) {
@@ -152,17 +164,15 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( $"G65 P\"TPCI\" X1={szMidPointX} Y1={szMidPointY} Z1={szMidPointZ} {m_MasterAxisName}1={szMidPointM} {m_SlaveAxisName}1={szMidPointS} X2={szEndPointX} Y2={szEndPointY} Z2={szEndPointZ} {m_MasterAxisName}2={szEndPointM} {m_SlaveAxisName}2={szEndPointS};" );
 		}
 
-		void WriteOneProcessPath( List<PostPoint> postList, bool G00 = false )
+		void WriteOneProcessPath( List<PostPoint> postPointList )
 		{
-			if( postPoint == null ) {
+			if( postPointList == null || postPointList.Count == 0 ) {
 				return;
 			}
-			string szX = postPoint.X.ToString( "F3" );
-			string szY = postPoint.Y.ToString( "F3" );
-			string szZ = postPoint.Z.ToString( "F3" );
-			string szRotaryAxisCommand = GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI );
-			string szFollow = followSafeDistance == 0 ? string.Empty : FOLLOW_SAFE_DISTANCE_COMMAND + followSafeDistance.ToString( "F3" );
-			m_StreamWriter.WriteLine( $"G00 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand} {szFollow};" );
+			for( int i = 0; i < postPointList.Count; i++ ) {
+				var onePostPoint = postPointList[ i ];
+				WriteOnePoint( onePostPoint );
+			}
 		}
 
 		void WriteOneFrogLeap( PostPoint midPoint, PostPoint endPoint, double followSafeDistance = 0 )
@@ -196,17 +206,6 @@ namespace MyCAM.Post
 			}
 			else {
 				return szS + " " + szM;
-			}
-		}
-
-		void WriteOneProcessPath( List<PostPoint> postPointList )
-		{
-			if( postPointList == null || postPointList.Count == 0 ) {
-				return;
-			}
-			for( int i = 0; i < postPointList.Count; i++ ) {
-				var onePostPoint = postPointList[ i ];
-				WriteOnePoint( onePostPoint );
 			}
 		}
 
