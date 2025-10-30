@@ -79,7 +79,7 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		protected override void ViewerMouseDown( MouseEventArgs e )
+		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
 			if( e.Button == MouseButtons.Left ) {
 				m_Viewer.GetAISContext().SelectDetected();

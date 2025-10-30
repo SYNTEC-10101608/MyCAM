@@ -108,6 +108,12 @@ namespace OCCViewer
 			};
 			control.MouseUp += ( sender, e ) => OnMouseUp( e );
 			control.MouseMove += ( sender, e ) => OnMouseMove( e );
+			control.MouseClick += ( sender, e ) =>
+			{
+				control.Focus();
+				OnMouseClick( e );
+			};
+			control.MouseDoubleClick += ( sender, e ) => OnMouseDoubleClick( e );
 			control.KeyDown += ( sender, e ) => OnKeyDown( e );
 			control.Paint += ( sender, e ) => UpdateView();
 			return true;
@@ -512,6 +518,16 @@ namespace OCCViewer
 			}
 		}
 
+		void OnMouseClick( MouseEventArgs e )
+		{
+			MouseClick?.Invoke( e );
+		}
+
+		void OnMouseDoubleClick( MouseEventArgs e )
+		{
+			MouseDoubleClick?.Invoke( e );
+		}
+
 		void OnKeyDown( KeyEventArgs e )
 		{
 			KeyDown?.Invoke( e );
@@ -550,6 +566,8 @@ namespace OCCViewer
 		public Action<MouseEventArgs> MouseDown;
 		public Action<MouseEventArgs> MouseUp;
 		public Action<MouseEventArgs> MouseMove;
+		public Action<MouseEventArgs> MouseClick;
+		public Action<MouseEventArgs> MouseDoubleClick;
 		public Action<KeyEventArgs> KeyDown;
 	}
 }

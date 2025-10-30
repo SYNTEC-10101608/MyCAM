@@ -84,7 +84,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		protected override void ViewerMouseDown( MouseEventArgs e )
+		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
 			if( e.Button != MouseButtons.Left ) {
 				return;
