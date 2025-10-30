@@ -1114,7 +1114,7 @@ namespace MyCAM.Editor
 				// get start and end index
 				(int, int) nStartIndex = interpolateIntervalList[ i ].Item1;
 				(int, int) nEndIndex = interpolateIntervalList[ i ].Item2;
-				points = InterpolateToolVec( camData, nStartIndex, nEndIndex );
+				points.AddRange( InterpolateToolVec( camData, nStartIndex, nEndIndex ) );
 			}
 			return true;
 
@@ -1128,13 +1128,13 @@ namespace MyCAM.Editor
 			double dTotalLength = 0;
 
 			// 同一個segment內
-			if( nStartIndex.Item1 == nEndIndex.Item1 ) {
+			if( nStartIndex.Item1 == nEndIndex.Item1 && nStartIndex.Item2< nEndIndex.Item2 ) {
 
 				if( camdata.CADSegmentList[ nStartIndex.Item1 ] is LineCADSegment lineCADSegment ) {
-					toolVecLocation.AddRange( GetLine( lineCADSegment, nStartIndex.Item2, true, nEndIndex.Item2, true, ref dTotalLength ) );
+					toolVecLocation.AddRange( GetLine( lineCADSegment, nStartIndex.Item2, true, nEndIndex.Item2, true, ref dTotalLength , false) );
 				}
 				if( camdata.CADSegmentList[ nStartIndex.Item1 ] is ArcCADSegment arcCADSegment ) {
-					toolVecLocation.AddRange( GetArc( arcCADSegment, nStartIndex.Item2, true, nEndIndex.Item2, true, ref dTotalLength ) );
+					toolVecLocation.AddRange( GetArc( arcCADSegment, nStartIndex.Item2, true, nEndIndex.Item2, true, ref dTotalLength , true) );
 				}
 			}
 			else {
@@ -1142,29 +1142,29 @@ namespace MyCAM.Editor
 				if( nStartIndex.Item1 < nEndIndex.Item1 ) {
 
 					if( camdata.CADSegmentList[ nStartIndex.Item1 ] is LineCADSegment lineCADSegment ) {
-						toolVecLocation.AddRange( GetLine( lineCADSegment, nStartIndex.Item2, true, lineCADSegment.PointList.Count-1, false, ref dTotalLength ) );
+						toolVecLocation.AddRange( GetLine( lineCADSegment, nStartIndex.Item2, true, lineCADSegment.PointList.Count - 1, false, ref dTotalLength , false) );
 					}
 					if( camdata.CADSegmentList[ nStartIndex.Item1 ] is ArcCADSegment arcCADSegment ) {
-						toolVecLocation.AddRange( GetArc( arcCADSegment, nStartIndex.Item2, true, arcCADSegment.PointList.Count - 1, false, ref dTotalLength ) );
+						toolVecLocation.AddRange( GetArc( arcCADSegment, nStartIndex.Item2, true, arcCADSegment.PointList.Count - 1, false, ref dTotalLength,false ) );
 					}
 
-					
+
 					for( int i = nStartIndex.Item1 + 1; i < nEndIndex.Item1; i++ ) {
 
-						if( camdata.CADSegmentList[i] is LineCADSegment lineCADSegment_1 ) {
-							toolVecLocation.AddRange( GetLine( lineCADSegment_1, 0, false, lineCADSegment_1.PointList.Count - 1, false, ref dTotalLength ) );
+						if( camdata.CADSegmentList[ i ] is LineCADSegment lineCADSegment_1 ) {
+							toolVecLocation.AddRange( GetLine( lineCADSegment_1, 0, false, lineCADSegment_1.PointList.Count - 1, false, ref dTotalLength,false ) );
 						}
 						if( camdata.CADSegmentList[ i ] is ArcCADSegment arcCADSegment_1 ) {
-							toolVecLocation.AddRange( GetArc( arcCADSegment_1, 0, false, arcCADSegment_1.PointList.Count - 1, false, ref dTotalLength ) );
+							toolVecLocation.AddRange( GetArc( arcCADSegment_1, 0, false, arcCADSegment_1.PointList.Count - 1, false, ref dTotalLength, false ) );
 						}
 					}
 
 					// last Segment length
 					if( camdata.CADSegmentList[ nEndIndex.Item1 ] is LineCADSegment lineCADSegment_2 ) {
-						toolVecLocation.AddRange( GetLine( lineCADSegment_2, 0, false, nEndIndex.Item2, true, ref dTotalLength ) );
+						toolVecLocation.AddRange( GetLine( lineCADSegment_2, 0, false, nEndIndex.Item2, true, ref dTotalLength, false ) );
 					}
 					if( camdata.CADSegmentList[ nEndIndex.Item1 ] is ArcCADSegment arcCADSegment_2 ) {
-						toolVecLocation.AddRange( GetArc( arcCADSegment_2, 0, false, nEndIndex.Item2, true, ref dTotalLength ) );
+						toolVecLocation.AddRange( GetArc( arcCADSegment_2, 0, false, nEndIndex.Item2, true, ref dTotalLength, false ) );
 					}
 				}
 
@@ -1172,27 +1172,37 @@ namespace MyCAM.Editor
 				else {
 
 					if( camdata.CADSegmentList[ nStartIndex.Item1 ] is LineCADSegment lineCADSegment ) {
-						toolVecLocation.AddRange( GetLine( lineCADSegment, nStartIndex.Item2, true, lineCADSegment.PointList.Count-1, false, ref dTotalLength ) );
+						toolVecLocation.AddRange( GetLine( lineCADSegment, nStartIndex.Item2, true, lineCADSegment.PointList.Count - 1, false, ref dTotalLength, false ) );
 					}
 					if( camdata.CADSegmentList[ nStartIndex.Item1 ] is ArcCADSegment arcCADSegment ) {
-						toolVecLocation.AddRange( GetArc( arcCADSegment, nStartIndex.Item2, true, arcCADSegment.PointList.Count - 1, false, ref dTotalLength ) );
+						toolVecLocation.AddRange( GetArc( arcCADSegment, nStartIndex.Item2, true, arcCADSegment.PointList.Count - 1, false, ref dTotalLength, false ) );
+					}
+
+					// 到樂ㄉㄚ
+					for( int i = nStartIndex.Item1 + 1; i < camdata.CADSegmentList.Count; i++ ) {
+						if( camdata.CADSegmentList[ i ] is LineCADSegment lineCADSegment_1 ) {
+							toolVecLocation.AddRange( GetLine( lineCADSegment_1, 0, false, lineCADSegment_1.PointList.Count - 1, false, ref dTotalLength, false ) );
+						}
+						if( camdata.CADSegmentList[ i ] is ArcCADSegment arcCADSegment_1 ) {
+							toolVecLocation.AddRange( GetArc( arcCADSegment_1, 0, false, arcCADSegment_1.PointList.Count - 1, false, ref dTotalLength, false ) );
+						}
 					}
 
 					for( int i = 0; i < nEndIndex.Item1; i++ ) {
 						if( camdata.CADSegmentList[ i ] is LineCADSegment lineCADSegment_1 ) {
-							toolVecLocation.AddRange( GetLine( lineCADSegment_1, 0, false, lineCADSegment_1.PointList.Count - 1, false, ref dTotalLength ) );
+							toolVecLocation.AddRange( GetLine( lineCADSegment_1, 0, false, lineCADSegment_1.PointList.Count - 1, false, ref dTotalLength, false ) );
 						}
-						if ( camdata.CADSegmentList[ i ] is ArcCADSegment arcCADSegment_1 ) {
-							toolVecLocation.AddRange( GetArc( arcCADSegment_1, 0, false, arcCADSegment_1.PointList.Count - 1, false, ref dTotalLength ) );
+						if( camdata.CADSegmentList[ i ] is ArcCADSegment arcCADSegment_1 ) {
+							toolVecLocation.AddRange( GetArc( arcCADSegment_1, 0, false, arcCADSegment_1.PointList.Count - 1, false, ref dTotalLength, false ) );
 						}
 					}
 
 					// first Segment length
-					if( camdata.CADSegmentList[ nEndIndex.Item1] is LineCADSegment lineCADSegment_2 ) {
-						toolVecLocation.AddRange( GetLine( lineCADSegment_2, 0, false, nEndIndex.Item2, true, ref dTotalLength ) );
+					if( camdata.CADSegmentList[ nEndIndex.Item1 ] is LineCADSegment lineCADSegment_2 ) {
+						toolVecLocation.AddRange( GetLine( lineCADSegment_2, 0, false, nEndIndex.Item2, true, ref dTotalLength, false ) );
 					}
 					if( camdata.CADSegmentList[ nEndIndex.Item1 ] is ArcCADSegment arcCADSegment_2 ) {
-						toolVecLocation.AddRange( GetArc( arcCADSegment_2, 0, false, nEndIndex.Item2, true, ref dTotalLength ) );
+						toolVecLocation.AddRange( GetArc( arcCADSegment_2, 0, false, nEndIndex.Item2, true, ref dTotalLength, false ) );
 					}
 
 				}
@@ -1201,15 +1211,17 @@ namespace MyCAM.Editor
 			// get the start and end tool vector
 			CADPoint startCADPnt = camdata.CADSegmentList[ nStartIndex.Item1 ].PointList[ nStartIndex.Item2 ];
 			CAMPoint startCAMPnt = BuildCAMSegmentHelper.GetCAMPoint( startCADPnt, camdata.IsToolVecReverse );
+			camdata.ToolVecModifyMap_New.TryGetValue( nStartIndex, out var value1 );
 			gp_Vec startVec = GetVecFromAB( startCAMPnt,
-				camdata.ToolVecModifyMap_New[ nStartIndex ].Item1 * Math.PI / 180,
-				camdata.ToolVecModifyMap_New[ nStartIndex ].Item2 * Math.PI / 180
+				value1.Item1 * Math.PI / 180,
+				value1.Item2 * Math.PI / 180
 				);
 			CADPoint endCADPnt = camdata.CADSegmentList[ nEndIndex.Item1 ].PointList[ nEndIndex.Item2 ];
 			CAMPoint endCAMPnt = BuildCAMSegmentHelper.GetCAMPoint( endCADPnt, camdata.IsToolVecReverse );
+			camdata.ToolVecModifyMap_New.TryGetValue( nEndIndex, out var value2 );
 			gp_Vec endVec = GetVecFromAB( endCAMPnt,
-				camdata.ToolVecModifyMap_New[ nEndIndex ].Item1 * Math.PI / 180,
-				camdata.ToolVecModifyMap_New[ nEndIndex ].Item2 * Math.PI / 180
+				value2.Item1 * Math.PI / 180,
+				value2.Item2 * Math.PI / 180
 				);
 
 			// get the quaternion for interpolation
@@ -1219,8 +1231,9 @@ namespace MyCAM.Editor
 
 			for( int i = 0; i < toolVecLocation.Count; i++ ) {
 
-				double t = accumulatedDistance / dTotalLength;
 				accumulatedDistance += toolVecLocation[ i ].dDistance;
+				double t = accumulatedDistance / dTotalLength;
+				
 
 				gp_Quaternion q = new gp_Quaternion();
 				slerp.Interpolate( t, ref q );
@@ -1233,10 +1246,13 @@ namespace MyCAM.Editor
 			return points;
 		}
 
-		List<(gp_Pnt point, double dDistance, bool isModiyToolVec)> GetArc( ArcCADSegment arcCADSegment, int nStartIndex, bool IsSModify, int nEndIndex, bool IsEModify, ref double dTotalLength )
+		List<(gp_Pnt point, double dDistance, bool isModiyToolVec)> GetArc( ArcCADSegment arcCADSegment, int nStartIndex, bool IsSModify, int nEndIndex, bool IsEModify, ref double dTotalLength , bool IsNeedToDrawStart)
 		{
 			List<(gp_Pnt point, double dDistance, bool isModiyToolVec)> pointToolVecList = new List<(gp_Pnt point, double dDistance, bool isModiyToolVec)>();
-			pointToolVecList.Add( (arcCADSegment.PointList[ nStartIndex ].Point, 0, IsSModify) );
+			
+			if( IsNeedToDrawStart ) {
+				pointToolVecList.Add( (arcCADSegment.PointList[ nStartIndex ].Point, 0, IsSModify) );
+			}
 			int midIndex = arcCADSegment.PointList.Count / 2;
 
 			// 圓弧在中間
@@ -1259,16 +1275,18 @@ namespace MyCAM.Editor
 			return pointToolVecList;
 		}
 
-		List<(gp_Pnt point, double dDistance, bool isModiyToolVec)> GetLine( LineCADSegment lineCADSegment, int nStartIndex, bool IsSModify, int nEndIndex, bool IsEModify, ref double dTotalLength )
+		List<(gp_Pnt point, double dDistance, bool isModiyToolVec)> GetLine( LineCADSegment lineCADSegment, int nStartIndex, bool IsSModify, int nEndIndex, bool IsEModify, ref double dTotalLength, bool IsNeedToDrawStart )
 		{
 
 			List<(gp_Pnt point, double dDistance, bool isModiyToolVec)> pointToolVecList = new List<(gp_Pnt point, double dDistance, bool isModiyToolVec)>();
-			pointToolVecList.Add( (lineCADSegment.PointList[ nStartIndex ].Point, 0, IsSModify) );
+			if( IsNeedToDrawStart ) {
+				pointToolVecList.Add( (lineCADSegment.PointList[ nStartIndex ].Point, 0, IsSModify) );
+			}
 			double dDistanceFromStartToLineEnd = ( nEndIndex - nStartIndex ) * lineCADSegment.PointSpace;
 			dTotalLength += dDistanceFromStartToLineEnd;
 
 			// 這段結尾
-			pointToolVecList.Add( (lineCADSegment.PointList[nEndIndex].Point, dDistanceFromStartToLineEnd, IsEModify) );
+			pointToolVecList.Add( (lineCADSegment.PointList[ nEndIndex ].Point, dDistanceFromStartToLineEnd, IsEModify) );
 
 			return pointToolVecList;
 		}
@@ -1281,6 +1299,10 @@ namespace MyCAM.Editor
 
 			List<((int, int), (int, int))> intervalList = new List<((int, int), (int, int))>();
 			if( camData.IsClosed ) {
+
+				int firstModifySegment = indexInOrder[ 0 ].Item1;
+
+
 
 				// for closed path, the index is wrapped
 				for( int i = 0; i < indexInOrder.Count; i++ ) {
