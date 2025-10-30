@@ -343,6 +343,14 @@ namespace MyCAM.Data
 			}
 		}
 
+		public Dictionary<(int, int), Tuple<double, double>> ToolVecModifyMap_New
+		{
+			get
+			{
+				return new Dictionary<(int, int), Tuple<double, double>>( m_ToolVecModifyMap_New );
+			}
+		}
+
 		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg )
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
@@ -690,6 +698,7 @@ namespace MyCAM.Data
 			ModifyToolVec();
 		}
 
+
 		void ModifyToolVec()
 		{
 			if( m_ToolVecModifyMap.Count == 0 ) {
@@ -718,6 +727,8 @@ namespace MyCAM.Data
 				InterpolateToolVec( nStartIndex, nEndIndex );
 			}
 		}
+
+		
 
 		gp_Vec GetVecFromAB( CAMPoint camPoint, double dRA_rad, double dRB_rad )
 		{

@@ -1,4 +1,8 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Helper;
 using MyCAM.Post;
@@ -20,10 +24,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -574,9 +574,18 @@ namespace MyCAM.Editor
 
 			// build tool vec
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
-				foreach(ICADSegmentElement cadSegment in camData.CADSegmentList ) {
-					DrawToolVec( cadSegment, camData );
-;				}
+				bool isGetSuccess = PathToolVec( camData, out List<(gp_Pnt point, gp_Dir toolVec, bool isModifyToolVec)> points );
+				if( isGetSuccess ) {
+					for( int i = 0; i < points.Count; i++ ) {
+						AIS_Line toolVecAIS = GetVecAIS( points[ i ].point, points[ i ].toolVec, EvecType.ToolVec );
+						if( points[ i ].isModifyToolVec ) {
+							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+							toolVecAIS.SetWidth( 4 );
+						}
+						m_ToolVecAISList.Add( toolVecAIS );
+					}
+				}
+
 			}
 
 			// display the tool vec
@@ -1067,32 +1076,240 @@ namespace MyCAM.Editor
 			base.OnEditActionEnd( action );
 		}
 
-		void DrawToolVec( ICADSegmentElement cadSegment, CAMData camData )
+		bool PathToolVec( CAMData camData, out List<(gp_Pnt point, gp_Dir toolVec, bool isModifiedToolVec)> points )
+		{
+			points = new List<(gp_Pnt point, gp_Dir toolVec, bool isModifiedToolVec)>();
+			if( camData.CADSegmentList == null || camData.CADSegmentList.Count == 0 ) {
+				return false;
+			}
+
+			// 沒有操縱桿
+			if( camData.ToolVecModifyMap_New.Count == 0 ) {
+				for( int i = 0; i < camData.CADSegmentList.Count; i++ ) {
+					points.AddRange( DrawNormalToolVec( camData.CADSegmentList[ i ], camData.IsToolVecReverse ) );
+				}
+				return true;
+			}
+
+			// 有一根
+			if( camData.ToolVecModifyMap_New.Count == 1 ) {
+				(int, int) targetPointSegmentIndex = camData.ToolVecModifyMap_New.Keys.First();
+				CADPoint targetPoint = camData.CADSegmentList[ targetPointSegmentIndex.Item1 ].PointList[ targetPointSegmentIndex.Item2 ];
+				CAMPoint targetCAMPoint = BuildCAMSegmentHelper.GetCAMPoint( targetPoint, camData.IsToolVecReverse );
+				gp_Vec newVec = GetVecFromAB( targetCAMPoint,
+					camData.ToolVecModifyMap_New.Values.First().Item1 * Math.PI / 180,
+					camData.ToolVecModifyMap_New.Values.First().Item2 * Math.PI / 180 );
+				gp_Dir assignDir = new gp_Dir( newVec );
+				points = DrawAssignToolVec( camData.CADSegmentList, assignDir );
+				points.Add( (targetPoint.Point, assignDir, true) );
+				return true;
+			}
+
+			// 有多根
+			List<((int, int), (int, int))> interpolateIntervalList = GetInterpolateIntervalList( camData );
+
+			// modify the tool vector
+			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
+
+				// get start and end index
+				(int, int) nStartIndex = interpolateIntervalList[ i ].Item1;
+				(int, int) nEndIndex = interpolateIntervalList[ i ].Item2;
+				points = InterpolateToolVec( camData, nStartIndex, nEndIndex );
+			}
+			return true;
+
+		}
+
+		List<(gp_Pnt point, gp_Dir toolVec, bool isModiyToolVec)> InterpolateToolVec( CAMData camdata, (int, int) nStartIndex, (int, int) nEndIndex )
+		{
+			List<(gp_Pnt point, double dDistance, bool isModifyToolVec)> toolVecLocation = new List<(gp_Pnt point, double dDistance, bool isModifyToolVec)>();
+			List<(gp_Pnt point, gp_Dir toolVec, bool isModiyToolVec)> points = new List<(gp_Pnt point, gp_Dir toolVecbool, bool isModiyToolVec)>();
+			// 計算長度
+
+			double dTotalLength = 0;
+
+			// 同一個segment內
+			if( nStartIndex.Item1 == nEndIndex.Item1 ) {
+				int gapCount = nEndIndex.Item2 - nStartIndex.Item2;
+				dTotalLength = camdata.CADSegmentList[ nStartIndex.Item1 ].PointSpace * gapCount;
+				toolVecLocation.Add( (camdata.CADSegmentList[ nStartIndex.Item1 ].PointList[ nStartIndex.Item2 ].Point, 0, true) );
+				toolVecLocation.Add( (camdata.CADSegmentList[ nEndIndex.Item1 ].PointList[ nEndIndex.Item2 ].Point, dTotalLength, true) );
+
+			}
+			else {
+				// 前一段到後幾段
+				if( nStartIndex.Item1 < nEndIndex.Item1 ) {
+
+					// first Segment length
+					double segmentLastIndex = camdata.CADSegmentList[ nStartIndex.Item1 ].PointList.Count - 1;
+					double firtSegmentLength = ( segmentLastIndex - nStartIndex.Item2 ) * camdata.CADSegmentList[ nStartIndex.Item1 ].PointSpace;
+					toolVecLocation.Add( (camdata.CADSegmentList[ nStartIndex.Item1 ].PointList[ nStartIndex.Item2 ].Point, 0, true) );
+					toolVecLocation.Add( (camdata.CADSegmentList[ nStartIndex.Item1 ].EndPoint.Point, firtSegmentLength, false) );
+					dTotalLength += firtSegmentLength;
+					for( int i = nStartIndex.Item1 + 1; i < nEndIndex.Item1; i++ ) {
+						double dThisHoleSegmentLength = camdata.CADSegmentList[ i ].TotalLength;
+						dTotalLength += dThisHoleSegmentLength;
+						toolVecLocation.Add( (camdata.CADSegmentList[ i ].EndPoint.Point, dThisHoleSegmentLength, false) );
+					}
+
+					// last Segment length
+					double dLastSegmentLength = camdata.CADSegmentList[ nEndIndex.Item1 ].PointSpace * nEndIndex.Item2;
+					dTotalLength += dLastSegmentLength;
+					toolVecLocation.Add( (camdata.CADSegmentList[ nEndIndex.Item1 ].PointList[ nEndIndex.Item2 ].Point, dLastSegmentLength, true) );
+				}
+
+				// 最後一段到前面
+				else {
+					double segmentLastIndex = camdata.CADSegmentList[ nStartIndex.Item1 ].PointList.Count - 1;
+					double lastSegmentLength = ( segmentLastIndex - nStartIndex.Item2 ) * camdata.CADSegmentList[ nStartIndex.Item1 ].PointSpace;
+					toolVecLocation.Add( (camdata.CADSegmentList[ nStartIndex.Item1 ].PointList[ nStartIndex.Item2 ].Point, 0, true) );
+					toolVecLocation.Add( (camdata.CADSegmentList[ nStartIndex.Item1 ].EndPoint.Point, lastSegmentLength, false) );
+					dTotalLength += lastSegmentLength;
+
+					for( int i = 0; i < nStartIndex.Item1; i++ ) {
+						double dThisHoleSegmentLength = camdata.CADSegmentList[ i ].TotalLength;
+						dTotalLength += dThisHoleSegmentLength;
+						toolVecLocation.Add( (camdata.CADSegmentList[ i ].EndPoint.Point, dThisHoleSegmentLength, false) );
+					}
+
+					// first Segment length
+
+					double firstSegmentLength = camdata.CADSegmentList[ nEndIndex.Item1 ].PointSpace * nEndIndex.Item2;
+					dTotalLength += firstSegmentLength;
+					toolVecLocation.Add( (camdata.CADSegmentList[ nEndIndex.Item1 ].PointList[ nEndIndex.Item2 ].Point, firstSegmentLength, true) );
+				}
+			}
+
+			// get the start and end tool vector
+			CADPoint startCADPnt = camdata.CADSegmentList[ nStartIndex.Item1 ].PointList[ nStartIndex.Item2 ];
+			CAMPoint startCAMPnt = BuildCAMSegmentHelper.GetCAMPoint( startCADPnt, camdata.IsToolVecReverse );
+			gp_Vec startVec = GetVecFromAB( startCAMPnt,
+				camdata.ToolVecModifyMap_New[ nStartIndex ].Item1 * Math.PI / 180,
+				camdata.ToolVecModifyMap_New[ nStartIndex ].Item2 * Math.PI / 180
+				);
+			CADPoint endCADPnt = camdata.CADSegmentList[ nEndIndex.Item1 ].PointList[ nEndIndex.Item2 ];
+			CAMPoint endCAMPnt = BuildCAMSegmentHelper.GetCAMPoint( endCADPnt, camdata.IsToolVecReverse );
+			gp_Vec endVec = GetVecFromAB( endCAMPnt,
+				camdata.ToolVecModifyMap_New[ nEndIndex ].Item1 * Math.PI / 180,
+				camdata.ToolVecModifyMap_New[ nEndIndex ].Item2 * Math.PI / 180
+				);
+
+			// get the quaternion for interpolation
+			gp_Quaternion q12 = new gp_Quaternion( startVec, endVec );
+			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
+			double accumulatedDistance = 0;
+
+			for( int i = 0; i < toolVecLocation.Count; i++ ) {
+
+				double t = accumulatedDistance / dTotalLength;
+				accumulatedDistance += toolVecLocation[ i ].dDistance;
+
+				gp_Quaternion q = new gp_Quaternion();
+				slerp.Interpolate( t, ref q );
+				gp_Trsf trsf = new gp_Trsf();
+				trsf.SetRotation( q );
+				gp_Dir toolVecDir = new gp_Dir( startVec.Transformed( trsf ) );
+				points.Add( (toolVecLocation[ i ].point, toolVecDir, toolVecLocation[i].isModifyToolVec) );
+
+			}
+			return points;
+		}
+
+		List<((int, int), (int, int))> GetInterpolateIntervalList( CAMData camData )
+		{
+			// sort the modify data by index
+			List<(int, int)> indexInOrder = camData.ToolVecModifyMap_New.Keys.ToList();
+			indexInOrder.Sort();
+
+			List<((int, int), (int, int))> intervalList = new List<((int, int), (int, int))>();
+			if( camData.IsClosed ) {
+
+				// for closed path, the index is wrapped
+				for( int i = 0; i < indexInOrder.Count; i++ ) {
+					int nextIndex = ( i + 1 ) % indexInOrder.Count;
+					intervalList.Add( (indexInOrder[ i ], indexInOrder[ nextIndex ]) );
+				}
+			}
+			else {
+				for( int i = 0; i < indexInOrder.Count - 1; i++ ) {
+					intervalList.Add( (indexInOrder[ i ], indexInOrder[ i + 1 ]) );
+				}
+			}
+			return intervalList;
+		}
+
+		List<(gp_Pnt point, gp_Dir toolVec, bool isModifiedToolVec)> DrawAssignToolVec( List<ICADSegmentElement> cadSegmentList, gp_Dir assignDir )
+		{
+			List<(gp_Pnt point, gp_Dir toolVec, bool isModifiedToolVec)> points = new List<(gp_Pnt point, gp_Dir toolVec, bool isModifiedToolVec)>();
+			for( int i = 0; i < cadSegmentList.Count; i++ ) {
+				switch( cadSegmentList[ i ] ) {
+					case ArcCADSegment arcSegment:
+						points.Add( (arcSegment.StartPoint.Point, assignDir, false) );
+						points.Add( (arcSegment.EndPoint.Point, assignDir, false) );
+						points.Add( (arcSegment.MidPoint.Point, assignDir, false) );
+						break;
+					case LineCADSegment lineSegment:
+						points.Add( (lineSegment.StartPoint.Point, assignDir, false) );
+						points.Add( (lineSegment.EndPoint.Point, assignDir, false) );
+						break;
+					default:
+						return points;
+				}
+			}
+			return points;
+		}
+
+		gp_Vec GetVecFromAB( CAMPoint camPoint, double dRA_rad, double dRB_rad )
+		{
+			// TDOD: RA == 0 || RB == 0
+			if( dRA_rad == 0 && dRB_rad == 0 ) {
+				return new gp_Vec( camPoint.ToolVec );
+			}
+
+			// get the x, y, z direction
+			gp_Dir x = camPoint.CADPoint.TangentVec;
+			gp_Dir z = camPoint.CADPoint.NormalVec_1st;
+			gp_Dir y = z.Crossed( x );
+
+			// X:Y:Z = tanA:tanB:1
+			double X = 0;
+			double Y = 0;
+			double Z = 0;
+			if( dRA_rad == 0 ) {
+				X = 0;
+				Z = 1;
+			}
+			else {
+				X = dRA_rad < 0 ? -1 : 1;
+				Z = X / Math.Tan( dRA_rad );
+			}
+			Y = Z * Math.Tan( dRB_rad );
+			gp_Dir dir1 = new gp_Dir( x.XYZ() * X + y.XYZ() * Y + z.XYZ() * Z );
+			return new gp_Vec( dir1.XYZ() );
+		}
+
+
+		List<(gp_Pnt point, gp_Dir toolVec, bool isModifiedToolVec)> DrawNormalToolVec( ICADSegmentElement cadSegment, bool isToolVecReverse )
 		{
 
-			List<(gp_Pnt point, gp_Dir toolVec)> points = new List<(gp_Pnt point, gp_Dir toolVec)>();
+			List<(gp_Pnt point, gp_Dir toolVec, bool isModifiedToolVec)> points = new List<(gp_Pnt point, gp_Dir toolVec, bool isModifiedToolVec)>();
 
 			switch( cadSegment ) {
 				case LineCADSegment lineSegment:
-					points.Add( (lineSegment.StartPoint.Point, lineSegment.StartPoint.NormalVec_1st) );
-					points.Add( (lineSegment.EndPoint.Point, lineSegment.EndPoint.NormalVec_1st) );
+					points.Add( (lineSegment.StartPoint.Point, lineSegment.StartPoint.NormalVec_1st, false) );
+					points.Add( (lineSegment.EndPoint.Point, lineSegment.EndPoint.NormalVec_1st, false) );
 					break;
 
 				case ArcCADSegment arcSegment:
-					points.Add( (arcSegment.StartPoint.Point, arcSegment.StartPoint.NormalVec_1st) );
-					points.Add( (arcSegment.EndPoint.Point, arcSegment.EndPoint.NormalVec_1st) );
-					points.Add( (arcSegment.MidPoint.Point, arcSegment.MidPoint.NormalVec_1st) );
+					points.Add( (arcSegment.StartPoint.Point, arcSegment.StartPoint.NormalVec_1st, false) );
+					points.Add( (arcSegment.EndPoint.Point, arcSegment.EndPoint.NormalVec_1st, false) );
+					points.Add( (arcSegment.MidPoint.Point, arcSegment.MidPoint.NormalVec_1st, false) );
 					break;
 
 				default:
-					return;
+					return points;
 			}
-
-			foreach( var (pnt, dir) in points ) {
-				gp_Dir finalDir = camData.IsToolVecReverse ? dir.Reversed() : dir;
-				AIS_Line vecAIS = GetVecAIS( pnt, finalDir, EvecType.ToolVec );
-				m_ToolVecAISList.Add( vecAIS );
-			}
+			return points;
 		}
 	}
 }
