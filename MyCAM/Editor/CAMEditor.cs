@@ -497,7 +497,7 @@ namespace MyCAM.Editor
 			// stop current action
 			EndActionIfNotDefault();
 			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData, m_DataManager.EntryAndExitData );
-			bool bSuccess = writer.ConvertSuccess( out string szErrorMessage );
+			bool bSuccess = writer.ConvertSuccess_New( out string szErrorMessage );
 			if( bSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提示]成功轉出NC", MyApp.NoticeType.Hint );
 			}

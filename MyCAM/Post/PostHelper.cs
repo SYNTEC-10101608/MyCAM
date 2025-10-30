@@ -146,7 +146,7 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		public static bool SolvePath_New( PostSolver postSolver,CAMData currentCAMData, List<ICAMSegmentElement> camSegmentList, PathEndInfo endInfoOfPreviousPath,
+		public static bool SolvePath_New( PostSolver postSolver, CAMData currentCAMData, List<ICAMSegmentElement> camSegmentList, PathEndInfo endInfoOfPreviousPath,
 			bool isFirstPath, bool isLastPath, EntryAndExitData entryAndExitData,
 			out PathSegmentPostData pathG54PostData, out PathSegmentPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo )
 		{
@@ -198,7 +198,7 @@ namespace MyCAM.Post
 
 			// set process start point
 			if( !bStart ) {
-				pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPath[0].StartPoint;
+				pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPath[ 0 ].StartPoint;
 				pathMCSPostData.ProcessStartPoint = pathMCSPostData.MainPathPostPath[ 0 ].StartPoint;
 			}
 
@@ -351,10 +351,8 @@ namespace MyCAM.Post
 			resultMCS = new List<PostPath>();
 
 			// solve IK
-			List<Tuple<CAMPoint, double, double>> rotateAngleList = new List<Tuple<CAMPoint, double, double>>();
-			List<bool> sigularTagList = new List<bool>();
-
 			List<SegmentIKInfo> segmentIKInfoList = new List<SegmentIKInfo>();
+
 			// 這條路的多段segment
 			foreach( ICAMSegmentElement camSegment in pathSegmentList ) {
 				List<Tuple<CAMPoint, double, double>> thisSegmentRotateAngleList = new List<Tuple<CAMPoint, double, double>>();
@@ -365,8 +363,6 @@ namespace MyCAM.Post
 				if( isSolveStartSuccess == false ) {
 					return false;
 				}
-				rotateAngleList.AddRange( startRotateAngleList );
-				sigularTagList.AddRange( startSigularTagList );
 				thisSegmentRotateAngleList.AddRange( startRotateAngleList );
 				thisSigularTagList.AddRange( startSigularTagList );
 
@@ -378,8 +374,6 @@ namespace MyCAM.Post
 					if( isSolveMidSuccess == false ) {
 						return false;
 					}
-					rotateAngleList.AddRange( midRotateAngleList );
-					sigularTagList.AddRange( midSigularTagList );
 					thisSegmentRotateAngleList.AddRange( midRotateAngleList );
 					thisSigularTagList.AddRange( midSigularTagList );
 				}
@@ -389,8 +383,6 @@ namespace MyCAM.Post
 				if( isSolveEndSuccess == false ) {
 					return false;
 				}
-				rotateAngleList.AddRange( endRotateAngleList );
-				sigularTagList.AddRange( endSigularTagList );
 				thisSegmentRotateAngleList.AddRange( endRotateAngleList );
 				thisSigularTagList.AddRange( endSigularTagList );
 
@@ -401,16 +393,19 @@ namespace MyCAM.Post
 				} );
 			}
 
+			// 這段路中的n個segment
 			for( int i = 0; i < segmentIKInfoList.Count; i++ ) {
 
 				List<PostPoint> postPointList = new List<PostPoint>();
 				List<PostPoint> mcsPointList = new List<PostPoint>();
+
+				// 這個segment的n個點
 				for( int j = 0; j < segmentIKInfoList[ i ].RotateAngleList.Count; j++ ) {
 
 					// TODO: filter the sigular points
 					// solve FK
 					gp_Pnt pointG54 = segmentIKInfoList[ i ].RotateAngleList[ j ].Item1.CADPoint.Point;
-					gp_Vec tcpOffset = postSolver.SolveFK( segmentIKInfoList[ i ].RotateAngleList[ j ].Item2, segmentIKInfoList[ i ].RotateAngleList[ j ].Item3, pointG54 );
+					gp_Vec tcpOffset = postSolver.SolveFK( segmentIKInfoList[ i ].RotateAngleList[ j ].Item2, segmentIKInfoList[i].RotateAngleList[ j ].Item3, pointG54 );
 					gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
 
 					// add G54 frame data
@@ -419,8 +414,8 @@ namespace MyCAM.Post
 						X = pointG54.X(),
 						Y = pointG54.Y(),
 						Z = pointG54.Z(),
-						Master = rotateAngleList[ i ].Item2,
-						Slave = rotateAngleList[ i ].Item3
+						Master = segmentIKInfoList[ i ].RotateAngleList[ j ].Item2,
+						Slave = segmentIKInfoList[ i ].RotateAngleList[ j ].Item3
 					};
 					postPointList.Add( frameDataG54 );
 
@@ -430,8 +425,8 @@ namespace MyCAM.Post
 						X = pointMCS.X(),
 						Y = pointMCS.Y(),
 						Z = pointMCS.Z(),
-						Master = rotateAngleList[ i ].Item2,
-						Slave = rotateAngleList[ i ].Item3
+						Master = segmentIKInfoList[ i ].RotateAngleList[ j ].Item2,
+						Slave = segmentIKInfoList[ i ].RotateAngleList[ j ].Item3
 					};
 					mcsPointList.Add( frameDataMCS );
 				}
