@@ -86,7 +86,12 @@ namespace MyCAM.Editor
 		{
 			// single select
 			if( !m_IsDragging && e.Button == MouseButtons.Left ) {
-				m_Viewer.Select();
+				if( ( Control.ModifierKeys & Keys.Control ) == Keys.Control ) {
+					m_Viewer.Select( AIS_SelectionScheme.AIS_SelectionScheme_XOR );
+				}
+				else {
+					m_Viewer.Select();
+				}
 				//SyncSelectionFromViewToTree();
 			}
 		}
@@ -120,7 +125,7 @@ namespace MyCAM.Editor
 
 		protected override void ViewerMouseUp( MouseEventArgs e )
 		{
-			if( e.Button == MouseButtons.Left ) {
+			if( m_IsDragging && e.Button == MouseButtons.Left ) {
 				int modifiedY = m_Viewer.Height - e.Y;
 				m_RubberBand.SetRectangle( e.X, modifiedY, e.X, modifiedY );
 				m_Viewer.GetAISContext().Redisplay( m_RubberBand, true ); // UpdateView does not work here
@@ -130,7 +135,12 @@ namespace MyCAM.Editor
 				int minY = Math.Min( m_RubberBandStartY, modifiedY );
 				int maxX = Math.Max( m_RubberBandStartX, e.X );
 				int maxY = Math.Max( m_RubberBandStartY, modifiedY );
-				m_Viewer.SelectRectangle( minX, minY, maxX, maxY, AIS_SelectionScheme.AIS_SelectionScheme_Add );
+				if( ( Control.ModifierKeys & Keys.Control ) == Keys.Control ) {
+					m_Viewer.SelectRectangle( minX, minY, maxX, maxY, AIS_SelectionScheme.AIS_SelectionScheme_XOR );
+				}
+				else {
+					m_Viewer.SelectRectangle( minX, minY, maxX, maxY );
+				}
 
 				// update dragging flag
 				m_IsDragging = false;
