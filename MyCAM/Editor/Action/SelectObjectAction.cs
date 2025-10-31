@@ -86,7 +86,7 @@ namespace MyCAM.Editor
 		{
 			// single select
 			if( !m_IsDragging && e.Button == MouseButtons.Left ) {
-				m_Viewer.GetAISContext().SelectDetected();
+				m_Viewer.Select();
 				m_Viewer.UpdateView();
 				//SyncSelectionFromViewToTree();
 			}
