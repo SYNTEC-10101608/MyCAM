@@ -50,6 +50,15 @@ namespace MyCAM
 
 			// this is to keep highlighted selected node when tree view looses focus
 			m_TreeView.HideSelection = false;
+			this.m_panTreeView.Controls.Remove( m_TreeView );
+			m_TreeView = new MultiSelectTreeView();
+			this.m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_TreeView.Location = new System.Drawing.Point( 0, 0 );
+			this.m_TreeView.Name = "m_TreeView";
+			this.m_TreeView.Size = new System.Drawing.Size( 165, 705 );
+			this.m_TreeView.TabIndex = 0;
+			this.m_TreeView.ForeColor = System.Drawing.Color.Black;
+			this.m_panTreeView.Controls.Add( this.m_TreeView );
 
 			// show G54
 			ShowG54Trihedron();

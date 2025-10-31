@@ -6,6 +6,7 @@ using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -31,9 +32,6 @@ namespace MyCAM.Editor
 			// viewer
 			m_RubberBand = new AIS_RubberBand( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1 );
 			m_RubberBand.SetRectangle( 0, 0, 0, 0 ); // need to set initial rectangle
-
-			// tree view
-			m_TreeViewBehavior = new MultiSelectTreeViewDecorator( treeView );
 
 			// sync selection
 			m_SelectedIDSet = new HashSet<string>();
@@ -73,7 +71,6 @@ namespace MyCAM.Editor
 
 			// display rubber band
 			m_Viewer.GetAISContext().Display( m_RubberBand, true );
-			m_TreeViewBehavior.SelectionChanged += TreeViewSelectionChanged;
 		}
 
 		public override void End()
@@ -248,7 +245,7 @@ namespace MyCAM.Editor
 			m_bSuppressTreeViewSync = true;
 
 			// clear old selection
-			m_TreeViewBehavior.ClearSelection();
+			(m_TreeView as MultiSelectTreeView).ClearSelection();
 			m_SelectedIDSet.Clear();
 
 			// get the selected ID
@@ -270,12 +267,14 @@ namespace MyCAM.Editor
 
 
 			// find the node in the tree view
+			List<TreeNode> selectedNodes = new List<TreeNode>();
 			foreach( string szUID in m_SelectedIDSet ) {
 				if( !m_ViewManager.TreeNodeMap.ContainsKey( szUID ) ) {
 					continue;
 				}
-				m_TreeViewBehavior.SelectNode( m_ViewManager.TreeNodeMap[ szUID ] );
+				selectedNodes.Add( m_ViewManager.TreeNodeMap[ szUID ] );
 			}
+			( m_TreeView as MultiSelectTreeView ).SelectNodes( selectedNodes );
 			m_bSuppressTreeViewSync = false;
 		}
 
@@ -290,8 +289,7 @@ namespace MyCAM.Editor
 			m_SelectedIDSet.Clear();
 
 			// get the selected ID
-			List<TreeNode> selectedNodes = new List<TreeNode>( m_TreeViewBehavior.SelectedNodes );
-			foreach( TreeNode node in selectedNodes ) {
+			foreach( TreeNode node in ( m_TreeView as MultiSelectTreeView ).SelectedNodes ) {
 				if( node == null || string.IsNullOrEmpty( node.Text ) ) {
 					continue;
 				}
@@ -320,9 +318,6 @@ namespace MyCAM.Editor
 		int m_RubberBandStartX = 0;
 		int m_RubberBandStartY = 0;
 		bool m_IsDragging = false;
-
-		// tree action
-		MultiSelectTreeViewDecorator m_TreeViewBehavior;
 
 		// selection sync
 		HashSet<string> m_SelectedIDSet;

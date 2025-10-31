@@ -1,239 +1,176 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using System.Drawing;
 
 namespace MyCAM.Editor
 {
-	public interface IMultiSelectTreeView
+	public class MultiSelectTreeView : TreeView
 	{
-		TreeView UnderlyingTreeView
-		{
-			get;
-		}
-		IReadOnlyCollection<TreeNode> SelectedNodes
-		{
-			get;
-		}
-		void SelectNode( TreeNode node );
-		void DeselectNode( TreeNode node );
-		void ToggleNodeSelection( TreeNode node );
-		void ClearSelection();
-	}
+		private HashSet<TreeNode> _selectedNodes = new HashSet<TreeNode>();
+		private TreeNode _lastNode = null;
+		private bool _suppressSelectEvent = false;
 
-	public class MultiSelectTreeViewDecorator : IMultiSelectTreeView
-	{
-		private readonly TreeView _treeView;
-		private readonly HashSet<TreeNode> _selectedNodes = new HashSet<TreeNode>();
-		private TreeNode _lastNodeClicked;
-		// store the starting node for Shift‑range
-		private TreeNode _rangeStartNode;
+		[Browsable( false )]
+		public IReadOnlyCollection<TreeNode> SelectedNodes => _selectedNodes;
 
-		public Action SelectionChanged;
-
-		public MultiSelectTreeViewDecorator( TreeView treeView )
+		public MultiSelectTreeView()
 		{
-			_treeView = treeView ?? throw new ArgumentNullException( nameof( treeView ) );
-			AttachEvents();
+			// Enable owner draw so we can highlight multiple nodes.
+			this.DrawMode = TreeViewDrawMode.OwnerDrawText;
+			this.HideSelection = false;
 		}
 
-		public TreeView UnderlyingTreeView => _treeView;
-
-		public IReadOnlyCollection<TreeNode> SelectedNodes => _selectedNodes.ToList().AsReadOnly();
-
-		private void AttachEvents()
-		{
-			_treeView.BeforeSelect += TreeView_BeforeSelect;
-			_treeView.NodeMouseClick += TreeView_NodeMouseClick;
-			_treeView.KeyDown += TreeView_KeyDown;
-			_treeView.DrawMode = TreeViewDrawMode.OwnerDrawText;
-			_treeView.DrawNode += TreeView_DrawNode;
-		}
-
-		private void TreeView_BeforeSelect( object sender, TreeViewCancelEventArgs e )
-		{
-			// Prevent default selection change 
-			e.Cancel = true;
-		}
-
-		private void TreeView_NodeMouseClick( object sender, TreeNodeMouseClickEventArgs e )
-		{
-			_treeView.Focus();
-
-			bool ctrl = ( Control.ModifierKeys & Keys.Control ) == Keys.Control;
-			bool shift = ( Control.ModifierKeys & Keys.Shift ) == Keys.Shift;
-
-			if( ctrl ) {
-				// Ctrl key toggles selection
-				ToggleNodeSelection( e.Node );
-				_rangeStartNode = e.Node;
-			}
-			else if( shift && _rangeStartNode != null ) {
-				// SHIFT pressed: select range between _rangeStartNode and clicked node
-				SelectRange( _rangeStartNode, e.Node );
-			}
-			else {
-				// No modifier: clear previous selection and start new
-				ClearSelection();
-				SelectNode( e.Node );
-				_rangeStartNode = e.Node;
-			}
-
-			_lastNodeClicked = e.Node;
-		}
-
-		private void TreeView_KeyDown( object sender, KeyEventArgs e )
-		{
-			// Example: Ctrl+A to select all
-			if( e.Control && e.KeyCode == Keys.A ) {
-				SelectAllNodes();
-				e.Handled = true;
-			}
-			// You can add more keyboard logic here (e.g., Shift+Arrow)
-		}
-
-		private void TreeView_DrawNode( object sender, DrawTreeNodeEventArgs e )
+		protected override void OnDrawNode( DrawTreeNodeEventArgs e )
 		{
 			if( _selectedNodes.Contains( e.Node ) ) {
-				e.Graphics.FillRectangle( SystemBrushes.Highlight, e.Node.Bounds );
-				TextRenderer.DrawText( e.Graphics, e.Node.Text, _treeView.Font,
-					e.Node.Bounds, SystemColors.HighlightText, TextFormatFlags.GlyphOverhangPadding );
+				// draw selected background
+				e.Graphics.FillRectangle( SystemBrushes.Highlight, e.Bounds );
+				TextRenderer.DrawText( e.Graphics,
+									  e.Node.Text,
+									  this.Font,
+									  e.Bounds,
+									  SystemColors.HighlightText,
+									  TextFormatFlags.GlyphOverhangPadding );
 			}
 			else {
 				e.DrawDefault = true;
+				base.OnDrawNode( e );
 			}
 		}
 
-		private void SelectRange( TreeNode startNode, TreeNode endNode )
+		protected override void OnBeforeSelect( TreeViewCancelEventArgs e )
 		{
-			if( startNode == null || endNode == null ) {
-				SelectNode( endNode );
+			if( _suppressSelectEvent ) {
+				base.OnBeforeSelect( e );
 				return;
 			}
 
-			// Clear previous selection
-			ClearSelection();
+			// We intercept selection and handle our multi-select logic.
+			e.Cancel = true;
 
-			// If same parent, simple sibling-range
-			if( startNode.Parent == endNode.Parent ) {
-				TreeNodeCollection nodes = startNode.Parent == null
-					? _treeView.Nodes
-					: startNode.Parent.Nodes;
+			TreeNode node = e.Node;
+			bool ctrl = ( ModifierKeys & Keys.Control ) == Keys.Control;
+			bool shift = ( ModifierKeys & Keys.Shift ) == Keys.Shift;
 
-				int idx1 = nodes.IndexOf( startNode );
-				int idx2 = nodes.IndexOf( endNode );
-				if( idx1 > idx2 ) {
-					var t = idx1;
-					idx1 = idx2;
-					idx2 = t;
-				}
-				for( int i = idx1; i <= idx2; i++ ) {
-					SelectNode( nodes[ i ] );
-				}
+			if( !ctrl && !shift ) {
+				// Single click without modifier: clear previous and select only this
+				ClearSelection();
+				AddNodeToSelection( node );
 			}
-			else {
-				// More complex scenario: tree nodes may be in different branches.
-				// Here we handle a “flat list” of all nodes in traversal order, then pick between indices.
-				List<TreeNode> all = GetAllVisibleNodes( _treeView ).ToList();
-				int i1 = all.IndexOf( startNode );
-				int i2 = all.IndexOf( endNode );
-				if( i1 < 0 || i2 < 0 ) {
-					// fallback to selecting just endNode
-					SelectNode( endNode );
+			else if( ctrl && !shift ) {
+				// Ctrl + click toggles selection of the node
+				if( _selectedNodes.Contains( node ) )
+					RemoveNodeFromSelection( node );
+				else
+					AddNodeToSelection( node );
+
+				_lastNode = node;
+			}
+			else if( shift ) {
+				// Shift + click: select range from last node to this node in same parent collection
+				if( _lastNode == null ) {
+					AddNodeToSelection( node );
 				}
 				else {
-					if( i1 > i2 ) {
-						var t = i1;
-						i1 = i2;
-						i2 = t;
+					TreeNode start = _lastNode;
+					TreeNode end = node;
+
+					// Find common parent
+					TreeNode parent = start.Parent == end.Parent ? start.Parent : null;
+					TreeNodeCollection siblings;
+					if( parent != null )
+						siblings = parent.Nodes;
+					else
+						siblings = this.Nodes;
+
+					int startIndex = siblings.IndexOf( start );
+					int endIndex = siblings.IndexOf( end );
+					if( startIndex > endIndex ) {
+						int tmp = startIndex;
+						startIndex = endIndex;
+						endIndex = tmp;
 					}
-					for( int i = i1; i <= i2; i++ ) {
-						SelectNode( all[ i ] );
-					}
+
+					ClearSelection();
+					for( int i = startIndex; i <= endIndex; i++ )
+						AddNodeToSelection( siblings[ i ] );
 				}
 			}
+
+			base.OnBeforeSelect( e );
 		}
 
-		private IEnumerable<TreeNode> GetAllVisibleNodes( TreeView tree )
+		protected override void OnAfterSelect( TreeViewEventArgs e )
 		{
-			foreach( TreeNode root in tree.Nodes ) {
-				foreach( var node in Traverse( root ) ) {
-					yield return node;
-				}
+			// Prevent the base TreeView from doing its default single‐select logic
+			if( !_suppressSelectEvent ) {
+				_suppressSelectEvent = true;
+				base.OnAfterSelect( e );
+				_suppressSelectEvent = false;
 			}
+
+			// Raise our own event if needed (you could add a SelectedNodesChanged event)
 		}
 
-		private IEnumerable<TreeNode> Traverse( TreeNode node )
+		private void AddNodeToSelection( TreeNode node )
 		{
-			yield return node;
-			foreach( TreeNode child in node.Nodes ) {
-				foreach( var desc in Traverse( child ) )
-					yield return desc;
-			}
+			_selectedNodes.Add( node );
+			_lastNode = node;
+			node.BackColor = SystemColors.Highlight;
+			node.ForeColor = SystemColors.HighlightText;
+			this.InvalidateNode( node );
 		}
 
-		public void SelectNode( TreeNode node )
+		private void RemoveNodeFromSelection( TreeNode node )
 		{
-			if( node == null )
-				return;
-			if( _selectedNodes.Add( node ) ) {
-				OnSelectionChanged();
-				_treeView.Invalidate( node.Bounds );
-				_treeView.Update();
-			}
-		}
-
-		public void DeselectNode( TreeNode node )
-		{
-			if( node == null )
-				return;
-			if( _selectedNodes.Remove( node ) ) {
-				OnSelectionChanged();
-				_treeView.Invalidate( node.Bounds );
-			}
-		}
-
-		public void ToggleNodeSelection( TreeNode node )
-		{
-			if( node == null )
-				return;
-			if( _selectedNodes.Contains( node ) )
-				DeselectNode( node );
-			else
-				SelectNode( node );
+			_selectedNodes.Remove( node );
+			node.BackColor = this.BackColor;
+			node.ForeColor = this.ForeColor;
+			this.InvalidateNode( node );
 		}
 
 		public void ClearSelection()
 		{
-			if( _selectedNodes.Count == 0 )
-				return;
-			foreach( var node in _selectedNodes.ToList() ) {
-				_treeView.Invalidate( node.Bounds );
+			foreach( var n in _selectedNodes.ToList() ) {
+				n.BackColor = this.BackColor;
+				n.ForeColor = this.ForeColor;
+				this.InvalidateNode( n );
 			}
+
 			_selectedNodes.Clear();
-			OnSelectionChanged();
 		}
 
-		public void SelectAllNodes()
+		private void InvalidateNode( TreeNode node )
+		{
+			if( node != null ) {
+				Rectangle r = node.Bounds;
+				if( !r.IsEmpty )
+					this.Invalidate( r );
+			}
+		}
+
+		/// <summary>
+		/// Utility: programmatically select the given node (clearing others) 
+		/// </summary>
+		/// <param name="node"></param>
+		public void SelectNode( TreeNode node )
 		{
 			ClearSelection();
-			foreach( TreeNode node in _treeView.Nodes ) {
-				SelectNodeRecursive( node );
-			}
+			AddNodeToSelection( node );
 		}
 
-		private void SelectNodeRecursive( TreeNode node )
+		/// <summary>
+		/// Utility: programmatically select multiple nodes (clearing existing selection) 
+		/// </summary>
+		/// <param name="nodes"></param>
+		public void SelectNodes( IEnumerable<TreeNode> nodes )
 		{
-			SelectNode( node );
-			foreach( TreeNode child in node.Nodes ) {
-				SelectNodeRecursive( child );
-			}
-		}
-
-		private void OnSelectionChanged()
-		{
-			SelectionChanged?.Invoke();
+			ClearSelection();
+			foreach( var n in nodes )
+				AddNodeToSelection( n );
 		}
 	}
 }
