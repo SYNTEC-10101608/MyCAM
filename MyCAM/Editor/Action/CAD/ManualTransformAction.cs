@@ -95,7 +95,6 @@ namespace MyCAM.Editor
 				else {
 					m_Viewer.Select( AIS_SelectionScheme.AIS_SelectionScheme_Replace );
 				}
-				m_Viewer.UpdateView();
 			}
 		}
 
