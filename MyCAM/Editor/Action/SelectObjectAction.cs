@@ -5,6 +5,7 @@ using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -26,8 +27,16 @@ namespace MyCAM.Editor
 			: base( dataManager, viewer, treeView, viewManager )
 		{
 			m_SelectType = type;
+
+			// viewer
 			m_RubberBand = new AIS_RubberBand( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1 );
 			m_RubberBand.SetRectangle( 0, 0, 0, 0 ); // need to set initial rectangle
+
+			// tree view
+			m_TreeViewBehavior = new MultiSelectTreeViewDecorator( treeView );
+
+			// sync selection
+			m_SelectedIDSet = new HashSet<string>();
 		}
 
 		public override EditActionType ActionType
@@ -60,10 +69,11 @@ namespace MyCAM.Editor
 				}
 			}
 			m_bSuppressTreeViewSync = false;
-			SyncSelectionFromTreeToView();
+			//SyncSelectionFromTreeToView();
 
 			// display rubber band
 			m_Viewer.GetAISContext().Display( m_RubberBand, true );
+			m_TreeViewBehavior.SelectionChanged += TreeViewSelectionChanged;
 		}
 
 		public override void End()
@@ -92,7 +102,7 @@ namespace MyCAM.Editor
 				else {
 					m_Viewer.Select();
 				}
-				//SyncSelectionFromViewToTree();
+				SyncSelectionFromViewToTree();
 			}
 		}
 
@@ -141,6 +151,7 @@ namespace MyCAM.Editor
 				else {
 					m_Viewer.SelectRectangle( minX, minY, maxX, maxY );
 				}
+				SyncSelectionFromViewToTree();
 
 				// update dragging flag
 				m_IsDragging = false;
@@ -154,13 +165,13 @@ namespace MyCAM.Editor
 
 		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
 		{
-			if( e.Node == null ) {
-				return;
-			}
+			//if( e.Node == null ) {
+			//	return;
+			//}
 
-			// tell CAMEditor tree select is change
-			TreeSelectionChange?.Invoke();
-			SyncSelectionFromTreeToView();
+			//// tell CAMEditor tree select is change
+			//TreeSelectionChange?.Invoke();
+			//SyncSelectionFromTreeToView();
 		}
 
 		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
@@ -176,6 +187,11 @@ namespace MyCAM.Editor
 			}
 			string szUID = selectedNode.Text;
 			ChangeObjectVisibility( szUID );
+		}
+
+		void TreeViewSelectionChanged()
+		{
+			SyncSelectionFromTreeToView();
 		}
 
 		void OnKeyDown( KeyEventArgs e )
@@ -229,31 +245,37 @@ namespace MyCAM.Editor
 
 		void SyncSelectionFromViewToTree()
 		{
-			// clear tree view selection, this set does not trigger the AfterSelect event
-			m_TreeView.SelectedNode = null;
+			m_bSuppressTreeViewSync = true;
 
-			// get the selected shape
+			// clear old selection
+			m_TreeViewBehavior.ClearSelection();
+			m_SelectedIDSet.Clear();
+
+			// get the selected ID
 			m_Viewer.GetAISContext().InitSelected();
-			if( !m_Viewer.GetAISContext().MoreSelected() ) {
-				return;
-			}
-			TopoDS_Shape selectedShape = m_Viewer.GetAISContext().SelectedShape();
-			if( selectedShape == null || selectedShape.IsNull() ) {
-				return;
+			while( m_Viewer.GetAISContext().MoreSelected() ) {
+				TopoDS_Shape selectedShape = m_Viewer.GetAISContext().SelectedShape();
+				if( selectedShape == null || selectedShape.IsNull() ) {
+					continue;
+				}
+
+				// find the corresponding UID
+				string szUID = m_DataManager.GetUIDByShape( selectedShape );
+				if( string.IsNullOrEmpty( szUID ) ) {
+					continue;
+				}
+				m_SelectedIDSet.Add( szUID );
+				m_Viewer.GetAISContext().NextSelected();
 			}
 
-			// find the corresponding UID
-			string szUID = m_DataManager.GetUIDByShape( selectedShape );
-			if( string.IsNullOrEmpty( szUID ) ) {
-				return;
-			}
 
 			// find the node in the tree view
-			if( !m_ViewManager.TreeNodeMap.ContainsKey( szUID ) ) {
-				return;
+			foreach( string szUID in m_SelectedIDSet ) {
+				if( !m_ViewManager.TreeNodeMap.ContainsKey( szUID ) ) {
+					continue;
+				}
+				m_TreeViewBehavior.SelectNode( m_ViewManager.TreeNodeMap[ szUID ] );
 			}
-			m_bSuppressTreeViewSync = true;
-			m_TreeView.SelectedNode = m_ViewManager.TreeNodeMap[ szUID ];
 			m_bSuppressTreeViewSync = false;
 		}
 
@@ -263,36 +285,46 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// clear viewer slection
-			m_Viewer.GetAISContext().ClearSelected( true );
+			// clear old slection
+			m_Viewer.GetAISContext().ClearSelected( false );
+			m_SelectedIDSet.Clear();
 
-			// get the selected node
-			TreeNode node = m_TreeView.SelectedNode;
-			if( node == null || string.IsNullOrEmpty( node.Text ) ) {
-				return;
+			// get the selected ID
+			List<TreeNode> selectedNodes = new List<TreeNode>( m_TreeViewBehavior.SelectedNodes );
+			foreach( TreeNode node in selectedNodes ) {
+				if( node == null || string.IsNullOrEmpty( node.Text ) ) {
+					continue;
+				}
+				m_SelectedIDSet.Add( node.Text );
 			}
-			string szUID = node.Text;
 
 			// find the corresponding view object
-			if( !m_ViewManager.ViewObjectMap.ContainsKey( szUID ) ) {
-				return;
+			foreach( string szUID in m_SelectedIDSet ) {
+				if( !m_ViewManager.ViewObjectMap.ContainsKey( szUID ) ) {
+					continue;
+				}
+				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szUID ];
+				if( viewObject == null || viewObject.AISHandle == null ) {
+					continue;
+				}
+				m_Viewer.GetAISContext().AddOrRemoveSelected( viewObject.AISHandle, false );
 			}
-			ViewObject viewObject = m_ViewManager.ViewObjectMap[ szUID ];
-			if( viewObject == null || viewObject.AISHandle == null ) {
-				return;
-			}
-
-			// select the shape in the viewer
-			m_Viewer.GetAISContext().SetSelected( viewObject.AISHandle, true );
+			m_Viewer.UpdateView();
 		}
 
 		bool m_bSuppressTreeViewSync = false;
 		ESelectObjectType m_SelectType;
 
-		// mouse action
+		// viewer mouse action
 		AIS_RubberBand m_RubberBand;
 		int m_RubberBandStartX = 0;
 		int m_RubberBandStartY = 0;
 		bool m_IsDragging = false;
+
+		// tree action
+		MultiSelectTreeViewDecorator m_TreeViewBehavior;
+
+		// selection sync
+		HashSet<string> m_SelectedIDSet;
 	}
 }

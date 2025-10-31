@@ -79,6 +79,7 @@
     <Compile Include="Editor\Dialog\TraverseDlg.Designer.cs">
       <DependentUpon>TraverseDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\TreeViewAdapter.cs" />
     <Compile Include="Editor\IEditor.cs" />
     <Compile Include="Editor\SimuEditor.cs" />
     <Compile Include="Data\LeadData.cs" />
