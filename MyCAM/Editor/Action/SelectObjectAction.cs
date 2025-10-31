@@ -1,4 +1,7 @@
 ﻿using MyCAM.Data;
+using OCC.AIS;
+using OCC.Aspect;
+using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
@@ -23,6 +26,8 @@ namespace MyCAM.Editor
 			: base( dataManager, viewer, treeView, viewManager )
 		{
 			m_SelectType = type;
+			m_RubberBand = new AIS_RubberBand( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1 );
+			m_RubberBand.SetRectangle( 0, 0, 0, 0 ); // need to set initial rectangle
 		}
 
 		public override EditActionType ActionType
@@ -56,6 +61,9 @@ namespace MyCAM.Editor
 			}
 			m_bSuppressTreeViewSync = false;
 			SyncSelectionFromTreeToView();
+
+			// display rubber band
+			m_Viewer.GetAISContext().Display( m_RubberBand, true );
 		}
 
 		public override void End()
@@ -68,16 +76,65 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
 			}
 			m_bSuppressTreeViewSync = false;
+
+			// remove rubber band
+			m_Viewer.GetAISContext().Remove( m_RubberBand, true );
 			base.End();
 		}
 
 		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
-			// select
-			if( e.Button == MouseButtons.Left ) {
+			// single select
+			if( !m_IsDragging && e.Button == MouseButtons.Left ) {
 				m_Viewer.GetAISContext().SelectDetected();
 				m_Viewer.UpdateView();
-				SyncSelectionFromViewToTree();
+				//SyncSelectionFromViewToTree();
+			}
+		}
+
+		protected override void ViewerMouseDown( MouseEventArgs e )
+		{
+			if( e.Button == MouseButtons.Left ) {
+				int modifiedY = m_Viewer.Height - e.Y;
+				m_RubberBandStartX = e.X;
+				m_RubberBandStartY = modifiedY;
+				m_RubberBand.SetRectangle( m_RubberBandStartX, m_RubberBandStartY, m_RubberBandStartX, m_RubberBandStartY );
+				m_Viewer.GetAISContext().Redisplay( m_RubberBand, true ); // UpdateView does not work here
+			}
+		}
+
+		protected override void ViewerMouseMove( MouseEventArgs e )
+		{
+			if( e.Button == MouseButtons.Left ) {
+				int modifiedY = m_Viewer.Height - e.Y;
+				int minX = Math.Min( m_RubberBandStartX, e.X );
+				int minY = Math.Min( m_RubberBandStartY, modifiedY );
+				int maxX = Math.Max( m_RubberBandStartX, e.X );
+				int maxY = Math.Max( m_RubberBandStartY, modifiedY );
+				m_RubberBand.SetRectangle( minX, minY, maxX, maxY );
+				m_Viewer.GetAISContext().Redisplay( m_RubberBand, true ); // UpdateView does not work here
+
+				// update dragging flag
+				m_IsDragging = true;
+			}
+		}
+
+		protected override void ViewerMouseUp( MouseEventArgs e )
+		{
+			if( e.Button == MouseButtons.Left ) {
+				int modifiedY = m_Viewer.Height - e.Y;
+				m_RubberBand.SetRectangle( e.X, modifiedY, e.X, modifiedY );
+				m_Viewer.GetAISContext().Redisplay( m_RubberBand, true ); // UpdateView does not work here
+
+				// select shapes within rubber band
+				int minX = Math.Min( m_RubberBandStartX, e.X );
+				int minY = Math.Min( m_RubberBandStartY, modifiedY );
+				int maxX = Math.Max( m_RubberBandStartX, e.X );
+				int maxY = Math.Max( m_RubberBandStartY, modifiedY );
+				m_Viewer.SelectRectangle( minX, minY, maxX, maxY, AIS_SelectionScheme.AIS_SelectionScheme_Add );
+
+				// update dragging flag
+				m_IsDragging = false;
 			}
 		}
 
@@ -222,5 +279,11 @@ namespace MyCAM.Editor
 
 		bool m_bSuppressTreeViewSync = false;
 		ESelectObjectType m_SelectType;
+
+		// mouse action
+		AIS_RubberBand m_RubberBand;
+		int m_RubberBandStartX = 0;
+		int m_RubberBandStartY = 0;
+		bool m_IsDragging = false;
 	}
 }
