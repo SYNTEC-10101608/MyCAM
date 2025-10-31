@@ -71,6 +71,7 @@ namespace MyCAM.Editor
 
 			// display rubber band
 			m_Viewer.GetAISContext().Display( m_RubberBand, true );
+			(m_TreeView as MultiSelectTreeView).SelectedNodesChanged += ( s, e ) => TreeViewSelectionChanged();
 		}
 
 		public override void End()
@@ -86,6 +87,7 @@ namespace MyCAM.Editor
 
 			// remove rubber band
 			m_Viewer.GetAISContext().Remove( m_RubberBand, true );
+			(m_TreeView as MultiSelectTreeView).SelectedNodesChanged -= ( s, e ) => TreeViewSelectionChanged();
 			base.End();
 		}
 
