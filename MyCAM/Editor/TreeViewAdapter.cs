@@ -13,6 +13,7 @@ namespace MyCAM.Editor
 		private TreeNode _lastNode = null;
 		private bool _suppressSelectEvent = false;
 		private bool _cascadeCheck = false;
+		private TreeNode _anchorNode = null;
 
 		public event EventHandler SelectedNodesChanged;
 
@@ -58,33 +59,42 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			e.Cancel = true;  // we will handle selection ourselves
-
+			e.Cancel = true;
 			TreeNode node = e.Node;
 			bool ctrl = ( ModifierKeys & Keys.Control ) == Keys.Control;
 			bool shift = ( ModifierKeys & Keys.Shift ) == Keys.Shift;
 
 			if( !ctrl && !shift ) {
+				// plain click: clear previous, select only this
 				ClearSelection();
 				AddNodeToSelection( node );
+
+				// reset anchor for future shift‑range
+				_anchorNode = node;
 			}
 			else if( ctrl && !shift ) {
+				// Ctrl + click: toggle
 				if( _selectedNodes.Contains( node ) )
 					RemoveNodeFromSelection( node );
 				else
 					AddNodeToSelection( node );
+
+				// reset anchor to this node (so next shift uses this as start)
+				_anchorNode = node;
 				_lastNode = node;
 			}
 			else if( shift ) {
-				if( _lastNode == null ) {
+				// Shift + click: use anchorNode as start
+				if( _anchorNode == null ) {
 					AddNodeToSelection( node );
+					_anchorNode = node;
 				}
 				else {
-					// attempt range select across same parent or root
-					TreeNode start = _lastNode;
+					TreeNode start = _anchorNode;
 					TreeNode end = node;
-					TreeNodeCollection siblings = null;
 
+					// get siblings or root collection
+					TreeNodeCollection siblings = null;
 					if( start.Parent == end.Parent && start.Parent != null )
 						siblings = start.Parent.Nodes;
 					else if( start.Parent == null && end.Parent == null )
@@ -94,10 +104,12 @@ namespace MyCAM.Editor
 						int startIndex = siblings.IndexOf( start );
 						int endIndex = siblings.IndexOf( end );
 						if( startIndex > endIndex ) {
+							// swap
 							var tmp = startIndex;
 							startIndex = endIndex;
 							endIndex = tmp;
 						}
+
 						ClearSelection();
 						for( int i = startIndex; i <= endIndex; i++ ) {
 							AddNodeToSelection( siblings[ i ] );
@@ -108,6 +120,8 @@ namespace MyCAM.Editor
 						AddNodeToSelection( node );
 					}
 				}
+				_lastNode = node;
+				// Note: Do NOT reset _anchorNode here.
 			}
 
 			base.OnBeforeSelect( e );
