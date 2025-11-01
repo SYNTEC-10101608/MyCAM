@@ -244,11 +244,11 @@ namespace MyCAM.Editor
 		{
 			if( highlight ) {
 				node.BackColor = SystemColors.Highlight;
-				node.ForeColor = SystemColors.HighlightText;
+				//node.ForeColor = SystemColors.HighlightText;
 			}
 			else {
 				node.BackColor = this.BackColor;
-				node.ForeColor = this.ForeColor;
+				//node.ForeColor = this.ForeColor;
 			}
 		}
 

@@ -159,12 +159,9 @@ namespace MyCAM.Editor
 
 		public void ChangeObjectVisibility()
 		{
-			TreeNode selectedNode = m_TreeView.SelectedNode;
-			if( selectedNode == null || string.IsNullOrEmpty( selectedNode.Text ) ) {
-				return;
+			foreach( string szUID in m_SelectedIDSet ) {
+				ChangeObjectVisibility( szUID );
 			}
-			string szUID = selectedNode.Text;
-			ChangeObjectVisibility( szUID );
 		}
 
 		void ChangeObjectVisibility( string szUID )
