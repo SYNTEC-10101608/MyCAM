@@ -45,6 +45,7 @@ namespace MyCAM.Editor
 		public virtual void EditStart()
 		{
 			// start default action
+			m_DefaultAction.ClearSelection();
 			m_CurrentAction = m_DefaultAction;
 			m_CurrentAction.Start();
 		}
@@ -59,6 +60,7 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				m_DefaultAction.End();
 			}
+			m_DefaultAction.ClearSelection();
 		}
 
 		protected virtual void StartEditAction( IEditorAction action )

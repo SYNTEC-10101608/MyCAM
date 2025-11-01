@@ -7,7 +7,6 @@ using OCCViewer;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace MyCAM.Editor
 {
@@ -38,25 +37,36 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 			ActivateObject();
+			SyncSlectionFromSet();
 			m_bSuppressTreeViewSync = false;
-			//SyncSelectionFromTreeToView();
 
 			// display rubber band
 			m_Viewer.GetAISContext().Display( m_RubberBand, true );
-			( m_TreeView as MultiSelectTreeView ).SelectionChanged += ( s, e ) => TreeViewSelectionChanged();
+			( m_TreeView as MultiSelectTreeView ).SelectionChanged += TreeViewSelectionChanged;
 		}
 
 		public override void End()
 		{
-			// clear selection
-			m_Viewer.GetAISContext().ClearSelected( true );
-			m_bSuppressTreeViewSync = false;
 			DeactivateObject();
+			m_bSuppressTreeViewSync = false;
 
 			// remove rubber band
 			m_Viewer.GetAISContext().Remove( m_RubberBand, true );
-			( m_TreeView as MultiSelectTreeView ).SelectionChanged -= ( s, e ) => TreeViewSelectionChanged();
+			( m_TreeView as MultiSelectTreeView ).SelectionChanged -= TreeViewSelectionChanged;
 			base.End();
+		}
+
+		public void ChangeObjectVisibility()
+		{
+			foreach( string szUID in m_SelectedIDSet ) {
+				ChangeObjectVisibility( szUID );
+			}
+		}
+
+		public void ClearSelection()
+		{
+			m_SelectedIDSet.Clear();
+			SyncSlectionFromSet();
 		}
 
 		protected override void ViewerMouseClick( MouseEventArgs e )
@@ -157,13 +167,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void ChangeObjectVisibility()
-		{
-			foreach( string szUID in m_SelectedIDSet ) {
-				ChangeObjectVisibility( szUID );
-			}
-		}
-
 		void ChangeObjectVisibility( string szUID )
 		{
 			// toggle the visibility of the selected object
@@ -194,7 +197,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void TreeViewSelectionChanged()
+		void TreeViewSelectionChanged( object sender, EventArgs e )
 		{
 			SyncSelectionFromTreeToView();
 		}
@@ -265,6 +268,33 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().AddOrRemoveSelected( viewObject.AISHandle, false );
 			}
 			m_Viewer.UpdateView();
+		}
+
+		void SyncSlectionFromSet()
+		{
+			// sync to tree
+			m_bSuppressTreeViewSync = true;
+			( m_TreeView as MultiSelectTreeView ).ClearSelection();
+			foreach( string szUID in m_SelectedIDSet ) {
+				if( !m_ViewManager.TreeNodeMap.ContainsKey( szUID ) ) {
+					continue;
+				}
+				( m_TreeView as MultiSelectTreeView ).SelectNode( m_ViewManager.TreeNodeMap[ szUID ] );
+			}
+			m_bSuppressTreeViewSync = false;
+
+			// sync to view
+			m_Viewer.GetAISContext().ClearSelected( false );
+			foreach( string szUID in m_SelectedIDSet ) {
+				if( !m_ViewManager.ViewObjectMap.ContainsKey( szUID ) ) {
+					continue;
+				}
+				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szUID ];
+				if( viewObject == null || viewObject.AISHandle == null ) {
+					continue;
+				}
+				m_Viewer.GetAISContext().AddOrRemoveSelected( viewObject.AISHandle, false );
+			}
 		}
 
 		bool m_bSuppressTreeViewSync = false;
