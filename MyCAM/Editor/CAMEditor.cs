@@ -43,10 +43,10 @@ namespace MyCAM.Editor
 			m_DataManager.PathAdded += OnPathAdded;
 
 			// default action is select object action
-			m_DefaultAction = new SelectObjectAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Path );
-			( m_DefaultAction as SelectObjectAction ).TreeSelectionChange += OnTreeSelectionChange;
-			( m_DefaultAction as SelectObjectAction ).RemovePath += RemovePath;
-			( m_DefaultAction as SelectObjectAction ).PathOrderMove += MoveProcess;
+			m_DefaultAction = new SelectPathAction_( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+			( m_DefaultAction as SelectPathAction_ ).TreeSelectionChange += OnTreeSelectionChange;
+			( m_DefaultAction as SelectPathAction_ ).RemovePath += RemovePath;
+			( m_DefaultAction as SelectPathAction_ ).PathOrderMove += MoveProcess;
 		}
 
 		// for viewer resource handle

@@ -7,27 +7,17 @@ using OCCViewer;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace MyCAM.Editor
 {
-	internal enum ESelectObjectType
-	{
-		Part,
-		Path,
-	}
-
-	internal class SelectObjectAction : KeyMouseActionBase
+	internal abstract class SelectObjectAction : KeyMouseActionBase
 	{
 		public Action TreeSelectionChange;
-		public Action RemovePath;
-		public Action<bool> PathOrderMove;
 
-		public SelectObjectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
-			ESelectObjectType type )
+		protected SelectObjectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
-			m_SelectType = type;
-
 			// viewer
 			m_RubberBand = new AIS_RubberBand( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1 );
 			m_RubberBand.SetRectangle( 0, 0, 0, 0 ); // need to set initial rectangle
@@ -47,24 +37,7 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-
-			// reset activation mode
-			if( m_SelectType == ESelectObjectType.Part ) {
-				foreach( var partID in m_DataManager.PartIDList ) {
-					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
-						continue;
-					}
-					m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle );
-				}
-			}
-			else if( m_SelectType == ESelectObjectType.Path ) {
-				foreach( var partID in m_DataManager.PathIDList ) {
-					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
-						continue;
-					}
-					m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle );
-				}
-			}
+			ActivateObject();
 			m_bSuppressTreeViewSync = false;
 			//SyncSelectionFromTreeToView();
 
@@ -77,12 +50,8 @@ namespace MyCAM.Editor
 		{
 			// clear selection
 			m_Viewer.GetAISContext().ClearSelected( true );
-
-			// reset activation mode
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
-			}
 			m_bSuppressTreeViewSync = false;
+			DeactivateObject();
 
 			// remove rubber band
 			m_Viewer.GetAISContext().Remove( m_RubberBand, true );
@@ -177,6 +146,17 @@ namespace MyCAM.Editor
 			OnKeyDown( e );
 		}
 
+		protected abstract void ActivateObject();
+
+		protected abstract void DeactivateObject();
+
+		protected virtual void OnKeyDown( KeyEventArgs e )
+		{
+			if( e.KeyCode == Keys.Space ) {
+				ChangeObjectVisibility();
+			}
+		}
+
 		public void ChangeObjectVisibility()
 		{
 			TreeNode selectedNode = m_TreeView.SelectedNode;
@@ -185,30 +165,6 @@ namespace MyCAM.Editor
 			}
 			string szUID = selectedNode.Text;
 			ChangeObjectVisibility( szUID );
-		}
-
-		void TreeViewSelectionChanged()
-		{
-			SyncSelectionFromTreeToView();
-		}
-
-		void OnKeyDown( KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Space ) {
-				ChangeObjectVisibility();
-			}
-			if( e.KeyCode == Keys.Delete ) {
-				RemovePath?.Invoke();
-			}
-			if( e.Shift ) {
-				if( e.KeyCode == Keys.Up ) {
-					PathOrderMove?.Invoke( true );
-				}
-
-				if( e.KeyCode == Keys.Down ) {
-					PathOrderMove?.Invoke( false );
-				}
-			}
 		}
 
 		void ChangeObjectVisibility( string szUID )
@@ -239,6 +195,11 @@ namespace MyCAM.Editor
 				node.ForeColor = System.Drawing.Color.LightGray;
 				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, true );
 			}
+		}
+
+		void TreeViewSelectionChanged()
+		{
+			SyncSelectionFromTreeToView();
 		}
 
 		void SyncSelectionFromViewToTree()
@@ -310,7 +271,6 @@ namespace MyCAM.Editor
 		}
 
 		bool m_bSuppressTreeViewSync = false;
-		ESelectObjectType m_SelectType;
 
 		// viewer mouse action
 		AIS_RubberBand m_RubberBand;

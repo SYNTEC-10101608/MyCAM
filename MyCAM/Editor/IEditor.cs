@@ -105,7 +105,7 @@ namespace MyCAM.Editor
 		protected readonly ViewManager m_ViewManager;
 
 		// action properties
-		protected IEditorAction m_DefaultAction;
+		protected SelectObjectAction m_DefaultAction;
 		protected IEditorAction m_CurrentAction;
 		protected bool m_IsNextAction = false;
 	}

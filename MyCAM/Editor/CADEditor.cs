@@ -33,7 +33,7 @@ namespace MyCAM.Editor
 			m_DataManager.FeatureAdded += OnFeatureAdded;
 
 			// default action is select object action
-			m_DefaultAction = new SelectObjectAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Part );
+			m_DefaultAction = new SelectPartAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 		}
 
 		// editor
