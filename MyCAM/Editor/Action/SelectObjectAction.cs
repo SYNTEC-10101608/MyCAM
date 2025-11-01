@@ -6,7 +6,6 @@ using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -71,7 +70,7 @@ namespace MyCAM.Editor
 
 			// display rubber band
 			m_Viewer.GetAISContext().Display( m_RubberBand, true );
-			(m_TreeView as MultiSelectTreeView).SelectedNodesChanged += ( s, e ) => TreeViewSelectionChanged();
+			( m_TreeView as MultiSelectTreeView ).SelectionChanged += ( s, e ) => TreeViewSelectionChanged();
 		}
 
 		public override void End()
@@ -87,7 +86,7 @@ namespace MyCAM.Editor
 
 			// remove rubber band
 			m_Viewer.GetAISContext().Remove( m_RubberBand, true );
-			(m_TreeView as MultiSelectTreeView).SelectedNodesChanged -= ( s, e ) => TreeViewSelectionChanged();
+			( m_TreeView as MultiSelectTreeView ).SelectionChanged -= ( s, e ) => TreeViewSelectionChanged();
 			base.End();
 		}
 
@@ -247,7 +246,7 @@ namespace MyCAM.Editor
 			m_bSuppressTreeViewSync = true;
 
 			// clear old selection
-			(m_TreeView as MultiSelectTreeView).ClearSelection();
+			( m_TreeView as MultiSelectTreeView ).ClearSelection();
 			m_SelectedIDSet.Clear();
 
 			// get the selected ID
@@ -269,14 +268,12 @@ namespace MyCAM.Editor
 
 
 			// find the node in the tree view
-			List<TreeNode> selectedNodes = new List<TreeNode>();
 			foreach( string szUID in m_SelectedIDSet ) {
 				if( !m_ViewManager.TreeNodeMap.ContainsKey( szUID ) ) {
 					continue;
 				}
-				selectedNodes.Add( m_ViewManager.TreeNodeMap[ szUID ] );
+				( m_TreeView as MultiSelectTreeView ).SelectNode( m_ViewManager.TreeNodeMap[ szUID ] );
 			}
-			( m_TreeView as MultiSelectTreeView ).SelectNodes( selectedNodes );
 			m_bSuppressTreeViewSync = false;
 		}
 

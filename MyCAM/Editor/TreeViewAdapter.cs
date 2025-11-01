@@ -9,396 +9,318 @@ namespace MyCAM.Editor
 {
 	public class MultiSelectTreeView : TreeView
 	{
-		private HashSet<TreeNode> _selectedNodes = new HashSet<TreeNode>();
-		private TreeNode _lastNode = null;
-		private bool _suppressSelectEvent = false;
-		private bool _cascadeCheck = false;
+		// Maintains the selected nodes
+		private readonly List<TreeNode> _selectedNodes = new List<TreeNode>();
+		// Anchor node for Shift selection
 		private TreeNode _anchorNode = null;
 
-		public event EventHandler SelectedNodesChanged;
-
+		// Public read-only access to selected nodes
 		[Browsable( false )]
-		public IReadOnlyCollection<TreeNode> SelectedNodes => _selectedNodes;
+		public IReadOnlyList<TreeNode> SelectedNodes => _selectedNodes.AsReadOnly();
 
-		[DefaultValue( false )]
-		public bool CascadeCheck
-		{
-			get => _cascadeCheck;
-			set => _cascadeCheck = value;
-		}
+		// Event for selection changes
+		public event EventHandler SelectionChanged;
 
 		public MultiSelectTreeView()
 		{
-			this.DrawMode = TreeViewDrawMode.OwnerDrawText;
+			// Enable keyboard support
 			this.HideSelection = false;
-			// Allow checkboxes if wanted, user must set CheckBoxes = true in designer/code
-			this.CheckBoxes = false;
-		}
-
-		protected override void OnDrawNode( DrawTreeNodeEventArgs e )
-		{
-			if( _selectedNodes.Contains( e.Node ) ) {
-				e.Graphics.FillRectangle( SystemBrushes.Highlight, e.Bounds );
-				TextRenderer.DrawText( e.Graphics,
-									  e.Node.Text,
-									  this.Font,
-									  e.Bounds,
-									  SystemColors.HighlightText,
-									  TextFormatFlags.GlyphOverhangPadding );
-			}
-			else {
-				e.DrawDefault = true;
-				base.OnDrawNode( e );
-			}
+			// Ensure no built-in selected node (we manage highlighting ourselves)
+			base.SelectedNode = null;
+			// Subscribe to key down
+			this.KeyDown += MultiSelectTreeView_KeyDown;
 		}
 
 		protected override void OnBeforeSelect( TreeViewCancelEventArgs e )
 		{
-			if( _suppressSelectEvent ) {
-				base.OnBeforeSelect( e );
-				return;
-			}
-
+			// Cancel built-in selection – we manage selection manually
 			e.Cancel = true;
-			TreeNode node = e.Node;
-			bool ctrl = ( ModifierKeys & Keys.Control ) == Keys.Control;
-			bool shift = ( ModifierKeys & Keys.Shift ) == Keys.Shift;
-
-			if( !ctrl && !shift ) {
-				// plain click: clear previous, select only this
-				ClearSelection();
-				AddNodeToSelection( node );
-
-				// reset anchor for future shift‑range
-				_anchorNode = node;
-			}
-			else if( ctrl && !shift ) {
-				// Ctrl + click: toggle
-				if( _selectedNodes.Contains( node ) )
-					RemoveNodeFromSelection( node );
-				else
-					AddNodeToSelection( node );
-
-				// reset anchor to this node (so next shift uses this as start)
-				_anchorNode = node;
-				_lastNode = node;
-			}
-			else if( shift ) {
-				// Shift + click: use anchorNode as start
-				if( _anchorNode == null ) {
-					AddNodeToSelection( node );
-					_anchorNode = node;
-				}
-				else {
-					TreeNode start = _anchorNode;
-					TreeNode end = node;
-
-					// get siblings or root collection
-					TreeNodeCollection siblings = null;
-					if( start.Parent == end.Parent && start.Parent != null )
-						siblings = start.Parent.Nodes;
-					else if( start.Parent == null && end.Parent == null )
-						siblings = this.Nodes;
-
-					if( siblings != null ) {
-						int startIndex = siblings.IndexOf( start );
-						int endIndex = siblings.IndexOf( end );
-						if( startIndex > endIndex ) {
-							// swap
-							var tmp = startIndex;
-							startIndex = endIndex;
-							endIndex = tmp;
-						}
-
-						ClearSelection();
-						for( int i = startIndex; i <= endIndex; i++ ) {
-							AddNodeToSelection( siblings[ i ] );
-						}
-					}
-					else {
-						ClearSelection();
-						AddNodeToSelection( node );
-					}
-				}
-				_lastNode = node;
-				// Note: Do NOT reset _anchorNode here.
-			}
-
 			base.OnBeforeSelect( e );
 		}
 
 		protected override void OnAfterSelect( TreeViewEventArgs e )
 		{
-			if( !_suppressSelectEvent ) {
-				_suppressSelectEvent = true;
-				base.OnAfterSelect( e );
-				_suppressSelectEvent = false;
-			}
-			OnSelectedNodesChanged( EventArgs.Empty );
+			// Prevent built-in selection highlight
+			base.OnAfterSelect( e );
+			if( base.SelectedNode != null )
+				base.SelectedNode = null;
 		}
 
-		protected override bool IsInputKey( Keys keyData )
+		protected override void OnMouseDown( MouseEventArgs e )
 		{
-			// Let Up/Down/Home/End/PageUp/PageDown be input keys so OnKeyDown will receive them.
-			if( ( keyData & Keys.KeyCode ) == Keys.Up ||
-				( keyData & Keys.KeyCode ) == Keys.Down ||
-				( keyData & Keys.KeyCode ) == Keys.Home ||
-				( keyData & Keys.KeyCode ) == Keys.End ||
-				( keyData & Keys.KeyCode ) == Keys.PageUp ||
-				( keyData & Keys.KeyCode ) == Keys.PageDown ||
-				( keyData & Keys.KeyCode ) == Keys.A && ( ModifierKeys & Keys.Control ) == Keys.Control ) {
-				return true;
-			}
-			return base.IsInputKey( keyData );
-		}
-
-		protected override void OnKeyDown( KeyEventArgs e )
-		{
-			base.OnKeyDown( e );
-
-			if( e.Control && e.KeyCode == Keys.A ) {
-				// Ctrl+A = select all nodes
-				SelectAllNodes();
-				e.Handled = true;
+			TreeNode node = this.GetNodeAt( e.Location );
+			if( node == null ) {
+				base.OnMouseDown( e );
 				return;
 			}
 
-			if( !_selectedNodes.Any() )
-				return;
+			bool ctrl = ( ModifierKeys & Keys.Control ) == Keys.Control;
+			bool shift = ( ModifierKeys & Keys.Shift ) == Keys.Shift;
 
-			TreeNode currentFocus = _lastNode ?? _selectedNodes.First();
-
-			TreeNode next = null;
-			switch( e.KeyCode ) {
-				case Keys.Up:
-					next = GetPreviousNode( currentFocus );
-					break;
-				case Keys.Down:
-					next = GetNextNode( currentFocus );
-					break;
-				case Keys.Home:
-					next = GetFirstVisibleNode();
-					break;
-				case Keys.End:
-					next = GetLastVisibleNode();
-					break;
-				case Keys.PageUp:
-					next = GetPageUpNode( currentFocus );
-					break;
-				case Keys.PageDown:
-					next = GetPageDownNode( currentFocus );
-					break;
-			}
-
-			if( next != null ) {
+			if( !ctrl && !shift ) {
+				// Normal click: clear selection, select this node
 				ClearSelection();
-				AddNodeToSelection( next );
-				this.SelectedNode = next;  // ensures focus is set
+				SelectNode( node );
+				_anchorNode = node;
+			}
+			else if( ctrl ) {
+				// Ctrl click: toggle this node
+				if( _selectedNodes.Contains( node ) )
+					UnselectNode( node );
+				else
+					SelectNode( node );
+				_anchorNode = node;
+			}
+			else if( shift ) {
+				// Shift click: select range from anchor to this node
+				if( _anchorNode == null ) {
+					// No anchor, behave like normal click
+					ClearSelection();
+					SelectNode( node );
+					_anchorNode = node;
+				}
+				else {
+					SelectRange( _anchorNode, node, ctrlMode: false );
+				}
+			}
+
+			base.OnMouseDown( e );
+		}
+
+		private void MultiSelectTreeView_KeyDown( object sender, KeyEventArgs e )
+		{
+			// Handle Up / Down navigation
+			if( e.KeyCode == Keys.Up || e.KeyCode == Keys.Down ) {
 				e.Handled = true;
+				TreeNode next = null;
+				if( _selectedNodes.Count > 0 ) {
+					// pick last selected as focus
+					TreeNode current = _selectedNodes.Last();
+					next = ( e.KeyCode == Keys.Up ) ? GetPreviousVisibleNode( current ) : GetNextVisibleNode( current );
+				}
+				else {
+					// pick first visible node
+					next = this.TopNode;
+				}
+
+				if( next != null ) {
+					bool ctrl = ( ModifierKeys & Keys.Control ) == Keys.Control;
+					bool shift = ( ModifierKeys & Keys.Shift ) == Keys.Shift;
+
+					if( !ctrl && !shift ) {
+						ClearSelection();
+						SelectNode( next );
+						_anchorNode = next;
+					}
+					else if( ctrl ) {
+						// toggle
+						if( _selectedNodes.Contains( next ) )
+							UnselectNode( next );
+						else
+							SelectNode( next );
+						_anchorNode = next;
+					}
+					else if( shift ) {
+						if( _anchorNode == null ) {
+							SelectNode( next );
+							_anchorNode = next;
+						}
+						else {
+							SelectRange( _anchorNode, next, ctrlMode: false );
+						}
+					}
+
+					// bring node into view
+					this.SelectedNode = next;  // temporarily set to scroll into view
+					this.SelectedNode = null;
+				}
+			}
+			// Handle Ctrl+A
+			else if( e.Control && e.KeyCode == Keys.A ) {
+				e.Handled = true;
+				SelectAll();
 			}
 		}
 
-		private void SelectAllNodes()
-		{
-			ClearSelection();
-			foreach( TreeNode node in GetAllNodesRecursive( this.Nodes ) ) {
-				AddNodeToSelection( node );
-			}
-		}
-
-		private IEnumerable<TreeNode> GetAllNodesRecursive( TreeNodeCollection nodes )
-		{
-			foreach( TreeNode n in nodes ) {
-				yield return n;
-				foreach( var child in GetAllNodesRecursive( n.Nodes ) )
-					yield return child;
-			}
-		}
-
-		private TreeNode GetFirstVisibleNode()
-		{
-			return this.Nodes.Cast<TreeNode>().FirstOrDefault( n => n != null );
-		}
-
-		private TreeNode GetLastVisibleNode()
-		{
-			var all = GetAllNodesRecursive( this.Nodes ).ToList();
-			return all.LastOrDefault();
-		}
-
-		private TreeNode GetNextNode( TreeNode node )
-		{
-			// In‑order traversal of visible nodes (all expanded).
-			if( node == null )
-				return null;
-
-			// children first
-			if( node.IsExpanded && node.Nodes.Count > 0 )
-				return node.Nodes[ 0 ];
-
-			// next sibling
-			var parent = node.Parent;
-			TreeNodeCollection siblings = parent != null ? parent.Nodes : this.Nodes;
-			int idx = siblings.IndexOf( node );
-			if( idx < siblings.Count - 1 )
-				return siblings[ idx + 1 ];
-
-			// climb up until you find a next sibling
-			TreeNode ancestor = parent;
-			while( ancestor != null ) {
-				TreeNodeCollection ancSib = ancestor.Parent != null ? ancestor.Parent.Nodes : this.Nodes;
-				int ancIdx = ancSib.IndexOf( ancestor );
-				if( ancIdx < ancSib.Count - 1 )
-					return ancSib[ ancIdx + 1 ];
-				ancestor = ancestor.Parent;
-			}
-
-			return null;
-		}
-
-		private TreeNode GetPreviousNode( TreeNode node )
-		{
-			if( node == null )
-				return null;
-
-			var parent = node.Parent;
-			TreeNodeCollection siblings = parent != null ? parent.Nodes : this.Nodes;
-			int idx = siblings.IndexOf( node );
-
-			if( idx > 0 ) {
-				// previous sibling, then go deep into its last visible child
-				TreeNode prev = siblings[ idx - 1 ];
-				// go to deepest visible child
-				while( prev.IsExpanded && prev.Nodes.Count > 0 )
-					prev = prev.Nodes[ prev.Nodes.Count - 1 ];
-				return prev;
-			}
-
-			// no previous sibling so parent is previous
-			if( parent != null )
-				return parent;
-
-			return null;
-		}
-
-		private TreeNode GetPageUpNode( TreeNode node )
-		{
-			// simple implementation: move up by e.g. 10 nodes
-			const int step = 10;
-			TreeNode current = node;
-			for( int i = 0; i < step; i++ ) {
-				var prev = GetPreviousNode( current );
-				if( prev == null )
-					break;
-				current = prev;
-			}
-			return current;
-		}
-
-		private TreeNode GetPageDownNode( TreeNode node )
-		{
-			const int step = 10;
-			TreeNode current = node;
-			for( int i = 0; i < step; i++ ) {
-				var nxt = GetNextNode( current );
-				if( nxt == null )
-					break;
-				current = nxt;
-			}
-			return current;
-		}
-
-		protected override void OnAfterCheck( TreeViewEventArgs e )
-		{
-			base.OnAfterCheck( e );
-			if( this.CheckBoxes && _cascadeCheck ) {
-				TreeNode node = e.Node;
-				bool isChecked = node.Checked;
-				CascadeCheckChildren( node, isChecked );
-				CascadeCheckParent( node );
-			}
-		}
-
-		private void CascadeCheckChildren( TreeNode node, bool isChecked )
-		{
-			foreach( TreeNode child in node.Nodes ) {
-				child.Checked = isChecked;
-				CascadeCheckChildren( child, isChecked );
-			}
-		}
-
-		private void CascadeCheckParent( TreeNode node )
-		{
-			if( node.Parent != null ) {
-				bool allSibsChecked = node.Parent.Nodes.Cast<TreeNode>().All( n => n.Checked );
-				node.Parent.Checked = allSibsChecked;
-				CascadeCheckParent( node.Parent );
-			}
-		}
-
-		private void AddNodeToSelection( TreeNode node )
+		/// <summary>
+		/// Selects the given node (adds to selection).
+		/// </summary>
+		public void SelectNode( TreeNode node )
 		{
 			if( node == null )
 				return;
-			if( !_selectedNodes.Contains( node ) ) {
-				_selectedNodes.Add( node );
-				_lastNode = node;
-				node.BackColor = SystemColors.Highlight;
-				node.ForeColor = SystemColors.HighlightText;
-				InvalidateNode( node );
-				OnSelectedNodesChanged( EventArgs.Empty );
-			}
+			if( _selectedNodes.Contains( node ) )
+				return;
+			_selectedNodes.Add( node );
+			HighlightNode( node, true );
+			OnSelectionChanged();
 		}
 
-		private void RemoveNodeFromSelection( TreeNode node )
+		/// <summary>
+		/// Unselects the given node (removes from selection).
+		/// </summary>
+		public void UnselectNode( TreeNode node )
 		{
 			if( node == null )
 				return;
-			if( _selectedNodes.Contains( node ) ) {
-				_selectedNodes.Remove( node );
-				node.BackColor = this.BackColor;
-				node.ForeColor = this.ForeColor;
-				InvalidateNode( node );
-				OnSelectedNodesChanged( EventArgs.Empty );
+			if( _selectedNodes.Remove( node ) ) {
+				HighlightNode( node, false );
+				OnSelectionChanged();
 			}
 		}
 
+		/// <summary>
+		/// Clears all selections.
+		/// </summary>
 		public void ClearSelection()
 		{
 			if( _selectedNodes.Count == 0 )
 				return;
 			foreach( var n in _selectedNodes.ToList() ) {
-				n.BackColor = this.BackColor;
-				n.ForeColor = this.ForeColor;
-				InvalidateNode( n );
+				HighlightNode( n, false );
 			}
 			_selectedNodes.Clear();
-			_lastNode = null;
-			OnSelectedNodesChanged( EventArgs.Empty );
+			OnSelectionChanged();
 		}
 
-		private void InvalidateNode( TreeNode node )
-		{
-			if( node != null && node.Bounds != Rectangle.Empty )
-				this.Invalidate( node.Bounds );
-		}
-
-		public void SelectNode( TreeNode node )
+		/// <summary>
+		/// Selects all nodes in the tree (pre-order).
+		/// </summary>
+		public void SelectAll()
 		{
 			ClearSelection();
-			AddNodeToSelection( node );
+			foreach( TreeNode n in GetAllNodes( this.Nodes ) ) {
+				_selectedNodes.Add( n );
+				HighlightNode( n, true );
+			}
+			OnSelectionChanged();
 		}
 
-		public void SelectNodes( IEnumerable<TreeNode> nodes )
+		/// <summary>
+		/// Helper: select a contiguous range between two nodes in tree-visible order.
+		/// If ctrlMode is true, we don’t clear existing, otherwise we clear first.
+		/// </summary>
+		private void SelectRange( TreeNode anchor, TreeNode current, bool ctrlMode )
 		{
-			ClearSelection();
-			foreach( var n in nodes )
-				AddNodeToSelection( n );
+			if( anchor == null || current == null )
+				return;
+
+			// Build a list of visible nodes in display order
+			List<TreeNode> visible = GetVisibleNodes().ToList();
+			int idx1 = visible.IndexOf( anchor );
+			int idx2 = visible.IndexOf( current );
+			if( idx1 < 0 || idx2 < 0 )
+				return;
+
+			int start = Math.Min( idx1, idx2 );
+			int end = Math.Max( idx1, idx2 );
+
+			if( !ctrlMode )
+				ClearSelection();
+
+			for( int i = start; i <= end; i++ ) {
+				TreeNode n = visible[ i ];
+				if( !_selectedNodes.Contains( n ) ) {
+					_selectedNodes.Add( n );
+					HighlightNode( n, true );
+				}
+			}
+
+			OnSelectionChanged();
 		}
 
-		protected virtual void OnSelectedNodesChanged( EventArgs e )
+		/// <summary>
+		/// Raise selection changed event.
+		/// </summary>
+		protected virtual void OnSelectionChanged()
 		{
-			SelectedNodesChanged?.Invoke( this, e );
+			SelectionChanged?.Invoke( this, EventArgs.Empty );
+		}
+
+		/// <summary>
+		/// Highlight or un-highlight a node (change BackColor/ForeColor).
+		/// </summary>
+		private void HighlightNode( TreeNode node, bool highlight )
+		{
+			if( highlight ) {
+				node.BackColor = SystemColors.Highlight;
+				node.ForeColor = SystemColors.HighlightText;
+			}
+			else {
+				node.BackColor = this.BackColor;
+				node.ForeColor = this.ForeColor;
+			}
+		}
+
+		/// <summary>
+		/// Get all nodes under a collection (recursive).
+		/// </summary>
+		private IEnumerable<TreeNode> GetAllNodes( TreeNodeCollection nodes )
+		{
+			foreach( TreeNode n in nodes ) {
+				yield return n;
+				foreach( var child in GetAllNodes( n.Nodes ) )
+					yield return child;
+			}
+		}
+
+		/// <summary>
+		/// Get a flat list of visible nodes (in expand/collapse visible order).
+		/// </summary>
+		private IEnumerable<TreeNode> GetVisibleNodes()
+		{
+			TreeNode n = this.TopNode;
+			while( n != null ) {
+				yield return n;
+				if( n.IsExpanded && n.Nodes.Count > 0 ) {
+					n = n.Nodes[ 0 ];
+				}
+				else {
+					// go to next sibling or parent’s next sibling
+					while( n != null && n.NextNode == null )
+						n = n.Parent;
+					if( n != null )
+						n = n.NextNode;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets the next visible node after the given node, or null.
+		/// </summary>
+		private TreeNode GetNextVisibleNode( TreeNode node )
+		{
+			if( node == null )
+				return null;
+			if( node.IsExpanded && node.Nodes.Count > 0 )
+				return node.Nodes[ 0 ];
+			if( node.NextNode != null )
+				return node.NextNode;
+			TreeNode p = node.Parent;
+			while( p != null ) {
+				if( p.NextNode != null )
+					return p.NextNode;
+				p = p.Parent;
+			}
+			return null;
+		}
+
+		/// <summary>
+		/// Gets the previous visible node before the given node, or null.
+		/// </summary>
+		private TreeNode GetPreviousVisibleNode( TreeNode node )
+		{
+			if( node == null )
+				return null;
+			if( node.PrevNode != null ) {
+				// move to last visible child of previous sibling
+				TreeNode n = node.PrevNode;
+				while( n.IsExpanded && n.Nodes.Count > 0 ) {
+					n = n.Nodes[ n.Nodes.Count - 1 ];
+				}
+				return n;
+			}
+			return node.Parent;
 		}
 	}
 }
