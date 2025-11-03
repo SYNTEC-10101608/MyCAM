@@ -27,6 +27,18 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
+	internal struct EditableInfo
+	{
+		public bool IsStartPointEditable;
+		public bool IsReverseEditable;
+		public bool IsOverCutEditable;
+		public bool IsLeadLineEditable;
+		public bool IsChangeLeadDirectionEditable;
+		public bool IsToolVecEditable;
+		public bool IsToolVecReverseEditable;
+		public bool IsTraverseEditable;
+	}
+
 	internal class CAMEditor : EditorBase
 	{
 		// to notice main form
@@ -44,7 +56,7 @@ namespace MyCAM.Editor
 
 			// default action is select object action
 			m_DefaultAction = new SelectPathAction_( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
-			( m_DefaultAction as SelectPathAction_ ).TreeSelectionChange += OnTreeSelectionChange;
+			( m_DefaultAction as SelectPathAction_ ).SelectionChange += OnPathSelectionChange;
 			( m_DefaultAction as SelectPathAction_ ).RemovePath += RemovePath;
 			( m_DefaultAction as SelectPathAction_ ).PathOrderMove += MoveProcess;
 		}
@@ -532,7 +544,7 @@ namespace MyCAM.Editor
 		}
 
 		// tree selection changed
-		void OnTreeSelectionChange()
+		void OnPathSelectionChange()
 		{
 			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;

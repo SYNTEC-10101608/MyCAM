@@ -12,7 +12,7 @@ namespace MyCAM.Editor
 {
 	internal abstract class SelectObjectAction : KeyMouseActionBase
 	{
-		public Action TreeSelectionChange;
+		public Action SelectionChange;
 
 		protected SelectObjectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
@@ -80,6 +80,7 @@ namespace MyCAM.Editor
 					m_Viewer.Select();
 				}
 				SyncSelectionFromViewToTree();
+				SelectionChange?.Invoke();
 			}
 		}
 
@@ -129,6 +130,7 @@ namespace MyCAM.Editor
 					m_Viewer.SelectRectangle( minX, minY, maxX, maxY );
 				}
 				SyncSelectionFromViewToTree();
+				SelectionChange?.Invoke();
 
 				// update dragging flag
 				m_IsDragging = false;
@@ -200,6 +202,7 @@ namespace MyCAM.Editor
 		void TreeViewSelectionChanged( object sender, EventArgs e )
 		{
 			SyncSelectionFromTreeToView();
+			SelectionChange?.Invoke();
 		}
 
 		void SyncSelectionFromViewToTree()
@@ -295,6 +298,8 @@ namespace MyCAM.Editor
 				}
 				m_Viewer.GetAISContext().AddOrRemoveSelected( viewObject.AISHandle, false );
 			}
+			m_Viewer.UpdateView();
+			SelectionChange?.Invoke();
 		}
 
 		bool m_bSuppressTreeViewSync = false;
