@@ -27,8 +27,22 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal struct EditableInfo
+	internal class EditableInfo
 	{
+		public EditableInfo()
+		{
+			// all set true
+			IsStartPointEditable = true;
+			IsReverseEditable = true;
+			IsOverCutEditable = true;
+			IsLeadLineEditable = true;
+			IsChangeLeadDirectionEditable = true;
+			IsToolVecEditable = true;
+			IsToolVecReverseEditable = true;
+			IsTraverseEditable = true;
+			
+		}
+
 		public bool IsStartPointEditable;
 		public bool IsReverseEditable;
 		public bool IsOverCutEditable;
@@ -37,12 +51,14 @@ namespace MyCAM.Editor
 		public bool IsToolVecEditable;
 		public bool IsToolVecReverseEditable;
 		public bool IsTraverseEditable;
+		public bool IsMoveProcessEditable;
+		public bool IsAutoOrderEditable;
 	}
 
 	internal class CAMEditor : EditorBase
 	{
 		// to notice main form
-		public Action<bool, bool> PathPropertyChanged; // isClosed, hasLead
+		public Action<EditableInfo> PathPropertyChanged; // isClosed, hasLead
 		public Action<EditActionType, EActionStatus> RaiseCAMActionStatusChange;
 
 		// action with dialog need to disable main form
@@ -511,19 +527,34 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		// tree selection changed
-		void OnPathSelectionChange() // TODO: multi select
+		// selection changed
+		void OnPathSelectionChange()
 		{
 			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
 			List<string> szPathIDList = GetSelectedIDList();
-			string szPathID = szPathIDList.Count > 0 ? szPathIDList[ 0 ] : string.Empty;
-			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
-				return;
+			EditableInfo editableInfo = new EditableInfo();
+
+			// no multi edit: start point, tool vec, sort
+			if( szPathIDList.Count > 1 ) {
+				editableInfo.IsStartPointEditable = false;
+				editableInfo.IsToolVecEditable = false;
+				editableInfo.IsMoveProcessEditable = false;
+				editableInfo.IsAutoOrderEditable = false;
 			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
-			PathPropertyChanged?.Invoke( pathData.CAMData.IsClosed, pathData.CAMData.IsHasLead );
+
+			// closed path editable only: start point, overcut, lead line, change lead dir
+			foreach( string szPathID in szPathIDList ) {
+				if( !( (PathData)m_DataManager.ShapeDataMap[ szPathID ] ).CAMData.IsClosed ) {
+					editableInfo.IsStartPointEditable = false;
+					editableInfo.IsOverCutEditable = false;
+					editableInfo.IsLeadLineEditable = false;
+					editableInfo.IsChangeLeadDirectionEditable = false;
+					break;
+				}
+			}
+			PathPropertyChanged?.Invoke( editableInfo );
 		}
 
 		#region Show CAM

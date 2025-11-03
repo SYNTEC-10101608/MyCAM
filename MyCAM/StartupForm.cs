@@ -575,23 +575,16 @@ namespace MyCAM
 		}
 
 		// path property change event
-		void OnCAMPathPropertyChanged( bool isClosePath, bool isPathWithLead )
+		void OnCAMPathPropertyChanged( EditableInfo editableInfo )
 		{
-			OnPathIsCloseChanged( isClosePath );
-			OnPathLeadChanged( isPathWithLead );
-		}
-
-		void OnPathIsCloseChanged( bool isClosePath )
-		{
-			m_tsbStartPoint.Enabled = isClosePath;
-			m_tsbSetLead.Enabled = isClosePath;
-			m_tsbFlipLead.Enabled = isClosePath;
-			m_tsbOverCut.Enabled = isClosePath;
-		}
-
-		void OnPathLeadChanged( bool isPathWithLead )
-		{
-			m_tsbFlipLead.Enabled = isPathWithLead;
+			m_tsbStartPoint.Enabled = editableInfo.IsStartPointEditable;
+			m_tsbOverCut.Enabled = editableInfo.IsOverCutEditable;
+			m_tsbSetLead.Enabled = editableInfo.IsLeadLineEditable;
+			m_tsbFlipLead.Enabled = editableInfo.IsChangeLeadDirectionEditable;
+			m_tsbToolVec.Enabled = editableInfo.IsToolVecEditable;
+			m_tsbMoveUp.Enabled = editableInfo.IsMoveProcessEditable;
+			m_tsbMoveDown.Enabled = editableInfo.IsMoveProcessEditable;
+			m_tsbAutoOrder.Enabled = editableInfo.IsAutoOrderEditable;
 		}
 
 		// ui display
