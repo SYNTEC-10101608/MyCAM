@@ -8,11 +8,6 @@ namespace MyCAM.Post
 {
 	internal class PathEndInfo
 	{
-		public bool IsExist
-		{
-			get; set;
-		}
-
 		public CAMPoint EndCAMPoint
 		{
 			get; set;
@@ -31,8 +26,8 @@ namespace MyCAM.Post
 
 	internal static class PostHelper
 	{
-		public static bool SolvePath( PostSolver postSolver, CAMData currentCAMData, PathEndInfo endInfoOfPreviousPath,
-			bool isFirstPath, bool isLastPath, EntryAndExitData entryAndExitData,
+		public static bool SolvePath( PostSolver postSolver, CAMData currentCAMData,
+			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
 			out PostData pathG54PostData, out PostData pathMCSPostData, out PathEndInfo currentPathtEndInfo )
 		{
 			// for simulation
@@ -48,8 +43,8 @@ namespace MyCAM.Post
 			}
 
 			// to ensure joint space continuity of process path
-			double dLastPointProcess_M = endInfoOfPreviousPath.IsExist ? endInfoOfPreviousPath.Master : 0;
-			double dLastPointProcess_S = endInfoOfPreviousPath.IsExist ? endInfoOfPreviousPath.Slave : 0;
+			double dLastPointProcess_M = endInfoOfPreviousPath?.Master ?? 0;
+			double dLastPointProcess_S = endInfoOfPreviousPath?.Slave ?? 0;
 
 			// flag for process start point
 			bool bStart = false;
@@ -107,12 +102,14 @@ namespace MyCAM.Post
 				pathMCSPostData.LeadOutPostPointList.AddRange( leadOutMCS );
 			}
 
-			// traverse from previous path to current path
-			if( isFirstPath ) {
+			// should be the first path
+			if( endInfoOfPreviousPath == null ) {
 
-				// the entry is treat as cut down of the first path
+				// the traverse of first path is entry
 				CalculateEntry( currentCAMData, entryAndExitData, ref pathG54PostData, ref pathMCSPostData );
 			}
+
+			// traverse from previous path to current path
 			else {
 				CalculateTraverse( endInfoOfPreviousPath, currentCAMData, ref pathG54PostData, ref pathMCSPostData );
 			}
@@ -120,7 +117,6 @@ namespace MyCAM.Post
 			// end info of current path
 			currentPathtEndInfo = new PathEndInfo()
 			{
-				IsExist = true,
 				EndCAMPoint = currentCAMData.GetProcessEndPoint(),
 				Master = dLastPointProcess_M,
 				Slave = dLastPointProcess_S
@@ -227,7 +223,7 @@ namespace MyCAM.Post
 
 		static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, CAMData currentCAMData, ref PostData pathG54PostData, ref PostData pathMCSPostData )
 		{
-			if( endInfoOfPreviousPath.IsExist == false ) {
+			if( endInfoOfPreviousPath == null ) {
 				return;
 			}
 
