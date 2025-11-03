@@ -178,18 +178,18 @@ namespace MyCAM.Post
 
 			// solve IK
 			List<Tuple<double, double>> rotateAngleList = new List<Tuple<double, double>>();
-			List<bool> sigularTagList = new List<bool>();
+			List<bool> singularTagList = new List<bool>();
 			foreach( CAMPoint point in camPointList ) {
 				IKSolveResult ikResult = postSolver.SolveIK( point, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
-				if( ikResult == IKSolveResult.IvalidInput || ikResult == IKSolveResult.NoSolution ) {
+				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
 					return false;
 				}
 				rotateAngleList.Add( new Tuple<double, double>( dLastProcessPathM, dLastProcessPathS ) );
 				if( ikResult == IKSolveResult.NoError ) {
-					sigularTagList.Add( false );
+					singularTagList.Add( false );
 				}
 				else if( ikResult == IKSolveResult.MasterInfinityOfSolution || ikResult == IKSolveResult.SlaveInfinityOfSolution ) {
-					sigularTagList.Add( true );
+					singularTagList.Add( true );
 				}
 			}
 
