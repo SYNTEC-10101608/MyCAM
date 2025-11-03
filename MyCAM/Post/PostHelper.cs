@@ -38,7 +38,7 @@ namespace MyCAM.Post
 
 			// to make solution continuous
 			currentPathtEndInfo = new PathEndInfo();
-			if( postSolver == null || endInfoOfPreviousPath == null || currentCAMData == null ) {
+			if( postSolver == null || currentCAMData == null ) {
 				return false;
 			}
 
