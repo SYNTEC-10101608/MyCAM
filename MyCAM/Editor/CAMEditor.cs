@@ -840,17 +840,17 @@ namespace MyCAM.Editor
 			}
 
 			// entry
-			CAMPoint firstPathStartPoint = camDataList.First().GetProcessStartPoint();
-			CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
 			if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
+				CAMPoint firstPathStartPoint = camDataList.First().GetProcessStartPoint();
+				CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
 				AIS_Line entryLine = GetLineAIS( entryPoint.CADPoint.Point, firstPathStartPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
 				m_TraverseAISList.Insert( 0, entryLine );
 			}
 
 			// exit
-			CAMPoint lastPathEndPoint = camDataList.Last().GetProcessEndPoint();
-			CAMPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
 			if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
+				CAMPoint lastPathEndPoint = camDataList.Last().GetProcessEndPoint();
+				CAMPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
 				AIS_Line exitLine = GetLineAIS( lastPathEndPoint.CADPoint.Point, exitPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
 				m_TraverseAISList.Add( exitLine );
 			}

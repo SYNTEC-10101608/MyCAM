@@ -127,6 +127,11 @@ namespace MyCAM.Post
 		public static void CalculateExit( PathEndInfo endInfoOfLastPath, EntryAndExitData entryAndExitData,
 			out PostPoint G54ExitPoint, out PostPoint MCSExitPoint )
 		{
+			if( entryAndExitData.ExitDistance <= 0 ) {
+				G54ExitPoint = null;
+				MCSExitPoint = null;
+				return;
+			}
 			CAMPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfLastPath.EndCAMPoint, entryAndExitData.ExitDistance );
 
 			// G54
@@ -315,6 +320,13 @@ namespace MyCAM.Post
 
 		static void CalculateEntry( CAMData currentCAMData, EntryAndExitData entryAndExitData, ref PostData pathG54PostData, ref PostData pathMCSPostData )
 		{
+			if( entryAndExitData.EntryDistance <= 0 ) {
+
+				// just set follow safe distance
+				pathG54PostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
+				pathMCSPostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
+				return;
+			}
 			CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( currentCAMData.GetProcessStartPoint(), entryAndExitData.EntryDistance );
 
 			// G54
