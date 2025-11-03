@@ -38,9 +38,8 @@
 			this.m_txbLiftUpDistance = new System.Windows.Forms.TextBox();
 			this.m_lblLiftUpDistance = new System.Windows.Forms.Label();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.m_chkEnableFrogLeap = new System.Windows.Forms.CheckBox();
-			this.m_txbFrogLeapDistance = new System.Windows.Forms.TextBox();
 			this.m_lblFrogLeapDistance = new System.Windows.Forms.Label();
+			this.m_txbFrogLeapDistance = new System.Windows.Forms.TextBox();
 			this.m_lblFrogLeapDistanceUnit = new System.Windows.Forms.Label();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
@@ -165,7 +164,6 @@
 			this.tableLayoutPanel1.Controls.Add(this.m_lblFrogLeapDistance, 1, 4);
 			this.tableLayoutPanel1.Controls.Add(this.m_txbFrogLeapDistance, 2, 4);
 			this.tableLayoutPanel1.Controls.Add(this.m_lblFrogLeapDistanceUnit, 3, 4);
-			this.tableLayoutPanel1.Controls.Add(this.m_chkEnableFrogLeap, 1, 5);
 			this.tableLayoutPanel1.Controls.Add(this.m_btnConfirm, 3, 7);
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -181,16 +179,15 @@
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(410, 310);
 			this.tableLayoutPanel1.TabIndex = 17;
 			// 
-			// m_chkEnableFrogLeap
+			// m_lblFrogLeapDistance
 			// 
-			this.m_chkEnableFrogLeap.AutoSize = true;
-			this.m_chkEnableFrogLeap.Location = new System.Drawing.Point(23, 143);
-			this.m_chkEnableFrogLeap.Name = "m_chkEnableFrogLeap";
-			this.m_chkEnableFrogLeap.Size = new System.Drawing.Size(59, 22);
-			this.m_chkEnableFrogLeap.TabIndex = 4;
-			this.m_chkEnableFrogLeap.Text = "蛙跳";
-			this.m_chkEnableFrogLeap.UseVisualStyleBackColor = true;
-			this.m_chkEnableFrogLeap.CheckedChanged += new System.EventHandler(this.m_chkEnableFrogLeap_CheckedChanged);
+			this.m_lblFrogLeapDistance.AutoSize = true;
+			this.m_lblFrogLeapDistance.Location = new System.Drawing.Point(26, 110);
+			this.m_lblFrogLeapDistance.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+			this.m_lblFrogLeapDistance.Name = "m_lblFrogLeapDistance";
+			this.m_lblFrogLeapDistance.Size = new System.Drawing.Size(72, 18);
+			this.m_lblFrogLeapDistance.TabIndex = 6;
+			this.m_lblFrogLeapDistance.Text = "蛙跳距離";
 			// 
 			// m_txbFrogLeapDistance
 			// 
@@ -201,16 +198,6 @@
 			this.m_txbFrogLeapDistance.TabIndex = 3;
 			this.m_txbFrogLeapDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbFrogLeapDistance_KeyDown);
 			this.m_txbFrogLeapDistance.Leave += new System.EventHandler(this.m_txbFrogLeapDistance_Leave);
-			// 
-			// m_lblFrogLeapDistance
-			// 
-			this.m_lblFrogLeapDistance.AutoSize = true;
-			this.m_lblFrogLeapDistance.Location = new System.Drawing.Point(26, 110);
-			this.m_lblFrogLeapDistance.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-			this.m_lblFrogLeapDistance.Name = "m_lblFrogLeapDistance";
-			this.m_lblFrogLeapDistance.Size = new System.Drawing.Size(72, 18);
-			this.m_lblFrogLeapDistance.TabIndex = 6;
-			this.m_lblFrogLeapDistance.Text = "蛙跳距離";
 			// 
 			// m_lblFrogLeapDistanceUnit
 			// 
@@ -254,6 +241,5 @@
 		private System.Windows.Forms.TextBox m_txbFrogLeapDistance;
 		private System.Windows.Forms.Label m_lblFrogLeapDistance;
 		private System.Windows.Forms.Label m_lblFrogLeapDistanceUnit;
-		private System.Windows.Forms.CheckBox m_chkEnableFrogLeap;
 	}
 }

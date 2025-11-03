@@ -403,11 +403,6 @@ namespace MyCAM.FileManager
 			get; set;
 		}
 
-		public bool EnableFrogLeap
-		{
-			get; set;
-		}
-
 		// parameterless constructor (for XmlSerializer)
 		internal TraverseDataDTO()
 		{
@@ -422,12 +417,11 @@ namespace MyCAM.FileManager
 			CutDownDistance = traverseData.CutDownDistance;
 			FollowSafeDistance = traverseData.FollowSafeDistance;
 			FrogLeapDistance = traverseData.FrogLeapDistance;
-			EnableFrogLeap = traverseData.EnableFrogLeap;
 		}
 
 		internal TraverseData ToTraverseData()
 		{
-			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance, EnableFrogLeap );
+			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance );
 		}
 	}
 

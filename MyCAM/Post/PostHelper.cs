@@ -262,7 +262,7 @@ namespace MyCAM.Post
 			}
 
 			// frog leap
-			if( currentCAMData.TraverseData.EnableFrogLeap && currentCAMData.TraverseData.FrogLeapDistance > 0 ) {
+			if( currentCAMData.TraverseData.FrogLeapDistance > 0 ) {
 				CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCAMData.TraverseData.FrogLeapDistance );
 
 				// G54 middle point

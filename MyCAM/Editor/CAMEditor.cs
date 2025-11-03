@@ -805,7 +805,7 @@ namespace MyCAM.Editor
 				}
 
 				// frog leap
-				if( currentCamData.TraverseData.EnableFrogLeap && currentCamData.TraverseData.FrogLeapDistance > 0 ) {
+				if( currentCamData.TraverseData.FrogLeapDistance > 0 ) {
 					CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCamData.TraverseData.FrogLeapDistance );
 					GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( p2.CADPoint.Point, p3.CADPoint.Point, p4.CADPoint.Point );
 					if( makeCircle.IsDone() ) {
