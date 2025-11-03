@@ -326,7 +326,7 @@ namespace MyCAM.Post
 				Master = pathG54PostData.ProcessStartPoint.Master,
 				Slave = pathG54PostData.ProcessStartPoint.Slave
 			};
-			pathG54PostData.FollowSafeDistance = currentCAMData.TraverseData.FollowSafeDistance;
+			pathG54PostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 
 			// MCS
 			pathMCSPostData.CutDownPostPoint = new PostPoint()
@@ -337,7 +337,7 @@ namespace MyCAM.Post
 				Master = pathMCSPostData.ProcessStartPoint.Master,
 				Slave = pathMCSPostData.ProcessStartPoint.Slave
 			};
-			pathMCSPostData.FollowSafeDistance = currentCAMData.TraverseData.FollowSafeDistance;
+			pathMCSPostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 		}
 
 		#endregion

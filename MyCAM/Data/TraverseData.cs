@@ -2,16 +2,18 @@
 {
 	public class EntryAndExitData
 	{
-		public EntryAndExitData( double entryDistance, double exitDistance )
+		public EntryAndExitData( double entryDistance, double exitDistance, double followSafeDistance )
 		{
 			EntryDistance = entryDistance;
 			ExitDistance = exitDistance;
+			FollowSafeDistance = followSafeDistance;
 		}
 
 		public EntryAndExitData()
 		{
 			EntryDistance = ENTRY_DISTANCE;
 			ExitDistance = EXIT_DISTANCE;
+			FollowSafeDistance = FOLLOW_SAFE_DISTANCE;
 		}
 
 		public double EntryDistance
@@ -24,13 +26,19 @@
 			get; set;
 		}
 
+		public double FollowSafeDistance
+		{
+			get; set;
+		}
+
 		public EntryAndExitData Clone()
 		{
-			return new EntryAndExitData( EntryDistance, ExitDistance );
+			return new EntryAndExitData( EntryDistance, ExitDistance, FollowSafeDistance );
 		}
 
 		public static double ENTRY_DISTANCE = 100.0;
 		public static double EXIT_DISTANCE = 100.0;
+		public static double FOLLOW_SAFE_DISTANCE = 5.0;
 	}
 
 	public class TraverseData

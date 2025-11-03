@@ -439,6 +439,12 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public double FollowSafeDistance
+		{
+			get;
+			set;
+		}
+
 		// parameterless constructor (for XmlSerializer)
 		internal EntryAndExitDataDTO()
 		{
@@ -451,11 +457,12 @@ namespace MyCAM.FileManager
 			}
 			EntryDistance = entryAndExitData.EntryDistance;
 			ExitDistance = entryAndExitData.ExitDistance;
+			FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 		}
 
 		internal EntryAndExitData ToEntryAndExitData()
 		{
-			return new EntryAndExitData( EntryDistance, ExitDistance );
+			return new EntryAndExitData( EntryDistance, ExitDistance, FollowSafeDistance );
 		}
 	}
 
