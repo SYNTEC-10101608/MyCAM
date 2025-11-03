@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MyCAM.Data;
 using OCC.gp;
@@ -30,6 +31,47 @@ namespace MyCAM.Helper
 			gp_Dir toolDir = isToolVecReverse ? cadPoint.NormalVec_1st.Reversed() : cadPoint.NormalVec_1st;
 			CAMPoint camPoint = new CAMPoint( cadPoint, toolDir );
 			return camPoint;
+		}
+
+		public static gp_Vec GetModifyToolVecByMap(CAMData camData, (int,int) nTargetPnt)
+		{
+			CADPoint targetCADPnt = camData.CADSegmentList[ nTargetPnt.Item1 ].PointList[ nTargetPnt.Item2 ];
+			CAMPoint targetCAMPnt = GetCAMPoint( targetCADPnt, camData.IsToolVecReverse );
+			camData.ToolVecModifyMap_New.TryGetValue( nTargetPnt, out var value1 );
+			gp_Vec startVec = GetVecFromAB( targetCAMPnt,
+				value1.Item1 * Math.PI / 180,
+				value1.Item2 * Math.PI / 180
+				);
+			return startVec;
+		}
+
+		public static gp_Vec GetVecFromAB( CAMPoint camPoint, double dRA_rad, double dRB_rad )
+		{
+			// TDOD: RA == 0 || RB == 0
+			if( dRA_rad == 0 && dRB_rad == 0 ) {
+				return new gp_Vec( camPoint.ToolVec );
+			}
+
+			// get the x, y, z direction
+			gp_Dir x = camPoint.CADPoint.TangentVec;
+			gp_Dir z = camPoint.CADPoint.NormalVec_1st;
+			gp_Dir y = z.Crossed( x );
+
+			// X:Y:Z = tanA:tanB:1
+			double X = 0;
+			double Y = 0;
+			double Z = 0;
+			if( dRA_rad == 0 ) {
+				X = 0;
+				Z = 1;
+			}
+			else {
+				X = dRA_rad < 0 ? -1 : 1;
+				Z = X / Math.Tan( dRA_rad );
+			}
+			Y = Z * Math.Tan( dRB_rad );
+			gp_Dir dir1 = new gp_Dir( x.XYZ() * X + y.XYZ() * Y + z.XYZ() * Z );
+			return new gp_Vec( dir1.XYZ() );
 		}
 		static List<ICAMSegmentElement> GetOrderedSegment( CAMData camdata )
 		{

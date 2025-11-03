@@ -59,6 +59,8 @@ namespace MyCAM.Editor
 			leadDialog.Show( MyApp.MainForm );
 		}
 
+
+
 		void SetLeadParam( LeadData leadData )
 		{
 			m_CAMData.LeadLineParam = leadData.Clone();
