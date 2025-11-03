@@ -69,6 +69,11 @@ namespace MyCAM.Editor
 			SyncSlectionFromSet();
 		}
 
+		public List<string> GetSelectedIDs()
+		{
+			return new List<string>( m_SelectedIDSet );
+		}
+
 		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
 			// single select

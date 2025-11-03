@@ -233,15 +233,11 @@ namespace MyCAM.Editor
 			( (SelectPathAction)m_CurrentAction ).SelectDone();
 		}
 
-		public void RemovePath()
+		public void RemovePath() // TODO: multi remove
 		{
 			// stop current action
-			EndActionIfNotDefault();
-			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
-				return;
-			}
+			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
+			string szPathID = szPathIDList[ 0 ];
 
 			// remove from data manager
 			m_DataManager.RemovePath( szPathID );
@@ -262,87 +258,71 @@ namespace MyCAM.Editor
 
 		public void SetStartPoint()
 		{
-			// is on/off button, so end it then return
+			// action edit, no multi edit supported
 			if( IsSameAction( EditActionType.StartPoint ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			bool isGetIDSuccess = ValidateSelectAndEndExAction( out string szPathID );
+			bool isGetIDSuccess = ValidateBeforeActionEdit( out List<string> szPathIDList, false );
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
-
-			// skip non-closed path
-			if( !pathData.CAMData.IsClosed ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]非封閉路徑不支援修改起點", MyApp.NoticeType.Hint );
-				return;
-			}
-			var action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
+			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
 
-		public void SetReverse()
+		public void SetReverse() // TODO: multi edit
 		{
-			// stop current action
-			EndActionIfNotDefault();
-			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
-				return;
-			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			// one shot edit, muti edit supported
+			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
 
 			// toggle reverse state
 			pathData.CAMData.IsReverse = !pathData.CAMData.IsReverse;
 			ShowCAMData();
 		}
 
-		public void SetOverCut()
+		public void SetOverCut() // TODO: multi edit
 		{
-			// is on/off button, so end it then return
+			// action edit, multi edit supported
 			if( IsSameAction( EditActionType.OverCut ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			bool isGetIDSuccess = ValidateSelectAndEndExAction( out string szPathID );
+			bool isGetIDSuccess = ValidateBeforeActionEdit( out List<string> szPathIDList, true );
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
 			OverCutAction action = new OverCutAction( m_DataManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
 
-		public void SetLeadLine()
+		public void SetLeadLine() // TODO: multi edit
 		{
-			// is on/off button, so end it then return
+			// action edit, multi edit supported
 			if( IsSameAction( EditActionType.SetLead ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			bool isGetIDSuccess = ValidateSelectAndEndExAction( out string szPathID );
+			bool isGetIDSuccess = ValidateBeforeActionEdit( out List<string> szPathIDList, true );
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
 			LeadAction action = new LeadAction( m_DataManager, pathData.CAMData );
 			action.PropertyChanged += OnSetLeadPropertyChanged;
 			StartEditAction( action );
 		}
 
-		public void ChangeLeadDirection()
+		public void ChangeLeadDirection() // TODO: multi edit
 		{
-			// stop current action
-			EndActionIfNotDefault();
-			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
-				return;
-			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			// one shot edit, muti edit supported
+			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
 
 			// nothing change
 			if( pathData.CAMData.IsHasLead == false ) {
@@ -358,16 +338,16 @@ namespace MyCAM.Editor
 
 		public void SetToolVec()
 		{
-			// is on/off button, so end it then return
+			// action edit, no multi edit supported
 			if( IsSameAction( EditActionType.ToolVec ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			bool isGetIDSuccess = ValidateSelectAndEndExAction( out string szPathID );
+			bool isGetIDSuccess = ValidateBeforeActionEdit( out List<string> szPathIDList, false );
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 
@@ -379,34 +359,29 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void SetToolVecReverse()
+		public void SetToolVecReverse() // TODO: multi edit
 		{
-			// stop current action
-			EndActionIfNotDefault();
-			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
-				return;
-			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			// one shot edit, multi edit supported
+			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
 
 			// toggle reverse state
 			pathData.CAMData.IsToolVecReverse = !pathData.CAMData.IsToolVecReverse;
 			ShowCAMData();
 		}
 
-		public void SeTraverseParam()
+		public void SeTraverseParam() // TODO: multi edit
 		{
-			// is on/off button, so end it then return
+			// action edit, multi edit supported
 			if( IsSameAction( EditActionType.SetTraverseParam ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			bool isGetIDSuccess = ValidateSelectAndEndExAction( out string szPathID );
+			bool isGetIDSuccess = ValidateBeforeActionEdit( out List<string> szPathIDList, true );
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
 			TraverseAction action = new TraverseAction( m_DataManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
@@ -414,7 +389,7 @@ namespace MyCAM.Editor
 
 		public void SetEntryAndExitParam()
 		{
-			// is on/off button, so end it then return
+			// action edit, not depends on path
 			if( IsSameAction( EditActionType.SetEntryAndExitParam ) ) {
 				m_CurrentAction.End();
 				return;
@@ -426,16 +401,13 @@ namespace MyCAM.Editor
 
 		#endregion
 
-		// TODO: refresh tree
 		public void MoveProcess( bool bUp )
 		{
+			// one shot edit, no multi edit supported
+			ValidateBeforeOneShotEdit( out List<string> szPathIDList, false );
+			string szPathID = szPathIDList[ 0 ];
+
 			// stop current action
-			EndActionIfNotDefault();
-			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
-				return;
-			}
 			int nIndex = m_DataManager.PathIDList.IndexOf( szPathID );
 			if( nIndex < 0 || nIndex > m_DataManager.PathIDList.Count - 1
 				|| bUp && nIndex == 0
@@ -452,26 +424,22 @@ namespace MyCAM.Editor
 			ShowCAMData();
 		}
 
-		// TODO: implement it and refresh tree
 		public void AutoSortProcess()
 		{
-			EndActionIfNotDefault();
-			string szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
-				return;
-			}
+			// one shot edit, no multi edit supported
+			ValidateBeforeOneShotEdit( out List<string> szPathIDList, false );
+			string szStartPathID = szPathIDList[ 0 ];
 			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
 			m_DataManager.PathIDList.Clear();
-			m_DataManager.PathIDList.Add( szPathID );
+			m_DataManager.PathIDList.Add( szStartPathID );
 
 			// get start point
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
+			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szStartPathID ];
 			gp_Pnt currentPoint = pathData.CAMData.GetProcessStartPoint().CADPoint.Point;
 
 			// visited path recorded container
 			bool[] visited = new bool[ pathIDList.Count ];
-			int startIdx = pathIDList.IndexOf( szPathID );
+			int startIdx = pathIDList.IndexOf( szStartPathID );
 			visited[ startIdx ] = true;
 			int visitedCount = 1;
 			while( visitedCount < pathIDList.Count ) {
@@ -544,12 +512,13 @@ namespace MyCAM.Editor
 		}
 
 		// tree selection changed
-		void OnPathSelectionChange()
+		void OnPathSelectionChange() // TODO: multi select
 		{
 			if( m_CurrentAction.ActionType != EditActionType.SelectObject ) {
 				return;
 			}
-			string szPathID = GetSelectedPathID();
+			List<string> szPathIDList = GetSelectedIDList();
+			string szPathID = szPathIDList.Count > 0 ? szPathIDList[ 0 ] : string.Empty;
 			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
 				return;
 			}
@@ -930,12 +899,12 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		void OnSetLeadPropertyChanged( bool isConfirm, bool isHasLead )
+		void OnSetLeadPropertyChanged( bool isConfirm, bool isHasLead ) // TODO: new action
 		{
 			ShowCAMData();
-			if( isConfirm ) {
-				PathPropertyChanged?.Invoke( ( (PathData)m_DataManager.ShapeDataMap[ GetSelectedPathID() ] ).CAMData.IsClosed, isHasLead );
-			}
+			//if( isConfirm ) {
+			//	PathPropertyChanged?.Invoke( ( (PathData)m_DataManager.ShapeDataMap[ GetSelectedIDList() ] ).CAMData.IsClosed, isHasLead );
+			//}
 		}
 
 		#endregion
@@ -999,13 +968,9 @@ namespace MyCAM.Editor
 			return coneAIS;
 		}
 
-		string GetSelectedPathID()
+		List<string> GetSelectedIDList()
 		{
-			TreeNode selectedNode = m_TreeView.SelectedNode;
-			if( selectedNode == null || string.IsNullOrEmpty( selectedNode.Text ) ) {
-				return string.Empty;
-			}
-			return selectedNode.Text;
+			return m_DefaultAction.GetSelectedIDs();
 		}
 
 		bool IsSameAction( EditActionType newActionType )
@@ -1016,14 +981,40 @@ namespace MyCAM.Editor
 			return false;
 		}
 
-		bool ValidateSelectAndEndExAction( out string szPathID )
+		bool ValidateBeforeActionEdit( out List<string> szIDList, bool isMutiEditable )
 		{
-			szPathID = GetSelectedPathID();
-			if( string.IsNullOrEmpty( szPathID ) || !m_DataManager.ShapeDataMap.ContainsKey( szPathID ) ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
+			szIDList = GetSelectedIDList();
 
-				// default action do not need to stop
+			// nothing selected
+			if( szIDList.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
 				EndActionIfNotDefault();
+				return false;
+			}
+
+			// multiple selected but not allowed
+			else if( isMutiEditable == false && szIDList.Count > 1 ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]只能選擇一個路徑進行編輯", MyApp.NoticeType.Hint );
+				EndActionIfNotDefault();
+				return false;
+			}
+			return true;
+		}
+
+		bool ValidateBeforeOneShotEdit( out List<string> szIDList, bool isMutiEditable )
+		{
+			EndActionIfNotDefault();
+			szIDList = GetSelectedIDList();
+
+			// nothing selected
+			if( szIDList.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
+				return false;
+			}
+
+			// multiple selected but not allowed
+			else if( isMutiEditable == false && szIDList.Count > 1 ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]只能選擇一個路徑進行編輯", MyApp.NoticeType.Hint );
 				return false;
 			}
 			return true;
