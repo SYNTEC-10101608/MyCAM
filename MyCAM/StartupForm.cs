@@ -48,8 +48,7 @@ namespace MyCAM
 			}
 			m_Viewer.UpdateView();
 
-			// this is to keep highlighted selected node when tree view looses focus
-			m_TreeView.HideSelection = false;
+			// replace by multi select tree view
 			this.m_panTreeView.Controls.Remove( m_TreeView );
 			m_TreeView = new MultiSelectTreeView();
 			this.m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
