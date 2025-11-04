@@ -57,7 +57,7 @@ namespace MyCAM.Editor
 	internal class CAMEditor : EditorBase
 	{
 		// to notice main form
-		public Action<EditableInfo> PathPropertyChanged; // isClosed, hasLead
+		public Action<EditableInfo> PathPropertyChanged;
 		public Action<EditActionType, EActionStatus> RaiseCAMActionStatusChange;
 
 		// action with dialog need to disable main form
@@ -142,7 +142,7 @@ namespace MyCAM.Editor
 			HideCAMData();
 		}
 
-		// APIs
+		// view API
 
 		public void SetShowToolVec( bool isShowToolVec )
 		{
@@ -167,6 +167,8 @@ namespace MyCAM.Editor
 			m_ShowTraversePath = isShowTraversePath;
 			ShowCAMData();
 		}
+
+		// add/ remove path API
 
 		public void StartSelectFace()
 		{
@@ -285,8 +287,7 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				return;
 			}
-			bool isGetIDSuccess = ValidateBeforeActionEdit( out List<string> szPathIDList, false );
-			if( isGetIDSuccess == false ) {
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
 			if( !GetCAMDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
@@ -319,8 +320,7 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				return;
 			}
-			bool isGetIDSuccess = ValidateBeforeActionEdit( out List<string> szPathIDList, true );
-			if( isGetIDSuccess == false ) {
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
 			List<CAMData> camDataList = new List<CAMData>();
@@ -342,8 +342,7 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				return;
 			}
-			bool isGetIDSuccess = ValidateBeforeActionEdit( out List<string> szPathIDList, true );
-			if( isGetIDSuccess == false ) {
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
 			List<CAMData> camDataList = new List<CAMData>();
@@ -365,8 +364,7 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				return;
 			}
-			bool isGetIDSuccess = ValidateBeforeActionEdit( out List<string> szPathIDList, false );
-			if( isGetIDSuccess == false ) {
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
 			if( !GetCAMDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
@@ -405,8 +403,7 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				return;
 			}
-			bool isGetIDSuccess = ValidateBeforeActionEdit( out List<string> szPathIDList, true );
-			if( isGetIDSuccess == false ) {
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
 			List<CAMData> camDataList = new List<CAMData>();
@@ -435,19 +432,22 @@ namespace MyCAM.Editor
 
 		#endregion
 
+		// sort API
 		public void MoveProcess( bool bUp )
 		{
 			// one shot edit, no multi edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, false );
 			string szPathID = szPathIDList[ 0 ];
-
-			// stop current action
 			int nIndex = m_DataManager.PathIDList.IndexOf( szPathID );
+
+			// check boundary
 			if( nIndex < 0 || nIndex > m_DataManager.PathIDList.Count - 1
 				|| bUp && nIndex == 0
 				|| !bUp && nIndex == m_DataManager.PathIDList.Count - 1 ) {
 				return;
 			}
+
+			// move process
 			m_DataManager.PathIDList.RemoveAt( nIndex );
 			if( bUp ) {
 				m_DataManager.PathIDList.Insert( nIndex - 1, szPathID );
@@ -512,6 +512,7 @@ namespace MyCAM.Editor
 			ShowCAMData();
 		}
 
+		// convert NC
 		public void ConverNC()
 		{
 			// stop current action
