@@ -45,7 +45,7 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// TODO: check all CAMData has same traverse param or not
-			TraverseDlg traverseParamSettingFrom = new TraverseDlg( new TraverseData() );
+			TraverseDlg traverseParamSettingFrom = new TraverseDlg( m_BackupTraverseDataList[ 0 ].Clone() );
 			PropertyChanged?.Invoke();
 			traverseParamSettingFrom.Confirm += ConfirmTraverseParam;
 			traverseParamSettingFrom.Preview += PreviewTraverseParam;

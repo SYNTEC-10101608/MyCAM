@@ -37,7 +37,7 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// TODO: check all CAMData have same over cut length?
-			OverCutDlg overCutForm = new OverCutDlg( 0 );
+			OverCutDlg overCutForm = new OverCutDlg( m_dOverCutBackupList[ 0 ] );
 			PropertyChanged?.Invoke();
 
 			// preview
@@ -58,9 +58,7 @@ namespace MyCAM.Editor
 			// cancel
 			overCutForm.Cancel += () =>
 			{
-				for( int i = 0; i < m_CAMDataList.Count; i++ ) {
-					m_CAMDataList[ i ].OverCutLength = m_dOverCutBackupList[ i ];
-				}
+				RestoreBackupOverCutLength();
 				PropertyChanged?.Invoke();
 				End();
 			};
@@ -71,6 +69,13 @@ namespace MyCAM.Editor
 		{
 			foreach( var camData in m_CAMDataList ) {
 				camData.OverCutLength = dOverCutLength;
+			}
+		}
+
+		void RestoreBackupOverCutLength()
+		{
+			for( int i = 0; i < m_CAMDataList.Count; i++ ) {
+				m_CAMDataList[ i ].OverCutLength = m_dOverCutBackupList[ i ];
 			}
 		}
 

@@ -46,7 +46,7 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// TODO: check all CAMData has same lead param or not
-			LeadDlg leadDialog = new LeadDlg( new LeadData() );
+			LeadDlg leadDialog = new LeadDlg( m_BackupLeadParamList[ 0 ].Clone() );
 			PropertyChanged?.Invoke();
 
 			// preview
@@ -86,17 +86,6 @@ namespace MyCAM.Editor
 			for( int i = 0; i < m_CAMDataList.Count; i++ ) {
 				m_CAMDataList[ i ].LeadLineParam = m_BackupLeadParamList[ i ].Clone();
 			}
-		}
-
-		bool GetHasLeadStatus()
-		{
-			// Return false if one of the CAMData has no lead
-			foreach( var camData in m_CAMDataList ) {
-				if( !camData.IsHasLead ) {
-					return false;
-				}
-			}
-			return true;
 		}
 
 		List<CAMData> m_CAMDataList;
