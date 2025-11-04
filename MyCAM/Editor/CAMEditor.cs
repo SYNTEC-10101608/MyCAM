@@ -249,7 +249,7 @@ namespace MyCAM.Editor
 			( (SelectPathAction)m_CurrentAction ).SelectDone();
 		}
 
-		public void RemovePath() // TODO: multi remove
+		public void RemovePath()
 		{
 			// stop current action
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
