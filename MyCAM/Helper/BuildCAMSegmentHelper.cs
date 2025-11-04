@@ -20,6 +20,7 @@ namespace MyCAM.Helper
 			if( camdata.IsReverse ) {
 				ReverseCAMSegmentList( ref camSegmentList );
 			}
+			GetMainPathOrderedSegment_New( camdata );
 			return true;
 		}
 
@@ -133,9 +134,90 @@ namespace MyCAM.Helper
 			return camSegmentList;
 		}
 
-		static  void GetMainPathOrderedSegment_New( CAMData camdata )
+		static List<((int SegmentIdx, int PointIdxt) start, (int SegmentIdx, int PointIdx) end)> GetMainPathOrderedSegment_New( CAMData camData )
 		{
-			
+			if (camData.ToolVecModifyMap_New.Count <= 1 ) {
+
+				List<((int SegmentIdx, int PointIdxt) start, (int SegmentIdx, int PointIdx) end)> unSeparateIntervalList = new List<((int SegmentIdx, int PointIdxt) start, (int SegmentIdx, int PointIdx) end)>();
+				for (int i = 0; i< camData.CADSegmentList.Count; i++ ) {
+					if ( i == 0 ) {
+						unSeparateIntervalList.Add( ((i, 0), (i, camData.CADSegmentList[ i ].PointList.Count - 1)) );
+						continue;
+					}
+					else {
+						unSeparateIntervalList.Add( (unSeparateIntervalList.Last().end, (i, camData.CADSegmentList[ i ].PointList.Count - 1)) );
+						continue;
+					}
+				}
+				return unSeparateIntervalList;
+			}
+
+			// 獲得有哪些區間
+			List<((int SegmentIdx, int PointIdxt) start, (int SegmentIdx, int PointIdx) end)> interpolateIntervalList = GetInterpolateIntervalList( camData );
+
+			List<((int SegmentIdx, int PointIdxt) start, (int SegmentIdx, int PointIdx) end)> separateIntervalList = new List<((int SegmentIdx, int PointIdxt) start, (int SegmentIdx, int PointIdx) end)>();
+
+			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
+				if( interpolateIntervalList[ i ].start.SegmentIdx == interpolateIntervalList[ i ].end.SegmentIdx ) {
+					separateIntervalList.Add( interpolateIntervalList[ i ] );
+					continue;
+				}
+
+
+				if( interpolateIntervalList[ i ].end.SegmentIdx > interpolateIntervalList[ i ].start.SegmentIdx ) {
+					for( int j = interpolateIntervalList[ i ].start.SegmentIdx; j <= interpolateIntervalList[ i ].end.SegmentIdx; j++ ) {
+
+						// 這個區段第一個
+						if( j == interpolateIntervalList[ i ].start.SegmentIdx ) {
+							int nThisSegmentEndPntIndx = camData.CADSegmentList[ interpolateIntervalList[ i ].start.SegmentIdx ].PointList.Count - 1;
+							separateIntervalList.Add( (interpolateIntervalList[ i ].start, (interpolateIntervalList[ i ].start.SegmentIdx, nThisSegmentEndPntIndx)) );
+							continue;
+						}
+
+						// 這個區段中間
+						if( j > interpolateIntervalList[ i ].start.SegmentIdx && j < interpolateIntervalList[ i ].end.SegmentIdx ) {
+							separateIntervalList.Add( (separateIntervalList.Last().end, (j, camData.CADSegmentList[ j ].PointList.Count - 1)) );
+							continue;
+						}
+
+						// 這個區段最後
+						if( j == interpolateIntervalList[ i ].end.SegmentIdx ) {
+							separateIntervalList.Add( (separateIntervalList.Last().end, (j, interpolateIntervalList[ i ].end.PointIdx)) );
+							continue;
+						}
+					}
+					continue;
+				}
+
+				// 迴轉處
+				for( int k = interpolateIntervalList[ i ].start.SegmentIdx; k < camData.CADSegmentList.Count; k++ ) {
+
+					// 這個區段第一個
+					if( k == interpolateIntervalList[ i ].start.SegmentIdx ) {
+						int nThisSegmentEndPntIndx = camData.CADSegmentList[ interpolateIntervalList[ i ].start.SegmentIdx ].PointList.Count - 1;
+						separateIntervalList.Add( (interpolateIntervalList[ i ].start, (interpolateIntervalList[ i ].start.SegmentIdx, nThisSegmentEndPntIndx)) );
+						continue;
+					}
+
+					// 這個區段中間
+					if( k > interpolateIntervalList[ i ].start.SegmentIdx && k < interpolateIntervalList[ i ].end.SegmentIdx ) {
+						separateIntervalList.Add( (separateIntervalList.Last().end, (k, camData.CADSegmentList[ k ].PointList.Count - 1)) );
+						continue;
+					}
+				}
+
+				for( int k = 0; k <= interpolateIntervalList[ i ].end.SegmentIdx; k++ ) {
+					if( k != interpolateIntervalList[ i ].end.SegmentIdx ) {
+						separateIntervalList.Add( (( separateIntervalList.Last().end ), (k, camData.CADSegmentList[ k ].PointList.Count - 1)) );
+						continue;
+					}
+					else {
+						separateIntervalList.Add( (( separateIntervalList.Last().end ), interpolateIntervalList[ i ].end) );
+					}
+				}
+			}
+			return separateIntervalList;
+
 		}
 
 		static void ReverseCAMSegmentList( ref List<ICAMSegmentElement> camSegmentList )
@@ -233,7 +315,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static List<ICAMSegmentElement> BuildLeadCAMSegment(CAMData camData, bool isLeadIn)
+		static List<ICAMSegmentElement> BuildLeadCAMSegment( CAMData camData, bool isLeadIn )
 		{
 			List<ICAMSegmentElement> LeadCADSegment = new List<ICAMSegmentElement>();
 			if( isLeadIn ) {
@@ -244,7 +326,7 @@ namespace MyCAM.Helper
 					return LeadCADSegment;
 				}
 			}
-			if (camData.LeadLineParam.LeadOut.Type != LeadLineType.None  ) {
+			if( camData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
 				ICADSegmentElement leadInCADSegment = BuildLeadCADSegment( camData, isLeadIn );
 				ICAMSegmentElement leadInCAMSegment = BuildCAMSegment( leadInCADSegment, camData.IsToolVecReverse );
 				LeadCADSegment.Add( leadInCAMSegment );
@@ -334,7 +416,7 @@ namespace MyCAM.Helper
 				return startPointToolVec;
 			}
 			List<((int, int), (int, int))> interpolateIntervalList = GetInterpolateIntervalList( camData );
-			((int, int), (int, int)) startPointSegmentRange = GetTargetPntSegmentRange( interpolateIntervalList, camData.NewStartPoint );
+			((int, int), (int, int)) startPointSegmentRange = GetTargetPntSegmentRange( interpolateIntervalList, camData.NewStartPoint, out _ );
 			InterpolateToolVec( camData, startPointSegmentRange.Item1, startPointSegmentRange.Item2, out double dTotalLength );
 			gp_Vec segmentsStartVec = BuildCAMSegmentHelper.GetModifyToolVecByMap( camData, startPointSegmentRange.Item1 );
 			gp_Vec segmentsEdnVec = BuildCAMSegmentHelper.GetModifyToolVecByMap( camData, startPointSegmentRange.Item2 );
@@ -535,8 +617,9 @@ namespace MyCAM.Helper
 
 		static ((int, int), (int, int)) GetTargetPntSegmentRange(
 	List<((int segmentIndex, int pointIndex), (int segmentIndex, int pointIndex))> segments,
-	(int segmentIndex, int pointIndex) target )
+	(int segmentIndex, int pointIndex) target, out int index )
 		{
+			index = -1;
 			for( int i = 0; i < segments.Count; i++ ) {
 				(int segmentIndex, int pointIndex) start = segments[ i ].Item1;
 				(int segmentIndex, int pointIndex) end = segments[ i ].Item2;
@@ -546,18 +629,27 @@ namespace MyCAM.Helper
 					if( target.segmentIndex == start.segmentIndex &&
 						target.pointIndex >= start.pointIndex &&
 						target.pointIndex <= end.pointIndex )
-						return segments[ i ];
+						index = i;
+					return segments[ i ];
 				}
 				// case 2: 順向區間
 				else if( start.segmentIndex < end.segmentIndex ) {
-					if( target.segmentIndex > start.segmentIndex && target.segmentIndex < end.segmentIndex )
+					if( target.segmentIndex > start.segmentIndex && target.segmentIndex < end.segmentIndex ) {
+						index = i;
 						return segments[ i ];
+					}
 
-					if( target.segmentIndex == start.segmentIndex && target.pointIndex >= start.pointIndex )
+					if( target.segmentIndex == start.segmentIndex && target.pointIndex >= start.pointIndex ) {
+						index = i;
 						return segments[ i ];
+					}
 
-					if( target.segmentIndex == end.segmentIndex && target.pointIndex <= end.pointIndex )
+
+					if( target.segmentIndex == end.segmentIndex && target.pointIndex <= end.pointIndex ) {
+						index = i;
 						return segments[ i ];
+					}
+
 				}
 				// case 3: 迴轉區間（封閉環）
 				else // start.segmentIndex > end.segmentIndex
@@ -570,8 +662,10 @@ namespace MyCAM.Helper
 						( target.segmentIndex < end.segmentIndex ) ||
 						( target.segmentIndex == end.segmentIndex && target.pointIndex <= end.pointIndex );
 
-					if( inBeforeWrap || inAfterWrap )
+					if( inBeforeWrap || inAfterWrap ) {
+						index = i;
 						return segments[ i ];
+					}
 				}
 			}
 
