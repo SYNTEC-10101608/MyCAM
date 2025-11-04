@@ -61,6 +61,7 @@ namespace MyCAM.Editor
 			foreach( string szUID in m_SelectedIDSet ) {
 				ChangeObjectVisibility( szUID );
 			}
+			m_Viewer.UpdateView();
 		}
 
 		public void ClearSelection()
@@ -198,11 +199,11 @@ namespace MyCAM.Editor
 			viewObject.Visible = !viewObject.Visible;
 			if( viewObject.Visible ) {
 				node.ForeColor = System.Drawing.Color.Black;
-				m_Viewer.GetAISContext().Display( viewObject.AISHandle, true );
+				m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
 			}
 			else {
 				node.ForeColor = System.Drawing.Color.LightGray;
-				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, true );
+				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
 			}
 		}
 
