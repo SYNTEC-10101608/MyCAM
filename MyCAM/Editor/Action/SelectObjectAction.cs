@@ -95,6 +95,8 @@ namespace MyCAM.Editor
 				int modifiedY = m_Viewer.Height - e.Y;
 				m_RubberBandStartX = e.X;
 				m_RubberBandStartY = modifiedY;
+				m_SelectStartX = e.X;
+				m_SelectStartY = e.Y;
 				m_RubberBand.SetRectangle( m_RubberBandStartX, m_RubberBandStartY, m_RubberBandStartX, m_RubberBandStartY );
 				m_Viewer.GetAISContext().Redisplay( m_RubberBand, true ); // UpdateView does not work here
 			}
@@ -124,10 +126,10 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Redisplay( m_RubberBand, true ); // UpdateView does not work here
 
 				// select shapes within rubber band
-				int minX = Math.Min( m_RubberBandStartX, e.X );
-				int minY = Math.Min( m_RubberBandStartY, modifiedY );
-				int maxX = Math.Max( m_RubberBandStartX, e.X );
-				int maxY = Math.Max( m_RubberBandStartY, modifiedY );
+				int minX = Math.Min( m_SelectStartX, e.X );
+				int minY = Math.Min( m_SelectStartY, e.Y );
+				int maxX = Math.Max( m_SelectStartX, e.X );
+				int maxY = Math.Max( m_SelectStartY, e.Y );
 				if( ( Control.ModifierKeys & Keys.Control ) == Keys.Control ) {
 					m_Viewer.SelectRectangle( minX, minY, maxX, maxY, AIS_SelectionScheme.AIS_SelectionScheme_XOR );
 				}
@@ -313,6 +315,8 @@ namespace MyCAM.Editor
 		AIS_RubberBand m_RubberBand;
 		int m_RubberBandStartX = 0;
 		int m_RubberBandStartY = 0;
+		int m_SelectStartX = 0;
+		int m_SelectStartY = 0;
 		bool m_IsDragging = false;
 
 		// selection sync
