@@ -38,7 +38,6 @@ namespace MyCAM.Editor
 			base.Start();
 			ActivateObject();
 			SyncSlectionFromSet();
-			m_bSuppressTreeViewSync = false;
 
 			// display rubber band
 			m_Viewer.GetAISContext().Display( m_RubberBand, true );
@@ -48,7 +47,6 @@ namespace MyCAM.Editor
 		public override void End()
 		{
 			DeactivateObject();
-			m_bSuppressTreeViewSync = false;
 
 			// remove rubber band
 			m_Viewer.GetAISContext().Remove( m_RubberBand, true );
@@ -86,7 +84,6 @@ namespace MyCAM.Editor
 					m_Viewer.Select();
 				}
 				SyncSelectionFromView();
-				SelectionChange?.Invoke();
 			}
 		}
 
@@ -138,7 +135,6 @@ namespace MyCAM.Editor
 					m_Viewer.SelectRectangle( minX, minY, maxX, maxY );
 				}
 				SyncSelectionFromView();
-				SelectionChange?.Invoke();
 
 				// update dragging flag
 				m_IsDragging = false;
@@ -154,17 +150,6 @@ namespace MyCAM.Editor
 				( m_TreeView as MultiSelectTreeView ).ReverseSelection();
 			}
 			OnKeyDown( e );
-		}
-
-		protected override void TreeViewAfterSelect( object sender, TreeViewEventArgs e )
-		{
-			//if( e.Node == null ) {
-			//	return;
-			//}
-
-			//// tell CAMEditor tree select is change
-			//TreeSelectionChange?.Invoke();
-			//SyncSelectionFromTreeToView();
 		}
 
 		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
@@ -186,14 +171,13 @@ namespace MyCAM.Editor
 		void ChangeObjectVisibility( string szUID )
 		{
 			// toggle the visibility of the selected object
-			if( !m_ViewManager.ViewObjectMap.ContainsKey( szUID ) ) {
+			if( string.IsNullOrEmpty( szUID )
+				|| !m_ViewManager.ViewObjectMap.ContainsKey( szUID )
+				|| !m_ViewManager.TreeNodeMap.ContainsKey( szUID ) ) {
 				return;
 			}
 			ViewObject viewObject = m_ViewManager.ViewObjectMap[ szUID ];
 			if( viewObject == null || viewObject.AISHandle == null ) {
-				return;
-			}
-			if( !m_ViewManager.TreeNodeMap.ContainsKey( szUID ) ) {
 				return;
 			}
 			TreeNode node = m_ViewManager.TreeNodeMap[ szUID ];
@@ -216,7 +200,6 @@ namespace MyCAM.Editor
 		void TreeViewSelectionChanged( object sender, EventArgs e )
 		{
 			SyncSelectionFromTree();
-			SelectionChange?.Invoke();
 		}
 
 		void SyncSelectionFromView()
@@ -252,9 +235,6 @@ namespace MyCAM.Editor
 			// get the selected ID
 			foreach( TreeNode node in ( m_TreeView as MultiSelectTreeView ).SelectedNodes ) {
 				if( node == null || string.IsNullOrEmpty( node.Text ) ) {
-					continue;
-				}
-				if( node == m_ViewManager.PartNode || node == m_ViewManager.PathNode ) {
 					continue;
 				}
 				m_SelectedIDSet.Add( node.Text );
