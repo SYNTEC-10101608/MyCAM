@@ -19,7 +19,6 @@ namespace MyCAM.Editor
 				m_txbFollowSafeDistance.Text = m_FollowSafeDistance.ToString( "F3" );
 				m_txbLiftUpDistance.Text = m_LifUpDistance.ToString( "F3" );
 				m_txbFrogLeapDistance.Text = m_FrogLeapDistance.ToString( "F3" );
-				m_chkEnableFrogLeap.Checked = m_bEnableFrogLeap;
 				return;
 			}
 
@@ -28,14 +27,12 @@ namespace MyCAM.Editor
 			m_txbFollowSafeDistance.Text = Data.FollowSafeDistance.ToString( "F3" );
 			m_txbLiftUpDistance.Text = Data.LiftUpDistance.ToString( "F3" );
 			m_txbFrogLeapDistance.Text = Data.FrogLeapDistance.ToString( "F3" );
-			m_chkEnableFrogLeap.Checked = Data.EnableFrogLeap;
 
 			// set field value
 			m_CutDownDistance = Data.CutDownDistance;
 			m_FollowSafeDistance = Data.FollowSafeDistance;
 			m_LifUpDistance = Data.LiftUpDistance;
 			m_FrogLeapDistance = Data.FrogLeapDistance;
-			m_bEnableFrogLeap = Data.EnableFrogLeap;
 		}
 
 		void m_txbCutDownDistance_KeyDown( object sender, KeyEventArgs e )
@@ -55,7 +52,7 @@ namespace MyCAM.Editor
 		{
 			if( double.TryParse( m_txbCutDownDistance.Text, out double cutDownDistance ) && cutDownDistance >= 0 && cutDownDistance < double.MaxValue ) {
 				m_CutDownDistance = cutDownDistance;
-				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_bEnableFrogLeap ) );
+				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance ) );
 			}
 			else {
 				m_txbCutDownDistance.Text = m_CutDownDistance.ToString();
@@ -79,7 +76,7 @@ namespace MyCAM.Editor
 		{
 			if( double.TryParse( m_txbFollowSafeDistance.Text, out double followSafeDistance ) && followSafeDistance >= 0 && followSafeDistance < double.MaxValue ) {
 				m_FollowSafeDistance = followSafeDistance;
-				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_bEnableFrogLeap ) );
+				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance ) );
 			}
 			else {
 				m_txbFollowSafeDistance.Text = m_FollowSafeDistance.ToString();
@@ -103,7 +100,7 @@ namespace MyCAM.Editor
 		{
 			if( double.TryParse( m_txbLiftUpDistance.Text, out double liftUpDistance ) && liftUpDistance >= 0 && liftUpDistance < double.MaxValue ) {
 				m_LifUpDistance = liftUpDistance;
-				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_bEnableFrogLeap ) );
+				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance ) );
 			}
 			else {
 				m_txbLiftUpDistance.Text = m_LifUpDistance.ToString();
@@ -127,28 +124,21 @@ namespace MyCAM.Editor
 		{
 			if( double.TryParse( m_txbFrogLeapDistance.Text, out double frogLeapDistance ) && frogLeapDistance >= 0 && frogLeapDistance < double.MaxValue ) {
 				m_FrogLeapDistance = frogLeapDistance;
-				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_bEnableFrogLeap ) );
+				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance ) );
 			}
 			else {
 				m_txbFrogLeapDistance.Text = m_FrogLeapDistance.ToString();
 			}
 		}
 
-		void m_chkEnableFrogLeap_CheckedChanged( object sender, EventArgs e )
-		{
-			m_bEnableFrogLeap = m_chkEnableFrogLeap.Checked;
-			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_bEnableFrogLeap ) );
-		}
-
 		void m_btnConfirm_Click( object sender, EventArgs e )
 		{
-			RaiseConfirm( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_bEnableFrogLeap ) );
+			RaiseConfirm( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance ) );
 		}
 
 		double m_CutDownDistance = TraverseData.CUT_DOWN_DISTANCE;
 		double m_FollowSafeDistance = TraverseData.FOLLOW_SAFE_DISTANCE;
 		double m_LifUpDistance = TraverseData.LIFT_UP_DISTANCE;
 		double m_FrogLeapDistance = TraverseData.FROG_LEAP_DISTANCE;
-		bool m_bEnableFrogLeap = TraverseData.ENABLE_FROG_LEAP;
 	}
 }

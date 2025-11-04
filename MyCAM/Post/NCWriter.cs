@@ -9,8 +9,8 @@ namespace MyCAM.Post
 	{
 		public NCWriter( List<CAMData> processDataList, MachineData machineData, EntryAndExitData entryAndExitData )
 		{
-			if( processDataList == null || processDataList.Count == 0 || machineData == null || entryAndExitData == null ) {
-				return;
+			if( processDataList == null || machineData == null || entryAndExitData == null ) {
+				throw new ArgumentNullException( "NCWriter constructor argument is null." );
 			}
 			m_ProcessDataList = processDataList;
 			m_MachineData = machineData;
@@ -41,12 +41,12 @@ namespace MyCAM.Post
 					m_StreamWriter.WriteLine( "G43.4 P1;" ); // G43.4 新動程
 
 					// to keep last point of previous path
-					PathEndInfo endInfoOfPreviousPath = new PathEndInfo();
+					PathEndInfo endInfoOfPreviousPath = null;
 					for( int i = 0; i < m_ProcessDataList.Count; i++ ) {
 
 						// solve all post data of the path
 						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessDataList[ i ],
-							endInfoOfPreviousPath, i == 0, i == m_ProcessDataList.Count - 1, m_EntryAndExitData,
+							endInfoOfPreviousPath, m_EntryAndExitData,
 							out PostData postData, out _, out endInfoOfPreviousPath ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 							return false;
