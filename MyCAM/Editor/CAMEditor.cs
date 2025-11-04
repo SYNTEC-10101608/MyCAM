@@ -40,7 +40,7 @@ namespace MyCAM.Editor
 			IsToolVecEditable = true;
 			IsToolVecReverseEditable = true;
 			IsTraverseEditable = true;
-			
+
 		}
 
 		public bool IsStartPointEditable;
@@ -283,7 +283,9 @@ namespace MyCAM.Editor
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
+			if( !GetPathDataByID( szPathIDList[ 0 ], out PathData pathData ) ) {
+				return;
+			}
 			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
@@ -293,10 +295,14 @@ namespace MyCAM.Editor
 		{
 			// one shot edit, muti edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
+			foreach( string szPathID in szPathIDList ) {
+				if( !GetPathDataByID( szPathID, out PathData pathData ) ) {
+					continue;
+				}
 
-			// toggle reverse state
-			pathData.CAMData.IsReverse = !pathData.CAMData.IsReverse;
+				// toggle reverse state
+				pathData.CAMData.IsReverse = !pathData.CAMData.IsReverse;
+			}
 			ShowCAMData();
 		}
 
@@ -311,7 +317,9 @@ namespace MyCAM.Editor
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
+			if( !GetPathDataByID( szPathIDList[ 0 ], out PathData pathData ) ) {
+				return;
+			}
 			OverCutAction action = new OverCutAction( m_DataManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
@@ -328,7 +336,9 @@ namespace MyCAM.Editor
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
+			if( !GetPathDataByID( szPathIDList[ 0 ], out PathData pathData ) ) {
+				return;
+			}
 			LeadAction action = new LeadAction( m_DataManager, pathData.CAMData );
 			action.PropertyChanged += OnSetLeadPropertyChanged;
 			StartEditAction( action );
@@ -338,17 +348,17 @@ namespace MyCAM.Editor
 		{
 			// one shot edit, muti edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
+			foreach( string szPathID in szPathIDList ) {
+				if( !GetPathDataByID( szPathID, out PathData pathData ) ) {
+					continue;
+				}
 
-			// nothing change
-			if( pathData.CAMData.IsHasLead == false ) {
-				pathData.CAMData.LeadLineParam.IsChangeLeadDirection = false;
-				return;
+				// toggle change lead dir state
+				pathData.CAMData.LeadLineParam.IsChangeLeadDirection = !pathData.CAMData.LeadLineParam.IsChangeLeadDirection;
+
+				// need clone to trigger property changed event
+				pathData.CAMData.LeadLineParam = pathData.CAMData.LeadLineParam.Clone();
 			}
-			pathData.CAMData.LeadLineParam.IsChangeLeadDirection = !pathData.CAMData.LeadLineParam.IsChangeLeadDirection;
-
-			// need clone to trigger property changed event
-			pathData.CAMData.LeadLineParam = pathData.CAMData.LeadLineParam.Clone();
 			ShowCAMData();
 		}
 
@@ -363,7 +373,9 @@ namespace MyCAM.Editor
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
+			if( !GetPathDataByID( szPathIDList[ 0 ], out PathData pathData ) ) {
+				return;
+			}
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 
@@ -379,10 +391,14 @@ namespace MyCAM.Editor
 		{
 			// one shot edit, multi edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
+			foreach( string szPathID in szPathIDList ) {
+				if( !GetPathDataByID( szPathID, out PathData pathData ) ) {
+					continue;
+				}
 
-			// toggle reverse state
-			pathData.CAMData.IsToolVecReverse = !pathData.CAMData.IsToolVecReverse;
+				// toggle reverse state
+				pathData.CAMData.IsToolVecReverse = !pathData.CAMData.IsToolVecReverse;
+			}
 			ShowCAMData();
 		}
 
@@ -397,7 +413,9 @@ namespace MyCAM.Editor
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szPathIDList[ 0 ] ];
+			if( !GetPathDataByID( szPathIDList[ 0 ], out PathData pathData ) ) {
+				return;
+			}
 			TraverseAction action = new TraverseAction( m_DataManager, pathData.CAMData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
@@ -445,13 +463,17 @@ namespace MyCAM.Editor
 			// one shot edit, no multi edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, false );
 			string szStartPathID = szPathIDList[ 0 ];
+
+			// get start point
+			if( !GetPathDataByID( szStartPathID, out PathData pathData ) ) {
+				return;
+			}
+			gp_Pnt currentPoint = pathData.CAMData.GetProcessStartPoint().CADPoint.Point;
+
+			// init data manager
 			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
 			m_DataManager.PathIDList.Clear();
 			m_DataManager.PathIDList.Add( szStartPathID );
-
-			// get start point
-			PathData pathData = (PathData)m_DataManager.ShapeDataMap[ szStartPathID ];
-			gp_Pnt currentPoint = pathData.CAMData.GetProcessStartPoint().CADPoint.Point;
 
 			// visited path recorded container
 			bool[] visited = new bool[ pathIDList.Count ];
@@ -546,7 +568,10 @@ namespace MyCAM.Editor
 
 			// closed path editable only: start point, overcut, lead line, change lead dir
 			foreach( string szPathID in szPathIDList ) {
-				if( !( (PathData)m_DataManager.ShapeDataMap[ szPathID ] ).CAMData.IsClosed ) {
+				if( !GetPathDataByID( szPathID, out PathData pathData ) ) {
+					continue;
+				}
+				if( !pathData.CAMData.IsClosed ) {
 					editableInfo.IsStartPointEditable = false;
 					editableInfo.IsOverCutEditable = false;
 					editableInfo.IsLeadLineEditable = false;
@@ -1048,6 +1073,21 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]只能選擇一個路徑進行編輯", MyApp.NoticeType.Hint );
 				return false;
 			}
+			return true;
+		}
+
+		bool GetPathDataByID( string szPathID, out PathData pathData )
+		{
+			pathData = null;
+			if( m_DataManager.ShapeDataMap.ContainsKey( szPathID ) == false ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
+				return false;
+			}
+			if( m_DataManager.ShapeDataMap[ szPathID ] == null || !( m_DataManager.ShapeDataMap[ szPathID ] is PathData ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
+				return false;
+			}
+			pathData = (PathData)m_DataManager.ShapeDataMap[ szPathID ];
 			return true;
 		}
 
