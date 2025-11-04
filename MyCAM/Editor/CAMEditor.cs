@@ -253,20 +253,27 @@ namespace MyCAM.Editor
 		{
 			// stop current action
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
-			string szPathID = szPathIDList[ 0 ];
+			foreach( string szPathID in szPathIDList ) {
 
-			// remove from data manager
-			m_DataManager.RemovePath( szPathID );
+				// remove from data manager
+				m_DataManager.RemovePath( szPathID );
 
-			// remove from viewer
-			m_Viewer.GetAISContext().Remove( m_ViewManager.ViewObjectMap[ szPathID ].AISHandle, false );
-			m_ViewManager.ViewObjectMap.Remove( szPathID );
+				// remove from viewer
+				if( m_ViewManager.ViewObjectMap.ContainsKey( szPathID )) {
+					m_Viewer.GetAISContext().Remove( m_ViewManager.ViewObjectMap[ szPathID ].AISHandle, false );
+					m_ViewManager.ViewObjectMap.Remove( szPathID );
+				}
 
-			// remove from tree view
-			TreeNode node = m_ViewManager.TreeNodeMap[ szPathID ];
-			m_TreeView.Nodes.Remove( node );
-			m_ViewManager.TreeNodeMap.Remove( szPathID );
+				// remove from tree view
+				if( m_ViewManager.TreeNodeMap.ContainsKey( szPathID ) ) {
+					TreeNode node = m_ViewManager.TreeNodeMap[ szPathID ];
+					m_TreeView.Nodes.Remove( node );
+					m_ViewManager.TreeNodeMap.Remove( szPathID );
+				}
+			}
 
+			// clear selection after remove path
+			m_DefaultAction.ClearSelection();
 			ShowCAMData();
 		}
 
@@ -291,7 +298,7 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void SetReverse() // TODO: multi edit
+		public void SetReverse()
 		{
 			// one shot edit, muti edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
@@ -344,7 +351,7 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void ChangeLeadDirection() // TODO: multi edit
+		public void ChangeLeadDirection()
 		{
 			// one shot edit, muti edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
@@ -387,7 +394,7 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void SetToolVecReverse() // TODO: multi edit
+		public void SetToolVecReverse()
 		{
 			// one shot edit, multi edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
@@ -1079,11 +1086,10 @@ namespace MyCAM.Editor
 		bool GetPathDataByID( string szPathID, out PathData pathData )
 		{
 			pathData = null;
-			if( m_DataManager.ShapeDataMap.ContainsKey( szPathID ) == false ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
-				return false;
-			}
-			if( m_DataManager.ShapeDataMap[ szPathID ] == null || !( m_DataManager.ShapeDataMap[ szPathID ] is PathData ) ) {
+			if( string.IsNullOrEmpty( szPathID )
+				|| m_DataManager.ShapeDataMap.ContainsKey( szPathID ) == false
+				|| m_DataManager.ShapeDataMap[ szPathID ] == null
+				|| !( m_DataManager.ShapeDataMap[ szPathID ] is PathData ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
 				return false;
 			}
