@@ -32,15 +32,30 @@ namespace MyCAM.Helper
 
 		public static CAMPoint GetFrogLeapMiddlePoint( CAMPoint frogLeapStartPoint, CAMPoint frogLeapEndPoint, double frogLeapDistance )
 		{
-			// get middle point of frog leap
+			if( frogLeapStartPoint == null || frogLeapEndPoint == null ) {
+				return null;
+			}
+
+			// get middle point of traverse
 			gp_Pnt moveMidP = new gp_Pnt(
 				( frogLeapStartPoint.CADPoint.Point.X() + frogLeapEndPoint.CADPoint.Point.X() ) / 2.0,
 				( frogLeapStartPoint.CADPoint.Point.Y() + frogLeapEndPoint.CADPoint.Point.Y() ) / 2.0,
 				( frogLeapStartPoint.CADPoint.Point.Z() + frogLeapEndPoint.CADPoint.Point.Z() ) / 2.0
 			);
-			gp_Dir arcMidDir;
+
+			// if frog leap distance is zero, return middle point between start and end point
+			if( frogLeapDistance == 0 ) {
+				CADPoint centerCAMPoint = new CADPoint(
+					moveMidP,
+					new gp_Dir(), // doesn't matter
+					new gp_Dir(), // doesn't matter
+					new gp_Dir() // doesn't matter
+				);
+				return new CAMPoint( centerCAMPoint, new gp_Dir() ); // tool vector doesn't matter
+			}
 
 			// if tool vectors are parallel, use Z axis as moving direction
+			gp_Dir arcMidDir;
 			if( frogLeapStartPoint.ToolVec.IsOpposite( frogLeapEndPoint.ToolVec, 1e-3 ) ) {
 				arcMidDir = new gp_Dir( 0, 0, 1 );
 			}

@@ -9,8 +9,8 @@ namespace MyCAM.Post
 	{
 		public NCWriter( List<CAMData> processDataList, MachineData machineData, EntryAndExitData entryAndExitData )
 		{
-			if( processDataList == null || processDataList.Count == 0 || machineData == null || entryAndExitData == null ) {
-				return;
+			if( processDataList == null || machineData == null || entryAndExitData == null ) {
+				throw new ArgumentNullException( "NCWriter constructor argument is null." );
 			}
 			m_ProcessDataList = processDataList;
 			m_MachineData = machineData;

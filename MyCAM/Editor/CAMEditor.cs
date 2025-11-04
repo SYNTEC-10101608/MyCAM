@@ -799,43 +799,45 @@ namespace MyCAM.Editor
 				CAMPoint p5 = currentCamData.GetProcessStartPoint();
 
 				// lift up
-				if( currentCamData.TraverseData.LiftUpDistance > 0 ) {
-					AIS_Line line1 = GetLineAIS( p1.CADPoint.Point, p2.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
-					m_TraverseAISList.Add( line1 );
+				if( currentCamData.TraverseData.LiftUpDistance > 0 && p1 != null && p2 != null ) {
+					AddOneLinearTraverse( p1.CADPoint.Point, p2.CADPoint.Point );
 				}
 
 				// frog leap
-				if( currentCamData.TraverseData.FrogLeapDistance > 0 ) {
+				if( currentCamData.TraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
 					CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCamData.TraverseData.FrogLeapDistance );
-					GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( p2.CADPoint.Point, p3.CADPoint.Point, p4.CADPoint.Point );
-					if( makeCircle.IsDone() ) {
-						Geom_TrimmedCurve arcCurve = makeCircle.Value();
-						BRepBuilderAPI_MakeEdge makeEdge = new BRepBuilderAPI_MakeEdge( arcCurve );
-						AIS_Shape arcAIS = new AIS_Shape( makeEdge.Shape() );
-						arcAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-						arcAIS.SetWidth( 1 );
-						arcAIS.SetTransparency( 1 );
-						Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_DASH, 1 );
-						arcAIS.Attributes().SetWireAspect( prs3D_LineAspect );
-						m_FrogLeapAISList.Add( arcAIS );
+					if( p3 != null ) {
+						GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( p2.CADPoint.Point, p3.CADPoint.Point, p4.CADPoint.Point );
+						if( makeCircle.IsDone() ) {
+							Geom_TrimmedCurve arcCurve = makeCircle.Value();
+							BRepBuilderAPI_MakeEdge makeEdge = new BRepBuilderAPI_MakeEdge( arcCurve );
+							AIS_Shape arcAIS = new AIS_Shape( makeEdge.Shape() );
+							arcAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+							arcAIS.SetWidth( 1 );
+							arcAIS.SetTransparency( 1 );
+							Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_DASH, 1 );
+							arcAIS.Attributes().SetWireAspect( prs3D_LineAspect );
+							m_FrogLeapAISList.Add( arcAIS );
+						}
+						else {
+							// fallback to normal traverse line
+							AddOneLinearTraverse( p2.CADPoint.Point, p4.CADPoint.Point );
+						}
 					}
 					else {
 						// fallback to normal traverse line
-						AIS_Line line2 = GetLineAIS( p2.CADPoint.Point, p4.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
-						m_TraverseAISList.Add( line2 );
+						AddOneLinearTraverse( p2.CADPoint.Point, p4.CADPoint.Point );
 					}
 				}
 
 				// normal traverse
-				else {
-					AIS_Line line2 = GetLineAIS( p2.CADPoint.Point, p4.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
-					m_TraverseAISList.Add( line2 );
+				else if( p2 != null && p4 != null ) {
+					AddOneLinearTraverse( p2.CADPoint.Point, p4.CADPoint.Point );
 				}
 
 				// cut down
-				if( currentCamData.TraverseData.CutDownDistance > 0 ) {
-					AIS_Line line3 = GetLineAIS( p4.CADPoint.Point, p5.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
-					m_TraverseAISList.Add( line3 );
+				if( currentCamData.TraverseData.CutDownDistance > 0 && p4 != null && p5 != null ) {
+					AddOneLinearTraverse( p4.CADPoint.Point, p5.CADPoint.Point );
 				}
 			}
 
@@ -843,16 +845,18 @@ namespace MyCAM.Editor
 			if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
 				CAMPoint firstPathStartPoint = camDataList.First().GetProcessStartPoint();
 				CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
-				AIS_Line entryLine = GetLineAIS( entryPoint.CADPoint.Point, firstPathStartPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
-				m_TraverseAISList.Insert( 0, entryLine );
+				if( firstPathStartPoint != null && entryPoint != null ) {
+					AddOneLinearTraverse( entryPoint.CADPoint.Point, firstPathStartPoint.CADPoint.Point );
+				}
 			}
 
 			// exit
 			if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
 				CAMPoint lastPathEndPoint = camDataList.Last().GetProcessEndPoint();
 				CAMPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
-				AIS_Line exitLine = GetLineAIS( lastPathEndPoint.CADPoint.Point, exitPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
-				m_TraverseAISList.Add( exitLine );
+				if( lastPathEndPoint != null && exitPoint != null ) {
+					AddOneLinearTraverse( lastPathEndPoint.CADPoint.Point, exitPoint.CADPoint.Point );
+				}
 			}
 
 			// Display all lines
@@ -864,6 +868,12 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Display( frogLeapAIS, false );
 				m_Viewer.GetAISContext().Deactivate( frogLeapAIS );
 			}
+		}
+
+		void AddOneLinearTraverse( gp_Pnt startPnt, gp_Pnt endPnt )
+		{
+			AIS_Line traverseAIS = GetLineAIS( startPnt, endPnt, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+			m_TraverseAISList.Add( traverseAIS );
 		}
 
 		void HideCAMData()
