@@ -85,7 +85,7 @@ namespace MyCAM.Editor
 				else {
 					m_Viewer.Select();
 				}
-				SyncSelectionFromViewToTree();
+				SyncSelectionFromView();
 				SelectionChange?.Invoke();
 			}
 		}
@@ -137,7 +137,7 @@ namespace MyCAM.Editor
 				else {
 					m_Viewer.SelectRectangle( minX, minY, maxX, maxY );
 				}
-				SyncSelectionFromViewToTree();
+				SyncSelectionFromView();
 				SelectionChange?.Invoke();
 
 				// update dragging flag
@@ -147,6 +147,12 @@ namespace MyCAM.Editor
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
+			if( e.Control && e.KeyCode == Keys.A ) {
+				( m_TreeView as MultiSelectTreeView ).SelectAll();
+			}
+			else if( e.Control && e.KeyCode == Keys.R ) {
+				( m_TreeView as MultiSelectTreeView ).ReverseSelection();
+			}
 			OnKeyDown( e );
 		}
 
@@ -209,16 +215,12 @@ namespace MyCAM.Editor
 
 		void TreeViewSelectionChanged( object sender, EventArgs e )
 		{
-			SyncSelectionFromTreeToView();
+			SyncSelectionFromTree();
 			SelectionChange?.Invoke();
 		}
 
-		void SyncSelectionFromViewToTree()
+		void SyncSelectionFromView()
 		{
-			m_bSuppressTreeViewSync = true;
-
-			// clear old selection
-			( m_TreeView as MultiSelectTreeView ).ClearSelection();
 			m_SelectedIDSet.Clear();
 
 			// get the selected ID
@@ -237,26 +239,14 @@ namespace MyCAM.Editor
 				m_SelectedIDSet.Add( szUID );
 				m_Viewer.GetAISContext().NextSelected();
 			}
-
-
-			// find the node in the tree view
-			foreach( string szUID in m_SelectedIDSet ) {
-				if( !m_ViewManager.TreeNodeMap.ContainsKey( szUID ) ) {
-					continue;
-				}
-				( m_TreeView as MultiSelectTreeView ).SelectNode( m_ViewManager.TreeNodeMap[ szUID ] );
-			}
-			m_bSuppressTreeViewSync = false;
+			SyncSlectionFromSet();
 		}
 
-		void SyncSelectionFromTreeToView()
+		void SyncSelectionFromTree()
 		{
 			if( m_bSuppressTreeViewSync ) {
 				return;
 			}
-
-			// clear old slection
-			m_Viewer.GetAISContext().ClearSelected( false );
 			m_SelectedIDSet.Clear();
 
 			// get the selected ID
@@ -264,21 +254,12 @@ namespace MyCAM.Editor
 				if( node == null || string.IsNullOrEmpty( node.Text ) ) {
 					continue;
 				}
+				if( node == m_ViewManager.PartNode || node == m_ViewManager.PathNode ) {
+					continue;
+				}
 				m_SelectedIDSet.Add( node.Text );
 			}
-
-			// find the corresponding view object
-			foreach( string szUID in m_SelectedIDSet ) {
-				if( !m_ViewManager.ViewObjectMap.ContainsKey( szUID ) ) {
-					continue;
-				}
-				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szUID ];
-				if( viewObject == null || viewObject.AISHandle == null ) {
-					continue;
-				}
-				m_Viewer.GetAISContext().AddOrRemoveSelected( viewObject.AISHandle, false );
-			}
-			m_Viewer.UpdateView();
+			SyncSlectionFromSet();
 		}
 
 		void SyncSlectionFromSet()

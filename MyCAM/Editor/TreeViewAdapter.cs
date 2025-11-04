@@ -140,6 +140,29 @@ namespace MyCAM.Editor
 				e.Handled = true;
 				SelectAll();
 			}
+			// Handle Ctrl+R
+			else if( e.Control && e.KeyCode == Keys.R ) {
+				e.Handled = true;
+				ReverseSelection();
+			}
+		}
+
+		/// <summary>
+		/// Reverses the selection state of all visible nodes.
+		/// </summary>
+		public void ReverseSelection()
+		{
+			foreach( TreeNode node in GetVisibleNodes() ) {
+				if( _selectedNodes.Contains( node ) ) {
+					_selectedNodes.Remove( node );
+					HighlightNode( node, false );
+				}
+				else {
+					_selectedNodes.Add( node );
+					HighlightNode( node, true );
+				}
+			}
+			OnSelectionChanged();
 		}
 
 		/// <summary>
