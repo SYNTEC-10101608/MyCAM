@@ -290,7 +290,7 @@ namespace MyCAM.Editor
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			if( !GetPathDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
+			if( !GetCAMDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
 				return;
 			}
 			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, camData );
@@ -303,7 +303,7 @@ namespace MyCAM.Editor
 			// one shot edit, muti edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetPathDataByID( szPathID, out CAMData camData ) ) {
+				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
 					continue;
 				}
 
@@ -326,7 +326,7 @@ namespace MyCAM.Editor
 			}
 			List<CAMData> camDataList = new List<CAMData>();
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetPathDataByID( szPathID, out CAMData camData ) ) {
+				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
 					continue;
 				}
 				camDataList.Add( camData );
@@ -347,7 +347,7 @@ namespace MyCAM.Editor
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			if( !GetPathDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
+			if( !GetCAMDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
 				return;
 			}
 			LeadAction action = new LeadAction( m_DataManager, camData );
@@ -360,7 +360,7 @@ namespace MyCAM.Editor
 			// one shot edit, muti edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetPathDataByID( szPathID, out CAMData camData ) ) {
+				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
 					continue;
 				}
 
@@ -384,7 +384,7 @@ namespace MyCAM.Editor
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			if( !GetPathDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
+			if( !GetCAMDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
 				return;
 			}
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, camData );
@@ -403,7 +403,7 @@ namespace MyCAM.Editor
 			// one shot edit, multi edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetPathDataByID( szPathID, out CAMData camData ) ) {
+				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
 					continue;
 				}
 
@@ -424,7 +424,7 @@ namespace MyCAM.Editor
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			if( !GetPathDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
+			if( !GetCAMDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
 				return;
 			}
 			TraverseAction action = new TraverseAction( m_DataManager, camData );
@@ -476,7 +476,7 @@ namespace MyCAM.Editor
 			string szStartPathID = szPathIDList[ 0 ];
 
 			// get start point
-			if( !GetPathDataByID( szStartPathID, out CAMData camData ) ) {
+			if( !GetCAMDataByID( szStartPathID, out CAMData camData ) ) {
 				return;
 			}
 			gp_Pnt currentPoint = camData.GetProcessStartPoint().CADPoint.Point;
@@ -499,7 +499,7 @@ namespace MyCAM.Editor
 					if( visited[ i ] ) {
 						continue;
 					}
-					if( !GetPathDataByID( pathIDList[ i ], out CAMData nextcamData ) ) {
+					if( !GetCAMDataByID( pathIDList[ i ], out CAMData nextcamData ) ) {
 						continue;
 					}
 					gp_Pnt nextStartPoint = nextcamData.GetProcessStartPoint().CADPoint.Point;
@@ -581,7 +581,7 @@ namespace MyCAM.Editor
 
 			// closed path editable only: start point, overcut, lead line, change lead dir
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetPathDataByID( szPathID, out CAMData camData ) ) {
+				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
 					continue;
 				}
 				if( !camData.IsClosed ) {
@@ -1089,7 +1089,7 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		bool GetPathDataByID( string szPathID, out CAMData camData )
+		bool GetCAMDataByID( string szPathID, out CAMData camData )
 		{
 			camData = null;
 			if( string.IsNullOrEmpty( szPathID )
