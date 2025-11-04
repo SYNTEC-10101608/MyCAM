@@ -84,6 +84,58 @@ namespace MyCAM.Helper
 			return StraightLeadCAMPointList;
 		}
 
+		public static Geom_Curve BuildStraightLeadLine_New( CADPoint startCADPoint, gp_Dir startPointDir, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, out gp_Pnt leadLineEndPoint, out gp_Dir leadDir )
+		{
+			leadLineEndPoint = new gp_Pnt();
+			leadDir = new gp_Dir();
+			// protection 
+			if( dLeadLineLength <= 0 ) {
+				return null;
+			}
+
+			//  establish a coordinate system through this point and its direction vector and normal vector
+			CAMPoint startPoint = new CAMPoint( startCADPoint, startPointDir );
+			gp_Dir XVec = new gp_Dir( -startPoint.CADPoint.TangentVec.X(), -startPoint.CADPoint.TangentVec.Y(), -startPoint.CADPoint.TangentVec.Z() );
+			gp_Dir ZVec = startPoint.ToolVec;
+			gp_Ax3 planeCS = new gp_Ax3( startPoint.CADPoint.Point, ZVec, XVec );
+
+			gp_Dir xDir = planeCS.XDirection();
+			gp_Dir yDir = planeCS.YDirection();
+			double angleRad = dLeadLineAngle * Math.PI / 180.0;
+			double cosA = Math.Cos( angleRad );
+			double sinA = Math.Sin( angleRad );
+
+			// vector to remove from original point to the lead line end point
+			gp_Vec dirVec2D = new gp_Vec( xDir ).Multiplied( cosA ) + new gp_Vec( yDir ).Multiplied( sinA );
+			leadLineEndPoint = startPoint.CADPoint.Point.Translated( dirVec2D.Multiplied( dLeadLineLength ) );
+
+			// flip by y axis
+			if( ( isLeadIn == false && isReverse == false ) || ( isLeadIn && isReverse ) ) {
+				gp_Trsf mirrorTrsf = new gp_Trsf();
+				mirrorTrsf.SetMirror( new gp_Ax1( planeCS.Location(), planeCS.YDirection() ) );
+				leadLineEndPoint.Transform( mirrorTrsf );
+
+			}
+
+			// flip by x axis
+			if( isChangeLeadDirection ) {
+				gp_Trsf mirrorTrsf = new gp_Trsf();
+				mirrorTrsf.SetMirror( new gp_Ax1( planeCS.Location(), planeCS.XDirection() ) );
+				leadLineEndPoint.Transform( mirrorTrsf );
+			}
+
+			gp_Vec startToEndVec = new gp_Vec( startCADPoint.Point, leadLineEndPoint );
+			gp_Dir startToEndDir = new gp_Dir( startToEndVec );
+			leadDir = startToEndDir;
+			if( isLeadIn ) {
+				leadDir.Reverse();
+			}
+
+			Geom_Line geomLine = new Geom_Line( startCADPoint.Point, startToEndDir );
+			Geom_TrimmedCurve trimmedLine = new Geom_TrimmedCurve( geomLine, 0, startCADPoint.Point.Distance( leadLineEndPoint ) );
+			return trimmedLine;
+		}
+
 		// when isLeadIn, the input point is start of path, and is end of lead in
 		public static List<CAMPoint> BuildArcLeadLine( CAMPoint CurveLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, double dDeflection, double dMaxLength )
 		{
@@ -169,6 +221,87 @@ namespace MyCAM.Helper
 				resultList.Add( leadCAMPoint );
 			}
 			return resultList;
+		}
+
+		public static Geom_Curve BuildArcLead_New( CADPoint startCADPoint, gp_Dir startPointDir, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, out gp_Pnt leadEndPnt, out gp_Pnt leadMidPnt, out gp_Dir leadDir )
+		{
+			leadEndPnt = new gp_Pnt();
+			leadMidPnt = new gp_Pnt();
+			leadDir = new gp_Dir();
+
+			// protection
+			if( dLeadLineLength <= 0 || dLeadLineAngle <= 0 ) {
+				return null;
+			}
+
+			CAMPoint startPoint = new CAMPoint( startCADPoint, startPointDir );
+
+			//  establish a coordinate system through this point and its direction vector and normal vector
+			gp_Dir XVec = startPoint.CADPoint.TangentVec;
+			gp_Dir ZVec = startPoint.ToolVec;
+			gp_Ax3 leadLinePlane = new gp_Ax3( startPoint.CADPoint.Point, ZVec, XVec );
+
+			// circle center shifted along -Y
+			gp_Vec movingDirection = new gp_Vec( leadLinePlane.YDirection() );
+			movingDirection.Reverse();
+			gp_Pnt circleCenterPnt = new gp_Pnt( leadLinePlane.Location().XYZ() + movingDirection.Multiplied( dLeadLineLength ).XYZ() );
+
+			// circle definition
+			gp_Ax2 circleAx2 = new gp_Ax2( circleCenterPnt, leadLinePlane.Direction(), leadLinePlane.YDirection() );
+			Geom_Circle geomCircle = new Geom_Circle( new gp_Circ( circleAx2, dLeadLineLength ) );
+
+			// compute angles
+			double dArcAngle;
+			if( isLeadIn ) {
+				dArcAngle = dLeadLineAngle * Math.PI / 180.0;
+			}
+			else {
+				dArcAngle = -dLeadLineAngle * Math.PI / 180.0;
+			}
+			Geom_TrimmedCurve leadLineCurve;
+			if( isLeadIn ) {
+				leadLineCurve = new Geom_TrimmedCurve( geomCircle, 0, dArcAngle, true );
+			}
+			else {
+				leadLineCurve = new Geom_TrimmedCurve( geomCircle, dArcAngle, Math.PI * 2, true );
+			}
+
+			if( isReverse ) {
+				gp_Trsf mirror = new gp_Trsf();
+				mirror.SetMirror( new gp_Ax1( leadLinePlane.Location(), leadLinePlane.YDirection() ) );
+
+				Geom_TrimmedCurve leadLineCurveTrimmed = leadLineCurve.Transformed( mirror ) as Geom_TrimmedCurve;
+				if( leadLineCurveTrimmed != null ) {
+					leadLineCurve = leadLineCurveTrimmed;
+				}
+				else {
+					return null;
+				}
+			}
+
+			if( isChangeLeadDirection ) {
+				gp_Trsf mirror = new gp_Trsf();
+				mirror.SetMirror( new gp_Ax1( leadLinePlane.Location(), leadLinePlane.XDirection() ) );
+				Geom_TrimmedCurve leadLineCurveTrimmed = leadLineCurve.Transformed( mirror ) as Geom_TrimmedCurve;
+				if( leadLineCurveTrimmed != null ) {
+					leadLineCurve = leadLineCurveTrimmed;
+				}
+				else {
+					return null;
+				}
+			}
+			gp_Vec tangentVec = new gp_Vec();
+			leadMidPnt = leadLineCurve.Value( ( leadLineCurve.LastParameter() + leadLineCurve.FirstParameter() ) * 0.5 );
+
+			if( isLeadIn ) {
+				leadLineCurve.D1( leadLineCurve.LastParameter(), ref leadEndPnt, ref tangentVec );
+			}
+			else {
+				leadLineCurve.D1( leadLineCurve.FirstParameter(), ref leadEndPnt, ref tangentVec );
+			}
+			tangentVec.Reverse();
+			leadDir = new gp_Dir( tangentVec );
+			return leadLineCurve;
 		}
 
 		static List<gp_Pnt> Get2PntSegmentPnt( gp_Pnt currentPnt, gp_Pnt nextPnt, double stepLength )

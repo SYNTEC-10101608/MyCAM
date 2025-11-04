@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Helper;
@@ -53,7 +55,7 @@ namespace MyCAM.Editor
 		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh, no need activate
 		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
 		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>(); // need refresh, no need activate
-		List<AIS_Line> m_LeadAISList = new List<AIS_Line>(); // need refresh, no need activate
+		List<AIS_Shape> m_LeadAISList = new List<AIS_Shape>(); // need refresh, no need activate
 		List<AIS_Shape> m_LeadOrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
 		List<AIS_Line> m_OverCutAISList = new List<AIS_Line>(); // need refresh, no need activate
 		List<AIS_Line> m_TraverseAISList = new List<AIS_Line>(); // need refresh, no need activate
@@ -553,8 +555,7 @@ namespace MyCAM.Editor
 			ShowOrientation_New();
 			ShowIndex();
 			ShowOverCut();
-			ShowLeadLine();
-			ShowLeadOrientation();
+			ShowLeadLine_New();
 			ShowTraversalPath();
 			m_Viewer.UpdateView();
 		}
@@ -595,7 +596,8 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void ShowLeadLine()
+
+		/*void ShowLeadLine()
 		{
 			// clear the previous tool vec
 			foreach( AIS_Line toolVecAIS in m_LeadAISList ) {
@@ -633,29 +635,113 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Deactivate( toolVecAIS );
 			}
 		}
+		*/
 
 		void ShowLeadLine_New()
 		{
 			// clear the previous tool vec
-			foreach( AIS_Line toolVecAIS in m_LeadAISList ) {
+			foreach( AIS_Shape toolVecAIS in m_LeadAISList ) {
 				m_Viewer.GetAISContext().Remove( toolVecAIS, false );
 			}
 			m_LeadAISList.Clear();
+
+			// clear the previous orientation
+			foreach( AIS_Shape orientationAIS in m_LeadOrientationAISList ) {
+				m_Viewer.GetAISContext().Remove( orientationAIS, false );
+			}
+			m_LeadOrientationAISList.Clear();
+
 
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				(int, int) startPointIndex = camData.NewStartPoint;
 				gp_Dir startPointToolVec = GetStartPointToolVec( camData );
 
+				// lead in
+				if( camData.LeadLineParam.LeadIn.Type == LeadLineType.Line ) {
+					Geom_Curve lineCurve = LeadHelper.BuildStraightLeadLine_New( camData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[ camData.NewStartPoint.Item2 ], startPointToolVec, true, camData.LeadLineParam.LeadIn.Length, camData.LeadLineParam.LeadIn.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out gp_Dir leadDir );
+					if (lineCurve == null ) {
+						break;
+					}
+					AIS_Shape lineShape = CurveToAIS( lineCurve, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+					m_LeadAISList.Add( lineShape );
 
+					AIS_Shape orientationAIS = GetOrientationAIS( leadLineEndPoint, leadDir );
+					m_LeadOrientationAISList.Add( orientationAIS );
+				}
+				if( camData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ) {
+					Geom_Curve arcCurve = LeadHelper.BuildArcLead_New( camData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[camData.NewStartPoint.Item2], startPointToolVec, true, camData.LeadLineParam.LeadIn.Length, camData.LeadLineParam.LeadIn.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out _, out gp_Dir leadDir );
+					if( arcCurve == null ) {
+						break;
+					}
+					AIS_Shape arcShape = CurveToAIS( arcCurve, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+					m_LeadAISList.Add( arcShape );
 
+					AIS_Shape orientationAIS = GetOrientationAIS( leadLineEndPoint, leadDir );
+					m_LeadOrientationAISList.Add( orientationAIS );
+				}
+
+				if( camData.LeadLineParam.LeadOut.Type == LeadLineType.Line ) {
+					Geom_Curve lineCurve = LeadHelper.BuildStraightLeadLine_New( amData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[ camData.NewStartPoint.Item2 ], startPointToolVec, false, camData.LeadLineParam.LeadOut.Length, camData.LeadLineParam.LeadOut.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out gp_Dir leadDir );
+					if( lineCurve == null ) {
+						break;
+					}
+					AIS_Shape lineShape = CurveToAIS( lineCurve, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+					m_LeadAISList.Add( lineShape );
+					AIS_Shape orientationAIS = GetOrientationAIS( leadLineEndPoint, leadDir );
+					m_LeadOrientationAISList.Add( orientationAIS );
+
+				}
+
+				if( camData.LeadLineParam.LeadOut.Type == LeadLineType.Arc ) {
+					Geom_Curve arcCurve = LeadHelper.BuildArcLead_New( camData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[ camData.NewStartPoint.Item2 ], startPointToolVec, false, camData.LeadLineParam.LeadOut.Length, camData.LeadLineParam.LeadOut.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out _, out gp_Dir leadDir );
+
+					if( arcCurve == null ) {
+						break;
+					}
+					AIS_Shape arcShape = CurveToAIS( arcCurve, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+					m_LeadAISList.Add( arcShape );
+
+					AIS_Shape orientationAIS = GetOrientationAIS( leadLineEndPoint, leadDir );
+					m_LeadOrientationAISList.Add( orientationAIS );
+				}
 			}
 
 			// display the lead line
-			foreach( AIS_Line toolVecAIS in m_LeadAISList ) {
+			foreach( AIS_Shape toolVecAIS in m_LeadAISList ) {
 				m_Viewer.GetAISContext().Display( toolVecAIS, false );
 				m_Viewer.GetAISContext().Deactivate( toolVecAIS );
 			}
+			// display the orientation
+			foreach( AIS_Shape orientationAIS in m_LeadOrientationAISList ) {
+				m_Viewer.GetAISContext().Display( orientationAIS, false );
+				m_Viewer.GetAISContext().Deactivate( orientationAIS );
+			}
 		}
+
+		public static void IsNormalDirection( gp_Pnt p1, gp_Pnt p2, gp_Pnt p3, gp_Dir dir, double tolerance = 1e-6 )
+		{
+			if( p1 == null || p2 == null || p3 == null || dir == null ) {
+				return;
+			}
+
+			// 計算平面法向量 (透過向量叉積)
+			gp_Vec v1 = new gp_Vec( p1, p2 );
+			gp_Vec v2 = new gp_Vec( p1, p3 );
+
+			gp_Vec normalVec = v1.Crossed( v2 );
+
+			if( normalVec.Magnitude() < tolerance )
+				throw new ArgumentException( "三個點共線，無法定義平面。" );
+
+			gp_Dir planeNormal = new gp_Dir( normalVec );
+
+			// 計算兩個單位向量的點積
+			double dot = Math.Abs( planeNormal.Dot( dir ) );
+
+			// 若 dot 接近 1，即平行（正向或反向）
+			Console.WriteLine( Math.Abs( dot - 1.0 ) < tolerance );
+		}
+
 
 		gp_Dir GetStartPointToolVec( CAMData camData )
 		{
@@ -677,14 +763,14 @@ namespace MyCAM.Editor
 			}
 			List<((int, int), (int, int))> interpolateIntervalList = GetInterpolateIntervalList( camData );
 			((int, int), (int, int)) startPointSegmentRange = GetStartPointSegment( interpolateIntervalList, camData.NewStartPoint );
-
+			InterpolateToolVec( camData, startPointSegmentRange.Item1, startPointSegmentRange.Item2, out double dTotalLength );
 			gp_Vec segmentsStartVec = BuildCAMSegmentHelper.GetModifyToolVecByMap( camData, startPointSegmentRange.Item1 );
 			gp_Vec segmentsEdnVec = BuildCAMSegmentHelper.GetModifyToolVecByMap( camData, startPointSegmentRange.Item2 );
 			// get the quaternion for interpolation
 			gp_Quaternion q12 = new gp_Quaternion( segmentsStartVec, segmentsEdnVec );
 			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
 
-			double weight = GetStartPointWeight( camData, startPointSegmentRange, camData.NewStartPoint );
+			double weight = GetStartPointWeight( camData, startPointSegmentRange, camData.NewStartPoint, dTotalLength );
 
 			gp_Quaternion q = new gp_Quaternion();
 			slerp.Interpolate( weight, ref q );
@@ -695,85 +781,115 @@ namespace MyCAM.Editor
 
 		}
 
-		((int, int), (int, int)) GetStartPointSegment( List<((int segmentIndex, int PointIndex), (int segmentIndex, int PointIndex))> segments, (int, int) target )
+		((int, int), (int, int)) GetStartPointSegment(
+	List<((int segmentIndex, int pointIndex), (int segmentIndex, int pointIndex))> segments,
+	(int segmentIndex, int pointIndex) target )
 		{
 			for( int i = 0; i < segments.Count; i++ ) {
-				var (start, end) = segments[ i ];
-				if( start.Item1 <= target.Item1 && target.Item1 <= end.Item1 ||
-					end.Item1 <= target.Item1 && target.Item1 <= start.Item1 ) {
-					return segments[ i ];
+				(int segmentIndex, int pointIndex) start = segments[ i ].Item1;
+				(int segmentIndex, int pointIndex) end = segments[ i ].Item2;
+
+				// case 1: 同一個 segment
+				if( start.segmentIndex == end.segmentIndex ) {
+					if( target.segmentIndex == start.segmentIndex &&
+						target.pointIndex >= start.pointIndex &&
+						target.pointIndex <= end.pointIndex )
+						return segments[ i ];
+				}
+				// case 2: 順向區間
+				else if( start.segmentIndex < end.segmentIndex ) {
+					if( target.segmentIndex > start.segmentIndex && target.segmentIndex < end.segmentIndex )
+						return segments[ i ];
+
+					if( target.segmentIndex == start.segmentIndex && target.pointIndex >= start.pointIndex )
+						return segments[ i ];
+
+					if( target.segmentIndex == end.segmentIndex && target.pointIndex <= end.pointIndex )
+						return segments[ i ];
+				}
+				// case 3: 迴轉區間（封閉環）
+				else // start.segmentIndex > end.segmentIndex
+				{
+					bool inBeforeWrap =
+						( target.segmentIndex > start.segmentIndex ) ||
+						( target.segmentIndex == start.segmentIndex && target.pointIndex >= start.pointIndex );
+
+					bool inAfterWrap =
+						( target.segmentIndex < end.segmentIndex ) ||
+						( target.segmentIndex == end.segmentIndex && target.pointIndex <= end.pointIndex );
+
+					if( inBeforeWrap || inAfterWrap )
+						return segments[ i ];
 				}
 			}
+
 			return ((-1, -1), (-1, -1));
 		}
 
-		double GetStartPointWeight( CAMData camData, ((int segmentIndex, int pointIndex) startSegment, (int segmentIndex, int pointIndex) endSegment) segmentRange, (int segmentIndex, int pointIndex) startPointIdx )
+
+		double GetStartPointWeight( CAMData camData, ((int segmentIndex, int pointIndex) startSegment, (int segmentIndex, int pointIndex) endSegment) segmentRange, (int segmentIndex, int pointIndex) startPointIdx, double dSegmentLength )
 		{
 			// all pnt in the same segment
 			if( segmentRange.startSegment.segmentIndex == segmentRange.endSegment.segmentIndex ) {
-				double dTotalLength = ( segmentRange.endSegment.pointIndex - segmentRange.startSegment.pointIndex ) * camData.CADSegmentList[ segmentRange.startSegment.segmentIndex ].PointSpace;
-				double dSegmentStartToStartPoint = ( startPointIdx.Item2 - segmentRange.startSegment.pointIndex ) * camData.CADSegmentList[ segmentRange.startSegment.segmentIndex ].PointSpace;
-				double weight = dSegmentStartToStartPoint / dTotalLength;
+
+				double dSegmentStartToStartPoint = ( startPointIdx.pointIndex - segmentRange.startSegment.pointIndex ) * camData.CADSegmentList[ segmentRange.startSegment.segmentIndex ].PointSpace;
+				double weight = dSegmentStartToStartPoint / dSegmentLength;
 				return weight;
 			}
 
 			// start segment index < end segment index
 			if( segmentRange.startSegment.segmentIndex < segmentRange.endSegment.segmentIndex ) {
-				double dTotalLength = 0;
-				dTotalLength += ( camData.CADSegmentList[ segmentRange.startSegment.segmentIndex ].PointList.Count - 1 - startPointIdx.pointIndex ) * camData.CADSegmentList[ segmentRange.startSegment.segmentIndex ].PointSpace;
-				for( int i = segmentRange.startSegment.segmentIndex + 1; i < segmentRange.endSegment.segmentIndex; i++ ) {
-					dTotalLength += camData.CADSegmentList[ i ].TotalLength;
-				}
-				dTotalLength += ( segmentRange.endSegment.pointIndex ) * camData.CADSegmentList[ segmentRange.endSegment.segmentIndex ].PointSpace;
 
 				double dSegmentStartToStartPoint = 0;
 				for( int i = segmentRange.startSegment.segmentIndex; i <= segmentRange.endSegment.segmentIndex; i++ ) {
+					if( i == startPointIdx.segmentIndex && startPointIdx.segmentIndex == segmentRange.startSegment.segmentIndex ) {
+						dSegmentStartToStartPoint += ( startPointIdx.pointIndex - segmentRange.startSegment.pointIndex ) * camData.CADSegmentList[ i ].PointSpace;
+						break;
+					}
 					if( i == startPointIdx.segmentIndex ) {
-						dSegmentStartToStartPoint += startPointIdx.pointIndex * camData.CADSegmentList[ i ].PointSpace;
+						dSegmentStartToStartPoint += ( startPointIdx.pointIndex ) * camData.CADSegmentList[ i ].PointSpace;
 						break;
 					}
 					if( i == segmentRange.startSegment.segmentIndex && i != startPointIdx.segmentIndex ) {
-						dSegmentStartToStartPoint += ( camData.CADSegmentList[ i ].PointList.Count - 1 - startPointIdx.pointIndex ) * camData.CADSegmentList[ i ].PointSpace;
+						dSegmentStartToStartPoint += ( camData.CADSegmentList[ i ].PointList.Count - 1 - segmentRange.startSegment.pointIndex ) * camData.CADSegmentList[ i ].PointSpace;
 					}
 					else {
 						dSegmentStartToStartPoint += camData.CADSegmentList[ i ].TotalLength;
 					}
 				}
-				double weight = dSegmentStartToStartPoint / dTotalLength;
+				double weight = dSegmentStartToStartPoint / dSegmentLength;
 				return weight;
 			}
 
 			// start segment index > end segment
-			double dTotalLength_1 = 0;
-			for( int i = segmentRange.endSegment.segmentIndex; i <= camData.CADSegmentList.Count; i++ ) {
-				if( i == segmentRange.endSegment.segmentIndex ) {
-					dTotalLength_1 += ( camData.CADSegmentList[ i ].PointList.Count - 1 - segmentRange.endSegment.pointIndex ) * camData.CADSegmentList[ i ].PointSpace;
-				}
-				dTotalLength_1 += camData.CADSegmentList[ i ].TotalLength;
-			}
-			for( int i = 0; i < segmentRange.startSegment.segmentIndex; i++ ) {
-				dTotalLength_1 += camData.CADSegmentList[ i ].TotalLength;
-			}
-			dTotalLength_1 += ( segmentRange.startSegment.pointIndex ) * camData.CADSegmentList[ segmentRange.startSegment.segmentIndex ].PointSpace;
-
 			double dSegmentStartToStartPoint_1 = 0;
 
-			if( startPointIdx.segmentIndex > segmentRange.endSegment.segmentIndex ) {
-				for( int i = segmentRange.startSegment.segmentIndex; i <= camData.CADSegmentList.Count; i++ ) {
+			// 在後面這段
+			if( startPointIdx.segmentIndex >= segmentRange.endSegment.segmentIndex ) {
+				for( int i = segmentRange.startSegment.segmentIndex; i < camData.CADSegmentList.Count; i++ ) {
 					if( i == segmentRange.startSegment.segmentIndex && i == startPointIdx.segmentIndex ) {
 						dSegmentStartToStartPoint_1 += ( startPointIdx.pointIndex - segmentRange.startSegment.pointIndex ) * camData.CADSegmentList[ i ].PointSpace;
-						break;
+						double weight = dSegmentStartToStartPoint_1 / dSegmentLength;
+						return weight;
 					}
 					if( i == segmentRange.startSegment.segmentIndex ) {
-						dSegmentStartToStartPoint_1 += ( segmentRange.startSegment.pointIndex ) * camData.CADSegmentList[ i ].PointSpace;
+						dSegmentStartToStartPoint_1 += ( camData.CADSegmentList[ i ].PointList.Count - 1 - segmentRange.startSegment.pointIndex ) * camData.CADSegmentList[ i ].PointSpace;
 						continue;
 					}
+					if( i == startPointIdx.segmentIndex ) {
+						dSegmentStartToStartPoint_1 += startPointIdx.pointIndex * camData.CADSegmentList[ i ].PointSpace;
+						double weight = dSegmentStartToStartPoint_1 / dSegmentLength;
+						return weight;
+					}
+
 					dSegmentStartToStartPoint_1 += camData.CADSegmentList[ i ].TotalLength;
-					double weight = dSegmentStartToStartPoint_1 / dTotalLength_1;
-					return weight;
+
 				}
 			}
+
+			// 在前面那段
 			else {
+
 				for( int i = segmentRange.startSegment.segmentIndex; i < camData.CADSegmentList.Count; i++ ) {
 					if( i == segmentRange.startSegment.segmentIndex ) {
 						dSegmentStartToStartPoint_1 += ( camData.CADSegmentList[ i ].PointList.Count - 1 - segmentRange.startSegment.pointIndex ) * camData.CADSegmentList[ i ].PointSpace;
@@ -788,7 +904,7 @@ namespace MyCAM.Editor
 					}
 					dSegmentStartToStartPoint_1 += camData.CADSegmentList[ i ].TotalLength;
 				}
-				double weight = dSegmentStartToStartPoint_1 / dTotalLength_1;
+				double weight = dSegmentStartToStartPoint_1 / dSegmentLength;
 				return weight;
 			}
 			return -1;
@@ -1085,7 +1201,7 @@ namespace MyCAM.Editor
 			}
 
 			// hide lead 
-			foreach( AIS_Line leadAIS in m_LeadAISList ) {
+			foreach( AIS_Shape leadAIS in m_LeadAISList ) {
 				m_Viewer.GetAISContext().Remove( leadAIS, false );
 			}
 
@@ -1157,6 +1273,19 @@ namespace MyCAM.Editor
 				lineAIS.Attributes().SetLineAspect( prs3D_LineAspect );
 			}
 			return lineAIS;
+		}
+
+		AIS_Shape CurveToAIS( Geom_Curve curve, Quantity_NameOfColor color, double lineWidth = 1, double dTransparancy = 1, bool isDashLine = false )
+		{
+			if( curve == null ) {
+				return null;
+			}
+			BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( curve );
+			TopoDS_Edge edge = edgeMaker.Edge();
+			AIS_Shape aisCurve = new AIS_Shape( edge );
+			aisCurve.SetColor( new Quantity_Color( color ) );
+			aisCurve.SetWidth( lineWidth );
+			return aisCurve;
 		}
 
 		AIS_Shape GetOrientationAIS( gp_Pnt point, gp_Dir dir )
@@ -1276,19 +1405,18 @@ namespace MyCAM.Editor
 				// get start and end index
 				(int, int) nStartIndex = interpolateIntervalList[ i ].Item1;
 				(int, int) nEndIndex = interpolateIntervalList[ i ].Item2;
-				points.AddRange( InterpolateToolVec( camData, nStartIndex, nEndIndex ) );
+				points.AddRange( InterpolateToolVec( camData, nStartIndex, nEndIndex, out _ ) );
 			}
 			return true;
 
 		}
 
-		List<(gp_Pnt point, gp_Dir toolVec, bool isModiyToolVec)> InterpolateToolVec( CAMData camdata, (int, int) nStartIndex, (int, int) nEndIndex )
+		List<(gp_Pnt point, gp_Dir toolVec, bool isModiyToolVec)> InterpolateToolVec( CAMData camdata, (int, int) nStartIndex, (int, int) nEndIndex, out double dTotalLength )
 		{
 			List<(gp_Pnt point, double dDistance, bool isModifyToolVec)> toolVecLocation = new List<(gp_Pnt point, double dDistance, bool isModifyToolVec)>();
 			List<(gp_Pnt point, gp_Dir toolVec, bool isModiyToolVec)> points = new List<(gp_Pnt point, gp_Dir toolVecbool, bool isModiyToolVec)>();
-
 			// 計算長度
-			double dTotalLength = 0;
+			dTotalLength = 0;
 
 			// 同一個segment內
 			if( nStartIndex.Item1 == nEndIndex.Item1 && nStartIndex.Item2 < nEndIndex.Item2 ) {
@@ -1365,7 +1493,6 @@ namespace MyCAM.Editor
 					if( camdata.CADSegmentList[ nEndIndex.Item1 ] is ArcCADSegment arcCADSegment_2 ) {
 						toolVecLocation.AddRange( GetArcToolVecLoaction( arcCADSegment_2, 0, false, nEndIndex.Item2, true, ref dTotalLength, false ) );
 					}
-
 				}
 			}
 
