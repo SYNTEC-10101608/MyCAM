@@ -126,13 +126,14 @@ namespace MyCAM.Helper
 
 			gp_Vec startToEndVec = new gp_Vec( startCADPoint.Point, leadLineEndPoint );
 			gp_Dir startToEndDir = new gp_Dir( startToEndVec );
+		
+
+			Geom_Line geomLine = new Geom_Line( startCADPoint.Point, startToEndDir );
+			Geom_TrimmedCurve trimmedLine = new Geom_TrimmedCurve( geomLine, 0, startCADPoint.Point.Distance( leadLineEndPoint ) );
 			leadDir = startToEndDir;
 			if( isLeadIn ) {
 				leadDir.Reverse();
 			}
-
-			Geom_Line geomLine = new Geom_Line( startCADPoint.Point, startToEndDir );
-			Geom_TrimmedCurve trimmedLine = new Geom_TrimmedCurve( geomLine, 0, startCADPoint.Point.Distance( leadLineEndPoint ) );
 			return trimmedLine;
 		}
 

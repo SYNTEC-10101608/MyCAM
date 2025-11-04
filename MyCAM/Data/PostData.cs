@@ -128,6 +128,28 @@ namespace MyCAM.Data
 		}
 	}
 
+	internal class PathCAMSegmentPage
+	{
+		public List<ICAMSegmentElement> LeadInSegment
+		{
+			get; set;
+		}
+
+		public List<ICAMSegmentElement> MainPathSegment
+		{
+			get; set;
+		}
+
+		public List<ICAMSegmentElement> OverCutSegment
+		{
+			get; set;
+		}
+
+		public List<ICAMSegmentElement> LeadOutSegment
+		{
+			get; set;
+		}
+	}
 
 	public enum EPostPathType
 	{
