@@ -313,7 +313,7 @@ namespace MyCAM.Editor
 			ShowCAMData();
 		}
 
-		public void SetOverCut() // TODO: multi edit
+		public void SetOverCut()
 		{
 			// action edit, multi edit supported
 			if( IsSameAction( EditActionType.OverCut ) ) {
@@ -336,7 +336,7 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void SetLeadLine() // TODO: multi edit
+		public void SetLeadLine()
 		{
 			// action edit, multi edit supported
 			if( IsSameAction( EditActionType.SetLead ) ) {
@@ -347,10 +347,14 @@ namespace MyCAM.Editor
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			if( !GetCAMDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
-				return;
+			List<CAMData> camDataList = new List<CAMData>();
+			foreach( string szPathID in szPathIDList ) {
+				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
+					continue;
+				}
+				camDataList.Add( camData );
 			}
-			LeadAction action = new LeadAction( m_DataManager, camData );
+			LeadAction action = new LeadAction( m_DataManager, camDataList );
 			action.PropertyChanged += OnSetLeadPropertyChanged;
 			StartEditAction( action );
 		}
@@ -413,7 +417,7 @@ namespace MyCAM.Editor
 			ShowCAMData();
 		}
 
-		public void SeTraverseParam() // TODO: multi edit
+		public void SeTraverseParam()
 		{
 			// action edit, multi edit supported
 			if( IsSameAction( EditActionType.SetTraverseParam ) ) {
@@ -424,10 +428,14 @@ namespace MyCAM.Editor
 			if( isGetIDSuccess == false ) {
 				return;
 			}
-			if( !GetCAMDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
-				return;
+			List<CAMData> camDataList = new List<CAMData>();
+			foreach( string szPathID in szPathIDList ) {
+				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
+					continue;
+				}
+				camDataList.Add( camData );
 			}
-			TraverseAction action = new TraverseAction( m_DataManager, camData );
+			TraverseAction action = new TraverseAction( m_DataManager, camDataList );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
