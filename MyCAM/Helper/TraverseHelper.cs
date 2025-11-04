@@ -41,7 +41,7 @@ namespace MyCAM.Helper
 			gp_Dir arcMidDir;
 
 			// if tool vectors are parallel, use Z axis as moving direction
-			if( frogLeapStartPoint.ToolVec.IsParallel( frogLeapEndPoint.ToolVec, 1e-6 ) ) {
+			if( frogLeapStartPoint.ToolVec.IsOpposite( frogLeapEndPoint.ToolVec, 1e-3 ) ) {
 				arcMidDir = new gp_Dir( 0, 0, 1 );
 			}
 
