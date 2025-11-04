@@ -29,7 +29,7 @@ namespace MyCAM.Post
 		NoSolution = 1,
 		MasterInfinityOfSolution = 2,
 		SlaveInfinityOfSolution = 3,
-		IvalidInput = 4,
+		InvalidInput = 4,
 	}
 
 	/// <summary>
@@ -355,7 +355,7 @@ namespace MyCAM.Post
 			dM_Out = 0;
 			dS_Out = 0;
 			if( point == null ) {
-				return IKSolveResult.IvalidInput;
+				return IKSolveResult.InvalidInput;
 			}
 
 			// swap the input master and slave axis if needed
