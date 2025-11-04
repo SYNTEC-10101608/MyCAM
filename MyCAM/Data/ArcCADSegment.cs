@@ -5,11 +5,9 @@ namespace MyCAM.Data
 {
 	internal class ArcCADSegment : CADSegmentBase
 	{
-		public ArcCADSegment( List<CADPoint> arcPointList, double dTotalLength, double dPointSpace,gp_Pnt circleCenter, gp_Dir centerDir )
+		public ArcCADSegment( List<CADPoint> arcPointList, double dTotalLength, double dPointSpace )
 			: base( arcPointList, dTotalLength , dPointSpace)
 		{
-			CenterOfCircle = circleCenter;
-			CenterDir = centerDir;
 			MidPoint = arcPointList[ arcPointList.Count / 2 ];
 		}
 
@@ -35,36 +33,6 @@ namespace MyCAM.Data
 			}
 		}
 
-		public gp_Pnt CenterOfCircle
-		{
-			get
-			{
-				return m_CenterOfCircle;
-			}
-			private set
-			{
-				if( value != null ) {
-					m_CenterOfCircle = value;
-				}
-			}
-		}
-
-		public gp_Dir CenterDir
-		{
-			get
-			{
-				return m_CenterDir;
-			}
-			set
-			{
-				if( value != null ) {
-					m_CenterDir = value;
-				}
-			}
-		}
-
 		CADPoint m_MidPoint;
-		gp_Pnt m_CenterOfCircle;
-		gp_Dir m_CenterDir;
 	}
 }

@@ -33,8 +33,8 @@ namespace MyCAM.Helper
 			}
 
 			List<ICAMSegmentElement> leadInSegment = BuildLeadCAMSegment( camData, true );
-			camSegmentPage.LeadInSegment = leadInSegment;
 
+			camSegmentPage.LeadInSegment = leadInSegment;
 			// forward arrangement of main path
 			List<ICAMSegmentElement> camSegmentList = GetMainPathOrderedSegment( camData );
 			if( camData.IsReverse ) {
@@ -364,7 +364,7 @@ namespace MyCAM.Helper
 						CADPoint cadPoint = new CADPoint( leadPntList[ i ], startPointToolVec, startPointToolVec, startCadPoint.TangentVec );
 						leadCadPointList.Add( cadPoint );
 					}
-					ArcCADSegment arcCADSegment = new ArcCADSegment( leadCadPointList, 0, 0, null, null );
+					ArcCADSegment arcCADSegment = new ArcCADSegment( leadCadPointList, 0, 0 );
 					return arcCADSegment;
 				}
 			}
@@ -391,7 +391,7 @@ namespace MyCAM.Helper
 					CADPoint cadPoint = new CADPoint( leadPntList[ i ], startPointToolVec, startPointToolVec, startCadPoint.TangentVec );
 					leadCadPointList.Add( cadPoint );
 				}
-				ArcCADSegment arcCADSegment = new ArcCADSegment( leadCadPointList, leadEndPnt.Distance( startCadPoint.Point ), leadEndPnt.Distance( startCadPoint.Point ), null, null );
+				ArcCADSegment arcCADSegment = new ArcCADSegment( leadCadPointList, leadEndPnt.Distance( startCadPoint.Point ), leadEndPnt.Distance( startCadPoint.Point ) );
 				return arcCADSegment;
 			}
 			return null;

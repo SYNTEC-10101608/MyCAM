@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Windows.Forms;
-using System.Xml.Linq;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Helper;
@@ -560,8 +558,94 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
+		void BreadRawCADSegment()
+		{
+			
+			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
+				int statPointIndex = 0;
+				List<(int, int)> breakPointList = new List<(int, int)>();
+				(int, int) startPointInfo = camData.NewStartPoint;
+				List<(int, int)> modifyMap = camData.ToolVecModifyMap_New.Keys.ToList();
+				breakPointList.Add( startPointInfo );
+				breakPointList.AddRange( modifyMap );
+
+				// order the break point
+				breakPointList.Sort();
+
+				List<ICADSegmentElement> breakedCADSegmentList = new List<ICADSegmentElement>();
+				
+				// 看每條segment
+				for( int segmentIndex = 0; segmentIndex < camData.CADSegmentList.Count; segmentIndex++ ) {
+					List<int> breakPoint = new List<int>();
+					for( int breakPointListIndex = 0; breakPointListIndex < breakPointList.Count; breakPointListIndex++ ) {
+						if( breakPointList[ breakPointListIndex].Item1 == segmentIndex ) {
+							breakPoint.Add( breakPointList[ breakPointListIndex ].Item2 );
+						}
+					}
+
+					// 沒有分割
+					if( breakPoint.Count == 0  || (breakPoint.Count == 1 && breakPoint[0] ==0) ) {
+						breakedCADSegmentList.Add( camData.CADSegmentList[ segmentIndex ] );
+					}
+
+
+					else {
+						for( int k = 0; k < breakPoint.Count; k++ ) {
+							// 起始
+							if( k == 0 ) {
+								List<CADPoint> partSegmentPoint = new List<CADPoint>();
+								int pointCount = breakPoint[ k ] + 1;
+								partSegmentPoint.AddRange( camData.CADSegmentList[ segmentIndex ].PointList.GetRange( 0, pointCount ) );
+								double newLength = camData.CADSegmentList[ segmentIndex ].PointSpace * ( pointCount - 1 );
+								breakedCADSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, newLength, camData.CADSegmentList[ segmentIndex ].PointSpace ) );
+								if( (segmentIndex, breakPoint[k]) == startPointInfo ) {
+									statPointIndex = breakedCADSegmentList.Count - 1;
+								}
+							}
+							// 中間
+							if( k != 0 ) {
+								List<CADPoint> partSegmentPoint = new List<CADPoint>();
+								int pointCount = breakPoint[ k ] - breakPoint[ k - 1 ] + 1;
+								partSegmentPoint.AddRange( camData.CADSegmentList[ segmentIndex ].PointList.GetRange( breakPoint[ k - 1 ], pointCount ) );
+								double newLength = camData.CADSegmentList[ segmentIndex ].PointSpace * ( pointCount - 1 );
+								breakedCADSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, newLength, camData.CADSegmentList[ segmentIndex ].PointSpace ) );
+								if( (segmentIndex, breakPoint[ k ]) == startPointInfo ) {
+									statPointIndex = breakedCADSegmentList.Count - 1;
+								}
+							}
+
+							// 尾
+							if( k == breakPoint.Count - 1 ) {
+								List<CADPoint> partSegmentPoint = new List<CADPoint>();
+								int pointCount = camData.CADSegmentList[ segmentIndex ].PointList.Count - breakPoint[ k ];
+								partSegmentPoint.AddRange( camData.CADSegmentList[ segmentIndex ].PointList.GetRange( breakPoint[ k  ], pointCount ) );
+								double newLength = camData.CADSegmentList[ segmentIndex ].PointSpace * ( pointCount - 1 );
+								breakedCADSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, newLength, camData.CADSegmentList[ segmentIndex ].PointSpace ) );
+								if( (segmentIndex, breakPoint[ k ]) == startPointInfo ) {
+									statPointIndex = breakedCADSegmentList.Count - 1;
+								}
+							}
+						}
+					}
+				}
+				Console.WriteLine( breakedCADSegmentList.Count );
+			}
+		}
+
+		ICADSegmentElement CreateSeparate(EContourType contourTyupe, List<CADPoint> partSegmentPoint, double newLength, double pointSpace )
+		{
+
+			if( contourTyupe == EContourType.Line ) {
+				LineCADSegment lineCADSegment = new LineCADSegment( partSegmentPoint, newLength, pointSpace );
+				return lineCADSegment;
+			}
+			ArcCADSegment arcCADSegment = new ArcCADSegment( partSegmentPoint, newLength, pointSpace );
+			return arcCADSegment;
+		}
+
 		void ShowToolVec_New()
 		{
+			BreadRawCADSegment();
 			// clear the previous tool vec
 			foreach( AIS_Line toolVecAIS in m_ToolVecAISList ) {
 				m_Viewer.GetAISContext().Remove( toolVecAIS, false );
@@ -659,7 +743,7 @@ namespace MyCAM.Editor
 				// lead in
 				if( camData.LeadLineParam.LeadIn.Type == LeadLineType.Line ) {
 					Geom_Curve lineCurve = LeadHelper.BuildStraightLeadLine_New( camData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[ camData.NewStartPoint.Item2 ], startPointToolVec, true, camData.LeadLineParam.LeadIn.Length, camData.LeadLineParam.LeadIn.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out gp_Dir leadDir );
-					if (lineCurve == null ) {
+					if( lineCurve == null ) {
 						break;
 					}
 					AIS_Shape lineShape = CurveToAIS( lineCurve, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
@@ -669,7 +753,7 @@ namespace MyCAM.Editor
 					m_LeadOrientationAISList.Add( orientationAIS );
 				}
 				if( camData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ) {
-					Geom_Curve arcCurve = LeadHelper.BuildArcLead_New( camData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[camData.NewStartPoint.Item2], startPointToolVec, true, camData.LeadLineParam.LeadIn.Length, camData.LeadLineParam.LeadIn.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out _, out gp_Dir leadDir );
+					Geom_Curve arcCurve = LeadHelper.BuildArcLead_New( camData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[ camData.NewStartPoint.Item2 ], startPointToolVec, true, camData.LeadLineParam.LeadIn.Length, camData.LeadLineParam.LeadIn.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out _, out gp_Dir leadDir );
 					if( arcCurve == null ) {
 						break;
 					}
@@ -718,8 +802,8 @@ namespace MyCAM.Editor
 			}
 		}
 
-		
-		
+
+
 
 		void ShowOrientation()
 		{

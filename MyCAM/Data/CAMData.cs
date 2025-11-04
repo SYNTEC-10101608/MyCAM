@@ -149,6 +149,12 @@ namespace MyCAM.Data
 			get; private set;
 		}
 
+		internal List<ICADSegmentElement> BreakedCADSegmentList
+		{
+			get; 
+			set;
+		}
+
 		// CAM property
 
 		internal List<CAMPoint> CAMPointList
@@ -535,7 +541,7 @@ namespace MyCAM.Data
 				// this curve is arc use equal length split
 				else if( GeometryTool.IsCircularArc( edge, out gp_Pnt circleCenter, out _, out gp_Dir centerDir ) ) {
 					tempCADPointList = Pretreatment.GetSegmentPointsByEqualLength( edge, shellFace, PRECISION_MAX_LENGTH, false, out double dEdgeLength, out double dPointSpace );
-					ArcCADSegment arcSegment = new ArcCADSegment( tempCADPointList, dEdgeLength, dPointSpace, circleCenter, centerDir );
+					ArcCADSegment arcSegment = new ArcCADSegment( tempCADPointList, dEdgeLength, dPointSpace);
 					CADSegmentList.Add( arcSegment );
 				}
 
