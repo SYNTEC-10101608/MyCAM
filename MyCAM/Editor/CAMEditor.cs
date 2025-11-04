@@ -39,7 +39,8 @@ namespace MyCAM.Editor
 			IsToolVecEditable = true;
 			IsToolVecReverseEditable = true;
 			IsTraverseEditable = true;
-
+			IsMoveProcessEditable = true;
+			IsAutoOrderEditable = true;
 		}
 
 		public bool IsStartPointEditable;
