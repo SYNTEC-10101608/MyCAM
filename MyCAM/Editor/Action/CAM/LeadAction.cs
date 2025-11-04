@@ -31,7 +31,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public Action<bool, bool> PropertyChanged; // isConfirm, isHasLead
+		public Action PropertyChanged; // isConfirm, isHasLead
 
 		public override EditActionType ActionType
 		{
@@ -47,20 +47,20 @@ namespace MyCAM.Editor
 
 			// TODO: check all CAMData has same lead param or not
 			LeadDlg leadDialog = new LeadDlg( new LeadData() );
-			PropertyChanged?.Invoke( false, false );
+			PropertyChanged?.Invoke();
 
 			// preview
 			leadDialog.Preview += ( leadData ) =>
 			{
 				SetLeadParamForAll( leadData );
-				PropertyChanged?.Invoke( false, false ); // the second param is not used here
+				PropertyChanged?.Invoke();
 			};
 
 			// confirm
 			leadDialog.Confirm += ( leadData ) =>
 			{
 				SetLeadParamForAll( leadData );
-				PropertyChanged?.Invoke( true, GetHasLeadStatus() );
+				PropertyChanged?.Invoke();
 				End();
 			};
 
@@ -68,7 +68,7 @@ namespace MyCAM.Editor
 			leadDialog.Cancel += () =>
 			{
 				RestoreBackupLeadParams();
-				PropertyChanged?.Invoke( false, false ); // the second param is not used here
+				PropertyChanged?.Invoke();
 				End();
 			};
 			leadDialog.Show( MyApp.MainForm );

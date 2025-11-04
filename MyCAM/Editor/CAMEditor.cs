@@ -36,7 +36,6 @@ namespace MyCAM.Editor
 			IsReverseEditable = true;
 			IsOverCutEditable = true;
 			IsLeadLineEditable = true;
-			IsChangeLeadDirectionEditable = true;
 			IsToolVecEditable = true;
 			IsToolVecReverseEditable = true;
 			IsTraverseEditable = true;
@@ -47,7 +46,6 @@ namespace MyCAM.Editor
 		public bool IsReverseEditable;
 		public bool IsOverCutEditable;
 		public bool IsLeadLineEditable;
-		public bool IsChangeLeadDirectionEditable;
 		public bool IsToolVecEditable;
 		public bool IsToolVecReverseEditable;
 		public bool IsTraverseEditable;
@@ -355,26 +353,8 @@ namespace MyCAM.Editor
 				camDataList.Add( camData );
 			}
 			LeadAction action = new LeadAction( m_DataManager, camDataList );
-			action.PropertyChanged += OnSetLeadPropertyChanged;
+			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
-		}
-
-		public void ChangeLeadDirection()
-		{
-			// one shot edit, muti edit supported
-			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
-			foreach( string szPathID in szPathIDList ) {
-				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
-					continue;
-				}
-
-				// toggle change lead dir state
-				camData.LeadLineParam.IsChangeLeadDirection = !camData.LeadLineParam.IsChangeLeadDirection;
-
-				// need clone to trigger property changed event
-				camData.LeadLineParam = camData.LeadLineParam.Clone();
-			}
-			ShowCAMData();
 		}
 
 		public void SetToolVec()
@@ -596,7 +576,6 @@ namespace MyCAM.Editor
 					editableInfo.IsStartPointEditable = false;
 					editableInfo.IsOverCutEditable = false;
 					editableInfo.IsLeadLineEditable = false;
-					editableInfo.IsChangeLeadDirectionEditable = false;
 					break;
 				}
 			}
@@ -974,14 +953,6 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( orientationAIS, false );
 			}
 			m_Viewer.UpdateView();
-		}
-
-		void OnSetLeadPropertyChanged( bool isConfirm, bool isHasLead ) // TODO: new action
-		{
-			ShowCAMData();
-			//if( isConfirm ) {
-			//	PathPropertyChanged?.Invoke( ( (PathData)m_DataManager.ShapeDataMap[ GetSelectedIDList() ] ).CAMData.IsClosed, isHasLead );
-			//}
 		}
 
 		#endregion

@@ -317,11 +317,6 @@ namespace MyCAM
 			m_CAMEditor.SetLeadLine();
 		}
 
-		void m_tsbFlipLead_Click( object sender, EventArgs e )
-		{
-			m_CAMEditor.ChangeLeadDirection();
-		}
-
 		void m_tsbOverCut_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SetOverCut();
@@ -580,7 +575,6 @@ namespace MyCAM
 			m_tsbStartPoint.Enabled = editableInfo.IsStartPointEditable;
 			m_tsbOverCut.Enabled = editableInfo.IsOverCutEditable;
 			m_tsbSetLead.Enabled = editableInfo.IsLeadLineEditable;
-			m_tsbFlipLead.Enabled = editableInfo.IsChangeLeadDirectionEditable;
 			m_tsbToolVec.Enabled = editableInfo.IsToolVecEditable;
 			m_tsbMoveUp.Enabled = editableInfo.IsMoveProcessEditable;
 			m_tsbMoveDown.Enabled = editableInfo.IsMoveProcessEditable;
