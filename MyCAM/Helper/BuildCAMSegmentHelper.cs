@@ -33,10 +33,10 @@ namespace MyCAM.Helper
 			}
 
 			List<ICAMSegmentElement> leadInSegment = BuildLeadCAMSegment( camData, true );
-
 			camSegmentPage.LeadInSegment = leadInSegment;
+
 			// forward arrangement of main path
-			List<ICAMSegmentElement> camSegmentList = GetMainPathOrderedSegment( camData );
+			List<ICAMSegmentElement> camSegmentList = GetMainPathOrderedSegment_New2( camData );
 			if( camData.IsReverse ) {
 				ReverseCAMSegmentList( ref camSegmentList );
 			}
@@ -44,10 +44,6 @@ namespace MyCAM.Helper
 
 			List<ICAMSegmentElement> leadOutSegment = BuildLeadCAMSegment( camData, false );
 			camSegmentPage.LeadOutSegment = leadOutSegment;
-
-
-
-
 			return true;
 		}
 
@@ -130,6 +126,21 @@ namespace MyCAM.Helper
 				List<ICAMSegmentElement> startSegmentSeparatedListTransformed = startSegmentSeparatedList.Cast<ICAMSegmentElement>().ToList();
 				camSegmentList.Add( startSegmentSeparatedList[ 0 ] );
 				camSegmentList.AddRange( BuildOrderedCAMListAfterStartSegment( camdata, startSegmentSeparatedListTransformed ) );
+			}
+			return camSegmentList;
+		}
+
+		static List<ICAMSegmentElement> GetMainPathOrderedSegment_New2( CAMData camdata )
+		{
+			if (camdata == null || camdata.BreakedCAMSegmentList == null || camdata.BreakedCAMSegmentList.Count == 0 ) {
+				return new List<ICAMSegmentElement>();
+			}
+			int nStartPointIndex = camdata.StartPointIndex;
+			List<ICAMSegmentElement> camSegmentList = new List<ICAMSegmentElement>();
+
+			camSegmentList.AddRange( camdata.BreakedCAMSegmentList.GetRange( nStartPointIndex, camdata.BreakedCAMSegmentList.Count - nStartPointIndex ) );
+			if( nStartPointIndex > 0 ) {
+				camSegmentList.AddRange( camdata.BreakedCAMSegmentList.GetRange( 0, nStartPointIndex +1) );
 			}
 			return camSegmentList;
 		}
@@ -337,9 +348,11 @@ namespace MyCAM.Helper
 
 		static ICADSegmentElement BuildLeadCADSegment( CAMData camData, bool leadin )
 		{
+			int nStartPointSegmentIndex = camData.StartPointIndex;
+			
 			(int, int) startPointIndex = camData.NewStartPoint;
-			CADPoint startCadPoint = camData.CADSegmentList[ startPointIndex.Item1 ].PointList[ startPointIndex.Item2 ];
-			gp_Dir startPointToolVec = GetStartPointToolVec( camData );
+			CADPoint startCadPoint = camData.BreakedCAMSegmentList[ nStartPointSegmentIndex ].StartPoint.CADPoint;
+			gp_Dir startPointToolVec = camData.BreakedCAMSegmentList[ nStartPointSegmentIndex ].StartPoint.ToolVec;
 
 			if( leadin ) {
 				if( camData.LeadLineParam.LeadIn.Type == LeadLineType.Line ) {

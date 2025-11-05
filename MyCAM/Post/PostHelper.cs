@@ -247,6 +247,106 @@ namespace MyCAM.Post
 			return true;
 		}
 
+		public static bool SolvePath_New_New( PostSolver postSolver, CAMData currentCAMData,PathCAMSegmentPage pathCamSegmentPage, PathEndInfo endInfoOfPreviousPath,
+			bool isFirstPath, bool isLastPath, EntryAndExitData entryAndExitData,
+			out PathSegmentPostData pathG54PostData, out PathSegmentPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo )
+		{
+			// for simulation
+			pathMCSPostData = new PathSegmentPostData();
+
+			// for write NC file
+			pathG54PostData = new PathSegmentPostData();
+
+			// to make solution continuous
+			currentPathtEndInfo = new PathEndInfo();
+			if( postSolver == null || endInfoOfPreviousPath == null || pathCamSegmentPage == null ) {
+				return false;
+			}
+
+			// to ensure joint space continuity of process path
+			double dLastPointProcess_M = endInfoOfPreviousPath.IsExist ? endInfoOfPreviousPath.Master : 0;
+			double dLastPointProcess_S = endInfoOfPreviousPath.IsExist ? endInfoOfPreviousPath.Slave : 0;
+
+			// flag for process start point
+			bool bStart = false;
+			 
+			// lead- in
+			if( pathCamSegmentPage.LeadInSegment.Count > 0 ) {
+				if( !SolveProcessPath_New( postSolver, pathCamSegmentPage.LeadInSegment,
+				out List<PostPath> leadInG54, out List<PostPath> leadInMCS,
+				ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
+					return false;
+				}
+				pathG54PostData.LeadInPostPath.AddRange( leadInG54 );
+				pathMCSPostData.LeadInPostPath.AddRange( leadInMCS );
+
+				// set process start point
+				pathG54PostData.ProcessStartPoint = pathG54PostData.LeadInPostPath[ 0 ].StartPoint;
+				pathMCSPostData.ProcessStartPoint = pathMCSPostData.LeadInPostPath[ 0 ].StartPoint;
+				bStart = true;
+			}
+
+			// main path
+			if( !SolveProcessPath_New( postSolver, pathCamSegmentPage.MainPathSegment,
+				out List<PostPath> mainG54, out List<PostPath> mainMCS,
+				ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
+				return false;
+			}
+			pathG54PostData.MainPathPostPath.AddRange( mainG54 );
+			pathMCSPostData.MainPathPostPath.AddRange( mainMCS );
+
+			// set process start point
+			if( !bStart ) {
+				pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPath[ 0 ].StartPoint;
+				pathMCSPostData.ProcessStartPoint = pathMCSPostData.MainPathPostPath[ 0 ].StartPoint;
+			}
+
+			/*
+			// over-cut
+			if( currentCAMData.OverCutLength != 0 && currentCAMData.OverCutCAMPointList.Count > 0 ) {
+				if( !SolveProcessPath( postSolver, currentCAMData.OverCutCAMPointList,
+					out List<PostPoint> overCutG54, out List<PostPoint> overCutMCS,
+					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
+					return false;
+				}
+				pathG54PostData.OverCutPostPointList.AddRange( overCutG54 );
+				pathMCSPostData.OverCutPostPointList.AddRange( overCutMCS );
+			}
+			*/
+
+			// lead-out
+			if( pathCamSegmentPage.LeadOutSegment.Count > 0 ) {
+				if( !SolveProcessPath_New( postSolver,pathCamSegmentPage.LeadOutSegment,
+					out List<PostPath> leadOutG54, out List<PostPath> leadOutMCS,
+					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
+					return false;
+				}
+				pathG54PostData.LeadOutPostPath.AddRange( leadOutG54 );
+				pathMCSPostData.LeadOutPostPath.AddRange( leadOutMCS );
+			}
+			
+
+			// traverse from previous path to current path
+			if( isFirstPath ) {
+
+				// the entry is treat as cut down of the first path
+				CalculateEntry_New( currentCAMData, entryAndExitData, ref pathG54PostData, ref pathMCSPostData );
+			}
+			else {
+				CalculateTraverse_New( endInfoOfPreviousPath, currentCAMData, ref pathG54PostData, ref pathMCSPostData );
+			}
+
+			// end info of current path
+			currentPathtEndInfo = new PathEndInfo()
+			{
+				IsExist = true,
+				EndCAMPoint = currentCAMData.GetProcessEndPoint(),
+				Master = dLastPointProcess_M,
+				Slave = dLastPointProcess_S
+			};
+			return true;
+		}
+
 		public static void CalculateExit( PathEndInfo endInfoOfLastPath, EntryAndExitData entryAndExitData,
 			out PostPoint G54ExitPoint, out PostPoint MCSExitPoint )
 		{

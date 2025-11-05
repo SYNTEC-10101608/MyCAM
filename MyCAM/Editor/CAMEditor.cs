@@ -560,6 +560,7 @@ namespace MyCAM.Editor
 
 		void BreadRawCADSegment()
 		{
+			// 看每條路
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 				int statPointIndex = 0;
 				List<(int, int)> breakPointList = new List<(int, int)>();
@@ -585,7 +586,7 @@ namespace MyCAM.Editor
 					}
 
 					// 沒有分割()
-					if( breakPoint.Count == 0 || breakPoint[ 0 ] == 0 && (segmentIndex, 0) == startPointInfo ) {
+					if( breakPoint.Count == 0 || breakPoint.Count == 1 && breakPoint[ 0 ] == 0 && (segmentIndex, 0) == startPointInfo ) {
 						breakedCAMSegmentList.AddRange( BuildUnSepareteCAMSegment( camData, segmentIndex ) );
 					}
 
@@ -599,9 +600,17 @@ namespace MyCAM.Editor
 								partSegmentPoint.AddRange( camData.CADSegmentList[ segmentIndex ].PointList.GetRange( 0, pointCount ) );
 								gp_Dir startPointToolVec = BuildCAMSegmentHelper.GetSegmentPointToolVec( camData, (segmentIndex, 0) );
 								gp_Dir endPointToolVec = BuildCAMSegmentHelper.GetSegmentPointToolVec( camData, (segmentIndex, breakPoint[ k ]) );
-								breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, true ) );
-								if( (segmentIndex, breakPoint[ k ]) == startPointInfo ) {
-									statPointIndex = breakedCAMSegmentList.Count - 1;
+
+								// 只是起點不是姿態點
+								if( (segmentIndex, breakPoint[ k ]) == startPointInfo && modifyMap.Contains( (segmentIndex, breakPoint[ k ]) ) == false ) {
+									breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, false ) );
+									
+									//下一段的起頭才是起點的segment
+									statPointIndex = breakedCAMSegmentList.Count;
+									
+								}
+								else {
+									breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, true ) );
 								}
 							}
 							// 中間
@@ -612,9 +621,15 @@ namespace MyCAM.Editor
 								gp_Dir startPointToolVec = BuildCAMSegmentHelper.GetSegmentPointToolVec( camData, (segmentIndex, breakPoint[ k - 1 ]) );
 								gp_Dir endPointToolVec = BuildCAMSegmentHelper.GetSegmentPointToolVec( camData, (segmentIndex, breakPoint[ k ]) );
 								double newLength = camData.CADSegmentList[ segmentIndex ].PointSpace * ( pointCount - 1 );
-								breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, true ) );
-								if( (segmentIndex, breakPoint[ k ]) == startPointInfo ) {
-									statPointIndex = breakedCAMSegmentList.Count - 1;
+
+								// 只是起點不是姿態點
+								if( (segmentIndex, breakPoint[ k ]) == startPointInfo && modifyMap.Contains( (segmentIndex, breakPoint[ k ]) ) == false ) {
+									breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, false) );
+									//下一段的起頭才是起點的segment
+									statPointIndex = breakedCAMSegmentList.Count ;
+								}
+								else {
+									breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, true ) );
 								}
 							}
 
@@ -628,14 +643,12 @@ namespace MyCAM.Editor
 								gp_Dir startPointToolVec = BuildCAMSegmentHelper.GetSegmentPointToolVec( camData, (segmentIndex, breakPoint[ k ]) );
 								gp_Dir endPointToolVec = BuildCAMSegmentHelper.GetSegmentPointToolVec( camData, (segmentIndex, camData.CADSegmentList[ segmentIndex ].PointList.Count - 1) );
 								breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, false ) );
-								if( (segmentIndex, breakPoint[ k ]) == startPointInfo ) {
-									statPointIndex = breakedCAMSegmentList.Count - 1;
-								}
 							}
 						}
 					}
 				}
 				camData.BreakedCAMSegmentList = breakedCAMSegmentList;
+				camData.StartPointIndex = statPointIndex;
 			}
 
 		}
@@ -674,7 +687,7 @@ namespace MyCAM.Editor
 				}
 				if( camData.CADSegmentList[ segmentIndex ] is ArcCADSegment arcCADSegment ) {
 					CAMPoint midCAMPoint = new CAMPoint( arcCADSegment.MidPoint, assignDir );
-					ArcCAMSegment arcCAMSegment = new ArcCAMSegment( starCAMPoint, endCAMPoint, midCAMPoint ,false);
+					ArcCAMSegment arcCAMSegment = new ArcCAMSegment( starCAMPoint, endCAMPoint, midCAMPoint, false );
 					breakedCAMSegmentList.Add( arcCAMSegment );
 				}
 			}
@@ -691,11 +704,11 @@ namespace MyCAM.Editor
 					avgVec.Add( new gp_Vec( endPointToolVec ) );
 					gp_Dir avgDir = new gp_Dir( avgVec );
 					CAMPoint midCAMPoint = new CAMPoint( camData.CADSegmentList[ segmentIndex ].PointList[ camData.CADSegmentList[ segmentIndex ].PointList.Count / 2 ], avgDir );
-					ArcCAMSegment arcCAMSegment = new ArcCAMSegment( starCAMPoint, endCAMPoint, midCAMPoint,false );
+					ArcCAMSegment arcCAMSegment = new ArcCAMSegment( starCAMPoint, endCAMPoint, midCAMPoint, false );
 					breakedCAMSegmentList.Add( arcCAMSegment );
 				}
 				else {
-					LineCAMSegment lineCAMSegment = new LineCAMSegment( starCAMPoint, endCAMPoint,false );
+					LineCAMSegment lineCAMSegment = new LineCAMSegment( starCAMPoint, endCAMPoint, false );
 					breakedCAMSegmentList.Add( lineCAMSegment );
 				}
 			}
@@ -748,6 +761,11 @@ namespace MyCAM.Editor
 					else {
 						AIS_Line startPointToolVecAIS = GetVecAIS( camSegment.StartPoint.CADPoint.Point, camSegment.StartPoint.ToolVec, EvecType.ToolVec );
 						AIS_Line endPointToolVecAIS = GetVecAIS( camSegment.EndPoint.CADPoint.Point, camSegment.EndPoint.ToolVec, EvecType.ToolVec );
+
+
+						endPointToolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+						endPointToolVecAIS.SetWidth( 4 );
+
 						m_ToolVecAISList.Add( startPointToolVecAIS );
 						m_ToolVecAISList.Add( endPointToolVecAIS );
 
@@ -823,12 +841,11 @@ namespace MyCAM.Editor
 
 
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
-				(int, int) startPointIndex = camData.NewStartPoint;
-				gp_Dir startPointToolVec = BuildCAMSegmentHelper.GetStartPointToolVec( camData );
+				int nStartPointSegmentIndex = camData.StartPointIndex;
 
 				// lead in
 				if( camData.LeadLineParam.LeadIn.Type == LeadLineType.Line ) {
-					Geom_Curve lineCurve = LeadHelper.BuildStraightLeadLine_New( camData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[ camData.NewStartPoint.Item2 ], startPointToolVec, true, camData.LeadLineParam.LeadIn.Length, camData.LeadLineParam.LeadIn.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out gp_Dir leadDir );
+					Geom_Curve lineCurve = LeadHelper.BuildStraightLeadLine_New( camData.BreakedCAMSegmentList[ nStartPointSegmentIndex ].StartPoint.CADPoint, camData.BreakedCAMSegmentList[ nStartPointSegmentIndex ].StartPoint.ToolVec, true, camData.LeadLineParam.LeadIn.Length, camData.LeadLineParam.LeadIn.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out gp_Dir leadDir );
 					if( lineCurve == null ) {
 						break;
 					}
@@ -839,7 +856,7 @@ namespace MyCAM.Editor
 					m_LeadOrientationAISList.Add( orientationAIS );
 				}
 				if( camData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ) {
-					Geom_Curve arcCurve = LeadHelper.BuildArcLead_New( camData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[ camData.NewStartPoint.Item2 ], startPointToolVec, true, camData.LeadLineParam.LeadIn.Length, camData.LeadLineParam.LeadIn.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out _, out gp_Dir leadDir );
+					Geom_Curve arcCurve = LeadHelper.BuildArcLead_New( camData.BreakedCAMSegmentList[ nStartPointSegmentIndex ].StartPoint.CADPoint, camData.BreakedCAMSegmentList[ nStartPointSegmentIndex ].StartPoint.ToolVec, true, camData.LeadLineParam.LeadIn.Length, camData.LeadLineParam.LeadIn.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out _, out gp_Dir leadDir );
 					if( arcCurve == null ) {
 						break;
 					}
@@ -851,7 +868,7 @@ namespace MyCAM.Editor
 				}
 
 				if( camData.LeadLineParam.LeadOut.Type == LeadLineType.Line ) {
-					Geom_Curve lineCurve = LeadHelper.BuildStraightLeadLine_New( camData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[ camData.NewStartPoint.Item2 ], startPointToolVec, false, camData.LeadLineParam.LeadOut.Length, camData.LeadLineParam.LeadOut.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out gp_Dir leadDir );
+					Geom_Curve lineCurve = LeadHelper.BuildStraightLeadLine_New( camData.BreakedCAMSegmentList[ nStartPointSegmentIndex ].StartPoint.CADPoint, camData.BreakedCAMSegmentList[ nStartPointSegmentIndex ].StartPoint.ToolVec, false, camData.LeadLineParam.LeadOut.Length, camData.LeadLineParam.LeadOut.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out gp_Dir leadDir );
 					if( lineCurve == null ) {
 						break;
 					}
@@ -863,7 +880,7 @@ namespace MyCAM.Editor
 				}
 
 				if( camData.LeadLineParam.LeadOut.Type == LeadLineType.Arc ) {
-					Geom_Curve arcCurve = LeadHelper.BuildArcLead_New( camData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[ camData.NewStartPoint.Item2 ], startPointToolVec, false, camData.LeadLineParam.LeadOut.Length, camData.LeadLineParam.LeadOut.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out _, out gp_Dir leadDir );
+					Geom_Curve arcCurve = LeadHelper.BuildArcLead_New( camData.BreakedCAMSegmentList[ nStartPointSegmentIndex ].StartPoint.CADPoint, camData.BreakedCAMSegmentList[ nStartPointSegmentIndex ].StartPoint.ToolVec, false, camData.LeadLineParam.LeadOut.Length, camData.LeadLineParam.LeadOut.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out _, out gp_Dir leadDir );
 
 					if( arcCurve == null ) {
 						break;

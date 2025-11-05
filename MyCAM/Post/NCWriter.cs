@@ -95,7 +95,7 @@ namespace MyCAM.Post
 
 						// 這條路的各段,現在只有Main
 						// solve master and slave angle
-						bool buildSuccess = BuildCAMSegmentHelper.BuildCAMSegment( m_ProcessDataList[ i ], out List<ICAMSegmentElement> camSegmentList );
+						bool buildSuccess = BuildCAMSegmentHelper.BuildCAMSegment_New( m_ProcessDataList[ i ], out PathCAMSegmentPage camSegmentPage );
 						if( buildSuccess == false ) {
 							return false;
 						}

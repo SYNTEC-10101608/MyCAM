@@ -262,6 +262,20 @@ namespace MyCAM.Data
 			}
 		}
 
+		public int StartPointIndex
+		{
+			get
+			{
+				return m_StartPointIndex;
+			}
+			set
+			{
+				if( m_StartPointIndex != value ) {
+					m_StartPointIndex = value;
+				}
+			}
+		}
+
 		public (int, int) NewStartPoint
 		{
 			get
@@ -461,10 +475,8 @@ namespace MyCAM.Data
 				m_IsDirty = false;
 			}
 
-			// todo!!!
-			(int, int) startPointIndex = NewStartPoint;
-			CADPoint cadPoint = CADSegmentList[ startPointIndex.Item1 ].PointList[ startPointIndex.Item2 ];
-			CAMPoint camPoint = BuildCAMSegmentHelper.GetCAMPoint( cadPoint, m_IsToolVecReverse );
+			int nStartPointIndex = StartPointIndex;
+			CAMPoint camPoint = BreakedCAMSegmentList[ nStartPointIndex ].StartPoint;
 			return camPoint;
 		}
 
@@ -475,10 +487,8 @@ namespace MyCAM.Data
 				m_IsDirty = false;
 			}
 
-			// todo!!!
-			(int, int) startPointIndex = NewStartPoint;
-			CADPoint cadPoint = CADSegmentList[ startPointIndex.Item1 ].PointList[ startPointIndex.Item2 ];
-			CAMPoint camPoint = BuildCAMSegmentHelper.GetCAMPoint( cadPoint, m_IsToolVecReverse );
+			int nStartPointIndex = StartPointIndex;
+			CAMPoint camPoint = BreakedCAMSegmentList[ nStartPointIndex ].StartPoint;
 			return camPoint;
 		}
 
@@ -496,6 +506,7 @@ namespace MyCAM.Data
 		bool m_IsReverse = false;
 		bool m_IsToolVecReverse = false;
 		int m_StartPoint = 0;
+		int m_StartPointIndex = 0;
 		(int, int) m_NewStartPoint = (0, 0);
 		double m_OverCutLength = 0;
 
