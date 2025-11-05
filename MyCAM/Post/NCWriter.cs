@@ -356,11 +356,6 @@ namespace MyCAM.Post
 			PostPoint lastPostPoint = null;
 			for( int i = 0; i < processPathSegmentPostPath.Count; i++ ) {
 
-				// 第一條路要從安全距離下降到起點
-				if( i == 0 ) {
-					WriteOnePoint( new gp_Pnt( processPathSegmentPostPath[ i ].StartPoint.X, processPathSegmentPostPath[ i ].StartPoint.Y, processPathSegmentPostPath[ i ].StartPoint.Z ), processPathSegmentPostPath[ i ].StartPoint.Master, processPathSegmentPostPath[ i ].StartPoint.Slave );
-					lastPostPoint = processPathSegmentPostPath[ i ].StartPoint;
-				}
 				if( IsSamePostPoint( processPathSegmentPostPath[ i ].StartPoint, lastPostPoint ) == false ) {
 					return;
 				}

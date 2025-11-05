@@ -575,11 +575,24 @@ namespace MyCAM.Data
 					CADSegmentList.Add( lineSegment );
 				}
 
+			
+
 				// this curve is arc use equal length split
-				else if( GeometryTool.IsCircularArc( edge, out gp_Pnt circleCenter, out _, out gp_Dir centerDir ) ) {
-					tempCADPointList = Pretreatment.GetSegmentPointsByEqualLength( edge, shellFace, PRECISION_MAX_LENGTH, false, out double dEdgeLength, out double dPointSpace );
-					ArcCADSegment arcSegment = new ArcCADSegment( tempCADPointList, dEdgeLength, dPointSpace );
-					CADSegmentList.Add( arcSegment );
+				else if( GeometryTool.IsCircularArc( edge, out gp_Pnt circleCenter, out _, out gp_Dir centerDir, out double arcAngle ) ) {
+
+					List<TopoDS_Edge> arcEdgeList = new List<TopoDS_Edge>();
+					if (arcAngle > Math.PI / 2 ) {
+						arcEdgeList = GeometryTool.SplitArcEdgeIfTooLarge( edge );
+					}
+					else {
+						arcEdgeList.Add( edge );
+					}
+					for ( int j = 0; j < arcEdgeList.Count; j++ ) {
+						tempCADPointList = Pretreatment.GetSegmentPointsByEqualLength( arcEdgeList[j], shellFace, PRECISION_MAX_LENGTH, false, out double dEdgeLength, out double dPointSpace );
+						ArcCADSegment arcSegment = new ArcCADSegment( tempCADPointList, dEdgeLength, dPointSpace );
+						CADSegmentList.Add( arcSegment );
+					}
+						
 				}
 
 				// use chord error split

@@ -270,26 +270,13 @@ namespace MyCAM.Helper
 			if( isReverse ) {
 				gp_Trsf mirror = new gp_Trsf();
 				mirror.SetMirror( new gp_Ax1( leadLinePlane.Location(), leadLinePlane.YDirection() ) );
-
-				Geom_TrimmedCurve leadLineCurveTrimmed = leadLineCurve.Transformed( mirror ) as Geom_TrimmedCurve;
-				if( leadLineCurveTrimmed != null ) {
-					leadLineCurve = leadLineCurveTrimmed;
-				}
-				else {
-					return null;
-				}
+				leadLineCurve.Transform( mirror );
 			}
 
 			if( isChangeLeadDirection ) {
 				gp_Trsf mirror = new gp_Trsf();
 				mirror.SetMirror( new gp_Ax1( leadLinePlane.Location(), leadLinePlane.XDirection() ) );
-				Geom_TrimmedCurve leadLineCurveTrimmed = leadLineCurve.Transformed( mirror ) as Geom_TrimmedCurve;
-				if( leadLineCurveTrimmed != null ) {
-					leadLineCurve = leadLineCurveTrimmed;
-				}
-				else {
-					return null;
-				}
+				leadLineCurve.Transform( mirror );
 			}
 			gp_Vec tangentVec = new gp_Vec();
 			leadMidPnt = leadLineCurve.Value( ( leadLineCurve.LastParameter() + leadLineCurve.FirstParameter() ) * 0.5 );
