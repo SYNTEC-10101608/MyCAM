@@ -1,5 +1,4 @@
-﻿using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRep;
@@ -10,6 +9,7 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -79,10 +79,10 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		protected override void ViewerMouseDown( MouseEventArgs e )
+		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
 			if( e.Button == MouseButtons.Left ) {
-				m_Viewer.GetAISContext().SelectDetected();
+				m_Viewer.Select();
 				bool bSelected = GetSelectPoint( out gp_Pnt slectedPoint );
 				if( !bSelected ) {
 					return;

@@ -86,16 +86,15 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		protected override void ViewerMouseDown( MouseEventArgs e )
+		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
 			if( e.Button == MouseButtons.Left ) {
 				if( ( Control.ModifierKeys & Keys.Control ) == Keys.Control ) {
-					m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_XOR );
+					m_Viewer.Select( AIS_SelectionScheme.AIS_SelectionScheme_XOR );
 				}
 				else {
-					m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_Replace );
+					m_Viewer.Select( AIS_SelectionScheme.AIS_SelectionScheme_Replace );
 				}
-				m_Viewer.UpdateView();
 			}
 		}
 

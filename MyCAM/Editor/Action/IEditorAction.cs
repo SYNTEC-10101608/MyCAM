@@ -126,6 +126,8 @@ namespace MyCAM.Editor
 			m_Viewer.MouseDown += ViewerMouseDown;
 			m_Viewer.MouseMove += ViewerMouseMove;
 			m_Viewer.MouseUp += ViewerMouseUp;
+			m_Viewer.MouseClick += ViewerMouseClick;
+			m_Viewer.MouseDoubleClick += ViewerMouseDoubleClick;
 			m_Viewer.KeyDown += ViewerKeyDown;
 			m_TreeView.AfterSelect += TreeViewAfterSelect;
 			m_TreeView.KeyDown += TreeViewKeyDown;
@@ -137,6 +139,8 @@ namespace MyCAM.Editor
 			m_Viewer.MouseDown -= ViewerMouseDown;
 			m_Viewer.MouseMove -= ViewerMouseMove;
 			m_Viewer.MouseUp -= ViewerMouseUp;
+			m_Viewer.MouseClick -= ViewerMouseClick;
+			m_Viewer.MouseDoubleClick -= ViewerMouseDoubleClick;
 			m_Viewer.KeyDown -= ViewerKeyDown;
 			m_TreeView.AfterSelect -= TreeViewAfterSelect;
 			m_TreeView.KeyDown -= TreeViewKeyDown;
@@ -154,6 +158,16 @@ namespace MyCAM.Editor
 		}
 
 		protected virtual void ViewerMouseUp( MouseEventArgs e )
+		{
+			// do nothing and wait for hook
+		}
+
+		protected virtual void ViewerMouseClick( MouseEventArgs e )
+		{
+			// do nothing and wait for hook
+		}
+
+		protected virtual void ViewerMouseDoubleClick( MouseEventArgs e )
 		{
 			// do nothing and wait for hook
 		}

@@ -98,16 +98,17 @@ namespace OCCViewer
 			Graphic3d_RenderingParams.CRef cref = myView.ChangeRenderingParams();
 			cref.Ptr.NbMsaaSamples = 10000;
 
+			// initialize hwd
+			m_wndControl = control;
+
 			// viewer mouse action
 			KeyMouseActionEnabled = true;
 			control.MouseWheel += ( sender, e ) => OnMouseWheel( e );
-			control.MouseDown += ( sender, e ) =>
-			{
-				control.Focus();
-				OnMouseDown( e );
-			};
+			control.MouseDown += ( sender, e ) => OnMouseDown( e );
 			control.MouseUp += ( sender, e ) => OnMouseUp( e );
 			control.MouseMove += ( sender, e ) => OnMouseMove( e );
+			control.MouseClick += ( sender, e ) => OnMouseClick( e );
+			control.MouseDoubleClick += ( sender, e ) => OnMouseDoubleClick( e );
 			control.KeyDown += ( sender, e ) => OnKeyDown( e );
 			control.Paint += ( sender, e ) => UpdateView();
 			return true;
@@ -200,18 +201,18 @@ namespace OCCViewer
 			myView?.StartRotation( x, y );
 		}
 
-		public void Select( int x1, int y1, int x2, int y2 )
+		public void SelectRectangle( int x1, int y1, int x2, int y2, AIS_SelectionScheme scheme = AIS_SelectionScheme.AIS_SelectionScheme_Replace )
 		{
 			if( myAISContext != null ) {
-				myAISContext.SelectRectangle( new Graphic3d_Vec2i( x1, y1 ), new Graphic3d_Vec2i( x2, y2 ), myView );
+				myAISContext.SelectRectangle( new Graphic3d_Vec2i( x1, y1 ), new Graphic3d_Vec2i( x2, y2 ), myView, scheme );
 				myAISContext.UpdateCurrentViewer();
 			}
 		}
 
-		public void Select()
+		public void Select( AIS_SelectionScheme scheme = AIS_SelectionScheme.AIS_SelectionScheme_Replace )
 		{
 			if( myAISContext != null ) {
-				myAISContext.SelectDetected();
+				myAISContext.SelectDetected( scheme );
 				myAISContext.UpdateCurrentViewer();
 			}
 		}
@@ -220,22 +221,6 @@ namespace OCCViewer
 		{
 			if( myAISContext != null && myView != null ) {
 				myAISContext.MoveTo( x, y, myView, true );
-			}
-		}
-
-		public void ShiftSelect( int x1, int y1, int x2, int y2 )
-		{
-			if( myAISContext != null ) {
-				myAISContext.SelectRectangle( new Graphic3d_Vec2i( x1, y1 ), new Graphic3d_Vec2i( x2, y2 ), myView, AIS_SelectionScheme.AIS_SelectionScheme_XOR );
-				myAISContext.UpdateCurrentViewer();
-			}
-		}
-
-		public void ShiftSelect()
-		{
-			if( myAISContext != null ) {
-				myAISContext.SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_XOR );
-				myAISContext.UpdateCurrentViewer();
 			}
 		}
 
@@ -432,6 +417,25 @@ namespace OCCViewer
 			myAISContext.SelectionManager().Selector().SetPixelTolerance( SELECT_PixelTolerance );
 		}
 
+		// hwd
+		Control m_wndControl;
+
+		public int Width
+		{
+			get
+			{
+				return m_wndControl.Width;
+			}
+		}
+
+		public int Height
+		{
+			get
+			{
+				return m_wndControl.Height;
+			}
+		}
+
 		// mouse action
 		int m_nXMousePosition = 0;
 		int m_nYMousePosition = 0;
@@ -461,6 +465,7 @@ namespace OCCViewer
 
 		void OnMouseDown( MouseEventArgs e )
 		{
+			m_wndControl.Focus();
 			MouseDown?.Invoke( e );
 			if( !KeyMouseActionEnabled ) {
 				return;
@@ -512,6 +517,17 @@ namespace OCCViewer
 			}
 		}
 
+		void OnMouseClick( MouseEventArgs e )
+		{
+			m_wndControl.Focus();
+			MouseClick?.Invoke( e );
+		}
+
+		void OnMouseDoubleClick( MouseEventArgs e )
+		{
+			MouseDoubleClick?.Invoke( e );
+		}
+
 		void OnKeyDown( KeyEventArgs e )
 		{
 			KeyDown?.Invoke( e );
@@ -550,6 +566,8 @@ namespace OCCViewer
 		public Action<MouseEventArgs> MouseDown;
 		public Action<MouseEventArgs> MouseUp;
 		public Action<MouseEventArgs> MouseMove;
+		public Action<MouseEventArgs> MouseClick;
+		public Action<MouseEventArgs> MouseDoubleClick;
 		public Action<KeyEventArgs> KeyDown;
 	}
 }

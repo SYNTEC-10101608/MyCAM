@@ -47,6 +47,7 @@ namespace MyCAM.Editor
 			// start default action
 			m_CurrentAction = m_DefaultAction;
 			m_CurrentAction.Start();
+			m_DefaultAction.ClearSelection();
 		}
 
 		public virtual void EditEnd()
@@ -59,6 +60,7 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				m_DefaultAction.End();
 			}
+			m_DefaultAction.ClearSelection();
 		}
 
 		protected virtual void StartEditAction( IEditorAction action )
@@ -105,7 +107,7 @@ namespace MyCAM.Editor
 		protected readonly ViewManager m_ViewManager;
 
 		// action properties
-		protected IEditorAction m_DefaultAction;
+		protected SelectObjectAction m_DefaultAction;
 		protected IEditorAction m_CurrentAction;
 		protected bool m_IsNextAction = false;
 	}
