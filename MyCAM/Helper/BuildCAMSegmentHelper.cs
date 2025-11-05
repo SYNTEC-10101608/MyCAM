@@ -8,22 +8,6 @@ namespace MyCAM.Helper
 {
 	internal static class BuildCAMSegmentHelper
 	{
-		public static bool BuildCAMSegment( CAMData camdata, out List<ICAMSegmentElement> camSegmentList )
-		{
-			camSegmentList = new List<ICAMSegmentElement>();
-			if( camdata.CADSegmentList == null || camdata.CADSegmentList.Count == 0 ) {
-				return false;
-			}
-
-			// forward arrangement
-			camSegmentList = GetMainPathOrderedSegment( camdata );
-			if( camdata.IsReverse ) {
-				ReverseCAMSegmentList( ref camSegmentList );
-			}
-			GetMainPathOrderedSegment_New( camdata );
-			return true;
-		}
-
 		public static bool BuildCAMSegment_New( CAMData camData, out PathCAMSegmentPage camSegmentPage )
 		{
 			camSegmentPage = new PathCAMSegmentPage();

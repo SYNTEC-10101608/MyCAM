@@ -246,17 +246,19 @@ namespace OCCTool
 
 			// 需要拆分
 			int nSplit = (int)Math.Ceiling( angle / maxAngleRad );
-			double subAngle = angle / nSplit;
 
 			// 取得原始幾何與參數範圍
 			double first = 0, last = 0;
 			Geom_Curve baseCurve = BRep_Tool.Curve( edge, ref first, ref last );
+			double subAngle = ( last - first ) / 2;
 
 			// 實際拆分
 			double current = first;
 			for( int i = 0; i < nSplit; i++ ) {
 				double next = current + subAngle;
-				if( next > last ) next = last;
+				if( next > last ) {
+					break;
+				}
 
 				Geom_TrimmedCurve subArc = new Geom_TrimmedCurve( baseCurve, current, next, true );
 				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( subArc );

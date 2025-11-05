@@ -588,6 +588,9 @@ namespace MyCAM.Editor
 					// 沒有分割()
 					if( breakPoint.Count == 0 || breakPoint.Count == 1 && breakPoint[ 0 ] == 0 && (segmentIndex, 0) == startPointInfo ) {
 						breakedCAMSegmentList.AddRange( BuildUnSepareteCAMSegment( camData, segmentIndex ) );
+						if( (segmentIndex, 0) == startPointInfo ) {
+							statPointIndex = breakedCAMSegmentList.Count-1;
+						}
 					}
 
 
@@ -785,7 +788,8 @@ namespace MyCAM.Editor
 		}
 
 
-		/*void ShowLeadLine()
+		/*
+		void ShowLeadLine()
 		{
 			// clear the previous tool vec
 			foreach( AIS_Line toolVecAIS in m_LeadAISList ) {

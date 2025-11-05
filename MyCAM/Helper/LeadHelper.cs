@@ -97,6 +97,9 @@ namespace MyCAM.Helper
 			CAMPoint startPoint = new CAMPoint( startCADPoint, startPointDir );
 			gp_Dir XVec = new gp_Dir( -startPoint.CADPoint.TangentVec.X(), -startPoint.CADPoint.TangentVec.Y(), -startPoint.CADPoint.TangentVec.Z() );
 			gp_Dir ZVec = startPoint.ToolVec;
+			if (IsParallel(XVec, ZVec ) ) {
+				return null;
+			}
 			gp_Ax3 planeCS = new gp_Ax3( startPoint.CADPoint.Point, ZVec, XVec );
 
 			gp_Dir xDir = planeCS.XDirection();
@@ -240,6 +243,10 @@ namespace MyCAM.Helper
 			//  establish a coordinate system through this point and its direction vector and normal vector
 			gp_Dir XVec = startPoint.CADPoint.TangentVec;
 			gp_Dir ZVec = startPoint.ToolVec;
+			if( IsParallel( XVec, ZVec ) ) {
+				return null;
+			}
+
 			gp_Ax3 leadLinePlane = new gp_Ax3( startPoint.CADPoint.Point, ZVec, XVec );
 
 			// circle center shifted along -Y
@@ -267,12 +274,14 @@ namespace MyCAM.Helper
 				leadLineCurve = new Geom_TrimmedCurve( geomCircle, dArcAngle, Math.PI * 2, true );
 			}
 
+			// mirror by y axis
 			if( isReverse ) {
 				gp_Trsf mirror = new gp_Trsf();
 				mirror.SetMirror( new gp_Ax1( leadLinePlane.Location(), leadLinePlane.YDirection() ) );
 				leadLineCurve.Transform( mirror );
 			}
 
+			// mirror by x axis
 			if( isChangeLeadDirection ) {
 				gp_Trsf mirror = new gp_Trsf();
 				mirror.SetMirror( new gp_Ax1( leadLinePlane.Location(), leadLinePlane.XDirection() ) );
@@ -394,6 +403,15 @@ namespace MyCAM.Helper
 				tangentDir.Reverse();
 				tangentList.Add( tangentDir );
 			}
+		}
+
+		static bool IsParallel( gp_Dir dir1, gp_Dir dir2, double tolerance = 1e-3 )
+		{
+			gp_Vec v1 = new gp_Vec( dir1 );
+			gp_Vec v2 = new gp_Vec( dir2 );
+
+			gp_Vec cross = v1.Crossed( v2 );
+			return cross.Magnitude() < tolerance;
 		}
 	}
 }
