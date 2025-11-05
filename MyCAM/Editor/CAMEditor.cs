@@ -76,6 +76,9 @@ namespace MyCAM.Editor
 			( m_DefaultAction as SelectPathAction_ ).PathOrderMove += MoveProcess;
 		}
 
+		public const string PATH_NODE_PREFIX = "Path_";
+		public const int PATH_NODE_PERFIX_LENGTH = 5;
+
 		// for viewer resource handle
 		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh, no need activate
 		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
@@ -265,11 +268,13 @@ namespace MyCAM.Editor
 					m_ViewManager.ViewObjectMap.Remove( szPathID );
 				}
 
-				// remove from tree view
-				if( m_ViewManager.TreeNodeMap.ContainsKey( szPathID ) ) {
-					TreeNode node = m_ViewManager.TreeNodeMap[ szPathID ];
-					m_TreeView.Nodes.Remove( node );
-					m_ViewManager.TreeNodeMap.Remove( szPathID );
+				// remove last node from tree view
+				int removePathNodeIndex = m_DataManager.PathIDList.Count; // 1 based index
+				string szNodeID = PATH_NODE_PREFIX + ( removePathNodeIndex ).ToString(); // 1 based index
+				if( m_ViewManager.TreeNodeMap.ContainsKey( szNodeID ) ) {
+					TreeNode node = m_ViewManager.TreeNodeMap[ szNodeID ];
+					m_ViewManager.PathNode.Nodes.Remove( node );
+					m_ViewManager.TreeNodeMap.Remove( szNodeID );
 				}
 			}
 
@@ -536,9 +541,14 @@ namespace MyCAM.Editor
 				}
 
 				// add a new node to the tree view
-				TreeNode node = new TreeNode( szID );
+				int nodeIndex = m_DataManager.PathIDList.IndexOf( szID ) + 1; // 1 based index
+				if( nodeIndex == -1 ) {
+					continue;
+				}
+				string szNodeID = PATH_NODE_PREFIX + nodeIndex.ToString();
+				TreeNode node = new TreeNode( szNodeID );
 				m_ViewManager.PathNode.Nodes.Add( node );
-				m_ViewManager.TreeNodeMap.Add( szID, node );
+				m_ViewManager.TreeNodeMap.Add( szNodeID, node );
 
 				// add a new shape to the viewer
 				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ShapeDataMap[ szID ].Shape, 3.0 );

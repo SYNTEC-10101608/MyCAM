@@ -202,7 +202,7 @@ namespace MyCAM.Editor
 			SyncSelectionFromTree();
 		}
 
-		void SyncSelectionFromView()
+		protected virtual void SyncSelectionFromView()
 		{
 			m_SelectedIDSet.Clear();
 
@@ -225,7 +225,7 @@ namespace MyCAM.Editor
 			SyncSlectionFromSet();
 		}
 
-		void SyncSelectionFromTree()
+		protected virtual void SyncSelectionFromTree()
 		{
 			if( m_bSuppressTreeViewSync ) {
 				return;
@@ -243,7 +243,7 @@ namespace MyCAM.Editor
 			SyncSlectionFromSet();
 		}
 
-		void SyncSlectionFromSet()
+		protected virtual void SyncSlectionFromSet()
 		{
 			// sync to tree
 			m_bSuppressTreeViewSync = true;
@@ -272,7 +272,7 @@ namespace MyCAM.Editor
 			SelectionChange?.Invoke();
 		}
 
-		bool m_bSuppressTreeViewSync = false;
+		protected bool m_bSuppressTreeViewSync = false;
 
 		// viewer mouse action
 		AIS_RubberBand m_RubberBand;
@@ -283,6 +283,6 @@ namespace MyCAM.Editor
 		bool m_IsDragging = false;
 
 		// selection sync
-		HashSet<string> m_SelectedIDSet;
+		protected HashSet<string> m_SelectedIDSet;
 	}
 }
