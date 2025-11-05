@@ -30,7 +30,7 @@ namespace MyCAM.Editor
 		public Action PropertyChanged;
 		public Action<EActionStatus> RaiseEditingToolVecDlg;
 
-		protected override void ViewerMouseDown( MouseEventArgs e )
+		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
 			// editing tool vector, do not allow other operation
 			if( IsPausedSelectMode ) {

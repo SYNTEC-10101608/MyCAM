@@ -68,16 +68,13 @@ namespace MyCAM.Editor
 			}
 		}
 
-		protected override void ViewerMouseDown( MouseEventArgs e )
+		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			m_Viewer.GetAISContext().SelectDetected( AIS_SelectionScheme.AIS_SelectionScheme_Add );
+			m_Viewer.Select( AIS_SelectionScheme.AIS_SelectionScheme_Add );
 			if( m_Viewer.GetAISContext().NbSelected() != 2 ) {
-
-				// update view to keep selection highlighted on the canvas
-				m_Viewer.UpdateView();
 				return;
 			}
 			List<TopoDS_Shape> selectedShapeList = new List<TopoDS_Shape>();

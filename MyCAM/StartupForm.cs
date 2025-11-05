@@ -48,8 +48,14 @@ namespace MyCAM
 			}
 			m_Viewer.UpdateView();
 
-			// this is to keep highlighted selected node when tree view looses focus
-			m_TreeView.HideSelection = false;
+			// multi select tree view
+			m_TreeView = new MultiSelectTreeView();
+			m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+			m_TreeView.Location = new System.Drawing.Point( 0, 0 );
+			m_TreeView.Name = "m_TreeView";
+			m_TreeView.TabIndex = 0;
+			m_TreeView.ForeColor = System.Drawing.Color.Black;
+			m_panTreeView.Controls.Add( this.m_TreeView );
 
 			// show G54
 			ShowG54Trihedron();
@@ -102,6 +108,7 @@ namespace MyCAM
 
 		// view properties
 		Viewer m_Viewer;
+		TreeView m_TreeView;
 		ViewManager m_ViewManager;
 
 		// data manager
@@ -307,11 +314,6 @@ namespace MyCAM
 		void m_tsbSetLead_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SetLeadLine();
-		}
-
-		void m_tsbFlipLead_Click( object sender, EventArgs e )
-		{
-			m_CAMEditor.ChangeLeadDirection();
 		}
 
 		void m_tsbOverCut_Click( object sender, EventArgs e )
@@ -567,23 +569,15 @@ namespace MyCAM
 		}
 
 		// path property change event
-		void OnCAMPathPropertyChanged( bool isClosePath, bool isPathWithLead )
+		void OnCAMPathPropertyChanged( EditableInfo editableInfo )
 		{
-			OnPathIsCloseChanged( isClosePath );
-			OnPathLeadChanged( isPathWithLead );
-		}
-
-		void OnPathIsCloseChanged( bool isClosePath )
-		{
-			m_tsbStartPoint.Enabled = isClosePath;
-			m_tsbSetLead.Enabled = isClosePath;
-			m_tsbFlipLead.Enabled = isClosePath;
-			m_tsbOverCut.Enabled = isClosePath;
-		}
-
-		void OnPathLeadChanged( bool isPathWithLead )
-		{
-			m_tsbFlipLead.Enabled = isPathWithLead;
+			m_tsbStartPoint.Enabled = editableInfo.IsStartPointEditable;
+			m_tsbOverCut.Enabled = editableInfo.IsOverCutEditable;
+			m_tsbSetLead.Enabled = editableInfo.IsLeadLineEditable;
+			m_tsbToolVec.Enabled = editableInfo.IsToolVecEditable;
+			m_tsbMoveUp.Enabled = editableInfo.IsMoveProcessEditable;
+			m_tsbMoveDown.Enabled = editableInfo.IsMoveProcessEditable;
+			m_tsbAutoOrder.Enabled = editableInfo.IsAutoOrderEditable;
 		}
 
 		// ui display

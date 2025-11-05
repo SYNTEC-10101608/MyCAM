@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.IFSelect;
@@ -12,6 +8,10 @@ using OCC.TopoDS;
 using OCC.XSControl;
 using OCCTool;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -33,7 +33,7 @@ namespace MyCAM.Editor
 			m_DataManager.FeatureAdded += OnFeatureAdded;
 
 			// default action is select object action
-			m_DefaultAction = new SelectObjectAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, ESelectObjectType.Part );
+			m_DefaultAction = new SelectPartAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 		}
 
 		// editor
@@ -203,6 +203,7 @@ namespace MyCAM.Editor
 			// update tree view and viewer
 			m_ViewManager.PartNode.ExpandAll();
 			m_Viewer.UpdateView();
+			m_DefaultAction.ClearSelection();
 		}
 
 		void OnFeatureAdded( List<string> newFeatureIDs )
