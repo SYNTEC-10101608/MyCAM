@@ -149,10 +149,22 @@ namespace MyCAM.Data
 			get; private set;
 		}
 
-		internal List<ICADSegmentElement> BreakedCADSegmentList
+		internal List<ICAMSegmentElement> BreakedCAMSegmentList
 		{
-			get; 
-			set;
+			get
+			{
+				if( m_IsDirty ) {
+					BuildCAMPointList_New();
+					m_IsDirty = false;
+				}
+				return m_BrakedCAMSegment;
+			}
+			set
+			{
+				if ( value != null ) {
+					m_BrakedCAMSegment = value;
+				}
+			}
 		}
 
 		// CAM property
@@ -480,6 +492,7 @@ namespace MyCAM.Data
 
 		// tunple <segment, index> , tuple<RA, RB>
 		Dictionary<(int ,int), Tuple<double, double>> m_ToolVecModifyMap_New = new Dictionary<(int,int), Tuple<double, double>>();
+		List<ICAMSegmentElement> m_BrakedCAMSegment = new List<ICAMSegmentElement>();
 		bool m_IsReverse = false;
 		bool m_IsToolVecReverse = false;
 		int m_StartPoint = 0;

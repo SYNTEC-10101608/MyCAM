@@ -136,11 +136,11 @@ namespace MyCAM.Helper
 
 		static List<((int SegmentIdx, int PointIdxt) start, (int SegmentIdx, int PointIdx) end)> GetMainPathOrderedSegment_New( CAMData camData )
 		{
-			if (camData.ToolVecModifyMap_New.Count <= 1 ) {
+			if( camData.ToolVecModifyMap_New.Count <= 1 ) {
 
 				List<((int SegmentIdx, int PointIdxt) start, (int SegmentIdx, int PointIdx) end)> unSeparateIntervalList = new List<((int SegmentIdx, int PointIdxt) start, (int SegmentIdx, int PointIdx) end)>();
-				for (int i = 0; i< camData.CADSegmentList.Count; i++ ) {
-					if ( i == 0 ) {
+				for( int i = 0; i < camData.CADSegmentList.Count; i++ ) {
+					if( i == 0 ) {
 						unSeparateIntervalList.Add( ((i, 0), (i, camData.CADSegmentList[ i ].PointList.Count - 1)) );
 						continue;
 					}
@@ -232,13 +232,13 @@ namespace MyCAM.Helper
 			// reverse start / end point
 			for( int i = 0; i < camSegmentList.Count; i++ ) {
 				if( camSegmentList[ i ].ContourType == EContourType.Line ) {
-					LineCAMSegment reversedLineCAMSegment = new LineCAMSegment( camSegmentList[ i ].EndPoint, camSegmentList[ i ].StartPoint );
+					LineCAMSegment reversedLineCAMSegment = new LineCAMSegment( camSegmentList[ i ].EndPoint, camSegmentList[ i ].StartPoint,false );
 					camSegmentList[ i ] = reversedLineCAMSegment;
 					continue;
 				}
 				if( camSegmentList[ i ].ContourType == EContourType.Arc ) {
 					ArcCAMSegment oldSegment = (ArcCAMSegment)camSegmentList[ i ];
-					ArcCAMSegment reversedArcCAMSegment = new ArcCAMSegment( oldSegment.EndPoint, oldSegment.StartPoint, oldSegment.MidPoint );
+					ArcCAMSegment reversedArcCAMSegment = new ArcCAMSegment( oldSegment.EndPoint, oldSegment.StartPoint, oldSegment.MidPoint,false );
 					camSegmentList[ i ] = reversedArcCAMSegment;
 				}
 			}
@@ -435,10 +435,47 @@ namespace MyCAM.Helper
 
 		}
 
+		public static gp_Dir GetSegmentPointToolVec( CAMData camData, (int segment, int pointIndex) targetPoint )
+		{
+			if (camData.ToolVecModifyMap_New.Count == 1 ) {
+				
+					(int, int) targetPointSegmentIndex = camData.ToolVecModifyMap_New.Keys.First();
+					CADPoint modifyPoint = camData.CADSegmentList[ targetPointSegmentIndex.Item1 ].PointList[ targetPointSegmentIndex.Item2 ];
+					CAMPoint targetCAMPoint = BuildCAMSegmentHelper.GetCAMPoint( modifyPoint, camData.IsToolVecReverse );
+					gp_Vec newVec = GetVecFromAB( targetCAMPoint,
+						camData.ToolVecModifyMap_New.Values.First().Item1 * Math.PI / 180,
+						camData.ToolVecModifyMap_New.Values.First().Item2 * Math.PI / 180 );
+					gp_Dir assignDir = new gp_Dir( newVec );
+				return assignDir;
+				
+				
+			}
+
+			List<((int, int), (int, int))> interpolateIntervalList = GetInterpolateIntervalList( camData );
+			((int, int), (int, int)) targetPointSegmentRange = GetTargetPntSegmentRange( interpolateIntervalList, targetPoint, out _ );
+			InterpolateToolVec( camData, targetPointSegmentRange.Item1, targetPointSegmentRange.Item2, out double dTotalLength );
+			gp_Vec segmentsStartVec = GetModifyToolVecByMap( camData, targetPointSegmentRange.Item1 );
+			gp_Vec segmentsEdnVec = GetModifyToolVecByMap( camData, targetPointSegmentRange.Item2 );
+
+			// get the quaternion for interpolation
+			gp_Quaternion q12 = new gp_Quaternion( segmentsStartVec, segmentsEdnVec );
+			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
+
+			double weight = GetPntToolVecWeight( camData, targetPointSegmentRange, targetPoint, dTotalLength );
+
+			gp_Quaternion q = new gp_Quaternion();
+			slerp.Interpolate( weight, ref q );
+			gp_Trsf trsf = new gp_Trsf();
+			trsf.SetRotation( q );
+			gp_Dir toolVecDir = new gp_Dir( segmentsStartVec.Transformed( trsf ) );
+			return toolVecDir;
+		}
+
 		public static List<(gp_Pnt point, gp_Dir toolVec, bool isModiyToolVec)> InterpolateToolVec( CAMData camdata, (int, int) nStartIndex, (int, int) nEndIndex, out double dTotalLength )
 		{
 			List<(gp_Pnt point, double dDistance, bool isModifyToolVec)> toolVecLocation = new List<(gp_Pnt point, double dDistance, bool isModifyToolVec)>();
 			List<(gp_Pnt point, gp_Dir toolVec, bool isModiyToolVec)> points = new List<(gp_Pnt point, gp_Dir toolVecbool, bool isModiyToolVec)>();
+			
 			// 計算長度
 			dTotalLength = 0;
 
@@ -711,7 +748,7 @@ namespace MyCAM.Helper
 			double dSegmentStartToStartPoint_1 = 0;
 
 			// 在後面這段
-			if( targetPntInfo.segmentIndex >= segmentRange.endSegment.segmentIndex ) {
+			if( targetPntInfo.segmentIndex > segmentRange.endSegment.segmentIndex ) {
 				for( int i = segmentRange.startSegment.segmentIndex; i < camData.CADSegmentList.Count; i++ ) {
 					if( i == segmentRange.startSegment.segmentIndex && i == targetPntInfo.segmentIndex ) {
 						dSegmentStartToStartPoint_1 += ( targetPntInfo.pointIndex - segmentRange.startSegment.pointIndex ) * camData.CADSegmentList[ i ].PointSpace;
@@ -757,7 +794,7 @@ namespace MyCAM.Helper
 		}
 
 
-		static LineCAMSegment BuildCAMLineSegment( List<CADPoint> linePointList, bool isToolVecReverse )
+		public static LineCAMSegment BuildCAMLineSegment( List<CADPoint> linePointList, bool isToolVecReverse )
 		{
 			LineCAMSegment camLineSegment = null;
 			if( linePointList == null || linePointList.Count < 2 ) {
@@ -765,11 +802,11 @@ namespace MyCAM.Helper
 			}
 			CAMPoint startCAMPoint = GetCAMPoint( linePointList[ 0 ], isToolVecReverse );
 			CAMPoint endCAMPoint = GetCAMPoint( linePointList[ linePointList.Count - 1 ], isToolVecReverse );
-			camLineSegment = new LineCAMSegment( startCAMPoint, endCAMPoint );
+			camLineSegment = new LineCAMSegment( startCAMPoint, endCAMPoint,false );
 			return camLineSegment;
 		}
 
-		static ArcCAMSegment BuildCAMArcSegment( List<CADPoint> arcPointList, bool isToolVecReverse )
+		public static ArcCAMSegment BuildCAMArcSegment( List<CADPoint> arcPointList, bool isToolVecReverse )
 		{
 			ArcCAMSegment camArcSegment = null;
 			if( arcPointList == null || arcPointList.Count < 2 ) {
@@ -780,13 +817,13 @@ namespace MyCAM.Helper
 
 			if( arcPointList.Count % 2 != 0 ) {
 				CAMPoint realMidCAMPoint = GetCAMPoint( arcPointList[ arcPointList.Count / 2 ], isToolVecReverse );
-				camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, realMidCAMPoint );
+				camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, realMidCAMPoint,false );
 				return camArcSegment;
 			}
 
 			CADPoint EstimatedMidCADPoint = GetArcMidPoint( arcPointList );
 			CAMPoint EstimatedMidCAMPoint = GetCAMPoint( EstimatedMidCADPoint, isToolVecReverse );
-			camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, EstimatedMidCAMPoint );
+			camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, EstimatedMidCAMPoint,false );
 			return camArcSegment;
 		}
 

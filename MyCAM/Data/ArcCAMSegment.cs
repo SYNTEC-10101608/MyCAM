@@ -2,8 +2,9 @@
 {
 	internal class ArcCAMSegment : CAMSegmentBase
 	{
-		public ArcCAMSegment( CAMPoint startPoint, CAMPoint endPoint, CAMPoint midPoint )
-			: base( startPoint, endPoint )
+		public ArcCAMSegment( CAMPoint startPoint, CAMPoint endPoint, CAMPoint midPoint, bool isModifyElement
+			)
+			: base( startPoint, endPoint, isModifyElement )
 		{
 			MidPoint = midPoint;
 		}

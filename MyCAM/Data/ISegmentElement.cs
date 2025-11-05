@@ -58,6 +58,11 @@ namespace MyCAM.Data
 		{
 			get;
 		}
+
+		bool IsModifyElement
+		{
+			get;
+		}
 	}
 
 	internal abstract class CADSegmentBase : ICADSegmentElement
@@ -165,13 +170,14 @@ namespace MyCAM.Data
 
 	internal abstract class CAMSegmentBase : ICAMSegmentElement
 	{
-		protected CAMSegmentBase( CAMPoint startPoint, CAMPoint endPoint )
+		protected CAMSegmentBase( CAMPoint startPoint, CAMPoint endPoint, bool isModifyElement = false  )
 		{
 			if( startPoint == null || endPoint == null ) {
 				throw new System.ArgumentException( " CAMSegmentBasis constructing points are null" );
 			}
 			StartPoint = startPoint;
 			EndPoint = endPoint;
+			IsModifyElement = isModifyElement;
 		}
 
 		public abstract EContourType ContourType
@@ -189,6 +195,11 @@ namespace MyCAM.Data
 		{
 			get;
 			private set;
+		}
+
+		public virtual bool IsModifyElement
+		{
+			get; set;
 		}
 	}
 }
