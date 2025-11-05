@@ -82,6 +82,7 @@
 			this.m_tscLevel3Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsSelectPath = new System.Windows.Forms.ToolStrip();
 			this.m_tsbManualSelectPathOK = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbSewPart = new System.Windows.Forms.ToolStripButton();
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -403,8 +404,8 @@
 			// m_tscLevel1Container.ContentPanel
 			// 
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCAMFunction);
-			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsFileFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCADFunction);
+			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsFileFunction);
 			this.m_tscLevel1Container.ContentPanel.Size = new System.Drawing.Size(1065, 46);
 			this.m_tscLevel1Container.Dock = System.Windows.Forms.DockStyle.Top;
 			this.m_tscLevel1Container.Location = new System.Drawing.Point(0, 24);
@@ -462,6 +463,7 @@
 			this.m_tsCADFunction.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_tsCADFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
 			this.m_tsCADFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbSewPart,
             this.m_tsbAddPoint_AcrCenter,
             this.m_tsbAddPoint_EdgeCenter,
             this.m_tsbAddPoint_PointCenter,
@@ -711,6 +713,16 @@
 			this.m_tsbManualSelectPathOK.Text = "手動選取完成";
 			this.m_tsbManualSelectPathOK.Click += new System.EventHandler(this.m_tsbManualSelectPathOK_Click);
 			// 
+			// m_tsbSewPart
+			// 
+			this.m_tsbSewPart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbSewPart.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbSewPart.Image")));
+			this.m_tsbSewPart.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbSewPart.Name = "m_tsbSewPart";
+			this.m_tsbSewPart.Size = new System.Drawing.Size(44, 43);
+			this.m_tsbSewPart.Text = "模型縫補";
+			this.m_tsbSewPart.Click += new System.EventHandler(this.m_tsbSewPart_Click);
+			// 
 			// StartupForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -816,6 +828,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbSelPath_FreeBound;
 		private System.Windows.Forms.ToolStripButton m_tsbSelPath_Manual;
 		private System.Windows.Forms.ToolStripButton m_tsbEntryAndExitSetting;
+		private System.Windows.Forms.ToolStripButton m_tsbSewPart;
 	}
 }
 
