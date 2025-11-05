@@ -56,7 +56,6 @@
 			this.m_tsbShowTraverse = new System.Windows.Forms.ToolStripButton();
 			this.m_panViewer = new System.Windows.Forms.Panel();
 			this.m_panTreeView = new System.Windows.Forms.Panel();
-			this.m_TreeView = new System.Windows.Forms.TreeView();
 			this.m_tscLevel1Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsFileFunction = new System.Windows.Forms.ToolStrip();
 			this.m_tsbImport3DFile = new System.Windows.Forms.ToolStripButton();
@@ -90,7 +89,6 @@
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
 			this.m_tsViewerToolBar.SuspendLayout();
-			this.m_panTreeView.SuspendLayout();
 			this.m_tscLevel1Container.ContentPanel.SuspendLayout();
 			this.m_tscLevel1Container.SuspendLayout();
 			this.m_tsFileFunction.SuspendLayout();
@@ -396,20 +394,11 @@
 			// m_panTreeView
 			// 
 			this.m_panTreeView.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-			this.m_panTreeView.Controls.Add(this.m_TreeView);
 			this.m_panTreeView.Dock = System.Windows.Forms.DockStyle.Left;
 			this.m_panTreeView.Location = new System.Drawing.Point(0, 0);
 			this.m_panTreeView.Name = "m_panTreeView";
 			this.m_panTreeView.Size = new System.Drawing.Size(165, 705);
 			this.m_panTreeView.TabIndex = 0;
-			// 
-			// m_TreeView
-			// 
-			this.m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_TreeView.Location = new System.Drawing.Point(0, 0);
-			this.m_TreeView.Name = "m_TreeView";
-			this.m_TreeView.Size = new System.Drawing.Size(165, 705);
-			this.m_TreeView.TabIndex = 0;
 			// 
 			// m_tscLevel1Container
 			// 
@@ -748,7 +737,6 @@
 			this.m_panBackGround.PerformLayout();
 			this.m_tsViewerToolBar.ResumeLayout(false);
 			this.m_tsViewerToolBar.PerformLayout();
-			this.m_panTreeView.ResumeLayout(false);
 			this.m_tscLevel1Container.ContentPanel.ResumeLayout(false);
 			this.m_tscLevel1Container.ContentPanel.PerformLayout();
 			this.m_tscLevel1Container.ResumeLayout(false);
@@ -786,7 +774,6 @@
 		private System.Windows.Forms.Panel m_panBackGround;
 		private System.Windows.Forms.Panel m_panTreeView;
 		private System.Windows.Forms.Panel m_panViewer;
-		private System.Windows.Forms.TreeView m_TreeView;
 		private System.Windows.Forms.ToolStripButton m_tsbDeletePath;
 		private System.Windows.Forms.ToolStripButton m_tsbStartPoint;
 		private System.Windows.Forms.ToolStripButton m_tsbReverse;

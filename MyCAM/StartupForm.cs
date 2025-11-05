@@ -48,16 +48,14 @@ namespace MyCAM
 			}
 			m_Viewer.UpdateView();
 
-			// replace by multi select tree view
-			this.m_panTreeView.Controls.Remove( m_TreeView );
+			// multi select tree view
 			m_TreeView = new MultiSelectTreeView();
-			this.m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_TreeView.Location = new System.Drawing.Point( 0, 0 );
-			this.m_TreeView.Name = "m_TreeView";
-			this.m_TreeView.Size = new System.Drawing.Size( 165, 705 );
-			this.m_TreeView.TabIndex = 0;
-			this.m_TreeView.ForeColor = System.Drawing.Color.Black;
-			this.m_panTreeView.Controls.Add( this.m_TreeView );
+			m_TreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+			m_TreeView.Location = new System.Drawing.Point( 0, 0 );
+			m_TreeView.Name = "m_TreeView";
+			m_TreeView.TabIndex = 0;
+			m_TreeView.ForeColor = System.Drawing.Color.Black;
+			m_panTreeView.Controls.Add( this.m_TreeView );
 
 			// show G54
 			ShowG54Trihedron();
@@ -110,6 +108,7 @@ namespace MyCAM
 
 		// view properties
 		Viewer m_Viewer;
+		TreeView m_TreeView;
 		ViewManager m_ViewManager;
 
 		// data manager
