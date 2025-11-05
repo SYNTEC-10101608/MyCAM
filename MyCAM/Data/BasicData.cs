@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using OCC.BRep;
+﻿using OCC.BRep;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopExp;
 using OCC.TopoDS;
+using OCCTool;
+using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
@@ -26,9 +26,21 @@ namespace MyCAM.Data
 			get; private set;
 		}
 
+		public void SewShape( double sewTol )
+		{
+			TopoDS_Shape result = ShapeTool.SewShape( new List<TopoDS_Shape>() { Shape }, sewTol );
+			if( result == null || result.IsNull() ) {
+				return;
+			}
+			Shape = result;
+		}
+
 		public virtual void DoTransform( gp_Trsf transform )
 		{
 			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
+			if( !shapeTransform.IsDone() ) {
+				return;
+			}
 			Shape = shapeTransform.Shape();
 		}
 	}
@@ -50,7 +62,7 @@ namespace MyCAM.Data
 		}
 
 		// to get path data from file
-		public PathData( string szUID, TopoDS_Shape shapeData, CAMData camData)
+		public PathData( string szUID, TopoDS_Shape shapeData, CAMData camData )
 		: base( szUID, shapeData )
 		{
 			m_CAMData = camData;

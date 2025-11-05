@@ -206,7 +206,7 @@ namespace MyCAM
 		// sew part
 		void m_tsbSewPart_Click( object sender, EventArgs e )
 		{
-
+			m_CADEditor.SewPart();
 		}
 
 		// add feature

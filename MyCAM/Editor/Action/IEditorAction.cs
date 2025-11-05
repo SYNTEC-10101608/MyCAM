@@ -17,6 +17,7 @@ namespace MyCAM.Editor
 		SelectObject,
 
 		// CAD
+		SewPart,
 		AddPoint_CircArcCenter,
 		AddPoint_EdgeMidPoint,
 		AddPoint_TwoVertexMidPoint,
