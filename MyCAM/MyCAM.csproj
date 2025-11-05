@@ -81,7 +81,7 @@
     <Compile Include="Editor\Dialog\TraverseDlg.Designer.cs">
       <DependentUpon>TraverseDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\TreeViewAdapter.cs">
+    <Compile Include="Editor\MultiSelectTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Editor\IEditor.cs" />
