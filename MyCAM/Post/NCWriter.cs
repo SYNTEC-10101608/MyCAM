@@ -101,7 +101,7 @@ namespace MyCAM.Post
 						}
 
 						// solve all post data of the path
-						if( !PostHelper.SolvePath_New( m_PostSolver, m_ProcessDataList[ i ], camSegmentList,
+						if( !PostHelper.SolvePath_New_New( m_PostSolver, m_ProcessDataList[ i ], camSegmentPage,
 							endInfoOfPreviousPath, i == 0, i == m_ProcessDataList.Count - 1, m_EntryAndExitData,
 							out PathSegmentPostData pathSegmentPostData, out _, out endInfoOfPreviousPath ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();

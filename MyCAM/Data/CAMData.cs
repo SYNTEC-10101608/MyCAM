@@ -161,7 +161,7 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				if ( value != null ) {
+				if( value != null ) {
 					m_BrakedCAMSegment = value;
 				}
 			}
@@ -394,7 +394,7 @@ namespace MyCAM.Data
 			m_IsDirty = true;
 		}
 
-		public void SetToolVecModify_New( (int,int) index, double dRA_deg, double dRB_deg )
+		public void SetToolVecModify_New( (int, int) index, double dRA_deg, double dRB_deg )
 		{
 			if( m_ToolVecModifyMap_New.ContainsKey( index ) ) {
 				m_ToolVecModifyMap_New[ index ] = new Tuple<double, double>( dRA_deg, dRB_deg );
@@ -441,7 +441,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		public void RemoveToolVecModify_New( (int,int) index )
+		public void RemoveToolVecModify_New( (int, int) index )
 		{
 			if( m_ToolVecModifyMap_New.ContainsKey( index ) ) {
 				m_ToolVecModifyMap_New.Remove( index );
@@ -474,9 +474,16 @@ namespace MyCAM.Data
 				BuildCAMPointList_New();
 				m_IsDirty = false;
 			}
+			CAMPoint camPoint = null;
+
+			if( m_LeadParam.LeadIn.Type != LeadLineType.None ) {
+				List<ICAMSegmentElement> leadCAMSegment = BuildCAMSegmentHelper.BuildLeadCAMSegment( this, true );
+				camPoint = leadCAMSegment.FirstOrDefault()?.StartPoint;
+				return camPoint;
+			}
 
 			int nStartPointIndex = StartPointIndex;
-			CAMPoint camPoint = BreakedCAMSegmentList[ nStartPointIndex ].StartPoint;
+			camPoint = BreakedCAMSegmentList[ nStartPointIndex ].StartPoint;
 			return camPoint;
 		}
 
@@ -487,8 +494,14 @@ namespace MyCAM.Data
 				m_IsDirty = false;
 			}
 
+			CAMPoint camPoint = null;
+			if( m_LeadParam.LeadOut.Type != LeadLineType.None ) {
+				List<ICAMSegmentElement> leadCAMSegment = BuildCAMSegmentHelper.BuildLeadCAMSegment( this, false );
+				camPoint = leadCAMSegment.LastOrDefault()?.EndPoint;
+				return camPoint;
+			}
 			int nStartPointIndex = StartPointIndex;
-			CAMPoint camPoint = BreakedCAMSegmentList[ nStartPointIndex ].StartPoint;
+			camPoint = BreakedCAMSegmentList[ nStartPointIndex ].StartPoint;
 			return camPoint;
 		}
 
@@ -501,7 +514,7 @@ namespace MyCAM.Data
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 
 		// tunple <segment, index> , tuple<RA, RB>
-		Dictionary<(int ,int), Tuple<double, double>> m_ToolVecModifyMap_New = new Dictionary<(int,int), Tuple<double, double>>();
+		Dictionary<(int, int), Tuple<double, double>> m_ToolVecModifyMap_New = new Dictionary<(int, int), Tuple<double, double>>();
 		List<ICAMSegmentElement> m_BrakedCAMSegment = new List<ICAMSegmentElement>();
 		bool m_IsReverse = false;
 		bool m_IsToolVecReverse = false;
@@ -565,7 +578,7 @@ namespace MyCAM.Data
 				// this curve is arc use equal length split
 				else if( GeometryTool.IsCircularArc( edge, out gp_Pnt circleCenter, out _, out gp_Dir centerDir ) ) {
 					tempCADPointList = Pretreatment.GetSegmentPointsByEqualLength( edge, shellFace, PRECISION_MAX_LENGTH, false, out double dEdgeLength, out double dPointSpace );
-					ArcCADSegment arcSegment = new ArcCADSegment( tempCADPointList, dEdgeLength, dPointSpace);
+					ArcCADSegment arcSegment = new ArcCADSegment( tempCADPointList, dEdgeLength, dPointSpace );
 					CADSegmentList.Add( arcSegment );
 				}
 
@@ -758,7 +771,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		
+
 
 		gp_Vec GetVecFromAB( CAMPoint camPoint, double dRA_rad, double dRB_rad )
 		{

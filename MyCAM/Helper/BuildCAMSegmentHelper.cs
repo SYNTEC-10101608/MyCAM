@@ -140,7 +140,7 @@ namespace MyCAM.Helper
 
 			camSegmentList.AddRange( camdata.BreakedCAMSegmentList.GetRange( nStartPointIndex, camdata.BreakedCAMSegmentList.Count - nStartPointIndex ) );
 			if( nStartPointIndex > 0 ) {
-				camSegmentList.AddRange( camdata.BreakedCAMSegmentList.GetRange( 0, nStartPointIndex +1) );
+				camSegmentList.AddRange( camdata.BreakedCAMSegmentList.GetRange( 0, nStartPointIndex) );
 			}
 			return camSegmentList;
 		}
@@ -326,7 +326,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static List<ICAMSegmentElement> BuildLeadCAMSegment( CAMData camData, bool isLeadIn )
+		public static List<ICAMSegmentElement> BuildLeadCAMSegment( CAMData camData, bool isLeadIn )
 		{
 			List<ICAMSegmentElement> LeadCADSegment = new List<ICAMSegmentElement>();
 			if( isLeadIn ) {
@@ -396,7 +396,7 @@ namespace MyCAM.Helper
 				LineCADSegment lineCADSegment = new LineCADSegment( leadCadPointList, 0, 0 );
 				return lineCADSegment;
 			}
-			if( camData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ) {
+			if( camData.LeadLineParam.LeadOut.Type == LeadLineType.Arc ) {
 				LeadHelper.BuildArcLead_New( startCadPoint, startPointToolVec, false, camData.LeadLineParam.LeadOut.Length, camData.LeadLineParam.LeadOut.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadEndPnt, out gp_Pnt leadMidPnt, out _ );
 				List<gp_Pnt> leadPntList = new List<gp_Pnt>() { startCadPoint.Point, leadMidPnt, leadEndPnt };
 				List<CADPoint> leadCadPointList = new List<CADPoint>();
@@ -410,46 +410,14 @@ namespace MyCAM.Helper
 			return null;
 		}
 
-		public static gp_Dir GetStartPointToolVec( CAMData camData )
-		{
-			gp_Dir startPointToolVec = new gp_Dir();
-			if( camData.ToolVecModifyMap_New.Count == 0 ) {
-				CADPoint cadPoint = camData.CADSegmentList[ camData.NewStartPoint.Item1 ].PointList[ camData.NewStartPoint.Item2 ];
-				startPointToolVec = cadPoint.NormalVec_1st;
-				return startPointToolVec;
-			}
-			if( camData.ToolVecModifyMap_New.Count == 1 ) {
-				(int, int) targetPointSegmentIndex = camData.ToolVecModifyMap_New.Keys.First();
-				CADPoint targetPoint = camData.CADSegmentList[ targetPointSegmentIndex.Item1 ].PointList[ targetPointSegmentIndex.Item2 ];
-				CAMPoint targetCAMPoint = BuildCAMSegmentHelper.GetCAMPoint( targetPoint, camData.IsToolVecReverse );
-				gp_Vec newVec = GetVecFromAB( targetCAMPoint,
-					camData.ToolVecModifyMap_New.Values.First().Item1 * Math.PI / 180,
-					camData.ToolVecModifyMap_New.Values.First().Item2 * Math.PI / 180 );
-				startPointToolVec = new gp_Dir( newVec );
-				return startPointToolVec;
-			}
-			List<((int, int), (int, int))> interpolateIntervalList = GetInterpolateIntervalList( camData );
-			((int, int), (int, int)) startPointSegmentRange = GetTargetPntSegmentRange( interpolateIntervalList, camData.NewStartPoint, out _ );
-			InterpolateToolVec( camData, startPointSegmentRange.Item1, startPointSegmentRange.Item2, out double dTotalLength );
-			gp_Vec segmentsStartVec = BuildCAMSegmentHelper.GetModifyToolVecByMap( camData, startPointSegmentRange.Item1 );
-			gp_Vec segmentsEdnVec = BuildCAMSegmentHelper.GetModifyToolVecByMap( camData, startPointSegmentRange.Item2 );
-			// get the quaternion for interpolation
-			gp_Quaternion q12 = new gp_Quaternion( segmentsStartVec, segmentsEdnVec );
-			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
-
-			double weight = GetPntToolVecWeight( camData, startPointSegmentRange, camData.NewStartPoint, dTotalLength );
-
-			gp_Quaternion q = new gp_Quaternion();
-			slerp.Interpolate( weight, ref q );
-			gp_Trsf trsf = new gp_Trsf();
-			trsf.SetRotation( q );
-			gp_Dir toolVecDir = new gp_Dir( segmentsStartVec.Transformed( trsf ) );
-			return toolVecDir;
-
-		}
-
 		public static gp_Dir GetSegmentPointToolVec( CAMData camData, (int segment, int pointIndex) targetPoint )
 		{
+			if (camData.ToolVecModifyMap_New.Count == 0 ) {
+				CADPoint cadStartPoint = camData.CADSegmentList[ targetPoint.segment ].PointList[ targetPoint.pointIndex ];
+				CAMPoint startCAMPoint = GetCAMPoint( cadStartPoint, camData.IsToolVecReverse );
+				return startCAMPoint.ToolVec;
+			}
+
 			if (camData.ToolVecModifyMap_New.Count == 1 ) {
 				
 					(int, int) targetPointSegmentIndex = camData.ToolVecModifyMap_New.Keys.First();
@@ -643,6 +611,8 @@ namespace MyCAM.Helper
 
 		public static List<((int, int), (int, int))> GetInterpolateIntervalList( CAMData camData )
 		{
+			// dic欠上保護
+
 			// sort the modify data by index
 			List<(int, int)> indexInOrder = camData.ToolVecModifyMap_New.Keys.ToList();
 			indexInOrder.Sort();
