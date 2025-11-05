@@ -581,7 +581,7 @@ namespace MyCAM.Data
 					// separate arc into angle - pi/2
 					List<TopoDS_Edge> arcEdgeList = new List<TopoDS_Edge>();
 					if( arcAngle > Math.PI / 2 ) {
-						arcEdgeList = GeometryTool.SplitArcEdgeIfTooLarge( edge );
+						arcEdgeList = Pretreatment.SplitArcEdgeIfTooLarge( edge, shellFace );
 					}
 					else {
 						arcEdgeList.Add( edge );

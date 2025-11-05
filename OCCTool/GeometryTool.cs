@@ -230,46 +230,6 @@ namespace OCCTool
 			return false;
 		}
 
-		public static List<TopoDS_Edge> SplitArcEdgeIfTooLarge( TopoDS_Edge edge, double maxAngleRad = Math.PI / 2 )
-		{
-			List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
-
-			// 取得圓弧的圓心、半徑、方向與弧角
-			if( !IsCircularArc( edge, out gp_Pnt center, out double radius, out gp_Dir dir, out double angle ) )
-				return edgeList; // 不是圓弧
-
-			// 若弧角 <= maxAngleRad，直接回傳原 edge
-			if( angle <= maxAngleRad ) {
-				edgeList.Add( edge );
-				return edgeList;
-			}
-
-			// 需要拆分
-			int nSplit = (int)Math.Ceiling( angle / maxAngleRad );
-
-			// 取得原始幾何與參數範圍
-			double first = 0, last = 0;
-			Geom_Curve baseCurve = BRep_Tool.Curve( edge, ref first, ref last );
-			double subAngle = ( last - first ) / 2;
-
-			// 實際拆分
-			double current = first;
-			for( int i = 0; i < nSplit; i++ ) {
-				double next = current + subAngle;
-				if( next > last ) {
-					break;
-				}
-
-				Geom_TrimmedCurve subArc = new Geom_TrimmedCurve( baseCurve, current, next, true );
-				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( subArc );
-				TopoDS_Edge subEdge = edgeMaker.Edge();
-				edgeList.Add( subEdge );
-
-				current = next;
-			}
-			return edgeList;
-		}
-
 
 		public static bool GetEdgeMidPoint( TopoDS_Edge edge, out gp_Pnt mid )
 		{

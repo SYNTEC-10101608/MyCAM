@@ -585,11 +585,20 @@ namespace MyCAM.Editor
 						}
 					}
 
-					// 沒有分割()
-					if( breakPoint.Count == 0 || breakPoint.Count == 1 && breakPoint[ 0 ] == 0 && (segmentIndex, 0) == startPointInfo ) {
+					// 沒有分割
+					if( (breakPoint.Count == 0) ||
+						(breakPoint.Count == 1 && breakPoint[ 0 ] == 0 && (segmentIndex, 0) == startPointInfo ) // 這段的起點被當成整條路的起點
+						) {
 						breakedCAMSegmentList.AddRange( BuildUnSepareteCAMSegment( camData, segmentIndex ) );
 						if( (segmentIndex, 0) == startPointInfo ) {
 							statPointIndex = breakedCAMSegmentList.Count-1;
+						}
+					}
+
+					else if(  breakPoint.Count == 1 && breakPoint[ 0 ] == camData.CADSegmentList[ segmentIndex ].PointList.Count - 1  ){// 這段的終點被當bar) {
+						breakedCAMSegmentList.AddRange( BuildUnSepareteCAMSegment( camData, segmentIndex ) );
+						if( (segmentIndex, 0) == startPointInfo ) {
+							statPointIndex = breakedCAMSegmentList.Count - 1;
 						}
 					}
 
@@ -607,10 +616,10 @@ namespace MyCAM.Editor
 								// 只是起點不是姿態點
 								if( (segmentIndex, breakPoint[ k ]) == startPointInfo && modifyMap.Contains( (segmentIndex, breakPoint[ k ]) ) == false ) {
 									breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, false ) );
-									
+
 									//下一段的起頭才是起點的segment
 									statPointIndex = breakedCAMSegmentList.Count;
-									
+
 								}
 								else {
 									breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, true ) );
@@ -627,9 +636,9 @@ namespace MyCAM.Editor
 
 								// 只是起點不是姿態點
 								if( (segmentIndex, breakPoint[ k ]) == startPointInfo && modifyMap.Contains( (segmentIndex, breakPoint[ k ]) ) == false ) {
-									breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, false) );
+									breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, false ) );
 									//下一段的起頭才是起點的segment
-									statPointIndex = breakedCAMSegmentList.Count ;
+									statPointIndex = breakedCAMSegmentList.Count;
 								}
 								else {
 									breakedCAMSegmentList.Add( CreateSeparate( camData.CADSegmentList[ segmentIndex ].ContourType, partSegmentPoint, startPointToolVec, endPointToolVec, true ) );

@@ -11,11 +11,52 @@ using OCC.Geom2d;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
+using OCCTool;
 
 namespace MyCAM.Helper
 {
 	internal static class Pretreatment
 	{
+		public static List<TopoDS_Edge> SplitArcEdgeIfTooLarge( TopoDS_Edge edge, TopoDS_Face shellFace, double maxAngleRad = Math.PI / 2 )
+		{
+			List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
+
+			// 取得圓弧的圓心、半徑、方向與弧角
+			if( !GeometryTool.IsCircularArc( edge, out gp_Pnt center, out double radius, out gp_Dir dir, out double angle ) )
+				return edgeList; // 不是圓弧
+
+			// 若弧角 <= maxAngleRad，直接回傳原 edge
+			if( angle <= maxAngleRad ) {
+				edgeList.Add( edge );
+				return edgeList;
+			}
+
+			// 需要拆分
+			int nSplit = (int)Math.Ceiling( angle / maxAngleRad );
+
+			// get curve param
+			BRepAdaptor_Curve adaptorCurve = TryGetAdaptorCurve( edge, shellFace, out double dStartU, out double dEndU );
+			if( adaptorCurve == null ) {
+				return new List<TopoDS_Edge>();
+			}
+
+			double dDeltaU = ( dEndU - dStartU ) / nSplit;
+
+			// collect parameter lists for each segment of the curve
+			List<double> segmentParamList = new List<double>();
+
+			for ( int i = 0 ; i <= nSplit; i++ ) {
+				segmentParamList.Add( dStartU + i * dDeltaU );
+			}
+
+			// reverse the segment parameters if the edge is reversed
+			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				segmentParamList.Reverse();
+			}
+			List<TopoDS_Edge> subEdgeList = SplitEdgeByParamsOnFace( edge, shellFace, segmentParamList );
+			return subEdgeList;
+		}
+
 		// public function area
 		public static List<TopoDS_Edge> GetBsplineToEdgeList( TopoDS_Edge edge, TopoDS_Face shellFace )
 		{
