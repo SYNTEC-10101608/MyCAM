@@ -27,7 +27,6 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StartupForm));
 			this.m_msMode = new System.Windows.Forms.MenuStrip();
 			this.m_tsmiFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -83,8 +82,6 @@
 			this.m_tscLevel3Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsSelectPath = new System.Windows.Forms.ToolStrip();
 			this.m_tsbManualSelectPathOK = new System.Windows.Forms.ToolStripButton();
-			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-			this.toolTip2 = new System.Windows.Forms.ToolTip(this.components);
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_panBackGround.SuspendLayout();
@@ -813,8 +810,6 @@
 		private System.Windows.Forms.ToolStripButton m_tsbSaveProjectFile;
 		private System.Windows.Forms.ToolStrip m_tsViewerToolBar;
 		private System.Windows.Forms.ToolStripButton m_tsbShowVec;
-		private System.Windows.Forms.ToolTip toolTip1;
-		private System.Windows.Forms.ToolTip toolTip2;
 		private System.Windows.Forms.ToolStripButton m_tsbShowOrder;
 		private System.Windows.Forms.ToolStripButton m_tsbShowOrientation;
 		private System.Windows.Forms.ToolStripButton m_tsbShowTraverse;
