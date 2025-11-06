@@ -290,10 +290,14 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
-			if( !GetCAMDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
+			if( !GetCraftDataByID( szPathIDList[ 0 ], out CraftData craftData ) ) {
 				return;
 			}
-			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, camData );
+			if( !GetCacheInfoByID( szPathIDList[ 0 ], out ICacheInfo cacheInfo ) ) {
+				return;
+			}
+
+			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, (ContourCacheInfo)cacheInfo, craftData );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -303,12 +307,13 @@ namespace MyCAM.Editor
 			// one shot edit, muti edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
+				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 
 				// toggle reverse state
-				camData.IsReverse = !camData.IsReverse;
+				craftData.IsReverse = !craftData.IsReverse;
+				// To-do：update CacheInfo in CAMPoint
 			}
 			ShowCAMData();
 		}
@@ -323,14 +328,14 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
-			List<CAMData> camDataList = new List<CAMData>();
+			List<CraftData> craftDataList = new List<CraftData>();
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
+				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
-				camDataList.Add( camData );
+				craftDataList.Add( craftData );
 			}
-			OverCutAction action = new OverCutAction( m_DataManager, camDataList );
+			OverCutAction action = new OverCutAction( m_DataManager, craftDataList );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -345,14 +350,14 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
-			List<CAMData> camDataList = new List<CAMData>();
+			List<CraftData> craftDataList = new List<CraftData>();
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
+				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
-				camDataList.Add( camData );
+				craftDataList.Add( craftData );
 			}
-			LeadAction action = new LeadAction( m_DataManager, camDataList );
+			LeadAction action = new LeadAction( m_DataManager, craftDataList );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -367,10 +372,10 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
-			if( !GetCAMDataByID( szPathIDList[ 0 ], out CAMData camData ) ) {
+			if( !GetCacheInfoByID( szPathIDList[ 0 ], out ICacheInfo cacheInfo ) ) {
 				return;
 			}
-			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, camData );
+			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, (ContourCacheInfo)cacheInfo );
 			action.PropertyChanged += ShowCAMData;
 
 			// when editing tool vec dilog show/close, need disable/enable main form
@@ -386,17 +391,17 @@ namespace MyCAM.Editor
 			// one shot edit, multi edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
+				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 
 				// toggle reverse state
-				camData.IsToolVecReverse = !camData.IsToolVecReverse;
+				craftData.IsToolVecReverse = !craftData.IsToolVecReverse;
 			}
 			ShowCAMData();
 		}
 
-		public void SeTraverseParam()
+		public void SetTraverseParam()
 		{
 			// action edit, multi edit supported
 			if( IsSameAction( EditActionType.SetTraverseParam ) ) {
@@ -406,14 +411,14 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
-			List<CAMData> camDataList = new List<CAMData>();
+			List<CraftData> craftDataList = new List<CraftData>();
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
+				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
-				camDataList.Add( camData );
+				craftDataList.Add( craftData );
 			}
-			TraverseAction action = new TraverseAction( m_DataManager, camDataList );
+			TraverseAction action = new TraverseAction( m_DataManager, craftDataList );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -465,10 +470,10 @@ namespace MyCAM.Editor
 			string szStartPathID = szPathIDList[ 0 ];
 
 			// get start point
-			if( !GetCAMDataByID( szStartPathID, out CAMData camData ) ) {
+			if( !GetCacheInfoByID( szStartPathID, out ICacheInfo cacheInfo ) ) {
 				return;
 			}
-			gp_Pnt currentPoint = camData.GetProcessStartPoint().CADPoint.Point;
+			gp_Pnt currentPoint = cacheInfo.GetProcessStartPoint().CADPoint.Point;
 
 			// init data manager
 			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
@@ -488,10 +493,10 @@ namespace MyCAM.Editor
 					if( visited[ i ] ) {
 						continue;
 					}
-					if( !GetCAMDataByID( pathIDList[ i ], out CAMData nextcamData ) ) {
+					if( !GetCacheInfoByID( pathIDList[ i ], out ICacheInfo nextCacheInfo ) ) {
 						continue;
 					}
-					gp_Pnt nextStartPoint = nextcamData.GetProcessStartPoint().CADPoint.Point;
+					gp_Pnt nextStartPoint = nextCacheInfo.GetProcessStartPoint().CADPoint.Point;
 					double distanceSq = currentPoint.SquareDistance( nextStartPoint );
 					if( distanceSq < minDistanceSq ) {
 						minDistanceSq = distanceSq;
@@ -517,7 +522,17 @@ namespace MyCAM.Editor
 		{
 			// stop current action
 			EndActionIfNotDefault();
-			NCWriter writer = new NCWriter( m_DataManager.GetCAMDataList(), m_DataManager.MachineData, m_DataManager.EntryAndExitData );
+
+			List<CraftData> craftDataList = new List<CraftData>();
+			foreach( string szID in m_DataManager.PathIDList ) {
+				if( !GetCraftDataByID( szID, out CraftData craftData ) ) {
+					MyApp.Logger.ShowOnLogPanel( $"路徑 {szID} 未設定加工參數，無法轉出NC", MyApp.NoticeType.Error );
+					return;
+				}
+				craftDataList.Add( craftData );
+			}
+
+			NCWriter writer = new NCWriter( m_DataManager.GetContourCacheInfoList(), craftDataList, m_DataManager.MachineData, m_DataManager.EntryAndExitData );
 			bool bSuccess = writer.ConvertSuccess( out string szErrorMessage );
 			if( bSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提示]成功轉出NC", MyApp.NoticeType.Hint );
@@ -541,7 +556,7 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ShapeDataMap[ szID ].Shape, 3.0 );
+				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ObjectMap[ szID ].Shape, 3.0 );
 				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
@@ -571,10 +586,10 @@ namespace MyCAM.Editor
 
 			// closed path editable only: start point, overcut, lead line, change lead dir
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCAMDataByID( szPathID, out CAMData camData ) ) {
+				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
-				if( !camData.IsClosed ) {
+				if( !craftData.IsClosed ) {
 					editableInfo.IsStartPointEditable = false;
 					editableInfo.IsOverCutEditable = false;
 					editableInfo.IsLeadLineEditable = false;
@@ -611,16 +626,20 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// build tool vec
-			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
-				for( int i = 0; i < camData.CAMPointList.Count; i++ ) {
-					CAMPoint camPoint = camData.CAMPointList[ i ];
-					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					if( IsModifiedToolVecIndex( i, camData ) ) {
-						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-						toolVecAIS.SetWidth( 4 );
+			foreach( string szID in m_DataManager.PathIDList ) {
+				for( int i = 0; i < m_DataManager.CacheInfoMap.Count; i++ ) {
+					if( m_DataManager.CacheInfoMap[ szID ].PathType == PathType.Contour ) {
+						ContourCacheInfo cacheInfo = (ContourCacheInfo)m_DataManager.CacheInfoMap[ szID ];
+						CAMPoint camPoint = cacheInfo.CAMPointList[ i ];
+						AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
+						GetCraftDataByID( szID, out CraftData craftData );
+						if( IsModifiedToolVecIndex( i, cacheInfo, craftData ) ) {
+							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+							toolVecAIS.SetWidth( 4 );
+						}
+						m_ToolVecAISList.Add( toolVecAIS );
 					}
-					m_ToolVecAISList.Add( toolVecAIS );
+
 				}
 			}
 
@@ -639,24 +658,28 @@ namespace MyCAM.Editor
 			}
 			m_LeadAISList.Clear();
 
-			// build lead line AIS
-			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
 
-				// draw lead in
-				if( camData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
-					for( int i = 0; i < camData.LeadInCAMPointList.Count - 1; i++ ) {
-						CAMPoint currentCAMPoint = camData.LeadInCAMPointList[ i ];
-						CAMPoint nextCAMPoint = camData.LeadInCAMPointList[ i + 1 ];
+
+			foreach( string szID in m_DataManager.PathIDList ) {
+				GetCraftDataByID( szID, out CraftData craftData );
+				GetCacheInfoByID( szID, out ICacheInfo cacheInfo );
+				if( m_DataManager.CacheInfoMap[ szID ].PathType != PathType.Contour ) {
+					continue;
+				}
+				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)m_DataManager.CacheInfoMap[ szID ];
+				if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
+					for( int i = 0; i < contourCacheInfo.LeadInCAMPointList.Count - 1; i++ ) {
+						CAMPoint currentCAMPoint = contourCacheInfo.LeadInCAMPointList[ i ];
+						CAMPoint nextCAMPoint = contourCacheInfo.LeadInCAMPointList[ i + 1 ];
 						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
 						m_LeadAISList.Add( LeadAISLine );
 					}
 				}
 
-				// draw lead out
-				if( camData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
-					for( int i = 0; i < camData.LeadOutCAMPointList.Count - 1; i++ ) {
-						CAMPoint currentCAMPoint = camData.LeadOutCAMPointList[ i ];
-						CAMPoint nextCAMPoint = camData.LeadOutCAMPointList[ i + 1 ];
+				if( craftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
+					for( int i = 0; i < contourCacheInfo.LeadOutCAMPointList.Count - 1; i++ ) {
+						CAMPoint currentCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i ];
+						CAMPoint nextCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i + 1 ];
 						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
 						m_LeadAISList.Add( LeadAISLine );
 					}
@@ -683,16 +706,23 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// build orientation
-			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
-				gp_Pnt showPoint = camData.CAMPointList[ 0 ].CADPoint.Point;
-				gp_Dir orientationDir = new gp_Dir( camData.CAMPointList[ 0 ].CADPoint.TangentVec.XYZ() );
-				if( camData.IsReverse ) {
+			foreach( string szID in m_DataManager.PathIDList ) {
+				GetCraftDataByID( szID, out CraftData craftData );
+				GetCacheInfoByID( szID, out ICacheInfo cacheInfo );
+				if( m_DataManager.CacheInfoMap[ szID ].PathType != PathType.Contour ) {
+					continue;
+				}
+
+				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
+				gp_Pnt showPoint = contourCacheInfo.CAMPointList[ 0 ].CADPoint.Point;
+				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMPointList[ 0 ].CADPoint.TangentVec.XYZ() );
+				if( craftData.IsReverse ) {
 					orientationDir.Reverse();
 				}
 				AIS_Shape orientationAIS = GetOrientationAIS( showPoint, orientationDir );
 				m_OrientationAISList.Add( orientationAIS );
 			}
+
 
 			// display the orientation
 			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
@@ -709,27 +739,31 @@ namespace MyCAM.Editor
 			}
 			m_LeadOrientationAISList.Clear();
 
-			// build orientation
-			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
+			foreach( string szID in m_DataManager.PathIDList ) {
+				GetCraftDataByID( szID, out CraftData craftData );
+				GetCacheInfoByID( szID, out ICacheInfo cacheInfo );
+				if( m_DataManager.CacheInfoMap[ szID ].PathType != PathType.Contour ) {
+					continue;
+				}
+				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 
-				// path with lead in
-				if( camData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
-					if( camData.LeadInCAMPointList.Count == 0 ) {
+				if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
+					if( contourCacheInfo.LeadInCAMPointList.Count == 0 ) {
 						break;
 					}
-					gp_Pnt leadInStartPoint = camData.LeadInCAMPointList.First().CADPoint.Point;
-					gp_Dir leadInOrientationDir = new gp_Dir( camData.LeadInCAMPointList.First().CADPoint.TangentVec.XYZ() );
+					gp_Pnt leadInStartPoint = contourCacheInfo.LeadInCAMPointList.First().CADPoint.Point;
+					gp_Dir leadInOrientationDir = new gp_Dir( contourCacheInfo.LeadInCAMPointList.First().CADPoint.TangentVec.XYZ() );
 					AIS_Shape orientationAIS = GetOrientationAIS( leadInStartPoint, leadInOrientationDir );
 					m_LeadOrientationAISList.Add( orientationAIS );
 				}
 
 				// path with lead out
-				if( camData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
-					if( camData.LeadOutCAMPointList.Count == 0 ) {
+				if( craftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
+					if( contourCacheInfo.LeadOutCAMPointList.Count == 0 ) {
 						break;
 					}
-					gp_Pnt leadOutEndPoint = camData.LeadOutCAMPointList.Last().CADPoint.Point;
-					gp_Dir leadOutOrientationDir = new gp_Dir( camData.LeadOutCAMPointList.Last().CADPoint.TangentVec.XYZ() );
+					gp_Pnt leadOutEndPoint = contourCacheInfo.LeadOutCAMPointList.Last().CADPoint.Point;
+					gp_Dir leadOutOrientationDir = new gp_Dir( contourCacheInfo.LeadOutCAMPointList.Last().CADPoint.TangentVec.XYZ() );
 					AIS_Shape orientationAIS = GetOrientationAIS( leadOutEndPoint, leadOutOrientationDir );
 					m_LeadOrientationAISList.Add( orientationAIS );
 				}
@@ -757,8 +791,16 @@ namespace MyCAM.Editor
 
 			// create text label
 			int nCurrentIndex = 0;
-			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
-				gp_Pnt location = camData.CAMPointList[ 0 ].CADPoint.Point;
+
+
+			foreach( string szID in m_DataManager.PathIDList ) {
+				GetCraftDataByID( szID, out CraftData craftData );
+				GetCacheInfoByID( szID, out ICacheInfo cacheInfo );
+				if( m_DataManager.CacheInfoMap[ szID ].PathType != PathType.Contour ) {
+					continue;
+				}
+				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
+				gp_Pnt location = contourCacheInfo.CAMPointList[ 0 ].CADPoint.Point;
 				string szIndex = nCurrentIndex++.ToString();
 
 				// create text label ais
@@ -786,11 +828,17 @@ namespace MyCAM.Editor
 			}
 			m_OverCutAISList.Clear();
 
-			// build over cut
-			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
-				if( camData.OverCutLength > 0 ) {
-					for( int i = 0; i < camData.OverCutCAMPointList.Count - 1; i++ ) {
-						AIS_Line OverCutAISLine = GetLineAIS( camData.OverCutCAMPointList[ i ].CADPoint.Point, camData.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
+
+			foreach( string szID in m_DataManager.PathIDList ) {
+				GetCraftDataByID( szID, out CraftData craftData );
+				GetCacheInfoByID( szID, out ICacheInfo cacheInfo );
+				if( m_DataManager.CacheInfoMap[ szID ].PathType != PathType.Contour ) {
+					continue;
+				}
+				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
+				if( craftData.OverCutLength > 0 ) {
+					for( int i = 0; i < contourCacheInfo.OverCutCAMPointList.Count - 1; i++ ) {
+						AIS_Line OverCutAISLine = GetLineAIS( contourCacheInfo.OverCutCAMPointList[ i ].CADPoint.Point, contourCacheInfo.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
 						m_OverCutAISList.Add( OverCutAISLine );
 					}
 				}
@@ -819,32 +867,33 @@ namespace MyCAM.Editor
 			if( m_ShowTraversePath == false ) {
 				return;
 			}
-			List<CAMData> camDataList = m_DataManager.GetCAMDataList();
-			if( camDataList == null || camDataList.Count <= 1 ) {
-				return;
-			}
-			for( int i = 1; i < camDataList.Count; i++ ) {
-				CAMData previousCamData = camDataList[ i - 1 ];
-				CAMData currentCamData = camDataList[ i ];
+
+
+			for( int i = 1; i < m_DataManager.PathIDList.Count; i++ ) {
+				GetCraftDataByID( m_DataManager.PathIDList[ i ], out CraftData previousCraftData );
+				GetCacheInfoByID( m_DataManager.PathIDList[ i ], out ICacheInfo previousCacheInfo );
+
+				GetCraftDataByID( m_DataManager.PathIDList[ i + 1 ], out CraftData currentCraftData );
+				GetCacheInfoByID( m_DataManager.PathIDList[ i + 1 ], out ICacheInfo currentCacheInfo );
 
 				// p1: end of previous path
 				// p2: lift up point of previous path
 				// p3: frog leap middle point (if frog leap)
 				// p4: cut down point of current path
 				// p5: start of current path
-				CAMPoint p1 = previousCamData.GetProcessEndPoint();
-				CAMPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( previousCamData.GetProcessEndPoint(), currentCamData.TraverseData.LiftUpDistance );
-				CAMPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCamData.GetProcessStartPoint(), currentCamData.TraverseData.CutDownDistance );
-				CAMPoint p5 = currentCamData.GetProcessStartPoint();
+				CAMPoint p1 = previousCacheInfo.GetProcessEndPoint();
+				CAMPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( previousCacheInfo.GetProcessEndPoint(), currentCraftData.TraverseData.LiftUpDistance );
+				CAMPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCacheInfo.GetProcessStartPoint(), currentCraftData.TraverseData.CutDownDistance );
+				CAMPoint p5 = currentCacheInfo.GetProcessStartPoint();
 
 				// lift up
-				if( currentCamData.TraverseData.LiftUpDistance > 0 && p1 != null && p2 != null ) {
+				if( currentCraftData.TraverseData.LiftUpDistance > 0 && p1 != null && p2 != null ) {
 					AddOneLinearTraverse( p1.CADPoint.Point, p2.CADPoint.Point );
 				}
 
 				// frog leap
-				if( currentCamData.TraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
-					CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCamData.TraverseData.FrogLeapDistance );
+				if( currentCraftData.TraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
+					CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCraftData.TraverseData.FrogLeapDistance );
 					if( p3 != null ) {
 						GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( p2.CADPoint.Point, p3.CADPoint.Point, p4.CADPoint.Point );
 						if( makeCircle.IsDone() ) {
@@ -875,14 +924,15 @@ namespace MyCAM.Editor
 				}
 
 				// cut down
-				if( currentCamData.TraverseData.CutDownDistance > 0 && p4 != null && p5 != null ) {
+				if( currentCraftData.TraverseData.CutDownDistance > 0 && p4 != null && p5 != null ) {
 					AddOneLinearTraverse( p4.CADPoint.Point, p5.CADPoint.Point );
 				}
 			}
 
 			// entry
 			if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
-				CAMPoint firstPathStartPoint = camDataList.First().GetProcessStartPoint();
+				GetCacheInfoByID( m_DataManager.PathIDList.First(), out ICacheInfo cacheInfo );
+				CAMPoint firstPathStartPoint = cacheInfo.GetProcessStartPoint();
 				CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
 				if( firstPathStartPoint != null && entryPoint != null ) {
 					AddOneLinearTraverse( entryPoint.CADPoint.Point, firstPathStartPoint.CADPoint.Point );
@@ -891,7 +941,8 @@ namespace MyCAM.Editor
 
 			// exit
 			if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
-				CAMPoint lastPathEndPoint = camDataList.Last().GetProcessEndPoint();
+				GetCacheInfoByID( m_DataManager.PathIDList.Last(), out ICacheInfo cacheInfo );
+				CAMPoint lastPathEndPoint = cacheInfo.GetProcessEndPoint();
 				CAMPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
 				if( lastPathEndPoint != null && exitPoint != null ) {
 					AddOneLinearTraverse( lastPathEndPoint.CADPoint.Point, exitPoint.CADPoint.Point );
@@ -960,16 +1011,16 @@ namespace MyCAM.Editor
 		#endregion
 
 		// methods
-		bool IsModifiedToolVecIndex( int index, CAMData camData )
+		bool IsModifiedToolVecIndex( int index, ContourCacheInfo cacheInfo, CraftData craftData )
 		{
 			// map CAD and CAM point index
-			int nLength = camData.CADPointList.Count;
-			int modifiedIndex = camData.IsReverse
-				? ( nLength - ( camData.IsClosed ? 0 : 1 ) - index + camData.StartPoint ) % nLength
-				: ( index + camData.StartPoint ) % nLength;
+			int nLength = cacheInfo.CADPointList.Count;
+			int modifiedIndex = craftData.IsReverse
+				? ( nLength - ( craftData.IsClosed ? 0 : 1 ) - index + craftData.StartPointIndex ) % nLength
+				: ( index + craftData.StartPointIndex ) % nLength;
 
 			// need highlight if the index is modified index
-			return camData.GetToolVecModifyIndex().Contains( modifiedIndex );
+			return cacheInfo.GetToolVecModifyIndex().Contains( modifiedIndex );
 		}
 
 		AIS_Line GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
@@ -1070,18 +1121,31 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		bool GetCAMDataByID( string szPathID, out CAMData camData )
+		bool GetCraftDataByID( string szPathID, out CraftData craftData )
 		{
-			camData = null;
+			craftData = null;
 			if( string.IsNullOrEmpty( szPathID )
-				|| m_DataManager.ShapeDataMap.ContainsKey( szPathID ) == false
-				|| m_DataManager.ShapeDataMap[ szPathID ] == null
-				|| !( m_DataManager.ShapeDataMap[ szPathID ] is PathObject
-				|| ( (PathObject)m_DataManager.ShapeDataMap[ szPathID ] ).CAMData == null ) ) {
+				|| m_DataManager.ObjectMap.ContainsKey( szPathID ) == false
+				|| m_DataManager.ObjectMap[ szPathID ] == null
+				|| !( m_DataManager.ObjectMap[ szPathID ] is PathObject
+				|| ( (PathObject)m_DataManager.ObjectMap[ szPathID ] ).CraftData == null ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
 				return false;
 			}
-			camData = ( (PathObject)m_DataManager.ShapeDataMap[ szPathID ] ).CAMData;
+			craftData = ( (PathObject)m_DataManager.ObjectMap[ szPathID ] ).CraftData;
+			return true;
+		}
+
+		bool GetCacheInfoByID( string szPathID, out ICacheInfo cacheInfo )
+		{
+			cacheInfo = null;
+			if( string.IsNullOrEmpty( szPathID )
+				|| m_DataManager.CacheInfoMap.ContainsKey( szPathID ) == false
+				|| m_DataManager.CacheInfoMap[ szPathID ] == null ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
+				return false;
+			}
+			cacheInfo = m_DataManager.CacheInfoMap[ szPathID ];
 			return true;
 		}
 
