@@ -146,7 +146,15 @@ namespace MyCAM.Data
 
 		internal List<ICADSegmentElement> CADSegmentList
 		{
-			get; private set;
+			get {
+				return m_CADSegmentList.Select( segment => segment.Clone() ).ToList();
+			}
+			private set
+			{
+				if( value != null ) {
+					m_CADSegmentList = value;
+				}
+			}
 		}
 
 		internal List<ICAMSegmentElement> BreakedCAMSegmentList
@@ -516,6 +524,7 @@ namespace MyCAM.Data
 		// tunple <segment, index> , tuple<RA, RB>
 		Dictionary<(int, int), Tuple<double, double>> m_ToolVecModifyMap_New = new Dictionary<(int, int), Tuple<double, double>>();
 		List<ICAMSegmentElement> m_BrakedCAMSegment = new List<ICAMSegmentElement>();
+		List<ICADSegmentElement> m_CADSegmentList = new List<ICADSegmentElement>();
 		bool m_IsReverse = false;
 		bool m_IsToolVecReverse = false;
 		int m_StartPoint = 0;

@@ -16,5 +16,14 @@ namespace MyCAM.Data
 				return EContourType.Line;
 			}
 		}
+
+		public override ICADSegmentElement Clone()
+		{
+			List<CADPoint> clonedPointList = new List<CADPoint>();
+			foreach( CADPoint point in m_PointList ) {
+				clonedPointList.Add( point.Clone() as CADPoint );
+			}
+			return new LineCADSegment( clonedPointList, m_TotalLength, m_PointSapce );
+		}
 	}
 }

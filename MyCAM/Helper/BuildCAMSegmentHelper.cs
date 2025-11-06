@@ -761,7 +761,7 @@ namespace MyCAM.Helper
 		}
 
 
-		public static LineCAMSegment BuildCAMLineSegment( List<CADPoint> linePointList, bool isToolVecReverse )
+		public static LineCAMSegment BuildCAMLineSegment( List<CADPoint> linePointList, bool isToolVecReverse, bool isModify = false )
 		{
 			LineCAMSegment camLineSegment = null;
 			if( linePointList == null || linePointList.Count < 2 ) {
@@ -769,11 +769,11 @@ namespace MyCAM.Helper
 			}
 			CAMPoint startCAMPoint = GetCAMPoint( linePointList[ 0 ], isToolVecReverse );
 			CAMPoint endCAMPoint = GetCAMPoint( linePointList[ linePointList.Count - 1 ], isToolVecReverse );
-			camLineSegment = new LineCAMSegment( startCAMPoint, endCAMPoint,false );
+			camLineSegment = new LineCAMSegment( startCAMPoint, endCAMPoint, isModify );
 			return camLineSegment;
 		}
 
-		public static ArcCAMSegment BuildCAMArcSegment( List<CADPoint> arcPointList, bool isToolVecReverse )
+		public static ArcCAMSegment BuildCAMArcSegment( List<CADPoint> arcPointList, bool isToolVecReverse, bool isModify = false )
 		{
 			ArcCAMSegment camArcSegment = null;
 			if( arcPointList == null || arcPointList.Count < 2 ) {
@@ -784,7 +784,7 @@ namespace MyCAM.Helper
 
 			if( arcPointList.Count % 2 != 0 ) {
 				CAMPoint realMidCAMPoint = GetCAMPoint( arcPointList[ arcPointList.Count / 2 ], isToolVecReverse );
-				camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, realMidCAMPoint,false );
+				camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, realMidCAMPoint, isModify );
 				return camArcSegment;
 			}
 

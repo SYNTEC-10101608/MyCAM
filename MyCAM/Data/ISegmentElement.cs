@@ -40,6 +40,8 @@ namespace MyCAM.Data
 		{
 			get;
 		}
+
+		ICADSegmentElement Clone();
 	}
 
 	internal interface ICAMSegmentElement
@@ -126,12 +128,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		public virtual CADSegmentBase Clone()
-		{
-			List<CADPoint> clonedPoints = new List<CADPoint>();
-			clonedPoints.AddRange( m_PointList.Select( p => p.Clone() ) );
-			return null;
-		}
+		public abstract ICADSegmentElement Clone();
 
 		public double TotalLength
 		{
@@ -170,7 +167,7 @@ namespace MyCAM.Data
 
 	internal abstract class CAMSegmentBase : ICAMSegmentElement
 	{
-		protected CAMSegmentBase( CAMPoint startPoint, CAMPoint endPoint, bool isModifyElement = false  )
+		protected CAMSegmentBase( CAMPoint startPoint, CAMPoint endPoint, bool isModifyElement = false )
 		{
 			if( startPoint == null || endPoint == null ) {
 				throw new System.ArgumentException( " CAMSegmentBasis constructing points are null" );

@@ -33,6 +33,15 @@ namespace MyCAM.Data
 			}
 		}
 
+		public override ICADSegmentElement Clone()
+		{
+			List<CADPoint> clonedPointList = new List<CADPoint>();
+			foreach( CADPoint point in m_PointList ) {
+				clonedPointList.Add( point.Clone() as CADPoint );
+			}
+			return new ArcCADSegment( clonedPointList, m_TotalLength, m_PointSapce );
+		}
+
 		CADPoint m_MidPoint;
 	}
 }

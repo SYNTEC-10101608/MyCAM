@@ -33,7 +33,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			(int,int) adjustedIndex = adjustStartPoint( nIndex );
-			m_CAMData.NewStartPoint = adjustedIndex;
+			m_CAMData.NewStartPoint = nIndex;
 			PropertyChanged?.Invoke();
 			m_Viewer.GetAISContext().ClearSelected( true );
 		}
