@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.Aspect;
@@ -8,14 +6,16 @@ using OCC.Prs3d;
 using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
+using System;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
 	internal class ToolVectorAction : IndexSelectAction
 	{
 		public ToolVectorAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
-			CAMData camData )
-			: base( dataManager, viewer, treeView, viewManager, camData )
+			ContourCacheInfo cacheInfo )
+			: base( dataManager, viewer, treeView, viewManager, cacheInfo )
 		{
 		}
 
@@ -45,7 +45,7 @@ namespace MyCAM.Editor
 			}
 
 			// modify tool vector
-			bool isModified = m_CAMData.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
+			bool isModified = m_CacheInfo.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
 			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg );
 
 			// back up old data
@@ -88,7 +88,7 @@ namespace MyCAM.Editor
 
 		void LockSelectedVertexHighLight( TopoDS_Shape selectedVertex )
 		{
-			if( selectedVertex == null || selectedVertex.IsNull()) {
+			if( selectedVertex == null || selectedVertex.IsNull() ) {
 				return;
 			}
 
@@ -122,10 +122,10 @@ namespace MyCAM.Editor
 		void SetToolVecParam( int VecIndex, ToolVecParam toolVecParam )
 		{
 			if( !toolVecParam.IsModified ) {
-				m_CAMData.RemoveToolVecModify( VecIndex );
+				m_CacheInfo.RemoveToolVecModify( VecIndex );
 				return;
 			}
-			m_CAMData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
+			m_CacheInfo.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
 		}
 
 		void DrawVertexOnViewer( TopoDS_Shape selectedVertex )

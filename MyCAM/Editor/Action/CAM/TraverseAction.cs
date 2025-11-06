@@ -7,19 +7,19 @@ namespace MyCAM.Editor
 {
 	internal class TraverseAction : EditActionBase
 	{
-		public TraverseAction( DataManager dataManager, List<CAMData> camDataList )
+		public TraverseAction( DataManager dataManager, List<CraftData> craftData )
 			: base( dataManager )
 		{
-			if( camDataList == null || camDataList.Count == 0 ) {
-				throw new ArgumentNullException( "TraverseAction constructing argument camDataList null or empty" );
+			if( craftData == null || craftData.Count == 0 ) {
+				throw new ArgumentNullException( "TraverseAction constructing argument craftData null or empty" );
 			}
-			m_CAMDataList = camDataList;
+			m_CraftDataList = craftData;
 
 			// when user cancel the traverse setting, need to turn path back
 			m_BackupTraverseDataList = new List<TraverseData>();
-			foreach( var camData in m_CAMDataList ) {
+			foreach( var camData in m_CraftDataList ) {
 				if( camData == null ) {
-					throw new ArgumentNullException( "TraverseAction constructing argument camDataList contains null CAMData" );
+					throw new ArgumentNullException( "TraverseAction constructing argument craftData contains null ContourCacheInfo" );
 				}
 				if( camData.TraverseData == null ) {
 					m_BackupTraverseDataList.Add( new TraverseData() );
@@ -75,19 +75,19 @@ namespace MyCAM.Editor
 
 		void SetTraverseParam( TraverseData data )
 		{
-			foreach( var camData in m_CAMDataList ) {
+			foreach( var camData in m_CraftDataList ) {
 				camData.TraverseData = data.Clone();
 			}
 		}
 
 		void RestoreBackupTraverseData()
 		{
-			for( int i = 0; i < m_CAMDataList.Count; i++ ) {
-				m_CAMDataList[ i ].TraverseData = m_BackupTraverseDataList[ i ];
+			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
+				m_CraftDataList[ i ].TraverseData = m_BackupTraverseDataList[ i ];
 			}
 		}
 
-		List<CAMData> m_CAMDataList;
+		List<CraftData> m_CraftDataList;
 		List<TraverseData> m_BackupTraverseDataList;
 	}
 }

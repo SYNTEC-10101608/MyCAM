@@ -8,9 +8,10 @@ namespace MyCAM.Editor
 	internal class StartPointAction : IndexSelectAction
 	{
 		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
-			CAMData camData )
-			: base( dataManager, viewer, treeView, viewManager, camData )
+			ContourCacheInfo cacheInfo, CraftData craftData )
+			: base( dataManager, viewer, treeView, viewManager, cacheInfo )
 		{
+			m_CraftData = craftData ?? new CraftData();
 		}
 
 		public override EditActionType ActionType
@@ -28,11 +29,11 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			int nIndex = GetSelectIndex(out _);
+			int nIndex = GetSelectIndex( out _ );
 			if( nIndex == -1 ) {
 				return;
 			}
-			m_CAMData.StartPoint = nIndex;
+			m_CraftData.StartPointIndex = nIndex;
 			PropertyChanged?.Invoke();
 			m_Viewer.GetAISContext().ClearSelected( true );
 		}
@@ -43,5 +44,7 @@ namespace MyCAM.Editor
 				End();
 			}
 		}
+
+		CraftData m_CraftData;
 	}
 }
