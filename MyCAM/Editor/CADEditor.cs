@@ -91,21 +91,21 @@ namespace MyCAM.Editor
 			ReadFileData( format, szFileName );
 		}
 
-		public void ImportProjectFile()
-		{
-			// stop current action
-			EndActionIfNotDefault();
-			ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_ViewManager );
-			StartEditAction( action );
-		}
+		//public void ImportProjectFile()
+		//{
+		//	// stop current action
+		//	EndActionIfNotDefault();
+		//	ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_ViewManager );
+		//	StartEditAction( action );
+		//}
 
-		public void SaveProjectFile()
-		{
-			// stop current action
-			EndActionIfNotDefault();
-			SaveProjectFileAction action = new SaveProjectFileAction( m_DataManager );
-			StartEditAction( action );
-		}
+		//public void SaveProjectFile()
+		//{
+		//	// stop current action
+		//	EndActionIfNotDefault();
+		//	SaveProjectFileAction action = new SaveProjectFileAction( m_DataManager );
+		//	StartEditAction( action );
+		//}
 
 		public void AddPoint( AddPointType type )
 		{
