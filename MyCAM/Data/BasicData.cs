@@ -26,10 +26,10 @@ namespace MyCAM.Data
 
 	internal class PartObject : IObject
 	{
-		public PartObject( string szUID, TopoDS_Shape shapeData )
+		public PartObject( string szUID, TopoDS_Shape shape )
 		{
 			UID = szUID;
-			Shape = shapeData;
+			Shape = shape;
 		}
 
 		public string UID
@@ -59,8 +59,10 @@ namespace MyCAM.Data
 
 	internal abstract class PathObject : IObject
 	{
-		protected PathObject( string szUID, TopoDS_Shape shapeData, PathType pathShapeType )
+		protected PathObject( string szUID, TopoDS_Shape shape, PathType pathShapeType )
 		{
+			UID = szUID;
+			Shape = shape;
 			PathType = pathShapeType;
 		}
 
