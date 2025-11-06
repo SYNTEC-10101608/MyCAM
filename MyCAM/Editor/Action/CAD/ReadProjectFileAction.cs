@@ -52,7 +52,7 @@ namespace MyCAM.Editor
 					}
 
 					// turn DTO to data
-					dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData );
+					dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, PartObject> shapeDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData );
 
 					// set back to data manager
 					m_DataManager.ResetDataManger( shapeDataMap, partIDList, pathIDList, shapeIDs, entryAndExitData );
@@ -80,7 +80,7 @@ namespace MyCAM.Editor
 
 			// buill part tree
 			foreach( var szNewDataID in m_DataManager.PartIDList ) {
-				ShapeData data = m_DataManager.ShapeDataMap[ szNewDataID ];
+				PartObject data = m_DataManager.ShapeDataMap[ szNewDataID ];
 
 				// add node to the tree view
 				TreeNode node = new TreeNode( data.UID );
@@ -96,7 +96,7 @@ namespace MyCAM.Editor
 			// build path tree
 			m_ViewManager.PathNode.Nodes.Clear();
 			foreach( var szNewPathDataID in m_DataManager.PathIDList ) {
-				ShapeData data = m_DataManager.ShapeDataMap[ szNewPathDataID ];
+				PartObject data = m_DataManager.ShapeDataMap[ szNewPathDataID ];
 
 				// add a new node to the tree view
 				TreeNode node = new TreeNode( szNewPathDataID );

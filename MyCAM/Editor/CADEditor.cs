@@ -187,7 +187,7 @@ namespace MyCAM.Editor
 			m_ViewManager.ViewObjectMap.Clear();
 			m_ViewManager.TreeNodeMap.Clear();
 			foreach( var szNewDataID in m_DataManager.PartIDList ) {
-				ShapeData data = m_DataManager.ShapeDataMap[ szNewDataID ];
+				PartObject data = m_DataManager.ShapeDataMap[ szNewDataID ];
 
 				// add node to the tree view
 				TreeNode node = new TreeNode( data.UID );

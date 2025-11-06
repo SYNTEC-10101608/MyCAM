@@ -1076,12 +1076,12 @@ namespace MyCAM.Editor
 			if( string.IsNullOrEmpty( szPathID )
 				|| m_DataManager.ShapeDataMap.ContainsKey( szPathID ) == false
 				|| m_DataManager.ShapeDataMap[ szPathID ] == null
-				|| !( m_DataManager.ShapeDataMap[ szPathID ] is PathData
-				|| ( (PathData)m_DataManager.ShapeDataMap[ szPathID ] ).CAMData == null ) ) {
+				|| !( m_DataManager.ShapeDataMap[ szPathID ] is PathObject
+				|| ( (PathObject)m_DataManager.ShapeDataMap[ szPathID ] ).CAMData == null ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
 				return false;
 			}
-			camData = ( (PathData)m_DataManager.ShapeDataMap[ szPathID ] ).CAMData;
+			camData = ( (PathObject)m_DataManager.ShapeDataMap[ szPathID ] ).CAMData;
 			return true;
 		}
 

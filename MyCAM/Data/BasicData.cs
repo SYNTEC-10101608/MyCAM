@@ -1,16 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using OCC.BRep;
-using OCC.BRepBuilderAPI;
+﻿using OCC.BRepBuilderAPI;
 using OCC.gp;
-using OCC.TopExp;
 using OCC.TopoDS;
 
 namespace MyCAM.Data
 {
-	internal class ShapeData
+	internal interface IObject
 	{
-		public ShapeData( string szUID, TopoDS_Shape shapeData )
+		string UID
+		{
+			get;
+		}
+
+		TopoDS_Shape Shape
+		{
+			get;
+		}
+
+		void DoTransform( gp_Trsf transform );
+	}
+
+	internal class PartObject : IObject
+	{
+		public PartObject( string szUID, TopoDS_Shape shapeData )
 		{
 			UID = szUID;
 			Shape = shapeData;
@@ -33,44 +44,48 @@ namespace MyCAM.Data
 		}
 	}
 
-	// path data
-	internal class PathData : ShapeData
+	internal abstract class PathObject : IObject
 	{
-		public PathData( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathElementList )
-			: base( szUID, shapeData )
+		protected PathObject( string szUID, TopoDS_Shape shapeData, PathType pathShapeType )
 		{
-			TopoDS_Vertex startVertex = new TopoDS_Vertex();
-			TopoDS_Vertex endVertex = new TopoDS_Vertex();
-			TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
-			gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
-			gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
-			bool isClosed = startPoint.IsEqual( endPoint, 1e-3 );
-
-			m_CAMData = new CAMData( pathElementList, isClosed );
+			PathType = pathShapeType;
 		}
 
-		// to get path data from file
-		public PathData( string szUID, TopoDS_Shape shapeData, CAMData camData)
-		: base( szUID, shapeData )
+		public string UID
 		{
-			m_CAMData = camData;
+			get; private set;
 		}
 
-		public CAMData CAMData
+		public TopoDS_Shape Shape
 		{
-			get
-			{
-				return m_CAMData;
+			get; private set;
+		}
+
+		public PathType PathType
+		{
+			get; protected set;
+		}
+
+		public virtual void DoTransform( gp_Trsf transform )
+		{
+			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
+			Shape = shapeTransform.Shape();
+		}
+
+		public virtual void UpdateShape( TopoDS_Shape newShape )
+		{
+			Shape = newShape;
+		}
+
+		public virtual PathObject Clone()
+		{
+			PathObject newPathData = (PathObject)this.MemberwiseClone();
+			if( this.Shape != null ) {
+				BRepBuilderAPI_Copy copyShape = new BRepBuilderAPI_Copy( this.Shape );
+				newPathData.UpdateShape( copyShape.Shape() );
 			}
+			return newPathData;
 		}
-
-		public override void DoTransform( gp_Trsf transform )
-		{
-			base.DoTransform( transform );
-			m_CAMData.Transform( transform );
-		}
-
-		CAMData m_CAMData;
 	}
 
 	internal class PathEdge5D
@@ -90,5 +105,11 @@ namespace MyCAM.Data
 		{
 			get; private set;
 		}
+	}
+
+	public enum PathType
+	{
+		Contour = 0,
+		Rectangle = 1,
 	}
 }

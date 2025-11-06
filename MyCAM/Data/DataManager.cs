@@ -30,16 +30,16 @@ namespace MyCAM.Data
 		// TODO: this is temp solution
 		public DataManager()
 		{
-			ShapeDataMap = new Dictionary<string, ShapeData>();
+			ShapeDataMap = new Dictionary<string, PartObject>();
 			PartIDList = new List<string>();
 			PathIDList = new List<string>();
 			m_MachineData = m_DefaultMachineData;
 		}
 
-		public void ResetDataManger( Dictionary<string, ShapeData> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData )
+		public void ResetDataManger( Dictionary<string, PartObject> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData )
 		{
 			// check shape map is mach with partList & pathList
-			Dictionary<string, ShapeData> checkedShapeDataMap = new Dictionary<string, ShapeData>();
+			Dictionary<string, PartObject> checkedShapeDataMap = new Dictionary<string, PartObject>();
 			List<string> checkedPartIDList = new List<string>();
 			List<string> checkedPathIDList = new List<string>();
 
@@ -65,7 +65,7 @@ namespace MyCAM.Data
 			ResetShapeIDsByDTO( shapeIDs );
 		}
 
-		public Dictionary<string, ShapeData> ShapeDataMap
+		public Dictionary<string, PartObject> ShapeDataMap
 		{
 			get; private set;
 		}
@@ -119,7 +119,7 @@ namespace MyCAM.Data
 			if( newShape == null || newShape.IsNull() ) {
 				return;
 			}
-			List<ShapeData> newShapeData = ArrangeShapeData( newShape );
+			List<PartObject> newShapeData = ArrangeShapeData( newShape );
 			if( newShapeData.Count == 0 ) {
 				return; // no valid shape data
 			}
@@ -144,7 +144,7 @@ namespace MyCAM.Data
 				return;
 			}
 			string szID = "Ref_" + GetNewPartID( newFeature );
-			ShapeData newData = new ShapeData( szID, newFeature );
+			PartObject newData = new PartObject( szID, newFeature );
 			ShapeDataMap[ szID ] = newData;
 			PartIDList.Add( szID );
 			FeatureAdded?.Invoke( new List<string>() { szID } );
@@ -185,7 +185,7 @@ namespace MyCAM.Data
 				// add valid path
 				if( isValidPath ) {
 					string szID = "Path_" + ++m_PathID;
-					PathData pathData = new PathData( szID, pathWire, pathElements );
+					PathObject pathData = new PathData( szID, pathWire, pathElements );
 					pathData.CAMData.TraverseData = new TraverseData();
 					ShapeDataMap[ szID ] = pathData;
 					newPathIDList.Add( szID );
@@ -210,7 +210,7 @@ namespace MyCAM.Data
 		{
 			List<CAMData> camDataList = new List<CAMData>();
 			foreach( string pathID in PathIDList ) {
-				camDataList.Add( ( (PathData)ShapeDataMap[ pathID ] ).CAMData );
+				camDataList.Add( ( (PathObject)ShapeDataMap[ pathID ] ).CAMData );
 			}
 			return camDataList;
 		}
@@ -240,16 +240,16 @@ namespace MyCAM.Data
 			m_PathID = structShapeIDs.Path_ID;
 		}
 
-		List<ShapeData> ArrangeShapeData( TopoDS_Shape oneShape )
+		List<PartObject> ArrangeShapeData( TopoDS_Shape oneShape )
 		{
 			if( oneShape == null || oneShape.IsNull() ) {
-				return new List<ShapeData>();
+				return new List<PartObject>();
 			}
 			if( oneShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_COMPOUND ) {
 				string szID = GetNewPartID( oneShape );
-				return new List<ShapeData>() { new ShapeData( szID, oneShape ) };
+				return new List<PartObject>() { new PartObject( szID, oneShape ) };
 			}
-			List<ShapeData> result = new List<ShapeData>();
+			List<PartObject> result = new List<PartObject>();
 			foreach( TopoDS_Shape subShape in oneShape.elementsAsList ) {
 				result.AddRange( ArrangeShapeData( subShape ) );
 			}

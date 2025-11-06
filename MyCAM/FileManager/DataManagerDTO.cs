@@ -74,7 +74,7 @@ namespace MyCAM.FileManager
 			ToEntryAndExitDataDTO( dataManager.EntryAndExitData );
 		}
 
-		internal void DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData )
+		internal void DataMgrDTO2Data( out Dictionary<string, PartObject> shapeMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData )
 		{
 			shapeMap = ShapeMapDTOToShapeMap();
 			partIDList = PartIDListDTOToPartList();
@@ -86,7 +86,7 @@ namespace MyCAM.FileManager
 		#region Generate DTO
 
 		// ShapeDataMap → ShapeDataMapDTO
-		void ToShapeDataDTO( Dictionary<string, ShapeData> shapeDataMap )
+		void ToShapeDataDTO( Dictionary<string, PartObject> shapeDataMap )
 		{
 			ShapeDataMap = new List<PartDataDTO>();
 			if( shapeDataMap == null ) {
@@ -95,14 +95,14 @@ namespace MyCAM.FileManager
 			foreach( var shapeData in shapeDataMap ) {
 
 				// current index is path data
-				if( shapeData.Value is PathData path ) {
+				if( shapeData.Value is PathObject path ) {
 					PathDataDTO pathDataDTO = new PathDataDTO( path );
 					ShapeDataMap.Add( pathDataDTO );
 					continue;
 				}
 
 				// is part data
-				if( shapeData.Value is ShapeData ) {
+				if( shapeData.Value is PartObject ) {
 					PartDataDTO partDataDTO = new PartDataDTO( shapeData.Value );
 					ShapeDataMap.Add( partDataDTO );
 					continue;
@@ -142,22 +142,22 @@ namespace MyCAM.FileManager
 
 		#region Generate Data by DTO
 
-		Dictionary<string, ShapeData> ShapeMapDTOToShapeMap()
+		Dictionary<string, PartObject> ShapeMapDTOToShapeMap()
 		{
 			if( ShapeDataMap == null || ShapeDataMap.Count == 0 ) {
 				throw new ArgumentException( "ShapeDataMap deserialization failed." );
 			}
-			Dictionary<string, ShapeData> shapeMap = new Dictionary<string, ShapeData>();
+			Dictionary<string, PartObject> shapeMap = new Dictionary<string, PartObject>();
 			foreach( var entry in ShapeDataMap ) {
 
 				// need to identify pathDataDTO first, because partdata include pathdata
 				if( entry is PathDataDTO pathDataDTO ) {
-					PathData pathData = pathDataDTO.PathDTOToPathData();
+					PathObject pathData = pathDataDTO.PathDTOToPathData();
 					shapeMap.Add( pathDataDTO.UID, pathData );
 					continue;
 				}
 				if( entry is PartDataDTO partDataDTO ) {
-					ShapeData shapeData = partDataDTO.PartDTOToPartData();
+					PartObject shapeData = partDataDTO.PartDTOToPartData();
 					shapeMap.Add( partDataDTO.UID, shapeData );
 					continue;
 				}
@@ -222,7 +222,7 @@ namespace MyCAM.FileManager
 		}
 
 		// PartData → DTO
-		internal PartDataDTO( ShapeData shapeData )
+		internal PartDataDTO( PartObject shapeData )
 		{
 			if( shapeData == null ) {
 				return;
@@ -232,14 +232,14 @@ namespace MyCAM.FileManager
 		}
 
 		// DTO → PartData
-		internal ShapeData PartDTOToPartData()
+		internal PartObject PartDTOToPartData()
 		{
 			// protection
 			if( Shape == null || string.IsNullOrEmpty( UID ) ) {
 				throw new ArgumentNullException( "PartData deserialization failed." );
 			}
 			TopoDS_Shape topoShape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
-			return new ShapeData( UID, topoShape );
+			return new PartObject( UID, topoShape );
 		}
 	}
 
@@ -257,7 +257,7 @@ namespace MyCAM.FileManager
 		}
 
 		// PathData → DTO
-		internal PathDataDTO( PathData pathData )
+		internal PathDataDTO( PathObject pathData )
 		{
 			if( pathData == null ) {
 				return;
@@ -268,11 +268,11 @@ namespace MyCAM.FileManager
 		}
 
 		// DTO → PathData
-		internal PathData PathDTOToPathData()
+		internal PathObject PathDTOToPathData()
 		{
 			// protection
 			if( Shape == null || string.IsNullOrEmpty( UID ) ) {
-				throw new ArgumentNullException( "PathData deserialization failed." );
+				throw new ArgumentNullException( "PathObject deserialization failed." );
 			}
 			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
 			CAMData camData = CAMData.ToCAMData();
