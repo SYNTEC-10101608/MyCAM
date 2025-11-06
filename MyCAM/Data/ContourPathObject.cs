@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using OCC.TopoDS;
+using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
-	internal class ContourPathObject : CraftData
+	internal class ContourPathObject : PathObject
 	{
-		public ContourPathObject( List<PathEdge5D> pathDataList, CraftData craftData )
+		public ContourPathObject( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathDataList, CraftData craftData )
+			: base( szUID, shapeData, PathType.Contour )
 		{
 			m_PathEdge5DList = pathDataList;
 			m_CraftData = craftData;
@@ -18,11 +20,19 @@ namespace MyCAM.Data
 			}
 		}
 
-		public CraftData CraftData
+		public override CraftData CraftData
 		{
 			get
 			{
 				return m_CraftData;
+			}
+		}
+
+		public ContourCacheInfo ContourCacheInfo
+		{
+			get
+			{
+				return new ContourCacheInfo( m_PathEdge5DList, m_CraftData );
 			}
 		}
 

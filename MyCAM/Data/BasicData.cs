@@ -82,6 +82,11 @@ namespace MyCAM.Data
 			}
 		}
 
+		public virtual CraftData CraftData
+		{
+			get; set;
+		} = new CraftData();
+
 		public PathType PathType
 		{
 			get; protected set;

@@ -1,22 +1,14 @@
-﻿using System.Collections.Generic;
-
-namespace MyCAM.Data
+﻿namespace MyCAM.Data
 {
 	internal interface ICacheInfo
 	{
-		List<CAMPoint> LeadInCAMPointList
+		PathType PathType
 		{
 			get;
 		}
 
-		List<CAMPoint> LeadOutCAMPointList
-		{
-			get;
-		}
+		CAMPoint GetProcessStartPoint();
 
-		List<CAMPoint> OverCutCAMPointList
-		{
-			get;
-		}
+		CAMPoint GetProcessEndPoint();
 	}
 }
