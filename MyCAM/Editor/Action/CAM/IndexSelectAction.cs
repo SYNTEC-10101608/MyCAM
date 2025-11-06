@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
 using OCC.TopAbs;
@@ -8,19 +6,21 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
+using System;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
 	internal abstract class IndexSelectAction : KeyMouseActionBase
 	{
 		protected IndexSelectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
-			CAMData camData )
+			ContourCacheInfo cacheInfo )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
-			if( camData == null ) {
-				throw new ArgumentNullException( "PathIndexSelectAction constructing argument camData null" );
+			if( cacheInfo == null ) {
+				throw new ArgumentNullException( "PathIndexSelectAction constructing argument cacheInfo null" );
 			}
-			m_CAMData = camData;
+			m_CacheInfo = cacheInfo;
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}
@@ -107,8 +107,8 @@ namespace MyCAM.Editor
 			BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
 
 			// add points to the polygon
-			for( int i = 0; i < m_CAMData.CADPointList.Count; i++ ) {
-				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_CAMData.CADPointList[ i ].Point );
+			for( int i = 0; i < m_CacheInfo.CADPointList.Count; i++ ) {
+				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_CacheInfo.CADPointList[ i ].Point );
 				polygonMaker.Add( vertexMaker.Vertex() );
 				m_VertexMap.Bind( vertexMaker.Vertex(), i );
 			}
@@ -122,7 +122,7 @@ namespace MyCAM.Editor
 			m_SelectedPointAIS.SetWidth( 1e-3 );
 		}
 
-		protected CAMData m_CAMData;
+		protected ContourCacheInfo m_CacheInfo;
 
 		// map point on view to index on CAMData
 		protected TopTools_DataMapOfShapeInteger m_VertexMap;

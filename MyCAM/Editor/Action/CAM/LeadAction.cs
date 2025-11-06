@@ -8,19 +8,19 @@ namespace MyCAM.Editor
 {
 	internal class LeadAction : EditActionBase
 	{
-		public LeadAction( DataManager dataManager, List<CAMData> camDataList )
+		public LeadAction( DataManager dataManager, List<CraftData> craftDataList )
 			: base( dataManager )
 		{
-			if( camDataList == null || camDataList.Count == 0 ) {
-				throw new ArgumentNullException( "LeadAction constructing argument camDataList null or empty" );
+			if( craftDataList == null || craftDataList.Count == 0 ) {
+				throw new ArgumentNullException( "LeadAction constructing argument craftDataList null or empty" );
 			}
-			m_CAMDataList = camDataList;
+			m_CraftDataList = craftDataList;
 
 			// when user cancel the lead setting, need to turn path back
 			m_BackupLeadParamList = new List<LeadData>();
-			foreach( var camData in m_CAMDataList ) {
+			foreach( var camData in m_CraftDataList ) {
 				if( camData == null ) {
-					throw new ArgumentNullException( "LeadAction constructing argument camDataList contains null CAMData" );
+					throw new ArgumentNullException( "LeadAction constructing argument craftDataList contains null ContourCacheInfo" );
 				}
 				if( camData.LeadLineParam == null ) {
 					m_BackupLeadParamList.Add( new LeadData() );
@@ -76,19 +76,19 @@ namespace MyCAM.Editor
 
 		void SetLeadParamForAll( LeadData leadData )
 		{
-			foreach( var camData in m_CAMDataList ) {
+			foreach( var camData in m_CraftDataList ) {
 				camData.LeadLineParam = leadData.Clone();
 			}
 		}
 
 		void RestoreBackupLeadParams()
 		{
-			for( int i = 0; i < m_CAMDataList.Count; i++ ) {
-				m_CAMDataList[ i ].LeadLineParam = m_BackupLeadParamList[ i ].Clone();
+			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
+				m_CraftDataList[ i ].LeadLineParam = m_BackupLeadParamList[ i ].Clone();
 			}
 		}
 
-		List<CAMData> m_CAMDataList;
+		List<CraftData> m_CraftDataList;
 		List<LeadData> m_BackupLeadParamList;
 	}
 }
