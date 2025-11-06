@@ -26,7 +26,7 @@ namespace MyCAM.Post
 
 	internal static class PostHelper
 	{
-		public static bool SolvePath( PostSolver postSolver, CAMData currentCAMData,
+		public static bool SolvePath( PostSolver postSolver, ContourCacheInfo currentCAMData, CraftData craftData,
 			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
 			out PostData pathG54PostData, out PostData pathMCSPostData, out PathEndInfo currentPathtEndInfo )
 		{
@@ -50,7 +50,7 @@ namespace MyCAM.Post
 			bool bStart = false;
 
 			// lead-in
-			if( currentCAMData.LeadLineParam.LeadIn.Type != LeadLineType.None && currentCAMData.LeadInCAMPointList.Count > 0 ) {
+			if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None && currentCAMData.LeadInCAMPointList.Count > 0 ) {
 				if( !SolveProcessPath( postSolver, currentCAMData.LeadInCAMPointList,
 					out List<PostPoint> leadInG54, out List<PostPoint> leadInMCS,
 					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
@@ -81,7 +81,7 @@ namespace MyCAM.Post
 			}
 
 			// over-cut
-			if( currentCAMData.OverCutLength != 0 && currentCAMData.OverCutCAMPointList.Count > 0 ) {
+			if( craftData.OverCutLength != 0 && currentCAMData.OverCutCAMPointList.Count > 0 ) {
 				if( !SolveProcessPath( postSolver, currentCAMData.OverCutCAMPointList,
 					out List<PostPoint> overCutG54, out List<PostPoint> overCutMCS,
 					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
@@ -92,7 +92,7 @@ namespace MyCAM.Post
 			}
 
 			// lead-out
-			if( currentCAMData.LeadLineParam.LeadOut.Type != LeadLineType.None && currentCAMData.LeadOutCAMPointList.Count > 0 ) {
+			if( craftData.LeadLineParam.LeadOut.Type != LeadLineType.None && currentCAMData.LeadOutCAMPointList.Count > 0 ) {
 				if( !SolveProcessPath( postSolver, currentCAMData.LeadOutCAMPointList,
 					out List<PostPoint> leadOutG54, out List<PostPoint> leadOutMCS,
 					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
@@ -111,7 +111,7 @@ namespace MyCAM.Post
 
 			// traverse from previous path to current path
 			else {
-				CalculateTraverse( endInfoOfPreviousPath, currentCAMData, ref pathG54PostData, ref pathMCSPostData );
+				CalculateTraverse( endInfoOfPreviousPath, currentCAMData, craftData, ref pathG54PostData, ref pathMCSPostData );
 			}
 
 			// end info of current path
@@ -232,7 +232,7 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, CAMData currentCAMData, ref PostData pathG54PostData, ref PostData pathMCSPostData )
+		static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, ContourCacheInfo currentCAMData, CraftData craftData, ref PostData pathG54PostData, ref PostData pathMCSPostData )
 		{
 			if( endInfoOfPreviousPath == null || currentCAMData == null ) {
 				return;
@@ -244,12 +244,12 @@ namespace MyCAM.Post
 			// p4: cut down point of current path
 			// p5: start of current path (not used here)
 			CAMPoint p1 = endInfoOfPreviousPath.EndCAMPoint;
-			CAMPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, currentCAMData.TraverseData.LiftUpDistance );
-			CAMPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCAMData.GetProcessStartPoint(), currentCAMData.TraverseData.CutDownDistance );
+			CAMPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, craftData.TraverseData.LiftUpDistance );
+			CAMPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCAMData.GetProcessStartPoint(), craftData.TraverseData.CutDownDistance );
 			CAMPoint p5 = currentCAMData.GetProcessStartPoint();
 
 			// lift up
-			if( currentCAMData.TraverseData.LiftUpDistance > 0 && p2 != null ) {
+			if( craftData.TraverseData.LiftUpDistance > 0 && p2 != null ) {
 
 				// G54
 				pathG54PostData.LiftUpPostPoint = new PostPoint()
@@ -273,8 +273,8 @@ namespace MyCAM.Post
 			}
 
 			// frog leap
-			if( currentCAMData.TraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
-				CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCAMData.TraverseData.FrogLeapDistance );
+			if( craftData.TraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
+				CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, craftData.TraverseData.FrogLeapDistance );
 
 				if( p3 != null ) {
 					// G54 middle point
@@ -300,7 +300,7 @@ namespace MyCAM.Post
 			}
 
 			// cut down
-			if( currentCAMData.TraverseData.CutDownDistance > 0 && p4 != null ) {
+			if( craftData.TraverseData.CutDownDistance > 0 && p4 != null ) {
 
 				// G54
 				pathG54PostData.CutDownPostPoint = new PostPoint()
@@ -322,11 +322,11 @@ namespace MyCAM.Post
 					Slave = pathMCSPostData.ProcessStartPoint.Slave
 				};
 			}
-			pathG54PostData.FollowSafeDistance = currentCAMData.TraverseData.FollowSafeDistance;
-			pathMCSPostData.FollowSafeDistance = currentCAMData.TraverseData.FollowSafeDistance;
+			pathG54PostData.FollowSafeDistance = craftData.TraverseData.FollowSafeDistance;
+			pathMCSPostData.FollowSafeDistance = craftData.TraverseData.FollowSafeDistance;
 		}
 
-		static void CalculateEntry( CAMData currentCAMData, EntryAndExitData entryAndExitData, ref PostData pathG54PostData, ref PostData pathMCSPostData )
+		static void CalculateEntry( ContourCacheInfo currentCAMData, EntryAndExitData entryAndExitData, ref PostData pathG54PostData, ref PostData pathMCSPostData )
 		{
 			if( currentCAMData == null || entryAndExitData == null ) {
 				return;

@@ -7,12 +7,13 @@ namespace MyCAM.Post
 {
 	internal class NCWriter
 	{
-		public NCWriter( List<CAMData> processDataList, MachineData machineData, EntryAndExitData entryAndExitData )
+		public NCWriter( List<ContourCacheInfo> processCacheInfo, List<CraftData> craftDataList, MachineData machineData, EntryAndExitData entryAndExitData )
 		{
-			if( processDataList == null || machineData == null || entryAndExitData == null ) {
+			if( processCacheInfo == null || machineData == null || entryAndExitData == null ) {
 				throw new ArgumentNullException( "NCWriter constructor argument is null." );
 			}
-			m_ProcessDataList = processDataList;
+			m_ProcessCacheInfo = processCacheInfo;
+			m_CraftDataList = craftDataList;
 			m_MachineData = machineData;
 			m_PostSolver = new PostSolver( machineData );
 			m_MasterAxisName = ConvertRotaryAxisName( m_MachineData.MasterRotaryAxis );
@@ -20,7 +21,8 @@ namespace MyCAM.Post
 			m_EntryAndExitData = entryAndExitData;
 		}
 
-		List<CAMData> m_ProcessDataList;
+		List<ContourCacheInfo> m_ProcessCacheInfo;
+		List<CraftData> m_CraftDataList;
 		StreamWriter m_StreamWriter;
 		PostSolver m_PostSolver;
 		MachineData m_MachineData;
@@ -42,10 +44,10 @@ namespace MyCAM.Post
 
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
-					for( int i = 0; i < m_ProcessDataList.Count; i++ ) {
+					for( int i = 0; i < m_ProcessCacheInfo.Count; i++ ) {
 
 						// solve all post data of the path
-						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessDataList[ i ],
+						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessCacheInfo[ i ], m_CraftDataList[ i ],
 							endInfoOfPreviousPath, m_EntryAndExitData,
 							out PostData postData, out _, out endInfoOfPreviousPath ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
@@ -55,7 +57,7 @@ namespace MyCAM.Post
 					}
 
 					// write exit
-					if( m_ProcessDataList.Count > 0 ) {
+					if( m_ProcessCacheInfo.Count > 0 ) {
 
 						// calculate exit point
 						PostHelper.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out PostPoint exitPoint, out _ );
