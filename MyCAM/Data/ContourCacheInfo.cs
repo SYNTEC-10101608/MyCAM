@@ -25,6 +25,14 @@ namespace MyCAM.Data
 			BuildCAMPointList();
 		}
 
+		public PathType PathType
+		{
+			get
+			{
+				return PathType.Contour;
+			}
+		}
+
 		#region result
 		public List<CADPoint> CADPointList
 		{
@@ -159,8 +167,9 @@ namespace MyCAM.Data
 			return camPoint;
 		}
 
-		public void UpdateCacheInfo()
+		public void UpdateCacheInfo( CraftData craftData )
 		{
+			m_CraftData = craftData;
 			BuildCAMPointList();
 		}
 
