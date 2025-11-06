@@ -30,7 +30,7 @@ namespace MyCAM.Data
 		// TODO: this is temp solution
 		public DataManager()
 		{
-			ShapeDataMap = new Dictionary<string, PartObject>();
+			ObjectMap = new Dictionary<string, IObject>();
 			PartIDList = new List<string>();
 			PathIDList = new List<string>();
 			m_MachineData = m_DefaultMachineData;
@@ -39,7 +39,7 @@ namespace MyCAM.Data
 		public void ResetDataManger( Dictionary<string, PartObject> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData )
 		{
 			// check shape map is mach with partList & pathList
-			Dictionary<string, PartObject> checkedShapeDataMap = new Dictionary<string, PartObject>();
+			Dictionary<string, IObject> checkedShapeDataMap = new Dictionary<string, IObject>();
 			List<string> checkedPartIDList = new List<string>();
 			List<string> checkedPathIDList = new List<string>();
 
@@ -58,16 +58,21 @@ namespace MyCAM.Data
 					checkedPathIDList.Add( pathDataID );
 				}
 			}
-			ShapeDataMap = checkedShapeDataMap;
+			ObjectMap = checkedShapeDataMap;
 			PartIDList = checkedPartIDList;
 			PathIDList = checkedPathIDList;
 			EntryAndExitData = entryAndExitData;
 			ResetShapeIDsByDTO( shapeIDs );
 		}
 
-		public Dictionary<string, PartObject> ShapeDataMap
+		public Dictionary<string, IObject> ObjectMap
 		{
 			get; private set;
+		}
+
+		public Dictionary<string, ICacheInfo> CacheInfoMap
+		{
+			get; set;
 		}
 
 		public List<string> PartIDList
@@ -126,13 +131,13 @@ namespace MyCAM.Data
 
 			// clear all datas
 			ResetShapeIDs();
-			ShapeDataMap.Clear();
+			ObjectMap.Clear();
 			PartIDList.Clear();
 			PathIDList.Clear();
 
 			// update all datas
 			foreach( var shapeData in newShapeData ) {
-				ShapeDataMap[ shapeData.UID ] = shapeData;
+				ObjectMap[ shapeData.UID ] = shapeData;
 				PartIDList.Add( shapeData.UID );
 			}
 			PartChanged?.Invoke();
@@ -145,7 +150,7 @@ namespace MyCAM.Data
 			}
 			string szID = "Ref_" + GetNewPartID( newFeature );
 			PartObject newData = new PartObject( szID, newFeature );
-			ShapeDataMap[ szID ] = newData;
+			ObjectMap[ szID ] = newData;
 			PartIDList.Add( szID );
 			FeatureAdded?.Invoke( new List<string>() { szID } );
 		}
@@ -185,9 +190,9 @@ namespace MyCAM.Data
 				// add valid path
 				if( isValidPath ) {
 					string szID = "Path_" + ++m_PathID;
-					PathObject pathData = new PathData( szID, pathWire, pathElements );
-					pathData.CAMData.TraverseData = new TraverseData();
-					ShapeDataMap[ szID ] = pathData;
+					ContourPathObject contourPathObject = new ContourPathObject( szID, pathWire, pathElements, new CraftData() );
+					contourPathObject.CraftData.TraverseData = new TraverseData();
+					ObjectMap[ szID ] = contourPathObject;
 					newPathIDList.Add( szID );
 				}
 			}
@@ -203,16 +208,28 @@ namespace MyCAM.Data
 				return;
 			}
 			PathIDList.Remove( pathID );
-			ShapeDataMap.Remove( pathID );
+			ObjectMap.Remove( pathID );
 		}
 
-		public List<CAMData> GetCAMDataList()
+		public List<ICacheInfo> GetCacheInfoList()
 		{
-			List<CAMData> camDataList = new List<CAMData>();
+			List<ICacheInfo> cacheInfoList = new List<ICacheInfo>();
 			foreach( string pathID in PathIDList ) {
-				camDataList.Add( ( (PathObject)ShapeDataMap[ pathID ] ).CAMData );
+				cacheInfoList.Add( CacheInfoMap[ pathID ] );
 			}
-			return camDataList;
+			return cacheInfoList;
+		}
+
+		public List<ContourCacheInfo> GetContourCacheInfoList()
+		{
+			List<ContourCacheInfo> cacheInfoList = new List<ContourCacheInfo>();
+			foreach( string pathID in PathIDList ) {
+				if( CacheInfoMap[ pathID ].PathType == PathType.Rectangle ) {
+					continue;
+				}
+				cacheInfoList.Add( CacheInfoMap[ pathID ] as ContourCacheInfo );
+			}
+			return cacheInfoList;
 		}
 
 		public ShapeIDsStruct GetShapeIDsForDTO()
@@ -296,7 +313,7 @@ namespace MyCAM.Data
 			if( shape == null || shape.IsNull() ) {
 				return string.Empty;
 			}
-			foreach( var model in ShapeDataMap.Values ) {
+			foreach( var model in ObjectMap.Values ) {
 				if( model.Shape.IsEqual( shape ) ) {
 					return model.UID;
 				}
