@@ -16,6 +16,11 @@ namespace MyCAM.Data
 			get;
 		}
 
+		ObjectType ObjectType
+		{
+			get;
+		}
+
 		void DoTransform( gp_Trsf transform );
 	}
 
@@ -35,6 +40,14 @@ namespace MyCAM.Data
 		public TopoDS_Shape Shape
 		{
 			get; private set;
+		}
+
+		public ObjectType ObjectType
+		{
+			get
+			{
+				return ObjectType.Part;
+			}
 		}
 
 		public virtual void DoTransform( gp_Trsf transform )
@@ -59,6 +72,14 @@ namespace MyCAM.Data
 		public TopoDS_Shape Shape
 		{
 			get; private set;
+		}
+
+		public ObjectType ObjectType
+		{
+			get
+			{
+				return ObjectType.Path;
+			}
 		}
 
 		public PathType PathType
@@ -105,6 +126,12 @@ namespace MyCAM.Data
 		{
 			get; private set;
 		}
+	}
+
+	public enum ObjectType
+	{
+		Part = 0,
+		Path = 1,
 	}
 
 	public enum PathType
