@@ -80,7 +80,7 @@ namespace MyCAM.Editor
 
 			// buill part tree
 			foreach( var szNewDataID in m_DataManager.PartIDList ) {
-				PartObject data = m_DataManager.ShapeDataMap[ szNewDataID ];
+				PartObject data = m_DataManager.ObjectMap[ szNewDataID ];
 
 				// add node to the tree view
 				TreeNode node = new TreeNode( data.UID );
@@ -96,7 +96,7 @@ namespace MyCAM.Editor
 			// build path tree
 			m_ViewManager.PathNode.Nodes.Clear();
 			foreach( var szNewPathDataID in m_DataManager.PathIDList ) {
-				PartObject data = m_DataManager.ShapeDataMap[ szNewPathDataID ];
+				PartObject data = m_DataManager.ObjectMap[ szNewPathDataID ];
 
 				// add a new node to the tree view
 				TreeNode node = new TreeNode( szNewPathDataID );
@@ -104,7 +104,7 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szNewPathDataID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ShapeDataMap[ szNewPathDataID ].Shape );
+				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ObjectMap[ szNewPathDataID ].Shape );
 				m_ViewManager.ViewObjectMap.Add( szNewPathDataID, new ViewObject( aisShape ) );
 			}
 
