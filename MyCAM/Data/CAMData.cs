@@ -149,11 +149,19 @@ namespace MyCAM.Data
 			get {
 				return m_CADSegmentList.Select( segment => segment.Clone() ).ToList();
 			}
-			private set
-			{
-				if( value != null ) {
-					m_CADSegmentList = value;
-				}
+		}
+
+		void AddSegment( ICADSegmentElement segment )
+		{
+			if( segment != null ) {
+				m_CADSegmentList.Add( segment );
+			}	
+		}
+
+		void AddSegment( IEnumerable<ICADSegmentElement> segmentList )
+		{
+			if( segmentList != null ) {
+				m_CADSegmentList.AddRange( segmentList );
 			}
 		}
 
@@ -564,7 +572,6 @@ namespace MyCAM.Data
 
 		void BuildCADSegment()
 		{
-			CADSegmentList = new List<ICADSegmentElement>();
 			CADPointList = new List<CADPoint>();
 			List<CADPoint> tempCADPointList = new List<CADPoint>();
 			if( m_PathEdge5DList == null ) {
@@ -581,7 +588,7 @@ namespace MyCAM.Data
 				if( GeometryTool.IsLine( edge, out _, out _ ) ) {
 					tempCADPointList = Pretreatment.GetSegmentPointsByEqualLength( edge, shellFace, PRECISION_MAX_LENGTH, false, out double dEdgeLength, out double dPointSpace );
 					LineCADSegment lineSegment = new LineCADSegment( tempCADPointList, dEdgeLength, dPointSpace );
-					CADSegmentList.Add( lineSegment );
+					AddSegment( lineSegment );
 				}
 
 				// this curve is arc use equal length split
@@ -598,7 +605,7 @@ namespace MyCAM.Data
 					for( int j = 0; j < arcEdgeList.Count; j++ ) {
 						tempCADPointList = Pretreatment.GetSegmentPointsByEqualLength( arcEdgeList[ j ], shellFace, PRECISION_MAX_LENGTH, false, out double dEdgeLength, out double dPointSpace );
 						ArcCADSegment arcSegment = new ArcCADSegment( tempCADPointList, dEdgeLength, dPointSpace );
-						CADSegmentList.Add( arcSegment );
+						AddSegment( arcSegment );
 					}
 				}
 
@@ -608,10 +615,11 @@ namespace MyCAM.Data
 					List<TopoDS_Edge> segmentEdgeList = Pretreatment.GetBsplineToEdgeList( edge, shellFace );
 
 					// each edge use equal length split
-					CADSegmentList.AddRange( Pretreatment.GetCADSegmentLineFromShortEdge( segmentEdgeList, shellFace ) );
+					AddSegment( Pretreatment.GetCADSegmentLineFromShortEdge( segmentEdgeList, shellFace ) );
 				}
 				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, i == 0, i == m_PathEdge5DList.Count - 1 ) );
 			}
+			m_NewStartPoint = (CADSegmentList.Count - 1, CADSegmentList[ CADSegmentList.Count - 1 ].PointList.Count - 1);
 		}
 
 		/// <summary>
