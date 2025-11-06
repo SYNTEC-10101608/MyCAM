@@ -41,6 +41,15 @@ namespace MyCAM.Helper
 			return camPoint;
 		}
 
+		public static CAMPoint GetCAMPointWithAssignDir( CADPoint cadPoint, gp_Dir assignDir)
+		{
+			if( cadPoint == null ) {
+				return null;
+			}
+			CAMPoint camPoint = new CAMPoint( cadPoint, assignDir );
+			return camPoint;
+		}
+
 		public static gp_Vec GetModifyToolVecByMap( CAMData camData, (int, int) nTargetPnt )
 		{
 			CADPoint targetCADPnt = camData.CADSegmentList[ nTargetPnt.Item1 ].PointList[ nTargetPnt.Item2 ];
@@ -773,6 +782,18 @@ namespace MyCAM.Helper
 			return camLineSegment;
 		}
 
+		public static LineCAMSegment BuildCAMLineSegmentWithAssignDir( List<CADPoint> linePointList, gp_Dir assignDir , bool isModify = false )
+		{
+			LineCAMSegment camLineSegment = null;
+			if( linePointList == null || linePointList.Count < 2 ) {
+				return camLineSegment;
+			}
+			CAMPoint startCAMPoint = GetCAMPointWithAssignDir( linePointList[ 0 ], assignDir );
+			CAMPoint endCAMPoint = GetCAMPointWithAssignDir( linePointList[ linePointList.Count - 1 ], assignDir );
+			camLineSegment = new LineCAMSegment( startCAMPoint, endCAMPoint, isModify );
+			return camLineSegment;
+		}
+
 		public static ArcCAMSegment BuildCAMArcSegment( List<CADPoint> arcPointList, bool isToolVecReverse, bool isModify = false )
 		{
 			ArcCAMSegment camArcSegment = null;
@@ -791,6 +812,27 @@ namespace MyCAM.Helper
 			CADPoint EstimatedMidCADPoint = GetArcMidPoint( arcPointList );
 			CAMPoint EstimatedMidCAMPoint = GetCAMPoint( EstimatedMidCADPoint, isToolVecReverse );
 			camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, EstimatedMidCAMPoint,false );
+			return camArcSegment;
+		}
+
+		public static ArcCAMSegment BuildCAMArcSegmentWithAssignDir( List<CADPoint> arcPointList, gp_Dir assignDir, bool isModify = false )
+		{
+			ArcCAMSegment camArcSegment = null;
+			if( arcPointList == null || arcPointList.Count < 2 ) {
+				return camArcSegment;
+			}
+			CAMPoint startCAMPoint = GetCAMPointWithAssignDir( arcPointList[ 0 ], assignDir );
+			CAMPoint endCAMPoint = GetCAMPointWithAssignDir( arcPointList[ arcPointList.Count - 1 ], assignDir );
+
+			if( arcPointList.Count % 2 != 0 ) {
+				CAMPoint realMidCAMPoint = GetCAMPointWithAssignDir( arcPointList[ arcPointList.Count / 2 ], assignDir );
+				camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, realMidCAMPoint, isModify );
+				return camArcSegment;
+			}
+
+			CADPoint EstimatedMidCADPoint = GetArcMidPoint( arcPointList );
+			CAMPoint EstimatedMidCAMPoint = GetCAMPointWithAssignDir( EstimatedMidCADPoint, assignDir );
+			camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, EstimatedMidCAMPoint, false );
 			return camArcSegment;
 		}
 
