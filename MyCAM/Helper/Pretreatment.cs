@@ -169,8 +169,6 @@ namespace MyCAM.Helper
 				// create new edges using 2D curves + faces
 				BRepBuilderAPI_MakeEdge maker = new BRepBuilderAPI_MakeEdge( trimmed2d, surface );
 				TopoDS_Edge subEdge = maker.Edge();
-				Console.WriteLine( "New" + subEdge.Orientation() );
-				Console.Write( "Ori" + edge.Orientation() );
 				subEdge.Orientation( edge.Orientation() );
 				subEdgeList.Add( subEdge );
 			}

@@ -497,9 +497,7 @@ namespace MyCAM.Data
 				camPoint = leadCAMSegment.FirstOrDefault()?.StartPoint;
 				return camPoint;
 			}
-
-			int nStartPointIndex = StartPointIndex;
-			camPoint = BreakedCAMSegmentList[ nStartPointIndex ].StartPoint;
+			camPoint = BreakedCAMSegmentList[ 0 ].StartPoint;
 			return camPoint;
 		}
 
@@ -516,8 +514,8 @@ namespace MyCAM.Data
 				camPoint = leadCAMSegment.LastOrDefault()?.EndPoint;
 				return camPoint;
 			}
-			int nStartPointIndex = StartPointIndex;
-			camPoint = BreakedCAMSegmentList[ nStartPointIndex ].StartPoint;
+			
+			camPoint = BreakedCAMSegmentList[ 0 ].StartPoint;
 			return camPoint;
 		}
 
@@ -552,23 +550,6 @@ namespace MyCAM.Data
 		const double PRECISION_DEFLECTION = 0.01;
 		const double PRECISION_MAX_LENGTH = 1;
 		const double PRECISION_MIN_ERROR = 0.001;
-
-		void BuildCADPointList()
-		{
-			CADPointList = new List<CADPoint>();
-			if( m_PathEdge5DList == null ) {
-				return;
-			}
-
-			// go through the contour edges
-			for( int i = 0; i < m_PathEdge5DList.Count; i++ ) {
-				TopoDS_Edge edge = m_PathEdge5DList[ i ].PathEdge;
-				TopoDS_Face shellFace = m_PathEdge5DList[ i ].ComponentFace;
-				TopoDS_Face solidFace = m_PathEdge5DList[ i ].ComponentFace; // TODO: set solid face
-				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace,
-					i == 0, i == m_PathEdge5DList.Count - 1 ) );
-			}
-		}
 
 		void BuildCADSegment()
 		{

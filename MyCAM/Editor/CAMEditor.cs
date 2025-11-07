@@ -566,6 +566,7 @@ namespace MyCAM.Editor
 			// 排好的 + 原生toolbar
 			List<ICADSegmentElement> breakedCADSegment = BreakByToolVecBar( reorderedSegment, ModifyMapList, ControlBarMap, out Dictionary<int, (int, int)> ControlBarMapedAsIndex );
 			List<ICAMSegmentElement> camSegmentList = BuildCAMSegment( camData, breakedCADSegment, ControlBarMapedAsIndex );
+			camData.BreakedCAMSegmentList = camSegmentList;
 		}
 
 
@@ -667,21 +668,25 @@ namespace MyCAM.Editor
 					for( int k = startBarIndex + 1; k < breakedCADSegment.Count; k++ ) {
 						dLengthFromStart += breakedCADSegment[ k ].TotalLength;
 					}
-					for( int k = 0; k <= i; k++ ) {
-						dLengthFromStart += breakedCADSegment[ k ].TotalLength;
+
+					// 他在0~end區間
+					if (i<= endBarIndex ) {
+						for( int k = 0; k <= i; k++ ) {
+							dLengthFromStart += breakedCADSegment[ k ].TotalLength;
+						}
 					}
 				}
 
 				gp_Dir camSegmentStartToolVec = GetInterpolateToolVecByLength( startToolVec, endToolVec, dLengthFromStart - breakedCADSegment[ i ].TotalLength, dTotalLength );
-				gp_Dir endSegmentStartToolVec = GetInterpolateToolVecByLength( startToolVec, endToolVec, dLengthFromStart, dTotalLength );
+				gp_Dir camSegmentEndToolVec = GetInterpolateToolVecByLength( startToolVec, endToolVec, dLengthFromStart, dTotalLength );
 				CAMPoint startCAMPoint = new CAMPoint( breakedCADSegment[ i ].StartPoint, camSegmentStartToolVec );
-				CAMPoint endCAMPoint = new CAMPoint( breakedCADSegment[ i ].EndPoint, endSegmentStartToolVec );
+				CAMPoint endCAMPoint = new CAMPoint( breakedCADSegment[ i ].EndPoint, camSegmentEndToolVec );
 				if( breakedCADSegment[ i ].ContourType == EContourType.Line ) {
 					LineCAMSegment lineCAMSegment = new LineCAMSegment( startCAMPoint, endCAMPoint, false );
 					camSegmentList.Add( lineCAMSegment );
 				}
 				else {
-					gp_Dir midToolVec = GetDirAverage( camSegmentStartToolVec, endSegmentStartToolVec );
+					gp_Dir midToolVec = GetDirAverage( camSegmentStartToolVec, camSegmentEndToolVec );
 					CAMPoint midCAMPoint = new CAMPoint( breakedCADSegment[ i ].PointList[ breakedCADSegment[ i ].PointList.Count / 2 ], midToolVec );
 					ArcCAMSegment arcCAMSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, midCAMPoint, false );
 					camSegmentList.Add( arcCAMSegment );
@@ -712,7 +717,7 @@ namespace MyCAM.Editor
 			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
 
 			gp_Quaternion q = new gp_Quaternion();
-			slerp.Interpolate( dDeltaLength, ref q );
+			slerp.Interpolate( dDeltaLength / dTotalLength , ref q );
 			gp_Trsf trsf = new gp_Trsf();
 			trsf.SetRotation( q );
 			gp_Dir toolVecDir = new gp_Dir( startToolVec.Transformed( trsf ) );
@@ -737,6 +742,7 @@ namespace MyCAM.Editor
 
 		List<int> FindBarIndexRange( List<int> barIndex, int targetIndex )
 		{
+			// first index is left side bar, second index is right sight bar
 			List<int> result = new List<int>();
 			barIndex.Sort();
 			int nextBarIndex = -1;
@@ -744,11 +750,13 @@ namespace MyCAM.Editor
 
 				// find the first bar index which is larger than target index
 				if( barIndex[ i ] >= targetIndex ) {
-					result.Add( i );
+					result.Add( barIndex[ i ] );
 					nextBarIndex = i;
 					break;
 				}
 			}
+
+			// 他的右邊沒有控制點
 			if( nextBarIndex == -1 ) {
 				result.Add( barIndex.Last() );
 				result.Add( barIndex.First() );
@@ -832,7 +840,10 @@ namespace MyCAM.Editor
 			}
 
 			// no need to break segment
-			if( startPoint.pointIndex == camData.CADSegmentList[ startPoint.segment ].PointList.Count - 1 || startPoint.pointIndex == 0 ) {
+			if( startPoint.pointIndex == camData.CADSegmentList[ startPoint.segment ].PointList.Count - 1 ) {
+				ICADSegmentElement realLastSegment = reorderedCADSegmentList.First();
+				reorderedCADSegmentList.RemoveAt( 0 );
+				reorderedCADSegmentList.Add( realLastSegment );
 				return reorderedCADSegmentList;
 			}
 

@@ -112,7 +112,7 @@ namespace MyCAM.Editor
 				for( int j = 0; j < m_CAMData.CADSegmentList[ i ].PointList.Count; j++ ) {
 
 					// 後面幾段的起點不用畫
-					if( j == 0 && i != 0 ) {
+					if( j == 0) {
 						continue;
 					}
 					BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_CAMData.CADSegmentList[ i ].PointList[ j ].Point );
@@ -124,7 +124,6 @@ namespace MyCAM.Editor
 			if( polygonMaker.IsDone() == false ) {
 				return;
 			}
-			Console.WriteLine( nCount );
 			TopoDS_Wire wire = polygonMaker.Wire();
 			m_SelectedPointAIS = new AIS_Shape( wire );
 
