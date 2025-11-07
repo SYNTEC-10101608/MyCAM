@@ -50,6 +50,11 @@ namespace MyCAM.Data
 			}
 		}
 
+		public PathType PathType
+		{
+			get; protected set;
+		}
+
 		public virtual void DoTransform( gp_Trsf transform )
 		{
 			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
@@ -87,7 +92,7 @@ namespace MyCAM.Data
 		public virtual CraftData CraftData
 		{
 			get; set;
-		} = new CraftData();
+		}
 
 		public PathType PathType
 		{

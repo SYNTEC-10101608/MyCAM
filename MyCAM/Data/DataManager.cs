@@ -69,12 +69,6 @@ namespace MyCAM.Data
 		{
 			get; private set;
 		}
-
-		public Dictionary<string, ICacheInfo> CacheInfoMap
-		{
-			get; set;
-		}
-
 		public List<string> PartIDList
 		{
 			get; private set;
@@ -124,9 +118,9 @@ namespace MyCAM.Data
 			if( newShape == null || newShape.IsNull() ) {
 				return;
 			}
-			List<PartObject> newShapeData = ArrangeShapeData( newShape );
-			if( newShapeData.Count == 0 ) {
-				return; // no valid shape data
+			List<PartObject> newPartObjectList = ArrangeObject( newShape );
+			if( newPartObjectList.Count == 0 ) {
+				return; // no valid object
 			}
 
 			// clear all datas
@@ -136,9 +130,9 @@ namespace MyCAM.Data
 			PathIDList.Clear();
 
 			// update all datas
-			foreach( var shapeData in newShapeData ) {
-				ObjectMap[ shapeData.UID ] = shapeData;
-				PartIDList.Add( shapeData.UID );
+			foreach( var objectData in newPartObjectList ) {
+				ObjectMap[ objectData.UID ] = objectData;
+				PartIDList.Add( objectData.UID );
 			}
 			PartChanged?.Invoke();
 		}
@@ -190,7 +184,7 @@ namespace MyCAM.Data
 				// add valid path
 				if( isValidPath ) {
 					string szID = "Path_" + ++m_PathID;
-					ContourPathObject contourPathObject = new ContourPathObject( szID, pathWire, pathElements, new CraftData() );
+					ContourPathObject contourPathObject = new ContourPathObject( szID, pathWire, pathElements, new CraftData( szID ) );
 					contourPathObject.CraftData.TraverseData = new TraverseData();
 					ObjectMap[ szID ] = contourPathObject;
 					newPathIDList.Add( szID );
@@ -211,23 +205,14 @@ namespace MyCAM.Data
 			ObjectMap.Remove( pathID );
 		}
 
-		public List<ICacheInfo> GetCacheInfoList()
-		{
-			List<ICacheInfo> cacheInfoList = new List<ICacheInfo>();
-			foreach( string pathID in PathIDList ) {
-				cacheInfoList.Add( CacheInfoMap[ pathID ] );
-			}
-			return cacheInfoList;
-		}
-
 		public List<ContourCacheInfo> GetContourCacheInfoList()
 		{
 			List<ContourCacheInfo> cacheInfoList = new List<ContourCacheInfo>();
 			foreach( string pathID in PathIDList ) {
-				if( CacheInfoMap[ pathID ].PathType == PathType.Rectangle ) {
+				if( ( ObjectMap[ pathID ] as PartObject ).PathType == PathType.Rectangle ) {
 					continue;
 				}
-				cacheInfoList.Add( CacheInfoMap[ pathID ] as ContourCacheInfo );
+				cacheInfoList.Add( ObjectMap[ pathID ] as ContourCacheInfo );
 			}
 			return cacheInfoList;
 		}
@@ -257,7 +242,7 @@ namespace MyCAM.Data
 			m_PathID = structShapeIDs.Path_ID;
 		}
 
-		List<PartObject> ArrangeShapeData( TopoDS_Shape oneShape )
+		List<PartObject> ArrangeObject( TopoDS_Shape oneShape )
 		{
 			if( oneShape == null || oneShape.IsNull() ) {
 				return new List<PartObject>();
@@ -268,7 +253,7 @@ namespace MyCAM.Data
 			}
 			List<PartObject> result = new List<PartObject>();
 			foreach( TopoDS_Shape subShape in oneShape.elementsAsList ) {
-				result.AddRange( ArrangeShapeData( subShape ) );
+				result.AddRange( ArrangeObject( subShape ) );
 			}
 			return result;
 		}
