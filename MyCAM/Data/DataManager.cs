@@ -184,7 +184,7 @@ namespace MyCAM.Data
 				// add valid path
 				if( isValidPath ) {
 					string szID = "Path_" + ++m_PathID;
-					ContourPathObject contourPathObject = new ContourPathObject( szID, pathWire, pathElements, new CraftData( szID ) );
+					ContourPathObject contourPathObject = new ContourPathObject( this, szID, pathWire, pathElements );
 					contourPathObject.CraftData.TraverseData = new TraverseData();
 					ObjectMap[ szID ] = contourPathObject;
 					newPathIDList.Add( szID );
@@ -213,6 +213,15 @@ namespace MyCAM.Data
 					continue;
 				}
 				cacheInfoList.Add( ObjectMap[ pathID ] as ContourCacheInfo );
+			}
+			return cacheInfoList;
+		}
+
+		public List<ICacheInfo> GetCacheInfoList()
+		{
+			List<ICacheInfo> cacheInfoList = new List<ICacheInfo>();
+			foreach( string pathID in PathIDList ) {
+				cacheInfoList.Add( ObjectMap[ pathID ] as ICacheInfo );
 			}
 			return cacheInfoList;
 		}
