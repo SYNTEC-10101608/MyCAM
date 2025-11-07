@@ -8,9 +8,9 @@ namespace MyCAM.Editor
 	internal class StartPointAction : IndexSelectAction
 	{
 		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
-			: base( dataManager, viewer, treeView, viewManager, cacheInfo )
+			: base( dataManager, viewer, treeView, viewManager, pathID )
 		{
-			m_CraftData = craftData ?? new CraftData();
+			m_CraftData = ( m_DataManager.ObjectMap[ m_PathID ] as ContourPathObject ).CraftData;
 		}
 
 		public override EditActionType ActionType

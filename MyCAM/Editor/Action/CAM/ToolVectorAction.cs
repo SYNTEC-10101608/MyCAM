@@ -16,6 +16,7 @@ namespace MyCAM.Editor
 		public ToolVectorAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
 			: base( dataManager, viewer, treeView, viewManager, pathID )
 		{
+			m_CraftData = ( m_DataManager.ObjectMap[ m_PathID ] as ContourPathObject ).CraftData;
 		}
 
 		public override EditActionType ActionType
@@ -121,10 +122,10 @@ namespace MyCAM.Editor
 		void SetToolVecParam( int VecIndex, ToolVecParam toolVecParam )
 		{
 			if( !toolVecParam.IsModified ) {
-				m_CacheInfo.RemoveToolVecModify( VecIndex );
+				m_CraftData.RemoveToolVecModify( VecIndex );
 				return;
 			}
-			m_CacheInfo.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
+			m_CraftData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
 		}
 
 		void DrawVertexOnViewer( TopoDS_Shape selectedVertex )
@@ -151,5 +152,6 @@ namespace MyCAM.Editor
 
 		// to storage which vertex keep show high light point on viewer
 		AIS_Shape m_KeepedHighLightPoint = null;
+		CraftData m_CraftData = null;
 	}
 }

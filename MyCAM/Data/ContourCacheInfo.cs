@@ -13,8 +13,8 @@ namespace MyCAM.Data
 {
 	internal class ContourCacheInfo : ICacheInfo
 	{
-		List<PathEdge5D> m_PathEdge5DList = new List<PathEdge5D>();
-		CraftData m_CraftData = new CraftData();
+		List<PathEdge5D> m_PathEdge5DList;
+		CraftData m_CraftData;
 
 		public ContourCacheInfo( string szID, List<PathEdge5D> pathDataList, CraftData craftData )
 		{
@@ -46,94 +46,60 @@ namespace MyCAM.Data
 		}
 
 		// To-do：use this function is Dirty
-		public List<CAMPoint> CAMPointList
+		internal List<CAMPoint> CAMPointList
 		{
 			get
 			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
 				return m_CAMPointList;
 			}
 		}
 
 		// To-do：use this function is Dirty
-		public List<CAMPoint> LeadInCAMPointList
+		internal List<CAMPoint> LeadInCAMPointList
 		{
 			get
 			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
 				return m_LeadInCAMPointList;
 			}
 		}
 
 		// To-do：use this function is Dirty
-		public List<CAMPoint> LeadOutCAMPointList
+		internal List<CAMPoint> LeadOutCAMPointList
 		{
 			get
 			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
 				return m_LeadOutCAMPointList;
 			}
 		}
 
 		// To-do：use this function is Dirty
-		public List<CAMPoint> OverCutCAMPointList
+		internal List<CAMPoint> OverCutCAMPointList
 		{
 			get
 			{
+				if( m_IsDirty ) {
+					BuildCAMPointList();
+					m_IsDirty = false;
+				}
 				return m_OverCutPointList;
-			}
-		}
-
-		public Dictionary<int, Tuple<double, double>> ToolVecModifyMap
-		{
-			get
-			{
-				return new Dictionary<int, Tuple<double, double>>( m_ToolVecModifyMap );
 			}
 		}
 
 		#endregion
 
 		#region Public API
-		// API for outside modification
-		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
-		{
-			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				dRA_deg = m_ToolVecModifyMap[ index ].Item1;
-				dRB_deg = m_ToolVecModifyMap[ index ].Item2;
-				return true;
-			}
-			else {
-				dRA_deg = 0;
-				dRB_deg = 0;
-				return false;
-			}
-		}
-
-		// To-do：use this function is Dirty
-		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg )
-		{
-			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				m_ToolVecModifyMap[ index ] = new Tuple<double, double>( dRA_deg, dRB_deg );
-			}
-			else {
-				m_ToolVecModifyMap.Add( index, new Tuple<double, double>( dRA_deg, dRB_deg ) );
-			}
-		}
-
-		// To-do：use this function is Dirty
-		public void RemoveToolVecModify( int index )
-		{
-			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				m_ToolVecModifyMap.Remove( index );
-			}
-		}
-
-		public HashSet<int> GetToolVecModifyIndex()
-		{
-			HashSet<int> result = new HashSet<int>();
-			foreach( int nIndex in m_ToolVecModifyMap.Keys ) {
-				result.Add( nIndex );
-			}
-			return result;
-		}
 
 		// To-do：use this function is Dirty
 		public void Transform( gp_Trsf transform )
