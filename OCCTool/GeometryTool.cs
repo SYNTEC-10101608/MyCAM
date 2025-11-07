@@ -81,6 +81,32 @@ namespace OCCTool
 			return midpoint;
 		}
 
+		public static gp_Pnt FindMidPoint( gp_Pnt p1, gp_Pnt p2 )
+		{
+			double dMidX = ( p1.x + p2.x ) / 2.0;
+			double dMidY = ( p1.y + p2.y ) / 2.0;
+			double dMidZ = ( p1.z + p2.z ) / 2.0;
+			return new gp_Pnt( dMidX, dMidY, dMidZ );
+		}
+
+		public static gp_Dir GetDirAverage( gp_Dir dir1, gp_Dir dir2 )
+		{
+			if( dir1 == null || dir2 == null ) {
+				return null;
+			}
+			if( dir1.IsOpposite( dir2, 1e-3 ) ) {
+				return dir1;
+			}
+			if( dir1.IsParallel( dir2, 1e-3 ) ) {
+				return dir1;
+			}
+			gp_Vec v1 = new gp_Vec( dir1 );
+			gp_Vec v2 = new gp_Vec( dir2 );
+			gp_Vec vAvg = v1.Added( v2 );
+			gp_Dir avgDir = new gp_Dir( vAvg );
+			return avgDir;
+		}
+
 		public static bool IsApproximatelyLinear( TopoDS_Edge edge )
 		{
 			return IsApproximatelyLinear( edge, out _, out _ );
