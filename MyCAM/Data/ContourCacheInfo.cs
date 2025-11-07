@@ -16,8 +16,9 @@ namespace MyCAM.Data
 		List<PathEdge5D> m_PathEdge5DList;
 		CraftData m_CraftData;
 
-		public ContourCacheInfo( string szID, List<PathEdge5D> pathDataList, CraftData craftData )
+		public ContourCacheInfo( DataManager dataManager, string szID, List<PathEdge5D> pathDataList, CraftData craftData )
 		{
+			m_DataManager = dataManager;
 			m_PathEdge5DList = pathDataList;
 			m_CraftData = craftData;
 			UID = szID;
@@ -50,7 +51,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				if( m_IsDirty ) {
+				if( m_CraftData.GetCraftDataIsDirty() || m_IsDirty ) {
 					BuildCAMPointList();
 					m_IsDirty = false;
 				}
@@ -63,7 +64,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				if( m_IsDirty ) {
+				if( m_CraftData.GetCraftDataIsDirty() || m_IsDirty ) {
 					BuildCAMPointList();
 					m_IsDirty = false;
 				}
@@ -76,7 +77,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				if( m_IsDirty ) {
+				if( m_CraftData.GetCraftDataIsDirty() || m_IsDirty ) {
 					BuildCAMPointList();
 					m_IsDirty = false;
 				}
@@ -89,7 +90,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				if( m_IsDirty ) {
+				if( m_CraftData.GetCraftDataIsDirty() || m_IsDirty ) {
 					BuildCAMPointList();
 					m_IsDirty = false;
 				}
@@ -108,11 +109,16 @@ namespace MyCAM.Data
 			foreach( CADPoint cadPoint in CADPointList ) {
 				cadPoint.Transform( transform );
 			}
+			m_IsDirty = true;
 		}
 
 		// To-do：use this function is Dirty
 		public CAMPoint GetProcessStartPoint()
 		{
+			if( m_IsDirty ) {
+				BuildCAMPointList();
+				m_IsDirty = false;
+			}
 			CAMPoint camPoint = null;
 			if( m_LeadInCAMPointList.Count > 0 && m_CraftData.LeadLineParam.LeadIn.Length > 0 ) {
 				camPoint = m_LeadInCAMPointList.First().Clone();
@@ -126,6 +132,10 @@ namespace MyCAM.Data
 		// To-do：use this function is Dirty
 		public CAMPoint GetProcessEndPoint()
 		{
+			if( m_IsDirty ) {
+				BuildCAMPointList();
+				m_IsDirty = false;
+			}
 			CAMPoint camPoint = null;
 			if( m_LeadOutCAMPointList.Count > 0 && m_CraftData.LeadLineParam.LeadOut.Length > 0 ) {
 				camPoint = m_LeadOutCAMPointList.Last().Clone();
@@ -139,16 +149,14 @@ namespace MyCAM.Data
 			return camPoint;
 		}
 
-		public void UpdateCacheInfo( CraftData craftData )
-		{
-			m_CraftData = craftData;
-			//BuildCAMPointList();
-		}
-
 		#endregion
 
 		void BuildCADPointList()
 		{
+			//if( m_DataManager.ObjectMap.ContainsKey( UID ) ) {
+			//	m_PathEdge5DList = ( m_DataManager.ObjectMap[ UID ] as ContourPathObject ).PathDataList;
+			//}
+
 			CADPointList = new List<CADPoint>();
 			if( m_PathEdge5DList == null ) {
 				return;
@@ -256,6 +264,9 @@ namespace MyCAM.Data
 
 		void BuildCAMPointList()
 		{
+			//if( m_DataManager.ObjectMap.ContainsKey( UID ) ) {
+			//	m_CraftData = ( m_DataManager.ObjectMap[ UID ] as ContourPathObject ).CraftData;
+			//}
 			m_IsDirty = false;
 			m_CAMPointList = new List<CAMPoint>();
 			SetToolVec();
@@ -293,15 +304,15 @@ namespace MyCAM.Data
 
 		void ModifyToolVec()
 		{
-			if( m_ToolVecModifyMap.Count == 0 ) {
+			if( m_CraftData.ToolVecModifyMap.Count == 0 ) {
 				return;
 			}
 
 			// all tool vector are modified to the same value, no need to do interpolation
-			if( m_ToolVecModifyMap.Count == 1 ) {
-				gp_Vec newVec = GetVecFromAB( m_CAMPointList[ m_ToolVecModifyMap.Keys.First() ],
-					m_ToolVecModifyMap.Values.First().Item1 * Math.PI / 180,
-					m_ToolVecModifyMap.Values.First().Item2 * Math.PI / 180 );
+			if( m_CraftData.ToolVecModifyMap.Count == 1 ) {
+				gp_Vec newVec = GetVecFromAB( m_CAMPointList[ m_CraftData.ToolVecModifyMap.Keys.First() ],
+					m_CraftData.ToolVecModifyMap.Values.First().Item1 * Math.PI / 180,
+					m_CraftData.ToolVecModifyMap.Values.First().Item2 * Math.PI / 180 );
 				foreach( CAMPoint camPoint in m_CAMPointList ) {
 					camPoint.ToolVec = new gp_Dir( newVec.XYZ() );
 				}
@@ -352,7 +363,7 @@ namespace MyCAM.Data
 		List<Tuple<int, int>> GetInterpolateIntervalList()
 		{
 			// sort the modify data by index
-			List<int> indexInOrder = m_ToolVecModifyMap.Keys.ToList();
+			List<int> indexInOrder = m_CraftData.ToolVecModifyMap.Keys.ToList();
 			indexInOrder.Sort();
 			List<Tuple<int, int>> intervalList = new List<Tuple<int, int>>();
 			if( m_CraftData.IsClosed ) {
@@ -378,11 +389,11 @@ namespace MyCAM.Data
 
 			// get the start and end tool vector
 			gp_Vec startVec = GetVecFromAB( m_CAMPointList[ nStartIndex ],
-				m_ToolVecModifyMap[ nStartIndex ].Item1 * Math.PI / 180,
-				m_ToolVecModifyMap[ nStartIndex ].Item2 * Math.PI / 180 );
+				m_CraftData.ToolVecModifyMap[ nStartIndex ].Item1 * Math.PI / 180,
+				m_CraftData.ToolVecModifyMap[ nStartIndex ].Item2 * Math.PI / 180 );
 			gp_Vec endVec = GetVecFromAB( m_CAMPointList[ nEndIndex ],
-				m_ToolVecModifyMap[ nEndIndex ].Item1 * Math.PI / 180,
-				m_ToolVecModifyMap[ nEndIndex ].Item2 * Math.PI / 180 );
+				m_CraftData.ToolVecModifyMap[ nEndIndex ].Item1 * Math.PI / 180,
+				m_CraftData.ToolVecModifyMap[ nEndIndex ].Item2 * Math.PI / 180 );
 
 			// get the total distance for interpolation parameter
 			double totaldistance = 0;
@@ -594,10 +605,10 @@ namespace MyCAM.Data
 		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
-		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 
 		// dirty flag
 		bool m_IsDirty = false;
+		DataManager m_DataManager = null;
 
 		// Discretize parameters
 		Dictionary<CADPoint, CADPoint> m_ConnectPointMap = new Dictionary<CADPoint, CADPoint>();
