@@ -93,9 +93,8 @@ namespace MyCAM.Post
 					// 這條路
 					for( int i = 0; i < m_ProcessDataList.Count; i++ ) {
 
-						// 這條路的各段,現在只有Main
 						// solve master and slave angle
-						bool buildSuccess = BuildCAMSegmentHelper.BuildCAMSegment_New( m_ProcessDataList[ i ], out PathCAMSegmentPage camSegmentPage );
+						bool buildSuccess = BuildCAMSegmentHelper.GetCAMSegmentPage( m_ProcessDataList[ i ], out PathCAMSegmentPage camSegmentPage );
 						if( buildSuccess == false ) {
 							return false;
 						}
@@ -173,8 +172,6 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" );
 			return;
 		}
-
-
 
 		void WriteOnePoint( PostPoint postPoint )
 		{
@@ -358,9 +355,7 @@ namespace MyCAM.Post
 			PostPoint lastPostPoint = null;
 			for( int i = 0; i < processPathSegmentPostPath.Count; i++ ) {
 
-				// 第一條路要從安全距離下降到起點
 				if( i == 0 ) {
-					// WriteOnePoint( new gp_Pnt( processPathSegmentPostPath[ i ].StartPoint.X, processPathSegmentPostPath[ i ].StartPoint.Y, processPathSegmentPostPath[ i ].StartPoint.Z ), processPathSegmentPostPath[ i ].StartPoint.Master, processPathSegmentPostPath[ i ].StartPoint.Slave );
 					lastPostPoint = processPathSegmentPostPath[ i ].StartPoint;
 				}
 				if( IsSamePostPoint( processPathSegmentPostPath[ i ].StartPoint, lastPostPoint ) == false ) {
