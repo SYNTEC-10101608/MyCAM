@@ -122,6 +122,7 @@ namespace MyCAM.Data
 			// build raw data
 			BuildCADSegment();
 			BuildCAMPointList_New();
+			BuildPathCAMSegment();
 		}
 
 		// for construct path by reading file
@@ -137,6 +138,7 @@ namespace MyCAM.Data
 			m_OverCutLength = dOverCutLength;
 			m_ToolVecModifyMap = ToolVecModifyMap;
 			BuildCAMPointList_New();
+			BuildPathCAMSegment();
 		}
 
 		internal List<CADPoint> CADPointList
@@ -146,7 +148,8 @@ namespace MyCAM.Data
 
 		internal List<ICADSegmentElement> CADSegmentList
 		{
-			get {
+			get
+			{
 				return m_CADSegmentList.Select( segment => segment.Clone() ).ToList();
 			}
 		}
@@ -155,7 +158,7 @@ namespace MyCAM.Data
 		{
 			if( segment != null ) {
 				m_CADSegmentList.Add( segment );
-			}	
+			}
 		}
 
 		void AddSegment( IEnumerable<ICADSegmentElement> segmentList )
@@ -171,6 +174,7 @@ namespace MyCAM.Data
 			{
 				if( m_IsDirty ) {
 					BuildCAMPointList_New();
+					BuildPathCAMSegment();
 					m_IsDirty = false;
 				}
 				return m_BrakedCAMSegment;
@@ -191,7 +195,7 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				if ( value != null ) {
+				if( value != null ) {
 					m_ControlBarIndex = value;
 				}
 			}
@@ -205,6 +209,7 @@ namespace MyCAM.Data
 			{
 				if( m_IsDirty ) {
 					BuildCAMPointList_New();
+					BuildPathCAMSegment();
 					m_IsDirty = false;
 				}
 				return m_CAMPointList;
@@ -217,6 +222,7 @@ namespace MyCAM.Data
 			{
 				if( m_IsDirty ) {
 					BuildCAMPointList_New();
+					BuildPathCAMSegment();
 					m_IsDirty = false;
 				}
 				return m_LeadInCAMPointList;
@@ -229,6 +235,7 @@ namespace MyCAM.Data
 			{
 				if( m_IsDirty ) {
 					BuildCAMPointList_New();
+					BuildPathCAMSegment();
 					m_IsDirty = false;
 				}
 				return m_LeadOutCAMPointList;
@@ -241,6 +248,7 @@ namespace MyCAM.Data
 			{
 				if( m_IsDirty ) {
 					BuildCAMPointList_New();
+					BuildPathCAMSegment();
 					m_IsDirty = false;
 				}
 				return m_OverCutPointList;
@@ -292,20 +300,6 @@ namespace MyCAM.Data
 			}
 		}
 
-		public int StartPointIndex
-		{
-			get
-			{
-				return m_StartPointIndex;
-			}
-			set
-			{
-				if( m_StartPointIndex != value ) {
-					m_StartPointIndex = value;
-				}
-			}
-		}
-
 		public (int, int) NewStartPoint
 		{
 			get
@@ -316,6 +310,7 @@ namespace MyCAM.Data
 			{
 				if( m_NewStartPoint != value ) {
 					m_NewStartPoint = value;
+					m_IsDirty = true;
 				}
 			}
 		}
@@ -479,7 +474,6 @@ namespace MyCAM.Data
 			}
 		}
 
-
 		public HashSet<int> GetToolVecModifyIndex()
 		{
 			HashSet<int> result = new HashSet<int>();
@@ -495,6 +489,12 @@ namespace MyCAM.Data
 			foreach( CADPoint cadPoint in CADPointList ) {
 				cadPoint.Transform( transform );
 			}
+
+			foreach( ICADSegmentElement cADSegmentElement in m_CADSegmentList ) {
+				foreach( CADPoint cadPoint in cADSegmentElement.PointList ) {
+					cadPoint.Transform( transform );
+				}
+			}
 			m_IsDirty = true;
 		}
 
@@ -502,7 +502,7 @@ namespace MyCAM.Data
 		{
 			if( m_IsDirty ) {
 				BuildCAMPointList_New();
-				m_IsDirty = false;
+				BuildPathCAMSegment();
 			}
 			CAMPoint camPoint = null;
 
@@ -519,6 +519,7 @@ namespace MyCAM.Data
 		{
 			if( m_IsDirty ) {
 				BuildCAMPointList_New();
+				BuildPathCAMSegment();
 				m_IsDirty = false;
 			}
 
@@ -528,7 +529,7 @@ namespace MyCAM.Data
 				camPoint = leadCAMSegment.LastOrDefault()?.EndPoint;
 				return camPoint;
 			}
-			
+
 			camPoint = BreakedCAMSegmentList[ 0 ].StartPoint;
 			return camPoint;
 		}
@@ -745,6 +746,379 @@ namespace MyCAM.Data
 			SetLeadout();
 		}
 
+		#region Build CAM Segment
+
+		void BuildPathCAMSegment()
+		{
+			List<ICADSegmentElement> reorderedSegment = BreakAndReorderByStartPoint( this );
+			List<(int, int)> ModifyMapList = ModidyInexMap( this, reorderedSegment.Count, out Dictionary<(int, int), (int, int)> ControlBarMap );
+			List<ICADSegmentElement> breakedCADSegment = BreakByToolVecBar( reorderedSegment, ModifyMapList, ControlBarMap, out Dictionary<int, (int, int)> ControlBarMapedAsIndex );
+			List<ICAMSegmentElement> camSegmentList = BuildCAMSegment( this, breakedCADSegment, ControlBarMapedAsIndex );
+			List<int> controlBarIndex = ControlBarMapedAsIndex.Keys.ToList();
+			this.BreakedCAMSegmentList = camSegmentList;
+			this.ControlBarIndexList = controlBarIndex;
+		}
+
+		List<ICAMSegmentElement> BuildCAMSegment( CAMData camData, List<ICADSegmentElement> breakedCADSegment, Dictionary<int, (int, int)> ControlBarMapedAsIndex )
+		{
+			List<ICAMSegmentElement> camSegmentList = new List<ICAMSegmentElement>();
+
+			if( ControlBarMapedAsIndex.Count == 0 ) {
+				for( int i = 0; i < breakedCADSegment.Count; i++ ) {
+					if( breakedCADSegment[ i ].ContourType == EContourType.Line ) {
+						LineCAMSegment lineCAMSegment = BuildCAMSegmentHelper.BuildCAMLineSegment( breakedCADSegment[ i ].PointList, camData.IsToolVecReverse );
+						camSegmentList.Add( lineCAMSegment );
+					}
+					else {
+						ArcCAMSegment arcCAMSegment = BuildCAMSegmentHelper.BuildCAMArcSegment( breakedCADSegment[ i ].PointList, camData.IsToolVecReverse );
+						camSegmentList.Add( arcCAMSegment );
+					}
+				}
+				return camSegmentList;
+			}
+			camSegmentList = BuildCAMSegmentWithSeveralToolBar( camData, breakedCADSegment, ControlBarMapedAsIndex );
+			return camSegmentList;
+		}
+
+		List<ICAMSegmentElement> BuildCAMSegmentWithSeveralToolBar( CAMData camData, List<ICADSegmentElement> breakedCADSegment, Dictionary<int, (int, int)> ControlBarMapedAsIndex )
+		{
+			if( ControlBarMapedAsIndex.Count == 0 || breakedCADSegment.Count == 0 ) {
+				return new List<ICAMSegmentElement>();
+			}
+			List<ICAMSegmentElement> camSegmentList = new List<ICAMSegmentElement>();
+
+			// the segment with control bar
+			List<int> barIndexList = ControlBarMapedAsIndex.Keys.ToList();
+			barIndexList.Sort();
+
+			for( int i = 0; i < breakedCADSegment.Count; i++ ) {
+				List<int> barIndexRange = FindBarIndexRange( barIndexList, i );
+				int startBarIndex = barIndexRange[ 0 ];
+				int endBarIndex = barIndexRange[ 1 ];
+
+				gp_Vec startToolVec = GetToolVecByBreakedSegmenIndex( camData, breakedCADSegment, startBarIndex, ControlBarMapedAsIndex );
+				gp_Vec endToolVec = GetToolVecByBreakedSegmenIndex( camData, breakedCADSegment, endBarIndex, ControlBarMapedAsIndex );
+
+				if( startToolVec == null || endToolVec == null ) {
+					continue;
+				}
+
+				// calculate total length from start bar to end bar
+				double dTotalLength = SumSegmentLength( breakedCADSegment, startBarIndex, endBarIndex );
+				double dLengthFromStartBar = SumSegmentLength( breakedCADSegment, startBarIndex, i );
+				gp_Dir camSegmentStartToolVec = GetInterpolateToolVecByLength( startToolVec, endToolVec, dLengthFromStartBar - breakedCADSegment[ i ].TotalLength, dTotalLength );
+				gp_Dir camSegmentEndToolVec = GetInterpolateToolVecByLength( startToolVec, endToolVec, dLengthFromStartBar, dTotalLength );
+				CAMPoint startCAMPoint = new CAMPoint( breakedCADSegment[ i ].StartPoint, camSegmentStartToolVec );
+				CAMPoint endCAMPoint = new CAMPoint( breakedCADSegment[ i ].EndPoint, camSegmentEndToolVec );
+
+				if( breakedCADSegment[ i ].ContourType == EContourType.Line ) {
+					LineCAMSegment lineCAMSegment = new LineCAMSegment( startCAMPoint, endCAMPoint, false );
+					camSegmentList.Add( lineCAMSegment );
+				}
+				else {
+					gp_Dir midToolVec = GeometryTool.GetDirAverage( camSegmentStartToolVec, camSegmentEndToolVec );
+					CAMPoint midCAMPoint;
+					if( breakedCADSegment[ i ].PointList.Count < 3 ) {
+						CADPoint midCADPoint = GetMidCAMPointForShortSegment( breakedCADSegment[ i ].StartPoint, breakedCADSegment[ i ].EndPoint );
+						midCAMPoint = new CAMPoint( midCADPoint, midToolVec );
+					}
+					else {
+						midCAMPoint = new CAMPoint( breakedCADSegment[ i ].PointList[ breakedCADSegment[ i ].PointList.Count / 2 ], midToolVec );
+					}
+					ArcCAMSegment arcCAMSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, midCAMPoint, false );
+					camSegmentList.Add( arcCAMSegment );
+				}
+			}
+			return camSegmentList;
+		}
+
+		CADPoint GetMidCAMPointForShortSegment( CADPoint startCADPoint, CADPoint endCAMPoint )
+		{
+			gp_Pnt midPoint = GeometryTool.FindMidPoint( startCADPoint.Point, endCAMPoint.Point );
+			gp_Dir normalVec = GeometryTool.GetDirAverage( startCADPoint.NormalVec_1st, endCAMPoint.NormalVec_1st );
+			gp_Dir tanVec = GeometryTool.GetDirAverage( startCADPoint.TangentVec, endCAMPoint.TangentVec );
+			CADPoint midCADPoint = new CADPoint( midPoint, normalVec, normalVec, tanVec );
+			return midCADPoint;
+		}
+
+		double SumSegmentLength( List<ICADSegmentElement> segmentList, int startIndex, int endIndex )
+		{
+			int nSegmentCount = segmentList.Count;
+			if( segmentList == null || segmentList.Count == 0 ) {
+				return 0.0;
+			}
+			if( startIndex < 0 || startIndex >= nSegmentCount || endIndex < 0 || endIndex >= nSegmentCount ) {
+				return 0.0;
+			}
+
+			double dLength = 0.0;
+			int nCurrent = ( startIndex + 1 ) % nSegmentCount;
+			while( true ) {
+				dLength += segmentList[ nCurrent ].TotalLength;
+				if( nCurrent == endIndex ) {
+					break;
+				}
+				nCurrent = ( nCurrent + 1 ) % nSegmentCount;
+			}
+			return dLength;
+		}
+
+		gp_Dir GetInterpolateToolVecByLength( gp_Vec startToolVec, gp_Vec endToolVec, double dDeltaLength, double dTotalLength )
+		{
+			// get the quaternion for interpolation
+			gp_Quaternion q12 = new gp_Quaternion( startToolVec, endToolVec );
+			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
+
+			gp_Quaternion q = new gp_Quaternion();
+			slerp.Interpolate( dDeltaLength / dTotalLength, ref q );
+			gp_Trsf trsf = new gp_Trsf();
+			trsf.SetRotation( q );
+			gp_Dir toolVecDir = new gp_Dir( startToolVec.Transformed( trsf ) );
+			return toolVecDir;
+		}
+
+		gp_Vec GetToolVecByBreakedSegmenIndex( CAMData camData, List<ICADSegmentElement> breakedCADSegment, int targetIndex, Dictionary<int, (int, int)> ControlBarMapedAsIndex )
+		{
+			// real bar index in original CAD segment
+			if( ControlBarMapedAsIndex.TryGetValue( targetIndex, out (int, int) oriSegmentIndex ) ) {
+
+				// get AB value
+				if( camData.ToolVecModifyMap_New.TryGetValue( oriSegmentIndex, out Tuple<double, double> AB_Value ) ) {
+					CADPoint cadPoint = breakedCADSegment[ targetIndex ].PointList.Last();
+					CAMPoint camPoint = BuildCAMSegmentHelper.GetCAMPoint( cadPoint, camData.IsToolVecReverse );
+					gp_Vec ToolVec = GetVecFromAB( camPoint, AB_Value.Item1 * Math.PI / 180, AB_Value.Item2 * Math.PI / 180 );
+					return ToolVec;
+				}
+			}
+			return null;
+		}
+
+		List<int> FindBarIndexRange( List<int> barIndex, int targetIndex )
+		{
+			if( barIndex == null || barIndex.Count == 0 ) {
+				return new List<int>();
+			}
+			barIndex.Sort();
+
+			// find first index which >= targetIndex
+			int nextBarPos = barIndex.FindIndex( x => x >= targetIndex );
+
+			// no found means all bar is smaller than target index
+			if( nextBarPos == -1 ) {
+				return new List<int> { barIndex.Last(), barIndex.First() };
+			}
+
+			// find the largest value less than taget index
+			int prevBarPos = ( nextBarPos - 1 + barIndex.Count ) % barIndex.Count;
+			return new List<int> { barIndex[ prevBarPos ], barIndex[ nextBarPos ] };
+		}
+
+		List<(int, int)> ModidyInexMap( CAMData camData, int SegmentCount, out Dictionary<(int, int), (int, int)> ControlBarMap )
+		{
+			ControlBarMap = new Dictionary<(int, int), (int, int)>();
+			List<(int, int)> modifyMap = camData.ToolVecModifyMap_New.Keys.ToList();
+			if( modifyMap.Count == 0 ) {
+				return modifyMap;
+			}
+
+			(int segment, int pointIndex) startPoint = camData.NewStartPoint;
+			for( int i = 0; i < modifyMap.Count; i++ ) {
+
+				// start point is at the end of segment, that segment no change
+				if( camData.CADSegmentList.Count == SegmentCount ) {
+					(int, int) backup = modifyMap[ i ];
+					int newSegmentIndex = ( modifyMap[ i ].Item1 - startPoint.segment - 1 + camData.CADSegmentList.Count ) % camData.CADSegmentList.Count;
+					modifyMap[ i ] = (newSegmentIndex, modifyMap[ i ].Item2);
+					ControlBarMap.Add( modifyMap[ i ], backup );
+				}
+
+				// start point is at the middle of segment, that segment be breaked into two segments
+				else {
+
+					// not at start segment, need to modify segment index
+					if( modifyMap[ i ].Item1 != startPoint.segment ) {
+						(int, int) backup = modifyMap[ i ];
+						int newSegmentIndex = ( ( modifyMap[ i ].Item1 - startPoint.segment + camData.CADSegmentList.Count ) % camData.CADSegmentList.Count );
+						modifyMap[ i ] = (newSegmentIndex, modifyMap[ i ].Item2);
+						ControlBarMap.Add( modifyMap[ i ], backup );
+					}
+
+					// is at start segment
+					else {
+						if( modifyMap[ i ].Item2 > startPoint.pointIndex ) {
+							(int, int) backup = modifyMap[ i ];
+
+							// in the first part
+							modifyMap[ i ] = (0, modifyMap[ i ].Item2 - startPoint.pointIndex);
+							ControlBarMap.Add( modifyMap[ i ], backup );
+						}
+						else {
+
+							// in the last 
+							(int, int) backup = modifyMap[ i ];
+							int newSegmentIndex = SegmentCount - 1;
+							modifyMap[ i ] = (newSegmentIndex, modifyMap[ i ].Item2);
+							ControlBarMap.Add( modifyMap[ i ], backup );
+						}
+					}
+				}
+			}
+			return modifyMap;
+		}
+
+		List<ICADSegmentElement> BreakAndReorderByStartPoint( CAMData camData )
+		{
+			(int segment, int pointIndex) startPoint = camData.NewStartPoint;
+			List<ICADSegmentElement> reorderedCADSegmentList = new List<ICADSegmentElement>();
+
+			// reorder segment list
+			List<ICADSegmentElement> cadSegmentList = camData.CADSegmentList;
+			for( int i = 0; i < cadSegmentList.Count; i++ ) {
+				int index = ( startPoint.segment + i ) % cadSegmentList.Count;
+				reorderedCADSegmentList.Add( cadSegmentList[ index ] );
+			}
+
+			// no need to break segment
+			if( startPoint.pointIndex == camData.CADSegmentList[ startPoint.segment ].PointList.Count - 1 ) {
+				ICADSegmentElement realLastSegment = reorderedCADSegmentList.First();
+				reorderedCADSegmentList.RemoveAt( 0 );
+				reorderedCADSegmentList.Add( realLastSegment );
+				return reorderedCADSegmentList;
+			}
+
+			bool isSuccess = SeparateCADSegmentAtTargetIndex( camData.CADSegmentList[ startPoint.segment ], startPoint.pointIndex, out List<ICADSegmentElement> breakedCADSegmentList );
+
+			if( isSuccess ) {
+
+				// this segment need to break
+				reorderedCADSegmentList.RemoveAt( 0 );
+
+				// insert breaked segment ( [0] is segment after start point, [1] is segment before start point)
+				reorderedCADSegmentList.Insert( 0, breakedCADSegmentList.First() );
+				reorderedCADSegmentList.Add( breakedCADSegmentList.Last() );
+				return reorderedCADSegmentList;
+			}
+			return reorderedCADSegmentList;
+		}
+
+		List<ICADSegmentElement> BreakByToolVecBar( List<ICADSegmentElement> orderedCADSegmentList, List<(int, int)> modifyBar, Dictionary<(int, int), (int, int)> ControlBarMap, out Dictionary<int, (int, int)> ControlBarMapedAsIndex )
+		{
+			ControlBarMapedAsIndex = new Dictionary<int, (int, int)>();
+			List<ICADSegmentElement> breakedCADSegmentList = new List<ICADSegmentElement>();
+			if( modifyBar.Count == 0 ) {
+				return orderedCADSegmentList;
+			}
+
+			modifyBar.Sort();
+			for( int segmentIndex = 0; segmentIndex < orderedCADSegmentList.Count; segmentIndex++ ) {
+				List<int> breakPointIndex = new List<int>();
+				for( int j = 0; j < modifyBar.Count; j++ ) {
+
+					// last point no need to break
+					if( modifyBar[ j ].Item1 == segmentIndex ) {
+						breakPointIndex.Add( modifyBar[ j ].Item2 );
+					}
+				}
+				// no need to break
+				if( breakPointIndex.Count == 0 ) {
+					breakedCADSegmentList.Add( orderedCADSegmentList[ segmentIndex ] );
+					continue;
+				}
+
+				List<List<CADPoint>> splitedCADPointList = SplitCADPointList( orderedCADSegmentList[ segmentIndex ].PointList, breakPointIndex, out bool isLastSegmentModify );
+				for( int k = 0; k < splitedCADPointList.Count; k++ ) {
+					ICADSegmentElement newCADSegment = CreatCADSegmentByCADPoint(
+						splitedCADPointList[ k ],
+						orderedCADSegmentList[ segmentIndex ].ContourType,
+						orderedCADSegmentList[ segmentIndex ].PointSpace );
+					if( newCADSegment != null ) {
+						breakedCADSegmentList.Add( newCADSegment );
+
+						// 紀錄controlbart Index
+						if( k != splitedCADPointList.Count - 1 ) {
+							(int, int) oriSegmentIndex = ControlBarMap[ (segmentIndex, breakPointIndex[ k ]) ];
+							ControlBarMapedAsIndex[ breakedCADSegmentList.Count - 1 ] = oriSegmentIndex;
+						}
+						else {
+							if( isLastSegmentModify ) {
+								(int, int) oriSegmentIndex = ControlBarMap[ (segmentIndex, breakPointIndex[ k ]) ];
+								ControlBarMapedAsIndex[ breakedCADSegmentList.Count - 1 ] = oriSegmentIndex;
+							}
+						}
+					}
+				}
+			}
+			return breakedCADSegmentList;
+		}
+
+		ICADSegmentElement CreatCADSegmentByCADPoint( List<CADPoint> cadPointList, EContourType contourType, double pointSpace )
+		{
+			if( contourType == EContourType.Line ) {
+				return new LineCADSegment( cadPointList, pointSpace * ( cadPointList.Count - 1 ), pointSpace );
+			}
+			if( contourType == EContourType.Arc ) {
+				return new ArcCADSegment( cadPointList, pointSpace * ( cadPointList.Count - 1 ), pointSpace );
+			}
+			return null;
+		}
+
+		public List<List<CADPoint>> SplitCADPointList( List<CADPoint> segmentCADPointList, List<int> separateLocation, out bool isLastSegmentModify )
+		{
+			List<List<CADPoint>> resultCADPointList = new List<List<CADPoint>>();
+			isLastSegmentModify = true;
+			if( segmentCADPointList == null || segmentCADPointList.Count == 0 ) {
+				return resultCADPointList;
+			}
+			separateLocation = separateLocation.OrderBy( index => index ).ToList();
+			int nStartIndex = 0;
+			foreach( int nIndex in separateLocation ) {
+
+				// avoid out of range
+				if( nIndex > segmentCADPointList.Count - 1 ) {
+					break;
+				}
+				resultCADPointList.Add( segmentCADPointList.GetRange( nStartIndex, nIndex - nStartIndex + 1 ) );
+				nStartIndex = nIndex;
+			}
+
+			// last part
+			if( nStartIndex < segmentCADPointList.Count - 1 ) {
+				resultCADPointList.Add( segmentCADPointList.GetRange( nStartIndex, segmentCADPointList.Count - nStartIndex ) );
+				isLastSegmentModify = false;
+			}
+			return resultCADPointList;
+		}
+
+		bool SeparateCADSegmentAtTargetIndex( ICADSegmentElement segmentElement, int targetIndex, out List<ICADSegmentElement> breakedCADSegmentList )
+		{
+			breakedCADSegmentList = new List<ICADSegmentElement>();
+			if( segmentElement == null || targetIndex == 0 || targetIndex == segmentElement.PointList.Count - 1 ) {
+				return false;
+			}
+			List<int> separateLocation = new List<int> { targetIndex };
+			List<List<CADPoint>> splitedCADPointList = SplitCADPointList( segmentElement.PointList, separateLocation, out _ );
+
+			List<CADPoint> pointListAfterTargetIndex = splitedCADPointList.Last();
+			List<CADPoint> pointListBeforeTargetIndex = splitedCADPointList.First();
+			if( segmentElement is LineCADSegment ) {
+				LineCADSegment lineSegmentAfterTargetIndex = new LineCADSegment( pointListAfterTargetIndex, segmentElement.PointSpace * ( pointListAfterTargetIndex.Count - 1 ), segmentElement.PointSpace );
+				LineCADSegment lineSegmentBeforeTargetIndex = new LineCADSegment( pointListBeforeTargetIndex, segmentElement.PointSpace * ( pointListBeforeTargetIndex.Count - 1 ), segmentElement.PointSpace );
+				breakedCADSegmentList.Add( lineSegmentAfterTargetIndex );
+				breakedCADSegmentList.Add( lineSegmentBeforeTargetIndex );
+				return true;
+			}
+			if( segmentElement is ArcCADSegment ) {
+				ArcCADSegment arcSegmentAfterTargetIndex = new ArcCADSegment( pointListAfterTargetIndex, segmentElement.PointSpace * ( pointListAfterTargetIndex.Count - 1 ), segmentElement.PointSpace );
+				ArcCADSegment arcSegmentBeforTargetIndex = new ArcCADSegment( pointListBeforeTargetIndex, segmentElement.PointSpace * ( pointListBeforeTargetIndex.Count - 1 ), segmentElement.PointSpace );
+				breakedCADSegmentList.Add( arcSegmentAfterTargetIndex );
+				breakedCADSegmentList.Add( arcSegmentBeforTargetIndex );
+				return true;
+			}
+			return false;
+		}
+
+		#endregion
+
 		void SetToolVec()
 		{
 			for( int i = 0; i < CADPointList.Count; i++ ) {
@@ -762,7 +1136,6 @@ namespace MyCAM.Data
 			}
 			ModifyToolVec();
 		}
-
 
 		void ModifyToolVec()
 		{
@@ -792,8 +1165,6 @@ namespace MyCAM.Data
 				InterpolateToolVec( nStartIndex, nEndIndex );
 			}
 		}
-
-
 
 		gp_Vec GetVecFromAB( CAMPoint camPoint, double dRA_rad, double dRB_rad )
 		{
