@@ -41,7 +41,7 @@ namespace MyCAM.Helper
 			return camPoint;
 		}
 
-		public static CAMPoint GetCAMPointWithAssignDir( CADPoint cadPoint, gp_Dir assignDir)
+		public static CAMPoint GetCAMPointWithAssignDir( CADPoint cadPoint, gp_Dir assignDir )
 		{
 			if( cadPoint == null ) {
 				return null;
@@ -94,7 +94,7 @@ namespace MyCAM.Helper
 
 		static List<ICAMSegmentElement> GetMainPathOrderedSegment_New2( CAMData camdata )
 		{
-			if (camdata == null || camdata.BreakedCAMSegmentList == null || camdata.BreakedCAMSegmentList.Count == 0 ) {
+			if( camdata == null || camdata.BreakedCAMSegmentList == null || camdata.BreakedCAMSegmentList.Count == 0 ) {
 				return new List<ICAMSegmentElement>();
 			}
 			List<ICAMSegmentElement> camSegmentList = camdata.BreakedCAMSegmentList;
@@ -113,13 +113,13 @@ namespace MyCAM.Helper
 			// reverse start / end point
 			for( int i = 0; i < camSegmentList.Count; i++ ) {
 				if( camSegmentList[ i ].ContourType == EContourType.Line ) {
-					LineCAMSegment reversedLineCAMSegment = new LineCAMSegment( camSegmentList[ i ].EndPoint, camSegmentList[ i ].StartPoint,false );
+					LineCAMSegment reversedLineCAMSegment = new LineCAMSegment( camSegmentList[ i ].EndPoint, camSegmentList[ i ].StartPoint, false );
 					camSegmentList[ i ] = reversedLineCAMSegment;
 					continue;
 				}
 				if( camSegmentList[ i ].ContourType == EContourType.Arc ) {
 					ArcCAMSegment oldSegment = (ArcCAMSegment)camSegmentList[ i ];
-					ArcCAMSegment reversedArcCAMSegment = new ArcCAMSegment( oldSegment.EndPoint, oldSegment.StartPoint, oldSegment.MidPoint,false );
+					ArcCAMSegment reversedArcCAMSegment = new ArcCAMSegment( oldSegment.EndPoint, oldSegment.StartPoint, oldSegment.MidPoint, false );
 					camSegmentList[ i ] = reversedArcCAMSegment;
 				}
 			}
@@ -155,64 +155,56 @@ namespace MyCAM.Helper
 			return LeadCADSegment;
 		}
 
-		static ICADSegmentElement BuildLeadCADSegment( CAMData camData, bool leadin )
+		static ICADSegmentElement BuildLeadCADSegment( CAMData camData, bool isLeadin )
 		{
-			CADPoint startCadPoint = camData.BreakedCAMSegmentList.First().StartPoint.CADPoint;
-			gp_Dir startPointToolVec = camData.BreakedCAMSegmentList.First().StartPoint.ToolVec;
+			ICAMSegmentElement segment = camData.BreakedCAMSegmentList.First();
+			CADPoint startCadPoint = segment.StartPoint.CADPoint;
+			gp_Dir startToolVec = segment.StartPoint.ToolVec;
 
-			if( leadin ) {
-				if( camData.LeadLineParam.LeadIn.Type == LeadLineType.Line ) {
-					LeadHelper.BuildStraightLeadLine_New( startCadPoint, startPointToolVec, true, camData.LeadLineParam.LeadIn.Length, camData.LeadLineParam.LeadIn.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out _ );
+			LeadParam leadParam = isLeadin ? camData.LeadLineParam.LeadIn : camData.LeadLineParam.LeadOut;
 
-					// lead in start from lead end
-					List<gp_Pnt> leadPointList = new List<gp_Pnt>() { leadLineEndPoint, startCadPoint.Point };
-					List<CADPoint> leadCadPointList = new List<CADPoint>();
-					for( int i = 0; i < leadPointList.Count; i++ ) {
-						CADPoint cadPoint = new CADPoint( leadPointList[ i ], startPointToolVec, startPointToolVec, startCadPoint.TangentVec );
-						leadCadPointList.Add( cadPoint );
-					}
-					LineCADSegment lineCADSegment = new LineCADSegment( leadCadPointList, 0, 0 );
-					return lineCADSegment;
-				}
-				if( camData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ) {
-					LeadHelper.BuildArcLead_New( startCadPoint, startPointToolVec, true, camData.LeadLineParam.LeadIn.Length, camData.LeadLineParam.LeadIn.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadEndPnt, out gp_Pnt leadMidPnt, out _ );
-					List<gp_Pnt> leadPntList = new List<gp_Pnt>() { leadEndPnt, leadMidPnt, startCadPoint.Point };
-					List<CADPoint> leadCadPointList = new List<CADPoint>();
-					for( int i = 0; i < leadPntList.Count; i++ ) {
-						CADPoint cadPoint = new CADPoint( leadPntList[ i ], startPointToolVec, startPointToolVec, startCadPoint.TangentVec );
-						leadCadPointList.Add( cadPoint );
-					}
-					ArcCADSegment arcCADSegment = new ArcCADSegment( leadCadPointList, 0, 0 );
-					return arcCADSegment;
-				}
+			// draw arc / line lead
+			if( leadParam.Type == LeadLineType.Line ) {
+				LeadHelper.BuildStraightLeadLine_New(
+					startCadPoint, startToolVec, isLeadin,
+					leadParam.Length, leadParam.Angle,
+					camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse,
+					out gp_Pnt endPnt, out _
+				);
+
+				// start point and end point
+				var leadPoints = isLeadin
+					? new List<gp_Pnt> { endPnt, startCadPoint.Point }     // Lead In：from outside to start point
+					: new List<gp_Pnt> { startCadPoint.Point, endPnt };     // Lead Out： from start point to outside
+
+				return CreateLineSegment( leadPoints, startToolVec );
 			}
+			else if( leadParam.Type == LeadLineType.Arc ) {
+				LeadHelper.BuildArcLead_New(
+					startCadPoint, startToolVec, isLeadin,
+					leadParam.Length, leadParam.Angle,
+					camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse,
+					out gp_Pnt endPnt, out gp_Pnt midPnt, out _
+				);
+				var leadPoints = isLeadin
+					? new List<gp_Pnt> { endPnt, midPnt, startCadPoint.Point }    // Lead In
+					: new List<gp_Pnt> { startCadPoint.Point, midPnt, endPnt };   // Lead Out
 
-			if( camData.LeadLineParam.LeadOut.Type == LeadLineType.Line ) {
-
-				LeadHelper.BuildStraightLeadLine_New( startCadPoint, startPointToolVec, false, camData.LeadLineParam.LeadOut.Length, camData.LeadLineParam.LeadOut.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadLineEndPoint, out _ );
-
-				// lead out start from start point
-				List<gp_Pnt> leadPointList = new List<gp_Pnt>() { startCadPoint.Point, leadLineEndPoint };
-				List<CADPoint> leadCadPointList = new List<CADPoint>();
-				for( int i = 0; i < leadPointList.Count; i++ ) {
-					CADPoint cadPoint = new CADPoint( leadPointList[ i ], startPointToolVec, startPointToolVec, startCadPoint.TangentVec );
-					leadCadPointList.Add( cadPoint );
-				}
-				LineCADSegment lineCADSegment = new LineCADSegment( leadCadPointList, 0, 0 );
-				return lineCADSegment;
-			}
-			if( camData.LeadLineParam.LeadOut.Type == LeadLineType.Arc ) {
-				LeadHelper.BuildArcLead_New( startCadPoint, startPointToolVec, false, camData.LeadLineParam.LeadOut.Length, camData.LeadLineParam.LeadOut.Angle, camData.LeadLineParam.IsChangeLeadDirection, camData.IsReverse, out gp_Pnt leadEndPnt, out gp_Pnt leadMidPnt, out _ );
-				List<gp_Pnt> leadPntList = new List<gp_Pnt>() { startCadPoint.Point, leadMidPnt, leadEndPnt };
-				List<CADPoint> leadCadPointList = new List<CADPoint>();
-				for( int i = 0; i < leadPntList.Count; i++ ) {
-					CADPoint cadPoint = new CADPoint( leadPntList[ i ], startPointToolVec, startPointToolVec, startCadPoint.TangentVec );
-					leadCadPointList.Add( cadPoint );
-				}
-				ArcCADSegment arcCADSegment = new ArcCADSegment( leadCadPointList, leadEndPnt.Distance( startCadPoint.Point ), leadEndPnt.Distance( startCadPoint.Point ) );
-				return arcCADSegment;
+				return CreateArcSegment( leadPoints, startToolVec );
 			}
 			return null;
+		}
+
+		static LineCADSegment CreateLineSegment( List<gp_Pnt> points, gp_Dir toolVec )
+		{
+			List<CADPoint> cadPoints = points.Select( p => new CADPoint( p, toolVec, toolVec, new gp_Dir() ) ).ToList();
+			return new LineCADSegment( cadPoints, 0, 0 );
+		}
+
+		static ArcCADSegment CreateArcSegment( List<gp_Pnt> points, gp_Dir toolVec )
+		{
+			List<CADPoint> cadPoints = points.Select( p => new CADPoint( p, toolVec, toolVec, new gp_Dir() ) ).ToList();
+			return new ArcCADSegment( cadPoints, 0, 0 );
 		}
 
 		public static LineCAMSegment BuildCAMLineSegment( List<CADPoint> linePointList, bool isToolVecReverse, bool isModify = false )
@@ -244,7 +236,7 @@ namespace MyCAM.Helper
 
 			CADPoint EstimatedMidCADPoint = GetArcMidPoint( arcPointList );
 			CAMPoint EstimatedMidCAMPoint = GetCAMPoint( EstimatedMidCADPoint, isToolVecReverse );
-			camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, EstimatedMidCAMPoint,false );
+			camArcSegment = new ArcCAMSegment( startCAMPoint, endCAMPoint, EstimatedMidCAMPoint, false );
 			return camArcSegment;
 		}
 
