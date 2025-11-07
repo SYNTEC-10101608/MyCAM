@@ -38,7 +38,7 @@ namespace MyCAM.Data
 		}
 
 		List<PathEdge5D> m_PathEdge5DList;
-		CraftData m_CraftData = new CraftData();
+		CraftData m_CraftData;
 		ContourCacheInfo m_ContourCacheInfo;
 	}
 }

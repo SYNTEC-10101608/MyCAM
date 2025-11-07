@@ -45,7 +45,7 @@ namespace MyCAM.Editor
 			}
 
 			// modify tool vector
-			bool isModified = m_CacheInfo.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
+			bool isModified = m_CraftData.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
 			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg );
 
 			// back up old data
