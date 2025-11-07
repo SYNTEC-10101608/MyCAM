@@ -108,14 +108,16 @@ namespace MyCAM.Editor
 			// build wire from cad points
 			BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
 			int nCount = 0;
-			for( int i = 0; i < m_CAMData.CADSegmentList.Count; i++ ) {
-				for( int j = 0; j < m_CAMData.CADSegmentList[ i ].PointList.Count; j++ ) {
 
-					// 後面幾段的起點不用畫
+			List<ICADSegmentElement> cadSegment = m_CAMData.CADSegmentList;
+			for( int i = 0; i < cadSegment.Count; i++ ) {
+				for( int j = 0; j < cadSegment[ i ].PointList.Count; j++ ) {
+
+					// each segment start point do not need to draw
 					if( j == 0) {
 						continue;
 					}
-					BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_CAMData.CADSegmentList[ i ].PointList[ j ].Point );
+					BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( cadSegment[ i ].PointList[ j ].Point );
 					polygonMaker.Add( vertexMaker.Vertex() );
 					nCount++;
 					m_VertexMap_int_int.Bind( vertexMaker.Vertex(), i, j );

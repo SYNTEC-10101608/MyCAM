@@ -183,6 +183,20 @@ namespace MyCAM.Data
 			}
 		}
 
+		internal List<int> ControlBarIndexList
+		{
+			get
+			{
+				return m_ControlBarIndex;
+			}
+			set
+			{
+				if ( value != null ) {
+					m_ControlBarIndex = value;
+				}
+			}
+		}
+
 		// CAM property
 
 		internal List<CAMPoint> CAMPointList
@@ -531,6 +545,7 @@ namespace MyCAM.Data
 		Dictionary<(int, int), Tuple<double, double>> m_ToolVecModifyMap_New = new Dictionary<(int, int), Tuple<double, double>>();
 		List<ICAMSegmentElement> m_BrakedCAMSegment = new List<ICAMSegmentElement>();
 		List<ICADSegmentElement> m_CADSegmentList = new List<ICADSegmentElement>();
+		List<int> m_ControlBarIndex = new List<int>();
 		bool m_IsReverse = false;
 		bool m_IsToolVecReverse = false;
 		int m_StartPoint = 0;

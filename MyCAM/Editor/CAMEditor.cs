@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using MyCAM.App;
@@ -560,13 +561,19 @@ namespace MyCAM.Editor
 
 		void BreadRawCADSegment( CAMData camData )
 		{
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
 			List<ICADSegmentElement> reorderedSegment = BreakAndReorderByStartPoint( camData );
+			sw.Stop();
+			Console.WriteLine( $"API 執行時間: {sw.ElapsedMilliseconds} 毫秒" );
 			List<(int, int)> ModifyMapList = ModidyInexMap( camData, reorderedSegment.Count, out Dictionary<(int, int), (int, int)> ControlBarMap );
 
 			// 排好的 + 原生toolbar
 			List<ICADSegmentElement> breakedCADSegment = BreakByToolVecBar( reorderedSegment, ModifyMapList, ControlBarMap, out Dictionary<int, (int, int)> ControlBarMapedAsIndex );
 			List<ICAMSegmentElement> camSegmentList = BuildCAMSegment( camData, breakedCADSegment, ControlBarMapedAsIndex );
+			List<int> controlBarIndex = ControlBarMapedAsIndex.Keys.ToList();
 			camData.BreakedCAMSegmentList = camSegmentList;
+			camData.ControlBarIndexList = controlBarIndex;
 		}
 
 
@@ -574,21 +581,21 @@ namespace MyCAM.Editor
 		{
 			List<ICAMSegmentElement> camSegmentList = new List<ICAMSegmentElement>();
 
-			if ( ControlBarMapedAsIndex.Count == 0 ) {
-				for(int i = 0; i < breakedCADSegment.Count; i++ ) {
-					if (  breakedCADSegment[i].ContourType == EContourType.Line ) {
-						LineCAMSegment lineCAMSegment = BuildCAMSegmentHelper.BuildCAMLineSegment( breakedCADSegment[i].PointList, camData.IsToolVecReverse );
+			if( ControlBarMapedAsIndex.Count == 0 ) {
+				for( int i = 0; i < breakedCADSegment.Count; i++ ) {
+					if( breakedCADSegment[ i ].ContourType == EContourType.Line ) {
+						LineCAMSegment lineCAMSegment = BuildCAMSegmentHelper.BuildCAMLineSegment( breakedCADSegment[ i ].PointList, camData.IsToolVecReverse );
 						camSegmentList.Add( lineCAMSegment );
 					}
-					else { 						
-						ArcCAMSegment arcCAMSegment = BuildCAMSegmentHelper.BuildCAMArcSegment( breakedCADSegment[i].PointList, camData.IsToolVecReverse );
+					else {
+						ArcCAMSegment arcCAMSegment = BuildCAMSegmentHelper.BuildCAMArcSegment( breakedCADSegment[ i ].PointList, camData.IsToolVecReverse );
 						camSegmentList.Add( arcCAMSegment );
 					}
 				}
 				return camSegmentList;
 			}
-			
-			if ( ControlBarMapedAsIndex.Count == 1 ) {
+
+			if( ControlBarMapedAsIndex.Count == 1 ) {
 
 				(int, int) targetPointSegmentIndex = camData.ToolVecModifyMap_New.Keys.First();
 				CADPoint modifyPoint = camData.CADSegmentList[ targetPointSegmentIndex.Item1 ].PointList[ targetPointSegmentIndex.Item2 ];
@@ -612,8 +619,8 @@ namespace MyCAM.Editor
 			}
 
 
-			if ( ControlBarMapedAsIndex.Count > 1 ) {
-				camSegmentList = BuildCAMSegmentWithSeveralToolBar(camData, breakedCADSegment,  ControlBarMapedAsIndex );
+			if( ControlBarMapedAsIndex.Count > 1 ) {
+				camSegmentList = BuildCAMSegmentWithSeveralToolBar( camData, breakedCADSegment, ControlBarMapedAsIndex );
 			}
 			return camSegmentList;
 
@@ -621,11 +628,10 @@ namespace MyCAM.Editor
 
 		List<ICAMSegmentElement> BuildCAMSegmentWithSeveralToolBar( CAMData camData, List<ICADSegmentElement> breakedCADSegment, Dictionary<int, (int, int)> ControlBarMapedAsIndex )
 		{
-			if ( ControlBarMapedAsIndex.Count == 0 || breakedCADSegment.Count == 0)
-			{
+			if( ControlBarMapedAsIndex.Count == 0 || breakedCADSegment.Count == 0 ) {
 				return new List<ICAMSegmentElement>();
 			}
-			List<ICAMSegmentElement> camSegmentList = new List<ICAMSegmentElement>();	
+			List<ICAMSegmentElement> camSegmentList = new List<ICAMSegmentElement>();
 			// the segment with control bar
 			List<int> barIndexList = ControlBarMapedAsIndex.Keys.ToList();
 			barIndexList.Sort();
@@ -670,7 +676,7 @@ namespace MyCAM.Editor
 					}
 
 					// 他在0~end區間
-					if (i<= endBarIndex ) {
+					if( i <= endBarIndex ) {
 						for( int k = 0; k <= i; k++ ) {
 							dLengthFromStart += breakedCADSegment[ k ].TotalLength;
 						}
@@ -717,7 +723,7 @@ namespace MyCAM.Editor
 			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
 
 			gp_Quaternion q = new gp_Quaternion();
-			slerp.Interpolate( dDeltaLength / dTotalLength , ref q );
+			slerp.Interpolate( dDeltaLength / dTotalLength, ref q );
 			gp_Trsf trsf = new gp_Trsf();
 			trsf.SetRotation( q );
 			gp_Dir toolVecDir = new gp_Dir( startToolVec.Transformed( trsf ) );
@@ -830,14 +836,19 @@ namespace MyCAM.Editor
 
 		List<ICADSegmentElement> BreakAndReorderByStartPoint( CAMData camData )
 		{
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
 			(int segment, int pointIndex) startPoint = camData.NewStartPoint;
 			List<ICADSegmentElement> reorderedCADSegmentList = new List<ICADSegmentElement>();
 
 			// reorder segment list
-			for( int i = 0; i < camData.CADSegmentList.Count; i++ ) {
-				int index = ( startPoint.segment + i ) % camData.CADSegmentList.Count;
-				reorderedCADSegmentList.Add( camData.CADSegmentList[ index ] );
+			List<ICADSegmentElement> cadSegmentList = camData.CADSegmentList;
+			for( int i = 0; i < cadSegmentList.Count; i++ ) {
+				int index = ( startPoint.segment + i ) % cadSegmentList.Count;
+				reorderedCADSegmentList.Add( cadSegmentList[ index ] );
 			}
+			sw.Stop();
+			Console.WriteLine( $"重新排列起點: {sw.ElapsedMilliseconds} 毫秒" );
 
 			// no need to break segment
 			if( startPoint.pointIndex == camData.CADSegmentList[ startPoint.segment ].PointList.Count - 1 ) {
@@ -847,7 +858,11 @@ namespace MyCAM.Editor
 				return reorderedCADSegmentList;
 			}
 
+			Stopwatch sw2 = new Stopwatch();
+			sw2.Start();
 			bool isSuccess = SeparateCADSegmentAtTargetIndex( camData.CADSegmentList[ startPoint.segment ], startPoint.pointIndex, out List<ICADSegmentElement> breakedCADSegmentList );
+			sw2.Stop();
+			Console.WriteLine( $"分割起點: {sw.ElapsedMilliseconds} 毫秒" );
 			if( isSuccess ) {
 
 				// this segment need to break
@@ -991,20 +1006,12 @@ namespace MyCAM.Editor
 
 			// build tool vec
 			foreach( CAMData camData in m_DataManager.GetCAMDataList() ) {
+	
 				BreadRawCADSegment( camData );
-				foreach( ICAMSegmentElement camSegment in camData.BreakedCAMSegmentList ) {
-
-					if( camSegment.IsModifyElement == false ) {
-						AIS_Line endPointToolVecAIS = GetVecAIS( camSegment.EndPoint.CADPoint.Point, camSegment.EndPoint.ToolVec, EvecType.ToolVec );
-						if( camSegment is ArcCAMSegment arcCAMSegment ) {
-							AIS_Line midPointToolVecAIS = GetVecAIS( arcCAMSegment.MidPoint.CADPoint.Point, arcCAMSegment.MidPoint.ToolVec, EvecType.ToolVec );
-							m_ToolVecAISList.Add( midPointToolVecAIS );
-						}
-						m_ToolVecAISList.Add( endPointToolVecAIS );
-					}
-					else {
-						AIS_Line startPointToolVecAIS = GetVecAIS( camSegment.StartPoint.CADPoint.Point, camSegment.StartPoint.ToolVec, EvecType.ToolVec );
-						AIS_Line endPointToolVecAIS = GetVecAIS( camSegment.EndPoint.CADPoint.Point, camSegment.EndPoint.ToolVec, EvecType.ToolVec );
+				for( int i = 0; i < camData.BreakedCAMSegmentList.Count; i++ ) {
+					if( camData.ControlBarIndexList.Contains( i ) ) {
+						AIS_Line startPointToolVecAIS = GetVecAIS( camData.BreakedCAMSegmentList[ i ].StartPoint.CADPoint.Point, camData.BreakedCAMSegmentList[ i ].StartPoint.ToolVec, EvecType.ToolVec );
+						AIS_Line endPointToolVecAIS = GetVecAIS( camData.BreakedCAMSegmentList[ i ].EndPoint.CADPoint.Point, camData.BreakedCAMSegmentList[ i ].EndPoint.ToolVec, EvecType.ToolVec );
 
 
 						endPointToolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
@@ -1013,12 +1020,21 @@ namespace MyCAM.Editor
 						m_ToolVecAISList.Add( startPointToolVecAIS );
 						m_ToolVecAISList.Add( endPointToolVecAIS );
 
-						if( camSegment is ArcCAMSegment arcCAMSegment ) {
+						if( camData.BreakedCAMSegmentList[ i ] is ArcCAMSegment arcCAMSegment ) {
 							AIS_Line midPointToolVecAIS = GetVecAIS( arcCAMSegment.MidPoint.CADPoint.Point, arcCAMSegment.MidPoint.ToolVec, EvecType.ToolVec );
 							m_ToolVecAISList.Add( midPointToolVecAIS );
 						}
 					}
+					else {
+						AIS_Line endPointToolVecAIS = GetVecAIS( camData.BreakedCAMSegmentList[ i ].EndPoint.CADPoint.Point, camData.BreakedCAMSegmentList[ i ].EndPoint.ToolVec, EvecType.ToolVec );
+						if( camData.BreakedCAMSegmentList[ i ] is ArcCAMSegment arcCAMSegment ) {
+							AIS_Line midPointToolVecAIS = GetVecAIS( arcCAMSegment.MidPoint.CADPoint.Point, arcCAMSegment.MidPoint.ToolVec, EvecType.ToolVec );
+							m_ToolVecAISList.Add( midPointToolVecAIS );
+						}
+						m_ToolVecAISList.Add( endPointToolVecAIS );
+					}
 				}
+
 			}
 
 			// display the tool vec
