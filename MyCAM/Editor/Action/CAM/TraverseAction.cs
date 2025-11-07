@@ -89,7 +89,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		List<CraftData> m_CraftDataList;
+		List<CraftData> m_CraftDataList = new List<CraftData>();
 		List<TraverseData> m_BackupTraverseDataList;
 		List<string> m_PathIDList;
 	}

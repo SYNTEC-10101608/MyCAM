@@ -20,7 +20,7 @@ namespace MyCAM.Editor
 				throw new ArgumentNullException( "IndexSelectAction constructing argument null" );
 			}
 			m_PathID = pathID;
-			m_CacheInfo = m_DataManager.ObjectMap[ m_PathID ] as ContourCacheInfo;
+			m_CacheInfo = ( m_DataManager.ObjectMap[ m_PathID ] as ContourPathObject ).ContourCacheInfo;
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}

@@ -84,7 +84,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		readonly List<CraftData> m_CraftDataList;
+		readonly List<CraftData> m_CraftDataList = new List<CraftData>();
 		readonly List<double> m_dOverCutBackupList;
 		List<string> m_PathIDList;
 	}

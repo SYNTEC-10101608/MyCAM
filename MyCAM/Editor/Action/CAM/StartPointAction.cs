@@ -1,16 +1,19 @@
 ﻿using MyCAM.Data;
 using OCCViewer;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
 	internal class StartPointAction : IndexSelectAction
 	{
-		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
-			: base( dataManager, viewer, treeView, viewManager, pathID )
+		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, List<string> pathIDList )
+			: base( dataManager, viewer, treeView, viewManager, pathIDList.First() )
 		{
 			m_CraftData = ( m_DataManager.ObjectMap[ m_PathID ] as ContourPathObject ).CraftData;
+			m_PathIDList = pathIDList;
 		}
 
 		public override EditActionType ActionType
@@ -21,7 +24,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public Action PropertyChanged;
+		public Action<List<string>> PropertyChanged;
 
 		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
@@ -33,7 +36,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			m_CraftData.StartPointIndex = nIndex;
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 			m_Viewer.GetAISContext().ClearSelected( true );
 		}
 
@@ -45,5 +48,6 @@ namespace MyCAM.Editor
 		}
 
 		CraftData m_CraftData;
+		List<string> m_PathIDList;
 	}
 }

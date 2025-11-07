@@ -17,7 +17,7 @@ namespace MyCAM.Editor
 			m_PathIDList = pathIDList;
 
 			foreach( string ID in m_PathIDList ) {
-				m_CraftDataList.Add( ( m_DataManager.ObjectMap[ ID ] as PathObject ).CraftData );
+				m_CraftDataList.Add( ( dataManager.ObjectMap[ ID ] as PathObject ).CraftData );
 			}
 
 			// when user cancel the lead setting, need to turn path back
@@ -90,7 +90,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		List<CraftData> m_CraftDataList;
+		List<CraftData> m_CraftDataList = new List<CraftData>();
 		List<LeadData> m_BackupLeadParamList;
 		List<string> m_PathIDList;
 	}
