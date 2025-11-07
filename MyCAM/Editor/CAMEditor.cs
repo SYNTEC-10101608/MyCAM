@@ -77,12 +77,14 @@ namespace MyCAM.Editor
 		}
 
 		// for viewer resource handle
-		List<AIS_Line> m_ToolVecAISList = new List<AIS_Line>(); // need refresh, no need activate
-		List<AIS_Shape> m_OrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
-		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>(); // need refresh, no need activate
-		List<AIS_Line> m_LeadAISList = new List<AIS_Line>(); // need refresh, no need activate
-		List<AIS_Shape> m_LeadOrientationAISList = new List<AIS_Shape>(); // need refresh, no need activate
-		List<AIS_Line> m_OverCutAISList = new List<AIS_Line>(); // need refresh, no need activate
+		Dictionary<string, List<AIS_Line>> m_ToolVecAISDict = new Dictionary<string, List<AIS_Line>>();
+
+		Dictionary<string, AIS_Shape> m_OrientationAISList = new Dictionary<string, AIS_Shape>(); // need refresh, no need activate
+		Dictionary<string, AIS_TextLabel> m_IndexList = new Dictionary<string, AIS_TextLabel>(); // need refresh, no need activate
+		Dictionary<string, List<AIS_Line>> m_LeadAISDict = new Dictionary<string, List<AIS_Line>>(); // need refresh, no need activate
+		Dictionary<string, List<AIS_Shape>> m_LeadOrientationAISDict = new Dictionary<string, List<AIS_Shape>>(); // need refresh, no need activate
+
+		Dictionary<string, List<AIS_Line>> m_OverCutAISDict = new Dictionary<string, List<AIS_Line>>(); // need refresh, no need activate
 		List<AIS_Line> m_TraverseAISList = new List<AIS_Line>(); // need refresh, no need activate
 		List<AIS_Shape> m_FrogLeapAISList = new List<AIS_Shape>(); // need refresh, no need activate
 
@@ -290,14 +292,8 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
-			if( !GetCraftDataByID( szPathIDList[ 0 ], out CraftData craftData ) ) {
-				return;
-			}
-			if( !GetCacheInfoByID( szPathIDList[ 0 ], out ICacheInfo cacheInfo ) ) {
-				return;
-			}
 
-			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, (ContourCacheInfo)cacheInfo, craftData );
+			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -307,7 +303,7 @@ namespace MyCAM.Editor
 			// one shot edit, muti edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+				if( !DataHelper.GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 
@@ -315,7 +311,7 @@ namespace MyCAM.Editor
 				craftData.IsReverse = !craftData.IsReverse;
 				// To-do：update CacheInfo in CAMPoint
 			}
-			ShowCAMData();
+			ShowCAMData( szPathIDList );
 		}
 
 		public void SetOverCut()
@@ -328,14 +324,7 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
-			List<CraftData> craftDataList = new List<CraftData>();
-			foreach( string szPathID in szPathIDList ) {
-				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
-					continue;
-				}
-				craftDataList.Add( craftData );
-			}
-			OverCutAction action = new OverCutAction( m_DataManager, craftDataList );
+			OverCutAction action = new OverCutAction( m_DataManager, szPathIDList );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -350,14 +339,7 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
-			List<CraftData> craftDataList = new List<CraftData>();
-			foreach( string szPathID in szPathIDList ) {
-				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
-					continue;
-				}
-				craftDataList.Add( craftData );
-			}
-			LeadAction action = new LeadAction( m_DataManager, craftDataList );
+			LeadAction action = new LeadAction( m_DataManager, szPathIDList );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -372,10 +354,7 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
-			if( !GetCacheInfoByID( szPathIDList[ 0 ], out ICacheInfo cacheInfo ) ) {
-				return;
-			}
-			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, (ContourCacheInfo)cacheInfo );
+			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList );
 			action.PropertyChanged += ShowCAMData;
 
 			// when editing tool vec dilog show/close, need disable/enable main form
@@ -391,14 +370,14 @@ namespace MyCAM.Editor
 			// one shot edit, multi edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+				if( !DataHelper.GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 
 				// toggle reverse state
 				craftData.IsToolVecReverse = !craftData.IsToolVecReverse;
 			}
-			ShowCAMData();
+			ShowCAMData( szPathIDList );
 		}
 
 		public void SetTraverseParam()
@@ -411,14 +390,7 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
-			List<CraftData> craftDataList = new List<CraftData>();
-			foreach( string szPathID in szPathIDList ) {
-				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
-					continue;
-				}
-				craftDataList.Add( craftData );
-			}
-			TraverseAction action = new TraverseAction( m_DataManager, craftDataList );
+			TraverseAction action = new TraverseAction( m_DataManager, szPathIDList );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -470,7 +442,7 @@ namespace MyCAM.Editor
 			string szStartPathID = szPathIDList[ 0 ];
 
 			// get start point
-			if( !GetCacheInfoByID( szStartPathID, out ICacheInfo cacheInfo ) ) {
+			if( !DataHelper.GetCacheInfoByID( m_DataManager, szStartPathID, out ICacheInfo cacheInfo ) ) {
 				return;
 			}
 			gp_Pnt currentPoint = cacheInfo.GetProcessStartPoint().CADPoint.Point;
@@ -493,7 +465,7 @@ namespace MyCAM.Editor
 					if( visited[ i ] ) {
 						continue;
 					}
-					if( !GetCacheInfoByID( pathIDList[ i ], out ICacheInfo nextCacheInfo ) ) {
+					if( !DataHelper.GetCacheInfoByID( m_DataManager, pathIDList[ i ], out ICacheInfo nextCacheInfo ) ) {
 						continue;
 					}
 					gp_Pnt nextStartPoint = nextCacheInfo.GetProcessStartPoint().CADPoint.Point;
@@ -525,7 +497,7 @@ namespace MyCAM.Editor
 
 			List<CraftData> craftDataList = new List<CraftData>();
 			foreach( string szID in m_DataManager.PathIDList ) {
-				if( !GetCraftDataByID( szID, out CraftData craftData ) ) {
+				if( !DataHelper.GetCraftDataByID( m_DataManager, szID, out CraftData craftData ) ) {
 					MyApp.Logger.ShowOnLogPanel( $"路徑 {szID} 未設定加工參數，無法轉出NC", MyApp.NoticeType.Error );
 					return;
 				}
@@ -586,7 +558,7 @@ namespace MyCAM.Editor
 
 			// closed path editable only: start point, overcut, lead line, change lead dir
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+				if( !DataHelper.GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 				if( !craftData.IsClosed ) {
@@ -602,187 +574,265 @@ namespace MyCAM.Editor
 		#region Show CAM
 		void ShowCAMData()
 		{
+			List<string> pathIDList = m_DataManager.PathIDList;
+
 			// TODO: we dont always need to refresh such many things
-			ShowToolVec();
-			ShowOrientation();
-			ShowIndex();
-			ShowOverCut();
-			ShowLeadLine();
-			ShowLeadOrientation();
+			ShowToolVec( pathIDList );
+			ShowOrientation( pathIDList );
+			ShowIndex( pathIDList );
+			ShowOverCut( pathIDList );
+			ShowLeadLine( pathIDList );
+			ShowLeadOrientation( pathIDList );
 			ShowTraversalPath();
 			m_Viewer.UpdateView();
 		}
 
-		void ShowToolVec()
+		void ShowCAMData( List<string> pathIDList )
+		{
+			// TODO: we dont always need to refresh such many things
+			ShowToolVec( pathIDList );
+			ShowOrientation( pathIDList );
+			ShowIndex( pathIDList );
+			ShowOverCut( pathIDList );
+			ShowLeadLine( pathIDList );
+			ShowLeadOrientation( pathIDList );
+			ShowTraversalPath();
+			m_Viewer.UpdateView();
+		}
+
+		void ShowToolVec( List<string> pathIDList )
 		{
 			// clear the previous tool vec
-			foreach( AIS_Line toolVecAIS in m_ToolVecAISList ) {
-				m_Viewer.GetAISContext().Remove( toolVecAIS, false );
+			foreach( string szPathID in pathIDList ) {
+				if( m_ToolVecAISDict.ContainsKey( szPathID ) ) {
+					List<AIS_Line> toolVecAISList = m_ToolVecAISDict[ szPathID ];
+					foreach( AIS_Line toolVecAIS in toolVecAISList ) {
+						m_Viewer.GetAISContext().Remove( toolVecAIS, false );
+					}
+					m_ToolVecAISDict[ szPathID ].Clear();
+					m_ToolVecAISDict.Remove( szPathID );
+				}
 			}
-			m_ToolVecAISList.Clear();
 
 			// no need to show
 			if( m_ShowToolVec == false ) {
 				return;
 			}
 
-			foreach( string szID in m_DataManager.PathIDList ) {
-				for( int i = 0; i < m_DataManager.CacheInfoMap.Count; i++ ) {
-					if( m_DataManager.CacheInfoMap[ szID ].PathType == PathType.Contour ) {
-						ContourCacheInfo cacheInfo = (ContourCacheInfo)m_DataManager.CacheInfoMap[ szID ];
-						CAMPoint camPoint = cacheInfo.CAMPointList[ i ];
-						AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-						GetCraftDataByID( szID, out CraftData craftData );
-						if( IsModifiedToolVecIndex( i, cacheInfo, craftData ) ) {
-							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-							toolVecAIS.SetWidth( 4 );
-						}
-						m_ToolVecAISList.Add( toolVecAIS );
-					}
+			// build tool vec
+			foreach( string szPathID in pathIDList ) {
+				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
+					continue;
+				}
+				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).ContourCacheInfo;
+				CraftData craftData = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).CraftData;
+				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
+				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
 
+				for( int i = 0; i < contourCacheInfo.CAMPointList.Count; i++ ) {
+					CAMPoint camPoint = contourCacheInfo.CAMPointList[ i ];
+					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
+					if( IsModifiedToolVecIndex( i, contourCacheInfo, craftData ) ) {
+						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+						toolVecAIS.SetWidth( 4 );
+					}
+					toolVecAISList.Add( toolVecAIS );
 				}
 			}
 
 			// display the tool vec
-			foreach( AIS_Line toolVecAIS in m_ToolVecAISList ) {
-				m_Viewer.GetAISContext().Display( toolVecAIS, false );
-				m_Viewer.GetAISContext().Deactivate( toolVecAIS );
+			foreach( string szPathID in pathIDList ) {
+				if( m_ToolVecAISDict.ContainsKey( szPathID ) ) {
+					List<AIS_Line> toolVecAISList = m_ToolVecAISDict[ szPathID ];
+					foreach( AIS_Line toolVecAIS in toolVecAISList ) {
+						m_Viewer.GetAISContext().Display( toolVecAIS, false );
+						m_Viewer.GetAISContext().Deactivate( toolVecAIS );
+					}
+				}
 			}
 		}
 
-		void ShowLeadLine()
+		void ShowLeadLine( List<string> pathIDList )
 		{
 			// clear the previous tool vec
-			foreach( AIS_Line toolVecAIS in m_LeadAISList ) {
-				m_Viewer.GetAISContext().Remove( toolVecAIS, false );
+			foreach( string szPathID in pathIDList ) {
+				if( m_LeadAISDict.ContainsKey( szPathID ) ) {
+					List<AIS_Line> leadAISList = m_LeadAISDict[ szPathID ];
+					foreach( AIS_Line leadAIS in leadAISList ) {
+						m_Viewer.GetAISContext().Remove( leadAIS, false );
+					}
+					m_LeadAISDict[ szPathID ].Clear();
+					m_LeadAISDict.Remove( szPathID );
+				}
 			}
-			m_LeadAISList.Clear();
 
-
-
-			foreach( string szID in m_DataManager.PathIDList ) {
-				GetCraftDataByID( szID, out CraftData craftData );
-				GetCacheInfoByID( szID, out ICacheInfo cacheInfo );
-				if( m_DataManager.CacheInfoMap[ szID ].PathType != PathType.Contour ) {
+			foreach( string szPathID in pathIDList ) {
+				if( DataHelper.GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false
+					|| DataHelper.GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) == false ) {
 					continue;
 				}
-				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)m_DataManager.CacheInfoMap[ szID ];
+				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
+					continue;
+				}
+				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
+					List<AIS_Line> leadAISList = new List<AIS_Line>();
+					m_LeadAISDict.Add( szPathID, leadAISList );
 					for( int i = 0; i < contourCacheInfo.LeadInCAMPointList.Count - 1; i++ ) {
 						CAMPoint currentCAMPoint = contourCacheInfo.LeadInCAMPointList[ i ];
 						CAMPoint nextCAMPoint = contourCacheInfo.LeadInCAMPointList[ i + 1 ];
 						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
-						m_LeadAISList.Add( LeadAISLine );
+						leadAISList.Add( LeadAISLine );
 					}
 				}
 
 				if( craftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
+					List<AIS_Line> leadAISList;
+					if( m_LeadAISDict.ContainsKey( szPathID ) ) {
+						leadAISList = m_LeadAISDict[ szPathID ];
+					}
+					else {
+						leadAISList = new List<AIS_Line>();
+						m_LeadAISDict.Add( szPathID, leadAISList );
+					}
 					for( int i = 0; i < contourCacheInfo.LeadOutCAMPointList.Count - 1; i++ ) {
 						CAMPoint currentCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i ];
 						CAMPoint nextCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i + 1 ];
 						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
-						m_LeadAISList.Add( LeadAISLine );
+						leadAISList.Add( LeadAISLine );
 					}
 				}
 			}
 
 			// display the lead line
-			foreach( AIS_Line toolVecAIS in m_LeadAISList ) {
-				m_Viewer.GetAISContext().Display( toolVecAIS, false );
-				m_Viewer.GetAISContext().Deactivate( toolVecAIS );
+			foreach( string szPathID in pathIDList ) {
+				if( m_LeadAISDict.ContainsKey( szPathID ) ) {
+					List<AIS_Line> leadAISList = m_LeadAISDict[ szPathID ];
+					foreach( AIS_Line leadAIS in leadAISList ) {
+						m_Viewer.GetAISContext().Display( leadAIS, false );
+						m_Viewer.GetAISContext().Deactivate( leadAIS );
+					}
+				}
 			}
 		}
 
-		void ShowOrientation()
+		void ShowOrientation( List<string> pathIDList )
 		{
 			// clear the previous orientation
-			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
-				m_Viewer.GetAISContext().Remove( orientationAIS, false );
+			foreach( string szPathID in pathIDList ) {
+				if( m_OrientationAISList.ContainsKey( szPathID ) ) {
+					m_Viewer.GetAISContext().Remove( m_OrientationAISList[ szPathID ], false );
+					m_OrientationAISList.Remove( szPathID );
+				}
 			}
-			m_OrientationAISList.Clear();
 
 			// no need to show
 			if( m_ShowOrientation == false ) {
 				return;
 			}
 
-			foreach( string szID in m_DataManager.PathIDList ) {
-				GetCraftDataByID( szID, out CraftData craftData );
-				GetCacheInfoByID( szID, out ICacheInfo cacheInfo );
-				if( m_DataManager.CacheInfoMap[ szID ].PathType != PathType.Contour ) {
+			foreach( string szPathID in pathIDList ) {
+				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
 					continue;
 				}
-
-				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
+				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).ContourCacheInfo;
+				CraftData craftData = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).CraftData;
 				gp_Pnt showPoint = contourCacheInfo.CAMPointList[ 0 ].CADPoint.Point;
 				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMPointList[ 0 ].CADPoint.TangentVec.XYZ() );
 				if( craftData.IsReverse ) {
 					orientationDir.Reverse();
 				}
 				AIS_Shape orientationAIS = GetOrientationAIS( showPoint, orientationDir );
-				m_OrientationAISList.Add( orientationAIS );
+				m_OrientationAISList.Add( szPathID, orientationAIS );
 			}
 
 
 			// display the orientation
-			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
-				m_Viewer.GetAISContext().Display( orientationAIS, false );
-				m_Viewer.GetAISContext().Deactivate( orientationAIS );
+			foreach( string szPathID in pathIDList ) {
+				if( m_OrientationAISList.ContainsKey( szPathID ) ) {
+					m_Viewer.GetAISContext().Display( m_OrientationAISList[ szPathID ], false );
+					m_Viewer.GetAISContext().Deactivate( m_OrientationAISList[ szPathID ] );
+				}
 			}
 		}
 
-		void ShowLeadOrientation()
+		void ShowLeadOrientation( List<string> pathIDList )
 		{
 			// clear the previous orientation
-			foreach( AIS_Shape orientationAIS in m_LeadOrientationAISList ) {
-				m_Viewer.GetAISContext().Remove( orientationAIS, false );
+			foreach( string szPathID in pathIDList ) {
+				if( m_LeadOrientationAISDict.ContainsKey( szPathID ) ) {
+					List<AIS_Shape> orientationAISList = m_LeadOrientationAISDict[ szPathID ];
+					foreach( AIS_Shape orientationAIS in orientationAISList ) {
+						m_Viewer.GetAISContext().Remove( orientationAIS, false );
+					}
+					m_LeadOrientationAISDict[ szPathID ].Clear();
+					m_LeadOrientationAISDict.Remove( szPathID );
+				}
 			}
-			m_LeadOrientationAISList.Clear();
 
-			foreach( string szID in m_DataManager.PathIDList ) {
-				GetCraftDataByID( szID, out CraftData craftData );
-				GetCacheInfoByID( szID, out ICacheInfo cacheInfo );
-				if( m_DataManager.CacheInfoMap[ szID ].PathType != PathType.Contour ) {
+			foreach( string szPathID in pathIDList ) {
+				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
 					continue;
 				}
-				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
+				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).ContourCacheInfo;
+				CraftData craftData = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).CraftData;
 
 				if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
+					List<AIS_Shape> orientationAISList = new List<AIS_Shape>();
+					m_LeadOrientationAISDict.Add( szPathID, orientationAISList );
+
 					if( contourCacheInfo.LeadInCAMPointList.Count == 0 ) {
 						break;
 					}
 					gp_Pnt leadInStartPoint = contourCacheInfo.LeadInCAMPointList.First().CADPoint.Point;
 					gp_Dir leadInOrientationDir = new gp_Dir( contourCacheInfo.LeadInCAMPointList.First().CADPoint.TangentVec.XYZ() );
 					AIS_Shape orientationAIS = GetOrientationAIS( leadInStartPoint, leadInOrientationDir );
-					m_LeadOrientationAISList.Add( orientationAIS );
+					orientationAISList.Add( orientationAIS );
 				}
 
 				// path with lead out
 				if( craftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
+
+					List<AIS_Shape> orientationAISList;
+					if( m_LeadOrientationAISDict.ContainsKey( szPathID ) ) {
+						orientationAISList = m_LeadOrientationAISDict[ szPathID ];
+					}
+					else {
+						orientationAISList = new List<AIS_Shape>();
+						m_LeadOrientationAISDict.Add( szPathID, orientationAISList );
+					}
+
 					if( contourCacheInfo.LeadOutCAMPointList.Count == 0 ) {
 						break;
 					}
 					gp_Pnt leadOutEndPoint = contourCacheInfo.LeadOutCAMPointList.Last().CADPoint.Point;
 					gp_Dir leadOutOrientationDir = new gp_Dir( contourCacheInfo.LeadOutCAMPointList.Last().CADPoint.TangentVec.XYZ() );
 					AIS_Shape orientationAIS = GetOrientationAIS( leadOutEndPoint, leadOutOrientationDir );
-					m_LeadOrientationAISList.Add( orientationAIS );
+					orientationAISList.Add( orientationAIS );
 				}
 			}
 
 			// display the orientation
-			foreach( AIS_Shape orientationAIS in m_LeadOrientationAISList ) {
-				m_Viewer.GetAISContext().Display( orientationAIS, false );
-				m_Viewer.GetAISContext().Deactivate( orientationAIS );
+			foreach( string szPathID in pathIDList ) {
+				if( m_LeadOrientationAISDict.ContainsKey( szPathID ) ) {
+					List<AIS_Shape> orientationAISList = m_LeadOrientationAISDict[ szPathID ];
+					foreach( AIS_Shape orientationAIS in orientationAISList ) {
+						m_Viewer.GetAISContext().Display( orientationAIS, false );
+						m_Viewer.GetAISContext().Deactivate( orientationAIS );
+					}
+				}
 			}
 		}
 
-		void ShowIndex()
+		void ShowIndex( List<string> pathIDList )
 		{
 			// clear the previous text label
-			foreach( AIS_TextLabel textLabel in m_IndexList ) {
-				m_Viewer.GetAISContext().Remove( textLabel, false );
+			foreach( string szPathID in pathIDList ) {
+				if( m_IndexList.ContainsKey( szPathID ) ) {
+					m_Viewer.GetAISContext().Remove( m_IndexList[ szPathID ], false );
+					m_IndexList.Remove( szPathID );
+				}
 			}
-			m_IndexList.Clear();
 
 			// no need to show
 			if( m_ShowOrder == false ) {
@@ -793,13 +843,11 @@ namespace MyCAM.Editor
 			int nCurrentIndex = 0;
 
 
-			foreach( string szID in m_DataManager.PathIDList ) {
-				GetCraftDataByID( szID, out CraftData craftData );
-				GetCacheInfoByID( szID, out ICacheInfo cacheInfo );
-				if( m_DataManager.CacheInfoMap[ szID ].PathType != PathType.Contour ) {
+			foreach( string szPathID in pathIDList ) {
+				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
 					continue;
 				}
-				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
+				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).ContourCacheInfo;
 				gp_Pnt location = contourCacheInfo.CAMPointList[ 0 ].CADPoint.Point;
 				string szIndex = nCurrentIndex++.ToString();
 
@@ -810,44 +858,57 @@ namespace MyCAM.Editor
 				textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
 				textLabel.SetHeight( 20 );
 				textLabel.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
-				m_IndexList.Add( textLabel );
+				m_IndexList.Add( szPathID, textLabel );
 			}
 
 			// display text label
-			foreach( AIS_TextLabel textLabel in m_IndexList ) {
-				m_Viewer.GetAISContext().Display( textLabel, false );
-				m_Viewer.GetAISContext().Deactivate( textLabel );
+			foreach( string szPathID in pathIDList ) {
+				if( m_IndexList.ContainsKey( szPathID ) ) {
+					m_Viewer.GetAISContext().Display( m_IndexList[ szPathID ], false );
+					m_Viewer.GetAISContext().Deactivate( m_IndexList[ szPathID ] );
+				}
 			}
 		}
 
-		void ShowOverCut()
+		void ShowOverCut( List<string> pathIDList )
 		{
 			// clear the previous tool vec
-			foreach( AIS_Line overCutAIS in m_OverCutAISList ) {
-				m_Viewer.GetAISContext().Remove( overCutAIS, false );
+			foreach( string szPathID in pathIDList ) {
+				if( m_OverCutAISDict.ContainsKey( szPathID ) ) {
+					List<AIS_Line> overcutAISList = m_OverCutAISDict[ szPathID ];
+					foreach( AIS_Line overcutAIS in overcutAISList ) {
+						m_Viewer.GetAISContext().Remove( overcutAIS, false );
+					}
+					m_OverCutAISDict[ szPathID ].Clear();
+					m_OverCutAISDict.Remove( szPathID );
+				}
 			}
-			m_OverCutAISList.Clear();
 
-
-			foreach( string szID in m_DataManager.PathIDList ) {
-				GetCraftDataByID( szID, out CraftData craftData );
-				GetCacheInfoByID( szID, out ICacheInfo cacheInfo );
-				if( m_DataManager.CacheInfoMap[ szID ].PathType != PathType.Contour ) {
+			foreach( string szPathID in pathIDList ) {
+				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
 					continue;
 				}
-				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
+				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).ContourCacheInfo;
+				CraftData craftData = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).CraftData;
+				List<AIS_Line> overcutAISList = new List<AIS_Line>();
+				m_OverCutAISDict.Add( szPathID, overcutAISList );
 				if( craftData.OverCutLength > 0 ) {
 					for( int i = 0; i < contourCacheInfo.OverCutCAMPointList.Count - 1; i++ ) {
-						AIS_Line OverCutAISLine = GetLineAIS( contourCacheInfo.OverCutCAMPointList[ i ].CADPoint.Point, contourCacheInfo.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
-						m_OverCutAISList.Add( OverCutAISLine );
+						AIS_Line overCutAISLine = GetLineAIS( contourCacheInfo.OverCutCAMPointList[ i ].CADPoint.Point, contourCacheInfo.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
+						overcutAISList.Add( overCutAISLine );
 					}
 				}
 			}
 
 			// display the tool vec
-			foreach( AIS_Line toolVecAIS in m_OverCutAISList ) {
-				m_Viewer.GetAISContext().Display( toolVecAIS, false );
-				m_Viewer.GetAISContext().Deactivate( toolVecAIS );
+			foreach( string szPathID in pathIDList ) {
+				if( m_OverCutAISDict.ContainsKey( szPathID ) ) {
+					List<AIS_Line> overcutAISList = m_OverCutAISDict[ szPathID ];
+					foreach( AIS_Line overcutAIS in overcutAISList ) {
+						m_Viewer.GetAISContext().Display( overcutAIS, false );
+						m_Viewer.GetAISContext().Deactivate( overcutAIS );
+					}
+				}
 			}
 		}
 
@@ -870,11 +931,9 @@ namespace MyCAM.Editor
 
 
 			for( int i = 1; i < m_DataManager.PathIDList.Count; i++ ) {
-				GetCraftDataByID( m_DataManager.PathIDList[ i ], out CraftData previousCraftData );
-				GetCacheInfoByID( m_DataManager.PathIDList[ i ], out ICacheInfo previousCacheInfo );
-
-				GetCraftDataByID( m_DataManager.PathIDList[ i + 1 ], out CraftData currentCraftData );
-				GetCacheInfoByID( m_DataManager.PathIDList[ i + 1 ], out ICacheInfo currentCacheInfo );
+				ContourCacheInfo previousCacheInfo = ( m_DataManager.ObjectMap[ m_DataManager.PathIDList[ i - 1 ] ] as ContourPathObject ).ContourCacheInfo;
+				ContourCacheInfo currentCacheInfo = ( m_DataManager.ObjectMap[ m_DataManager.PathIDList[ i ] ] as ContourPathObject ).ContourCacheInfo;
+				CraftData currentCraftData = ( m_DataManager.ObjectMap[ m_DataManager.PathIDList[ i ] ] as ContourPathObject ).CraftData;
 
 				// p1: end of previous path
 				// p2: lift up point of previous path
@@ -930,8 +989,10 @@ namespace MyCAM.Editor
 			}
 
 			// entry
-			if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
-				GetCacheInfoByID( m_DataManager.PathIDList.First(), out ICacheInfo cacheInfo );
+			if( m_DataManager.EntryAndExitData.EntryDistance > 0 && m_DataManager.PathIDList.Count != 0 ) {
+				if( DataHelper.GetCacheInfoByID( m_DataManager, m_DataManager.PathIDList.First(), out ICacheInfo cacheInfo ) == false ) {
+					return;
+				}
 				CAMPoint firstPathStartPoint = cacheInfo.GetProcessStartPoint();
 				CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
 				if( firstPathStartPoint != null && entryPoint != null ) {
@@ -940,8 +1001,10 @@ namespace MyCAM.Editor
 			}
 
 			// exit
-			if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
-				GetCacheInfoByID( m_DataManager.PathIDList.Last(), out ICacheInfo cacheInfo );
+			if( m_DataManager.EntryAndExitData.ExitDistance > 0 && m_DataManager.PathIDList.Count != 0 ) {
+				if( DataHelper.GetCacheInfoByID( m_DataManager, m_DataManager.PathIDList.Last(), out ICacheInfo cacheInfo ) == false ) {
+					return;
+				}
 				CAMPoint lastPathEndPoint = cacheInfo.GetProcessEndPoint();
 				CAMPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
 				if( lastPathEndPoint != null && exitPoint != null ) {
@@ -969,28 +1032,34 @@ namespace MyCAM.Editor
 		void HideCAMData()
 		{
 			// hide tool vec
-			foreach( AIS_Line toolVecAIS in m_ToolVecAISList ) {
-				m_Viewer.GetAISContext().Remove( toolVecAIS, false );
+			foreach( List<AIS_Line> toolVecAIS in m_ToolVecAISDict.Values ) {
+				foreach( AIS_Line lineAIS in toolVecAIS ) {
+					m_Viewer.GetAISContext().Remove( lineAIS, false );
+				}
 			}
 
 			// hide orientation
-			foreach( AIS_Shape orientationAIS in m_OrientationAISList ) {
+			foreach( AIS_Shape orientationAIS in m_OrientationAISList.Values ) {
 				m_Viewer.GetAISContext().Remove( orientationAIS, false );
 			}
 
 			// hide index
-			foreach( AIS_TextLabel textLabel in m_IndexList ) {
+			foreach( AIS_TextLabel textLabel in m_IndexList.Values ) {
 				m_Viewer.GetAISContext().Remove( textLabel, false );
 			}
 
 			// hide over cut
-			foreach( AIS_Line overCutAIS in m_OverCutAISList ) {
-				m_Viewer.GetAISContext().Remove( overCutAIS, false );
+			foreach( List<AIS_Line> overCutAISList in m_OverCutAISDict.Values ) {
+				foreach( AIS_Line overCutAIS in overCutAISList ) {
+					m_Viewer.GetAISContext().Remove( overCutAIS, false );
+				}
 			}
 
 			// hide lead 
-			foreach( AIS_Line leadAIS in m_LeadAISList ) {
-				m_Viewer.GetAISContext().Remove( leadAIS, false );
+			foreach( List<AIS_Line> leadAISList in m_LeadAISDict.Values ) {
+				foreach( AIS_Line leadAIS in leadAISList ) {
+					m_Viewer.GetAISContext().Remove( leadAIS, false );
+				}
 			}
 
 			// hide traverse path
@@ -1002,8 +1071,10 @@ namespace MyCAM.Editor
 			}
 
 			// hide lead orientation
-			foreach( AIS_Shape orientationAIS in m_LeadOrientationAISList ) {
-				m_Viewer.GetAISContext().Remove( orientationAIS, false );
+			foreach( List<AIS_Shape> orientationAISList in m_LeadOrientationAISDict.Values ) {
+				foreach( AIS_Shape orientationAIS in orientationAISList ) {
+					m_Viewer.GetAISContext().Remove( orientationAIS, false );
+				}
 			}
 			m_Viewer.UpdateView();
 		}
@@ -1020,7 +1091,7 @@ namespace MyCAM.Editor
 				: ( index + craftData.StartPointIndex ) % nLength;
 
 			// need highlight if the index is modified index
-			return cacheInfo.GetToolVecModifyIndex().Contains( modifiedIndex );
+			return craftData.GetToolVecModifyIndex().Contains( modifiedIndex );
 		}
 
 		AIS_Line GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
@@ -1121,33 +1192,9 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		bool GetCraftDataByID( string szPathID, out CraftData craftData )
-		{
-			craftData = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| m_DataManager.ObjectMap.ContainsKey( szPathID ) == false
-				|| m_DataManager.ObjectMap[ szPathID ] == null
-				|| !( m_DataManager.ObjectMap[ szPathID ] is PathObject
-				|| ( (PathObject)m_DataManager.ObjectMap[ szPathID ] ).CraftData == null ) ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
-				return false;
-			}
-			craftData = ( (PathObject)m_DataManager.ObjectMap[ szPathID ] ).CraftData;
-			return true;
-		}
 
-		bool GetCacheInfoByID( string szPathID, out ICacheInfo cacheInfo )
-		{
-			cacheInfo = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| m_DataManager.CacheInfoMap.ContainsKey( szPathID ) == false
-				|| m_DataManager.CacheInfoMap[ szPathID ] == null ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
-				return false;
-			}
-			cacheInfo = m_DataManager.CacheInfoMap[ szPathID ];
-			return true;
-		}
+
+
 
 		// edit actions
 		protected override void OnEditActionStart( IEditorAction action )

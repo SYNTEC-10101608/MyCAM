@@ -103,6 +103,7 @@
     <Compile Include="Editor\Dialog\OverCutDlg.Designer.cs">
       <DependentUpon>OverCutDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helper\DataHelper.cs" />
     <Compile Include="Helper\MachineDataXMLHelper.cs" />
     <Compile Include="Helper\TraverseHelper.cs" />
     <Compile Include="FileManager\MachineDataDTO.cs" />
