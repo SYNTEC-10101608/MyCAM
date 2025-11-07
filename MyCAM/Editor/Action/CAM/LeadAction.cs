@@ -6,15 +6,19 @@ using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {
-	internal class LeadAction : EditActionBase
+	internal class LeadAction : EditCAMActionBase
 	{
-		public LeadAction( DataManager dataManager, List<CraftData> craftDataList )
+		public LeadAction( DataManager dataManager, List<string> pathIDList )
 			: base( dataManager )
 		{
-			if( craftDataList == null || craftDataList.Count == 0 ) {
-				throw new ArgumentNullException( "LeadAction constructing argument craftDataList null or empty" );
+			if( pathIDList == null || pathIDList.Count == 0 ) {
+				throw new ArgumentNullException( "LeadAction constructing argument pathIDList null or empty" );
 			}
-			m_CraftDataList = craftDataList;
+			m_PathIDList = pathIDList;
+
+			foreach( string ID in m_PathIDList ) {
+				m_CraftDataList.Add( ( m_DataManager.ObjectMap[ ID ] as PathObject ).CraftData );
+			}
 
 			// when user cancel the lead setting, need to turn path back
 			m_BackupLeadParamList = new List<LeadData>();
@@ -31,8 +35,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public Action PropertyChanged; // isConfirm, isHasLead
-
 		public override EditActionType ActionType
 		{
 			get
@@ -47,20 +49,20 @@ namespace MyCAM.Editor
 
 			// TODO: check all CAMData has same lead param or not
 			LeadDlg leadDialog = new LeadDlg( m_BackupLeadParamList[ 0 ].Clone() );
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 
 			// preview
 			leadDialog.Preview += ( leadData ) =>
 			{
 				SetLeadParamForAll( leadData );
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( m_PathIDList );
 			};
 
 			// confirm
 			leadDialog.Confirm += ( leadData ) =>
 			{
 				SetLeadParamForAll( leadData );
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( m_PathIDList );
 				End();
 			};
 
@@ -68,7 +70,7 @@ namespace MyCAM.Editor
 			leadDialog.Cancel += () =>
 			{
 				RestoreBackupLeadParams();
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( m_PathIDList );
 				End();
 			};
 			leadDialog.Show( MyApp.MainForm );
@@ -90,5 +92,6 @@ namespace MyCAM.Editor
 
 		List<CraftData> m_CraftDataList;
 		List<LeadData> m_BackupLeadParamList;
+		List<string> m_PathIDList;
 	}
 }

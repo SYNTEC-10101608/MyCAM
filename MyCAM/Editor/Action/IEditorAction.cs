@@ -1,6 +1,7 @@
 ﻿using MyCAM.Data;
 using OCCViewer;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -60,6 +61,16 @@ namespace MyCAM.Editor
 		{
 			get; set;
 		}
+	}
+
+	internal abstract class EditCAMActionBase : EditActionBase
+	{
+		protected EditCAMActionBase( DataManager dataManager ) : base( dataManager )
+		{
+
+		}
+
+		public Action<List<string>> PropertyChanged;
 	}
 
 	internal abstract class EditActionBase : IEditorAction

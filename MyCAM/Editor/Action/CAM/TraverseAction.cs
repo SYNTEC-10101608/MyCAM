@@ -5,15 +5,19 @@ using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {
-	internal class TraverseAction : EditActionBase
+	internal class TraverseAction : EditCAMActionBase
 	{
-		public TraverseAction( DataManager dataManager, List<CraftData> craftData )
+		public TraverseAction( DataManager dataManager, List<string> pathIDList )
 			: base( dataManager )
 		{
-			if( craftData == null || craftData.Count == 0 ) {
-				throw new ArgumentNullException( "TraverseAction constructing argument craftData null or empty" );
+			if( pathIDList == null || pathIDList.Count == 0 ) {
+				throw new ArgumentNullException( "LeadAction constructing argument pathIDList null or empty" );
 			}
-			m_CraftDataList = craftData;
+			m_PathIDList = pathIDList;
+
+			foreach( string ID in m_PathIDList ) {
+				m_CraftDataList.Add( ( m_DataManager.ObjectMap[ ID ] as PathObject ).CraftData );
+			}
 
 			// when user cancel the traverse setting, need to turn path back
 			m_BackupTraverseDataList = new List<TraverseData>();
@@ -30,8 +34,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public Action PropertyChanged;
-
 		public override EditActionType ActionType
 		{
 			get
@@ -46,7 +48,7 @@ namespace MyCAM.Editor
 
 			// TODO: check all CAMData has same traverse param or not
 			TraverseDlg traverseParamSettingFrom = new TraverseDlg( m_BackupTraverseDataList[ 0 ].Clone() );
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 			traverseParamSettingFrom.Confirm += ConfirmTraverseParam;
 			traverseParamSettingFrom.Preview += PreviewTraverseParam;
 			traverseParamSettingFrom.Cancel += CancelTraverseParam;
@@ -56,20 +58,20 @@ namespace MyCAM.Editor
 		void PreviewTraverseParam( TraverseData data )
 		{
 			SetTraverseParam( data );
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
 		void ConfirmTraverseParam( TraverseData data )
 		{
 			SetTraverseParam( data );
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 			End();
 		}
 
 		void CancelTraverseParam()
 		{
 			RestoreBackupTraverseData();
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 			End();
 		}
 
@@ -89,5 +91,6 @@ namespace MyCAM.Editor
 
 		List<CraftData> m_CraftDataList;
 		List<TraverseData> m_BackupTraverseDataList;
+		List<string> m_PathIDList;
 	}
 }
