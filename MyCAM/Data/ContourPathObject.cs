@@ -10,6 +10,7 @@ namespace MyCAM.Data
 		{
 			m_PathEdge5DList = pathDataList;
 			m_CraftData = craftData;
+			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_PathEdge5DList, craftData );
 		}
 
 		public List<PathEdge5D> PathDataList
@@ -32,11 +33,12 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return new ContourCacheInfo( m_PathEdge5DList, m_CraftData );
+				return m_ContourCacheInfo;
 			}
 		}
 
 		List<PathEdge5D> m_PathEdge5DList;
 		CraftData m_CraftData = new CraftData();
+		ContourCacheInfo m_ContourCacheInfo;
 	}
 }

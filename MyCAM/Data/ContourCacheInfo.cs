@@ -16,13 +16,19 @@ namespace MyCAM.Data
 		List<PathEdge5D> m_PathEdge5DList = new List<PathEdge5D>();
 		CraftData m_CraftData = new CraftData();
 
-		public ContourCacheInfo( List<PathEdge5D> pathDataList, CraftData craftData )
+		public ContourCacheInfo( string szID, List<PathEdge5D> pathDataList, CraftData craftData )
 		{
 			m_PathEdge5DList = pathDataList;
 			m_CraftData = craftData;
+			UID = szID;
 
 			BuildCADPointList();
 			BuildCAMPointList();
+		}
+
+		public string UID
+		{
+			get; private set;
 		}
 
 		public PathType PathType
@@ -170,7 +176,7 @@ namespace MyCAM.Data
 		public void UpdateCacheInfo( CraftData craftData )
 		{
 			m_CraftData = craftData;
-			BuildCAMPointList();
+			//BuildCAMPointList();
 		}
 
 		#endregion
