@@ -13,9 +13,8 @@ namespace MyCAM.Editor
 {
 	internal class ToolVectorAction : IndexSelectAction
 	{
-		public ToolVectorAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
-			ContourCacheInfo cacheInfo )
-			: base( dataManager, viewer, treeView, viewManager, cacheInfo )
+		public ToolVectorAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
+			: base( dataManager, viewer, treeView, viewManager, pathID )
 		{
 		}
 

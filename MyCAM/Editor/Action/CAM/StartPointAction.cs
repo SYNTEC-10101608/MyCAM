@@ -7,8 +7,7 @@ namespace MyCAM.Editor
 {
 	internal class StartPointAction : IndexSelectAction
 	{
-		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
-			ContourCacheInfo cacheInfo, CraftData craftData )
+		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
 			: base( dataManager, viewer, treeView, viewManager, cacheInfo )
 		{
 			m_CraftData = craftData ?? new CraftData();

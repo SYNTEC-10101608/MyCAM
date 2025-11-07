@@ -13,14 +13,14 @@ namespace MyCAM.Editor
 {
 	internal abstract class IndexSelectAction : KeyMouseActionBase
 	{
-		protected IndexSelectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
-			ContourCacheInfo cacheInfo )
+		protected IndexSelectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
-			if( cacheInfo == null ) {
-				throw new ArgumentNullException( "PathIndexSelectAction constructing argument cacheInfo null" );
+			if( pathID == string.Empty ) {
+				throw new ArgumentNullException( "IndexSelectAction constructing argument null" );
 			}
-			m_CacheInfo = cacheInfo;
+			m_PathID = pathID;
+			m_CacheInfo = m_DataManager.ObjectMap[ m_PathID ] as ContourCacheInfo;
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}
@@ -122,6 +122,7 @@ namespace MyCAM.Editor
 			m_SelectedPointAIS.SetWidth( 1e-3 );
 		}
 
+		protected string m_PathID;
 		protected ContourCacheInfo m_CacheInfo;
 
 		// map point on view to index on CAMData
