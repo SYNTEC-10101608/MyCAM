@@ -209,10 +209,10 @@ namespace MyCAM.Data
 		{
 			List<ContourCacheInfo> cacheInfoList = new List<ContourCacheInfo>();
 			foreach( string pathID in PathIDList ) {
-				if( ( ObjectMap[ pathID ] as PartObject ).PathType == PathType.Rectangle ) {
+				if( ( ObjectMap[ pathID ] as PathObject ).PathType != PathType.Contour ) {
 					continue;
 				}
-				cacheInfoList.Add( ObjectMap[ pathID ] as ContourCacheInfo );
+				cacheInfoList.Add( ( ObjectMap[ pathID ] as ContourPathObject ).ContourCacheInfo );
 			}
 			return cacheInfoList;
 		}
@@ -340,7 +340,7 @@ namespace MyCAM.Data
 		readonly MixTypeMachineData m_DefaultMachineData = new MixTypeMachineData()
 		{
 			ToolDirection = ToolDirection.Z,
-			MasterRotaryAxis = RotaryAxis.Y,
+			MasterRotaryAxis = RotaryAxis.X,
 			SlaveRotaryAxis = RotaryAxis.Z,
 			MasterRotaryDirection = RotaryDirection.RightHand,
 			SlaveRotaryDirection = RotaryDirection.LeftHand,

@@ -7,22 +7,25 @@ namespace MyCAM.Post
 {
 	internal class NCWriter
 	{
-		public NCWriter( List<ContourCacheInfo> processCacheInfo, List<CraftData> craftDataList, MachineData machineData, EntryAndExitData entryAndExitData )
+		public NCWriter( DataManager dataManager )
 		{
-			if( processCacheInfo == null || machineData == null || entryAndExitData == null ) {
+			if( dataManager.GetContourCacheInfoList() == null || dataManager.MachineData == null || dataManager.EntryAndExitData == null ) {
 				throw new ArgumentNullException( "NCWriter constructor argument is null." );
 			}
-			m_ProcessCacheInfo = processCacheInfo;
-			m_CraftDataList = craftDataList;
-			m_MachineData = machineData;
-			m_PostSolver = new PostSolver( machineData );
+			m_ProcessCacheInfo = dataManager.GetContourCacheInfoList();
+
+			foreach( var szID in dataManager.PathIDList ) {
+				m_CraftDataList.Add( ( dataManager.ObjectMap[ szID ] as PathObject ).CraftData );
+			}
+			m_MachineData = dataManager.MachineData;
+			m_PostSolver = new PostSolver( dataManager.MachineData );
 			m_MasterAxisName = ConvertRotaryAxisName( m_MachineData.MasterRotaryAxis );
 			m_SlaveAxisName = ConvertRotaryAxisName( m_MachineData.SlaveRotaryAxis );
-			m_EntryAndExitData = entryAndExitData;
+			m_EntryAndExitData = dataManager.EntryAndExitData;
 		}
 
 		List<ContourCacheInfo> m_ProcessCacheInfo;
-		List<CraftData> m_CraftDataList;
+		List<CraftData> m_CraftDataList = new List<CraftData>();
 		StreamWriter m_StreamWriter;
 		PostSolver m_PostSolver;
 		MachineData m_MachineData;

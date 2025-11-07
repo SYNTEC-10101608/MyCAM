@@ -80,7 +80,7 @@ namespace MyCAM.Editor
 		Dictionary<string, List<AIS_Line>> m_ToolVecAISDict = new Dictionary<string, List<AIS_Line>>();
 
 		Dictionary<string, AIS_Shape> m_OrientationAISList = new Dictionary<string, AIS_Shape>(); // need refresh, no need activate
-		Dictionary<string, AIS_TextLabel> m_IndexList = new Dictionary<string, AIS_TextLabel>(); // need refresh, no need activate
+		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>(); // need refresh, no need activate
 		Dictionary<string, List<AIS_Line>> m_LeadAISDict = new Dictionary<string, List<AIS_Line>>(); // need refresh, no need activate
 		Dictionary<string, List<AIS_Shape>> m_LeadOrientationAISDict = new Dictionary<string, List<AIS_Shape>>(); // need refresh, no need activate
 
@@ -277,7 +277,7 @@ namespace MyCAM.Editor
 
 			// clear selection after remove path
 			m_DefaultAction.ClearSelection();
-			ShowCAMData();
+			RemoveCAMData( szPathIDList );
 		}
 
 		#region Set CAM
@@ -494,17 +494,7 @@ namespace MyCAM.Editor
 		{
 			// stop current action
 			EndActionIfNotDefault();
-
-			List<CraftData> craftDataList = new List<CraftData>();
-			foreach( string szID in m_DataManager.PathIDList ) {
-				if( !DataHelper.GetCraftDataByID( m_DataManager, szID, out CraftData craftData ) ) {
-					MyApp.Logger.ShowOnLogPanel( $"路徑 {szID} 未設定加工參數，無法轉出NC", MyApp.NoticeType.Error );
-					return;
-				}
-				craftDataList.Add( craftData );
-			}
-
-			NCWriter writer = new NCWriter( m_DataManager.GetContourCacheInfoList(), craftDataList, m_DataManager.MachineData, m_DataManager.EntryAndExitData );
+			NCWriter writer = new NCWriter( m_DataManager );
 			bool bSuccess = writer.ConvertSuccess( out string szErrorMessage );
 			if( bSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提示]成功轉出NC", MyApp.NoticeType.Hint );
@@ -579,7 +569,7 @@ namespace MyCAM.Editor
 			// TODO: we dont always need to refresh such many things
 			ShowToolVec( pathIDList );
 			ShowOrientation( pathIDList );
-			ShowIndex( pathIDList );
+			ShowIndex();
 			ShowOverCut( pathIDList );
 			ShowLeadLine( pathIDList );
 			ShowLeadOrientation( pathIDList );
@@ -592,7 +582,7 @@ namespace MyCAM.Editor
 			// TODO: we dont always need to refresh such many things
 			ShowToolVec( pathIDList );
 			ShowOrientation( pathIDList );
-			ShowIndex( pathIDList );
+			ShowIndex();
 			ShowOverCut( pathIDList );
 			ShowLeadLine( pathIDList );
 			ShowLeadOrientation( pathIDList );
@@ -600,7 +590,21 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		void ShowToolVec( List<string> pathIDList )
+		void RemoveCAMData( List<string> pathIDList )
+		{
+			// TODO: we dont always need to refresh such many things
+			RomoveToolVec( pathIDList );
+			RomoveToolVec( pathIDList );
+			RomoveLeadLine( pathIDList );
+			RomoveOrientation( pathIDList );
+			RomoveIndex();
+			RomoveOverCut( pathIDList );
+			RomoveLeadOrientation( pathIDList );
+			ShowTraversalPath();
+			m_Viewer.UpdateView();
+		}
+
+		void RomoveToolVec( List<string> pathIDList )
 		{
 			// clear the previous tool vec
 			foreach( string szPathID in pathIDList ) {
@@ -613,7 +617,11 @@ namespace MyCAM.Editor
 					m_ToolVecAISDict.Remove( szPathID );
 				}
 			}
+		}
 
+		void ShowToolVec( List<string> pathIDList )
+		{
+			RomoveToolVec( pathIDList );
 			// no need to show
 			if( m_ShowToolVec == false ) {
 				return;
@@ -652,7 +660,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void ShowLeadLine( List<string> pathIDList )
+		void RomoveLeadLine( List<string> pathIDList )
 		{
 			// clear the previous tool vec
 			foreach( string szPathID in pathIDList ) {
@@ -665,7 +673,11 @@ namespace MyCAM.Editor
 					m_LeadAISDict.Remove( szPathID );
 				}
 			}
+		}
 
+		void ShowLeadLine( List<string> pathIDList )
+		{
+			RomoveLeadLine( pathIDList );
 			foreach( string szPathID in pathIDList ) {
 				if( DataHelper.GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false
 					|| DataHelper.GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) == false ) {
@@ -716,7 +728,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void ShowOrientation( List<string> pathIDList )
+		void RomoveOrientation( List<string> pathIDList )
 		{
 			// clear the previous orientation
 			foreach( string szPathID in pathIDList ) {
@@ -725,6 +737,11 @@ namespace MyCAM.Editor
 					m_OrientationAISList.Remove( szPathID );
 				}
 			}
+		}
+
+		void ShowOrientation( List<string> pathIDList )
+		{
+			RomoveOrientation( pathIDList );
 
 			// no need to show
 			if( m_ShowOrientation == false ) {
@@ -756,7 +773,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void ShowLeadOrientation( List<string> pathIDList )
+		void RomoveLeadOrientation( List<string> pathIDList )
 		{
 			// clear the previous orientation
 			foreach( string szPathID in pathIDList ) {
@@ -769,7 +786,11 @@ namespace MyCAM.Editor
 					m_LeadOrientationAISDict.Remove( szPathID );
 				}
 			}
+		}
 
+		void ShowLeadOrientation( List<string> pathIDList )
+		{
+			RomoveLeadOrientation( pathIDList );
 			foreach( string szPathID in pathIDList ) {
 				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
 					continue;
@@ -824,15 +845,17 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void ShowIndex( List<string> pathIDList )
+		void RomoveIndex()
 		{
-			// clear the previous text label
-			foreach( string szPathID in pathIDList ) {
-				if( m_IndexList.ContainsKey( szPathID ) ) {
-					m_Viewer.GetAISContext().Remove( m_IndexList[ szPathID ], false );
-					m_IndexList.Remove( szPathID );
-				}
+			foreach( AIS_TextLabel textLabel in m_IndexList ) {
+				m_Viewer.GetAISContext().Remove( textLabel, false );
 			}
+			m_IndexList.Clear();
+		}
+
+		void ShowIndex()
+		{
+			RomoveIndex();
 
 			// no need to show
 			if( m_ShowOrder == false ) {
@@ -841,14 +864,8 @@ namespace MyCAM.Editor
 
 			// create text label
 			int nCurrentIndex = 0;
-
-
-			foreach( string szPathID in pathIDList ) {
-				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
-					continue;
-				}
-				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).ContourCacheInfo;
-				gp_Pnt location = contourCacheInfo.CAMPointList[ 0 ].CADPoint.Point;
+			foreach( ContourCacheInfo cacheInfo in m_DataManager.GetContourCacheInfoList() ) {
+				gp_Pnt location = cacheInfo.CAMPointList[ 0 ].CADPoint.Point;
 				string szIndex = nCurrentIndex++.ToString();
 
 				// create text label ais
@@ -858,19 +875,17 @@ namespace MyCAM.Editor
 				textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
 				textLabel.SetHeight( 20 );
 				textLabel.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
-				m_IndexList.Add( szPathID, textLabel );
+				m_IndexList.Add( textLabel );
 			}
 
 			// display text label
-			foreach( string szPathID in pathIDList ) {
-				if( m_IndexList.ContainsKey( szPathID ) ) {
-					m_Viewer.GetAISContext().Display( m_IndexList[ szPathID ], false );
-					m_Viewer.GetAISContext().Deactivate( m_IndexList[ szPathID ] );
-				}
+			foreach( AIS_TextLabel textLabel in m_IndexList ) {
+				m_Viewer.GetAISContext().Display( textLabel, false );
+				m_Viewer.GetAISContext().Deactivate( textLabel );
 			}
 		}
 
-		void ShowOverCut( List<string> pathIDList )
+		void RomoveOverCut( List<string> pathIDList )
 		{
 			// clear the previous tool vec
 			foreach( string szPathID in pathIDList ) {
@@ -883,7 +898,11 @@ namespace MyCAM.Editor
 					m_OverCutAISDict.Remove( szPathID );
 				}
 			}
+		}
 
+		void ShowOverCut( List<string> pathIDList )
+		{
+			RomoveOverCut( pathIDList );
 			foreach( string szPathID in pathIDList ) {
 				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
 					continue;
@@ -1044,7 +1063,7 @@ namespace MyCAM.Editor
 			}
 
 			// hide index
-			foreach( AIS_TextLabel textLabel in m_IndexList.Values ) {
+			foreach( AIS_TextLabel textLabel in m_IndexList ) {
 				m_Viewer.GetAISContext().Remove( textLabel, false );
 			}
 
