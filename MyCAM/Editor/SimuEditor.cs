@@ -104,15 +104,18 @@ namespace MyCAM.Editor
 
 		public void BuildSimuData()
 		{
+
+			List<ICacheInfo> cacheInfoList = m_DataManager.GetCacheInfoList();
+
 			if( m_DataManager.GetCacheInfoList().Count == 0 || m_PostSolver == null ) {
 				return;
 			}
 			foreach( string szID in m_DataManager.PartIDList ) {
 				CraftData craftData = ( m_DataManager.ObjectMap[ szID ] as PathObject ).CraftData;
-				ICacheInfo cacheInfo = m_DataManager.CacheInfoMap[ szID ];
+				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szID ] as ContourPathObject ).ContourCacheInfo;
 				gp_Vec G54Offset = new gp_Vec( 40, -385, -640 );
 				m_PostSolver.G54Offset = G54Offset;
-				if( PostHelper.SolvePath( m_PostSolver, (ContourCacheInfo)cacheInfo, craftData,
+				if( PostHelper.SolvePath( m_PostSolver, contourCacheInfo, craftData,
 					new PathEndInfo(), new EntryAndExitData(),
 					out _, out PostData simuPostData, out _ ) == false ) {
 					continue;
