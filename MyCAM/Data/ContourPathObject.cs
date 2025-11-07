@@ -48,6 +48,11 @@ namespace MyCAM.Data
 			}
 		}
 
+		public override void DoTransform( gp_Trsf transform )
+		{
+			base.DoTransform( transform );
+			m_ContourCacheInfo.Transform( transform );
+		}
 
 		List<PathEdge5D> m_PathEdge5DList;
 		CraftData m_CraftData;
