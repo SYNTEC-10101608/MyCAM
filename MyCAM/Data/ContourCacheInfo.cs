@@ -1,10 +1,6 @@
-﻿using MyCAM.Helper;
-using OCC.BOPTools;
-using OCC.BRepAdaptor;
-using OCC.GCPnts;
+﻿using MyCAM.App;
+using MyCAM.Helper;
 using OCC.gp;
-using OCC.TopAbs;
-using OCC.TopoDS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,17 +9,16 @@ namespace MyCAM.Data
 {
 	internal class ContourCacheInfo : ICacheInfo
 	{
-		List<PathEdge5D> m_PathEdge5DList;
 		CraftData m_CraftData;
+		List<CADPoint> m_CADPointList = new List<CADPoint>();
 
-		public ContourCacheInfo( DataManager dataManager, string szID, List<PathEdge5D> pathDataList, CraftData craftData )
+		public ContourCacheInfo( DataManager dataManager, string szID, List<CADPoint> cadPointList, CraftData craftData )
 		{
 			m_DataManager = dataManager;
-			m_PathEdge5DList = pathDataList;
+			m_CADPointList = cadPointList;
 			m_CraftData = craftData;
 			UID = szID;
 
-			BuildCADPointList();
 			BuildCAMPointList();
 		}
 
@@ -41,10 +36,6 @@ namespace MyCAM.Data
 		}
 
 		#region result
-		public List<CADPoint> CADPointList
-		{
-			get; private set;
-		}
 
 		// To-do：use this function is Dirty
 		internal List<CAMPoint> CAMPointList
@@ -106,7 +97,7 @@ namespace MyCAM.Data
 		public void Transform( gp_Trsf transform )
 		{
 			// transform CAD points
-			foreach( CADPoint cadPoint in CADPointList ) {
+			foreach( CADPoint cadPoint in m_CADPointList ) {
 				cadPoint.Transform( transform );
 			}
 			m_IsDirty = true;
@@ -151,117 +142,6 @@ namespace MyCAM.Data
 
 		#endregion
 
-		void BuildCADPointList()
-		{
-			//if( m_DataManager.ObjectMap.ContainsKey( UID ) ) {
-			//	m_PathEdge5DList = ( m_DataManager.ObjectMap[ UID ] as ContourPathObject ).PathDataList;
-			//}
-
-			CADPointList = new List<CADPoint>();
-			if( m_PathEdge5DList == null ) {
-				return;
-			}
-
-			// go through the contour edges
-			for( int i = 0; i < m_PathEdge5DList.Count; i++ ) {
-				TopoDS_Edge edge = m_PathEdge5DList[ i ].PathEdge;
-				TopoDS_Face shellFace = m_PathEdge5DList[ i ].ComponentFace;
-				TopoDS_Face solidFace = m_PathEdge5DList[ i ].ComponentFace; // TODO: set solid face
-				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace,
-					i == 0, i == m_PathEdge5DList.Count - 1 ) );
-			}
-		}
-
-		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace, bool bFirst, bool bLast )
-		{
-			List<CADPoint> oneSegmentPointList = new List<CADPoint>();
-
-			// get curve parameters
-			BRepAdaptor_Curve adC = new BRepAdaptor_Curve( edge, shellFace );
-			double dStartU = adC.FirstParameter();
-			double dEndU = adC.LastParameter();
-
-			// break the curve into segments with given deflection precision
-			GCPnts_QuasiUniformDeflection qUD = new GCPnts_QuasiUniformDeflection( adC, PRECISION_DEFLECTION, dStartU, dEndU );
-
-			// break the curve into segments with given max length
-			List<double> segmentParamList = new List<double>();
-			for( int i = 1; i < qUD.NbPoints(); i++ ) {
-				segmentParamList.Add( qUD.Parameter( i ) );
-				double dLength = GCPnts_AbscissaPoint.Length( adC, qUD.Parameter( i ), qUD.Parameter( i + 1 ) );
-
-				// add sub-segments if the length is greater than max length
-				if( dLength > PRECISION_MAX_LENGTH ) {
-					int nSubSegmentCount = (int)Math.Ceiling( dLength / PRECISION_MAX_LENGTH );
-					double dSubSegmentLength = ( qUD.Parameter( i + 1 ) - qUD.Parameter( i ) ) / nSubSegmentCount;
-
-					// using equal parameter to break the segment
-					for( int j = 1; j < nSubSegmentCount; j++ ) {
-						segmentParamList.Add( qUD.Parameter( i ) + j * dSubSegmentLength );
-					}
-				}
-			}
-			segmentParamList.Add( qUD.Parameter( qUD.NbPoints() ) );
-
-			// reverse the segment parameters if the edge is reversed
-			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-				segmentParamList.Reverse();
-			}
-
-			for( int i = 0; i < segmentParamList.Count; i++ ) {
-				double U = segmentParamList[ i ];
-
-				// get point
-				gp_Pnt point = adC.Value( U );
-
-				// get shell normal (1st)
-				gp_Dir normalVec_1st = new gp_Dir();
-				BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, shellFace, U, ref normalVec_1st );
-				if( shellFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-					normalVec_1st.Reverse();
-				}
-
-				// TODO: get solid normal (2nd)
-				gp_Dir normalVec_2nd = new gp_Dir( normalVec_1st.XYZ() );
-
-				// get tangent
-				gp_Vec tangentVec = new gp_Vec();
-				gp_Pnt _p = new gp_Pnt();
-				adC.D1( U, ref _p, ref tangentVec );
-				if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-					tangentVec.Reverse();
-				}
-
-				// build
-				CADPoint cadPoint = new CADPoint( point, normalVec_1st, normalVec_2nd, new gp_Dir( tangentVec ) );
-
-				// map the last point of the previous edge to the start point, and use current start point to present
-				if( !bFirst && i == 0 && CADPointList.Count > 0 ) {
-					CADPoint lastPoint = CADPointList.Last();
-					CADPointList.RemoveAt( CADPointList.Count - 1 );
-					m_ConnectPointMap[ cadPoint ] = lastPoint;
-					oneSegmentPointList.Add( cadPoint );
-				}
-				else if( bLast && i == segmentParamList.Count - 1 && CADPointList.Count > 0 ) {
-
-					// map the last point to the start point
-					if( m_CraftData.IsClosed ) {
-						CADPoint firstPoint = CADPointList[ 0 ];
-						m_ConnectPointMap[ firstPoint ] = cadPoint;
-					}
-
-					// add the last point
-					else {
-						oneSegmentPointList.Add( cadPoint );
-					}
-				}
-				else {
-					oneSegmentPointList.Add( cadPoint );
-				}
-			}
-			return oneSegmentPointList;
-		}
-
 		void BuildCAMPointList()
 		{
 			//if( m_DataManager.ObjectMap.ContainsKey( UID ) ) {
@@ -286,10 +166,10 @@ namespace MyCAM.Data
 
 		void SetToolVec()
 		{
-			for( int i = 0; i < CADPointList.Count; i++ ) {
+			for( int i = 0; i < m_CADPointList.Count; i++ ) {
 
 				// calculate tool vector
-				CADPoint cadPoint = CADPointList[ i ];
+				CADPoint cadPoint = m_CADPointList[ i ];
 				CAMPoint camPoint;
 				if( m_CraftData.IsToolVecReverse ) {
 					camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st.Reversed() );
@@ -469,7 +349,7 @@ namespace MyCAM.Data
 
 					// need to stop inside this segment
 					double dRemain = m_CraftData.OverCutLength - dTotalOverCutLength;
-					if( dRemain <= PRECISION_MIN_ERROR ) {
+					if( dRemain <= MyApp.PRECISION_MIN_ERROR ) {
 						return;
 					}
 
@@ -505,7 +385,7 @@ namespace MyCAM.Data
 		gp_Dir InterpolateVecBetween2Vec( gp_Vec currentVec, gp_Vec nextVec, double interpolatePercent )
 		{
 			// this case is unsolcvable, so just return current vec
-			if( currentVec.IsOpposite( nextVec, PRECISION_MIN_ERROR ) ) {
+			if( currentVec.IsOpposite( nextVec, MyApp.PRECISION_MIN_ERROR ) ) {
 				return new gp_Dir( currentVec.XYZ() );
 			}
 
@@ -540,7 +420,7 @@ namespace MyCAM.Data
 			double dDistanceBetweenCurrentPoint2NewPoint = currentCAMPoint.CADPoint.Point.Distance( point );
 
 			// two point overlap
-			if( dDistanceOfCAMPath2Point <= PRECISION_MIN_ERROR ) {
+			if( dDistanceOfCAMPath2Point <= MyApp.PRECISION_MIN_ERROR ) {
 				return;
 			}
 			double interpolatePercent = dDistanceBetweenCurrentPoint2NewPoint / dDistanceOfCAMPath2Point;
@@ -565,7 +445,7 @@ namespace MyCAM.Data
 					m_LeadInCAMPointList = LeadHelper.BuildStraightLeadLine( m_CAMPointList.First(), true, m_CraftData.LeadLineParam.LeadIn.Length, m_CraftData.LeadLineParam.LeadIn.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse );
 					break;
 				case LeadLineType.Arc:
-					m_LeadInCAMPointList = LeadHelper.BuildArcLeadLine( m_CAMPointList.First(), true, m_CraftData.LeadLineParam.LeadIn.Length, m_CraftData.LeadLineParam.LeadIn.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH );
+					m_LeadInCAMPointList = LeadHelper.BuildArcLeadLine( m_CAMPointList.First(), true, m_CraftData.LeadLineParam.LeadIn.Length, m_CraftData.LeadLineParam.LeadIn.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse, MyApp.PRECISION_DEFLECTION, MyApp.PRECISION_MAX_LENGTH );
 					break;
 				default:
 					break;
@@ -592,7 +472,7 @@ namespace MyCAM.Data
 					m_LeadOutCAMPointList = LeadHelper.BuildStraightLeadLine( leadOutStartPoint, false, m_CraftData.LeadLineParam.LeadOut.Length, m_CraftData.LeadLineParam.LeadOut.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse );
 					break;
 				case LeadLineType.Arc:
-					m_LeadOutCAMPointList = LeadHelper.BuildArcLeadLine( leadOutStartPoint, false, m_CraftData.LeadLineParam.LeadOut.Length, m_CraftData.LeadLineParam.LeadOut.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH );
+					m_LeadOutCAMPointList = LeadHelper.BuildArcLeadLine( leadOutStartPoint, false, m_CraftData.LeadLineParam.LeadOut.Length, m_CraftData.LeadLineParam.LeadOut.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse, MyApp.PRECISION_DEFLECTION, MyApp.PRECISION_MAX_LENGTH );
 					break;
 				default:
 					break;
@@ -610,10 +490,7 @@ namespace MyCAM.Data
 		bool m_IsDirty = false;
 		DataManager m_DataManager = null;
 
-		// Discretize parameters
-		Dictionary<CADPoint, CADPoint> m_ConnectPointMap = new Dictionary<CADPoint, CADPoint>();
-		const double PRECISION_DEFLECTION = 0.01;
-		const double PRECISION_MAX_LENGTH = 1;
-		const double PRECISION_MIN_ERROR = 0.001;
+
+
 	}
 }

@@ -640,7 +640,7 @@ namespace MyCAM.Editor
 				for( int i = 0; i < contourCacheInfo.CAMPointList.Count; i++ ) {
 					CAMPoint camPoint = contourCacheInfo.CAMPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					if( IsModifiedToolVecIndex( i, contourCacheInfo, craftData ) ) {
+					if( IsModifiedToolVecIndex( i, contourCacheInfo, craftData, contourCacheInfo.CAMPointList.Select( point => camPoint.CADPoint ).ToList() ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
 					}
@@ -1101,10 +1101,10 @@ namespace MyCAM.Editor
 		#endregion
 
 		// methods
-		bool IsModifiedToolVecIndex( int index, ContourCacheInfo cacheInfo, CraftData craftData )
+		bool IsModifiedToolVecIndex( int index, ContourCacheInfo cacheInfo, CraftData craftData, List<CADPoint> cadPointList )
 		{
 			// map CAD and CAM point index
-			int nLength = cacheInfo.CADPointList.Count;
+			int nLength = cadPointList.Count;
 			int modifiedIndex = craftData.IsReverse
 				? ( nLength - ( craftData.IsClosed ? 0 : 1 ) - index + craftData.StartPointIndex ) % nLength
 				: ( index + craftData.StartPointIndex ) % nLength;
