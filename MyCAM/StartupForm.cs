@@ -195,12 +195,12 @@ namespace MyCAM
 
 		void m_tsbImportProjectFile_Click( object sender, EventArgs e )
 		{
-			//m_CADEditor.ImportProjectFile();
+			m_CADEditor.ImportProjectFile();
 		}
 
 		void m_tsbSaveProjectFile_Click( object sender, EventArgs e )
 		{
-			//m_CADEditor.SaveProjectFile();
+			m_CADEditor.SaveProjectFile();
 		}
 
 		// add feature
