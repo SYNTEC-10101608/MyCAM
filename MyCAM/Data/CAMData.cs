@@ -751,7 +751,11 @@ namespace MyCAM.Data
 		void BuildPathCAMSegment()
 		{
 			List<ICADSegmentElement> reorderedSegment = BreakAndReorderByStartPoint( this );
-			List<(int, int)> ModifyMapList = ModidyInexMap( this, reorderedSegment.Count, out Dictionary<(int, int), (int, int)> ControlBarMap );
+
+			// List<int, int> is new tool bar index after modify, Dictionary<int, int> key is new tool bar index vlaue is old tool bar index
+			List<(int, int)> ModifyMapList = ModidyToolBarInexMap( this, reorderedSegment.Count, out Dictionary<(int, int), (int, int)> ControlBarMap );
+
+			// dictionary<int, (int, int)> key is new tool bar segment index (tool bar must at segment last point index) , value is old tool bar (segment index, point index)
 			List<ICADSegmentElement> breakedCADSegment = BreakByToolVecBar( reorderedSegment, ModifyMapList, ControlBarMap, out Dictionary<int, (int, int)> ControlBarMapedAsIndex );
 			List<ICAMSegmentElement> camSegmentList = BuildCAMSegment( this, breakedCADSegment, ControlBarMapedAsIndex );
 			List<int> controlBarIndex = ControlBarMapedAsIndex.Keys.ToList();
@@ -913,7 +917,7 @@ namespace MyCAM.Data
 			return new List<int> { barIndex[ prevBarPos ], barIndex[ nextBarPos ] };
 		}
 
-		List<(int, int)> ModidyInexMap( CAMData camData, int SegmentCount, out Dictionary<(int, int), (int, int)> ControlBarMap )
+		List<(int, int)> ModidyToolBarInexMap( CAMData camData, int SegmentCount, out Dictionary<(int, int), (int, int)> ControlBarMap )
 		{
 			ControlBarMap = new Dictionary<(int, int), (int, int)>();
 			List<(int, int)> modifyMap = camData.ToolVecModifyMap_New.Keys.ToList();
@@ -971,6 +975,12 @@ namespace MyCAM.Data
 			(int segment, int pointIndex) startPoint = camData.NewStartPoint;
 			List<ICADSegmentElement> reorderedCADSegmentList = new List<ICADSegmentElement>();
 
+			// unclosed contour no need to reorder
+			if( camData.IsClosed == false ) {
+				reorderedCADSegmentList = camData.CADSegmentList;
+				return reorderedCADSegmentList;
+			}
+
 			// reorder segment list
 			List<ICADSegmentElement> cadSegmentList = camData.CADSegmentList;
 			for( int i = 0; i < cadSegmentList.Count; i++ ) {
@@ -986,8 +996,8 @@ namespace MyCAM.Data
 				return reorderedCADSegmentList;
 			}
 
+			// split segment at start point
 			bool isSuccess = SeparateCADSegmentAtTargetIndex( camData.CADSegmentList[ startPoint.segment ], startPoint.pointIndex, out List<ICADSegmentElement> breakedCADSegmentList );
-
 			if( isSuccess ) {
 
 				// this segment need to break
@@ -1013,8 +1023,6 @@ namespace MyCAM.Data
 			for( int segmentIndex = 0; segmentIndex < orderedCADSegmentList.Count; segmentIndex++ ) {
 				List<int> breakPointIndex = new List<int>();
 				for( int j = 0; j < modifyBar.Count; j++ ) {
-
-					// last point no need to break
 					if( modifyBar[ j ].Item1 == segmentIndex ) {
 						breakPointIndex.Add( modifyBar[ j ].Item2 );
 					}
@@ -1069,9 +1077,14 @@ namespace MyCAM.Data
 			if( segmentCADPointList == null || segmentCADPointList.Count == 0 ) {
 				return resultCADPointList;
 			}
+
 			separateLocation = separateLocation.OrderBy( index => index ).ToList();
 			int nStartIndex = 0;
 			foreach( int nIndex in separateLocation ) {
+
+				if( nIndex == 0 ) {
+					continue;
+				}
 
 				// avoid out of range
 				if( nIndex > segmentCADPointList.Count - 1 ) {
