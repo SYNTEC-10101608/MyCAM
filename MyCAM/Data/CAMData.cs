@@ -1082,6 +1082,7 @@ namespace MyCAM.Data
 			int nStartIndex = 0;
 			foreach( int nIndex in separateLocation ) {
 
+				// nuclose path may have tool bar and segment index 0
 				if( nIndex == 0 ) {
 					continue;
 				}
