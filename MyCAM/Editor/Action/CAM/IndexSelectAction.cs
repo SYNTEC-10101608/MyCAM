@@ -20,7 +20,7 @@ namespace MyCAM.Editor
 				throw new ArgumentNullException( "IndexSelectAction constructing argument null" );
 			}
 			m_PathID = pathID;
-			m_CacheInfo = ( m_DataManager.ObjectMap[ m_PathID ] as ContourPathObject ).ContourCacheInfo;
+			m_ContourPathObject = (ContourPathObject)m_DataManager.ObjectMap[ m_PathID ];
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}
@@ -107,8 +107,8 @@ namespace MyCAM.Editor
 			BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
 
 			// add points to the polygon
-			for( int i = 0; i < m_CacheInfo.CADPointList.Count; i++ ) {
-				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_CacheInfo.CADPointList[ i ].Point );
+			for( int i = 0; i < m_ContourPathObject.CADPointList.Count; i++ ) {
+				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_ContourPathObject.CADPointList[ i ].Point );
 				polygonMaker.Add( vertexMaker.Vertex() );
 				m_VertexMap.Bind( vertexMaker.Vertex(), i );
 			}
@@ -123,7 +123,7 @@ namespace MyCAM.Editor
 		}
 
 		protected string m_PathID;
-		protected ContourCacheInfo m_CacheInfo;
+		protected ContourPathObject m_ContourPathObject;
 
 		// map point on view to index on CAMData
 		protected TopTools_DataMapOfShapeInteger m_VertexMap;

@@ -30,6 +30,14 @@ namespace MyCAM.Data
 			m_ContourCacheInfo = new ContourCacheInfo( dataManager, szUID, m_CADPointList, m_CraftData );
 		}
 
+		public ContourPathObject( string szUID, TopoDS_Shape shapeData, List<CADPoint> cadPointList, CraftData craftData )
+			: base( szUID, shapeData, PathType.Contour )
+		{
+			m_CADPointList = cadPointList;
+			m_CraftData = craftData;
+			m_ContourCacheInfo = new ContourCacheInfo( null, szUID, m_CADPointList, m_CraftData );
+		}
+
 		public List<CADPoint> CADPointList
 		{
 			get
