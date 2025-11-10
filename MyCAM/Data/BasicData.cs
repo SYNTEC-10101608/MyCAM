@@ -57,7 +57,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal abstract class PathObject : IObject
+	public abstract class PathObject : IObject
 	{
 		protected PathObject( string szUID, TopoDS_Shape shape, PathType pathShapeType )
 		{
