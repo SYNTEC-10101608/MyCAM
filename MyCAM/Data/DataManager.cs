@@ -36,29 +36,29 @@ namespace MyCAM.Data
 			m_MachineData = m_DefaultMachineData;
 		}
 
-		public void ResetDataManger( Dictionary<string, PartObject> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData )
+		public void ResetDataManger( Dictionary<string, IObject> objectMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData )
 		{
 			// check shape map is mach with partList & pathList
-			Dictionary<string, IObject> checkedShapeDataMap = new Dictionary<string, IObject>();
+			Dictionary<string, IObject> checkedObjectMap = new Dictionary<string, IObject>();
 			List<string> checkedPartIDList = new List<string>();
 			List<string> checkedPathIDList = new List<string>();
 
 			// read part in sequence
 			foreach( var partDataID in partIDList ) {
-				if( shapeDataMap.ContainsKey( partDataID ) ) {
-					checkedShapeDataMap[ partDataID ] = shapeDataMap[ partDataID ];
+				if( objectMap.ContainsKey( partDataID ) ) {
+					checkedObjectMap[ partDataID ] = objectMap[ partDataID ];
 					checkedPartIDList.Add( partDataID );
 				}
 			}
 
 			// read path in sequence
 			foreach( var pathDataID in pathIDList ) {
-				if( shapeDataMap.ContainsKey( pathDataID ) ) {
-					checkedShapeDataMap[ pathDataID ] = shapeDataMap[ pathDataID ];
+				if( objectMap.ContainsKey( pathDataID ) ) {
+					checkedObjectMap[ pathDataID ] = objectMap[ pathDataID ];
 					checkedPathIDList.Add( pathDataID );
 				}
 			}
-			ObjectMap = checkedShapeDataMap;
+			ObjectMap = checkedObjectMap;
 			PartIDList = checkedPartIDList;
 			PathIDList = checkedPathIDList;
 			EntryAndExitData = entryAndExitData;
