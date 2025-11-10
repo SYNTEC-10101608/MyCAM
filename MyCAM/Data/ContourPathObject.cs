@@ -25,8 +25,8 @@ namespace MyCAM.Data
 			gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
 			bool isClosed = startPoint.IsEqual( endPoint, 1e-3 );
 
-			m_CADPointList = BuildCADPointList( pathDataList );
 			m_CraftData = new CraftData( szUID, isClosed );
+			m_CADPointList = BuildCADPointList( pathDataList );
 			m_ContourCacheInfo = new ContourCacheInfo( dataManager, szUID, m_CADPointList, m_CraftData );
 		}
 
