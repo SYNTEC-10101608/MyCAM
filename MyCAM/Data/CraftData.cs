@@ -146,9 +146,6 @@ namespace MyCAM.Data
 		}
 
 		// API for outside modification
-
-
-		// To-do：use this function is Dirty
 		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg )
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
@@ -160,7 +157,6 @@ namespace MyCAM.Data
 			m_IsDirty = true;
 		}
 
-		// To-do：use this function is Dirty
 		public void RemoveToolVecModify( int index )
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
