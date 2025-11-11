@@ -63,6 +63,8 @@ namespace MyCAM.Data
 		{
 			UID = szUID;
 			Shape = shape;
+
+			// re: implement in derived class, like ObjectType
 			PathType = pathShapeType;
 		}
 
@@ -84,11 +86,13 @@ namespace MyCAM.Data
 			}
 		}
 
+		// re: why virtual here? let it abstract if no default implementation
 		public virtual CraftData CraftData
 		{
 			get; set;
 		}
 
+		// re: let it abstract
 		public PathType PathType
 		{
 			get; protected set;
@@ -100,11 +104,13 @@ namespace MyCAM.Data
 			Shape = shapeTransform.Shape();
 		}
 
+		// re: move to standard pattern
 		public virtual void UpdateShape( TopoDS_Shape newShape )
 		{
 			Shape = newShape;
 		}
 
+		// re: implement clone by yourself, dont use MemberwiseClone directly
 		public virtual PathObject Clone()
 		{
 			PathObject newPathData = (PathObject)this.MemberwiseClone();

@@ -26,6 +26,7 @@ namespace MyCAM.Data
 			gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
 			bool isClosed = startPoint.IsEqual( endPoint, 1e-3 );
 
+			// re: why isClosed is a field of CraftData?
 			m_CraftData = new CraftData( szUID, isClosed );
 			m_CADPointList = BuildCADPointList( pathDataList );
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData );
@@ -34,6 +35,7 @@ namespace MyCAM.Data
 		public ContourPathObject( string szUID, TopoDS_Shape shapeData, List<CADPoint> cadPointList, CraftData craftData )
 			: base( szUID, shapeData, PathType.Contour )
 		{
+			// re: null check, throw exception if null
 			m_CADPointList = cadPointList;
 			m_CraftData = craftData;
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData );
@@ -65,6 +67,7 @@ namespace MyCAM.Data
 
 		public override void DoTransform( gp_Trsf transform )
 		{
+			// re: transform CAD points
 			base.DoTransform( transform );
 			m_ContourCacheInfo.Transform( transform );
 		}

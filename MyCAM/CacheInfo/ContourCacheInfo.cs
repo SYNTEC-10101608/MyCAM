@@ -10,9 +10,11 @@ namespace MyCAM.CacheInfo
 {
 	internal class ContourCacheInfo : ICacheInfo
 	{
+		// re: move to somewhere else
 		CraftData m_CraftData;
 		List<CADPoint> m_CADPointList = new List<CADPoint>();
 
+		// re: why we need to pass this two here?
 		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData )
 		{
 			m_CADPointList = cadPointList;
@@ -89,6 +91,7 @@ namespace MyCAM.CacheInfo
 
 		#region Public API
 
+		// re: no need to transform here, just rebuild
 		public void Transform( gp_Trsf transform )
 		{
 			// transform CAD points
@@ -477,6 +480,7 @@ namespace MyCAM.CacheInfo
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
 
 		// dirty flag
+		// re: no need this
 		bool m_IsDirty = false;
 	}
 }

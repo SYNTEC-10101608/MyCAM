@@ -252,6 +252,7 @@ namespace MyCAM.Data
 			m_PathID = structShapeIDs.Path_ID;
 		}
 
+		// re: naming "ArrangePartObject"
 		List<PartObject> ArrangeObject( TopoDS_Shape oneShape )
 		{
 			if( oneShape == null || oneShape.IsNull() ) {

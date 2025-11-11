@@ -6,6 +6,7 @@ namespace MyCAM.Data
 {
 	public class CraftData
 	{
+		// re: comment what is this for
 		public CraftData( string szUID, LeadData leadData, int startPoint, double overCutLength, bool isReverse, bool isClosed, TraverseData traverseData, Dictionary<int, Tuple<double, double>> toolVecModifyMap, bool isToolVecReverse )
 		{
 			UID = szUID;
@@ -55,6 +56,7 @@ namespace MyCAM.Data
 			}
 		}
 
+		//re: why no ref here? and this shoul be cache
 		public bool IsHasLead
 		{
 			get
@@ -164,6 +166,7 @@ namespace MyCAM.Data
 		}
 
 		// API for outside modification
+		// re: this is better to stay in cache
 		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
@@ -178,7 +181,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		// To-do：use this function is Dirty
+		// re: To-do：use this function is Dirty
 		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg )
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
@@ -190,7 +193,7 @@ namespace MyCAM.Data
 			m_IsDirty = true;
 		}
 
-		// To-do：use this function is Dirty
+		// re: To-do：use this function is Dirty
 		public void RemoveToolVecModify( int index )
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
@@ -199,6 +202,7 @@ namespace MyCAM.Data
 			m_IsDirty = true;
 		}
 
+		// re: this is better to stay in cache
 		public HashSet<int> GetToolVecModifyIndex()
 		{
 			HashSet<int> result = new HashSet<int>();
@@ -213,6 +217,7 @@ namespace MyCAM.Data
 			if( m_IsDirty == false ) {
 				return false;
 			}
+			// re: logic bomb
 			bool isDirty = m_IsDirty;
 			m_IsDirty = false;
 			return isDirty;
@@ -230,6 +235,7 @@ namespace MyCAM.Data
 		bool m_IsDirty = false;
 	}
 
+	// re: should not be here
 	public class CADPoint
 	{
 		public CADPoint( gp_Pnt point, gp_Dir normalVec_1st, gp_Dir normalVec_2nd, gp_Dir tangentVec )
