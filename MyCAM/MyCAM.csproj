@@ -58,6 +58,7 @@
     <Compile Include="CacheInfo\ICacheInfo.cs" />
     <Compile Include="Data\MachineData.cs" />
     <Compile Include="Data\MachineDefine.cs" />
+    <Compile Include="Data\PointInformation.cs" />
     <Compile Include="Data\PostData.cs" />
     <Compile Include="Data\TraverseData.cs" />
     <Compile Include="Editor\Action\CAD\AddLineAction.cs" />
