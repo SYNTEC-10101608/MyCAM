@@ -59,11 +59,10 @@ namespace MyCAM.Data
 
 	public abstract class PathObject : IObject
 	{
-		protected PathObject( string szUID, TopoDS_Shape shape, PathType pathShapeType )
+		protected PathObject( string szUID, TopoDS_Shape shape )
 		{
 			UID = szUID;
 			Shape = shape;
-			PathType = pathShapeType;
 		}
 
 		public string UID
@@ -84,35 +83,20 @@ namespace MyCAM.Data
 			}
 		}
 
-		public virtual CraftData CraftData
+		public abstract CraftData CraftData
 		{
-			get; set;
+			get;
 		}
 
-		public PathType PathType
+		public abstract PathType PathType
 		{
-			get; protected set;
+			get;
 		}
 
 		public virtual void DoTransform( gp_Trsf transform )
 		{
 			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
 			Shape = shapeTransform.Shape();
-		}
-
-		public virtual void UpdateShape( TopoDS_Shape newShape )
-		{
-			Shape = newShape;
-		}
-
-		public virtual PathObject Clone()
-		{
-			PathObject newPathData = (PathObject)this.MemberwiseClone();
-			if( this.Shape != null ) {
-				BRepBuilderAPI_Copy copyShape = new BRepBuilderAPI_Copy( this.Shape );
-				newPathData.UpdateShape( copyShape.Shape() );
-			}
-			return newPathData;
 		}
 	}
 

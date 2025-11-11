@@ -17,7 +17,7 @@ namespace MyCAM.Data
 	internal class ContourPathObject : PathObject
 	{
 		public ContourPathObject( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathDataList )
-			: base( szUID, shapeData, PathType.Contour )
+			: base( szUID, shapeData )
 		{
 			TopoDS_Vertex startVertex = new TopoDS_Vertex();
 			TopoDS_Vertex endVertex = new TopoDS_Vertex();
@@ -32,8 +32,11 @@ namespace MyCAM.Data
 		}
 
 		public ContourPathObject( string szUID, TopoDS_Shape shapeData, List<CADPoint> cadPointList, CraftData craftData )
-			: base( szUID, shapeData, PathType.Contour )
+			: base( szUID, shapeData )
 		{
+			if( shapeData == null || cadPointList == null || craftData == null ) {
+				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
+			}
 			m_CADPointList = cadPointList;
 			m_CraftData = craftData;
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData );
@@ -63,10 +66,20 @@ namespace MyCAM.Data
 			}
 		}
 
+		public override PathType PathType
+		{
+			get
+			{
+				return PathType.Contour;
+			}
+		}
+
 		public override void DoTransform( gp_Trsf transform )
 		{
 			base.DoTransform( transform );
-			m_ContourCacheInfo.Transform( transform );
+			foreach( CADPoint cadPoint in CADPointList ) {
+				cadPoint.Transform( transform );
+			}
 		}
 
 		List<CADPoint> BuildCADPointList( List<PathEdge5D> pathEdge5DList )
