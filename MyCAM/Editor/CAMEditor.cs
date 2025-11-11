@@ -1211,10 +1211,6 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-
-
-
-
 		// edit actions
 		protected override void OnEditActionStart( IEditorAction action )
 		{
