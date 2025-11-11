@@ -796,6 +796,7 @@ namespace MyCAM.Data
 			barIndexList.Sort();
 
 			for( int i = 0; i < breakedCADSegment.Count; i++ ) {
+				// re: let only one "bar" to be a special case
 				List<int> barIndexRange = FindBarIndexRange( barIndexList, i );
 				int startBarIndex = barIndexRange[ 0 ];
 				int endBarIndex = barIndexRange[ 1 ];
@@ -819,6 +820,7 @@ namespace MyCAM.Data
 					LineCAMSegment lineCAMSegment = new LineCAMSegment( startCAMPoint, endCAMPoint, false );
 					camSegmentList.Add( lineCAMSegment );
 				}
+				// re: else if arc
 				else {
 					gp_Dir midToolVec = GeometryTool.GetDirAverage( camSegmentStartToolVec, camSegmentEndToolVec );
 					CAMPoint midCAMPoint;
@@ -874,6 +876,7 @@ namespace MyCAM.Data
 			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
 
 			gp_Quaternion q = new gp_Quaternion();
+			// re: use "1" if ratio is almost 1
 			slerp.Interpolate( dDeltaLength / dTotalLength, ref q );
 			gp_Trsf trsf = new gp_Trsf();
 			trsf.SetRotation( q );
@@ -970,6 +973,7 @@ namespace MyCAM.Data
 			return modifyMap;
 		}
 
+		// re: start using CAMSegment from this
 		List<ICADSegmentElement> BreakAndReorderByStartPoint( CAMData camData )
 		{
 			(int segment, int pointIndex) startPoint = camData.NewStartPoint;
@@ -998,6 +1002,8 @@ namespace MyCAM.Data
 
 			// split segment at start point
 			bool isSuccess = SeparateCADSegmentAtTargetIndex( camData.CADSegmentList[ startPoint.segment ], startPoint.pointIndex, out List<ICADSegmentElement> breakedCADSegmentList );
+			
+			// re: count check
 			if( isSuccess ) {
 
 				// this segment need to break
@@ -1078,6 +1084,7 @@ namespace MyCAM.Data
 				return resultCADPointList;
 			}
 
+			// re: clone the point to prevent pointer issue
 			separateLocation = separateLocation.OrderBy( index => index ).ToList();
 			int nStartIndex = 0;
 			foreach( int nIndex in separateLocation ) {
@@ -1103,6 +1110,7 @@ namespace MyCAM.Data
 			return resultCADPointList;
 		}
 
+		// re: the function is for start point, naming issue
 		bool SeparateCADSegmentAtTargetIndex( ICADSegmentElement segmentElement, int targetIndex, out List<ICADSegmentElement> breakedCADSegmentList )
 		{
 			breakedCADSegmentList = new List<ICADSegmentElement>();
@@ -1114,6 +1122,8 @@ namespace MyCAM.Data
 
 			List<CADPoint> pointListAfterTargetIndex = splitedCADPointList.Last();
 			List<CADPoint> pointListBeforeTargetIndex = splitedCADPointList.First();
+
+			// re: may write better here
 			if( segmentElement is LineCADSegment ) {
 				LineCADSegment lineSegmentAfterTargetIndex = new LineCADSegment( pointListAfterTargetIndex, segmentElement.PointSpace * ( pointListAfterTargetIndex.Count - 1 ), segmentElement.PointSpace );
 				LineCADSegment lineSegmentBeforeTargetIndex = new LineCADSegment( pointListBeforeTargetIndex, segmentElement.PointSpace * ( pointListBeforeTargetIndex.Count - 1 ), segmentElement.PointSpace );

@@ -46,6 +46,8 @@ namespace MyCAM.Helper
 			List<double> segmentParamList = new List<double>();
 
 			for ( int i = 0 ; i <= nSplit; i++ ) {
+
+				// re: last point should use dEndU to avoid precision issue
 				segmentParamList.Add( dStartU + i * dDeltaU );
 			}
 
@@ -112,12 +114,15 @@ namespace MyCAM.Helper
 			if( adaptorCurve == null ) {
 				return new List<CADPoint>();
 			}
+			// re: null check before use
+
 			List<double> segmentParamList = GetCurveEachSegmentParamByLength( adaptorCurve, dStartU, dEndU, dMaxSegmentLength, dEdgeLength, out dEachPartLength );
 			if( segmentParamList.Count < 2 ) {
 				return new List<CADPoint>();
 			}
 
 			// need to consider orientation
+			// re: WTH is this?
 			if( IsTanVecAdjusted == false ) {
 				if( lineEdge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
 					segmentParamList.Reverse();
@@ -128,14 +133,17 @@ namespace MyCAM.Helper
 		}
 
 		// private function area
+		// re: adaptorCurve not used
 		static List<double> GetCurveEachSegmentParamByLength( BRepAdaptor_Curve adaptorCurve, double dStartU, double dEndU, double dMaxSegmentLength, double dEdgeLength, out double dEachPartLength )
 		{
 			// this edge will be divided into N segments
+			// re: make sure to get odd count of points to get middle of edge
 			int nSubSegmentCount = (int)Math.Ceiling( dEdgeLength / dMaxSegmentLength );
 			dEachPartLength = dEdgeLength / nSubSegmentCount;
 			double dDeltaU = ( dEndU - dStartU ) / nSubSegmentCount;
 
 			List<double> segmentParamList = new List<double>();
+			// re: the last point should use dEndU to avoid precision issue
 			for( int i = 0; i <= nSubSegmentCount; i++ ) {
 				double param = dStartU + i * dDeltaU;
 				segmentParamList.Add( param );
@@ -175,6 +183,7 @@ namespace MyCAM.Helper
 			return subEdgeList;
 		}
 
+		// re: name too long...
 		static List<CADPoint> GetCADPointByEdgeAndEachPointSegmentParam( List<double> segmentParamList, TopoDS_Edge edge, TopoDS_Face shellFace, BRepAdaptor_Curve adC, bool IsTanVecAdjusted )
 		{
 			List<CADPoint> oneSegmentPointList = new List<CADPoint>();

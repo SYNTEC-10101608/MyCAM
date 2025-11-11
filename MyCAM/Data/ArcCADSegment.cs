@@ -8,6 +8,8 @@ namespace MyCAM.Data
 {
 	internal class ArcCADSegment : CADSegmentBase
 	{
+		// re: use builder to consider build a arc or line segment
+		// re: we should also bring chord length
 		public ArcCADSegment( List<CADPoint> arcPointList, double dTotalLength, double dPointSpace )
 			: base( arcPointList, dTotalLength, dPointSpace )
 		{
