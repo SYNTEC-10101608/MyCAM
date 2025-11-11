@@ -12,9 +12,8 @@ namespace MyCAM.Data
 		CraftData m_CraftData;
 		List<CADPoint> m_CADPointList = new List<CADPoint>();
 
-		public ContourCacheInfo( DataManager dataManager, string szID, List<CADPoint> cadPointList, CraftData craftData )
+		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData )
 		{
-			m_DataManager = dataManager;
 			m_CADPointList = cadPointList;
 			m_CraftData = craftData;
 			UID = szID;
@@ -144,9 +143,6 @@ namespace MyCAM.Data
 
 		void BuildCAMPointList()
 		{
-			//if( m_DataManager.ObjectMap.ContainsKey( UID ) ) {
-			//	m_CraftData = ( m_DataManager.ObjectMap[ UID ] as ContourPathObject ).CraftData;
-			//}
 			m_IsDirty = false;
 			m_CAMPointList = new List<CAMPoint>();
 			SetToolVec();
@@ -488,9 +484,5 @@ namespace MyCAM.Data
 
 		// dirty flag
 		bool m_IsDirty = false;
-		DataManager m_DataManager = null;
-
-
-
 	}
 }

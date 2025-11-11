@@ -15,7 +15,7 @@ namespace MyCAM.Data
 {
 	internal class ContourPathObject : PathObject
 	{
-		public ContourPathObject( DataManager dataManager, string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathDataList )
+		public ContourPathObject( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathDataList )
 			: base( szUID, shapeData, PathType.Contour )
 		{
 			TopoDS_Vertex startVertex = new TopoDS_Vertex();
@@ -27,7 +27,7 @@ namespace MyCAM.Data
 
 			m_CraftData = new CraftData( szUID, isClosed );
 			m_CADPointList = BuildCADPointList( pathDataList );
-			m_ContourCacheInfo = new ContourCacheInfo( dataManager, szUID, m_CADPointList, m_CraftData );
+			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData );
 		}
 
 		public ContourPathObject( string szUID, TopoDS_Shape shapeData, List<CADPoint> cadPointList, CraftData craftData )
@@ -35,7 +35,7 @@ namespace MyCAM.Data
 		{
 			m_CADPointList = cadPointList;
 			m_CraftData = craftData;
-			m_ContourCacheInfo = new ContourCacheInfo( null, szUID, m_CADPointList, m_CraftData );
+			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData );
 		}
 
 		public List<CADPoint> CADPointList

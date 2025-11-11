@@ -184,7 +184,7 @@ namespace MyCAM.Data
 				// add valid path
 				if( isValidPath ) {
 					string szID = "Path_" + ++m_PathID;
-					ContourPathObject contourPathObject = new ContourPathObject( this, szID, pathWire, pathElements );
+					ContourPathObject contourPathObject = new ContourPathObject( szID, pathWire, pathElements );
 					contourPathObject.CraftData.TraverseData = new TraverseData();
 					ObjectMap[ szID ] = contourPathObject;
 					newPathIDList.Add( szID );
