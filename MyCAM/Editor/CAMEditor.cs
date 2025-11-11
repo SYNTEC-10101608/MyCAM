@@ -549,10 +549,10 @@ namespace MyCAM.Editor
 
 			// closed path editable only: start point, overcut, lead line, change lead dir
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
+				if( !GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) ) {
 					continue;
 				}
-				if( !craftData.IsClosed ) {
+				if( !( cacheInfo as ContourCacheInfo ).IsClosed ) {
 					editableInfo.IsStartPointEditable = false;
 					editableInfo.IsOverCutEditable = false;
 					editableInfo.IsLeadLineEditable = false;
@@ -1107,7 +1107,7 @@ namespace MyCAM.Editor
 			// map CAD and CAM point index
 			int nLength = cadPointList.Count;
 			int modifiedIndex = craftData.IsReverse
-				? ( nLength - ( craftData.IsClosed ? 0 : 1 ) - index + craftData.StartPointIndex ) % nLength
+				? ( nLength - ( cacheInfo.IsClosed ? 0 : 1 ) - index + craftData.StartPointIndex ) % nLength
 				: ( index + craftData.StartPointIndex ) % nLength;
 
 			// need highlight if the index is modified index

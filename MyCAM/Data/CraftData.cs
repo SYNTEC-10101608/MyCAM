@@ -6,6 +6,12 @@ namespace MyCAM.Data
 {
 	public class CraftData
 	{
+		public CraftData( string szUID )
+		{
+			UID = szUID;
+		}
+
+		// this constructor is used when reading from file
 		public CraftData( string szUID, LeadData leadData, int startPoint, double overCutLength, bool isReverse, bool isClosed, TraverseData traverseData, Dictionary<int, Tuple<double, double>> toolVecModifyMap, bool isToolVecReverse )
 		{
 			UID = szUID;
@@ -13,16 +19,9 @@ namespace MyCAM.Data
 			m_StartPointIndex = startPoint;
 			m_OverCutLength = overCutLength;
 			m_IsReverse = isReverse;
-			IsClosed = isClosed;
 			m_TraverseData = traverseData;
 			m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>( toolVecModifyMap );
 			m_IsToolVecReverse = isToolVecReverse;
-		}
-
-		public CraftData( string szUID, bool isClosed )
-		{
-			UID = szUID;
-			IsClosed = isClosed;
 		}
 
 		public string UID
@@ -52,17 +51,6 @@ namespace MyCAM.Data
 					m_LeadParam = value;
 					m_IsDirty = true;
 				}
-			}
-		}
-
-		public bool IsHasLead
-		{
-			get
-			{
-				if( m_LeadParam == null ) {
-					return false;
-				}
-				return ( m_LeadParam.LeadIn.Type != LeadLineType.None ) || ( m_LeadParam.LeadOut.Type != LeadLineType.None );
 			}
 		}
 		#endregion
@@ -110,11 +98,6 @@ namespace MyCAM.Data
 					m_IsDirty = true;
 				}
 			}
-		}
-
-		public bool IsClosed
-		{
-			get; private set;
 		}
 
 		public TraverseData TraverseData

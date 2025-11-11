@@ -26,9 +26,9 @@ namespace MyCAM.Data
 			gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
 			bool isClosed = startPoint.IsEqual( endPoint, 1e-3 );
 
-			m_CraftData = new CraftData( szUID, isClosed );
-			m_CADPointList = BuildCADPointList( pathDataList );
-			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData );
+			m_CraftData = new CraftData( szUID );
+			m_CADPointList = BuildCADPointList( pathDataList, isClosed );
+			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData, isClosed );
 		}
 
 		public ContourPathObject( string szUID, TopoDS_Shape shapeData, List<CADPoint> cadPointList, CraftData craftData )
@@ -37,9 +37,16 @@ namespace MyCAM.Data
 			if( shapeData == null || cadPointList == null || craftData == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
+			TopoDS_Vertex startVertex = new TopoDS_Vertex();
+			TopoDS_Vertex endVertex = new TopoDS_Vertex();
+			TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
+			gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
+			gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
+			bool isClosed = startPoint.IsEqual( endPoint, 1e-3 );
+
 			m_CADPointList = cadPointList;
 			m_CraftData = craftData;
-			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData );
+			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData, isClosed );
 		}
 
 		public List<CADPoint> CADPointList
@@ -82,7 +89,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		List<CADPoint> BuildCADPointList( List<PathEdge5D> pathEdge5DList )
+		List<CADPoint> BuildCADPointList( List<PathEdge5D> pathEdge5DList, bool isClosed )
 		{
 			m_CADPointList = new List<CADPoint>();
 			if( pathEdge5DList == null ) {
@@ -95,12 +102,12 @@ namespace MyCAM.Data
 				TopoDS_Face shellFace = pathEdge5DList[ i ].ComponentFace;
 				TopoDS_Face solidFace = pathEdge5DList[ i ].ComponentFace; // TODO: set solid face
 				CADPointList.AddRange( GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace,
-					i == 0, i == pathEdge5DList.Count - 1 ) );
+					i == 0, i == pathEdge5DList.Count - 1, isClosed ) );
 			}
 			return CADPointList;
 		}
 
-		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace, bool bFirst, bool bLast )
+		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace, bool bFirst, bool bLast, bool isClosed )
 		{
 			List<CADPoint> oneSegmentPointList = new List<CADPoint>();
 
@@ -173,7 +180,7 @@ namespace MyCAM.Data
 				else if( bLast && i == segmentParamList.Count - 1 && m_CADPointList.Count > 0 ) {
 
 					// map the last point to the start point
-					if( m_CraftData.IsClosed ) {
+					if( isClosed ) {
 						CADPoint firstPoint = m_CADPointList[ 0 ];
 						m_ConnectPointMap[ firstPoint ] = cadPoint;
 					}

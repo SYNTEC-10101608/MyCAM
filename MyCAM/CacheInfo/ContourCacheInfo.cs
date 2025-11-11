@@ -10,11 +10,12 @@ namespace MyCAM.CacheInfo
 {
 	internal class ContourCacheInfo : ICacheInfo
 	{
-		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData )
+		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData, bool isClose )
 		{
+			UID = szID;
 			m_CADPointList = cadPointList;
 			m_CraftData = craftData;
-			UID = szID;
+			IsClosed = isClose;
 
 			BuildCAMPointList();
 		}
@@ -78,6 +79,11 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
+		public bool IsClosed
+		{
+			get; private set;
+		}
+
 		#endregion
 
 		#region Public API
@@ -125,7 +131,7 @@ namespace MyCAM.CacheInfo
 			SetOrientation();
 
 			// close the loop if is closed
-			if( m_CraftData.IsClosed && m_CAMPointList.Count > 0 ) {
+			if( IsClosed && m_CAMPointList.Count > 0 ) {
 				m_CAMPointList.Add( m_CAMPointList[ 0 ].Clone() );
 			}
 
@@ -217,7 +223,7 @@ namespace MyCAM.CacheInfo
 			List<int> indexInOrder = m_CraftData.ToolVecModifyMap.Keys.ToList();
 			indexInOrder.Sort();
 			List<Tuple<int, int>> intervalList = new List<Tuple<int, int>>();
-			if( m_CraftData.IsClosed ) {
+			if( IsClosed ) {
 
 				// for closed path, the index is wrapped
 				for( int i = 0; i < indexInOrder.Count; i++ ) {
@@ -286,7 +292,7 @@ namespace MyCAM.CacheInfo
 				m_CAMPointList.Reverse();
 
 				// modify start point index for closed path
-				if( m_CraftData.IsClosed ) {
+				if( IsClosed ) {
 					CAMPoint lastPoint = m_CAMPointList.Last();
 					m_CAMPointList.Remove( lastPoint );
 					m_CAMPointList.Insert( 0, lastPoint );
@@ -299,7 +305,7 @@ namespace MyCAM.CacheInfo
 		void SetOverCut()
 		{
 			m_OverCutPointList.Clear();
-			if( m_CAMPointList.Count == 0 || m_CraftData.OverCutLength == 0 || !m_CraftData.IsClosed ) {
+			if( m_CAMPointList.Count == 0 || m_CraftData.OverCutLength == 0 || !IsClosed ) {
 				return;
 			}
 			double dTotalOverCutLength = 0;

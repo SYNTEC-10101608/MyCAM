@@ -406,7 +406,6 @@ namespace MyCAM.FileManager
 			IsReverse = craftData.IsReverse;
 			IsToolVecReverse = craftData.IsToolVecReverse;
 			StartPoint = craftData.StartPointIndex;
-			IsClosed = craftData.IsClosed;
 			LeadParam = craftData.LeadLineParam != null
 						? new LeadParamDTO( craftData.LeadLineParam )
 						: new LeadParamDTO();
