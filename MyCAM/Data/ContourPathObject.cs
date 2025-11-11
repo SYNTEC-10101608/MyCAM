@@ -1,4 +1,5 @@
 ﻿using MyCAM.App;
+using MyCAM.CacheInfo;
 using OCC.BOPTools;
 using OCC.BRep;
 using OCC.BRepAdaptor;

@@ -1,4 +1,5 @@
 ﻿using MyCAM.App;
+using MyCAM.CacheInfo;
 using MyCAM.Data;
 using MyCAM.Helper;
 using MyCAM.Post;

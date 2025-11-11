@@ -1,11 +1,12 @@
 ﻿using MyCAM.App;
+using MyCAM.Data;
 using MyCAM.Helper;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MyCAM.Data
+namespace MyCAM.CacheInfo
 {
 	internal class ContourCacheInfo : ICacheInfo
 	{

@@ -1,4 +1,5 @@
-﻿using MyCAM.Data;
+﻿using MyCAM.CacheInfo;
+using MyCAM.Data;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.BRepAlgoAPI;

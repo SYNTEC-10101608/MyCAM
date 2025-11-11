@@ -52,10 +52,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\ContourCacheInfo.cs" />
+    <Compile Include="CacheInfo\ContourCacheInfo.cs" />
     <Compile Include="Data\ContourPathObject.cs" />
     <Compile Include="Data\CraftData.cs" />
-    <Compile Include="Data\ICacheInfo.cs" />
+    <Compile Include="CacheInfo\ICacheInfo.cs" />
     <Compile Include="Data\MachineData.cs" />
     <Compile Include="Data\MachineDefine.cs" />
     <Compile Include="Data\PostData.cs" />

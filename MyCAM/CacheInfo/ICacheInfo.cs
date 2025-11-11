@@ -1,4 +1,6 @@
-﻿namespace MyCAM.Data
+﻿using MyCAM.Data;
+
+namespace MyCAM.CacheInfo
 {
 	internal interface ICacheInfo
 	{
