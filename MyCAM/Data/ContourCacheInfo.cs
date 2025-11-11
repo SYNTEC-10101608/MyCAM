@@ -36,7 +36,6 @@ namespace MyCAM.Data
 
 		#region result
 
-		// To-do：use this function is Dirty
 		internal List<CAMPoint> CAMPointList
 		{
 			get
@@ -49,7 +48,6 @@ namespace MyCAM.Data
 			}
 		}
 
-		// To-do：use this function is Dirty
 		internal List<CAMPoint> LeadInCAMPointList
 		{
 			get
@@ -62,7 +60,6 @@ namespace MyCAM.Data
 			}
 		}
 
-		// To-do：use this function is Dirty
 		internal List<CAMPoint> LeadOutCAMPointList
 		{
 			get
@@ -75,7 +72,6 @@ namespace MyCAM.Data
 			}
 		}
 
-		// To-do：use this function is Dirty
 		internal List<CAMPoint> OverCutCAMPointList
 		{
 			get
@@ -92,7 +88,6 @@ namespace MyCAM.Data
 
 		#region Public API
 
-		// To-do：use this function is Dirty
 		public void Transform( gp_Trsf transform )
 		{
 			// transform CAD points
@@ -102,7 +97,6 @@ namespace MyCAM.Data
 			m_IsDirty = true;
 		}
 
-		// To-do：use this function is Dirty
 		public CAMPoint GetProcessStartPoint()
 		{
 			if( m_IsDirty ) {
@@ -119,7 +113,6 @@ namespace MyCAM.Data
 			return camPoint;
 		}
 
-		// To-do：use this function is Dirty
 		public CAMPoint GetProcessEndPoint()
 		{
 			if( m_IsDirty ) {
