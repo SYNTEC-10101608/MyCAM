@@ -12,7 +12,7 @@ namespace MyCAM.Editor
 		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, List<string> pathIDList )
 			: base( dataManager, viewer, treeView, viewManager, pathIDList.First() )
 		{
-			m_CraftData = ( m_DataManager.ObjectMap[ m_PathID ] as ContourPathObject ).CraftData;
+			m_CraftData = ( m_DataManager.ObjectMap[ m_PathID ] as PathObject ).CraftData;
 			m_PathIDList = pathIDList;
 		}
 
