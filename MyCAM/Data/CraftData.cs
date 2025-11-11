@@ -213,9 +213,8 @@ namespace MyCAM.Data
 			if( m_IsDirty == false ) {
 				return false;
 			}
-			bool isDirty = m_IsDirty;
 			m_IsDirty = false;
-			return isDirty;
+			return true;
 		}
 
 		LeadData m_LeadParam = new LeadData();

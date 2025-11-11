@@ -10,9 +10,6 @@ namespace MyCAM.CacheInfo
 {
 	internal class ContourCacheInfo : ICacheInfo
 	{
-		CraftData m_CraftData;
-		List<CADPoint> m_CADPointList = new List<CADPoint>();
-
 		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData )
 		{
 			m_CADPointList = cadPointList;
@@ -41,9 +38,8 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.GetCraftDataIsDirty() || m_IsDirty ) {
+				if( m_CraftData.GetCraftDataIsDirty() ) {
 					BuildCAMPointList();
-					m_IsDirty = false;
 				}
 				return m_CAMPointList;
 			}
@@ -53,9 +49,8 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.GetCraftDataIsDirty() || m_IsDirty ) {
+				if( m_CraftData.GetCraftDataIsDirty() ) {
 					BuildCAMPointList();
-					m_IsDirty = false;
 				}
 				return m_LeadInCAMPointList;
 			}
@@ -65,9 +60,8 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.GetCraftDataIsDirty() || m_IsDirty ) {
+				if( m_CraftData.GetCraftDataIsDirty() ) {
 					BuildCAMPointList();
-					m_IsDirty = false;
 				}
 				return m_LeadOutCAMPointList;
 			}
@@ -77,9 +71,8 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.GetCraftDataIsDirty() || m_IsDirty ) {
+				if( m_CraftData.GetCraftDataIsDirty() ) {
 					BuildCAMPointList();
-					m_IsDirty = false;
 				}
 				return m_OverCutPointList;
 			}
@@ -89,20 +82,10 @@ namespace MyCAM.CacheInfo
 
 		#region Public API
 
-		public void Transform( gp_Trsf transform )
-		{
-			// transform CAD points
-			foreach( CADPoint cadPoint in m_CADPointList ) {
-				cadPoint.Transform( transform );
-			}
-			m_IsDirty = true;
-		}
-
 		public CAMPoint GetProcessStartPoint()
 		{
-			if( m_IsDirty ) {
+			if( m_CraftData.GetCraftDataIsDirty() ) {
 				BuildCAMPointList();
-				m_IsDirty = false;
 			}
 			CAMPoint camPoint = null;
 			if( m_LeadInCAMPointList.Count > 0 && m_CraftData.LeadLineParam.LeadIn.Length > 0 ) {
@@ -116,9 +99,8 @@ namespace MyCAM.CacheInfo
 
 		public CAMPoint GetProcessEndPoint()
 		{
-			if( m_IsDirty ) {
+			if( m_CraftData.GetCraftDataIsDirty() ) {
 				BuildCAMPointList();
-				m_IsDirty = false;
 			}
 			CAMPoint camPoint = null;
 			if( m_LeadOutCAMPointList.Count > 0 && m_CraftData.LeadLineParam.LeadOut.Length > 0 ) {
@@ -137,7 +119,6 @@ namespace MyCAM.CacheInfo
 
 		void BuildCAMPointList()
 		{
-			m_IsDirty = false;
 			m_CAMPointList = new List<CAMPoint>();
 			SetToolVec();
 			SetStartPoint();
@@ -476,7 +457,7 @@ namespace MyCAM.CacheInfo
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
 
-		// dirty flag
-		bool m_IsDirty = false;
+		CraftData m_CraftData;
+		List<CADPoint> m_CADPointList = new List<CADPoint>();
 	}
 }
