@@ -119,7 +119,7 @@ namespace MyCAM.Data
 			if( newShape == null || newShape.IsNull() ) {
 				return;
 			}
-			List<PartObject> newPartObjectList = ArrangeObject( newShape );
+			List<PartObject> newPartObjectList = ArrangePartObject( newShape );
 			if( newPartObjectList.Count == 0 ) {
 				return; // no valid object
 			}
@@ -252,7 +252,7 @@ namespace MyCAM.Data
 			m_PathID = structShapeIDs.Path_ID;
 		}
 
-		List<PartObject> ArrangeObject( TopoDS_Shape oneShape )
+		List<PartObject> ArrangePartObject( TopoDS_Shape oneShape )
 		{
 			if( oneShape == null || oneShape.IsNull() ) {
 				return new List<PartObject>();
@@ -263,7 +263,7 @@ namespace MyCAM.Data
 			}
 			List<PartObject> result = new List<PartObject>();
 			foreach( TopoDS_Shape subShape in oneShape.elementsAsList ) {
-				result.AddRange( ArrangeObject( subShape ) );
+				result.AddRange( ArrangePartObject( subShape ) );
 			}
 			return result;
 		}
