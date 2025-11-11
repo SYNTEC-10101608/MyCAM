@@ -159,6 +159,29 @@ namespace MyCAM.CacheInfo
 			ModifyToolVec();
 		}
 
+		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
+		{
+			if( m_CraftData.ToolVecModifyMap.ContainsKey( index ) ) {
+				dRA_deg = m_CraftData.ToolVecModifyMap[ index ].Item1;
+				dRB_deg = m_CraftData.ToolVecModifyMap[ index ].Item2;
+				return true;
+			}
+			else {
+				dRA_deg = 0;
+				dRB_deg = 0;
+				return false;
+			}
+		}
+
+		public HashSet<int> GetToolVecModifyIndex()
+		{
+			HashSet<int> result = new HashSet<int>();
+			foreach( int nIndex in m_CraftData.ToolVecModifyMap.Keys ) {
+				result.Add( nIndex );
+			}
+			return result;
+		}
+
 		void ModifyToolVec()
 		{
 			if( m_CraftData.ToolVecModifyMap.Count == 0 ) {

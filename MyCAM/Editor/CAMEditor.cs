@@ -1111,7 +1111,7 @@ namespace MyCAM.Editor
 				: ( index + craftData.StartPointIndex ) % nLength;
 
 			// need highlight if the index is modified index
-			return craftData.GetToolVecModifyIndex().Contains( modifiedIndex );
+			return cacheInfo.GetToolVecModifyIndex().Contains( modifiedIndex );
 		}
 
 		AIS_Line GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )

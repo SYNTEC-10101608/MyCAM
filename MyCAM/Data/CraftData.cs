@@ -146,19 +146,7 @@ namespace MyCAM.Data
 		}
 
 		// API for outside modification
-		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
-		{
-			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				dRA_deg = m_ToolVecModifyMap[ index ].Item1;
-				dRB_deg = m_ToolVecModifyMap[ index ].Item2;
-				return true;
-			}
-			else {
-				dRA_deg = 0;
-				dRB_deg = 0;
-				return false;
-			}
-		}
+
 
 		// To-do：use this function is Dirty
 		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg )
@@ -179,15 +167,6 @@ namespace MyCAM.Data
 				m_ToolVecModifyMap.Remove( index );
 			}
 			m_IsDirty = true;
-		}
-
-		public HashSet<int> GetToolVecModifyIndex()
-		{
-			HashSet<int> result = new HashSet<int>();
-			foreach( int nIndex in m_ToolVecModifyMap.Keys ) {
-				result.Add( nIndex );
-			}
-			return result;
 		}
 
 		public bool GetCraftDataIsDirty()
