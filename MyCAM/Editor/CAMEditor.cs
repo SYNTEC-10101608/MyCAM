@@ -303,7 +303,7 @@ namespace MyCAM.Editor
 			// one shot edit, muti edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
 			foreach( string szPathID in szPathIDList ) {
-				if( !DataHelper.GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
+				if( !GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 
@@ -370,7 +370,7 @@ namespace MyCAM.Editor
 			// one shot edit, multi edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
 			foreach( string szPathID in szPathIDList ) {
-				if( !DataHelper.GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
+				if( !GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 
@@ -442,7 +442,7 @@ namespace MyCAM.Editor
 			string szStartPathID = szPathIDList[ 0 ];
 
 			// get start point
-			if( !DataHelper.GetCacheInfoByID( m_DataManager, szStartPathID, out ICacheInfo cacheInfo ) ) {
+			if( !GetCacheInfoByID( m_DataManager, szStartPathID, out ICacheInfo cacheInfo ) ) {
 				return;
 			}
 			gp_Pnt currentPoint = cacheInfo.GetProcessStartPoint().CADPoint.Point;
@@ -465,7 +465,7 @@ namespace MyCAM.Editor
 					if( visited[ i ] ) {
 						continue;
 					}
-					if( !DataHelper.GetCacheInfoByID( m_DataManager, pathIDList[ i ], out ICacheInfo nextCacheInfo ) ) {
+					if( !GetCacheInfoByID( m_DataManager, pathIDList[ i ], out ICacheInfo nextCacheInfo ) ) {
 						continue;
 					}
 					gp_Pnt nextStartPoint = nextCacheInfo.GetProcessStartPoint().CADPoint.Point;
@@ -548,7 +548,7 @@ namespace MyCAM.Editor
 
 			// closed path editable only: start point, overcut, lead line, change lead dir
 			foreach( string szPathID in szPathIDList ) {
-				if( !DataHelper.GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
+				if( !GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 				if( !craftData.IsClosed ) {
@@ -679,8 +679,8 @@ namespace MyCAM.Editor
 		{
 			RomoveLeadLine( pathIDList );
 			foreach( string szPathID in pathIDList ) {
-				if( DataHelper.GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false
-					|| DataHelper.GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) == false ) {
+				if( GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false
+					|| GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) == false ) {
 					continue;
 				}
 				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
@@ -1009,7 +1009,7 @@ namespace MyCAM.Editor
 
 			// entry
 			if( m_DataManager.EntryAndExitData.EntryDistance > 0 && m_DataManager.PathIDList.Count != 0 ) {
-				if( DataHelper.GetCacheInfoByID( m_DataManager, m_DataManager.PathIDList.First(), out ICacheInfo cacheInfo ) == false ) {
+				if( GetCacheInfoByID( m_DataManager, m_DataManager.PathIDList.First(), out ICacheInfo cacheInfo ) == false ) {
 					return;
 				}
 				CAMPoint firstPathStartPoint = cacheInfo.GetProcessStartPoint();
@@ -1021,7 +1021,7 @@ namespace MyCAM.Editor
 
 			// exit
 			if( m_DataManager.EntryAndExitData.ExitDistance > 0 && m_DataManager.PathIDList.Count != 0 ) {
-				if( DataHelper.GetCacheInfoByID( m_DataManager, m_DataManager.PathIDList.Last(), out ICacheInfo cacheInfo ) == false ) {
+				if( GetCacheInfoByID( m_DataManager, m_DataManager.PathIDList.Last(), out ICacheInfo cacheInfo ) == false ) {
 					return;
 				}
 				CAMPoint lastPathEndPoint = cacheInfo.GetProcessEndPoint();
@@ -1210,6 +1210,40 @@ namespace MyCAM.Editor
 			}
 			return true;
 		}
+
+		bool GetCraftDataByID( DataManager dataManager, string szPathID, out CraftData craftData )
+		{
+			craftData = null;
+			if( string.IsNullOrEmpty( szPathID )
+				|| dataManager.ObjectMap.ContainsKey( szPathID ) == false
+				|| dataManager.ObjectMap[ szPathID ] == null
+				|| !( dataManager.ObjectMap[ szPathID ] is PathObject
+				|| ( (PathObject)dataManager.ObjectMap[ szPathID ] ).CraftData == null ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
+				return false;
+			}
+
+			if( ( (PathObject)dataManager.ObjectMap[ szPathID ] ).PathType == PathType.Contour ) {
+				craftData = ( (ContourPathObject)dataManager.ObjectMap[ szPathID ] ).CraftData;
+			}
+			return true;
+		}
+
+		bool GetCacheInfoByID( DataManager dataManager, string szPathID, out ICacheInfo cacheInfo )
+		{
+			cacheInfo = null;
+			if( string.IsNullOrEmpty( szPathID )
+				|| dataManager.ObjectMap.ContainsKey( szPathID ) == false
+				|| dataManager.ObjectMap[ szPathID ] == null ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
+				return false;
+			}
+			if( ( (PathObject)dataManager.ObjectMap[ szPathID ] ).PathType == PathType.Contour ) {
+				cacheInfo = ( (ContourPathObject)dataManager.ObjectMap[ szPathID ] ).ContourCacheInfo;
+			}
+			return true;
+		}
+
 
 		// edit actions
 		protected override void OnEditActionStart( IEditorAction action )
