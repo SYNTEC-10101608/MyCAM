@@ -235,7 +235,10 @@ namespace MyCAM.Editor
 		{
 			// stop current action
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
-			foreach( string szPathID in szPathIDList ) {
+
+			foreach( var item in szPathIDList ) {
+				string szPathID = item;
+				int originalIndex = m_DataManager.PathIDList.IndexOf( szPathID );
 
 				// remove from data manager
 				m_DataManager.RemovePath( szPathID );
@@ -245,14 +248,10 @@ namespace MyCAM.Editor
 					m_Viewer.GetAISContext().Remove( m_ViewManager.ViewObjectMap[ szPathID ].AISHandle, false );
 					m_ViewManager.ViewObjectMap.Remove( szPathID );
 				}
-
-				// remove from tree view
-				if( m_ViewManager.TreeNodeMap.ContainsKey( szPathID ) ) {
-					TreeNode node = m_ViewManager.TreeNodeMap[ szPathID ];
-					m_TreeView.Nodes.Remove( node );
-					m_ViewManager.TreeNodeMap.Remove( szPathID );
-				}
 			}
+
+			// Rebuild tree nodes with correct indices after removal
+			RebuildTreeNodes();
 
 			// clear selection after remove path
 			m_DefaultAction.ClearSelection();
@@ -405,11 +404,26 @@ namespace MyCAM.Editor
 
 			// move process
 			m_DataManager.PathIDList.RemoveAt( nIndex );
+			int newIndex;
 			if( bUp ) {
-				m_DataManager.PathIDList.Insert( nIndex - 1, szPathID );
+				newIndex = nIndex - 1;
+				m_DataManager.PathIDList.Insert( newIndex, szPathID );
 			}
 			else {
-				m_DataManager.PathIDList.Insert( nIndex + 1, szPathID );
+				newIndex = nIndex + 1;
+				m_DataManager.PathIDList.Insert( newIndex, szPathID );
+			}
+
+			// tree view select moved node
+			string newNodeID = PATH_NODE_PREFIX + ( newIndex + 1 ).ToString();
+			if( m_ViewManager.TreeNodeMap.ContainsKey( newNodeID ) ) {
+				TreeNode nodeToSelect = m_ViewManager.TreeNodeMap[ newNodeID ];
+				m_TreeView.SelectedNode = nodeToSelect;
+
+				if( m_DefaultAction is SelectPathAction_ selectAction ) {
+					selectAction.ClearSelection();
+					selectAction.SelectPathByID( szPathID );
+				}
 			}
 			ShowAllCAMData();
 		}
@@ -465,6 +479,12 @@ namespace MyCAM.Editor
 					break;
 				}
 			}
+
+			// select focus on first path
+			if( m_DefaultAction is SelectPathAction_ selectAction ) {
+				selectAction.ClearSelection();
+				selectAction.SelectPathByID( m_DataManager.PathIDList.First() );
+			}
 			ShowAllCAMData();
 		}
 
@@ -492,9 +512,14 @@ namespace MyCAM.Editor
 				}
 
 				// add a new node to the tree view
-				TreeNode node = new TreeNode( szID );
+				int nodeIndex = m_DataManager.PathIDList.IndexOf( szID ) + 1; // 1 based index
+				if( nodeIndex == -1 ) {
+					continue;
+				}
+				string szNodeID = PATH_NODE_PREFIX + nodeIndex.ToString();
+				TreeNode node = new TreeNode( szNodeID );
 				m_ViewManager.PathNode.Nodes.Add( node );
-				m_ViewManager.TreeNodeMap.Add( szID, node );
+				m_ViewManager.TreeNodeMap.Add( szNodeID, node );
 
 				// add a new shape to the viewer
 				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ObjectMap[ szID ].Shape, 3.0 );
@@ -547,7 +572,7 @@ namespace MyCAM.Editor
 			// take all path IDs
 			List<string> pathIDList = m_DataManager.PathIDList;
 			ShowCAMData( pathIDList );
-		}
+			}
 
 		void ShowCAMData( List<string> pathIDList )
 		{
@@ -557,13 +582,13 @@ namespace MyCAM.Editor
 			m_CraftRenderer.Show( pathIDList );
 			m_TraverseRenderer.Show();
 			m_Viewer.UpdateView();
-		}
+			}
 
 		void RemoveAllCAMData()
 		{
 			List<string> pathIDList = m_DataManager.PathIDList;
 			RemoveCAMData( pathIDList );
-		}
+			}
 
 		void RemoveCAMData( List<string> pathIDList )
 		{
@@ -646,6 +671,34 @@ namespace MyCAM.Editor
 				craftData = ( (ContourPathObject)dataManager.ObjectMap[ szPathID ] ).CraftData;
 			}
 			return true;
+		}
+
+		void RebuildTreeNodes()
+		{
+			// Clear existing tree nodes and mappings
+			m_ViewManager.PathNode.Nodes.Clear();
+
+			// Remove old path node mappings
+			var keysToRemove = m_ViewManager.TreeNodeMap.Keys
+				.Where( key => key.StartsWith( PATH_NODE_PREFIX ) )
+				.ToList();
+
+			foreach( var key in keysToRemove ) {
+				m_ViewManager.TreeNodeMap.Remove( key );
+			}
+
+			// Rebuild tree nodes with correct indices
+			for( int i = 0; i < m_DataManager.PathIDList.Count; i++ ) {
+				string pathID = m_DataManager.PathIDList[ i ];
+				string szNodeID = PATH_NODE_PREFIX + ( i + 1 ).ToString(); // 1-based index
+
+				TreeNode node = new TreeNode( szNodeID );
+				m_ViewManager.PathNode.Nodes.Add( node );
+				m_ViewManager.TreeNodeMap.Add( szNodeID, node );
+			}
+
+			// Expand all nodes
+			m_ViewManager.PathNode.ExpandAll();
 		}
 
 		bool GetCacheInfoByID( DataManager dataManager, string szPathID, out ICacheInfo cacheInfo )
