@@ -185,6 +185,4 @@ namespace MyCAM.Data
 		bool m_IsReverse = false;
 		bool m_IsDirty = false;
 	}
-
-
 }

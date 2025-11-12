@@ -79,13 +79,13 @@ namespace MyCAM.Editor
 
 		// for viewer resource handle
 		Dictionary<string, List<AIS_Line>> m_ToolVecAISDict = new Dictionary<string, List<AIS_Line>>();
-
 		Dictionary<string, AIS_Shape> m_OrientationAISList = new Dictionary<string, AIS_Shape>(); // need refresh, no need activate
-		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>(); // need refresh, no need activate
 		Dictionary<string, List<AIS_Line>> m_LeadAISDict = new Dictionary<string, List<AIS_Line>>(); // need refresh, no need activate
 		Dictionary<string, List<AIS_Shape>> m_LeadOrientationAISDict = new Dictionary<string, List<AIS_Shape>>(); // need refresh, no need activate
-
 		Dictionary<string, List<AIS_Line>> m_OverCutAISDict = new Dictionary<string, List<AIS_Line>>(); // need refresh, no need activate
+
+		// this three need to consider standard pattern, so they are only lists now
+		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>(); // need refresh, no need activate
 		List<AIS_Line> m_TraverseAISList = new List<AIS_Line>(); // need refresh, no need activate
 		List<AIS_Shape> m_FrogLeapAISList = new List<AIS_Shape>(); // need refresh, no need activate
 
