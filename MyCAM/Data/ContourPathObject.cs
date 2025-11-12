@@ -31,6 +31,7 @@ namespace MyCAM.Data
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData, isClosed );
 		}
 
+		// this is for the file read constructor
 		public ContourPathObject( string szUID, TopoDS_Shape shapeData, List<CADPoint> cadPointList, CraftData craftData )
 			: base( szUID, shapeData )
 		{
