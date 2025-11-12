@@ -84,9 +84,10 @@ namespace MyCAM.Data
 		public override void DoTransform( gp_Trsf transform )
 		{
 			base.DoTransform( transform );
-			foreach( CADPoint cadPoint in CADPointList ) {
+			foreach( CADPoint cadPoint in m_CADPointList ) {
 				cadPoint.Transform( transform );
 			}
+			m_ContourCacheInfo.Transform();
 		}
 
 		List<CADPoint> BuildCADPointList( List<PathEdge5D> pathEdge5DList, bool isClosed )

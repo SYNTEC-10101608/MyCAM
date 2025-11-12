@@ -87,6 +87,10 @@ namespace MyCAM.CacheInfo
 		#endregion
 
 		#region Public API
+		public void Transform()
+		{
+			BuildCAMPointList();
+		}
 
 		public CAMPoint GetProcessStartPoint()
 		{
