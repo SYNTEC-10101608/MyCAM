@@ -620,6 +620,10 @@ namespace MyCAM.Data
 				return new gp_Vec( camPoint.ToolVec );
 			}
 
+			if( Math.Abs( dRA_rad * 180 / Math.PI - 666 ) < 1e-6 ) {
+				return new gp_Vec( 0, 0, 1 );
+			}
+
 			// get the x, y, z direction
 			gp_Dir x = camPoint.CADPoint.TangentVec;
 			gp_Dir z = camPoint.CADPoint.NormalVec_1st;

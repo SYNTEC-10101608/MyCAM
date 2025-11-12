@@ -201,6 +201,8 @@ namespace MyCAM.Post
 			}
 
 			// TODO: filter the sigular points
+			FilterSingularPoints( camPointList, ref rotateAngleList, singularTagList );
+
 			// solve FK
 			for( int i = 0; i < camPointList.Count; i++ ) {
 				gp_Pnt pointG54 = camPointList[ i ].CADPoint.Point;
@@ -230,6 +232,54 @@ namespace MyCAM.Post
 				resultMCS.Add( frameDataMCS );
 			}
 			return true;
+		}
+
+		static void FilterSingularPoints( List<CAMPoint> camPointList, ref List<Tuple<double, double>> rotateAngleList, List<bool> singularTagList )
+		{
+			for( int i = 0; i < singularTagList.Count; i++ ) {
+				if( !singularTagList[ i ] )
+					continue;
+
+				// Find the start and end of singular region
+				int singularStart = i;
+				int singularEnd = i;
+
+				// Extend to find the full singular region
+				while( singularEnd < singularTagList.Count - 1 && singularTagList[ singularEnd + 1 ] ) {
+					singularEnd++;
+				}
+
+				// Need valid entry and exit points for interpolation
+				if( singularStart > 0 && singularEnd < singularTagList.Count - 1 ) {
+					var entryAngles = rotateAngleList[ singularStart - 1 ];
+					var exitAngles = rotateAngleList[ singularEnd + 1 ];
+
+					// Calculate cumulative distances
+					var distances = new double[ singularEnd - singularStart + 1 ];
+					distances[ 0 ] = 0;
+					double totalDistance = 0;
+
+					for( int j = singularStart; j < singularEnd; j++ ) {
+						var p1 = camPointList[ j ].CADPoint.Point;
+						var p2 = camPointList[ j + 1 ].CADPoint.Point;
+						double dist = Math.Sqrt( Math.Pow( p2.X() - p1.X(), 2 ) + Math.Pow( p2.Y() - p1.Y(), 2 ) + Math.Pow( p2.Z() - p1.Z(), 2 ) );
+						totalDistance += dist;
+						distances[ j - singularStart + 1 ] = totalDistance;
+					}
+
+					// Interpolate master and slave values
+					for( int j = singularStart; j <= singularEnd; j++ ) {
+						double ratio = totalDistance > 0 ? distances[ j - singularStart ] / totalDistance : 0;
+						double interpolatedMaster = entryAngles.Item1 + ( exitAngles.Item1 - entryAngles.Item1 ) * ratio;
+						double interpolatedSlave = entryAngles.Item2 + ( exitAngles.Item2 - entryAngles.Item2 ) * ratio;
+
+						rotateAngleList[ j ] = new Tuple<double, double>( interpolatedMaster, interpolatedSlave );
+					}
+				}
+
+				// Skip to end of current singular region
+				i = singularEnd;
+			}
 		}
 
 		static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, CAMData currentCAMData, ref PostData pathG54PostData, ref PostData pathMCSPostData )

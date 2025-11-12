@@ -90,7 +90,7 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( "無效字串", MyApp.NoticeType.Warning );
 				return false;
 			}
-			if( angleA_deg <= -180 || angleA_deg >= 180 ||
+			if( ( ( angleA_deg <= -180 || angleA_deg >= 180 ) && Math.Abs( angleA_deg - 666 ) > 1e-6 ) ||
 			   angleB_deg <= -180 || angleB_deg >= 180 ) {
 				MyApp.Logger.ShowOnLogPanel( "角度必須在 -180~180 範圍內", MyApp.NoticeType.Warning );
 				return false;
