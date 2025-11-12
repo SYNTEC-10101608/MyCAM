@@ -155,7 +155,7 @@ namespace MyCAM.FileManager
 				// need to identify pathDataDTO first, because partdata include pathdata
 				if( entry is PathObjectDTO pathDataDTO ) {
 					if( pathDataDTO is ContourPathObjectDTO contourPathObject ) {
-						objectMap.Add( pathDataDTO.UID, contourPathObject.PathDTOToPathData() );
+						objectMap.Add( pathDataDTO.UID, contourPathObject.PathDTOToContourPathObject() );
 					}
 					continue;
 				}
@@ -269,11 +269,6 @@ namespace MyCAM.FileManager
 		{
 		}
 
-		// PathData → DTO
-		internal PathObjectDTO( PathObject pathData )
-		{
-		}
-
 		public CraftDataDTO CraftData
 		{
 			get;
@@ -289,7 +284,6 @@ namespace MyCAM.FileManager
 
 	public class ContourPathObjectDTO : PathObjectDTO
 	{
-		// CADPoint list for graphics display
 		[XmlArray( "CADPointListDTO" )]
 		[XmlArrayItem( "CADPointDTO" )]
 		public List<CADPointDTO> CADPointList
@@ -297,6 +291,10 @@ namespace MyCAM.FileManager
 			get;
 			set;
 		} = new List<CADPointDTO>();
+
+		internal ContourPathObjectDTO()
+		{
+		}
 
 		internal ContourPathObjectDTO( PathObject pathObject )
 		{
@@ -318,12 +316,8 @@ namespace MyCAM.FileManager
 			CraftData = new CraftDataDTO( pathObject.CraftData );
 		}
 
-		internal ContourPathObjectDTO()
-		{
-		}
-
-		// DTO → PathData
-		internal ContourPathObject PathDTOToPathData()
+		// DTO → ContourPathObject
+		internal ContourPathObject PathDTOToContourPathObject()
 		{
 			// protection
 			if( Shape == null || string.IsNullOrEmpty( UID ) ) {
