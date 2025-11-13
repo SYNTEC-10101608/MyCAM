@@ -698,7 +698,13 @@ namespace MyCAM.Data
 				slerp.Interpolate( t, ref q );
 				gp_Trsf trsf = new gp_Trsf();
 				trsf.SetRotation( q );
-				m_CAMPointList[ i % m_CAMPointList.Count ].ToolVec = new gp_Dir( startVec.Transformed( trsf ) );
+				//m_CAMPointList[ i % m_CAMPointList.Count ].ToolVec = new gp_Dir( startVec.Transformed( trsf ) );
+				if( i == nStartIndex ) {
+					m_CAMPointList[ i % m_CAMPointList.Count ].ToolVec = new gp_Dir( startVec.Transformed( trsf ) );
+				}
+				else {
+					m_CAMPointList[ i % m_CAMPointList.Count ].ToolVec = new gp_Dir( 0, 0, 1 );
+				}
 			}
 		}
 

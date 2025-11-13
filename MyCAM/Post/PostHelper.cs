@@ -255,11 +255,11 @@ namespace MyCAM.Post
 					var exitAngles = rotateAngleList[ singularEnd + 1 ];
 
 					// Calculate cumulative distances
-					var distances = new double[ singularEnd - singularStart + 1 ];
+					var distances = new double[ singularEnd - singularStart + 2 ];
 					distances[ 0 ] = 0;
 					double totalDistance = 0;
 
-					for( int j = singularStart; j < singularEnd; j++ ) {
+					for( int j = singularStart - 1; j <= singularEnd; j++ ) {
 						var p1 = camPointList[ j ].CADPoint.Point;
 						var p2 = camPointList[ j + 1 ].CADPoint.Point;
 						double dist = Math.Sqrt( Math.Pow( p2.X() - p1.X(), 2 ) + Math.Pow( p2.Y() - p1.Y(), 2 ) + Math.Pow( p2.Z() - p1.Z(), 2 ) );
@@ -272,7 +272,6 @@ namespace MyCAM.Post
 						double ratio = totalDistance > 0 ? distances[ j - singularStart ] / totalDistance : 0;
 						double interpolatedMaster = entryAngles.Item1 + ( exitAngles.Item1 - entryAngles.Item1 ) * ratio;
 						double interpolatedSlave = entryAngles.Item2 + ( exitAngles.Item2 - entryAngles.Item2 ) * ratio;
-
 						rotateAngleList[ j ] = new Tuple<double, double>( interpolatedMaster, interpolatedSlave );
 					}
 				}
