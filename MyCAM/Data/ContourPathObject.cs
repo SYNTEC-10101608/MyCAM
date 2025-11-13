@@ -16,35 +16,27 @@ namespace MyCAM.Data
 {
 	internal class ContourPathObject : PathObject
 	{
-		public ContourPathObject( string szUID, TopoDS_Shape shapeData, List<PathEdge5D> pathDataList )
-			: base( szUID, shapeData )
+		public ContourPathObject( string szUID, TopoDS_Shape shape, List<PathEdge5D> pathDataList )
+			: base( szUID, shape )
 		{
-			TopoDS_Vertex startVertex = new TopoDS_Vertex();
-			TopoDS_Vertex endVertex = new TopoDS_Vertex();
-			TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
-			gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
-			gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
-			bool isClosed = startPoint.IsEqual( endPoint, 1e-3 );
+			if( string.IsNullOrWhiteSpace( szUID ) || shape == null || shape.IsNull() || pathDataList == null ) {
+				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
+			}
 
+			bool isClosed = DetermineIfClosed( shape );
 			m_CADPointList = BuildCADPointList( pathDataList, isClosed );
 			m_CraftData = new CraftData( szUID );
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData, isClosed );
 		}
 
 		// this is for the file read constructor
-		public ContourPathObject( string szUID, TopoDS_Shape shapeData, List<CADPoint> cadPointList, CraftData craftData )
-			: base( szUID, shapeData )
+		public ContourPathObject( string szUID, TopoDS_Shape shape, List<CADPoint> cadPointList, CraftData craftData )
+			: base( szUID, shape )
 		{
-			if( shapeData == null || cadPointList == null || craftData == null ) {
+			if( string.IsNullOrWhiteSpace( szUID ) || shape == null || cadPointList == null || craftData == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
-			TopoDS_Vertex startVertex = new TopoDS_Vertex();
-			TopoDS_Vertex endVertex = new TopoDS_Vertex();
-			TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
-			gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
-			gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
-			bool isClosed = startPoint.IsEqual( endPoint, 1e-3 );
-
+			bool isClosed = DetermineIfClosed( shape );
 			m_CADPointList = cadPointList;
 			m_CraftData = craftData;
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData, isClosed );
@@ -197,6 +189,27 @@ namespace MyCAM.Data
 				}
 			}
 			return oneSegmentPointList;
+		}
+
+		bool DetermineIfClosed( TopoDS_Shape shapeData )
+		{
+			if( shapeData == null || shapeData.IsNull() )
+				return false;
+
+			try {
+				TopoDS_Vertex startVertex = new TopoDS_Vertex();
+				TopoDS_Vertex endVertex = new TopoDS_Vertex();
+				TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
+
+				gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
+				gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
+
+				return startPoint.IsEqual( endPoint, 1e-3 );
+			}
+			catch( Exception ex ) {
+				MyApp.Logger.ShowOnLogPanel( $"Error occurred while determining a closed path.: {ex.Message}", MyApp.NoticeType.Warning );
+				return false;
+			}
 		}
 
 

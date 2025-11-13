@@ -12,6 +12,9 @@ namespace MyCAM.CacheInfo
 	{
 		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData, bool isClose )
 		{
+			if( string.IsNullOrWhiteSpace( szID ) || m_CADPointList == null || m_CraftData == null ) {
+				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );
+			}
 			UID = szID;
 			m_CADPointList = cadPointList;
 			m_CraftData = craftData;
