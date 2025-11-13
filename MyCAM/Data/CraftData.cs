@@ -165,8 +165,8 @@ namespace MyCAM.Data
 			m_IsDirty = true;
 		}
 
-		// re: comment it
-		public bool GetCraftDataIsDirty()
+		// fix : comment
+		public bool CheckAndRefreshCraftDataIsDirty()
 		{
 			if( m_IsDirty == false ) {
 				return false;

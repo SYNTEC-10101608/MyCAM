@@ -66,11 +66,12 @@ namespace MyCAM.Data
 			ResetShapeIDsByDTO( shapeIDs );
 		}
 
-		// re: 換行
+		// fix: 換行
 		public Dictionary<string, IObject> ObjectMap
 		{
 			get; private set;
 		}
+
 		public List<string> PartIDList
 		{
 			get; private set;

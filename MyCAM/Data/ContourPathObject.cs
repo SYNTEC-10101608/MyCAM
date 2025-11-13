@@ -19,8 +19,8 @@ namespace MyCAM.Data
 		public ContourPathObject( string szUID, TopoDS_Shape shape, List<PathEdge5D> pathDataList )
 			: base( szUID, shape )
 		{
-			// re: empty, collection count check
-			if( string.IsNullOrWhiteSpace( szUID ) || shape == null || shape.IsNull() || pathDataList == null ) {
+			// fix: empty, collection count check
+			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || pathDataList == null || pathDataList.Count == 0 ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
 
@@ -34,7 +34,7 @@ namespace MyCAM.Data
 		public ContourPathObject( string szUID, TopoDS_Shape shape, List<CADPoint> cadPointList, CraftData craftData )
 			: base( szUID, shape )
 		{
-			if( string.IsNullOrWhiteSpace( szUID ) || shape == null || cadPointList == null || craftData == null ) {
+			if( string.IsNullOrEmpty( szUID ) || shape == null || cadPointList == null || cadPointList.Count == 0 || craftData == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
 			bool isClosed = DetermineIfClosed( shape );

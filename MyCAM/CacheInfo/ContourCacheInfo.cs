@@ -12,7 +12,7 @@ namespace MyCAM.CacheInfo
 	{
 		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData, bool isClose )
 		{
-			if( string.IsNullOrWhiteSpace( szID ) || m_CADPointList == null || m_CraftData == null ) {
+			if( string.IsNullOrEmpty( szID ) || m_CADPointList == null || m_CADPointList.Count == 0 || m_CraftData == null ) {
 				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );
 			}
 			UID = szID;
@@ -42,7 +42,7 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.GetCraftDataIsDirty() ) {
+				if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
 					BuildCAMPointList();
 				}
 				return m_CAMPointList;
@@ -53,7 +53,7 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.GetCraftDataIsDirty() ) {
+				if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
 					BuildCAMPointList();
 				}
 				return m_LeadInCAMPointList;
@@ -64,7 +64,7 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.GetCraftDataIsDirty() ) {
+				if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
 					BuildCAMPointList();
 				}
 				return m_LeadOutCAMPointList;
@@ -75,7 +75,7 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.GetCraftDataIsDirty() ) {
+				if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
 					BuildCAMPointList();
 				}
 				return m_OverCutPointList;
@@ -97,7 +97,7 @@ namespace MyCAM.CacheInfo
 
 		public CAMPoint GetProcessStartPoint()
 		{
-			if( m_CraftData.GetCraftDataIsDirty() ) {
+			if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
 				BuildCAMPointList();
 			}
 			CAMPoint camPoint = null;
@@ -112,7 +112,7 @@ namespace MyCAM.CacheInfo
 
 		public CAMPoint GetProcessEndPoint()
 		{
-			if( m_CraftData.GetCraftDataIsDirty() ) {
+			if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
 				BuildCAMPointList();
 			}
 			CAMPoint camPoint = null;
