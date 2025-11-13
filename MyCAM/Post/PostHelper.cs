@@ -234,6 +234,7 @@ namespace MyCAM.Post
 			return true;
 		}
 
+
 		static void FilterSingularPoints( List<CAMPoint> camPointList, ref List<Tuple<double, double>> rotateAngleList, List<bool> singularTagList )
 		{
 			for( int i = 0; i < singularTagList.Count; i++ ) {
@@ -267,12 +268,14 @@ namespace MyCAM.Post
 						distances[ j - singularStart + 1 ] = totalDistance;
 					}
 
-					// Interpolate master and slave values
+					// Interpolate master and slave values using constant-jerk curve
 					for( int j = singularStart; j <= singularEnd; j++ ) {
-						double ratio = totalDistance > 0 ? distances[ j - singularStart ] / totalDistance : 0;
-						double interpolatedMaster = entryAngles.Item1 + ( exitAngles.Item1 - entryAngles.Item1 ) * ratio;
-						double interpolatedSlave = entryAngles.Item2 + ( exitAngles.Item2 - entryAngles.Item2 ) * ratio;
+						double t = totalDistance > 0 ? distances[ j - singularStart ] / totalDistance : 0;
+						double smoothRatio = t;
+						double interpolatedMaster = entryAngles.Item1 + ( exitAngles.Item1 - entryAngles.Item1 ) * smoothRatio;
+						double interpolatedSlave = entryAngles.Item2 + ( exitAngles.Item2 - entryAngles.Item2 ) * smoothRatio;
 						rotateAngleList[ j ] = new Tuple<double, double>( interpolatedMaster, interpolatedSlave );
+						Console.WriteLine( j + " : " + smoothRatio );
 					}
 				}
 
