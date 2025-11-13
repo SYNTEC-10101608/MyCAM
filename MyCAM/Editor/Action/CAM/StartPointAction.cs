@@ -2,20 +2,18 @@
 using OCCViewer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
 	internal class StartPointAction : IndexSelectAction
 	{
-		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, List<string> pathIDList )
-			: base( dataManager, viewer, treeView, viewManager, pathIDList.First() )
+		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
+			: base( dataManager, viewer, treeView, viewManager, pathID )
 		{
+			// fix: list check ( in IndexSelectAction)
+			m_PathIDList = new List<string>() { pathID };
 			m_CraftData = ( m_DataManager.ObjectMap[ m_PathID ] as PathObject ).CraftData;
-
-			// re: list check
-			m_PathIDList = pathIDList;
 		}
 
 		public override EditActionType ActionType

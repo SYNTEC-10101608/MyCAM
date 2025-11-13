@@ -294,7 +294,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList );
+			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -355,7 +355,7 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
-			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList );
+			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
 			action.PropertyChanged += ShowCAMData;
 
 			// when editing tool vec dilog show/close, need disable/enable main form
