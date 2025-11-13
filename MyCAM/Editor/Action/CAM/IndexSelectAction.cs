@@ -16,13 +16,16 @@ namespace MyCAM.Editor
 		protected IndexSelectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
-			// re: is null or empty
-			if( pathID == string.Empty ) {
+			// fix: is null or empty
+			if( string.IsNullOrEmpty( pathID ) ) {
 				throw new ArgumentNullException( "IndexSelectAction constructing argument null" );
 			}
 			m_PathID = pathID;
 
-			// re: map data missing protection
+			// fix: map data missing protection
+			if( !m_DataManager.ObjectMap.ContainsKey( m_PathID ) ) {
+				throw new ArgumentException( "IndexSelectAction constructing argument invalid" );
+			}
 			m_ContourPathObject = (ContourPathObject)m_DataManager.ObjectMap[ m_PathID ];
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();

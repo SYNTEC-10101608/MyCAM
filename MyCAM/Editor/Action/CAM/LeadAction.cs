@@ -9,28 +9,20 @@ namespace MyCAM.Editor
 	internal class LeadAction : EditCAMActionBase
 	{
 		public LeadAction( DataManager dataManager, List<string> pathIDList )
-			: base( dataManager )
+			: base( dataManager, pathIDList )
 		{
-			if( pathIDList == null || pathIDList.Count == 0 ) {
-				throw new ArgumentNullException( "LeadAction constructing argument pathIDList null or empty" );
-			}
-			m_PathIDList = pathIDList;
-
-			foreach( string ID in m_PathIDList ) {
-				m_CraftDataList.Add( ( dataManager.ObjectMap[ ID ] as PathObject ).CraftData );
-			}
-
+			// checked in base constructor
 			// when user cancel the lead setting, need to turn path back
 			m_BackupLeadParamList = new List<LeadData>();
-			foreach( var camData in m_CraftDataList ) {
-				if( camData == null ) {
+			foreach( var craftData in m_CraftDataList ) {
+				if( craftData == null ) {
 					throw new ArgumentNullException( "LeadAction constructing argument craftDataList contains null ContourCacheInfo" );
 				}
-				if( camData.LeadLineParam == null ) {
+				if( craftData.LeadLineParam == null ) {
 					m_BackupLeadParamList.Add( new LeadData() );
 				}
 				else {
-					m_BackupLeadParamList.Add( camData.LeadLineParam.Clone() );
+					m_BackupLeadParamList.Add( craftData.LeadLineParam.Clone() );
 				}
 			}
 		}
@@ -90,8 +82,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		List<CraftData> m_CraftDataList = new List<CraftData>();
 		List<LeadData> m_BackupLeadParamList;
-		List<string> m_PathIDList;
 	}
 }

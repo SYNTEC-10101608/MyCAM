@@ -9,17 +9,9 @@ namespace MyCAM.Editor
 	internal class OverCutAction : EditCAMActionBase
 	{
 		public OverCutAction( DataManager dataManager, List<string> pathIDList )
-		: base( dataManager )
+		: base( dataManager, pathIDList )
 		{
-			if( pathIDList == null || pathIDList.Count == 0 ) {
-				throw new ArgumentNullException( "LeadAction constructing argument pathIDList null or empty" );
-			}
-			m_PathIDList = pathIDList;
-
-			foreach( string ID in m_PathIDList ) {
-				m_CraftDataList.Add( ( m_DataManager.ObjectMap[ ID ] as PathObject ).CraftData );
-			}
-
+			// checked in base constructor
 			m_dOverCutBackupList = new List<double>();
 			foreach( var craftData in m_CraftDataList ) {
 				if( craftData == null ) {
@@ -84,8 +76,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		readonly List<CraftData> m_CraftDataList = new List<CraftData>();
 		readonly List<double> m_dOverCutBackupList;
-		List<string> m_PathIDList;
 	}
 }

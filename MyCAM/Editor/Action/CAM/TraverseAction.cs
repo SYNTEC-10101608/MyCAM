@@ -8,17 +8,9 @@ namespace MyCAM.Editor
 	internal class TraverseAction : EditCAMActionBase
 	{
 		public TraverseAction( DataManager dataManager, List<string> pathIDList )
-			: base( dataManager )
+			: base( dataManager, pathIDList )
 		{
-			if( pathIDList == null || pathIDList.Count == 0 ) {
-				throw new ArgumentNullException( "LeadAction constructing argument pathIDList null or empty" );
-			}
-			m_PathIDList = pathIDList;
-
-			foreach( string ID in m_PathIDList ) {
-				m_CraftDataList.Add( ( m_DataManager.ObjectMap[ ID ] as PathObject ).CraftData );
-			}
-
+			// checked in base constructor
 			// when user cancel the traverse setting, need to turn path back
 			m_BackupTraverseDataList = new List<TraverseData>();
 			foreach( var camData in m_CraftDataList ) {
@@ -89,8 +81,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		List<CraftData> m_CraftDataList = new List<CraftData>();
 		List<TraverseData> m_BackupTraverseDataList;
-		List<string> m_PathIDList;
 	}
 }
