@@ -63,11 +63,12 @@ namespace MyCAM.Editor
 		}
 	}
 
+	// re: need this?
 	internal abstract class EditCAMActionBase : EditActionBase
 	{
 		protected EditCAMActionBase( DataManager dataManager ) : base( dataManager )
 		{
-
+			// re: do some common things here (derived actions)
 		}
 
 		public Action<List<string>> PropertyChanged;

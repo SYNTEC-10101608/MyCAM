@@ -19,6 +19,7 @@ namespace MyCAM.Data
 		public ContourPathObject( string szUID, TopoDS_Shape shape, List<PathEdge5D> pathDataList )
 			: base( szUID, shape )
 		{
+			// re: empty, collection count check
 			if( string.IsNullOrWhiteSpace( szUID ) || shape == null || shape.IsNull() || pathDataList == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}

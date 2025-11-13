@@ -13,6 +13,8 @@ namespace MyCAM.Editor
 			: base( dataManager, viewer, treeView, viewManager, pathIDList.First() )
 		{
 			m_CraftData = ( m_DataManager.ObjectMap[ m_PathID ] as PathObject ).CraftData;
+
+			// re: list check
 			m_PathIDList = pathIDList;
 		}
 
