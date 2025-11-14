@@ -761,7 +761,6 @@ namespace MyCAM.Editor
 				m_OrientationAISList.Add( szPathID, orientationAIS );
 			}
 
-
 			// display the orientation
 			foreach( string szPathID in pathIDList ) {
 				if( m_OrientationAISList.ContainsKey( szPathID ) ) {
