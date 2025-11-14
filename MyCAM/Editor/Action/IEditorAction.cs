@@ -1,6 +1,7 @@
 ﻿using MyCAM.Data;
 using OCCViewer;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -60,6 +61,28 @@ namespace MyCAM.Editor
 		{
 			get; set;
 		}
+	}
+
+	internal abstract class EditCAMActionBase : EditActionBase
+	{
+		protected EditCAMActionBase( DataManager dataManager, List<string> pathIDList ) : base( dataManager )
+		{
+			if( pathIDList == null || pathIDList.Count == 0 ) {
+				throw new ArgumentNullException( "LeadAction constructing argument pathIDList null or empty" );
+			}
+			m_PathIDList = pathIDList;
+
+			foreach( string szID in m_PathIDList ) {
+				if( !m_DataManager.ObjectMap.ContainsKey( szID ) ) {
+					throw new ArgumentException( "LeadAction constructing argument pathIDList contains invalid path ID" );
+				}
+				m_CraftDataList.Add( ( dataManager.ObjectMap[ szID ] as PathObject ).CraftData );
+			}
+		}
+
+		public Action<List<string>> PropertyChanged;
+		protected List<CraftData> m_CraftDataList = new List<CraftData>();
+		protected List<string> m_PathIDList;
 	}
 
 	internal abstract class EditActionBase : IEditorAction

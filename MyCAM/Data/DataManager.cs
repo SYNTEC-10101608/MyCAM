@@ -1,4 +1,5 @@
-﻿using OCC.gp;
+﻿using MyCAM.CacheInfo;
+using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
@@ -30,42 +31,42 @@ namespace MyCAM.Data
 		// TODO: this is temp solution
 		public DataManager()
 		{
-			ShapeDataMap = new Dictionary<string, ShapeData>();
+			ObjectMap = new Dictionary<string, IObject>();
 			PartIDList = new List<string>();
 			PathIDList = new List<string>();
 			m_MachineData = m_DefaultMachineData;
 		}
 
-		public void ResetDataManger( Dictionary<string, ShapeData> shapeDataMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData )
+		public void ResetDataManger( Dictionary<string, IObject> objectMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData )
 		{
 			// check shape map is mach with partList & pathList
-			Dictionary<string, ShapeData> checkedShapeDataMap = new Dictionary<string, ShapeData>();
+			Dictionary<string, IObject> checkedObjectMap = new Dictionary<string, IObject>();
 			List<string> checkedPartIDList = new List<string>();
 			List<string> checkedPathIDList = new List<string>();
 
 			// read part in sequence
 			foreach( var partDataID in partIDList ) {
-				if( shapeDataMap.ContainsKey( partDataID ) ) {
-					checkedShapeDataMap[ partDataID ] = shapeDataMap[ partDataID ];
+				if( objectMap.ContainsKey( partDataID ) ) {
+					checkedObjectMap[ partDataID ] = objectMap[ partDataID ];
 					checkedPartIDList.Add( partDataID );
 				}
 			}
 
 			// read path in sequence
 			foreach( var pathDataID in pathIDList ) {
-				if( shapeDataMap.ContainsKey( pathDataID ) ) {
-					checkedShapeDataMap[ pathDataID ] = shapeDataMap[ pathDataID ];
+				if( objectMap.ContainsKey( pathDataID ) ) {
+					checkedObjectMap[ pathDataID ] = objectMap[ pathDataID ];
 					checkedPathIDList.Add( pathDataID );
 				}
 			}
-			ShapeDataMap = checkedShapeDataMap;
+			ObjectMap = checkedObjectMap;
 			PartIDList = checkedPartIDList;
 			PathIDList = checkedPathIDList;
 			EntryAndExitData = entryAndExitData;
 			ResetShapeIDsByDTO( shapeIDs );
 		}
 
-		public Dictionary<string, ShapeData> ShapeDataMap
+		public Dictionary<string, IObject> ObjectMap
 		{
 			get; private set;
 		}
@@ -119,21 +120,21 @@ namespace MyCAM.Data
 			if( newShape == null || newShape.IsNull() ) {
 				return;
 			}
-			List<ShapeData> newShapeData = ArrangeShapeData( newShape );
-			if( newShapeData.Count == 0 ) {
-				return; // no valid shape data
+			List<PartObject> newPartObjectList = ArrangePartObject( newShape );
+			if( newPartObjectList.Count == 0 ) {
+				return; // no valid object
 			}
 
 			// clear all datas
 			ResetShapeIDs();
-			ShapeDataMap.Clear();
+			ObjectMap.Clear();
 			PartIDList.Clear();
 			PathIDList.Clear();
 
 			// update all datas
-			foreach( var shapeData in newShapeData ) {
-				ShapeDataMap[ shapeData.UID ] = shapeData;
-				PartIDList.Add( shapeData.UID );
+			foreach( var objectData in newPartObjectList ) {
+				ObjectMap[ objectData.UID ] = objectData;
+				PartIDList.Add( objectData.UID );
 			}
 			PartChanged?.Invoke();
 		}
@@ -144,8 +145,8 @@ namespace MyCAM.Data
 				return;
 			}
 			string szID = "Ref_" + GetNewPartID( newFeature );
-			ShapeData newData = new ShapeData( szID, newFeature );
-			ShapeDataMap[ szID ] = newData;
+			PartObject newData = new PartObject( szID, newFeature );
+			ObjectMap[ szID ] = newData;
 			PartIDList.Add( szID );
 			FeatureAdded?.Invoke( new List<string>() { szID } );
 		}
@@ -185,9 +186,9 @@ namespace MyCAM.Data
 				// add valid path
 				if( isValidPath ) {
 					string szID = "Path_" + ++m_PathID;
-					PathData pathData = new PathData( szID, pathWire, pathElements );
-					pathData.CAMData.TraverseData = new TraverseData();
-					ShapeDataMap[ szID ] = pathData;
+					ContourPathObject contourPathObject = new ContourPathObject( szID, pathWire, pathElements );
+					contourPathObject.CraftData.TraverseData = new TraverseData();
+					ObjectMap[ szID ] = contourPathObject;
 					newPathIDList.Add( szID );
 				}
 			}
@@ -203,16 +204,28 @@ namespace MyCAM.Data
 				return;
 			}
 			PathIDList.Remove( pathID );
-			ShapeDataMap.Remove( pathID );
+			ObjectMap.Remove( pathID );
 		}
 
-		public List<CAMData> GetCAMDataList()
+		public List<ContourCacheInfo> GetContourCacheInfoList()
 		{
-			List<CAMData> camDataList = new List<CAMData>();
+			List<ContourCacheInfo> cacheInfoList = new List<ContourCacheInfo>();
 			foreach( string pathID in PathIDList ) {
-				camDataList.Add( ( (PathData)ShapeDataMap[ pathID ] ).CAMData );
+				if( ( ObjectMap[ pathID ] as PathObject ).PathType != PathType.Contour ) {
+					continue;
+				}
+				cacheInfoList.Add( ( ObjectMap[ pathID ] as ContourPathObject ).ContourCacheInfo );
 			}
-			return camDataList;
+			return cacheInfoList;
+		}
+
+		public List<ICacheInfo> GetCacheInfoList()
+		{
+			List<ICacheInfo> cacheInfoList = new List<ICacheInfo>();
+			foreach( string pathID in PathIDList ) {
+				cacheInfoList.Add( ObjectMap[ pathID ] as ICacheInfo );
+			}
+			return cacheInfoList;
 		}
 
 		public ShapeIDsStruct GetShapeIDsForDTO()
@@ -240,18 +253,18 @@ namespace MyCAM.Data
 			m_PathID = structShapeIDs.Path_ID;
 		}
 
-		List<ShapeData> ArrangeShapeData( TopoDS_Shape oneShape )
+		List<PartObject> ArrangePartObject( TopoDS_Shape oneShape )
 		{
 			if( oneShape == null || oneShape.IsNull() ) {
-				return new List<ShapeData>();
+				return new List<PartObject>();
 			}
 			if( oneShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_COMPOUND ) {
 				string szID = GetNewPartID( oneShape );
-				return new List<ShapeData>() { new ShapeData( szID, oneShape ) };
+				return new List<PartObject>() { new PartObject( szID, oneShape ) };
 			}
-			List<ShapeData> result = new List<ShapeData>();
+			List<PartObject> result = new List<PartObject>();
 			foreach( TopoDS_Shape subShape in oneShape.elementsAsList ) {
-				result.AddRange( ArrangeShapeData( subShape ) );
+				result.AddRange( ArrangePartObject( subShape ) );
 			}
 			return result;
 		}
@@ -296,7 +309,7 @@ namespace MyCAM.Data
 			if( shape == null || shape.IsNull() ) {
 				return string.Empty;
 			}
-			foreach( var model in ShapeDataMap.Values ) {
+			foreach( var model in ObjectMap.Values ) {
 				if( model.Shape.IsEqual( shape ) ) {
 					return model.UID;
 				}

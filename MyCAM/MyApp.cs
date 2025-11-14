@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MyCAM.LogManager;
+using System;
 using System.Windows.Forms;
-using MyCAM.LogManager;
 
 namespace MyCAM.App
 {
@@ -45,5 +45,9 @@ namespace MyCAM.App
 		static Form m_MainForm;
 		static LogHandler m_Logger;
 		static Panel m_LogPanel;
+
+		public const double PRECISION_DEFLECTION = 0.01;
+		public const double PRECISION_MAX_LENGTH = 1;
+		public const double PRECISION_MIN_ERROR = 0.001;
 	}
 }

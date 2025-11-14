@@ -1,4 +1,6 @@
-﻿namespace MyCAM.Data
+﻿using System;
+
+namespace MyCAM.Data
 {
 	public enum LeadLineType
 	{
@@ -42,19 +44,57 @@
 			IsChangeLeadDirection = isChangeLeadDirection;
 		}
 
+		public Action LeadPropertyChanged;
+
 		public LeadParam LeadIn
 		{
-			get; set;
+			get
+			{
+				if( m_LeadIn == null ) {
+					m_LeadIn = new LeadParam();
+				}
+				return m_LeadIn;
+			}
+			set
+			{
+				if( m_LeadIn != value ) {
+					m_LeadIn = value;
+					LeadPropertyChanged?.Invoke();
+				}
+			}
 		}
 
 		public LeadParam LeadOut
 		{
-			get; set;
+			get
+			{
+				if( m_LeadOut == null ) {
+					m_LeadOut = new LeadParam();
+				}
+				return m_LeadOut;
+			}
+			set
+			{
+				if( m_LeadOut != value ) {
+					m_LeadOut = value;
+					LeadPropertyChanged?.Invoke();
+				}
+			}
 		}
 
 		public bool IsChangeLeadDirection
 		{
-			get; set;
+			get
+			{
+				return m_IsChangeLeadDirection;
+			}
+			set
+			{
+				if( m_IsChangeLeadDirection != value ) {
+					m_IsChangeLeadDirection = value;
+					LeadPropertyChanged?.Invoke();
+				}
+			}
 		}
 
 		public LeadData Clone()
@@ -69,6 +109,10 @@
 				IsChangeLeadDirection
 			);
 		}
+
+		LeadParam m_LeadIn;
+		LeadParam m_LeadOut;
+		bool m_IsChangeLeadDirection;
 	}
 }
 

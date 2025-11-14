@@ -18,14 +18,14 @@ namespace MyCAM.FileManager
 	{
 		#region XML structure
 
-		[XmlArray( "ShapeDataMapDTO" )]
-		[XmlArrayItem( "PartDataDTO", typeof( PartDataDTO ) )]
-		[XmlArrayItem( "PathDataDTO", typeof( PathDataDTO ) )]
-		public List<PartDataDTO> ShapeDataMap
+		[XmlArray( "ObjectMapDTO" )]
+		[XmlArrayItem( "PartObjectDTO", typeof( PartObjectDTO ) )]
+		[XmlArrayItem( "PathObjectDTO", typeof( PathObjectDTO ) )]
+		public List<IObjectDTO> ObjectDataMap
 		{
 			get;
 			private set;
-		} = new List<PartDataDTO>();
+		} = new List<IObjectDTO>();
 
 		[XmlArray( "PartIDListDTO" )]
 		[XmlArrayItem( "PartID" )]
@@ -67,16 +67,16 @@ namespace MyCAM.FileManager
 			if( dataManager == null ) {
 				return;
 			}
-			ToShapeDataDTO( dataManager.ShapeDataMap );
+			ToObjectDataDTO( dataManager.ObjectMap );
 			ToPartIDListDTO( dataManager.PartIDList );
 			ToPathIDListDTO( dataManager.PathIDList );
 			ToShapeIDDTO( dataManager.GetShapeIDsForDTO() );
 			ToEntryAndExitDataDTO( dataManager.EntryAndExitData );
 		}
 
-		internal void DataMgrDTO2Data( out Dictionary<string, ShapeData> shapeMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData )
+		internal void DataMgrDTO2Data( out Dictionary<string, IObject> objectDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData )
 		{
-			shapeMap = ShapeMapDTOToShapeMap();
+			objectDataMap = ObjectMapDTOToObjectMap();
 			partIDList = PartIDListDTOToPartList();
 			pathIDList = PathIDListDTOToPathList();
 			shapeIDs = ShapeIDDTOToShapeIDStruct();
@@ -85,26 +85,28 @@ namespace MyCAM.FileManager
 
 		#region Generate DTO
 
-		// ShapeDataMap → ShapeDataMapDTO
-		void ToShapeDataDTO( Dictionary<string, ShapeData> shapeDataMap )
+		// ObjectDataMap → ObjectDataMapDTO
+		void ToObjectDataDTO( Dictionary<string, IObject> objectDataMap )
 		{
-			ShapeDataMap = new List<PartDataDTO>();
-			if( shapeDataMap == null ) {
+			ObjectDataMap = new List<IObjectDTO>();
+			if( objectDataMap == null ) {
 				return;
 			}
-			foreach( var shapeData in shapeDataMap ) {
+			foreach( var objectData in objectDataMap ) {
 
 				// current index is path data
-				if( shapeData.Value is PathData path ) {
-					PathDataDTO pathDataDTO = new PathDataDTO( path );
-					ShapeDataMap.Add( pathDataDTO );
+				if( objectData.Value is PathObject path ) {
+					if( path.PathType == PathType.Contour ) {
+						ContourPathObjectDTO pathDataDTO = new ContourPathObjectDTO( path );
+						ObjectDataMap.Add( pathDataDTO );
+					}
 					continue;
 				}
 
 				// is part data
-				if( shapeData.Value is ShapeData ) {
-					PartDataDTO partDataDTO = new PartDataDTO( shapeData.Value );
-					ShapeDataMap.Add( partDataDTO );
+				if( objectData.Value is PartObject part ) {
+					PartObjectDTO partDataDTO = new PartObjectDTO( part );
+					ObjectDataMap.Add( partDataDTO );
 					continue;
 				}
 			}
@@ -142,27 +144,28 @@ namespace MyCAM.FileManager
 
 		#region Generate Data by DTO
 
-		Dictionary<string, ShapeData> ShapeMapDTOToShapeMap()
+		Dictionary<string, IObject> ObjectMapDTOToObjectMap()
 		{
-			if( ShapeDataMap == null || ShapeDataMap.Count == 0 ) {
-				throw new ArgumentException( "ShapeDataMap deserialization failed." );
+			if( ObjectDataMap == null || ObjectDataMap.Count == 0 ) {
+				throw new ArgumentException( "ObjectMap deserialization failed." );
 			}
-			Dictionary<string, ShapeData> shapeMap = new Dictionary<string, ShapeData>();
-			foreach( var entry in ShapeDataMap ) {
+			Dictionary<string, IObject> objectMap = new Dictionary<string, IObject>();
+			foreach( var entry in ObjectDataMap ) {
 
 				// need to identify pathDataDTO first, because partdata include pathdata
-				if( entry is PathDataDTO pathDataDTO ) {
-					PathData pathData = pathDataDTO.PathDTOToPathData();
-					shapeMap.Add( pathDataDTO.UID, pathData );
+				if( entry is PathObjectDTO pathDataDTO ) {
+					if( pathDataDTO is ContourPathObjectDTO contourPathObject ) {
+						objectMap.Add( pathDataDTO.UID, contourPathObject.PathDTOToContourPathObject() );
+					}
 					continue;
 				}
-				if( entry is PartDataDTO partDataDTO ) {
-					ShapeData shapeData = partDataDTO.PartDTOToPartData();
-					shapeMap.Add( partDataDTO.UID, shapeData );
+				if( entry is PartObjectDTO partDataDTO ) {
+					PartObject partObject = partDataDTO.PartDTOToPartData();
+					objectMap.Add( partDataDTO.UID, partObject );
 					continue;
 				}
 			}
-			return shapeMap;
+			return objectMap;
 		}
 
 		List<string> PartIDListDTOToPartList()
@@ -202,7 +205,9 @@ namespace MyCAM.FileManager
 		#endregion
 	}
 
-	public class PartDataDTO
+	[XmlInclude( typeof( PartObjectDTO ) )]
+	[XmlInclude( typeof( PathObjectDTO ) )]
+	public abstract class IObjectDTO
 	{
 		// properties
 		public string UID
@@ -212,77 +217,128 @@ namespace MyCAM.FileManager
 
 		public TopoShapeDTO Shape
 		{
-			get;
-			set;
+			get; set;
 		} = new TopoShapeDTO();
 
+		public ObjectType ObjectType
+		{
+			get; set;
+		} = ObjectType.Part;
+
 		// constructor for XmlSerializer
-		internal PartDataDTO()
+		internal IObjectDTO()
+		{
+		}
+	}
+
+	public class PartObjectDTO : IObjectDTO
+	{
+		// constructor for XmlSerializer
+		internal PartObjectDTO()
 		{
 		}
 
 		// PartData → DTO
-		internal PartDataDTO( ShapeData shapeData )
+		internal PartObjectDTO( PartObject partData )
 		{
-			if( shapeData == null ) {
+			if( partData == null ) {
 				return;
 			}
-			UID = shapeData.UID;
-			Shape = new TopoShapeDTO( shapeData.Shape );
+			UID = partData.UID;
+			Shape = new TopoShapeDTO( partData.Shape );
+			ObjectType = ObjectType.Part;
 		}
 
 		// DTO → PartData
-		internal ShapeData PartDTOToPartData()
+		internal PartObject PartDTOToPartData()
 		{
 			// protection
 			if( Shape == null || string.IsNullOrEmpty( UID ) ) {
 				throw new ArgumentNullException( "PartData deserialization failed." );
 			}
 			TopoDS_Shape topoShape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
-			return new ShapeData( UID, topoShape );
+			return new PartObject( UID, topoShape );
 		}
 	}
 
-	public class PathDataDTO : PartDataDTO
+	[XmlInclude( typeof( ContourPathObjectDTO ) )]
+	public abstract class PathObjectDTO : IObjectDTO
 	{
-		public CAMDataDTO CAMData
+		// constructor for XmlSerializer
+		internal PathObjectDTO()
+		{
+		}
+
+		public CraftDataDTO CraftData
 		{
 			get;
 			set;
-		} = new CAMDataDTO();
+		} = new CraftDataDTO();
 
-		// constructor for XmlSerializer
-		internal PathDataDTO()
+		public PathType PathType
+		{
+			get;
+			set;
+		} = PathType.Contour;
+	}
+
+	public class ContourPathObjectDTO : PathObjectDTO
+	{
+		[XmlArray( "CADPointListDTO" )]
+		[XmlArrayItem( "CADPointDTO" )]
+		public List<CADPointDTO> CADPointList
+		{
+			get;
+			set;
+		} = new List<CADPointDTO>();
+
+		internal ContourPathObjectDTO()
 		{
 		}
 
-		// PathData → DTO
-		internal PathDataDTO( PathData pathData )
+		internal ContourPathObjectDTO( PathObject pathObject )
 		{
-			if( pathData == null ) {
+			if( pathObject == null ) {
 				return;
 			}
-			UID = pathData.UID;
-			Shape = new TopoShapeDTO( pathData.Shape );
-			CAMData = new CAMDataDTO( pathData.CAMData );
+			UID = pathObject.UID;
+			Shape = new TopoShapeDTO( pathObject.Shape );
+			ObjectType = ObjectType.Path;
+			PathType = PathType.Contour;
+			if( pathObject is ContourPathObject ) {
+				foreach( var point in ( (ContourPathObject)pathObject ).CADPointList ) {
+					CADPointList.Add( new CADPointDTO( point ) );
+				}
+			}
+			else {
+				CADPointList = new List<CADPointDTO>();
+			}
+			CraftData = new CraftDataDTO( pathObject.CraftData );
 		}
 
-		// DTO → PathData
-		internal PathData PathDTOToPathData()
+		// DTO → ContourPathObject
+		internal ContourPathObject PathDTOToContourPathObject()
 		{
 			// protection
 			if( Shape == null || string.IsNullOrEmpty( UID ) ) {
-				throw new ArgumentNullException( "PathData deserialization failed." );
+				throw new ArgumentNullException( "PathObject deserialization failed." );
 			}
 			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
-			CAMData camData = CAMData.ToCAMData();
-			return new PathData( UID, shape, camData );
+			CraftData craftData = CraftData.ToCraftData();
+			List<CADPoint> cadPointList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
+			return new ContourPathObject( UID, shape, cadPointList, craftData );
 		}
 	}
 
-	public class CAMDataDTO
+	public class CraftDataDTO
 	{
 		// properties
+		public string UID
+		{
+			get;
+			set;
+		} = string.Empty;
+
 		public bool IsReverse
 		{
 			get;
@@ -331,50 +387,40 @@ namespace MyCAM.FileManager
 			set;
 		} = new List<ToolVecMapDTO>();
 
-		public List<CADPointDTO> CADPointList
-		{
-			get;
-			set;
-		} = new List<CADPointDTO>();
-
-		internal CAMDataDTO()
+		internal CraftDataDTO()
 		{
 		}
 
-		internal CAMDataDTO( CAMData camData )
+		internal CraftDataDTO( CraftData craftData )
 		{
-			if( camData == null ) {
+			if( craftData == null ) {
 				return;
 			}
-			IsReverse = camData.IsReverse;
-			IsToolVecReverse = camData.IsToolVecReverse;
-			StartPoint = camData.StartPoint;
-			IsClosed = camData.IsClosed;
-			LeadParam = camData.LeadLineParam != null
-						? new LeadParamDTO( camData.LeadLineParam )
+			UID = craftData.UID;
+			IsReverse = craftData.IsReverse;
+			IsToolVecReverse = craftData.IsToolVecReverse;
+			StartPoint = craftData.StartPointIndex;
+			LeadParam = craftData.LeadLineParam != null
+						? new LeadParamDTO( craftData.LeadLineParam )
 						: new LeadParamDTO();
-			TraverseData = camData.TraverseData != null
-							? new TraverseDataDTO( camData.TraverseData )
+			TraverseData = craftData.TraverseData != null
+							? new TraverseDataDTO( craftData.TraverseData )
 							: new TraverseDataDTO();
-			OverCutLength = camData.OverCutLength;
-			ToolVecModifyMap = ( camData.ToolVecModifyMap ?? new Dictionary<int, Tuple<double, double>>() )
+			OverCutLength = craftData.OverCutLength;
+			ToolVecModifyMap = ( craftData.ToolVecModifyMap ?? new Dictionary<int, Tuple<double, double>>() )
 				.Select( kvp => new ToolVecMapDTO( kvp.Key, kvp.Value.Item1, kvp.Value.Item2 ) )
-				.ToList();
-			CADPointList = ( camData.CADPointList ?? new List<CADPoint>() )
-				.Select( point => new CADPointDTO( point ) )
 				.ToList();
 		}
 
-		internal CAMData ToCAMData()
+		internal CraftData ToCraftData()
 		{
-			if( ToolVecModifyMap == null || CADPointList == null || CADPointList.Count == 0 || LeadParam == null || TraverseData == null ) {
-				throw new ArgumentException( "CAMData deserialization failed." );
+			if( ToolVecModifyMap == null || LeadParam == null || TraverseData == null ) {
+				throw new ArgumentException( "ContourCacheInfo deserialization failed." );
 			}
 			Dictionary<int, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
-			List<CADPoint> cadPoints = CADPointList.Select( dto => dto.ToCADPoint() ).ToList();
 			LeadData leadParam = LeadParam.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
-			return new CAMData( cadPoints, IsClosed, StartPoint, leadParam, IsReverse, IsToolVecReverse, OverCutLength, toolVecModifyMap, traverseData );
+			return new CraftData( UID, leadParam, StartPoint, OverCutLength, IsReverse, IsClosed, traverseData, toolVecModifyMap, IsToolVecReverse );
 		}
 	}
 

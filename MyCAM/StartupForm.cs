@@ -351,7 +351,7 @@ namespace MyCAM
 		// post parameter setting
 		void m_tsbTraverseParamSetting_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.SeTraverseParam();
+			m_CAMEditor.SetTraverseParam();
 		}
 
 		void m_tsbEntryAndExitSetting_Click( object sender, EventArgs e )

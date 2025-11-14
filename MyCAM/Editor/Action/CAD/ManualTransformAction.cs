@@ -296,7 +296,7 @@ namespace MyCAM.Editor
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_FACE );
+					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ObjectMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_FACE );
 					while( expMove.More() ) {
 						TopoDS_Shape face = expMove.Current();
 						if( sel.IsEqual( face ) ) {
@@ -323,7 +323,7 @@ namespace MyCAM.Editor
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
+					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ObjectMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
 					while( expMove.More() ) {
 						TopoDS_Shape face = expMove.Current();
 						if( sel.IsEqual( face ) ) {
@@ -350,7 +350,7 @@ namespace MyCAM.Editor
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ShapeDataMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
+					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ObjectMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
 					while( expMove.More() ) {
 						TopoDS_Shape vertex = expMove.Current();
 						if( sel.IsEqual( vertex ) ) {

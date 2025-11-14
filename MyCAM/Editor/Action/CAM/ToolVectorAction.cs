@@ -1,6 +1,5 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
+using MyCAM.CacheInfo;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.Aspect;
@@ -8,15 +7,22 @@ using OCC.Prs3d;
 using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
 	internal class ToolVectorAction : IndexSelectAction
 	{
-		public ToolVectorAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
-			CAMData camData )
-			: base( dataManager, viewer, treeView, viewManager, camData )
+		public ToolVectorAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
+			: base( dataManager, viewer, treeView, viewManager, pathID )
 		{
+			// checked in base constructor
+			m_PathIDList = new List<string>() { pathID };
+			m_CraftData = ( m_DataManager.ObjectMap[ m_PathID ] as PathObject ).CraftData;
+			m_ContourCacheInfo = ( m_DataManager.ObjectMap[ m_PathID ] as ContourPathObject ).ContourCacheInfo;
+
 		}
 
 		public override EditActionType ActionType
@@ -27,7 +33,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public Action PropertyChanged;
+		public Action<List<string>> PropertyChanged;
 		public Action<EActionStatus> RaiseEditingToolVecDlg;
 
 		protected override void ViewerMouseClick( MouseEventArgs e )
@@ -45,7 +51,7 @@ namespace MyCAM.Editor
 			}
 
 			// modify tool vector
-			bool isModified = m_CAMData.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
+			bool isModified = m_ContourCacheInfo.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
 			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg );
 
 			// back up old data
@@ -54,7 +60,7 @@ namespace MyCAM.Editor
 			toolVecForm.Preview += ( ToolVec ) =>
 			{
 				SetToolVecParam( nIndex, ToolVec );
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( m_PathIDList );
 			};
 			toolVecForm.Confirm += ( ToolVec ) =>
 			{
@@ -88,7 +94,7 @@ namespace MyCAM.Editor
 
 		void LockSelectedVertexHighLight( TopoDS_Shape selectedVertex )
 		{
-			if( selectedVertex == null || selectedVertex.IsNull()) {
+			if( selectedVertex == null || selectedVertex.IsNull() ) {
 				return;
 			}
 
@@ -116,16 +122,16 @@ namespace MyCAM.Editor
 
 			// unlock viewer
 			UnlockSelectedVertexHighLight();
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
 		void SetToolVecParam( int VecIndex, ToolVecParam toolVecParam )
 		{
 			if( !toolVecParam.IsModified ) {
-				m_CAMData.RemoveToolVecModify( VecIndex );
+				m_CraftData.RemoveToolVecModify( VecIndex );
 				return;
 			}
-			m_CAMData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
+			m_CraftData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
 		}
 
 		void DrawVertexOnViewer( TopoDS_Shape selectedVertex )
@@ -152,5 +158,8 @@ namespace MyCAM.Editor
 
 		// to storage which vertex keep show high light point on viewer
 		AIS_Shape m_KeepedHighLightPoint = null;
+		CraftData m_CraftData = null;
+		ContourCacheInfo m_ContourCacheInfo = null;
+		List<string> m_PathIDList = null;
 	}
 }

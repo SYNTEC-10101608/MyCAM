@@ -6,21 +6,18 @@ using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {
-	internal class OverCutAction : EditActionBase
+	internal class OverCutAction : EditCAMActionBase
 	{
-		public OverCutAction( DataManager dataManager, List<CAMData> camDataList )
-		: base( dataManager )
+		public OverCutAction( DataManager dataManager, List<string> pathIDList )
+		: base( dataManager, pathIDList )
 		{
-			if( camDataList == null || camDataList.Count == 0 ) {
-				throw new ArgumentNullException( "OverCutAction constructing argument camData list null or empty" );
-			}
-			m_CAMDataList = camDataList;
+			// checked in base constructor
 			m_dOverCutBackupList = new List<double>();
-			foreach( var camData in m_CAMDataList ) {
-				if( camData == null ) {
-					throw new ArgumentNullException( "OverCutAction constructing argument camData null item" );
+			foreach( var craftData in m_CraftDataList ) {
+				if( craftData == null ) {
+					throw new ArgumentNullException( "OverCutAction constructing argument craftData null item" );
 				}
-				m_dOverCutBackupList.Add( camData.OverCutLength );
+				m_dOverCutBackupList.Add( craftData.OverCutLength );
 			}
 		}
 
@@ -38,20 +35,20 @@ namespace MyCAM.Editor
 
 			// TODO: check all CAMData have same over cut length?
 			OverCutDlg overCutForm = new OverCutDlg( m_dOverCutBackupList[ 0 ] );
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 
 			// preview
 			overCutForm.Preview += ( overCutLength ) =>
 			{
 				SetOverCutLength( overCutLength );
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( m_PathIDList );
 			};
 
 			// confirm
 			overCutForm.Confirm += ( overCutLength ) =>
 			{
 				SetOverCutLength( overCutLength );
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( m_PathIDList );
 				End();
 			};
 
@@ -59,7 +56,7 @@ namespace MyCAM.Editor
 			overCutForm.Cancel += () =>
 			{
 				RestoreBackupOverCutLength();
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( m_PathIDList );
 				End();
 			};
 			overCutForm.Show( MyApp.MainForm );
@@ -67,20 +64,18 @@ namespace MyCAM.Editor
 
 		void SetOverCutLength( double dOverCutLength )
 		{
-			foreach( var camData in m_CAMDataList ) {
+			foreach( var camData in m_CraftDataList ) {
 				camData.OverCutLength = dOverCutLength;
 			}
 		}
 
 		void RestoreBackupOverCutLength()
 		{
-			for( int i = 0; i < m_CAMDataList.Count; i++ ) {
-				m_CAMDataList[ i ].OverCutLength = m_dOverCutBackupList[ i ];
+			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
+				m_CraftDataList[ i ].OverCutLength = m_dOverCutBackupList[ i ];
 			}
 		}
 
-		public Action PropertyChanged;
-		readonly List<CAMData> m_CAMDataList;
 		readonly List<double> m_dOverCutBackupList;
 	}
 }

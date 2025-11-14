@@ -136,7 +136,7 @@ namespace MyCAM.Editor
 				if( viewObject.Visible == false ) {
 					continue;
 				}
-				shpaeList.Add( m_DataManager.ShapeDataMap[ szID ].Shape );
+				shpaeList.Add( m_DataManager.ObjectMap[ szID ].Shape );
 			}
 			if( shpaeList == null || shpaeList.Count == 0 ) {
 				return;

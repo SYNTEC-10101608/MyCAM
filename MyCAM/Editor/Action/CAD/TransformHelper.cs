@@ -18,7 +18,7 @@ namespace MyCAM.Editor
 
 		public void TransformData()
 		{
-			foreach( var oneData in m_DataManager.ShapeDataMap ) {
+			foreach( var oneData in m_DataManager.ObjectMap ) {
 				oneData.Value.DoTransform( m_3PTransform );
 				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ oneData.Key ].AISHandle );
 				if( oneAIS == null || oneAIS.IsNull() ) {

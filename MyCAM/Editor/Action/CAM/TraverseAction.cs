@@ -5,21 +5,17 @@ using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {
-	internal class TraverseAction : EditActionBase
+	internal class TraverseAction : EditCAMActionBase
 	{
-		public TraverseAction( DataManager dataManager, List<CAMData> camDataList )
-			: base( dataManager )
+		public TraverseAction( DataManager dataManager, List<string> pathIDList )
+			: base( dataManager, pathIDList )
 		{
-			if( camDataList == null || camDataList.Count == 0 ) {
-				throw new ArgumentNullException( "TraverseAction constructing argument camDataList null or empty" );
-			}
-			m_CAMDataList = camDataList;
-
+			// checked in base constructor
 			// when user cancel the traverse setting, need to turn path back
 			m_BackupTraverseDataList = new List<TraverseData>();
-			foreach( var camData in m_CAMDataList ) {
+			foreach( var camData in m_CraftDataList ) {
 				if( camData == null ) {
-					throw new ArgumentNullException( "TraverseAction constructing argument camDataList contains null CAMData" );
+					throw new ArgumentNullException( "TraverseAction constructing argument craftData contains null ContourCacheInfo" );
 				}
 				if( camData.TraverseData == null ) {
 					m_BackupTraverseDataList.Add( new TraverseData() );
@@ -29,8 +25,6 @@ namespace MyCAM.Editor
 				}
 			}
 		}
-
-		public Action PropertyChanged;
 
 		public override EditActionType ActionType
 		{
@@ -46,7 +40,7 @@ namespace MyCAM.Editor
 
 			// TODO: check all CAMData has same traverse param or not
 			TraverseDlg traverseParamSettingFrom = new TraverseDlg( m_BackupTraverseDataList[ 0 ].Clone() );
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 			traverseParamSettingFrom.Confirm += ConfirmTraverseParam;
 			traverseParamSettingFrom.Preview += PreviewTraverseParam;
 			traverseParamSettingFrom.Cancel += CancelTraverseParam;
@@ -56,38 +50,37 @@ namespace MyCAM.Editor
 		void PreviewTraverseParam( TraverseData data )
 		{
 			SetTraverseParam( data );
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
 		void ConfirmTraverseParam( TraverseData data )
 		{
 			SetTraverseParam( data );
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 			End();
 		}
 
 		void CancelTraverseParam()
 		{
 			RestoreBackupTraverseData();
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 			End();
 		}
 
 		void SetTraverseParam( TraverseData data )
 		{
-			foreach( var camData in m_CAMDataList ) {
+			foreach( var camData in m_CraftDataList ) {
 				camData.TraverseData = data.Clone();
 			}
 		}
 
 		void RestoreBackupTraverseData()
 		{
-			for( int i = 0; i < m_CAMDataList.Count; i++ ) {
-				m_CAMDataList[ i ].TraverseData = m_BackupTraverseDataList[ i ];
+			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
+				m_CraftDataList[ i ].TraverseData = m_BackupTraverseDataList[ i ];
 			}
 		}
 
-		List<CAMData> m_CAMDataList;
 		List<TraverseData> m_BackupTraverseDataList;
 	}
 }

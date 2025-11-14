@@ -6,32 +6,26 @@ using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {
-	internal class LeadAction : EditActionBase
+	internal class LeadAction : EditCAMActionBase
 	{
-		public LeadAction( DataManager dataManager, List<CAMData> camDataList )
-			: base( dataManager )
+		public LeadAction( DataManager dataManager, List<string> pathIDList )
+			: base( dataManager, pathIDList )
 		{
-			if( camDataList == null || camDataList.Count == 0 ) {
-				throw new ArgumentNullException( "LeadAction constructing argument camDataList null or empty" );
-			}
-			m_CAMDataList = camDataList;
-
+			// checked in base constructor
 			// when user cancel the lead setting, need to turn path back
 			m_BackupLeadParamList = new List<LeadData>();
-			foreach( var camData in m_CAMDataList ) {
-				if( camData == null ) {
-					throw new ArgumentNullException( "LeadAction constructing argument camDataList contains null CAMData" );
+			foreach( var craftData in m_CraftDataList ) {
+				if( craftData == null ) {
+					throw new ArgumentNullException( "LeadAction constructing argument craftDataList contains null ContourCacheInfo" );
 				}
-				if( camData.LeadLineParam == null ) {
+				if( craftData.LeadLineParam == null ) {
 					m_BackupLeadParamList.Add( new LeadData() );
 				}
 				else {
-					m_BackupLeadParamList.Add( camData.LeadLineParam.Clone() );
+					m_BackupLeadParamList.Add( craftData.LeadLineParam.Clone() );
 				}
 			}
 		}
-
-		public Action PropertyChanged; // isConfirm, isHasLead
 
 		public override EditActionType ActionType
 		{
@@ -47,20 +41,20 @@ namespace MyCAM.Editor
 
 			// TODO: check all CAMData has same lead param or not
 			LeadDlg leadDialog = new LeadDlg( m_BackupLeadParamList[ 0 ].Clone() );
-			PropertyChanged?.Invoke();
+			PropertyChanged?.Invoke( m_PathIDList );
 
 			// preview
 			leadDialog.Preview += ( leadData ) =>
 			{
 				SetLeadParamForAll( leadData );
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( m_PathIDList );
 			};
 
 			// confirm
 			leadDialog.Confirm += ( leadData ) =>
 			{
 				SetLeadParamForAll( leadData );
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( m_PathIDList );
 				End();
 			};
 
@@ -68,7 +62,7 @@ namespace MyCAM.Editor
 			leadDialog.Cancel += () =>
 			{
 				RestoreBackupLeadParams();
-				PropertyChanged?.Invoke();
+				PropertyChanged?.Invoke( m_PathIDList );
 				End();
 			};
 			leadDialog.Show( MyApp.MainForm );
@@ -76,19 +70,18 @@ namespace MyCAM.Editor
 
 		void SetLeadParamForAll( LeadData leadData )
 		{
-			foreach( var camData in m_CAMDataList ) {
+			foreach( var camData in m_CraftDataList ) {
 				camData.LeadLineParam = leadData.Clone();
 			}
 		}
 
 		void RestoreBackupLeadParams()
 		{
-			for( int i = 0; i < m_CAMDataList.Count; i++ ) {
-				m_CAMDataList[ i ].LeadLineParam = m_BackupLeadParamList[ i ].Clone();
+			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
+				m_CraftDataList[ i ].LeadLineParam = m_BackupLeadParamList[ i ].Clone();
 			}
 		}
 
-		List<CAMData> m_CAMDataList;
 		List<LeadData> m_BackupLeadParamList;
 	}
 }

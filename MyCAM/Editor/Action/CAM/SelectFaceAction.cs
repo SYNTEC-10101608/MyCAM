@@ -37,7 +37,7 @@ namespace MyCAM.Editor
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
 				}
-				TopoDS_Shape oneshape = m_DataManager.ShapeDataMap[ partID ].Shape;
+				TopoDS_Shape oneshape = m_DataManager.ObjectMap[ partID ].Shape;
 
 				// collect all faces
 				TopExp_Explorer exp = new TopExp_Explorer( oneshape, TopAbs_ShapeEnum.TopAbs_FACE );
