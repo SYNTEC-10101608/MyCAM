@@ -12,6 +12,7 @@ namespace MyCAM.CacheInfo
 	{
 		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData, bool isClose )
 		{
+			// fix: input data check issue, u should check input but not m_member
 			if( string.IsNullOrEmpty( szID ) || cadPointList == null || cadPointList.Count == 0 || craftData == null ) {
 				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );
 			}
@@ -91,6 +92,7 @@ namespace MyCAM.CacheInfo
 		#endregion
 
 		#region Public API
+		// fix:when the shape has tranform, need to call this to update the cache info
 		public void Transform()
 		{
 			BuildCAMPointList();
@@ -502,6 +504,7 @@ namespace MyCAM.CacheInfo
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
 
+		// fix:they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
 		List<CADPoint> m_CADPointList = new List<CADPoint>();
 		bool m_IsCraftDataDirty = false;
