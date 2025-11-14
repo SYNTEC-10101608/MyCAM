@@ -10,12 +10,17 @@ namespace MyCAM.Post
 	{
 		public NCWriter( DataManager dataManager )
 		{
+			// fix: check null argument
 			if( dataManager.GetContourCacheInfoList() == null || dataManager.MachineData == null || dataManager.EntryAndExitData == null ) {
 				throw new ArgumentNullException( "NCWriter constructor argument is null." );
 			}
-			m_ProcessCacheInfo = dataManager.GetContourCacheInfoList();
+			m_ProcessCacheInfoList = dataManager.GetContourCacheInfoList();
 
+			// fix: check before get from map
 			foreach( var szID in dataManager.PathIDList ) {
+				if( !dataManager.ObjectMap.ContainsKey( szID ) ) {
+					throw new ArgumentException( "NCWriter constructor argument contains invalid path ID." );
+				}
 				m_CraftDataList.Add( ( dataManager.ObjectMap[ szID ] as PathObject ).CraftData );
 			}
 			m_MachineData = dataManager.MachineData;
@@ -25,7 +30,8 @@ namespace MyCAM.Post
 			m_EntryAndExitData = dataManager.EntryAndExitData;
 		}
 
-		List<ContourCacheInfo> m_ProcessCacheInfo;
+		// fix: naming: List
+		List<ContourCacheInfo> m_ProcessCacheInfoList;
 		List<CraftData> m_CraftDataList = new List<CraftData>();
 		StreamWriter m_StreamWriter;
 		PostSolver m_PostSolver;
@@ -48,10 +54,10 @@ namespace MyCAM.Post
 
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
-					for( int i = 0; i < m_ProcessCacheInfo.Count; i++ ) {
+					for( int i = 0; i < m_ProcessCacheInfoList.Count; i++ ) {
 
 						// solve all post data of the path
-						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessCacheInfo[ i ], m_CraftDataList[ i ],
+						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessCacheInfoList[ i ], m_CraftDataList[ i ],
 							endInfoOfPreviousPath, m_EntryAndExitData,
 							out PostData postData, out _, out endInfoOfPreviousPath ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
@@ -61,7 +67,7 @@ namespace MyCAM.Post
 					}
 
 					// write exit
-					if( m_ProcessCacheInfo.Count > 0 ) {
+					if( m_ProcessCacheInfoList.Count > 0 ) {
 
 						// calculate exit point
 						PostHelper.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out PostPoint exitPoint, out _ );
