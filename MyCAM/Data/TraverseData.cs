@@ -1,4 +1,6 @@
-﻿namespace MyCAM.Data
+﻿using System;
+
+namespace MyCAM.Data
 {
 	public class EntryAndExitData
 	{
@@ -45,38 +47,77 @@
 	{
 		public TraverseData( double liftUpDistance, double cutDownDistance, double followSafeDistance, double frogLeapDistance )
 		{
-			LiftUpDistance = liftUpDistance;
-			CutDownDistance = cutDownDistance;
-			FollowSafeDistance = followSafeDistance;
-			FrogLeapDistance = frogLeapDistance;
+			m_LiftUpDistance = liftUpDistance;
+			m_CutDownDistance = cutDownDistance;
+			m_FollowSafeDistance = followSafeDistance;
+			m_FrogLeapDistance = frogLeapDistance;
 		}
 
 		public TraverseData()
 		{
-			LiftUpDistance = LIFT_UP_DISTANCE;
-			CutDownDistance = CUT_DOWN_DISTANCE;
-			FollowSafeDistance = FOLLOW_SAFE_DISTANCE;
-			FrogLeapDistance = FROG_LEAP_DISTANCE;
+
 		}
+
+		public Action TraverseParameterChanged;
 
 		public double LiftUpDistance
 		{
-			get; set;
+			get
+			{
+				return m_LiftUpDistance;
+			}
+			set
+			{
+				if( m_LiftUpDistance != value ) {
+					m_LiftUpDistance = value;
+					TraverseParameterChanged?.Invoke();
+				}
+			}
 		}
 
 		public double CutDownDistance
 		{
-			get; set;
+			get
+			{
+				return m_CutDownDistance;
+			}
+			set
+			{
+				if( m_CutDownDistance != value ) {
+					m_CutDownDistance = value;
+					TraverseParameterChanged?.Invoke();
+				}
+			}
 		}
 
 		public double FollowSafeDistance
 		{
-			get; set;
+			get
+			{
+				return m_FollowSafeDistance;
+			}
+			set
+			{
+				if( m_FollowSafeDistance != value ) {
+					m_FollowSafeDistance = value;
+					TraverseParameterChanged?.Invoke();
+				}
+			}
 		}
 
 		public double FrogLeapDistance
 		{
-			get; set;
+			get
+			{
+				return m_FrogLeapDistance;
+			}
+			set
+			{
+				if( m_FrogLeapDistance != value ) {
+					m_FrogLeapDistance = value;
+					TraverseParameterChanged?.Invoke();
+				}
+			}
 		}
 
 		public TraverseData Clone()
@@ -88,5 +129,9 @@
 		public static double CUT_DOWN_DISTANCE = 0.0;
 		public static double FOLLOW_SAFE_DISTANCE = 5.0;
 		public static double FROG_LEAP_DISTANCE = 10.0;
+		double m_LiftUpDistance = LIFT_UP_DISTANCE;
+		double m_CutDownDistance = CUT_DOWN_DISTANCE;
+		double m_FollowSafeDistance = FOLLOW_SAFE_DISTANCE;
+		double m_FrogLeapDistance = FROG_LEAP_DISTANCE;
 	}
 }

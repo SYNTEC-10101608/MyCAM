@@ -52,8 +52,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CacheInfo\ContourCacheInfo.cs" />
+    <Compile Include="Data\ContourPathObject.cs" />
+    <Compile Include="Data\CraftData.cs" />
+    <Compile Include="CacheInfo\ICacheInfo.cs" />
     <Compile Include="Data\MachineData.cs" />
     <Compile Include="Data\MachineDefine.cs" />
+    <Compile Include="Data\PointData.cs" />
     <Compile Include="Data\PostData.cs" />
     <Compile Include="Data\TraverseData.cs" />
     <Compile Include="Editor\Action\CAD\AddLineAction.cs" />
@@ -105,7 +110,6 @@
     <Compile Include="Helper\LeadHelper.cs" />
     <Compile Include="FileManager\DataManagerDTO.cs" />
     <Compile Include="MyApp.cs" />
-    <Compile Include="Data\CAMData.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
     <Compile Include="Editor\Action\CAM\SelectFaceAction.cs" />
     <Compile Include="Editor\Action\CAM\SelectPathAction.cs" />

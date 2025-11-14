@@ -235,7 +235,7 @@ namespace MyCAM.Editor
 			// get the selected ID
 			foreach( TreeNode node in ( m_TreeView as MultiSelectTreeView ).SelectedNodes ) {
 				if( node == null || string.IsNullOrEmpty( node.Text )
-					|| !m_DataManager.ShapeDataMap.ContainsKey( node.Text ) ) {
+					|| !m_DataManager.ObjectMap.ContainsKey( node.Text ) ) {
 					continue;
 				}
 				m_SelectedIDSet.Add( node.Text );

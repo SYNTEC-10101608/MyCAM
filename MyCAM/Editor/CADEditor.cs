@@ -187,7 +187,7 @@ namespace MyCAM.Editor
 			m_ViewManager.ViewObjectMap.Clear();
 			m_ViewManager.TreeNodeMap.Clear();
 			foreach( var szNewDataID in m_DataManager.PartIDList ) {
-				ShapeData data = m_DataManager.ShapeDataMap[ szNewDataID ];
+				PartObject data = (PartObject)m_DataManager.ObjectMap[ szNewDataID ];
 
 				// add node to the tree view
 				TreeNode node = new TreeNode( data.UID );
@@ -219,7 +219,7 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( m_DataManager.ShapeDataMap[ szID ].Shape );
+				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( m_DataManager.ObjectMap[ szID ].Shape );
 				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}

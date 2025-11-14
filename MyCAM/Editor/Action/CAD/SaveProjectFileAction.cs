@@ -1,11 +1,10 @@
-﻿using System;
+﻿using MyCAM.App;
+using MyCAM.Data;
+using MyCAM.FileManager;
+using System;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using MyCAM.App;
-using MyCAM.Data;
-using MyCAM.FileManager;
-using MyCAM.LogManager;
 
 namespace MyCAM.Editor
 {
