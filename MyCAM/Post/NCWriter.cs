@@ -10,12 +10,15 @@ namespace MyCAM.Post
 	{
 		public NCWriter( DataManager dataManager )
 		{
+			// re: check null argument
 			if( dataManager.GetContourCacheInfoList() == null || dataManager.MachineData == null || dataManager.EntryAndExitData == null ) {
 				throw new ArgumentNullException( "NCWriter constructor argument is null." );
 			}
 			m_ProcessCacheInfo = dataManager.GetContourCacheInfoList();
 
 			foreach( var szID in dataManager.PathIDList ) {
+
+				// re: check before get from map
 				m_CraftDataList.Add( ( dataManager.ObjectMap[ szID ] as PathObject ).CraftData );
 			}
 			m_MachineData = dataManager.MachineData;
@@ -25,6 +28,7 @@ namespace MyCAM.Post
 			m_EntryAndExitData = dataManager.EntryAndExitData;
 		}
 
+		// re: naming: List
 		List<ContourCacheInfo> m_ProcessCacheInfo;
 		List<CraftData> m_CraftDataList = new List<CraftData>();
 		StreamWriter m_StreamWriter;
@@ -34,6 +38,7 @@ namespace MyCAM.Post
 		string m_SlaveAxisName = string.Empty;
 		EntryAndExitData m_EntryAndExitData;
 
+		// re: we tlak
 		public bool ConvertSuccess( out string errorMessage )
 		{
 			errorMessage = string.Empty;

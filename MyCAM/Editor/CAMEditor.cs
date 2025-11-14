@@ -510,6 +510,8 @@ namespace MyCAM.Editor
 		{
 			foreach( string szID in newPathIDs ) {
 				if( string.IsNullOrEmpty( szID ) ) {
+
+					// re: help, should be continue here
 					return;
 				}
 
@@ -563,10 +565,14 @@ namespace MyCAM.Editor
 		}
 
 		#region Show CAM
+
+		// re: naming: show all CAM data
 		void ShowCAMData()
 		{
+			// re: comment here
 			List<string> pathIDList = m_DataManager.PathIDList;
 
+			// re: u fixed it
 			// TODO: we dont always need to refresh such many things
 			ShowToolVec( pathIDList );
 			ShowOrientation( pathIDList );
@@ -580,6 +586,7 @@ namespace MyCAM.Editor
 
 		void ShowCAMData( List<string> pathIDList )
 		{
+			// re: u fixed it
 			// TODO: we dont always need to refresh such many things
 			ShowToolVec( pathIDList );
 			ShowOrientation( pathIDList );
@@ -594,6 +601,7 @@ namespace MyCAM.Editor
 		void RemoveCAMData( List<string> pathIDList )
 		{
 			// TODO: we dont always need to refresh such many things
+			// re: redundant code
 			RomoveToolVec( pathIDList );
 			RomoveToolVec( pathIDList );
 			RomoveLeadLine( pathIDList );
@@ -680,6 +688,8 @@ namespace MyCAM.Editor
 		{
 			RomoveLeadLine( pathIDList );
 			foreach( string szPathID in pathIDList ) {
+
+				// re: diif way to get cache info and craft data?
 				if( GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false
 					|| GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) == false ) {
 					continue;
@@ -688,6 +698,8 @@ namespace MyCAM.Editor
 					continue;
 				}
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
+
+				// re: does it really need craft data?
 				if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
 					List<AIS_Line> leadAISList = new List<AIS_Line>();
 					m_LeadAISDict.Add( szPathID, leadAISList );
@@ -866,6 +878,8 @@ namespace MyCAM.Editor
 			// create text label
 			int nCurrentIndex = 0;
 			foreach( ContourCacheInfo cacheInfo in m_DataManager.GetContourCacheInfoList() ) {
+
+				// re:a API in cache is better?
 				gp_Pnt location = cacheInfo.CAMPointList[ 0 ].CADPoint.Point;
 				string szIndex = nCurrentIndex++.ToString();
 
@@ -1043,12 +1057,15 @@ namespace MyCAM.Editor
 			}
 		}
 
+
+		// re: move it to other place to keep area clean
 		void AddOneLinearTraverse( gp_Pnt startPnt, gp_Pnt endPnt )
 		{
 			AIS_Line traverseAIS = GetLineAIS( startPnt, endPnt, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
 			m_TraverseAISList.Add( traverseAIS );
 		}
 
+		// re: naming hide all CAM data
 		void HideCAMData()
 		{
 			// hide tool vec
@@ -1102,6 +1119,7 @@ namespace MyCAM.Editor
 		#endregion
 
 		// methods
+		// re: we talk
 		bool IsModifiedToolVecIndex( int index, ContourCacheInfo cacheInfo, CraftData craftData, List<CADPoint> cadPointList )
 		{
 			// map CAD and CAM point index
@@ -1219,6 +1237,7 @@ namespace MyCAM.Editor
 				|| dataManager.ObjectMap.ContainsKey( szPathID ) == false
 				|| dataManager.ObjectMap[ szPathID ] == null
 				|| !( dataManager.ObjectMap[ szPathID ] is PathObject
+				// re: help, the logic check issue here
 				|| ( (PathObject)dataManager.ObjectMap[ szPathID ] ).CraftData == null ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
 				return false;

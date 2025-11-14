@@ -77,6 +77,7 @@ namespace MyCAM.Data
 
 		public override void DoTransform( gp_Trsf transform )
 		{
+			// re: comment whats doing step by step here
 			base.DoTransform( transform );
 			foreach( CADPoint cadPoint in m_CADPointList ) {
 				cadPoint.Transform( transform );

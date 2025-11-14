@@ -12,6 +12,7 @@ namespace MyCAM.CacheInfo
 	{
 		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData, bool isClose )
 		{
+			// re: input data check issue, u should check input but not m_member
 			if( string.IsNullOrWhiteSpace( szID ) || m_CADPointList == null || m_CraftData == null ) {
 				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );
 			}
@@ -90,6 +91,7 @@ namespace MyCAM.CacheInfo
 		#endregion
 
 		#region Public API
+		// re: comment here
 		public void Transform()
 		{
 			BuildCAMPointList();
@@ -493,6 +495,7 @@ namespace MyCAM.CacheInfo
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
 
+		// re: comment here, mark they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
 		List<CADPoint> m_CADPointList = new List<CADPoint>();
 	}
