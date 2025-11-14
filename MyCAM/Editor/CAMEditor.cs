@@ -567,7 +567,8 @@ namespace MyCAM.Editor
 		// fix: naming: show all CAM data
 		void ShowAllCAMData()
 		{
-			// fix: take all path IDs
+			// fix:add description
+			// take all path IDs
 			List<string> pathIDList = m_DataManager.PathIDList;
 			ShowToolVec( pathIDList );
 			ShowOrientation( pathIDList );

@@ -92,7 +92,8 @@ namespace MyCAM.CacheInfo
 		#endregion
 
 		#region Public API
-		// fix:when the shape has tranform, need to call this to update the cache info
+		// fix: add description
+		// when the shape has tranform, need to call this to update the cache info
 		public void Transform()
 		{
 			BuildCAMPointList();
@@ -524,7 +525,8 @@ namespace MyCAM.CacheInfo
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
 
-		// fix:they are sibling pointer, and change the declare order
+		// fix: add description
+		// they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
 		List<CADPoint> m_CADPointList = new List<CADPoint>();
 
