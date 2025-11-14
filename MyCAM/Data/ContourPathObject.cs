@@ -1,5 +1,9 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyCAM.App;
 using MyCAM.CacheInfo;
+using MyCAM.Helper;
 using OCC.BOPTools;
 using OCC.BRep;
 using OCC.BRepAdaptor;
@@ -8,9 +12,7 @@ using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using OCCTool;
 
 namespace MyCAM.Data
 {
@@ -25,21 +27,22 @@ namespace MyCAM.Data
 
 			bool isClosed = DetermineIfClosed( shape );
 			m_CADPointList = BuildCADPointList( pathDataList, isClosed );
+			m_CADSegmentList = BuildCADSegment( pathDataList, isClosed );
 			m_CraftData = new CraftData( szUID );
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData, isClosed );
 		}
 
 		// this is for the file read constructor
-		public ContourPathObject( string szUID, TopoDS_Shape shape, List<CADPoint> cadPointList, CraftData craftData )
+		public ContourPathObject( string szUID, TopoDS_Shape shape, List<ICADSegmentElement> cadSegmentList, CraftData craftData )
 			: base( szUID, shape )
 		{
-			if( string.IsNullOrEmpty( szUID ) || shape == null || cadPointList == null || cadPointList.Count == 0 || craftData == null ) {
+			if( string.IsNullOrEmpty( szUID ) || shape == null || cadSegmentList == null || cadSegmentList.Count == 0 || craftData == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
 			bool isClosed = DetermineIfClosed( shape );
-			m_CADPointList = cadPointList;
+			m_CADSegmentList = cadSegmentList;
 			m_CraftData = craftData;
-			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADPointList, m_CraftData, isClosed );
+			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADSegmentList, m_CraftData, isClosed );
 		}
 
 		public List<CADPoint> CADPointList
@@ -47,6 +50,14 @@ namespace MyCAM.Data
 			get
 			{
 				return m_CADPointList;
+			}
+		}
+
+		public List<ICADSegmentElement> CADSegmentList
+		{
+			get
+			{
+				return m_CADSegmentList;
 			}
 		}
 
@@ -106,6 +117,66 @@ namespace MyCAM.Data
 			}
 			return CADPointList;
 		}
+
+		List<ICADSegmentElement> BuildCADSegment( List<PathEdge5D> pathEdge5DList, bool isClosed )
+		{
+			List<ICADSegmentElement> cadSegmentList = new List<ICADSegmentElement>();
+
+			if( pathEdge5DList == null ) {
+				return null;
+			}
+			// go through the contour edges
+			for( int i = 0; i < pathEdge5DList.Count; i++ ) {
+				TopoDS_Edge edge = pathEdge5DList[ i ].PathEdge;
+				TopoDS_Face shellFace = pathEdge5DList[ i ].ComponentFace;
+				TopoDS_Face solidFace = pathEdge5DList[ i ].ComponentFace; // TODO: set solid face
+
+				// this curve is line use equal length split
+				if( GeometryTool.IsLine( edge, out _, out _ ) ) {
+					List<CADPoint> tempCADPointList = PretreatmentHelper.GetSegmentPointsByEqualLength( edge, shellFace, PRECISION_MAX_LENGTH, out double dEdgeLength, out double dPerArcLength, out double dPerChordLength );
+					bool buildSuccess = CADCAMSegmentBuilder.BuildCADSegment( tempCADPointList, EContourType.Line, dEdgeLength, dPerArcLength, dPerChordLength, out ICADSegmentElement cadSegment );
+					if( buildSuccess ) {
+						cadSegmentList.Add( cadSegment );
+					}
+				}
+
+				// this curve is arc choose the best option from the two options (chord error vs equal length)
+				else if( GeometryTool.IsCircularArc( edge, out _, out _, out gp_Dir centerDir, out double arcAngle ) ) {
+					List<List<CADPoint>> cadPointList = PretreatmentHelper.SplitArcEdge( edge, shellFace, out List<double> eachSegmentLength, out List<double> dEachArcLength, out List<double> dEachChordLength );
+					if( cadPointList == null || cadPointList.Count == 0 ) {
+						continue;
+					}
+					for( int j = 0; j < cadPointList.Count; j++ ) {
+						bool buildSuccess = CADCAMSegmentBuilder.BuildCADSegment( cadPointList[ j ], EContourType.Arc, eachSegmentLength[ j ], dEachArcLength[ j ], dEachChordLength[ j ], out ICADSegmentElement cadSegment );
+						if( buildSuccess ) {
+							cadSegmentList.Add( cadSegment );
+						}
+					}
+				}
+
+				// use chord error split
+				else {
+
+					// separate this bspline
+					List<List<CADPoint>> cadPointList = PretreatmentHelper.GetBsplineToEdgeList( edge, shellFace, out List<double> eachSegmentLength, out List<double> eachArcLength );
+					if( cadPointList == null || cadPointList.Count == 0 ) {
+						continue;
+					}
+					for( int j = 0; j < cadPointList.Count; j++ ) {
+
+						// calculate chord length
+						double dChordLength = cadPointList[ j ].First().Point.Distance( cadPointList[ j ][ 1 ].Point );
+						bool buildSuccess = CADCAMSegmentBuilder.BuildCADSegment( cadPointList[ j ], EContourType.Line, eachSegmentLength[ j ], eachArcLength[ j ], dChordLength, out ICADSegmentElement cadSegment );
+						if( buildSuccess ) {
+							cadSegmentList.Add( cadSegment );
+						}
+					}
+				}
+			}
+			return cadSegmentList;
+		}
+
+
 
 		List<CADPoint> GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace, bool bFirst, bool bLast, bool isClosed )
 		{
@@ -218,12 +289,15 @@ namespace MyCAM.Data
 			}
 		}
 
-
 		List<CADPoint> m_CADPointList;
+		List<ICADSegmentElement> m_CADSegmentList;
 		CraftData m_CraftData;
 		ContourCacheInfo m_ContourCacheInfo;
 
 		// Discretize parameters
 		Dictionary<CADPoint, CADPoint> m_ConnectPointMap = new Dictionary<CADPoint, CADPoint>();
+
+		const double PRECISION_DEFLECTION = 0.01;
+		const double PRECISION_MAX_LENGTH = 1;
 	}
 }

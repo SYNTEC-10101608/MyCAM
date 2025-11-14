@@ -1,9 +1,9 @@
-﻿using OCC.BRep;
+﻿using System;
+using OCC.BRep;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
-using System;
 
 namespace MyCAM.Editor
 {
@@ -209,7 +209,7 @@ namespace MyCAM.Editor
 
 				// check is circular arc?
 				if( !isValid1 ) {
-					isValid1 = GeometryTool.IsCircularArc( TopoDS.ToEdge( refShape ), out pR, out _, out dR );
+					isValid1 = GeometryTool.IsCircularArc( TopoDS.ToEdge( refShape ), out pR, out _, out dR, out _ );
 				}
 			}
 			bool isValid2 = false;
@@ -225,7 +225,7 @@ namespace MyCAM.Editor
 
 				// check is circular arc?
 				if( !isValid2 ) {
-					isValid2 = GeometryTool.IsCircularArc( TopoDS.ToEdge( moveShape ), out pM, out _, out dM );
+					isValid2 = GeometryTool.IsCircularArc( TopoDS.ToEdge( moveShape ), out pM, out _, out dM, out _ );
 				}
 			}
 			return isValid1 && isValid2;

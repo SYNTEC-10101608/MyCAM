@@ -1,4 +1,5 @@
-﻿using OCC.BRep;
+﻿using System;
+using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.BRepBuilderAPI;
 using OCC.BRepGProp;
@@ -14,7 +15,6 @@ using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
-using System;
 
 namespace OCCTool
 {
@@ -158,16 +158,20 @@ namespace OCCTool
 			}
 		}
 
-		public static bool IsCircularArc( TopoDS_Edge edge, out gp_Pnt p, out double r, out gp_Dir dir )
+		public static bool IsCircularArc( TopoDS_Edge edge, out gp_Pnt p, out double r, out gp_Dir dir, out double angle )
 		{
 			p = new gp_Pnt();
 			dir = new gp_Dir();
 			r = 0;
+			angle = 0;
 			BRepAdaptor_Curve adCurve = new BRepAdaptor_Curve( edge );
 			if( adCurve.GetCurveType() == GeomAbs_CurveType.GeomAbs_Circle ) {
 				p = adCurve.Circle().Location();
 				dir = adCurve.Circle().Axis().Direction();
 				r = adCurve.Circle().Radius();
+				double first = adCurve.FirstParameter();
+				double last = adCurve.LastParameter();
+				angle = Math.Abs( last - first );
 				return true;
 			}
 			double dStartU = 0;
@@ -179,6 +183,7 @@ namespace OCCTool
 				p = geom_Circle.Location();
 				dir = geom_Circle.Axis().Direction();
 				r = geom_Circle.Radius();
+				angle = Math.Abs( cl - cf );
 				return true;
 			}
 			return false;
@@ -266,6 +271,24 @@ namespace OCCTool
 			}
 			edge = brepEdge.Edge();
 			return true;
+		}
+
+		public static gp_Dir GetDirAverage( gp_Dir dir1, gp_Dir dir2 )
+		{
+			if( dir1 == null || dir2 == null ) {
+				return null;
+			}
+			if( dir1.IsOpposite( dir2, 1e-3 ) ) {
+				return dir1;
+			}
+			if( dir1.IsParallel( dir2, 1e-3 ) ) {
+				return dir1;
+			}
+			gp_Vec v1 = new gp_Vec( dir1 );
+			gp_Vec v2 = new gp_Vec( dir2 );
+			gp_Vec vAvg = v1.Added( v2 );
+			gp_Dir avgDir = new gp_Dir( vAvg );
+			return avgDir;
 		}
 
 		// private

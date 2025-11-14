@@ -3,6 +3,46 @@ using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
+	public struct SegmentPointIndex
+	{
+		public int SegIdx;   // Segment Index
+		public int PntIdx;   // Point Index
+
+		public SegmentPointIndex( int segIdx, int pntIdx )
+		{
+			SegIdx = segIdx;
+			PntIdx = pntIdx;
+		}
+
+		public bool Equals( SegmentPointIndex other )
+		{
+			return SegIdx == other.SegIdx && PntIdx == other.PntIdx;
+		}
+
+		public override bool Equals( object obj )
+		{
+			if( obj is SegmentPointIndex other ) {
+				return Equals( other );
+			}
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return (SegIdx, PntIdx).GetHashCode();
+		}
+
+		public static bool operator ==( SegmentPointIndex a, SegmentPointIndex b )
+		{
+			return a.SegIdx == b.SegIdx && a.PntIdx == b.PntIdx;
+		}
+
+		public static bool operator !=( SegmentPointIndex a, SegmentPointIndex b )
+		{
+			return !( a == b );
+		}
+	}
+
 	public class CraftData
 	{
 		public CraftData( string szUID )
@@ -58,9 +98,10 @@ namespace MyCAM.Data
 				}
 			}
 		}
+
 		#endregion
 
-		public int StartPointIndex
+		public SegmentPointIndex StartPointIndex
 		{
 			get
 			{
@@ -143,11 +184,11 @@ namespace MyCAM.Data
 			}
 		}
 
-		public Dictionary<int, Tuple<double, double>> ToolVecModifyMap
+		public Dictionary<SegmentPointIndex, Tuple<double, double>> ToolVecModifyMap
 		{
 			get
 			{
-				return new Dictionary<int, Tuple<double, double>>( m_ToolVecModifyMap );
+				return new Dictionary<SegmentPointIndex, Tuple<double, double>>( m_ToolVecModifyMap );
 			}
 		}
 
@@ -178,9 +219,9 @@ namespace MyCAM.Data
 
 		LeadData m_LeadParam = new LeadData();
 		TraverseData m_TraverseData = new TraverseData();
-		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
+		Dictionary<SegmentPointIndex, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<SegmentPointIndex, Tuple<double, double>>();
 
-		int m_StartPointIndex = 0;
+		SegmentPointIndex m_StartPointIndex = new SegmentPointIndex( 0, 0 );
 		double m_OverCutLength = 0;
 
 		bool m_IsToolVecReverse = false;

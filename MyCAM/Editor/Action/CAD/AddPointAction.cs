@@ -151,7 +151,7 @@ namespace MyCAM.Editor
 
 		bool AddCircArcCenter( TopoDS_Edge edge )
 		{
-			bool isValidCircle = GeometryTool.IsCircularArc( edge, out gp_Pnt center, out _, out _ );
+			bool isValidCircle = GeometryTool.IsCircularArc( edge, out gp_Pnt center, out _, out _, out _ );
 			if( !isValidCircle ) {
 				MyApp.Logger.ShowOnLogPanel( "非正圓弧", MyApp.NoticeType.Warning );
 				return false;
