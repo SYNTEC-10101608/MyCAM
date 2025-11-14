@@ -11,6 +11,7 @@ namespace MyCAM.Editor
 		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
 			: base( dataManager, viewer, treeView, viewManager, pathID )
 		{
+			// checked in base constructor
 			// fix: list check ( in IndexSelectAction)
 			m_PathIDList = new List<string>() { pathID };
 			m_CraftData = ( m_DataManager.ObjectMap[ m_PathID ] as PathObject ).CraftData;
