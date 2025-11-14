@@ -527,6 +527,8 @@ namespace MyCAM.CacheInfo
 		// fix:they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
 		List<CADPoint> m_CADPointList = new List<CADPoint>();
+
+		// flag to indicate craft data changed
 		bool m_IsCraftDataDirty = false;
 	}
 }
