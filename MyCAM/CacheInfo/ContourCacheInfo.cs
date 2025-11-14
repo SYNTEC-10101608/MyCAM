@@ -19,6 +19,7 @@ namespace MyCAM.CacheInfo
 			m_CADPointList = cadPointList;
 			m_CraftData = craftData;
 			IsClosed = isClose;
+			m_CraftData.ParameterChanged += SetCraftDataDirty;
 
 			BuildCAMPointList();
 		}
@@ -42,7 +43,7 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
+				if( m_IsCraftDataDirty ) {
 					BuildCAMPointList();
 				}
 				return m_CAMPointList;
@@ -53,7 +54,7 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
+				if( m_IsCraftDataDirty ) {
 					BuildCAMPointList();
 				}
 				return m_LeadInCAMPointList;
@@ -64,7 +65,7 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
+				if( m_IsCraftDataDirty ) {
 					BuildCAMPointList();
 				}
 				return m_LeadOutCAMPointList;
@@ -75,7 +76,7 @@ namespace MyCAM.CacheInfo
 		{
 			get
 			{
-				if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
+				if( m_IsCraftDataDirty ) {
 					BuildCAMPointList();
 				}
 				return m_OverCutPointList;
@@ -97,7 +98,7 @@ namespace MyCAM.CacheInfo
 
 		public CAMPoint GetProcessStartPoint()
 		{
-			if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
+			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
 			}
 			CAMPoint camPoint = null;
@@ -112,7 +113,7 @@ namespace MyCAM.CacheInfo
 
 		public CAMPoint GetProcessEndPoint()
 		{
-			if( m_CraftData.CheckAndRefreshCraftDataIsDirty() ) {
+			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
 			}
 			CAMPoint camPoint = null;
@@ -132,6 +133,7 @@ namespace MyCAM.CacheInfo
 
 		void BuildCAMPointList()
 		{
+			m_IsCraftDataDirty = false;
 			m_CAMPointList = new List<CAMPoint>();
 			SetToolVec();
 			SetStartPoint();
@@ -330,6 +332,13 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
+		void SetCraftDataDirty()
+		{
+			if( !m_IsCraftDataDirty ) {
+				m_IsCraftDataDirty = true;
+			}
+		}
+
 		#region Over cut
 
 		void SetOverCut()
@@ -495,5 +504,6 @@ namespace MyCAM.CacheInfo
 
 		CraftData m_CraftData;
 		List<CADPoint> m_CADPointList = new List<CADPoint>();
+		bool m_IsCraftDataDirty = false;
 	}
 }

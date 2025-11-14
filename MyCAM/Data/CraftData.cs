@@ -8,6 +8,8 @@ namespace MyCAM.Data
 		public CraftData( string szUID )
 		{
 			UID = szUID;
+			m_LeadParam.LeadPropertyChanged += MultiLevelParameterChanged;
+			m_TraverseData.TraverseParameterChanged += MultiLevelParameterChanged;
 		}
 
 		// this constructor is used when reading from file
@@ -21,7 +23,11 @@ namespace MyCAM.Data
 			m_TraverseData = traverseData;
 			m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>( toolVecModifyMap );
 			m_IsToolVecReverse = isToolVecReverse;
+			m_LeadParam.LeadPropertyChanged += MultiLevelParameterChanged;
+			m_TraverseData.TraverseParameterChanged += MultiLevelParameterChanged;
 		}
+
+		public Action ParameterChanged;
 
 		public string UID
 		{
@@ -48,7 +54,7 @@ namespace MyCAM.Data
 				}
 				if( m_LeadParam != value ) {
 					m_LeadParam = value;
-					m_IsDirty = true;
+					ParameterChanged?.Invoke();
 				}
 			}
 		}
@@ -64,7 +70,7 @@ namespace MyCAM.Data
 			{
 				if( m_StartPointIndex != value ) {
 					m_StartPointIndex = value;
-					m_IsDirty = true;
+					ParameterChanged?.Invoke();
 				}
 			}
 		}
@@ -79,7 +85,7 @@ namespace MyCAM.Data
 			{
 				if( m_OverCutLength != value ) {
 					m_OverCutLength = value;
-					m_IsDirty = true;
+					ParameterChanged?.Invoke();
 				}
 			}
 		}
@@ -94,7 +100,7 @@ namespace MyCAM.Data
 			{
 				if( m_IsReverse != value ) {
 					m_IsReverse = value;
-					m_IsDirty = true;
+					ParameterChanged?.Invoke();
 				}
 			}
 		}
@@ -117,7 +123,7 @@ namespace MyCAM.Data
 				}
 				if( m_TraverseData != value ) {
 					m_TraverseData = value;
-					m_IsDirty = true;
+					ParameterChanged?.Invoke();
 				}
 			}
 		}
@@ -132,7 +138,7 @@ namespace MyCAM.Data
 			{
 				if( m_IsToolVecReverse != value ) {
 					m_IsToolVecReverse = value;
-					m_IsDirty = true;
+					ParameterChanged?.Invoke();
 				}
 			}
 		}
@@ -154,7 +160,7 @@ namespace MyCAM.Data
 			else {
 				m_ToolVecModifyMap.Add( index, new Tuple<double, double>( dRA_deg, dRB_deg ) );
 			}
-			m_IsDirty = true;
+			ParameterChanged?.Invoke();
 		}
 
 		public void RemoveToolVecModify( int index )
@@ -162,17 +168,12 @@ namespace MyCAM.Data
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
 				m_ToolVecModifyMap.Remove( index );
 			}
-			m_IsDirty = true;
+			ParameterChanged?.Invoke();
 		}
 
-		// fix : comment
-		public bool CheckAndRefreshCraftDataIsDirty()
+		void MultiLevelParameterChanged()
 		{
-			if( m_IsDirty == false ) {
-				return false;
-			}
-			m_IsDirty = false;
-			return true;
+			ParameterChanged?.Invoke();
 		}
 
 		LeadData m_LeadParam = new LeadData();
@@ -184,6 +185,5 @@ namespace MyCAM.Data
 
 		bool m_IsToolVecReverse = false;
 		bool m_IsReverse = false;
-		bool m_IsDirty = false;
 	}
 }
