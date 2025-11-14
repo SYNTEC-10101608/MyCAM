@@ -60,6 +60,7 @@
     <Compile Include="Data\MachineDefine.cs" />
     <Compile Include="Data\PointData.cs" />
     <Compile Include="Data\PostData.cs" />
+    <Compile Include="Data\ISegment.cs" />
     <Compile Include="Data\TraverseData.cs" />
     <Compile Include="Editor\Action\CAD\AddLineAction.cs" />
     <Compile Include="Editor\Action\CAD\AxisTransformAction.cs" />

@@ -100,4 +100,74 @@ namespace MyCAM.Data
 		// using backing field to prevent modified outside
 		gp_Dir m_ToolVec;
 	}
+
+	public class CAMPoint2
+	{
+		public CAMPoint2( gp_Pnt point, gp_Dir normal1, gp_Dir normal2, gp_Dir tangVec, gp_Dir toolVec )
+		{
+			m_Point = new gp_Pnt( point.X(), point.Y(), point.Z() );
+			m_NormalVec_1st = new gp_Dir( normal1.XYZ() );
+			m_NormalVec_2nd = new gp_Dir( normal2.XYZ() );
+			m_TangentVec = new gp_Dir( tangVec.XYZ() );
+			m_ToolVec = new gp_Dir( toolVec.XYZ() );
+		}
+
+		public gp_Pnt Point
+		{
+			get
+			{
+				return new gp_Pnt( m_Point.X(), m_Point.Y(), m_Point.Z() );
+			}
+		}
+
+		public gp_Dir NormalVec_1st
+		{
+			get
+			{
+				return new gp_Dir( m_NormalVec_1st.XYZ() );
+			}
+		}
+
+		// normal vector on co-face
+		public gp_Dir NormalVec_2nd
+		{
+			get
+			{
+				return new gp_Dir( m_NormalVec_2nd.XYZ() );
+			}
+		}
+
+		// tangent vector on path
+		public gp_Dir TangentVec
+		{
+			get
+			{
+				return new gp_Dir( m_TangentVec.XYZ() );
+			}
+		}
+
+		public gp_Dir ToolVec
+		{
+			get
+			{
+				return new gp_Dir( m_ToolVec.XYZ() );
+			}
+			set
+			{
+				m_ToolVec = new gp_Dir( value.XYZ() );
+			}
+		}
+
+		public CAMPoint2 Clone()
+		{
+			return new CAMPoint2( Point, NormalVec_1st, NormalVec_2nd, TangentVec, ToolVec );
+		}
+
+		// using backing field to prevent modified outside
+		gp_Dir m_ToolVec;
+		gp_Pnt m_Point;
+		gp_Dir m_NormalVec_1st;
+		gp_Dir m_NormalVec_2nd;
+		gp_Dir m_TangentVec;
+	}
 }
