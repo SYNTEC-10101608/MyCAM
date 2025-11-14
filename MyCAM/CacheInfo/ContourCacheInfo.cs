@@ -131,6 +131,26 @@ namespace MyCAM.CacheInfo
 			return camPoint;
 		}
 
+		public bool GetPathIsReverse()
+		{
+			return m_CraftData.IsReverse;
+		}
+
+		public int GetPathStartPointIndex()
+		{
+			return m_CraftData.StartPointIndex;
+		}
+
+		public LeadData GetPathLeadData()
+		{
+			return m_CraftData.LeadLineParam;
+		}
+
+		public double GetPathOverCutLength()
+		{
+			return m_CraftData.OverCutLength;
+		}
+
 		#endregion
 
 		void BuildCAMPointList()
