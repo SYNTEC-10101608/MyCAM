@@ -127,7 +127,7 @@ namespace MyCAM.Editor
 				AIS_InteractiveObject obj = m_ViewManager.ViewObjectMap[ pathID ].AISHandle;
 				m_Viewer.GetAISContext().Display( obj, false );
 			}
-			ShowCAMData();
+			ShowAllCAMData();
 		}
 
 		public override void EditEnd()
@@ -142,7 +142,7 @@ namespace MyCAM.Editor
 				AIS_InteractiveObject obj = m_ViewManager.ViewObjectMap[ pathID ].AISHandle;
 				m_Viewer.GetAISContext().Remove( obj, false );
 			}
-			HideCAMData();
+			HideAllCAMData();
 		}
 
 		// view API
@@ -150,25 +150,25 @@ namespace MyCAM.Editor
 		public void SetShowToolVec( bool isShowToolVec )
 		{
 			m_ShowToolVec = isShowToolVec;
-			ShowCAMData();
+			ShowAllCAMData();
 		}
 
 		public void SetShowOrientation( bool isShowOrientation )
 		{
 			m_ShowOrientation = isShowOrientation;
-			ShowCAMData();
+			ShowAllCAMData();
 		}
 
 		public void SetShowOrder( bool isShowOrder )
 		{
 			m_ShowOrder = isShowOrder;
-			ShowCAMData();
+			ShowAllCAMData();
 		}
 
 		public void SetShowTraversePath( bool isShowTraversePath )
 		{
 			m_ShowTraversePath = isShowTraversePath;
-			ShowCAMData();
+			ShowAllCAMData();
 		}
 
 		// add/ remove path API
@@ -404,7 +404,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			EntryAndExitAction action = new EntryAndExitAction( m_DataManager );
-			action.PropertyChanged += ShowCAMData;
+			action.PropertyChanged += ShowAllCAMData;
 			StartEditAction( action );
 		}
 
@@ -433,7 +433,7 @@ namespace MyCAM.Editor
 			else {
 				m_DataManager.PathIDList.Insert( nIndex + 1, szPathID );
 			}
-			ShowCAMData();
+			ShowAllCAMData();
 		}
 
 		public void AutoSortProcess()
@@ -487,7 +487,7 @@ namespace MyCAM.Editor
 					break;
 				}
 			}
-			ShowCAMData();
+			ShowAllCAMData();
 		}
 
 		// convert NC
@@ -510,7 +510,7 @@ namespace MyCAM.Editor
 		{
 			foreach( string szID in newPathIDs ) {
 				if( string.IsNullOrEmpty( szID ) ) {
-					return;
+					continue;
 				}
 
 				// add a new node to the tree view
@@ -526,7 +526,7 @@ namespace MyCAM.Editor
 
 			// update tree view and viewer
 			m_ViewManager.PathNode.ExpandAll();
-			ShowCAMData();
+			ShowAllCAMData();
 			m_Viewer.UpdateView();
 		}
 
@@ -563,11 +563,12 @@ namespace MyCAM.Editor
 		}
 
 		#region Show CAM
-		void ShowCAMData()
-		{
-			List<string> pathIDList = m_DataManager.PathIDList;
 
-			// TODO: we dont always need to refresh such many things
+		// fix: naming: show all CAM data
+		void ShowAllCAMData()
+		{
+			// fix: take all path IDs
+			List<string> pathIDList = m_DataManager.PathIDList;
 			ShowToolVec( pathIDList );
 			ShowOrientation( pathIDList );
 			ShowIndex();
@@ -580,7 +581,6 @@ namespace MyCAM.Editor
 
 		void ShowCAMData( List<string> pathIDList )
 		{
-			// TODO: we dont always need to refresh such many things
 			ShowToolVec( pathIDList );
 			ShowOrientation( pathIDList );
 			ShowIndex();
@@ -593,8 +593,6 @@ namespace MyCAM.Editor
 
 		void RemoveCAMData( List<string> pathIDList )
 		{
-			// TODO: we dont always need to refresh such many things
-			RomoveToolVec( pathIDList );
 			RomoveToolVec( pathIDList );
 			RomoveLeadLine( pathIDList );
 			RomoveOrientation( pathIDList );
@@ -623,6 +621,7 @@ namespace MyCAM.Editor
 		void ShowToolVec( List<string> pathIDList )
 		{
 			RomoveToolVec( pathIDList );
+
 			// no need to show
 			if( m_ShowToolVec == false ) {
 				return;
@@ -1043,13 +1042,8 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void AddOneLinearTraverse( gp_Pnt startPnt, gp_Pnt endPnt )
-		{
-			AIS_Line traverseAIS = GetLineAIS( startPnt, endPnt, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
-			m_TraverseAISList.Add( traverseAIS );
-		}
-
-		void HideCAMData()
+		// fix: naming hide all CAM data
+		void HideAllCAMData()
 		{
 			// hide tool vec
 			foreach( List<AIS_Line> toolVecAIS in m_ToolVecAISDict.Values ) {
@@ -1165,6 +1159,12 @@ namespace MyCAM.Editor
 			return m_DefaultAction.GetSelectedIDs();
 		}
 
+		void AddOneLinearTraverse( gp_Pnt startPnt, gp_Pnt endPnt )
+		{
+			AIS_Line traverseAIS = GetLineAIS( startPnt, endPnt, Quantity_NameOfColor.Quantity_NOC_RED, 1, 1, true );
+			m_TraverseAISList.Add( traverseAIS );
+		}
+
 		bool IsSameAction( EditActionType newActionType )
 		{
 			if( m_CurrentAction != null && m_CurrentAction.ActionType == newActionType ) {
@@ -1218,8 +1218,9 @@ namespace MyCAM.Editor
 			if( string.IsNullOrEmpty( szPathID )
 				|| dataManager.ObjectMap.ContainsKey( szPathID ) == false
 				|| dataManager.ObjectMap[ szPathID ] == null
-				|| !( dataManager.ObjectMap[ szPathID ] is PathObject
-				|| ( (PathObject)dataManager.ObjectMap[ szPathID ] ).CraftData == null ) ) {
+				|| !( dataManager.ObjectMap[ szPathID ] is PathObject )
+				// fix: help, the logic check issue here
+				|| ( (PathObject)dataManager.ObjectMap[ szPathID ] ).CraftData == null ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
 				return false;
 			}
