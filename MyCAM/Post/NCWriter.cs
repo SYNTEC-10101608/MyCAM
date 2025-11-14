@@ -10,7 +10,7 @@ namespace MyCAM.Post
 	{
 		public NCWriter( DataManager dataManager )
 		{
-			// fix: check null argument
+			// re: check null argument
 			if( dataManager.GetContourCacheInfoList() == null || dataManager.MachineData == null || dataManager.EntryAndExitData == null ) {
 				throw new ArgumentNullException( "NCWriter constructor argument is null." );
 			}
