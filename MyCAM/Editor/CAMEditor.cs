@@ -629,18 +629,17 @@ namespace MyCAM.Editor
 
 			// build tool vec
 			foreach( string szPathID in pathIDList ) {
-				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
+				if( GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false || cacheInfo.PathType != PathType.Contour ) {
 					continue;
 				}
-				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).ContourCacheInfo;
-				CraftData craftData = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).CraftData;
+				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
 				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
 
 				for( int i = 0; i < contourCacheInfo.CAMPointList.Count; i++ ) {
 					CAMPoint camPoint = contourCacheInfo.CAMPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					if( IsModifiedToolVecIndex( i, contourCacheInfo, craftData, contourCacheInfo.CAMPointList.Select( point => camPoint.CADPoint ).ToList() ) ) {
+					if( IsModifiedToolVecIndex( i, contourCacheInfo, contourCacheInfo.CAMPointList.Select( point => camPoint.CADPoint ).ToList() ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
 					}
@@ -680,14 +679,12 @@ namespace MyCAM.Editor
 			RomoveLeadLine( pathIDList );
 			foreach( string szPathID in pathIDList ) {
 				if( GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false
-					|| GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) == false ) {
-					continue;
-				}
-				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
+					|| cacheInfo.PathType != PathType.Contour ) {
 					continue;
 				}
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
-				if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
+				LeadData leadData = contourCacheInfo.GetPathLeadData();
+				if( leadData.LeadIn.Type != LeadLineType.None ) {
 					List<AIS_Line> leadAISList = new List<AIS_Line>();
 					m_LeadAISDict.Add( szPathID, leadAISList );
 					for( int i = 0; i < contourCacheInfo.LeadInCAMPointList.Count - 1; i++ ) {
@@ -698,7 +695,7 @@ namespace MyCAM.Editor
 					}
 				}
 
-				if( craftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
+				if( leadData.LeadOut.Type != LeadLineType.None ) {
 					List<AIS_Line> leadAISList;
 					if( m_LeadAISDict.ContainsKey( szPathID ) ) {
 						leadAISList = m_LeadAISDict[ szPathID ];
@@ -749,14 +746,14 @@ namespace MyCAM.Editor
 			}
 
 			foreach( string szPathID in pathIDList ) {
-				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
+				if( GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false
+					|| cacheInfo.PathType != PathType.Contour ) {
 					continue;
 				}
-				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).ContourCacheInfo;
-				CraftData craftData = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).CraftData;
+				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				gp_Pnt showPoint = contourCacheInfo.CAMPointList[ 0 ].CADPoint.Point;
 				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMPointList[ 0 ].CADPoint.TangentVec.XYZ() );
-				if( craftData.IsReverse ) {
+				if( contourCacheInfo.GetPathIsReverse() ) {
 					orientationDir.Reverse();
 				}
 				AIS_Shape orientationAIS = GetOrientationAIS( showPoint, orientationDir );
@@ -792,13 +789,13 @@ namespace MyCAM.Editor
 		{
 			RomoveLeadOrientation( pathIDList );
 			foreach( string szPathID in pathIDList ) {
-				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
+				if( GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false
+					|| cacheInfo.PathType != PathType.Contour ) {
 					continue;
 				}
-				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).ContourCacheInfo;
-				CraftData craftData = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).CraftData;
-
-				if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
+				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
+				LeadData leadData = contourCacheInfo.GetPathLeadData();
+				if( leadData.LeadIn.Type != LeadLineType.None ) {
 					List<AIS_Shape> orientationAISList = new List<AIS_Shape>();
 					m_LeadOrientationAISDict.Add( szPathID, orientationAISList );
 
@@ -812,7 +809,7 @@ namespace MyCAM.Editor
 				}
 
 				// path with lead out
-				if( craftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
+				if( leadData.LeadOut.Type != LeadLineType.None ) {
 
 					List<AIS_Shape> orientationAISList;
 					if( m_LeadOrientationAISDict.ContainsKey( szPathID ) ) {
@@ -904,14 +901,14 @@ namespace MyCAM.Editor
 		{
 			RomoveOverCut( pathIDList );
 			foreach( string szPathID in pathIDList ) {
-				if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject ).PathType != PathType.Contour ) {
+				if( GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false
+					|| cacheInfo.PathType != PathType.Contour ) {
 					continue;
 				}
-				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).ContourCacheInfo;
-				CraftData craftData = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject ).CraftData;
+				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				List<AIS_Line> overcutAISList = new List<AIS_Line>();
 				m_OverCutAISDict.Add( szPathID, overcutAISList );
-				if( craftData.OverCutLength > 0 ) {
+				if( contourCacheInfo.GetPathOverCutLength() > 0 ) {
 					for( int i = 0; i < contourCacheInfo.OverCutCAMPointList.Count - 1; i++ ) {
 						AIS_Line overCutAISLine = GetLineAIS( contourCacheInfo.OverCutCAMPointList[ i ].CADPoint.Point, contourCacheInfo.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
 						overcutAISList.Add( overCutAISLine );
@@ -1096,13 +1093,13 @@ namespace MyCAM.Editor
 		#endregion
 
 		// methods
-		bool IsModifiedToolVecIndex( int index, ContourCacheInfo cacheInfo, CraftData craftData, List<CADPoint> cadPointList )
+		bool IsModifiedToolVecIndex( int index, ContourCacheInfo cacheInfo, List<CADPoint> cadPointList )
 		{
 			// map CAD and CAM point index
 			int nLength = cadPointList.Count;
-			int modifiedIndex = craftData.IsReverse
-				? ( nLength - ( cacheInfo.IsClosed ? 0 : 1 ) - index + craftData.StartPointIndex ) % nLength
-				: ( index + craftData.StartPointIndex ) % nLength;
+			int modifiedIndex = cacheInfo.GetPathIsReverse()
+				? ( nLength - ( cacheInfo.IsClosed ? 0 : 1 ) - index + cacheInfo.GetPathStartPointIndex() ) % nLength
+				: ( index + cacheInfo.GetPathStartPointIndex() ) % nLength;
 
 			// need highlight if the index is modified index
 			return cacheInfo.GetToolVecModifyIndex().Contains( modifiedIndex );
