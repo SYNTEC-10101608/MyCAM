@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using MyCAM.App;
 using MyCAM.CacheInfo;
@@ -27,6 +28,7 @@ namespace MyCAM.Data
 
 			bool isClosed = DetermineIfClosed( shape );
 			m_CADSegmentList = BuildCADSegment( pathDataList, isClosed );
+			Console.WriteLine( m_CADSegmentList.Count );
 			m_CraftData = new CraftData( szUID );
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADSegmentList, m_CraftData, isClosed );
 			m_CraftData.StartPointIndex = new SegmentPointIndex(m_CADSegmentList.Count - 1, m_CADSegmentList[ CADSegmentList.Count - 1 ].PointList.Count - 1);
@@ -120,6 +122,7 @@ namespace MyCAM.Data
 					if( cadPointList == null || cadPointList.Count == 0 ) {
 						continue;
 					}
+					
 					for( int j = 0; j < cadPointList.Count; j++ ) {
 						bool buildSuccess = CADCAMSegmentBuilder.BuildCADSegment( cadPointList[ j ], EContourType.Arc, eachSegmentLength[ j ], dEachArcLength[ j ], dEachChordLength[ j ], out ICADSegmentElement cadSegment );
 						if( buildSuccess ) {

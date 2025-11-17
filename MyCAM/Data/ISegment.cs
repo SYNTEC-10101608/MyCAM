@@ -4,7 +4,7 @@ using OCC.gp;
 
 namespace MyCAM.Data
 {
-	enum EContourType
+	public enum EContourType
 	{
 		Line,
 		Arc,
@@ -67,6 +67,7 @@ namespace MyCAM.Data
 			m_PointList = pointList;
 			m_TotalLength = dTotalLength;
 			m_PerArcLength = dPerArcLength;
+			m_PerChordLength = dPerChordLength;
 		}
 
 		public abstract EContourType ContourType

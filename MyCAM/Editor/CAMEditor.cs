@@ -716,7 +716,14 @@ namespace MyCAM.Editor
 
 				// lead out
 				if( leadData.LeadOut.Type != LeadLineType.None ) {
-					leadOutCurve = LeadHelper.BuildLeadGeom( false, leadData.LeadOut.Type, contourCacheInfo.CAMSegmentList.Last().EndPoint, leadData.LeadOut.Length, leadData.LeadOut.Angle, leadData.IsChangeLeadDirection, contourCacheInfo.GetPathIsReverse(), out gp_Pnt leadEndPnt, out _, out gp_Dir leadDir );
+					CAMPoint2 overCutConnectwtih = null;
+					if( contourCacheInfo.OverCutSegment.Count > 0 && contourCacheInfo.GetPathOverCutLength() > 0 ) {
+						overCutConnectwtih = contourCacheInfo.OverCutSegment.Last().EndPoint;
+					}
+					else {
+						overCutConnectwtih = contourCacheInfo.CAMSegmentList.Last().EndPoint;
+					}
+					leadOutCurve = LeadHelper.BuildLeadGeom( false, leadData.LeadOut.Type, overCutConnectwtih, leadData.LeadOut.Length, leadData.LeadOut.Angle, leadData.IsChangeLeadDirection, contourCacheInfo.GetPathIsReverse(), out gp_Pnt leadEndPnt, out _, out gp_Dir leadDir );
 					if( leadOutCurve == null ) {
 						continue;
 					}
@@ -895,7 +902,7 @@ namespace MyCAM.Editor
 						{
 							AIS_Shape overCutAIS = new AIS_Shape( edge );
 							overCutAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_DEEPPINK ) );
-							overCutAIS.SetWidth( 2 );
+							overCutAIS.SetWidth( 5 );
 							return overCutAIS;
 						} ) );
 					}

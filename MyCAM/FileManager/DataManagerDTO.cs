@@ -1,14 +1,15 @@
-﻿using MyCAM.Data;
-using OCC.BRep;
-using OCC.BRepTools;
-using OCC.gp;
-using OCC.TopoDS;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-/*
+using MyCAM.CacheInfo;
+using MyCAM.Data;
+using OCC.BRep;
+using OCC.BRepTools;
+using OCC.gp;
+using OCC.TopoDS;
+
 namespace MyCAM.FileManager
 {
 	// use this class to serialize/deserialize DataManager
@@ -284,13 +285,19 @@ namespace MyCAM.FileManager
 
 	public class ContourPathObjectDTO : PathObjectDTO
 	{
-		[XmlArray( "CADPointListDTO" )]
-		[XmlArrayItem( "CADPointDTO" )]
-		public List<CADPointDTO> CADPointList
+		[XmlArray( "CADSegmentListDTO" )]
+		[XmlArrayItem( "CADSegmentDTO" )]
+		public List<CADSegmentDTO> CADSegmentList
 		{
 			get;
 			set;
-		} = new List<CADPointDTO>();
+		} = new List<CADSegmentDTO>();
+
+		public List<int> CtrlToolSegIdxList
+		{
+			get;
+			set;
+		} = new List<int>();
 
 		internal ContourPathObjectDTO()
 		{
@@ -305,13 +312,20 @@ namespace MyCAM.FileManager
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
 			PathType = PathType.Contour;
-			if( pathObject is ContourPathObject ) {
-				foreach( var point in ( (ContourPathObject)pathObject ).CADPointList ) {
-					CADPointList.Add( new CADPointDTO( point ) );
-				}
+
+			// this path
+			if( pathObject is ContourPathObject contourPathObject) {
+
+				// Segment → DTO
+				CADSegmentList = ( contourPathObject.CADSegmentList ?? new List<ICADSegmentElement>() )
+					.Select( seg => new CADSegmentDTO( seg ) )
+					.ToList();
+				// Control index list
+				CtrlToolSegIdxList = ( contourPathObject.ContourCacheInfo?.CtrlToolSegIdxList ?? new List<int>() )
+					.ToList();
 			}
 			else {
-				CADPointList = new List<CADPointDTO>();
+				CADSegmentList = new List<CADSegmentDTO>();
 			}
 			CraftData = new CraftDataDTO( pathObject.CraftData );
 		}
@@ -325,8 +339,9 @@ namespace MyCAM.FileManager
 			}
 			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
 			CraftData craftData = CraftData.ToCraftData();
-			List<ICADSegmentElement> CADSegmentList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
-			return new ContourPathObject( UID, shape, CADSegmentList, craftData );
+			List<ICADSegmentElement> pathCADSegmentList = CADSegmentList.Select( cadPointDTO => cadPointDTO.ToCADSegment() ).ToList();
+			List<int> contorlToolSegIdxList = CtrlToolSegIdxList.Select( idx => idx ).ToList();
+			return new ContourPathObject( UID, shape, pathCADSegmentList, craftData );
 		}
 	}
 
@@ -407,8 +422,8 @@ namespace MyCAM.FileManager
 							? new TraverseDataDTO( craftData.TraverseData )
 							: new TraverseDataDTO();
 			OverCutLength = craftData.OverCutLength;
-			ToolVecModifyMap = ( craftData.ToolVecModifyMap ?? new Dictionary<int, Tuple<double, double>>() )
-				.Select( kvp => new ToolVecMapDTO( kvp.Key, kvp.Value.Item1, kvp.Value.Item2 ) )
+			ToolVecModifyMap = ( craftData.ToolVecModifyMap ?? new Dictionary<SegmentPointIndex, Tuple<double, double>>() )
+				.Select( kvp => new ToolVecMapDTO( new SegmentIndexDTO( kvp.Key ), kvp.Value.Item1, kvp.Value.Item2 ) )
 				.ToList();
 		}
 
@@ -417,7 +432,7 @@ namespace MyCAM.FileManager
 			if( ToolVecModifyMap == null || LeadParam == null || TraverseData == null ) {
 				throw new ArgumentException( "ContourCacheInfo deserialization failed." );
 			}
-			Dictionary<SegmentPointIndex, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
+			Dictionary<SegmentPointIndex, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => new SegmentPointIndex( ToolVecModifyData.segmentIndex.SegIdx, ToolVecModifyData.segmentIndex.PntIdx ), ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
 			LeadData leadParam = LeadParam.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
 			return new CraftData( UID, leadParam, StartPoint, OverCutLength, IsReverse, IsClosed, traverseData, toolVecModifyMap, IsToolVecReverse );
@@ -598,7 +613,84 @@ namespace MyCAM.FileManager
 
 	public class CADSegmentDTO
 	{
+		public EContourType ContourType
+		{
+			get;
+			set;
+		}
 
+		public List<CADPointDTO> PointList
+		{
+			get;
+			set;
+		} = new List<CADPointDTO>();
+
+		public double TotalLength
+		{
+			get;
+			set;
+		}
+
+		public double PerArcLength
+		{
+			get;
+			set;
+		}
+
+		public double PerChordLength
+		{
+			get;
+			set;
+		}
+
+		// special for arc segment
+		public CADPointDTO MidPoint
+		{
+			get;
+			set;
+		}
+
+		internal CADSegmentDTO()
+		{
+		}
+
+		internal CADSegmentDTO( ICADSegmentElement segment )
+		{
+			if( segment == null ) {
+				return;
+			}
+			ContourType = segment.ContourType;
+			PointList = segment.PointList.Select( p => new CADPointDTO( p ) ).ToList();
+			TotalLength = segment.TotalLength;
+			PerArcLength = segment.PerArcLegnth;
+			PerChordLength = segment.PerChordLength;
+
+			if( segment is ArcCADSegment arcSegment ) {
+				if( arcSegment != null && arcSegment.MidPoint != null ) {
+					MidPoint = new CADPointDTO( arcSegment.MidPoint );
+				}
+			}
+		}
+
+		internal ICADSegmentElement ToCADSegment()
+		{
+			List<CADPoint> cadPoints = PointList != null
+				? PointList.Select( dto => dto.ToCADPoint() ).ToList()
+				: new List<CADPoint>();
+
+			if( cadPoints.Count < 2 ) {
+				throw new System.InvalidOperationException( "CADSegmentDTO conversion failed: PointList has fewer than 2 points" );
+			}
+
+			switch( ContourType ) {
+				case EContourType.Line:
+					return new LineCADSegment( cadPoints, TotalLength, PerArcLength, PerChordLength );
+				case EContourType.Arc:
+					return new ArcCADSegment( cadPoints, TotalLength, PerArcLength, PerChordLength );
+				default:
+					throw new System.InvalidOperationException( "Unknown contourType" );
+			}
+		}
 	}
 
 	public class CADPointDTO
@@ -798,12 +890,13 @@ namespace MyCAM.FileManager
 
 	public class SegmentIndexDTO
 	{
-		public int SegmentIndex
+		public int SegIdx
 		{
 			get;
 			set;
 		}
-		public int PointIndex
+
+		public int PntIdx
 		{
 			get;
 			set;
@@ -816,13 +909,13 @@ namespace MyCAM.FileManager
 
 		internal SegmentIndexDTO( SegmentPointIndex segmentPointIndex )
 		{
-			SegmentIndex = segmentPointIndex.SegIdx;
-			PointIndex = segmentPointIndex.PntIdx;
+			SegIdx = segmentPointIndex.SegIdx;
+			PntIdx = segmentPointIndex.PntIdx;
 		}
 
 		internal SegmentPointIndex ToSegmentPointIndex()
 		{
-			return new SegmentPointIndex( SegmentIndex, PointIndex );
+			return new SegmentPointIndex( SegIdx, PntIdx );
 		}
 	}
 
@@ -926,4 +1019,3 @@ namespace MyCAM.FileManager
 		}
 	}
 }
-*/

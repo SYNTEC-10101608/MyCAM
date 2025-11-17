@@ -21,6 +21,7 @@ namespace MyCAM.CacheInfo
 			IsClosed = isClose;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
 			BuildPathCAMSegment();
+			BuildCAMFeatureSegment();
 		}
 
 		public string UID
@@ -44,6 +45,7 @@ namespace MyCAM.CacheInfo
 			{
 				if( m_IsCraftDataDirty ) {
 					BuildPathCAMSegment();
+					BuildCAMFeatureSegment();
 				}
 				return m_CAMSegmentList;
 			}
@@ -72,6 +74,7 @@ namespace MyCAM.CacheInfo
 			{
 				if( m_IsCraftDataDirty ) {
 					BuildPathCAMSegment();
+					BuildCAMFeatureSegment();
 				}
 				return m_OverCutSegmentList;
 			}
@@ -90,6 +93,7 @@ namespace MyCAM.CacheInfo
 		public void Transform()
 		{
 			BuildPathCAMSegment();
+			BuildCAMFeatureSegment();
 		}
 
 		public CAMPoint GetProcessStartPoint()
@@ -620,9 +624,11 @@ namespace MyCAM.CacheInfo
 
 		void SetOverCut()
 		{
-			List<ICAMSegmentElement> overCutSement = OverCutSegmentBuilder.BuildOverCutSegment( m_CAMSegmentList, m_CraftData.OverCutLength );
-			if( overCutSement.Count > 0 ) {
-				m_OverCutSegmentList = overCutSement;
+			if ( m_CraftData.OverCutLength > 0 ) {
+				List<ICAMSegmentElement> overCutSement = OverCutSegmentBuilder.BuildOverCutSegment( m_CAMSegmentList, m_CraftData.OverCutLength );
+				if( overCutSement.Count > 0 ) {
+					m_OverCutSegmentList = overCutSement;
+				}
 			}
 		}
 

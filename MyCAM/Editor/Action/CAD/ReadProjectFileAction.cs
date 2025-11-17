@@ -1,8 +1,14 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.FileManager;
 using OCC.AIS;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+
 
 namespace MyCAM.Editor
 {
@@ -36,7 +42,6 @@ namespace MyCAM.Editor
 					return;
 				}
 
-				/*
 				// IO protection
 				try {
 					XmlSerializer serializer = new XmlSerializer( typeof( DataManagerDTO ) );
@@ -57,7 +62,6 @@ namespace MyCAM.Editor
 				catch( Exception ex ) {
 					MyApp.Logger.ShowOnLogPanel( $"讀取專案檔案失敗：\n{ex.Message}", MyApp.NoticeType.Error );
 				}
-				*/
 			}
 			End();
 		}
