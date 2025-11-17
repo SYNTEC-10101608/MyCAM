@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-
+/*
 namespace MyCAM.FileManager
 {
 	// use this class to serialize/deserialize DataManager
@@ -325,8 +325,8 @@ namespace MyCAM.FileManager
 			}
 			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
 			CraftData craftData = CraftData.ToCraftData();
-			List<CADPoint> cadPointList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
-			return new ContourPathObject( UID, shape, cadPointList, craftData );
+			List<ICADSegmentElement> CADSegmentList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
+			return new ContourPathObject( UID, shape, CADSegmentList, craftData );
 		}
 	}
 
@@ -351,7 +351,7 @@ namespace MyCAM.FileManager
 			set;
 		}
 
-		public int StartPoint
+		public SegmentPointIndex StartPoint
 		{
 			get;
 			set;
@@ -417,7 +417,7 @@ namespace MyCAM.FileManager
 			if( ToolVecModifyMap == null || LeadParam == null || TraverseData == null ) {
 				throw new ArgumentException( "ContourCacheInfo deserialization failed." );
 			}
-			Dictionary<int, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
+			Dictionary<SegmentPointIndex, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
 			LeadData leadParam = LeadParam.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
 			return new CraftData( UID, leadParam, StartPoint, OverCutLength, IsReverse, IsClosed, traverseData, toolVecModifyMap, IsToolVecReverse );
@@ -594,6 +594,11 @@ namespace MyCAM.FileManager
 			}
 			return new LeadData( leadInType, leadOutType, LeadInLength, LeadInAngle, LeadOutLength, LeadOutAngle, IsChangeLeadDirection );
 		}
+	}
+
+	public class CADSegmentDTO
+	{
+
 	}
 
 	public class CADPointDTO
@@ -791,13 +796,43 @@ namespace MyCAM.FileManager
 		}
 	}
 
-	public class ToolVecMapDTO
+	public class SegmentIndexDTO
 	{
-		public int Index
+		public int SegmentIndex
 		{
 			get;
 			set;
 		}
+		public int PointIndex
+		{
+			get;
+			set;
+		}
+
+		// parameterless constructor(for XmlSerializer)
+		internal SegmentIndexDTO()
+		{
+		}
+
+		internal SegmentIndexDTO( SegmentPointIndex segmentPointIndex )
+		{
+			SegmentIndex = segmentPointIndex.SegIdx;
+			PointIndex = segmentPointIndex.PntIdx;
+		}
+
+		internal SegmentPointIndex ToSegmentPointIndex()
+		{
+			return new SegmentPointIndex( SegmentIndex, PointIndex );
+		}
+	}
+
+	public class ToolVecMapDTO
+	{
+		public SegmentIndexDTO segmentIndex
+		{
+			get;
+			set;
+		} = new SegmentIndexDTO();
 
 		public double Value1
 		{
@@ -816,9 +851,9 @@ namespace MyCAM.FileManager
 		{
 		}
 
-		internal ToolVecMapDTO( int index, double value1, double value2 )
+		internal ToolVecMapDTO( SegmentIndexDTO segmentIndexDTO, double value1, double value2 )
 		{
-			Index = index;
+			segmentIndex = segmentIndexDTO;
 			Value1 = value1;
 			Value2 = value2;
 		}
@@ -891,3 +926,4 @@ namespace MyCAM.FileManager
 		}
 	}
 }
+*/

@@ -291,6 +291,15 @@ namespace OCCTool
 			return avgDir;
 		}
 
+		public static bool IsParallel( gp_Dir dir1, gp_Dir dir2, double tolerance = 1e-3 )
+		{
+			gp_Vec v1 = new gp_Vec( dir1 );
+			gp_Vec v2 = new gp_Vec( dir2 );
+
+			gp_Vec cross = v1.Crossed( v2 );
+			return cross.Magnitude() < tolerance;
+		}
+
 		// private
 		static bool IsApproximatelyLinear( TopoDS_Edge edge, out gp_Pnt p2, out gp_Pnt p1 )
 		{

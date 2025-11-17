@@ -36,6 +36,7 @@ namespace MyCAM.Editor
 					return;
 				}
 
+				/*
 				// avoid writing error
 				try {
 					// turn data manager to dto
@@ -54,6 +55,7 @@ namespace MyCAM.Editor
 				catch( Exception ex ) {
 					MyApp.Logger.ShowOnLogPanel( $"儲存檔案時發生錯誤：\n{ex.Message}", MyApp.NoticeType.Error );
 				}
+				*/
 			}
 			End();
 		}

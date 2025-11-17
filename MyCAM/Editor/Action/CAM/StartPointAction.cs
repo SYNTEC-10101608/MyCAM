@@ -1,8 +1,8 @@
-﻿using MyCAM.Data;
-using OCCViewer;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using MyCAM.Data;
+using OCCViewer;
 
 namespace MyCAM.Editor
 {
@@ -31,8 +31,8 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			int nIndex = GetSelectIndex( out _ );
-			if( nIndex == -1 ) {
+			SegmentPointIndex nIndex = GetSelectIndex( out _ );
+			if( nIndex == new SegmentPointIndex( -1, -1 ) ) {
 				return;
 			}
 			m_CraftData.StartPointIndex = nIndex;

@@ -1,4 +1,8 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.CacheInfo;
 using MyCAM.Data;
 using MyCAM.Helper;
@@ -21,10 +25,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -80,9 +80,9 @@ namespace MyCAM.Editor
 		// for viewer resource handle
 		Dictionary<string, List<AIS_Line>> m_ToolVecAISDict = new Dictionary<string, List<AIS_Line>>();
 		Dictionary<string, AIS_Shape> m_OrientationAISList = new Dictionary<string, AIS_Shape>(); // need refresh, no need activate
-		Dictionary<string, List<AIS_Line>> m_LeadAISDict = new Dictionary<string, List<AIS_Line>>(); // need refresh, no need activate
+		Dictionary<string, List<AIS_Shape>> m_LeadAISDict = new Dictionary<string, List<AIS_Shape>>(); // need refresh, no need activate
 		Dictionary<string, List<AIS_Shape>> m_LeadOrientationAISDict = new Dictionary<string, List<AIS_Shape>>(); // need refresh, no need activate
-		Dictionary<string, List<AIS_Line>> m_OverCutAISDict = new Dictionary<string, List<AIS_Line>>(); // need refresh, no need activate
+		Dictionary<string, List<AIS_Shape>> m_OverCutAISDict = new Dictionary<string, List<AIS_Shape>>(); // need refresh, no need activate
 
 		// this three need to consider standard pattern, so they are only lists now
 		List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>(); // need refresh, no need activate
@@ -573,7 +573,6 @@ namespace MyCAM.Editor
 			ShowIndex();
 			ShowOverCut( pathIDList );
 			ShowLeadLine( pathIDList );
-			ShowLeadOrientation( pathIDList );
 			ShowTraversalPath();
 			m_Viewer.UpdateView();
 		}
@@ -585,7 +584,6 @@ namespace MyCAM.Editor
 			ShowIndex();
 			ShowOverCut( pathIDList );
 			ShowLeadLine( pathIDList );
-			ShowLeadOrientation( pathIDList );
 			ShowTraversalPath();
 			m_Viewer.UpdateView();
 		}
@@ -635,14 +633,28 @@ namespace MyCAM.Editor
 				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
 				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
 
-				for( int i = 0; i < contourCacheInfo.CAMPointList.Count; i++ ) {
-					CAMPoint camPoint = contourCacheInfo.CAMPointList[ i ];
-					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					if( IsModifiedToolVecIndex( i, contourCacheInfo, contourCacheInfo.CAMPointList.Select( point => camPoint.CADPoint ).ToList() ) ) {
-						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-						toolVecAIS.SetWidth( 4 );
+				// each segment in this path
+				for( int i = 0; i < contourCacheInfo.CAMSegmentList.Count; i++ ) {
+					if( contourCacheInfo.CtrlToolSegIdxList.Contains( i ) ) {
+						AIS_Line endPointToolVecAIS = GetVecAIS( contourCacheInfo.CAMSegmentList[ i ].EndPoint.Point, contourCacheInfo.CAMSegmentList[ i ].EndPoint.ToolVec, EvecType.ToolVec );
+						endPointToolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+						endPointToolVecAIS.SetWidth( 4 );
+						toolVecAISList.Add( endPointToolVecAIS );
+
+						// draw mid point tool vec for arc segment
+						if( contourCacheInfo.CAMSegmentList[ i ] is ArcCAMSegment arcCAMSegment ) {
+							AIS_Line midPointToolVecAIS = GetVecAIS( arcCAMSegment.MidPoint.Point, arcCAMSegment.MidPoint.ToolVec, EvecType.ToolVec );
+							toolVecAISList.Add( midPointToolVecAIS );
+						}
 					}
-					toolVecAISList.Add( toolVecAIS );
+					else {
+						AIS_Line endPointToolVecAIS = GetVecAIS( contourCacheInfo.CAMSegmentList[ i ].EndPoint.Point, contourCacheInfo.CAMSegmentList[ i ].EndPoint.ToolVec, EvecType.ToolVec );
+						if( contourCacheInfo.CAMSegmentList[ i ] is ArcCAMSegment arcCAMSegment ) {
+							AIS_Line midPointToolVecAIS = GetVecAIS( arcCAMSegment.MidPoint.Point, arcCAMSegment.MidPoint.ToolVec, EvecType.ToolVec );
+							toolVecAISList.Add( midPointToolVecAIS );
+						}
+						toolVecAISList.Add( endPointToolVecAIS );
+					}
 				}
 			}
 
@@ -663,8 +675,8 @@ namespace MyCAM.Editor
 			// clear the previous tool vec
 			foreach( string szPathID in pathIDList ) {
 				if( m_LeadAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Line> leadAISList = m_LeadAISDict[ szPathID ];
-					foreach( AIS_Line leadAIS in leadAISList ) {
+					List<AIS_Shape> leadAISList = m_LeadAISDict[ szPathID ];
+					foreach( AIS_Shape leadAIS in leadAISList ) {
 						m_Viewer.GetAISContext().Remove( leadAIS, false );
 					}
 					m_LeadAISDict[ szPathID ].Clear();
@@ -676,6 +688,8 @@ namespace MyCAM.Editor
 		void ShowLeadLine( List<string> pathIDList )
 		{
 			RomoveLeadLine( pathIDList );
+			RomoveLeadOrientation( pathIDList );
+
 			foreach( string szPathID in pathIDList ) {
 				if( GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false
 					|| cacheInfo.PathType != PathType.Contour ) {
@@ -683,46 +697,63 @@ namespace MyCAM.Editor
 				}
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				LeadData leadData = contourCacheInfo.GetPathLeadData();
+				Geom_Curve leadInCurve = null;
+				Geom_Curve leadOutCurve = null;
+				List<AIS_Shape> leadShape = new List<AIS_Shape>();
+				List<AIS_Shape> orientationAISList = new List<AIS_Shape>();
+
+				// lead in
 				if( leadData.LeadIn.Type != LeadLineType.None ) {
-					List<AIS_Line> leadAISList = new List<AIS_Line>();
-					m_LeadAISDict.Add( szPathID, leadAISList );
-					for( int i = 0; i < contourCacheInfo.LeadInCAMPointList.Count - 1; i++ ) {
-						CAMPoint currentCAMPoint = contourCacheInfo.LeadInCAMPointList[ i ];
-						CAMPoint nextCAMPoint = contourCacheInfo.LeadInCAMPointList[ i + 1 ];
-						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
-						leadAISList.Add( LeadAISLine );
+					leadInCurve = LeadHelper.BuildLeadGeom( true, leadData.LeadIn.Type, contourCacheInfo.CAMSegmentList.First().StartPoint, leadData.LeadIn.Length, leadData.LeadIn.Angle, leadData.IsChangeLeadDirection, contourCacheInfo.GetPathIsReverse(), out gp_Pnt leadEndPnt, out _, out gp_Dir leadDir );
+					if( leadInCurve == null ) {
+						continue;
 					}
+					AIS_Shape LeadInSegmentShape = TopoBuilder.CurveToAIS( leadInCurve, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+					AIS_Shape orientationAIS = GetOrientationAIS( leadEndPnt, leadDir );
+					leadShape.Add( LeadInSegmentShape );
+					orientationAISList.Add( orientationAIS );
 				}
 
+				// lead out
 				if( leadData.LeadOut.Type != LeadLineType.None ) {
-					List<AIS_Line> leadAISList;
-					if( m_LeadAISDict.ContainsKey( szPathID ) ) {
-						leadAISList = m_LeadAISDict[ szPathID ];
+					leadOutCurve = LeadHelper.BuildLeadGeom( false, leadData.LeadOut.Type, contourCacheInfo.CAMSegmentList.Last().EndPoint, leadData.LeadOut.Length, leadData.LeadOut.Angle, leadData.IsChangeLeadDirection, contourCacheInfo.GetPathIsReverse(), out gp_Pnt leadEndPnt, out _, out gp_Dir leadDir );
+					if( leadOutCurve == null ) {
+						continue;
 					}
-					else {
-						leadAISList = new List<AIS_Line>();
-						m_LeadAISDict.Add( szPathID, leadAISList );
-					}
-					for( int i = 0; i < contourCacheInfo.LeadOutCAMPointList.Count - 1; i++ ) {
-						CAMPoint currentCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i ];
-						CAMPoint nextCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i + 1 ];
-						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
-						leadAISList.Add( LeadAISLine );
-					}
+					AIS_Shape LeadOutSegmentShape = TopoBuilder.CurveToAIS( leadOutCurve, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+					AIS_Shape orientationAIS = GetOrientationAIS( leadEndPnt, leadDir );
+					leadShape.Add( LeadOutSegmentShape );
+					orientationAISList.Add( orientationAIS );
 				}
+				if( leadShape.Count == 0 ) {
+					continue;
+				}
+				m_LeadAISDict.Add( szPathID, leadShape );
+				m_LeadOrientationAISDict.Add( szPathID, orientationAISList );
 			}
 
 			// display the lead line
 			foreach( string szPathID in pathIDList ) {
 				if( m_LeadAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Line> leadAISList = m_LeadAISDict[ szPathID ];
-					foreach( AIS_Line leadAIS in leadAISList ) {
+					List<AIS_Shape> leadAISList = m_LeadAISDict[ szPathID ];
+					foreach( AIS_Shape leadAIS in leadAISList ) {
 						m_Viewer.GetAISContext().Display( leadAIS, false );
 						m_Viewer.GetAISContext().Deactivate( leadAIS );
 					}
 				}
 			}
+
+			foreach( string szPathID in pathIDList ) {
+				if( m_LeadOrientationAISDict.ContainsKey( szPathID ) ) {
+					List<AIS_Shape> orientationAISList = m_LeadOrientationAISDict[ szPathID ];
+					foreach( AIS_Shape orientationAIS in orientationAISList ) {
+						m_Viewer.GetAISContext().Display( orientationAIS, false );
+						m_Viewer.GetAISContext().Deactivate( orientationAIS );
+					}
+				}
+			}
 		}
+
 
 		void RomoveOrientation( List<string> pathIDList )
 		{
@@ -750,8 +781,8 @@ namespace MyCAM.Editor
 					continue;
 				}
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
-				gp_Pnt showPoint = contourCacheInfo.CAMPointList[ 0 ].CADPoint.Point;
-				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMPointList[ 0 ].CADPoint.TangentVec.XYZ() );
+				gp_Pnt showPoint = contourCacheInfo.CAMSegmentList.First().StartPoint.Point;
+				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMSegmentList.First().StartPoint.TangentVec.XYZ() );
 				if( contourCacheInfo.GetPathIsReverse() ) {
 					orientationDir.Reverse();
 				}
@@ -783,63 +814,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void ShowLeadOrientation( List<string> pathIDList )
-		{
-			RomoveLeadOrientation( pathIDList );
-			foreach( string szPathID in pathIDList ) {
-				if( GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false
-					|| cacheInfo.PathType != PathType.Contour ) {
-					continue;
-				}
-				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
-				LeadData leadData = contourCacheInfo.GetPathLeadData();
-				if( leadData.LeadIn.Type != LeadLineType.None ) {
-					List<AIS_Shape> orientationAISList = new List<AIS_Shape>();
-					m_LeadOrientationAISDict.Add( szPathID, orientationAISList );
-
-					if( contourCacheInfo.LeadInCAMPointList.Count == 0 ) {
-						break;
-					}
-					gp_Pnt leadInStartPoint = contourCacheInfo.LeadInCAMPointList.First().CADPoint.Point;
-					gp_Dir leadInOrientationDir = new gp_Dir( contourCacheInfo.LeadInCAMPointList.First().CADPoint.TangentVec.XYZ() );
-					AIS_Shape orientationAIS = GetOrientationAIS( leadInStartPoint, leadInOrientationDir );
-					orientationAISList.Add( orientationAIS );
-				}
-
-				// path with lead out
-				if( leadData.LeadOut.Type != LeadLineType.None ) {
-
-					List<AIS_Shape> orientationAISList;
-					if( m_LeadOrientationAISDict.ContainsKey( szPathID ) ) {
-						orientationAISList = m_LeadOrientationAISDict[ szPathID ];
-					}
-					else {
-						orientationAISList = new List<AIS_Shape>();
-						m_LeadOrientationAISDict.Add( szPathID, orientationAISList );
-					}
-
-					if( contourCacheInfo.LeadOutCAMPointList.Count == 0 ) {
-						break;
-					}
-					gp_Pnt leadOutEndPoint = contourCacheInfo.LeadOutCAMPointList.Last().CADPoint.Point;
-					gp_Dir leadOutOrientationDir = new gp_Dir( contourCacheInfo.LeadOutCAMPointList.Last().CADPoint.TangentVec.XYZ() );
-					AIS_Shape orientationAIS = GetOrientationAIS( leadOutEndPoint, leadOutOrientationDir );
-					orientationAISList.Add( orientationAIS );
-				}
-			}
-
-			// display the orientation
-			foreach( string szPathID in pathIDList ) {
-				if( m_LeadOrientationAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Shape> orientationAISList = m_LeadOrientationAISDict[ szPathID ];
-					foreach( AIS_Shape orientationAIS in orientationAISList ) {
-						m_Viewer.GetAISContext().Display( orientationAIS, false );
-						m_Viewer.GetAISContext().Deactivate( orientationAIS );
-					}
-				}
-			}
-		}
-
 		void RomoveIndex()
 		{
 			foreach( AIS_TextLabel textLabel in m_IndexList ) {
@@ -860,7 +834,7 @@ namespace MyCAM.Editor
 			// create text label
 			int nCurrentIndex = 0;
 			foreach( ContourCacheInfo cacheInfo in m_DataManager.GetContourCacheInfoList() ) {
-				gp_Pnt location = cacheInfo.CAMPointList[ 0 ].CADPoint.Point;
+				gp_Pnt location = cacheInfo.CAMSegmentList.First().StartPoint.Point;
 				string szIndex = nCurrentIndex++.ToString();
 
 				// create text label ais
@@ -885,8 +859,8 @@ namespace MyCAM.Editor
 			// clear the previous tool vec
 			foreach( string szPathID in pathIDList ) {
 				if( m_OverCutAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Line> overcutAISList = m_OverCutAISDict[ szPathID ];
-					foreach( AIS_Line overcutAIS in overcutAISList ) {
+					List<AIS_Shape> overcutAISList = m_OverCutAISDict[ szPathID ];
+					foreach( AIS_Shape overcutAIS in overcutAISList ) {
 						m_Viewer.GetAISContext().Remove( overcutAIS, false );
 					}
 					m_OverCutAISDict[ szPathID ].Clear();
@@ -904,12 +878,26 @@ namespace MyCAM.Editor
 					continue;
 				}
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
-				List<AIS_Line> overcutAISList = new List<AIS_Line>();
+				List<AIS_Shape> overcutAISList = new List<AIS_Shape>();
 				m_OverCutAISDict.Add( szPathID, overcutAISList );
-				if( contourCacheInfo.GetPathOverCutLength() > 0 ) {
-					for( int i = 0; i < contourCacheInfo.OverCutCAMPointList.Count - 1; i++ ) {
-						AIS_Line overCutAISLine = GetLineAIS( contourCacheInfo.OverCutCAMPointList[ i ].CADPoint.Point, contourCacheInfo.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
-						overcutAISList.Add( overCutAISLine );
+
+				for( int i = 0; i < contourCacheInfo.OverCutSegment.Count; i++ ) {
+					List<TopoDS_Edge> overCutEdgeList = new List<TopoDS_Edge>();
+					if( contourCacheInfo.GetPathOverCutLength() > 0 && contourCacheInfo.OverCutSegment.Count > 0 ) {
+						foreach( ICAMSegmentElement segment in contourCacheInfo.OverCutSegment ) {
+							TopoDS_Edge edge = TopoBuilder.ConvertSegmentToTopo( segment );
+							if( edge == null ) {
+								continue;
+							}
+							overCutEdgeList.Add( edge );
+						}
+						overcutAISList.AddRange( overCutEdgeList.Select( edge =>
+						{
+							AIS_Shape overCutAIS = new AIS_Shape( edge );
+							overCutAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_DEEPPINK ) );
+							overCutAIS.SetWidth( 2 );
+							return overCutAIS;
+						} ) );
 					}
 				}
 			}
@@ -917,8 +905,8 @@ namespace MyCAM.Editor
 			// display the tool vec
 			foreach( string szPathID in pathIDList ) {
 				if( m_OverCutAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Line> overcutAISList = m_OverCutAISDict[ szPathID ];
-					foreach( AIS_Line overcutAIS in overcutAISList ) {
+					List<AIS_Shape> overcutAISList = m_OverCutAISDict[ szPathID ];
+					foreach( AIS_Shape overcutAIS in overcutAISList ) {
 						m_Viewer.GetAISContext().Display( overcutAIS, false );
 						m_Viewer.GetAISContext().Deactivate( overcutAIS );
 					}
@@ -1057,15 +1045,15 @@ namespace MyCAM.Editor
 			}
 
 			// hide over cut
-			foreach( List<AIS_Line> overCutAISList in m_OverCutAISDict.Values ) {
-				foreach( AIS_Line overCutAIS in overCutAISList ) {
+			foreach( List<AIS_Shape> overCutAISList in m_OverCutAISDict.Values ) {
+				foreach( AIS_Shape overCutAIS in overCutAISList ) {
 					m_Viewer.GetAISContext().Remove( overCutAIS, false );
 				}
 			}
 
 			// hide lead 
-			foreach( List<AIS_Line> leadAISList in m_LeadAISDict.Values ) {
-				foreach( AIS_Line leadAIS in leadAISList ) {
+			foreach( List<AIS_Shape> leadAISList in m_LeadAISDict.Values ) {
+				foreach( AIS_Shape leadAIS in leadAISList ) {
 					m_Viewer.GetAISContext().Remove( leadAIS, false );
 				}
 			}
@@ -1088,19 +1076,6 @@ namespace MyCAM.Editor
 		}
 
 		#endregion
-
-		// methods
-		bool IsModifiedToolVecIndex( int index, ContourCacheInfo cacheInfo, List<CADPoint> cadPointList )
-		{
-			// map CAD and CAM point index
-			int nLength = cadPointList.Count;
-			int modifiedIndex = cacheInfo.GetPathIsReverse()
-				? ( nLength - ( cacheInfo.IsClosed ? 0 : 1 ) - index + cacheInfo.GetPathStartPointIndex() ) % nLength
-				: ( index + cacheInfo.GetPathStartPointIndex() ) % nLength;
-
-			// need highlight if the index is modified index
-			return cacheInfo.GetToolVecModifyIndex().Contains( modifiedIndex );
-		}
 
 		AIS_Line GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
 		{

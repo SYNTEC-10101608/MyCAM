@@ -50,6 +50,9 @@ namespace MyCAM.Data
 		}
 
 		ICADSegmentElement Clone();
+
+		void Transform( gp_Trsf transForm );
+
 	}
 
 	internal abstract class CADSegmentBase : ICADSegmentElement
@@ -147,14 +150,23 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return m_PerArcLength;
+				return m_PerChordLength;
 			}
 			private set
 			{
 				if( value >= 0.0 ) {
-					m_PerArcLength = value;
+					m_PerChordLength = value;
 				}
 			}
+		}
+
+		public virtual void Transform( gp_Trsf transForm )
+		{
+			foreach( CADPoint point in m_PointList ) {
+				point.Transform( transForm );
+			}
+			m_StartPoint = m_PointList[ 0 ];
+			m_EndPoint = m_PointList[ m_PointList.Count - 1 ];
 		}
 
 		protected List<CADPoint> m_PointList = new List<CADPoint>();
@@ -229,6 +241,12 @@ namespace MyCAM.Data
 				clonedPointList.Add( point.Clone() );
 			}
 			return new ArcCADSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength );
+		}
+
+		public override void Transform( gp_Trsf transform )
+		{
+			base.Transform( transform );
+			MidPoint = m_PointList[ m_MidIndex ];
 		}
 
 		CADPoint m_MidPoint;

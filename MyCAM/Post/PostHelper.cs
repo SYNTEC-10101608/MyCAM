@@ -50,6 +50,7 @@ namespace MyCAM.Post
 			// flag for process start point
 			bool bStart = false;
 
+			/*
 			// lead-in
 			if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None && currentCAMData.LeadInCAMPointList.Count > 0 ) {
 				if( !SolveProcessPath( postSolver, currentCAMData.LeadInCAMPointList,
@@ -122,6 +123,7 @@ namespace MyCAM.Post
 				Master = dLastPointProcess_M,
 				Slave = dLastPointProcess_S
 			};
+			*/
 			return true;
 		}
 

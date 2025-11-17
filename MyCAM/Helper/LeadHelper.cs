@@ -1,31 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MyCAM.Data;
-using OCC.GCPnts;
 using OCC.Geom;
-using OCC.GeomAdaptor;
 using OCC.gp;
-using OCC.Precision;
+using OCCTool;
 
 namespace MyCAM.Helper
 {
 	internal static class LeadHelper
 	{
-		// when isLeadIn, the input point is start of path, and is end of lead in
-		public static List<CAMPoint> BuildStraightLeadLine( CAMPoint StraightLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse )
+		public static List<ICAMSegmentElement> BuildLeadCAMSegment( CraftData craftData, ICAMSegmentElement CAMSegConnectWithStartPnt, bool isLeadIn )
 		{
-			List<CAMPoint> StraightLeadCAMPointList = new List<CAMPoint>();
+			List<ICAMSegmentElement> LeadCADSegment = new List<ICAMSegmentElement>();
+			if( isLeadIn ) {
+				if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
+					ICAMSegmentElement leadInCAMSegment = BuildLeadCADSegment( craftData, CAMSegConnectWithStartPnt, isLeadIn );
+					LeadCADSegment.Add( leadInCAMSegment );
+					return LeadCADSegment;
+				}
+			}
+			if( craftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
+				ICAMSegmentElement leadInCAMSegment = BuildLeadCADSegment( craftData, CAMSegConnectWithStartPnt, isLeadIn );
+				LeadCADSegment.Add( leadInCAMSegment );
+				return LeadCADSegment;
+			}
+			return LeadCADSegment;
+		}
 
+		public static Geom_Curve BuildLeadGeom( bool isLeadIn, LeadLineType leadLineType, CAMPoint2 pntConnectWithLead, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, out gp_Pnt leadEndPnt, out gp_Pnt leadMidPnt, out gp_Dir leadDir )
+		{
+			if( isLeadIn ) {
+				return BuildLeadGeomByParam( true, leadLineType, pntConnectWithLead, dLeadLineLength, dLeadLineAngle, isChangeLeadDirection, isReverse , out leadEndPnt, out  leadMidPnt, out  leadDir );
+			}
+			return BuildLeadGeomByParam( false, leadLineType, pntConnectWithLead, dLeadLineLength, dLeadLineAngle, isChangeLeadDirection, isReverse, out leadEndPnt, out  leadMidPnt, out  leadDir );
+		}
+
+		static Geom_Curve BuildStraightLead( CAMPoint2 pntConnectWithPath, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, out gp_Pnt leadLineEndPoint, out gp_Dir leadDir )
+		{
+			leadLineEndPoint = new gp_Pnt();
+			leadDir = new gp_Dir();
 			// protection 
-			if( StraightLeadStartOrEndPoint == null || dLeadLineLength == 0 ) {
-				return StraightLeadCAMPointList;
+			if( dLeadLineLength <= 0 ) {
+				return null;
 			}
 
 			//  establish a coordinate system through this point and its direction vector and normal vector
-			CAMPoint startPoint = StraightLeadStartOrEndPoint;
-			gp_Dir XVec = new gp_Dir( -startPoint.CADPoint.TangentVec.X(), -startPoint.CADPoint.TangentVec.Y(), -startPoint.CADPoint.TangentVec.Z() );
-			gp_Dir ZVec = startPoint.ToolVec;
-			gp_Ax3 planeCS = new gp_Ax3( startPoint.CADPoint.Point, ZVec, XVec );
+			gp_Dir XVec = new gp_Dir( -pntConnectWithPath.TangentVec.X(), -pntConnectWithPath.TangentVec.Y(), -pntConnectWithPath.TangentVec.Z() );
+			gp_Dir ZVec = pntConnectWithPath.ToolVec;
+			if( GeometryTool.IsParallel( XVec, ZVec ) ) {
+				return null;
+			}
+			gp_Ax3 planeCS = new gp_Ax3( pntConnectWithPath.Point, ZVec, XVec );
 
 			gp_Dir xDir = planeCS.XDirection();
 			gp_Dir yDir = planeCS.YDirection();
@@ -35,13 +61,14 @@ namespace MyCAM.Helper
 
 			// vector to remove from original point to the lead line end point
 			gp_Vec dirVec2D = new gp_Vec( xDir ).Multiplied( cosA ) + new gp_Vec( yDir ).Multiplied( sinA );
-			gp_Pnt leadLineEndPoint = startPoint.CADPoint.Point.Translated( dirVec2D.Multiplied( dLeadLineLength ) );
+			leadLineEndPoint = pntConnectWithPath.Point.Translated( dirVec2D.Multiplied( dLeadLineLength ) );
 
 			// flip by y axis
 			if( ( isLeadIn == false && isReverse == false ) || ( isLeadIn && isReverse ) ) {
 				gp_Trsf mirrorTrsf = new gp_Trsf();
 				mirrorTrsf.SetMirror( new gp_Ax1( planeCS.Location(), planeCS.YDirection() ) );
 				leadLineEndPoint.Transform( mirrorTrsf );
+
 			}
 
 			// flip by x axis
@@ -50,52 +77,39 @@ namespace MyCAM.Helper
 				mirrorTrsf.SetMirror( new gp_Ax1( planeCS.Location(), planeCS.XDirection() ) );
 				leadLineEndPoint.Transform( mirrorTrsf );
 			}
-			gp_Dir endPointVector;
 
-			// path new point -> start point
+			gp_Vec startToEndVec = new gp_Vec( pntConnectWithPath.Point, leadLineEndPoint );
+			gp_Dir startToEndDir = new gp_Dir( startToEndVec );
+
+
+			Geom_Line geomLine = new Geom_Line( pntConnectWithPath.Point, startToEndDir );
+			Geom_TrimmedCurve trimmedLine = new Geom_TrimmedCurve( geomLine, 0, pntConnectWithPath.Point.Distance( leadLineEndPoint ) );
+			leadDir = startToEndDir;
 			if( isLeadIn ) {
-				endPointVector = new gp_Dir( new gp_Vec( leadLineEndPoint, startPoint.CADPoint.Point ) );
+				leadDir.Reverse();
 			}
-
-			// path end point -> new point
-			else {
-				endPointVector = new gp_Dir( new gp_Vec( startPoint.CADPoint.Point, leadLineEndPoint ) );
-			}
-
-			// split lead line to several points
-			List<gp_Pnt> leadPointList = Get2PntSegmentPnt( leadLineEndPoint, startPoint.CADPoint.Point, 1 );
-
-
-			for( int i = 0; i < leadPointList.Count; i++ ) {
-				CADPoint leadPoint = new CADPoint(
-				leadPointList[ i ],
-				startPoint.CADPoint.NormalVec_1st,
-				startPoint.CADPoint.NormalVec_2nd,
-				endPointVector
-				);
-				CAMPoint leadCAMPoint = new CAMPoint( leadPoint, startPoint.ToolVec );
-				StraightLeadCAMPointList.Add( leadCAMPoint );
-			}
-
-			// lead out start point is path end point
-			if( isLeadIn == false ) {
-				StraightLeadCAMPointList.Reverse();
-			}
-			return StraightLeadCAMPointList;
+			return trimmedLine;
 		}
 
-		// when isLeadIn, the input point is start of path, and is end of lead in
-		public static List<CAMPoint> BuildArcLeadLine( CAMPoint CurveLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, double dDeflection, double dMaxLength )
+		static Geom_Curve BuildArcLead( CAMPoint2 pntConnectWithPath, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, out gp_Pnt leadEndPnt, out gp_Pnt leadMidPnt, out gp_Dir leadDir )
 		{
+			leadEndPnt = new gp_Pnt();
+			leadMidPnt = new gp_Pnt();
+			leadDir = new gp_Dir();
+
 			// protection
-			if( CurveLeadStartOrEndPoint == null || dLeadLineLength <= 0 || dLeadLineAngle <= 0 ) {
-				return new List<CAMPoint>();
+			if( dLeadLineLength <= 0 || dLeadLineAngle <= 0 ) {
+				return null;
 			}
 
 			//  establish a coordinate system through this point and its direction vector and normal vector
-			gp_Dir XVec = CurveLeadStartOrEndPoint.CADPoint.TangentVec;
-			gp_Dir ZVec = CurveLeadStartOrEndPoint.ToolVec;
-			gp_Ax3 leadLinePlane = new gp_Ax3( CurveLeadStartOrEndPoint.CADPoint.Point, ZVec, XVec );
+			gp_Dir XVec = pntConnectWithPath.TangentVec;
+			gp_Dir ZVec = pntConnectWithPath.ToolVec;
+			if( GeometryTool.IsParallel( XVec, ZVec ) ) {
+				return null;
+			}
+
+			gp_Ax3 leadLinePlane = new gp_Ax3( pntConnectWithPath.Point, ZVec, XVec );
 
 			// circle center shifted along -Y
 			gp_Vec movingDirection = new gp_Vec( leadLinePlane.YDirection() );
@@ -122,157 +136,107 @@ namespace MyCAM.Helper
 				leadLineCurve = new Geom_TrimmedCurve( geomCircle, dArcAngle, Math.PI * 2, true );
 			}
 
-			// split the curve into points
-			GetCurveSegmentPointsWithTangent( leadLineCurve, circleCenterPnt, ZVec, out List<gp_Pnt> pts, out List<gp_Dir> tangentDirList, dDeflection, dMaxLength );
-
-			// because all cuver start at the point which lead connect with main path, but that should be last point
-			pts.Reverse();
-			tangentDirList.Reverse();
-
 			// mirror by y axis
 			if( isReverse ) {
-				gp_Ax1 mirrorAxisY = new gp_Ax1( leadLinePlane.Location(), leadLinePlane.YDirection() );
-				gp_Trsf mirrorTrsf = new gp_Trsf();
-				mirrorTrsf.SetMirror( mirrorAxisY );
-				for( int i = 0; i < pts.Count; i++ ) {
-
-					// mirror point
-					pts[ i ].Transform( mirrorTrsf );
-
-					// mirror tangent vec
-					tangentDirList[ i ] = new gp_Dir( new gp_Vec( tangentDirList[ i ] ).Transformed( mirrorTrsf ) );
-				}
+				gp_Trsf mirror = new gp_Trsf();
+				mirror.SetMirror( new gp_Ax1( leadLinePlane.Location(), leadLinePlane.YDirection() ) );
+				leadLineCurve.Transform( mirror );
 			}
 
 			// mirror by x axis
 			if( isChangeLeadDirection ) {
-				gp_Ax1 mirrorAxisX = new gp_Ax1( leadLinePlane.Location(), leadLinePlane.XDirection() );
-				gp_Trsf mirrorTrsf = new gp_Trsf();
-				mirrorTrsf.SetMirror( mirrorAxisX );
-				for( int i = 0; i < pts.Count; i++ ) {
-					pts[ i ].Transform( mirrorTrsf );
-					tangentDirList[ i ] = new gp_Dir( new gp_Vec( tangentDirList[ i ] ).Transformed( mirrorTrsf ) );
-				}
+				gp_Trsf mirror = new gp_Trsf();
+				mirror.SetMirror( new gp_Ax1( leadLinePlane.Location(), leadLinePlane.XDirection() ) );
+				leadLineCurve.Transform( mirror );
 			}
+			gp_Vec tangentVec = new gp_Vec();
+			leadMidPnt = leadLineCurve.Value( ( leadLineCurve.LastParameter() + leadLineCurve.FirstParameter() ) * 0.5 );
 
-			// create cad cam data
-			List<CAMPoint> resultList = new List<CAMPoint>();
-			for( int i = 0; i < pts.Count; i++ ) {
-
-				CADPoint leadPoint = new CADPoint(
-				pts[ i ],
-				CurveLeadStartOrEndPoint.ToolVec,
-				CurveLeadStartOrEndPoint.ToolVec,
-				tangentDirList[ i ]
-				);
-				CAMPoint leadCAMPoint = new CAMPoint( leadPoint, CurveLeadStartOrEndPoint.ToolVec );
-				resultList.Add( leadCAMPoint );
+			if( isLeadIn ) {
+				leadLineCurve.D1( leadLineCurve.LastParameter(), ref leadEndPnt, ref tangentVec );
 			}
-			return resultList;
+			else {
+				leadLineCurve.D1( leadLineCurve.FirstParameter(), ref leadEndPnt, ref tangentVec );
+			}
+			tangentVec.Reverse();
+			leadDir = new gp_Dir( tangentVec );
+			return leadLineCurve;
 		}
 
-		static List<gp_Pnt> Get2PntSegmentPnt( gp_Pnt currentPnt, gp_Pnt nextPnt, double stepLength )
+		static Geom_Curve BuildLeadGeomByParam( bool isLeadIn, LeadLineType leadLineType, CAMPoint2 pntConnectWithLead, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, out gp_Pnt leadEndPnt, out gp_Pnt leadMidPnt, out gp_Dir leadDir )
 		{
-			List<gp_Pnt> pntList = new List<gp_Pnt>();
-			gp_Vec dirVec = new gp_Vec( currentPnt, nextPnt );
-			double totalLength = dirVec.Magnitude();
-
-			// too short
-			if( totalLength < Precision.Confusion() ) {
-				pntList.Add( new gp_Pnt( currentPnt.X(), currentPnt.Y(), currentPnt.Z() ) );
-				return pntList;
+			leadDir = new gp_Dir();
+			leadEndPnt = new gp_Pnt();
+			leadMidPnt = new gp_Pnt();
+			if( leadLineType == LeadLineType.Line ) {
+				return BuildStraightLead( pntConnectWithLead, isLeadIn, dLeadLineLength, dLeadLineAngle, isChangeLeadDirection, isReverse, out leadEndPnt, out leadDir );
 			}
-			gp_Dir dir = new gp_Dir( dirVec );
-			int nTotalSegmentCount = (int)Math.Floor( totalLength / stepLength );
-
-			// firt point
-			pntList.Add( new gp_Pnt( currentPnt.X(), currentPnt.Y(), currentPnt.Z() ) );
-
-			// split each segment
-			for( int i = 1; i < nTotalSegmentCount; i++ ) {
-				gp_Pnt pi = new gp_Pnt(
-					currentPnt.X() + dir.X() * stepLength * i,
-					currentPnt.Y() + dir.Y() * stepLength * i,
-					currentPnt.Z() + dir.Z() * stepLength * i
-				);
-				pntList.Add( pi );
+			if( leadLineType == LeadLineType.Arc ) {
+				return BuildArcLead( pntConnectWithLead, isLeadIn, dLeadLineLength, dLeadLineAngle, isChangeLeadDirection, isReverse, out leadEndPnt, out leadMidPnt, out leadDir );
 			}
-			pntList.Add( new gp_Pnt( nextPnt.X(), nextPnt.Y(), nextPnt.Z() ) );
-			return pntList;
+			return null;
 		}
 
-		static void GetCurveSegmentPointsWithTangent( Geom_TrimmedCurve curve, gp_Pnt circleCenter, gp_Dir circleNormal, out List<gp_Pnt> pointList, out List<gp_Dir> tangentList, double dDeflection, double dMaxLength )
+		static ICAMSegmentElement BuildLeadCADSegment( CraftData craftData, ICAMSegmentElement CAMSegConnectWithLead, bool isLeadin )
 		{
-			pointList = new List<gp_Pnt>();
-			tangentList = new List<gp_Dir>();
-			if( curve == null || dDeflection <= 0 || dMaxLength <= 0 ) {
-				return;
+			CAMPoint2 pntConnectWithPath;
+			gp_Dir LeadToolVec;
+
+			// is leadout and with over cut
+			if( isLeadin == false && craftData.OverCutLength > 0 && CAMSegConnectWithLead != null ) {
+				pntConnectWithPath = CAMSegConnectWithLead.EndPoint;
+				LeadToolVec = CAMSegConnectWithLead.EndPoint.ToolVec;
 			}
-			double first = curve.FirstParameter();
-			double last = curve.LastParameter();
-
-			// wrap the curve with an adaptor to calculate arc length
-			GeomAdaptor_Curve gac = new GeomAdaptor_Curve( curve, first, last );
-			double totalLength = GCPnts_AbscissaPoint.Length( gac, first, last, 1.0e-7 );
-			double radius = circleCenter.Distance( curve.Value( first ) );
-
-			// calculate the length of each arc segment based on the chord height tolerance
-			double dArcMax = 2.0 * Math.Acos( Math.Max( 0.0, 1.0 - dDeflection / radius ) );
-			double dStepLength = radius * dArcMax;
-
-			// ensure dStepLength not greater than maxStepLength
-			dStepLength = Math.Min( dStepLength, dMaxLength );
-			int nTotalSegmentCount = (int)Math.Ceiling( totalLength / dStepLength );
-
-			// start point
-			gp_Pnt startpoint = new gp_Pnt();
-			gp_Vec startPointTangentVec = new gp_Vec();
-			curve.D1( first, ref startpoint, ref startPointTangentVec );
-			pointList.Add( startpoint );
-
-			// right-hand rule will be counterclockwise, so it needs to be turned clockwise.
-			gp_Dir tangentDir = new gp_Dir( startPointTangentVec );
-			tangentDir.Reverse();
-			tangentList.Add( tangentDir );
-
-			// each point
-			for( int i = 1; i <= nTotalSegmentCount - 1; i++ ) {
-				double targetLen = i * dStepLength;
-
-				// arc length exceeds the total length of the curve, set as the end point of the curve
-				if( targetLen > totalLength ) {
-					targetLen = totalLength;
-				}
-
-				// according to the target arc length to get u param
-				GCPnts_AbscissaPoint arcParam = new GCPnts_AbscissaPoint( gac, targetLen, first, 1.0e-7, 1000 );
-				if( !arcParam.IsDone() ) break;
-				double dCurveParamU = arcParam.Parameter();
-
-				// get point
-				gp_Pnt middlePoint = new gp_Pnt();
-				gp_Vec middlePointTangentVec = new gp_Vec();
-				curve.D1( dCurveParamU, ref middlePoint, ref middlePointTangentVec );
-
-				// avoid overlap point
-				if( pointList.Count == 0 || middlePoint.Distance( pointList[ pointList.Count - 1 ] ) > 1.0e-9 ) {
-					pointList.Add( middlePoint );
-					gp_Dir middliePointTangentDir = new gp_Dir( middlePointTangentVec );
-					middliePointTangentDir.Reverse();
-					tangentList.Add( middliePointTangentDir );
-				}
+			else {
+				pntConnectWithPath = CAMSegConnectWithLead.StartPoint;
+				LeadToolVec = CAMSegConnectWithLead.StartPoint.ToolVec;
 			}
 
-			// end point
-			gp_Pnt pEnd = new gp_Pnt();
-			gp_Vec vEnd = new gp_Vec();
-			curve.D1( last, ref pEnd, ref vEnd );
-			if( pointList.Count == 0 || pEnd.Distance( pointList[ pointList.Count - 1 ] ) > 1.0e-9 ) {
-				pointList.Add( pEnd );
-				tangentDir = new gp_Dir( vEnd );
-				tangentDir.Reverse();
-				tangentList.Add( tangentDir );
+			LeadParam leadParam = isLeadin ? craftData.LeadLineParam.LeadIn : craftData.LeadLineParam.LeadOut;
+
+			// draw arc / line lead
+			if( leadParam.Type == LeadLineType.Line ) {
+				LeadHelper.BuildStraightLead(
+					pntConnectWithPath, isLeadin,
+					leadParam.Length, leadParam.Angle,
+					craftData.LeadLineParam.IsChangeLeadDirection, craftData.IsReverse,
+					out gp_Pnt endPnt, out _
+				);
+
+
+				// start point and end point
+				var leadPoints = isLeadin
+					? new List<gp_Pnt> { endPnt, pntConnectWithPath.Point }     // Lead In：from outside to start point
+					: new List<gp_Pnt> { pntConnectWithPath.Point, endPnt };     // Lead Out： from start point to outside
+
+				return CreateLeadCAMSegment( leadPoints, LeadToolVec );
 			}
+			else if( leadParam.Type == LeadLineType.Arc ) {
+				LeadHelper.BuildArcLead(
+					 pntConnectWithPath, isLeadin,
+					leadParam.Length, leadParam.Angle,
+					craftData.LeadLineParam.IsChangeLeadDirection, craftData.IsReverse,
+					out gp_Pnt endPnt, out gp_Pnt midPnt, out _
+				);
+				var leadPoints = isLeadin
+					? new List<gp_Pnt> { endPnt, midPnt, pntConnectWithPath.Point }    // Lead In
+					: new List<gp_Pnt> { pntConnectWithPath.Point, midPnt, endPnt };   // Lead Out
+
+				return CreateArcLeadCAMSegment( leadPoints, LeadToolVec );
+			}
+			return null;
+		}
+
+		static LineCAMSegment CreateLeadCAMSegment( List<gp_Pnt> points, gp_Dir toolVec )
+		{
+			List<CAMPoint2> camPointList = points.Select( p => new CAMPoint2( p, toolVec, toolVec, toolVec, toolVec ) ).ToList();
+			return new LineCAMSegment( camPointList, 0, 0, 0 );
+		}
+
+		static ArcCAMSegment CreateArcLeadCAMSegment( List<gp_Pnt> points, gp_Dir toolVec )
+		{
+			List<CAMPoint2> camPointList = points.Select( p => new CAMPoint2( p, toolVec, toolVec, toolVec, toolVec ) ).ToList();
+			return new ArcCAMSegment( camPointList, 0, 0, 0 );
 		}
 	}
 }

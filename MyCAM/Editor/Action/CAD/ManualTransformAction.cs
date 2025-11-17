@@ -408,6 +408,5 @@ namespace MyCAM.Editor
 
 		TopoDS_Shape m_G54Shape;
 		List<AIS_Shape> m_G54AISList;
-		bool m_IsControlPress = false;
 	}
 }

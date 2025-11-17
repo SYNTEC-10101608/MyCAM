@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
-	public struct SegmentPointIndex
+	public struct SegmentPointIndex : IComparable<SegmentPointIndex>
 	{
 		public int SegIdx;   // Segment Index
 		public int PntIdx;   // Point Index
@@ -32,6 +32,23 @@ namespace MyCAM.Data
 			return (SegIdx, PntIdx).GetHashCode();
 		}
 
+		public int CompareTo( SegmentPointIndex other )
+		{
+			// compare with other segment index
+			if( other == null ) {
+				return 1;
+			}
+
+			//this.SegIdx < other.SegIdx → cmpResult = -1
+			//this.SegIdx > other.SegIdx → cmpResult = 1
+			int cmpResult = this.SegIdx.CompareTo( other.SegIdx );
+			if( cmpResult != 0 ) {
+				return cmpResult;
+			}
+
+			return this.PntIdx.CompareTo( other.PntIdx );
+		}
+
 		public static bool operator ==( SegmentPointIndex a, SegmentPointIndex b )
 		{
 			return a.SegIdx == b.SegIdx && a.PntIdx == b.PntIdx;
@@ -53,7 +70,7 @@ namespace MyCAM.Data
 		}
 
 		// this constructor is used when reading from file
-		public CraftData( string szUID, LeadData leadData, int startPoint, double overCutLength, bool isReverse, bool isClosed, TraverseData traverseData, Dictionary<int, Tuple<double, double>> toolVecModifyMap, bool isToolVecReverse )
+		public CraftData( string szUID, LeadData leadData, SegmentPointIndex startPoint, double overCutLength, bool isReverse, bool isClosed, TraverseData traverseData, Dictionary<SegmentPointIndex, Tuple<double, double>> toolVecModifyMap, bool isToolVecReverse )
 		{
 			UID = szUID;
 			m_LeadParam = leadData;
@@ -61,7 +78,7 @@ namespace MyCAM.Data
 			m_OverCutLength = overCutLength;
 			m_IsReverse = isReverse;
 			m_TraverseData = traverseData;
-			m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>( toolVecModifyMap );
+			m_ToolVecModifyMap = new Dictionary<SegmentPointIndex, Tuple<double, double>>( toolVecModifyMap );
 			m_IsToolVecReverse = isToolVecReverse;
 			m_LeadParam.LeadPropertyChanged += MultiLevelParameterChanged;
 			m_TraverseData.TraverseParameterChanged += MultiLevelParameterChanged;
@@ -193,21 +210,21 @@ namespace MyCAM.Data
 		}
 
 		// API for outside modification
-		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg )
+		public void SetToolVecModify( SegmentPointIndex segmentPointIndex, double dRA_deg, double dRB_deg )
 		{
-			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				m_ToolVecModifyMap[ index ] = new Tuple<double, double>( dRA_deg, dRB_deg );
+			if( m_ToolVecModifyMap.ContainsKey( segmentPointIndex ) ) {
+				m_ToolVecModifyMap[ segmentPointIndex ] = new Tuple<double, double>( dRA_deg, dRB_deg );
 			}
 			else {
-				m_ToolVecModifyMap.Add( index, new Tuple<double, double>( dRA_deg, dRB_deg ) );
+				m_ToolVecModifyMap.Add( segmentPointIndex, new Tuple<double, double>( dRA_deg, dRB_deg ) );
 			}
 			ParameterChanged?.Invoke();
 		}
 
-		public void RemoveToolVecModify( int index )
+		public void RemoveToolVecModify( SegmentPointIndex SegmentPointIndex )
 		{
-			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				m_ToolVecModifyMap.Remove( index );
+			if( m_ToolVecModifyMap.ContainsKey( SegmentPointIndex ) ) {
+				m_ToolVecModifyMap.Remove( SegmentPointIndex );
 			}
 			ParameterChanged?.Invoke();
 		}

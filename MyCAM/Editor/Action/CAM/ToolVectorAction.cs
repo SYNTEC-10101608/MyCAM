@@ -1,4 +1,7 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.CacheInfo;
 using MyCAM.Data;
 using OCC.AIS;
@@ -7,9 +10,6 @@ using OCC.Prs3d;
 using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -45,8 +45,8 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			int nIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
-			if( nIndex == -1 ) {
+			SegmentPointIndex nIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
+			if( nIndex == new SegmentPointIndex( -1, -1 ) ) {
 				return;
 			}
 
@@ -125,13 +125,13 @@ namespace MyCAM.Editor
 			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
-		void SetToolVecParam( int VecIndex, ToolVecParam toolVecParam )
+		void SetToolVecParam( SegmentPointIndex VecSegmentIndex, ToolVecParam toolVecParam )
 		{
 			if( !toolVecParam.IsModified ) {
-				m_CraftData.RemoveToolVecModify( VecIndex );
+				m_CraftData.RemoveToolVecModify( VecSegmentIndex );
 				return;
 			}
-			m_CraftData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
+			m_CraftData.SetToolVecModify( VecSegmentIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
 		}
 
 		void DrawVertexOnViewer( TopoDS_Shape selectedVertex )
