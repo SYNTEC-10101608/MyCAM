@@ -103,4 +103,27 @@ namespace MyCAM.Data
 			return newPoint;
 		}
 	}
+
+	internal class PathNCPackage
+	{
+		public List<ICAMSegmentElement> LeadInSegment
+		{
+			get; set;
+		}
+
+		public List<ICAMSegmentElement> MainPathSegment
+		{
+			get; set;
+		}
+
+		public List<ICAMSegmentElement> OverCutSegment
+		{
+			get; set;
+		}
+
+		public List<ICAMSegmentElement> LeadOutSegment
+		{
+			get; set;
+		}
+	}
 }

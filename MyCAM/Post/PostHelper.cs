@@ -1,9 +1,9 @@
-﻿using MyCAM.CacheInfo;
+﻿using System;
+using System.Collections.Generic;
+using MyCAM.CacheInfo;
 using MyCAM.Data;
 using MyCAM.Helper;
 using OCC.gp;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Post
 {
@@ -51,6 +51,7 @@ namespace MyCAM.Post
 			bool bStart = false;
 
 			/*
+
 			// lead-in
 			if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None && currentCAMData.LeadInCAMPointList.Count > 0 ) {
 				if( !SolveProcessPath( postSolver, currentCAMData.LeadInCAMPointList,
@@ -124,8 +125,10 @@ namespace MyCAM.Post
 				Slave = dLastPointProcess_S
 			};
 			*/
+
 			return true;
 		}
+
 
 		public static void CalculateExit( PathEndInfo endInfoOfLastPath, EntryAndExitData entryAndExitData,
 			out PostPoint G54ExitPoint, out PostPoint MCSExitPoint )

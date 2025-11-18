@@ -179,19 +179,8 @@ namespace MyCAM.Helper
 
 		static ICAMSegmentElement BuildLeadCADSegment( CraftData craftData, ICAMSegmentElement CAMSegConnectWithLead, bool isLeadin )
 		{
-			CAMPoint2 pntConnectWithPath;
-			gp_Dir LeadToolVec;
-
-			// is leadout and with over cut
-			if( isLeadin == false && craftData.OverCutLength > 0 && CAMSegConnectWithLead != null ) {
-				pntConnectWithPath = CAMSegConnectWithLead.EndPoint;
-				LeadToolVec = CAMSegConnectWithLead.EndPoint.ToolVec;
-			}
-			else {
-				pntConnectWithPath = CAMSegConnectWithLead.StartPoint;
-				LeadToolVec = CAMSegConnectWithLead.StartPoint.ToolVec;
-			}
-
+			CAMPoint2 pntConnectWithPath = isLeadin ? CAMSegConnectWithLead.StartPoint: CAMSegConnectWithLead.EndPoint;
+			gp_Dir LeadToolVec = pntConnectWithPath.ToolVec;
 			LeadParam leadParam = isLeadin ? craftData.LeadLineParam.LeadIn : craftData.LeadLineParam.LeadOut;
 
 			// draw arc / line lead
@@ -202,7 +191,6 @@ namespace MyCAM.Helper
 					craftData.LeadLineParam.IsChangeLeadDirection, craftData.IsReverse,
 					out gp_Pnt endPnt, out _
 				);
-
 
 				// start point and end point
 				var leadPoints = isLeadin

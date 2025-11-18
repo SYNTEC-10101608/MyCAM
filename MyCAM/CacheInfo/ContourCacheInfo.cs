@@ -68,6 +68,31 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
+
+		public List<ICAMSegmentElement> LeadInSegment
+		{
+			get
+			{
+				if( m_IsCraftDataDirty ) {
+					BuildPathCAMSegment();
+					BuildCAMFeatureSegment();
+				}
+				return m_LeadInSegmentList;
+			}
+		} 
+
+		public List<ICAMSegmentElement> LeadOutSegment
+		{
+			get
+			{
+				if( m_IsCraftDataDirty ) {
+					BuildPathCAMSegment();
+					BuildCAMFeatureSegment();
+				}
+				return m_LeadOutSegmentList;
+			}
+		}
+
 		public List<ICAMSegmentElement> OverCutSegment
 		{
 			get
@@ -103,15 +128,12 @@ namespace MyCAM.CacheInfo
 				BuildCAMFeatureSegment();
 			}
 			CAMPoint camPoint = null;
-			ICAMSegmentElement camSegmentConnectWithStartPnt = CAMSegmentList.FirstOrDefault();
-
-
+			ICAMSegmentElement camSegmentConnectWithStartPnt = null;
 			if( m_CraftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
-				List<ICAMSegmentElement> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithStartPnt, true );
-				CAMPoint2 camPoint1 = leadCAMSegment.FirstOrDefault()?.StartPoint;
-				CADPoint cadPoint1 = new CADPoint( camPoint1.Point, camPoint1.NormalVec_1st, camPoint1.NormalVec_2nd, camPoint1.TangentVec );
-				camPoint = new CAMPoint( cadPoint1, camPoint1.ToolVec );
-				return camPoint;
+				camSegmentConnectWithStartPnt = LeadInSegment.First();
+			}
+			else {
+				camSegmentConnectWithStartPnt = CAMSegmentList.First(); ;
 			}
 			CAMPoint2 camPoint2 = camSegmentConnectWithStartPnt.StartPoint;
 			CADPoint cadPOint2 = new CADPoint( camPoint2.Point, camPoint2.NormalVec_1st, camPoint2.NormalVec_2nd, camPoint2.TangentVec );
@@ -120,17 +142,17 @@ namespace MyCAM.CacheInfo
 		}
 
 		public CAMPoint GetProcessEndPoint()
-		{
+		 {
 			if( m_IsCraftDataDirty ) {
 				BuildPathCAMSegment();
 				BuildCAMFeatureSegment();
 			}
 			CAMPoint camPoint = null;
 			ICAMSegmentElement camSegmentConnectWithEndPnt = null;
-
-			// with lead out
 			if( m_CraftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
-
+				camSegmentConnectWithEndPnt = LeadOutSegment.Last();
+			}
+			else {
 				// with overcut
 				if( m_CraftData.OverCutLength > 0 && m_OverCutSegmentList.Count > 0 ) {
 					camSegmentConnectWithEndPnt = m_OverCutSegmentList.Last();
@@ -138,21 +160,8 @@ namespace MyCAM.CacheInfo
 				else {
 					camSegmentConnectWithEndPnt = CAMSegmentList.Last();
 				}
-				List<ICAMSegmentElement> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithEndPnt, false );
-				CAMPoint2 leadOutLastPoint = leadCAMSegment.LastOrDefault()?.EndPoint;
-				CADPoint cadPoint = new CADPoint( leadOutLastPoint.Point, leadOutLastPoint.NormalVec_1st, leadOutLastPoint.NormalVec_2nd, leadOutLastPoint.TangentVec );
-				camPoint = new CAMPoint( cadPoint, leadOutLastPoint.ToolVec );
-				return camPoint;
 			}
-
-			// with over cut
-			if( m_CraftData.OverCutLength > 0 && m_OverCutSegmentList.Count > 0 ) {
-				CAMPoint2 overCutLastPnt = m_OverCutSegmentList.Last().EndPoint;
-				CADPoint cadPoint = new CADPoint( overCutLastPnt.Point, overCutLastPnt.NormalVec_1st, overCutLastPnt.NormalVec_2nd, overCutLastPnt.TangentVec );
-				camPoint = new CAMPoint( cadPoint, overCutLastPnt.ToolVec );
-				return camPoint;
-			}
-			CAMPoint2 camEndPoint = CAMSegmentList[ 0 ].StartPoint;
+			CAMPoint2 camEndPoint = camSegmentConnectWithEndPnt.EndPoint;
 			CADPoint cadEndPnt = new CADPoint( camEndPoint.Point, camEndPoint.NormalVec_1st, camEndPoint.NormalVec_2nd, camEndPoint.TangentVec );
 			camPoint = new CAMPoint( cadEndPnt, camEndPoint.ToolVec );
 			return camPoint;
@@ -201,6 +210,7 @@ namespace MyCAM.CacheInfo
 		void BuildCAMFeatureSegment()
 		{
 			SetOverCut();
+			SetLead();
 		}
 
 		List<ICAMSegmentElement> BreakAndReorderByStartPoint()
@@ -666,12 +676,34 @@ namespace MyCAM.CacheInfo
 			return resultDir;
 		}
 
-
 		#endregion
+
+		void SetLead()
+		{
+			if( m_CraftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
+				ICAMSegmentElement camSegmentConnectWithStartPnt = CAMSegmentList.FirstOrDefault();
+				List<ICAMSegmentElement> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithStartPnt, true );
+				m_LeadInSegmentList = leadCAMSegment;
+			}
+			if (m_CraftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
+				ICAMSegmentElement camSegmentConnectWithEndPnt;
+				// with overcut
+				if( m_CraftData.OverCutLength > 0 && m_OverCutSegmentList.Count > 0 ) {
+					camSegmentConnectWithEndPnt = m_OverCutSegmentList.Last();
+				}
+				else {
+					camSegmentConnectWithEndPnt = CAMSegmentList.Last();
+				}
+				List<ICAMSegmentElement> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithEndPnt, false );
+				m_LeadOutSegmentList = leadCAMSegment;
+			}
+		}
 
 		List<ICAMSegmentElement> m_CAMSegmentList = new List<ICAMSegmentElement>();
 		List<int> m_CtrlToolSegIdxList = new List<int>();
 		List<ICAMSegmentElement> m_OverCutSegmentList = new List<ICAMSegmentElement>();
+		List<ICAMSegmentElement> m_LeadInSegmentList = new List<ICAMSegmentElement>();
+		List<ICAMSegmentElement> m_LeadOutSegmentList = new List<ICAMSegmentElement>();
 
 		// they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
