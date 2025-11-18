@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using MyCAM.CacheInfo;
 using MyCAM.Data;
 using OCC.BRep;
 using OCC.BRepTools;
@@ -293,12 +292,6 @@ namespace MyCAM.FileManager
 			set;
 		} = new List<CADSegmentDTO>();
 
-		public List<int> CtrlToolSegIdxList
-		{
-			get;
-			set;
-		} = new List<int>();
-
 		internal ContourPathObjectDTO()
 		{
 		}
@@ -314,14 +307,11 @@ namespace MyCAM.FileManager
 			PathType = PathType.Contour;
 
 			// this path
-			if( pathObject is ContourPathObject contourPathObject) {
+			if( pathObject is ContourPathObject contourPathObject ) {
 
-				// Segment → DTO
+				// segment to DTO
 				CADSegmentList = ( contourPathObject.CADSegmentList ?? new List<ICADSegmentElement>() )
 					.Select( seg => new CADSegmentDTO( seg ) )
-					.ToList();
-				// Control index list
-				CtrlToolSegIdxList = ( contourPathObject.ContourCacheInfo?.CtrlToolSegIdxList ?? new List<int>() )
 					.ToList();
 			}
 			else {
@@ -340,7 +330,6 @@ namespace MyCAM.FileManager
 			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
 			CraftData craftData = CraftData.ToCraftData();
 			List<ICADSegmentElement> pathCADSegmentList = CADSegmentList.Select( cadPointDTO => cadPointDTO.ToCADSegment() ).ToList();
-			List<int> contorlToolSegIdxList = CtrlToolSegIdxList.Select( idx => idx ).ToList();
 			return new ContourPathObject( UID, shape, pathCADSegmentList, craftData );
 		}
 	}

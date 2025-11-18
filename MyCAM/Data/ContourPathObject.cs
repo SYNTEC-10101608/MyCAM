@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using MyCAM.App;
 using MyCAM.CacheInfo;
 using MyCAM.Helper;
-using OCC.BOPTools;
 using OCC.BRep;
-using OCC.BRepAdaptor;
-using OCC.GCPnts;
 using OCC.gp;
-using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCCTool;
@@ -28,14 +23,13 @@ namespace MyCAM.Data
 
 			bool isClosed = DetermineIfClosed( shape );
 			m_CADSegmentList = BuildCADSegment( pathDataList, isClosed );
-			Console.WriteLine( m_CADSegmentList.Count );
 			m_CraftData = new CraftData( szUID );
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADSegmentList, m_CraftData, isClosed );
-			m_CraftData.StartPointIndex = new SegmentPointIndex(m_CADSegmentList.Count - 1, m_CADSegmentList[ CADSegmentList.Count - 1 ].PointList.Count - 1);
+			m_CraftData.StartPointIndex = new SegmentPointIndex( m_CADSegmentList.Count - 1, m_CADSegmentList[ CADSegmentList.Count - 1 ].PointList.Count - 1 );
 		}
 
 		// this is for the file read constructor
-		public ContourPathObject( string szUID, TopoDS_Shape shape, List<ICADSegmentElement> cadSegmentList, CraftData craftData )
+		public ContourPathObject( string szUID, TopoDS_Shape shape, List<ICADSegmentElement> cadSegmentList, CraftData craftData)
 			: base( szUID, shape )
 		{
 			if( string.IsNullOrEmpty( szUID ) || shape == null || cadSegmentList == null || cadSegmentList.Count == 0 || craftData == null ) {
@@ -122,7 +116,7 @@ namespace MyCAM.Data
 					if( cadPointList == null || cadPointList.Count == 0 ) {
 						continue;
 					}
-					
+
 					for( int j = 0; j < cadPointList.Count; j++ ) {
 						bool buildSuccess = CADCAMSegmentBuilder.BuildCADSegment( cadPointList[ j ], EContourType.Arc, eachSegmentLength[ j ], dEachArcLength[ j ], dEachChordLength[ j ], out ICADSegmentElement cadSegment );
 						if( buildSuccess ) {
