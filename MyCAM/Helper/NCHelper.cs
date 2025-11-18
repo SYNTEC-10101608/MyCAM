@@ -16,7 +16,15 @@ namespace MyCAM.Helper
 			ncPackage.MainPathSegment = contourCacheInfo.CAMSegmentList;
 			ncPackage.LeadInSegment = contourCacheInfo.LeadInSegment;
 			ncPackage.LeadOutSegment = contourCacheInfo.LeadOutSegment;
+			ncPackage.OverCutSegment = contourCacheInfo.OverCutSegment;
 			return true;
 		}
+
+		public static bool BuildPostPath()
+		{
+			return true;
+		}
+
+
 	}
 }

@@ -1,8 +1,9 @@
-﻿using MyCAM.CacheInfo;
-using MyCAM.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MyCAM.CacheInfo;
+using MyCAM.Data;
+using MyCAM.Helper;
 
 namespace MyCAM.Post
 {
@@ -53,11 +54,12 @@ namespace MyCAM.Post
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
 					for( int i = 0; i < m_ProcessCacheInfoList.Count; i++ ) {
+						bool isBuildSucces = NCHelper.BuildNCPackage( m_ProcessCacheInfoList[ i ], out PathNCPackage pathNCPackage );
 
 						// solve all post data of the path
-						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessCacheInfoList[ i ], m_CraftDataList[ i ],
+						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessCacheInfoList[ i ], pathNCPackage, m_CraftDataList[ i ],
 							endInfoOfPreviousPath, m_EntryAndExitData,
-							out PostData postData, out _, out endInfoOfPreviousPath ) ) {
+							out PathSegmentPostData postData, out _, out endInfoOfPreviousPath ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 							return false;
 						}
@@ -83,7 +85,7 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteCutting( PostData currentPathPostData, int N_Index )
+		void WriteCutting( PathSegmentPostData currentPathPostData, int N_Index )
 		{
 			// the N code
 			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
@@ -96,26 +98,53 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\" H1;" );
 
 			// write each process path
-			WriteOneProcessPath( currentPathPostData.LeadInPostPointList );
-			WriteOneProcessPath( currentPathPostData.MainPathPostPointList );
-			WriteOneProcessPath( currentPathPostData.OverCutPostPointList );
-			WriteOneProcessPath( currentPathPostData.LeadOutPostPointList );
+			WriteOneProcessPath( currentPathPostData.LeadInPostPath);
+			WriteOneProcessPath( currentPathPostData.MainPathPostPath );
+			WriteOneProcessPath( currentPathPostData.OverCutPostPath );
+			WriteOneProcessPath( currentPathPostData.LeadOutPostPath);
 
 			// end cutting
 			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" );
 			return;
 		}
 
-		void WriteOnePoint( PostPoint postPoint )
+		void WriteOneSegmentPath( PostPath segmentPostPath )
 		{
-			if( postPoint == null ) {
+			if( segmentPostPath is ArcPostPath arcPostPath ) {
+				WriteG02Path( arcPostPath );
 				return;
 			}
-			string szX = postPoint.X.ToString( "F3" );
-			string szY = postPoint.Y.ToString( "F3" );
-			string szZ = postPoint.Z.ToString( "F3" );
-			string szRotaryAxisCommand = GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI );
-			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand};" );
+			if( segmentPostPath is LinePostPath linePostPath ) {
+				WriteG01Path( linePostPath );
+			}
+		}
+
+		void WriteG02Path( ArcPostPath arcPostPath )
+		{
+			string szMidPointX = arcPostPath.MidPoint.X.ToString( "F3" );
+			string szMidPointY = arcPostPath.MidPoint.Y.ToString( "F3" );
+			string szMidPointZ = arcPostPath.MidPoint.Z.ToString( "F3" );
+			string szMidPointM = ( arcPostPath.MidPoint.Master * 180 / Math.PI ).ToString( "F3" );
+			string szMidPointS = ( arcPostPath.MidPoint.Slave * 180 / Math.PI ).ToString( "F3" );
+
+			// end point data
+			string szEndPointX = arcPostPath.EndPoint.X.ToString( "F3" );
+			string szEndPointY = arcPostPath.EndPoint.Y.ToString( "F3" );
+			string szEndPointZ = arcPostPath.EndPoint.Z.ToString( "F3" );
+			string szEndPointM = ( arcPostPath.EndPoint.Master * 180 / Math.PI ).ToString( "F3" );
+			string szEndPointS = ( arcPostPath.EndPoint.Slave * 180 / Math.PI ).ToString( "F3" );
+			m_StreamWriter.WriteLine( $"G65 P\"TPCI\" X1={szMidPointX} Y1={szMidPointY} Z1={szMidPointZ} {m_MasterAxisName}1={szMidPointM} {m_SlaveAxisName}1={szMidPointS} X2={szEndPointX} Y2={szEndPointY} Z2={szEndPointZ} {m_MasterAxisName}2={szEndPointM} {m_SlaveAxisName}2={szEndPointS};" );
+		}
+
+		void WriteG01Path( LinePostPath linePostPath )
+		{
+			string szX = linePostPath.EndPoint.X.ToString( "F3" );
+			string szY = linePostPath.EndPoint.Y.ToString( "F3" );
+			string szZ = linePostPath.EndPoint.Z.ToString( "F3" );
+			string szM = ( linePostPath.EndPoint.Master * 180 / Math.PI ).ToString( "F3" );
+			string szS = ( linePostPath.EndPoint.Slave * 180 / Math.PI ).ToString( "F3" );
+			string command = "G01";
+			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} {m_MasterAxisName}{szM} {m_SlaveAxisName}{szS};" );
 		}
 
 		void WriteOneLinearTraverse( PostPoint postPoint, double followSafeDistance = 0 )
@@ -165,18 +194,18 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteOneProcessPath( List<PostPoint> postPointList )
+		void WriteOneProcessPath( List<PostPath> postPointList )
 		{
 			if( postPointList == null || postPointList.Count == 0 ) {
 				return;
 			}
 			for( int i = 0; i < postPointList.Count; i++ ) {
 				var onePostPoint = postPointList[ i ];
-				WriteOnePoint( onePostPoint );
+				WriteOneSegmentPath( onePostPoint );
 			}
 		}
 
-		void WriteTraverse( PostData currentPathPostData )
+		void WriteTraverse( PathSegmentPostData currentPathPostData )
 		{
 			// lift up
 			if( currentPathPostData.LiftUpPostPoint != null ) {

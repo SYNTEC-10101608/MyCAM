@@ -2,6 +2,162 @@
 
 namespace MyCAM.Data
 {
+	public enum EPostPathType
+	{
+		Line,
+		Arc
+	}
+
+	internal class PathSegmentPostData
+	{
+		public List<PostPath> LeadInPostPath
+		{
+			get; set;
+		}
+
+		public List<PostPath> MainPathPostPath
+		{
+			get; set;
+		}
+
+		public List<PostPath> OverCutPostPath
+		{
+			get; set;
+		}
+
+		public List<PostPath> LeadOutPostPath
+		{
+			get; set;
+		}
+
+		// lift up of previous path, null meaning lift up distance is 0
+		public PostPoint LiftUpPostPoint
+		{
+			get; set;
+		}
+
+		// cut down of current path, null meaning cut down distance is 0
+		public PostPoint CutDownPostPoint
+		{
+			get; set;
+		}
+
+		public double FollowSafeDistance
+		{
+			get; set;
+		}
+
+		// the center and end point of frog leap
+		public PostPoint FrogLeapMidPostPoint
+		{
+			get; set;
+		}
+
+		public PostPoint ProcessStartPoint
+		{
+			get; set;
+		}
+
+		public PathSegmentPostData()
+		{
+			LeadInPostPath = new List<PostPath>();
+			MainPathPostPath = new List<PostPath>();
+			OverCutPostPath = new List<PostPath>();
+			LeadOutPostPath = new List<PostPath>();
+			CutDownPostPoint = null;
+			LiftUpPostPoint = null;
+			FollowSafeDistance = 0;
+			FrogLeapMidPostPoint = null;
+		}
+	}
+
+	internal abstract class PostPath
+	{
+		public abstract EPostPathType PostPathType
+		{
+			get;
+		}
+
+		public PostPoint StartPoint
+		{
+			get;
+			protected set;
+		}
+
+		public PostPoint EndPoint
+		{
+			get;
+			protected set;
+		}
+
+		public virtual List<PostPoint> GetPostPointList()
+		{
+			List<PostPoint> pointList = new List<PostPoint>();
+			pointList.Add( StartPoint );
+			pointList.Add( EndPoint );
+			return pointList;
+		}
+
+		protected PostPath( PostPoint startPoint, PostPoint endPoint )
+		{
+			StartPoint = startPoint;
+			EndPoint = endPoint;
+		}
+	}
+
+	internal class LinePostPath : PostPath
+	{
+		public LinePostPath( PostPoint startPoint, PostPoint endPoint )
+			: base( startPoint, endPoint )
+		{
+			StartPoint = startPoint;
+			EndPoint = endPoint;
+		}
+
+		public override EPostPathType PostPathType
+		{
+			get
+			{
+				return EPostPathType.Line;
+			}
+		}
+	}
+
+	internal class ArcPostPath : PostPath
+	{
+		public ArcPostPath( PostPoint startPoint, PostPoint midPoint, PostPoint endPoint )
+			: base( startPoint, endPoint )
+		{
+			StartPoint = startPoint;
+			MidPoint = midPoint;
+			EndPoint = endPoint;
+		}
+
+		public override EPostPathType PostPathType
+		{
+			get
+			{
+				return EPostPathType.Line;
+			}
+		}
+
+		public PostPoint MidPoint
+		{
+			get;
+			private set;
+		}
+
+		public override List<PostPoint> GetPostPointList()
+		{
+			List<PostPoint> pointList = new List<PostPoint>();
+			pointList.Add( StartPoint );
+			pointList.Add( MidPoint );
+			pointList.Add( EndPoint );
+			return pointList;
+		}
+	}
+
+
 	internal class PostData
 	{
 		public List<PostPoint> LeadInPostPointList
