@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using MyCAM.Data;
+using OCC.BRepAdaptor;
+using OCC.GC;
+using OCC.GCPnts;
 using OCC.Geom;
+using OCC.GeomAdaptor;
 using OCC.gp;
 using OCCTool;
 
@@ -15,13 +19,13 @@ namespace MyCAM.Helper
 			List<ICAMSegmentElement> LeadCADSegment = new List<ICAMSegmentElement>();
 			if( isLeadIn ) {
 				if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
-					ICAMSegmentElement leadInCAMSegment = BuildLeadCADSegment( craftData, CAMSegConnectWithStartPnt, isLeadIn );
+					ICAMSegmentElement leadInCAMSegment = BuildLeadSegment( craftData, CAMSegConnectWithStartPnt, isLeadIn );
 					LeadCADSegment.Add( leadInCAMSegment );
 					return LeadCADSegment;
 				}
 			}
 			if( craftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
-				ICAMSegmentElement leadInCAMSegment = BuildLeadCADSegment( craftData, CAMSegConnectWithStartPnt, isLeadIn );
+				ICAMSegmentElement leadInCAMSegment = BuildLeadSegment( craftData, CAMSegConnectWithStartPnt, isLeadIn );
 				LeadCADSegment.Add( leadInCAMSegment );
 				return LeadCADSegment;
 			}
@@ -31,9 +35,9 @@ namespace MyCAM.Helper
 		public static Geom_Curve BuildLeadGeom( bool isLeadIn, LeadLineType leadLineType, CAMPoint2 pntConnectWithLead, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, out gp_Pnt leadEndPnt, out gp_Pnt leadMidPnt, out gp_Dir leadDir )
 		{
 			if( isLeadIn ) {
-				return BuildLeadGeomByParam( true, leadLineType, pntConnectWithLead, dLeadLineLength, dLeadLineAngle, isChangeLeadDirection, isReverse , out leadEndPnt, out  leadMidPnt, out  leadDir );
+				return BuildLeadGeomByParam( true, leadLineType, pntConnectWithLead, dLeadLineLength, dLeadLineAngle, isChangeLeadDirection, isReverse, out leadEndPnt, out leadMidPnt, out leadDir );
 			}
-			return BuildLeadGeomByParam( false, leadLineType, pntConnectWithLead, dLeadLineLength, dLeadLineAngle, isChangeLeadDirection, isReverse, out leadEndPnt, out  leadMidPnt, out  leadDir );
+			return BuildLeadGeomByParam( false, leadLineType, pntConnectWithLead, dLeadLineLength, dLeadLineAngle, isChangeLeadDirection, isReverse, out leadEndPnt, out leadMidPnt, out leadDir );
 		}
 
 		static Geom_Curve BuildStraightLead( CAMPoint2 pntConnectWithPath, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, out gp_Pnt leadLineEndPoint, out gp_Dir leadDir )
@@ -177,15 +181,15 @@ namespace MyCAM.Helper
 			return null;
 		}
 
-		static ICAMSegmentElement BuildLeadCADSegment( CraftData craftData, ICAMSegmentElement CAMSegConnectWithLead, bool isLeadin )
+		static ICAMSegmentElement BuildLeadSegment( CraftData craftData, ICAMSegmentElement CAMSegConnectWithLead, bool isLeadin )
 		{
-			CAMPoint2 pntConnectWithPath = isLeadin ? CAMSegConnectWithLead.StartPoint: CAMSegConnectWithLead.EndPoint;
+			CAMPoint2 pntConnectWithPath = isLeadin ? CAMSegConnectWithLead.StartPoint : CAMSegConnectWithLead.EndPoint;
 			gp_Dir LeadToolVec = pntConnectWithPath.ToolVec;
 			LeadParam leadParam = isLeadin ? craftData.LeadLineParam.LeadIn : craftData.LeadLineParam.LeadOut;
 
 			// draw arc / line lead
 			if( leadParam.Type == LeadLineType.Line ) {
-				LeadHelper.BuildStraightLead(
+				BuildStraightLead(
 					pntConnectWithPath, isLeadin,
 					leadParam.Length, leadParam.Angle,
 					craftData.LeadLineParam.IsChangeLeadDirection, craftData.IsReverse,
@@ -215,16 +219,160 @@ namespace MyCAM.Helper
 			return null;
 		}
 
-		static LineCAMSegment CreateLeadCAMSegment( List<gp_Pnt> points, gp_Dir toolVec )
+		static LineCAMSegment CreateLeadCAMSegment( List<gp_Pnt> points, gp_Dir toolVec, double maxSegmentLength = 1.0 )
 		{
-			List<CAMPoint2> camPointList = points.Select( p => new CAMPoint2( p, toolVec, toolVec, toolVec, toolVec ) ).ToList();
-			return new LineCAMSegment( camPointList, 0, 0, 0 );
+			if( points == null || points.Count < 2 ) {
+				return null;
+			}
+			gp_Pnt startPoint = points.First();
+			gp_Pnt endPoint = points.Last();
+			List<CAMPoint2> camPointList = CreateEqualLengthDiscretizedPoints( startPoint, endPoint, toolVec, maxSegmentLength,
+				out double totalLength, out double eachSegmentLength );
+
+			if( camPointList == null || camPointList.Count < 2 ) {
+				camPointList = points.Select( p => new CAMPoint2( p, toolVec, toolVec, toolVec, toolVec ) ).ToList();
+				totalLength = startPoint.Distance( endPoint );
+				eachSegmentLength = totalLength;
+			}
+			return new LineCAMSegment( camPointList, totalLength, eachSegmentLength, eachSegmentLength );
 		}
 
-		static ArcCAMSegment CreateArcLeadCAMSegment( List<gp_Pnt> points, gp_Dir toolVec )
+		static ArcCAMSegment CreateArcLeadCAMSegment( List<gp_Pnt> points, gp_Dir toolVec, double maxSegmentLength = 1.0 )
 		{
-			List<CAMPoint2> camPointList = points.Select( p => new CAMPoint2( p, toolVec, toolVec, toolVec, toolVec ) ).ToList();
-			return new ArcCAMSegment( camPointList, 0, 0, 0 );
+			if( points == null || points.Count != 3 ) {
+				List<CAMPoint2> camPointList = points?.Select( p => new CAMPoint2( p, toolVec, toolVec, toolVec, toolVec ) ).ToList();
+				return new ArcCAMSegment( camPointList ?? new List<CAMPoint2>(), 0, 0, 0 );
+			}
+
+			gp_Pnt startPoint = points[ 0 ];
+			gp_Pnt midPoint = points[ 1 ];
+			gp_Pnt endPoint = points[ 2 ];
+
+			List<CAMPoint2> discretizedPoints = CreateArcEqualLengthDiscretizedPoints( startPoint, midPoint, endPoint,
+				toolVec, maxSegmentLength, out double totalLength, out double eachArcLength, out double eachChordLength );
+
+			if( discretizedPoints == null || discretizedPoints.Count < 2 ) {
+				discretizedPoints = points.Select( p => new CAMPoint2( p, toolVec, toolVec, toolVec, toolVec ) ).ToList();
+				totalLength = 0;
+				eachArcLength = 0;
+				eachChordLength = 0;
+			}
+
+			return new ArcCAMSegment( discretizedPoints, totalLength, eachArcLength, eachChordLength );
+		}
+
+		static List<CAMPoint2> CreateEqualLengthDiscretizedPoints( gp_Pnt startPoint, gp_Pnt endPoint, gp_Dir toolVec,
+		double maxSegmentLength, out double totalLength, out double eachSegmentLength )
+		{
+			totalLength = 0;
+			eachSegmentLength = 0;
+
+			try {
+				totalLength = startPoint.Distance( endPoint );
+				if( totalLength <= 0 ) {
+					return null;
+				}
+
+				int segmentCount = (int)Math.Ceiling( totalLength / maxSegmentLength );
+				if( segmentCount <= 0 ) {
+					segmentCount = 1;
+				}
+
+				eachSegmentLength = totalLength / segmentCount;
+				gp_Vec lineVec = new gp_Vec( startPoint, endPoint );
+				lineVec.Normalize();
+				gp_Dir tangentDir = new gp_Dir( lineVec );
+
+				// doesn't matter
+				gp_Dir normalVec = toolVec;
+
+				List<CAMPoint2> camPointList = new List<CAMPoint2>();
+				for( int i = 0; i <= segmentCount; i++ ) {
+					double t = (double)i / segmentCount;
+					gp_Pnt currentPoint = new gp_Pnt(
+						startPoint.X() + t * ( endPoint.X() - startPoint.X() ),
+						startPoint.Y() + t * ( endPoint.Y() - startPoint.Y() ),
+						startPoint.Z() + t * ( endPoint.Z() - startPoint.Z() )
+					);
+
+					CAMPoint2 camPoint = new CAMPoint2( currentPoint, normalVec, normalVec, tangentDir, toolVec );
+					camPointList.Add( camPoint );
+				}
+				return camPointList;
+			}
+			catch( Exception ) {
+				return null;
+			}
+		}
+
+		static List<CAMPoint2> CreateArcEqualLengthDiscretizedPoints( gp_Pnt startPoint, gp_Pnt midPoint, gp_Pnt endPoint,
+	gp_Dir toolVec, double maxSegmentLength, out double totalLength, out double eachArcLength, out double eachChordLength )
+		{
+			totalLength = 0;
+			eachArcLength = 0;
+			eachChordLength = 0;
+
+			try {
+				GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( startPoint, midPoint, endPoint );
+				if( !makeCircle.IsDone() ) {
+					return null;
+				}
+
+				Geom_TrimmedCurve arcCurve = makeCircle.Value();
+				if( arcCurve == null || arcCurve.IsNull() ) {
+					return null;
+				}
+				GeomAdaptor_Curve adaptorCurve = new GeomAdaptor_Curve( arcCurve );
+				double dStartU = adaptorCurve.FirstParameter();
+				double dEndU = adaptorCurve.LastParameter();
+
+				totalLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dStartU, dEndU );
+				if( totalLength <= 0 ) {
+					return null;
+				}
+
+				int segmentCount = (int)Math.Ceiling( totalLength / maxSegmentLength );
+
+				// protection
+				if( segmentCount <= 0 ) {
+					segmentCount = 1;
+				}
+				if( segmentCount % 2 == 0 ) {
+					segmentCount++;
+				}
+
+				eachArcLength = totalLength / segmentCount;
+				double deltaU = ( dEndU - dStartU ) / segmentCount;
+				gp_Dir normalVec = toolVec;
+
+				List<CAMPoint2> camPointList = new List<CAMPoint2>();
+				for( int i = 0; i <= segmentCount; i++ ) {
+					double u;
+					if( i == segmentCount ) {
+						u = dEndU;
+					}
+					else {
+						u = dStartU + i * deltaU;
+					}
+
+					gp_Pnt point = adaptorCurve.Value( u );
+					gp_Vec tangentVec = new gp_Vec();
+					gp_Pnt tempPoint = new gp_Pnt();
+					adaptorCurve.D1( u, ref tempPoint, ref tangentVec );
+					gp_Dir tangentDir = new gp_Dir( tangentVec );
+
+					CAMPoint2 camPoint = new CAMPoint2( point, normalVec, normalVec, tangentDir, toolVec );
+					camPointList.Add( camPoint );
+				}
+
+				if( camPointList.Count >= 2 ) {
+					eachChordLength = camPointList[ 0 ].Point.Distance( camPointList[ 1 ].Point );
+				}
+				return camPointList;
+			}
+			catch( Exception ) {
+				return null;
+			}
 		}
 	}
 }

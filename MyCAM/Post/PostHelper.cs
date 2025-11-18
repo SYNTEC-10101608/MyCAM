@@ -30,7 +30,7 @@ namespace MyCAM.Post
 	{
 		public static bool SolvePath( PostSolver postSolver, ContourCacheInfo currentCAMData, PathNCPackage pathNCPacke, CraftData craftData,
 			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
-			out PathSegmentPostData pathG54PostData, out PathSegmentPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo )
+			out PathSegmentPostData pathG54PostData, out PathSegmentPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo, bool isNeedDispersion = false )
 		{
 			// for simulation
 			pathMCSPostData = new PathSegmentPostData();
@@ -54,8 +54,8 @@ namespace MyCAM.Post
 			// lead-in
 			if( pathNCPacke.LeadInSegment.Count > 0 ) {
 				if( !SolveProcessPath( postSolver, pathNCPacke.LeadInSegment,
-					out List<PostPath> leadInG54, out List<PostPath> leadInMCS,
-					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
+					out List<IPostPath> leadInG54, out List<IPostPath> leadInMCS,
+					ref dLastPointProcess_M, ref dLastPointProcess_S , isNeedDispersion ) ) {
 					return false;
 				}
 				pathG54PostData.LeadInPostPath.AddRange( leadInG54 );
@@ -69,8 +69,8 @@ namespace MyCAM.Post
 
 			// main path
 			if( !SolveProcessPath( postSolver, pathNCPacke.MainPathSegment,
-				out List<PostPath> mainG54, out List<PostPath> mainMCS,
-				ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
+				out List<IPostPath> mainG54, out List<IPostPath> mainMCS,
+				ref dLastPointProcess_M, ref dLastPointProcess_S , isNeedDispersion ) ) {
 				return false;
 			}
 			pathG54PostData.MainPathPostPath.AddRange( mainG54 );
@@ -85,8 +85,8 @@ namespace MyCAM.Post
 			// over-cut
 			if( pathNCPacke.OverCutSegment.Count > 0 ) {
 				if( !SolveProcessPath( postSolver, pathNCPacke.OverCutSegment,
-					out List<PostPath> overCutG54, out List<PostPath> overCutMCS,
-					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
+					out List<IPostPath> overCutG54, out List<IPostPath> overCutMCS,
+					ref dLastPointProcess_M, ref dLastPointProcess_S , isNeedDispersion ) ) {
 					return false;
 				}
 				pathG54PostData.OverCutPostPath.AddRange( overCutG54 );
@@ -96,8 +96,8 @@ namespace MyCAM.Post
 			// lead-out
 			if( pathNCPacke.LeadOutSegment.Count > 0 ) {
 				if( !SolveProcessPath( postSolver, pathNCPacke.LeadOutSegment,
-					out List<PostPath> leadOutG54, out List<PostPath> leadOutMCS,
-					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
+					out List<IPostPath> leadOutG54, out List<IPostPath> leadOutMCS,
+					ref dLastPointProcess_M, ref dLastPointProcess_S , isNeedDispersion ) ) {
 					return false;
 				}
 				pathG54PostData.LeadOutPostPath.AddRange( leadOutG54 );
@@ -163,22 +163,22 @@ namespace MyCAM.Post
 				return result;
 			}
 			if( postData.LeadInPostPath.Count > 0 ) {
-				foreach( PostPath path in postData.LeadInPostPath ) {
+				foreach( IPostPath path in postData.LeadInPostPath ) {
 					result.AddRange( path.GetPostPointList() );
 				}
 			}
 			if( postData.MainPathPostPath.Count > 0 ) {
-				foreach( PostPath path in postData.MainPathPostPath ) {
+				foreach( IPostPath path in postData.MainPathPostPath ) {
 					result.AddRange( path.GetPostPointList() );
 				}
 			}
 			if( postData.OverCutPostPath.Count > 0 ) {
-				foreach( PostPath path in postData.OverCutPostPath ) {
+				foreach( IPostPath path in postData.OverCutPostPath ) {
 					result.AddRange( path.GetPostPointList() );
 				}
 			}
 			if( postData.LeadOutPostPath.Count > 0 ) {
-				foreach( PostPath path in postData.LeadOutPostPath ) {
+				foreach( IPostPath path in postData.LeadOutPostPath ) {
 					result.AddRange( path.GetPostPointList() );
 				}
 			}
@@ -188,34 +188,34 @@ namespace MyCAM.Post
 		#region Private methods
 
 		static bool SolveProcessPath( PostSolver postSolver, List<ICAMSegmentElement> pathSegmentList,
-			out List<PostPath> resultG54, out List<PostPath> resultMCS, ref double dLastProcessPathM, ref double dLastProcessPathS )
+			out List<IPostPath> resultG54, out List<IPostPath> resultMCS, ref double dLastProcessPathM, ref double dLastProcessPathS, bool isNeedDispersion = false )
 		{
 			{
-				resultG54 = new List<PostPath>();
-				resultMCS = new List<PostPath>();
+				resultG54 = new List<IPostPath>();
+				resultMCS = new List<IPostPath>();
 				if( pathSegmentList == null || pathSegmentList.Count == 0 ) {
 					return false;
 				}
 
 				// solve IK
 				if( !SolveIKForPath( postSolver, pathSegmentList, ref dLastProcessPathM, ref dLastProcessPathS,
-					out List<Tuple<double, double>> rotateAngleList, out List<bool> singularTagList ) ) {
+					out List<Tuple<double, double>> rotateAngleList, out List<bool> singularTagList, isNeedDispersion ) ) {
 					return false;
 				}
 
 				// TODO: filter the sigular points
-				GenerateG54Results( pathSegmentList, rotateAngleList, out resultG54 );
-				GenerateMCSResults( postSolver, pathSegmentList, rotateAngleList, out resultMCS );
+				GenerateG54Results( pathSegmentList, rotateAngleList, out resultG54 , isNeedDispersion );
+				GenerateMCSResults( postSolver, pathSegmentList, rotateAngleList, out resultMCS , isNeedDispersion );
 
 				return true;
 			}
 		}
 
 		static bool SolveProcessPath_New( PostSolver postSolver, List<ICAMSegmentElement> SegmentList,
-			out List<PostPath> resultG54, out List<PostPath> resultMCS, ref double dLastProcessPathM, ref double dLastProcessPathS )
+			out List<IPostPath> resultG54, out List<IPostPath> resultMCS, ref double dLastProcessPathM, ref double dLastProcessPathS )
 		{
-			resultG54 = new List<PostPath>();
-			resultMCS = new List<PostPath>();
+			resultG54 = new List<IPostPath>();
+			resultMCS = new List<IPostPath>();
 			if( SegmentList == null || SegmentList.Count == 0 ) {
 				return false;
 			}
@@ -235,21 +235,26 @@ namespace MyCAM.Post
 
 		static bool SolveIKForPath( PostSolver postSolver, List<ICAMSegmentElement> SegmentList,
 									ref double dLastProcessPathM, ref double dLastProcessPathS,
-									out List<Tuple<double, double>> rotateAngleList, out List<bool> singularTagList )
+									out List<Tuple<double, double>> rotateAngleList, out List<bool> singularTagList, bool isNeedDispersion = false )
 		{
 			rotateAngleList = new List<Tuple<double, double>>();
 			singularTagList = new List<bool>();
 
 			foreach( ICAMSegmentElement camSegment in SegmentList ) {
 				List<CAMPoint2> pointList = new List<CAMPoint2>();
-				if( camSegment is ArcCAMSegment arcCAMSegment ) {
-					pointList.Add( arcCAMSegment.StartPoint );
-					pointList.Add( arcCAMSegment.MidPoint );
-					pointList.Add( camSegment.EndPoint );
+				if( isNeedDispersion ) {
+					pointList = camSegment.CAMPointList;
 				}
 				else {
-					pointList.Add( camSegment.StartPoint );
-					pointList.Add( camSegment.EndPoint );
+					if( camSegment is ArcCAMSegment arcCAMSegment ) {
+						pointList.Add( arcCAMSegment.StartPoint );
+						pointList.Add( arcCAMSegment.MidPoint );
+						pointList.Add( camSegment.EndPoint );
+					}
+					else {
+						pointList.Add( camSegment.StartPoint );
+						pointList.Add( camSegment.EndPoint );
+					}
 				}
 				foreach( CAMPoint2 camPoint in pointList ) {
 					IKSolveResult ikResult = postSolver.SolveIK( camPoint.ToolVec, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
@@ -268,56 +273,29 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		static void GenerateG54Results( List<ICAMSegmentElement> camPointList, List<Tuple<double, double>> rotateAngleList, out List<PostPath> resultG54 )
+		static void GenerateG54Results( List<ICAMSegmentElement> camSegmentList, List<Tuple<double, double>> rotateAngleList, out List<IPostPath> resultG54, bool isNeedDispersion = false )
 		{
-			resultG54 = new List<PostPath>();
-			int nPointCount = 0;
+			resultG54 = new List<IPostPath>();
+			int pointIndex = 0;
 
-			// each segment in this path
-			foreach( ICAMSegmentElement camSegment in camPointList ) {
-				List<CAMPoint2> pointList = new List<CAMPoint2>();
-				if( camSegment is ArcCAMSegment arcCAMSegment ) {
-					pointList.Add( arcCAMSegment.StartPoint );
-					pointList.Add( arcCAMSegment.MidPoint );
-					pointList.Add( camSegment.EndPoint );
-				}
-				else {
-					pointList.Add( camSegment.StartPoint );
-					pointList.Add( camSegment.EndPoint );
-				}
+			foreach( ICAMSegmentElement camSegment in camSegmentList ) {
 
-				// start / end point of this segment
-				List<PostPoint> postPointList = new List<PostPoint>();
-				foreach( CAMPoint2 point in pointList ) {
-					gp_Pnt pointG54 = point.Point;
-					// add G54 frame data
-					PostPoint frameDataG54 = new PostPoint()
-					{
-						X = pointG54.X(),
-						Y = pointG54.Y(),
-						Z = pointG54.Z(),
-						Master = rotateAngleList[ nPointCount ].Item1,
-						Slave = rotateAngleList[ nPointCount ].Item2
-					};
-					postPointList.Add( frameDataG54 );
-					nPointCount++;
-				}
-				if( postPointList.Count == 3 ) {
-					ArcPostPath g54ArcPostPath = new ArcPostPath( postPointList[ 0 ], postPointList[ 1 ], postPointList[ 2 ] );
-					resultG54.Add( g54ArcPostPath );
-				}
-				else {
-					LinePostPath g54LinePostPath = new LinePostPath( postPointList[ 0 ], postPointList[ 1 ] );
-					resultG54.Add( g54LinePostPath );
+				// get nc point
+				List<CAMPoint2> pointList = GetPointsFromSegment( camSegment, isNeedDispersion );
+				List<PostPoint> postPointList = CreateG54PostPoints( pointList, rotateAngleList, ref pointIndex );
+				IPostPath g54PostPath = CreatePostPath( camSegment, postPointList, isNeedDispersion );
+				if( g54PostPath != null ) {
+					resultG54.Add( g54PostPath );
 				}
 			}
 		}
 
-		static void GenerateMCSResults( PostSolver postSolver, List<ICAMSegmentElement> camPointList, List<Tuple<double, double>> holePathRotateAngleList, out List<PostPath> resultMCS )
+		static List<CAMPoint2> GetPointsFromSegment( ICAMSegmentElement camSegment, bool isNeedDispersion )
 		{
-			resultMCS = new List<PostPath>();
-			int pointCount = 0;
-			foreach( ICAMSegmentElement camSegment in camPointList ) {
+			if( isNeedDispersion ) {
+				return camSegment.CAMPointList;
+			}
+			else {
 				List<CAMPoint2> pointList = new List<CAMPoint2>();
 				if( camSegment is ArcCAMSegment arcCAMSegment ) {
 					pointList.Add( arcCAMSegment.StartPoint );
@@ -328,31 +306,88 @@ namespace MyCAM.Post
 					pointList.Add( camSegment.StartPoint );
 					pointList.Add( camSegment.EndPoint );
 				}
-				List<PostPoint> mcsPointList = new List<PostPoint>();
-				foreach( CAMPoint2 camPoint in pointList ) {
-					gp_Pnt pointG54 = camPoint.Point;
-					gp_Vec tcpOffset = postSolver.SolveFK( holePathRotateAngleList[ 0 ].Item1, holePathRotateAngleList[ 0 ].Item2, pointG54 );
-					gp_Pnt pointMCS = pointG54.Translated( tcpOffset );// add MCS frame data
-					PostPoint frameDataMCS = new PostPoint()
-					{
-						X = pointMCS.X(),
-						Y = pointMCS.Y(),
-						Z = pointMCS.Z(),
-						Master = holePathRotateAngleList[ pointCount ].Item1,
-						Slave = holePathRotateAngleList[ pointCount ].Item2
-					};
-					mcsPointList.Add( frameDataMCS );
-					pointCount++;
-				}
-				if( mcsPointList.Count == 3 ) {
-					ArcPostPath g54ArcPostPath = new ArcPostPath( mcsPointList[ 0 ], mcsPointList[ 1 ], mcsPointList[ 2 ] );
-					resultMCS.Add( g54ArcPostPath );
+				return pointList;
+			}
+		}
+
+		static List<PostPoint> CreateG54PostPoints( List<CAMPoint2> camPoints, List<Tuple<double, double>> rotateAngleList, ref int pointIndex )
+		{
+			List<PostPoint> postPoints = new List<PostPoint>();
+
+			foreach( CAMPoint2 camPoint in camPoints ) {
+				gp_Pnt pointG54 = camPoint.Point;
+				PostPoint frameDataG54 = new PostPoint()
+				{
+					X = pointG54.X(),
+					Y = pointG54.Y(),
+					Z = pointG54.Z(),
+					Master = rotateAngleList[ pointIndex ].Item1,
+					Slave = rotateAngleList[ pointIndex ].Item2
+				};
+				postPoints.Add( frameDataG54 );
+				pointIndex++;
+			}
+
+			return postPoints;
+		}
+
+		static IPostPath CreatePostPath( ICAMSegmentElement camSegment, List<PostPoint> postPointList, bool isNeedDispersion )
+		{
+			if( isNeedDispersion ) {
+				if( camSegment.ContourType == EContourType.Arc ) {
+					return new DispersionArcPostPath( postPointList );
 				}
 				else {
-					LinePostPath g54LinePostPath = new LinePostPath( mcsPointList[ 0 ], mcsPointList[ 1 ] );
-					resultMCS.Add( g54LinePostPath );
+					return new DispersionLinePostPath( postPointList );
 				}
 			}
+			else {
+				if( camSegment.ContourType == EContourType.Arc && postPointList.Count >= 3 ) {
+					return new ArcPostPath( postPointList[ 0 ], postPointList[ 1 ], postPointList[ 2 ] );
+				}
+				else if( postPointList.Count >= 2 ) {
+					return new LinePostPath( postPointList[ 0 ], postPointList[ 1 ] );
+				}
+				return null;
+			}
+		}
+
+		static void GenerateMCSResults( PostSolver postSolver, List<ICAMSegmentElement> camSegmentList, List<Tuple<double, double>> rotateAngleList, out List<IPostPath> resultMCS, bool isNeedDispersion = false )
+		{
+			resultMCS = new List<IPostPath>();
+			int pointIndex = 0;
+
+			foreach( ICAMSegmentElement camSegment in camSegmentList ) {
+				List<CAMPoint2> pointList = GetPointsFromSegment( camSegment, isNeedDispersion );
+				List<PostPoint> postPointList = CreateMCSPostPoints( postSolver, pointList, rotateAngleList, ref pointIndex );
+				IPostPath mcsPostPath = CreatePostPath( camSegment, postPointList, isNeedDispersion );
+				if( mcsPostPath != null ) {
+					resultMCS.Add( mcsPostPath );
+				}
+			}
+		}
+
+		static List<PostPoint> CreateMCSPostPoints( PostSolver postSolver, List<CAMPoint2> camPoints, List<Tuple<double, double>> rotateAngleList, ref int pointIndex )
+		{
+			List<PostPoint> postPoints = new List<PostPoint>();
+
+			foreach( CAMPoint2 camPoint in camPoints ) {
+				gp_Pnt pointG54 = camPoint.Point;
+				gp_Vec tcpOffset = postSolver.SolveFK( rotateAngleList[ pointIndex ].Item1, rotateAngleList[ pointIndex ].Item2, pointG54 );
+				gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
+				PostPoint frameDataMCS = new PostPoint()
+				{
+					X = pointMCS.X(),
+					Y = pointMCS.Y(),
+					Z = pointMCS.Z(),
+					Master = rotateAngleList[ pointIndex ].Item1,
+					Slave = rotateAngleList[ pointIndex ].Item2
+				};
+				postPoints.Add( frameDataMCS );
+				pointIndex++;
+			}
+
+			return postPoints;
 		}
 
 		static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, ContourCacheInfo currentCAMData, CraftData craftData, ref PathSegmentPostData pathG54PostData, ref PathSegmentPostData pathMCSPostData )

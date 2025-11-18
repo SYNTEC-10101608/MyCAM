@@ -1,5 +1,12 @@
+using System;
+using System.Collections.Generic;
 using MyCAM.CacheInfo;
 using MyCAM.Data;
+using OCC.BRepAdaptor;
+using OCC.GC;
+using OCC.GCPnts;
+using OCC.Geom;
+using OCC.gp;
 
 namespace MyCAM.Helper
 {
@@ -20,10 +27,7 @@ namespace MyCAM.Helper
 			return true;
 		}
 
-		public static bool BuildPostPath()
-		{
-			return true;
-		}
+	
 
 
 	}

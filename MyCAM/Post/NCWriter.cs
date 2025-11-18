@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.NetworkInformation;
 using MyCAM.CacheInfo;
 using MyCAM.Data;
 using MyCAM.Helper;
@@ -39,7 +40,7 @@ namespace MyCAM.Post
 		string m_SlaveAxisName = string.Empty;
 		EntryAndExitData m_EntryAndExitData;
 
-		public bool ConvertSuccess( out string errorMessage )
+		public bool ConvertSuccess( out string errorMessage, bool isNeedDispersion = false )
 		{
 			errorMessage = string.Empty;
 			try {
@@ -59,7 +60,7 @@ namespace MyCAM.Post
 						// solve all post data of the path
 						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessCacheInfoList[ i ], pathNCPackage, m_CraftDataList[ i ],
 							endInfoOfPreviousPath, m_EntryAndExitData,
-							out PathSegmentPostData postData, out _, out endInfoOfPreviousPath ) ) {
+							out PathSegmentPostData postData, out _, out endInfoOfPreviousPath, true ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 							return false;
 						}
@@ -98,17 +99,17 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\" H1;" );
 
 			// write each process path
-			WriteOneProcessPath( currentPathPostData.LeadInPostPath);
+			WriteOneProcessPath( currentPathPostData.LeadInPostPath );
 			WriteOneProcessPath( currentPathPostData.MainPathPostPath );
 			WriteOneProcessPath( currentPathPostData.OverCutPostPath );
-			WriteOneProcessPath( currentPathPostData.LeadOutPostPath);
+			WriteOneProcessPath( currentPathPostData.LeadOutPostPath );
 
 			// end cutting
 			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" );
 			return;
 		}
 
-		void WriteOneSegmentPath( PostPath segmentPostPath )
+		void WriteOneSegmentPath( IPostPath segmentPostPath )
 		{
 			if( segmentPostPath is ArcPostPath arcPostPath ) {
 				WriteG02Path( arcPostPath );
@@ -116,6 +117,10 @@ namespace MyCAM.Post
 			}
 			if( segmentPostPath is LinePostPath linePostPath ) {
 				WriteG01Path( linePostPath );
+				return;
+			}
+			if(segmentPostPath is DispersionPostPath dispersionPostPath) {
+				WriteDispersionG01Path( dispersionPostPath );
 			}
 		}
 
@@ -145,6 +150,22 @@ namespace MyCAM.Post
 			string szS = ( linePostPath.EndPoint.Slave * 180 / Math.PI ).ToString( "F3" );
 			string command = "G01";
 			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} {m_MasterAxisName}{szM} {m_SlaveAxisName}{szS};" );
+		}
+
+		void WriteDispersionG01Path(DispersionPostPath postPath)
+		{
+			List<PostPoint> postPointList = postPath.PostPointList;
+
+			// first point do not need to write g01
+			for ( int i = 1; i<postPointList.Count; i++ ) {
+				string szX = postPointList[i].X.ToString( "F3" );
+				string szY = postPointList[ i ].Y.ToString( "F3" );
+				string szZ = postPointList[ i ].Z.ToString( "F3" );
+				string szM = ( postPointList[ i ].Master * 180 / Math.PI ).ToString( "F3" );
+				string szS = ( postPointList[ i ].Slave * 180 / Math.PI ).ToString( "F3" );
+				string command = "G01";
+				m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} {m_MasterAxisName}{szM} {m_SlaveAxisName}{szS};" );
+			}
 		}
 
 		void WriteOneLinearTraverse( PostPoint postPoint, double followSafeDistance = 0 )
@@ -194,7 +215,7 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteOneProcessPath( List<PostPath> postPointList )
+		void WriteOneProcessPath( List<IPostPath> postPointList )
 		{
 			if( postPointList == null || postPointList.Count == 0 ) {
 				return;

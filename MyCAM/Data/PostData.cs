@@ -1,31 +1,34 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Data
 {
 	public enum EPostPathType
 	{
 		Line,
-		Arc
+		Arc,
+		DispersionLine,
+		DispersionArc
 	}
 
 	internal class PathSegmentPostData
 	{
-		public List<PostPath> LeadInPostPath
+		public List<IPostPath> LeadInPostPath
 		{
 			get; set;
 		}
 
-		public List<PostPath> MainPathPostPath
+		public List<IPostPath> MainPathPostPath
 		{
 			get; set;
 		}
 
-		public List<PostPath> OverCutPostPath
+		public List<IPostPath> OverCutPostPath
 		{
 			get; set;
 		}
 
-		public List<PostPath> LeadOutPostPath
+		public List<IPostPath> LeadOutPostPath
 		{
 			get; set;
 		}
@@ -60,10 +63,10 @@ namespace MyCAM.Data
 
 		public PathSegmentPostData()
 		{
-			LeadInPostPath = new List<PostPath>();
-			MainPathPostPath = new List<PostPath>();
-			OverCutPostPath = new List<PostPath>();
-			LeadOutPostPath = new List<PostPath>();
+			LeadInPostPath = new List<IPostPath>();
+			MainPathPostPath = new List<IPostPath>();
+			OverCutPostPath = new List<IPostPath>();
+			LeadOutPostPath = new List<IPostPath>();
 			CutDownPostPoint = null;
 			LiftUpPostPoint = null;
 			FollowSafeDistance = 0;
@@ -71,7 +74,27 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal abstract class PostPath
+	internal interface IPostPath
+	{
+		EPostPathType PostPathType
+		{
+			get;
+		}
+
+		PostPoint StartPoint
+		{
+			get;
+		}
+
+		PostPoint EndPoint
+		{
+			get;
+		}
+
+		List<PostPoint> GetPostPointList();
+	}
+
+	internal abstract class UndispersionPostPath : IPostPath
 	{
 		public abstract EPostPathType PostPathType
 		{
@@ -80,14 +103,12 @@ namespace MyCAM.Data
 
 		public PostPoint StartPoint
 		{
-			get;
-			protected set;
+			get; protected set;
 		}
 
 		public PostPoint EndPoint
 		{
-			get;
-			protected set;
+			get; protected set;
 		}
 
 		public virtual List<PostPoint> GetPostPointList()
@@ -98,14 +119,15 @@ namespace MyCAM.Data
 			return pointList;
 		}
 
-		protected PostPath( PostPoint startPoint, PostPoint endPoint )
+		protected UndispersionPostPath( PostPoint startPoint, PostPoint endPoint )
 		{
 			StartPoint = startPoint;
 			EndPoint = endPoint;
 		}
 	}
 
-	internal class LinePostPath : PostPath
+
+	internal class LinePostPath : UndispersionPostPath
 	{
 		public LinePostPath( PostPoint startPoint, PostPoint endPoint )
 			: base( startPoint, endPoint )
@@ -123,7 +145,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal class ArcPostPath : PostPath
+	internal class ArcPostPath : UndispersionPostPath
 	{
 		public ArcPostPath( PostPoint startPoint, PostPoint midPoint, PostPoint endPoint )
 			: base( startPoint, endPoint )
@@ -154,6 +176,82 @@ namespace MyCAM.Data
 			pointList.Add( MidPoint );
 			pointList.Add( EndPoint );
 			return pointList;
+		}
+	}
+
+	internal abstract class DispersionPostPath : IPostPath
+	{
+		public abstract EPostPathType PostPathType
+		{
+			get;
+		}
+
+		public PostPoint StartPoint
+		{
+			get; protected set;
+		}
+
+		public PostPoint EndPoint
+		{
+			get; protected set;
+		}
+
+		public List<PostPoint> PostPointList
+		{
+			get; protected set;
+		}
+
+		public virtual List<PostPoint> GetPostPointList()
+		{
+			return new List<PostPoint>( PostPointList );
+		}
+
+		protected DispersionPostPath( List<PostPoint> postPointList )
+		{
+			if( postPointList == null || postPointList.Count < 2 ) {
+				throw new System.ArgumentException( "DispersionPostPath requires at least 2 points" );
+			}
+			PostPointList = postPointList;
+			StartPoint = postPointList.First();
+			EndPoint = postPointList.Last();
+		}
+	}
+	internal class DispersionLinePostPath : DispersionPostPath
+	{
+		public DispersionLinePostPath( List<PostPoint> postPointList )
+			: base( postPointList )
+		{
+		}
+
+		public override EPostPathType PostPathType
+		{
+			get
+			{
+				return EPostPathType.DispersionLine;
+			}
+		}
+	}
+
+	internal class DispersionArcPostPath : DispersionPostPath
+	{
+		public PostPoint MidPoint
+		{
+			get; private set;
+		}
+
+		public DispersionArcPostPath( List<PostPoint> postPointList )
+			: base( postPointList )
+		{
+			int midIndex = postPointList.Count / 2;
+			MidPoint = postPointList[ midIndex ];
+		}
+
+		public override EPostPathType PostPathType
+		{
+			get
+			{
+				return EPostPathType.DispersionArc;
+			}
 		}
 	}
 
