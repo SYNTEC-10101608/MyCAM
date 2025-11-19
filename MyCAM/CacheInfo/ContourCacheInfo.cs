@@ -406,6 +406,7 @@ namespace MyCAM.CacheInfo
 						// record this segment index with control stick
 						if( k != splitedCAMPointList.Count - 1 ) {
 							SegmentPointIndex oriSegmentIndex = ControlStickMap[ new SegmentPointIndex( segmentIndex, breakPointIndex[ k ] ) ];
+							breakedCAMSegmentList[ breakedCAMSegmentList.Count - 1 ].IsModifySegment = true;
 							ControlStickMapAsOriIndex[ breakedCAMSegmentList.Count - 1 ] = oriSegmentIndex;
 						}
 						else {
@@ -414,6 +415,7 @@ namespace MyCAM.CacheInfo
 							if( isLastSegmentModify ) {
 								SegmentPointIndex oriSegmentIndex = ControlStickMap[ new SegmentPointIndex( segmentIndex, breakPointIndex[ k ] ) ];
 								ControlStickMapAsOriIndex[ breakedCAMSegmentList.Count - 1 ] = oriSegmentIndex;
+								breakedCAMSegmentList[ breakedCAMSegmentList.Count - 1 ].IsModifySegment = true;
 							}
 						}
 					}

@@ -126,6 +126,104 @@ namespace MyCAM.Post
 			return true;
 		}
 
+		public static bool SolvePath_AC( PostSolver postSolver, ContourCacheInfo currentCAMData, PathNCPackage pathNCPacke, CraftData craftData,
+			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
+			out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo, bool isNeedDispersion = true )
+		{
+			// for simulation
+			pathMCSPostData = new PathPostData();
+
+			// for write NC file
+			pathG54PostData = new PathPostData();
+
+			// to make solution continuous
+			currentPathtEndInfo = new PathEndInfo();
+			if( postSolver == null || pathNCPacke == null || entryAndExitData == null ) {
+				return false;
+			}
+
+			// to ensure joint space continuity of process path
+			double dLastPointProcess_M = endInfoOfPreviousPath?.Master ?? 0;
+			double dLastPointProcess_S = endInfoOfPreviousPath?.Slave ?? 0;
+
+			// flag for process start point
+			bool bStart = false;
+
+			// lead-in
+			if( pathNCPacke.LeadInSegment.Count > 0 ) {
+				if( !SolveProcessPath( postSolver, pathNCPacke.LeadInSegment,
+					out List<ISegmentPostData> leadInG54, out List<ISegmentPostData> leadInMCS,
+					ref dLastPointProcess_M, ref dLastPointProcess_S, isNeedDispersion ) ) {
+					return false;
+				}
+				pathG54PostData.LeadInPostPath.AddRange( leadInG54 );
+				pathMCSPostData.LeadInPostPath.AddRange( leadInMCS );
+
+				// set process start point
+				pathG54PostData.ProcessStartPoint = pathG54PostData.LeadInPostPath.First().StartPoint;
+				pathMCSPostData.ProcessStartPoint = pathMCSPostData.LeadInPostPath.First().StartPoint;
+				bStart = true;
+			}
+
+			// main path
+			if( !SolveProcessPath( postSolver, pathNCPacke.MainPathSegment,
+				out List<ISegmentPostData> mainG54, out List<ISegmentPostData> mainMCS,
+				ref dLastPointProcess_M, ref dLastPointProcess_S, isNeedDispersion ) ) {
+				return false;
+			}
+			pathG54PostData.MainPathPostPath.AddRange( mainG54 );
+			pathMCSPostData.MainPathPostPath.AddRange( mainMCS );
+
+			// set process start point
+			if( !bStart ) {
+				pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPath.First().StartPoint;
+				pathMCSPostData.ProcessStartPoint = pathMCSPostData.MainPathPostPath.First().StartPoint;
+			}
+
+			// over-cut
+			if( pathNCPacke.OverCutSegment.Count > 0 ) {
+				if( !SolveProcessPath( postSolver, pathNCPacke.OverCutSegment,
+					out List<ISegmentPostData> overCutG54, out List<ISegmentPostData> overCutMCS,
+					ref dLastPointProcess_M, ref dLastPointProcess_S, isNeedDispersion ) ) {
+					return false;
+				}
+				pathG54PostData.OverCutPostPath.AddRange( overCutG54 );
+				pathMCSPostData.OverCutPostPath.AddRange( overCutMCS );
+			}
+
+			// lead-out
+			if( pathNCPacke.LeadOutSegment.Count > 0 ) {
+				if( !SolveProcessPath( postSolver, pathNCPacke.LeadOutSegment,
+					out List<ISegmentPostData> leadOutG54, out List<ISegmentPostData> leadOutMCS,
+					ref dLastPointProcess_M, ref dLastPointProcess_S, isNeedDispersion ) ) {
+					return false;
+				}
+				pathG54PostData.LeadOutPostPath.AddRange( leadOutG54 );
+				pathMCSPostData.LeadOutPostPath.AddRange( leadOutMCS );
+			}
+
+			// should be the first path
+			if( endInfoOfPreviousPath == null ) {
+
+				// the traverse of first path is entry
+				CalculateEntry( currentCAMData, entryAndExitData, ref pathG54PostData, ref pathMCSPostData );
+			}
+
+			// traverse from previous path to current path
+			else {
+				CalculateTraverse( endInfoOfPreviousPath, currentCAMData, craftData, ref pathG54PostData, ref pathMCSPostData );
+			}
+
+			// end info of current path
+			currentPathtEndInfo = new PathEndInfo()
+			{
+				EndCAMPoint = currentCAMData.GetProcessEndPoint(),
+				Master = dLastPointProcess_M,
+				Slave = dLastPointProcess_S
+			};
+			return true;
+		}
+
 		public static void CalculateExit( PathEndInfo endInfoOfLastPath, EntryAndExitData entryAndExitData,
 			out PostPoint G54ExitPoint, out PostPoint MCSExitPoint )
 		{
@@ -206,6 +304,60 @@ namespace MyCAM.Post
 
 				return true;
 			}
+		}
+
+		static bool SolveProcessPath_AC( PostSolver postSolver, List<ICAMSegmentElement> pathSegmentList, List<int> CtrlToolIndex,
+			out List<ISegmentPostData> resultG54, out List<ISegmentPostData> resultMCS, ref double dLastProcessPathM, ref double dLastProcessPathS, bool isNeedDispersion = true )
+		{
+			{
+				resultG54 = new List<ISegmentPostData>();
+				resultMCS = new List<ISegmentPostData>();
+				if( pathSegmentList == null || pathSegmentList.Count == 0 ) {
+					return false;
+				}
+
+				// 解所有點的joint space
+				if( !SolveIKForPath( postSolver, pathSegmentList, ref dLastProcessPathM, ref dLastProcessPathS,
+					out List<Tuple<double, double>> rotateAngleList, out List<bool> singularTagList, isNeedDispersion ) ) {
+					return false;
+				}
+
+				for( int i = 0; i < CtrlToolIndex.Count; i++ ) {
+					int startIndex = CtrlToolIndex[ i ];
+					int endIndex = ( i == CtrlToolIndex.Count - 1 ) ? CtrlToolIndex.First() : CtrlToolIndex[ i + 1 ];
+
+					// 在這個區段要插捕的segment們
+					List<ICAMSegmentElement> subPathSegmentList = ExtractSegmentRange( pathSegmentList, startIndex + 1, endIndex );
+
+					// 起終點姿態
+					Tuple<double, double> startAngle = rotateAngleList[ i ];
+					Tuple<double, double> endAngle = rotateAngleList[ ( i == CtrlToolIndex.Count - 1 ) ? 0 : i + 1 ];
+				}
+
+				// TODO: filter the sigular points
+				GenerateG54Results( pathSegmentList, rotateAngleList, out resultG54, isNeedDispersion );
+				GenerateMCSResults( postSolver, pathSegmentList, rotateAngleList, out resultMCS, isNeedDispersion );
+
+				return true;
+			}
+		}
+
+		static List<ICAMSegmentElement> ExtractSegmentRange(List<ICAMSegmentElement> pathSegmentList, int startIndex, int endIndex)
+{
+			List<ICAMSegmentElement> result = new List<ICAMSegmentElement>();
+
+			// normal range
+			if( startIndex <= endIndex ) {
+				result.AddRange( pathSegmentList.Skip( startIndex ).Take( endIndex - startIndex + 1 ) );
+			}
+
+			// cycle part
+			else {
+				result.AddRange( pathSegmentList.Skip( startIndex ) );
+				result.AddRange( pathSegmentList.Take( endIndex + 1 ) );
+			}
+
+			return result;
 		}
 
 		static bool SolveIKForPath( PostSolver postSolver, List<ICAMSegmentElement> SegmentList,
@@ -509,16 +661,6 @@ namespace MyCAM.Post
 
 		#region AC Interpolation
 
-		static void CollectIKinfo( List<segmentIKInfo> segmentIKInfo, out List<CAMPoint2> camPointList, out List<Tuple<double, double>> rotateAngleList, out List<bool> singularTagList )
-		{
-			// in this list<segment> only first segment's first point is kept
-			camPointList = segmentIKInfo.SelectMany( ( segment, index ) => index == 0 ?
-							segment.CAMPointList.Select( point => point.Clone() ) :
-							segment.CAMPointList.Skip( 1 ).Select( point => point.Clone() ) )
-							.ToList();
-			rotateAngleList = segmentIKInfo.SelectMany( ( segment, index ) => index == 0 ? segment.RotateAngleList : segment.RotateAngleList.Skip( 1 ) ).ToList();
-			singularTagList = segmentIKInfo.SelectMany( ( segment, index ) => index == 0 ? segment.SigularTagList : segment.SigularTagList.Skip( 1 ) ).ToList();
-		}
 
 		static void FilterSingularPoints( List<CAMPoint2> camPointList, List<bool> singularTagList, ref List<Tuple<double, double>> rotateAngleList )
 		{
@@ -593,6 +735,20 @@ namespace MyCAM.Post
 				// skip to end of current singular region
 				i = singularEnd;
 			}
+		}
+
+		static void InterpolateSingularRegion( List<ICAMSegmentElement> segmentList, Tuple<double, double> entryAngles, Tuple<double, double> exitAngles )
+		{
+			double dTootalLength = 0;
+			foreach( ICAMSegmentElement segment in segmentList ) {
+				dTootalLength += segment.TotalLength;
+			}
+
+			// 各段
+			for( int i = 0; i < segmentList.Count; i++ ) {
+				
+			}
+			
 		}
 
 		static void InterpolateSingularRegion( List<CAMPoint2> camPointList, ref List<Tuple<double, double>> rotateAngleList,

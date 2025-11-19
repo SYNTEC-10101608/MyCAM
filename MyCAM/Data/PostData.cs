@@ -346,6 +346,11 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		public bool IsInSigularRabge
+		{
+			get; set;
+		} = false;
+
 		public PostPoint Clone()
 		{
 			PostPoint newPoint = new PostPoint();
@@ -354,6 +359,7 @@ namespace MyCAM.Data
 			newPoint.Z = Z;
 			newPoint.Master = Master;
 			newPoint.Slave = Slave;
+			newPoint.IsInSigularRabge = IsInSigularRabge;
 			return newPoint;
 		}
 	}
