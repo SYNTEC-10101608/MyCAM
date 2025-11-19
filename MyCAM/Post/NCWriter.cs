@@ -60,7 +60,7 @@ namespace MyCAM.Post
 						// solve all post data of the path
 						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessCacheInfoList[ i ], pathNCPackage, m_CraftDataList[ i ],
 							endInfoOfPreviousPath, m_EntryAndExitData,
-							out PathSegmentPostData postData, out _, out endInfoOfPreviousPath, true ) ) {
+							out PathPostData postData, out _, out endInfoOfPreviousPath, true ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 							return false;
 						}
@@ -86,7 +86,7 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteCutting( PathSegmentPostData currentPathPostData, int N_Index )
+		void WriteCutting( PathPostData currentPathPostData, int N_Index )
 		{
 			// the N code
 			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
@@ -109,22 +109,22 @@ namespace MyCAM.Post
 			return;
 		}
 
-		void WriteOneSegmentPath( IPostPath segmentPostPath )
+		void WriteOneSegmentPath( ISegmentPostData segmentPostPath )
 		{
-			if( segmentPostPath is ArcPostPath arcPostPath ) {
+			if( segmentPostPath is ArcPost arcPostPath ) {
 				WriteG02Path( arcPostPath );
 				return;
 			}
-			if( segmentPostPath is LinePostPath linePostPath ) {
+			if( segmentPostPath is LinePost linePostPath ) {
 				WriteG01Path( linePostPath );
 				return;
 			}
-			if(segmentPostPath is DispersionPostPath dispersionPostPath) {
+			if(segmentPostPath is SplitPost dispersionPostPath) {
 				WriteDispersionG01Path( dispersionPostPath );
 			}
 		}
 
-		void WriteG02Path( ArcPostPath arcPostPath )
+		void WriteG02Path( ArcPost arcPostPath )
 		{
 			string szMidPointX = arcPostPath.MidPoint.X.ToString( "F3" );
 			string szMidPointY = arcPostPath.MidPoint.Y.ToString( "F3" );
@@ -141,7 +141,7 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( $"G65 P\"TPCI\" X1={szMidPointX} Y1={szMidPointY} Z1={szMidPointZ} {m_MasterAxisName}1={szMidPointM} {m_SlaveAxisName}1={szMidPointS} X2={szEndPointX} Y2={szEndPointY} Z2={szEndPointZ} {m_MasterAxisName}2={szEndPointM} {m_SlaveAxisName}2={szEndPointS};" );
 		}
 
-		void WriteG01Path( LinePostPath linePostPath )
+		void WriteG01Path( LinePost linePostPath )
 		{
 			string szX = linePostPath.EndPoint.X.ToString( "F3" );
 			string szY = linePostPath.EndPoint.Y.ToString( "F3" );
@@ -152,7 +152,7 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} {m_MasterAxisName}{szM} {m_SlaveAxisName}{szS};" );
 		}
 
-		void WriteDispersionG01Path(DispersionPostPath postPath)
+		void WriteDispersionG01Path(SplitPost postPath)
 		{
 			List<PostPoint> postPointList = postPath.PostPointList;
 
@@ -215,7 +215,7 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteOneProcessPath( List<IPostPath> postPointList )
+		void WriteOneProcessPath( List<ISegmentPostData> postPointList )
 		{
 			if( postPointList == null || postPointList.Count == 0 ) {
 				return;
@@ -226,7 +226,7 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteTraverse( PathSegmentPostData currentPathPostData )
+		void WriteTraverse( PathPostData currentPathPostData )
 		{
 			// lift up
 			if( currentPathPostData.LiftUpPostPoint != null ) {

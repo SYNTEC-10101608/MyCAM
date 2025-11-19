@@ -163,6 +163,56 @@ namespace MyCAM.Data
 			return new CAMPoint2( Point, NormalVec_1st, NormalVec_2nd, TangentVec, ToolVec );
 		}
 
+		public bool Equals( CAMPoint2 other )
+		{
+			if( other == null ) {
+				return false;
+			}
+			if( ReferenceEquals( this, other ) ) {
+				return true;
+			}
+			const double TOLERANCE = 1e-3;
+			if( m_Point.IsEqual( other.m_Point, TOLERANCE ) == false ) {
+				return false;
+			}
+			if( m_ToolVec.IsEqual( other.m_ToolVec, TOLERANCE ) == false ) {
+				return false;
+			}
+			return true;
+		}
+
+		public override bool Equals( object obj )
+		{
+			return Equals( obj as CAMPoint2 );
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked {
+				int hash = 17;
+				hash = hash * 23 + m_Point.X().GetHashCode();
+				hash = hash * 23 + m_Point.Y().GetHashCode();
+				hash = hash * 23 + m_Point.Z().GetHashCode();
+				return hash;
+			}
+		}
+
+		public static bool operator ==( CAMPoint2 left, CAMPoint2 right )
+		{
+			if( ReferenceEquals( left, right ) ) {
+				return true;
+			}
+			if( left is null || right is null ) {
+				return false;
+			}
+			return left.Equals( right );
+		}
+
+		public static bool operator !=( CAMPoint2 left, CAMPoint2 right )
+		{
+			return !( left == right );
+		}
+
 		// using backing field to prevent modified outside
 		gp_Dir m_ToolVec;
 		gp_Pnt m_Point;

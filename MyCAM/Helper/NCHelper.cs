@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MyCAM.CacheInfo;
 using MyCAM.Data;
 using OCC.BRepAdaptor;
@@ -20,15 +21,11 @@ namespace MyCAM.Helper
 				contourCacheInfo.CAMSegmentList == null || contourCacheInfo.CAMSegmentList.Count == 0 ) {
 				return false;
 			}
-			ncPackage.MainPathSegment = contourCacheInfo.CAMSegmentList;
-			ncPackage.LeadInSegment = contourCacheInfo.LeadInSegment;
-			ncPackage.LeadOutSegment = contourCacheInfo.LeadOutSegment;
-			ncPackage.OverCutSegment = contourCacheInfo.OverCutSegment;
+			ncPackage.LeadInSegment = contourCacheInfo.LeadInSegment?.Select( eachSegment => eachSegment.Clone() ).ToList() ?? new List<ICAMSegmentElement>();
+			ncPackage.MainPathSegment = contourCacheInfo.CAMSegmentList?.Select( eachSegment => eachSegment.Clone() ).ToList() ?? new List<ICAMSegmentElement>();
+			ncPackage.LeadOutSegment = contourCacheInfo.LeadOutSegment?.Select( eachSegment => eachSegment.Clone() ).ToList() ?? new List<ICAMSegmentElement>();
+			ncPackage.OverCutSegment = contourCacheInfo.OverCutSegment?.Select( eachSegment => eachSegment.Clone() ).ToList() ?? new List<ICAMSegmentElement>();
 			return true;
 		}
-
-	
-
-
 	}
 }

@@ -120,7 +120,7 @@ namespace MyCAM.Editor
 				bool isBuildSucces = NCHelper.BuildNCPackage( contourCacheInfo, out PathNCPackage pathNCPackage );
 				if( PostHelper.SolvePath( m_PostSolver, contourCacheInfo, pathNCPackage, craftData,
 					new PathEndInfo(), new EntryAndExitData(),
-					out _, out PathSegmentPostData simuPostData, out _ ) == false ) {
+					out _, out PathPostData simuPostData, out _ ) == false ) {
 					continue;
 				}
 

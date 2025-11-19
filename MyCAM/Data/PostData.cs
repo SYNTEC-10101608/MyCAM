@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MyCAM.Data
@@ -11,24 +12,24 @@ namespace MyCAM.Data
 		DispersionArc
 	}
 
-	internal class PathSegmentPostData
+	internal class PathPostData
 	{
-		public List<IPostPath> LeadInPostPath
+		public List<ISegmentPostData> LeadInPostPath
 		{
 			get; set;
 		}
 
-		public List<IPostPath> MainPathPostPath
+		public List<ISegmentPostData> MainPathPostPath
 		{
 			get; set;
 		}
 
-		public List<IPostPath> OverCutPostPath
+		public List<ISegmentPostData> OverCutPostPath
 		{
 			get; set;
 		}
 
-		public List<IPostPath> LeadOutPostPath
+		public List<ISegmentPostData> LeadOutPostPath
 		{
 			get; set;
 		}
@@ -61,12 +62,12 @@ namespace MyCAM.Data
 			get; set;
 		}
 
-		public PathSegmentPostData()
+		public PathPostData()
 		{
-			LeadInPostPath = new List<IPostPath>();
-			MainPathPostPath = new List<IPostPath>();
-			OverCutPostPath = new List<IPostPath>();
-			LeadOutPostPath = new List<IPostPath>();
+			LeadInPostPath = new List<ISegmentPostData>();
+			MainPathPostPath = new List<ISegmentPostData>();
+			OverCutPostPath = new List<ISegmentPostData>();
+			LeadOutPostPath = new List<ISegmentPostData>();
 			CutDownPostPoint = null;
 			LiftUpPostPoint = null;
 			FollowSafeDistance = 0;
@@ -74,7 +75,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal interface IPostPath
+	internal interface ISegmentPostData
 	{
 		EPostPathType PostPathType
 		{
@@ -94,7 +95,7 @@ namespace MyCAM.Data
 		List<PostPoint> GetPostPointList();
 	}
 
-	internal abstract class UndispersionPostPath : IPostPath
+	internal abstract class NormalPost : ISegmentPostData
 	{
 		public abstract EPostPathType PostPathType
 		{
@@ -119,17 +120,16 @@ namespace MyCAM.Data
 			return pointList;
 		}
 
-		protected UndispersionPostPath( PostPoint startPoint, PostPoint endPoint )
+		protected NormalPost( PostPoint startPoint, PostPoint endPoint )
 		{
 			StartPoint = startPoint;
 			EndPoint = endPoint;
 		}
 	}
 
-
-	internal class LinePostPath : UndispersionPostPath
+	internal class LinePost : NormalPost
 	{
-		public LinePostPath( PostPoint startPoint, PostPoint endPoint )
+		public LinePost( PostPoint startPoint, PostPoint endPoint )
 			: base( startPoint, endPoint )
 		{
 			StartPoint = startPoint;
@@ -145,9 +145,9 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal class ArcPostPath : UndispersionPostPath
+	internal class ArcPost : NormalPost
 	{
-		public ArcPostPath( PostPoint startPoint, PostPoint midPoint, PostPoint endPoint )
+		public ArcPost( PostPoint startPoint, PostPoint midPoint, PostPoint endPoint )
 			: base( startPoint, endPoint )
 		{
 			StartPoint = startPoint;
@@ -179,7 +179,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal abstract class DispersionPostPath : IPostPath
+	internal abstract class SplitPost : ISegmentPostData
 	{
 		public abstract EPostPathType PostPathType
 		{
@@ -206,7 +206,7 @@ namespace MyCAM.Data
 			return new List<PostPoint>( PostPointList );
 		}
 
-		protected DispersionPostPath( List<PostPoint> postPointList )
+		protected SplitPost( List<PostPoint> postPointList )
 		{
 			if( postPointList == null || postPointList.Count < 2 ) {
 				throw new System.ArgumentException( "DispersionPostPath requires at least 2 points" );
@@ -216,9 +216,10 @@ namespace MyCAM.Data
 			EndPoint = postPointList.Last();
 		}
 	}
-	internal class DispersionLinePostPath : DispersionPostPath
+
+	internal class SplitLinePost : SplitPost
 	{
-		public DispersionLinePostPath( List<PostPoint> postPointList )
+		public SplitLinePost( List<PostPoint> postPointList )
 			: base( postPointList )
 		{
 		}
@@ -232,14 +233,14 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal class DispersionArcPostPath : DispersionPostPath
+	internal class SplitArcPostPath : SplitPost
 	{
 		public PostPoint MidPoint
 		{
 			get; private set;
 		}
 
-		public DispersionArcPostPath( List<PostPoint> postPointList )
+		public SplitArcPostPath( List<PostPoint> postPointList )
 			: base( postPointList )
 		{
 			int midIndex = postPointList.Count / 2;
@@ -254,7 +255,6 @@ namespace MyCAM.Data
 			}
 		}
 	}
-
 
 	internal class PostData
 	{
@@ -378,6 +378,53 @@ namespace MyCAM.Data
 		public List<ICAMSegmentElement> LeadOutSegment
 		{
 			get; set;
+		}
+	}
+
+	internal class PathIKSolveInfo
+	{
+		public List<segmentIKInfo> LeadInIKSoveInfo
+		{
+			get; set;
+		}
+
+		public List<segmentIKInfo> MainPathIKSoveInfo
+		{
+			get; set;
+		}
+
+		public List<segmentIKInfo> OverCutIKSoveInfo
+		{
+			get; set;
+		}
+
+		public List<segmentIKInfo> LeadOutIKSoveInfo
+		{
+			get; set;
+		}
+	}
+
+	internal class segmentIKInfo
+	{
+		public List<CAMPoint2> CAMPointList
+		{
+			get; set;
+		}
+
+		public List<Tuple<double, double>> RotateAngleList
+		{
+			get; set;
+		}
+		public List<bool> SigularTagList
+		{
+			get; set;
+		}
+
+		public segmentIKInfo()
+		{
+			RotateAngleList = new List<Tuple<double, double>>();
+			SigularTagList = new List<bool>();
+			CAMPointList = new List<CAMPoint2>();
 		}
 	}
 }

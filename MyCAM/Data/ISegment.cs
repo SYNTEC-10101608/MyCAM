@@ -303,6 +303,8 @@ namespace MyCAM.Data
 		void SetStartPointToolVec( gp_Dir startPointToolVec );
 
 		void SetEndPointToolVec( gp_Dir endPointToolVec );
+
+		ICAMSegmentElement Clone();
 	}
 
 	internal abstract class CAMSegmentBase : ICAMSegmentElement
@@ -327,14 +329,30 @@ namespace MyCAM.Data
 
 		public virtual CAMPoint2 StartPoint
 		{
-			get;
-			private set;
+			get
+			{
+				return m_StartPoint;
+			}
+			private set
+			{
+				if( value != null ) {
+					m_StartPoint = value;
+				}
+			}
 		}
 
 		public virtual CAMPoint2 EndPoint
 		{
-			get;
-			private set;
+			get
+			{
+				return m_EndPoint;
+			}
+			private set
+			{
+				if( value != null ) {
+					m_EndPoint = value;
+				}
+			}
 		}
 
 		public virtual List<CAMPoint2> CAMPointList
@@ -394,6 +412,8 @@ namespace MyCAM.Data
 			CalculatePointLisToolVec();
 		}
 
+		public abstract ICAMSegmentElement Clone();
+
 		protected virtual void CalculatePointLisToolVec()
 		{
 			gp_Vec startPointToolVec = new gp_Vec( StartPoint.ToolVec );
@@ -415,6 +435,11 @@ namespace MyCAM.Data
 		}
 
 		protected List<CAMPoint2> m_CAMPointList = new List<CAMPoint2>();
+		protected CAMPoint2 m_StartPoint;
+		protected CAMPoint2 m_EndPoint;
+		protected double m_TotalLength = 0.0;
+		protected double m_PerArcLength = 0.0;
+		protected double m_PerChordLength = 0.0;
 	}
 
 	internal class LineCAMSegment : CAMSegmentBase
@@ -430,6 +455,15 @@ namespace MyCAM.Data
 			{
 				return EContourType.Line;
 			}
+		}
+
+		public override ICAMSegmentElement Clone()
+		{
+			List<CAMPoint2> clonedPointList = new List<CAMPoint2>();
+			foreach( CAMPoint2 point in CAMPointList ) {
+				clonedPointList.Add( point.Clone() );
+			}
+			return new LineCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength );
 		}
 	}
 
@@ -457,6 +491,15 @@ namespace MyCAM.Data
 			{
 				return m_dStartToMidLength;
 			}
+		}
+
+		public override ICAMSegmentElement Clone()
+		{
+			List<CAMPoint2> clonedPointList = new List<CAMPoint2>();
+			foreach( CAMPoint2 point in CAMPointList ) {
+				clonedPointList.Add( point.Clone() );
+			}
+			return new ArcCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength );
 		}
 
 		public CAMPoint2 MidPoint
