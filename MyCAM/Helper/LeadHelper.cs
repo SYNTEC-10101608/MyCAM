@@ -313,11 +313,12 @@ namespace MyCAM.Helper
 			eachChordLength = 0;
 
 			try {
+
+				// 3 points to arc
 				GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( startPoint, midPoint, endPoint );
 				if( !makeCircle.IsDone() ) {
 					return null;
 				}
-
 				Geom_TrimmedCurve arcCurve = makeCircle.Value();
 				if( arcCurve == null || arcCurve.IsNull() ) {
 					return null;
@@ -325,49 +326,30 @@ namespace MyCAM.Helper
 				GeomAdaptor_Curve adaptorCurve = new GeomAdaptor_Curve( arcCurve );
 				double dStartU = adaptorCurve.FirstParameter();
 				double dEndU = adaptorCurve.LastParameter();
-
 				totalLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dStartU, dEndU );
 				if( totalLength <= 0 ) {
 					return null;
 				}
-
-				int segmentCount = (int)Math.Ceiling( totalLength / maxSegmentLength );
-
-				// protection
-				if( segmentCount <= 0 ) {
-					segmentCount = 1;
-				}
-				if( segmentCount % 2 == 0 ) {
-					segmentCount++;
+				List<double> paramList = PretreatmentHelper.GetCurveEachSegmentParamByLength(
+					dStartU, dEndU, maxSegmentLength, totalLength, out eachArcLength );
+				if( paramList == null || paramList.Count < 2 ) {
+					return null;
 				}
 
-				eachArcLength = totalLength / segmentCount;
-				double deltaU = ( dEndU - dStartU ) / segmentCount;
-				gp_Dir normalVec = toolVec;
-
+				// doesn't matter
+				gp_Dir uselessVec = toolVec;
 				List<CAMPoint2> camPointList = new List<CAMPoint2>();
-				for( int i = 0; i <= segmentCount; i++ ) {
-					double u;
-					if( i == segmentCount ) {
-						u = dEndU;
-					}
-					else {
-						u = dStartU + i * deltaU;
-					}
 
+				foreach( double u in paramList ) {
 					gp_Pnt point = adaptorCurve.Value( u );
-					gp_Vec tangentVec = new gp_Vec();
-					gp_Pnt tempPoint = new gp_Pnt();
-					adaptorCurve.D1( u, ref tempPoint, ref tangentVec );
-					gp_Dir tangentDir = new gp_Dir( tangentVec );
-
-					CAMPoint2 camPoint = new CAMPoint2( point, normalVec, normalVec, tangentDir, toolVec );
+					CAMPoint2 camPoint = new CAMPoint2( point, uselessVec, uselessVec, uselessVec, toolVec );
 					camPointList.Add( camPoint );
 				}
 
 				if( camPointList.Count >= 2 ) {
 					eachChordLength = camPointList[ 0 ].Point.Distance( camPointList[ 1 ].Point );
 				}
+
 				return camPointList;
 			}
 			catch( Exception ) {

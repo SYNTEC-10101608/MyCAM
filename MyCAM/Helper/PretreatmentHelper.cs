@@ -99,8 +99,8 @@ namespace MyCAM.Helper
 
 				// each part split by equal length
 				double dthisEdgeLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dSegmentParamList[ i ], dSegmentParamList[ i + 1 ] );
-				List<double> thisPartParamList2 = GetCurveEachSegmentParamByLength( dSegmentParamList[ i ], dSegmentParamList[ i + 1 ], PRECISION_MAX_LENGTH, dthisEdgeLength, out double dEachArcLength );
-				CADPointList.Add( GetCADPointsFromCurveParams( thisPartParamList2, edge, shellFace, adaptorCurve ) );
+				List<double> thisPartParamList = GetCurveEachSegmentParamByLength( dSegmentParamList[ i ], dSegmentParamList[ i + 1 ], PRECISION_MAX_LENGTH, dthisEdgeLength, out double dEachArcLength );
+				CADPointList.Add( GetCADPointsFromCurveParams( thisPartParamList, edge, shellFace, adaptorCurve ) );
 				eachSegmentLength.Add( dthisEdgeLength );
 				eachArcLength.Add( dEachArcLength );
 			}
@@ -127,6 +127,116 @@ namespace MyCAM.Helper
 				segmentParamList.Reverse();
 			}
 			return segmentParamList;
+		}
+
+		public static List<double> GetCurveEachSegmentParamByLength( double dStartU, double dEndU, double dMaxSegmentLength, double dEdgeLength, out double dEachArcLength )
+		{
+			int nSubSegmentCount = (int)Math.Ceiling( dEdgeLength / dMaxSegmentLength );
+
+			// make sure to get odd count of points to get middle of edge for arc
+			if( nSubSegmentCount % 2 == 0 ) {
+				nSubSegmentCount += 1;
+			}
+			dEachArcLength = dEdgeLength / nSubSegmentCount;
+			double dDeltaU = ( dEndU - dStartU ) / nSubSegmentCount;
+			List<double> segmentParamList = new List<double>();
+			for( int i = 0; i < nSubSegmentCount; i++ ) {
+				double param = dStartU + i * dDeltaU;
+				segmentParamList.Add( param );
+			}
+			segmentParamList.Add( dEndU );
+			return segmentParamList;
+		}
+
+		public static List<CADPoint> GetSegmentPointsByEqualLength( TopoDS_Edge lineEdge, TopoDS_Face shellFace, double dMaxSegmentLength, out double dEdgeLength, out double dEachArcLength, out double dEachChordLength )
+		{
+			dEdgeLength = 0;
+			dEachArcLength = 0;
+			dEachChordLength = 0;
+
+			// get curve parameters
+			BRepAdaptor_Curve adaptorCurve = TryGetAdaptorCurve( lineEdge, shellFace, out double dStartU, out double dEndU );
+			if( adaptorCurve == null || adaptorCurve.IsNull() ) {
+				return null;
+			}
+
+			// curve length from parameter StartU toEndU 
+			dEdgeLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dStartU, dEndU );
+
+			List<double> segmentParamList = GetCurveEachSegmentParamByLength( dStartU, dEndU, dMaxSegmentLength, dEdgeLength, out dEachArcLength );
+			if( segmentParamList.Count < 2 ) {
+				return null;
+			}
+
+			// need to consider orientation
+			if( lineEdge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				segmentParamList.Reverse();
+			}
+			List<CADPoint> oneSegmentPointList = GetCADPointsFromCurveParams( segmentParamList, lineEdge, shellFace, adaptorCurve );
+
+			if( oneSegmentPointList.Count < 2 ) {
+				return null;
+			}
+			dEachChordLength = oneSegmentPointList.First().Point.Distance( oneSegmentPointList[ 1 ].Point );
+			return oneSegmentPointList;
+		}
+
+		// private function area
+
+		static List<CADPoint> GetCADPointsFromCurveParams( List<double> segmentParamList, TopoDS_Edge edge, TopoDS_Face shellFace, BRepAdaptor_Curve adC, bool IsTanVecAdjusted = false )
+		{
+			List<CADPoint> oneSegmentPointList = new List<CADPoint>();
+			for( int i = 0; i < segmentParamList.Count; i++ ) {
+				double U = segmentParamList[ i ];
+
+				// get point
+				gp_Pnt point = adC.Value( U );
+
+				// get shell normal (1st)
+				gp_Dir normalVec_1st = new gp_Dir();
+				BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, shellFace, U, ref normalVec_1st );
+				if( shellFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+					normalVec_1st.Reverse();
+				}
+
+				// TODO: get solid normal (2nd)
+				gp_Dir normalVec_2nd = new gp_Dir( normalVec_1st.XYZ() );
+
+				// get tangent
+				gp_Vec tangentVec = new gp_Vec();
+				gp_Pnt _p = new gp_Pnt();
+				adC.D1( U, ref _p, ref tangentVec );
+				if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+					tangentVec.Reverse();
+				}
+				CADPoint cadPoint = new CADPoint( point, normalVec_1st, normalVec_2nd, new gp_Dir( tangentVec ) );
+				oneSegmentPointList.Add( cadPoint );
+			}
+			return oneSegmentPointList;
+		}
+
+		static BRepAdaptor_Curve TryGetAdaptorCurve( TopoDS_Edge edge, TopoDS_Face face, out double dStartU, out double dEndU )
+		{
+			dStartU = 0.0;
+			dEndU = 0.0;
+
+			if( edge == null || face == null || edge.IsNull() || face.IsNull() ) {
+				return null;
+			}
+			try {
+				BRepAdaptor_Curve adCurve = new BRepAdaptor_Curve( edge, face );
+
+				// get the start and end point parameters
+				dStartU = adCurve.FirstParameter();
+				dEndU = adCurve.LastParameter();
+				return adCurve;
+			}
+
+			// when there is no correspondence between edge and face
+			catch( Exception ) {
+				return null;
+			}
+
 		}
 
 		// Tuple<double Deflection, double ChordLength, double ArcLength>
@@ -192,115 +302,6 @@ namespace MyCAM.Helper
 			double segmentArcLength = R * finalPartArcAngle;
 			Tuple<double, double, double> result = new Tuple<double, double, double>( deflectionToUse, segmentChordLength, segmentArcLength );
 			return result;
-		}
-
-		public static List<CADPoint> GetSegmentPointsByEqualLength( TopoDS_Edge lineEdge, TopoDS_Face shellFace, double dMaxSegmentLength, out double dEdgeLength, out double dEachArcLength, out double dEachChordLength )
-		{
-			dEdgeLength = 0;
-			dEachArcLength = 0;
-			dEachChordLength = 0;
-
-			// get curve parameters
-			BRepAdaptor_Curve adaptorCurve = TryGetAdaptorCurve( lineEdge, shellFace, out double dStartU, out double dEndU );
-			if( adaptorCurve == null || adaptorCurve.IsNull() ) {
-				return null;
-			}
-
-			// curve length from parameter StartU toEndU 
-			dEdgeLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dStartU, dEndU );
-
-			List<double> segmentParamList = GetCurveEachSegmentParamByLength( dStartU, dEndU, dMaxSegmentLength, dEdgeLength, out dEachArcLength );
-			if( segmentParamList.Count < 2 ) {
-				return null;
-			}
-
-			// need to consider orientation
-			if( lineEdge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-				segmentParamList.Reverse();
-			}
-			List<CADPoint> oneSegmentPointList = GetCADPointsFromCurveParams( segmentParamList, lineEdge, shellFace, adaptorCurve );
-
-			if( oneSegmentPointList.Count < 2 ) {
-				return null;
-			}
-			dEachChordLength = oneSegmentPointList.First().Point.Distance( oneSegmentPointList[ 1 ].Point );
-			return oneSegmentPointList;
-		}
-
-		// private function area
-		static List<double> GetCurveEachSegmentParamByLength( double dStartU, double dEndU, double dMaxSegmentLength, double dEdgeLength, out double dEachArcLength )
-		{
-			int nSubSegmentCount = (int)Math.Ceiling( dEdgeLength / dMaxSegmentLength );
-
-			// make sure to get odd count of points to get middle of edge for arc
-			if( nSubSegmentCount % 2 == 0 ) {
-				nSubSegmentCount += 1;
-			}
-			dEachArcLength = dEdgeLength / nSubSegmentCount;
-			double dDeltaU = ( dEndU - dStartU ) / nSubSegmentCount;
-			List<double> segmentParamList = new List<double>();
-			for( int i = 0; i < nSubSegmentCount; i++ ) {
-				double param = dStartU + i * dDeltaU;
-				segmentParamList.Add( param );
-			}
-			segmentParamList.Add( dEndU );
-			return segmentParamList;
-		}
-
-		static List<CADPoint> GetCADPointsFromCurveParams( List<double> segmentParamList, TopoDS_Edge edge, TopoDS_Face shellFace, BRepAdaptor_Curve adC, bool IsTanVecAdjusted = false )
-		{
-			List<CADPoint> oneSegmentPointList = new List<CADPoint>();
-			for( int i = 0; i < segmentParamList.Count; i++ ) {
-				double U = segmentParamList[ i ];
-
-				// get point
-				gp_Pnt point = adC.Value( U );
-
-				// get shell normal (1st)
-				gp_Dir normalVec_1st = new gp_Dir();
-				BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, shellFace, U, ref normalVec_1st );
-				if( shellFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-					normalVec_1st.Reverse();
-				}
-
-				// TODO: get solid normal (2nd)
-				gp_Dir normalVec_2nd = new gp_Dir( normalVec_1st.XYZ() );
-
-				// get tangent
-				gp_Vec tangentVec = new gp_Vec();
-				gp_Pnt _p = new gp_Pnt();
-				adC.D1( U, ref _p, ref tangentVec );
-				if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-					tangentVec.Reverse();
-				}
-				CADPoint cadPoint = new CADPoint( point, normalVec_1st, normalVec_2nd, new gp_Dir( tangentVec ) );
-				oneSegmentPointList.Add( cadPoint );
-			}
-			return oneSegmentPointList;
-		}
-
-		static BRepAdaptor_Curve TryGetAdaptorCurve( TopoDS_Edge edge, TopoDS_Face face, out double dStartU, out double dEndU )
-		{
-			dStartU = 0.0;
-			dEndU = 0.0;
-
-			if( edge == null || face == null || edge.IsNull() || face.IsNull() ) {
-				return null;
-			}
-			try {
-				BRepAdaptor_Curve adCurve = new BRepAdaptor_Curve( edge, face );
-
-				// get the start and end point parameters
-				dStartU = adCurve.FirstParameter();
-				dEndU = adCurve.LastParameter();
-				return adCurve;
-			}
-
-			// when there is no correspondence between edge and face
-			catch( Exception ) {
-				return null;
-			}
-
 		}
 
 		const double PRECISION_DEFLECTION = 0.01;
