@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.NetworkInformation;
 using MyCAM.CacheInfo;
 using MyCAM.Data;
 using MyCAM.Helper;
@@ -60,7 +59,7 @@ namespace MyCAM.Post
 						// solve all post data of the path
 						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessCacheInfoList[ i ], pathNCPackage, m_CraftDataList[ i ],
 							endInfoOfPreviousPath, m_EntryAndExitData,
-							out PathPostData postData, out _, out endInfoOfPreviousPath, true ) ) {
+							out PathPostData postData, out _, out endInfoOfPreviousPath, true, true ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 							return false;
 						}
@@ -119,7 +118,7 @@ namespace MyCAM.Post
 				WriteG01Path( linePostPath );
 				return;
 			}
-			if(segmentPostPath is SplitPost dispersionPostPath) {
+			if( segmentPostPath is SplitPost dispersionPostPath ) {
 				WriteDispersionG01Path( dispersionPostPath );
 			}
 		}
@@ -152,13 +151,13 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} {m_MasterAxisName}{szM} {m_SlaveAxisName}{szS};" );
 		}
 
-		void WriteDispersionG01Path(SplitPost postPath)
+		void WriteDispersionG01Path( SplitPost postPath )
 		{
 			List<PostPoint> postPointList = postPath.PostPointList;
 
 			// first point do not need to write g01
-			for ( int i = 1; i<postPointList.Count; i++ ) {
-				string szX = postPointList[i].X.ToString( "F3" );
+			for( int i = 1; i < postPointList.Count; i++ ) {
+				string szX = postPointList[ i ].X.ToString( "F3" );
 				string szY = postPointList[ i ].Y.ToString( "F3" );
 				string szZ = postPointList[ i ].Z.ToString( "F3" );
 				string szM = ( postPointList[ i ].Master * 180 / Math.PI ).ToString( "F3" );

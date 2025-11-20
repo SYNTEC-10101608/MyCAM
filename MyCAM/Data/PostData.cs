@@ -92,6 +92,11 @@ namespace MyCAM.Data
 			get;
 		}
 
+		bool IsModify
+		{
+			get;
+		}
+
 		List<PostPoint> GetPostPointList();
 	}
 
@@ -112,6 +117,12 @@ namespace MyCAM.Data
 			get; protected set;
 		}
 
+		public bool IsModify
+		{
+			get;
+			private set;
+		} = false;
+
 		public virtual List<PostPoint> GetPostPointList()
 		{
 			List<PostPoint> pointList = new List<PostPoint>();
@@ -120,20 +131,19 @@ namespace MyCAM.Data
 			return pointList;
 		}
 
-		protected NormalPost( PostPoint startPoint, PostPoint endPoint )
+		protected NormalPost( PostPoint startPoint, PostPoint endPoint, bool isModify )
 		{
 			StartPoint = startPoint;
 			EndPoint = endPoint;
+			IsModify = isModify;
 		}
 	}
 
 	internal class LinePost : NormalPost
 	{
-		public LinePost( PostPoint startPoint, PostPoint endPoint )
-			: base( startPoint, endPoint )
+		public LinePost( PostPoint startPoint, PostPoint endPoint, bool isModify )
+			: base( startPoint, endPoint, isModify )
 		{
-			StartPoint = startPoint;
-			EndPoint = endPoint;
 		}
 
 		public override EPostPathType PostPathType
@@ -147,19 +157,17 @@ namespace MyCAM.Data
 
 	internal class ArcPost : NormalPost
 	{
-		public ArcPost( PostPoint startPoint, PostPoint midPoint, PostPoint endPoint )
-			: base( startPoint, endPoint )
+		public ArcPost( PostPoint startPoint, PostPoint midPoint, PostPoint endPoint, bool isModify )
+			: base( startPoint, endPoint, isModify )
 		{
-			StartPoint = startPoint;
 			MidPoint = midPoint;
-			EndPoint = endPoint;
 		}
 
 		public override EPostPathType PostPathType
 		{
 			get
 			{
-				return EPostPathType.Line;
+				return EPostPathType.Arc;
 			}
 		}
 
@@ -186,6 +194,11 @@ namespace MyCAM.Data
 			get;
 		}
 
+		public bool IsModify
+		{
+			get;
+		} = false;
+
 		public PostPoint StartPoint
 		{
 			get; protected set;
@@ -203,10 +216,10 @@ namespace MyCAM.Data
 
 		public virtual List<PostPoint> GetPostPointList()
 		{
-			return new List<PostPoint>( PostPointList );
+			return PostPointList;
 		}
 
-		protected SplitPost( List<PostPoint> postPointList )
+		protected SplitPost( List<PostPoint> postPointList, bool isModify )
 		{
 			if( postPointList == null || postPointList.Count < 2 ) {
 				throw new System.ArgumentException( "DispersionPostPath requires at least 2 points" );
@@ -214,13 +227,14 @@ namespace MyCAM.Data
 			PostPointList = postPointList;
 			StartPoint = postPointList.First();
 			EndPoint = postPointList.Last();
+			IsModify = isModify;
 		}
 	}
 
 	internal class SplitLinePost : SplitPost
 	{
-		public SplitLinePost( List<PostPoint> postPointList )
-			: base( postPointList )
+		public SplitLinePost( List<PostPoint> postPointList, bool isModify )
+			: base( postPointList, isModify )
 		{
 		}
 
@@ -240,8 +254,8 @@ namespace MyCAM.Data
 			get; private set;
 		}
 
-		public SplitArcPostPath( List<PostPoint> postPointList )
-			: base( postPointList )
+		public SplitArcPostPath( List<PostPoint> postPointList, bool isModify )
+			: base( postPointList, isModify )
 		{
 			int midIndex = postPointList.Count / 2;
 			MidPoint = postPointList[ midIndex ];
