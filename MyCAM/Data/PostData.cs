@@ -399,6 +399,36 @@ namespace MyCAM.Data
 		{
 			get; set;
 		}
+
+		public CAMPoint ProcessStartPnt
+		{
+			get; set;
+		}
+
+		public CAMPoint ProcessEndPnt
+		{
+			get; set;
+		}
+
+		public double LiftUpDistance
+		{
+			get; set;
+		}
+
+		public double FrogLeapDistance
+		{
+			get; set;
+		}
+
+		public double CutDownDistance
+		{
+			get; set;
+		}
+
+		 public double FollowSafeDistance
+		{
+			get;set;
+		}
 	}
 
 	internal class PathIKSolveInfo

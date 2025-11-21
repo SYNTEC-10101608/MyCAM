@@ -68,7 +68,6 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-
 		public List<ICAMSegmentElement> LeadInSegment
 		{
 			get
@@ -406,7 +405,7 @@ namespace MyCAM.CacheInfo
 						// record this segment index with control stick
 						if( k != splitedCAMPointList.Count - 1 ) {
 							SegmentPointIndex oriSegmentIndex = ControlStickMap[ new SegmentPointIndex( segmentIndex, breakPointIndex[ k ] ) ];
-							breakedCAMSegmentList[ breakedCAMSegmentList.Count - 1 ].IsModifySegment = true;
+							breakedCAMSegmentList[ breakedCAMSegmentList.Count - 1 ].IsModify = true;
 							ControlStickMapAsOriIndex[ breakedCAMSegmentList.Count - 1 ] = oriSegmentIndex;
 						}
 						else {
@@ -415,7 +414,7 @@ namespace MyCAM.CacheInfo
 							if( isLastSegmentModify ) {
 								SegmentPointIndex oriSegmentIndex = ControlStickMap[ new SegmentPointIndex( segmentIndex, breakPointIndex[ k ] ) ];
 								ControlStickMapAsOriIndex[ breakedCAMSegmentList.Count - 1 ] = oriSegmentIndex;
-								breakedCAMSegmentList[ breakedCAMSegmentList.Count - 1 ].IsModifySegment = true;
+								breakedCAMSegmentList[ breakedCAMSegmentList.Count - 1 ].IsModify = true;
 							}
 						}
 					}
@@ -637,7 +636,7 @@ namespace MyCAM.CacheInfo
 		void SetOverCut()
 		{
 			if ( m_CraftData.OverCutLength > 0 ) {
-				List<ICAMSegmentElement> overCutSement = OverCutSegmentBuilder.BuildOverCutSegment( m_CAMSegmentList, m_CraftData.OverCutLength );
+				List<ICAMSegmentElement> overCutSement = OverCutSegmentBuilder.BuildOverCutSegment( m_CAMSegmentList, m_CraftData.OverCutLength ,m_CraftData.IsReverse);
 				if( overCutSement.Count > 0 ) {
 					m_OverCutSegmentList = overCutSement;
 				}

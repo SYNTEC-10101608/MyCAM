@@ -54,11 +54,10 @@ namespace MyCAM.Post
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
 					for( int i = 0; i < m_ProcessCacheInfoList.Count; i++ ) {
-						bool isBuildSucces = NCHelper.BuildNCPackage( m_ProcessCacheInfoList[ i ], out PathNCPackage pathNCPackage );
+						bool isBuildSucces = NCHelper.BuildNCPackage( m_ProcessCacheInfoList[ i ], m_CraftDataList[ i ], out PathNCPackage pathNCPackage );
 
 						// solve all post data of the path
-						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessCacheInfoList[ i ], pathNCPackage, m_CraftDataList[ i ],
-							endInfoOfPreviousPath, m_EntryAndExitData,
+						if( !PostHelper.SolvePath( m_PostSolver, pathNCPackage, endInfoOfPreviousPath, m_EntryAndExitData,
 							out PathPostData postData, out _, out endInfoOfPreviousPath, true, true ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 							return false;

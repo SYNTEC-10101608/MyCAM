@@ -296,7 +296,7 @@ namespace MyCAM.Data
 			get;
 		}
 
-		bool IsModifySegment
+		bool IsModify
 		{
 			get; set;
 		}
@@ -325,7 +325,7 @@ namespace MyCAM.Data
 			TotalLength = dTotalLength;
 			PerArcLength = dArcLength;
 			PerChordLength = dChordLength;
-			IsModifySegment = isModifySegment;
+			IsModify = isModifySegment;
 		}
 
 		public abstract EContourType ContourType
@@ -333,7 +333,7 @@ namespace MyCAM.Data
 			get;
 		}
 
-		public virtual bool IsModifySegment
+		public virtual bool IsModify
 		{
 			get
 			{
