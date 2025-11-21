@@ -49,20 +49,20 @@ namespace MyCAM.Post
 			double dLastPointProcess_S = endInfoOfPreviousPath?.Slave ?? 0;
 
 			if( useACSolution ) {
-				return SolvePathWithACInterpolation( postSolver, currentCAMData, pathNCPacke, craftData,
+				return SolvePathWithACCase( postSolver, currentCAMData, pathNCPacke, craftData,
 					endInfoOfPreviousPath, entryAndExitData,
 					out pathG54PostData, out pathMCSPostData, out currentPathtEndInfo, isNeedDispersion,
 					ref dLastPointProcess_M, ref dLastPointProcess_S );
 			}
 			else {
-				return SolvePathTraditional( postSolver, pathNCPacke, craftData, currentCAMData,
+				return SolvePathNormalCase( postSolver, pathNCPacke, craftData, currentCAMData,
 					endInfoOfPreviousPath, entryAndExitData,
 					out pathG54PostData, out pathMCSPostData, out currentPathtEndInfo, isNeedDispersion,
 					ref dLastPointProcess_M, ref dLastPointProcess_S );
 			}
 		}
 
-		static bool SolvePathWithACInterpolation( PostSolver postSolver, ContourCacheInfo currentCAMData, PathNCPackage pathNCPacke, CraftData craftData,
+		static bool SolvePathWithACCase( PostSolver postSolver, ContourCacheInfo currentCAMData, PathNCPackage pathNCPacke, CraftData craftData,
 			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
 			out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo, bool isNeedDispersion,
 			ref double dLastPointProcess_M, ref double dLastPointProcess_S )
@@ -131,7 +131,7 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		static bool SolvePathTraditional( PostSolver postSolver, PathNCPackage pathNCPacke, CraftData craftData, ContourCacheInfo currentCAMData,
+		static bool SolvePathNormalCase( PostSolver postSolver, PathNCPackage pathNCPacke, CraftData craftData, ContourCacheInfo currentCAMData,
 			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
 			out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo, bool isNeedDispersion,
 			ref double dLastPointProcess_M, ref double dLastPointProcess_S )
@@ -187,7 +187,7 @@ namespace MyCAM.Post
 			if( pathNCPacke.LeadOutSegment.Count > 0 ) {
 				if( !SolveProcessPathIK( postSolver, pathNCPacke.LeadOutSegment,
 					ref dLastPointProcess_M, ref dLastPointProcess_S,
-					out List<ISegmentPostData> leadOutG54,isNeedDispersion ) ) {
+					out List<ISegmentPostData> leadOutG54, isNeedDispersion ) ) {
 					return false;
 				}
 				pathG54PostData.LeadOutPostPath.AddRange( leadOutG54 );
@@ -312,7 +312,7 @@ namespace MyCAM.Post
 
 				// spacial case: if it's the last point of modify segment, don't mark as singular
 				bool isLastPointOfModifySegment = isModify && ( i == pointList.Count - 1 );
-				bool shouldMarkAsSingular = isSingular && !isLastPointOfModifySegment;
+				bool isMarkAsSingular = isSingular && !isLastPointOfModifySegment;
 				PostPoint postPoint = new PostPoint()
 				{
 					X = camPoint.Point.X(),
@@ -320,30 +320,42 @@ namespace MyCAM.Post
 					Z = camPoint.Point.Z(),
 					Master = dLastProcessPathM,
 					Slave = dLastProcessPathS,
-					IsInSigularRabge = shouldMarkAsSingular
+					IsInSigularRabge = isMarkAsSingular
 				};
 				postPointList.Add( postPoint );
 			}
 			return postPointList;
 		}
 
-		static ISegmentPostData CreateSegmentPostData( ICAMSegmentElement camSegment, List<PostPoint> postPointList, bool isNeedDispersion )
+		static ISegmentPostData CreateSegmentPostData( ICAMSegmentElement camSegment, List<PostPoint> postPointList, bool isDisperseSeg )
 		{
 			bool isModified = camSegment.IsModifySegment;
 
 			if( camSegment is ArcCAMSegment ) {
-				if( isNeedDispersion ) {
+				if( isDisperseSeg ) {
+					if( postPointList.Count < 3 ) {
+						return null;
+					}
 					return new SplitArcPostPath( postPointList, isModified );
 				}
 				else {
+					if( postPointList.Count != 3 ) {
+						return null;
+					}
 					return new ArcPost( postPointList[ 0 ], postPointList[ 1 ], postPointList[ 2 ], isModified );
 				}
 			}
 			else if( camSegment is LineCAMSegment ) {
-				if( isNeedDispersion ) {
+				if( isDisperseSeg ) {
+					if (postPointList.Count < 2) {
+						return null;
+					}
 					return new SplitLinePost( postPointList, isModified );
 				}
 				else {
+					if(postPointList.Count != 2 ) {
+						return null;
+					}
 					return new LinePost( postPointList[ 0 ], postPointList[ 1 ], isModified );
 				}
 			}
@@ -713,8 +725,8 @@ namespace MyCAM.Post
 			bool isWrappedRegion = region.isWrapped;
 
 			// get entry and exit angles
-			(double entryMaster, double entrySlave) = GetEntryAngles( allPoints, singularStart, singularEnd, isWrappedRegion, isClosedPath );
-			(double exitMaster, double exitSlave) = GetExitAngles( allPoints, singularStart, singularEnd, isWrappedRegion, isClosedPath );
+			(double entryMaster, double entrySlave) = GetEntryAngle( allPoints, singularStart, singularEnd, isWrappedRegion, isClosedPath );
+			(double exitMaster, double exitSlave) = GetExitAngle( allPoints, singularStart, singularEnd, isWrappedRegion, isClosedPath );
 
 			if( isWrappedRegion ) {
 				// handle wrapped singular region
@@ -794,7 +806,7 @@ namespace MyCAM.Post
 			}
 		}
 
-		static (double master, double slave) GetEntryAngles( List<PostPoint> allPoints, int singularStart, int singularEnd, bool isWrapped, bool isClosedPath )
+		static (double master, double slave) GetEntryAngle( List<PostPoint> allPoints, int singularStart, int singularEnd, bool isWrapped, bool isClosedPath )
 		{
 			if( isWrapped ) {
 				// 跨起點區域：入口角度是 singularStart 的前一個點
@@ -822,7 +834,7 @@ namespace MyCAM.Post
 			return (0.0, 0.0);
 		}
 
-		static (double master, double slave) GetExitAngles( List<PostPoint> allPoints, int singularStart, int singularEnd, bool isWrapped, bool isClosedPath )
+		static (double master, double slave) GetExitAngle( List<PostPoint> allPoints, int singularStart, int singularEnd, bool isWrapped, bool isClosedPath )
 		{
 			if( isWrapped ) {
 				// 跨起點區域：出口角度是 singularEnd 的下一個點
@@ -913,7 +925,7 @@ namespace MyCAM.Post
 			}
 			distances.Add( totalDistance );
 
-			// 計算 wrapped 點之間的累積距離
+			// cal point in singular area each distance
 			for( int j = 0; j < wrappedPoints.Count - 1; j++ ) {
 				PostPoint p1 = wrappedPoints[ j ];
 				PostPoint p2 = wrappedPoints[ j + 1 ];

@@ -1,13 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using MyCAM.CacheInfo;
 using MyCAM.Data;
-using OCC.BRepAdaptor;
-using OCC.GC;
-using OCC.GCPnts;
-using OCC.Geom;
-using OCC.gp;
 
 namespace MyCAM.Helper
 {
@@ -26,6 +20,17 @@ namespace MyCAM.Helper
 			ncPackage.LeadOutSegment = contourCacheInfo.LeadOutSegment?.Select( eachSegment => eachSegment.Clone() ).ToList() ?? new List<ICAMSegmentElement>();
 			ncPackage.OverCutSegment = contourCacheInfo.OverCutSegment?.Select( eachSegment => eachSegment.Clone() ).ToList() ?? new List<ICAMSegmentElement>();
 			return true;
+		}
+
+		public static List<ICAMSegmentElement> ReverseSegment( List<ICAMSegmentElement> camSegmentList )
+		{
+			List<ICAMSegmentElement> reversedSegment = new List<ICAMSegmentElement>();
+			foreach( ICAMSegmentElement segment in camSegmentList ) {
+				List<CAMPoint2> temCAMPost = segment.CAMPointList;
+				temCAMPost.Reverse();
+
+			}
+			return reversedSegment;
 		}
 	}
 }

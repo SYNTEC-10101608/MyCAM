@@ -492,6 +492,8 @@ namespace MyCAM.Data
 			: base( camPointList, dTotalLength, dArcLength, dChordLength, isModifySegment )
 		{
 			m_MidIndex = camPointList.Count / 2;
+
+			// share pointer
 			MidPoint = camPointList[ m_MidIndex ];
 			m_dStartToMidLength = PerArcLength * m_MidIndex;
 		}
