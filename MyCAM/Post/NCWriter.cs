@@ -39,7 +39,7 @@ namespace MyCAM.Post
 		string m_SlaveAxisName = string.Empty;
 		EntryAndExitData m_EntryAndExitData;
 
-		public bool ConvertSuccess( out string errorMessage, bool isNeedDispersion = false )
+		public bool ConvertSuccess( out string errorMessage, bool isDispersion= true )
 		{
 			errorMessage = string.Empty;
 			try {
@@ -62,7 +62,7 @@ namespace MyCAM.Post
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 							return false;
 						}
-						WriteCutting( postData, i + 1 );
+						WriteCutting( postData, i + 1, isDispersion );
 					}
 
 					// write exit
@@ -84,7 +84,7 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteCutting( PathPostData currentPathPostData, int N_Index )
+		void WriteCutting( PathPostData currentPathPostData, int N_Index , bool isDispersion )
 		{
 			// the N code
 			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
@@ -97,18 +97,23 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\" H1;" );
 
 			// write each process path
-			WriteOneProcessPath( currentPathPostData.LeadInPostPath );
-			WriteOneProcessPath( currentPathPostData.MainPathPostPath );
-			WriteOneProcessPath( currentPathPostData.OverCutPostPath );
-			WriteOneProcessPath( currentPathPostData.LeadOutPostPath );
+			WriteOneProcessPath( currentPathPostData.LeadInPostPath , isDispersion);
+			WriteOneProcessPath( currentPathPostData.MainPathPostPath, isDispersion );
+			WriteOneProcessPath( currentPathPostData.OverCutPostPath, isDispersion );
+			WriteOneProcessPath( currentPathPostData.LeadOutPostPath, isDispersion );
 
 			// end cutting
 			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" );
 			return;
 		}
 
-		void WriteOneSegmentPath( ISegmentPostData segmentPostPath )
+		void WriteOneSegmentPath( ISegmentPostData segmentPostPath, bool isSplit )
 		{
+			if( isSplit ) {
+				WriteDispersionG01Path( segmentPostPath );
+				return;
+			}
+
 			if( segmentPostPath is ArcPost arcPostPath ) {
 				WriteG02Path( arcPostPath );
 				return;
@@ -116,9 +121,6 @@ namespace MyCAM.Post
 			if( segmentPostPath is LinePost linePostPath ) {
 				WriteG01Path( linePostPath );
 				return;
-			}
-			if( segmentPostPath is SplitPost dispersionPostPath ) {
-				WriteDispersionG01Path( dispersionPostPath );
 			}
 		}
 
@@ -150,7 +152,7 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( $"{command} X{szX} Y{szY} Z{szZ} {m_MasterAxisName}{szM} {m_SlaveAxisName}{szS};" );
 		}
 
-		void WriteDispersionG01Path( SplitPost postPath )
+		void WriteDispersionG01Path( ISegmentPostData postPath )
 		{
 			List<PostPoint> postPointList = postPath.PostPointList;
 
@@ -213,14 +215,14 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteOneProcessPath( List<ISegmentPostData> postPointList )
+		void WriteOneProcessPath( List<ISegmentPostData> postPointList, bool isDispersion )
 		{
 			if( postPointList == null || postPointList.Count == 0 ) {
 				return;
 			}
 			for( int i = 0; i < postPointList.Count; i++ ) {
 				var onePostPoint = postPointList[ i ];
-				WriteOneSegmentPath( onePostPoint );
+				WriteOneSegmentPath( onePostPoint, isDispersion );
 			}
 		}
 

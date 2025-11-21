@@ -7,9 +7,7 @@ namespace MyCAM.Data
 	public enum EPostPathType
 	{
 		Line,
-		Arc,
-		DispersionLine,
-		DispersionArc
+		Arc
 	}
 
 	internal class PathPostData
@@ -97,73 +95,101 @@ namespace MyCAM.Data
 			get;
 		}
 
+		List<PostPoint> PostPointList
+		{
+			get; set;
+		}
+
 		List<PostPoint> GetPostPointList();
 	}
 
-	internal abstract class NormalPost : ISegmentPostData
+	internal class LinePost : ISegmentPostData
 	{
-		public abstract EPostPathType PostPathType
+		public LinePost( List<PostPoint> postPointList, bool isModify )
 		{
-			get;
+			PostPointList = postPointList;
+			IsModify = isModify;
+			StartPoint = postPointList.First();
+			EndPoint = postPointList.Last();
 		}
 
 		public PostPoint StartPoint
 		{
-			get; protected set;
+			get; set;
 		}
 
 		public PostPoint EndPoint
 		{
-			get; protected set;
+			get; set;
+		}
+
+		public List<PostPoint> PostPointList
+		{
+			get; set;
 		}
 
 		public bool IsModify
 		{
-			get;
-			private set;
-		} = false;
-
-		public virtual List<PostPoint> GetPostPointList()
-		{
-			List<PostPoint> pointList = new List<PostPoint>();
-			pointList.Add( StartPoint );
-			pointList.Add( EndPoint );
-			return pointList;
+			get; protected set;
 		}
 
-		protected NormalPost( PostPoint startPoint, PostPoint endPoint, bool isModify )
-		{
-			StartPoint = startPoint;
-			EndPoint = endPoint;
-			IsModify = isModify;
-		}
-	}
-
-	internal class LinePost : NormalPost
-	{
-		public LinePost( PostPoint startPoint, PostPoint endPoint, bool isModify )
-			: base( startPoint, endPoint, isModify )
-		{
-		}
-
-		public override EPostPathType PostPathType
+		public EPostPathType PostPathType
 		{
 			get
 			{
 				return EPostPathType.Line;
 			}
 		}
+
+		public List<PostPoint> GetPostPointList()
+		{
+			return PostPointList;
+		}
 	}
 
-	internal class ArcPost : NormalPost
+	internal class ArcPost : ISegmentPostData
 	{
-		public ArcPost( PostPoint startPoint, PostPoint midPoint, PostPoint endPoint, bool isModify )
-			: base( startPoint, endPoint, isModify )
+		public PostPoint MidPoint
 		{
-			MidPoint = midPoint;
+			get; private set;
 		}
 
-		public override EPostPathType PostPathType
+		public ArcPost( List<PostPoint> postPointList, bool isModify )
+		{
+			PostPointList = postPointList;
+			int midIndex = postPointList.Count / 2;
+			MidPoint = postPointList[ midIndex ];
+		}
+
+		public PostPoint StartPoint
+		{
+			get; set;
+		}
+
+		public PostPoint EndPoint
+		{
+			get; set;
+		}
+
+		public PostPoint MidPnt
+		{
+			get
+			{
+				return MidPoint;
+			}
+		}
+
+		public List<PostPoint> PostPointList
+		{
+			get; set;
+		}
+
+		public bool IsModify
+		{
+			get; protected set;
+		}
+
+		public EPostPathType PostPathType
 		{
 			get
 			{
@@ -171,102 +197,9 @@ namespace MyCAM.Data
 			}
 		}
 
-		public PostPoint MidPoint
-		{
-			get;
-			private set;
-		}
-
-		public override List<PostPoint> GetPostPointList()
-		{
-			List<PostPoint> pointList = new List<PostPoint>();
-			pointList.Add( StartPoint );
-			pointList.Add( MidPoint );
-			pointList.Add( EndPoint );
-			return pointList;
-		}
-	}
-
-	internal abstract class SplitPost : ISegmentPostData
-	{
-		public abstract EPostPathType PostPathType
-		{
-			get;
-		}
-
-		public bool IsModify
-		{
-			get;
-		} = false;
-
-		public PostPoint StartPoint
-		{
-			get; protected set;
-		}
-
-		public PostPoint EndPoint
-		{
-			get; protected set;
-		}
-
-		public List<PostPoint> PostPointList
-		{
-			get; protected set;
-		}
-
-		public virtual List<PostPoint> GetPostPointList()
+		public List<PostPoint> GetPostPointList()
 		{
 			return PostPointList;
-		}
-
-		protected SplitPost( List<PostPoint> postPointList, bool isModify )
-		{
-			if( postPointList == null || postPointList.Count < 2 ) {
-				throw new System.ArgumentException( "DispersionPostPath requires at least 2 points" );
-			}
-			PostPointList = postPointList;
-			StartPoint = postPointList.First();
-			EndPoint = postPointList.Last();
-			IsModify = isModify;
-		}
-	}
-
-	internal class SplitLinePost : SplitPost
-	{
-		public SplitLinePost( List<PostPoint> postPointList, bool isModify )
-			: base( postPointList, isModify )
-		{
-		}
-
-		public override EPostPathType PostPathType
-		{
-			get
-			{
-				return EPostPathType.DispersionLine;
-			}
-		}
-	}
-
-	internal class SplitArcPostPath : SplitPost
-	{
-		public PostPoint MidPoint
-		{
-			get; private set;
-		}
-
-		public SplitArcPostPath( List<PostPoint> postPointList, bool isModify )
-			: base( postPointList, isModify )
-		{
-			int midIndex = postPointList.Count / 2;
-			MidPoint = postPointList[ midIndex ];
-		}
-
-		public override EPostPathType PostPathType
-		{
-			get
-			{
-				return EPostPathType.DispersionArc;
-			}
 		}
 	}
 
@@ -425,9 +358,9 @@ namespace MyCAM.Data
 			get; set;
 		}
 
-		 public double FollowSafeDistance
+		public double FollowSafeDistance
 		{
-			get;set;
+			get; set;
 		}
 	}
 

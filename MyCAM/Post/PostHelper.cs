@@ -272,7 +272,7 @@ namespace MyCAM.Post
 		{
 			List<ISegmentPostData> segmentPostData = new List<ISegmentPostData>();
 			foreach( ICAMSegmentElement camSegment in camSegmentList ) {
-				List<CAMPoint2> pointList = GetPointsFromSegment( camSegment, isNeedDispersion );
+				List<CAMPoint2> pointList = camSegment.CAMPointList;
 				List<PostPoint> postPointList = new List<PostPoint>();
 				foreach( CAMPoint2 camPoint in pointList ) {
 					PostPoint postList = new PostPoint()
@@ -331,54 +331,18 @@ namespace MyCAM.Post
 			bool isModified = camSegment.IsModify;
 
 			if( camSegment is ArcCAMSegment ) {
-				if( isDisperseSeg ) {
-					if( postPointList.Count < 3 ) {
-						return null;
-					}
-					return new SplitArcPostPath( postPointList, isModified );
+				if( postPointList.Count < 3 ) {
+					return null;
 				}
-				else {
-					if( postPointList.Count != 3 ) {
-						return null;
-					}
-					return new ArcPost( postPointList[ 0 ], postPointList[ 1 ], postPointList[ 2 ], isModified );
-				}
+				return new ArcPost( postPointList, isModified );
 			}
 			else if( camSegment is LineCAMSegment ) {
-				if( isDisperseSeg ) {
-					if( postPointList.Count < 2 ) {
-						return null;
-					}
-					return new SplitLinePost( postPointList, isModified );
+				if( postPointList.Count < 2 ) {
+					return null;
 				}
-				else {
-					if( postPointList.Count != 2 ) {
-						return null;
-					}
-					return new LinePost( postPointList[ 0 ], postPointList[ 1 ], isModified );
-				}
+				return new LinePost( postPointList, isModified );
 			}
 			return null;
-		}
-
-		static List<CAMPoint2> GetPointsFromSegment( ICAMSegmentElement camSegment, bool isNeedDispersion )
-		{
-			if( isNeedDispersion ) {
-				return camSegment.CAMPointList;
-			}
-			else {
-				List<CAMPoint2> pointList = new List<CAMPoint2>();
-				if( camSegment is ArcCAMSegment arcCAMSegment ) {
-					pointList.Add( arcCAMSegment.StartPoint );
-					pointList.Add( arcCAMSegment.MidPoint );
-					pointList.Add( camSegment.EndPoint );
-				}
-				else {
-					pointList.Add( camSegment.StartPoint );
-					pointList.Add( camSegment.EndPoint );
-				}
-				return pointList;
-			}
 		}
 
 		static List<PostPoint> CreateMCSPostPoints( PostSolver postSolver, List<CAMPoint2> camPoints, List<Tuple<double, double>> rotateAngleList, ref int pointIndex )
@@ -566,7 +530,7 @@ namespace MyCAM.Post
 				return false;
 			}
 			foreach( ICAMSegmentElement camSegment in segmentList ) {
-				List<CAMPoint2> pointList = GetPointsFromSegment( camSegment, isNeedDispersion );
+				List<CAMPoint2> pointList = camSegment.CAMPointList;
 
 				// create post points form each cam point
 				List<PostPoint> postPointList = CreateSegmentPostPoint( postSolver, pointList, ref dLastProcessPathM, ref dLastProcessPathS, camSegment.IsModify );
