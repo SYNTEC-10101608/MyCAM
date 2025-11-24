@@ -157,8 +157,11 @@ namespace MyCAM.Data
 		public ArcPost( List<PostPoint> postPointList, bool isModify )
 		{
 			PostPointList = postPointList;
+			StartPoint = PostPointList.First();
+			EndPoint = PostPointList.Last();
 			int midIndex = postPointList.Count / 2;
 			MidPoint = postPointList[ midIndex ];
+			IsModify = isModify;
 		}
 
 		public PostPoint StartPoint
@@ -359,6 +362,16 @@ namespace MyCAM.Data
 		}
 
 		public double FollowSafeDistance
+		{
+			get; set;
+		}
+
+		public double EntryDistance
+		{
+			get;set;
+		}
+
+		public double Entry_FollowSafeDistance
 		{
 			get; set;
 		}

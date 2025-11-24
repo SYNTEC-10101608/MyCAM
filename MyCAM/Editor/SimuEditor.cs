@@ -114,11 +114,12 @@ namespace MyCAM.Editor
 			}
 			foreach( string szID in m_DataManager.PartIDList ) {
 				CraftData craftData = ( m_DataManager.ObjectMap[ szID ] as PathObject ).CraftData;
+				EntryAndExitData entryAndExitData = m_DataManager.EntryAndExitData;
 				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szID ] as ContourPathObject ).ContourCacheInfo;
 				gp_Vec G54Offset = new gp_Vec( 40, -385, -640 );
 				m_PostSolver.G54Offset = G54Offset;
-				bool isBuildSucces = NCHelper.BuildNCPackage( contourCacheInfo, craftData, out PathNCPackage pathNCPackage );
-				if( PostHelper.SolvePath( m_PostSolver,  pathNCPackage,new PathEndInfo(), new EntryAndExitData(),
+				bool isBuildSucces = NCHelper.BuildNCPackage( contourCacheInfo, craftData, entryAndExitData, out PathNCPackage pathNCPackage );
+				if( PostHelper.SolvePath( m_PostSolver,  pathNCPackage,new PathEndInfo(),
 					out _, out PathPostData simuPostData, out _ ) == false ) {
 					continue;
 				}

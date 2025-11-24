@@ -39,7 +39,7 @@ namespace MyCAM.Post
 		string m_SlaveAxisName = string.Empty;
 		EntryAndExitData m_EntryAndExitData;
 
-		public bool ConvertSuccess( out string errorMessage, bool isDispersion= true )
+		public bool ConvertSuccess( out string errorMessage, bool isDispersion = true, bool isACCase = true )
 		{
 			errorMessage = string.Empty;
 			try {
@@ -54,11 +54,11 @@ namespace MyCAM.Post
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
 					for( int i = 0; i < m_ProcessCacheInfoList.Count; i++ ) {
-						bool isBuildSucces = NCHelper.BuildNCPackage( m_ProcessCacheInfoList[ i ], m_CraftDataList[ i ], out PathNCPackage pathNCPackage );
+						bool isBuildSucces = NCHelper.BuildNCPackage( m_ProcessCacheInfoList[ i ], m_CraftDataList[ i ], m_EntryAndExitData, out PathNCPackage pathNCPackage );
 
 						// solve all post data of the path
-						if( !PostHelper.SolvePath( m_PostSolver, pathNCPackage, endInfoOfPreviousPath, m_EntryAndExitData,
-							out PathPostData postData, out _, out endInfoOfPreviousPath, true, true ) ) {
+						if( !PostHelper.SolvePath( m_PostSolver, pathNCPackage, endInfoOfPreviousPath,
+							out PathPostData postData, out _, out endInfoOfPreviousPath, isDispersion, isACCase ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 							return false;
 						}
@@ -84,7 +84,7 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteCutting( PathPostData currentPathPostData, int N_Index , bool isDispersion )
+		void WriteCutting( PathPostData currentPathPostData, int N_Index, bool isDispersion )
 		{
 			// the N code
 			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
@@ -97,7 +97,7 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\" H1;" );
 
 			// write each process path
-			WriteOneProcessPath( currentPathPostData.LeadInPostPath , isDispersion);
+			WriteOneProcessPath( currentPathPostData.LeadInPostPath, isDispersion );
 			WriteOneProcessPath( currentPathPostData.MainPathPostPath, isDispersion );
 			WriteOneProcessPath( currentPathPostData.OverCutPostPath, isDispersion );
 			WriteOneProcessPath( currentPathPostData.LeadOutPostPath, isDispersion );

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MyCAM.CacheInfo;
 using MyCAM.Data;
 using MyCAM.Helper;
 using OCC.gp;
@@ -29,7 +28,7 @@ namespace MyCAM.Post
 	internal static class PostHelper
 	{
 		public static bool SolvePath( PostSolver postSolver, PathNCPackage pathNCPacke,
-	PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
+	PathEndInfo endInfoOfPreviousPath,
 	out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo, bool isNeedDispersion = true, bool useACSolution = true )
 		{
 			// for simulation
@@ -40,7 +39,7 @@ namespace MyCAM.Post
 
 			// to make solution continuous
 			currentPathtEndInfo = new PathEndInfo();
-			if( postSolver == null || pathNCPacke == null || entryAndExitData == null ) {
+			if( postSolver == null || pathNCPacke == null ) {
 				return false;
 			}
 
@@ -49,20 +48,20 @@ namespace MyCAM.Post
 			double dLastPointProcess_S = endInfoOfPreviousPath?.Slave ?? 0;
 
 			if( useACSolution ) {
-				return SolvePathWithACCase( postSolver, pathNCPacke, endInfoOfPreviousPath, entryAndExitData,
-					out pathG54PostData, out pathMCSPostData, out currentPathtEndInfo, isNeedDispersion,
+				return SolvePathWithACCase( postSolver, pathNCPacke, endInfoOfPreviousPath,
+					out pathG54PostData, out pathMCSPostData, out currentPathtEndInfo,
 					ref dLastPointProcess_M, ref dLastPointProcess_S );
 			}
 			else {
-				return SolvePathNormalCase( postSolver, pathNCPacke, endInfoOfPreviousPath, entryAndExitData,
-					out pathG54PostData, out pathMCSPostData, out currentPathtEndInfo, isNeedDispersion,
+				return SolvePathNormalCase( postSolver, pathNCPacke, endInfoOfPreviousPath,
+					out pathG54PostData, out pathMCSPostData, out currentPathtEndInfo,
 					ref dLastPointProcess_M, ref dLastPointProcess_S );
 			}
 		}
 
 		static bool SolvePathWithACCase( PostSolver postSolver, PathNCPackage pathNCPacke,
-			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
-			out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo, bool isNeedDispersion,
+			PathEndInfo endInfoOfPreviousPath,
+			out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo,
 			ref double dLastPointProcess_M, ref double dLastPointProcess_S )
 		{
 			pathG54PostData = new PathPostData();
@@ -70,10 +69,10 @@ namespace MyCAM.Post
 			currentPathtEndInfo = new PathEndInfo();
 			bool bStart = false;
 
-			// main path with AC interpolation
+			// Step 1 : solve main path
 			if( !SolvePath_ACSolution( postSolver, pathNCPacke.MainPathSegment,
 				ref dLastPointProcess_M, ref dLastPointProcess_S,
-				out List<ISegmentPostData> mainG54, isNeedDispersion ) ) {
+				out List<ISegmentPostData> mainG54 ) ) {
 				return false;
 			}
 			pathG54PostData.MainPathPostPath.AddRange( mainG54 );
@@ -84,8 +83,7 @@ namespace MyCAM.Post
 				List<ISegmentPostData> leadInPostData = BuildPostSegmentsWithFixedRotation(
 					pathNCPacke.LeadInSegment,
 					mainG54.First().StartPoint.Master,
-					mainG54.First().StartPoint.Slave,
-					isNeedDispersion );
+					mainG54.First().StartPoint.Slave );
 				pathG54PostData.LeadInPostPath.AddRange( leadInPostData );
 				pathMCSPostData.LeadInPostPath.AddRange( leadInPostData );
 
@@ -99,8 +97,7 @@ namespace MyCAM.Post
 				List<ISegmentPostData> leadOutPostData = BuildPostSegmentsWithFixedRotation(
 					pathNCPacke.LeadOutSegment,
 					mainG54.Last().EndPoint.Master,
-					mainG54.Last().EndPoint.Slave,
-					isNeedDispersion );
+					mainG54.Last().EndPoint.Slave );
 				pathG54PostData.LeadOutPostPath.AddRange( leadOutPostData );
 				pathMCSPostData.LeadOutPostPath.AddRange( leadOutPostData );
 			}
@@ -113,10 +110,10 @@ namespace MyCAM.Post
 
 			// calculate entry/traverse
 			if( endInfoOfPreviousPath == null ) {
-				CalculateEntry( pathNCPacke.ProcessStartPnt, entryAndExitData, ref pathG54PostData, ref pathMCSPostData );
+				CalculateEntry( pathNCPacke.ProcessStartPnt, pathNCPacke.EntryDistance, pathNCPacke.Entry_FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
 			}
 			else {
-				CalculateTraverse( endInfoOfPreviousPath, pathNCPacke.ProcessStartPnt, pathNCPacke.LiftUpDistance, pathNCPacke.FrogLeapDistance, pathNCPacke.CutDownDistance, pathNCPacke.FrogLeapDistance, ref pathG54PostData, ref pathMCSPostData );
+				CalculateTraverse( endInfoOfPreviousPath, pathNCPacke.ProcessStartPnt, pathNCPacke.LiftUpDistance, pathNCPacke.FrogLeapDistance, pathNCPacke.CutDownDistance, pathNCPacke.FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
 			}
 
 			// end info of current path
@@ -130,8 +127,8 @@ namespace MyCAM.Post
 		}
 
 		static bool SolvePathNormalCase( PostSolver postSolver, PathNCPackage pathNCPack,
-			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
-			out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo, bool isNeedDispersion,
+			PathEndInfo endInfoOfPreviousPath, out PathPostData pathG54PostData,
+			out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo,
 			ref double dLastPointProcess_M, ref double dLastPointProcess_S )
 		{
 			pathG54PostData = new PathPostData();
@@ -143,8 +140,7 @@ namespace MyCAM.Post
 			if( pathNCPack.LeadInSegment.Count > 0 ) {
 				if( !SolveProcessPathIK( postSolver, pathNCPack.LeadInSegment,
 					ref dLastPointProcess_M, ref dLastPointProcess_S,
-					out List<ISegmentPostData> leadInG54,
-					 isNeedDispersion ) ) {
+					out List<ISegmentPostData> leadInG54 ) ) {
 					return false;
 				}
 				pathG54PostData.LeadInPostPath.AddRange( leadInG54 );
@@ -158,8 +154,7 @@ namespace MyCAM.Post
 			// main path
 			if( !SolveProcessPathIK( postSolver, pathNCPack.MainPathSegment,
 				ref dLastPointProcess_M, ref dLastPointProcess_S,
-				out List<ISegmentPostData> mainG54,
-				 isNeedDispersion ) ) {
+				out List<ISegmentPostData> mainG54 ) ) {
 				return false;
 			}
 			pathG54PostData.MainPathPostPath.AddRange( mainG54 );
@@ -174,7 +169,7 @@ namespace MyCAM.Post
 			if( pathNCPack.OverCutSegment.Count > 0 ) {
 				if( !SolveProcessPathIK( postSolver, pathNCPack.OverCutSegment,
 					ref dLastPointProcess_M, ref dLastPointProcess_S,
-					out List<ISegmentPostData> overCutG54, isNeedDispersion ) ) {
+					out List<ISegmentPostData> overCutG54 ) ) {
 					return false;
 				}
 				pathG54PostData.OverCutPostPath.AddRange( overCutG54 );
@@ -185,7 +180,7 @@ namespace MyCAM.Post
 			if( pathNCPack.LeadOutSegment.Count > 0 ) {
 				if( !SolveProcessPathIK( postSolver, pathNCPack.LeadOutSegment,
 					ref dLastPointProcess_M, ref dLastPointProcess_S,
-					out List<ISegmentPostData> leadOutG54, isNeedDispersion ) ) {
+					out List<ISegmentPostData> leadOutG54 ) ) {
 					return false;
 				}
 				pathG54PostData.LeadOutPostPath.AddRange( leadOutG54 );
@@ -194,10 +189,9 @@ namespace MyCAM.Post
 
 			// calculate entry/traverse
 			if( endInfoOfPreviousPath == null ) {
-				CalculateEntry( pathNCPack.ProcessStartPnt, entryAndExitData, ref pathG54PostData, ref pathMCSPostData );
+				CalculateEntry( pathNCPack.ProcessStartPnt, pathNCPack.EntryDistance, pathNCPack.Entry_FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
 			}
 			else {
-				// double dLiftUpDistance, double dFrogLeapDistance, double CutDownDistance, double FollowSafeDistance, ref PathPostData pathG54PostData, ref PathPostData pathMCSPostData
 				CalculateTraverse( endInfoOfPreviousPath, pathNCPack.ProcessStartPnt, pathNCPack.LiftUpDistance, pathNCPack.FrogLeapDistance, pathNCPack.CutDownDistance, pathNCPack.FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
 			}
 
@@ -268,7 +262,7 @@ namespace MyCAM.Post
 			return result;
 		}
 
-		static List<ISegmentPostData> BuildPostSegmentsWithFixedRotation( List<ICAMSegmentElement> camSegmentList, double dMaster, double dSlave, bool isNeedDispersion = true )
+		static List<ISegmentPostData> BuildPostSegmentsWithFixedRotation( List<ICAMSegmentElement> camSegmentList, double dMaster, double dSlave )
 		{
 			List<ISegmentPostData> segmentPostData = new List<ISegmentPostData>();
 			foreach( ICAMSegmentElement camSegment in camSegmentList ) {
@@ -286,7 +280,7 @@ namespace MyCAM.Post
 					};
 					postPointList.Add( postList );
 				}
-				ISegmentPostData segment = CreateSegmentPostData( camSegment, postPointList, isNeedDispersion );
+				ISegmentPostData segment = CreateSegmentPostData( camSegment, postPointList );
 				segmentPostData.Add( segment );
 			}
 			return segmentPostData;
@@ -304,14 +298,7 @@ namespace MyCAM.Post
 				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
 					return null;
 				}
-
-				// check is singular point
-				bool isSingular = ( ikResult == IKSolveResult.MasterInfinityOfSolution ||
-								  ikResult == IKSolveResult.SlaveInfinityOfSolution );
-
-				// spacial case: if it's the last point of modify segment, don't mark as singular
-				bool isLastPointOfModifySegment = isModify && ( i == pointList.Count - 1 );
-				bool isMarkAsSingular = isSingular && !isLastPointOfModifySegment;
+				bool isRealSingularPnt = IsRealSingular( ikResult, isModify, i == pointList.Count - 1 );
 				PostPoint postPoint = new PostPoint()
 				{
 					X = camPoint.Point.X(),
@@ -319,14 +306,14 @@ namespace MyCAM.Post
 					Z = camPoint.Point.Z(),
 					Master = dLastProcessPathM,
 					Slave = dLastProcessPathS,
-					IsInSigularRabge = isMarkAsSingular
+					IsInSigularRabge = isRealSingularPnt
 				};
 				postPointList.Add( postPoint );
 			}
 			return postPointList;
 		}
 
-		static ISegmentPostData CreateSegmentPostData( ICAMSegmentElement camSegment, List<PostPoint> postPointList, bool isDisperseSeg )
+		static ISegmentPostData CreateSegmentPostData( ICAMSegmentElement camSegment, List<PostPoint> postPointList )
 		{
 			bool isModified = camSegment.IsModify;
 
@@ -343,6 +330,19 @@ namespace MyCAM.Post
 				return new LinePost( postPointList, isModified );
 			}
 			return null;
+		}
+
+		static bool IsRealSingular( IKSolveResult ikResult, bool isModify, bool isLastPntOfSegment )
+		{
+			bool isSingular = ( ikResult == IKSolveResult.MasterInfinityOfSolution ||
+								  ikResult == IKSolveResult.SlaveInfinityOfSolution );
+			if( isSingular ) {
+				if( isModify && isLastPntOfSegment ) {
+					return false;
+				}
+				return true;
+			}
+			return false;
 		}
 
 		static List<PostPoint> CreateMCSPostPoints( PostSolver postSolver, List<CAMPoint2> camPoints, List<Tuple<double, double>> rotateAngleList, ref int pointIndex )
@@ -462,19 +462,19 @@ namespace MyCAM.Post
 			pathMCSPostData.FollowSafeDistance = FollowSafeDistance;
 		}
 
-		static void CalculateEntry( CAMPoint entryCAM, EntryAndExitData entryAndExitData, ref PathPostData pathG54PostData, ref PathPostData pathMCSPostData )
+		static void CalculateEntry( CAMPoint entryCAM, double dEntryDistance, double dFollowSafeDistance, ref PathPostData pathG54PostData, ref PathPostData pathMCSPostData )
 		{
-			if( entryCAM == null || entryAndExitData == null ) {
+			if( entryCAM == null ) {
 				return;
 			}
-			if( entryAndExitData.EntryDistance <= 0 ) {
+			if( dEntryDistance <= 0 ) {
 
 				// just set follow safe distance
-				pathG54PostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
-				pathMCSPostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
+				pathG54PostData.FollowSafeDistance = dFollowSafeDistance;
+				pathMCSPostData.FollowSafeDistance = dFollowSafeDistance;
 				return;
 			}
-			CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( entryCAM, entryAndExitData.EntryDistance );
+			CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( entryCAM, dEntryDistance );
 			if( entryPoint == null ) {
 				return;
 			}
@@ -488,7 +488,7 @@ namespace MyCAM.Post
 				Master = pathG54PostData.ProcessStartPoint.Master,
 				Slave = pathG54PostData.ProcessStartPoint.Slave
 			};
-			pathG54PostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
+			pathG54PostData.FollowSafeDistance = dFollowSafeDistance;
 
 			// MCS
 			pathMCSPostData.CutDownPostPoint = new PostPoint()
@@ -499,18 +499,17 @@ namespace MyCAM.Post
 				Master = pathMCSPostData.ProcessStartPoint.Master,
 				Slave = pathMCSPostData.ProcessStartPoint.Slave
 			};
-			pathMCSPostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
+			pathMCSPostData.FollowSafeDistance = dFollowSafeDistance;
 		}
 
 		#region AC Solution
 
 		static bool SolvePath_ACSolution( PostSolver postSolver, List<ICAMSegmentElement> segmentList,
-							ref double dLastProcessPathM, ref double dLastProcessPathS, out List<ISegmentPostData> segmentPostData,
-							bool isNeedDispersion = true )
+							ref double dLastProcessPathM, ref double dLastProcessPathS, out List<ISegmentPostData> segmentPostData )
 		{
 			bool isSolveDone = SolveProcessPathIK( postSolver, segmentList,
 							ref dLastProcessPathM, ref dLastProcessPathS,
-							out segmentPostData, isNeedDispersion );
+							out segmentPostData );
 			if( isSolveDone == false ) {
 				return false;
 			}
@@ -523,7 +522,7 @@ namespace MyCAM.Post
 
 		static bool SolveProcessPathIK( PostSolver postSolver, List<ICAMSegmentElement> segmentList,
 							ref double dLastProcessPathM, ref double dLastProcessPathS,
-							out List<ISegmentPostData> segmentPostData, bool isNeedDispersion = true )
+							out List<ISegmentPostData> segmentPostData )
 		{
 			segmentPostData = new List<ISegmentPostData>();
 			if( segmentList == null || segmentList.Count == 0 ) {
@@ -537,7 +536,7 @@ namespace MyCAM.Post
 				if( postPointList == null ) {
 					return false;
 				}
-				ISegmentPostData segment = CreateSegmentPostData( camSegment, postPointList, isNeedDispersion );
+				ISegmentPostData segment = CreateSegmentPostData( camSegment, postPointList );
 				if( segment != null ) {
 					segmentPostData.Add( segment );
 				}

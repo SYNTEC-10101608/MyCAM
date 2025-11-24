@@ -7,7 +7,7 @@ namespace MyCAM.Helper
 {
 	internal static class NCHelper
 	{
-		public static bool BuildNCPackage( ContourCacheInfo contourCacheInfo, CraftData craftData, out PathNCPackage ncPackage )
+		public static bool BuildNCPackage( ContourCacheInfo contourCacheInfo, CraftData craftData, EntryAndExitData entryAndExitData, out PathNCPackage ncPackage )
 		{
 			ncPackage = new PathNCPackage();
 
@@ -24,7 +24,7 @@ namespace MyCAM.Helper
 			// set process points and traverse data
 			SetProcessPoints( ncPackage, contourCacheInfo );
 			SetTraverseData( ncPackage, craftData.TraverseData );
-
+			SetEntryAndExitData( ncPackage, entryAndExitData );
 			return true;
 		}
 
@@ -58,6 +58,12 @@ namespace MyCAM.Helper
 			ncPackage.FrogLeapDistance = traverseData.FrogLeapDistance;
 			ncPackage.CutDownDistance = traverseData.CutDownDistance;
 			ncPackage.FollowSafeDistance = traverseData.FollowSafeDistance;
+		}
+
+		static void SetEntryAndExitData( PathNCPackage ncPackage, EntryAndExitData entryAndExitData )
+		{
+			ncPackage.EntryDistance = entryAndExitData.EntryDistance;
+			ncPackage.Entry_FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 		}
 
 		public static List<ICAMSegmentElement> ReverseSegment( List<ICAMSegmentElement> camSegmentList )

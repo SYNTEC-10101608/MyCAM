@@ -412,7 +412,7 @@ namespace MyCAM.FileManager
 							: new TraverseDataDTO();
 			OverCutLength = craftData.OverCutLength;
 			ToolVecModifyMap = ( craftData.ToolVecModifyMap ?? new Dictionary<SegmentPointIndex, Tuple<double, double>>() )
-				.Select( kvp => new ToolVecMapDTO( new SegmentIndexDTO( kvp.Key ), kvp.Value.Item1, kvp.Value.Item2 ) )
+				.Select( KeyValueMap => new ToolVecMapDTO( new SegmentIndexDTO( KeyValueMap.Key ), KeyValueMap.Value.Item1, KeyValueMap.Value.Item2 ) )
 				.ToList();
 		}
 
@@ -421,7 +421,7 @@ namespace MyCAM.FileManager
 			if( ToolVecModifyMap == null || LeadParam == null || TraverseData == null ) {
 				throw new ArgumentException( "ContourCacheInfo deserialization failed." );
 			}
-			Dictionary<SegmentPointIndex, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => new SegmentPointIndex( ToolVecModifyData.segmentIndex.SegIdx, ToolVecModifyData.segmentIndex.PntIdx ), ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
+			Dictionary<SegmentPointIndex, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => new SegmentPointIndex( ToolVecModifyData.SegmentIndex.SegIdx, ToolVecModifyData.SegmentIndex.PntIdx ), ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
 			LeadData leadParam = LeadParam.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
 			return new CraftData( UID, leadParam, StartPoint, OverCutLength, IsReverse, IsClosed, traverseData, toolVecModifyMap, IsToolVecReverse );
@@ -677,7 +677,7 @@ namespace MyCAM.FileManager
 				case EContourType.Arc:
 					return new ArcCADSegment( cadPoints, TotalLength, PerArcLength, PerChordLength );
 				default:
-					throw new System.InvalidOperationException( "Unknown contourType" );
+					throw new InvalidOperationException( "Unknown contourType" );
 			}
 		}
 	}
@@ -910,7 +910,7 @@ namespace MyCAM.FileManager
 
 	public class ToolVecMapDTO
 	{
-		public SegmentIndexDTO segmentIndex
+		public SegmentIndexDTO SegmentIndex
 		{
 			get;
 			set;
@@ -935,7 +935,7 @@ namespace MyCAM.FileManager
 
 		internal ToolVecMapDTO( SegmentIndexDTO segmentIndexDTO, double value1, double value2 )
 		{
-			segmentIndex = segmentIndexDTO;
+			SegmentIndex = segmentIndexDTO;
 			Value1 = value1;
 			Value2 = value2;
 		}
