@@ -193,17 +193,28 @@ namespace MyCAM.CacheInfo
 		void BuildPathCAMSegment()
 		{
 			m_IsCraftDataDirty = false;
+
+			// Step 1: Reorder segments based on start point
 			List<ICAMSegmentElement> reorderedSegment = BreakAndReorderByStartPoint();
 
-			// List<SegmentPointIndex> is new tool stick index after modify, Dictionary<SegmentPointIndex> key is new tool stick index vlaue is old tool stick index
-			List<SegmentPointIndex> toolVecControlStickList = ModidyToolBarInexMap( reorderedSegment.Count, out Dictionary<SegmentPointIndex, SegmentPointIndex> ControlStickMap );
+			// Step 2: Map tool vector control indices to new segment order
+			// List<SegmentPointIndex>: Tool vector control points after reordering (adjusted for new segment sequence)
+			// Dictionary<SegmentPointIndex, SegmentPointIndex>: 
+			// Key = Tool vector control point location in reordered segments
+			// Value = Original tool vector control point location before reordering
+			List<SegmentPointIndex> toolVecControlStickList = ModidyCtrlPntIdxMap( reorderedSegment.Count, out Dictionary<SegmentPointIndex, SegmentPointIndex> CtrlPntMap );
 
-			// dictionary<int, (int, int)> key is new tool bar segment index (tool bar must at segment last point index) , value is old tool bar (segment index, point index)
-			List<ICAMSegmentElement> breakedCADSegment = BreakByToolVecBar( reorderedSegment, toolVecControlStickList, ControlStickMap, out Dictionary<int, SegmentPointIndex> ControlStickMapAsOriIndex );
-			List<ICAMSegmentElement> camSegmentList = AdjustSegmentToolVec( breakedCADSegment, ControlStickMapAsOriIndex );
-			List<int> controlBarIndex = ControlStickMapAsOriIndex.Keys.ToList();
-			CAMSegmentList = camSegmentList;
-			CtrlToolSegIdxList = controlBarIndex;
+			// Step 3: Break segments at tool vector control points
+			// Dictionary<int, SegmentPointIndex>
+			// Key: Final segment index (after reordering and breaking) where tool control point is at segment end
+			// Value: Original control point location (segment index and point index before any processing)
+			List<ICAMSegmentElement> breakedCAMSegment = BreakByToolVecBar( reorderedSegment, toolVecControlStickList, CtrlPntMap, out Dictionary<int, SegmentPointIndex> CtrPntMapWithOriIndex );
+			
+			// Step 4: Adjust tool vectors based on control settings
+			List<ICAMSegmentElement> finalCAMSegments = AdjustSegmentToolVec( breakedCAMSegment, CtrPntMapWithOriIndex );
+
+			// Step 5: Set final results
+			SetResults( finalCAMSegments, CtrPntMapWithOriIndex );
 		}
 
 		void BuildCAMFeatureSegment()
@@ -214,11 +225,11 @@ namespace MyCAM.CacheInfo
 
 		List<ICAMSegmentElement> BreakAndReorderByStartPoint()
 		{
-			const int FIRST_Index_Segment_Count = 2;
+			const int EXPECTED_SPLIT_COUNT = 2;
 			SegmentPointIndex startPoint = m_CraftData.StartPointIndex;
 			List<ICAMSegmentElement> reorderedCAMSegmentList = new List<ICAMSegmentElement>();
 
-			// reorder segment list
+			// Step 1: Reorder segments starting from startPoint.SegIdx
 			IReadOnlyList<ICADSegmentElement> cadSegmentList = CADSegmentList;
 			for( int i = 0; i < cadSegmentList.Count; i++ ) {
 				int index = ( startPoint.SegIdx + i ) % cadSegmentList.Count;
@@ -228,7 +239,7 @@ namespace MyCAM.CacheInfo
 				}
 			}
 
-			// no need to break segment
+			// Stpe2: Check if startPoint.PntIdx is at the last point, start from next segmentno need to break segment
 			if( startPoint.PntIdx == cadSegmentList[ startPoint.SegIdx ].PointList.Count - 1 ) {
 				ICAMSegmentElement realLastSegment = reorderedCAMSegmentList.First();
 				reorderedCAMSegmentList.RemoveAt( 0 );
@@ -236,24 +247,24 @@ namespace MyCAM.CacheInfo
 				return reorderedCAMSegmentList;
 			}
 
-			// split segment at start point
-			bool isSuccess = SplitStartPointSegment( reorderedCAMSegmentList.First(), startPoint.PntIdx, out List<ICAMSegmentElement> breakedStartSegmentList );
+			// Step 3: Split the first segment at startPoint.PntIdx
+			bool isSuccess = SplitStartPointSegment( reorderedCAMSegmentList.First(), startPoint.PntIdx, out List<ICAMSegmentElement> splitSegments );
 
 			// delete the first segment and insert breaked segment
-			if( isSuccess && breakedStartSegmentList.Count == FIRST_Index_Segment_Count ) {
+			if( isSuccess && splitSegments.Count == EXPECTED_SPLIT_COUNT ) {
 
-				// this segment need to break
+				// remove original first segment
 				reorderedCAMSegmentList.RemoveAt( 0 );
 
-				// insert breaked segment ( [0] is segment after start point, [1] is segment before start point)
-				reorderedCAMSegmentList.Insert( 0, breakedStartSegmentList.First() );
-				reorderedCAMSegmentList.Add( breakedStartSegmentList.Last() );
+				// add split segments: first part is the begining of path, second part is the end of path
+				reorderedCAMSegmentList.Insert( 0, splitSegments.First() );
+				reorderedCAMSegmentList.Add( splitSegments.Last() );
 				return reorderedCAMSegmentList;
 			}
 			return reorderedCAMSegmentList;
 		}
 
-		List<SegmentPointIndex> ModidyToolBarInexMap( int SegmentCount, out Dictionary<SegmentPointIndex, SegmentPointIndex> ControlStickMap )
+		List<SegmentPointIndex> ModidyCtrlPntIdxMap( int SegmentCount, out Dictionary<SegmentPointIndex, SegmentPointIndex> ControlStickMap )
 		{
 			// key is new segment info value is old segment info
 			ControlStickMap = new Dictionary<SegmentPointIndex, SegmentPointIndex>();
@@ -423,11 +434,11 @@ namespace MyCAM.CacheInfo
 			return breakedCAMSegmentList;
 		}
 
-		List<ICAMSegmentElement> AdjustSegmentToolVec( List<ICAMSegmentElement> breakedCAMSegment, Dictionary<int, SegmentPointIndex> ControlBarMapedAsIndex )
+		List<ICAMSegmentElement> AdjustSegmentToolVec( List<ICAMSegmentElement> breakedCAMSegment, Dictionary<int, SegmentPointIndex> CtrlPntMapWithIndex )
 		{
 			List<ICAMSegmentElement> camSegmentList = new List<ICAMSegmentElement>();
 			camSegmentList = breakedCAMSegment;
-			if( ControlBarMapedAsIndex.Count == 0 ) {
+			if( CtrlPntMapWithIndex.Count == 0 ) {
 				if( m_CraftData.IsToolVecReverse == false ) {
 					return camSegmentList;
 				}
@@ -440,19 +451,26 @@ namespace MyCAM.CacheInfo
 				}
 
 			}
-			if( ControlBarMapedAsIndex.Count == 1 ) {
-				PathWith1ControlStick( ref camSegmentList, ControlBarMapedAsIndex );
+			if( CtrlPntMapWithIndex.Count == 1 ) {
+				PathWith1CtrlPnt( ref camSegmentList, CtrlPntMapWithIndex );
 				return camSegmentList;
 			}
-			BuildCAMSegmentWithSeveralToolBar( ref camSegmentList, ControlBarMapedAsIndex );
+			BuildCAMSegmentWithSeveralCtrlPnt( ref camSegmentList, CtrlPntMapWithIndex );
 			return camSegmentList;
 		}
 
-		void PathWith1ControlStick( ref List<ICAMSegmentElement> breakedCAMSegment, Dictionary<int, SegmentPointIndex> ControlBarMapedAsIndex )
+		void SetResults( List<ICAMSegmentElement> camSegments, Dictionary<int, SegmentPointIndex> CtrlPntMapWithIdx )
+		{
+			List<int> controlIndices = CtrlPntMapWithIdx.Keys.ToList();
+			CAMSegmentList = camSegments ?? new List<ICAMSegmentElement>();
+			CtrlToolSegIdxList = controlIndices ?? new List<int>();
+		}
+
+		void PathWith1CtrlPnt( ref List<ICAMSegmentElement> breakedCAMSegment, Dictionary<int, SegmentPointIndex> CtrlPntMapWithIdx )
 		{
 			// calculate tool vec
-			int toolStickIndex = ControlBarMapedAsIndex.Keys.First();
-			SegmentPointIndex oriToolStickIndex = ControlBarMapedAsIndex.Values.First();
+			int toolStickIndex = CtrlPntMapWithIdx.Keys.First();
+			SegmentPointIndex oriToolStickIndex = CtrlPntMapWithIdx.Values.First();
 			m_CraftData.ToolVecModifyMap.TryGetValue( oriToolStickIndex, out Tuple<double, double> AB_Value );
 			CAMPoint2 targetCAMPoint = breakedCAMSegment[ toolStickIndex ].EndPoint;
 			gp_Dir oriToolVec = m_CraftData.IsToolVecReverse ? targetCAMPoint.NormalVec_1st.Reversed() : targetCAMPoint.NormalVec_1st;
@@ -493,14 +511,14 @@ namespace MyCAM.CacheInfo
 			return new gp_Vec( dir1.XYZ() );
 		}
 
-		void BuildCAMSegmentWithSeveralToolBar( ref List<ICAMSegmentElement> breakedCAMSegment, Dictionary<int, SegmentPointIndex> ControlBarMapedAsIndex )
+		void BuildCAMSegmentWithSeveralCtrlPnt( ref List<ICAMSegmentElement> breakedCAMSegment, Dictionary<int, SegmentPointIndex> CtrlPntMapWithIdx )
 		{
-			if( ControlBarMapedAsIndex.Count == 0 || breakedCAMSegment.Count == 0 ) {
+			if( CtrlPntMapWithIdx.Count == 0 || breakedCAMSegment.Count == 0 ) {
 				return;
 			}
 
 			// the segment with control stick
-			List<int> ControlStickIndexList = ControlBarMapedAsIndex.Keys.ToList();
+			List<int> ControlStickIndexList = CtrlPntMapWithIdx.Keys.ToList();
 			ControlStickIndexList.Sort();
 
 			Dictionary<SegmentPointIndex, Tuple<double, double>> ToolVecModifyMap = m_CraftData.ToolVecModifyMap;
@@ -508,8 +526,8 @@ namespace MyCAM.CacheInfo
 				List<int> controlStickRange = FindBarIndexRange( ControlStickIndexList, i );
 				int startBarIndex = controlStickRange[ 0 ];
 				int endBarIndex = controlStickRange[ 1 ];
-				gp_Vec startToolVec = GetToolVecByBreakedSegmenIndex( breakedCAMSegment, startBarIndex, ControlBarMapedAsIndex, ToolVecModifyMap );
-				gp_Vec endToolVec = GetToolVecByBreakedSegmenIndex( breakedCAMSegment, endBarIndex, ControlBarMapedAsIndex, ToolVecModifyMap );
+				gp_Vec startToolVec = GetToolVecByBreakedSegmenIndex( breakedCAMSegment, startBarIndex, CtrlPntMapWithIdx, ToolVecModifyMap );
+				gp_Vec endToolVec = GetToolVecByBreakedSegmenIndex( breakedCAMSegment, endBarIndex, CtrlPntMapWithIdx, ToolVecModifyMap );
 
 				if( startToolVec == null || endToolVec == null ) {
 					continue;
@@ -525,10 +543,10 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		gp_Vec GetToolVecByBreakedSegmenIndex( List<ICAMSegmentElement> breakedCAMSegment, int targetIndex, Dictionary<int, SegmentPointIndex> ControlBarMapedAsIndex, Dictionary<SegmentPointIndex, Tuple<double, double>> ToolVecModifyMap )
+		gp_Vec GetToolVecByBreakedSegmenIndex( List<ICAMSegmentElement> breakedCAMSegment, int targetIndex, Dictionary<int, SegmentPointIndex> CtrlPntMapWithIdx, Dictionary<SegmentPointIndex, Tuple<double, double>> ToolVecModifyMap )
 		{
-			// real bar index in original CAD segment
-			if( ControlBarMapedAsIndex.TryGetValue( targetIndex, out SegmentPointIndex oriSegmentIndex ) ) {
+			// real control point index in original CAD segment
+			if( CtrlPntMapWithIdx.TryGetValue( targetIndex, out SegmentPointIndex oriSegmentIndex ) ) {
 
 				// get AB value
 				if( ToolVecModifyMap.TryGetValue( oriSegmentIndex, out Tuple<double, double> AB_Value ) ) {
