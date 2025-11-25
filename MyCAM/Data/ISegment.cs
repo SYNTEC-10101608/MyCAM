@@ -4,7 +4,7 @@ using OCC.gp;
 
 namespace MyCAM.Data
 {
-	public enum EContourType
+	public enum ESegmentType
 	{
 		Line,
 		Arc,
@@ -14,7 +14,7 @@ namespace MyCAM.Data
 
 	internal interface ICADSegmentElement
 	{
-		EContourType ContourType
+		ESegmentType SegmentType
 		{
 			get;
 		}
@@ -70,7 +70,7 @@ namespace MyCAM.Data
 			m_PerChordLength = dPerChordLength;
 		}
 
-		public abstract EContourType ContourType
+		public abstract ESegmentType SegmentType
 		{
 			get;
 		}
@@ -185,11 +185,11 @@ namespace MyCAM.Data
 		{
 		}
 
-		public override EContourType ContourType
+		public override ESegmentType SegmentType
 		{
 			get
 			{
-				return EContourType.Line;
+				return ESegmentType.Line;
 			}
 		}
 
@@ -213,11 +213,11 @@ namespace MyCAM.Data
 			m_dStartToMidLength = PerArcLegnth * m_MidIndex;
 		}
 
-		public override EContourType ContourType
+		public override ESegmentType SegmentType
 		{
 			get
 			{
-				return EContourType.Arc;
+				return ESegmentType.Arc;
 			}
 		}
 
@@ -261,7 +261,7 @@ namespace MyCAM.Data
 
 	internal interface ICAMSegmentElement
 	{
-		EContourType ContourType
+		ESegmentType ContourType
 		{
 			get;
 		}
@@ -328,7 +328,7 @@ namespace MyCAM.Data
 			IsModify = isModifySegment;
 		}
 
-		public abstract EContourType ContourType
+		public abstract ESegmentType ContourType
 		{
 			get;
 		}
@@ -468,11 +468,11 @@ namespace MyCAM.Data
 		{
 		}
 
-		public override EContourType ContourType
+		public override ESegmentType ContourType
 		{
 			get
 			{
-				return EContourType.Line;
+				return ESegmentType.Line;
 			}
 		}
 
@@ -498,11 +498,11 @@ namespace MyCAM.Data
 			m_dStartToMidLength = PerArcLength * m_MidIndex;
 		}
 
-		public override EContourType ContourType
+		public override ESegmentType ContourType
 		{
 			get
 			{
-				return EContourType.Arc;
+				return ESegmentType.Arc;
 			}
 		}
 

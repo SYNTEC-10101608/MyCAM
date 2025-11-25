@@ -602,7 +602,7 @@ namespace MyCAM.FileManager
 
 	public class CADSegmentDTO
 	{
-		public EContourType ContourType
+		public ESegmentType ContourType
 		{
 			get;
 			set;
@@ -648,7 +648,7 @@ namespace MyCAM.FileManager
 			if( segment == null ) {
 				return;
 			}
-			ContourType = segment.ContourType;
+			ContourType = segment.SegmentType;
 			PointList = segment.PointList.Select( p => new CADPointDTO( p ) ).ToList();
 			TotalLength = segment.TotalLength;
 			PerArcLength = segment.PerArcLegnth;
@@ -672,9 +672,9 @@ namespace MyCAM.FileManager
 			}
 
 			switch( ContourType ) {
-				case EContourType.Line:
+				case ESegmentType.Line:
 					return new LineCADSegment( cadPoints, TotalLength, PerArcLength, PerChordLength );
-				case EContourType.Arc:
+				case ESegmentType.Arc:
 					return new ArcCADSegment( cadPoints, TotalLength, PerArcLength, PerChordLength );
 				default:
 					throw new InvalidOperationException( "Unknown contourType" );

@@ -17,12 +17,12 @@ namespace MyCAM.Helper
 			if( camSegment == null ) {
 				return null;
 			}
-			if( camSegment.ContourType == EContourType.Line ) {
+			if( camSegment.ContourType == ESegmentType.Line ) {
 				BRepBuilderAPI_MakeEdge edgeBuilder = new BRepBuilderAPI_MakeEdge( camSegment.StartPoint.Point, camSegment.EndPoint.Point );
 				edge = edgeBuilder.Edge();
 				return edge;
 			}
-			if( camSegment.ContourType == EContourType.Arc ) {
+			if( camSegment.ContourType == ESegmentType.Arc ) {
 				// build arc from 3 points
 				if( camSegment.CAMPointList.Count >= 3 ) {
 					ArcCAMSegment arcCAMSegment = camSegment as ArcCAMSegment;

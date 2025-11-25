@@ -104,7 +104,7 @@ namespace MyCAM.Data
 				// this curve is line use equal length split
 				if( GeometryTool.IsLine( edge, out _, out _ ) ) {
 					List<CADPoint> tempCADPointList = PretreatmentHelper.GetSegmentPointsByEqualLength( edge, shellFace, PRECISION_MAX_LENGTH, out double dEdgeLength, out double dPerArcLength, out double dPerChordLength );
-					bool buildSuccess = CADCAMSegmentBuilder.BuildCADSegment( tempCADPointList, EContourType.Line, dEdgeLength, dPerArcLength, dPerChordLength, out ICADSegmentElement cadSegment );
+					bool buildSuccess = CADSegmentBuilder.BuildCADSegment( tempCADPointList, ESegmentType.Line, dEdgeLength, dPerArcLength, dPerChordLength, out ICADSegmentElement cadSegment );
 					if( buildSuccess ) {
 						cadSegmentList.Add( cadSegment );
 					}
@@ -118,7 +118,7 @@ namespace MyCAM.Data
 					}
 
 					for( int j = 0; j < cadPointList.Count; j++ ) {
-						bool buildSuccess = CADCAMSegmentBuilder.BuildCADSegment( cadPointList[ j ], EContourType.Arc, eachSegmentLength[ j ], dEachArcLength[ j ], dEachChordLength[ j ], out ICADSegmentElement cadSegment );
+						bool buildSuccess = CADSegmentBuilder.BuildCADSegment( cadPointList[ j ], ESegmentType.Arc, eachSegmentLength[ j ], dEachArcLength[ j ], dEachChordLength[ j ], out ICADSegmentElement cadSegment );
 						if( buildSuccess ) {
 							cadSegmentList.Add( cadSegment );
 						}
@@ -137,7 +137,7 @@ namespace MyCAM.Data
 
 						// calculate chord length
 						double dChordLength = cadPointList[ j ].First().Point.Distance( cadPointList[ j ][ 1 ].Point );
-						bool buildSuccess = CADCAMSegmentBuilder.BuildCADSegment( cadPointList[ j ], EContourType.Line, eachSegmentLength[ j ], eachArcLength[ j ], dChordLength, out ICADSegmentElement cadSegment );
+						bool buildSuccess = CADSegmentBuilder.BuildCADSegment( cadPointList[ j ], ESegmentType.Line, eachSegmentLength[ j ], eachArcLength[ j ], dChordLength, out ICADSegmentElement cadSegment );
 						if( buildSuccess ) {
 							cadSegmentList.Add( cadSegment );
 						}

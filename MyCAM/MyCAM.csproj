@@ -105,7 +105,8 @@
     <Compile Include="Editor\Dialog\OverCutDlg.Designer.cs">
       <DependentUpon>OverCutDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helper\CADCAMSegmentBuilder.cs" />
+    <Compile Include="Helper\CADSegmentBuilder.cs" />
+    <Compile Include="Helper\CAMSegmentBuilder.cs" />
     <Compile Include="Helper\MachineDataXMLHelper.cs" />
     <Compile Include="Helper\NCHelper.cs" />
     <Compile Include="Helper\OverCutSegmentBuilder.cs" />

@@ -233,7 +233,7 @@ namespace MyCAM.CacheInfo
 			IReadOnlyList<ICADSegmentElement> cadSegmentList = CADSegmentList;
 			for( int i = 0; i < cadSegmentList.Count; i++ ) {
 				int index = ( startPoint.SegIdx + i ) % cadSegmentList.Count;
-				bool isBuildSuccess = CADCAMSegmentBuilder.BuildCAMSegment( cadSegmentList[ index ], out ICAMSegmentElement camSegment );
+				bool isBuildSuccess = CAMSegmentBuilder.BuildCAMSegment( cadSegmentList[ index ], out ICAMSegmentElement camSegment );
 				if( isBuildSuccess ) {
 					reorderedCAMSegmentList.Add( camSegment );
 				}
@@ -336,8 +336,8 @@ namespace MyCAM.CacheInfo
 			List<CAMPoint2> pntListAfterTargetIndex = splitedPointList.Last();
 			List<CAMPoint2> pntListBeforeTargetIndex = splitedPointList.First();
 
-			bool isFirstBuildSuccess = CADCAMSegmentBuilder.BuildCAMSegmentByCAMPoint( pntListAfterTargetIndex, camSegment.ContourType, camSegment.PerArcLength * ( pntListAfterTargetIndex.Count - 1 ), camSegment.PerArcLength, camSegment.PerChordLength, out ICAMSegmentElement segmentAfterStartPoint );
-			bool isLastBuildSuccess = CADCAMSegmentBuilder.BuildCAMSegmentByCAMPoint( pntListBeforeTargetIndex, camSegment.ContourType, camSegment.PerArcLength * ( pntListBeforeTargetIndex.Count - 1 ), camSegment.PerArcLength, camSegment.PerChordLength, out ICAMSegmentElement segmentBeforeStartPoint );
+			bool isFirstBuildSuccess = CAMSegmentBuilder.BuildCAMSegmentByCAMPoint( pntListAfterTargetIndex, camSegment.ContourType, camSegment.PerArcLength * ( pntListAfterTargetIndex.Count - 1 ), camSegment.PerArcLength, camSegment.PerChordLength, out ICAMSegmentElement segmentAfterStartPoint );
+			bool isLastBuildSuccess = CAMSegmentBuilder.BuildCAMSegmentByCAMPoint( pntListBeforeTargetIndex, camSegment.ContourType, camSegment.PerArcLength * ( pntListBeforeTargetIndex.Count - 1 ), camSegment.PerArcLength, camSegment.PerChordLength, out ICAMSegmentElement segmentBeforeStartPoint );
 			if( !isFirstBuildSuccess || !isLastBuildSuccess ) {
 				return false;
 			}
@@ -409,7 +409,7 @@ namespace MyCAM.CacheInfo
 
 				List<List<CAMPoint2>> splitedCAMPointList = SplitCAMPointList( orderedCADSegmentList[ segmentIndex ].CAMPointList, breakPointIndex, out bool isLastSegmentModify );
 				for( int k = 0; k < splitedCAMPointList.Count; k++ ) {
-					bool isBuildSuccess = CADCAMSegmentBuilder.BuildCAMSegmentByCAMPoint( splitedCAMPointList[ k ], orderedCADSegmentList[ segmentIndex ].ContourType, orderedCADSegmentList[ segmentIndex ].PerArcLength * splitedCAMPointList[ k ].Count - 1, orderedCADSegmentList[ segmentIndex ].PerArcLength, orderedCADSegmentList[ segmentIndex ].PerChordLength, out ICAMSegmentElement newCAMSegment );
+					bool isBuildSuccess = CAMSegmentBuilder.BuildCAMSegmentByCAMPoint( splitedCAMPointList[ k ], orderedCADSegmentList[ segmentIndex ].ContourType, orderedCADSegmentList[ segmentIndex ].PerArcLength * splitedCAMPointList[ k ].Count - 1, orderedCADSegmentList[ segmentIndex ].PerArcLength, orderedCADSegmentList[ segmentIndex ].PerChordLength, out ICAMSegmentElement newCAMSegment );
 					if( isBuildSuccess ) {
 						breakedCAMSegmentList.Add( newCAMSegment );
 
