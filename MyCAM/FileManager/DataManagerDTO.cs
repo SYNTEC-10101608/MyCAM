@@ -650,7 +650,7 @@ namespace MyCAM.FileManager
 			}
 			ContourType = segment.SegmentType;
 			PointList = segment.PointList.Select( p => new CADPointDTO( p ) ).ToList();
-			TotalLength = segment.TotalLength;
+			TotalLength = segment.SegmentLength;
 			PerArcLength = segment.SubSegmentLength;
 			PerChordLength = segment.PerChordLength;
 

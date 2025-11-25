@@ -4,6 +4,7 @@ using OCC.gp;
 
 namespace MyCAM.Data
 {
+	// fix: 這個應該叫 segment type
 	public enum ESegmentType
 	{
 		Line,
@@ -34,7 +35,8 @@ namespace MyCAM.Data
 			get;
 		}
 
-		double TotalLength
+		// fix: 建議命名可以直接是 SegmentLength
+		double SegmentLength 
 		{
 			get;
 		}
@@ -75,17 +77,12 @@ namespace MyCAM.Data
 			get;
 		}
 
+		// fix: 下面的屬性 private set 感覺沒什麼意義
 		public virtual CADPoint StartPoint
 		{
 			get
 			{
 				return m_StartPoint;
-			}
-			private set
-			{
-				if( value != null ) {
-					m_StartPoint = value;
-				}
 			}
 		}
 
@@ -95,12 +92,6 @@ namespace MyCAM.Data
 			{
 				return m_EndPoint;
 			}
-			private set
-			{
-				if( value != null ) {
-					m_EndPoint = value;
-				}
-			}
 		}
 
 		public virtual List<CADPoint> PointList
@@ -109,27 +100,15 @@ namespace MyCAM.Data
 			{
 				return new List<CADPoint>( m_PointList );
 			}
-			private set
-			{
-				if( value != null ) {
-					m_PointList = value;
-				}
-			}
 		}
 
 		public abstract ICADSegment Clone();
 
-		public double TotalLength
+		public double SegmentLength
 		{
 			get
 			{
 				return m_TotalLength;
-			}
-			private set
-			{
-				if( value >= 0.0 ) {
-					m_TotalLength = value;
-				}
 			}
 		}
 
@@ -139,12 +118,6 @@ namespace MyCAM.Data
 			{
 				return m_SubSegmentLength;
 			}
-			private set
-			{
-				if( value >= 0.0 ) {
-					m_SubSegmentLength = value;
-				}
-			}
 		}
 
 		public double PerChordLength
@@ -153,12 +126,6 @@ namespace MyCAM.Data
 			{
 				return m_PerChordLength;
 			}
-			private set
-			{
-				if( value >= 0.0 ) {
-					m_PerChordLength = value;
-				}
-			}
 		}
 
 		public virtual void Transform( gp_Trsf transForm )
@@ -166,11 +133,11 @@ namespace MyCAM.Data
 			foreach( CADPoint point in m_PointList ) {
 				point.Transform( transForm );
 			}
-			m_StartPoint = m_PointList[ 0 ];
-			m_EndPoint = m_PointList[ m_PointList.Count - 1 ];
+			// fix: 這個操作是否多餘
 		}
 
-		protected List<CADPoint> m_PointList = new List<CADPoint>();
+		// fix: member 在建構子會初始化，這裡就不需要再初始化一次了
+		protected List<CADPoint> m_PointList;
 		protected CADPoint m_StartPoint;
 		protected CADPoint m_EndPoint;
 		protected double m_TotalLength = 0.0;
@@ -197,7 +164,8 @@ namespace MyCAM.Data
 		{
 			List<CADPoint> clonedPointList = new List<CADPoint>();
 			foreach( CADPoint point in m_PointList ) {
-				clonedPointList.Add( point.Clone() as CADPoint );
+				// fix: 這邊的 as CADPoint 不需要
+				clonedPointList.Add( point.Clone());
 			}
 			return new LineCADSegment( clonedPointList, m_TotalLength, m_SubSegmentLength, m_PerChordLength );
 		}
@@ -208,9 +176,12 @@ namespace MyCAM.Data
 		public ArcCADSegment( List<CADPoint> arcPointList, double dTotalLength, double dPerArcLength, double dPerChordLength )
 			: base( arcPointList, dTotalLength, dPerArcLength, dPerChordLength )
 		{
+			// fix: 這邊是否需要自己保護 count <=2 的情況？
+			if( arcPointList.Count <= 2 ) {
+				throw new System.ArgumentException( "ArcCADSegment requires at least 3 points to define a valid arc." );
+			}
 			m_MidIndex = arcPointList.Count / 2;
 			MidPoint = arcPointList[ m_MidIndex ];
-			m_dStartToMidLength = SubSegmentLength * m_MidIndex;
 		}
 
 		public override ESegmentType SegmentType
@@ -227,6 +198,8 @@ namespace MyCAM.Data
 			{
 				return m_MidPoint;
 			}
+
+			// fix: 這個 private set 感覺沒什麼意義===>因為base沒做這個動作,這裡我需要開出來讓建構子來設置
 			private set
 			{
 				if( value != null ) {
@@ -244,15 +217,8 @@ namespace MyCAM.Data
 			return new ArcCADSegment( clonedPointList, m_TotalLength, m_SubSegmentLength, m_PerChordLength );
 		}
 
-		public override void Transform( gp_Trsf transform )
-		{
-			base.Transform( transform );
-			MidPoint = m_PointList[ m_MidIndex ];
-		}
-
 		CADPoint m_MidPoint;
 		int m_MidIndex = 0;
-		double m_dStartToMidLength = 0.0;
 	}
 
 	#endregion
