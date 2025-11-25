@@ -13,13 +13,13 @@ namespace MyCAM.Helper
 	{
 		const int LOWEST_PointsToBuildSegment = 2;
 
-		public static bool BuildCAMSegment( ICADSegmentElement cadSegment, out ICAMSegmentElement camSegment )
+		public static bool BuildCAMSegment( ICADSegment cadSegment, out ICAMSegmentElement camSegment )
 		{
 			camSegment = null;
 			if( cadSegment == null ) {
 				return false;
 			}
-			return BuildCAMSegment( cadSegment.PointList, cadSegment.SegmentType, cadSegment.TotalLength, cadSegment.PerArcLegnth, cadSegment.PerChordLength, out camSegment );
+			return BuildCAMSegment( cadSegment.PointList, cadSegment.SegmentType, cadSegment.TotalLength, cadSegment.SubSegmentLength, cadSegment.PerChordLength, out camSegment );
 		}
 
 		public static bool BuildCAMSegmentByCAMPoint( List<CAMPoint2> camPointList, ESegmentType contourType, double dTotalLength, double dPerArcLength, double dPerChordLength, out ICAMSegmentElement camSegment )

@@ -330,7 +330,7 @@ namespace MyCAM.Helper
 				if( totalLength <= 0 ) {
 					return null;
 				}
-				List<double> paramList = PretreatmentHelper.GetCurveEachSegmentParamByLength(
+				List<double> paramList = CADPretreatHelper.DiscretizeArcOrLineByLength(
 					dStartU, dEndU, maxSegmentLength, totalLength, out eachArcLength );
 				if( paramList == null || paramList.Count < 2 ) {
 					return null;

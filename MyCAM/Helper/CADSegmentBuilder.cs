@@ -9,21 +9,21 @@ namespace MyCAM.Helper
 	{
 		const int LOWEST_PointsToBuildSegment = 2;
 
-		public static bool BuildCADSegment( List<CADPoint> pointList, ESegmentType contourType, double dTotalLength, double dPerArcLength, double dPerChordLength, out ICADSegmentElement cadSegment )
+		public static bool BuildCADSegment( List<CADPoint> pointList, ESegmentType contourType, double dSegmentLength, double dSubSegmentLength, double dPerChordLength, out ICADSegment cadSegment )
 		{
 			cadSegment = null;
 			if( pointList == null || pointList.Count < LOWEST_PointsToBuildSegment ) {
 				return false;
 			}
 			if( contourType == ESegmentType.Line ) {
-				cadSegment = new LineCADSegment( pointList, dTotalLength, dPerArcLength, dPerChordLength );
+				cadSegment = new LineCADSegment( pointList, dSegmentLength, dSubSegmentLength, dPerChordLength );
 				return true;
 			}
 			if( contourType == ESegmentType.Arc ) {
 
 				// arc is too short, build line instead
 				if( pointList.Count == LOWEST_PointsToBuildSegment ) {
-					cadSegment = new LineCADSegment( pointList, dTotalLength, dPerArcLength, dPerChordLength );
+					cadSegment = new LineCADSegment( pointList, dSegmentLength, dSubSegmentLength, dPerChordLength );
 				}
 				else {
 
@@ -39,7 +39,7 @@ namespace MyCAM.Helper
 						CADPoint cADPoint = new CADPoint( midPoint, normalVec1, normalVec2, tangentVec );
 						pointList.Insert( pointList.Count / 2, cADPoint );
 					}
-					cadSegment = new ArcCADSegment( pointList, dTotalLength, dPerArcLength, dPerChordLength );
+					cadSegment = new ArcCADSegment( pointList, dSegmentLength, dSubSegmentLength, dPerChordLength );
 				}
 
 				return true;

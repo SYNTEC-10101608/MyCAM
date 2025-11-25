@@ -1,4 +1,5 @@
-﻿using MyCAM.CacheInfo;
+﻿using MyCAM.App;
+using MyCAM.CacheInfo;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
@@ -157,45 +158,52 @@ namespace MyCAM.Data
 			if( pathWireList == null || pathWireList.Count == 0 || allEdgeMap == null ) {
 				return;
 			}
+
 			List<string> newPathIDList = new List<string>();
 			foreach( var pathWire in pathWireList ) {
+				try {
+					// explore the path wire to get edges and component faces
+					TopExp_Explorer exp = new TopExp_Explorer( pathWire, TopAbs_ShapeEnum.TopAbs_EDGE );
+					List<PathEdge5D> pathElements = new List<PathEdge5D>();
+					bool isValidPath = true;
 
-				// explore the path wire to get edges and component faces
-				TopExp_Explorer exp = new TopExp_Explorer( pathWire, TopAbs_ShapeEnum.TopAbs_EDGE );
-				List<PathEdge5D> pathElements = new List<PathEdge5D>();
-				bool isValidPath = true;
-				while( exp.More() ) {
-					TopoDS_Edge oneEdge = TopoDS.ToEdge( exp.Current() );
+					while( exp.More() ) {
+						TopoDS_Edge oneEdge = TopoDS.ToEdge( exp.Current() );
 
-					// edge not found in the edge map
-					if( !allEdgeMap.Contains( oneEdge ) || allEdgeMap.FindFromKey( oneEdge ).Size() == 0 ) {
-						isValidPath = false;
-						break;
+						// edge not found in the edge map
+						if( !allEdgeMap.Contains( oneEdge ) || allEdgeMap.FindFromKey( oneEdge ).Size() == 0 ) {
+							isValidPath = false;
+							break;
+						}
+
+						// pick the first face from map, and it should be only one face
+						if( allEdgeMap.FindFromKey( oneEdge ).Size() != 1 ) {
+							isValidPath = false;
+							break;
+						}
+
+						TopoDS_Face oneFace = TopoDS.ToFace( allEdgeMap.FindFromKey( oneEdge ).First().Ptr );
+						pathElements.Add( new PathEdge5D( oneEdge, oneFace ) );
+						exp.Next();
 					}
 
-					// pick the first face from map, and it should be only one face
-					if( allEdgeMap.FindFromKey( oneEdge ).Size() != 1 ) {
-						isValidPath = false;
-						break;
+					// add valid path
+					if( isValidPath ) {
+						string szID = "Path_" + ++m_PathID;
+						ContourPathObject contourPathObject = new ContourPathObject( szID, pathWire, pathElements );
+						contourPathObject.CraftData.TraverseData = new TraverseData();
+						ObjectMap[ szID ] = contourPathObject;
+						newPathIDList.Add( szID );
 					}
-					TopoDS_Face oneFace = TopoDS.ToFace( allEdgeMap.FindFromKey( oneEdge ).First().Ptr );
-					pathElements.Add( new PathEdge5D( oneEdge, oneFace ) );
-					exp.Next();
 				}
-
-				// add valid path
-				if( isValidPath ) {
-					string szID = "Path_" + ++m_PathID;
-					ContourPathObject contourPathObject = new ContourPathObject( szID, pathWire, pathElements );
-					contourPathObject.CraftData.TraverseData = new TraverseData();
-					ObjectMap[ szID ] = contourPathObject;
-					newPathIDList.Add( szID );
+				catch( Exception ex ) {
+					MyApp.Logger?.ShowOnLogPanel( $"[路徑建立失敗] {ex.Message}", MyApp.NoticeType.Warning );
 				}
 			}
-
-			// add to path ID list
-			PathIDList.AddRange( newPathIDList );
-			PathAdded?.Invoke( newPathIDList );
+			if( newPathIDList.Count > 0 ) {
+				PathIDList.AddRange( newPathIDList );
+				PathAdded?.Invoke( newPathIDList );
+			}
 		}
 
 		public void RemovePath( string pathID )

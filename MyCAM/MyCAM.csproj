@@ -110,7 +110,7 @@
     <Compile Include="Helper\MachineDataXMLHelper.cs" />
     <Compile Include="Helper\NCHelper.cs" />
     <Compile Include="Helper\OverCutSegmentBuilder.cs" />
-    <Compile Include="Helper\PretreatmentHelper.cs" />
+    <Compile Include="Helper\CADPretreatHelper.cs" />
     <Compile Include="Helper\TopoBuilder.cs" />
     <Compile Include="Helper\TraverseHelper.cs" />
     <Compile Include="FileManager\MachineDataDTO.cs" />

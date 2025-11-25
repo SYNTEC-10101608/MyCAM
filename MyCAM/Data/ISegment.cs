@@ -12,7 +12,7 @@ namespace MyCAM.Data
 
 	#region CAD Segment
 
-	internal interface ICADSegmentElement
+	internal interface ICADSegment
 	{
 		ESegmentType SegmentType
 		{
@@ -39,7 +39,7 @@ namespace MyCAM.Data
 			get;
 		}
 
-		double PerArcLegnth
+		double SubSegmentLength
 		{
 			get;
 		}
@@ -49,13 +49,13 @@ namespace MyCAM.Data
 			get;
 		}
 
-		ICADSegmentElement Clone();
+		ICADSegment Clone();
 
 		void Transform( gp_Trsf transForm );
 
 	}
 
-	internal abstract class CADSegmentBase : ICADSegmentElement
+	internal abstract class CADSegmentBase : ICADSegment
 	{
 		protected CADSegmentBase( List<CADPoint> pointList, double dTotalLength, double dPerArcLength, double dPerChordLength )
 		{
@@ -66,7 +66,7 @@ namespace MyCAM.Data
 			m_EndPoint = pointList[ pointList.Count - 1 ];
 			m_PointList = pointList;
 			m_TotalLength = dTotalLength;
-			m_PerArcLength = dPerArcLength;
+			m_SubSegmentLength = dPerArcLength;
 			m_PerChordLength = dPerChordLength;
 		}
 
@@ -117,7 +117,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		public abstract ICADSegmentElement Clone();
+		public abstract ICADSegment Clone();
 
 		public double TotalLength
 		{
@@ -133,16 +133,16 @@ namespace MyCAM.Data
 			}
 		}
 
-		public double PerArcLegnth
+		public double SubSegmentLength
 		{
 			get
 			{
-				return m_PerArcLength;
+				return m_SubSegmentLength;
 			}
 			private set
 			{
 				if( value >= 0.0 ) {
-					m_PerArcLength = value;
+					m_SubSegmentLength = value;
 				}
 			}
 		}
@@ -174,7 +174,7 @@ namespace MyCAM.Data
 		protected CADPoint m_StartPoint;
 		protected CADPoint m_EndPoint;
 		protected double m_TotalLength = 0.0;
-		protected double m_PerArcLength = 0.0;
+		protected double m_SubSegmentLength = 0.0;
 		protected double m_PerChordLength = 0.0;
 	}
 
@@ -193,13 +193,13 @@ namespace MyCAM.Data
 			}
 		}
 
-		public override ICADSegmentElement Clone()
+		public override ICADSegment Clone()
 		{
 			List<CADPoint> clonedPointList = new List<CADPoint>();
 			foreach( CADPoint point in m_PointList ) {
 				clonedPointList.Add( point.Clone() as CADPoint );
 			}
-			return new LineCADSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength );
+			return new LineCADSegment( clonedPointList, m_TotalLength, m_SubSegmentLength, m_PerChordLength );
 		}
 	}
 
@@ -210,7 +210,7 @@ namespace MyCAM.Data
 		{
 			m_MidIndex = arcPointList.Count / 2;
 			MidPoint = arcPointList[ m_MidIndex ];
-			m_dStartToMidLength = PerArcLegnth * m_MidIndex;
+			m_dStartToMidLength = SubSegmentLength * m_MidIndex;
 		}
 
 		public override ESegmentType SegmentType
@@ -235,13 +235,13 @@ namespace MyCAM.Data
 			}
 		}
 
-		public override ICADSegmentElement Clone()
+		public override ICADSegment Clone()
 		{
 			List<CADPoint> clonedPointList = new List<CADPoint>();
 			foreach( CADPoint point in m_PointList ) {
 				clonedPointList.Add( point.Clone() );
 			}
-			return new ArcCADSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength );
+			return new ArcCADSegment( clonedPointList, m_TotalLength, m_SubSegmentLength, m_PerChordLength );
 		}
 
 		public override void Transform( gp_Trsf transform )

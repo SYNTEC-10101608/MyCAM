@@ -10,7 +10,7 @@ namespace MyCAM.CacheInfo
 {
 	internal class ContourCacheInfo : ICacheInfo
 	{
-		public ContourCacheInfo( string szID, List<ICADSegmentElement> cadSegmentList, CraftData craftData, bool isClose )
+		public ContourCacheInfo( string szID, List<ICADSegment> cadSegmentList, CraftData craftData, bool isClose )
 		{
 			if( string.IsNullOrEmpty( szID ) || cadSegmentList == null || cadSegmentList.Count == 0 || craftData == null ) {
 				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );
@@ -230,7 +230,7 @@ namespace MyCAM.CacheInfo
 			List<ICAMSegmentElement> reorderedCAMSegmentList = new List<ICAMSegmentElement>();
 
 			// Step 1: Reorder segments starting from startPoint.SegIdx
-			IReadOnlyList<ICADSegmentElement> cadSegmentList = CADSegmentList;
+			IReadOnlyList<ICADSegment> cadSegmentList = CADSegmentList;
 			for( int i = 0; i < cadSegmentList.Count; i++ ) {
 				int index = ( startPoint.SegIdx + i ) % cadSegmentList.Count;
 				bool isBuildSuccess = CAMSegmentBuilder.BuildCAMSegment( cadSegmentList[ index ], out ICAMSegmentElement camSegment );
@@ -726,8 +726,8 @@ namespace MyCAM.CacheInfo
 
 		// they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
-		List<ICADSegmentElement> m_CADSegmentList;
-		public IReadOnlyList<ICADSegmentElement> CADSegmentList => m_CADSegmentList;
+		List<ICADSegment> m_CADSegmentList;
+		public IReadOnlyList<ICADSegment> CADSegmentList => m_CADSegmentList;
 
 		// flag to indicate craft data changed
 		bool m_IsCraftDataDirty = false;

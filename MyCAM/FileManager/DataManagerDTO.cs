@@ -310,7 +310,7 @@ namespace MyCAM.FileManager
 			if( pathObject is ContourPathObject contourPathObject ) {
 
 				// segment to DTO
-				CADSegmentList = ( contourPathObject.CADSegmentList ?? new List<ICADSegmentElement>() )
+				CADSegmentList = ( contourPathObject.CADSegmentList ?? new List<ICADSegment>() )
 					.Select( seg => new CADSegmentDTO( seg ) )
 					.ToList();
 			}
@@ -329,7 +329,7 @@ namespace MyCAM.FileManager
 			}
 			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
 			CraftData craftData = CraftData.ToCraftData();
-			List<ICADSegmentElement> pathCADSegmentList = CADSegmentList.Select( cadPointDTO => cadPointDTO.ToCADSegment() ).ToList();
+			List<ICADSegment> pathCADSegmentList = CADSegmentList.Select( cadPointDTO => cadPointDTO.ToCADSegment() ).ToList();
 			return new ContourPathObject( UID, shape, pathCADSegmentList, craftData );
 		}
 	}
@@ -643,7 +643,7 @@ namespace MyCAM.FileManager
 		{
 		}
 
-		internal CADSegmentDTO( ICADSegmentElement segment )
+		internal CADSegmentDTO( ICADSegment segment )
 		{
 			if( segment == null ) {
 				return;
@@ -651,7 +651,7 @@ namespace MyCAM.FileManager
 			ContourType = segment.SegmentType;
 			PointList = segment.PointList.Select( p => new CADPointDTO( p ) ).ToList();
 			TotalLength = segment.TotalLength;
-			PerArcLength = segment.PerArcLegnth;
+			PerArcLength = segment.SubSegmentLength;
 			PerChordLength = segment.PerChordLength;
 
 			if( segment is ArcCADSegment arcSegment ) {
@@ -661,7 +661,7 @@ namespace MyCAM.FileManager
 			}
 		}
 
-		internal ICADSegmentElement ToCADSegment()
+		internal ICADSegment ToCADSegment()
 		{
 			List<CADPoint> cadPoints = PointList != null
 				? PointList.Select( dto => dto.ToCADPoint() ).ToList()
