@@ -12,9 +12,12 @@ using OCCTool;
 
 namespace MyCAM.Helper
 {
+	// re: 這個類別專門處理建構 "CAD" Segment 的前處理，我理解正確嗎?
+	// re: 這個類別裡面有很多除法運算，需要注意除以零的情況
 	internal static class PretreatmentHelper
 	{
 		// public function area
+		// re: 這個命名建議就叫 DiscretizeArcToCADPoints
 		public static List<List<CADPoint>> SplitArcEdge( TopoDS_Edge edge, TopoDS_Face shellFace, out List<double> eachSegmentLength, out List<double> dEachArcLength, out List<double> dEachChordLength, double maxAngleRad = Math.PI / 2 )
 		{
 			eachSegmentLength = new List<double>();
@@ -37,7 +40,9 @@ namespace MyCAM.Helper
 			if( angle <= maxAngleRad ) {
 
 				// Tuple<double Deflection, double ChordLength, double ArcLength>
+				// re: 這邊正式 code 應該就避免用 tuple 了，可以改用自訂 struct 或 class
 				Tuple<double, double, double> deflctionResult = CalculateDeflectionForCircularEdge( adaptorCurve, dStartU, dEndU, R );
+				// re: 這邊比我想像中複雜，我覺得 CalculateDeflectionForCircularEdge 可以直接根據 angle/R 算出 segment 數量，當然要直接還傳 u List 也可以
 				segmentParamList = ChordErrorSplit( adaptorCurve, edge, shellFace, dStartU, dEndU, deflctionResult.Item1 );
 
 				// out put
@@ -75,11 +80,14 @@ namespace MyCAM.Helper
 
 			// reverse each segment
 			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+
+				// re: 這邊只是反轉 segment 的順序嗎? 還是 segment 內的點也要反轉?
 				arcCADPointList.Reverse();
 			}
 			return arcCADPointList;
 		}
 
+		// re: 這個命名建議就叫 DiscretizeBsplineToCADPoints
 		public static List<List<CADPoint>> GetBsplineToEdgeList( TopoDS_Edge edge, TopoDS_Face shellFace, out List<double> eachSegmentLength, out List<double> eachArcLength )
 		{
 			eachSegmentLength = new List<double>();
@@ -89,6 +97,7 @@ namespace MyCAM.Helper
 				return null;
 			}
 			BRepAdaptor_Curve adaptorCurve = TryGetAdaptorCurve( edge, shellFace, out double dStartU, out double dEndU );
+			// re: adaptorCurve isNull
 			if( adaptorCurve == null ) {
 				return null;
 			}
@@ -107,6 +116,7 @@ namespace MyCAM.Helper
 			return CADPointList;
 		}
 
+		// re: 這個人應該可以 private
 		public static List<double> ChordErrorSplit( BRepAdaptor_Curve adaptorCurve, TopoDS_Edge edge, TopoDS_Face shellFace, double dStartU, double dEndU, double dDeflection = PRECISION_DEFLECTION )
 		{
 			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() ) {
@@ -129,10 +139,14 @@ namespace MyCAM.Helper
 			return segmentParamList;
 		}
 
+		// re: 這個 API 建議改名叫 DiscretizeArcOrLineByLength
+		// re: 他使用上有限制，應該只適用圓弧或直線
+		// re: dEachArcLength 不只 for arc，不一定要改
 		public static List<double> GetCurveEachSegmentParamByLength( double dStartU, double dEndU, double dMaxSegmentLength, double dEdgeLength, out double dEachArcLength )
 		{
 			int nSubSegmentCount = (int)Math.Ceiling( dEdgeLength / dMaxSegmentLength );
 
+			// re: 如果要分出中點，段落的數量應該是偶數?
 			// make sure to get odd count of points to get middle of edge for arc
 			if( nSubSegmentCount % 2 == 0 ) {
 				nSubSegmentCount += 1;
@@ -148,12 +162,14 @@ namespace MyCAM.Helper
 			return segmentParamList;
 		}
 
+		// re: 這個命名建議就叫 DiscretizeLineToCADPoints
 		public static List<CADPoint> GetSegmentPointsByEqualLength( TopoDS_Edge lineEdge, TopoDS_Face shellFace, double dMaxSegmentLength, out double dEdgeLength, out double dEachArcLength, out double dEachChordLength )
 		{
+			// re: 這邊錯誤的回傳 null 會不會有問題? empty list 會不會比較好? (其他 function 也檢查一下)
 			dEdgeLength = 0;
 			dEachArcLength = 0;
 			dEachChordLength = 0;
-
+			// re: 這裡應該要先做傳入引數的檢查 (其他 function 也檢查一下)
 			// get curve parameters
 			BRepAdaptor_Curve adaptorCurve = TryGetAdaptorCurve( lineEdge, shellFace, out double dStartU, out double dEndU );
 			if( adaptorCurve == null || adaptorCurve.IsNull() ) {
@@ -177,12 +193,14 @@ namespace MyCAM.Helper
 			if( oneSegmentPointList.Count < 2 ) {
 				return null;
 			}
+
+			// re: 這邊是不是可以直接用 dEachArcLength?
 			dEachChordLength = oneSegmentPointList.First().Point.Distance( oneSegmentPointList[ 1 ].Point );
 			return oneSegmentPointList;
 		}
 
 		// private function area
-
+		// re: IsTanVecAdjusted 參數目前沒有使用到，可以考慮移除
 		static List<CADPoint> GetCADPointsFromCurveParams( List<double> segmentParamList, TopoDS_Edge edge, TopoDS_Face shellFace, BRepAdaptor_Curve adC, bool IsTanVecAdjusted = false )
 		{
 			List<CADPoint> oneSegmentPointList = new List<CADPoint>();
@@ -242,7 +260,7 @@ namespace MyCAM.Helper
 		// Tuple<double Deflection, double ChordLength, double ArcLength>
 		static Tuple<double, double, double> CalculateDeflectionForCircularEdge( BRepAdaptor_Curve adaptorCurve, double dStartU, double dEndU, double R, double maxChordError = PRECISION_DEFLECTION, double maxSegmentLength = PRECISION_MAX_LENGTH )
 		{
-
+			// re: 在這裡應該直接根據條件往上終止流程，而不是丟擲異常
 			if( adaptorCurve == null ) {
 				throw new ArgumentNullException( nameof( adaptorCurve ) );
 			}

@@ -9,6 +9,7 @@ using OCCTool;
 
 namespace MyCAM.Helper
 {
+	// re: 命名 CADCAM 感覺可以省略，或是 builder 去分 CAD/CAM
 	internal static  class CADCAMSegmentBuilder
 	{
 		const int LOWEST_PointsToBuildSegment = 2;
@@ -31,6 +32,7 @@ namespace MyCAM.Helper
 				}
 				else {
 
+					// re: 我記得當時有一個結論，是如果沒有兩點圓弧的話，這個插入工作就不需要了?
 					// arc points count should be odd number
 					if( pointList.Count % 2 == 0 ) {
 						gp_Pnt midPoint = new gp_Pnt(

@@ -4,6 +4,7 @@ using OCC.gp;
 
 namespace MyCAM.Data
 {
+	// re: 這個應該叫 segment type
 	public enum EContourType
 	{
 		Line,
@@ -12,6 +13,7 @@ namespace MyCAM.Data
 
 	#region CAD Segment
 
+	// re: 命名 "Element" 有點多餘了
 	internal interface ICADSegmentElement
 	{
 		EContourType ContourType
@@ -34,6 +36,7 @@ namespace MyCAM.Data
 			get;
 		}
 
+		// re: 建議命名可以直接是 SegmentLength
 		double TotalLength
 		{
 			get;
@@ -75,6 +78,7 @@ namespace MyCAM.Data
 			get;
 		}
 
+		// re: 下面的屬性 private set 感覺沒什麼意義
 		public virtual CADPoint StartPoint
 		{
 			get
@@ -166,10 +170,13 @@ namespace MyCAM.Data
 			foreach( CADPoint point in m_PointList ) {
 				point.Transform( transForm );
 			}
+
+			// re: 這個操作是否多餘
 			m_StartPoint = m_PointList[ 0 ];
 			m_EndPoint = m_PointList[ m_PointList.Count - 1 ];
 		}
 
+		// re: member 在建構子會初始化，這裡就不需要再初始化一次了
 		protected List<CADPoint> m_PointList = new List<CADPoint>();
 		protected CADPoint m_StartPoint;
 		protected CADPoint m_EndPoint;
@@ -197,6 +204,8 @@ namespace MyCAM.Data
 		{
 			List<CADPoint> clonedPointList = new List<CADPoint>();
 			foreach( CADPoint point in m_PointList ) {
+
+				// re: 這邊的 as CADPoint 不需要
 				clonedPointList.Add( point.Clone() as CADPoint );
 			}
 			return new LineCADSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength );
@@ -208,6 +217,7 @@ namespace MyCAM.Data
 		public ArcCADSegment( List<CADPoint> arcPointList, double dTotalLength, double dPerArcLength, double dPerChordLength )
 			: base( arcPointList, dTotalLength, dPerArcLength, dPerChordLength )
 		{
+			// re: 這邊是否需要自己保護 count <=2 的情況？
 			m_MidIndex = arcPointList.Count / 2;
 			MidPoint = arcPointList[ m_MidIndex ];
 			m_dStartToMidLength = PerArcLegnth * m_MidIndex;
@@ -227,6 +237,8 @@ namespace MyCAM.Data
 			{
 				return m_MidPoint;
 			}
+
+			// re: 這個 private set 感覺沒什麼意義
 			private set
 			{
 				if( value != null ) {
@@ -246,12 +258,15 @@ namespace MyCAM.Data
 
 		public override void Transform( gp_Trsf transform )
 		{
+			// re: 這個操作是否多餘
 			base.Transform( transform );
 			MidPoint = m_PointList[ m_MidIndex ];
 		}
 
 		CADPoint m_MidPoint;
 		int m_MidIndex = 0;
+
+		// re: 這個沒用到?
 		double m_dStartToMidLength = 0.0;
 	}
 

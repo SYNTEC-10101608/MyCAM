@@ -22,9 +22,13 @@ namespace MyCAM.Data
 			}
 
 			bool isClosed = DetermineIfClosed( shape );
+
+			// re: 這邊是否可能出現 count 為 0 的情況? 需要保護?
 			m_CADSegmentList = BuildCADSegment( pathDataList, isClosed );
 			m_CraftData = new CraftData( szUID );
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADSegmentList, m_CraftData, isClosed );
+
+			// re: 這裡應該就讓他是 0,0 也沒關係?
 			m_CraftData.StartPointIndex = new SegmentPointIndex( m_CADSegmentList.Count - 1, m_CADSegmentList[ CADSegmentList.Count - 1 ].PointList.Count - 1 );
 		}
 
@@ -45,6 +49,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
+				// re: 我建議這裡就先不要 clone 了，後續再找機會優化
 				return m_CADSegmentList.Select( segment => segment.Clone() ).ToList();
 			}
 		}
@@ -88,13 +93,16 @@ namespace MyCAM.Data
 			m_ContourCacheInfo.Transform();
 		}
 
+		// re: 這個 is close 引數沒有用到了?
 		List<ICADSegmentElement> BuildCADSegment( List<PathEdge5D> pathEdge5DList, bool isClosed )
 		{
 			List<ICADSegmentElement> cadSegmentList = new List<ICADSegmentElement>();
 
 			if( pathEdge5DList == null ) {
+				// re: 應該回傳空 list?
 				return null;
 			}
+			// re: 空行
 			// go through the contour edges
 			for( int i = 0; i < pathEdge5DList.Count; i++ ) {
 				TopoDS_Edge edge = pathEdge5DList[ i ].PathEdge;
@@ -103,14 +111,19 @@ namespace MyCAM.Data
 
 				// this curve is line use equal length split
 				if( GeometryTool.IsLine( edge, out _, out _ ) ) {
+
+					// re: 這個精度的命名需要調整一下
 					List<CADPoint> tempCADPointList = PretreatmentHelper.GetSegmentPointsByEqualLength( edge, shellFace, PRECISION_MAX_LENGTH, out double dEdgeLength, out double dPerArcLength, out double dPerChordLength );
+					// re: 這邊 tempCADPointList 應該要先檢查
 					bool buildSuccess = CADCAMSegmentBuilder.BuildCADSegment( tempCADPointList, EContourType.Line, dEdgeLength, dPerArcLength, dPerChordLength, out ICADSegmentElement cadSegment );
+					// re: 這邊 failed 的可能是哪些情況，是否應該直接終止整個流程?
 					if( buildSuccess ) {
 						cadSegmentList.Add( cadSegment );
 					}
 				}
 
 				// this curve is arc choose the best option from the two options (chord error vs equal length)
+				// re: 這邊 center 跟 arcAngle 沒有用到?
 				else if( GeometryTool.IsCircularArc( edge, out _, out _, out gp_Dir centerDir, out double arcAngle ) ) {
 					List<List<CADPoint>> cadPointList = PretreatmentHelper.SplitArcEdge( edge, shellFace, out List<double> eachSegmentLength, out List<double> dEachArcLength, out List<double> dEachChordLength );
 					if( cadPointList == null || cadPointList.Count == 0 ) {
@@ -136,6 +149,7 @@ namespace MyCAM.Data
 					for( int j = 0; j < cadPointList.Count; j++ ) {
 
 						// calculate chord length
+						// re: 建議架構統一，ChordLength 在 PretreatmentHelper 算好傳回來
 						double dChordLength = cadPointList[ j ].First().Point.Distance( cadPointList[ j ][ 1 ].Point );
 						bool buildSuccess = CADCAMSegmentBuilder.BuildCADSegment( cadPointList[ j ], EContourType.Line, eachSegmentLength[ j ], eachArcLength[ j ], dChordLength, out ICADSegmentElement cadSegment );
 						if( buildSuccess ) {
