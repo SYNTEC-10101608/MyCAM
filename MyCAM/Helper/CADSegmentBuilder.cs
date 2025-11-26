@@ -5,19 +5,20 @@ using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
+	// fix: 命名 CADCAM 感覺可以省略，或是 builder 去分 CAD/CAM
 	internal static class CADSegmentBuilder
 	{
 		const int LOWEST_PointsToBuildSegment = 2;
 
-		public static bool BuildCADSegment( List<CADPoint> pointList, ESegmentType contourType, double dSegmentLength, double dSubSegmentLength, double dPerChordLength, out ICADSegment cadSegment )
+		public static CADPretreatHelper.CADError BuildCADSegment( List<CADPoint> pointList, ESegmentType contourType, double dSegmentLength, double dSubSegmentLength, double dPerChordLength, out ICADSegment cadSegment )
 		{
 			cadSegment = null;
 			if( pointList == null || pointList.Count < LOWEST_PointsToBuildSegment ) {
-				return false;
+				return CADPretreatHelper.CADError.PointCountError;
 			}
 			if( contourType == ESegmentType.Line ) {
 				cadSegment = new LineCADSegment( pointList, dSegmentLength, dSubSegmentLength, dPerChordLength );
-				return true;
+				return CADPretreatHelper.CADError.Done;
 			}
 			if( contourType == ESegmentType.Arc ) {
 
@@ -26,25 +27,13 @@ namespace MyCAM.Helper
 					cadSegment = new LineCADSegment( pointList, dSegmentLength, dSubSegmentLength, dPerChordLength );
 				}
 				else {
-
-					// arc points count should be odd number
-					if( pointList.Count % 2 == 0 ) {
-						gp_Pnt midPoint = new gp_Pnt(
-							( pointList[ pointList.Count / 2 - 1 ].Point.X() + pointList[ pointList.Count / 2 ].Point.X() ) / 2.0,
-							( pointList[ pointList.Count / 2 - 1 ].Point.Y() + pointList[ pointList.Count / 2 ].Point.Y() ) / 2.0,
-							( pointList[ pointList.Count / 2 - 1 ].Point.Z() + pointList[ pointList.Count / 2 ].Point.Z() ) / 2.0 );
-						gp_Dir normalVec1 = GeometryTool.GetDirAverage( pointList[ pointList.Count / 2 - 1 ].NormalVec_1st, pointList[ pointList.Count / 2 ].NormalVec_1st );
-						gp_Dir normalVec2 = GeometryTool.GetDirAverage( pointList[ pointList.Count / 2 - 1 ].NormalVec_2nd, pointList[ pointList.Count / 2 ].NormalVec_2nd );
-						gp_Dir tangentVec = GeometryTool.GetDirAverage( pointList[ pointList.Count / 2 - 1 ].TangentVec, pointList[ pointList.Count / 2 ].TangentVec );
-						CADPoint cADPoint = new CADPoint( midPoint, normalVec1, normalVec2, tangentVec );
-						pointList.Insert( pointList.Count / 2, cADPoint );
-					}
+					// fix: 我記得當時有一個結論，是如果沒有兩點圓弧的話，這個插入工作就不需要了?
 					cadSegment = new ArcCADSegment( pointList, dSegmentLength, dSubSegmentLength, dPerChordLength );
 				}
 
-				return true;
+				return CADPretreatHelper.CADError.Done;
 			}
-			return false;
+			return CADPretreatHelper.CADError.UnknownSegemntType;
 		}
 	}
 }

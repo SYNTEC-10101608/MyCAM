@@ -9,7 +9,6 @@ using OCCTool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using static MyCAM.Helper.CADPretreatHelper;
 
 namespace MyCAM.Data
@@ -23,8 +22,12 @@ namespace MyCAM.Data
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
 			bool isClosed = DetermineIfClosed( shape );
-			bool isBuildDone =  BuildCADSegment( pathDataList, out List<ICADSegment> cadSegList );
-			if ( isBuildDone == false || cadSegList == null || cadSegList.Count == 0 ) {
+			// fix: 這邊是否可能出現 count 為 0 的情況? 需要保護?
+			CADError isBuildDone = BuildCADSegment( pathDataList, out List<ICADSegment> cadSegList );
+			if( isBuildDone != CADError.Done ) {
+				throw new Exception( isBuildDone.ToString() );
+			}
+			if( cadSegList == null || cadSegList.Count == 0 ) {
 				throw new Exception( "ContourPathObject CAD segment build failed" );
 			}
 			m_CADSegmentList = cadSegList;
@@ -93,12 +96,12 @@ namespace MyCAM.Data
 			m_ContourCacheInfo.Transform();
 		}
 
-		bool BuildCADSegment( List<PathEdge5D> pathEdge5DList , out List<ICADSegment> cadSegmentList )
+		CADError BuildCADSegment( List<PathEdge5D> pathEdge5DList, out List<ICADSegment> cadSegmentList )
 		{
 			cadSegmentList = new List<ICADSegment>();
 			if( pathEdge5DList == null ) {
 				// fix:應該回傳空 list?
-				return false;
+				return CADError.ParamError;
 			}
 			// go through the contour edges
 			for( int i = 0; i < pathEdge5DList.Count; i++ ) {
@@ -108,28 +111,28 @@ namespace MyCAM.Data
 
 				// this curve is line use equal length split
 				if( GeometryTool.IsLine( edge, out _, out _ ) ) {
-					bool isDiscretizeDone = DiscretizeLineToCADPnt( edge, shellFace, PRECISION_MAX_LENGTH, out CADSegBuildData cadSegBuildData );
-					if (isDiscretizeDone == false ) {
-						return false;
+					CADError result = DiscretizeLineToBuildData( edge, shellFace, PRECISION_MAX_LENGTH, out CADSegBuildData cadSegBuildData );
+					if( result != CADError.Done ) {
+						return result;
 					}
-					bool buildDone = CADSegmentBuilder.BuildCADSegment( cadSegBuildData.PointList, ESegmentType.Line, cadSegBuildData.SegmentLength, cadSegBuildData.SubSegmentLength, cadSegBuildData.PerChordLength, out ICADSegment cadSegment );
-					if( buildDone == false ) {
-						return false;
+					CADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildData.PointList, ESegmentType.Line, cadSegBuildData.SegmentLength, cadSegBuildData.SubSegmentLength, cadSegBuildData.PerChordLength, out ICADSegment cadSegment );
+					if( buildResult != CADError.Done ) {
+						return buildResult;
 					}
 					cadSegmentList.Add( cadSegment );
 				}
 
 				// this curve is arc choose the best option from the two options (chord error vs equal length)
 				else if( GeometryTool.IsCircularArc( edge, out _, out _, out gp_Dir centerDir, out double arcAngle ) ) {
-					bool isDiscretizeDone = DiscretizeArcToCADSegments( edge, shellFace, out List<CADSegBuildData> cadSegBuildDataList, Math.PI / 2 );
-					if( isDiscretizeDone == false || cadSegBuildDataList == null || cadSegBuildDataList.Count == 0 ) {
-						return false;
+					CADError result = DiscretizeArcToSegmentBuildData( edge, shellFace, out List<CADSegBuildData> cadSegBuildDataList, Math.PI / 2 );
+					if( result != CADError.Done || cadSegBuildDataList == null || cadSegBuildDataList.Count == 0 ) {
+						return result;
 					}
 
 					for( int j = 0; j < cadSegBuildDataList.Count; j++ ) {
-						bool buildDone = CADSegmentBuilder.BuildCADSegment( cadSegBuildDataList[ j ].PointList, ESegmentType.Arc, cadSegBuildDataList[ j ].SegmentLength, cadSegBuildDataList[ j ].SubSegmentLength, cadSegBuildDataList[ j ].PerChordLength, out ICADSegment cadSegment );
-						if( buildDone == false) {
-							return false;
+						CADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildDataList[ j ].PointList, ESegmentType.Arc, cadSegBuildDataList[ j ].SegmentLength, cadSegBuildDataList[ j ].SubSegmentLength, cadSegBuildDataList[ j ].PerChordLength, out ICADSegment cadSegment );
+						if( buildResult != CADError.Done ) {
+							return buildResult;
 						}
 						cadSegmentList.Add( cadSegment );
 					}
@@ -139,20 +142,23 @@ namespace MyCAM.Data
 				else {
 
 					// separate this bspline
-					bool isDiscretizeDone = CADPretreatHelper.DiscretizeBsplineToCADPnt( edge, shellFace, out List<CADSegBuildData> cadSegmentBuildDataList );
-					if( isDiscretizeDone == false || cadSegmentBuildDataList == null || cadSegmentBuildDataList.Count == 0 ) {
-						return false;
+					CADError result = DiscretizeBsplineToBuildData( edge, shellFace, out List<CADSegBuildData> cadSegmentBuildDataList );
+					if( result != CADError.Done ) {
+						return result;
+					}
+					if( cadSegmentBuildDataList == null || cadSegmentBuildDataList.Count == 0 ) {
+						return CADError.DiscretizFaild;
 					}
 					for( int j = 0; j < cadSegmentBuildDataList.Count; j++ ) {
-						bool buildDone = CADSegmentBuilder.BuildCADSegment( cadSegmentBuildDataList[ j ].PointList, ESegmentType.Line, cadSegmentBuildDataList[ j ].SegmentLength, cadSegmentBuildDataList[ j ].SubSegmentLength, cadSegmentBuildDataList[ j ].PerChordLength, out ICADSegment cadSegment );
-						if( buildDone == false ) {
-							return false;
+						CADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegmentBuildDataList[ j ].PointList, ESegmentType.Line, cadSegmentBuildDataList[ j ].SegmentLength, cadSegmentBuildDataList[ j ].SubSegmentLength, cadSegmentBuildDataList[ j ].PerChordLength, out ICADSegment cadSegment );
+						if( buildResult != CADError.Done ) {
+							return buildResult;
 						}
 						cadSegmentList.Add( cadSegment );
 					}
 				}
 			}
-			return true;
+			return CADError.Done;
 		}
 
 		bool DetermineIfClosed( TopoDS_Shape shapeData )
