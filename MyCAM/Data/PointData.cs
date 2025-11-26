@@ -109,7 +109,8 @@ namespace MyCAM.Data
 			m_NormalVec_1st = new gp_Dir( normal1.XYZ() );
 			m_NormalVec_2nd = new gp_Dir( normal2.XYZ() );
 			m_TangentVec = new gp_Dir( tangVec.XYZ() );
-			m_ToolVec = new gp_Dir( toolVec.XYZ() );
+			ToolVec = toolVec;
+			// m_ToolVec = new gp_Dir( toolVec.XYZ() );
 		}
 
 		public gp_Pnt Point
@@ -148,6 +149,7 @@ namespace MyCAM.Data
 
 		public gp_Dir ToolVec
 		{
+			/*
 			get
 			{
 				return new gp_Dir( m_ToolVec.XYZ() );
@@ -156,6 +158,8 @@ namespace MyCAM.Data
 			{
 				m_ToolVec = new gp_Dir( value.XYZ() );
 			}
+			*/
+			get;set;
 		}
 
 		public CAMPoint2 Clone()
@@ -175,7 +179,7 @@ namespace MyCAM.Data
 			if( m_Point.IsEqual( other.m_Point, TOLERANCE ) == false ) {
 				return false;
 			}
-			if( m_ToolVec.IsEqual( other.m_ToolVec, TOLERANCE ) == false ) {
+			if( ToolVec.IsEqual( other.ToolVec, TOLERANCE ) == false ) {
 				return false;
 			}
 			return true;

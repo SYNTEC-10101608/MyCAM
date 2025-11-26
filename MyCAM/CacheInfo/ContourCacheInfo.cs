@@ -311,7 +311,9 @@ namespace MyCAM.CacheInfo
 				ApplyToolVectorInterpolation( camPointInfoList );
 
 				// Step 6: 重新組織成最終的 CAM 段列表
-				List<ICAMSegmentElement> finalSegments = ReconstructCAMSegments( camPointInfoList, reorderedSegmentList );
+				// List<ICAMSegmentElement> finalSegments = ReconstructCAMSegments( camPointInfoList, reorderedSegmentList );
+				// Step 5: 直接提取，無需重建
+				List<ICAMSegmentElement> finalSegments = ExtractFinalSegments( reorderedSegmentList );
 
 				// Step 7: 設定結果
 				SetResults( finalSegments, ExtractControlPointIndices( reorderedSegmentList ) );
@@ -530,14 +532,12 @@ namespace MyCAM.CacheInfo
 			if( brokenSegmentList == null || brokenSegmentList.Count == 0 ) {
 				return camInfoList;
 			}
-				
-
 			for( int segIdx = 0; segIdx < brokenSegmentList.Count; segIdx++ ) {
 				BrokenCAMSegment segment = brokenSegmentList[ segIdx ];
 				List<CAMPoint2> camPoints = segment.CAMSegment.CAMPointList;
 
 				for( int pntIdx = 0; pntIdx < camPoints.Count; pntIdx++ ) {
-					CAMPointInfo camPointInfo = new CAMPointInfo( camPoints[ pntIdx ].Clone() );
+					CAMPointInfo camPointInfo = new CAMPointInfo( camPoints[ pntIdx ]);
 
 					// this is ctrl pnt (this segment is contrl segment + this point is last point + this ctrl pnt can map back to ori pnt)
 					if( segment.IsControlSegment && pntIdx == camPoints.Count - 1 && segment.OriginalControlPoint.HasValue ) {
@@ -566,7 +566,6 @@ namespace MyCAM.CacheInfo
 					camInfoList.Add( camPointInfo );
 				}
 			}
-
 			return camInfoList;
 		}
 
