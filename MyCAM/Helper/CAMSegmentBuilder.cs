@@ -19,7 +19,7 @@ namespace MyCAM.Helper
 			if( cadSegment == null ) {
 				return false;
 			}
-			return BuildCAMSegment( cadSegment.PointList, cadSegment.SegmentType, cadSegment.SegmentLength, cadSegment.SubSegmentLength, cadSegment.PerChordLength, out camSegment );
+			return BuildCAMSegmentByCADPoint( cadSegment.PointList, cadSegment.SegmentType, cadSegment.SegmentLength, cadSegment.SubSegmentLength, cadSegment.PerChordLength, out camSegment );
 		}
 
 		public static bool BuildCAMSegmentByCAMPoint( List<CAMPoint2> camPointList, ESegmentType contourType, double dTotalLength, double dPerArcLength, double dPerChordLength, out ICAMSegmentElement camSegment )
@@ -48,7 +48,7 @@ namespace MyCAM.Helper
 			return false;
 		}
 
-		public static bool BuildCAMSegment( List<CADPoint> cadPointList, ESegmentType contourType, double dTotalLength, double dPerArcLength, double dPerChordLength, out ICAMSegmentElement camSegment )
+		public static bool BuildCAMSegmentByCADPoint( List<CADPoint> cadPointList, ESegmentType contourType, double dTotalLength, double dPerArcLength, double dPerChordLength, out ICAMSegmentElement camSegment )
 		{
 			camSegment = null;
 			if( cadPointList == null || cadPointList.Count < LOWEST_PointsToBuildSegment ) {
