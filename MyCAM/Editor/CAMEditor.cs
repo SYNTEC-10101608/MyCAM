@@ -761,7 +761,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-
+		// re: 空行
 		void RomoveOrientation( List<string> pathIDList )
 		{
 			// clear the previous orientation
@@ -788,6 +788,8 @@ namespace MyCAM.Editor
 					continue;
 				}
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
+
+				// re: 這邊 CacheInfo 是否應該開 API 專門拿來取 MainPath 的起點
 				gp_Pnt showPoint = contourCacheInfo.CAMSegmentList.First().StartPoint.Point;
 				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMSegmentList.First().StartPoint.TangentVec.XYZ() );
 				if( contourCacheInfo.GetPathIsReverse() ) {
@@ -806,6 +808,7 @@ namespace MyCAM.Editor
 			}
 		}
 
+		// re: show 的部分移除了，Remove 是否也該移除
 		void RomoveLeadOrientation( List<string> pathIDList )
 		{
 			// clear the previous orientation
@@ -841,6 +844,8 @@ namespace MyCAM.Editor
 			// create text label
 			int nCurrentIndex = 0;
 			foreach( ContourCacheInfo cacheInfo in m_DataManager.GetContourCacheInfoList() ) {
+
+				// re: 同上
 				gp_Pnt location = cacheInfo.CAMSegmentList.First().StartPoint.Point;
 				string szIndex = nCurrentIndex++.ToString();
 
@@ -1032,6 +1037,7 @@ namespace MyCAM.Editor
 			}
 		}
 
+		// re: 這個建議更名為 RemoveAllCAMData，並移到上面
 		void HideAllCAMData()
 		{
 			// hide tool vec

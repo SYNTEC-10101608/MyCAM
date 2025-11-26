@@ -4,14 +4,17 @@ using System.Linq;
 
 namespace MyCAM.Data
 {
+	// re: 應該叫 PostSegmentType?
 	public enum EPostPathType
 	{
 		Line,
 		Arc
 	}
 
+	// re: 我建議命名如果需要前綴自的話可以叫 ContourPostData
 	internal class PathPostData
 	{
+		// re: 以下命名的尾綴 PostPath 感覺有點多餘，因為這個類別本身就叫 PathPostData 了
 		public List<ISegmentPostData> LeadInPostPath
 		{
 			get; set;
@@ -73,8 +76,10 @@ namespace MyCAM.Data
 		}
 	}
 
+	// re: 命名建議是 IPostSegment 比較符合風格，衍生類別也統一 (LinePostSegment, ArcPostSegment)
 	internal interface ISegmentPostData
 	{
+		// re: naming
 		EPostPathType PostPathType
 		{
 			get;
@@ -90,6 +95,7 @@ namespace MyCAM.Data
 			get;
 		}
 
+		// re: 看起來這個屬性其實沒在用了
 		bool IsModify
 		{
 			get;
@@ -100,6 +106,7 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		// re: 上面已經開 get，這個就多餘了
 		List<PostPoint> GetPostPointList();
 	}
 
@@ -149,6 +156,7 @@ namespace MyCAM.Data
 
 	internal class ArcPost : ISegmentPostData
 	{
+		// re: 移到下面
 		public PostPoint MidPoint
 		{
 			get; private set;
@@ -174,6 +182,7 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		// re: 沒用到
 		public PostPoint MidPnt
 		{
 			get
@@ -377,6 +386,8 @@ namespace MyCAM.Data
 		}
 	}
 
+
+	// re: 下面這坨看起來用不到?
 	internal class PathIKSolveInfo
 	{
 		public List<segmentIKInfo> LeadInIKSoveInfo

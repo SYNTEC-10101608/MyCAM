@@ -7,6 +7,8 @@ using MyCAM.Helper;
 
 namespace MyCAM.Post
 {
+	// re: 寫點 function 可以開成分圓弧和直線的，引數是終點 or 中間點 + 終點，讓 code 可以共用
+	// re: 也可以考慮一下空移的部分要怎麼共用 code
 	internal class NCWriter
 	{
 		public NCWriter( DataManager dataManager )
@@ -54,6 +56,7 @@ namespace MyCAM.Post
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
 					for( int i = 0; i < m_ProcessCacheInfoList.Count; i++ ) {
+						// re: 這個 isBuildSucces 沒用到
 						bool isBuildSucces = NCHelper.BuildNCPackage( m_ProcessCacheInfoList[ i ], m_CraftDataList[ i ], m_EntryAndExitData, out PathNCPackage pathNCPackage );
 
 						// solve all post data of the path
@@ -114,6 +117,7 @@ namespace MyCAM.Post
 				return;
 			}
 
+			// re: 這邊應該走 if/else 比較好讀
 			if( segmentPostPath is ArcPost arcPostPath ) {
 				WriteG02Path( arcPostPath );
 				return;
@@ -203,6 +207,7 @@ namespace MyCAM.Post
 				$"X2={szX2} Y2={szY2} Z2={szZ2} {szRotaryAxisCommand2} {szFollow};" );
 		}
 
+		// re: 記得用這個確保順序
 		string GetRotaryAxisCommand( double master_deg, double slave_deg, string szAxisCommandFix = "" )
 		{
 			string szM = m_MasterAxisName + szAxisCommandFix + master_deg.ToString( "F3" );

@@ -39,11 +39,13 @@ namespace MyCAM.CacheInfo
 
 		#region result
 
+		// re: 這個命名我建議可以改叫 main path segment list
 		public List<ICAMSegmentElement> CAMSegmentList
 		{
 			get
 			{
 				if( m_IsCraftDataDirty ) {
+					// re: 這兩個總是一起出現，分成兩個方法的目的是甚麼，對外是否考慮包一個統一方法?
 					BuildPathCAMSegment();
 					BuildCAMFeatureSegment();
 				}
@@ -57,6 +59,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
+		// re: 目前還不知道這個是幹嘛的
 		public List<int> CtrlToolSegIdxList
 		{
 			get => m_CtrlToolSegIdxList;
@@ -68,6 +71,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
+		// re: 這幾個命名應該加 List 或加 s，以目前規範建議加 List
 		public List<ICAMSegmentElement> LeadInSegment
 		{
 			get
@@ -166,6 +170,7 @@ namespace MyCAM.CacheInfo
 			return camPoint;
 		}
 
+		// re: 以下這幾個方法有一些討論空間，具體看使用者
 		public bool GetPathIsReverse()
 		{
 			return m_CraftData.IsReverse;
@@ -619,6 +624,7 @@ namespace MyCAM.CacheInfo
 
 		#endregion
 
+		// re: 這應該移至 public API 區域
 		public bool GetToolVecModify( SegmentPointIndex index, out double dRA_deg, out double dRB_deg )
 		{
 			if( m_CraftData.ToolVecModifyMap.ContainsKey( index ) ) {

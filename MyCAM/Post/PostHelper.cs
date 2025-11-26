@@ -29,6 +29,8 @@ namespace MyCAM.Post
 	{
 		public static bool SolvePath( PostSolver postSolver, PathNCPackage pathNCPacke,
 	PathEndInfo endInfoOfPreviousPath,
+	// re: isNeedDispersion 沒用到了，可以移除
+	// re: 如同討論，useACSolution 不做引數傳遞，現階段固定為 true
 	out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo, bool isNeedDispersion = true, bool useACSolution = true )
 		{
 			// for simulation
@@ -87,6 +89,7 @@ namespace MyCAM.Post
 				pathG54PostData.LeadInPostPath.AddRange( leadInPostData );
 				pathMCSPostData.LeadInPostPath.AddRange( leadInPostData );
 
+				// re: 如果 leadin 是後算，那應該就不需要 bStart，有進這裡再更新
 				pathG54PostData.ProcessStartPoint = pathG54PostData.LeadInPostPath.First().StartPoint;
 				pathMCSPostData.ProcessStartPoint = pathMCSPostData.LeadInPostPath.First().StartPoint;
 				bStart = true;
@@ -286,6 +289,7 @@ namespace MyCAM.Post
 			return segmentPostData;
 		}
 
+		// re: 這個命名需要雕琢一下，他不僅建構了 PostPoint，還做了 IK 求解
 		static List<PostPoint> CreateSegmentPostPoint( PostSolver postSolver, List<CAMPoint2> pointList,
 										   ref double dLastProcessPathM, ref double dLastProcessPathS, bool isModify )
 		{
@@ -334,6 +338,7 @@ namespace MyCAM.Post
 
 		static bool IsRealSingular( IKSolveResult ikResult, bool isModify, bool isLastPntOfSegment )
 		{
+			// re: 這邊可能要註解一下，不然很難理解
 			bool isSingular = ( ikResult == IKSolveResult.MasterInfinityOfSolution ||
 								  ikResult == IKSolveResult.SlaveInfinityOfSolution );
 			if( isSingular ) {
@@ -533,10 +538,14 @@ namespace MyCAM.Post
 
 				// create post points form each cam point
 				List<PostPoint> postPointList = CreateSegmentPostPoint( postSolver, pointList, ref dLastProcessPathM, ref dLastProcessPathS, camSegment.IsModify );
+
+				// re: 這邊應該也走 return bool，out 計算結果，比較一致
 				if( postPointList == null ) {
 					return false;
 				}
 				ISegmentPostData segment = CreateSegmentPostData( camSegment, postPointList );
+
+				// re: 這邊應該也走 return bool，out 計算結果，比較一致；然後這邊如果 null 應該要直接 return false?
 				if( segment != null ) {
 					segmentPostData.Add( segment );
 				}
@@ -544,6 +553,7 @@ namespace MyCAM.Post
 			return true;
 		}
 
+		// re: 這個運算是否有考慮全都在奇異點的情境?
 		static bool AdjustSingular( ref List<ISegmentPostData> segmentPostList )
 		{
 			if( segmentPostList == null || segmentPostList.Count == 0 ) {

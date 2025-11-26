@@ -66,6 +66,7 @@ namespace MyCAM.Helper
 			ncPackage.Entry_FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 		}
 
+		// re: 這個之後應該就不需要了?
 		public static List<ICAMSegmentElement> ReverseSegment( List<ICAMSegmentElement> camSegmentList )
 		{
 			if( camSegmentList == null || camSegmentList.Count == 0 ) {

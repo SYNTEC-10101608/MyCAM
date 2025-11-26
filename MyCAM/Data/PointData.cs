@@ -138,6 +138,7 @@ namespace MyCAM.Data
 		}
 
 		// tangent vector on path
+		// re: 這個之後是不是也要開 set 出來 (考慮反向)
 		public gp_Dir TangentVec
 		{
 			get
