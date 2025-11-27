@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using OCC.gp;
+using System.Collections.Generic;
 using System.Linq;
-using OCC.gp;
 
 namespace MyCAM.Data
 {
@@ -13,6 +13,7 @@ namespace MyCAM.Data
 
 	#region CAD Segment
 
+	// fix: 命名 "Element" 有點多餘了
 	internal interface ICADSegment
 	{
 		ESegmentType SegmentType
@@ -36,7 +37,7 @@ namespace MyCAM.Data
 		}
 
 		// fix: 建議命名可以直接是 SegmentLength
-		double SegmentLength 
+		double SegmentLength
 		{
 			get;
 		}
@@ -133,16 +134,15 @@ namespace MyCAM.Data
 			foreach( CADPoint point in m_PointList ) {
 				point.Transform( transForm );
 			}
-			// fix: 這個操作是否多餘
 		}
 
 		// fix: member 在建構子會初始化，這裡就不需要再初始化一次了
 		protected List<CADPoint> m_PointList;
 		protected CADPoint m_StartPoint;
 		protected CADPoint m_EndPoint;
-		protected double m_TotalLength = 0.0;
-		protected double m_SubSegmentLength = 0.0;
-		protected double m_PerChordLength = 0.0;
+		protected double m_TotalLength;
+		protected double m_SubSegmentLength;
+		protected double m_PerChordLength;
 	}
 
 	internal class LineCADSegment : CADSegmentBase
@@ -165,7 +165,7 @@ namespace MyCAM.Data
 			List<CADPoint> clonedPointList = new List<CADPoint>();
 			foreach( CADPoint point in m_PointList ) {
 				// fix: 這邊的 as CADPoint 不需要
-				clonedPointList.Add( point.Clone());
+				clonedPointList.Add( point.Clone() );
 			}
 			return new LineCADSegment( clonedPointList, m_TotalLength, m_SubSegmentLength, m_PerChordLength );
 		}
@@ -200,11 +200,9 @@ namespace MyCAM.Data
 			}
 
 			// fix: 這個 private set 感覺沒什麼意義===>因為base沒做這個動作,這裡我需要開出來讓建構子來設置
-			private set
+			set
 			{
-				if( value != null ) {
-					m_MidPoint = value;
-				}
+				m_MidPoint = value;
 			}
 		}
 
@@ -430,7 +428,7 @@ namespace MyCAM.Data
 	internal class LineCAMSegment : CAMSegmentBase
 	{
 		public LineCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength, bool isModifySegment = false )
-			: base( camPointList, dTotalLength, dArcLength, dChordLength , isModifySegment)
+			: base( camPointList, dTotalLength, dArcLength, dChordLength, isModifySegment )
 		{
 		}
 
@@ -461,7 +459,6 @@ namespace MyCAM.Data
 
 			// share pointer
 			MidPoint = camPointList[ m_MidIndex ];
-			m_dStartToMidLength = PerArcLength * m_MidIndex;
 		}
 
 		public override ESegmentType ContourType
@@ -469,14 +466,6 @@ namespace MyCAM.Data
 			get
 			{
 				return ESegmentType.Arc;
-			}
-		}
-
-		public double dStartToMidLength
-		{
-			get
-			{
-				return m_dStartToMidLength;
 			}
 		}
 
@@ -505,7 +494,6 @@ namespace MyCAM.Data
 
 		CAMPoint2 m_MidPoint;
 		int m_MidIndex = 0;
-		double m_dStartToMidLength = 0.0;
 	}
 
 	#endregion

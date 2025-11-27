@@ -8,7 +8,6 @@ using OCC.TopoDS;
 using OCCTool;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using static MyCAM.Helper.CADPretreatHelper;
 
 namespace MyCAM.Data
@@ -33,7 +32,8 @@ namespace MyCAM.Data
 			m_CADSegmentList = cadSegList;
 			m_CraftData = new CraftData( szUID );
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADSegmentList, m_CraftData, isClosed );
-			m_CraftData.StartPointIndex = new SegmentPointIndex( m_CADSegmentList.Count - 1, m_CADSegmentList[ CADSegmentList.Count - 1 ].PointList.Count - 1 );
+			// fix: 這裡應該就讓他是 0,0 也沒關係?
+			m_CraftData.StartPointIndex = new SegmentPointIndex( 0,0 );
 		}
 
 		// this is for the file read constructor
@@ -49,11 +49,12 @@ namespace MyCAM.Data
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADSegmentList, m_CraftData, isClosed );
 		}
 
-		public List<ICADSegment> CADSegmentList
+		public IReadOnlyList<ICADSegment> CADSegmentList
 		{
 			get
 			{
-				return m_CADSegmentList.Select( segment => segment.Clone() ).ToList();
+				//fix: 我建議這裡就先不要 clone 了，後續再找機會優化
+				return m_CADSegmentList;
 			}
 		}
 
@@ -96,6 +97,7 @@ namespace MyCAM.Data
 			m_ContourCacheInfo.Transform();
 		}
 
+		// fix: 這個 is close 引數沒有用到了?
 		CADError BuildCADSegment( List<PathEdge5D> pathEdge5DList, out List<ICADSegment> cadSegmentList )
 		{
 			cadSegmentList = new List<ICADSegment>();
@@ -111,11 +113,15 @@ namespace MyCAM.Data
 
 				// this curve is line use equal length split
 				if( GeometryTool.IsLine( edge, out _, out _ ) ) {
-					CADError result = DiscretizeLineToBuildData( edge, shellFace, PRECISION_MAX_LENGTH, out CADSegBuildData cadSegBuildData );
+
+					// fix: 這個精度的命名需要調整一下
+					CADError result = DiscretizeLineToBuildData( edge, shellFace, MAX_DISTANCE_BETWEEN_POINTS, out CADSegBuildData cadSegBuildData );
 					if( result != CADError.Done ) {
 						return result;
 					}
+					// fix: 這邊 tempCADPointList 應該要先檢查 ===>改為CADSegmentBuilder自己檢查然後吐出結果
 					CADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildData.PointList, ESegmentType.Line, cadSegBuildData.SegmentLength, cadSegBuildData.SubSegmentLength, cadSegBuildData.PerChordLength, out ICADSegment cadSegment );
+					// fix: 這邊 failed 的可能是哪些情況，是否應該直接終止整個流程?===>改為直接回傳錯誤碼
 					if( buildResult != CADError.Done ) {
 						return buildResult;
 					}
@@ -123,7 +129,8 @@ namespace MyCAM.Data
 				}
 
 				// this curve is arc choose the best option from the two options (chord error vs equal length)
-				else if( GeometryTool.IsCircularArc( edge, out _, out _, out gp_Dir centerDir, out double arcAngle ) ) {
+				// fix: 這邊 center 跟 arcAngle 沒有用到?==>done
+				else if( GeometryTool.IsCircularArc( edge, out _, out _, out _, out _ ) ) {
 					CADError result = DiscretizeArcToSegmentBuildData( edge, shellFace, out List<CADSegBuildData> cadSegBuildDataList, Math.PI / 2 );
 					if( result != CADError.Done || cadSegBuildDataList == null || cadSegBuildDataList.Count == 0 ) {
 						return result;
@@ -150,6 +157,7 @@ namespace MyCAM.Data
 						return CADError.DiscretizFaild;
 					}
 					for( int j = 0; j < cadSegmentBuildDataList.Count; j++ ) {
+						// fix: 建議架構統一，ChordLength 在 PretreatmentHelper 算好傳回來===>上面DiscretizeBsplineToBuildData已經算回來了
 						CADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegmentBuildDataList[ j ].PointList, ESegmentType.Line, cadSegmentBuildDataList[ j ].SegmentLength, cadSegmentBuildDataList[ j ].SubSegmentLength, cadSegmentBuildDataList[ j ].PerChordLength, out ICADSegment cadSegment );
 						if( buildResult != CADError.Done ) {
 							return buildResult;
@@ -190,6 +198,6 @@ namespace MyCAM.Data
 		Dictionary<CADPoint, CADPoint> m_ConnectPointMap = new Dictionary<CADPoint, CADPoint>();
 
 		const double PRECISION_DEFLECTION = 0.01;
-		const double PRECISION_MAX_LENGTH = 1;
+		const double MAX_DISTANCE_BETWEEN_POINTS = 1;
 	}
 }

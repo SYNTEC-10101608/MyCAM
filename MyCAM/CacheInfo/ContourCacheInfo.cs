@@ -5,7 +5,6 @@ using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static MyCAM.CacheInfo.ContourCacheInfo;
 
 namespace MyCAM.CacheInfo
 {
@@ -225,25 +224,42 @@ namespace MyCAM.CacheInfo
 			{
 				get; set;
 			}
+
 			public bool IsStartSegment
 			{
 				get; set;
 			}
+
 			public bool IsControlSegment
 			{
 				get; set;
 			}
+
+			// unclose path start point may as also a control point
+			public bool IsFirstPntIsStartPnt
+			{
+				get; set;
+			}
+
+			public bool IsFirstPntIsCtrlPnt
+
+			{
+				get; set;
+			}
+
 			public SegmentPointIndex? OriginalControlPoint
 			{
 				get; set;
 			}
 
-			public BrokenCAMSegment( ICAMSegmentElement camSegment, bool isStart = false, bool isControl = false, SegmentPointIndex? originalCtrlPnt = null )
+			public BrokenCAMSegment( ICAMSegmentElement camSegment, bool isStart = false, bool isControl = false, SegmentPointIndex? originalCtrlPnt = null, bool isFirstPntIsStartPnt = false, bool isFirstPntIsCtrlPnt = false )
 			{
 				CAMSegment = camSegment;
 				IsStartSegment = isStart;
 				IsControlSegment = isControl;
 				OriginalControlPoint = originalCtrlPnt;
+				IsFirstPntIsStartPnt = isFirstPntIsStartPnt;
+				IsFirstPntIsCtrlPnt = isFirstPntIsCtrlPnt;
 			}
 		}
 
@@ -267,12 +283,6 @@ namespace MyCAM.CacheInfo
 			}
 
 			public double DistanceToNext
-			{
-				get; set;
-			}
-
-			// if this point is the end point of a segment, mapping to the start point of next segment
-			public int? MappingToNextSegmentStart
 			{
 				get; set;
 			}
@@ -305,15 +315,15 @@ namespace MyCAM.CacheInfo
 				List<BrokenCAMSegment> reorderedSegmentList = ReorderSegmentsByStartPoint( brokenSegmentList );
 
 				// Step 4: Flatten CAM points to point bars
-				List<CAMPointInfo> camPointInfoList = FlattenCAMPointsToBar( reorderedSegmentList );
+				List<CAMPointInfo> camPointInfoList = FlattenSegmentToPointList( reorderedSegmentList );
 
 				// Step 5: interpolate tool vector
 				ApplyToolVectorInterpolation( camPointInfoList );
 
 				// Step 6: 重新組織成最終的 CAM 段列表
-				// List<ICAMSegmentElement> finalSegments = ReconstructCAMSegments( camPointInfoList, reorderedSegmentList );
+				List<ICAMSegmentElement> finalSegments = ReconstructCAMSegments( camPointInfoList, reorderedSegmentList );
 				// Step 5: 直接提取，無需重建
-				List<ICAMSegmentElement> finalSegments = ExtractFinalSegments( reorderedSegmentList );
+				//List<ICAMSegmentElement> finalSegments = ExtractFinalSegments( reorderedSegmentList );
 
 				// Step 7: 設定結果
 				SetResults( finalSegments, ExtractControlPointIndices( reorderedSegmentList ) );
@@ -346,10 +356,12 @@ namespace MyCAM.CacheInfo
 		{
 			HashSet<SegmentPointIndex> breakPoints = new HashSet<SegmentPointIndex>();
 
-			// start point if need wiil be been adjusted to segment end
-			SegmentPointIndex startPoint = AdjustPointToSegmentEnd( m_CraftData.StartPointIndex );
-			if( startPoint.SegIdx >= 0 && startPoint.SegIdx < CADSegmentList.Count ) {
-				breakPoints.Add( startPoint );
+			if( IsClosed ) {
+				// start point if need wiil be been adjusted to segment end
+				SegmentPointIndex startPoint = AdjustPointToSegmentEnd( m_CraftData.StartPointIndex );
+				if( startPoint.SegIdx >= 0 && startPoint.SegIdx < CADSegmentList.Count ) {
+					breakPoints.Add( startPoint );
+				}
 			}
 
 			// add ctrl pnt
@@ -386,24 +398,12 @@ namespace MyCAM.CacheInfo
 			return originalPoint;
 		}
 
-		bool IsValidBreakPoint( SegmentPointIndex point )
-		{
-			if( point.SegIdx < 0 || point.SegIdx >= CADSegmentList.Count )
-				return false;
-
-			var segment = CADSegmentList[ point.SegIdx ];
-			if( point.PntIdx < 0 || point.PntIdx >= segment.PointList.Count )
-				return false;
-
-			return true;
-		}
-
 		List<BrokenCAMSegment> SplitCADSegmentsByBreakPoints( HashSet<SegmentPointIndex> breakPoints )
 		{
 			List<BrokenCAMSegment> result = new List<BrokenCAMSegment>();
 
 			// protection
-			if (breakPoints == null ) {
+			if( breakPoints == null ) {
 				breakPoints = new HashSet<SegmentPointIndex>();
 			}
 			for( int segIdx = 0; segIdx < CADSegmentList.Count; segIdx++ ) {
@@ -459,7 +459,21 @@ namespace MyCAM.CacheInfo
 						bool isStart = m_CraftData.StartPointIndex.Equals( breakPoint );
 						bool isControl = m_CraftData.ToolVecModifyMap.ContainsKey( breakPoint );
 
-						result.Add( new BrokenCAMSegment( subCAMSegment, isStart, isControl, breakPoint ) );
+						// this is unclose path first seg
+						if( result.Count == 0 && breadPntIdx.First() == 0 ) {
+							SegmentPointIndex uncloseFirstPnt = new SegmentPointIndex( thisSegIdx, breadPntIdx.First() );
+
+							// this unclose path start point is also a control point
+							if( m_CraftData.ToolVecModifyMap.ContainsKey( uncloseFirstPnt ) ) {
+								result.Add( new BrokenCAMSegment( subCAMSegment, isStart, isControl, breakPoint, true, true ) );
+							}
+							else {
+								result.Add( new BrokenCAMSegment( subCAMSegment, isStart, isControl, breakPoint, true, false ) );
+							}
+						}
+						else {
+							result.Add( new BrokenCAMSegment( subCAMSegment, isStart, isControl, breakPoint ) );
+						}
 					}
 				}
 				startIdx = breakIdx;
@@ -472,8 +486,17 @@ namespace MyCAM.CacheInfo
 					double subLength = CalculateSubSegmentLength( cadSegment, startIdx, pointList.Count - 1 );
 					double perLength = subLength / ( lastSubPoints.Count - 1 );
 
-					if( CAMSegmentBuilder.BuildCAMSegmentByCADPoint( lastSubPoints, cadSegment.SegmentType, subLength, perLength, cadSegment.PerChordLength, out ICAMSegmentElement lastCAMSegment ) ) {
-						result.Add( new BrokenCAMSegment( lastCAMSegment ) );
+					bool buildDone = CAMSegmentBuilder.BuildCAMSegmentByCADPoint( lastSubPoints, cadSegment.SegmentType, subLength, perLength, cadSegment.PerChordLength, out ICAMSegmentElement lastCAMSegment );
+					if( buildDone ) {
+
+						if( startIdx == 0 ) {
+							SegmentPointIndex breakPoint = new SegmentPointIndex( thisSegIdx, 0 );
+							result.Add( new BrokenCAMSegment( lastCAMSegment, false, false, breakPoint, true ) );
+						}
+						else {
+							result.Add( new BrokenCAMSegment( lastCAMSegment ) );
+						}
+
 					}
 				}
 			}
@@ -513,7 +536,7 @@ namespace MyCAM.CacheInfo
 
 			// reorder: segments after start segment + segments before start segment + start segment
 			List<BrokenCAMSegment> reorderedList = new List<BrokenCAMSegment>();
-			
+
 			// add segments after start segment
 			reorderedList.AddRange( brokenSegmentList.Skip( startSegmentIndex + 1 ) );
 
@@ -525,10 +548,9 @@ namespace MyCAM.CacheInfo
 			return reorderedList;
 		}
 
-		List<CAMPointInfo> FlattenCAMPointsToBar( List<BrokenCAMSegment> brokenSegmentList )
+		List<CAMPointInfo> FlattenSegmentToPointList( List<BrokenCAMSegment> brokenSegmentList )
 		{
 			List<CAMPointInfo> camInfoList = new List<CAMPointInfo>();
-
 			if( brokenSegmentList == null || brokenSegmentList.Count == 0 ) {
 				return camInfoList;
 			}
@@ -537,7 +559,7 @@ namespace MyCAM.CacheInfo
 				List<CAMPoint2> camPoints = segment.CAMSegment.CAMPointList;
 
 				for( int pntIdx = 0; pntIdx < camPoints.Count; pntIdx++ ) {
-					CAMPointInfo camPointInfo = new CAMPointInfo( camPoints[ pntIdx ]);
+					CAMPointInfo camPointInfo = new CAMPointInfo( camPoints[ pntIdx ] );
 
 					// this is ctrl pnt (this segment is contrl segment + this point is last point + this ctrl pnt can map back to ori pnt)
 					if( segment.IsControlSegment && pntIdx == camPoints.Count - 1 && segment.OriginalControlPoint.HasValue ) {
@@ -552,17 +574,9 @@ namespace MyCAM.CacheInfo
 					// this pnt is not this segmnt last pnt
 					if( pntIdx < camPoints.Count - 1 ) {
 						camPointInfo.DistanceToNext = camPoints[ pntIdx ].Point.Distance( camPoints[ pntIdx + 1 ].Point );
-					}
 
-					// this pnt is the last pnt of this segment
-					else if( segIdx < brokenSegmentList.Count - 1 ) {
-						
-						// cal this segment last pnt to next segment start pnt
-						var nextSegmentFirstPoint = brokenSegmentList[ segIdx + 1 ].CAMSegment.CAMPointList.First();
-						camPointInfo.DistanceToNext = camPoints[ pntIdx ].Point.Distance( nextSegmentFirstPoint.Point );
-						camPointInfo.MappingToNextSegmentStart = 0; // mapping 到下一段的第一個點
 					}
-
+					// if this pnt is this segment last pnt, this pnt will overlapping with next segment first pnt, so distance = 0 (default value)
 					camInfoList.Add( camPointInfo );
 				}
 			}
@@ -587,12 +601,29 @@ namespace MyCAM.CacheInfo
 				ApplyGlobalToolVector( camPointInfoList );
 				return;
 			}
+			if( ctrlPntIdx.Count == 1 ) {
+				ApplySpecifiedVec( camPointInfoList, ctrlPntIdx[ 0 ] );
+				ApplyGlobalToolVector( camPointInfoList );
+				return;
+			}
 
 			// handle every region
 			for( int i = 0; i < ctrlPntIdx.Count; i++ ) {
 				int startCtrlIdx = ctrlPntIdx[ i ];
 				int endCtrlIdx = ctrlPntIdx[ ( i + 1 ) % ctrlPntIdx.Count ];
 				ApplyInterpolationInRegion( camPointInfoList, startCtrlIdx, endCtrlIdx );
+			}
+		}
+
+		void ApplySpecifiedVec( List<CAMPointInfo> pointInfoList, int nSpecifiedIdx )
+		{
+			gp_Vec SpecifiedVec = CalCtrlPntToolVec( pointInfoList[ nSpecifiedIdx ] );
+
+			if( SpecifiedVec == null ) {
+				return;
+			}
+			foreach( var pointInfo in pointInfoList ) {
+				pointInfo.Point.ToolVec = new gp_Dir( SpecifiedVec );
 			}
 		}
 
@@ -617,14 +648,8 @@ namespace MyCAM.CacheInfo
 			int currentIdx = startCtrlIdx;
 
 			while( true ) {
-
-				// 執行四元數插值
 				gp_Dir interpolatedToolVec = GetInterpolateToolVecByLength( startToolVec, endToolVec, currentLength, totalLength );
-
-				// 設定工具向量
 				pointInfoList[ currentIdx ].Point.ToolVec = interpolatedToolVec;
-
-				// 如果到達終點，跳出
 				if( currentIdx == endCtrlIdx ) {
 					break;
 				}
@@ -651,7 +676,7 @@ namespace MyCAM.CacheInfo
 
 		double CalRegionLength( List<CAMPointInfo> pointBars, int startIdx, int endIdx )
 		{
-			if(pointBars == null || pointBars.Count == 0 ) {
+			if( pointBars == null || pointBars.Count == 0 ) {
 				return 0;
 			}
 			double length = 0;
