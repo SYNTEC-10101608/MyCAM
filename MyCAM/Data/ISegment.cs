@@ -309,6 +309,7 @@ namespace MyCAM.Data
 			}
 		}
 
+
 		public virtual CAMPoint2 StartPoint
 		{
 			get
@@ -496,5 +497,132 @@ namespace MyCAM.Data
 		int m_MidIndex = 0;
 	}
 
+	internal interface IEnhancedCAMSegmentElement : ICAMSegmentElement
+	{
+		bool IsStartAtHead
+		{
+			get; set;
+		}     // segment的頭是起點
+		bool IsStartAtTail
+		{
+			get; set;
+		}     // segment的尾是起點
+		bool IsControlAtHead
+		{
+			get; set;
+		}   // segment的頭是控制點
+		bool IsControlAtTail
+		{
+			get; set;
+		}   // segment的尾是控制點
+	}
+
+	internal abstract class EnhancedCAMSegmentBase : CAMSegmentBase, IEnhancedCAMSegmentElement
+	{
+		protected EnhancedCAMSegmentBase( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength, bool isModifySegment = false )
+			: base( camPointList, dTotalLength, dArcLength, dChordLength, isModifySegment )
+		{
+			IsStartAtHead = false;
+			IsStartAtTail = false;
+			IsControlAtHead = false;
+			IsControlAtTail = false;
+		}
+
+		public bool IsStartAtHead
+		{
+			get; set;
+		}
+		public bool IsStartAtTail
+		{
+			get; set;
+		}
+		public bool IsControlAtHead
+		{
+			get; set;
+		}
+		public bool IsControlAtTail
+		{
+			get; set;
+		}
+	}
+
+	internal class EnhancedLineCAMSegment : EnhancedCAMSegmentBase
+	{
+		public EnhancedLineCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength, bool isModifySegment = false )
+			: base( camPointList, dTotalLength, dArcLength, dChordLength, isModifySegment )
+		{
+		}
+
+		public override ESegmentType ContourType
+		{
+			get
+			{
+				return ESegmentType.Line;
+			}
+		}
+
+		public override ICAMSegmentElement Clone()
+		{
+			List<CAMPoint2> clonedPointList = new List<CAMPoint2>();
+			foreach( CAMPoint2 point in CAMPointList ) {
+				clonedPointList.Add( point.Clone() );
+			}
+			var cloned = new EnhancedLineCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength, m_isModifySegment );
+			cloned.IsStartAtHead = IsStartAtHead;
+			cloned.IsStartAtTail = IsStartAtTail;
+			cloned.IsControlAtHead = IsControlAtHead;
+			cloned.IsControlAtTail = IsControlAtTail;
+			return cloned;
+		}
+	}
+
+	internal class EnhancedArcCAMSegment : EnhancedCAMSegmentBase
+	{
+		public EnhancedArcCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength, bool isModifySegment = false )
+			: base( camPointList, dTotalLength, dArcLength, dChordLength, isModifySegment )
+		{
+			m_MidIndex = camPointList.Count / 2;
+			MidPoint = camPointList[ m_MidIndex ];
+		}
+
+		public override ESegmentType ContourType
+		{
+			get
+			{
+				return ESegmentType.Arc;
+			}
+		}
+
+		public override ICAMSegmentElement Clone()
+		{
+			List<CAMPoint2> clonedPointList = new List<CAMPoint2>();
+			foreach( CAMPoint2 point in CAMPointList ) {
+				clonedPointList.Add( point.Clone() );
+			}
+			var cloned = new EnhancedArcCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength, m_isModifySegment );
+			cloned.IsStartAtHead = IsStartAtHead;
+			cloned.IsStartAtTail = IsStartAtTail;
+			cloned.IsControlAtHead = IsControlAtHead;
+			cloned.IsControlAtTail = IsControlAtTail;
+			return cloned;
+		}
+
+		public CAMPoint2 MidPoint
+		{
+			get
+			{
+				return m_MidPoint;
+			}
+			private set
+			{
+				if( value != null ) {
+					m_MidPoint = value;
+				}
+			}
+		}
+
+		CAMPoint2 m_MidPoint;
+		int m_MidIndex = 0;
+	}
 	#endregion
 }

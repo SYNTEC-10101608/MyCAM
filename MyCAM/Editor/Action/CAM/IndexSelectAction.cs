@@ -111,7 +111,7 @@ namespace MyCAM.Editor
 			// build wire from cad points
 			BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
 			int nCount = 0;
-			List<ICADSegment> cadSegmentList = m_ContourPathObject.CADSegmentList;
+			IReadOnlyList<ICADSegment> cadSegmentList = m_ContourPathObject.CADSegmentList;
 
 			// each segment
 			for( int i = 0; i < cadSegmentList.Count; i++ ) {

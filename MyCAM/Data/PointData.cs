@@ -1,4 +1,5 @@
 ﻿using OCC.gp;
+using System;
 
 namespace MyCAM.Data
 {
@@ -149,7 +150,6 @@ namespace MyCAM.Data
 
 		public gp_Dir ToolVec
 		{
-			/*
 			get
 			{
 				return new gp_Dir( m_ToolVec.XYZ() );
@@ -158,8 +158,6 @@ namespace MyCAM.Data
 			{
 				m_ToolVec = new gp_Dir( value.XYZ() );
 			}
-			*/
-			get;set;
 		}
 
 		public CAMPoint2 Clone()
@@ -223,5 +221,132 @@ namespace MyCAM.Data
 		gp_Dir m_NormalVec_1st;
 		gp_Dir m_NormalVec_2nd;
 		gp_Dir m_TangentVec;
+	}
+
+	internal class SpecialPnt : CAMPoint2
+	{
+		public SpecialPnt( CAMPoint2 pnt1, CAMPoint2 pnt2, bool isCtrlPnt, bool isStartPnt, double dAValue = 0, double dBValue = 0 )
+			: base( pnt1.Point, pnt1.NormalVec_1st, pnt1.NormalVec_2nd, pnt1.TangentVec, pnt1.ToolVec )
+		{
+			AdditionalPoint = pnt2;
+			IsCtrlPnt = isCtrlPnt;
+			IsStartPnt = isStartPnt;
+			if( isCtrlPnt ) {
+				CtrlPntAValue = dAValue;
+				CtrlPntBValue = dBValue;
+			}
+		}
+
+		public CAMPoint2 AdditionalPoint
+		{
+			get; set;
+		}
+
+		public bool IsCtrlPnt
+		{
+			get; set;
+		}
+
+		public bool IsStartPnt
+		{
+			get; set;
+		}
+
+		public double CtrlPntAValue
+		{
+			get;
+		}
+
+		public double CtrlPntBValue
+		{
+			get;
+		}
+
+		public new SpecialPnt Clone()
+		{
+			SpecialPnt cloned = new SpecialPnt(
+					
+				// as pnt1
+				this,  
+				AdditionalPoint,
+				IsCtrlPnt,
+				IsStartPnt,
+				CtrlPntAValue,
+				CtrlPntBValue
+			);
+			return cloned;
+		}
+
+		public bool Equals( SpecialPnt other )
+		{
+			if( other == null ) {
+				return false;
+			}
+			if( ReferenceEquals( this, other ) ) {
+				return true;
+			}
+
+			if( !base.Equals( other ) ) {
+				return false;
+			}
+
+			if( IsCtrlPnt != other.IsCtrlPnt || IsStartPnt != other.IsStartPnt ) {
+				return false;
+			}
+
+			if( IsCtrlPnt ) {
+				const double TOLERANCE = 1e-3;
+				if( Math.Abs( CtrlPntAValue - other.CtrlPntAValue ) > TOLERANCE ||
+					Math.Abs( CtrlPntBValue - other.CtrlPntBValue ) > TOLERANCE ) {
+					return false;
+				}
+			}
+			if( AdditionalPoint == null && other.AdditionalPoint == null ) {
+				return true;
+			}
+			if( AdditionalPoint == null || other.AdditionalPoint == null ) {
+				return false;
+			}
+			return AdditionalPoint.Equals( other.AdditionalPoint );
+		}
+
+		public override bool Equals( object obj )
+		{
+			return Equals( obj as SpecialPnt );
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked {
+				int hash = base.GetHashCode();
+				hash = hash * 23 + IsCtrlPnt.GetHashCode();
+				hash = hash * 23 + IsStartPnt.GetHashCode();
+				if( IsCtrlPnt ) {
+					hash = hash * 23 + CtrlPntAValue.GetHashCode();
+					hash = hash * 23 + CtrlPntBValue.GetHashCode();
+				}
+				if( AdditionalPoint != null ) {
+					hash = hash * 23 + AdditionalPoint.GetHashCode();
+				}
+				return hash;
+			}
+		}
+
+		public static bool operator ==( SpecialPnt left, SpecialPnt right )
+		{
+			// same reference
+			if( ReferenceEquals( left, right ) ) {
+				return true;
+			}
+			if( left is null || right is null ) {
+				return false;
+			}
+			return left.Equals( right );
+		}
+
+		public static bool operator !=( SpecialPnt left, SpecialPnt right )
+		{
+			return !( left == right );
+		}
 	}
 }
