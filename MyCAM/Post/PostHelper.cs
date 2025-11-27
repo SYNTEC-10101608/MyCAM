@@ -262,10 +262,10 @@ namespace MyCAM.Post
 			return result;
 		}
 
-		static List<ISegmentPostData> BuildPostSegmentsWithFixedRotation( List<ICAMSegmentElement> camSegmentList, double dMaster, double dSlave )
+		static List<ISegmentPostData> BuildPostSegmentsWithFixedRotation( List<ICAMSegment> camSegmentList, double dMaster, double dSlave )
 		{
 			List<ISegmentPostData> segmentPostData = new List<ISegmentPostData>();
-			foreach( ICAMSegmentElement camSegment in camSegmentList ) {
+			foreach( ICAMSegment camSegment in camSegmentList ) {
 				List<CAMPoint2> pointList = camSegment.CAMPointList;
 				List<PostPoint> postPointList = new List<PostPoint>();
 				foreach( CAMPoint2 camPoint in pointList ) {
@@ -280,7 +280,7 @@ namespace MyCAM.Post
 					};
 					postPointList.Add( postList );
 				}
-				ISegmentPostData segment = CreateSegmentPostData( camSegment, postPointList );
+				ISegmentPostData segment = CreateSegmentPostData( camSegment, postPointList, camSegment.IsModify );
 				segmentPostData.Add( segment );
 			}
 			return segmentPostData;
@@ -313,15 +313,13 @@ namespace MyCAM.Post
 			return postPointList;
 		}
 
-		static ISegmentPostData CreateSegmentPostData( ICAMSegmentElement camSegment, List<PostPoint> postPointList )
+		static ISegmentPostData CreateSegmentPostData( ICAMSegment camSegment, List<PostPoint> postPointList ,bool isModified )
 		{
-			bool isModified = camSegment.IsModify;
-
 			if( camSegment is ArcCAMSegment ) {
 				if( postPointList.Count < 3 ) {
 					return null;
 				}
-				return new ArcPost( postPointList, isModified );
+				return new ArcPost( postPointList, isModified);
 			}
 			else if( camSegment is LineCAMSegment ) {
 				if( postPointList.Count < 2 ) {
@@ -504,7 +502,7 @@ namespace MyCAM.Post
 
 		#region AC Solution
 
-		static bool SolvePath_ACSolution( PostSolver postSolver, List<ICAMSegmentElement> segmentList,
+		static bool SolvePath_ACSolution( PostSolver postSolver, List<ICAMSegment> segmentList,
 							ref double dLastProcessPathM, ref double dLastProcessPathS, out List<ISegmentPostData> segmentPostData )
 		{
 			bool isSolveDone = SolveProcessPathIK( postSolver, segmentList,
@@ -520,7 +518,7 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		static bool SolveProcessPathIK( PostSolver postSolver, List<ICAMSegmentElement> segmentList,
+		static bool SolveProcessPathIK( PostSolver postSolver, List<ICAMSegment> segmentList,
 							ref double dLastProcessPathM, ref double dLastProcessPathS,
 							out List<ISegmentPostData> segmentPostData )
 		{
@@ -528,7 +526,7 @@ namespace MyCAM.Post
 			if( segmentList == null || segmentList.Count == 0 ) {
 				return false;
 			}
-			foreach( ICAMSegmentElement camSegment in segmentList ) {
+			foreach( ICAMSegment camSegment in segmentList ) {
 				List<CAMPoint2> pointList = camSegment.CAMPointList;
 
 				// create post points form each cam point
@@ -536,7 +534,7 @@ namespace MyCAM.Post
 				if( postPointList == null ) {
 					return false;
 				}
-				ISegmentPostData segment = CreateSegmentPostData( camSegment, postPointList );
+				ISegmentPostData segment = CreateSegmentPostData( camSegment, postPointList, camSegment.IsModify );
 				if( segment != null ) {
 					segmentPostData.Add( segment );
 				}

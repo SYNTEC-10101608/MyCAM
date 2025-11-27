@@ -13,7 +13,7 @@ namespace MyCAM.Helper
 	{
 		const int LOWEST_PointsToBuildSegment = 2;
 
-		public static bool BuildCAMSegment( ICADSegment cadSegment, out ICAMSegmentElement camSegment )
+		public static bool BuildCAMSegment( ICADSegment cadSegment, out ICAMSegment camSegment )
 		{
 			camSegment = null;
 			if( cadSegment == null ) {
@@ -22,7 +22,7 @@ namespace MyCAM.Helper
 			return BuildCAMSegmentByCADPoint( cadSegment.PointList, cadSegment.SegmentType, cadSegment.SegmentLength, cadSegment.SubSegmentLength, cadSegment.PerChordLength, out camSegment );
 		}
 
-		public static bool BuildCAMSegmentByCAMPoint( List<CAMPoint2> camPointList, ESegmentType contourType, double dTotalLength, double dPerArcLength, double dPerChordLength, out ICAMSegmentElement camSegment )
+		public static bool BuildCAMSegmentByCAMPoint( List<CAMPoint2> camPointList, ESegmentType contourType, double dTotalLength, double dPerArcLength, double dPerChordLength, out ICAMSegment camSegment )
 		{
 			camSegment = null;
 			if( camPointList == null || camPointList.Count < LOWEST_PointsToBuildSegment ) {
@@ -48,7 +48,7 @@ namespace MyCAM.Helper
 			return false;
 		}
 
-		public static bool BuildCAMSegmentByCADPoint( List<CADPoint> cadPointList, ESegmentType contourType, double dTotalLength, double dPerArcLength, double dPerChordLength, out ICAMSegmentElement camSegment )
+		public static bool BuildCAMSegmentByCADPoint( List<CADPoint> cadPointList, ESegmentType contourType, double dTotalLength, double dPerArcLength, double dPerChordLength, out ICAMSegment camSegment )
 		{
 			camSegment = null;
 			if( cadPointList == null || cadPointList.Count < LOWEST_PointsToBuildSegment ) {

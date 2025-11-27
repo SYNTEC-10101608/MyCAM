@@ -161,7 +161,6 @@ namespace MyCAM.Data
 			EndPoint = PostPointList.Last();
 			int midIndex = postPointList.Count / 2;
 			MidPoint = postPointList[ midIndex ];
-			IsModify = isModify;
 		}
 
 		public PostPoint StartPoint
@@ -316,22 +315,22 @@ namespace MyCAM.Data
 
 	internal class PathNCPackage
 	{
-		public List<ICAMSegmentElement> LeadInSegment
+		public List<ICAMSegment> LeadInSegment
 		{
 			get; set;
 		}
 
-		public List<ICAMSegmentElement> MainPathSegment
+		public List<ICAMSegment> MainPathSegment
 		{
 			get; set;
 		}
 
-		public List<ICAMSegmentElement> OverCutSegment
+		public List<ICAMSegment> OverCutSegment
 		{
 			get; set;
 		}
 
-		public List<ICAMSegmentElement> LeadOutSegment
+		public List<ICAMSegment> LeadOutSegment
 		{
 			get; set;
 		}

@@ -35,12 +35,12 @@ namespace MyCAM.Helper
 				   contourCacheInfo.CAMSegmentList != null && contourCacheInfo.CAMSegmentList.Count > 0;
 		}
 
-		static List<ICAMSegmentElement> CloneSegmentList( List<ICAMSegmentElement> segmentList )
+		static List<ICAMSegment> CloneSegmentList( List<ICAMSegment> segmentList )
 		{
-			return segmentList?.Select( segment => segment.Clone() ).ToList() ?? new List<ICAMSegmentElement>();
+			return segmentList?.Select( segment => segment.Clone() ).ToList() ?? new List<ICAMSegment>();
 		}
 
-		static List<ICAMSegmentElement> BuildMainPathSegment( ContourCacheInfo contourCacheInfo )
+		static List<ICAMSegment> BuildMainPathSegment( ContourCacheInfo contourCacheInfo )
 		{
 			var clonedSegments = CloneSegmentList( contourCacheInfo.CAMSegmentList );
 			return contourCacheInfo.GetPathIsReverse() ? ReverseSegment( clonedSegments ) : clonedSegments;
@@ -66,24 +66,24 @@ namespace MyCAM.Helper
 			ncPackage.Entry_FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 		}
 
-		public static List<ICAMSegmentElement> ReverseSegment( List<ICAMSegmentElement> camSegmentList )
+		public static List<ICAMSegment> ReverseSegment( List<ICAMSegment> camSegmentList )
 		{
 			if( camSegmentList == null || camSegmentList.Count == 0 ) {
-				return new List<ICAMSegmentElement>();
+				return new List<ICAMSegment>();
 			}
-			List<ICAMSegmentElement> reversedSegment = new List<ICAMSegmentElement>();
+			List<ICAMSegment> reversedSegment = new List<ICAMSegment>();
 
-			foreach( ICAMSegmentElement segment in camSegmentList ) {
+			foreach( ICAMSegment segment in camSegmentList ) {
 				List<CAMPoint2> reversedCAMPoints = new List<CAMPoint2>( segment.CAMPointList );
 				reversedCAMPoints.Reverse();
 
 				if( segment is ArcCAMSegment ) {
 					reversedSegment.Add( new ArcCAMSegment( reversedCAMPoints, segment.TotalLength,
-						segment.PerArcLength, segment.PerChordLength, segment.IsModify ) );
+						segment.PerArcLength, segment.PerChordLength ) );
 				}
 				else if( segment is LineCAMSegment ) {
 					reversedSegment.Add( new LineCAMSegment( reversedCAMPoints, segment.TotalLength,
-						segment.PerArcLength, segment.PerChordLength, segment.IsModify ) );
+						segment.PerArcLength, segment.PerChordLength) );
 				}
 			}
 			reversedSegment.Reverse();

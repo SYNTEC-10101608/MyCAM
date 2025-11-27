@@ -14,18 +14,18 @@ namespace MyCAM.Helper
 {
 	internal static class LeadHelper
 	{
-		public static List<ICAMSegmentElement> BuildLeadCAMSegment( CraftData craftData, ICAMSegmentElement CAMSegConnectWithStartPnt, bool isLeadIn )
+		public static List<ICAMSegment> BuildLeadCAMSegment( CraftData craftData, ICAMSegment CAMSegConnectWithStartPnt, bool isLeadIn )
 		{
-			List<ICAMSegmentElement> LeadCADSegment = new List<ICAMSegmentElement>();
+			List<ICAMSegment> LeadCADSegment = new List<ICAMSegment>();
 			if( isLeadIn ) {
 				if( craftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
-					ICAMSegmentElement leadInCAMSegment = BuildLeadSegment( craftData, CAMSegConnectWithStartPnt, isLeadIn );
+					ICAMSegment leadInCAMSegment = BuildLeadSegment( craftData, CAMSegConnectWithStartPnt, isLeadIn );
 					LeadCADSegment.Add( leadInCAMSegment );
 					return LeadCADSegment;
 				}
 			}
 			if( craftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
-				ICAMSegmentElement leadInCAMSegment = BuildLeadSegment( craftData, CAMSegConnectWithStartPnt, isLeadIn );
+				ICAMSegment leadInCAMSegment = BuildLeadSegment( craftData, CAMSegConnectWithStartPnt, isLeadIn );
 				LeadCADSegment.Add( leadInCAMSegment );
 				return LeadCADSegment;
 			}
@@ -181,7 +181,7 @@ namespace MyCAM.Helper
 			return null;
 		}
 
-		static ICAMSegmentElement BuildLeadSegment( CraftData craftData, ICAMSegmentElement CAMSegConnectWithLead, bool isLeadin )
+		static ICAMSegment BuildLeadSegment( CraftData craftData, ICAMSegment CAMSegConnectWithLead, bool isLeadin )
 		{
 			CAMPoint2 pntConnectWithPath = isLeadin ? CAMSegConnectWithLead.StartPoint : CAMSegConnectWithLead.EndPoint;
 			gp_Dir LeadToolVec = pntConnectWithPath.ToolVec;

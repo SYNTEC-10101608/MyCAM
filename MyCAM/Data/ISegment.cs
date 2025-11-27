@@ -223,7 +223,7 @@ namespace MyCAM.Data
 
 	#region CAM Segment
 
-	internal interface ICAMSegmentElement
+	internal interface ICAMSegment
 	{
 		ESegmentType ContourType
 		{
@@ -245,6 +245,12 @@ namespace MyCAM.Data
 			get;
 		}
 
+		bool IsModify
+		{
+			get;
+			set;
+		}
+
 		double TotalLength
 		{
 			get;
@@ -260,11 +266,6 @@ namespace MyCAM.Data
 			get;
 		}
 
-		bool IsModify
-		{
-			get; set;
-		}
-
 		gp_Dir GetStartPointToolVec();
 
 		gp_Dir GetEndPointToolVec();
@@ -273,12 +274,12 @@ namespace MyCAM.Data
 
 		void SetEndPointToolVec( gp_Dir endPointToolVec );
 
-		ICAMSegmentElement Clone();
+		ICAMSegment Clone();
 	}
 
-	internal abstract class CAMSegmentBase : ICAMSegmentElement
+	internal abstract class CAMSegmentBase : ICAMSegment
 	{
-		protected CAMSegmentBase( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength, bool isModifySegment = false )
+		protected CAMSegmentBase( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength )
 		{
 			if( camPointList.Count < 2 ) {
 				throw new System.ArgumentException( " CAMSegmentBasis constructing points are null" );
@@ -289,24 +290,11 @@ namespace MyCAM.Data
 			TotalLength = dTotalLength;
 			PerArcLength = dArcLength;
 			PerChordLength = dChordLength;
-			IsModify = isModifySegment;
 		}
 
 		public abstract ESegmentType ContourType
 		{
 			get;
-		}
-
-		public virtual bool IsModify
-		{
-			get
-			{
-				return m_isModifySegment;
-			}
-			set
-			{
-				m_isModifySegment = value;
-			}
 		}
 
 
@@ -346,6 +334,18 @@ namespace MyCAM.Data
 				if( value != null ) {
 					m_CAMPointList = value;
 				}
+			}
+		}
+
+		bool ICAMSegment.IsModify
+		{
+			get
+			{
+				return m_isModifySegment;
+			}
+			set
+			{
+				m_isModifySegment = value;
 			}
 		}
 
@@ -395,7 +395,7 @@ namespace MyCAM.Data
 			CalculatePointLisToolVec();
 		}
 
-		public abstract ICAMSegmentElement Clone();
+		public abstract ICAMSegment Clone();
 
 		protected virtual void CalculatePointLisToolVec()
 		{
@@ -428,8 +428,8 @@ namespace MyCAM.Data
 
 	internal class LineCAMSegment : CAMSegmentBase
 	{
-		public LineCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength, bool isModifySegment = false )
-			: base( camPointList, dTotalLength, dArcLength, dChordLength, isModifySegment )
+		public LineCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength )
+			: base( camPointList, dTotalLength, dArcLength, dChordLength )
 		{
 		}
 
@@ -441,20 +441,20 @@ namespace MyCAM.Data
 			}
 		}
 
-		public override ICAMSegmentElement Clone()
+		public override ICAMSegment Clone()
 		{
 			List<CAMPoint2> clonedPointList = new List<CAMPoint2>();
 			foreach( CAMPoint2 point in CAMPointList ) {
 				clonedPointList.Add( point.Clone() );
 			}
-			return new LineCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength, m_isModifySegment );
+			return new LineCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength );
 		}
 	}
 
 	internal class ArcCAMSegment : CAMSegmentBase
 	{
-		public ArcCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength, bool isModifySegment = false )
-			: base( camPointList, dTotalLength, dArcLength, dChordLength, isModifySegment )
+		public ArcCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength )
+			: base( camPointList, dTotalLength, dArcLength, dChordLength )
 		{
 			m_MidIndex = camPointList.Count / 2;
 
@@ -470,13 +470,13 @@ namespace MyCAM.Data
 			}
 		}
 
-		public override ICAMSegmentElement Clone()
+		public override ICAMSegment Clone()
 		{
 			List<CAMPoint2> clonedPointList = new List<CAMPoint2>();
 			foreach( CAMPoint2 point in CAMPointList ) {
 				clonedPointList.Add( point.Clone() );
 			}
-			return new ArcCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength, m_isModifySegment );
+			return new ArcCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength );
 		}
 
 		public CAMPoint2 MidPoint
@@ -497,132 +497,5 @@ namespace MyCAM.Data
 		int m_MidIndex = 0;
 	}
 
-	internal interface IEnhancedCAMSegmentElement : ICAMSegmentElement
-	{
-		bool IsStartAtHead
-		{
-			get; set;
-		}     // segment的頭是起點
-		bool IsStartAtTail
-		{
-			get; set;
-		}     // segment的尾是起點
-		bool IsControlAtHead
-		{
-			get; set;
-		}   // segment的頭是控制點
-		bool IsControlAtTail
-		{
-			get; set;
-		}   // segment的尾是控制點
-	}
-
-	internal abstract class EnhancedCAMSegmentBase : CAMSegmentBase, IEnhancedCAMSegmentElement
-	{
-		protected EnhancedCAMSegmentBase( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength, bool isModifySegment = false )
-			: base( camPointList, dTotalLength, dArcLength, dChordLength, isModifySegment )
-		{
-			IsStartAtHead = false;
-			IsStartAtTail = false;
-			IsControlAtHead = false;
-			IsControlAtTail = false;
-		}
-
-		public bool IsStartAtHead
-		{
-			get; set;
-		}
-		public bool IsStartAtTail
-		{
-			get; set;
-		}
-		public bool IsControlAtHead
-		{
-			get; set;
-		}
-		public bool IsControlAtTail
-		{
-			get; set;
-		}
-	}
-
-	internal class EnhancedLineCAMSegment : EnhancedCAMSegmentBase
-	{
-		public EnhancedLineCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength, bool isModifySegment = false )
-			: base( camPointList, dTotalLength, dArcLength, dChordLength, isModifySegment )
-		{
-		}
-
-		public override ESegmentType ContourType
-		{
-			get
-			{
-				return ESegmentType.Line;
-			}
-		}
-
-		public override ICAMSegmentElement Clone()
-		{
-			List<CAMPoint2> clonedPointList = new List<CAMPoint2>();
-			foreach( CAMPoint2 point in CAMPointList ) {
-				clonedPointList.Add( point.Clone() );
-			}
-			var cloned = new EnhancedLineCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength, m_isModifySegment );
-			cloned.IsStartAtHead = IsStartAtHead;
-			cloned.IsStartAtTail = IsStartAtTail;
-			cloned.IsControlAtHead = IsControlAtHead;
-			cloned.IsControlAtTail = IsControlAtTail;
-			return cloned;
-		}
-	}
-
-	internal class EnhancedArcCAMSegment : EnhancedCAMSegmentBase
-	{
-		public EnhancedArcCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength, bool isModifySegment = false )
-			: base( camPointList, dTotalLength, dArcLength, dChordLength, isModifySegment )
-		{
-			m_MidIndex = camPointList.Count / 2;
-			MidPoint = camPointList[ m_MidIndex ];
-		}
-
-		public override ESegmentType ContourType
-		{
-			get
-			{
-				return ESegmentType.Arc;
-			}
-		}
-
-		public override ICAMSegmentElement Clone()
-		{
-			List<CAMPoint2> clonedPointList = new List<CAMPoint2>();
-			foreach( CAMPoint2 point in CAMPointList ) {
-				clonedPointList.Add( point.Clone() );
-			}
-			var cloned = new EnhancedArcCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength, m_isModifySegment );
-			cloned.IsStartAtHead = IsStartAtHead;
-			cloned.IsStartAtTail = IsStartAtTail;
-			cloned.IsControlAtHead = IsControlAtHead;
-			cloned.IsControlAtTail = IsControlAtTail;
-			return cloned;
-		}
-
-		public CAMPoint2 MidPoint
-		{
-			get
-			{
-				return m_MidPoint;
-			}
-			private set
-			{
-				if( value != null ) {
-					m_MidPoint = value;
-				}
-			}
-		}
-
-		CAMPoint2 m_MidPoint;
-		int m_MidIndex = 0;
-	}
 	#endregion
 }

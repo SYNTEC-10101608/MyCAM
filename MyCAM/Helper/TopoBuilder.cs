@@ -11,7 +11,7 @@ namespace MyCAM.Helper
 {
 	internal static class TopoBuilder
 	{
-		public static TopoDS_Edge ConvertSegmentToTopo( ICAMSegmentElement camSegment )
+		public static TopoDS_Edge ConvertSegmentToTopo( ICAMSegment camSegment )
 		{
 			TopoDS_Edge edge;
 			if( camSegment == null ) {

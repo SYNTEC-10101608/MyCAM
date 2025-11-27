@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.CacheInfo;
 using MyCAM.Data;
 using MyCAM.Helper;
@@ -25,6 +21,11 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -623,7 +624,6 @@ namespace MyCAM.Editor
 			if( m_ShowToolVec == false ) {
 				return;
 			}
-
 			// build tool vec
 			foreach( string szPathID in pathIDList ) {
 				if( GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false || cacheInfo.PathType != PathType.Contour ) {
@@ -632,29 +632,20 @@ namespace MyCAM.Editor
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
 				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
-
+			
 				// each segment in this path
 				for( int i = 0; i < contourCacheInfo.CAMSegmentList.Count; i++ ) {
-					if( contourCacheInfo.CtrlToolSegIdxList.Contains( i ) ) {
-						AIS_Line endPointToolVecAIS = GetVecAIS( contourCacheInfo.CAMSegmentList[ i ].EndPoint.Point, contourCacheInfo.CAMSegmentList[ i ].EndPoint.ToolVec, EvecType.ToolVec );
-						endPointToolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-						endPointToolVecAIS.SetWidth( 4 );
-						toolVecAISList.Add( endPointToolVecAIS );
-
-						// draw mid point tool vec for arc segment
-						if( contourCacheInfo.CAMSegmentList[ i ] is ArcCAMSegment arcCAMSegment ) {
-							AIS_Line midPointToolVecAIS = GetVecAIS( arcCAMSegment.MidPoint.Point, arcCAMSegment.MidPoint.ToolVec, EvecType.ToolVec );
-							toolVecAISList.Add( midPointToolVecAIS );
+					
+						// each point
+						for (int j  = 1; j< contourCacheInfo.CAMSegmentList[i].CAMPointList.Count; j++ ) {
+							AIS_Line pointToolVecAIS = GetVecAIS( contourCacheInfo.CAMSegmentList[i].CAMPointList[j].Point, contourCacheInfo.CAMSegmentList[i].CAMPointList[j].ToolVec, EvecType.ToolVec );
+							toolVecAISList.Add( pointToolVecAIS );
+							if ( j == contourCacheInfo.CAMSegmentList[i].CAMPointList.Count - 1  && contourCacheInfo.CtrlToolSegIdxList.Contains( i ) ) { 
+								pointToolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+								pointToolVecAIS.SetWidth( 4 );
+							}
 						}
-					}
-					else {
-						AIS_Line endPointToolVecAIS = GetVecAIS( contourCacheInfo.CAMSegmentList[ i ].EndPoint.Point, contourCacheInfo.CAMSegmentList[ i ].EndPoint.ToolVec, EvecType.ToolVec );
-						if( contourCacheInfo.CAMSegmentList[ i ] is ArcCAMSegment arcCAMSegment ) {
-							AIS_Line midPointToolVecAIS = GetVecAIS( arcCAMSegment.MidPoint.Point, arcCAMSegment.MidPoint.ToolVec, EvecType.ToolVec );
-							toolVecAISList.Add( midPointToolVecAIS );
-						}
-						toolVecAISList.Add( endPointToolVecAIS );
-					}
+					
 				}
 			}
 
@@ -891,7 +882,7 @@ namespace MyCAM.Editor
 				for( int i = 0; i < contourCacheInfo.OverCutSegment.Count; i++ ) {
 					List<TopoDS_Edge> overCutEdgeList = new List<TopoDS_Edge>();
 					if( contourCacheInfo.GetPathOverCutLength() > 0 && contourCacheInfo.OverCutSegment.Count > 0 ) {
-						foreach( ICAMSegmentElement segment in contourCacheInfo.OverCutSegment ) {
+						foreach( ICAMSegment segment in contourCacheInfo.OverCutSegment ) {
 							TopoDS_Edge edge = TopoBuilder.ConvertSegmentToTopo( segment );
 							if( edge == null ) {
 								continue;

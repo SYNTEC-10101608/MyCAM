@@ -7,15 +7,15 @@ namespace MyCAM.Helper
 {
 	internal static class OverCutSegmentBuilder
 	{
-		public static List<ICAMSegmentElement> BuildOverCutSegment( List<ICAMSegmentElement> camSegmentList, double dOverCutLength ,bool isReverse)
+		public static List<ICAMSegment> BuildOverCutSegment( List<ICAMSegment> camSegmentList, double dOverCutLength ,bool isReverse)
 		{
-			List<ICAMSegmentElement> PathSegment = camSegmentList?.Select( eachSegment => eachSegment.Clone() ).ToList() ?? new List<ICAMSegmentElement>();
+			List<ICAMSegment> PathSegment = camSegmentList?.Select( eachSegment => eachSegment.Clone() ).ToList() ?? new List<ICAMSegment>();
 			if( isReverse ) {
-				List<ICAMSegmentElement> reversedSegment = NCHelper.ReverseSegment( camSegmentList );
+				List<ICAMSegment> reversedSegment = NCHelper.ReverseSegment( camSegmentList );
 				PathSegment = reversedSegment;
 			}
 			double dTotalLength = 0.0;
-			List<ICAMSegmentElement> overCutSegmentList = new List<ICAMSegmentElement>();
+			List<ICAMSegment> overCutSegmentList = new List<ICAMSegment>();
 			for( int i = 0; i < PathSegment.Count; i++ ) {
 				double dAddThisSegmentLength = dTotalLength + PathSegment[ i ].TotalLength;
 
@@ -33,12 +33,12 @@ namespace MyCAM.Helper
 					List<CAMPoint2> camPointList = new List<CAMPoint2>();
 					camPointList.AddRange( PathSegment[ i ].CAMPointList.GetRange( 0, dNeedPartCount + 1 ) );
 					if( PathSegment[ i ].ContourType == ESegmentType.Line ) {
-						bool isBuildSuccess = CAMSegmentBuilder.BuildCAMSegmentByCAMPoint( camPointList, PathSegment[ i ].ContourType, dNeedPartCount * camSegmentList[ i ].PerChordLength, camSegmentList[ i ].PerArcLength, camSegmentList[ i ].PerChordLength, out ICAMSegmentElement camSegment );
+						bool isBuildSuccess = CAMSegmentBuilder.BuildCAMSegmentByCAMPoint( camPointList, PathSegment[ i ].ContourType, dNeedPartCount * camSegmentList[ i ].PerChordLength, camSegmentList[ i ].PerArcLength, camSegmentList[ i ].PerChordLength, out ICAMSegment camSegment );
 						overCutSegmentList.Add( camSegment );
 						return overCutSegmentList;
 					}
 					if( camSegmentList[ i ].ContourType == ESegmentType.Arc ) {
-						bool isBuildSuccess = CAMSegmentBuilder.BuildCAMSegmentByCAMPoint( camPointList, PathSegment[ i ].ContourType, dNeedPartCount * camSegmentList[ i ].PerArcLength, camSegmentList[ i ].PerArcLength, camSegmentList[ i ].PerChordLength, out ICAMSegmentElement camSegment );
+						bool isBuildSuccess = CAMSegmentBuilder.BuildCAMSegmentByCAMPoint( camPointList, PathSegment[ i ].ContourType, dNeedPartCount * camSegmentList[ i ].PerArcLength, camSegmentList[ i ].PerArcLength, camSegmentList[ i ].PerChordLength, out ICAMSegment camSegment );
 						overCutSegmentList.Add( camSegment );
 						return overCutSegmentList;
 					}

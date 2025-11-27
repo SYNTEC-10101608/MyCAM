@@ -4,6 +4,7 @@ using MyCAM.Helper;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace MyCAM.CacheInfo
@@ -39,7 +40,7 @@ namespace MyCAM.CacheInfo
 
 		#region result
 
-		public List<ICAMSegmentElement> CAMSegmentList
+		public List<ICAMSegment> CAMSegmentList
 		{
 			get
 			{
@@ -68,7 +69,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public List<ICAMSegmentElement> LeadInSegment
+		public List<ICAMSegment> LeadInSegment
 		{
 			get
 			{
@@ -80,7 +81,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public List<ICAMSegmentElement> LeadOutSegment
+		public List<ICAMSegment> LeadOutSegment
 		{
 			get
 			{
@@ -92,7 +93,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public List<ICAMSegmentElement> OverCutSegment
+		public List<ICAMSegment> OverCutSegment
 		{
 			get
 			{
@@ -127,7 +128,7 @@ namespace MyCAM.CacheInfo
 				BuildCAMFeatureSegment();
 			}
 			CAMPoint camPoint = null;
-			ICAMSegmentElement camSegmentConnectWithStartPnt = null;
+			ICAMSegment camSegmentConnectWithStartPnt = null;
 			if( m_CraftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
 				camSegmentConnectWithStartPnt = LeadInSegment.First();
 			}
@@ -147,7 +148,7 @@ namespace MyCAM.CacheInfo
 				BuildCAMFeatureSegment();
 			}
 			CAMPoint camPoint = null;
-			ICAMSegmentElement camSegmentConnectWithEndPnt = null;
+			ICAMSegment camSegmentConnectWithEndPnt = null;
 			if( m_CraftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
 				camSegmentConnectWithEndPnt = LeadOutSegment.Last();
 			}
@@ -190,51 +191,6 @@ namespace MyCAM.CacheInfo
 
 		#region Build CAM Segment
 
-		// segment be breaked
-		internal class BrokenCAMSegment
-		{
-			public ICAMSegmentElement CAMSegment
-			{
-				get; set;
-			}
-
-			public bool IsStartSegment
-			{
-				get; set;
-			}
-
-			public bool IsControlSegment
-			{
-				get; set;
-			}
-
-			// unclose path start point may as also a control point
-			public bool IsFirstPntIsStartPnt
-			{
-				get; set;
-			}
-
-			public bool IsFirstPntIsCtrlPnt
-
-			{
-				get; set;
-			}
-
-			public SegmentPointIndex? OriginalControlPoint
-			{
-				get; set;
-			}
-
-			public BrokenCAMSegment( ICAMSegmentElement camSegment, bool isStart = false, bool isControl = false, SegmentPointIndex? originalCtrlPnt = null, bool isFirstPntIsStartPnt = false, bool isFirstPntIsCtrlPnt = false )
-			{
-				CAMSegment = camSegment;
-				IsStartSegment = isStart;
-				IsControlSegment = isControl;
-				OriginalControlPoint = originalCtrlPnt;
-				IsFirstPntIsStartPnt = isFirstPntIsStartPnt;
-				IsFirstPntIsCtrlPnt = isFirstPntIsCtrlPnt;
-			}
-		}
 
 		// 代表處理後的點資訊
 		internal class CAMPointInfo
@@ -314,10 +270,43 @@ namespace MyCAM.CacheInfo
 
 		void BuildPathCAMSegment()
 		{
+			m_IsCraftDataDirty = false;
+
+			// Step 1: Collect all cad point
 			List<CAMPointInfo> pathCAMInfo = FlattenCADSegmentsToCAMPointInfo();
+
+			// Step 2: Do interpolation
 			ApplyToolVectorInterpolation( pathCAMInfo );
 
+			// Step 3: use caminfo to build cam segment
+			bool isBuildDone = ReBuildCAMSegment( pathCAMInfo, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx );
+			if( isBuildDone == false ) {
+				return;
+			}
+			CAMSegmentList = PathCAMSegList;
+			CtrlToolSegIdxList = CtrlSegIdx;
+		}
 
+		bool ReBuildCAMSegment( List<CAMPointInfo> pathCAMInfo, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx )
+		{
+			CtrlSegIdx = new List<int>();
+			int currentSegmentIdx = 0;
+			PathCAMSegList = new List<ICAMSegment>();
+			bool isBuildDone = ReBuildCAMSegmentFromStartPnt( pathCAMInfo, CADSegmentList, ref CtrlSegIdx, ref currentSegmentIdx, out List<ICAMSegment> camSegmentList );
+			if( isBuildDone && camSegmentList != null ) {
+				PathCAMSegList.AddRange( camSegmentList );
+			}
+			else {
+				return false;
+			}
+			bool isBuildPreDone = ReBuildCAMSegBeforStartPnt( pathCAMInfo, CADSegmentList, ref CtrlSegIdx, ref currentSegmentIdx, out List<ICAMSegment> preCamSegmentList );
+			if( isBuildPreDone && preCamSegmentList != null ) {
+				PathCAMSegList.AddRange( preCamSegmentList );
+			}
+			else {
+				return false;
+			}
+			return true;
 		}
 
 		void InterpolateToolVec( int nStartIndex, int nEndIndex, List<CAMPointInfo> pathCAMInfo )
@@ -337,7 +326,6 @@ namespace MyCAM.CacheInfo
 
 			// get the total distance for interpolation parameter
 			double totaldistance = 0;
-
 			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
 				totaldistance += pathCAMInfo[ i % pathCAMInfo.Count ].DistanceToNext;
 			}
@@ -381,66 +369,95 @@ namespace MyCAM.CacheInfo
 		}
 
 
-		public List<CAMPointInfo> FlattenCADSegmentsToCAMPointInfo()
+		List<CAMPointInfo> FlattenCADSegmentsToCAMPointInfo()
 		{
 			List<CAMPointInfo> result = new List<CAMPointInfo>();
-
 			if( CADSegmentList == null || CADSegmentList.Count == 0 ) {
 				return result;
 			}
-
 			SegmentPointIndex startPointIndex = m_CraftData.StartPointIndex;
 			Dictionary<SegmentPointIndex, Tuple<double, double>> toolVecModifyMap = m_CraftData.ToolVecModifyMap;
 
 			for( int segIdx = 0; segIdx < CADSegmentList.Count; segIdx++ ) {
 				ICADSegment cadSegment = CADSegmentList[ segIdx ];
 				List<CADPoint> pointList = cadSegment.PointList;
-
 				for( int pntIdx = 0; pntIdx < pointList.Count; pntIdx++ ) {
 					CADPoint cadPoint = pointList[ pntIdx ];
 					SegmentPointIndex currentPointIndex = new SegmentPointIndex( segIdx, pntIdx );
 
-					// 轉換為CAMPoint2
+					// conver this cad point
 					CAMPoint2 camPoint = ConvertCADPointToCAMPoint2( cadPoint );
+					bool isOverlapPoint = ( pntIdx == 0 && result.Count > 0 );
 
-					// 創建CAMPointInfo
-					CAMPointInfo CurrentInfo = new CAMPointInfo( camPoint );
+					// case A : overlap point
+					if( isOverlapPoint ) {
 
-					// 1. 檢查是否為segment的第一個點且前面還有segment
-					if( pntIdx == 0 && result.Count > 0 ) {
-						// 取得上一段segment的最後一個點，設置為Point2
+						// Step 1: get and set at last pointinfo , do not need to create new one
 						CAMPointInfo lastPointInfo = result[ result.Count - 1 ];
 						lastPointInfo.Point2 = camPoint;
-						CurrentInfo = lastPointInfo;
+
+						// Step 2: check property and set back to last point info
+						bool isStartPoint = startPointIndex.Equals( currentPointIndex );
+						bool isControlPoint = toolVecModifyMap.ContainsKey( currentPointIndex );
+						if( isStartPoint ) {
+							lastPointInfo.IsStartPnt = true;
+						}
+						if( isControlPoint ) {
+							lastPointInfo.IsCtrlPnt = true;
+							lastPointInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
+						}
+						// Step 3: calculate distance to next point
+						lastPointInfo.DistanceToNext = CalDistanceToNext( segIdx, pntIdx, CADSegmentList );
 					}
 
-					// 2. 檢查是否為起點
-					bool isStartPoint = startPointIndex.Equals( currentPointIndex );
-					if( isStartPoint ) {
-						CurrentInfo.IsStartPnt = true;
+					// Case B : not overlap point
+					else {
+
+						// Step 1: create new CAMPointInfo
+						CAMPointInfo currentInfo = new CAMPointInfo( camPoint );
+
+						// Step 2: check property
+						bool isStartPoint = startPointIndex.Equals( currentPointIndex );
+						if( isStartPoint ) {
+							currentInfo.IsStartPnt = true;
+						}
+						bool isControlPoint = toolVecModifyMap.ContainsKey( currentPointIndex );
+						if( isControlPoint ) {
+							currentInfo.IsCtrlPnt = true;
+							currentInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
+
+							// this point2 is for next segment start point
+							currentInfo.Point2 = camPoint.Clone();
+						}
+
+						// Step 3: calculate distance to next point  
+						currentInfo.DistanceToNext = CalDistanceToNext( segIdx, pntIdx, CADSegmentList );
+						result.Add( currentInfo );
 					}
-
-					// 3. 檢查是否為控制點
-					bool isControlPoint = toolVecModifyMap.ContainsKey( currentPointIndex );
-					if( isControlPoint ) {
-						CurrentInfo.IsCtrlPnt = true;
-						CurrentInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
-					}
-
-					// 4. 計算到下一個點的距離
-					CurrentInfo.DistanceToNext = CalDistanceToNext( segIdx, pntIdx, CADSegmentList );
-
-					result.Add( CurrentInfo );
 				}
 			}
 
-			// 5. 封閉路徑處理：移除最後一個點（因為它與第一個點重複）
+			// closed path last point merge to first point
 			if( IsClosed && result.Count > 1 ) {
+				CAMPointInfo lastCAMInfo = result[ result.Count - 1 ];
+				CAMPoint2 lastCAMPoint = lastCAMInfo.Point.Clone();
 
-				// 移除最後一個重複點
+				// remove last point
 				result.RemoveAt( result.Count - 1 );
-			}
 
+				// put last point info to first point - point2
+				CAMPointInfo firstPointInfo = result[ 0 ];
+				firstPointInfo.Point2 = lastCAMPoint;
+
+				// if last point with property set it to first point
+				if( lastCAMInfo.IsStartPnt ) {
+					firstPointInfo.IsStartPnt = true;
+				}
+				if( lastCAMInfo.IsCtrlPnt ) {
+					firstPointInfo.IsCtrlPnt = true;
+					firstPointInfo.ABValues = lastCAMInfo.ABValues;
+				}
+			}
 			return result;
 		}
 
@@ -451,8 +468,9 @@ namespace MyCAM.CacheInfo
 			// check is last point in segment
 			if( pntIdx == cadSegment[ segIdx ].PointList.Count - 1 ) {
 
-				// is last point in segment
+				// is not last segment
 				if( segIdx < cadSegment.Count - 1 ) {
+
 					// has next segment, calculate to next segment first point
 					ICADSegment nextSegment = cadSegment[ segIdx + 1 ];
 					if( nextSegment.PointList != null && nextSegment.PointList.Count > 0 ) {
@@ -465,6 +483,7 @@ namespace MyCAM.CacheInfo
 				}
 
 				else if( IsClosed ) {
+
 					// closed path and is last segment last point, calculate to first segment first point
 					if( cadSegment.Count > 0 && cadSegment[ 0 ].PointList.Count > 0 ) {
 						CADPoint firstPnt = cadSegment[ 0 ].StartPoint;
@@ -472,9 +491,12 @@ namespace MyCAM.CacheInfo
 						return distance;
 					}
 				}
+
 				// unclose path last point, distance is 0
 				return 0.0;
 			}
+
+			// not last point in segment
 			else {
 				// point in segment, calculate to next point in same segment
 				CADPoint nextPnt = cadSegment[ segIdx ].PointList[ pntIdx + 1 ];
@@ -482,12 +504,9 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-
-		private CAMPoint2 ConvertCADPointToCAMPoint2( CADPoint cadPoint )
+		CAMPoint2 ConvertCADPointToCAMPoint2( CADPoint cadPoint )
 		{
-			// 初始工具向量設為法向量，後續會根據插值計算調整
 			gp_Dir initialToolVec = cadPoint.NormalVec_1st;
-
 			return new CAMPoint2(
 				cadPoint.Point,
 				cadPoint.NormalVec_1st,
@@ -497,7 +516,181 @@ namespace MyCAM.CacheInfo
 			);
 		}
 
+		bool ReBuildCAMSegBeforStartPnt( List<CAMPointInfo> camPntList, IReadOnlyList<ICADSegment> cadSegmentList, ref List<int> CtrlSegIdx, ref int currentSegmentIdx, out List<ICAMSegment> camSegmentList )
+		{
+			camSegmentList = new List<ICAMSegment>();
+			if( camPntList == null || camPntList.Count == 0 ) {
+				return true;
+			}
+			int nStartPntIndx = 0;
+			for( int i = 0; i < camPntList.Count; i++ ) {
+				if( camPntList[ i ].IsStartPnt ) {
+					nStartPntIndx = i;
+					break;
+				}
+			}
 
+			// start point is at [0][0], no point before it
+			if( nStartPntIndx == 0 ) {
+				return true;
+			}
+			List<CAMPoint2> currentSegmentPoints = new List<CAMPoint2>();
+			int segmentStartIndex = 0;
+			for( int i = 0; i <= nStartPntIndx; i++ ) {
+				CAMPointInfo currentPointInfo = camPntList[ i ];
+				currentSegmentPoints.Add( currentPointInfo.Point );
+
+				// check need to build CAMSegment
+				bool isSplitPoint = currentPointInfo.Point2 != null && i != 0;
+				bool reachStartPoint = i == nStartPntIndx;
+
+				if( isSplitPoint || reachStartPoint ) {
+					if( currentSegmentPoints.Count >= 2 ) {
+						bool isGetDone = GetSegmentType( segmentStartIndex, cadSegmentList, out ESegmentType segmentType );
+						if( isGetDone == false ) {
+							return false;
+						}
+
+						// for record on CtrlSegIdx
+						currentSegmentIdx = camSegmentList.Count;
+						ICAMSegment camSegment = BuildCAMSegmentFromCAMPointInfo( currentSegmentPoints, segmentType );
+						if( camSegment == null ) {
+							return false;
+						}
+						if( camPntList[ i ].IsCtrlPnt ) {
+							CtrlSegIdx.Add( currentSegmentIdx );
+						}
+						camSegmentList.Add( camSegment );
+					}
+
+					// is new segment start
+					if( !reachStartPoint ) {
+						currentSegmentPoints = new List<CAMPoint2>();
+						currentSegmentPoints.Add( currentPointInfo.Point2 );
+						segmentStartIndex = i;
+					}
+				}
+			}
+			return true;
+		}
+
+		bool ReBuildCAMSegmentFromStartPnt( List<CAMPointInfo> camPntList, IReadOnlyList<ICADSegment> cadSegmentList, ref List<int> CtrlSegIdx, ref int currentSegmentIdx, out List<ICAMSegment> camSegmentList )
+		{
+			camSegmentList = new List<ICAMSegment>();
+			if( camPntList == null || camPntList.Count == 0 ) {
+				return true;
+			}
+
+			// find start point at with index
+			int nStartPntIndx = 0;
+			for( int i = 0; i < camPntList.Count; i++ ) {
+				if( camPntList[ i ].IsStartPnt ) {
+					nStartPntIndx = i;
+					break;
+				}
+			}
+			List<CAMPoint2> currentSegmentPoints = new List<CAMPoint2>();
+
+			for( int i = nStartPntIndx; i < camPntList.Count; i++ ) {
+				CAMPointInfo currentPointInfo = camPntList[ i ];
+
+				// start point may at overlap area
+				if( i == nStartPntIndx && currentPointInfo.Point2 != null ) {
+					currentSegmentPoints.Add( currentPointInfo.Point2 );
+				}
+				else {
+					currentSegmentPoints.Add( currentPointInfo.Point );
+				}
+
+				// check special case
+				bool isSplitPoint = currentPointInfo.Point2 != null && i != nStartPntIndx;
+				bool isLastPoint = i == camPntList.Count - 1;
+
+				if( isSplitPoint || isLastPoint ) {
+
+					// it is close path last pnt
+					if( isLastPoint && IsClosed ) {
+						// add point back : real end pnt is first segment index[0]
+						currentSegmentPoints.Add( camPntList[ 0 ].Point2 );
+					}
+
+					// build cam segment
+					if( currentSegmentPoints.Count >= 2 ) {
+						bool isGetDone = GetSegmentType( i, cadSegmentList, out ESegmentType segmentType );
+						if( isGetDone == false ) {
+							return false;
+						}
+						ICAMSegment camSegment = BuildCAMSegmentFromCAMPointInfo( currentSegmentPoints, segmentType );
+
+						// for CtrlSegIdx to record
+						currentSegmentIdx = camSegmentList.Count;
+						if( camSegment == null ) {
+							return false;
+						}
+						if( camPntList[ i ].IsCtrlPnt ) {
+							CtrlSegIdx.Add( currentSegmentIdx );
+						}
+						camSegmentList.Add( camSegment );
+					}
+
+					// is not last pnt, prepare new pnt for next segment
+					if( !isLastPoint ) {
+
+						// reset
+						currentSegmentPoints = new List<CAMPoint2>();
+
+						// next seg start at point2
+						currentSegmentPoints.Add( currentPointInfo.Point2 );
+					}
+				}
+			}
+
+			return true;
+		}
+
+		ICAMSegment BuildCAMSegmentFromCAMPointInfo( List<CAMPoint2> camPointList, ESegmentType segmentType )
+		{
+			if( camPointList == null || camPointList.Count < 2 ) {
+				return null;
+			}
+			double dChordLength = camPointList[ 0 ].Point.Distance( camPointList[ 1 ].Point );
+			double dEdgeLength = dChordLength * ( camPointList.Count - 1 );
+			ICAMSegment camSegment = null;
+			if( segmentType == ESegmentType.Line ) {
+
+				camSegment = new LineCAMSegment( camPointList, dEdgeLength, dChordLength, dChordLength );
+			}
+			else if( segmentType == ESegmentType.Arc ) {
+				camSegment = new ArcCAMSegment( camPointList, dEdgeLength, dChordLength, dChordLength );
+			}
+			return camSegment;
+		}
+
+		bool GetSegmentType( int nPntIndex, IReadOnlyList<ICADSegment> cadsegment, out ESegmentType segmentType )
+		{
+			int nPntSum = 0;
+			segmentType = ESegmentType.Line;
+
+			for( int i = 0; i < cadsegment.Count; i++ ) {
+
+				// removew over pnt
+				if( i != 0 ) {
+					nPntSum -= 1; // 減去重複點
+				}
+
+				// cal current seg range
+				int segmentStartIndex = nPntSum;
+				int segmentEndIndex = nPntSum + cadsegment[ i ].PointList.Count - 1;
+
+				// check nPntIndex is in this range
+				if( nPntIndex >= segmentStartIndex && nPntIndex <= segmentEndIndex ) {
+					segmentType = cadsegment[ i ].SegmentType;
+					return true;
+				}
+				nPntSum += cadsegment[ i ].PointList.Count;
+			}
+			return false;
+		}
 
 		void ApplyToolVectorInterpolation( List<CAMPointInfo> camPointInfoList )
 		{
@@ -521,8 +714,7 @@ namespace MyCAM.CacheInfo
 				ApplySpecifiedVec( camPointInfoList, ctrlPntIdx[ 0 ] );
 				return;
 			}
-
-			List<Tuple<int, int>>  interpolateIntervalList = GetInterpolateIntervalList( ctrlPntIdx );
+			List<Tuple<int, int>> interpolateIntervalList = GetInterpolateIntervalList( ctrlPntIdx );
 
 			// modify the tool vector
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
@@ -546,7 +738,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		
+
 
 		gp_Vec CalCtrlPntToolVec( CAMPointInfo controlBar )
 		{
@@ -572,7 +764,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		
+
 
 
 		void BuildCAMFeatureSegment()
@@ -651,7 +843,7 @@ namespace MyCAM.CacheInfo
 		void SetOverCut()
 		{
 			if( m_CraftData.OverCutLength > 0 ) {
-				List<ICAMSegmentElement> overCutSement = OverCutSegmentBuilder.BuildOverCutSegment( m_CAMSegmentList, m_CraftData.OverCutLength, m_CraftData.IsReverse );
+				List<ICAMSegment> overCutSement = OverCutSegmentBuilder.BuildOverCutSegment( m_CAMSegmentList, m_CraftData.OverCutLength, m_CraftData.IsReverse );
 				if( overCutSement.Count > 0 ) {
 					m_OverCutSegmentList = overCutSement;
 				}
@@ -697,12 +889,12 @@ namespace MyCAM.CacheInfo
 		void SetLead()
 		{
 			if( m_CraftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
-				ICAMSegmentElement camSegmentConnectWithStartPnt = CAMSegmentList.FirstOrDefault();
-				List<ICAMSegmentElement> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithStartPnt, true );
+				ICAMSegment camSegmentConnectWithStartPnt = CAMSegmentList.FirstOrDefault();
+				List<ICAMSegment> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithStartPnt, true );
 				m_LeadInSegmentList = leadCAMSegment;
 			}
 			if( m_CraftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
-				ICAMSegmentElement camSegmentConnectWithEndPnt;
+				ICAMSegment camSegmentConnectWithEndPnt;
 				// with overcut
 				if( m_CraftData.OverCutLength > 0 && m_OverCutSegmentList.Count > 0 ) {
 					camSegmentConnectWithEndPnt = m_OverCutSegmentList.Last();
@@ -710,16 +902,16 @@ namespace MyCAM.CacheInfo
 				else {
 					camSegmentConnectWithEndPnt = CAMSegmentList.Last();
 				}
-				List<ICAMSegmentElement> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithEndPnt, false );
+				List<ICAMSegment> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithEndPnt, false );
 				m_LeadOutSegmentList = leadCAMSegment;
 			}
 		}
 
-		List<ICAMSegmentElement> m_CAMSegmentList = new List<ICAMSegmentElement>();
+		List<ICAMSegment> m_CAMSegmentList = new List<ICAMSegment>();
 		List<int> m_CtrlToolSegIdxList = new List<int>();
-		List<ICAMSegmentElement> m_OverCutSegmentList = new List<ICAMSegmentElement>();
-		List<ICAMSegmentElement> m_LeadInSegmentList = new List<ICAMSegmentElement>();
-		List<ICAMSegmentElement> m_LeadOutSegmentList = new List<ICAMSegmentElement>();
+		List<ICAMSegment> m_OverCutSegmentList = new List<ICAMSegment>();
+		List<ICAMSegment> m_LeadInSegmentList = new List<ICAMSegment>();
+		List<ICAMSegment> m_LeadOutSegmentList = new List<ICAMSegment>();
 
 		// they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
