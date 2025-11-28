@@ -47,7 +47,7 @@ namespace MyCAM.Helper
 				return new List<ICAMSegment>();
 			}
 			var clonedSegments = CloneSegmentList( contourCacheInfo.CAMSegmentList );
-			return contourCacheInfo.GetPathIsReverse() ? ReverseSegment( clonedSegments ) : clonedSegments;
+			return clonedSegments;
 		}
 
 		static void SetProcessPoints( PathNCPackage ncPackage, ContourCacheInfo contourCacheInfo )

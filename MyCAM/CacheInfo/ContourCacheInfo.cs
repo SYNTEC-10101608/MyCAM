@@ -4,7 +4,6 @@ using MyCAM.Helper;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace MyCAM.CacheInfo
@@ -133,7 +132,7 @@ namespace MyCAM.CacheInfo
 				camSegmentConnectWithStartPnt = LeadInSegment.First();
 			}
 			else {
-				if ( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+				if( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
 					return null;
 				}
 				camSegmentConnectWithStartPnt = CAMSegmentList.First(); ;
@@ -161,7 +160,7 @@ namespace MyCAM.CacheInfo
 					camSegmentConnectWithEndPnt = m_OverCutSegmentList.Last();
 				}
 				else {
-					if ( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+					if( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
 						return null;
 					}
 					camSegmentConnectWithEndPnt = CAMSegmentList.Last();
@@ -276,8 +275,6 @@ namespace MyCAM.CacheInfo
 
 		void BuildPathCAMSegment()
 		{
-			Stopwatch sw = new Stopwatch();
-			sw.Start();
 			m_IsCraftDataDirty = false;
 
 			// Step 1: Collect all cad point
@@ -293,8 +290,6 @@ namespace MyCAM.CacheInfo
 			}
 			CAMSegmentList = PathCAMSegList;
 			CtrlToolSegIdxList = CtrlSegIdx;
-			sw.Stop();
-			Console.WriteLine( $"耗時2: {sw.ElapsedMilliseconds} ms" );
 		}
 
 		bool ReBuildCAMSegment( List<CAMPointInfo> pathCAMInfo, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx )
@@ -400,7 +395,7 @@ namespace MyCAM.CacheInfo
 					SegmentPointIndex currentPointIndex = new SegmentPointIndex( segIdx, pntIdx );
 
 					// conver this cad point
-					CAMPoint2 camPoint = ConvertCADPointToCAMPoint2( cadPoint );
+					CAMPoint2 camPoint = ConvertCADPointToCAMPoint2( cadPoint, m_CraftData.IsToolVecReverse );
 					bool isFistSegFirstPnt = ( pntIdx == 0 && segIdx == 0 );
 					bool isOverlapPnt = ( pntIdx == 0 && result.Count > 0 );
 
@@ -506,18 +501,36 @@ namespace MyCAM.CacheInfo
 					firstPointInfo.ABValues = lastCAMInfo.ABValues;
 				}
 			}
+			if( m_CraftData.IsReverse ) {
+				ReverseCAMInfo( ref result );
+			}
 			return result;
 		}
 
-		CAMPoint2 ConvertCADPointToCAMPoint2( CADPoint cadPoint )
+		void ReverseCAMInfo( ref List<CAMPointInfo> camInfoList )
 		{
-			gp_Dir initialToolVec = cadPoint.NormalVec_1st;
+			camInfoList.Reverse();
+			foreach( CAMPointInfo camInfo in camInfoList ) {
+
+				if( camInfo.Point2 == null ) {
+					continue;
+				}
+				// swap point and point2
+				CAMPoint2 tempPnt = camInfo.Point;
+				camInfo.Point = camInfo.Point2;
+				camInfo.Point2 = tempPnt;
+			}
+		}
+
+		CAMPoint2 ConvertCADPointToCAMPoint2( CADPoint cadPoint, bool isToolVecReverse )
+		{
+			gp_Dir initNorVec = isToolVecReverse ? cadPoint.NormalVec_1st.Reversed() : cadPoint.NormalVec_1st;
 			return new CAMPoint2(
 				cadPoint.Point,
-				cadPoint.NormalVec_1st,
-				cadPoint.NormalVec_2nd,
+				initNorVec,
+				initNorVec,
 				cadPoint.TangentVec,
-				initialToolVec
+				initNorVec
 			);
 		}
 
@@ -560,7 +573,7 @@ namespace MyCAM.CacheInfo
 							return false;
 						}
 						// for record on CtrlSegIdx
-						currentSegmentIdx ++;
+						currentSegmentIdx++;
 						if( camPntList[ i ].IsCtrlPnt ) {
 							CtrlSegIdx.Add( currentSegmentIdx );
 						}
@@ -675,7 +688,12 @@ namespace MyCAM.CacheInfo
 				camSegment = new LineCAMSegment( camPointList, dEdgeLength, dChordLength, dChordLength );
 			}
 			else if( segmentType == ESegmentType.Arc ) {
-				camSegment = new ArcCAMSegment( camPointList, dEdgeLength, dChordLength, dChordLength );
+				if( camPointList.Count < 3 ) {
+					camSegment = new LineCAMSegment( camPointList, dEdgeLength, dChordLength, dChordLength );
+				}
+				else {
+					camSegment = new ArcCAMSegment( camPointList, dEdgeLength, dChordLength, dChordLength );
+				}
 			}
 			return camSegment;
 		}
@@ -684,7 +702,7 @@ namespace MyCAM.CacheInfo
 		{
 			int nPntSum = 0;
 			segmentType = ESegmentType.Line;
-			if (cadsegment == null || cadsegment.Count == 0 ) {
+			if( cadsegment == null || cadsegment.Count == 0 ) {
 				return false;
 			}
 
@@ -724,9 +742,10 @@ namespace MyCAM.CacheInfo
 
 			// do not have ctrl pnt
 			if( ctrlPntIdx.Count == 0 ) {
-				ApplyGlobalToolVector( camPointInfoList );
 				return;
 			}
+
+			// only one ctrl pnt, apply to all point
 			if( ctrlPntIdx.Count == 1 ) {
 				ApplySpecifiedVec( camPointInfoList, ctrlPntIdx[ 0 ] );
 				return;
@@ -755,8 +774,6 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-
-
 		gp_Vec CalCtrlPntToolVec( CAMPointInfo controlBar )
 		{
 			if( !controlBar.IsCtrlPnt || controlBar.ABValues == null )
@@ -771,22 +788,10 @@ namespace MyCAM.CacheInfo
 				abValues.Item1 * Math.PI / 180, abValues.Item2 * Math.PI / 180 );
 		}
 
-		void ApplyGlobalToolVector( List<CAMPointInfo> camPointList )
-		{
-			if( !m_CraftData.IsToolVecReverse )
-				return;
-
-			foreach( var point in camPointList ) {
-				point.ToolVec = point.ToolVec.Reversed();
-			}
-		}
-
-
-
-
 		void BuildCAMFeatureSegment()
 		{
-			SetOverCut();
+			// Topo:overcut
+			// SetOverCut();
 			SetLead();
 		}
 
@@ -906,7 +911,7 @@ namespace MyCAM.CacheInfo
 		void SetLead()
 		{
 			if( m_CraftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
-				if ( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+				if( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
 					return;
 				}
 				ICAMSegment camSegmentConnectWithStartPnt = CAMSegmentList.FirstOrDefault();
@@ -920,7 +925,7 @@ namespace MyCAM.CacheInfo
 					camSegmentConnectWithEndPnt = m_OverCutSegmentList.Last();
 				}
 				else {
-					if ( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+					if( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
 						return;
 					}
 					camSegmentConnectWithEndPnt = CAMSegmentList.Last();
