@@ -241,7 +241,7 @@ namespace MyCAM.CacheInfo
 		{
 			// consider wrapped
 			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + pathCAMInfo.Count : nEndIndex;
-			if( pathCAMInfo[ nStartIndex ].Point2 == null || pathCAMInfo[ nEndIndex].Point2 == null ) {
+			if( pathCAMInfo[ nStartIndex ].Point2 == null || pathCAMInfo[ nEndIndex ].Point2 == null ) {
 				return;
 			}
 
@@ -483,7 +483,6 @@ namespace MyCAM.CacheInfo
 				return true;
 			}
 			List<CAMPoint2> currentSegmentPoints = new List<CAMPoint2>();
-			int segmentStartIndex = 0;
 			for( int i = 0; i <= nStartPntIndx; i++ ) {
 				CAMPointInfo currentPointInfo = camPntList[ i ];
 				currentSegmentPoints.Add( currentPointInfo.Point );
@@ -494,7 +493,9 @@ namespace MyCAM.CacheInfo
 
 				if( isSplitPoint || reachStartPoint ) {
 					if( currentSegmentPoints.Count >= 2 ) {
-						bool isGetDone = GetSegmentType( segmentStartIndex, cadSegmentList, out ESegmentType segmentType );
+
+						// check last pnt is at with segment
+						bool isGetDone = GetSegmentType( i, cadSegmentList, out ESegmentType segmentType );
 						if( isGetDone == false ) {
 							return false;
 						}
@@ -514,7 +515,6 @@ namespace MyCAM.CacheInfo
 					if( !reachStartPoint ) {
 						currentSegmentPoints = new List<CAMPoint2>();
 						currentSegmentPoints.Add( currentPointInfo.Point2 );
-						segmentStartIndex = i;
 					}
 				}
 			}
@@ -572,6 +572,7 @@ namespace MyCAM.CacheInfo
 
 					// build cam segment
 					if( currentSegmentPoints.Count >= 2 ) {
+						// check last pnt is at with segment
 						bool isGetDone = GetSegmentType( i, cadSegmentList, out ESegmentType segmentType );
 						if( isGetDone == false ) {
 							return false;
@@ -640,7 +641,7 @@ namespace MyCAM.CacheInfo
 
 				// removew over pnt
 				if( i != 0 ) {
-					nPntSum -= 1; // 減去重複點
+					nPntSum -= 1;
 				}
 
 				// cal current seg range
@@ -688,7 +689,7 @@ namespace MyCAM.CacheInfo
 				// get start and end index
 				int nStartIndex = interpolateIntervalList[ i ].Item1;
 				int nEndIndex = interpolateIntervalList[ i ].Item2;
-				InterpolateToolVec( nStartIndex, nEndIndex, camPointInfoList , isReverse );
+				InterpolateToolVec( nStartIndex, nEndIndex, camPointInfoList, isReverse );
 			}
 		}
 
