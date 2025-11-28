@@ -525,7 +525,7 @@ namespace MyCAM.CacheInfo
 		{
 			camSegmentList = new List<ICAMSegment>();
 			if( camPntList == null || camPntList.Count == 0 ) {
-				return true;
+				return false;
 			}
 			int nStartPntIndx = 0;
 			for( int i = 0; i < camPntList.Count; i++ ) {
@@ -560,7 +560,7 @@ namespace MyCAM.CacheInfo
 							return false;
 						}
 						// for record on CtrlSegIdx
-						currentSegmentIdx = camSegmentList.Count;
+						currentSegmentIdx ++;
 						if( camPntList[ i ].IsCtrlPnt ) {
 							CtrlSegIdx.Add( currentSegmentIdx );
 						}
@@ -582,7 +582,7 @@ namespace MyCAM.CacheInfo
 		{
 			camSegmentList = new List<ICAMSegment>();
 			if( camPntList == null || camPntList.Count == 0 ) {
-				return true;
+				return false;
 			}
 
 			// find start point at with index
@@ -618,7 +618,6 @@ namespace MyCAM.CacheInfo
 				// check special case (break pnt)
 				bool isSplitPoint = currentPointInfo.Point2 != null && i != nStartPntIndx;
 				bool isLastPoint = i == camPntList.Count - 1;
-
 				if( isSplitPoint || isLastPoint ) {
 
 					// it is close path last pnt
@@ -685,6 +684,9 @@ namespace MyCAM.CacheInfo
 		{
 			int nPntSum = 0;
 			segmentType = ESegmentType.Line;
+			if (cadsegment == null || cadsegment.Count == 0 ) {
+				return false;
+			}
 
 			for( int i = 0; i < cadsegment.Count; i++ ) {
 
