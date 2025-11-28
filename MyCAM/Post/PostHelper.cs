@@ -28,8 +28,8 @@ namespace MyCAM.Post
 	internal static class PostHelper
 	{
 		public static bool SolvePath( PostSolver postSolver, PathNCPackage pathNCPacke,
-	PathEndInfo endInfoOfPreviousPath,
-	out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo, bool isNeedDispersion = true, bool useACSolution = true )
+		PathEndInfo endInfoOfPreviousPath,
+		out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo, bool isNeedDispersion = true, bool useACSolution = true )
 		{
 			// for simulation
 			pathMCSPostData = new PathPostData();
@@ -57,192 +57,6 @@ namespace MyCAM.Post
 					out pathG54PostData, out pathMCSPostData, out currentPathtEndInfo,
 					ref dLastPointProcess_M, ref dLastPointProcess_S );
 			}
-		}
-
-		static bool SolvePathWithACCase( PostSolver postSolver, PathNCPackage pathNCPacke,
-			PathEndInfo endInfoOfPreviousPath,
-			out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo,
-			ref double dLastPointProcess_M, ref double dLastPointProcess_S )
-		{
-			pathG54PostData = new PathPostData();
-			pathMCSPostData = new PathPostData();
-			currentPathtEndInfo = new PathEndInfo();
-			bool bStart = false;
-
-			// Step 1 : solve main path
-			if( !SolvePath_ACSolution( postSolver, pathNCPacke.MainPathSegment, pathNCPacke.CtrlSegIdx,
-				ref dLastPointProcess_M, ref dLastPointProcess_S,
-				out List<ISegmentPostData> mainG54 ) ) {
-				return false;
-			}
-			pathG54PostData.MainPathPostPath.AddRange( mainG54 );
-			pathMCSPostData.MainPathPostPath.AddRange( mainG54 );
-
-			// lead-in with fixed rotation based on main path start
-			if( pathNCPacke.LeadInSegment.Count > 0 ) {
-
-				List<int> defaultSegModifyStatus = new List<int>();
-
-				// last pnt is ctrl pnt
-				if( pathNCPacke.CtrlSegIdx.Contains( pathNCPacke.MainPathSegment.Count - 1 ) ) {
-					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadInSegment.Count, true );
-				}
-				else {
-					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadInSegment.Count, false );
-				}
-				List<ISegmentPostData> leadInPostData = BuildPostSegmentsWithFixedRotation(
-					pathNCPacke.LeadInSegment, defaultSegModifyStatus,
-					mainG54.First().StartPoint.Master,
-					mainG54.First().StartPoint.Slave );
-				pathG54PostData.LeadInPostPath.AddRange( leadInPostData );
-				pathMCSPostData.LeadInPostPath.AddRange( leadInPostData );
-
-				pathG54PostData.ProcessStartPoint = pathG54PostData.LeadInPostPath.First().StartPoint;
-				pathMCSPostData.ProcessStartPoint = pathMCSPostData.LeadInPostPath.First().StartPoint;
-				bStart = true;
-			}
-
-			// lead-out with fixed rotation based on main path end
-			if( pathNCPacke.LeadOutSegment.Count > 0 ) {
-				List<int> defaultSegModifyStatus = new List<int>();
-
-				// last pnt is ctrl pnt
-				if( pathNCPacke.CtrlSegIdx.Contains( pathNCPacke.MainPathSegment.Count - 1 ) ) {
-					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadOutSegment.Count, true );
-				}
-				else {
-					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadOutSegment.Count, false );
-				}
-				List<ISegmentPostData> leadOutPostData = BuildPostSegmentsWithFixedRotation(
-					pathNCPacke.LeadOutSegment, defaultSegModifyStatus,
-					mainG54.Last().EndPoint.Master,
-					mainG54.Last().EndPoint.Slave );
-				pathG54PostData.LeadOutPostPath.AddRange( leadOutPostData );
-				pathMCSPostData.LeadOutPostPath.AddRange( leadOutPostData );
-			}
-
-			// set process start point if no lead-in
-			if( !bStart ) {
-				pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPath.First().StartPoint;
-				pathMCSPostData.ProcessStartPoint = pathMCSPostData.MainPathPostPath.First().StartPoint;
-			}
-
-			// calculate entry/traverse
-			if( endInfoOfPreviousPath == null ) {
-				CalculateEntry( pathNCPacke.ProcessStartPnt, pathNCPacke.EntryDistance, pathNCPacke.Entry_FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
-			}
-			else {
-				CalculateTraverse( endInfoOfPreviousPath, pathNCPacke.ProcessStartPnt, pathNCPacke.LiftUpDistance, pathNCPacke.FrogLeapDistance, pathNCPacke.CutDownDistance, pathNCPacke.FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
-			}
-
-			// end info of current path
-			currentPathtEndInfo = new PathEndInfo()
-			{
-				EndCAMPoint = pathNCPacke.ProcessEndPnt,
-				Master = dLastPointProcess_M,
-				Slave = dLastPointProcess_S
-			};
-			return true;
-		}
-
-		static bool SolvePathNormalCase( PostSolver postSolver, PathNCPackage pathNCPack,
-			PathEndInfo endInfoOfPreviousPath, out PathPostData pathG54PostData,
-			out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo,
-			ref double dLastPointProcess_M, ref double dLastPointProcess_S )
-		{
-			pathG54PostData = new PathPostData();
-			pathMCSPostData = new PathPostData();
-			currentPathtEndInfo = new PathEndInfo();
-			bool bStart = false;
-
-			// lead-in
-			if( pathNCPack.LeadInSegment.Count > 0 ) {
-
-				List<int> defaultSegStatus = new List<int>();
-
-				// last pnt is ctrl pnt
-				if( pathNCPack.CtrlSegIdx.Contains( pathNCPack.MainPathSegment.Count - 1 ) ) {
-					defaultSegStatus = CreateDefaultSegmentModifyList( pathNCPack.LeadInSegment.Count, true );
-				}
-				else {
-					defaultSegStatus = CreateDefaultSegmentModifyList( pathNCPack.LeadInSegment.Count, false );
-				}
-				if( !SolveProcessPathIK( postSolver, pathNCPack.LeadInSegment, defaultSegStatus,
-					ref dLastPointProcess_M, ref dLastPointProcess_S,
-					out List<ISegmentPostData> leadInG54 ) ) {
-					return false;
-				}
-				pathG54PostData.LeadInPostPath.AddRange( leadInG54 );
-				pathMCSPostData.LeadInPostPath.AddRange( leadInG54 );
-
-				pathG54PostData.ProcessStartPoint = pathG54PostData.LeadInPostPath.First().StartPoint;
-				pathMCSPostData.ProcessStartPoint = pathMCSPostData.LeadInPostPath.First().StartPoint;
-				bStart = true;
-			}
-
-			// main path
-			if( !SolveProcessPathIK( postSolver, pathNCPack.MainPathSegment,pathNCPack.CtrlSegIdx,
-				ref dLastPointProcess_M, ref dLastPointProcess_S,
-				out List<ISegmentPostData> mainG54 ) ) {
-				return false;
-			}
-			pathG54PostData.MainPathPostPath.AddRange( mainG54 );
-			pathMCSPostData.MainPathPostPath.AddRange( mainG54 );
-
-			if( !bStart ) {
-				pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPath.First().StartPoint;
-				pathMCSPostData.ProcessStartPoint = pathMCSPostData.MainPathPostPath.First().StartPoint;
-			}
-
-			// Todo:over-cut
-			/*
-			if( pathNCPack.OverCutSegment.Count > 0 ) {
-				if( !SolveProcessPathIK( postSolver, pathNCPack.OverCutSegment,
-					ref dLastPointProcess_M, ref dLastPointProcess_S,
-					out List<ISegmentPostData> overCutG54 ) ) {
-					return false;
-				}
-				pathG54PostData.OverCutPostPath.AddRange( overCutG54 );
-				pathMCSPostData.OverCutPostPath.AddRange( overCutG54 );
-			}
-			*/
-
-			// lead-out
-			if( pathNCPack.LeadOutSegment.Count > 0 ) {
-				List<int> defaultSegStatus = new List<int>();
-				// last pnt is ctrl pnt
-				if( pathNCPack.CtrlSegIdx.Contains( pathNCPack.MainPathSegment.Count - 1 ) ) {
-					defaultSegStatus = CreateDefaultSegmentModifyList( pathNCPack.LeadOutSegment.Count, true );
-				}
-				else {
-					defaultSegStatus = CreateDefaultSegmentModifyList( pathNCPack.LeadOutSegment.Count, false );
-				}
-				if( !SolveProcessPathIK( postSolver, pathNCPack.LeadOutSegment, defaultSegStatus,
-					ref dLastPointProcess_M, ref dLastPointProcess_S,
-					out List<ISegmentPostData> leadOutG54 ) ) {
-					return false;
-				}
-				pathG54PostData.LeadOutPostPath.AddRange( leadOutG54 );
-				pathMCSPostData.LeadOutPostPath.AddRange( leadOutG54 );
-			}
-
-			// calculate entry/traverse
-			if( endInfoOfPreviousPath == null ) {
-				CalculateEntry( pathNCPack.ProcessStartPnt, pathNCPack.EntryDistance, pathNCPack.Entry_FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
-			}
-			else {
-				CalculateTraverse( endInfoOfPreviousPath, pathNCPack.ProcessStartPnt, pathNCPack.LiftUpDistance, pathNCPack.FrogLeapDistance, pathNCPack.CutDownDistance, pathNCPack.FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
-			}
-
-			// end info of current path
-			currentPathtEndInfo = new PathEndInfo()
-			{
-				EndCAMPoint = pathNCPack.ProcessEndPnt,
-				Master = dLastPointProcess_M,
-				Slave = dLastPointProcess_S
-			};
-
-			return true;
 		}
 
 		public static void CalculateExit( PathEndInfo endInfoOfLastPath, EntryAndExitData entryAndExitData,
@@ -396,29 +210,6 @@ namespace MyCAM.Post
 			return false;
 		}
 
-		static List<PostPoint> CreateMCSPostPoints( PostSolver postSolver, List<CAMPoint2> camPoints, List<Tuple<double, double>> rotateAngleList, ref int pointIndex )
-		{
-			List<PostPoint> postPoints = new List<PostPoint>();
-
-			foreach( CAMPoint2 camPoint in camPoints ) {
-				gp_Pnt pointG54 = camPoint.Point;
-				gp_Vec tcpOffset = postSolver.SolveFK( rotateAngleList[ pointIndex ].Item1, rotateAngleList[ pointIndex ].Item2, pointG54 );
-				gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
-				PostPoint frameDataMCS = new PostPoint()
-				{
-					X = pointMCS.X(),
-					Y = pointMCS.Y(),
-					Z = pointMCS.Z(),
-					Master = rotateAngleList[ pointIndex ].Item1,
-					Slave = rotateAngleList[ pointIndex ].Item2
-				};
-				postPoints.Add( frameDataMCS );
-				pointIndex++;
-			}
-
-			return postPoints;
-		}
-
 		static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, CAMPoint ProcessStartPoint, double dLiftUpDistance, double dFrogLeapDistance, double CutDownDistance, double FollowSafeDistance, ref PathPostData pathG54PostData, ref PathPostData pathMCSPostData )
 		{
 			if( ProcessStartPoint == null || endInfoOfPreviousPath == null ) {
@@ -551,6 +342,192 @@ namespace MyCAM.Post
 				Slave = pathMCSPostData.ProcessStartPoint.Slave
 			};
 			pathMCSPostData.FollowSafeDistance = dFollowSafeDistance;
+		}
+
+		static bool SolvePathWithACCase( PostSolver postSolver, PathNCPackage pathNCPacke,
+		PathEndInfo endInfoOfPreviousPath,
+		out PathPostData pathG54PostData, out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo,
+		ref double dLastPointProcess_M, ref double dLastPointProcess_S )
+		{
+			pathG54PostData = new PathPostData();
+			pathMCSPostData = new PathPostData();
+			currentPathtEndInfo = new PathEndInfo();
+			bool bStart = false;
+
+			// Step 1 : solve main path
+			if( !SolvePath_ACSolution( postSolver, pathNCPacke.MainPathSegment, pathNCPacke.CtrlSegIdx,
+				ref dLastPointProcess_M, ref dLastPointProcess_S,
+				out List<ISegmentPostData> mainG54 ) ) {
+				return false;
+			}
+			pathG54PostData.MainPathPostPath.AddRange( mainG54 );
+			pathMCSPostData.MainPathPostPath.AddRange( mainG54 );
+
+			// lead-in with fixed rotation based on main path start
+			if( pathNCPacke.LeadInSegment.Count > 0 ) {
+
+				List<int> defaultSegModifyStatus = new List<int>();
+
+				// last pnt is ctrl pnt
+				if( pathNCPacke.CtrlSegIdx.Contains( pathNCPacke.MainPathSegment.Count - 1 ) ) {
+					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadInSegment.Count, true );
+				}
+				else {
+					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadInSegment.Count, false );
+				}
+				List<ISegmentPostData> leadInPostData = BuildPostSegmentsWithFixedRotation(
+					pathNCPacke.LeadInSegment, defaultSegModifyStatus,
+					mainG54.First().StartPoint.Master,
+					mainG54.First().StartPoint.Slave );
+				pathG54PostData.LeadInPostPath.AddRange( leadInPostData );
+				pathMCSPostData.LeadInPostPath.AddRange( leadInPostData );
+
+				pathG54PostData.ProcessStartPoint = pathG54PostData.LeadInPostPath.First().StartPoint;
+				pathMCSPostData.ProcessStartPoint = pathMCSPostData.LeadInPostPath.First().StartPoint;
+				bStart = true;
+			}
+
+			// lead-out with fixed rotation based on main path end
+			if( pathNCPacke.LeadOutSegment.Count > 0 ) {
+				List<int> defaultSegModifyStatus = new List<int>();
+
+				// last pnt is ctrl pnt
+				if( pathNCPacke.CtrlSegIdx.Contains( pathNCPacke.MainPathSegment.Count - 1 ) ) {
+					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadOutSegment.Count, true );
+				}
+				else {
+					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadOutSegment.Count, false );
+				}
+				List<ISegmentPostData> leadOutPostData = BuildPostSegmentsWithFixedRotation(
+					pathNCPacke.LeadOutSegment, defaultSegModifyStatus,
+					mainG54.Last().EndPoint.Master,
+					mainG54.Last().EndPoint.Slave );
+				pathG54PostData.LeadOutPostPath.AddRange( leadOutPostData );
+				pathMCSPostData.LeadOutPostPath.AddRange( leadOutPostData );
+			}
+
+			// set process start point if no lead-in
+			if( !bStart ) {
+				pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPath.First().StartPoint;
+				pathMCSPostData.ProcessStartPoint = pathMCSPostData.MainPathPostPath.First().StartPoint;
+			}
+
+			// calculate entry/traverse
+			if( endInfoOfPreviousPath == null ) {
+				CalculateEntry( pathNCPacke.ProcessStartPnt, pathNCPacke.EntryDistance, pathNCPacke.Entry_FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
+			}
+			else {
+				CalculateTraverse( endInfoOfPreviousPath, pathNCPacke.ProcessStartPnt, pathNCPacke.LiftUpDistance, pathNCPacke.FrogLeapDistance, pathNCPacke.CutDownDistance, pathNCPacke.FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
+			}
+
+			// end info of current path
+			currentPathtEndInfo = new PathEndInfo()
+			{
+				EndCAMPoint = pathNCPacke.ProcessEndPnt,
+				Master = dLastPointProcess_M,
+				Slave = dLastPointProcess_S
+			};
+			return true;
+		}
+
+		static bool SolvePathNormalCase( PostSolver postSolver, PathNCPackage pathNCPack,
+			PathEndInfo endInfoOfPreviousPath, out PathPostData pathG54PostData,
+			out PathPostData pathMCSPostData, out PathEndInfo currentPathtEndInfo,
+			ref double dLastPointProcess_M, ref double dLastPointProcess_S )
+		{
+			pathG54PostData = new PathPostData();
+			pathMCSPostData = new PathPostData();
+			currentPathtEndInfo = new PathEndInfo();
+			bool bStart = false;
+
+			// lead-in
+			if( pathNCPack.LeadInSegment.Count > 0 ) {
+
+				List<int> defaultSegStatus = new List<int>();
+
+				// last pnt is ctrl pnt
+				if( pathNCPack.CtrlSegIdx.Contains( pathNCPack.MainPathSegment.Count - 1 ) ) {
+					defaultSegStatus = CreateDefaultSegmentModifyList( pathNCPack.LeadInSegment.Count, true );
+				}
+				else {
+					defaultSegStatus = CreateDefaultSegmentModifyList( pathNCPack.LeadInSegment.Count, false );
+				}
+				if( !SolveProcessPathIK( postSolver, pathNCPack.LeadInSegment, defaultSegStatus,
+					ref dLastPointProcess_M, ref dLastPointProcess_S,
+					out List<ISegmentPostData> leadInG54 ) ) {
+					return false;
+				}
+				pathG54PostData.LeadInPostPath.AddRange( leadInG54 );
+				pathMCSPostData.LeadInPostPath.AddRange( leadInG54 );
+
+				pathG54PostData.ProcessStartPoint = pathG54PostData.LeadInPostPath.First().StartPoint;
+				pathMCSPostData.ProcessStartPoint = pathMCSPostData.LeadInPostPath.First().StartPoint;
+				bStart = true;
+			}
+
+			// main path
+			if( !SolveProcessPathIK( postSolver, pathNCPack.MainPathSegment, pathNCPack.CtrlSegIdx,
+				ref dLastPointProcess_M, ref dLastPointProcess_S,
+				out List<ISegmentPostData> mainG54 ) ) {
+				return false;
+			}
+			pathG54PostData.MainPathPostPath.AddRange( mainG54 );
+			pathMCSPostData.MainPathPostPath.AddRange( mainG54 );
+
+			if( !bStart ) {
+				pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPath.First().StartPoint;
+				pathMCSPostData.ProcessStartPoint = pathMCSPostData.MainPathPostPath.First().StartPoint;
+			}
+
+			// Todo:over-cut
+			/*
+			if( pathNCPack.OverCutSegment.Count > 0 ) {
+				if( !SolveProcessPathIK( postSolver, pathNCPack.OverCutSegment,
+					ref dLastPointProcess_M, ref dLastPointProcess_S,
+					out List<ISegmentPostData> overCutG54 ) ) {
+					return false;
+				}
+				pathG54PostData.OverCutPostPath.AddRange( overCutG54 );
+				pathMCSPostData.OverCutPostPath.AddRange( overCutG54 );
+			}
+			*/
+
+			// lead-out
+			if( pathNCPack.LeadOutSegment.Count > 0 ) {
+				List<int> defaultSegStatus = new List<int>();
+				// last pnt is ctrl pnt
+				if( pathNCPack.CtrlSegIdx.Contains( pathNCPack.MainPathSegment.Count - 1 ) ) {
+					defaultSegStatus = CreateDefaultSegmentModifyList( pathNCPack.LeadOutSegment.Count, true );
+				}
+				else {
+					defaultSegStatus = CreateDefaultSegmentModifyList( pathNCPack.LeadOutSegment.Count, false );
+				}
+				if( !SolveProcessPathIK( postSolver, pathNCPack.LeadOutSegment, defaultSegStatus,
+					ref dLastPointProcess_M, ref dLastPointProcess_S,
+					out List<ISegmentPostData> leadOutG54 ) ) {
+					return false;
+				}
+				pathG54PostData.LeadOutPostPath.AddRange( leadOutG54 );
+				pathMCSPostData.LeadOutPostPath.AddRange( leadOutG54 );
+			}
+
+			// calculate entry/traverse
+			if( endInfoOfPreviousPath == null ) {
+				CalculateEntry( pathNCPack.ProcessStartPnt, pathNCPack.EntryDistance, pathNCPack.Entry_FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
+			}
+			else {
+				CalculateTraverse( endInfoOfPreviousPath, pathNCPack.ProcessStartPnt, pathNCPack.LiftUpDistance, pathNCPack.FrogLeapDistance, pathNCPack.CutDownDistance, pathNCPack.FollowSafeDistance, ref pathG54PostData, ref pathMCSPostData );
+			}
+
+			// end info of current path
+			currentPathtEndInfo = new PathEndInfo()
+			{
+				EndCAMPoint = pathNCPack.ProcessEndPnt,
+				Master = dLastPointProcess_M,
+				Slave = dLastPointProcess_S
+			};
+
+			return true;
 		}
 
 		#region AC Solution

@@ -223,130 +223,73 @@ namespace MyCAM.Data
 		gp_Dir m_TangentVec;
 	}
 
-	internal class SpecialPnt : CAMPoint2
+	public class CAMPointInfo
 	{
-		public SpecialPnt( CAMPoint2 pnt1, CAMPoint2 pnt2, bool isCtrlPnt, bool isStartPnt, double dAValue = 0, double dBValue = 0 )
-			: base( pnt1.Point, pnt1.NormalVec_1st, pnt1.NormalVec_2nd, pnt1.TangentVec, pnt1.ToolVec )
-		{
-			AdditionalPoint = pnt2;
-			IsCtrlPnt = isCtrlPnt;
-			IsStartPnt = isStartPnt;
-			if( isCtrlPnt ) {
-				CtrlPntAValue = dAValue;
-				CtrlPntBValue = dBValue;
-			}
-		}
-
-		public CAMPoint2 AdditionalPoint
+		public CAMPoint2 Point
 		{
 			get; set;
+		}
+
+		public CAMPoint2 Point2
+		{
+			get; set;
+		}
+
+		public gp_Dir ToolVec
+		{
+			get
+			{
+				return m_ToolVec;
+			}
+			set
+			{
+				m_ToolVec = value;
+				setToolVec( value );
+			}
+
 		}
 
 		public bool IsCtrlPnt
 		{
 			get; set;
-		}
+		} = false;
 
 		public bool IsStartPnt
 		{
 			get; set;
-		}
+		} = false;
 
-		public double CtrlPntAValue
+		// if is not control point, ABValues is null
+		public Tuple<double, double> ABValues
 		{
-			get;
+			get; set;
 		}
 
-		public double CtrlPntBValue
+		public double DistanceToNext
 		{
-			get;
+			get; set;
 		}
 
-		public new SpecialPnt Clone()
+		public CAMPointInfo( CAMPoint2 point )
 		{
-			SpecialPnt cloned = new SpecialPnt(
-					
-				// as pnt1
-				this,  
-				AdditionalPoint,
-				IsCtrlPnt,
-				IsStartPnt,
-				CtrlPntAValue,
-				CtrlPntBValue
-			);
-			return cloned;
+			Point = point;
+			IsCtrlPnt = false;
+			IsStartPnt = false;
+			DistanceToNext = 0;
 		}
 
-		public bool Equals( SpecialPnt other )
+		void setToolVec( gp_Dir dir )
 		{
-			if( other == null ) {
-				return false;
+			if( dir == null ) {
+				return;
 			}
-			if( ReferenceEquals( this, other ) ) {
-				return true;
+			if( Point != null ) {
+				Point.ToolVec = dir;
 			}
-
-			if( !base.Equals( other ) ) {
-				return false;
-			}
-
-			if( IsCtrlPnt != other.IsCtrlPnt || IsStartPnt != other.IsStartPnt ) {
-				return false;
-			}
-
-			if( IsCtrlPnt ) {
-				const double TOLERANCE = 1e-3;
-				if( Math.Abs( CtrlPntAValue - other.CtrlPntAValue ) > TOLERANCE ||
-					Math.Abs( CtrlPntBValue - other.CtrlPntBValue ) > TOLERANCE ) {
-					return false;
-				}
-			}
-			if( AdditionalPoint == null && other.AdditionalPoint == null ) {
-				return true;
-			}
-			if( AdditionalPoint == null || other.AdditionalPoint == null ) {
-				return false;
-			}
-			return AdditionalPoint.Equals( other.AdditionalPoint );
-		}
-
-		public override bool Equals( object obj )
-		{
-			return Equals( obj as SpecialPnt );
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked {
-				int hash = base.GetHashCode();
-				hash = hash * 23 + IsCtrlPnt.GetHashCode();
-				hash = hash * 23 + IsStartPnt.GetHashCode();
-				if( IsCtrlPnt ) {
-					hash = hash * 23 + CtrlPntAValue.GetHashCode();
-					hash = hash * 23 + CtrlPntBValue.GetHashCode();
-				}
-				if( AdditionalPoint != null ) {
-					hash = hash * 23 + AdditionalPoint.GetHashCode();
-				}
-				return hash;
+			if( Point2 != null ) {
+				Point2.ToolVec = dir;
 			}
 		}
-
-		public static bool operator ==( SpecialPnt left, SpecialPnt right )
-		{
-			// same reference
-			if( ReferenceEquals( left, right ) ) {
-				return true;
-			}
-			if( left is null || right is null ) {
-				return false;
-			}
-			return left.Equals( right );
-		}
-
-		public static bool operator !=( SpecialPnt left, SpecialPnt right )
-		{
-			return !( left == right );
-		}
+		gp_Dir m_ToolVec;
 	}
 }

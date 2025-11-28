@@ -196,83 +196,6 @@ namespace MyCAM.CacheInfo
 
 		#region Build CAM Segment
 
-
-		// 代表處理後的點資訊
-		internal class CAMPointInfo
-		{
-			public CAMPoint2 Point
-			{
-				get; set;
-			}
-
-			public CAMPoint2 Point2
-			{
-				get; set;
-			}
-
-			public gp_Dir ToolVec
-			{
-				get
-				{
-					return m_ToolVec;
-				}
-				set
-				{
-					m_ToolVec = value;
-					setToolVec( value );
-				}
-
-			}
-
-			public bool IsCtrlPnt
-			{
-				get; set;
-			} = false;
-
-			public bool IsStartPnt
-			{
-				get; set;
-			} = false;
-
-			// if is not control point, ABValues is null
-			public Tuple<double, double> ABValues
-			{
-				get; set;
-			}
-
-			public double DistanceToNext
-			{
-				get; set;
-			}
-
-			public CAMPointInfo( CAMPoint2 point )
-			{
-				Point = point;
-				IsCtrlPnt = false;
-				IsStartPnt = false;
-				DistanceToNext = 0;
-			}
-
-			void setToolVec( gp_Dir dir )
-			{
-				if( dir == null ) {
-					return;
-				}
-				if( Point != null ) {
-					Point.ToolVec = dir;
-				}
-				if( Point2 != null ) {
-					Point2.ToolVec = dir;
-				}
-			}
-			gp_Dir m_ToolVec;
-		}
-
-
-		// use hashset to avoid duplicate break points
-
-
-
 		void BuildPathCAMSegment()
 		{
 			m_IsCraftDataDirty = false;
@@ -281,7 +204,7 @@ namespace MyCAM.CacheInfo
 			List<CAMPointInfo> pathCAMInfo = FlattenCADSegmentsToCAMPointInfo();
 
 			// Step 2: Do interpolation
-			ApplyToolVectorInterpolation( pathCAMInfo );
+			ApplyToolVectorInterpolation( pathCAMInfo, m_CraftData.IsReverse );
 
 			// Step 3: use caminfo to build cam segment
 			bool isBuildDone = ReBuildCAMSegment( pathCAMInfo, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx );
@@ -314,18 +237,25 @@ namespace MyCAM.CacheInfo
 			return true;
 		}
 
-		void InterpolateToolVec( int nStartIndex, int nEndIndex, List<CAMPointInfo> pathCAMInfo )
+		void InterpolateToolVec( int nStartIndex, int nEndIndex, List<CAMPointInfo> pathCAMInfo, bool isReverse )
 		{
 			// consider wrapped
 			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + pathCAMInfo.Count : nEndIndex;
+			if( pathCAMInfo[ nStartIndex ].Point2 == null || pathCAMInfo[ nEndIndex].Point2 == null ) {
+				return;
+			}
+
+			// to keep use same point to interpolate
+			gp_Dir startPntTanVec = isReverse ? pathCAMInfo[ nStartIndex ].Point2.TangentVec : pathCAMInfo[ nStartIndex ].Point.TangentVec;
+			gp_Dir endPntTanVec = isReverse ? pathCAMInfo[ nEndIndex ].Point2.TangentVec : pathCAMInfo[ nEndIndex ].Point.TangentVec;
 
 			// get the start and end tool vector
 			gp_Vec startVec = GetVecFromAB( pathCAMInfo[ nStartIndex ].Point.NormalVec_1st,
-				pathCAMInfo[ nStartIndex ].Point.TangentVec,
+				startPntTanVec,
 				pathCAMInfo[ nStartIndex ].ABValues.Item1 * Math.PI / 180,
 				pathCAMInfo[ nStartIndex ].ABValues.Item2 * Math.PI / 180 );
 			gp_Vec endVec = GetVecFromAB( pathCAMInfo[ nEndIndex ].Point.NormalVec_1st,
-				pathCAMInfo[ nEndIndex ].Point.TangentVec,
+				endPntTanVec,
 				pathCAMInfo[ nEndIndex ].ABValues.Item1 * Math.PI / 180,
 				pathCAMInfo[ nEndIndex ].ABValues.Item2 * Math.PI / 180 );
 
@@ -727,7 +657,7 @@ namespace MyCAM.CacheInfo
 			return false;
 		}
 
-		void ApplyToolVectorInterpolation( List<CAMPointInfo> camPointInfoList )
+		void ApplyToolVectorInterpolation( List<CAMPointInfo> camPointInfoList, bool isReverse )
 		{
 			if( camPointInfoList == null || camPointInfoList.Count == 0 )
 				return;
@@ -758,7 +688,7 @@ namespace MyCAM.CacheInfo
 				// get start and end index
 				int nStartIndex = interpolateIntervalList[ i ].Item1;
 				int nEndIndex = interpolateIntervalList[ i ].Item2;
-				InterpolateToolVec( nStartIndex, nEndIndex, camPointInfoList );
+				InterpolateToolVec( nStartIndex, nEndIndex, camPointInfoList , isReverse );
 			}
 		}
 
@@ -824,10 +754,6 @@ namespace MyCAM.CacheInfo
 			return new gp_Vec( dir1.XYZ() );
 		}
 
-
-
-
-
 		#endregion
 
 		public bool GetToolVecModify( SegmentPointIndex index, out double dRA_deg, out double dRB_deg )
@@ -842,15 +768,6 @@ namespace MyCAM.CacheInfo
 				dRB_deg = 0;
 				return false;
 			}
-		}
-
-		public HashSet<SegmentPointIndex> GetToolVecModifyIndex()
-		{
-			HashSet<SegmentPointIndex> result = new HashSet<SegmentPointIndex>();
-			foreach( SegmentPointIndex nIndex in m_CraftData.ToolVecModifyMap.Keys ) {
-				result.Add( nIndex );
-			}
-			return result;
 		}
 
 		void SetCraftDataDirty()

@@ -17,7 +17,7 @@ namespace MyCAM.Helper
 
 			// get path segments
 			ncPackage.LeadInSegment = CloneSegmentList( contourCacheInfo.LeadInSegment );
-			ncPackage.MainPathSegment = BuildMainPathSegment( contourCacheInfo );
+			ncPackage.MainPathSegment = CloneSegmentList( contourCacheInfo.CAMSegmentList );
 			ncPackage.LeadOutSegment = CloneSegmentList( contourCacheInfo.LeadOutSegment );
 			ncPackage.OverCutSegment = CloneSegmentList( contourCacheInfo.OverCutSegment );
 			ncPackage.CtrlSegIdx = new List<int>( contourCacheInfo.CtrlToolSegIdxList);
@@ -39,15 +39,6 @@ namespace MyCAM.Helper
 		static List<ICAMSegment> CloneSegmentList( List<ICAMSegment> segmentList )
 		{
 			return segmentList?.Select( segment => segment.Clone() ).ToList() ?? new List<ICAMSegment>();
-		}
-
-		static List<ICAMSegment> BuildMainPathSegment( ContourCacheInfo contourCacheInfo )
-		{
-			if ( contourCacheInfo.CAMSegmentList == null || contourCacheInfo.CAMSegmentList.Count == 0 ) {
-				return new List<ICAMSegment>();
-			}
-			var clonedSegments = CloneSegmentList( contourCacheInfo.CAMSegmentList );
-			return clonedSegments;
 		}
 
 		static void SetProcessPoints( PathNCPackage ncPackage, ContourCacheInfo contourCacheInfo )
