@@ -1,6 +1,5 @@
 ﻿using MyCAM.Data;
 using MyCAM.Helper;
-using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -115,10 +114,10 @@ namespace MyCAM.Post
 			return result;
 		}
 
-		static List<ISegmentPostData> BuildPostSegmentsWithFixedRotation( List<ICAMSegment> camSegmentList, List<int> isModifySegIdx, double dMaster, double dSlave )
+		static List<ISegmentPostData> BuildPostSegmentsWithFixedRotation( List<ICAMSegment> camSegmentList, double dMaster, double dSlave )
 		{
 			List<ISegmentPostData> segmentPostData = new List<ISegmentPostData>();
-			if ( camSegmentList == null || camSegmentList.Count == 0 ) {
+			if( camSegmentList == null || camSegmentList.Count == 0 ) {
 				return segmentPostData;
 			}
 			for( int i = 0; i < camSegmentList.Count; i++ ) {
@@ -140,8 +139,7 @@ namespace MyCAM.Post
 					};
 					postPointList.Add( postList );
 				}
-				bool isModify = isModifySegIdx.Contains( i );
-				ISegmentPostData segment = CreateSegmentPostData( camSegment, postPointList, isModify );
+				ISegmentPostData segment = CreateSegmentPostData( camSegment, postPointList, false );
 				segmentPostData.Add( segment );
 			}
 			return segmentPostData;
@@ -367,16 +365,8 @@ namespace MyCAM.Post
 			if( pathNCPacke.LeadInSegment.Count > 0 ) {
 
 				List<int> defaultSegModifyStatus = new List<int>();
-
-				// last pnt is ctrl pnt
-				if( pathNCPacke.CtrlSegIdx.Contains( pathNCPacke.MainPathSegment.Count - 1 ) ) {
-					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadInSegment.Count, true );
-				}
-				else {
-					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadInSegment.Count, false );
-				}
 				List<ISegmentPostData> leadInPostData = BuildPostSegmentsWithFixedRotation(
-					pathNCPacke.LeadInSegment, defaultSegModifyStatus,
+					pathNCPacke.LeadInSegment,
 					mainG54.First().StartPoint.Master,
 					mainG54.First().StartPoint.Slave );
 				pathG54PostData.LeadInPostPath.AddRange( leadInPostData );
@@ -390,16 +380,8 @@ namespace MyCAM.Post
 			// lead-out with fixed rotation based on main path end
 			if( pathNCPacke.LeadOutSegment.Count > 0 ) {
 				List<int> defaultSegModifyStatus = new List<int>();
-
-				// last pnt is ctrl pnt
-				if( pathNCPacke.CtrlSegIdx.Contains( pathNCPacke.MainPathSegment.Count - 1 ) ) {
-					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadOutSegment.Count, true );
-				}
-				else {
-					defaultSegModifyStatus = CreateDefaultSegmentModifyList( pathNCPacke.LeadOutSegment.Count, false );
-				}
 				List<ISegmentPostData> leadOutPostData = BuildPostSegmentsWithFixedRotation(
-					pathNCPacke.LeadOutSegment, defaultSegModifyStatus,
+					pathNCPacke.LeadOutSegment,
 					mainG54.Last().EndPoint.Master,
 					mainG54.Last().EndPoint.Slave );
 				pathG54PostData.LeadOutPostPath.AddRange( leadOutPostData );
@@ -553,14 +535,14 @@ namespace MyCAM.Post
 							out List<ISegmentPostData> segmentPostData )
 		{
 			segmentPostData = new List<ISegmentPostData>();
-			if( segmentList == null || segmentList.Count == 0 || CtrlSegIdx == null) {
+			if( segmentList == null || segmentList.Count == 0 || CtrlSegIdx == null ) {
 				return false;
 			}
 			for( int i = 0; i < segmentList.Count; i++ ) {
 				List<CAMPoint2> pointList = segmentList[ i ].CAMPointList;
 
 				// create post points form each cam point
-				List<PostPoint> postPointList = CreateSegmentPostPoint( postSolver, pointList, ref dLastProcessPathM, ref dLastProcessPathS, CtrlSegIdx.Contains(i) );
+				List<PostPoint> postPointList = CreateSegmentPostPoint( postSolver, pointList, ref dLastProcessPathM, ref dLastProcessPathS, CtrlSegIdx.Contains( i ) );
 				if( postPointList == null ) {
 					return false;
 				}
