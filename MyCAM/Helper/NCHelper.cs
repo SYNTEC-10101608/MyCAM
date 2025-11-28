@@ -20,6 +20,7 @@ namespace MyCAM.Helper
 			ncPackage.MainPathSegment = BuildMainPathSegment( contourCacheInfo );
 			ncPackage.LeadOutSegment = CloneSegmentList( contourCacheInfo.LeadOutSegment );
 			ncPackage.OverCutSegment = CloneSegmentList( contourCacheInfo.OverCutSegment );
+			ncPackage.CtrlSegIdx = new List<int>( contourCacheInfo.CtrlToolSegIdxList);
 
 			// set process points and traverse data
 			SetProcessPoints( ncPackage, contourCacheInfo );

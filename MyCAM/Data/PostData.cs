@@ -325,6 +325,11 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		public List<int> CtrlSegIdx
+		{
+			get; set;
+		}
+
 		public List<ICAMSegment> OverCutSegment
 		{
 			get; set;

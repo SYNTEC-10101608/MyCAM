@@ -99,7 +99,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return new List<CADPoint>( m_PointList );
+				return  m_PointList;
 			}
 		}
 
@@ -245,12 +245,6 @@ namespace MyCAM.Data
 			get;
 		}
 
-		bool IsModify
-		{
-			get;
-			set;
-		}
-
 		double TotalLength
 		{
 			get;
@@ -337,18 +331,6 @@ namespace MyCAM.Data
 				if( value != null ) {
 					m_CAMPointList = value;
 				}
-			}
-		}
-
-		bool ICAMSegment.IsModify
-		{
-			get
-			{
-				return m_isModifySegment;
-			}
-			set
-			{
-				m_isModifySegment = value;
 			}
 		}
 
