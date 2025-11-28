@@ -328,8 +328,11 @@ namespace MyCAM.Data
 
 		public virtual List<CAMPoint2> CAMPointList
 		{
-			get => m_CAMPointList.Select( p => p.Clone() ).ToList();
-			private set
+			get
+			{
+				return m_CAMPointList;
+			}
+			set
 			{
 				if( value != null ) {
 					m_CAMPointList = value;

@@ -497,7 +497,7 @@ namespace MyCAM.Editor
 			// stop current action
 			EndActionIfNotDefault();
 			NCWriter writer = new NCWriter( m_DataManager );
-			bool bSuccess = writer.ConvertSuccess( out string szErrorMessage , false, true);
+			bool bSuccess = writer.ConvertSuccess( out string szErrorMessage, false, true );
 			if( bSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提示]成功轉出NC", MyApp.NoticeType.Hint );
 			}
@@ -618,12 +618,15 @@ namespace MyCAM.Editor
 
 		void ShowToolVec( List<string> pathIDList )
 		{
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
 			RomoveToolVec( pathIDList );
 
 			// no need to show
 			if( m_ShowToolVec == false ) {
 				return;
 			}
+	
 			// build tool vec
 			foreach( string szPathID in pathIDList ) {
 				if( GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) == false || cacheInfo.PathType != PathType.Contour ) {
@@ -632,12 +635,17 @@ namespace MyCAM.Editor
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
 				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
-			
+				if ( contourCacheInfo.CAMSegmentList == null || contourCacheInfo.CAMSegmentList.Count == 0 ) {
+					continue;
+				}
+
 				// each segment in this path
 				for( int i = 0; i < contourCacheInfo.CAMSegmentList.Count; i++ ) {
-					
+					if( contourCacheInfo.CAMSegmentList[ i ].CAMPointList== null || contourCacheInfo.CAMSegmentList[ i ].CAMPointList.Count == 0 ) {
+						continue;
+					}
 						// each point
-						for (int j  = 1; j< contourCacheInfo.CAMSegmentList[i].CAMPointList.Count; j++ ) {
+						for (int j  = 1; j< contourCacheInfo.CAMSegmentList[ i ].CAMPointList.Count; j++ ) {
 							AIS_Line pointToolVecAIS = GetVecAIS( contourCacheInfo.CAMSegmentList[i].CAMPointList[j].Point, contourCacheInfo.CAMSegmentList[i].CAMPointList[j].ToolVec, EvecType.ToolVec );
 							toolVecAISList.Add( pointToolVecAIS );
 							if ( j == contourCacheInfo.CAMSegmentList[i].CAMPointList.Count - 1  && contourCacheInfo.CtrlToolSegIdxList.Contains( i ) ) { 
@@ -645,7 +653,6 @@ namespace MyCAM.Editor
 								pointToolVecAIS.SetWidth( 4 );
 							}
 						}
-					
 				}
 			}
 
@@ -695,6 +702,9 @@ namespace MyCAM.Editor
 
 				// lead in
 				if( leadData.LeadIn.Type != LeadLineType.None ) {
+					if ( contourCacheInfo.CAMSegmentList == null ||contourCacheInfo.CAMSegmentList.Count == 0 ) {
+						continue;
+					}
 					leadInCurve = LeadHelper.BuildLeadGeom( true, leadData.LeadIn.Type, contourCacheInfo.CAMSegmentList.First().StartPoint, leadData.LeadIn.Length, leadData.LeadIn.Angle, leadData.IsChangeLeadDirection, contourCacheInfo.GetPathIsReverse(), out gp_Pnt leadEndPnt, out _, out gp_Dir leadDir );
 					if( leadInCurve == null ) {
 						continue;
@@ -712,6 +722,9 @@ namespace MyCAM.Editor
 						overCutConnectwtih = contourCacheInfo.OverCutSegment.Last().EndPoint;
 					}
 					else {
+						if ( contourCacheInfo.CAMSegmentList == null || contourCacheInfo.CAMSegmentList.Count == 0 ) {
+							continue;
+						}
 						overCutConnectwtih = contourCacheInfo.CAMSegmentList.Last().EndPoint;
 					}
 					leadOutCurve = LeadHelper.BuildLeadGeom( false, leadData.LeadOut.Type, overCutConnectwtih, leadData.LeadOut.Length, leadData.LeadOut.Angle, leadData.IsChangeLeadDirection, contourCacheInfo.GetPathIsReverse(), out gp_Pnt leadEndPnt, out _, out gp_Dir leadDir );
@@ -779,6 +792,9 @@ namespace MyCAM.Editor
 					continue;
 				}
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
+				if ( contourCacheInfo.CAMSegmentList == null || contourCacheInfo.CAMSegmentList.Count == 0 ) {
+					continue;
+				}
 				gp_Pnt showPoint = contourCacheInfo.CAMSegmentList.First().StartPoint.Point;
 				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMSegmentList.First().StartPoint.TangentVec.XYZ() );
 				if( contourCacheInfo.GetPathIsReverse() ) {

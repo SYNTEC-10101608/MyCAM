@@ -42,6 +42,9 @@ namespace MyCAM.Helper
 
 		static List<ICAMSegment> BuildMainPathSegment( ContourCacheInfo contourCacheInfo )
 		{
+			if ( contourCacheInfo.CAMSegmentList == null || contourCacheInfo.CAMSegmentList.Count == 0 ) {
+				return new List<ICAMSegment>();
+			}
 			var clonedSegments = CloneSegmentList( contourCacheInfo.CAMSegmentList );
 			return contourCacheInfo.GetPathIsReverse() ? ReverseSegment( clonedSegments ) : clonedSegments;
 		}

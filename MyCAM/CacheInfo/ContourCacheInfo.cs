@@ -133,6 +133,9 @@ namespace MyCAM.CacheInfo
 				camSegmentConnectWithStartPnt = LeadInSegment.First();
 			}
 			else {
+				if ( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+					return null;
+				}
 				camSegmentConnectWithStartPnt = CAMSegmentList.First(); ;
 			}
 			CAMPoint2 camPoint2 = camSegmentConnectWithStartPnt.StartPoint;
@@ -158,6 +161,9 @@ namespace MyCAM.CacheInfo
 					camSegmentConnectWithEndPnt = m_OverCutSegmentList.Last();
 				}
 				else {
+					if ( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+						return null;
+					}
 					camSegmentConnectWithEndPnt = CAMSegmentList.Last();
 				}
 			}
@@ -270,6 +276,8 @@ namespace MyCAM.CacheInfo
 
 		void BuildPathCAMSegment()
 		{
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
 			m_IsCraftDataDirty = false;
 
 			// Step 1: Collect all cad point
@@ -285,6 +293,8 @@ namespace MyCAM.CacheInfo
 			}
 			CAMSegmentList = PathCAMSegList;
 			CtrlToolSegIdxList = CtrlSegIdx;
+			sw.Stop();
+			Console.WriteLine( $"耗時2: {sw.ElapsedMilliseconds} ms" );
 		}
 
 		bool ReBuildCAMSegment( List<CAMPointInfo> pathCAMInfo, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx )
@@ -368,7 +378,11 @@ namespace MyCAM.CacheInfo
 			return intervalList;
 		}
 
-
+		// double cam point case 
+		// 1. frist segment first pnt
+		// 2. start pnt
+		// 3. overlap area pnt
+		// 4. ctrl pnt
 		List<CAMPointInfo> FlattenCADSegmentsToCAMPointInfo()
 		{
 			List<CAMPointInfo> result = new List<CAMPointInfo>();
@@ -387,10 +401,34 @@ namespace MyCAM.CacheInfo
 
 					// conver this cad point
 					CAMPoint2 camPoint = ConvertCADPointToCAMPoint2( cadPoint );
-					bool isOverlapPoint = ( pntIdx == 0 && result.Count > 0 );
+					bool isFistSegFirstPnt = ( pntIdx == 0 && segIdx == 0 );
+					bool isOverlapPnt = ( pntIdx == 0 && result.Count > 0 );
 
-					// case A : overlap point
-					if( isOverlapPoint ) {
+					// case A : fist seg first pnt
+					if( isFistSegFirstPnt ) {
+
+						// Step 1: create new CAMPointInfo
+						CAMPointInfo currentInfo = new CAMPointInfo( camPoint );
+
+						// first seg first pnt will be break pnt (this point2 is for next segment start point)
+						currentInfo.Point2 = camPoint.Clone();
+
+						// Step 2: check property
+						bool isStartPoint = startPointIndex.Equals( currentPointIndex );
+						if( isStartPoint ) {
+							currentInfo.IsStartPnt = true;
+						}
+						bool isControlPoint = toolVecModifyMap.ContainsKey( currentPointIndex );
+						if( isControlPoint ) {
+							currentInfo.IsCtrlPnt = true;
+							currentInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
+						}
+						currentInfo.DistanceToNext = cadSegment.PerChordLength;
+						result.Add( currentInfo );
+					}
+
+					// case B : overlap point
+					else if( isOverlapPnt ) {
 
 						// Step 1: get and set at last pointinfo , do not need to create new one
 						CAMPointInfo lastPointInfo = result[ result.Count - 1 ];
@@ -407,10 +445,10 @@ namespace MyCAM.CacheInfo
 							lastPointInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
 						}
 						// Step 3: calculate distance to next point
-						lastPointInfo.DistanceToNext = CalDistanceToNext( segIdx, pntIdx, CADSegmentList );
+						lastPointInfo.DistanceToNext = cadSegment.PerChordLength;
 					}
 
-					// Case B : not overlap point
+					// Case C : not overlap point
 					else {
 
 						// Step 1: create new CAMPointInfo
@@ -420,18 +458,28 @@ namespace MyCAM.CacheInfo
 						bool isStartPoint = startPointIndex.Equals( currentPointIndex );
 						if( isStartPoint ) {
 							currentInfo.IsStartPnt = true;
+
+							// start pnt will be break pnt (this point2 is for next segment start point)
+							currentInfo.Point2 = camPoint.Clone();
 						}
 						bool isControlPoint = toolVecModifyMap.ContainsKey( currentPointIndex );
 						if( isControlPoint ) {
 							currentInfo.IsCtrlPnt = true;
 							currentInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
 
-							// this point2 is for next segment start point
+							// ctrl pnt will be break pnt (this point2 is for next segment start point)
 							currentInfo.Point2 = camPoint.Clone();
 						}
 
-						// Step 3: calculate distance to next point  
-						currentInfo.DistanceToNext = CalDistanceToNext( segIdx, pntIdx, CADSegmentList );
+						// Step 3: calculate distance to next point
+						if( pntIdx == pointList.Count - 1 ) {
+
+							// it is a segment last pnt
+							currentInfo.DistanceToNext = 0;
+						}
+						else {
+							currentInfo.DistanceToNext = cadSegment.PerChordLength;
+						}
 						result.Add( currentInfo );
 					}
 				}
@@ -445,9 +493,9 @@ namespace MyCAM.CacheInfo
 				// remove last point
 				result.RemoveAt( result.Count - 1 );
 
-				// put last point info to first point - point2
+				// put last point info to first point - point
 				CAMPointInfo firstPointInfo = result[ 0 ];
-				firstPointInfo.Point2 = lastCAMPoint;
+				firstPointInfo.Point = lastCAMPoint;
 
 				// if last point with property set it to first point
 				if( lastCAMInfo.IsStartPnt ) {
@@ -459,49 +507,6 @@ namespace MyCAM.CacheInfo
 				}
 			}
 			return result;
-		}
-
-		double CalDistanceToNext( int segIdx, int pntIdx, IReadOnlyList<ICADSegment> cadSegment )
-		{
-			CADPoint currentPnt = cadSegment[ segIdx ].PointList[ pntIdx ];
-
-			// check is last point in segment
-			if( pntIdx == cadSegment[ segIdx ].PointList.Count - 1 ) {
-
-				// is not last segment
-				if( segIdx < cadSegment.Count - 1 ) {
-
-					// has next segment, calculate to next segment first point
-					ICADSegment nextSegment = cadSegment[ segIdx + 1 ];
-					if( nextSegment.PointList != null && nextSegment.PointList.Count > 0 ) {
-						CADPoint nextPnt = nextSegment.StartPoint;
-						double distance = currentPnt.Point.Distance( nextPnt.Point );
-
-						// due to segment point overlap, this distance should be close to 0
-						return distance;
-					}
-				}
-
-				else if( IsClosed ) {
-
-					// closed path and is last segment last point, calculate to first segment first point
-					if( cadSegment.Count > 0 && cadSegment[ 0 ].PointList.Count > 0 ) {
-						CADPoint firstPnt = cadSegment[ 0 ].StartPoint;
-						double distance = currentPnt.Point.Distance( firstPnt.Point );
-						return distance;
-					}
-				}
-
-				// unclose path last point, distance is 0
-				return 0.0;
-			}
-
-			// not last point in segment
-			else {
-				// point in segment, calculate to next point in same segment
-				CADPoint nextPnt = cadSegment[ segIdx ].PointList[ pntIdx + 1 ];
-				return currentPnt.Point.Distance( nextPnt.Point );
-			}
 		}
 
 		CAMPoint2 ConvertCADPointToCAMPoint2( CADPoint cadPoint )
@@ -550,13 +555,12 @@ namespace MyCAM.CacheInfo
 						if( isGetDone == false ) {
 							return false;
 						}
-
-						// for record on CtrlSegIdx
-						currentSegmentIdx = camSegmentList.Count;
 						ICAMSegment camSegment = BuildCAMSegmentFromCAMPointInfo( currentSegmentPoints, segmentType );
 						if( camSegment == null ) {
 							return false;
 						}
+						// for record on CtrlSegIdx
+						currentSegmentIdx = camSegmentList.Count;
 						if( camPntList[ i ].IsCtrlPnt ) {
 							CtrlSegIdx.Add( currentSegmentIdx );
 						}
@@ -594,15 +598,24 @@ namespace MyCAM.CacheInfo
 			for( int i = nStartPntIndx; i < camPntList.Count; i++ ) {
 				CAMPointInfo currentPointInfo = camPntList[ i ];
 
-				// start point may at overlap area
-				if( i == nStartPntIndx && currentPointInfo.Point2 != null ) {
-					currentSegmentPoints.Add( currentPointInfo.Point2 );
+				// start point is special case
+				if( i == nStartPntIndx ) {
+
+					// any segment to build start with point2
+					if( currentPointInfo.Point2 != null ) {
+						currentSegmentPoints.Add( currentPointInfo.Point2 );
+					}
+
+					// start point caminfo need have two pnt
+					else {
+						return false;
+					}
 				}
 				else {
 					currentSegmentPoints.Add( currentPointInfo.Point );
 				}
 
-				// check special case
+				// check special case (break pnt)
 				bool isSplitPoint = currentPointInfo.Point2 != null && i != nStartPntIndx;
 				bool isLastPoint = i == camPntList.Count - 1;
 
@@ -610,8 +623,9 @@ namespace MyCAM.CacheInfo
 
 					// it is close path last pnt
 					if( isLastPoint && IsClosed ) {
+
 						// add point back : real end pnt is first segment index[0]
-						currentSegmentPoints.Add( camPntList[ 0 ].Point2 );
+						currentSegmentPoints.Add( camPntList[ 0 ].Point );
 					}
 
 					// build cam segment
@@ -621,19 +635,21 @@ namespace MyCAM.CacheInfo
 							return false;
 						}
 						ICAMSegment camSegment = BuildCAMSegmentFromCAMPointInfo( currentSegmentPoints, segmentType );
-
-						// for CtrlSegIdx to record
-						currentSegmentIdx = camSegmentList.Count;
 						if( camSegment == null ) {
 							return false;
 						}
+
+						// for CtrlSegIdx to record
+						currentSegmentIdx = camSegmentList.Count;
+
+						// segment end not with isCtrlPnt means it is normal overlap
 						if( camPntList[ i ].IsCtrlPnt ) {
 							CtrlSegIdx.Add( currentSegmentIdx );
 						}
 						camSegmentList.Add( camSegment );
 					}
 
-					// is not last pnt, prepare new pnt for next segment
+					// is not last pnt, prepare new pnt for next segment (every segment start with point2)
 					if( !isLastPoint ) {
 
 						// reset
@@ -644,7 +660,6 @@ namespace MyCAM.CacheInfo
 					}
 				}
 			}
-
 			return true;
 		}
 
@@ -889,6 +904,9 @@ namespace MyCAM.CacheInfo
 		void SetLead()
 		{
 			if( m_CraftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
+				if ( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+					return;
+				}
 				ICAMSegment camSegmentConnectWithStartPnt = CAMSegmentList.FirstOrDefault();
 				List<ICAMSegment> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithStartPnt, true );
 				m_LeadInSegmentList = leadCAMSegment;
@@ -900,6 +918,9 @@ namespace MyCAM.CacheInfo
 					camSegmentConnectWithEndPnt = m_OverCutSegmentList.Last();
 				}
 				else {
+					if ( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+						return;
+					}
 					camSegmentConnectWithEndPnt = CAMSegmentList.Last();
 				}
 				List<ICAMSegment> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithEndPnt, false );
