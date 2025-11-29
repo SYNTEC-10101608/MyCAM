@@ -117,6 +117,7 @@
     <Compile Include="FileManager\MachineDataDTO.cs" />
     <Compile Include="Helper\LeadHelper.cs" />
     <Compile Include="FileManager\DataManagerDTO.cs" />
+    <Compile Include="Helper\VectorInterpolateHelper.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
     <Compile Include="Editor\Action\CAM\SelectFaceAction.cs" />
