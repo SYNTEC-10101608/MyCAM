@@ -7,7 +7,7 @@ namespace MyCAM.Helper
 {
 	public interface IToolVecCAMPointInfo
 	{
-		bool IsToolVecdPnt
+		bool IsToolVecPnt
 		{
 			get;
 		}
@@ -21,7 +21,6 @@ namespace MyCAM.Helper
 		}
 		gp_Dir ToolVec
 		{
-			get;
 			set;
 		}
 		Tuple<double, double> ABValues
@@ -49,18 +48,21 @@ namespace MyCAM.Helper
 
 		public gp_Dir ToolVec
 		{
-			get
-			{
-				return m_ToolVec;
-			}
 			set
 			{
-				m_ToolVec = value;
-				SetToolVec( value );
+				if( value == null ) {
+					return;
+				}
+				if( Point != null ) {
+					Point.ToolVec = new gp_Dir( value.XYZ() );
+				}
+				if( SharingPoint != null ) {
+					SharingPoint.ToolVec = new gp_Dir( value.XYZ() );
+				}
 			}
 		}
 
-		public bool IsToolVecdPnt
+		public bool IsToolVecPnt
 		{
 			get; set;
 		} = false;
@@ -85,26 +87,11 @@ namespace MyCAM.Helper
 		{
 			Point = point;
 			SharingPoint = null;
-			IsToolVecdPnt = false;
+			IsToolVecPnt = false;
 			IsStartPnt = false;
 			ABValues = null;
 			DistanceToNext = 0;
 		}
-
-		void SetToolVec( gp_Dir dir )
-		{
-			if( dir == null ) {
-				return;
-			}
-			if( Point != null ) {
-				Point.ToolVec = dir;
-			}
-			if( SharingPoint != null ) {
-				SharingPoint.ToolVec = dir;
-			}
-		}
-
-		gp_Dir m_ToolVec;
 	}
 
 	public class CAMPrestageHelper
@@ -150,7 +137,7 @@ namespace MyCAM.Helper
 						}
 						bool isControlPoint = toolVecModifyMap.ContainsKey( currentPointIndex );
 						if( isControlPoint ) {
-							currentInfo.IsToolVecdPnt = true;
+							currentInfo.IsToolVecPnt = true;
 							currentInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
 						}
 
@@ -171,7 +158,7 @@ namespace MyCAM.Helper
 							lastPointInfo.IsStartPnt = true;
 						}
 						if( isControlPoint ) {
-							lastPointInfo.IsToolVecdPnt = true;
+							lastPointInfo.IsToolVecPnt = true;
 							lastPointInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
 						}
 
@@ -191,7 +178,7 @@ namespace MyCAM.Helper
 						}
 						bool isControlPoint = toolVecModifyMap.ContainsKey( currentPointIndex );
 						if( isControlPoint ) {
-							currentInfo.IsToolVecdPnt = true;
+							currentInfo.IsToolVecPnt = true;
 							currentInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
 							currentInfo.SharingPoint = camPoint.Clone();
 						}
@@ -228,8 +215,8 @@ namespace MyCAM.Helper
 				if( lastCAMInfo.IsStartPnt ) {
 					firstPointInfo.IsStartPnt = true;
 				}
-				if( lastCAMInfo.IsToolVecdPnt ) {
-					firstPointInfo.IsToolVecdPnt = true;
+				if( lastCAMInfo.IsToolVecPnt ) {
+					firstPointInfo.IsToolVecPnt = true;
 					firstPointInfo.ABValues = lastCAMInfo.ABValues;
 				}
 				// the distance to next is seted in the loop already

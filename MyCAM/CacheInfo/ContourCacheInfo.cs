@@ -304,7 +304,7 @@ namespace MyCAM.CacheInfo
 						}
 						// for record on CtrlSegIdx
 						currentSegmentIdx++;
-						if( camPntList[ i ].IsToolVecdPnt ) {
+						if( camPntList[ i ].IsToolVecPnt ) {
 							CtrlSegIdx.Add( currentSegmentIdx );
 						}
 						camSegmentList.Add( camSegment );
@@ -385,7 +385,7 @@ namespace MyCAM.CacheInfo
 						currentSegmentIdx = camSegmentList.Count;
 
 						// segment end not with isCtrlPnt means it is normal overlap
-						if( camPntList[ i ].IsToolVecdPnt ) {
+						if( camPntList[ i ].IsToolVecPnt ) {
 							CtrlSegIdx.Add( currentSegmentIdx );
 						}
 						camSegmentList.Add( camSegment );
