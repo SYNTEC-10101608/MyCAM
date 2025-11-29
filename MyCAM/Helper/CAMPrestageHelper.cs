@@ -15,10 +15,6 @@ namespace MyCAM.Helper
 		{
 			get;
 		}
-		CAMPoint2 SharingPoint
-		{
-			get;
-		}
 		gp_Dir ToolVec
 		{
 			set;
