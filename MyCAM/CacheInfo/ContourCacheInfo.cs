@@ -167,6 +167,20 @@ namespace MyCAM.CacheInfo
 			return camPoint;
 		}
 
+		public bool GetToolVecModify( SegmentPointIndex index, out double dRA_deg, out double dRB_deg )
+		{
+			if( m_CraftData.ToolVecModifyMap.ContainsKey( index ) ) {
+				dRA_deg = m_CraftData.ToolVecModifyMap[ index ].Item1;
+				dRB_deg = m_CraftData.ToolVecModifyMap[ index ].Item2;
+				return true;
+			}
+			else {
+				dRA_deg = 0;
+				dRB_deg = 0;
+				return false;
+			}
+		}
+
 		public bool GetPathIsReverse()
 		{
 			return m_CraftData.IsReverse;
@@ -196,16 +210,17 @@ namespace MyCAM.CacheInfo
 			m_IsCraftDataDirty = false;
 
 			// Step 1: Collect all cad point
-			List<CAMPointInfo> pathCAMInfo = CAMPrestageHelper.FlattenCADSegmentsToCAMPointInfo( m_CADSegmentList, m_CraftData, IsClosed );
+			List<CAMPointInfo> pathCAMInfoList = CAMPrestageHelper.FlattenCADSegmentsToCAMPointInfo( m_CADSegmentList, m_CraftData, IsClosed );
 			if( m_CraftData.IsReverse ) {
-				ReverseCAMInfo( ref pathCAMInfo );
+				ReverseCAMInfo( ref pathCAMInfoList );
 			}
 
 			// Step 2: Do interpolation
-			ToolVectorHelper.CalculateToolVector( pathCAMInfo, m_CraftData.IsToolVecReverse, m_CraftData.IsReverse, IsClosed );
+			List<IToolVecCAMPointInfo> toolVecInfoList = pathCAMInfoList.Cast<IToolVecCAMPointInfo>().ToList();
+			ToolVectorHelper.CalculateToolVector( ref toolVecInfoList, m_CraftData.IsToolVecReverse, m_CraftData.IsReverse, IsClosed );
 
 			// Step 3: use caminfo to build cam segment
-			bool isBuildDone = ReBuildCAMSegment( pathCAMInfo, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx );
+			bool isBuildDone = ReBuildCAMSegment( pathCAMInfoList, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx );
 			if( isBuildDone == false ) {
 				return;
 			}
@@ -289,7 +304,7 @@ namespace MyCAM.CacheInfo
 						}
 						// for record on CtrlSegIdx
 						currentSegmentIdx++;
-						if( camPntList[ i ].IsCtrlPnt ) {
+						if( camPntList[ i ].IsToolVecdPnt ) {
 							CtrlSegIdx.Add( currentSegmentIdx );
 						}
 						camSegmentList.Add( camSegment );
@@ -370,7 +385,7 @@ namespace MyCAM.CacheInfo
 						currentSegmentIdx = camSegmentList.Count;
 
 						// segment end not with isCtrlPnt means it is normal overlap
-						if( camPntList[ i ].IsCtrlPnt ) {
+						if( camPntList[ i ].IsToolVecdPnt ) {
 							CtrlSegIdx.Add( currentSegmentIdx );
 						}
 						camSegmentList.Add( camSegment );

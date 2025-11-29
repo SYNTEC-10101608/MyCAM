@@ -1,5 +1,4 @@
-﻿using MyCAM.Data;
-using OCC.gp;
+﻿using OCC.gp;
 using System;
 using System.Collections.Generic;
 
@@ -7,15 +6,16 @@ namespace MyCAM.Helper
 {
 	internal class ToolVectorHelper
 	{
-		public static void CalculateToolVector( List<CAMPointInfo> camPointInfoList, bool isToolVecReverse, bool isReverse, bool isClosed )
+		public static void CalculateToolVector( ref List<IToolVecCAMPointInfo> camPointInfoList, bool isToolVecReverse, bool isReverse, bool isClosed )
 		{
-			if( camPointInfoList == null || camPointInfoList.Count == 0 )
+			if( camPointInfoList == null || camPointInfoList.Count == 0 ) {
 				return;
+			}
 
 			// find all ctrl pnt
 			List<int> ctrlPntIdx = new List<int>();
 			for( int i = 0; i < camPointInfoList.Count; i++ ) {
-				if( camPointInfoList[ i ].IsCtrlPnt ) {
+				if( camPointInfoList[ i ].IsToolVecdPnt ) {
 					ctrlPntIdx.Add( i );
 				}
 			}
@@ -42,7 +42,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static void InterpolateToolVec( int nStartIndex, int nEndIndex, List<CAMPointInfo> pathCAMInfo, bool isReverse )
+		static void InterpolateToolVec( int nStartIndex, int nEndIndex, List<IToolVecCAMPointInfo> pathCAMInfo, bool isReverse )
 		{
 			// consider wrapped
 			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + pathCAMInfo.Count : nEndIndex;
@@ -108,7 +108,7 @@ namespace MyCAM.Helper
 			return intervalList;
 		}
 
-		static void ApplySpecifiedVec( List<CAMPointInfo> pointInfoList, int nSpecifiedIdx, bool isToolVecReverse )
+		static void ApplySpecifiedVec( List<IToolVecCAMPointInfo> pointInfoList, int nSpecifiedIdx, bool isToolVecReverse )
 		{
 			gp_Vec SpecifiedVec = CalCtrlPntToolVec( pointInfoList[ nSpecifiedIdx ], isToolVecReverse );
 
@@ -120,9 +120,9 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static gp_Vec CalCtrlPntToolVec( CAMPointInfo controlBar, bool isToolVecReverse )
+		static gp_Vec CalCtrlPntToolVec( IToolVecCAMPointInfo controlBar, bool isToolVecReverse )
 		{
-			if( !controlBar.IsCtrlPnt || controlBar.ABValues == null )
+			if( !controlBar.IsToolVecdPnt || controlBar.ABValues == null )
 				return null;
 
 			var abValues = controlBar.ABValues;
