@@ -198,20 +198,30 @@ namespace MyCAM.Helper
 			// split this bspline by chord error
 			List<double> dSegmentParamList = ChordErrorSplit( adaptorCurve, dStartU, dEndU );
 			if( dSegmentParamList == null || dSegmentParamList.Count < 2 ) {
-				return BuildCADError.InvalidInputParam;
+				return BuildCADError.InvalidPointCount;
+			}
+
+			// need to consider orientation
+			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				dSegmentParamList.Reverse();
 			}
 			for( int i = 0; i < dSegmentParamList.Count - 1; i++ ) {
 
 				// each part split by equal length
-				double dthisEdgeLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dSegmentParamList[ i ], dSegmentParamList[ i + 1 ] );
-				List<double> thisPartParamList = DiscretizeArcOrLineByLength( dSegmentParamList[ i ], dSegmentParamList[ i + 1 ], DISCRETE_MAX_LENGTH, dthisEdgeLength, out double dSubSegLength );
-				DiscretizedCADData cadSegmentBuildData = new DiscretizedCADData();
-				List<CADPoint> cadPointList = GetCADPointsFromCurveParams( thisPartParamList, edge, shellFace, adaptorCurve );
+				double edgeLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dSegmentParamList[ i ], dSegmentParamList[ i + 1 ] );
+
+				// no need to consider orientation here because the param list has already considered
+				List<double> paramList = DiscretizeArcOrLineByLength( dSegmentParamList[ i ], dSegmentParamList[ i + 1 ], DISCRETE_MAX_LENGTH, edgeLength, out double dSubSegLength );
+				if( paramList.Count < 2 ) {
+					return BuildCADError.InvalidPointCount;
+				}
+				List<CADPoint> cadPointList = GetCADPointsFromCurveParams( paramList, edge, shellFace, adaptorCurve );
 				if( cadPointList.Count < 2 ) {
 					return BuildCADError.InvalidPointCount;
 				}
+				DiscretizedCADData cadSegmentBuildData = new DiscretizedCADData();
 				cadSegmentBuildData.DiscCADPointList = cadPointList;
-				cadSegmentBuildData.SegmentLength = dthisEdgeLength;
+				cadSegmentBuildData.SegmentLength = edgeLength;
 				cadSegmentBuildData.SubSegmentLength = dSubSegLength;
 				cadSegmentBuildData.SubChordLength = cadSegmentBuildData.DiscCADPointList.First().Point.Distance( cadSegmentBuildData.DiscCADPointList[ 1 ].Point );
 				cadSegmentBuildDataList.Add( cadSegmentBuildData );
@@ -227,9 +237,11 @@ namespace MyCAM.Helper
 				return new List<double>();
 			}
 			int nSubSegmentCount = (int)Math.Ceiling( dEdgeLength / dMaxSegmentLength );
-			if( nSubSegmentCount <= 0 ) {
-				dSubSegmentLength = 0.0;
-				return new List<double>();
+
+			// no need to split
+			if( nSubSegmentCount <= 1 ) {
+				dSubSegmentLength = dEdgeLength;
+				return new List<double>() { dStartU, dEndU };
 			}
 
 			// make sure to get odd count of points to get middle of edge for arc
@@ -268,9 +280,7 @@ namespace MyCAM.Helper
 			return segmentParamList;
 		}
 
-
 		// private function area
-		// fix: IsTanVecAdjusted 參數目前沒有使用到，可以考慮移除
 		static List<CADPoint> GetCADPointsFromCurveParams( List<double> segmentParamList, TopoDS_Edge edge, TopoDS_Face shellFace, BRepAdaptor_Curve adC )
 		{
 			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() || adC == null || adC.IsNull() || segmentParamList == null || segmentParamList.Count == 0 ) {
@@ -395,26 +405,8 @@ namespace MyCAM.Helper
 			}
 		}
 
-		public static bool DetermineIfClosed( TopoDS_Shape shapeData )
-		{
-			if( shapeData == null || shapeData.IsNull() ) {
-				return false;
-			}
-			try {
-				TopoDS_Vertex startVertex = new TopoDS_Vertex();
-				TopoDS_Vertex endVertex = new TopoDS_Vertex();
-				TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
-				gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
-				gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
-				return startPoint.IsEqual( endPoint, GEOM_TOLERANCE );
-			}
-			catch {
-				return false;
-			}
-		}
-
-		const double DOUBLE_TOLERANCE = 1e-6;
 		const double GEOM_TOLERANCE = 1e-3;
+		const double DOUBLE_TOLERANCE = 1e-6;
 		const double DISCRETE_MAX_DEFLECTION = 0.01;
 		const double DISCRETE_MAX_LENGTH = 1;
 	}

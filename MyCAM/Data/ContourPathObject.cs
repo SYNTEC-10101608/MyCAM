@@ -1,6 +1,8 @@
 ﻿using MyCAM.CacheInfo;
 using MyCAM.Helper;
+using OCC.BRep;
 using OCC.gp;
+using OCC.TopExp;
 using OCC.TopoDS;
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,7 @@ namespace MyCAM.Data
 			if( pathDataList == null || pathDataList.Count == 0 ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
-			bool isClosed = CADPretreatHelper.DetermineIfClosed( shape );
+			bool isClosed = DetermineIfClosed( shape );
 			BuildCADError isBuildDone = CADPretreatHelper.BuildCADSegment( pathDataList, out List<ICADSegment> cadSegList );
 			if( isBuildDone != BuildCADError.Done || cadSegList == null || cadSegList.Count == 0 ) {
 				throw new Exception( "ContourPathObject CAD segment build failed" );
@@ -33,7 +35,7 @@ namespace MyCAM.Data
 			if( cadSegmentList == null || cadSegmentList.Count == 0 || craftData == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
-			bool isClosed = CADPretreatHelper.DetermineIfClosed( shape );
+			bool isClosed = DetermineIfClosed( shape );
 			m_CADSegmentList = cadSegmentList;
 			m_CraftData = craftData;
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADSegmentList, m_CraftData, isClosed );
@@ -86,6 +88,25 @@ namespace MyCAM.Data
 			m_ContourCacheInfo.Transform();
 		}
 
+		bool DetermineIfClosed( TopoDS_Shape shapeData )
+		{
+			if( shapeData == null || shapeData.IsNull() ) {
+				return false;
+			}
+			try {
+				TopoDS_Vertex startVertex = new TopoDS_Vertex();
+				TopoDS_Vertex endVertex = new TopoDS_Vertex();
+				TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
+				gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
+				gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
+				return startPoint.IsEqual( endPoint, GEOM_TOLERANCE );
+			}
+			catch {
+				return false;
+			}
+		}
+
+		const double GEOM_TOLERANCE = 1e-3;
 		List<ICADSegment> m_CADSegmentList;
 		CraftData m_CraftData;
 		ContourCacheInfo m_ContourCacheInfo;
