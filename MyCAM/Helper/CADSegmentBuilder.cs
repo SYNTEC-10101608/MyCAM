@@ -11,7 +11,7 @@ namespace MyCAM.Helper
 		{
 			cadSegment = null;
 			if( data.DiscCADPointList == null || data.DiscCADPointList.Count < LOWEST_PointsToBuildSegment ) {
-				return BuildCADError.PointCountError;
+				return BuildCADError.InvalidPointCount;
 			}
 			if( contourType == ESegmentType.Line ) {
 				cadSegment = new LineCADSegment( data.DiscCADPointList, data.SegmentLength, data.SubSegmentLength, data.SubChordLength );

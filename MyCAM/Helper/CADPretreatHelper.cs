@@ -14,17 +14,13 @@ using System.Linq;
 
 namespace MyCAM.Helper
 {
-	public enum DiscreteError
-	{
-	}
-
 	public enum BuildCADError
 	{
 		Done,
 		GeomTypeError,
 		AdaptorFaild,
-		ParamError,
-		PointCountError,
+		InvalidInputParam,
+		InvalidPointCount,
 		DiscretizFaild,
 		UnknownSegemntType
 	}
@@ -44,7 +40,7 @@ namespace MyCAM.Helper
 		{
 			cadSegmentList = new List<ICADSegment>();
 			if( pathEdge5DList == null || pathEdge5DList.Count == 0 ) {
-				return BuildCADError.ParamError;
+				return BuildCADError.InvalidInputParam;
 			}
 
 			// go through the contour edges
@@ -107,12 +103,11 @@ namespace MyCAM.Helper
 			return BuildCADError.Done;
 		}
 
-		static BuildCADError DiscretizeLine( TopoDS_Edge lineEdge, TopoDS_Face shellFace, double dMaxSegmentLength, out DiscretizedCADData cadSegBuildData )
+		public static BuildCADError DiscretizeLine( TopoDS_Edge lineEdge, TopoDS_Face shellFace, double dMaxSegmentLength, out DiscretizedCADData cadSegBuildData )
 		{
 			cadSegBuildData = new DiscretizedCADData();
-			// fix: 這裡應該要先做傳入引數的檢查 (其他 function 也檢查一下)
 			if( lineEdge == null || lineEdge.IsNull() || shellFace == null || shellFace.IsNull() || dMaxSegmentLength <= 0 ) {
-				return BuildCADError.ParamError;
+				return BuildCADError.InvalidInputParam;
 			}
 
 			// get curve parameters
@@ -125,7 +120,7 @@ namespace MyCAM.Helper
 			double dEdgeLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dStartU, dEndU );
 			List<double> segmentParamList = DiscretizeArcOrLineByLength( dStartU, dEndU, dMaxSegmentLength, dEdgeLength, out double dSubSegLength );
 			if( segmentParamList.Count < 2 ) {
-				return BuildCADError.ParamError;
+				return BuildCADError.InvalidPointCount;
 			}
 
 			// need to consider orientation
@@ -134,7 +129,7 @@ namespace MyCAM.Helper
 			}
 			List<CADPoint> oneSegmentPointList = GetCADPointsFromCurveParams( segmentParamList, lineEdge, shellFace, adaptorCurve );
 			if( oneSegmentPointList.Count < 2 ) {
-				return BuildCADError.PointCountError;
+				return BuildCADError.InvalidPointCount;
 			}
 			cadSegBuildData.DiscCADPointList = oneSegmentPointList;
 			cadSegBuildData.SegmentLength = dEdgeLength;
@@ -145,12 +140,12 @@ namespace MyCAM.Helper
 			return BuildCADError.Done;
 		}
 
-		static BuildCADError DiscretizeArc( TopoDS_Edge edge, TopoDS_Face shellFace, out List<DiscretizedCADData> cadSegmentBuildData, double maxAngleRad = Math.PI / 2 )
+		public static BuildCADError DiscretizeArc( TopoDS_Edge edge, TopoDS_Face shellFace, out List<DiscretizedCADData> cadSegmentBuildData, double maxAngleRad = Math.PI / 2 )
 		{
 			cadSegmentBuildData = new List<DiscretizedCADData>();
 
 			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() || maxAngleRad <= 0 ) {
-				return BuildCADError.ParamError;
+				return BuildCADError.InvalidInputParam;
 			}
 			if( !GeometryTool.IsCircularArc( edge, out _, out double R, out _, out double angle ) ) {
 				return BuildCADError.GeomTypeError;
@@ -206,11 +201,11 @@ namespace MyCAM.Helper
 			return BuildCADError.Done;
 		}
 
-		static BuildCADError DiscretizeBspline( TopoDS_Edge edge, TopoDS_Face shellFace, out List<DiscretizedCADData> cadSegmentBuildDataList )
+		public static BuildCADError DiscretizeBspline( TopoDS_Edge edge, TopoDS_Face shellFace, out List<DiscretizedCADData> cadSegmentBuildDataList )
 		{
 			cadSegmentBuildDataList = new List<DiscretizedCADData>();
 			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() ) {
-				return BuildCADError.ParamError;
+				return BuildCADError.InvalidInputParam;
 			}
 			BRepAdaptor_Curve adaptorCurve = TryGetAdaptorCurve( edge, shellFace, out double dStartU, out double dEndU );
 
@@ -223,7 +218,7 @@ namespace MyCAM.Helper
 			// this param has already considered edge orientation
 			List<double> dSegmentParamList = ChordErrorSplit( adaptorCurve, edge, shellFace, dStartU, dEndU );
 			if( dSegmentParamList == null || dSegmentParamList.Count < 2 ) {
-				return BuildCADError.ParamError;
+				return BuildCADError.InvalidInputParam;
 			}
 			for( int i = 0; i < dSegmentParamList.Count - 1; i++ ) {
 
@@ -233,7 +228,7 @@ namespace MyCAM.Helper
 				DiscretizedCADData cadSegmentBuildData = new DiscretizedCADData();
 				List<CADPoint> cadPointList = GetCADPointsFromCurveParams( thisPartParamList, edge, shellFace, adaptorCurve );
 				if( cadPointList.Count < 2 ) {
-					return BuildCADError.PointCountError;
+					return BuildCADError.InvalidPointCount;
 				}
 				cadSegmentBuildData.DiscCADPointList = cadPointList;
 				cadSegmentBuildData.SegmentLength = dthisEdgeLength;
@@ -246,7 +241,7 @@ namespace MyCAM.Helper
 
 		public static List<double> DiscretizeArcOrLineByLength( double dStartU, double dEndU, double dMaxSegmentLength, double dEdgeLength, out double dSubSegmentLength )
 		{
-			if( dMaxSegmentLength <= 0 || dEdgeLength <= 0 || dStartU == dEndU ) {
+			if( dMaxSegmentLength <= 0 || dEdgeLength <= 0 || Math.Abs( dStartU - dEndU ) < CURVE_PARAM_TOLERANCE ) {
 				dSubSegmentLength = 0.0;
 				return new List<double>();
 			}
@@ -255,7 +250,7 @@ namespace MyCAM.Helper
 				dSubSegmentLength = 0.0;
 				return new List<double>();
 			}
-			// fix: 如果要分出中點，段落的數量應該是偶數?
+
 			// make sure to get odd count of points to get middle of edge for arc
 			if( nSubSegmentCount % 2 != 0 ) {
 				nSubSegmentCount += 1;
@@ -330,7 +325,6 @@ namespace MyCAM.Helper
 			catch( Exception ) {
 				return null;
 			}
-
 		}
 
 		static BuildCADError DiscretizeArcToCADBuildData( BRepAdaptor_Curve adaptorCurve, TopoDS_Edge edge, TopoDS_Face shellFace, double dStartU, double dEndU, double maxChordError, double maxSegmentLength, out DiscretizedCADData cadBuildData )
@@ -340,7 +334,7 @@ namespace MyCAM.Helper
 				return BuildCADError.AdaptorFaild;
 			}
 			if( maxChordError <= 0.0 || maxSegmentLength <= 0.0 || edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() ) {
-				return BuildCADError.ParamError;
+				return BuildCADError.InvalidInputParam;
 			}
 			double segmentLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dStartU, dEndU );
 
@@ -354,7 +348,7 @@ namespace MyCAM.Helper
 			List<CADPoint> cadPointList = GetCADPointsFromCurveParams( finalParams, edge, shellFace, adaptorCurve );
 
 			if( cadPointList.Count < 2 ) {
-				return BuildCADError.PointCountError;
+				return BuildCADError.InvalidPointCount;
 			}
 
 			// set back to construct element
@@ -450,6 +444,7 @@ namespace MyCAM.Helper
 			}
 		}
 
+		const double CURVE_PARAM_TOLERANCE = 1e-6;
 		const double GEOM_TOLERANCE = 1e-3;
 		const double DISCRETE_MAX_DEFLECTION = 0.01;
 		const double DISCRETE_MAX_LENGTH = 1;
