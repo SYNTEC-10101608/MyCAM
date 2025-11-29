@@ -1,6 +1,7 @@
 ﻿using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopoDS;
+using System;
 
 namespace MyCAM.Data
 {
@@ -61,6 +62,9 @@ namespace MyCAM.Data
 	{
 		protected PathObject( string szUID, TopoDS_Shape shape )
 		{
+			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() ) {
+				throw new ArgumentNullException( "PathObject constructing argument null" );
+			}
 			UID = szUID;
 			Shape = shape;
 		}
