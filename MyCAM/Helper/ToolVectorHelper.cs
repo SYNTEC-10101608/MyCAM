@@ -1,10 +1,35 @@
-﻿using OCC.gp;
+﻿using MyCAM.Data;
+using OCC.gp;
 using System;
 using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
-	internal class ToolVectorHelper
+	public interface IToolVecCAMPointInfo
+	{
+		bool IsToolVecPnt
+		{
+			get;
+		}
+		CAMPoint2 Point
+		{
+			get;
+		}
+		gp_Dir ToolVec
+		{
+			set;
+		}
+		Tuple<double, double> ABValues
+		{
+			get;
+		}
+		double DistanceToNext
+		{
+			get;
+		}
+	}
+
+	public class ToolVectorHelper
 	{
 		public static void CalculateToolVector( ref List<IToolVecCAMPointInfo> camPointInfoList, bool isToolVecReverse, bool isClosed )
 		{

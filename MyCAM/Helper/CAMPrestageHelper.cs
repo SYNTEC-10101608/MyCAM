@@ -5,30 +5,6 @@ using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
-	public interface IToolVecCAMPointInfo
-	{
-		bool IsToolVecPnt
-		{
-			get;
-		}
-		CAMPoint2 Point
-		{
-			get;
-		}
-		gp_Dir ToolVec
-		{
-			set;
-		}
-		Tuple<double, double> ABValues
-		{
-			get;
-		}
-		double DistanceToNext
-		{
-			get;
-		}
-	}
-
 	public class CAMPointInfo : IToolVecCAMPointInfo
 	{
 		public CAMPoint2 Point
