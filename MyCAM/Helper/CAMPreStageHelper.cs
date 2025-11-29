@@ -66,7 +66,7 @@ namespace MyCAM.Helper
 		}
 	}
 
-	public class CAMPretageHelper
+	public class CAMPreStageHelper
 	{
 		public static List<CAMPointInfo> FlattenCADSegmentsToCAMPointInfo(
 			List<ICADSegment> cadSegmentList, CraftData craftData, bool isClosed )
