@@ -211,13 +211,13 @@ namespace MyCAM.CacheInfo
 
 			// Step 1: Collect all cad point
 			List<CAMPointInfo> pathCAMInfoList = CAMPrestageHelper.FlattenCADSegmentsToCAMPointInfo( m_CADSegmentList, m_CraftData, IsClosed );
-			if( m_CraftData.IsReverse ) {
-				ReverseCAMInfo( ref pathCAMInfoList );
-			}
 
 			// Step 2: Do interpolation
 			List<IToolVecCAMPointInfo> toolVecInfoList = pathCAMInfoList.Cast<IToolVecCAMPointInfo>().ToList();
-			ToolVectorHelper.CalculateToolVector( ref toolVecInfoList, m_CraftData.IsToolVecReverse, m_CraftData.IsReverse, IsClosed );
+			ToolVectorHelper.CalculateToolVector( ref toolVecInfoList, m_CraftData.IsToolVecReverse, IsClosed );
+			if( m_CraftData.IsReverse ) {
+				ReverseCAMInfo( ref pathCAMInfoList );
+			}
 
 			// Step 3: use caminfo to build cam segment
 			bool isBuildDone = ReBuildCAMSegment( pathCAMInfoList, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx );
