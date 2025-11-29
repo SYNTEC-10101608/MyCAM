@@ -5,6 +5,7 @@ namespace MyCAM.Helper
 	internal static class CADSegmentBuilder
 	{
 		const int LOWEST_PointsToBuildSegment = 2;
+		const int LOWEST_PointsToBuildArcSegment = 3;
 
 		public static BuildCADError BuildCADSegment( DiscretizedCADData data, ESegmentType contourType, out ICADSegment cadSegment )
 		{
@@ -19,11 +20,10 @@ namespace MyCAM.Helper
 			if( contourType == ESegmentType.Arc ) {
 
 				// arc is too short, build line instead
-				if( data.DiscCADPointList.Count == LOWEST_PointsToBuildSegment ) {
+				if( data.DiscCADPointList.Count < LOWEST_PointsToBuildArcSegment ) {
 					cadSegment = new LineCADSegment( data.DiscCADPointList, data.SegmentLength, data.SubSegmentLength, data.SubChordLength );
 				}
 				else {
-					// fix: 我記得當時有一個結論，是如果沒有兩點圓弧的話，這個插入工作就不需要了?
 					cadSegment = new ArcCADSegment( data.DiscCADPointList, data.SegmentLength, data.SubSegmentLength, data.SubChordLength );
 				}
 
