@@ -210,7 +210,7 @@ namespace MyCAM.CacheInfo
 			m_IsCraftDataDirty = false;
 
 			// Step 1: Collect all cad point
-			List<CAMPointInfo> pathCAMInfoList = CAMPrestageHelper.FlattenCADSegmentsToCAMPointInfo( m_CADSegmentList, m_CraftData, IsClosed );
+			List<CAMPointInfo> pathCAMInfoList = CAMPreStageHelper.FlattenCADSegmentsToCAMPointInfo( m_CADSegmentList, m_CraftData, IsClosed );
 
 			// Step 2: Do interpolation
 			List<IToolVecCAMPointInfo> toolVecInfoList = pathCAMInfoList.Cast<IToolVecCAMPointInfo>().ToList();
