@@ -10,15 +10,15 @@ namespace MyCAM.Helper
 	{
 		const int LOWEST_PointsToBuildSegment = 2;
 
-		public static CADPretreatHelper.CADError BuildCADSegment( List<CADPoint> pointList, ESegmentType contourType, double dSegmentLength, double dSubSegmentLength, double dPerChordLength, out ICADSegment cadSegment )
+		public static BuildCADError BuildCADSegment( List<CADPoint> pointList, ESegmentType contourType, double dSegmentLength, double dSubSegmentLength, double dPerChordLength, out ICADSegment cadSegment )
 		{
 			cadSegment = null;
 			if( pointList == null || pointList.Count < LOWEST_PointsToBuildSegment ) {
-				return CADPretreatHelper.CADError.PointCountError;
+				return BuildCADError.PointCountError;
 			}
 			if( contourType == ESegmentType.Line ) {
 				cadSegment = new LineCADSegment( pointList, dSegmentLength, dSubSegmentLength, dPerChordLength );
-				return CADPretreatHelper.CADError.Done;
+				return BuildCADError.Done;
 			}
 			if( contourType == ESegmentType.Arc ) {
 
@@ -31,9 +31,9 @@ namespace MyCAM.Helper
 					cadSegment = new ArcCADSegment( pointList, dSegmentLength, dSubSegmentLength, dPerChordLength );
 				}
 
-				return CADPretreatHelper.CADError.Done;
+				return BuildCADError.Done;
 			}
-			return CADPretreatHelper.CADError.UnknownSegemntType;
+			return BuildCADError.UnknownSegemntType;
 		}
 	}
 }

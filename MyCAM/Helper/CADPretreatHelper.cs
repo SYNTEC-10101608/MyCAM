@@ -25,17 +25,17 @@ namespace MyCAM.Helper
 		UnknownSegemntType
 	}
 
+	public struct DiscretizedCADData
+	{
+		public List<CADPoint> DiscCADPointList;
+		public double SegmentLength;
+		public double SubSegmentLength;
+		public double SubChordLength;
+	}
+
 	public static class CADPretreatHelper
 	{
 		// public function area
-		public struct CADSegBuildData
-		{
-			public List<CADPoint> PointList;
-			public double SegmentLength;
-			public double SubSegmentLength;
-			public double PerChordLength;
-		}
-
 		public static BuildCADError BuildCADSegment( List<PathEdge5D> pathEdge5DList, out List<ICADSegment> cadSegmentList )
 		{
 			cadSegmentList = new List<ICADSegment>();
@@ -53,12 +53,12 @@ namespace MyCAM.Helper
 				if( GeometryTool.IsLine( edge, out _, out _ ) ) {
 
 					// fix: 這個精度的命名需要調整一下
-					BuildCADError result = DiscretizeLineToBuildData( edge, shellFace, MAX_DISTANCE_BETWEEN_POINTS, out CADSegBuildData cadSegBuildData );
+					BuildCADError result = DiscretizeLineToBuildData( edge, shellFace, MAX_DISTANCE_BETWEEN_POINTS, out DiscretizedCADData cadSegBuildData );
 					if( result != BuildCADError.Done ) {
 						return result;
 					}
 					// fix: 這邊 tempCADPointList 應該要先檢查 ===>改為CADSegmentBuilder自己檢查然後吐出結果
-					BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildData.PointList, ESegmentType.Line, cadSegBuildData.SegmentLength, cadSegBuildData.SubSegmentLength, cadSegBuildData.PerChordLength, out ICADSegment cadSegment );
+					BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildData.DiscCADPointList, ESegmentType.Line, cadSegBuildData.SegmentLength, cadSegBuildData.SubSegmentLength, cadSegBuildData.SubChordLength, out ICADSegment cadSegment );
 					// fix: 這邊 failed 的可能是哪些情況，是否應該直接終止整個流程?===>改為直接回傳錯誤碼
 					if( buildResult != BuildCADError.Done ) {
 						return buildResult;
@@ -69,13 +69,13 @@ namespace MyCAM.Helper
 				// this curve is arc choose the best option from the two options (chord error vs equal length)
 				// fix: 這邊 center 跟 arcAngle 沒有用到?==>done
 				else if( GeometryTool.IsCircularArc( edge, out _, out _, out _, out _ ) ) {
-					BuildCADError result = DiscretizeArcToSegmentBuildData( edge, shellFace, out List<CADSegBuildData> cadSegBuildDataList, Math.PI / 2 );
+					BuildCADError result = DiscretizeArcToSegmentBuildData( edge, shellFace, out List<DiscretizedCADData> cadSegBuildDataList, Math.PI / 2 );
 					if( result != BuildCADError.Done || cadSegBuildDataList == null || cadSegBuildDataList.Count == 0 ) {
 						return result;
 					}
 
 					for( int j = 0; j < cadSegBuildDataList.Count; j++ ) {
-						BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildDataList[ j ].PointList, ESegmentType.Arc, cadSegBuildDataList[ j ].SegmentLength, cadSegBuildDataList[ j ].SubSegmentLength, cadSegBuildDataList[ j ].PerChordLength, out ICADSegment cadSegment );
+						BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildDataList[ j ].DiscCADPointList, ESegmentType.Arc, cadSegBuildDataList[ j ].SegmentLength, cadSegBuildDataList[ j ].SubSegmentLength, cadSegBuildDataList[ j ].SubChordLength, out ICADSegment cadSegment );
 						if( buildResult != BuildCADError.Done ) {
 							return buildResult;
 						}
@@ -87,7 +87,7 @@ namespace MyCAM.Helper
 				else {
 
 					// separate this bspline
-					BuildCADError result = DiscretizeBsplineToBuildData( edge, shellFace, out List<CADSegBuildData> cadSegmentBuildDataList );
+					BuildCADError result = DiscretizeBsplineToBuildData( edge, shellFace, out List<DiscretizedCADData> cadSegmentBuildDataList );
 					if( result != BuildCADError.Done ) {
 						return result;
 					}
@@ -96,7 +96,7 @@ namespace MyCAM.Helper
 					}
 					for( int j = 0; j < cadSegmentBuildDataList.Count; j++ ) {
 						// fix: 建議架構統一，ChordLength 在 PretreatmentHelper 算好傳回來===>上面DiscretizeBsplineToBuildData已經算回來了
-						BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegmentBuildDataList[ j ].PointList, ESegmentType.Line, cadSegmentBuildDataList[ j ].SegmentLength, cadSegmentBuildDataList[ j ].SubSegmentLength, cadSegmentBuildDataList[ j ].PerChordLength, out ICADSegment cadSegment );
+						BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegmentBuildDataList[ j ].DiscCADPointList, ESegmentType.Line, cadSegmentBuildDataList[ j ].SegmentLength, cadSegmentBuildDataList[ j ].SubSegmentLength, cadSegmentBuildDataList[ j ].SubChordLength, out ICADSegment cadSegment );
 						if( buildResult != BuildCADError.Done ) {
 							return buildResult;
 						}
@@ -107,10 +107,47 @@ namespace MyCAM.Helper
 			return BuildCADError.Done;
 		}
 
-		// fix: 這個命名建議就叫 DiscretizeArcToCADPoints 我把他的子功能才叫ToBuildData.因為可能很多段
-		public static BuildCADError DiscretizeArcToSegmentBuildData( TopoDS_Edge edge, TopoDS_Face shellFace, out List<CADSegBuildData> cadSegmentBuildData, double maxAngleRad = Math.PI / 2 )
+		static BuildCADError DiscretizeLineToBuildData( TopoDS_Edge lineEdge, TopoDS_Face shellFace, double dMaxSegmentLength, out DiscretizedCADData cadSegBuildData )
 		{
-			cadSegmentBuildData = new List<CADSegBuildData>();
+			cadSegBuildData = new DiscretizedCADData();
+			// fix: 這裡應該要先做傳入引數的檢查 (其他 function 也檢查一下)
+			if( lineEdge == null || lineEdge.IsNull() || shellFace == null || shellFace.IsNull() || dMaxSegmentLength <= 0 ) {
+				return BuildCADError.ParamError;
+			}
+
+			// get curve parameters
+			BRepAdaptor_Curve adaptorCurve = TryGetAdaptorCurve( lineEdge, shellFace, out double dStartU, out double dEndU );
+			if( adaptorCurve == null || adaptorCurve.IsNull() ) {
+				return BuildCADError.AdaptorFaild;
+			}
+
+			// curve length from parameter StartU toEndU 
+			double dEdgeLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dStartU, dEndU );
+			List<double> segmentParamList = DiscretizeArcOrLineByLength( dStartU, dEndU, dMaxSegmentLength, dEdgeLength, out double dSubSegLength );
+			if( segmentParamList.Count < 2 ) {
+				return BuildCADError.ParamError;
+			}
+
+			// need to consider orientation
+			if( lineEdge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				segmentParamList.Reverse();
+			}
+			List<CADPoint> oneSegmentPointList = GetCADPointsFromCurveParams( segmentParamList, lineEdge, shellFace, adaptorCurve );
+			if( oneSegmentPointList.Count < 2 ) {
+				return BuildCADError.PointCountError;
+			}
+			cadSegBuildData.DiscCADPointList = oneSegmentPointList;
+			cadSegBuildData.SegmentLength = dEdgeLength;
+			cadSegBuildData.SubSegmentLength = dSubSegLength;
+
+			// discretize line will get the same length of SubSegmentLength and PerChordLength
+			cadSegBuildData.SubChordLength = cadSegBuildData.SubSegmentLength;
+			return BuildCADError.Done;
+		}
+
+		static BuildCADError DiscretizeArcToSegmentBuildData( TopoDS_Edge edge, TopoDS_Face shellFace, out List<DiscretizedCADData> cadSegmentBuildData, double maxAngleRad = Math.PI / 2 )
+		{
+			cadSegmentBuildData = new List<DiscretizedCADData>();
 
 			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() || maxAngleRad <= 0 ) {
 				return BuildCADError.ParamError;
@@ -127,7 +164,7 @@ namespace MyCAM.Helper
 			if( angle <= maxAngleRad ) {
 				// fix: 這邊正式 code 應該就避免用 tuple 了，可以改用自訂 struct 或 class===>改用struct
 				// fix: 這邊比我想像中複雜，我覺得 CalculateDeflectionForCircularEdge 可以直接根據 angle/R 算出 segment 數量，當然要直接還傳 u List 也可以 ====>包起來
-				BuildCADError result = DiscretizeArcToCADBuildData( adaptorCurve, edge, shellFace, dStartU, dEndU, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH, out CADSegBuildData cadContstrucElement );
+				BuildCADError result = DiscretizeArcToCADBuildData( adaptorCurve, edge, shellFace, dStartU, dEndU, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH, out DiscretizedCADData cadContstrucElement );
 				if( result != BuildCADError.Done ) {
 					return result;
 				}
@@ -155,7 +192,7 @@ namespace MyCAM.Helper
 			for( int i = 0; i < segmentParamList.Count - 1; i++ ) {
 
 				// each cad point is ordered by orientation
-				BuildCADError result = DiscretizeArcToCADBuildData( adaptorCurve, edge, shellFace, segmentParamList[ i ], segmentParamList[ i + 1 ], PRECISION_DEFLECTION, PRECISION_MAX_LENGTH, out CADSegBuildData cadContstrucElement );
+				BuildCADError result = DiscretizeArcToCADBuildData( adaptorCurve, edge, shellFace, segmentParamList[ i ], segmentParamList[ i + 1 ], PRECISION_DEFLECTION, PRECISION_MAX_LENGTH, out DiscretizedCADData cadContstrucElement );
 				if( result != BuildCADError.Done ) {
 					return result;
 				}
@@ -169,10 +206,9 @@ namespace MyCAM.Helper
 			return BuildCADError.Done;
 		}
 
-		// fix: 這個命名建議就叫 DiscretizeBsplineToCADPoints
-		public static BuildCADError DiscretizeBsplineToBuildData( TopoDS_Edge edge, TopoDS_Face shellFace, out List<CADSegBuildData> cadSegmentBuildDataList )
+		static BuildCADError DiscretizeBsplineToBuildData( TopoDS_Edge edge, TopoDS_Face shellFace, out List<DiscretizedCADData> cadSegmentBuildDataList )
 		{
-			cadSegmentBuildDataList = new List<CADSegBuildData>();
+			cadSegmentBuildDataList = new List<DiscretizedCADData>();
 			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() ) {
 				return BuildCADError.ParamError;
 			}
@@ -194,23 +230,20 @@ namespace MyCAM.Helper
 				// each part split by equal length
 				double dthisEdgeLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dSegmentParamList[ i ], dSegmentParamList[ i + 1 ] );
 				List<double> thisPartParamList = DiscretizeArcOrLineByLength( dSegmentParamList[ i ], dSegmentParamList[ i + 1 ], PRECISION_MAX_LENGTH, dthisEdgeLength, out double dSubSegLength );
-				CADSegBuildData cadSegmentBuildData = new CADSegBuildData();
+				DiscretizedCADData cadSegmentBuildData = new DiscretizedCADData();
 				List<CADPoint> cadPointList = GetCADPointsFromCurveParams( thisPartParamList, edge, shellFace, adaptorCurve );
 				if( cadPointList.Count < 2 ) {
 					return BuildCADError.PointCountError;
 				}
-				cadSegmentBuildData.PointList = cadPointList;
+				cadSegmentBuildData.DiscCADPointList = cadPointList;
 				cadSegmentBuildData.SegmentLength = dthisEdgeLength;
 				cadSegmentBuildData.SubSegmentLength = dSubSegLength;
-				cadSegmentBuildData.PerChordLength = cadSegmentBuildData.PointList.First().Point.Distance( cadSegmentBuildData.PointList[ 1 ].Point );
+				cadSegmentBuildData.SubChordLength = cadSegmentBuildData.DiscCADPointList.First().Point.Distance( cadSegmentBuildData.DiscCADPointList[ 1 ].Point );
 				cadSegmentBuildDataList.Add( cadSegmentBuildData );
 			}
 			return BuildCADError.Done;
 		}
 
-		// fix: 這個 API 建議改名叫 DiscretizeArcOrLineByLength
-		// fix: 他使用上有限制，應該只適用圓弧或直線
-		// fix: dEachArcLength 不只 for arc，不一定要改
 		public static List<double> DiscretizeArcOrLineByLength( double dStartU, double dEndU, double dMaxSegmentLength, double dEdgeLength, out double dSubSegmentLength )
 		{
 			if( dMaxSegmentLength <= 0 || dEdgeLength <= 0 || dStartU == dEndU ) {
@@ -238,44 +271,6 @@ namespace MyCAM.Helper
 			return segmentParamList;
 		}
 
-		// fix: 這個命名建議就叫 DiscretizeLineToCADPoints ===> 更改為大家都out build data
-		public static BuildCADError DiscretizeLineToBuildData( TopoDS_Edge lineEdge, TopoDS_Face shellFace, double dMaxSegmentLength, out CADSegBuildData cadSegBuildData )
-		{
-			cadSegBuildData = new CADSegBuildData();
-			// fix: 這裡應該要先做傳入引數的檢查 (其他 function 也檢查一下)
-			if( lineEdge == null || lineEdge.IsNull() || shellFace == null || shellFace.IsNull() || dMaxSegmentLength <= 0 ) {
-				return BuildCADError.ParamError;
-			}
-
-			// get curve parameters
-			BRepAdaptor_Curve adaptorCurve = TryGetAdaptorCurve( lineEdge, shellFace, out double dStartU, out double dEndU );
-			if( adaptorCurve == null || adaptorCurve.IsNull() ) {
-				return BuildCADError.AdaptorFaild;
-			}
-
-			// curve length from parameter StartU toEndU 
-			double dEdgeLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dStartU, dEndU );
-			List<double> segmentParamList = DiscretizeArcOrLineByLength( dStartU, dEndU, dMaxSegmentLength, dEdgeLength, out double dSubSegLength );
-			if( segmentParamList.Count < 2 ) {
-				return BuildCADError.ParamError;
-			}
-
-			// need to consider orientation
-			if( lineEdge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-				segmentParamList.Reverse();
-			}
-			List<CADPoint> oneSegmentPointList = GetCADPointsFromCurveParams( segmentParamList, lineEdge, shellFace, adaptorCurve );
-			if( oneSegmentPointList.Count < 2 ) {
-				return BuildCADError.PointCountError;
-			}
-			cadSegBuildData.PointList = oneSegmentPointList;
-			cadSegBuildData.SegmentLength = dEdgeLength;
-			cadSegBuildData.SubSegmentLength = dSubSegLength;
-
-			// discretize line will get the same length of SubSegmentLength and PerChordLength
-			cadSegBuildData.PerChordLength = cadSegBuildData.SubSegmentLength;
-			return BuildCADError.Done;
-		}
 
 		// private function area
 		// fix: IsTanVecAdjusted 參數目前沒有使用到，可以考慮移除
@@ -338,9 +333,9 @@ namespace MyCAM.Helper
 
 		}
 
-		static BuildCADError DiscretizeArcToCADBuildData( BRepAdaptor_Curve adaptorCurve, TopoDS_Edge edge, TopoDS_Face shellFace, double dStartU, double dEndU, double maxChordError, double maxSegmentLength, out CADSegBuildData cadBuildData )
+		static BuildCADError DiscretizeArcToCADBuildData( BRepAdaptor_Curve adaptorCurve, TopoDS_Edge edge, TopoDS_Face shellFace, double dStartU, double dEndU, double maxChordError, double maxSegmentLength, out DiscretizedCADData cadBuildData )
 		{
-			cadBuildData = new CADSegBuildData();
+			cadBuildData = new DiscretizedCADData();
 			if( adaptorCurve == null ) {
 				return BuildCADError.AdaptorFaild;
 			}
@@ -424,17 +419,17 @@ namespace MyCAM.Helper
 			return new List<double>();
 		}
 
-		static void SetCADConstructElement( ref CADSegBuildData element, List<CADPoint> pointList,
+		static void SetCADConstructElement( ref DiscretizedCADData element, List<CADPoint> pointList,
 		double totalArcLength, double subSegLength )
 		{
 			if( pointList == null || pointList.Count < 2 ) {
-				element = new CADSegBuildData();
+				element = new DiscretizedCADData();
 				return;
 			}
-			element.PointList = pointList;
+			element.DiscCADPointList = pointList;
 			element.SegmentLength = totalArcLength;
 			element.SubSegmentLength = subSegLength;
-			element.PerChordLength = pointList.First().Point.Distance( pointList[ 1 ].Point );
+			element.SubChordLength = pointList.First().Point.Distance( pointList[ 1 ].Point );
 		}
 
 		public static bool DetermineIfClosed( TopoDS_Shape shapeData )
@@ -455,7 +450,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		const double GEOM_TOLERANCE = 1e-3;
+		const double GEOM_TOLERANCE = 0.001;
 		const double MAX_DISTANCE_BETWEEN_POINTS = 1;
 		const double PRECISION_DEFLECTION = 0.01;
 		const double PRECISION_MAX_LENGTH = 1;
