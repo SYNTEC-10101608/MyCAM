@@ -53,7 +53,7 @@ namespace MyCAM.Helper
 				if( GeometryTool.IsLine( edge, out _, out _ ) ) {
 
 					// fix: 這個精度的命名需要調整一下
-					BuildCADError result = DiscretizeLineToBuildData( edge, shellFace, MAX_DISTANCE_BETWEEN_POINTS, out DiscretizedCADData cadSegBuildData );
+					BuildCADError result = DiscretizeLineToBuildData( edge, shellFace, DISCRETE_MAX_LENGTH, out DiscretizedCADData cadSegBuildData );
 					if( result != BuildCADError.Done ) {
 						return result;
 					}
@@ -164,7 +164,7 @@ namespace MyCAM.Helper
 			if( angle <= maxAngleRad ) {
 				// fix: 這邊正式 code 應該就避免用 tuple 了，可以改用自訂 struct 或 class===>改用struct
 				// fix: 這邊比我想像中複雜，我覺得 CalculateDeflectionForCircularEdge 可以直接根據 angle/R 算出 segment 數量，當然要直接還傳 u List 也可以 ====>包起來
-				BuildCADError result = DiscretizeArcToCADBuildData( adaptorCurve, edge, shellFace, dStartU, dEndU, PRECISION_DEFLECTION, PRECISION_MAX_LENGTH, out DiscretizedCADData cadContstrucElement );
+				BuildCADError result = DiscretizeArcToCADBuildData( adaptorCurve, edge, shellFace, dStartU, dEndU, DISCRETE_MAX_DEFLECTION, DISCRETE_MAX_LENGTH, out DiscretizedCADData cadContstrucElement );
 				if( result != BuildCADError.Done ) {
 					return result;
 				}
@@ -192,7 +192,7 @@ namespace MyCAM.Helper
 			for( int i = 0; i < segmentParamList.Count - 1; i++ ) {
 
 				// each cad point is ordered by orientation
-				BuildCADError result = DiscretizeArcToCADBuildData( adaptorCurve, edge, shellFace, segmentParamList[ i ], segmentParamList[ i + 1 ], PRECISION_DEFLECTION, PRECISION_MAX_LENGTH, out DiscretizedCADData cadContstrucElement );
+				BuildCADError result = DiscretizeArcToCADBuildData( adaptorCurve, edge, shellFace, segmentParamList[ i ], segmentParamList[ i + 1 ], DISCRETE_MAX_DEFLECTION, DISCRETE_MAX_LENGTH, out DiscretizedCADData cadContstrucElement );
 				if( result != BuildCADError.Done ) {
 					return result;
 				}
@@ -229,7 +229,7 @@ namespace MyCAM.Helper
 
 				// each part split by equal length
 				double dthisEdgeLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dSegmentParamList[ i ], dSegmentParamList[ i + 1 ] );
-				List<double> thisPartParamList = DiscretizeArcOrLineByLength( dSegmentParamList[ i ], dSegmentParamList[ i + 1 ], PRECISION_MAX_LENGTH, dthisEdgeLength, out double dSubSegLength );
+				List<double> thisPartParamList = DiscretizeArcOrLineByLength( dSegmentParamList[ i ], dSegmentParamList[ i + 1 ], DISCRETE_MAX_LENGTH, dthisEdgeLength, out double dSubSegLength );
 				DiscretizedCADData cadSegmentBuildData = new DiscretizedCADData();
 				List<CADPoint> cadPointList = GetCADPointsFromCurveParams( thisPartParamList, edge, shellFace, adaptorCurve );
 				if( cadPointList.Count < 2 ) {
@@ -365,7 +365,7 @@ namespace MyCAM.Helper
 		}
 
 		// fix: 這個人應該可以 private
-		static List<double> ChordErrorSplit( BRepAdaptor_Curve adaptorCurve, TopoDS_Edge edge, TopoDS_Face shellFace, double dStartU, double dEndU, double dDeflection = PRECISION_DEFLECTION )
+		static List<double> ChordErrorSplit( BRepAdaptor_Curve adaptorCurve, TopoDS_Edge edge, TopoDS_Face shellFace, double dStartU, double dEndU, double dDeflection = DISCRETE_MAX_DEFLECTION )
 		{
 			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() || adaptorCurve == null || adaptorCurve.IsNull() || dDeflection <= 0 ) {
 				return new List<double>();
@@ -450,9 +450,8 @@ namespace MyCAM.Helper
 			}
 		}
 
-		const double GEOM_TOLERANCE = 0.001;
-		const double MAX_DISTANCE_BETWEEN_POINTS = 1;
-		const double PRECISION_DEFLECTION = 0.01;
-		const double PRECISION_MAX_LENGTH = 1;
+		const double GEOM_TOLERANCE = 1e-3;
+		const double DISCRETE_MAX_DEFLECTION = 0.01;
+		const double DISCRETE_MAX_LENGTH = 1;
 	}
 }
