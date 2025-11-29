@@ -1,9 +1,6 @@
-﻿using MyCAM.App;
-using MyCAM.CacheInfo;
+﻿using MyCAM.CacheInfo;
 using MyCAM.Helper;
-using OCC.BRep;
 using OCC.gp;
-using OCC.TopExp;
 using OCC.TopoDS;
 using System;
 using System.Collections.Generic;
@@ -18,7 +15,7 @@ namespace MyCAM.Data
 			if( pathDataList == null || pathDataList.Count == 0 ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
-			bool isClosed = DetermineIfClosed( shape );
+			bool isClosed = CADPretreatHelper.DetermineIfClosed( shape );
 			BuildCADError isBuildDone = CADPretreatHelper.BuildCADSegment( pathDataList, out List<ICADSegment> cadSegList );
 			if( isBuildDone != BuildCADError.Done || cadSegList == null || cadSegList.Count == 0 ) {
 				throw new Exception( "ContourPathObject CAD segment build failed" );
@@ -36,7 +33,7 @@ namespace MyCAM.Data
 			if( cadSegmentList == null || cadSegmentList.Count == 0 || craftData == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
-			bool isClosed = DetermineIfClosed( shape );
+			bool isClosed = CADPretreatHelper.DetermineIfClosed( shape );
 			m_CADSegmentList = cadSegmentList;
 			m_CraftData = craftData;
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADSegmentList, m_CraftData, isClosed );
@@ -46,7 +43,6 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				//fix: 我建議這裡就先不要 clone 了，後續再找機會優化
 				return m_CADSegmentList;
 			}
 		}
@@ -88,27 +84,6 @@ namespace MyCAM.Data
 
 			// Step3:recalculate cache info because CAD points have changed
 			m_ContourCacheInfo.Transform();
-		}
-
-		bool DetermineIfClosed( TopoDS_Shape shapeData )
-		{
-			if( shapeData == null || shapeData.IsNull() )
-				return false;
-
-			try {
-				TopoDS_Vertex startVertex = new TopoDS_Vertex();
-				TopoDS_Vertex endVertex = new TopoDS_Vertex();
-				TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
-
-				gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
-				gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
-
-				return startPoint.IsEqual( endPoint, 1e-3 );
-			}
-			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"Error occurred while determining a closed path.: {ex.Message}", MyApp.NoticeType.Warning );
-				return false;
-			}
 		}
 
 		List<ICADSegment> m_CADSegmentList;

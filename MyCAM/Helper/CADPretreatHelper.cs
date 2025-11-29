@@ -1,9 +1,11 @@
 ﻿using MyCAM.Data;
 using OCC.BOPTools;
+using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.GCPnts;
 using OCC.gp;
 using OCC.TopAbs;
+using OCC.TopExp;
 using OCC.TopoDS;
 using OCCTool;
 using System;
@@ -349,7 +351,7 @@ namespace MyCAM.Helper
 			double segmentLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dStartU, dEndU );
 
 			// choose chord error split or equal length split
-			List<double> finalParams = SelectSplitStrategy( adaptorCurve, edge, shellFace, dStartU, dEndU, maxChordError, maxSegmentLength, segmentLength , out double subSegmentLength );
+			List<double> finalParams = SelectSplitStrategy( adaptorCurve, edge, shellFace, dStartU, dEndU, maxChordError, maxSegmentLength, segmentLength, out double subSegmentLength );
 			if( finalParams == null || finalParams.Count < 2 ) {
 				return BuildCADError.DiscretizFaild;
 			}
@@ -363,7 +365,8 @@ namespace MyCAM.Helper
 
 			// set back to construct element
 			SetCADConstructElement( ref cadBuildData, cadPointList, segmentLength, subSegmentLength );
-			return BuildCADError.Done; ;
+			return BuildCADError.Done;
+			;
 
 		}
 
@@ -435,6 +438,25 @@ namespace MyCAM.Helper
 			element.PerChordLength = pointList.First().Point.Distance( pointList[ 1 ].Point );
 		}
 
+		public static bool DetermineIfClosed( TopoDS_Shape shapeData )
+		{
+			if( shapeData == null || shapeData.IsNull() ) {
+				return false;
+			}
+			try {
+				TopoDS_Vertex startVertex = new TopoDS_Vertex();
+				TopoDS_Vertex endVertex = new TopoDS_Vertex();
+				TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
+				gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
+				gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
+				return startPoint.IsEqual( endPoint, GEOM_TOLERANCE );
+			}
+			catch {
+				return false;
+			}
+		}
+
+		const double GEOM_TOLERANCE = 1e-3;
 		const double MAX_DISTANCE_BETWEEN_POINTS = 1;
 		const double PRECISION_DEFLECTION = 0.01;
 		const double PRECISION_MAX_LENGTH = 1;
