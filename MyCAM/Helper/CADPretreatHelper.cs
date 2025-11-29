@@ -106,7 +106,7 @@ namespace MyCAM.Helper
 		public static BuildCADError DiscretizeLine( TopoDS_Edge lineEdge, TopoDS_Face shellFace, double dMaxSegmentLength, out DiscretizedCADData cadSegBuildData )
 		{
 			cadSegBuildData = new DiscretizedCADData();
-			if( lineEdge == null || lineEdge.IsNull() || shellFace == null || shellFace.IsNull() || dMaxSegmentLength <= 0 ) {
+			if( lineEdge == null || lineEdge.IsNull() || shellFace == null || shellFace.IsNull() || Math.Abs(dMaxSegmentLength) < CURVE_PARAM_TOLERANCE ) {
 				return BuildCADError.InvalidInputParam;
 			}
 
@@ -144,14 +144,14 @@ namespace MyCAM.Helper
 		{
 			cadSegmentBuildData = new List<DiscretizedCADData>();
 
-			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() || maxAngleRad <= 0 ) {
+			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() || Math.Abs(maxAngleRad) < CURVE_PARAM_TOLERANCE ) {
 				return BuildCADError.InvalidInputParam;
 			}
 			if( !GeometryTool.IsCircularArc( edge, out _, out double R, out _, out double angle ) ) {
 				return BuildCADError.GeomTypeError;
 			}
 			BRepAdaptor_Curve adaptorCurve = TryGetAdaptorCurve( edge, shellFace, out double dStartU, out double dEndU );
-			if( adaptorCurve == null || adaptorCurve.IsNull() || dStartU == dEndU ) {
+			if( adaptorCurve == null || adaptorCurve.IsNull() || Math.Abs(dStartU - dEndU) < CURVE_PARAM_TOLERANCE ) {
 				return BuildCADError.AdaptorFaild;
 			}
 
@@ -241,7 +241,7 @@ namespace MyCAM.Helper
 
 		public static List<double> DiscretizeArcOrLineByLength( double dStartU, double dEndU, double dMaxSegmentLength, double dEdgeLength, out double dSubSegmentLength )
 		{
-			if( dMaxSegmentLength <= 0 || dEdgeLength <= 0 || Math.Abs( dStartU - dEndU ) < CURVE_PARAM_TOLERANCE ) {
+			if( Math.Abs(dMaxSegmentLength) < CURVE_PARAM_TOLERANCE || Math.Abs(dEdgeLength) < CURVE_PARAM_TOLERANCE || Math.Abs( dStartU - dEndU ) < CURVE_PARAM_TOLERANCE ) {
 				dSubSegmentLength = 0.0;
 				return new List<double>();
 			}
@@ -333,7 +333,7 @@ namespace MyCAM.Helper
 			if( adaptorCurve == null ) {
 				return BuildCADError.AdaptorFaild;
 			}
-			if( maxChordError <= 0.0 || maxSegmentLength <= 0.0 || edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() ) {
+			if( Math.Abs(maxChordError) < CURVE_PARAM_TOLERANCE || Math.Abs(maxSegmentLength) < CURVE_PARAM_TOLERANCE || edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() ) {
 				return BuildCADError.InvalidInputParam;
 			}
 			double segmentLength = GCPnts_AbscissaPoint.Length( adaptorCurve, dStartU, dEndU );
@@ -361,7 +361,7 @@ namespace MyCAM.Helper
 		// fix: 這個人應該可以 private
 		static List<double> ChordErrorSplit( BRepAdaptor_Curve adaptorCurve, TopoDS_Edge edge, TopoDS_Face shellFace, double dStartU, double dEndU, double dDeflection = DISCRETE_MAX_DEFLECTION )
 		{
-			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() || adaptorCurve == null || adaptorCurve.IsNull() || dDeflection <= 0 ) {
+			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() || adaptorCurve == null || adaptorCurve.IsNull() || Math.Abs(dDeflection) < CURVE_PARAM_TOLERANCE ) {
 				return new List<double>();
 			}
 			// break the curve into segments with given deflection precision
@@ -387,7 +387,7 @@ namespace MyCAM.Helper
 			if( adaptorCurve == null || adaptorCurve.IsNull() ) {
 				return new List<double>();
 			}
-			if( maxChordError <= 0.0 || maxSegmentLength <= 0.0 || edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() ) {
+			if( Math.Abs(maxChordError) < CURVE_PARAM_TOLERANCE || Math.Abs(maxSegmentLength) < CURVE_PARAM_TOLERANCE || edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() ) {
 				return new List<double>();
 			}
 
