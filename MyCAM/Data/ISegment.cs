@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace MyCAM.Data
 {
-	// fix: 這個應該叫 segment type
 	public enum ESegmentType
 	{
 		Line,
@@ -12,9 +11,7 @@ namespace MyCAM.Data
 	}
 
 	#region CAD Segment
-
-	// fix: 命名 "Element" 有點多餘了
-	internal interface ICADSegment
+	public interface ICADSegment
 	{
 		ESegmentType SegmentType
 		{
@@ -36,7 +33,6 @@ namespace MyCAM.Data
 			get;
 		}
 
-		// fix: 建議命名可以直接是 SegmentLength
 		double SegmentLength
 		{
 			get;
@@ -55,10 +51,9 @@ namespace MyCAM.Data
 		ICADSegment Clone();
 
 		void Transform( gp_Trsf transForm );
-
 	}
 
-	internal abstract class CADSegmentBase : ICADSegment
+	public abstract class CADSegmentBase : ICADSegment
 	{
 		protected CADSegmentBase( List<CADPoint> pointList, double dTotalLength, double dPerArcLength, double dPerChordLength )
 		{
@@ -78,7 +73,6 @@ namespace MyCAM.Data
 			get;
 		}
 
-		// fix: 下面的屬性 private set 感覺沒什麼意義
 		public virtual CADPoint StartPoint
 		{
 			get
@@ -99,7 +93,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return  m_PointList;
+				return m_PointList;
 			}
 		}
 
@@ -136,7 +130,6 @@ namespace MyCAM.Data
 			}
 		}
 
-		// fix: member 在建構子會初始化，這裡就不需要再初始化一次了
 		protected List<CADPoint> m_PointList;
 		protected CADPoint m_StartPoint;
 		protected CADPoint m_EndPoint;
@@ -145,7 +138,7 @@ namespace MyCAM.Data
 		protected double m_PerChordLength;
 	}
 
-	internal class LineCADSegment : CADSegmentBase
+	public class LineCADSegment : CADSegmentBase
 	{
 		public LineCADSegment( List<CADPoint> linePointList, double dTotalLength, double dPerArcLegnth, double dPerChordLength )
 			: base( linePointList, dTotalLength, dPerArcLegnth, dPerChordLength )
@@ -164,24 +157,22 @@ namespace MyCAM.Data
 		{
 			List<CADPoint> clonedPointList = new List<CADPoint>();
 			foreach( CADPoint point in m_PointList ) {
-				// fix: 這邊的 as CADPoint 不需要
 				clonedPointList.Add( point.Clone() );
 			}
 			return new LineCADSegment( clonedPointList, m_TotalLength, m_SubSegmentLength, m_PerChordLength );
 		}
 	}
 
-	internal class ArcCADSegment : CADSegmentBase
+	public class ArcCADSegment : CADSegmentBase
 	{
 		public ArcCADSegment( List<CADPoint> arcPointList, double dTotalLength, double dPerArcLength, double dPerChordLength )
 			: base( arcPointList, dTotalLength, dPerArcLength, dPerChordLength )
 		{
-			// fix: 這邊是否需要自己保護 count <=2 的情況？
 			if( arcPointList.Count <= 2 ) {
 				throw new System.ArgumentException( "ArcCADSegment requires at least 3 points to define a valid arc." );
 			}
 			m_MidIndex = arcPointList.Count / 2;
-			MidPoint = arcPointList[ m_MidIndex ];
+			m_MidPoint = arcPointList[ m_MidIndex ];
 		}
 
 		public override ESegmentType SegmentType
@@ -197,12 +188,6 @@ namespace MyCAM.Data
 			get
 			{
 				return m_MidPoint;
-			}
-
-			// fix: 這個 private set 感覺沒什麼意義===>因為base沒做這個動作,這裡我需要開出來讓建構子來設置
-			set
-			{
-				m_MidPoint = value;
 			}
 		}
 

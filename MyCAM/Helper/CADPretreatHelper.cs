@@ -14,7 +14,7 @@ using System.Linq;
 
 namespace MyCAM.Helper
 {
-	internal enum BuildCADError
+	public enum BuildCADError
 	{
 		Done,
 		GeomTypeError,
@@ -25,10 +25,9 @@ namespace MyCAM.Helper
 		UnknownSegemntType
 	}
 
-	internal static class CADPretreatHelper
+	public static class CADPretreatHelper
 	{
 		// public function area
-
 		public struct CADSegBuildData
 		{
 			public List<CADPoint> PointList;
