@@ -6,13 +6,20 @@ namespace MyCAM.Helper
 {
 	internal class ToolVectorHelper
 	{
-		public static void CalculateToolVector( ref List<IToolVecCAMPointInfo> camPointInfoList, bool isToolVecReverse, bool isReverse, bool isClosed )
+		public static void CalculateToolVector( ref List<IToolVecCAMPointInfo> camPointInfoList, bool isToolVecReverse, bool isPathReverse, bool isClosed )
 		{
 			if( camPointInfoList == null || camPointInfoList.Count == 0 ) {
 				return;
 			}
 
-			// find all ctrl pnt
+			// reverse all tool vec if needed
+			if( isToolVecReverse ) {
+				foreach( var camPntInfo in camPointInfoList ) {
+					camPntInfo.ToolVec.Reverse();
+				}
+			}
+
+			// find all ctrl pnt for interpolation
 			List<int> ctrlPntIdx = new List<int>();
 			for( int i = 0; i < camPointInfoList.Count; i++ ) {
 				if( camPointInfoList[ i ].IsToolVecdPnt ) {
@@ -27,10 +34,9 @@ namespace MyCAM.Helper
 
 			// only one ctrl pnt, apply to all point
 			if( ctrlPntIdx.Count == 1 ) {
-				ApplySpecifiedVec( camPointInfoList, ctrlPntIdx[ 0 ], isToolVecReverse );
+				ApplySpecifiedVec( camPointInfoList, ctrlPntIdx[ 0 ], isPathReverse );
 				return;
 			}
-
 			List<Tuple<int, int>> interpolateIntervalList = GetInterpolateIntervalList( ctrlPntIdx, isClosed );
 
 			// modify the tool vector
@@ -38,50 +44,21 @@ namespace MyCAM.Helper
 				// get start and end index
 				int nStartIndex = interpolateIntervalList[ i ].Item1;
 				int nEndIndex = interpolateIntervalList[ i ].Item2;
-				InterpolateToolVec( nStartIndex, nEndIndex, camPointInfoList, isReverse );
+				InterpolateToolVec( nStartIndex, nEndIndex, camPointInfoList, isPathReverse );
 			}
 		}
 
-		static void InterpolateToolVec( int nStartIndex, int nEndIndex, List<IToolVecCAMPointInfo> pathCAMInfo, bool isReverse )
+		static void ApplySpecifiedVec( List<IToolVecCAMPointInfo> pointInfoList, int nSpecifiedIdx, bool isPathReverse )
 		{
-			// consider wrapped
-			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + pathCAMInfo.Count : nEndIndex;
-			if( pathCAMInfo[ nStartIndex ].SharingPoint == null || pathCAMInfo[ nEndIndex ].SharingPoint == null ) {
+			// get the specified tool vec
+			gp_Vec SpecifiedVec = CalCtrlPntToolVec( pointInfoList[ nSpecifiedIdx ], isPathReverse );
+			if( SpecifiedVec == null ) {
 				return;
 			}
 
-			// to keep use same point to interpolate
-			gp_Dir startPntTanVec = isReverse ? pathCAMInfo[ nStartIndex ].SharingPoint.TangentVec : pathCAMInfo[ nStartIndex ].Point.TangentVec;
-			gp_Dir endPntTanVec = isReverse ? pathCAMInfo[ nEndIndex ].SharingPoint.TangentVec : pathCAMInfo[ nEndIndex ].Point.TangentVec;
-
-			// get the start and end tool vector
-			gp_Vec startVec = GetVecFromAB( pathCAMInfo[ nStartIndex ].Point.NormalVec_1st,
-				startPntTanVec,
-				pathCAMInfo[ nStartIndex ].ABValues.Item1 * Math.PI / 180,
-				pathCAMInfo[ nStartIndex ].ABValues.Item2 * Math.PI / 180 );
-			gp_Vec endVec = GetVecFromAB( pathCAMInfo[ nEndIndex ].Point.NormalVec_1st,
-				endPntTanVec,
-				pathCAMInfo[ nEndIndex ].ABValues.Item1 * Math.PI / 180,
-				pathCAMInfo[ nEndIndex ].ABValues.Item2 * Math.PI / 180 );
-
-			// get the total distance for interpolation parameter
-			double totaldistance = 0;
-			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
-				totaldistance += pathCAMInfo[ i % pathCAMInfo.Count ].DistanceToNext;
-			}
-
-			// get the quaternion for interpolation
-			gp_Quaternion q12 = new gp_Quaternion( startVec, endVec );
-			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
-			double accumulatedDistance = 0;
-			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
-				double t = accumulatedDistance / totaldistance;
-				accumulatedDistance += pathCAMInfo[ i % pathCAMInfo.Count ].DistanceToNext;
-				gp_Quaternion q = new gp_Quaternion();
-				slerp.Interpolate( t, ref q );
-				gp_Trsf trsf = new gp_Trsf();
-				trsf.SetRotation( q );
-				pathCAMInfo[ i % pathCAMInfo.Count ].ToolVec = new gp_Dir( startVec.Transformed( trsf ) );
+			// apply to all point
+			foreach( var pointInfo in pointInfoList ) {
+				pointInfo.ToolVec = new gp_Dir( SpecifiedVec );
 			}
 		}
 
@@ -108,42 +85,50 @@ namespace MyCAM.Helper
 			return intervalList;
 		}
 
-		static void ApplySpecifiedVec( List<IToolVecCAMPointInfo> pointInfoList, int nSpecifiedIdx, bool isToolVecReverse )
+		static void InterpolateToolVec( int nStartIndex, int nEndIndex, List<IToolVecCAMPointInfo> pathCAMInfo, bool isPathReverse )
 		{
-			gp_Vec SpecifiedVec = CalCtrlPntToolVec( pointInfoList[ nSpecifiedIdx ], isToolVecReverse );
+			// consider wrapped
+			gp_Vec startVec = CalCtrlPntToolVec( pathCAMInfo[ nStartIndex ], isPathReverse );
+			gp_Vec endVec = CalCtrlPntToolVec( pathCAMInfo[ nEndIndex ], isPathReverse );
+			if( startVec == null || endVec == null ) {
 
-			if( SpecifiedVec == null ) {
+				// should not run into this
 				return;
 			}
-			foreach( var pointInfo in pointInfoList ) {
-				pointInfo.ToolVec = new gp_Dir( SpecifiedVec );
-			}
+
+			// do interpolation
+			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + pathCAMInfo.Count : nEndIndex;
+			QuaternionInterpolate( nStartIndex, nEndIndexModify, startVec, endVec, ref pathCAMInfo );
 		}
 
-		static gp_Vec CalCtrlPntToolVec( IToolVecCAMPointInfo controlBar, bool isToolVecReverse )
+		static gp_Vec CalCtrlPntToolVec( IToolVecCAMPointInfo controlPoint, bool isPathReverse )
 		{
-			if( !controlBar.IsToolVecdPnt || controlBar.ABValues == null )
+			if( !controlPoint.IsToolVecdPnt || controlPoint.ABValues == null ) {
 				return null;
+			}
+			var abValues = controlPoint.ABValues;
 
-			var abValues = controlBar.ABValues;
-			gp_Dir oriNormal = isToolVecReverse ?
-				controlBar.Point.NormalVec_1st.Reversed() :
-				controlBar.Point.NormalVec_1st;
-
-			return GetVecFromAB( oriNormal, controlBar.Point.TangentVec,
-				abValues.Item1 * Math.PI / 180, abValues.Item2 * Math.PI / 180 );
+			// use sharing point tangent if it exists and path is reversed
+			gp_Dir tangentVec;
+			if( isPathReverse && controlPoint.SharingPoint != null ) {
+				tangentVec = controlPoint.SharingPoint.TangentVec;
+			}
+			else {
+				tangentVec = controlPoint.Point.TangentVec;
+			}
+			return GetVecFromAB( controlPoint.ToolVec, tangentVec, abValues.Item1 * Math.PI / 180, abValues.Item2 * Math.PI / 180 );
 		}
 
-		static gp_Vec GetVecFromAB( gp_Dir normal_1st, gp_Dir tangentVec, double dRA_rad, double dRB_rad )
+		static gp_Vec GetVecFromAB( gp_Dir initToolVec, gp_Dir tangentVec, double dRA_rad, double dRB_rad )
 		{
 			// TDOD: RA == 0 || RB == 0
 			if( dRA_rad == 0 && dRB_rad == 0 ) {
-				return new gp_Vec( normal_1st );
+				return new gp_Vec( initToolVec );
 			}
 
 			// get the x, y, z direction
 			gp_Dir x = tangentVec;
-			gp_Dir z = normal_1st;
+			gp_Dir z = initToolVec;
 			gp_Dir y = z.Crossed( x );
 
 			// X:Y:Z = tanA:tanB:1
@@ -161,6 +146,29 @@ namespace MyCAM.Helper
 			Y = Z * Math.Tan( dRB_rad );
 			gp_Dir dir1 = new gp_Dir( x.XYZ() * X + y.XYZ() * Y + z.XYZ() * Z );
 			return new gp_Vec( dir1.XYZ() );
+		}
+
+		static void QuaternionInterpolate( int nStartIndex, int nEndIndex, gp_Vec startVec, gp_Vec endVec, ref List<IToolVecCAMPointInfo> pathCAMInfo )
+		{
+			// get the total distance for interpolation parameter
+			double totaldistance = 0;
+			for( int i = nStartIndex; i < nEndIndex; i++ ) {
+				totaldistance += pathCAMInfo[ i % pathCAMInfo.Count ].DistanceToNext;
+			}
+
+			// get the quaternion for interpolation
+			gp_Quaternion q12 = new gp_Quaternion( startVec, endVec );
+			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
+			double accumulatedDistance = 0;
+			for( int i = nStartIndex; i < nEndIndex; i++ ) {
+				double t = accumulatedDistance / totaldistance;
+				accumulatedDistance += pathCAMInfo[ i % pathCAMInfo.Count ].DistanceToNext;
+				gp_Quaternion q = new gp_Quaternion();
+				slerp.Interpolate( t, ref q );
+				gp_Trsf trsf = new gp_Trsf();
+				trsf.SetRotation( q );
+				pathCAMInfo[ i % pathCAMInfo.Count ].ToolVec = new gp_Dir( startVec.Transformed( trsf ) );
+			}
 		}
 	}
 }
