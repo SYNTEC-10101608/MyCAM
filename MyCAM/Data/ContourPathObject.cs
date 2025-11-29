@@ -17,30 +17,25 @@ namespace MyCAM.Data
 		public ContourPathObject( string szUID, TopoDS_Shape shape, List<PathEdge5D> pathDataList )
 			: base( szUID, shape )
 		{
-			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || pathDataList == null || pathDataList.Count == 0 ) {
+			if( pathDataList == null || pathDataList.Count == 0 ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
 			bool isClosed = DetermineIfClosed( shape );
-			// fix: 這邊是否可能出現 count 為 0 的情況? 需要保護?
 			CADError isBuildDone = BuildCADSegment( pathDataList, out List<ICADSegment> cadSegList );
-			if( isBuildDone != CADError.Done ) {
-				throw new Exception( isBuildDone.ToString() );
-			}
-			if( cadSegList == null || cadSegList.Count == 0 ) {
+			if( isBuildDone != CADError.Done || cadSegList == null || cadSegList.Count == 0 ) {
 				throw new Exception( "ContourPathObject CAD segment build failed" );
 			}
 			m_CADSegmentList = cadSegList;
 			m_CraftData = new CraftData( szUID );
 			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_CADSegmentList, m_CraftData, isClosed );
-			// fix: 這裡應該就讓他是 0,0 也沒關係?
-			m_CraftData.StartPointIndex = new SegmentPointIndex( 0,0 );
+			m_CraftData.StartPointIndex = new SegmentPointIndex( 0, 0 );
 		}
 
 		// this is for the file read constructor
 		public ContourPathObject( string szUID, TopoDS_Shape shape, List<ICADSegment> cadSegmentList, CraftData craftData )
 			: base( szUID, shape )
 		{
-			if( string.IsNullOrEmpty( szUID ) || shape == null || cadSegmentList == null || cadSegmentList.Count == 0 || craftData == null ) {
+			if( cadSegmentList == null || cadSegmentList.Count == 0 || craftData == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
 			bool isClosed = DetermineIfClosed( shape );
@@ -97,7 +92,6 @@ namespace MyCAM.Data
 			m_ContourCacheInfo.Transform();
 		}
 
-		// fix: 這個 is close 引數沒有用到了?
 		CADError BuildCADSegment( List<PathEdge5D> pathEdge5DList, out List<ICADSegment> cadSegmentList )
 		{
 			cadSegmentList = new List<ICADSegment>();
