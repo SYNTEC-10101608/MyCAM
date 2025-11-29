@@ -1,11 +1,9 @@
 ﻿using MyCAM.Data;
 using OCC.BOPTools;
-using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.GCPnts;
 using OCC.gp;
 using OCC.TopAbs;
-using OCC.TopExp;
 using OCC.TopoDS;
 using OCCTool;
 using System;
@@ -63,13 +61,11 @@ namespace MyCAM.Helper
 				}
 
 				// this curve is arc choose the best option from the two options (chord error vs equal length)
-				// fix: 這邊 center 跟 arcAngle 沒有用到?==>done
 				else if( GeometryTool.IsCircularArc( edge, out _, out _, out _, out _ ) ) {
 					BuildCADError result = DiscretizeArc( edge, shellFace, out List<DiscretizedCADData> cadSegBuildDataList, Math.PI / 2 );
 					if( result != BuildCADError.Done || cadSegBuildDataList == null || cadSegBuildDataList.Count == 0 ) {
 						return result;
 					}
-
 					for( int j = 0; j < cadSegBuildDataList.Count; j++ ) {
 						BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildDataList[ j ], ESegmentType.Arc, out ICADSegment cadSegment );
 						if( buildResult != BuildCADError.Done ) {
@@ -84,14 +80,10 @@ namespace MyCAM.Helper
 
 					// separate this bspline
 					BuildCADError result = DiscretizeBspline( edge, shellFace, out List<DiscretizedCADData> cadSegmentBuildDataList );
-					if( result != BuildCADError.Done ) {
+					if( result != BuildCADError.Done || cadSegmentBuildDataList == null || cadSegmentBuildDataList.Count == 0 ) {
 						return result;
 					}
-					if( cadSegmentBuildDataList == null || cadSegmentBuildDataList.Count == 0 ) {
-						return BuildCADError.DiscretizFaild;
-					}
 					for( int j = 0; j < cadSegmentBuildDataList.Count; j++ ) {
-						// fix: 建議架構統一，ChordLength 在 PretreatmentHelper 算好傳回來===>上面DiscretizeBsplineToBuildData已經算回來了
 						BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegmentBuildDataList[ j ], ESegmentType.Line, out ICADSegment cadSegment );
 						if( buildResult != BuildCADError.Done ) {
 							return buildResult;
@@ -223,13 +215,14 @@ namespace MyCAM.Helper
 				cadSegmentBuildData.DiscCADPointList = cadPointList;
 				cadSegmentBuildData.SegmentLength = edgeLength;
 				cadSegmentBuildData.SubSegmentLength = dSubSegLength;
-				cadSegmentBuildData.SubChordLength = cadSegmentBuildData.DiscCADPointList.First().Point.Distance( cadSegmentBuildData.DiscCADPointList[ 1 ].Point );
+
+				// we suppose the chord length is close to the sub segment length here
+				cadSegmentBuildData.SubChordLength = cadSegmentBuildData.SubSegmentLength;
 				cadSegmentBuildDataList.Add( cadSegmentBuildData );
 			}
 			return BuildCADError.Done;
 		}
 
-		// TODO: 不想讓他 public
 		public static List<double> DiscretizeArcOrLineByLength( double dStartU, double dEndU, double dMaxSegmentLength, double dEdgeLength, out double dSubSegmentLength )
 		{
 			if( dMaxSegmentLength < DOUBLE_TOLERANCE || dEdgeLength < DOUBLE_TOLERANCE || Math.Abs( dStartU - dEndU ) < DOUBLE_TOLERANCE ) {
@@ -259,7 +252,7 @@ namespace MyCAM.Helper
 			return segmentParamList;
 		}
 
-		public static List<double> ChordErrorSplit( BRepAdaptor_Curve adaptorCurve, double dStartU, double dEndU, double dDeflection = DISCRETE_MAX_DEFLECTION )
+		static List<double> ChordErrorSplit( BRepAdaptor_Curve adaptorCurve, double dStartU, double dEndU, double dDeflection = DISCRETE_MAX_DEFLECTION )
 		{
 			if( dDeflection < DOUBLE_TOLERANCE ) {
 				return new List<double>();
@@ -283,7 +276,8 @@ namespace MyCAM.Helper
 		// private function area
 		static List<CADPoint> GetCADPointsFromCurveParams( List<double> segmentParamList, TopoDS_Edge edge, TopoDS_Face shellFace, BRepAdaptor_Curve adC )
 		{
-			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() || adC == null || adC.IsNull() || segmentParamList == null || segmentParamList.Count == 0 ) {
+			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() || adC == null || adC.IsNull()
+				|| segmentParamList == null || segmentParamList.Count == 0 ) {
 				return new List<CADPoint>();
 			}
 			List<CADPoint> oneSegmentPointList = new List<CADPoint>();
@@ -405,7 +399,6 @@ namespace MyCAM.Helper
 			}
 		}
 
-		const double GEOM_TOLERANCE = 1e-3;
 		const double DOUBLE_TOLERANCE = 1e-6;
 		const double DISCRETE_MAX_DEFLECTION = 0.01;
 		const double DISCRETE_MAX_LENGTH = 1;
