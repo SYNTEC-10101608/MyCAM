@@ -49,17 +49,18 @@ namespace MyCAM.CacheInfo
 				}
 				return m_CAMSegmentList;
 			}
-			set
-			{
-				if( value != null ) {
-					m_CAMSegmentList = value;
-				}
-			}
 		}
 
 		public List<int> CtrlToolSegIdxList
 		{
-			get => m_CtrlToolSegIdxList;
+			get
+			{
+				if( m_IsCraftDataDirty ) {
+					BuildPathCAMSegment();
+					BuildCAMFeatureSegment();
+				}
+				return m_CtrlToolSegIdxList;
+			}
 			private set
 			{
 				if( value != null ) {
@@ -135,7 +136,8 @@ namespace MyCAM.CacheInfo
 				if( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
 					return null;
 				}
-				camSegmentConnectWithStartPnt = CAMSegmentList.First(); ;
+				camSegmentConnectWithStartPnt = CAMSegmentList.First();
+				;
 			}
 			CAMPoint2 camPoint2 = camSegmentConnectWithStartPnt.StartPoint;
 			CADPoint cadPOint2 = new CADPoint( camPoint2.Point, camPoint2.NormalVec_1st, camPoint2.NormalVec_2nd, camPoint2.TangentVec );
@@ -211,7 +213,7 @@ namespace MyCAM.CacheInfo
 			if( isBuildDone == false ) {
 				return;
 			}
-			CAMSegmentList = PathCAMSegList;
+			m_CAMSegmentList = PathCAMSegList;
 			CtrlToolSegIdxList = CtrlSegIdx;
 		}
 
