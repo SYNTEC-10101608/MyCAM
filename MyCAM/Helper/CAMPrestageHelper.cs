@@ -5,7 +5,77 @@ using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
-	internal class CAMPrestageHelper
+	public class CAMPointInfo
+	{
+		public CAMPoint2 Point
+		{
+			get; set;
+		}
+
+		public CAMPoint2 Point2
+		{
+			get; set;
+		}
+
+		public gp_Dir ToolVec
+		{
+			get
+			{
+				return m_ToolVec;
+			}
+			set
+			{
+				m_ToolVec = value;
+				setToolVec( value );
+			}
+
+		}
+
+		public bool IsCtrlPnt
+		{
+			get; set;
+		} = false;
+
+		public bool IsStartPnt
+		{
+			get; set;
+		} = false;
+
+		// if is not control point, ABValues is null
+		public Tuple<double, double> ABValues
+		{
+			get; set;
+		}
+
+		public double DistanceToNext
+		{
+			get; set;
+		}
+
+		public CAMPointInfo( CAMPoint2 point )
+		{
+			Point = point;
+			IsCtrlPnt = false;
+			IsStartPnt = false;
+			DistanceToNext = 0;
+		}
+
+		void setToolVec( gp_Dir dir )
+		{
+			if( dir == null ) {
+				return;
+			}
+			if( Point != null ) {
+				Point.ToolVec = dir;
+			}
+			if( Point2 != null ) {
+				Point2.ToolVec = dir;
+			}
+		}
+		gp_Dir m_ToolVec;
+	}
+
+	public class CAMPrestageHelper
 	{
 		public static List<CAMPointInfo> FlattenCADSegmentsToCAMPointInfo(
 			List<ICADSegment> cadSegmentList, CraftData craftData, bool isClosed )
