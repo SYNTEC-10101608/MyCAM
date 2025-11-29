@@ -61,12 +61,6 @@ namespace MyCAM.CacheInfo
 				}
 				return m_CtrlToolSegIdxList;
 			}
-			private set
-			{
-				if( value != null ) {
-					m_CtrlToolSegIdxList = value;
-				}
-			}
 		}
 
 		public List<ICAMSegment> LeadInSegment
@@ -130,14 +124,13 @@ namespace MyCAM.CacheInfo
 			CAMPoint camPoint = null;
 			ICAMSegment camSegmentConnectWithStartPnt = null;
 			if( m_CraftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
-				camSegmentConnectWithStartPnt = LeadInSegment.First();
+				camSegmentConnectWithStartPnt = m_LeadInSegmentList.First();
 			}
 			else {
-				if( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+				if( m_CAMSegmentList == null || m_CAMSegmentList.Count == 0 ) {
 					return null;
 				}
-				camSegmentConnectWithStartPnt = CAMSegmentList.First();
-				;
+				camSegmentConnectWithStartPnt = m_CAMSegmentList.First();
 			}
 			CAMPoint2 camPoint2 = camSegmentConnectWithStartPnt.StartPoint;
 			CADPoint cadPOint2 = new CADPoint( camPoint2.Point, camPoint2.NormalVec_1st, camPoint2.NormalVec_2nd, camPoint2.TangentVec );
@@ -154,7 +147,7 @@ namespace MyCAM.CacheInfo
 			CAMPoint camPoint = null;
 			ICAMSegment camSegmentConnectWithEndPnt = null;
 			if( m_CraftData.LeadLineParam.LeadOut.Type != LeadLineType.None ) {
-				camSegmentConnectWithEndPnt = LeadOutSegment.Last();
+				camSegmentConnectWithEndPnt = m_LeadOutSegmentList.Last();
 			}
 			else {
 				// with overcut
@@ -162,10 +155,10 @@ namespace MyCAM.CacheInfo
 					camSegmentConnectWithEndPnt = m_OverCutSegmentList.Last();
 				}
 				else {
-					if( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+					if( m_CAMSegmentList == null || m_CAMSegmentList.Count == 0 ) {
 						return null;
 					}
-					camSegmentConnectWithEndPnt = CAMSegmentList.Last();
+					camSegmentConnectWithEndPnt = m_CAMSegmentList.Last();
 				}
 			}
 			CAMPoint2 camEndPoint = camSegmentConnectWithEndPnt.EndPoint;
@@ -214,7 +207,7 @@ namespace MyCAM.CacheInfo
 				return;
 			}
 			m_CAMSegmentList = PathCAMSegList;
-			CtrlToolSegIdxList = CtrlSegIdx;
+			m_CtrlToolSegIdxList = CtrlSegIdx;
 		}
 
 		bool ReBuildCAMSegment( List<CAMPointInfo> pathCAMInfo, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx )
@@ -222,14 +215,14 @@ namespace MyCAM.CacheInfo
 			CtrlSegIdx = new List<int>();
 			int currentSegmentIdx = 0;
 			PathCAMSegList = new List<ICAMSegment>();
-			bool isBuildDone = ReBuildCAMSegmentFromStartPnt( pathCAMInfo, CADSegmentList, ref CtrlSegIdx, ref currentSegmentIdx, out List<ICAMSegment> camSegmentList );
+			bool isBuildDone = ReBuildCAMSegmentFromStartPnt( pathCAMInfo, m_CADSegmentList, ref CtrlSegIdx, ref currentSegmentIdx, out List<ICAMSegment> camSegmentList );
 			if( isBuildDone && camSegmentList != null ) {
 				PathCAMSegList.AddRange( camSegmentList );
 			}
 			else {
 				return false;
 			}
-			bool isBuildPreDone = ReBuildCAMSegBeforStartPnt( pathCAMInfo, CADSegmentList, ref CtrlSegIdx, ref currentSegmentIdx, out List<ICAMSegment> preCamSegmentList );
+			bool isBuildPreDone = ReBuildCAMSegBeforStartPnt( pathCAMInfo, m_CADSegmentList, ref CtrlSegIdx, ref currentSegmentIdx, out List<ICAMSegment> preCamSegmentList );
 			if( isBuildPreDone && preCamSegmentList != null ) {
 				PathCAMSegList.AddRange( preCamSegmentList );
 			}
@@ -313,14 +306,14 @@ namespace MyCAM.CacheInfo
 		List<CAMPointInfo> FlattenCADSegmentsToCAMPointInfo()
 		{
 			List<CAMPointInfo> result = new List<CAMPointInfo>();
-			if( CADSegmentList == null || CADSegmentList.Count == 0 ) {
+			if( m_CADSegmentList == null || m_CADSegmentList.Count == 0 ) {
 				return result;
 			}
 			SegmentPointIndex startPointIndex = m_CraftData.StartPointIndex;
 			Dictionary<SegmentPointIndex, Tuple<double, double>> toolVecModifyMap = m_CraftData.ToolVecModifyMap;
 
-			for( int segIdx = 0; segIdx < CADSegmentList.Count; segIdx++ ) {
-				ICADSegment cadSegment = CADSegmentList[ segIdx ];
+			for( int segIdx = 0; segIdx < m_CADSegmentList.Count; segIdx++ ) {
+				ICADSegment cadSegment = m_CADSegmentList[ segIdx ];
 				List<CADPoint> pointList = cadSegment.PointList;
 				for( int pntIdx = 0; pntIdx < pointList.Count; pntIdx++ ) {
 					CADPoint cadPoint = pointList[ pntIdx ];
@@ -831,10 +824,10 @@ namespace MyCAM.CacheInfo
 		void SetLead()
 		{
 			if( m_CraftData.LeadLineParam.LeadIn.Type != LeadLineType.None ) {
-				if( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+				if( m_CAMSegmentList == null || m_CAMSegmentList.Count == 0 ) {
 					return;
 				}
-				ICAMSegment camSegmentConnectWithStartPnt = CAMSegmentList.FirstOrDefault();
+				ICAMSegment camSegmentConnectWithStartPnt = m_CAMSegmentList.FirstOrDefault();
 				List<ICAMSegment> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithStartPnt, true );
 				m_LeadInSegmentList = leadCAMSegment;
 			}
@@ -845,10 +838,10 @@ namespace MyCAM.CacheInfo
 					camSegmentConnectWithEndPnt = m_OverCutSegmentList.Last();
 				}
 				else {
-					if( CAMSegmentList == null || CAMSegmentList.Count == 0 ) {
+					if( m_CAMSegmentList == null || m_CAMSegmentList.Count == 0 ) {
 						return;
 					}
-					camSegmentConnectWithEndPnt = CAMSegmentList.Last();
+					camSegmentConnectWithEndPnt = m_CAMSegmentList.Last();
 				}
 				List<ICAMSegment> leadCAMSegment = LeadHelper.BuildLeadCAMSegment( m_CraftData, camSegmentConnectWithEndPnt, false );
 				m_LeadOutSegmentList = leadCAMSegment;
