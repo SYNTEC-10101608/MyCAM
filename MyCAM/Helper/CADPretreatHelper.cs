@@ -59,7 +59,7 @@ namespace MyCAM.Helper
 					if( result != BuildCADError.Done ) {
 						return result;
 					}
-					BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildData.DiscCADPointList, ESegmentType.Line, cadSegBuildData.SegmentLength, cadSegBuildData.SubSegmentLength, cadSegBuildData.SubChordLength, out ICADSegment cadSegment );
+					BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildData, ESegmentType.Line, out ICADSegment cadSegment );
 					if( buildResult != BuildCADError.Done ) {
 						return buildResult;
 					}
@@ -75,7 +75,7 @@ namespace MyCAM.Helper
 					}
 
 					for( int j = 0; j < cadSegBuildDataList.Count; j++ ) {
-						BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildDataList[ j ].DiscCADPointList, ESegmentType.Arc, cadSegBuildDataList[ j ].SegmentLength, cadSegBuildDataList[ j ].SubSegmentLength, cadSegBuildDataList[ j ].SubChordLength, out ICADSegment cadSegment );
+						BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildDataList[ j ], ESegmentType.Arc, out ICADSegment cadSegment );
 						if( buildResult != BuildCADError.Done ) {
 							return buildResult;
 						}
@@ -96,7 +96,7 @@ namespace MyCAM.Helper
 					}
 					for( int j = 0; j < cadSegmentBuildDataList.Count; j++ ) {
 						// fix: 建議架構統一，ChordLength 在 PretreatmentHelper 算好傳回來===>上面DiscretizeBsplineToBuildData已經算回來了
-						BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegmentBuildDataList[ j ].DiscCADPointList, ESegmentType.Line, cadSegmentBuildDataList[ j ].SegmentLength, cadSegmentBuildDataList[ j ].SubSegmentLength, cadSegmentBuildDataList[ j ].SubChordLength, out ICADSegment cadSegment );
+						BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegmentBuildDataList[ j ], ESegmentType.Line, out ICADSegment cadSegment );
 						if( buildResult != BuildCADError.Done ) {
 							return buildResult;
 						}
