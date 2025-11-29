@@ -140,8 +140,8 @@ namespace MyCAM.Data
 
 	public class LineCADSegment : CADSegmentBase
 	{
-		public LineCADSegment( List<CADPoint> linePointList, double dTotalLength, double dPerArcLegnth, double dPerChordLength )
-			: base( linePointList, dTotalLength, dPerArcLegnth, dPerChordLength )
+		public LineCADSegment( List<CADPoint> linePointList, double dTotalLength, double dSubSegmentLegnth, double dSubChordLength )
+			: base( linePointList, dTotalLength, dSubSegmentLegnth, dSubChordLength )
 		{
 		}
 
@@ -165,8 +165,8 @@ namespace MyCAM.Data
 
 	public class ArcCADSegment : CADSegmentBase
 	{
-		public ArcCADSegment( List<CADPoint> arcPointList, double dTotalLength, double dPerArcLength, double dPerChordLength )
-			: base( arcPointList, dTotalLength, dPerArcLength, dPerChordLength )
+		public ArcCADSegment( List<CADPoint> arcPointList, double dTotalLength, double dSubSegmentLength, double dSubChordLength )
+			: base( arcPointList, dTotalLength, dSubSegmentLength, dSubChordLength )
 		{
 			if( arcPointList.Count <= 2 ) {
 				throw new System.ArgumentException( "ArcCADSegment requires at least 3 points to define a valid arc." );
@@ -230,17 +230,17 @@ namespace MyCAM.Data
 			get;
 		}
 
-		double TotalLength
+		double SegmentLength
 		{
 			get;
 		}
 
-		double PerChordLength
+		double SubChordLength
 		{
 			get;
 		}
 
-		double PerArcLength
+		double SubSegmentLength
 		{
 			get;
 		}
@@ -258,17 +258,17 @@ namespace MyCAM.Data
 
 	internal abstract class CAMSegmentBase : ICAMSegment
 	{
-		protected CAMSegmentBase( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength )
+		protected CAMSegmentBase( List<CAMPoint2> camPointList, double dSegmentLength, double dSubSegmentLength, double dSubChordLength )
 		{
 			if( camPointList.Count < 2 ) {
 				throw new System.ArgumentException( " CAMSegmentBasis constructing points are null" );
 			}
-			StartPoint = camPointList.First().Clone();
-			EndPoint = camPointList.Last().Clone();
-			CAMPointList = camPointList;
-			TotalLength = dTotalLength;
-			PerArcLength = dArcLength;
-			PerChordLength = dChordLength;
+			m_StartPoint = camPointList.First();
+			m_EndPoint = camPointList.Last();
+			m_CAMPointList = camPointList;
+			m_SegmentLength = dSegmentLength;
+			m_SubSegmentLength = dSubSegmentLength;
+			m_SubChordLength = dSubChordLength;
 		}
 
 		public abstract ESegmentType ContourType
@@ -283,12 +283,6 @@ namespace MyCAM.Data
 			{
 				return m_StartPoint;
 			}
-			private set
-			{
-				if( value != null ) {
-					m_StartPoint = value;
-				}
-			}
 		}
 
 		public virtual CAMPoint2 EndPoint
@@ -296,12 +290,6 @@ namespace MyCAM.Data
 			get
 			{
 				return m_EndPoint;
-			}
-			private set
-			{
-				if( value != null ) {
-					m_EndPoint = value;
-				}
 			}
 		}
 
@@ -311,40 +299,40 @@ namespace MyCAM.Data
 			{
 				return m_CAMPointList;
 			}
-			set
+		}
+
+		public virtual double SegmentLength
+		{
+			get
 			{
-				if( value != null ) {
-					m_CAMPointList = value;
-				}
+				return m_SegmentLength;
 			}
 		}
 
-		public virtual double TotalLength
+		public virtual double SubChordLength
 		{
-			get;
-			private set;
+			get
+			{
+				return m_SubChordLength;
+			}
 		}
 
-		public virtual double PerChordLength
+		public virtual double SubSegmentLength
 		{
-			get;
-			private set;
-		}
-
-		public virtual double PerArcLength
-		{
-			get;
-			private set;
+			get
+			{
+				return m_SubSegmentLength;
+			}
 		}
 
 		public virtual gp_Dir GetStartPointToolVec()
 		{
-			return new gp_Dir( StartPoint.ToolVec.XYZ() );
+			return new gp_Dir( m_StartPoint.ToolVec.XYZ() );
 		}
 
 		public virtual gp_Dir GetEndPointToolVec()
 		{
-			return new gp_Dir( EndPoint.ToolVec.XYZ() );
+			return new gp_Dir( m_EndPoint.ToolVec.XYZ() );
 		}
 
 		public virtual void SetStartPointToolVec( gp_Dir startPointToolVec )
@@ -352,7 +340,7 @@ namespace MyCAM.Data
 			if( startPointToolVec == null ) {
 				return;
 			}
-			StartPoint.ToolVec = new gp_Dir( startPointToolVec.XYZ() );
+			m_StartPoint.ToolVec = new gp_Dir( startPointToolVec.XYZ() );
 			CalculatePointLisToolVec();
 		}
 
@@ -361,7 +349,7 @@ namespace MyCAM.Data
 			if( endPointToolVec == null ) {
 				return;
 			}
-			EndPoint.ToolVec = new gp_Dir( endPointToolVec.XYZ() );
+			m_EndPoint.ToolVec = new gp_Dir( endPointToolVec.XYZ() );
 			CalculatePointLisToolVec();
 		}
 
@@ -369,8 +357,8 @@ namespace MyCAM.Data
 
 		protected virtual void CalculatePointLisToolVec()
 		{
-			gp_Vec startPointToolVec = new gp_Vec( StartPoint.ToolVec );
-			gp_Vec endPointToolVec = new gp_Vec( EndPoint.ToolVec );
+			gp_Vec startPointToolVec = new gp_Vec( m_StartPoint.ToolVec );
+			gp_Vec endPointToolVec = new gp_Vec( m_EndPoint.ToolVec );
 
 			// get the quaternion for interpolation
 			gp_Quaternion q12 = new gp_Quaternion( startPointToolVec, endPointToolVec );
@@ -378,7 +366,7 @@ namespace MyCAM.Data
 
 			gp_Quaternion q = new gp_Quaternion();
 			for( int i = 0; i < m_CAMPointList.Count - 1; i++ ) {
-				slerp.Interpolate( PerArcLength * i / TotalLength, ref q );
+				slerp.Interpolate( m_SubSegmentLength * i / m_SegmentLength, ref q );
 				gp_Trsf trsf = new gp_Trsf();
 				trsf.SetRotation( q );
 				gp_Dir toolVecDir = new gp_Dir( startPointToolVec.Transformed( trsf ) );
@@ -390,16 +378,16 @@ namespace MyCAM.Data
 		protected List<CAMPoint2> m_CAMPointList = new List<CAMPoint2>();
 		protected CAMPoint2 m_StartPoint;
 		protected CAMPoint2 m_EndPoint;
-		protected double m_TotalLength = 0.0;
-		protected double m_PerArcLength = 0.0;
-		protected double m_PerChordLength = 0.0;
+		protected double m_SegmentLength = 0.0;
+		protected double m_SubSegmentLength = 0.0;
+		protected double m_SubChordLength = 0.0;
 		protected bool m_isModifySegment = false;
 	}
 
 	internal class LineCAMSegment : CAMSegmentBase
 	{
-		public LineCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength )
-			: base( camPointList, dTotalLength, dArcLength, dChordLength )
+		public LineCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dSubSegmentLength, double dSubChordLength )
+			: base( camPointList, dTotalLength, dSubSegmentLength, dSubChordLength )
 		{
 		}
 
@@ -417,19 +405,22 @@ namespace MyCAM.Data
 			foreach( CAMPoint2 point in CAMPointList ) {
 				clonedPointList.Add( point.Clone() );
 			}
-			return new LineCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength );
+			return new LineCAMSegment( clonedPointList, m_SegmentLength, m_SubSegmentLength, m_SubChordLength );
 		}
 	}
 
 	internal class ArcCAMSegment : CAMSegmentBase
 	{
-		public ArcCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dArcLength, double dChordLength )
-			: base( camPointList, dTotalLength, dArcLength, dChordLength )
+		public ArcCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dSubSegmentLength, double dSubChordLength )
+			: base( camPointList, dTotalLength, dSubSegmentLength, dSubChordLength )
 		{
+			if( camPointList.Count <= 2 ) {
+				throw new System.ArgumentException( "ArcCAMSegment requires at least 3 points to define a valid arc." );
+			}
 			m_MidIndex = camPointList.Count / 2;
 
 			// share pointer
-			MidPoint = camPointList[ m_MidIndex ];
+			m_MidPoint = camPointList[ m_MidIndex ];
 		}
 
 		public override ESegmentType ContourType
@@ -446,7 +437,7 @@ namespace MyCAM.Data
 			foreach( CAMPoint2 point in CAMPointList ) {
 				clonedPointList.Add( point.Clone() );
 			}
-			return new ArcCAMSegment( clonedPointList, m_TotalLength, m_PerArcLength, m_PerChordLength );
+			return new ArcCAMSegment( clonedPointList, m_SegmentLength, m_SubSegmentLength, m_SubChordLength );
 		}
 
 		public CAMPoint2 MidPoint
@@ -454,12 +445,6 @@ namespace MyCAM.Data
 			get
 			{
 				return m_MidPoint;
-			}
-			private set
-			{
-				if( value != null ) {
-					m_MidPoint = value;
-				}
 			}
 		}
 

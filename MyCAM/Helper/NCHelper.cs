@@ -73,12 +73,12 @@ namespace MyCAM.Helper
 				reversedCAMPoints.Reverse();
 
 				if( segment is ArcCAMSegment ) {
-					reversedSegment.Add( new ArcCAMSegment( reversedCAMPoints, segment.TotalLength,
-						segment.PerArcLength, segment.PerChordLength ) );
+					reversedSegment.Add( new ArcCAMSegment( reversedCAMPoints, segment.SegmentLength,
+						segment.SubSegmentLength, segment.SubChordLength ) );
 				}
 				else if( segment is LineCAMSegment ) {
-					reversedSegment.Add( new LineCAMSegment( reversedCAMPoints, segment.TotalLength,
-						segment.PerArcLength, segment.PerChordLength) );
+					reversedSegment.Add( new LineCAMSegment( reversedCAMPoints, segment.SegmentLength,
+						segment.SubSegmentLength, segment.SubChordLength) );
 				}
 			}
 			reversedSegment.Reverse();
