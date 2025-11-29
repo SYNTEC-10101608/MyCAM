@@ -89,11 +89,12 @@ namespace MyCAM.Helper
 
 			// split arc by angle
 			List<double> segmentParamList = new List<double>();
-			int nSplitCount = (int)Math.Ceiling( angle / maxAngleRad );
-
-			// protection
-			if( nSplitCount < 1 ) {
+			int nSplitCount;
+			if( angle - maxAngleRad < DOUBLE_TOLERANCE ) {
 				nSplitCount = 1;
+			}
+			else {
+				nSplitCount = (int)Math.Ceiling( angle / maxAngleRad );
 			}
 			double dDeltaU = ( dEndU - dStartU ) / nSplitCount;
 
