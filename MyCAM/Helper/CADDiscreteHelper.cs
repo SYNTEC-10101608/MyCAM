@@ -31,6 +31,10 @@ namespace MyCAM.Helper
 		public double SubChordLength;
 	}
 
+
+	/// <summary>
+	/// The CADDiscreteHelper class discretizes 5D path wire data into CADPoint and CADSegment
+	/// </summary>
 	public static class CADDiscreteHelper
 	{
 		// public function area
