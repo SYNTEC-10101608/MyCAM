@@ -31,7 +31,7 @@ namespace MyCAM.Helper
 		public double SubChordLength;
 	}
 
-	public static class CADPretreatHelper
+	public static class CADDiscreteHelper
 	{
 		// public function area
 		public static BuildCADError BuildCADSegment( List<PathEdge5D> pathEdge5DList, out List<ICADSegment> cadSegmentList )
