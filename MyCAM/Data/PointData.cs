@@ -110,8 +110,7 @@ namespace MyCAM.Data
 			m_NormalVec_1st = new gp_Dir( normal1.XYZ() );
 			m_NormalVec_2nd = new gp_Dir( normal2.XYZ() );
 			m_TangentVec = new gp_Dir( tangVec.XYZ() );
-			ToolVec = toolVec;
-			// m_ToolVec = new gp_Dir( toolVec.XYZ() );
+			m_ToolVec = new gp_Dir( toolVec.XYZ() );
 		}
 
 		public gp_Pnt Point
@@ -146,6 +145,10 @@ namespace MyCAM.Data
 			{
 				return new gp_Dir( m_TangentVec.XYZ() );
 			}
+			set
+			{
+				m_TangentVec = new gp_Dir( value.XYZ() );
+			}
 		}
 
 		public gp_Dir ToolVec
@@ -163,56 +166,6 @@ namespace MyCAM.Data
 		public CAMPoint2 Clone()
 		{
 			return new CAMPoint2( Point, NormalVec_1st, NormalVec_2nd, TangentVec, ToolVec );
-		}
-
-		public bool Equals( CAMPoint2 other )
-		{
-			if( other == null ) {
-				return false;
-			}
-			if( ReferenceEquals( this, other ) ) {
-				return true;
-			}
-			const double TOLERANCE = 1e-3;
-			if( m_Point.IsEqual( other.m_Point, TOLERANCE ) == false ) {
-				return false;
-			}
-			if( ToolVec.IsEqual( other.ToolVec, TOLERANCE ) == false ) {
-				return false;
-			}
-			return true;
-		}
-
-		public override bool Equals( object obj )
-		{
-			return Equals( obj as CAMPoint2 );
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked {
-				int hash = 17;
-				hash = hash * 23 + m_Point.X().GetHashCode();
-				hash = hash * 23 + m_Point.Y().GetHashCode();
-				hash = hash * 23 + m_Point.Z().GetHashCode();
-				return hash;
-			}
-		}
-
-		public static bool operator ==( CAMPoint2 left, CAMPoint2 right )
-		{
-			if( ReferenceEquals( left, right ) ) {
-				return true;
-			}
-			if( left is null || right is null ) {
-				return false;
-			}
-			return left.Equals( right );
-		}
-
-		public static bool operator !=( CAMPoint2 left, CAMPoint2 right )
-		{
-			return !( left == right );
 		}
 
 		// using backing field to prevent modified outside
