@@ -20,6 +20,13 @@ namespace MyCAM.Helper
 
 			// go through the contour edges
 			for( int i = 0; i < pathEdge5DList.Count; i++ ) {
+				if( pathEdge5DList[ i ] == null ) {
+					return false;
+				}
+				if( pathEdge5DList[ i ].PathEdge == null || pathEdge5DList[ i ].PathEdge.IsNull()
+					|| pathEdge5DList[ i ].ComponentFace == null || pathEdge5DList[ i ].ComponentFace.IsNull() ) {
+					return false;
+				}
 				TopoDS_Edge edge = pathEdge5DList[ i ].PathEdge;
 				TopoDS_Face shellFace = pathEdge5DList[ i ].ComponentFace;
 				TopoDS_Face solidFace = pathEdge5DList[ i ].ComponentFace; // TODO: set solid face

@@ -348,7 +348,7 @@ namespace MyCAM.CacheInfo
 							currentInfo.IsCtrlPnt = true;
 							currentInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
 						}
-						currentInfo.DistanceToNext = cadSegment.PerChordLength;
+						currentInfo.DistanceToNext = cadSegment.SubChordLength;
 						result.Add( currentInfo );
 					}
 
@@ -370,7 +370,7 @@ namespace MyCAM.CacheInfo
 							lastPointInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
 						}
 						// Step 3: calculate distance to next point
-						lastPointInfo.DistanceToNext = cadSegment.PerChordLength;
+						lastPointInfo.DistanceToNext = cadSegment.SubChordLength;
 					}
 
 					// Case C : not overlap point
@@ -403,7 +403,7 @@ namespace MyCAM.CacheInfo
 							currentInfo.DistanceToNext = 0;
 						}
 						else {
-							currentInfo.DistanceToNext = cadSegment.PerChordLength;
+							currentInfo.DistanceToNext = cadSegment.SubChordLength;
 						}
 						result.Add( currentInfo );
 					}

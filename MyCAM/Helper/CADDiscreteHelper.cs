@@ -37,7 +37,7 @@ namespace MyCAM.Helper
 	{
 		// public function area
 		public static DiscreteCADError DiscretizeLine( TopoDS_Edge lineEdge, TopoDS_Face shellFace, out DiscretizedCADData cadSegBuildData,
-			double dMaxSegmentLength = DISCRETE_MAX_DEFLECTION )
+			double dMaxSegmentLength = DISCRETE_MAX_LENGTH )
 		{
 			cadSegBuildData = new DiscretizedCADData();
 			if( lineEdge == null || lineEdge.IsNull() || shellFace == null || shellFace.IsNull() || dMaxSegmentLength < DOUBLE_TOLERANCE ) {
@@ -67,7 +67,7 @@ namespace MyCAM.Helper
 			cadSegBuildData.SegmentLength = dEdgeLength;
 			cadSegBuildData.SubSegmentLength = dSubSegLength;
 
-			// discretize line will get the same length of SubSegmentLength and PerChordLength
+			// discretize line will get the same length of SubSegmentLength and SubChordLength
 			cadSegBuildData.SubChordLength = cadSegBuildData.SubSegmentLength;
 			return DiscreteCADError.Done;
 		}

@@ -626,7 +626,7 @@ namespace MyCAM.FileManager
 			set;
 		}
 
-		public double PerChordLength
+		public double SubChordLength
 		{
 			get;
 			set;
@@ -652,7 +652,7 @@ namespace MyCAM.FileManager
 			PointList = segment.PointList.Select( p => new CADPointDTO( p ) ).ToList();
 			TotalLength = segment.SegmentLength;
 			PerArcLength = segment.SubSegmentLength;
-			PerChordLength = segment.PerChordLength;
+			SubChordLength = segment.SubChordLength;
 
 			if( segment is ArcCADSegment arcSegment ) {
 				if( arcSegment != null && arcSegment.MidPoint != null ) {
@@ -673,9 +673,9 @@ namespace MyCAM.FileManager
 
 			switch( ContourType ) {
 				case ESegmentType.Line:
-					return new LineCADSegment( cadPoints, TotalLength, PerArcLength, PerChordLength );
+					return new LineCADSegment( cadPoints, TotalLength, PerArcLength, SubChordLength );
 				case ESegmentType.Arc:
-					return new ArcCADSegment( cadPoints, TotalLength, PerArcLength, PerChordLength );
+					return new ArcCADSegment( cadPoints, TotalLength, PerArcLength, SubChordLength );
 				default:
 					throw new InvalidOperationException( "Unknown contourType" );
 			}

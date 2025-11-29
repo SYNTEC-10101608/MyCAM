@@ -43,7 +43,7 @@ namespace MyCAM.Data
 			get;
 		}
 
-		double PerChordLength
+		double SubChordLength
 		{
 			get;
 		}
@@ -55,7 +55,7 @@ namespace MyCAM.Data
 
 	public abstract class CADSegmentBase : ICADSegment
 	{
-		protected CADSegmentBase( List<CADPoint> pointList, double dTotalLength, double dPerArcLength, double dPerChordLength )
+		protected CADSegmentBase( List<CADPoint> pointList, double dTotalLength, double dPerArcLength, double dSubChordLength )
 		{
 			if( pointList == null || pointList.Count < 2 ) {
 				throw new System.ArgumentException( "CADSegmentBasis constructing argument pointList null or count less than 2." );
@@ -65,7 +65,7 @@ namespace MyCAM.Data
 			m_PointList = pointList;
 			m_TotalLength = dTotalLength;
 			m_SubSegmentLength = dPerArcLength;
-			m_PerChordLength = dPerChordLength;
+			m_SubChordLength = dSubChordLength;
 		}
 
 		public abstract ESegmentType SegmentType
@@ -115,11 +115,11 @@ namespace MyCAM.Data
 			}
 		}
 
-		public double PerChordLength
+		public double SubChordLength
 		{
 			get
 			{
-				return m_PerChordLength;
+				return m_SubChordLength;
 			}
 		}
 
@@ -135,7 +135,7 @@ namespace MyCAM.Data
 		protected CADPoint m_EndPoint;
 		protected double m_TotalLength;
 		protected double m_SubSegmentLength;
-		protected double m_PerChordLength;
+		protected double m_SubChordLength;
 	}
 
 	public class LineCADSegment : CADSegmentBase
@@ -159,7 +159,7 @@ namespace MyCAM.Data
 			foreach( CADPoint point in m_PointList ) {
 				clonedPointList.Add( point.Clone() );
 			}
-			return new LineCADSegment( clonedPointList, m_TotalLength, m_SubSegmentLength, m_PerChordLength );
+			return new LineCADSegment( clonedPointList, m_TotalLength, m_SubSegmentLength, m_SubChordLength );
 		}
 	}
 
@@ -197,7 +197,7 @@ namespace MyCAM.Data
 			foreach( CADPoint point in m_PointList ) {
 				clonedPointList.Add( point.Clone() );
 			}
-			return new ArcCADSegment( clonedPointList, m_TotalLength, m_SubSegmentLength, m_PerChordLength );
+			return new ArcCADSegment( clonedPointList, m_TotalLength, m_SubSegmentLength, m_SubChordLength );
 		}
 
 		CADPoint m_MidPoint;
