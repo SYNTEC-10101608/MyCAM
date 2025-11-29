@@ -202,7 +202,7 @@ namespace MyCAM.CacheInfo
 			}
 
 			// Step 2: Do interpolation
-			VectorInterpolateHelper.ApplyToolVectorInterpolation( pathCAMInfo, m_CraftData.IsReverse, IsClosed );
+			ToolVectorHelper.CalculateToolVector( pathCAMInfo, m_CraftData.IsToolVecReverse, m_CraftData.IsReverse, IsClosed );
 
 			// Step 3: use caminfo to build cam segment
 			bool isBuildDone = ReBuildCAMSegment( pathCAMInfo, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx );
