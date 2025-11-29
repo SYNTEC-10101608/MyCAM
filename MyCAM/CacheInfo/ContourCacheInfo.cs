@@ -196,7 +196,10 @@ namespace MyCAM.CacheInfo
 			m_IsCraftDataDirty = false;
 
 			// Step 1: Collect all cad point
-			List<CAMPointInfo> pathCAMInfo = FlattenCADSegmentsToCAMPointInfo();
+			List<CAMPointInfo> pathCAMInfo = CAMPrestageHelper.FlattenCADSegmentsToCAMPointInfo( m_CADSegmentList, m_CraftData, IsClosed );
+			if( m_CraftData.IsReverse ) {
+				ReverseCAMInfo( ref pathCAMInfo );
+			}
 
 			// Step 2: Do interpolation
 			ApplyToolVectorInterpolation( pathCAMInfo, m_CraftData.IsReverse );
@@ -208,6 +211,19 @@ namespace MyCAM.CacheInfo
 			}
 			m_CAMSegmentList = PathCAMSegList;
 			m_CtrlToolSegIdxList = CtrlSegIdx;
+		}
+
+		void ReverseCAMInfo( ref List<CAMPointInfo> camInfoList )
+		{
+			camInfoList.Reverse();
+			foreach( CAMPointInfo camInfo in camInfoList ) {
+				if( camInfo.SharingPoint == null ) {
+					continue;
+				}
+				CAMPoint2 tempPnt = camInfo.Point;
+				camInfo.Point = camInfo.SharingPoint;
+				camInfo.SharingPoint = tempPnt;
+			}
 		}
 
 		bool ReBuildCAMSegment( List<CAMPointInfo> pathCAMInfo, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx )
@@ -236,13 +252,13 @@ namespace MyCAM.CacheInfo
 		{
 			// consider wrapped
 			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + pathCAMInfo.Count : nEndIndex;
-			if( pathCAMInfo[ nStartIndex ].Point2 == null || pathCAMInfo[ nEndIndex ].Point2 == null ) {
+			if( pathCAMInfo[ nStartIndex ].SharingPoint == null || pathCAMInfo[ nEndIndex ].SharingPoint == null ) {
 				return;
 			}
 
 			// to keep use same point to interpolate
-			gp_Dir startPntTanVec = isReverse ? pathCAMInfo[ nStartIndex ].Point2.TangentVec : pathCAMInfo[ nStartIndex ].Point.TangentVec;
-			gp_Dir endPntTanVec = isReverse ? pathCAMInfo[ nEndIndex ].Point2.TangentVec : pathCAMInfo[ nEndIndex ].Point.TangentVec;
+			gp_Dir startPntTanVec = isReverse ? pathCAMInfo[ nStartIndex ].SharingPoint.TangentVec : pathCAMInfo[ nStartIndex ].Point.TangentVec;
+			gp_Dir endPntTanVec = isReverse ? pathCAMInfo[ nEndIndex ].SharingPoint.TangentVec : pathCAMInfo[ nEndIndex ].Point.TangentVec;
 
 			// get the start and end tool vector
 			gp_Vec startVec = GetVecFromAB( pathCAMInfo[ nStartIndex ].Point.NormalVec_1st,
@@ -298,17 +314,6 @@ namespace MyCAM.CacheInfo
 			return intervalList;
 		}
 
-		// double cam point case 
-		// 1. frist segment first pnt
-		// 2. start pnt
-		// 3. overlap area pnt
-		// 4. ctrl pnt
-		// Extracted FlattenCADSegmentsToCAMPointInfo logic to CAMPrestageHelper
-		List<CAMPointInfo> FlattenCADSegmentsToCAMPointInfo()
-		{
-			return CAMPrestageHelper.FlattenCADSegmentsToCAMPointInfo( m_CADSegmentList, m_CraftData, IsClosed );
-		}
-
 		bool ReBuildCAMSegBeforStartPnt( List<CAMPointInfo> camPntList, IReadOnlyList<ICADSegment> cadSegmentList, ref List<int> CtrlSegIdx, ref int currentSegmentIdx, out List<ICAMSegment> camSegmentList )
 		{
 			camSegmentList = new List<ICAMSegment>();
@@ -333,7 +338,7 @@ namespace MyCAM.CacheInfo
 				currentSegmentPoints.Add( currentPointInfo.Point );
 
 				// check need to build CAMSegment
-				bool isSplitPoint = currentPointInfo.Point2 != null && i != 0;
+				bool isSplitPoint = currentPointInfo.SharingPoint != null && i != 0;
 				bool reachStartPoint = i == nStartPntIndx;
 
 				if( isSplitPoint || reachStartPoint ) {
@@ -359,7 +364,7 @@ namespace MyCAM.CacheInfo
 					// is new segment start
 					if( !reachStartPoint ) {
 						currentSegmentPoints = new List<CAMPoint2>();
-						currentSegmentPoints.Add( currentPointInfo.Point2 );
+						currentSegmentPoints.Add( currentPointInfo.SharingPoint );
 					}
 				}
 			}
@@ -390,8 +395,8 @@ namespace MyCAM.CacheInfo
 				if( i == nStartPntIndx ) {
 
 					// any segment to build start with point2
-					if( currentPointInfo.Point2 != null ) {
-						currentSegmentPoints.Add( currentPointInfo.Point2 );
+					if( currentPointInfo.SharingPoint != null ) {
+						currentSegmentPoints.Add( currentPointInfo.SharingPoint );
 					}
 
 					// start point caminfo need have two pnt
@@ -404,7 +409,7 @@ namespace MyCAM.CacheInfo
 				}
 
 				// check special case (break pnt)
-				bool isSplitPoint = currentPointInfo.Point2 != null && i != nStartPntIndx;
+				bool isSplitPoint = currentPointInfo.SharingPoint != null && i != nStartPntIndx;
 				bool isLastPoint = i == camPntList.Count - 1;
 				if( isSplitPoint || isLastPoint ) {
 
@@ -444,7 +449,7 @@ namespace MyCAM.CacheInfo
 						currentSegmentPoints = new List<CAMPoint2>();
 
 						// next seg start at point2
-						currentSegmentPoints.Add( currentPointInfo.Point2 );
+						currentSegmentPoints.Add( currentPointInfo.SharingPoint );
 					}
 				}
 			}
