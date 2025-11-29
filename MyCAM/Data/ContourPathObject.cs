@@ -18,8 +18,8 @@ namespace MyCAM.Data
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
 			bool isClosed = DetermineIfClosed( shape );
-			BuildCADError isBuildDone = CADDiscreteHelper.BuildCADSegment( pathDataList, out List<ICADSegment> cadSegList );
-			if( isBuildDone != BuildCADError.Done || cadSegList == null || cadSegList.Count == 0 ) {
+			bool isBuildDone = CADSegmentBuilder.BuildCADSegment( pathDataList, out List<ICADSegment> cadSegList );
+			if( !isBuildDone || cadSegList == null || cadSegList.Count == 0 ) {
 				throw new Exception( "ContourPathObject CAD segment build failed" );
 			}
 			m_CADSegmentList = cadSegList;
