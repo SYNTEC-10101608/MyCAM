@@ -208,7 +208,7 @@ namespace MyCAM.Data
 
 	#region CAM Segment
 
-	internal interface ICAMSegment
+	public interface ICAMSegment
 	{
 		ESegmentType ContourType
 		{
@@ -256,7 +256,7 @@ namespace MyCAM.Data
 		ICAMSegment Clone();
 	}
 
-	internal abstract class CAMSegmentBase : ICAMSegment
+	public abstract class CAMSegmentBase : ICAMSegment
 	{
 		protected CAMSegmentBase( List<CAMPoint2> camPointList, double dSegmentLength, double dSubSegmentLength, double dSubChordLength )
 		{
@@ -384,7 +384,7 @@ namespace MyCAM.Data
 		protected bool m_isModifySegment = false;
 	}
 
-	internal class LineCAMSegment : CAMSegmentBase
+	public class LineCAMSegment : CAMSegmentBase
 	{
 		public LineCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dSubSegmentLength, double dSubChordLength )
 			: base( camPointList, dTotalLength, dSubSegmentLength, dSubChordLength )
@@ -409,7 +409,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal class ArcCAMSegment : CAMSegmentBase
+	public class ArcCAMSegment : CAMSegmentBase
 	{
 		public ArcCAMSegment( List<CAMPoint2> camPointList, double dTotalLength, double dSubSegmentLength, double dSubChordLength )
 			: base( camPointList, dTotalLength, dSubSegmentLength, dSubChordLength )
@@ -451,6 +451,5 @@ namespace MyCAM.Data
 		CAMPoint2 m_MidPoint;
 		int m_MidIndex = 0;
 	}
-
 	#endregion
 }
