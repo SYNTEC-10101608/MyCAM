@@ -14,6 +14,10 @@ using System.Linq;
 
 namespace MyCAM.Helper
 {
+	public enum DiscreteError
+	{
+	}
+
 	public enum BuildCADError
 	{
 		Done,
@@ -39,10 +43,10 @@ namespace MyCAM.Helper
 		public static BuildCADError BuildCADSegment( List<PathEdge5D> pathEdge5DList, out List<ICADSegment> cadSegmentList )
 		{
 			cadSegmentList = new List<ICADSegment>();
-			if( pathEdge5DList == null ) {
-				// fix:應該回傳空 list?
+			if( pathEdge5DList == null || pathEdge5DList.Count == 0 ) {
 				return BuildCADError.ParamError;
 			}
+
 			// go through the contour edges
 			for( int i = 0; i < pathEdge5DList.Count; i++ ) {
 				TopoDS_Edge edge = pathEdge5DList[ i ].PathEdge;
@@ -51,15 +55,11 @@ namespace MyCAM.Helper
 
 				// this curve is line use equal length split
 				if( GeometryTool.IsLine( edge, out _, out _ ) ) {
-
-					// fix: 這個精度的命名需要調整一下
-					BuildCADError result = DiscretizeLineToBuildData( edge, shellFace, DISCRETE_MAX_LENGTH, out DiscretizedCADData cadSegBuildData );
+					BuildCADError result = DiscretizeLine( edge, shellFace, DISCRETE_MAX_LENGTH, out DiscretizedCADData cadSegBuildData );
 					if( result != BuildCADError.Done ) {
 						return result;
 					}
-					// fix: 這邊 tempCADPointList 應該要先檢查 ===>改為CADSegmentBuilder自己檢查然後吐出結果
 					BuildCADError buildResult = CADSegmentBuilder.BuildCADSegment( cadSegBuildData.DiscCADPointList, ESegmentType.Line, cadSegBuildData.SegmentLength, cadSegBuildData.SubSegmentLength, cadSegBuildData.SubChordLength, out ICADSegment cadSegment );
-					// fix: 這邊 failed 的可能是哪些情況，是否應該直接終止整個流程?===>改為直接回傳錯誤碼
 					if( buildResult != BuildCADError.Done ) {
 						return buildResult;
 					}
@@ -69,7 +69,7 @@ namespace MyCAM.Helper
 				// this curve is arc choose the best option from the two options (chord error vs equal length)
 				// fix: 這邊 center 跟 arcAngle 沒有用到?==>done
 				else if( GeometryTool.IsCircularArc( edge, out _, out _, out _, out _ ) ) {
-					BuildCADError result = DiscretizeArcToSegmentBuildData( edge, shellFace, out List<DiscretizedCADData> cadSegBuildDataList, Math.PI / 2 );
+					BuildCADError result = DiscretizeArc( edge, shellFace, out List<DiscretizedCADData> cadSegBuildDataList, Math.PI / 2 );
 					if( result != BuildCADError.Done || cadSegBuildDataList == null || cadSegBuildDataList.Count == 0 ) {
 						return result;
 					}
@@ -87,7 +87,7 @@ namespace MyCAM.Helper
 				else {
 
 					// separate this bspline
-					BuildCADError result = DiscretizeBsplineToBuildData( edge, shellFace, out List<DiscretizedCADData> cadSegmentBuildDataList );
+					BuildCADError result = DiscretizeBspline( edge, shellFace, out List<DiscretizedCADData> cadSegmentBuildDataList );
 					if( result != BuildCADError.Done ) {
 						return result;
 					}
@@ -107,7 +107,7 @@ namespace MyCAM.Helper
 			return BuildCADError.Done;
 		}
 
-		static BuildCADError DiscretizeLineToBuildData( TopoDS_Edge lineEdge, TopoDS_Face shellFace, double dMaxSegmentLength, out DiscretizedCADData cadSegBuildData )
+		static BuildCADError DiscretizeLine( TopoDS_Edge lineEdge, TopoDS_Face shellFace, double dMaxSegmentLength, out DiscretizedCADData cadSegBuildData )
 		{
 			cadSegBuildData = new DiscretizedCADData();
 			// fix: 這裡應該要先做傳入引數的檢查 (其他 function 也檢查一下)
@@ -145,7 +145,7 @@ namespace MyCAM.Helper
 			return BuildCADError.Done;
 		}
 
-		static BuildCADError DiscretizeArcToSegmentBuildData( TopoDS_Edge edge, TopoDS_Face shellFace, out List<DiscretizedCADData> cadSegmentBuildData, double maxAngleRad = Math.PI / 2 )
+		static BuildCADError DiscretizeArc( TopoDS_Edge edge, TopoDS_Face shellFace, out List<DiscretizedCADData> cadSegmentBuildData, double maxAngleRad = Math.PI / 2 )
 		{
 			cadSegmentBuildData = new List<DiscretizedCADData>();
 
@@ -206,7 +206,7 @@ namespace MyCAM.Helper
 			return BuildCADError.Done;
 		}
 
-		static BuildCADError DiscretizeBsplineToBuildData( TopoDS_Edge edge, TopoDS_Face shellFace, out List<DiscretizedCADData> cadSegmentBuildDataList )
+		static BuildCADError DiscretizeBspline( TopoDS_Edge edge, TopoDS_Face shellFace, out List<DiscretizedCADData> cadSegmentBuildDataList )
 		{
 			cadSegmentBuildDataList = new List<DiscretizedCADData>();
 			if( edge == null || edge.IsNull() || shellFace == null || shellFace.IsNull() ) {

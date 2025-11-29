@@ -1,11 +1,8 @@
 ﻿using MyCAM.Data;
-using OCC.gp;
-using OCCTool;
 using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
-	// fix: 命名 CADCAM 感覺可以省略，或是 builder 去分 CAD/CAM
 	internal static class CADSegmentBuilder
 	{
 		const int LOWEST_PointsToBuildSegment = 2;
