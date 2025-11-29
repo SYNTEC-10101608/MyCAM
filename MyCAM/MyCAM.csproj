@@ -107,7 +107,7 @@
     </Compile>
     <Compile Include="Helper\CADSegmentBuilder.cs" />
     <Compile Include="Helper\CAMPostStageHelper.cs" />
-    <Compile Include="Helper\CAMPreStageHelper.cs" />
+    <Compile Include="Helper\CAMPretageHelper.cs" />
     <Compile Include="Helper\CAMSegmentBuilder.cs" />
     <Compile Include="Helper\MachineDataXMLHelper.cs" />
     <Compile Include="Helper\NCHelper.cs" />
