@@ -220,7 +220,7 @@ namespace MyCAM.CacheInfo
 			}
 
 			// Step 3: use caminfo to build cam segment
-			List<ICAMSegElementInfo> camSegElementInfoList = pathCAMInfoList.Cast<ICAMSegElementInfo>().ToList();
+			List<ICAMSegInfo> camSegElementInfoList = pathCAMInfoList.Cast<ICAMSegInfo>().ToList();
 			bool isBuildDone = CAMPostStageHelper.ReBuildCAMSegment( camSegElementInfoList, IsClosed, out List<ICAMSegment> PathCAMSegList, out List<int> CtrlSegIdx );
 			if( isBuildDone == false ) {
 				return;

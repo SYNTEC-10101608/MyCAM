@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
-	public class CAMPointInfo : IToolVecCAMPointInfo, ICAMSegElementInfo
+	public class CAMPointInfo : IToolVecCAMPointInfo, ICAMSegInfo
 	{
 		public CAMPoint2 MainPoint
 		{
