@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
-	public class CAMPointInfo : IToolVecCAMPointInfo
+	public class CAMPointInfo : IToolVecCAMPointInfo, ICAMSegElementInfo
 	{
 		public CAMPoint2 MainPoint
 		{
@@ -18,7 +18,15 @@ namespace MyCAM.Helper
 			get; set;
 		}
 
+		public ICADSegment MainPointSeg
+		{
+			get; set;
+		}
 
+		public ICADSegment SharingPointSeg
+		{
+			get; set;
+		}
 
 		public gp_Dir ToolVec
 		{
@@ -39,12 +47,12 @@ namespace MyCAM.Helper
 		public bool IsToolVecPnt
 		{
 			get; set;
-		} = false;
+		}
 
 		public bool IsStartPnt
 		{
 			get; set;
-		} = false;
+		}
 
 		// if is not control point, ABValues is null
 		public Tuple<double, double> ABValues
@@ -103,6 +111,8 @@ namespace MyCAM.Helper
 					if( isFirstSegFirstPnt ) {
 						CAMPointInfo currentInfo = new CAMPointInfo( camPoint );
 						currentInfo.SharingPoint = camPoint.Clone();
+						currentInfo.MainPointSeg = cadSegment;
+						currentInfo.SharingPointSeg = cadSegment;
 
 						// set flags
 						bool isStartPoint = startPointIndex.Equals( currentPointIndex );
@@ -124,6 +134,7 @@ namespace MyCAM.Helper
 					else if( isOverlapPnt ) {
 						CAMPointInfo lastPointInfo = result[ result.Count - 1 ];
 						lastPointInfo.SharingPoint = camPoint;
+						lastPointInfo.SharingPointSeg = cadSegment;
 
 						// set flags
 						bool isStartPoint = startPointIndex.Equals( currentPointIndex );
@@ -143,18 +154,21 @@ namespace MyCAM.Helper
 					// normal point inside a sgment, we add new point info
 					else {
 						CAMPointInfo currentInfo = new CAMPointInfo( camPoint );
+						currentInfo.MainPointSeg = cadSegment;
 
 						// set flags
 						bool isStartPoint = startPointIndex.Equals( currentPointIndex );
 						if( isStartPoint ) {
 							currentInfo.IsStartPnt = true;
 							currentInfo.SharingPoint = camPoint.Clone();
+							currentInfo.SharingPointSeg = cadSegment;
 						}
 						bool isControlPoint = toolVecModifyMap.ContainsKey( currentPointIndex );
 						if( isControlPoint ) {
 							currentInfo.IsToolVecPnt = true;
 							currentInfo.ABValues = toolVecModifyMap[ currentPointIndex ];
 							currentInfo.SharingPoint = camPoint.Clone();
+							currentInfo.SharingPointSeg = cadSegment;
 						}
 
 						// wait next segment to set distance to next, or for a non-closed path, just set 0
@@ -184,6 +198,7 @@ namespace MyCAM.Helper
 				// the merged point is point form last point, and the sharing point is from first point
 				CAMPointInfo firstPointInfo = result[ 0 ];
 				firstPointInfo.MainPoint = lastCAMPoint;
+				firstPointInfo.MainPointSeg = lastCAMInfo.MainPointSeg;
 
 				// merge flags
 				if( lastCAMInfo.IsStartPnt ) {
