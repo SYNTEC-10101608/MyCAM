@@ -11,7 +11,7 @@ namespace MyCAM.Helper
 		{
 			get;
 		}
-		CAMPoint2 Point
+		CAMPoint2 MainPoint
 		{
 			get;
 		}
@@ -49,7 +49,7 @@ namespace MyCAM.Helper
 			if( ctrlPntIdx.Count == 0 ) {
 				if( isToolVecReverse ) {
 					foreach( var pointInfo in camPointInfoList ) {
-						pointInfo.ToolVec = pointInfo.Point.NormalVec_1st.Reversed();
+						pointInfo.ToolVec = pointInfo.MainPoint.NormalVec_1st.Reversed();
 					}
 				}
 				return;
@@ -133,8 +133,8 @@ namespace MyCAM.Helper
 			var abValues = controlPoint.ABValues;
 
 			// use sharing point tangent if it exists and path is reversed
-			gp_Dir tangentVec = controlPoint.Point.TangentVec;
-			gp_Dir initToolVec = controlPoint.Point.NormalVec_1st;
+			gp_Dir tangentVec = controlPoint.MainPoint.TangentVec;
+			gp_Dir initToolVec = controlPoint.MainPoint.NormalVec_1st;
 			if( isToolVecReverse ) {
 				initToolVec.Reverse();
 			}

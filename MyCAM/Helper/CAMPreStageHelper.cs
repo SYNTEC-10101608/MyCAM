@@ -7,7 +7,7 @@ namespace MyCAM.Helper
 {
 	public class CAMPointInfo : IToolVecCAMPointInfo
 	{
-		public CAMPoint2 Point
+		public CAMPoint2 MainPoint
 		{
 			get; set;
 		}
@@ -18,6 +18,8 @@ namespace MyCAM.Helper
 			get; set;
 		}
 
+
+
 		public gp_Dir ToolVec
 		{
 			set
@@ -25,8 +27,8 @@ namespace MyCAM.Helper
 				if( value == null ) {
 					return;
 				}
-				if( Point != null ) {
-					Point.ToolVec = new gp_Dir( value.XYZ() );
+				if( MainPoint != null ) {
+					MainPoint.ToolVec = new gp_Dir( value.XYZ() );
 				}
 				if( SharingPoint != null ) {
 					SharingPoint.ToolVec = new gp_Dir( value.XYZ() );
@@ -57,7 +59,7 @@ namespace MyCAM.Helper
 
 		public CAMPointInfo( CAMPoint2 point )
 		{
-			Point = point;
+			MainPoint = point;
 			SharingPoint = null;
 			IsToolVecPnt = false;
 			IsStartPnt = false;
@@ -174,14 +176,14 @@ namespace MyCAM.Helper
 
 				// find last point info
 				CAMPointInfo lastCAMInfo = result[ result.Count - 1 ];
-				CAMPoint2 lastCAMPoint = lastCAMInfo.Point.Clone();
+				CAMPoint2 lastCAMPoint = lastCAMInfo.MainPoint.Clone();
 
 				// remove last point info
 				result.RemoveAt( result.Count - 1 );
 
 				// the merged point is point form last point, and the sharing point is from first point
 				CAMPointInfo firstPointInfo = result[ 0 ];
-				firstPointInfo.Point = lastCAMPoint;
+				firstPointInfo.MainPoint = lastCAMPoint;
 
 				// merge flags
 				if( lastCAMInfo.IsStartPnt ) {

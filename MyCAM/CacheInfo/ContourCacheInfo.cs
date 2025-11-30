@@ -236,8 +236,8 @@ namespace MyCAM.CacheInfo
 				if( camInfo.SharingPoint == null ) {
 					continue;
 				}
-				CAMPoint2 tempPnt = camInfo.Point;
-				camInfo.Point = camInfo.SharingPoint;
+				CAMPoint2 tempPnt = camInfo.MainPoint;
+				camInfo.MainPoint = camInfo.SharingPoint;
 				camInfo.SharingPoint = tempPnt;
 			}
 		}

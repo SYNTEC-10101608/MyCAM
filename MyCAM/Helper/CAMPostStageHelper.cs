@@ -53,7 +53,7 @@ namespace MyCAM.Helper
 			List<CAMPoint2> currentSegmentPoints = new List<CAMPoint2>();
 			for( int i = 0; i <= nStartPntIndx; i++ ) {
 				CAMPointInfo currentPointInfo = camPntList[ i ];
-				currentSegmentPoints.Add( currentPointInfo.Point );
+				currentSegmentPoints.Add( currentPointInfo.MainPoint );
 
 				// check need to build CAMSegment
 				bool isSplitPoint = currentPointInfo.SharingPoint != null && i != 0;
@@ -123,7 +123,7 @@ namespace MyCAM.Helper
 					}
 				}
 				else {
-					currentSegmentPoints.Add( currentPointInfo.Point );
+					currentSegmentPoints.Add( currentPointInfo.MainPoint );
 				}
 
 				// check special case (break pnt)
@@ -135,7 +135,7 @@ namespace MyCAM.Helper
 					if( isLastPoint && isClosed ) {
 
 						// add point back : real end pnt is first segment index[0]
-						currentSegmentPoints.Add( camPntList[ 0 ].Point );
+						currentSegmentPoints.Add( camPntList[ 0 ].MainPoint );
 					}
 
 					// build cam segment
