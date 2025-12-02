@@ -10,17 +10,19 @@ namespace MyCAM.CacheInfo
 {
 	public class ContourCacheInfo : ICacheInfo
 	{
-		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData, bool isClose )
+		public ContourCacheInfo( string szID, ContourGeomData geomData, CraftData craftData, bool isClose )
 		{
-			if( string.IsNullOrEmpty( szID ) || cadPointList == null || cadPointList.Count == 0 || craftData == null ) {
+			if( string.IsNullOrEmpty( szID ) || geomData == null || craftData == null ) {
 				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );
 			}
+			if( geomData.CADPointList.Count == 0 ) {
+				throw new ArgumentException( "ContourCacheInfo constructing argument empty cadPointList" );
+			}
 			UID = szID;
-			m_CADPointList = cadPointList;
+			m_CADPointList = geomData.CADPointList;
 			m_CraftData = craftData;
 			IsClosed = isClose;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
-
 			BuildCAMPointList();
 		}
 
@@ -37,7 +39,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		#region result
+		#region computation result
 
 		internal List<CAMPoint> CAMPointList
 		{
@@ -83,20 +85,6 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public bool IsClosed
-		{
-			get; private set;
-		}
-
-		#endregion
-
-		#region Public API
-		// when the shape has tranform, need to call this to update the cache info
-		public void Update()
-		{
-			BuildCAMPointList();
-		}
-
 		public CAMPoint GetProcessStartPoint()
 		{
 			if( m_IsCraftDataDirty ) {
@@ -129,15 +117,25 @@ namespace MyCAM.CacheInfo
 			}
 			return camPoint;
 		}
+		#endregion
+
+		#region API
+		// when the shape has tranform, need to call this to update the cache info
+		public void DoTransform()
+		{
+			BuildCAMPointList();
+		}
+		#endregion
+
+		#region craft data
+		public int GetPathStartPointIndex()
+		{
+			return m_CraftData.StartPointIndex;
+		}
 
 		public bool GetPathIsReverse()
 		{
 			return m_CraftData.IsReverse;
-		}
-
-		public int GetPathStartPointIndex()
-		{
-			return m_CraftData.StartPointIndex;
 		}
 
 		public LeadData GetPathLeadData()
@@ -149,8 +147,12 @@ namespace MyCAM.CacheInfo
 		{
 			return m_CraftData.OverCutLength;
 		}
-
 		#endregion
+
+		public bool IsClosed
+		{
+			get; private set;
+		}
 
 		void BuildCAMPointList()
 		{
