@@ -20,6 +20,7 @@ namespace MyCAM.CacheInfo
 			}
 			UID = szID;
 			m_CADPointList = geomData.CADPointList;
+			m_ConnectCADPointMap = geomData.ConnectPointMap;
 			m_CraftData = craftData;
 			IsClosed = isClose;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
@@ -180,19 +181,37 @@ namespace MyCAM.CacheInfo
 		void BuildCAMPointList()
 		{
 			m_IsCraftDataDirty = false;
+
+			// bild inital CAM point list
 			m_CAMPointList = new List<CAMPoint>();
 			foreach( CADPoint cadPoint in m_CADPointList ) {
 				CAMPoint camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st );
 				m_CAMPointList.Add( camPoint );
+				if( m_ConnectCADPointMap.ContainsKey( cadPoint ) ) {
+					CADPoint connectedCADPoint = m_ConnectCADPointMap[ cadPoint ];
+					CAMPoint connectedCAMPoint = new CAMPoint( connectedCADPoint, connectedCADPoint.NormalVec_1st );
+					m_ConnectCAMPointMap.Add( camPoint, connectedCAMPoint );
+				}
 			}
+
+			// set tool vector
 			List<IToolVecPoint> toolVecPointList = m_CAMPointList.Cast<IToolVecPoint>().ToList();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, IsClosed, m_CraftData.IsReverse );
+			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, IsClosed, m_CraftData.IsToolVecReverse );
+			foreach( var oneConnect in m_ConnectCAMPointMap ) {
+				oneConnect.Value.ToolVec = oneConnect.Key.ToolVec;
+			}
+
+			// set start point and orientation
 			SetStartPoint();
 			SetOrientation();
 
 			// close the loop if is closed
 			if( IsClosed && m_CAMPointList.Count > 0 ) {
-				m_CAMPointList.Add( m_CAMPointList[ 0 ].Clone() );
+				CAMPoint startPoint = m_CAMPointList[ 0 ];
+				CAMPoint connectedCAMPoint = m_ConnectCAMPointMap.ContainsKey( startPoint )
+												? m_ConnectCAMPointMap[ startPoint ]
+												: startPoint.Clone();
+				m_CAMPointList.Add( connectedCAMPoint );
 			}
 
 			// all CAM point are settled down, start set lead / overcut
@@ -225,13 +244,6 @@ namespace MyCAM.CacheInfo
 					m_CAMPointList.Remove( lastPoint );
 					m_CAMPointList.Insert( 0, lastPoint );
 				}
-			}
-		}
-
-		void SetCraftDataDirty()
-		{
-			if( !m_IsCraftDataDirty ) {
-				m_IsCraftDataDirty = true;
 			}
 		}
 
@@ -393,7 +405,15 @@ namespace MyCAM.CacheInfo
 
 		#endregion
 
+		void SetCraftDataDirty()
+		{
+			if( !m_IsCraftDataDirty ) {
+				m_IsCraftDataDirty = true;
+			}
+		}
+
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
+		Dictionary<CAMPoint, CAMPoint> m_ConnectCAMPointMap = new Dictionary<CAMPoint, CAMPoint>();
 		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
@@ -401,6 +421,7 @@ namespace MyCAM.CacheInfo
 		// they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
 		List<CADPoint> m_CADPointList = new List<CADPoint>();
+		Dictionary<CADPoint, CADPoint> m_ConnectCADPointMap = new Dictionary<CADPoint, CADPoint>();
 
 		// flag to indicate craft data changed
 		bool m_IsCraftDataDirty = false;

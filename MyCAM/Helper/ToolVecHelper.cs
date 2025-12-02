@@ -145,7 +145,7 @@ namespace MyCAM.Helper
 		static void ReverseToolVec( ref List<IToolVecPoint> toolVecPointList )
 		{
 			foreach( IToolVecPoint toolVecPoint in toolVecPointList ) {
-				toolVecPoint.ToolVec.Reverse();
+				toolVecPoint.ToolVec = toolVecPoint.ToolVec.Reversed();
 			}
 		}
 	}
