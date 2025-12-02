@@ -59,9 +59,12 @@ namespace MyCAM.Data
 			foreach( CADPoint cadPoint in m_CADPointList ) {
 				cadPoint.Transform( transform );
 			}
+			foreach( var oneConnectPoint in m_ConnectPointMap ) {
+				oneConnectPoint.Value.Transform( transform );
+			}
 		}
 
 		List<CADPoint> m_CADPointList;
-		Dictionary<CADPoint, CADPoint> m_ConnectPointMap = new Dictionary<CADPoint, CADPoint>();
+		Dictionary<CADPoint, CADPoint> m_ConnectPointMap;
 	}
 }
