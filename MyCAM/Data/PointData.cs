@@ -97,12 +97,12 @@ namespace MyCAM.Data
 			get;
 		}
 
-		gp_Dir ToolVec
+		gp_Dir TangentVec
 		{
 			get;
 		}
 
-		gp_Dir TangentVec
+		gp_Dir ToolVec
 		{
 			get;
 		}

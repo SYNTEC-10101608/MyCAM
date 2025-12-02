@@ -215,7 +215,7 @@ namespace MyCAM.CacheInfo
 
 			// set over cut
 			List<IOverCutPoint> camPointOverCutList = m_CAMPointList.Cast<IOverCutPoint>().ToList();
-			OverCutHelper.SetOverCut( ref camPointOverCutList, out List<IOverCutPoint> overCutPointList, m_CraftData.OverCutLength, IsClosed );
+			OverCutHelper.SetOverCut( camPointOverCutList, out List<IOverCutPoint> overCutPointList, m_CraftData.OverCutLength, IsClosed );
 
 			// set lead
 			SetLeadIn();

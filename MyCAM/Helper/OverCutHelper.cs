@@ -7,7 +7,7 @@ namespace MyCAM.Helper
 {
 	public static class OverCutHelper
 	{
-		public static void SetOverCut( ref List<IOverCutPoint> mainPointList, out List<IOverCutPoint> overCutPointList,
+		public static void SetOverCut( IReadOnlyList<IOverCutPoint> mainPointList, out List<IOverCutPoint> overCutPointList,
 			double overCutLength, bool isClosed, double overCutTolerance = OVERCUT_MATH_TOLERANCE )
 		{
 			overCutPointList = new List<IOverCutPoint>();
