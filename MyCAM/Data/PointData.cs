@@ -143,7 +143,6 @@ namespace MyCAM.Data
 		ITraversePoint Clone();
 	}
 
-	// currently assuming CAM = CAD + ToolVec
 	public class CAMPoint : IToolVecPoint, IOverCutPoint, ILeadLinePoint, ITraversePoint
 	{
 		public CAMPoint( CADPoint cadPoint )
