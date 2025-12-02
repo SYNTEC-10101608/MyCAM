@@ -40,7 +40,7 @@ namespace MyCAM.Helper
 					gp_Pnt overCutEndPoint = GetExactOverCutEndPoint( mainPointList[ i ].Point, mainPointList[ i + 1 ].Point, dRemain );
 
 					// interpolate tool vector
-					InterpolateToolAndTangentVecBetween2CAMPoint( mainPointList[ i ], mainPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
+					InterpolateVecBetween2Point( mainPointList[ i ], mainPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
 
 					// create new cam point
 					IOverCutPoint camPoint = BuildOverCutPoint( overCutEndPoint, endPointToolVec, endPointTangentVec );
@@ -64,7 +64,8 @@ namespace MyCAM.Helper
 			return new gp_Pnt( currentPoint.XYZ() + moveVec.XYZ() );
 		}
 
-		static void InterpolateToolAndTangentVecBetween2CAMPoint( IOverCutPoint currentCAMPoint, IOverCutPoint nextCAMPoint, gp_Pnt point,
+		// get mid point
+		static void InterpolateVecBetween2Point( IOverCutPoint currentCAMPoint, IOverCutPoint nextCAMPoint, gp_Pnt point,
 			out gp_Dir toolDir, out gp_Dir tangentDir )
 		{
 			toolDir = currentCAMPoint.ToolVec;
@@ -93,6 +94,7 @@ namespace MyCAM.Helper
 			tangentDir = InterpolateVecBetween2Vec( currentTangentVec, nextTangentVec, interpolatePercent );
 		}
 
+		// get vec of mid point
 		static gp_Dir InterpolateVecBetween2Vec( gp_Vec currentVec, gp_Vec nextVec, double interpolatePercent )
 		{
 			// this case is unsolvable, so just return current vec

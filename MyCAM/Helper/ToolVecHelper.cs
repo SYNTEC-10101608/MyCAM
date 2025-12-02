@@ -8,11 +8,9 @@ namespace MyCAM.Helper
 {
 	public static class ToolVecHelper
 	{
-		public static void SetToolVec(
-			ref List<IToolVecPoint> toolVecPointList,
+		public static void SetToolVec( ref List<IToolVecPoint> toolVecPointList,
 			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
-			bool isClosed,
-			bool isToolVecReverse )
+			bool isClosed, bool isToolVecReverse )
 		{
 			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, isClosed );
 			if( isToolVecReverse ) {
@@ -20,8 +18,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static void ModifyToolVec(
-			ref List<IToolVecPoint> toolVecPointList,
+		static void ModifyToolVec( ref List<IToolVecPoint> toolVecPointList,
 			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
 			bool isClosed )
 		{
@@ -48,7 +45,7 @@ namespace MyCAM.Helper
 				// get start and end index
 				int nStartIndex = interpolateIntervalList[ i ].Item1;
 				int nEndIndex = interpolateIntervalList[ i ].Item2;
-				InterpolateToolVec( nStartIndex, nEndIndex, ref toolVecPointList, toolVecModifyMap );
+				InterpolateToolVec( ref toolVecPointList, toolVecModifyMap, nStartIndex, nEndIndex );
 			}
 		}
 
@@ -76,10 +73,9 @@ namespace MyCAM.Helper
 			return intervalList;
 		}
 
-		static void InterpolateToolVec(
-			int nStartIndex, int nEndIndex,
-			ref List<IToolVecPoint> toolVecPointList,
-			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap )
+		static void InterpolateToolVec( ref List<IToolVecPoint> toolVecPointList,
+			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
+			int nStartIndex, int nEndIndex )
 		{
 			// consider wrapped
 			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + toolVecPointList.Count : nEndIndex;
