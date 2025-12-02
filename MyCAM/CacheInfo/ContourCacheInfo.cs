@@ -249,55 +249,6 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		#region Lead function
-
-		void SetLeadIn()
-		{
-			m_LeadInCAMPointList.Clear();
-			if( m_CAMPointList.Count == 0 ) {
-				return;
-			}
-			switch( m_CraftData.LeadLineParam.LeadIn.Type ) {
-				case LeadLineType.Line:
-					m_LeadInCAMPointList = LeadHelper.BuildStraightLeadLine( m_CAMPointList.First(), true, m_CraftData.LeadLineParam.LeadIn.Length, m_CraftData.LeadLineParam.LeadIn.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse );
-					break;
-				case LeadLineType.Arc:
-					m_LeadInCAMPointList = LeadHelper.BuildArcLeadLine( m_CAMPointList.First(), true, m_CraftData.LeadLineParam.LeadIn.Length, m_CraftData.LeadLineParam.LeadIn.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse, MyApp.DISCRETE_MAX_DEFLECTION, MyApp.DISCRETE_MAX_EDGE_LENGTH );
-					break;
-				default:
-					break;
-			}
-		}
-
-		void SetLeadout()
-		{
-			m_LeadOutCAMPointList.Clear();
-			if( m_CAMPointList.Count == 0 ) {
-				return;
-			}
-
-			// with over cut means lead out first point is over cut last point
-			CAMPoint leadOutStartPoint;
-			if( m_CraftData.OverCutLength > 0 && m_OverCutPointList.Count > 0 ) {
-				leadOutStartPoint = m_OverCutPointList.Last();
-			}
-			else {
-				leadOutStartPoint = m_CAMPointList.Last();
-			}
-			switch( m_CraftData.LeadLineParam.LeadOut.Type ) {
-				case LeadLineType.Line:
-					m_LeadOutCAMPointList = LeadHelper.BuildStraightLeadLine( leadOutStartPoint, false, m_CraftData.LeadLineParam.LeadOut.Length, m_CraftData.LeadLineParam.LeadOut.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse );
-					break;
-				case LeadLineType.Arc:
-					m_LeadOutCAMPointList = LeadHelper.BuildArcLeadLine( leadOutStartPoint, false, m_CraftData.LeadLineParam.LeadOut.Length, m_CraftData.LeadLineParam.LeadOut.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse, MyApp.DISCRETE_MAX_DEFLECTION, MyApp.DISCRETE_MAX_EDGE_LENGTH );
-					break;
-				default:
-					break;
-			}
-		}
-
-		#endregion
-
 		void SetCraftDataDirty()
 		{
 			if( !m_IsCraftDataDirty ) {

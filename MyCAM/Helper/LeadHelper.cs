@@ -1,16 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using OCC.GCPnts;
 using OCC.Geom;
 using OCC.GeomAdaptor;
 using OCC.gp;
 using OCC.Precision;
+using System;
+using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
-	internal static class LeadHelper
+	public static class LeadHelper
 	{
+		public static void SetLeadIn()
+		{
+			m_LeadInCAMPointList.Clear();
+			if( m_CAMPointList.Count == 0 ) {
+				return;
+			}
+			switch( m_CraftData.LeadLineParam.LeadIn.Type ) {
+				case LeadLineType.Line:
+					m_LeadInCAMPointList = LeadHelper.BuildStraightLeadLine( m_CAMPointList.First(), true, m_CraftData.LeadLineParam.LeadIn.Length, m_CraftData.LeadLineParam.LeadIn.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse );
+					break;
+				case LeadLineType.Arc:
+					m_LeadInCAMPointList = LeadHelper.BuildArcLeadLine( m_CAMPointList.First(), true, m_CraftData.LeadLineParam.LeadIn.Length, m_CraftData.LeadLineParam.LeadIn.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse, MyApp.DISCRETE_MAX_DEFLECTION, MyApp.DISCRETE_MAX_EDGE_LENGTH );
+					break;
+				default:
+					break;
+			}
+		}
+
+		public static void SetLeadout()
+		{
+			m_LeadOutCAMPointList.Clear();
+			if( m_CAMPointList.Count == 0 ) {
+				return;
+			}
+
+			// with over cut means lead out first point is over cut last point
+			CAMPoint leadOutStartPoint;
+			if( m_CraftData.OverCutLength > 0 && m_OverCutPointList.Count > 0 ) {
+				leadOutStartPoint = m_OverCutPointList.Last();
+			}
+			else {
+				leadOutStartPoint = m_CAMPointList.Last();
+			}
+			switch( m_CraftData.LeadLineParam.LeadOut.Type ) {
+				case LeadLineType.Line:
+					m_LeadOutCAMPointList = LeadHelper.BuildStraightLeadLine( leadOutStartPoint, false, m_CraftData.LeadLineParam.LeadOut.Length, m_CraftData.LeadLineParam.LeadOut.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse );
+					break;
+				case LeadLineType.Arc:
+					m_LeadOutCAMPointList = LeadHelper.BuildArcLeadLine( leadOutStartPoint, false, m_CraftData.LeadLineParam.LeadOut.Length, m_CraftData.LeadLineParam.LeadOut.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse, MyApp.DISCRETE_MAX_DEFLECTION, MyApp.DISCRETE_MAX_EDGE_LENGTH );
+					break;
+				default:
+					break;
+			}
+		}
+
 		// when isLeadIn, the input point is start of path, and is end of lead in
 		public static List<CAMPoint> BuildStraightLeadLine( CAMPoint StraightLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse )
 		{
