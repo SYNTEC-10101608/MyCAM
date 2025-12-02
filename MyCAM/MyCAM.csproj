@@ -143,6 +143,7 @@
     <Compile Include="Data\BasicData.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="LogManager\LogHandler.cs" />
+    <Compile Include="Helper\OverCutHelper.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="Post\PostHelper.cs" />
