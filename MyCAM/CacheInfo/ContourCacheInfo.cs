@@ -92,7 +92,7 @@ namespace MyCAM.CacheInfo
 
 		#region Public API
 		// when the shape has tranform, need to call this to update the cache info
-		public void Transform()
+		public void Update()
 		{
 			BuildCAMPointList();
 		}

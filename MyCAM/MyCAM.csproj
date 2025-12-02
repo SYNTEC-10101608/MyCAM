@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CacheInfo\ContourCacheInfo.cs" />
+    <Compile Include="Data\ContourGeomData.cs" />
     <Compile Include="Data\ContourPathObject.cs" />
     <Compile Include="Data\CraftData.cs" />
     <Compile Include="CacheInfo\ICacheInfo.cs" />

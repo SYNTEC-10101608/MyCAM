@@ -298,35 +298,36 @@ namespace MyCAM.FileManager
 
 		internal ContourPathObjectDTO( PathObject pathObject )
 		{
-			if( pathObject == null ) {
-				return;
-			}
-			UID = pathObject.UID;
-			Shape = new TopoShapeDTO( pathObject.Shape );
-			ObjectType = ObjectType.Path;
-			PathType = PathType.Contour;
-			if( pathObject is ContourPathObject ) {
-				foreach( var point in ( (ContourPathObject)pathObject ).CADPointList ) {
-					CADPointList.Add( new CADPointDTO( point ) );
-				}
-			}
-			else {
-				CADPointList = new List<CADPointDTO>();
-			}
-			CraftData = new CraftDataDTO( pathObject.CraftData );
+			//if( pathObject == null ) {
+			//	return;
+			//}
+			//UID = pathObject.UID;
+			//Shape = new TopoShapeDTO( pathObject.Shape );
+			//ObjectType = ObjectType.Path;
+			//PathType = PathType.Contour;
+			//if( pathObject is ContourPathObject ) {
+			//	foreach( var point in ( (ContourPathObject)pathObject ).CADPointList ) {
+			//		CADPointList.Add( new CADPointDTO( point ) );
+			//	}
+			//}
+			//else {
+			//	CADPointList = new List<CADPointDTO>();
+			//}
+			//CraftData = new CraftDataDTO( pathObject.CraftData );
 		}
 
 		// DTO → ContourPathObject
 		internal ContourPathObject PathDTOToContourPathObject()
 		{
 			// protection
-			if( Shape == null || string.IsNullOrEmpty( UID ) ) {
-				throw new ArgumentNullException( "PathObject deserialization failed." );
-			}
-			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
-			CraftData craftData = CraftData.ToCraftData();
-			List<CADPoint> cadPointList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
-			return new ContourPathObject( UID, shape, cadPointList, craftData );
+			//if( Shape == null || string.IsNullOrEmpty( UID ) ) {
+			//	throw new ArgumentNullException( "PathObject deserialization failed." );
+			//}
+			//TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
+			//CraftData craftData = CraftData.ToCraftData();
+			//List<CADPoint> cadPointList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
+			//return new ContourPathObject( UID, shape, cadPointList, craftData );
+			return null;
 		}
 	}
 
