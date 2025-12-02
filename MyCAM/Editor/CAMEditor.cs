@@ -446,7 +446,7 @@ namespace MyCAM.Editor
 			if( !GetCacheInfoByID( m_DataManager, szStartPathID, out ICacheInfo cacheInfo ) ) {
 				return;
 			}
-			gp_Pnt currentPoint = cacheInfo.GetProcessStartPoint().CADPoint.Point;
+			gp_Pnt currentPoint = cacheInfo.GetProcessStartPoint().Point;
 
 			// init data manager
 			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
@@ -469,7 +469,7 @@ namespace MyCAM.Editor
 					if( !GetCacheInfoByID( m_DataManager, pathIDList[ i ], out ICacheInfo nextCacheInfo ) ) {
 						continue;
 					}
-					gp_Pnt nextStartPoint = nextCacheInfo.GetProcessStartPoint().CADPoint.Point;
+					gp_Pnt nextStartPoint = nextCacheInfo.GetProcessStartPoint().Point;
 					double distanceSq = currentPoint.SquareDistance( nextStartPoint );
 					if( distanceSq < minDistanceSq ) {
 						minDistanceSq = distanceSq;
@@ -637,7 +637,7 @@ namespace MyCAM.Editor
 
 				for( int i = 0; i < contourCacheInfo.CAMPointList.Count; i++ ) {
 					CAMPoint camPoint = contourCacheInfo.CAMPointList[ i ];
-					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
+					AIS_Line toolVecAIS = GetVecAIS( camPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
 					if( IsModifiedToolVecIndex( i, contourCacheInfo ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
@@ -689,7 +689,7 @@ namespace MyCAM.Editor
 					for( int i = 0; i < contourCacheInfo.LeadInCAMPointList.Count - 1; i++ ) {
 						CAMPoint currentCAMPoint = contourCacheInfo.LeadInCAMPointList[ i ];
 						CAMPoint nextCAMPoint = contourCacheInfo.LeadInCAMPointList[ i + 1 ];
-						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.Point, nextCAMPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
 						leadAISList.Add( LeadAISLine );
 					}
 				}
@@ -706,7 +706,7 @@ namespace MyCAM.Editor
 					for( int i = 0; i < contourCacheInfo.LeadOutCAMPointList.Count - 1; i++ ) {
 						CAMPoint currentCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i ];
 						CAMPoint nextCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i + 1 ];
-						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.CADPoint.Point, nextCAMPoint.CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.Point, nextCAMPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
 						leadAISList.Add( LeadAISLine );
 					}
 				}
@@ -750,8 +750,8 @@ namespace MyCAM.Editor
 					continue;
 				}
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
-				gp_Pnt showPoint = contourCacheInfo.CAMPointList[ 0 ].CADPoint.Point;
-				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMPointList[ 0 ].CADPoint.TangentVec.XYZ() );
+				gp_Pnt showPoint = contourCacheInfo.CAMPointList[ 0 ].Point;
+				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMPointList[ 0 ].TangentVec.XYZ() );
 				if( contourCacheInfo.IsPathReverse ) {
 					orientationDir.Reverse();
 				}
@@ -800,8 +800,8 @@ namespace MyCAM.Editor
 					if( contourCacheInfo.LeadInCAMPointList.Count == 0 ) {
 						break;
 					}
-					gp_Pnt leadInStartPoint = contourCacheInfo.LeadInCAMPointList.First().CADPoint.Point;
-					gp_Dir leadInOrientationDir = new gp_Dir( contourCacheInfo.LeadInCAMPointList.First().CADPoint.TangentVec.XYZ() );
+					gp_Pnt leadInStartPoint = contourCacheInfo.LeadInCAMPointList.First().Point;
+					gp_Dir leadInOrientationDir = new gp_Dir( contourCacheInfo.LeadInCAMPointList.First().TangentVec.XYZ() );
 					AIS_Shape orientationAIS = GetOrientationAIS( leadInStartPoint, leadInOrientationDir );
 					orientationAISList.Add( orientationAIS );
 				}
@@ -821,8 +821,8 @@ namespace MyCAM.Editor
 					if( contourCacheInfo.LeadOutCAMPointList.Count == 0 ) {
 						break;
 					}
-					gp_Pnt leadOutEndPoint = contourCacheInfo.LeadOutCAMPointList.Last().CADPoint.Point;
-					gp_Dir leadOutOrientationDir = new gp_Dir( contourCacheInfo.LeadOutCAMPointList.Last().CADPoint.TangentVec.XYZ() );
+					gp_Pnt leadOutEndPoint = contourCacheInfo.LeadOutCAMPointList.Last().Point;
+					gp_Dir leadOutOrientationDir = new gp_Dir( contourCacheInfo.LeadOutCAMPointList.Last().TangentVec.XYZ() );
 					AIS_Shape orientationAIS = GetOrientationAIS( leadOutEndPoint, leadOutOrientationDir );
 					orientationAISList.Add( orientationAIS );
 				}
@@ -860,7 +860,7 @@ namespace MyCAM.Editor
 			// create text label
 			int nCurrentIndex = 0;
 			foreach( ContourCacheInfo cacheInfo in m_DataManager.GetContourCacheInfoList() ) {
-				gp_Pnt location = cacheInfo.CAMPointList[ 0 ].CADPoint.Point;
+				gp_Pnt location = cacheInfo.CAMPointList[ 0 ].Point;
 				string szIndex = nCurrentIndex++.ToString();
 
 				// create text label ais
@@ -908,7 +908,7 @@ namespace MyCAM.Editor
 				m_OverCutAISDict.Add( szPathID, overcutAISList );
 				if( contourCacheInfo.OverCutLength > 0 ) {
 					for( int i = 0; i < contourCacheInfo.OverCutCAMPointList.Count - 1; i++ ) {
-						AIS_Line overCutAISLine = GetLineAIS( contourCacheInfo.OverCutCAMPointList[ i ].CADPoint.Point, contourCacheInfo.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
+						AIS_Line overCutAISLine = GetLineAIS( contourCacheInfo.OverCutCAMPointList[ i ].Point, contourCacheInfo.OverCutCAMPointList[ i + 1 ].Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
 						overcutAISList.Add( overCutAISLine );
 					}
 				}

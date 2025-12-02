@@ -204,7 +204,7 @@ namespace MyCAM.Post
 			// TODO: filter the sigular points
 			// solve FK
 			for( int i = 0; i < camPointList.Count; i++ ) {
-				gp_Pnt pointG54 = camPointList[ i ].CADPoint.Point;
+				gp_Pnt pointG54 = camPointList[ i ].Point;
 				gp_Vec tcpOffset = postSolver.SolveFK( rotateAngleList[ i ].Item1, rotateAngleList[ i ].Item2, pointG54 );
 				gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
 

@@ -1,5 +1,4 @@
-﻿using MyCAM.Helper;
-using OCC.gp;
+﻿using OCC.gp;
 
 namespace MyCAM.Data
 {
@@ -147,15 +146,16 @@ namespace MyCAM.Data
 	// currently assuming CAM = CAD + ToolVec
 	public class CAMPoint : IToolVecPoint, IOverCutPoint, ILeadLinePoint, ITraversePoint
 	{
-		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
+		public CAMPoint( CADPoint cadPoint )
 		{
-			CADPoint = cadPoint;
-			m_ToolVec = new gp_Dir( toolVec.XYZ() );
+			m_CADPoint = cadPoint.Clone();
+			m_ToolVec = new gp_Dir( cadPoint.NormalVec_1st.XYZ() );
 		}
 
-		public CADPoint CADPoint
+		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
 		{
-			get; private set;
+			m_CADPoint = cadPoint.Clone();
+			m_ToolVec = new gp_Dir( toolVec.XYZ() );
 		}
 
 		public gp_Dir ToolVec
@@ -174,7 +174,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return CADPoint.Point;
+				return m_CADPoint.Point;
 			}
 		}
 
@@ -182,7 +182,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return CADPoint.NormalVec_1st;
+				return m_CADPoint.NormalVec_1st;
 			}
 		}
 
@@ -190,13 +190,13 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return CADPoint.TangentVec;
+				return m_CADPoint.TangentVec;
 			}
 		}
 
 		public CAMPoint Clone()
 		{
-			return new CAMPoint( CADPoint.Clone(), ToolVec );
+			return new CAMPoint( m_CADPoint.Clone() );
 		}
 
 		// the explicit interface implementation for IOverCutPoint.Clone
@@ -211,6 +211,7 @@ namespace MyCAM.Data
 		}
 
 		// using backing field to prevent modified outside
+		CADPoint m_CADPoint;
 		gp_Dir m_ToolVec;
 	}
 }

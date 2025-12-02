@@ -228,11 +228,11 @@ namespace MyCAM.CacheInfo
 			// bild inital CAM point list
 			m_CAMPointList = new List<CAMPoint>();
 			foreach( CADPoint cadPoint in m_CADPointList ) {
-				CAMPoint camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st );
+				CAMPoint camPoint = new CAMPoint( cadPoint );
 				m_CAMPointList.Add( camPoint );
 				if( m_ConnectCADPointMap.ContainsKey( cadPoint ) ) {
 					CADPoint connectedCADPoint = m_ConnectCADPointMap[ cadPoint ];
-					CAMPoint connectedCAMPoint = new CAMPoint( connectedCADPoint, connectedCADPoint.NormalVec_1st );
+					CAMPoint connectedCAMPoint = new CAMPoint( connectedCADPoint );
 					m_ConnectCAMPointMap.Add( camPoint, connectedCAMPoint );
 				}
 			}
