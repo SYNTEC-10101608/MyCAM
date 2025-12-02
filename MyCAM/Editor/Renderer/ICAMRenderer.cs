@@ -10,7 +10,8 @@ namespace MyCAM.Editor.Renderer
 		/// <summary>
 		/// Show the rendered objects
 		/// </summary>
-		void Show();
+		/// <param name="bUpdate">Whether to update view after showing, default is false</param>
+		void Show( bool bUpdate = false );
 
 		/// <summary>
 		/// Remove all rendered objects

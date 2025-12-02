@@ -15,26 +15,22 @@ namespace MyCAM.Editor.Renderer
 	/// <summary>
 	/// Renderer for path orientation cones
 	/// </summary>
-	internal class OrientationRenderer : ICAMRenderer
+	internal class OrientationRenderer : CAMRendererBase
 	{
-		readonly Viewer m_Viewer;
-		readonly DataManager m_DataManager;
 		readonly Dictionary<string, AIS_Shape> m_OrientationAISDict = new Dictionary<string, AIS_Shape>();
 		readonly Dictionary<string, List<AIS_Shape>> m_LeadOrientationAISDict = new Dictionary<string, List<AIS_Shape>>();
-		bool m_IsShow = true;
 
 		public OrientationRenderer( Viewer viewer, DataManager dataManager )
+			: base( viewer, dataManager )
 		{
-			m_Viewer = viewer;
-			m_DataManager = dataManager;
 		}
 
-		public void Show()
+		public override void Show( bool bUpdate = false )
 		{
-			Show( m_DataManager.PathIDList );
+			Show( m_DataManager.PathIDList, bUpdate );
 		}
 
-		public void Show( List<string> pathIDList )
+		public void Show( List<string> pathIDList, bool bUpdate = false )
 		{
 			Remove( pathIDList );
 
@@ -45,9 +41,13 @@ namespace MyCAM.Editor.Renderer
 
 			ShowPathOrientation( pathIDList );
 			ShowLeadOrientation( pathIDList );
+
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
-		public void Remove()
+		public override void Remove()
 		{
 			Remove( m_DataManager.PathIDList );
 		}
@@ -58,24 +58,12 @@ namespace MyCAM.Editor.Renderer
 			RemoveLeadOrientation( pathIDList );
 		}
 
-		public void SetShow( bool isShow )
-		{
-			m_IsShow = isShow;
-		}
-
-		public void UpdateView()
-		{
-			m_Viewer.UpdateView();
-		}
-
 		void ShowPathOrientation( List<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
-				if( GetCacheInfoByID( szPathID, out ICacheInfo cacheInfo ) == false
-					|| cacheInfo.PathType != PathType.Contour ) {
+				if( !GetContourCacheInfoByID( szPathID, out ContourCacheInfo contourCacheInfo ) ) {
 					continue;
 				}
-				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				gp_Pnt showPoint = contourCacheInfo.CAMPointList[ 0 ].Point;
 				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMPointList[ 0 ].TangentVec.XYZ() );
 				if( contourCacheInfo.IsPathReverse ) {
@@ -107,11 +95,9 @@ namespace MyCAM.Editor.Renderer
 		void ShowLeadOrientation( List<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
-				if( GetCacheInfoByID( szPathID, out ICacheInfo cacheInfo ) == false
-					|| cacheInfo.PathType != PathType.Contour ) {
+				if( !GetContourCacheInfoByID( szPathID, out ContourCacheInfo contourCacheInfo ) ) {
 					continue;
 				}
-				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				LeadData leadData = contourCacheInfo.LeadData;
 				if( leadData.LeadIn.Type != LeadLineType.None ) {
 					List<AIS_Shape> orientationAISList = new List<AIS_Shape>();
@@ -185,20 +171,6 @@ namespace MyCAM.Editor.Renderer
 			coneAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			coneAIS.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
 			return coneAIS;
-		}
-
-		bool GetCacheInfoByID( string szPathID, out ICacheInfo cacheInfo )
-		{
-			cacheInfo = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| m_DataManager.ObjectMap.ContainsKey( szPathID ) == false
-				|| m_DataManager.ObjectMap[ szPathID ] == null ) {
-				return false;
-			}
-			if( ( (PathObject)m_DataManager.ObjectMap[ szPathID ] ).PathType == PathType.Contour ) {
-				cacheInfo = ( (ContourPathObject)m_DataManager.ObjectMap[ szPathID ] ).ContourCacheInfo;
-			}
-			return true;
 		}
 	}
 }

@@ -14,20 +14,16 @@ namespace MyCAM.Editor.Renderer
 	/// <summary>
 	/// Renderer for path index labels
 	/// </summary>
-	internal class IndexRenderer : ICAMRenderer
+	internal class IndexRenderer : CAMRendererBase
 	{
-		readonly Viewer m_Viewer;
-		readonly DataManager m_DataManager;
 		readonly List<AIS_TextLabel> m_IndexList = new List<AIS_TextLabel>();
-		bool m_IsShow = true;
 
 		public IndexRenderer( Viewer viewer, DataManager dataManager )
+			: base( viewer, dataManager )
 		{
-			m_Viewer = viewer;
-			m_DataManager = dataManager;
 		}
 
-		public void Show()
+		public override void Show( bool bUpdate = false )
 		{
 			Remove();
 
@@ -57,24 +53,18 @@ namespace MyCAM.Editor.Renderer
 				m_Viewer.GetAISContext().Display( textLabel, false );
 				m_Viewer.GetAISContext().Deactivate( textLabel );
 			}
+
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
-		public void Remove()
+		public override void Remove()
 		{
 			foreach( AIS_TextLabel textLabel in m_IndexList ) {
 				m_Viewer.GetAISContext().Remove( textLabel, false );
 			}
 			m_IndexList.Clear();
-		}
-
-		public void SetShow( bool isShow )
-		{
-			m_IsShow = isShow;
-		}
-
-		public void UpdateView()
-		{
-			m_Viewer.UpdateView();
 		}
 	}
 }

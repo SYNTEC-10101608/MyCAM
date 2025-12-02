@@ -548,22 +548,20 @@ namespace MyCAM.Editor
 		{
 			// take all path IDs
 			List<string> pathIDList = m_DataManager.PathIDList;
-			m_ToolVecRenderer.Show( pathIDList );
-			m_OrientationRenderer.Show( pathIDList );
-			m_IndexRenderer.Show();
-			m_CraftRenderer.Show( pathIDList );
-			m_TraverseRenderer.Show();
-			m_Viewer.UpdateView();
+			m_ToolVecRenderer.Show( pathIDList, false );
+			m_OrientationRenderer.Show( pathIDList, false );
+			m_IndexRenderer.Show( false );
+			m_CraftRenderer.Show( pathIDList, false );
+			m_TraverseRenderer.Show( true ); // update view at the end
 		}
 
 		void ShowCAMData( List<string> pathIDList )
 		{
-			m_ToolVecRenderer.Show( pathIDList );
-			m_OrientationRenderer.Show( pathIDList );
-			m_IndexRenderer.Show();
-			m_CraftRenderer.Show( pathIDList );
-			m_TraverseRenderer.Show();
-			m_Viewer.UpdateView();
+			m_ToolVecRenderer.Show( pathIDList, false );
+			m_OrientationRenderer.Show( pathIDList, false );
+			m_IndexRenderer.Show( false );
+			m_CraftRenderer.Show( pathIDList, false );
+			m_TraverseRenderer.Show( true ); // update view at the end
 		}
 
 		void RemoveCAMData( List<string> pathIDList )
@@ -572,8 +570,7 @@ namespace MyCAM.Editor
 			m_CraftRenderer.Remove( pathIDList );
 			m_OrientationRenderer.Remove( pathIDList );
 			m_IndexRenderer.Remove();
-			m_TraverseRenderer.Show();
-			m_Viewer.UpdateView();
+			m_TraverseRenderer.Show( true ); // update view at the end
 		}
 
 		void HideAllCAMData()

@@ -91,6 +91,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Editor\IEditor.cs" />
+    <Compile Include="Editor\Renderer\CAMRendererBase.cs" />
     <Compile Include="Editor\Renderer\CraftRenderer.cs" />
     <Compile Include="Editor\Renderer\ICAMRenderer.cs" />
     <Compile Include="Editor\Renderer\IndexRenderer.cs" />

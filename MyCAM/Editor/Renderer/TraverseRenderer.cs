@@ -18,21 +18,17 @@ namespace MyCAM.Editor.Renderer
 	/// <summary>
 	/// Renderer for traverse paths between cutting paths
 	/// </summary>
-	internal class TraverseRenderer : ICAMRenderer
+	internal class TraverseRenderer : CAMRendererBase
 	{
-		readonly Viewer m_Viewer;
-		readonly DataManager m_DataManager;
 		readonly List<AIS_Line> m_TraverseAISList = new List<AIS_Line>();
 		readonly List<AIS_Shape> m_FrogLeapAISList = new List<AIS_Shape>();
-		bool m_IsShow = true;
 
 		public TraverseRenderer( Viewer viewer, DataManager dataManager )
+			: base( viewer, dataManager )
 		{
-			m_Viewer = viewer;
-			m_DataManager = dataManager;
 		}
 
-		public void Show()
+		public override void Show( bool bUpdate = false )
 		{
 			Remove();
 
@@ -131,9 +127,13 @@ namespace MyCAM.Editor.Renderer
 				m_Viewer.GetAISContext().Display( frogLeapAIS, false );
 				m_Viewer.GetAISContext().Deactivate( frogLeapAIS );
 			}
+
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
-		public void Remove()
+		public override void Remove()
 		{
 			// Remove previous lines
 			foreach( AIS_Line traverseAIS in m_TraverseAISList ) {
@@ -144,16 +144,6 @@ namespace MyCAM.Editor.Renderer
 			}
 			m_TraverseAISList.Clear();
 			m_FrogLeapAISList.Clear();
-		}
-
-		public void SetShow( bool isShow )
-		{
-			m_IsShow = isShow;
-		}
-
-		public void UpdateView()
-		{
-			m_Viewer.UpdateView();
 		}
 
 		void AddOneLinearTraverse( gp_Pnt startPnt, gp_Pnt endPnt )
@@ -173,20 +163,6 @@ namespace MyCAM.Editor.Renderer
 				lineAIS.Attributes().SetLineAspect( prs3D_LineAspect );
 			}
 			return lineAIS;
-		}
-
-		bool GetCacheInfoByID( string szPathID, out ICacheInfo cacheInfo )
-		{
-			cacheInfo = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| m_DataManager.ObjectMap.ContainsKey( szPathID ) == false
-				|| m_DataManager.ObjectMap[ szPathID ] == null ) {
-				return false;
-			}
-			if( ( (PathObject)m_DataManager.ObjectMap[ szPathID ] ).PathType == PathType.Contour ) {
-				cacheInfo = ( (ContourPathObject)m_DataManager.ObjectMap[ szPathID ] ).ContourCacheInfo;
-			}
-			return true;
 		}
 	}
 }

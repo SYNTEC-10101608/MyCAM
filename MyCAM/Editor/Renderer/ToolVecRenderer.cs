@@ -12,25 +12,21 @@ namespace MyCAM.Editor.Renderer
 	/// <summary>
 	/// Renderer for tool vectors
 	/// </summary>
-	internal class ToolVecRenderer : ICAMRenderer
+	internal class ToolVecRenderer : CAMRendererBase
 	{
-		readonly Viewer m_Viewer;
-		readonly DataManager m_DataManager;
 		readonly Dictionary<string, List<AIS_Line>> m_ToolVecAISDict = new Dictionary<string, List<AIS_Line>>();
-		bool m_IsShow = true;
 
 		public ToolVecRenderer( Viewer viewer, DataManager dataManager )
+			: base( viewer, dataManager )
 		{
-			m_Viewer = viewer;
-			m_DataManager = dataManager;
 		}
 
-		public void Show()
+		public override void Show( bool bUpdate = false )
 		{
-			Show( m_DataManager.PathIDList );
+			Show( m_DataManager.PathIDList, bUpdate );
 		}
 
-		public void Show( List<string> pathIDList )
+		public void Show( List<string> pathIDList, bool bUpdate = false )
 		{
 			Remove( pathIDList );
 
@@ -41,10 +37,9 @@ namespace MyCAM.Editor.Renderer
 
 			// build tool vec
 			foreach( string szPathID in pathIDList ) {
-				if( GetCacheInfoByID( szPathID, out ICacheInfo cacheInfo ) == false || cacheInfo.PathType != PathType.Contour ) {
+				if( !GetContourCacheInfoByID( szPathID, out ContourCacheInfo contourCacheInfo ) ) {
 					continue;
 				}
-				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
 				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
 
@@ -69,9 +64,13 @@ namespace MyCAM.Editor.Renderer
 					}
 				}
 			}
+
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
-		public void Remove()
+		public override void Remove()
 		{
 			Remove( m_DataManager.PathIDList );
 		}
@@ -90,16 +89,6 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		public void SetShow( bool isShow )
-		{
-			m_IsShow = isShow;
-		}
-
-		public void UpdateView()
-		{
-			m_Viewer.UpdateView();
-		}
-
 		bool IsModifiedToolVecIndex( int index, ContourCacheInfo cacheInfo )
 		{
 			return cacheInfo.GetToolVecModifyIndex().Contains( index );
@@ -112,20 +101,6 @@ namespace MyCAM.Editor.Renderer
 			lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
 			lineAIS.SetWidth( 1 );
 			return lineAIS;
-		}
-
-		bool GetCacheInfoByID( string szPathID, out ICacheInfo cacheInfo )
-		{
-			cacheInfo = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| m_DataManager.ObjectMap.ContainsKey( szPathID ) == false
-				|| m_DataManager.ObjectMap[ szPathID ] == null ) {
-				return false;
-			}
-			if( ( (PathObject)m_DataManager.ObjectMap[ szPathID ] ).PathType == PathType.Contour ) {
-				cacheInfo = ( (ContourPathObject)m_DataManager.ObjectMap[ szPathID ] ).ContourCacheInfo;
-			}
-			return true;
 		}
 	}
 }
