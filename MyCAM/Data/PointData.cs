@@ -66,8 +66,32 @@ namespace MyCAM.Data
 		gp_Dir m_TangentVec;
 	}
 
+	public interface IToolVecPoint
+	{
+		gp_Pnt Point
+		{
+			get;
+		}
+
+		gp_Dir InitToolVec
+		{
+			get;
+		}
+
+		gp_Dir InitTangentVec
+		{
+			get;
+		}
+
+		gp_Dir ToolVec
+		{
+			get;
+			set;
+		}
+	}
+
 	// currently assuming CAM = CAD + ToolVec
-	public class CAMPoint
+	public class CAMPoint : IToolVecPoint
 	{
 		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
 		{
@@ -89,6 +113,30 @@ namespace MyCAM.Data
 			set
 			{
 				m_ToolVec = new gp_Dir( value.XYZ() );
+			}
+		}
+
+		public gp_Pnt Point
+		{
+			get
+			{
+				return CADPoint.Point;
+			}
+		}
+
+		public gp_Dir InitToolVec
+		{
+			get
+			{
+				return CADPoint.NormalVec_1st;
+			}
+		}
+
+		public gp_Dir InitTangentVec
+		{
+			get
+			{
+				return CADPoint.TangentVec;
 			}
 		}
 
