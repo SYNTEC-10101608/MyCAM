@@ -10,7 +10,6 @@ using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
-using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -122,7 +121,7 @@ namespace MyCAM.Editor
 				AIS_InteractiveObject obj = m_ViewManager.ViewObjectMap[ pathID ].AISHandle;
 				m_Viewer.GetAISContext().Remove( obj, false );
 			}
-			HideAllCAMData();
+			RemoveAllCAMData();
 		}
 
 		// view API
@@ -548,20 +547,23 @@ namespace MyCAM.Editor
 		{
 			// take all path IDs
 			List<string> pathIDList = m_DataManager.PathIDList;
-			m_ToolVecRenderer.Show( pathIDList, false );
-			m_OrientationRenderer.Show( pathIDList, false );
-			m_IndexRenderer.Show( false );
-			m_CraftRenderer.Show( pathIDList, false );
-			m_TraverseRenderer.Show( true ); // update view at the end
+			ShowCAMData( pathIDList );
 		}
 
 		void ShowCAMData( List<string> pathIDList )
 		{
-			m_ToolVecRenderer.Show( pathIDList, false );
-			m_OrientationRenderer.Show( pathIDList, false );
-			m_IndexRenderer.Show( false );
-			m_CraftRenderer.Show( pathIDList, false );
-			m_TraverseRenderer.Show( true ); // update view at the end
+			m_ToolVecRenderer.Show( pathIDList );
+			m_OrientationRenderer.Show( pathIDList );
+			m_IndexRenderer.Show();
+			m_CraftRenderer.Show( pathIDList );
+			m_TraverseRenderer.Show();
+			m_Viewer.UpdateView();
+		}
+
+		void RemoveAllCAMData()
+		{
+			List<string> pathIDList = m_DataManager.PathIDList;
+			RemoveCAMData( pathIDList );
 		}
 
 		void RemoveCAMData( List<string> pathIDList )
@@ -570,15 +572,6 @@ namespace MyCAM.Editor
 			m_CraftRenderer.Remove( pathIDList );
 			m_OrientationRenderer.Remove( pathIDList );
 			m_IndexRenderer.Remove();
-			m_TraverseRenderer.Show( true ); // update view at the end
-		}
-
-		void HideAllCAMData()
-		{
-			m_ToolVecRenderer.Remove();
-			m_OrientationRenderer.Remove();
-			m_IndexRenderer.Remove();
-			m_CraftRenderer.Remove();
 			m_TraverseRenderer.Remove();
 			m_Viewer.UpdateView();
 		}
