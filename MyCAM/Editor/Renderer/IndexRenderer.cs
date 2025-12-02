@@ -59,12 +59,16 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		public override void Remove()
+		public override void Remove( bool bUpdate = false )
 		{
 			foreach( AIS_TextLabel textLabel in m_IndexList ) {
 				m_Viewer.GetAISContext().Remove( textLabel, false );
 			}
 			m_IndexList.Clear();
+
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 	}
 }

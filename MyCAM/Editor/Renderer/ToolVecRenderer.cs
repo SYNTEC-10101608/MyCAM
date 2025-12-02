@@ -70,12 +70,12 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		public override void Remove()
+		public override void Remove( bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList );
+			Remove( m_DataManager.PathIDList, bUpdate );
 		}
 
-		public void Remove( List<string> pathIDList )
+		public void Remove( List<string> pathIDList, bool bUpdate = false )
 		{
 			foreach( string szPathID in pathIDList ) {
 				if( m_ToolVecAISDict.ContainsKey( szPathID ) ) {
@@ -86,6 +86,10 @@ namespace MyCAM.Editor.Renderer
 					m_ToolVecAISDict[ szPathID ].Clear();
 					m_ToolVecAISDict.Remove( szPathID );
 				}
+			}
+
+			if( bUpdate ) {
+				UpdateView();
 			}
 		}
 

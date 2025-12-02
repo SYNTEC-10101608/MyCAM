@@ -47,15 +47,19 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		public override void Remove()
+		public override void Remove( bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList );
+			Remove( m_DataManager.PathIDList, bUpdate );
 		}
 
-		public void Remove( List<string> pathIDList )
+		public void Remove( List<string> pathIDList, bool bUpdate = false )
 		{
 			RemovePathOrientation( pathIDList );
 			RemoveLeadOrientation( pathIDList );
+
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
 		void ShowPathOrientation( List<string> pathIDList )

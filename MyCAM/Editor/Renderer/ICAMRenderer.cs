@@ -16,7 +16,8 @@ namespace MyCAM.Editor.Renderer
 		/// <summary>
 		/// Remove all rendered objects
 		/// </summary>
-		void Remove();
+		/// <param name="bUpdate">Whether to update view after removing, default is false</param>
+		void Remove( bool bUpdate = false );
 
 		/// <summary>
 		/// Set whether to show the rendered objects

@@ -133,7 +133,7 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		public override void Remove()
+		public override void Remove( bool bUpdate = false )
 		{
 			// Remove previous lines
 			foreach( AIS_Line traverseAIS in m_TraverseAISList ) {
@@ -144,6 +144,10 @@ namespace MyCAM.Editor.Renderer
 			}
 			m_TraverseAISList.Clear();
 			m_FrogLeapAISList.Clear();
+
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
 		void AddOneLinearTraverse( gp_Pnt startPnt, gp_Pnt endPnt )
