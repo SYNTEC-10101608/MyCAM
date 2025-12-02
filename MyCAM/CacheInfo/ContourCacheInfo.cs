@@ -127,24 +127,36 @@ namespace MyCAM.CacheInfo
 		#endregion
 
 		#region craft data
-		public int GetPathStartPointIndex()
+		public int StartPointIndex
 		{
-			return m_CraftData.StartPointIndex;
+			get
+			{
+				return m_CraftData.StartPointIndex;
+			}
 		}
 
-		public bool GetPathIsReverse()
+		public bool IsPathReverse
 		{
-			return m_CraftData.IsReverse;
+			get
+			{
+				return m_CraftData.IsReverse;
+			}
 		}
 
-		public LeadData GetPathLeadData()
+		public LeadData LeadData
 		{
-			return m_CraftData.LeadLineParam;
+			get
+			{
+				return m_CraftData.LeadLineParam;
+			}
 		}
 
-		public double GetPathOverCutLength()
+		public double OverCutLength
 		{
-			return m_CraftData.OverCutLength;
+			get
+			{
+				return m_CraftData.OverCutLength;
+			}
 		}
 
 		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
@@ -161,11 +173,44 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
+		// TODO: fix the stupid way to get the modified index
 		public HashSet<int> GetToolVecModifyIndex()
 		{
+			// simulate the index modification
+			List<int> modifiedIndices = new List<int>();
+			for( int i = 0; i < m_CADPointList.Count; i++ ) {
+				modifiedIndices.Add( i );
+			}
+
+			// index change due to start point
+			if( m_CraftData.StartPointIndex != 0 ) {
+
+				// need to map back to original index
+				List<int> rearrangedIndices = new List<int>();
+				for( int i = 0; i < modifiedIndices.Count; i++ ) {
+					rearrangedIndices.Add( modifiedIndices[ ( i + m_CraftData.StartPointIndex ) % modifiedIndices.Count ] );
+				}
+				modifiedIndices = rearrangedIndices;
+			}
+
+			// index change due to reverse
+			if( m_CraftData.IsReverse ) {
+
+				// modify start point index for closed path
+				modifiedIndices.Reverse();
+				if( IsClosed ) {
+					int lastIndex = modifiedIndices.Last();
+					modifiedIndices.RemoveAt( modifiedIndices.Count - 1 );
+					modifiedIndices.Insert( 0, lastIndex );
+				}
+			}
+
+			// the final mapping
 			HashSet<int> result = new HashSet<int>();
-			foreach( int nIndex in m_CraftData.ToolVecModifyMap.Keys ) {
-				result.Add( nIndex );
+			for( int i = 0; i < modifiedIndices.Count; i++ ) {
+				if( m_CraftData.ToolVecModifyMap.ContainsKey( modifiedIndices[ i ] ) ) {
+					result.Add( i );
+				}
 			}
 			return result;
 		}

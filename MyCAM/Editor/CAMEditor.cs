@@ -638,7 +638,7 @@ namespace MyCAM.Editor
 				for( int i = 0; i < contourCacheInfo.CAMPointList.Count; i++ ) {
 					CAMPoint camPoint = contourCacheInfo.CAMPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( camPoint.CADPoint.Point, camPoint.ToolVec, EvecType.ToolVec );
-					if( IsModifiedToolVecIndex( i, contourCacheInfo, contourCacheInfo.CAMPointList.Select( point => camPoint.CADPoint ).ToList() ) ) {
+					if( IsModifiedToolVecIndex( i, contourCacheInfo ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
 					}
@@ -682,7 +682,7 @@ namespace MyCAM.Editor
 					continue;
 				}
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
-				LeadData leadData = contourCacheInfo.GetPathLeadData();
+				LeadData leadData = contourCacheInfo.LeadData;
 				if( leadData.LeadIn.Type != LeadLineType.None ) {
 					List<AIS_Line> leadAISList = new List<AIS_Line>();
 					m_LeadAISDict.Add( szPathID, leadAISList );
@@ -752,7 +752,7 @@ namespace MyCAM.Editor
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				gp_Pnt showPoint = contourCacheInfo.CAMPointList[ 0 ].CADPoint.Point;
 				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMPointList[ 0 ].CADPoint.TangentVec.XYZ() );
-				if( contourCacheInfo.GetPathIsReverse() ) {
+				if( contourCacheInfo.IsPathReverse ) {
 					orientationDir.Reverse();
 				}
 				AIS_Shape orientationAIS = GetOrientationAIS( showPoint, orientationDir );
@@ -792,7 +792,7 @@ namespace MyCAM.Editor
 					continue;
 				}
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
-				LeadData leadData = contourCacheInfo.GetPathLeadData();
+				LeadData leadData = contourCacheInfo.LeadData;
 				if( leadData.LeadIn.Type != LeadLineType.None ) {
 					List<AIS_Shape> orientationAISList = new List<AIS_Shape>();
 					m_LeadOrientationAISDict.Add( szPathID, orientationAISList );
@@ -906,7 +906,7 @@ namespace MyCAM.Editor
 				ContourCacheInfo contourCacheInfo = (ContourCacheInfo)cacheInfo;
 				List<AIS_Line> overcutAISList = new List<AIS_Line>();
 				m_OverCutAISDict.Add( szPathID, overcutAISList );
-				if( contourCacheInfo.GetPathOverCutLength() > 0 ) {
+				if( contourCacheInfo.OverCutLength > 0 ) {
 					for( int i = 0; i < contourCacheInfo.OverCutCAMPointList.Count - 1; i++ ) {
 						AIS_Line overCutAISLine = GetLineAIS( contourCacheInfo.OverCutCAMPointList[ i ].CADPoint.Point, contourCacheInfo.OverCutCAMPointList[ i + 1 ].CADPoint.Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
 						overcutAISList.Add( overCutAISLine );
@@ -1090,16 +1090,9 @@ namespace MyCAM.Editor
 		#endregion
 
 		// methods
-		bool IsModifiedToolVecIndex( int index, ContourCacheInfo cacheInfo, List<CADPoint> cadPointList )
+		bool IsModifiedToolVecIndex( int index, ContourCacheInfo cacheInfo )
 		{
-			// map CAD and CAM point index
-			int nLength = cadPointList.Count;
-			int modifiedIndex = cacheInfo.GetPathIsReverse()
-				? ( nLength - ( cacheInfo.IsClosed ? 0 : 1 ) - index + cacheInfo.GetPathStartPointIndex() ) % nLength
-				: ( index + cacheInfo.GetPathStartPointIndex() ) % nLength;
-
-			// need highlight if the index is modified index
-			return cacheInfo.GetToolVecModifyIndex().Contains( modifiedIndex );
+			return cacheInfo.GetToolVecModifyIndex().Contains( index );
 		}
 
 		AIS_Line GetVecAIS( gp_Pnt point, gp_Dir dir, EvecType vecType )
