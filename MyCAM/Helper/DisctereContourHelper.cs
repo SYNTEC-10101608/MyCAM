@@ -29,16 +29,17 @@ namespace MyCAM.Helper
 				TopoDS_Face shellFace = pathEdge5DList[ i ].ComponentFace;
 				TopoDS_Face solidFace = pathEdge5DList[ i ].ComponentFace; // TODO: set solid face
 				if( !GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, i == 0, i == pathEdge5DList.Count - 1, isClosed,
-					ref cadPointList, ref connectPointMap ) ) {
+					ref cadPointList, ref connectPointMap,
+					maxDeflection, maxEdgeLength ) ) {
 					return false;
 				}
 			}
 			return true;
 		}
 
-		public static bool GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace, bool bFirst, bool bLast, bool isClosed,
+		static bool GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace, bool bFirst, bool bLast, bool isClosed,
 			ref List<CADPoint> cadPointList, ref Dictionary<CADPoint, CADPoint> connectPointMap,
-			double maxDeflection = DISCRETE_MAX_DEFLECTION, double maxEdgeLength = DISCRETE_MAX_EDGE_LENGTH )
+			double maxDeflection, double maxEdgeLength )
 		{
 			List<CADPoint> oneSegmentPointList = new List<CADPoint>();
 
@@ -130,6 +131,6 @@ namespace MyCAM.Helper
 		}
 
 		const double DISCRETE_MAX_DEFLECTION = 0.01;
-		const double DISCRETE_MAX_EDGE_LENGTH = 1;
+		const double DISCRETE_MAX_EDGE_LENGTH = 1.0;
 	}
 }
