@@ -185,7 +185,7 @@ namespace MyCAM.CacheInfo
 				CAMPoint camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st );
 				m_CAMPointList.Add( camPoint );
 			}
-			List<IToolVecPoint> toolVecPointList = m_CADPointList.Cast<IToolVecPoint>().ToList();
+			List<IToolVecPoint> toolVecPointList = m_CAMPointList.Cast<IToolVecPoint>().ToList();
 			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, IsClosed, m_CraftData.IsReverse );
 			SetStartPoint();
 			SetOrientation();
