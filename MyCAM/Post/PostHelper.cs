@@ -133,7 +133,7 @@ namespace MyCAM.Post
 			if( entryAndExitData.ExitDistance <= 0 ) {
 				return;
 			}
-			CAMPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfLastPath.EndCAMPoint, entryAndExitData.ExitDistance );
+			ITraversePoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfLastPath.EndCAMPoint, entryAndExitData.ExitDistance );
 			if( exitPoint == null ) {
 				return;
 			}
@@ -141,9 +141,9 @@ namespace MyCAM.Post
 			// G54
 			G54ExitPoint = new PostPoint()
 			{
-				X = exitPoint.CADPoint.Point.X(),
-				Y = exitPoint.CADPoint.Point.Y(),
-				Z = exitPoint.CADPoint.Point.Z(),
+				X = exitPoint.Point.X(),
+				Y = exitPoint.Point.Y(),
+				Z = exitPoint.Point.Z(),
 				Master = endInfoOfLastPath.Master,
 				Slave = endInfoOfLastPath.Slave
 			};
@@ -244,10 +244,10 @@ namespace MyCAM.Post
 			// p3: frog leap middle point (if frog leap)
 			// p4: cut down point of current path
 			// p5: start of current path (not used here)
-			CAMPoint p1 = endInfoOfPreviousPath.EndCAMPoint;
-			CAMPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, craftData.TraverseData.LiftUpDistance );
-			CAMPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCAMData.GetProcessStartPoint(), craftData.TraverseData.CutDownDistance );
-			CAMPoint p5 = currentCAMData.GetProcessStartPoint();
+			ITraversePoint p1 = endInfoOfPreviousPath.EndCAMPoint;
+			ITraversePoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, craftData.TraverseData.LiftUpDistance );
+			ITraversePoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCAMData.GetProcessStartPoint(), craftData.TraverseData.CutDownDistance );
+			ITraversePoint p5 = currentCAMData.GetProcessStartPoint();
 
 			// lift up
 			if( craftData.TraverseData.LiftUpDistance > 0 && p2 != null ) {
@@ -255,9 +255,9 @@ namespace MyCAM.Post
 				// G54
 				pathG54PostData.LiftUpPostPoint = new PostPoint()
 				{
-					X = p2.CADPoint.Point.X(),
-					Y = p2.CADPoint.Point.Y(),
-					Z = p2.CADPoint.Point.Z(),
+					X = p2.Point.X(),
+					Y = p2.Point.Y(),
+					Z = p2.Point.Z(),
 					Master = endInfoOfPreviousPath.Master,
 					Slave = endInfoOfPreviousPath.Slave
 				};
@@ -265,9 +265,9 @@ namespace MyCAM.Post
 				// MCS
 				pathMCSPostData.LiftUpPostPoint = new PostPoint()
 				{
-					X = p2.CADPoint.Point.X(), // TODO: need to be changed to MCS point
-					Y = p2.CADPoint.Point.Y(),
-					Z = p2.CADPoint.Point.Z(),
+					X = p2.Point.X(), // TODO: need to be changed to MCS point
+					Y = p2.Point.Y(),
+					Z = p2.Point.Z(),
 					Master = endInfoOfPreviousPath.Master,
 					Slave = endInfoOfPreviousPath.Slave
 				};
@@ -275,15 +275,15 @@ namespace MyCAM.Post
 
 			// frog leap
 			if( craftData.TraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
-				CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, craftData.TraverseData.FrogLeapDistance );
+				ITraversePoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, craftData.TraverseData.FrogLeapDistance );
 
 				if( p3 != null ) {
 					// G54 middle point
 					pathG54PostData.FrogLeapMidPostPoint = new PostPoint()
 					{
-						X = p3.CADPoint.Point.X(),
-						Y = p3.CADPoint.Point.Y(),
-						Z = p3.CADPoint.Point.Z(),
+						X = p3.Point.X(),
+						Y = p3.Point.Y(),
+						Z = p3.Point.Z(),
 						Master = ( endInfoOfPreviousPath.Master + pathG54PostData.ProcessStartPoint.Master ) / 2.0,
 						Slave = ( endInfoOfPreviousPath.Slave + pathG54PostData.ProcessStartPoint.Slave ) / 2.0
 					};
@@ -291,9 +291,9 @@ namespace MyCAM.Post
 					// MCS middle point
 					pathMCSPostData.FrogLeapMidPostPoint = new PostPoint()
 					{
-						X = p3.CADPoint.Point.X(), // TODO: need to be changed to MCS point
-						Y = p3.CADPoint.Point.Y(),
-						Z = p3.CADPoint.Point.Z(),
+						X = p3.Point.X(), // TODO: need to be changed to MCS point
+						Y = p3.Point.Y(),
+						Z = p3.Point.Z(),
 						Master = ( endInfoOfPreviousPath.Master + pathMCSPostData.ProcessStartPoint.Master ) / 2.0,
 						Slave = ( endInfoOfPreviousPath.Slave + pathMCSPostData.ProcessStartPoint.Slave ) / 2.0
 					};
@@ -306,9 +306,9 @@ namespace MyCAM.Post
 				// G54
 				pathG54PostData.CutDownPostPoint = new PostPoint()
 				{
-					X = p4.CADPoint.Point.X(),
-					Y = p4.CADPoint.Point.Y(),
-					Z = p4.CADPoint.Point.Z(),
+					X = p4.Point.X(),
+					Y = p4.Point.Y(),
+					Z = p4.Point.Z(),
 					Master = pathG54PostData.ProcessStartPoint.Master,
 					Slave = pathG54PostData.ProcessStartPoint.Slave
 				};
@@ -316,9 +316,9 @@ namespace MyCAM.Post
 				// MCS
 				pathMCSPostData.CutDownPostPoint = new PostPoint()
 				{
-					X = p4.CADPoint.Point.X(), // TODO: need to be changed to MCS point
-					Y = p4.CADPoint.Point.Y(),
-					Z = p4.CADPoint.Point.Z(),
+					X = p4.Point.X(), // TODO: need to be changed to MCS point
+					Y = p4.Point.Y(),
+					Z = p4.Point.Z(),
 					Master = pathMCSPostData.ProcessStartPoint.Master,
 					Slave = pathMCSPostData.ProcessStartPoint.Slave
 				};
@@ -339,7 +339,7 @@ namespace MyCAM.Post
 				pathMCSPostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 				return;
 			}
-			CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( currentCAMData.GetProcessStartPoint(), entryAndExitData.EntryDistance );
+			ITraversePoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( currentCAMData.GetProcessStartPoint(), entryAndExitData.EntryDistance );
 			if( entryPoint == null ) {
 				return;
 			}
@@ -347,9 +347,9 @@ namespace MyCAM.Post
 			// G54
 			pathG54PostData.CutDownPostPoint = new PostPoint()
 			{
-				X = entryPoint.CADPoint.Point.X(),
-				Y = entryPoint.CADPoint.Point.Y(),
-				Z = entryPoint.CADPoint.Point.Z(),
+				X = entryPoint.Point.X(),
+				Y = entryPoint.Point.Y(),
+				Z = entryPoint.Point.Z(),
 				Master = pathG54PostData.ProcessStartPoint.Master,
 				Slave = pathG54PostData.ProcessStartPoint.Slave
 			};
@@ -358,9 +358,9 @@ namespace MyCAM.Post
 			// MCS
 			pathMCSPostData.CutDownPostPoint = new PostPoint()
 			{
-				X = entryPoint.CADPoint.Point.X(), // TODO: need to be changed to MCS point
-				Y = entryPoint.CADPoint.Point.Y(),
-				Z = entryPoint.CADPoint.Point.Z(),
+				X = entryPoint.Point.X(), // TODO: need to be changed to MCS point
+				Y = entryPoint.Point.Y(),
+				Z = entryPoint.Point.Z(),
 				Master = pathMCSPostData.ProcessStartPoint.Master,
 				Slave = pathMCSPostData.ProcessStartPoint.Slave
 			};

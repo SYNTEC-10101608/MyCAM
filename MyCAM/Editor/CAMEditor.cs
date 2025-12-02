@@ -954,21 +954,21 @@ namespace MyCAM.Editor
 				// p3: frog leap middle point (if frog leap)
 				// p4: cut down point of current path
 				// p5: start of current path
-				CAMPoint p1 = previousCacheInfo.GetProcessEndPoint();
-				CAMPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( previousCacheInfo.GetProcessEndPoint(), currentCraftData.TraverseData.LiftUpDistance );
-				CAMPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCacheInfo.GetProcessStartPoint(), currentCraftData.TraverseData.CutDownDistance );
-				CAMPoint p5 = currentCacheInfo.GetProcessStartPoint();
+				ITraversePoint p1 = previousCacheInfo.GetProcessEndPoint();
+				ITraversePoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( previousCacheInfo.GetProcessEndPoint(), currentCraftData.TraverseData.LiftUpDistance );
+				ITraversePoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCacheInfo.GetProcessStartPoint(), currentCraftData.TraverseData.CutDownDistance );
+				ITraversePoint p5 = currentCacheInfo.GetProcessStartPoint();
 
 				// lift up
 				if( currentCraftData.TraverseData.LiftUpDistance > 0 && p1 != null && p2 != null ) {
-					AddOneLinearTraverse( p1.CADPoint.Point, p2.CADPoint.Point );
+					AddOneLinearTraverse( p1.Point, p2.Point );
 				}
 
 				// frog leap
 				if( currentCraftData.TraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
-					CAMPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCraftData.TraverseData.FrogLeapDistance );
+					ITraversePoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCraftData.TraverseData.FrogLeapDistance );
 					if( p3 != null ) {
-						GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( p2.CADPoint.Point, p3.CADPoint.Point, p4.CADPoint.Point );
+						GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( p2.Point, p3.Point, p4.Point );
 						if( makeCircle.IsDone() ) {
 							Geom_TrimmedCurve arcCurve = makeCircle.Value();
 							BRepBuilderAPI_MakeEdge makeEdge = new BRepBuilderAPI_MakeEdge( arcCurve );
@@ -982,23 +982,23 @@ namespace MyCAM.Editor
 						}
 						else {
 							// fallback to normal traverse line
-							AddOneLinearTraverse( p2.CADPoint.Point, p4.CADPoint.Point );
+							AddOneLinearTraverse( p2.Point, p4.Point );
 						}
 					}
 					else {
 						// fallback to normal traverse line
-						AddOneLinearTraverse( p2.CADPoint.Point, p4.CADPoint.Point );
+						AddOneLinearTraverse( p2.Point, p4.Point );
 					}
 				}
 
 				// normal traverse
 				else if( p2 != null && p4 != null ) {
-					AddOneLinearTraverse( p2.CADPoint.Point, p4.CADPoint.Point );
+					AddOneLinearTraverse( p2.Point, p4.Point );
 				}
 
 				// cut down
 				if( currentCraftData.TraverseData.CutDownDistance > 0 && p4 != null && p5 != null ) {
-					AddOneLinearTraverse( p4.CADPoint.Point, p5.CADPoint.Point );
+					AddOneLinearTraverse( p4.Point, p5.Point );
 				}
 			}
 
@@ -1007,10 +1007,10 @@ namespace MyCAM.Editor
 				if( GetCacheInfoByID( m_DataManager, m_DataManager.PathIDList.First(), out ICacheInfo cacheInfo ) == false ) {
 					return;
 				}
-				CAMPoint firstPathStartPoint = cacheInfo.GetProcessStartPoint();
-				CAMPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
+				ITraversePoint firstPathStartPoint = cacheInfo.GetProcessStartPoint();
+				ITraversePoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
 				if( firstPathStartPoint != null && entryPoint != null ) {
-					AddOneLinearTraverse( entryPoint.CADPoint.Point, firstPathStartPoint.CADPoint.Point );
+					AddOneLinearTraverse( entryPoint.Point, firstPathStartPoint.Point );
 				}
 			}
 
@@ -1019,10 +1019,10 @@ namespace MyCAM.Editor
 				if( GetCacheInfoByID( m_DataManager, m_DataManager.PathIDList.Last(), out ICacheInfo cacheInfo ) == false ) {
 					return;
 				}
-				CAMPoint lastPathEndPoint = cacheInfo.GetProcessEndPoint();
-				CAMPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
+				ITraversePoint lastPathEndPoint = cacheInfo.GetProcessEndPoint();
+				ITraversePoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
 				if( lastPathEndPoint != null && exitPoint != null ) {
-					AddOneLinearTraverse( lastPathEndPoint.CADPoint.Point, exitPoint.CADPoint.Point );
+					AddOneLinearTraverse( lastPathEndPoint.Point, exitPoint.Point );
 				}
 			}
 
