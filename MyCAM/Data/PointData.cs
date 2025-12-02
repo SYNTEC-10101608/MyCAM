@@ -16,7 +16,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return new gp_Pnt( m_Point.X(), m_Point.Y(), m_Point.Z() );
+				return new gp_Pnt( m_Point.XYZ() );
 			}
 		}
 
