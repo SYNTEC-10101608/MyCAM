@@ -181,6 +181,10 @@ namespace MyCAM.CacheInfo
 		{
 			m_IsCraftDataDirty = false;
 			m_CAMPointList = new List<CAMPoint>();
+			foreach( CADPoint cadPoint in m_CADPointList ) {
+				CAMPoint camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st );
+				m_CAMPointList.Add( camPoint );
+			}
 			List<IToolVecPoint> toolVecPointList = m_CADPointList.Cast<IToolVecPoint>().ToList();
 			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, IsClosed, m_CraftData.IsReverse );
 			SetStartPoint();
