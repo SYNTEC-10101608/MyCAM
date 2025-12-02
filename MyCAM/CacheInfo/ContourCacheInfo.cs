@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	internal class ContourCacheInfo : ICacheInfo
+	public class ContourCacheInfo : ICacheInfo
 	{
 		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData, bool isClose )
 		{

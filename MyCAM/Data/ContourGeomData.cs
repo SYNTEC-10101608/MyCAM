@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace MyCAM.Data
 {
-	internal class ContourGeomData
+	public class ContourGeomData
 	{
 		public ContourGeomData( string szUID, List<PathEdge5D> pathDataList, bool isClosed )
 		{

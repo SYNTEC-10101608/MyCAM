@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
-	internal class ContourPathObject : PathObject
+	public class ContourPathObject : PathObject
 	{
 		public ContourPathObject( string szUID, TopoDS_Shape shape, List<PathEdge5D> pathDataList )
 			: base( szUID, shape )
