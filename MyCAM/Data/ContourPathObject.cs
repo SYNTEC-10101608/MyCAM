@@ -31,7 +31,7 @@ namespace MyCAM.Data
 		public ContourPathObject( string szUID, TopoDS_Shape shape, ContourGeomData geomData, CraftData craftData )
 			: base( szUID, shape )
 		{
-			if( string.IsNullOrEmpty( szUID ) || shape == null || geomData == null || craftData == null ) {
+			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || geomData == null || craftData == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
 			bool isClosed = DetermineIfClosed( shape );

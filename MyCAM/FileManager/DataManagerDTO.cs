@@ -358,12 +358,6 @@ namespace MyCAM.FileManager
 			set;
 		}
 
-		public bool IsClosed
-		{
-			get;
-			set;
-		}
-
 		public TraverseDataDTO TraverseData
 		{
 			get;
@@ -421,7 +415,7 @@ namespace MyCAM.FileManager
 			Dictionary<int, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
 			LeadData leadParam = LeadParam.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
-			return new CraftData( UID, leadParam, StartPoint, OverCutLength, IsReverse, IsClosed, traverseData, toolVecModifyMap, IsToolVecReverse );
+			return new CraftData( UID, StartPoint, IsReverse, leadParam, OverCutLength, toolVecModifyMap, IsToolVecReverse, traverseData );
 		}
 	}
 
