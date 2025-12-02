@@ -1,54 +1,50 @@
-﻿using MyCAM.App;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.gp;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyCAM.Helper
 {
-	public static  class OverCutHelper
+	public static class OverCutHelper
 	{
-		public static void SetOverCut()
+		public static void SetOverCut( ref List<IOverCutPoint> mainPointList, out List<IOverCutPoint> overCutPointList,
+			double overCutLength, bool isClosed, double overCutTolerance = OVERCUT_MATH_TOLERANCE )
 		{
-			m_OverCutPointList.Clear();
-			if( m_CAMPointList.Count == 0 || m_CraftData.OverCutLength == 0 || !IsClosed ) {
+			overCutPointList = new List<IOverCutPoint>();
+			if( mainPointList.Count == 0 || overCutLength == 0 || !isClosed ) {
 				return;
 			}
 			double dTotalOverCutLength = 0;
 
 			// end point is the start of over cut
-			m_OverCutPointList.Add( m_CAMPointList.Last().Clone() );
-			for( int i = 0; i < m_CAMPointList.Count - 1; i++ ) {
+			overCutPointList.Add( mainPointList.Last().Clone() );
+			for( int i = 0; i < mainPointList.Count - 1; i++ ) {
 
 				// get this edge distance
-				double dDistance = m_CAMPointList[ i ].CADPoint.Point.Distance( m_CAMPointList[ i + 1 ].CADPoint.Point );
-				if( dTotalOverCutLength + dDistance < m_CraftData.OverCutLength ) {
+				double dDistance = mainPointList[ i ].Point.Distance( mainPointList[ i + 1 ].Point );
+				if( dTotalOverCutLength + dDistance < overCutLength ) {
 
 					// still within overcut length → take next point directly
-					m_OverCutPointList.Add( m_CAMPointList[ i + 1 ].Clone() );
+					overCutPointList.Add( mainPointList[ i + 1 ].Clone() );
 					dTotalOverCutLength += dDistance;
 				}
 				else {
 
 					// need to stop inside this segment
-					double dRemain = m_CraftData.OverCutLength - dTotalOverCutLength;
-					if( dRemain <= MyApp.PRECISION_MIN_ERROR ) {
+					double dRemain = overCutLength - dTotalOverCutLength;
+					if( dRemain <= overCutTolerance ) {
 						return;
 					}
 
 					// compute new point along segment
-					gp_Pnt overCutEndPoint = GetExactOverCutEndPoint( m_CAMPointList[ i ].CADPoint.Point, m_CAMPointList[ i + 1 ].CADPoint.Point, dRemain );
+					gp_Pnt overCutEndPoint = GetExactOverCutEndPoint( mainPointList[ i ].Point, mainPointList[ i + 1 ].Point, dRemain );
 
 					// interpolate tool vector
-					InterpolateToolAndTangentVecBetween2CAMPoint( m_CAMPointList[ i ], m_CAMPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
+					InterpolateToolAndTangentVecBetween2CAMPoint( mainPointList[ i ], mainPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
 
-					// create new cam poiont
-					CADPoint cadPoint = new CADPoint( overCutEndPoint, endPointToolVec, endPointToolVec, endPointTangentVec );
-					CAMPoint camPoint = new CAMPoint( cadPoint, endPointToolVec );
-					m_OverCutPointList.Add( camPoint );
+					// create new cam point
+					IOverCutPoint camPoint = BuildOverCutPoint( overCutEndPoint, endPointToolVec, endPointTangentVec );
+					overCutPointList.Add( camPoint );
 					return;
 				}
 			}
@@ -68,10 +64,39 @@ namespace MyCAM.Helper
 			return new gp_Pnt( currentPoint.XYZ() + moveVec.XYZ() );
 		}
 
+		static void InterpolateToolAndTangentVecBetween2CAMPoint( IOverCutPoint currentCAMPoint, IOverCutPoint nextCAMPoint, gp_Pnt point,
+			out gp_Dir toolDir, out gp_Dir tangentDir )
+		{
+			toolDir = currentCAMPoint.ToolVec;
+			tangentDir = currentCAMPoint.TangentVec;
+
+			// get current and next tool vector
+			gp_Vec currentVec = new gp_Vec( currentCAMPoint.ToolVec );
+			gp_Vec nextVec = new gp_Vec( nextCAMPoint.ToolVec );
+
+			// get current and next tangent vector
+			gp_Vec currentTangentVec = new gp_Vec( currentCAMPoint.TangentVec );
+			gp_Vec nextTangentVec = new gp_Vec( nextCAMPoint.TangentVec );
+
+			// calculate new point percentage
+			double dDistanceOfCAMPath2Point = currentCAMPoint.Point.Distance( nextCAMPoint.Point );
+			double dDistanceBetweenCurrentPoint2NewPoint = currentCAMPoint.Point.Distance( point );
+
+			// two point overlap
+			if( dDistanceOfCAMPath2Point <= OVERCUT_MATH_TOLERANCE ) {
+				return;
+			}
+			double interpolatePercent = dDistanceBetweenCurrentPoint2NewPoint / dDistanceOfCAMPath2Point;
+
+			// get new point dir
+			toolDir = InterpolateVecBetween2Vec( currentVec, nextVec, interpolatePercent );
+			tangentDir = InterpolateVecBetween2Vec( currentTangentVec, nextTangentVec, interpolatePercent );
+		}
+
 		static gp_Dir InterpolateVecBetween2Vec( gp_Vec currentVec, gp_Vec nextVec, double interpolatePercent )
 		{
-			// this case is unsolcvable, so just return current vec
-			if( currentVec.IsOpposite( nextVec, MyApp.PRECISION_MIN_ERROR ) ) {
+			// this case is unsolvable, so just return current vec
+			if( currentVec.IsOpposite( nextVec, VECTOR_OPPOSITE_TOLERANCE ) ) {
 				return new gp_Dir( currentVec.XYZ() );
 			}
 
@@ -88,32 +113,14 @@ namespace MyCAM.Helper
 			return resultDir;
 		}
 
-		static void InterpolateToolAndTangentVecBetween2CAMPoint( CAMPoint currentCAMPoint, CAMPoint nextCAMPoint, gp_Pnt point, out gp_Dir toolDir, out gp_Dir tangentDir )
+		static IOverCutPoint BuildOverCutPoint( gp_Pnt overCutEndPoint, gp_Dir endPointToolVec, gp_Dir endPointTangentVec )
 		{
-			toolDir = currentCAMPoint.ToolVec;
-			tangentDir = currentCAMPoint.CADPoint.TangentVec;
-
-			// get current and next tool vector
-			gp_Vec currentVec = new gp_Vec( currentCAMPoint.ToolVec );
-			gp_Vec nextVec = new gp_Vec( nextCAMPoint.ToolVec );
-
-			// get current and next tangent vector
-			gp_Vec currentTangentVec = new gp_Vec( currentCAMPoint.CADPoint.TangentVec );
-			gp_Vec nextTangentVec = new gp_Vec( nextCAMPoint.CADPoint.TangentVec );
-
-			// calculate new point percentage
-			double dDistanceOfCAMPath2Point = currentCAMPoint.CADPoint.Point.Distance( nextCAMPoint.CADPoint.Point );
-			double dDistanceBetweenCurrentPoint2NewPoint = currentCAMPoint.CADPoint.Point.Distance( point );
-
-			// two point overlap
-			if( dDistanceOfCAMPath2Point <= MyApp.PRECISION_MIN_ERROR ) {
-				return;
-			}
-			double interpolatePercent = dDistanceBetweenCurrentPoint2NewPoint / dDistanceOfCAMPath2Point;
-
-			// get new point dir
-			toolDir = InterpolateVecBetween2Vec( currentVec, nextVec, interpolatePercent );
-			tangentDir = InterpolateVecBetween2Vec( currentTangentVec, nextTangentVec, interpolatePercent );
+			CADPoint cadPoint = new CADPoint( overCutEndPoint, endPointToolVec, endPointToolVec, endPointTangentVec );
+			CAMPoint camPoint = new CAMPoint( cadPoint, endPointToolVec );
+			return camPoint;
 		}
+
+		const double OVERCUT_MATH_TOLERANCE = 0.001;
+		const double VECTOR_OPPOSITE_TOLERANCE = 0.001;
 	}
 }

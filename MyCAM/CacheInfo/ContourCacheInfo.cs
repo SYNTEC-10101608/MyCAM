@@ -1,7 +1,6 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Helper;
-using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -214,8 +213,11 @@ namespace MyCAM.CacheInfo
 				m_CAMPointList.Add( connectedCAMPoint );
 			}
 
-			// all CAM point are settled down, start set lead / overcut
-			SetOverCut();
+			// set over cut
+			List<IOverCutPoint> camPointOverCutList = m_CAMPointList.Cast<IOverCutPoint>().ToList();
+			OverCutHelper.SetOverCut( ref camPointOverCutList, out List<IOverCutPoint> overCutPointList, m_CraftData.OverCutLength, IsClosed );
+
+			// set lead
 			SetLeadIn();
 			SetLeadout();
 		}

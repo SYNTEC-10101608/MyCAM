@@ -78,7 +78,7 @@ namespace MyCAM.Data
 			get;
 		}
 
-		gp_Dir InitTangentVec
+		gp_Dir TangentVec
 		{
 			get;
 		}
@@ -90,8 +90,28 @@ namespace MyCAM.Data
 		}
 	}
 
+	public interface IOverCutPoint
+	{
+		gp_Pnt Point
+		{
+			get;
+		}
+
+		gp_Dir ToolVec
+		{
+			get;
+		}
+
+		gp_Dir TangentVec
+		{
+			get;
+		}
+
+		IOverCutPoint Clone();
+	}
+
 	// currently assuming CAM = CAD + ToolVec
-	public class CAMPoint : IToolVecPoint
+	public class CAMPoint : IToolVecPoint, IOverCutPoint
 	{
 		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
 		{
@@ -132,7 +152,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		public gp_Dir InitTangentVec
+		public gp_Dir TangentVec
 		{
 			get
 			{
@@ -143,6 +163,12 @@ namespace MyCAM.Data
 		public CAMPoint Clone()
 		{
 			return new CAMPoint( CADPoint.Clone(), ToolVec );
+		}
+
+		// the explicit interface implementation for IOverCutPoint.Clone
+		IOverCutPoint IOverCutPoint.Clone()
+		{
+			return Clone();
 		}
 
 		// using backing field to prevent modified outside

@@ -121,7 +121,7 @@ namespace MyCAM.Helper
 			}
 
 			// get the x, y, z direction
-			gp_Dir x = tooVecPoint.InitTangentVec;
+			gp_Dir x = tooVecPoint.TangentVec;
 			gp_Dir z = tooVecPoint.InitToolVec;
 			gp_Dir y = z.Crossed( x );
 
