@@ -1,4 +1,5 @@
-﻿using OCC.gp;
+﻿using MyCAM.Helper;
+using OCC.gp;
 
 namespace MyCAM.Data
 {
@@ -110,8 +111,26 @@ namespace MyCAM.Data
 		IOverCutPoint Clone();
 	}
 
+	public interface ILeadLinePoint
+	{
+		gp_Pnt Point
+		{
+			get;
+		}
+
+		gp_Dir TangentVec
+		{
+			get;
+		}
+
+		gp_Dir ToolVec
+		{
+			get;
+		}
+	}
+
 	// currently assuming CAM = CAD + ToolVec
-	public class CAMPoint : IToolVecPoint, IOverCutPoint
+	public class CAMPoint : IToolVecPoint, IOverCutPoint, ILeadLinePoint
 	{
 		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
 		{

@@ -1,5 +1,4 @@
-﻿using MyCAM.App;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using MyCAM.Helper;
 using System;
 using System.Collections.Generic;
@@ -216,10 +215,15 @@ namespace MyCAM.CacheInfo
 			// set over cut
 			List<IOverCutPoint> camPointOverCutList = m_CAMPointList.Cast<IOverCutPoint>().ToList();
 			OverCutHelper.SetOverCut( camPointOverCutList, out List<IOverCutPoint> overCutPointList, m_CraftData.OverCutLength, IsClosed );
+			m_OverCutPointList = overCutPointList.Cast<CAMPoint>().ToList();
 
 			// set lead
-			SetLeadIn();
-			SetLeadout();
+			List<ILeadLinePoint> mainPointList = m_CAMPointList.Cast<ILeadLinePoint>().ToList();
+			List<ILeadLinePoint> overCutPointList2 = m_OverCutPointList.Cast<ILeadLinePoint>().ToList();
+			LeadHelper.SetLeadIn( mainPointList, out List<ILeadLinePoint> leadInPointList, m_CraftData.LeadLineParam, m_CraftData.IsReverse );
+			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
+			LeadHelper.SetLeadOut( mainPointList, overCutPointList2, out List<ILeadLinePoint> leadOutPointList, m_CraftData.LeadLineParam, m_CraftData.IsReverse );
+			m_LeadOutCAMPointList = leadOutPointList.Cast<CAMPoint>().ToList();
 		}
 
 		void SetStartPoint()
