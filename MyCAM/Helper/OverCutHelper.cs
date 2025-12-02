@@ -113,6 +113,7 @@ namespace MyCAM.Helper
 			return resultDir;
 		}
 
+		// this method is now for building a CAMPoint as OverCutPoint
 		static IOverCutPoint BuildOverCutPoint( gp_Pnt overCutEndPoint, gp_Dir endPointToolVec, gp_Dir endPointTangentVec )
 		{
 			CADPoint cadPoint = new CADPoint( overCutEndPoint, endPointToolVec, endPointToolVec, endPointTangentVec );
