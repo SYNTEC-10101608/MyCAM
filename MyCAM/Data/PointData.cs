@@ -129,8 +129,23 @@ namespace MyCAM.Data
 		}
 	}
 
+	public interface ITraversePoint
+	{
+		gp_Pnt Point
+		{
+			get;
+		}
+
+		gp_Dir ToolVec
+		{
+			get;
+		}
+
+		ITraversePoint Clone();
+	}
+
 	// currently assuming CAM = CAD + ToolVec
-	public class CAMPoint : IToolVecPoint, IOverCutPoint, ILeadLinePoint
+	public class CAMPoint : IToolVecPoint, IOverCutPoint, ILeadLinePoint, ITraversePoint
 	{
 		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
 		{
@@ -186,6 +201,11 @@ namespace MyCAM.Data
 
 		// the explicit interface implementation for IOverCutPoint.Clone
 		IOverCutPoint IOverCutPoint.Clone()
+		{
+			return Clone();
+		}
+
+		ITraversePoint ITraversePoint.Clone()
 		{
 			return Clone();
 		}
