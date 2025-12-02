@@ -91,6 +91,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Editor\IEditor.cs" />
+    <Compile Include="Editor\Renderer\CraftRenderer.cs" />
+    <Compile Include="Editor\Renderer\ICAMRenderer.cs" />
+    <Compile Include="Editor\Renderer\IndexRenderer.cs" />
+    <Compile Include="Editor\Renderer\OrientationRenderer.cs" />
+    <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
+    <Compile Include="Editor\Renderer\TraverseRenderer.cs" />
     <Compile Include="Editor\SimuEditor.cs" />
     <Compile Include="Data\LeadData.cs" />
     <Compile Include="Editor\Dialog\LeadDlg.cs">
