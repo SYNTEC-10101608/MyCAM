@@ -14,7 +14,8 @@ namespace MyCAM.Editor.Renderer
 	/// </summary>
 	internal class CraftRenderer : CAMRendererBase
 	{
-		readonly Dictionary<string, List<AIS_Line>> m_LeadAISDict = new Dictionary<string, List<AIS_Line>>();
+		readonly Dictionary<string, List<AIS_Line>> m_LeadInAISDict = new Dictionary<string, List<AIS_Line>>();
+		readonly Dictionary<string, List<AIS_Line>> m_LeadOutAISDict = new Dictionary<string, List<AIS_Line>>();
 		readonly Dictionary<string, List<AIS_Line>> m_OverCutAISDict = new Dictionary<string, List<AIS_Line>>();
 
 		public CraftRenderer( Viewer viewer, DataManager dataManager )
@@ -30,14 +31,12 @@ namespace MyCAM.Editor.Renderer
 		public void Show( List<string> pathIDList, bool bUpdate = false )
 		{
 			Remove( pathIDList );
-
 			if( !m_IsShow ) {
 				return;
 			}
-
-			ShowLeadLine( pathIDList );
+			ShowLeadInLine( pathIDList );
+			ShowLeadOutLine( pathIDList );
 			ShowOverCut( pathIDList );
-
 			if( bUpdate ) {
 				UpdateView();
 			}
@@ -50,85 +49,65 @@ namespace MyCAM.Editor.Renderer
 
 		public void Remove( List<string> pathIDList, bool bUpdate = false )
 		{
-			RemoveLeadLine( pathIDList );
+			RemoveLeadInLine( pathIDList );
+			RemoveLeadOutLine( pathIDList );
 			RemoveOverCut( pathIDList );
-
 			if( bUpdate ) {
 				UpdateView();
 			}
 		}
 
-		void ShowLeadLine( List<string> pathIDList )
+		void ShowLeadInLine( List<string> pathIDList )
+		{
+			ShowLeadLine( pathIDList, m_LeadInAISDict,
+				( leadData ) => leadData.LeadIn.Type != LeadLineType.None,
+				GetLeadInPointList );
+		}
+
+		void ShowLeadOutLine( List<string> pathIDList )
+		{
+			ShowLeadLine( pathIDList, m_LeadOutAISDict,
+				( leadData ) => leadData.LeadOut.Type != LeadLineType.None,
+				GetLeadOutPointList );
+		}
+
+		void RemoveLeadInLine( List<string> pathIDList )
+		{
+			RemoveLines( m_LeadInAISDict, pathIDList );
+		}
+
+		void RemoveLeadOutLine( List<string> pathIDList )
+		{
+			RemoveLines( m_LeadOutAISDict, pathIDList );
+		}
+
+		void ShowLeadLine(
+			List<string> pathIDList,
+			Dictionary<string, List<AIS_Line>> lineDict,
+			System.Func<LeadData, bool> needShowFunc,
+			System.Func<string, List<IProcessPoint>> getPointListFunc )
 		{
 			foreach( string szPathID in pathIDList ) {
 				LeadData leadData = GetLeadData( szPathID );
-				if( leadData == null ) {
+				if( leadData == null || !needShowFunc( leadData ) ) {
 					continue;
 				}
-
-				// path with lead in
-				if( leadData.LeadIn.Type != LeadLineType.None ) {
-					List<IProcessPoint> leadInPointList = GetLeadInPointList( szPathID );
-					if( leadInPointList != null && leadInPointList.Count > 0 ) {
-						List<AIS_Line> leadAISList = new List<AIS_Line>();
-						m_LeadAISDict.Add( szPathID, leadAISList );
-
-						for( int i = 0; i < leadInPointList.Count - 1; i++ ) {
-							gp_Pnt currentCAMPoint = leadInPointList[ i ].Point;
-							gp_Pnt nextCAMPoint = leadInPointList[ i + 1 ].Point;
-							AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint, nextCAMPoint, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
-							leadAISList.Add( LeadAISLine );
-						}
-					}
+				List<IProcessPoint> pointList = getPointListFunc( szPathID );
+				if( pointList == null || pointList.Count == 0 ) {
+					continue;
 				}
-
-				// path with lead out
-				if( leadData.LeadOut.Type != LeadLineType.None ) {
-					List<IProcessPoint> leadOutPointList = GetLeadOutPointList( szPathID );
-					if( leadOutPointList != null && leadOutPointList.Count > 0 ) {
-						List<AIS_Line> leadAISList;
-						if( m_LeadAISDict.ContainsKey( szPathID ) ) {
-							leadAISList = m_LeadAISDict[ szPathID ];
-						}
-						else {
-							leadAISList = new List<AIS_Line>();
-							m_LeadAISDict.Add( szPathID, leadAISList );
-						}
-
-						for( int i = 0; i < leadOutPointList.Count - 1; i++ ) {
-							gp_Pnt currentCAMPoint = leadOutPointList[ i ].Point;
-							gp_Pnt nextCAMPoint = leadOutPointList[ i + 1 ].Point;
-							AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint, nextCAMPoint, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
-							leadAISList.Add( LeadAISLine );
-						}
-					}
+				List<AIS_Line> leadAISList = new List<AIS_Line>();
+				lineDict.Add( szPathID, leadAISList );
+				for( int i = 0; i < pointList.Count - 1; i++ ) {
+					gp_Pnt currentCAMPoint = pointList[ i ].Point;
+					gp_Pnt nextCAMPoint = pointList[ i + 1 ].Point;
+					AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint, nextCAMPoint, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+					leadAISList.Add( LeadAISLine );
 				}
 			}
 
 			// display the lead line
-			foreach( string szPathID in pathIDList ) {
-				if( m_LeadAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Line> leadAISList = m_LeadAISDict[ szPathID ];
-					foreach( AIS_Line leadAIS in leadAISList ) {
-						m_Viewer.GetAISContext().Display( leadAIS, false );
-						m_Viewer.GetAISContext().Deactivate( leadAIS );
-					}
-				}
-			}
-		}
-
-		void RemoveLeadLine( List<string> pathIDList )
-		{
-			foreach( string szPathID in pathIDList ) {
-				if( m_LeadAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Line> leadAISList = m_LeadAISDict[ szPathID ];
-					foreach( AIS_Line leadAIS in leadAISList ) {
-						m_Viewer.GetAISContext().Remove( leadAIS, false );
-					}
-					m_LeadAISDict[ szPathID ].Clear();
-					m_LeadAISDict.Remove( szPathID );
-				}
-			}
+			DisplayLines( lineDict, pathIDList );
 		}
 
 		void ShowOverCut( List<string> pathIDList )
@@ -152,28 +131,38 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 
-			// display the tool vec
+			// display the overcut line
+			DisplayLines( m_OverCutAISDict, pathIDList );
+		}
+
+		void RemoveOverCut( List<string> pathIDList )
+		{
+			RemoveLines( m_OverCutAISDict, pathIDList );
+		}
+
+		void DisplayLines( Dictionary<string, List<AIS_Line>> lineDict, List<string> pathIDList )
+		{
 			foreach( string szPathID in pathIDList ) {
-				if( m_OverCutAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Line> overcutAISList = m_OverCutAISDict[ szPathID ];
-					foreach( AIS_Line overcutAIS in overcutAISList ) {
-						m_Viewer.GetAISContext().Display( overcutAIS, false );
-						m_Viewer.GetAISContext().Deactivate( overcutAIS );
+				if( lineDict.ContainsKey( szPathID ) ) {
+					List<AIS_Line> lineAISList = lineDict[ szPathID ];
+					foreach( AIS_Line lineAIS in lineAISList ) {
+						m_Viewer.GetAISContext().Display( lineAIS, false );
+						m_Viewer.GetAISContext().Deactivate( lineAIS );
 					}
 				}
 			}
 		}
 
-		void RemoveOverCut( List<string> pathIDList )
+		void RemoveLines( Dictionary<string, List<AIS_Line>> lineDict, List<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
-				if( m_OverCutAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Line> overcutAISList = m_OverCutAISDict[ szPathID ];
-					foreach( AIS_Line overcutAIS in overcutAISList ) {
-						m_Viewer.GetAISContext().Remove( overcutAIS, false );
+				if( lineDict.ContainsKey( szPathID ) ) {
+					List<AIS_Line> lineAISList = lineDict[ szPathID ];
+					foreach( AIS_Line lineAIS in lineAISList ) {
+						m_Viewer.GetAISContext().Remove( lineAIS, false );
 					}
-					m_OverCutAISDict[ szPathID ].Clear();
-					m_OverCutAISDict.Remove( szPathID );
+					lineDict[ szPathID ].Clear();
+					lineDict.Remove( szPathID );
 				}
 			}
 		}
