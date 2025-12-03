@@ -39,7 +39,6 @@ namespace MyCAM.Editor.Renderer
 				if( location == null ) {
 					continue;
 				}
-
 				string szIndex = (++nCurrentIndex).ToString();
 
 				// create text label ais
@@ -69,7 +68,6 @@ namespace MyCAM.Editor.Renderer
 				m_Viewer.GetAISContext().Remove( textLabel, false );
 			}
 			m_IndexList.Clear();
-
 			if( bUpdate ) {
 				UpdateView();
 			}

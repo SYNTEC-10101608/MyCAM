@@ -18,7 +18,8 @@ namespace MyCAM.Editor.Renderer
 	internal class OrientationRenderer : CAMRendererBase
 	{
 		readonly Dictionary<string, AIS_Shape> m_OrientationAISDict = new Dictionary<string, AIS_Shape>();
-		readonly Dictionary<string, List<AIS_Shape>> m_LeadOrientationAISDict = new Dictionary<string, List<AIS_Shape>>();
+		readonly Dictionary<string, AIS_Shape> m_LeadInOrientationAISDict = new Dictionary<string, AIS_Shape>();
+		readonly Dictionary<string, AIS_Shape> m_LeadOutOrientationAISDict = new Dictionary<string, AIS_Shape>();
 
 		public OrientationRenderer( Viewer viewer, DataManager dataManager )
 			: base( viewer, dataManager )
@@ -38,10 +39,9 @@ namespace MyCAM.Editor.Renderer
 			if( !m_IsShow ) {
 				return;
 			}
-
 			ShowPathOrientation( pathIDList );
-			ShowLeadOrientation( pathIDList );
-
+			ShowLeadInOrientation( pathIDList );
+			ShowLeadOutOrientation( pathIDList );
 			if( bUpdate ) {
 				UpdateView();
 			}
@@ -55,8 +55,8 @@ namespace MyCAM.Editor.Renderer
 		public void Remove( List<string> pathIDList, bool bUpdate = false )
 		{
 			RemovePathOrientation( pathIDList );
-			RemoveLeadOrientation( pathIDList );
-
+			RemoveLeadInOrientation( pathIDList );
+			RemoveLeadOutOrientation( pathIDList );
 			if( bUpdate ) {
 				UpdateView();
 			}
@@ -69,7 +69,6 @@ namespace MyCAM.Editor.Renderer
 				if( firstPoint == null ) {
 					continue;
 				}
-
 				gp_Pnt showPoint = firstPoint.Point;
 				gp_Dir orientationDir = new gp_Dir( firstPoint.TangentVec.XYZ() );
 				if( GetIsPathReverse( szPathID ) ) {
@@ -80,91 +79,78 @@ namespace MyCAM.Editor.Renderer
 			}
 
 			// display the orientation
-			foreach( string szPathID in pathIDList ) {
-				if( m_OrientationAISDict.ContainsKey( szPathID ) ) {
-					m_Viewer.GetAISContext().Display( m_OrientationAISDict[ szPathID ], false );
-					m_Viewer.GetAISContext().Deactivate( m_OrientationAISDict[ szPathID ] );
-				}
-			}
+			DisplayOrientations( m_OrientationAISDict, pathIDList );
 		}
 
 		void RemovePathOrientation( List<string> pathIDList )
 		{
-			foreach( string szPathID in pathIDList ) {
-				if( m_OrientationAISDict.ContainsKey( szPathID ) ) {
-					m_Viewer.GetAISContext().Remove( m_OrientationAISDict[ szPathID ], false );
-					m_OrientationAISDict.Remove( szPathID );
-				}
-			}
+			RemoveOrientations( m_OrientationAISDict, pathIDList );
 		}
 
-		void ShowLeadOrientation( List<string> pathIDList )
+		void ShowLeadInOrientation( List<string> pathIDList )
+		{
+			ShowLeadOrientation( pathIDList, m_LeadInOrientationAISDict,
+				( leadData ) => leadData.LeadIn.Type != LeadLineType.None,
+				GetLeadInFirstPoint );
+		}
+
+		void ShowLeadOutOrientation( List<string> pathIDList )
+		{
+			ShowLeadOrientation( pathIDList, m_LeadOutOrientationAISDict,
+				( leadData ) => leadData.LeadOut.Type != LeadLineType.None,
+				GetLeadOutLastPoint );
+		}
+
+		void RemoveLeadInOrientation( List<string> pathIDList )
+		{
+			RemoveOrientations( m_LeadInOrientationAISDict, pathIDList );
+		}
+
+		void RemoveLeadOutOrientation( List<string> pathIDList )
+		{
+			RemoveOrientations( m_LeadOutOrientationAISDict, pathIDList );
+		}
+
+		void ShowLeadOrientation(
+			List<string> pathIDList,
+			Dictionary<string, AIS_Shape> orientationDict,
+			System.Func<LeadData, bool> needShowFunc,
+			System.Func<string, IOrientationPoint> getPointFunc )
 		{
 			foreach( string szPathID in pathIDList ) {
 				LeadData leadData = GetLeadData( szPathID );
-				if( leadData == null ) {
+				if( leadData == null || !needShowFunc( leadData ) ) {
 					continue;
 				}
-
-				// path with lead in
-				if( leadData.LeadIn.Type != LeadLineType.None ) {
-					IOrientationPoint leadInStartPoint = GetLeadInFirstPoint( szPathID );
-					if( leadInStartPoint == null ) {
-						continue;
-					}
-
-					List<AIS_Shape> orientationAISList = new List<AIS_Shape>();
-					m_LeadOrientationAISDict.Add( szPathID, orientationAISList );
-
-					gp_Dir leadInOrientationDir = new gp_Dir( leadInStartPoint.TangentVec.XYZ() );
-					AIS_Shape orientationAIS = GetOrientationAIS( leadInStartPoint.Point, leadInOrientationDir );
-					orientationAISList.Add( orientationAIS );
+				IOrientationPoint orientationPoint = getPointFunc( szPathID );
+				if( orientationPoint == null ) {
+					continue;
 				}
-
-				// path with lead out
-				if( leadData.LeadOut.Type != LeadLineType.None ) {
-					IOrientationPoint leadOutEndPoint = GetLeadOutLastPoint( szPathID );
-					if( leadOutEndPoint == null ) {
-						continue;
-					}
-
-					List<AIS_Shape> orientationAISList;
-					if( m_LeadOrientationAISDict.ContainsKey( szPathID ) ) {
-						orientationAISList = m_LeadOrientationAISDict[ szPathID ];
-					}
-					else {
-						orientationAISList = new List<AIS_Shape>();
-						m_LeadOrientationAISDict.Add( szPathID, orientationAISList );
-					}
-
-					gp_Dir leadOutOrientationDir = new gp_Dir( leadOutEndPoint.TangentVec.XYZ() );
-					AIS_Shape orientationAIS = GetOrientationAIS( leadOutEndPoint.Point, leadOutOrientationDir );
-					orientationAISList.Add( orientationAIS );
-				}
+				gp_Dir orientationDir = new gp_Dir( orientationPoint.TangentVec.XYZ() );
+				AIS_Shape orientationAIS = GetOrientationAIS( orientationPoint.Point, orientationDir );
+				orientationDict.Add( szPathID, orientationAIS );
 			}
 
 			// display the orientation
+			DisplayOrientations( orientationDict, pathIDList );
+		}
+
+		void DisplayOrientations( Dictionary<string, AIS_Shape> orientationDict, List<string> pathIDList )
+		{
 			foreach( string szPathID in pathIDList ) {
-				if( m_LeadOrientationAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Shape> orientationAISList = m_LeadOrientationAISDict[ szPathID ];
-					foreach( AIS_Shape orientationAIS in orientationAISList ) {
-						m_Viewer.GetAISContext().Display( orientationAIS, false );
-						m_Viewer.GetAISContext().Deactivate( orientationAIS );
-					}
+				if( orientationDict.ContainsKey( szPathID ) ) {
+					m_Viewer.GetAISContext().Display( orientationDict[ szPathID ], false );
+					m_Viewer.GetAISContext().Deactivate( orientationDict[ szPathID ] );
 				}
 			}
 		}
 
-		void RemoveLeadOrientation( List<string> pathIDList )
+		void RemoveOrientations( Dictionary<string, AIS_Shape> orientationDict, List<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
-				if( m_LeadOrientationAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Shape> orientationAISList = m_LeadOrientationAISDict[ szPathID ];
-					foreach( AIS_Shape orientationAIS in orientationAISList ) {
-						m_Viewer.GetAISContext().Remove( orientationAIS, false );
-					}
-					m_LeadOrientationAISDict[ szPathID ].Clear();
-					m_LeadOrientationAISDict.Remove( szPathID );
+				if( orientationDict.ContainsKey( szPathID ) ) {
+					m_Viewer.GetAISContext().Remove( orientationDict[ szPathID ], false );
+					orientationDict.Remove( szPathID );
 				}
 			}
 		}
