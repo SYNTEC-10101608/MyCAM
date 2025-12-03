@@ -6,7 +6,6 @@ using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -42,10 +41,8 @@ namespace MyCAM.Editor.Renderer
 				if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
 					continue;
 				}
-
 				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
 				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
-
 				for( int i = 0; i < toolVecPointList.Count; i++ ) {
 					IProcessPoint point = toolVecPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
@@ -67,7 +64,6 @@ namespace MyCAM.Editor.Renderer
 					}
 				}
 			}
-
 			if( bUpdate ) {
 				UpdateView();
 			}
@@ -90,7 +86,6 @@ namespace MyCAM.Editor.Renderer
 					m_ToolVecAISDict.Remove( szPathID );
 				}
 			}
-
 			if( bUpdate ) {
 				UpdateView();
 			}
@@ -120,6 +115,7 @@ namespace MyCAM.Editor.Renderer
 			return pointList;
 		}
 
+		// TODO: the method is kepp casting same thing in a loop, optimize it later
 		bool IsToolVecModifyPoint( string pathID, IProcessPoint point )
 		{
 			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
@@ -128,7 +124,6 @@ namespace MyCAM.Editor.Renderer
 			if( point is ISetToolVecPoint toolVecPoint ) {
 				return contourCacheInfo.IsToolVecModifyPoint( toolVecPoint );
 			}
-
 			return false;
 		}
 	}
