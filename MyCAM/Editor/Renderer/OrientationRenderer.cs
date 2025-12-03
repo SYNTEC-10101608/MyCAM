@@ -37,6 +37,9 @@ namespace MyCAM.Editor.Renderer
 
 			// no need to show
 			if( !m_IsShow ) {
+				if( bUpdate ) {
+					UpdateView();
+				}
 				return;
 			}
 			ShowPathOrientation( pathIDList );

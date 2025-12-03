@@ -32,6 +32,9 @@ namespace MyCAM.Editor.Renderer
 		{
 			Remove( pathIDList );
 			if( !m_IsShow ) {
+				if( bUpdate ) {
+					UpdateView();
+				}
 				return;
 			}
 			ShowLeadInLine( pathIDList );
