@@ -1,7 +1,6 @@
 using MyCAM.CacheInfo;
 using MyCAM.Data;
 using OCCViewer;
-using System.Collections.Generic;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -33,34 +32,21 @@ namespace MyCAM.Editor.Renderer
 			m_Viewer.UpdateView();
 		}
 
-		/// <summary>
-		/// Get cache info by path ID
-		/// </summary>
-		protected bool GetCacheInfoByID( string szPathID, out ICacheInfo cacheInfo )
-		{
-			cacheInfo = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
-				|| m_DataManager.ObjectMap[ szPathID ] == null ) {
-				return false;
-			}
-			if( ( m_DataManager.ObjectMap[ szPathID ] as PathObject )?.PathType == PathType.Contour ) {
-				cacheInfo = ( m_DataManager.ObjectMap[ szPathID ] as ContourPathObject )?.ContourCacheInfo;
-			}
-			return cacheInfo != null;
-		}
-
-		/// <summary>
-		/// Get contour cache info by path ID
-		/// </summary>
 		protected bool GetContourCacheInfoByID( string szPathID, out ContourCacheInfo contourCacheInfo )
 		{
 			contourCacheInfo = null;
-			if( GetCacheInfoByID( szPathID, out ICacheInfo cacheInfo ) && cacheInfo.PathType == PathType.Contour ) {
-				contourCacheInfo = cacheInfo as ContourCacheInfo;
-				return true;
+			if( string.IsNullOrEmpty( szPathID )
+				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
+				|| m_DataManager.ObjectMap[ szPathID ] == null
+				|| m_DataManager.ObjectMap[ szPathID ].ObjectType != ObjectType.Path ) {
+				return false;
 			}
-			return false;
+			PathObject pathObject = m_DataManager.ObjectMap[ szPathID ] as PathObject;
+			if( pathObject.PathType != PathType.Contour ) {
+				return false;
+			}
+			contourCacheInfo = ( pathObject as ContourPathObject ).ContourCacheInfo;
+			return contourCacheInfo != null;
 		}
 	}
 }

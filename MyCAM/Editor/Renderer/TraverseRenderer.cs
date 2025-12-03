@@ -181,13 +181,17 @@ namespace MyCAM.Editor.Renderer
 
 		IProcessPoint GetProcessStartPoint( string pathID )
 		{
-			GetContourCacheInfoByID( pathID, out ContourCacheInfo cacheInfo );
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo cacheInfo ) ) {
+				return null;
+			}
 			return cacheInfo?.GetProcessStartPoint();
 		}
 
 		IProcessPoint GetProcessEndPoint( string pathID )
 		{
-			GetContourCacheInfoByID( pathID, out ContourCacheInfo cacheInfo );
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo cacheInfo ) ) {
+				return null;
+			}
 			return cacheInfo?.GetProcessEndPoint();
 		}
 
