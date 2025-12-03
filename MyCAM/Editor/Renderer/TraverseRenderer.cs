@@ -39,28 +39,34 @@ namespace MyCAM.Editor.Renderer
 
 			// Traverse between paths
 			for( int i = 1; i < m_DataManager.PathIDList.Count; i++ ) {
-				ContourCacheInfo previousCacheInfo = ( m_DataManager.ObjectMap[ m_DataManager.PathIDList[ i - 1 ] ] as ContourPathObject ).ContourCacheInfo;
-				ContourCacheInfo currentCacheInfo = ( m_DataManager.ObjectMap[ m_DataManager.PathIDList[ i ] ] as ContourPathObject ).ContourCacheInfo;
-				CraftData currentCraftData = ( m_DataManager.ObjectMap[ m_DataManager.PathIDList[ i ] ] as ContourPathObject ).CraftData;
+				string previousPathID = m_DataManager.PathIDList[ i - 1 ];
+				string currentPathID = m_DataManager.PathIDList[ i ];
+				TraverseData currentTraverseData = GetTraverseData( currentPathID );
 
 				// p1: end of previous path
 				// p2: lift up point of previous path
 				// p3: frog leap middle point (if frog leap)
 				// p4: cut down point of current path
 				// p5: start of current path
-				IProcessPoint p1 = previousCacheInfo.GetProcessEndPoint();
-				IProcessPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( previousCacheInfo.GetProcessEndPoint(), currentCraftData.TraverseData.LiftUpDistance );
-				IProcessPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentCacheInfo.GetProcessStartPoint(), currentCraftData.TraverseData.CutDownDistance );
-				IProcessPoint p5 = currentCacheInfo.GetProcessStartPoint();
+				IProcessPoint p1 = GetEndPoint( previousPathID );
+				if( p1 == null ) {
+					continue;
+				}
+				IProcessPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( p1, currentTraverseData.LiftUpDistance );
+				IProcessPoint p5 = GetStartPoint( currentPathID );
+				if( p5 == null ) {
+					continue;
+				}
+				IProcessPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( p5, currentTraverseData.CutDownDistance );
 
 				// lift up
-				if( currentCraftData.TraverseData.LiftUpDistance > 0 && p1 != null && p2 != null ) {
+				if( currentTraverseData.LiftUpDistance > 0 && p1 != null && p2 != null ) {
 					AddOneLinearTraverse( p1.Point, p2.Point );
 				}
 
 				// frog leap
-				if( currentCraftData.TraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
-					IProcessPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentCraftData.TraverseData.FrogLeapDistance );
+				if( currentTraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
+					IProcessPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentTraverseData.FrogLeapDistance );
 					if( p3 != null ) {
 						GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( p2.Point, p3.Point, p4.Point );
 						if( makeCircle.IsDone() ) {
@@ -91,30 +97,34 @@ namespace MyCAM.Editor.Renderer
 				}
 
 				// cut down
-				if( currentCraftData.TraverseData.CutDownDistance > 0 && p4 != null && p5 != null ) {
+				if( currentTraverseData.CutDownDistance > 0 && p4 != null && p5 != null ) {
 					AddOneLinearTraverse( p4.Point, p5.Point );
 				}
 			}
 
 			// entry
 			if( m_DataManager.EntryAndExitData.EntryDistance > 0 && m_DataManager.PathIDList.Count != 0 ) {
-				if( GetCacheInfoByID( m_DataManager.PathIDList.First(), out ICacheInfo cacheInfo ) ) {
-					IProcessPoint firstPathStartPoint = cacheInfo.GetProcessStartPoint();
-					IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
-					if( firstPathStartPoint != null && entryPoint != null ) {
-						AddOneLinearTraverse( entryPoint.Point, firstPathStartPoint.Point );
-					}
+				string firstPathID = m_DataManager.PathIDList.First();
+				IProcessPoint firstPathStartPoint = GetStartPoint( firstPathID );
+				if( firstPathStartPoint == null ) {
+					return;
+				}
+				IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
+				if( firstPathStartPoint != null && entryPoint != null ) {
+					AddOneLinearTraverse( entryPoint.Point, firstPathStartPoint.Point );
 				}
 			}
 
 			// exit
 			if( m_DataManager.EntryAndExitData.ExitDistance > 0 && m_DataManager.PathIDList.Count != 0 ) {
-				if( GetCacheInfoByID( m_DataManager.PathIDList.Last(), out ICacheInfo cacheInfo ) ) {
-					IProcessPoint lastPathEndPoint = cacheInfo.GetProcessEndPoint();
-					IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
-					if( lastPathEndPoint != null && exitPoint != null ) {
-						AddOneLinearTraverse( lastPathEndPoint.Point, exitPoint.Point );
-					}
+				string lastPathID = m_DataManager.PathIDList.Last();
+				IProcessPoint lastPathEndPoint = GetEndPoint( lastPathID );
+				if( lastPathEndPoint == null ) {
+					return;
+				}
+				IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
+				if( lastPathEndPoint != null && exitPoint != null ) {
+					AddOneLinearTraverse( lastPathEndPoint.Point, exitPoint.Point );
 				}
 			}
 
@@ -167,6 +177,48 @@ namespace MyCAM.Editor.Renderer
 				lineAIS.Attributes().SetLineAspect( prs3D_LineAspect );
 			}
 			return lineAIS;
+		}
+
+
+		ContourCacheInfo GetCacheInfo( string pathID )
+		{
+			if( string.IsNullOrEmpty( pathID ) || !m_DataManager.ObjectMap.ContainsKey( pathID ) ) {
+				return null;
+			}
+			PathObject pathObject = m_DataManager.ObjectMap[ pathID ] as PathObject;
+			if( pathObject == null ) {
+				return null;
+			}
+			ContourPathObject contourPathObject = pathObject as ContourPathObject;
+			if( contourPathObject == null ) {
+				return null;
+			}
+			return contourPathObject.ContourCacheInfo;
+		}
+
+		IProcessPoint GetStartPoint( string pathID )
+		{
+			ContourCacheInfo cacheInfo = GetCacheInfo( pathID );
+			return cacheInfo?.GetProcessStartPoint();
+		}
+
+		IProcessPoint GetEndPoint( string pathID )
+		{
+			ContourCacheInfo cacheInfo = GetCacheInfo( pathID );
+			return cacheInfo?.GetProcessEndPoint();
+		}
+
+		TraverseData GetTraverseData( string pathID )
+		{
+			if( string.IsNullOrEmpty( pathID ) || !m_DataManager.ObjectMap.ContainsKey( pathID ) ) {
+				return new TraverseData();
+			}
+			PathObject pathObject = m_DataManager.ObjectMap[ pathID ] as PathObject;
+			if( pathObject == null ) {
+				return new TraverseData();
+			}
+			CraftData craftData = pathObject.CraftData;
+			return craftData?.TraverseData ?? new TraverseData();
 		}
 	}
 }
