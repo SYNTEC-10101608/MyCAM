@@ -188,11 +188,9 @@ namespace MyCAM.Editor.Renderer
 			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
 				return null;
 			}
-
 			if( contourCacheInfo.CAMPointList == null || contourCacheInfo.CAMPointList.Count == 0 ) {
 				return null;
 			}
-
 			return contourCacheInfo.CAMPointList[ 0 ];
 		}
 
@@ -201,11 +199,9 @@ namespace MyCAM.Editor.Renderer
 			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
 				return null;
 			}
-
 			if( contourCacheInfo.LeadInCAMPointList == null || contourCacheInfo.LeadInCAMPointList.Count == 0 ) {
 				return null;
 			}
-
 			return contourCacheInfo.LeadInCAMPointList.First();
 		}
 
@@ -214,11 +210,9 @@ namespace MyCAM.Editor.Renderer
 			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
 				return null;
 			}
-
 			if( contourCacheInfo.LeadOutCAMPointList == null || contourCacheInfo.LeadOutCAMPointList.Count == 0 ) {
 				return null;
 			}
-
 			return contourCacheInfo.LeadOutCAMPointList.Last();
 		}
 

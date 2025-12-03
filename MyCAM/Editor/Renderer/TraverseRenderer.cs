@@ -179,7 +179,6 @@ namespace MyCAM.Editor.Renderer
 			return lineAIS;
 		}
 
-
 		IProcessPoint GetStartPoint( string pathID )
 		{
 			GetContourCacheInfoByID( pathID, out ContourCacheInfo cacheInfo );
