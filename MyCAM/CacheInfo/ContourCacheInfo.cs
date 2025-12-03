@@ -173,7 +173,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public bool IsToolVecModifyPoint( IToolVecPoint point )
+		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -212,7 +212,7 @@ namespace MyCAM.CacheInfo
 			}
 
 			// set tool vector
-			List<IToolVecPoint> toolVecPointList = m_CAMPointList.Cast<IToolVecPoint>().ToList();
+			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
 			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, IsClosed, m_CraftData.IsToolVecReverse );
 			foreach( var oneConnect in m_ConnectCAMPointMap ) {
 				oneConnect.Value.ToolVec = oneConnect.Key.ToolVec;
@@ -232,16 +232,16 @@ namespace MyCAM.CacheInfo
 			}
 
 			// set over cut
-			List<IOverCutPoint> camPointOverCutList = m_CAMPointList.Cast<IOverCutPoint>().ToList();
-			OverCutHelper.SetOverCut( camPointOverCutList, out List<IOverCutPoint> overCutPointList, m_CraftData.OverCutLength, IsClosed );
+			List<IOrientationPoint> camPointOverCutList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
+			OverCutHelper.SetOverCut( camPointOverCutList, out List<IOrientationPoint> overCutPointList, m_CraftData.OverCutLength, IsClosed );
 			m_OverCutPointList = overCutPointList.Cast<CAMPoint>().ToList();
 
 			// set lead
-			List<ILeadLinePoint> mainPointList = m_CAMPointList.Cast<ILeadLinePoint>().ToList();
-			List<ILeadLinePoint> overCutPointList2 = m_OverCutPointList.Cast<ILeadLinePoint>().ToList();
-			LeadHelper.SetLeadIn( mainPointList, out List<ILeadLinePoint> leadInPointList, m_CraftData.LeadLineParam, m_CraftData.IsReverse );
+			List<IOrientationPoint> mainPointList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
+			List<IOrientationPoint> overCutPointList2 = m_OverCutPointList.Cast<IOrientationPoint>().ToList();
+			LeadHelper.SetLeadIn( mainPointList, out List<IOrientationPoint> leadInPointList, m_CraftData.LeadLineParam, m_CraftData.IsReverse );
 			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
-			LeadHelper.SetLeadOut( mainPointList, overCutPointList2, out List<ILeadLinePoint> leadOutPointList, m_CraftData.LeadLineParam, m_CraftData.IsReverse );
+			LeadHelper.SetLeadOut( mainPointList, overCutPointList2, out List<IOrientationPoint> leadOutPointList, m_CraftData.LeadLineParam, m_CraftData.IsReverse );
 			m_LeadOutCAMPointList = leadOutPointList.Cast<CAMPoint>().ToList();
 		}
 

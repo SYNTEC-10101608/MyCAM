@@ -66,7 +66,7 @@ namespace MyCAM.Data
 		gp_Dir m_TangentVec;
 	}
 
-	public interface IToolVecPoint
+	public interface ISetToolVecPoint
 	{
 		gp_Pnt Point
 		{
@@ -90,7 +90,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	public interface IOverCutPoint
+	public interface IOrientationPoint
 	{
 		gp_Pnt Point
 		{
@@ -107,25 +107,7 @@ namespace MyCAM.Data
 			get;
 		}
 
-		IOverCutPoint Clone();
-	}
-
-	public interface ILeadLinePoint
-	{
-		gp_Pnt Point
-		{
-			get;
-		}
-
-		gp_Dir TangentVec
-		{
-			get;
-		}
-
-		gp_Dir ToolVec
-		{
-			get;
-		}
+		IOrientationPoint Clone();
 	}
 
 	public interface IProcessPoint
@@ -143,7 +125,7 @@ namespace MyCAM.Data
 		IProcessPoint Clone();
 	}
 
-	public class CAMPoint : IToolVecPoint, IOverCutPoint, ILeadLinePoint, IProcessPoint
+	public class CAMPoint : ISetToolVecPoint, IOrientationPoint, IProcessPoint
 	{
 		public CAMPoint( CADPoint cadPoint )
 		{
@@ -199,7 +181,7 @@ namespace MyCAM.Data
 		}
 
 		// the explicit interface implementation for IOverCutPoint.Clone
-		IOverCutPoint IOverCutPoint.Clone()
+		IOrientationPoint IOrientationPoint.Clone()
 		{
 			return Clone();
 		}

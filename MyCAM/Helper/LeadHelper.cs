@@ -11,12 +11,12 @@ namespace MyCAM.Helper
 {
 	public static class LeadHelper
 	{
-		public static void SetLeadIn( IReadOnlyList<ILeadLinePoint> mainPointList,
-			out List<ILeadLinePoint> leadInPointList,
+		public static void SetLeadIn( IReadOnlyList<IOrientationPoint> mainPointList,
+			out List<IOrientationPoint> leadInPointList,
 			LeadData leadInData, bool isPathReverse,
 			double maxDeflection = DISCRETE_MAX_DEFLECTION, double maxEdgeLength = DISCRETE_MAX_EDGE_LENGTH )
 		{
-			leadInPointList = new List<ILeadLinePoint>();
+			leadInPointList = new List<IOrientationPoint>();
 			if( mainPointList.Count == 0 ) {
 				return;
 			}
@@ -34,18 +34,18 @@ namespace MyCAM.Helper
 			}
 		}
 
-		public static void SetLeadOut( IReadOnlyList<ILeadLinePoint> mainPointList, IReadOnlyList<ILeadLinePoint> overCutPointList,
-			out List<ILeadLinePoint> leadOutPointList,
+		public static void SetLeadOut( IReadOnlyList<IOrientationPoint> mainPointList, IReadOnlyList<IOrientationPoint> overCutPointList,
+			out List<IOrientationPoint> leadOutPointList,
 			LeadData leadOutData, bool isPathReverse,
 			double maxDeflection = DISCRETE_MAX_DEFLECTION, double maxEdgeLength = DISCRETE_MAX_EDGE_LENGTH )
 		{
-			leadOutPointList = new List<ILeadLinePoint>();
+			leadOutPointList = new List<IOrientationPoint>();
 			if( mainPointList.Count == 0 ) {
 				return;
 			}
 
 			// with over cut means lead out first point is over cut last point
-			ILeadLinePoint leadOutStartPoint;
+			IOrientationPoint leadOutStartPoint;
 			if( overCutPointList.Count > 0 ) {
 				leadOutStartPoint = overCutPointList[ overCutPointList.Count - 1 ];
 			}
@@ -67,9 +67,9 @@ namespace MyCAM.Helper
 		}
 
 		// when isLeadIn, the input point is start of path, and is end of lead in
-		static List<ILeadLinePoint> BuildStraightLeadLine( ILeadLinePoint StraightLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse )
+		static List<IOrientationPoint> BuildStraightLeadLine( IOrientationPoint StraightLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse )
 		{
-			List<ILeadLinePoint> LeadPointList = new List<ILeadLinePoint>();
+			List<IOrientationPoint> LeadPointList = new List<IOrientationPoint>();
 
 			// protection 
 			if( StraightLeadStartOrEndPoint == null || dLeadLineLength == 0 ) {
@@ -77,7 +77,7 @@ namespace MyCAM.Helper
 			}
 
 			//  establish a coordinate system through this point and its direction vector and normal vector
-			ILeadLinePoint startPoint = StraightLeadStartOrEndPoint;
+			IOrientationPoint startPoint = StraightLeadStartOrEndPoint;
 			gp_Dir XVec = new gp_Dir( -startPoint.TangentVec.X(), -startPoint.TangentVec.Y(), -startPoint.TangentVec.Z() );
 			gp_Dir ZVec = startPoint.ToolVec;
 			gp_Ax3 planeCS = new gp_Ax3( startPoint.Point, ZVec, XVec );
@@ -122,7 +122,7 @@ namespace MyCAM.Helper
 
 
 			for( int i = 0; i < leadPointList.Count; i++ ) {
-				ILeadLinePoint leadPoint = BuildLeadLinePoint( leadPointList[ i ], endPointVector, startPoint.ToolVec );
+				IOrientationPoint leadPoint = BuildLeadLinePoint( leadPointList[ i ], endPointVector, startPoint.ToolVec );
 				LeadPointList.Add( leadPoint );
 			}
 
@@ -134,11 +134,11 @@ namespace MyCAM.Helper
 		}
 
 		// when isLeadIn, the input point is start of path, and is end of lead in
-		static List<ILeadLinePoint> BuildArcLeadLine( ILeadLinePoint CurveLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, double dDeflection, double dMaxLength )
+		static List<IOrientationPoint> BuildArcLeadLine( IOrientationPoint CurveLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, double dDeflection, double dMaxLength )
 		{
 			// protection
 			if( CurveLeadStartOrEndPoint == null || dLeadLineLength <= 0 || dLeadLineAngle <= 0 ) {
-				return new List<ILeadLinePoint>();
+				return new List<IOrientationPoint>();
 			}
 
 			//  establish a coordinate system through this point and its direction vector and normal vector
@@ -205,10 +205,10 @@ namespace MyCAM.Helper
 			}
 
 			// create cad cam data
-			List<ILeadLinePoint> resultList = new List<ILeadLinePoint>();
+			List<IOrientationPoint> resultList = new List<IOrientationPoint>();
 			for( int i = 0; i < pts.Count; i++ ) {
 
-				ILeadLinePoint leadPoint = BuildLeadLinePoint( pts[ i ], tangentDirList[ i ], CurveLeadStartOrEndPoint.ToolVec );
+				IOrientationPoint leadPoint = BuildLeadLinePoint( pts[ i ], tangentDirList[ i ], CurveLeadStartOrEndPoint.ToolVec );
 				resultList.Add( leadPoint );
 			}
 			return resultList;
@@ -319,8 +319,8 @@ namespace MyCAM.Helper
 			}
 		}
 
-		// this method is now for building a CAMPoint as ILeadLinePoint
-		static ILeadLinePoint BuildLeadLinePoint( gp_Pnt point, gp_Dir tangentVec, gp_Dir toolVec )
+		// this method is now for building a CAMPoint as IOrientationPoint
+		static IOrientationPoint BuildLeadLinePoint( gp_Pnt point, gp_Dir tangentVec, gp_Dir toolVec )
 		{
 			CADPoint leadPoint = new CADPoint(
 				point,

@@ -8,7 +8,7 @@ namespace MyCAM.Helper
 {
 	public static class ToolVecHelper
 	{
-		public static void SetToolVec( ref List<IToolVecPoint> toolVecPointList,
+		public static void SetToolVec( ref List<ISetToolVecPoint> toolVecPointList,
 			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
 			bool isClosed, bool isToolVecReverse )
 		{
@@ -18,7 +18,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static void ModifyToolVec( ref List<IToolVecPoint> toolVecPointList,
+		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList,
 			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
 			bool isClosed )
 		{
@@ -31,7 +31,7 @@ namespace MyCAM.Helper
 				gp_Vec newVec = GetVecFromAB( toolVecPointList[ toolVecModifyMap.Keys.First() ],
 					toolVecModifyMap.Values.First().Item1 * Math.PI / 180,
 					toolVecModifyMap.Values.First().Item2 * Math.PI / 180 );
-				foreach( IToolVecPoint toolVecPoint in toolVecPointList ) {
+				foreach( ISetToolVecPoint toolVecPoint in toolVecPointList ) {
 					toolVecPoint.ToolVec = new gp_Dir( newVec.XYZ() );
 				}
 			}
@@ -73,7 +73,7 @@ namespace MyCAM.Helper
 			return intervalList;
 		}
 
-		static void InterpolateToolVec( ref List<IToolVecPoint> toolVecPointList,
+		static void InterpolateToolVec( ref List<ISetToolVecPoint> toolVecPointList,
 			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
 			int nStartIndex, int nEndIndex )
 		{
@@ -109,7 +109,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static gp_Vec GetVecFromAB( IToolVecPoint tooVecPoint, double dRA_rad, double dRB_rad )
+		static gp_Vec GetVecFromAB( ISetToolVecPoint tooVecPoint, double dRA_rad, double dRB_rad )
 		{
 			// TDOD: RA == 0 || RB == 0
 			if( dRA_rad == 0 && dRB_rad == 0 ) {
@@ -138,9 +138,9 @@ namespace MyCAM.Helper
 			return new gp_Vec( dir1.XYZ() );
 		}
 
-		static void ReverseToolVec( ref List<IToolVecPoint> toolVecPointList )
+		static void ReverseToolVec( ref List<ISetToolVecPoint> toolVecPointList )
 		{
-			foreach( IToolVecPoint toolVecPoint in toolVecPointList ) {
+			foreach( ISetToolVecPoint toolVecPoint in toolVecPointList ) {
 				toolVecPoint.ToolVec = toolVecPoint.ToolVec.Reversed();
 			}
 		}

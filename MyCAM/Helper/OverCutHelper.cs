@@ -7,10 +7,10 @@ namespace MyCAM.Helper
 {
 	public static class OverCutHelper
 	{
-		public static void SetOverCut( IReadOnlyList<IOverCutPoint> mainPointList, out List<IOverCutPoint> overCutPointList,
+		public static void SetOverCut( IReadOnlyList<IOrientationPoint> mainPointList, out List<IOrientationPoint> overCutPointList,
 			double overCutLength, bool isClosed, double overCutTolerance = OVERCUT_MATH_TOLERANCE )
 		{
-			overCutPointList = new List<IOverCutPoint>();
+			overCutPointList = new List<IOrientationPoint>();
 			if( mainPointList.Count == 0 || overCutLength == 0 || !isClosed ) {
 				return;
 			}
@@ -43,7 +43,7 @@ namespace MyCAM.Helper
 					InterpolateVecBetween2Point( mainPointList[ i ], mainPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
 
 					// create new cam point
-					IOverCutPoint camPoint = BuildOverCutPoint( overCutEndPoint, endPointToolVec, endPointTangentVec );
+					IOrientationPoint camPoint = BuildOverCutPoint( overCutEndPoint, endPointToolVec, endPointTangentVec );
 					overCutPointList.Add( camPoint );
 					return;
 				}
@@ -65,7 +65,7 @@ namespace MyCAM.Helper
 		}
 
 		// get mid point
-		static void InterpolateVecBetween2Point( IOverCutPoint currentCAMPoint, IOverCutPoint nextCAMPoint, gp_Pnt point,
+		static void InterpolateVecBetween2Point( IOrientationPoint currentCAMPoint, IOrientationPoint nextCAMPoint, gp_Pnt point,
 			out gp_Dir toolDir, out gp_Dir tangentDir )
 		{
 			toolDir = currentCAMPoint.ToolVec;
@@ -116,7 +116,7 @@ namespace MyCAM.Helper
 		}
 
 		// this method is now for building a CAMPoint as OverCutPoint
-		static IOverCutPoint BuildOverCutPoint( gp_Pnt overCutEndPoint, gp_Dir endPointToolVec, gp_Dir endPointTangentVec )
+		static IOrientationPoint BuildOverCutPoint( gp_Pnt overCutEndPoint, gp_Dir endPointToolVec, gp_Dir endPointTangentVec )
 		{
 			CADPoint cadPoint = new CADPoint( overCutEndPoint, endPointToolVec, endPointToolVec, endPointTangentVec );
 			CAMPoint camPoint = new CAMPoint( cadPoint, endPointToolVec );
