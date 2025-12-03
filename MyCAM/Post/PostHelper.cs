@@ -25,6 +25,22 @@ namespace MyCAM.Post
 
 	internal class ContourNCPackage
 	{
+		public ContourNCPackage( LeadData leadLineParam, double overCutLength,
+			List<IProcessPoint> camPointList,
+			List<IProcessPoint> leadInCAMPointList,
+			List<IProcessPoint> leadOutCAMPointList,
+			List<IProcessPoint> overCutCAMPointList,
+			TraverseData traverseData )
+		{
+			LeadLineParam = leadLineParam;
+			OverCutLength = overCutLength;
+			CAMPointList = camPointList;
+			LeadInCAMPointList = leadInCAMPointList;
+			LeadOutCAMPointList = leadOutCAMPointList;
+			OverCutCAMPointList = overCutCAMPointList;
+			TraverseData = traverseData;
+		}
+
 		public LeadData LeadLineParam
 		{
 			get;
