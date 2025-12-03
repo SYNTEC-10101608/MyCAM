@@ -65,7 +65,7 @@ namespace MyCAM.Editor.Renderer
 		void ShowPathOrientation( List<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
-				CAMPoint firstPoint = GetFirstCAMPoint( szPathID );
+				IOrientationPoint firstPoint = GetFirstCAMPoint( szPathID );
 				if( firstPoint == null ) {
 					continue;
 				}
@@ -108,9 +108,9 @@ namespace MyCAM.Editor.Renderer
 
 				// path with lead in
 				if( leadData.LeadIn.Type != LeadLineType.None ) {
-					CAMPoint leadInStartPoint = GetLeadInFirstPoint( szPathID );
+					IOrientationPoint leadInStartPoint = GetLeadInFirstPoint( szPathID );
 					if( leadInStartPoint == null ) {
-						break;
+						continue;
 					}
 
 					List<AIS_Shape> orientationAISList = new List<AIS_Shape>();
@@ -123,9 +123,9 @@ namespace MyCAM.Editor.Renderer
 
 				// path with lead out
 				if( leadData.LeadOut.Type != LeadLineType.None ) {
-					CAMPoint leadOutEndPoint = GetLeadOutLastPoint( szPathID );
+					IOrientationPoint leadOutEndPoint = GetLeadOutLastPoint( szPathID );
 					if( leadOutEndPoint == null ) {
-						break;
+						continue;
 					}
 
 					List<AIS_Shape> orientationAISList;
@@ -183,7 +183,7 @@ namespace MyCAM.Editor.Renderer
 			return coneAIS;
 		}
 
-		CAMPoint GetFirstCAMPoint( string pathID )
+		IOrientationPoint GetFirstCAMPoint( string pathID )
 		{
 			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
 				return null;
@@ -194,7 +194,7 @@ namespace MyCAM.Editor.Renderer
 			return contourCacheInfo.CAMPointList[ 0 ];
 		}
 
-		CAMPoint GetLeadInFirstPoint( string pathID )
+		IOrientationPoint GetLeadInFirstPoint( string pathID )
 		{
 			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
 				return null;
@@ -205,7 +205,7 @@ namespace MyCAM.Editor.Renderer
 			return contourCacheInfo.LeadInCAMPointList.First();
 		}
 
-		CAMPoint GetLeadOutLastPoint( string pathID )
+		IOrientationPoint GetLeadOutLastPoint( string pathID )
 		{
 			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
 				return null;
