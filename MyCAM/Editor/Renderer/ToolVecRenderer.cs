@@ -46,7 +46,7 @@ namespace MyCAM.Editor.Renderer
 				for( int i = 0; i < contourCacheInfo.CAMPointList.Count; i++ ) {
 					IToolVecPoint point = contourCacheInfo.CAMPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
-					if( IsModifiedToolVecIndex( i, contourCacheInfo ) ) {
+					if( contourCacheInfo.IsToolVecModifyPoint( point ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
 					}
@@ -91,11 +91,6 @@ namespace MyCAM.Editor.Renderer
 			if( bUpdate ) {
 				UpdateView();
 			}
-		}
-
-		bool IsModifiedToolVecIndex( int index, ContourCacheInfo cacheInfo )
-		{
-			return cacheInfo.GetToolVecModifyIndex().Contains( index );
 		}
 
 		AIS_Line GetVecAIS( gp_Pnt point, gp_Dir dir )

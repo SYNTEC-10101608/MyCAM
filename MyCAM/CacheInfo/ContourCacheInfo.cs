@@ -173,46 +173,16 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		// TODO: fix the stupid way to get the modified index
-		public HashSet<int> GetToolVecModifyIndex()
+		public bool IsToolVecModifyPoint( IToolVecPoint point )
 		{
-			// simulate the index modification
-			List<int> modifiedIndices = new List<int>();
-			for( int i = 0; i < m_CADPointList.Count; i++ ) {
-				modifiedIndices.Add( i );
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
 			}
-
-			// index change due to start point
-			if( m_CraftData.StartPointIndex != 0 ) {
-
-				// need to map back to original index
-				List<int> rearrangedIndices = new List<int>();
-				for( int i = 0; i < modifiedIndices.Count; i++ ) {
-					rearrangedIndices.Add( modifiedIndices[ ( i + m_CraftData.StartPointIndex ) % modifiedIndices.Count ] );
-				}
-				modifiedIndices = rearrangedIndices;
+			if( m_CAMPointIndexMap.ContainsKey( point as CAMPoint ) ) {
+				int index = m_CAMPointIndexMap[ point as CAMPoint ];
+				return m_CraftData.ToolVecModifyMap.ContainsKey( index );
 			}
-
-			// index change due to reverse
-			if( m_CraftData.IsReverse ) {
-
-				// modify start point index for closed path
-				modifiedIndices.Reverse();
-				if( IsClosed ) {
-					int lastIndex = modifiedIndices.Last();
-					modifiedIndices.RemoveAt( modifiedIndices.Count - 1 );
-					modifiedIndices.Insert( 0, lastIndex );
-				}
-			}
-
-			// the final mapping
-			HashSet<int> result = new HashSet<int>();
-			for( int i = 0; i < modifiedIndices.Count; i++ ) {
-				if( m_CraftData.ToolVecModifyMap.ContainsKey( modifiedIndices[ i ] ) ) {
-					result.Add( i );
-				}
-			}
-			return result;
+			return false;
 		}
 		#endregion
 
@@ -225,10 +195,14 @@ namespace MyCAM.CacheInfo
 		{
 			m_IsCraftDataDirty = false;
 
-			// bild inital CAM point list
+			// build initial CAM point list
 			m_CAMPointList = new List<CAMPoint>();
-			foreach( CADPoint cadPoint in m_CADPointList ) {
+			m_CAMPointIndexMap.Clear();
+			m_ConnectCAMPointMap.Clear();
+			for( int i = 0; i < m_CADPointList.Count; i++ ) {
+				CADPoint cadPoint = m_CADPointList[ i ];
 				CAMPoint camPoint = new CAMPoint( cadPoint );
+				m_CAMPointIndexMap.Add( camPoint, i );
 				m_CAMPointList.Add( camPoint );
 				if( m_ConnectCADPointMap.ContainsKey( cadPoint ) ) {
 					CADPoint connectedCADPoint = m_ConnectCADPointMap[ cadPoint ];
@@ -306,6 +280,8 @@ namespace MyCAM.CacheInfo
 		}
 
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
+
+		// for CAM point connection
 		Dictionary<CAMPoint, CAMPoint> m_ConnectCAMPointMap = new Dictionary<CAMPoint, CAMPoint>();
 		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
@@ -314,7 +290,12 @@ namespace MyCAM.CacheInfo
 		// they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
 		List<CADPoint> m_CADPointList = new List<CADPoint>();
+
+		// for CAD point connection
 		Dictionary<CADPoint, CADPoint> m_ConnectCADPointMap = new Dictionary<CADPoint, CADPoint>();
+
+		// for index mapping
+		Dictionary<CAMPoint, int> m_CAMPointIndexMap = new Dictionary<CAMPoint, int>();
 
 		// flag to indicate craft data changed
 		bool m_IsCraftDataDirty = false;
