@@ -125,7 +125,7 @@ namespace MyCAM.Editor
 		}
 
 		// view API
-
+		// TODO: the implementation can be optimized to avoid redundant rendering
 		public void SetShowToolVec( bool isShowToolVec )
 		{
 			m_ToolVecRenderer.SetShow( isShowToolVec );

@@ -44,8 +44,8 @@ namespace MyCAM.Editor.Renderer
 				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
 
 				for( int i = 0; i < contourCacheInfo.CAMPointList.Count; i++ ) {
-					CAMPoint camPoint = contourCacheInfo.CAMPointList[ i ];
-					AIS_Line toolVecAIS = GetVecAIS( camPoint.Point, camPoint.ToolVec );
+					IToolVecPoint point = contourCacheInfo.CAMPointList[ i ];
+					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
 					if( IsModifiedToolVecIndex( i, contourCacheInfo ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );

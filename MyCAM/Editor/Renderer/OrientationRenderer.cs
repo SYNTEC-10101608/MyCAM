@@ -172,7 +172,7 @@ namespace MyCAM.Editor.Renderer
 			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
 			coneAIS.SetMaterial( aspect );
 			coneAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			coneAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			coneAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_WireFrame );
 			coneAIS.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
 			return coneAIS;
 		}

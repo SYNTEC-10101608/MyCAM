@@ -69,9 +69,9 @@ namespace MyCAM.Editor.Renderer
 					List<AIS_Line> leadAISList = new List<AIS_Line>();
 					m_LeadAISDict.Add( szPathID, leadAISList );
 					for( int i = 0; i < contourCacheInfo.LeadInCAMPointList.Count - 1; i++ ) {
-						CAMPoint currentCAMPoint = contourCacheInfo.LeadInCAMPointList[ i ];
-						CAMPoint nextCAMPoint = contourCacheInfo.LeadInCAMPointList[ i + 1 ];
-						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.Point, nextCAMPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+						gp_Pnt currentCAMPoint = contourCacheInfo.LeadInCAMPointList[ i ].Point;
+						gp_Pnt nextCAMPoint = contourCacheInfo.LeadInCAMPointList[ i + 1 ].Point;
+						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint, nextCAMPoint, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
 						leadAISList.Add( LeadAISLine );
 					}
 				}
@@ -86,9 +86,9 @@ namespace MyCAM.Editor.Renderer
 						m_LeadAISDict.Add( szPathID, leadAISList );
 					}
 					for( int i = 0; i < contourCacheInfo.LeadOutCAMPointList.Count - 1; i++ ) {
-						CAMPoint currentCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i ];
-						CAMPoint nextCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i + 1 ];
-						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint.Point, nextCAMPoint.Point, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+						gp_Pnt currentCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i ].Point;
+						gp_Pnt nextCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i + 1 ].Point;
+						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint, nextCAMPoint, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
 						leadAISList.Add( LeadAISLine );
 					}
 				}

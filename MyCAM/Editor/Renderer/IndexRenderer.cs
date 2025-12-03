@@ -36,7 +36,7 @@ namespace MyCAM.Editor.Renderer
 			int nCurrentIndex = 0;
 			foreach( ContourCacheInfo cacheInfo in m_DataManager.GetContourCacheInfoList() ) {
 				gp_Pnt location = cacheInfo.CAMPointList[ 0 ].Point;
-				string szIndex = nCurrentIndex++.ToString();
+				string szIndex = (++nCurrentIndex).ToString();
 
 				// create text label ais
 				AIS_TextLabel textLabel = new AIS_TextLabel();
