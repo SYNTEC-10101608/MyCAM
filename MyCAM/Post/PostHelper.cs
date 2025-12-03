@@ -24,7 +24,7 @@ namespace MyCAM.Post
 		}
 	}
 
-	internal class PathNCPackage
+	internal class ContourNCPackage
 	{
 		public LeadData LeadLineParam
 		{
@@ -74,7 +74,7 @@ namespace MyCAM.Post
 
 	internal static class PostHelper
 	{
-		public static bool SolvePath( PostSolver postSolver, PathNCPackage currentPathNCPack,
+		public static bool SolvePath( PostSolver postSolver, ContourNCPackage currentPathNCPack,
 			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
 			out PostData pathG54PostData, out PostData pathMCSPostData, out PathEndInfo currentPathtEndInfo )
 		{
@@ -280,7 +280,7 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, PathNCPackage currentPathNCPack, ref PostData pathG54PostData, ref PostData pathMCSPostData )
+		static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, ContourNCPackage currentPathNCPack, ref PostData pathG54PostData, ref PostData pathMCSPostData )
 		{
 			if( endInfoOfPreviousPath == null || currentPathNCPack == null ) {
 				return;
@@ -374,7 +374,7 @@ namespace MyCAM.Post
 			pathMCSPostData.FollowSafeDistance = currentPathNCPack.TraverseData.FollowSafeDistance;
 		}
 
-		static void CalculateEntry( PathNCPackage currentPathNCPack, EntryAndExitData entryAndExitData, ref PostData pathG54PostData, ref PostData pathMCSPostData )
+		static void CalculateEntry( ContourNCPackage currentPathNCPack, EntryAndExitData entryAndExitData, ref PostData pathG54PostData, ref PostData pathMCSPostData )
 		{
 			if( currentPathNCPack == null || entryAndExitData == null ) {
 				return;
