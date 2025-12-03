@@ -5,7 +5,7 @@ namespace MyCAM.Helper
 {
 	public static class TraverseHelper
 	{
-		public static ITraversePoint GetCutDownOrLiftUpPoint( ITraversePoint pathPoint, double dDistance )
+		public static IProcessPoint GetCutDownOrLiftUpPoint( IProcessPoint pathPoint, double dDistance )
 		{
 			if( pathPoint == null ) {
 				return null;
@@ -24,7 +24,7 @@ namespace MyCAM.Helper
 			return BuildTraversePoint( resultPoint, pathPoint.ToolVec );
 		}
 
-		public static ITraversePoint GetFrogLeapMiddlePoint( ITraversePoint frogLeapStartPoint, ITraversePoint frogLeapEndPoint, double frogLeapDistance )
+		public static IProcessPoint GetFrogLeapMiddlePoint( IProcessPoint frogLeapStartPoint, IProcessPoint frogLeapEndPoint, double frogLeapDistance )
 		{
 			if( frogLeapStartPoint == null || frogLeapEndPoint == null ) {
 				return null;
@@ -68,7 +68,7 @@ namespace MyCAM.Helper
 		}
 
 		// this method is now for building a CAMPoint as ITraversePoint
-		static ITraversePoint BuildTraversePoint( gp_Pnt point, gp_Dir toolVec )
+		static IProcessPoint BuildTraversePoint( gp_Pnt point, gp_Dir toolVec )
 		{
 			CADPoint cadPoint = new CADPoint(
 				point,

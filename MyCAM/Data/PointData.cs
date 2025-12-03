@@ -128,7 +128,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	public interface ITraversePoint
+	public interface IProcessPoint
 	{
 		gp_Pnt Point
 		{
@@ -140,10 +140,10 @@ namespace MyCAM.Data
 			get;
 		}
 
-		ITraversePoint Clone();
+		IProcessPoint Clone();
 	}
 
-	public class CAMPoint : IToolVecPoint, IOverCutPoint, ILeadLinePoint, ITraversePoint
+	public class CAMPoint : IToolVecPoint, IOverCutPoint, ILeadLinePoint, IProcessPoint
 	{
 		public CAMPoint( CADPoint cadPoint )
 		{
@@ -204,7 +204,7 @@ namespace MyCAM.Data
 			return Clone();
 		}
 
-		ITraversePoint ITraversePoint.Clone()
+		IProcessPoint IProcessPoint.Clone()
 		{
 			return Clone();
 		}

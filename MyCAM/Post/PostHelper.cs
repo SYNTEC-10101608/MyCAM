@@ -8,7 +8,7 @@ namespace MyCAM.Post
 {
 	internal class PathEndInfo
 	{
-		public CAMPoint EndCAMPoint
+		public IProcessPoint EndCAMPoint
 		{
 			get; set;
 		}
@@ -36,22 +36,22 @@ namespace MyCAM.Post
 			get;
 		}
 
-		public List<CAMPoint> CAMPointList
+		public List<IProcessPoint> CAMPointList
 		{
 			get;
 		}
 
-		public List<CAMPoint> LeadInCAMPointList
+		public List<IProcessPoint> LeadInCAMPointList
 		{
 			get;
 		}
 
-		public List<CAMPoint> LeadOutCAMPointList
+		public List<IProcessPoint> LeadOutCAMPointList
 		{
 			get;
 		}
 
-		public List<CAMPoint> OverCutCAMPointList
+		public List<IProcessPoint> OverCutCAMPointList
 		{
 			get;
 		}
@@ -61,12 +61,12 @@ namespace MyCAM.Post
 			get;
 		}
 
-		public CAMPoint GetProcessStartPoint()
+		public IProcessPoint GetProcessStartPoint()
 		{
 			return null;
 		}
 
-		public CAMPoint GetProcessEndPoint()
+		public IProcessPoint GetProcessEndPoint()
 		{
 			return null;
 		}
@@ -180,7 +180,7 @@ namespace MyCAM.Post
 			if( entryAndExitData.ExitDistance <= 0 ) {
 				return;
 			}
-			ITraversePoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfLastPath.EndCAMPoint, entryAndExitData.ExitDistance );
+			IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfLastPath.EndCAMPoint, entryAndExitData.ExitDistance );
 			if( exitPoint == null ) {
 				return;
 			}
@@ -222,7 +222,7 @@ namespace MyCAM.Post
 
 		#region Private methods
 
-		static bool SolveProcessPath( PostSolver postSolver, List<CAMPoint> camPointList,
+		static bool SolveProcessPath( PostSolver postSolver, List<IProcessPoint> camPointList,
 			out List<PostPoint> resultG54, out List<PostPoint> resultMCS, ref double dLastProcessPathM, ref double dLastProcessPathS )
 		{
 			resultG54 = new List<PostPoint>();
@@ -291,10 +291,10 @@ namespace MyCAM.Post
 			// p3: frog leap middle point (if frog leap)
 			// p4: cut down point of current path
 			// p5: start of current path (not used here)
-			ITraversePoint p1 = endInfoOfPreviousPath.EndCAMPoint;
-			ITraversePoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, currentPathNCPack.TraverseData.LiftUpDistance );
-			ITraversePoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentPathNCPack.GetProcessStartPoint(), currentPathNCPack.TraverseData.CutDownDistance );
-			ITraversePoint p5 = currentPathNCPack.GetProcessStartPoint();
+			IProcessPoint p1 = endInfoOfPreviousPath.EndCAMPoint;
+			IProcessPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, currentPathNCPack.TraverseData.LiftUpDistance );
+			IProcessPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentPathNCPack.GetProcessStartPoint(), currentPathNCPack.TraverseData.CutDownDistance );
+			IProcessPoint p5 = currentPathNCPack.GetProcessStartPoint();
 
 			// lift up
 			if( currentPathNCPack.TraverseData.LiftUpDistance > 0 && p2 != null ) {
@@ -322,7 +322,7 @@ namespace MyCAM.Post
 
 			// frog leap
 			if( currentPathNCPack.TraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
-				ITraversePoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentPathNCPack.TraverseData.FrogLeapDistance );
+				IProcessPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentPathNCPack.TraverseData.FrogLeapDistance );
 
 				if( p3 != null ) {
 					// G54 middle point
@@ -386,7 +386,7 @@ namespace MyCAM.Post
 				pathMCSPostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 				return;
 			}
-			ITraversePoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( currentPathNCPack.GetProcessStartPoint(), entryAndExitData.EntryDistance );
+			IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( currentPathNCPack.GetProcessStartPoint(), entryAndExitData.EntryDistance );
 			if( entryPoint == null ) {
 				return;
 			}
