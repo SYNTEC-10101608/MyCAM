@@ -128,25 +128,25 @@ namespace MyCAM.Editor
 		public void SetShowToolVec( bool isShowToolVec )
 		{
 			m_ToolVecRenderer.SetShow( isShowToolVec );
-			ShowAllCAMData();
+			m_ToolVecRenderer.Show( true );
 		}
 
 		public void SetShowOrientation( bool isShowOrientation )
 		{
 			m_OrientationRenderer.SetShow( isShowOrientation );
-			ShowAllCAMData();
+			m_OrientationRenderer.Show( true );
 		}
 
 		public void SetShowOrder( bool isShowOrder )
 		{
 			m_IndexRenderer.SetShow( isShowOrder );
-			ShowAllCAMData();
+			m_IndexRenderer.Show( true );
 		}
 
 		public void SetShowTraversePath( bool isShowTraversePath )
 		{
 			m_TraverseRenderer.SetShow( isShowTraversePath );
-			ShowAllCAMData();
+			m_TraverseRenderer.Show( true );
 		}
 
 		// add/ remove path API
