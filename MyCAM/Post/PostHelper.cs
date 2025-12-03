@@ -90,23 +90,6 @@ namespace MyCAM.Post
 			double dLastPointProcess_M = endInfoOfPreviousPath?.Master ?? 0;
 			double dLastPointProcess_S = endInfoOfPreviousPath?.Slave ?? 0;
 
-			// flag for process start point
-			bool bStart = false;
-
-			// lead-in
-			if( currentPathNCPack.LeadLineParam.LeadIn.Type != LeadLineType.None && currentPathNCPack.LeadInCAMPointList.Count > 0 ) {
-				if( !SolveProcessPath( postSolver, currentPathNCPack.LeadInCAMPointList,
-					out List<PostPoint> leadInG54,
-					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
-					return false;
-				}
-				pathG54PostData.LeadInPostPointList.AddRange( leadInG54 );
-
-				// set process start point
-				pathG54PostData.ProcessStartPoint = pathG54PostData.LeadInPostPointList[ 0 ];
-				bStart = true;
-			}
-
 			// main path
 			if( !SolveProcessPath( postSolver, currentPathNCPack.CAMPointList,
 				out List<PostPoint> mainG54,
@@ -114,11 +97,7 @@ namespace MyCAM.Post
 				return false;
 			}
 			pathG54PostData.MainPathPostPointList.AddRange( mainG54 );
-
-			// set process start point
-			if( !bStart ) {
-				pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPointList[ 0 ];
-			}
+			pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPointList[ 0 ];
 
 			// over-cut
 			if( currentPathNCPack.OverCutLength != 0 && currentPathNCPack.OverCutCAMPointList.Count > 0 ) {
@@ -130,11 +109,27 @@ namespace MyCAM.Post
 				pathG54PostData.OverCutPostPointList.AddRange( overCutG54 );
 			}
 
+			// lead-in
+			if( currentPathNCPack.LeadLineParam.LeadIn.Type != LeadLineType.None && currentPathNCPack.LeadInCAMPointList.Count > 0 ) {
+				if( pathG54PostData.MainPathPostPointList.Count == 0 ) {
+					return false;
+				}
+				double startM = pathG54PostData.MainPathPostPointList[ 0 ].Master;
+				double startS = pathG54PostData.MainPathPostPointList[ 0 ].Slave;
+				if( !BuildProcessPath( currentPathNCPack.LeadInCAMPointList, startM, startS,
+					out List<PostPoint> leadInG54 ) ) {
+					return false;
+				}
+				pathG54PostData.LeadInPostPointList.AddRange( leadInG54 );
+
+				// update process start point
+				pathG54PostData.ProcessStartPoint = pathG54PostData.LeadInPostPointList[ 0 ];
+			}
+
 			// lead-out
 			if( currentPathNCPack.LeadLineParam.LeadOut.Type != LeadLineType.None && currentPathNCPack.LeadOutCAMPointList.Count > 0 ) {
-				if( !SolveProcessPath( postSolver, currentPathNCPack.LeadOutCAMPointList,
-					out List<PostPoint> leadOutG54,
-					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
+				if( !BuildProcessPath( currentPathNCPack.LeadOutCAMPointList, dLastPointProcess_M, dLastPointProcess_S,
+					out List<PostPoint> leadOutG54 ) ) {
 					return false;
 				}
 				pathG54PostData.LeadOutPostPointList.AddRange( leadOutG54 );
@@ -234,6 +229,28 @@ namespace MyCAM.Post
 			}
 
 			// TODO: filter the sigular points
+			return true;
+		}
+
+		static bool BuildProcessPath( List<IProcessPoint> camPointList, double dM, double dS, out List<PostPoint> resultG54 )
+		{
+			resultG54 = new List<PostPoint>();
+			if( camPointList == null || camPointList.Count == 0 ) {
+				return false;
+			}
+
+			// build G54 points
+			foreach( CAMPoint point in camPointList ) {
+				PostPoint g54Point = new PostPoint()
+				{
+					X = point.Point.X(),
+					Y = point.Point.Y(),
+					Z = point.Point.Z(),
+					Master = dM,
+					Slave = dS
+				};
+				resultG54.Add( g54Point );
+			}
 			return true;
 		}
 
