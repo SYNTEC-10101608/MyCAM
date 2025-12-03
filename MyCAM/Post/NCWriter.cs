@@ -55,7 +55,7 @@ namespace MyCAM.Post
 					for( int i = 0; i < m_ProcessCacheInfoList.Count; i++ ) {
 
 						// solve all post data of the path
-						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessCacheInfoList[ i ], m_CraftDataList[ i ],
+						if( !PostHelper.SolvePath( m_PostSolver, null,
 							endInfoOfPreviousPath, m_EntryAndExitData,
 							out PostData postData, out _, out endInfoOfPreviousPath ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
