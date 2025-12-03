@@ -1,5 +1,6 @@
 ﻿using MyCAM.Data;
 using MyCAM.Helper;
+using OCC.gp;
 using System;
 using System.Collections.Generic;
 
@@ -219,18 +220,18 @@ namespace MyCAM.Post
 
 		#region Private methods
 
-		static bool SolveProcessPath( PostSolver postSolver, List<IProcessPoint> camPointList,
+		static bool SolveProcessPath( PostSolver postSolver, List<IProcessPoint> pointList,
 			out List<PostPoint> resultG54, ref double dLastProcessPathM, ref double dLastProcessPathS )
 		{
 			resultG54 = new List<PostPoint>();
-			if( camPointList == null || camPointList.Count == 0 ) {
+			if( pointList == null || pointList.Count == 0 ) {
 				return false;
 			}
 
 			// solve IK
 			List<Tuple<double, double>> rotateAngleList = new List<Tuple<double, double>>();
 			List<bool> singularTagList = new List<bool>();
-			foreach( CAMPoint point in camPointList ) {
+			foreach( CAMPoint point in pointList ) {
 				IKSolveResult ikResult = postSolver.SolveIK( point, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
 				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
 					return false;
@@ -244,7 +245,23 @@ namespace MyCAM.Post
 				}
 			}
 
-			// TODO: filter the sigular points
+			// TODO: filter the singular points
+
+			// solve FK
+			for( int i = 0; i < pointList.Count; i++ ) {
+				gp_Pnt pointG54 = pointList[ i ].Point;
+
+				// add G54 frame data
+				PostPoint frameDataG54 = new PostPoint()
+				{
+					X = pointG54.X(),
+					Y = pointG54.Y(),
+					Z = pointG54.Z(),
+					Master = rotateAngleList[ i ].Item1,
+					Slave = rotateAngleList[ i ].Item2
+				};
+				resultG54.Add( frameDataG54 );
+			}
 			return true;
 		}
 
