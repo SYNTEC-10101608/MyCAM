@@ -38,7 +38,7 @@ namespace MyCAM.Editor.Renderer
 
 			// build tool vec
 			foreach( string szPathID in pathIDList ) {
-				List<IToolVecPoint> toolVecPointList = GetToolVecPointList( szPathID );
+				List<IProcessPoint> toolVecPointList = GetToolVecPointList( szPathID );
 				if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
 					continue;
 				}
@@ -47,7 +47,7 @@ namespace MyCAM.Editor.Renderer
 				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
 
 				for( int i = 0; i < toolVecPointList.Count; i++ ) {
-					IToolVecPoint point = toolVecPointList[ i ];
+					IProcessPoint point = toolVecPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
 					if( IsToolVecModifyPoint( szPathID, point ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
@@ -105,21 +105,31 @@ namespace MyCAM.Editor.Renderer
 			return lineAIS;
 		}
 
-		List<IToolVecPoint> GetToolVecPointList( string pathID )
+		List<IProcessPoint> GetToolVecPointList( string pathID )
 		{
 			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
 				return null;
 			}
-			return contourCacheInfo.CAMPointList.Cast<IToolVecPoint>().ToList();
+			if( contourCacheInfo.CAMPointList == null ) {
+				return null;
+			}
+			List<IProcessPoint> pointList = new List<IProcessPoint>();
+			foreach( CAMPoint camPoint in contourCacheInfo.CAMPointList ) {
+				pointList.Add( camPoint );
+			}
+			return pointList;
 		}
 
-		// TODO: this call cast too many times in a loop, optimize it later
-		bool IsToolVecModifyPoint( string pathID, IToolVecPoint point )
+		bool IsToolVecModifyPoint( string pathID, IProcessPoint point )
 		{
 			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
 				return false;
 			}
-			return contourCacheInfo.IsToolVecModifyPoint( point );
+			if( point is ISetToolVecPoint toolVecPoint ) {
+				return contourCacheInfo.IsToolVecModifyPoint( toolVecPoint );
+			}
+
+			return false;
 		}
 	}
 }
