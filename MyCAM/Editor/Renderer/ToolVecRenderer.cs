@@ -6,6 +6,7 @@ using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -37,16 +38,18 @@ namespace MyCAM.Editor.Renderer
 
 			// build tool vec
 			foreach( string szPathID in pathIDList ) {
-				if( !GetContourCacheInfoByID( szPathID, out ContourCacheInfo contourCacheInfo ) ) {
+				List<IToolVecPoint> toolVecPointList = GetToolVecPointList( szPathID );
+				if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
 					continue;
 				}
+
 				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
 				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
 
-				for( int i = 0; i < contourCacheInfo.CAMPointList.Count; i++ ) {
-					IToolVecPoint point = contourCacheInfo.CAMPointList[ i ];
+				for( int i = 0; i < toolVecPointList.Count; i++ ) {
+					IToolVecPoint point = toolVecPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
-					if( contourCacheInfo.IsToolVecModifyPoint( point ) ) {
+					if( IsToolVecModifyPoint( szPathID, point ) ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
 					}
@@ -100,6 +103,23 @@ namespace MyCAM.Editor.Renderer
 			lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
 			lineAIS.SetWidth( 1 );
 			return lineAIS;
+		}
+
+		List<IToolVecPoint> GetToolVecPointList( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return null;
+			}
+			return contourCacheInfo.CAMPointList.Cast<IToolVecPoint>().ToList();
+		}
+
+		// TODO: this call cast too many times in a loop, optimize it later
+		bool IsToolVecModifyPoint( string pathID, IToolVecPoint point )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return false;
+			}
+			return contourCacheInfo.IsToolVecModifyPoint( point );
 		}
 	}
 }

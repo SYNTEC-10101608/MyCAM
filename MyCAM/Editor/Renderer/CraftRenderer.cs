@@ -61,22 +61,36 @@ namespace MyCAM.Editor.Renderer
 		void ShowLeadLine( List<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
-				if( !GetContourCacheInfoByID( szPathID, out ContourCacheInfo contourCacheInfo ) ) {
+				LeadData leadData = GetLeadData( szPathID );
+				if( leadData == null ) {
 					continue;
 				}
-				LeadData leadData = contourCacheInfo.LeadData;
+
+				// path with lead in
 				if( leadData.LeadIn.Type != LeadLineType.None ) {
+					List<IProcessPoint> leadInPointList = GetLeadInPointList( szPathID );
+					if( leadInPointList == null || leadInPointList.Count == 0 ) {
+						continue;
+					}
+
 					List<AIS_Line> leadAISList = new List<AIS_Line>();
 					m_LeadAISDict.Add( szPathID, leadAISList );
-					for( int i = 0; i < contourCacheInfo.LeadInCAMPointList.Count - 1; i++ ) {
-						gp_Pnt currentCAMPoint = contourCacheInfo.LeadInCAMPointList[ i ].Point;
-						gp_Pnt nextCAMPoint = contourCacheInfo.LeadInCAMPointList[ i + 1 ].Point;
+
+					for( int i = 0; i < leadInPointList.Count - 1; i++ ) {
+						gp_Pnt currentCAMPoint = leadInPointList[ i ].Point;
+						gp_Pnt nextCAMPoint = leadInPointList[ i + 1 ].Point;
 						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint, nextCAMPoint, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
 						leadAISList.Add( LeadAISLine );
 					}
 				}
 
+				// path with lead out
 				if( leadData.LeadOut.Type != LeadLineType.None ) {
+					List<IProcessPoint> leadOutPointList = GetLeadOutPointList( szPathID );
+					if( leadOutPointList == null || leadOutPointList.Count == 0 ) {
+						continue;
+					}
+
 					List<AIS_Line> leadAISList;
 					if( m_LeadAISDict.ContainsKey( szPathID ) ) {
 						leadAISList = m_LeadAISDict[ szPathID ];
@@ -85,9 +99,10 @@ namespace MyCAM.Editor.Renderer
 						leadAISList = new List<AIS_Line>();
 						m_LeadAISDict.Add( szPathID, leadAISList );
 					}
-					for( int i = 0; i < contourCacheInfo.LeadOutCAMPointList.Count - 1; i++ ) {
-						gp_Pnt currentCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i ].Point;
-						gp_Pnt nextCAMPoint = contourCacheInfo.LeadOutCAMPointList[ i + 1 ].Point;
+
+					for( int i = 0; i < leadOutPointList.Count - 1; i++ ) {
+						gp_Pnt currentCAMPoint = leadOutPointList[ i ].Point;
+						gp_Pnt nextCAMPoint = leadOutPointList[ i + 1 ].Point;
 						AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint, nextCAMPoint, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
 						leadAISList.Add( LeadAISLine );
 					}
@@ -123,14 +138,19 @@ namespace MyCAM.Editor.Renderer
 		void ShowOverCut( List<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
-				if( !GetContourCacheInfoByID( szPathID, out ContourCacheInfo contourCacheInfo ) ) {
+				double overCutLength = GetOverCutLength( szPathID );
+				List<IProcessPoint> overCutPointList = GetOverCutPointList( szPathID );
+				
+				if( overCutPointList == null ) {
 					continue;
 				}
+
 				List<AIS_Line> overcutAISList = new List<AIS_Line>();
 				m_OverCutAISDict.Add( szPathID, overcutAISList );
-				if( contourCacheInfo.OverCutLength > 0 ) {
-					for( int i = 0; i < contourCacheInfo.OverCutCAMPointList.Count - 1; i++ ) {
-						AIS_Line overCutAISLine = GetLineAIS( contourCacheInfo.OverCutCAMPointList[ i ].Point, contourCacheInfo.OverCutCAMPointList[ i + 1 ].Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
+
+				if( overCutLength > 0 ) {
+					for( int i = 0; i < overCutPointList.Count - 1; i++ ) {
+						AIS_Line overCutAISLine = GetLineAIS( overCutPointList[ i ].Point, overCutPointList[ i + 1 ].Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
 						overcutAISList.Add( overCutAISLine );
 					}
 				}
@@ -168,6 +188,88 @@ namespace MyCAM.Editor.Renderer
 			lineAIS.SetColor( new Quantity_Color( color ) );
 			lineAIS.SetWidth( 1 );
 			return lineAIS;
+		}
+
+		/// <summary>
+		/// Get lead-in point list from path ID
+		/// </summary>
+		List<IProcessPoint> GetLeadInPointList( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return null;
+			}
+
+			if( contourCacheInfo.LeadInCAMPointList == null ) {
+				return null;
+			}
+
+			List<IProcessPoint> pointList = new List<IProcessPoint>();
+			foreach( CAMPoint camPoint in contourCacheInfo.LeadInCAMPointList ) {
+				pointList.Add( camPoint );
+			}
+			return pointList;
+		}
+
+		/// <summary>
+		/// Get lead-out point list from path ID
+		/// </summary>
+		List<IProcessPoint> GetLeadOutPointList( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return null;
+			}
+
+			if( contourCacheInfo.LeadOutCAMPointList == null ) {
+				return null;
+			}
+
+			List<IProcessPoint> pointList = new List<IProcessPoint>();
+			foreach( CAMPoint camPoint in contourCacheInfo.LeadOutCAMPointList ) {
+				pointList.Add( camPoint );
+			}
+			return pointList;
+		}
+
+		/// <summary>
+		/// Get overcut point list from path ID
+		/// </summary>
+		List<IProcessPoint> GetOverCutPointList( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return null;
+			}
+
+			if( contourCacheInfo.OverCutCAMPointList == null ) {
+				return null;
+			}
+
+			List<IProcessPoint> pointList = new List<IProcessPoint>();
+			foreach( CAMPoint camPoint in contourCacheInfo.OverCutCAMPointList ) {
+				pointList.Add( camPoint );
+			}
+			return pointList;
+		}
+
+		/// <summary>
+		/// Get lead data from path ID
+		/// </summary>
+		LeadData GetLeadData( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return null;
+			}
+			return contourCacheInfo.LeadData;
+		}
+
+		/// <summary>
+		/// Get overcut length from path ID
+		/// </summary>
+		double GetOverCutLength( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return 0.0;
+			}
+			return contourCacheInfo.OverCutLength;
 		}
 	}
 }

@@ -180,31 +180,15 @@ namespace MyCAM.Editor.Renderer
 		}
 
 
-		ContourCacheInfo GetCacheInfo( string pathID )
-		{
-			if( string.IsNullOrEmpty( pathID ) || !m_DataManager.ObjectMap.ContainsKey( pathID ) ) {
-				return null;
-			}
-			PathObject pathObject = m_DataManager.ObjectMap[ pathID ] as PathObject;
-			if( pathObject == null ) {
-				return null;
-			}
-			ContourPathObject contourPathObject = pathObject as ContourPathObject;
-			if( contourPathObject == null ) {
-				return null;
-			}
-			return contourPathObject.ContourCacheInfo;
-		}
-
 		IProcessPoint GetStartPoint( string pathID )
 		{
-			ContourCacheInfo cacheInfo = GetCacheInfo( pathID );
+			GetContourCacheInfoByID( pathID, out ContourCacheInfo cacheInfo );
 			return cacheInfo?.GetProcessStartPoint();
 		}
 
 		IProcessPoint GetEndPoint( string pathID )
 		{
-			ContourCacheInfo cacheInfo = GetCacheInfo( pathID );
+			GetContourCacheInfoByID( pathID, out ContourCacheInfo cacheInfo );
 			return cacheInfo?.GetProcessEndPoint();
 		}
 

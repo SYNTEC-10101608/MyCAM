@@ -65,12 +65,14 @@ namespace MyCAM.Editor.Renderer
 		void ShowPathOrientation( List<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
-				if( !GetContourCacheInfoByID( szPathID, out ContourCacheInfo contourCacheInfo ) ) {
+				CAMPoint firstPoint = GetFirstCAMPoint( szPathID );
+				if( firstPoint == null ) {
 					continue;
 				}
-				gp_Pnt showPoint = contourCacheInfo.CAMPointList[ 0 ].Point;
-				gp_Dir orientationDir = new gp_Dir( contourCacheInfo.CAMPointList[ 0 ].TangentVec.XYZ() );
-				if( contourCacheInfo.IsPathReverse ) {
+
+				gp_Pnt showPoint = firstPoint.Point;
+				gp_Dir orientationDir = new gp_Dir( firstPoint.TangentVec.XYZ() );
+				if( GetIsPathReverse( szPathID ) ) {
 					orientationDir.Reverse();
 				}
 				AIS_Shape orientationAIS = GetOrientationAIS( showPoint, orientationDir );
@@ -99,25 +101,33 @@ namespace MyCAM.Editor.Renderer
 		void ShowLeadOrientation( List<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
-				if( !GetContourCacheInfoByID( szPathID, out ContourCacheInfo contourCacheInfo ) ) {
+				LeadData leadData = GetLeadData( szPathID );
+				if( leadData == null ) {
 					continue;
 				}
-				LeadData leadData = contourCacheInfo.LeadData;
+
+				// path with lead in
 				if( leadData.LeadIn.Type != LeadLineType.None ) {
+					CAMPoint leadInStartPoint = GetLeadInFirstPoint( szPathID );
+					if( leadInStartPoint == null ) {
+						break;
+					}
+
 					List<AIS_Shape> orientationAISList = new List<AIS_Shape>();
 					m_LeadOrientationAISDict.Add( szPathID, orientationAISList );
 
-					if( contourCacheInfo.LeadInCAMPointList.Count == 0 ) {
-						break;
-					}
-					gp_Pnt leadInStartPoint = contourCacheInfo.LeadInCAMPointList.First().Point;
-					gp_Dir leadInOrientationDir = new gp_Dir( contourCacheInfo.LeadInCAMPointList.First().TangentVec.XYZ() );
-					AIS_Shape orientationAIS = GetOrientationAIS( leadInStartPoint, leadInOrientationDir );
+					gp_Dir leadInOrientationDir = new gp_Dir( leadInStartPoint.TangentVec.XYZ() );
+					AIS_Shape orientationAIS = GetOrientationAIS( leadInStartPoint.Point, leadInOrientationDir );
 					orientationAISList.Add( orientationAIS );
 				}
 
 				// path with lead out
 				if( leadData.LeadOut.Type != LeadLineType.None ) {
+					CAMPoint leadOutEndPoint = GetLeadOutLastPoint( szPathID );
+					if( leadOutEndPoint == null ) {
+						break;
+					}
+
 					List<AIS_Shape> orientationAISList;
 					if( m_LeadOrientationAISDict.ContainsKey( szPathID ) ) {
 						orientationAISList = m_LeadOrientationAISDict[ szPathID ];
@@ -127,12 +137,8 @@ namespace MyCAM.Editor.Renderer
 						m_LeadOrientationAISDict.Add( szPathID, orientationAISList );
 					}
 
-					if( contourCacheInfo.LeadOutCAMPointList.Count == 0 ) {
-						break;
-					}
-					gp_Pnt leadOutEndPoint = contourCacheInfo.LeadOutCAMPointList.Last().Point;
-					gp_Dir leadOutOrientationDir = new gp_Dir( contourCacheInfo.LeadOutCAMPointList.Last().TangentVec.XYZ() );
-					AIS_Shape orientationAIS = GetOrientationAIS( leadOutEndPoint, leadOutOrientationDir );
+					gp_Dir leadOutOrientationDir = new gp_Dir( leadOutEndPoint.TangentVec.XYZ() );
+					AIS_Shape orientationAIS = GetOrientationAIS( leadOutEndPoint.Point, leadOutOrientationDir );
 					orientationAISList.Add( orientationAIS );
 				}
 			}
@@ -175,6 +181,61 @@ namespace MyCAM.Editor.Renderer
 			coneAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_WireFrame );
 			coneAIS.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
 			return coneAIS;
+		}
+
+		CAMPoint GetFirstCAMPoint( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return null;
+			}
+
+			if( contourCacheInfo.CAMPointList == null || contourCacheInfo.CAMPointList.Count == 0 ) {
+				return null;
+			}
+
+			return contourCacheInfo.CAMPointList[ 0 ];
+		}
+
+		CAMPoint GetLeadInFirstPoint( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return null;
+			}
+
+			if( contourCacheInfo.LeadInCAMPointList == null || contourCacheInfo.LeadInCAMPointList.Count == 0 ) {
+				return null;
+			}
+
+			return contourCacheInfo.LeadInCAMPointList.First();
+		}
+
+		CAMPoint GetLeadOutLastPoint( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return null;
+			}
+
+			if( contourCacheInfo.LeadOutCAMPointList == null || contourCacheInfo.LeadOutCAMPointList.Count == 0 ) {
+				return null;
+			}
+
+			return contourCacheInfo.LeadOutCAMPointList.Last();
+		}
+
+		LeadData GetLeadData( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return null;
+			}
+			return contourCacheInfo.LeadData;
+		}
+
+		bool GetIsPathReverse( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return false;
+			}
+			return contourCacheInfo.IsPathReverse;
 		}
 	}
 }

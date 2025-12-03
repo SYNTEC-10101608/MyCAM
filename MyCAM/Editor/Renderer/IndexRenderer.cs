@@ -34,8 +34,12 @@ namespace MyCAM.Editor.Renderer
 
 			// create text label
 			int nCurrentIndex = 0;
-			foreach( ContourCacheInfo cacheInfo in m_DataManager.GetContourCacheInfoList() ) {
-				gp_Pnt location = cacheInfo.CAMPointList[ 0 ].Point;
+			foreach( string pathID in m_DataManager.PathIDList ) {
+				gp_Pnt location = GetFirstCAMPoint( pathID );
+				if( location == null ) {
+					continue;
+				}
+
 				string szIndex = (++nCurrentIndex).ToString();
 
 				// create text label ais
@@ -69,6 +73,22 @@ namespace MyCAM.Editor.Renderer
 			if( bUpdate ) {
 				UpdateView();
 			}
+		}
+
+		/// <summary>
+		/// Get the first CAM point from path ID for index label positioning
+		/// </summary>
+		gp_Pnt GetFirstCAMPoint( string pathID )
+		{
+			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+				return null;
+			}
+
+			if( contourCacheInfo.CAMPointList == null || contourCacheInfo.CAMPointList.Count == 0 ) {
+				return null;
+			}
+
+			return contourCacheInfo.CAMPointList[ 0 ].Point;
 		}
 	}
 }
