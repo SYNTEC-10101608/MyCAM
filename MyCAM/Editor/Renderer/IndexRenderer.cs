@@ -35,7 +35,7 @@ namespace MyCAM.Editor.Renderer
 			// create text label
 			int nCurrentIndex = 0;
 			foreach( string pathID in m_DataManager.PathIDList ) {
-				gp_Pnt location = GetFirstCAMPoint( pathID );
+				gp_Pnt location = GetMainPathStartPoint( pathID );
 				if( location == null ) {
 					continue;
 				}
@@ -75,19 +75,14 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		/// <summary>
-		/// Get the first CAM point from path ID for index label positioning
-		/// </summary>
-		gp_Pnt GetFirstCAMPoint( string pathID )
+		gp_Pnt GetMainPathStartPoint( string pathID )
 		{
 			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
 				return null;
 			}
-
 			if( contourCacheInfo.CAMPointList == null || contourCacheInfo.CAMPointList.Count == 0 ) {
 				return null;
 			}
-
 			return contourCacheInfo.CAMPointList[ 0 ].Point;
 		}
 	}
