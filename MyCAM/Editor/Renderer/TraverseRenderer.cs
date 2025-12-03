@@ -48,12 +48,12 @@ namespace MyCAM.Editor.Renderer
 				// p3: frog leap middle point (if frog leap)
 				// p4: cut down point of current path
 				// p5: start of current path
-				IProcessPoint p1 = GetEndPoint( previousPathID );
+				IProcessPoint p1 = GetProcessEndPoint( previousPathID );
 				if( p1 == null ) {
 					continue;
 				}
 				IProcessPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( p1, currentTraverseData.LiftUpDistance );
-				IProcessPoint p5 = GetStartPoint( currentPathID );
+				IProcessPoint p5 = GetProcessStartPoint( currentPathID );
 				if( p5 == null ) {
 					continue;
 				}
@@ -105,7 +105,7 @@ namespace MyCAM.Editor.Renderer
 			// entry
 			if( m_DataManager.EntryAndExitData.EntryDistance > 0 && m_DataManager.PathIDList.Count != 0 ) {
 				string firstPathID = m_DataManager.PathIDList.First();
-				IProcessPoint firstPathStartPoint = GetStartPoint( firstPathID );
+				IProcessPoint firstPathStartPoint = GetProcessStartPoint( firstPathID );
 				if( firstPathStartPoint == null ) {
 					return;
 				}
@@ -118,7 +118,7 @@ namespace MyCAM.Editor.Renderer
 			// exit
 			if( m_DataManager.EntryAndExitData.ExitDistance > 0 && m_DataManager.PathIDList.Count != 0 ) {
 				string lastPathID = m_DataManager.PathIDList.Last();
-				IProcessPoint lastPathEndPoint = GetEndPoint( lastPathID );
+				IProcessPoint lastPathEndPoint = GetProcessEndPoint( lastPathID );
 				if( lastPathEndPoint == null ) {
 					return;
 				}
@@ -179,13 +179,13 @@ namespace MyCAM.Editor.Renderer
 			return lineAIS;
 		}
 
-		IProcessPoint GetStartPoint( string pathID )
+		IProcessPoint GetProcessStartPoint( string pathID )
 		{
 			GetContourCacheInfoByID( pathID, out ContourCacheInfo cacheInfo );
 			return cacheInfo?.GetProcessStartPoint();
 		}
 
-		IProcessPoint GetEndPoint( string pathID )
+		IProcessPoint GetProcessEndPoint( string pathID )
 		{
 			GetContourCacheInfoByID( pathID, out ContourCacheInfo cacheInfo );
 			return cacheInfo?.GetProcessEndPoint();
@@ -196,8 +196,7 @@ namespace MyCAM.Editor.Renderer
 			if( string.IsNullOrEmpty( pathID ) || !m_DataManager.ObjectMap.ContainsKey( pathID ) ) {
 				return new TraverseData();
 			}
-			PathObject pathObject = m_DataManager.ObjectMap[ pathID ] as PathObject;
-			if( pathObject == null ) {
+			if( !( m_DataManager.ObjectMap[ pathID ] is PathObject pathObject ) ) {
 				return new TraverseData();
 			}
 			CraftData craftData = pathObject.CraftData;
