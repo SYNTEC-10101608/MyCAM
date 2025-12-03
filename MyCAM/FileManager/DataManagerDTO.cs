@@ -298,36 +298,35 @@ namespace MyCAM.FileManager
 
 		internal ContourPathObjectDTO( PathObject pathObject )
 		{
-			//if( pathObject == null ) {
-			//	return;
-			//}
-			//UID = pathObject.UID;
-			//Shape = new TopoShapeDTO( pathObject.Shape );
-			//ObjectType = ObjectType.Path;
-			//PathType = PathType.Contour;
-			//if( pathObject is ContourPathObject ) {
-			//	foreach( var point in ( (ContourPathObject)pathObject ).CADPointList ) {
-			//		CADPointList.Add( new CADPointDTO( point ) );
-			//	}
-			//}
-			//else {
-			//	CADPointList = new List<CADPointDTO>();
-			//}
-			//CraftData = new CraftDataDTO( pathObject.CraftData );
+			if( pathObject == null ) {
+				return;
+			}
+			UID = pathObject.UID;
+			Shape = new TopoShapeDTO( pathObject.Shape );
+			ObjectType = ObjectType.Path;
+			PathType = PathType.Contour;
+			if( pathObject is ContourPathObject ) {
+				foreach( var point in ( (ContourPathObject)pathObject ).CADPointList ) {
+					CADPointList.Add( new CADPointDTO( point ) );
+				}
+			}
+			else {
+				CADPointList = new List<CADPointDTO>();
+			}
+			CraftData = new CraftDataDTO( pathObject.CraftData );
 		}
 
 		// DTO → ContourPathObject
 		internal ContourPathObject PathDTOToContourPathObject()
 		{
 			// protection
-			//if( Shape == null || string.IsNullOrEmpty( UID ) ) {
-			//	throw new ArgumentNullException( "PathObject deserialization failed." );
-			//}
-			//TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
-			//CraftData craftData = CraftData.ToCraftData();
-			//List<CADPoint> cadPointList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
-			//return new ContourPathObject( UID, shape, cadPointList, craftData );
-			return null;
+			if( Shape == null || string.IsNullOrEmpty( UID ) ) {
+				throw new ArgumentNullException( "PathObject deserialization failed." );
+			}
+			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
+			CraftData craftData = CraftData.ToCraftData();
+			List<CADPoint> cadPointList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
+			return new ContourPathObject( UID, shape, cadPointList, craftData );
 		}
 	}
 
@@ -353,6 +352,12 @@ namespace MyCAM.FileManager
 		}
 
 		public int StartPoint
+		{
+			get;
+			set;
+		}
+
+		public bool IsClosed
 		{
 			get;
 			set;
@@ -415,7 +420,7 @@ namespace MyCAM.FileManager
 			Dictionary<int, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
 			LeadData leadParam = LeadParam.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
-			return new CraftData( UID, StartPoint, IsReverse, leadParam, OverCutLength, toolVecModifyMap, IsToolVecReverse, traverseData );
+			return new CraftData( UID, leadParam, StartPoint, OverCutLength, IsReverse, IsClosed, traverseData, toolVecModifyMap, IsToolVecReverse );
 		}
 	}
 
