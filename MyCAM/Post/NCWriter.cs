@@ -239,7 +239,9 @@ namespace MyCAM.Post
 				contourCacheInfo.LeadInCAMPointList.Cast<IProcessPoint>().ToList(),
 				contourCacheInfo.LeadOutCAMPointList.Cast<IProcessPoint>().ToList(),
 				contourCacheInfo.OverCutCAMPointList.Cast<IProcessPoint>().ToList(),
-				craftData.TraverseData );
+				craftData.TraverseData,
+				contourCacheInfo.GetProcessEndPoint(),
+				contourCacheInfo.GetProcessEndPoint() );
 		}
 
 		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";
