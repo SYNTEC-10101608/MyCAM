@@ -159,13 +159,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FiveAxisSolverCore.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="IKSolverCore.h" />
     <ClInclude Include="PostToolCommon.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="IKSolverCore.cpp" />
-    <ClCompile Include="IKSolverWrapper.cpp" />
+    <ClCompile Include="FiveAxisSolverCore.cpp" />
+    <ClCompile Include="FiveAxisSolverWrapper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

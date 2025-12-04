@@ -18,18 +18,18 @@
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IKSolverCore.h">
+    <ClInclude Include="PostToolCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PostToolCommon.h">
+    <ClInclude Include="FiveAxisSolverCore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="IKSolverCore.cpp">
+    <ClCompile Include="FiveAxisSolverCore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IKSolverWrapper.cpp">
+    <ClCompile Include="FiveAxisSolverWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

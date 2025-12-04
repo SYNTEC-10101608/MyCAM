@@ -1,7 +1,7 @@
-﻿using System;
+﻿using OCC.gp;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using OCC.gp;
 
 namespace MyCAM.Data
 {
@@ -82,6 +82,26 @@ namespace MyCAM.Data
 		}
 
 		public double ToolLength
+		{
+			get; set;
+		}
+
+		public double MasterAxisStart_deg
+		{
+			get; set;
+		}
+
+		public double MasterAxisEnd_deg
+		{
+			get; set;
+		}
+
+		public double SlaveAxisStart_deg
+		{
+			get; set;
+		}
+
+		public double SlaveAxisEnd_deg
 		{
 			get; set;
 		}
