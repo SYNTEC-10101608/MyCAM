@@ -203,6 +203,12 @@ namespace MyCAM
 			m_CADEditor.SaveProjectFile();
 		}
 
+		// sew part
+		void m_tsbSewPart_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.SewPart();
+		}
+
 		// add feature
 		private void m_tsbAddLine_TwoVertexConnect_Click( object sender, EventArgs e )
 		{

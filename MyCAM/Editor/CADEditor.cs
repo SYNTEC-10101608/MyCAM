@@ -107,6 +107,19 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SewPart()
+		{
+			if( m_CurrentAction.ActionType == EditActionType.SewPart ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeEdit( out List<string> szIDList ) ) {
+				return;
+			}
+			SewPartAction action = new SewPartAction( m_DataManager, m_Viewer, m_ViewManager, szIDList );
+			StartEditAction( action );
+		}
+
 		public void AddPoint( AddPointType type )
 		{
 			// user reclick same action enterace
@@ -267,10 +280,28 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
 				return;
 			}
-			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape }/*, 1e-1*/ );
+			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape } );
 
 			// add the read shape to the manager
 			m_DataManager.AddPart( oneShape );
+		}
+
+		List<string> GetSelectedIDList()
+		{
+			return m_DefaultAction.GetSelectedIDs();
+		}
+
+		bool ValidateBeforeEdit( out List<string> szIDList )
+		{
+			EndActionIfNotDefault();
+			szIDList = GetSelectedIDList();
+
+			// nothing selected
+			if( szIDList.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇零件", MyApp.NoticeType.Hint );
+				return false;
+			}
+			return true;
 		}
 
 		// edit actions

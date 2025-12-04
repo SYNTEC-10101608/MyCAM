@@ -25,6 +25,7 @@ namespace MyCAM.Editor
 		ThreePtTransform,
 		ManualTransform,
 		AxisTransform,
+		SewPart,
 
 		// CAM
 		SelectFace,

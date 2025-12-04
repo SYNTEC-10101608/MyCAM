@@ -64,6 +64,7 @@
     <Compile Include="Editor\Action\CAD\AddLineAction.cs" />
     <Compile Include="Editor\Action\CAD\AxisTransformAction.cs" />
     <Compile Include="Editor\Action\CAD\SelectPartAction.cs" />
+    <Compile Include="Editor\Action\CAD\SewPartAction.cs" />
     <Compile Include="Editor\Action\CAM\EntryAndExitAction.cs" />
     <Compile Include="Editor\Action\CAM\LeadAction.cs" />
     <Compile Include="Editor\Action\CAM\OverCutAction.cs" />
@@ -79,6 +80,12 @@
     </Compile>
     <Compile Include="Editor\Dialog\EntryAndExitDlg.Designer.cs">
       <DependentUpon>EntryAndExitDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Dialog\SewPartDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\SewPartDlg.Designer.cs">
+      <DependentUpon>SewPartDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Dialog\TraverseDlg.cs">
       <SubType>Form</SubType>
@@ -160,6 +167,9 @@
     <EmbeddedResource Include="Editor\Dialog\EntryAndExitDlg.resx">
       <DependentUpon>EntryAndExitDlg.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\SewPartDlg.resx">
+      <DependentUpon>SewPartDlg.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\TraverseDlg.resx">
       <DependentUpon>TraverseDlg.cs</DependentUpon>
     </EmbeddedResource>
@@ -177,6 +187,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="StartupForm.resx">
       <DependentUpon>StartupForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
