@@ -24,12 +24,21 @@
     <ClInclude Include="PostToolCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FiveAxisSolverCore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IKSolverCore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IKSolverWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FiveAxisSolverCore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FiveAxisSolverWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
