@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRep;
 using OCC.gp;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -18,6 +18,7 @@ namespace MyCAM.Editor
 		{
 			CreateRotationCenter();
 			CreateManipulator();
+			m_OneTimeTrsf = new gp_Trsf();
 		}
 
 		public override EditActionType ActionType
@@ -110,6 +111,9 @@ namespace MyCAM.Editor
 
 		void ApplyTransform( gp_Trsf trsf )
 		{
+			if( m_OneTimeTrsf == null ) {
+				return;
+			}
 			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, trsf );
 			transformHelper.TransformData();
 		}
