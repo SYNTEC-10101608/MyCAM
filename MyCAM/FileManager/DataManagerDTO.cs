@@ -284,13 +284,11 @@ namespace MyCAM.FileManager
 
 	public class ContourPathObjectDTO : PathObjectDTO
 	{
-		[XmlArray( "CADPointListDTO" )]
-		[XmlArrayItem( "CADPointDTO" )]
-		public List<CADPointDTO> CADPointList
+		public ContourGeomDataDTO GeomData
 		{
 			get;
 			set;
-		} = new List<CADPointDTO>();
+		} = new ContourGeomDataDTO();
 
 		internal ContourPathObjectDTO()
 		{
@@ -305,13 +303,11 @@ namespace MyCAM.FileManager
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
 			PathType = PathType.Contour;
-			if( pathObject is ContourPathObject ) {
-				foreach( var point in ( (ContourPathObject)pathObject ).CADPointList ) {
-					CADPointList.Add( new CADPointDTO( point ) );
-				}
+			if( pathObject is ContourPathObject contourPathObject ) {
+				GeomData = new ContourGeomDataDTO( contourPathObject.GeomData );
 			}
 			else {
-				CADPointList = new List<CADPointDTO>();
+				GeomData = new ContourGeomDataDTO();
 			}
 			CraftData = new CraftDataDTO( pathObject.CraftData );
 		}
@@ -320,13 +316,110 @@ namespace MyCAM.FileManager
 		internal ContourPathObject PathDTOToContourPathObject()
 		{
 			// protection
-			if( Shape == null || string.IsNullOrEmpty( UID ) ) {
+			if( Shape == null || string.IsNullOrEmpty( UID ) || GeomData == null ) {
 				throw new ArgumentNullException( "PathObject deserialization failed." );
 			}
 			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
 			CraftData craftData = CraftData.ToCraftData();
+			ContourGeomData geomData = GeomData.ToContourGeomData();
+			return new ContourPathObject( UID, shape, geomData, craftData );
+		}
+	}
+
+	public class ContourGeomDataDTO
+	{
+		public string UID
+		{
+			get;
+			set;
+		} = string.Empty;
+
+		[XmlArray( "CADPointListDTO" )]
+		[XmlArrayItem( "CADPointDTO" )]
+		public List<CADPointDTO> CADPointList
+		{
+			get;
+			set;
+		} = new List<CADPointDTO>();
+
+		[XmlArray( "ConnectPointMapDTO" )]
+		[XmlArrayItem( "ConnectPointPairDTO" )]
+		public List<ConnectPointPairDTO> ConnectPointMap
+		{
+			get;
+			set;
+		} = new List<ConnectPointPairDTO>();
+
+		internal ContourGeomDataDTO()
+		{
+		}
+
+		internal ContourGeomDataDTO( ContourGeomData geomData )
+		{
+			if( geomData == null ) {
+				return;
+			}
+			UID = geomData.UID;
+			
+			// Convert CADPointList
+			foreach( var point in geomData.CADPointList ) {
+				CADPointList.Add( new CADPointDTO( point ) );
+			}
+
+			// Convert ConnectPointMap to list of pairs
+			// Key is index in CADPointList, Value is separate CADPoint (connection point)
+			foreach( var kvp in geomData.ConnectPointMap ) {
+				int keyIndex = geomData.CADPointList.IndexOf( kvp.Key );
+				if( keyIndex >= 0 ) {
+					ConnectPointMap.Add( new ConnectPointPairDTO( keyIndex, new CADPointDTO( kvp.Value ) ) );
+				}
+			}
+		}
+
+		internal ContourGeomData ToContourGeomData()
+		{
+			if( CADPointList == null || ConnectPointMap == null ) {
+				throw new ArgumentException( "ContourGeomData deserialization failed." );
+			}
+			
 			List<CADPoint> cadPointList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
-			return new ContourPathObject( UID, shape, cadPointList, craftData );
+			
+			// Reconstruct ConnectPointMap
+			// Key is from CADPointList by index, Value is separate CADPoint
+			Dictionary<CADPoint, CADPoint> connectPointMap = new Dictionary<CADPoint, CADPoint>();
+			foreach( var pair in ConnectPointMap ) {
+				if( pair.KeyIndex >= 0 && pair.KeyIndex < cadPointList.Count && pair.ValuePoint != null ) {
+					CADPoint valuePoint = pair.ValuePoint.ToCADPoint();
+					connectPointMap[cadPointList[pair.KeyIndex]] = valuePoint;
+				}
+			}
+
+			return new ContourGeomData( UID, cadPointList, connectPointMap );
+		}
+	}
+
+	public class ConnectPointPairDTO
+	{
+		public int KeyIndex
+		{
+			get;
+			set;
+		}
+
+		public CADPointDTO ValuePoint
+		{
+			get;
+			set;
+		}
+
+		internal ConnectPointPairDTO()
+		{
+		}
+
+		internal ConnectPointPairDTO( int keyIndex, CADPointDTO valuePoint )
+		{
+			KeyIndex = keyIndex;
+			ValuePoint = valuePoint;
 		}
 	}
 
@@ -352,12 +445,6 @@ namespace MyCAM.FileManager
 		}
 
 		public int StartPoint
-		{
-			get;
-			set;
-		}
-
-		public bool IsClosed
 		{
 			get;
 			set;
@@ -420,7 +507,7 @@ namespace MyCAM.FileManager
 			Dictionary<int, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
 			LeadData leadParam = LeadParam.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
-			return new CraftData( UID, leadParam, StartPoint, OverCutLength, IsReverse, IsClosed, traverseData, toolVecModifyMap, IsToolVecReverse );
+			return new CraftData( UID, StartPoint, IsReverse, leadParam, OverCutLength, toolVecModifyMap, IsToolVecReverse, traverseData );
 		}
 	}
 

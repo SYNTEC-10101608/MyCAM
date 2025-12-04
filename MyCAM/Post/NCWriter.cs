@@ -3,6 +3,7 @@ using MyCAM.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace MyCAM.Post
 {
@@ -11,17 +12,11 @@ namespace MyCAM.Post
 		public NCWriter( DataManager dataManager )
 		{
 			// fix: check null argument
-			if( dataManager == null || dataManager.GetContourCacheInfoList() == null || dataManager.MachineData == null || dataManager.EntryAndExitData == null ) {
+			if( dataManager == null || dataManager.MachineData == null || dataManager.EntryAndExitData == null || dataManager.PathIDList == null ) {
 				throw new ArgumentNullException( "NCWriter constructor argument is null." );
 			}
-			m_ProcessCacheInfoList = dataManager.GetContourCacheInfoList();
-
-			foreach( var szID in dataManager.PathIDList ) {
-				if( !dataManager.ObjectMap.ContainsKey( szID ) ) {
-					throw new ArgumentException( "NCWriter constructor argument contains invalid path ID." );
-				}
-				m_CraftDataList.Add( ( dataManager.ObjectMap[ szID ] as PathObject ).CraftData );
-			}
+			m_DataManager = dataManager;
+			m_PathIDList = dataManager.PathIDList;
 			m_MachineData = dataManager.MachineData;
 			m_PostSolver = new PostSolver( dataManager.MachineData );
 			m_MasterAxisName = ConvertRotaryAxisName( m_MachineData.MasterRotaryAxis );
@@ -29,8 +24,8 @@ namespace MyCAM.Post
 			m_EntryAndExitData = dataManager.EntryAndExitData;
 		}
 
-		List<ContourCacheInfo> m_ProcessCacheInfoList;
-		List<CraftData> m_CraftDataList = new List<CraftData>();
+		DataManager m_DataManager;
+		IReadOnlyList<string> m_PathIDList;
 		StreamWriter m_StreamWriter;
 		PostSolver m_PostSolver;
 		MachineData m_MachineData;
@@ -52,12 +47,12 @@ namespace MyCAM.Post
 
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
-					for( int i = 0; i < m_ProcessCacheInfoList.Count; i++ ) {
+					for( int i = 0; i < m_PathIDList.Count; i++ ) {
 
 						// solve all post data of the path
-						if( !PostHelper.SolvePath( m_PostSolver, m_ProcessCacheInfoList[ i ], m_CraftDataList[ i ],
+						if( !PostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
 							endInfoOfPreviousPath, m_EntryAndExitData,
-							out PostData postData, out _, out endInfoOfPreviousPath ) ) {
+							out PostData postData, out endInfoOfPreviousPath ) ) {
 							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 							return false;
 						}
@@ -65,10 +60,10 @@ namespace MyCAM.Post
 					}
 
 					// write exit
-					if( m_ProcessCacheInfoList.Count > 0 ) {
+					if( m_PathIDList.Count > 0 ) {
 
 						// calculate exit point
-						PostHelper.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out PostPoint exitPoint, out _ );
+						PostHelper.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out PostPoint exitPoint );
 						m_StreamWriter.WriteLine( "// Exit" );
 						WriteOneLinearTraverse( exitPoint );
 					}
@@ -222,6 +217,29 @@ namespace MyCAM.Post
 				default:
 					return "";
 			}
+		}
+
+		ContourNCPackage BuildPackageByID( string szID )
+		{
+			if( !m_DataManager.ObjectMap.ContainsKey( szID )
+				|| m_DataManager.ObjectMap[ szID ].ObjectType != ObjectType.Path ) {
+				return null;
+			}
+			PathObject pathObject = m_DataManager.ObjectMap[ szID ] as PathObject;
+			if( pathObject.PathType != PathType.Contour ) {
+				return null;
+			}
+			ContourPathObject contourPathObject = pathObject as ContourPathObject;
+			ContourCacheInfo contourCacheInfo = contourPathObject.ContourCacheInfo;
+			CraftData craftData = contourPathObject.CraftData;
+			return new ContourNCPackage(
+				craftData.LeadLineParam,
+				craftData.OverCutLength,
+				contourCacheInfo.CAMPointList.Cast<IProcessPoint>().ToList(),
+				contourCacheInfo.LeadInCAMPointList.Cast<IProcessPoint>().ToList(),
+				contourCacheInfo.LeadOutCAMPointList.Cast<IProcessPoint>().ToList(),
+				contourCacheInfo.OverCutCAMPointList.Cast<IProcessPoint>().ToList(),
+				craftData.TraverseData );
 		}
 
 		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";

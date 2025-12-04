@@ -16,7 +16,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return new gp_Pnt( m_Point.X(), m_Point.Y(), m_Point.Z() );
+				return new gp_Pnt( m_Point.XYZ() );
 			}
 		}
 
@@ -66,18 +66,77 @@ namespace MyCAM.Data
 		gp_Dir m_TangentVec;
 	}
 
-	// currently assuming CAM = CAD + ToolVec
-	public class CAMPoint
+	public interface ISetToolVecPoint
 	{
-		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
+		gp_Pnt Point
 		{
-			CADPoint = cadPoint;
-			m_ToolVec = new gp_Dir( toolVec.XYZ() );
+			get;
 		}
 
-		public CADPoint CADPoint
+		gp_Dir InitToolVec
 		{
-			get; private set;
+			get;
+		}
+
+		gp_Dir TangentVec
+		{
+			get;
+		}
+
+		gp_Dir ToolVec
+		{
+			get;
+			set;
+		}
+	}
+
+	public interface IOrientationPoint
+	{
+		gp_Pnt Point
+		{
+			get;
+		}
+
+		gp_Dir TangentVec
+		{
+			get;
+		}
+
+		gp_Dir ToolVec
+		{
+			get;
+		}
+
+		IOrientationPoint Clone();
+	}
+
+	public interface IProcessPoint
+	{
+		gp_Pnt Point
+		{
+			get;
+		}
+
+		gp_Dir ToolVec
+		{
+			get;
+		}
+
+		IProcessPoint Clone();
+	}
+
+	public class CAMPoint : ISetToolVecPoint, IOrientationPoint, IProcessPoint
+	{
+		public CAMPoint( CADPoint cadPoint )
+		{
+			m_CADPoint = cadPoint.Clone();
+			m_ToolVec = new gp_Dir( cadPoint.NormalVec_1st.XYZ() );
+		}
+
+		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
+		{
+			m_CADPoint = cadPoint.Clone();
+			m_ToolVec = new gp_Dir( toolVec.XYZ() );
 		}
 
 		public gp_Dir ToolVec
@@ -92,12 +151,48 @@ namespace MyCAM.Data
 			}
 		}
 
+		public gp_Pnt Point
+		{
+			get
+			{
+				return m_CADPoint.Point;
+			}
+		}
+
+		public gp_Dir InitToolVec
+		{
+			get
+			{
+				return m_CADPoint.NormalVec_1st;
+			}
+		}
+
+		public gp_Dir TangentVec
+		{
+			get
+			{
+				return m_CADPoint.TangentVec;
+			}
+		}
+
 		public CAMPoint Clone()
 		{
-			return new CAMPoint( CADPoint.Clone(), ToolVec );
+			return new CAMPoint( m_CADPoint.Clone() );
+		}
+
+		// the explicit interface implementation for IOverCutPoint.Clone
+		IOrientationPoint IOrientationPoint.Clone()
+		{
+			return Clone();
+		}
+
+		IProcessPoint IProcessPoint.Clone()
+		{
+			return Clone();
 		}
 
 		// using backing field to prevent modified outside
+		CADPoint m_CADPoint;
 		gp_Dir m_ToolVec;
 	}
 }

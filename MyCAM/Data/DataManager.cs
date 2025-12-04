@@ -207,27 +207,6 @@ namespace MyCAM.Data
 			ObjectMap.Remove( pathID );
 		}
 
-		public List<ContourCacheInfo> GetContourCacheInfoList()
-		{
-			List<ContourCacheInfo> cacheInfoList = new List<ContourCacheInfo>();
-			foreach( string pathID in PathIDList ) {
-				if( ( ObjectMap[ pathID ] as PathObject ).PathType != PathType.Contour ) {
-					continue;
-				}
-				cacheInfoList.Add( ( ObjectMap[ pathID ] as ContourPathObject ).ContourCacheInfo );
-			}
-			return cacheInfoList;
-		}
-
-		public List<ICacheInfo> GetCacheInfoList()
-		{
-			List<ICacheInfo> cacheInfoList = new List<ICacheInfo>();
-			foreach( string pathID in PathIDList ) {
-				cacheInfoList.Add( ObjectMap[ pathID ] as ICacheInfo );
-			}
-			return cacheInfoList;
-		}
-
 		public ShapeIDsStruct GetShapeIDsForDTO()
 		{
 			return new ShapeIDsStruct()
