@@ -104,7 +104,7 @@ namespace MyCAM.Editor.Renderer
 				for( int i = 0; i < pointList.Count - 1; i++ ) {
 					gp_Pnt currentCAMPoint = pointList[ i ].Point;
 					gp_Pnt nextCAMPoint = pointList[ i + 1 ].Point;
-					AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint, nextCAMPoint, Quantity_NameOfColor.Quantity_NOC_GREENYELLOW );
+					AIS_Line LeadAISLine = GetLineAIS( currentCAMPoint, nextCAMPoint, Quantity_NameOfColor.Quantity_NOC_DARKORANGE );
 					leadAISList.Add( LeadAISLine );
 				}
 			}
@@ -128,7 +128,7 @@ namespace MyCAM.Editor.Renderer
 
 				if( overCutLength > 0 ) {
 					for( int i = 0; i < overCutPointList.Count - 1; i++ ) {
-						AIS_Line overCutAISLine = GetLineAIS( overCutPointList[ i ].Point, overCutPointList[ i + 1 ].Point, Quantity_NameOfColor.Quantity_NOC_DEEPPINK );
+						AIS_Line overCutAISLine = GetLineAIS( overCutPointList[ i ].Point, overCutPointList[ i + 1 ].Point, Quantity_NameOfColor.Quantity_NOC_DARKORANGE );
 						overcutAISList.Add( overCutAISLine );
 					}
 				}
@@ -174,7 +174,7 @@ namespace MyCAM.Editor.Renderer
 		{
 			AIS_Line lineAIS = new AIS_Line( new Geom_CartesianPoint( startPnt ), new Geom_CartesianPoint( endPnt ) );
 			lineAIS.SetColor( new Quantity_Color( color ) );
-			lineAIS.SetWidth( 1 );
+			lineAIS.SetWidth( 2.5 );
 			return lineAIS;
 		}
 
