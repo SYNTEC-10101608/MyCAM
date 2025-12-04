@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CacheInfo\ContourCacheInfo.cs" />
+    <Compile Include="Data\ContourGeomData.cs" />
     <Compile Include="Data\ContourPathObject.cs" />
     <Compile Include="Data\CraftData.cs" />
     <Compile Include="CacheInfo\ICacheInfo.cs" />
@@ -90,6 +91,13 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Editor\IEditor.cs" />
+    <Compile Include="Editor\Renderer\CAMRendererBase.cs" />
+    <Compile Include="Editor\Renderer\CraftRenderer.cs" />
+    <Compile Include="Editor\Renderer\ICAMRenderer.cs" />
+    <Compile Include="Editor\Renderer\IndexRenderer.cs" />
+    <Compile Include="Editor\Renderer\OrientationRenderer.cs" />
+    <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
+    <Compile Include="Editor\Renderer\TraverseRenderer.cs" />
     <Compile Include="Editor\SimuEditor.cs" />
     <Compile Include="Data\LeadData.cs" />
     <Compile Include="Editor\Dialog\LeadDlg.cs">
@@ -104,7 +112,9 @@
     <Compile Include="Editor\Dialog\OverCutDlg.Designer.cs">
       <DependentUpon>OverCutDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helper\DisctereContourHelper.cs" />
     <Compile Include="Helper\MachineDataXMLHelper.cs" />
+    <Compile Include="Helper\ToolVecHelper.cs" />
     <Compile Include="Helper\TraverseHelper.cs" />
     <Compile Include="FileManager\MachineDataDTO.cs" />
     <Compile Include="Helper\LeadHelper.cs" />
@@ -140,6 +150,7 @@
     <Compile Include="Data\BasicData.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="LogManager\LogHandler.cs" />
+    <Compile Include="Helper\OverCutHelper.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="Post\PostHelper.cs" />

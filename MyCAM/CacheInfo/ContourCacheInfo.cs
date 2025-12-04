@@ -1,26 +1,27 @@
-﻿using MyCAM.App;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using MyCAM.Helper;
-using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	internal class ContourCacheInfo : ICacheInfo
+	public class ContourCacheInfo : ICacheInfo
 	{
-		public ContourCacheInfo( string szID, List<CADPoint> cadPointList, CraftData craftData, bool isClose )
+		public ContourCacheInfo( string szID, ContourGeomData geomData, CraftData craftData, bool isClose )
 		{
-			if( string.IsNullOrEmpty( szID ) || cadPointList == null || cadPointList.Count == 0 || craftData == null ) {
+			if( string.IsNullOrEmpty( szID ) || geomData == null || craftData == null ) {
 				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );
 			}
+			if( geomData.CADPointList.Count == 0 ) {
+				throw new ArgumentException( "ContourCacheInfo constructing argument empty cadPointList" );
+			}
 			UID = szID;
-			m_CADPointList = cadPointList;
+			m_CADPointList = geomData.CADPointList;
+			m_ConnectCADPointMap = geomData.ConnectPointMap;
 			m_CraftData = craftData;
 			IsClosed = isClose;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
-
 			BuildCAMPointList();
 		}
 
@@ -37,7 +38,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		#region result
+		#region computation result
 
 		internal List<CAMPoint> CAMPointList
 		{
@@ -83,20 +84,6 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public bool IsClosed
-		{
-			get; private set;
-		}
-
-		#endregion
-
-		#region Public API
-		// when the shape has tranform, need to call this to update the cache info
-		public void Transform()
-		{
-			BuildCAMPointList();
-		}
-
 		public CAMPoint GetProcessStartPoint()
 		{
 			if( m_IsCraftDataDirty ) {
@@ -129,64 +116,47 @@ namespace MyCAM.CacheInfo
 			}
 			return camPoint;
 		}
-
-		public bool GetPathIsReverse()
-		{
-			return m_CraftData.IsReverse;
-		}
-
-		public int GetPathStartPointIndex()
-		{
-			return m_CraftData.StartPointIndex;
-		}
-
-		public LeadData GetPathLeadData()
-		{
-			return m_CraftData.LeadLineParam;
-		}
-
-		public double GetPathOverCutLength()
-		{
-			return m_CraftData.OverCutLength;
-		}
-
 		#endregion
 
-		void BuildCAMPointList()
+		#region API
+		// when the shape has tranform, need to call this to update the cache info
+		public void DoTransform()
 		{
-			m_IsCraftDataDirty = false;
-			m_CAMPointList = new List<CAMPoint>();
-			SetToolVec();
-			SetStartPoint();
-			SetOrientation();
+			BuildCAMPointList();
+		}
+		#endregion
 
-			// close the loop if is closed
-			if( IsClosed && m_CAMPointList.Count > 0 ) {
-				m_CAMPointList.Add( m_CAMPointList[ 0 ].Clone() );
+		#region craft data
+		public int StartPointIndex
+		{
+			get
+			{
+				return m_CraftData.StartPointIndex;
 			}
-
-			// all CAM point are settled down, start set lead / overcut
-			SetOverCut();
-			SetLeadIn();
-			SetLeadout();
 		}
 
-		void SetToolVec()
+		public bool IsPathReverse
 		{
-			for( int i = 0; i < m_CADPointList.Count; i++ ) {
-
-				// calculate tool vector
-				CADPoint cadPoint = m_CADPointList[ i ];
-				CAMPoint camPoint;
-				if( m_CraftData.IsToolVecReverse ) {
-					camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st.Reversed() );
-				}
-				else {
-					camPoint = new CAMPoint( cadPoint, cadPoint.NormalVec_1st );
-				}
-				m_CAMPointList.Add( camPoint );
+			get
+			{
+				return m_CraftData.IsReverse;
 			}
-			ModifyToolVec();
+		}
+
+		public LeadData LeadData
+		{
+			get
+			{
+				return m_CraftData.LeadLineParam;
+			}
+		}
+
+		public double OverCutLength
+		{
+			get
+			{
+				return m_CraftData.OverCutLength;
+			}
 		}
 
 		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
@@ -203,127 +173,76 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public HashSet<int> GetToolVecModifyIndex()
+		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
 		{
-			HashSet<int> result = new HashSet<int>();
-			foreach( int nIndex in m_CraftData.ToolVecModifyMap.Keys ) {
-				result.Add( nIndex );
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
 			}
-			return result;
+			if( m_CAMPointIndexMap.ContainsKey( point as CAMPoint ) ) {
+				int index = m_CAMPointIndexMap[ point as CAMPoint ];
+				return m_CraftData.ToolVecModifyMap.ContainsKey( index );
+			}
+			return false;
+		}
+		#endregion
+
+		public bool IsClosed
+		{
+			get; private set;
 		}
 
-		void ModifyToolVec()
+		void BuildCAMPointList()
 		{
-			if( m_CraftData.ToolVecModifyMap.Count == 0 ) {
-				return;
-			}
+			m_IsCraftDataDirty = false;
 
-			// all tool vector are modified to the same value, no need to do interpolation
-			if( m_CraftData.ToolVecModifyMap.Count == 1 ) {
-				gp_Vec newVec = GetVecFromAB( m_CAMPointList[ m_CraftData.ToolVecModifyMap.Keys.First() ],
-					m_CraftData.ToolVecModifyMap.Values.First().Item1 * Math.PI / 180,
-					m_CraftData.ToolVecModifyMap.Values.First().Item2 * Math.PI / 180 );
-				foreach( CAMPoint camPoint in m_CAMPointList ) {
-					camPoint.ToolVec = new gp_Dir( newVec.XYZ() );
+			// build initial CAM point list
+			m_CAMPointList = new List<CAMPoint>();
+			m_CAMPointIndexMap.Clear();
+			m_ConnectCAMPointMap.Clear();
+			for( int i = 0; i < m_CADPointList.Count; i++ ) {
+				CADPoint cadPoint = m_CADPointList[ i ];
+				CAMPoint camPoint = new CAMPoint( cadPoint );
+				m_CAMPointIndexMap.Add( camPoint, i );
+				m_CAMPointList.Add( camPoint );
+				if( m_ConnectCADPointMap.ContainsKey( cadPoint ) ) {
+					CADPoint connectedCADPoint = m_ConnectCADPointMap[ cadPoint ];
+					CAMPoint connectedCAMPoint = new CAMPoint( connectedCADPoint );
+					m_ConnectCAMPointMap.Add( camPoint, connectedCAMPoint );
 				}
 			}
 
-			// get the interpolate interval list
-			List<Tuple<int, int>> interpolateIntervalList = GetInterpolateIntervalList();
-
-			// modify the tool vector
-			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
-
-				// get start and end index
-				int nStartIndex = interpolateIntervalList[ i ].Item1;
-				int nEndIndex = interpolateIntervalList[ i ].Item2;
-				InterpolateToolVec( nStartIndex, nEndIndex );
-			}
-		}
-
-		gp_Vec GetVecFromAB( CAMPoint camPoint, double dRA_rad, double dRB_rad )
-		{
-			// TDOD: RA == 0 || RB == 0
-			if( dRA_rad == 0 && dRB_rad == 0 ) {
-				return new gp_Vec( camPoint.ToolVec );
+			// set tool vector
+			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
+			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, IsClosed, m_CraftData.IsToolVecReverse );
+			foreach( var oneConnect in m_ConnectCAMPointMap ) {
+				oneConnect.Value.ToolVec = oneConnect.Key.ToolVec;
 			}
 
-			// get the x, y, z direction
-			gp_Dir x = camPoint.CADPoint.TangentVec;
-			gp_Dir z = camPoint.CADPoint.NormalVec_1st;
-			gp_Dir y = z.Crossed( x );
+			// set start point and orientation
+			SetStartPoint();
+			SetOrientation();
 
-			// X:Y:Z = tanA:tanB:1
-			double X = 0;
-			double Y = 0;
-			double Z = 0;
-			if( dRA_rad == 0 ) {
-				X = 0;
-				Z = 1;
-			}
-			else {
-				X = dRA_rad < 0 ? -1 : 1;
-				Z = X / Math.Tan( dRA_rad );
-			}
-			Y = Z * Math.Tan( dRB_rad );
-			gp_Dir dir1 = new gp_Dir( x.XYZ() * X + y.XYZ() * Y + z.XYZ() * Z );
-			return new gp_Vec( dir1.XYZ() );
-		}
-
-		List<Tuple<int, int>> GetInterpolateIntervalList()
-		{
-			// sort the modify data by index
-			List<int> indexInOrder = m_CraftData.ToolVecModifyMap.Keys.ToList();
-			indexInOrder.Sort();
-			List<Tuple<int, int>> intervalList = new List<Tuple<int, int>>();
-			if( IsClosed ) {
-
-				// for closed path, the index is wrapped
-				for( int i = 0; i < indexInOrder.Count; i++ ) {
-					int nextIndex = ( i + 1 ) % indexInOrder.Count;
-					intervalList.Add( new Tuple<int, int>( indexInOrder[ i ], indexInOrder[ nextIndex ] ) );
-				}
-			}
-			else {
-				for( int i = 0; i < indexInOrder.Count - 1; i++ ) {
-					intervalList.Add( new Tuple<int, int>( indexInOrder[ i ], indexInOrder[ i + 1 ] ) );
-				}
-			}
-			return intervalList;
-		}
-
-		void InterpolateToolVec( int nStartIndex, int nEndIndex )
-		{
-			// consider wrapped
-			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + m_CAMPointList.Count : nEndIndex;
-
-			// get the start and end tool vector
-			gp_Vec startVec = GetVecFromAB( m_CAMPointList[ nStartIndex ],
-				m_CraftData.ToolVecModifyMap[ nStartIndex ].Item1 * Math.PI / 180,
-				m_CraftData.ToolVecModifyMap[ nStartIndex ].Item2 * Math.PI / 180 );
-			gp_Vec endVec = GetVecFromAB( m_CAMPointList[ nEndIndex ],
-				m_CraftData.ToolVecModifyMap[ nEndIndex ].Item1 * Math.PI / 180,
-				m_CraftData.ToolVecModifyMap[ nEndIndex ].Item2 * Math.PI / 180 );
-
-			// get the total distance for interpolation parameter
-			double totaldistance = 0;
-			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
-				totaldistance += m_CAMPointList[ i % m_CAMPointList.Count ].CADPoint.Point.SquareDistance( m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.Point );
+			// close the loop if is closed
+			if( IsClosed && m_CAMPointList.Count > 0 ) {
+				CAMPoint startPoint = m_CAMPointList[ 0 ];
+				CAMPoint connectedCAMPoint = m_ConnectCAMPointMap.ContainsKey( startPoint )
+												? m_ConnectCAMPointMap[ startPoint ]
+												: startPoint.Clone();
+				m_CAMPointList.Add( connectedCAMPoint );
 			}
 
-			// get the quaternion for interpolation
-			gp_Quaternion q12 = new gp_Quaternion( startVec, endVec );
-			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
-			double accumulatedDistance = 0;
-			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
-				double t = accumulatedDistance / totaldistance;
-				accumulatedDistance += m_CAMPointList[ i % m_CAMPointList.Count ].CADPoint.Point.SquareDistance( m_CAMPointList[ ( i + 1 ) % m_CAMPointList.Count ].CADPoint.Point );
-				gp_Quaternion q = new gp_Quaternion();
-				slerp.Interpolate( t, ref q );
-				gp_Trsf trsf = new gp_Trsf();
-				trsf.SetRotation( q );
-				m_CAMPointList[ i % m_CAMPointList.Count ].ToolVec = new gp_Dir( startVec.Transformed( trsf ) );
-			}
+			// set over cut
+			List<IOrientationPoint> camPointOverCutList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
+			OverCutHelper.SetOverCut( camPointOverCutList, out List<IOrientationPoint> overCutPointList, m_CraftData.OverCutLength, IsClosed );
+			m_OverCutPointList = overCutPointList.Cast<CAMPoint>().ToList();
+
+			// set lead
+			List<IOrientationPoint> mainPointList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
+			List<IOrientationPoint> overCutPointList2 = m_OverCutPointList.Cast<IOrientationPoint>().ToList();
+			LeadHelper.SetLeadIn( mainPointList, out List<IOrientationPoint> leadInPointList, m_CraftData.LeadLineParam, m_CraftData.IsReverse );
+			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
+			LeadHelper.SetLeadOut( mainPointList, overCutPointList2, out List<IOrientationPoint> leadOutPointList, m_CraftData.LeadLineParam, m_CraftData.IsReverse );
+			m_LeadOutCAMPointList = leadOutPointList.Cast<CAMPoint>().ToList();
 		}
 
 		void SetStartPoint()
@@ -360,165 +279,10 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		#region Over cut
-
-		void SetOverCut()
-		{
-			m_OverCutPointList.Clear();
-			if( m_CAMPointList.Count == 0 || m_CraftData.OverCutLength == 0 || !IsClosed ) {
-				return;
-			}
-			double dTotalOverCutLength = 0;
-
-			// end point is the start of over cut
-			m_OverCutPointList.Add( m_CAMPointList.Last().Clone() );
-			for( int i = 0; i < m_CAMPointList.Count - 1; i++ ) {
-
-				// get this edge distance
-				double dDistance = m_CAMPointList[ i ].CADPoint.Point.Distance( m_CAMPointList[ i + 1 ].CADPoint.Point );
-				if( dTotalOverCutLength + dDistance < m_CraftData.OverCutLength ) {
-
-					// still within overcut length → take next point directly
-					m_OverCutPointList.Add( m_CAMPointList[ i + 1 ].Clone() );
-					dTotalOverCutLength += dDistance;
-				}
-				else {
-
-					// need to stop inside this segment
-					double dRemain = m_CraftData.OverCutLength - dTotalOverCutLength;
-					if( dRemain <= MyApp.PRECISION_MIN_ERROR ) {
-						return;
-					}
-
-					// compute new point along segment
-					gp_Pnt overCutEndPoint = GetExactOverCutEndPoint( m_CAMPointList[ i ].CADPoint.Point, m_CAMPointList[ i + 1 ].CADPoint.Point, dRemain );
-
-					// interpolate tool vector
-					InterpolateToolAndTangentVecBetween2CAMPoint( m_CAMPointList[ i ], m_CAMPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
-
-					// create new cam poiont
-					CADPoint cadPoint = new CADPoint( overCutEndPoint, endPointToolVec, endPointToolVec, endPointTangentVec );
-					CAMPoint camPoint = new CAMPoint( cadPoint, endPointToolVec );
-					m_OverCutPointList.Add( camPoint );
-					return;
-				}
-			}
-		}
-
-		gp_Pnt GetExactOverCutEndPoint( gp_Pnt currentPoint, gp_Pnt nextPoint, double dDistanceMoveFromOverPoint )
-		{
-			// from currentPoint → nextOverLengthPoint
-			gp_Vec movingVec = new gp_Vec( currentPoint, nextPoint );
-
-			// normalize to unit vector
-			movingVec.Normalize();
-
-			gp_Vec moveVec = movingVec.Multiplied( dDistanceMoveFromOverPoint );
-
-			// shifted along the vector
-			return new gp_Pnt( currentPoint.XYZ() + moveVec.XYZ() );
-		}
-
-		gp_Dir InterpolateVecBetween2Vec( gp_Vec currentVec, gp_Vec nextVec, double interpolatePercent )
-		{
-			// this case is unsolcvable, so just return current vec
-			if( currentVec.IsOpposite( nextVec, MyApp.PRECISION_MIN_ERROR ) ) {
-				return new gp_Dir( currentVec.XYZ() );
-			}
-
-			// get the quaternion for interpolation
-			gp_Quaternion q12 = new gp_Quaternion( currentVec, nextVec );
-			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
-
-			// calculate new point attitude
-			gp_Quaternion q = new gp_Quaternion();
-			slerp.Interpolate( interpolatePercent, ref q );
-			gp_Trsf trsf = new gp_Trsf();
-			trsf.SetRotation( q );
-			gp_Dir resultDir = new gp_Dir( currentVec.Transformed( trsf ) );
-			return resultDir;
-		}
-
-		void InterpolateToolAndTangentVecBetween2CAMPoint( CAMPoint currentCAMPoint, CAMPoint nextCAMPoint, gp_Pnt point, out gp_Dir toolDir, out gp_Dir tangentDir )
-		{
-			toolDir = currentCAMPoint.ToolVec;
-			tangentDir = currentCAMPoint.CADPoint.TangentVec;
-
-			// get current and next tool vector
-			gp_Vec currentVec = new gp_Vec( currentCAMPoint.ToolVec );
-			gp_Vec nextVec = new gp_Vec( nextCAMPoint.ToolVec );
-
-			// get current and next tangent vector
-			gp_Vec currentTangentVec = new gp_Vec( currentCAMPoint.CADPoint.TangentVec );
-			gp_Vec nextTangentVec = new gp_Vec( nextCAMPoint.CADPoint.TangentVec );
-
-			// calculate new point percentage
-			double dDistanceOfCAMPath2Point = currentCAMPoint.CADPoint.Point.Distance( nextCAMPoint.CADPoint.Point );
-			double dDistanceBetweenCurrentPoint2NewPoint = currentCAMPoint.CADPoint.Point.Distance( point );
-
-			// two point overlap
-			if( dDistanceOfCAMPath2Point <= MyApp.PRECISION_MIN_ERROR ) {
-				return;
-			}
-			double interpolatePercent = dDistanceBetweenCurrentPoint2NewPoint / dDistanceOfCAMPath2Point;
-
-			// get new point dir
-			toolDir = InterpolateVecBetween2Vec( currentVec, nextVec, interpolatePercent );
-			tangentDir = InterpolateVecBetween2Vec( currentTangentVec, nextTangentVec, interpolatePercent );
-		}
-
-		#endregion
-
-		#region Lead function
-
-		void SetLeadIn()
-		{
-			m_LeadInCAMPointList.Clear();
-			if( m_CAMPointList.Count == 0 ) {
-				return;
-			}
-			switch( m_CraftData.LeadLineParam.LeadIn.Type ) {
-				case LeadLineType.Line:
-					m_LeadInCAMPointList = LeadHelper.BuildStraightLeadLine( m_CAMPointList.First(), true, m_CraftData.LeadLineParam.LeadIn.Length, m_CraftData.LeadLineParam.LeadIn.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse );
-					break;
-				case LeadLineType.Arc:
-					m_LeadInCAMPointList = LeadHelper.BuildArcLeadLine( m_CAMPointList.First(), true, m_CraftData.LeadLineParam.LeadIn.Length, m_CraftData.LeadLineParam.LeadIn.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse, MyApp.PRECISION_DEFLECTION, MyApp.PRECISION_MAX_LENGTH );
-					break;
-				default:
-					break;
-			}
-		}
-
-		void SetLeadout()
-		{
-			m_LeadOutCAMPointList.Clear();
-			if( m_CAMPointList.Count == 0 ) {
-				return;
-			}
-
-			// with over cut means lead out first point is over cut last point
-			CAMPoint leadOutStartPoint;
-			if( m_CraftData.OverCutLength > 0 && m_OverCutPointList.Count > 0 ) {
-				leadOutStartPoint = m_OverCutPointList.Last();
-			}
-			else {
-				leadOutStartPoint = m_CAMPointList.Last();
-			}
-			switch( m_CraftData.LeadLineParam.LeadOut.Type ) {
-				case LeadLineType.Line:
-					m_LeadOutCAMPointList = LeadHelper.BuildStraightLeadLine( leadOutStartPoint, false, m_CraftData.LeadLineParam.LeadOut.Length, m_CraftData.LeadLineParam.LeadOut.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse );
-					break;
-				case LeadLineType.Arc:
-					m_LeadOutCAMPointList = LeadHelper.BuildArcLeadLine( leadOutStartPoint, false, m_CraftData.LeadLineParam.LeadOut.Length, m_CraftData.LeadLineParam.LeadOut.Angle, m_CraftData.LeadLineParam.IsChangeLeadDirection, m_CraftData.IsReverse, MyApp.PRECISION_DEFLECTION, MyApp.PRECISION_MAX_LENGTH );
-					break;
-				default:
-					break;
-			}
-		}
-
-		#endregion
-
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
+
+		// for CAM point connection
+		Dictionary<CAMPoint, CAMPoint> m_ConnectCAMPointMap = new Dictionary<CAMPoint, CAMPoint>();
 		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
@@ -526,6 +290,12 @@ namespace MyCAM.CacheInfo
 		// they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
 		List<CADPoint> m_CADPointList = new List<CADPoint>();
+
+		// for CAD point connection
+		Dictionary<CADPoint, CADPoint> m_ConnectCADPointMap = new Dictionary<CADPoint, CADPoint>();
+
+		// for index mapping
+		Dictionary<CAMPoint, int> m_CAMPointIndexMap = new Dictionary<CAMPoint, int>();
 
 		// flag to indicate craft data changed
 		bool m_IsCraftDataDirty = false;

@@ -4,7 +4,7 @@ using OCC.TopoDS;
 
 namespace MyCAM.Data
 {
-	internal interface IObject
+	public interface IObject
 	{
 		string UID
 		{
@@ -24,7 +24,7 @@ namespace MyCAM.Data
 		void DoTransform( gp_Trsf transform );
 	}
 
-	internal class PartObject : IObject
+	public class PartObject : IObject
 	{
 		public PartObject( string szUID, TopoDS_Shape shape )
 		{
@@ -100,7 +100,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal class PathEdge5D
+	public class PathEdge5D
 	{
 		public PathEdge5D( TopoDS_Edge pathEdge, TopoDS_Face componentFace )
 		{
