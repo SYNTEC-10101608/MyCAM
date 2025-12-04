@@ -1,6 +1,8 @@
 ﻿using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopoDS;
+using OCCTool;
+using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
@@ -22,6 +24,8 @@ namespace MyCAM.Data
 		}
 
 		void DoTransform( gp_Trsf transform );
+
+		void SewShape( double sewTol );
 	}
 
 	public class PartObject : IObject
@@ -50,9 +54,22 @@ namespace MyCAM.Data
 			}
 		}
 
+
+		public virtual void SewShape( double sewTol )
+		{
+			TopoDS_Shape result = ShapeTool.SewShape( new List<TopoDS_Shape>() { Shape }, sewTol );
+			if( result == null || result.IsNull() ) {
+				return;
+			}
+			Shape = result;
+		}
+
 		public virtual void DoTransform( gp_Trsf transform )
 		{
 			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
+			if( !shapeTransform.IsDone() ) {
+				return;
+			}
 			Shape = shapeTransform.Shape();
 		}
 	}
@@ -93,9 +110,21 @@ namespace MyCAM.Data
 			get;
 		}
 
+		public virtual void SewShape( double sewTol )
+		{
+			TopoDS_Shape result = ShapeTool.SewShape( new List<TopoDS_Shape>() { Shape }, sewTol );
+			if( result == null || result.IsNull() ) {
+				return;
+			}
+			Shape = result;
+		}
+
 		public virtual void DoTransform( gp_Trsf transform )
 		{
 			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
+			if( !shapeTransform.IsDone() ) {
+				return;
+			}
 			Shape = shapeTransform.Shape();
 		}
 	}
