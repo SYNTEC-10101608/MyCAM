@@ -1,26 +1,19 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.gp;
+using PostTool.Interop;
+using System;
 
 namespace MyCAM.Post
 {
-	// P/INVOKE from C++ PostTool.dll
-	internal static class IKSolverInterop
+	/// <summary>
+	/// Constants for IK/FK solver
+	/// </summary>
+	internal static class SolverConstants
 	{
-		[DllImport( "PostTool.dll", CallingConvention = CallingConvention.StdCall )]
-		public static extern int IKSolver_IJKtoMS(
-			double[] ToolDirection,
-			double[] ToolDirectionAtZero,
-			double[] DirectOfFirstRotAxis,
-			double[] DirectOfSecondRotAxis,
-			double LastMasterRotAngle,
-			double LastSlaveRotAngle,
-			out double MRotAngle1,
-			out double SRotAngle1,
-			out double MRotAngle2,
-			out double SRotAngle2
-		);
+		/// <summary>
+		/// IU (Internal Unit) to BLU (Base Length Unit) conversion factor for rotary axes
+		/// </summary>
+		public const double IU_TO_BLU_ROTARY = 1000.0;
 	}
 
 	public enum IKSolveResult
@@ -68,8 +61,8 @@ namespace MyCAM.Post
 
 			// calculate the M and S angle
 			double[] ToolDirection = new double[ 3 ] { toolVec_In.X(), toolVec_In.Y(), toolVec_In.Z() };
-			int solveResult = IKSolverInterop.IKSolver_IJKtoMS( ToolDirection, m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir,
-				dM_In, dS_In, out double dM1, out double dS1, out double dM2, out double dS2 );
+			int solveResult = FiveAxisSolver.IJKtoMS( ToolDirection, m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir,
+				dM_In, dS_In, out double dM1, out double dS1, out double dM2, out double dS2, SolverConstants.IU_TO_BLU_ROTARY );
 
 			// master has infinite solution
 			if( solveResult == (int)IKSolveResult.MasterInfinityOfSolution ) {
