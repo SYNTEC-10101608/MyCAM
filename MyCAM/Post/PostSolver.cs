@@ -10,10 +10,8 @@ namespace MyCAM.Post
 	/// </summary>
 	internal static class SolverConstants
 	{
-		/// <summary>
-		/// IU (Internal Unit) to BLU (Base Length Unit) conversion factor for rotary axes
-		/// </summary>
-		public const double IU_TO_BLU_ROTARY = 1000.0;
+		// we are not using different system, so just set it to 1
+		public const double IU_TO_BLU_ROTARY = 1;
 	}
 
 	public enum IKSolveResult
@@ -23,7 +21,7 @@ namespace MyCAM.Post
 		MasterInfinityOfSolution = 2,
 		SlaveInfinityOfSolution = 3,
 		InvalidInput = 4,
-
+		OutOfRange = 5,
 	}
 
 	/// <summary>
@@ -106,7 +104,9 @@ namespace MyCAM.Post
 				SolverConstants.IU_TO_BLU_ROTARY );
 
 			if( chooseResult != (int)IKSolveResult.NoError ) {
-				return (IKSolveResult)chooseResult;
+
+				// solvanle but can not choose a valid solution within range
+				return IKSolveResult.OutOfRange;
 			}
 			return IKSolveResult.NoError;
 		}
