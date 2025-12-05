@@ -12,7 +12,7 @@ using namespace Eigen;
 #define MIN_EPSILON_THRESHOLD		( DBL_EPSILON * 1.0e6 )
 #define EPSILON_double				( DBL_EPSILON * 1.0e6 )
 #define FIVEAXIS_SOL_TOL			( 0.001 )
-#define REACHABLE_EPSILON			( 1.0e-6 )
+#define REACHABLE_EPSILON			( 0.001 )
 
 namespace PostTool
 {
