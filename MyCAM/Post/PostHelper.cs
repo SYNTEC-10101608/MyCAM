@@ -236,7 +236,7 @@ namespace MyCAM.Post
 			// solve IK
 			List<Tuple<double, double>> rotateAngleList = new List<Tuple<double, double>>();
 			List<bool> singularTagList = new List<bool>();
-			foreach( CAMPoint point in pointList ) {
+			foreach( IProcessPoint point in pointList ) {
 				IKSolveResult ikResult = postSolver.SolveIK( point, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
 				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
 					return false;
@@ -278,7 +278,7 @@ namespace MyCAM.Post
 			}
 
 			// build G54 points
-			foreach( CAMPoint point in camPointList ) {
+			foreach( IProcessPoint point in camPointList ) {
 				PostPoint g54Point = new PostPoint()
 				{
 					X = point.Point.X(),

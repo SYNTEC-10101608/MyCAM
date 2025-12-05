@@ -23,6 +23,7 @@ namespace MyCAM.Post
 		MasterInfinityOfSolution = 2,
 		SlaveInfinityOfSolution = 3,
 		InvalidInput = 4,
+
 	}
 
 	/// <summary>
@@ -326,11 +327,11 @@ namespace MyCAM.Post
 			m_IKSolver = solverBuilder.BuildIKSolver();
 		}
 
-		public IKSolveResult SolveIK( CAMPoint point, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
+		public IKSolveResult SolveIK( IProcessPoint point, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
 		{
 			dM_Out = 0;
 			dS_Out = 0;
-			if( point == null ) {
+			if( point == null || point.ToolVec == null ) {
 				return IKSolveResult.InvalidInput;
 			}
 
