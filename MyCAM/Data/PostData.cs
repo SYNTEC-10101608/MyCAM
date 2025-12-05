@@ -65,6 +65,43 @@ namespace MyCAM.Data
 		}
 	}
 
+	internal class StandardPatternPostData
+	{
+		public PostPoint RefPoint
+		{
+			get; set;
+		}
+
+		public PostPoint StartPoint
+		{
+			get; set;
+		}
+
+		// lift up of previous path, null meaning lift up distance is 0
+		public PostPoint LiftUpPostPoint
+		{
+			get; set;
+		}
+
+		// cut down of current path, null meaning cut down distance is 0
+		public PostPoint CutDownPostPoint
+		{
+			get; set;
+		}
+
+		public double FollowSafeDistance
+		{
+			get; set;
+		}
+
+		// the center and end point of frog leap
+		public PostPoint FrogLeapMidPostPoint
+		{
+			get; set;
+		}
+
+	}
+
 	internal class PostPoint
 	{
 		public double X
@@ -103,4 +140,6 @@ namespace MyCAM.Data
 			return newPoint;
 		}
 	}
+
+
 }

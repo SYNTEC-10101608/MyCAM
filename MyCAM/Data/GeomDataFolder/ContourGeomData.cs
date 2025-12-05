@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
-	public class ContourGeomData
+	public class ContourGeomData : IGeomData
 	{
 		public ContourGeomData( string szUID, List<PathEdge5D> pathDataList, bool isClosed )
 		{
@@ -38,6 +38,14 @@ namespace MyCAM.Data
 			get; private set;
 		}
 
+		public PathType PathType
+		{
+			get
+			{
+				return PathType.Contour;
+			}
+		}
+
 		public List<CADPoint> CADPointList
 		{
 			get
@@ -62,6 +70,11 @@ namespace MyCAM.Data
 			foreach( var oneConnectPoint in m_ConnectPointMap ) {
 				oneConnectPoint.Value.Transform( transform );
 			}
+		}
+
+		public IGeomData Clone()
+		{
+			return new ContourGeomData( UID, m_CADPointList, m_ConnectPointMap );
 		}
 
 		List<CADPoint> m_CADPointList;

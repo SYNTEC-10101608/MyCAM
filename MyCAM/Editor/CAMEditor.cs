@@ -50,6 +50,7 @@ namespace MyCAM.Editor
 		// to notice main form
 		public Action<EditableInfo> PathPropertyChanged;
 		public Action<EditActionType, EActionStatus> RaiseCAMActionStatusChange;
+		public Action<PathType> PathShapeTypeChanged;
 
 		// action with dialog need to disable main form
 		// because other action enterance might close this action, but without closing this form
@@ -386,6 +387,21 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetStandardPattern()
+		{
+			if( IsSameAction( EditActionType.SetPattern ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
+
+			PatternAction action = new PatternAction( m_DataManager, m_Viewer, m_ViewManager, szPathIDList );
+			action.PropertyChanged += OnPathShapeTypeChange;
+			StartEditAction( action );
+		}
+
 		#endregion
 
 		// sort API
@@ -530,7 +546,7 @@ namespace MyCAM.Editor
 				if( !GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) ) {
 					continue;
 				}
-				if( !( cacheInfo as ContourCacheInfo ).IsClosed ) {
+				if( !( cacheInfo is ContourCacheInfo ) || !( cacheInfo as ContourCacheInfo ).IsClosed ) {
 					editableInfo.IsStartPointEditable = false;
 					editableInfo.IsOverCutEditable = false;
 					editableInfo.IsLeadLineEditable = false;
@@ -538,6 +554,11 @@ namespace MyCAM.Editor
 				}
 			}
 			PathPropertyChanged?.Invoke( editableInfo );
+		}
+
+		void OnPathShapeTypeChange( PathType type, List<string> szPathIDList )
+		{
+			PathShapeTypeChanged?.Invoke( type );
 		}
 
 		#region Show CAM

@@ -1,11 +1,11 @@
-﻿using MyCAM.CacheInfo;
-using OCC.gp;
+﻿using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -295,6 +295,29 @@ namespace MyCAM.Data
 			}
 			return string.Empty;
 		}
+
+		public Dictionary<string, PathObject> GetPathObjectDictionary()
+		{
+			return ObjectMap.Values.OfType<PathObject>().ToDictionary( obj => obj.UID );
+		}
+
+		public IGeomData GetGeomDataByID( string pathID )
+		{
+			Dictionary<string, PathObject> pathObjectList = GetPathObjectDictionary();
+			if( pathObjectList.TryGetValue( pathID, out PathObject pathObject ) ) {
+				switch( pathObject.PathType ) {
+					case PathType.Circle:
+						return ( pathObject as CirclePathObject ).CircleGeomData;
+					case PathType.Rectangle:
+						return ( pathObject as RectanglePathObject ).RectangleGeomData;
+					case PathType.Contour:
+					default:
+						return ( pathObject as ContourPathObject ).ContourGeomData;
+				}
+			}
+			return null;
+		}
+
 
 		void ResetShapeIDs()
 		{

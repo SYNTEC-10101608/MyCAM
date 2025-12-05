@@ -1,5 +1,6 @@
 ﻿using MyCAM.CacheInfo;
 using MyCAM.Data;
+using MyCAM.Data.GeomDataFolder;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -47,16 +48,29 @@ namespace MyCAM.Post
 
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
+					Dictionary<string, PathObject> pathObjectDict = m_DataManager.GetPathObjectDictionary();
 					for( int i = 0; i < m_PathIDList.Count; i++ ) {
 
-						// solve all post data of the path
-						if( !PostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
-							endInfoOfPreviousPath, m_EntryAndExitData,
-							out PostData postData, out endInfoOfPreviousPath ) ) {
-							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
-							return false;
+						if( pathObjectDict[ m_PathIDList[ i ] ].PathType == PathType.Contour ) {
+
+							// solve all post data of the path
+							if( !PostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
+								endInfoOfPreviousPath, m_EntryAndExitData,
+								out PostData postData, out endInfoOfPreviousPath ) ) {
+								errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
+								return false;
+							}
+							WriteCutting( postData, i + 1 );
 						}
-						WriteCutting( postData, i + 1 );
+						else {
+							StandardPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
+							if( !StandardPatternPostHelper.SolvePath( m_PostSolver, package, endInfoOfPreviousPath, m_EntryAndExitData,
+								out StandardPatternPostData postData, out endInfoOfPreviousPath ) ) {
+								errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
+								return false;
+							}
+							WriteStandardPatternCutting( postData, package.CraftData, i + 1, pathObjectDict[ m_PathIDList[ i ] ].PathType );
+						}
 					}
 
 					// write exit
@@ -99,6 +113,62 @@ namespace MyCAM.Post
 			// end cutting
 			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" );
 			return;
+		}
+
+		void WriteStandardPatternCutting( StandardPatternPostData currentPathPostData, CraftData craftData, int N_Index, PathType type )
+		{
+			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
+			m_StreamWriter.WriteLine( "N" + N_Index );
+			WriteStandardPatternTraverse( currentPathPostData );
+			switch( type ) {
+				case PathType.Circle:
+					CircleGeomData circleGeomData = m_DataManager.GetGeomDataByID( m_PathIDList[ N_Index - 1 ] ) as CircleGeomData;
+					WriteStandardPatternCircleCutting( currentPathPostData, craftData, circleGeomData );
+					break;
+				case PathType.Rectangle:
+					RectangleGeomData rectangleGeomData = m_DataManager.GetGeomDataByID( m_PathIDList[ N_Index - 1 ] ) as RectangleGeomData;
+					WriteStandardPatternRectangleCutting( currentPathPostData, craftData, rectangleGeomData );
+					break;
+			}
+		}
+
+		void WriteStandardPatternCircleCutting( StandardPatternPostData currentPathPostData, CraftData craftData, CircleGeomData circleGeomData )
+		{
+			double linearLeadInLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Line ? craftData.LeadLineParam.LeadIn.Length : 0;
+			double ArcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
+			m_StreamWriter.WriteLine( "G65 P\"SY_CIRC\"" +
+				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
+				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
+				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
+				" " + m_MasterAxisName + ( currentPathPostData.RefPoint.Master / Math.PI * 180 ).ToString( "F2" ) +
+				" " + m_SlaveAxisName + ( currentPathPostData.RefPoint.Slave / Math.PI * 180 ).ToString( "F2" ) +
+				" D" + circleGeomData.Diameter.ToString( "F2" ) +
+				" E" + linearLeadInLength.ToString( "F2" ) +
+				" R" + ArcLeadOutLength.ToString( "F2" ) +
+				" Q" + circleGeomData.RotatedAngle_deg.ToString( "F2" ) +
+				" H1" +
+				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
+		}
+
+		void WriteStandardPatternRectangleCutting( StandardPatternPostData currentPathPostData, CraftData craftData, RectangleGeomData rectangleGeomData )
+		{
+			double linearLeadInLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Line ? craftData.LeadLineParam.LeadIn.Length : 0;
+			double ArcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
+			m_StreamWriter.WriteLine( "G65 P\"SY_RECT\"" +
+				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
+				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
+				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
+				" " + m_MasterAxisName + ( currentPathPostData.RefPoint.Master / Math.PI * 180 ).ToString( "F2" ) +
+				" " + m_SlaveAxisName + ( currentPathPostData.RefPoint.Slave / Math.PI * 180 ).ToString( "F2" ) +
+				" U" + rectangleGeomData.Length.ToString( "F2" ) +
+				" W" + rectangleGeomData.Width.ToString( "F2" ) +
+				" D" + rectangleGeomData.CornerRadius.ToString( "F2" ) +
+				" T" + ( craftData.StartPointIndex + 1 ).ToString() +
+				" E" + linearLeadInLength.ToString( "F2" ) +
+				" R" + ArcLeadOutLength.ToString( "F2" ) +
+				" Q" + rectangleGeomData.RotatedAngle_deg.ToString( "F2" ) +
+				" H1" +
+				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
 		}
 
 		void WriteOnePoint( PostPoint postPoint )
@@ -205,6 +275,40 @@ namespace MyCAM.Post
 			}
 		}
 
+		void WriteStandardPatternTraverse( StandardPatternPostData currentPathPostData )
+		{
+			// lift up
+			if( currentPathPostData.LiftUpPostPoint != null ) {
+				WriteOneLinearTraverse( currentPathPostData.LiftUpPostPoint );
+			}
+
+			// frog leap with cut down
+			if( currentPathPostData.FrogLeapMidPostPoint != null && currentPathPostData.CutDownPostPoint != null ) {
+				WriteOneFrogLeap( currentPathPostData.FrogLeapMidPostPoint, currentPathPostData.CutDownPostPoint );
+
+				// cut down
+				WriteOneLinearTraverse( currentPathPostData.StartPoint, currentPathPostData.FollowSafeDistance );
+			}
+
+			// form leap without cut down
+			else if( currentPathPostData.FrogLeapMidPostPoint != null && currentPathPostData.CutDownPostPoint == null ) {
+				WriteOneFrogLeap( currentPathPostData.FrogLeapMidPostPoint, currentPathPostData.StartPoint, currentPathPostData.FollowSafeDistance );
+			}
+
+			// no frog leap
+			else if( currentPathPostData.FrogLeapMidPostPoint == null && currentPathPostData.CutDownPostPoint != null ) {
+				WriteOneLinearTraverse( currentPathPostData.CutDownPostPoint );
+
+				// cut down
+				WriteOneLinearTraverse( currentPathPostData.StartPoint, currentPathPostData.FollowSafeDistance );
+			}
+
+			// no frog leap and no cut down
+			else {
+				WriteOneLinearTraverse( currentPathPostData.StartPoint, currentPathPostData.FollowSafeDistance );
+			}
+		}
+
 		string ConvertRotaryAxisName( RotaryAxis axis )
 		{
 			switch( axis ) {
@@ -243,6 +347,39 @@ namespace MyCAM.Post
 				contourCacheInfo.GetProcessEndPoint(),
 				contourCacheInfo.GetProcessEndPoint() );
 		}
+
+		StandardPatternNCPackage BuildPackageByID_StandardPattern( string szID )
+		{
+			if( !m_DataManager.ObjectMap.ContainsKey( szID )
+				|| m_DataManager.ObjectMap[ szID ].ObjectType != ObjectType.Path ) {
+				return null;
+			}
+			PathObject pathObject = m_DataManager.ObjectMap[ szID ] as PathObject;
+			if( pathObject.PathType == PathType.Contour ) {
+				return null;
+			}
+			switch( pathObject.PathType ) {
+				case PathType.Circle: {
+						CirclePathObject circlePathObject = pathObject as CirclePathObject;
+						CircleCacheInfo circleCacheInfo = circlePathObject.CircleCacheInfo;
+						return new StandardPatternNCPackage(
+							circleCacheInfo.GetProcessRefPoint(),
+							circleCacheInfo.StartPointList[ circlePathObject.CraftData.StartPointIndex ],
+							circlePathObject.CraftData );
+					}
+				case PathType.Rectangle: {
+						RectanglePathObject rectanglePathObject = pathObject as RectanglePathObject;
+						RectangleCacheInfo rectangleCacheInfo = rectanglePathObject.RectangleCacheInfo;
+
+						return new StandardPatternNCPackage(
+							rectangleCacheInfo.GetProcessRefPoint(),
+							rectangleCacheInfo.StartPointList[ rectanglePathObject.CraftData.StartPointIndex ],
+							rectanglePathObject.CraftData );
+					}
+			}
+			return null;
+		}
+
 
 		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";
 	}

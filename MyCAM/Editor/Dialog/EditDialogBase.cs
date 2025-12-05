@@ -13,7 +13,7 @@ namespace MyCAM.Editor
 		// events
 		public Action<TEditDataType> Preview;
 		public Action<TEditDataType> Confirm;
-		public Action Cancel;
+		public System.Action Cancel;
 
 		protected virtual void RaisePreview( TEditDataType data )
 		{

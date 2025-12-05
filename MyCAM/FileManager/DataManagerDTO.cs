@@ -304,7 +304,7 @@ namespace MyCAM.FileManager
 			ObjectType = ObjectType.Path;
 			PathType = PathType.Contour;
 			if( pathObject is ContourPathObject contourPathObject ) {
-				GeomData = new ContourGeomDataDTO( contourPathObject.GeomData );
+				GeomData = new ContourGeomDataDTO( contourPathObject.ContourGeomData );
 			}
 			else {
 				GeomData = new ContourGeomDataDTO();

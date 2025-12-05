@@ -22,9 +22,9 @@ namespace MyCAM.Data
 			}
 
 			bool isClosed = DetermineIfClosed( shape );
-			m_GeomData = new ContourGeomData( szUID, pathDataList, isClosed );
+			m_ContourGeomData = new ContourGeomData( szUID, pathDataList, isClosed );
 			m_CraftData = new CraftData( szUID );
-			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_GeomData, m_CraftData, isClosed );
+			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_ContourGeomData, m_CraftData, isClosed );
 		}
 
 		// this is for the file read constructor
@@ -35,16 +35,16 @@ namespace MyCAM.Data
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
 			bool isClosed = DetermineIfClosed( shape );
-			m_GeomData = geomData;
+			m_ContourGeomData = geomData;
 			m_CraftData = craftData;
-			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_GeomData, m_CraftData, isClosed );
+			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_ContourGeomData, m_CraftData, isClosed );
 		}
 
-		public ContourGeomData GeomData
+		public ContourGeomData ContourGeomData
 		{
 			get
 			{
-				return m_GeomData;
+				return m_ContourGeomData;
 			}
 		}
 
@@ -79,7 +79,7 @@ namespace MyCAM.Data
 			base.DoTransform( transform );
 
 			// Step2:then transform the geom data
-			m_GeomData.DoTransform( transform );
+			m_ContourGeomData.DoTransform( transform );
 
 			// Step3:recalculate cache info
 			m_ContourCacheInfo.DoTransform();
@@ -106,7 +106,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		ContourGeomData m_GeomData;
+		ContourGeomData m_ContourGeomData;
 		CraftData m_CraftData;
 		ContourCacheInfo m_ContourCacheInfo;
 	}

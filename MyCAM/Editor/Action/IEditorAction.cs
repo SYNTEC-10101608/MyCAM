@@ -36,6 +36,7 @@ namespace MyCAM.Editor
 		OverCut,
 		SetTraverseParam,
 		SetEntryAndExitParam,
+		SetPattern,
 
 		// File
 		ImportProjectFile,
