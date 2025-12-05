@@ -31,7 +31,9 @@ namespace MyCAM.Post
 	/// </summary>
 	internal class IKSolver
 	{
-		public IKSolver( gp_Dir toolDir, gp_Dir masterRotateDir, gp_Dir slaveRotateDir, bool isReverseMS )
+		public IKSolver( gp_Dir toolDir, gp_Dir masterRotateDir, gp_Dir slaveRotateDir, bool isReverseMS,
+			double masterAxisStart = 0, double masterAxisEnd = 0,
+			double slaveAxisStart = 0, double slaveAxisEnd = 0 )
 		{
 			// give a defaul Z dir BC type
 			if( toolDir == null ) {
@@ -47,6 +49,10 @@ namespace MyCAM.Post
 			m_MasterRotateDir = new double[ 3 ] { masterRotateDir.X(), masterRotateDir.Y(), masterRotateDir.Z() };
 			m_SlaveRotateDir = new double[ 3 ] { slaveRotateDir.X(), slaveRotateDir.Y(), slaveRotateDir.Z() };
 			m_isReverseMS = isReverseMS;
+			m_MasterAxisStart = masterAxisStart;
+			m_MasterAxisEnd = masterAxisEnd;
+			m_SlaveAxisStart = slaveAxisStart;
+			m_SlaveAxisEnd = slaveAxisEnd;
 		}
 
 		// the angle for spindle is right-handed, for table is left-handed
@@ -85,18 +91,21 @@ namespace MyCAM.Post
 				return IKSolveResult.NoSolution;
 			}
 
-			// the system is solvable, choose the closest solution
-			dM1 = FindClosetCoterminalAngle( dM_In, dM1 );
-			dM2 = FindClosetCoterminalAngle( dM_In, dM2 );
-			double diff1 = Math.Abs( dM_In - dM1 ) + Math.Abs( dS_In - dS1 );
-			double diff2 = Math.Abs( dM_In - dM2 ) + Math.Abs( dS_In - dS2 );
-			if( diff1 < diff2 ) {
-				dM_Out = dM1;
-				dS_Out = dS1;
-			}
-			else {
-				dM_Out = dM2;
-				dS_Out = dS2;
+			// the system is solvable, choose the best solution using FiveAxisSolver.ChooseSolution
+			// Note: Rotation directions are fixed to 1 (right-hand) for both axes
+			int chooseResult = FiveAxisSolver.ChooseSolution(
+				dM1, dS1, dM2, dS2,
+				dM_In, dS_In,
+				out dM_Out, out dS_Out,
+				SolutionType.ShortestDist,
+				m_MasterAxisStart, m_MasterAxisEnd,
+				m_SlaveAxisStart, m_SlaveAxisEnd,
+				1,  // Master axis rotation direction (right-hand)
+				1,  // Slave axis rotation direction (right-hand)
+				SolverConstants.IU_TO_BLU_ROTARY );
+
+			if( chooseResult != (int)IKSolveResult.NoError ) {
+				return (IKSolveResult)chooseResult;
 			}
 			return IKSolveResult.NoError;
 		}
@@ -109,43 +118,17 @@ namespace MyCAM.Post
 			}
 		}
 
-		double FindClosetCoterminalAngle( double dM_In, double dM )
-		{
-			// case when they are originally coterminal
-			if( Math.Abs( dM_In - dM ) % ( 2 * Math.PI ) < 1e-6 ) {
-				return dM_In;
-			}
-
-			// find the closest coterminal angle
-			double valueP;
-			double valueN;
-			if( dM < dM_In ) {
-				valueP = dM;
-				while( valueP < dM_In ) {
-					valueP += 2 * Math.PI;
-				}
-				valueN = valueP - 2 * Math.PI;
-			}
-			else {
-				valueN = dM;
-				while( valueN > dM_In ) {
-					valueN -= 2 * Math.PI;
-				}
-				valueP = valueN + 2 * Math.PI;
-			}
-			if( Math.Abs( dM_In - valueP ) < Math.Abs( dM_In - valueN ) ) {
-				return valueP;
-			}
-			else {
-				return valueN;
-			}
-		}
-
 		// machine properties
 		double[] m_ToolDir;
 		double[] m_MasterRotateDir;
 		double[] m_SlaveRotateDir;
 		bool m_isReverseMS;
+
+		// axis limits (0,0 means no limit)
+		double m_MasterAxisStart;
+		double m_MasterAxisEnd;
+		double m_SlaveAxisStart;
+		double m_SlaveAxisEnd;
 	}
 
 	internal interface FKSolver
