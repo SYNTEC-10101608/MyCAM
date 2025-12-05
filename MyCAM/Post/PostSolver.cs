@@ -30,9 +30,9 @@ namespace MyCAM.Post
 	/// </summary>
 	internal class IKSolver
 	{
-		public IKSolver( gp_Dir toolDir, gp_Dir masterRotateDir, gp_Dir slaveRotateDir, bool isReverseMS,
-			double masterAxisStart = 0, double masterAxisEnd = 0,
-			double slaveAxisStart = 0, double slaveAxisEnd = 0 )
+		public IKSolver( gp_Dir toolDir, gp_Dir masterRotateDir, gp_Dir slaveRotateDir,
+			double masterAxisStart_deg, double masterAxisEnd_deg,
+			double slaveAxisStart_deg, double slaveAxisEnd_deg, bool isReverseMS )
 		{
 			// give a defaul Z dir BC type
 			if( toolDir == null ) {
@@ -48,10 +48,10 @@ namespace MyCAM.Post
 			m_MasterRotateDir = new double[ 3 ] { masterRotateDir.X(), masterRotateDir.Y(), masterRotateDir.Z() };
 			m_SlaveRotateDir = new double[ 3 ] { slaveRotateDir.X(), slaveRotateDir.Y(), slaveRotateDir.Z() };
 			m_isReverseMS = isReverseMS;
-			m_MasterAxisStart = masterAxisStart;
-			m_MasterAxisEnd = masterAxisEnd;
-			m_SlaveAxisStart = slaveAxisStart;
-			m_SlaveAxisEnd = slaveAxisEnd;
+			m_MasterAxisStart = masterAxisStart_deg * Math.PI / 180.0;
+			m_MasterAxisEnd = masterAxisEnd_deg * Math.PI / 180.0;
+			m_SlaveAxisStart = slaveAxisStart_deg * Math.PI / 180.0;
+			m_SlaveAxisEnd = slaveAxisEnd_deg * Math.PI / 180.0;
 		}
 
 		// the angle for spindle is right-handed, for table is left-handed
@@ -430,7 +430,9 @@ namespace MyCAM.Post
 
 		public override IKSolver BuildIKSolver()
 		{
-			return new IKSolver( m_MachineData.ToolDir, m_MachineData.MasterRotateDir, m_MachineData.SlaveRotateDir, false );
+			return new IKSolver( m_MachineData.ToolDir, m_MachineData.MasterRotateDir, m_MachineData.SlaveRotateDir,
+				m_MachineData.MasterAxisStart_deg, m_MachineData.MasterAxisEnd_deg,
+				m_MachineData.SlaveAxisStart_deg, m_MachineData.SlaveAxisEnd_deg, false );
 		}
 	}
 
@@ -455,7 +457,9 @@ namespace MyCAM.Post
 		public override IKSolver BuildIKSolver()
 		{
 			// for table type, just exchange the master and slave axis
-			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir, true );
+			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir,
+				m_MachineData.SlaveAxisStart_deg, m_MachineData.SlaveAxisEnd_deg,
+				m_MachineData.MasterAxisStart_deg, m_MachineData.MasterAxisEnd_deg, true );
 		}
 	}
 
@@ -480,7 +484,9 @@ namespace MyCAM.Post
 		public override IKSolver BuildIKSolver()
 		{
 			// for mix type, just exchange the master and slave axis
-			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir, true );
+			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir,
+				m_MachineData.SlaveAxisStart_deg, m_MachineData.SlaveAxisEnd_deg,
+				m_MachineData.MasterAxisStart_deg, m_MachineData.MasterAxisEnd_deg, true );
 		}
 	}
 }
