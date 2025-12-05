@@ -49,9 +49,10 @@ namespace MyCAM.Post
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
 					Dictionary<string, PathObject> pathObjectDict = m_DataManager.GetPathObjectDictionary();
+					PathType pathType;
 					for( int i = 0; i < m_PathIDList.Count; i++ ) {
-
-						if( pathObjectDict[ m_PathIDList[ i ] ].PathType == PathType.Contour ) {
+						pathType = pathObjectDict[ m_PathIDList[ i ] ].PathType;
+						if( pathType == PathType.Contour ) {
 
 							// solve all post data of the path
 							if( !PostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
@@ -69,7 +70,8 @@ namespace MyCAM.Post
 								errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 								return false;
 							}
-							WriteStandardPatternCutting( postData, package.CraftData, i + 1, pathObjectDict[ m_PathIDList[ i ] ].PathType );
+							IGeomData geomData = DataGettingHelper.GetGeomDataByID( m_PathIDList[ i ] );
+							WriteStandardPatternCutting( pathType, postData, package.CraftData, geomData, i + 1 );
 						}
 					}
 
@@ -115,18 +117,18 @@ namespace MyCAM.Post
 			return;
 		}
 
-		void WriteStandardPatternCutting( StandardPatternPostData currentPathPostData, CraftData craftData, int N_Index, PathType type )
+		void WriteStandardPatternCutting( PathType type, StandardPatternPostData currentPathPostData, CraftData craftData, IGeomData geomData, int N_Index )
 		{
 			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
 			m_StreamWriter.WriteLine( "N" + N_Index );
 			WriteStandardPatternTraverse( currentPathPostData );
 			switch( type ) {
 				case PathType.Circle:
-					CircleGeomData circleGeomData = m_DataManager.GetGeomDataByID( m_PathIDList[ N_Index - 1 ] ) as CircleGeomData;
+					CircleGeomData circleGeomData = geomData as CircleGeomData;
 					WriteStandardPatternCircleCutting( currentPathPostData, craftData, circleGeomData );
 					break;
 				case PathType.Rectangle:
-					RectangleGeomData rectangleGeomData = m_DataManager.GetGeomDataByID( m_PathIDList[ N_Index - 1 ] ) as RectangleGeomData;
+					RectangleGeomData rectangleGeomData = geomData as RectangleGeomData;
 					WriteStandardPatternRectangleCutting( currentPathPostData, craftData, rectangleGeomData );
 					break;
 			}
@@ -370,7 +372,6 @@ namespace MyCAM.Post
 				case PathType.Rectangle: {
 						RectanglePathObject rectanglePathObject = pathObject as RectanglePathObject;
 						RectangleCacheInfo rectangleCacheInfo = rectanglePathObject.RectangleCacheInfo;
-
 						return new StandardPatternNCPackage(
 							rectangleCacheInfo.GetProcessRefPoint(),
 							rectangleCacheInfo.StartPointList[ rectanglePathObject.CraftData.StartPointIndex ],

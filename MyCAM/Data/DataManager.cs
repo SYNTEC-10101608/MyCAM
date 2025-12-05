@@ -301,23 +301,6 @@ namespace MyCAM.Data
 			return ObjectMap.Values.OfType<PathObject>().ToDictionary( obj => obj.UID );
 		}
 
-		public IGeomData GetGeomDataByID( string pathID )
-		{
-			Dictionary<string, PathObject> pathObjectList = GetPathObjectDictionary();
-			if( pathObjectList.TryGetValue( pathID, out PathObject pathObject ) ) {
-				switch( pathObject.PathType ) {
-					case PathType.Circle:
-						return ( pathObject as CirclePathObject ).CircleGeomData;
-					case PathType.Rectangle:
-						return ( pathObject as RectanglePathObject ).RectangleGeomData;
-					case PathType.Contour:
-					default:
-						return ( pathObject as ContourPathObject ).ContourGeomData;
-				}
-			}
-			return null;
-		}
-
 
 		void ResetShapeIDs()
 		{

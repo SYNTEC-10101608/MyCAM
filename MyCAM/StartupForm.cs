@@ -75,6 +75,7 @@ namespace MyCAM
 				m_DataManager = new DataManager();
 				MyApp.Logger.ShowOnLogPanel( "使用默認機構專案檔", MyApp.NoticeType.Warning );
 			}
+			DataGettingHelper.Initialize( m_DataManager );
 
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );

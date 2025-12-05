@@ -29,7 +29,7 @@ namespace MyCAM.Editor
 
 			m_PatternSettingInfoList = new List<PatternSettingInfo>();
 			foreach( string pathID in szPathIDList ) {
-				IGeomData geomData = dataManager.GetGeomDataByID( pathID );
+				IGeomData geomData = DataGettingHelper.GetGeomDataByID( pathID );
 				if( geomData == null ) {
 					continue;
 				}
