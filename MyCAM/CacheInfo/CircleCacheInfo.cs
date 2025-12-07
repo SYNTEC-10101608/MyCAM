@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
-	public class CircleCacheInfo : ICacheInfo
+	public class CircleCacheInfo : ICacheInfo, IStartPnt
 	{
 		public CircleCacheInfo( string szID, gp_Ax3 coordinateInfo, CircleGeomData circleGeomData, CraftData craftData )
 		{
@@ -97,6 +97,11 @@ namespace MyCAM.CacheInfo
 			}
 
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
+		}
+
+		public gp_Pnt GetMainPathStartPoint()
+		{
+			return m_StartPointList[ m_CraftData.StartPointIndex ].Point;
 		}
 
 		public bool IsClosed

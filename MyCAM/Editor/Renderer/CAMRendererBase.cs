@@ -48,5 +48,39 @@ namespace MyCAM.Editor.Renderer
 			contourCacheInfo = ( pathObject as ContourPathObject ).ContourCacheInfo;
 			return contourCacheInfo != null;
 		}
+
+		protected bool GetMainPathStartPnt( string szPathID, out IStartPnt pointGettable )
+		{
+			pointGettable = null;
+			if( string.IsNullOrEmpty( szPathID )
+				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
+				|| m_DataManager.ObjectMap[ szPathID ] == null
+				|| m_DataManager.ObjectMap[ szPathID ].ObjectType != ObjectType.Path ) {
+				return false;
+			}
+
+			PathObject pathObject = m_DataManager.GetPathObjectDictionary()[ szPathID ];
+			switch( pathObject.PathType ) {
+				case PathType.Circle:
+					if( pathObject is CirclePathObject circlePathObject ) {
+						pointGettable = circlePathObject.CircleCacheInfo;
+						return true;
+					}
+					return false;
+				case PathType.Rectangle:
+					if( pathObject is RectanglePathObject rectanglePathObject ) {
+						pointGettable = rectanglePathObject.RectangleCacheInfo;
+						return true;
+					}
+					return false;
+				case PathType.Contour:
+				default:
+					if( pathObject is ContourPathObject contourPathObject ) {
+						pointGettable = contourPathObject.ContourCacheInfo;
+						return true;
+					}
+					return false;
+			}
+		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using OCC.gp;
 
 namespace MyCAM.CacheInfo
 {
@@ -12,5 +13,10 @@ namespace MyCAM.CacheInfo
 		CAMPoint GetProcessStartPoint();
 
 		CAMPoint GetProcessEndPoint();
+	}
+
+	internal interface IStartPnt
+	{
+		gp_Pnt GetMainPathStartPoint();
 	}
 }

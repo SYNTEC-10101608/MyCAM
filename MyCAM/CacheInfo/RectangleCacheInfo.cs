@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
-	public class RectangleCacheInfo : ICacheInfo
+	public class RectangleCacheInfo : ICacheInfo, IStartPnt
 	{
 		public RectangleCacheInfo( string szID, gp_Ax3 coordinateInfo, RectangleGeomData rectangleGeomData, CraftData craftData )
 		{
@@ -96,6 +96,11 @@ namespace MyCAM.CacheInfo
 			}
 
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
+		}
+
+		public gp_Pnt GetMainPathStartPoint()
+		{
+			return m_StartPointList[ m_CraftData.StartPointIndex ].Point;
 		}
 
 		public bool IsClosed

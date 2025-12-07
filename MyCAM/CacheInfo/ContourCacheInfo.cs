@@ -1,12 +1,13 @@
 ﻿using MyCAM.Data;
 using MyCAM.Helper;
+using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class ContourCacheInfo : ICacheInfo
+	public class ContourCacheInfo : ICacheInfo, IStartPnt
 	{
 		public ContourCacheInfo( string szID, ContourGeomData geomData, CraftData craftData, bool isClose )
 		{
@@ -115,6 +116,14 @@ namespace MyCAM.CacheInfo
 				camPoint = m_CAMPointList.Last().Clone();
 			}
 			return camPoint;
+		}
+
+		public gp_Pnt GetMainPathStartPoint()
+		{
+			if( m_CAMPointList == null || m_CAMPointList.Count == 0 ) {
+				return null;
+			}
+			return m_CAMPointList.First().Point.MakeCopy();
 		}
 		#endregion
 
