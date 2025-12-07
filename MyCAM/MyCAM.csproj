@@ -55,6 +55,7 @@
     <Compile Include="CacheInfo\CircleCacheInfo.cs" />
     <Compile Include="CacheInfo\ContourCacheInfo.cs" />
     <Compile Include="CacheInfo\RectangleCacheInfo.cs" />
+    <Compile Include="Data\DataGettingHelper.cs" />
     <Compile Include="Data\GeomDataFolder\CircleGeomData.cs" />
     <Compile Include="Data\GeomDataFolder\ContourGeomData.cs" />
     <Compile Include="Data\PathObjectFolder\CirclePathObject.cs" />
