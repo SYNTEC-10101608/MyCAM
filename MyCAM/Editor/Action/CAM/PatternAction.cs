@@ -1,6 +1,7 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Data.GeomDataFolder;
+using MyCAM.Data.PathObjectFolder;
 using MyCAM.Editor.Dialog;
 using MyCAM.Editor.Factory;
 using OCC.AIS;
@@ -130,6 +131,13 @@ namespace MyCAM.Editor
 					return new CirclePathObject( szID, shape, geomData as CircleGeomData, originalPathObject.CraftData, contourPathObject );
 				case PathType.Rectangle:
 					return new RectanglePathObject( szID, shape, geomData as RectangleGeomData, originalPathObject.CraftData, contourPathObject );
+				case PathType.Runway:
+					return new RunwayPathObject( szID, shape, geomData as RunwayGeomData, originalPathObject.CraftData, contourPathObject );
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					return new PolygonPathObject( szID, shape, geomData as PolygonGeomData, originalPathObject.CraftData, contourPathObject );
 				case PathType.Contour:
 				default:
 
@@ -151,6 +159,13 @@ namespace MyCAM.Editor
 					return ( pathObject as CirclePathObject ).ContourPathObject;
 				case PathType.Rectangle:
 					return ( pathObject as RectanglePathObject ).ContourPathObject;
+				case PathType.Runway:
+					return ( pathObject as RunwayPathObject ).ContourPathObject;
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					return ( pathObject as PolygonPathObject ).ContourPathObject;
 				case PathType.Contour:
 				default:
 					return pathObject as ContourPathObject;

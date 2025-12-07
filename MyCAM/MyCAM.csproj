@@ -54,10 +54,14 @@
   <ItemGroup>
     <Compile Include="CacheInfo\CircleCacheInfo.cs" />
     <Compile Include="CacheInfo\ContourCacheInfo.cs" />
+    <Compile Include="CacheInfo\PolygonCacheInfo.cs" />
     <Compile Include="CacheInfo\RectangleCacheInfo.cs" />
+    <Compile Include="CacheInfo\RunwayCacheInfo.cs" />
     <Compile Include="Data\DataGettingHelper.cs" />
     <Compile Include="Data\GeomDataFolder\CircleGeomData.cs" />
     <Compile Include="Data\GeomDataFolder\ContourGeomData.cs" />
+    <Compile Include="Data\GeomDataFolder\PolygonGeomData.cs" />
+    <Compile Include="Data\GeomDataFolder\RunwayGeomData.cs" />
     <Compile Include="Data\PathObjectFolder\CirclePathObject.cs" />
     <Compile Include="Data\PathObjectFolder\ContourPathObject.cs" />
     <Compile Include="Data\CraftData.cs" />
@@ -66,7 +70,9 @@
     <Compile Include="Data\GeomDataFolder\RectangleGeomData.cs" />
     <Compile Include="Data\MachineData.cs" />
     <Compile Include="Data\MachineDefine.cs" />
+    <Compile Include="Data\PathObjectFolder\PolygonPathObject.cs" />
     <Compile Include="Data\PathObjectFolder\RectanglePathObject.cs" />
+    <Compile Include="Data\PathObjectFolder\RunwayPathObject.cs" />
     <Compile Include="Data\PointData.cs" />
     <Compile Include="Data\PostData.cs" />
     <Compile Include="Data\TraverseData.cs" />

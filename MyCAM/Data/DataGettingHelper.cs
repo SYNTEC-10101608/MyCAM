@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MyCAM.Data.PathObjectFolder;
+using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
@@ -20,6 +21,13 @@ namespace MyCAM.Data
 						return ( pathObject as CirclePathObject ).CircleGeomData;
 					case PathType.Rectangle:
 						return ( pathObject as RectanglePathObject ).RectangleGeomData;
+					case PathType.Runway:
+						return ( pathObject as RunwayPathObject ).RunwayGeomData;
+					case PathType.Triangle:
+					case PathType.Square:
+					case PathType.Pentagon:
+					case PathType.Hexagon:
+						return ( pathObject as PolygonPathObject ).PolygonGeomData;
 					case PathType.Contour:
 					default:
 						return ( pathObject as ContourPathObject ).ContourGeomData;

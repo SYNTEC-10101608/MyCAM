@@ -1,6 +1,7 @@
 ﻿using MyCAM.CacheInfo;
 using MyCAM.Data;
 using MyCAM.Data.GeomDataFolder;
+using MyCAM.Data.PathObjectFolder;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -131,6 +132,19 @@ namespace MyCAM.Post
 					RectangleGeomData rectangleGeomData = geomData as RectangleGeomData;
 					WriteStandardPatternRectangleCutting( currentPathPostData, craftData, rectangleGeomData );
 					break;
+				case PathType.Runway:
+					RunwayGeomData runwayGeomData = geomData as RunwayGeomData;
+					WriteStandardPatternRunwayCutting( currentPathPostData, craftData, runwayGeomData );
+					break;
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					PolygonGeomData polygonGeomData = geomData as PolygonGeomData;
+					WriteStandardPatternPolygonCutting( currentPathPostData, craftData, polygonGeomData );
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -169,6 +183,47 @@ namespace MyCAM.Post
 				" E" + linearLeadInLength.ToString( "F2" ) +
 				" R" + ArcLeadOutLength.ToString( "F2" ) +
 				" Q" + rectangleGeomData.RotatedAngle_deg.ToString( "F2" ) +
+				" H1" +
+				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
+		}
+
+		void WriteStandardPatternRunwayCutting( StandardPatternPostData currentPathPostData, CraftData craftData, RunwayGeomData runwayGeomData )
+		{
+			double linearLeadInLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Line ? craftData.LeadLineParam.LeadIn.Length : 0;
+			double ArcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
+			m_StreamWriter.WriteLine( "G65 P\"SY_RUNWAY\"" +
+				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
+				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
+				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
+				" " + m_MasterAxisName + ( currentPathPostData.RefPoint.Master / Math.PI * 180 ).ToString( "F2" ) +
+				" " + m_SlaveAxisName + ( currentPathPostData.RefPoint.Slave / Math.PI * 180 ).ToString( "F2" ) +
+				" U" + runwayGeomData.Length.ToString( "F2" ) +
+				" W" + runwayGeomData.Width.ToString( "F2" ) +
+				" T" + ( craftData.StartPointIndex + 1 ).ToString() +
+				" E" + linearLeadInLength.ToString( "F2" ) +
+				" R" + ArcLeadOutLength.ToString( "F2" ) +
+				" Q" + runwayGeomData.RotatedAngle_deg.ToString( "F2" ) +
+				" H1" +
+				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
+		}
+
+		void WriteStandardPatternPolygonCutting( StandardPatternPostData currentPathPostData, CraftData craftData, PolygonGeomData polygonGeomData )
+		{
+			double linearLeadInLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Line ? craftData.LeadLineParam.LeadIn.Length : 0;
+			double ArcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
+			m_StreamWriter.WriteLine( "G65 P\"SY_POLYGON\"" +
+				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
+				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
+				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
+				" " + m_MasterAxisName + ( currentPathPostData.RefPoint.Master / Math.PI * 180 ).ToString( "F2" ) +
+				" " + m_SlaveAxisName + ( currentPathPostData.RefPoint.Slave / Math.PI * 180 ).ToString( "F2" ) +
+				" U" + polygonGeomData.Sides.ToString() +
+				" W" + polygonGeomData.SideLength.ToString( "F2" ) +
+				" D" + polygonGeomData.CornerRadius.ToString( "F2" ) +
+				" T" + ( craftData.StartPointIndex + 1 ).ToString() +
+				" E" + linearLeadInLength.ToString( "F2" ) +
+				" R" + ArcLeadOutLength.ToString( "F2" ) +
+				" Q" + polygonGeomData.RotatedAngle_deg.ToString( "F2" ) +
 				" H1" +
 				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
 		}
@@ -361,22 +416,40 @@ namespace MyCAM.Post
 				return null;
 			}
 			switch( pathObject.PathType ) {
-				case PathType.Circle: {
-						CirclePathObject circlePathObject = pathObject as CirclePathObject;
-						CircleCacheInfo circleCacheInfo = circlePathObject.CircleCacheInfo;
-						return new StandardPatternNCPackage(
-							circleCacheInfo.GetProcessRefPoint(),
-							circleCacheInfo.StartPointList[ circlePathObject.CraftData.StartPointIndex ],
-							circlePathObject.CraftData );
-					}
-				case PathType.Rectangle: {
-						RectanglePathObject rectanglePathObject = pathObject as RectanglePathObject;
-						RectangleCacheInfo rectangleCacheInfo = rectanglePathObject.RectangleCacheInfo;
-						return new StandardPatternNCPackage(
-							rectangleCacheInfo.GetProcessRefPoint(),
-							rectangleCacheInfo.StartPointList[ rectanglePathObject.CraftData.StartPointIndex ],
-							rectanglePathObject.CraftData );
-					}
+				case PathType.Circle:
+					CirclePathObject circlePathObject = pathObject as CirclePathObject;
+					CircleCacheInfo circleCacheInfo = circlePathObject.CircleCacheInfo;
+					return new StandardPatternNCPackage(
+						circleCacheInfo.GetProcessRefPoint(),
+						circleCacheInfo.StartPointList[ circlePathObject.CraftData.StartPointIndex ],
+						circlePathObject.CraftData );
+				case PathType.Rectangle:
+					RectanglePathObject rectanglePathObject = pathObject as RectanglePathObject;
+					RectangleCacheInfo rectangleCacheInfo = rectanglePathObject.RectangleCacheInfo;
+					return new StandardPatternNCPackage(
+						rectangleCacheInfo.GetProcessRefPoint(),
+						rectangleCacheInfo.StartPointList[ rectanglePathObject.CraftData.StartPointIndex ],
+						rectanglePathObject.CraftData );
+				case PathType.Runway:
+					RunwayPathObject runwayPathObject = pathObject as RunwayPathObject;
+					RunwayCacheInfo runwayCacheInfo = runwayPathObject.RunwayCacheInfo;
+					return new StandardPatternNCPackage(
+						runwayCacheInfo.GetProcessRefPoint(),
+						runwayCacheInfo.StartPointList[ runwayPathObject.CraftData.StartPointIndex ],
+						runwayPathObject.CraftData );
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					PolygonPathObject polygonPathObject = pathObject as PolygonPathObject;
+					PolygonCacheInfo polygonCacheInfo = polygonPathObject.PolygonCacheInfo;
+					return new StandardPatternNCPackage(
+						polygonCacheInfo.GetProcessRefPoint(),
+						polygonCacheInfo.StartPointList[ polygonPathObject.CraftData.StartPointIndex ],
+						polygonPathObject.CraftData );
+				default:
+					break;
+
 			}
 			return null;
 		}

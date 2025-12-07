@@ -1,0 +1,86 @@
+﻿namespace MyCAM.Data.GeomDataFolder
+{
+	public class RunwayGeomData : IGeomData, IRotatable
+	{
+		public RunwayGeomData( string szUID, double length, double width, double rotatedAngle_deg )
+		{
+			m_szUID = szUID;
+			m_Length = length;
+			m_Width = width;
+			m_RotatedAngle_deg = rotatedAngle_deg;
+		}
+
+		public RunwayGeomData( string szUID )
+		{
+			m_szUID = szUID;
+			m_Length = DEFAULT_LENGTH;
+			m_Width = DEFAULT_WIDTH;
+			m_RotatedAngle_deg = DEFAULT_ROTATED_ANGLE;
+		}
+
+		public string UID
+		{
+			get
+			{
+				return m_szUID;
+			}
+		}
+
+		public PathType PathType
+		{
+			get
+			{
+				return PathType.Runway;
+			}
+		}
+
+		public double Length
+		{
+			get
+			{
+				return m_Length;
+			}
+			set
+			{
+				m_Length = value;
+			}
+		}
+
+		public double Width
+		{
+			get
+			{
+				return m_Width;
+			}
+			set
+			{
+				m_Width = value;
+			}
+		}
+
+		public double RotatedAngle_deg
+		{
+			get
+			{
+				return m_RotatedAngle_deg;
+			}
+			set
+			{
+				m_RotatedAngle_deg = value;
+			}
+		}
+
+		public IGeomData Clone()
+		{
+			return new RunwayGeomData( m_szUID, m_Length, m_Width, m_RotatedAngle_deg );
+		}
+
+		public const double DEFAULT_LENGTH = 40.0;
+		public const double DEFAULT_WIDTH = 20.0;
+		public const double DEFAULT_ROTATED_ANGLE = 0.0;
+		double m_Length;
+		double m_Width;
+		double m_RotatedAngle_deg;
+		string m_szUID;
+	}
+}
