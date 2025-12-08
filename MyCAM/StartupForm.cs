@@ -591,6 +591,7 @@ namespace MyCAM
 			m_tsbMoveUp.Enabled = editableInfo.IsMoveProcessEditable;
 			m_tsbMoveDown.Enabled = editableInfo.IsMoveProcessEditable;
 			m_tsbAutoOrder.Enabled = editableInfo.IsAutoOrderEditable;
+			m_tsbReverse.Enabled = editableInfo.IsReverseEditable;
 		}
 
 		// path type change event

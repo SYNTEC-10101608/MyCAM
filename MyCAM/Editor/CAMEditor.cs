@@ -433,7 +433,9 @@ namespace MyCAM.Editor
 		public void AutoSortProcess()
 		{
 			// one shot edit, no multi edit supported
-			ValidateBeforeOneShotEdit( out List<string> szPathIDList, false );
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, false ) ) {
+				return;
+			}
 			string szStartPathID = szPathIDList[ 0 ];
 
 			// get start point
@@ -546,11 +548,16 @@ namespace MyCAM.Editor
 				if( !DataGettingHelper.GetGeomDataByID( szPathID, out IGeomData geomData ) ) {
 					continue;
 				}
-				if( !( geomData.PathType != PathType.Contour ) || !geomData.IsClosed ) {
+				if( !geomData.IsClosed ) {
 					editableInfo.IsStartPointEditable = false;
 					editableInfo.IsOverCutEditable = false;
 					editableInfo.IsLeadLineEditable = false;
 					break;
+				}
+
+				if( geomData.PathType != PathType.Contour ) {
+					editableInfo.IsReverseEditable = false;
+					editableInfo.IsToolVecEditable = false;
 				}
 			}
 			PathPropertyChanged?.Invoke( editableInfo );
@@ -558,6 +565,7 @@ namespace MyCAM.Editor
 
 		void OnPathShapeTypeChange( PathType type, List<string> szPathIDList )
 		{
+			ShowAllCAMData();
 			PathShapeTypeChanged?.Invoke( type );
 		}
 
