@@ -1,6 +1,5 @@
 using MyCAM.CacheInfo;
 using MyCAM.Data;
-using MyCAM.Data.PathObjectFolder;
 using OCCViewer;
 
 namespace MyCAM.Editor.Renderer
@@ -33,239 +32,67 @@ namespace MyCAM.Editor.Renderer
 			m_Viewer.UpdateView();
 		}
 
-		protected bool GetContourCacheInfoByID( string szPathID, out ContourCacheInfo contourCacheInfo )
+		bool TryGetPathObject( string szPathID, out PathObject pathObject )
 		{
-			contourCacheInfo = null;
+			pathObject = null;
 			if( string.IsNullOrEmpty( szPathID )
-				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
-				|| m_DataManager.ObjectMap[ szPathID ] == null
-				|| m_DataManager.ObjectMap[ szPathID ].ObjectType != ObjectType.Path ) {
+				|| !m_DataManager.GetPathObjectDictionary().ContainsKey( szPathID )
+				|| m_DataManager.GetPathObjectDictionary()[ szPathID ] == null ) {
 				return false;
 			}
-			PathObject pathObject = m_DataManager.ObjectMap[ szPathID ] as PathObject;
-			if( pathObject.PathType != PathType.Contour ) {
-				return false;
-			}
-			contourCacheInfo = ( pathObject as ContourPathObject ).ContourCacheInfo;
-			return contourCacheInfo != null;
+
+			pathObject = m_DataManager.ObjectMap[ szPathID ] as PathObject;
+			return pathObject != null;
 		}
 
 		protected bool GetStartPointCache( string szPathID, out IStartPointCache startPointCache )
 		{
 			startPointCache = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
-				|| m_DataManager.ObjectMap[ szPathID ] == null
-				|| m_DataManager.ObjectMap[ szPathID ].ObjectType != ObjectType.Path ) {
+			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
 				return false;
 			}
 
-			PathObject pathObject = m_DataManager.GetPathObjectDictionary()[ szPathID ];
-			switch( pathObject.PathType ) {
-				case PathType.Circle:
-					if( pathObject is CirclePathObject circlePathObject ) {
-						startPointCache = circlePathObject.CircleCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Rectangle:
-					if( pathObject is RectanglePathObject rectanglePathObject ) {
-						startPointCache = rectanglePathObject.RectangleCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Runway:
-					if( pathObject is RunwayPathObject runwayPathObject ) {
-						startPointCache = runwayPathObject.RunwayCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Triangle:
-				case PathType.Square:
-				case PathType.Pentagon:
-				case PathType.Hexagon:
-					if( pathObject is PolygonPathObject polygonPathObject ) {
-						startPointCache = polygonPathObject.PolygonCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Contour:
-				default:
-					if( pathObject is ContourPathObject contourPathObject ) {
-						startPointCache = contourPathObject.ContourCacheInfo;
-						return true;
-					}
-					return false;
-			}
+			return PathCacheProvider.TryGetStartPointCache( pathObject, out startPointCache );
 		}
 
 		protected bool GetLeadCache( string szPathID, out ILeadCache leadCache )
 		{
 			leadCache = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
-				|| m_DataManager.ObjectMap[ szPathID ] == null
-				|| m_DataManager.ObjectMap[ szPathID ].ObjectType != ObjectType.Path ) {
+			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
 				return false;
 			}
 
-			PathObject pathObject = m_DataManager.GetPathObjectDictionary()[ szPathID ];
-			switch( pathObject.PathType ) {
-				case PathType.Circle:
-					if( pathObject is CirclePathObject circlePathObject ) {
-						leadCache = circlePathObject.CircleCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Rectangle:
-					if( pathObject is RectanglePathObject rectanglePathObject ) {
-						leadCache = rectanglePathObject.RectangleCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Runway:
-					if( pathObject is RunwayPathObject runwayPathObject ) {
-						leadCache = runwayPathObject.RunwayCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Triangle:
-				case PathType.Square:
-				case PathType.Pentagon:
-				case PathType.Hexagon:
-					if( pathObject is PolygonPathObject polygonPathObject ) {
-						leadCache = polygonPathObject.PolygonCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Contour:
-				default:
-					if( pathObject is ContourPathObject contourPathObject ) {
-						leadCache = contourPathObject.ContourCacheInfo;
-						return true;
-					}
-					return false;
-			}
+			return PathCacheProvider.TryGetLeadCache( pathObject, out leadCache );
 		}
 
 		protected bool GetPathReverseCache( string szPathID, out IPathReverseCache pathReverseCache )
 		{
 			pathReverseCache = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
-				|| m_DataManager.ObjectMap[ szPathID ] == null
-				|| m_DataManager.ObjectMap[ szPathID ].ObjectType != ObjectType.Path ) {
+			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
 				return false;
 			}
 
-			PathObject pathObject = m_DataManager.GetPathObjectDictionary()[ szPathID ];
-			switch( pathObject.PathType ) {
-				case PathType.Circle:
-					if( pathObject is CirclePathObject circlePathObject ) {
-						pathReverseCache = circlePathObject.CircleCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Rectangle:
-					if( pathObject is RectanglePathObject rectanglePathObject ) {
-						pathReverseCache = rectanglePathObject.RectangleCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Runway:
-					if( pathObject is RunwayPathObject runwayPathObject ) {
-						pathReverseCache = runwayPathObject.RunwayCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Triangle:
-				case PathType.Square:
-				case PathType.Pentagon:
-				case PathType.Hexagon:
-					if( pathObject is PolygonPathObject polygonPathObject ) {
-						pathReverseCache = polygonPathObject.PolygonCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Contour:
-				default:
-					if( pathObject is ContourPathObject contourPathObject ) {
-						pathReverseCache = contourPathObject.ContourCacheInfo;
-						return true;
-					}
-					return false;
-			}
+			return PathCacheProvider.TryGetPathReverseCache( pathObject, out pathReverseCache );
 		}
 
 		protected bool GetToolVecCache( string szPathID, out IToolVecCache toolVecCache )
 		{
 			toolVecCache = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
-				|| m_DataManager.ObjectMap[ szPathID ] == null
-				|| m_DataManager.ObjectMap[ szPathID ].ObjectType != ObjectType.Path ) {
+			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
 				return false;
 			}
 
-			PathObject pathObject = m_DataManager.GetPathObjectDictionary()[ szPathID ];
-			switch( pathObject.PathType ) {
-				case PathType.Contour:
-				default:
-					if( pathObject is ContourPathObject contourPathObject ) {
-						toolVecCache = contourPathObject.ContourCacheInfo;
-						return true;
-					}
-					return false;
-			}
+			return PathCacheProvider.TryGetToolVecCache( pathObject, out toolVecCache );
 		}
 
 		protected bool GetOverCutCache( string szPathID, out IOverCutCache overCutCache )
 		{
 			overCutCache = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
-				|| m_DataManager.ObjectMap[ szPathID ] == null
-				|| m_DataManager.ObjectMap[ szPathID ].ObjectType != ObjectType.Path ) {
+			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
 				return false;
 			}
 
-			PathObject pathObject = m_DataManager.GetPathObjectDictionary()[ szPathID ];
-			switch( pathObject.PathType ) {
-				case PathType.Circle:
-					if( pathObject is CirclePathObject circlePathObject ) {
-						overCutCache = circlePathObject.CircleCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Rectangle:
-					if( pathObject is RectanglePathObject rectanglePathObject ) {
-						overCutCache = rectanglePathObject.RectangleCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Runway:
-					if( pathObject is RunwayPathObject runwayPathObject ) {
-						overCutCache = runwayPathObject.RunwayCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Triangle:
-				case PathType.Square:
-				case PathType.Pentagon:
-				case PathType.Hexagon:
-					if( pathObject is PolygonPathObject polygonPathObject ) {
-						overCutCache = polygonPathObject.PolygonCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Contour:
-				default:
-					if( pathObject is ContourPathObject contourPathObject ) {
-						overCutCache = contourPathObject.ContourCacheInfo;
-						return true;
-					}
-					return false;
-			}
+			return PathCacheProvider.TryGetOverCutCache( pathObject, out overCutCache );
 		}
 	}
 }

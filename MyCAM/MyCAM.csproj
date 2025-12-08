@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="CacheInfo\CircleCacheInfo.cs" />
     <Compile Include="CacheInfo\ContourCacheInfo.cs" />
+    <Compile Include="CacheInfo\PathCacheProvider.cs" />
     <Compile Include="CacheInfo\PolygonCacheInfo.cs" />
     <Compile Include="CacheInfo\RectangleCacheInfo.cs" />
     <Compile Include="CacheInfo\RunwayCacheInfo.cs" />
