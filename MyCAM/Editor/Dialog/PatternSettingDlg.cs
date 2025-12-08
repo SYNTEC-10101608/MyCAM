@@ -71,78 +71,165 @@ namespace MyCAM.Editor.Dialog
 
 		void m_cmbPathType_SelectedIndexChanged( object sender, EventArgs e )
 		{
-			m_NewPatternSettingInfoList = new List<PatternSettingInfo>();
+			List<PatternSettingInfo> patternSettingInfoList = new List<PatternSettingInfo>();
 			ShowSpecificPanel( m_cmbPathType.SelectedIndex );
-			switch( m_cmbPathType.SelectedIndex ) {
-				case 0:
-					for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
-						m_NewPatternSettingInfoList.Add( new PatternSettingInfo( m_PatternSettingInfoList[ i ].ContourPathObject.ContourGeomData, m_PatternSettingInfoList[ i ].ContourPathObject ) );
-					}
+
+			PathType selectedPathType = (PathType)m_cmbPathType.SelectedIndex;
+			PathType currentPathType = m_PatternSettingInfoList[ 0 ].GeomData.PathType;
+
+			switch( selectedPathType ) {
+				case PathType.Contour:
+					patternSettingInfoList = CreateContourPatternList();
 					break;
-				case 1:
-					if( m_PatternSettingInfoList[ 0 ].GeomData.PathType != PathType.Circle ) {
-						for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
-							m_NewPatternSettingInfoList.Add( new PatternSettingInfo( new CircleGeomData( m_PatternSettingInfoList[ i ].GeomData.UID ), m_PatternSettingInfoList[ i ].ContourPathObject ) );
-						}
-					}
-					else {
-						for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
-							m_NewPatternSettingInfoList.Add( new PatternSettingInfo( m_PatternSettingInfoList[ 0 ].GeomData, m_PatternSettingInfoList[ i ].ContourPathObject ) );
-						}
-					}
-					CircleGeomData circleGeomData = (CircleGeomData)m_NewPatternSettingInfoList[ 0 ].GeomData;
-					SetCircleParam( circleGeomData.Diameter, circleGeomData.RotatedAngle_deg );
+				case PathType.Circle:
+					patternSettingInfoList = CreateCirclePatternList( currentPathType );
 					break;
-				case 2:
-					if( m_PatternSettingInfoList[ 0 ].GeomData.PathType != PathType.Rectangle ) {
-						for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
-							m_NewPatternSettingInfoList.Add( new PatternSettingInfo( new RectangleGeomData( m_PatternSettingInfoList[ i ].GeomData.UID ), m_PatternSettingInfoList[ i ].ContourPathObject ) );
-						}
-					}
-					else {
-						for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
-							m_NewPatternSettingInfoList.Add( new PatternSettingInfo( m_PatternSettingInfoList[ 0 ].GeomData, m_PatternSettingInfoList[ i ].ContourPathObject ) );
-						}
-					}
-					RectangleGeomData rectGeomData = (RectangleGeomData)m_NewPatternSettingInfoList[ 0 ].GeomData;
-					SetRectangleParam( rectGeomData.Length, rectGeomData.Width, rectGeomData.CornerRadius, rectGeomData.RotatedAngle_deg );
+				case PathType.Rectangle:
+					patternSettingInfoList = CreateRectanglePatternList( currentPathType );
 					break;
-				case 3:
-					if( m_PatternSettingInfoList[ 0 ].GeomData.PathType != PathType.Runway ) {
-						for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
-							m_NewPatternSettingInfoList.Add( new PatternSettingInfo( new RunwayGeomData( m_PatternSettingInfoList[ i ].GeomData.UID ), m_PatternSettingInfoList[ i ].ContourPathObject ) );
-						}
-					}
-					else {
-						for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
-							m_NewPatternSettingInfoList.Add( new PatternSettingInfo( m_PatternSettingInfoList[ 0 ].GeomData, m_PatternSettingInfoList[ i ].ContourPathObject ) );
-						}
-					}
-					RunwayGeomData runwayGeomData = (RunwayGeomData)m_NewPatternSettingInfoList[ 0 ].GeomData;
-					SetRunwayParam( runwayGeomData.Length, runwayGeomData.Width, runwayGeomData.RotatedAngle_deg );
+				case PathType.Runway:
+					patternSettingInfoList = CreateRunwayPatternList( currentPathType );
 					break;
-				case 4:
-				case 5:
-				case 6:
-				case 7:
-					if( !IsPolygonSide( m_PatternSettingInfoList[ 0 ].GeomData.PathType, out int nSides ) ) {
-						for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
-							m_NewPatternSettingInfoList.Add( new PatternSettingInfo( new PolygonGeomData( m_PatternSettingInfoList[ i ].GeomData.UID, nSides ), m_PatternSettingInfoList[ i ].ContourPathObject ) );
-						}
-					}
-					else {
-						for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
-							m_NewPatternSettingInfoList.Add( new PatternSettingInfo( m_PatternSettingInfoList[ 0 ].GeomData, m_PatternSettingInfoList[ i ].ContourPathObject ) );
-						}
-					}
-					PolygonGeomData polygonGeomData = (PolygonGeomData)m_NewPatternSettingInfoList[ 0 ].GeomData;
-					SetPolygonParam( polygonGeomData.SideLength, polygonGeomData.CornerRadius, polygonGeomData.RotatedAngle_deg );
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					patternSettingInfoList = CreatePolygonPatternList( selectedPathType, currentPathType );
 					break;
 				default:
-
 					break;
 			}
-			RaisePreview( m_NewPatternSettingInfoList );
+
+			RaisePreview( patternSettingInfoList );
+			m_NewPatternSettingInfoList = patternSettingInfoList;
+		}
+
+		List<PatternSettingInfo> CreateContourPatternList()
+		{
+			List<PatternSettingInfo> patternSettingInfoList = new List<PatternSettingInfo>();
+			for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
+				patternSettingInfoList.Add( new PatternSettingInfo(
+					m_PatternSettingInfoList[ i ].ContourPathObject.ContourGeomData,
+					m_PatternSettingInfoList[ i ].ContourPathObject ) );
+			}
+			return patternSettingInfoList;
+		}
+
+		List<PatternSettingInfo> CreateCirclePatternList( PathType currentPathType )
+		{
+			List<PatternSettingInfo> patternSettingInfoList = new List<PatternSettingInfo>();
+
+			// If current type is not Circle, create new default CircleGeomData for each item
+			if( currentPathType != PathType.Circle ) {
+				for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
+					patternSettingInfoList.Add( new PatternSettingInfo(
+						new CircleGeomData( m_PatternSettingInfoList[ i ].GeomData.UID ),
+						m_PatternSettingInfoList[ i ].ContourPathObject ) );
+				}
+			}
+			else {
+
+				// Reuse existing CircleGeomData from first item
+				for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
+					patternSettingInfoList.Add( new PatternSettingInfo(
+						m_PatternSettingInfoList[ 0 ].GeomData,
+						m_PatternSettingInfoList[ i ].ContourPathObject ) );
+				}
+			}
+
+			CircleGeomData circleGeomData = (CircleGeomData)patternSettingInfoList[ 0 ].GeomData;
+			SetCircleParam( circleGeomData.Diameter, circleGeomData.RotatedAngle_deg );
+			return patternSettingInfoList;
+		}
+
+		List<PatternSettingInfo> CreateRectanglePatternList( PathType currentPathType )
+		{
+			List<PatternSettingInfo> patternSettingInfoList = new List<PatternSettingInfo>();
+
+			// If current type is not Rectangle, create new default RectangleGeomData for each item
+			if( currentPathType != PathType.Rectangle ) {
+				for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
+					patternSettingInfoList.Add( new PatternSettingInfo(
+						new RectangleGeomData( m_PatternSettingInfoList[ i ].GeomData.UID ),
+						m_PatternSettingInfoList[ i ].ContourPathObject ) );
+				}
+			}
+			else {
+
+				// Reuse existing RectangleGeomData from first item
+				for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
+					patternSettingInfoList.Add( new PatternSettingInfo(
+						m_PatternSettingInfoList[ 0 ].GeomData,
+						m_PatternSettingInfoList[ i ].ContourPathObject ) );
+				}
+			}
+
+			RectangleGeomData rectGeomData = (RectangleGeomData)patternSettingInfoList[ 0 ].GeomData;
+			SetRectangleParam( rectGeomData.Length, rectGeomData.Width, rectGeomData.CornerRadius, rectGeomData.RotatedAngle_deg );
+			return patternSettingInfoList;
+		}
+
+		List<PatternSettingInfo> CreateRunwayPatternList( PathType currentPathType )
+		{
+			List<PatternSettingInfo> patternSettingInfoList = new List<PatternSettingInfo>();
+
+			// If current type is not Runway, create new default RunwayGeomData for each item
+			if( currentPathType != PathType.Runway ) {
+				for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
+					patternSettingInfoList.Add( new PatternSettingInfo(
+						new RunwayGeomData( m_PatternSettingInfoList[ i ].GeomData.UID ),
+						m_PatternSettingInfoList[ i ].ContourPathObject ) );
+				}
+			}
+			else {
+
+				// Reuse existing RunwayGeomData from first item
+				for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
+					patternSettingInfoList.Add( new PatternSettingInfo(
+						m_PatternSettingInfoList[ 0 ].GeomData,
+						m_PatternSettingInfoList[ i ].ContourPathObject ) );
+				}
+			}
+
+			RunwayGeomData runwayGeomData = (RunwayGeomData)patternSettingInfoList[ 0 ].GeomData;
+			SetRunwayParam( runwayGeomData.Length, runwayGeomData.Width, runwayGeomData.RotatedAngle_deg );
+			return patternSettingInfoList;
+		}
+
+		List<PatternSettingInfo> CreatePolygonPatternList( PathType selectedPathType, PathType currentPathType )
+		{
+			List<PatternSettingInfo> patternSettingInfoList = new List<PatternSettingInfo>();
+
+			// Check if current type is already a polygon type
+			bool isCurrentPolygon = IsPolygonSide( currentPathType, out int currentSides );
+
+			// Get the number of sides for the selected polygon type
+			if( !IsPolygonSide( selectedPathType, out int selectedSides ) ) {
+
+				// This should not happen as selectedPathType is already confirmed to be a polygon
+				return patternSettingInfoList;
+			}
+
+			// If current type is not a polygon OR it's a different polygon type, create new PolygonGeomData
+			if( !isCurrentPolygon || currentPathType != selectedPathType ) {
+				for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
+					patternSettingInfoList.Add( new PatternSettingInfo(
+						new PolygonGeomData( m_PatternSettingInfoList[ i ].GeomData.UID, selectedSides ),
+						m_PatternSettingInfoList[ i ].ContourPathObject ) );
+				}
+			}
+			else {
+				// Same polygon type, reuse existing PolygonGeomData from first item
+				for( int i = 0; i < m_PatternSettingInfoList.Count; i++ ) {
+					patternSettingInfoList.Add( new PatternSettingInfo(
+						m_PatternSettingInfoList[ 0 ].GeomData,
+						m_PatternSettingInfoList[ i ].ContourPathObject ) );
+				}
+			}
+
+			PolygonGeomData polygonGeomData = (PolygonGeomData)patternSettingInfoList[ 0 ].GeomData;
+			SetPolygonParam( polygonGeomData.SideLength, polygonGeomData.CornerRadius, polygonGeomData.RotatedAngle_deg );
+			return patternSettingInfoList;
 		}
 
 		void HideAllPanels()
@@ -219,7 +306,6 @@ namespace MyCAM.Editor.Dialog
 
 		bool IsPolygonSide( PathType pathType, out int nSides )
 		{
-			const int PolygonComboStartIndex = (int)PathType.Triangle;
 			switch( pathType ) {
 				case PathType.Triangle:
 					nSides = 3;
@@ -234,7 +320,7 @@ namespace MyCAM.Editor.Dialog
 					nSides = 6;
 					return true;
 				default:
-					nSides = m_cmbPathType.SelectedIndex - PolygonComboStartIndex + 3;
+					nSides = -1;
 					return false;
 			}
 		}
