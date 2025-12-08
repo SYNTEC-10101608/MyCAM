@@ -3,6 +3,7 @@ using MyCAM.Data.GeomDataFolder;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
@@ -149,30 +150,40 @@ namespace MyCAM.CacheInfo
 
 		public CAMPoint GetProcessStartPoint()
 		{
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
 			if( LeadInCAMPointList.Count != 0 ) {
 				return LeadInCAMPointList[ 0 ].Clone();
 			}
-
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
 
 		public CAMPoint GetProcessEndPoint()
 		{
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
 			if( OverCutCAMPointList.Count != 0 ) {
 				return OverCutCAMPointList[ OverCutCAMPointList.Count - 1 ].Clone();
 			}
-
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
 
 		public CAMPoint GetMainPathStartCAMPoint()
 		{
-			return m_StartPointList[ m_CraftData.StartPointIndex ];
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
+			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
 
 		public List<CAMPoint> GetToolVecList()
 		{
-			return m_StartPointList;
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
+			return m_StartPointList.Select( p => p.Clone() ).ToList();
 		}
 
 		public bool IsToolVecModifyPoint( ISetToolVecPoint point )

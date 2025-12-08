@@ -119,12 +119,18 @@ namespace MyCAM.CacheInfo
 
 		public CAMPoint GetMainPathStartCAMPoint()
 		{
-			return m_CAMPointList.First();
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
+			return m_CAMPointList.First().Clone();
 		}
 
 		public List<CAMPoint> GetToolVecList()
 		{
-			return m_CAMPointList;
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
+			return m_CAMPointList.Select( p => p.Clone() ).ToList();
 		}
 
 		#endregion
