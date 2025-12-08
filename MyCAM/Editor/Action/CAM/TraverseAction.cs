@@ -13,15 +13,15 @@ namespace MyCAM.Editor
 			// checked in base constructor
 			// when user cancel the traverse setting, need to turn path back
 			m_BackupTraverseDataList = new List<TraverseData>();
-			foreach( var camData in m_CraftDataList ) {
-				if( camData == null ) {
-					throw new ArgumentNullException( "TraverseAction constructing argument craftData contains null ContourCacheInfo" );
+			foreach( var craftData in m_CraftDataList ) {
+				if( craftData == null ) {
+					throw new ArgumentNullException( "TraverseAction constructing argument craftData contains null craftData" );
 				}
-				if( camData.TraverseData == null ) {
+				if( craftData.TraverseData == null ) {
 					m_BackupTraverseDataList.Add( new TraverseData() );
 				}
 				else {
-					m_BackupTraverseDataList.Add( camData.TraverseData.Clone() );
+					m_BackupTraverseDataList.Add( craftData.TraverseData.Clone() );
 				}
 			}
 		}

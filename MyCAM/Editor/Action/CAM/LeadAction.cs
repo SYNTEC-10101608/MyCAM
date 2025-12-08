@@ -16,7 +16,7 @@ namespace MyCAM.Editor
 			m_BackupLeadParamList = new List<LeadData>();
 			foreach( var craftData in m_CraftDataList ) {
 				if( craftData == null ) {
-					throw new ArgumentNullException( "LeadAction constructing argument craftDataList contains null ContourCacheInfo" );
+					throw new ArgumentNullException( "LeadAction constructing argument craftDataList contains null craftData" );
 				}
 				if( craftData.LeadLineParam == null ) {
 					m_BackupLeadParamList.Add( new LeadData() );
