@@ -29,16 +29,25 @@ namespace MyCAM.Editor.Dialog
 					m_cmbPathType.SelectedIndex = 0;
 					break;
 				case PathType.Circle:
+					if( !( patternSettingInfo.GeomData is CircleGeomData circleGeomData ) ) {
+						return;
+					}
 					m_txbCircleDiameter.Text = ( (CircleGeomData)patternSettingInfo.GeomData ).Diameter.ToString();
 					m_txbCircleRotatedAngle.Text = ( (CircleGeomData)patternSettingInfo.GeomData ).RotatedAngle_deg.ToString();
 					break;
 				case PathType.Rectangle:
+					if( !( patternSettingInfo.GeomData is RectangleGeomData rectangleGeomData ) ) {
+						return;
+					}
 					m_txbRecLength.Text = ( (RectangleGeomData)patternSettingInfo.GeomData ).Length.ToString();
 					m_txbRecWidth.Text = ( (RectangleGeomData)patternSettingInfo.GeomData ).Width.ToString();
 					m_txbRecCornerRadius.Text = ( (RectangleGeomData)patternSettingInfo.GeomData ).CornerRadius.ToString();
 					m_txbRecRotatedAngle.Text = ( (RectangleGeomData)patternSettingInfo.GeomData ).RotatedAngle_deg.ToString();
 					break;
 				case PathType.Runway:
+					if( !( patternSettingInfo.GeomData is RunwayGeomData runwayGeomData ) ) {
+						return;
+					}
 					m_txbRunwayLength.Text = ( (RunwayGeomData)patternSettingInfo.GeomData ).Length.ToString();
 					m_txbRunwayWidth.Text = ( (RunwayGeomData)patternSettingInfo.GeomData ).Width.ToString();
 					m_txbRunwayRotatedAngle.Text = ( (RunwayGeomData)patternSettingInfo.GeomData ).RotatedAngle_deg.ToString();
@@ -47,6 +56,9 @@ namespace MyCAM.Editor.Dialog
 				case PathType.Square:
 				case PathType.Pentagon:
 				case PathType.Hexagon:
+					if( !( patternSettingInfo.GeomData is PolygonGeomData ) ) {
+						return;
+					}
 					PolygonGeomData polygonData = (PolygonGeomData)patternSettingInfo.GeomData;
 					m_txbPolygonSideLength.Text = polygonData.SideLength.ToString();
 					m_txbPolygonCornerRadius.Text = polygonData.CornerRadius.ToString();
@@ -144,24 +156,23 @@ namespace MyCAM.Editor.Dialog
 		void ShowSpecificPanel( int nIndex )
 		{
 			HideAllPanels();
-			switch( nIndex ) {
-				case 0:
-				default:
-					break;
-				case 1:
+			switch( (PathType)nIndex ) {
+				case PathType.Circle:
 					m_panelCircle.Visible = true;
 					break;
-				case 2:
+				case PathType.Rectangle:
 					m_panelRectangle.Visible = true;
 					break;
-				case 3:
+				case PathType.Runway:
 					m_panelRunway.Visible = true;
 					break;
-				case 4:
-				case 5:
-				case 6:
-				case 7:
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
 					m_panelPolygon.Visible = true;
+					break;
+				default:
 					break;
 			}
 		}
@@ -208,7 +219,7 @@ namespace MyCAM.Editor.Dialog
 
 		bool IsPolygonSide( PathType pathType, out int nSides )
 		{
-			int nIndexOffset = 1;
+			const int PolygonComboStartIndex = (int)PathType.Triangle;
 			switch( pathType ) {
 				case PathType.Triangle:
 					nSides = 3;
@@ -223,7 +234,7 @@ namespace MyCAM.Editor.Dialog
 					nSides = 6;
 					return true;
 				default:
-					nSides = m_cmbPathType.SelectedIndex - nIndexOffset;
+					nSides = m_cmbPathType.SelectedIndex - PolygonComboStartIndex + 3;
 					return false;
 			}
 		}
@@ -252,6 +263,7 @@ namespace MyCAM.Editor.Dialog
 			}
 		}
 
+		// circle
 		void m_txbCircleDiameter_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode != Keys.Enter ) {
@@ -268,6 +280,9 @@ namespace MyCAM.Editor.Dialog
 		void SetCircleDiameter()
 		{
 			if( double.TryParse( m_txbCircleDiameter.Text, out double diameter ) && diameter != m_CircleDiameter && diameter > 0 ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_CircleDiameter = diameter;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is CircleGeomData circleData ) {
@@ -297,6 +312,9 @@ namespace MyCAM.Editor.Dialog
 		void SetCircleRotatedAngle()
 		{
 			if( double.TryParse( m_txbCircleRotatedAngle.Text, out double angle ) && angle != m_CirRotatedAngle_deg ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_CirRotatedAngle_deg = angle;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is CircleGeomData circleData ) {
@@ -327,6 +345,9 @@ namespace MyCAM.Editor.Dialog
 		void SetRectangleLength()
 		{
 			if( double.TryParse( m_txbRecLength.Text, out double length ) && length != m_RectLength && length > 0 ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_RectLength = length;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is RectangleGeomData rectangleGeomData ) {
@@ -356,6 +377,9 @@ namespace MyCAM.Editor.Dialog
 		void SetRectangleWidth()
 		{
 			if( double.TryParse( m_txbRecWidth.Text, out double width ) && width != m_RectWidth && width > 0 ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_RectWidth = width;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is RectangleGeomData rectangleGeomData ) {
@@ -385,6 +409,9 @@ namespace MyCAM.Editor.Dialog
 		void SetRectangleCornerRadius()
 		{
 			if( double.TryParse( m_txbRecCornerRadius.Text, out double cornerRadius ) && cornerRadius != m_RectCornerRadius && cornerRadius >= 0 ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_RectCornerRadius = cornerRadius;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is RectangleGeomData rectangleGeomData ) {
@@ -414,6 +441,9 @@ namespace MyCAM.Editor.Dialog
 		void SetRectangleRotatedAngle()
 		{
 			if( double.TryParse( m_txbRecRotatedAngle.Text, out double rotatedAngle_deg ) && rotatedAngle_deg != m_RectRotatedAngle_deg ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_RectRotatedAngle_deg = rotatedAngle_deg;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is RectangleGeomData rectangleGeomData ) {
@@ -444,6 +474,9 @@ namespace MyCAM.Editor.Dialog
 		void SetRunwayLength()
 		{
 			if( double.TryParse( m_txbRunwayLength.Text, out double length ) && length != m_RunwayLength && length > m_RunwayWidth ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_RunwayLength = length;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is RunwayGeomData runwayGeomData ) {
@@ -473,6 +506,9 @@ namespace MyCAM.Editor.Dialog
 		void SetRunwayWidth()
 		{
 			if( double.TryParse( m_txbRunwayWidth.Text, out double width ) && width != m_RunwayWidth && width > 0 && width < m_RunwayLength ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_RunwayWidth = width;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is RunwayGeomData runwayGeomData ) {
@@ -502,6 +538,9 @@ namespace MyCAM.Editor.Dialog
 		void SetRunwayRotatedAngle()
 		{
 			if( double.TryParse( m_txbRunwayRotatedAngle.Text, out double rotatedAngle_deg ) && rotatedAngle_deg != m_RunwayRotatedAngle_deg ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_RunwayRotatedAngle_deg = rotatedAngle_deg;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is RunwayGeomData runwayGeomData ) {
@@ -532,6 +571,9 @@ namespace MyCAM.Editor.Dialog
 		void SetPolygonSideLength()
 		{
 			if( double.TryParse( m_txbPolygonSideLength.Text, out double sideLength ) && sideLength != m_PolygonSideLength && sideLength > 0 ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_PolygonSideLength = sideLength;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is PolygonGeomData polygonGeomData ) {
@@ -561,6 +603,9 @@ namespace MyCAM.Editor.Dialog
 		void SetPolygonRotatedAngle()
 		{
 			if( double.TryParse( m_txbPolygonRotatedAngle.Text, out double rotatedAngle_deg ) && rotatedAngle_deg != m_PolygonRotatedAngle_deg ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_PolygonRotatedAngle_deg = rotatedAngle_deg;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is PolygonGeomData polygonGeomData ) {
@@ -590,6 +635,9 @@ namespace MyCAM.Editor.Dialog
 		void SetPolygonCornerRadius()
 		{
 			if( double.TryParse( m_txbPolygonCornerRadius.Text, out double cornerRadius ) && cornerRadius != m_PolygonCornerRadius && cornerRadius >= 0 ) {
+				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
+					return;
+				}
 				m_PolygonCornerRadius = cornerRadius;
 				foreach( PatternSettingInfo settingInfo in m_NewPatternSettingInfoList ) {
 					if( settingInfo.GeomData is PolygonGeomData polygonGeomData ) {
