@@ -34,9 +34,8 @@ namespace MyCAM.Editor
 					continue;
 				}
 
-				ContourPathObject contourPathObject = null;
-				if( dataManager.ObjectMap[ pathID ] is PathObject pathObject ) {
-					contourPathObject = GetContourPathObject( pathObject );
+				if( !DataGettingHelper.GetContourPathObject( dataManager.GetPathObjectDictionary()[ pathID ], out ContourPathObject contourPathObject ) ) {
+					continue;
 				}
 				m_PatternSettingInfoList.Add( new PatternSettingInfo( geomData, contourPathObject ) );
 			}
@@ -105,7 +104,9 @@ namespace MyCAM.Editor
 					continue;
 				}
 
-				ContourPathObject contourPathObject = GetContourPathObject( pathObjectDict[ szID ] );
+				if( !DataGettingHelper.GetContourPathObject( pathObjectDict[ szID ], out ContourPathObject contourPathObject ) ) {
+					continue;
+				}
 				m_DataManager.ObjectMap[ szID ] = CreatePathObject( szID, shape, geomDataList[ nCount ], contourPathObject, pathObjectDict[ szID ] );
 				UpdateCanvasPattern( szID, shape );
 				nCount++;
@@ -148,26 +149,6 @@ namespace MyCAM.Editor
 						contourGeomData = ( originalPathObject as ContourPathObject ).ContourGeomData;
 					}
 					return new ContourPathObject( szID, shape, contourGeomData, originalPathObject.CraftData );
-			}
-		}
-
-		ContourPathObject GetContourPathObject( PathObject pathObject )
-		{
-			switch( pathObject.PathType ) {
-				case PathType.Circle:
-					return ( pathObject as CirclePathObject ).ContourPathObject;
-				case PathType.Rectangle:
-					return ( pathObject as RectanglePathObject ).ContourPathObject;
-				case PathType.Runway:
-					return ( pathObject as RunwayPathObject ).ContourPathObject;
-				case PathType.Triangle:
-				case PathType.Square:
-				case PathType.Pentagon:
-				case PathType.Hexagon:
-					return ( pathObject as PolygonPathObject ).ContourPathObject;
-				case PathType.Contour:
-				default:
-					return pathObject as ContourPathObject;
 			}
 		}
 

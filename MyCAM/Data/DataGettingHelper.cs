@@ -59,6 +59,64 @@ namespace MyCAM.Data
 			return false;
 		}
 
+		public static bool GetCraftDataByID( string szPathID, out CraftData craftData )
+		{
+			craftData = null;
+			if( string.IsNullOrEmpty( szPathID )
+				|| m_DataManager.GetPathObjectDictionary().ContainsKey( szPathID ) == false
+				|| m_DataManager.GetPathObjectDictionary()[ szPathID ] == null
+				|| m_DataManager.GetPathObjectDictionary()[ szPathID ].CraftData == null ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
+				return false;
+			}
+
+			if( m_DataManager.GetPathObjectDictionary()[ szPathID ].PathType == PathType.Contour ) {
+				craftData = m_DataManager.GetPathObjectDictionary()[ szPathID ].CraftData;
+			}
+			return true;
+		}
+
+		public static bool GetContourPathObject( PathObject pathObject, out ContourPathObject contourPathObj )
+		{
+			contourPathObj = null;
+			switch( pathObject.PathType ) {
+				case PathType.Circle:
+					if( pathObject is CirclePathObject circlePathObject ) {
+						contourPathObj = circlePathObject.ContourPathObject;
+						return true;
+					}
+					return false;
+				case PathType.Rectangle:
+					if( pathObject is RectanglePathObject rectanglePathObject ) {
+						contourPathObj = rectanglePathObject.ContourPathObject;
+						return true;
+					}
+					return false;
+				case PathType.Runway:
+					if( pathObject is RunwayPathObject runwayPathObject ) {
+						contourPathObj = runwayPathObject.ContourPathObject;
+						return true;
+					}
+					return false;
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					if( pathObject is PolygonPathObject polygonPathObject ) {
+						contourPathObj = polygonPathObject.ContourPathObject;
+						return true;
+					}
+					return false;
+				case PathType.Contour:
+				default:
+					if( pathObject is ContourPathObject contourPathObject ) {
+						contourPathObj = contourPathObject;
+						return true;
+					}
+					return false;
+			}
+		}
+
 		public static bool GetPathHeadTailCacheByID( string pathID, out IPathHeadTailCache pathHeadTailCache )
 		{
 			pathHeadTailCache = null;
@@ -99,23 +157,6 @@ namespace MyCAM.Data
 					}
 					return false;
 			}
-		}
-
-		public static bool GetCraftDataByID( string szPathID, out CraftData craftData )
-		{
-			craftData = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| m_DataManager.GetPathObjectDictionary().ContainsKey( szPathID ) == false
-				|| m_DataManager.GetPathObjectDictionary()[ szPathID ] == null
-				|| m_DataManager.GetPathObjectDictionary()[ szPathID ].CraftData == null ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
-				return false;
-			}
-
-			if( m_DataManager.GetPathObjectDictionary()[ szPathID ].PathType == PathType.Contour ) {
-				craftData = m_DataManager.GetPathObjectDictionary()[ szPathID ].CraftData;
-			}
-			return true;
 		}
 	}
 }
