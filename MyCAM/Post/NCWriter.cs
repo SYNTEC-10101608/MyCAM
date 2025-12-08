@@ -1,6 +1,5 @@
 ﻿using MyCAM.CacheInfo;
 using MyCAM.Data;
-using MyCAM.Data.GeomDataFolder;
 using MyCAM.Data.PathObjectFolder;
 using System;
 using System.Collections.Generic;
@@ -125,108 +124,10 @@ namespace MyCAM.Post
 
 		void WriteStandardPatternCutting( PathType type, StandardPatternPostData currentPathPostData, CraftData craftData, IGeomData geomData, int N_Index )
 		{
-			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
-			m_StreamWriter.WriteLine( "N" + N_Index );
-			WriteStandardPatternTraverse( currentPathPostData );
-			switch( type ) {
-				case PathType.Circle:
-					CircleGeomData circleGeomData = geomData as CircleGeomData;
-					WriteStandardPatternCircleCutting( currentPathPostData, craftData, circleGeomData );
-					break;
-				case PathType.Rectangle:
-					RectangleGeomData rectangleGeomData = geomData as RectangleGeomData;
-					WriteStandardPatternRectangleCutting( currentPathPostData, craftData, rectangleGeomData );
-					break;
-				case PathType.Runway:
-					RunwayGeomData runwayGeomData = geomData as RunwayGeomData;
-					WriteStandardPatternRunwayCutting( currentPathPostData, craftData, runwayGeomData );
-					break;
-				case PathType.Triangle:
-				case PathType.Square:
-				case PathType.Pentagon:
-				case PathType.Hexagon:
-					PolygonGeomData polygonGeomData = geomData as PolygonGeomData;
-					WriteStandardPatternPolygonCutting( currentPathPostData, craftData, polygonGeomData );
-					break;
-				default:
-					break;
-			}
-		}
-
-		void WriteStandardPatternCircleCutting( StandardPatternPostData currentPathPostData, CraftData craftData, CircleGeomData circleGeomData )
-		{
-			double linearLeadInLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Line ? craftData.LeadLineParam.LeadIn.Length : 0;
-			double ArcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
-			m_StreamWriter.WriteLine( "G65 P\"SY_CIRC\"" +
-				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
-				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
-				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
-				" " + GetRotaryAxisCommand( currentPathPostData.RefPoint.Master / Math.PI * 180, currentPathPostData.RefPoint.Slave / Math.PI * 180 ) +
-				" D" + circleGeomData.Diameter.ToString( "F2" ) +
-				" E" + linearLeadInLength.ToString( "F2" ) +
-				" R" + ArcLeadOutLength.ToString( "F2" ) +
-				" Q" + circleGeomData.RotatedAngle_deg.ToString( "F2" ) +
-				" H1" +
-				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
-		}
-
-		void WriteStandardPatternRectangleCutting( StandardPatternPostData currentPathPostData, CraftData craftData, RectangleGeomData rectangleGeomData )
-		{
-			double linearLeadInLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Line ? craftData.LeadLineParam.LeadIn.Length : 0;
-			double ArcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
-			m_StreamWriter.WriteLine( "G65 P\"SY_RECT\"" +
-				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
-				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
-				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
-				" " + GetRotaryAxisCommand( currentPathPostData.RefPoint.Master / Math.PI * 180, currentPathPostData.RefPoint.Slave / Math.PI * 180 ) +
-				" U" + rectangleGeomData.Length.ToString( "F2" ) +
-				" W" + rectangleGeomData.Width.ToString( "F2" ) +
-				" D" + rectangleGeomData.CornerRadius.ToString( "F2" ) +
-				" T" + ( craftData.StartPointIndex + 1 ).ToString() +
-				" E" + linearLeadInLength.ToString( "F2" ) +
-				" R" + ArcLeadOutLength.ToString( "F2" ) +
-				" Q" + rectangleGeomData.RotatedAngle_deg.ToString( "F2" ) +
-				" H1" +
-				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
-		}
-
-		void WriteStandardPatternRunwayCutting( StandardPatternPostData currentPathPostData, CraftData craftData, RunwayGeomData runwayGeomData )
-		{
-			double linearLeadInLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Line ? craftData.LeadLineParam.LeadIn.Length : 0;
-			double ArcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
-			m_StreamWriter.WriteLine( "G65 P\"SY_RUNWAY\"" +
-				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
-				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
-				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
-				" " + GetRotaryAxisCommand( currentPathPostData.RefPoint.Master / Math.PI * 180, currentPathPostData.RefPoint.Slave / Math.PI * 180 ) +
-				" U" + runwayGeomData.Length.ToString( "F2" ) +
-				" W" + runwayGeomData.Width.ToString( "F2" ) +
-				" T" + ( craftData.StartPointIndex + 1 ).ToString() +
-				" E" + linearLeadInLength.ToString( "F2" ) +
-				" R" + ArcLeadOutLength.ToString( "F2" ) +
-				" Q" + runwayGeomData.RotatedAngle_deg.ToString( "F2" ) +
-				" H1" +
-				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
-		}
-
-		void WriteStandardPatternPolygonCutting( StandardPatternPostData currentPathPostData, CraftData craftData, PolygonGeomData polygonGeomData )
-		{
-			double linearLeadInLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Line ? craftData.LeadLineParam.LeadIn.Length : 0;
-			double ArcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
-			m_StreamWriter.WriteLine( "G65 P\"SY_POLYGON\"" +
-				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
-				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
-				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
-				" " + GetRotaryAxisCommand( currentPathPostData.RefPoint.Master / Math.PI * 180, currentPathPostData.RefPoint.Slave / Math.PI * 180 ) +
-				" U" + polygonGeomData.Sides.ToString() +
-				" W" + polygonGeomData.SideLength.ToString( "F2" ) +
-				" D" + polygonGeomData.CornerRadius.ToString( "F2" ) +
-				" T" + ( craftData.StartPointIndex + 1 ).ToString() +
-				" E" + linearLeadInLength.ToString( "F2" ) +
-				" R" + ArcLeadOutLength.ToString( "F2" ) +
-				" Q" + polygonGeomData.RotatedAngle_deg.ToString( "F2" ) +
-				" H1" +
-				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
+			StandardPatternNCWriter.WriteStandardPatternCutting( m_StreamWriter, type, currentPathPostData, craftData, geomData, N_Index,
+				( writer, point, followDist ) => WriteOneLinearTraverse( point, followDist ),
+				( writer, midPoint, endPoint, followDist ) => WriteOneFrogLeap( midPoint, endPoint, followDist ),
+				( master, slave ) => GetRotaryAxisCommand( master, slave ) );
 		}
 
 		void WriteOnePoint( PostPoint postPoint )
@@ -330,40 +231,6 @@ namespace MyCAM.Post
 			// no frog leap and no cut down
 			else {
 				WriteOneLinearTraverse( currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
-			}
-		}
-
-		void WriteStandardPatternTraverse( StandardPatternPostData currentPathPostData )
-		{
-			// lift up
-			if( currentPathPostData.LiftUpPostPoint != null ) {
-				WriteOneLinearTraverse( currentPathPostData.LiftUpPostPoint );
-			}
-
-			// frog leap with cut down
-			if( currentPathPostData.FrogLeapMidPostPoint != null && currentPathPostData.CutDownPostPoint != null ) {
-				WriteOneFrogLeap( currentPathPostData.FrogLeapMidPostPoint, currentPathPostData.CutDownPostPoint );
-
-				// cut down
-				WriteOneLinearTraverse( currentPathPostData.StartPoint, currentPathPostData.FollowSafeDistance );
-			}
-
-			// form leap without cut down
-			else if( currentPathPostData.FrogLeapMidPostPoint != null && currentPathPostData.CutDownPostPoint == null ) {
-				WriteOneFrogLeap( currentPathPostData.FrogLeapMidPostPoint, currentPathPostData.StartPoint, currentPathPostData.FollowSafeDistance );
-			}
-
-			// no frog leap
-			else if( currentPathPostData.FrogLeapMidPostPoint == null && currentPathPostData.CutDownPostPoint != null ) {
-				WriteOneLinearTraverse( currentPathPostData.CutDownPostPoint );
-
-				// cut down
-				WriteOneLinearTraverse( currentPathPostData.StartPoint, currentPathPostData.FollowSafeDistance );
-			}
-
-			// no frog leap and no cut down
-			else {
-				WriteOneLinearTraverse( currentPathPostData.StartPoint, currentPathPostData.FollowSafeDistance );
 			}
 		}
 
