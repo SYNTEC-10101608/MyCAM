@@ -198,10 +198,10 @@ namespace MyCAM.CacheInfo
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
 			}
-			//if( m_CAMPointIndexMap.ContainsKey( point as CAMPoint ) ) {
-			//	int index = m_CAMPointIndexMap[ point as CAMPoint ];
-			//	return m_CraftData.ToolVecModifyMap.ContainsKey( index );
-			//}
+			if( m_CAMPointIndexMap.ContainsKey( point as CAMPoint ) ) {
+				int index = m_CAMPointIndexMap[ point as CAMPoint ];
+				return m_CraftData.ToolVecModifyMap.ContainsKey( index );
+			}
 			return false;
 		}
 		#endregion

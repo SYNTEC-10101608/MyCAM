@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
-	public class CircleCacheInfo : IPathHeadTailCache, IStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache
+	public class CircleCacheInfo : IPathHeadTailCache, IStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache
 	{
 		public CircleCacheInfo( string szID, gp_Ax3 coordinateInfo, CircleGeomData circleGeomData, CraftData craftData )
 		{
@@ -112,18 +112,6 @@ namespace MyCAM.CacheInfo
 		public List<CAMPoint> GetToolVecList()
 		{
 			return m_StartPointList;
-		}
-
-		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			//if( m_CAMPointIndexMap.ContainsKey( point as CAMPoint ) ) {
-			//	int index = m_CAMPointIndexMap[ point as CAMPoint ];
-			//	return m_CraftData.ToolVecModifyMap.ContainsKey( index );
-			//}
-			return false;
 		}
 
 		public bool IsClosed

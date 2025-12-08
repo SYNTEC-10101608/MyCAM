@@ -209,33 +209,6 @@ namespace MyCAM.Editor.Renderer
 
 			PathObject pathObject = m_DataManager.GetPathObjectDictionary()[ szPathID ];
 			switch( pathObject.PathType ) {
-				case PathType.Circle:
-					if( pathObject is CirclePathObject circlePathObject ) {
-						toolVecCache = circlePathObject.CircleCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Rectangle:
-					if( pathObject is RectanglePathObject rectanglePathObject ) {
-						toolVecCache = rectanglePathObject.RectangleCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Runway:
-					if( pathObject is RunwayPathObject runwayPathObject ) {
-						toolVecCache = runwayPathObject.RunwayCacheInfo;
-						return true;
-					}
-					return false;
-				case PathType.Triangle:
-				case PathType.Square:
-				case PathType.Pentagon:
-				case PathType.Hexagon:
-					if( pathObject is PolygonPathObject polygonPathObject ) {
-						toolVecCache = polygonPathObject.PolygonCacheInfo;
-						return true;
-					}
-					return false;
 				case PathType.Contour:
 				default:
 					if( pathObject is ContourPathObject contourPathObject ) {
