@@ -1,6 +1,5 @@
 ﻿using MyCAM.Data;
 using MyCAM.Helper;
-using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -118,15 +117,7 @@ namespace MyCAM.CacheInfo
 			return camPoint;
 		}
 
-		public gp_Pnt GetMainPathStartPoint()
-		{
-			if( m_CAMPointList == null || m_CAMPointList.Count == 0 ) {
-				return null;
-			}
-			return m_CAMPointList.First().Point.MakeCopy();
-		}
-
-		public CAMPoint GetFirstCAMPoint()
+		public CAMPoint GetMainPathStartCAMPoint()
 		{
 			return m_CAMPointList.First();
 		}
@@ -152,6 +143,17 @@ namespace MyCAM.CacheInfo
 			get
 			{
 				return m_CraftData.StartPointIndex;
+			}
+		}
+
+		public List<CAMPoint> StartPointList
+		{
+			get
+			{
+				if( m_IsCraftDataDirty ) {
+					BuildCAMPointList();
+				}
+				return m_CAMPointList;
 			}
 		}
 

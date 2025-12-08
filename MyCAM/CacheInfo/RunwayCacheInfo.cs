@@ -165,12 +165,7 @@ namespace MyCAM.CacheInfo
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
 
-		public gp_Pnt GetMainPathStartPoint()
-		{
-			return m_StartPointList[ m_CraftData.StartPointIndex ].Point;
-		}
-
-		public CAMPoint GetFirstCAMPoint()
+		public CAMPoint GetMainPathStartCAMPoint()
 		{
 			return m_StartPointList[ m_CraftData.StartPointIndex ];
 		}

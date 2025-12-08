@@ -1,15 +1,17 @@
 using MyCAM.Data;
 using MyCAM.Data.PathObjectFolder;
-using OCC.gp;
 using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
 	public interface IStartPointCache
 	{
-		gp_Pnt GetMainPathStartPoint();
+		CAMPoint GetMainPathStartCAMPoint();
 
-		CAMPoint GetFirstCAMPoint();
+		List<CAMPoint> StartPointList
+		{
+			get;
+		}
 	}
 
 	public interface ILeadCache
