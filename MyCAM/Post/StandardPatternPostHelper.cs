@@ -110,6 +110,15 @@ namespace MyCAM.Post
 				singularTagList = true;
 			}
 
+
+			double masterAngle = rotateAngleList.Item1;
+			double slaveAngle = rotateAngleList.Item2;
+
+			if( point.ToolVec.IsParallel( new gp_Dir( 0, 0, 1 ), 0.001 ) ) {
+				slaveAngle = 0;
+				masterAngle = 0;
+			}
+
 			// solve FK
 			gp_Pnt pointG54 = camPoint.Point;
 			PostPoint frameDataG54 = new PostPoint()
@@ -117,8 +126,8 @@ namespace MyCAM.Post
 				X = pointG54.X(),
 				Y = pointG54.Y(),
 				Z = pointG54.Z(),
-				Master = rotateAngleList.Item1,
-				Slave = rotateAngleList.Item2
+				Master = masterAngle,
+				Slave = slaveAngle
 			};
 			resultG54 = frameDataG54;
 			return true;
