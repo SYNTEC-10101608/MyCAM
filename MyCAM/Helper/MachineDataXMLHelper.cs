@@ -491,7 +491,7 @@ namespace MyCAM.Helper
 			T defaultValue = new T();
 
 			// get that pr node
-			XElement prNode = parent.Elements( "Pr" ).FirstOrDefault( node => node.Attribute( "ID" ).ToString() == szPrId );
+			XElement prNode = parent.Elements( "Pr" ).FirstOrDefault( node => (string)node.Attribute( "ID" ) == szPrId );
 
 			// can't find that node
 			if( prNode == null ) {

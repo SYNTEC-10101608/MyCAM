@@ -89,9 +89,9 @@
 
 	public class MachineParamName
 	{
-		public const string MASTER_LIMIMT_START_PARAM_NAME = "Master_Min";
-		public const string MASTER_LIMIMT_END_PARAM_NAME = "Master_Max";
-		public const string SLAVE_LIMIMT_START_PARAM_NAME = "Slave_Min";
-		public const string SLAVE_LIMIMT_END_PARAM_NAME = "Slave_Max";
+		public const string MASTER_LIMIMT_START_PARAM_NAME = "Master_Start";
+		public const string MASTER_LIMIMT_END_PARAM_NAME = "Master_End";
+		public const string SLAVE_LIMIMT_START_PARAM_NAME = "Slave_Start";
+		public const string SLAVE_LIMIMT_END_PARAM_NAME = "Slave_End";
 	}
 }
