@@ -7,11 +7,11 @@ namespace MyCAM.Post
 {
 	internal class StandardPatternNCPackage
 	{
-		public StandardPatternNCPackage( CAMPoint refPoint, CAMPoint startPoint, CraftData craftData )
+		public StandardPatternNCPackage( CAMPoint refPoint, CAMPoint startPoint, TraverseData traverseData )
 		{
 			RefPoint = refPoint ?? throw new ArgumentNullException( nameof( refPoint ) );
 			StartPoint = startPoint ?? throw new ArgumentNullException( nameof( startPoint ) );
-			CraftData = craftData ?? throw new ArgumentNullException( nameof( craftData ) );
+			TraverseData = traverseData ?? throw new ArgumentNullException( nameof( traverseData ) );
 		}
 
 		public CAMPoint RefPoint
@@ -24,7 +24,7 @@ namespace MyCAM.Post
 			get; private set;
 		}
 
-		public CraftData CraftData
+		public TraverseData TraverseData
 		{
 			get; private set;
 		}
@@ -136,12 +136,12 @@ namespace MyCAM.Post
 			// p4: cut down point of current path
 			// p5: start of current path (not used here)
 			IProcessPoint p1 = endInfoOfPreviousPath.EndCAMPoint;
-			IProcessPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, currentPathNCPack.CraftData.TraverseData.LiftUpDistance );
-			IProcessPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentPathNCPack.StartPoint, currentPathNCPack.CraftData.TraverseData.CutDownDistance );
+			IProcessPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, currentPathNCPack.TraverseData.LiftUpDistance );
+			IProcessPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentPathNCPack.StartPoint, currentPathNCPack.TraverseData.CutDownDistance );
 			IProcessPoint p5 = currentPathNCPack.StartPoint;
 
 			// lift up
-			if( currentPathNCPack.CraftData.TraverseData.LiftUpDistance > 0 && p2 != null ) {
+			if( currentPathNCPack.TraverseData.LiftUpDistance > 0 && p2 != null ) {
 
 				// G54
 				pathG54PostData.LiftUpPostPoint = new PostPoint()
@@ -155,8 +155,8 @@ namespace MyCAM.Post
 			}
 
 			// frog leap
-			if( currentPathNCPack.CraftData.TraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
-				IProcessPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentPathNCPack.CraftData.TraverseData.FrogLeapDistance );
+			if( currentPathNCPack.TraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
+				IProcessPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentPathNCPack.TraverseData.FrogLeapDistance );
 
 				if( p3 != null ) {
 					// G54 middle point
@@ -172,7 +172,7 @@ namespace MyCAM.Post
 			}
 
 			// cut down
-			if( currentPathNCPack.CraftData.TraverseData.CutDownDistance > 0 && p4 != null ) {
+			if( currentPathNCPack.TraverseData.CutDownDistance > 0 && p4 != null ) {
 
 				// G54
 				pathG54PostData.CutDownPostPoint = new PostPoint()
@@ -184,7 +184,7 @@ namespace MyCAM.Post
 					Slave = pathG54PostData.StartPoint.Slave
 				};
 			}
-			pathG54PostData.FollowSafeDistance = currentPathNCPack.CraftData.TraverseData.FollowSafeDistance;
+			pathG54PostData.FollowSafeDistance = currentPathNCPack.TraverseData.FollowSafeDistance;
 		}
 
 		static void CalculateEntry( StandardPatternNCPackage currentPathNCPack, EntryAndExitData entryAndExitData, ref StandardPatternPostData pathG54PostData )

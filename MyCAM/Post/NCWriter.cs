@@ -72,7 +72,10 @@ namespace MyCAM.Post
 								return false;
 							}
 							IGeomData geomData = DataGettingHelper.GetGeomDataByID( m_PathIDList[ i ] );
-							WriteStandardPatternCutting( pathType, postData, package.CraftData, geomData, i + 1 );
+							if( !pathObjectDict.TryGetValue( m_PathIDList[ i ], out PathObject pathobject ) ) {
+								return false;
+							}
+							WriteStandardPatternCutting( pathType, postData, pathobject.CraftData, geomData, i + 1 );
 						}
 					}
 
@@ -156,8 +159,7 @@ namespace MyCAM.Post
 				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
 				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
 				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
-				" " + m_MasterAxisName + ( currentPathPostData.RefPoint.Master / Math.PI * 180 ).ToString( "F2" ) +
-				" " + m_SlaveAxisName + ( currentPathPostData.RefPoint.Slave / Math.PI * 180 ).ToString( "F2" ) +
+				" " + GetRotaryAxisCommand( currentPathPostData.RefPoint.Master / Math.PI * 180, currentPathPostData.RefPoint.Slave / Math.PI * 180 ) +
 				" D" + circleGeomData.Diameter.ToString( "F2" ) +
 				" E" + linearLeadInLength.ToString( "F2" ) +
 				" R" + ArcLeadOutLength.ToString( "F2" ) +
@@ -174,8 +176,7 @@ namespace MyCAM.Post
 				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
 				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
 				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
-				" " + m_MasterAxisName + ( currentPathPostData.RefPoint.Master / Math.PI * 180 ).ToString( "F2" ) +
-				" " + m_SlaveAxisName + ( currentPathPostData.RefPoint.Slave / Math.PI * 180 ).ToString( "F2" ) +
+				" " + GetRotaryAxisCommand( currentPathPostData.RefPoint.Master / Math.PI * 180, currentPathPostData.RefPoint.Slave / Math.PI * 180 ) +
 				" U" + rectangleGeomData.Length.ToString( "F2" ) +
 				" W" + rectangleGeomData.Width.ToString( "F2" ) +
 				" D" + rectangleGeomData.CornerRadius.ToString( "F2" ) +
@@ -195,8 +196,7 @@ namespace MyCAM.Post
 				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
 				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
 				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
-				" " + m_MasterAxisName + ( currentPathPostData.RefPoint.Master / Math.PI * 180 ).ToString( "F2" ) +
-				" " + m_SlaveAxisName + ( currentPathPostData.RefPoint.Slave / Math.PI * 180 ).ToString( "F2" ) +
+				" " + GetRotaryAxisCommand( currentPathPostData.RefPoint.Master / Math.PI * 180, currentPathPostData.RefPoint.Slave / Math.PI * 180 ) +
 				" U" + runwayGeomData.Length.ToString( "F2" ) +
 				" W" + runwayGeomData.Width.ToString( "F2" ) +
 				" T" + ( craftData.StartPointIndex + 1 ).ToString() +
@@ -215,8 +215,7 @@ namespace MyCAM.Post
 				" X" + Math.Round( currentPathPostData.RefPoint.X, 3 ) +
 				" Y" + Math.Round( currentPathPostData.RefPoint.Y, 3 ) +
 				" Z" + Math.Round( currentPathPostData.RefPoint.Z, 3 ) +
-				" " + m_MasterAxisName + ( currentPathPostData.RefPoint.Master / Math.PI * 180 ).ToString( "F2" ) +
-				" " + m_SlaveAxisName + ( currentPathPostData.RefPoint.Slave / Math.PI * 180 ).ToString( "F2" ) +
+				" " + GetRotaryAxisCommand( currentPathPostData.RefPoint.Master / Math.PI * 180, currentPathPostData.RefPoint.Slave / Math.PI * 180 ) +
 				" U" + polygonGeomData.Sides.ToString() +
 				" W" + polygonGeomData.SideLength.ToString( "F2" ) +
 				" D" + polygonGeomData.CornerRadius.ToString( "F2" ) +
@@ -422,21 +421,21 @@ namespace MyCAM.Post
 					return new StandardPatternNCPackage(
 						circleCacheInfo.GetProcessRefPoint(),
 						circleCacheInfo.StartPointList[ circlePathObject.CraftData.StartPointIndex ],
-						circlePathObject.CraftData );
+						circlePathObject.CraftData.TraverseData );
 				case PathType.Rectangle:
 					RectanglePathObject rectanglePathObject = pathObject as RectanglePathObject;
 					RectangleCacheInfo rectangleCacheInfo = rectanglePathObject.RectangleCacheInfo;
 					return new StandardPatternNCPackage(
 						rectangleCacheInfo.GetProcessRefPoint(),
 						rectangleCacheInfo.StartPointList[ rectanglePathObject.CraftData.StartPointIndex ],
-						rectanglePathObject.CraftData );
+						rectanglePathObject.CraftData.TraverseData );
 				case PathType.Runway:
 					RunwayPathObject runwayPathObject = pathObject as RunwayPathObject;
 					RunwayCacheInfo runwayCacheInfo = runwayPathObject.RunwayCacheInfo;
 					return new StandardPatternNCPackage(
 						runwayCacheInfo.GetProcessRefPoint(),
 						runwayCacheInfo.StartPointList[ runwayPathObject.CraftData.StartPointIndex ],
-						runwayPathObject.CraftData );
+						runwayPathObject.CraftData.TraverseData );
 				case PathType.Triangle:
 				case PathType.Square:
 				case PathType.Pentagon:
@@ -446,7 +445,7 @@ namespace MyCAM.Post
 					return new StandardPatternNCPackage(
 						polygonCacheInfo.GetProcessRefPoint(),
 						polygonCacheInfo.StartPointList[ polygonPathObject.CraftData.StartPointIndex ],
-						polygonPathObject.CraftData );
+						polygonPathObject.CraftData.TraverseData );
 				default:
 					break;
 
