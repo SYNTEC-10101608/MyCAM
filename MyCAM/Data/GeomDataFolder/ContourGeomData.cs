@@ -16,11 +16,12 @@ namespace MyCAM.Data
 				throw new ArgumentException( "ContourGeomData constructing argument empty pathDataList" );
 			}
 			UID = szUID;
+			m_IsClosed = isClosed;
 			DisctereContourHelper.BuildContourGeomData( pathDataList, isClosed,
 				out m_CADPointList, out m_ConnectPointMap );
 		}
 
-		public ContourGeomData( string szUID, List<CADPoint> cadPointList, Dictionary<CADPoint, CADPoint> connectPointMap )
+		public ContourGeomData( string szUID, List<CADPoint> cadPointList, Dictionary<CADPoint, CADPoint> connectPointMap, bool isClosed )
 		{
 			if( cadPointList == null || connectPointMap == null ) {
 				throw new ArgumentNullException( "ContourGeomData constructing argument null" );
@@ -31,6 +32,7 @@ namespace MyCAM.Data
 			UID = szUID;
 			m_CADPointList = cadPointList;
 			m_ConnectPointMap = connectPointMap;
+			m_IsClosed = isClosed;
 		}
 
 		public string UID
@@ -62,6 +64,14 @@ namespace MyCAM.Data
 			}
 		}
 
+		public bool IsClosed
+		{
+			get
+			{
+				return m_IsClosed;
+			}
+		}
+
 		public void DoTransform( gp_Trsf transform )
 		{
 			foreach( CADPoint cadPoint in m_CADPointList ) {
@@ -74,10 +84,11 @@ namespace MyCAM.Data
 
 		public IGeomData Clone()
 		{
-			return new ContourGeomData( UID, m_CADPointList, m_ConnectPointMap );
+			return new ContourGeomData( UID, m_CADPointList, m_ConnectPointMap, m_IsClosed );
 		}
 
 		List<CADPoint> m_CADPointList;
 		Dictionary<CADPoint, CADPoint> m_ConnectPointMap;
+		bool m_IsClosed;
 	}
 }

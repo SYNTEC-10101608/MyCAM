@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class RunwayCacheInfo : IStartPnt
+	public class RunwayCacheInfo : IStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IPathHeadTailCache, IOverCutCache
 	{
 		public RunwayCacheInfo( string szID, gp_Ax3 coordinateInfo, RunwayGeomData runwayGeomData, CraftData craftData )
 		{
@@ -81,6 +81,30 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
+		public bool IsPathReverse
+		{
+			get
+			{
+				return m_CraftData.IsReverse;
+			}
+		}
+
+		public LeadData LeadData
+		{
+			get
+			{
+				return m_CraftData.LeadLineParam;
+			}
+		}
+
+		public double OverCutLength
+		{
+			get
+			{
+				return m_CraftData.OverCutLength;
+			}
+		}
+
 		public CAMPoint GetProcessRefPoint()
 		{
 			// Calculate runway parameters
@@ -146,6 +170,28 @@ namespace MyCAM.CacheInfo
 		public gp_Pnt GetMainPathStartPoint()
 		{
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Point;
+		}
+
+		public CAMPoint GetFirstCAMPoint()
+		{
+			return m_StartPointList[ m_CraftData.StartPointIndex ];
+		}
+
+		public List<CAMPoint> GetToolVecList()
+		{
+			return m_StartPointList;
+		}
+
+		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
+		{
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
+			//if( m_CAMPointIndexMap.ContainsKey( point as CAMPoint ) ) {
+			//	int index = m_CAMPointIndexMap[ point as CAMPoint ];
+			//	return m_CraftData.ToolVecModifyMap.ContainsKey( index );
+			//}
+			return false;
 		}
 
 		public void DoTransform( gp_Trsf transform )

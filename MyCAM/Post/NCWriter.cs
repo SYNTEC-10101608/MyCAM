@@ -71,7 +71,9 @@ namespace MyCAM.Post
 								errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 								return false;
 							}
-							IGeomData geomData = DataGettingHelper.GetGeomDataByID( m_PathIDList[ i ] );
+							if( !DataGettingHelper.GetGeomDataByID( m_PathIDList[ i ], out IGeomData geomData ) ) {
+								return false;
+							}
 							if( !pathObjectDict.TryGetValue( m_PathIDList[ i ], out PathObject pathobject ) ) {
 								return false;
 							}

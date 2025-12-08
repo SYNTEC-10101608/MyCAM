@@ -360,7 +360,7 @@ namespace MyCAM.FileManager
 				return;
 			}
 			UID = geomData.UID;
-			
+
 			// Convert CADPointList
 			foreach( var point in geomData.CADPointList ) {
 				CADPointList.Add( new CADPointDTO( point ) );
@@ -381,20 +381,20 @@ namespace MyCAM.FileManager
 			if( CADPointList == null || ConnectPointMap == null ) {
 				throw new ArgumentException( "ContourGeomData deserialization failed." );
 			}
-			
+
 			List<CADPoint> cadPointList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
-			
+
 			// Reconstruct ConnectPointMap
 			// Key is from CADPointList by index, Value is separate CADPoint
 			Dictionary<CADPoint, CADPoint> connectPointMap = new Dictionary<CADPoint, CADPoint>();
 			foreach( var pair in ConnectPointMap ) {
 				if( pair.KeyIndex >= 0 && pair.KeyIndex < cadPointList.Count && pair.ValuePoint != null ) {
 					CADPoint valuePoint = pair.ValuePoint.ToCADPoint();
-					connectPointMap[cadPointList[pair.KeyIndex]] = valuePoint;
+					connectPointMap[ cadPointList[ pair.KeyIndex ] ] = valuePoint;
 				}
 			}
 
-			return new ContourGeomData( UID, cadPointList, connectPointMap );
+			return new ContourGeomData( UID, cadPointList, connectPointMap, true );
 		}
 	}
 

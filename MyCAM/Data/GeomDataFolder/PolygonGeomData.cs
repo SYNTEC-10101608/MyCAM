@@ -95,6 +95,14 @@
 			}
 		}
 
+		public bool IsClosed
+		{
+			get
+			{
+				return true;
+			}
+		}
+
 		public IGeomData Clone()
 		{
 			return new PolygonGeomData( m_szUID, Sides, m_SideLength, m_CornerRadius, m_RotatedAngle_deg );

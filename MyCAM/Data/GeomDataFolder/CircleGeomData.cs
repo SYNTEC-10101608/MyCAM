@@ -56,6 +56,14 @@
 			}
 		}
 
+		public bool IsClosed
+		{
+			get
+			{
+				return true;
+			}
+		}
+
 		public IGeomData Clone()
 		{
 			return new CircleGeomData( m_szUID, m_Diameter, m_RotatedAngle_deg );

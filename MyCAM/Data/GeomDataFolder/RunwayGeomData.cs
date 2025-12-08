@@ -70,6 +70,14 @@
 			}
 		}
 
+		public bool IsClosed
+		{
+			get
+			{
+				return true;
+			}
+		}
+
 		public IGeomData Clone()
 		{
 			return new RunwayGeomData( m_szUID, m_Length, m_Width, m_RotatedAngle_deg );

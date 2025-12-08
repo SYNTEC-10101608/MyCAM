@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class PolygonCacheInfo : IStartPnt
+	public class PolygonCacheInfo : IStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IPathHeadTailCache, IOverCutCache
 	{
 		public PolygonCacheInfo( string szID, gp_Ax3 coordinateInfo, PolygonGeomData polygonGeomData, CraftData craftData )
 		{
@@ -78,14 +78,6 @@ namespace MyCAM.CacheInfo
 
 		#endregion
 
-		public bool IsClosed
-		{
-			get
-			{
-				return true;
-			}
-		}
-
 		public CAMPoint GetProcessRefPoint()
 		{
 			return new CAMPoint( new CADPoint( m_CoordinateInfo.Location(), m_CoordinateInfo.Direction(), m_CoordinateInfo.XDirection(), m_CoordinateInfo.YDirection() ), m_CoordinateInfo.Direction() );
@@ -112,6 +104,60 @@ namespace MyCAM.CacheInfo
 		public gp_Pnt GetMainPathStartPoint()
 		{
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Point;
+		}
+
+		public CAMPoint GetFirstCAMPoint()
+		{
+			return m_StartPointList[ m_CraftData.StartPointIndex ];
+		}
+
+		public List<CAMPoint> GetToolVecList()
+		{
+			return m_StartPointList;
+		}
+
+		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
+		{
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
+			//if( m_CAMPointIndexMap.ContainsKey( point as CAMPoint ) ) {
+			//	int index = m_CAMPointIndexMap[ point as CAMPoint ];
+			//	return m_CraftData.ToolVecModifyMap.ContainsKey( index );
+			//}
+			return false;
+		}
+
+		public bool IsClosed
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		public bool IsPathReverse
+		{
+			get
+			{
+				return m_CraftData.IsReverse;
+			}
+		}
+
+		public LeadData LeadData
+		{
+			get
+			{
+				return m_CraftData.LeadLineParam;
+			}
+		}
+
+		public double OverCutLength
+		{
+			get
+			{
+				return m_CraftData.OverCutLength;
+			}
 		}
 
 		public void DoTransform( gp_Trsf transform )

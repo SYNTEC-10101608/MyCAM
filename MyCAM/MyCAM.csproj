@@ -65,7 +65,7 @@
     <Compile Include="Data\PathObjectFolder\CirclePathObject.cs" />
     <Compile Include="Data\PathObjectFolder\ContourPathObject.cs" />
     <Compile Include="Data\CraftData.cs" />
-    <Compile Include="CacheInfo\ICacheInfo.cs" />
+    <Compile Include="CacheInfo\IPathHeadTailCache.cs" />
     <Compile Include="Data\GeomDataFolder\IGeomData.cs" />
     <Compile Include="Data\GeomDataFolder\RectangleGeomData.cs" />
     <Compile Include="Data\MachineData.cs" />

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
-	public class RectangleCacheInfo : ICacheInfo, IStartPnt
+	public class RectangleCacheInfo : IPathHeadTailCache, IStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache
 	{
 		public RectangleCacheInfo( string szID, gp_Ax3 coordinateInfo, RectangleGeomData rectangleGeomData, CraftData craftData )
 		{
@@ -103,11 +103,57 @@ namespace MyCAM.CacheInfo
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Point;
 		}
 
+		public CAMPoint GetFirstCAMPoint()
+		{
+			return m_StartPointList[ m_CraftData.StartPointIndex ];
+		}
+
+		public List<CAMPoint> GetToolVecList()
+		{
+			return m_StartPointList;
+		}
+
+		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
+		{
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
+			//if( m_CAMPointIndexMap.ContainsKey( point as CAMPoint ) ) {
+			//	int index = m_CAMPointIndexMap[ point as CAMPoint ];
+			//	return m_CraftData.ToolVecModifyMap.ContainsKey( index );
+			//}
+			return false;
+		}
+
 		public bool IsClosed
 		{
 			get
 			{
 				return true;
+			}
+		}
+
+		public bool IsPathReverse
+		{
+			get
+			{
+				return m_CraftData.IsReverse;
+			}
+		}
+
+		public LeadData LeadData
+		{
+			get
+			{
+				return m_CraftData.LeadLineParam;
+			}
+		}
+
+		public double OverCutLength
+		{
+			get
+			{
+				return m_CraftData.OverCutLength;
 			}
 		}
 

@@ -84,6 +84,14 @@
 			}
 		}
 
+		public bool IsClosed
+		{
+			get
+			{
+				return true;
+			}
+		}
+
 		public IGeomData Clone()
 		{
 			return new RectangleGeomData( m_szUID, m_Width, m_Length, m_CornerRadius, m_RotatedAngle_deg );

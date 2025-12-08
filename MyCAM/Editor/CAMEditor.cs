@@ -283,7 +283,7 @@ namespace MyCAM.Editor
 			// one shot edit, muti edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 
@@ -350,7 +350,7 @@ namespace MyCAM.Editor
 			// one shot edit, multi edit supported
 			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 
@@ -437,10 +437,10 @@ namespace MyCAM.Editor
 			string szStartPathID = szPathIDList[ 0 ];
 
 			// get start point
-			if( !GetCacheInfoByID( m_DataManager, szStartPathID, out ICacheInfo cacheInfo ) ) {
+			if( !DataGettingHelper.GetPathHeadTailCacheByID( szStartPathID, out IPathHeadTailCache pathHeadTailCache ) ) {
 				return;
 			}
-			gp_Pnt currentPoint = cacheInfo.GetProcessStartPoint().Point;
+			gp_Pnt currentPoint = pathHeadTailCache.GetProcessStartPoint().Point;
 
 			// init data manager
 			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
@@ -460,10 +460,10 @@ namespace MyCAM.Editor
 					if( visited[ i ] ) {
 						continue;
 					}
-					if( !GetCacheInfoByID( m_DataManager, pathIDList[ i ], out ICacheInfo nextCacheInfo ) ) {
-						continue;
+					if( !DataGettingHelper.GetPathHeadTailCacheByID( szStartPathID, out IPathHeadTailCache nextPathHeadTailCache ) ) {
+						return;
 					}
-					gp_Pnt nextStartPoint = nextCacheInfo.GetProcessStartPoint().Point;
+					gp_Pnt nextStartPoint = nextPathHeadTailCache.GetProcessStartPoint().Point;
 					double distanceSq = currentPoint.SquareDistance( nextStartPoint );
 					if( distanceSq < minDistanceSq ) {
 						minDistanceSq = distanceSq;
@@ -543,10 +543,10 @@ namespace MyCAM.Editor
 
 			// closed path editable only: start point, overcut, lead line, change lead dir
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) ) {
+				if( !DataGettingHelper.GetGeomDataByID( szPathID, out IGeomData geomData ) ) {
 					continue;
 				}
-				if( !( cacheInfo is ContourCacheInfo ) || !( cacheInfo as ContourCacheInfo ).IsClosed ) {
+				if( !( geomData.PathType != PathType.Contour ) || !geomData.IsClosed ) {
 					editableInfo.IsStartPointEditable = false;
 					editableInfo.IsOverCutEditable = false;
 					editableInfo.IsLeadLineEditable = false;
@@ -650,40 +650,6 @@ namespace MyCAM.Editor
 			}
 			return true;
 		}
-
-		bool GetCraftDataByID( DataManager dataManager, string szPathID, out CraftData craftData )
-		{
-			craftData = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| dataManager.ObjectMap.ContainsKey( szPathID ) == false
-				|| dataManager.ObjectMap[ szPathID ] == null
-				|| !( dataManager.ObjectMap[ szPathID ] is PathObject )
-				|| ( (PathObject)dataManager.ObjectMap[ szPathID ] ).CraftData == null ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
-				return false;
-			}
-
-			if( ( (PathObject)dataManager.ObjectMap[ szPathID ] ).PathType == PathType.Contour ) {
-				craftData = ( (ContourPathObject)dataManager.ObjectMap[ szPathID ] ).CraftData;
-			}
-			return true;
-		}
-
-		bool GetCacheInfoByID( DataManager dataManager, string szPathID, out ICacheInfo cacheInfo )
-		{
-			cacheInfo = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| dataManager.ObjectMap.ContainsKey( szPathID ) == false
-				|| dataManager.ObjectMap[ szPathID ] == null ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
-				return false;
-			}
-			if( ( (PathObject)dataManager.ObjectMap[ szPathID ] ).PathType == PathType.Contour ) {
-				cacheInfo = ( (ContourPathObject)dataManager.ObjectMap[ szPathID ] ).ContourCacheInfo;
-			}
-			return true;
-		}
-
 
 		// edit actions
 		protected override void OnEditActionStart( IEditorAction action )

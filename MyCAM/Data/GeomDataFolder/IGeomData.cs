@@ -12,6 +12,11 @@
 			get;
 		}
 
+		bool IsClosed
+		{
+			get;
+		}
+
 		IGeomData Clone();
 	}
 
