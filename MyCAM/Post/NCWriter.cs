@@ -71,9 +71,11 @@ namespace MyCAM.Post
 								return false;
 							}
 							if( !DataGettingHelper.GetGeomDataByID( m_PathIDList[ i ], out IGeomData geomData ) ) {
+								errorMessage = "路徑資訊取得錯誤，路徑：" + ( i ).ToString();
 								return false;
 							}
 							if( !pathObjectDict.TryGetValue( m_PathIDList[ i ], out PathObject pathobject ) ) {
+								errorMessage = "路徑資訊取得錯誤，路徑：" + ( i ).ToString();
 								return false;
 							}
 							WriteStandardPatternCutting( pathType, postData, pathobject.CraftData, geomData, i + 1 );
