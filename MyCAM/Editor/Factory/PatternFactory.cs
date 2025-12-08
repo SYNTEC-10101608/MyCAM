@@ -239,10 +239,16 @@ namespace MyCAM.Editor.Factory
 
 		void GetLocalCoordination( gp_Pnt centerPoint, gp_Dir normalDir, double rotationAngleInDegrees, out gp_Dir xDir, out gp_Dir yDir )
 		{
-			if( normalDir.IsParallel( new gp_Dir( 0, 0, 1 ), 0.001 ) ) {
+			if( normalDir.IsParallel( new gp_Dir( 0, 0, 1 ), 0.001 ) && !normalDir.IsOpposite( new gp_Dir( 0, 0, 1 ), 0.001 ) ) {
 				gp_Trsf trsf = new gp_Trsf();
 				trsf.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), 0 );
 				gp_Dir refDir = new gp_Dir( 1, 0, 0 );
+				xDir = refDir.Transformed( trsf );
+			}
+			else if( normalDir.IsParallel( new gp_Dir( 0, 0, 1 ), 0.001 ) && normalDir.IsOpposite( new gp_Dir( 0, 0, 1 ), 0.001 ) ) {
+				gp_Trsf trsf = new gp_Trsf();
+				trsf.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 0 );
+				gp_Dir refDir = new gp_Dir( -1, 0, 0 );
 				xDir = refDir.Transformed( trsf );
 			}
 			else {
