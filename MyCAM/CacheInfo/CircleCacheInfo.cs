@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
-	public class CircleCacheInfo : IPathHeadTailCache, IStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache
+	public class CircleCacheInfo : IPathHeadTailCache, IStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
 		public CircleCacheInfo( string szID, gp_Ax3 coordinateInfo, CircleGeomData circleGeomData, CraftData craftData )
 		{
@@ -107,6 +107,11 @@ namespace MyCAM.CacheInfo
 		public List<CAMPoint> GetToolVecList()
 		{
 			return m_StartPointList;
+		}
+
+		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
+		{
+			return false;
 		}
 
 		public bool IsClosed

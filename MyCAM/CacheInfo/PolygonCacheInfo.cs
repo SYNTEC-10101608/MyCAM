@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
-	public class PolygonCacheInfo : IStartPointCache, ILeadCache, IPathReverseCache, IPathHeadTailCache, IOverCutCache
+	public class PolygonCacheInfo : IPathHeadTailCache, IStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
 		public PolygonCacheInfo( string szID, gp_Ax3 coordinateInfo, PolygonGeomData polygonGeomData, CraftData craftData )
 		{
@@ -107,6 +107,11 @@ namespace MyCAM.CacheInfo
 		public List<CAMPoint> GetToolVecList()
 		{
 			return m_StartPointList;
+		}
+
+		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
+		{
+			return false;
 		}
 
 		public bool IsClosed

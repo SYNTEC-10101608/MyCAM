@@ -123,7 +123,7 @@ namespace MyCAM.CacheInfo
 
 		public IToolVecCache GetToolVecCache( PathObject pathObject )
 		{
-			return null; // Circle doesn't support tool vector cache
+			return ( pathObject as CirclePathObject )?.CircleCacheInfo;
 		}
 
 		public IOverCutCache GetOverCutCache( PathObject pathObject )
@@ -151,7 +151,7 @@ namespace MyCAM.CacheInfo
 
 		public IToolVecCache GetToolVecCache( PathObject pathObject )
 		{
-			return null; // Rectangle doesn't support tool vector cache
+			return ( pathObject as RectanglePathObject )?.RectangleCacheInfo;
 		}
 
 		public IOverCutCache GetOverCutCache( PathObject pathObject )
@@ -179,7 +179,7 @@ namespace MyCAM.CacheInfo
 
 		public IToolVecCache GetToolVecCache( PathObject pathObject )
 		{
-			return null; // Polygon doesn't support tool vector cache
+			return ( pathObject as PolygonPathObject )?.PolygonCacheInfo;
 		}
 
 		public IOverCutCache GetOverCutCache( PathObject pathObject )
@@ -207,7 +207,7 @@ namespace MyCAM.CacheInfo
 
 		public IToolVecCache GetToolVecCache( PathObject pathObject )
 		{
-			return null; // Runway doesn't support tool vector cache
+			return ( pathObject as RunwayPathObject )?.RunwayCacheInfo;
 		}
 
 		public IOverCutCache GetOverCutCache( PathObject pathObject )

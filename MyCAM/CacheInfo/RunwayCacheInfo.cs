@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
-	public class RunwayCacheInfo : IStartPointCache, ILeadCache, IPathReverseCache, IPathHeadTailCache, IOverCutCache
+	public class RunwayCacheInfo : IPathHeadTailCache, IStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
 		public RunwayCacheInfo( string szID, gp_Ax3 coordinateInfo, RunwayGeomData runwayGeomData, CraftData craftData )
 		{
@@ -173,6 +173,11 @@ namespace MyCAM.CacheInfo
 		public List<CAMPoint> GetToolVecList()
 		{
 			return m_StartPointList;
+		}
+
+		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
+		{
+			return false;
 		}
 
 		public void DoTransform( gp_Trsf transform )
