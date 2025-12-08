@@ -5,13 +5,6 @@ using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
-	public interface IPathHeadTailCache
-	{
-		CAMPoint GetProcessStartPoint();
-
-		CAMPoint GetProcessEndPoint();
-	}
-
 	public interface IStartPointCache
 	{
 		gp_Pnt GetMainPathStartPoint();
@@ -65,6 +58,13 @@ namespace MyCAM.CacheInfo
 		}
 	}
 
+	public interface IPathHeadTailCache
+	{
+		CAMPoint GetProcessStartPoint();
+
+		CAMPoint GetProcessEndPoint();
+	}
+
 	internal interface IPathCacheStrategy
 	{
 		IStartPointCache GetStartPointCache( PathObject pathObject );
@@ -72,7 +72,6 @@ namespace MyCAM.CacheInfo
 		IPathReverseCache GetPathReverseCache( PathObject pathObject );
 		IToolVecCache GetToolVecCache( PathObject pathObject );
 		IOverCutCache GetOverCutCache( PathObject pathObject );
-		IPathHeadTailCache GetPathHeadTailCache( PathObject pathObject );
 	}
 
 	internal class ContourCacheStrategy : IPathCacheStrategy
@@ -98,11 +97,6 @@ namespace MyCAM.CacheInfo
 		}
 
 		public IOverCutCache GetOverCutCache( PathObject pathObject )
-		{
-			return ( pathObject as ContourPathObject )?.ContourCacheInfo;
-		}
-
-		public IPathHeadTailCache GetPathHeadTailCache( PathObject pathObject )
 		{
 			return ( pathObject as ContourPathObject )?.ContourCacheInfo;
 		}
@@ -134,11 +128,6 @@ namespace MyCAM.CacheInfo
 		{
 			return ( pathObject as CirclePathObject )?.CircleCacheInfo;
 		}
-
-		public IPathHeadTailCache GetPathHeadTailCache( PathObject pathObject )
-		{
-			return ( pathObject as CirclePathObject )?.CircleCacheInfo;
-		}
 	}
 
 	internal class RectangleCacheStrategy : IPathCacheStrategy
@@ -164,11 +153,6 @@ namespace MyCAM.CacheInfo
 		}
 
 		public IOverCutCache GetOverCutCache( PathObject pathObject )
-		{
-			return ( pathObject as RectanglePathObject )?.RectangleCacheInfo;
-		}
-
-		public IPathHeadTailCache GetPathHeadTailCache( PathObject pathObject )
 		{
 			return ( pathObject as RectanglePathObject )?.RectangleCacheInfo;
 		}
@@ -200,11 +184,6 @@ namespace MyCAM.CacheInfo
 		{
 			return ( pathObject as PolygonPathObject )?.PolygonCacheInfo;
 		}
-
-		public IPathHeadTailCache GetPathHeadTailCache( PathObject pathObject )
-		{
-			return ( pathObject as PolygonPathObject )?.PolygonCacheInfo;
-		}
 	}
 
 	internal class RunwayCacheStrategy : IPathCacheStrategy
@@ -230,11 +209,6 @@ namespace MyCAM.CacheInfo
 		}
 
 		public IOverCutCache GetOverCutCache( PathObject pathObject )
-		{
-			return ( pathObject as RunwayPathObject )?.RunwayCacheInfo;
-		}
-
-		public IPathHeadTailCache GetPathHeadTailCache( PathObject pathObject )
 		{
 			return ( pathObject as RunwayPathObject )?.RunwayCacheInfo;
 		}
@@ -328,18 +302,6 @@ namespace MyCAM.CacheInfo
 
 			IPathCacheStrategy strategy = PathCacheStrategyFactory.GetStrategy( pathObject.PathType );
 			cache = strategy.GetOverCutCache( pathObject );
-			return cache != null;
-		}
-
-		public static bool TryGetPathHeadTailCache( PathObject pathObject, out IPathHeadTailCache cache )
-		{
-			cache = null;
-			if( pathObject == null ) {
-				return false;
-			}
-
-			IPathCacheStrategy strategy = PathCacheStrategyFactory.GetStrategy( pathObject.PathType );
-			cache = strategy.GetPathHeadTailCache( pathObject );
 			return cache != null;
 		}
 	}
