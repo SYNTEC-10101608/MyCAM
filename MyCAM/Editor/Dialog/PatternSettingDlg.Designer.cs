@@ -71,19 +71,17 @@
 			this.m_panelCircle.Controls.Add(this.m_txbCircleDiameter);
 			this.m_panelCircle.Controls.Add(this.label6);
 			this.m_panelCircle.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_panelCircle.Location = new System.Drawing.Point(29, 68);
-			this.m_panelCircle.Margin = new System.Windows.Forms.Padding(4);
+			this.m_panelCircle.Location = new System.Drawing.Point(22, 54);
 			this.m_panelCircle.Name = "m_panelCircle";
-			this.m_panelCircle.Size = new System.Drawing.Size(347, 325);
+			this.m_panelCircle.Size = new System.Drawing.Size(260, 260);
 			this.m_panelCircle.TabIndex = 31;
 			this.m_panelCircle.Visible = false;
 			// 
 			// m_txbCircleRotatedAngle
 			// 
-			this.m_txbCircleRotatedAngle.Location = new System.Drawing.Point(187, 100);
-			this.m_txbCircleRotatedAngle.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbCircleRotatedAngle.Location = new System.Drawing.Point(140, 80);
 			this.m_txbCircleRotatedAngle.Name = "m_txbCircleRotatedAngle";
-			this.m_txbCircleRotatedAngle.Size = new System.Drawing.Size(132, 26);
+			this.m_txbCircleRotatedAngle.Size = new System.Drawing.Size(100, 22);
 			this.m_txbCircleRotatedAngle.TabIndex = 19;
 			this.m_txbCircleRotatedAngle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbCircleRotatedAngle_KeyDown);
 			this.m_txbCircleRotatedAngle.Leave += new System.EventHandler(this.m_txbCircleRotatedAngle_Leave);
@@ -92,19 +90,17 @@
 			// 
 			this.label7.AutoSize = true;
 			this.label7.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label7.Location = new System.Drawing.Point(27, 100);
-			this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label7.Location = new System.Drawing.Point(20, 80);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(95, 22);
+			this.label7.Size = new System.Drawing.Size(76, 17);
 			this.label7.TabIndex = 18;
 			this.label7.Text = "旋轉角度:";
 			// 
 			// m_txbCircleDiameter
 			// 
-			this.m_txbCircleDiameter.Location = new System.Drawing.Point(187, 38);
-			this.m_txbCircleDiameter.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbCircleDiameter.Location = new System.Drawing.Point(140, 30);
 			this.m_txbCircleDiameter.Name = "m_txbCircleDiameter";
-			this.m_txbCircleDiameter.Size = new System.Drawing.Size(132, 26);
+			this.m_txbCircleDiameter.Size = new System.Drawing.Size(100, 22);
 			this.m_txbCircleDiameter.TabIndex = 17;
 			this.m_txbCircleDiameter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbCircleDiameter_KeyDown);
 			this.m_txbCircleDiameter.Leave += new System.EventHandler(this.m_txbCircleDiameter_Leave);
@@ -113,10 +109,9 @@
 			// 
 			this.label6.AutoSize = true;
 			this.label6.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label6.Location = new System.Drawing.Point(27, 38);
-			this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label6.Location = new System.Drawing.Point(20, 30);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(90, 22);
+			this.label6.Size = new System.Drawing.Size(72, 17);
 			this.label6.TabIndex = 16;
 			this.label6.Text = "圓直徑：";
 			// 
@@ -129,19 +124,17 @@
 			this.m_panelRunway.Controls.Add(this.m_txbRunwayLength);
 			this.m_panelRunway.Controls.Add(this.label15);
 			this.m_panelRunway.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_panelRunway.Location = new System.Drawing.Point(29, 68);
-			this.m_panelRunway.Margin = new System.Windows.Forms.Padding(4);
+			this.m_panelRunway.Location = new System.Drawing.Point(22, 54);
 			this.m_panelRunway.Name = "m_panelRunway";
-			this.m_panelRunway.Size = new System.Drawing.Size(347, 325);
+			this.m_panelRunway.Size = new System.Drawing.Size(260, 260);
 			this.m_panelRunway.TabIndex = 30;
 			this.m_panelRunway.Visible = false;
 			// 
 			// m_txbRunwayRotatedAngle
 			// 
-			this.m_txbRunwayRotatedAngle.Location = new System.Drawing.Point(187, 162);
-			this.m_txbRunwayRotatedAngle.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbRunwayRotatedAngle.Location = new System.Drawing.Point(140, 130);
 			this.m_txbRunwayRotatedAngle.Name = "m_txbRunwayRotatedAngle";
-			this.m_txbRunwayRotatedAngle.Size = new System.Drawing.Size(132, 26);
+			this.m_txbRunwayRotatedAngle.Size = new System.Drawing.Size(100, 22);
 			this.m_txbRunwayRotatedAngle.TabIndex = 23;
 			this.m_txbRunwayRotatedAngle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbRunwayRotatedAngle_KeyDown);
 			this.m_txbRunwayRotatedAngle.Leave += new System.EventHandler(this.m_txbRunwayRotatedAngle_Leave);
@@ -150,19 +143,17 @@
 			// 
 			this.label12.AutoSize = true;
 			this.label12.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label12.Location = new System.Drawing.Point(27, 162);
-			this.label12.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label12.Location = new System.Drawing.Point(20, 130);
 			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(95, 22);
+			this.label12.Size = new System.Drawing.Size(76, 17);
 			this.label12.TabIndex = 22;
 			this.label12.Text = "旋轉角度:";
 			// 
 			// m_txbRunwayWidth
 			// 
-			this.m_txbRunwayWidth.Location = new System.Drawing.Point(187, 100);
-			this.m_txbRunwayWidth.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbRunwayWidth.Location = new System.Drawing.Point(140, 80);
 			this.m_txbRunwayWidth.Name = "m_txbRunwayWidth";
-			this.m_txbRunwayWidth.Size = new System.Drawing.Size(132, 26);
+			this.m_txbRunwayWidth.Size = new System.Drawing.Size(100, 22);
 			this.m_txbRunwayWidth.TabIndex = 21;
 			this.m_txbRunwayWidth.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbRunwayWidth_KeyDown);
 			this.m_txbRunwayWidth.Leave += new System.EventHandler(this.m_txbRunwayWidth_Leave);
@@ -171,19 +162,17 @@
 			// 
 			this.label14.AutoSize = true;
 			this.label14.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label14.Location = new System.Drawing.Point(27, 100);
-			this.label14.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label14.Location = new System.Drawing.Point(20, 80);
 			this.label14.Name = "label14";
-			this.label14.Size = new System.Drawing.Size(95, 22);
+			this.label14.Size = new System.Drawing.Size(76, 17);
 			this.label14.TabIndex = 20;
 			this.label14.Text = "寬邊距離:";
 			// 
 			// m_txbRunwayLength
 			// 
-			this.m_txbRunwayLength.Location = new System.Drawing.Point(187, 38);
-			this.m_txbRunwayLength.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbRunwayLength.Location = new System.Drawing.Point(140, 30);
 			this.m_txbRunwayLength.Name = "m_txbRunwayLength";
-			this.m_txbRunwayLength.Size = new System.Drawing.Size(132, 26);
+			this.m_txbRunwayLength.Size = new System.Drawing.Size(100, 22);
 			this.m_txbRunwayLength.TabIndex = 19;
 			this.m_txbRunwayLength.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbRunwayLength_KeyDown);
 			this.m_txbRunwayLength.Leave += new System.EventHandler(this.m_txbRunwayLength_Leave);
@@ -192,10 +181,9 @@
 			// 
 			this.label15.AutoSize = true;
 			this.label15.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label15.Location = new System.Drawing.Point(27, 38);
-			this.label15.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label15.Location = new System.Drawing.Point(20, 30);
 			this.label15.Name = "label15";
-			this.label15.Size = new System.Drawing.Size(95, 22);
+			this.label15.Size = new System.Drawing.Size(76, 17);
 			this.label15.TabIndex = 18;
 			this.label15.Text = "長邊距離:";
 			// 
@@ -208,19 +196,17 @@
 			this.m_panelPolygon.Controls.Add(this.m_txbPolygonSideLength);
 			this.m_panelPolygon.Controls.Add(this.label13);
 			this.m_panelPolygon.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_panelPolygon.Location = new System.Drawing.Point(29, 68);
-			this.m_panelPolygon.Margin = new System.Windows.Forms.Padding(4);
+			this.m_panelPolygon.Location = new System.Drawing.Point(22, 54);
 			this.m_panelPolygon.Name = "m_panelPolygon";
-			this.m_panelPolygon.Size = new System.Drawing.Size(347, 325);
+			this.m_panelPolygon.Size = new System.Drawing.Size(260, 260);
 			this.m_panelPolygon.TabIndex = 29;
 			this.m_panelPolygon.Visible = false;
 			// 
 			// m_txbPolygonCornerRadius
 			// 
-			this.m_txbPolygonCornerRadius.Location = new System.Drawing.Point(187, 100);
-			this.m_txbPolygonCornerRadius.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbPolygonCornerRadius.Location = new System.Drawing.Point(140, 80);
 			this.m_txbPolygonCornerRadius.Name = "m_txbPolygonCornerRadius";
-			this.m_txbPolygonCornerRadius.Size = new System.Drawing.Size(132, 26);
+			this.m_txbPolygonCornerRadius.Size = new System.Drawing.Size(100, 22);
 			this.m_txbPolygonCornerRadius.TabIndex = 19;
 			this.m_txbPolygonCornerRadius.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbPolygonCornerRadius_KeyDown);
 			this.m_txbPolygonCornerRadius.Leave += new System.EventHandler(this.m_txbPolygonCornerRadius_Leave);
@@ -229,19 +215,17 @@
 			// 
 			this.label8.AutoSize = true;
 			this.label8.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label8.Location = new System.Drawing.Point(27, 100);
-			this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label8.Location = new System.Drawing.Point(20, 80);
 			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(95, 22);
+			this.label8.Size = new System.Drawing.Size(76, 17);
 			this.label8.TabIndex = 18;
 			this.label8.Text = "倒角半徑:";
 			// 
 			// m_txbPolygonRotatedAngle
 			// 
-			this.m_txbPolygonRotatedAngle.Location = new System.Drawing.Point(187, 162);
-			this.m_txbPolygonRotatedAngle.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbPolygonRotatedAngle.Location = new System.Drawing.Point(140, 130);
 			this.m_txbPolygonRotatedAngle.Name = "m_txbPolygonRotatedAngle";
-			this.m_txbPolygonRotatedAngle.Size = new System.Drawing.Size(132, 26);
+			this.m_txbPolygonRotatedAngle.Size = new System.Drawing.Size(100, 22);
 			this.m_txbPolygonRotatedAngle.TabIndex = 17;
 			this.m_txbPolygonRotatedAngle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbPolygonRotatedAngle_KeyDown);
 			this.m_txbPolygonRotatedAngle.Leave += new System.EventHandler(this.m_txbPolygonRotatedAngle_Leave);
@@ -250,19 +234,17 @@
 			// 
 			this.label11.AutoSize = true;
 			this.label11.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label11.Location = new System.Drawing.Point(27, 162);
-			this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label11.Location = new System.Drawing.Point(20, 130);
 			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(95, 22);
+			this.label11.Size = new System.Drawing.Size(76, 17);
 			this.label11.TabIndex = 16;
 			this.label11.Text = "旋轉角度:";
 			// 
 			// m_txbPolygonSideLength
 			// 
-			this.m_txbPolygonSideLength.Location = new System.Drawing.Point(187, 38);
-			this.m_txbPolygonSideLength.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbPolygonSideLength.Location = new System.Drawing.Point(140, 30);
 			this.m_txbPolygonSideLength.Name = "m_txbPolygonSideLength";
-			this.m_txbPolygonSideLength.Size = new System.Drawing.Size(132, 26);
+			this.m_txbPolygonSideLength.Size = new System.Drawing.Size(100, 22);
 			this.m_txbPolygonSideLength.TabIndex = 13;
 			this.m_txbPolygonSideLength.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbPolygonSideLength_KeyDown);
 			this.m_txbPolygonSideLength.Leave += new System.EventHandler(this.m_txbPolygonSideLength_Leave);
@@ -271,20 +253,18 @@
 			// 
 			this.label13.AutoSize = true;
 			this.label13.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label13.Location = new System.Drawing.Point(27, 38);
-			this.label13.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label13.Location = new System.Drawing.Point(20, 30);
 			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(55, 22);
+			this.label13.Size = new System.Drawing.Size(44, 17);
 			this.label13.TabIndex = 12;
 			this.label13.Text = "邊長:";
 			// 
 			// m_btnConfirm
 			// 
 			this.m_btnConfirm.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_btnConfirm.Location = new System.Drawing.Point(271, 400);
-			this.m_btnConfirm.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnConfirm.Location = new System.Drawing.Point(203, 320);
 			this.m_btnConfirm.Name = "m_btnConfirm";
-			this.m_btnConfirm.Size = new System.Drawing.Size(107, 38);
+			this.m_btnConfirm.Size = new System.Drawing.Size(80, 30);
 			this.m_btnConfirm.TabIndex = 28;
 			this.m_btnConfirm.Text = "確認";
 			this.m_btnConfirm.UseVisualStyleBackColor = true;
@@ -294,10 +274,9 @@
 			// 
 			this.label1.AutoSize = true;
 			this.label1.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label1.Location = new System.Drawing.Point(41, 22);
-			this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label1.Location = new System.Drawing.Point(31, 18);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(95, 22);
+			this.label1.Size = new System.Drawing.Size(76, 17);
 			this.label1.TabIndex = 27;
 			this.label1.Text = "輪廓種類:";
 			// 
@@ -312,49 +291,44 @@
 			this.m_panelRectangle.Controls.Add(this.label3);
 			this.m_panelRectangle.Controls.Add(this.label2);
 			this.m_panelRectangle.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_panelRectangle.Location = new System.Drawing.Point(29, 68);
-			this.m_panelRectangle.Margin = new System.Windows.Forms.Padding(4);
+			this.m_panelRectangle.Location = new System.Drawing.Point(22, 54);
 			this.m_panelRectangle.Name = "m_panelRectangle";
-			this.m_panelRectangle.Size = new System.Drawing.Size(347, 325);
+			this.m_panelRectangle.Size = new System.Drawing.Size(260, 260);
 			this.m_panelRectangle.TabIndex = 26;
 			this.m_panelRectangle.Visible = false;
 			// 
 			// m_txbRecRotatedAngle
 			// 
-			this.m_txbRecRotatedAngle.Location = new System.Drawing.Point(187, 225);
-			this.m_txbRecRotatedAngle.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbRecRotatedAngle.Location = new System.Drawing.Point(140, 180);
 			this.m_txbRecRotatedAngle.Name = "m_txbRecRotatedAngle";
-			this.m_txbRecRotatedAngle.Size = new System.Drawing.Size(132, 26);
+			this.m_txbRecRotatedAngle.Size = new System.Drawing.Size(100, 22);
 			this.m_txbRecRotatedAngle.TabIndex = 16;
 			this.m_txbRecRotatedAngle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbRecRotatedAngle_KeyDown);
 			this.m_txbRecRotatedAngle.Leave += new System.EventHandler(this.m_txbRecRotatedAngle_Leave);
 			// 
 			// m_txbRecCornerRadius
 			// 
-			this.m_txbRecCornerRadius.Location = new System.Drawing.Point(187, 162);
-			this.m_txbRecCornerRadius.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbRecCornerRadius.Location = new System.Drawing.Point(140, 130);
 			this.m_txbRecCornerRadius.Name = "m_txbRecCornerRadius";
-			this.m_txbRecCornerRadius.Size = new System.Drawing.Size(132, 26);
+			this.m_txbRecCornerRadius.Size = new System.Drawing.Size(100, 22);
 			this.m_txbRecCornerRadius.TabIndex = 10;
 			this.m_txbRecCornerRadius.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbRecCornerRadius_KeyDown);
 			this.m_txbRecCornerRadius.Leave += new System.EventHandler(this.m_txbRecCornerRadius_Leave);
 			// 
 			// m_txbRecWidth
 			// 
-			this.m_txbRecWidth.Location = new System.Drawing.Point(187, 100);
-			this.m_txbRecWidth.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbRecWidth.Location = new System.Drawing.Point(140, 80);
 			this.m_txbRecWidth.Name = "m_txbRecWidth";
-			this.m_txbRecWidth.Size = new System.Drawing.Size(132, 26);
+			this.m_txbRecWidth.Size = new System.Drawing.Size(100, 22);
 			this.m_txbRecWidth.TabIndex = 9;
 			this.m_txbRecWidth.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbRecWidth_KeyDown);
 			this.m_txbRecWidth.Leave += new System.EventHandler(this.m_txbRecWidth_Leave);
 			// 
 			// m_txbRecLength
 			// 
-			this.m_txbRecLength.Location = new System.Drawing.Point(187, 38);
-			this.m_txbRecLength.Margin = new System.Windows.Forms.Padding(4);
+			this.m_txbRecLength.Location = new System.Drawing.Point(140, 30);
 			this.m_txbRecLength.Name = "m_txbRecLength";
-			this.m_txbRecLength.Size = new System.Drawing.Size(132, 26);
+			this.m_txbRecLength.Size = new System.Drawing.Size(100, 22);
 			this.m_txbRecLength.TabIndex = 8;
 			this.m_txbRecLength.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbRecLength_KeyDown);
 			this.m_txbRecLength.Leave += new System.EventHandler(this.m_txbRecLength_Leave);
@@ -363,10 +337,9 @@
 			// 
 			this.label5.AutoSize = true;
 			this.label5.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label5.Location = new System.Drawing.Point(27, 225);
-			this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label5.Location = new System.Drawing.Point(20, 180);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(110, 22);
+			this.label5.Size = new System.Drawing.Size(88, 17);
 			this.label5.TabIndex = 7;
 			this.label5.Text = "旋轉角度：";
 			// 
@@ -374,10 +347,9 @@
 			// 
 			this.label4.AutoSize = true;
 			this.label4.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label4.Location = new System.Drawing.Point(27, 162);
-			this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label4.Location = new System.Drawing.Point(20, 130);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(110, 22);
+			this.label4.Size = new System.Drawing.Size(88, 17);
 			this.label4.TabIndex = 6;
 			this.label4.Text = "倒角半徑：";
 			// 
@@ -385,23 +357,21 @@
 			// 
 			this.label3.AutoSize = true;
 			this.label3.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label3.Location = new System.Drawing.Point(27, 100);
-			this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label3.Location = new System.Drawing.Point(20, 80);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(110, 22);
+			this.label3.Size = new System.Drawing.Size(88, 17);
 			this.label3.TabIndex = 5;
-			this.label3.Text = "寬邊長度：";
+			this.label3.Text = "寬邊距離：";
 			// 
 			// label2
 			// 
 			this.label2.AutoSize = true;
 			this.label2.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label2.Location = new System.Drawing.Point(27, 38);
-			this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.label2.Location = new System.Drawing.Point(20, 30);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(110, 22);
+			this.label2.Size = new System.Drawing.Size(88, 17);
 			this.label2.TabIndex = 4;
-			this.label2.Text = "長邊長度：";
+			this.label2.Text = "長邊距離：";
 			// 
 			// m_cmbPathType
 			// 
@@ -416,18 +386,17 @@
             "正方形",
             "五邊形",
             "六邊形"});
-			this.m_cmbPathType.Location = new System.Drawing.Point(151, 20);
-			this.m_cmbPathType.Margin = new System.Windows.Forms.Padding(4);
+			this.m_cmbPathType.Location = new System.Drawing.Point(113, 16);
 			this.m_cmbPathType.Name = "m_cmbPathType";
-			this.m_cmbPathType.Size = new System.Drawing.Size(197, 26);
+			this.m_cmbPathType.Size = new System.Drawing.Size(149, 24);
 			this.m_cmbPathType.TabIndex = 25;
 			this.m_cmbPathType.SelectedIndexChanged += new System.EventHandler(this.m_cmbPathType_SelectedIndexChanged);
 			// 
 			// PatternSettingDlg
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(413, 458);
+			this.ClientSize = new System.Drawing.Size(305, 366);
 			this.Controls.Add(this.m_panelCircle);
 			this.Controls.Add(this.m_panelRunway);
 			this.Controls.Add(this.m_panelPolygon);
@@ -435,7 +404,7 @@
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.m_panelRectangle);
 			this.Controls.Add(this.m_cmbPathType);
-			this.Margin = new System.Windows.Forms.Padding(4);
+			this.Location = new System.Drawing.Point(22, 54);
 			this.Name = "PatternSettingDlg";
 			this.Text = "PatternSettingDlg";
 			this.m_panelCircle.ResumeLayout(false);
