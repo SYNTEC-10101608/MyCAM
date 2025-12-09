@@ -430,7 +430,7 @@ namespace MyCAM.Editor.Dialog
 
 		void SetRectangleLength()
 		{
-			if( double.TryParse( m_txbRecLength.Text, out double length ) && length != m_RectLength && length > 0 ) {
+			if( double.TryParse( m_txbRecLength.Text, out double length ) && length != m_RectLength && length > 0 && length > 2 * m_RectCornerRadius ) {
 				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
 					return;
 				}
@@ -462,7 +462,7 @@ namespace MyCAM.Editor.Dialog
 
 		void SetRectangleWidth()
 		{
-			if( double.TryParse( m_txbRecWidth.Text, out double width ) && width != m_RectWidth && width > 0 ) {
+			if( double.TryParse( m_txbRecWidth.Text, out double width ) && width != m_RectWidth && width > 0 && width > 2 * m_RectCornerRadius ) {
 				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
 					return;
 				}
@@ -494,7 +494,7 @@ namespace MyCAM.Editor.Dialog
 
 		void SetRectangleCornerRadius()
 		{
-			if( double.TryParse( m_txbRecCornerRadius.Text, out double cornerRadius ) && cornerRadius != m_RectCornerRadius && cornerRadius >= 0 ) {
+			if( double.TryParse( m_txbRecCornerRadius.Text, out double cornerRadius ) && cornerRadius != m_RectCornerRadius && cornerRadius >= 0 && 2 * cornerRadius < m_RectLength && 2 * cornerRadius < m_RectWidth ) {
 				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
 					return;
 				}
@@ -559,7 +559,7 @@ namespace MyCAM.Editor.Dialog
 
 		void SetRunwayLength()
 		{
-			if( double.TryParse( m_txbRunwayLength.Text, out double length ) && length != m_RunwayLength && length > m_RunwayWidth ) {
+			if( double.TryParse( m_txbRunwayLength.Text, out double length ) && length != m_RunwayLength && length > m_RunwayWidth && length > 0 ) {
 				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
 					return;
 				}
@@ -656,7 +656,7 @@ namespace MyCAM.Editor.Dialog
 
 		void SetPolygonSideLength()
 		{
-			if( double.TryParse( m_txbPolygonSideLength.Text, out double sideLength ) && sideLength != m_PolygonSideLength && sideLength > 0 ) {
+			if( double.TryParse( m_txbPolygonSideLength.Text, out double sideLength ) && sideLength != m_PolygonSideLength && sideLength > 0 && sideLength > 2 * m_PolygonCornerRadius ) {
 				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
 					return;
 				}
@@ -720,7 +720,7 @@ namespace MyCAM.Editor.Dialog
 
 		void SetPolygonCornerRadius()
 		{
-			if( double.TryParse( m_txbPolygonCornerRadius.Text, out double cornerRadius ) && cornerRadius != m_PolygonCornerRadius && cornerRadius >= 0 ) {
+			if( double.TryParse( m_txbPolygonCornerRadius.Text, out double cornerRadius ) && cornerRadius != m_PolygonCornerRadius && cornerRadius >= 0 && 2 * cornerRadius < m_PolygonSideLength ) {
 				if( m_NewPatternSettingInfoList == null || m_NewPatternSettingInfoList.Count == 0 ) {
 					return;
 				}
