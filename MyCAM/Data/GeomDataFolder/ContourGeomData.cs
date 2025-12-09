@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
-	public class ContourGeomData : IGeomData
+	public class ContourGeomData : IGeomData, ICenterPointCache
 	{
 		public ContourGeomData( string szUID, List<PathEdge5D> pathDataList, bool isClosed )
 		{
@@ -19,6 +19,7 @@ namespace MyCAM.Data
 			m_IsClosed = isClosed;
 			DisctereContourHelper.BuildContourGeomData( pathDataList, isClosed,
 				out m_CADPointList, out m_ConnectPointMap );
+			DisctereContourHelper.GetContourCenterPointAndNormalDir( m_CADPointList, out m_OriCenterPnt, out m_AverageNormalDir );
 		}
 
 		public ContourGeomData( string szUID, List<CADPoint> cadPointList, Dictionary<CADPoint, CADPoint> connectPointMap, bool isClosed )
@@ -33,6 +34,7 @@ namespace MyCAM.Data
 			m_CADPointList = cadPointList;
 			m_ConnectPointMap = connectPointMap;
 			m_IsClosed = isClosed;
+			DisctereContourHelper.GetContourCenterPointAndNormalDir( m_CADPointList, out m_OriCenterPnt, out m_AverageNormalDir );
 		}
 
 		public string UID
@@ -72,6 +74,22 @@ namespace MyCAM.Data
 			}
 		}
 
+		public gp_Pnt CenterPnt
+		{
+			get
+			{
+				return m_OriCenterPnt;
+			}
+		}
+
+		public gp_Dir AverageNormalDir
+		{
+			get
+			{
+				return m_AverageNormalDir;
+			}
+		}
+
 		public void DoTransform( gp_Trsf transform )
 		{
 			foreach( CADPoint cadPoint in m_CADPointList ) {
@@ -89,6 +107,8 @@ namespace MyCAM.Data
 
 		List<CADPoint> m_CADPointList;
 		Dictionary<CADPoint, CADPoint> m_ConnectPointMap;
+		gp_Pnt m_OriCenterPnt;
+		gp_Dir m_AverageNormalDir;
 		bool m_IsClosed;
 	}
 }

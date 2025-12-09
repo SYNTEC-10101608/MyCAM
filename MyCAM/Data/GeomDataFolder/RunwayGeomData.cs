@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Data.GeomDataFolder
 {
-	public class RunwayGeomData : IGeomData, IRotatable
+	public class RunwayGeomData : IGeomData, IRotatable, IStandardPatternGeomData
 	{
 		public RunwayGeomData( string szUID, double length, double width, double rotatedAngle_deg )
 		{

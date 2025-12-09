@@ -88,7 +88,7 @@ namespace MyCAM.Data
 			m_CraftData = craftData;
 			m_ContourPathObject = contourPathObject;
 
-			PatternFactory patternFactory = new PatternFactory( contourPathObject.ContourGeomData.CADPointList, rectangleGeomData );
+			PatternFactory patternFactory = new PatternFactory( contourPathObject.ContourGeomData, rectangleGeomData );
 			gp_Ax3 coordinateInfo = patternFactory.GetCoordinateInfo();
 			m_RectangleCacheInfo = new RectangleCacheInfo( szUID, coordinateInfo, rectangleGeomData, m_CraftData );
 		}

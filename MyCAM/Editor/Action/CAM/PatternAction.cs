@@ -99,7 +99,7 @@ namespace MyCAM.Editor
 					continue;
 				}
 
-				if( !ShapeCreate( geomDataList[ nCount ], patternSettingInfoList[ nCount ].ContourPathObject.ContourGeomData.CADPointList, out shape ) ) {
+				if( !ShapeCreate( geomDataList[ nCount ], patternSettingInfoList[ nCount ].ContourPathObject, out shape ) ) {
 					nCount++;
 					continue;
 				}
@@ -114,10 +114,21 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		bool ShapeCreate( IGeomData geomData, List<CADPoint> originalCADPointList, out TopoDS_Shape shape )
+		bool ShapeCreate( IGeomData geomData, ContourPathObject contourPathObject, out TopoDS_Shape shape )
 		{
-			PatternFactory standardPatternFactory = new PatternFactory( originalCADPointList, geomData );
-			shape = standardPatternFactory.GetShape();
+			shape = null;
+			if( geomData == null || contourPathObject == null ) {
+				return false;
+			}
+
+			if( !( geomData is IStandardPatternGeomData standardPatternGeomData ) ) {
+				shape = contourPathObject.Shape;
+			}
+			else {
+				PatternFactory standardPatternFactory = new PatternFactory( contourPathObject.ContourGeomData, standardPatternGeomData );
+				shape = standardPatternFactory.GetShape();
+			}
+
 			if( shape == null || shape.IsNull() ) {
 				return false;
 			}

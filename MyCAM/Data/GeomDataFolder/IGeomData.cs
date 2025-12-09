@@ -1,4 +1,6 @@
-﻿namespace MyCAM.Data
+﻿using OCC.gp;
+
+namespace MyCAM.Data
 {
 	public interface IGeomData
 	{
@@ -26,5 +28,27 @@
 		{
 			get; set;
 		}
+	}
+
+	public interface ICenterPointCache
+	{
+		gp_Pnt CenterPnt
+		{
+			get;
+		}
+
+		gp_Dir AverageNormalDir
+		{
+			get;
+		}
+	}
+
+	public interface IStandardPatternGeomData
+	{
+		PathType PathType
+		{
+			get;
+		}
+
 	}
 }

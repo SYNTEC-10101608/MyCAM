@@ -115,6 +115,7 @@
     <Compile Include="Editor\Dialog\TraverseDlg.Designer.cs">
       <DependentUpon>TraverseDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Factory\IWireCreationStrategy.cs" />
     <Compile Include="Editor\Factory\PatternFactory.cs" />
     <Compile Include="Editor\MultiSelectTreeView.cs">
       <SubType>Component</SubType>

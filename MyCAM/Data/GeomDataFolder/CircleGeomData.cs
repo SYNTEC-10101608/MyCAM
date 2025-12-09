@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Data
 {
-	public class CircleGeomData : IGeomData, IRotatable
+	public class CircleGeomData : IGeomData, IRotatable, IStandardPatternGeomData
 	{
 		public CircleGeomData( string szUID, double diameter, double rotatedAngle_deg )
 		{
