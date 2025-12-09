@@ -9,7 +9,6 @@ using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Editor
 {
@@ -28,20 +27,16 @@ namespace MyCAM.Editor
 				}
 			}
 
-			m_PatternSettingInfoList = new List<PatternSettingInfo>();
 			foreach( string pathID in szPathIDList ) {
 				if( !DataGettingHelper.GetGeomDataByID( pathID, out IGeomData geomData ) ) {
 					continue;
 				}
-
-				if( !DataGettingHelper.GetContourPathObject( dataManager.GetPathObjectDictionary()[ pathID ], out ContourPathObject contourPathObject ) ) {
-					continue;
+				if( m_GeomData == null ) {
+					m_GeomData = geomData;
+					m_BackFirstPathType = geomData.PathType;
 				}
-				m_PatternSettingInfoList.Add( new PatternSettingInfo( geomData, contourPathObject ) );
+				m_BackUpPathObjectList.Add( pathID, dataManager.ObjectMap[ pathID ] as PathObject );
 			}
-
-			m_BackUpPatternSettingInfoList = m_PatternSettingInfoList.Select( info => info.Clone() ).ToList();
-
 			m_Viewer = viewer;
 			m_ViewManager = viewManager;
 			m_szPathIDList = szPathIDList;
@@ -60,106 +55,94 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			PatternSettingDlg patternFrom = new PatternSettingDlg( m_PatternSettingInfoList );
+			IStandardPatternGeomData standardPatternGeomData = ( m_GeomData is IStandardPatternGeomData ) ? (IStandardPatternGeomData)m_GeomData : null;
+			PatternSettingDlg patternFrom = new PatternSettingDlg( standardPatternGeomData );
 			patternFrom.Confirm += ConfirmPatternSetting;
 			patternFrom.Preview += PreviewPatternSetting;
 			patternFrom.Cancel += CancelPatternSetting;
 			patternFrom.Show( MyApp.MainForm );
 		}
 
-		void PreviewPatternSetting( List<PatternSettingInfo> patternSettingInfoList )
+		void PreviewPatternSetting( IStandardPatternGeomData standardPatternGeomData )
 		{
-			PatternCreate( patternSettingInfoList );
-			PropertyChanged?.Invoke( patternSettingInfoList.First().GeomData.PathType, m_szPathIDList );
+			PatternCreate( standardPatternGeomData );
+			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
+			PropertyChanged?.Invoke( pathType, m_szPathIDList );
 		}
 
-		void ConfirmPatternSetting( List<PatternSettingInfo> patternSettingInfoList )
+		void ConfirmPatternSetting( IStandardPatternGeomData standardPatternGeomData )
 		{
-			PatternCreate( patternSettingInfoList );
-			PropertyChanged?.Invoke( patternSettingInfoList.First().GeomData.PathType, m_szPathIDList );
+			PatternCreate( standardPatternGeomData );
+			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
+			PropertyChanged?.Invoke( pathType, m_szPathIDList );
 			End();
 		}
 
 		void CancelPatternSetting()
 		{
-			PatternCreate( m_BackUpPatternSettingInfoList );
-			PropertyChanged?.Invoke( m_BackUpPatternSettingInfoList.First().GeomData.PathType, m_szPathIDList );
+			PatternRestore();
+			PropertyChanged?.Invoke( m_BackFirstPathType, m_szPathIDList );
 			End();
 		}
 
-		void PatternCreate( List<PatternSettingInfo> patternSettingInfoList )
+		void PatternCreate( IStandardPatternGeomData standardPatternGeomData )
 		{
 			TopoDS_Shape shape = null;
-			List<IGeomData> geomDataList = patternSettingInfoList.Select( info => info.GeomData ).ToList();
 			Dictionary<string, PathObject> pathObjectDict = m_DataManager.GetPathObjectDictionary();
-			int nCount = 0;
 			foreach( var szID in m_szPathIDList ) {
 				if( !pathObjectDict.ContainsKey( szID ) || pathObjectDict[ szID ] == null ) {
-					nCount++;
 					continue;
 				}
-
-				if( !ShapeCreate( geomDataList[ nCount ], patternSettingInfoList[ nCount ].ContourPathObject, out shape ) ) {
-					nCount++;
-					continue;
-				}
-
 				if( !DataGettingHelper.GetContourPathObject( pathObjectDict[ szID ], out ContourPathObject contourPathObject ) ) {
 					continue;
 				}
-				m_DataManager.ObjectMap[ szID ] = CreatePathObject( szID, shape, geomDataList[ nCount ], contourPathObject, pathObjectDict[ szID ] );
+
+				if( standardPatternGeomData == null ) {
+					shape = contourPathObject.Shape;
+				}
+				else {
+					PatternFactory standardPatternFactory = new PatternFactory( contourPathObject.ContourGeomData, standardPatternGeomData );
+					shape = standardPatternFactory.GetShape();
+				}
+
+				m_DataManager.ObjectMap[ szID ] = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, pathObjectDict[ szID ] );
 				UpdateCanvasPattern( szID, shape );
-				nCount++;
 			}
 			m_Viewer.UpdateView();
 		}
 
-		bool ShapeCreate( IGeomData geomData, ContourPathObject contourPathObject, out TopoDS_Shape shape )
+		void PatternRestore()
 		{
-			shape = null;
-			if( geomData == null || contourPathObject == null ) {
-				return false;
+			TopoDS_Shape shape = null;
+			foreach( var szID in m_szPathIDList ) {
+				if( !m_BackUpPathObjectList.ContainsKey( szID ) || m_BackUpPathObjectList[ szID ] == null ) {
+					continue;
+				}
+				shape = m_BackUpPathObjectList[ szID ].Shape;
+				m_DataManager.ObjectMap[ szID ] = m_BackUpPathObjectList[ szID ];
+				UpdateCanvasPattern( szID, shape );
 			}
-
-			if( !( geomData is IStandardPatternGeomData standardPatternGeomData ) ) {
-				shape = contourPathObject.Shape;
-			}
-			else {
-				PatternFactory standardPatternFactory = new PatternFactory( contourPathObject.ContourGeomData, standardPatternGeomData );
-				shape = standardPatternFactory.GetShape();
-			}
-
-			if( shape == null || shape.IsNull() ) {
-				return false;
-			}
-			return true;
+			m_Viewer.UpdateView();
 		}
 
-		PathObject CreatePathObject( string szID, TopoDS_Shape shape, IGeomData geomData, ContourPathObject contourPathObject, PathObject originalPathObject )
+		PathObject CreatePathObject( string szID, TopoDS_Shape shape, IStandardPatternGeomData standardPatternGeomData, ContourPathObject contourPathObject, PathObject originalPathObject )
 		{
-			switch( geomData.PathType ) {
+			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
+			switch( pathType ) {
 				case PathType.Circle:
-					return new CirclePathObject( szID, shape, geomData as CircleGeomData, originalPathObject.CraftData, contourPathObject );
+					return new CirclePathObject( szID, shape, standardPatternGeomData as CircleGeomData, originalPathObject.CraftData, contourPathObject );
 				case PathType.Rectangle:
-					return new RectanglePathObject( szID, shape, geomData as RectangleGeomData, originalPathObject.CraftData, contourPathObject );
+					return new RectanglePathObject( szID, shape, standardPatternGeomData as RectangleGeomData, originalPathObject.CraftData, contourPathObject );
 				case PathType.Runway:
-					return new RunwayPathObject( szID, shape, geomData as RunwayGeomData, originalPathObject.CraftData, contourPathObject );
+					return new RunwayPathObject( szID, shape, standardPatternGeomData as RunwayGeomData, originalPathObject.CraftData, contourPathObject );
 				case PathType.Triangle:
 				case PathType.Square:
 				case PathType.Pentagon:
 				case PathType.Hexagon:
-					return new PolygonPathObject( szID, shape, geomData as PolygonGeomData, originalPathObject.CraftData, contourPathObject );
+					return new PolygonPathObject( szID, shape, standardPatternGeomData as PolygonGeomData, originalPathObject.CraftData, contourPathObject );
 				case PathType.Contour:
 				default:
-
-					// For ContourPathObject, we need to use ContourGeomData
-					ContourGeomData contourGeomData = geomData as ContourGeomData;
-					if( contourGeomData == null ) {
-
-						// If geomData is not ContourGeomData, create one from the original
-						contourGeomData = ( originalPathObject as ContourPathObject ).ContourGeomData;
-					}
-					return new ContourPathObject( szID, shape, contourGeomData, originalPathObject.CraftData );
+					return contourPathObject;
 			}
 		}
 
@@ -174,7 +157,8 @@ namespace MyCAM.Editor
 		ViewManager m_ViewManager;
 		Viewer m_Viewer;
 		List<string> m_szPathIDList = new List<string>();
-		List<PatternSettingInfo> m_PatternSettingInfoList;
-		List<PatternSettingInfo> m_BackUpPatternSettingInfoList;
+		IGeomData m_GeomData;
+		PathType m_BackFirstPathType;
+		Dictionary<string, PathObject> m_BackUpPathObjectList = new Dictionary<string, PathObject>();
 	}
 }
