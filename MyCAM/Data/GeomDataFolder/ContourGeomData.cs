@@ -7,7 +7,7 @@ namespace MyCAM.Data
 {
 	public class ContourGeomData : IGeomData, ICenterPointCache
 	{
-		public ContourGeomData( string szUID, List<PathEdge5D> pathDataList, bool isClosed )
+		public ContourGeomData( List<PathEdge5D> pathDataList, bool isClosed )
 		{
 			if( pathDataList == null ) {
 				throw new ArgumentNullException( "ContourGeomData constructing argument null" );
@@ -15,14 +15,13 @@ namespace MyCAM.Data
 			if( pathDataList.Count == 0 ) {
 				throw new ArgumentException( "ContourGeomData constructing argument empty pathDataList" );
 			}
-			UID = szUID;
 			m_IsClosed = isClosed;
 			DisctereContourHelper.BuildContourGeomData( pathDataList, isClosed,
 				out m_CADPointList, out m_ConnectPointMap );
 			DisctereContourHelper.GetContourCenterPointAndNormalDir( m_CADPointList, out m_OriCenterPnt, out m_AverageNormalDir );
 		}
 
-		public ContourGeomData( string szUID, List<CADPoint> cadPointList, Dictionary<CADPoint, CADPoint> connectPointMap, bool isClosed )
+		public ContourGeomData( List<CADPoint> cadPointList, Dictionary<CADPoint, CADPoint> connectPointMap, bool isClosed )
 		{
 			if( cadPointList == null || connectPointMap == null ) {
 				throw new ArgumentNullException( "ContourGeomData constructing argument null" );
@@ -30,16 +29,10 @@ namespace MyCAM.Data
 			if( cadPointList.Count == 0 ) {
 				throw new ArgumentException( "ContourGeomData constructing argument empty cadPointList" );
 			}
-			UID = szUID;
 			m_CADPointList = cadPointList;
 			m_ConnectPointMap = connectPointMap;
 			m_IsClosed = isClosed;
 			DisctereContourHelper.GetContourCenterPointAndNormalDir( m_CADPointList, out m_OriCenterPnt, out m_AverageNormalDir );
-		}
-
-		public string UID
-		{
-			get; private set;
 		}
 
 		public PathType PathType
@@ -102,7 +95,7 @@ namespace MyCAM.Data
 
 		public IGeomData Clone()
 		{
-			return new ContourGeomData( UID, m_CADPointList, m_ConnectPointMap, m_IsClosed );
+			return new ContourGeomData( m_CADPointList, m_ConnectPointMap, m_IsClosed );
 		}
 
 		List<CADPoint> m_CADPointList;

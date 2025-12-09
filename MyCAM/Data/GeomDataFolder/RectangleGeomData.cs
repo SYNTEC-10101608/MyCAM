@@ -2,30 +2,20 @@
 {
 	public class RectangleGeomData : IGeomData, IRotatable, IStandardPatternGeomData
 	{
-		public RectangleGeomData( string szUID, double width, double height, double cornerRadius, double rotatedAngle_deg )
+		public RectangleGeomData( double width, double height, double cornerRadius, double rotatedAngle_deg )
 		{
-			m_szUID = szUID;
 			m_Width = width;
 			m_Length = height;
 			m_CornerRadius = cornerRadius;
 			m_RotatedAngle_deg = rotatedAngle_deg;
 		}
 
-		public RectangleGeomData( string szUID )
+		public RectangleGeomData()
 		{
-			m_szUID = szUID;
 			m_Width = DEFAULT_WIDTH;
 			m_Length = DEFAULT_LENGTH;
 			m_CornerRadius = DEFAULT_CORNER_RADIUS;
 			m_RotatedAngle_deg = DEFAULT_ROTATED_ANGLE;
-		}
-
-		public string UID
-		{
-			get
-			{
-				return m_szUID;
-			}
 		}
 
 		public PathType PathType
@@ -94,7 +84,7 @@
 
 		public IGeomData Clone()
 		{
-			return new RectangleGeomData( m_szUID, m_Width, m_Length, m_CornerRadius, m_RotatedAngle_deg );
+			return new RectangleGeomData( m_Width, m_Length, m_CornerRadius, m_RotatedAngle_deg );
 		}
 
 		public const double DEFAULT_CORNER_RADIUS = 5.0;
@@ -105,6 +95,5 @@
 		double m_Length;
 		double m_CornerRadius;
 		double m_RotatedAngle_deg;
-		string m_szUID;
 	}
 }

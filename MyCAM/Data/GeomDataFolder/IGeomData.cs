@@ -4,11 +4,6 @@ namespace MyCAM.Data
 {
 	public interface IGeomData
 	{
-		string UID
-		{
-			get;
-		}
-
 		PathType PathType
 		{
 			get;

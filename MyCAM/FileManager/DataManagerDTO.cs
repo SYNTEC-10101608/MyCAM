@@ -595,12 +595,6 @@ namespace MyCAM.FileManager
 
 	public class ContourGeomDataDTO
 	{
-		public string UID
-		{
-			get;
-			set;
-		} = string.Empty;
-
 		public bool IsClosed
 		{
 			get;
@@ -632,7 +626,6 @@ namespace MyCAM.FileManager
 			if( geomData == null ) {
 				return;
 			}
-			UID = geomData.UID;
 			IsClosed = geomData.IsClosed;
 
 			// Convert CADPointList
@@ -668,18 +661,12 @@ namespace MyCAM.FileManager
 				}
 			}
 
-			return new ContourGeomData( UID, cadPointList, connectPointMap, IsClosed );
+			return new ContourGeomData( cadPointList, connectPointMap, IsClosed );
 		}
 	}
 
 	public class CircleGeomDataDTO
 	{
-		public string UID
-		{
-			get;
-			set;
-		} = string.Empty;
-
 		public double Diameter
 		{
 			get;
@@ -702,25 +689,18 @@ namespace MyCAM.FileManager
 			if( geomData == null ) {
 				return;
 			}
-			UID = geomData.UID;
 			Diameter = geomData.Diameter;
 			RotatedAngle_deg = geomData.RotatedAngle_deg;
 		}
 
 		internal CircleGeomData ToCircleGeomData()
 		{
-			return new CircleGeomData( UID, Diameter, RotatedAngle_deg );
+			return new CircleGeomData( Diameter, RotatedAngle_deg );
 		}
 	}
 
 	public class RectangleGeomDataDTO
 	{
-		public string UID
-		{
-			get;
-			set;
-		} = string.Empty;
-
 		public double Width
 		{
 			get;
@@ -755,7 +735,6 @@ namespace MyCAM.FileManager
 			if( geomData == null ) {
 				return;
 			}
-			UID = geomData.UID;
 			Width = geomData.Width;
 			Length = geomData.Length;
 			CornerRadius = geomData.CornerRadius;
@@ -764,18 +743,12 @@ namespace MyCAM.FileManager
 
 		internal RectangleGeomData ToRectangleGeomData()
 		{
-			return new RectangleGeomData( UID, Width, Length, CornerRadius, RotatedAngle_deg );
+			return new RectangleGeomData( Width, Length, CornerRadius, RotatedAngle_deg );
 		}
 	}
 
 	public class PolygonGeomDataDTO
 	{
-		public string UID
-		{
-			get;
-			set;
-		} = string.Empty;
-
 		public int Sides
 		{
 			get;
@@ -810,7 +783,6 @@ namespace MyCAM.FileManager
 			if( geomData == null ) {
 				return;
 			}
-			UID = geomData.UID;
 			Sides = geomData.Sides;
 			SideLength = geomData.SideLength;
 			CornerRadius = geomData.CornerRadius;
@@ -819,18 +791,12 @@ namespace MyCAM.FileManager
 
 		internal PolygonGeomData ToPolygonGeomData()
 		{
-			return new PolygonGeomData( UID, Sides, SideLength, CornerRadius, RotatedAngle_deg );
+			return new PolygonGeomData( Sides, SideLength, CornerRadius, RotatedAngle_deg );
 		}
 	}
 
 	public class RunwayGeomDataDTO
 	{
-		public string UID
-		{
-			get;
-			set;
-		} = string.Empty;
-
 		public double Length
 		{
 			get;
@@ -859,7 +825,6 @@ namespace MyCAM.FileManager
 			if( geomData == null ) {
 				return;
 			}
-			UID = geomData.UID;
 			Length = geomData.Length;
 			Width = geomData.Width;
 			RotatedAngle_deg = geomData.RotatedAngle_deg;
@@ -867,7 +832,7 @@ namespace MyCAM.FileManager
 
 		internal RunwayGeomData ToRunwayGeomData()
 		{
-			return new RunwayGeomData( UID, Length, Width, RotatedAngle_deg );
+			return new RunwayGeomData( Length, Width, RotatedAngle_deg );
 		}
 	}
 

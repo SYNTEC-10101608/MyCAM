@@ -2,26 +2,16 @@
 {
 	public class CircleGeomData : IGeomData, IRotatable, IStandardPatternGeomData
 	{
-		public CircleGeomData( string szUID, double diameter, double rotatedAngle_deg )
+		public CircleGeomData( double diameter, double rotatedAngle_deg )
 		{
-			m_szUID = szUID;
 			m_Diameter = diameter;
 			m_RotatedAngle_deg = rotatedAngle_deg;
 		}
 
-		public CircleGeomData( string szUID )
+		public CircleGeomData()
 		{
-			m_szUID = szUID;
 			m_Diameter = DEFAULT_DIAMETER;
 			m_RotatedAngle_deg = DEFAULT_ROTATED_ANGLE;
-		}
-
-		public string UID
-		{
-			get
-			{
-				return m_szUID;
-			}
 		}
 
 		public PathType PathType
@@ -66,13 +56,12 @@
 
 		public IGeomData Clone()
 		{
-			return new CircleGeomData( m_szUID, m_Diameter, m_RotatedAngle_deg );
+			return new CircleGeomData( m_Diameter, m_RotatedAngle_deg );
 		}
 
 		public const double DEFAULT_DIAMETER = 20.0;
 		public const double DEFAULT_ROTATED_ANGLE = 0.0;
 		double m_Diameter;
 		double m_RotatedAngle_deg = 0;
-		string m_szUID;
 	}
 }

@@ -2,36 +2,26 @@
 {
 	public class PolygonGeomData : IGeomData, IRotatable, IStandardPatternGeomData
 	{
-		public PolygonGeomData( string szUID, int sides, double sideLength, double cornerRadius, double rotatedAngle_deg )
+		public PolygonGeomData( int sides, double sideLength, double cornerRadius, double rotatedAngle_deg )
 		{
 			if( sides < 3 || sides > 6 ) {
 				throw new System.ArgumentOutOfRangeException( nameof( sides ), "Polygon must have 3 to 6 sides" );
 			}
-			m_szUID = szUID;
 			Sides = sides;
 			m_SideLength = sideLength;
 			m_CornerRadius = cornerRadius;
 			m_RotatedAngle_deg = rotatedAngle_deg;
 		}
 
-		public PolygonGeomData( string szUID, int sides )
+		public PolygonGeomData( int sides )
 		{
 			if( sides < 3 || sides > 6 ) {
 				throw new System.ArgumentOutOfRangeException( nameof( sides ), "Polygon must have 3 to 6 sides" );
 			}
-			m_szUID = szUID;
 			Sides = sides;
 			m_SideLength = DEFAULT_SIDE_LENGTH;
 			m_CornerRadius = DEFAULT_CORNER_RADIUS;
 			m_RotatedAngle_deg = DEFAULT_ROTATED_ANGLE;
-		}
-
-		public string UID
-		{
-			get
-			{
-				return m_szUID;
-			}
 		}
 
 		public PathType PathType
@@ -105,7 +95,7 @@
 
 		public IGeomData Clone()
 		{
-			return new PolygonGeomData( m_szUID, Sides, m_SideLength, m_CornerRadius, m_RotatedAngle_deg );
+			return new PolygonGeomData( Sides, m_SideLength, m_CornerRadius, m_RotatedAngle_deg );
 		}
 
 		public const int DEFAULT_SIDES = 3;
@@ -115,6 +105,5 @@
 		double m_SideLength;
 		double m_CornerRadius;
 		double m_RotatedAngle_deg;
-		string m_szUID;
 	}
 }

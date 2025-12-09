@@ -2,28 +2,18 @@
 {
 	public class RunwayGeomData : IGeomData, IRotatable, IStandardPatternGeomData
 	{
-		public RunwayGeomData( string szUID, double length, double width, double rotatedAngle_deg )
+		public RunwayGeomData( double length, double width, double rotatedAngle_deg )
 		{
-			m_szUID = szUID;
 			m_Length = length;
 			m_Width = width;
 			m_RotatedAngle_deg = rotatedAngle_deg;
 		}
 
-		public RunwayGeomData( string szUID )
+		public RunwayGeomData()
 		{
-			m_szUID = szUID;
 			m_Length = DEFAULT_LENGTH;
 			m_Width = DEFAULT_WIDTH;
 			m_RotatedAngle_deg = DEFAULT_ROTATED_ANGLE;
-		}
-
-		public string UID
-		{
-			get
-			{
-				return m_szUID;
-			}
 		}
 
 		public PathType PathType
@@ -80,7 +70,7 @@
 
 		public IGeomData Clone()
 		{
-			return new RunwayGeomData( m_szUID, m_Length, m_Width, m_RotatedAngle_deg );
+			return new RunwayGeomData( m_Length, m_Width, m_RotatedAngle_deg );
 		}
 
 		public const double DEFAULT_LENGTH = 40.0;
@@ -89,6 +79,5 @@
 		double m_Length;
 		double m_Width;
 		double m_RotatedAngle_deg;
-		string m_szUID;
 	}
 }
