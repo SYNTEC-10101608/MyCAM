@@ -23,7 +23,7 @@ namespace MyCAM.Data
 
 			bool isClosed = DetermineIfClosed( shape );
 			m_ContourGeomData = new ContourGeomData( pathDataList, isClosed );
-			m_CraftData = new CraftData( szUID );
+			m_CraftData = new CraftData();
 			m_ContourCacheInfo = new ContourCacheInfo( m_ContourGeomData, m_CraftData, isClosed );
 		}
 

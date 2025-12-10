@@ -15,7 +15,7 @@ namespace MyCAM.Data
 				throw new System.ArgumentNullException( "RectanglePathObject constructing argument null" );
 			}
 
-			CraftData craftData = new CraftData( szUID );
+			CraftData craftData = new CraftData();
 			InitializeRectanglePathObject( szUID, rectangleGeomData, craftData, contourPathObject );
 		}
 

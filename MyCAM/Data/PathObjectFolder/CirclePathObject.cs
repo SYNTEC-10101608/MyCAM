@@ -14,7 +14,7 @@ namespace MyCAM.Data
 				throw new System.ArgumentNullException( "CirclePathObject constructing argument null" );
 			}
 
-			CraftData craftData = new CraftData( szUID );
+			CraftData craftData = new CraftData();
 			InitializeCirclePathObject( szUID, circleGeomData, craftData, contourPathObject );
 		}
 

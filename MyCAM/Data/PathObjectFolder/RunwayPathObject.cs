@@ -15,7 +15,7 @@ namespace MyCAM.Data.PathObjectFolder
 				throw new System.ArgumentNullException( "RunwayPathObject constructing argument null" );
 			}
 
-			CraftData craftData = new CraftData( szUID );
+			CraftData craftData = new CraftData();
 			InitializeRunwayPathObject( szUID, runwayGeomData, craftData, contourPathObject );
 		}
 

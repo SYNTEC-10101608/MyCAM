@@ -15,7 +15,7 @@ namespace MyCAM.Data.PathObjectFolder
 				throw new System.ArgumentNullException( "PolygonPathObject constructing argument null" );
 			}
 
-			CraftData craftData = new CraftData( szUID );
+			CraftData craftData = new CraftData();
 			InitializePolygonPathObject( szUID, polygonGeomData, craftData, contourPathObject );
 		}
 
