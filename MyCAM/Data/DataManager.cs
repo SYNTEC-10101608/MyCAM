@@ -5,7 +5,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -294,11 +293,6 @@ namespace MyCAM.Data
 				}
 			}
 			return string.Empty;
-		}
-
-		public Dictionary<string, PathObject> GetPathObjectDictionary()
-		{
-			return ObjectMap.Values.OfType<PathObject>().ToDictionary( obj => obj.UID );
 		}
 
 

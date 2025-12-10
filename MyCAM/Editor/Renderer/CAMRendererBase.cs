@@ -36,8 +36,8 @@ namespace MyCAM.Editor.Renderer
 		{
 			pathObject = null;
 			if( string.IsNullOrEmpty( szPathID )
-				|| !m_DataManager.GetPathObjectDictionary().ContainsKey( szPathID )
-				|| m_DataManager.GetPathObjectDictionary()[ szPathID ] == null ) {
+				|| !DataGettingHelper.GetPathObjectDictionary().ContainsKey( szPathID )
+				|| DataGettingHelper.GetPathObjectDictionary()[ szPathID ] == null ) {
 				return false;
 			}
 

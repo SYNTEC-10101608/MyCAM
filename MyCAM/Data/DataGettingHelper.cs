@@ -2,6 +2,7 @@
 using MyCAM.CacheInfo;
 using MyCAM.Data.PathObjectFolder;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -14,10 +15,15 @@ namespace MyCAM.Data
 			m_DataManager = dataManager;
 		}
 
+		public static Dictionary<string, PathObject> GetPathObjectDictionary()
+		{
+			return m_DataManager.ObjectMap.Values.OfType<PathObject>().ToDictionary( obj => obj.UID );
+		}
+
 		public static bool GetGeomDataByID( string pathID, out IGeomData geomData )
 		{
 			geomData = null;
-			Dictionary<string, PathObject> pathObjectList = m_DataManager.GetPathObjectDictionary();
+			Dictionary<string, PathObject> pathObjectList = GetPathObjectDictionary();
 			if( pathObjectList.TryGetValue( pathID, out PathObject pathObject ) ) {
 				switch( pathObject.PathType ) {
 					case PathType.Circle:
@@ -63,15 +69,15 @@ namespace MyCAM.Data
 		{
 			craftData = null;
 			if( string.IsNullOrEmpty( szPathID )
-				|| m_DataManager.GetPathObjectDictionary().ContainsKey( szPathID ) == false
-				|| m_DataManager.GetPathObjectDictionary()[ szPathID ] == null
-				|| m_DataManager.GetPathObjectDictionary()[ szPathID ].CraftData == null ) {
+				|| GetPathObjectDictionary().ContainsKey( szPathID ) == false
+				|| GetPathObjectDictionary()[ szPathID ] == null
+				|| GetPathObjectDictionary()[ szPathID ].CraftData == null ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
 				return false;
 			}
 
-			if( m_DataManager.GetPathObjectDictionary()[ szPathID ].PathType == PathType.Contour ) {
-				craftData = m_DataManager.GetPathObjectDictionary()[ szPathID ].CraftData;
+			if( GetPathObjectDictionary()[ szPathID ].PathType == PathType.Contour ) {
+				craftData = GetPathObjectDictionary()[ szPathID ].CraftData;
 			}
 			return true;
 		}
@@ -120,7 +126,7 @@ namespace MyCAM.Data
 		public static bool GetProcessPathStartEndCacheByID( string pathID, out IProcessPathStartEndCache processPathStartEndCache )
 		{
 			processPathStartEndCache = null;
-			PathObject pathObject = m_DataManager.GetPathObjectDictionary()[ pathID ];
+			PathObject pathObject = GetPathObjectDictionary()[ pathID ];
 			switch( pathObject.PathType ) {
 				case PathType.Circle:
 					if( pathObject is CirclePathObject circlePathObject ) {

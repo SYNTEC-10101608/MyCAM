@@ -88,7 +88,7 @@ namespace MyCAM.Editor
 		void PatternCreate( IStandardPatternGeomData standardPatternGeomData )
 		{
 			TopoDS_Shape shape = null;
-			Dictionary<string, PathObject> pathObjectDict = m_DataManager.GetPathObjectDictionary();
+			Dictionary<string, PathObject> pathObjectDict = DataGettingHelper.GetPathObjectDictionary();
 			foreach( var szID in m_szPathIDList ) {
 				if( !pathObjectDict.ContainsKey( szID ) || pathObjectDict[ szID ] == null ) {
 					continue;

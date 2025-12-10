@@ -48,7 +48,7 @@ namespace MyCAM.Post
 
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
-					Dictionary<string, PathObject> pathObjectDict = m_DataManager.GetPathObjectDictionary();
+					Dictionary<string, PathObject> pathObjectDict = DataGettingHelper.GetPathObjectDictionary();
 					PathType pathType;
 					for( int i = 0; i < m_PathIDList.Count; i++ ) {
 						pathType = pathObjectDict[ m_PathIDList[ i ] ].PathType;
