@@ -12,77 +12,76 @@ namespace MyCAM.Editor.Factory
 		bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStandardPatternGeomData standardPatternGeomData, out TopoDS_Wire wire );
 	}
 
-	internal class CircleWireStrategy : IWireCreationStrategy
+	internal class WireCreationStrategy<TGeomData> : IWireCreationStrategy
+		where TGeomData : class, IStandardPatternGeomData
 	{
+		readonly Func<gp_Pnt, gp_Pln, TGeomData, WireResult> m_WireFactory;
+
+		public WireCreationStrategy( Func<gp_Pnt, gp_Pln, TGeomData, WireResult> wireFactory )
+		{
+			m_WireFactory = wireFactory ?? throw new ArgumentNullException( nameof( wireFactory ) );
+		}
+
 		public bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStandardPatternGeomData standardPatternGeomData, out TopoDS_Wire wire )
 		{
 			wire = null;
-			if( !( standardPatternGeomData is CircleGeomData circleGeom ) ) {
+
+			// type-safe casting
+			if( !( standardPatternGeomData is TGeomData typedGeomData ) ) {
 				return false;
 			}
-			return CircleFactory.CreateCircleWireOnPlane( centerPoint, circleGeom.Diameter / 2.0, plane, out wire );
+
+			// call the factory delegate with typed geometry data
+			WireResult result = m_WireFactory( centerPoint, plane, typedGeomData );
+			wire = result.Wire;
+			return result.Success;
 		}
 	}
 
-	internal class RectangleWireStrategy : IWireCreationStrategy
-	{
-		public bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStandardPatternGeomData standardPatternGeomData, out TopoDS_Wire wire )
-		{
-			wire = null;
-			if( !( standardPatternGeomData is RectangleGeomData rectangleGeomData ) ) {
-				return false;
-			}
-			return RectangleFactory.CreateRoundedRectangleWireOnPlane(
-				centerPoint,
-				rectangleGeomData.Length,
-				rectangleGeomData.Width,
-				rectangleGeomData.CornerRadius,
-				plane,
-				out wire );
-		}
-	}
 
-	internal class RunwayWireStrategy : IWireCreationStrategy
+	// because lambda expressions cannot capture out parameters and reference variables, define a struct to hold the result
+	internal struct WireResult
 	{
-		public bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStandardPatternGeomData standardPatternGeomData, out TopoDS_Wire wire )
-		{
-			wire = null;
-			if( !( standardPatternGeomData is RunwayGeomData runwayGeomData ) ) {
-				return false;
-			}
-			return RunwayFactory.CreateRunwayWireOnPlane(
-				centerPoint,
-				runwayGeomData.Length,
-				runwayGeomData.Width,
-				plane,
-				out wire );
-		}
-	}
+		public bool Success;
+		public TopoDS_Wire Wire;
 
-	internal class PolygonWireStrategy : IWireCreationStrategy
-	{
-		public bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStandardPatternGeomData standardPatternGeomData, out TopoDS_Wire wire )
+		public WireResult( bool success, TopoDS_Wire wire )
 		{
-			wire = null;
-			if( !( standardPatternGeomData is PolygonGeomData polygonGeomData ) ) {
-				return false;
-			}
-			return PolygonFactory.CreatePolygonWireOnPlane(
-				centerPoint,
-				polygonGeomData.Sides,
-				polygonGeomData.SideLength,
-				polygonGeomData.CornerRadius,
-				plane,
-				out wire );
+			Success = success;
+			Wire = wire;
 		}
 	}
 
 	internal static class WireCreationStrategyFactory
 	{
-		static readonly CircleWireStrategy s_CircleStrategy = new CircleWireStrategy();
-		static readonly RectangleWireStrategy s_RectangleStrategy = new RectangleWireStrategy();
-		static readonly RunwayWireStrategy s_RunwayStrategy = new RunwayWireStrategy();
-		static readonly PolygonWireStrategy s_PolygonStrategy = new PolygonWireStrategy();
+		// create singleton strategy instances using generic WireCreationStrategy with lambda expressions
+		static readonly IWireCreationStrategy s_CircleStrategy =
+			new WireCreationStrategy<CircleGeomData>( ( center, plane, geom ) =>
+			{
+				bool success = CircleFactory.CreateCircleWireOnPlane( center, geom.Diameter / 2.0, plane, out TopoDS_Wire wire );
+				return new WireResult( success, wire );
+			} );
+
+		static readonly IWireCreationStrategy s_RectangleStrategy =
+			new WireCreationStrategy<RectangleGeomData>( ( center, plane, geom ) =>
+			{
+				bool success = RectangleFactory.CreateRoundedRectangleWireOnPlane( center, geom.Length, geom.Width, geom.CornerRadius, plane, out TopoDS_Wire wire );
+				return new WireResult( success, wire );
+			} );
+
+		static readonly IWireCreationStrategy s_RunwayStrategy =
+			new WireCreationStrategy<RunwayGeomData>( ( center, plane, geom ) =>
+			{
+				bool success = RunwayFactory.CreateRunwayWireOnPlane( center, geom.Length, geom.Width, plane, out TopoDS_Wire wire );
+				return new WireResult( success, wire );
+			} );
+
+		static readonly IWireCreationStrategy s_PolygonStrategy =
+			new WireCreationStrategy<PolygonGeomData>( ( center, plane, geom ) =>
+			{
+				bool success = PolygonFactory.CreatePolygonWireOnPlane( center, geom.Sides, geom.SideLength, geom.CornerRadius, plane, out TopoDS_Wire wire );
+				return new WireResult( success, wire );
+			} );
 
 		public static IWireCreationStrategy GetStrategy( PathType pathType )
 		{
@@ -360,22 +359,22 @@ namespace MyCAM.Editor.Factory
 			double radius = sideLength / ( 2.0 * Math.Sin( Math.PI / sides ) );
 
 			// determine initial angle offset based on the number of sides
-			double angleOffset = 0.0;
+			double angleOffset;
 			switch( sides ) {
-				case 3: // triangle: vertex points in the positive Y direction (90¢X)
-					angleOffset = Math.PI / 2.0; // 90¢X
+				case 3:
+					angleOffset = Math.PI / 2.0;
 					break;
-				case 4: // square: midpoint of the edge in the positive Y direction, rotate 45¢X
-					angleOffset = Math.PI / 4.0; // 45¢X, edges vertical to Y-axis
+				case 4:
+					angleOffset = Math.PI / 4.0;
 					break;
-				case 5: // pentagon: vertex points in the positive Y direction (90¢X)
-					angleOffset = Math.PI / 2.0; // 90¢X
+				case 5:
+					angleOffset = Math.PI / 2.0;
 					break;
-				case 6: // hexagon: midpoint of the edge in the positive Y direction, edges vertical to Y-axis
-					angleOffset = 0.0; // 0¢X, hexagon default has edges vertical to Y-axis
+				case 6:
+					angleOffset = 0.0;
 					break;
 				default:
-					angleOffset = 0.0; // default start from the positive X direction
+					angleOffset = 0.0;
 					break;
 			}
 
@@ -403,7 +402,6 @@ namespace MyCAM.Editor.Factory
 				}
 			}
 			else {
-
 				// attempt to create rounded polygon
 				if( !CreateRoundedPolygonWire( wireBuilder, vertices, cornerRadius, sides ) ) {
 					return false;
@@ -438,16 +436,8 @@ namespace MyCAM.Editor.Factory
 			// for regular polygons, the interior angle is fixed: (n-2) * £k / n
 			double interiorAngle = ( sides - 2 ) * Math.PI / sides;
 			double halfAngle = interiorAngle / 2.0;
-			double tanHalfAngle = Math.Tan( halfAngle );
-			double sinHalfAngle = Math.Sin( halfAngle );
-
-			if( tanHalfAngle < 1e-9 || sinHalfAngle < 1e-9 ) {
-				return false;
-			}
-
-			// calculate tangent point distance and center distance (same for all vertices)
-			double tangentDistance = cornerRadius / tanHalfAngle;
-			double centerDistance = cornerRadius / sinHalfAngle;
+			double tangentDistance = cornerRadius / Math.Tan( halfAngle );
+			double centerDistance = cornerRadius / Math.Sin( halfAngle );
 
 			// check if edge length is sufficient
 			double edgeLength = vertices[ 0 ].Distance( vertices[ 1 ] );
@@ -465,12 +455,6 @@ namespace MyCAM.Editor.Factory
 
 				// current edge vector
 				gp_Vec edgeVec = new gp_Vec( currentVertex, nextVertex );
-				double currentEdgeLength = edgeVec.Magnitude();
-
-				if( currentEdgeLength <= 1e-9 ) {
-					return false;
-				}
-
 				edgeVec.Normalize();
 
 				// edge start point: shortened by the fillet of the current vertex
@@ -486,16 +470,10 @@ namespace MyCAM.Editor.Factory
 					nextVertex.Y() - edgeVec.Y() * tangentDistance,
 					nextVertex.Z()
 				);
-
-				// check if the shortened edge still has a valid length
-				if( edgeStarts[ i ].Distance( edgeEnds[ i ] ) <= 1e-9 ) {
-					return false;
-				}
 			}
 
 			// add all edges and fillets
 			for( int i = 0; i < sides; i++ ) {
-
 				//add shortened straight edge
 				BRepBuilderAPI_MakeEdge edgeBuilder = new BRepBuilderAPI_MakeEdge( edgeStarts[ i ], edgeEnds[ i ] );
 				if( !edgeBuilder.IsDone() ) {
@@ -521,18 +499,11 @@ namespace MyCAM.Editor.Factory
 			gp_Vec vec1 = new gp_Vec( vertex, tangentPoint1 );
 			gp_Vec vec2 = new gp_Vec( vertex, tangentPoint2 );
 
-			if( vec1.Magnitude() < 1e-9 || vec2.Magnitude() < 1e-9 ) {
-				return false;
-			}
-
 			vec1.Normalize();
 			vec2.Normalize();
 
 			// calculate bisector direction
 			gp_Vec bisector = vec1.Added( vec2 );
-			if( bisector.Magnitude() < 1e-9 ) {
-				return false;
-			}
 			bisector.Normalize();
 
 			// inscribed circle center: move inward along the bisector
@@ -541,14 +512,6 @@ namespace MyCAM.Editor.Factory
 				vertex.Y() + bisector.Y() * centerDistance,
 				vertex.Z()
 			);
-
-			// verify if the distances from the center to the two tangent points are equal to the radius
-			double dist1 = arcCenter.Distance( tangentPoint1 );
-			double dist2 = arcCenter.Distance( tangentPoint2 );
-
-			if( Math.Abs( dist1 - radius ) > 1e-3 || Math.Abs( dist2 - radius ) > 1e-3 ) {
-				return false;
-			}
 
 			// create inscribed circular arc
 			gp_Ax2 circleAxis = new gp_Ax2( arcCenter, normalDir );
