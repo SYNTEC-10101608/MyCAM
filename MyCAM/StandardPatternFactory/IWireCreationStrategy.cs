@@ -5,7 +5,7 @@ using OCC.gp;
 using OCC.TopoDS;
 using System;
 
-namespace MyCAM.Editor.Factory
+namespace MyCAM.StandardPatternFactory
 {
 	internal interface IWireCreationStrategy
 	{

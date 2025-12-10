@@ -115,8 +115,6 @@
     <Compile Include="Editor\Dialog\TraverseDlg.Designer.cs">
       <DependentUpon>TraverseDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Factory\IWireCreationStrategy.cs" />
-    <Compile Include="Editor\Factory\PatternFactory.cs" />
     <Compile Include="Editor\MultiSelectTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -192,6 +190,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="StandardPatternFactory\IWireCreationStrategy.cs" />
+    <Compile Include="StandardPatternFactory\PatternFactory.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>

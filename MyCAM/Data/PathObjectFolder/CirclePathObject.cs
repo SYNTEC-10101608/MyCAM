@@ -1,5 +1,5 @@
 ﻿using MyCAM.CacheInfo;
-using MyCAM.Editor.Factory;
+using MyCAM.StandardPatternFactory;
 using OCC.gp;
 using OCC.TopoDS;
 

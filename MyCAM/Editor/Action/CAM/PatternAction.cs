@@ -3,7 +3,7 @@ using MyCAM.Data;
 using MyCAM.Data.GeomDataFolder;
 using MyCAM.Data.PathObjectFolder;
 using MyCAM.Editor.Dialog;
-using MyCAM.Editor.Factory;
+using MyCAM.StandardPatternFactory;
 using OCC.AIS;
 using OCC.TopoDS;
 using OCCViewer;
