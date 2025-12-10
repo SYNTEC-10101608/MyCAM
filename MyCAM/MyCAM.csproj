@@ -58,6 +58,7 @@
     <Compile Include="CacheInfo\PolygonCacheInfo.cs" />
     <Compile Include="CacheInfo\RectangleCacheInfo.cs" />
     <Compile Include="CacheInfo\RunwayCacheInfo.cs" />
+    <Compile Include="CacheInfo\StandardPatternBasedCacheInfo.cs" />
     <Compile Include="CacheInfo\StandardPatternCacheInfoFactory.cs" />
     <Compile Include="Data\DataGettingHelper.cs" />
     <Compile Include="Data\GeomDataFolder\CircleGeomData.cs" />

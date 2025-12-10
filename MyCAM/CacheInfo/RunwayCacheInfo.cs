@@ -2,25 +2,21 @@
 using OCC.gp;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class RunwayCacheInfo : IStandardPatternCacheInfo, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
+	public class RunwayCacheInfo : StandardPatternBasedCacheInfo
 	{
 		public RunwayCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData geomData, CraftData craftData )
+			: base( coordinateInfo, craftData )
 		{
-			if( geomData == null || craftData == null || !( geomData is RunwayGeomData runwayGeomData ) ) {
-				throw new ArgumentNullException( "RunwayCacheInfo constructing argument error" );
+			if( geomData == null || !( geomData is RunwayGeomData runwayGeomData ) ) {
+				throw new ArgumentNullException( "RunwayCacheInfo constructing argument error - invalid geomData" );
 			}
-			m_CoordinateInfo = coordinateInfo;
 			m_RunwayGeomData = runwayGeomData;
-			m_CraftData = craftData;
-			m_CraftData.ParameterChanged += SetCraftDataDirty;
-			BuildCAMPointList();
 		}
 
-		public PathType PathType
+		public override PathType PathType
 		{
 			get
 			{
@@ -28,69 +24,10 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public List<CAMPoint> StartPointList
-		{
-			get
-			{
-				if( m_IsCraftDataDirty ) {
-					BuildCAMPointList();
-				}
-				return m_StartPointList;
-			}
-		}
-
-		public List<CAMPoint> LeadInCAMPointList
-		{
-			get
-			{
-				if( m_IsCraftDataDirty ) {
-					BuildCAMPointList();
-				}
-				return m_LeadInCAMPointList;
-			}
-		}
-
-		public List<CAMPoint> LeadOutCAMPointList
-		{
-			get;
-		}
-
-		public List<CAMPoint> OverCutCAMPointList
-		{
-			get
-			{
-				if( m_IsCraftDataDirty ) {
-					BuildCAMPointList();
-				}
-				return m_OverCutPointList;
-			}
-		}
-
-		public bool IsPathReverse
-		{
-			get
-			{
-				return m_CraftData.IsReverse;
-			}
-		}
-
-		public LeadData LeadData
-		{
-			get
-			{
-				return m_CraftData.LeadLineParam;
-			}
-		}
-
-		public double OverCutLength
-		{
-			get
-			{
-				return m_CraftData.OverCutLength;
-			}
-		}
-
-		public CAMPoint GetProcessRefPoint()
+		/// <summary>
+		/// Override GetProcessRefPoint for Runway-specific calculation
+		/// </summary>
+		public new CAMPoint GetProcessRefPoint()
 		{
 			// Calculate runway parameters
 			double length = m_RunwayGeomData.Length;
@@ -102,12 +39,10 @@ namespace MyCAM.CacheInfo
 			gp_Pnt leftArcCenter;
 
 			if( straightLength <= 0.001 ) {
-
 				// Pure circle case: center is at origin
 				leftArcCenter = new gp_Pnt( 0, 0, 0 );
 			}
 			else {
-
 				// Runway shape: left arc center is at (-straightLength/2, 0, 0)
 				double halfStraight = straightLength / 2.0;
 				leftArcCenter = new gp_Pnt( -halfStraight, 0, 0 );
@@ -115,9 +50,9 @@ namespace MyCAM.CacheInfo
 
 			// Transform local coordinates to world coordinate system
 			gp_Ax3 targetCoordSystem = new gp_Ax3(
-				m_CoordinateInfo.Location(),
-				m_CoordinateInfo.Direction(),
-				m_CoordinateInfo.XDirection()
+				CoordinateInfo.Location(),
+				CoordinateInfo.Direction(),
+				CoordinateInfo.XDirection()
 			);
 			gp_Trsf transformation = new gp_Trsf();
 			transformation.SetTransformation( targetCoordSystem, new gp_Ax3() );
@@ -126,86 +61,21 @@ namespace MyCAM.CacheInfo
 			return new CAMPoint(
 				new CADPoint(
 					worldLeftArcCenter,
-					m_CoordinateInfo.Direction(),
-					m_CoordinateInfo.XDirection(),
-					m_CoordinateInfo.YDirection()
+					CoordinateInfo.Direction(),
+					CoordinateInfo.XDirection(),
+					CoordinateInfo.YDirection()
 				),
-				m_CoordinateInfo.Direction()
+				CoordinateInfo.Direction()
 			);
 		}
 
-		public IProcessPoint GetProcessStartPoint()
+		protected override void BuildCAMPointList()
 		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			if( LeadInCAMPointList.Count != 0 ) {
-				return LeadInCAMPointList[ 0 ].Clone();
-			}
-			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
-		}
-
-		public IProcessPoint GetProcessEndPoint()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			if( OverCutCAMPointList.Count != 0 ) {
-				return OverCutCAMPointList[ OverCutCAMPointList.Count - 1 ].Clone();
-			}
-			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
-		}
-
-		public IProcessPoint GetMainPathStartCAMPoint()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
-		}
-
-		public IReadOnlyList<IProcessPoint> GetToolVecList()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			return m_StartPointList.Cast<IProcessPoint>().ToList();
-		}
-
-		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
-		{
-			return false;
-		}
-
-		public void DoTransform( gp_Trsf transform )
-		{
-			m_CoordinateInfo.Transform( transform );
-			BuildCAMPointList();
-		}
-
-		void BuildCAMPointList()
-		{
-			m_IsCraftDataDirty = false;
-			m_StartPointList = RunwayCacheInfoExtensions.GetStartPointList( m_CoordinateInfo, m_RunwayGeomData.Length, m_RunwayGeomData.Width );
-		}
-
-		void SetCraftDataDirty()
-		{
-			if( !m_IsCraftDataDirty ) {
-				m_IsCraftDataDirty = true;
-			}
+			ClearCraftDataDirty();
+			m_StartPointList = RunwayCacheInfoExtensions.GetStartPointList( CoordinateInfo, m_RunwayGeomData.Length, m_RunwayGeomData.Width );
 		}
 
 		RunwayGeomData m_RunwayGeomData;
-		gp_Ax3 m_CoordinateInfo;
-		string m_szPathID;
-		List<CAMPoint> m_StartPointList = new List<CAMPoint>();
-		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
-		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
-		CraftData m_CraftData;
-
-		// flag to indicate craft data changed
-		bool m_IsCraftDataDirty = false;
 	}
 
 	internal static class RunwayCacheInfoExtensions

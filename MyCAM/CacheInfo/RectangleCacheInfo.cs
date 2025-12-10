@@ -2,25 +2,21 @@ using MyCAM.Data;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class RectangleCacheInfo : IStandardPatternCacheInfo, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
+	public class RectangleCacheInfo : StandardPatternBasedCacheInfo
 	{
 		public RectangleCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData geomData, CraftData craftData )
+			: base( coordinateInfo, craftData )
 		{
-			if( geomData == null || craftData == null || !( geomData is RectangleGeomData rectangleGeomData ) ) {
-				throw new ArgumentNullException( "RectangleCacheInfo constructing argument error" );
+			if( geomData == null || !( geomData is RectangleGeomData rectangleGeomData ) ) {
+				throw new ArgumentNullException( "RectangleCacheInfo constructing argument error - invalid geomData" );
 			}
-			m_CoordinateInfo = coordinateInfo;
 			m_RectangleGeomData = rectangleGeomData;
-			m_CraftData = craftData;
-			m_CraftData.ParameterChanged += SetCraftDataDirty;
-			BuildCAMPointList();
 		}
 
-		public PathType PathType
+		public override PathType PathType
 		{
 			get
 			{
@@ -28,151 +24,13 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		#region Computation Result
-		public List<CAMPoint> StartPointList
+		protected override void BuildCAMPointList()
 		{
-			get
-			{
-				if( m_IsCraftDataDirty ) {
-					BuildCAMPointList();
-				}
-				return m_StartPointList;
-			}
-		}
-
-		public List<CAMPoint> LeadInCAMPointList
-		{
-			get
-			{
-				if( m_IsCraftDataDirty ) {
-					BuildCAMPointList();
-				}
-				return m_LeadInCAMPointList;
-			}
-		}
-
-		public List<CAMPoint> LeadOutCAMPointList
-		{
-			get;
-		}
-
-		public List<CAMPoint> OverCutCAMPointList
-		{
-			get
-			{
-				if( m_IsCraftDataDirty ) {
-					BuildCAMPointList();
-				}
-				return m_OverCutPointList;
-			}
-		}
-
-		#endregion
-
-		public CAMPoint GetProcessRefPoint()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			return new CAMPoint( new CADPoint( m_CoordinateInfo.Location(), m_CoordinateInfo.Direction(), m_CoordinateInfo.XDirection(), m_CoordinateInfo.YDirection() ), m_CoordinateInfo.Direction() );
-		}
-
-		public IProcessPoint GetProcessStartPoint()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			if( LeadInCAMPointList.Count != 0 ) {
-				return LeadInCAMPointList[ 0 ].Clone();
-			}
-			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
-		}
-
-		public IProcessPoint GetProcessEndPoint()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			if( OverCutCAMPointList.Count != 0 ) {
-				return OverCutCAMPointList[ OverCutCAMPointList.Count - 1 ].Clone();
-			}
-			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
-		}
-
-		public IProcessPoint GetMainPathStartCAMPoint()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
-		}
-
-		public IReadOnlyList<IProcessPoint> GetToolVecList()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			return m_StartPointList.Cast<IProcessPoint>().ToList();
-		}
-
-		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
-		{
-			return false;
-		}
-
-		public bool IsPathReverse
-		{
-			get
-			{
-				return m_CraftData.IsReverse;
-			}
-		}
-
-		public LeadData LeadData
-		{
-			get
-			{
-				return m_CraftData.LeadLineParam;
-			}
-		}
-
-		public double OverCutLength
-		{
-			get
-			{
-				return m_CraftData.OverCutLength;
-			}
-		}
-
-		public void DoTransform( gp_Trsf transform )
-		{
-			m_CoordinateInfo.Transform( transform );
-			BuildCAMPointList();
-		}
-
-		void BuildCAMPointList()
-		{
-			m_IsCraftDataDirty = false;
-			m_StartPointList = RectangleCacheInfoExtensions.GetStartPointList( m_CoordinateInfo, m_RectangleGeomData.Length, m_RectangleGeomData.Width );
-		}
-
-		void SetCraftDataDirty()
-		{
-			if( !m_IsCraftDataDirty ) {
-				m_IsCraftDataDirty = true;
-			}
+			ClearCraftDataDirty();
+			m_StartPointList = RectangleCacheInfoExtensions.GetStartPointList( CoordinateInfo, m_RectangleGeomData.Length, m_RectangleGeomData.Width );
 		}
 
 		RectangleGeomData m_RectangleGeomData;
-		gp_Ax3 m_CoordinateInfo;
-		string m_szPathID;
-		List<CAMPoint> m_StartPointList = new List<CAMPoint>();
-		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
-		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
-		CraftData m_CraftData;
-
-		// flag to indicate craft data changed
-		bool m_IsCraftDataDirty = false;
 	}
 
 	internal static class RectangleCacheInfoExtensions
