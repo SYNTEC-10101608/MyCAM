@@ -439,10 +439,10 @@ namespace MyCAM.Editor
 			string szStartPathID = szPathIDList[ 0 ];
 
 			// get start point
-			if( !DataGettingHelper.GetPathHeadTailCacheByID( szStartPathID, out IPathHeadTailCache pathHeadTailCache ) ) {
+			if( !DataGettingHelper.GetProcessPathStartEndCacheByID( szStartPathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
 				return;
 			}
-			gp_Pnt currentPoint = pathHeadTailCache.GetProcessStartPoint().Point;
+			gp_Pnt currentPoint = processPathStartEndCache.GetProcessStartPoint().Point;
 
 			// init data manager
 			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
@@ -462,10 +462,10 @@ namespace MyCAM.Editor
 					if( visited[ i ] ) {
 						continue;
 					}
-					if( !DataGettingHelper.GetPathHeadTailCacheByID( szStartPathID, out IPathHeadTailCache nextPathHeadTailCache ) ) {
+					if( !DataGettingHelper.GetProcessPathStartEndCacheByID( szStartPathID, out IProcessPathStartEndCache nextProcessPathStartEndCache ) ) {
 						return;
 					}
-					gp_Pnt nextStartPoint = nextPathHeadTailCache.GetProcessStartPoint().Point;
+					gp_Pnt nextStartPoint = nextProcessPathStartEndCache.GetProcessStartPoint().Point;
 					double distanceSq = currentPoint.SquareDistance( nextStartPoint );
 					if( distanceSq < minDistanceSq ) {
 						minDistanceSq = distanceSq;

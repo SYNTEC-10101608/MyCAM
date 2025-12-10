@@ -174,13 +174,13 @@ namespace MyCAM.Editor.Renderer
 
 		IOrientationPoint GetFirstCAMPoint( string pathID )
 		{
-			if( !GetStartPointCache( pathID, out IStartPointCache StartPointCache ) ) {
+			if( !GetMainPathStartPointCache( pathID, out IMainPathStartPointCache mainPathStartPointCache ) ) {
 				return null;
 			}
-			if( StartPointCache.GetMainPathStartCAMPoint() == null ) {
+			if( mainPathStartPointCache.GetMainPathStartCAMPoint() == null || !( mainPathStartPointCache is IOrientationPoint orientationPoint ) ) {
 				return null;
 			}
-			return StartPointCache.GetMainPathStartCAMPoint();
+			return orientationPoint;
 		}
 
 		IOrientationPoint GetLeadInFirstPoint( string pathID )

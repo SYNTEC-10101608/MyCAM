@@ -291,21 +291,21 @@ namespace MyCAM.Post
 					CircleCacheInfo circleCacheInfo = circlePathObject.CircleCacheInfo;
 					return new StandardPatternNCPackage(
 						circleCacheInfo.GetProcessRefPoint(),
-						circleCacheInfo.StartPointList[ circlePathObject.CraftData.StartPointIndex ],
+						circleCacheInfo.GetMainPathStartCAMPoint(),
 						circlePathObject.CraftData.TraverseData );
 				case PathType.Rectangle:
 					RectanglePathObject rectanglePathObject = pathObject as RectanglePathObject;
 					RectangleCacheInfo rectangleCacheInfo = rectanglePathObject.RectangleCacheInfo;
 					return new StandardPatternNCPackage(
 						rectangleCacheInfo.GetProcessRefPoint(),
-						rectangleCacheInfo.StartPointList[ rectanglePathObject.CraftData.StartPointIndex ],
+						rectangleCacheInfo.GetMainPathStartCAMPoint(),
 						rectanglePathObject.CraftData.TraverseData );
 				case PathType.Runway:
 					RunwayPathObject runwayPathObject = pathObject as RunwayPathObject;
 					RunwayCacheInfo runwayCacheInfo = runwayPathObject.RunwayCacheInfo;
 					return new StandardPatternNCPackage(
 						runwayCacheInfo.GetProcessRefPoint(),
-						runwayCacheInfo.StartPointList[ runwayPathObject.CraftData.StartPointIndex ],
+						runwayCacheInfo.GetMainPathStartCAMPoint(),
 						runwayPathObject.CraftData.TraverseData );
 				case PathType.Triangle:
 				case PathType.Square:
@@ -315,7 +315,7 @@ namespace MyCAM.Post
 					PolygonCacheInfo polygonCacheInfo = polygonPathObject.PolygonCacheInfo;
 					return new StandardPatternNCPackage(
 						polygonCacheInfo.GetProcessRefPoint(),
-						polygonCacheInfo.StartPointList[ polygonPathObject.CraftData.StartPointIndex ],
+						polygonCacheInfo.GetMainPathStartCAMPoint(),
 						polygonPathObject.CraftData.TraverseData );
 				default:
 					break;

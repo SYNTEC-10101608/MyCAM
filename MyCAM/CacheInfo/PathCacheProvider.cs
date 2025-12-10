@@ -1,17 +1,13 @@
 using MyCAM.Data;
 using MyCAM.Data.PathObjectFolder;
+using System;
 using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
-	public interface IStartPointCache
+	public interface IMainPathStartPointCache
 	{
-		CAMPoint GetMainPathStartCAMPoint();
-
-		List<CAMPoint> StartPointList
-		{
-			get;
-		}
+		IProcessPoint GetMainPathStartCAMPoint();
 	}
 
 	public interface ILeadCache
@@ -60,169 +56,88 @@ namespace MyCAM.CacheInfo
 		}
 	}
 
-	public interface IPathHeadTailCache
+	public interface IProcessPathStartEndCache
 	{
 		CAMPoint GetProcessStartPoint();
 
 		CAMPoint GetProcessEndPoint();
 	}
 
+	/// <summary>
+	/// Generic strategy for path cache access using type-safe property accessor
+	/// Eliminates code duplication by using a generic approach
+	/// </summary>
+	/// <typeparam name="TPathObject">Type of PathObject (e.g., ContourPathObject, CirclePathObject)</typeparam>
+	internal class PathCacheStrategy<TPathObject> : IPathCacheStrategy
+		where TPathObject : PathObject
+	{
+		private readonly Func<TPathObject, object> m_CacheInfoGetter;
+
+		public PathCacheStrategy( Func<TPathObject, object> cacheInfoGetter )
+		{
+			m_CacheInfoGetter = cacheInfoGetter ?? throw new ArgumentNullException( nameof( cacheInfoGetter ) );
+		}
+
+		public IMainPathStartPointCache GetMainPathStartPointCache( PathObject pathObject )
+		{
+			return GetCacheInfo( pathObject ) as IMainPathStartPointCache;
+		}
+
+		public ILeadCache GetLeadCache( PathObject pathObject )
+		{
+			return GetCacheInfo( pathObject ) as ILeadCache;
+		}
+
+		public IPathReverseCache GetPathReverseCache( PathObject pathObject )
+		{
+			return GetCacheInfo( pathObject ) as IPathReverseCache;
+		}
+
+		public IToolVecCache GetToolVecCache( PathObject pathObject )
+		{
+			return GetCacheInfo( pathObject ) as IToolVecCache;
+		}
+
+		public IOverCutCache GetOverCutCache( PathObject pathObject )
+		{
+			return GetCacheInfo( pathObject ) as IOverCutCache;
+		}
+
+		private object GetCacheInfo( PathObject pathObject )
+		{
+			if( pathObject is TPathObject typedPath ) {
+				return m_CacheInfoGetter( typedPath );
+			}
+			return null;
+		}
+	}
+
 	internal interface IPathCacheStrategy
 	{
-		IStartPointCache GetStartPointCache( PathObject pathObject );
+		IMainPathStartPointCache GetMainPathStartPointCache( PathObject pathObject );
 		ILeadCache GetLeadCache( PathObject pathObject );
 		IPathReverseCache GetPathReverseCache( PathObject pathObject );
 		IToolVecCache GetToolVecCache( PathObject pathObject );
 		IOverCutCache GetOverCutCache( PathObject pathObject );
 	}
 
-	internal class ContourCacheStrategy : IPathCacheStrategy
-	{
-		public IStartPointCache GetStartPointCache( PathObject pathObject )
-		{
-			return ( pathObject as ContourPathObject )?.ContourCacheInfo;
-		}
-
-		public ILeadCache GetLeadCache( PathObject pathObject )
-		{
-			return ( pathObject as ContourPathObject )?.ContourCacheInfo;
-		}
-
-		public IPathReverseCache GetPathReverseCache( PathObject pathObject )
-		{
-			return ( pathObject as ContourPathObject )?.ContourCacheInfo;
-		}
-
-		public IToolVecCache GetToolVecCache( PathObject pathObject )
-		{
-			return ( pathObject as ContourPathObject )?.ContourCacheInfo;
-		}
-
-		public IOverCutCache GetOverCutCache( PathObject pathObject )
-		{
-			return ( pathObject as ContourPathObject )?.ContourCacheInfo;
-		}
-	}
-
-	internal class CircleCacheStrategy : IPathCacheStrategy
-	{
-		public IStartPointCache GetStartPointCache( PathObject pathObject )
-		{
-			return ( pathObject as CirclePathObject )?.CircleCacheInfo;
-		}
-
-		public ILeadCache GetLeadCache( PathObject pathObject )
-		{
-			return ( pathObject as CirclePathObject )?.CircleCacheInfo;
-		}
-
-		public IPathReverseCache GetPathReverseCache( PathObject pathObject )
-		{
-			return ( pathObject as CirclePathObject )?.CircleCacheInfo;
-		}
-
-		public IToolVecCache GetToolVecCache( PathObject pathObject )
-		{
-			return ( pathObject as CirclePathObject )?.CircleCacheInfo;
-		}
-
-		public IOverCutCache GetOverCutCache( PathObject pathObject )
-		{
-			return ( pathObject as CirclePathObject )?.CircleCacheInfo;
-		}
-	}
-
-	internal class RectangleCacheStrategy : IPathCacheStrategy
-	{
-		public IStartPointCache GetStartPointCache( PathObject pathObject )
-		{
-			return ( pathObject as RectanglePathObject )?.RectangleCacheInfo;
-		}
-
-		public ILeadCache GetLeadCache( PathObject pathObject )
-		{
-			return ( pathObject as RectanglePathObject )?.RectangleCacheInfo;
-		}
-
-		public IPathReverseCache GetPathReverseCache( PathObject pathObject )
-		{
-			return ( pathObject as RectanglePathObject )?.RectangleCacheInfo;
-		}
-
-		public IToolVecCache GetToolVecCache( PathObject pathObject )
-		{
-			return ( pathObject as RectanglePathObject )?.RectangleCacheInfo;
-		}
-
-		public IOverCutCache GetOverCutCache( PathObject pathObject )
-		{
-			return ( pathObject as RectanglePathObject )?.RectangleCacheInfo;
-		}
-	}
-
-	internal class PolygonCacheStrategy : IPathCacheStrategy
-	{
-		public IStartPointCache GetStartPointCache( PathObject pathObject )
-		{
-			return ( pathObject as PolygonPathObject )?.PolygonCacheInfo;
-		}
-
-		public ILeadCache GetLeadCache( PathObject pathObject )
-		{
-			return ( pathObject as PolygonPathObject )?.PolygonCacheInfo;
-		}
-
-		public IPathReverseCache GetPathReverseCache( PathObject pathObject )
-		{
-			return ( pathObject as PolygonPathObject )?.PolygonCacheInfo;
-		}
-
-		public IToolVecCache GetToolVecCache( PathObject pathObject )
-		{
-			return ( pathObject as PolygonPathObject )?.PolygonCacheInfo;
-		}
-
-		public IOverCutCache GetOverCutCache( PathObject pathObject )
-		{
-			return ( pathObject as PolygonPathObject )?.PolygonCacheInfo;
-		}
-	}
-
-	internal class RunwayCacheStrategy : IPathCacheStrategy
-	{
-		public IStartPointCache GetStartPointCache( PathObject pathObject )
-		{
-			return ( pathObject as RunwayPathObject )?.RunwayCacheInfo;
-		}
-
-		public ILeadCache GetLeadCache( PathObject pathObject )
-		{
-			return ( pathObject as RunwayPathObject )?.RunwayCacheInfo;
-		}
-
-		public IPathReverseCache GetPathReverseCache( PathObject pathObject )
-		{
-			return ( pathObject as RunwayPathObject )?.RunwayCacheInfo;
-		}
-
-		public IToolVecCache GetToolVecCache( PathObject pathObject )
-		{
-			return ( pathObject as RunwayPathObject )?.RunwayCacheInfo;
-		}
-
-		public IOverCutCache GetOverCutCache( PathObject pathObject )
-		{
-			return ( pathObject as RunwayPathObject )?.RunwayCacheInfo;
-		}
-	}
-
 	internal static class PathCacheStrategyFactory
 	{
-		private static readonly ContourCacheStrategy s_ContourStrategy = new ContourCacheStrategy();
-		private static readonly CircleCacheStrategy s_CircleStrategy = new CircleCacheStrategy();
-		private static readonly RectangleCacheStrategy s_RectangleStrategy = new RectangleCacheStrategy();
-		private static readonly PolygonCacheStrategy s_PolygonStrategy = new PolygonCacheStrategy();
-		private static readonly RunwayCacheStrategy s_RunwayStrategy = new RunwayCacheStrategy();
+		// Create singleton strategy instances using generic PathCacheStrategy
+		private static readonly IPathCacheStrategy s_ContourStrategy = 
+			new PathCacheStrategy<ContourPathObject>( p => p.ContourCacheInfo );
+		
+		private static readonly IPathCacheStrategy s_CircleStrategy = 
+			new PathCacheStrategy<CirclePathObject>( p => p.CircleCacheInfo );
+		
+		private static readonly IPathCacheStrategy s_RectangleStrategy = 
+			new PathCacheStrategy<RectanglePathObject>( p => p.RectangleCacheInfo );
+		
+		private static readonly IPathCacheStrategy s_PolygonStrategy = 
+			new PathCacheStrategy<PolygonPathObject>( p => p.PolygonCacheInfo );
+		
+		private static readonly IPathCacheStrategy s_RunwayStrategy = 
+			new PathCacheStrategy<RunwayPathObject>( p => p.RunwayCacheInfo );
 
 		public static IPathCacheStrategy GetStrategy( PathType pathType )
 		{
@@ -247,55 +162,36 @@ namespace MyCAM.CacheInfo
 
 	internal static class PathCacheProvider
 	{
-		public static bool TryGetStartPointCache( PathObject pathObject, out IStartPointCache cache )
+		public static bool TryGetMainPathStartPointCache( PathObject pathObject, out IMainPathStartPointCache cache )
 		{
-			cache = null;
-			if( pathObject == null ) {
-				return false;
-			}
-
-			IPathCacheStrategy strategy = PathCacheStrategyFactory.GetStrategy( pathObject.PathType );
-			cache = strategy.GetStartPointCache( pathObject );
-			return cache != null;
+			return TryGetCache( pathObject, s => s.GetMainPathStartPointCache( pathObject ), out cache );
 		}
 
 		public static bool TryGetLeadCache( PathObject pathObject, out ILeadCache cache )
 		{
-			cache = null;
-			if( pathObject == null ) {
-				return false;
-			}
-
-			IPathCacheStrategy strategy = PathCacheStrategyFactory.GetStrategy( pathObject.PathType );
-			cache = strategy.GetLeadCache( pathObject );
-			return cache != null;
+			return TryGetCache( pathObject, s => s.GetLeadCache( pathObject ), out cache );
 		}
 
 		public static bool TryGetPathReverseCache( PathObject pathObject, out IPathReverseCache cache )
 		{
-			cache = null;
-			if( pathObject == null ) {
-				return false;
-			}
-
-			IPathCacheStrategy strategy = PathCacheStrategyFactory.GetStrategy( pathObject.PathType );
-			cache = strategy.GetPathReverseCache( pathObject );
-			return cache != null;
+			return TryGetCache( pathObject, s => s.GetPathReverseCache( pathObject ), out cache );
 		}
 
 		public static bool TryGetToolVecCache( PathObject pathObject, out IToolVecCache cache )
 		{
-			cache = null;
-			if( pathObject == null ) {
-				return false;
-			}
-
-			IPathCacheStrategy strategy = PathCacheStrategyFactory.GetStrategy( pathObject.PathType );
-			cache = strategy.GetToolVecCache( pathObject );
-			return cache != null;
+			return TryGetCache( pathObject, s => s.GetToolVecCache( pathObject ), out cache );
 		}
 
 		public static bool TryGetOverCutCache( PathObject pathObject, out IOverCutCache cache )
+		{
+			return TryGetCache( pathObject, s => s.GetOverCutCache( pathObject ), out cache );
+		}
+
+		/// <summary>
+		/// Generic helper method to reduce duplication in TryGet methods
+		/// </summary>
+		private static bool TryGetCache<TCache>( PathObject pathObject, Func<IPathCacheStrategy, TCache> cacheGetter, out TCache cache )
+			where TCache : class
 		{
 			cache = null;
 			if( pathObject == null ) {
@@ -303,7 +199,7 @@ namespace MyCAM.CacheInfo
 			}
 
 			IPathCacheStrategy strategy = PathCacheStrategyFactory.GetStrategy( pathObject.PathType );
-			cache = strategy.GetOverCutCache( pathObject );
+			cache = cacheGetter( strategy );
 			return cache != null;
 		}
 	}

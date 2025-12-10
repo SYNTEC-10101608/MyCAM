@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class ContourCacheInfo : IPathHeadTailCache, IStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache
+	public class ContourCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache
 	{
 		public ContourCacheInfo( string szID, ContourGeomData geomData, CraftData craftData, bool isClose )
 		{
@@ -117,7 +117,7 @@ namespace MyCAM.CacheInfo
 			return camPoint;
 		}
 
-		public CAMPoint GetMainPathStartCAMPoint()
+		public IProcessPoint GetMainPathStartCAMPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -130,7 +130,7 @@ namespace MyCAM.CacheInfo
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
 			}
-			return m_CAMPointList.Select( p => p.Clone() ).ToList();
+			return m_CAMPointList;
 		}
 
 		#endregion
@@ -149,17 +149,6 @@ namespace MyCAM.CacheInfo
 			get
 			{
 				return m_CraftData.StartPointIndex;
-			}
-		}
-
-		public List<CAMPoint> StartPointList
-		{
-			get
-			{
-				if( m_IsCraftDataDirty ) {
-					BuildCAMPointList();
-				}
-				return m_CAMPointList;
 			}
 		}
 

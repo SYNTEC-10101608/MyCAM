@@ -117,26 +117,26 @@ namespace MyCAM.Data
 			}
 		}
 
-		public static bool GetPathHeadTailCacheByID( string pathID, out IPathHeadTailCache pathHeadTailCache )
+		public static bool GetProcessPathStartEndCacheByID( string pathID, out IProcessPathStartEndCache processPathStartEndCache )
 		{
-			pathHeadTailCache = null;
+			processPathStartEndCache = null;
 			PathObject pathObject = m_DataManager.GetPathObjectDictionary()[ pathID ];
 			switch( pathObject.PathType ) {
 				case PathType.Circle:
 					if( pathObject is CirclePathObject circlePathObject ) {
-						pathHeadTailCache = circlePathObject.CircleCacheInfo;
+						processPathStartEndCache = circlePathObject.CircleCacheInfo;
 						return true;
 					}
 					return false;
 				case PathType.Rectangle:
 					if( pathObject is RectanglePathObject rectanglePathObject ) {
-						pathHeadTailCache = rectanglePathObject.RectangleCacheInfo;
+						processPathStartEndCache = rectanglePathObject.RectangleCacheInfo;
 						return true;
 					}
 					return false;
 				case PathType.Runway:
 					if( pathObject is RunwayPathObject runwayPathObject ) {
-						pathHeadTailCache = runwayPathObject.RunwayCacheInfo;
+						processPathStartEndCache = runwayPathObject.RunwayCacheInfo;
 						return true;
 					}
 					return false;
@@ -145,14 +145,14 @@ namespace MyCAM.Data
 				case PathType.Pentagon:
 				case PathType.Hexagon:
 					if( pathObject is PolygonPathObject polygonPathObject ) {
-						pathHeadTailCache = polygonPathObject.PolygonCacheInfo;
+						processPathStartEndCache = polygonPathObject.PolygonCacheInfo;
 						return true;
 					}
 					return false;
 				case PathType.Contour:
 				default:
 					if( pathObject is ContourPathObject contourPathObject ) {
-						pathHeadTailCache = contourPathObject.ContourCacheInfo;
+						processPathStartEndCache = contourPathObject.ContourCacheInfo;
 						return true;
 					}
 					return false;

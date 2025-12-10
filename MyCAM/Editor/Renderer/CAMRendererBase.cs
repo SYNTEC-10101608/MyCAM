@@ -45,14 +45,14 @@ namespace MyCAM.Editor.Renderer
 			return pathObject != null;
 		}
 
-		protected bool GetStartPointCache( string szPathID, out IStartPointCache startPointCache )
+		protected bool GetMainPathStartPointCache( string szPathID, out IMainPathStartPointCache mainPathStartPoint )
 		{
-			startPointCache = null;
+			mainPathStartPoint = null;
 			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
 				return false;
 			}
 
-			return PathCacheProvider.TryGetStartPointCache( pathObject, out startPointCache );
+			return PathCacheProvider.TryGetMainPathStartPointCache( pathObject, out mainPathStartPoint );
 		}
 
 		protected bool GetLeadCache( string szPathID, out ILeadCache leadCache )

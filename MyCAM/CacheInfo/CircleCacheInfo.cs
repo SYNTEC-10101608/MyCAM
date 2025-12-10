@@ -2,11 +2,10 @@
 using OCC.gp;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class CircleCacheInfo : IPathHeadTailCache, IStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
+	public class CircleCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
 		public CircleCacheInfo( string szID, gp_Ax3 coordinateInfo, CircleGeomData circleGeomData, CraftData craftData )
 		{
@@ -107,7 +106,7 @@ namespace MyCAM.CacheInfo
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
 
-		public CAMPoint GetMainPathStartCAMPoint()
+		public IProcessPoint GetMainPathStartCAMPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -120,7 +119,7 @@ namespace MyCAM.CacheInfo
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
 			}
-			return m_StartPointList.Select( p => p.Clone() ).ToList();
+			return m_StartPointList;
 		}
 
 		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
