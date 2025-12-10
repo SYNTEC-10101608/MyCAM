@@ -31,15 +31,15 @@ namespace PostTool
 		/// <returns>Error code (0 = no error)</returns>
 		int POSTTOOL_API IJKtoMS(
 			Eigen::Vector3d ToolDirection,
-			const Eigen::Vector3d& ToolDirectionAtZero,
-			const Eigen::Vector3d& DirectOfFirstRotAxis,
-			const Eigen::Vector3d& DirectOfSecondRotAxis,
+			const Eigen::Vector3d &ToolDirectionAtZero,
+			const Eigen::Vector3d &DirectOfFirstRotAxis,
+			const Eigen::Vector3d &DirectOfSecondRotAxis,
 			double LastMasterRotAngle,
 			double LastSlaveRotAngle,
-			double& MRotAngle1,
-			double& SRotAngle1,
-			double& MRotAngle2,
-			double& SRotAngle2,
+			double &MRotAngle1,
+			double &SRotAngle1,
+			double &MRotAngle2,
+			double &SRotAngle2,
 			double IUtoBLU_Rotary );
 
 		/// <summary>
@@ -69,8 +69,8 @@ namespace PostTool
 			double SRotAngle2,
 			double LastMasterRotAngle,
 			double LastSlaveRotAngle,
-			double& MasterRotAngle,
-			double& SlaveRotAngle,
+			double &MasterRotAngle,
+			double &SlaveRotAngle,
 			SolutionType type,
 			double FStart,
 			double FEnd,
@@ -81,14 +81,14 @@ namespace PostTool
 			double IUtoBLU_Rotary );
 
 	private:
-		bool SolveQuadEq( double a, double b, double c, double& x1, double& x2 );
+		bool SolveQuadEq( double a, double b, double c, double &x1, double &x2 );
 		double Determinant( double a, double b, double c, double d );
 		bool IsAtPermissibleRange( double Angle, double start, double end, double IUtoBLU_Rotary );
-		void ConvertAngleRange( double& angle, double IUtoBLU_Rotary );
-		bool ToPermissibleCoterminalAng( double& TarPos, double LastPos, SolutionType Prefer, 
+		void ConvertAngleRange( double &angle, double IUtoBLU_Rotary );
+		bool ToPermissibleCoterminalAng( double &TarPos, double LastPos, SolutionType Prefer,
 			double LimitStart, double LimitEnd, int nRDofAX, double IUtoBLU_Rotary );
 		bool IsPathPermissible( double Tar, double LastPos, double Start, double End, double IUtoBLU_Rotary );
-		bool IsSolutionPermissible( double& MasterTarPos, double& SlaveTarPos, 
+		bool IsSolutionPermissible( double &MasterTarPos, double &SlaveTarPos,
 			double MasterLastPos, double SlaveLastPos, SolutionType type,
 			double FStart, double FEnd, double SStart, double SEnd,
 			int nRDOfFirst, int nRDOfSecond, double IUtoBLU_Rotary );
