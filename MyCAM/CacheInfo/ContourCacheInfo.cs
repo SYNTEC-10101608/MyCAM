@@ -8,7 +8,7 @@ namespace MyCAM.CacheInfo
 {
 	public class ContourCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache
 	{
-		public ContourCacheInfo( ContourGeomData geomData, CraftData craftData, bool isClose )
+		public ContourCacheInfo( ContourGeomData geomData, CraftData craftData )
 		{
 			if( geomData == null || craftData == null ) {
 				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );
@@ -19,7 +19,7 @@ namespace MyCAM.CacheInfo
 			m_CADPointList = geomData.CADPointList;
 			m_ConnectCADPointMap = geomData.ConnectPointMap;
 			m_CraftData = craftData;
-			m_IsClose = isClose;
+			m_IsClose = geomData.IsClosed;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
 			BuildCAMPointList();
 		}
