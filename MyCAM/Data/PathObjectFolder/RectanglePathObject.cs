@@ -90,7 +90,7 @@ namespace MyCAM.Data
 
 			PatternFactory patternFactory = new PatternFactory( contourPathObject.ContourGeomData, rectangleGeomData );
 			gp_Ax3 coordinateInfo = patternFactory.GetCoordinateInfo();
-			m_RectangleCacheInfo = new RectangleCacheInfo( szUID, coordinateInfo, rectangleGeomData, m_CraftData );
+			m_RectangleCacheInfo = new RectangleCacheInfo( coordinateInfo, rectangleGeomData, m_CraftData );
 		}
 
 		CraftData m_CraftData;

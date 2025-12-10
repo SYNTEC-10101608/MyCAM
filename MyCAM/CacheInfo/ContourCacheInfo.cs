@@ -8,26 +8,20 @@ namespace MyCAM.CacheInfo
 {
 	public class ContourCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache
 	{
-		public ContourCacheInfo( string szID, ContourGeomData geomData, CraftData craftData, bool isClose )
+		public ContourCacheInfo( ContourGeomData geomData, CraftData craftData, bool isClose )
 		{
-			if( string.IsNullOrEmpty( szID ) || geomData == null || craftData == null ) {
+			if( geomData == null || craftData == null ) {
 				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );
 			}
 			if( geomData.CADPointList.Count == 0 ) {
 				throw new ArgumentException( "ContourCacheInfo constructing argument empty cadPointList" );
 			}
-			UID = szID;
 			m_CADPointList = geomData.CADPointList;
 			m_ConnectCADPointMap = geomData.ConnectPointMap;
 			m_CraftData = craftData;
 			m_IsClose = isClose;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
 			BuildCAMPointList();
-		}
-
-		public string UID
-		{
-			get; private set;
 		}
 
 		public PathType PathType
@@ -84,7 +78,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public CAMPoint GetProcessStartPoint()
+		public IProcessPoint GetProcessStartPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -99,7 +93,7 @@ namespace MyCAM.CacheInfo
 			return camPoint;
 		}
 
-		public CAMPoint GetProcessEndPoint()
+		public IProcessPoint GetProcessEndPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -125,12 +119,12 @@ namespace MyCAM.CacheInfo
 			return m_CAMPointList.First().Clone();
 		}
 
-		public List<CAMPoint> GetToolVecList()
+		public IReadOnlyList<IProcessPoint> GetToolVecList()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
 			}
-			return m_CAMPointList;
+			return m_CAMPointList.Cast<IProcessPoint>().ToList();
 		}
 
 		#endregion

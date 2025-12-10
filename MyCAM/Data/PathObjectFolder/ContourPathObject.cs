@@ -24,7 +24,7 @@ namespace MyCAM.Data
 			bool isClosed = DetermineIfClosed( shape );
 			m_ContourGeomData = new ContourGeomData( pathDataList, isClosed );
 			m_CraftData = new CraftData( szUID );
-			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_ContourGeomData, m_CraftData, isClosed );
+			m_ContourCacheInfo = new ContourCacheInfo( m_ContourGeomData, m_CraftData, isClosed );
 		}
 
 		// this is for the file read constructor
@@ -37,7 +37,7 @@ namespace MyCAM.Data
 			bool isClosed = DetermineIfClosed( shape );
 			m_ContourGeomData = geomData;
 			m_CraftData = craftData;
-			m_ContourCacheInfo = new ContourCacheInfo( szUID, m_ContourGeomData, m_CraftData, isClosed );
+			m_ContourCacheInfo = new ContourCacheInfo( m_ContourGeomData, m_CraftData, isClosed );
 		}
 
 		public ContourGeomData ContourGeomData

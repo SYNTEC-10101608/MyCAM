@@ -89,7 +89,7 @@ namespace MyCAM.Data
 
 			PatternFactory patternFactory = new PatternFactory( contourPathObject.ContourGeomData, circleGeomData );
 			gp_Ax3 coordinateInfo = patternFactory.GetCoordinateInfo();
-			m_CircleCacheInfo = new CircleCacheInfo( szUID, coordinateInfo, circleGeomData, m_CraftData );
+			m_CircleCacheInfo = new CircleCacheInfo( coordinateInfo, circleGeomData, m_CraftData );
 		}
 
 		CircleGeomData m_CircleGeomData;

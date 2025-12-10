@@ -3,26 +3,22 @@ using MyCAM.Data.GeomDataFolder;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
 	public class RunwayCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
-		public RunwayCacheInfo( string szID, gp_Ax3 coordinateInfo, RunwayGeomData runwayGeomData, CraftData craftData )
+		public RunwayCacheInfo( gp_Ax3 coordinateInfo, RunwayGeomData runwayGeomData, CraftData craftData )
 		{
-			if( string.IsNullOrEmpty( szID ) || runwayGeomData == null || craftData == null ) {
+			if( runwayGeomData == null || craftData == null ) {
 				throw new ArgumentNullException( "RunwayCacheInfo constructing argument null" );
 			}
-			UID = szID;
 			m_CoordinateInfo = coordinateInfo;
 			m_RunwayGeomData = runwayGeomData;
 			m_CraftData = craftData;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
 			BuildCAMPointList();
-		}
-		public string UID
-		{
-			get; private set;
 		}
 
 		public PathType PathType
@@ -147,7 +143,7 @@ namespace MyCAM.CacheInfo
 			);
 		}
 
-		public CAMPoint GetProcessStartPoint()
+		public IProcessPoint GetProcessStartPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -158,7 +154,7 @@ namespace MyCAM.CacheInfo
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
 
-		public CAMPoint GetProcessEndPoint()
+		public IProcessPoint GetProcessEndPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -177,12 +173,12 @@ namespace MyCAM.CacheInfo
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
 
-		public List<CAMPoint> GetToolVecList()
+		public IReadOnlyList<IProcessPoint> GetToolVecList()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
 			}
-			return m_StartPointList;
+			return m_StartPointList.Cast<IProcessPoint>().ToList();
 		}
 
 		public bool IsToolVecModifyPoint( ISetToolVecPoint point )

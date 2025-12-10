@@ -3,27 +3,22 @@ using MyCAM.Data.GeomDataFolder;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
 	public class RectangleCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
-		public RectangleCacheInfo( string szID, gp_Ax3 coordinateInfo, RectangleGeomData rectangleGeomData, CraftData craftData )
+		public RectangleCacheInfo( gp_Ax3 coordinateInfo, RectangleGeomData rectangleGeomData, CraftData craftData )
 		{
-			if( string.IsNullOrEmpty( szID ) || rectangleGeomData == null || craftData == null ) {
+			if( rectangleGeomData == null || craftData == null ) {
 				throw new ArgumentNullException( "RectangleCacheInfo constructing argument null" );
 			}
-			UID = szID;
 			m_CoordinateInfo = coordinateInfo;
 			m_RectangleGeomData = rectangleGeomData;
 			m_CraftData = craftData;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
 			BuildCAMPointList();
-		}
-
-		public string UID
-		{
-			get; private set;
 		}
 
 		public PathType PathType
@@ -83,7 +78,7 @@ namespace MyCAM.CacheInfo
 			return new CAMPoint( new CADPoint( m_CoordinateInfo.Location(), m_CoordinateInfo.Direction(), m_CoordinateInfo.XDirection(), m_CoordinateInfo.YDirection() ), m_CoordinateInfo.Direction() );
 		}
 
-		public CAMPoint GetProcessStartPoint()
+		public IProcessPoint GetProcessStartPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -94,7 +89,7 @@ namespace MyCAM.CacheInfo
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
 
-		public CAMPoint GetProcessEndPoint()
+		public IProcessPoint GetProcessEndPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -113,12 +108,12 @@ namespace MyCAM.CacheInfo
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
 
-		public List<CAMPoint> GetToolVecList()
+		public IReadOnlyList<IProcessPoint> GetToolVecList()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
 			}
-			return m_StartPointList;
+			return m_StartPointList.Cast<IProcessPoint>().ToList();
 		}
 
 		public bool IsToolVecModifyPoint( ISetToolVecPoint point )

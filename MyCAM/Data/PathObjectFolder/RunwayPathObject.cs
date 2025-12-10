@@ -90,7 +90,7 @@ namespace MyCAM.Data.PathObjectFolder
 
 			PatternFactory patternFactory = new PatternFactory( contourPathObject.ContourGeomData, runwayGeomData );
 			gp_Ax3 coordinateInfo = patternFactory.GetCoordinateInfo();
-			m_RunwayCacheInfo = new RunwayCacheInfo( szUID, coordinateInfo, runwayGeomData, m_CraftData );
+			m_RunwayCacheInfo = new RunwayCacheInfo( coordinateInfo, runwayGeomData, m_CraftData );
 		}
 
 		CraftData m_CraftData;
