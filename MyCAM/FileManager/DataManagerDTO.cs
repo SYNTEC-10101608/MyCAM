@@ -864,12 +864,6 @@ namespace MyCAM.FileManager
 	public class CraftDataDTO
 	{
 		// properties
-		public string UID
-		{
-			get;
-			set;
-		} = string.Empty;
-
 		public bool IsReverse
 		{
 			get;
@@ -921,7 +915,6 @@ namespace MyCAM.FileManager
 			if( craftData == null ) {
 				return;
 			}
-			UID = craftData.UID;
 			IsReverse = craftData.IsReverse;
 			IsToolVecReverse = craftData.IsToolVecReverse;
 			StartPoint = craftData.StartPointIndex;
@@ -945,7 +938,7 @@ namespace MyCAM.FileManager
 			Dictionary<int, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
 			LeadData leadParam = LeadParam.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
-			return new CraftData( UID, StartPoint, IsReverse, leadParam, OverCutLength, toolVecModifyMap, IsToolVecReverse, traverseData );
+			return new CraftData( StartPoint, IsReverse, leadParam, OverCutLength, toolVecModifyMap, IsToolVecReverse, traverseData );
 		}
 	}
 
