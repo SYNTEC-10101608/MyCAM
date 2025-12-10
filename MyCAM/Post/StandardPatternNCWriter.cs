@@ -1,5 +1,4 @@
 using MyCAM.Data;
-using MyCAM.Data.GeomDataFolder;
 using System;
 using System.IO;
 

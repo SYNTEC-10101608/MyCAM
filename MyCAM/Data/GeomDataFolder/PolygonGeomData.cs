@@ -1,4 +1,4 @@
-﻿namespace MyCAM.Data.GeomDataFolder
+﻿namespace MyCAM.Data
 {
 	public class PolygonGeomData : IStandardPatternGeomData
 	{

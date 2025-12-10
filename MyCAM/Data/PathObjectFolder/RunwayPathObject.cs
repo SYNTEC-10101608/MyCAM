@@ -1,10 +1,9 @@
 ﻿using MyCAM.CacheInfo;
-using MyCAM.Data.GeomDataFolder;
 using MyCAM.StandardPatternFactory;
 using OCC.gp;
 using OCC.TopoDS;
 
-namespace MyCAM.Data.PathObjectFolder
+namespace MyCAM.Data
 {
 	internal class RunwayPathObject : PathObject
 	{

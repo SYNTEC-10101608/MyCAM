@@ -1,5 +1,4 @@
 using MyCAM.Data;
-using MyCAM.Data.GeomDataFolder;
 using OCC.gp;
 using System;
 
@@ -48,19 +47,19 @@ namespace MyCAM.CacheInfo
 	internal static class StandardPatternCacheInfoFactory
 	{
 		// Strategy instances for each pattern type
-		static readonly IStandardPatternCacheInfoStrategy s_CircleStrategy = 
+		static readonly IStandardPatternCacheInfoStrategy s_CircleStrategy =
 			new StandardPatternCacheInfoStrategy<CircleCacheInfo>(
 				( coord, geom, craft ) => new CircleCacheInfo( coord, geom, craft ) );
 
-		static readonly IStandardPatternCacheInfoStrategy s_RectangleStrategy = 
+		static readonly IStandardPatternCacheInfoStrategy s_RectangleStrategy =
 			new StandardPatternCacheInfoStrategy<RectangleCacheInfo>(
 				( coord, geom, craft ) => new RectangleCacheInfo( coord, geom, craft ) );
 
-		static readonly IStandardPatternCacheInfoStrategy s_RunwayStrategy = 
+		static readonly IStandardPatternCacheInfoStrategy s_RunwayStrategy =
 			new StandardPatternCacheInfoStrategy<RunwayCacheInfo>(
 				( coord, geom, craft ) => new RunwayCacheInfo( coord, geom, craft ) );
 
-		static readonly IStandardPatternCacheInfoStrategy s_PolygonStrategy = 
+		static readonly IStandardPatternCacheInfoStrategy s_PolygonStrategy =
 			new StandardPatternCacheInfoStrategy<PolygonCacheInfo>(
 				( coord, geom, craft ) => new PolygonCacheInfo( coord, geom, craft ) );
 

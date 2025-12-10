@@ -235,7 +235,9 @@ namespace MyCAM.Editor
 		public void RemovePath()
 		{
 			// stop current action
-			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
 			foreach( string szPathID in szPathIDList ) {
 
 				// remove from data manager
@@ -281,7 +283,9 @@ namespace MyCAM.Editor
 		public void SetReverse()
 		{
 			// one shot edit, muti edit supported
-			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
 			foreach( string szPathID in szPathIDList ) {
 				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
@@ -348,7 +352,9 @@ namespace MyCAM.Editor
 		public void SetToolVecReverse()
 		{
 			// one shot edit, multi edit supported
-			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
 			foreach( string szPathID in szPathIDList ) {
 				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
@@ -408,7 +414,9 @@ namespace MyCAM.Editor
 		public void MoveProcess( bool bUp )
 		{
 			// one shot edit, no multi edit supported
-			ValidateBeforeOneShotEdit( out List<string> szPathIDList, false );
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
 			string szPathID = szPathIDList[ 0 ];
 			int nIndex = m_DataManager.PathIDList.IndexOf( szPathID );
 
@@ -565,7 +573,7 @@ namespace MyCAM.Editor
 
 		void OnPathShapeTypeChange( PathType type, List<string> szPathIDList )
 		{
-			ShowAllCAMData();
+			ShowCAMData( szPathIDList );
 			PathShapeTypeChanged?.Invoke( type );
 		}
 
@@ -601,7 +609,6 @@ namespace MyCAM.Editor
 			m_OrientationRenderer.Remove( pathIDList );
 			m_IndexRenderer.Remove();
 			m_TraverseRenderer.Remove();
-			ShowAllCAMData();
 		}
 
 		#endregion

@@ -1,6 +1,4 @@
 ﻿using MyCAM.Data;
-using MyCAM.Data.GeomDataFolder;
-using MyCAM.Data.PathObjectFolder;
 using OCC.BRep;
 using OCC.BRepTools;
 using OCC.gp;

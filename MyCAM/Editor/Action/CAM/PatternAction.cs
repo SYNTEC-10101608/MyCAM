@@ -1,7 +1,5 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
-using MyCAM.Data.GeomDataFolder;
-using MyCAM.Data.PathObjectFolder;
 using MyCAM.Editor.Dialog;
 using MyCAM.StandardPatternFactory;
 using OCC.AIS;

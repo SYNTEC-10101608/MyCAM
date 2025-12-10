@@ -1,5 +1,4 @@
 ﻿using MyCAM.CacheInfo;
-using MyCAM.Data.GeomDataFolder;
 using MyCAM.StandardPatternFactory;
 using OCC.gp;
 using OCC.TopoDS;

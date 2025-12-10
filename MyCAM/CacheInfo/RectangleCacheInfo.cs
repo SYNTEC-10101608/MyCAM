@@ -1,5 +1,4 @@
 using MyCAM.Data;
-using MyCAM.Data.GeomDataFolder;
 using OCC.gp;
 using System;
 using System.Collections.Generic;

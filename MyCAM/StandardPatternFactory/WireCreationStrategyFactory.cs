@@ -1,5 +1,4 @@
 using MyCAM.Data;
-using MyCAM.Data.GeomDataFolder;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopoDS;
