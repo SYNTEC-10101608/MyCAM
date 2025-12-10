@@ -16,30 +16,6 @@ namespace MyCAM.Data
 		{
 		}
 
-		public override PathType PathType
-		{
-			get
-			{
-				return PathType.Circle;
-			}
-		}
-
-		// provide strongly-typed access to GeomData
-		public CircleGeomData CircleGeomData
-		{
-			get
-			{
-				return (CircleGeomData)GeomData;
-			}
-		}
-
-		// provide strongly-typed access to CacheInfo
-		public CircleCacheInfo CircleCacheInfo
-		{
-			get
-			{
-				return (CircleCacheInfo)base.CacheInfo;
-			}
-		}
+		public override PathType PathType => PathType.Circle;
 	}
 }

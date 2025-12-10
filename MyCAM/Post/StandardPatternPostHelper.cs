@@ -7,14 +7,14 @@ namespace MyCAM.Post
 {
 	internal class StandardPatternNCPackage
 	{
-		public StandardPatternNCPackage( CAMPoint refPoint, IProcessPoint startPoint, TraverseData traverseData )
+		public StandardPatternNCPackage( IProcessPoint refPoint, IProcessPoint startPoint, TraverseData traverseData )
 		{
 			RefPoint = refPoint ?? throw new ArgumentNullException( nameof( refPoint ) );
 			StartPoint = startPoint ?? throw new ArgumentNullException( nameof( startPoint ) );
 			TraverseData = traverseData ?? throw new ArgumentNullException( nameof( traverseData ) );
 		}
 
-		public CAMPoint RefPoint
+		public IProcessPoint RefPoint
 		{
 			get; private set;
 		}

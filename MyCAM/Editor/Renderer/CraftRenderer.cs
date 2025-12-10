@@ -180,7 +180,7 @@ namespace MyCAM.Editor.Renderer
 
 		List<IProcessPoint> GetLeadInPointList( string pathID )
 		{
-			if( !GetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !DataGettingHelper.GetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
 			if( leadCache.LeadInCAMPointList == null ) {
@@ -195,7 +195,7 @@ namespace MyCAM.Editor.Renderer
 
 		List<IProcessPoint> GetLeadOutPointList( string pathID )
 		{
-			if( !GetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !DataGettingHelper.GetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
 			if( leadCache.LeadOutCAMPointList == null ) {
@@ -210,7 +210,7 @@ namespace MyCAM.Editor.Renderer
 
 		List<IProcessPoint> GetOverCutPointList( string pathID )
 		{
-			if( !GetOverCutCache( pathID, out IOverCutCache overCutCache ) ) {
+			if( !DataGettingHelper.GetOverCutCache( pathID, out IOverCutCache overCutCache ) ) {
 				return null;
 			}
 			if( overCutCache.OverCutCAMPointList == null ) {
@@ -225,7 +225,7 @@ namespace MyCAM.Editor.Renderer
 
 		LeadData GetLeadData( string pathID )
 		{
-			if( !GetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !DataGettingHelper.GetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
 			return leadCache.LeadData;
@@ -233,7 +233,7 @@ namespace MyCAM.Editor.Renderer
 
 		double GetOverCutLength( string pathID )
 		{
-			if( !GetOverCutCache( pathID, out IOverCutCache overCutCache ) ) {
+			if( !DataGettingHelper.GetOverCutCache( pathID, out IOverCutCache overCutCache ) ) {
 				return 0.0;
 			}
 			return overCutCache.OverCutLength;

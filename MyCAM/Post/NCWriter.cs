@@ -284,37 +284,40 @@ namespace MyCAM.Post
 			if( pathObject.PathType == PathType.Contour ) {
 				return null;
 			}
+			if( !DataGettingHelper.GetReferencePoint( szID, out IProcessPoint refPoint ) ) {
+				return null;
+			}
+			if( !DataGettingHelper.GetMainPathStartPointCache( szID, out IMainPathStartPointCache mainPathStartPoint ) ) {
+				return null;
+			}
+
 			switch( pathObject.PathType ) {
 				case PathType.Circle:
 					CirclePathObject circlePathObject = pathObject as CirclePathObject;
-					CircleCacheInfo circleCacheInfo = circlePathObject.CircleCacheInfo;
 					return new StandardPatternNCPackage(
-						circleCacheInfo.GetProcessRefPoint(),
-						circleCacheInfo.GetMainPathStartCAMPoint(),
+						refPoint,
+						mainPathStartPoint.GetMainPathStartCAMPoint(),
 						circlePathObject.CraftData.TraverseData );
 				case PathType.Rectangle:
 					RectanglePathObject rectanglePathObject = pathObject as RectanglePathObject;
-					RectangleCacheInfo rectangleCacheInfo = rectanglePathObject.RectangleCacheInfo;
 					return new StandardPatternNCPackage(
-						rectangleCacheInfo.GetProcessRefPoint(),
-						rectangleCacheInfo.GetMainPathStartCAMPoint(),
+						refPoint,
+						mainPathStartPoint.GetMainPathStartCAMPoint(),
 						rectanglePathObject.CraftData.TraverseData );
 				case PathType.Runway:
 					RunwayPathObject runwayPathObject = pathObject as RunwayPathObject;
-					RunwayCacheInfo runwayCacheInfo = runwayPathObject.RunwayCacheInfo;
 					return new StandardPatternNCPackage(
-						runwayCacheInfo.GetProcessRefPoint(),
-						runwayCacheInfo.GetMainPathStartCAMPoint(),
+						refPoint,
+						mainPathStartPoint.GetMainPathStartCAMPoint(),
 						runwayPathObject.CraftData.TraverseData );
 				case PathType.Triangle:
 				case PathType.Square:
 				case PathType.Pentagon:
 				case PathType.Hexagon:
 					PolygonPathObject polygonPathObject = pathObject as PolygonPathObject;
-					PolygonCacheInfo polygonCacheInfo = polygonPathObject.PolygonCacheInfo;
 					return new StandardPatternNCPackage(
-						polygonCacheInfo.GetProcessRefPoint(),
-						polygonCacheInfo.GetMainPathStartCAMPoint(),
+						refPoint,
+						mainPathStartPoint.GetMainPathStartCAMPoint(),
 						polygonPathObject.CraftData.TraverseData );
 				default:
 					break;

@@ -16,31 +16,6 @@ namespace MyCAM.Data
 		{
 		}
 
-		public override PathType PathType
-		{
-			get
-			{
-				// polygon uses PathType from GeomData (Triangle, Square, Pentagon, Hexagon)
-				return GeomData.PathType;
-			}
-		}
-
-		// provide strongly-typed access to GeomData
-		public PolygonGeomData PolygonGeomData
-		{
-			get
-			{
-				return (PolygonGeomData)GeomData;
-			}
-		}
-
-		// provide strongly-typed access to CacheInfo
-		public PolygonCacheInfo PolygonCacheInfo
-		{
-			get
-			{
-				return (PolygonCacheInfo)base.CacheInfo;
-			}
-		}
+		public override PathType PathType => GeomData.PathType;
 	}
 }

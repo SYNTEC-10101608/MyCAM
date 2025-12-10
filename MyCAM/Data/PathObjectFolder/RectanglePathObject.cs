@@ -16,30 +16,6 @@ namespace MyCAM.Data
 		{
 		}
 
-		public override PathType PathType
-		{
-			get
-			{
-				return PathType.Rectangle;
-			}
-		}
-
-		// provide strongly-typed access to GeomData
-		public RectangleGeomData RectangleGeomData
-		{
-			get
-			{
-				return (RectangleGeomData)GeomData;
-			}
-		}
-
-		// provide strongly-typed access to CacheInfo
-		public RectangleCacheInfo RectangleCacheInfo
-		{
-			get
-			{
-				return (RectangleCacheInfo)base.CacheInfo;
-			}
-		}
+		public override PathType PathType => PathType.Rectangle;
 	}
 }

@@ -16,30 +16,6 @@ namespace MyCAM.Data
 		{
 		}
 
-		public override PathType PathType
-		{
-			get
-			{
-				return PathType.Runway;
-			}
-		}
-
-		// provide strongly-typed access to GeomData
-		public RunwayGeomData RunwayGeomData
-		{
-			get
-			{
-				return (RunwayGeomData)GeomData;
-			}
-		}
-
-		// provide strongly-typed access to CacheInfo
-		public RunwayCacheInfo RunwayCacheInfo
-		{
-			get
-			{
-				return (RunwayCacheInfo)base.CacheInfo;
-			}
-		}
+		public override PathType PathType => PathType.Runway;
 	}
 }

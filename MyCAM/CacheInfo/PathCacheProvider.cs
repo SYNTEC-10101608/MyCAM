@@ -13,6 +13,8 @@ namespace MyCAM.CacheInfo
 		}
 
 		void DoTransform( gp_Trsf transform );
+
+		IProcessPoint GetProcessRefPoint();
 	}
 
 	public interface IMainPathStartPointCache

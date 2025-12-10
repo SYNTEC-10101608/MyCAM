@@ -174,7 +174,7 @@ namespace MyCAM.Editor.Renderer
 
 		IOrientationPoint GetFirstCAMPoint( string pathID )
 		{
-			if( !GetMainPathStartPointCache( pathID, out IMainPathStartPointCache mainPathStartPointCache ) ) {
+			if( !DataGettingHelper.GetMainPathStartPointCache( pathID, out IMainPathStartPointCache mainPathStartPointCache ) ) {
 				return null;
 			}
 			if( mainPathStartPointCache.GetMainPathStartCAMPoint() == null || !( mainPathStartPointCache is IOrientationPoint orientationPoint ) ) {
@@ -185,7 +185,7 @@ namespace MyCAM.Editor.Renderer
 
 		IOrientationPoint GetLeadInFirstPoint( string pathID )
 		{
-			if( !GetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !DataGettingHelper.GetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
 			if( leadCache.LeadInCAMPointList == null || leadCache.LeadInCAMPointList.Count == 0 ) {
@@ -196,7 +196,7 @@ namespace MyCAM.Editor.Renderer
 
 		IOrientationPoint GetLeadOutLastPoint( string pathID )
 		{
-			if( !GetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !DataGettingHelper.GetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
 			if( leadCache.LeadOutCAMPointList == null || leadCache.LeadOutCAMPointList.Count == 0 ) {
@@ -207,7 +207,7 @@ namespace MyCAM.Editor.Renderer
 
 		LeadData GetLeadData( string pathID )
 		{
-			if( !GetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !DataGettingHelper.GetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
 			return leadCache.LeadData;
@@ -215,7 +215,7 @@ namespace MyCAM.Editor.Renderer
 
 		bool GetIsPathReverse( string pathID )
 		{
-			if( !GetPathReverseCache( pathID, out IPathReverseCache pathReverseCache ) ) {
+			if( !DataGettingHelper.GetPathReverseCache( pathID, out IPathReverseCache pathReverseCache ) ) {
 				return false;
 			}
 			return pathReverseCache.IsPathReverse;

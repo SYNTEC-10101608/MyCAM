@@ -405,9 +405,9 @@ namespace MyCAM.FileManager
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
 			PathType = PathType.Circle;
-			if( pathObject is CirclePathObject circlePathObject ) {
-				GeomData = new CircleGeomDataDTO( circlePathObject.CircleGeomData );
-				ContourPathObject = new ContourPathObjectDTO( circlePathObject.ContourPathObject );
+			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
+				GeomData = new CircleGeomDataDTO( (CircleGeomData)standardPatternPathObject.GeomData );
+				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
 			}
 			else {
 				GeomData = new CircleGeomDataDTO();
@@ -458,9 +458,9 @@ namespace MyCAM.FileManager
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
 			PathType = PathType.Rectangle;
-			if( pathObject is RectanglePathObject rectanglePathObject ) {
-				GeomData = new RectangleGeomDataDTO( rectanglePathObject.RectangleGeomData );
-				ContourPathObject = new ContourPathObjectDTO( rectanglePathObject.ContourPathObject );
+			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
+				GeomData = new RectangleGeomDataDTO( (RectangleGeomData)standardPatternPathObject.GeomData );
+				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
 			}
 			else {
 				GeomData = new RectangleGeomDataDTO();
@@ -510,10 +510,10 @@ namespace MyCAM.FileManager
 			UID = pathObject.UID;
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
-			if( pathObject is PolygonPathObject polygonPathObject ) {
-				PathType = polygonPathObject.PathType; // Use the actual PathType from PolygonGeomData
-				GeomData = new PolygonGeomDataDTO( polygonPathObject.PolygonGeomData );
-				ContourPathObject = new ContourPathObjectDTO( polygonPathObject.ContourPathObject );
+			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
+				PathType = pathObject.PathType; // Use the actual PathType from PathObject (which gets it from PolygonGeomData)
+				GeomData = new PolygonGeomDataDTO( (PolygonGeomData)standardPatternPathObject.GeomData );
+				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
 			}
 			else {
 				PathType = PathType.Triangle; // Default
@@ -565,9 +565,9 @@ namespace MyCAM.FileManager
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
 			PathType = PathType.Runway;
-			if( pathObject is RunwayPathObject runwayPathObject ) {
-				GeomData = new RunwayGeomDataDTO( runwayPathObject.RunwayGeomData );
-				ContourPathObject = new ContourPathObjectDTO( runwayPathObject.ContourPathObject );
+			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
+				GeomData = new RunwayGeomDataDTO( (RunwayGeomData)standardPatternPathObject.GeomData );
+				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
 			}
 			else {
 				GeomData = new RunwayGeomDataDTO();

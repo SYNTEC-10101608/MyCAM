@@ -105,7 +105,7 @@ namespace MyCAM.Editor.Renderer
 
 		List<IProcessPoint> GetToolVecPointList( string pathID )
 		{
-			if( !GetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
+			if( !DataGettingHelper.GetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
 				return null;
 			}
 			if( toolVecCache.GetToolVecList() == null ) {
@@ -121,7 +121,7 @@ namespace MyCAM.Editor.Renderer
 		// TODO: the method is kepp casting same thing in a loop, optimize it later
 		bool IsToolVecModifyPoint( string pathID, IProcessPoint point )
 		{
-			if( !GetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
+			if( !DataGettingHelper.GetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
 				return false;
 			}
 			if( point is ISetToolVecPoint toolVecPoint ) {

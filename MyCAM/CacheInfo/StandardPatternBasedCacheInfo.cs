@@ -8,7 +8,6 @@ namespace MyCAM.CacheInfo
 {
 	public abstract class StandardPatternBasedCacheInfo : IStandardPatternCacheInfo, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
-
 		protected StandardPatternBasedCacheInfo( gp_Ax3 coordinateInfo, CraftData craftData )
 		{
 			if( coordinateInfo == null || craftData == null ) {
@@ -21,7 +20,7 @@ namespace MyCAM.CacheInfo
 			BuildCAMPointList();
 		}
 
-		#region Abstract Members - Must be implemented by derived classes
+		#region Abstract Members
 
 		public abstract PathType PathType
 		{
@@ -100,7 +99,7 @@ namespace MyCAM.CacheInfo
 
 		#region Common Methods
 
-		public virtual CAMPoint GetProcessRefPoint()
+		public virtual IProcessPoint GetProcessRefPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -172,14 +171,6 @@ namespace MyCAM.CacheInfo
 			get
 			{
 				return m_CoordinateInfo;
-			}
-		}
-
-		protected CraftData CraftData
-		{
-			get
-			{
-				return m_CraftData;
 			}
 		}
 
