@@ -9,10 +9,10 @@ namespace MyCAM.CacheInfo
 {
 	public class RectangleCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
-		public RectangleCacheInfo( gp_Ax3 coordinateInfo, RectangleGeomData rectangleGeomData, CraftData craftData )
+		public RectangleCacheInfo( gp_Ax3 coordinateInfo, IGeomData geomData, CraftData craftData )
 		{
-			if( rectangleGeomData == null || craftData == null ) {
-				throw new ArgumentNullException( "RectangleCacheInfo constructing argument null" );
+			if( geomData == null || craftData == null || !( geomData is RectangleGeomData rectangleGeomData ) ) {
+				throw new ArgumentNullException( "RectangleCacheInfo constructing argument error" );
 			}
 			m_CoordinateInfo = coordinateInfo;
 			m_RectangleGeomData = rectangleGeomData;

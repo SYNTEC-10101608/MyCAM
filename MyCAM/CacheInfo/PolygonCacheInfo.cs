@@ -9,10 +9,10 @@ namespace MyCAM.CacheInfo
 {
 	public class PolygonCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
-		public PolygonCacheInfo( gp_Ax3 coordinateInfo, PolygonGeomData polygonGeomData, CraftData craftData )
+		public PolygonCacheInfo( gp_Ax3 coordinateInfo, IGeomData geomData, CraftData craftData )
 		{
-			if( polygonGeomData == null || craftData == null ) {
-				throw new ArgumentNullException( "PolygonCacheInfo constructing argument null" );
+			if( geomData == null || craftData == null || !( geomData is PolygonGeomData polygonGeomData ) ) {
+				throw new ArgumentNullException( "PolygonCacheInfo constructing argument error" );
 			}
 			m_CoordinateInfo = coordinateInfo;
 			m_PolygonGeomData = polygonGeomData;

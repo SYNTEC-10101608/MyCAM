@@ -8,10 +8,10 @@ namespace MyCAM.CacheInfo
 {
 	public class CircleCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
-		public CircleCacheInfo( gp_Ax3 coordinateInfo, CircleGeomData circleGeomData, CraftData craftData )
+		public CircleCacheInfo( gp_Ax3 coordinateInfo, IGeomData geomData, CraftData craftData )
 		{
-			if( circleGeomData == null || craftData == null ) {
-				throw new ArgumentNullException( "CircleCacheInfo constructing argument null" );
+			if( geomData == null || craftData == null || !( geomData is CircleGeomData circleGeomData ) ) {
+				throw new ArgumentNullException( "CircleCacheInfo constructing argument error" );
 			}
 			m_CoordinateInfo = coordinateInfo;
 			m_CircleGeomData = circleGeomData;

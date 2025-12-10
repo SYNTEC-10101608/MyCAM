@@ -9,10 +9,10 @@ namespace MyCAM.CacheInfo
 {
 	public class RunwayCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
-		public RunwayCacheInfo( gp_Ax3 coordinateInfo, RunwayGeomData runwayGeomData, CraftData craftData )
+		public RunwayCacheInfo( gp_Ax3 coordinateInfo, IGeomData geomData, CraftData craftData )
 		{
-			if( runwayGeomData == null || craftData == null ) {
-				throw new ArgumentNullException( "RunwayCacheInfo constructing argument null" );
+			if( geomData == null || craftData == null || !( geomData is RunwayGeomData runwayGeomData ) ) {
+				throw new ArgumentNullException( "RunwayCacheInfo constructing argument error" );
 			}
 			m_CoordinateInfo = coordinateInfo;
 			m_RunwayGeomData = runwayGeomData;
