@@ -38,12 +38,8 @@ namespace MyCAM.Data
 		}
 	}
 
-	public interface IStandardPatternGeomData : IRotatable
+	public interface IStandardPatternGeomData : IRotatable, IGeomData
 	{
-		PathType PathType
-		{
-			get;
-		}
 
 	}
 }
