@@ -43,24 +43,26 @@ namespace MyCAM.Editor.Factory
 			coordination = null;
 			gp_Dir xDir = null;
 			gp_Dir yDir = null;
+
+			// build local coordination system ( reference DOC:https://syntecclub.atlassian.net/wiki/spaces/AUTO/pages/89458700 )
 			if( m_NormalDir.IsParallel( new gp_Dir( 0, 0, 1 ), TOLERANCE ) && !m_NormalDir.IsOpposite( new gp_Dir( 0, 0, 1 ), TOLERANCE ) ) {
-				gp_Trsf trsf = new gp_Trsf();
-				trsf.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), 0 );
-				gp_Dir refDir = new gp_Dir( 1, 0, 0 );
-				xDir = refDir.Transformed( trsf );
+				xDir = new gp_Dir( 1, 0, 0 );
 			}
 			else if( m_NormalDir.IsParallel( new gp_Dir( 0, 0, 1 ), TOLERANCE ) && m_NormalDir.IsOpposite( new gp_Dir( 0, 0, 1 ), TOLERANCE ) ) {
 				gp_Trsf trsf = new gp_Trsf();
-				trsf.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 0 );
-				gp_Dir refDir = new gp_Dir( -1, 0, 0 );
+				trsf.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 1, 0 ) ), 180 );
+				gp_Dir refDir = new gp_Dir( 1, 0, 0 );
 				xDir = refDir.Transformed( trsf );
 			}
 			else {
+
+				// general case
 				gp_Dir refDir = new gp_Dir( 0, 0, 1 );
 				xDir = refDir.Crossed( m_NormalDir );
 			}
 			yDir = m_NormalDir.Crossed( xDir );
 
+			// create coordination system considering rotation
 			gp_Ax3 coordSystem = new gp_Ax3( m_CenterPoint, m_NormalDir, xDir );
 			if( Math.Abs( rotationAngleInDegrees ) > 1e-9 ) {
 				double rotationAngleInRadians = rotationAngleInDegrees * Math.PI / 180.0;
