@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Data.GeomDataFolder
 {
-	public class RectangleGeomData : IGeomData, IRotatable, IStandardPatternGeomData
+	public class RectangleGeomData : IGeomData, IStandardPatternGeomData
 	{
 		public RectangleGeomData( double width, double height, double cornerRadius, double rotatedAngle_deg )
 		{

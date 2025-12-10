@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Data.GeomDataFolder
 {
-	public class PolygonGeomData : IGeomData, IRotatable, IStandardPatternGeomData
+	public class PolygonGeomData : IGeomData, IStandardPatternGeomData
 	{
 		public PolygonGeomData( int sides, double sideLength, double cornerRadius, double rotatedAngle_deg )
 		{

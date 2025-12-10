@@ -112,8 +112,8 @@ namespace MyCAM.Editor.Renderer
 				return null;
 			}
 			List<IProcessPoint> pointList = new List<IProcessPoint>();
-			foreach( CAMPoint camPoint in toolVecCache.GetToolVecList() ) {
-				pointList.Add( camPoint );
+			foreach( IProcessPoint point in toolVecCache.GetToolVecList() ) {
+				pointList.Add( point );
 			}
 			return pointList;
 		}

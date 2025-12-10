@@ -38,7 +38,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	public interface IStandardPatternGeomData
+	public interface IStandardPatternGeomData : IRotatable
 	{
 		PathType PathType
 		{
