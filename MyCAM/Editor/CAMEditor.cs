@@ -601,7 +601,7 @@ namespace MyCAM.Editor
 			m_OrientationRenderer.Remove( pathIDList );
 			m_IndexRenderer.Remove();
 			m_TraverseRenderer.Remove();
-			m_Viewer.UpdateView();
+			ShowAllCAMData();
 		}
 
 		#endregion
