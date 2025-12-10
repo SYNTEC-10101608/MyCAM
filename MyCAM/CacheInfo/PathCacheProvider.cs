@@ -38,7 +38,7 @@ namespace MyCAM.CacheInfo
 
 	public interface IToolVecCache
 	{
-		List<CAMPoint> GetToolVecList();
+		IReadOnlyList<IProcessPoint> GetToolVecList();
 
 		bool IsToolVecModifyPoint( ISetToolVecPoint point );
 	}
@@ -58,16 +58,11 @@ namespace MyCAM.CacheInfo
 
 	public interface IProcessPathStartEndCache
 	{
-		CAMPoint GetProcessStartPoint();
+		IProcessPoint GetProcessStartPoint();
 
-		CAMPoint GetProcessEndPoint();
+		IProcessPoint GetProcessEndPoint();
 	}
 
-	/// <summary>
-	/// Generic strategy for path cache access using type-safe property accessor
-	/// Eliminates code duplication by using a generic approach
-	/// </summary>
-	/// <typeparam name="TPathObject">Type of PathObject (e.g., ContourPathObject, CirclePathObject)</typeparam>
 	internal class PathCacheStrategy<TPathObject> : IPathCacheStrategy
 		where TPathObject : PathObject
 	{
@@ -115,28 +110,32 @@ namespace MyCAM.CacheInfo
 	internal interface IPathCacheStrategy
 	{
 		IMainPathStartPointCache GetMainPathStartPointCache( PathObject pathObject );
+
 		ILeadCache GetLeadCache( PathObject pathObject );
+
 		IPathReverseCache GetPathReverseCache( PathObject pathObject );
+
 		IToolVecCache GetToolVecCache( PathObject pathObject );
+
 		IOverCutCache GetOverCutCache( PathObject pathObject );
 	}
 
 	internal static class PathCacheStrategyFactory
 	{
-		// Create singleton strategy instances using generic PathCacheStrategy
-		private static readonly IPathCacheStrategy s_ContourStrategy = 
+		// create singleton strategy instances using generic PathCacheStrategy
+		private static readonly IPathCacheStrategy s_ContourStrategy =
 			new PathCacheStrategy<ContourPathObject>( p => p.ContourCacheInfo );
-		
-		private static readonly IPathCacheStrategy s_CircleStrategy = 
+
+		static readonly IPathCacheStrategy s_CircleStrategy =
 			new PathCacheStrategy<CirclePathObject>( p => p.CircleCacheInfo );
-		
-		private static readonly IPathCacheStrategy s_RectangleStrategy = 
+
+		static readonly IPathCacheStrategy s_RectangleStrategy =
 			new PathCacheStrategy<RectanglePathObject>( p => p.RectangleCacheInfo );
-		
-		private static readonly IPathCacheStrategy s_PolygonStrategy = 
+
+		static readonly IPathCacheStrategy s_PolygonStrategy =
 			new PathCacheStrategy<PolygonPathObject>( p => p.PolygonCacheInfo );
-		
-		private static readonly IPathCacheStrategy s_RunwayStrategy = 
+
+		static readonly IPathCacheStrategy s_RunwayStrategy =
 			new PathCacheStrategy<RunwayPathObject>( p => p.RunwayCacheInfo );
 
 		public static IPathCacheStrategy GetStrategy( PathType pathType )
@@ -187,10 +186,7 @@ namespace MyCAM.CacheInfo
 			return TryGetCache( pathObject, s => s.GetOverCutCache( pathObject ), out cache );
 		}
 
-		/// <summary>
-		/// Generic helper method to reduce duplication in TryGet methods
-		/// </summary>
-		private static bool TryGetCache<TCache>( PathObject pathObject, Func<IPathCacheStrategy, TCache> cacheGetter, out TCache cache )
+		static bool TryGetCache<TCache>( PathObject pathObject, Func<IPathCacheStrategy, TCache> cacheGetter, out TCache cache )
 			where TCache : class
 		{
 			cache = null;
