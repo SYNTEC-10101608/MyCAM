@@ -462,7 +462,7 @@ namespace MyCAM.Editor
 					if( visited[ i ] ) {
 						continue;
 					}
-					if( !DataGettingHelper.GetProcessPathStartEndCacheByID( szStartPathID, out IProcessPathStartEndCache nextProcessPathStartEndCache ) ) {
+					if( !DataGettingHelper.GetProcessPathStartEndCacheByID( pathIDList[ i ], out IProcessPathStartEndCache nextProcessPathStartEndCache ) ) {
 						return;
 					}
 					gp_Pnt nextStartPoint = nextProcessPathStartEndCache.GetProcessStartPoint().Point;
