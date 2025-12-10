@@ -76,7 +76,7 @@ namespace MyCAM.Data.PathObjectFolder
 			base.DoTransform( transform );
 
 			// Step2: then transform CAD points because they depend on shape
-			ContourPathObject.DoTransform( transform );
+			m_ContourPathObject.DoTransform( transform );
 
 			// Step3: recalculate cache info because CAD points have changed
 			m_RunwayCacheInfo.DoTransform( transform );
