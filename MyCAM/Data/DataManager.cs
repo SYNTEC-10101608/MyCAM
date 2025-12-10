@@ -327,7 +327,7 @@ namespace MyCAM.Data
 		readonly MixTypeMachineData m_DefaultMachineData = new MixTypeMachineData()
 		{
 			ToolDirection = ToolDirection.Z,
-			MasterRotaryAxis = RotaryAxis.Y,
+			MasterRotaryAxis = RotaryAxis.X,
 			SlaveRotaryAxis = RotaryAxis.Z,
 			MasterRotaryDirection = RotaryDirection.RightHand,
 			SlaveRotaryDirection = RotaryDirection.LeftHand,
