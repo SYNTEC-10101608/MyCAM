@@ -1,5 +1,6 @@
 using MyCAM.Data;
 using MyCAM.Data.PathObjectFolder;
+using OCC.gp;
 using System;
 using System.Collections.Generic;
 
@@ -11,6 +12,8 @@ namespace MyCAM.CacheInfo
 		{
 			get;
 		}
+
+		void DoTransform( gp_Trsf transform );
 	}
 
 	public interface IMainPathStartPointCache
@@ -134,32 +137,20 @@ namespace MyCAM.CacheInfo
 		static readonly IPathCacheStrategy s_ContourStrategy =
 			new PathCacheStrategy<ContourPathObject>( p => p.ContourCacheInfo );
 
-		static readonly IPathCacheStrategy s_CircleStrategy =
-			new PathCacheStrategy<CirclePathObject>( p => p.CircleCacheInfo );
-
-		static readonly IPathCacheStrategy s_RectangleStrategy =
-			new PathCacheStrategy<RectanglePathObject>( p => p.RectangleCacheInfo );
-
-		static readonly IPathCacheStrategy s_PolygonStrategy =
-			new PathCacheStrategy<PolygonPathObject>( p => p.PolygonCacheInfo );
-
-		static readonly IPathCacheStrategy s_RunwayStrategy =
-			new PathCacheStrategy<RunwayPathObject>( p => p.RunwayCacheInfo );
+		static readonly IPathCacheStrategy s_StandardPatternStrategy =
+			new PathCacheStrategy<StandardPatternBasedPathObject>( p => p.CacheInfo );
 
 		public static IPathCacheStrategy GetStrategy( PathType pathType )
 		{
 			switch( pathType ) {
 				case PathType.Circle:
-					return s_CircleStrategy;
 				case PathType.Rectangle:
-					return s_RectangleStrategy;
 				case PathType.Triangle:
 				case PathType.Square:
 				case PathType.Pentagon:
 				case PathType.Hexagon:
-					return s_PolygonStrategy;
 				case PathType.Runway:
-					return s_RunwayStrategy;
+					return s_StandardPatternStrategy;
 				case PathType.Contour:
 				default:
 					return s_ContourStrategy;

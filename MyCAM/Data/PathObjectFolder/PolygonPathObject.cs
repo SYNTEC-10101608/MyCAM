@@ -90,7 +90,9 @@ namespace MyCAM.Data.PathObjectFolder
 
 			PatternFactory patternFactory = new PatternFactory( contourPathObject.ContourGeomData, polygonGeomData );
 			gp_Ax3 coordinateInfo = patternFactory.GetCoordinateInfo();
-			m_PolygonCacheInfo = new PolygonCacheInfo( coordinateInfo, polygonGeomData, m_CraftData );
+
+			// Factory returns IStandardPatternCacheInfo interface
+			m_PolygonCacheInfo = (PolygonCacheInfo)StandardPatternCacheInfoFactory.CreateCacheInfo( coordinateInfo, polygonGeomData, craftData );
 		}
 
 		CraftData m_CraftData;

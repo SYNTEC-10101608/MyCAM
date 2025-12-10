@@ -90,7 +90,9 @@ namespace MyCAM.Data.PathObjectFolder
 
 			PatternFactory patternFactory = new PatternFactory( contourPathObject.ContourGeomData, runwayGeomData );
 			gp_Ax3 coordinateInfo = patternFactory.GetCoordinateInfo();
-			m_RunwayCacheInfo = new RunwayCacheInfo( coordinateInfo, runwayGeomData, m_CraftData );
+
+			// Unified factory interface - factory uses PathType to determine correct CacheInfo
+			m_RunwayCacheInfo = (RunwayCacheInfo)StandardPatternCacheInfoFactory.CreateCacheInfo( coordinateInfo, runwayGeomData, craftData );
 		}
 
 		CraftData m_CraftData;

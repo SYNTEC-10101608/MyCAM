@@ -1,4 +1,4 @@
-﻿using MyCAM.Data;
+using MyCAM.Data;
 using MyCAM.Data.GeomDataFolder;
 using OCC.gp;
 using System;
@@ -153,7 +153,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public void Transform( gp_Trsf transform )
+		public void DoTransform( gp_Trsf transform )
 		{
 			m_CoordinateInfo.Transform( transform );
 			BuildCAMPointList();

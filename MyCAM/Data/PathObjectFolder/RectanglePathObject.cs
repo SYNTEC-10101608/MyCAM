@@ -79,7 +79,7 @@ namespace MyCAM.Data
 			m_ContourPathObject.DoTransform( transform );
 
 			// Step3:recalculate cache info because CAD points have changed
-			m_RectangleCacheInfo.Transform( transform );
+			m_RectangleCacheInfo.DoTransform( transform );
 		}
 
 		void InitializeRectanglePathObject( string szUID, RectangleGeomData rectangleGeomData, CraftData craftData, ContourPathObject contourPathObject )
@@ -90,7 +90,9 @@ namespace MyCAM.Data
 
 			PatternFactory patternFactory = new PatternFactory( contourPathObject.ContourGeomData, rectangleGeomData );
 			gp_Ax3 coordinateInfo = patternFactory.GetCoordinateInfo();
-			m_RectangleCacheInfo = new RectangleCacheInfo( coordinateInfo, rectangleGeomData, m_CraftData );
+
+			// Factory returns IStandardPatternCacheInfo interface
+			m_RectangleCacheInfo = (RectangleCacheInfo)StandardPatternCacheInfoFactory.CreateCacheInfo( coordinateInfo, rectangleGeomData, craftData );
 		}
 
 		CraftData m_CraftData;
