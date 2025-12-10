@@ -14,6 +14,11 @@
     <Pr ID="3018" Value="0" />
     <Pr ID="3019" Value="0" />
     <Pr ID="3020" Value="0" />
+	<!--Axial Limit-->
+	<Pr ID="Master_Start" Value="0" />
+	<Pr ID="Master_End" Value="0" />
+	<Pr ID="Slave_Start" Value="0" />
+	<Pr ID="Slave_End" Value="0" />
     <!--Spindle Type-->
     <Pr ID="3021" Value="-101200" />
     <Pr ID="3022" Value="-190" />
