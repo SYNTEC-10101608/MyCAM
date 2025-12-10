@@ -5,6 +5,14 @@ using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
+	public interface IStandardPatternCacheInfo
+	{
+		PathType PathType
+		{
+			get;
+		}
+	}
+
 	public interface IMainPathStartPointCache
 	{
 		IProcessPoint GetMainPathStartCAMPoint();

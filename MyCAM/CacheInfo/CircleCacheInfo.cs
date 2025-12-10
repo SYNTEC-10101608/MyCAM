@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class CircleCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
+	public class CircleCacheInfo : IStandardPatternCacheInfo, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
-		public CircleCacheInfo( gp_Ax3 coordinateInfo, IGeomData geomData, CraftData craftData )
+		public CircleCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData geomData, CraftData craftData )
 		{
 			if( geomData == null || craftData == null || !( geomData is CircleGeomData circleGeomData ) ) {
 				throw new ArgumentNullException( "CircleCacheInfo constructing argument error" );

@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class PolygonCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
+	public class PolygonCacheInfo : IStandardPatternCacheInfo, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
-		public PolygonCacheInfo( gp_Ax3 coordinateInfo, IGeomData geomData, CraftData craftData )
+		public PolygonCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData geomData, CraftData craftData )
 		{
 			if( geomData == null || craftData == null || !( geomData is PolygonGeomData polygonGeomData ) ) {
 				throw new ArgumentNullException( "PolygonCacheInfo constructing argument error" );

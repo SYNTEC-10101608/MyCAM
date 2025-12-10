@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class RunwayCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
+	public class RunwayCacheInfo : IStandardPatternCacheInfo, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
 	{
-		public RunwayCacheInfo( gp_Ax3 coordinateInfo, IGeomData geomData, CraftData craftData )
+		public RunwayCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData geomData, CraftData craftData )
 		{
 			if( geomData == null || craftData == null || !( geomData is RunwayGeomData runwayGeomData ) ) {
 				throw new ArgumentNullException( "RunwayCacheInfo constructing argument error" );
