@@ -27,7 +27,7 @@ namespace MyCAM.CacheInfo
 		/// <summary>
 		/// Override GetProcessRefPoint for Runway-specific calculation
 		/// </summary>
-		public new CAMPoint GetProcessRefPoint()
+		public override CAMPoint GetProcessRefPoint()
 		{
 			// Calculate runway parameters
 			double length = m_RunwayGeomData.Length;

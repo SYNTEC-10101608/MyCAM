@@ -20,12 +20,12 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				// Polygon uses PathType from GeomData (Triangle, Square, Pentagon, Hexagon)
+				// polygon uses PathType from GeomData (Triangle, Square, Pentagon, Hexagon)
 				return GeomData.PathType;
 			}
 		}
 
-		// Provide strongly-typed access to GeomData
+		// provide strongly-typed access to GeomData
 		public PolygonGeomData PolygonGeomData
 		{
 			get
@@ -34,7 +34,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		// Provide strongly-typed access to CacheInfo
+		// provide strongly-typed access to CacheInfo
 		public PolygonCacheInfo PolygonCacheInfo
 		{
 			get

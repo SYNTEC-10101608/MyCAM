@@ -24,7 +24,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		// Provide strongly-typed access to GeomData
+		// provide strongly-typed access to GeomData
 		public RunwayGeomData RunwayGeomData
 		{
 			get
@@ -33,7 +33,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		// Provide strongly-typed access to CacheInfo
+		// provide strongly-typed access to CacheInfo
 		public RunwayCacheInfo RunwayCacheInfo
 		{
 			get
