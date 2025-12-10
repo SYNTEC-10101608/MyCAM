@@ -120,14 +120,6 @@ namespace MyCAM.CacheInfo
 			return false;
 		}
 
-		public bool IsClosed
-		{
-			get
-			{
-				return true;
-			}
-		}
-
 		public bool IsPathReverse
 		{
 			get

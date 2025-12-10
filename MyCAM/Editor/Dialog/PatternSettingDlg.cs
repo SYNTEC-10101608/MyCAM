@@ -26,37 +26,36 @@ namespace MyCAM.Editor.Dialog
 					if( !( m_StandardPatternGeomData is CircleGeomData circleGeomData ) ) {
 						return;
 					}
-					m_txbCircleDiameter.Text = ( (CircleGeomData)m_StandardPatternGeomData ).Diameter.ToString();
-					m_txbCircleRotatedAngle.Text = ( (CircleGeomData)m_StandardPatternGeomData ).RotatedAngle_deg.ToString();
+					m_txbCircleDiameter.Text = circleGeomData.Diameter.ToString();
+					m_txbCircleRotatedAngle.Text = circleGeomData.RotatedAngle_deg.ToString();
 					break;
 				case PathType.Rectangle:
 					if( !( m_StandardPatternGeomData is RectangleGeomData rectangleGeomData ) ) {
 						return;
 					}
-					m_txbRecLength.Text = ( (RectangleGeomData)m_StandardPatternGeomData ).Length.ToString();
-					m_txbRecWidth.Text = ( (RectangleGeomData)m_StandardPatternGeomData ).Width.ToString();
-					m_txbRecCornerRadius.Text = ( (RectangleGeomData)m_StandardPatternGeomData ).CornerRadius.ToString();
-					m_txbRecRotatedAngle.Text = ( (RectangleGeomData)m_StandardPatternGeomData ).RotatedAngle_deg.ToString();
+					m_txbRecLength.Text = rectangleGeomData.Length.ToString();
+					m_txbRecWidth.Text = rectangleGeomData.Width.ToString();
+					m_txbRecCornerRadius.Text = rectangleGeomData.CornerRadius.ToString();
+					m_txbRecRotatedAngle.Text = rectangleGeomData.RotatedAngle_deg.ToString();
 					break;
 				case PathType.Runway:
 					if( !( m_StandardPatternGeomData is RunwayGeomData runwayGeomData ) ) {
 						return;
 					}
-					m_txbRunwayLength.Text = ( (RunwayGeomData)m_StandardPatternGeomData ).Length.ToString();
-					m_txbRunwayWidth.Text = ( (RunwayGeomData)m_StandardPatternGeomData ).Width.ToString();
-					m_txbRunwayRotatedAngle.Text = ( (RunwayGeomData)m_StandardPatternGeomData ).RotatedAngle_deg.ToString();
+					m_txbRunwayLength.Text = runwayGeomData.Length.ToString();
+					m_txbRunwayWidth.Text = runwayGeomData.Width.ToString();
+					m_txbRunwayRotatedAngle.Text = runwayGeomData.RotatedAngle_deg.ToString();
 					break;
 				case PathType.Triangle:
 				case PathType.Square:
 				case PathType.Pentagon:
 				case PathType.Hexagon:
-					if( !( m_StandardPatternGeomData is PolygonGeomData ) ) {
+					if( !( m_StandardPatternGeomData is PolygonGeomData polygonGeomData ) ) {
 						return;
 					}
-					PolygonGeomData polygonData = (PolygonGeomData)m_StandardPatternGeomData;
-					m_txbPolygonSideLength.Text = polygonData.SideLength.ToString();
-					m_txbPolygonCornerRadius.Text = polygonData.CornerRadius.ToString();
-					m_txbPolygonRotatedAngle.Text = polygonData.RotatedAngle_deg.ToString();
+					m_txbPolygonSideLength.Text = polygonGeomData.SideLength.ToString();
+					m_txbPolygonCornerRadius.Text = polygonGeomData.CornerRadius.ToString();
+					m_txbPolygonRotatedAngle.Text = polygonGeomData.RotatedAngle_deg.ToString();
 					break;
 				default:
 					break;
@@ -73,19 +72,19 @@ namespace MyCAM.Editor.Dialog
 
 			switch( selectedPathType ) {
 				case PathType.Circle:
-					newStandardPatternGeomData = CreateCirclePatternList( currentPathType );
+					newStandardPatternGeomData = CreateCirclePattern( currentPathType );
 					break;
 				case PathType.Rectangle:
-					newStandardPatternGeomData = CreateRectanglePatternList( currentPathType );
+					newStandardPatternGeomData = CreateRectanglePattern( currentPathType );
 					break;
 				case PathType.Runway:
-					newStandardPatternGeomData = CreateRunwayPatternList( currentPathType );
+					newStandardPatternGeomData = CreateRunwayPattern( currentPathType );
 					break;
 				case PathType.Triangle:
 				case PathType.Square:
 				case PathType.Pentagon:
 				case PathType.Hexagon:
-					newStandardPatternGeomData = CreatePolygonPatternList( selectedPathType, currentPathType );
+					newStandardPatternGeomData = CreatePolygonPattern( selectedPathType, currentPathType );
 					break;
 				default:
 					newStandardPatternGeomData = null;
@@ -96,7 +95,7 @@ namespace MyCAM.Editor.Dialog
 			m_NewStandardPatternGeomData = newStandardPatternGeomData;
 		}
 
-		IStandardPatternGeomData CreateCirclePatternList( PathType currentPathType )
+		IStandardPatternGeomData CreateCirclePattern( PathType currentPathType )
 		{
 			IStandardPatternGeomData standardPatternGeomData = null;
 
@@ -113,7 +112,7 @@ namespace MyCAM.Editor.Dialog
 			return standardPatternGeomData;
 		}
 
-		IStandardPatternGeomData CreateRectanglePatternList( PathType currentPathType )
+		IStandardPatternGeomData CreateRectanglePattern( PathType currentPathType )
 		{
 			IStandardPatternGeomData standardPatternGeomData = null;
 
@@ -130,7 +129,7 @@ namespace MyCAM.Editor.Dialog
 			return standardPatternGeomData;
 		}
 
-		IStandardPatternGeomData CreateRunwayPatternList( PathType currentPathType )
+		IStandardPatternGeomData CreateRunwayPattern( PathType currentPathType )
 		{
 			IStandardPatternGeomData standardPatternGeomData = null;
 
@@ -147,7 +146,7 @@ namespace MyCAM.Editor.Dialog
 			return standardPatternGeomData;
 		}
 
-		IStandardPatternGeomData CreatePolygonPatternList( PathType selectedPathType, PathType currentPathType )
+		IStandardPatternGeomData CreatePolygonPattern( PathType selectedPathType, PathType currentPathType )
 		{
 			IStandardPatternGeomData standardPatternGeomData = null;
 
