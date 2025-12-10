@@ -123,7 +123,7 @@ namespace MyCAM.CacheInfo
 	internal static class PathCacheStrategyFactory
 	{
 		// create singleton strategy instances using generic PathCacheStrategy
-		private static readonly IPathCacheStrategy s_ContourStrategy =
+		static readonly IPathCacheStrategy s_ContourStrategy =
 			new PathCacheStrategy<ContourPathObject>( p => p.ContourCacheInfo );
 
 		static readonly IPathCacheStrategy s_CircleStrategy =
