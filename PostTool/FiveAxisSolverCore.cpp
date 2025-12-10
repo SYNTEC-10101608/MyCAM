@@ -22,7 +22,7 @@ namespace PostTool
 	const int ALMID_MasterInfinityOfSolution = 2;
 	const int ALMID_SlaveInfinityOfSolution = 3;
 
-	bool FiveAxisSolverCore::SolveQuadEq( double a, double b, double c, double& x1, double& x2 )
+	bool FiveAxisSolverCore::SolveQuadEq( double a, double b, double c, double &x1, double &x2 )
 	{
 		constexpr double EPSILON = std::numeric_limits<double>::epsilon() * 1.0e6;
 
@@ -55,7 +55,7 @@ namespace PostTool
 		return a * d - b * c;
 	}
 
-	void FiveAxisSolverCore::ConvertAngleRange( double& angle, double IUtoBLU_Rotary )
+	void FiveAxisSolverCore::ConvertAngleRange( double &angle, double IUtoBLU_Rotary )
 	{
 		const double PI = M_PI * IUtoBLU_Rotary;
 		const double DoublePI = 2 * PI;
@@ -77,7 +77,7 @@ namespace PostTool
 	{
 		ConvertAngleRange( Angle, IUtoBLU_Rotary );
 
-		if( end == start ) {
+		if( std::fabs( end - start ) < MIN_EPSILON_THRESHOLD ) {
 			return true;
 		}
 
@@ -140,31 +140,31 @@ namespace PostTool
 		}
 	}
 
-	bool FiveAxisSolverCore::ToPermissibleCoterminalAng( double& TarPos, double LastPos, SolutionType Prefer,
+	bool FiveAxisSolverCore::ToPermissibleCoterminalAng( double &TarPos, double LastPos, SolutionType Prefer,
 		double LimitStart, double LimitEnd, int nRDofAX, double IUtoBLU_Rotary )
 	{
 		const double PI = M_PI;
 		const double BLUtoIU_Rotary = 1.0 / IUtoBLU_Rotary;
 
-		int nRev = static_cast<int>( std::floor( ( LastPos - TarPos ) / PI * BLUtoIU_Rotary * 0.5 ) );
-		double CoterAng[2];
+		int nRev = static_cast< int >( std::floor( ( LastPos - TarPos ) / PI * BLUtoIU_Rotary * 0.5 ) );
+		double CoterAng[ 2 ];
 
-		CoterAng[0] = TarPos + 2 * ( nRev + 1 ) * PI * IUtoBLU_Rotary;
-		if( std::fabs( LastPos - CoterAng[0] ) < FIVEAXIS_SOL_TOL ) {
-			TarPos = CoterAng[0];
+		CoterAng[ 0 ] = TarPos + 2 * ( nRev + 1 ) * PI * IUtoBLU_Rotary;
+		if( std::fabs( LastPos - CoterAng[ 0 ] ) < FIVEAXIS_SOL_TOL ) {
+			TarPos = CoterAng[ 0 ];
 			return true;
 		}
 
-		CoterAng[1] = TarPos + 2 * nRev * PI * IUtoBLU_Rotary;
-		if( std::fabs( LastPos - CoterAng[1] ) < FIVEAXIS_SOL_TOL ) {
-			TarPos = CoterAng[1];
+		CoterAng[ 1 ] = TarPos + 2 * nRev * PI * IUtoBLU_Rotary;
+		if( std::fabs( LastPos - CoterAng[ 1 ] ) < FIVEAXIS_SOL_TOL ) {
+			TarPos = CoterAng[ 1 ];
 			return true;
 		}
 
 		int nSolution = 0;
-		bool bPermissible[2];
-		bPermissible[0] = IsPathPermissible( CoterAng[0], LastPos, LimitStart, LimitEnd, IUtoBLU_Rotary );
-		bPermissible[1] = IsPathPermissible( CoterAng[1], LastPos, LimitStart, LimitEnd, IUtoBLU_Rotary );
+		bool bPermissible[ 2 ];
+		bPermissible[ 0 ] = IsPathPermissible( CoterAng[ 0 ], LastPos, LimitStart, LimitEnd, IUtoBLU_Rotary );
+		bPermissible[ 1 ] = IsPathPermissible( CoterAng[ 1 ], LastPos, LimitStart, LimitEnd, IUtoBLU_Rotary );
 
 		switch( Prefer ) {
 		case SolutionType::MasterPos:
@@ -177,10 +177,10 @@ namespace PostTool
 
 		case SolutionType::ShortestDist:
 		case SolutionType::MSAngleShortestDist:
-			if( bPermissible[0] == true ) {
-				if( bPermissible[1] == true ) {
-					double Tar0Dist = CoterAng[0] - LastPos;
-					double Tar1Dist = LastPos - CoterAng[1];
+			if( bPermissible[ 0 ] == true ) {
+				if( bPermissible[ 1 ] == true ) {
+					double Tar0Dist = CoterAng[ 0 ] - LastPos;
+					double Tar1Dist = LastPos - CoterAng[ 1 ];
 
 					if( std::fabs( Tar0Dist - Tar1Dist ) > REACHABLE_EPSILON ) {
 						nSolution = ( Tar0Dist < Tar1Dist ) ? 0 : 1;
@@ -193,7 +193,7 @@ namespace PostTool
 					nSolution = 0;
 				}
 			}
-			else if( bPermissible[1] == true ) {
+			else if( bPermissible[ 1 ] == true ) {
 				nSolution = 1;
 			}
 			else {
@@ -205,13 +205,13 @@ namespace PostTool
 			return false;
 		}
 
-		if( bPermissible[nSolution] == true ) {
-			TarPos = CoterAng[nSolution];
+		if( bPermissible[ nSolution ] == true ) {
+			TarPos = CoterAng[ nSolution ];
 		}
-		return bPermissible[nSolution];
+		return bPermissible[ nSolution ];
 	}
 
-	bool FiveAxisSolverCore::IsSolutionPermissible( double& MasterTarPos, double& SlaveTarPos,
+	bool FiveAxisSolverCore::IsSolutionPermissible( double &MasterTarPos, double &SlaveTarPos,
 		double MasterLastPos, double SlaveLastPos, SolutionType type,
 		double FStart, double FEnd, double SStart, double SEnd,
 		int nRDOfFirst, int nRDOfSecond, double IUtoBLU_Rotary )
@@ -230,15 +230,15 @@ namespace PostTool
 
 	int FiveAxisSolverCore::IJKtoMS(
 		Vector3d ToolDirection,
-		const Vector3d& ToolDirectionAtZero,
-		const Vector3d& DirectOfFirstRotAxis,
-		const Vector3d& DirectOfSecondRotAxis,
+		const Vector3d &ToolDirectionAtZero,
+		const Vector3d &DirectOfFirstRotAxis,
+		const Vector3d &DirectOfSecondRotAxis,
 		double LastMasterRotAngle,
 		double LastSlaveRotAngle,
-		double& MRotAngle1,
-		double& SRotAngle1,
-		double& MRotAngle2,
-		double& SRotAngle2,
+		double &MRotAngle1,
+		double &SRotAngle1,
+		double &MRotAngle2,
+		double &SRotAngle2,
 		double IUtoBLU_Rotary )
 	{
 		double MSin1, MSin2, MCos1, MCos2, SSin1, SSin2, SCos1, SCos2;
@@ -380,8 +380,8 @@ namespace PostTool
 		double SRotAngle2,
 		double LastMasterRotAngle,
 		double LastSlaveRotAngle,
-		double& MasterRotAngle,
-		double& SlaveRotAngle,
+		double &MasterRotAngle,
+		double &SlaveRotAngle,
 		SolutionType type,
 		double FStart,
 		double FEnd,
