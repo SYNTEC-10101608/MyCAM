@@ -22,16 +22,16 @@ namespace MyCAM.Post
 			double arcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
 
 			writer.WriteLine( "G65 P\"SY_CIRC\"" +
-				" X" + Math.Round( postData.RefPoint.X, 3 ) +
-				" Y" + Math.Round( postData.RefPoint.Y, 3 ) +
-				" Z" + Math.Round( postData.RefPoint.Z, 3 ) +
+				" X" + postData.RefPoint.X.ToString( "F3" ) +
+				" Y" + postData.RefPoint.Y.ToString( "F3" ) +
+				" Z" + postData.RefPoint.Z.ToString( "F3" ) +
 				" " + getRotaryAxisCommand( postData.RefPoint.Master / Math.PI * 180, postData.RefPoint.Slave / Math.PI * 180 ) +
-				" D" + circleGeomData.Diameter.ToString( "F2" ) +
-				" E" + linearLeadInLength.ToString( "F2" ) +
-				" R" + arcLeadOutLength.ToString( "F2" ) +
-				" Q" + circleGeomData.RotatedAngle_deg.ToString( "F2" ) +
+				" D" + circleGeomData.Diameter.ToString( "F3" ) +
+				" E" + linearLeadInLength.ToString( "F3" ) +
+				" R" + arcLeadOutLength.ToString( "F3" ) +
+				" Q" + circleGeomData.RotatedAngle_deg.ToString( "F3" ) +
 				" H1" +
-				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
+				" V" + craftData.OverCutLength.ToString( "F3" ) + ";" );
 		}
 	}
 
@@ -48,19 +48,19 @@ namespace MyCAM.Post
 			double arcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
 
 			writer.WriteLine( "G65 P\"SY_RECT\"" +
-				" X" + Math.Round( postData.RefPoint.X, 3 ) +
-				" Y" + Math.Round( postData.RefPoint.Y, 3 ) +
-				" Z" + Math.Round( postData.RefPoint.Z, 3 ) +
+				" X" + postData.RefPoint.X.ToString( "F3" ) +
+				" Y" + postData.RefPoint.Y.ToString( "F3" ) +
+				" Z" + postData.RefPoint.Z.ToString( "F3" ) +
 				" " + getRotaryAxisCommand( postData.RefPoint.Master / Math.PI * 180, postData.RefPoint.Slave / Math.PI * 180 ) +
-				" U" + rectangleGeomData.Length.ToString( "F2" ) +
-				" W" + rectangleGeomData.Width.ToString( "F2" ) +
-				" D" + rectangleGeomData.CornerRadius.ToString( "F2" ) +
+				" U" + rectangleGeomData.Length.ToString( "F3" ) +
+				" W" + rectangleGeomData.Width.ToString( "F3" ) +
+				" D" + rectangleGeomData.CornerRadius.ToString( "F3" ) +
 				" T" + ( craftData.StartPointIndex + 1 ).ToString() +
-				" E" + linearLeadInLength.ToString( "F2" ) +
-				" R" + arcLeadOutLength.ToString( "F2" ) +
-				" Q" + rectangleGeomData.RotatedAngle_deg.ToString( "F2" ) +
+				" E" + linearLeadInLength.ToString( "F3" ) +
+				" R" + arcLeadOutLength.ToString( "F3" ) +
+				" Q" + rectangleGeomData.RotatedAngle_deg.ToString( "F3" ) +
 				" H1" +
-				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
+				" V" + craftData.OverCutLength.ToString( "F3" ) + ";" );
 		}
 	}
 
@@ -77,18 +77,18 @@ namespace MyCAM.Post
 			double arcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
 
 			writer.WriteLine( "G65 P\"SY_RUNWAY\"" +
-				" X" + Math.Round( postData.RefPoint.X, 3 ) +
-				" Y" + Math.Round( postData.RefPoint.Y, 3 ) +
-				" Z" + Math.Round( postData.RefPoint.Z, 3 ) +
+				" X" + postData.RefPoint.X.ToString( "F3" ) +
+				" Y" + postData.RefPoint.Y.ToString( "F3" ) +
+				" Z" + postData.RefPoint.Z.ToString( "F3" ) +
 				" " + getRotaryAxisCommand( postData.RefPoint.Master / Math.PI * 180, postData.RefPoint.Slave / Math.PI * 180 ) +
-				" U" + runwayGeomData.Length.ToString( "F2" ) +
-				" W" + runwayGeomData.Width.ToString( "F2" ) +
+				" U" + runwayGeomData.Length.ToString( "F3" ) +
+				" W" + runwayGeomData.Width.ToString( "F3" ) +
 				" T" + ( craftData.StartPointIndex + 1 ).ToString() +
-				" E" + linearLeadInLength.ToString( "F2" ) +
-				" R" + arcLeadOutLength.ToString( "F2" ) +
-				" Q" + runwayGeomData.RotatedAngle_deg.ToString( "F2" ) +
+				" E" + linearLeadInLength.ToString( "F3" ) +
+				" R" + arcLeadOutLength.ToString( "F3" ) +
+				" Q" + runwayGeomData.RotatedAngle_deg.ToString( "F3" ) +
 				" H1" +
-				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
+				" V" + craftData.OverCutLength.ToString( "F3" ) + ";" );
 		}
 	}
 
@@ -105,19 +105,19 @@ namespace MyCAM.Post
 			double arcLeadOutLength = craftData.LeadLineParam.LeadIn.Type == LeadLineType.Arc ? craftData.LeadLineParam.LeadIn.Length : 0;
 
 			writer.WriteLine( "G65 P\"SY_POLYGON\"" +
-				" X" + Math.Round( postData.RefPoint.X, 3 ) +
-				" Y" + Math.Round( postData.RefPoint.Y, 3 ) +
-				" Z" + Math.Round( postData.RefPoint.Z, 3 ) +
+				" X" + postData.RefPoint.X.ToString( "F3" ) +
+				" Y" + postData.RefPoint.Y.ToString( "F3" ) +
+				" Z" + postData.RefPoint.Z.ToString( "F3" ) +
 				" " + getRotaryAxisCommand( postData.RefPoint.Master / Math.PI * 180, postData.RefPoint.Slave / Math.PI * 180 ) +
 				" U" + polygonGeomData.Sides.ToString() +
-				" W" + polygonGeomData.SideLength.ToString( "F2" ) +
-				" D" + polygonGeomData.CornerRadius.ToString( "F2" ) +
+				" W" + polygonGeomData.SideLength.ToString( "F3" ) +
+				" D" + polygonGeomData.CornerRadius.ToString( "F3" ) +
 				" T" + ( craftData.StartPointIndex + 1 ).ToString() +
-				" E" + linearLeadInLength.ToString( "F2" ) +
-				" R" + arcLeadOutLength.ToString( "F2" ) +
-				" Q" + polygonGeomData.RotatedAngle_deg.ToString( "F2" ) +
+				" E" + linearLeadInLength.ToString( "F3" ) +
+				" R" + arcLeadOutLength.ToString( "F3" ) +
+				" Q" + polygonGeomData.RotatedAngle_deg.ToString( "F3" ) +
 				" H1" +
-				" V" + craftData.OverCutLength.ToString( "F2" ) + ";" );
+				" V" + craftData.OverCutLength.ToString( "F3" ) + ";" );
 		}
 	}
 
