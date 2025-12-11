@@ -565,6 +565,13 @@ namespace MyCAM.Editor.Dialog
 				if( !( m_NewStandardPatternGeomData is PolygonGeomData polygonGeomData ) ) {
 					return;
 				}
+
+				// validate that the edge length is sufficient for the corner radius
+				if( m_PolygonCornerRadius > 0 && !IsPolygonGeometryValid( polygonGeomData.Sides, sideLength, m_PolygonCornerRadius ) ) {
+					m_txbPolygonSideLength.Text = m_PolygonSideLength.ToString( "F3" );
+					return;
+				}
+
 				m_PolygonSideLength = sideLength;
 				polygonGeomData.SideLength = m_PolygonSideLength;
 				RaisePreview( m_NewStandardPatternGeomData );
@@ -621,6 +628,13 @@ namespace MyCAM.Editor.Dialog
 				if( !( m_NewStandardPatternGeomData is PolygonGeomData polygonGeomData ) ) {
 					return;
 				}
+
+				// validate that the corner radius is compatible with the edge length
+				if( cornerRadius > 0 && !IsPolygonGeometryValid( polygonGeomData.Sides, m_PolygonSideLength, cornerRadius ) ) {
+					m_txbPolygonCornerRadius.Text = m_PolygonCornerRadius.ToString( "F3" );
+					return;
+				}
+
 				m_PolygonCornerRadius = cornerRadius;
 				polygonGeomData.CornerRadius = m_PolygonCornerRadius;
 				RaisePreview( m_NewStandardPatternGeomData );
@@ -633,6 +647,24 @@ namespace MyCAM.Editor.Dialog
 		void m_btnConfirm_Click( object sender, EventArgs e )
 		{
 			RaiseConfirm( m_NewStandardPatternGeomData );
+		}
+
+		bool IsPolygonGeometryValid( int sides, double sideLength, double cornerRadius )
+		{
+			// interior angle calculation constant
+			const int INTERIOR_ANGLE_NUMERATOR_OFFSET = 2;
+
+			// edge tangent distance multiplier
+			const double EDGE_TANGENT_MULTIPLIER = 2.0;
+
+			// calculate interior angle and tangent distance
+			// interior angle = (n-2) * π / n
+			double interiorAngle = ( sides - INTERIOR_ANGLE_NUMERATOR_OFFSET ) * Math.PI / sides;
+			double halfAngle = interiorAngle / EDGE_TANGENT_MULTIPLIER;
+			double tangentDistance = cornerRadius / Math.Tan( halfAngle );
+
+			// check if edge length is sufficient: 2 * tangentDistance must be less than edge length
+			return tangentDistance * EDGE_TANGENT_MULTIPLIER <= sideLength;
 		}
 
 		IStandardPatternGeomData m_StandardPatternGeomData;

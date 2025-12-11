@@ -91,6 +91,7 @@ namespace MyCAM.Data
 			foreach( var oneConnectPoint in m_ConnectPointMap ) {
 				oneConnectPoint.Value.Transform( transform );
 			}
+			DisctereContourHelper.GetContourCenterPointAndNormalDir( m_CADPointList, out m_OriCenterPnt, out m_AverageNormalDir );
 		}
 
 		public IGeomData Clone()
