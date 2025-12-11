@@ -25,7 +25,7 @@ namespace MyCAM.CacheInfo
 
 	public interface IMainPathStartPointCache : ICacheInfo
 	{
-		IProcessPoint GetMainPathStartCAMPoint();
+		CAMPoint GetMainPathStartCAMPoint();
 	}
 
 	public interface ILeadCache : ICacheInfo

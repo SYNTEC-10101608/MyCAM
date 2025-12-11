@@ -103,13 +103,7 @@ namespace MyCAM.CacheInfo
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
 			}
-			return new CAMPoint(
-				new CADPoint(
-					m_CoordinateInfo.Location(),
-					m_CoordinateInfo.Direction(),
-					m_CoordinateInfo.XDirection(),
-					m_CoordinateInfo.YDirection() ),
-				m_CoordinateInfo.Direction() );
+			return m_RefPoint;
 		}
 
 		public IProcessPoint GetProcessStartPoint()
@@ -134,7 +128,7 @@ namespace MyCAM.CacheInfo
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
 
-		public IProcessPoint GetMainPathStartCAMPoint()
+		public CAMPoint GetMainPathStartCAMPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -198,6 +192,8 @@ namespace MyCAM.CacheInfo
 		protected List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
 
 		protected CraftData m_CraftData;
+
+		protected CAMPoint m_RefPoint;
 
 		protected bool m_IsCraftDataDirty = false;
 

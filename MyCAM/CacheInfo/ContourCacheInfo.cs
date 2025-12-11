@@ -111,7 +111,7 @@ namespace MyCAM.CacheInfo
 			return camPoint;
 		}
 
-		public IProcessPoint GetMainPathStartCAMPoint()
+		public CAMPoint GetMainPathStartCAMPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();

@@ -27,6 +27,23 @@ namespace MyCAM.CacheInfo
 
 		public override IProcessPoint GetProcessRefPoint()
 		{
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
+			return m_RefPoint;
+
+
+		}
+
+		protected override void BuildCAMPointList()
+		{
+			ClearCraftDataDirty();
+			m_RefPoint = RunwayRefPoint();
+			m_StartPointList = RunwayCacheInfoExtensions.GetStartPointList( CoordinateInfo, m_RunwayGeomData.Length, m_RunwayGeomData.Width );
+		}
+
+		CAMPoint RunwayRefPoint()
+		{
 			// calculate runway parameters
 			double length = m_RunwayGeomData.Length;
 			double width = m_RunwayGeomData.Width;
@@ -67,13 +84,6 @@ namespace MyCAM.CacheInfo
 				CoordinateInfo.Direction()
 			);
 		}
-
-		protected override void BuildCAMPointList()
-		{
-			ClearCraftDataDirty();
-			m_StartPointList = RunwayCacheInfoExtensions.GetStartPointList( CoordinateInfo, m_RunwayGeomData.Length, m_RunwayGeomData.Width );
-		}
-
 		RunwayGeomData m_RunwayGeomData;
 	}
 

@@ -28,6 +28,7 @@ namespace MyCAM.CacheInfo
 		protected override void BuildCAMPointList()
 		{
 			ClearCraftDataDirty();
+			m_RefPoint = new CAMPoint( new CADPoint( m_CoordinateInfo.Location(), m_CoordinateInfo.Direction(), m_CoordinateInfo.XDirection(), m_CoordinateInfo.YDirection() ), m_CoordinateInfo.Direction() );
 			m_StartPointList = RectangleCacheInfoExtensions.GetStartPointList( CoordinateInfo, m_RectangleGeomData.Length, m_RectangleGeomData.Width );
 		}
 
