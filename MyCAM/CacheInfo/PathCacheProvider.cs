@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 namespace MyCAM.CacheInfo
 {
+	#region Cache Interface Definitions
+
 	public interface ICacheInfo
 	{
 		PathType PathType
@@ -79,68 +81,32 @@ namespace MyCAM.CacheInfo
 		IProcessPoint GetProcessEndPoint();
 	}
 
-	internal class PathCacheStrategy<TString> : IPathCacheStrategy
-		where TString : PathObject
-	{
-		private readonly Func<TString, ICacheInfo> m_CacheInfoGetter;
+	#endregion
 
-		public PathCacheStrategy( Func<TString, ICacheInfo> cacheInfoGetter )
+	#region Path Cache Strategy Pattern
+
+	internal interface IPathCacheStrategy
+	{
+		ICacheInfo GetCacheInfo( PathObject pathObject );
+	}
+
+	internal class PathCacheStrategy<TPathObject> : IPathCacheStrategy
+		where TPathObject : PathObject
+	{
+		private readonly Func<TPathObject, ICacheInfo> m_CacheInfoGetter;
+
+		public PathCacheStrategy( Func<TPathObject, ICacheInfo> cacheInfoGetter )
 		{
 			m_CacheInfoGetter = cacheInfoGetter ?? throw new ArgumentNullException( nameof( cacheInfoGetter ) );
 		}
 
-		public IMainPathStartPointCache GetMainPathStartPointCache( string szPathID )
+		public ICacheInfo GetCacheInfo( PathObject pathObject )
 		{
-			return GetCacheInfo( szPathID ) as IMainPathStartPointCache;
-		}
-
-		public ILeadCache GetLeadCache( string szPathID )
-		{
-			return GetCacheInfo( szPathID ) as ILeadCache;
-		}
-
-		public IPathReverseCache GetPathReverseCache( string szPathID )
-		{
-			return GetCacheInfo( szPathID ) as IPathReverseCache;
-		}
-
-		public IToolVecCache GetToolVecCache( string szPathID )
-		{
-			return GetCacheInfo( szPathID ) as IToolVecCache;
-		}
-
-		public IOverCutCache GetOverCutCache( string szPathID )
-		{
-			return GetCacheInfo( szPathID ) as IOverCutCache;
-		}
-
-		public IProcessPathStartEndCache GetProcessPathStartEndCache( string szPathID )
-		{
-			return GetCacheInfo( szPathID ) as IProcessPathStartEndCache;
-		}
-
-		private ICacheInfo GetCacheInfo( string szPathID )
-		{
-			if( szPathID is TString typedPath ) {
-				return m_CacheInfoGetter( typedPath );
+			if( pathObject is TPathObject typedPathObject ) {
+				return m_CacheInfoGetter( typedPathObject );
 			}
 			return null;
 		}
-	}
-
-	internal interface IPathCacheStrategy
-	{
-		IMainPathStartPointCache GetMainPathStartPointCache( string szPathID );
-
-		ILeadCache GetLeadCache( string szPathID );
-
-		IPathReverseCache GetPathReverseCache( string szPathID );
-
-		IToolVecCache GetToolVecCache( string szPathID );
-
-		IOverCutCache GetOverCutCache( string szPathID );
-
-		IProcessPathStartEndCache GetProcessPathStartEndCache( string szPathID );
 	}
 
 	internal static class PathCacheStrategyFactory
@@ -170,49 +136,64 @@ namespace MyCAM.CacheInfo
 		}
 	}
 
-	internal static class PathCacheProvider
+	#endregion
+
+	#region Path Cache Provider
+
+	public static class PathCacheProvider
 	{
 		public static bool TryGetMainPathStartPointCache( string szPathID, out IMainPathStartPointCache cache )
 		{
-			return TryGetCache( szPathID, s => s.GetMainPathStartPointCache( szPathID ), out cache );
+			return TryGetCache( szPathID, out cache );
 		}
 
 		public static bool TryGetLeadCache( string szPathID, out ILeadCache cache )
 		{
-			return TryGetCache( szPathID, s => s.GetLeadCache( szPathID ), out cache );
+			return TryGetCache( szPathID, out cache );
 		}
 
 		public static bool TryGetPathReverseCache( string szPathID, out IPathReverseCache cache )
 		{
-			return TryGetCache( szPathID, s => s.GetPathReverseCache( szPathID ), out cache );
+			return TryGetCache( szPathID, out cache );
 		}
 
 		public static bool TryGetToolVecCache( string szPathID, out IToolVecCache cache )
 		{
-			return TryGetCache( szPathID, s => s.GetToolVecCache( szPathID ), out cache );
+			return TryGetCache( szPathID, out cache );
 		}
 
 		public static bool TryGetOverCutCache( string szPathID, out IOverCutCache cache )
 		{
-			return TryGetCache( szPathID, s => s.GetOverCutCache( szPathID ), out cache );
+			return TryGetCache( szPathID, out cache );
 		}
 
 		public static bool TryGetProcessPathStartEndCache( string szPathID, out IProcessPathStartEndCache cache )
 		{
-			return TryGetCache( szPathID, s => s.GetProcessPathStartEndCache( szPathID ), out cache );
+			return TryGetCache( szPathID, out cache );
 		}
 
-		static bool TryGetCache<TCache>( string szPathID, Func<IPathCacheStrategy, TCache> cacheGetter, out TCache cache )
-			where TCache : class
+		static bool TryGetCache<TCache>( string szPathID, out TCache cache )
+			where TCache : class, ICacheInfo
 		{
 			cache = null;
-			if( DataGettingHelper.TryGetPathObject( szPathID, out PathObject pathObject ) ) {
+
+			// use DataGettingHelper to get PathObject from string ID
+			if( !DataGettingHelper.TryGetPathObject( szPathID, out PathObject pathObject ) ) {
 				return false;
 			}
 
+			// get strategy based on PathType
 			IPathCacheStrategy strategy = PathCacheStrategyFactory.GetStrategy( pathObject.PathType );
-			cache = cacheGetter( strategy );
+			if( strategy == null ) {
+				return false;
+			}
+
+			// get cache info and cast to requested type
+			ICacheInfo cacheInfo = strategy.GetCacheInfo( pathObject );
+			cache = cacheInfo as TCache;
 			return cache != null;
 		}
 	}
+
+	#endregion
 }

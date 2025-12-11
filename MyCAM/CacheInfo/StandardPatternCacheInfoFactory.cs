@@ -21,13 +21,15 @@ namespace MyCAM.CacheInfo
 
 		public IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData standardPatternGeomData, CraftData craftData )
 		{
-			if( coordinateInfo == null )
+			if( coordinateInfo == null ) {
 				throw new ArgumentNullException( nameof( coordinateInfo ) );
-			if( standardPatternGeomData == null )
+			}
+			if( standardPatternGeomData == null ) {
 				throw new ArgumentNullException( nameof( standardPatternGeomData ) );
-			if( craftData == null )
+			}
+			if( craftData == null ) {
 				throw new ArgumentNullException( nameof( craftData ) );
-
+			}
 			return m_CacheInfoFactory( coordinateInfo, standardPatternGeomData, craftData );
 		}
 	}

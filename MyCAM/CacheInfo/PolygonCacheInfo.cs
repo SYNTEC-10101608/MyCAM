@@ -14,6 +14,7 @@ namespace MyCAM.CacheInfo
 				throw new ArgumentNullException( "PolygonCacheInfo constructing argument error - invalid geomData" );
 			}
 			m_PolygonGeomData = polygonGeomData;
+			BuildCAMPointList();
 		}
 
 		public override PathType PathType

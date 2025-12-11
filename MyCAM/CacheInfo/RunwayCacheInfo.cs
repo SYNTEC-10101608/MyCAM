@@ -14,6 +14,7 @@ namespace MyCAM.CacheInfo
 				throw new ArgumentNullException( "RunwayCacheInfo constructing argument error - invalid geomData" );
 			}
 			m_RunwayGeomData = runwayGeomData;
+			BuildCAMPointList();
 		}
 
 		public override PathType PathType

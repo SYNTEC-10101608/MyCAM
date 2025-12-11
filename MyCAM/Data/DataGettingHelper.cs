@@ -79,7 +79,6 @@ namespace MyCAM.Data
 
 			// use unified CacheInfo property from StandardPatternBasedPathObject
 			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
-
 				// cacheInfo implements IStandardPatternCacheInfo which has GetProcessRefPoint
 				if( standardPatternPathObject.StandatdPatternCacheInfo is IStandardPatternRefPointCache refPointCache ) {
 					refPoint = refPointCache.GetProcessRefPoint();
@@ -98,8 +97,9 @@ namespace MyCAM.Data
 				return false;
 			}
 
-			if( string.IsNullOrEmpty( szPathID )
-				|| m_DataManager.ObjectMap.ContainsKey( szPathID ) == false
+			// check if the object exists and is a PathObject
+			if( m_DataManager?.ObjectMap == null
+				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
 				|| m_DataManager.ObjectMap[ szPathID ] == null
 				|| !( m_DataManager.ObjectMap[ szPathID ] is PathObject ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );

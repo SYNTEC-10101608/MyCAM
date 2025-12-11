@@ -14,6 +14,7 @@ namespace MyCAM.CacheInfo
 				throw new ArgumentNullException( "RectangleCacheInfo constructing argument error - invalid geomData" );
 			}
 			m_RectangleGeomData = rectangleGeomData;
+			BuildCAMPointList();
 		}
 
 		public override PathType PathType

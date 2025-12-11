@@ -14,6 +14,7 @@ namespace MyCAM.CacheInfo
 				throw new ArgumentNullException( "CircleCacheInfo constructing argument error - invalid geomData" );
 			}
 			m_CircleGeomData = circleGeomData;
+			BuildCAMPointList();
 		}
 
 		public override PathType PathType

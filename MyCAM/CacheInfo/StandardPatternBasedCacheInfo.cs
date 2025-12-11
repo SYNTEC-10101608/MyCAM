@@ -17,7 +17,6 @@ namespace MyCAM.CacheInfo
 			m_CoordinateInfo = coordinateInfo;
 			m_CraftData = craftData;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
-			BuildCAMPointList();
 		}
 
 		#region Abstract Members
