@@ -6,6 +6,8 @@ using System;
 
 namespace MyCAM.StandardPatternFactory
 {
+	#region Strategy Pattern Interfaces and Classes
+
 	internal interface IWireCreationStrategy
 	{
 		bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStandardPatternGeomData standardPatternGeomData, out TopoDS_Wire wire );
@@ -37,7 +39,6 @@ namespace MyCAM.StandardPatternFactory
 		}
 	}
 
-
 	// because lambda expressions cannot capture out parameters and reference variables, define a struct to hold the result
 	internal struct WireResult
 	{
@@ -51,37 +52,38 @@ namespace MyCAM.StandardPatternFactory
 		}
 	}
 
+	#endregion
+
+	#region Strategy Factory
+
 	internal static class WireCreationStrategyFactory
 	{
-		// Diameter to radius conversion factor
-		const double DIAMETER_TO_RADIUS_FACTOR = 2.0;
-
 		// create singleton strategy instances using generic WireCreationStrategy with lambda expressions
 		static readonly IWireCreationStrategy s_CircleStrategy =
 			new WireCreationStrategy<CircleGeomData>( ( center, plane, geom ) =>
 			{
-				bool success = CircleFactory.CreateCircleWireOnPlane( center, geom.Diameter / DIAMETER_TO_RADIUS_FACTOR, plane, out TopoDS_Wire wire );
+				bool success = StandardPatternWireFactory.CreateCircleWire( center, geom.Diameter, plane, out TopoDS_Wire wire );
 				return new WireResult( success, wire );
 			} );
 
 		static readonly IWireCreationStrategy s_RectangleStrategy =
 			new WireCreationStrategy<RectangleGeomData>( ( center, plane, geom ) =>
 			{
-				bool success = RectangleFactory.CreateRoundedRectangleWireOnPlane( center, geom.Length, geom.Width, geom.CornerRadius, plane, out TopoDS_Wire wire );
+				bool success = StandardPatternWireFactory.CreateRoundedRectangleWire( center, geom.Length, geom.Width, geom.CornerRadius, plane, out TopoDS_Wire wire );
 				return new WireResult( success, wire );
 			} );
 
 		static readonly IWireCreationStrategy s_RunwayStrategy =
 			new WireCreationStrategy<RunwayGeomData>( ( center, plane, geom ) =>
 			{
-				bool success = RunwayFactory.CreateRunwayWireOnPlane( center, geom.Length, geom.Width, plane, out TopoDS_Wire wire );
+				bool success = StandardPatternWireFactory.CreateRunwayWire( center, geom.Length, geom.Width, plane, out TopoDS_Wire wire );
 				return new WireResult( success, wire );
 			} );
 
 		static readonly IWireCreationStrategy s_PolygonStrategy =
 			new WireCreationStrategy<PolygonGeomData>( ( center, plane, geom ) =>
 			{
-				bool success = PolygonFactory.CreatePolygonWireOnPlane( center, geom.Sides, geom.SideLength, geom.CornerRadius, plane, out TopoDS_Wire wire );
+				bool success = StandardPatternWireFactory.CreatePolygonWire( center, geom.Sides, geom.SideLength, geom.CornerRadius, plane, out TopoDS_Wire wire );
 				return new WireResult( success, wire );
 			} );
 
@@ -106,24 +108,18 @@ namespace MyCAM.StandardPatternFactory
 		}
 	}
 
-	internal static class CircleFactory
-	{
-		// Tolerance for geometric comparisons
-		const double GEOMETRIC_TOLERANCE = 1e-9;
-		
-		// Local coordinate system origin
-		const double LOCAL_ORIGIN_X = 0.0;
-		const double LOCAL_ORIGIN_Y = 0.0;
-		const double LOCAL_ORIGIN_Z = 0.0;
-		
-		// Local Z-axis direction (pointing up in XY plane)
-		const double LOCAL_Z_DIRECTION_X = 0.0;
-		const double LOCAL_Z_DIRECTION_Y = 0.0;
-		const double LOCAL_Z_DIRECTION_Z = 1.0;
+	#endregion
 
-		public static bool CreateCircleWireOnPlane( gp_Pnt centerPoint, double radius, gp_Pln plane, out TopoDS_Wire wire )
+	#region Unified Standard Pattern Wire Factory
+
+	internal static class StandardPatternWireFactory
+	{
+		#region Circle Wire Creation
+
+		public static bool CreateCircleWire( gp_Pnt centerPoint, double diameterius, gp_Pln plane, out TopoDS_Wire wire )
 		{
 			wire = null;
+			double radius = diameterius / DIAMETER_TO_RADIUS_FACTOR;
 			if( centerPoint == null || radius <= GEOMETRIC_TOLERANCE || plane == null ) {
 				return false;
 			}
@@ -148,39 +144,15 @@ namespace MyCAM.StandardPatternFactory
 			}
 			TopoDS_Wire localWire = wireBuilder.Wire();
 
-			// create target coordinate system
-			gp_Ax3 targetCoordSystem = new gp_Ax3( centerPoint, plane.Axis().Direction(), plane.XAxis().Direction() );
-
-			// create transformation
-			gp_Trsf transformation = new gp_Trsf();
-			transformation.SetTransformation( targetCoordSystem, new gp_Ax3() );
-
-			// apply transformation
-			BRepBuilderAPI_Transform transformBuilder = new BRepBuilderAPI_Transform( localWire, transformation, true );
-			if( !transformBuilder.IsDone() ) {
-				return false;
-			}
-
-			wire = TopoDS.ToWire( transformBuilder.Shape() );
-			return true;
+			// transform to target plane
+			return TransformWireToPlane( localWire, centerPoint, plane, out wire );
 		}
-	}
 
-	internal static class RectangleFactory
-	{
-		// Tolerance for geometric comparisons
-		const double GEOMETRIC_TOLERANCE = 1e-9;
-		
-		// Half dimension factor for calculating half length/width
-		const double HALF_DIMENSION_FACTOR = 2.0;
-		
-		// Local coordinate Z value (XY plane)
-		const double LOCAL_Z_COORDINATE = 0.0;
-		
-		// Zero radius threshold for sharp corners
-		const double ZERO_RADIUS_THRESHOLD = 0.0;
+		#endregion
 
-		public static bool CreateRoundedRectangleWireOnPlane( gp_Pnt centerPoint, double length, double width, double radius, gp_Pln plane, out TopoDS_Wire wire )
+		#region Rectangle Wire Creation
+
+		public static bool CreateRoundedRectangleWire( gp_Pnt centerPoint, double length, double width, double radius, gp_Pln plane, out TopoDS_Wire wire )
 		{
 			wire = null;
 			if( centerPoint == null || plane == null || length <= GEOMETRIC_TOLERANCE || width <= GEOMETRIC_TOLERANCE || radius < ZERO_RADIUS_THRESHOLD ) {
@@ -196,81 +168,16 @@ namespace MyCAM.StandardPatternFactory
 
 			BRepBuilderAPI_MakeWire wireBuilder = new BRepBuilderAPI_MakeWire();
 
-			// rounded rectangle in XY plane
+			// create rounded or sharp rectangle based on radius
 			if( r > ZERO_RADIUS_THRESHOLD ) {
-				gp_Dir zDir = gp.DZ();
-
-				// line points
-				gp_Pnt p1 = new gp_Pnt( halfL - r, halfW, LOCAL_Z_COORDINATE );
-				gp_Pnt p2 = new gp_Pnt( halfL, halfW - r, LOCAL_Z_COORDINATE );
-				gp_Pnt p3 = new gp_Pnt( halfL, -( halfW - r ), LOCAL_Z_COORDINATE );
-				gp_Pnt p4 = new gp_Pnt( halfL - r, -halfW, LOCAL_Z_COORDINATE );
-				gp_Pnt p5 = new gp_Pnt( -( halfL - r ), -halfW, LOCAL_Z_COORDINATE );
-				gp_Pnt p6 = new gp_Pnt( -halfL, -( halfW - r ), LOCAL_Z_COORDINATE );
-				gp_Pnt p7 = new gp_Pnt( -halfL, halfW - r, LOCAL_Z_COORDINATE );
-				gp_Pnt p8 = new gp_Pnt( -( halfL - r ), halfW, LOCAL_Z_COORDINATE );
-
-				// arc centers
-				gp_Pnt c1 = new gp_Pnt( halfL - r, halfW - r, LOCAL_Z_COORDINATE );
-				gp_Pnt c2 = new gp_Pnt( halfL - r, -( halfW - r ), LOCAL_Z_COORDINATE );
-				gp_Pnt c3 = new gp_Pnt( -( halfL - r ), -( halfW - r ), LOCAL_Z_COORDINATE );
-				gp_Pnt c4 = new gp_Pnt( -( halfL - r ), halfW - r, LOCAL_Z_COORDINATE );
-
-				BRepBuilderAPI_MakeEdge l1Builder = new BRepBuilderAPI_MakeEdge( p8, p1 );
-				BRepBuilderAPI_MakeEdge l2Builder = new BRepBuilderAPI_MakeEdge( p2, p3 );
-				BRepBuilderAPI_MakeEdge l3Builder = new BRepBuilderAPI_MakeEdge( p4, p5 );
-				BRepBuilderAPI_MakeEdge l4Builder = new BRepBuilderAPI_MakeEdge( p6, p7 );
-				if( !l1Builder.IsDone() || !l2Builder.IsDone() || !l3Builder.IsDone() || !l4Builder.IsDone() ) {
+				if( !CreateRoundedRectangleEdges( wireBuilder, halfL, halfW, r ) ) {
 					return false;
 				}
-				TopoDS_Edge l1 = l1Builder.Edge();
-				TopoDS_Edge l2 = l2Builder.Edge();
-				TopoDS_Edge l3 = l3Builder.Edge();
-				TopoDS_Edge l4 = l4Builder.Edge();
-
-				// arc edges
-				BRepBuilderAPI_MakeEdge a1Builder = new BRepBuilderAPI_MakeEdge( new gp_Circ( new gp_Ax2( c1, zDir ), r ), p2, p1 );
-				BRepBuilderAPI_MakeEdge a2Builder = new BRepBuilderAPI_MakeEdge( new gp_Circ( new gp_Ax2( c2, zDir ), r ), p4, p3 );
-				BRepBuilderAPI_MakeEdge a3Builder = new BRepBuilderAPI_MakeEdge( new gp_Circ( new gp_Ax2( c3, zDir ), r ), p6, p5 );
-				BRepBuilderAPI_MakeEdge a4Builder = new BRepBuilderAPI_MakeEdge( new gp_Circ( new gp_Ax2( c4, zDir ), r ), p8, p7 );
-				if( !a1Builder.IsDone() || !a2Builder.IsDone() || !a3Builder.IsDone() || !a4Builder.IsDone() ) {
-					return false;
-				}
-
-				// reverse arcs to ensure correct orientation
-				TopoDS_Edge a1 = TopoDS.ToEdge( a1Builder.Edge().Reversed() );
-				TopoDS_Edge a2 = TopoDS.ToEdge( a2Builder.Edge().Reversed() );
-				TopoDS_Edge a3 = TopoDS.ToEdge( a3Builder.Edge().Reversed() );
-				TopoDS_Edge a4 = TopoDS.ToEdge( a4Builder.Edge().Reversed() );
-
-				wireBuilder.Add( l1 );
-				wireBuilder.Add( a1 );
-				wireBuilder.Add( l2 );
-				wireBuilder.Add( a2 );
-				wireBuilder.Add( l3 );
-				wireBuilder.Add( a3 );
-				wireBuilder.Add( l4 );
-				wireBuilder.Add( a4 );
 			}
-			// sharp rectangle
 			else {
-				gp_Pnt pTopRight = new gp_Pnt( halfL, halfW, LOCAL_Z_COORDINATE );
-				gp_Pnt pBotRight = new gp_Pnt( halfL, -halfW, LOCAL_Z_COORDINATE );
-				gp_Pnt pBotLeft = new gp_Pnt( -halfL, -halfW, LOCAL_Z_COORDINATE );
-				gp_Pnt pTopLeft = new gp_Pnt( -halfL, halfW, LOCAL_Z_COORDINATE );
-
-				BRepBuilderAPI_MakeEdge eTopBuilder = new BRepBuilderAPI_MakeEdge( pTopLeft, pTopRight );
-				BRepBuilderAPI_MakeEdge eRightBuilder = new BRepBuilderAPI_MakeEdge( pTopRight, pBotRight );
-				BRepBuilderAPI_MakeEdge eBottomBuilder = new BRepBuilderAPI_MakeEdge( pBotRight, pBotLeft );
-				BRepBuilderAPI_MakeEdge eLeftBuilder = new BRepBuilderAPI_MakeEdge( pBotLeft, pTopLeft );
-				if( !eTopBuilder.IsDone() || !eRightBuilder.IsDone() || !eBottomBuilder.IsDone() || !eLeftBuilder.IsDone() ) {
+				if( !CreateSharpRectangleEdges( wireBuilder, halfL, halfW ) ) {
 					return false;
 				}
-
-				wireBuilder.Add( eTopBuilder.Edge() );
-				wireBuilder.Add( eRightBuilder.Edge() );
-				wireBuilder.Add( eBottomBuilder.Edge() );
-				wireBuilder.Add( eLeftBuilder.Edge() );
 			}
 
 			// check wire creation
@@ -279,39 +186,95 @@ namespace MyCAM.StandardPatternFactory
 			}
 			TopoDS_Wire localWire = wireBuilder.Wire();
 
-			// create target coordinate system
-			gp_Ax3 targetCoordSystem = new gp_Ax3( centerPoint, plane.Axis().Direction(), plane.XAxis().Direction() );
-			gp_Trsf transformation = new gp_Trsf();
-			transformation.SetTransformation( targetCoordSystem, new gp_Ax3() );
+			// transform to target plane
+			return TransformWireToPlane( localWire, centerPoint, plane, out wire );
+		}
 
-			// apply transformation
-			BRepBuilderAPI_Transform transformBuilder = new BRepBuilderAPI_Transform( localWire, transformation, true );
-			if( !transformBuilder.IsDone() ) {
+		static bool CreateRoundedRectangleEdges( BRepBuilderAPI_MakeWire wireBuilder, double halfL, double halfW, double r )
+		{
+			gp_Dir zDir = gp.DZ();
+
+			// line points
+			gp_Pnt p1 = new gp_Pnt( halfL - r, halfW, LOCAL_ORIGIN_Z );
+			gp_Pnt p2 = new gp_Pnt( halfL, halfW - r, LOCAL_ORIGIN_Z );
+			gp_Pnt p3 = new gp_Pnt( halfL, -( halfW - r ), LOCAL_ORIGIN_Z );
+			gp_Pnt p4 = new gp_Pnt( halfL - r, -halfW, LOCAL_ORIGIN_Z );
+			gp_Pnt p5 = new gp_Pnt( -( halfL - r ), -halfW, LOCAL_ORIGIN_Z );
+			gp_Pnt p6 = new gp_Pnt( -halfL, -( halfW - r ), LOCAL_ORIGIN_Z );
+			gp_Pnt p7 = new gp_Pnt( -halfL, halfW - r, LOCAL_ORIGIN_Z );
+			gp_Pnt p8 = new gp_Pnt( -( halfL - r ), halfW, LOCAL_ORIGIN_Z );
+
+			// arc centers
+			gp_Pnt c1 = new gp_Pnt( halfL - r, halfW - r, LOCAL_ORIGIN_Z );
+			gp_Pnt c2 = new gp_Pnt( halfL - r, -( halfW - r ), LOCAL_ORIGIN_Z );
+			gp_Pnt c3 = new gp_Pnt( -( halfL - r ), -( halfW - r ), LOCAL_ORIGIN_Z );
+			gp_Pnt c4 = new gp_Pnt( -( halfL - r ), halfW - r, LOCAL_ORIGIN_Z );
+
+			// create straight edges
+			BRepBuilderAPI_MakeEdge l1Builder = new BRepBuilderAPI_MakeEdge( p8, p1 );
+			BRepBuilderAPI_MakeEdge l2Builder = new BRepBuilderAPI_MakeEdge( p2, p3 );
+			BRepBuilderAPI_MakeEdge l3Builder = new BRepBuilderAPI_MakeEdge( p4, p5 );
+			BRepBuilderAPI_MakeEdge l4Builder = new BRepBuilderAPI_MakeEdge( p6, p7 );
+			if( !l1Builder.IsDone() || !l2Builder.IsDone() || !l3Builder.IsDone() || !l4Builder.IsDone() ) {
 				return false;
 			}
-			wire = TopoDS.ToWire( transformBuilder.Shape() );
+
+			// create arc edges
+			BRepBuilderAPI_MakeEdge a1Builder = new BRepBuilderAPI_MakeEdge( new gp_Circ( new gp_Ax2( c1, zDir ), r ), p2, p1 );
+			BRepBuilderAPI_MakeEdge a2Builder = new BRepBuilderAPI_MakeEdge( new gp_Circ( new gp_Ax2( c2, zDir ), r ), p4, p3 );
+			BRepBuilderAPI_MakeEdge a3Builder = new BRepBuilderAPI_MakeEdge( new gp_Circ( new gp_Ax2( c3, zDir ), r ), p6, p5 );
+			BRepBuilderAPI_MakeEdge a4Builder = new BRepBuilderAPI_MakeEdge( new gp_Circ( new gp_Ax2( c4, zDir ), r ), p8, p7 );
+			if( !a1Builder.IsDone() || !a2Builder.IsDone() || !a3Builder.IsDone() || !a4Builder.IsDone() ) {
+				return false;
+			}
+
+			// reverse arcs to ensure correct orientation
+			TopoDS_Edge a1 = TopoDS.ToEdge( a1Builder.Edge().Reversed() );
+			TopoDS_Edge a2 = TopoDS.ToEdge( a2Builder.Edge().Reversed() );
+			TopoDS_Edge a3 = TopoDS.ToEdge( a3Builder.Edge().Reversed() );
+			TopoDS_Edge a4 = TopoDS.ToEdge( a4Builder.Edge().Reversed() );
+
+			// add edges in sequence
+			wireBuilder.Add( l1Builder.Edge() );
+			wireBuilder.Add( a1 );
+			wireBuilder.Add( l2Builder.Edge() );
+			wireBuilder.Add( a2 );
+			wireBuilder.Add( l3Builder.Edge() );
+			wireBuilder.Add( a3 );
+			wireBuilder.Add( l4Builder.Edge() );
+			wireBuilder.Add( a4 );
+
 			return true;
 		}
-	}
 
-	internal static class RunwayFactory
-	{
-		// Tolerance for geometric comparisons
-		const double GEOMETRIC_TOLERANCE = 1e-9;
-		
-		// Half dimension factor for calculating half measurements
-		const double HALF_DIMENSION_FACTOR = 2.0;
-		
-		// Local coordinate values
-		const double LOCAL_Y_CENTER = 0.0;
-		const double LOCAL_Z_COORDINATE = 0.0;
-		
-		// Local Z-axis direction (pointing up in XY plane)
-		const double LOCAL_Z_DIRECTION_X = 0.0;
-		const double LOCAL_Z_DIRECTION_Y = 0.0;
-		const double LOCAL_Z_DIRECTION_Z = 1.0;
+		static bool CreateSharpRectangleEdges( BRepBuilderAPI_MakeWire wireBuilder, double halfL, double halfW )
+		{
+			gp_Pnt pTopRight = new gp_Pnt( halfL, halfW, LOCAL_ORIGIN_Z );
+			gp_Pnt pBotRight = new gp_Pnt( halfL, -halfW, LOCAL_ORIGIN_Z );
+			gp_Pnt pBotLeft = new gp_Pnt( -halfL, -halfW, LOCAL_ORIGIN_Z );
+			gp_Pnt pTopLeft = new gp_Pnt( -halfL, halfW, LOCAL_ORIGIN_Z );
 
-		public static bool CreateRunwayWireOnPlane( gp_Pnt centerPoint, double length, double width, gp_Pln plane, out TopoDS_Wire wire )
+			BRepBuilderAPI_MakeEdge eTopBuilder = new BRepBuilderAPI_MakeEdge( pTopLeft, pTopRight );
+			BRepBuilderAPI_MakeEdge eRightBuilder = new BRepBuilderAPI_MakeEdge( pTopRight, pBotRight );
+			BRepBuilderAPI_MakeEdge eBottomBuilder = new BRepBuilderAPI_MakeEdge( pBotRight, pBotLeft );
+			BRepBuilderAPI_MakeEdge eLeftBuilder = new BRepBuilderAPI_MakeEdge( pBotLeft, pTopLeft );
+			if( !eTopBuilder.IsDone() || !eRightBuilder.IsDone() || !eBottomBuilder.IsDone() || !eLeftBuilder.IsDone() ) {
+				return false;
+			}
+
+			wireBuilder.Add( eTopBuilder.Edge() );
+			wireBuilder.Add( eRightBuilder.Edge() );
+			wireBuilder.Add( eBottomBuilder.Edge() );
+			wireBuilder.Add( eLeftBuilder.Edge() );
+
+			return true;
+		}
+
+		#endregion
+
+		#region Runway Wire Creation
+
+		public static bool CreateRunwayWire( gp_Pnt centerPoint, double length, double width, gp_Pln plane, out TopoDS_Wire wire )
 		{
 			wire = null;
 
@@ -319,23 +282,23 @@ namespace MyCAM.StandardPatternFactory
 			if( length <= GEOMETRIC_TOLERANCE || width <= GEOMETRIC_TOLERANCE || width > length ) {
 				return false;
 			}
+
 			double radius = width / HALF_DIMENSION_FACTOR;
 			double straightLength = length - width;
+			double halfStraight = straightLength / HALF_DIMENSION_FACTOR;
+			double halfWidth = width / HALF_DIMENSION_FACTOR;
 
 			BRepBuilderAPI_MakeWire wireBuilder = new BRepBuilderAPI_MakeWire();
-			double halfLength = length / HALF_DIMENSION_FACTOR;
-			double halfWidth = width / HALF_DIMENSION_FACTOR;
-			double halfStraight = straightLength / HALF_DIMENSION_FACTOR;
 
 			// straight segment endpoints
-			gp_Pnt leftTop = new gp_Pnt( -halfStraight, halfWidth, LOCAL_Z_COORDINATE );
-			gp_Pnt rightTop = new gp_Pnt( halfStraight, halfWidth, LOCAL_Z_COORDINATE );
-			gp_Pnt rightBottom = new gp_Pnt( halfStraight, -halfWidth, LOCAL_Z_COORDINATE );
-			gp_Pnt leftBottom = new gp_Pnt( -halfStraight, -halfWidth, LOCAL_Z_COORDINATE );
+			gp_Pnt leftTop = new gp_Pnt( -halfStraight, halfWidth, LOCAL_ORIGIN_Z );
+			gp_Pnt rightTop = new gp_Pnt( halfStraight, halfWidth, LOCAL_ORIGIN_Z );
+			gp_Pnt rightBottom = new gp_Pnt( halfStraight, -halfWidth, LOCAL_ORIGIN_Z );
+			gp_Pnt leftBottom = new gp_Pnt( -halfStraight, -halfWidth, LOCAL_ORIGIN_Z );
 
 			// arc centers at both ends of straight segments
-			gp_Pnt leftCenter = new gp_Pnt( -halfStraight, LOCAL_Y_CENTER, LOCAL_Z_COORDINATE );
-			gp_Pnt rightCenter = new gp_Pnt( halfStraight, LOCAL_Y_CENTER, LOCAL_Z_COORDINATE );
+			gp_Pnt leftCenter = new gp_Pnt( -halfStraight, LOCAL_ORIGIN_Y, LOCAL_ORIGIN_Z );
+			gp_Pnt rightCenter = new gp_Pnt( halfStraight, LOCAL_ORIGIN_Y, LOCAL_ORIGIN_Z );
 
 			gp_Dir localZ = new gp_Dir( LOCAL_Z_DIRECTION_X, LOCAL_Z_DIRECTION_Y, LOCAL_Z_DIRECTION_Z );
 
@@ -368,68 +331,15 @@ namespace MyCAM.StandardPatternFactory
 			}
 			TopoDS_Wire localWire = wireBuilder.Wire();
 
-			// create target coordinate system
-			gp_Ax3 targetCoordSystem = new gp_Ax3( centerPoint, plane.Axis().Direction(), plane.XAxis().Direction() );
-
-			// create transformation matrix
-			gp_Trsf transformation = new gp_Trsf();
-			transformation.SetTransformation( targetCoordSystem, new gp_Ax3() );
-
-			// apply transformation
-			BRepBuilderAPI_Transform transformBuilder = new BRepBuilderAPI_Transform( localWire, transformation, true );
-			if( !transformBuilder.IsDone() ) {
-				return false;
-			}
-			wire = TopoDS.ToWire( transformBuilder.Shape() );
-			return true;
+			// transform to target plane
+			return TransformWireToPlane( localWire, centerPoint, plane, out wire );
 		}
-	}
 
-	internal static class PolygonFactory
-	{
-		// Tolerance for geometric comparisons
-		const double GEOMETRIC_TOLERANCE = 1e-9;
-		
-		// Polygon side constraints
-		const int MIN_POLYGON_SIDES = 3;
-		const int MAX_POLYGON_SIDES = 6;
-		
-		// Half dimension factor
-		const double HALF_DIMENSION_FACTOR = 2.0;
-		
-		// Local coordinate Z value (XY plane)
-		const double LOCAL_Z_COORDINATE = 0.0;
-		
-		// Local Z-axis direction (pointing up in XY plane)
-		const double LOCAL_Z_DIRECTION_X = 0.0;
-		const double LOCAL_Z_DIRECTION_Y = 0.0;
-		const double LOCAL_Z_DIRECTION_Z = 1.0;
-		
-		// Polygon-specific angle offsets
-		const int TRIANGLE_SIDES = 3;
-		const double TRIANGLE_ANGLE_OFFSET = Math.PI / 2.0;    // 90 degrees
-		
-		const int SQUARE_SIDES = 4;
-		const double SQUARE_ANGLE_OFFSET = Math.PI / 4.0;      // 45 degrees
-		
-		const int PENTAGON_SIDES = 5;
-		const double PENTAGON_ANGLE_OFFSET = Math.PI / 2.0;    // 90 degrees
-		
-		const int HEXAGON_SIDES = 6;
-		const double HEXAGON_ANGLE_OFFSET = 0.0;               // 0 degrees
-		
-		const double DEFAULT_ANGLE_OFFSET = 0.0;
-		
-		// Interior angle calculation constant
-		const int INTERIOR_ANGLE_NUMERATOR_OFFSET = 2;
-		
-		// Edge tangent distance multiplier
-		const double EDGE_TANGENT_MULTIPLIER = 2.0;
-		
-		// Zero radius threshold
-		const double ZERO_RADIUS_THRESHOLD = 0.0;
+		#endregion
 
-		public static bool CreatePolygonWireOnPlane( gp_Pnt centerPoint, int sides, double sideLength, double cornerRadius, gp_Pln plane, out TopoDS_Wire wire )
+		#region Polygon Wire Creation
+
+		public static bool CreatePolygonWire( gp_Pnt centerPoint, int sides, double sideLength, double cornerRadius, gp_Pln plane, out TopoDS_Wire wire )
 		{
 			wire = null;
 
@@ -451,26 +361,20 @@ namespace MyCAM.StandardPatternFactory
 				double angle = i * angleStep + angleOffset;
 				double x = radius * Math.Cos( angle );
 				double y = radius * Math.Sin( angle );
-				vertices[ i ] = new gp_Pnt( x, y, LOCAL_Z_COORDINATE );
+				vertices[ i ] = new gp_Pnt( x, y, LOCAL_ORIGIN_Z );
 			}
 
 			BRepBuilderAPI_MakeWire wireBuilder = new BRepBuilderAPI_MakeWire();
 
 			// create sharp-cornered polygon if fillet radius is 0 or very small
 			if( cornerRadius <= GEOMETRIC_TOLERANCE ) {
-				for( int i = 0; i < sides; i++ ) {
-					gp_Pnt startPoint = vertices[ i ];
-					gp_Pnt endPoint = vertices[ ( i + 1 ) % sides ];
-					BRepBuilderAPI_MakeEdge edgeBuilder = new BRepBuilderAPI_MakeEdge( startPoint, endPoint );
-					if( !edgeBuilder.IsDone() ) {
-						return false;
-					}
-					wireBuilder.Add( edgeBuilder.Edge() );
+				if( !CreateSharpPolygonEdges( wireBuilder, vertices, sides ) ) {
+					return false;
 				}
 			}
 			else {
-				// attempt to create rounded polygon
-				if( !CreateRoundedPolygonWire( wireBuilder, vertices, cornerRadius, sides ) ) {
+				// create rounded polygon
+				if( !CreateRoundedPolygonEdges( wireBuilder, vertices, cornerRadius, sides ) ) {
 					return false;
 				}
 			}
@@ -480,20 +384,8 @@ namespace MyCAM.StandardPatternFactory
 			}
 			TopoDS_Wire localWire = wireBuilder.Wire();
 
-			// create target coordinate system
-			gp_Ax3 targetCoordSystem = new gp_Ax3( centerPoint, plane.Axis().Direction(), plane.XAxis().Direction() );
-
-			// create transformation matrix
-			gp_Trsf transformation = new gp_Trsf();
-			transformation.SetTransformation( targetCoordSystem, new gp_Ax3() );
-
-			// apply transformation
-			BRepBuilderAPI_Transform transformBuilder = new BRepBuilderAPI_Transform( localWire, transformation, true );
-			if( !transformBuilder.IsDone() ) {
-				return false;
-			}
-			wire = TopoDS.ToWire( transformBuilder.Shape() );
-			return true;
+			// transform to target plane
+			return TransformWireToPlane( localWire, centerPoint, plane, out wire );
 		}
 
 		static double GetAngleOffsetForSides( int sides )
@@ -512,7 +404,21 @@ namespace MyCAM.StandardPatternFactory
 			}
 		}
 
-		static bool CreateRoundedPolygonWire( BRepBuilderAPI_MakeWire wireBuilder, gp_Pnt[] vertices, double cornerRadius, int sides )
+		static bool CreateSharpPolygonEdges( BRepBuilderAPI_MakeWire wireBuilder, gp_Pnt[] vertices, int sides )
+		{
+			for( int i = 0; i < sides; i++ ) {
+				gp_Pnt startPoint = vertices[ i ];
+				gp_Pnt endPoint = vertices[ ( i + 1 ) % sides ];
+				BRepBuilderAPI_MakeEdge edgeBuilder = new BRepBuilderAPI_MakeEdge( startPoint, endPoint );
+				if( !edgeBuilder.IsDone() ) {
+					return false;
+				}
+				wireBuilder.Add( edgeBuilder.Edge() );
+			}
+			return true;
+		}
+
+		static bool CreateRoundedPolygonEdges( BRepBuilderAPI_MakeWire wireBuilder, gp_Pnt[] vertices, double cornerRadius, int sides )
 		{
 			gp_Dir localZ = new gp_Dir( LOCAL_Z_DIRECTION_X, LOCAL_Z_DIRECTION_Y, LOCAL_Z_DIRECTION_Z );
 
@@ -557,7 +463,7 @@ namespace MyCAM.StandardPatternFactory
 
 			// add all edges and fillets
 			for( int i = 0; i < sides; i++ ) {
-				//add shortened straight edge
+				// add shortened straight edge
 				BRepBuilderAPI_MakeEdge edgeBuilder = new BRepBuilderAPI_MakeEdge( edgeStarts[ i ], edgeEnds[ i ] );
 				if( !edgeBuilder.IsDone() ) {
 					return false;
@@ -608,5 +514,81 @@ namespace MyCAM.StandardPatternFactory
 			wireBuilder.Add( arcEdgeBuilder.Edge() );
 			return true;
 		}
+
+		#endregion
+
+		#region Common Transformation Utilities
+
+		static bool TransformWireToPlane( TopoDS_Wire localWire, gp_Pnt centerPoint, gp_Pln plane, out TopoDS_Wire wire )
+		{
+			wire = null;
+
+			// create target coordinate system
+			gp_Ax3 targetCoordSystem = new gp_Ax3( centerPoint, plane.Axis().Direction(), plane.XAxis().Direction() );
+
+			// create transformation
+			gp_Trsf transformation = new gp_Trsf();
+			transformation.SetTransformation( targetCoordSystem, new gp_Ax3() );
+
+			// apply transformation
+			BRepBuilderAPI_Transform transformBuilder = new BRepBuilderAPI_Transform( localWire, transformation, true );
+			if( !transformBuilder.IsDone() ) {
+				return false;
+			}
+
+			wire = TopoDS.ToWire( transformBuilder.Shape() );
+			return true;
+		}
+
+		#endregion
+
+		// tolerance for geometric comparisons
+		public const double GEOMETRIC_TOLERANCE = 1e-9;
+
+		// half dimension factor for calculating half measurements
+		public const double HALF_DIMENSION_FACTOR = 2.0;
+
+		// diameter to radius conversion factor
+		public const double DIAMETER_TO_RADIUS_FACTOR = 2.0;
+
+		// local coordinate system origin (XY plane)
+		public const double LOCAL_ORIGIN_X = 0.0;
+		public const double LOCAL_ORIGIN_Y = 0.0;
+		public const double LOCAL_ORIGIN_Z = 0.0;
+
+		// local Z-axis direction (pointing up in XY plane)
+		public const double LOCAL_Z_DIRECTION_X = 0.0;
+		public const double LOCAL_Z_DIRECTION_Y = 0.0;
+		public const double LOCAL_Z_DIRECTION_Z = 1.0;
+
+		// zero radius threshold for sharp corners
+		public const double ZERO_RADIUS_THRESHOLD = 0.0;
+
+		// polygon side constraints
+		const int MIN_POLYGON_SIDES = 3;
+		const int MAX_POLYGON_SIDES = 6;
+
+		// polygon-specific angle offsets
+		const int TRIANGLE_SIDES = 3;
+		const double TRIANGLE_ANGLE_OFFSET = Math.PI / 2.0;    // 90 degrees
+
+		const int SQUARE_SIDES = 4;
+		const double SQUARE_ANGLE_OFFSET = Math.PI / 4.0;      // 45 degrees
+
+		const int PENTAGON_SIDES = 5;
+		const double PENTAGON_ANGLE_OFFSET = Math.PI / 2.0;    // 90 degrees
+
+		const int HEXAGON_SIDES = 6;
+		const double HEXAGON_ANGLE_OFFSET = 0.0;               // 0 degrees
+
+		const double DEFAULT_ANGLE_OFFSET = 0.0;
+
+		// interior angle calculation constant
+		const int INTERIOR_ANGLE_NUMERATOR_OFFSET = 2;
+
+		// edge tangent distance multiplier
+		const double EDGE_TANGENT_MULTIPLIER = 2.0;
 	}
+
+	#endregion
 }
