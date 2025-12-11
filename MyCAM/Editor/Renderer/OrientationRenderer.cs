@@ -177,7 +177,7 @@ namespace MyCAM.Editor.Renderer
 			if( !PathCacheProvider.TryGetMainPathStartPointCache( pathID, out IMainPathStartPointCache mainPathStartPointCache ) ) {
 				return null;
 			}
-			if( mainPathStartPointCache.GetMainPathStartCAMPoint() == null || !( mainPathStartPointCache is IOrientationPoint orientationPoint ) ) {
+			if( mainPathStartPointCache.GetMainPathStartCAMPoint() == null || !( mainPathStartPointCache.GetMainPathStartCAMPoint() is IOrientationPoint orientationPoint ) ) {
 				return null;
 			}
 			return orientationPoint;
