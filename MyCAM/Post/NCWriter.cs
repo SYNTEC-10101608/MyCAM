@@ -47,10 +47,12 @@ namespace MyCAM.Post
 
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
-					Dictionary<string, PathObject> pathObjectDict = DataGettingHelper.GetPathObjectDictionary();
 					PathType pathType;
 					for( int i = 0; i < m_PathIDList.Count; i++ ) {
-						pathType = pathObjectDict[ m_PathIDList[ i ] ].PathType;
+						if( !DataGettingHelper.TryGetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
+							continue;
+						}
+						pathType = pathObject.PathType;
 						if( pathType == PathType.Contour ) {
 
 							// solve all post data of the path
@@ -73,11 +75,7 @@ namespace MyCAM.Post
 								errorMessage = "路徑資訊取得錯誤，路徑：" + ( i ).ToString();
 								return false;
 							}
-							if( !pathObjectDict.TryGetValue( m_PathIDList[ i ], out PathObject pathobject ) ) {
-								errorMessage = "路徑資訊取得錯誤，路徑：" + ( i ).ToString();
-								return false;
-							}
-							WriteStandardPatternCutting( pathType, postData, pathobject.CraftData, geomData, i + 1 );
+							WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, geomData, i + 1 );
 						}
 					}
 

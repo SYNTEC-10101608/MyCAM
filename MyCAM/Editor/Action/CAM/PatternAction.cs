@@ -86,12 +86,11 @@ namespace MyCAM.Editor
 		void PatternCreate( IStandardPatternGeomData standardPatternGeomData )
 		{
 			TopoDS_Shape shape = null;
-			Dictionary<string, PathObject> pathObjectDict = DataGettingHelper.GetPathObjectDictionary();
 			foreach( var szID in m_szPathIDList ) {
-				if( !pathObjectDict.ContainsKey( szID ) || pathObjectDict[ szID ] == null ) {
+				if( !DataGettingHelper.TryGetPathObject( szID, out PathObject pathObject ) ) {
 					continue;
 				}
-				if( !DataGettingHelper.GetContourPathObject( pathObjectDict[ szID ], out ContourPathObject contourPathObject ) ) {
+				if( !DataGettingHelper.GetContourPathObject( pathObject, out ContourPathObject contourPathObject ) ) {
 					continue;
 				}
 
@@ -103,7 +102,7 @@ namespace MyCAM.Editor
 					shape = standardPatternFactory.GetShape();
 				}
 
-				m_DataManager.ObjectMap[ szID ] = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, pathObjectDict[ szID ] );
+				m_DataManager.ObjectMap[ szID ] = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, pathObject );
 				UpdateCanvasPattern( szID, shape );
 			}
 			m_Viewer.UpdateView();

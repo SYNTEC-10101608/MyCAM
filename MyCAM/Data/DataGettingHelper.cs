@@ -1,6 +1,5 @@
-﻿using MyCAM.CacheInfo;
-using System.Collections.Generic;
-using System.Linq;
+﻿using MyCAM.App;
+using MyCAM.CacheInfo;
 
 namespace MyCAM.Data
 {
@@ -13,11 +12,6 @@ namespace MyCAM.Data
 			m_DataManager = dataManager;
 		}
 
-		public static Dictionary<string, PathObject> GetPathObjectDictionary()
-		{
-			return m_DataManager.ObjectMap.Values.OfType<PathObject>().ToDictionary( obj => obj.UID );
-		}
-
 		#region GeomData and PathObject Access
 
 		public static bool GetGeomDataByID( string pathID, out IGeomData geomData )
@@ -27,7 +21,7 @@ namespace MyCAM.Data
 				return false;
 			}
 
-			// Use unified GeomData property from StandardPatternBasedPathObject
+			// use unified GeomData property from StandardPatternBasedPathObject
 			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
 				geomData = standardPatternPathObject.GeomData;
 				return true;
@@ -63,7 +57,7 @@ namespace MyCAM.Data
 				return false;
 			}
 
-			// Use unified ContourPathObject property from StandardPatternBasedPathObject
+			// use unified ContourPathObject property from StandardPatternBasedPathObject
 			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
 				contourPathObj = standardPatternPathObject.ContourPathObject;
 				return true;
@@ -86,7 +80,7 @@ namespace MyCAM.Data
 				return false;
 			}
 
-			// Use unified CacheInfo property from StandardPatternBasedPathObject
+			// use unified CacheInfo property from StandardPatternBasedPathObject
 			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
 				processPathStartEndCache = standardPatternPathObject.CacheInfo as IProcessPathStartEndCache;
 				return processPathStartEndCache != null;
@@ -105,9 +99,10 @@ namespace MyCAM.Data
 				return false;
 			}
 
-			// Use unified CacheInfo property from StandardPatternBasedPathObject
+			// use unified CacheInfo property from StandardPatternBasedPathObject
 			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
-				// CacheInfo implements IStandardPatternCacheInfo which has GetProcessRefPoint
+
+				// cacheInfo implements IStandardPatternCacheInfo which has GetProcessRefPoint
 				if( standardPatternPathObject.CacheInfo is IStandardPatternCacheInfo standardCacheInfo ) {
 					refPoint = standardCacheInfo.GetProcessRefPoint();
 					return true;
@@ -161,36 +156,29 @@ namespace MyCAM.Data
 			return PathCacheProvider.TryGetOverCutCache( pathObject, out overCutCache );
 		}
 
-		#endregion
 
-		#region Private Helper Methods
-
-		/// <summary>
-		/// Safely retrieves a PathObject by ID with null and existence checks
-		/// </summary>
-		/// <param name="szPathID">The path ID to retrieve</param>
-		/// <param name="pathObject">The retrieved PathObject, or null if not found</param>
-		/// <returns>True if the PathObject was successfully retrieved, false otherwise</returns>
-		static bool TryGetPathObject( string szPathID, out PathObject pathObject )
+		public static bool TryGetPathObject( string szPathID, out PathObject pathObject )
 		{
 			pathObject = null;
 
-			// Validate input
+			// validate input
 			if( string.IsNullOrEmpty( szPathID ) ) {
 				return false;
 			}
 
-			// Get the dictionary once to avoid multiple calls
-			Dictionary<string, PathObject> pathObjectDict = GetPathObjectDictionary();
-
-			// Check if key exists and retrieve PathObject
-			if( !pathObjectDict.TryGetValue( szPathID, out pathObject ) || pathObject == null ) {
+			if( string.IsNullOrEmpty( szPathID )
+				|| m_DataManager.ObjectMap.ContainsKey( szPathID ) == false
+				|| m_DataManager.ObjectMap[ szPathID ] == null
+				|| m_DataManager.ObjectMap[ szPathID ] is PathObject pathObj == false
+				|| pathObj.CraftData == null ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
 				return false;
 			}
 
+			pathObject = pathObj;
 			return true;
 		}
-
 		#endregion
+
 	}
 }
