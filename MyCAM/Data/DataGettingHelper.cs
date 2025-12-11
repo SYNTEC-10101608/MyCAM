@@ -9,7 +9,7 @@ namespace MyCAM.Data
 
 		internal static void Initialize( DataManager dataManager )
 		{
-			if( m_DataManager == null ) {
+			if( dataManager == null ) {
 				return;
 			}
 			m_DataManager = dataManager;
@@ -101,13 +101,12 @@ namespace MyCAM.Data
 			if( string.IsNullOrEmpty( szPathID )
 				|| m_DataManager.ObjectMap.ContainsKey( szPathID ) == false
 				|| m_DataManager.ObjectMap[ szPathID ] == null
-				|| m_DataManager.ObjectMap[ szPathID ] is PathObject pathObj == false
-				|| pathObj.CraftData == null ) {
+				|| !( m_DataManager.ObjectMap[ szPathID ] is PathObject ) ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
 				return false;
 			}
 
-			pathObject = pathObj;
+			pathObject = m_DataManager.ObjectMap[ szPathID ] as PathObject;
 			return true;
 		}
 	}
