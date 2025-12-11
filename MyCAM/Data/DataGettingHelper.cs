@@ -9,10 +9,11 @@ namespace MyCAM.Data
 
 		internal static void Initialize( DataManager dataManager )
 		{
+			if( m_DataManager == null ) {
+				return;
+			}
 			m_DataManager = dataManager;
 		}
-
-		#region GeomData and PathObject Access
 
 		public static bool GetGeomDataByID( string pathID, out IGeomData geomData )
 		{
@@ -69,29 +70,6 @@ namespace MyCAM.Data
 			return false;
 		}
 
-		#endregion
-
-		#region Cache Access - Unified Pattern
-
-		public static bool GetProcessPathStartEndCacheByID( string pathID, out IProcessPathStartEndCache processPathStartEndCache )
-		{
-			processPathStartEndCache = null;
-			if( !TryGetPathObject( pathID, out PathObject pathObject ) ) {
-				return false;
-			}
-
-			// use unified CacheInfo property from StandardPatternBasedPathObject
-			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
-				processPathStartEndCache = standardPatternPathObject.CacheInfo as IProcessPathStartEndCache;
-				return processPathStartEndCache != null;
-			}
-			else if( pathObject is ContourPathObject contourPathObject ) {
-				processPathStartEndCache = contourPathObject.ContourCacheInfo;
-				return true;
-			}
-			return false;
-		}
-
 		public static bool GetReferencePoint( string pathID, out IProcessPoint refPoint )
 		{
 			refPoint = null;
@@ -103,59 +81,13 @@ namespace MyCAM.Data
 			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
 
 				// cacheInfo implements IStandardPatternCacheInfo which has GetProcessRefPoint
-				if( standardPatternPathObject.CacheInfo is IStandardPatternCacheInfo standardCacheInfo ) {
-					refPoint = standardCacheInfo.GetProcessRefPoint();
+				if( standardPatternPathObject.StandatdPatternCacheInfo is IStandardPatternRefPointCache refPointCache ) {
+					refPoint = refPointCache.GetProcessRefPoint();
 					return true;
 				}
 			}
 			return false;
 		}
-
-		public static bool GetMainPathStartPointCache( string szPathID, out IMainPathStartPointCache mainPathStartPoint )
-		{
-			mainPathStartPoint = null;
-			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
-				return false;
-			}
-			return PathCacheProvider.TryGetMainPathStartPointCache( pathObject, out mainPathStartPoint );
-		}
-
-		public static bool GetLeadCache( string szPathID, out ILeadCache leadCache )
-		{
-			leadCache = null;
-			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
-				return false;
-			}
-			return PathCacheProvider.TryGetLeadCache( pathObject, out leadCache );
-		}
-
-		public static bool GetPathReverseCache( string szPathID, out IPathReverseCache pathReverseCache )
-		{
-			pathReverseCache = null;
-			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
-				return false;
-			}
-			return PathCacheProvider.TryGetPathReverseCache( pathObject, out pathReverseCache );
-		}
-
-		public static bool GetToolVecCache( string szPathID, out IToolVecCache toolVecCache )
-		{
-			toolVecCache = null;
-			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
-				return false;
-			}
-			return PathCacheProvider.TryGetToolVecCache( pathObject, out toolVecCache );
-		}
-
-		public static bool GetOverCutCache( string szPathID, out IOverCutCache overCutCache )
-		{
-			overCutCache = null;
-			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
-				return false;
-			}
-			return PathCacheProvider.TryGetOverCutCache( pathObject, out overCutCache );
-		}
-
 
 		public static bool TryGetPathObject( string szPathID, out PathObject pathObject )
 		{
@@ -178,7 +110,5 @@ namespace MyCAM.Data
 			pathObject = pathObj;
 			return true;
 		}
-		#endregion
-
 	}
 }

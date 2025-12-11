@@ -4,19 +4,13 @@ using System;
 
 namespace MyCAM.CacheInfo
 {
-	/// <summary>
-	/// Strategy interface for creating CacheInfo objects
-	/// </summary>
 	internal interface IStandardPatternCacheInfoStrategy
 	{
 		IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData standardPatternGeomData, CraftData craftData );
 	}
 
-	/// <summary>
-	/// Generic strategy implementation for creating specific CacheInfo types
-	/// </summary>
 	internal class StandardPatternCacheInfoStrategy<TCacheInfo> : IStandardPatternCacheInfoStrategy
-		where TCacheInfo : class, IStandardPatternCacheInfo
+		where TCacheInfo : IStandardPatternCacheInfo
 	{
 		readonly Func<gp_Ax3, IStandardPatternGeomData, CraftData, TCacheInfo> m_CacheInfoFactory;
 
@@ -38,34 +32,21 @@ namespace MyCAM.CacheInfo
 		}
 	}
 
-	/// <summary>
-	/// Factory for creating standard pattern CacheInfo objects
-	/// Uses strategy pattern to delegate creation based on PathType
-	/// External callers only need to provide: gp_Ax3, IStandardPatternGeomData, CraftData
-	/// Returns IStandardPatternCacheInfo interface
-	/// </summary>
 	internal static class StandardPatternCacheInfoFactory
 	{
-		// Strategy instances for each pattern type
 		static readonly IStandardPatternCacheInfoStrategy s_CircleStrategy =
 			new StandardPatternCacheInfoStrategy<CircleCacheInfo>(
 				( coord, geom, craft ) => new CircleCacheInfo( coord, geom, craft ) );
-
 		static readonly IStandardPatternCacheInfoStrategy s_RectangleStrategy =
 			new StandardPatternCacheInfoStrategy<RectangleCacheInfo>(
 				( coord, geom, craft ) => new RectangleCacheInfo( coord, geom, craft ) );
-
 		static readonly IStandardPatternCacheInfoStrategy s_RunwayStrategy =
 			new StandardPatternCacheInfoStrategy<RunwayCacheInfo>(
 				( coord, geom, craft ) => new RunwayCacheInfo( coord, geom, craft ) );
-
 		static readonly IStandardPatternCacheInfoStrategy s_PolygonStrategy =
 			new StandardPatternCacheInfoStrategy<PolygonCacheInfo>(
 				( coord, geom, craft ) => new PolygonCacheInfo( coord, geom, craft ) );
 
-		/// <summary>
-		/// Gets the appropriate strategy based on PathType
-		/// </summary>
 		public static IStandardPatternCacheInfoStrategy GetStrategy( PathType pathType )
 		{
 			switch( pathType ) {
@@ -86,11 +67,6 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		/// <summary>
-		/// Unified entry point for creating CacheInfo
-		/// Automatically determines the correct strategy based on PathType
-		/// Returns IStandardPatternCacheInfo interface for type safety
-		/// </summary>
 		public static IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData standardPatternGeomData, CraftData craftData )
 		{
 			if( standardPatternGeomData == null ) {

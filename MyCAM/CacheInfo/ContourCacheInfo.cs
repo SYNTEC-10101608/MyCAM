@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class ContourCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache
+	public class ContourCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache, ICacheInfo
 	{
 		public ContourCacheInfo( ContourGeomData geomData, CraftData craftData )
 		{

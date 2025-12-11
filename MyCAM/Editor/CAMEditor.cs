@@ -447,7 +447,7 @@ namespace MyCAM.Editor
 			string szStartPathID = szPathIDList[ 0 ];
 
 			// get start point
-			if( !DataGettingHelper.GetProcessPathStartEndCacheByID( szStartPathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
+			if( !PathCacheProvider.TryGetProcessPathStartEndCache( szStartPathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
 				return;
 			}
 			gp_Pnt currentPoint = processPathStartEndCache.GetProcessStartPoint().Point;
@@ -470,7 +470,7 @@ namespace MyCAM.Editor
 					if( visited[ i ] ) {
 						continue;
 					}
-					if( !DataGettingHelper.GetProcessPathStartEndCacheByID( pathIDList[ i ], out IProcessPathStartEndCache nextProcessPathStartEndCache ) ) {
+					if( !PathCacheProvider.TryGetProcessPathStartEndCache( pathIDList[ i ], out IProcessPathStartEndCache nextProcessPathStartEndCache ) ) {
 						return;
 					}
 					gp_Pnt nextStartPoint = nextProcessPathStartEndCache.GetProcessStartPoint().Point;

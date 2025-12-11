@@ -184,7 +184,7 @@ namespace MyCAM.Editor.Renderer
 
 		IProcessPoint GetProcessStartPoint( string pathID )
 		{
-			if( !DataGettingHelper.GetProcessPathStartEndCacheByID( pathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
+			if( !PathCacheProvider.TryGetProcessPathStartEndCache( pathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
 				return null;
 			}
 			return processPathStartEndCache?.GetProcessStartPoint();
@@ -192,7 +192,7 @@ namespace MyCAM.Editor.Renderer
 
 		IProcessPoint GetProcessEndPoint( string pathID )
 		{
-			if( !DataGettingHelper.GetProcessPathStartEndCacheByID( pathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
+			if( !PathCacheProvider.TryGetProcessPathStartEndCache( pathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
 				return null;
 			}
 			return processPathStartEndCache?.GetProcessEndPoint();

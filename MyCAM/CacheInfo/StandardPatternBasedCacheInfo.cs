@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public abstract class StandardPatternBasedCacheInfo : IStandardPatternCacheInfo, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache
+	public abstract class StandardPatternBasedCacheInfo : IStandardPatternCacheInfo, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache, IStandardPatternRefPointCache
 	{
 		protected StandardPatternBasedCacheInfo( gp_Ax3 coordinateInfo, CraftData craftData )
 		{

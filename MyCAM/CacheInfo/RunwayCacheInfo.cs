@@ -24,31 +24,29 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		/// <summary>
-		/// Override GetProcessRefPoint for Runway-specific calculation
-		/// </summary>
 		public override IProcessPoint GetProcessRefPoint()
 		{
-			// Calculate runway parameters
+			// calculate runway parameters
 			double length = m_RunwayGeomData.Length;
 			double width = m_RunwayGeomData.Width;
 			double radius = width / 2.0;
 			double straightLength = length - width;
 
-			// Left arc center position in local coordinate system
+			// left arc center position in local coordinate system
 			gp_Pnt leftArcCenter;
 
 			if( straightLength <= 0.001 ) {
-				// Pure circle case: center is at origin
+
+				// pure circle case: center is at origin
 				leftArcCenter = new gp_Pnt( 0, 0, 0 );
 			}
 			else {
-				// Runway shape: left arc center is at (-straightLength/2, 0, 0)
+				// runway shape: left arc center is at (-straightLength/2, 0, 0)
 				double halfStraight = straightLength / 2.0;
 				leftArcCenter = new gp_Pnt( -halfStraight, 0, 0 );
 			}
 
-			// Transform local coordinates to world coordinate system
+			// transform local coordinates to world coordinate system
 			gp_Ax3 targetCoordSystem = new gp_Ax3(
 				CoordinateInfo.Location(),
 				CoordinateInfo.Direction(),

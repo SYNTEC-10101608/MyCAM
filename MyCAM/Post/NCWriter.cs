@@ -285,7 +285,7 @@ namespace MyCAM.Post
 			if( !DataGettingHelper.GetReferencePoint( szID, out IProcessPoint refPoint ) ) {
 				return null;
 			}
-			if( !DataGettingHelper.GetMainPathStartPointCache( szID, out IMainPathStartPointCache mainPathStartPoint ) ) {
+			if( !PathCacheProvider.TryGetMainPathStartPointCache( szID, out IMainPathStartPointCache mainPathStartPoint ) ) {
 				return null;
 			}
 
