@@ -22,14 +22,9 @@ namespace MyCAM.Data
 		void DoTransform( gp_Trsf transform );
 	}
 
-	public interface ICenterAvgDir
+	public interface IRefCenterDir
 	{
-		gp_Pnt CenterPnt
-		{
-			get;
-		}
-
-		gp_Dir AverageNormalDir
+		gp_Ax1 RefCenterDir
 		{
 			get;
 		}
@@ -43,11 +38,11 @@ namespace MyCAM.Data
 		}
 	}
 
-	public interface IContourGeomData : IGeomData, ITransformableGeom, ICenterAvgDir
+	public interface IContourGeomData : IGeomData, ITransformableGeom, IRefCenterDir
 	{
 	}
 
-	public interface IStdPatternGeomData : IGeomData, ITransformableGeom, IRotatable, ICenterAvgDir
+	public interface IStdPatternGeomData : IGeomData, ITransformableGeom, IRotatable
 	{
 	}
 }

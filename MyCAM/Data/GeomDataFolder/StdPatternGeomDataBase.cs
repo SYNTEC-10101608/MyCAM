@@ -29,32 +29,13 @@ namespace MyCAM.Data
 			}
 		}
 
-		public gp_Pnt CenterPnt
-		{
-			get
-			{
-				return new gp_Pnt( m_OriCenterPnt.XYZ() );
-			}
-		}
-
-		public gp_Dir AverageNormalDir
-		{
-			get
-			{
-				return new gp_Dir( m_AverageNormalDir.XYZ() );
-			}
-		}
-
 		public virtual void DoTransform( gp_Trsf transform )
 		{
-			m_OriCenterPnt.Transform( transform );
-			m_AverageNormalDir.Transform( transform );
+			// currently no implementation
 		}
 
 		public abstract IGeomData Clone();
 
 		protected double m_RotatedAngle_deg;
-		gp_Pnt m_OriCenterPnt;
-		gp_Dir m_AverageNormalDir;
 	}
 }

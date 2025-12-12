@@ -7,13 +7,13 @@ namespace MyCAM.StandardPatternFactory
 {
 	public class PatternFactory
 	{
-		public PatternFactory( ICenterAvgDir standardPatternInfo, IStdPatternGeomData standardPatternGeomData )
+		public PatternFactory( IRefCenterDir standardPatternInfo, IStdPatternGeomData standardPatternGeomData )
 		{
 			if( standardPatternInfo == null ) {
 				throw new ArgumentNullException( "PatternFactory constructing argument null" );
 			}
-			m_CenterPoint = standardPatternInfo.CenterPnt;
-			m_NormalDir = standardPatternInfo.AverageNormalDir;
+			m_CenterPoint = standardPatternInfo.RefCenterDir.Location();
+			m_NormalDir = standardPatternInfo.RefCenterDir.Direction();
 			m_StandardPatternGeomData = standardPatternGeomData;
 
 			// get rotation angle from IRotatable interface if the geometry supports rotation

@@ -130,10 +130,9 @@ namespace MyCAM.Helper
 			return true;
 		}
 
-		public static void GetContourCenterPointAndNormalDir( List<CADPoint> points, out gp_Pnt originalPoint, out gp_Dir normalDirect )
+		public static void GetRefCoordFromContour( List<CADPoint> points, out gp_Ax1 refCoord )
 		{
-			originalPoint = new gp_Pnt();
-			normalDirect = new gp_Dir();
+			refCoord = new gp_Ax1();
 
 			if( points == null || points.Count == 0 ) {
 				return;
@@ -155,8 +154,9 @@ namespace MyCAM.Helper
 				yDirValue += point.NormalVec_1st.Y();
 				zDirValue += point.NormalVec_1st.Z();
 			}
-			originalPoint.SetCoord( xValue / nPointNumber, yValue / nPointNumber, zValue / nPointNumber );
-			normalDirect.SetCoord( xDirValue / nPointNumber, yDirValue / nPointNumber, zDirValue / nPointNumber );
+			gp_Pnt p = new gp_Pnt( xValue / nPointNumber, yValue / nPointNumber, zValue / nPointNumber );
+			gp_Dir d = new gp_Dir( xDirValue / nPointNumber, yDirValue / nPointNumber, zDirValue / nPointNumber );
+			refCoord = new gp_Ax1( p, d );
 		}
 
 		const double DISCRETE_MAX_DEFLECTION = 0.01;

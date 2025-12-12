@@ -18,7 +18,7 @@ namespace MyCAM.Data
 			m_IsClosed = isClosed;
 			DisctereContourHelper.BuildContourGeomData( pathDataList, isClosed,
 				out m_CADPointList, out m_ConnectPointMap );
-			DisctereContourHelper.GetContourCenterPointAndNormalDir( m_CADPointList, out m_OriCenterPnt, out m_AverageNormalDir );
+			DisctereContourHelper.GetRefCoordFromContour( m_CADPointList, out m_RefCoord );
 		}
 
 		public ContourGeomData( List<CADPoint> cadPointList, Dictionary<CADPoint, CADPoint> connectPointMap, bool isClosed )
@@ -32,7 +32,7 @@ namespace MyCAM.Data
 			m_CADPointList = cadPointList;
 			m_ConnectPointMap = connectPointMap;
 			m_IsClosed = isClosed;
-			DisctereContourHelper.GetContourCenterPointAndNormalDir( m_CADPointList, out m_OriCenterPnt, out m_AverageNormalDir );
+			DisctereContourHelper.GetRefCoordFromContour( m_CADPointList, out m_RefCoord );
 		}
 
 		public PathType PathType
@@ -67,19 +67,11 @@ namespace MyCAM.Data
 			}
 		}
 
-		public gp_Pnt CenterPnt
+		public gp_Ax1 RefCenterDir
 		{
 			get
 			{
-				return new gp_Pnt( m_OriCenterPnt.XYZ() );
-			}
-		}
-
-		public gp_Dir AverageNormalDir
-		{
-			get
-			{
-				return new gp_Dir( m_AverageNormalDir.XYZ() );
+				return new gp_Ax1( m_RefCoord.Location(), m_RefCoord.Direction() );
 			}
 		}
 
@@ -91,8 +83,7 @@ namespace MyCAM.Data
 			foreach( var oneConnectPoint in m_ConnectPointMap ) {
 				oneConnectPoint.Value.Transform( transform );
 			}
-			m_OriCenterPnt.Transform( transform );
-			m_AverageNormalDir.Transform( transform );
+			m_RefCoord.Transform( transform );
 		}
 
 		public IGeomData Clone()
@@ -102,8 +93,7 @@ namespace MyCAM.Data
 
 		List<CADPoint> m_CADPointList;
 		Dictionary<CADPoint, CADPoint> m_ConnectPointMap;
-		gp_Pnt m_OriCenterPnt;
-		gp_Dir m_AverageNormalDir;
+		gp_Ax1 m_RefCoord;
 		bool m_IsClosed;
 	}
 }
