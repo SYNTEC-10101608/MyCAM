@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.Aspect;
@@ -13,6 +10,9 @@ using OCC.TopExp;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -296,7 +296,10 @@ namespace MyCAM.Editor
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ObjectMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_FACE );
+					if( !DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObj ) ) {
+						continue;
+					}
+					TopExp_Explorer expMove = new TopExp_Explorer( shapeObj.Shape, TopAbs_ShapeEnum.TopAbs_FACE );
 					while( expMove.More() ) {
 						TopoDS_Shape face = expMove.Current();
 						if( sel.IsEqual( face ) ) {
@@ -323,7 +326,10 @@ namespace MyCAM.Editor
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ObjectMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
+					if( !DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObj ) ) {
+						continue;
+					}
+					TopExp_Explorer expMove = new TopExp_Explorer( shapeObj.Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
 					while( expMove.More() ) {
 						TopoDS_Shape face = expMove.Current();
 						if( sel.IsEqual( face ) ) {
@@ -350,7 +356,10 @@ namespace MyCAM.Editor
 					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 						continue;
 					}
-					TopExp_Explorer expMove = new TopExp_Explorer( m_DataManager.ObjectMap[ partID ].Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
+					if( !DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObj ) ) {
+						continue;
+					}
+					TopExp_Explorer expMove = new TopExp_Explorer( shapeObj.Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
 					while( expMove.More() ) {
 						TopoDS_Shape vertex = expMove.Current();
 						if( sel.IsEqual( vertex ) ) {

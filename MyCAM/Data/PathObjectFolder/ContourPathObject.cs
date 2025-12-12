@@ -47,14 +47,6 @@ namespace MyCAM.Data
 			}
 		}
 
-		public override CraftData CraftData
-		{
-			get
-			{
-				return m_CraftData;
-			}
-		}
-
 		public ContourCacheInfo ContourCacheInfo
 		{
 			get
@@ -106,7 +98,6 @@ namespace MyCAM.Data
 		}
 
 		ContourGeomData m_ContourGeomData;
-		CraftData m_CraftData;
 		ContourCacheInfo m_ContourCacheInfo;
 	}
 }

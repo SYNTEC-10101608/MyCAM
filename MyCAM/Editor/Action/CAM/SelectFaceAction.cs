@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.TopAbs;
@@ -10,6 +7,9 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -37,7 +37,10 @@ namespace MyCAM.Editor
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
 				}
-				TopoDS_Shape oneshape = m_DataManager.ObjectMap[ partID ].Shape;
+				if( !DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObject ) ) {
+					continue;
+				}
+				TopoDS_Shape oneshape = shapeObject.Shape;
 
 				// collect all faces
 				TopExp_Explorer exp = new TopExp_Explorer( oneshape, TopAbs_ShapeEnum.TopAbs_FACE );

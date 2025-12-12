@@ -551,7 +551,10 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szNodeID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ObjectMap[ szID ].Shape, 3.0 );
+				if( !DataGettingHelper.GetShapeObject( szID, out IShapeObject shapeObj ) ) {
+					continue;
+				}
+				AIS_Shape aisShape = ViewHelper.CreatePathAIS( shapeObj.Shape, 3.0 );
 				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
@@ -612,7 +615,7 @@ namespace MyCAM.Editor
 			// take all path IDs
 			List<string> pathIDList = m_DataManager.PathIDList;
 			ShowCAMData( pathIDList );
-			}
+		}
 
 		void ShowCAMData( List<string> pathIDList )
 		{
@@ -622,13 +625,13 @@ namespace MyCAM.Editor
 			m_CraftRenderer.Show( pathIDList );
 			m_TraverseRenderer.Show();
 			m_Viewer.UpdateView();
-			}
+		}
 
 		void RemoveAllCAMData()
 		{
 			List<string> pathIDList = m_DataManager.PathIDList;
 			RemoveCAMData( pathIDList );
-			}
+		}
 
 		void RemoveCAMData( List<string> pathIDList )
 		{

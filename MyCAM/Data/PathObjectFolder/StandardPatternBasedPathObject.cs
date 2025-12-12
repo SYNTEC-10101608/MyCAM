@@ -44,14 +44,6 @@ namespace MyCAM.Data
 			}
 		}
 
-		public override CraftData CraftData
-		{
-			get
-			{
-				return m_CraftData;
-			}
-		}
-
 		public ContourPathObject ContourPathObject
 		{
 			get
@@ -90,7 +82,6 @@ namespace MyCAM.Data
 		}
 
 		IStandardPatternGeomData m_GeomData;
-		CraftData m_CraftData;
 		StandardPatternBasedCacheInfo m_StandatdPatternCacheInfo;
 		ContourPathObject m_ContourPathObject;
 	}

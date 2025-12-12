@@ -13,22 +13,31 @@ namespace MyCAM.Data
 			get;
 		}
 
-		TopoDS_Shape Shape
-		{
-			get;
-		}
-
 		ObjectType ObjectType
 		{
 			get;
 		}
+	}
 
+	public interface IShapeObject
+	{
+		TopoDS_Shape Shape
+		{
+			get;
+		}
+	}
+
+	public interface ITransformableObject
+	{
 		void DoTransform( gp_Trsf transform );
+	}
 
+	public interface ISewableObject : IShapeObject
+	{
 		void SewShape( double sewTol );
 	}
 
-	public class PartObject : IObject
+	public class PartObject : IObject, IShapeObject, ITransformableObject, ISewableObject
 	{
 		public PartObject( string szUID, TopoDS_Shape shape )
 		{
@@ -54,7 +63,6 @@ namespace MyCAM.Data
 			}
 		}
 
-
 		public virtual void SewShape( double sewTol )
 		{
 			TopoDS_Shape result = ShapeTool.SewShape( new List<TopoDS_Shape>() { Shape }, sewTol );
@@ -74,7 +82,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	public abstract class PathObject : IObject
+	public abstract class PathObject : IObject, IShapeObject, ITransformableObject
 	{
 		protected PathObject( string szUID, TopoDS_Shape shape )
 		{
@@ -100,23 +108,17 @@ namespace MyCAM.Data
 			}
 		}
 
-		public abstract CraftData CraftData
+		public CraftData CraftData
 		{
-			get;
+			get
+			{
+				return m_CraftData;
+			}
 		}
 
 		public abstract PathType PathType
 		{
 			get;
-		}
-
-		public virtual void SewShape( double sewTol )
-		{
-			TopoDS_Shape result = ShapeTool.SewShape( new List<TopoDS_Shape>() { Shape }, sewTol );
-			if( result == null || result.IsNull() ) {
-				return;
-			}
-			Shape = result;
 		}
 
 		public virtual void DoTransform( gp_Trsf transform )
@@ -127,6 +129,8 @@ namespace MyCAM.Data
 			}
 			Shape = shapeTransform.Shape();
 		}
+
+		protected CraftData m_CraftData;
 	}
 
 	public class PathEdge5D

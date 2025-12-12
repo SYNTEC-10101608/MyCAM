@@ -232,7 +232,10 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( m_DataManager.ObjectMap[ szID ].Shape );
+				if( !DataGettingHelper.GetShapeObject( szID, out IShapeObject shapeObj ) ) {
+					continue;
+				}
+				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( shapeObj.Shape );
 				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}

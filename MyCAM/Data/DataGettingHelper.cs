@@ -109,5 +109,53 @@ namespace MyCAM.Data
 			pathObject = m_DataManager.ObjectMap[ szPathID ] as PathObject;
 			return true;
 		}
+
+		public static bool GetShapeObject( string szObjID, out IShapeObject shape )
+		{
+			shape = null;
+			if( m_DataManager == null || string.IsNullOrEmpty( szObjID ) ) {
+				return false;
+			}
+			if( m_DataManager.ObjectMap == null
+				|| !m_DataManager.ObjectMap.ContainsKey( szObjID )
+				|| m_DataManager.ObjectMap[ szObjID ] == null
+				|| !( m_DataManager.ObjectMap[ szObjID ] is IShapeObject _shapeObject ) ) {
+				return false;
+			}
+			shape = _shapeObject;
+			return true;
+		}
+
+		public static bool GetTransformableObject( string szObjID, out ITransformableObject transformable )
+		{
+			transformable = null;
+			if( m_DataManager == null || string.IsNullOrEmpty( szObjID ) ) {
+				return false;
+			}
+			if( m_DataManager.ObjectMap == null
+				|| !m_DataManager.ObjectMap.ContainsKey( szObjID )
+				|| m_DataManager.ObjectMap[ szObjID ] == null
+				|| !( m_DataManager.ObjectMap[ szObjID ] is ITransformableObject _transformable ) ) {
+				return false;
+			}
+			transformable = _transformable;
+			return true;
+		}
+
+		public static bool GetSewableObject( string szObjID, out ISewableObject sewable )
+		{
+			sewable = null;
+			if( m_DataManager == null || string.IsNullOrEmpty( szObjID ) ) {
+				return false;
+			}
+			if( m_DataManager.ObjectMap == null
+				|| !m_DataManager.ObjectMap.ContainsKey( szObjID )
+				|| m_DataManager.ObjectMap[ szObjID ] == null
+				|| !( m_DataManager.ObjectMap[ szObjID ] is ISewableObject _sewable ) ) {
+				return false;
+			}
+			sewable = _sewable;
+			return true;
+		}
 	}
 }
