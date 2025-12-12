@@ -1,66 +1,11 @@
 using MyCAM.Data;
 using System;
-using System.Collections.Generic;
 
 namespace MyCAM.PathCache
 {
-	#region Path Cache Strategy Pattern
-
-	internal interface IPathCacheStrategy
-	{
-		IPathCache GetCacheInfo( PathObject pathObject );
-	}
-
-	internal class PathCacheStrategy<TPathObject> : IPathCacheStrategy
-		where TPathObject : PathObject
-	{
-		private readonly Func<TPathObject, IPathCache> m_CacheInfoGetter;
-
-		public PathCacheStrategy( Func<TPathObject, IPathCache> cacheInfoGetter )
-		{
-			m_CacheInfoGetter = cacheInfoGetter ?? throw new ArgumentNullException( nameof( cacheInfoGetter ) );
-		}
-
-		public IPathCache GetCacheInfo( PathObject pathObject )
-		{
-			if( pathObject is TPathObject typedPathObject ) {
-				return m_CacheInfoGetter( typedPathObject );
-			}
-			return null;
-		}
-	}
-
-	internal static class PathCacheStrategyFactory
-	{
-		// create singleton strategy instances using generic PathCacheStrategy
-		static readonly IPathCacheStrategy s_ContourStrategy =
-			new PathCacheStrategy<ContourPathObject>( p => p.ContourCacheInfo );
-
-		static readonly IPathCacheStrategy s_StandardPatternStrategy =
-			new PathCacheStrategy<StdPatternObjectBase>( p => p.StandatdPatternCacheInfo );
-
-		public static IPathCacheStrategy GetStrategy( PathType pathType )
-		{
-			switch( pathType ) {
-				case PathType.Circle:
-				case PathType.Rectangle:
-				case PathType.Triangle:
-				case PathType.Square:
-				case PathType.Pentagon:
-				case PathType.Hexagon:
-				case PathType.Runway:
-					return s_StandardPatternStrategy;
-				case PathType.Contour:
-				default:
-					return s_ContourStrategy;
-			}
-		}
-	}
-
-	#endregion
-
 	#region Path Cache Provider
 
+	// this is for user to get any kind of cache they want
 	public static class PathCacheProvider
 	{
 		public static bool TryGetMainPathStartPointCache( string szPathID, out IMainPathStartPointCache cache )
@@ -93,6 +38,7 @@ namespace MyCAM.PathCache
 			return TryGetCache( szPathID, out cache );
 		}
 
+		// this call strategy to get correct cache by path type
 		static bool TryGetCache<TCache>( string szPathID, out TCache cache )
 			where TCache : class, IPathCache
 		{
@@ -113,6 +59,62 @@ namespace MyCAM.PathCache
 			IPathCache cacheInfo = strategy.GetCacheInfo( pathObject );
 			cache = cacheInfo as TCache;
 			return cache != null;
+		}
+	}
+
+	#endregion
+
+	// the below implementation is not that important
+	#region Path Cache Strategy Pattern
+
+	internal interface IPathCacheStrategy
+	{
+		IPathCache GetCacheInfo( PathObject pathObject );
+	}
+
+	internal class PathCacheStrategy<TPathObject> : IPathCacheStrategy
+		where TPathObject : PathObject
+	{
+		private readonly Func<TPathObject, IPathCache> m_CacheInfoGetter;
+
+		public PathCacheStrategy( Func<TPathObject, IPathCache> cacheInfoGetter )
+		{
+			m_CacheInfoGetter = cacheInfoGetter ?? throw new ArgumentNullException( nameof( cacheInfoGetter ) );
+		}
+
+		public IPathCache GetCacheInfo( PathObject pathObject )
+		{
+			if( pathObject is TPathObject typedPathObject ) {
+				return m_CacheInfoGetter( typedPathObject );
+			}
+			return null;
+		}
+	}
+
+	internal static class PathCacheStrategyFactory
+	{
+		// create singleton strategy instances using generic PathCacheStrategy
+		static readonly IPathCacheStrategy s_ContourStrategy =
+			new PathCacheStrategy<ContourPathObject>( obj => obj.ContourCacheInfo );
+
+		static readonly IPathCacheStrategy s_StandardPatternStrategy =
+			new PathCacheStrategy<StdPatternObjectBase>( obj => obj.StandatdPatternCacheInfo );
+
+		public static IPathCacheStrategy GetStrategy( PathType pathType )
+		{
+			switch( pathType ) {
+				case PathType.Circle:
+				case PathType.Rectangle:
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+				case PathType.Runway:
+					return s_StandardPatternStrategy;
+				case PathType.Contour:
+				default:
+					return s_ContourStrategy;
+			}
 		}
 	}
 
