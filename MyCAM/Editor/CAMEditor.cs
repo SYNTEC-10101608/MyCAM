@@ -74,6 +74,9 @@ namespace MyCAM.Editor
 			m_TraverseRenderer = new TraverseRenderer( m_Viewer, m_DataManager );
 		}
 
+		public const string PATH_NODE_PREFIX = "Path_";
+		public const int PATH_NODE_PERFIX_LENGTH = 5;
+
 		// Renderers
 		IndexRenderer m_IndexRenderer;
 		OrientationRenderer m_OrientationRenderer;
