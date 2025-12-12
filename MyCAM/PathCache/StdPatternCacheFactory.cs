@@ -2,15 +2,15 @@ using MyCAM.Data;
 using OCC.gp;
 using System;
 
-namespace MyCAM.CacheInfo
+namespace MyCAM.PathCache
 {
 	internal interface IStandardPatternCacheInfoStrategy
 	{
-		IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData );
+		IStdPatternCache CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData );
 	}
 
 	internal class StandardPatternCacheInfoStrategy<TCacheInfo> : IStandardPatternCacheInfoStrategy
-		where TCacheInfo : IStandardPatternCacheInfo
+		where TCacheInfo : IStdPatternCache
 	{
 		readonly Func<gp_Ax3, IStdPatternGeomData, CraftData, TCacheInfo> m_CacheInfoFactory;
 
@@ -19,7 +19,7 @@ namespace MyCAM.CacheInfo
 			m_CacheInfoFactory = cacheInfoFactory ?? throw new ArgumentNullException( nameof( cacheInfoFactory ) );
 		}
 
-		public IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
+		public IStdPatternCache CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
 		{
 			if( coordinateInfo == null ) {
 				throw new ArgumentNullException( nameof( coordinateInfo ) );
@@ -34,20 +34,20 @@ namespace MyCAM.CacheInfo
 		}
 	}
 
-	internal static class StandardPatternCacheInfoFactory
+	internal static class StdPatternCacheFactory
 	{
 		static readonly IStandardPatternCacheInfoStrategy s_CircleStrategy =
-			new StandardPatternCacheInfoStrategy<CircleCacheInfo>(
-				( coord, geom, craft ) => new CircleCacheInfo( coord, geom, craft ) );
+			new StandardPatternCacheInfoStrategy<CircleCache>(
+				( coord, geom, craft ) => new CircleCache( coord, geom, craft ) );
 		static readonly IStandardPatternCacheInfoStrategy s_RectangleStrategy =
-			new StandardPatternCacheInfoStrategy<RectangleCacheInfo>(
-				( coord, geom, craft ) => new RectangleCacheInfo( coord, geom, craft ) );
+			new StandardPatternCacheInfoStrategy<RectangleCache>(
+				( coord, geom, craft ) => new RectangleCache( coord, geom, craft ) );
 		static readonly IStandardPatternCacheInfoStrategy s_RunwayStrategy =
-			new StandardPatternCacheInfoStrategy<RunwayCacheInfo>(
-				( coord, geom, craft ) => new RunwayCacheInfo( coord, geom, craft ) );
+			new StandardPatternCacheInfoStrategy<RunwayCache>(
+				( coord, geom, craft ) => new RunwayCache( coord, geom, craft ) );
 		static readonly IStandardPatternCacheInfoStrategy s_PolygonStrategy =
-			new StandardPatternCacheInfoStrategy<PolygonCacheInfo>(
-				( coord, geom, craft ) => new PolygonCacheInfo( coord, geom, craft ) );
+			new StandardPatternCacheInfoStrategy<PolygonCache>(
+				( coord, geom, craft ) => new PolygonCache( coord, geom, craft ) );
 
 		public static IStandardPatternCacheInfoStrategy GetStrategy( PathType pathType )
 		{
@@ -69,7 +69,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public static IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
+		public static IStdPatternCache CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
 		{
 			if( standardPatternGeomData == null ) {
 				throw new ArgumentNullException( nameof( standardPatternGeomData ) );

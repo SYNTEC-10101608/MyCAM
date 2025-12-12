@@ -3,11 +3,11 @@ using OCC.gp;
 using System;
 using System.Collections.Generic;
 
-namespace MyCAM.CacheInfo
+namespace MyCAM.PathCache
 {
-	public class RectangleCacheInfo : StandardPatternBasedCacheInfo
+	public class RectangleCache : StdPatternCacheBase
 	{
-		public RectangleCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
+		public RectangleCache( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
 			: base( coordinateInfo, craftData )
 		{
 			if( geomData == null || !( geomData is RectangleGeomData rectangleGeomData ) ) {

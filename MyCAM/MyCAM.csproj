@@ -52,14 +52,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CacheInfo\CircleCacheInfo.cs" />
-    <Compile Include="CacheInfo\ContourCacheInfo.cs" />
-    <Compile Include="CacheInfo\PathCacheProvider.cs" />
-    <Compile Include="CacheInfo\PolygonCacheInfo.cs" />
-    <Compile Include="CacheInfo\RectangleCacheInfo.cs" />
-    <Compile Include="CacheInfo\RunwayCacheInfo.cs" />
-    <Compile Include="CacheInfo\StandardPatternBasedCacheInfo.cs" />
-    <Compile Include="CacheInfo\StandardPatternCacheInfoFactory.cs" />
+    <Compile Include="PathCache\CircleCache.cs" />
+    <Compile Include="PathCache\ContourCache.cs" />
+    <Compile Include="PathCache\InterfaceDefine.cs" />
+    <Compile Include="PathCache\PathCacheProvider.cs" />
+    <Compile Include="PathCache\PolygonCache.cs" />
+    <Compile Include="PathCache\RectangleCache.cs" />
+    <Compile Include="PathCache\RunwayCache.cs" />
+    <Compile Include="PathCache\StdPatternCacheBase.cs" />
+    <Compile Include="PathCache\StdPatternCacheFactory.cs" />
     <Compile Include="Data\DataGettingHelper.cs" />
     <Compile Include="Data\GeomDataFolder\CircleGeomData.cs" />
     <Compile Include="Data\GeomDataFolder\ContourGeomData.cs" />

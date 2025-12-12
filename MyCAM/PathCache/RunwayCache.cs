@@ -3,11 +3,11 @@ using OCC.gp;
 using System;
 using System.Collections.Generic;
 
-namespace MyCAM.CacheInfo
+namespace MyCAM.PathCache
 {
-	public class RunwayCacheInfo : StandardPatternBasedCacheInfo
+	public class RunwayCache : StdPatternCacheBase
 	{
-		public RunwayCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
+		public RunwayCache( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
 			: base( coordinateInfo, craftData )
 		{
 			if( geomData == null || !( geomData is RunwayGeomData runwayGeomData ) ) {

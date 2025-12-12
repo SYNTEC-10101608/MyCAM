@@ -1,5 +1,5 @@
 ﻿using MyCAM.App;
-using MyCAM.CacheInfo;
+using MyCAM.PathCache;
 
 namespace MyCAM.Data
 {
@@ -80,7 +80,7 @@ namespace MyCAM.Data
 			// use unified CacheInfo property from StandardPatternBasedPathObject
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				// cacheInfo implements IStandardPatternCacheInfo which has GetProcessRefPoint
-				if( standardPatternPathObject.StandatdPatternCacheInfo is IStandardPatternRefPointCache refPointCache ) {
+				if( standardPatternPathObject.StandatdPatternCacheInfo is IStdPatternRefPointCache refPointCache ) {
 					refPoint = refPointCache.GetProcessRefPoint();
 					return true;
 				}

@@ -1,4 +1,4 @@
-﻿using MyCAM.CacheInfo;
+﻿using MyCAM.PathCache;
 using MyCAM.Data;
 using System;
 using System.Collections.Generic;
@@ -258,7 +258,7 @@ namespace MyCAM.Post
 				return null;
 			}
 			ContourPathObject contourPathObject = pathObject as ContourPathObject;
-			ContourCacheInfo contourCacheInfo = contourPathObject.ContourCacheInfo;
+			ContourCache contourCacheInfo = contourPathObject.ContourCacheInfo;
 			CraftData craftData = contourPathObject.CraftData;
 			return new ContourNCPackage(
 				craftData.LeadLineParam,

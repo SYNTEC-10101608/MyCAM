@@ -3,11 +3,11 @@ using OCC.gp;
 using System;
 using System.Collections.Generic;
 
-namespace MyCAM.CacheInfo
+namespace MyCAM.PathCache
 {
-	public class PolygonCacheInfo : StandardPatternBasedCacheInfo
+	public class PolygonCache : StdPatternCacheBase
 	{
-		public PolygonCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
+		public PolygonCache( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
 			: base( coordinateInfo, craftData )
 		{
 			if( geomData == null || !( geomData is PolygonGeomData polygonGeomData ) ) {

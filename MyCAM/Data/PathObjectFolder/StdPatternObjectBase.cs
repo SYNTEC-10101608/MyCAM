@@ -1,4 +1,4 @@
-﻿using MyCAM.CacheInfo;
+﻿using MyCAM.PathCache;
 using MyCAM.StandardPatternFactory;
 using OCC.gp;
 using OCC.TopoDS;
@@ -52,7 +52,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		public StandardPatternBasedCacheInfo StandatdPatternCacheInfo
+		public StdPatternCacheBase StandatdPatternCacheInfo
 		{
 			get
 			{
@@ -78,11 +78,11 @@ namespace MyCAM.Data
 			gp_Ax3 coordinateInfo = patternFactory.GetCoordinateInfo();
 
 			// factory automatically determines the correct CacheInfo type based on GeomData type
-			m_StandatdPatternCacheInfo = (StandardPatternBasedCacheInfo)StandardPatternCacheInfoFactory.CreateCacheInfo( coordinateInfo, m_GeomData, m_CraftData );
+			m_StandatdPatternCacheInfo = (StdPatternCacheBase)StdPatternCacheFactory.CreateCacheInfo( coordinateInfo, m_GeomData, m_CraftData );
 		}
 
 		IStdPatternGeomData m_GeomData;
-		StandardPatternBasedCacheInfo m_StandatdPatternCacheInfo;
+		StdPatternCacheBase m_StandatdPatternCacheInfo;
 		ContourPathObject m_ContourPathObject;
 	}
 }

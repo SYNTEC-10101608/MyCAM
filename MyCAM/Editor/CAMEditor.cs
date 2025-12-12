@@ -1,5 +1,5 @@
 ﻿using MyCAM.App;
-using MyCAM.CacheInfo;
+using MyCAM.PathCache;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Post;

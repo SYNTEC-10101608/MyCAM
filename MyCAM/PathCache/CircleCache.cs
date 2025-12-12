@@ -3,11 +3,11 @@ using OCC.gp;
 using System;
 using System.Collections.Generic;
 
-namespace MyCAM.CacheInfo
+namespace MyCAM.PathCache
 {
-	public class CircleCacheInfo : StandardPatternBasedCacheInfo
+	public class CircleCache : StdPatternCacheBase
 	{
-		public CircleCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
+		public CircleCache( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
 			: base( coordinateInfo, craftData )
 		{
 			if( geomData == null || !( geomData is CircleGeomData circleGeomData ) ) {

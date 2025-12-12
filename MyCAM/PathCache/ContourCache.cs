@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MyCAM.CacheInfo
+namespace MyCAM.PathCache
 {
-	public class ContourCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache, ICacheInfo
+	public class ContourCache : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache, IPathCache
 	{
-		public ContourCacheInfo( ContourGeomData geomData, CraftData craftData )
+		public ContourCache( ContourGeomData geomData, CraftData craftData )
 		{
 			if( geomData == null || craftData == null ) {
 				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );

@@ -1,5 +1,5 @@
 ﻿using MyCAM.App;
-using MyCAM.CacheInfo;
+using MyCAM.PathCache;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.Aspect;
@@ -159,7 +159,7 @@ namespace MyCAM.Editor
 		// to storage which vertex keep show high light point on viewer
 		AIS_Shape m_KeepedHighLightPoint = null;
 		CraftData m_CraftData = null;
-		ContourCacheInfo m_ContourCacheInfo = null;
+		ContourCache m_ContourCacheInfo = null;
 		List<string> m_PathIDList = null;
 	}
 }

@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MyCAM.CacheInfo
+namespace MyCAM.PathCache
 {
-	public abstract class StandardPatternBasedCacheInfo : IStandardPatternCacheInfo, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache, IStandardPatternRefPointCache
+	public abstract class StdPatternCacheBase : IStdPatternCache, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache, IStdPatternRefPointCache
 	{
-		protected StandardPatternBasedCacheInfo( gp_Ax3 coordinateInfo, CraftData craftData )
+		protected StdPatternCacheBase( gp_Ax3 coordinateInfo, CraftData craftData )
 		{
 			if( coordinateInfo == null || craftData == null ) {
 				throw new ArgumentNullException( "StandardPatternBasedCacheInfo constructing argument null" );

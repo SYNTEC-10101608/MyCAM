@@ -1,4 +1,4 @@
-﻿using MyCAM.CacheInfo;
+﻿using MyCAM.PathCache;
 using OCC.TopoDS;
 
 namespace MyCAM.Data

@@ -2,105 +2,26 @@ using MyCAM.Data;
 using System;
 using System.Collections.Generic;
 
-namespace MyCAM.CacheInfo
+namespace MyCAM.PathCache
 {
-	#region Cache Interface Definitions
-
-	public interface ICacheInfo
-	{
-		PathType PathType
-		{
-			get;
-		}
-	}
-
-	public interface IStandardPatternCacheInfo : ICacheInfo
-	{
-	}
-
-	public interface IStandardPatternRefPointCache
-	{
-		IProcessPoint GetProcessRefPoint();
-	}
-
-	public interface IMainPathStartPointCache : ICacheInfo
-	{
-		CAMPoint GetMainPathStartCAMPoint();
-	}
-
-	public interface ILeadCache : ICacheInfo
-	{
-		List<CAMPoint> LeadInCAMPointList
-		{
-			get;
-		}
-
-		List<CAMPoint> LeadOutCAMPointList
-		{
-			get;
-		}
-
-		LeadData LeadData
-		{
-			get;
-		}
-	}
-
-	public interface IPathReverseCache : ICacheInfo
-	{
-		bool IsPathReverse
-		{
-			get;
-		}
-	}
-
-	public interface IToolVecCache : ICacheInfo
-	{
-		IReadOnlyList<IProcessPoint> GetToolVecList();
-
-		bool IsToolVecModifyPoint( ISetToolVecPoint point );
-	}
-
-	public interface IOverCutCache : ICacheInfo
-	{
-		List<CAMPoint> OverCutCAMPointList
-		{
-			get;
-		}
-
-		double OverCutLength
-		{
-			get;
-		}
-	}
-
-	public interface IProcessPathStartEndCache : ICacheInfo
-	{
-		IProcessPoint GetProcessStartPoint();
-
-		IProcessPoint GetProcessEndPoint();
-	}
-
-	#endregion
-
 	#region Path Cache Strategy Pattern
 
 	internal interface IPathCacheStrategy
 	{
-		ICacheInfo GetCacheInfo( PathObject pathObject );
+		IPathCache GetCacheInfo( PathObject pathObject );
 	}
 
 	internal class PathCacheStrategy<TPathObject> : IPathCacheStrategy
 		where TPathObject : PathObject
 	{
-		private readonly Func<TPathObject, ICacheInfo> m_CacheInfoGetter;
+		private readonly Func<TPathObject, IPathCache> m_CacheInfoGetter;
 
-		public PathCacheStrategy( Func<TPathObject, ICacheInfo> cacheInfoGetter )
+		public PathCacheStrategy( Func<TPathObject, IPathCache> cacheInfoGetter )
 		{
 			m_CacheInfoGetter = cacheInfoGetter ?? throw new ArgumentNullException( nameof( cacheInfoGetter ) );
 		}
 
-		public ICacheInfo GetCacheInfo( PathObject pathObject )
+		public IPathCache GetCacheInfo( PathObject pathObject )
 		{
 			if( pathObject is TPathObject typedPathObject ) {
 				return m_CacheInfoGetter( typedPathObject );
@@ -173,7 +94,7 @@ namespace MyCAM.CacheInfo
 		}
 
 		static bool TryGetCache<TCache>( string szPathID, out TCache cache )
-			where TCache : class, ICacheInfo
+			where TCache : class, IPathCache
 		{
 			cache = null;
 
@@ -189,7 +110,7 @@ namespace MyCAM.CacheInfo
 			}
 
 			// get cache info and cast to requested type
-			ICacheInfo cacheInfo = strategy.GetCacheInfo( pathObject );
+			IPathCache cacheInfo = strategy.GetCacheInfo( pathObject );
 			cache = cacheInfo as TCache;
 			return cache != null;
 		}

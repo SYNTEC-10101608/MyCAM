@@ -1,4 +1,4 @@
-using MyCAM.CacheInfo;
+using MyCAM.PathCache;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRepPrimAPI;

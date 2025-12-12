@@ -1,5 +1,5 @@
 ﻿using MyCAM.App;
-using MyCAM.CacheInfo;
+using MyCAM.PathCache;
 using OCC.BRep;
 using OCC.gp;
 using OCC.TopExp;
@@ -24,7 +24,7 @@ namespace MyCAM.Data
 			bool isClosed = DetermineIfClosed( shape );
 			m_ContourGeomData = new ContourGeomData( pathDataList, isClosed );
 			m_CraftData = new CraftData();
-			m_ContourCacheInfo = new ContourCacheInfo( m_ContourGeomData, m_CraftData );
+			m_ContourCacheInfo = new ContourCache( m_ContourGeomData, m_CraftData );
 		}
 
 		// this is for the file read constructor
@@ -36,7 +36,7 @@ namespace MyCAM.Data
 			}
 			m_ContourGeomData = geomData;
 			m_CraftData = craftData;
-			m_ContourCacheInfo = new ContourCacheInfo( m_ContourGeomData, m_CraftData );
+			m_ContourCacheInfo = new ContourCache( m_ContourGeomData, m_CraftData );
 		}
 
 		public ContourGeomData ContourGeomData
@@ -47,7 +47,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		public ContourCacheInfo ContourCacheInfo
+		public ContourCache ContourCacheInfo
 		{
 			get
 			{
@@ -98,6 +98,6 @@ namespace MyCAM.Data
 		}
 
 		ContourGeomData m_ContourGeomData;
-		ContourCacheInfo m_ContourCacheInfo;
+		ContourCache m_ContourCacheInfo;
 	}
 }
