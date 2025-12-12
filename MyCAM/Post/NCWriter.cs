@@ -47,16 +47,36 @@ namespace MyCAM.Post
 
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
+					PathType pathType;
 					for( int i = 0; i < m_PathIDList.Count; i++ ) {
-
-						// solve all post data of the path
-						if( !PostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
-							endInfoOfPreviousPath, m_EntryAndExitData,
-							out PostData postData, out endInfoOfPreviousPath ) ) {
-							errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
-							return false;
+						if( !DataGettingHelper.TryGetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
+							continue;
 						}
-						WriteCutting( postData, i + 1 );
+						pathType = pathObject.PathType;
+						if( pathType == PathType.Contour ) {
+
+							// solve all post data of the path
+							if( !PostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
+								endInfoOfPreviousPath, m_EntryAndExitData,
+								out PostData postData, out endInfoOfPreviousPath ) ) {
+								errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
+								return false;
+							}
+							WriteCutting( postData, i + 1 );
+						}
+						else {
+							StandardPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
+							if( !StandardPatternPostHelper.SolvePath( m_PostSolver, package, endInfoOfPreviousPath, m_EntryAndExitData,
+								out StandardPatternPostData postData, out endInfoOfPreviousPath ) ) {
+								errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
+								return false;
+							}
+							if( !DataGettingHelper.GetGeomDataByID( m_PathIDList[ i ], out IGeomData geomData ) ) {
+								errorMessage = "路徑資訊取得錯誤，路徑：" + ( i ).ToString();
+								return false;
+							}
+							WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, geomData, i + 1 );
+						}
 					}
 
 					// write exit
@@ -99,6 +119,14 @@ namespace MyCAM.Post
 			// end cutting
 			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" );
 			return;
+		}
+
+		void WriteStandardPatternCutting( PathType type, StandardPatternPostData currentPathPostData, CraftData craftData, IGeomData geomData, int N_Index )
+		{
+			StandardPatternNCWriter.WriteStandardPatternCutting( m_StreamWriter, type, currentPathPostData, craftData, geomData, N_Index,
+				( writer, point, followDist ) => WriteOneLinearTraverse( point, followDist ),
+				( writer, midPoint, endPoint, followDist ) => WriteOneFrogLeap( midPoint, endPoint, followDist ),
+				( master, slave ) => GetRotaryAxisCommand( master, slave ) );
 		}
 
 		void WriteOnePoint( PostPoint postPoint )
@@ -243,6 +271,59 @@ namespace MyCAM.Post
 				contourCacheInfo.GetProcessEndPoint(),
 				contourCacheInfo.GetProcessEndPoint() );
 		}
+
+		StandardPatternNCPackage BuildPackageByID_StandardPattern( string szID )
+		{
+			if( !m_DataManager.ObjectMap.ContainsKey( szID )
+				|| m_DataManager.ObjectMap[ szID ].ObjectType != ObjectType.Path ) {
+				return null;
+			}
+			PathObject pathObject = m_DataManager.ObjectMap[ szID ] as PathObject;
+			if( pathObject.PathType == PathType.Contour ) {
+				return null;
+			}
+			if( !DataGettingHelper.GetReferencePoint( szID, out IProcessPoint refPoint ) ) {
+				return null;
+			}
+			if( !PathCacheProvider.TryGetMainPathStartPointCache( szID, out IMainPathStartPointCache mainPathStartPoint ) ) {
+				return null;
+			}
+
+			switch( pathObject.PathType ) {
+				case PathType.Circle:
+					CirclePathObject circlePathObject = pathObject as CirclePathObject;
+					return new StandardPatternNCPackage(
+						refPoint,
+						mainPathStartPoint.GetMainPathStartCAMPoint(),
+						circlePathObject.CraftData.TraverseData );
+				case PathType.Rectangle:
+					RectanglePathObject rectanglePathObject = pathObject as RectanglePathObject;
+					return new StandardPatternNCPackage(
+						refPoint,
+						mainPathStartPoint.GetMainPathStartCAMPoint(),
+						rectanglePathObject.CraftData.TraverseData );
+				case PathType.Runway:
+					RunwayPathObject runwayPathObject = pathObject as RunwayPathObject;
+					return new StandardPatternNCPackage(
+						refPoint,
+						mainPathStartPoint.GetMainPathStartCAMPoint(),
+						runwayPathObject.CraftData.TraverseData );
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					PolygonPathObject polygonPathObject = pathObject as PolygonPathObject;
+					return new StandardPatternNCPackage(
+						refPoint,
+						mainPathStartPoint.GetMainPathStartCAMPoint(),
+						polygonPathObject.CraftData.TraverseData );
+				default:
+					break;
+
+			}
+			return null;
+		}
+
 
 		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";
 	}

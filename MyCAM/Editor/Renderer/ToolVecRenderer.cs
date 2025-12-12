@@ -105,15 +105,15 @@ namespace MyCAM.Editor.Renderer
 
 		List<IProcessPoint> GetToolVecPointList( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
 				return null;
 			}
-			if( contourCacheInfo.CAMPointList == null ) {
+			if( toolVecCache.GetToolVecList() == null ) {
 				return null;
 			}
 			List<IProcessPoint> pointList = new List<IProcessPoint>();
-			foreach( CAMPoint camPoint in contourCacheInfo.CAMPointList ) {
-				pointList.Add( camPoint );
+			foreach( IProcessPoint point in toolVecCache.GetToolVecList() ) {
+				pointList.Add( point );
 			}
 			return pointList;
 		}
@@ -121,11 +121,11 @@ namespace MyCAM.Editor.Renderer
 		// TODO: the method is kepp casting same thing in a loop, optimize it later
 		bool IsToolVecModifyPoint( string pathID, IProcessPoint point )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
 				return false;
 			}
 			if( point is ISetToolVecPoint toolVecPoint ) {
-				return contourCacheInfo.IsToolVecModifyPoint( toolVecPoint );
+				return toolVecCache.IsToolVecModifyPoint( toolVecPoint );
 			}
 			return false;
 		}

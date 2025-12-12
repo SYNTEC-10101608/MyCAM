@@ -180,14 +180,14 @@ namespace MyCAM.Editor.Renderer
 
 		List<IProcessPoint> GetLeadInPointList( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
-			if( contourCacheInfo.LeadInCAMPointList == null ) {
+			if( leadCache.LeadInCAMPointList == null ) {
 				return null;
 			}
 			List<IProcessPoint> pointList = new List<IProcessPoint>();
-			foreach( CAMPoint camPoint in contourCacheInfo.LeadInCAMPointList ) {
+			foreach( CAMPoint camPoint in leadCache.LeadInCAMPointList ) {
 				pointList.Add( camPoint );
 			}
 			return pointList;
@@ -195,14 +195,14 @@ namespace MyCAM.Editor.Renderer
 
 		List<IProcessPoint> GetLeadOutPointList( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
-			if( contourCacheInfo.LeadOutCAMPointList == null ) {
+			if( leadCache.LeadOutCAMPointList == null ) {
 				return null;
 			}
 			List<IProcessPoint> pointList = new List<IProcessPoint>();
-			foreach( CAMPoint camPoint in contourCacheInfo.LeadOutCAMPointList ) {
+			foreach( CAMPoint camPoint in leadCache.LeadOutCAMPointList ) {
 				pointList.Add( camPoint );
 			}
 			return pointList;
@@ -210,14 +210,14 @@ namespace MyCAM.Editor.Renderer
 
 		List<IProcessPoint> GetOverCutPointList( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetOverCutCache( pathID, out IOverCutCache overCutCache ) ) {
 				return null;
 			}
-			if( contourCacheInfo.OverCutCAMPointList == null ) {
+			if( overCutCache.OverCutCAMPointList == null ) {
 				return null;
 			}
 			List<IProcessPoint> pointList = new List<IProcessPoint>();
-			foreach( CAMPoint camPoint in contourCacheInfo.OverCutCAMPointList ) {
+			foreach( CAMPoint camPoint in overCutCache.OverCutCAMPointList ) {
 				pointList.Add( camPoint );
 			}
 			return pointList;
@@ -225,18 +225,18 @@ namespace MyCAM.Editor.Renderer
 
 		LeadData GetLeadData( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
-			return contourCacheInfo.LeadData;
+			return leadCache.LeadData;
 		}
 
 		double GetOverCutLength( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetOverCutCache( pathID, out IOverCutCache overCutCache ) ) {
 				return 0.0;
 			}
-			return contourCacheInfo.OverCutLength;
+			return overCutCache.OverCutLength;
 		}
 	}
 }

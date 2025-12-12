@@ -21,6 +21,11 @@ namespace MyCAM.FileManager
 		[XmlArray( "ObjectMapDTO" )]
 		[XmlArrayItem( "PartObjectDTO", typeof( PartObjectDTO ) )]
 		[XmlArrayItem( "PathObjectDTO", typeof( PathObjectDTO ) )]
+		[XmlArrayItem( "ContourPathObjectDTO", typeof( ContourPathObjectDTO ) )]
+		[XmlArrayItem( "CirclePathObjectDTO", typeof( CirclePathObjectDTO ) )]
+		[XmlArrayItem( "RectanglePathObjectDTO", typeof( RectanglePathObjectDTO ) )]
+		[XmlArrayItem( "PolygonPathObjectDTO", typeof( PolygonPathObjectDTO ) )]
+		[XmlArrayItem( "RunwayPathObjectDTO", typeof( RunwayPathObjectDTO ) )]
 		public List<IObjectDTO> ObjectDataMap
 		{
 			get;
@@ -96,9 +101,40 @@ namespace MyCAM.FileManager
 
 				// current index is path data
 				if( objectData.Value is PathObject path ) {
-					if( path.PathType == PathType.Contour ) {
-						ContourPathObjectDTO pathDataDTO = new ContourPathObjectDTO( path );
-						ObjectDataMap.Add( pathDataDTO );
+					switch( path.PathType ) {
+						case PathType.Contour:
+							if( path is ContourPathObject contourPath ) {
+								ContourPathObjectDTO pathDataDTO = new ContourPathObjectDTO( contourPath );
+								ObjectDataMap.Add( pathDataDTO );
+							}
+							break;
+						case PathType.Circle:
+							if( path is CirclePathObject circlePath ) {
+								CirclePathObjectDTO circleDTO = new CirclePathObjectDTO( circlePath );
+								ObjectDataMap.Add( circleDTO );
+							}
+							break;
+						case PathType.Rectangle:
+							if( path is RectanglePathObject rectanglePath ) {
+								RectanglePathObjectDTO rectangleDTO = new RectanglePathObjectDTO( rectanglePath );
+								ObjectDataMap.Add( rectangleDTO );
+							}
+							break;
+						case PathType.Triangle:
+						case PathType.Square:
+						case PathType.Pentagon:
+						case PathType.Hexagon:
+							if( path is PolygonPathObject polygonPath ) {
+								PolygonPathObjectDTO polygonDTO = new PolygonPathObjectDTO( polygonPath );
+								ObjectDataMap.Add( polygonDTO );
+							}
+							break;
+						case PathType.Runway:
+							if( path is RunwayPathObject runwayPath ) {
+								RunwayPathObjectDTO runwayDTO = new RunwayPathObjectDTO( runwayPath );
+								ObjectDataMap.Add( runwayDTO );
+							}
+							break;
 					}
 					continue;
 				}
@@ -156,6 +192,18 @@ namespace MyCAM.FileManager
 				if( entry is PathObjectDTO pathDataDTO ) {
 					if( pathDataDTO is ContourPathObjectDTO contourPathObject ) {
 						objectMap.Add( pathDataDTO.UID, contourPathObject.PathDTOToContourPathObject() );
+					}
+					else if( pathDataDTO is CirclePathObjectDTO circlePathObject ) {
+						objectMap.Add( pathDataDTO.UID, circlePathObject.PathDTOToCirclePathObject() );
+					}
+					else if( pathDataDTO is RectanglePathObjectDTO rectanglePathObject ) {
+						objectMap.Add( pathDataDTO.UID, rectanglePathObject.PathDTOToRectanglePathObject() );
+					}
+					else if( pathDataDTO is PolygonPathObjectDTO polygonPathObject ) {
+						objectMap.Add( pathDataDTO.UID, polygonPathObject.PathDTOToPolygonPathObject() );
+					}
+					else if( pathDataDTO is RunwayPathObjectDTO runwayPathObject ) {
+						objectMap.Add( pathDataDTO.UID, runwayPathObject.PathDTOToRunwayPathObject() );
 					}
 					continue;
 				}
@@ -262,6 +310,10 @@ namespace MyCAM.FileManager
 	}
 
 	[XmlInclude( typeof( ContourPathObjectDTO ) )]
+	[XmlInclude( typeof( CirclePathObjectDTO ) )]
+	[XmlInclude( typeof( RectanglePathObjectDTO ) )]
+	[XmlInclude( typeof( PolygonPathObjectDTO ) )]
+	[XmlInclude( typeof( RunwayPathObjectDTO ) )]
 	public abstract class PathObjectDTO : IObjectDTO
 	{
 		// constructor for XmlSerializer
@@ -304,7 +356,7 @@ namespace MyCAM.FileManager
 			ObjectType = ObjectType.Path;
 			PathType = PathType.Contour;
 			if( pathObject is ContourPathObject contourPathObject ) {
-				GeomData = new ContourGeomDataDTO( contourPathObject.GeomData );
+				GeomData = new ContourGeomDataDTO( contourPathObject.ContourGeomData );
 			}
 			else {
 				GeomData = new ContourGeomDataDTO();
@@ -326,13 +378,226 @@ namespace MyCAM.FileManager
 		}
 	}
 
-	public class ContourGeomDataDTO
+	public class CirclePathObjectDTO : PathObjectDTO
 	{
-		public string UID
+		public CircleGeomDataDTO GeomData
 		{
 			get;
 			set;
-		} = string.Empty;
+		} = new CircleGeomDataDTO();
+
+		public ContourPathObjectDTO ContourPathObject
+		{
+			get;
+			set;
+		} = new ContourPathObjectDTO();
+
+		internal CirclePathObjectDTO()
+		{
+		}
+
+		internal CirclePathObjectDTO( PathObject pathObject )
+		{
+			if( pathObject == null ) {
+				return;
+			}
+			UID = pathObject.UID;
+			Shape = new TopoShapeDTO( pathObject.Shape );
+			ObjectType = ObjectType.Path;
+			PathType = PathType.Circle;
+			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
+				GeomData = new CircleGeomDataDTO( (CircleGeomData)standardPatternPathObject.GeomData );
+				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
+			}
+			else {
+				GeomData = new CircleGeomDataDTO();
+				ContourPathObject = new ContourPathObjectDTO();
+			}
+			CraftData = new CraftDataDTO( pathObject.CraftData );
+		}
+
+		// DTO → CirclePathObject
+		internal CirclePathObject PathDTOToCirclePathObject()
+		{
+			// protection
+			if( Shape == null || string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
+				throw new ArgumentNullException( "CirclePathObject deserialization failed." );
+			}
+			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
+			CraftData craftData = CraftData.ToCraftData();
+			CircleGeomData geomData = GeomData.ToCircleGeomData();
+			ContourPathObject contourPathObject = ContourPathObject.PathDTOToContourPathObject();
+			return new CirclePathObject( UID, shape, geomData, craftData, contourPathObject );
+		}
+	}
+
+	public class RectanglePathObjectDTO : PathObjectDTO
+	{
+		public RectangleGeomDataDTO GeomData
+		{
+			get;
+			set;
+		} = new RectangleGeomDataDTO();
+
+		public ContourPathObjectDTO ContourPathObject
+		{
+			get;
+			set;
+		} = new ContourPathObjectDTO();
+
+		internal RectanglePathObjectDTO()
+		{
+		}
+
+		internal RectanglePathObjectDTO( PathObject pathObject )
+		{
+			if( pathObject == null ) {
+				return;
+			}
+			UID = pathObject.UID;
+			Shape = new TopoShapeDTO( pathObject.Shape );
+			ObjectType = ObjectType.Path;
+			PathType = PathType.Rectangle;
+			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
+				GeomData = new RectangleGeomDataDTO( (RectangleGeomData)standardPatternPathObject.GeomData );
+				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
+			}
+			else {
+				GeomData = new RectangleGeomDataDTO();
+				ContourPathObject = new ContourPathObjectDTO();
+			}
+			CraftData = new CraftDataDTO( pathObject.CraftData );
+		}
+
+		// DTO → RectanglePathObject
+		internal RectanglePathObject PathDTOToRectanglePathObject()
+		{
+			// protection
+			if( Shape == null || string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
+				throw new ArgumentNullException( "RectanglePathObject deserialization failed." );
+			}
+			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
+			CraftData craftData = CraftData.ToCraftData();
+			RectangleGeomData geomData = GeomData.ToRectangleGeomData();
+			ContourPathObject contourPathObject = ContourPathObject.PathDTOToContourPathObject();
+			return new RectanglePathObject( UID, shape, geomData, craftData, contourPathObject );
+		}
+	}
+
+	public class PolygonPathObjectDTO : PathObjectDTO
+	{
+		public PolygonGeomDataDTO GeomData
+		{
+			get;
+			set;
+		} = new PolygonGeomDataDTO();
+
+		public ContourPathObjectDTO ContourPathObject
+		{
+			get;
+			set;
+		} = new ContourPathObjectDTO();
+
+		internal PolygonPathObjectDTO()
+		{
+		}
+
+		internal PolygonPathObjectDTO( PathObject pathObject )
+		{
+			if( pathObject == null ) {
+				return;
+			}
+			UID = pathObject.UID;
+			Shape = new TopoShapeDTO( pathObject.Shape );
+			ObjectType = ObjectType.Path;
+			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
+				PathType = pathObject.PathType; // Use the actual PathType from PathObject (which gets it from PolygonGeomData)
+				GeomData = new PolygonGeomDataDTO( (PolygonGeomData)standardPatternPathObject.GeomData );
+				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
+			}
+			else {
+				PathType = PathType.Triangle; // Default
+				GeomData = new PolygonGeomDataDTO();
+				ContourPathObject = new ContourPathObjectDTO();
+			}
+			CraftData = new CraftDataDTO( pathObject.CraftData );
+		}
+
+		// DTO → PolygonPathObject
+		internal PolygonPathObject PathDTOToPolygonPathObject()
+		{
+			// protection
+			if( Shape == null || string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
+				throw new ArgumentNullException( "PolygonPathObject deserialization failed." );
+			}
+			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
+			CraftData craftData = CraftData.ToCraftData();
+			PolygonGeomData geomData = GeomData.ToPolygonGeomData();
+			ContourPathObject contourPathObject = ContourPathObject.PathDTOToContourPathObject();
+			return new PolygonPathObject( UID, shape, geomData, craftData, contourPathObject );
+		}
+	}
+
+	public class RunwayPathObjectDTO : PathObjectDTO
+	{
+		public RunwayGeomDataDTO GeomData
+		{
+			get;
+			set;
+		} = new RunwayGeomDataDTO();
+
+		public ContourPathObjectDTO ContourPathObject
+		{
+			get;
+			set;
+		} = new ContourPathObjectDTO();
+
+		internal RunwayPathObjectDTO()
+		{
+		}
+
+		internal RunwayPathObjectDTO( PathObject pathObject )
+		{
+			if( pathObject == null ) {
+				return;
+			}
+			UID = pathObject.UID;
+			Shape = new TopoShapeDTO( pathObject.Shape );
+			ObjectType = ObjectType.Path;
+			PathType = PathType.Runway;
+			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
+				GeomData = new RunwayGeomDataDTO( (RunwayGeomData)standardPatternPathObject.GeomData );
+				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
+			}
+			else {
+				GeomData = new RunwayGeomDataDTO();
+				ContourPathObject = new ContourPathObjectDTO();
+			}
+			CraftData = new CraftDataDTO( pathObject.CraftData );
+		}
+
+		// DTO → RunwayPathObject
+		internal RunwayPathObject PathDTOToRunwayPathObject()
+		{
+			// protection
+			if( Shape == null || string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
+				throw new ArgumentNullException( "RunwayPathObject deserialization failed." );
+			}
+			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
+			CraftData craftData = CraftData.ToCraftData();
+			RunwayGeomData geomData = GeomData.ToRunwayGeomData();
+			ContourPathObject contourPathObject = ContourPathObject.PathDTOToContourPathObject();
+			return new RunwayPathObject( UID, shape, geomData, craftData, contourPathObject );
+		}
+	}
+
+	public class ContourGeomDataDTO
+	{
+		public bool IsClosed
+		{
+			get;
+			set;
+		}
 
 		[XmlArray( "CADPointListDTO" )]
 		[XmlArrayItem( "CADPointDTO" )]
@@ -359,8 +624,8 @@ namespace MyCAM.FileManager
 			if( geomData == null ) {
 				return;
 			}
-			UID = geomData.UID;
-			
+			IsClosed = geomData.IsClosed;
+
 			// Convert CADPointList
 			foreach( var point in geomData.CADPointList ) {
 				CADPointList.Add( new CADPointDTO( point ) );
@@ -381,20 +646,191 @@ namespace MyCAM.FileManager
 			if( CADPointList == null || ConnectPointMap == null ) {
 				throw new ArgumentException( "ContourGeomData deserialization failed." );
 			}
-			
+
 			List<CADPoint> cadPointList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
-			
+
 			// Reconstruct ConnectPointMap
 			// Key is from CADPointList by index, Value is separate CADPoint
 			Dictionary<CADPoint, CADPoint> connectPointMap = new Dictionary<CADPoint, CADPoint>();
 			foreach( var pair in ConnectPointMap ) {
 				if( pair.KeyIndex >= 0 && pair.KeyIndex < cadPointList.Count && pair.ValuePoint != null ) {
 					CADPoint valuePoint = pair.ValuePoint.ToCADPoint();
-					connectPointMap[cadPointList[pair.KeyIndex]] = valuePoint;
+					connectPointMap[ cadPointList[ pair.KeyIndex ] ] = valuePoint;
 				}
 			}
 
-			return new ContourGeomData( UID, cadPointList, connectPointMap );
+			return new ContourGeomData( cadPointList, connectPointMap, IsClosed );
+		}
+	}
+
+	public class CircleGeomDataDTO
+	{
+		public double Diameter
+		{
+			get;
+			set;
+		}
+
+		public double RotatedAngle_deg
+		{
+			get;
+			set;
+		}
+
+		// parameterless constructor (for XmlSerializer)
+		internal CircleGeomDataDTO()
+		{
+		}
+
+		internal CircleGeomDataDTO( CircleGeomData geomData )
+		{
+			if( geomData == null ) {
+				return;
+			}
+			Diameter = geomData.Diameter;
+			RotatedAngle_deg = geomData.RotatedAngle_deg;
+		}
+
+		internal CircleGeomData ToCircleGeomData()
+		{
+			return new CircleGeomData( Diameter, RotatedAngle_deg );
+		}
+	}
+
+	public class RectangleGeomDataDTO
+	{
+		public double Width
+		{
+			get;
+			set;
+		}
+
+		public double Length
+		{
+			get;
+			set;
+		}
+
+		public double CornerRadius
+		{
+			get;
+			set;
+		}
+
+		public double RotatedAngle_deg
+		{
+			get;
+			set;
+		}
+
+		// parameterless constructor (for XmlSerializer)
+		internal RectangleGeomDataDTO()
+		{
+		}
+
+		internal RectangleGeomDataDTO( RectangleGeomData geomData )
+		{
+			if( geomData == null ) {
+				return;
+			}
+			Width = geomData.Width;
+			Length = geomData.Length;
+			CornerRadius = geomData.CornerRadius;
+			RotatedAngle_deg = geomData.RotatedAngle_deg;
+		}
+
+		internal RectangleGeomData ToRectangleGeomData()
+		{
+			return new RectangleGeomData( Width, Length, CornerRadius, RotatedAngle_deg );
+		}
+	}
+
+	public class PolygonGeomDataDTO
+	{
+		public int Sides
+		{
+			get;
+			set;
+		}
+
+		public double SideLength
+		{
+			get;
+			set;
+		}
+
+		public double CornerRadius
+		{
+			get;
+			set;
+		}
+
+		public double RotatedAngle_deg
+		{
+			get;
+			set;
+		}
+
+		// parameterless constructor (for XmlSerializer)
+		internal PolygonGeomDataDTO()
+		{
+		}
+
+		internal PolygonGeomDataDTO( PolygonGeomData geomData )
+		{
+			if( geomData == null ) {
+				return;
+			}
+			Sides = geomData.Sides;
+			SideLength = geomData.SideLength;
+			CornerRadius = geomData.CornerRadius;
+			RotatedAngle_deg = geomData.RotatedAngle_deg;
+		}
+
+		internal PolygonGeomData ToPolygonGeomData()
+		{
+			return new PolygonGeomData( Sides, SideLength, CornerRadius, RotatedAngle_deg );
+		}
+	}
+
+	public class RunwayGeomDataDTO
+	{
+		public double Length
+		{
+			get;
+			set;
+		}
+
+		public double Width
+		{
+			get;
+			set;
+		}
+
+		public double RotatedAngle_deg
+		{
+			get;
+			set;
+		}
+
+		// parameterless constructor (for XmlSerializer)
+		internal RunwayGeomDataDTO()
+		{
+		}
+
+		internal RunwayGeomDataDTO( RunwayGeomData geomData )
+		{
+			if( geomData == null ) {
+				return;
+			}
+			Length = geomData.Length;
+			Width = geomData.Width;
+			RotatedAngle_deg = geomData.RotatedAngle_deg;
+		}
+
+		internal RunwayGeomData ToRunwayGeomData()
+		{
+			return new RunwayGeomData( Length, Width, RotatedAngle_deg );
 		}
 	}
 
@@ -426,12 +862,6 @@ namespace MyCAM.FileManager
 	public class CraftDataDTO
 	{
 		// properties
-		public string UID
-		{
-			get;
-			set;
-		} = string.Empty;
-
 		public bool IsReverse
 		{
 			get;
@@ -483,7 +913,6 @@ namespace MyCAM.FileManager
 			if( craftData == null ) {
 				return;
 			}
-			UID = craftData.UID;
 			IsReverse = craftData.IsReverse;
 			IsToolVecReverse = craftData.IsToolVecReverse;
 			StartPoint = craftData.StartPointIndex;
@@ -507,7 +936,7 @@ namespace MyCAM.FileManager
 			Dictionary<int, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
 			LeadData leadParam = LeadParam.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
-			return new CraftData( UID, StartPoint, IsReverse, leadParam, OverCutLength, toolVecModifyMap, IsToolVecReverse, traverseData );
+			return new CraftData( StartPoint, IsReverse, leadParam, OverCutLength, toolVecModifyMap, IsToolVecReverse, traverseData );
 		}
 	}
 

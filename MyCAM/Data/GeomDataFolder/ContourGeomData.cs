@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
-	public class ContourGeomData
+	public class ContourGeomData : IGeomData, ICenterPointCache
 	{
-		public ContourGeomData( string szUID, List<PathEdge5D> pathDataList, bool isClosed )
+		public ContourGeomData( List<PathEdge5D> pathDataList, bool isClosed )
 		{
 			if( pathDataList == null ) {
 				throw new ArgumentNullException( "ContourGeomData constructing argument null" );
@@ -15,12 +15,13 @@ namespace MyCAM.Data
 			if( pathDataList.Count == 0 ) {
 				throw new ArgumentException( "ContourGeomData constructing argument empty pathDataList" );
 			}
-			UID = szUID;
+			m_IsClosed = isClosed;
 			DisctereContourHelper.BuildContourGeomData( pathDataList, isClosed,
 				out m_CADPointList, out m_ConnectPointMap );
+			DisctereContourHelper.GetContourCenterPointAndNormalDir( m_CADPointList, out m_OriCenterPnt, out m_AverageNormalDir );
 		}
 
-		public ContourGeomData( string szUID, List<CADPoint> cadPointList, Dictionary<CADPoint, CADPoint> connectPointMap )
+		public ContourGeomData( List<CADPoint> cadPointList, Dictionary<CADPoint, CADPoint> connectPointMap, bool isClosed )
 		{
 			if( cadPointList == null || connectPointMap == null ) {
 				throw new ArgumentNullException( "ContourGeomData constructing argument null" );
@@ -28,14 +29,18 @@ namespace MyCAM.Data
 			if( cadPointList.Count == 0 ) {
 				throw new ArgumentException( "ContourGeomData constructing argument empty cadPointList" );
 			}
-			UID = szUID;
 			m_CADPointList = cadPointList;
 			m_ConnectPointMap = connectPointMap;
+			m_IsClosed = isClosed;
+			DisctereContourHelper.GetContourCenterPointAndNormalDir( m_CADPointList, out m_OriCenterPnt, out m_AverageNormalDir );
 		}
 
-		public string UID
+		public PathType PathType
 		{
-			get; private set;
+			get
+			{
+				return PathType.Contour;
+			}
 		}
 
 		public List<CADPoint> CADPointList
@@ -54,6 +59,30 @@ namespace MyCAM.Data
 			}
 		}
 
+		public bool IsClosed
+		{
+			get
+			{
+				return m_IsClosed;
+			}
+		}
+
+		public gp_Pnt CenterPnt
+		{
+			get
+			{
+				return m_OriCenterPnt;
+			}
+		}
+
+		public gp_Dir AverageNormalDir
+		{
+			get
+			{
+				return m_AverageNormalDir;
+			}
+		}
+
 		public void DoTransform( gp_Trsf transform )
 		{
 			foreach( CADPoint cadPoint in m_CADPointList ) {
@@ -62,9 +91,18 @@ namespace MyCAM.Data
 			foreach( var oneConnectPoint in m_ConnectPointMap ) {
 				oneConnectPoint.Value.Transform( transform );
 			}
+			DisctereContourHelper.GetContourCenterPointAndNormalDir( m_CADPointList, out m_OriCenterPnt, out m_AverageNormalDir );
+		}
+
+		public IGeomData Clone()
+		{
+			return new ContourGeomData( m_CADPointList, m_ConnectPointMap, m_IsClosed );
 		}
 
 		List<CADPoint> m_CADPointList;
 		Dictionary<CADPoint, CADPoint> m_ConnectPointMap;
+		gp_Pnt m_OriCenterPnt;
+		gp_Dir m_AverageNormalDir;
+		bool m_IsClosed;
 	}
 }

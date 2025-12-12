@@ -157,6 +157,12 @@ namespace MyCAM.Data
 	public enum PathType
 	{
 		Contour = 0,
-		Rectangle = 1,
+		Circle = 1,
+		Rectangle = 2,
+		Runway = 3,
+		Triangle = 4,
+		Square = 5,
+		Pentagon = 6,
+		Hexagon = 7,
 	}
 }

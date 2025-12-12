@@ -5,15 +5,13 @@ namespace MyCAM.Data
 {
 	public class CraftData
 	{
-		public CraftData( string szUID )
+		public CraftData()
 		{
-			UID = szUID;
 			SubscribeSubParamChanged();
 		}
 
 		// this constructor is used when reading from file
-		public CraftData( string szUID,
-			int startPoint,
+		public CraftData( int startPoint,
 			bool isReverse,
 			LeadData leadData,
 			double overCutLength,
@@ -21,7 +19,6 @@ namespace MyCAM.Data
 			bool isToolVecReverse,
 			TraverseData traverseData )
 		{
-			UID = szUID;
 			m_StartPointIndex = startPoint;
 			m_IsReverse = isReverse;
 			m_LeadParam = leadData;
@@ -33,11 +30,6 @@ namespace MyCAM.Data
 		}
 
 		public Action ParameterChanged;
-
-		public string UID
-		{
-			get; private set;
-		}
 
 		public int StartPointIndex
 		{

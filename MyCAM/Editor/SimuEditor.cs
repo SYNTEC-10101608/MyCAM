@@ -105,8 +105,6 @@ namespace MyCAM.Editor
 
 		public void BuildSimuData()
 		{
-
-			List<ICacheInfo> cacheInfoList = new List<ICacheInfo>();
 			foreach( string szID in m_DataManager.PartIDList ) {
 				CraftData craftData = ( m_DataManager.ObjectMap[ szID ] as PathObject ).CraftData;
 				ContourCacheInfo contourCacheInfo = ( m_DataManager.ObjectMap[ szID ] as ContourPathObject ).ContourCacheInfo;

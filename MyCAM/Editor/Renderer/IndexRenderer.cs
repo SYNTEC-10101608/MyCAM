@@ -2,7 +2,6 @@ using MyCAM.CacheInfo;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.gp;
-using OCC.Graphic3d;
 using OCC.Quantity;
 using OCC.TCollection;
 using OCCTool;
@@ -42,7 +41,7 @@ namespace MyCAM.Editor.Renderer
 				if( location == null ) {
 					continue;
 				}
-				string szIndex = (++nCurrentIndex).ToString();
+				string szIndex = ( ++nCurrentIndex ).ToString();
 
 				// create text label ais
 				AIS_TextLabel textLabel = new AIS_TextLabel();
@@ -78,13 +77,10 @@ namespace MyCAM.Editor.Renderer
 
 		gp_Pnt GetMainPathStartPoint( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetMainPathStartPointCache( pathID, out IMainPathStartPointCache startPnt ) ) {
 				return null;
 			}
-			if( contourCacheInfo.CAMPointList == null || contourCacheInfo.CAMPointList.Count == 0 ) {
-				return null;
-			}
-			return contourCacheInfo.CAMPointList[ 0 ].Point;
+			return startPnt.GetMainPathStartCAMPoint().Point;
 		}
 	}
 }

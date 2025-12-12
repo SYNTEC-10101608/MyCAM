@@ -50,6 +50,7 @@ namespace MyCAM.Editor
 		// to notice main form
 		public Action<EditableInfo> PathPropertyChanged;
 		public Action<EditActionType, EActionStatus> RaiseCAMActionStatusChange;
+		public Action<PathType> PathShapeTypeChanged;
 
 		// action with dialog need to disable main form
 		// because other action enterance might close this action, but without closing this form
@@ -234,7 +235,9 @@ namespace MyCAM.Editor
 		public void RemovePath()
 		{
 			// stop current action
-			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
 			foreach( string szPathID in szPathIDList ) {
 
 				// remove from data manager
@@ -280,9 +283,11 @@ namespace MyCAM.Editor
 		public void SetReverse()
 		{
 			// one shot edit, muti edit supported
-			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 
@@ -347,9 +352,11 @@ namespace MyCAM.Editor
 		public void SetToolVecReverse()
 		{
 			// one shot edit, multi edit supported
-			ValidateBeforeOneShotEdit( out List<string> szPathIDList, true );
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCraftDataByID( m_DataManager, szPathID, out CraftData craftData ) ) {
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 
@@ -386,13 +393,30 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetStandardPattern()
+		{
+			if( IsSameAction( EditActionType.SetPattern ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
+
+			PatternAction action = new PatternAction( m_DataManager, m_Viewer, m_ViewManager, szPathIDList );
+			action.PropertyChanged += OnPathShapeTypeChange;
+			StartEditAction( action );
+		}
+
 		#endregion
 
 		// sort API
 		public void MoveProcess( bool bUp )
 		{
 			// one shot edit, no multi edit supported
-			ValidateBeforeOneShotEdit( out List<string> szPathIDList, false );
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
 			string szPathID = szPathIDList[ 0 ];
 			int nIndex = m_DataManager.PathIDList.IndexOf( szPathID );
 
@@ -417,14 +441,16 @@ namespace MyCAM.Editor
 		public void AutoSortProcess()
 		{
 			// one shot edit, no multi edit supported
-			ValidateBeforeOneShotEdit( out List<string> szPathIDList, false );
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, false ) ) {
+				return;
+			}
 			string szStartPathID = szPathIDList[ 0 ];
 
 			// get start point
-			if( !GetCacheInfoByID( m_DataManager, szStartPathID, out ICacheInfo cacheInfo ) ) {
+			if( !PathCacheProvider.TryGetProcessPathStartEndCache( szStartPathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
 				return;
 			}
-			gp_Pnt currentPoint = cacheInfo.GetProcessStartPoint().Point;
+			gp_Pnt currentPoint = processPathStartEndCache.GetProcessStartPoint().Point;
 
 			// init data manager
 			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
@@ -444,10 +470,10 @@ namespace MyCAM.Editor
 					if( visited[ i ] ) {
 						continue;
 					}
-					if( !GetCacheInfoByID( m_DataManager, pathIDList[ i ], out ICacheInfo nextCacheInfo ) ) {
-						continue;
+					if( !PathCacheProvider.TryGetProcessPathStartEndCache( pathIDList[ i ], out IProcessPathStartEndCache nextProcessPathStartEndCache ) ) {
+						return;
 					}
-					gp_Pnt nextStartPoint = nextCacheInfo.GetProcessStartPoint().Point;
+					gp_Pnt nextStartPoint = nextProcessPathStartEndCache.GetProcessStartPoint().Point;
 					double distanceSq = currentPoint.SquareDistance( nextStartPoint );
 					if( distanceSq < minDistanceSq ) {
 						minDistanceSq = distanceSq;
@@ -527,17 +553,28 @@ namespace MyCAM.Editor
 
 			// closed path editable only: start point, overcut, lead line, change lead dir
 			foreach( string szPathID in szPathIDList ) {
-				if( !GetCacheInfoByID( m_DataManager, szPathID, out ICacheInfo cacheInfo ) ) {
+				if( !DataGettingHelper.GetGeomDataByID( szPathID, out IGeomData geomData ) ) {
 					continue;
 				}
-				if( !( cacheInfo as ContourCacheInfo ).IsClosed ) {
+				if( !geomData.IsClosed ) {
 					editableInfo.IsStartPointEditable = false;
 					editableInfo.IsOverCutEditable = false;
 					editableInfo.IsLeadLineEditable = false;
 					break;
 				}
+
+				if( geomData.PathType != PathType.Contour ) {
+					editableInfo.IsReverseEditable = false;
+					editableInfo.IsToolVecEditable = false;
+				}
 			}
 			PathPropertyChanged?.Invoke( editableInfo );
+		}
+
+		void OnPathShapeTypeChange( PathType type, List<string> szPathIDList )
+		{
+			ShowCAMData( szPathIDList );
+			PathShapeTypeChanged?.Invoke( type );
 		}
 
 		#region Show CAM
@@ -629,40 +666,6 @@ namespace MyCAM.Editor
 			}
 			return true;
 		}
-
-		bool GetCraftDataByID( DataManager dataManager, string szPathID, out CraftData craftData )
-		{
-			craftData = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| dataManager.ObjectMap.ContainsKey( szPathID ) == false
-				|| dataManager.ObjectMap[ szPathID ] == null
-				|| !( dataManager.ObjectMap[ szPathID ] is PathObject )
-				|| ( (PathObject)dataManager.ObjectMap[ szPathID ] ).CraftData == null ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
-				return false;
-			}
-
-			if( ( (PathObject)dataManager.ObjectMap[ szPathID ] ).PathType == PathType.Contour ) {
-				craftData = ( (ContourPathObject)dataManager.ObjectMap[ szPathID ] ).CraftData;
-			}
-			return true;
-		}
-
-		bool GetCacheInfoByID( DataManager dataManager, string szPathID, out ICacheInfo cacheInfo )
-		{
-			cacheInfo = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| dataManager.ObjectMap.ContainsKey( szPathID ) == false
-				|| dataManager.ObjectMap[ szPathID ] == null ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
-				return false;
-			}
-			if( ( (PathObject)dataManager.ObjectMap[ szPathID ] ).PathType == PathType.Contour ) {
-				cacheInfo = ( (ContourPathObject)dataManager.ObjectMap[ szPathID ] ).ContourCacheInfo;
-			}
-			return true;
-		}
-
 
 		// edit actions
 		protected override void OnEditActionStart( IEditorAction action )

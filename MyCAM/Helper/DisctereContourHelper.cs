@@ -130,6 +130,35 @@ namespace MyCAM.Helper
 			return true;
 		}
 
+		public static void GetContourCenterPointAndNormalDir( List<CADPoint> points, out gp_Pnt originalPoint, out gp_Dir normalDirect )
+		{
+			originalPoint = new gp_Pnt();
+			normalDirect = new gp_Dir();
+
+			if( points == null || points.Count == 0 ) {
+				return;
+			}
+
+			int nPointNumber = points.Count;
+			double xValue = 0.0;
+			double yValue = 0.0;
+			double zValue = 0.0;
+			double xDirValue = 0.0;
+			double yDirValue = 0.0;
+			double zDirValue = 0.0;
+
+			foreach( var point in points ) {
+				xValue += point.Point.X();
+				yValue += point.Point.Y();
+				zValue += point.Point.Z();
+				xDirValue += point.NormalVec_1st.X();
+				yDirValue += point.NormalVec_1st.Y();
+				zDirValue += point.NormalVec_1st.Z();
+			}
+			originalPoint.SetCoord( xValue / nPointNumber, yValue / nPointNumber, zValue / nPointNumber );
+			normalDirect.SetCoord( xDirValue / nPointNumber, yDirValue / nPointNumber, zDirValue / nPointNumber );
+		}
+
 		const double DISCRETE_MAX_DEFLECTION = 0.01;
 		const double DISCRETE_MAX_EDGE_LENGTH = 1.0;
 	}

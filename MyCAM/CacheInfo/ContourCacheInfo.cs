@@ -6,28 +6,22 @@ using System.Linq;
 
 namespace MyCAM.CacheInfo
 {
-	public class ContourCacheInfo : ICacheInfo
+	public class ContourCacheInfo : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache, ICacheInfo
 	{
-		public ContourCacheInfo( string szID, ContourGeomData geomData, CraftData craftData, bool isClose )
+		public ContourCacheInfo( ContourGeomData geomData, CraftData craftData )
 		{
-			if( string.IsNullOrEmpty( szID ) || geomData == null || craftData == null ) {
+			if( geomData == null || craftData == null ) {
 				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );
 			}
 			if( geomData.CADPointList.Count == 0 ) {
 				throw new ArgumentException( "ContourCacheInfo constructing argument empty cadPointList" );
 			}
-			UID = szID;
 			m_CADPointList = geomData.CADPointList;
 			m_ConnectCADPointMap = geomData.ConnectPointMap;
 			m_CraftData = craftData;
-			IsClosed = isClose;
+			m_IsClose = geomData.IsClosed;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
 			BuildCAMPointList();
-		}
-
-		public string UID
-		{
-			get; private set;
 		}
 
 		public PathType PathType
@@ -51,7 +45,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		internal List<CAMPoint> LeadInCAMPointList
+		public List<CAMPoint> LeadInCAMPointList
 		{
 			get
 			{
@@ -62,7 +56,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		internal List<CAMPoint> LeadOutCAMPointList
+		public List<CAMPoint> LeadOutCAMPointList
 		{
 			get
 			{
@@ -73,7 +67,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		internal List<CAMPoint> OverCutCAMPointList
+		public List<CAMPoint> OverCutCAMPointList
 		{
 			get
 			{
@@ -84,7 +78,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public CAMPoint GetProcessStartPoint()
+		public IProcessPoint GetProcessStartPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -99,7 +93,7 @@ namespace MyCAM.CacheInfo
 			return camPoint;
 		}
 
-		public CAMPoint GetProcessEndPoint()
+		public IProcessPoint GetProcessEndPoint()
 		{
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
@@ -116,6 +110,23 @@ namespace MyCAM.CacheInfo
 			}
 			return camPoint;
 		}
+
+		public CAMPoint GetMainPathStartCAMPoint()
+		{
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
+			return m_CAMPointList.First().Clone();
+		}
+
+		public IReadOnlyList<IProcessPoint> GetToolVecList()
+		{
+			if( m_IsCraftDataDirty ) {
+				BuildCAMPointList();
+			}
+			return m_CAMPointList.Cast<IProcessPoint>().ToList();
+		}
+
 		#endregion
 
 		#region API
@@ -186,11 +197,6 @@ namespace MyCAM.CacheInfo
 		}
 		#endregion
 
-		public bool IsClosed
-		{
-			get; private set;
-		}
-
 		void BuildCAMPointList()
 		{
 			m_IsCraftDataDirty = false;
@@ -213,7 +219,7 @@ namespace MyCAM.CacheInfo
 
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, IsClosed, m_CraftData.IsToolVecReverse );
+			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, m_IsClose, m_CraftData.IsToolVecReverse );
 			foreach( var oneConnect in m_ConnectCAMPointMap ) {
 				oneConnect.Value.ToolVec = oneConnect.Key.ToolVec;
 			}
@@ -223,7 +229,7 @@ namespace MyCAM.CacheInfo
 			SetOrientation();
 
 			// close the loop if is closed
-			if( IsClosed && m_CAMPointList.Count > 0 ) {
+			if( m_IsClose && m_CAMPointList.Count > 0 ) {
 				CAMPoint startPoint = m_CAMPointList[ 0 ];
 				CAMPoint connectedCAMPoint = m_ConnectCAMPointMap.ContainsKey( startPoint )
 												? m_ConnectCAMPointMap[ startPoint ]
@@ -233,7 +239,7 @@ namespace MyCAM.CacheInfo
 
 			// set over cut
 			List<IOrientationPoint> camPointOverCutList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
-			OverCutHelper.SetOverCut( camPointOverCutList, out List<IOrientationPoint> overCutPointList, m_CraftData.OverCutLength, IsClosed );
+			OverCutHelper.SetOverCut( camPointOverCutList, out List<IOrientationPoint> overCutPointList, m_CraftData.OverCutLength, m_IsClose );
 			m_OverCutPointList = overCutPointList.Cast<CAMPoint>().ToList();
 
 			// set lead
@@ -264,7 +270,7 @@ namespace MyCAM.CacheInfo
 				m_CAMPointList.Reverse();
 
 				// modify start point index for closed path
-				if( IsClosed ) {
+				if( m_IsClose ) {
 					CAMPoint lastPoint = m_CAMPointList.Last();
 					m_CAMPointList.Remove( lastPoint );
 					m_CAMPointList.Insert( 0, lastPoint );
@@ -299,5 +305,6 @@ namespace MyCAM.CacheInfo
 
 		// flag to indicate craft data changed
 		bool m_IsCraftDataDirty = false;
+		bool m_IsClose = false;
 	}
 }

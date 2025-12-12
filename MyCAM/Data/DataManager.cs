@@ -1,5 +1,4 @@
-﻿using MyCAM.CacheInfo;
-using OCC.gp;
+﻿using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;

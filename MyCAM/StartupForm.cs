@@ -75,6 +75,7 @@ namespace MyCAM
 				m_DataManager = new DataManager();
 				MyApp.Logger.ShowOnLogPanel( "使用默認機構專案檔", MyApp.NoticeType.Warning );
 			}
+			DataGettingHelper.Initialize( m_DataManager );
 
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -85,6 +86,7 @@ namespace MyCAM
 			m_CAMEditor.PathPropertyChanged = OnCAMPathPropertyChanged;
 			m_CAMEditor.RaiseCAMActionStatusChange += OnCAMActionStatusChange;
 			m_CAMEditor.RaiseWithDlgActionStatusChange += OnCAMDlgActionStatusChange;
+			m_CAMEditor.PathShapeTypeChanged = OnPathShapeTypeChange;
 			RaiseShowVecStatusChange += m_CAMEditor.SetShowToolVec;
 			RaiseShowOrderStatusChange += m_CAMEditor.SetShowOrder;
 			RaiseShowOrientStatusChange += m_CAMEditor.SetShowOrientation;
@@ -365,6 +367,11 @@ namespace MyCAM
 			m_CAMEditor.SetEntryAndExitParam();
 		}
 
+		void m_tsbPatternSetting_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetStandardPattern();
+		}
+
 		// convert NC
 		void m_tsbConvertNC_Click( object sender, EventArgs e )
 		{
@@ -584,6 +591,20 @@ namespace MyCAM
 			m_tsbMoveUp.Enabled = editableInfo.IsMoveProcessEditable;
 			m_tsbMoveDown.Enabled = editableInfo.IsMoveProcessEditable;
 			m_tsbAutoOrder.Enabled = editableInfo.IsAutoOrderEditable;
+			m_tsbReverse.Enabled = editableInfo.IsReverseEditable;
+		}
+
+		// path type change event
+		void OnPathShapeTypeChange( PathType type )
+		{
+			if( type != PathType.Contour ) {
+				m_tsbReverse.Enabled = false;
+				m_tsbToolVec.Enabled = false;
+			}
+			else {
+				m_tsbReverse.Enabled = true;
+				m_tsbToolVec.Enabled = true;
+			}
 		}
 
 		// ui display
@@ -912,6 +933,8 @@ namespace MyCAM
 		}
 
 		#endregion
+
+
 	}
 }
 
