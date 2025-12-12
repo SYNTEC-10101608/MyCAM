@@ -7,7 +7,7 @@ namespace MyCAM.CacheInfo
 {
 	public class CircleCacheInfo : StandardPatternBasedCacheInfo
 	{
-		public CircleCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData geomData, CraftData craftData )
+		public CircleCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
 			: base( coordinateInfo, craftData )
 		{
 			if( geomData == null || !( geomData is CircleGeomData circleGeomData ) ) {

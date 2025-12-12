@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
-	public class ContourGeomData : IGeomData, ICenterPointCache
+	public class ContourGeomData : IContourGeomData
 	{
 		public ContourGeomData( List<PathEdge5D> pathDataList, bool isClosed )
 		{
@@ -71,7 +71,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return m_OriCenterPnt;
+				return new gp_Pnt( m_OriCenterPnt.XYZ() );
 			}
 		}
 
@@ -79,7 +79,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return m_AverageNormalDir;
+				return new gp_Dir( m_AverageNormalDir.XYZ() );
 			}
 		}
 
@@ -91,7 +91,8 @@ namespace MyCAM.Data
 			foreach( var oneConnectPoint in m_ConnectPointMap ) {
 				oneConnectPoint.Value.Transform( transform );
 			}
-			DisctereContourHelper.GetContourCenterPointAndNormalDir( m_CADPointList, out m_OriCenterPnt, out m_AverageNormalDir );
+			m_OriCenterPnt.Transform( transform );
+			m_AverageNormalDir.Transform( transform );
 		}
 
 		public IGeomData Clone()

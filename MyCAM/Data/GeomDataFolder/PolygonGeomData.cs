@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Data
 {
-	public class PolygonGeomData : IStandardPatternGeomData
+	public class PolygonGeomData : StdPatternGeomDataBase
 	{
 		public PolygonGeomData( int sides, double sideLength, double cornerRadius, double rotatedAngle_deg )
 		{
@@ -24,7 +24,7 @@
 			m_RotatedAngle_deg = DEFAULT_ROTATED_ANGLE;
 		}
 
-		public PathType PathType
+		public override PathType PathType
 		{
 			get
 			{
@@ -73,27 +73,7 @@
 			}
 		}
 
-		public double RotatedAngle_deg
-		{
-			get
-			{
-				return m_RotatedAngle_deg;
-			}
-			set
-			{
-				m_RotatedAngle_deg = value;
-			}
-		}
-
-		public bool IsClosed
-		{
-			get
-			{
-				return true;
-			}
-		}
-
-		public IGeomData Clone()
+		public override IGeomData Clone()
 		{
 			return new PolygonGeomData( Sides, m_SideLength, m_CornerRadius, m_RotatedAngle_deg );
 		}
@@ -104,6 +84,5 @@
 		public const double DEFAULT_ROTATED_ANGLE = 0.0;
 		double m_SideLength;
 		double m_CornerRadius;
-		double m_RotatedAngle_deg;
 	}
 }

@@ -7,7 +7,7 @@ namespace MyCAM.CacheInfo
 {
 	public class RectangleCacheInfo : StandardPatternBasedCacheInfo
 	{
-		public RectangleCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData geomData, CraftData craftData )
+		public RectangleCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
 			: base( coordinateInfo, craftData )
 		{
 			if( geomData == null || !( geomData is RectangleGeomData rectangleGeomData ) ) {

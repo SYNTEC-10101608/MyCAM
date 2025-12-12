@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Data
 {
-	public class RunwayGeomData : IStandardPatternGeomData
+	public class RunwayGeomData : StdPatternGeomDataBase
 	{
 		public RunwayGeomData( double length, double width, double rotatedAngle_deg )
 		{
@@ -16,7 +16,7 @@
 			m_RotatedAngle_deg = DEFAULT_ROTATED_ANGLE;
 		}
 
-		public PathType PathType
+		public override PathType PathType
 		{
 			get
 			{
@@ -48,27 +48,7 @@
 			}
 		}
 
-		public double RotatedAngle_deg
-		{
-			get
-			{
-				return m_RotatedAngle_deg;
-			}
-			set
-			{
-				m_RotatedAngle_deg = value;
-			}
-		}
-
-		public bool IsClosed
-		{
-			get
-			{
-				return true;
-			}
-		}
-
-		public IGeomData Clone()
+		public override IGeomData Clone()
 		{
 			return new RunwayGeomData( m_Length, m_Width, m_RotatedAngle_deg );
 		}
@@ -78,6 +58,5 @@
 		public const double DEFAULT_ROTATED_ANGLE = 0.0;
 		double m_Length;
 		double m_Width;
-		double m_RotatedAngle_deg;
 	}
 }

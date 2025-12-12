@@ -7,7 +7,7 @@ namespace MyCAM.CacheInfo
 {
 	public class RunwayCacheInfo : StandardPatternBasedCacheInfo
 	{
-		public RunwayCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData geomData, CraftData craftData )
+		public RunwayCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
 			: base( coordinateInfo, craftData )
 		{
 			if( geomData == null || !( geomData is RunwayGeomData runwayGeomData ) ) {

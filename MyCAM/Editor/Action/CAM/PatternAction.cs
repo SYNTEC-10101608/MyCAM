@@ -53,7 +53,7 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			IStandardPatternGeomData standardPatternGeomData = ( m_GeomData is IStandardPatternGeomData ) ? (IStandardPatternGeomData)m_GeomData.Clone() : null;
+			IStdPatternGeomData standardPatternGeomData = ( m_GeomData is IStdPatternGeomData ) ? (IStdPatternGeomData)m_GeomData.Clone() : null;
 			PatternSettingDlg patternFrom = new PatternSettingDlg( standardPatternGeomData );
 			patternFrom.Confirm += ConfirmPatternSetting;
 			patternFrom.Preview += PreviewPatternSetting;
@@ -61,14 +61,14 @@ namespace MyCAM.Editor
 			patternFrom.Show( MyApp.MainForm );
 		}
 
-		void PreviewPatternSetting( IStandardPatternGeomData standardPatternGeomData )
+		void PreviewPatternSetting( IStdPatternGeomData standardPatternGeomData )
 		{
 			PatternCreate( standardPatternGeomData );
 			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
 			PropertyChanged?.Invoke( pathType, m_szPathIDList );
 		}
 
-		void ConfirmPatternSetting( IStandardPatternGeomData standardPatternGeomData )
+		void ConfirmPatternSetting( IStdPatternGeomData standardPatternGeomData )
 		{
 			PatternCreate( standardPatternGeomData );
 			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
@@ -83,7 +83,7 @@ namespace MyCAM.Editor
 			End();
 		}
 
-		void PatternCreate( IStandardPatternGeomData standardPatternGeomData )
+		void PatternCreate( IStdPatternGeomData standardPatternGeomData )
 		{
 			TopoDS_Shape shape = null;
 			foreach( var szID in m_szPathIDList ) {
@@ -122,7 +122,7 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		PathObject CreatePathObject( string szID, TopoDS_Shape shape, IStandardPatternGeomData standardPatternGeomData, ContourPathObject contourPathObject, PathObject originalPathObject )
+		PathObject CreatePathObject( string szID, TopoDS_Shape shape, IStdPatternGeomData standardPatternGeomData, ContourPathObject contourPathObject, PathObject originalPathObject )
 		{
 			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
 			switch( pathType ) {

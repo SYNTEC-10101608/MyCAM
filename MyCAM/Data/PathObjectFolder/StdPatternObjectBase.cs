@@ -7,7 +7,7 @@ namespace MyCAM.Data
 {
 	internal abstract class StdPatternObjectBase : PathObject
 	{
-		protected StdPatternObjectBase( string szUID, TopoDS_Shape shape, IStandardPatternGeomData geomData, ContourPathObject contourPathObject )
+		protected StdPatternObjectBase( string szUID, TopoDS_Shape shape, IStdPatternGeomData geomData, ContourPathObject contourPathObject )
 			: base( szUID, shape )
 		{
 			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || geomData == null || contourPathObject == null ) {
@@ -22,7 +22,7 @@ namespace MyCAM.Data
 		}
 
 
-		protected StdPatternObjectBase( string szUID, TopoDS_Shape shape, IStandardPatternGeomData geomData, CraftData craftData, ContourPathObject contourPathObject )
+		protected StdPatternObjectBase( string szUID, TopoDS_Shape shape, IStdPatternGeomData geomData, CraftData craftData, ContourPathObject contourPathObject )
 			: base( szUID, shape )
 		{
 			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || geomData == null || craftData == null || contourPathObject == null ) {
@@ -36,7 +36,7 @@ namespace MyCAM.Data
 			InitializeCacheInfo();
 		}
 
-		public IStandardPatternGeomData GeomData
+		public IStdPatternGeomData GeomData
 		{
 			get
 			{
@@ -81,7 +81,7 @@ namespace MyCAM.Data
 			m_StandatdPatternCacheInfo = (StandardPatternBasedCacheInfo)StandardPatternCacheInfoFactory.CreateCacheInfo( coordinateInfo, m_GeomData, m_CraftData );
 		}
 
-		IStandardPatternGeomData m_GeomData;
+		IStdPatternGeomData m_GeomData;
 		StandardPatternBasedCacheInfo m_StandatdPatternCacheInfo;
 		ContourPathObject m_ContourPathObject;
 	}

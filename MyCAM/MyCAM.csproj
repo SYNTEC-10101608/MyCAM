@@ -65,6 +65,7 @@
     <Compile Include="Data\GeomDataFolder\ContourGeomData.cs" />
     <Compile Include="Data\GeomDataFolder\PolygonGeomData.cs" />
     <Compile Include="Data\GeomDataFolder\RunwayGeomData.cs" />
+    <Compile Include="Data\GeomDataFolder\StdPatternGeomDataBase.cs" />
     <Compile Include="Data\PathObjectFolder\CirclePathObject.cs" />
     <Compile Include="Data\PathObjectFolder\ContourPathObject.cs" />
     <Compile Include="Data\CraftData.cs" />

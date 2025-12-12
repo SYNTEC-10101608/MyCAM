@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Data
 {
-	public class CircleGeomData : IStandardPatternGeomData
+	public class CircleGeomData : StdPatternGeomDataBase
 	{
 		public CircleGeomData( double diameter, double rotatedAngle_deg )
 		{
@@ -14,7 +14,7 @@
 			m_RotatedAngle_deg = DEFAULT_ROTATED_ANGLE;
 		}
 
-		public PathType PathType
+		public override PathType PathType
 		{
 			get
 			{
@@ -34,27 +34,7 @@
 			}
 		}
 
-		public double RotatedAngle_deg
-		{
-			get
-			{
-				return m_RotatedAngle_deg;
-			}
-			set
-			{
-				m_RotatedAngle_deg = value;
-			}
-		}
-
-		public bool IsClosed
-		{
-			get
-			{
-				return true;
-			}
-		}
-
-		public IGeomData Clone()
+		public override IGeomData Clone()
 		{
 			return new CircleGeomData( m_Diameter, m_RotatedAngle_deg );
 		}
@@ -62,6 +42,5 @@
 		public const double DEFAULT_DIAMETER = 20.0;
 		public const double DEFAULT_ROTATED_ANGLE = 0.0;
 		double m_Diameter;
-		double m_RotatedAngle_deg = 0;
 	}
 }

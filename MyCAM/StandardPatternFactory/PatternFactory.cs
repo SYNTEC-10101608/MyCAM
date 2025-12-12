@@ -7,7 +7,7 @@ namespace MyCAM.StandardPatternFactory
 {
 	public class PatternFactory
 	{
-		public PatternFactory( ICenterPointCache standardPatternInfo, IStandardPatternGeomData standardPatternGeomData )
+		public PatternFactory( ICenterAvgDir standardPatternInfo, IStdPatternGeomData standardPatternGeomData )
 		{
 			if( standardPatternInfo == null ) {
 				throw new ArgumentNullException( "PatternFactory constructing argument null" );
@@ -92,7 +92,7 @@ namespace MyCAM.StandardPatternFactory
 			return strategy.CreateWire( m_CenterPoint, plane, m_StandardPatternGeomData, out wire );
 		}
 
-		IStandardPatternGeomData m_StandardPatternGeomData;
+		IStdPatternGeomData m_StandardPatternGeomData;
 		TopoDS_Wire m_ShapeWire;
 		gp_Pnt m_CenterPoint;
 		gp_Dir m_NormalDir;

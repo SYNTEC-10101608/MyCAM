@@ -6,20 +6,20 @@ namespace MyCAM.CacheInfo
 {
 	internal interface IStandardPatternCacheInfoStrategy
 	{
-		IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData standardPatternGeomData, CraftData craftData );
+		IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData );
 	}
 
 	internal class StandardPatternCacheInfoStrategy<TCacheInfo> : IStandardPatternCacheInfoStrategy
 		where TCacheInfo : IStandardPatternCacheInfo
 	{
-		readonly Func<gp_Ax3, IStandardPatternGeomData, CraftData, TCacheInfo> m_CacheInfoFactory;
+		readonly Func<gp_Ax3, IStdPatternGeomData, CraftData, TCacheInfo> m_CacheInfoFactory;
 
-		public StandardPatternCacheInfoStrategy( Func<gp_Ax3, IStandardPatternGeomData, CraftData, TCacheInfo> cacheInfoFactory )
+		public StandardPatternCacheInfoStrategy( Func<gp_Ax3, IStdPatternGeomData, CraftData, TCacheInfo> cacheInfoFactory )
 		{
 			m_CacheInfoFactory = cacheInfoFactory ?? throw new ArgumentNullException( nameof( cacheInfoFactory ) );
 		}
 
-		public IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData standardPatternGeomData, CraftData craftData )
+		public IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
 		{
 			if( coordinateInfo == null ) {
 				throw new ArgumentNullException( nameof( coordinateInfo ) );
@@ -69,7 +69,7 @@ namespace MyCAM.CacheInfo
 			}
 		}
 
-		public static IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStandardPatternGeomData standardPatternGeomData, CraftData craftData )
+		public static IStandardPatternCacheInfo CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
 		{
 			if( standardPatternGeomData == null ) {
 				throw new ArgumentNullException( nameof( standardPatternGeomData ) );

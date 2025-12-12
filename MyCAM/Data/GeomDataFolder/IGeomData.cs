@@ -17,15 +17,12 @@ namespace MyCAM.Data
 		IGeomData Clone();
 	}
 
-	public interface IRotatable
+	public interface ITransformableGeom
 	{
-		double RotatedAngle_deg
-		{
-			get; set;
-		}
+		void DoTransform( gp_Trsf transform );
 	}
 
-	public interface ICenterPointCache
+	public interface ICenterAvgDir
 	{
 		gp_Pnt CenterPnt
 		{
@@ -38,8 +35,19 @@ namespace MyCAM.Data
 		}
 	}
 
-	public interface IStandardPatternGeomData : IRotatable, IGeomData
+	public interface IRotatable
 	{
+		double RotatedAngle_deg
+		{
+			get; set;
+		}
+	}
 
+	public interface IContourGeomData : IGeomData, ITransformableGeom, ICenterAvgDir
+	{
+	}
+
+	public interface IStdPatternGeomData : IGeomData, ITransformableGeom, IRotatable, ICenterAvgDir
+	{
 	}
 }

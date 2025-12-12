@@ -10,11 +10,11 @@ namespace MyCAM.StandardPatternFactory
 
 	internal interface IWireCreationStrategy
 	{
-		bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStandardPatternGeomData standardPatternGeomData, out TopoDS_Wire wire );
+		bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStdPatternGeomData standardPatternGeomData, out TopoDS_Wire wire );
 	}
 
 	internal class WireCreationStrategy<TGeomData> : IWireCreationStrategy
-		where TGeomData : class, IStandardPatternGeomData
+		where TGeomData : class, IStdPatternGeomData
 	{
 		readonly Func<gp_Pnt, gp_Pln, TGeomData, WireResult> m_WireFactory;
 
@@ -23,7 +23,7 @@ namespace MyCAM.StandardPatternFactory
 			m_WireFactory = wireFactory ?? throw new ArgumentNullException( nameof( wireFactory ) );
 		}
 
-		public bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStandardPatternGeomData standardPatternGeomData, out TopoDS_Wire wire )
+		public bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStdPatternGeomData standardPatternGeomData, out TopoDS_Wire wire )
 		{
 			wire = null;
 
