@@ -9,38 +9,104 @@ namespace MyCAM.Editor
 {
 	public class MultiSelectTreeView : TreeView
 	{
-		// Maintains the selected nodes
-		private readonly List<TreeNode> _selectedNodes = new List<TreeNode>();
-		// Anchor node for Shift selection
-		private TreeNode _anchorNode = null;
-
-		// Public read-only access to selected nodes
+		// public read-only access to selected nodes
 		[Browsable( false )]
-		public IReadOnlyList<TreeNode> SelectedNodes => _selectedNodes.AsReadOnly();
+		public IReadOnlyList<TreeNode> SelectedNodes => m_SelectedNodes.AsReadOnly();
 
-		// Event for selection changes
+		// event for selection changes
 		public event EventHandler SelectionChanged;
 
 		public MultiSelectTreeView()
 		{
-			// Enable keyboard support
+			// enable keyboard support
 			this.HideSelection = false;
-			// Ensure no built-in selected node (we manage highlighting ourselves)
+
+			// ensure no built-in selected node (we manage highlighting ourselves)
 			base.SelectedNode = null;
-			// Subscribe to key down
+
+			// subscribe to key down
 			this.KeyDown += MultiSelectTreeView_KeyDown;
+
+			// avoid collapse
+			this.BeforeCollapse += MultiSelectTreeView_BeforeCollapse;
+		}
+
+		public void ReverseSelection()
+		{
+			foreach( TreeNode node in GetAllNodes( this.Nodes ) ) {
+				if( m_SelectedNodes.Contains( node ) ) {
+					m_SelectedNodes.Remove( node );
+					HighlightNode( node, false );
+				}
+				else {
+					m_SelectedNodes.Add( node );
+					HighlightNode( node, true );
+				}
+			}
+			OnSelectionChanged();
+		}
+
+		public void SelectNode( TreeNode node )
+		{
+			if( node == null ) {
+				return;
+			}
+			if( m_SelectedNodes.Contains( node ) ) {
+				return;
+			}
+			m_SelectedNodes.Add( node );
+			HighlightNode( node, true );
+
+			// only set anchor when shift is not pressed
+			if( ( ModifierKeys & Keys.Shift ) != Keys.Shift ) {
+				m_AnchorNode = node;
+			}
+			OnSelectionChanged();
+		}
+
+		public void UnselectNode( TreeNode node )
+		{
+			if( node == null ) {
+				return;
+			}
+			if( m_SelectedNodes.Remove( node ) ) {
+				HighlightNode( node, false );
+				OnSelectionChanged();
+			}
+		}
+
+		public void ClearSelection()
+		{
+			if( m_SelectedNodes.Count == 0 ) {
+				return;
+			}
+			foreach( var n in m_SelectedNodes.ToList() ) {
+				HighlightNode( n, false );
+			}
+			m_SelectedNodes.Clear();
+			OnSelectionChanged();
+		}
+
+		public void SelectAll()
+		{
+			ClearSelection();
+			foreach( TreeNode n in GetAllNodes( this.Nodes ) ) {
+				m_SelectedNodes.Add( n );
+				HighlightNode( n, true );
+			}
+			OnSelectionChanged();
 		}
 
 		protected override void OnBeforeSelect( TreeViewCancelEventArgs e )
 		{
-			// Cancel built-in selection – we manage selection manually
+			// cancel built-in selection – we manage selection manually
 			e.Cancel = true;
 			base.OnBeforeSelect( e );
 		}
 
 		protected override void OnAfterSelect( TreeViewEventArgs e )
 		{
-			// Prevent built-in selection highlight
+			// prevent built-in selection highlight
 			base.OnAfterSelect( e );
 			if( base.SelectedNode != null )
 				base.SelectedNode = null;
@@ -58,47 +124,58 @@ namespace MyCAM.Editor
 			bool shift = ( ModifierKeys & Keys.Shift ) == Keys.Shift;
 
 			if( !ctrl && !shift ) {
-				// Normal click: clear selection, select this node
+
+				// normal click: clear selection, select this node
 				ClearSelection();
 				SelectNode( node );
-				_anchorNode = node;
+				m_AnchorNode = node;
 			}
 			else if( ctrl ) {
-				// Ctrl click: toggle this node
-				if( _selectedNodes.Contains( node ) )
+
+				// ctrl click: toggle this node
+				if( m_SelectedNodes.Contains( node ) )
 					UnselectNode( node );
 				else
 					SelectNode( node );
-				_anchorNode = node;
+				m_AnchorNode = node;
 			}
 			else if( shift ) {
-				// Shift click: select range from anchor to this node
-				if( _anchorNode == null ) {
-					// No anchor, behave like normal click
+
+				// shift click: select range from anchor to this node, don't change anchor
+				if( m_AnchorNode == null ) {
+
+					// no anchor, behave like normal click but set anchor
 					ClearSelection();
-					SelectNode( node );
-					_anchorNode = node;
+					SelectNodeWithoutAnchor( node );
+					m_AnchorNode = node;
 				}
 				else {
-					SelectRange( _anchorNode, node, ctrlMode: false );
+					SelectRange( m_AnchorNode, node, ctrlMode: false );
+					// don't change anchor here
 				}
 			}
-
 			base.OnMouseDown( e );
 		}
 
-		private void MultiSelectTreeView_KeyDown( object sender, KeyEventArgs e )
+		protected virtual void OnSelectionChanged()
 		{
-			// Handle Up / Down navigation
+			SelectionChanged?.Invoke( this, EventArgs.Empty );
+		}
+
+		void MultiSelectTreeView_KeyDown( object sender, KeyEventArgs e )
+		{
+			// handle up / down navigation
 			if( e.KeyCode == Keys.Up || e.KeyCode == Keys.Down ) {
 				e.Handled = true;
 				TreeNode next = null;
-				if( _selectedNodes.Count > 0 ) {
+				if( m_SelectedNodes.Count > 0 ) {
+
 					// pick last selected as focus
-					TreeNode current = _selectedNodes.Last();
+					TreeNode current = m_SelectedNodes.Last();
 					next = ( e.KeyCode == Keys.Up ) ? GetPreviousVisibleNode( current ) : GetNextVisibleNode( current );
 				}
 				else {
+
 					// pick first visible node
 					next = this.TopNode;
 				}
@@ -110,126 +187,56 @@ namespace MyCAM.Editor
 					if( !ctrl && !shift ) {
 						ClearSelection();
 						SelectNode( next );
-						_anchorNode = next;
+						m_AnchorNode = next;
 					}
 					else if( ctrl ) {
+
 						// toggle
-						if( _selectedNodes.Contains( next ) )
+						if( m_SelectedNodes.Contains( next ) )
 							UnselectNode( next );
 						else
 							SelectNode( next );
-						_anchorNode = next;
+						m_AnchorNode = next;
 					}
 					else if( shift ) {
-						if( _anchorNode == null ) {
-							SelectNode( next );
-							_anchorNode = next;
+
+						// shift navigation: don't change anchor
+						if( m_AnchorNode == null ) {
+							SelectNodeWithoutAnchor( next );
+							m_AnchorNode = next;
 						}
 						else {
-							SelectRange( _anchorNode, next, ctrlMode: false );
+							SelectRange( m_AnchorNode, next, ctrlMode: false );
 						}
 					}
 
 					// bring node into view
-					this.SelectedNode = next;  // temporarily set to scroll into view
+					this.SelectedNode = next;
 					this.SelectedNode = null;
 				}
 			}
-			// Handle Ctrl+A
+
+			// handle ctrl+a
 			else if( e.Control && e.KeyCode == Keys.A ) {
 				e.Handled = true;
 				SelectAll();
 			}
-			// Handle Ctrl+R
+
+			// handle ctrl+r
 			else if( e.Control && e.KeyCode == Keys.R ) {
 				e.Handled = true;
 				ReverseSelection();
 			}
 		}
 
-		/// <summary>
-		/// Reverses the selection state of all visible nodes.
-		/// </summary>
-		public void ReverseSelection()
+		void SelectRange( TreeNode anchor, TreeNode current, bool ctrlMode )
 		{
-			foreach( TreeNode node in GetVisibleNodes() ) {
-				if( _selectedNodes.Contains( node ) ) {
-					_selectedNodes.Remove( node );
-					HighlightNode( node, false );
-				}
-				else {
-					_selectedNodes.Add( node );
-					HighlightNode( node, true );
-				}
+			if( anchor == null || current == null ) {
+				return;
 			}
-			OnSelectionChanged();
-		}
 
-		/// <summary>
-		/// Selects the given node (adds to selection).
-		/// </summary>
-		public void SelectNode( TreeNode node )
-		{
-			if( node == null )
-				return;
-			if( _selectedNodes.Contains( node ) )
-				return;
-			_selectedNodes.Add( node );
-			HighlightNode( node, true );
-			OnSelectionChanged();
-		}
-
-		/// <summary>
-		/// Unselects the given node (removes from selection).
-		/// </summary>
-		public void UnselectNode( TreeNode node )
-		{
-			if( node == null )
-				return;
-			if( _selectedNodes.Remove( node ) ) {
-				HighlightNode( node, false );
-				OnSelectionChanged();
-			}
-		}
-
-		/// <summary>
-		/// Clears all selections.
-		/// </summary>
-		public void ClearSelection()
-		{
-			if( _selectedNodes.Count == 0 )
-				return;
-			foreach( var n in _selectedNodes.ToList() ) {
-				HighlightNode( n, false );
-			}
-			_selectedNodes.Clear();
-			OnSelectionChanged();
-		}
-
-		/// <summary>
-		/// Selects all nodes in the tree (pre-order).
-		/// </summary>
-		public void SelectAll()
-		{
-			ClearSelection();
-			foreach( TreeNode n in GetAllNodes( this.Nodes ) ) {
-				_selectedNodes.Add( n );
-				HighlightNode( n, true );
-			}
-			OnSelectionChanged();
-		}
-
-		/// <summary>
-		/// Helper: select a contiguous range between two nodes in tree-visible order.
-		/// If ctrlMode is true, we don’t clear existing, otherwise we clear first.
-		/// </summary>
-		private void SelectRange( TreeNode anchor, TreeNode current, bool ctrlMode )
-		{
-			if( anchor == null || current == null )
-				return;
-
-			// Build a list of visible nodes in display order
-			List<TreeNode> visible = GetVisibleNodes().ToList();
+			// build a list of visible nodes in display order
+			List<TreeNode> visible = GetAllNodes( this.Nodes ).ToList();
 			int idx1 = visible.IndexOf( anchor );
 			int idx2 = visible.IndexOf( current );
 			if( idx1 < 0 || idx2 < 0 )
@@ -238,13 +245,14 @@ namespace MyCAM.Editor
 			int start = Math.Min( idx1, idx2 );
 			int end = Math.Max( idx1, idx2 );
 
-			if( !ctrlMode )
+			if( !ctrlMode ) {
 				ClearSelection();
+			}
 
 			for( int i = start; i <= end; i++ ) {
 				TreeNode n = visible[ i ];
-				if( !_selectedNodes.Contains( n ) ) {
-					_selectedNodes.Add( n );
+				if( !m_SelectedNodes.Contains( n ) ) {
+					m_SelectedNodes.Add( n );
 					HighlightNode( n, true );
 				}
 			}
@@ -252,73 +260,37 @@ namespace MyCAM.Editor
 			OnSelectionChanged();
 		}
 
-		/// <summary>
-		/// Raise selection changed event.
-		/// </summary>
-		protected virtual void OnSelectionChanged()
-		{
-			SelectionChanged?.Invoke( this, EventArgs.Empty );
-		}
-
-		/// <summary>
-		/// Highlight or un-highlight a node (change BackColor/ForeColor).
-		/// </summary>
-		private void HighlightNode( TreeNode node, bool highlight )
+		void HighlightNode( TreeNode node, bool highlight )
 		{
 			if( highlight ) {
 				node.BackColor = SystemColors.Highlight;
-				//node.ForeColor = SystemColors.HighlightText;
 			}
 			else {
 				node.BackColor = this.BackColor;
-				//node.ForeColor = this.ForeColor;
 			}
 		}
 
-		/// <summary>
-		/// Get all nodes under a collection (recursive).
-		/// </summary>
-		private IEnumerable<TreeNode> GetAllNodes( TreeNodeCollection nodes )
+		IEnumerable<TreeNode> GetAllNodes( TreeNodeCollection nodes )
 		{
 			foreach( TreeNode n in nodes ) {
 				yield return n;
-				foreach( var child in GetAllNodes( n.Nodes ) )
+				foreach( var child in GetAllNodes( n.Nodes ) ) {
 					yield return child;
-			}
-		}
-
-		/// <summary>
-		/// Get a flat list of visible nodes (in expand/collapse visible order).
-		/// </summary>
-		private IEnumerable<TreeNode> GetVisibleNodes()
-		{
-			TreeNode n = this.TopNode;
-			while( n != null ) {
-				yield return n;
-				if( n.IsExpanded && n.Nodes.Count > 0 ) {
-					n = n.Nodes[ 0 ];
-				}
-				else {
-					// go to next sibling or parent’s next sibling
-					while( n != null && n.NextNode == null )
-						n = n.Parent;
-					if( n != null )
-						n = n.NextNode;
 				}
 			}
 		}
 
-		/// <summary>
-		/// Gets the next visible node after the given node, or null.
-		/// </summary>
-		private TreeNode GetNextVisibleNode( TreeNode node )
+		TreeNode GetNextVisibleNode( TreeNode node )
 		{
-			if( node == null )
+			if( node == null ) {
 				return null;
-			if( node.IsExpanded && node.Nodes.Count > 0 )
+			}
+			if( node.IsExpanded && node.Nodes.Count > 0 ) {
 				return node.Nodes[ 0 ];
-			if( node.NextNode != null )
+			}
+			if( node.NextNode != null ) {
 				return node.NextNode;
+			}
 			TreeNode p = node.Parent;
 			while( p != null ) {
 				if( p.NextNode != null )
@@ -328,14 +300,13 @@ namespace MyCAM.Editor
 			return null;
 		}
 
-		/// <summary>
-		/// Gets the previous visible node before the given node, or null.
-		/// </summary>
-		private TreeNode GetPreviousVisibleNode( TreeNode node )
+		TreeNode GetPreviousVisibleNode( TreeNode node )
 		{
-			if( node == null )
+			if( node == null ) {
 				return null;
+			}
 			if( node.PrevNode != null ) {
+
 				// move to last visible child of previous sibling
 				TreeNode n = node.PrevNode;
 				while( n.IsExpanded && n.Nodes.Count > 0 ) {
@@ -345,5 +316,29 @@ namespace MyCAM.Editor
 			}
 			return node.Parent;
 		}
+
+		void MultiSelectTreeView_BeforeCollapse( object sender, TreeViewCancelEventArgs e )
+		{
+			e.Cancel = true;
+		}
+
+		void SelectNodeWithoutAnchor( TreeNode node )
+		{
+			if( node == null ) {
+				return;
+			}
+			if( m_SelectedNodes.Contains( node ) ) {
+				return;
+			}
+			m_SelectedNodes.Add( node );
+			HighlightNode( node, true );
+			OnSelectionChanged();
+		}
+
+		// maintains the selected nodes
+		readonly List<TreeNode> m_SelectedNodes = new List<TreeNode>();
+
+		// anchor node for shift selection
+		TreeNode m_AnchorNode = null;
 	}
 }
