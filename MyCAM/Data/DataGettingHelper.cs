@@ -23,7 +23,7 @@ namespace MyCAM.Data
 			}
 
 			// use unified GeomData property from StandardPatternBasedPathObject
-			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
+			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				geomData = standardPatternPathObject.GeomData;
 				return true;
 			}
@@ -59,7 +59,7 @@ namespace MyCAM.Data
 			}
 
 			// use unified ContourPathObject property from StandardPatternBasedPathObject
-			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
+			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				contourPathObj = standardPatternPathObject.ContourPathObject;
 				return true;
 			}
@@ -78,7 +78,7 @@ namespace MyCAM.Data
 			}
 
 			// use unified CacheInfo property from StandardPatternBasedPathObject
-			if( pathObject is StandardPatternBasedPathObject standardPatternPathObject ) {
+			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				// cacheInfo implements IStandardPatternCacheInfo which has GetProcessRefPoint
 				if( standardPatternPathObject.StandatdPatternCacheInfo is IStandardPatternRefPointCache refPointCache ) {
 					refPoint = refPointCache.GetProcessRefPoint();

@@ -75,7 +75,7 @@
     <Compile Include="Data\PathObjectFolder\PolygonPathObject.cs" />
     <Compile Include="Data\PathObjectFolder\RectanglePathObject.cs" />
     <Compile Include="Data\PathObjectFolder\RunwayPathObject.cs" />
-    <Compile Include="Data\PathObjectFolder\StandardPatternBasedPathObject.cs" />
+    <Compile Include="Data\PathObjectFolder\StdPatternObjectBase.cs" />
     <Compile Include="Data\PointData.cs" />
     <Compile Include="Data\PostData.cs" />
     <Compile Include="Data\TraverseData.cs" />

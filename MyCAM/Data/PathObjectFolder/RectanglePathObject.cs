@@ -3,7 +3,7 @@ using OCC.TopoDS;
 
 namespace MyCAM.Data
 {
-	internal class RectanglePathObject : StandardPatternBasedPathObject
+	internal class RectanglePathObject : StdPatternObjectBase
 	{
 		internal RectanglePathObject( string szUID, TopoDS_Shape shape, RectangleGeomData rectangleGeomData, ContourPathObject contourPathObject )
 			: base( szUID, shape, rectangleGeomData, contourPathObject )

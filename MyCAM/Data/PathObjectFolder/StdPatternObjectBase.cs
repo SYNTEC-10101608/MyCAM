@@ -5,9 +5,9 @@ using OCC.TopoDS;
 
 namespace MyCAM.Data
 {
-	internal abstract class StandardPatternBasedPathObject : PathObject
+	internal abstract class StdPatternObjectBase : PathObject
 	{
-		protected StandardPatternBasedPathObject( string szUID, TopoDS_Shape shape, IStandardPatternGeomData geomData, ContourPathObject contourPathObject )
+		protected StdPatternObjectBase( string szUID, TopoDS_Shape shape, IStandardPatternGeomData geomData, ContourPathObject contourPathObject )
 			: base( szUID, shape )
 		{
 			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || geomData == null || contourPathObject == null ) {
@@ -22,7 +22,7 @@ namespace MyCAM.Data
 		}
 
 
-		protected StandardPatternBasedPathObject( string szUID, TopoDS_Shape shape, IStandardPatternGeomData geomData, CraftData craftData, ContourPathObject contourPathObject )
+		protected StdPatternObjectBase( string szUID, TopoDS_Shape shape, IStandardPatternGeomData geomData, CraftData craftData, ContourPathObject contourPathObject )
 			: base( szUID, shape )
 		{
 			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || geomData == null || craftData == null || contourPathObject == null ) {
