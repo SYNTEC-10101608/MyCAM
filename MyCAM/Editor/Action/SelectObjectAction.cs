@@ -37,7 +37,7 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 			ActivateObject();
-			SyncSlectionFromSet();
+			SyncSelectionFromSet();
 
 			// display rubber band
 			m_Viewer.GetAISContext().Display( m_RubberBand, true );
@@ -65,7 +65,7 @@ namespace MyCAM.Editor
 		public void ClearSelection()
 		{
 			m_SelectedIDSet.Clear();
-			SyncSlectionFromSet();
+			SyncSelectionFromSet();
 		}
 
 		public List<string> GetSelectedIDs()
@@ -202,7 +202,7 @@ namespace MyCAM.Editor
 			SyncSelectionFromTree();
 		}
 
-		void SyncSelectionFromView()
+		protected virtual void SyncSelectionFromView()
 		{
 			m_SelectedIDSet.Clear();
 
@@ -222,10 +222,10 @@ namespace MyCAM.Editor
 				m_SelectedIDSet.Add( szUID );
 				m_Viewer.GetAISContext().NextSelected();
 			}
-			SyncSlectionFromSet();
+			SyncSelectionFromSet();
 		}
 
-		void SyncSelectionFromTree()
+		protected virtual void SyncSelectionFromTree()
 		{
 			if( m_bSuppressTreeViewSync ) {
 				return;
@@ -240,23 +240,26 @@ namespace MyCAM.Editor
 				}
 				m_SelectedIDSet.Add( node.Text );
 			}
-			SyncSlectionFromSet();
+			SyncSelectionFromSet();
 		}
 
-		void SyncSlectionFromSet()
+		protected virtual void SyncSelectionFromSet()
 		{
 			// sync to tree
 			m_bSuppressTreeViewSync = true;
 			( m_TreeView as MultiSelectTreeView ).ClearSelection();
+			TreeNode lastSelectedNode = null;
+
 			foreach( string szUID in m_SelectedIDSet ) {
 				if( !m_ViewManager.TreeNodeMap.ContainsKey( szUID ) ) {
 					continue;
 				}
-				( m_TreeView as MultiSelectTreeView ).SelectNode( m_ViewManager.TreeNodeMap[ szUID ] );
+				TreeNode node = m_ViewManager.TreeNodeMap[ szUID ];
+				( m_TreeView as MultiSelectTreeView ).SelectNode( node );
+				lastSelectedNode = node;
 			}
 			m_bSuppressTreeViewSync = false;
 
-			// sync to view
 			m_Viewer.GetAISContext().ClearSelected( false );
 			foreach( string szUID in m_SelectedIDSet ) {
 				if( !m_ViewManager.ViewObjectMap.ContainsKey( szUID ) ) {
@@ -272,7 +275,7 @@ namespace MyCAM.Editor
 			SelectionChange?.Invoke();
 		}
 
-		bool m_bSuppressTreeViewSync = false;
+		protected bool m_bSuppressTreeViewSync = false;
 
 		// viewer mouse action
 		AIS_RubberBand m_RubberBand;
@@ -283,6 +286,6 @@ namespace MyCAM.Editor
 		bool m_IsDragging = false;
 
 		// selection sync
-		HashSet<string> m_SelectedIDSet;
+		protected HashSet<string> m_SelectedIDSet;
 	}
 }
