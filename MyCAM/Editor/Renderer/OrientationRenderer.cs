@@ -174,51 +174,51 @@ namespace MyCAM.Editor.Renderer
 
 		IOrientationPoint GetFirstCAMPoint( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetMainPathStartPointCache( pathID, out IMainPathStartPointCache mainPathStartPointCache ) ) {
 				return null;
 			}
-			if( contourCacheInfo.CAMPointList == null || contourCacheInfo.CAMPointList.Count == 0 ) {
+			if( mainPathStartPointCache.GetMainPathStartCAMPoint() == null || !( mainPathStartPointCache.GetMainPathStartCAMPoint() is IOrientationPoint orientationPoint ) ) {
 				return null;
 			}
-			return contourCacheInfo.CAMPointList[ 0 ];
+			return orientationPoint;
 		}
 
 		IOrientationPoint GetLeadInFirstPoint( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
-			if( contourCacheInfo.LeadInCAMPointList == null || contourCacheInfo.LeadInCAMPointList.Count == 0 ) {
+			if( leadCache.LeadInCAMPointList == null || leadCache.LeadInCAMPointList.Count == 0 ) {
 				return null;
 			}
-			return contourCacheInfo.LeadInCAMPointList.First();
+			return leadCache.LeadInCAMPointList.First();
 		}
 
 		IOrientationPoint GetLeadOutLastPoint( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
-			if( contourCacheInfo.LeadOutCAMPointList == null || contourCacheInfo.LeadOutCAMPointList.Count == 0 ) {
+			if( leadCache.LeadOutCAMPointList == null || leadCache.LeadOutCAMPointList.Count == 0 ) {
 				return null;
 			}
-			return contourCacheInfo.LeadOutCAMPointList.Last();
+			return leadCache.LeadOutCAMPointList.Last();
 		}
 
 		LeadData GetLeadData( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
-			return contourCacheInfo.LeadData;
+			return leadCache.LeadData;
 		}
 
 		bool GetIsPathReverse( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo contourCacheInfo ) ) {
+			if( !PathCacheProvider.TryGetPathReverseCache( pathID, out IPathReverseCache pathReverseCache ) ) {
 				return false;
 			}
-			return contourCacheInfo.IsPathReverse;
+			return pathReverseCache.IsPathReverse;
 		}
 	}
 }

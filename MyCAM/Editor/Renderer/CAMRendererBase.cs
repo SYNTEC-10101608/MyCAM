@@ -1,4 +1,3 @@
-using MyCAM.CacheInfo;
 using MyCAM.Data;
 using OCCViewer;
 
@@ -30,23 +29,6 @@ namespace MyCAM.Editor.Renderer
 		public void UpdateView()
 		{
 			m_Viewer.UpdateView();
-		}
-
-		protected bool GetContourCacheInfoByID( string szPathID, out ContourCacheInfo contourCacheInfo )
-		{
-			contourCacheInfo = null;
-			if( string.IsNullOrEmpty( szPathID )
-				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
-				|| m_DataManager.ObjectMap[ szPathID ] == null
-				|| m_DataManager.ObjectMap[ szPathID ].ObjectType != ObjectType.Path ) {
-				return false;
-			}
-			PathObject pathObject = m_DataManager.ObjectMap[ szPathID ] as PathObject;
-			if( pathObject.PathType != PathType.Contour ) {
-				return false;
-			}
-			contourCacheInfo = ( pathObject as ContourPathObject ).ContourCacheInfo;
-			return contourCacheInfo != null;
 		}
 	}
 }

@@ -184,18 +184,18 @@ namespace MyCAM.Editor.Renderer
 
 		IProcessPoint GetProcessStartPoint( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo cacheInfo ) ) {
+			if( !PathCacheProvider.TryGetProcessPathStartEndCache( pathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
 				return null;
 			}
-			return cacheInfo?.GetProcessStartPoint();
+			return processPathStartEndCache?.GetProcessStartPoint();
 		}
 
 		IProcessPoint GetProcessEndPoint( string pathID )
 		{
-			if( !GetContourCacheInfoByID( pathID, out ContourCacheInfo cacheInfo ) ) {
+			if( !PathCacheProvider.TryGetProcessPathStartEndCache( pathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
 				return null;
 			}
-			return cacheInfo?.GetProcessEndPoint();
+			return processPathStartEndCache?.GetProcessEndPoint();
 		}
 
 		TraverseData GetTraverseData( string pathID )
