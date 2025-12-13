@@ -195,8 +195,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="StandardPatternFactory\WireCreationStrategyFactory.cs" />
-    <Compile Include="StandardPatternFactory\PatternFactory.cs" />
+    <Compile Include="Helper\StdPatternWireHelper.cs" />
+    <Compile Include="Helper\StdPatternHelper.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>
