@@ -18,7 +18,7 @@ namespace MyCAM.Data
 			m_IsClosed = isClosed;
 			DisctereContourHelper.BuildContourGeomData( pathDataList, isClosed,
 				out m_CADPointList, out m_ConnectPointMap );
-			DisctereContourHelper.GetRefCoordFromContour( m_CADPointList, out m_RefCoord );
+			DisctereContourHelper.GetRefCoordFromContour( m_CADPointList, out m_RefCenterDir );
 		}
 
 		public ContourGeomData( List<CADPoint> cadPointList, Dictionary<CADPoint, CADPoint> connectPointMap, bool isClosed )
@@ -32,7 +32,7 @@ namespace MyCAM.Data
 			m_CADPointList = cadPointList;
 			m_ConnectPointMap = connectPointMap;
 			m_IsClosed = isClosed;
-			DisctereContourHelper.GetRefCoordFromContour( m_CADPointList, out m_RefCoord );
+			DisctereContourHelper.GetRefCoordFromContour( m_CADPointList, out m_RefCenterDir );
 		}
 
 		public PathType PathType
@@ -71,7 +71,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return new gp_Ax1( m_RefCoord.Location(), m_RefCoord.Direction() );
+				return new gp_Ax1( m_RefCenterDir.Location(), m_RefCenterDir.Direction() );
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace MyCAM.Data
 			foreach( var oneConnectPoint in m_ConnectPointMap ) {
 				oneConnectPoint.Value.Transform( transform );
 			}
-			m_RefCoord.Transform( transform );
+			m_RefCenterDir.Transform( transform );
 		}
 
 		public IGeomData Clone()
@@ -93,7 +93,7 @@ namespace MyCAM.Data
 
 		List<CADPoint> m_CADPointList;
 		Dictionary<CADPoint, CADPoint> m_ConnectPointMap;
-		gp_Ax1 m_RefCoord;
+		gp_Ax1 m_RefCenterDir;
 		bool m_IsClosed;
 	}
 }
