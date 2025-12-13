@@ -3,100 +3,61 @@ using OCC.gp;
 using OCC.TopoDS;
 using System;
 
-namespace MyCAM.StandardPatternFactory
+namespace MyCAM.Helper
 {
-	public class PatternFactory
+	public static class StdPatternHelper
 	{
-		public PatternFactory( IRefCenterDir standardPatternInfo, IStdPatternGeomData standardPatternGeomData )
+		public static gp_Ax3 GetPatternRefCoord( gp_Ax1 refCenterDir, double rotationAngle_deg )
 		{
-			if( standardPatternInfo == null ) {
-				throw new ArgumentNullException( "PatternFactory constructing argument null" );
-			}
-			m_CenterPoint = standardPatternInfo.RefCenterDir.Location();
-			m_NormalDir = standardPatternInfo.RefCenterDir.Direction();
-			m_StandardPatternGeomData = standardPatternGeomData;
-
-			// get rotation angle from IRotatable interface if the geometry supports rotation
-			double rotatedAngleInDegrees = 0.0;
-			if( standardPatternGeomData is IRotatable rotatableGeom ) {
-				rotatedAngleInDegrees = rotatableGeom.RotatedAngle_deg;
-			}
-			GetLocalCoordination( rotatedAngleInDegrees, out m_Coordination );
-
-			if( CreateStandardPatternWire( out TopoDS_Wire wire ) ) {
-				m_ShapeWire = wire;
-			}
-		}
-
-		public TopoDS_Shape GetShape()
-		{
-			return m_ShapeWire;
-		}
-
-		public gp_Ax3 GetCoordinateInfo()
-		{
-			return m_Coordination;
-		}
-
-		void GetLocalCoordination( double rotationAngleInDegrees, out gp_Ax3 coordination )
-		{
-			coordination = null;
-			gp_Dir xDir = null;
-			gp_Dir yDir = null;
+			gp_Pnt centerPoint = refCenterDir.Location();
+			gp_Dir normalDir = refCenterDir.Direction();
+			gp_Dir xDir;
 
 			// build local coordination system ( reference DOC:https://syntecclub.atlassian.net/wiki/spaces/AUTO/pages/89458700 )
-			if( m_NormalDir.IsParallel( new gp_Dir( 0, 0, 1 ), TOLERANCE ) && !m_NormalDir.IsOpposite( new gp_Dir( 0, 0, 1 ), TOLERANCE ) ) {
+			// the target is the same as TOOL_DIR
+			if( normalDir.IsParallel( TOOL_DIR, DIR_TOLERANCE ) && !normalDir.IsOpposite( TOOL_DIR, DIR_TOLERANCE ) ) {
 				xDir = new gp_Dir( 1, 0, 0 );
 			}
-			else if( m_NormalDir.IsParallel( new gp_Dir( 0, 0, 1 ), TOLERANCE ) && m_NormalDir.IsOpposite( new gp_Dir( 0, 0, 1 ), TOLERANCE ) ) {
-				gp_Trsf trsf = new gp_Trsf();
-				trsf.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 1, 0 ) ), 180 );
-				gp_Dir refDir = new gp_Dir( 1, 0, 0 );
-				xDir = refDir.Transformed( trsf );
-			}
-			else {
 
-				// general case
-				gp_Dir refDir = new gp_Dir( 0, 0, 1 );
-				xDir = refDir.Crossed( m_NormalDir );
+			// the target is opposite to TOOL_DIR
+			else if( normalDir.IsParallel( TOOL_DIR, DIR_TOLERANCE ) && normalDir.IsOpposite( TOOL_DIR, DIR_TOLERANCE ) ) {
+				xDir = new gp_Dir( -1, 0, 0 );
 			}
-			yDir = m_NormalDir.Crossed( xDir );
+
+			// general case
+			else {
+				xDir = TOOL_DIR.Crossed( normalDir );
+			}
 
 			// create coordination system considering rotation
-			gp_Ax3 coordSystem = new gp_Ax3( m_CenterPoint, m_NormalDir, xDir );
-			if( Math.Abs( rotationAngleInDegrees ) > 1e-9 ) {
-				double rotationAngleInRadians = rotationAngleInDegrees * Math.PI / 180.0;
-				gp_Ax1 rotationAxis = new gp_Ax1( m_CenterPoint, m_NormalDir );
+			gp_Ax3 coordSystem = new gp_Ax3( centerPoint, normalDir, xDir );
+			if( Math.Abs( rotationAngle_deg ) > ANGLE_TOLERANCE_DEG ) {
+				double rotationAngleInRadians = rotationAngle_deg * Math.PI / 180.0;
+				gp_Ax1 rotationAxis = new gp_Ax1( centerPoint, normalDir );
 				coordSystem.Rotate( rotationAxis, rotationAngleInRadians );
 			}
-			xDir = coordSystem.XDirection();
-			yDir = coordSystem.YDirection();
-			coordination = new gp_Ax3( m_CenterPoint, m_NormalDir, xDir );
+			return coordSystem;
 		}
 
-		bool CreateStandardPatternWire( out TopoDS_Wire wire )
+		public static TopoDS_Shape GetPathWire( gp_Ax1 refCenterDir, IStdPatternGeomData StdPatternGeomData )
 		{
-			gp_Ax3 ax3 = m_Coordination;
-			gp_Pln plane = new gp_Pln( ax3 );
-			wire = null;
+			// get pattern reference coordination system
+			gp_Ax3 patternRefCoord = GetPatternRefCoord( refCenterDir, StdPatternGeomData.RotatedAngle_deg );
 
-			// get appropriate strategy for the geometry type
-			IWireCreationStrategy strategy = WireCreationStrategyFactory.GetStrategy( m_StandardPatternGeomData.PathType );
-			if( strategy == null ) {
-
-				// pathType not supported by strategies (e.g., Contour)
-				return false;
-			}
-
-			// use strategy to create wire
-			return strategy.CreateWire( m_CenterPoint, plane, m_StandardPatternGeomData, out wire );
+			// get path wire
+			return GetPathWire( patternRefCoord, StdPatternGeomData );
 		}
 
-		IStdPatternGeomData m_StandardPatternGeomData;
-		TopoDS_Wire m_ShapeWire;
-		gp_Pnt m_CenterPoint;
-		gp_Dir m_NormalDir;
-		gp_Ax3 m_Coordination;
-		const double TOLERANCE = 0.001;
+		public static TopoDS_Shape GetPathWire( gp_Ax3 patternRefCoord, IStdPatternGeomData StdPatternGeomData )
+		{
+			TopoDS_Wire wire = null;
+			WireCreationStrategyFactory.GetStrategy( StdPatternGeomData.PathType )
+				?.CreateWire( patternRefCoord, StdPatternGeomData, out wire );
+			return wire;
+		}
+
+		const double DIR_TOLERANCE = 0.001;
+		const double ANGLE_TOLERANCE_DEG = 0.001;
+		static readonly gp_Dir TOOL_DIR = new gp_Dir( 0, 0, 1 );
 	}
 }

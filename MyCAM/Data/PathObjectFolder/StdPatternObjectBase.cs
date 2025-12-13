@@ -1,5 +1,5 @@
 ﻿using MyCAM.PathCache;
-using MyCAM.StandardPatternFactory;
+using MyCAM.Helper;
 using OCC.gp;
 using OCC.TopoDS;
 
@@ -74,8 +74,7 @@ namespace MyCAM.Data
 
 		void InitializeCacheInfo()
 		{
-			PatternFactory patternFactory = new PatternFactory( m_ContourPathObject.ContourGeomData, m_GeomData );
-			gp_Ax3 coordinateInfo = patternFactory.GetCoordinateInfo();
+			gp_Ax3 coordinateInfo = StdPatternHelper.GetPatternRefCoord( m_ContourPathObject.ContourGeomData.RefCenterDir, m_GeomData.RotatedAngle_deg );
 
 			// factory automatically determines the correct CacheInfo type based on GeomData type
 			m_StandatdPatternCacheInfo = (StdPatternCacheBase)StdPatternCacheFactory.CreateCacheInfo( coordinateInfo, m_GeomData, m_CraftData );

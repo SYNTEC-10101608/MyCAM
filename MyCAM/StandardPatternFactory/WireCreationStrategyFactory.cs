@@ -4,13 +4,13 @@ using OCC.gp;
 using OCC.TopoDS;
 using System;
 
-namespace MyCAM.StandardPatternFactory
+namespace MyCAM.Helper
 {
 	#region Strategy Pattern Interfaces and Classes
 
 	internal interface IWireCreationStrategy
 	{
-		bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStdPatternGeomData standardPatternGeomData, out TopoDS_Wire wire );
+		bool CreateWire( gp_Ax3 refCoord, IStdPatternGeomData standardPatternGeomData, out TopoDS_Wire wire );
 	}
 
 	internal class WireCreationStrategy<TGeomData> : IWireCreationStrategy
@@ -23,7 +23,7 @@ namespace MyCAM.StandardPatternFactory
 			m_WireFactory = wireFactory ?? throw new ArgumentNullException( nameof( wireFactory ) );
 		}
 
-		public bool CreateWire( gp_Pnt centerPoint, gp_Pln plane, IStdPatternGeomData standardPatternGeomData, out TopoDS_Wire wire )
+		public bool CreateWire( gp_Ax3 refCoord, IStdPatternGeomData standardPatternGeomData, out TopoDS_Wire wire )
 		{
 			wire = null;
 
@@ -33,6 +33,8 @@ namespace MyCAM.StandardPatternFactory
 			}
 
 			// call the factory delegate with typed geometry data
+			gp_Pnt centerPoint = refCoord.Location();
+			gp_Pln plane = new gp_Pln( refCoord );
 			WireResult result = m_WireFactory( centerPoint, plane, typedGeomData );
 			wire = result.Wire;
 			return result.Success;

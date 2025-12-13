@@ -1,7 +1,7 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
-using MyCAM.StandardPatternFactory;
+using MyCAM.Helper;
 using OCC.AIS;
 using OCC.TopoDS;
 using OCCViewer;
@@ -98,8 +98,7 @@ namespace MyCAM.Editor
 					shape = contourPathObject.Shape;
 				}
 				else {
-					PatternFactory standardPatternFactory = new PatternFactory( contourPathObject.ContourGeomData, standardPatternGeomData );
-					shape = standardPatternFactory.GetShape();
+					shape = StdPatternHelper.GetPathWire( contourPathObject.ContourGeomData.RefCenterDir, standardPatternGeomData );
 				}
 
 				m_DataManager.ObjectMap[ szID ] = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, pathObject );
