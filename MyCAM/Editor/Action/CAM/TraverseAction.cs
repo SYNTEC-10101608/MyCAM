@@ -77,7 +77,7 @@ namespace MyCAM.Editor
 		void RestoreBackupTraverseDatas()
 		{
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
-				m_CraftDataList[ i ].TraverseData = m_BackupTraverseDataList[ i ];
+				m_CraftDataList[ i ].TraverseData = m_BackupTraverseDataList[ i ].Clone();
 			}
 		}
 
