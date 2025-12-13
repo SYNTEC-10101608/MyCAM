@@ -180,7 +180,7 @@
       <DependentUpon>ToolVectorDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\ViewManager.cs" />
-    <Compile Include="Data\Object\BasicData.cs" />
+    <Compile Include="Data\Object\BasicObject.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="LogManager\LogHandler.cs" />
     <Compile Include="Helper\CAM\OverCutHelper.cs" />
