@@ -145,12 +145,12 @@
     <Compile Include="Editor\Dialog\OverCutDlg.Designer.cs">
       <DependentUpon>OverCutDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helper\DisctereContourHelper.cs" />
-    <Compile Include="Helper\MachineDataXMLHelper.cs" />
-    <Compile Include="Helper\ToolVecHelper.cs" />
-    <Compile Include="Helper\TraverseHelper.cs" />
+    <Compile Include="Helper\CAD\DisctereContourHelper.cs" />
+    <Compile Include="Helper\FileIO\MachineDataXMLHelper.cs" />
+    <Compile Include="Helper\CAM\ToolVecHelper.cs" />
+    <Compile Include="Helper\CAM\TraverseHelper.cs" />
     <Compile Include="FileManager\MachineDataDTO.cs" />
-    <Compile Include="Helper\LeadHelper.cs" />
+    <Compile Include="Helper\CAM\LeadHelper.cs" />
     <Compile Include="FileManager\DataManagerDTO.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
@@ -183,7 +183,7 @@
     <Compile Include="Data\BasicData.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="LogManager\LogHandler.cs" />
-    <Compile Include="Helper\OverCutHelper.cs" />
+    <Compile Include="Helper\CAM\OverCutHelper.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="Post\PostHelper.cs" />
@@ -195,8 +195,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Helper\StdPatternWireHelper.cs" />
-    <Compile Include="Helper\StdPatternHelper.cs" />
+    <Compile Include="Helper\CAD\StdPatternWireHelper.cs" />
+    <Compile Include="Helper\CAD\StdPatternHelper.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>
