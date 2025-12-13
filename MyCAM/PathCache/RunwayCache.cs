@@ -7,8 +7,8 @@ namespace MyCAM.PathCache
 {
 	public class RunwayCache : StdPatternCacheBase
 	{
-		public RunwayCache( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
-			: base( coordinateInfo, craftData )
+		public RunwayCache( gp_Ax3 refCoord, IStdPatternGeomData geomData, CraftData craftData )
+			: base( refCoord, craftData )
 		{
 			if( geomData == null || !( geomData is RunwayGeomData runwayGeomData ) ) {
 				throw new ArgumentNullException( "RunwayCache constructing argument error - invalid geomData" );
@@ -31,15 +31,13 @@ namespace MyCAM.PathCache
 				BuildCAMPointList();
 			}
 			return m_RefPoint;
-
-
 		}
 
 		protected override void BuildCAMPointList()
 		{
 			ClearCraftDataDirty();
 			m_RefPoint = RunwayRefPoint();
-			m_StartPointList = RunwayCacheExtensions.GetStartPointList( CoordinateInfo, m_RunwayGeomData.Length, m_RunwayGeomData.Width );
+			m_StartPointList = RunwayCacheExtensions.GetStartPointList( m_RefCoord, m_RunwayGeomData.Length, m_RunwayGeomData.Width );
 		}
 
 		CAMPoint RunwayRefPoint()
@@ -66,9 +64,9 @@ namespace MyCAM.PathCache
 
 			// transform local coordinates to world coordinate system
 			gp_Ax3 targetCoordSystem = new gp_Ax3(
-				CoordinateInfo.Location(),
-				CoordinateInfo.Direction(),
-				CoordinateInfo.XDirection()
+				m_RefCoord.Location(),
+				m_RefCoord.Direction(),
+				m_RefCoord.XDirection()
 			);
 			gp_Trsf transformation = new gp_Trsf();
 			transformation.SetTransformation( targetCoordSystem, new gp_Ax3() );
@@ -77,11 +75,11 @@ namespace MyCAM.PathCache
 			return new CAMPoint(
 				new CADPoint(
 					worldLeftArcCenter,
-					CoordinateInfo.Direction(),
-					CoordinateInfo.XDirection(),
-					CoordinateInfo.YDirection()
+					m_RefCoord.Direction(),
+					m_RefCoord.XDirection(),
+					m_RefCoord.YDirection()
 				),
-				CoordinateInfo.Direction()
+				m_RefCoord.Direction()
 			);
 		}
 		RunwayGeomData m_RunwayGeomData;
@@ -89,10 +87,10 @@ namespace MyCAM.PathCache
 
 	internal static class RunwayCacheExtensions
 	{
-		internal static List<CAMPoint> GetStartPointList( gp_Ax3 coordinateInfo, double length, double width )
+		internal static List<CAMPoint> GetStartPointList( gp_Ax3 refCoord, double length, double width )
 		{
-			gp_Pnt centerPoint = coordinateInfo.Location();
-			gp_Pln plane = new gp_Pln( coordinateInfo );
+			gp_Pnt centerPoint = refCoord.Location();
+			gp_Pln plane = new gp_Pln( refCoord );
 			double radius = width / 2.0;
 			double straightLength = length - width;
 

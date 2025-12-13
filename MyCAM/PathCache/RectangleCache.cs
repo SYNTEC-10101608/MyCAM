@@ -7,8 +7,8 @@ namespace MyCAM.PathCache
 {
 	public class RectangleCache : StdPatternCacheBase
 	{
-		public RectangleCache( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
-			: base( coordinateInfo, craftData )
+		public RectangleCache( gp_Ax3 refCoord, IStdPatternGeomData geomData, CraftData craftData )
+			: base( refCoord, craftData )
 		{
 			if( geomData == null || !( geomData is RectangleGeomData rectangleGeomData ) ) {
 				throw new ArgumentNullException( "RectangleCache constructing argument error - invalid geomData" );
@@ -28,8 +28,8 @@ namespace MyCAM.PathCache
 		protected override void BuildCAMPointList()
 		{
 			ClearCraftDataDirty();
-			m_RefPoint = new CAMPoint( new CADPoint( m_CoordinateInfo.Location(), m_CoordinateInfo.Direction(), m_CoordinateInfo.XDirection(), m_CoordinateInfo.YDirection() ), m_CoordinateInfo.Direction() );
-			m_StartPointList = RectangleCacheExtensions.GetStartPointList( CoordinateInfo, m_RectangleGeomData.Length, m_RectangleGeomData.Width );
+			m_RefPoint = new CAMPoint( new CADPoint( m_RefCoord.Location(), m_RefCoord.Direction(), m_RefCoord.XDirection(), m_RefCoord.YDirection() ), m_RefCoord.Direction() );
+			m_StartPointList = RectangleCacheExtensions.GetStartPointList( m_RefCoord, m_RectangleGeomData.Length, m_RectangleGeomData.Width );
 		}
 
 		RectangleGeomData m_RectangleGeomData;
@@ -37,10 +37,10 @@ namespace MyCAM.PathCache
 
 	internal static class RectangleCacheExtensions
 	{
-		internal static List<CAMPoint> GetStartPointList( gp_Ax3 coordinateInfo, double longSideLength, double shortSideLength )
+		internal static List<CAMPoint> GetStartPointList( gp_Ax3 refCoord, double longSideLength, double shortSideLength )
 		{
-			gp_Pnt centerPoint = coordinateInfo.Location();
-			gp_Pln plane = new gp_Pln( coordinateInfo );
+			gp_Pnt centerPoint = refCoord.Location();
+			gp_Pln plane = new gp_Pln( refCoord );
 			double halfL = longSideLength / 2.0;
 			double halfW = shortSideLength / 2.0;
 

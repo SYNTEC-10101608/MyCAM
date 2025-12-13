@@ -8,13 +8,13 @@ namespace MyCAM.PathCache
 {
 	public abstract class StdPatternCacheBase : IStdPatternCache, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IOverCutCache, IToolVecCache, IStdPatternRefPointCache
 	{
-		protected StdPatternCacheBase( gp_Ax3 coordinateInfo, CraftData craftData )
+		protected StdPatternCacheBase( gp_Ax3 refCoord, CraftData craftData )
 		{
-			if( coordinateInfo == null || craftData == null ) {
+			if( refCoord == null || craftData == null ) {
 				throw new ArgumentNullException( "StdPatternCacheBase constructing argument null" );
 			}
 
-			m_CoordinateInfo = coordinateInfo;
+			m_RefCoord = refCoord;
 			m_CraftData = craftData;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
 		}
@@ -66,7 +66,7 @@ namespace MyCAM.PathCache
 				if( m_IsCraftDataDirty ) {
 					BuildCAMPointList();
 				}
-				return m_OverCutPointList;
+				return m_OverCutCAMPointList;
 			}
 		}
 
@@ -111,8 +111,8 @@ namespace MyCAM.PathCache
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
 			}
-			if( LeadInCAMPointList.Count != 0 ) {
-				return LeadInCAMPointList[ 0 ].Clone();
+			if( m_LeadInCAMPointList.Count != 0 ) {
+				return m_LeadInCAMPointList[ 0 ].Clone();
 			}
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
@@ -122,8 +122,8 @@ namespace MyCAM.PathCache
 			if( m_IsCraftDataDirty ) {
 				BuildCAMPointList();
 			}
-			if( OverCutCAMPointList.Count != 0 ) {
-				return OverCutCAMPointList[ OverCutCAMPointList.Count - 1 ].Clone();
+			if( m_OverCutCAMPointList.Count != 0 ) {
+				return m_OverCutCAMPointList[ m_OverCutCAMPointList.Count - 1 ].Clone();
 			}
 			return m_StartPointList[ m_CraftData.StartPointIndex ].Clone();
 		}
@@ -151,21 +151,13 @@ namespace MyCAM.PathCache
 
 		public void DoTransform( gp_Trsf transform )
 		{
-			m_CoordinateInfo.Transform( transform );
+			m_RefCoord.Transform( transform );
 			BuildCAMPointList();
 		}
 
 		#endregion
 
 		#region Protected Members
-
-		protected gp_Ax3 CoordinateInfo
-		{
-			get
-			{
-				return m_CoordinateInfo;
-			}
-		}
 
 		protected void SetCraftDataDirty()
 		{
@@ -183,18 +175,12 @@ namespace MyCAM.PathCache
 
 		#region Protected Fields
 
-		protected gp_Ax3 m_CoordinateInfo;
-
+		protected gp_Ax3 m_RefCoord;
 		protected List<CAMPoint> m_StartPointList = new List<CAMPoint>();
-
 		protected List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
-
-		protected List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
-
+		protected List<CAMPoint> m_OverCutCAMPointList = new List<CAMPoint>();
 		protected CraftData m_CraftData;
-
 		protected CAMPoint m_RefPoint;
-
 		protected bool m_IsCraftDataDirty = false;
 
 		#endregion

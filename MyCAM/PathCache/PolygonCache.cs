@@ -7,8 +7,8 @@ namespace MyCAM.PathCache
 {
 	public class PolygonCache : StdPatternCacheBase
 	{
-		public PolygonCache( gp_Ax3 coordinateInfo, IStdPatternGeomData geomData, CraftData craftData )
-			: base( coordinateInfo, craftData )
+		public PolygonCache( gp_Ax3 refCoord, IStdPatternGeomData geomData, CraftData craftData )
+			: base( refCoord, craftData )
 		{
 			if( geomData == null || !( geomData is PolygonGeomData polygonGeomData ) ) {
 				throw new ArgumentNullException( "PolygonCache constructing argument error - invalid geomData" );
@@ -28,8 +28,8 @@ namespace MyCAM.PathCache
 		protected override void BuildCAMPointList()
 		{
 			ClearCraftDataDirty();
-			m_RefPoint = new CAMPoint( new CADPoint( m_CoordinateInfo.Location(), m_CoordinateInfo.Direction(), m_CoordinateInfo.XDirection(), m_CoordinateInfo.YDirection() ), m_CoordinateInfo.Direction() );
-			m_StartPointList = PolygonCacheExtensions.GetStartPointList( CoordinateInfo, m_PolygonGeomData.Sides, m_PolygonGeomData.SideLength );
+			m_RefPoint = new CAMPoint( new CADPoint( m_RefCoord.Location(), m_RefCoord.Direction(), m_RefCoord.XDirection(), m_RefCoord.YDirection() ), m_RefCoord.Direction() );
+			m_StartPointList = PolygonCacheExtensions.GetStartPointList( m_RefCoord, m_PolygonGeomData.Sides, m_PolygonGeomData.SideLength );
 		}
 
 		PolygonGeomData m_PolygonGeomData;
@@ -37,9 +37,9 @@ namespace MyCAM.PathCache
 
 	internal static class PolygonCacheExtensions
 	{
-		internal static List<CAMPoint> GetStartPointList( gp_Ax3 coordinateInfo, int sides, double sideLength )
+		internal static List<CAMPoint> GetStartPointList( gp_Ax3 refCoord, int sides, double sideLength )
 		{
-			gp_Pnt centerPoint = coordinateInfo.Location();
+			gp_Pnt centerPoint = refCoord.Location();
 
 			// calculate circumradius R = sideLength / (2 * sin(π/n))
 			double angleStep = 2.0 * Math.PI / sides;
@@ -50,7 +50,7 @@ namespace MyCAM.PathCache
 			gp_Dir local_Z_pos = gp.DZ();
 
 			// create coordinate system transformation
-			gp_Ax3 targetCoordSystem = new gp_Ax3( centerPoint, coordinateInfo.Direction(), coordinateInfo.XDirection() );
+			gp_Ax3 targetCoordSystem = new gp_Ax3( centerPoint, refCoord.Direction(), refCoord.XDirection() );
 			gp_Trsf coordTransformation = new gp_Trsf();
 			coordTransformation.SetTransformation( targetCoordSystem, new gp_Ax3() );
 

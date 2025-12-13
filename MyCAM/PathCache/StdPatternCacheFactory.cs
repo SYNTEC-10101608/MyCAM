@@ -6,7 +6,7 @@ namespace MyCAM.PathCache
 {
 	internal interface IStdPatternCacheStrategy
 	{
-		IStdPatternCache CreatePathCache( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData );
+		IStdPatternCache CreatePathCache( gp_Ax3 refCoord, IStdPatternGeomData standardPatternGeomData, CraftData craftData );
 	}
 
 	internal class StdPatternCacheStrategy<TPathCache> : IStdPatternCacheStrategy
@@ -19,10 +19,10 @@ namespace MyCAM.PathCache
 			m_PathCacheFactory = pathCacheFactory ?? throw new ArgumentNullException( nameof( pathCacheFactory ) );
 		}
 
-		public IStdPatternCache CreatePathCache( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
+		public IStdPatternCache CreatePathCache( gp_Ax3 refCoord, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
 		{
-			if( coordinateInfo == null ) {
-				throw new ArgumentNullException( nameof( coordinateInfo ) );
+			if( refCoord == null ) {
+				throw new ArgumentNullException( nameof( refCoord ) );
 			}
 			if( standardPatternGeomData == null ) {
 				throw new ArgumentNullException( nameof( standardPatternGeomData ) );
@@ -30,7 +30,7 @@ namespace MyCAM.PathCache
 			if( craftData == null ) {
 				throw new ArgumentNullException( nameof( craftData ) );
 			}
-			return m_PathCacheFactory( coordinateInfo, standardPatternGeomData, craftData );
+			return m_PathCacheFactory( refCoord, standardPatternGeomData, craftData );
 		}
 	}
 
@@ -69,7 +69,7 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public static IStdPatternCache CreatePathCache( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
+		public static IStdPatternCache CreatePathCache( gp_Ax3 refCoord, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
 		{
 			if( standardPatternGeomData == null ) {
 				throw new ArgumentNullException( nameof( standardPatternGeomData ) );
@@ -80,7 +80,7 @@ namespace MyCAM.PathCache
 				throw new ArgumentException( $"No strategy found for PathType: {standardPatternGeomData.PathType}" );
 			}
 
-			return strategy.CreatePathCache( coordinateInfo, standardPatternGeomData, craftData );
+			return strategy.CreatePathCache( refCoord, standardPatternGeomData, craftData );
 		}
 	}
 }
