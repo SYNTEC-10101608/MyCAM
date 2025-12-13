@@ -26,7 +26,7 @@ namespace MyCAM.Post
 
 	internal class ContourNCPackage
 	{
-		public ContourNCPackage( LeadData leadLineParam, double overCutLength,
+		public ContourNCPackage( LeadData leadData, double overCutLength,
 			List<IProcessPoint> camPointList,
 			List<IProcessPoint> leadInCAMPointList,
 			List<IProcessPoint> leadOutCAMPointList,
@@ -36,7 +36,7 @@ namespace MyCAM.Post
 			IProcessPoint processEndPoint
 			)
 		{
-			LeadLineParam = leadLineParam;
+			LeadData = leadData;
 			OverCutLength = overCutLength;
 			CAMPointList = camPointList;
 			LeadInCAMPointList = leadInCAMPointList;
@@ -47,7 +47,7 @@ namespace MyCAM.Post
 			ProcessEndPoint = processEndPoint;
 		}
 
-		public LeadData LeadLineParam
+		public LeadData LeadData
 		{
 			get;
 		}
@@ -132,7 +132,7 @@ namespace MyCAM.Post
 			}
 
 			// lead-in
-			if( currentPathNCPack.LeadLineParam.LeadIn.Type != LeadLineType.None && currentPathNCPack.LeadInCAMPointList.Count > 0 ) {
+			if( currentPathNCPack.LeadData.LeadIn.Type != LeadGeomType.None && currentPathNCPack.LeadInCAMPointList.Count > 0 ) {
 				if( pathG54PostData.MainPathPostPointList.Count == 0 ) {
 					return false;
 				}
@@ -149,7 +149,7 @@ namespace MyCAM.Post
 			}
 
 			// lead-out
-			if( currentPathNCPack.LeadLineParam.LeadOut.Type != LeadLineType.None && currentPathNCPack.LeadOutCAMPointList.Count > 0 ) {
+			if( currentPathNCPack.LeadData.LeadOut.Type != LeadGeomType.None && currentPathNCPack.LeadOutCAMPointList.Count > 0 ) {
 				if( !BuildProcessPath( currentPathNCPack.LeadOutCAMPointList, dLastPointProcess_M, dLastPointProcess_S,
 					out List<PostPoint> leadOutG54 ) ) {
 					return false;

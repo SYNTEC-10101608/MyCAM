@@ -74,7 +74,7 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				return m_CraftData.IsReverse;
+				return m_CraftData.IsPathReverse;
 			}
 		}
 
@@ -82,7 +82,7 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				return m_CraftData.LeadLineParam;
+				return m_CraftData.LeadData;
 			}
 		}
 

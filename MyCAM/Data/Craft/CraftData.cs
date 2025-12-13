@@ -12,7 +12,7 @@ namespace MyCAM.Data
 
 		// this constructor is used when reading from file
 		public CraftData( int startPoint,
-			bool isReverse,
+			bool isPathReverse,
 			LeadData leadData,
 			double overCutLength,
 			Dictionary<int, Tuple<double, double>> toolVecModifyMap,
@@ -20,8 +20,8 @@ namespace MyCAM.Data
 			TraverseData traverseData )
 		{
 			m_StartPointIndex = startPoint;
-			m_IsReverse = isReverse;
-			m_LeadParam = leadData;
+			m_IsPathReverse = isPathReverse;
+			m_LeadData = leadData;
 			m_OverCutLength = overCutLength;
 			m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>( toolVecModifyMap );
 			m_IsToolVecReverse = isToolVecReverse;
@@ -46,30 +46,30 @@ namespace MyCAM.Data
 			}
 		}
 
-		public bool IsReverse
+		public bool IsPathReverse
 		{
 			get
 			{
-				return m_IsReverse;
+				return m_IsPathReverse;
 			}
 			set
 			{
-				if( m_IsReverse != value ) {
-					m_IsReverse = value;
+				if( m_IsPathReverse != value ) {
+					m_IsPathReverse = value;
 					ParameterChanged?.Invoke();
 				}
 			}
 		}
 
-		public LeadData LeadLineParam
+		public LeadData LeadData
 		{
 			get
 			{
 				// to prevent null value
-				if( m_LeadParam == null ) {
-					m_LeadParam = new LeadData();
+				if( m_LeadData == null ) {
+					m_LeadData = new LeadData();
 				}
-				return m_LeadParam;
+				return m_LeadData;
 			}
 			set
 			{
@@ -77,8 +77,8 @@ namespace MyCAM.Data
 				if( value == null ) {
 					value = new LeadData();
 				}
-				if( m_LeadParam != value ) {
-					m_LeadParam = value;
+				if( m_LeadData != value ) {
+					m_LeadData = value;
 					ParameterChanged?.Invoke();
 				}
 			}
@@ -167,8 +167,8 @@ namespace MyCAM.Data
 
 		void SubscribeSubParamChanged()
 		{
-			m_LeadParam.LeadPropertyChanged += SubParamChanged;
-			m_TraverseData.TraverseParameterChanged += SubParamChanged;
+			m_LeadData.PropertyChanged += SubParamChanged;
+			m_TraverseData.PropertyChanged += SubParamChanged;
 		}
 
 		void SubParamChanged()
@@ -177,8 +177,8 @@ namespace MyCAM.Data
 		}
 
 		int m_StartPointIndex = 0;
-		bool m_IsReverse = false;
-		LeadData m_LeadParam = new LeadData();
+		bool m_IsPathReverse = false;
+		LeadData m_LeadData = new LeadData();
 		double m_OverCutLength = 0;
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsToolVecReverse = false;

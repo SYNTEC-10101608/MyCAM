@@ -58,7 +58,7 @@ namespace MyCAM.Data
 
 		}
 
-		public Action TraverseParameterChanged;
+		public Action PropertyChanged;
 
 		public double LiftUpDistance
 		{
@@ -70,7 +70,7 @@ namespace MyCAM.Data
 			{
 				if( m_LiftUpDistance != value ) {
 					m_LiftUpDistance = value;
-					TraverseParameterChanged?.Invoke();
+					PropertyChanged?.Invoke();
 				}
 			}
 		}
@@ -85,7 +85,7 @@ namespace MyCAM.Data
 			{
 				if( m_CutDownDistance != value ) {
 					m_CutDownDistance = value;
-					TraverseParameterChanged?.Invoke();
+					PropertyChanged?.Invoke();
 				}
 			}
 		}
@@ -100,7 +100,7 @@ namespace MyCAM.Data
 			{
 				if( m_FollowSafeDistance != value ) {
 					m_FollowSafeDistance = value;
-					TraverseParameterChanged?.Invoke();
+					PropertyChanged?.Invoke();
 				}
 			}
 		}
@@ -115,7 +115,7 @@ namespace MyCAM.Data
 			{
 				if( m_FrogLeapDistance != value ) {
 					m_FrogLeapDistance = value;
-					TraverseParameterChanged?.Invoke();
+					PropertyChanged?.Invoke();
 				}
 			}
 		}

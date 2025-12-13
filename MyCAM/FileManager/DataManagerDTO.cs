@@ -862,7 +862,7 @@ namespace MyCAM.FileManager
 	public class CraftDataDTO
 	{
 		// properties
-		public bool IsReverse
+		public bool IsPathReverse
 		{
 			get;
 			set;
@@ -886,11 +886,11 @@ namespace MyCAM.FileManager
 			set;
 		} = new TraverseDataDTO();
 
-		public LeadParamDTO LeadParam
+		public LeadDataDTO LeadData
 		{
 			get;
 			set;
-		} = new LeadParamDTO();
+		} = new LeadDataDTO();
 
 		public double OverCutLength
 		{
@@ -913,12 +913,12 @@ namespace MyCAM.FileManager
 			if( craftData == null ) {
 				return;
 			}
-			IsReverse = craftData.IsReverse;
+			IsPathReverse = craftData.IsPathReverse;
 			IsToolVecReverse = craftData.IsToolVecReverse;
 			StartPoint = craftData.StartPointIndex;
-			LeadParam = craftData.LeadLineParam != null
-						? new LeadParamDTO( craftData.LeadLineParam )
-						: new LeadParamDTO();
+			LeadData = craftData.LeadData != null
+						? new LeadDataDTO( craftData.LeadData )
+						: new LeadDataDTO();
 			TraverseData = craftData.TraverseData != null
 							? new TraverseDataDTO( craftData.TraverseData )
 							: new TraverseDataDTO();
@@ -930,13 +930,13 @@ namespace MyCAM.FileManager
 
 		internal CraftData ToCraftData()
 		{
-			if( ToolVecModifyMap == null || LeadParam == null || TraverseData == null ) {
+			if( ToolVecModifyMap == null || LeadData == null || TraverseData == null ) {
 				throw new ArgumentException( "ContourCacheInfo deserialization failed." );
 			}
 			Dictionary<int, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
-			LeadData leadParam = LeadParam.ToLeadData();
+			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
-			return new CraftData( StartPoint, IsReverse, leadParam, OverCutLength, toolVecModifyMap, IsToolVecReverse, traverseData );
+			return new CraftData( StartPoint, IsPathReverse, leadData, OverCutLength, toolVecModifyMap, IsToolVecReverse, traverseData );
 		}
 	}
 
@@ -1028,7 +1028,7 @@ namespace MyCAM.FileManager
 		}
 	}
 
-	public class LeadParamDTO
+	public class LeadDataDTO
 	{
 		public int LeadInType
 		{
@@ -1073,37 +1073,37 @@ namespace MyCAM.FileManager
 		}
 
 		// parameterless constructor (for XmlSerializer)
-		internal LeadParamDTO()
+		internal LeadDataDTO()
 		{
 		}
 
 		// constructor from LeadData
-		internal LeadParamDTO( LeadData leadParam )
+		internal LeadDataDTO( LeadData leadData )
 		{
-			if( leadParam == null ) {
+			if( leadData == null ) {
 				return;
 			}
-			LeadInType = (int)leadParam.LeadIn.Type;
-			LeadOutType = (int)leadParam.LeadOut.Type;
-			LeadInLength = leadParam.LeadIn.Length;
-			LeadOutLength = leadParam.LeadOut.Length;
-			LeadInAngle = leadParam.LeadIn.Angle;
-			LeadOutAngle = leadParam.LeadOut.Angle;
-			IsChangeLeadDirection = leadParam.IsChangeLeadDirection;
+			LeadInType = (int)leadData.LeadIn.Type;
+			LeadOutType = (int)leadData.LeadOut.Type;
+			LeadInLength = leadData.LeadIn.Length;
+			LeadOutLength = leadData.LeadOut.Length;
+			LeadInAngle = leadData.LeadIn.Angle;
+			LeadOutAngle = leadData.LeadOut.Angle;
+			IsChangeLeadDirection = leadData.IsChangeLeadDirection;
 		}
 
 		internal LeadData ToLeadData()
 		{
-			LeadLineType leadInType;
-			if( Enum.IsDefined( typeof( LeadLineType ), LeadInType ) ) {
-				leadInType = (LeadLineType)LeadInType;
+			LeadGeomType leadInType;
+			if( Enum.IsDefined( typeof( LeadGeomType ), LeadInType ) ) {
+				leadInType = (LeadGeomType)LeadInType;
 			}
 			else {
 				throw new ArgumentException( "LeadData deserialization failed." );
 			}
-			LeadLineType leadOutType;
-			if( Enum.IsDefined( typeof( LeadLineType ), LeadOutType ) ) {
-				leadOutType = (LeadLineType)LeadOutType;
+			LeadGeomType leadOutType;
+			if( Enum.IsDefined( typeof( LeadGeomType ), LeadOutType ) ) {
+				leadOutType = (LeadGeomType)LeadOutType;
 			}
 			else {
 				throw new ArgumentException( "LeadData deserialization failed." );

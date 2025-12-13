@@ -24,7 +24,7 @@ namespace MyCAM.Editor
 		{
 			// all set true
 			IsStartPointEditable = true;
-			IsReverseEditable = true;
+			IsPathReverseEditable = true;
 			IsOverCutEditable = true;
 			IsLeadLineEditable = true;
 			IsToolVecEditable = true;
@@ -35,7 +35,7 @@ namespace MyCAM.Editor
 		}
 
 		public bool IsStartPointEditable;
-		public bool IsReverseEditable;
+		public bool IsPathReverseEditable;
 		public bool IsOverCutEditable;
 		public bool IsLeadLineEditable;
 		public bool IsToolVecEditable;
@@ -294,7 +294,7 @@ namespace MyCAM.Editor
 				}
 
 				// toggle reverse state
-				craftData.IsReverse = !craftData.IsReverse;
+				craftData.IsPathReverse = !craftData.IsPathReverse;
 				// To-do：update CacheInfo in CAMPoint
 			}
 			ShowCAMData( szPathIDList );
@@ -368,10 +368,10 @@ namespace MyCAM.Editor
 			ShowCAMData( szPathIDList );
 		}
 
-		public void SetTraverseParam()
+		public void SetTraverseData()
 		{
 			// action edit, multi edit supported
-			if( IsSameAction( EditActionType.SetTraverseParam ) ) {
+			if( IsSameAction( EditActionType.SetTraverse ) ) {
 				m_CurrentAction.End();
 				return;
 			}
@@ -595,7 +595,7 @@ namespace MyCAM.Editor
 				}
 
 				if( geomData.PathType != PathType.Contour ) {
-					editableInfo.IsReverseEditable = false;
+					editableInfo.IsPathReverseEditable = false;
 					editableInfo.IsToolVecEditable = false;
 				}
 			}
@@ -731,7 +731,7 @@ namespace MyCAM.Editor
 			base.OnEditActionStart( action );
 			if( action.ActionType == EditActionType.OverCut ||
 				action.ActionType == EditActionType.SetLead ||
-				action.ActionType == EditActionType.SetTraverseParam ) {
+				action.ActionType == EditActionType.SetTraverse ) {
 
 				// lock main form
 				m_TreeView.Enabled = false;
@@ -747,7 +747,7 @@ namespace MyCAM.Editor
 			// these action will show dialog, need to lock ui
 			if( action.ActionType == EditActionType.OverCut ||
 				action.ActionType == EditActionType.SetLead ||
-				action.ActionType == EditActionType.SetTraverseParam
+				action.ActionType == EditActionType.SetTraverse
 				) {
 
 				// unlock main form

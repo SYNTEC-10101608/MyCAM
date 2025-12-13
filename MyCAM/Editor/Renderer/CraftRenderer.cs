@@ -63,14 +63,14 @@ namespace MyCAM.Editor.Renderer
 		void ShowLeadInLine( List<string> pathIDList )
 		{
 			ShowLeadLine( pathIDList, m_LeadInAISDict,
-				( leadData ) => leadData.LeadIn.Type != LeadLineType.None,
+				( leadData ) => leadData.LeadIn.Type != LeadGeomType.None,
 				GetLeadInPointList );
 		}
 
 		void ShowLeadOutLine( List<string> pathIDList )
 		{
 			ShowLeadLine( pathIDList, m_LeadOutAISDict,
-				( leadData ) => leadData.LeadOut.Type != LeadLineType.None,
+				( leadData ) => leadData.LeadOut.Type != LeadGeomType.None,
 				GetLeadOutPointList );
 		}
 

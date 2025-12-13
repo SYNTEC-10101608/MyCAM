@@ -2,23 +2,23 @@
 
 namespace MyCAM.Data
 {
-	public enum LeadLineType
+	public enum LeadGeomType
 	{
 		None = 0,
 		Line,
 		Arc,
 	}
 
-	public class LeadParam
+	public class LeadGeom
 	{
-		public LeadParam( LeadLineType type = LeadLineType.None, double length = 0, double angle = 0 )
+		public LeadGeom( LeadGeomType type = LeadGeomType.None, double length = 0, double angle = 0 )
 		{
 			Type = type;
 			Length = length;
 			Angle = angle;
 		}
 
-		public LeadLineType Type
+		public LeadGeomType Type
 		{
 			get; set;
 		}
@@ -36,22 +36,22 @@ namespace MyCAM.Data
 
 	public class LeadData
 	{
-		public LeadData( LeadLineType leadInType = LeadLineType.None, LeadLineType leadOutType = LeadLineType.None,
+		public LeadData( LeadGeomType leadInType = LeadGeomType.None, LeadGeomType leadOutType = LeadGeomType.None,
 			double dLeadInLength = 0, double dLeadInAngle = 0, double dLeadOutLength = 0, double dLeadOutAngle = 0, bool isChangeLeadDirection = false )
 		{
-			LeadIn = new LeadParam( leadInType, dLeadInLength, dLeadInAngle );
-			LeadOut = new LeadParam( leadOutType, dLeadOutLength, dLeadOutAngle );
+			LeadIn = new LeadGeom( leadInType, dLeadInLength, dLeadInAngle );
+			LeadOut = new LeadGeom( leadOutType, dLeadOutLength, dLeadOutAngle );
 			IsChangeLeadDirection = isChangeLeadDirection;
 		}
 
-		public Action LeadPropertyChanged;
+		public Action PropertyChanged;
 
-		public LeadParam LeadIn
+		public LeadGeom LeadIn
 		{
 			get
 			{
 				if( m_LeadIn == null ) {
-					m_LeadIn = new LeadParam();
+					m_LeadIn = new LeadGeom();
 				}
 				return m_LeadIn;
 			}
@@ -59,17 +59,17 @@ namespace MyCAM.Data
 			{
 				if( m_LeadIn != value ) {
 					m_LeadIn = value;
-					LeadPropertyChanged?.Invoke();
+					PropertyChanged?.Invoke();
 				}
 			}
 		}
 
-		public LeadParam LeadOut
+		public LeadGeom LeadOut
 		{
 			get
 			{
 				if( m_LeadOut == null ) {
-					m_LeadOut = new LeadParam();
+					m_LeadOut = new LeadGeom();
 				}
 				return m_LeadOut;
 			}
@@ -77,7 +77,7 @@ namespace MyCAM.Data
 			{
 				if( m_LeadOut != value ) {
 					m_LeadOut = value;
-					LeadPropertyChanged?.Invoke();
+					PropertyChanged?.Invoke();
 				}
 			}
 		}
@@ -92,7 +92,7 @@ namespace MyCAM.Data
 			{
 				if( m_IsChangeLeadDirection != value ) {
 					m_IsChangeLeadDirection = value;
-					LeadPropertyChanged?.Invoke();
+					PropertyChanged?.Invoke();
 				}
 			}
 		}
@@ -110,8 +110,8 @@ namespace MyCAM.Data
 			);
 		}
 
-		LeadParam m_LeadIn;
-		LeadParam m_LeadOut;
+		LeadGeom m_LeadIn;
+		LeadGeom m_LeadOut;
 		bool m_IsChangeLeadDirection;
 	}
 }

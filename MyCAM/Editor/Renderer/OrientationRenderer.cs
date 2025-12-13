@@ -93,14 +93,14 @@ namespace MyCAM.Editor.Renderer
 		void ShowLeadInOrientation( List<string> pathIDList )
 		{
 			ShowLeadOrientation( pathIDList, m_LeadInOrientationAISDict,
-				( leadData ) => leadData.LeadIn.Type != LeadLineType.None,
+				( leadData ) => leadData.LeadIn.Type != LeadGeomType.None,
 				GetLeadInFirstPoint );
 		}
 
 		void ShowLeadOutOrientation( List<string> pathIDList )
 		{
 			ShowLeadOrientation( pathIDList, m_LeadOutOrientationAISDict,
-				( leadData ) => leadData.LeadOut.Type != LeadLineType.None,
+				( leadData ) => leadData.LeadOut.Type != LeadGeomType.None,
 				GetLeadOutLastPoint );
 		}
 

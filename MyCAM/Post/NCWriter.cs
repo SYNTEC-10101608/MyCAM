@@ -261,7 +261,7 @@ namespace MyCAM.Post
 			ContourCache contourCacheInfo = contourPathObject.ContourCacheInfo;
 			CraftData craftData = contourPathObject.CraftData;
 			return new ContourNCPackage(
-				craftData.LeadLineParam,
+				craftData.LeadData,
 				craftData.OverCutLength,
 				contourCacheInfo.CAMPointList.Cast<IProcessPoint>().ToList(),
 				contourCacheInfo.LeadInCAMPointList.Cast<IProcessPoint>().ToList(),

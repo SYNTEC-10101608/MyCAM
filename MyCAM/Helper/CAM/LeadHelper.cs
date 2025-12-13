@@ -20,13 +20,13 @@ namespace MyCAM.Helper
 			if( mainPointList.Count == 0 ) {
 				return;
 			}
-			LeadParam leadInParam = leadInData.LeadIn;
+			LeadGeom leadInParam = leadInData.LeadIn;
 			bool isChangeLeadDirection = leadInData.IsChangeLeadDirection;
 			switch( leadInParam.Type ) {
-				case LeadLineType.Line:
+				case LeadGeomType.Line:
 					leadInPointList = BuildStraightLeadLine( mainPointList[ 0 ], true, leadInParam.Length, leadInParam.Angle, isChangeLeadDirection, isPathReverse );
 					break;
-				case LeadLineType.Arc:
+				case LeadGeomType.Arc:
 					leadInPointList = BuildArcLeadLine( mainPointList[ 0 ], true, leadInParam.Length, leadInParam.Angle, isChangeLeadDirection, isPathReverse, maxDeflection, maxEdgeLength );
 					break;
 				default:
@@ -52,13 +52,13 @@ namespace MyCAM.Helper
 			else {
 				leadOutStartPoint = mainPointList[ mainPointList.Count - 1 ];
 			}
-			LeadParam leadOutParam = leadOutData.LeadOut;
+			LeadGeom leadOutParam = leadOutData.LeadOut;
 			bool isChangeLeadDirection = leadOutData.IsChangeLeadDirection;
 			switch( leadOutParam.Type ) {
-				case LeadLineType.Line:
+				case LeadGeomType.Line:
 					leadOutPointList = BuildStraightLeadLine( leadOutStartPoint, false, leadOutParam.Length, leadOutParam.Angle, isChangeLeadDirection, isPathReverse );
 					break;
-				case LeadLineType.Arc:
+				case LeadGeomType.Arc:
 					leadOutPointList = BuildArcLeadLine( leadOutStartPoint, false, leadOutParam.Length, leadOutParam.Angle, isChangeLeadDirection, isPathReverse, maxDeflection, maxEdgeLength );
 					break;
 				default:
@@ -67,7 +67,7 @@ namespace MyCAM.Helper
 		}
 
 		// when isLeadIn, the input point is start of path, and is end of lead in
-		static List<IOrientationPoint> BuildStraightLeadLine( IOrientationPoint StraightLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse )
+		static List<IOrientationPoint> BuildStraightLeadLine( IOrientationPoint StraightLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isPathReverse )
 		{
 			List<IOrientationPoint> LeadPointList = new List<IOrientationPoint>();
 
@@ -93,7 +93,7 @@ namespace MyCAM.Helper
 			gp_Pnt leadLineEndPoint = startPoint.Point.Translated( dirVec2D.Multiplied( dLeadLineLength ) );
 
 			// flip by y axis
-			if( ( isLeadIn == false && isReverse == false ) || ( isLeadIn && isReverse ) ) {
+			if( ( isLeadIn == false && isPathReverse == false ) || ( isLeadIn && isPathReverse ) ) {
 				gp_Trsf mirrorTrsf = new gp_Trsf();
 				mirrorTrsf.SetMirror( new gp_Ax1( planeCS.Location(), planeCS.YDirection() ) );
 				leadLineEndPoint.Transform( mirrorTrsf );
@@ -134,7 +134,7 @@ namespace MyCAM.Helper
 		}
 
 		// when isLeadIn, the input point is start of path, and is end of lead in
-		static List<IOrientationPoint> BuildArcLeadLine( IOrientationPoint CurveLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isReverse, double dDeflection, double dMaxLength )
+		static List<IOrientationPoint> BuildArcLeadLine( IOrientationPoint CurveLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isPathReverse, double dDeflection, double dMaxLength )
 		{
 			// protection
 			if( CurveLeadStartOrEndPoint == null || dLeadLineLength <= 0 || dLeadLineAngle <= 0 ) {
@@ -179,7 +179,7 @@ namespace MyCAM.Helper
 			tangentDirList.Reverse();
 
 			// mirror by y axis
-			if( isReverse ) {
+			if( isPathReverse ) {
 				gp_Ax1 mirrorAxisY = new gp_Ax1( leadLinePlane.Location(), leadLinePlane.YDirection() );
 				gp_Trsf mirrorTrsf = new gp_Trsf();
 				mirrorTrsf.SetMirror( mirrorAxisY );

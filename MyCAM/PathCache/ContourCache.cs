@@ -84,7 +84,7 @@ namespace MyCAM.PathCache
 				BuildCAMPointList();
 			}
 			CAMPoint camPoint = null;
-			if( m_LeadInCAMPointList.Count > 0 && m_CraftData.LeadLineParam.LeadIn.Length > 0 ) {
+			if( m_LeadInCAMPointList.Count > 0 && m_CraftData.LeadData.LeadIn.Length > 0 ) {
 				camPoint = m_LeadInCAMPointList.First().Clone();
 			}
 			else if( m_CAMPointList.Count > 0 ) {
@@ -99,7 +99,7 @@ namespace MyCAM.PathCache
 				BuildCAMPointList();
 			}
 			CAMPoint camPoint = null;
-			if( m_LeadOutCAMPointList.Count > 0 && m_CraftData.LeadLineParam.LeadOut.Length > 0 ) {
+			if( m_LeadOutCAMPointList.Count > 0 && m_CraftData.LeadData.LeadOut.Length > 0 ) {
 				camPoint = m_LeadOutCAMPointList.Last().Clone();
 			}
 			else if( m_OverCutPointList.Count > 0 && m_CraftData.OverCutLength > 0 ) {
@@ -150,7 +150,7 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				return m_CraftData.IsReverse;
+				return m_CraftData.IsPathReverse;
 			}
 		}
 
@@ -158,7 +158,7 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				return m_CraftData.LeadLineParam;
+				return m_CraftData.LeadData;
 			}
 		}
 
@@ -245,9 +245,9 @@ namespace MyCAM.PathCache
 			// set lead
 			List<IOrientationPoint> mainPointList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
 			List<IOrientationPoint> overCutPointList2 = m_OverCutPointList.Cast<IOrientationPoint>().ToList();
-			LeadHelper.SetLeadIn( mainPointList, out List<IOrientationPoint> leadInPointList, m_CraftData.LeadLineParam, m_CraftData.IsReverse );
+			LeadHelper.SetLeadIn( mainPointList, out List<IOrientationPoint> leadInPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
 			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
-			LeadHelper.SetLeadOut( mainPointList, overCutPointList2, out List<IOrientationPoint> leadOutPointList, m_CraftData.LeadLineParam, m_CraftData.IsReverse );
+			LeadHelper.SetLeadOut( mainPointList, overCutPointList2, out List<IOrientationPoint> leadOutPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
 			m_LeadOutCAMPointList = leadOutPointList.Cast<CAMPoint>().ToList();
 		}
 
@@ -266,7 +266,7 @@ namespace MyCAM.PathCache
 		void SetOrientation()
 		{
 			// reverse the cad points if is reverse
-			if( m_CraftData.IsReverse ) {
+			if( m_CraftData.IsPathReverse ) {
 				m_CAMPointList.Reverse();
 
 				// modify start point index for closed path
