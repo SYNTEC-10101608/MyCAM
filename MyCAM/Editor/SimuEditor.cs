@@ -107,7 +107,7 @@ namespace MyCAM.Editor
 		{
 			foreach( string szID in m_DataManager.PartIDList ) {
 				CraftData craftData = ( m_DataManager.ObjectMap[ szID ] as PathObject ).CraftData;
-				ContourCache contourCache = ( m_DataManager.ObjectMap[ szID ] as ContourPathObject ).ContourCache;
+				ContourCache contourCache = ( m_DataManager.ObjectMap[ szID ] as ContourPathObject ).ContourCache as ContourCache;
 				gp_Vec G54Offset = new gp_Vec( 40, -385, -640 );
 				m_PostSolver.G54Offset = G54Offset;
 				PostData simuPostData = null; // TODO: the implementation should be rework

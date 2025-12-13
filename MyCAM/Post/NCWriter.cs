@@ -258,7 +258,7 @@ namespace MyCAM.Post
 				return null;
 			}
 			ContourPathObject contourPathObject = pathObject as ContourPathObject;
-			ContourCache contourCache = contourPathObject.ContourCache;
+			ContourCache contourCache = contourPathObject.ContourCache as ContourCache;
 			CraftData craftData = contourPathObject.CraftData;
 			return new ContourNCPackage(
 				craftData.LeadData,

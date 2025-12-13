@@ -60,7 +60,7 @@
     <Compile Include="PathCache\RectangleCache.cs" />
     <Compile Include="PathCache\RunwayCache.cs" />
     <Compile Include="PathCache\StdPatternCacheBase.cs" />
-    <Compile Include="PathCache\StdPatternCacheFactory.cs" />
+    <Compile Include="PathCache\PathCacheFactory.cs" />
     <Compile Include="Data\DataGettingHelper.cs" />
     <Compile Include="Data\Geom\CircleGeomData.cs" />
     <Compile Include="Data\Geom\ContourGeomData.cs" />

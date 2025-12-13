@@ -1,12 +1,13 @@
 ﻿using MyCAM.Data;
 using MyCAM.Helper;
+using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MyCAM.PathCache
 {
-	public class ContourCache : IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache, IPathCache
+	public class ContourCache : IContourCache, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache, IPathCache
 	{
 		public ContourCache( ContourGeomData geomData, CraftData craftData )
 		{
@@ -131,7 +132,7 @@ namespace MyCAM.PathCache
 
 		#region API
 		// when the shape has tranform, need to call this to update the cache info
-		public void DoTransform()
+		public void DoTransform( gp_Trsf trasform )
 		{
 			BuildCAMPointList();
 		}

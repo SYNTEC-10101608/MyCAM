@@ -65,11 +65,14 @@ namespace MyCAM.Data
 			// Step1: transform shape first
 			base.DoTransform( transform );
 
-			// Step2: then transform CAD points because they depend on shape
-			m_ContourPathObject.DoTransform( transform );
+			// Step2: then transform geom data, currently do nothing since transform is not depends on geom data
+			m_GeomData.DoTransform( transform );
 
-			// Step3: recalculate cache info because CAD points have changed
+			// Step3: recalculate cache
 			m_StandatdPatternCache.DoTransform( transform );
+
+			// Step4: transform the underlying contour path object
+			m_ContourPathObject.DoTransform( transform );
 		}
 
 		void InitializeCache()
@@ -77,7 +80,7 @@ namespace MyCAM.Data
 			gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( m_ContourPathObject.ContourGeomData.RefCenterDir, m_GeomData.RotatedAngle_deg );
 
 			// factory automatically determines the correct Cache type based on GeomData type
-			m_StandatdPatternCache = (StdPatternCacheBase)StdPatternCacheFactory.CreatePathCache( refCoord, m_GeomData, m_CraftData );
+			m_StandatdPatternCache = (StdPatternCacheBase)PathCacheFactory.CreateStdPatternCache( refCoord, m_GeomData, m_CraftData );
 		}
 
 		IStdPatternGeomData m_GeomData;

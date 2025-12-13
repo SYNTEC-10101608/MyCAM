@@ -21,7 +21,7 @@ namespace MyCAM.Editor
 			// checked in base constructor
 			m_PathIDList = new List<string>() { pathID };
 			m_CraftData = ( m_DataManager.ObjectMap[ m_PathID ] as PathObject ).CraftData;
-			m_ContourCache = ( m_DataManager.ObjectMap[ m_PathID ] as ContourPathObject ).ContourCache;
+			m_ContourCache = ( ( m_DataManager.ObjectMap[ m_PathID ] as ContourPathObject ).ContourCache ) as ContourCache;
 
 		}
 

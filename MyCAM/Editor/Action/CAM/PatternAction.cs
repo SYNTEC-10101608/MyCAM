@@ -99,6 +99,9 @@ namespace MyCAM.Editor
 				}
 				else {
 					shape = StdPatternHelper.GetPathWire( contourPathObject.ContourGeomData.RefCenterDir, standardPatternGeomData );
+					if( shape == null || shape.IsNull() ) {
+						continue;
+					}
 				}
 
 				m_DataManager.ObjectMap[ szID ] = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, pathObject );

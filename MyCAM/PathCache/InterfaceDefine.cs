@@ -17,6 +17,10 @@ namespace MyCAM.PathCache
 		void DoTransform( gp_Trsf transform );
 	}
 
+	public interface IContourCache : IPathCache, ITransformableCache
+	{
+	}
+
 	public interface IStdPatternCache : IPathCache, ITransformableCache
 	{
 	}
