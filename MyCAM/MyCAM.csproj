@@ -62,25 +62,25 @@
     <Compile Include="PathCache\StdPatternCacheBase.cs" />
     <Compile Include="PathCache\StdPatternCacheFactory.cs" />
     <Compile Include="Data\DataGettingHelper.cs" />
-    <Compile Include="Data\GeomDataFolder\CircleGeomData.cs" />
-    <Compile Include="Data\GeomDataFolder\ContourGeomData.cs" />
-    <Compile Include="Data\GeomDataFolder\PolygonGeomData.cs" />
-    <Compile Include="Data\GeomDataFolder\RunwayGeomData.cs" />
-    <Compile Include="Data\GeomDataFolder\StdPatternGeomDataBase.cs" />
-    <Compile Include="Data\PathObjectFolder\CirclePathObject.cs" />
-    <Compile Include="Data\PathObjectFolder\ContourPathObject.cs" />
-    <Compile Include="Data\CraftData.cs" />
-    <Compile Include="Data\GeomDataFolder\IGeomData.cs" />
-    <Compile Include="Data\GeomDataFolder\RectangleGeomData.cs" />
-    <Compile Include="Data\MachineData.cs" />
-    <Compile Include="Data\MachineDefine.cs" />
-    <Compile Include="Data\PathObjectFolder\PolygonPathObject.cs" />
-    <Compile Include="Data\PathObjectFolder\RectanglePathObject.cs" />
-    <Compile Include="Data\PathObjectFolder\RunwayPathObject.cs" />
-    <Compile Include="Data\PathObjectFolder\StdPatternObjectBase.cs" />
+    <Compile Include="Data\Geom\CircleGeomData.cs" />
+    <Compile Include="Data\Geom\ContourGeomData.cs" />
+    <Compile Include="Data\Geom\PolygonGeomData.cs" />
+    <Compile Include="Data\Geom\RunwayGeomData.cs" />
+    <Compile Include="Data\Geom\StdPatternGeomDataBase.cs" />
+    <Compile Include="Data\Object\CirclePathObject.cs" />
+    <Compile Include="Data\Object\ContourPathObject.cs" />
+    <Compile Include="Data\Craft\CraftData.cs" />
+    <Compile Include="Data\Geom\IGeomData.cs" />
+    <Compile Include="Data\Geom\RectangleGeomData.cs" />
+    <Compile Include="Data\Machine\MachineData.cs" />
+    <Compile Include="Data\Machine\MachineDefine.cs" />
+    <Compile Include="Data\Object\PolygonPathObject.cs" />
+    <Compile Include="Data\Object\RectanglePathObject.cs" />
+    <Compile Include="Data\Object\RunwayPathObject.cs" />
+    <Compile Include="Data\Object\StdPatternObjectBase.cs" />
     <Compile Include="Data\PointData.cs" />
     <Compile Include="Data\PostData.cs" />
-    <Compile Include="Data\TraverseData.cs" />
+    <Compile Include="Data\Craft\TraverseData.cs" />
     <Compile Include="Editor\Action\CAD\AddLineAction.cs" />
     <Compile Include="Editor\Action\CAD\AxisTransformAction.cs" />
     <Compile Include="Editor\Action\CAD\SelectPartAction.cs" />
@@ -132,7 +132,7 @@
     <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
     <Compile Include="Editor\Renderer\TraverseRenderer.cs" />
     <Compile Include="Editor\SimuEditor.cs" />
-    <Compile Include="Data\LeadData.cs" />
+    <Compile Include="Data\Craft\LeadData.cs" />
     <Compile Include="Editor\Dialog\LeadDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -180,7 +180,7 @@
       <DependentUpon>ToolVectorDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\ViewManager.cs" />
-    <Compile Include="Data\BasicData.cs" />
+    <Compile Include="Data\Object\BasicData.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="LogManager\LogHandler.cs" />
     <Compile Include="Helper\CAM\OverCutHelper.cs" />
