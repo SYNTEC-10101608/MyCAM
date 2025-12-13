@@ -130,7 +130,7 @@ namespace MyCAM.Helper
 			return true;
 		}
 
-		public static void GetRefCoordFromContour( List<CADPoint> points, out gp_Ax1 refCoord )
+		public static void GetRefCenterDirFromContour( List<CADPoint> points, out gp_Ax1 refCoord )
 		{
 			refCoord = new gp_Ax1();
 

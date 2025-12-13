@@ -18,7 +18,7 @@ namespace MyCAM.Data
 			m_IsClosed = isClosed;
 			DisctereContourHelper.BuildContourGeomData( pathDataList, isClosed,
 				out m_CADPointList, out m_ConnectPointMap );
-			DisctereContourHelper.GetRefCoordFromContour( m_CADPointList, out m_RefCenterDir );
+			DisctereContourHelper.GetRefCenterDirFromContour( m_CADPointList, out m_RefCenterDir );
 		}
 
 		public ContourGeomData( List<CADPoint> cadPointList, Dictionary<CADPoint, CADPoint> connectPointMap, bool isClosed )
@@ -32,7 +32,7 @@ namespace MyCAM.Data
 			m_CADPointList = cadPointList;
 			m_ConnectPointMap = connectPointMap;
 			m_IsClosed = isClosed;
-			DisctereContourHelper.GetRefCoordFromContour( m_CADPointList, out m_RefCenterDir );
+			DisctereContourHelper.GetRefCenterDirFromContour( m_CADPointList, out m_RefCenterDir );
 		}
 
 		public PathType PathType
