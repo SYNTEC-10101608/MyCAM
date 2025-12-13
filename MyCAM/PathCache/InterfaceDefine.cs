@@ -1,9 +1,6 @@
 ﻿using MyCAM.Data;
-using System;
+using OCC.gp;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyCAM.PathCache
 {
@@ -15,7 +12,12 @@ namespace MyCAM.PathCache
 		}
 	}
 
-	public interface IStdPatternCache : IPathCache
+	public interface ITransformableCache
+	{
+		void DoTransform( gp_Trsf transform );
+	}
+
+	public interface IStdPatternCache : IPathCache, ITransformableCache
 	{
 	}
 

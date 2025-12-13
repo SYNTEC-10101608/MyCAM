@@ -11,7 +11,7 @@ namespace MyCAM.PathCache
 			: base( coordinateInfo, craftData )
 		{
 			if( geomData == null || !( geomData is RectangleGeomData rectangleGeomData ) ) {
-				throw new ArgumentNullException( "RectangleCacheInfo constructing argument error - invalid geomData" );
+				throw new ArgumentNullException( "RectangleCache constructing argument error - invalid geomData" );
 			}
 			m_RectangleGeomData = rectangleGeomData;
 			BuildCAMPointList();
@@ -29,13 +29,13 @@ namespace MyCAM.PathCache
 		{
 			ClearCraftDataDirty();
 			m_RefPoint = new CAMPoint( new CADPoint( m_CoordinateInfo.Location(), m_CoordinateInfo.Direction(), m_CoordinateInfo.XDirection(), m_CoordinateInfo.YDirection() ), m_CoordinateInfo.Direction() );
-			m_StartPointList = RectangleCacheInfoExtensions.GetStartPointList( CoordinateInfo, m_RectangleGeomData.Length, m_RectangleGeomData.Width );
+			m_StartPointList = RectangleCacheExtensions.GetStartPointList( CoordinateInfo, m_RectangleGeomData.Length, m_RectangleGeomData.Width );
 		}
 
 		RectangleGeomData m_RectangleGeomData;
 	}
 
-	internal static class RectangleCacheInfoExtensions
+	internal static class RectangleCacheExtensions
 	{
 		internal static List<CAMPoint> GetStartPointList( gp_Ax3 coordinateInfo, double longSideLength, double shortSideLength )
 		{

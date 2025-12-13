@@ -11,10 +11,10 @@ namespace MyCAM.PathCache
 		public ContourCache( ContourGeomData geomData, CraftData craftData )
 		{
 			if( geomData == null || craftData == null ) {
-				throw new ArgumentNullException( "ContourCacheInfo constructing argument null" );
+				throw new ArgumentNullException( "ContourCache constructing argument null" );
 			}
 			if( geomData.CADPointList.Count == 0 ) {
-				throw new ArgumentException( "ContourCacheInfo constructing argument empty cadPointList" );
+				throw new ArgumentException( "ContourCache constructing argument empty cadPointList" );
 			}
 			m_CADPointList = geomData.CADPointList;
 			m_ConnectCADPointMap = geomData.ConnectPointMap;

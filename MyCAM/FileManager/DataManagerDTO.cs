@@ -931,7 +931,7 @@ namespace MyCAM.FileManager
 		internal CraftData ToCraftData()
 		{
 			if( ToolVecModifyMap == null || LeadData == null || TraverseData == null ) {
-				throw new ArgumentException( "ContourCacheInfo deserialization failed." );
+				throw new ArgumentException( "ContourCache deserialization failed." );
 			}
 			Dictionary<int, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
 			LeadData leadData = LeadData.ToLeadData();

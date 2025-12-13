@@ -77,10 +77,11 @@ namespace MyCAM.Data
 				return false;
 			}
 
-			// use unified CacheInfo property from StandardPatternBasedPathObject
+			// use unified Cache property from StandardPatternBasedPathObject
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
-				// cacheInfo implements IStandardPatternCacheInfo which has GetProcessRefPoint
-				if( standardPatternPathObject.StandatdPatternCacheInfo is IStdPatternRefPointCache refPointCache ) {
+
+				// cache implements IStdPatternCache which has GetProcessRefPoint
+				if( standardPatternPathObject.StandatdPatternCache is IStdPatternRefPointCache refPointCache ) {
 					refPoint = refPointCache.GetProcessRefPoint();
 					return true;
 				}

@@ -56,8 +56,8 @@ namespace MyCAM.PathCache
 			}
 
 			// get cache info and cast to requested type
-			IPathCache cacheInfo = strategy.GetCacheInfo( pathObject );
-			cache = cacheInfo as TCache;
+			IPathCache pathCache = strategy.GetPathCache( pathObject );
+			cache = pathCache as TCache;
 			return cache != null;
 		}
 	}
@@ -69,23 +69,23 @@ namespace MyCAM.PathCache
 
 	internal interface IPathCacheStrategy
 	{
-		IPathCache GetCacheInfo( PathObject pathObject );
+		IPathCache GetPathCache( PathObject pathObject );
 	}
 
 	internal class PathCacheStrategy<TPathObject> : IPathCacheStrategy
 		where TPathObject : PathObject
 	{
-		private readonly Func<TPathObject, IPathCache> m_CacheInfoGetter;
+		private readonly Func<TPathObject, IPathCache> m_PathCacheGetter;
 
-		public PathCacheStrategy( Func<TPathObject, IPathCache> cacheInfoGetter )
+		public PathCacheStrategy( Func<TPathObject, IPathCache> pathCacheGetter )
 		{
-			m_CacheInfoGetter = cacheInfoGetter ?? throw new ArgumentNullException( nameof( cacheInfoGetter ) );
+			m_PathCacheGetter = pathCacheGetter ?? throw new ArgumentNullException( nameof( pathCacheGetter ) );
 		}
 
-		public IPathCache GetCacheInfo( PathObject pathObject )
+		public IPathCache GetPathCache( PathObject pathObject )
 		{
 			if( pathObject is TPathObject typedPathObject ) {
-				return m_CacheInfoGetter( typedPathObject );
+				return m_PathCacheGetter( typedPathObject );
 			}
 			return null;
 		}
@@ -95,10 +95,10 @@ namespace MyCAM.PathCache
 	{
 		// create singleton strategy instances using generic PathCacheStrategy
 		static readonly IPathCacheStrategy s_ContourStrategy =
-			new PathCacheStrategy<ContourPathObject>( obj => obj.ContourCacheInfo );
+			new PathCacheStrategy<ContourPathObject>( obj => obj.ContourCache );
 
 		static readonly IPathCacheStrategy s_StandardPatternStrategy =
-			new PathCacheStrategy<StdPatternObjectBase>( obj => obj.StandatdPatternCacheInfo );
+			new PathCacheStrategy<StdPatternObjectBase>( obj => obj.StandatdPatternCache );
 
 		public static IPathCacheStrategy GetStrategy( PathType pathType )
 		{

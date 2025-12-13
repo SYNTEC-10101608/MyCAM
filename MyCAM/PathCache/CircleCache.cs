@@ -11,7 +11,7 @@ namespace MyCAM.PathCache
 			: base( coordinateInfo, craftData )
 		{
 			if( geomData == null || !( geomData is CircleGeomData circleGeomData ) ) {
-				throw new ArgumentNullException( "CircleCacheInfo constructing argument error - invalid geomData" );
+				throw new ArgumentNullException( "CircleCache constructing argument error - invalid geomData" );
 			}
 			m_CircleGeomData = circleGeomData;
 			BuildCAMPointList();
@@ -29,13 +29,13 @@ namespace MyCAM.PathCache
 		{
 			ClearCraftDataDirty();
 			m_RefPoint = new CAMPoint( new CADPoint( m_CoordinateInfo.Location(), m_CoordinateInfo.Direction(), m_CoordinateInfo.XDirection(), m_CoordinateInfo.YDirection() ), m_CoordinateInfo.Direction() );
-			m_StartPointList = CircleCacheInfoExtensions.GetStartPointList( CoordinateInfo, m_CircleGeomData.Diameter );
+			m_StartPointList = CircleCacheExtensions.GetStartPointList( CoordinateInfo, m_CircleGeomData.Diameter );
 		}
 
 		CircleGeomData m_CircleGeomData;
 	}
 
-	internal static class CircleCacheInfoExtensions
+	internal static class CircleCacheExtensions
 	{
 		internal static List<CAMPoint> GetStartPointList( gp_Ax3 coordinateInfo, double diameter )
 		{

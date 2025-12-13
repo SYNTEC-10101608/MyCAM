@@ -258,18 +258,18 @@ namespace MyCAM.Post
 				return null;
 			}
 			ContourPathObject contourPathObject = pathObject as ContourPathObject;
-			ContourCache contourCacheInfo = contourPathObject.ContourCacheInfo;
+			ContourCache contourCache = contourPathObject.ContourCache;
 			CraftData craftData = contourPathObject.CraftData;
 			return new ContourNCPackage(
 				craftData.LeadData,
 				craftData.OverCutLength,
-				contourCacheInfo.CAMPointList.Cast<IProcessPoint>().ToList(),
-				contourCacheInfo.LeadInCAMPointList.Cast<IProcessPoint>().ToList(),
-				contourCacheInfo.LeadOutCAMPointList.Cast<IProcessPoint>().ToList(),
-				contourCacheInfo.OverCutCAMPointList.Cast<IProcessPoint>().ToList(),
+				contourCache.CAMPointList.Cast<IProcessPoint>().ToList(),
+				contourCache.LeadInCAMPointList.Cast<IProcessPoint>().ToList(),
+				contourCache.LeadOutCAMPointList.Cast<IProcessPoint>().ToList(),
+				contourCache.OverCutCAMPointList.Cast<IProcessPoint>().ToList(),
 				craftData.TraverseData,
-				contourCacheInfo.GetProcessEndPoint(),
-				contourCacheInfo.GetProcessEndPoint() );
+				contourCache.GetProcessEndPoint(),
+				contourCache.GetProcessEndPoint() );
 		}
 
 		StandardPatternNCPackage BuildPackageByID_StandardPattern( string szID )

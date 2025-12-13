@@ -4,22 +4,22 @@ using System;
 
 namespace MyCAM.PathCache
 {
-	internal interface IStandardPatternCacheInfoStrategy
+	internal interface IStdPatternCacheStrategy
 	{
-		IStdPatternCache CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData );
+		IStdPatternCache CreatePathCache( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData );
 	}
 
-	internal class StandardPatternCacheInfoStrategy<TCacheInfo> : IStandardPatternCacheInfoStrategy
-		where TCacheInfo : IStdPatternCache
+	internal class StdPatternCacheStrategy<TPathCache> : IStdPatternCacheStrategy
+		where TPathCache : IStdPatternCache
 	{
-		readonly Func<gp_Ax3, IStdPatternGeomData, CraftData, TCacheInfo> m_CacheInfoFactory;
+		readonly Func<gp_Ax3, IStdPatternGeomData, CraftData, TPathCache> m_PathCacheFactory;
 
-		public StandardPatternCacheInfoStrategy( Func<gp_Ax3, IStdPatternGeomData, CraftData, TCacheInfo> cacheInfoFactory )
+		public StdPatternCacheStrategy( Func<gp_Ax3, IStdPatternGeomData, CraftData, TPathCache> pathCacheFactory )
 		{
-			m_CacheInfoFactory = cacheInfoFactory ?? throw new ArgumentNullException( nameof( cacheInfoFactory ) );
+			m_PathCacheFactory = pathCacheFactory ?? throw new ArgumentNullException( nameof( pathCacheFactory ) );
 		}
 
-		public IStdPatternCache CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
+		public IStdPatternCache CreatePathCache( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
 		{
 			if( coordinateInfo == null ) {
 				throw new ArgumentNullException( nameof( coordinateInfo ) );
@@ -30,26 +30,26 @@ namespace MyCAM.PathCache
 			if( craftData == null ) {
 				throw new ArgumentNullException( nameof( craftData ) );
 			}
-			return m_CacheInfoFactory( coordinateInfo, standardPatternGeomData, craftData );
+			return m_PathCacheFactory( coordinateInfo, standardPatternGeomData, craftData );
 		}
 	}
 
 	internal static class StdPatternCacheFactory
 	{
-		static readonly IStandardPatternCacheInfoStrategy s_CircleStrategy =
-			new StandardPatternCacheInfoStrategy<CircleCache>(
+		static readonly IStdPatternCacheStrategy s_CircleStrategy =
+			new StdPatternCacheStrategy<CircleCache>(
 				( coord, geom, craft ) => new CircleCache( coord, geom, craft ) );
-		static readonly IStandardPatternCacheInfoStrategy s_RectangleStrategy =
-			new StandardPatternCacheInfoStrategy<RectangleCache>(
+		static readonly IStdPatternCacheStrategy s_RectangleStrategy =
+			new StdPatternCacheStrategy<RectangleCache>(
 				( coord, geom, craft ) => new RectangleCache( coord, geom, craft ) );
-		static readonly IStandardPatternCacheInfoStrategy s_RunwayStrategy =
-			new StandardPatternCacheInfoStrategy<RunwayCache>(
+		static readonly IStdPatternCacheStrategy s_RunwayStrategy =
+			new StdPatternCacheStrategy<RunwayCache>(
 				( coord, geom, craft ) => new RunwayCache( coord, geom, craft ) );
-		static readonly IStandardPatternCacheInfoStrategy s_PolygonStrategy =
-			new StandardPatternCacheInfoStrategy<PolygonCache>(
+		static readonly IStdPatternCacheStrategy s_PolygonStrategy =
+			new StdPatternCacheStrategy<PolygonCache>(
 				( coord, geom, craft ) => new PolygonCache( coord, geom, craft ) );
 
-		public static IStandardPatternCacheInfoStrategy GetStrategy( PathType pathType )
+		public static IStdPatternCacheStrategy GetStrategy( PathType pathType )
 		{
 			switch( pathType ) {
 				case PathType.Circle:
@@ -69,18 +69,18 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public static IStdPatternCache CreateCacheInfo( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
+		public static IStdPatternCache CreatePathCache( gp_Ax3 coordinateInfo, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
 		{
 			if( standardPatternGeomData == null ) {
 				throw new ArgumentNullException( nameof( standardPatternGeomData ) );
 			}
 
-			IStandardPatternCacheInfoStrategy strategy = GetStrategy( standardPatternGeomData.PathType );
+			IStdPatternCacheStrategy strategy = GetStrategy( standardPatternGeomData.PathType );
 			if( strategy == null ) {
 				throw new ArgumentException( $"No strategy found for PathType: {standardPatternGeomData.PathType}" );
 			}
 
-			return strategy.CreateCacheInfo( coordinateInfo, standardPatternGeomData, craftData );
+			return strategy.CreatePathCache( coordinateInfo, standardPatternGeomData, craftData );
 		}
 	}
 }

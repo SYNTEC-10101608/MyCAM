@@ -11,7 +11,7 @@ namespace MyCAM.PathCache
 		protected StdPatternCacheBase( gp_Ax3 coordinateInfo, CraftData craftData )
 		{
 			if( coordinateInfo == null || craftData == null ) {
-				throw new ArgumentNullException( "StandardPatternBasedCacheInfo constructing argument null" );
+				throw new ArgumentNullException( "StdPatternCacheBase constructing argument null" );
 			}
 
 			m_CoordinateInfo = coordinateInfo;

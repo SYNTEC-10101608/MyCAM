@@ -11,7 +11,7 @@ namespace MyCAM.PathCache
 			: base( coordinateInfo, craftData )
 		{
 			if( geomData == null || !( geomData is RunwayGeomData runwayGeomData ) ) {
-				throw new ArgumentNullException( "RunwayCacheInfo constructing argument error - invalid geomData" );
+				throw new ArgumentNullException( "RunwayCache constructing argument error - invalid geomData" );
 			}
 			m_RunwayGeomData = runwayGeomData;
 			BuildCAMPointList();
@@ -39,7 +39,7 @@ namespace MyCAM.PathCache
 		{
 			ClearCraftDataDirty();
 			m_RefPoint = RunwayRefPoint();
-			m_StartPointList = RunwayCacheInfoExtensions.GetStartPointList( CoordinateInfo, m_RunwayGeomData.Length, m_RunwayGeomData.Width );
+			m_StartPointList = RunwayCacheExtensions.GetStartPointList( CoordinateInfo, m_RunwayGeomData.Length, m_RunwayGeomData.Width );
 		}
 
 		CAMPoint RunwayRefPoint()
@@ -87,7 +87,7 @@ namespace MyCAM.PathCache
 		RunwayGeomData m_RunwayGeomData;
 	}
 
-	internal static class RunwayCacheInfoExtensions
+	internal static class RunwayCacheExtensions
 	{
 		internal static List<CAMPoint> GetStartPointList( gp_Ax3 coordinateInfo, double length, double width )
 		{

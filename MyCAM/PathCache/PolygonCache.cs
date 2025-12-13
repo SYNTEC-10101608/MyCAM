@@ -11,7 +11,7 @@ namespace MyCAM.PathCache
 			: base( coordinateInfo, craftData )
 		{
 			if( geomData == null || !( geomData is PolygonGeomData polygonGeomData ) ) {
-				throw new ArgumentNullException( "PolygonCacheInfo constructing argument error - invalid geomData" );
+				throw new ArgumentNullException( "PolygonCache constructing argument error - invalid geomData" );
 			}
 			m_PolygonGeomData = polygonGeomData;
 			BuildCAMPointList();
@@ -29,13 +29,13 @@ namespace MyCAM.PathCache
 		{
 			ClearCraftDataDirty();
 			m_RefPoint = new CAMPoint( new CADPoint( m_CoordinateInfo.Location(), m_CoordinateInfo.Direction(), m_CoordinateInfo.XDirection(), m_CoordinateInfo.YDirection() ), m_CoordinateInfo.Direction() );
-			m_StartPointList = PolygonCacheInfoExtensions.GetStartPointList( CoordinateInfo, m_PolygonGeomData.Sides, m_PolygonGeomData.SideLength );
+			m_StartPointList = PolygonCacheExtensions.GetStartPointList( CoordinateInfo, m_PolygonGeomData.Sides, m_PolygonGeomData.SideLength );
 		}
 
 		PolygonGeomData m_PolygonGeomData;
 	}
 
-	internal static class PolygonCacheInfoExtensions
+	internal static class PolygonCacheExtensions
 	{
 		internal static List<CAMPoint> GetStartPointList( gp_Ax3 coordinateInfo, int sides, double sideLength )
 		{

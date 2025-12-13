@@ -295,7 +295,6 @@ namespace MyCAM.Editor
 
 				// toggle reverse state
 				craftData.IsPathReverse = !craftData.IsPathReverse;
-				// To-do：update CacheInfo in CAMPoint
 			}
 			ShowCAMData( szPathIDList );
 		}
