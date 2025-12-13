@@ -17,14 +17,6 @@ namespace MyCAM.PathCache
 			BuildCAMPointList();
 		}
 
-		public override PathType PathType
-		{
-			get
-			{
-				return PathType.Circle;
-			}
-		}
-
 		protected override void BuildCAMPointList()
 		{
 			ClearCraftDataDirty();

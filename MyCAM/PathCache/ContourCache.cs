@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace MyCAM.PathCache
 {
-	public class ContourCache : IContourCache, IProcessPathStartEndCache, IMainPathStartPointCache, ILeadCache, IPathReverseCache, IToolVecCache, IOverCutCache, IPathCache
+	public class ContourCache : IContourCache
 	{
 		public ContourCache( ContourGeomData geomData, CraftData craftData )
 		{
@@ -25,17 +25,9 @@ namespace MyCAM.PathCache
 			BuildCAMPointList();
 		}
 
-		public PathType PathType
-		{
-			get
-			{
-				return PathType.Contour;
-			}
-		}
-
 		#region computation result
 
-		internal List<CAMPoint> CAMPointList
+		public List<CAMPoint> MainPathPointList
 		{
 			get
 			{
@@ -46,7 +38,7 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public List<CAMPoint> LeadInCAMPointList
+		public List<CAMPoint> LeadInPointList
 		{
 			get
 			{
@@ -57,7 +49,7 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public List<CAMPoint> LeadOutCAMPointList
+		public List<CAMPoint> LeadOutPointList
 		{
 			get
 			{
@@ -68,7 +60,7 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public List<CAMPoint> OverCutCAMPointList
+		public List<CAMPoint> OverCutPointList
 		{
 			get
 			{
@@ -79,55 +71,6 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public IProcessPoint GetProcessStartPoint()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			CAMPoint camPoint = null;
-			if( m_LeadInCAMPointList.Count > 0 && m_CraftData.LeadData.LeadIn.Length > 0 ) {
-				camPoint = m_LeadInCAMPointList.First().Clone();
-			}
-			else if( m_CAMPointList.Count > 0 ) {
-				camPoint = m_CAMPointList.First().Clone();
-			}
-			return camPoint;
-		}
-
-		public IProcessPoint GetProcessEndPoint()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			CAMPoint camPoint = null;
-			if( m_LeadOutCAMPointList.Count > 0 && m_CraftData.LeadData.LeadOut.Length > 0 ) {
-				camPoint = m_LeadOutCAMPointList.Last().Clone();
-			}
-			else if( m_OverCutPointList.Count > 0 && m_CraftData.OverCutLength > 0 ) {
-				camPoint = m_OverCutPointList.Last().Clone();
-			}
-			else if( m_CAMPointList.Count > 0 ) {
-				camPoint = m_CAMPointList.Last().Clone();
-			}
-			return camPoint;
-		}
-
-		public CAMPoint GetMainPathStartCAMPoint()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			return m_CAMPointList.First().Clone();
-		}
-
-		public IReadOnlyList<IProcessPoint> GetToolVecList()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			return m_CAMPointList.Cast<IProcessPoint>().ToList();
-		}
-
 		#endregion
 
 		#region API
@@ -135,66 +78,6 @@ namespace MyCAM.PathCache
 		public void DoTransform( gp_Trsf trasform )
 		{
 			BuildCAMPointList();
-		}
-		#endregion
-
-		#region craft data
-		public int StartPointIndex
-		{
-			get
-			{
-				return m_CraftData.StartPointIndex;
-			}
-		}
-
-		public bool IsPathReverse
-		{
-			get
-			{
-				return m_CraftData.IsPathReverse;
-			}
-		}
-
-		public LeadData LeadData
-		{
-			get
-			{
-				return m_CraftData.LeadData;
-			}
-		}
-
-		public double OverCutLength
-		{
-			get
-			{
-				return m_CraftData.OverCutLength;
-			}
-		}
-
-		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
-		{
-			if( m_CraftData.ToolVecModifyMap.ContainsKey( index ) ) {
-				dRA_deg = m_CraftData.ToolVecModifyMap[ index ].Item1;
-				dRB_deg = m_CraftData.ToolVecModifyMap[ index ].Item2;
-				return true;
-			}
-			else {
-				dRA_deg = 0;
-				dRB_deg = 0;
-				return false;
-			}
-		}
-
-		public bool IsToolVecModifyPoint( ISetToolVecPoint point )
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			if( m_CAMPointIndexMap.ContainsKey( point as CAMPoint ) ) {
-				int index = m_CAMPointIndexMap[ point as CAMPoint ];
-				return m_CraftData.ToolVecModifyMap.ContainsKey( index );
-			}
-			return false;
 		}
 		#endregion
 

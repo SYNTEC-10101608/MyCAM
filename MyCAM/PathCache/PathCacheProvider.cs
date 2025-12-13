@@ -8,41 +8,114 @@ namespace MyCAM.PathCache
 	// this is for user to get any kind of cache they want
 	public static class PathCacheProvider
 	{
-		public static bool TryGetMainPathStartPointCache( string szPathID, out IMainPathStartPointCache cache )
+		public static bool TryGetStdPatternRefPointCache( string szPathID, out IStdPatternRefPointCache cache )
 		{
-			return TryGetCache( szPathID, out cache );
-		}
+			cache = null;
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				return false;
+			}
 
-		public static bool TryGetLeadCache( string szPathID, out ILeadCache cache )
-		{
-			return TryGetCache( szPathID, out cache );
-		}
+			// only standard pattern has RefPoint
+			IStdPatternCache stdPatternCache = _cache as IStdPatternCache;
+			if( stdPatternCache == null ) {
+				return false;
+			}
 
-		public static bool TryGetPathReverseCache( string szPathID, out IPathReverseCache cache )
-		{
-			return TryGetCache( szPathID, out cache );
-		}
-
-		public static bool TryGetToolVecCache( string szPathID, out IToolVecCache cache )
-		{
-			return TryGetCache( szPathID, out cache );
-		}
-
-		public static bool TryGetOverCutCache( string szPathID, out IOverCutCache cache )
-		{
-			return TryGetCache( szPathID, out cache );
+			cache = new StdPatternRefPointCache( stdPatternCache );
+			return true;
 		}
 
 		public static bool TryGetProcessPathStartEndCache( string szPathID, out IProcessPathStartEndCache cache )
 		{
-			return TryGetCache( szPathID, out cache );
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				cache = null;
+				return false;
+			}
+
+			cache = new ProcessPathStartEndCache( _cache, craftData );
+			return true;
+		}
+
+		public static bool TryGetMainPathStartPointCache( string szPathID, out IMainPathStartPointCache cache )
+		{
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				cache = null;
+				return false;
+			}
+
+			cache = new MainPathStartPointCache( _cache );
+			return true;
+		}
+
+		public static bool TryGetOrientationCache( string szPathID, out IOrientationCache cache )
+		{
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				cache = null;
+				return false;
+			}
+
+			cache = new OrientationCache( _cache, craftData );
+			return true;
+		}
+
+		public static bool TryGetLeadCache( string szPathID, out ILeadCache cache )
+		{
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				cache = null;
+				return false;
+			}
+
+			cache = new LeadCache( _cache, craftData );
+			return true;
+		}
+
+		public static bool TryGetOverCutCache( string szPathID, out IOverCutCache cache )
+		{
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				cache = null;
+				return false;
+			}
+
+			cache = new OverCutCache( _cache, craftData );
+			return true;
+		}
+
+		public static bool TryGetPathReverseCache( string szPathID, out IPathReverseCache cache )
+		{
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				cache = null;
+				return false;
+			}
+
+			cache = new PathReverseCache( craftData );
+			return true;
+		}
+
+		public static bool TryGetToolVecCache( string szPathID, out IToolVecCache cache )
+		{
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				cache = null;
+				return false;
+			}
+
+			cache = new ToolVecCache( _cache, craftData );
+			return true;
 		}
 
 		// this call strategy to get correct cache by path type
-		static bool TryGetCache<TCache>( string szPathID, out TCache cache )
+		static bool TryGetPathCacheAndCraftData<TCache>( string szPathID, out TCache cache, out CraftData craftData )
 			where TCache : class, IPathCache
 		{
 			cache = null;
+			craftData = null;
 
 			// use DataGettingHelper to get PathObject from string ID
 			if( !DataGettingHelper.TryGetPathObject( szPathID, out PathObject pathObject ) ) {
@@ -58,7 +131,10 @@ namespace MyCAM.PathCache
 			// get cache info and cast to requested type
 			IPathCache pathCache = strategy.GetPathCache( pathObject );
 			cache = pathCache as TCache;
-			return cache != null;
+
+			// get CraftData
+			craftData = pathObject.CraftData;
+			return cache != null && craftData != null;
 		}
 	}
 
@@ -84,10 +160,7 @@ namespace MyCAM.PathCache
 
 		public IPathCache GetPathCache( PathObject pathObject )
 		{
-			if( pathObject is TPathObject typedPathObject ) {
-				return m_PathCacheGetter( typedPathObject );
-			}
-			return null;
+			return m_PathCacheGetter( pathObject as TPathObject );
 		}
 	}
 

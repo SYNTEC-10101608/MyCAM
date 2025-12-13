@@ -17,22 +17,6 @@ namespace MyCAM.PathCache
 			BuildCAMPointList();
 		}
 
-		public override PathType PathType
-		{
-			get
-			{
-				return PathType.Runway;
-			}
-		}
-
-		public override IProcessPoint GetProcessRefPoint()
-		{
-			if( m_IsCraftDataDirty ) {
-				BuildCAMPointList();
-			}
-			return m_RefPoint;
-		}
-
 		protected override void BuildCAMPointList()
 		{
 			ClearCraftDataDirty();

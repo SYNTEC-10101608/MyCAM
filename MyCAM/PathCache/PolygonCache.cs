@@ -17,14 +17,6 @@ namespace MyCAM.PathCache
 			BuildCAMPointList();
 		}
 
-		public override PathType PathType
-		{
-			get
-			{
-				return m_PolygonGeomData.PathType;
-			}
-		}
-
 		protected override void BuildCAMPointList()
 		{
 			ClearCraftDataDirty();

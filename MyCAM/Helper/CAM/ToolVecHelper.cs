@@ -12,6 +12,14 @@ namespace MyCAM.Helper
 			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
 			bool isClosed, bool isToolVecReverse )
 		{
+			// mark the modified point
+			for(int i = 0; i < toolVecPointList.Count; i++ ) {
+				if( !toolVecModifyMap.ContainsKey( i ) ) {
+					continue;
+				}
+				toolVecPointList[ i ].IsToolVecModPoint = true;
+			}
+
 			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, isClosed );
 			if( isToolVecReverse ) {
 				ReverseToolVec( ref toolVecPointList );

@@ -1,5 +1,5 @@
-using MyCAM.PathCache;
 using MyCAM.Data;
+using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
@@ -124,10 +124,7 @@ namespace MyCAM.Editor.Renderer
 			if( !PathCacheProvider.TryGetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
 				return false;
 			}
-			if( point is ISetToolVecPoint toolVecPoint ) {
-				return toolVecCache.IsToolVecModifyPoint( toolVecPoint );
-			}
-			return false;
+			return toolVecCache.IsToolVecModifyPoint( point );
 		}
 	}
 }
