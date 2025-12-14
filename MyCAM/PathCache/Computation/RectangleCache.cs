@@ -22,6 +22,9 @@ namespace MyCAM.PathCache
 			ClearCraftDataDirty();
 			m_RefPoint = new CAMPoint( new CADPoint( m_RefCoord.Location(), m_RefCoord.Direction(), m_RefCoord.XDirection(), m_RefCoord.YDirection() ), m_RefCoord.Direction() );
 			m_StartPointList = RectangleCacheExtensions.GetStartPointList( m_RefCoord, m_RectangleGeomData.Length, m_RectangleGeomData.Width );
+
+			// close the loop
+			m_StartPointList.Add( m_StartPointList[ 0 ].Clone() );
 		}
 
 		RectangleGeomData m_RectangleGeomData;

@@ -44,7 +44,10 @@ namespace MyCAM.PathCache
 
 		public List<CAMPoint> LeadOutPointList
 		{
-			get;
+			get
+			{
+				return new List<CAMPoint>();
+			}
 		}
 
 		public List<CAMPoint> OverCutPointList

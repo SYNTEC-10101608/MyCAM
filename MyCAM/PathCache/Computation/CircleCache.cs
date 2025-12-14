@@ -22,6 +22,9 @@ namespace MyCAM.PathCache
 			ClearCraftDataDirty();
 			m_RefPoint = new CAMPoint( new CADPoint( m_RefCoord.Location(), m_RefCoord.Direction(), m_RefCoord.XDirection(), m_RefCoord.YDirection() ), m_RefCoord.Direction() );
 			m_StartPointList = CircleCacheExtensions.GetStartPointList( m_RefCoord, m_CircleGeomData.Diameter );
+
+			// close the loop
+			m_StartPointList.Add( m_StartPointList[ 0 ].Clone() );
 		}
 
 		CircleGeomData m_CircleGeomData;

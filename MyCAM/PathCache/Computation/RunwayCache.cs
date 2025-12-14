@@ -22,6 +22,9 @@ namespace MyCAM.PathCache
 			ClearCraftDataDirty();
 			m_RefPoint = RunwayRefPoint();
 			m_StartPointList = RunwayCacheExtensions.GetStartPointList( m_RefCoord, m_RunwayGeomData.Length, m_RunwayGeomData.Width );
+
+			// close the loop
+			m_StartPointList.Add( m_StartPointList[ 0 ].Clone() );
 		}
 
 		CAMPoint RunwayRefPoint()
