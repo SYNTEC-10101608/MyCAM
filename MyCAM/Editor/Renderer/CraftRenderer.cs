@@ -1,5 +1,5 @@
-using MyCAM.PathCache;
 using MyCAM.Data;
+using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
@@ -178,49 +178,28 @@ namespace MyCAM.Editor.Renderer
 			return lineAIS;
 		}
 
-		List<IProcessPoint> GetLeadInPointList( string pathID )
+		IReadOnlyList<IProcessPoint> GetLeadInPointList( string pathID )
 		{
 			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
-			if( leadCache.LeadInCAMPointList == null ) {
-				return null;
-			}
-			List<IProcessPoint> pointList = new List<IProcessPoint>();
-			foreach( CAMPoint camPoint in leadCache.LeadInCAMPointList ) {
-				pointList.Add( camPoint );
-			}
-			return pointList;
+			return leadCache.LeadInCAMPointList;
 		}
 
-		List<IProcessPoint> GetLeadOutPointList( string pathID )
+		IReadOnlyList<IProcessPoint> GetLeadOutPointList( string pathID )
 		{
 			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
 				return null;
 			}
-			if( leadCache.LeadOutCAMPointList == null ) {
-				return null;
-			}
-			List<IProcessPoint> pointList = new List<IProcessPoint>();
-			foreach( CAMPoint camPoint in leadCache.LeadOutCAMPointList ) {
-				pointList.Add( camPoint );
-			}
-			return pointList;
+			return leadCache.LeadOutCAMPointList;
 		}
 
-		List<IProcessPoint> GetOverCutPointList( string pathID )
+		IReadOnlyList<IProcessPoint> GetOverCutPointList( string pathID )
 		{
 			if( !PathCacheProvider.TryGetOverCutCache( pathID, out IOverCutCache overCutCache ) ) {
 				return null;
 			}
-			if( overCutCache.OverCutCAMPointList == null ) {
-				return null;
-			}
-			List<IProcessPoint> pointList = new List<IProcessPoint>();
-			foreach( CAMPoint camPoint in overCutCache.OverCutCAMPointList ) {
-				pointList.Add( camPoint );
-			}
-			return pointList;
+			return overCutCache.OverCutCAMPointList;
 		}
 
 		LeadData GetLeadData( string pathID )

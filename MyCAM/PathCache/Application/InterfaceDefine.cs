@@ -118,6 +118,14 @@ namespace MyCAM.PathCache
 		}
 	}
 
+	public interface ITraverseDataCache : IProcessPathStartEndCache
+	{
+		TraverseData TraverseData
+		{
+			get;
+		}
+	}
+
 	public interface IToolVecCache
 	{
 		IReadOnlyList<IProcessPoint> GetToolVecList();

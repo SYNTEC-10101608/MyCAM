@@ -38,6 +38,18 @@ namespace MyCAM.PathCache
 			return true;
 		}
 
+		public static bool TryGetTraverseDataCache( string szPathID, out ITraverseDataCache cache )
+		{
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				cache = null;
+				return false;
+			}
+
+			cache = new TraverseDataCache( _cache, craftData );
+			return true;
+		}
+
 		public static bool TryGetMainPathStartPointCache( string szPathID, out IMainPathStartPointCache cache )
 		{
 			IPathCache _cache;

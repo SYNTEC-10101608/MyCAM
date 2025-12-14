@@ -5,8 +5,8 @@ namespace MyCAM.PathCache
 {
 	internal class ProcessPathStartEndCache : IProcessPathStartEndCache
 	{
-		private readonly IPathCache m_PathCache;
-		private readonly CraftData m_CraftData;
+		protected readonly IPathCache m_PathCache;
+		protected readonly CraftData m_CraftData;
 
 		public ProcessPathStartEndCache( IPathCache pathCache, CraftData craftData )
 		{

@@ -184,30 +184,26 @@ namespace MyCAM.Editor.Renderer
 
 		IProcessPoint GetProcessStartPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetProcessPathStartEndCache( pathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
+			if( !PathCacheProvider.TryGetTraverseDataCache( pathID, out ITraverseDataCache traverseDataCache ) ) {
 				return null;
 			}
-			return processPathStartEndCache?.GetProcessStartPoint();
+			return traverseDataCache.GetProcessStartPoint();
 		}
 
 		IProcessPoint GetProcessEndPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetProcessPathStartEndCache( pathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
+			if( !PathCacheProvider.TryGetTraverseDataCache( pathID, out ITraverseDataCache traverseDataCache ) ) {
 				return null;
 			}
-			return processPathStartEndCache?.GetProcessEndPoint();
+			return traverseDataCache.GetProcessEndPoint();
 		}
 
 		TraverseData GetTraverseData( string pathID )
 		{
-			if( string.IsNullOrEmpty( pathID ) || !m_DataManager.ObjectMap.ContainsKey( pathID ) ) {
+			if( !PathCacheProvider.TryGetTraverseDataCache( pathID, out ITraverseDataCache traverseDataCache ) ) {
 				return new TraverseData();
 			}
-			if( !( m_DataManager.ObjectMap[ pathID ] is PathObject pathObject ) ) {
-				return new TraverseData();
-			}
-			CraftData craftData = pathObject.CraftData;
-			return craftData?.TraverseData ?? new TraverseData();
+			return traverseDataCache.TraverseData;
 		}
 	}
 }
