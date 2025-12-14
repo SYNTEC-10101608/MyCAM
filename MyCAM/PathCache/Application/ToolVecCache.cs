@@ -4,20 +4,14 @@ using System.Linq;
 
 namespace MyCAM.PathCache
 {
-	internal class ToolVecCache : IToolVecCache
+	internal class ToolVecCache : MainPathPointCache, IToolVecCache
 	{
-		private readonly IPathCache m_PathCache;
 		private readonly CraftData m_CraftData;
 
 		public ToolVecCache( IPathCache pathCache, CraftData craftData )
+			: base( pathCache )
 		{
-			m_PathCache = pathCache;
 			m_CraftData = craftData;
-		}
-
-		public IReadOnlyList<IProcessPoint> GetToolVecList()
-		{
-			return m_PathCache.MainPathPointList.Cast<IProcessPoint>().ToList();
 		}
 
 		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )

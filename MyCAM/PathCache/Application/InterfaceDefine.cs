@@ -58,7 +58,7 @@ namespace MyCAM.PathCache
 
 	public interface IMainPathStartPointCache
 	{
-		gp_Pnt GetMainPathStartCAMPoint();
+		IProcessPoint GetMainPathStartCAMPoint();
 	}
 
 	public interface IOrientationCache
@@ -126,10 +126,16 @@ namespace MyCAM.PathCache
 		}
 	}
 
-	public interface IToolVecCache
+	public interface IMainPathCache
 	{
-		IReadOnlyList<IProcessPoint> GetToolVecList();
+		IReadOnlyList<IProcessPoint> MainPathPointList
+		{
+			get;
+		}
+	}
 
+	public interface IToolVecCache : IMainPathCache
+	{
 		bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg );
 
 		bool IsToolVecModifyPoint( IProcessPoint point );

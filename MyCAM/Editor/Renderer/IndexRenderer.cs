@@ -80,7 +80,7 @@ namespace MyCAM.Editor.Renderer
 			if( !PathCacheProvider.TryGetMainPathStartPointCache( pathID, out IMainPathStartPointCache startPnt ) ) {
 				return null;
 			}
-			return startPnt.GetMainPathStartCAMPoint();
+			return startPnt.GetMainPathStartCAMPoint().Point;
 		}
 	}
 }

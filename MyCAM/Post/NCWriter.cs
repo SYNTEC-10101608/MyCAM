@@ -249,82 +249,37 @@ namespace MyCAM.Post
 
 		ContourNCPackage BuildPackageByID( string szID )
 		{
-			return null;
-			//if( !m_DataManager.ObjectMap.ContainsKey( szID )
-			//	|| m_DataManager.ObjectMap[ szID ].ObjectType != ObjectType.Path ) {
-			//	return null;
-			//}
-			//PathObject pathObject = m_DataManager.ObjectMap[ szID ] as PathObject;
-			//if( pathObject.PathType != PathType.Contour ) {
-			//	return null;
-			//}
-			//ContourPathObject contourPathObject = pathObject as ContourPathObject;
-			//ContourCache contourCache = contourPathObject.ContourCache as ContourCache;
-			//CraftData craftData = contourPathObject.CraftData;
-			//return new ContourNCPackage(
-			//	craftData.LeadData,
-			//	craftData.OverCutLength,
-			//	contourCache.MainPathPointList.Cast<IProcessPoint>().ToList(),
-			//	contourCache.LeadInPointList.Cast<IProcessPoint>().ToList(),
-			//	contourCache.LeadOutPointList.Cast<IProcessPoint>().ToList(),
-			//	contourCache.OverCutPointList.Cast<IProcessPoint>().ToList(),
-			//	craftData.TraverseData,
-			//	contourCache.GetProcessEndPoint(),
-			//	contourCache.GetProcessEndPoint() );
+			if(!PathCacheProvider.TryGetLeadCache( szID, out ILeadCache leadCache )
+				|| !PathCacheProvider.TryGetOverCutCache( szID, out IOverCutCache overCutCache )
+				|| !PathCacheProvider.TryGetProcessPathStartEndCache( szID, out IProcessPathStartEndCache processPathStartEndCache )
+				|| !PathCacheProvider.TryGetTraverseDataCache( szID, out ITraverseDataCache traverseDataCache )
+				|| !PathCacheProvider.TryGetMainPathCache( szID, out IMainPathCache mainPathCache ) ) {
+				return null;
+			}
+			return new ContourNCPackage(
+				leadCache.LeadData,
+				overCutCache.OverCutLength,
+				mainPathCache.MainPathPointList,
+				leadCache.LeadInCAMPointList,
+				leadCache.LeadOutCAMPointList,
+				overCutCache.OverCutCAMPointList,
+				traverseDataCache.TraverseData,
+				traverseDataCache.GetProcessEndPoint(),
+				traverseDataCache.GetProcessEndPoint() );
 		}
 
 		StandardPatternNCPackage BuildPackageByID_StandardPattern( string szID )
 		{
-			//if( !m_DataManager.ObjectMap.ContainsKey( szID )
-			//	|| m_DataManager.ObjectMap[ szID ].ObjectType != ObjectType.Path ) {
-			//	return null;
-			//}
-			//PathObject pathObject = m_DataManager.ObjectMap[ szID ] as PathObject;
-			//if( pathObject.PathType == PathType.Contour ) {
-			//	return null;
-			//}
-			//if( !DataGettingHelper.GetReferencePoint( szID, out IProcessPoint refPoint ) ) {
-			//	return null;
-			//}
-			//if( !PathCacheProvider.TryGetMainPathStartPointCache( szID, out IMainPathStartPointCache mainPathStartPoint ) ) {
-			//	return null;
-			//}
-
-			//switch( pathObject.PathType ) {
-			//	case PathType.Circle:
-			//		CirclePathObject circlePathObject = pathObject as CirclePathObject;
-			//		return new StandardPatternNCPackage(
-			//			refPoint,
-			//			mainPathStartPoint.GetMainPathStartCAMPoint(),
-			//			circlePathObject.CraftData.TraverseData );
-			//	case PathType.Rectangle:
-			//		RectanglePathObject rectanglePathObject = pathObject as RectanglePathObject;
-			//		return new StandardPatternNCPackage(
-			//			refPoint,
-			//			mainPathStartPoint.GetMainPathStartCAMPoint(),
-			//			rectanglePathObject.CraftData.TraverseData );
-			//	case PathType.Runway:
-			//		RunwayPathObject runwayPathObject = pathObject as RunwayPathObject;
-			//		return new StandardPatternNCPackage(
-			//			refPoint,
-			//			mainPathStartPoint.GetMainPathStartCAMPoint(),
-			//			runwayPathObject.CraftData.TraverseData );
-			//	case PathType.Triangle:
-			//	case PathType.Square:
-			//	case PathType.Pentagon:
-			//	case PathType.Hexagon:
-			//		PolygonPathObject polygonPathObject = pathObject as PolygonPathObject;
-			//		return new StandardPatternNCPackage(
-			//			refPoint,
-			//			mainPathStartPoint.GetMainPathStartCAMPoint(),
-			//			polygonPathObject.CraftData.TraverseData );
-			//	default:
-			//		break;
-
-			//}
-			return null;
+			if( !PathCacheProvider.TryGetStdPatternRefPointCache( szID, out IStdPatternRefPointCache refPointCache )
+				|| !PathCacheProvider.TryGetMainPathStartPointCache( szID, out IMainPathStartPointCache mainPathStartPointCache ) 
+				|| !PathCacheProvider.TryGetTraverseDataCache( szID, out ITraverseDataCache traverseDataCache ) ) {
+				return null;
+			}
+			return new StandardPatternNCPackage(
+						refPointCache.GetProcessRefPoint(),
+						mainPathStartPointCache.GetMainPathStartCAMPoint(),
+						traverseDataCache.TraverseData );
 		}
-
 
 		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";
 	}

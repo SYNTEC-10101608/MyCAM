@@ -26,6 +26,17 @@ namespace MyCAM.PathCache
 			return true;
 		}
 
+		public static bool TryGetMainPathCache( string szPathID, out IMainPathCache cache )
+		{
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				cache = null;
+				return false;
+			}
+			cache = new MainPathPointCache( _cache );
+			return true;
+		}
+
 		public static bool TryGetProcessPathStartEndCache( string szPathID, out IProcessPathStartEndCache cache )
 		{
 			IPathCache _cache;

@@ -27,10 +27,10 @@ namespace MyCAM.Post
 	internal class ContourNCPackage
 	{
 		public ContourNCPackage( LeadData leadData, double overCutLength,
-			List<IProcessPoint> camPointList,
-			List<IProcessPoint> leadInCAMPointList,
-			List<IProcessPoint> leadOutCAMPointList,
-			List<IProcessPoint> overCutCAMPointList,
+			IReadOnlyList<IProcessPoint> camPointList,
+			IReadOnlyList<IProcessPoint> leadInCAMPointList,
+			IReadOnlyList<IProcessPoint> leadOutCAMPointList,
+			IReadOnlyList<IProcessPoint> overCutCAMPointList,
 			TraverseData traverseData,
 			IProcessPoint processStartPoint,
 			IProcessPoint processEndPoint
@@ -57,22 +57,22 @@ namespace MyCAM.Post
 			get;
 		}
 
-		public List<IProcessPoint> CAMPointList
+		public IReadOnlyList<IProcessPoint> CAMPointList
 		{
 			get;
 		}
 
-		public List<IProcessPoint> LeadInCAMPointList
+		public IReadOnlyList<IProcessPoint> LeadInCAMPointList
 		{
 			get;
 		}
 
-		public List<IProcessPoint> LeadOutCAMPointList
+		public IReadOnlyList<IProcessPoint> LeadOutCAMPointList
 		{
 			get;
 		}
 
-		public List<IProcessPoint> OverCutCAMPointList
+		public IReadOnlyList<IProcessPoint> OverCutCAMPointList
 		{
 			get;
 		}
@@ -225,7 +225,7 @@ namespace MyCAM.Post
 
 		#region Private methods
 
-		static bool SolveProcessPath( PostSolver postSolver, List<IProcessPoint> pointList,
+		static bool SolveProcessPath( PostSolver postSolver, IReadOnlyList<IProcessPoint> pointList,
 			out List<PostPoint> resultG54, ref double dLastProcessPathM, ref double dLastProcessPathS )
 		{
 			resultG54 = new List<PostPoint>();
@@ -270,7 +270,7 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		static bool BuildProcessPath( List<IProcessPoint> camPointList, double dM, double dS, out List<PostPoint> resultG54 )
+		static bool BuildProcessPath( IReadOnlyList<IProcessPoint> camPointList, double dM, double dS, out List<PostPoint> resultG54 )
 		{
 			resultG54 = new List<PostPoint>();
 			if( camPointList == null || camPointList.Count == 0 ) {
