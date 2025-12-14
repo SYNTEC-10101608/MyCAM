@@ -49,7 +49,7 @@ namespace MyCAM.Post
 					PathEndInfo endInfoOfPreviousPath = null;
 					PathType pathType;
 					for( int i = 0; i < m_PathIDList.Count; i++ ) {
-						if( !DataGettingHelper.TryGetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
+						if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
 							continue;
 						}
 						pathType = pathObject.PathType;

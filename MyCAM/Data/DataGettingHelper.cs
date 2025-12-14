@@ -1,7 +1,4 @@
-﻿using MyCAM.App;
-using MyCAM.PathCache;
-
-namespace MyCAM.Data
+﻿namespace MyCAM.Data
 {
 	public static class DataGettingHelper
 	{
@@ -15,40 +12,62 @@ namespace MyCAM.Data
 			m_DataManager = dataManager;
 		}
 
+		public static bool GetPathObject( string szPathID, out PathObject pathObject )
+		{
+			pathObject = null;
+
+			// validate input
+			if( string.IsNullOrEmpty( szPathID ) ) {
+				return false;
+			}
+
+			// check if the object exists and is a PathObject
+			if( m_DataManager?.ObjectMap == null
+				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
+				|| m_DataManager.ObjectMap[ szPathID ] == null
+				|| !( m_DataManager.ObjectMap[ szPathID ] is PathObject _pathObject ) ) {
+				return false;
+			}
+
+			pathObject = _pathObject;
+			return pathObject != null;
+		}
+
+		public static bool GetPathType( string szPathID, out PathType pathType )
+		{
+			pathType = PathType.Contour;
+			if( !GetPathObject( szPathID, out PathObject pathObject ) ) {
+				return false;
+			}
+			pathType = pathObject.PathType;
+			return true;
+		}
+
 		public static bool GetGeomDataByID( string pathID, out IGeomData geomData )
 		{
 			geomData = null;
-			if( !TryGetPathObject( pathID, out PathObject pathObject ) ) {
+			if( !GetPathObject( pathID, out PathObject pathObject ) ) {
 				return false;
 			}
 
 			// use unified GeomData property from StandardPatternBasedPathObject
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				geomData = standardPatternPathObject.GeomData;
-				return true;
 			}
 			else if( pathObject is ContourPathObject contourPathObject ) {
 				geomData = contourPathObject.ContourGeomData;
-				return true;
 			}
-			return false;
+			return geomData != null;
 		}
 
 		public static bool GetCraftDataByID( string szPathID, out CraftData craftData )
 		{
 			craftData = null;
-			if( !TryGetPathObject( szPathID, out PathObject pathObject ) ) {
+			if( !GetPathObject( szPathID, out PathObject pathObject ) ) {
 				return false;
 			}
-
-			if( pathObject.CraftData == null ) {
-				return false;
-			}
-
-			if( pathObject.PathType == PathType.Contour ) {
-				craftData = pathObject.CraftData;
-			}
-			return true;
+			craftData = pathObject.CraftData;
+			return craftData != null;
 		}
 
 		public static bool GetContourPathObject( PathObject pathObject, out ContourPathObject contourPathObj )
@@ -70,47 +89,6 @@ namespace MyCAM.Data
 			return false;
 		}
 
-		public static bool GetReferencePoint( string pathID, out IProcessPoint refPoint )
-		{
-			refPoint = null;
-			if( !TryGetPathObject( pathID, out PathObject pathObject ) ) {
-				return false;
-			}
-
-			// use unified Cache property from StandardPatternBasedPathObject
-			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
-
-				// cache implements IStdPatternCache which has GetProcessRefPoint
-				if( standardPatternPathObject.StdPatternCache is IStdPatternRefPointCache refPointCache ) {
-					refPoint = refPointCache.GetProcessRefPoint();
-					return true;
-				}
-			}
-			return false;
-		}
-
-		public static bool TryGetPathObject( string szPathID, out PathObject pathObject )
-		{
-			pathObject = null;
-
-			// validate input
-			if( string.IsNullOrEmpty( szPathID ) ) {
-				return false;
-			}
-
-			// check if the object exists and is a PathObject
-			if( m_DataManager?.ObjectMap == null
-				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
-				|| m_DataManager.ObjectMap[ szPathID ] == null
-				|| !( m_DataManager.ObjectMap[ szPathID ] is PathObject ) ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]所選路徑資料異常，請重新選擇", MyApp.NoticeType.Hint );
-				return false;
-			}
-
-			pathObject = m_DataManager.ObjectMap[ szPathID ] as PathObject;
-			return true;
-		}
-
 		public static bool GetShapeObject( string szObjID, out IShapeObject shape )
 		{
 			shape = null;
@@ -124,7 +102,7 @@ namespace MyCAM.Data
 				return false;
 			}
 			shape = _shapeObject;
-			return true;
+			return shape != null;
 		}
 
 		public static bool GetTransformableObject( string szObjID, out ITransformableObject transformable )
@@ -140,7 +118,7 @@ namespace MyCAM.Data
 				return false;
 			}
 			transformable = _transformable;
-			return true;
+			return transformable != null;
 		}
 
 		public static bool GetSewableObject( string szObjID, out ISewableObject sewable )
@@ -156,7 +134,7 @@ namespace MyCAM.Data
 				return false;
 			}
 			sewable = _sewable;
-			return true;
+			return sewable != null;
 		}
 	}
 }

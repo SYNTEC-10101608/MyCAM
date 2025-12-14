@@ -118,7 +118,7 @@ namespace MyCAM.PathCache
 			craftData = null;
 
 			// use DataGettingHelper to get PathObject from string ID
-			if( !DataGettingHelper.TryGetPathObject( szPathID, out PathObject pathObject ) ) {
+			if( !DataGettingHelper.GetPathObject( szPathID, out PathObject pathObject ) ) {
 				return false;
 			}
 

@@ -87,7 +87,7 @@ namespace MyCAM.Editor
 		{
 			TopoDS_Shape shape = null;
 			foreach( var szID in m_szPathIDList ) {
-				if( !DataGettingHelper.TryGetPathObject( szID, out PathObject pathObject ) ) {
+				if( !DataGettingHelper.GetPathObject( szID, out PathObject pathObject ) ) {
 					continue;
 				}
 				if( !DataGettingHelper.GetContourPathObject( pathObject, out ContourPathObject contourPathObject ) ) {
