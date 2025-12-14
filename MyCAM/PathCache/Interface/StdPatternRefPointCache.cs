@@ -13,7 +13,7 @@ namespace MyCAM.PathCache
 
 		public IProcessPoint GetProcessRefPoint()
 		{
-			return m_StdPatternCache.RefPoint;
+			return m_StdPatternCache.RefPoint.Clone();
 		}
 	}
 }
