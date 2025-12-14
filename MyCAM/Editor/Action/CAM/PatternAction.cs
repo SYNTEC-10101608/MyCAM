@@ -98,7 +98,7 @@ namespace MyCAM.Editor
 					shape = contourPathObject.Shape;
 				}
 				else {
-					shape = StdPatternHelper.GetPathWire( contourPathObject.ContourGeomData.RefCenterDir, standardPatternGeomData );
+					shape = StdPatternHelper.GetPathWire( contourPathObject.GeomData.RefCenterDir, standardPatternGeomData );
 					if( shape == null || shape.IsNull() ) {
 						continue;
 					}

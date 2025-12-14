@@ -55,7 +55,7 @@
 				geomData = standardPatternPathObject.GeomData;
 			}
 			else if( pathObject is ContourPathObject contourPathObject ) {
-				geomData = contourPathObject.ContourGeomData;
+				geomData = contourPathObject.GeomData;
 			}
 			return geomData != null;
 		}

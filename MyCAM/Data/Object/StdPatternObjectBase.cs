@@ -77,14 +77,14 @@ namespace MyCAM.Data
 
 		void InitializeCache()
 		{
-			gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( m_ContourPathObject.ContourGeomData.RefCenterDir, m_GeomData.RotatedAngle_deg );
+			gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( m_ContourPathObject.GeomData.RefCenterDir, m_GeomData.RotatedAngle_deg );
 
 			// factory automatically determines the correct Cache type based on GeomData type
 			m_StdPatternCache = (StdPatternCacheBase)PathCacheFactory.CreateStdPatternCache( refCoord, m_GeomData, m_CraftData );
 		}
 
-		IStdPatternGeomData m_GeomData;
-		IStdPatternCache m_StdPatternCache;
-		ContourPathObject m_ContourPathObject;
+		protected IStdPatternGeomData m_GeomData;
+		protected IStdPatternCache m_StdPatternCache;
+		protected ContourPathObject m_ContourPathObject;
 	}
 }

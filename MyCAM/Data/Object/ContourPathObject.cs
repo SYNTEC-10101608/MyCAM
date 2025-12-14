@@ -39,7 +39,7 @@ namespace MyCAM.Data
 			m_ContourCache = PathCacheFactory.CreateContourCache( m_ContourGeomData, m_CraftData );
 		}
 
-		public IContourGeomData ContourGeomData
+		public IContourGeomData GeomData
 		{
 			get
 			{

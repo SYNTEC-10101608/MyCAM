@@ -16,6 +16,6 @@ namespace MyCAM.Data
 		{
 		}
 
-		public override PathType PathType => GeomData.PathType;
+		public override PathType PathType => m_GeomData.PathType;
 	}
 }
