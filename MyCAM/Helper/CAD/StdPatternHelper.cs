@@ -51,7 +51,7 @@ namespace MyCAM.Helper
 		public static TopoDS_Shape GetPathWire( gp_Ax3 patternRefCoord, IStdPatternGeomData StdPatternGeomData )
 		{
 			TopoDS_Wire wire = null;
-			WireCreationStrategyFactory.GetStrategy( StdPatternGeomData.PathType )
+			StdPatterWireFactory.GetStrategy( StdPatternGeomData.PathType )
 				?.CreateWire( patternRefCoord, StdPatternGeomData, out wire );
 			return wire;
 		}

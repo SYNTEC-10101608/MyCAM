@@ -204,7 +204,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Helper\CAD\StdPatternWireHelper.cs" />
+    <Compile Include="Helper\CAD\StdPatterWireFactory.cs" />
     <Compile Include="Helper\CAD\StdPatternHelper.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>

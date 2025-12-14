@@ -58,7 +58,7 @@ namespace MyCAM.Helper
 
 	#region Strategy Factory
 
-	internal static class WireCreationStrategyFactory
+	internal static class StdPatterWireFactory
 	{
 		// create singleton strategy instances using generic WireCreationStrategy with lambda expressions
 		static readonly IWireCreationStrategy s_CircleStrategy =
