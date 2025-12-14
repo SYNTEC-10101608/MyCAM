@@ -88,14 +88,14 @@ namespace MyCAM.Editor.Renderer
 			List<string> pathIDList,
 			Dictionary<string, List<AIS_Line>> lineDict,
 			System.Func<LeadData, bool> needShowFunc,
-			System.Func<string, List<IProcessPoint>> getPointListFunc )
+			System.Func<string, IReadOnlyList<IProcessPoint>> getPointListFunc )
 		{
 			foreach( string szPathID in pathIDList ) {
 				LeadData leadData = GetLeadData( szPathID );
 				if( leadData == null || !needShowFunc( leadData ) ) {
 					continue;
 				}
-				List<IProcessPoint> pointList = getPointListFunc( szPathID );
+				IReadOnlyList<IProcessPoint> pointList = getPointListFunc( szPathID );
 				if( pointList == null || pointList.Count == 0 ) {
 					continue;
 				}
@@ -117,7 +117,7 @@ namespace MyCAM.Editor.Renderer
 		{
 			foreach( string szPathID in pathIDList ) {
 				double overCutLength = GetOverCutLength( szPathID );
-				List<IProcessPoint> overCutPointList = GetOverCutPointList( szPathID );
+				IReadOnlyList<IProcessPoint> overCutPointList = GetOverCutPointList( szPathID );
 
 				if( overCutPointList == null || overCutPointList.Count == 0 ) {
 					continue;
