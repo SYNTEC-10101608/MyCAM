@@ -211,7 +211,7 @@ namespace MyCAM.Editor
 				if( !DataGettingHelper.GetShapeObject( szNewDataID, out IShapeObject shapeObject ) ) {
 					continue;
 				}
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( shapeObject.Shape );
+				AIS_Shape aisShape = ViewHelper.CreatePartAIS( shapeObject.Shape );
 				m_ViewManager.ViewObjectMap.Add( data.UID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
