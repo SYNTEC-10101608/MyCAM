@@ -170,7 +170,7 @@ namespace MyCAM.PathCache
 		static readonly IPathCacheStrategy s_ContourStrategy =
 			new PathCacheStrategy<ContourPathObject>( obj => obj.ContourCache );
 
-		static readonly IPathCacheStrategy s_StandardPatternStrategy =
+		static readonly IPathCacheStrategy s_StdPatternStrategy =
 			new PathCacheStrategy<StdPatternObjectBase>( obj => obj.StdPatternCache );
 
 		public static IPathCacheStrategy GetStrategy( PathType pathType )
@@ -183,7 +183,7 @@ namespace MyCAM.PathCache
 				case PathType.Pentagon:
 				case PathType.Hexagon:
 				case PathType.Runway:
-					return s_StandardPatternStrategy;
+					return s_StdPatternStrategy;
 				case PathType.Contour:
 				default:
 					return s_ContourStrategy;

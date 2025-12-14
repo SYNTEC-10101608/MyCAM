@@ -14,16 +14,16 @@ namespace MyCAM.PathCache
 			return new ContourCache( (ContourGeomData)contourGeomData, craftData );
 		}
 
-		public static IStdPatternCache CreateStdPatternCache( gp_Ax3 refCoord, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
+		public static IStdPatternCache CreateStdPatternCache( gp_Ax3 refCoord, IStdPatternGeomData stdPatternGeomData, CraftData craftData )
 		{
-			if( refCoord == null || standardPatternGeomData == null || craftData == null ) {
+			if( refCoord == null || stdPatternGeomData == null || craftData == null ) {
 				throw new ArgumentNullException( "StdPatternCache construct parameters null." );
 			}
-			IStdPatternCacheStrategy strategy = GetStrategy( standardPatternGeomData.PathType );
+			IStdPatternCacheStrategy strategy = GetStrategy( stdPatternGeomData.PathType );
 			if( strategy == null ) {
-				throw new ArgumentException( $"No strategy found for PathType: {standardPatternGeomData.PathType}" );
+				throw new ArgumentException( $"No strategy found for PathType: {stdPatternGeomData.PathType}" );
 			}
-			return strategy.CreatePathCache( refCoord, standardPatternGeomData, craftData );
+			return strategy.CreatePathCache( refCoord, stdPatternGeomData, craftData );
 		}
 
 		static IStdPatternCacheStrategy GetStrategy( PathType pathType )
@@ -62,7 +62,7 @@ namespace MyCAM.PathCache
 
 	internal interface IStdPatternCacheStrategy
 	{
-		IStdPatternCache CreatePathCache( gp_Ax3 refCoord, IStdPatternGeomData standardPatternGeomData, CraftData craftData );
+		IStdPatternCache CreatePathCache( gp_Ax3 refCoord, IStdPatternGeomData stdPatternGeomData, CraftData craftData );
 	}
 
 	internal class StdPatternCacheStrategy<TPathCache> : IStdPatternCacheStrategy
@@ -75,18 +75,12 @@ namespace MyCAM.PathCache
 			m_PathCacheFactory = pathCacheFactory ?? throw new ArgumentNullException( nameof( pathCacheFactory ) );
 		}
 
-		public IStdPatternCache CreatePathCache( gp_Ax3 refCoord, IStdPatternGeomData standardPatternGeomData, CraftData craftData )
+		public IStdPatternCache CreatePathCache( gp_Ax3 refCoord, IStdPatternGeomData stdPatternGeomData, CraftData craftData )
 		{
-			if( refCoord == null ) {
-				throw new ArgumentNullException( nameof( refCoord ) );
+			if( refCoord == null || stdPatternGeomData == null || craftData == null ) {
+				throw new ArgumentNullException( "PathCache construct parameters null." );
 			}
-			if( standardPatternGeomData == null ) {
-				throw new ArgumentNullException( nameof( standardPatternGeomData ) );
-			}
-			if( craftData == null ) {
-				throw new ArgumentNullException( nameof( craftData ) );
-			}
-			return m_PathCacheFactory( refCoord, standardPatternGeomData, craftData );
+			return m_PathCacheFactory( refCoord, stdPatternGeomData, craftData );
 		}
 	}
 }
