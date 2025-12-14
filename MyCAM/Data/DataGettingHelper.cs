@@ -81,7 +81,7 @@ namespace MyCAM.Data
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 
 				// cache implements IStdPatternCache which has GetProcessRefPoint
-				if( standardPatternPathObject.StandatdPatternCache is IStdPatternRefPointCache refPointCache ) {
+				if( standardPatternPathObject.StdPatternCache is IStdPatternRefPointCache refPointCache ) {
 					refPoint = refPointCache.GetProcessRefPoint();
 					return true;
 				}

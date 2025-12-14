@@ -171,7 +171,7 @@ namespace MyCAM.PathCache
 			new PathCacheStrategy<ContourPathObject>( obj => obj.ContourCache );
 
 		static readonly IPathCacheStrategy s_StandardPatternStrategy =
-			new PathCacheStrategy<StdPatternObjectBase>( obj => obj.StandatdPatternCache );
+			new PathCacheStrategy<StdPatternObjectBase>( obj => obj.StdPatternCache );
 
 		public static IPathCacheStrategy GetStrategy( PathType pathType )
 		{

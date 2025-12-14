@@ -1,5 +1,5 @@
-﻿using MyCAM.PathCache;
-using MyCAM.Helper;
+﻿using MyCAM.Helper;
+using MyCAM.PathCache;
 using OCC.gp;
 using OCC.TopoDS;
 
@@ -52,11 +52,11 @@ namespace MyCAM.Data
 			}
 		}
 
-		public IStdPatternCache StandatdPatternCache
+		public IStdPatternCache StdPatternCache
 		{
 			get
 			{
-				return m_StandatdPatternCache;
+				return m_StdPatternCache;
 			}
 		}
 
@@ -69,7 +69,7 @@ namespace MyCAM.Data
 			m_GeomData.DoTransform( transform );
 
 			// Step3: recalculate cache
-			m_StandatdPatternCache.DoTransform( transform );
+			m_StdPatternCache.DoTransform( transform );
 
 			// Step4: transform the underlying contour path object
 			m_ContourPathObject.DoTransform( transform );
@@ -80,11 +80,11 @@ namespace MyCAM.Data
 			gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( m_ContourPathObject.ContourGeomData.RefCenterDir, m_GeomData.RotatedAngle_deg );
 
 			// factory automatically determines the correct Cache type based on GeomData type
-			m_StandatdPatternCache = (StdPatternCacheBase)PathCacheFactory.CreateStdPatternCache( refCoord, m_GeomData, m_CraftData );
+			m_StdPatternCache = (StdPatternCacheBase)PathCacheFactory.CreateStdPatternCache( refCoord, m_GeomData, m_CraftData );
 		}
 
 		IStdPatternGeomData m_GeomData;
-		IStdPatternCache m_StandatdPatternCache;
+		IStdPatternCache m_StdPatternCache;
 		ContourPathObject m_ContourPathObject;
 	}
 }
