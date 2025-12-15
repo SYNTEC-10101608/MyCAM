@@ -8,7 +8,7 @@ namespace MyCAM.Post
 {
 	internal class PathEndInfo
 	{
-		public IProcessPoint EndPoint
+		public IProcessPoint EndCAMPoint
 		{
 			get; set;
 		}
@@ -38,10 +38,10 @@ namespace MyCAM.Post
 		{
 			LeadData = leadData;
 			OverCutLength = overCutLength;
-			MainPointList = mainPointList;
-			LeadInPointList = leadInPointList;
-			LeadOutPointList = leadOutPointList;
-			OverCutPointList = overCutPointList;
+			CAMPointList = camPointList;
+			LeadInCAMPointList = leadInCAMPointList;
+			LeadOutCAMPointList = leadOutCAMPointList;
+			OverCutCAMPointList = overCutCAMPointList;
 			TraverseData = traverseData;
 			ProcessStartPoint = processStartPoint;
 			ProcessEndPoint = processEndPoint;
@@ -113,7 +113,7 @@ namespace MyCAM.Post
 			double dLastPointProcess_S = endInfoOfPreviousPath?.Slave ?? 0;
 
 			// main path
-			if( !SolveProcessPath( postSolver, currentPathNCPack.MainPointList,
+			if( !SolveProcessPath( postSolver, currentPathNCPack.CAMPointList,
 				out List<PostPoint> mainG54,
 				ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
 				return false;
@@ -122,8 +122,8 @@ namespace MyCAM.Post
 			pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPointList[ 0 ];
 
 			// over-cut
-			if( currentPathNCPack.OverCutLength != 0 && currentPathNCPack.OverCutPointList.Count > 0 ) {
-				if( !SolveProcessPath( postSolver, currentPathNCPack.OverCutPointList,
+			if( currentPathNCPack.OverCutLength != 0 && currentPathNCPack.OverCutCAMPointList.Count > 0 ) {
+				if( !SolveProcessPath( postSolver, currentPathNCPack.OverCutCAMPointList,
 					out List<PostPoint> overCutG54,
 					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
 					return false;
@@ -138,7 +138,7 @@ namespace MyCAM.Post
 				}
 				double startM = pathG54PostData.MainPathPostPointList[ 0 ].Master;
 				double startS = pathG54PostData.MainPathPostPointList[ 0 ].Slave;
-				if( !BuildProcessPath( currentPathNCPack.LeadInPointList, startM, startS,
+				if( !BuildProcessPath( currentPathNCPack.LeadInCAMPointList, startM, startS,
 					out List<PostPoint> leadInG54 ) ) {
 					return false;
 				}
@@ -172,7 +172,7 @@ namespace MyCAM.Post
 			// end info of current path
 			currentPathtEndInfo = new PathEndInfo()
 			{
-				EndPoint = currentPathNCPack.ProcessEndPoint,
+				EndCAMPoint = currentPathNCPack.ProcessEndPoint,
 				Master = dLastPointProcess_M,
 				Slave = dLastPointProcess_S
 			};
@@ -186,7 +186,7 @@ namespace MyCAM.Post
 			if( entryAndExitData.ExitDistance <= 0 ) {
 				return;
 			}
-			IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfLastPath.EndPoint, entryAndExitData.ExitDistance );
+			IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfLastPath.EndCAMPoint, entryAndExitData.ExitDistance );
 			if( exitPoint == null ) {
 				return;
 			}
@@ -236,7 +236,7 @@ namespace MyCAM.Post
 			// solve IK
 			List<Tuple<double, double>> rotateAngleList = new List<Tuple<double, double>>();
 			List<bool> singularTagList = new List<bool>();
-			foreach( IProcessPoint point in pointList ) {
+			foreach( CAMPoint point in pointList ) {
 				IKSolveResult ikResult = postSolver.SolveIK( point, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
 				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution || ikResult == IKSolveResult.OutOfRange ) {
 					return false;
@@ -273,12 +273,12 @@ namespace MyCAM.Post
 		static bool BuildProcessPath( IReadOnlyList<IProcessPoint> camPointList, double dM, double dS, out List<PostPoint> resultG54 )
 		{
 			resultG54 = new List<PostPoint>();
-			if( pointList == null || pointList.Count == 0 ) {
+			if( camPointList == null || camPointList.Count == 0 ) {
 				return false;
 			}
 
 			// build G54 points
-			foreach( IProcessPoint point in pointList ) {
+			foreach( CAMPoint point in camPointList ) {
 				PostPoint g54Point = new PostPoint()
 				{
 					X = point.Point.X(),
@@ -303,8 +303,8 @@ namespace MyCAM.Post
 			// p3: frog leap middle point (if frog leap)
 			// p4: cut down point of current path
 			// p5: start of current path (not used here)
-			IProcessPoint p1 = endInfoOfPreviousPath.EndPoint;
-			IProcessPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndPoint, currentPathNCPack.TraverseData.LiftUpDistance );
+			IProcessPoint p1 = endInfoOfPreviousPath.EndCAMPoint;
+			IProcessPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, currentPathNCPack.TraverseData.LiftUpDistance );
 			IProcessPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentPathNCPack.ProcessStartPoint, currentPathNCPack.TraverseData.CutDownDistance );
 			IProcessPoint p5 = currentPathNCPack.ProcessStartPoint;
 
