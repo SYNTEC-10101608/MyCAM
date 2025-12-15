@@ -88,6 +88,12 @@ namespace MyCAM.Data
 			get;
 			set;
 		}
+
+		bool IsToolVecModPoint
+		{
+			get;
+			set;
+		}
 	}
 
 	public interface IOrientationPoint
@@ -175,12 +181,18 @@ namespace MyCAM.Data
 			}
 		}
 
-		public CAMPoint Clone()
+		public bool IsToolVecModPoint
 		{
-			return new CAMPoint( m_CADPoint.Clone() );
+			get;
+			set;
 		}
 
-		// the explicit interface implementation for IOverCutPoint.Clone
+		public CAMPoint Clone()
+		{
+			return new CAMPoint( m_CADPoint.Clone(), m_ToolVec );
+		}
+
+		// the explicit interface implementation
 		IOrientationPoint IOrientationPoint.Clone()
 		{
 			return Clone();

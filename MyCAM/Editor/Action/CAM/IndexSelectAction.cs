@@ -20,11 +20,11 @@ namespace MyCAM.Editor
 				throw new ArgumentNullException( "IndexSelectAction constructing argument null" );
 			}
 			m_PathID = pathID;
-
-			if( !m_DataManager.ObjectMap.ContainsKey( m_PathID ) ) {
-				throw new ArgumentException( "IndexSelectAction constructing argument invalid" );
+			if( !DataGettingHelper.GetGeomDataByID( m_PathID, out IGeomData geomData )
+				|| !( geomData is ContourGeomData contourGeomData ) ) {
+				throw new ArgumentException( "IndexSelectAction constructing argument invalid pathID" );
 			}
-			m_ContourGeomData = ( m_DataManager.ObjectMap[ m_PathID ] as ContourPathObject )?.ContourGeomData;
+			m_ContourGeomData = contourGeomData;
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}

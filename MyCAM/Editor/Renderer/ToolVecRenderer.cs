@@ -1,5 +1,5 @@
-using MyCAM.CacheInfo;
 using MyCAM.Data;
+using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
@@ -40,7 +40,7 @@ namespace MyCAM.Editor.Renderer
 
 			// build tool vec
 			foreach( string szPathID in pathIDList ) {
-				List<IProcessPoint> toolVecPointList = GetToolVecPointList( szPathID );
+				IReadOnlyList<IProcessPoint> toolVecPointList = GetToolVecPointList( szPathID );
 				if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
 					continue;
 				}
@@ -103,19 +103,12 @@ namespace MyCAM.Editor.Renderer
 			return lineAIS;
 		}
 
-		List<IProcessPoint> GetToolVecPointList( string pathID )
+		IReadOnlyList<IProcessPoint> GetToolVecPointList( string pathID )
 		{
 			if( !PathCacheProvider.TryGetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
 				return null;
 			}
-			if( toolVecCache.GetToolVecList() == null ) {
-				return null;
-			}
-			List<IProcessPoint> pointList = new List<IProcessPoint>();
-			foreach( IProcessPoint point in toolVecCache.GetToolVecList() ) {
-				pointList.Add( point );
-			}
-			return pointList;
+			return toolVecCache.MainPathPointList;
 		}
 
 		// TODO: the method is kepp casting same thing in a loop, optimize it later
@@ -124,10 +117,7 @@ namespace MyCAM.Editor.Renderer
 			if( !PathCacheProvider.TryGetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
 				return false;
 			}
-			if( point is ISetToolVecPoint toolVecPoint ) {
-				return toolVecCache.IsToolVecModifyPoint( toolVecPoint );
-			}
-			return false;
+			return toolVecCache.IsToolVecModifyPoint( point );
 		}
 	}
 }

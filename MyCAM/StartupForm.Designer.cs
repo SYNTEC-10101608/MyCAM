@@ -78,7 +78,7 @@
 			this.m_tsbMoveUp = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbMoveDown = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAutoOrder = new System.Windows.Forms.ToolStripButton();
-			this.m_tsbTraverseParamSetting = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbSetTraverseData = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbEntryAndExitSetting = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbConvertNC = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbPatternSetting = new System.Windows.Forms.ToolStripButton();
@@ -153,7 +153,7 @@
             this.m_tsbMoveUp,
             this.m_tsbMoveDown,
             this.m_tsbAutoOrder,
-            this.m_tsbTraverseParamSetting,
+            this.m_tsbSetTraverseData,
             this.m_tsbEntryAndExitSetting,
             this.m_tsbPatternSetting,
             this.m_tsbConvertNC});
@@ -679,13 +679,13 @@
 			// 
 			// m_tsbTraverseParamSetting
 			// 
-			this.m_tsbTraverseParamSetting.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_tsbTraverseParamSetting.Image = global::MyCAM.Properties.Resources.TraverseParam;
-			this.m_tsbTraverseParamSetting.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbTraverseParamSetting.Name = "m_tsbTraverseParamSetting";
-			this.m_tsbTraverseParamSetting.Size = new System.Drawing.Size(44, 18);
-			this.m_tsbTraverseParamSetting.Text = "空移參數設定";
-			this.m_tsbTraverseParamSetting.Click += new System.EventHandler(this.m_tsbTraverseParamSetting_Click);
+			this.m_tsbSetTraverseData.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbSetTraverseData.Image = global::MyCAM.Properties.Resources.TraverseParam;
+			this.m_tsbSetTraverseData.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbSetTraverseData.Name = "m_tsbTraverseParamSetting";
+			this.m_tsbSetTraverseData.Size = new System.Drawing.Size(44, 18);
+			this.m_tsbSetTraverseData.Text = "空移參數設定";
+			this.m_tsbSetTraverseData.Click += new System.EventHandler(this.m_tsbSetTraverseData_Click);
 			// 
 			// m_tsbEntryAndExitSetting
 			// 
@@ -831,7 +831,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbSelectD1ContFace;
 		private System.Windows.Forms.ToolStrip m_tsSelectPath;
 		private System.Windows.Forms.ToolStripButton m_tsbManualSelectPathOK;
-		private System.Windows.Forms.ToolStripButton m_tsbTraverseParamSetting;
+		private System.Windows.Forms.ToolStripButton m_tsbSetTraverseData;
 		private System.Windows.Forms.ToolStripButton m_tsbConvertNC;
 		private System.Windows.Forms.ToolStripButton m_tsbAddPoint_AcrCenter;
 		private System.Windows.Forms.ToolStripButton m_tsbAddPoint_EdgeCenter;

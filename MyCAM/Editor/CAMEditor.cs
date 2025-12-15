@@ -1,5 +1,5 @@
 ﻿using MyCAM.App;
-using MyCAM.CacheInfo;
+using MyCAM.PathCache;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Post;
@@ -24,7 +24,7 @@ namespace MyCAM.Editor
 		{
 			// all set true
 			IsStartPointEditable = true;
-			IsReverseEditable = true;
+			IsPathReverseEditable = true;
 			IsOverCutEditable = true;
 			IsLeadLineEditable = true;
 			IsToolVecEditable = true;
@@ -35,7 +35,7 @@ namespace MyCAM.Editor
 		}
 
 		public bool IsStartPointEditable;
-		public bool IsReverseEditable;
+		public bool IsPathReverseEditable;
 		public bool IsOverCutEditable;
 		public bool IsLeadLineEditable;
 		public bool IsToolVecEditable;
@@ -294,8 +294,7 @@ namespace MyCAM.Editor
 				}
 
 				// toggle reverse state
-				craftData.IsReverse = !craftData.IsReverse;
-				// To-do：update CacheInfo in CAMPoint
+				craftData.IsPathReverse = !craftData.IsPathReverse;
 			}
 			ShowCAMData( szPathIDList );
 		}
@@ -368,10 +367,10 @@ namespace MyCAM.Editor
 			ShowCAMData( szPathIDList );
 		}
 
-		public void SetTraverseParam()
+		public void SetTraverseData()
 		{
 			// action edit, multi edit supported
-			if( IsSameAction( EditActionType.SetTraverseParam ) ) {
+			if( IsSameAction( EditActionType.SetTraverse ) ) {
 				m_CurrentAction.End();
 				return;
 			}
@@ -551,7 +550,10 @@ namespace MyCAM.Editor
 				m_ViewManager.TreeNodeMap.Add( szNodeID, node );
 
 				// add a new shape to the viewer
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( m_DataManager.ObjectMap[ szID ].Shape, 3.0 );
+				if( !DataGettingHelper.GetShapeObject( szID, out IShapeObject shapeObj ) ) {
+					continue;
+				}
+				AIS_Shape aisShape = ViewHelper.CreatePathAIS( shapeObj.Shape, 3.0 );
 				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
 				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
@@ -592,7 +594,7 @@ namespace MyCAM.Editor
 				}
 
 				if( geomData.PathType != PathType.Contour ) {
-					editableInfo.IsReverseEditable = false;
+					editableInfo.IsPathReverseEditable = false;
 					editableInfo.IsToolVecEditable = false;
 				}
 			}
@@ -612,7 +614,7 @@ namespace MyCAM.Editor
 			// take all path IDs
 			List<string> pathIDList = m_DataManager.PathIDList;
 			ShowCAMData( pathIDList );
-			}
+		}
 
 		void ShowCAMData( List<string> pathIDList )
 		{
@@ -622,13 +624,13 @@ namespace MyCAM.Editor
 			m_CraftRenderer.Show( pathIDList );
 			m_TraverseRenderer.Show();
 			m_Viewer.UpdateView();
-			}
+		}
 
 		void RemoveAllCAMData()
 		{
 			List<string> pathIDList = m_DataManager.PathIDList;
 			RemoveCAMData( pathIDList );
-			}
+		}
 
 		void RemoveCAMData( List<string> pathIDList )
 		{
@@ -728,7 +730,7 @@ namespace MyCAM.Editor
 			base.OnEditActionStart( action );
 			if( action.ActionType == EditActionType.OverCut ||
 				action.ActionType == EditActionType.SetLead ||
-				action.ActionType == EditActionType.SetTraverseParam ) {
+				action.ActionType == EditActionType.SetTraverse ) {
 
 				// lock main form
 				m_TreeView.Enabled = false;
@@ -744,7 +746,7 @@ namespace MyCAM.Editor
 			// these action will show dialog, need to lock ui
 			if( action.ActionType == EditActionType.OverCut ||
 				action.ActionType == EditActionType.SetLead ||
-				action.ActionType == EditActionType.SetTraverseParam
+				action.ActionType == EditActionType.SetTraverse
 				) {
 
 				// unlock main form

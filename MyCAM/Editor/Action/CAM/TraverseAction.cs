@@ -30,7 +30,7 @@ namespace MyCAM.Editor
 		{
 			get
 			{
-				return EditActionType.SetTraverseParam;
+				return EditActionType.SetTraverse;
 			}
 		}
 
@@ -39,45 +39,45 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// TODO: check all CAMData has same traverse param or not
-			TraverseDlg traverseParamSettingFrom = new TraverseDlg( m_BackupTraverseDataList[ 0 ].Clone() );
+			TraverseDlg traverseDataFrom = new TraverseDlg( m_BackupTraverseDataList[ 0 ].Clone() );
 			PropertyChanged?.Invoke( m_PathIDList );
-			traverseParamSettingFrom.Confirm += ConfirmTraverseParam;
-			traverseParamSettingFrom.Preview += PreviewTraverseParam;
-			traverseParamSettingFrom.Cancel += CancelTraverseParam;
-			traverseParamSettingFrom.Show( MyApp.MainForm );
+			traverseDataFrom.Confirm += ConfirmTraverseData;
+			traverseDataFrom.Preview += PreviewTraverseData;
+			traverseDataFrom.Cancel += CancelTraverseData;
+			traverseDataFrom.Show( MyApp.MainForm );
 		}
 
-		void PreviewTraverseParam( TraverseData data )
+		void PreviewTraverseData( TraverseData data )
 		{
-			SetTraverseParam( data );
+			SetTraverseData( data );
 			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
-		void ConfirmTraverseParam( TraverseData data )
+		void ConfirmTraverseData( TraverseData data )
 		{
-			SetTraverseParam( data );
+			SetTraverseData( data );
 			PropertyChanged?.Invoke( m_PathIDList );
 			End();
 		}
 
-		void CancelTraverseParam()
+		void CancelTraverseData()
 		{
-			RestoreBackupTraverseData();
+			RestoreBackupTraverseDatas();
 			PropertyChanged?.Invoke( m_PathIDList );
 			End();
 		}
 
-		void SetTraverseParam( TraverseData data )
+		void SetTraverseData( TraverseData data )
 		{
 			foreach( var camData in m_CraftDataList ) {
 				camData.TraverseData = data.Clone();
 			}
 		}
 
-		void RestoreBackupTraverseData()
+		void RestoreBackupTraverseDatas()
 		{
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
-				m_CraftDataList[ i ].TraverseData = m_BackupTraverseDataList[ i ];
+				m_CraftDataList[ i ].TraverseData = m_BackupTraverseDataList[ i ].Clone();
 			}
 		}
 

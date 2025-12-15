@@ -288,7 +288,10 @@ namespace MyCAM.Data
 				return string.Empty;
 			}
 			foreach( var model in ObjectMap.Values ) {
-				if( model.Shape.IsEqual( shape ) ) {
+				if( !DataGettingHelper.GetShapeObject( model.UID, out IShapeObject shapeObject ) ) {
+					continue;
+				}
+				if( shapeObject.Shape.IsEqual( shape ) ) {
 					return model.UID;
 				}
 			}

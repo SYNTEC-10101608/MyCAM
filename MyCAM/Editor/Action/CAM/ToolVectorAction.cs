@@ -1,6 +1,6 @@
 ﻿using MyCAM.App;
-using MyCAM.CacheInfo;
 using MyCAM.Data;
+using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.Prs3d;
@@ -20,9 +20,12 @@ namespace MyCAM.Editor
 		{
 			// checked in base constructor
 			m_PathIDList = new List<string>() { pathID };
-			m_CraftData = ( m_DataManager.ObjectMap[ m_PathID ] as PathObject ).CraftData;
-			m_ContourCacheInfo = ( m_DataManager.ObjectMap[ m_PathID ] as ContourPathObject ).ContourCacheInfo;
-
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
+				throw new ArgumentException( "Cannot get CraftData by pathID: " + pathID );
+			}
+			if( !PathCacheProvider.TryGetToolVecCache( pathID, out m_ToolVecCache ) ) {
+				throw new ArgumentException( "Cannot get ToolVecCache by pathID: " + pathID );
+			}
 		}
 
 		public override EditActionType ActionType
@@ -51,7 +54,7 @@ namespace MyCAM.Editor
 			}
 
 			// modify tool vector
-			bool isModified = m_ContourCacheInfo.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
+			bool isModified = m_ToolVecCache.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
 			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg );
 
 			// back up old data
@@ -159,7 +162,7 @@ namespace MyCAM.Editor
 		// to storage which vertex keep show high light point on viewer
 		AIS_Shape m_KeepedHighLightPoint = null;
 		CraftData m_CraftData = null;
-		ContourCacheInfo m_ContourCacheInfo = null;
+		IToolVecCache m_ToolVecCache = null;
 		List<string> m_PathIDList = null;
 	}
 }

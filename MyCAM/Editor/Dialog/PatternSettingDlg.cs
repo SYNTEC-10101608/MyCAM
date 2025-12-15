@@ -4,9 +4,9 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
-	public partial class PatternSettingDlg : EditDialogBase<IStandardPatternGeomData>
+	public partial class PatternSettingDlg : EditDialogBase<IStdPatternGeomData>
 	{
-		public PatternSettingDlg( IStandardPatternGeomData standardPatternGeomData )
+		public PatternSettingDlg( IStdPatternGeomData standardPatternGeomData )
 		{
 			m_StandardPatternGeomData = standardPatternGeomData;
 			m_PathType = standardPatternGeomData == null ? PathType.Contour : standardPatternGeomData.PathType;
@@ -64,7 +64,7 @@ namespace MyCAM.Editor.Dialog
 
 		void m_cmbPathType_SelectedIndexChanged( object sender, EventArgs e )
 		{
-			IStandardPatternGeomData newStandardPatternGeomData = null;
+			IStdPatternGeomData newStandardPatternGeomData = null;
 			ShowSpecificPanel( m_cmbPathType.SelectedIndex );
 
 			PathType selectedPathType = (PathType)m_cmbPathType.SelectedIndex;
@@ -95,9 +95,9 @@ namespace MyCAM.Editor.Dialog
 			m_NewStandardPatternGeomData = newStandardPatternGeomData;
 		}
 
-		IStandardPatternGeomData CreateCirclePattern( PathType currentPathType )
+		IStdPatternGeomData CreateCirclePattern( PathType currentPathType )
 		{
-			IStandardPatternGeomData standardPatternGeomData = null;
+			IStdPatternGeomData standardPatternGeomData = null;
 
 			// If current type is not Circle, create new default CircleGeomData for each item
 			if( currentPathType != PathType.Circle ) {
@@ -112,9 +112,9 @@ namespace MyCAM.Editor.Dialog
 			return standardPatternGeomData;
 		}
 
-		IStandardPatternGeomData CreateRectanglePattern( PathType currentPathType )
+		IStdPatternGeomData CreateRectanglePattern( PathType currentPathType )
 		{
-			IStandardPatternGeomData standardPatternGeomData = null;
+			IStdPatternGeomData standardPatternGeomData = null;
 
 			// If current type is not Rectangle, create new default RectangleGeomData for each item
 			if( currentPathType != PathType.Rectangle ) {
@@ -129,9 +129,9 @@ namespace MyCAM.Editor.Dialog
 			return standardPatternGeomData;
 		}
 
-		IStandardPatternGeomData CreateRunwayPattern( PathType currentPathType )
+		IStdPatternGeomData CreateRunwayPattern( PathType currentPathType )
 		{
-			IStandardPatternGeomData standardPatternGeomData = null;
+			IStdPatternGeomData standardPatternGeomData = null;
 
 			// If current type is not Runway, create new default RunwayGeomData for each item
 			if( currentPathType != PathType.Runway ) {
@@ -146,9 +146,9 @@ namespace MyCAM.Editor.Dialog
 			return standardPatternGeomData;
 		}
 
-		IStandardPatternGeomData CreatePolygonPattern( PathType selectedPathType, PathType currentPathType )
+		IStdPatternGeomData CreatePolygonPattern( PathType selectedPathType, PathType currentPathType )
 		{
-			IStandardPatternGeomData standardPatternGeomData = null;
+			IStdPatternGeomData standardPatternGeomData = null;
 
 			// Check if current type is already a polygon type
 			bool isCurrentPolygon = IsPolygonSide( currentPathType, out int currentSides );
@@ -667,8 +667,8 @@ namespace MyCAM.Editor.Dialog
 			return tangentDistance * EDGE_TANGENT_MULTIPLIER <= sideLength;
 		}
 
-		IStandardPatternGeomData m_StandardPatternGeomData;
-		IStandardPatternGeomData m_NewStandardPatternGeomData;
+		IStdPatternGeomData m_StandardPatternGeomData;
+		IStdPatternGeomData m_NewStandardPatternGeomData;
 		PathType m_PathType;
 
 		// circle

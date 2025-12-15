@@ -1,4 +1,4 @@
-using MyCAM.CacheInfo;
+using MyCAM.PathCache;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRepPrimAPI;
@@ -93,14 +93,14 @@ namespace MyCAM.Editor.Renderer
 		void ShowLeadInOrientation( List<string> pathIDList )
 		{
 			ShowLeadOrientation( pathIDList, m_LeadInOrientationAISDict,
-				( leadData ) => leadData.LeadIn.Type != LeadLineType.None,
+				( leadData ) => leadData.LeadIn.Type != LeadGeomType.None,
 				GetLeadInFirstPoint );
 		}
 
 		void ShowLeadOutOrientation( List<string> pathIDList )
 		{
 			ShowLeadOrientation( pathIDList, m_LeadOutOrientationAISDict,
-				( leadData ) => leadData.LeadOut.Type != LeadLineType.None,
+				( leadData ) => leadData.LeadOut.Type != LeadGeomType.None,
 				GetLeadOutLastPoint );
 		}
 
@@ -174,35 +174,26 @@ namespace MyCAM.Editor.Renderer
 
 		IOrientationPoint GetFirstCAMPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetMainPathStartPointCache( pathID, out IMainPathStartPointCache mainPathStartPointCache ) ) {
+			if( !PathCacheProvider.TryGetOrientationCache( pathID, out IOrientationCache orientationCache ) ) {
 				return null;
 			}
-			if( mainPathStartPointCache.GetMainPathStartCAMPoint() == null || !( mainPathStartPointCache.GetMainPathStartCAMPoint() is IOrientationPoint orientationPoint ) ) {
-				return null;
-			}
-			return orientationPoint;
+			return orientationCache.MainPathStartPoint;
 		}
 
 		IOrientationPoint GetLeadInFirstPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !PathCacheProvider.TryGetOrientationCache( pathID, out IOrientationCache orientationCache ) ) {
 				return null;
 			}
-			if( leadCache.LeadInCAMPointList == null || leadCache.LeadInCAMPointList.Count == 0 ) {
-				return null;
-			}
-			return leadCache.LeadInCAMPointList.First();
+			return orientationCache.LeadInStartPoint;
 		}
 
 		IOrientationPoint GetLeadOutLastPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !PathCacheProvider.TryGetOrientationCache( pathID, out IOrientationCache orientationCache ) ) {
 				return null;
 			}
-			if( leadCache.LeadOutCAMPointList == null || leadCache.LeadOutCAMPointList.Count == 0 ) {
-				return null;
-			}
-			return leadCache.LeadOutCAMPointList.Last();
+			return orientationCache.LeadOutEndPoint;
 		}
 
 		LeadData GetLeadData( string pathID )
