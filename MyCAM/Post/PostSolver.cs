@@ -69,22 +69,8 @@ namespace MyCAM.Post
 			int solveResult = FiveAxisSolver.IJKtoMS( ToolDirection, m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir,
 				dM_In, dS_In, out double dM1, out double dS1, out double dM2, out double dS2, SolverConstants.IU_TO_BLU_ROTARY );
 
-			// master has infinite solution
-			if( solveResult == (int)IKSolveResult.MasterInfinityOfSolution ) {
-				dM_Out = dM1;
-				dS_Out = dS1;
-				return IKSolveResult.MasterInfinityOfSolution;
-			}
-
-			// slave has infinite solution, this may almost not happen in real world
-			else if( solveResult == (int)IKSolveResult.SlaveInfinityOfSolution ) {
-				dM_Out = dM1;
-				dS_Out = dS1;
-				return IKSolveResult.SlaveInfinityOfSolution;
-			}
-
 			// no solution
-			else if( solveResult == (int)IKSolveResult.NoSolution ) {
+			if( solveResult == (int)IKSolveResult.NoSolution ) {
 				dM_Out = 0;
 				dS_Out = 0;
 				return IKSolveResult.NoSolution;
@@ -108,7 +94,7 @@ namespace MyCAM.Post
 				// solvanle but can not choose a valid solution within range
 				return IKSolveResult.OutOfRange;
 			}
-			return IKSolveResult.NoError;
+			return (IKSolveResult)solveResult;
 		}
 
 		public bool IsReverseMS
