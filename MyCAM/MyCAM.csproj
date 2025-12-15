@@ -52,33 +52,43 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CacheInfo\CircleCacheInfo.cs" />
-    <Compile Include="CacheInfo\ContourCacheInfo.cs" />
-    <Compile Include="CacheInfo\PathCacheProvider.cs" />
-    <Compile Include="CacheInfo\PolygonCacheInfo.cs" />
-    <Compile Include="CacheInfo\RectangleCacheInfo.cs" />
-    <Compile Include="CacheInfo\RunwayCacheInfo.cs" />
-    <Compile Include="CacheInfo\StandardPatternBasedCacheInfo.cs" />
-    <Compile Include="CacheInfo\StandardPatternCacheInfoFactory.cs" />
+    <Compile Include="PathCache\Application\MainPathPointCache.cs" />
+    <Compile Include="PathCache\Application\TraverseDataCache.cs" />
+    <Compile Include="PathCache\Computation\CircleCache.cs" />
+    <Compile Include="PathCache\Computation\ContourCache.cs" />
+    <Compile Include="PathCache\Application\InterfaceDefine.cs" />
+    <Compile Include="PathCache\Application\LeadCache.cs" />
+    <Compile Include="PathCache\Application\MainPathStartPointCache.cs" />
+    <Compile Include="PathCache\Application\OrientationCache.cs" />
+    <Compile Include="PathCache\Application\OverCutCache.cs" />
+    <Compile Include="PathCache\PathCacheProvider.cs" />
+    <Compile Include="PathCache\Application\PathReverseCache.cs" />
+    <Compile Include="PathCache\Computation\PolygonCache.cs" />
+    <Compile Include="PathCache\Application\ProcessPathStartEndCache.cs" />
+    <Compile Include="PathCache\Computation\RectangleCache.cs" />
+    <Compile Include="PathCache\Computation\RunwayCache.cs" />
+    <Compile Include="PathCache\Computation\StdPatternCacheBase.cs" />
+    <Compile Include="PathCache\PathCacheFactory.cs" />
     <Compile Include="Data\DataGettingHelper.cs" />
-    <Compile Include="Data\GeomDataFolder\CircleGeomData.cs" />
-    <Compile Include="Data\GeomDataFolder\ContourGeomData.cs" />
-    <Compile Include="Data\GeomDataFolder\PolygonGeomData.cs" />
-    <Compile Include="Data\GeomDataFolder\RunwayGeomData.cs" />
-    <Compile Include="Data\PathObjectFolder\CirclePathObject.cs" />
-    <Compile Include="Data\PathObjectFolder\ContourPathObject.cs" />
-    <Compile Include="Data\CraftData.cs" />
-    <Compile Include="Data\GeomDataFolder\IGeomData.cs" />
-    <Compile Include="Data\GeomDataFolder\RectangleGeomData.cs" />
-    <Compile Include="Data\MachineData.cs" />
-    <Compile Include="Data\MachineDefine.cs" />
-    <Compile Include="Data\PathObjectFolder\PolygonPathObject.cs" />
-    <Compile Include="Data\PathObjectFolder\RectanglePathObject.cs" />
-    <Compile Include="Data\PathObjectFolder\RunwayPathObject.cs" />
-    <Compile Include="Data\PathObjectFolder\StandardPatternBasedPathObject.cs" />
+    <Compile Include="Data\Geom\CircleGeomData.cs" />
+    <Compile Include="Data\Geom\ContourGeomData.cs" />
+    <Compile Include="Data\Geom\PolygonGeomData.cs" />
+    <Compile Include="Data\Geom\RunwayGeomData.cs" />
+    <Compile Include="Data\Geom\StdPatternGeomDataBase.cs" />
+    <Compile Include="Data\Object\CirclePathObject.cs" />
+    <Compile Include="Data\Object\ContourPathObject.cs" />
+    <Compile Include="Data\Craft\CraftData.cs" />
+    <Compile Include="Data\Geom\IGeomData.cs" />
+    <Compile Include="Data\Geom\RectangleGeomData.cs" />
+    <Compile Include="Data\Machine\MachineData.cs" />
+    <Compile Include="Data\Machine\MachineDefine.cs" />
+    <Compile Include="Data\Object\PolygonPathObject.cs" />
+    <Compile Include="Data\Object\RectanglePathObject.cs" />
+    <Compile Include="Data\Object\RunwayPathObject.cs" />
+    <Compile Include="Data\Object\StdPatternObjectBase.cs" />
     <Compile Include="Data\PointData.cs" />
     <Compile Include="Data\PostData.cs" />
-    <Compile Include="Data\TraverseData.cs" />
+    <Compile Include="Data\Craft\TraverseData.cs" />
     <Compile Include="Editor\Action\CAD\AddLineAction.cs" />
     <Compile Include="Editor\Action\CAD\AxisTransformAction.cs" />
     <Compile Include="Editor\Action\CAD\SelectPartAction.cs" />
@@ -130,7 +140,7 @@
     <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
     <Compile Include="Editor\Renderer\TraverseRenderer.cs" />
     <Compile Include="Editor\SimuEditor.cs" />
-    <Compile Include="Data\LeadData.cs" />
+    <Compile Include="Data\Craft\LeadData.cs" />
     <Compile Include="Editor\Dialog\LeadDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -143,12 +153,12 @@
     <Compile Include="Editor\Dialog\OverCutDlg.Designer.cs">
       <DependentUpon>OverCutDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helper\DisctereContourHelper.cs" />
-    <Compile Include="Helper\MachineDataXMLHelper.cs" />
-    <Compile Include="Helper\ToolVecHelper.cs" />
-    <Compile Include="Helper\TraverseHelper.cs" />
+    <Compile Include="Helper\CAD\DisctereContourHelper.cs" />
+    <Compile Include="Helper\FileIO\MachineDataXMLHelper.cs" />
+    <Compile Include="Helper\CAM\ToolVecHelper.cs" />
+    <Compile Include="Helper\CAM\TraverseHelper.cs" />
     <Compile Include="FileManager\MachineDataDTO.cs" />
-    <Compile Include="Helper\LeadHelper.cs" />
+    <Compile Include="Helper\CAM\LeadHelper.cs" />
     <Compile Include="FileManager\DataManagerDTO.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
@@ -178,10 +188,12 @@
       <DependentUpon>ToolVectorDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\ViewManager.cs" />
-    <Compile Include="Data\BasicData.cs" />
+    <Compile Include="Data\Object\BasicObject.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="LogManager\LogHandler.cs" />
-    <Compile Include="Helper\OverCutHelper.cs" />
+    <Compile Include="Helper\CAM\OverCutHelper.cs" />
+    <Compile Include="PathCache\Application\StdPatternRefPointCache.cs" />
+    <Compile Include="PathCache\Application\ToolVecCache.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="Post\PostHelper.cs" />
@@ -193,8 +205,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="StandardPatternFactory\WireCreationStrategyFactory.cs" />
-    <Compile Include="StandardPatternFactory\PatternFactory.cs" />
+    <Compile Include="Helper\CAD\StdPatterWireFactory.cs" />
+    <Compile Include="Helper\CAD\StdPatternHelper.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -1,6 +1,5 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
-using MyCAM.Editor.Dialog;
 using OCC.AIS;
 using OCCViewer;
 using System;
@@ -49,11 +48,10 @@ namespace MyCAM.Editor
 			foreach( string szPartID in m_PartIDList ) {
 
 				// sew the part
-				if( !m_DataManager.PartIDList.Contains( szPartID ) || !m_DataManager.ObjectMap.ContainsKey( szPartID ) ) {
+				if( !DataGettingHelper.GetSewableObject( szPartID, out ISewableObject sewable ) ) {
 					continue;
 				}
-				IObject @object = m_DataManager.ObjectMap[ szPartID ];
-				@object.SewShape( dSewTol );
+				sewable.SewShape( dSewTol );
 
 				// update the viewer
 				if( !m_ViewManager.ViewObjectMap.ContainsKey( szPartID ) ) {
@@ -61,7 +59,7 @@ namespace MyCAM.Editor
 				}
 				AIS_Shape partAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szPartID ].AISHandle );
 				if( partAIS != null && !partAIS.IsNull() ) {
-					partAIS.SetShape( m_DataManager.ObjectMap[ szPartID ].Shape );
+					partAIS.SetShape( sewable.Shape );
 					m_Viewer.GetAISContext().Redisplay( partAIS, false );
 				}
 			}

@@ -13,16 +13,16 @@ namespace MyCAM.Editor
 		{
 			// checked in base constructor
 			// when user cancel the lead setting, need to turn path back
-			m_BackupLeadParamList = new List<LeadData>();
+			m_BackupLeadDataList = new List<LeadData>();
 			foreach( var craftData in m_CraftDataList ) {
 				if( craftData == null ) {
 					throw new ArgumentNullException( "LeadAction constructing argument craftDataList contains null craftData" );
 				}
-				if( craftData.LeadLineParam == null ) {
-					m_BackupLeadParamList.Add( new LeadData() );
+				if( craftData.LeadData == null ) {
+					m_BackupLeadDataList.Add( new LeadData() );
 				}
 				else {
-					m_BackupLeadParamList.Add( craftData.LeadLineParam.Clone() );
+					m_BackupLeadDataList.Add( craftData.LeadData.Clone() );
 				}
 			}
 		}
@@ -40,20 +40,20 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// TODO: check all CAMData has same lead param or not
-			LeadDlg leadDialog = new LeadDlg( m_BackupLeadParamList[ 0 ].Clone() );
+			LeadDlg leadDialog = new LeadDlg( m_BackupLeadDataList[ 0 ].Clone() );
 			PropertyChanged?.Invoke( m_PathIDList );
 
 			// preview
 			leadDialog.Preview += ( leadData ) =>
 			{
-				SetLeadParamForAll( leadData );
+				SetLeadDataForAll( leadData );
 				PropertyChanged?.Invoke( m_PathIDList );
 			};
 
 			// confirm
 			leadDialog.Confirm += ( leadData ) =>
 			{
-				SetLeadParamForAll( leadData );
+				SetLeadDataForAll( leadData );
 				PropertyChanged?.Invoke( m_PathIDList );
 				End();
 			};
@@ -61,27 +61,27 @@ namespace MyCAM.Editor
 			// cancel
 			leadDialog.Cancel += () =>
 			{
-				RestoreBackupLeadParams();
+				RestoreBackupLeadDatas();
 				PropertyChanged?.Invoke( m_PathIDList );
 				End();
 			};
 			leadDialog.Show( MyApp.MainForm );
 		}
 
-		void SetLeadParamForAll( LeadData leadData )
+		void SetLeadDataForAll( LeadData leadData )
 		{
 			foreach( var camData in m_CraftDataList ) {
-				camData.LeadLineParam = leadData.Clone();
+				camData.LeadData = leadData.Clone();
 			}
 		}
 
-		void RestoreBackupLeadParams()
+		void RestoreBackupLeadDatas()
 		{
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
-				m_CraftDataList[ i ].LeadLineParam = m_BackupLeadParamList[ i ].Clone();
+				m_CraftDataList[ i ].LeadData = m_BackupLeadDataList[ i ].Clone();
 			}
 		}
 
-		List<LeadData> m_BackupLeadParamList;
+		List<LeadData> m_BackupLeadDataList;
 	}
 }

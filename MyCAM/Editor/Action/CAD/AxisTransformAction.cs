@@ -140,7 +140,10 @@ namespace MyCAM.Editor
 				if( viewObject.Visible == false ) {
 					continue;
 				}
-				shpaeList.Add( m_DataManager.ObjectMap[ szID ].Shape );
+				if( !DataGettingHelper.GetShapeObject( szID, out IShapeObject shapeObj ) ) {
+					continue;
+				}
+				shpaeList.Add( shapeObj.Shape );
 			}
 			if( shpaeList == null || shpaeList.Count == 0 ) {
 				return;

@@ -1,4 +1,4 @@
-﻿using MyCAM.CacheInfo;
+﻿using MyCAM.PathCache;
 using MyCAM.Data;
 using System;
 using System.Collections.Generic;
@@ -49,7 +49,7 @@ namespace MyCAM.Post
 					PathEndInfo endInfoOfPreviousPath = null;
 					PathType pathType;
 					for( int i = 0; i < m_PathIDList.Count; i++ ) {
-						if( !DataGettingHelper.TryGetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
+						if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
 							continue;
 						}
 						pathType = pathObject.PathType;
@@ -249,81 +249,37 @@ namespace MyCAM.Post
 
 		ContourNCPackage BuildPackageByID( string szID )
 		{
-			if( !m_DataManager.ObjectMap.ContainsKey( szID )
-				|| m_DataManager.ObjectMap[ szID ].ObjectType != ObjectType.Path ) {
+			if(!PathCacheProvider.TryGetLeadCache( szID, out ILeadCache leadCache )
+				|| !PathCacheProvider.TryGetOverCutCache( szID, out IOverCutCache overCutCache )
+				|| !PathCacheProvider.TryGetProcessPathStartEndCache( szID, out IProcessPathStartEndCache processPathStartEndCache )
+				|| !PathCacheProvider.TryGetTraverseDataCache( szID, out ITraverseDataCache traverseDataCache )
+				|| !PathCacheProvider.TryGetMainPathCache( szID, out IMainPathCache mainPathCache ) ) {
 				return null;
 			}
-			PathObject pathObject = m_DataManager.ObjectMap[ szID ] as PathObject;
-			if( pathObject.PathType != PathType.Contour ) {
-				return null;
-			}
-			ContourPathObject contourPathObject = pathObject as ContourPathObject;
-			ContourCacheInfo contourCacheInfo = contourPathObject.ContourCacheInfo;
-			CraftData craftData = contourPathObject.CraftData;
 			return new ContourNCPackage(
-				craftData.LeadLineParam,
-				craftData.OverCutLength,
-				contourCacheInfo.CAMPointList.Cast<IProcessPoint>().ToList(),
-				contourCacheInfo.LeadInCAMPointList.Cast<IProcessPoint>().ToList(),
-				contourCacheInfo.LeadOutCAMPointList.Cast<IProcessPoint>().ToList(),
-				contourCacheInfo.OverCutCAMPointList.Cast<IProcessPoint>().ToList(),
-				craftData.TraverseData,
-				contourCacheInfo.GetProcessEndPoint(),
-				contourCacheInfo.GetProcessEndPoint() );
+				leadCache.LeadData,
+				overCutCache.OverCutLength,
+				mainPathCache.MainPathPointList,
+				leadCache.LeadInCAMPointList,
+				leadCache.LeadOutCAMPointList,
+				overCutCache.OverCutCAMPointList,
+				traverseDataCache.TraverseData,
+				traverseDataCache.GetProcessEndPoint(),
+				traverseDataCache.GetProcessEndPoint() );
 		}
 
 		StandardPatternNCPackage BuildPackageByID_StandardPattern( string szID )
 		{
-			if( !m_DataManager.ObjectMap.ContainsKey( szID )
-				|| m_DataManager.ObjectMap[ szID ].ObjectType != ObjectType.Path ) {
+			if( !PathCacheProvider.TryGetStdPatternRefPointCache( szID, out IStdPatternRefPointCache refPointCache )
+				|| !PathCacheProvider.TryGetMainPathStartPointCache( szID, out IMainPathStartPointCache mainPathStartPointCache ) 
+				|| !PathCacheProvider.TryGetTraverseDataCache( szID, out ITraverseDataCache traverseDataCache ) ) {
 				return null;
 			}
-			PathObject pathObject = m_DataManager.ObjectMap[ szID ] as PathObject;
-			if( pathObject.PathType == PathType.Contour ) {
-				return null;
-			}
-			if( !DataGettingHelper.GetReferencePoint( szID, out IProcessPoint refPoint ) ) {
-				return null;
-			}
-			if( !PathCacheProvider.TryGetMainPathStartPointCache( szID, out IMainPathStartPointCache mainPathStartPoint ) ) {
-				return null;
-			}
-
-			switch( pathObject.PathType ) {
-				case PathType.Circle:
-					CirclePathObject circlePathObject = pathObject as CirclePathObject;
-					return new StandardPatternNCPackage(
-						refPoint,
-						mainPathStartPoint.GetMainPathStartCAMPoint(),
-						circlePathObject.CraftData.TraverseData );
-				case PathType.Rectangle:
-					RectanglePathObject rectanglePathObject = pathObject as RectanglePathObject;
-					return new StandardPatternNCPackage(
-						refPoint,
-						mainPathStartPoint.GetMainPathStartCAMPoint(),
-						rectanglePathObject.CraftData.TraverseData );
-				case PathType.Runway:
-					RunwayPathObject runwayPathObject = pathObject as RunwayPathObject;
-					return new StandardPatternNCPackage(
-						refPoint,
-						mainPathStartPoint.GetMainPathStartCAMPoint(),
-						runwayPathObject.CraftData.TraverseData );
-				case PathType.Triangle:
-				case PathType.Square:
-				case PathType.Pentagon:
-				case PathType.Hexagon:
-					PolygonPathObject polygonPathObject = pathObject as PolygonPathObject;
-					return new StandardPatternNCPackage(
-						refPoint,
-						mainPathStartPoint.GetMainPathStartCAMPoint(),
-						polygonPathObject.CraftData.TraverseData );
-				default:
-					break;
-
-			}
-			return null;
+			return new StandardPatternNCPackage(
+						refPointCache.GetProcessRefPoint(),
+						mainPathStartPointCache.GetMainPathStartCAMPoint(),
+						traverseDataCache.TraverseData );
 		}
-
 
 		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";
 	}

@@ -357,9 +357,9 @@ namespace MyCAM
 		}
 
 		// post parameter setting
-		void m_tsbTraverseParamSetting_Click( object sender, EventArgs e )
+		void m_tsbSetTraverseData_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.SetTraverseParam();
+			m_CAMEditor.SetTraverseData();
 		}
 
 		void m_tsbEntryAndExitSetting_Click( object sender, EventArgs e )
@@ -516,8 +516,8 @@ namespace MyCAM
 					case EditActionType.ToolVec:
 						m_tsbToolVec.BackColor = DEFAULT_BtnColor;
 						break;
-					case EditActionType.SetTraverseParam:
-						m_tsbTraverseParamSetting.BackColor = DEFAULT_BtnColor;
+					case EditActionType.SetTraverse:
+						m_tsbSetTraverseData.BackColor = DEFAULT_BtnColor;
 						OnCAMDlgActionStatusChange( actionStatus );
 						break;
 					case EditActionType.SetEntryAndExitParam:
@@ -568,8 +568,8 @@ namespace MyCAM
 				case EditActionType.ToolVec:
 					m_tsbToolVec.BackColor = ON_ButtonColor;
 					break;
-				case EditActionType.SetTraverseParam:
-					m_tsbTraverseParamSetting.BackColor = ON_ButtonColor;
+				case EditActionType.SetTraverse:
+					m_tsbSetTraverseData.BackColor = ON_ButtonColor;
 					OnCAMDlgActionStatusChange( actionStatus );
 					break;
 				case EditActionType.SetEntryAndExitParam:
@@ -591,7 +591,7 @@ namespace MyCAM
 			m_tsbMoveUp.Enabled = editableInfo.IsMoveProcessEditable;
 			m_tsbMoveDown.Enabled = editableInfo.IsMoveProcessEditable;
 			m_tsbAutoOrder.Enabled = editableInfo.IsAutoOrderEditable;
-			m_tsbReverse.Enabled = editableInfo.IsReverseEditable;
+			m_tsbReverse.Enabled = editableInfo.IsPathReverseEditable;
 		}
 
 		// path type change event

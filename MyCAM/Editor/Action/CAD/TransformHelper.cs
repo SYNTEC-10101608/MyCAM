@@ -1,8 +1,8 @@
-﻿using OCC.AIS;
-using OCC.BRepBuilderAPI;
+﻿using MyCAM.Data;
+using OCC.AIS;
 using OCC.gp;
 using OCCViewer;
-using MyCAM.Data;
+using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {
@@ -18,13 +18,40 @@ namespace MyCAM.Editor
 
 		public void TransformData()
 		{
-			foreach( var oneData in m_DataManager.ObjectMap ) {
-				oneData.Value.DoTransform( m_3PTransform );
-				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ oneData.Key ].AISHandle );
+			List<ITransformableObject> transformableList = new List<ITransformableObject>();
+			List<string> transformObjIDList = new List<string>();
+
+			// get part to transform
+			foreach( string szPartID in m_DataManager.PartIDList ) {
+				if( DataGettingHelper.GetTransformableObject( szPartID, out ITransformableObject transformable ) ) {
+					transformableList.Add( transformable );
+					transformObjIDList.Add( szPartID );
+				}
+			}
+
+			// get path to transform
+			foreach( string szPathID in m_DataManager.PathIDList ) {
+				if( DataGettingHelper.GetTransformableObject( szPathID, out ITransformableObject transformable ) ) {
+					transformableList.Add( transformable );
+					transformObjIDList.Add( szPathID );
+				}
+			}
+
+			// do transform
+			foreach( var oneTransformable in transformableList ) {
+				oneTransformable.DoTransform( m_3PTransform );
+			}
+
+			// update viewer
+			foreach( var szObjID in transformObjIDList ) {
+				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szObjID ].AISHandle );
 				if( oneAIS == null || oneAIS.IsNull() ) {
 					continue;
 				}
-				oneAIS.SetShape( oneData.Value.Shape );
+				if( !DataGettingHelper.GetShapeObject( szObjID, out IShapeObject szObjShape ) ) {
+					continue;
+				}
+				oneAIS.SetShape( szObjShape.Shape );
 				m_Viewer.GetAISContext().Redisplay( oneAIS, false );
 			}
 			m_Viewer.UpdateView();
