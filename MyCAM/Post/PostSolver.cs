@@ -58,7 +58,7 @@ namespace MyCAM.Post
 		public IKSolveResult Solve( gp_Dir toolVec_In, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
 		{
 			// prevent from sigular area
-			if( toolVec_In.IsParallel( new gp_Dir( m_MasterRotateDir[ 0 ], m_MasterRotateDir[ 1 ], m_MasterRotateDir[ 2 ] ), 1e-2 ) ) {
+			if( toolVec_In.IsParallel( new gp_Dir( m_MasterRotateDir[ 0 ], m_MasterRotateDir[ 1 ], m_MasterRotateDir[ 2 ] ), 5 * Math.PI / 180 ) ) {
 
 				// just make it singular to prevent unexpected result
 				toolVec_In = new gp_Dir( m_MasterRotateDir[ 0 ], m_MasterRotateDir[ 1 ], m_MasterRotateDir[ 2 ] );
