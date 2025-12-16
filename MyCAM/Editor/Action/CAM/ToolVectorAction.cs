@@ -1,14 +1,17 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Helper;
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.Aspect;
+using OCC.gp;
 using OCC.Prs3d;
 using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -49,7 +52,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			int nIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
-			if( nIndex == -1 ) {
+			if( nIndex == DEFAULT_SELECT_INDEX ) {
 				return;
 			}
 
@@ -59,22 +62,12 @@ namespace MyCAM.Editor
 
 			// back up old data
 			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg );
-			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam );
-			toolVecForm.Preview += ( ToolVec ) =>
-			{
-				SetToolVecParam( nIndex, ToolVec );
-				PropertyChanged?.Invoke( m_PathIDList );
-			};
-			toolVecForm.Confirm += ( ToolVec ) =>
-			{
-				SetToolVecParam( nIndex, ToolVec );
-				SetToolVecDone();
-			};
-			toolVecForm.Cancel += () =>
-			{
-				SetToolVecParam( nIndex, m_BackupToolVecParam );
-				SetToolVecDone();
-			};
+			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
+			toolVecForm.RaiseKeep += () => SetToolVecOfKeep( nIndex, toolVecForm );
+			toolVecForm.RaiseZDir += () => SetToolVecOfZDir( nIndex, toolVecForm );
+			toolVecForm.Preview += ( ToolVec ) => SetToolVecParamAndPeview( nIndex, ToolVec );
+			toolVecForm.Confirm += ( ToolVec ) => ConfirmSetting( nIndex, ToolVec );
+			toolVecForm.Cancel += () => CancelSetting( nIndex );
 
 			// when editing a point lock the main form
 			RaiseEditingToolVecDlg?.Invoke( EActionStatus.Start );
@@ -157,6 +150,145 @@ namespace MyCAM.Editor
 			}
 		}
 
+		bool CalABAngleToPreCtrlPntToolVec( int nSelectIndex, out Tuple<double, double> param )
+		{
+			// get this modify point cam point
+			CADPoint toModifyCADPnt = m_ContourGeomData.CADPointList[ nSelectIndex ];
+			CAMPoint toModifyCAMPnt = new CAMPoint( toModifyCADPnt );
+
+			// get previous control point tool vector
+			gp_Dir assignDir = GetPreCtrlPntToolVec( m_ContourGeomData.CADPointList, m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsToolVecReverse, m_CraftData.IsPathReverse, m_ContourGeomData.IsClosed );
+			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyCAMPnt, m_CraftData.IsToolVecReverse, out param );
+			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
+				return true;
+			}
+			if( calResult == ToolVecHelper.ECalAngleResult.TooLargeAngle ) {
+				MyApp.Logger.ShowOnLogPanel( "目標向量與原始向量夾角過大", MyApp.NoticeType.Warning );
+				MessageBox.Show( "目標向量與原始向量夾角過大", "計算失敗", MessageBoxButtons.OK, MessageBoxIcon.Warning );
+				return false;
+			}
+			return false;
+		}
+
+		bool CalABAngleToZDir( int nSelectIndex, out Tuple<double, double> param )
+		{
+			// get this modify point cam point
+			CADPoint toModifyCADPnt = m_ContourGeomData.CADPointList[ nSelectIndex ];
+			CAMPoint toModifyCAMPnt = new CAMPoint( toModifyCADPnt );
+			gp_Dir assignDir = new gp_Dir( 0, 0, 1 );
+			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyCAMPnt, m_CraftData.IsToolVecReverse, out param );
+			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
+				return true;
+			}
+			if( calResult == ToolVecHelper.ECalAngleResult.TooLargeAngle ) {
+				MyApp.Logger.ShowOnLogPanel( "目標向量與原始向量夾角過大", MyApp.NoticeType.Warning );
+				MessageBox.Show( "目標向量與原始向量夾角過大", "計算失敗", MessageBoxButtons.OK, MessageBoxIcon.Warning );
+				return false;
+			}
+			return false;
+		}
+
+		void SetToolVecOfKeep( int nSelectIndex, ToolVectorDlg toolVecForm )
+		{
+			bool GetParamSuccess = CalABAngleToPreCtrlPntToolVec( nSelectIndex, out Tuple<double, double> param );
+			if( GetParamSuccess ) {
+				toolVecForm.SetParamBack( param );
+			}
+		}
+
+		void SetToolVecOfZDir( int nSelectIndex, ToolVectorDlg toolVecForm )
+		{
+			bool GetParamSuccess = CalABAngleToZDir( nSelectIndex, out Tuple<double, double> param );
+			if( GetParamSuccess ) {
+				toolVecForm.SetParamBack( param );
+			}
+		}
+
+		void SetToolVecParamAndPeview( int VecIndex, ToolVecParam toolVecParam )
+		{
+			SetToolVecParam( VecIndex, toolVecParam );
+			PropertyChanged?.Invoke( m_PathIDList );
+		}
+
+		void ConfirmSetting( int VecIndex, ToolVecParam toolVecParam )
+		{
+			SetToolVecParam( VecIndex, toolVecParam );
+			SetToolVecDone();
+		}
+
+		void CancelSetting( int VecIndex )
+		{
+			SetToolVecParam( VecIndex, m_BackupToolVecParam );
+			SetToolVecDone();
+		}
+
+		gp_Dir GetPreCtrlPntToolVec( List<CADPoint> oriCADPntList, IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap, int nTargetPntIdx, bool isToolVecReverse, bool isPathReverse, bool isClosePath )
+		{
+			List<int> ctrlPntIndexList = toolVecModifyMap.Keys.ToList();
+			int preCtrlIndex = GetPreCtrlPntIndex( nTargetPntIdx, ctrlPntIndexList, isPathReverse, isClosePath );
+
+			// do not have previous control point, return the target point tool vector
+			if( preCtrlIndex == DEFAULT_SELECT_INDEX || preCtrlIndex == nTargetPntIdx ) {
+				return oriCADPntList[ nTargetPntIdx ].NormalVec_1st;
+			}
+			Tuple<double, double> ctrlPntInfo = toolVecModifyMap[ preCtrlIndex ];
+			CAMPoint preCtrlCAMPnt = new CAMPoint( oriCADPntList[ preCtrlIndex ] );
+			gp_Vec targetVec = ToolVecHelper.GetVecFromABAngle( preCtrlCAMPnt,
+				ctrlPntInfo.Item1 * Math.PI / 180.0,
+				ctrlPntInfo.Item2 * Math.PI / 180.0,
+				isToolVecReverse );
+			return new gp_Dir( targetVec.XYZ() );
+		}
+
+		int GetPreCtrlPntIndex( int targetIndex, List<int> ctrlPntIndexList, bool isReverse, bool isClosePath )
+		{
+			// keep the list in order
+			ctrlPntIndexList.Sort();
+			int result = DEFAULT_SELECT_INDEX;
+
+			// find the last index which small than targetIndex
+			if( isReverse == false ) {
+				foreach( int nIndex in ctrlPntIndexList ) {
+					if( nIndex < targetIndex ) {
+						result = nIndex;
+					}
+					else {
+						break;
+					}
+				}
+
+				// unclose path do not find pre ctrl pnt index
+				if( isClosePath == false ) {
+					return targetIndex;
+				}
+
+				// if not found, return the last value of the list (circular logic)
+				if( result == DEFAULT_SELECT_INDEX && ctrlPntIndexList.Count > 0 ) {
+					result = ctrlPntIndexList.Last();
+				}
+			}
+			else {
+				// find the first index which larger than targetIndex
+				foreach( int nIndex in ctrlPntIndexList ) {
+					if( nIndex > targetIndex ) {
+						result = nIndex;
+						break;
+					}
+				}
+
+				// unclose path do not find next ctrl pnt index
+				if( isClosePath == false ) {
+					return targetIndex;
+				}
+
+				// if not found, return the first value of the list (circular logic)
+				if( result == DEFAULT_SELECT_INDEX && ctrlPntIndexList.Count > 0 ) {
+					result = ctrlPntIndexList.First();
+				}
+			}
+			return result;
+		}
+
 		ToolVecParam m_BackupToolVecParam;
 
 		// to storage which vertex keep show high light point on viewer
@@ -164,5 +296,7 @@ namespace MyCAM.Editor
 		CraftData m_CraftData = null;
 		IToolVecCache m_ToolVecCache = null;
 		List<string> m_PathIDList = null;
+
+		const int DEFAULT_SELECT_INDEX = -1;
 	}
 }

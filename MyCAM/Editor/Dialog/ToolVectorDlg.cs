@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MyCAM.App;
+using System;
 using System.Windows.Forms;
-using MyCAM.App;
 
 namespace MyCAM.Editor
 {
@@ -31,7 +31,10 @@ namespace MyCAM.Editor
 
 	public partial class ToolVectorDlg : EditDialogBase<ToolVecParam>
 	{
-		public ToolVectorDlg( ToolVecParam toolVecParam )
+		public Action RaiseKeep;
+		public Action RaiseZDir;
+
+		public ToolVectorDlg( ToolVecParam toolVecParam, bool isReverse )
 		{
 			// struct would not be null
 			if( toolVecParam.Equals( default( ToolVecParam ) ) ) {
@@ -39,14 +42,27 @@ namespace MyCAM.Editor
 			}
 			InitializeComponent();
 			m_ToolVecParam = toolVecParam;
+			m_IsPathRevese = isReverse;
 
 			// initialize textbox
-			m_tbxAngleA.Text = m_ToolVecParam.AngleA_deg.ToString();
-			m_tbxAngleB.Text = m_ToolVecParam.AngleB_deg.ToString();
+			m_tbxAngleA.Text = m_IsPathRevese ? ( -m_ToolVecParam.AngleA_deg ).ToString() : m_ToolVecParam.AngleA_deg.ToString();
+			m_tbxAngleB.Text = m_IsPathRevese ? ( -m_ToolVecParam.AngleB_deg ).ToString() : m_ToolVecParam.AngleB_deg.ToString();
 
 			// initialize button
 			m_btnRemove.Visible = m_ToolVecParam.IsModified;
 		}
+
+		public void SetParamBack( Tuple<double, double> ToolVecParam )
+		{
+			if( ToolVecParam.Item1 < MIN_Angle || ToolVecParam.Item1 > MAX_Angle ||
+				ToolVecParam.Item2 < MIN_Angle || ToolVecParam.Item2 > MAX_Angle ) {
+				return;
+			}
+			m_tbxAngleA.Text = m_IsPathRevese ? ( -ToolVecParam.Item1 ).ToString( "F3" ) : ToolVecParam.Item1.ToString( "F3" );
+			m_tbxAngleB.Text = m_IsPathRevese ? ( -ToolVecParam.Item2 ).ToString( "F3" ) : ToolVecParam.Item2.ToString( "F3" );
+			PreviewToolVecResult();
+		}
+
 
 		protected override void OnShown( EventArgs e )
 		{
@@ -60,8 +76,8 @@ namespace MyCAM.Editor
 		{
 			if( CheckParamValid() ) {
 				m_ToolVecParam.IsModified = true;
-				m_ToolVecParam.AngleA_deg = double.Parse( m_tbxAngleA.Text );
-				m_ToolVecParam.AngleB_deg = double.Parse( m_tbxAngleB.Text );
+				m_ToolVecParam.AngleA_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleA.Text ) : double.Parse( m_tbxAngleA.Text );
+				m_ToolVecParam.AngleB_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleB.Text ) : double.Parse( m_tbxAngleB.Text );
 				RaiseConfirm( m_ToolVecParam );
 			}
 			Close();
@@ -90,9 +106,9 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( "無效字串", MyApp.NoticeType.Warning );
 				return false;
 			}
-			if( angleA_deg <= -180 || angleA_deg >= 180 ||
-			   angleB_deg <= -180 || angleB_deg >= 180 ) {
-				MyApp.Logger.ShowOnLogPanel( "角度必須在 -180~180 範圍內", MyApp.NoticeType.Warning );
+			if( angleA_deg < MIN_Angle || angleA_deg > MAX_Angle ||
+			   angleB_deg < MIN_Angle || angleB_deg > MAX_Angle ) {
+				MyApp.Logger.ShowOnLogPanel( "角度必須在 -60~+60 範圍內", MyApp.NoticeType.Warning );
 				return false;
 			}
 			return true;
@@ -125,11 +141,25 @@ namespace MyCAM.Editor
 		void PreviewToolVecResult()
 		{
 			if( CheckParamValid() ) {
-				m_ToolVecParam.AngleA_deg = double.Parse( m_tbxAngleA.Text );
-				m_ToolVecParam.AngleB_deg = double.Parse( m_tbxAngleB.Text );
+				m_ToolVecParam.AngleA_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleA.Text ) : double.Parse( m_tbxAngleA.Text );
+				m_ToolVecParam.AngleB_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleB.Text ) : double.Parse( m_tbxAngleB.Text );
 				m_ToolVecParam.IsModified = true;
 				RaisePreview( m_ToolVecParam );
 			}
 		}
+
+		void m_btnKeep_Click( object sender, EventArgs e )
+		{
+			RaiseKeep();
+		}
+
+		void m_btnZDir_Click( object sender, EventArgs e )
+		{
+			RaiseZDir();
+		}
+
+		bool m_IsPathRevese = false;
+		const double MAX_Angle = 60.0;
+		const double MIN_Angle = -60.0;
 	}
 }
