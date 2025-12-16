@@ -39,10 +39,10 @@ namespace MyCAM.PathCache
 			List<ISetToolVecPoint> toolVecPointList = m_StartCAMPointList.Cast<ISetToolVecPoint>().ToList();
 			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, true, m_CraftData.IsToolVecReverse );
 
-
-
-
-
+			// set over cut
+			List<IOrientationPoint> camPointOverCutList = m_StartCAMPointList.Cast<IOrientationPoint>().ToList();
+			OverCutHelper.SetStdPatternOverCut( m_RefCoord, m_RectangleGeomData, camPointOverCutList, m_CraftData.OverCutLength, out List<IOrientationPoint> overCutPointList );
+			m_OverCutCAMPointList = overCutPointList.Cast<CAMPoint>().ToList();
 		}
 
 		void SetStartPoint()

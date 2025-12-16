@@ -40,7 +40,7 @@ namespace MyCAM.Helper
 					gp_Pnt overCutEndPoint = GetExactOverCutEndPoint( mainPointList[ i ].Point, mainPointList[ i + 1 ].Point, dRemain );
 
 					// interpolate tool vector
-					InterpolateVecBetween2Point( mainPointList[ i ], mainPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
+					GeomUitility.InterpolateVecBetween2Point( mainPointList[ i ], mainPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
 
 					// create new cam point
 					IOrientationPoint camPoint = BuildOverCutPoint( overCutEndPoint, endPointToolVec, endPointTangentVec );
@@ -50,72 +50,130 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static gp_Pnt GetExactOverCutEndPoint( gp_Pnt currentPoint, gp_Pnt nextPoint, double dDistanceMoveFromOverPoint )
+		public static void SetStdPatternOverCut( gp_Ax3 refCoord, IStdPatternGeomData geomData, List<IOrientationPoint> mainPointList, double overCutLength,
+			out List<IOrientationPoint> overCutPointList, double overCutTolerance = OVERCUT_MATH_TOLERANCE )
 		{
-			// from currentPoint → nextOverLengthPoint
-			gp_Vec movingVec = new gp_Vec( currentPoint, nextPoint );
+			overCutPointList = new List<IOrientationPoint>();
 
-			// normalize to unit vector
-			movingVec.Normalize();
-
-			gp_Vec moveVec = movingVec.Multiplied( dDistanceMoveFromOverPoint );
-
-			// shifted along the vector
-			return new gp_Pnt( currentPoint.XYZ() + moveVec.XYZ() );
-		}
-
-		// get mid point
-		static void InterpolateVecBetween2Point( IOrientationPoint currentCAMPoint, IOrientationPoint nextCAMPoint, gp_Pnt point,
-			out gp_Dir toolDir, out gp_Dir tangentDir )
-		{
-			toolDir = currentCAMPoint.ToolVec;
-			tangentDir = currentCAMPoint.TangentVec;
-
-			// get current and next tool vector
-			gp_Vec currentVec = new gp_Vec( currentCAMPoint.ToolVec );
-			gp_Vec nextVec = new gp_Vec( nextCAMPoint.ToolVec );
-
-			// get current and next tangent vector
-			gp_Vec currentTangentVec = new gp_Vec( currentCAMPoint.TangentVec );
-			gp_Vec nextTangentVec = new gp_Vec( nextCAMPoint.TangentVec );
-
-			// calculate new point percentage
-			double dDistanceOfCAMPath2Point = currentCAMPoint.Point.Distance( nextCAMPoint.Point );
-			double dDistanceBetweenCurrentPoint2NewPoint = currentCAMPoint.Point.Distance( point );
-
-			// two point overlap
-			if( dDistanceOfCAMPath2Point <= OVERCUT_MATH_TOLERANCE ) {
+			if( geomData == null || mainPointList == null || mainPointList.Count == 0 || overCutLength <= 0 ) {
 				return;
 			}
-			double interpolatePercent = dDistanceBetweenCurrentPoint2NewPoint / dDistanceOfCAMPath2Point;
 
-			// get new point dir
-			toolDir = InterpolateVecBetween2Vec( currentVec, nextVec, interpolatePercent );
-			tangentDir = InterpolateVecBetween2Vec( currentTangentVec, nextTangentVec, interpolatePercent );
-		}
-
-		// get vec of mid point
-		static gp_Dir InterpolateVecBetween2Vec( gp_Vec currentVec, gp_Vec nextVec, double interpolatePercent )
-		{
-			// this case is unsolvable, so just return current vec
-			if( currentVec.IsOpposite( nextVec, VECTOR_OPPOSITE_TOLERANCE ) ) {
-				return new gp_Dir( currentVec.XYZ() );
+			// Step 1: Discretize the geometry into orientation points
+			List<IOrientationPoint> discretizedPointList = DiscretizeGeometry( refCoord, geomData );
+			if( discretizedPointList == null || discretizedPointList.Count == 0 ) {
+				return;
 			}
 
-			// get the quaternion for interpolation
-			gp_Quaternion q12 = new gp_Quaternion( currentVec, nextVec );
-			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
+			// Step 2: Find the end point index in the discretized list
+			int endPointIndex = FindClosestPointIndex( discretizedPointList, mainPointList.Last().Clone() );
+			if( endPointIndex < 0 ) {
+				return;
+			}
 
-			// calculate new point attitude
-			gp_Quaternion q = new gp_Quaternion();
-			slerp.Interpolate( interpolatePercent, ref q );
-			gp_Trsf trsf = new gp_Trsf();
-			trsf.SetRotation( q );
-			gp_Dir resultDir = new gp_Dir( currentVec.Transformed( trsf ) );
-			return resultDir;
+			// Step 3: Calculate overcut starting from end point
+			// The path continues from endPointIndex onwards (wrapping around if needed)
+			double dTotalOverCutLength = 0;
+
+			// first point of overcut is the end point
+			overCutPointList.Add( discretizedPointList[ endPointIndex ].Clone() );
+
+			// traverse the path from end point onwards
+			for( int i = 0; i < discretizedPointList.Count; i++ ) {
+				int currentIndex = ( endPointIndex + i ) % discretizedPointList.Count;
+				int nextIndex = ( endPointIndex + i + 1 ) % discretizedPointList.Count;
+
+				// get this edge distance
+				double dDistance = discretizedPointList[ currentIndex ].Point.Distance( discretizedPointList[ nextIndex ].Point );
+				if( dTotalOverCutLength + dDistance < overCutLength ) {
+
+					// still within overcut length → take next point directly
+					overCutPointList.Add( discretizedPointList[ nextIndex ].Clone() );
+					dTotalOverCutLength += dDistance;
+				}
+				else {
+
+					// need to stop inside this segment
+					double dRemain = overCutLength - dTotalOverCutLength;
+					if( dRemain <= overCutTolerance ) {
+						return;
+					}
+
+					// compute new point along segment
+					gp_Pnt overCutEndPoint = GetExactOverCutEndPoint(
+						discretizedPointList[ currentIndex ].Point,
+						discretizedPointList[ nextIndex ].Point,
+						dRemain
+					);
+
+					// interpolate tool vector
+					GeomUitility.InterpolateVecBetween2Point(
+						discretizedPointList[ currentIndex ],
+						discretizedPointList[ nextIndex ],
+						overCutEndPoint,
+						out gp_Dir endPointToolVec,
+						out gp_Dir endPointTangentVec
+					);
+
+					// create new cam point
+					IOrientationPoint camPoint = BuildOverCutPoint( overCutEndPoint, endPointToolVec, endPointTangentVec );
+					overCutPointList.Add( camPoint );
+					return;
+				}
+			}
 		}
 
-		// this method is now for building a CAMPoint as OverCutPoint
+		static int FindClosestPointIndex( List<IOrientationPoint> pointList, IOrientationPoint targetPoint )
+		{
+			if( pointList == null || pointList.Count == 0 || targetPoint == null ) {
+				return -1;
+			}
+
+			int closestIndex = 0;
+			double minDistance = pointList[ 0 ].Point.Distance( targetPoint.Point );
+
+			for( int i = 1; i < pointList.Count; i++ ) {
+				double distance = pointList[ i ].Point.Distance( targetPoint.Point );
+				if( distance < minDistance ) {
+					minDistance = distance;
+					closestIndex = i;
+				}
+			}
+
+			return closestIndex;
+		}
+
+		static List<IOrientationPoint> DiscretizeGeometry( gp_Ax3 refCoord, IStdPatternGeomData geomData )
+		{
+			switch( geomData.PathType ) {
+				case PathType.Circle:
+					if( !( geomData is CircleGeomData circleData ) ) {
+						return null;
+					}
+					return DiscreteStdPatternHelper.DiscretizeCircle( refCoord, circleData );
+				case PathType.Rectangle:
+					if( !( geomData is RectangleGeomData rectangleData ) ) {
+						return null;
+					}
+					return DiscreteStdPatternHelper.DiscretizeRectangle( refCoord, rectangleData );
+				case PathType.Runway:
+					if( !( geomData is RunwayGeomData runwayData ) ) {
+						return null;
+					}
+					return DiscreteStdPatternHelper.DiscretizeRunway( refCoord, runwayData );
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					if( !( geomData is PolygonGeomData polygonData ) ) {
+						return null;
+					}
+					return DiscreteStdPatternHelper.DiscretizePolygon( refCoord, polygonData );
+				default:
+					return null;
+			}
+		}
+
 		static IOrientationPoint BuildOverCutPoint( gp_Pnt overCutEndPoint, gp_Dir endPointToolVec, gp_Dir endPointTangentVec )
 		{
 			CADPoint cadPoint = new CADPoint( overCutEndPoint, endPointToolVec, endPointToolVec, endPointTangentVec );
@@ -123,7 +181,19 @@ namespace MyCAM.Helper
 			return camPoint;
 		}
 
+		static gp_Pnt GetExactOverCutEndPoint( gp_Pnt currentPoint, gp_Pnt nextPoint, double dDistanceMoveFromOverPoint )
+		{
+			// from currentPoint → nextOverLengthPoint
+			gp_Vec movingVec = new gp_Vec( currentPoint, nextPoint );
+
+			// normalize to unit vector
+			movingVec.Normalize();
+			gp_Vec moveVec = movingVec.Multiplied( dDistanceMoveFromOverPoint );
+
+			// shifted along the vector
+			return new gp_Pnt( currentPoint.XYZ() + moveVec.XYZ() );
+		}
+
 		const double OVERCUT_MATH_TOLERANCE = 0.001;
-		const double VECTOR_OPPOSITE_TOLERANCE = 0.001;
 	}
 }

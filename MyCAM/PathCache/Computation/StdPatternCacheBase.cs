@@ -78,6 +78,9 @@ namespace MyCAM.PathCache
 
 		public void DoTransform( gp_Trsf transform )
 		{
+			foreach( CADPoint cadPoint in m_StartCADPointList ) {
+				cadPoint.Transform( transform );
+			}
 			m_RefCoord.Transform( transform );
 			BuildCAMPointList();
 		}

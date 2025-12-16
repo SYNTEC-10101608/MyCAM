@@ -25,7 +25,6 @@ namespace MyCAM.PathCache
 			ClearCraftDataDirty();
 			m_RefPoint = RunwayRefPoint();
 
-
 			// build initial CAM point list
 			m_StartCAMPointList = new List<CAMPoint>();
 			for( int i = 0; i < m_StartCADPointList.Count; i++ ) {
@@ -38,6 +37,11 @@ namespace MyCAM.PathCache
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_StartCAMPointList.Cast<ISetToolVecPoint>().ToList();
 			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, true, m_CraftData.IsToolVecReverse );
+
+			// set over cut
+			List<IOrientationPoint> camPointOverCutList = m_StartCAMPointList.Cast<IOrientationPoint>().ToList();
+			OverCutHelper.SetStdPatternOverCut( m_RefCoord, m_RunwayGeomData, camPointOverCutList, m_CraftData.OverCutLength, out List<IOrientationPoint> overCutPointList );
+			m_OverCutCAMPointList = overCutPointList.Cast<CAMPoint>().ToList();
 		}
 
 		void SetStartPoint()
