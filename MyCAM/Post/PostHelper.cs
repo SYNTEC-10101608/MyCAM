@@ -282,24 +282,24 @@ namespace MyCAM.Post
 			int n = singularTagList.Count;
 			int i = 0;
 
-			// find singular regions and interpolate
-			while( i < n ) {
+		// find singular regions and interpolate
+		while( i < n ) {
 
-				// skip non-singular points
-				if( !singularTagList[ i ] ) {
-					i++;
-					continue;
-				}
+			// skip non-singular points or points with IsToolVecModPoint == true
+			if( !singularTagList[ i ] || pointList[ i ].IsToolVecModPoint ) {
+				i++;
+				continue;
+			}
 
-				// found a singular point, find the range [regionStart, regionEnd]
-				int regionStart = i;
-				int regionEnd = i;
+			// found a singular point, find the range [regionStart, regionEnd]
+			int regionStart = i;
+			int regionEnd = i;
 
-				// extend to find the complete singular region
-				while( regionEnd < n && singularTagList[ regionEnd ] ) {
-					regionEnd++;
-				}
-				regionEnd--; // back to last singular point
+			// extend to find the complete singular region (singular and not IsToolVecModPoint)
+			while( regionEnd < n && singularTagList[ regionEnd ] && !pointList[ regionEnd ].IsToolVecModPoint ) {
+				regionEnd++;
+			}
+			regionEnd--; // back to last singular point
 
 				// determine start values for interpolation
 				double startM, startS;

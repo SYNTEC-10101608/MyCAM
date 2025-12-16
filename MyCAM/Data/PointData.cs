@@ -128,6 +128,12 @@ namespace MyCAM.Data
 			get;
 		}
 
+		// sorry, but this is the best way to solve the problem now
+		bool IsToolVecModPoint
+		{
+			get;
+		}
+
 		IProcessPoint Clone();
 	}
 
