@@ -2,28 +2,21 @@
 
 namespace MyCAM.Data
 {
-	public enum LeadGeomType
-	{
-		None = 0,
-		Line,
-		Arc,
-	}
-
 	public class LeadGeom
 	{
-		public LeadGeom( LeadGeomType type = LeadGeomType.None, double length = 0, double angle = 0 )
+		public LeadGeom( double straightLength = 0, double arclength = 0, double angle = 0 )
 		{
-			Type = type;
-			Length = length;
+			StraightLength = straightLength;
+			ArcLength = arclength;
 			Angle = angle;
 		}
 
-		public LeadGeomType Type
+		public double StraightLength
 		{
 			get; set;
 		}
 
-		public double Length
+		public double ArcLength
 		{
 			get; set;
 		}
@@ -36,11 +29,10 @@ namespace MyCAM.Data
 
 	public class LeadData
 	{
-		public LeadData( LeadGeomType leadInType = LeadGeomType.None, LeadGeomType leadOutType = LeadGeomType.None,
-			double dLeadInLength = 0, double dLeadInAngle = 0, double dLeadOutLength = 0, double dLeadOutAngle = 0, bool isChangeLeadDirection = false )
+		public LeadData( double dLeadInStraightLineLength = 0, double dLeadInArcLength = 0, double dLeadInAngle = 0, double dLeadOutStraightLineLength = 0, double dLeadOutArcLength = 0, double dLeadOutAngle = 0, bool isChangeLeadDirection = false )
 		{
-			LeadIn = new LeadGeom( leadInType, dLeadInLength, dLeadInAngle );
-			LeadOut = new LeadGeom( leadOutType, dLeadOutLength, dLeadOutAngle );
+			LeadIn = new LeadGeom( dLeadInStraightLineLength, dLeadInArcLength, dLeadInAngle );
+			LeadOut = new LeadGeom( dLeadOutStraightLineLength, dLeadOutArcLength, dLeadOutAngle );
 			IsChangeLeadDirection = isChangeLeadDirection;
 		}
 
@@ -100,11 +92,11 @@ namespace MyCAM.Data
 		public LeadData Clone()
 		{
 			return new LeadData(
-				LeadIn.Type,
-				LeadOut.Type,
-				LeadIn.Length,
+				LeadIn.StraightLength,
+				LeadIn.ArcLength,
 				LeadIn.Angle,
-				LeadOut.Length,
+				LeadOut.StraightLength,
+				LeadOut.ArcLength,
 				LeadOut.Angle,
 				IsChangeLeadDirection
 			);

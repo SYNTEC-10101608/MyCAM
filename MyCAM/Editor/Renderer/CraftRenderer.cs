@@ -63,14 +63,14 @@ namespace MyCAM.Editor.Renderer
 		void ShowLeadInLine( List<string> pathIDList )
 		{
 			ShowLeadLine( pathIDList, m_LeadInAISDict,
-				( leadData ) => leadData.LeadIn.Type != LeadGeomType.None,
+				( leadData ) => HasLeadIn( leadData ),
 				GetLeadInPointList );
 		}
 
 		void ShowLeadOutLine( List<string> pathIDList )
 		{
 			ShowLeadLine( pathIDList, m_LeadOutAISDict,
-				( leadData ) => leadData.LeadOut.Type != LeadGeomType.None,
+				( leadData ) => HasLeadOut( leadData ),
 				GetLeadOutPointList );
 		}
 
@@ -84,11 +84,39 @@ namespace MyCAM.Editor.Renderer
 			RemoveLines( m_LeadOutAISDict, pathIDList );
 		}
 
-		void ShowLeadLine(
-			List<string> pathIDList,
-			Dictionary<string, List<AIS_Line>> lineDict,
-			System.Func<LeadData, bool> needShowFunc,
-			System.Func<string, IReadOnlyList<IProcessPoint>> getPointListFunc )
+		/// <summary>
+		/// Check if lead in exists (has arc or line)
+		/// </summary>
+		bool HasLeadIn( LeadData leadData )
+		{
+			if( leadData == null || leadData.LeadIn == null ) {
+				return false;
+			}
+
+			LeadGeom leadIn = leadData.LeadIn;
+			bool hasArc = leadIn.ArcLength > 0 && leadIn.Angle > 0;
+			bool hasLine = leadIn.StraightLength > 0;
+
+			return hasArc || hasLine;
+		}
+
+		/// <summary>
+		/// Check if lead out exists (has arc or line)
+		/// </summary>
+		bool HasLeadOut( LeadData leadData )
+		{
+			if( leadData == null || leadData.LeadOut == null ) {
+				return false;
+			}
+
+			LeadGeom leadOut = leadData.LeadOut;
+			bool hasArc = leadOut.ArcLength > 0 && leadOut.Angle > 0;
+			bool hasLine = leadOut.StraightLength > 0;
+
+			return hasArc || hasLine;
+		}
+
+		void ShowLeadLine( List<string> pathIDList, Dictionary<string, List<AIS_Line>> lineDict, System.Func<LeadData, bool> needShowFunc, System.Func<string, IReadOnlyList<IProcessPoint>> getPointListFunc )
 		{
 			foreach( string szPathID in pathIDList ) {
 				LeadData leadData = GetLeadData( szPathID );

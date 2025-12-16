@@ -132,7 +132,7 @@ namespace MyCAM.Post
 			}
 
 			// lead-in
-			if( currentPathNCPack.LeadData.LeadIn.Type != LeadGeomType.None && currentPathNCPack.LeadInCAMPointList.Count > 0 ) {
+			if( HasLeadIn( currentPathNCPack.LeadData ) && currentPathNCPack.LeadInCAMPointList.Count > 0 ) {
 				if( pathG54PostData.MainPathPostPointList.Count == 0 ) {
 					return false;
 				}
@@ -149,7 +149,7 @@ namespace MyCAM.Post
 			}
 
 			// lead-out
-			if( currentPathNCPack.LeadData.LeadOut.Type != LeadGeomType.None && currentPathNCPack.LeadOutCAMPointList.Count > 0 ) {
+			if( HasLeadOut( currentPathNCPack.LeadData ) && currentPathNCPack.LeadOutCAMPointList.Count > 0 ) {
 				if( !BuildProcessPath( currentPathNCPack.LeadOutCAMPointList, dLastPointProcess_M, dLastPointProcess_S,
 					out List<PostPoint> leadOutG54 ) ) {
 					return false;
@@ -381,6 +381,22 @@ namespace MyCAM.Post
 				Slave = pathG54PostData.ProcessStartPoint.Slave
 			};
 			pathG54PostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
+		}
+
+		static bool HasLeadIn( LeadData leadData )
+		{
+			if( leadData == null ) {
+				return false;
+			}
+			return leadData.LeadIn.StraightLength != 0 || leadData.LeadIn.ArcLength != 0;
+		}
+
+		static bool HasLeadOut( LeadData leadData )
+		{
+			if( leadData == null ) {
+				return false;
+			}
+			return leadData.LeadOut.StraightLength != 0 || leadData.LeadOut.ArcLength != 0;
 		}
 
 		#endregion

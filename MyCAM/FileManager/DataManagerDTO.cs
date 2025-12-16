@@ -1030,25 +1030,25 @@ namespace MyCAM.FileManager
 
 	public class LeadDataDTO
 	{
-		public int LeadInType
+		public double LeadInStraightLength
 		{
 			get;
 			set;
 		}
 
-		public int LeadOutType
+		public double LeadInArcLength
 		{
 			get;
 			set;
 		}
 
-		public double LeadInLength
+		public double LeadOutStraightLength
 		{
 			get;
 			set;
 		}
 
-		public double LeadOutLength
+		public double LeadOutArcLength
 		{
 			get;
 			set;
@@ -1083,10 +1083,10 @@ namespace MyCAM.FileManager
 			if( leadData == null ) {
 				return;
 			}
-			LeadInType = (int)leadData.LeadIn.Type;
-			LeadOutType = (int)leadData.LeadOut.Type;
-			LeadInLength = leadData.LeadIn.Length;
-			LeadOutLength = leadData.LeadOut.Length;
+			LeadInStraightLength = leadData.LeadIn.StraightLength;
+			LeadOutStraightLength = leadData.LeadOut.StraightLength;
+			LeadInArcLength = leadData.LeadIn.ArcLength;
+			LeadOutArcLength = leadData.LeadOut.ArcLength;
 			LeadInAngle = leadData.LeadIn.Angle;
 			LeadOutAngle = leadData.LeadOut.Angle;
 			IsChangeLeadDirection = leadData.IsChangeLeadDirection;
@@ -1094,21 +1094,7 @@ namespace MyCAM.FileManager
 
 		internal LeadData ToLeadData()
 		{
-			LeadGeomType leadInType;
-			if( Enum.IsDefined( typeof( LeadGeomType ), LeadInType ) ) {
-				leadInType = (LeadGeomType)LeadInType;
-			}
-			else {
-				throw new ArgumentException( "LeadData deserialization failed." );
-			}
-			LeadGeomType leadOutType;
-			if( Enum.IsDefined( typeof( LeadGeomType ), LeadOutType ) ) {
-				leadOutType = (LeadGeomType)LeadOutType;
-			}
-			else {
-				throw new ArgumentException( "LeadData deserialization failed." );
-			}
-			return new LeadData( leadInType, leadOutType, LeadInLength, LeadInAngle, LeadOutLength, LeadOutAngle, IsChangeLeadDirection );
+			return new LeadData( LeadInStraightLength, LeadInArcLength, LeadInAngle, LeadOutStraightLength, LeadOutArcLength, LeadOutAngle, IsChangeLeadDirection );
 		}
 	}
 

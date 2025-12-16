@@ -93,14 +93,14 @@ namespace MyCAM.Editor.Renderer
 		void ShowLeadInOrientation( List<string> pathIDList )
 		{
 			ShowLeadOrientation( pathIDList, m_LeadInOrientationAISDict,
-				( leadData ) => leadData.LeadIn.Type != LeadGeomType.None,
+				( leadData ) => HasLeadIn( leadData ),
 				GetLeadInFirstPoint );
 		}
 
 		void ShowLeadOutOrientation( List<string> pathIDList )
 		{
 			ShowLeadOrientation( pathIDList, m_LeadOutOrientationAISDict,
-				( leadData ) => leadData.LeadOut.Type != LeadGeomType.None,
+				( leadData ) => HasLeadOut( leadData ),
 				GetLeadOutLastPoint );
 		}
 
@@ -112,6 +112,38 @@ namespace MyCAM.Editor.Renderer
 		void RemoveLeadOutOrientation( List<string> pathIDList )
 		{
 			RemoveOrientations( m_LeadOutOrientationAISDict, pathIDList );
+		}
+
+		/// <summary>
+		/// Check if lead in exists (has arc or line)
+		/// </summary>
+		bool HasLeadIn( LeadData leadData )
+		{
+			if( leadData == null || leadData.LeadIn == null ) {
+				return false;
+			}
+
+			LeadGeom leadIn = leadData.LeadIn;
+			bool hasArc = leadIn.ArcLength > 0 && leadIn.Angle > 0;
+			bool hasLine = leadIn.StraightLength > 0;
+
+			return hasArc || hasLine;
+		}
+
+		/// <summary>
+		/// Check if lead out exists (has arc or line)
+		/// </summary>
+		bool HasLeadOut( LeadData leadData )
+		{
+			if( leadData == null || leadData.LeadOut == null ) {
+				return false;
+			}
+
+			LeadGeom leadOut = leadData.LeadOut;
+			bool hasArc = leadOut.ArcLength > 0 && leadOut.Angle > 0;
+			bool hasLine = leadOut.StraightLength > 0;
+
+			return hasArc || hasLine;
 		}
 
 		void ShowLeadOrientation(

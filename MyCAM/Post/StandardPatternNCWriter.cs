@@ -18,8 +18,8 @@ namespace MyCAM.Post
 				throw new ArgumentException( "Invalid geometry data type for Circle pattern" );
 			}
 
-			double linearLeadInLength = craftData.LeadData.LeadIn.Type == LeadGeomType.Line ? craftData.LeadData.LeadIn.Length : 0;
-			double arcLeadOutLength = craftData.LeadData.LeadIn.Type == LeadGeomType.Arc ? craftData.LeadData.LeadIn.Length : 0;
+			double linearLeadInLength = craftData.LeadData.LeadIn.StraightLength;
+			double arcLeadOutLength = craftData.LeadData.LeadIn.ArcLength;
 
 			writer.WriteLine( "G65 P\"SY_CIRC\"" +
 				" X" + postData.RefPoint.X.ToString( "F3" ) +
@@ -44,8 +44,8 @@ namespace MyCAM.Post
 				throw new ArgumentException( "Invalid geometry data type for Rectangle pattern" );
 			}
 
-			double linearLeadInLength = craftData.LeadData.LeadIn.Type == LeadGeomType.Line ? craftData.LeadData.LeadIn.Length : 0;
-			double arcLeadOutLength = craftData.LeadData.LeadIn.Type == LeadGeomType.Arc ? craftData.LeadData.LeadIn.Length : 0;
+			double linearLeadInLength = craftData.LeadData.LeadIn.StraightLength;
+			double arcLeadOutLength = craftData.LeadData.LeadIn.ArcLength;
 
 			writer.WriteLine( "G65 P\"SY_RECT\"" +
 				" X" + postData.RefPoint.X.ToString( "F3" ) +
@@ -73,8 +73,8 @@ namespace MyCAM.Post
 				throw new ArgumentException( "Invalid geometry data type for Runway pattern" );
 			}
 
-			double linearLeadInLength = craftData.LeadData.LeadIn.Type == LeadGeomType.Line ? craftData.LeadData.LeadIn.Length : 0;
-			double arcLeadOutLength = craftData.LeadData.LeadIn.Type == LeadGeomType.Arc ? craftData.LeadData.LeadIn.Length : 0;
+			double linearLeadInLength = craftData.LeadData.LeadIn.StraightLength;
+			double arcLeadOutLength = craftData.LeadData.LeadIn.ArcLength;
 
 			writer.WriteLine( "G65 P\"SY_RUNWAY\"" +
 				" X" + postData.RefPoint.X.ToString( "F3" ) +
@@ -101,8 +101,8 @@ namespace MyCAM.Post
 				throw new ArgumentException( "Invalid geometry data type for Polygon pattern" );
 			}
 
-			double linearLeadInLength = craftData.LeadData.LeadIn.Type == LeadGeomType.Line ? craftData.LeadData.LeadIn.Length : 0;
-			double arcLeadOutLength = craftData.LeadData.LeadIn.Type == LeadGeomType.Arc ? craftData.LeadData.LeadIn.Length : 0;
+			double linearLeadInLength = craftData.LeadData.LeadIn.StraightLength;
+			double arcLeadOutLength = craftData.LeadData.LeadIn.ArcLength;
 
 			writer.WriteLine( "G65 P\"SY_POLYGON\"" +
 				" X" + postData.RefPoint.X.ToString( "F3" ) +

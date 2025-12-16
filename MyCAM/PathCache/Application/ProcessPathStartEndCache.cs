@@ -17,7 +17,7 @@ namespace MyCAM.PathCache
 		public IProcessPoint GetProcessStartPoint()
 		{
 			CAMPoint camPoint = null;
-			if( m_PathCache.LeadInPointList.Count > 0 && m_CraftData.LeadData.LeadIn.Length > 0 ) {
+			if( m_PathCache.LeadInPointList.Count > 0 && ( m_CraftData.LeadData.LeadIn.StraightLength > 0 || m_CraftData.LeadData.LeadIn.ArcLength > 0 ) ) {
 				camPoint = m_PathCache.LeadInPointList.First().Clone();
 			}
 			else if( m_PathCache.MainPathPointList.Count > 0 ) {
@@ -29,7 +29,7 @@ namespace MyCAM.PathCache
 		public IProcessPoint GetProcessEndPoint()
 		{
 			CAMPoint camPoint = null;
-			if( m_PathCache.LeadOutPointList.Count > 0 && m_CraftData.LeadData.LeadOut.Length > 0 ) {
+			if( m_PathCache.LeadOutPointList.Count > 0 && ( m_CraftData.LeadData.LeadOut.StraightLength > 0 || m_CraftData.LeadData.LeadOut.ArcLength > 0 ) ) {
 				camPoint = m_PathCache.LeadOutPointList.Last().Clone();
 			}
 			else if( m_PathCache.OverCutPointList.Count > 0 && m_CraftData.OverCutLength > 0 ) {
