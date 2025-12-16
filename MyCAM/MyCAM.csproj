@@ -61,6 +61,7 @@
     <Compile Include="PathCache\Application\MainPathStartPointCache.cs" />
     <Compile Include="PathCache\Application\OrientationCache.cs" />
     <Compile Include="PathCache\Application\OverCutCache.cs" />
+    <Compile Include="Helper\CAD\StdPatternStartPointFactory.cs" />
     <Compile Include="PathCache\PathCacheProvider.cs" />
     <Compile Include="PathCache\Application\PathReverseCache.cs" />
     <Compile Include="PathCache\Computation\PolygonCache.cs" />
@@ -205,7 +206,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Helper\CAD\StdPatterWireFactory.cs" />
+    <Compile Include="Helper\CAD\StdPatternWireFactory.cs" />
     <Compile Include="Helper\CAD\StdPatternHelper.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>

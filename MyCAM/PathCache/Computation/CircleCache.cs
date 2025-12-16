@@ -1,7 +1,9 @@
 ﻿using MyCAM.Data;
+using MyCAM.Helper;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.PathCache
 {
@@ -14,6 +16,7 @@ namespace MyCAM.PathCache
 				throw new ArgumentNullException( "CircleCache constructing argument error - invalid geomData" );
 			}
 			m_CircleGeomData = circleGeomData;
+			m_StartCADPointList = StdPatternStartPointFactory.GetStartPointList( m_RefCoord, circleGeomData );
 			BuildCAMPointList();
 		}
 
@@ -21,44 +24,36 @@ namespace MyCAM.PathCache
 		{
 			ClearCraftDataDirty();
 			m_RefPoint = new CAMPoint( new CADPoint( m_RefCoord.Location(), m_RefCoord.Direction(), m_RefCoord.XDirection(), m_RefCoord.YDirection() ), m_RefCoord.Direction() );
-			m_StartPointList = CircleCacheExtensions.GetStartPointList( m_RefCoord, m_CircleGeomData.Diameter );
 
-			// close the loop
-			m_StartPointList.Add( m_StartPointList[ 0 ].Clone() );
+			// build initial CAM point list
+			m_StartCAMPointList = new List<CAMPoint>();
+			for( int i = 0; i < m_StartCADPointList.Count; i++ ) {
+				CADPoint cadPoint = m_StartCADPointList[ i ];
+				CAMPoint camPoint = new CAMPoint( cadPoint );
+				m_StartCAMPointList.Add( camPoint );
+			}
+			SetStartPoint();
+
+			// set tool vector
+			List<ISetToolVecPoint> toolVecPointList = m_StartCAMPointList.Cast<ISetToolVecPoint>().ToList();
+			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, true, m_CraftData.IsToolVecReverse );
+
+
+		}
+
+		void SetStartPoint()
+		{
+			// rearrange cam points to start from the start index
+			if( m_CraftData.StartPointIndex != 0 ) {
+				List<CAMPoint> newStartPointList = new List<CAMPoint>();
+				for( int i = 0; i < m_StartCAMPointList.Count; i++ ) {
+					newStartPointList.Add( m_StartCAMPointList[ ( i + m_CraftData.StartPointIndex ) % m_StartCAMPointList.Count ] );
+				}
+				m_StartCAMPointList = newStartPointList;
+			}
+			m_StartCAMPointList.Add( m_StartCAMPointList[ 0 ].Clone() ); // close the circle
 		}
 
 		CircleGeomData m_CircleGeomData;
-	}
-
-	internal static class CircleCacheExtensions
-	{
-		internal static List<CAMPoint> GetStartPointList( gp_Ax3 refCoord, double diameter )
-		{
-			gp_Pnt centerPoint = refCoord.Location();
-			double radius = diameter / 2;
-
-			// directly calculate intersection point along ref coord X-axis direction
-			// intersection point = center + X-axis direction * radius
-			gp_Dir xDirection = refCoord.XDirection();
-			gp_Vec radiusVector = new gp_Vec( xDirection.XYZ() * radius );
-			gp_Pnt intersectionPoint = centerPoint.Translated( radiusVector );
-
-			// define various vectors (in target coordinate system)
-			gp_Dir normal = refCoord.Direction();
-			gp_Dir radialIn = xDirection.Reversed();
-			gp_Dir tangent = refCoord.YDirection().Reversed();
-			gp_Dir toolVec = normal;
-
-			// create CADPoint and CAMPoint
-			CADPoint cadPoint = new CADPoint( intersectionPoint, normal, radialIn, tangent );
-			CAMPoint camPoint = new CAMPoint( cadPoint, toolVec );
-
-			// return list containing single point
-			List<CAMPoint> resultList = new List<CAMPoint>
-			{
-				camPoint
-			};
-			return resultList;
-		}
 	}
 }

@@ -1,7 +1,9 @@
 using MyCAM.Data;
+using MyCAM.Helper;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.PathCache
 {
@@ -14,6 +16,7 @@ namespace MyCAM.PathCache
 				throw new ArgumentNullException( "RectangleCache constructing argument error - invalid geomData" );
 			}
 			m_RectangleGeomData = rectangleGeomData;
+			m_StartCADPointList = StdPatternStartPointFactory.GetStartPointList( m_RefCoord, rectangleGeomData );
 			BuildCAMPointList();
 		}
 
@@ -21,71 +24,40 @@ namespace MyCAM.PathCache
 		{
 			ClearCraftDataDirty();
 			m_RefPoint = new CAMPoint( new CADPoint( m_RefCoord.Location(), m_RefCoord.Direction(), m_RefCoord.XDirection(), m_RefCoord.YDirection() ), m_RefCoord.Direction() );
-			m_StartPointList = RectangleCacheExtensions.GetStartPointList( m_RefCoord, m_RectangleGeomData.Length, m_RectangleGeomData.Width );
 
-			// close the loop
-			m_StartPointList.Add( m_StartPointList[ 0 ].Clone() );
+
+			// build initial CAM point list
+			m_StartCAMPointList = new List<CAMPoint>();
+			for( int i = 0; i < m_StartCADPointList.Count; i++ ) {
+				CADPoint cadPoint = m_StartCADPointList[ i ];
+				CAMPoint camPoint = new CAMPoint( cadPoint );
+				m_StartCAMPointList.Add( camPoint );
+			}
+			SetStartPoint();
+
+			// set tool vector
+			List<ISetToolVecPoint> toolVecPointList = m_StartCAMPointList.Cast<ISetToolVecPoint>().ToList();
+			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, true, m_CraftData.IsToolVecReverse );
+
+
+
+
+
+		}
+
+		void SetStartPoint()
+		{
+			// rearrange cam points to start from the start index
+			if( m_CraftData.StartPointIndex != 0 ) {
+				List<CAMPoint> newStartPointList = new List<CAMPoint>();
+				for( int i = 0; i < m_StartCAMPointList.Count; i++ ) {
+					newStartPointList.Add( m_StartCAMPointList[ ( i + m_CraftData.StartPointIndex ) % m_StartCAMPointList.Count ] );
+				}
+				m_StartCAMPointList = newStartPointList;
+			}
+			m_StartCAMPointList.Add( m_StartCAMPointList[ 0 ].Clone() ); // close the polygon
 		}
 
 		RectangleGeomData m_RectangleGeomData;
-	}
-
-	internal static class RectangleCacheExtensions
-	{
-		internal static List<CAMPoint> GetStartPointList( gp_Ax3 refCoord, double longSideLength, double shortSideLength )
-		{
-			gp_Pnt centerPoint = refCoord.Location();
-			gp_Pln plane = new gp_Pln( refCoord );
-			double halfL = longSideLength / 2.0;
-			double halfW = shortSideLength / 2.0;
-
-			gp_Dir local_X_pos = gp.DX();
-			gp_Dir local_X_neg = gp.DX().Reversed();
-			gp_Dir local_Y_pos = gp.DY();
-			gp_Dir local_Y_neg = gp.DY().Reversed();
-			gp_Dir local_Z_pos = gp.DZ();
-
-			gp_Pnt local_Pnt_L_Pos = new gp_Pnt( halfL, 0, 0 );
-			gp_Dir local_N1_L_Pos = local_Z_pos;
-			gp_Dir local_N2_L_Pos = local_X_neg;
-			gp_Dir local_Tan_L_Pos = local_Y_neg;
-			gp_Dir local_Tool_L_Pos = local_Z_pos;
-
-			gp_Pnt local_Pnt_S_Neg = new gp_Pnt( 0, -halfW, 0 );
-			gp_Dir local_N1_S_Neg = local_Z_pos;
-			gp_Dir local_N2_S_Neg = local_Y_pos;
-			gp_Dir local_Tan_S_Neg = local_X_neg;
-			gp_Dir local_Tool_S_Neg = local_Z_pos;
-
-			gp_Ax3 targetCoordSystem = new gp_Ax3( centerPoint, plane.Axis().Direction(), plane.XAxis().Direction() );
-
-			gp_Ax3 finalCoordSystem = targetCoordSystem.Rotated( plane.Axis(), 0 );
-			gp_Trsf transformation = new gp_Trsf();
-			transformation.SetTransformation( finalCoordSystem, new gp_Ax3() );
-
-			CADPoint cad_L_Pos = new CADPoint(
-				local_Pnt_L_Pos.Transformed( transformation ),
-				local_N1_L_Pos.Transformed( transformation ),
-				local_N2_L_Pos.Transformed( transformation ),
-				local_Tan_L_Pos.Transformed( transformation )
-			);
-			CAMPoint cam_L_Pos = new CAMPoint( cad_L_Pos, local_Tool_L_Pos.Transformed( transformation ) );
-
-			CADPoint cad_S_Neg = new CADPoint(
-				local_Pnt_S_Neg.Transformed( transformation ),
-				local_N1_S_Neg.Transformed( transformation ),
-				local_N2_S_Neg.Transformed( transformation ),
-				local_Tan_S_Neg.Transformed( transformation )
-			);
-			CAMPoint cam_S_Neg = new CAMPoint( cad_S_Neg, local_Tool_S_Neg.Transformed( transformation ) );
-
-			List<CAMPoint> resultList = new List<CAMPoint>
-			{
-				cam_L_Pos,
-				cam_S_Neg,
-			};
-
-			return resultList;
-		}
 	}
 }

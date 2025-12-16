@@ -137,7 +137,7 @@ namespace MyCAM.PathCache
 
 		void SetStartPoint()
 		{
-			// rearrange cam points to start from the strt index
+			// rearrange cam points to start from the start index
 			if( m_CraftData.StartPointIndex != 0 ) {
 				List<CAMPoint> newCAMPointList = new List<CAMPoint>();
 				for( int i = 0; i < m_CAMPointList.Count; i++ ) {

@@ -27,7 +27,7 @@ namespace MyCAM.PathCache
 				if( m_IsCraftDataDirty ) {
 					BuildCAMPointList();
 				}
-				return m_StartPointList;
+				return m_StartCAMPointList;
 			}
 		}
 
@@ -105,7 +105,8 @@ namespace MyCAM.PathCache
 		#region Protected Fields
 
 		protected gp_Ax3 m_RefCoord;
-		protected List<CAMPoint> m_StartPointList = new List<CAMPoint>();
+		protected List<CADPoint> m_StartCADPointList = new List<CADPoint>();
+		protected List<CAMPoint> m_StartCAMPointList = new List<CAMPoint>();
 		protected List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		protected List<CAMPoint> m_OverCutCAMPointList = new List<CAMPoint>();
 		protected CraftData m_CraftData;

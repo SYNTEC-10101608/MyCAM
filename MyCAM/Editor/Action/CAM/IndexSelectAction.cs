@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
 using OCC.TopAbs;
@@ -7,6 +8,7 @@ using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -20,11 +22,11 @@ namespace MyCAM.Editor
 				throw new ArgumentNullException( "IndexSelectAction constructing argument null" );
 			}
 			m_PathID = pathID;
-			if( !DataGettingHelper.GetGeomDataByID( m_PathID, out IGeomData geomData )
-				|| !( geomData is ContourGeomData contourGeomData ) ) {
+			if( !PathCacheProvider.TryGetMainPathCache( pathID, out IMainPathCache mainPathCache ) ) {
 				throw new ArgumentException( "IndexSelectAction constructing argument invalid pathID" );
 			}
-			m_ContourGeomData = contourGeomData;
+
+			m_ProcessPoints = mainPathCache.MainPathPointList;
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}
@@ -111,8 +113,8 @@ namespace MyCAM.Editor
 			BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
 
 			// add points to the polygon
-			for( int i = 0; i < m_ContourGeomData.CADPointList.Count; i++ ) {
-				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_ContourGeomData.CADPointList[ i ].Point );
+			for( int i = 0; i < m_ProcessPoints.Count; i++ ) {
+				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_ProcessPoints[ i ].Point );
 				polygonMaker.Add( vertexMaker.Vertex() );
 				m_VertexMap.Bind( vertexMaker.Vertex(), i );
 			}
@@ -127,7 +129,7 @@ namespace MyCAM.Editor
 		}
 
 		protected string m_PathID;
-		protected ContourGeomData m_ContourGeomData;
+		protected IReadOnlyList<IProcessPoint> m_ProcessPoints;
 
 		// map point on view to index on CAMData
 		protected TopTools_DataMapOfShapeInteger m_VertexMap;
