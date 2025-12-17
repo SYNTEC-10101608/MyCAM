@@ -52,7 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helper\CAD\DiscreteStdPatternHelper.cs" />
+    <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
     <Compile Include="PathCache\Application\MainPathPointCache.cs" />
     <Compile Include="PathCache\Application\TraverseDataCache.cs" />
     <Compile Include="PathCache\Computation\CircleCache.cs" />
@@ -62,7 +62,7 @@
     <Compile Include="PathCache\Application\MainPathStartPointCache.cs" />
     <Compile Include="PathCache\Application\OrientationCache.cs" />
     <Compile Include="PathCache\Application\OverCutCache.cs" />
-    <Compile Include="Helper\CAD\StdPatternStartPointFactory.cs" />
+    <Compile Include="Helper\CAD\StdPatternStartPointListFactory.cs" />
     <Compile Include="PathCache\PathCacheProvider.cs" />
     <Compile Include="PathCache\Application\PathReverseCache.cs" />
     <Compile Include="PathCache\Computation\PolygonCache.cs" />

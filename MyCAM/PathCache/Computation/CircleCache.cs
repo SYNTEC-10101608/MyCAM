@@ -16,7 +16,7 @@ namespace MyCAM.PathCache
 				throw new ArgumentNullException( "CircleCache constructing argument error - invalid geomData" );
 			}
 			m_CircleGeomData = circleGeomData;
-			m_StartCADPointList = StdPatternStartPointFactory.GetStartPointList( m_RefCoord, circleGeomData );
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, circleGeomData );
 			BuildCAMPointList();
 		}
 

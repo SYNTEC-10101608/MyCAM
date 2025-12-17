@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
-	internal static class StdPatternStartPointFactory
+	internal static class StdPatternStartPointListFactory
 	{
 		public static List<CADPoint> GetStartPointList( gp_Ax3 refCoord, IStdPatternGeomData geomData )
 		{
@@ -38,10 +38,7 @@ namespace MyCAM.Helper
 
 		#region Type-Safe Conversion Helper
 
-		static List<CADPoint> GetStartPointListTyped<TGeomData>(
-			gp_Ax3 refCoord,
-			IStdPatternGeomData geomData,
-			Func<gp_Ax3, TGeomData, List<CADPoint>> generator ) where TGeomData : class, IStdPatternGeomData
+		static List<CADPoint> GetStartPointListTyped<TGeomData>( gp_Ax3 refCoord, IStdPatternGeomData geomData, Func<gp_Ax3, TGeomData, List<CADPoint>> generator ) where TGeomData : class, IStdPatternGeomData
 		{
 			TGeomData typedData = geomData as TGeomData;
 			if( typedData == null ) {
@@ -237,12 +234,7 @@ namespace MyCAM.Helper
 			return transformation;
 		}
 
-		static CADPoint TransformCADPoint(
-			gp_Pnt localPoint,
-			gp_Dir localNormal1,
-			gp_Dir localNormal2,
-			gp_Dir localTangent,
-			gp_Trsf transformation )
+		static CADPoint TransformCADPoint( gp_Pnt localPoint, gp_Dir localNormal1, gp_Dir localNormal2, gp_Dir localTangent, gp_Trsf transformation )
 		{
 			return new CADPoint(
 				localPoint.Transformed( transformation ),

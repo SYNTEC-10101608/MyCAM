@@ -16,7 +16,7 @@ namespace MyCAM.PathCache
 				throw new ArgumentNullException( "PolygonCache constructing argument error - invalid geomData" );
 			}
 			m_PolygonGeomData = polygonGeomData;
-			m_StartCADPointList = StdPatternStartPointFactory.GetStartPointList( refCoord, polygonGeomData );
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( refCoord, polygonGeomData );
 			BuildCAMPointList();
 		}
 

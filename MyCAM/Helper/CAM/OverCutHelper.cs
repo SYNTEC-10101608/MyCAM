@@ -40,7 +40,7 @@ namespace MyCAM.Helper
 					gp_Pnt overCutEndPoint = GetExactOverCutEndPoint( mainPointList[ i ].Point, mainPointList[ i + 1 ].Point, dRemain );
 
 					// interpolate tool vector
-					GeomUitility.InterpolateVecBetween2Point( mainPointList[ i ], mainPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
+					DiscreteUtility.InterpolateVecBetween2Point( mainPointList[ i ], mainPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
 
 					// create new cam point
 					IOrientationPoint camPoint = BuildOverCutPoint( overCutEndPoint, endPointToolVec, endPointTangentVec );
@@ -60,8 +60,7 @@ namespace MyCAM.Helper
 			}
 
 			// Step 1: Discretize the geometry into orientation points
-			List<IOrientationPoint> discretizedPointList = DiscretizeGeometry( refCoord, geomData );
-			if( discretizedPointList == null || discretizedPointList.Count == 0 ) {
+			if( !StdPatternDiscreteFactory.GetDiscreteOriPointList( refCoord, geomData, out List<IOrientationPoint> discretizedPointList ) || discretizedPointList == null || discretizedPointList.Count == 0 ) {
 				return;
 			}
 
@@ -107,7 +106,7 @@ namespace MyCAM.Helper
 					);
 
 					// interpolate tool vector
-					GeomUitility.InterpolateVecBetween2Point(
+					DiscreteUtility.InterpolateVecBetween2Point(
 						discretizedPointList[ currentIndex ],
 						discretizedPointList[ nextIndex ],
 						overCutEndPoint,
@@ -141,37 +140,6 @@ namespace MyCAM.Helper
 			}
 
 			return closestIndex;
-		}
-
-		static List<IOrientationPoint> DiscretizeGeometry( gp_Ax3 refCoord, IStdPatternGeomData geomData )
-		{
-			switch( geomData.PathType ) {
-				case PathType.Circle:
-					if( !( geomData is CircleGeomData circleData ) ) {
-						return null;
-					}
-					return DiscreteStdPatternHelper.DiscretizeCircle( refCoord, circleData );
-				case PathType.Rectangle:
-					if( !( geomData is RectangleGeomData rectangleData ) ) {
-						return null;
-					}
-					return DiscreteStdPatternHelper.DiscretizeRectangle( refCoord, rectangleData );
-				case PathType.Runway:
-					if( !( geomData is RunwayGeomData runwayData ) ) {
-						return null;
-					}
-					return DiscreteStdPatternHelper.DiscretizeRunway( refCoord, runwayData );
-				case PathType.Triangle:
-				case PathType.Square:
-				case PathType.Pentagon:
-				case PathType.Hexagon:
-					if( !( geomData is PolygonGeomData polygonData ) ) {
-						return null;
-					}
-					return DiscreteStdPatternHelper.DiscretizePolygon( refCoord, polygonData );
-				default:
-					return null;
-			}
 		}
 
 		static IOrientationPoint BuildOverCutPoint( gp_Pnt overCutEndPoint, gp_Dir endPointToolVec, gp_Dir endPointTangentVec )

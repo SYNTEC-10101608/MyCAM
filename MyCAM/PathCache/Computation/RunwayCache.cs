@@ -16,7 +16,7 @@ namespace MyCAM.PathCache
 				throw new ArgumentNullException( "RunwayCache constructing argument error - invalid geomData" );
 			}
 			m_RunwayGeomData = runwayGeomData;
-			m_StartCADPointList = StdPatternStartPointFactory.GetStartPointList( m_RefCoord, runwayGeomData );
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, runwayGeomData );
 			BuildCAMPointList();
 		}
 

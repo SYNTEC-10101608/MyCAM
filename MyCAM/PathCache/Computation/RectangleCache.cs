@@ -16,7 +16,7 @@ namespace MyCAM.PathCache
 				throw new ArgumentNullException( "RectangleCache constructing argument error - invalid geomData" );
 			}
 			m_RectangleGeomData = rectangleGeomData;
-			m_StartCADPointList = StdPatternStartPointFactory.GetStartPointList( m_RefCoord, rectangleGeomData );
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, rectangleGeomData );
 			BuildCAMPointList();
 		}
 
