@@ -170,12 +170,12 @@ namespace MyCAM.Post
 				writeFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.CutDownPostPoint, 0 );
 
 				// cut down
-				writeLinearTraverse( writer, postData.StartPoint, postData.FollowSafeDistance );
+				writeLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance );
 			}
 
 			// form leap without cut down
 			else if( postData.FrogLeapMidPostPoint != null && postData.CutDownPostPoint == null ) {
-				writeFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.StartPoint, postData.FollowSafeDistance );
+				writeFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.ProcessStartPoint, postData.FollowSafeDistance );
 			}
 
 			// no frog leap
@@ -183,12 +183,12 @@ namespace MyCAM.Post
 				writeLinearTraverse( writer, postData.CutDownPostPoint, 0 );
 
 				// cut down
-				writeLinearTraverse( writer, postData.StartPoint, postData.FollowSafeDistance );
+				writeLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance );
 			}
 
 			// no frog leap and no cut down
 			else {
-				writeLinearTraverse( writer, postData.StartPoint, postData.FollowSafeDistance );
+				writeLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance );
 			}
 		}
 

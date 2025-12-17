@@ -1,9 +1,8 @@
-﻿using MyCAM.PathCache;
-using MyCAM.Data;
+﻿using MyCAM.Data;
+using MyCAM.PathCache;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace MyCAM.Post
 {
@@ -249,7 +248,7 @@ namespace MyCAM.Post
 
 		ContourNCPackage BuildPackageByID( string szID )
 		{
-			if(!PathCacheProvider.TryGetLeadCache( szID, out ILeadCache leadCache )
+			if( !PathCacheProvider.TryGetLeadCache( szID, out ILeadCache leadCache )
 				|| !PathCacheProvider.TryGetOverCutCache( szID, out IOverCutCache overCutCache )
 				|| !PathCacheProvider.TryGetProcessPathStartEndCache( szID, out IProcessPathStartEndCache processPathStartEndCache )
 				|| !PathCacheProvider.TryGetTraverseDataCache( szID, out ITraverseDataCache traverseDataCache )
@@ -270,15 +269,22 @@ namespace MyCAM.Post
 
 		StandardPatternNCPackage BuildPackageByID_StandardPattern( string szID )
 		{
-			if( !PathCacheProvider.TryGetStdPatternRefPointCache( szID, out IStdPatternRefPointCache refPointCache )
-				|| !PathCacheProvider.TryGetMainPathStartPointCache( szID, out IMainPathStartPointCache mainPathStartPointCache ) 
+			if( !PathCacheProvider.TryGetLeadCache( szID, out ILeadCache leadCache )
+				|| !PathCacheProvider.TryGetStdPatternRefPointCache( szID, out IStdPatternRefPointCache refPointCache )
+				|| !PathCacheProvider.TryGetMainPathStartPointCache( szID, out IMainPathStartPointCache mainPathStartPointCache )
+				|| !PathCacheProvider.TryGetProcessPathStartEndCache( szID, out IProcessPathStartEndCache processPathStartEndCache )
 				|| !PathCacheProvider.TryGetTraverseDataCache( szID, out ITraverseDataCache traverseDataCache ) ) {
 				return null;
 			}
 			return new StandardPatternNCPackage(
 						refPointCache.GetProcessRefPoint(),
 						mainPathStartPointCache.GetMainPathStartCAMPoint(),
-						traverseDataCache.TraverseData );
+						traverseDataCache.TraverseData,
+						processPathStartEndCache.GetProcessStartPoint(),
+						processPathStartEndCache.GetProcessEndPoint(),
+						leadCache.LeadData,
+						leadCache.LeadInCAMPointList
+					);
 		}
 
 		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";

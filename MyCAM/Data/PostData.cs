@@ -72,7 +72,7 @@ namespace MyCAM.Data
 			get; set;
 		}
 
-		public PostPoint StartPoint
+		public PostPoint ProcessStartPoint
 		{
 			get; set;
 		}

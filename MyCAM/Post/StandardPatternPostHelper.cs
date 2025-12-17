@@ -2,16 +2,22 @@
 using MyCAM.Helper;
 using OCC.gp;
 using System;
+using System.Collections.Generic;
 
 namespace MyCAM.Post
 {
 	internal class StandardPatternNCPackage
 	{
-		public StandardPatternNCPackage( IProcessPoint refPoint, IProcessPoint startPoint, TraverseData traverseData )
+		public StandardPatternNCPackage( IProcessPoint refPoint, IProcessPoint startPoint, TraverseData traverseData, IProcessPoint processStartPoint,
+			IProcessPoint processEndPoint, LeadData leadData, IReadOnlyList<IProcessPoint> leadInCAMPointList )
 		{
 			RefPoint = refPoint ?? throw new ArgumentNullException( nameof( refPoint ) );
 			StartPoint = startPoint ?? throw new ArgumentNullException( nameof( startPoint ) );
 			TraverseData = traverseData ?? throw new ArgumentNullException( nameof( traverseData ) );
+			ProcessStartPoint = processStartPoint;
+			ProcessEndPoint = processEndPoint;
+			LeadData = leadData ?? throw new ArgumentNullException( nameof( leadData ) );
+			LeadInCAMPointList = leadInCAMPointList ?? throw new ArgumentNullException( nameof( leadInCAMPointList ) );
 		}
 
 		public IProcessPoint RefPoint
@@ -25,6 +31,26 @@ namespace MyCAM.Post
 		}
 
 		public TraverseData TraverseData
+		{
+			get; private set;
+		}
+
+		public IProcessPoint ProcessStartPoint
+		{
+			get; private set;
+		}
+
+		public IProcessPoint ProcessEndPoint
+		{
+			get; private set;
+		}
+
+		public LeadData LeadData
+		{
+			get; private set;
+		}
+
+		public IReadOnlyList<IProcessPoint> LeadInCAMPointList
 		{
 			get; private set;
 		}
@@ -56,7 +82,7 @@ namespace MyCAM.Post
 				return false;
 			}
 			pathG54PostData.RefPoint = mainG54;
-			pathG54PostData.StartPoint = new PostPoint()
+			pathG54PostData.ProcessStartPoint = new PostPoint()
 			{
 				X = currentPathNCPack.StartPoint.Point.X(),
 				Y = currentPathNCPack.StartPoint.Point.Y(),
@@ -64,6 +90,20 @@ namespace MyCAM.Post
 				Master = dLastPointProcess_M,
 				Slave = dLastPointProcess_S
 			};
+
+			// lead-in
+			if( LeadHelper.HasLeadIn( currentPathNCPack.LeadData ) && currentPathNCPack.LeadInCAMPointList.Count > 0 ) {
+
+				// update process start point
+				pathG54PostData.ProcessStartPoint = new PostPoint()
+				{
+					X = currentPathNCPack.LeadInCAMPointList[ 0 ].Point.X(),
+					Y = currentPathNCPack.LeadInCAMPointList[ 0 ].Point.Y(),
+					Z = currentPathNCPack.LeadInCAMPointList[ 0 ].Point.Z(),
+					Master = dLastPointProcess_M,
+					Slave = dLastPointProcess_S
+				};
+			}
 
 			if( endInfoOfPreviousPath == null ) {
 
@@ -79,7 +119,7 @@ namespace MyCAM.Post
 			// end info of current path
 			currentPathtEndInfo = new PathEndInfo()
 			{
-				EndCAMPoint = currentPathNCPack.StartPoint,
+				EndCAMPoint = currentPathNCPack.ProcessEndPoint,
 				Master = dLastPointProcess_M,
 				Slave = dLastPointProcess_S
 			};
@@ -110,11 +150,11 @@ namespace MyCAM.Post
 				singularTagList = true;
 			}
 
-
 			double masterAngle = rotateAngleList.Item1;
 			double slaveAngle = rotateAngleList.Item2;
 
-			if( point.ToolVec.IsParallel( new gp_Dir( 0, 0, 1 ), 0.001 ) ) {
+			// in singularity, set angles to zero
+			if( singularTagList ) {
 				slaveAngle = 0;
 				masterAngle = 0;
 			}
@@ -146,8 +186,8 @@ namespace MyCAM.Post
 			// p5: start of current path (not used here)
 			IProcessPoint p1 = endInfoOfPreviousPath.EndCAMPoint;
 			IProcessPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfPreviousPath.EndCAMPoint, currentPathNCPack.TraverseData.LiftUpDistance );
-			IProcessPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentPathNCPack.StartPoint, currentPathNCPack.TraverseData.CutDownDistance );
-			IProcessPoint p5 = currentPathNCPack.StartPoint;
+			IProcessPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( currentPathNCPack.ProcessStartPoint, currentPathNCPack.TraverseData.CutDownDistance );
+			IProcessPoint p5 = currentPathNCPack.ProcessStartPoint;
 
 			// lift up
 			if( currentPathNCPack.TraverseData.LiftUpDistance > 0 && p2 != null ) {
@@ -174,8 +214,8 @@ namespace MyCAM.Post
 						X = p3.Point.X(),
 						Y = p3.Point.Y(),
 						Z = p3.Point.Z(),
-						Master = ( endInfoOfPreviousPath.Master + pathG54PostData.StartPoint.Master ) / 2.0,
-						Slave = ( endInfoOfPreviousPath.Slave + pathG54PostData.StartPoint.Slave ) / 2.0
+						Master = ( endInfoOfPreviousPath.Master + pathG54PostData.ProcessStartPoint.Master ) / 2.0,
+						Slave = ( endInfoOfPreviousPath.Slave + pathG54PostData.ProcessStartPoint.Slave ) / 2.0
 					};
 				}
 			}
@@ -189,8 +229,8 @@ namespace MyCAM.Post
 					X = p4.Point.X(),
 					Y = p4.Point.Y(),
 					Z = p4.Point.Z(),
-					Master = pathG54PostData.StartPoint.Master,
-					Slave = pathG54PostData.StartPoint.Slave
+					Master = pathG54PostData.ProcessStartPoint.Master,
+					Slave = pathG54PostData.ProcessStartPoint.Slave
 				};
 			}
 			pathG54PostData.FollowSafeDistance = currentPathNCPack.TraverseData.FollowSafeDistance;
@@ -207,7 +247,7 @@ namespace MyCAM.Post
 				pathG54PostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 				return;
 			}
-			IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( currentPathNCPack.StartPoint, entryAndExitData.EntryDistance );
+			IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( currentPathNCPack.ProcessStartPoint, entryAndExitData.EntryDistance );
 			if( entryPoint == null ) {
 				return;
 			}
@@ -218,8 +258,8 @@ namespace MyCAM.Post
 				X = entryPoint.Point.X(),
 				Y = entryPoint.Point.Y(),
 				Z = entryPoint.Point.Z(),
-				Master = pathG54PostData.StartPoint.Master,
-				Slave = pathG54PostData.StartPoint.Slave
+				Master = pathG54PostData.ProcessStartPoint.Master,
+				Slave = pathG54PostData.ProcessStartPoint.Slave
 			};
 			pathG54PostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 		}
