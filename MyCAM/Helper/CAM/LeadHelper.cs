@@ -11,6 +11,22 @@ namespace MyCAM.Helper
 {
 	public static class LeadHelper
 	{
+		public static bool HasLeadIn( LeadData leadData )
+		{
+			if( leadData == null ) {
+				return false;
+			}
+			return leadData.LeadIn.StraightLength != 0 || leadData.LeadIn.ArcLength != 0;
+		}
+
+		public static bool HasLeadOut( LeadData leadData )
+		{
+			if( leadData == null ) {
+				return false;
+			}
+			return leadData.LeadOut.StraightLength != 0 || leadData.LeadOut.ArcLength != 0;
+		}
+
 		public static void SetLeadIn( IReadOnlyList<IOrientationPoint> mainPointList,
 			out List<IOrientationPoint> leadInPointList,
 			LeadData leadData, bool isPathReverse,
@@ -24,24 +40,27 @@ namespace MyCAM.Helper
 			LeadGeom leadInParam = leadData.LeadIn;
 			bool isChangeLeadDirection = leadData.IsChangeLeadDirection;
 
-			// Determine lead type based on parameters
+			// determine lead type based on parameters
 			bool hasArc = leadInParam.ArcLength > 0 && leadInParam.Angle > 0;
 			bool hasLine = leadInParam.StraightLength > 0;
 
 			if( hasArc && hasLine ) {
-				// Mixed lead: Arc + Line
+
+				// mixed lead: Arc + Line
 				leadInPointList = BuildMixedLeadLine( mainPointList[ 0 ], true,
 					leadInParam.ArcLength, leadInParam.StraightLength, leadInParam.Angle,
 					isChangeLeadDirection, isPathReverse, maxDeflection, maxEdgeLength );
 			}
 			else if( hasArc ) {
-				// Arc only
+
+				// arc only
 				leadInPointList = BuildArcLeadLine( mainPointList[ 0 ], true,
 					leadInParam.ArcLength, leadInParam.Angle,
 					isChangeLeadDirection, isPathReverse, maxDeflection, maxEdgeLength );
 			}
 			else if( hasLine ) {
-				// Line only
+
+				// line only
 				leadInPointList = BuildStraightLeadLine( mainPointList[ 0 ], true,
 					leadInParam.StraightLength, leadInParam.Angle,
 					isChangeLeadDirection, isPathReverse );
@@ -70,107 +89,85 @@ namespace MyCAM.Helper
 			LeadGeom leadOutParam = leadData.LeadOut;
 			bool isChangeLeadDirection = leadData.IsChangeLeadDirection;
 
-			// Determine lead type based on parameters
+			// determine lead type based on parameters
 			bool hasArc = leadOutParam.ArcLength > 0 && leadOutParam.Angle > 0;
 			bool hasLine = leadOutParam.StraightLength > 0;
 
 			if( hasArc && hasLine ) {
-				// Mixed lead: Arc + Line
+
+				// mixed lead: Arc + Line
 				leadOutPointList = BuildMixedLeadLine( leadOutStartPoint, false,
 					leadOutParam.ArcLength, leadOutParam.StraightLength, leadOutParam.Angle,
 					isChangeLeadDirection, isPathReverse, maxDeflection, maxEdgeLength );
 			}
 			else if( hasArc ) {
-				// Arc only
+
+				// arc only
 				leadOutPointList = BuildArcLeadLine( leadOutStartPoint, false,
 					leadOutParam.ArcLength, leadOutParam.Angle,
 					isChangeLeadDirection, isPathReverse, maxDeflection, maxEdgeLength );
 			}
 			else if( hasLine ) {
-				// Line only
+
+				// line only
 				leadOutPointList = BuildStraightLeadLine( leadOutStartPoint, false,
 					leadOutParam.StraightLength, leadOutParam.Angle,
 					isChangeLeadDirection, isPathReverse );
 			}
 		}
 
-		/// <summary>
-		/// Build mixed lead line: Arc + Straight line
-		/// </summary>
 		static List<IOrientationPoint> BuildMixedLeadLine( IOrientationPoint startOrEndPoint, bool isLeadIn,
 			double arcLength, double lineLength, double angle,
 			bool isChangeLeadDirection, bool isPathReverse,
 			double dDeflection, double dMaxLength )
 		{
-			List<IOrientationPoint> resultList = new List<IOrientationPoint>();
+			var resultList = new List<IOrientationPoint>();
 
 			// protection
 			if( startOrEndPoint == null || arcLength <= 0 || angle <= 0 || lineLength <= 0 ) {
 				return resultList;
 			}
 
-			// Step 1: Build arc lead line
+			// build arc part
 			List<IOrientationPoint> arcPoints = BuildArcLeadLine( startOrEndPoint, isLeadIn,
 				arcLength, angle, isChangeLeadDirection, isPathReverse, dDeflection, dMaxLength );
 
-			if( arcPoints.Count == 0 ) {
+			if( arcPoints == null || arcPoints.Count == 0 ) {
 				return resultList;
 			}
 
-			// Step 2: Get the end point of arc (which is the start of straight line)
-			IOrientationPoint arcEndPoint;
-			if( isLeadIn ) {
-				// For lead in: arc list is reversed, so first point is the farthest from path
-				arcEndPoint = arcPoints[ 0 ];
-			}
-			else {
-				// For lead out: arc list is in order, so last point is the farthest from path
-				arcEndPoint = arcPoints[ arcPoints.Count - 1 ];
-			}
+			// pick arc end (the point that connects to the straight)
+			IOrientationPoint arcEndPoint = isLeadIn ? arcPoints[ 0 ] : arcPoints[ arcPoints.Count - 1 ];
 
-			// Step 3: Build straight line from arc end point
-			// The tangent vector of arc end point becomes the direction of straight line
+			// straight direction is tangent at arc end
 			gp_Dir straightDirection = arcEndPoint.TangentVec;
 
-			// Calculate straight line end point
-			gp_Vec straightVec = new gp_Vec();
-			if( isLeadIn ) {
-				straightVec = new gp_Vec( straightDirection.Reversed() ).Multiplied( lineLength );
-			}
-			else {
-				straightVec = new gp_Vec( straightDirection ).Multiplied( lineLength );
-			}
+			// compute straight end point
+			gp_Vec straightVec = new gp_Vec( isLeadIn ? straightDirection.Reversed() : straightDirection ).Multiplied( lineLength );
 			gp_Pnt straightEndPoint = arcEndPoint.Point.Translated( straightVec );
 
-			// Step 4: Discretize the straight line
+			// discretize straight (from arc end to straight end)
 			List<gp_Pnt> straightPoints = Get2PntSegmentPnt( arcEndPoint.Point, straightEndPoint, 1 );
 
-			// Step 5: Combine results
+			// convert straight points to orientation points, skipping the first because it's the arc connection
+			List<IOrientationPoint> straightOri = new List<IOrientationPoint>();
+			for( int i = 1; i < straightPoints.Count; i++ ) {
+				straightOri.Add( BuildLeadLinePoint( straightPoints[ i ], straightDirection, startOrEndPoint.ToolVec ) );
+			}
+
 			if( isLeadIn ) {
-				// Lead in: straight line first, then arc
-				// Add straight line points (reverse order, skip first point as it's already in arc)
-				for( int i = straightPoints.Count - 1; i >= 1; i-- ) {
-					IOrientationPoint leadPoint = BuildLeadLinePoint( straightPoints[ i ], straightDirection, startOrEndPoint.ToolVec );
-					resultList.Add( leadPoint );
-				}
-				// Add arc points
+				straightOri.Reverse();
+				resultList.AddRange( straightOri );
 				resultList.AddRange( arcPoints );
 			}
 			else {
-				// Lead out: arc first, then straight line
-				// Add arc points
 				resultList.AddRange( arcPoints );
-				// Add straight line points (skip first point as it's already in arc)
-				for( int i = 1; i < straightPoints.Count; i++ ) {
-					IOrientationPoint leadPoint = BuildLeadLinePoint( straightPoints[ i ], straightDirection, startOrEndPoint.ToolVec );
-					resultList.Add( leadPoint );
-				}
+				resultList.AddRange( straightOri );
 			}
 
 			return resultList;
 		}
 
-		// when isLeadIn, the input point is start of path, and is end of lead in
 		static List<IOrientationPoint> BuildStraightLeadLine( IOrientationPoint StraightLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isPathReverse )
 		{
 			List<IOrientationPoint> LeadPointList = new List<IOrientationPoint>();
@@ -237,7 +234,6 @@ namespace MyCAM.Helper
 			return LeadPointList;
 		}
 
-		// when isLeadIn, the input point is start of path, and is end of lead in
 		static List<IOrientationPoint> BuildArcLeadLine( IOrientationPoint CurveLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isPathReverse, double dDeflection, double dMaxLength )
 		{
 			// protection
@@ -423,7 +419,6 @@ namespace MyCAM.Helper
 			}
 		}
 
-		// this method is now for building a CAMPoint as IOrientationPoint
 		static IOrientationPoint BuildLeadLinePoint( gp_Pnt point, gp_Dir tangentVec, gp_Dir toolVec )
 		{
 			CADPoint leadPoint = new CADPoint(

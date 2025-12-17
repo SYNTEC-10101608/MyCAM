@@ -1,5 +1,6 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Helper;
 using System;
 using System.Windows.Forms;
 
@@ -13,6 +14,7 @@ namespace MyCAM.Editor.Dialog
 				leadData = new LeadData();
 			}
 			InitializeComponent();
+			SetLeadDataDefaultValue( leadData );
 			m_LeadData = leadData;
 
 			// lead in setting
@@ -28,13 +30,35 @@ namespace MyCAM.Editor.Dialog
 			// initialize textbox
 			m_chkFlip.Checked = m_LeadData.IsChangeLeadDirection;
 
+			// for std pattern lead setting disable lead out controls
 			IsStdPattern += SetLeadOutControlsEnabled;
 		}
 
 		public Action<bool> IsStdPattern;
 
+		void SetLeadDataDefaultValue( LeadData leadData )
+		{
+			if( LeadHelper.HasLeadIn( leadData ) || LeadHelper.HasLeadOut( leadData ) ) {
+				return;
+			}
+
+			// lead in setting
+			leadData.LeadIn.StraightLength = DEFAULT_STRAIGHT_LENGTH;
+			leadData.LeadIn.ArcLength = DEFAULT_ARC_LENGTH;
+			leadData.LeadIn.Angle = DEFAULT_ANGLE;
+
+			// lead out setting
+			leadData.LeadOut.StraightLength = DEFAULT_STRAIGHT_LENGTH;
+			leadData.LeadOut.ArcLength = DEFAULT_ARC_LENGTH;
+			leadData.LeadOut.Angle = DEFAULT_ANGLE;
+
+			// initialize textbox
+			leadData.IsChangeLeadDirection = false;
+		}
+
 		void SetLeadOutControlsEnabled( bool isEnabled )
 		{
+			// ensure run on UI thread
 			if( this.InvokeRequired ) {
 				this.Invoke( new Action( () => SetLeadOutControlsEnabled( isEnabled ) ) );
 				return;
@@ -51,7 +75,6 @@ namespace MyCAM.Editor.Dialog
 				RaiseConfirm( m_LeadData );
 			}
 		}
-
 
 		void PreviewLeadResult()
 		{
@@ -74,9 +97,9 @@ namespace MyCAM.Editor.Dialog
 
 		bool ValidateLeadParam( LeadGeom leadData, TextBox tbxStraightLength, TextBox tbxArcLength, TextBox tbxAngle, string paramName )
 		{
-			if( leadData.StraightLength == DEFAULT_Value ) {
-				leadData.ArcLength = DEFAULT_Value;
-				leadData.Angle = DEFAULT_Value;
+			if( leadData.StraightLength == DEFAULT_VALUE ) {
+				leadData.ArcLength = DEFAULT_VALUE;
+				leadData.Angle = DEFAULT_VALUE;
 				return true;
 			}
 			if( !double.TryParse( tbxStraightLength.Text, out double dStraightLength ) ||
@@ -89,7 +112,7 @@ namespace MyCAM.Editor.Dialog
 				MyApp.Logger.ShowOnLogPanel( "長度需要大於等於0", MyApp.NoticeType.Warning );
 				return false;
 			}
-			if( !IsValidStraightLineAngle( dAngle ) ) {
+			if( !IsValidAngle( dAngle ) ) {
 				MyApp.Logger.ShowOnLogPanel( "角度必須在0 ~ 180範圍內", MyApp.NoticeType.Warning );
 				return false;
 			}
@@ -193,15 +216,7 @@ namespace MyCAM.Editor.Dialog
 
 		#endregion
 
-		bool IsValidArcAngle( double dAngle )
-		{
-			if( dAngle <= 0 || dAngle > 180 ) {
-				return false;
-			}
-			return true;
-		}
-
-		bool IsValidStraightLineAngle( double dAngle )
+		bool IsValidAngle( double dAngle )
 		{
 			if( dAngle < 0 || dAngle > 180 ) {
 				return false;
@@ -209,9 +224,10 @@ namespace MyCAM.Editor.Dialog
 			return true;
 		}
 
-		const double DEFAULT_Value = 0;
-		const double DEFAULT_Angle = 45;
-		const double DEFAULT_Length = 3;
+		const double DEFAULT_STRAIGHT_LENGTH = 3;
+		const double DEFAULT_ARC_LENGTH = 3;
+		const double DEFAULT_ANGLE = 45;
+		const double DEFAULT_VALUE = 0;
 		LeadData m_LeadData;
 
 
