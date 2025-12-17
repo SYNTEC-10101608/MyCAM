@@ -2,6 +2,7 @@
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
+using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCC.TopTools;
@@ -26,7 +27,7 @@ namespace MyCAM.Editor
 				throw new ArgumentException( "IndexSelectAction constructing argument invalid pathID" );
 			}
 
-			m_ProcessPoints = mainPathCache.MainPathPointList;
+			m_ProcessPoints = mainPathCache.GetMainPathPointListForOrder();
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}
@@ -114,7 +115,7 @@ namespace MyCAM.Editor
 
 			// add points to the polygon
 			for( int i = 0; i < m_ProcessPoints.Count; i++ ) {
-				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_ProcessPoints[ i ].Point );
+				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_ProcessPoints[ i ] );
 				polygonMaker.Add( vertexMaker.Vertex() );
 				m_VertexMap.Bind( vertexMaker.Vertex(), i );
 			}
@@ -129,7 +130,7 @@ namespace MyCAM.Editor
 		}
 
 		protected string m_PathID;
-		protected IReadOnlyList<IProcessPoint> m_ProcessPoints;
+		protected IReadOnlyList<gp_Pnt> m_ProcessPoints;
 
 		// map point on view to index on CAMData
 		protected TopTools_DataMapOfShapeInteger m_VertexMap;

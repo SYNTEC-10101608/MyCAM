@@ -71,6 +71,14 @@ namespace MyCAM.PathCache
 			}
 		}
 
+		public List<CADPoint> MainPathPointListForOrder
+		{
+			get
+			{
+				return m_CADPointList;
+			}
+		}
+
 		#endregion
 
 		#region API

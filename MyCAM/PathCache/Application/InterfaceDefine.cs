@@ -25,6 +25,11 @@ namespace MyCAM.PathCache
 		{
 			get;
 		}
+
+		List<CADPoint> MainPathPointListForOrder
+		{
+			get;
+		}
 	}
 
 	public interface ITransformableCache
@@ -132,6 +137,8 @@ namespace MyCAM.PathCache
 		{
 			get;
 		}
+
+		IReadOnlyList<gp_Pnt> GetMainPathPointListForOrder();
 	}
 
 	public interface IToolVecCache : IMainPathCache

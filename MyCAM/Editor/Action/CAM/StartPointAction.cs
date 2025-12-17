@@ -36,7 +36,6 @@ namespace MyCAM.Editor
 				return;
 			}
 			m_CraftData.StartPointIndex = nIndex;
-			Console.WriteLine( "nIndex：" + nIndex );
 			PropertyChanged?.Invoke( m_PathIDList );
 			m_Viewer.GetAISContext().ClearSelected( true );
 		}

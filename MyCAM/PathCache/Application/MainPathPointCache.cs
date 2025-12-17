@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using OCC.gp;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,6 +20,14 @@ namespace MyCAM.PathCache
 			{
 				return m_PathCache.MainPathPointList.Cast<IProcessPoint>().ToList();
 			}
+		}
+
+		public IReadOnlyList<gp_Pnt> GetMainPathPointListForOrder()
+		{
+			if( m_PathCache.MainPathPointListForOrder.Count > 0 ) {
+				return m_PathCache.MainPathPointListForOrder.Select( p => p.Point ).ToList();
+			}
+			return null;
 		}
 	}
 }
