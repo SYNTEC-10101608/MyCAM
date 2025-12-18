@@ -63,9 +63,12 @@ namespace MyCAM.Editor.Dialog
 				this.Invoke( new Action( () => SetLeadOutControlsEnabled( isEnabled ) ) );
 				return;
 			}
+			const double DEFAULT_STDPATTERN_ANGLE = 90;
 			m_tbxLeadOutStraightLength.Enabled = isEnabled;
 			m_tbxLeadOutArcLength.Enabled = isEnabled;
 			m_tbxLeadOutAngle.Enabled = isEnabled;
+			m_tbxLeadInAngle.Enabled = isEnabled;
+			m_tbxLeadInAngle.Text = DEFAULT_STDPATTERN_ANGLE.ToString();
 		}
 
 		void m_btnOK_Click( object sender, EventArgs e )
