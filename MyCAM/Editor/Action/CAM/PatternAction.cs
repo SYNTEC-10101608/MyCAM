@@ -3,6 +3,9 @@ using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using MyCAM.Helper;
 using OCC.AIS;
+using OCC.Geom;
+using OCC.gp;
+using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
@@ -61,6 +64,12 @@ namespace MyCAM.Editor
 			patternFrom.Show( MyApp.MainForm );
 		}
 
+		public override void End()
+		{
+			RemoveTrihedron();
+			base.End();
+		}
+
 		void PreviewPatternSetting( IStdPatternGeomData standardPatternGeomData )
 		{
 			PatternCreate( standardPatternGeomData );
@@ -85,6 +94,7 @@ namespace MyCAM.Editor
 
 		void PatternCreate( IStdPatternGeomData standardPatternGeomData )
 		{
+			RemoveTrihedron();
 			TopoDS_Shape shape = null;
 			foreach( var szID in m_szPathIDList ) {
 				if( !DataGettingHelper.GetPathObject( szID, out PathObject pathObject ) ) {
@@ -102,6 +112,9 @@ namespace MyCAM.Editor
 					if( shape == null || shape.IsNull() ) {
 						continue;
 					}
+
+					gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( contourPathObject.GeomData.RefCenterDir, standardPatternGeomData.RotatedAngle_deg );
+					ShowStdPatternTrihedron( refCoord );
 				}
 
 				m_DataManager.ObjectMap[ szID ] = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, pathObject );
@@ -112,6 +125,7 @@ namespace MyCAM.Editor
 
 		void PatternRestore()
 		{
+			RemoveTrihedron();
 			TopoDS_Shape shape = null;
 			foreach( var szID in m_szPathIDList ) {
 				if( !m_BackUpPathObjectList.ContainsKey( szID ) || m_BackUpPathObjectList[ szID ] == null ) {
@@ -153,6 +167,26 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Redisplay( shapeAIS, false );
 		}
 
+		void ShowStdPatternTrihedron( gp_Ax3 refCoord )
+		{
+			gp_Ax2 ax2 = refCoord.Ax2();
+			m_Trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
+			m_Trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			m_Trihedron.SetSize( 10.0 );
+			m_Trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			m_Trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			m_Trihedron.SetArrowColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			m_Viewer.GetAISContext().Display( m_Trihedron, false );
+			m_Viewer.GetAISContext().Deactivate( m_Trihedron );
+		}
+
+		void RemoveTrihedron()
+		{
+			if( m_Trihedron != null ) {
+				m_Viewer.GetAISContext().Remove( m_Trihedron, false );
+				m_Trihedron = null;
+			}
+		}
 
 		ViewManager m_ViewManager;
 		Viewer m_Viewer;
@@ -160,5 +194,6 @@ namespace MyCAM.Editor
 		IGeomData m_GeomData;
 		PathType m_BackFirstPathType;
 		Dictionary<string, PathObject> m_BackUpPathObjectList = new Dictionary<string, PathObject>();
+		AIS_Trihedron m_Trihedron;
 	}
 }
