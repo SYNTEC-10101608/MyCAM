@@ -201,23 +201,32 @@ namespace MyCAM.Helper
 
 		static double GetCircleMaxOverCutLength( CircleGeomData circleGeomData )
 		{
-			return Math.PI * circleGeomData.Diameter / 4;
+			// Unconditionally rounded to three decimal places.
+			return Math.Floor( Math.PI * circleGeomData.Diameter / 4 * 1000 ) * 1000;
 		}
 
 		static double GetRectangleMaxOverCutLength( RectangleGeomData rectangleGeomData, int startPointIndex )
 		{
 			if( startPointIndex != 0 ) {
-				return ( rectangleGeomData.Length - 2 * rectangleGeomData.CornerRadius ) / 2;
+
+				// Unconditionally rounded to three decimal places.
+				return Math.Floor( ( rectangleGeomData.Length - 2 * rectangleGeomData.CornerRadius ) / 2 * 1000 ) / 1000;
 			}
-			return ( rectangleGeomData.Width - 2 * rectangleGeomData.CornerRadius ) / 2;
+
+			// Unconditionally rounded to three decimal places.
+			return Math.Floor( ( rectangleGeomData.Width - 2 * rectangleGeomData.CornerRadius ) / 2 * 1000 ) / 1000;
 		}
 
 		static double GetRunwayMaxOverCutLength( RunwayGeomData runwayGeomData, int startPointIndex )
 		{
 			if( startPointIndex != 0 ) {
-				return ( runwayGeomData.Length - runwayGeomData.Width ) / 2.0;
+
+				// Unconditionally rounded to three decimal places.
+				return Math.Floor( ( runwayGeomData.Length - runwayGeomData.Width ) / 2.0 * 1000 ) / 1000;
 			}
-			return ( runwayGeomData.Width * Math.PI / 4.0 );
+
+			// Unconditionally rounded to three decimal places.
+			return Math.Floor( ( runwayGeomData.Width * Math.PI / 4.0 * 1000 ) ) / 1000;
 		}
 
 		static double GetPolygonMaxOverCutLength( PolygonGeomData polygonGeomData )
@@ -226,7 +235,9 @@ namespace MyCAM.Helper
 			double interiorAngle = ( polygonGeomData.Sides - 2 ) * Math.PI / polygonGeomData.Sides;
 			double halfAngle = interiorAngle / 2.0;
 			double tangentDistance = polygonGeomData.CornerRadius / Math.Tan( halfAngle );
-			return ( sideLength - 2 * tangentDistance ) / 2;
+
+			// Unconditionally rounded to three decimal places.
+			return Math.Floor( ( sideLength - 2 * tangentDistance ) / 2 * 1000 ) / 1000;
 		}
 
 		const double OVERCUT_MATH_TOLERANCE = 0.001;
