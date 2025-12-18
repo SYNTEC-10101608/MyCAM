@@ -22,10 +22,10 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public IReadOnlyList<gp_Pnt> GetMainPathPointListForOrder()
+		public IReadOnlyList<gp_Pnt> GetMainPathGPPntList()
 		{
-			if( m_PathCache.MainPathPointListForOrder.Count > 0 ) {
-				return m_PathCache.MainPathPointListForOrder.Select( p => p.Point ).ToList();
+			if( m_PathCache.MainPathCADPointList.Count > 0 ) {
+				return m_PathCache.MainPathCADPointList.Select( p => p.Point ).ToList();
 			}
 			return null;
 		}

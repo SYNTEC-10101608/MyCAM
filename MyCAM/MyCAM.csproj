@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
     <Compile Include="PathCache\Application\MainPathPointCache.cs" />
+    <Compile Include="PathCache\Application\StdPatternOverCutRestrictionCache.cs" />
     <Compile Include="PathCache\Application\TraverseDataCache.cs" />
     <Compile Include="PathCache\Computation\CircleCache.cs" />
     <Compile Include="PathCache\Computation\ContourCache.cs" />

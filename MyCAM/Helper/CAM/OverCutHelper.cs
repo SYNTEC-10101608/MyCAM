@@ -1,5 +1,6 @@
 ﻿using MyCAM.Data;
 using OCC.gp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -122,6 +123,42 @@ namespace MyCAM.Helper
 			}
 		}
 
+		public static double GetMaxOverCutLength( IStdPatternGeomData stdPatternGeomData, int StartPointIndex )
+		{
+			switch( stdPatternGeomData.PathType ) {
+				case PathType.Circle:
+					CircleGeomData circleGeomData = stdPatternGeomData as CircleGeomData;
+					if( circleGeomData != null ) {
+						return GetCircleMaxOverCutLength( circleGeomData );
+					}
+					break;
+				case PathType.Rectangle:
+					RectangleGeomData rectangleGeomData = stdPatternGeomData as RectangleGeomData;
+					if( rectangleGeomData != null ) {
+						return GetRectangleMaxOverCutLength( rectangleGeomData, StartPointIndex );
+					}
+					break;
+				case PathType.Runway:
+					RunwayGeomData runwayGeomData = stdPatternGeomData as RunwayGeomData;
+					if( runwayGeomData != null ) {
+						return GetRunwayMaxOverCutLength( runwayGeomData, StartPointIndex );
+					}
+					break;
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					PolygonGeomData polygonGeomData = stdPatternGeomData as PolygonGeomData;
+					if( polygonGeomData != null ) {
+						return GetPolygonMaxOverCutLength( polygonGeomData );
+					}
+					break;
+				default:
+					break;
+			}
+			return 0;
+		}
+
 		static int FindClosestPointIndex( List<IOrientationPoint> pointList, IOrientationPoint targetPoint )
 		{
 			if( pointList == null || pointList.Count == 0 || targetPoint == null ) {
@@ -160,6 +197,36 @@ namespace MyCAM.Helper
 
 			// shifted along the vector
 			return new gp_Pnt( currentPoint.XYZ() + moveVec.XYZ() );
+		}
+
+		static double GetCircleMaxOverCutLength( CircleGeomData circleGeomData )
+		{
+			return Math.PI * circleGeomData.Diameter / 4;
+		}
+
+		static double GetRectangleMaxOverCutLength( RectangleGeomData rectangleGeomData, int startPointIndex )
+		{
+			if( startPointIndex != 0 ) {
+				return ( rectangleGeomData.Length - 2 * rectangleGeomData.CornerRadius ) / 2;
+			}
+			return ( rectangleGeomData.Width - 2 * rectangleGeomData.CornerRadius ) / 2;
+		}
+
+		static double GetRunwayMaxOverCutLength( RunwayGeomData runwayGeomData, int startPointIndex )
+		{
+			if( startPointIndex != 0 ) {
+				return ( runwayGeomData.Length - runwayGeomData.Width ) / 2.0;
+			}
+			return ( runwayGeomData.Width * Math.PI / 4.0 );
+		}
+
+		static double GetPolygonMaxOverCutLength( PolygonGeomData polygonGeomData )
+		{
+			double sideLength = polygonGeomData.SideLength;
+			double interiorAngle = ( polygonGeomData.Sides - 2 ) * Math.PI / polygonGeomData.Sides;
+			double halfAngle = interiorAngle / 2.0;
+			double tangentDistance = polygonGeomData.CornerRadius / Math.Tan( halfAngle );
+			return ( sideLength - 2 * tangentDistance ) / 2;
 		}
 
 		const double OVERCUT_MATH_TOLERANCE = 0.001;

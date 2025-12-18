@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MyCAM.App;
+using System;
 using System.Windows.Forms;
-using MyCAM.App;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -12,6 +12,8 @@ namespace MyCAM.Editor.Dialog
 			m_OverCutLength = overCutLength;
 			m_tbxOverCutLength.Text = m_OverCutLength.ToString();
 		}
+
+		public Func<double, bool> CheckValueAccrodGeomRestriction;
 
 		void m_tbxOverCutLength_Leave( object sender, EventArgs e )
 		{
@@ -47,6 +49,10 @@ namespace MyCAM.Editor.Dialog
 			}
 			if( dOverCutLength < 0 ) {
 				MyApp.Logger.ShowOnLogPanel( "長度需要大於0", MyApp.NoticeType.Warning );
+				return false;
+			}
+			if( CheckValueAccrodGeomRestriction?.Invoke( dOverCutLength ) == false ) {
+				MyApp.Logger.ShowOnLogPanel( "過切長度超出幾何限制", MyApp.NoticeType.Warning );
 				return false;
 			}
 			m_OverCutLength = dOverCutLength;

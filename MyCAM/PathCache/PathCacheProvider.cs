@@ -26,6 +26,24 @@ namespace MyCAM.PathCache
 			return true;
 		}
 
+		public static bool TryGetStdPatternOverCutMaxinumCache( string szPathID, out IStdPatternOverCutMaxinumCache cache )
+		{
+			cache = null;
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				return false;
+			}
+
+			// only standard pattern has RefPoint
+			IStdPatternCache stdPatternCache = _cache as IStdPatternCache;
+			if( stdPatternCache == null ) {
+				return false;
+			}
+
+			cache = new StdPatternOverCutRestrictionCache( stdPatternCache );
+			return true;
+		}
+
 		public static bool TryGetMainPathCache( string szPathID, out IMainPathCache cache )
 		{
 			IPathCache _cache;

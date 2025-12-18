@@ -72,11 +72,19 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public List<CADPoint> MainPathPointListForOrder
+		public List<CADPoint> MainPathCADPointList
 		{
 			get
 			{
 				return m_StartCADPointList;
+			}
+		}
+
+		public double MaxOverCutLength
+		{
+			get
+			{
+				return m_MaxOverCutLength;
 			}
 		}
 
@@ -122,6 +130,7 @@ namespace MyCAM.PathCache
 		protected List<CAMPoint> m_OverCutCAMPointList = new List<CAMPoint>();
 		protected CraftData m_CraftData;
 		protected CAMPoint m_RefPoint;
+		protected double m_MaxOverCutLength;
 		protected bool m_IsCraftDataDirty = false;
 
 		#endregion

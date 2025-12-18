@@ -27,7 +27,7 @@ namespace MyCAM.Editor
 				throw new ArgumentException( "IndexSelectAction constructing argument invalid pathID" );
 			}
 
-			m_ProcessPoints = mainPathCache.GetMainPathPointListForOrder();
+			m_ProcessPoints = mainPathCache.GetMainPathGPPntList();
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}

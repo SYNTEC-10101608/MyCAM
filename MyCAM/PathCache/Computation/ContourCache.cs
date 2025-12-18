@@ -71,7 +71,7 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public List<CADPoint> MainPathPointListForOrder
+		public List<CADPoint> MainPathCADPointList
 		{
 			get
 			{
