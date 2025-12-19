@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using MyCAM.Helper;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,12 @@ namespace MyCAM.Editor
 				return;
 			}
 			m_CraftData.StartPointIndex = nIndex;
+
+			// update coupler craft data
+			if( m_DataManager.ObjectMap[ m_PathID ] is StdPatternObjectBase stdPatternObject && stdPatternObject.GeomData != null ) {
+				StdPatternCraftCoupler stdPatternCraftCoupler = new StdPatternCraftCoupler();
+				stdPatternCraftCoupler.HandleCouplerCraftForStartPoint( ref m_CraftData, stdPatternObject.GeomData );
+			}
 			PropertyChanged?.Invoke( m_PathIDList );
 			m_Viewer.GetAISContext().ClearSelected( true );
 		}
