@@ -25,9 +25,11 @@ namespace MyCAM.Editor
 					m_BackupLeadDataList.Add( craftData.LeadData.Clone() );
 				}
 			}
-			if( m_DataManager.ObjectMap.TryGetValue( m_PathIDList[ 0 ], out IObject obj ) ) {
-				if( obj is PathObject pathObj && pathObj is StdPatternObjectBase ) {
-					m_IsStdPattern = true;
+			for( int i = 0; i < m_PathIDList.Count; i++ ) {
+				if( m_DataManager.ObjectMap.TryGetValue( m_PathIDList[ i ], out IObject obj ) ) {
+					if( obj is PathObject pathObj && pathObj is StdPatternObjectBase ) {
+						m_IsStdPattern = true;
+					}
 				}
 			}
 		}
