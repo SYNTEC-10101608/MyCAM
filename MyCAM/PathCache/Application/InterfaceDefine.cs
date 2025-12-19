@@ -54,9 +54,9 @@ namespace MyCAM.PathCache
 		}
 	}
 
-	public interface IStdPatternOverCutMaxinumCache
+	public interface IStdPatternMaxOverCutCache
 	{
-		double GetMaxinumOverCutLength();
+		double GetMaxOverCutLength();
 	}
 
 	public interface IStdPatternRefPointCache

@@ -26,7 +26,7 @@ namespace MyCAM.PathCache
 			return true;
 		}
 
-		public static bool TryGetStdPatternOverCutMaxinumCache( string szPathID, out IStdPatternOverCutMaxinumCache cache )
+		public static bool TryGetStdPatternMaxOverCutCache( string szPathID, out IStdPatternMaxOverCutCache cache )
 		{
 			cache = null;
 			IPathCache _cache;
@@ -40,7 +40,7 @@ namespace MyCAM.PathCache
 				return false;
 			}
 
-			cache = new StdPatternOverCutRestrictionCache( stdPatternCache );
+			cache = new StdPatternMaxOverCutCache( stdPatternCache );
 			return true;
 		}
 

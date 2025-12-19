@@ -82,9 +82,9 @@ namespace MyCAM.Editor
 		{
 			bool isValid = true;
 			foreach( string szID in m_PathIDList ) {
-				PathCacheProvider.TryGetStdPatternOverCutMaxinumCache( szID, out IStdPatternOverCutMaxinumCache overCutCache );
+				PathCacheProvider.TryGetStdPatternMaxOverCutCache( szID, out IStdPatternMaxOverCutCache overCutCache );
 				if( overCutCache != null ) {
-					if( overcut > overCutCache.GetMaxinumOverCutLength() ) {
+					if( overcut > overCutCache.GetMaxOverCutLength() ) {
 						isValid = false;
 						break;
 					}
