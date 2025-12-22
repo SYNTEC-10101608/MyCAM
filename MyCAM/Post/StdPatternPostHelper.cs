@@ -6,9 +6,9 @@ using System.Collections.Generic;
 
 namespace MyCAM.Post
 {
-	internal class StandardPatternNCPackage
+	internal class StdPatternNCPackage
 	{
-		public StandardPatternNCPackage( IProcessPoint refPoint, IProcessPoint startPoint, TraverseData traverseData, IProcessPoint processStartPoint,
+		public StdPatternNCPackage( IProcessPoint refPoint, IProcessPoint startPoint, TraverseData traverseData, IProcessPoint processStartPoint,
 			IProcessPoint processEndPoint, LeadData leadData, IReadOnlyList<IProcessPoint> leadInCAMPointList )
 		{
 			RefPoint = refPoint ?? throw new ArgumentNullException( nameof( refPoint ) );
@@ -56,14 +56,14 @@ namespace MyCAM.Post
 		}
 	}
 
-	internal static class StandardPatternPostHelper
+	internal static class StdPatternPostHelper
 	{
-		public static bool SolvePath( PostSolver postSolver, StandardPatternNCPackage currentPathNCPack,
+		public static bool SolvePath( PostSolver postSolver, StdPatternNCPackage currentPathNCPack,
 			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
-			out StandardPatternPostData pathG54PostData, out PathEndInfo currentPathtEndInfo )
+			out StdPatternPostData pathG54PostData, out PathEndInfo currentPathtEndInfo )
 		{
 			// for write NC file
-			pathG54PostData = new StandardPatternPostData();
+			pathG54PostData = new StdPatternPostData();
 
 			// to make solution continuous
 			currentPathtEndInfo = new PathEndInfo();
@@ -173,7 +173,7 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, StandardPatternNCPackage currentPathNCPack, ref StandardPatternPostData pathG54PostData )
+		static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, StdPatternNCPackage currentPathNCPack, ref StdPatternPostData pathG54PostData )
 		{
 			if( endInfoOfPreviousPath == null || currentPathNCPack == null ) {
 				return;
@@ -236,7 +236,7 @@ namespace MyCAM.Post
 			pathG54PostData.FollowSafeDistance = currentPathNCPack.TraverseData.FollowSafeDistance;
 		}
 
-		static void CalculateEntry( StandardPatternNCPackage currentPathNCPack, EntryAndExitData entryAndExitData, ref StandardPatternPostData pathG54PostData )
+		static void CalculateEntry( StdPatternNCPackage currentPathNCPack, EntryAndExitData entryAndExitData, ref StdPatternPostData pathG54PostData )
 		{
 			if( currentPathNCPack == null || entryAndExitData == null ) {
 				return;

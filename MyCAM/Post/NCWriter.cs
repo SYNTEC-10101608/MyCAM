@@ -6,7 +6,7 @@ using System.IO;
 
 namespace MyCAM.Post
 {
-	internal class NCWriter
+	internal class NCWriter : ITraverseWriter
 	{
 		public NCWriter( DataManager dataManager )
 		{
@@ -31,6 +31,9 @@ namespace MyCAM.Post
 		string m_MasterAxisName = string.Empty;
 		string m_SlaveAxisName = string.Empty;
 		EntryAndExitData m_EntryAndExitData;
+
+		// INCCommandWriter implementation
+		public StreamWriter Writer => m_StreamWriter;
 
 		public bool ConvertSuccess( out string errorMessage )
 		{
@@ -64,9 +67,9 @@ namespace MyCAM.Post
 							WriteCutting( postData, i + 1 );
 						}
 						else {
-							StandardPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
-							if( !StandardPatternPostHelper.SolvePath( m_PostSolver, package, endInfoOfPreviousPath, m_EntryAndExitData,
-								out StandardPatternPostData postData, out endInfoOfPreviousPath ) ) {
+							StdPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
+							if( !StdPatternPostHelper.SolvePath( m_PostSolver, package, endInfoOfPreviousPath, m_EntryAndExitData,
+								out StdPatternPostData postData, out endInfoOfPreviousPath ) ) {
 								errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
 								return false;
 							}
@@ -84,7 +87,7 @@ namespace MyCAM.Post
 						// calculate exit point
 						PostHelper.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out PostPoint exitPoint );
 						m_StreamWriter.WriteLine( "// Exit" );
-						WriteOneLinearTraverse( exitPoint );
+						WriteLinearTraverse( exitPoint );
 					}
 					m_StreamWriter.WriteLine( "G65 P\"FileEnd\";" );
 					m_StreamWriter.WriteLine( "M30;" ); // 程式結束
@@ -120,12 +123,9 @@ namespace MyCAM.Post
 			return;
 		}
 
-		void WriteStandardPatternCutting( PathType type, StandardPatternPostData currentPathPostData, CraftData craftData, IGeomData geomData, int N_Index )
+		void WriteStandardPatternCutting( PathType type, StdPatternPostData currentPathPostData, CraftData craftData, IGeomData geomData, int N_Index )
 		{
-			StandardPatternNCWriter.WriteStandardPatternCutting( m_StreamWriter, type, currentPathPostData, craftData, geomData, N_Index,
-				( writer, point, followDist ) => WriteOneLinearTraverse( point, followDist ),
-				( writer, midPoint, endPoint, followDist ) => WriteOneFrogLeap( midPoint, endPoint, followDist ),
-				( master, slave ) => GetRotaryAxisCommand( master, slave ) );
+			StdPatternNCWriter.WriteStandardPatternCutting( this, type, currentPathPostData, craftData, geomData, N_Index );
 		}
 
 		void WriteOnePoint( PostPoint postPoint )
@@ -140,7 +140,7 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand};" );
 		}
 
-		void WriteOneLinearTraverse( PostPoint postPoint, double followSafeDistance = 0 )
+		public void WriteLinearTraverse( PostPoint postPoint, double followSafeDistance = 0 )
 		{
 			if( postPoint == null ) {
 				return;
@@ -153,7 +153,7 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( $"G00 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand} {szFollow};" );
 		}
 
-		void WriteOneFrogLeap( PostPoint midPoint, PostPoint endPoint, double followSafeDistance = 0 )
+		public void WriteFrogLeap( PostPoint midPoint, PostPoint endPoint, double followSafeDistance = 0 )
 		{
 			if( midPoint == null || endPoint == null ) {
 				return;
@@ -175,7 +175,7 @@ namespace MyCAM.Post
 				$"X2={szX2} Y2={szY2} Z2={szZ2} {szRotaryAxisCommand2} {szFollow};" );
 		}
 
-		string GetRotaryAxisCommand( double master_deg, double slave_deg, string szAxisCommandFix = "" )
+		public string GetRotaryAxisCommand( double master_deg, double slave_deg, string szAxisCommandFix = "" )
 		{
 			string szM = m_MasterAxisName + szAxisCommandFix + master_deg.ToString( "F3" );
 			string szS = m_SlaveAxisName + szAxisCommandFix + slave_deg.ToString( "F3" );
@@ -200,36 +200,8 @@ namespace MyCAM.Post
 
 		void WriteTraverse( PostData currentPathPostData )
 		{
-			// lift up
-			if( currentPathPostData.LiftUpPostPoint != null ) {
-				WriteOneLinearTraverse( currentPathPostData.LiftUpPostPoint );
-			}
-
-			// frog leap with cut down
-			if( currentPathPostData.FrogLeapMidPostPoint != null && currentPathPostData.CutDownPostPoint != null ) {
-				WriteOneFrogLeap( currentPathPostData.FrogLeapMidPostPoint, currentPathPostData.CutDownPostPoint );
-
-				// cut down
-				WriteOneLinearTraverse( currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
-			}
-
-			// form leap without cut down
-			else if( currentPathPostData.FrogLeapMidPostPoint != null && currentPathPostData.CutDownPostPoint == null ) {
-				WriteOneFrogLeap( currentPathPostData.FrogLeapMidPostPoint, currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
-			}
-
-			// no frog leap
-			else if( currentPathPostData.FrogLeapMidPostPoint == null && currentPathPostData.CutDownPostPoint != null ) {
-				WriteOneLinearTraverse( currentPathPostData.CutDownPostPoint );
-
-				// cut down
-				WriteOneLinearTraverse( currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
-			}
-
-			// no frog leap and no cut down
-			else {
-				WriteOneLinearTraverse( currentPathPostData.ProcessStartPoint, currentPathPostData.FollowSafeDistance );
-			}
+			// directly pass this (NCWriter implements ITraverseWriter)
+			TraverseWriterHelper.WriteTraverse( this, currentPathPostData );
 		}
 
 		string ConvertRotaryAxisName( RotaryAxis axis )
@@ -267,7 +239,7 @@ namespace MyCAM.Post
 				traverseDataCache.GetProcessEndPoint() );
 		}
 
-		StandardPatternNCPackage BuildPackageByID_StandardPattern( string szID )
+		StdPatternNCPackage BuildPackageByID_StandardPattern( string szID )
 		{
 			if( !PathCacheProvider.TryGetLeadCache( szID, out ILeadCache leadCache )
 				|| !PathCacheProvider.TryGetStdPatternRefPointCache( szID, out IStdPatternRefPointCache refPointCache )
@@ -276,7 +248,7 @@ namespace MyCAM.Post
 				|| !PathCacheProvider.TryGetTraverseDataCache( szID, out ITraverseDataCache traverseDataCache ) ) {
 				return null;
 			}
-			return new StandardPatternNCPackage(
+			return new StdPatternNCPackage(
 						refPointCache.GetProcessRefPoint(),
 						mainPathStartPointCache.GetMainPathStartCAMPoint(),
 						traverseDataCache.TraverseData,

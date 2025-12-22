@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using MyCAM.Post;
+using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
-	internal class PostData
+	internal class PostData : ITraversePostData
 	{
 		public List<PostPoint> LeadInPostPointList
 		{
@@ -65,7 +66,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal class StandardPatternPostData
+	internal class StdPatternPostData : ITraversePostData
 	{
 		public PostPoint RefPoint
 		{
@@ -99,7 +100,6 @@ namespace MyCAM.Data
 		{
 			get; set;
 		}
-
 	}
 
 	internal class PostPoint

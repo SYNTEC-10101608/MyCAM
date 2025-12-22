@@ -199,11 +199,13 @@
     <Compile Include="PathCache\Application\StdPatternRefPointCache.cs" />
     <Compile Include="PathCache\Application\ToolVecCache.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
+    <Compile Include="Post\ITraverseWriter.cs" />
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="Post\PostHelper.cs" />
     <Compile Include="Post\PostSolver.cs" />
-    <Compile Include="Post\StandardPatternNCWriter.cs" />
-    <Compile Include="Post\StandardPatternPostHelper.cs" />
+    <Compile Include="Post\StdPatternNCWriter.cs" />
+    <Compile Include="Post\StdPatternPostHelper.cs" />
+    <Compile Include="Post\TraverseWriterHelper.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
