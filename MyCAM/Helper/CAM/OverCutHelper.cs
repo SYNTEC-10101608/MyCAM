@@ -202,7 +202,7 @@ namespace MyCAM.Helper
 		static double GetCircleMaxOverCutLength( CircleGeomData circleGeomData )
 		{
 			// Unconditionally rounded to three decimal places.
-			return Math.Floor( Math.PI * circleGeomData.Diameter / 4 * 1000 ) * 1000;
+			return Math.Floor( Math.PI * circleGeomData.Diameter / 4 * 1000 ) / 1000;
 		}
 
 		static double GetRectangleMaxOverCutLength( RectangleGeomData rectangleGeomData, int startPointIndex )
