@@ -170,30 +170,31 @@ namespace MyCAM.Editor
 		void ShowStdPatternTrihedron( gp_Ax3 refCoord )
 		{
 			gp_Ax2 ax2 = refCoord.Ax2();
-			m_Trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
-			m_Trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			m_Trihedron.SetSize( 10.0 );
-			m_Trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			m_Trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			m_Trihedron.SetArrowColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			m_Viewer.GetAISContext().Display( m_Trihedron, false );
-			m_Viewer.GetAISContext().Deactivate( m_Trihedron );
+			AIS_Trihedron trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
+			trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			trihedron.SetSize( 10.0 );
+			trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			trihedron.SetArrowColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			m_Viewer.GetAISContext().Display( trihedron, false );
+			m_Viewer.GetAISContext().Deactivate( trihedron );
+			m_TrihedronList.Add( trihedron );
 		}
 
 		void RemoveTrihedron()
 		{
-			if( m_Trihedron != null ) {
-				m_Viewer.GetAISContext().Remove( m_Trihedron, false );
-				m_Trihedron = null;
+			foreach( var trihedron in m_TrihedronList ) {
+				m_Viewer.GetAISContext().Remove( trihedron, false );
 			}
+			m_TrihedronList.Clear();
 		}
 
 		ViewManager m_ViewManager;
 		Viewer m_Viewer;
 		List<string> m_szPathIDList = new List<string>();
+		List<AIS_Trihedron> m_TrihedronList = new List<AIS_Trihedron>();
 		IGeomData m_GeomData;
 		PathType m_BackFirstPathType;
 		Dictionary<string, PathObject> m_BackUpPathObjectList = new Dictionary<string, PathObject>();
-		AIS_Trihedron m_Trihedron;
 	}
 }
