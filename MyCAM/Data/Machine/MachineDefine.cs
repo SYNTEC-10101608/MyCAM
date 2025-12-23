@@ -60,27 +60,38 @@
 		SlaveTiltedVec_Z = 3020,
 
 		// spindle type
-		ToolToSlaveVec_X = 3021, 
-		ToolToSlaveVec_Y = 3022, 
-		ToolToSlaveVec_Z = 3023, 
-		SlaveToMasterVec_X = 3024, 
-		SlaveToMasterVec_Y = 3025, 
+		ToolToSlaveVec_X = 3021,
+		ToolToSlaveVec_Y = 3022,
+		ToolToSlaveVec_Z = 3023,
+		SlaveToMasterVec_X = 3024,
+		SlaveToMasterVec_Y = 3025,
 		SlaveToMasterVec_Z = 3026,
 
 		// table type
-		MasterToSlaveVec_X = 3031, 
-		MasterToSlaveVec_Y = 3032, 
-		MasterToSlaveVec_Z = 3033, 
-		MCSToMasterVec_X = 3034, 
-		MCSToMasterVec_Y = 3035, 
+		MasterToSlaveVec_X = 3031,
+		MasterToSlaveVec_Y = 3032,
+		MasterToSlaveVec_Z = 3033,
+		MCSToMasterVec_X = 3034,
+		MCSToMasterVec_Y = 3035,
 		MCSToMasterVec_Z = 3036,
 
 		// mix type
-		ToolToMasterVec_X = 3041, 
-		ToolToMasterVec_Y = 3042, 
-		ToolToMasterVec_Z = 3043, 
-		MCSToSlaveVec_X = 3044, 
-		MCSToSlaveVec_Y = 3045, 
-		MCSToSlaveVec_Z = 3046, 
+		ToolToMasterVec_X = 3041,
+		ToolToMasterVec_Y = 3042,
+		ToolToMasterVec_Z = 3043,
+		MCSToSlaveVec_X = 3044,
+		MCSToSlaveVec_Y = 3045,
+		MCSToSlaveVec_Z = 3046,
+
+		// limit
+		AxialLimit = 2401,
+	}
+
+	public class MachineParamName
+	{
+		public const string MASTER_LIMIMT_START_PARAM_NAME = "Master_Start";
+		public const string MASTER_LIMIMT_END_PARAM_NAME = "Master_End";
+		public const string SLAVE_LIMIMT_START_PARAM_NAME = "Slave_Start";
+		public const string SLAVE_LIMIMT_END_PARAM_NAME = "Slave_End";
 	}
 }

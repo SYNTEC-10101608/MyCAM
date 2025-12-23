@@ -1,8 +1,8 @@
-﻿using System;
+﻿using MyCAM.Data;
+using MyCAM.FileManager;
+using System;
 using System.Linq;
 using System.Xml.Linq;
-using MyCAM.Data;
-using MyCAM.FileManager;
 
 namespace MyCAM.Helper
 {
@@ -92,6 +92,12 @@ namespace MyCAM.Helper
 			// turn mm to blu
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.ToolLength, machineDataDTO.ToolLength * dRatioMMToBlu );
 
+			// axis range (degrees, no conversion needed)
+			ConvertPropertyToPrNode( root, MachineParamName.MASTER_LIMIMT_START_PARAM_NAME, machineDataDTO.MasterAxisStart_deg );
+			ConvertPropertyToPrNode( root, MachineParamName.MASTER_LIMIMT_END_PARAM_NAME, machineDataDTO.MasterAxisEnd_deg );
+			ConvertPropertyToPrNode( root, MachineParamName.SLAVE_LIMIMT_START_PARAM_NAME, machineDataDTO.SlaveAxisStart_deg );
+			ConvertPropertyToPrNode( root, MachineParamName.SLAVE_LIMIMT_END_PARAM_NAME, machineDataDTO.SlaveAxisEnd_deg );
+
 			// mster/slave tilted vector (turn mm to blu)
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.MasterTiltedVec_X, machineDataDTO.MasterTiltedVec_deg.X * dRatioMMToBlu );
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.MasterTiltedVec_Y, machineDataDTO.MasterTiltedVec_deg.Y * dRatioMMToBlu );
@@ -179,6 +185,13 @@ namespace MyCAM.Helper
 		{
 			parent.Add( new XElement( "Pr",
 				new XAttribute( "ID", nPrID ),
+				new XAttribute( "Value", prValue ?? 0 ) ) );
+		}
+
+		static void ConvertPropertyToPrNode( XElement parent, string szName, object prValue )
+		{
+			parent.Add( new XElement( "Pr",
+				new XAttribute( "ID", szName ),
 				new XAttribute( "Value", prValue ?? 0 ) ) );
 		}
 
@@ -308,6 +321,29 @@ namespace MyCAM.Helper
 				nErrorPrIndex = (int)MachinePrValue.ToolLength;
 				return machineDTOContainer;
 			}
+
+			// axis range (degrees, no conversion needed)
+			machineDataDTO.MasterAxisStart_deg = GetPrValue<double>( machineData, MachineParamName.MASTER_LIMIMT_START_PARAM_NAME, out prValueStatus );
+			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+				nErrorPrIndex = (int)MachinePrValue.AxialLimit;
+				return machineDTOContainer;
+			}
+			machineDataDTO.MasterAxisEnd_deg = GetPrValue<double>( machineData, MachineParamName.MASTER_LIMIMT_END_PARAM_NAME, out prValueStatus );
+			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+				nErrorPrIndex = (int)MachinePrValue.AxialLimit;
+				return machineDTOContainer;
+			}
+			machineDataDTO.SlaveAxisStart_deg = GetPrValue<double>( machineData, MachineParamName.SLAVE_LIMIMT_START_PARAM_NAME, out prValueStatus );
+			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+				nErrorPrIndex = (int)MachinePrValue.AxialLimit;
+				return machineDTOContainer;
+			}
+			machineDataDTO.SlaveAxisEnd_deg = GetPrValue<double>( machineData, MachineParamName.SLAVE_LIMIMT_END_PARAM_NAME, out prValueStatus );
+			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+				nErrorPrIndex = (int)MachinePrValue.AxialLimit;
+				return machineDTOContainer;
+			}
+
 			machineDataDTO.MasterTiltedVec_deg.X = GetPrValue<double>( machineData, (int)MachinePrValue.MasterTiltedVec_X, out prValueStatus, dRatioBluToMM );
 			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
 				nErrorPrIndex = (int)MachinePrValue.MasterTiltedVec_X;
@@ -443,14 +479,19 @@ namespace MyCAM.Helper
 			return machineDTOContainer;
 		}
 
-		// if input <T> is enum, return enum value ; if input <T> is int, return int value
 		static T GetPrValue<T>( XElement parent, int nPrId, out EFilePrValueStatus prValueStatus, double dRatio = 1 ) where T : struct
+		{
+			return GetPrValue<T>( parent, nPrId.ToString(), out prValueStatus, dRatio );
+		}
+
+		// if input <T> is enum, return enum value ; if input <T> is int, return int value
+		static T GetPrValue<T>( XElement parent, string szPrId, out EFilePrValueStatus prValueStatus, double dRatio = 1 ) where T : struct
 		{
 			prValueStatus = EFilePrValueStatus.GetSuccess;
 			T defaultValue = new T();
 
 			// get that pr node
-			XElement prNode = parent.Elements( "Pr" ).FirstOrDefault( node => (int?)node.Attribute( "ID" ) == nPrId );
+			XElement prNode = parent.Elements( "Pr" ).FirstOrDefault( node => (string)node.Attribute( "ID" ) == szPrId );
 
 			// can't find that node
 			if( prNode == null ) {
