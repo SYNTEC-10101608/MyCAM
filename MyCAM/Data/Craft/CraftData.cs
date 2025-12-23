@@ -3,8 +3,17 @@ using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
+	public enum EToolVecInterpolateType
+	{
+		VectorInterpolation,
+		TiltAngleInterpolation,
+		FixedDir,
+	}
+
 	public class CraftData
 	{
+	
+
 		public CraftData()
 		{
 			SubscribeSubParamChanged();
@@ -17,6 +26,7 @@ namespace MyCAM.Data
 			double overCutLength,
 			Dictionary<int, Tuple<double, double>> toolVecModifyMap,
 			bool isToolVecReverse,
+			EToolVecInterpolateType interpolateType,
 			TraverseData traverseData )
 		{
 			m_StartPointIndex = startPoint;
@@ -25,6 +35,7 @@ namespace MyCAM.Data
 			m_OverCutLength = overCutLength;
 			m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>( toolVecModifyMap );
 			m_IsToolVecReverse = isToolVecReverse;
+			m_InterpolateType = interpolateType;
 			m_TraverseData = traverseData;
 			SubscribeSubParamChanged();
 		}
@@ -114,6 +125,21 @@ namespace MyCAM.Data
 			}
 		}
 
+		public EToolVecInterpolateType InterpolateType
+		{
+			get
+			{
+				return m_InterpolateType;
+			}
+			set
+			{
+				if( m_InterpolateType != value ) {
+					m_InterpolateType = value;
+					ParameterChanged?.Invoke();
+				}
+			}
+		}
+
 		public Dictionary<int, Tuple<double, double>> ToolVecModifyMap
 		{
 			get
@@ -180,6 +206,7 @@ namespace MyCAM.Data
 		bool m_IsPathReverse = false;
 		LeadData m_LeadData = new LeadData();
 		double m_OverCutLength = 0;
+		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.VectorInterpolation;
 		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();

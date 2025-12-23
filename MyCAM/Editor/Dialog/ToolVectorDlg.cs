@@ -1,12 +1,18 @@
 ﻿using MyCAM.App;
 using System;
 using System.Windows.Forms;
+using MyCAM.Data;
 
 namespace MyCAM.Editor
 {
 	public struct ToolVecParam
 	{
 		public bool IsModified
+		{
+			get; set;
+		}
+
+		public EToolVecInterpolateType InterpolateType
 		{
 			get; set;
 		}
@@ -21,11 +27,12 @@ namespace MyCAM.Editor
 			get; set;
 		}
 
-		public ToolVecParam( bool isModified, double dAngleA_deg, double dAngelB_deg )
+		public ToolVecParam( bool isModified, double dAngleA_deg, double dAngelB_deg, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.VectorInterpolation )
 		{
 			IsModified = isModified;
 			AngleA_deg = dAngleA_deg;
 			AngleB_deg = dAngelB_deg;
+			InterpolateType = interpolateType;
 		}
 	}
 
@@ -50,6 +57,22 @@ namespace MyCAM.Editor
 
 			// initialize button
 			m_btnRemove.Visible = m_ToolVecParam.IsModified;
+
+			// initialize modify type
+			switch( toolVecParam.InterpolateType ) {
+				case EToolVecInterpolateType.FixedDir:
+					m_rbtFixedDir.Checked = true;
+					m_gbxParam.Enabled = false;
+					m_btnRemove.Enabled = false;
+					break;
+				case EToolVecInterpolateType.TiltAngleInterpolation:
+					m_rbtTiltAngleCase.Checked = true;
+					break;
+				case EToolVecInterpolateType.VectorInterpolation:
+				default:
+					m_rbtVecSpaceCase.Checked = true;
+					break;
+			}
 		}
 
 		public void SetParamBack( Tuple<double, double> ToolVecParam )
@@ -67,7 +90,7 @@ namespace MyCAM.Editor
 		protected override void OnShown( EventArgs e )
 		{
 			base.OnShown( e );
-			SetVertexAsModified();
+			PreviewToolVecResult();
 		}
 
 		ToolVecParam m_ToolVecParam;
@@ -75,28 +98,42 @@ namespace MyCAM.Editor
 		void m_btnOK_Click( object sender, EventArgs e )
 		{
 			if( CheckParamValid() ) {
-				m_ToolVecParam.IsModified = true;
-				m_ToolVecParam.AngleA_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleA.Text ) : double.Parse( m_tbxAngleA.Text );
-				m_ToolVecParam.AngleB_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleB.Text ) : double.Parse( m_tbxAngleB.Text );
+				SaveInterpolateType();
+
+				// fixed dir do not need to save angle (it would not change this pnt AB Angle)
+				if( m_ToolVecParam.InterpolateType != EToolVecInterpolateType.FixedDir ) {
+					SaveABAngle();
+				}
 				RaiseConfirm( m_ToolVecParam );
 			}
 			Close();
 		}
 
+		void SaveInterpolateType()
+		{
+			if( m_rbtFixedDir.Checked ) {
+				m_ToolVecParam.InterpolateType = EToolVecInterpolateType.FixedDir;
+			}
+			else if( m_rbtTiltAngleCase.Checked ) {
+				m_ToolVecParam.InterpolateType = EToolVecInterpolateType.TiltAngleInterpolation;
+			}
+			else {
+				m_ToolVecParam.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
+			}
+		}
+
+		void SaveABAngle()
+		{
+			m_ToolVecParam.IsModified = true;
+			m_ToolVecParam.AngleA_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleA.Text ) : double.Parse( m_tbxAngleA.Text );
+			m_ToolVecParam.AngleB_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleB.Text ) : double.Parse( m_tbxAngleB.Text );
+		}
 		void m_btnRemove_Click( object sender, EventArgs e )
 		{
 			// set flag to this tool vec is need to erase
 			m_ToolVecParam.IsModified = false;
 			RaiseConfirm( m_ToolVecParam );
 			Close();
-		}
-
-		void SetVertexAsModified()
-		{
-			// this vexter do not modified, set as modified and preview
-			if( !m_ToolVecParam.IsModified ) {
-				PreviewToolVecResult();
-			}
 		}
 
 		bool CheckParamValid()
@@ -141,9 +178,12 @@ namespace MyCAM.Editor
 		void PreviewToolVecResult()
 		{
 			if( CheckParamValid() ) {
-				m_ToolVecParam.AngleA_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleA.Text ) : double.Parse( m_tbxAngleA.Text );
-				m_ToolVecParam.AngleB_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleB.Text ) : double.Parse( m_tbxAngleB.Text );
-				m_ToolVecParam.IsModified = true;
+				SaveInterpolateType();
+
+				// fixed dir do not have to set AB angle
+				if( m_rbtFixedDir.Checked == false ) {
+					SaveABAngle();
+				}
 				RaisePreview( m_ToolVecParam );
 			}
 		}
@@ -156,6 +196,29 @@ namespace MyCAM.Editor
 		void m_btnZDir_Click( object sender, EventArgs e )
 		{
 			RaiseZDir();
+		}
+
+		void m_rbtVecSpaceCase_CheckedChanged( object sender, EventArgs e )
+		{
+			PreviewToolVecResult();
+		}
+
+		void m_rbtTiltAngleCase_CheckedChanged( object sender, EventArgs e )
+		{
+			PreviewToolVecResult();
+		}
+
+		void m_rbtFixedDir_CheckedChanged( object sender, EventArgs e )
+		{
+			if( m_rbtFixedDir.Checked ) {
+				m_gbxParam.Enabled = false;
+				m_btnRemove.Enabled = false;
+			}
+			else {
+				m_gbxParam.Enabled = true;
+				m_btnRemove.Enabled = true;
+			}
+			PreviewToolVecResult();
 		}
 
 		bool m_IsPathRevese = false;

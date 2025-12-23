@@ -143,6 +143,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap FixedToolVec {
+            get {
+                object obj = ResourceManager.GetObject("FixedToolVec", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Import3DFile {
             get {
                 object obj = ResourceManager.GetObject("Import3DFile", resourceCulture);

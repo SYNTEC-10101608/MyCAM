@@ -41,6 +41,7 @@ namespace MyCAM.Editor.Renderer
 			// build tool vec
 			foreach( string szPathID in pathIDList ) {
 				IReadOnlyList<IProcessPoint> toolVecPointList = GetToolVecPointList( szPathID );
+				EToolVecInterpolateType interpolateType = GetInterpolateType( szPathID );
 				if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
 					continue;
 				}
@@ -49,8 +50,20 @@ namespace MyCAM.Editor.Renderer
 				for( int i = 0; i < toolVecPointList.Count; i++ ) {
 					IProcessPoint point = toolVecPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
+
+					// fixed dir show green, modified point do not show
+					if( interpolateType == EToolVecInterpolateType.FixedDir ) {
+						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_SKYBLUE ) );
+						toolVecAISList.Add( toolVecAIS );
+						continue;
+					}
 					if( IsToolVecModifyPoint( szPathID, point ) ) {
-						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+						if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
+							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_ORANGE ) );
+						}
+						else {
+							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+						}
 						toolVecAIS.SetWidth( 4 );
 					}
 					toolVecAISList.Add( toolVecAIS );
@@ -118,6 +131,17 @@ namespace MyCAM.Editor.Renderer
 				return false;
 			}
 			return toolVecCache.IsToolVecModifyPoint( point );
+		}
+
+		EToolVecInterpolateType GetInterpolateType( string pathID )
+		{
+			if( !PathCacheProvider.TryGetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
+				return EToolVecInterpolateType.VectorInterpolation;
+			}
+			if( toolVecCache.GetToolVecInterpolateType( out EToolVecInterpolateType interpolateType ) ) {
+				return interpolateType;
+			}
+			return EToolVecInterpolateType.VectorInterpolation;
 		}
 	}
 }
