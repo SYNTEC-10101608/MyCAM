@@ -261,7 +261,7 @@ namespace MyCAM.Editor
 
 			// clear selection after remove path
 			m_DefaultAction.ClearSelection();
-			RemoveCAMData( szPathIDList );
+			RemovePathCAMData( szPathIDList );
 		}
 
 		#region Set CAM
@@ -659,6 +659,18 @@ namespace MyCAM.Editor
 			m_OrientationRenderer.Remove( pathIDList );
 			m_IndexRenderer.Remove();
 			m_TraverseRenderer.Remove();
+			m_Viewer.UpdateView();
+		}
+
+		void RemovePathCAMData( List<string> pathIDList )
+		{
+			m_ToolVecRenderer.Remove( pathIDList );
+			m_CraftRenderer.Remove( pathIDList );
+			m_OrientationRenderer.Remove( pathIDList );
+
+			// those info are not recorded on each path, need to refresh all not remove
+			m_IndexRenderer.Show();
+			m_TraverseRenderer.Show();
 			m_Viewer.UpdateView();
 		}
 
