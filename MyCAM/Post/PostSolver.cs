@@ -1,26 +1,17 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.gp;
+using PostTool.Interop;
+using System;
 
 namespace MyCAM.Post
 {
-	// P/INVOKE from C++ PostTool.dll
-	internal static class IKSolverInterop
+	/// <summary>
+	/// Constants for IK/FK solver
+	/// </summary>
+	internal static class SolverConstants
 	{
-		[DllImport( "PostTool.dll", CallingConvention = CallingConvention.StdCall )]
-		public static extern int IKSolver_IJKtoMS(
-			double[] ToolDirection,
-			double[] ToolDirectionAtZero,
-			double[] DirectOfFirstRotAxis,
-			double[] DirectOfSecondRotAxis,
-			double LastMasterRotAngle,
-			double LastSlaveRotAngle,
-			out double MRotAngle1,
-			out double SRotAngle1,
-			out double MRotAngle2,
-			out double SRotAngle2
-		);
+		// we are not using different system, so just set it to 1
+		public const double IU_TO_BLU_ROTARY = 1;
 	}
 
 	public enum IKSolveResult
@@ -30,6 +21,7 @@ namespace MyCAM.Post
 		MasterInfinityOfSolution = 2,
 		SlaveInfinityOfSolution = 3,
 		InvalidInput = 4,
+		OutOfRange = 5,
 	}
 
 	/// <summary>
@@ -38,7 +30,9 @@ namespace MyCAM.Post
 	/// </summary>
 	internal class IKSolver
 	{
-		public IKSolver( gp_Dir toolDir, gp_Dir masterRotateDir, gp_Dir slaveRotateDir, bool isReverseMS )
+		public IKSolver( gp_Dir toolDir, gp_Dir masterRotateDir, gp_Dir slaveRotateDir,
+			double masterAxisStart_deg, double masterAxisEnd_deg,
+			double slaveAxisStart_deg, double slaveAxisEnd_deg, bool isReverseMS )
 		{
 			// give a defaul Z dir BC type
 			if( toolDir == null ) {
@@ -54,13 +48,17 @@ namespace MyCAM.Post
 			m_MasterRotateDir = new double[ 3 ] { masterRotateDir.X(), masterRotateDir.Y(), masterRotateDir.Z() };
 			m_SlaveRotateDir = new double[ 3 ] { slaveRotateDir.X(), slaveRotateDir.Y(), slaveRotateDir.Z() };
 			m_isReverseMS = isReverseMS;
+			m_MasterAxisStart = masterAxisStart_deg * Math.PI / 180.0;
+			m_MasterAxisEnd = masterAxisEnd_deg * Math.PI / 180.0;
+			m_SlaveAxisStart = slaveAxisStart_deg * Math.PI / 180.0;
+			m_SlaveAxisEnd = slaveAxisEnd_deg * Math.PI / 180.0;
 		}
 
 		// the angle for spindle is right-handed, for table is left-handed
 		public IKSolveResult Solve( gp_Dir toolVec_In, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
 		{
 			// prevent from sigular area
-			if( toolVec_In.IsParallel( new gp_Dir( m_MasterRotateDir[ 0 ], m_MasterRotateDir[ 1 ], m_MasterRotateDir[ 2 ] ), 1e-2 ) ) {
+			if( toolVec_In.IsParallel( new gp_Dir( m_MasterRotateDir[ 0 ], m_MasterRotateDir[ 1 ], m_MasterRotateDir[ 2 ] ), SINGULAR_AREA_DEGREE * Math.PI / 180 ) ) {
 
 				// just make it singular to prevent unexpected result
 				toolVec_In = new gp_Dir( m_MasterRotateDir[ 0 ], m_MasterRotateDir[ 1 ], m_MasterRotateDir[ 2 ] );
@@ -68,44 +66,35 @@ namespace MyCAM.Post
 
 			// calculate the M and S angle
 			double[] ToolDirection = new double[ 3 ] { toolVec_In.X(), toolVec_In.Y(), toolVec_In.Z() };
-			int solveResult = IKSolverInterop.IKSolver_IJKtoMS( ToolDirection, m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir,
-				dM_In, dS_In, out double dM1, out double dS1, out double dM2, out double dS2 );
-
-			// master has infinite solution
-			if( solveResult == (int)IKSolveResult.MasterInfinityOfSolution ) {
-				dM_Out = dM1;
-				dS_Out = dS1;
-				return IKSolveResult.MasterInfinityOfSolution;
-			}
-
-			// slave has infinite solution, this may almost not happen in real world
-			else if( solveResult == (int)IKSolveResult.SlaveInfinityOfSolution ) {
-				dM_Out = dM1;
-				dS_Out = dS1;
-				return IKSolveResult.SlaveInfinityOfSolution;
-			}
+			int solveResult = FiveAxisSolver.IJKtoMS( ToolDirection, m_ToolDir, m_MasterRotateDir, m_SlaveRotateDir,
+				dM_In, dS_In, out double dM1, out double dS1, out double dM2, out double dS2, SolverConstants.IU_TO_BLU_ROTARY );
 
 			// no solution
-			else if( solveResult == (int)IKSolveResult.NoSolution ) {
+			if( solveResult == (int)IKSolveResult.NoSolution ) {
 				dM_Out = 0;
 				dS_Out = 0;
 				return IKSolveResult.NoSolution;
 			}
 
-			// the system is solvable, choose the closest solution
-			dM1 = FindClosetCoterminalAngle( dM_In, dM1 );
-			dM2 = FindClosetCoterminalAngle( dM_In, dM2 );
-			double diff1 = Math.Abs( dM_In - dM1 ) + Math.Abs( dS_In - dS1 );
-			double diff2 = Math.Abs( dM_In - dM2 ) + Math.Abs( dS_In - dS2 );
-			if( diff1 < diff2 ) {
-				dM_Out = dM1;
-				dS_Out = dS1;
+			// the system is solvable, choose the best solution using FiveAxisSolver.ChooseSolution
+			// Note: Rotation directions are fixed to 1 (right-hand) for both axes
+			int chooseResult = FiveAxisSolver.ChooseSolution(
+				dM1, dS1, dM2, dS2,
+				dM_In, dS_In,
+				out dM_Out, out dS_Out,
+				SolutionType.ShortestDist,
+				m_MasterAxisStart, m_MasterAxisEnd,
+				m_SlaveAxisStart, m_SlaveAxisEnd,
+				1,  // Master axis rotation direction (right-hand)
+				1,  // Slave axis rotation direction (right-hand)
+				SolverConstants.IU_TO_BLU_ROTARY );
+
+			if( chooseResult != (int)IKSolveResult.NoError ) {
+
+				// solvanle but can not choose a valid solution within range
+				return IKSolveResult.OutOfRange;
 			}
-			else {
-				dM_Out = dM2;
-				dS_Out = dS2;
-			}
-			return IKSolveResult.NoError;
+			return (IKSolveResult)solveResult;
 		}
 
 		public bool IsReverseMS
@@ -116,43 +105,20 @@ namespace MyCAM.Post
 			}
 		}
 
-		double FindClosetCoterminalAngle( double dM_In, double dM )
-		{
-			// case when they are originally coterminal
-			if( Math.Abs( dM_In - dM ) % ( 2 * Math.PI ) < 1e-6 ) {
-				return dM_In;
-			}
-
-			// find the closest coterminal angle
-			double valueP;
-			double valueN;
-			if( dM < dM_In ) {
-				valueP = dM;
-				while( valueP < dM_In ) {
-					valueP += 2 * Math.PI;
-				}
-				valueN = valueP - 2 * Math.PI;
-			}
-			else {
-				valueN = dM;
-				while( valueN > dM_In ) {
-					valueN -= 2 * Math.PI;
-				}
-				valueP = valueN + 2 * Math.PI;
-			}
-			if( Math.Abs( dM_In - valueP ) < Math.Abs( dM_In - valueN ) ) {
-				return valueP;
-			}
-			else {
-				return valueN;
-			}
-		}
-
 		// machine properties
 		double[] m_ToolDir;
 		double[] m_MasterRotateDir;
 		double[] m_SlaveRotateDir;
 		bool m_isReverseMS;
+
+		// axis limits (0,0 means no limit)
+		double m_MasterAxisStart;
+		double m_MasterAxisEnd;
+		double m_SlaveAxisStart;
+		double m_SlaveAxisEnd;
+
+		// singular area
+		const double SINGULAR_AREA_DEGREE = 5.0;
 	}
 
 	internal interface FKSolver
@@ -350,11 +316,11 @@ namespace MyCAM.Post
 			m_IKSolver = solverBuilder.BuildIKSolver();
 		}
 
-		public IKSolveResult SolveIK( CAMPoint point, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
+		public IKSolveResult SolveIK( IProcessPoint point, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
 		{
 			dM_Out = 0;
 			dS_Out = 0;
-			if( point == null ) {
+			if( point == null || point.ToolVec == null ) {
 				return IKSolveResult.InvalidInput;
 			}
 
@@ -453,7 +419,9 @@ namespace MyCAM.Post
 
 		public override IKSolver BuildIKSolver()
 		{
-			return new IKSolver( m_MachineData.ToolDir, m_MachineData.MasterRotateDir, m_MachineData.SlaveRotateDir, false );
+			return new IKSolver( m_MachineData.ToolDir, m_MachineData.MasterRotateDir, m_MachineData.SlaveRotateDir,
+				m_MachineData.MasterAxisStart_deg, m_MachineData.MasterAxisEnd_deg,
+				m_MachineData.SlaveAxisStart_deg, m_MachineData.SlaveAxisEnd_deg, false );
 		}
 	}
 
@@ -478,7 +446,9 @@ namespace MyCAM.Post
 		public override IKSolver BuildIKSolver()
 		{
 			// for table type, just exchange the master and slave axis
-			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir, true );
+			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir,
+				m_MachineData.SlaveAxisStart_deg, m_MachineData.SlaveAxisEnd_deg,
+				m_MachineData.MasterAxisStart_deg, m_MachineData.MasterAxisEnd_deg, true );
 		}
 	}
 
@@ -503,7 +473,10 @@ namespace MyCAM.Post
 		public override IKSolver BuildIKSolver()
 		{
 			// for mix type, just exchange the master and slave axis
-			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir, true );
+			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir,
+				m_MachineData.SlaveAxisStart_deg, m_MachineData.SlaveAxisEnd_deg,
+				m_MachineData.MasterAxisStart_deg, m_MachineData.MasterAxisEnd_deg, true );
 		}
 	}
 }
+

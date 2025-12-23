@@ -30,7 +30,7 @@ namespace MyCAM.PathCache
 
 		public bool IsToolVecModifyPoint( IProcessPoint point )
 		{
-			return ( point as CAMPoint ).IsToolVecModPoint;
+			return point.IsToolVecModPoint;
 		}
 	}
 }

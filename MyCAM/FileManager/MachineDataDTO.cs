@@ -1,7 +1,7 @@
-﻿using System;
-using System.Xml.Serialization;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.gp;
+using System;
+using System.Xml.Serialization;
 
 namespace MyCAM.FileManager
 {
@@ -109,6 +109,26 @@ namespace MyCAM.FileManager
 			get; set;
 		}
 
+		public double MasterAxisStart_deg
+		{
+			get; set;
+		}
+
+		public double MasterAxisEnd_deg
+		{
+			get; set;
+		}
+
+		public double SlaveAxisStart_deg
+		{
+			get; set;
+		}
+
+		public double SlaveAxisEnd_deg
+		{
+			get; set;
+		}
+
 		// parameterless constructor for XmlSerializer
 		internal MachineDataDTO()
 		{
@@ -128,6 +148,10 @@ namespace MyCAM.FileManager
 			MasterTiltedVec_deg = new gp_XYZDTO( data.MasterTiltedVec_deg );
 			SlaveTiltedVec_deg = new gp_XYZDTO( data.SlaveTiltedVec_deg );
 			ToolLength = data.ToolLength;
+			MasterAxisStart_deg = data.MasterAxisStart_deg;
+			MasterAxisEnd_deg = data.MasterAxisEnd_deg;
+			SlaveAxisStart_deg = data.SlaveAxisStart_deg;
+			SlaveAxisEnd_deg = data.SlaveAxisEnd_deg;
 		}
 	}
 
@@ -171,6 +195,10 @@ namespace MyCAM.FileManager
 				MasterTiltedVec_deg = MasterTiltedVec_deg.ToXYZ(),
 				SlaveTiltedVec_deg = SlaveTiltedVec_deg.ToXYZ(),
 				ToolLength = ToolLength,
+				MasterAxisStart_deg = MasterAxisStart_deg,
+				MasterAxisEnd_deg = MasterAxisEnd_deg,
+				SlaveAxisStart_deg = SlaveAxisStart_deg,
+				SlaveAxisEnd_deg = SlaveAxisEnd_deg,
 				ToolToSlaveVec = ToolToSlaveVec.ToVec(),
 				SlaveToMasterVec = SlaveToMasterVec.ToVec()
 			};
@@ -219,6 +247,10 @@ namespace MyCAM.FileManager
 				MasterTiltedVec_deg = MasterTiltedVec_deg.ToXYZ(),
 				SlaveTiltedVec_deg = SlaveTiltedVec_deg.ToXYZ(),
 				ToolLength = ToolLength,
+				MasterAxisStart_deg = MasterAxisStart_deg,
+				MasterAxisEnd_deg = MasterAxisEnd_deg,
+				SlaveAxisStart_deg = SlaveAxisStart_deg,
+				SlaveAxisEnd_deg = SlaveAxisEnd_deg,
 				MasterToSlaveVec = MasterToSlaveVec.ToVec(),
 				MCSToMasterVec = MCSToMasterVec.ToVec()
 			};
@@ -267,6 +299,10 @@ namespace MyCAM.FileManager
 				MasterTiltedVec_deg = MasterTiltedVec_deg.ToXYZ(),
 				SlaveTiltedVec_deg = SlaveTiltedVec_deg.ToXYZ(),
 				ToolLength = ToolLength,
+				MasterAxisStart_deg = MasterAxisStart_deg,
+				MasterAxisEnd_deg = MasterAxisEnd_deg,
+				SlaveAxisStart_deg = SlaveAxisStart_deg,
+				SlaveAxisEnd_deg = SlaveAxisEnd_deg,
 				ToolToMasterVec = ToolToMasterVec.ToVec(),
 				MCSToSlaveVec = MCSToSlaveVec.ToVec()
 			};

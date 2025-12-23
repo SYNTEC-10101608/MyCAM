@@ -194,6 +194,7 @@
     <Compile Include="Helper\CAM\OverCutHelper.cs" />
     <Compile Include="PathCache\Application\StdPatternRefPointCache.cs" />
     <Compile Include="PathCache\Application\ToolVecCache.cs" />
+    <Compile Include="Post\FiveAxisSolver.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="Post\PostHelper.cs" />
