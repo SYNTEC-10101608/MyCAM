@@ -340,6 +340,11 @@ namespace MyCAM
 			m_CAMEditor.SetToolVecReverse();
 		}
 
+		void m_tsbFixedToolVec_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetInterpolateTypeAsFixedDir();
+		}
+
 		// sort
 		void m_tsbMoveUp_Click( object sender, EventArgs e )
 		{
@@ -932,9 +937,7 @@ namespace MyCAM
 			}
 		}
 
+
 		#endregion
-
-
 	}
 }
-

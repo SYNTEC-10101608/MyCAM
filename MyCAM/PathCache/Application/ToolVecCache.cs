@@ -1,6 +1,5 @@
 using MyCAM.Data;
-using System.Collections.Generic;
-using System.Linq;
+
 
 namespace MyCAM.PathCache
 {
@@ -31,6 +30,12 @@ namespace MyCAM.PathCache
 		public bool IsToolVecModifyPoint( IProcessPoint point )
 		{
 			return ( point as CAMPoint ).IsToolVecModPoint;
+		}
+
+		public bool GetToolVecInterpolateType( out EToolVecInterpolateType interpolateType )
+		{
+			interpolateType = m_CraftData.InterpolateType;
+			return true;
 		}
 	}
 }

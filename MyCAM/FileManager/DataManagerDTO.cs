@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using static MyCAM.Data.CraftData;
 
 namespace MyCAM.FileManager
 {
@@ -898,6 +899,12 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public EToolVecInterpolateType InterpolateType
+		{
+			get;
+			set;
+		} = EToolVecInterpolateType.VectorInterpolation;
+
 		public List<ToolVecMapDTO> ToolVecModifyMap
 		{
 			get;
@@ -923,6 +930,7 @@ namespace MyCAM.FileManager
 							? new TraverseDataDTO( craftData.TraverseData )
 							: new TraverseDataDTO();
 			OverCutLength = craftData.OverCutLength;
+			InterpolateType = craftData.InterpolateType;
 			ToolVecModifyMap = ( craftData.ToolVecModifyMap ?? new Dictionary<int, Tuple<double, double>>() )
 				.Select( kvp => new ToolVecMapDTO( kvp.Key, kvp.Value.Item1, kvp.Value.Item2 ) )
 				.ToList();
@@ -936,7 +944,8 @@ namespace MyCAM.FileManager
 			Dictionary<int, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
-			return new CraftData( StartPoint, IsPathReverse, leadData, OverCutLength, toolVecModifyMap, IsToolVecReverse, traverseData );
+			EToolVecInterpolateType interpolateType = InterpolateType;
+			return new CraftData( StartPoint, IsPathReverse, leadData, OverCutLength, toolVecModifyMap, IsToolVecReverse, interpolateType, traverseData );
 		}
 	}
 

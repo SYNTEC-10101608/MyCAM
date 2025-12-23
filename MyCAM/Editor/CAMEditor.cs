@@ -1,7 +1,7 @@
 ﻿using MyCAM.App;
-using MyCAM.PathCache;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
+using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.gp;
@@ -363,6 +363,26 @@ namespace MyCAM.Editor
 
 				// toggle reverse state
 				craftData.IsToolVecReverse = !craftData.IsToolVecReverse;
+			}
+			ShowCAMData( szPathIDList );
+		}
+
+		public void SetInterpolateTypeAsFixedDir()
+		{
+			// one shot edit, multi edit supported
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
+			foreach( string szPathID in szPathIDList ) {
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+					continue;
+				}
+				if( craftData.InterpolateType == EToolVecInterpolateType.FixedDir ) {
+					craftData.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
+				}
+				else {
+					craftData.InterpolateType = EToolVecInterpolateType.FixedDir;
+				}
 			}
 			ShowCAMData( szPathIDList );
 		}

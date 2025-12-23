@@ -139,5 +139,7 @@ namespace MyCAM.PathCache
 		bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg );
 
 		bool IsToolVecModifyPoint( IProcessPoint point );
+
+		bool GetToolVecInterpolateType( out EToolVecInterpolateType interpolateType );
 	}
 }

@@ -58,10 +58,10 @@ namespace MyCAM.Editor
 
 			// modify tool vector
 			bool isModified = m_ToolVecCache.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
-			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg );
+			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, m_CraftData.InterpolateType );
 
 			// back up old data
-			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg );
+			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, m_CraftData.InterpolateType );
 			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
 			toolVecForm.RaiseKeep += () => SetToolVecOfKeep( nIndex, toolVecForm );
 			toolVecForm.RaiseZDir += () => SetToolVecOfZDir( nIndex, toolVecForm );
@@ -121,12 +121,13 @@ namespace MyCAM.Editor
 			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
-		void SetToolVecParam( int VecIndex, ToolVecParam toolVecParam )
+		void SetInterpolateType( ToolVecParam toolVecParam )
 		{
-			if( !toolVecParam.IsModified ) {
-				m_CraftData.RemoveToolVecModify( VecIndex );
-				return;
-			}
+			m_CraftData.InterpolateType = toolVecParam.InterpolateType;
+		}
+
+		void SetABAngle( int VecIndex, ToolVecParam toolVecParam )
+		{
 			m_CraftData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
 		}
 
@@ -206,19 +207,57 @@ namespace MyCAM.Editor
 
 		void SetToolVecParamAndPeview( int VecIndex, ToolVecParam toolVecParam )
 		{
-			SetToolVecParam( VecIndex, toolVecParam );
+			SetInterpolateType( toolVecParam );
+			SetABAngle( VecIndex, toolVecParam );
 			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
+		// remove or ok button clicked
 		void ConfirmSetting( int VecIndex, ToolVecParam toolVecParam )
 		{
-			SetToolVecParam( VecIndex, toolVecParam );
+			// fixdir can't remove point
+			if( toolVecParam.InterpolateType == EToolVecInterpolateType.FixedDir ) {
+
+				// this point originally is not modify point
+				if( m_BackupToolVecParam.IsModified == false ) {
+
+					// while dialog show up, user click other solution , will add this pnt modify
+					m_CraftData.RemoveToolVecModify( VecIndex );
+				}
+
+				// this pnt originally is modify point
+				else {
+
+					// set original value back
+					SetABAngle( VecIndex, m_BackupToolVecParam );
+				}
+			}
+			else {
+
+				// user remove pnt
+				if( toolVecParam.IsModified == false ) {
+					m_CraftData.RemoveToolVecModify( VecIndex );
+				}
+
+				// user add / adjust pnt
+				else {
+					SetABAngle( VecIndex, toolVecParam );
+				}
+			}
+			SetInterpolateType( toolVecParam );
 			SetToolVecDone();
 		}
 
 		void CancelSetting( int VecIndex )
 		{
-			SetToolVecParam( VecIndex, m_BackupToolVecParam );
+			// this point is not modify point when dialog show up
+			if( m_BackupToolVecParam.IsModified == false ) {
+				m_CraftData.RemoveToolVecModify( VecIndex );
+			}
+			else {
+				SetABAngle( VecIndex, m_BackupToolVecParam );
+			}
+			SetInterpolateType( m_BackupToolVecParam );
 			SetToolVecDone();
 		}
 
@@ -296,7 +335,6 @@ namespace MyCAM.Editor
 		CraftData m_CraftData = null;
 		IToolVecCache m_ToolVecCache = null;
 		List<string> m_PathIDList = null;
-
 		const int DEFAULT_SELECT_INDEX = -1;
 	}
 }

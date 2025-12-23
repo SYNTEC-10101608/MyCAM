@@ -21,6 +21,7 @@ namespace MyCAM.PathCache
 			m_ConnectCADPointMap = geomData.ConnectPointMap;
 			m_CraftData = craftData;
 			m_IsClose = geomData.IsClosed;
+			m_RefCenterDir = geomData.RefCenterDir;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
 			BuildCAMPointList();
 		}
@@ -103,7 +104,7 @@ namespace MyCAM.PathCache
 
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, m_IsClose, m_CraftData.IsToolVecReverse );
+			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, m_IsClose, m_CraftData.IsToolVecReverse, m_CraftData.InterpolateType, m_RefCenterDir );
 			foreach( var oneConnect in m_ConnectCAMPointMap ) {
 				oneConnect.Value.ToolVec = oneConnect.Key.ToolVec;
 			}
@@ -190,5 +191,6 @@ namespace MyCAM.PathCache
 		// flag to indicate craft data changed
 		bool m_IsCraftDataDirty = false;
 		bool m_IsClose = false;
+		gp_Ax1 m_RefCenterDir;
 	}
 }
