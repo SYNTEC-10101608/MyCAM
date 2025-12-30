@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
     <Compile Include="Helper\Coupler\StdPatternCraftCoupler.cs" />
+    <Compile Include="Helper\FormShow\DialogShowHelper.cs" />
     <Compile Include="PathCache\Application\MainPathPointCache.cs" />
     <Compile Include="PathCache\Application\StdPatternMaxOverCutCache.cs" />
     <Compile Include="PathCache\Application\TraverseDataCache.cs" />
