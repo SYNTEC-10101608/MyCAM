@@ -27,7 +27,6 @@ namespace MyCAM.Data
 		public Action<List<string>> FeatureAdded;
 		public Action<List<string>> PathAdded;
 
-		// TODO: this is temp solution
 		public DataManager()
 		{
 			ObjectMap = new Dictionary<string, IObject>();

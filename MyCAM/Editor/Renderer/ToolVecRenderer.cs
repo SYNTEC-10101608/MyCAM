@@ -124,7 +124,6 @@ namespace MyCAM.Editor.Renderer
 			return toolVecCache.MainPathPointList;
 		}
 
-		// TODO: the method is kepp casting same thing in a loop, optimize it later
 		bool IsToolVecModifyPoint( string pathID, IProcessPoint point )
 		{
 			if( !PathCacheProvider.TryGetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
