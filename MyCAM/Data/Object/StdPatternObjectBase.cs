@@ -7,6 +7,7 @@ namespace MyCAM.Data
 {
 	internal abstract class StdPatternObjectBase : PathObject
 	{
+		// TODO: this is not using so far
 		protected StdPatternObjectBase( string szUID, TopoDS_Shape shape, IStdPatternGeomData geomData, ContourPathObject contourPathObject )
 			: base( szUID, shape )
 		{
