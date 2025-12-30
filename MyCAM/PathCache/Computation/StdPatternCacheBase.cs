@@ -27,7 +27,7 @@ namespace MyCAM.PathCache
 				if( m_IsCraftDataDirty ) {
 					BuildCAMPointList();
 				}
-				return m_StartPointList;
+				return m_StartCAMPointList;
 			}
 		}
 
@@ -72,12 +72,31 @@ namespace MyCAM.PathCache
 			}
 		}
 
+		public List<CADPoint> MainPathCADPointList
+		{
+			get
+			{
+				return m_StartCADPointList;
+			}
+		}
+
+		public double MaxOverCutLength
+		{
+			get
+			{
+				return m_MaxOverCutLength;
+			}
+		}
+
 		#endregion
 
 		#region Common Methods
 
 		public void DoTransform( gp_Trsf transform )
 		{
+			foreach( CADPoint cadPoint in m_StartCADPointList ) {
+				cadPoint.Transform( transform );
+			}
 			m_RefCoord.Transform( transform );
 			BuildCAMPointList();
 		}
@@ -102,14 +121,29 @@ namespace MyCAM.PathCache
 
 		#endregion
 
+		protected void SetStartPoint()
+		{
+			// rearrange cam points to start from the start index
+			if( m_CraftData.StartPointIndex != 0 ) {
+				List<CAMPoint> newStartPointList = new List<CAMPoint>();
+				for( int i = 0; i < m_StartCAMPointList.Count; i++ ) {
+					newStartPointList.Add( m_StartCAMPointList[ ( i + m_CraftData.StartPointIndex ) % m_StartCAMPointList.Count ] );
+				}
+				m_StartCAMPointList = newStartPointList;
+			}
+			m_StartCAMPointList.Add( m_StartCAMPointList[ 0 ].Clone() ); // close the polygon
+		}
+
 		#region Protected Fields
 
 		protected gp_Ax3 m_RefCoord;
-		protected List<CAMPoint> m_StartPointList = new List<CAMPoint>();
+		protected List<CADPoint> m_StartCADPointList = new List<CADPoint>();
+		protected List<CAMPoint> m_StartCAMPointList = new List<CAMPoint>();
 		protected List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		protected List<CAMPoint> m_OverCutCAMPointList = new List<CAMPoint>();
 		protected CraftData m_CraftData;
 		protected CAMPoint m_RefPoint;
+		protected double m_MaxOverCutLength;
 		protected bool m_IsCraftDataDirty = false;
 
 		#endregion

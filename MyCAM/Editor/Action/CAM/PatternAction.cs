@@ -3,6 +3,9 @@ using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using MyCAM.Helper;
 using OCC.AIS;
+using OCC.Geom;
+using OCC.gp;
+using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
@@ -61,6 +64,12 @@ namespace MyCAM.Editor
 			patternFrom.Show( MyApp.MainForm );
 		}
 
+		public override void End()
+		{
+			RemoveTrihedron();
+			base.End();
+		}
+
 		void PreviewPatternSetting( IStdPatternGeomData standardPatternGeomData )
 		{
 			PatternCreate( standardPatternGeomData );
@@ -85,6 +94,7 @@ namespace MyCAM.Editor
 
 		void PatternCreate( IStdPatternGeomData standardPatternGeomData )
 		{
+			RemoveTrihedron();
 			TopoDS_Shape shape = null;
 			foreach( var szID in m_szPathIDList ) {
 				if( !DataGettingHelper.GetPathObject( szID, out PathObject pathObject ) ) {
@@ -102,6 +112,9 @@ namespace MyCAM.Editor
 					if( shape == null || shape.IsNull() ) {
 						continue;
 					}
+
+					gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( contourPathObject.GeomData.RefCenterDir, standardPatternGeomData.IsCoordinateReversed, standardPatternGeomData.RotatedAngle_deg );
+					ShowStdPatternTrihedron( refCoord );
 				}
 
 				m_DataManager.ObjectMap[ szID ] = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, pathObject );
@@ -112,6 +125,7 @@ namespace MyCAM.Editor
 
 		void PatternRestore()
 		{
+			RemoveTrihedron();
 			TopoDS_Shape shape = null;
 			foreach( var szID in m_szPathIDList ) {
 				if( !m_BackUpPathObjectList.ContainsKey( szID ) || m_BackUpPathObjectList[ szID ] == null ) {
@@ -126,19 +140,20 @@ namespace MyCAM.Editor
 
 		PathObject CreatePathObject( string szID, TopoDS_Shape shape, IStdPatternGeomData standardPatternGeomData, ContourPathObject contourPathObject, PathObject originalPathObject )
 		{
+			CraftData craftData = new CraftData();
 			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
 			switch( pathType ) {
 				case PathType.Circle:
-					return new CirclePathObject( szID, shape, standardPatternGeomData as CircleGeomData, originalPathObject.CraftData, contourPathObject );
+					return new CirclePathObject( szID, shape, standardPatternGeomData as CircleGeomData, craftData, contourPathObject );
 				case PathType.Rectangle:
-					return new RectanglePathObject( szID, shape, standardPatternGeomData as RectangleGeomData, originalPathObject.CraftData, contourPathObject );
+					return new RectanglePathObject( szID, shape, standardPatternGeomData as RectangleGeomData, craftData, contourPathObject );
 				case PathType.Runway:
-					return new RunwayPathObject( szID, shape, standardPatternGeomData as RunwayGeomData, originalPathObject.CraftData, contourPathObject );
+					return new RunwayPathObject( szID, shape, standardPatternGeomData as RunwayGeomData, craftData, contourPathObject );
 				case PathType.Triangle:
 				case PathType.Square:
 				case PathType.Pentagon:
 				case PathType.Hexagon:
-					return new PolygonPathObject( szID, shape, standardPatternGeomData as PolygonGeomData, originalPathObject.CraftData, contourPathObject );
+					return new PolygonPathObject( szID, shape, standardPatternGeomData as PolygonGeomData, craftData, contourPathObject );
 				case PathType.Contour:
 				default:
 					return contourPathObject;
@@ -152,10 +167,32 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Redisplay( shapeAIS, false );
 		}
 
+		void ShowStdPatternTrihedron( gp_Ax3 refCoord )
+		{
+			gp_Ax2 ax2 = refCoord.Ax2();
+			AIS_Trihedron trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
+			trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			trihedron.SetSize( 10.0 );
+			trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			trihedron.SetArrowColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			m_Viewer.GetAISContext().Display( trihedron, false );
+			m_Viewer.GetAISContext().Deactivate( trihedron );
+			m_TrihedronList.Add( trihedron );
+		}
+
+		void RemoveTrihedron()
+		{
+			foreach( var trihedron in m_TrihedronList ) {
+				m_Viewer.GetAISContext().Remove( trihedron, false );
+			}
+			m_TrihedronList.Clear();
+		}
 
 		ViewManager m_ViewManager;
 		Viewer m_Viewer;
 		List<string> m_szPathIDList = new List<string>();
+		List<AIS_Trihedron> m_TrihedronList = new List<AIS_Trihedron>();
 		IGeomData m_GeomData;
 		PathType m_BackFirstPathType;
 		Dictionary<string, PathObject> m_BackUpPathObjectList = new Dictionary<string, PathObject>();

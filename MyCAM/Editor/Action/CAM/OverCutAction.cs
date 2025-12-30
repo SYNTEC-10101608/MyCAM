@@ -1,6 +1,7 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
+using MyCAM.PathCache;
 using System;
 using System.Collections.Generic;
 
@@ -35,6 +36,7 @@ namespace MyCAM.Editor
 
 			// TODO: check all CAMData have same over cut length?
 			OverCutDlg overCutForm = new OverCutDlg( m_dOverCutBackupList[ 0 ] );
+			overCutForm.CheckValueGeomRestriction += IsValidOverCut;
 			PropertyChanged?.Invoke( m_PathIDList );
 
 			// preview
@@ -74,6 +76,21 @@ namespace MyCAM.Editor
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
 				m_CraftDataList[ i ].OverCutLength = m_dOverCutBackupList[ i ];
 			}
+		}
+
+		bool IsValidOverCut( double overcut )
+		{
+			bool isValid = true;
+			foreach( string szID in m_PathIDList ) {
+				PathCacheProvider.TryGetStdPatternMaxOverCutCache( szID, out IStdPatternMaxOverCutCache overCutCache );
+				if( overCutCache != null ) {
+					if( overcut > overCutCache.GetMaxOverCutLength() ) {
+						isValid = false;
+						break;
+					}
+				}
+			}
+			return isValid;
 		}
 
 		readonly List<double> m_dOverCutBackupList;

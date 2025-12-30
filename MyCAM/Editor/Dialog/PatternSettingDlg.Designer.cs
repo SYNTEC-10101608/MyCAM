@@ -58,6 +58,7 @@
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.m_cmbPathType = new System.Windows.Forms.ComboBox();
+			this.m_chkCoordReverse = new System.Windows.Forms.CheckBox();
 			this.m_panelCircle.SuspendLayout();
 			this.m_panelRunway.SuspendLayout();
 			this.m_panelPolygon.SuspendLayout();
@@ -392,11 +393,24 @@
 			this.m_cmbPathType.TabIndex = 25;
 			this.m_cmbPathType.SelectedIndexChanged += new System.EventHandler(this.m_cmbPathType_SelectedIndexChanged);
 			// 
+			// m_chkCoordReverse
+			// 
+			this.m_chkCoordReverse.AutoSize = true;
+			this.m_chkCoordReverse.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.m_chkCoordReverse.Location = new System.Drawing.Point(34, 329);
+			this.m_chkCoordReverse.Name = "m_chkCoordReverse";
+			this.m_chkCoordReverse.Size = new System.Drawing.Size(107, 21);
+			this.m_chkCoordReverse.TabIndex = 32;
+			this.m_chkCoordReverse.Text = "反轉座標系";
+			this.m_chkCoordReverse.UseVisualStyleBackColor = true;
+			this.m_chkCoordReverse.CheckedChanged += new System.EventHandler(this.m_chkCoordReverse_CheckedChanged);
+			// 
 			// PatternSettingDlg
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(305, 366);
+			this.Controls.Add(this.m_chkCoordReverse);
 			this.Controls.Add(this.m_panelCircle);
 			this.Controls.Add(this.m_panelRunway);
 			this.Controls.Add(this.m_panelPolygon);
@@ -453,5 +467,6 @@
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.ComboBox m_cmbPathType;
+		private System.Windows.Forms.CheckBox m_chkCoordReverse;
 	}
 }

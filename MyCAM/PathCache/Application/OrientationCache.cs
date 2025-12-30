@@ -18,7 +18,7 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_PathCache.LeadInPointList.Count > 0 && m_CraftData.LeadData.LeadIn.Length > 0 ) {
+				if( m_PathCache.LeadInPointList.Count > 0 && ( m_CraftData.LeadData.LeadIn.StraightLength > 0 || m_CraftData.LeadData.LeadIn.ArcLength > 0 ) ) {
 					return m_PathCache.LeadInPointList.First().Clone();
 				}
 				return null;
@@ -29,7 +29,7 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_PathCache.LeadOutPointList.Count > 0 && m_CraftData.LeadData.LeadOut.Length > 0 ) {
+				if( m_PathCache.LeadOutPointList.Count > 0 && ( m_CraftData.LeadData.LeadOut.StraightLength > 0 || m_CraftData.LeadData.LeadOut.ArcLength > 0 ) ) {
 					return m_PathCache.LeadOutPointList.Last().Clone();
 				}
 				return null;

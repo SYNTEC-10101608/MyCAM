@@ -29,6 +29,7 @@ namespace MyCAM.Editor
 			IsLeadLineEditable = true;
 			IsToolVecEditable = true;
 			IsToolVecReverseEditable = true;
+			IsFixedToolVecEditable = true;
 			IsTraverseEditable = true;
 			IsMoveProcessEditable = true;
 			IsAutoOrderEditable = true;
@@ -40,6 +41,7 @@ namespace MyCAM.Editor
 		public bool IsLeadLineEditable;
 		public bool IsToolVecEditable;
 		public bool IsToolVecReverseEditable;
+		public bool IsFixedToolVecEditable;
 		public bool IsTraverseEditable;
 		public bool IsMoveProcessEditable;
 		public bool IsAutoOrderEditable;
@@ -613,6 +615,8 @@ namespace MyCAM.Editor
 				if( geomData.PathType != PathType.Contour ) {
 					editableInfo.IsPathReverseEditable = false;
 					editableInfo.IsToolVecEditable = false;
+					editableInfo.IsToolVecReverseEditable = false;
+					editableInfo.IsFixedToolVecEditable = false;
 				}
 			}
 			PathPropertyChanged?.Invoke( editableInfo );

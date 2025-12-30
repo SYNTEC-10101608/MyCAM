@@ -29,6 +29,18 @@ namespace MyCAM.Data
 			}
 		}
 
+		public bool IsCoordinateReversed
+		{
+			get
+			{
+				return m_IsCoordinateReversed;
+			}
+			set
+			{
+				m_IsCoordinateReversed = value;
+			}
+		}
+
 		public virtual void DoTransform( gp_Trsf transform )
 		{
 			// currently no implementation
@@ -37,5 +49,6 @@ namespace MyCAM.Data
 		public abstract IGeomData Clone();
 
 		protected double m_RotatedAngle_deg;
+		protected bool m_IsCoordinateReversed;
 	}
 }

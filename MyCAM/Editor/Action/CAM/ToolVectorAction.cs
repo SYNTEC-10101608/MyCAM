@@ -29,6 +29,9 @@ namespace MyCAM.Editor
 			if( !PathCacheProvider.TryGetToolVecCache( pathID, out m_ToolVecCache ) ) {
 				throw new ArgumentException( "Cannot get ToolVecCache by pathID: " + pathID );
 			}
+			if( !DataGettingHelper.GetGeomDataByID( pathID, out m_GeomData ) ) {
+				throw new ArgumentException( "Cannot get GeomData by pathID: " + pathID );
+			}
 		}
 
 		public override EditActionType ActionType
@@ -154,11 +157,11 @@ namespace MyCAM.Editor
 		bool CalABAngleToPreCtrlPntToolVec( int nSelectIndex, out Tuple<double, double> param )
 		{
 			// get this modify point cam point
-			CADPoint toModifyCADPnt = m_ContourGeomData.CADPointList[ nSelectIndex ];
+			CADPoint toModifyCADPnt = m_ProcessCADPointList[ nSelectIndex ];
 			CAMPoint toModifyCAMPnt = new CAMPoint( toModifyCADPnt );
 
 			// get previous control point tool vector
-			gp_Dir assignDir = GetPreCtrlPntToolVec( m_ContourGeomData.CADPointList, m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsToolVecReverse, m_CraftData.IsPathReverse, m_ContourGeomData.IsClosed );
+			gp_Dir assignDir = GetPreCtrlPntToolVec( m_ProcessCADPointList, m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsToolVecReverse, m_CraftData.IsPathReverse, m_GeomData.IsClosed );
 			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyCAMPnt, m_CraftData.IsToolVecReverse, out param );
 			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
 				return true;
@@ -174,7 +177,7 @@ namespace MyCAM.Editor
 		bool CalABAngleToZDir( int nSelectIndex, out Tuple<double, double> param )
 		{
 			// get this modify point cam point
-			CADPoint toModifyCADPnt = m_ContourGeomData.CADPointList[ nSelectIndex ];
+			CADPoint toModifyCADPnt = m_ProcessCADPointList[ nSelectIndex ];
 			CAMPoint toModifyCAMPnt = new CAMPoint( toModifyCADPnt );
 			gp_Dir assignDir = new gp_Dir( 0, 0, 1 );
 			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyCAMPnt, m_CraftData.IsToolVecReverse, out param );
@@ -336,5 +339,6 @@ namespace MyCAM.Editor
 		IToolVecCache m_ToolVecCache = null;
 		List<string> m_PathIDList = null;
 		const int DEFAULT_SELECT_INDEX = -1;
+		IGeomData m_GeomData;
 	}
 }

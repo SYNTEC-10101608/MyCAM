@@ -113,7 +113,7 @@ namespace MyCAM.Editor
 				PostData simuPostData = null; // TODO: the implementation should be rework
 
 				// connecting post points of all process paths
-				List<PostPoint> currentPathPostPointList = PostHelper.GetConcatenatedPostList( simuPostData );
+				List<PostPoint> currentPathPostPointList = ContourPostHelper.GetConcatenatedPostList( simuPostData );
 
 				// build frame by frame
 				foreach( var postPoint in currentPathPostPointList ) {

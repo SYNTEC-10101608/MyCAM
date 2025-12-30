@@ -58,10 +58,13 @@ namespace MyCAM.Post
 		public IKSolveResult Solve( gp_Dir toolVec_In, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
 		{
 			// prevent from sigular area
-			if( toolVec_In.IsParallel( new gp_Dir( m_MasterRotateDir[ 0 ], m_MasterRotateDir[ 1 ], m_MasterRotateDir[ 2 ] ), SINGULAR_AREA_DEGREE * Math.PI / 180 ) ) {
+			if( toolVec_In.IsEqual( new gp_Dir( m_MasterRotateDir[ 0 ], m_MasterRotateDir[ 1 ], m_MasterRotateDir[ 2 ] ), SINGULAR_AREA_DEGREE * Math.PI / 180 ) ) {
 
 				// just make it singular to prevent unexpected result
 				toolVec_In = new gp_Dir( m_MasterRotateDir[ 0 ], m_MasterRotateDir[ 1 ], m_MasterRotateDir[ 2 ] );
+			}
+			else if( toolVec_In.IsOpposite( new gp_Dir( m_MasterRotateDir[ 0 ], m_MasterRotateDir[ 1 ], m_MasterRotateDir[ 2 ] ), SINGULAR_AREA_DEGREE * Math.PI / 180 ) ) {
+				toolVec_In = new gp_Dir( -m_MasterRotateDir[ 0 ], -m_MasterRotateDir[ 1 ], -m_MasterRotateDir[ 2 ] );
 			}
 
 			// calculate the M and S angle
@@ -333,6 +336,14 @@ namespace MyCAM.Post
 			// swap the output master and slave axis if needed
 			if( m_IKSolver.IsReverseMS ) {
 				(dS_Out, dM_Out) = (dM_Out, dS_Out);
+
+				// machine type is table type, need to exchange the ik result
+				if( ikResult == IKSolveResult.MasterInfinityOfSolution ) {
+					ikResult = IKSolveResult.SlaveInfinityOfSolution;
+				}
+				else if( ikResult == IKSolveResult.SlaveInfinityOfSolution ) {
+					ikResult = IKSolveResult.MasterInfinityOfSolution;
+				}
 			}
 			return ikResult;
 		}

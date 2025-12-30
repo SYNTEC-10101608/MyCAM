@@ -635,6 +635,8 @@ namespace MyCAM
 			m_tsbOverCut.Enabled = editableInfo.IsOverCutEditable;
 			m_tsbSetLead.Enabled = editableInfo.IsLeadLineEditable;
 			m_tsbToolVec.Enabled = editableInfo.IsToolVecEditable;
+			m_tsbToolVecReverse.Enabled = editableInfo.IsToolVecReverseEditable;
+			m_tsbFixedToolVec.Enabled = editableInfo.IsFixedToolVecEditable;
 			m_tsbMoveUp.Enabled = editableInfo.IsMoveProcessEditable;
 			m_tsbMoveDown.Enabled = editableInfo.IsMoveProcessEditable;
 			m_tsbAutoOrder.Enabled = editableInfo.IsAutoOrderEditable;
@@ -647,10 +649,12 @@ namespace MyCAM
 			if( type != PathType.Contour ) {
 				m_tsbReverse.Enabled = false;
 				m_tsbToolVec.Enabled = false;
+				m_tsbToolVecReverse.Enabled = false;
 			}
 			else {
 				m_tsbReverse.Enabled = true;
 				m_tsbToolVec.Enabled = true;
+				m_tsbToolVecReverse.Enabled = true;
 			}
 		}
 
