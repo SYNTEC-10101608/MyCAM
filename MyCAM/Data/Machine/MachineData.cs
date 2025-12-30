@@ -106,11 +106,13 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		// TODO: this should move out
 		public MachineTreeNode RootNode
 		{
 			get; set;
 		}
 
+		// TODO: the following is computation result, not raw data, should move out
 		public gp_Dir MasterRotateDir
 		{
 			get
