@@ -22,7 +22,6 @@ namespace MyCAM.Data
 			InitializeCache();
 		}
 
-
 		protected StdPatternObjectBase( string szUID, TopoDS_Shape shape, IStdPatternGeomData geomData, CraftData craftData, ContourPathObject contourPathObject )
 			: base( szUID, shape )
 		{
@@ -45,6 +44,7 @@ namespace MyCAM.Data
 			}
 		}
 
+		// TODO: can we light it up?
 		public ContourPathObject ContourPathObject
 		{
 			get

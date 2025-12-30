@@ -67,6 +67,7 @@ namespace MyCAM.Data
 			}
 		}
 
+		// TODO: follow the current strcture, this should be move to cache
 		public gp_Ax1 RefCenterDir
 		{
 			get

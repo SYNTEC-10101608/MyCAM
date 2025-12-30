@@ -63,6 +63,7 @@ namespace MyCAM.Data
 			}
 		}
 
+		// TODO: the following method should move out of a data record class
 		public virtual void SewShape( double sewTol )
 		{
 			TopoDS_Shape result = ShapeTool.SewShape( new List<TopoDS_Shape>() { Shape }, sewTol );
@@ -121,6 +122,7 @@ namespace MyCAM.Data
 			get;
 		}
 
+		// TODO: the following method should move out of a data record class
 		public virtual void DoTransform( gp_Trsf transform )
 		{
 			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );

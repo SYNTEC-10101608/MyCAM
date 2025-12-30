@@ -76,6 +76,7 @@ namespace MyCAM.Data
 			m_ContourCache.DoTransform( transform );
 		}
 
+		// TODO: this should move to helper
 		bool DetermineIfClosed( TopoDS_Shape shapeData )
 		{
 			if( shapeData == null || shapeData.IsNull() )
@@ -97,6 +98,7 @@ namespace MyCAM.Data
 			}
 		}
 
+		// TODO: over designed interface, its acceptable for a data record class to work with concrete class???
 		IContourGeomData m_ContourGeomData;
 		IContourCache m_ContourCache;
 	}
