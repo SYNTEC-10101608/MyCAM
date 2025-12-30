@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
+	// TODO: I need to review this class
 	internal static class StdPatternDiscreteFactory
 	{
 		public static bool GetDiscreteOriPointList( gp_Ax3 refCoord, IStdPatternGeomData geomData, out List<IOrientationPoint> discreteList )

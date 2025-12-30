@@ -2,6 +2,7 @@
 
 namespace MyCAM.Data
 {
+	// TDOD: use a factory to create CADPoint
 	public class CADPoint
 	{
 		public CADPoint( gp_Pnt point, gp_Dir normalVec_1st, gp_Dir normalVec_2nd, gp_Dir tangentVec )
@@ -137,6 +138,7 @@ namespace MyCAM.Data
 		IProcessPoint Clone();
 	}
 
+	// TODO: use a factory to create CAMPoint
 	public class CAMPoint : ISetToolVecPoint, IOrientationPoint, IProcessPoint
 	{
 		public CAMPoint( CADPoint cadPoint )

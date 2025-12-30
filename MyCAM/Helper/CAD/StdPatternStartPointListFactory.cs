@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
+	// TODO: I need to review this class
 	internal static class StdPatternStartPointListFactory
 	{
 		public static List<CADPoint> GetStartPointList( gp_Ax3 refCoord, IStdPatternGeomData geomData )
