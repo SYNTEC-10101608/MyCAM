@@ -98,20 +98,25 @@ namespace MyCAM.Editor
 
 			// build path tree
 			m_ViewManager.PathNode.Nodes.Clear();
-			foreach( var szNewPathDataID in m_DataManager.PathIDList ) {
-				PathObject data = (PathObject)m_DataManager.ObjectMap[ szNewPathDataID ];
+			int nodeStartIndex = 1;
+			for( int i = 0; i < m_DataManager.PathIDList.Count; i++ ) {
+				string pathID = m_DataManager.PathIDList[ i ];
 
-				// add a new node to the tree view
-				TreeNode node = new TreeNode( szNewPathDataID );
+				// get tree node text
+				string szNodeText = PATH_NODE_PREFIX + nodeStartIndex.ToString();
+				TreeNode node = new TreeNode( szNodeText );
 				m_ViewManager.PathNode.Nodes.Add( node );
-				m_ViewManager.TreeNodeMap.Add( szNewPathDataID, node );
+
+				// key is "Path_xxx" wich show on tree text, value is the node
+				m_ViewManager.TreeNodeMap.Add( szNodeText, node );
 
 				// add a new shape to the viewer
-				if( !DataGettingHelper.GetShapeObject( szNewPathDataID, out IShapeObject shapeObject ) ) {
+				if( !DataGettingHelper.GetShapeObject( pathID, out IShapeObject shapeObject ) ) {
 					continue;
 				}
 				AIS_Shape aisShape = ViewHelper.CreatePathAIS( shapeObject.Shape );
-				m_ViewManager.ViewObjectMap.Add( szNewPathDataID, new ViewObject( aisShape ) );
+				m_ViewManager.ViewObjectMap.Add( pathID, new ViewObject( aisShape ) );
+				nodeStartIndex++;
 			}
 
 			// update tree view and viewer
@@ -144,5 +149,6 @@ namespace MyCAM.Editor
 
 		Viewer m_Viewer;
 		ViewManager m_ViewManager;
+		const string PATH_NODE_PREFIX = "Path_";
 	}
 }

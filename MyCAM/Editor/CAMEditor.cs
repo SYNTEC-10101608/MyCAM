@@ -463,9 +463,6 @@ namespace MyCAM.Editor
 			// tree view select moved node
 			string newNodeID = PATH_NODE_PREFIX + ( newIndex + 1 ).ToString();
 			if( m_ViewManager.TreeNodeMap.ContainsKey( newNodeID ) ) {
-				TreeNode nodeToSelect = m_ViewManager.TreeNodeMap[ newNodeID ];
-				m_TreeView.SelectedNode = nodeToSelect;
-
 				if( m_DefaultAction is SelectPathAction_ selectAction ) {
 					selectAction.ClearSelection();
 					selectAction.SelectPathByID( szPathID );
