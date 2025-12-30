@@ -29,7 +29,9 @@ namespace MyCAM.Data
 
 	public class LeadData
 	{
-		public LeadData( double dLeadInStraightLineLength = 0, double dLeadInArcLength = 0, double dLeadInAngle = 90, double dLeadOutStraightLineLength = 0, double dLeadOutArcLength = 0, double dLeadOutAngle = 90, bool isChangeLeadDirection = false )
+		public LeadData( double dLeadInStraightLineLength = 0, double dLeadInArcLength = 0, double dLeadInAngle = 90,
+						double dLeadOutStraightLineLength = 0, double dLeadOutArcLength = 0, double dLeadOutAngle = 90,
+						bool isChangeLeadDirection = false )
 		{
 			LeadIn = new LeadGeom( dLeadInStraightLineLength, dLeadInArcLength, dLeadInAngle );
 			LeadOut = new LeadGeom( dLeadOutStraightLineLength, dLeadOutArcLength, dLeadOutAngle );
