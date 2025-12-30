@@ -15,14 +15,6 @@ namespace MyCAM.Helper
 			DataError
 		}
 
-		public struct TiltABAngle
-		{
-			public double dStart_RA_deg;
-			public double dStart_RB_deg;
-			public double dEnd_RA_deg;
-			public double dEnd_RB_deg;
-		}
-
 		public static void SetToolVec( ref List<ISetToolVecPoint> toolVecPointList,
 			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
 			bool isClosed, bool isToolVecReverse, EToolVecInterpolateType interpolateType, gp_Ax1 refCenterDir )
@@ -379,5 +371,14 @@ namespace MyCAM.Helper
 		const double TOO_LARGE_ANGLE_DEG = 60.0;
 		const double PROJECT_TOLERANCE = 1e-3;
 		const double RADIUS_TOLERANCE = 1e-3;
+
+		// information for tilt angle interpolation
+		struct TiltABAngle
+		{
+			public double dStart_RA_deg;
+			public double dStart_RB_deg;
+			public double dEnd_RA_deg;
+			public double dEnd_RB_deg;
+		}
 	}
 }

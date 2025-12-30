@@ -108,8 +108,6 @@ namespace MyCAM.Editor
 		{
 			// prevent built-in selection highlight
 			base.OnAfterSelect( e );
-			if( base.SelectedNode != null )
-				base.SelectedNode = null;
 		}
 
 		protected override void OnMouseDown( MouseEventArgs e )
@@ -209,10 +207,6 @@ namespace MyCAM.Editor
 							SelectRange( m_AnchorNode, next, ctrlMode: false );
 						}
 					}
-
-					// bring node into view
-					this.SelectedNode = next;
-					this.SelectedNode = null;
 				}
 			}
 
