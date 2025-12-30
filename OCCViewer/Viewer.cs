@@ -542,6 +542,11 @@ namespace OCCViewer
 					ZoomAllView();
 					UpdateView();
 					break;
+				case Keys.F6:
+					SnapToNearestOrthogonalView();
+					ZoomAllView();
+					UpdateView();
+					break;
 			}
 		}
 
@@ -562,6 +567,75 @@ namespace OCCViewer
 			myAISContext.SetHighlightStyle( type, drawer );
 		}
 
+		void SnapToNearestOrthogonalView()
+		{
+			// disable immediate update to avoid flickering
+			myView.SetImmediateUpdate( false );
+
+			// get current view direction and up vector
+			double vx = 0, vy = 0, vz = 0;
+			double upX = 0, upY = 0, upZ = 0;
+			myView.Proj( ref vx, ref vy, ref vz );
+			myView.Up( ref upX, ref upY, ref upZ );
+
+			gp_Dir currentDir = new gp_Dir( vx, vy, vz );
+			gp_Dir currentUp = new gp_Dir( upX, upY, upZ );
+
+			// define orthogonal directions
+			gp_Dir[] orthoDirs = {
+				new gp_Dir( 0, 0, 1 ), new gp_Dir( 0, 0, -1 ),
+				new gp_Dir( 0, 1, 0 ), new gp_Dir( 0, -1, 0 ),
+				new gp_Dir( 1, 0, 0 ), new gp_Dir( -1, 0, 0 )
+			};
+
+			// find nearest orthogonal direction
+			int bestIndex = 0;
+			double maxDot = currentDir.Dot( orthoDirs[ 0 ] );
+
+			for( int i = 1; i < orthoDirs.Length; i++ ) {
+				double dot = currentDir.Dot( orthoDirs[ i ] );
+				if( dot > maxDot ) {
+					maxDot = dot;
+					bestIndex = i;
+				}
+			}
+
+			gp_Dir newViewDir = orthoDirs[ bestIndex ];
+			gp_Dir newUp = CalculateOptimalUp( currentUp, newViewDir );
+
+			// apply new view orientation
+			myView.SetProj( newViewDir.X(), newViewDir.Y(), newViewDir.Z() );
+			myView.SetUp( newUp.X(), newUp.Y(), newUp.Z() );
+
+			// re-enable immediate update
+			myView.SetImmediateUpdate( true );
+			myView.Redraw();
+		}
+
+		gp_Dir CalculateOptimalUp( gp_Dir currentUp, gp_Dir viewDir )
+		{
+			// if current up isn't parallel to view direction, project it
+			double parallelThreshold = 0.9;
+			if( Math.Abs( currentUp.Dot( viewDir ) ) < parallelThreshold ) {
+				gp_Vec upVec = new gp_Vec( currentUp );
+				gp_Vec viewVec = new gp_Vec( viewDir );
+				gp_Vec projectedUp = upVec.Subtracted( viewVec.Multiplied( upVec.Dot( viewVec ) ) );
+				if( projectedUp.Magnitude() > MAX_TOLERANCE ) {
+					return new gp_Dir( projectedUp );
+				}
+			}
+
+			// use default up based on view direction
+			double absX = Math.Abs( viewDir.X() );
+			double absY = Math.Abs( viewDir.Y() );
+			double absZ = Math.Abs( viewDir.Z() );
+
+			if( absZ > absX && absZ > absY ) {
+				return new gp_Dir( 0, 1, 0 );  // Z-aligned: Y up
+			}
+			return new gp_Dir( 0, 0, 1 );  // X or Y aligned: Z up
+		}
+
 		public Action<MouseEventArgs> MouseWheel;
 		public Action<MouseEventArgs> MouseDown;
 		public Action<MouseEventArgs> MouseUp;
@@ -569,5 +643,6 @@ namespace OCCViewer
 		public Action<MouseEventArgs> MouseClick;
 		public Action<MouseEventArgs> MouseDoubleClick;
 		public Action<KeyEventArgs> KeyDown;
+		const double MAX_TOLERANCE = 0.001;
 	}
 }

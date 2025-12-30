@@ -276,9 +276,29 @@
       <Name>OCCViewer</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resource\Axo.png" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Resource\StandardPattern.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\Right View.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\LeftView.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\BackView.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\MainView.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\TopView.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\BottomView.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

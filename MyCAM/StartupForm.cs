@@ -162,8 +162,8 @@ namespace MyCAM
 			SwitchEditor( EEditorType.CAD );
 			RefreshToolStripLayout( EUIStatus.File );
 
-			// not in cam editing viewer tool bar can't be used
-			m_tsViewerToolBar.Enabled = false;
+			// not in cam editing viewer tool bar cam buttons can't be used
+			VisibleCAMQuickToolBarButtons( false );
 		}
 
 		// back to CAD editor
@@ -172,8 +172,8 @@ namespace MyCAM
 			SwitchEditor( EEditorType.CAD );
 			RefreshToolStripLayout( EUIStatus.CAD );
 
-			// not in cam editing viewer tool bar can't be used
-			m_tsViewerToolBar.Enabled = false;
+			// not in cam editing viewer tool bar cam buttons can't be used
+			VisibleCAMQuickToolBarButtons( false );
 		}
 
 		// go to CAM editor
@@ -185,8 +185,8 @@ namespace MyCAM
 			// ex CAM edtior might lock some entrance
 			EnableAllCAMEnterance();
 
-			// during cam editing viewer tool bar can be used
-			m_tsViewerToolBar.Enabled = true;
+			// during cam editing viewer tool bar cam buttons can be used
+			VisibleCAMQuickToolBarButtons( true );
 		}
 
 		// import part
@@ -406,6 +406,48 @@ namespace MyCAM
 		void m_tsbShowTraverse_CheckedChanged( object sender, EventArgs e )
 		{
 			RaiseShowTraverseStatusChange( m_tsbShowTraverse.Checked );
+		}
+
+		void m_tsbAXO_Click( object sender, EventArgs e )
+		{
+			m_Viewer.AxoView();
+			m_Viewer.ZoomAllView();
+		}
+
+		void m_tsbXPos_Click( object sender, EventArgs e )
+		{
+			m_Viewer.RightView();
+			m_Viewer.ZoomAllView();
+		}
+
+		void m_tsbXNeg_Click( object sender, EventArgs e )
+		{
+			m_Viewer.LeftView();
+			m_Viewer.ZoomAllView();
+		}
+
+		void m_tsbYPos_Click( object sender, EventArgs e )
+		{
+			m_Viewer.FrontView();
+			m_Viewer.ZoomAllView();
+		}
+
+		void m_tsbYNeg_Click( object sender, EventArgs e )
+		{
+			m_Viewer.BackView();
+			m_Viewer.ZoomAllView();
+		}
+
+		void m_tsbZPos_Click( object sender, EventArgs e )
+		{
+			m_Viewer.TopView();
+			m_Viewer.ZoomAllView();
+		}
+
+		void m_tsbZNeg_Click( object sender, EventArgs e )
+		{
+			m_Viewer.BottomView();
+			m_Viewer.ZoomAllView();
 		}
 
 		#endregion
@@ -720,6 +762,14 @@ namespace MyCAM
 			}
 		}
 
+		void VisibleCAMQuickToolBarButtons( bool isVisible )
+		{
+			m_tsbShowVec.Visible = isVisible;
+			m_tsbShowOrder.Visible = isVisible;
+			m_tsbShowOrientation.Visible = isVisible;
+			m_tsbShowTraverse.Visible = isVisible;
+		}
+
 		#endregion
 
 		// switch editor
@@ -765,7 +815,7 @@ namespace MyCAM
 
 			// default is cad mode
 			RefreshToolStripLayout( EUIStatus.File );
-			m_tsViewerToolBar.Enabled = false;
+			VisibleCAMQuickToolBarButtons( false );
 		}
 
 		// this setting is for main form to know what situation ui need to refresh as what look like
@@ -939,5 +989,7 @@ namespace MyCAM
 
 
 		#endregion
+
+
 	}
 }

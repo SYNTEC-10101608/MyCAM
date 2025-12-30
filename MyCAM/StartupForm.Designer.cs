@@ -46,6 +46,14 @@
 			this.m_pnlLog = new System.Windows.Forms.Panel();
 			this.m_tscLevel3Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsSelectPath = new System.Windows.Forms.ToolStrip();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tsbAXO = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbXPos = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbXNeg = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbYPos = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbYNeg = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbZPos = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbZNeg = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowVec = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowOrder = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbShowOrientation = new System.Windows.Forms.ToolStripButton();
@@ -119,21 +127,21 @@
 			// m_tsmiFile
 			// 
 			this.m_tsmiFile.Name = "m_tsmiFile";
-			this.m_tsmiFile.Size = new System.Drawing.Size(45, 20);
+			this.m_tsmiFile.Size = new System.Drawing.Size(43, 20);
 			this.m_tsmiFile.Text = "檔案";
 			this.m_tsmiFile.Click += new System.EventHandler(this.m_tsmiFile_Click);
 			// 
 			// m_tsmiCAD
 			// 
 			this.m_tsmiCAD.Name = "m_tsmiCAD";
-			this.m_tsmiCAD.Size = new System.Drawing.Size(43, 20);
+			this.m_tsmiCAD.Size = new System.Drawing.Size(44, 20);
 			this.m_tsmiCAD.Text = "CAD";
 			this.m_tsmiCAD.Click += new System.EventHandler(this.m_tsmiCAD_Click);
 			// 
 			// m_tsmiCAM
 			// 
 			this.m_tsmiCAM.Name = "m_tsmiCAM";
-			this.m_tsmiCAM.Size = new System.Drawing.Size(46, 20);
+			this.m_tsmiCAM.Size = new System.Drawing.Size(47, 20);
 			this.m_tsmiCAM.Text = "CAM";
 			this.m_tsmiCAM.Click += new System.EventHandler(this.m_tsmiCAM_Click);
 			// 
@@ -183,13 +191,21 @@
 			this.m_tsViewerToolBar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
 			this.m_tsViewerToolBar.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.m_tsViewerToolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbAXO,
+            this.m_tsbXPos,
+            this.m_tsbXNeg,
+            this.m_tsbYPos,
+            this.m_tsbYNeg,
+            this.m_tsbZPos,
+            this.m_tsbZNeg,
+            this.toolStripSeparator1,
             this.m_tsbShowVec,
             this.m_tsbShowOrder,
             this.m_tsbShowOrientation,
             this.m_tsbShowTraverse});
 			this.m_tsViewerToolBar.Location = new System.Drawing.Point(165, 0);
 			this.m_tsViewerToolBar.Name = "m_tsViewerToolBar";
-			this.m_tsViewerToolBar.Size = new System.Drawing.Size(25, 705);
+			this.m_tsViewerToolBar.Size = new System.Drawing.Size(32, 705);
 			this.m_tsViewerToolBar.TabIndex = 2;
 			this.m_tsViewerToolBar.Text = "toolStrip1";
 			// 
@@ -346,6 +362,88 @@
 			this.m_tsSelectPath.TabIndex = 1;
 			this.m_tsSelectPath.Text = "SelectPath";
 			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size(29, 6);
+			// 
+			// m_tsbAXO
+			// 
+			this.m_tsbAXO.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAXO.Image = global::MyCAM.Properties.Resources.Axo;
+			this.m_tsbAXO.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbAXO.Name = "m_tsbAXO";
+			this.m_tsbAXO.Size = new System.Drawing.Size(29, 24);
+			this.m_tsbAXO.Text = "AXO";
+			this.m_tsbAXO.ToolTipText = "AXO";
+			this.m_tsbAXO.Click += new System.EventHandler(this.m_tsbAXO_Click);
+			// 
+			// m_tsbXPos
+			// 
+			this.m_tsbXPos.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbXPos.Image = global::MyCAM.Properties.Resources.Right_View;
+			this.m_tsbXPos.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbXPos.Name = "m_tsbXPos";
+			this.m_tsbXPos.Size = new System.Drawing.Size(29, 24);
+			this.m_tsbXPos.Text = "X+";
+			this.m_tsbXPos.ToolTipText = "X+";
+			this.m_tsbXPos.Click += new System.EventHandler(this.m_tsbXPos_Click);
+			// 
+			// m_tsbXNeg
+			// 
+			this.m_tsbXNeg.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbXNeg.Image = global::MyCAM.Properties.Resources.LeftView;
+			this.m_tsbXNeg.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbXNeg.Name = "m_tsbXNeg";
+			this.m_tsbXNeg.Size = new System.Drawing.Size(29, 24);
+			this.m_tsbXNeg.Text = "X-";
+			this.m_tsbXNeg.ToolTipText = "X-";
+			this.m_tsbXNeg.Click += new System.EventHandler(this.m_tsbXNeg_Click);
+			// 
+			// m_tsbYPos
+			// 
+			this.m_tsbYPos.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbYPos.Image = global::MyCAM.Properties.Resources.BackView;
+			this.m_tsbYPos.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbYPos.Name = "m_tsbYPos";
+			this.m_tsbYPos.Size = new System.Drawing.Size(29, 24);
+			this.m_tsbYPos.Text = "Y+";
+			this.m_tsbYPos.ToolTipText = "Y+";
+			this.m_tsbYPos.Click += new System.EventHandler(this.m_tsbYPos_Click);
+			// 
+			// m_tsbYNeg
+			// 
+			this.m_tsbYNeg.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbYNeg.Image = global::MyCAM.Properties.Resources.MainView;
+			this.m_tsbYNeg.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbYNeg.Name = "m_tsbYNeg";
+			this.m_tsbYNeg.Size = new System.Drawing.Size(29, 24);
+			this.m_tsbYNeg.Text = "Y-";
+			this.m_tsbYNeg.ToolTipText = "Y-";
+			this.m_tsbYNeg.Click += new System.EventHandler(this.m_tsbYNeg_Click);
+			// 
+			// m_tsbZPos
+			// 
+			this.m_tsbZPos.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbZPos.Image = global::MyCAM.Properties.Resources.TopView;
+			this.m_tsbZPos.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbZPos.Name = "m_tsbZPos";
+			this.m_tsbZPos.Size = new System.Drawing.Size(29, 24);
+			this.m_tsbZPos.Text = "Z+";
+			this.m_tsbZPos.ToolTipText = "Z+";
+			this.m_tsbZPos.Click += new System.EventHandler(this.m_tsbZPos_Click);
+			// 
+			// m_tsbZNeg
+			// 
+			this.m_tsbZNeg.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbZNeg.Image = global::MyCAM.Properties.Resources.BottomView;
+			this.m_tsbZNeg.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbZNeg.Name = "m_tsbZNeg";
+			this.m_tsbZNeg.Size = new System.Drawing.Size(29, 24);
+			this.m_tsbZNeg.Text = "Z-";
+			this.m_tsbZNeg.ToolTipText = "Z-";
+			this.m_tsbZNeg.Click += new System.EventHandler(this.m_tsbZNeg_Click);
+			// 
 			// m_tsbShowVec
 			// 
 			this.m_tsbShowVec.Checked = true;
@@ -355,7 +453,7 @@
 			this.m_tsbShowVec.Image = global::MyCAM.Properties.Resources.ToolVec;
 			this.m_tsbShowVec.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowVec.Name = "m_tsbShowVec";
-			this.m_tsbShowVec.Size = new System.Drawing.Size(22, 24);
+			this.m_tsbShowVec.Size = new System.Drawing.Size(29, 24);
 			this.m_tsbShowVec.Text = "顯示姿態";
 			this.m_tsbShowVec.CheckedChanged += new System.EventHandler(this.m_tsbShowVec_CheckedChanged);
 			// 
@@ -368,7 +466,7 @@
 			this.m_tsbShowOrder.Image = global::MyCAM.Properties.Resources.AutoOrder;
 			this.m_tsbShowOrder.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowOrder.Name = "m_tsbShowOrder";
-			this.m_tsbShowOrder.Size = new System.Drawing.Size(22, 24);
+			this.m_tsbShowOrder.Size = new System.Drawing.Size(29, 24);
 			this.m_tsbShowOrder.Text = "顯示順序";
 			this.m_tsbShowOrder.CheckedChanged += new System.EventHandler(this.m_tsbShowOrder_CheckedChanged);
 			// 
@@ -381,7 +479,7 @@
 			this.m_tsbShowOrientation.Image = global::MyCAM.Properties.Resources.Reverse;
 			this.m_tsbShowOrientation.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowOrientation.Name = "m_tsbShowOrientation";
-			this.m_tsbShowOrientation.Size = new System.Drawing.Size(22, 24);
+			this.m_tsbShowOrientation.Size = new System.Drawing.Size(29, 24);
 			this.m_tsbShowOrientation.Text = "顯示路徑方向";
 			this.m_tsbShowOrientation.CheckedChanged += new System.EventHandler(this.m_tsbShowOrientation_CheckedChanged);
 			// 
@@ -394,7 +492,7 @@
 			this.m_tsbShowTraverse.Image = global::MyCAM.Properties.Resources.TraverseParam;
 			this.m_tsbShowTraverse.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowTraverse.Name = "m_tsbShowTraverse";
-			this.m_tsbShowTraverse.Size = new System.Drawing.Size(22, 24);
+			this.m_tsbShowTraverse.Size = new System.Drawing.Size(29, 24);
 			this.m_tsbShowTraverse.Text = "顯示抬下刀路徑";
 			this.m_tsbShowTraverse.CheckedChanged += new System.EventHandler(this.m_tsbShowTraverse_CheckedChanged);
 			// 
@@ -404,7 +502,7 @@
 			this.m_tsbManualSelectPathOK.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualSelectPathOK.Image")));
 			this.m_tsbManualSelectPathOK.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbManualSelectPathOK.Name = "m_tsbManualSelectPathOK";
-			this.m_tsbManualSelectPathOK.Size = new System.Drawing.Size(89, 19);
+			this.m_tsbManualSelectPathOK.Size = new System.Drawing.Size(83, 19);
 			this.m_tsbManualSelectPathOK.Text = "手動選取完成";
 			this.m_tsbManualSelectPathOK.Click += new System.EventHandler(this.m_tsbManualSelectPathOK_Click);
 			// 
@@ -415,7 +513,7 @@
 			this.m_tsbManualTransPlane.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbManualTransPlane.Name = "m_tsbManualTransPlane";
 			this.m_tsbManualTransPlane.RightToLeftAutoMirrorImage = true;
-			this.m_tsbManualTransPlane.Size = new System.Drawing.Size(50, 18);
+			this.m_tsbManualTransPlane.Size = new System.Drawing.Size(47, 18);
 			this.m_tsbManualTransPlane.Text = "面重合";
 			this.m_tsbManualTransPlane.Click += new System.EventHandler(this.m_tsbManualTransPlane_Click);
 			// 
@@ -425,7 +523,7 @@
 			this.m_tsbManualTransPlanePar.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualTransPlanePar.Image")));
 			this.m_tsbManualTransPlanePar.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbManualTransPlanePar.Name = "m_tsbManualTransPlanePar";
-			this.m_tsbManualTransPlanePar.Size = new System.Drawing.Size(50, 18);
+			this.m_tsbManualTransPlanePar.Size = new System.Drawing.Size(47, 18);
 			this.m_tsbManualTransPlanePar.Text = "面平行";
 			this.m_tsbManualTransPlanePar.Click += new System.EventHandler(this.m_tsbManualTransPlanePar_Click);
 			// 
@@ -435,7 +533,7 @@
 			this.m_tsbManualTransAxial.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualTransAxial.Image")));
 			this.m_tsbManualTransAxial.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbManualTransAxial.Name = "m_tsbManualTransAxial";
-			this.m_tsbManualTransAxial.Size = new System.Drawing.Size(50, 18);
+			this.m_tsbManualTransAxial.Size = new System.Drawing.Size(47, 18);
 			this.m_tsbManualTransAxial.Text = "軸重合";
 			this.m_tsbManualTransAxial.Click += new System.EventHandler(this.m_tsbManualTransAxial_Click);
 			// 
@@ -445,7 +543,7 @@
 			this.m_tsbManualTransAxialPar.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualTransAxialPar.Image")));
 			this.m_tsbManualTransAxialPar.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbManualTransAxialPar.Name = "m_tsbManualTransAxialPar";
-			this.m_tsbManualTransAxialPar.Size = new System.Drawing.Size(50, 18);
+			this.m_tsbManualTransAxialPar.Size = new System.Drawing.Size(47, 18);
 			this.m_tsbManualTransAxialPar.Text = "軸平行";
 			this.m_tsbManualTransAxialPar.Click += new System.EventHandler(this.m_tsbManualTransAxialPar_Click);
 			// 
@@ -455,7 +553,7 @@
 			this.m_tsbManualTransPointCoincide.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbManualTransPointCoincide.Image")));
 			this.m_tsbManualTransPointCoincide.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbManualTransPointCoincide.Name = "m_tsbManualTransPointCoincide";
-			this.m_tsbManualTransPointCoincide.Size = new System.Drawing.Size(50, 18);
+			this.m_tsbManualTransPointCoincide.Size = new System.Drawing.Size(47, 18);
 			this.m_tsbManualTransPointCoincide.Text = "點重合";
 			this.m_tsbManualTransPointCoincide.Click += new System.EventHandler(this.m_tsbManualTransPointCoincide_Click);
 			// 
@@ -475,7 +573,7 @@
 			this.m_tsbSelPath_FreeBound.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbSelPath_FreeBound.Image")));
 			this.m_tsbSelPath_FreeBound.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbSelPath_FreeBound.Name = "m_tsbSelPath_FreeBound";
-			this.m_tsbSelPath_FreeBound.Size = new System.Drawing.Size(76, 18);
+			this.m_tsbSelPath_FreeBound.Size = new System.Drawing.Size(71, 18);
 			this.m_tsbSelPath_FreeBound.Text = "所有面邊界";
 			this.m_tsbSelPath_FreeBound.Click += new System.EventHandler(this.m_tsbSelPath_FreeBound_Click);
 			// 
@@ -485,7 +583,7 @@
 			this.m_tsbSelPath_Manual.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbSelPath_Manual.Image")));
 			this.m_tsbSelPath_Manual.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbSelPath_Manual.Name = "m_tsbSelPath_Manual";
-			this.m_tsbSelPath_Manual.Size = new System.Drawing.Size(63, 18);
+			this.m_tsbSelPath_Manual.Size = new System.Drawing.Size(59, 18);
 			this.m_tsbSelPath_Manual.Text = "手動選取";
 			this.m_tsbSelPath_Manual.Click += new System.EventHandler(this.m_tsbSelPath_Manual_Click);
 			// 
@@ -868,6 +966,14 @@
 		private System.Windows.Forms.ToolStripButton m_tsbManualTransPlanePar;
 		private System.Windows.Forms.ToolStripButton m_tsbPatternSetting;
 		private System.Windows.Forms.ToolStripButton m_tsbFixedToolVec;
+		private System.Windows.Forms.ToolStripButton m_tsbAXO;
+		private System.Windows.Forms.ToolStripButton m_tsbXPos;
+		private System.Windows.Forms.ToolStripButton m_tsbXNeg;
+		private System.Windows.Forms.ToolStripButton m_tsbYPos;
+		private System.Windows.Forms.ToolStripButton m_tsbYNeg;
+		private System.Windows.Forms.ToolStripButton m_tsbZPos;
+		private System.Windows.Forms.ToolStripButton m_tsbZNeg;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 	}
 }
 
