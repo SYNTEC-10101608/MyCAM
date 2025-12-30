@@ -420,7 +420,7 @@
 			this.Controls.Add(this.m_cmbPathType);
 			this.Location = new System.Drawing.Point(22, 54);
 			this.Name = "PatternSettingDlg";
-			this.Text = "PatternSettingDlg";
+			this.Text = "設定圖元";
 			this.m_panelCircle.ResumeLayout(false);
 			this.m_panelCircle.PerformLayout();
 			this.m_panelRunway.ResumeLayout(false);

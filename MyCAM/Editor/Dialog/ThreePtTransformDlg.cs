@@ -1,11 +1,12 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using MyCAM.App;
 using OCC.gp;
+using System;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public partial class ThreePtTransformDlg : Form
+	// editdialog <input> is for preview and confirm, but no need input data here
+	public partial class ThreePtTransformDlg : EditDialogBase<object>
 	{
 		public ThreePtTransformDlg( gp_Pnt p1, gp_Pnt p2, gp_Pnt p3 )
 		{
