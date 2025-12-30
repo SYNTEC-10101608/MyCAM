@@ -60,10 +60,14 @@ namespace MyCAM.Editor.Dialog
 				default:
 					break;
 			}
+			if( m_StandardPatternGeomData != null ) {
+				m_chkCoordReverse.Checked = m_StandardPatternGeomData.IsCoordinateReversed;
+			}
 		}
 
 		void m_cmbPathType_SelectedIndexChanged( object sender, EventArgs e )
 		{
+			m_chkCoordReverse.Checked = false;
 			IStdPatternGeomData newStandardPatternGeomData = null;
 			ShowSpecificPanel( m_cmbPathType.SelectedIndex );
 
@@ -90,7 +94,6 @@ namespace MyCAM.Editor.Dialog
 					newStandardPatternGeomData = null;
 					break;
 			}
-
 			RaisePreview( newStandardPatternGeomData );
 			m_NewStandardPatternGeomData = newStandardPatternGeomData;
 		}
@@ -179,6 +182,7 @@ namespace MyCAM.Editor.Dialog
 			m_panelCircle.Visible = false;
 			m_panelRunway.Visible = false;
 			m_panelPolygon.Visible = false;
+			m_chkCoordReverse.Visible = false;
 		}
 
 		void ShowSpecificPanel( int nIndex )
@@ -187,18 +191,22 @@ namespace MyCAM.Editor.Dialog
 			switch( (PathType)nIndex ) {
 				case PathType.Circle:
 					m_panelCircle.Visible = true;
+					m_chkCoordReverse.Visible = true;
 					break;
 				case PathType.Rectangle:
 					m_panelRectangle.Visible = true;
+					m_chkCoordReverse.Visible = true;
 					break;
 				case PathType.Runway:
 					m_panelRunway.Visible = true;
+					m_chkCoordReverse.Visible = true;
 					break;
 				case PathType.Triangle:
 				case PathType.Square:
 				case PathType.Pentagon:
 				case PathType.Hexagon:
 					m_panelPolygon.Visible = true;
+					m_chkCoordReverse.Visible = true;
 					break;
 				default:
 					break;
@@ -642,6 +650,12 @@ namespace MyCAM.Editor.Dialog
 			else {
 				m_txbPolygonCornerRadius.Text = m_PolygonCornerRadius.ToString( "F3" );
 			}
+		}
+
+		void m_chkCoordReverse_CheckedChanged( object sender, EventArgs e )
+		{
+			m_NewStandardPatternGeomData.IsCoordinateReversed = m_chkCoordReverse.Checked;
+			RaisePreview( m_NewStandardPatternGeomData );
 		}
 
 		void m_btnConfirm_Click( object sender, EventArgs e )

@@ -52,7 +52,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
+    <Compile Include="Helper\Coupler\StdPatternCraftCoupler.cs" />
     <Compile Include="PathCache\Application\MainPathPointCache.cs" />
+    <Compile Include="PathCache\Application\StdPatternMaxOverCutCache.cs" />
     <Compile Include="PathCache\Application\TraverseDataCache.cs" />
     <Compile Include="PathCache\Computation\CircleCache.cs" />
     <Compile Include="PathCache\Computation\ContourCache.cs" />
@@ -61,6 +64,7 @@
     <Compile Include="PathCache\Application\MainPathStartPointCache.cs" />
     <Compile Include="PathCache\Application\OrientationCache.cs" />
     <Compile Include="PathCache\Application\OverCutCache.cs" />
+    <Compile Include="Helper\CAD\StdPatternStartPointListFactory.cs" />
     <Compile Include="PathCache\PathCacheProvider.cs" />
     <Compile Include="PathCache\Application\PathReverseCache.cs" />
     <Compile Include="PathCache\Computation\PolygonCache.cs" />
@@ -197,16 +201,19 @@
     <Compile Include="Post\FiveAxisSolver.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="Post\NCWriter.cs" />
-    <Compile Include="Post\PostHelper.cs" />
+    <Compile Include="Post\ContourPostHelper.cs" />
+    <Compile Include="Post\PostInterfaceDefine.cs" />
     <Compile Include="Post\PostSolver.cs" />
-    <Compile Include="Post\StandardPatternNCWriter.cs" />
-    <Compile Include="Post\StandardPatternPostHelper.cs" />
+    <Compile Include="Post\PostTraverseBuilder.cs" />
+    <Compile Include="Post\StdPatternNCWriter.cs" />
+    <Compile Include="Post\StdPatternPostHelper.cs" />
+    <Compile Include="Post\NCWriterHelper.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Helper\CAD\StdPatterWireFactory.cs" />
+    <Compile Include="Helper\CAD\StdPatternWireFactory.cs" />
     <Compile Include="Helper\CAD\StdPatternHelper.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>

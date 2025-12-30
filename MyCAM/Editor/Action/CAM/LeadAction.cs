@@ -25,6 +25,13 @@ namespace MyCAM.Editor
 					m_BackupLeadDataList.Add( craftData.LeadData.Clone() );
 				}
 			}
+			for( int i = 0; i < m_PathIDList.Count; i++ ) {
+				if( m_DataManager.ObjectMap.TryGetValue( m_PathIDList[ i ], out IObject obj ) ) {
+					if( obj is PathObject pathObj && pathObj is StdPatternObjectBase ) {
+						m_IsStdPattern = true;
+					}
+				}
+			}
 		}
 
 		public override EditActionType ActionType
@@ -41,6 +48,9 @@ namespace MyCAM.Editor
 
 			// TODO: check all CAMData has same lead param or not
 			LeadDlg leadDialog = new LeadDlg( m_BackupLeadDataList[ 0 ].Clone() );
+			if( m_IsStdPattern ) {
+				leadDialog.IsStdPattern?.Invoke( false );
+			}
 			PropertyChanged?.Invoke( m_PathIDList );
 
 			// preview
@@ -82,6 +92,7 @@ namespace MyCAM.Editor
 			}
 		}
 
+		bool m_IsStdPattern = false;
 		List<LeadData> m_BackupLeadDataList;
 	}
 }

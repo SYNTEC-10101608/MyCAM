@@ -2,7 +2,7 @@
 {
 	public class PolygonGeomData : StdPatternGeomDataBase
 	{
-		public PolygonGeomData( int sides, double sideLength, double cornerRadius, double rotatedAngle_deg )
+		public PolygonGeomData( int sides, double sideLength, double cornerRadius, double rotatedAngle_deg, bool isCoordinateReversed )
 		{
 			if( sides < 3 || sides > 6 ) {
 				throw new System.ArgumentOutOfRangeException( nameof( sides ), "Polygon must have 3 to 6 sides" );
@@ -11,6 +11,7 @@
 			m_SideLength = sideLength;
 			m_CornerRadius = cornerRadius;
 			m_RotatedAngle_deg = rotatedAngle_deg;
+			m_IsCoordinateReversed = isCoordinateReversed;
 		}
 
 		public PolygonGeomData( int sides )
@@ -22,6 +23,7 @@
 			m_SideLength = DEFAULT_SIDE_LENGTH;
 			m_CornerRadius = DEFAULT_CORNER_RADIUS;
 			m_RotatedAngle_deg = DEFAULT_ROTATED_ANGLE;
+			m_IsCoordinateReversed = false;
 		}
 
 		public override PathType PathType
@@ -75,7 +77,7 @@
 
 		public override IGeomData Clone()
 		{
-			return new PolygonGeomData( Sides, m_SideLength, m_CornerRadius, m_RotatedAngle_deg );
+			return new PolygonGeomData( Sides, m_SideLength, m_CornerRadius, m_RotatedAngle_deg, m_IsCoordinateReversed );
 		}
 
 		public const int DEFAULT_SIDES = 3;

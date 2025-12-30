@@ -1,7 +1,9 @@
 ﻿using MyCAM.Data;
+using MyCAM.Helper;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.PathCache
 {
@@ -14,6 +16,7 @@ namespace MyCAM.PathCache
 				throw new ArgumentNullException( "RunwayCache constructing argument error - invalid geomData" );
 			}
 			m_RunwayGeomData = runwayGeomData;
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( refCoord, runwayGeomData );
 			BuildCAMPointList();
 		}
 
@@ -21,10 +24,26 @@ namespace MyCAM.PathCache
 		{
 			ClearCraftDataDirty();
 			m_RefPoint = RunwayRefPoint();
-			m_StartPointList = RunwayCacheExtensions.GetStartPointList( m_RefCoord, m_RunwayGeomData.Length, m_RunwayGeomData.Width );
 
-			// close the loop
-			m_StartPointList.Add( m_StartPointList[ 0 ].Clone() );
+			// build initial CAM point list
+			m_StartCAMPointList = new List<CAMPoint>();
+			for( int i = 0; i < m_StartCADPointList.Count; i++ ) {
+				CADPoint cadPoint = m_StartCADPointList[ i ];
+				CAMPoint camPoint = new CAMPoint( cadPoint );
+				m_StartCAMPointList.Add( camPoint );
+			}
+			SetStartPoint();
+			m_MaxOverCutLength = OverCutHelper.GetMaxOverCutLength( m_RunwayGeomData, m_CraftData.StartPointIndex );
+
+			// set over cut
+			List<IOrientationPoint> camPointOverCutList = m_StartCAMPointList.Cast<IOrientationPoint>().ToList();
+			OverCutHelper.SetStdPatternOverCut( m_RefCoord, m_RunwayGeomData, camPointOverCutList, m_CraftData.OverCutLength, out List<IOrientationPoint> overCutPointList );
+			m_OverCutCAMPointList = overCutPointList.Cast<CAMPoint>().ToList();
+
+			// set lead
+			List<IOrientationPoint> mainPointList = m_StartCAMPointList.Cast<IOrientationPoint>().ToList();
+			LeadHelper.SetLeadIn( mainPointList, out List<IOrientationPoint> leadInPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
+			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
 		}
 
 		CAMPoint RunwayRefPoint()
@@ -69,77 +88,7 @@ namespace MyCAM.PathCache
 				m_RefCoord.Direction()
 			);
 		}
+
 		RunwayGeomData m_RunwayGeomData;
-	}
-
-	internal static class RunwayCacheExtensions
-	{
-		internal static List<CAMPoint> GetStartPointList( gp_Ax3 refCoord, double length, double width )
-		{
-			gp_Pnt centerPoint = refCoord.Location();
-			gp_Pln plane = new gp_Pln( refCoord );
-			double radius = width / 2.0;
-			double straightLength = length - width;
-
-			// runway shape start points:
-			// 1. arc midpoint intersecting with positive X-axis
-			// 2. long edge midpoint intersecting with negative Y-axis
-			double halfStraight = straightLength / 2.0;
-			gp_Dir local_X_pos = gp.DX();
-			gp_Dir local_X_neg = gp.DX().Reversed();
-			gp_Dir local_Y_pos = gp.DY();
-			gp_Dir local_Y_neg = gp.DY().Reversed();
-			gp_Dir local_Z_pos = gp.DZ();
-
-			// 1. arc midpoint intersecting with positive X-axis (right arc point on X-axis)
-			gp_Pnt local_Pnt_RightArc = new gp_Pnt( halfStraight + radius, 0, 0 );
-			gp_Dir local_N1_RightArc = local_Z_pos;
-			gp_Dir local_N2_RightArc = local_X_neg;
-			gp_Dir local_Tan_RightArc = local_Y_neg;
-			gp_Dir local_Tool_RightArc = local_Z_pos;
-
-			// 2. long edge midpoint intersecting with negative Y-axis (bottom edge midpoint)
-			gp_Pnt local_Pnt_BottomEdge = new gp_Pnt( 0, -radius, 0 );
-			gp_Dir local_N1_BottomEdge = local_Z_pos;
-			gp_Dir local_N2_BottomEdge = local_Y_pos;
-			gp_Dir local_Tan_BottomEdge = local_X_neg;
-			gp_Dir local_Tool_BottomEdge = local_Z_pos;
-
-			// create coordinate transformation
-			gp_Ax3 targetCoordSystem = new gp_Ax3(
-				centerPoint,
-				plane.Axis().Direction(),
-				plane.XAxis().Direction()
-			);
-
-			gp_Trsf transformation = new gp_Trsf();
-			transformation.SetTransformation( targetCoordSystem, new gp_Ax3() );
-
-			// transform right arc point
-			CADPoint cad_RightArc = new CADPoint(
-				local_Pnt_RightArc.Transformed( transformation ),
-				local_N1_RightArc.Transformed( transformation ),
-				local_N2_RightArc.Transformed( transformation ),
-				local_Tan_RightArc.Transformed( transformation )
-			);
-			CAMPoint cam_RightArc = new CAMPoint( cad_RightArc, local_Tool_RightArc.Transformed( transformation ) );
-
-			// transform bottom edge midpoint
-			CADPoint cad_BottomEdge = new CADPoint(
-				local_Pnt_BottomEdge.Transformed( transformation ),
-				local_N1_BottomEdge.Transformed( transformation ),
-				local_N2_BottomEdge.Transformed( transformation ),
-				local_Tan_BottomEdge.Transformed( transformation )
-			);
-			CAMPoint cam_BottomEdge = new CAMPoint( cad_BottomEdge, local_Tool_BottomEdge.Transformed( transformation ) );
-
-			List<CAMPoint> resultList = new List<CAMPoint>
-			{
-				cam_RightArc,
-				cam_BottomEdge,
-			};
-
-			return resultList;
-		}
 	}
 }

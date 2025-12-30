@@ -2,12 +2,13 @@
 {
 	public class RectangleGeomData : StdPatternGeomDataBase
 	{
-		public RectangleGeomData( double width, double height, double cornerRadius, double rotatedAngle_deg )
+		public RectangleGeomData( double width, double height, double cornerRadius, double rotatedAngle_deg, bool isCoordinateReversed )
 		{
 			m_Width = width;
 			m_Length = height;
 			m_CornerRadius = cornerRadius;
 			m_RotatedAngle_deg = rotatedAngle_deg;
+			m_IsCoordinateReversed = isCoordinateReversed;
 		}
 
 		public RectangleGeomData()
@@ -16,6 +17,7 @@
 			m_Length = DEFAULT_LENGTH;
 			m_CornerRadius = DEFAULT_CORNER_RADIUS;
 			m_RotatedAngle_deg = DEFAULT_ROTATED_ANGLE;
+			m_IsCoordinateReversed = false;
 		}
 
 		public override PathType PathType
@@ -64,7 +66,7 @@
 
 		public override IGeomData Clone()
 		{
-			return new RectangleGeomData( m_Width, m_Length, m_CornerRadius, m_RotatedAngle_deg );
+			return new RectangleGeomData( m_Width, m_Length, m_CornerRadius, m_RotatedAngle_deg, m_IsCoordinateReversed );
 		}
 
 		public const double DEFAULT_CORNER_RADIUS = 5.0;

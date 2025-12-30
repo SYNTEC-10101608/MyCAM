@@ -1,5 +1,4 @@
 using MyCAM.Data;
-using OCC.gp;
 using System.Linq;
 
 namespace MyCAM.PathCache

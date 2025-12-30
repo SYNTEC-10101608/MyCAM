@@ -62,16 +62,12 @@ namespace MyCAM.Editor.Renderer
 
 		void ShowLeadInLine( List<string> pathIDList )
 		{
-			ShowLeadLine( pathIDList, m_LeadInAISDict,
-				( leadData ) => leadData.LeadIn.Type != LeadGeomType.None,
-				GetLeadInPointList );
+			ShowLeadLine( pathIDList, m_LeadInAISDict, GetLeadInPointList );
 		}
 
 		void ShowLeadOutLine( List<string> pathIDList )
 		{
-			ShowLeadLine( pathIDList, m_LeadOutAISDict,
-				( leadData ) => leadData.LeadOut.Type != LeadGeomType.None,
-				GetLeadOutPointList );
+			ShowLeadLine( pathIDList, m_LeadOutAISDict, GetLeadOutPointList );
 		}
 
 		void RemoveLeadInLine( List<string> pathIDList )
@@ -84,15 +80,11 @@ namespace MyCAM.Editor.Renderer
 			RemoveLines( m_LeadOutAISDict, pathIDList );
 		}
 
-		void ShowLeadLine(
-			List<string> pathIDList,
-			Dictionary<string, List<AIS_Line>> lineDict,
-			System.Func<LeadData, bool> needShowFunc,
-			System.Func<string, IReadOnlyList<IProcessPoint>> getPointListFunc )
+		void ShowLeadLine( List<string> pathIDList, Dictionary<string, List<AIS_Line>> lineDict, System.Func<string, IReadOnlyList<IProcessPoint>> getPointListFunc )
 		{
 			foreach( string szPathID in pathIDList ) {
 				LeadData leadData = GetLeadData( szPathID );
-				if( leadData == null || !needShowFunc( leadData ) ) {
+				if( leadData == null || ( leadData.LeadIn.StraightLength == 0 && leadData.LeadIn.ArcLength == 0 ) ) {
 					continue;
 				}
 				IReadOnlyList<IProcessPoint> pointList = getPointListFunc( szPathID );

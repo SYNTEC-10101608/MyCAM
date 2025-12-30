@@ -7,21 +7,20 @@ namespace MyCAM.Helper
 {
 	public static class StdPatternHelper
 	{
-		public static gp_Ax3 GetPatternRefCoord( gp_Ax1 refCenterDir, double rotationAngle_deg )
+		public static gp_Ax3 GetPatternRefCoord( gp_Ax1 refCenterDir, bool isCoordinateReverse, double rotationAngle_deg )
 		{
 			gp_Pnt centerPoint = refCenterDir.Location();
 			gp_Dir normalDir = refCenterDir.Direction();
+			if( isCoordinateReverse ) {
+				normalDir.Reverse();
+			}
+
 			gp_Dir xDir;
 
 			// build local coordination system ( reference DOC:https://syntecclub.atlassian.net/wiki/spaces/AUTO/pages/89458700 )
 			// the target is the same as TOOL_DIR
-			if( normalDir.IsParallel( TOOL_DIR, DIR_TOLERANCE ) && !normalDir.IsOpposite( TOOL_DIR, DIR_TOLERANCE ) ) {
+			if( normalDir.IsParallel( TOOL_DIR, DIR_TOLERANCE ) ) {
 				xDir = new gp_Dir( 1, 0, 0 );
-			}
-
-			// the target is opposite to TOOL_DIR
-			else if( normalDir.IsParallel( TOOL_DIR, DIR_TOLERANCE ) && normalDir.IsOpposite( TOOL_DIR, DIR_TOLERANCE ) ) {
-				xDir = new gp_Dir( -1, 0, 0 );
 			}
 
 			// general case
@@ -39,19 +38,19 @@ namespace MyCAM.Helper
 			return coordSystem;
 		}
 
-		public static TopoDS_Shape GetPathWire( gp_Ax1 refCenterDir, IStdPatternGeomData StdPatternGeomData )
+		public static TopoDS_Shape GetPathWire( gp_Ax1 refCenterDir, IStdPatternGeomData stdPatternGeomData )
 		{
 			// get pattern reference coordination system
-			gp_Ax3 patternRefCoord = GetPatternRefCoord( refCenterDir, StdPatternGeomData.RotatedAngle_deg );
+			gp_Ax3 patternRefCoord = GetPatternRefCoord( refCenterDir, stdPatternGeomData.IsCoordinateReversed, stdPatternGeomData.RotatedAngle_deg );
 
 			// get path wire
-			return GetPathWire( patternRefCoord, StdPatternGeomData );
+			return GetPathWire( patternRefCoord, stdPatternGeomData );
 		}
 
 		public static TopoDS_Shape GetPathWire( gp_Ax3 patternRefCoord, IStdPatternGeomData StdPatternGeomData )
 		{
 			TopoDS_Wire wire = null;
-			StdPatterWireFactory.GetStrategy( StdPatternGeomData.PathType )
+			StdPatternWireFactory.GetStrategy( StdPatternGeomData.PathType )
 				?.CreateWire( patternRefCoord, StdPatternGeomData, out wire );
 			return wire;
 		}

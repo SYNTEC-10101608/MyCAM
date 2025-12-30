@@ -58,7 +58,7 @@ namespace MyCAM.Helper
 
 	#region Strategy Factory
 
-	internal static class StdPatterWireFactory
+	internal static class StdPatternWireFactory
 	{
 		// create singleton strategy instances using generic WireCreationStrategy with lambda expressions
 		static readonly IWireCreationStrategy s_CircleStrategy =
@@ -121,7 +121,7 @@ namespace MyCAM.Helper
 		public static bool CreateCircleWire( gp_Pnt centerPoint, double diameterius, gp_Pln plane, out TopoDS_Wire wire )
 		{
 			wire = null;
-			double radius = diameterius / DIAMETER_TO_RADIUS_FACTOR;
+			double radius = diameterius / 2.0;
 			if( centerPoint == null || radius <= GEOMETRIC_TOLERANCE || plane == null ) {
 				return false;
 			}
@@ -161,8 +161,8 @@ namespace MyCAM.Helper
 				return false;
 			}
 
-			double halfL = length / HALF_DIMENSION_FACTOR;
-			double halfW = width / HALF_DIMENSION_FACTOR;
+			double halfL = length / 2;
+			double halfW = width / 2;
 			double r = Math.Min( radius, Math.Min( halfL, halfW ) );
 			if( r < GEOMETRIC_TOLERANCE ) {
 				r = ZERO_RADIUS_THRESHOLD;
@@ -285,10 +285,10 @@ namespace MyCAM.Helper
 				return false;
 			}
 
-			double radius = width / HALF_DIMENSION_FACTOR;
+			double radius = width / 2;
 			double straightLength = length - width;
-			double halfStraight = straightLength / HALF_DIMENSION_FACTOR;
-			double halfWidth = width / HALF_DIMENSION_FACTOR;
+			double halfStraight = straightLength / 2;
+			double halfWidth = width / 2;
 
 			BRepBuilderAPI_MakeWire wireBuilder = new BRepBuilderAPI_MakeWire();
 
@@ -351,8 +351,8 @@ namespace MyCAM.Helper
 			}
 
 			// calculate circumradius R = sideLength / (2 * sin(£k/n))
-			double angleStep = HALF_DIMENSION_FACTOR * Math.PI / sides;
-			double radius = sideLength / ( HALF_DIMENSION_FACTOR * Math.Sin( Math.PI / sides ) );
+			double angleStep = 2 * Math.PI / sides;
+			double radius = sideLength / ( 2 * Math.Sin( Math.PI / sides ) );
 
 			// determine initial angle offset based on the number of sides
 			double angleOffset = GetAngleOffsetForSides( sides );
@@ -426,7 +426,7 @@ namespace MyCAM.Helper
 
 			// for regular polygons, the interior angle is fixed: (n-2) * £k / n
 			double interiorAngle = ( sides - INTERIOR_ANGLE_NUMERATOR_OFFSET ) * Math.PI / sides;
-			double halfAngle = interiorAngle / HALF_DIMENSION_FACTOR;
+			double halfAngle = interiorAngle / 2.0;
 			double tangentDistance = cornerRadius / Math.Tan( halfAngle );
 			double centerDistance = cornerRadius / Math.Sin( halfAngle );
 
@@ -545,13 +545,7 @@ namespace MyCAM.Helper
 		#endregion
 
 		// tolerance for geometric comparisons
-		public const double GEOMETRIC_TOLERANCE = 1e-9;
-
-		// half dimension factor for calculating half measurements
-		public const double HALF_DIMENSION_FACTOR = 2.0;
-
-		// diameter to radius conversion factor
-		public const double DIAMETER_TO_RADIUS_FACTOR = 2.0;
+		public const double GEOMETRIC_TOLERANCE = 0.001;
 
 		// local coordinate system origin (XY plane)
 		public const double LOCAL_ORIGIN_X = 0.0;

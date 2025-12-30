@@ -44,5 +44,10 @@ namespace MyCAM.Data
 
 	public interface IStdPatternGeomData : IGeomData, ITransformableGeom, IRotatable
 	{
+		bool IsCoordinateReversed
+		{
+			get;
+			set;
+		}
 	}
 }

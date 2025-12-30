@@ -25,6 +25,11 @@ namespace MyCAM.PathCache
 		{
 			get;
 		}
+
+		List<CADPoint> MainPathCADPointList
+		{
+			get;
+		}
 	}
 
 	public interface ITransformableCache
@@ -42,6 +47,16 @@ namespace MyCAM.PathCache
 		{
 			get;
 		}
+
+		double MaxOverCutLength
+		{
+			get;
+		}
+	}
+
+	public interface IStdPatternMaxOverCutCache
+	{
+		double GetMaxOverCutLength();
 	}
 
 	public interface IStdPatternRefPointCache
@@ -132,6 +147,8 @@ namespace MyCAM.PathCache
 		{
 			get;
 		}
+
+		List<CADPoint> GetMainPathCADPointList();
 	}
 
 	public interface IToolVecCache : IMainPathCache

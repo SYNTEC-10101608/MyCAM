@@ -1,5 +1,5 @@
-using MyCAM.PathCache;
 using MyCAM.Data;
+using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.BRepPrimAPI;
 using OCC.gp;
@@ -8,7 +8,6 @@ using OCC.Quantity;
 using OCCTool;
 using OCCViewer;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -92,16 +91,12 @@ namespace MyCAM.Editor.Renderer
 
 		void ShowLeadInOrientation( List<string> pathIDList )
 		{
-			ShowLeadOrientation( pathIDList, m_LeadInOrientationAISDict,
-				( leadData ) => leadData.LeadIn.Type != LeadGeomType.None,
-				GetLeadInFirstPoint );
+			ShowLeadOrientation( pathIDList, m_LeadInOrientationAISDict, GetLeadInFirstPoint );
 		}
 
 		void ShowLeadOutOrientation( List<string> pathIDList )
 		{
-			ShowLeadOrientation( pathIDList, m_LeadOutOrientationAISDict,
-				( leadData ) => leadData.LeadOut.Type != LeadGeomType.None,
-				GetLeadOutLastPoint );
+			ShowLeadOrientation( pathIDList, m_LeadOutOrientationAISDict, GetLeadOutLastPoint );
 		}
 
 		void RemoveLeadInOrientation( List<string> pathIDList )
@@ -117,12 +112,11 @@ namespace MyCAM.Editor.Renderer
 		void ShowLeadOrientation(
 			List<string> pathIDList,
 			Dictionary<string, AIS_Shape> orientationDict,
-			System.Func<LeadData, bool> needShowFunc,
 			System.Func<string, IOrientationPoint> getPointFunc )
 		{
 			foreach( string szPathID in pathIDList ) {
 				LeadData leadData = GetLeadData( szPathID );
-				if( leadData == null || !needShowFunc( leadData ) ) {
+				if( leadData == null || ( leadData.LeadIn.StraightLength == 0 && leadData.LeadIn.ArcLength == 0 ) ) {
 					continue;
 				}
 				IOrientationPoint orientationPoint = getPointFunc( szPathID );
