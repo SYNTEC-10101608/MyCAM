@@ -2,6 +2,7 @@
 
 namespace MyCAM.Data
 {
+	// TODO: the interface define should be refine
 	public interface IGeomData
 	{
 		PathType PathType

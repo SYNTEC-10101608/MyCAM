@@ -2,6 +2,7 @@
 
 namespace MyCAM.Data
 {
+	// TODO: the derived construct should check input parameters itself
 	public abstract class StdPatternGeomDataBase : IStdPatternGeomData
 	{
 		public abstract PathType PathType
