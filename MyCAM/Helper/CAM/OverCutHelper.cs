@@ -123,6 +123,7 @@ namespace MyCAM.Helper
 			}
 		}
 
+		// TODO: I think there should be some other better place for it
 		public static double GetMaxOverCutLength( IStdPatternGeomData stdPatternGeomData, int StartPointIndex )
 		{
 			switch( stdPatternGeomData.PathType ) {
