@@ -40,7 +40,7 @@ namespace MyCAM.Editor
 			{
 				End();
 			};
-			dlg.ShowDialog( MyApp.MainForm );
+			dlg.Show( MyApp.MainForm );
 		}
 
 		void SewPart( double dSewTol )
