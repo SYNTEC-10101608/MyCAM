@@ -64,10 +64,10 @@ namespace MyCAM.Editor
 			m_DataManager.PathAdded += OnPathAdded;
 
 			// default action is select object action
-			m_DefaultAction = new SelectPathAction_( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
-			( m_DefaultAction as SelectPathAction_ ).SelectionChange += OnPathSelectionChange;
-			( m_DefaultAction as SelectPathAction_ ).RemovePath += RemovePath;
-			( m_DefaultAction as SelectPathAction_ ).PathOrderMove += MoveProcess;
+			m_DefaultAction = new SelectPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+			( m_DefaultAction as SelectPathAction ).SelectionChange += OnPathSelectionChange;
+			( m_DefaultAction as SelectPathAction ).RemovePath += RemovePath;
+			( m_DefaultAction as SelectPathAction ).PathOrderMove += MoveProcess;
 
 			// Initialize renderers
 			m_IndexRenderer = new IndexRenderer( m_Viewer, m_DataManager );
@@ -225,7 +225,7 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				return;
 			}
-			SelectPathAction action = new SelectPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, selectedFaceGroupList );
+			SelectWireAction action = new SelectWireAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, selectedFaceGroupList );
 			StartEditAction( action );
 		}
 
@@ -234,7 +234,7 @@ namespace MyCAM.Editor
 			if( m_CurrentAction.ActionType != EditActionType.SelectPath ) {
 				return;
 			}
-			( (SelectPathAction)m_CurrentAction ).SelectDone();
+			( (SelectWireAction)m_CurrentAction ).SelectDone();
 		}
 
 		public void RemovePath()
@@ -465,7 +465,7 @@ namespace MyCAM.Editor
 			// tree view select moved node
 			string newNodeID = PATH_NODE_PREFIX + ( newIndex + 1 ).ToString();
 			if( m_ViewManager.TreeNodeMap.ContainsKey( newNodeID ) ) {
-				if( m_DefaultAction is SelectPathAction_ selectAction ) {
+				if( m_DefaultAction is SelectPathAction selectAction ) {
 					selectAction.ClearSelection();
 					selectAction.SelectPathByID( szPathID );
 				}
@@ -528,7 +528,7 @@ namespace MyCAM.Editor
 			}
 
 			// select focus on first path
-			if( m_DefaultAction is SelectPathAction_ selectAction ) {
+			if( m_DefaultAction is SelectPathAction selectAction ) {
 				selectAction.ClearSelection();
 				selectAction.SelectPathByID( m_DataManager.PathIDList.First() );
 			}

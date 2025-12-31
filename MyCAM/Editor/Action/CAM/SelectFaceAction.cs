@@ -110,6 +110,7 @@ namespace MyCAM.Editor
 			if( e.Button == MouseButtons.Left ) {
 				if( m_Viewer.GetAISContext().DetectedOwner().IsNull()
 					|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
+					m_Viewer.GetAISContext().ClearSelected( true );
 					return;
 				}
 				AIS_InteractiveObject detectedObject = m_Viewer.GetAISContext().DetectedInteractive();
@@ -118,6 +119,13 @@ namespace MyCAM.Editor
 				}
 				m_Viewer.GetAISContext().AddOrRemoveSelected( detectedObject, false );
 				m_Viewer.UpdateView();
+			}
+		}
+
+		protected override void ViewerMouseDoubleClick( MouseEventArgs e )
+		{
+			if( e.Button == MouseButtons.Left ) {
+				SelectD1ContFace();
 			}
 		}
 
@@ -240,6 +248,7 @@ namespace MyCAM.Editor
 			while( m_Viewer.GetAISContext().MoreSelected() ) {
 				TopoDS_Shape shape = m_Viewer.GetAISContext().SelectedShape();
 				if( shape == null || shape.ShapeType() != TopAbs_ShapeEnum.TopAbs_FACE ) {
+					m_Viewer.GetAISContext().NextSelected();
 					continue;
 				}
 				selectedFaceList.Add( TopoDS.ToFace( shape ) );
