@@ -102,7 +102,7 @@
     <Compile Include="Editor\Action\CAM\EntryAndExitAction.cs" />
     <Compile Include="Editor\Action\CAM\LeadAction.cs" />
     <Compile Include="Editor\Action\CAM\OverCutAction.cs" />
-    <Compile Include="Editor\Action\CAM\SelectPathAction_.cs" />
+    <Compile Include="Editor\Action\CAM\SelectPathAction.cs" />
     <Compile Include="Editor\Action\CAM\TraverseAction.cs" />
     <Compile Include="Editor\Action\CAD\ReadProjectFileAction.cs" />
     <Compile Include="Editor\Action\CAD\SaveProjectFileAction.cs" />
@@ -168,7 +168,7 @@
     <Compile Include="MyApp.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
     <Compile Include="Editor\Action\CAM\SelectFaceAction.cs" />
-    <Compile Include="Editor\Action\CAM\SelectPathAction.cs" />
+    <Compile Include="Editor\Action\CAM\SelectWireAction.cs" />
     <Compile Include="Editor\Action\CAM\StartPointAction.cs" />
     <Compile Include="Editor\Action\CAD\TransformConstraints.cs" />
     <Compile Include="Editor\Action\CAD\ThreePtTransformAction.cs" />
