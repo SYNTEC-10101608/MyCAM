@@ -222,7 +222,7 @@ namespace MyCAM.Editor
 		}
 
 		bool m_IsPathRevese = false;
-		const double MAX_Angle = 60.0;
-		const double MIN_Angle = -60.0;
+		const double MAX_Angle = 999;
+		const double MIN_Angle = -999;
 	}
 }

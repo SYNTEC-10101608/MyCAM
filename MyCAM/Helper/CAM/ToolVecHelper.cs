@@ -172,6 +172,55 @@ namespace MyCAM.Helper
 			return intervalList;
 		}
 
+		static void InterpolateToolVecByAxisPosition( ref List<ISetToolVecPoint> toolVecPointList,
+			int nStartIndex, int nEndIndex, double dStartM, double dStartS, double dEndM, double dEndS )
+		{
+			// consider wrapped
+			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + toolVecPointList.Count : nEndIndex;
+
+			// get the total distance for interpolation parameter
+			double totaldistance = 0;
+			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
+				totaldistance += toolVecPointList[ i % toolVecPointList.Count ].Point.SquareDistance( toolVecPointList[ ( i + 1 ) % toolVecPointList.Count ].Point );
+			}
+			double accumulatedDistance = 0;
+			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
+				double t = accumulatedDistance / totaldistance;
+				accumulatedDistance += toolVecPointList[ i % toolVecPointList.Count ].Point.SquareDistance( toolVecPointList[ ( i + 1 ) % toolVecPointList.Count ].Point );
+
+				// Interpolate axis positions independently
+				double dInterpM = dStartM + ( dEndM - dStartM ) * t;
+				double dInterpS = dStartS + ( dEndS - dStartS ) * t;
+
+				// Solve forward kinematics for A-C-spindle type
+				// Initial vector: [0, 0, 1]
+				// First rotation: rotate around Z-axis by C-axis angle (dInterpM)
+				// Second rotation: rotate around X-axis by A-axis angle (dInterpS)
+				gp_Vec toolVec = SolveACSpindleFK( dInterpM, dInterpS );
+				toolVecPointList[ i % toolVecPointList.Count ].ToolVec = new gp_Dir( toolVec );
+			}
+		}
+
+		static gp_Vec SolveACSpindleFK( double dC_rad, double dA_rad )
+		{
+			// Initial tool vector pointing in Z direction [0, 0, 1]
+			gp_Vec initVec = new gp_Vec( 0, 0, 1 );
+
+			// Second rotation: rotate around X-axis by A-axis angle
+			gp_Ax1 xAxis = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) );
+			gp_Trsf trsfA = new gp_Trsf();
+			trsfA.SetRotation( xAxis, dA_rad );
+			gp_Vec vecAfterA = initVec.Transformed( trsfA );
+
+			// First rotation: rotate around Z-axis by C-axis angle
+			gp_Ax1 zAxis = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
+			gp_Trsf trsfC = new gp_Trsf();
+			trsfC.SetRotation( zAxis, dC_rad );
+			gp_Vec finalVec = vecAfterA.Transformed( trsfC );
+
+			return finalVec;
+		}
+
 		static void InterpolateToolVecByTilt( ref List<ISetToolVecPoint> toolVecPointList,
 			int nStartIndex, int nEndIndex, double dStartRA_Deg, double dStartRB_Deg, double dEndRA_Deg, double dEndRB_Deg, bool isToolVecReverse )
 		{
@@ -306,10 +355,9 @@ namespace MyCAM.Helper
 		{
 			// all tool vector are modified to the same value, no need to do interpolation
 			if( toolVecModifyMap.Count == 1 ) {
-				gp_Vec newVec = GetVecFromABAngle( toolVecPointList[ toolVecModifyMap.Keys.First() ],
+				gp_Vec newVec = SolveACSpindleFK(
 					toolVecModifyMap.Values.First().Item1 * Math.PI / 180,
-					toolVecModifyMap.Values.First().Item2 * Math.PI / 180,
-					isToolVecReverse );
+					toolVecModifyMap.Values.First().Item2 * Math.PI / 180 );
 				foreach( ISetToolVecPoint toolVecPoint in toolVecPointList ) {
 					toolVecPoint.ToolVec = new gp_Dir( newVec.XYZ() );
 				}
@@ -319,16 +367,20 @@ namespace MyCAM.Helper
 			// get the interpolate interval list
 			List<Tuple<int, int>> interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap, isClosed );
 
-			// get the control point tool vector for each interval
-			List<Tuple<gp_Vec, gp_Vec>> ctrlPntToolVec = GetIntervalToolVec( interpolateIntervalList, toolVecPointList, toolVecModifyMap, isToolVecReverse );
-
-			// modify the tool vector
+			// modify the tool vector by interpolating axis positions
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
-
 				// get start and end index
 				int nStartIndex = interpolateIntervalList[ i ].Item1;
 				int nEndIndex = interpolateIntervalList[ i ].Item2;
-				InterpolateToolVec( ref toolVecPointList, nStartIndex, nEndIndex, ctrlPntToolVec[ i ].Item1, ctrlPntToolVec[ i ].Item2 );
+
+				// get axis positions in degrees, convert to radians
+				double dStartM = toolVecModifyMap[ nStartIndex ].Item1 * Math.PI / 180;
+				double dStartS = toolVecModifyMap[ nStartIndex ].Item2 * Math.PI / 180;
+				double dEndM = toolVecModifyMap[ nEndIndex ].Item1 * Math.PI / 180;
+				double dEndS = toolVecModifyMap[ nEndIndex ].Item2 * Math.PI / 180;
+
+				InterpolateToolVecByAxisPosition( ref toolVecPointList, nStartIndex, nEndIndex,
+					dStartM, dStartS, dEndM, dEndS );
 			}
 			return;
 		}
@@ -368,7 +420,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		const double TOO_LARGE_ANGLE_DEG = 60.0;
+		const double TOO_LARGE_ANGLE_DEG = 999;
 		const double PROJECT_TOLERANCE = 1e-3;
 		const double RADIUS_TOLERANCE = 1e-3;
 
