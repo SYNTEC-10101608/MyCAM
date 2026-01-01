@@ -122,19 +122,64 @@ namespace MyCAM.PathCache
 				}
 			}
 
-			// set initial IK result before start point and orientation changes
+		// set initial IK result before start point and orientation changes
 			SetInitIKResult();
 
-			// set tool vector
+			// create index tracking to map ToolVecModifyMap indices after transformations
+			List<int> indexMapping = new List<int>();
+			
+			// initialize with original indices
+			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
+				indexMapping.Add( i );
+			}
+
+			// set start point and orientation first
+			SetStartPoint();
+			SetOrientation();
+
+			// apply start point transformation to index mapping
+			if( m_CraftData.StartPointIndex != 0 ) {
+				List<int> newIndexMapping = new List<int>();
+				for( int i = 0; i < indexMapping.Count; i++ ) {
+					int sourceIndex = ( i + m_CraftData.StartPointIndex ) % indexMapping.Count;
+					newIndexMapping.Add( indexMapping[ sourceIndex ] );
+				}
+				indexMapping = newIndexMapping;
+			}
+
+			// apply orientation transformation (reverse) to index mapping
+			if( m_CraftData.IsPathReverse ) {
+				indexMapping.Reverse();
+
+				// modify start point index for closed path
+				if( m_IsClose ) {
+					int lastIndex = indexMapping.Last();
+					indexMapping.RemoveAt( indexMapping.Count - 1 );
+					indexMapping.Insert( 0, lastIndex );
+				}
+			}
+
+			// create transformed ToolVecModifyMap: map from transformed index to original modifications
+			Dictionary<int, Tuple<double, double>> transformedToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
+			foreach( var kvp in m_CraftData.ToolVecModifyMap ) {
+				int originalIndex = kvp.Key;
+				Tuple<double, double> modification = kvp.Value;
+				
+				// find which transformed index corresponds to this original index
+				for( int transformedIndex = 0; transformedIndex < indexMapping.Count; transformedIndex++ ) {
+					if( indexMapping[ transformedIndex ] == originalIndex ) {
+						transformedToolVecModifyMap[ transformedIndex ] = modification;
+						break;
+					}
+				}
+			}
+
+			// set tool vector with transformed map
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, m_IsClose, m_CraftData.IsToolVecReverse, m_CraftData.InterpolateType, m_RefCenterDir );
+			ToolVecHelper.SetToolVec( ref toolVecPointList, transformedToolVecModifyMap, m_IsClose, m_CraftData.IsToolVecReverse, m_CraftData.InterpolateType, m_RefCenterDir, 1 );
 			foreach( var oneConnect in m_ConnectCAMPointMap ) {
 				oneConnect.Value.ToolVec = oneConnect.Key.ToolVec;
 			}
-
-			// set start point and orientation
-			SetStartPoint();
-			SetOrientation();
 
 			// close the loop if is closed
 			if( m_IsClose && m_CAMPointList.Count > 0 ) {
