@@ -1,5 +1,6 @@
 ﻿using MyCAM.Data;
 using MyCAM.Helper;
+using MyCAM.Post;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
@@ -80,6 +81,17 @@ namespace MyCAM.PathCache
 			}
 		}
 
+		public List<Tuple<double, double>> InitIKResult
+		{
+			get
+			{
+				if( m_IsCraftDataDirty ) {
+					BuildCAMPointList();
+				}
+				return m_InitIKResult;
+			}
+		}
+
 		#endregion
 
 		#region API
@@ -109,6 +121,9 @@ namespace MyCAM.PathCache
 					m_ConnectCAMPointMap.Add( camPoint, connectedCAMPoint );
 				}
 			}
+
+			// set initial IK result before start point and orientation changes
+			SetInitIKResult();
 
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
@@ -142,6 +157,94 @@ namespace MyCAM.PathCache
 			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
 			LeadHelper.SetLeadOut( mainPointList, overCutPointList2, out List<IOrientationPoint> leadOutPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
 			m_LeadOutCAMPointList = leadOutPointList.Cast<CAMPoint>().ToList();
+		}
+
+		void SetInitIKResult()
+		{
+			// reset initial IK result
+			m_InitIKResult.Clear();
+
+			// get machine data
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return;
+			}
+
+			// create a copy of CAM points considering start point and orientation
+			List<CAMPoint> tempCAMPointList = new List<CAMPoint>();
+			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
+				tempCAMPointList.Add( m_CAMPointList[ i ].Clone() );
+			}
+
+			// apply start point transformation
+			if( m_CraftData.StartPointIndex != 0 ) {
+				List<CAMPoint> newTempList = new List<CAMPoint>();
+				for( int i = 0; i < tempCAMPointList.Count; i++ ) {
+					newTempList.Add( tempCAMPointList[ ( i + m_CraftData.StartPointIndex ) % tempCAMPointList.Count ] );
+				}
+				tempCAMPointList = newTempList;
+			}
+
+			// apply orientation transformation (reverse)
+			if( m_CraftData.IsPathReverse ) {
+				tempCAMPointList.Reverse();
+
+				// modify start point index for closed path
+				if( m_IsClose ) {
+					CAMPoint lastPoint = tempCAMPointList.Last();
+					tempCAMPointList.Remove( lastPoint );
+					tempCAMPointList.Insert( 0, lastPoint );
+				}
+			}
+
+			// solve IK for transformed points
+			PostSolver postSolver = new PostSolver( machineData );
+			List<IProcessPoint> processPointList = tempCAMPointList.Cast<IProcessPoint>().ToList();
+			double dLastM = 0.0;
+			double dLastS = 0.0;
+			List<Tuple<double, double>> ikResult;
+			if( !SolveProcessPath( postSolver, processPointList, out ikResult, ref dLastM, ref dLastS ) ) {
+				return;
+			}
+
+			// now we need to reverse the transformations to align with raw CAD point indices
+			// create a list with same size as CAD points
+			List<Tuple<double, double>> alignedResult = new List<Tuple<double, double>>( new Tuple<double, double>[ m_CADPointList.Count ] );
+
+			// map transformed indices back to original indices
+			for( int transformedIndex = 0; transformedIndex < ikResult.Count; transformedIndex++ ) {
+				// reverse the transformations to find original index
+
+				// step 1: reverse orientation transformation
+				int afterOrientationIndex = transformedIndex;
+				if( m_CraftData.IsPathReverse ) {
+					if( m_IsClose && transformedIndex == 0 ) {
+						// the first point after reverse is originally the last
+						afterOrientationIndex = m_CADPointList.Count - 1;
+					}
+					else if( m_IsClose ) {
+						// shift by one because of the rotation, then reverse
+						afterOrientationIndex = m_CADPointList.Count - transformedIndex;
+					}
+					else {
+						// simple reverse
+						afterOrientationIndex = m_CADPointList.Count - 1 - transformedIndex;
+					}
+				}
+
+				// step 2: reverse start point transformation
+				int originalIndex = afterOrientationIndex;
+				if( m_CraftData.StartPointIndex != 0 ) {
+					originalIndex = ( afterOrientationIndex - m_CraftData.StartPointIndex + m_CADPointList.Count ) % m_CADPointList.Count;
+				}
+
+				// store the IK result at the original index
+				if( originalIndex >= 0 && originalIndex < alignedResult.Count ) {
+					alignedResult[ originalIndex ] = ikResult[ transformedIndex ];
+				}
+			}
+
+			// assign to member variable
+			m_InitIKResult = alignedResult;
 		}
 
 		void SetStartPoint()
@@ -178,6 +281,32 @@ namespace MyCAM.PathCache
 			}
 		}
 
+		static bool SolveProcessPath( PostSolver postSolver, IReadOnlyList<IProcessPoint> pointList,
+			out List<Tuple<double,double>> resultG54, ref double dLastProcessPathM, ref double dLastProcessPathS )
+		{
+			resultG54 = new List<Tuple<double,double>>();
+			if( pointList == null || pointList.Count == 0 ) {
+				return false;
+			}
+
+			// solve IK
+			List<bool> singularTagList = new List<bool>();
+			foreach( IProcessPoint point in pointList ) {
+				IKSolveResult ikResult = postSolver.SolveIK( point, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
+				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution || ikResult == IKSolveResult.OutOfRange ) {
+					return false;
+				}
+				resultG54.Add( new Tuple<double, double>( dLastProcessPathM, dLastProcessPathS ) );
+				if( ikResult == IKSolveResult.NoError ) {
+					singularTagList.Add( false );
+				}
+				else if( ikResult == IKSolveResult.MasterInfinityOfSolution || ikResult == IKSolveResult.SlaveInfinityOfSolution ) {
+					singularTagList.Add( true );
+				}
+			}
+			return true;
+		}
+
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
 
 		// for CAM point connection
@@ -185,6 +314,7 @@ namespace MyCAM.PathCache
 		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
+		List<Tuple<double, double>> m_InitIKResult = new List<Tuple<double, double>>();
 
 		// they are sibling pointer, and change the declare order
 		CraftData m_CraftData;

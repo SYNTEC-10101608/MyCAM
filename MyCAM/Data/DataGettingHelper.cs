@@ -136,5 +136,11 @@
 			sewable = _sewable;
 			return sewable != null;
 		}
+
+		public static bool GetMachineData( out MachineData machineData )
+		{
+			machineData = m_DataManager?.MachineData;
+			return machineData != null;
+		}
 	}
 }
