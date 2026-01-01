@@ -209,25 +209,42 @@ namespace MyCAM.Post
 				return false;
 			}
 
-			// solve IK
-			List<Tuple<double, double>> rotateAngleList = new List<Tuple<double, double>>();
-			List<bool> singularTagList = new List<bool>();
+			bool isSolved = true;
 			foreach( IProcessPoint point in pointList ) {
-				IKSolveResult ikResult = postSolver.SolveIK( point, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
-				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution || ikResult == IKSolveResult.OutOfRange ) {
-					return false;
-				}
-				rotateAngleList.Add( new Tuple<double, double>( dLastProcessPathM, dLastProcessPathS ) );
-				if( ikResult == IKSolveResult.NoError ) {
-					singularTagList.Add( false );
-				}
-				else if( ikResult == IKSolveResult.MasterInfinityOfSolution || ikResult == IKSolveResult.SlaveInfinityOfSolution ) {
-					singularTagList.Add( true );
+				if( point.Master == CAMPoint.MAGIC_MS_INIT_VAL || point.Slave == CAMPoint.MAGIC_MS_INIT_VAL ) {
+					isSolved = false;
+					break;
 				}
 			}
 
-			// filter the singular points
-			FilterSingularPoints( pointList, rotateAngleList, singularTagList );
+			// solve IK
+			List<Tuple<double, double>> rotateAngleList = new List<Tuple<double, double>>();
+			List<bool> singularTagList = new List<bool>();
+			if( isSolved ) {
+				// use existing solution
+				foreach( IProcessPoint point in pointList ) {
+					rotateAngleList.Add( new Tuple<double, double>( point.Master, point.Slave ) );
+					singularTagList.Add( false );
+				}
+			}
+			else {
+				foreach( IProcessPoint point in pointList ) {
+					IKSolveResult ikResult = postSolver.SolveIK( point, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
+					if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution || ikResult == IKSolveResult.OutOfRange ) {
+						return false;
+					}
+					rotateAngleList.Add( new Tuple<double, double>( dLastProcessPathM, dLastProcessPathS ) );
+					if( ikResult == IKSolveResult.NoError ) {
+						singularTagList.Add( false );
+					}
+					else if( ikResult == IKSolveResult.MasterInfinityOfSolution || ikResult == IKSolveResult.SlaveInfinityOfSolution ) {
+						singularTagList.Add( true );
+					}
+				}
+
+				// filter the singular points
+				FilterSingularPoints( pointList, rotateAngleList, singularTagList );
+			}
 
 			// build post data
 			for( int i = 0; i < pointList.Count; i++ ) {

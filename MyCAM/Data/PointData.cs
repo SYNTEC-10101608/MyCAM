@@ -89,6 +89,16 @@ namespace MyCAM.Data
 			set;
 		}
 
+		double Master
+		{
+			get; set;
+		}
+
+		double Slave
+		{
+			get; set;
+		}
+
 		bool IsToolVecModPoint
 		{
 			get;
@@ -130,6 +140,16 @@ namespace MyCAM.Data
 
 		// sorry, but this is the best way to solve the problem now
 		bool IsToolVecModPoint
+		{
+			get;
+		}
+
+		double Master
+		{
+			get;
+		}
+
+		double Slave
 		{
 			get;
 		}
@@ -193,9 +213,36 @@ namespace MyCAM.Data
 			set;
 		}
 
+		public double Master
+		{
+			get
+			{
+				return m_Master;
+			}
+			set
+			{
+				m_Master = value;
+			}
+		}
+
+		public double Slave
+		{
+			get
+			{
+				return m_Slave;
+			}
+			set
+			{
+				m_Slave = value;
+			}
+		}
+
 		public CAMPoint Clone()
 		{
-			return new CAMPoint( m_CADPoint.Clone(), m_ToolVec );
+			CAMPoint newPoint = new CAMPoint( m_CADPoint.Clone(), m_ToolVec );
+			newPoint.Master = Master;
+			newPoint.Slave = Slave;
+			return newPoint;
 		}
 
 		// the explicit interface implementation
@@ -212,5 +259,8 @@ namespace MyCAM.Data
 		// using backing field to prevent modified outside
 		CADPoint m_CADPoint;
 		gp_Dir m_ToolVec;
+		public const double MAGIC_MS_INIT_VAL = 999;
+		double m_Master = MAGIC_MS_INIT_VAL;
+		double m_Slave = MAGIC_MS_INIT_VAL;
 	}
 }

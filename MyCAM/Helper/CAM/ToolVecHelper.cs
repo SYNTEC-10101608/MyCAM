@@ -198,6 +198,8 @@ namespace MyCAM.Helper
 				// Second rotation: rotate around X-axis by A-axis angle (dInterpS)
 				gp_Vec toolVec = SolveACSpindleFK( dInterpM, dInterpS );
 				toolVecPointList[ i % toolVecPointList.Count ].ToolVec = new gp_Dir( toolVec );
+				toolVecPointList[ i % toolVecPointList.Count ].Master = dInterpM;
+				toolVecPointList[ i % toolVecPointList.Count ].Slave = dInterpS;
 			}
 		}
 
@@ -360,6 +362,8 @@ namespace MyCAM.Helper
 					toolVecModifyMap.Values.First().Item2 * Math.PI / 180 );
 				foreach( ISetToolVecPoint toolVecPoint in toolVecPointList ) {
 					toolVecPoint.ToolVec = new gp_Dir( newVec.XYZ() );
+					toolVecPoint.Master = toolVecModifyMap.Values.First().Item1 * Math.PI / 180;
+					toolVecPoint.Slave = toolVecModifyMap.Values.First().Item2 * Math.PI / 180;
 				}
 				return;
 			}

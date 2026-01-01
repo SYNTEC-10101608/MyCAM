@@ -139,9 +139,9 @@ namespace MyCAM.PathCache
 			// close the loop if is closed
 			if( m_IsClose && m_CAMPointList.Count > 0 ) {
 				CAMPoint startPoint = m_CAMPointList[ 0 ];
-				CAMPoint connectedCAMPoint = m_ConnectCAMPointMap.ContainsKey( startPoint )
+				CAMPoint connectedCAMPoint = /*m_ConnectCAMPointMap.ContainsKey( startPoint )
 												? m_ConnectCAMPointMap[ startPoint ]
-												: startPoint.Clone();
+												: */startPoint.Clone();
 				m_CAMPointList.Add( connectedCAMPoint );
 			}
 
