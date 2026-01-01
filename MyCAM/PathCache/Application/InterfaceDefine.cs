@@ -1,5 +1,6 @@
 ﻿using MyCAM.Data;
 using OCC.gp;
+using System;
 using System.Collections.Generic;
 
 namespace MyCAM.PathCache
@@ -27,6 +28,11 @@ namespace MyCAM.PathCache
 		}
 
 		List<CADPoint> MainPathCADPointList
+		{
+			get;
+		}
+
+		List<Tuple<double, double>> InitIKResult
 		{
 			get;
 		}

@@ -1,4 +1,5 @@
 using MyCAM.Data;
+using System;
 
 
 namespace MyCAM.PathCache
@@ -21,8 +22,8 @@ namespace MyCAM.PathCache
 				return true;
 			}
 			else {
-				dRA_deg = 0;
-				dRB_deg = 0;
+				dRA_deg = m_PathCache.InitIKResult[ index ].Item1 * 180 / Math.PI;
+				dRB_deg = m_PathCache.InitIKResult[ index ].Item2 * 180 / Math.PI;
 				return false;
 			}
 		}

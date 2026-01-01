@@ -169,30 +169,44 @@ namespace MyCAM.PathCache
 				return;
 			}
 
-			// create a copy of CAM points considering start point and orientation
+			// create index tracking: each element stores the original CAD point index
+			List<int> indexMapping = new List<int>();
 			List<CAMPoint> tempCAMPointList = new List<CAMPoint>();
+			
+			// initialize with original indices
 			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
 				tempCAMPointList.Add( m_CAMPointList[ i ].Clone() );
+				indexMapping.Add( i );
 			}
 
 			// apply start point transformation
 			if( m_CraftData.StartPointIndex != 0 ) {
 				List<CAMPoint> newTempList = new List<CAMPoint>();
+				List<int> newIndexMapping = new List<int>();
 				for( int i = 0; i < tempCAMPointList.Count; i++ ) {
-					newTempList.Add( tempCAMPointList[ ( i + m_CraftData.StartPointIndex ) % tempCAMPointList.Count ] );
+					int sourceIndex = ( i + m_CraftData.StartPointIndex ) % tempCAMPointList.Count;
+					newTempList.Add( tempCAMPointList[ sourceIndex ] );
+					newIndexMapping.Add( indexMapping[ sourceIndex ] );
 				}
 				tempCAMPointList = newTempList;
+				indexMapping = newIndexMapping;
 			}
 
 			// apply orientation transformation (reverse)
 			if( m_CraftData.IsPathReverse ) {
 				tempCAMPointList.Reverse();
+				indexMapping.Reverse();
 
 				// modify start point index for closed path
 				if( m_IsClose ) {
 					CAMPoint lastPoint = tempCAMPointList.Last();
+					int lastIndex = indexMapping.Last();
+					
 					tempCAMPointList.Remove( lastPoint );
 					tempCAMPointList.Insert( 0, lastPoint );
+					
+					indexMapping.RemoveAt( indexMapping.Count - 1 );
+					indexMapping.Insert( 0, lastIndex );
 				}
 			}
 
@@ -206,38 +220,12 @@ namespace MyCAM.PathCache
 				return;
 			}
 
-			// now we need to reverse the transformations to align with raw CAD point indices
-			// create a list with same size as CAD points
+			// create result list aligned with raw CAD point indices
 			List<Tuple<double, double>> alignedResult = new List<Tuple<double, double>>( new Tuple<double, double>[ m_CADPointList.Count ] );
 
-			// map transformed indices back to original indices
+			// map IK results back to original indices using the tracking map
 			for( int transformedIndex = 0; transformedIndex < ikResult.Count; transformedIndex++ ) {
-				// reverse the transformations to find original index
-
-				// step 1: reverse orientation transformation
-				int afterOrientationIndex = transformedIndex;
-				if( m_CraftData.IsPathReverse ) {
-					if( m_IsClose && transformedIndex == 0 ) {
-						// the first point after reverse is originally the last
-						afterOrientationIndex = m_CADPointList.Count - 1;
-					}
-					else if( m_IsClose ) {
-						// shift by one because of the rotation, then reverse
-						afterOrientationIndex = m_CADPointList.Count - transformedIndex;
-					}
-					else {
-						// simple reverse
-						afterOrientationIndex = m_CADPointList.Count - 1 - transformedIndex;
-					}
-				}
-
-				// step 2: reverse start point transformation
-				int originalIndex = afterOrientationIndex;
-				if( m_CraftData.StartPointIndex != 0 ) {
-					originalIndex = ( afterOrientationIndex - m_CraftData.StartPointIndex + m_CADPointList.Count ) % m_CADPointList.Count;
-				}
-
-				// store the IK result at the original index
+				int originalIndex = indexMapping[ transformedIndex ];
 				if( originalIndex >= 0 && originalIndex < alignedResult.Count ) {
 					alignedResult[ originalIndex ] = ikResult[ transformedIndex ];
 				}

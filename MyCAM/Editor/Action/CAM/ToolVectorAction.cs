@@ -65,7 +65,7 @@ namespace MyCAM.Editor
 
 			// back up old data
 			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, m_CraftData.InterpolateType );
-			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
+			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam, false );
 			toolVecForm.RaiseKeep += () => SetToolVecOfKeep( nIndex, toolVecForm );
 			toolVecForm.RaiseZDir += () => SetToolVecOfZDir( nIndex, toolVecForm );
 			toolVecForm.Preview += ( ToolVec ) => SetToolVecParamAndPeview( nIndex, ToolVec );
