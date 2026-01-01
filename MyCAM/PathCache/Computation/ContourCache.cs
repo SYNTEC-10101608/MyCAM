@@ -122,12 +122,12 @@ namespace MyCAM.PathCache
 				}
 			}
 
-		// set initial IK result before start point and orientation changes
+			// set initial IK result before start point and orientation changes
 			SetInitIKResult();
 
 			// create index tracking to map ToolVecModifyMap indices after transformations
 			List<int> indexMapping = new List<int>();
-			
+
 			// initialize with original indices
 			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
 				indexMapping.Add( i );
@@ -164,7 +164,7 @@ namespace MyCAM.PathCache
 			foreach( var kvp in m_CraftData.ToolVecModifyMap ) {
 				int originalIndex = kvp.Key;
 				Tuple<double, double> modification = kvp.Value;
-				
+
 				// find which transformed index corresponds to this original index
 				for( int transformedIndex = 0; transformedIndex < indexMapping.Count; transformedIndex++ ) {
 					if( indexMapping[ transformedIndex ] == originalIndex ) {
@@ -174,9 +174,11 @@ namespace MyCAM.PathCache
 				}
 			}
 
+			int mod = 1;
+
 			// set tool vector with transformed map
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, transformedToolVecModifyMap, m_IsClose, m_CraftData.IsToolVecReverse, m_CraftData.InterpolateType, m_RefCenterDir, 1 );
+			ToolVecHelper.SetToolVec( ref toolVecPointList, transformedToolVecModifyMap, m_IsClose, m_CraftData.IsToolVecReverse, m_CraftData.InterpolateType, m_RefCenterDir, mod );
 			foreach( var oneConnect in m_ConnectCAMPointMap ) {
 				oneConnect.Value.ToolVec = oneConnect.Key.ToolVec;
 			}
@@ -187,6 +189,11 @@ namespace MyCAM.PathCache
 				CAMPoint connectedCAMPoint = /*m_ConnectCAMPointMap.ContainsKey( startPoint )
 												? m_ConnectCAMPointMap[ startPoint ]
 												: */startPoint.Clone();
+				connectedCAMPoint.Master += mod * Math.PI;
+				// if mod is odd, negate slave
+				if( mod % 2 != 0 ) {
+					connectedCAMPoint.Slave = -connectedCAMPoint.Slave;
+				}
 				m_CAMPointList.Add( connectedCAMPoint );
 			}
 
@@ -217,7 +224,7 @@ namespace MyCAM.PathCache
 			// create index tracking: each element stores the original CAD point index
 			List<int> indexMapping = new List<int>();
 			List<CAMPoint> tempCAMPointList = new List<CAMPoint>();
-			
+
 			// initialize with original indices
 			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
 				tempCAMPointList.Add( m_CAMPointList[ i ].Clone() );
@@ -246,10 +253,10 @@ namespace MyCAM.PathCache
 				if( m_IsClose ) {
 					CAMPoint lastPoint = tempCAMPointList.Last();
 					int lastIndex = indexMapping.Last();
-					
+
 					tempCAMPointList.Remove( lastPoint );
 					tempCAMPointList.Insert( 0, lastPoint );
-					
+
 					indexMapping.RemoveAt( indexMapping.Count - 1 );
 					indexMapping.Insert( 0, lastIndex );
 				}
@@ -315,9 +322,9 @@ namespace MyCAM.PathCache
 		}
 
 		static bool SolveProcessPath( PostSolver postSolver, IReadOnlyList<IProcessPoint> pointList,
-			out List<Tuple<double,double>> resultG54, ref double dLastProcessPathM, ref double dLastProcessPathS )
+			out List<Tuple<double, double>> resultG54, ref double dLastProcessPathM, ref double dLastProcessPathS )
 		{
-			resultG54 = new List<Tuple<double,double>>();
+			resultG54 = new List<Tuple<double, double>>();
 			if( pointList == null || pointList.Count == 0 ) {
 				return false;
 			}

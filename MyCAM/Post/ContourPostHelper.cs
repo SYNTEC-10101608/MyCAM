@@ -226,6 +226,8 @@ namespace MyCAM.Post
 					rotateAngleList.Add( new Tuple<double, double>( point.Master, point.Slave ) );
 					singularTagList.Add( false );
 				}
+				dLastProcessPathM = rotateAngleList[ rotateAngleList.Count - 1 ].Item1;
+				dLastProcessPathS = rotateAngleList[ rotateAngleList.Count - 1 ].Item2;
 			}
 			else {
 				foreach( IProcessPoint point in pointList ) {
