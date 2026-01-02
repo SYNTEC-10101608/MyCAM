@@ -63,7 +63,7 @@ namespace MyCAM.Post
 			string szRotaryAxisCommand = GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI,
 				masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
 			string szFollow = followSafeDistance == 0 ? string.Empty : FOLLOW_SAFE_DISTANCE_COMMAND + followSafeDistance.ToString( "F3" );
-			writer.WriteLine( $"G00 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand} {szFollow};" );
+			writer.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand};" );
 		}
 
 		public static void WriteFrogLeap( StreamWriter writer, PostPoint midPoint, PostPoint endPoint, double followSafeDistance,
