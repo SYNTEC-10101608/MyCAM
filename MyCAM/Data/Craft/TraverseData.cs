@@ -40,7 +40,7 @@ namespace MyCAM.Data
 
 		public static double ENTRY_DISTANCE = 100.0;
 		public static double EXIT_DISTANCE = 100.0;
-		public static double FOLLOW_SAFE_DISTANCE = 5.0;
+		public static double FOLLOW_SAFE_DISTANCE = 0.0;
 	}
 
 	public class TraverseData
@@ -127,7 +127,7 @@ namespace MyCAM.Data
 
 		public static double LIFT_UP_DISTANCE = 0.0;
 		public static double CUT_DOWN_DISTANCE = 0.0;
-		public static double FOLLOW_SAFE_DISTANCE = 5.0;
+		public static double FOLLOW_SAFE_DISTANCE = 0.0;
 		public static double FROG_LEAP_DISTANCE = 10.0;
 		double m_LiftUpDistance = LIFT_UP_DISTANCE;
 		double m_CutDownDistance = CUT_DOWN_DISTANCE;
