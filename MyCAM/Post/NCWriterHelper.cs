@@ -6,8 +6,6 @@ namespace MyCAM.Post
 {
 	internal static class NCWriterHelper
 	{
-		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";
-
 		public static void WriteTraverse( StreamWriter writer, ITraversePostData postData,
 			string masterAxisName, string slaveAxisName, RotaryAxis masterRotaryAxis, RotaryAxis slaveRotaryAxis )
 		{
@@ -106,5 +104,7 @@ namespace MyCAM.Post
 				return szS + " " + szM;
 			}
 		}
+
+		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";
 	}
 }

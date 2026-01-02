@@ -1,5 +1,4 @@
 ﻿using MyCAM.Data;
-using MyCAM.Helper;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
@@ -177,29 +176,6 @@ namespace MyCAM.Post
 				Slave = dLastPointProcess_S
 			};
 			return true;
-		}
-
-		public static void CalculateExit( PathEndInfo endInfoOfLastPath, EntryAndExitData entryAndExitData,
-			out PostPoint G54ExitPoint )
-		{
-			G54ExitPoint = null;
-			if( entryAndExitData.ExitDistance <= 0 ) {
-				return;
-			}
-			IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfLastPath.EndCAMPoint, entryAndExitData.ExitDistance );
-			if( exitPoint == null ) {
-				return;
-			}
-
-			// G54
-			G54ExitPoint = new PostPoint()
-			{
-				X = exitPoint.Point.X(),
-				Y = exitPoint.Point.Y(),
-				Z = exitPoint.Point.Z(),
-				Master = endInfoOfLastPath.Master,
-				Slave = endInfoOfLastPath.Slave
-			};
 		}
 
 		public static List<PostPoint> GetConcatenatedPostList( PostData postData )
