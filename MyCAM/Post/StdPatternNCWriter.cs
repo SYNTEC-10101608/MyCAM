@@ -211,7 +211,7 @@ namespace MyCAM.Post
 
 	internal static class StdPatternNCWriter
 	{
-		public static void WriteStandardPatternCutting( StreamWriter writer, PathType pathType, StdPatternPostData postData, 
+		public static void WriteStandardPatternCutting( StreamWriter writer, PathType pathType, StdPatternPostData postData,
 			CraftData craftData, IGeomData geomData, int nIndex,
 			string masterAxisName, string slaveAxisName, RotaryAxis masterRotaryAxis, RotaryAxis slaveRotaryAxis )
 		{
@@ -222,6 +222,7 @@ namespace MyCAM.Post
 			// write comment and N code
 			writer.WriteLine( "// Cutting" + nIndex );
 			writer.WriteLine( "N" + nIndex );
+			writer.WriteLine( "G65 P\"LoadParameter\" H1;" );
 
 			// write traverse section
 			NCWriterHelper.WriteTraverse( writer, postData, masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
