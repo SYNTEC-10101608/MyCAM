@@ -1,41 +1,52 @@
 ﻿using MyCAM.App;
 using OCC.gp;
 using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	// editdialog <input> is for preview and confirm, but no need input data here
-	public partial class ThreePtTransformDlg : EditDialogBase<object>
+	public struct TransParam
 	{
-		public ThreePtTransformDlg( gp_Pnt p1, gp_Pnt p2, gp_Pnt p3 )
+		public gp_Pnt MachineP1
+		{
+			get; set;
+		}
+
+		public gp_Pnt MachineP2
+		{
+			get; set;
+		}
+
+		public gp_Pnt MachineP3
+		{
+			get; set;
+		}
+
+		public TransParam( gp_Pnt machineP1, gp_Pnt machineP2, gp_Pnt machineP3 )
+		{
+			MachineP1 = machineP1;
+			MachineP2 = machineP2;
+			MachineP3 = machineP3;
+		}
+	}
+
+	public partial class ThreePtTransformDlg : EditDialogBase<TransParam>
+	{
+		public ThreePtTransformDlg( TransParam transParam )
 		{
 			InitializeComponent();
 
 			// init cad textbox
-			tbxCADX1.Text = p1.X().ToString( "F3" );
-			tbxCADY1.Text = p1.Y().ToString( "F3" );
-			tbxCADZ1.Text = p1.Z().ToString( "F3" );
+			tbxCADX1.Text = transParam.MachineP1.X().ToString( "F3" );
+			tbxCADY1.Text = transParam.MachineP1.Y().ToString( "F3" );
+			tbxCADZ1.Text = transParam.MachineP1.Z().ToString( "F3" );
 
-			tbxCADX2.Text = p2.X().ToString( "F3" );
-			tbxCADY2.Text = p2.Y().ToString( "F3" );
-			tbxCADZ2.Text = p2.Z().ToString( "F3" );
+			tbxCADX2.Text = transParam.MachineP2.X().ToString( "F3" );
+			tbxCADY2.Text = transParam.MachineP2.Y().ToString( "F3" );
+			tbxCADZ2.Text = transParam.MachineP2.Z().ToString( "F3" );
 
-			tbxCADX3.Text = p3.X().ToString( "F3" );
-			tbxCADY3.Text = p3.Y().ToString( "F3" );
-			tbxCADZ3.Text = p3.Z().ToString( "F3" );
-		}
-
-		public bool GetMachinePoint( out gp_Pnt p1, out gp_Pnt p2, out gp_Pnt p3 )
-		{
-			if( m_MachineP1 == null || m_MachineP2 == null || m_MachineP3 == null ) {
-				p1 = p2 = p3 = null;
-				return false;
-			}
-			p1 = m_MachineP1;
-			p2 = m_MachineP2;
-			p3 = m_MachineP3;
-			return true;
+			tbxCADX3.Text = transParam.MachineP3.X().ToString( "F3" );
+			tbxCADY3.Text = transParam.MachineP3.Y().ToString( "F3" );
+			tbxCADZ3.Text = transParam.MachineP3.Z().ToString( "F3" );
 		}
 
 		void btnOK_Click( object sender, EventArgs e )
@@ -74,9 +85,7 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( $"機械點不能共線", MyApp.NoticeType.Warning );
 				return;
 			}
-
-			// dialog result is OK
-			DialogResult = DialogResult.OK;
+			RaiseConfirm( new TransParam( m_MachineP1, m_MachineP2, m_MachineP3 ) );
 			Close();
 		}
 

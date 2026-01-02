@@ -124,15 +124,7 @@ namespace MyCAM.Editor
 
 					// create 3-point coordinate system
 					VectorTool.Create3PCoordSystem( m_1stPoint, m_2ndPoint, m_3rdPoint, out m_3PCoordSys );
-					if( !Show3PtTransformDialog() ) {
-						End();
-						return;
-					}
-
-					// final transformation
-					TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, m_3PTransform );
-					transformHelper.TransformData();
-					End();
+					Show3PtTransformDialog();
 				}
 			}
 		}
@@ -163,31 +155,44 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		bool Show3PtTransformDialog()
+		void Show3PtTransformDialog()
 		{
 			// Create and show the 3-point transform dialog
-			ThreePtTransformDlg dialog = new ThreePtTransformDlg( m_1stPoint, m_2ndPoint, m_3rdPoint );
+			ThreePtTransformDlg dialog = new ThreePtTransformDlg( new TransParam( m_1stPoint, m_2ndPoint, m_3rdPoint ) );
+			dialog.Confirm += ( transParam ) => StartTrans( transParam );
+			dialog.Cancel += () => End();
 			dialog.Show( MyApp.MainForm );
-			if( dialog.DialogResult != DialogResult.OK ) {
-				return false;
-			}
+		}
 
-			// get point from dialog
-			bool isValid = dialog.GetMachinePoint( out gp_Pnt machineP1, out gp_Pnt machineP2, out gp_Pnt machineP3 );
-			if( !isValid ) {
+		void StartTrans( TransParam transParam )
+		{
+			if( !isValisParam( transParam ) ) {
 				MyApp.Logger.ShowOnLogPanel( "無效的軸向參數", MyApp.NoticeType.Warning );
-				return false;
+				End();
+				return;
 			}
-
 			// create 3-point coordinate system
-			if( !VectorTool.Create3PCoordSystem( machineP1, machineP2, machineP3, out gp_Ax3 machineCoordSys ) ) {
+			if( !VectorTool.Create3PCoordSystem( transParam.MachineP1, transParam.MachineP2, transParam.MachineP3, out gp_Ax3 machineCoordSys ) ) {
 				MyApp.Logger.ShowOnLogPanel( "無法創建三點座標系", MyApp.NoticeType.Warning );
-				return false;
+				End();
+				return;
 			}
-
 			// create transformation
 			m_3PTransform = new gp_Trsf();
 			m_3PTransform.SetDisplacement( m_3PCoordSys, machineCoordSys );
+
+			// final transformation
+			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, m_3PTransform );
+			transformHelper.TransformData();
+			End();
+		}
+
+		bool isValisParam( TransParam transParam )
+		{
+			if( transParam.MachineP1 == null || transParam.MachineP2 == null || transParam.MachineP3 == null ) {
+				return false;
+			}
+
 			return true;
 		}
 
