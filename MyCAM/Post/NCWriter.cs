@@ -39,11 +39,7 @@ namespace MyCAM.Post
 			errorMessage = string.Empty;
 			try {
 				using( m_StreamWriter = new StreamWriter( "0000.nc" ) ) {
-					m_StreamWriter.WriteLine( "G65 P\"FileStart\" X\"Material1\" Y\"1.0\" Q1;" ); // 三點校正
-					m_StreamWriter.WriteLine( "G90;" ); // NC init
-					m_StreamWriter.WriteLine( "G17;" );
-					m_StreamWriter.WriteLine( "G53 Z0.;" ); // 機械軸復位
-					m_StreamWriter.WriteLine( "G53 " + m_MasterAxisName + "0. " + m_SlaveAxisName + "0." );
+					m_StreamWriter.WriteLine( "G65 P\"FileStart\" X\"Material1\" Y\"1.0\";" ); // 三點校正
 					m_StreamWriter.WriteLine( "G43.4 P1;" ); // G43.4 新動程
 
 					// to keep last point of previous path
@@ -60,7 +56,7 @@ namespace MyCAM.Post
 							if( !ContourPostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
 								endInfoOfPreviousPath, m_EntryAndExitData,
 								out PostData postData, out endInfoOfPreviousPath ) ) {
-								errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
+								errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
 								return false;
 							}
 							WriteCutting( postData, i + 1 );
@@ -69,11 +65,11 @@ namespace MyCAM.Post
 							StdPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
 							if( !StdPatternPostHelper.SolvePath( m_PostSolver, package, endInfoOfPreviousPath, m_EntryAndExitData,
 								out StdPatternPostData postData, out endInfoOfPreviousPath ) ) {
-								errorMessage = "後處理運算錯誤，路徑：" + ( i ).ToString();
+								errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
 								return false;
 							}
 							if( !DataGettingHelper.GetGeomDataByID( m_PathIDList[ i ], out IGeomData geomData ) ) {
-								errorMessage = "路徑資訊取得錯誤，路徑：" + ( i ).ToString();
+								errorMessage = "路徑資訊取得錯誤，路徑：" + ( i + 1 ).ToString();
 								return false;
 							}
 							WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, geomData, i + 1 );
@@ -105,13 +101,14 @@ namespace MyCAM.Post
 			// the N code
 			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
 			m_StreamWriter.WriteLine( "N" + N_Index );
+			m_StreamWriter.WriteLine( "G65 P\"LoadParameter\" H1;" );
 
 			// traverse from previous path to current path
 			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData,
 				m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
 
 			// start cutting
-			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\" H1;" );
+			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\";" );
 
 			// write each process path
 			WriteOneProcessPath( currentPathPostData.LeadInPostPointList );
