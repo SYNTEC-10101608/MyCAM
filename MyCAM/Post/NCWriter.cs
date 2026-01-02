@@ -183,7 +183,7 @@ namespace MyCAM.Post
 				leadCache.LeadOutCAMPointList,
 				overCutCache.OverCutCAMPointList,
 				traverseDataCache.TraverseData,
-				traverseDataCache.GetProcessEndPoint(),
+				traverseDataCache.GetProcessStartPoint(),
 				traverseDataCache.GetProcessEndPoint() );
 		}
 
