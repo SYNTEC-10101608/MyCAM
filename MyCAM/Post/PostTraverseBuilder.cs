@@ -95,5 +95,27 @@ namespace MyCAM.Post
 			};
 			pathG54PostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 		}
+
+		public static void CalculateExit( PathEndInfo endInfoOfLastPath, EntryAndExitData entryAndExitData, out PostPoint G54ExitPoint )
+		{
+			G54ExitPoint = null;
+			if( entryAndExitData.ExitDistance <= 0 ) {
+				return;
+			}
+			IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( endInfoOfLastPath.EndCAMPoint, entryAndExitData.ExitDistance );
+			if( exitPoint == null ) {
+				return;
+			}
+
+			// G54
+			G54ExitPoint = new PostPoint()
+			{
+				X = exitPoint.Point.X(),
+				Y = exitPoint.Point.Y(),
+				Z = exitPoint.Point.Z(),
+				Master = endInfoOfLastPath.Master,
+				Slave = endInfoOfLastPath.Slave
+			};
+		}
 	}
 }

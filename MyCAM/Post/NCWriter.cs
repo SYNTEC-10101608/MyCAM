@@ -84,9 +84,9 @@ namespace MyCAM.Post
 					if( m_PathIDList.Count > 0 ) {
 
 						// calculate exit point
-						ContourPostHelper.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out PostPoint exitPoint );
+						PostTraverseBuilder.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out PostPoint exitPoint );
 						m_StreamWriter.WriteLine( "// Exit" );
-						NCWriterHelper.WriteLinearTraverse( m_StreamWriter, exitPoint, 0, 
+						NCWriterHelper.WriteLinearTraverse( m_StreamWriter, exitPoint, 0,
 							m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
 					}
 					m_StreamWriter.WriteLine( "G65 P\"FileEnd\";" );
@@ -107,7 +107,7 @@ namespace MyCAM.Post
 			m_StreamWriter.WriteLine( "N" + N_Index );
 
 			// traverse from previous path to current path
-			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData, 
+			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData,
 				m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
 
 			// start cutting
@@ -208,7 +208,5 @@ namespace MyCAM.Post
 						leadCache.LeadInCAMPointList
 					);
 		}
-
-		const string FOLLOW_SAFE_DISTANCE_COMMAND = "S";
 	}
 }
