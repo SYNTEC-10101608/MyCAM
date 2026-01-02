@@ -199,7 +199,289 @@ namespace MyCAM.Post
 			return result;
 		}
 
+		/// <summary>
+		/// Filter path by removing points that are insignificant to both geometry and orientation.
+		/// </summary>
+		/// <param name="path">Input path points</param>
+		/// <param name="epsilon">Tolerance for geometry simplification</param>
+		/// <param name="orientationError">Tolerance for orientation simplification</param>
+		/// <returns>Filtered path with insignificant points removed</returns>
+		public static List<PostPoint> FilterPath( List<PostPoint> path, double epsilon = 0.001, double orientationError = 0.001 )
+		{
+			if( path == null || path.Count < 3 ) {
+				return path;
+			}
+
+			int len = path.Count;
+			double epsSqr = epsilon * epsilon;
+
+			// Step 1: Mark points insignificant to geometry (based on X, Y, Z)
+			bool[] geometryInsignificant = MarkGeometryInsignificantPoints( path, epsSqr );
+
+			// Step 2: Mark points insignificant to orientation (based on Master, Slave)
+			bool[] orientationInsignificant = MarkOrientationInsignificantPoints( path, orientationError );
+
+			// Step 3: Build filtered result - remove points insignificant to both geometry and orientation
+			List<PostPoint> filteredPath = new List<PostPoint>();
+			for( int i = 0; i < len; i++ ) {
+				// Keep point if it's significant to either geometry or orientation
+				if( !geometryInsignificant[ i ] || !orientationInsignificant[ i ] ) {
+					filteredPath.Add( path[ i ].Clone() );
+				}
+			}
+
+			return filteredPath;
+		}
+
 		#region Private methods
+
+		/// <summary>
+		/// Mark points that are insignificant to the path geometry (X, Y, Z).
+		/// Based on SimplifyPath algorithm logic.
+		/// </summary>
+		static bool[] MarkGeometryInsignificantPoints( List<PostPoint> path, double epsSqr )
+		{
+			int len = path.Count;
+			int high = len - 1;
+			bool[] flags = new bool[ len ];
+			double[] dsq = new double[ len ];
+
+			// Calculate initial perpendicular distances
+			// First and last points are always kept
+			dsq[ 0 ] = double.MaxValue;
+			dsq[ high ] = double.MaxValue;
+
+			for( int i = 1; i < high; ++i ) {
+				dsq[ i ] = PerpendicDistFromLineSqrd( path[ i ], path[ i - 1 ], path[ i + 1 ] );
+			}
+
+			// Iteratively mark insignificant points
+			int curr = 0;
+			for(; ; ) {
+				// Skip points with distance > epsSqr
+				if( dsq[ curr ] > epsSqr ) {
+					int start = curr;
+					do {
+						curr = GetNext( curr, high, ref flags );
+					} while( curr != start && dsq[ curr ] > epsSqr );
+					if( curr == start )
+						break;
+				}
+
+				int prev = GetPrior( curr, high, ref flags );
+				int next = GetNext( curr, high, ref flags );
+				if( next == prev )
+					break;
+
+				int prior2;
+				if( dsq[ next ] < dsq[ curr ] ) {
+					prior2 = prev;
+					prev = curr;
+					curr = next;
+					next = GetNext( next, high, ref flags );
+				}
+				else {
+					prior2 = GetPrior( prev, high, ref flags );
+				}
+
+				// Mark current point as insignificant
+				flags[ curr ] = true;
+				curr = next;
+				next = GetNext( next, high, ref flags );
+
+				// Update distances for affected neighbors
+				if( curr != high && curr != 0 ) {
+					dsq[ curr ] = PerpendicDistFromLineSqrd( path[ curr ], path[ prev ], path[ next ] );
+				}
+				if( prev != 0 && prev != high ) {
+					dsq[ prev ] = PerpendicDistFromLineSqrd( path[ prev ], path[ prior2 ], path[ curr ] );
+				}
+			}
+
+			return flags;
+		}
+
+		/// <summary>
+		/// Calculate squared perpendicular distance from a point to a line defined by two other points.
+		/// </summary>
+		static double PerpendicDistFromLineSqrd( PostPoint pt, PostPoint line1, PostPoint line2 )
+		{
+			double a = pt.X - line1.X;
+			double b = pt.Y - line1.Y;
+			double c = pt.Z - line1.Z;
+			double d = line2.X - line1.X;
+			double e = line2.Y - line1.Y;
+			double f = line2.Z - line1.Z;
+
+			double denomSqr = d * d + e * e + f * f;
+			if( denomSqr < GEOM_TOLERANCE * GEOM_TOLERANCE ) {
+				return 0;
+			}
+
+			// Cross product for 3D distance
+			double cross_x = b * f - c * e;
+			double cross_y = c * d - a * f;
+			double cross_z = a * e - b * d;
+
+			return ( cross_x * cross_x + cross_y * cross_y + cross_z * cross_z ) / denomSqr;
+		}
+
+		/// <summary>
+		/// Get next non-flagged index, wrapping around if necessary.
+		/// </summary>
+		static int GetNext( int current, int high, ref bool[] flags )
+		{
+			++current;
+			while( current <= high && flags[ current ] )
+				++current;
+			if( current <= high )
+				return current;
+			current = 0;
+			while( flags[ current ] )
+				++current;
+			return current;
+		}
+
+		/// <summary>
+		/// Get prior non-flagged index, wrapping around if necessary.
+		/// </summary>
+		static int GetPrior( int current, int high, ref bool[] flags )
+		{
+			if( current == 0 )
+				current = high;
+			else
+				--current;
+			while( current > 0 && flags[ current ] )
+				--current;
+			if( !flags[ current ] )
+				return current;
+			current = high;
+			while( flags[ current ] )
+				--current;
+			return current;
+		}
+
+		/// <summary>
+		/// Mark points that are insignificant to the path orientation (Master, Slave).
+		/// Uses iterative marking similar to geometry simplification.
+		/// </summary>
+		static bool[] MarkOrientationInsignificantPoints( List<PostPoint> path, double orientationError )
+		{
+			int len = path.Count;
+			int high = len - 1;
+			bool[] flags = new bool[ len ];
+			double orientationErrorSqr = orientationError * orientationError;
+
+			// Arrays to store master and slave dsq values
+			double[] masterDsq = new double[ len ];
+			double[] slaveDsq = new double[ len ];
+
+			// Calculate initial orientation deviations
+			// First and last points are always kept
+			masterDsq[ 0 ] = double.MaxValue;
+			masterDsq[ high ] = double.MaxValue;
+			slaveDsq[ 0 ] = double.MaxValue;
+			slaveDsq[ high ] = double.MaxValue;
+
+			for( int i = 1; i < high; ++i ) {
+				CalculateOrientationDsq( path[ i - 1 ], path[ i ], path[ i + 1 ], out masterDsq[ i ], out slaveDsq[ i ] );
+			}
+
+			// Iteratively mark insignificant points
+			int curr = 0;
+			for(; ; ) {
+				// Skip points where either master or slave has significant deviation
+				if( masterDsq[ curr ] > orientationErrorSqr || slaveDsq[ curr ] > orientationErrorSqr ) {
+					int start = curr;
+					do {
+						curr = GetNext( curr, high, ref flags );
+					} while( curr != start && ( masterDsq[ curr ] > orientationErrorSqr || slaveDsq[ curr ] > orientationErrorSqr ) );
+					if( curr == start )
+						break;
+				}
+
+				int prev = GetPrior( curr, high, ref flags );
+				int next = GetNext( curr, high, ref flags );
+				if( next == prev )
+					break;
+
+				int prior2;
+				// Choose point with smaller combined deviation to remove first
+				double currCombinedDsq = masterDsq[ curr ] + slaveDsq[ curr ];
+				double nextCombinedDsq = masterDsq[ next ] + slaveDsq[ next ];
+
+				if( nextCombinedDsq < currCombinedDsq ) {
+					prior2 = prev;
+					prev = curr;
+					curr = next;
+					next = GetNext( next, high, ref flags );
+				}
+				else {
+					prior2 = GetPrior( prev, high, ref flags );
+				}
+
+				// Mark current point as insignificant
+				flags[ curr ] = true;
+				curr = next;
+				next = GetNext( next, high, ref flags );
+
+				// Update deviations for affected neighbors
+				if( curr != high && curr != 0 ) {
+					CalculateOrientationDsq( path[ prev ], path[ curr ], path[ next ], out masterDsq[ curr ], out slaveDsq[ curr ] );
+				}
+				if( prev != 0 && prev != high ) {
+					CalculateOrientationDsq( path[ prior2 ], path[ prev ], path[ curr ], out masterDsq[ prev ], out slaveDsq[ prev ] );
+				}
+			}
+
+			return flags;
+		}
+
+		/// <summary>
+		/// Calculate orientation deviation squared (dsq) for both Master and Slave axes.
+		/// Formula: predictVal = angleL + Dis(pM-pL)/Dis(pR-pL) * (angleR - angleL)
+		///          dsq = (predictVal - angleM)^2
+		/// </summary>
+		/// <param name="pL">Left point</param>
+		/// <param name="pM">Middle point to check</param>
+		/// <param name="pR">Right point</param>
+		/// <param name="masterDsq">Output: squared deviation for Master axis</param>
+		/// <param name="slaveDsq">Output: squared deviation for Slave axis</param>
+		static void CalculateOrientationDsq( PostPoint pL, PostPoint pM, PostPoint pR, out double masterDsq, out double slaveDsq )
+		{
+			// Calculate 3D distances in Cartesian space (once for both axes)
+			double distML = Math.Sqrt(
+				( pM.X - pL.X ) * ( pM.X - pL.X ) +
+				( pM.Y - pL.Y ) * ( pM.Y - pL.Y ) +
+				( pM.Z - pL.Z ) * ( pM.Z - pL.Z )
+			);
+
+			double distRL = Math.Sqrt(
+				( pR.X - pL.X ) * ( pR.X - pL.X ) +
+				( pR.Y - pL.Y ) * ( pR.Y - pL.Y ) +
+				( pR.Z - pL.Z ) * ( pR.Z - pL.Z )
+			);
+
+			// Avoid division by zero
+			if( distRL < GEOM_TOLERANCE ) {
+				masterDsq = 0.0;
+				slaveDsq = 0.0;
+				return;
+			}
+
+			// Calculate interpolation parameter (same for both axes)
+			double t = distML / distRL;
+
+			// Calculate Master axis dsq
+			double predictMaster = pL.Master + t * ( pR.Master - pL.Master );
+			double deviationMaster = predictMaster - pM.Master;
+			masterDsq = deviationMaster * deviationMaster;
+
+			// Calculate Slave axis dsq
+			double predictSlave = pL.Slave + t * ( pR.Slave - pL.Slave );
+			double deviationSlave = predictSlave - pM.Slave;
+			slaveDsq = deviationSlave * deviationSlave;
+		}
 
 		static bool SolveProcessPath( PostSolver postSolver, IReadOnlyList<IProcessPoint> pointList,
 			out List<PostPoint> resultG54, ref double dLastProcessPathM, ref double dLastProcessPathS )
@@ -263,6 +545,8 @@ namespace MyCAM.Post
 				};
 				resultG54.Add( frameDataG54 );
 			}
+
+			resultG54 = FilterPath( resultG54, 0.01, 0.1 );
 			return true;
 		}
 
