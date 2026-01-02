@@ -174,7 +174,7 @@ namespace MyCAM.PathCache
 				}
 			}
 
-			int mod = 1;
+			int mod = -1;
 
 			// set tool vector with transformed map
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
