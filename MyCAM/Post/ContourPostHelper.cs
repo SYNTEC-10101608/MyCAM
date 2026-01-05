@@ -1,5 +1,8 @@
 ﻿using MyCAM.Data;
+using OCC.BRepBuilderAPI;
+using OCC.BRepTools;
 using OCC.gp;
+using OCC.TopoDS;
 using System;
 using System.Collections.Generic;
 
@@ -546,7 +549,8 @@ namespace MyCAM.Post
 				resultG54.Add( frameDataG54 );
 			}
 
-			resultG54 = FilterPath( resultG54, 0.01, 0.1 );
+			//resultG54 = ApplyWeightedMovingAverage( resultG54, 5 );
+			//resultG54 = FilterPath( resultG54, 0.001, 0.001 );
 			return true;
 		}
 
@@ -633,6 +637,253 @@ namespace MyCAM.Post
 				i = regionEnd + 1;
 			}
 		}
+
+		/// <summary>
+		/// Apply weighted moving average smoothing on rotational axes (Master and Slave) based on path length.
+		/// </summary>
+		/// <param name="postPoints">Input list of PostPoint</param>
+		/// <param name="windowSize">Half-window size (n). The full window is 2n+1</param>
+		/// <returns>New list of PostPoint with smoothed Master and Slave values</returns>
+		public static List<PostPoint> ApplyWeightedMovingAverage( List<PostPoint> postPoints, int windowSize )
+		{
+			if( postPoints == null || postPoints.Count == 0 ) {
+				return new List<PostPoint>();
+			}
+
+			if( postPoints.Count == 1 ) {
+				// Single point, just clone and return
+				List<PostPoint> singleResult = new List<PostPoint>();
+				singleResult.Add( postPoints[ 0 ].Clone() );
+				return singleResult;
+			}
+
+			// Step 1: Calculate cumulative path lengths
+			List<double> pathLengths = new List<double>();
+			pathLengths.Add( 0.0 ); // First point has path length 0
+
+			for( int i = 1; i < postPoints.Count; i++ ) {
+				double dx = postPoints[ i ].X - postPoints[ i - 1 ].X;
+				double dy = postPoints[ i ].Y - postPoints[ i - 1 ].Y;
+				double dz = postPoints[ i ].Z - postPoints[ i - 1 ].Z;
+				double distance = Math.Sqrt( dx * dx + dy * dy + dz * dz );
+				pathLengths.Add( pathLengths[ i - 1 ] + distance );
+			}
+
+			// Step 2: Extract Master and Slave arrays
+			List<double> masterAngles = new List<double>();
+			List<double> slaveAngles = new List<double>();
+			for( int i = 0; i < postPoints.Count; i++ ) {
+				masterAngles.Add( postPoints[ i ].Master );
+				slaveAngles.Add( postPoints[ i ].Slave );
+			}
+
+			// Step 3: Apply weighted moving average with reflection padding
+			List<double> smoothedMaster = ApplyWeightedMovingAverageToAxis( pathLengths, masterAngles, windowSize );
+			List<double> smoothedSlave = ApplyWeightedMovingAverageToAxis( pathLengths, slaveAngles, windowSize );
+
+			// Step 4: Create new PostPoint list with smoothed values
+			List<PostPoint> result = new List<PostPoint>();
+			for( int i = 0; i < postPoints.Count; i++ ) {
+				PostPoint newPoint = new PostPoint()
+				{
+					X = postPoints[ i ].X,
+					Y = postPoints[ i ].Y,
+					Z = postPoints[ i ].Z,
+					Master = smoothedMaster[ i ],
+					Slave = smoothedSlave[ i ]
+				};
+				result.Add( newPoint );
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Export path length vs. rotation axis data as BREP files.
+		/// Creates two BREP files: one for Master axis and one for Slave axis.
+		/// The BREP represents a 2D curve in (path length, rotation angle) space.
+		/// </summary>
+		/// <param name="postPoints">Input list of PostPoint</param>
+		/// <param name="suffix">Filename suffix (default: empty string). Files will be named "master{suffix}.brep" and "slave{suffix}.brep"</param>
+		/// <returns>True if export succeeded, false otherwise</returns>
+		public static bool ExportRotationAxisCurvesToBrep( List<PostPoint> postPoints, string suffix = "" )
+		{
+			if( postPoints == null || postPoints.Count == 0 ) {
+				return false;
+			}
+
+			// Step 1: Calculate cumulative path lengths
+			List<double> pathLengths = new List<double>();
+			pathLengths.Add( 0.0 ); // First point has path length 0
+
+			for( int i = 1; i < postPoints.Count; i++ ) {
+				double dx = postPoints[ i ].X - postPoints[ i - 1 ].X;
+				double dy = postPoints[ i ].Y - postPoints[ i - 1 ].Y;
+				double dz = postPoints[ i ].Z - postPoints[ i - 1 ].Z;
+				double distance = Math.Sqrt( dx * dx + dy * dy + dz * dz );
+				pathLengths.Add( pathLengths[ i - 1 ] + distance );
+			}
+
+			// Step 2: Build Master curve
+			List<gp_Pnt> masterPoints = new List<gp_Pnt>();
+			const double t = 100.0;
+			for( int i = 0; i < postPoints.Count; i++ ) {
+				// 2D curve in 3D space: (pathLength, Master, 0)
+				masterPoints.Add( new gp_Pnt( pathLengths[ i ], postPoints[ i ].Master * t, 0 ) );
+			}
+
+			// Step 3: Build Slave curve
+			List<gp_Pnt> slavePoints = new List<gp_Pnt>();
+			for( int i = 0; i < postPoints.Count; i++ ) {
+				// 2D curve in 3D space: (pathLength, Slave, 0)
+				slavePoints.Add( new gp_Pnt( pathLengths[ i ], postPoints[ i ].Slave * t, 0 ) );
+			}
+
+			// Step 4: Export Master curve to BREP
+			string appDir = AppDomain.CurrentDomain.BaseDirectory;
+			string masterFilename = System.IO.Path.Combine( appDir, $"master{suffix}.brep" );
+			if( !ExportPointsToBrep( masterPoints, masterFilename ) ) {
+				return false;
+			}
+
+			// Step 5: Export Slave curve to BREP
+			string slaveFilename = System.IO.Path.Combine( appDir, $"slave{suffix}.brep" );
+			if( !ExportPointsToBrep( slavePoints, slaveFilename ) ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Export a list of points as a polyline BREP file.
+		/// Creates a wire (polyline) connecting all points sequentially.
+		/// </summary>
+		static bool ExportPointsToBrep( List<gp_Pnt> points, string filename )
+		{
+			if( points == null || points.Count < 2 ) {
+				return false;
+			}
+
+			try {
+				// Create edges connecting consecutive points
+				BRepBuilderAPI_MakeWire wireBuilder = new BRepBuilderAPI_MakeWire();
+				for( int i = 0; i < points.Count - 1; i++ ) {
+					BRepBuilderAPI_MakeEdge edgeBuilder = new BRepBuilderAPI_MakeEdge( points[ i ], points[ i + 1 ] );
+					if( !edgeBuilder.IsDone() ) {
+						return false;
+					}
+					wireBuilder.Add( edgeBuilder.Edge() );
+				}
+
+				if( !wireBuilder.IsDone() ) {
+					return false;
+				}
+
+				TopoDS_Wire wire = wireBuilder.Wire();
+				TopoDS_Shape shape = wire;
+
+				// Write to BREP file
+				BRepTools.Write( shape, filename );
+				return true;
+			}
+			catch( Exception ) {
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Apply weighted moving average to a single axis using path length as weights.
+		/// Uses reflection/symmetric padding at boundaries.
+		/// </summary>
+		static List<double> ApplyWeightedMovingAverageToAxis( List<double> pathLengths, List<double> axisValues, int windowSize )
+		{
+			int n = axisValues.Count;
+			List<double> result = new List<double>();
+
+			// Calculate sigma based on window size
+			// We want the weight to decay to near zero at the window boundaries
+			// Using the 3-sigma rule: at k±windowSize, we want exp(-0.5 * (3)^2) ≈ 0.011
+			// So we set sigma such that pathDiff at window boundary ≈ 3*sigma
+			// First, estimate average path length per point
+			double totalPathLength = pathLengths[ n - 1 ] - pathLengths[ 0 ];
+			double avgPathLengthPerPoint = ( n > 1 ) ? ( totalPathLength / ( n - 1 ) ) : 1.0;
+
+			// Expected path difference at window boundary
+			double expectedPathDiffAtBoundary = avgPathLengthPerPoint * windowSize;
+
+			// Set sigma so that weight decays to ~0.011 at window boundary
+			// We use: exp(-0.5 * (expectedPathDiffAtBoundary / sigma)^2) = 0.011
+			// Solving: (expectedPathDiffAtBoundary / sigma)^2 = 2 * ln(1/0.011) ≈ 9
+			// Therefore: sigma = expectedPathDiffAtBoundary / 3
+			double sigma = expectedPathDiffAtBoundary / 3.0;
+
+			// Prevent division by zero
+			if( sigma < 1e-6 ) {
+				sigma = 1.0;
+			}
+
+			for( int k = 0; k < n; k++ ) {
+				double sumWeightedValues = 0.0;
+				double sumWeights = 0.0;
+
+				// Define the window range [k-windowSize, k+windowSize]
+				int windowStart = k - windowSize;
+				int windowEnd = k + windowSize;
+
+				for( int i = windowStart; i <= windowEnd; i++ ) {
+					// Apply reflection padding for boundary points
+					int reflectedIndex = GetReflectedIndex( i, n );
+
+					// Calculate weight based on path length difference
+					// Points closer in path length should have higher weight
+					double pathDiff = Math.Abs( pathLengths[ k ] - pathLengths[ reflectedIndex ] );
+
+					// Gaussian weight: weight(k) = 1, weight(k±windowSize) ≈ 0
+					// Formula: exp(-0.5 * (pathDiff / sigma)^2)
+					double weight = Math.Exp( -0.5 * ( pathDiff * pathDiff ) / ( sigma * sigma ) );
+
+					double reflectedValue = reflectedIndex == i
+						? axisValues[ i ]
+						: axisValues[ k ] - ( axisValues[ reflectedIndex ] - axisValues[ k ] );
+					sumWeightedValues += reflectedValue * weight;
+					sumWeights += weight;
+				}
+
+				// Calculate the weighted average
+				if( sumWeights > 0 ) {
+					result.Add( sumWeightedValues / sumWeights );
+				}
+				else {
+					result.Add( axisValues[ k ] );
+				}
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Get reflected index for symmetric padding.
+		/// Example: for array size 5 (indices 0-4):
+		/// i=-1 -> 1, i=-2 -> 2, i=5 -> 3, i=6 -> 2
+		/// </summary>
+		static int GetReflectedIndex( int index, int arraySize )
+		{
+			if( index >= 0 && index < arraySize ) {
+				return index;
+			}
+
+			// Handle negative indices (before start)
+			if( index < 0 ) {
+				return Math.Min( -index, arraySize - 1 );
+			}
+
+			// Handle indices beyond end
+			int overflow = index - ( arraySize - 1 );
+			int reflectedIdx = ( arraySize - 1 ) - overflow;
+			return Math.Max( 0, reflectedIdx );
+		}
+
 
 		static bool BuildProcessPath( IReadOnlyList<IProcessPoint> camPointList, double dM, double dS, out List<PostPoint> resultG54 )
 		{

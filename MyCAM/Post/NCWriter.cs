@@ -61,6 +61,7 @@ namespace MyCAM.Post
 								return false;
 							}
 							WriteCutting( postData, i + 1 );
+							ContourPostHelper.ExportRotationAxisCurvesToBrep( postData.MainPathPostPointList, "_Path" + ( i + 1 ).ToString() );
 						}
 						else {
 							StdPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
