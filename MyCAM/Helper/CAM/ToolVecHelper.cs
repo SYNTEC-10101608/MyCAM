@@ -17,7 +17,7 @@ namespace MyCAM.Helper
 
 	public static void SetToolVec( ref List<ISetToolVecPoint> toolVecPointList,
 		IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
-		bool isClosed, bool isToolVecReverse, EToolVecInterpolateType interpolateType, gp_Ax1 refCenterDir, int mod = 0 )
+		bool isClosed, bool isToolVecReverse, EToolVecInterpolateType interpolateType, gp_Ax1 refCenterDir, out int mod )
 	{
 		// mark the modified point
 		for( int i = 0; i < toolVecPointList.Count; i++ ) {
@@ -26,7 +26,7 @@ namespace MyCAM.Helper
 			}
 			toolVecPointList[ i ].IsToolVecModPoint = true;
 		}
-		ModifyToolVec( ref toolVecPointList, toolVecModifyMap, isClosed, isToolVecReverse, interpolateType, refCenterDir, mod );
+		ModifyToolVec( ref toolVecPointList, toolVecModifyMap, isClosed, isToolVecReverse, interpolateType, refCenterDir, out mod );
 	}
 
 		public static ECalAngleResult GetABAngleToTargetVec( gp_Dir assignDir, ISetToolVecPoint toModifyPnt, bool isToolVecReverse, out Tuple<double, double> param )
@@ -83,8 +83,9 @@ namespace MyCAM.Helper
 
 	static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList,
 		IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
-		bool isClosed, bool isToolVecReverse, EToolVecInterpolateType interpolateType, gp_Ax1 refCenterDir, int mod )
+		bool isClosed, bool isToolVecReverse, EToolVecInterpolateType interpolateType, gp_Ax1 refCenterDir, out int mod )
 	{
+		mod = 0;
 		if( interpolateType == EToolVecInterpolateType.FixedDir ) {
 			foreach( ISetToolVecPoint toolVecPoint in toolVecPointList ) {
 				if( isToolVecReverse ) {
@@ -103,7 +104,7 @@ namespace MyCAM.Helper
 			return;
 		}
 		if( interpolateType == EToolVecInterpolateType.VectorInterpolation ) {
-			ApplyVectorInterpolation( ref toolVecPointList, toolVecModifyMap, isToolVecReverse, isClosed, mod );
+			ApplyVectorInterpolation( ref toolVecPointList, toolVecModifyMap, isToolVecReverse, isClosed, out mod );
 			return;
 		}
 		if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
@@ -353,8 +354,9 @@ namespace MyCAM.Helper
 			return false;
 		}
 
-	static void ApplyVectorInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap, bool isToolVecReverse, bool isClosed, int mod )
+	static void ApplyVectorInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap, bool isToolVecReverse, bool isClosed, out int mod )
 	{
+		mod = 0;
 		// all tool vector are modified to the same value, no need to do interpolation
 		if( toolVecModifyMap.Count == 1 ) {
 			gp_Vec newVec = SolveACSpindleFK(
@@ -370,6 +372,33 @@ namespace MyCAM.Helper
 
 		// get the interpolate interval list
 		List<Tuple<int, int>> interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap, isClosed );
+
+		// calculate mod for closed path based on last interval
+		if( isClosed && interpolateIntervalList.Count > 0 ) {
+			int lastIntervalIndex = interpolateIntervalList.Count - 1;
+			int nStartIndex = interpolateIntervalList[ lastIntervalIndex ].Item1;
+			int nEndIndex = interpolateIntervalList[ lastIntervalIndex ].Item2;
+
+			// get master angles in degrees
+			double dStartM_deg = toolVecModifyMap[ nStartIndex ].Item1;
+			double dEndM_deg = toolVecModifyMap[ nEndIndex ].Item1;
+
+			// find mod that minimizes |X1 - Y| where X1 = X + mod * 180
+			// try all possible mod values: -2, -1, 0, 1, 2
+			int bestMod = 0;
+			double minDiff = Math.Abs( dEndM_deg - dStartM_deg );
+			
+			int[] modCandidates = { -2, -1, 0, 1, 2 };
+			foreach( int modCandidate in modCandidates ) {
+				double X1 = dEndM_deg + modCandidate * 180;
+				double diff = Math.Abs( X1 - dStartM_deg );
+				if( diff < minDiff ) {
+					minDiff = diff;
+					bestMod = modCandidate;
+				}
+			}
+			mod = bestMod;
+		}
 
 		// modify the tool vector by interpolating axis positions
 		for( int i = 0; i < interpolateIntervalList.Count; i++ ) {

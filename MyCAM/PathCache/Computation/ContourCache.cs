@@ -174,11 +174,9 @@ namespace MyCAM.PathCache
 				}
 			}
 
-			int mod = -1;
-
 			// set tool vector with transformed map
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, transformedToolVecModifyMap, m_IsClose, m_CraftData.IsToolVecReverse, m_CraftData.InterpolateType, m_RefCenterDir, mod );
+			ToolVecHelper.SetToolVec( ref toolVecPointList, transformedToolVecModifyMap, m_IsClose, m_CraftData.IsToolVecReverse, m_CraftData.InterpolateType, m_RefCenterDir, out int mod );
 			foreach( var oneConnect in m_ConnectCAMPointMap ) {
 				oneConnect.Value.ToolVec = oneConnect.Key.ToolVec;
 			}
