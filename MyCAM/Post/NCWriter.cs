@@ -103,14 +103,14 @@ namespace MyCAM.Post
 			// the N code
 			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
 			m_StreamWriter.WriteLine( "N" + N_Index );
-			m_StreamWriter.WriteLine( "G65 P\"LoadParameter\" H1;" );
+			m_StreamWriter.WriteLine( "//G65 P\"LoadParameter\" H1;" );
 
 			// traverse from previous path to current path
 			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData,
 				m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
 
 			// start cutting
-			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\";" );
+			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\" H6;" );
 
 			// write each process path
 			WriteOneProcessPath( currentPathPostData.LeadInPostPointList );

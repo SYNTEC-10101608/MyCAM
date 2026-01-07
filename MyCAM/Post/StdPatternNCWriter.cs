@@ -75,7 +75,7 @@ namespace MyCAM.Post
 			sb.Append( $" E{linearLeadInLength.ToString( "F3" )}" );
 			sb.Append( $" R{arcLeadOutLength.ToString( "F3" )}" );
 			sb.Append( $" Q{rotatedAngle_deg.ToString( "F3" )}" );
-			sb.Append( " H1" );
+			sb.Append( " H3" );
 			sb.Append( $" V{craftData.OverCutLength.ToString( "F3" )}" );
 
 			return sb.ToString();
@@ -222,7 +222,7 @@ namespace MyCAM.Post
 			// write comment and N code
 			writer.WriteLine( "// Cutting" + nIndex );
 			writer.WriteLine( "N" + nIndex );
-			writer.WriteLine( "G65 P\"LoadParameter\" H1;" );
+			writer.WriteLine( "//G65 P\"LoadParameter\" H1;" );
 
 			// write traverse section
 			NCWriterHelper.WriteTraverse( writer, postData, masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
