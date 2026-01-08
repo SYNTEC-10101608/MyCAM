@@ -114,6 +114,10 @@ namespace MyCAM.Data
 			}
 		}
 
+		public TopoDS_Shape MasterShape { get; set; }
+
+		public TopoDS_Shape SlaveShape { get; set; }
+
 		public void AddPart( TopoDS_Shape newShape )
 		{
 			if( newShape == null || newShape.IsNull() ) {

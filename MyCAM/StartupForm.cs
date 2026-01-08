@@ -5,7 +5,10 @@ using MyCAM.Helper;
 using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
+using OCC.IFSelect;
 using OCC.Quantity;
+using OCC.STEPControl;
+using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -76,6 +79,9 @@ namespace MyCAM
 				MyApp.Logger.ShowOnLogPanel( "使用默認機構專案檔", MyApp.NoticeType.Warning );
 			}
 			DataGettingHelper.Initialize( m_DataManager );
+
+			// Load Master and Slave shapes
+			//LoadMasterAndSlaveShapes();
 
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -844,6 +850,80 @@ namespace MyCAM
 				m_tscLevel2Container,
 				m_tscLevel3Container
 			};
+		}
+
+		void LoadMasterAndSlaveShapes()
+		{
+			// get exe directory
+			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+			string masterFilePath = Path.Combine( exeDir, "Master.stp" );
+			string slaveFilePath = Path.Combine( exeDir, "Slave.stp" );
+
+			// load Master.stp
+			if( File.Exists( masterFilePath ) ) {
+				try {
+					STEPControl_Reader reader = new STEPControl_Reader();
+					IFSelect_ReturnStatus status = reader.ReadFile( masterFilePath );
+					if( status == IFSelect_ReturnStatus.IFSelect_RetDone ) {
+						reader.TransferRoots();
+						if( reader.NbShapes() > 0 ) {
+							TopoDS_Shape masterShape = reader.OneShape();
+							if( masterShape != null && !masterShape.IsNull() ) {
+								m_DataManager.MasterShape = masterShape;
+								MyApp.Logger.ShowOnLogPanel( "已載入 Master.stp", MyApp.NoticeType.Hint );
+							}
+							else {
+								MyApp.Logger.ShowOnLogPanel( "Master.stp 載入失敗：形狀無效", MyApp.NoticeType.Warning );
+							}
+						}
+						else {
+							MyApp.Logger.ShowOnLogPanel( "Master.stp 載入失敗：無形狀數據", MyApp.NoticeType.Warning );
+						}
+					}
+					else {
+						MyApp.Logger.ShowOnLogPanel( "Master.stp 載入失敗", MyApp.NoticeType.Error );
+					}
+				}
+				catch( Exception ex ) {
+					MyApp.Logger.ShowOnLogPanel( $"載入 Master.stp 時發生錯誤：\n{ex.Message}", MyApp.NoticeType.Error );
+				}
+			}
+			else {
+				MyApp.Logger.ShowOnLogPanel( "找不到 Master.stp 檔案", MyApp.NoticeType.Warning );
+			}
+
+			// load Slave.stp
+			if( File.Exists( slaveFilePath ) ) {
+				try {
+					STEPControl_Reader reader = new STEPControl_Reader();
+					IFSelect_ReturnStatus status = reader.ReadFile( slaveFilePath );
+					if( status == IFSelect_ReturnStatus.IFSelect_RetDone ) {
+						reader.TransferRoots();
+						if( reader.NbShapes() > 0 ) {
+							TopoDS_Shape slaveShape = reader.OneShape();
+							if( slaveShape != null && !slaveShape.IsNull() ) {
+								m_DataManager.SlaveShape = slaveShape;
+								MyApp.Logger.ShowOnLogPanel( "已載入 Slave.stp", MyApp.NoticeType.Hint );
+							}
+							else {
+								MyApp.Logger.ShowOnLogPanel( "Slave.stp 載入失敗：形狀無效", MyApp.NoticeType.Warning );
+							}
+						}
+						else {
+							MyApp.Logger.ShowOnLogPanel( "Slave.stp 載入失敗：無形狀數據", MyApp.NoticeType.Warning );
+						}
+					}
+					else {
+						MyApp.Logger.ShowOnLogPanel( "Slave.stp 載入失敗", MyApp.NoticeType.Error );
+					}
+				}
+				catch( Exception ex ) {
+					MyApp.Logger.ShowOnLogPanel( $"載入 Slave.stp 時發生錯誤：\n{ex.Message}", MyApp.NoticeType.Error );
+				}
+			}
+			else {
+				MyApp.Logger.ShowOnLogPanel( "找不到 Slave.stp 檔案", MyApp.NoticeType.Warning );
+			}
 		}
 
 		#region Get machine data
