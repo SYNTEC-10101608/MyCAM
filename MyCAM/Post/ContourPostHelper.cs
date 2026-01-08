@@ -111,8 +111,8 @@ namespace MyCAM.Post
 			}
 
 			// to ensure joint space continuity of process path
-			double dLastPointProcess_M = endInfoOfPreviousPath?.Master ?? 0;
-			double dLastPointProcess_S = endInfoOfPreviousPath?.Slave ?? 0;
+			double dLastPointProcess_M = /*endInfoOfPreviousPath?.Master ??*/ 0;
+			double dLastPointProcess_S = /*endInfoOfPreviousPath?.Slave ??*/ 0;
 
 			// main path
 			if( !SolveProcessPath( postSolver, currentPathNCPack.CAMPointList,
@@ -550,7 +550,7 @@ namespace MyCAM.Post
 			}
 
 			//resultG54 = ApplyWeightedMovingAverage( resultG54, 5 );
-			//resultG54 = FilterPath( resultG54, 0.001, 0.001 );
+			resultG54 = FilterPath( resultG54, 0.1, 0.1 );
 			return true;
 		}
 
