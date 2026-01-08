@@ -187,11 +187,13 @@ namespace MyCAM.PathCache
 				CAMPoint connectedCAMPoint = /*m_ConnectCAMPointMap.ContainsKey( startPoint )
 												? m_ConnectCAMPointMap[ startPoint ]
 												: */startPoint.Clone();
-				connectedCAMPoint.Master += mod * Math.PI;
-				// if mod is odd, negate slave
-				if( mod % 2 != 0 ) {
-					connectedCAMPoint.Slave = -connectedCAMPoint.Slave;
-				}
+				//connectedCAMPoint.Master += mod * Math.PI;
+				//// if mod is odd, negate slave
+				//if( mod % 2 != 0 ) {
+				//	connectedCAMPoint.Slave = -connectedCAMPoint.Slave;
+				//}
+				connectedCAMPoint.Master = m_CAMPointList[ m_CAMPointList.Count - 1 ].Master;
+				connectedCAMPoint.Slave = m_CAMPointList[ m_CAMPointList.Count - 1 ].Slave;
 				m_CAMPointList.Add( connectedCAMPoint );
 			}
 

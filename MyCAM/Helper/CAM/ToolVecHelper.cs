@@ -415,13 +415,15 @@ namespace MyCAM.Helper
 			// check if this is the last interval (wraps back to first index)
 			bool isLastInterval = isClosed && ( i == interpolateIntervalList.Count - 1 );
 			if( isLastInterval ) {
-				// adjust end point axis positions for master rotation
-				dEndM += mod * Math.PI;
-				// if mod is odd, negate slave
-				if( mod % 2 != 0 ) {
-					dEndS = -dEndS;
+					//// adjust end point axis positions for master rotation
+					//dEndM += mod * Math.PI;
+					//// if mod is odd, negate slave
+					//if( mod % 2 != 0 ) {
+					//	dEndS = -dEndS;
+					//}
+					dEndM = dStartM;
+					dEndS = dStartS;
 				}
-			}
 
 			InterpolateToolVecByAxisPosition( ref toolVecPointList, nStartIndex, nEndIndex,
 				dStartM, dStartS, dEndM, dEndS );
