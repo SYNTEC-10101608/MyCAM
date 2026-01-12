@@ -28,12 +28,12 @@ namespace MyCAM
 
 		public StartupForm()
 		{
-#if !DEBUG
-			if( FALicenseChecker.LicenseChecker.IsLicenseActivated() == false ) {
-				MyApp.Logger.ShowOnLogPanel( "授權流程不正確", MyApp.NoticeType.Error);
-				Environment.Exit( 0 );
-			}
-#endif
+//#if !DEBUG
+//			if( FALicenseChecker.LicenseChecker.IsLicenseActivated() == false ) {
+//				MyApp.Logger.ShowOnLogPanel( "授權流程不正確", MyApp.NoticeType.Error);
+//				Environment.Exit( 0 );
+//			}
+//#endif
 
 			// need to init befor myapp because myapp will use LogPanel
 			InitializeComponent();

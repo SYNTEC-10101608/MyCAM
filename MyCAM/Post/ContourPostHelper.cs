@@ -549,8 +549,8 @@ namespace MyCAM.Post
 				resultG54.Add( frameDataG54 );
 			}
 
-			//resultG54 = ApplyWeightedMovingAverage( resultG54, 5 );
-			resultG54 = FilterPath( resultG54, 0.1, 0.1 );
+			resultG54 = ApplyWeightedMovingAverage( resultG54, 10 );
+			resultG54 = FilterPath( resultG54, 0.01, 0.01 );
 			return true;
 		}
 
