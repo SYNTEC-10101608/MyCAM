@@ -137,6 +137,7 @@ namespace MyCAM
 			File,
 			CAD,
 			CAM,
+			Simulation,
 
 			// cad function	
 			ManualTransForm,
@@ -829,6 +830,7 @@ namespace MyCAM
 				{ EUIStatus.File, new List<Control>() { m_tsFileFunction } },
 				{ EUIStatus.CAD , new List<Control>() { m_tsCADFunction } },
 				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction } },
+				{ EUIStatus.Simulation, new List<Control>() { m_tsSimuFunc } },
 
 				// cad function
 				{ EUIStatus.ManualTransForm, new List<Control>(){m_tsCADFunction, m_tsManualTrans } },
@@ -907,7 +909,7 @@ namespace MyCAM
 			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
 			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
 			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
-			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
+			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Laser );
 			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
 
 			machineData.RootNode.AddChild( YNode );
@@ -1133,6 +1135,39 @@ namespace MyCAM
 		void StartupForm_FormClosing( object sender, FormClosingEventArgs e )
 		{
 			CleanupVNCConnections();
+		}
+
+		#endregion
+
+		#region Simulation mode
+
+		void m_tsmiSimulation_Click( object sender, EventArgs e )
+		{
+			SwitchEditor( EEditorType.Simulation );
+			RefreshToolStripLayout( EUIStatus.Simulation );
+
+			// not in cam editing viewer tool bar cam buttons can't be used
+			VisibleCAMQuickToolBarButtons( false );
+		}
+
+		void m_tsbImportStl_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.ImportStl();
+		}
+
+		void m_btnPlay_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.PlaySimulation();
+		}
+
+		void m_btnPause_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.PauseSimulation();
+		}
+
+		void m_btnStop_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.StopSimulation();
 		}
 
 		#endregion
