@@ -119,7 +119,10 @@ namespace MyCAM.App
 					  Math.Min( centerX, workingArea.Right - dialog.Width ) );
 			centerY = Math.Max( workingArea.Top,
 					  Math.Min( centerY, workingArea.Bottom - dialog.Height ) );
-
+			if( workingArea.Width < workingArea.Height ) {
+				double offsetRatio = 0.5;
+				centerY = (int)( offsetRatio * centerY );
+			}
 			return new Point( centerX, centerY );
 		}
 

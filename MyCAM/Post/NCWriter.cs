@@ -31,14 +31,17 @@ namespace MyCAM.Post
 		string m_MasterAxisName = string.Empty;
 		string m_SlaveAxisName = string.Empty;
 		EntryAndExitData m_EntryAndExitData;
+		const string NC_FILES_RELATIVE_DIR = "C:\\NETWORK\\CNC\\NcFiles";
+		const string NC_FILE_DEFAULT_NAME = "MachingNC.nc";
 
 		public StreamWriter Writer => m_StreamWriter;
 
 		public bool ConvertSuccess( out string errorMessage )
 		{
 			errorMessage = string.Empty;
+			string szTargetDir = GetNCFilesDirectory();
 			try {
-				using( m_StreamWriter = new StreamWriter( "0000.nc" ) ) {
+				using( m_StreamWriter = new StreamWriter( Path.Combine( szTargetDir, NC_FILE_DEFAULT_NAME ) ) ) {
 					m_StreamWriter.WriteLine( "%@MACRO" );
 					m_StreamWriter.WriteLine( "G43.4 P1;" ); // G43.4 新動程
 					m_StreamWriter.WriteLine( "G65 P\"FileStart\" X\"Material1\" Y\"1.0\";" ); // 三點校正					
@@ -205,6 +208,15 @@ namespace MyCAM.Post
 						leadCache.LeadData,
 						leadCache.LeadInCAMPointList
 					);
+		}
+
+		string GetNCFilesDirectory()
+		{
+			string szTargetDir = NC_FILES_RELATIVE_DIR;
+			if( Directory.Exists( szTargetDir ) == false ) {
+				Directory.CreateDirectory( szTargetDir );
+			}
+			return szTargetDir;
 		}
 	}
 }
