@@ -1,6 +1,7 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
+using MyCAM.Editor.Dialog;
 using MyCAM.Helper;
 using OCC.AIS;
 using OCC.Geom;
@@ -13,6 +14,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using VNCFormsApp;
 
 namespace MyCAM
 {
@@ -739,11 +741,8 @@ namespace MyCAM
 			int currentIndex = 0;
 
 			// layout from bottom to top
-			if( m_pnlLog.Visible ) {
-				Controls.SetChildIndex( m_pnlLog, currentIndex++ );
-			}
 			if( m_panBackGround.Visible ) {
-				Controls.SetChildIndex( m_pnlLog, currentIndex++ );
+				Controls.SetChildIndex( m_panBackGround, currentIndex++ );
 			}
 			if( m_tscLevel3Container.Visible ) {
 				Controls.SetChildIndex( m_tscLevel3Container, currentIndex++ );
@@ -991,9 +990,150 @@ namespace MyCAM
 			}
 		}
 
+		#endregion
+
+		#region VNC Connection
+
+		static readonly IntPtr HWND_TOPMOST = new IntPtr( -1 );
+		static readonly IntPtr HWND_NOTOPMOST = new IntPtr( -2 );
+		const uint SWP_NOMOVE = 0x0002;
+		const uint SWP_NOSIZE = 0x0001;
+		const uint SWP_SHOWWINDOW = 0x0040;
+		const double CONTROLLER_SCREEN_RATIO = 0.56;
+
+		// Track the currently open ConnectDlg
+		ConnectDlg m_CurrentConnectDlg = null;
+
+		#region Dll Import
+		[System.Runtime.InteropServices.DllImport( "user32.dll" )]
+		static extern bool SetWindowPos( IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags );
 
 		#endregion
 
+		void m_tsbVNCConnection_Click( object sender, EventArgs e )
+		{
+			// If a ConnectDlg is already open, focus on it and return
+			if( m_CurrentConnectDlg != null && !m_CurrentConnectDlg.IsDisposed ) {
+				m_CurrentConnectDlg.Focus();
+				m_CurrentConnectDlg.BringToFront();
+				return;
+			}
 
+			// Create new ConnectDlg
+			m_CurrentConnectDlg = new ConnectDlg();
+
+			// Show the dialog and set focus
+			m_CurrentConnectDlg.Show( MyApp.MainForm );
+			m_CurrentConnectDlg.Focus();
+			m_CurrentConnectDlg.BringToFront();
+
+			// Handle form closed event to clear reference
+			m_CurrentConnectDlg.FormClosed += ( s, args ) =>
+			{
+				m_CurrentConnectDlg = null;
+			};
+
+			// Handle confirm event
+			m_CurrentConnectDlg.ConfirmEvent += ( ip ) =>
+			{
+				VNCUserControl newVNCControl = DoVNCConnect( ip );
+
+				switch( newVNCControl.ConnectionResult ) {
+					case VNCConnectionResult.Success:
+						m_CurrentConnectDlg.Close();
+						newVNCControl.WindowResize( m_panVNC.Width, (int)( m_panVNC.Width * CONTROLLER_SCREEN_RATIO ) );
+						break;
+
+					case VNCConnectionResult.FileNotFound:
+						MessageBox.Show( MyApp.MainForm, "找不到VNC執行檔，請確認VNC執行檔與程式執行檔在同一資料夾下", "外部程式調用錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						break;
+
+					case VNCConnectionResult.ConnectionFailed:
+						MessageBox.Show( MyApp.MainForm, "無法連線到指定IP位置", "連線錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						break;
+
+					case VNCConnectionResult.OtherError:
+						MessageBox.Show( MyApp.MainForm, "VNC連線過程發生未知錯誤", "連線錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						break;
+				}
+			};
+		}
+
+		VNCUserControl DoVNCConnect( string szIP )
+		{
+			CleanupVNCConnections();
+			VNCUserControl newVNCControl = new VNCUserControl( m_panVNC.Width, (int)( m_panVNC.Width * CONTROLLER_SCREEN_RATIO ), szIP );
+			newVNCControl.Dock = DockStyle.Fill;
+			newVNCControl.Location = new Point( 0, 0 );
+
+			m_panVNC.Controls.Add( newVNCControl );
+			m_panVNC.Visible = true;
+
+			SetWindowPos( this.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+			SetWindowPos( this.Handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+			return newVNCControl;
+		}
+
+		void CleanupVNCConnections()
+		{
+			if( m_panVNC != null ) {
+				foreach( Control ctrl in m_panVNC.Controls ) {
+					if( ctrl is VNCUserControl vncControl ) {
+						vncControl.CloseVNCProcess();
+						vncControl.Dispose();
+					}
+				}
+				m_panVNC.Controls.Clear();
+			}
+		}
+
+		void StartupForm_Resize( object sender, EventArgs e )
+		{
+#if DEBUG
+
+			if( this.Width > this.Height ) {
+				m_panVNC.Visible = false;
+
+				// VNC
+				this.m_panBackGround.RowStyles[ 2 ].SizeType = SizeType.Absolute;
+				this.m_panBackGround.RowStyles[ 2 ].Height = 0;
+
+				// CADCAM
+				this.m_panBackGround.RowStyles[ 0 ].SizeType = SizeType.Percent;
+				this.m_panBackGround.RowStyles[ 0 ].Height = 90;
+
+				// Log
+				this.m_panBackGround.RowStyles[ 1 ].SizeType = SizeType.Percent;
+				this.m_panBackGround.RowStyles[ 1 ].Height = 10;
+			}
+			else {
+				m_panVNC.Visible = true;
+
+				// CADCAM
+				this.m_panBackGround.RowStyles[ 0 ].SizeType = SizeType.Percent;
+				this.m_panBackGround.RowStyles[ 0 ].Height = 47;
+
+				// Log
+				this.m_panBackGround.RowStyles[ 1 ].SizeType = SizeType.Percent;
+				this.m_panBackGround.RowStyles[ 1 ].Height = 6;
+
+				// VNC
+				this.m_panBackGround.RowStyles[ 2 ].SizeType = SizeType.Percent;
+				this.m_panBackGround.RowStyles[ 2 ].Height = 47;
+
+				if( m_panVNC.Controls.Count != 0 ) {
+					( (VNCUserControl)m_panVNC.Controls[ 0 ] ).WindowResize( m_panVNC.Width, (int)( m_panVNC.Width * CONTROLLER_SCREEN_RATIO ) );
+				}
+			}
+
+#endif
+		}
+
+		void StartupForm_FormClosing( object sender, FormClosingEventArgs e )
+		{
+			CleanupVNCConnections();
+		}
+
+		#endregion
 	}
 }
