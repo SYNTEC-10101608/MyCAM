@@ -53,6 +53,16 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		public PostPoint LiftUpPostSafePlanePoint
+		{
+			get; set;
+		}
+
+		public PostPoint CutDownPostSafePlanePoint
+		{
+			get; set;
+		}
+
 		public PostData()
 		{
 			LeadInPostPointList = new List<PostPoint>();
@@ -63,6 +73,8 @@ namespace MyCAM.Data
 			LiftUpPostPoint = null;
 			FollowSafeDistance = 0;
 			FrogLeapMidPostPoint = null;
+			LiftUpPostSafePlanePoint = null;
+			CutDownPostSafePlanePoint = null;
 		}
 	}
 
@@ -97,6 +109,16 @@ namespace MyCAM.Data
 
 		// the center and end point of frog leap
 		public PostPoint FrogLeapMidPostPoint
+		{
+			get; set;
+		}
+
+		public PostPoint LiftUpPostSafePlanePoint
+		{
+			get; set;
+		}
+
+		public PostPoint CutDownPostSafePlanePoint
 		{
 			get; set;
 		}

@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
+    <Compile Include="Helper\Canvas\DrawHelper.cs" />
     <Compile Include="Helper\Coupler\StdPatternCraftCoupler.cs" />
     <Compile Include="Helper\FormShow\DialogShowHelper.cs" />
     <Compile Include="PathCache\Application\MainPathPointCache.cs" />

@@ -41,5 +41,15 @@ namespace MyCAM.Post
 		{
 			get; set;
 		}
+
+		PostPoint LiftUpPostSafePlanePoint
+		{
+			get; set;
+		}
+
+		PostPoint CutDownPostSafePlanePoint
+		{
+			get; set;
+		}
 	}
 }

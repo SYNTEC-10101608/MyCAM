@@ -45,12 +45,14 @@ namespace MyCAM.Data
 
 	public class TraverseData
 	{
-		public TraverseData( double liftUpDistance, double cutDownDistance, double followSafeDistance, double frogLeapDistance )
+		public TraverseData( double liftUpDistance, double cutDownDistance, double followSafeDistance, double frogLeapDistance, bool isSafePlaneChecked, double safePlaneDistance )
 		{
 			m_LiftUpDistance = liftUpDistance;
 			m_CutDownDistance = cutDownDistance;
 			m_FollowSafeDistance = followSafeDistance;
 			m_FrogLeapDistance = frogLeapDistance;
+			m_IsSafePlaneEnable = isSafePlaneChecked;
+			m_SafePlaneDistance = safePlaneDistance;
 		}
 
 		public TraverseData()
@@ -120,18 +122,52 @@ namespace MyCAM.Data
 			}
 		}
 
+		public bool IsSafePlaneEnable
+		{
+			get
+			{
+				return m_IsSafePlaneEnable;
+			}
+			set
+			{
+				if( m_IsSafePlaneEnable != value ) {
+					m_IsSafePlaneEnable = value;
+					PropertyChanged?.Invoke();
+				}
+			}
+		}
+
+		public double SafePlaneDistance
+		{
+			get
+			{
+				return m_SafePlaneDistance;
+			}
+			set
+			{
+				if( m_SafePlaneDistance != value ) {
+					m_SafePlaneDistance = value;
+					PropertyChanged?.Invoke();
+				}
+			}
+		}
+
 		public TraverseData Clone()
 		{
-			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance );
+			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance, IsSafePlaneEnable, SafePlaneDistance );
 		}
 
 		public static double LIFT_UP_DISTANCE = 0.0;
 		public static double CUT_DOWN_DISTANCE = 0.0;
 		public static double FOLLOW_SAFE_DISTANCE = 0.0;
 		public static double FROG_LEAP_DISTANCE = 10.0;
+		public static double SAFE_PLANE_DISTANCE = 20.0;
+		public static bool IS_SAFE_PLANE_CHECKED = false;
 		double m_LiftUpDistance = LIFT_UP_DISTANCE;
 		double m_CutDownDistance = CUT_DOWN_DISTANCE;
 		double m_FollowSafeDistance = FOLLOW_SAFE_DISTANCE;
 		double m_FrogLeapDistance = FROG_LEAP_DISTANCE;
+		double m_SafePlaneDistance = SAFE_PLANE_DISTANCE;
+		bool m_IsSafePlaneEnable = IS_SAFE_PLANE_CHECKED;
 	}
 }

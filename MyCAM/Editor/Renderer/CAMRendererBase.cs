@@ -19,6 +19,7 @@ namespace MyCAM.Editor.Renderer
 		}
 
 		public abstract void Show( bool bUpdate = false );
+
 		public abstract void Remove( bool bUpdate = false );
 
 		public void SetShow( bool isShow )

@@ -1,11 +1,8 @@
 using MyCAM.Data;
+using MyCAM.Helper;
 using MyCAM.PathCache;
 using OCC.AIS;
-using OCC.BRepPrimAPI;
 using OCC.gp;
-using OCC.Graphic3d;
-using OCC.Quantity;
-using OCCTool;
 using OCCViewer;
 using System.Collections.Generic;
 
@@ -76,7 +73,7 @@ namespace MyCAM.Editor.Renderer
 				if( GetIsPathReverse( szPathID ) ) {
 					orientationDir.Reverse();
 				}
-				AIS_Shape orientationAIS = GetOrientationAIS( showPoint, orientationDir );
+				AIS_Shape orientationAIS = DrawHelper.GetOrientationAIS( showPoint, orientationDir );
 				m_OrientationAISDict.Add( szPathID, orientationAIS );
 			}
 
@@ -124,7 +121,7 @@ namespace MyCAM.Editor.Renderer
 					continue;
 				}
 				gp_Dir orientationDir = new gp_Dir( orientationPoint.TangentVec.XYZ() );
-				AIS_Shape orientationAIS = GetOrientationAIS( orientationPoint.Point, orientationDir );
+				AIS_Shape orientationAIS = DrawHelper.GetOrientationAIS( orientationPoint.Point, orientationDir );
 				orientationDict.Add( szPathID, orientationAIS );
 			}
 
@@ -150,20 +147,6 @@ namespace MyCAM.Editor.Renderer
 					orientationDict.Remove( szPathID );
 				}
 			}
-		}
-
-		AIS_Shape GetOrientationAIS( gp_Pnt point, gp_Dir dir )
-		{
-			// draw a cone to indicate the orientation
-			gp_Ax2 coneAx2 = new gp_Ax2( point, dir );
-			BRepPrimAPI_MakeCone coneMaker = new BRepPrimAPI_MakeCone( coneAx2, 0.5, 0, 2 );
-			AIS_Shape coneAIS = new AIS_Shape( coneMaker.Shape() );
-			Graphic3d_MaterialAspect aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_STEEL );
-			coneAIS.SetMaterial( aspect );
-			coneAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			coneAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_WireFrame );
-			coneAIS.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
-			return coneAIS;
 		}
 
 		IOrientationPoint GetFirstCAMPoint( string pathID )

@@ -19,36 +19,38 @@ namespace MyCAM.Post
 			}
 
 			// frog leap with cut down
-			if( postData.FrogLeapMidPostPoint != null && postData.CutDownPostPoint != null ) {
-				WriteFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.CutDownPostPoint, 0,
+			if( postData.FrogLeapMidPostPoint != null ) {
+				if( postData.CutDownPostPoint != null ) {
+					WriteFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.CutDownPostPoint, 0,
+						masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
+					WriteLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance,
+						masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
+					return;
+				}
+				else {
+					WriteFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.ProcessStartPoint, postData.FollowSafeDistance,
+						masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
+					return;
+				}
+			}
+
+			// safe plane
+			else if( postData.LiftUpPostSafePlanePoint != null && postData.CutDownPostSafePlanePoint != null ) {
+				WriteLinearTraverse( writer, postData.LiftUpPostSafePlanePoint, 0,
 					masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
 
-				// cut down
-				WriteLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance,
+				WriteLinearTraverse( writer, postData.CutDownPostSafePlanePoint, 0,
 					masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
 			}
 
-			// frog leap without cut down
-			else if( postData.FrogLeapMidPostPoint != null && postData.CutDownPostPoint == null ) {
-				WriteFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.ProcessStartPoint, postData.FollowSafeDistance,
-					masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
-			}
-
-			// no frog leap
-			else if( postData.FrogLeapMidPostPoint == null && postData.CutDownPostPoint != null ) {
+			if( postData.CutDownPostPoint != null ) {
 				WriteLinearTraverse( writer, postData.CutDownPostPoint, 0,
 					masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
-
-				// cut down
-				WriteLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance,
-					masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
 			}
 
-			// no frog leap and no cut down
-			else {
-				WriteLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance,
-					masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
-			}
+			// cut down
+			WriteLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance,
+				masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
 		}
 
 		public static void WriteLinearTraverse( StreamWriter writer, PostPoint postPoint, double followSafeDistance,

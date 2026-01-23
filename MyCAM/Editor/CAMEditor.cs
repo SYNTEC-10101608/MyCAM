@@ -399,7 +399,7 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
-			TraverseAction action = new TraverseAction( m_DataManager, szPathIDList );
+			TraverseAction action = new TraverseAction( m_DataManager, szPathIDList, m_Viewer );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -643,7 +643,7 @@ namespace MyCAM.Editor
 			m_OrientationRenderer.Show( pathIDList );
 			m_IndexRenderer.Show();
 			m_CraftRenderer.Show( pathIDList );
-			m_TraverseRenderer.Show();
+			m_TraverseRenderer.Show( pathIDList );
 			m_Viewer.UpdateView();
 		}
 
@@ -659,7 +659,7 @@ namespace MyCAM.Editor
 			m_CraftRenderer.Remove( pathIDList );
 			m_OrientationRenderer.Remove( pathIDList );
 			m_IndexRenderer.Remove();
-			m_TraverseRenderer.Remove();
+			m_TraverseRenderer.Remove( pathIDList );
 			m_Viewer.UpdateView();
 		}
 
@@ -668,6 +668,7 @@ namespace MyCAM.Editor
 			m_ToolVecRenderer.Remove( pathIDList );
 			m_CraftRenderer.Remove( pathIDList );
 			m_OrientationRenderer.Remove( pathIDList );
+			m_TraverseRenderer.Remove( pathIDList );
 
 			// those info are not recorded on each path, need to refresh all not remove
 			m_IndexRenderer.Show();
