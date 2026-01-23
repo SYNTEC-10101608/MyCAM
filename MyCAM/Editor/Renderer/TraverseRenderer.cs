@@ -1,6 +1,6 @@
-using MyCAM.PathCache;
 using MyCAM.Data;
 using MyCAM.Helper;
+using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.BRepBuilderAPI;
@@ -15,13 +15,10 @@ using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
-	/// <summary>
-	/// Renderer for traverse paths between cutting paths
-	/// </summary>
 	internal class TraverseRenderer : CAMRendererBase
 	{
-		readonly List<AIS_Line> m_TraverseAISList = new List<AIS_Line>();
-		readonly List<AIS_Shape> m_FrogLeapAISList = new List<AIS_Shape>();
+		readonly Dictionary<string, List<AIS_Line>> m_TraverseAISDict = new Dictionary<string, List<AIS_Line>>();
+		readonly Dictionary<string, List<AIS_Shape>> m_FrogLeapAISDict = new Dictionary<string, List<AIS_Shape>>();
 
 		public TraverseRenderer( Viewer viewer, DataManager dataManager )
 			: base( viewer, dataManager )
@@ -30,117 +27,22 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Show( bool bUpdate = false )
 		{
-			Remove();
+			Show( m_DataManager.PathIDList, bUpdate );
+		}
 
-			// no need to show
+		public void Show( List<string> pathIDList, bool bUpdate = false )
+		{
+			List<string> pathsToUpdate = GetPathsToUpdate( pathIDList );
+			Remove( pathsToUpdate );
 			if( !m_IsShow ) {
 				if( bUpdate ) {
 					UpdateView();
 				}
 				return;
 			}
-
-			// Traverse between paths
-			for( int i = 1; i < m_DataManager.PathIDList.Count; i++ ) {
-				string previousPathID = m_DataManager.PathIDList[ i - 1 ];
-				string currentPathID = m_DataManager.PathIDList[ i ];
-				TraverseData currentTraverseData = GetTraverseData( currentPathID );
-
-				// p1: end of previous path
-				// p2: lift up point of previous path
-				// p3: frog leap middle point (if frog leap)
-				// p4: cut down point of current path
-				// p5: start of current path
-				IProcessPoint p1 = GetProcessEndPoint( previousPathID );
-				if( p1 == null ) {
-					continue;
-				}
-				IProcessPoint p2 = TraverseHelper.GetCutDownOrLiftUpPoint( p1, currentTraverseData.LiftUpDistance );
-				IProcessPoint p5 = GetProcessStartPoint( currentPathID );
-				if( p5 == null ) {
-					continue;
-				}
-				IProcessPoint p4 = TraverseHelper.GetCutDownOrLiftUpPoint( p5, currentTraverseData.CutDownDistance );
-
-				// lift up
-				if( currentTraverseData.LiftUpDistance > 0 && p1 != null && p2 != null ) {
-					AddOneLinearTraverse( p1.Point, p2.Point );
-				}
-
-				// frog leap
-				if( currentTraverseData.FrogLeapDistance > 0 && p2 != null && p4 != null ) {
-					IProcessPoint p3 = TraverseHelper.GetFrogLeapMiddlePoint( p2, p4, currentTraverseData.FrogLeapDistance );
-					if( p3 != null ) {
-						GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( p2.Point, p3.Point, p4.Point );
-						if( makeCircle.IsDone() ) {
-							Geom_TrimmedCurve arcCurve = makeCircle.Value();
-							BRepBuilderAPI_MakeEdge makeEdge = new BRepBuilderAPI_MakeEdge( arcCurve );
-							AIS_Shape arcAIS = new AIS_Shape( makeEdge.Shape() );
-							arcAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-							arcAIS.SetWidth( 1 );
-							arcAIS.SetTransparency( 1 );
-							Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_DASH, 1 );
-							arcAIS.Attributes().SetWireAspect( prs3D_LineAspect );
-							m_FrogLeapAISList.Add( arcAIS );
-						}
-						else {
-							// fallback to normal traverse line
-							AddOneLinearTraverse( p2.Point, p4.Point );
-						}
-					}
-					else {
-						// fallback to normal traverse line
-						AddOneLinearTraverse( p2.Point, p4.Point );
-					}
-				}
-
-				// normal traverse
-				else if( p2 != null && p4 != null ) {
-					AddOneLinearTraverse( p2.Point, p4.Point );
-				}
-
-				// cut down
-				if( currentTraverseData.CutDownDistance > 0 && p4 != null && p5 != null ) {
-					AddOneLinearTraverse( p4.Point, p5.Point );
-				}
-			}
-
-			// entry
-			if( m_DataManager.EntryAndExitData.EntryDistance > 0 && m_DataManager.PathIDList.Count != 0 ) {
-				string firstPathID = m_DataManager.PathIDList.First();
-				IProcessPoint firstPathStartPoint = GetProcessStartPoint( firstPathID );
-				if( firstPathStartPoint == null ) {
-					return;
-				}
-				IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
-				if( firstPathStartPoint != null && entryPoint != null ) {
-					AddOneLinearTraverse( entryPoint.Point, firstPathStartPoint.Point );
-				}
-			}
-
-			// exit
-			if( m_DataManager.EntryAndExitData.ExitDistance > 0 && m_DataManager.PathIDList.Count != 0 ) {
-				string lastPathID = m_DataManager.PathIDList.Last();
-				IProcessPoint lastPathEndPoint = GetProcessEndPoint( lastPathID );
-				if( lastPathEndPoint == null ) {
-					return;
-				}
-				IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
-				if( lastPathEndPoint != null && exitPoint != null ) {
-					AddOneLinearTraverse( lastPathEndPoint.Point, exitPoint.Point );
-				}
-			}
-
-			// Display all lines
-			foreach( AIS_Line rapidTraverseAIS in m_TraverseAISList ) {
-				m_Viewer.GetAISContext().Display( rapidTraverseAIS, false );
-				m_Viewer.GetAISContext().Deactivate( rapidTraverseAIS );
-			}
-			foreach( AIS_Shape frogLeapAIS in m_FrogLeapAISList ) {
-				m_Viewer.GetAISContext().Display( frogLeapAIS, false );
-				m_Viewer.GetAISContext().Deactivate( frogLeapAIS );
-			}
-
+			ShowTraversePath( pathsToUpdate );
+			ShowEntryAndExit();
+			DisplayTraverseLines( pathsToUpdate );
 			if( bUpdate ) {
 				UpdateView();
 			}
@@ -148,38 +50,235 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Remove( bool bUpdate = false )
 		{
-			// Remove previous lines
-			foreach( AIS_Line traverseAIS in m_TraverseAISList ) {
-				m_Viewer.GetAISContext().Remove( traverseAIS, false );
-			}
-			foreach( AIS_Shape frogLeapAIS in m_FrogLeapAISList ) {
-				m_Viewer.GetAISContext().Remove( frogLeapAIS, false );
-			}
-			m_TraverseAISList.Clear();
-			m_FrogLeapAISList.Clear();
+			Remove( m_DataManager.PathIDList, bUpdate );
+		}
 
+		public void Remove( List<string> pathIDList, bool bUpdate = false )
+		{
+			RemoveTraverseLines( pathIDList );
 			if( bUpdate ) {
 				UpdateView();
 			}
 		}
 
-		void AddOneLinearTraverse( gp_Pnt startPnt, gp_Pnt endPnt )
+		void ShowTraversePath( List<string> pathIDList )
 		{
-			AIS_Line traverseAIS = GetLineAIS( startPnt, endPnt, Quantity_NameOfColor.Quantity_NOC_RED, true );
-			m_TraverseAISList.Add( traverseAIS );
+			foreach( string currentPathID in pathIDList ) {
+				string previousPathID = GetPreviousPathIDInAllPaths( currentPathID );
+				if( previousPathID == null ) {
+					continue;
+				}
+
+				TraverseData currentTraverseData = GetTraverseData( currentPathID );
+
+				// Get process points
+				IProcessPoint previousEndPoint = GetProcessEndPoint( previousPathID );
+				IProcessPoint currentStartPoint = GetProcessStartPoint( currentPathID );
+
+				// Calculate all traverse points using helper
+				if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, currentTraverseData, out TraverseHelper.TraversePathResult result ) ) {
+					continue;
+				}
+
+				List<AIS_Line> traverseLineList = new List<AIS_Line>();
+				List<AIS_Shape> frogLeapShapeList = new List<AIS_Shape>();
+
+				// frog leap 
+				if( !currentTraverseData.IsSafePlaneEnable && currentTraverseData.FrogLeapDistance > 0 && result.FrogLeapMiddlePoint != null ) {
+					GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( result.LiftUpPoint.Point, result.FrogLeapMiddlePoint.Point, result.CutDownPoint.Point );
+					if( makeCircle.IsDone() ) {
+						Geom_TrimmedCurve arcCurve = makeCircle.Value();
+						BRepBuilderAPI_MakeEdge makeEdge = new BRepBuilderAPI_MakeEdge( arcCurve );
+						AIS_Shape arcAIS = new AIS_Shape( makeEdge.Shape() );
+						arcAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+						arcAIS.SetWidth( 1 );
+						arcAIS.SetTransparency( 1 );
+						Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_DASH, 1 );
+						arcAIS.Attributes().SetWireAspect( prs3D_LineAspect );
+						frogLeapShapeList.Add( arcAIS );
+
+						// lift up
+						if( currentTraverseData.LiftUpDistance > 0 ) {
+							AddOneLinearTraverse( traverseLineList, result.PreviousPathEnd.Point, result.LiftUpPoint.Point );
+						}
+
+						// cut down
+						if( currentTraverseData.CutDownDistance > 0 ) {
+							AddOneLinearTraverse( traverseLineList, result.CutDownPoint.Point, result.CurrentPathStart.Point );
+						}
+					}
+					else {
+						List<(gp_Pnt start, gp_Pnt end)> segments = TraverseHelper.GetTraverseLineSegments( result, currentTraverseData );
+						foreach( var seg in segments ) {
+							AddOneLinearTraverse( traverseLineList, seg.start, seg.end );
+						}
+					}
+				}
+				// safe plane or normal traverse
+				else {
+					List<(gp_Pnt start, gp_Pnt end)> segments = TraverseHelper.GetTraverseLineSegments( result, currentTraverseData );
+					foreach( var seg in segments ) {
+						AddOneLinearTraverse( traverseLineList, seg.start, seg.end );
+					}
+				}
+
+				if( traverseLineList.Count > 0 ) {
+					m_TraverseAISDict[ currentPathID ] = traverseLineList;
+				}
+				if( frogLeapShapeList.Count > 0 ) {
+					m_FrogLeapAISDict[ currentPathID ] = frogLeapShapeList;
+				}
+			}
 		}
 
-		AIS_Line GetLineAIS( gp_Pnt startPnt, gp_Pnt endPnt, Quantity_NameOfColor color, bool isDashLine )
+		void ShowEntryAndExit()
 		{
-			AIS_Line lineAIS = new AIS_Line( new Geom_CartesianPoint( startPnt ), new Geom_CartesianPoint( endPnt ) );
-			lineAIS.SetColor( new Quantity_Color( color ) );
-			lineAIS.SetWidth( 1 );
-			lineAIS.SetTransparency( 1 );
-			if( isDashLine ) {
-				Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( color ), Aspect_TypeOfLine.Aspect_TOL_DASH, 1 );
-				lineAIS.Attributes().SetLineAspect( prs3D_LineAspect );
+			if( m_DataManager.PathIDList.Count == 0 ) {
+				return;
 			}
-			return lineAIS;
+
+			// entry
+			if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
+				string firstPathID = m_DataManager.PathIDList.First();
+				IProcessPoint firstPathStartPoint = GetProcessStartPoint( firstPathID );
+				if( firstPathStartPoint != null ) {
+					IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
+					if( entryPoint != null ) {
+						List<AIS_Line> entryLineList = new List<AIS_Line>();
+						AddOneLinearTraverse( entryLineList, entryPoint.Point, firstPathStartPoint.Point );
+						m_TraverseAISDict[ "EntryTraverse" ] = entryLineList;
+					}
+				}
+			}
+
+			// exit
+			if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
+				string lastPathID = m_DataManager.PathIDList.Last();
+				IProcessPoint lastPathEndPoint = GetProcessEndPoint( lastPathID );
+				if( lastPathEndPoint != null ) {
+					IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
+					if( exitPoint != null ) {
+						List<AIS_Line> exitLineList = new List<AIS_Line>();
+						AddOneLinearTraverse( exitLineList, lastPathEndPoint.Point, exitPoint.Point );
+						m_TraverseAISDict[ "ExitTraverse" ] = exitLineList;
+					}
+				}
+			}
+		}
+
+		string GetPreviousPathIDInAllPaths( string currentPathID )
+		{
+			int indexInAllPaths = m_DataManager.PathIDList.IndexOf( currentPathID );
+			if( indexInAllPaths > 0 ) {
+				return m_DataManager.PathIDList[ indexInAllPaths - 1 ];
+			}
+			return null;
+		}
+
+		List<string> GetPathsToUpdate( List<string> pathIDList )
+		{
+			HashSet<string> pathsToUpdate = new HashSet<string>();
+
+			foreach( string pathID in pathIDList ) {
+				pathsToUpdate.Add( pathID );
+
+				// add next path
+				string nextPathID = GetNextPathIDInAllPaths( pathID );
+				if( nextPathID != null ) {
+					pathsToUpdate.Add( nextPathID );
+				}
+			}
+
+			// keep the order as in m_DataManager.PathIDList
+			List<string> result = new List<string>();
+			foreach( string pathID in m_DataManager.PathIDList ) {
+				if( pathsToUpdate.Contains( pathID ) ) {
+					result.Add( pathID );
+				}
+			}
+
+			return result;
+		}
+
+		string GetNextPathIDInAllPaths( string currentPathID )
+		{
+			int indexInAllPaths = m_DataManager.PathIDList.IndexOf( currentPathID );
+			if( indexInAllPaths >= 0 && indexInAllPaths < m_DataManager.PathIDList.Count - 1 ) {
+				return m_DataManager.PathIDList[ indexInAllPaths + 1 ];
+			}
+			return null;
+		}
+
+		void DisplayTraverseLines( List<string> pathIDList )
+		{
+			foreach( string pathID in pathIDList ) {
+				if( m_TraverseAISDict.ContainsKey( pathID ) ) {
+					foreach( AIS_Line lineAIS in m_TraverseAISDict[ pathID ] ) {
+						m_Viewer.GetAISContext().Display( lineAIS, false );
+						m_Viewer.GetAISContext().Deactivate( lineAIS );
+					}
+				}
+				if( m_FrogLeapAISDict.ContainsKey( pathID ) ) {
+					foreach( AIS_Shape shapeAIS in m_FrogLeapAISDict[ pathID ] ) {
+						m_Viewer.GetAISContext().Display( shapeAIS, false );
+						m_Viewer.GetAISContext().Deactivate( shapeAIS );
+					}
+				}
+			}
+
+			if( m_TraverseAISDict.ContainsKey( "__ENTRY__" ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__ENTRY__" ] ) {
+					m_Viewer.GetAISContext().Display( lineAIS, false );
+					m_Viewer.GetAISContext().Deactivate( lineAIS );
+				}
+			}
+			if( m_TraverseAISDict.ContainsKey( "__EXIT__" ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__EXIT__" ] ) {
+					m_Viewer.GetAISContext().Display( lineAIS, false );
+					m_Viewer.GetAISContext().Deactivate( lineAIS );
+				}
+			}
+		}
+
+		void RemoveTraverseLines( List<string> pathIDList )
+		{
+			foreach( string pathID in pathIDList ) {
+				if( m_TraverseAISDict.ContainsKey( pathID ) ) {
+					foreach( AIS_Line lineAIS in m_TraverseAISDict[ pathID ] ) {
+						m_Viewer.GetAISContext().Remove( lineAIS, false );
+					}
+					m_TraverseAISDict[ pathID ].Clear();
+					m_TraverseAISDict.Remove( pathID );
+				}
+				if( m_FrogLeapAISDict.ContainsKey( pathID ) ) {
+					foreach( AIS_Shape shapeAIS in m_FrogLeapAISDict[ pathID ] ) {
+						m_Viewer.GetAISContext().Remove( shapeAIS, false );
+					}
+					m_FrogLeapAISDict[ pathID ].Clear();
+					m_FrogLeapAISDict.Remove( pathID );
+				}
+			}
+
+			if( m_TraverseAISDict.ContainsKey( "__ENTRY__" ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__ENTRY__" ] ) {
+					m_Viewer.GetAISContext().Remove( lineAIS, false );
+				}
+				m_TraverseAISDict[ "__ENTRY__" ].Clear();
+				m_TraverseAISDict.Remove( "__ENTRY__" );
+			}
+			if( m_TraverseAISDict.ContainsKey( "__EXIT__" ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__EXIT__" ] ) {
+					m_Viewer.GetAISContext().Remove( lineAIS, false );
+				}
+				m_TraverseAISDict[ "__EXIT__" ].Clear();
+				m_TraverseAISDict.Remove( "__EXIT__" );
+			}
+		}
+
+		void AddOneLinearTraverse( List<AIS_Line> lineList, gp_Pnt startPnt, gp_Pnt endPnt )
+		{
+			AIS_Line traverseAIS = DrawHelper.GetLineAIS( startPnt, endPnt, Quantity_NameOfColor.Quantity_NOC_RED, 1, true );
+			lineList.Add( traverseAIS );
 		}
 
 		IProcessPoint GetProcessStartPoint( string pathID )

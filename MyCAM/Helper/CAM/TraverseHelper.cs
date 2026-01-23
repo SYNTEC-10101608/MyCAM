@@ -1,5 +1,6 @@
 ﻿using MyCAM.Data;
 using OCC.gp;
+using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
@@ -67,6 +68,108 @@ namespace MyCAM.Helper
 			return BuildTraversePoint( frogLeapMidP, arcMidDir );
 		}
 
+		public static gp_Pnt ProjectPointToPlane( gp_Pnt point, gp_Pln plane )
+		{
+			gp_Pnt planeLocation = plane.Location();
+			double distance = planeLocation.Z() - point.Z();
+			gp_Pnt projectedPoint = new gp_Pnt( point.X(), point.Y(), point.Z() + distance );
+			return projectedPoint;
+		}
+
+		public struct TraversePathResult
+		{
+			public IProcessPoint PreviousPathEnd;
+			public IProcessPoint LiftUpPoint;
+			public IProcessPoint FrogLeapMiddlePoint;
+			public IProcessPoint CutDownPoint;
+			public IProcessPoint CurrentPathStart;
+			public gp_Pnt SafePlaneLiftUpProjPoint;
+			public gp_Pnt SafePlaneCutDownProjPoint;
+		}
+
+		public static bool TryCalculateTraversePoints( IProcessPoint previousPathEnd, IProcessPoint currentPathStart, TraverseData traverseData, out TraversePathResult result )
+		{
+			result = new TraversePathResult();
+
+			if( previousPathEnd == null || currentPathStart == null ) {
+				return false;
+			}
+
+			// p1: end of previous path
+			result.PreviousPathEnd = previousPathEnd;
+
+			// p2: lift up point of previous path
+			result.LiftUpPoint = GetCutDownOrLiftUpPoint( previousPathEnd, traverseData.LiftUpDistance );
+
+			// p5: start of current path
+			result.CurrentPathStart = currentPathStart;
+
+			// p4: cut down point of current path
+			result.CutDownPoint = GetCutDownOrLiftUpPoint( currentPathStart, traverseData.CutDownDistance );
+
+			if( result.LiftUpPoint == null || result.CutDownPoint == null ) {
+				return false;
+			}
+
+			// p3: frog leap middle point (if frog leap mode)
+			if( !traverseData.IsSafePlaneEnable && traverseData.FrogLeapDistance > 0 ) {
+				result.FrogLeapMiddlePoint = GetFrogLeapMiddlePoint(
+					result.LiftUpPoint,
+					result.CutDownPoint,
+					traverseData.FrogLeapDistance
+				);
+			}
+
+			// p6, p7: projected points on safe plane (if safe plane mode)
+			if( traverseData.IsSafePlaneEnable ) {
+				double safePlaneZ = (double)traverseData.SafePlaneDistance;
+				gp_Pln safePlane = CreateSafePlane( safePlaneZ );
+
+				result.SafePlaneLiftUpProjPoint = ProjectPointToPlane( result.LiftUpPoint.Point, safePlane );
+				result.SafePlaneCutDownProjPoint = ProjectPointToPlane( result.CutDownPoint.Point, safePlane );
+			}
+
+			return true;
+		}
+
+		public static List<(gp_Pnt start, gp_Pnt end)> GetTraverseLineSegments(
+			TraversePathResult traverseResult,
+			TraverseData traverseData )
+		{
+			List<(gp_Pnt, gp_Pnt)> segments = new List<(gp_Pnt, gp_Pnt)>();
+
+			// lift up
+			if( traverseData.LiftUpDistance > 0 &&
+				traverseResult.PreviousPathEnd != null &&
+				traverseResult.LiftUpPoint != null ) {
+				segments.Add( (traverseResult.PreviousPathEnd.Point, traverseResult.LiftUpPoint.Point) );
+			}
+
+			// traverse (depends on mode)
+			if( traverseData.IsSafePlaneEnable ) {
+				// safe plane mode: p2 -> p6 -> p7 -> p4
+				segments.Add( (traverseResult.LiftUpPoint.Point, traverseResult.SafePlaneLiftUpProjPoint) );
+				segments.Add( (traverseResult.SafePlaneLiftUpProjPoint, traverseResult.SafePlaneCutDownProjPoint) );
+				segments.Add( (traverseResult.SafePlaneCutDownProjPoint, traverseResult.CutDownPoint.Point) );
+			}
+			else {
+				// normal or frog leap mode: p2 -> p4 (frog leap handled separately as arc)
+				if( traverseData.FrogLeapDistance == 0 || traverseResult.FrogLeapMiddlePoint == null ) {
+					segments.Add( (traverseResult.LiftUpPoint.Point, traverseResult.CutDownPoint.Point) );
+				}
+				// Note: frog leap arc is handled separately in rendering code
+			}
+
+			// cut down
+			if( traverseData.CutDownDistance > 0 &&
+				traverseResult.CutDownPoint != null &&
+				traverseResult.CurrentPathStart != null ) {
+				segments.Add( (traverseResult.CutDownPoint.Point, traverseResult.CurrentPathStart.Point) );
+			}
+
+			return segments;
+		}
+
 		// this method is now for building a CAMPoint as ITraversePoint
 		static IProcessPoint BuildTraversePoint( gp_Pnt point, gp_Dir toolVec )
 		{
@@ -77,6 +180,13 @@ namespace MyCAM.Helper
 				new gp_Dir() // doesn't matter
 			);
 			return new CAMPoint( cadPoint, toolVec );
+		}
+
+		static gp_Pln CreateSafePlane( double safePlaneZ )
+		{
+			gp_Pnt safePlaneOrigin = new gp_Pnt( 0, 0, safePlaneZ );
+			gp_Dir safePlaneNormal = new gp_Dir( 0, 0, 1 );
+			return new gp_Pln( safePlaneOrigin, safePlaneNormal );
 		}
 	}
 }

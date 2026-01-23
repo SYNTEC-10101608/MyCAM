@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using static MyCAM.Data.CraftData;
 
 namespace MyCAM.FileManager
 {
@@ -1002,6 +1001,16 @@ namespace MyCAM.FileManager
 			get; set;
 		}
 
+		public double SafePlaneDistance
+		{
+			get; set;
+		}
+
+		public bool IsSafePlaneChecked
+		{
+			get; set;
+		}
+
 		// parameterless constructor (for XmlSerializer)
 		internal TraverseDataDTO()
 		{
@@ -1016,11 +1025,13 @@ namespace MyCAM.FileManager
 			CutDownDistance = traverseData.CutDownDistance;
 			FollowSafeDistance = traverseData.FollowSafeDistance;
 			FrogLeapDistance = traverseData.FrogLeapDistance;
+			IsSafePlaneChecked = traverseData.IsSafePlaneEnable;
+			SafePlaneDistance = traverseData.SafePlaneDistance;
 		}
 
 		internal TraverseData ToTraverseData()
 		{
-			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance );
+			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance, IsSafePlaneChecked, SafePlaneDistance );
 		}
 	}
 

@@ -19,7 +19,10 @@ namespace MyCAM.Helper
 
 			// build local coordination system ( reference DOC:https://syntecclub.atlassian.net/wiki/spaces/AUTO/pages/89458700 )
 			// the target is the same as TOOL_DIR
-			if( normalDir.IsParallel( TOOL_DIR, DIR_TOLERANCE ) ) {
+			gp_Vec normalVec = new gp_Vec( normalDir );
+			gp_Vec toolVec = new gp_Vec( TOOL_DIR );
+			gp_Vec toolCross = toolVec.Crossed( normalVec );
+			if( toolCross.XYZ().SquareModulus() < DIR_TOLERANCE ) {
 				xDir = new gp_Dir( 1, 0, 0 );
 			}
 
