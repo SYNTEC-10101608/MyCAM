@@ -210,7 +210,7 @@ namespace MyCAM.Helper
 			gp_Vec initVec = new gp_Vec( 0, 0, 1 );
 
 			// Second rotation: rotate around X-axis by A-axis angle
-			gp_Ax1 xAxis = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) );
+			gp_Ax1 xAxis = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 1, 0 ) );
 			gp_Trsf trsfA = new gp_Trsf();
 			trsfA.SetRotation( xAxis, dA_rad );
 			gp_Vec vecAfterA = initVec.Transformed( trsfA );

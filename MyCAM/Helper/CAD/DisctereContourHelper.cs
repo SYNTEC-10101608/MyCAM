@@ -84,9 +84,9 @@ namespace MyCAM.Helper
 				// get shell normal (1st)
 				gp_Dir normalVec_1st = new gp_Dir();
 				BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, shellFace, U, ref normalVec_1st );
-				if( shellFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				//if( shellFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
 					normalVec_1st.Reverse();
-				}
+				//}
 
 				// TODO: get solid normal (2nd)
 				gp_Dir normalVec_2nd = new gp_Dir( normalVec_1st.XYZ() );
