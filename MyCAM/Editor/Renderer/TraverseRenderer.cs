@@ -226,14 +226,14 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 
-			if( m_TraverseAISDict.ContainsKey( "EntryTraverse" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "EntryTraverse" ] ) {
+			if( m_TraverseAISDict.ContainsKey( "__ENTRY__" ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__ENTRY__" ] ) {
 					m_Viewer.GetAISContext().Display( lineAIS, false );
 					m_Viewer.GetAISContext().Deactivate( lineAIS );
 				}
 			}
-			if( m_TraverseAISDict.ContainsKey( "ExitTraverse" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "ExitTraverse" ] ) {
+			if( m_TraverseAISDict.ContainsKey( "__EXIT__" ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__EXIT__" ] ) {
 					m_Viewer.GetAISContext().Display( lineAIS, false );
 					m_Viewer.GetAISContext().Deactivate( lineAIS );
 				}
@@ -259,19 +259,19 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 
-			if( m_TraverseAISDict.ContainsKey( "EntryTraverse" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "EntryTraverse" ] ) {
+			if( m_TraverseAISDict.ContainsKey( "__ENTRY__" ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__ENTRY__" ] ) {
 					m_Viewer.GetAISContext().Remove( lineAIS, false );
 				}
-				m_TraverseAISDict[ "EntryTraverse" ].Clear();
-				m_TraverseAISDict.Remove( "EntryTraverse" );
+				m_TraverseAISDict[ "__ENTRY__" ].Clear();
+				m_TraverseAISDict.Remove( "__ENTRY__" );
 			}
-			if( m_TraverseAISDict.ContainsKey( "ExitTraverse" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "ExitTraverse" ] ) {
+			if( m_TraverseAISDict.ContainsKey( "__EXIT__" ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__EXIT__" ] ) {
 					m_Viewer.GetAISContext().Remove( lineAIS, false );
 				}
-				m_TraverseAISDict[ "ExitTraverse" ].Clear();
-				m_TraverseAISDict.Remove( "ExitTraverse" );
+				m_TraverseAISDict[ "__EXIT__" ].Clear();
+				m_TraverseAISDict.Remove( "__EXIT__" );
 			}
 		}
 
