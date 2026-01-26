@@ -214,7 +214,7 @@
     <Compile Include="PathCache\Application\ToolVecCache.cs" />
     <Compile Include="Post\FiveAxisSolver.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
-    <Compile Include="Controller\FTPTransformission.cs" />
+    <Compile Include="Controller\FTPTransmission.cs" />
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="Post\ContourPostHelper.cs" />
     <Compile Include="Post\PostInterfaceDefine.cs" />

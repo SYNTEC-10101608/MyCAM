@@ -99,7 +99,7 @@ namespace MyCAM.Post
 				// File writing completed successfully
 				// Now upload to FTP if IP address is available
 				if( !string.IsNullOrWhiteSpace( MyApp.ControllerIP ) ) {
-					bool isSuccess = FTPTransformission.FileTransmit( localFilePath, MyApp.ControllerIP, out string szErrorMessage, NC_FILE_DEFAULT_NAME );
+					bool isSuccess = FTPTransmission.FileTransmit( localFilePath, MyApp.ControllerIP, out string szErrorMessage, NC_FILE_DEFAULT_NAME );
 
 					if( isSuccess ) {
 						MyApp.Logger.ShowOnLogPanel( "[操作提示]NC檔案已生成，FTP傳輸成功", MyApp.NoticeType.Hint );
