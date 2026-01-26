@@ -22,23 +22,6 @@ namespace MyCAM
 			}
 
 			try {
-				// Build FTP address
-				string szFtpAddress = $"ftp://{szFTPServerIP}/NcFiles/";
-
-				// Check FTP connection
-				FtpWebRequest testRequest = (FtpWebRequest)WebRequest.Create( szFtpAddress );
-				testRequest.Method = WebRequestMethods.Ftp.ListDirectory;
-				testRequest.Timeout = 1000;
-
-				try {
-					using( FtpWebResponse testResponse = (FtpWebResponse)testRequest.GetResponse() ) {
-						// Connection successful
-					}
-				}
-				catch {
-					szErrorMessage = "³s½u¥¢±Ñ";
-					return false;
-				}
 
 				// Use local file name if not specified
 				if( string.IsNullOrWhiteSpace( szFileName ) ) {
@@ -46,6 +29,7 @@ namespace MyCAM
 				}
 
 				// Create upload request
+				string szFtpAddress = $"ftp://{szFTPServerIP}/NcFiles/";
 				string szUploadFilePath = szFtpAddress + szFileName;
 				FtpWebRequest uploadRequest = (FtpWebRequest)WebRequest.Create( szUploadFilePath );
 				uploadRequest.Method = WebRequestMethods.Ftp.UploadFile;
