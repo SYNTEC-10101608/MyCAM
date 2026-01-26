@@ -12,6 +12,7 @@ using OCC.Quantity;
 using OCCViewer;
 using System.Collections.Generic;
 using System.Linq;
+using static MyCAM.Helper.TraverseHelper;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -84,7 +85,7 @@ namespace MyCAM.Editor.Renderer
 				List<AIS_Shape> frogLeapShapeList = new List<AIS_Shape>();
 
 				// frog leap 
-				if( !currentTraverseData.IsSafePlaneEnable && currentTraverseData.FrogLeapDistance > 0 && result.FrogLeapMiddlePoint != null ) {
+				if( !currentTraverseData.IsSafePlaneEnable && currentTraverseData.FrogLeapDistance > 0 && result.FrogLeapMiddlePoint != null && result.LiftUpPoint.Point != null && result.CutDownPoint.Point != null ) {
 					GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( result.LiftUpPoint.Point, result.FrogLeapMiddlePoint.Point, result.CutDownPoint.Point );
 					if( makeCircle.IsDone() ) {
 						Geom_TrimmedCurve arcCurve = makeCircle.Value();
@@ -98,17 +99,17 @@ namespace MyCAM.Editor.Renderer
 						frogLeapShapeList.Add( arcAIS );
 
 						// lift up
-						if( currentTraverseData.LiftUpDistance > 0 ) {
+						if( currentTraverseData.LiftUpDistance > 0 && result.PreviousPathEnd.Point != null ) {
 							AddOneLinearTraverse( traverseLineList, result.PreviousPathEnd.Point, result.LiftUpPoint.Point );
 						}
 
 						// cut down
-						if( currentTraverseData.CutDownDistance > 0 ) {
+						if( currentTraverseData.CutDownDistance > 0 && result.CurrentPathStart.Point != null ) {
 							AddOneLinearTraverse( traverseLineList, result.CutDownPoint.Point, result.CurrentPathStart.Point );
 						}
 					}
 					else {
-						List<(gp_Pnt start, gp_Pnt end)> segments = TraverseHelper.GetTraverseLineSegments( result, currentTraverseData );
+						List<(gp_Pnt start, gp_Pnt end)> segments = GetTraverseLineSegments( result, currentTraverseData );
 						foreach( var seg in segments ) {
 							AddOneLinearTraverse( traverseLineList, seg.start, seg.end );
 						}
@@ -116,7 +117,7 @@ namespace MyCAM.Editor.Renderer
 				}
 				// safe plane or normal traverse
 				else {
-					List<(gp_Pnt start, gp_Pnt end)> segments = TraverseHelper.GetTraverseLineSegments( result, currentTraverseData );
+					List<(gp_Pnt start, gp_Pnt end)> segments = GetTraverseLineSegments( result, currentTraverseData );
 					foreach( var seg in segments ) {
 						AddOneLinearTraverse( traverseLineList, seg.start, seg.end );
 					}
@@ -142,7 +143,7 @@ namespace MyCAM.Editor.Renderer
 				string firstPathID = m_DataManager.PathIDList.First();
 				IProcessPoint firstPathStartPoint = GetProcessStartPoint( firstPathID );
 				if( firstPathStartPoint != null ) {
-					IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
+					IProcessPoint entryPoint = GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
 					if( entryPoint != null ) {
 						List<AIS_Line> entryLineList = new List<AIS_Line>();
 						AddOneLinearTraverse( entryLineList, entryPoint.Point, firstPathStartPoint.Point );
@@ -156,7 +157,7 @@ namespace MyCAM.Editor.Renderer
 				string lastPathID = m_DataManager.PathIDList.Last();
 				IProcessPoint lastPathEndPoint = GetProcessEndPoint( lastPathID );
 				if( lastPathEndPoint != null ) {
-					IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
+					IProcessPoint exitPoint = GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
 					if( exitPoint != null ) {
 						List<AIS_Line> exitLineList = new List<AIS_Line>();
 						AddOneLinearTraverse( exitLineList, lastPathEndPoint.Point, exitPoint.Point );
@@ -303,6 +304,39 @@ namespace MyCAM.Editor.Renderer
 				return new TraverseData();
 			}
 			return traverseDataCache.TraverseData;
+		}
+
+		static List<(gp_Pnt start, gp_Pnt end)> GetTraverseLineSegments( TraversePathResult traverseResult, TraverseData traverseData )
+		{
+			List<(gp_Pnt, gp_Pnt)> segments = new List<(gp_Pnt, gp_Pnt)>();
+
+			// lift up
+			if( traverseData.LiftUpDistance > 0 &&
+				traverseResult.PreviousPathEnd != null &&
+				traverseResult.LiftUpPoint != null ) {
+				segments.Add( (traverseResult.PreviousPathEnd.Point, traverseResult.LiftUpPoint.Point) );
+			}
+
+			// traverse (depends on mode)
+			if( traverseData.IsSafePlaneEnable ) {
+				segments.Add( (traverseResult.LiftUpPoint.Point, traverseResult.SafePlaneLiftUpProjPoint) );
+				segments.Add( (traverseResult.SafePlaneLiftUpProjPoint, traverseResult.SafePlaneCutDownProjPoint) );
+				segments.Add( (traverseResult.SafePlaneCutDownProjPoint, traverseResult.CutDownPoint.Point) );
+			}
+			else {
+				if( traverseData.FrogLeapDistance == 0 || traverseResult.FrogLeapMiddlePoint == null ) {
+					segments.Add( (traverseResult.LiftUpPoint.Point, traverseResult.CutDownPoint.Point) );
+				}
+			}
+
+			// cut down
+			if( traverseData.CutDownDistance > 0 &&
+				traverseResult.CutDownPoint != null &&
+				traverseResult.CurrentPathStart != null ) {
+				segments.Add( (traverseResult.CutDownPoint.Point, traverseResult.CurrentPathStart.Point) );
+			}
+
+			return segments;
 		}
 	}
 }
