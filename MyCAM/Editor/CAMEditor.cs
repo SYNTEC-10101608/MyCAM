@@ -546,7 +546,7 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( "[操作提示]成功轉出NC", MyApp.NoticeType.Hint );
 			}
 			else {
-				MyApp.Logger.ShowOnLogPanel( $"轉出NC失敗: {szErrorMessage}", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( $"[操作提示]轉出NC失敗: {szErrorMessage}", MyApp.NoticeType.Error );
 			}
 		}
 

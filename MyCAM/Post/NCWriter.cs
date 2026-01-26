@@ -4,7 +4,6 @@ using MyCAM.PathCache;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows.Forms;
 
 namespace MyCAM.Post
 {
@@ -102,12 +101,14 @@ namespace MyCAM.Post
 					bool isSuccess = FTPTransmission.FileTransmit( localFilePath, MyApp.ControllerIP, out string szErrorMessage, NC_FILE_DEFAULT_NAME );
 
 					if( isSuccess ) {
-						MyApp.Logger.ShowOnLogPanel( "[操作提示]NC檔案已生成，FTP傳輸成功", MyApp.NoticeType.Hint );
+						MyApp.Logger.ShowOnLogPanel( "FTP傳輸NC檔案成功", MyApp.NoticeType.Hint, true );
 					}
 					else {
-						MessageBox.Show( "NC檔案已生成，但FTP傳輸失敗：\n" + szErrorMessage,
-							"FTP傳輸失敗", MessageBoxButtons.OK, MessageBoxIcon.Warning );
+						MyApp.Logger.ShowOnLogPanel( "FTP傳輸NC檔案失敗：\n" + szErrorMessage, MyApp.NoticeType.Error );
 					}
+				}
+				else {
+					MyApp.Logger.ShowOnLogPanel( "未與控制器進行連線，檔案無法傳輸", MyApp.NoticeType.Error );
 				}
 				return true;
 			}

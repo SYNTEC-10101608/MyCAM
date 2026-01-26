@@ -1,7 +1,7 @@
-﻿using System;
+﻿using MyCAM.App;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
-using MyCAM.App;
 
 namespace MyCAM.LogManager
 {
@@ -12,20 +12,31 @@ namespace MyCAM.LogManager
 			m_PanelShowMessage = panelControl;
 		}
 
-		public void ShowOnLogPanel( string message, MyApp.NoticeType type )
+		public void ShowOnLogPanel( string message, MyApp.NoticeType type, bool needMessageBox = false )
 		{
+			// Get color and icon based on type
+			Color color;
+			MessageBoxIcon icon;
+			bool forceMessageBox = false;
+
 			switch( type ) {
 				case MyApp.NoticeType.Error:
-					ShowError( message );
+					color = ERROR_Color;
+					icon = MessageBoxIcon.Error;
+					forceMessageBox = true;
 					break;
 				case MyApp.NoticeType.Warning:
-					AddLog( message, WARNING_Color );
+					color = WARNING_Color;
+					icon = MessageBoxIcon.Warning;
 					break;
 				case MyApp.NoticeType.Hint:
 				default:
-					AddLog( message, NORMAL_HintColor );
+					color = NORMAL_HintColor;
+					icon = MessageBoxIcon.Information;
 					break;
 			}
+
+			AddLog( message, color, icon, forceMessageBox || needMessageBox );
 		}
 
 		Panel m_PanelShowMessage;
@@ -33,21 +44,9 @@ namespace MyCAM.LogManager
 		readonly Color WARNING_Color = Color.Yellow;
 		readonly Color NORMAL_HintColor = Color.White;
 
-		void ShowError( string message )
+		void AddLog( string message, Color color, MessageBoxIcon icon, bool needMessageBox )
 		{
-			MessageBox.Show(
-				message,
-				"Error",
-				MessageBoxButtons.OK,
-				MessageBoxIcon.Error
-			);
-
-			// sync to log panel
-			AddLog( message, ERROR_Color );
-		}
-
-		void AddLog( string message, Color color )
-		{
+			// Add label to panel
 			Label lblStickOnPanel = new Label
 			{
 				AutoSize = true,
@@ -56,9 +55,13 @@ namespace MyCAM.LogManager
 				Dock = DockStyle.Top
 			};
 
-			// make sure message is on the top of panel
 			m_PanelShowMessage.Controls.Add( lblStickOnPanel );
 			m_PanelShowMessage.ScrollControlIntoView( lblStickOnPanel );
+
+			// Show message box if needed
+			if( needMessageBox ) {
+				MessageBox.Show( message, "Message", MessageBoxButtons.OK, icon );
+			}
 		}
 	}
 }

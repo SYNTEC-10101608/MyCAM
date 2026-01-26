@@ -36,7 +36,7 @@ namespace MyCAM
 					}
 				}
 				catch {
-					szErrorMessage = "FTP 錯誤：連線失敗";
+					szErrorMessage = "連線失敗";
 					return false;
 				}
 
@@ -66,14 +66,14 @@ namespace MyCAM
 						return true;
 					}
 					else {
-						szErrorMessage = $"FTP 上傳失敗，狀態碼：{response.StatusCode}";
+						szErrorMessage = $"上傳失敗，狀態碼：{response.StatusCode}";
 						return false;
 					}
 				}
 			}
 			catch( WebException webEx ) {
 				if( webEx.Response is FtpWebResponse ftpResponse ) {
-					szErrorMessage = $"FTP 錯誤：{ftpResponse.StatusDescription}";
+					szErrorMessage = $"{ftpResponse.StatusDescription}";
 				}
 				else {
 					szErrorMessage = $"網路錯誤：{webEx.Message}";
@@ -81,7 +81,7 @@ namespace MyCAM
 				return false;
 			}
 			catch( Exception ex ) {
-				szErrorMessage = $"FTP 上傳異常：{ex.Message}";
+				szErrorMessage = $"上傳異常：{ex.Message}";
 				return false;
 			}
 		}
