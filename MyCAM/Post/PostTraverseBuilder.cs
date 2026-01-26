@@ -19,7 +19,7 @@ namespace MyCAM.Post
 			}
 
 			// lift up
-			if( result.LiftUpPoint != null ) {
+			if( currentPathNCPack.TraverseData.LiftUpDistance > 0 && result.LiftUpPoint != null ) {
 				pathG54PostData.LiftUpPostPoint = new PostPoint()
 				{
 					X = result.LiftUpPoint.Point.X(),
@@ -65,7 +65,7 @@ namespace MyCAM.Post
 			}
 
 			// cut down
-			if( result.CutDownPoint != null ) {
+			if( currentPathNCPack.TraverseData.CutDownDistance > 0 && result.CutDownPoint != null ) {
 				pathG54PostData.CutDownPostPoint = new PostPoint()
 				{
 					X = result.CutDownPoint.Point.X(),
