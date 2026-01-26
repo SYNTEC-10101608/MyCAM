@@ -9,11 +9,25 @@ namespace MyCAM.App
 {
 	internal static class MyApp
 	{
+		static string m_szControllerIP = string.Empty;
+
 		public enum NoticeType
 		{
 			Hint,
 			Warning,
 			Error
+		}
+
+		public static string ControllerIP
+		{
+			get
+			{
+				return m_szControllerIP;
+			}
+			set
+			{
+				m_szControllerIP = value;
+			}
 		}
 
 		public static Form MainForm

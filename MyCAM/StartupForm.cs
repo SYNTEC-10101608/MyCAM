@@ -1042,6 +1042,7 @@ namespace MyCAM
 					case VNCConnectionResult.Success:
 						m_CurrentConnectDlg.Close();
 						newVNCControl.WindowResize( m_panVNC.Width, (int)( m_panVNC.Width * CONTROLLER_SCREEN_RATIO ) );
+						MyApp.ControllerIP = ip;
 						break;
 
 					case VNCConnectionResult.FileNotFound:

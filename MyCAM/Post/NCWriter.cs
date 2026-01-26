@@ -1,8 +1,10 @@
-﻿using MyCAM.Data;
+﻿using MyCAM.App;
+using MyCAM.Data;
 using MyCAM.PathCache;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Forms;
 
 namespace MyCAM.Post
 {
@@ -31,7 +33,6 @@ namespace MyCAM.Post
 		string m_MasterAxisName = string.Empty;
 		string m_SlaveAxisName = string.Empty;
 		EntryAndExitData m_EntryAndExitData;
-		const string NC_FILES_RELATIVE_DIR = "C:\\NETWORK\\CNC\\NcFiles";
 		const string NC_FILE_DEFAULT_NAME = "MachingNC.nc";
 
 		public StreamWriter Writer => m_StreamWriter;
@@ -39,9 +40,11 @@ namespace MyCAM.Post
 		public bool ConvertSuccess( out string errorMessage )
 		{
 			errorMessage = string.Empty;
-			string szTargetDir = GetNCFilesDirectory();
+			string szTargetDir = Directory.GetCurrentDirectory();
+			string localFilePath = Path.Combine( szTargetDir, NC_FILE_DEFAULT_NAME );
+
 			try {
-				using( m_StreamWriter = new StreamWriter( Path.Combine( szTargetDir, NC_FILE_DEFAULT_NAME ) ) ) {
+				using( m_StreamWriter = new StreamWriter( localFilePath ) ) {
 					m_StreamWriter.WriteLine( "%@MACRO" );
 					m_StreamWriter.WriteLine( "G43.4 P1;" ); // G43.4 新動程
 					m_StreamWriter.WriteLine( "G65 P\"FileStart\" X\"Material1\" Y\"1.0\";" ); // 三點校正					
@@ -91,6 +94,20 @@ namespace MyCAM.Post
 					}
 					m_StreamWriter.WriteLine( "G65 P\"FileEnd\";" );
 					m_StreamWriter.WriteLine( "M30;" ); // 程式結束
+				}
+
+				// File writing completed successfully
+				// Now upload to FTP if IP address is available
+				if( !string.IsNullOrWhiteSpace( MyApp.ControllerIP ) ) {
+					bool isSuccess = FTPTransformission.FileTransmit( localFilePath, MyApp.ControllerIP, out string szErrorMessage, NC_FILE_DEFAULT_NAME );
+
+					if( isSuccess ) {
+						MyApp.Logger.ShowOnLogPanel( "[操作提示]NC檔案已生成，FTP傳輸成功", MyApp.NoticeType.Hint );
+					}
+					else {
+						MessageBox.Show( "NC檔案已生成，但FTP傳輸失敗：\n" + szErrorMessage,
+							"FTP傳輸失敗", MessageBoxButtons.OK, MessageBoxIcon.Warning );
+					}
 				}
 				return true;
 			}
@@ -208,15 +225,6 @@ namespace MyCAM.Post
 						leadCache.LeadData,
 						leadCache.LeadInCAMPointList
 					);
-		}
-
-		string GetNCFilesDirectory()
-		{
-			string szTargetDir = NC_FILES_RELATIVE_DIR;
-			if( Directory.Exists( szTargetDir ) == false ) {
-				Directory.CreateDirectory( szTargetDir );
-			}
-			return szTargetDir;
 		}
 	}
 }
