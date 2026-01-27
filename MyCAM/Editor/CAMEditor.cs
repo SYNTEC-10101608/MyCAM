@@ -13,6 +13,7 @@ using OCC.TopTools;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -541,12 +542,28 @@ namespace MyCAM.Editor
 			// stop current action
 			EndActionIfNotDefault();
 			NCWriter writer = new NCWriter( m_DataManager );
-			bool bSuccess = writer.ConvertSuccess( out string szErrorMessage );
-			if( bSuccess ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提示]成功轉出NC", MyApp.NoticeType.Hint );
+			const string NC_FILE_DEFAULT_NAME = "MachingNC.nc";
+			string szLocalFilePath = Path.Combine( Directory.GetCurrentDirectory(), NC_FILE_DEFAULT_NAME );
+			bool bNCCreateSuccess = writer.ConvertSuccess( NC_FILE_DEFAULT_NAME, szLocalFilePath, out string szCreateErrorMessage );
+
+			if( !bNCCreateSuccess ) {
+				MyApp.Logger.ShowOnLogPanel( $"[NC轉出狀態]轉出NC失敗: {szCreateErrorMessage}\n" + "[檔案傳輸狀態]傳輸NC檔案失敗", MyApp.NoticeType.Error );
+				return;
+			}
+
+			// transmit file if CNC IP is set
+			if( string.IsNullOrWhiteSpace( MyApp.CNCIP ) ) {
+				MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + "[檔案傳輸狀態]未與控制器進行連線，檔案無法傳輸", MyApp.NoticeType.Warning, true );
 			}
 			else {
-				MyApp.Logger.ShowOnLogPanel( $"轉出NC失敗: {szErrorMessage}", MyApp.NoticeType.Error );
+				bool bTransmitSuccess = FTPTransmission.FileTransmit( szLocalFilePath, MyApp.CNCIP, NC_FILE_DEFAULT_NAME, out string szTransmitErrorMessage );
+
+				if( bTransmitSuccess ) {
+					MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + "[檔案傳輸狀態]傳輸NC檔案成功", MyApp.NoticeType.Hint, true );
+				}
+				else {
+					MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + $"[檔案傳輸狀態]傳輸NC檔案失敗：{szTransmitErrorMessage}", MyApp.NoticeType.Warning, true );
+				}
 			}
 		}
 

@@ -9,11 +9,25 @@ namespace MyCAM.App
 {
 	internal static class MyApp
 	{
+		static string m_szCNCIP = string.Empty;
+
 		public enum NoticeType
 		{
 			Hint,
 			Warning,
 			Error
+		}
+
+		public static string CNCIP
+		{
+			get
+			{
+				return m_szCNCIP;
+			}
+			set
+			{
+				m_szCNCIP = value;
+			}
 		}
 
 		public static Form MainForm

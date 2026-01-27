@@ -167,8 +167,7 @@ namespace MyCAM.Editor
 				return true;
 			}
 			if( calResult == ToolVecHelper.ECalAngleResult.TooLargeAngle ) {
-				MyApp.Logger.ShowOnLogPanel( "目標向量與原始向量夾角過大", MyApp.NoticeType.Warning );
-				MessageBox.Show( "目標向量與原始向量夾角過大", "計算失敗", MessageBoxButtons.OK, MessageBoxIcon.Warning );
+				MyApp.Logger.ShowOnLogPanel( "目標向量與原始向量夾角過大", MyApp.NoticeType.Warning, true );
 				return false;
 			}
 			return false;
@@ -185,8 +184,7 @@ namespace MyCAM.Editor
 				return true;
 			}
 			if( calResult == ToolVecHelper.ECalAngleResult.TooLargeAngle ) {
-				MyApp.Logger.ShowOnLogPanel( "目標向量與原始向量夾角過大", MyApp.NoticeType.Warning );
-				MessageBox.Show( "目標向量與原始向量夾角過大", "計算失敗", MessageBoxButtons.OK, MessageBoxIcon.Warning );
+				MyApp.Logger.ShowOnLogPanel( "目標向量與原始向量夾角過大", MyApp.NoticeType.Warning, true );
 				return false;
 			}
 			return false;

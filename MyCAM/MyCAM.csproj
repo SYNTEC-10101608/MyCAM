@@ -52,16 +52,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controller\VNCUserControl.cs">
+    <Compile Include="CNC\VNCUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controller\VNCUserControl.Designer.cs">
+    <Compile Include="CNC\VNCUserControl.Designer.cs">
       <DependentUpon>VNCUserControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controller\ConnectDlg.cs">
+    <Compile Include="CNC\ConnectDlg.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Controller\ConnectDlg.Designer.cs">
+    <Compile Include="CNC\ConnectDlg.Designer.cs">
       <DependentUpon>ConnectDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
@@ -214,6 +214,7 @@
     <Compile Include="PathCache\Application\ToolVecCache.cs" />
     <Compile Include="Post\FiveAxisSolver.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
+    <Compile Include="CNC\FTPTransmission.cs" />
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="Post\ContourPostHelper.cs" />
     <Compile Include="Post\PostInterfaceDefine.cs" />
@@ -237,10 +238,10 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Controller\VNCUserControl.resx">
+    <EmbeddedResource Include="CNC\VNCUserControl.resx">
       <DependentUpon>VNCUserControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controller\ConnectDlg.resx">
+    <EmbeddedResource Include="CNC\ConnectDlg.resx">
       <DependentUpon>ConnectDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\EntryAndExitDlg.resx">
