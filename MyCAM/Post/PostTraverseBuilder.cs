@@ -14,7 +14,7 @@ namespace MyCAM.Post
 			IProcessPoint previousEndPoint = endInfoOfPreviousPath.EndCAMPoint;
 			IProcessPoint currentStartPoint = currentPathNCPack.ProcessStartPoint;
 
-			if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, currentPathNCPack.TraverseData, out TraverseHelper.TraversePathResult result ) ) {
+			if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, currentPathNCPack.TraverseData, out TraversePathResult result ) ) {
 				return;
 			}
 
