@@ -6,7 +6,7 @@ namespace MyCAM
 {
 	internal static class FTPTransmission
 	{
-		public static bool FileTransmit( string szLocalFilePath, string szFTPServerIP, out string szErrorMessage, string szFileName )
+		public static bool FileTransmit( string szLocalFilePath, string szFTPServerIP, string szFileName, out string szErrorMessage )
 		{
 			szErrorMessage = string.Empty;
 

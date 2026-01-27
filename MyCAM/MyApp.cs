@@ -9,7 +9,7 @@ namespace MyCAM.App
 {
 	internal static class MyApp
 	{
-		static string m_szControllerIP = string.Empty;
+		static string m_szCNCIP = string.Empty;
 
 		public enum NoticeType
 		{
@@ -18,15 +18,15 @@ namespace MyCAM.App
 			Error
 		}
 
-		public static string ControllerIP
+		public static string CNCIP
 		{
 			get
 			{
-				return m_szControllerIP;
+				return m_szCNCIP;
 			}
 			set
 			{
-				m_szControllerIP = value;
+				m_szCNCIP = value;
 			}
 		}
 
