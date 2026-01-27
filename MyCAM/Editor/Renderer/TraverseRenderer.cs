@@ -17,9 +17,6 @@ namespace MyCAM.Editor.Renderer
 {
 	internal class TraverseRenderer : CAMRendererBase
 	{
-		readonly Dictionary<string, List<AIS_Line>> m_TraverseAISDict = new Dictionary<string, List<AIS_Line>>();
-		readonly Dictionary<string, List<AIS_Shape>> m_FrogLeapAISDict = new Dictionary<string, List<AIS_Shape>>();
-
 		public TraverseRenderer( Viewer viewer, DataManager dataManager )
 			: base( viewer, dataManager )
 		{
@@ -76,7 +73,7 @@ namespace MyCAM.Editor.Renderer
 				IProcessPoint currentStartPoint = GetProcessStartPoint( currentPathID );
 
 				// Calculate all traverse points using helper
-				if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, currentTraverseData, out TraverseHelper.TraversePathResult result ) ) {
+				if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, currentTraverseData, out TraversePathResult result ) ) {
 					continue;
 				}
 
@@ -84,7 +81,7 @@ namespace MyCAM.Editor.Renderer
 				List<AIS_Shape> frogLeapShapeList = new List<AIS_Shape>();
 
 				// frog leap 
-				if( !currentTraverseData.IsSafePlaneEnable && currentTraverseData.FrogLeapDistance > 0 && result.FrogLeapMiddlePoint != null ) {
+				if( !currentTraverseData.IsSafePlaneEnable && currentTraverseData.FrogLeapDistance > 0 && result.FrogLeapMiddlePoint != null && result.LiftUpPoint.Point != null && result.CutDownPoint.Point != null ) {
 					GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( result.LiftUpPoint.Point, result.FrogLeapMiddlePoint.Point, result.CutDownPoint.Point );
 					if( makeCircle.IsDone() ) {
 						Geom_TrimmedCurve arcCurve = makeCircle.Value();
@@ -98,17 +95,17 @@ namespace MyCAM.Editor.Renderer
 						frogLeapShapeList.Add( arcAIS );
 
 						// lift up
-						if( currentTraverseData.LiftUpDistance > 0 ) {
+						if( currentTraverseData.LiftUpDistance > 0 && result.PreviousPathEnd.Point != null ) {
 							AddOneLinearTraverse( traverseLineList, result.PreviousPathEnd.Point, result.LiftUpPoint.Point );
 						}
 
 						// cut down
-						if( currentTraverseData.CutDownDistance > 0 ) {
+						if( currentTraverseData.CutDownDistance > 0 && result.CurrentPathStart.Point != null ) {
 							AddOneLinearTraverse( traverseLineList, result.CutDownPoint.Point, result.CurrentPathStart.Point );
 						}
 					}
 					else {
-						List<(gp_Pnt start, gp_Pnt end)> segments = TraverseHelper.GetTraverseLineSegments( result, currentTraverseData );
+						List<(gp_Pnt start, gp_Pnt end)> segments = GetTraverseLineSegments( result, currentTraverseData );
 						foreach( var seg in segments ) {
 							AddOneLinearTraverse( traverseLineList, seg.start, seg.end );
 						}
@@ -116,7 +113,7 @@ namespace MyCAM.Editor.Renderer
 				}
 				// safe plane or normal traverse
 				else {
-					List<(gp_Pnt start, gp_Pnt end)> segments = TraverseHelper.GetTraverseLineSegments( result, currentTraverseData );
+					List<(gp_Pnt start, gp_Pnt end)> segments = GetTraverseLineSegments( result, currentTraverseData );
 					foreach( var seg in segments ) {
 						AddOneLinearTraverse( traverseLineList, seg.start, seg.end );
 					}
@@ -146,7 +143,7 @@ namespace MyCAM.Editor.Renderer
 					if( entryPoint != null ) {
 						List<AIS_Line> entryLineList = new List<AIS_Line>();
 						AddOneLinearTraverse( entryLineList, entryPoint.Point, firstPathStartPoint.Point );
-						m_TraverseAISDict[ "EntryTraverse" ] = entryLineList;
+						m_TraverseAISDict[ KEY_ENTRY ] = entryLineList;
 					}
 				}
 			}
@@ -160,7 +157,7 @@ namespace MyCAM.Editor.Renderer
 					if( exitPoint != null ) {
 						List<AIS_Line> exitLineList = new List<AIS_Line>();
 						AddOneLinearTraverse( exitLineList, lastPathEndPoint.Point, exitPoint.Point );
-						m_TraverseAISDict[ "ExitTraverse" ] = exitLineList;
+						m_TraverseAISDict[ KEY_EXIT ] = exitLineList;
 					}
 				}
 			}
@@ -226,14 +223,14 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 
-			if( m_TraverseAISDict.ContainsKey( "__ENTRY__" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__ENTRY__" ] ) {
+			if( m_TraverseAISDict.ContainsKey( KEY_ENTRY ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_ENTRY ] ) {
 					m_Viewer.GetAISContext().Display( lineAIS, false );
 					m_Viewer.GetAISContext().Deactivate( lineAIS );
 				}
 			}
-			if( m_TraverseAISDict.ContainsKey( "__EXIT__" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__EXIT__" ] ) {
+			if( m_TraverseAISDict.ContainsKey( KEY_EXIT ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_EXIT ] ) {
 					m_Viewer.GetAISContext().Display( lineAIS, false );
 					m_Viewer.GetAISContext().Deactivate( lineAIS );
 				}
@@ -259,19 +256,19 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 
-			if( m_TraverseAISDict.ContainsKey( "__ENTRY__" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__ENTRY__" ] ) {
+			if( m_TraverseAISDict.ContainsKey( KEY_ENTRY ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_ENTRY ] ) {
 					m_Viewer.GetAISContext().Remove( lineAIS, false );
 				}
-				m_TraverseAISDict[ "__ENTRY__" ].Clear();
-				m_TraverseAISDict.Remove( "__ENTRY__" );
+				m_TraverseAISDict[ KEY_ENTRY ].Clear();
+				m_TraverseAISDict.Remove( KEY_ENTRY );
 			}
-			if( m_TraverseAISDict.ContainsKey( "__EXIT__" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "__EXIT__" ] ) {
+			if( m_TraverseAISDict.ContainsKey( KEY_EXIT ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_EXIT ] ) {
 					m_Viewer.GetAISContext().Remove( lineAIS, false );
 				}
-				m_TraverseAISDict[ "__EXIT__" ].Clear();
-				m_TraverseAISDict.Remove( "__EXIT__" );
+				m_TraverseAISDict[ KEY_EXIT ].Clear();
+				m_TraverseAISDict.Remove( KEY_EXIT );
 			}
 		}
 
@@ -304,5 +301,43 @@ namespace MyCAM.Editor.Renderer
 			}
 			return traverseDataCache.TraverseData;
 		}
+
+		static List<(gp_Pnt start, gp_Pnt end)> GetTraverseLineSegments( TraversePathResult traverseResult, TraverseData traverseData )
+		{
+			List<(gp_Pnt, gp_Pnt)> segments = new List<(gp_Pnt, gp_Pnt)>();
+
+			// lift up
+			if( traverseData.LiftUpDistance > 0 &&
+				traverseResult.PreviousPathEnd != null &&
+				traverseResult.LiftUpPoint != null ) {
+				segments.Add( (traverseResult.PreviousPathEnd.Point, traverseResult.LiftUpPoint.Point) );
+			}
+
+			// traverse (depends on mode)
+			if( traverseData.IsSafePlaneEnable ) {
+				segments.Add( (traverseResult.LiftUpPoint.Point, traverseResult.SafePlaneLiftUpProjPoint) );
+				segments.Add( (traverseResult.SafePlaneLiftUpProjPoint, traverseResult.SafePlaneCutDownProjPoint) );
+				segments.Add( (traverseResult.SafePlaneCutDownProjPoint, traverseResult.CutDownPoint.Point) );
+			}
+			else {
+				if( traverseData.FrogLeapDistance == 0 || traverseResult.FrogLeapMiddlePoint == null ) {
+					segments.Add( (traverseResult.LiftUpPoint.Point, traverseResult.CutDownPoint.Point) );
+				}
+			}
+
+			// cut down
+			if( traverseData.CutDownDistance > 0 &&
+				traverseResult.CutDownPoint != null &&
+				traverseResult.CurrentPathStart != null ) {
+				segments.Add( (traverseResult.CutDownPoint.Point, traverseResult.CurrentPathStart.Point) );
+			}
+
+			return segments;
+		}
+
+		readonly Dictionary<string, List<AIS_Line>> m_TraverseAISDict = new Dictionary<string, List<AIS_Line>>();
+		readonly Dictionary<string, List<AIS_Shape>> m_FrogLeapAISDict = new Dictionary<string, List<AIS_Shape>>();
+		const string KEY_ENTRY = "KEY_ENTRY";
+		const string KEY_EXIT = "KEY_EXIT";
 	}
 }
