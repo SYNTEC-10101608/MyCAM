@@ -17,7 +17,7 @@ if not exist "%REL%" (
 )
 
 REM 從 reference 複製所有 dll 到 Debug 與 Release
-for /r "%SRC%" %%f in (*.dll) do (
+for /r "%SRC%" %%f in (*.dll *.exe) do (
     copy /y "%%f" "%DBG%\" >nul
     copy /y "%%f" "%REL%\" >nul
 )
