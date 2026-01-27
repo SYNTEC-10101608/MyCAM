@@ -250,16 +250,16 @@ namespace MyCAM.Post
 		static void FilterSingularPoints( IReadOnlyList<IProcessPoint> pointList,
 			List<Tuple<double, double>> rotateAngleList, List<bool> singularTagList )
 		{
+			const int FIRST_INDEX = 0;
 			if( pointList == null || rotateAngleList == null || singularTagList == null ||
 				pointList.Count == 0 || pointList.Count != rotateAngleList.Count || pointList.Count != singularTagList.Count ) {
 				return;
 			}
-
-			int n = singularTagList.Count;
+			int nPathPntCount = singularTagList.Count;
 			int i = 0;
 
 			// find singular regions and interpolate
-			while( i < n ) {
+			while( i < nPathPntCount ) {
 
 				// skip non-singular points or points with IsToolVecModPoint == true
 				if( !singularTagList[ i ] || pointList[ i ].IsToolVecModPoint ) {
@@ -272,17 +272,20 @@ namespace MyCAM.Post
 				int regionEnd = i;
 
 				// extend to find the complete singular region (singular and not IsToolVecModPoint)
-				while( regionEnd < n && singularTagList[ regionEnd ] && !pointList[ regionEnd ].IsToolVecModPoint ) {
+				// 1. did not exceed the last point
+				// 2. is singular point
+				// 3. is not IsToolVecModPoint
+				while( regionEnd < nPathPntCount && singularTagList[ regionEnd ] && !pointList[ regionEnd ].IsToolVecModPoint ) {
 					regionEnd++;
 				}
 				regionEnd--; // back to last singular point
 
 				// determine start values for interpolation
 				double startM, startS;
-				if( regionStart == 0 ) {
+				if( regionStart == FIRST_INDEX ) {
 					// rule 3: if first point is singular, use its value
-					startM = rotateAngleList[ 0 ].Item1;
-					startS = rotateAngleList[ 0 ].Item2;
+					startM = rotateAngleList[ FIRST_INDEX ].Item1;
+					startS = rotateAngleList[ FIRST_INDEX ].Item2;
 				}
 				else {
 					// use n-1 value
@@ -292,10 +295,10 @@ namespace MyCAM.Post
 
 				// determine end values for interpolation
 				double endM, endS;
-				if( regionEnd == n - 1 ) {
+				if( regionEnd == nPathPntCount - 1 ) {
 					// rule 4: if last point is singular, use its value
-					endM = rotateAngleList[ n - 1 ].Item1;
-					endS = rotateAngleList[ n - 1 ].Item2;
+					endM = rotateAngleList[ nPathPntCount - 1 ].Item1;
+					endS = rotateAngleList[ nPathPntCount - 1 ].Item2;
 				}
 				else {
 					// use m+1 value
@@ -305,17 +308,28 @@ namespace MyCAM.Post
 
 				// calculate cumulative path lengths for interpolation
 				List<double> cumulativeLength = new List<double>();
-				cumulativeLength.Add( 0.0 );
 				double totalLength = 0.0;
-
 				for( int j = regionStart; j <= regionEnd; j++ ) {
-					if( j > regionStart ) {
+
+					// first singular pnt is start point && this point is interpolation pnt
+					if( j == FIRST_INDEX ) {
+						cumulativeLength.Add( 0.0 );
+					}
+					else {
 						gp_Pnt p1 = pointList[ j - 1 ].Point;
 						gp_Pnt p2 = pointList[ j ].Point;
 						double segmentLength = p1.Distance( p2 );
 						totalLength += segmentLength;
+						cumulativeLength.Add( totalLength );
 					}
-					cumulativeLength.Add( totalLength );
+				}
+
+				// regionEnd is not the last point of this path
+				if( regionEnd != nPathPntCount - 1 ) {
+					gp_Pnt p1 = pointList[ regionEnd ].Point;
+					gp_Pnt p2 = pointList[ regionEnd + 1 ].Point;
+					double segmentLength = p1.Distance( p2 );
+					totalLength += segmentLength;
 				}
 
 				// linear interpolation along path length
