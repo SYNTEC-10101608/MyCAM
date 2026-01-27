@@ -183,7 +183,7 @@ namespace MyCAM.Editor
 			IProcessPoint previousEndPoint = GetProcessEndPoint( previousPathID );
 			IProcessPoint currentStartPoint = GetProcessStartPoint( currentPathID );
 
-			if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, traverseData, out TraverseHelper.TraversePathResult result ) ) {
+			if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, traverseData, out TraversePathResult result ) ) {
 				return false;
 			}
 			outP6 = result.SafePlaneLiftUpProjPoint;
