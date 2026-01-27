@@ -3,6 +3,17 @@ using OCC.gp;
 
 namespace MyCAM.Helper
 {
+	public struct TraversePathResult
+	{
+		public IProcessPoint PreviousPathEnd;
+		public IProcessPoint LiftUpPoint;
+		public IProcessPoint FrogLeapMiddlePoint;
+		public IProcessPoint CutDownPoint;
+		public IProcessPoint CurrentPathStart;
+		public gp_Pnt SafePlaneLiftUpProjPoint;
+		public gp_Pnt SafePlaneCutDownProjPoint;
+	}
+
 	public static class TraverseHelper
 	{
 		public static IProcessPoint GetCutDownOrLiftUpPoint( IProcessPoint pathPoint, double dDistance )
@@ -73,17 +84,6 @@ namespace MyCAM.Helper
 			double distance = planeLocation.Z() - point.Z();
 			gp_Pnt projectedPoint = new gp_Pnt( point.X(), point.Y(), point.Z() + distance );
 			return projectedPoint;
-		}
-
-		public struct TraversePathResult
-		{
-			public IProcessPoint PreviousPathEnd;
-			public IProcessPoint LiftUpPoint;
-			public IProcessPoint FrogLeapMiddlePoint;
-			public IProcessPoint CutDownPoint;
-			public IProcessPoint CurrentPathStart;
-			public gp_Pnt SafePlaneLiftUpProjPoint;
-			public gp_Pnt SafePlaneCutDownProjPoint;
 		}
 
 		public static bool TryCalculateTraversePoints( IProcessPoint previousPathEnd, IProcessPoint currentPathStart, TraverseData traverseData, out TraversePathResult result )

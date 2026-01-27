@@ -12,15 +12,11 @@ using OCC.Quantity;
 using OCCViewer;
 using System.Collections.Generic;
 using System.Linq;
-using static MyCAM.Helper.TraverseHelper;
 
 namespace MyCAM.Editor.Renderer
 {
 	internal class TraverseRenderer : CAMRendererBase
 	{
-		readonly Dictionary<string, List<AIS_Line>> m_TraverseAISDict = new Dictionary<string, List<AIS_Line>>();
-		readonly Dictionary<string, List<AIS_Shape>> m_FrogLeapAISDict = new Dictionary<string, List<AIS_Shape>>();
-
 		public TraverseRenderer( Viewer viewer, DataManager dataManager )
 			: base( viewer, dataManager )
 		{
@@ -77,7 +73,7 @@ namespace MyCAM.Editor.Renderer
 				IProcessPoint currentStartPoint = GetProcessStartPoint( currentPathID );
 
 				// Calculate all traverse points using helper
-				if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, currentTraverseData, out TraverseHelper.TraversePathResult result ) ) {
+				if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, currentTraverseData, out TraversePathResult result ) ) {
 					continue;
 				}
 
@@ -143,11 +139,11 @@ namespace MyCAM.Editor.Renderer
 				string firstPathID = m_DataManager.PathIDList.First();
 				IProcessPoint firstPathStartPoint = GetProcessStartPoint( firstPathID );
 				if( firstPathStartPoint != null ) {
-					IProcessPoint entryPoint = GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
+					IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
 					if( entryPoint != null ) {
 						List<AIS_Line> entryLineList = new List<AIS_Line>();
 						AddOneLinearTraverse( entryLineList, entryPoint.Point, firstPathStartPoint.Point );
-						m_TraverseAISDict[ "EntryTraverse" ] = entryLineList;
+						m_TraverseAISDict[ KEY_ENTRY ] = entryLineList;
 					}
 				}
 			}
@@ -157,11 +153,11 @@ namespace MyCAM.Editor.Renderer
 				string lastPathID = m_DataManager.PathIDList.Last();
 				IProcessPoint lastPathEndPoint = GetProcessEndPoint( lastPathID );
 				if( lastPathEndPoint != null ) {
-					IProcessPoint exitPoint = GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
+					IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
 					if( exitPoint != null ) {
 						List<AIS_Line> exitLineList = new List<AIS_Line>();
 						AddOneLinearTraverse( exitLineList, lastPathEndPoint.Point, exitPoint.Point );
-						m_TraverseAISDict[ "ExitTraverse" ] = exitLineList;
+						m_TraverseAISDict[ KEY_EXIT ] = exitLineList;
 					}
 				}
 			}
@@ -227,14 +223,14 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 
-			if( m_TraverseAISDict.ContainsKey( "EntryTraverse" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "EntryTraverse" ] ) {
+			if( m_TraverseAISDict.ContainsKey( KEY_ENTRY ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_ENTRY ] ) {
 					m_Viewer.GetAISContext().Display( lineAIS, false );
 					m_Viewer.GetAISContext().Deactivate( lineAIS );
 				}
 			}
-			if( m_TraverseAISDict.ContainsKey( "ExitTraverse" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "ExitTraverse" ] ) {
+			if( m_TraverseAISDict.ContainsKey( KEY_EXIT ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_EXIT ] ) {
 					m_Viewer.GetAISContext().Display( lineAIS, false );
 					m_Viewer.GetAISContext().Deactivate( lineAIS );
 				}
@@ -260,19 +256,19 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 
-			if( m_TraverseAISDict.ContainsKey( "EntryTraverse" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "EntryTraverse" ] ) {
+			if( m_TraverseAISDict.ContainsKey( KEY_ENTRY ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_ENTRY ] ) {
 					m_Viewer.GetAISContext().Remove( lineAIS, false );
 				}
-				m_TraverseAISDict[ "EntryTraverse" ].Clear();
-				m_TraverseAISDict.Remove( "EntryTraverse" );
+				m_TraverseAISDict[ KEY_ENTRY ].Clear();
+				m_TraverseAISDict.Remove( KEY_ENTRY );
 			}
-			if( m_TraverseAISDict.ContainsKey( "ExitTraverse" ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ "ExitTraverse" ] ) {
+			if( m_TraverseAISDict.ContainsKey( KEY_EXIT ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_EXIT ] ) {
 					m_Viewer.GetAISContext().Remove( lineAIS, false );
 				}
-				m_TraverseAISDict[ "ExitTraverse" ].Clear();
-				m_TraverseAISDict.Remove( "ExitTraverse" );
+				m_TraverseAISDict[ KEY_EXIT ].Clear();
+				m_TraverseAISDict.Remove( KEY_EXIT );
 			}
 		}
 
@@ -338,5 +334,10 @@ namespace MyCAM.Editor.Renderer
 
 			return segments;
 		}
+
+		readonly Dictionary<string, List<AIS_Line>> m_TraverseAISDict = new Dictionary<string, List<AIS_Line>>();
+		readonly Dictionary<string, List<AIS_Shape>> m_FrogLeapAISDict = new Dictionary<string, List<AIS_Shape>>();
+		const string KEY_ENTRY = "KEY_ENTRY";
+		const string KEY_EXIT = "KEY_EXIT";
 	}
 }
