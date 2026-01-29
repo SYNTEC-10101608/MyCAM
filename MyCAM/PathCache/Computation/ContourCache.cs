@@ -21,7 +21,6 @@ namespace MyCAM.PathCache
 			m_ConnectCADPointMap = geomData.ConnectPointMap;
 			m_CraftData = craftData;
 			m_IsClose = geomData.IsClosed;
-			m_RefCenterDir = geomData.RefCenterDir;
 			m_CraftData.ParameterChanged += SetCraftDataDirty;
 			BuildCAMPointList();
 		}
@@ -96,23 +95,24 @@ namespace MyCAM.PathCache
 
 			// build initial CAM point list
 			m_CAMPointList = new List<CAMPoint>();
-			m_CAMPointIndexMap.Clear();
 			m_ConnectCAMPointMap.Clear();
 			for( int i = 0; i < m_CADPointList.Count; i++ ) {
+
+				// build CAM point
 				CADPoint cadPoint = m_CADPointList[ i ];
-				CAMPoint camPoint = new CAMPoint( cadPoint );
-				m_CAMPointIndexMap.Add( camPoint, i );
+				CAMPoint camPoint = new CAMPoint( cadPoint, m_CraftData.IsToolVecReverse );
 				m_CAMPointList.Add( camPoint );
+
+				// build connection CAM point
 				if( m_ConnectCADPointMap.ContainsKey( cadPoint ) ) {
-					CADPoint connectedCADPoint = m_ConnectCADPointMap[ cadPoint ];
-					CAMPoint connectedCAMPoint = new CAMPoint( connectedCADPoint );
+					CAMPoint connectedCAMPoint = new CAMPoint( m_ConnectCADPointMap[ cadPoint ], m_CraftData.IsToolVecReverse );
 					m_ConnectCAMPointMap.Add( camPoint, connectedCAMPoint );
 				}
 			}
 
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, m_IsClose, m_CraftData.IsToolVecReverse, m_CraftData.InterpolateType, m_RefCenterDir );
+			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, m_IsClose, m_CraftData.InterpolateType );
 			foreach( var oneConnect in m_ConnectCAMPointMap ) {
 				oneConnect.Value.ToolVec = oneConnect.Key.ToolVec;
 			}
@@ -193,12 +193,8 @@ namespace MyCAM.PathCache
 		// for CAD point connection
 		Dictionary<CADPoint, CADPoint> m_ConnectCADPointMap = new Dictionary<CADPoint, CADPoint>();
 
-		// for index mapping
-		Dictionary<CAMPoint, int> m_CAMPointIndexMap = new Dictionary<CAMPoint, int>();
-
 		// flag to indicate craft data changed
 		bool m_IsCraftDataDirty = false;
 		bool m_IsClose = false;
-		gp_Ax1 m_RefCenterDir;
 	}
 }

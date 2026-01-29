@@ -142,12 +142,24 @@ namespace MyCAM.Data
 		public CAMPoint( CADPoint cadPoint )
 		{
 			m_CADPoint = cadPoint.Clone();
+			m_InitToolVec = new gp_Dir( cadPoint.NormalVec_1st.XYZ() );
 			m_ToolVec = new gp_Dir( cadPoint.NormalVec_1st.XYZ() );
 		}
 
 		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
 		{
 			m_CADPoint = cadPoint.Clone();
+			m_InitToolVec = new gp_Dir( cadPoint.NormalVec_1st.XYZ() );
+			m_ToolVec = new gp_Dir( toolVec.XYZ() );
+		}
+
+		public CAMPoint( CADPoint cadPoint, bool isToolVecReverse )
+		{
+			m_CADPoint = cadPoint.Clone();
+			gp_Dir toolVec = isToolVecReverse ?
+				new gp_Dir( cadPoint.NormalVec_1st.Reversed().XYZ() ) :
+				new gp_Dir( cadPoint.NormalVec_1st.XYZ() );
+			m_InitToolVec = new gp_Dir( toolVec.XYZ() );
 			m_ToolVec = new gp_Dir( toolVec.XYZ() );
 		}
 
@@ -211,6 +223,7 @@ namespace MyCAM.Data
 
 		// using backing field to prevent modified outside
 		CADPoint m_CADPoint;
+		gp_Dir m_InitToolVec;
 		gp_Dir m_ToolVec;
 	}
 }
