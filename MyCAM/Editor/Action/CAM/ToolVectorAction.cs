@@ -59,15 +59,19 @@ namespace MyCAM.Editor
 				return;
 			}
 
-		// modify tool vector
-		bool isModified = m_ToolVecCache.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
-		
-		// Calculate master/slave from A/B angles
-		Tuple<double, double> msAngle = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg );
-		ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, msAngle.Item1, msAngle.Item2, m_CraftData.InterpolateType );
+			// Store the current editing point for later use in MS/AB angle conversions
+			CADPoint editingCADPnt = m_ProcessCADPointList[ nIndex ];
+			m_CurrentEditingCAMPoint = new CAMPoint( editingCADPnt );
 
-		// back up old data
-		m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, msAngle.Item1, msAngle.Item2, m_CraftData.InterpolateType );
+			// modify tool vector
+			bool isModified = m_ToolVecCache.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
+
+			// Calculate master/slave from A/B angles using the current editing point
+			Tuple<double, double> msAngle = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, m_CurrentEditingCAMPoint );
+			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, msAngle.Item1, msAngle.Item2, m_CraftData.InterpolateType );
+
+			// back up old data
+			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, msAngle.Item1, msAngle.Item2, m_CraftData.InterpolateType );
 			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
 			toolVecForm.RaiseKeep += () => SetToolVecOfKeep( nIndex, toolVecForm );
 			toolVecForm.RaiseZDir += () => SetToolVecOfZDir( nIndex, toolVecForm );
@@ -213,13 +217,21 @@ namespace MyCAM.Editor
 
 		void UpdateMSAngleFromABAngle( double angleA_deg, double angleB_deg, ToolVectorDlg toolVecForm )
 		{
-			Tuple<double, double> msAngle = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg );
+			// Get the current editing point index from the form's context
+			if( m_CurrentEditingCAMPoint == null ) {
+				return;
+			}
+			Tuple<double, double> msAngle = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, m_CurrentEditingCAMPoint );
 			toolVecForm.SetMSAngleBack( msAngle );
 		}
 
 		void UpdateABAngleFromMSAngle( double master_deg, double slave_deg, ToolVectorDlg toolVecForm )
 		{
-			Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg );
+			// Get the current editing point for coordinate system
+			if( m_CurrentEditingCAMPoint == null ) {
+				return;
+			}
+			Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_CurrentEditingCAMPoint );
 			toolVecForm.SetABAngleBack( abAngles );
 		}
 
@@ -354,5 +366,8 @@ namespace MyCAM.Editor
 		List<string> m_PathIDList = null;
 		const int DEFAULT_SELECT_INDEX = -1;
 		IGeomData m_GeomData;
+
+		// Store the current editing CAM point for MS/AB angle conversions
+		CAMPoint m_CurrentEditingCAMPoint = null;
 	}
 }

@@ -70,18 +70,37 @@ namespace MyCAM.Helper
 			return new gp_Vec( dir1.XYZ() );
 		}
 
-		public static Tuple<double, double> GetMSAngleFromABAngle( double dRA_deg, double dRB_deg )
+		public static Tuple<double, double> GetMSAngleFromABAngle( double dRA_deg, double dRB_deg, ISetToolVecPoint toolVecPoint )
 		{
 			// TODO: Implement the conversion from A/B angle to master/slave angle
 			// For now, return magic numbers
 			return new Tuple<double, double>( 666, 666 );
 		}
 
-		public static Tuple<double, double> GetABAngleFromMSAngle( double dMaster_deg, double dSlave_deg )
+		public static Tuple<double, double> GetABAngleFromMSAngle( double dMaster_deg, double dSlave_deg, ISetToolVecPoint toolVecPoint )
 		{
-			// TODO: Implement the conversion from master/slave angle to A/B angle
-			// For now, return magic numbers
-			return new Tuple<double, double>( 666, 666 );
+			// Get machine data
+			if( !Data.DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
+
+			// Create PostSolver
+			Post.PostSolver postSolver = new Post.PostSolver( machineData );
+
+			// Convert degrees to radians for FK solver
+			double dMaster_rad = dMaster_deg * Math.PI / 180.0;
+			double dSlave_rad = dSlave_deg * Math.PI / 180.0;
+
+			// Use PostSolver API to get the tool vector from master/slave angles
+			gp_Dir toolVec = postSolver.SolveToolVec( dMaster_rad, dSlave_rad );
+
+			// Use GetABAngleToTargetVec to convert tool vector to A/B angles
+			ECalAngleResult result = GetABAngleToTargetVec( toolVecPoint, toolVec, out double dRA_deg, out double dRB_deg );
+
+			if( result != ECalAngleResult.Done ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
+			return new Tuple<double, double>( dRA_deg, dRB_deg );
 		}
 
 		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList,
@@ -184,7 +203,7 @@ namespace MyCAM.Helper
 		}
 
 		static void InterpolateToolVec( ref List<ISetToolVecPoint> toolVecPointList,
-	int nStartIndex, int nEndIndex, gp_Vec startVec, gp_Vec endVec )
+			int nStartIndex, int nEndIndex, gp_Vec startVec, gp_Vec endVec )
 		{
 			// consider wrapped
 			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + toolVecPointList.Count : nEndIndex;
@@ -218,7 +237,7 @@ namespace MyCAM.Helper
 				return ECalAngleResult.DataError;
 			}
 			gp_Dir newCoordX = toolVecPoint.TangentVec;
-			gp_Dir newCoordZ =  toolVecPoint.InitToolVec;
+			gp_Dir newCoordZ = toolVecPoint.InitToolVec;
 			gp_Dir newCoordY = newCoordZ.Crossed( newCoordX );
 
 			// check angle limit ( difference is too great )
