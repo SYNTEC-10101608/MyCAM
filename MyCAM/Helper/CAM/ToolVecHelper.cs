@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using MyCAM.Post;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
@@ -72,20 +73,42 @@ namespace MyCAM.Helper
 
 		public static Tuple<double, double> GetMSAngleFromABAngle( double dRA_deg, double dRB_deg, ISetToolVecPoint toolVecPoint )
 		{
-			// TODO: Implement the conversion from A/B angle to master/slave angle
-			// For now, return magic numbers
-			return new Tuple<double, double>( 666, 666 );
+			// Get machine data
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
+
+			// Create PostSolver
+			PostSolver postSolver = new PostSolver( machineData );
+
+			// Convert A/B angles to tool vector
+			gp_Vec toolVec = GetVecFromABAngle( toolVecPoint, dRA_deg * Math.PI / 180.0, dRB_deg * Math.PI / 180.0 );
+			CAMPoint p = ( toolVecPoint as CAMPoint ).Clone();
+			p.ToolVec = new gp_Dir( toolVec.XYZ() );
+
+			// Use SolveIK to get master/slave angles (initial values = 0, 0)
+			IKSolveResult result = postSolver.SolveIK( p, 0, 0, out double dMaster_rad, out double dSlave_rad );
+
+			if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution || result == IKSolveResult.OutOfRange ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
+
+			// Convert radians to degrees
+			double dMaster_deg = dMaster_rad * 180.0 / Math.PI;
+			double dSlave_deg = dSlave_rad * 180.0 / Math.PI;
+
+			return new Tuple<double, double>( dMaster_deg, dSlave_deg );
 		}
 
 		public static Tuple<double, double> GetABAngleFromMSAngle( double dMaster_deg, double dSlave_deg, ISetToolVecPoint toolVecPoint )
 		{
 			// Get machine data
-			if( !Data.DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
 				return new Tuple<double, double>( 0, 0 );
 			}
 
 			// Create PostSolver
-			Post.PostSolver postSolver = new Post.PostSolver( machineData );
+			PostSolver postSolver = new PostSolver( machineData );
 
 			// Convert degrees to radians for FK solver
 			double dMaster_rad = dMaster_deg * Math.PI / 180.0;
