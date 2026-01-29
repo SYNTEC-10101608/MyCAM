@@ -127,6 +127,8 @@ namespace MyCAM.Post
 	internal interface FKSolver
 	{
 		gp_Vec Solve( double masterAngle, double slaveAngle, gp_Vec G54XYZ, gp_Vec G54Offset );
+
+		gp_Dir SolveToolVec( double masterAngle, double slaveAngle );
 	}
 
 	internal class SpindleTypeFKSolver : FKSolver
@@ -175,17 +177,35 @@ namespace MyCAM.Post
 			masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), masterAngle );
 			ptOnMaster1.Transform( masterTrsf );
 
-			// calculate the offset
-			return new gp_Vec( ptOnMaster0.XYZ() - ptOnMaster1.XYZ() );
-		}
-
-		// machine properties
-		gp_Vec m_ToolToSlave;
-		gp_Vec m_SlaveToMaster;
-		gp_Vec m_ToolVec;
-		gp_Dir m_MasterRotateDir;
-		gp_Dir m_SlaveRotateDir;
+		// calculate the offset
+		return new gp_Vec( ptOnMaster0.XYZ() - ptOnMaster1.XYZ() );
 	}
+
+	public gp_Dir SolveToolVec( double masterAngle, double slaveAngle )
+	{
+		// start with the initial tool direction
+		gp_Dir toolDir = new gp_Dir( m_ToolVec );
+
+		// apply slave rotation
+		gp_Trsf slaveTrsf = new gp_Trsf();
+		slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_SlaveRotateDir ), slaveAngle );
+		toolDir.Transform( slaveTrsf );
+
+		// apply master rotation
+		gp_Trsf masterTrsf = new gp_Trsf();
+		masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), masterAngle );
+		toolDir.Transform( masterTrsf );
+
+		return toolDir;
+	}
+
+	// machine properties
+	gp_Vec m_ToolToSlave;
+	gp_Vec m_SlaveToMaster;
+	gp_Vec m_ToolVec;
+	gp_Dir m_MasterRotateDir;
+	gp_Dir m_SlaveRotateDir;
+}
 
 	internal class TableTypeFKSolver : FKSolver
 	{
@@ -235,17 +255,36 @@ namespace MyCAM.Post
 			masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), masterAngle );
 			ptOnMaster1.Transform( masterTrsf );
 
-			// calculate the offset
-			return new gp_Vec( ptOnMaster1.XYZ() - ptOnMaster0.XYZ() ) + m_ToolVec; // offset tool vector
-		}
-
-		// machine properties
-		gp_Vec m_MCSToMaster;
-		gp_Vec m_MasterToSlave;
-		gp_Vec m_ToolVec;
-		gp_Dir m_MasterRotateDir;
-		gp_Dir m_SlaveRotateDir;
+		// calculate the offset
+		return new gp_Vec( ptOnMaster1.XYZ() - ptOnMaster0.XYZ() ) + m_ToolVec; // offset tool vector
 	}
+
+	public gp_Dir SolveToolVec( double masterAngle, double slaveAngle )
+	{
+		// start with the initial tool direction
+		gp_Dir toolDir = new gp_Dir( m_ToolVec );
+
+		// for table type, rotations are reversed (left-hand rule)
+		// apply slave rotation (reversed)
+		gp_Trsf slaveTrsf = new gp_Trsf();
+		slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_SlaveRotateDir ), -slaveAngle );
+		toolDir.Transform( slaveTrsf );
+
+		// apply master rotation (reversed)
+		gp_Trsf masterTrsf = new gp_Trsf();
+		masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), -masterAngle );
+		toolDir.Transform( masterTrsf );
+
+		return toolDir;
+	}
+
+	// machine properties
+	gp_Vec m_MCSToMaster;
+	gp_Vec m_MasterToSlave;
+	gp_Vec m_ToolVec;
+	gp_Dir m_MasterRotateDir;
+	gp_Dir m_SlaveRotateDir;
+}
 
 	internal class MixTypeFKSolver : FKSolver
 	{
@@ -295,17 +334,36 @@ namespace MyCAM.Post
 			ptOnMaster1.Transform( masterTrsf );
 			gp_Vec masterOffset = new gp_Vec( ptOnMaster0.XYZ() - ptOnMaster1.XYZ() );
 
-			// total offset
-			return slaveOffset + masterOffset;
-		}
-
-		// machine properties
-		gp_Vec m_ToolToMaster;
-		gp_Vec m_MCSToSlave;
-		gp_Vec m_ToolVec;
-		gp_Dir m_MasterRotateDir;
-		gp_Dir m_SlaveRotateDir;
+		// total offset
+		return slaveOffset + masterOffset;
 	}
+
+	public gp_Dir SolveToolVec( double masterAngle, double slaveAngle )
+	{
+		// start with the initial tool direction
+		gp_Dir toolDir = new gp_Dir( m_ToolVec );
+
+		// for mix type, slave uses left-hand rule (reversed)
+		// apply slave rotation (reversed)
+		gp_Trsf slaveTrsf = new gp_Trsf();
+		slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_SlaveRotateDir ), -slaveAngle );
+		toolDir.Transform( slaveTrsf );
+
+		// apply master rotation (right-hand)
+		gp_Trsf masterTrsf = new gp_Trsf();
+		masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), masterAngle );
+		toolDir.Transform( masterTrsf );
+
+		return toolDir;
+	}
+
+	// machine properties
+	gp_Vec m_ToolToMaster;
+	gp_Vec m_MCSToSlave;
+	gp_Vec m_ToolVec;
+	gp_Dir m_MasterRotateDir;
+	gp_Dir m_SlaveRotateDir;
+}
 
 	public class PostSolver
 	{
