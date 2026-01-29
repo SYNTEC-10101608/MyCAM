@@ -959,7 +959,7 @@ namespace MyCAM.FileManager
 			OverCutLength = craftData.OverCutLength;
 			InterpolateType = craftData.InterpolateType;
 			ToolVecModifyMap = ( craftData.ToolVecModifyMap ?? new Dictionary<int, ToolVecModifyData>() )
-				.Select( kvp => new ToolVecMapDTO( kvp.Key, kvp.Value.RA_deg, kvp.Value.RB_deg, kvp.Value.MasterAngle_deg, kvp.Value.SlaveAngle_deg ) )
+				.Select( kvp => new ToolVecMapDTO( kvp.Key, kvp.Value.RA_deg, kvp.Value.RB_deg, kvp.Value.Master_deg, kvp.Value.Slave_deg ) )
 				.ToList();
 		}
 

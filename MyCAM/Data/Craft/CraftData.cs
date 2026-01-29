@@ -22,12 +22,12 @@ namespace MyCAM.Data
 			get; set;
 		}
 
-		public double MasterAngle_deg
+		public double Master_deg
 		{
 			get; set;
 		}
 
-		public double SlaveAngle_deg
+		public double Slave_deg
 		{
 			get; set;
 		}
@@ -36,21 +36,21 @@ namespace MyCAM.Data
 		{
 			RA_deg = 0;
 			RB_deg = 0;
-			MasterAngle_deg = 0;
-			SlaveAngle_deg = 0;
+			Master_deg = 0;
+			Slave_deg = 0;
 		}
 
 		public ToolVecModifyData( double ra_deg, double rb_deg, double master_deg, double slave_deg )
 		{
 			RA_deg = ra_deg;
 			RB_deg = rb_deg;
-			MasterAngle_deg = master_deg;
-			SlaveAngle_deg = slave_deg;
+			Master_deg = master_deg;
+			Slave_deg = slave_deg;
 		}
 
 		public ToolVecModifyData Clone()
 		{
-			return new ToolVecModifyData( RA_deg, RB_deg, MasterAngle_deg, SlaveAngle_deg );
+			return new ToolVecModifyData( RA_deg, RB_deg, Master_deg, Slave_deg );
 		}
 	}
 
