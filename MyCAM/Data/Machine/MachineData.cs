@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 namespace MyCAM.Data
 {
 	[Serializable]
-	internal class MachineTreeNode
+	public class MachineTreeNode
 	{
 		public MachineTreeNode( MachineComponentType type )
 		{
@@ -34,7 +34,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal abstract class MachineData
+	public abstract class MachineData
 	{
 		protected MachineData()
 		{
@@ -173,7 +173,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal class SpindleTypeMachineData : MachineData
+	public class SpindleTypeMachineData : MachineData
 	{
 		public override FiveAxisType FiveAxisType
 		{
@@ -212,7 +212,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal class TableTypeMachineData : MachineData
+	public class TableTypeMachineData : MachineData
 	{
 		public override FiveAxisType FiveAxisType
 		{
@@ -251,7 +251,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal class MixTypeMachineData : MachineData
+	public class MixTypeMachineData : MachineData
 	{
 		public override FiveAxisType FiveAxisType
 		{

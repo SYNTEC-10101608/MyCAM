@@ -1,5 +1,6 @@
 ﻿using MyCAM.Data;
 using MyCAM.Helper;
+using MyCAM.Post;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
@@ -79,6 +80,17 @@ namespace MyCAM.PathCache
 			}
 		}
 
+		public List<Tuple<double, double>> InitIKResult
+		{
+			get
+			{
+				if( m_IsCraftDataDirty ) {
+					BuildCAMPointList();
+				}
+				return m_InitIKResult;
+			}
+		}
+
 		#endregion
 
 		#region API
@@ -109,6 +121,9 @@ namespace MyCAM.PathCache
 					m_ConnectCAMPointMap.Add( camPoint, connectedCAMPoint );
 				}
 			}
+
+			// solve initial IK
+			SolveInitIK();
 
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
@@ -142,6 +157,37 @@ namespace MyCAM.PathCache
 			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
 			LeadHelper.SetLeadOut( mainPointList, overCutPointList2, out List<IOrientationPoint> leadOutPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
 			m_LeadOutCAMPointList = leadOutPointList.Cast<CAMPoint>().ToList();
+		}
+
+		void SolveInitIK()
+		{
+			m_InitIKResult.Clear();
+
+			// arrange solver
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				throw new Exception( "ContourCache SolveInitIK get machine data failed" );
+			}
+			PostSolver postSolver = new PostSolver( machineData );
+
+			// init master and slave angle
+			double dLastProcessPathM = 0;
+			double dLastProcessPathS = 0;
+
+			// solve IK
+			// solve IK
+			foreach( IProcessPoint point in m_CAMPointList ) {
+				IKSolveResult ikResult = postSolver.SolveIK( point, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
+				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
+					m_InitIKResult.Add( new Tuple<double, double>( 0, 0 ) );
+					continue;
+				}
+				else if( ikResult == IKSolveResult.OutOfRange ) {
+
+					// temporary do nothing
+				}
+				m_InitIKResult.Add( new Tuple<double, double>( dLastProcessPathM, dLastProcessPathS ) );
+			}
+			return;
 		}
 
 		void SetStartPoint()
@@ -185,6 +231,7 @@ namespace MyCAM.PathCache
 		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
+		List<Tuple<double, double>> m_InitIKResult = new List<Tuple<double, double>>();
 
 		// they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
