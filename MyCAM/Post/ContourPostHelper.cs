@@ -209,25 +209,13 @@ namespace MyCAM.Post
 				return false;
 			}
 
-			// solve IK
+			// get rotate angles from point
 			List<Tuple<double, double>> rotateAngleList = new List<Tuple<double, double>>();
-			List<bool> singularTagList = new List<bool>();
 			foreach( IProcessPoint point in pointList ) {
-				IKSolveResult ikResult = postSolver.SolveIK( point, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
-				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution || ikResult == IKSolveResult.OutOfRange ) {
-					return false;
-				}
-				rotateAngleList.Add( new Tuple<double, double>( dLastProcessPathM, dLastProcessPathS ) );
-				if( ikResult == IKSolveResult.NoError ) {
-					singularTagList.Add( false );
-				}
-				else if( ikResult == IKSolveResult.MasterInfinityOfSolution || ikResult == IKSolveResult.SlaveInfinityOfSolution ) {
-					singularTagList.Add( true );
-				}
+				rotateAngleList.Add( new Tuple<double, double>( point.ModMaster_rad, point.ModSlave_rad ) );
 			}
-
-			// filter the singular points
-			FilterSingularPoints( pointList, rotateAngleList, singularTagList );
+			dLastProcessPathM = rotateAngleList[ rotateAngleList.Count - 1 ].Item1;
+			dLastProcessPathS = rotateAngleList[ rotateAngleList.Count - 1 ].Item2;
 
 			// build post data
 			for( int i = 0; i < pointList.Count; i++ ) {

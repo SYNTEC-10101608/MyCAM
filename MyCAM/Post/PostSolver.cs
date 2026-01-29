@@ -127,6 +127,8 @@ namespace MyCAM.Post
 	internal interface FKSolver
 	{
 		gp_Vec Solve( double masterAngle, double slaveAngle, gp_Vec G54XYZ, gp_Vec G54Offset );
+
+		gp_Dir SolveToolVec( double masterAngle, double slaveAngle );
 	}
 
 	internal class SpindleTypeFKSolver : FKSolver
@@ -177,6 +179,24 @@ namespace MyCAM.Post
 
 			// calculate the offset
 			return new gp_Vec( ptOnMaster0.XYZ() - ptOnMaster1.XYZ() );
+		}
+
+		public gp_Dir SolveToolVec( double masterAngle, double slaveAngle )
+		{
+			// start with the initial tool direction
+			gp_Dir toolDir = new gp_Dir( m_ToolVec );
+
+			// apply slave rotation
+			gp_Trsf slaveTrsf = new gp_Trsf();
+			slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_SlaveRotateDir ), slaveAngle );
+			toolDir.Transform( slaveTrsf );
+
+			// apply master rotation
+			gp_Trsf masterTrsf = new gp_Trsf();
+			masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), masterAngle );
+			toolDir.Transform( masterTrsf );
+
+			return toolDir;
 		}
 
 		// machine properties
@@ -239,6 +259,25 @@ namespace MyCAM.Post
 			return new gp_Vec( ptOnMaster1.XYZ() - ptOnMaster0.XYZ() ) + m_ToolVec; // offset tool vector
 		}
 
+		public gp_Dir SolveToolVec( double masterAngle, double slaveAngle )
+		{
+			// start with the initial tool direction
+			gp_Dir toolDir = new gp_Dir( m_ToolVec );
+
+			// for table type, rotations are reversed (left-hand rule)
+			// apply slave rotation (reversed)
+			gp_Trsf slaveTrsf = new gp_Trsf();
+			slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_SlaveRotateDir ), -slaveAngle );
+			toolDir.Transform( slaveTrsf );
+
+			// apply master rotation (reversed)
+			gp_Trsf masterTrsf = new gp_Trsf();
+			masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), -masterAngle );
+			toolDir.Transform( masterTrsf );
+
+			return toolDir;
+		}
+
 		// machine properties
 		gp_Vec m_MCSToMaster;
 		gp_Vec m_MasterToSlave;
@@ -299,6 +338,25 @@ namespace MyCAM.Post
 			return slaveOffset + masterOffset;
 		}
 
+		public gp_Dir SolveToolVec( double masterAngle, double slaveAngle )
+		{
+			// start with the initial tool direction
+			gp_Dir toolDir = new gp_Dir( m_ToolVec );
+
+			// for mix type, slave uses left-hand rule (reversed)
+			// apply slave rotation (reversed)
+			gp_Trsf slaveTrsf = new gp_Trsf();
+			slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_SlaveRotateDir ), -slaveAngle );
+			toolDir.Transform( slaveTrsf );
+
+			// apply master rotation (right-hand)
+			gp_Trsf masterTrsf = new gp_Trsf();
+			masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), masterAngle );
+			toolDir.Transform( masterTrsf );
+
+			return toolDir;
+		}
+
 		// machine properties
 		gp_Vec m_ToolToMaster;
 		gp_Vec m_MCSToSlave;
@@ -319,11 +377,11 @@ namespace MyCAM.Post
 			m_IKSolver = solverBuilder.BuildIKSolver();
 		}
 
-		public IKSolveResult SolveIK( IProcessPoint point, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
+		public IKSolveResult SolveIK( gp_Dir toolVec, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
 		{
 			dM_Out = 0;
 			dS_Out = 0;
-			if( point == null || point.ToolVec == null ) {
+			if( toolVec == null ) {
 				return IKSolveResult.InvalidInput;
 			}
 
@@ -331,7 +389,7 @@ namespace MyCAM.Post
 			if( m_IKSolver.IsReverseMS ) {
 				(dS_In, dM_In) = (dM_In, dS_In);
 			}
-			IKSolveResult ikResult = m_IKSolver.Solve( point.ToolVec, dM_In, dS_In, out dM_Out, out dS_Out );
+			IKSolveResult ikResult = m_IKSolver.Solve( toolVec, dM_In, dS_In, out dM_Out, out dS_Out );
 
 			// swap the output master and slave axis if needed
 			if( m_IKSolver.IsReverseMS ) {
@@ -354,6 +412,11 @@ namespace MyCAM.Post
 				return new gp_Vec();
 			}
 			return m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54.XYZ() ), m_G54Offset );
+		}
+
+		public gp_Dir SolveToolVec( double dM, double dS )
+		{
+			return m_FKSolver.SolveToolVec( dM, dS );
 		}
 
 		public gp_Vec G54Offset
