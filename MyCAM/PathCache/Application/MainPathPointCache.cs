@@ -6,7 +6,7 @@ namespace MyCAM.PathCache
 {
 	internal class MainPathPointCache : IMainPathCache
 	{
-		private readonly IPathCache m_PathCache;
+		protected readonly IPathCache m_PathCache;
 
 		public MainPathPointCache( IPathCache pathCache )
 		{

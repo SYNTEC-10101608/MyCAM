@@ -64,14 +64,15 @@ namespace MyCAM.Editor
 			m_CurrentEditingCAMPoint = new CAMPoint( editingCADPnt );
 
 			// modify tool vector
-			bool isModified = m_ToolVecCache.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
+			bool isModified = m_ToolVecCache.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
 
 			// Calculate master/slave from A/B angles using the current editing point
-			Tuple<double, double> msAngle = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, m_CurrentEditingCAMPoint );
-			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, msAngle.Item1, msAngle.Item2, m_CraftData.InterpolateType );
+			// If not modified, use the values from InitIKResult (already in degrees from GetToolVecModify)
+			// If modified, use the stored values directly
+			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, master_deg, slave_deg, m_CraftData.InterpolateType );
 
 			// back up old data
-			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, msAngle.Item1, msAngle.Item2, m_CraftData.InterpolateType );
+			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, master_deg, slave_deg, m_CraftData.InterpolateType );
 			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
 			toolVecForm.RaiseKeep += () => SetToolVecOfKeep( nIndex, toolVecForm );
 			toolVecForm.RaiseZDir += () => SetToolVecOfZDir( nIndex, toolVecForm );
