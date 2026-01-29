@@ -16,8 +16,8 @@ namespace MyCAM.PathCache
 		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
 		{
 			if( m_CraftData.ToolVecModifyMap.ContainsKey( index ) ) {
-				dRA_deg = m_CraftData.ToolVecModifyMap[ index ].Item1;
-				dRB_deg = m_CraftData.ToolVecModifyMap[ index ].Item2;
+				dRA_deg = m_CraftData.ToolVecModifyMap[ index ].RA_deg;
+				dRB_deg = m_CraftData.ToolVecModifyMap[ index ].RB_deg;
 				return true;
 			}
 			else {

@@ -17,7 +17,7 @@ namespace MyCAM.Helper
 		}
 
 		public static void SetToolVec( ref List<ISetToolVecPoint> toolVecPointList,
-			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap, bool isClosed, EToolVecInterpolateType interpolateType )
+			IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, bool isClosed, EToolVecInterpolateType interpolateType )
 		{
 			// mark the modified point
 			for( int i = 0; i < toolVecPointList.Count; i++ ) {
@@ -127,7 +127,7 @@ namespace MyCAM.Helper
 		}
 
 		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList,
-			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
+			IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap,
 			bool isClosed, EToolVecInterpolateType interpolateType )
 		{
 			if( toolVecModifyMap.Count == 0 ) {
@@ -143,34 +143,34 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static List<Tuple<gp_Vec, gp_Vec>> GetIntervalToolVec( List<Tuple<int, int>> interpolateIntervalList, List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap )
+		static List<Tuple<gp_Vec, gp_Vec>> GetIntervalToolVec( List<Tuple<int, int>> interpolateIntervalList, List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
 		{
 			List<Tuple<gp_Vec, gp_Vec>> result = new List<Tuple<gp_Vec, gp_Vec>>();
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
 				int nStartIndex = interpolateIntervalList[ i ].Item1;
 				int nEndIndex = interpolateIntervalList[ i ].Item2;
 				gp_Vec startVec = GetVecFromABAngle( toolVecPointList[ nStartIndex ],
-					toolVecModifyMap[ nStartIndex ].Item1 * Math.PI / 180,
-					toolVecModifyMap[ nStartIndex ].Item2 * Math.PI / 180 );
+					toolVecModifyMap[ nStartIndex ].RA_deg * Math.PI / 180,
+					toolVecModifyMap[ nStartIndex ].RB_deg * Math.PI / 180 );
 				gp_Vec endVec = GetVecFromABAngle( toolVecPointList[ nEndIndex ],
-					toolVecModifyMap[ nEndIndex ].Item1 * Math.PI / 180,
-					toolVecModifyMap[ nEndIndex ].Item2 * Math.PI / 180 );
+					toolVecModifyMap[ nEndIndex ].RA_deg * Math.PI / 180,
+					toolVecModifyMap[ nEndIndex ].RB_deg * Math.PI / 180 );
 				result.Add( new Tuple<gp_Vec, gp_Vec>( startVec, endVec ) );
 			}
 			return result;
 		}
 
-		static List<TiltABAngle> GetABAngleFromInterval( List<Tuple<int, int>> interpolateIntervalList, IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap )
+		static List<TiltABAngle> GetABAngleFromInterval( List<Tuple<int, int>> interpolateIntervalList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
 		{
 			List<TiltABAngle> result = new List<TiltABAngle>();
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
 				int nStartIndex = interpolateIntervalList[ i ].Item1;
 				int nEndIndex = interpolateIntervalList[ i ].Item2;
 				TiltABAngle tiltAngleParam = new TiltABAngle();
-				tiltAngleParam.dStart_RA_deg = toolVecModifyMap[ nStartIndex ].Item1;
-				tiltAngleParam.dStart_RB_deg = toolVecModifyMap[ nStartIndex ].Item2;
-				tiltAngleParam.dEnd_RA_deg = toolVecModifyMap[ nEndIndex ].Item1;
-				tiltAngleParam.dEnd_RB_deg = toolVecModifyMap[ nEndIndex ].Item2;
+				tiltAngleParam.dStart_RA_deg = toolVecModifyMap[ nStartIndex ].RA_deg;
+				tiltAngleParam.dStart_RB_deg = toolVecModifyMap[ nStartIndex ].RB_deg;
+				tiltAngleParam.dEnd_RA_deg = toolVecModifyMap[ nEndIndex ].RA_deg;
+				tiltAngleParam.dEnd_RB_deg = toolVecModifyMap[ nEndIndex ].RB_deg;
 				result.Add( tiltAngleParam );
 			}
 			return result;
@@ -178,7 +178,7 @@ namespace MyCAM.Helper
 
 
 		static List<Tuple<int, int>> GetInterpolateIntervalList(
-			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
+			IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap,
 			bool isClosed )
 		{
 			// sort the modify data by index
@@ -330,13 +330,13 @@ namespace MyCAM.Helper
 			return false;
 		}
 
-		static void ApplyVectorInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap, bool isClosed )
+		static void ApplyVectorInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, bool isClosed )
 		{
 			// all tool vector are modified to the same value, no need to do interpolation
 			if( toolVecModifyMap.Count == 1 ) {
 				gp_Vec newVec = GetVecFromABAngle( toolVecPointList[ toolVecModifyMap.Keys.First() ],
-					toolVecModifyMap.Values.First().Item1 * Math.PI / 180,
-					toolVecModifyMap.Values.First().Item2 * Math.PI / 180 );
+					toolVecModifyMap.Values.First().RA_deg * Math.PI / 180,
+					toolVecModifyMap.Values.First().RB_deg * Math.PI / 180 );
 				foreach( ISetToolVecPoint toolVecPoint in toolVecPointList ) {
 					toolVecPoint.ToolVec = new gp_Dir( newVec.XYZ() );
 				}
@@ -360,12 +360,12 @@ namespace MyCAM.Helper
 			return;
 		}
 
-		static void ApplyTiltAngleInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap, bool isClosed )
+		static void ApplyTiltAngleInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, bool isClosed )
 		{
 			// all tool vector are modified to the same value, no need to do interpolation
 			if( toolVecModifyMap.Count == 1 ) {
-				double dRA_Deg = toolVecModifyMap.Values.First().Item1;
-				double dRB_Deg = toolVecModifyMap.Values.First().Item2;
+				double dRA_Deg = toolVecModifyMap.Values.First().RA_deg;
+				double dRB_Deg = toolVecModifyMap.Values.First().RB_deg;
 				foreach( ISetToolVecPoint toolVecPoint in toolVecPointList ) {
 					gp_Vec newVec = GetVecFromABAngle( toolVecPoint,
 						dRA_Deg * Math.PI / 180,

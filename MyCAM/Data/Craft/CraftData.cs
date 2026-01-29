@@ -10,9 +10,53 @@ namespace MyCAM.Data
 		FixedDir,
 	}
 
+	public class ToolVecModifyData
+	{
+		public double RA_deg
+		{
+			get; set;
+		}
+
+		public double RB_deg
+		{
+			get; set;
+		}
+
+		public double MasterAngle_deg
+		{
+			get; set;
+		}
+
+		public double SlaveAngle_deg
+		{
+			get; set;
+		}
+
+		public ToolVecModifyData()
+		{
+			RA_deg = 0;
+			RB_deg = 0;
+			MasterAngle_deg = 0;
+			SlaveAngle_deg = 0;
+		}
+
+		public ToolVecModifyData( double ra_deg, double rb_deg, double master_deg, double slave_deg )
+		{
+			RA_deg = ra_deg;
+			RB_deg = rb_deg;
+			MasterAngle_deg = master_deg;
+			SlaveAngle_deg = slave_deg;
+		}
+
+		public ToolVecModifyData Clone()
+		{
+			return new ToolVecModifyData( RA_deg, RB_deg, MasterAngle_deg, SlaveAngle_deg );
+		}
+	}
+
 	public class CraftData
 	{
-	
+
 
 		public CraftData()
 		{
@@ -24,7 +68,7 @@ namespace MyCAM.Data
 			bool isPathReverse,
 			LeadData leadData,
 			double overCutLength,
-			Dictionary<int, Tuple<double, double>> toolVecModifyMap,
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap,
 			bool isToolVecReverse,
 			EToolVecInterpolateType interpolateType,
 			TraverseData traverseData )
@@ -33,7 +77,12 @@ namespace MyCAM.Data
 			m_IsPathReverse = isPathReverse;
 			m_LeadData = leadData;
 			m_OverCutLength = overCutLength;
-			m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>( toolVecModifyMap );
+			m_ToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
+			if( toolVecModifyMap != null ) {
+				foreach( var kvp in toolVecModifyMap ) {
+					m_ToolVecModifyMap.Add( kvp.Key, kvp.Value.Clone() );
+				}
+			}
 			m_IsToolVecReverse = isToolVecReverse;
 			m_InterpolateType = interpolateType;
 			m_TraverseData = traverseData;
@@ -140,7 +189,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		public Dictionary<int, Tuple<double, double>> ToolVecModifyMap
+		public Dictionary<int, ToolVecModifyData> ToolVecModifyMap
 		{
 			get
 			{
@@ -172,13 +221,13 @@ namespace MyCAM.Data
 		}
 
 		// API for outside modification
-		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg )
+		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg, double master_deg, double slave_deg )
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				m_ToolVecModifyMap[ index ] = new Tuple<double, double>( dRA_deg, dRB_deg );
+				m_ToolVecModifyMap[ index ] = new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg );
 			}
 			else {
-				m_ToolVecModifyMap.Add( index, new Tuple<double, double>( dRA_deg, dRB_deg ) );
+				m_ToolVecModifyMap.Add( index, new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg ) );
 			}
 			ParameterChanged?.Invoke();
 		}
@@ -207,7 +256,7 @@ namespace MyCAM.Data
 		LeadData m_LeadData = new LeadData();
 		double m_OverCutLength = 0;
 		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.VectorInterpolation;
-		Dictionary<int, Tuple<double, double>> m_ToolVecModifyMap = new Dictionary<int, Tuple<double, double>>();
+		Dictionary<int, ToolVecModifyData> m_ToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
 	}

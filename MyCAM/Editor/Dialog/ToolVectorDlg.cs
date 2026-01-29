@@ -148,6 +148,8 @@ namespace MyCAM.Editor
 			m_ToolVecParam.IsModified = true;
 			m_ToolVecParam.AngleA_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleA.Text ) : double.Parse( m_tbxAngleA.Text );
 			m_ToolVecParam.AngleB_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleB.Text ) : double.Parse( m_tbxAngleB.Text );
+			m_ToolVecParam.Master_deg = double.Parse( m_tbxMaster.Text );
+			m_ToolVecParam.Slave_deg = double.Parse( m_tbxSlave.Text );
 		}
 
 		void m_btnRemove_Click( object sender, EventArgs e )

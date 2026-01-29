@@ -140,7 +140,7 @@ namespace MyCAM.Editor
 
 		void SetABAngle( int VecIndex, ToolVecParam toolVecParam )
 		{
-			m_CraftData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
+			m_CraftData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg, toolVecParam.Master_deg, toolVecParam.Slave_deg );
 		}
 
 		void DrawVertexOnViewer( TopoDS_Shape selectedVertex )
@@ -291,7 +291,7 @@ namespace MyCAM.Editor
 			SetToolVecDone();
 		}
 
-		gp_Dir GetPreCtrlPntToolVec( List<CADPoint> oriCADPntList, IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap, int nTargetPntIdx, bool isPathReverse, bool isClosePath )
+		gp_Dir GetPreCtrlPntToolVec( List<CADPoint> oriCADPntList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nTargetPntIdx, bool isPathReverse, bool isClosePath )
 		{
 			List<int> ctrlPntIndexList = toolVecModifyMap.Keys.ToList();
 			int preCtrlIndex = GetPreCtrlPntIndex( nTargetPntIdx, ctrlPntIndexList, isPathReverse, isClosePath );
@@ -300,11 +300,11 @@ namespace MyCAM.Editor
 			if( preCtrlIndex == DEFAULT_SELECT_INDEX || preCtrlIndex == nTargetPntIdx ) {
 				return oriCADPntList[ nTargetPntIdx ].NormalVec_1st;
 			}
-			Tuple<double, double> ctrlPntInfo = toolVecModifyMap[ preCtrlIndex ];
+			ToolVecModifyData ctrlPntInfo = toolVecModifyMap[ preCtrlIndex ];
 			CAMPoint preCtrlCAMPnt = new CAMPoint( oriCADPntList[ preCtrlIndex ] );
 			gp_Vec targetVec = ToolVecHelper.GetVecFromABAngle( preCtrlCAMPnt,
-				ctrlPntInfo.Item1 * Math.PI / 180.0,
-				ctrlPntInfo.Item2 * Math.PI / 180.0 );
+				ctrlPntInfo.RA_deg * Math.PI / 180.0,
+				ctrlPntInfo.RB_deg * Math.PI / 180.0 );
 			return new gp_Dir( targetVec.XYZ() );
 		}
 
