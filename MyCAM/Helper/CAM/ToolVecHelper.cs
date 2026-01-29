@@ -70,6 +70,20 @@ namespace MyCAM.Helper
 			return new gp_Vec( dir1.XYZ() );
 		}
 
+		public static Tuple<double, double> GetMSAngleFromABAngle( double dRA_deg, double dRB_deg )
+		{
+			// TODO: Implement the conversion from A/B angle to master/slave angle
+			// For now, return magic numbers
+			return new Tuple<double, double>( 666, 666 );
+		}
+
+		public static Tuple<double, double> GetABAngleFromMSAngle( double dMaster_deg, double dSlave_deg )
+		{
+			// TODO: Implement the conversion from master/slave angle to A/B angle
+			// For now, return magic numbers
+			return new Tuple<double, double>( 666, 666 );
+		}
+
 		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList,
 			IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap,
 			bool isClosed, EToolVecInterpolateType interpolateType )

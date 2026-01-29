@@ -59,15 +59,20 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// modify tool vector
-			bool isModified = m_ToolVecCache.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
-			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, m_CraftData.InterpolateType );
+		// modify tool vector
+		bool isModified = m_ToolVecCache.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
+		
+		// Calculate master/slave from A/B angles
+		Tuple<double, double> msAngle = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg );
+		ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, msAngle.Item1, msAngle.Item2, m_CraftData.InterpolateType );
 
-			// back up old data
-			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, m_CraftData.InterpolateType );
+		// back up old data
+		m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, msAngle.Item1, msAngle.Item2, m_CraftData.InterpolateType );
 			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
 			toolVecForm.RaiseKeep += () => SetToolVecOfKeep( nIndex, toolVecForm );
 			toolVecForm.RaiseZDir += () => SetToolVecOfZDir( nIndex, toolVecForm );
+			toolVecForm.RaiseUpdateMSAngleFromABAngle += ( angleA, angleB ) => UpdateMSAngleFromABAngle( angleA, angleB, toolVecForm );
+			toolVecForm.RaiseUpdateABAngleFromMSAngle += ( master, slave ) => UpdateABAngleFromMSAngle( master, slave, toolVecForm );
 			toolVecForm.Preview += ( ToolVec ) => SetToolVecParamAndPeview( nIndex, ToolVec );
 			toolVecForm.Confirm += ( ToolVec ) => ConfirmSetting( nIndex, ToolVec );
 			toolVecForm.Cancel += () => CancelSetting( nIndex );
@@ -194,7 +199,7 @@ namespace MyCAM.Editor
 		{
 			bool GetParamSuccess = CalABAngleToPreCtrlPntToolVec( nSelectIndex, out Tuple<double, double> param );
 			if( GetParamSuccess ) {
-				toolVecForm.SetParamBack( param );
+				toolVecForm.SetABAngleBack( param );
 			}
 		}
 
@@ -202,8 +207,20 @@ namespace MyCAM.Editor
 		{
 			bool GetParamSuccess = CalABAngleToZDir( nSelectIndex, out Tuple<double, double> param );
 			if( GetParamSuccess ) {
-				toolVecForm.SetParamBack( param );
+				toolVecForm.SetABAngleBack( param );
 			}
+		}
+
+		void UpdateMSAngleFromABAngle( double angleA_deg, double angleB_deg, ToolVectorDlg toolVecForm )
+		{
+			Tuple<double, double> msAngle = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg );
+			toolVecForm.SetMSAngleBack( msAngle );
+		}
+
+		void UpdateABAngleFromMSAngle( double master_deg, double slave_deg, ToolVectorDlg toolVecForm )
+		{
+			Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg );
+			toolVecForm.SetABAngleBack( abAngles );
 		}
 
 		void SetToolVecParamAndPeview( int VecIndex, ToolVecParam toolVecParam )
