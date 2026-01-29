@@ -115,10 +115,10 @@ namespace MyCAM.Editor
 
 					gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( contourPathObject.GeomData.RefCenterDir, standardPatternGeomData.IsCoordinateReversed, standardPatternGeomData.RotatedAngle_deg );
 					ShowStdPatternTrihedron( refCoord );
+					standardPatternGeomData.SetRefCoord( refCoord );
 				}
 
 				m_DataManager.ObjectMap[ szID ] = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, pathObject );
-				UpdateCanvasPattern( szID, shape );
 			}
 			m_Viewer.UpdateView();
 		}
@@ -133,7 +133,6 @@ namespace MyCAM.Editor
 				}
 				shape = m_BackUpPathObjectList[ szID ].Shape;
 				m_DataManager.ObjectMap[ szID ] = m_BackUpPathObjectList[ szID ];
-				UpdateCanvasPattern( szID, shape );
 			}
 			m_Viewer.UpdateView();
 		}
@@ -158,13 +157,6 @@ namespace MyCAM.Editor
 				default:
 					return contourPathObject;
 			}
-		}
-
-		void UpdateCanvasPattern( string szID, TopoDS_Shape shape )
-		{
-			AIS_Shape shapeAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szID ].AISHandle );
-			shapeAIS.SetShape( shape );
-			m_Viewer.GetAISContext().Redisplay( shapeAIS, false );
 		}
 
 		void ShowStdPatternTrihedron( gp_Ax3 refCoord )

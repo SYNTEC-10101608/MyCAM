@@ -64,21 +64,25 @@
     <Compile Include="CNC\ConnectDlg.Designer.cs">
       <DependentUpon>ConnectDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Renderer\MainPathRenderer.cs" />
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
+    <Compile Include="Helper\CAM\StartPointHelper.cs" />
     <Compile Include="Helper\Canvas\DrawHelper.cs" />
     <Compile Include="Helper\Coupler\StdPatternCraftCoupler.cs" />
     <Compile Include="Helper\FormShow\DialogShowHelper.cs" />
     <Compile Include="Helper\Simulation\CollisionHelper.cs" />
     <Compile Include="Helper\Simulation\MachineMeshToAISHelper.cs" />
     <Compile Include="Helper\Simulation\SimulationHelper.cs" />
+    <Compile Include="PathCache\Application\Action\StartPointActionCache.cs" />
     <Compile Include="PathCache\Application\MainPathPointCache.cs" />
+    <Compile Include="PathCache\Application\Renderer\MainPathPointRendererCache.cs" />
     <Compile Include="PathCache\Application\StdPatternMaxOverCutCache.cs" />
     <Compile Include="PathCache\Application\TraverseDataCache.cs" />
     <Compile Include="PathCache\Computation\CircleCache.cs" />
     <Compile Include="PathCache\Computation\ContourCache.cs" />
     <Compile Include="PathCache\Application\InterfaceDefine.cs" />
     <Compile Include="PathCache\Application\LeadCache.cs" />
-    <Compile Include="PathCache\Application\MainPathStartPointCache.cs" />
+    <Compile Include="PathCache\Application\Renderer\StartPointRendererCache.cs" />
     <Compile Include="PathCache\Application\OrientationCache.cs" />
     <Compile Include="PathCache\Application\OverCutCache.cs" />
     <Compile Include="Helper\CAD\StdPatternStartPointListFactory.cs" />

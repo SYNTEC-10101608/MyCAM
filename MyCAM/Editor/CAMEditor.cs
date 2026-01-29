@@ -76,6 +76,7 @@ namespace MyCAM.Editor
 			m_CraftRenderer = new CraftRenderer( m_Viewer, m_DataManager );
 			m_ToolVecRenderer = new ToolVecRenderer( m_Viewer, m_DataManager );
 			m_TraverseRenderer = new TraverseRenderer( m_Viewer, m_DataManager );
+			m_MainPathRenderer = new MainPathRenderer( m_Viewer, m_ViewManager, m_DataManager );
 		}
 
 		public const string PATH_NODE_PREFIX = "Path_";
@@ -87,6 +88,7 @@ namespace MyCAM.Editor
 		CraftRenderer m_CraftRenderer;
 		ToolVecRenderer m_ToolVecRenderer;
 		TraverseRenderer m_TraverseRenderer;
+		MainPathRenderer m_MainPathRenderer;
 
 		// editor
 		public override EEditorType Type
@@ -104,15 +106,6 @@ namespace MyCAM.Editor
 			// init tree
 			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
 			m_ViewManager.PathNode.ExpandAll();
-
-			// init viewer
-			foreach( var pathID in m_DataManager.PathIDList ) {
-				if( m_ViewManager.ViewObjectMap[ pathID ].Visible == false ) {
-					continue;
-				}
-				AIS_InteractiveObject obj = m_ViewManager.ViewObjectMap[ pathID ].AISHandle;
-				m_Viewer.GetAISContext().Display( obj, false );
-			}
 			ShowAllCAMData();
 		}
 
@@ -584,14 +577,6 @@ namespace MyCAM.Editor
 				TreeNode node = new TreeNode( szNodeID );
 				m_ViewManager.PathNode.Nodes.Add( node );
 				m_ViewManager.TreeNodeMap.Add( szNodeID, node );
-
-				// add a new shape to the viewer
-				if( !DataGettingHelper.GetShapeObject( szID, out IShapeObject shapeObj ) ) {
-					continue;
-				}
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( shapeObj.Shape, 3.0 );
-				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
-				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
 			}
 
 			// update tree view and viewer
@@ -656,6 +641,7 @@ namespace MyCAM.Editor
 
 		void ShowCAMData( List<string> pathIDList )
 		{
+			m_MainPathRenderer.Show();
 			m_ToolVecRenderer.Show( pathIDList );
 			m_OrientationRenderer.Show( pathIDList );
 			m_IndexRenderer.Show();
@@ -672,6 +658,7 @@ namespace MyCAM.Editor
 
 		void RemoveCAMData( List<string> pathIDList )
 		{
+			m_MainPathRenderer.Remove();
 			m_ToolVecRenderer.Remove( pathIDList );
 			m_CraftRenderer.Remove( pathIDList );
 			m_OrientationRenderer.Remove( pathIDList );
@@ -682,6 +669,7 @@ namespace MyCAM.Editor
 
 		void RemovePathCAMData( List<string> pathIDList )
 		{
+			m_MainPathRenderer.Remove( pathIDList );
 			m_ToolVecRenderer.Remove( pathIDList );
 			m_CraftRenderer.Remove( pathIDList );
 			m_OrientationRenderer.Remove( pathIDList );

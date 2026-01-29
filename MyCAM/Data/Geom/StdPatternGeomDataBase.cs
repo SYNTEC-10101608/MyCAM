@@ -1,4 +1,5 @@
 ﻿using OCC.gp;
+using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
@@ -7,6 +8,18 @@ namespace MyCAM.Data
 		public abstract PathType PathType
 		{
 			get;
+		}
+
+		public gp_Ax3 RefCoord
+		{
+			get
+			{
+				return m_RefCoord;
+			}
+			set
+			{
+				m_RefCoord = value;
+			}
 		}
 
 		public bool IsClosed
@@ -48,7 +61,14 @@ namespace MyCAM.Data
 
 		public abstract IGeomData Clone();
 
+		public void SetRefCoord( gp_Ax3 refCoord )
+		{
+			m_RefCoord = refCoord;
+		}
+
 		protected double m_RotatedAngle_deg;
 		protected bool m_IsCoordinateReversed;
+		protected List<CADPoint> m_CADPointList;
+		protected gp_Ax3 m_RefCoord = new gp_Ax3();
 	}
 }

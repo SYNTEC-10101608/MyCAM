@@ -1,4 +1,3 @@
-using MyCAM.App;
 using MyCAM.Data;
 using OCC.gp;
 using System;
@@ -8,344 +7,181 @@ namespace MyCAM.Helper
 {
 	internal static class StdPatternDiscreteFactory
 	{
-		public static bool GetDiscreteOriPointList( gp_Ax3 refCoord, IStdPatternGeomData geomData, out List<IOrientationPoint> discreteList )
+		#region Public API
+
+		public static List<CADPoint> DiscretizeCircle( double diameter, gp_Trsf transformation )
 		{
-			discreteList = null;
-			if( refCoord == null || geomData == null ) {
-				return false;
-			}
-
-			if( geomData is CircleGeomData circle ) {
-				return DiscretizeCircle( refCoord, circle, out discreteList );
-			}
-			if( geomData is RectangleGeomData rectangle ) {
-				return DiscretizeRectangle( refCoord, rectangle, out discreteList );
-			}
-			if( geomData is RunwayGeomData runway ) {
-				return DiscretizeRunway( refCoord, runway, out discreteList );
-			}
-			if( geomData is PolygonGeomData polygon ) {
-				return DiscretizePolygon( refCoord, polygon, out discreteList );
-			}
-
-			return false;
-		}
-
-		static bool DiscretizeCircle( gp_Ax3 refCoord, CircleGeomData circleData, out List<IOrientationPoint> circleOriPointList )
-		{
-			circleOriPointList = null;
-			if( refCoord == null || circleData == null ) {
-				return false;
-			}
-			double diameter = circleData.Diameter;
-
-			// validate inputs
 			if( diameter <= 0 ) {
-				return false;
+				return new List<CADPoint>();
 			}
+
 			double radius = diameter / 2.0;
-
-			// create coordinate system transformation
-			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( refCoord );
-			try {
-				GenerateCirclePath( radius, transformation, out circleOriPointList );
-			}
-			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"Error occurred while generating circle path: {ex.Message}", MyApp.NoticeType.Error );
-				return false;
-			}
-
-			return true;
+			return GenerateCirclePath( radius, transformation );
 		}
 
-		static bool DiscretizeRectangle( gp_Ax3 refCoord, RectangleGeomData rectangleData, out List<IOrientationPoint> rectangleOriPointList )
+		public static List<CADPoint> DiscretizeRectangle( double width, double length, double cornerRadius, gp_Trsf transformation )
 		{
-			rectangleOriPointList = null;
-			if( refCoord == null || rectangleData == null ) {
-				return false;
+			if( width <= 0 || length <= 0 || cornerRadius < 0 ) {
+				return new List<CADPoint>();
 			}
 
-			double width = rectangleData.Width;
-			double length = rectangleData.Length;
-			double cornerRadius = rectangleData.CornerRadius;
-
-			// validate inputs
-			if( width <= 0 || length <= 0 ) {
-				return false;
-			}
-			if( cornerRadius < 0 ) {
-				return false;
-			}
-
-			// limit corner radius to avoid overlap
-			// use 90% of the max possible value as safety margin to avoid precision issues
 			double maxCornerRadius = Math.Min( width, length ) / 2.0 * 0.9;
 			if( cornerRadius > maxCornerRadius ) {
 				cornerRadius = maxCornerRadius;
 			}
 
-			// create coordinate system transformation
-			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( refCoord );
-			try {
-				if( cornerRadius <= DEFAULT_PRECISION_MIN_ERROR ) {
-
-					// sharp corners
-					GenerateSharpRectanglePath( width, length, transformation, out rectangleOriPointList );
-				}
-				else {
-
-					// rounded corners
-					GenerateRoundedRectanglePath( width, length, cornerRadius, transformation, out rectangleOriPointList );
-				}
+			if( cornerRadius <= DEFAULT_PRECISION_MIN_ERROR ) {
+				return GenerateSharpRectanglePath( width, length, transformation );
 			}
-			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"Error occurred while generating rectangle path: {ex.Message}", MyApp.NoticeType.Error );
-				return false;
+			else {
+				return GenerateRoundedRectanglePath( width, length, cornerRadius, transformation );
 			}
-			return true;
 		}
 
-		static bool DiscretizeRunway( gp_Ax3 refCoord, RunwayGeomData runwayData, out List<IOrientationPoint> runwayOriPointList )
+		public static List<CADPoint> DiscretizeRunway( double length, double width, gp_Trsf transformation )
 		{
-			runwayOriPointList = null;
-			if( refCoord == null || runwayData == null ) {
-				return false;
+			if( length <= 0 || width <= 0 || length < width ) {
+				return new List<CADPoint>();
 			}
 
-			double length = runwayData.Length;
-			double width = runwayData.Width;
-
-			// validate inputs
-			if( length <= 0 || width <= 0 ) {
-				return false;
-			}
-			if( length < width ) {
-				return false;
-			}
-
-			// create coordinate system transformation
-			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( refCoord );
-			try {
-				GenerateRunwayPath( length, width, transformation, out runwayOriPointList );
-			}
-			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"Error occurred while generating runway path: {ex.Message}", MyApp.NoticeType.Error );
-				return false;
-			}
-			return true;
+			return GenerateRunwayPath( length, width, transformation );
 		}
 
-		static bool DiscretizePolygon( gp_Ax3 refCoord, PolygonGeomData polygonData, out List<IOrientationPoint> polygonOriPointList )
+		public static List<CADPoint> DiscretizePolygon( int sides, double sideLength, double cornerRadius, gp_Trsf transformation )
 		{
-			polygonOriPointList = null;
-			if( refCoord == null || polygonData == null ) {
-				return false;
+			if( sides < 3 || sideLength <= 0 || cornerRadius < 0 ) {
+				return new List<CADPoint>();
 			}
 
-			int sides = polygonData.Sides;
-			double sideLength = polygonData.SideLength;
-			double cornerRadius = polygonData.CornerRadius;
-
-			// validate inputs
-			if( sides < 3 ) {
-				return false;
-			}
-			if( sideLength <= 0 ) {
-				return false;
-			}
-			if( cornerRadius < 0 ) {
-				return false;
-			}
-
-			// calculate circumradius (distance from center to vertex)
 			double circumradius = sideLength / ( 2.0 * Math.Sin( Math.PI / sides ) );
-
-			// limit corner radius to avoid overlap
 			double maxCornerRadius = CalculateMaxCornerRadius( sides, sideLength );
 			if( cornerRadius > maxCornerRadius ) {
 				cornerRadius = maxCornerRadius;
 			}
 
-			// create coordinate system transformation
-			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( refCoord );
-
-			// calculate angle offset based on polygon type
 			double angleOffset = GetPolygonAngleOffset( sides );
 
-			try {
-				if( cornerRadius <= DEFAULT_PRECISION_MIN_ERROR ) {
-
-					// sharp corners
-					GenerateSharpPolygonPath( sides, circumradius, angleOffset, transformation, out polygonOriPointList );
-				}
-				else {
-
-					// rounded corners
-					GenerateRoundedPolygonPath( sides, sideLength, cornerRadius, angleOffset, transformation, circumradius, out polygonOriPointList );
-				}
+			if( cornerRadius <= DEFAULT_PRECISION_MIN_ERROR ) {
+				return GenerateSharpPolygonPath( sides, circumradius, angleOffset, transformation );
 			}
-			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"Error occurred while generating polygon path: {ex.Message}", MyApp.NoticeType.Error );
-				return false;
+			else {
+				return GenerateRoundedPolygonPath( sides, sideLength, cornerRadius, angleOffset, transformation, circumradius );
 			}
-			return true;
 		}
 
-		static void GenerateCirclePath( double radius, gp_Trsf transformation, out List<IOrientationPoint> resultList )
+		#endregion
+
+		#region Circle Path Generation
+
+		static List<CADPoint> GenerateCirclePath( double radius, gp_Trsf transformation )
 		{
-			// Minimum segments to use for full-circle discretization
 			const int DEFAULT_MIN_CIRCLE_SEGMENTS = 8;
 
-			resultList = new List<IOrientationPoint>();
+			List<CADPoint> resultList = new List<CADPoint>();
 			gp_Dir toolVec = new gp_Dir( 0, 0, 1 );
 
-			// calculate number of segments based on max length
 			double circumference = 2.0 * Math.PI * radius;
 			int segmentsByLength = Math.Max( DEFAULT_MIN_CIRCLE_SEGMENTS, (int)Math.Ceiling( circumference / DEFAULT_PRECISION_MAX_LENGTH ) );
 
-			// calculate number of segments based on chord height (deflection)
-			// deflection = radius * (1 - cos(angleStep/2))
-			// solving for angleStep: angleStep = 2 * arccos(1 - deflection/radius)
 			int segmentsByDeflection = int.MaxValue;
 			if( radius > DISCRETE_MAX_DEFLECTION ) {
 				double cosValue = 1.0 - ( DISCRETE_MAX_DEFLECTION / radius );
 				if( cosValue >= -1.0 && cosValue <= 1.0 ) {
-					double angleStep = 2.0 * Math.Acos( cosValue );
-					segmentsByDeflection = Math.Max( DEFAULT_MIN_CIRCLE_SEGMENTS, (int)Math.Ceiling( 2.0 * Math.PI / angleStep ) );
+					double angleStep_rad = 2.0 * Math.Acos( cosValue );
+					segmentsByDeflection = Math.Max( DEFAULT_MIN_CIRCLE_SEGMENTS, (int)Math.Ceiling( 2.0 * Math.PI / angleStep_rad ) );
 				}
 			}
 
-			// use the more restrictive (larger) number of segments
 			int segments = Math.Max( segmentsByLength, segmentsByDeflection );
+			double startAngle_rad = 0.0;
 
-			// start angle: 0 (can be adjusted if CircleGeomData has rotation)
-			double startAngle = 0.0;
-
-			// generate points around the circle in clockwise direction
 			for( int i = 0; i < segments; i++ ) {
 				double t = (double)i / segments;
+				double angle_rad = startAngle_rad - t * 2.0 * Math.PI;
+				gp_Pnt circlePoint = new gp_Pnt( radius * Math.Cos( angle_rad ), radius * Math.Sin( angle_rad ), 0 );
 
-				// clockwise: use negative angle progression
-				double angle = startAngle - t * 2.0 * Math.PI;
-				gp_Pnt circlePoint = new gp_Pnt( radius * Math.Cos( angle ), radius * Math.Sin( angle ), 0 );
-
-				// tangent and normal directions
-				gp_Dir tangent = DiscreteUtility.GetClockwiseTangent( angle );
+				gp_Dir tangent = DiscreteUtility.GetClockwiseTangent( angle_rad );
 				gp_Dir normal = DiscreteUtility.GetRadialNormal( new gp_Pnt( 0, 0, 0 ), circlePoint, radius );
 
-				// create orientation point
-				resultList.Add( DiscreteUtility.CreateOrientationPoint( circlePoint, toolVec, normal, tangent, transformation ) );
+				resultList.Add( CreateCADPoint( circlePoint, toolVec, normal, tangent, transformation ) );
 			}
+
+			return resultList;
 		}
 
-		static void GenerateSharpRectanglePath( double width, double length, gp_Trsf transformation, out List<IOrientationPoint> resultList )
+		#endregion
+
+		#region Rectangle Path Generation
+
+		static List<CADPoint> GenerateSharpRectanglePath( double width, double length, gp_Trsf transformation )
 		{
-			resultList = new List<IOrientationPoint>();
+			List<CADPoint> resultList = new List<CADPoint>();
 			gp_Dir toolVec = new gp_Dir( 0, 0, 1 );
 			double halfWidth = width / 2.0;
 			double halfLength = length / 2.0;
 
-			// define rectangle vertices in clockwise order starting from top-right
-			// top-right, bottom-right, bottom-left, top-left
 			List<gp_Pnt> vertices = new List<gp_Pnt>
 			{
-				new gp_Pnt( halfLength, halfWidth, 0 ),    // top-right
-				new gp_Pnt( halfLength, -halfWidth, 0 ),   // bottom-right
-				new gp_Pnt( -halfLength, -halfWidth, 0 ),  // bottom-left
-				new gp_Pnt( -halfLength, halfWidth, 0 )    // top-left
+				new gp_Pnt( halfLength, halfWidth, 0 ),
+				new gp_Pnt( halfLength, -halfWidth, 0 ),
+				new gp_Pnt( -halfLength, -halfWidth, 0 ),
+				new gp_Pnt( -halfLength, halfWidth, 0 )
 			};
-
-			// close the rectangle
 			vertices.Add( vertices[ 0 ] );
 
-			// generate points along each edge
 			for( int i = 0; i < vertices.Count - 1; i++ ) {
 				AddStraightEdgePoints( resultList, vertices[ i ], vertices[ i + 1 ], toolVec, transformation );
 			}
+
+			return resultList;
 		}
 
-		static void GenerateRoundedRectanglePath( double width, double length, double cornerRadius, gp_Trsf transformation, out List<IOrientationPoint> resultList )
+		static List<CADPoint> GenerateRoundedRectanglePath( double width, double length, double cornerRadius, gp_Trsf transformation )
 		{
-			resultList = new List<IOrientationPoint>();
+			List<CADPoint> resultList = new List<CADPoint>();
 			gp_Dir toolVec = new gp_Dir( 0, 0, 1 );
 			double halfWidth = width / 2.0;
 			double halfLength = length / 2.0;
 
-			// check if corner radius is valid
 			if( cornerRadius * 2 > width || cornerRadius * 2 > length ) {
-				// fallback to sharp corners
-				GenerateSharpRectanglePath( width, length, transformation, out resultList );
-				return;
+				return GenerateSharpRectanglePath( width, length, transformation );
 			}
 
-			// calculate edge start/end points after corner filleting
-			// for each corner, we need two points: where the straight edges end/start
-
-			// top edge: from (halfLength - cornerRadius, halfWidth) to (-halfLength + cornerRadius, halfWidth)
 			gp_Pnt topEdgeStart = new gp_Pnt( halfLength - cornerRadius, halfWidth, 0 );
 			gp_Pnt topEdgeEnd = new gp_Pnt( -halfLength + cornerRadius, halfWidth, 0 );
-
-			// right edge: from (halfLength, halfWidth - cornerRadius) to (halfLength, -halfWidth + cornerRadius)
 			gp_Pnt rightEdgeStart = new gp_Pnt( halfLength, halfWidth - cornerRadius, 0 );
 			gp_Pnt rightEdgeEnd = new gp_Pnt( halfLength, -halfWidth + cornerRadius, 0 );
-
-			// bottom edge: from (-halfLength + cornerRadius, -halfWidth) to (halfLength - cornerRadius, -halfWidth)
 			gp_Pnt bottomEdgeStart = new gp_Pnt( -halfLength + cornerRadius, -halfWidth, 0 );
 			gp_Pnt bottomEdgeEnd = new gp_Pnt( halfLength - cornerRadius, -halfWidth, 0 );
-
-			// left edge: from (-halfLength, -halfWidth + cornerRadius) to (-halfLength, halfWidth - cornerRadius)
 			gp_Pnt leftEdgeStart = new gp_Pnt( -halfLength, -halfWidth + cornerRadius, 0 );
 			gp_Pnt leftEdgeEnd = new gp_Pnt( -halfLength, halfWidth - cornerRadius, 0 );
 
-			// corner centers
 			gp_Pnt topRightCorner = new gp_Pnt( halfLength - cornerRadius, halfWidth - cornerRadius, 0 );
 			gp_Pnt bottomRightCorner = new gp_Pnt( halfLength - cornerRadius, -halfWidth + cornerRadius, 0 );
 			gp_Pnt bottomLeftCorner = new gp_Pnt( -halfLength + cornerRadius, -halfWidth + cornerRadius, 0 );
 			gp_Pnt topLeftCorner = new gp_Pnt( -halfLength + cornerRadius, halfWidth - cornerRadius, 0 );
 
-			// generate path: straight edge + corner arc, repeated for all 4 sides
-			// clockwise order: right edge, bottom-right corner, bottom edge, bottom-left corner, left edge, top-left corner, top edge, top-right corner
-
-			// 1. Right edge (top to bottom)
 			AddStraightEdgePoints( resultList, rightEdgeStart, rightEdgeEnd, toolVec, transformation );
-
-			// 2. Bottom-right corner (90 degrees, clockwise)
 			AddRectangleCornerArc( resultList, rightEdgeEnd, bottomEdgeEnd, bottomRightCorner, cornerRadius, toolVec, transformation );
-
-			// 3. Bottom edge (right to left)
 			AddStraightEdgePoints( resultList, bottomEdgeEnd, bottomEdgeStart, toolVec, transformation );
-
-			// 4. Bottom-left corner (90 degrees, clockwise)
 			AddRectangleCornerArc( resultList, bottomEdgeStart, leftEdgeStart, bottomLeftCorner, cornerRadius, toolVec, transformation );
-
-			// 5. Left edge (bottom to top)
 			AddStraightEdgePoints( resultList, leftEdgeStart, leftEdgeEnd, toolVec, transformation );
-
-			// 6. Top-left corner (90 degrees, clockwise)
 			AddRectangleCornerArc( resultList, leftEdgeEnd, topEdgeEnd, topLeftCorner, cornerRadius, toolVec, transformation );
-
-			// 7. Top edge (left to right)
 			AddStraightEdgePoints( resultList, topEdgeEnd, topEdgeStart, toolVec, transformation );
-
-			// 8. Top-right corner (90 degrees, clockwise)
 			AddRectangleCornerArc( resultList, topEdgeStart, rightEdgeStart, topRightCorner, cornerRadius, toolVec, transformation );
+
+			return resultList;
 		}
 
-		static void AddRectangleCornerArc( List<IOrientationPoint> resultList, gp_Pnt tangentPoint1, gp_Pnt tangentPoint2, gp_Pnt cornerCenter, double radius,
-			gp_Dir toolVec, gp_Trsf transformation )
+		static void AddRectangleCornerArc( List<CADPoint> resultList, gp_Pnt beginPoint, gp_Pnt endPoint, gp_Pnt cornerCenter, double radius, gp_Dir toolVec, gp_Trsf transformation )
 		{
-			// calculate start and end angles
-			double startAngle = Math.Atan2( tangentPoint1.Y() - cornerCenter.Y(), tangentPoint1.X() - cornerCenter.X() );
-			double endAngle = Math.Atan2( tangentPoint2.Y() - cornerCenter.Y(), tangentPoint2.X() - cornerCenter.X() );
+			double startAngle_rad = Math.Atan2( beginPoint.Y() - cornerCenter.Y(), beginPoint.X() - cornerCenter.X() );
+			double endAngle_rad = Math.Atan2( endPoint.Y() - cornerCenter.Y(), endPoint.X() - cornerCenter.X() );
+			double angleDiff = DiscreteUtility.GetClockwiseAngleDiff( startAngle_rad, endAngle_rad );
 
-			// ensure clockwise direction (negative angle difference)
-			double angleDiff = DiscreteUtility.GetClockwiseAngleDiff( startAngle, endAngle );
-
-			// calculate number of segments based on arc length
 			double arcLength = Math.Abs( angleDiff ) * radius;
 			int segmentsByLength = Math.Max( 1, (int)Math.Ceiling( arcLength / DEFAULT_PRECISION_MAX_LENGTH ) );
 
-			// calculate number of segments based on chord height (deflection)
 			int segmentsByDeflection = int.MaxValue;
 			if( radius > DISCRETE_MAX_DEFLECTION ) {
 				double cosValue = 1.0 - ( DISCRETE_MAX_DEFLECTION / radius );
@@ -355,69 +191,154 @@ namespace MyCAM.Helper
 				}
 			}
 
-			// use the more restrictive (larger) number of segments
 			int segments = Math.Max( segmentsByLength, segmentsByDeflection );
 
 			for( int j = 0; j < segments; j++ ) {
 				double t = (double)j / segments;
-				double angle = startAngle + t * angleDiff;
+				double angle_rad = startAngle_rad + t * angleDiff;
 
 				gp_Pnt arcPoint = new gp_Pnt(
-					cornerCenter.X() + radius * Math.Cos( angle ),
-					cornerCenter.Y() + radius * Math.Sin( angle ),
+					cornerCenter.X() + radius * Math.Cos( angle_rad ),
+					cornerCenter.Y() + radius * Math.Sin( angle_rad ),
 					0
 				);
 
-				// tangent and normal directions
-				gp_Dir arcTangent = DiscreteUtility.GetClockwiseTangent( angle );
+				gp_Dir arcTangent = DiscreteUtility.GetClockwiseTangent( angle_rad );
 				gp_Dir arcNormal = DiscreteUtility.GetRadialNormal( cornerCenter, arcPoint, radius );
 
-				// create orientation point
-				resultList.Add( DiscreteUtility.CreateOrientationPoint( arcPoint, toolVec, arcNormal, arcTangent, transformation ) );
+				resultList.Add( CreateCADPoint( arcPoint, toolVec, arcNormal, arcTangent, transformation ) );
 			}
 		}
 
-		static void GenerateRoundedPolygonPath( int sides, double sideLength, double cornerRadius, double angleOffset, gp_Trsf transformation, double circumradius, out List<IOrientationPoint> resultList )
+		#endregion
+
+		#region Runway Path Generation
+
+		static List<CADPoint> GenerateRunwayPath( double length, double width, gp_Trsf transformation )
 		{
-			resultList = new List<IOrientationPoint>();
+			List<CADPoint> resultList = new List<CADPoint>();
 			gp_Dir toolVec = new gp_Dir( 0, 0, 1 );
-			double angleStep = 2.0 * Math.PI / sides;
+			double radius = width / 2.0;
+			double straightLength = length - width;
+			double halfStraight = straightLength / 2.0;
 
-			// calculate interior angle and tangent distance
-			double interiorAngle = ( sides - 2 ) * Math.PI / sides;
-			double halfAngle = interiorAngle / 2.0;
-			double tanHalfAngle = Math.Tan( halfAngle );
-			double sinHalfAngle = Math.Sin( halfAngle );
+			gp_Pnt rightSemicircleCenter = new gp_Pnt( halfStraight, 0, 0 );
+			gp_Pnt leftSemicircleCenter = new gp_Pnt( -halfStraight, 0, 0 );
 
-			if( tanHalfAngle < DEFAULT_PRECISION_MIN_ERROR || sinHalfAngle < DEFAULT_PRECISION_MIN_ERROR ) {
-				// fallback to sharp polygon
-				GenerateSharpPolygonPath( sides, circumradius, angleOffset, transformation, out resultList );
-				return;
+			AddSemicircle( resultList, rightSemicircleCenter, radius, Math.PI / 2.0, -Math.PI / 2.0, toolVec, transformation );
+
+			gp_Pnt bottomStart = new gp_Pnt( halfStraight, -radius, 0 );
+			gp_Pnt bottomEnd = new gp_Pnt( -halfStraight, -radius, 0 );
+			AddStraightEdgePoints( resultList, bottomStart, bottomEnd, toolVec, transformation );
+
+			AddSemicircle( resultList, leftSemicircleCenter, radius, -Math.PI / 2.0, Math.PI / 2.0, toolVec, transformation );
+
+			gp_Pnt topStart = new gp_Pnt( -halfStraight, radius, 0 );
+			gp_Pnt topEnd = new gp_Pnt( halfStraight, radius, 0 );
+			AddStraightEdgePoints( resultList, topStart, topEnd, toolVec, transformation );
+
+			return resultList;
+		}
+
+		static void AddSemicircle( List<CADPoint> resultList, gp_Pnt center, double radius, double startAngle_rad, double endAngle_rad, gp_Dir toolVec, gp_Trsf transformation )
+		{
+			double angleDiff = DiscreteUtility.GetClockwiseAngleDiff( startAngle_rad, endAngle_rad );
+
+			double arcLength = Math.Abs( angleDiff ) * radius;
+			int segmentsByLength = Math.Max( 1, (int)Math.Ceiling( arcLength / DEFAULT_PRECISION_MAX_LENGTH ) );
+
+			int segmentsByDeflection = int.MaxValue;
+			if( radius > DISCRETE_MAX_DEFLECTION ) {
+				double cosValue = 1.0 - ( DISCRETE_MAX_DEFLECTION / radius );
+				if( cosValue >= -1.0 && cosValue <= 1.0 ) {
+					double angleStepForDeflection = 2.0 * Math.Acos( cosValue );
+					segmentsByDeflection = Math.Max( 1, (int)Math.Ceiling( Math.Abs( angleDiff ) / angleStepForDeflection ) );
+				}
 			}
 
-			// calculate tangent point distance and center distance
-			double tangentDistance = cornerRadius / tanHalfAngle;
-			double centerDistance = cornerRadius / sinHalfAngle;
+			int segments = Math.Max( segmentsByLength, segmentsByDeflection );
 
-			// generate vertices in clockwise order
+			for( int j = 0; j < segments; j++ ) {
+				double t = (double)j / segments;
+				double angle_rad = startAngle_rad + t * angleDiff;
+
+				gp_Pnt arcPoint = new gp_Pnt(
+					center.X() + radius * Math.Cos( angle_rad ),
+					center.Y() + radius * Math.Sin( angle_rad ),
+					0
+				);
+
+				gp_Dir arcTangent = DiscreteUtility.GetClockwiseTangent( angle_rad );
+				gp_Dir arcNormal = DiscreteUtility.GetRadialNormal( center, arcPoint, radius );
+
+				resultList.Add( CreateCADPoint( arcPoint, toolVec, arcNormal, arcTangent, transformation ) );
+			}
+		}
+
+		#endregion
+
+		#region Polygon Path Generation
+
+		static List<CADPoint> GenerateSharpPolygonPath( int sides, double circumradius, double angleOffset, gp_Trsf transformation )
+		{
+			List<CADPoint> resultList = new List<CADPoint>();
+			gp_Dir toolVec = new gp_Dir( 0, 0, 1 );
+			double angleStep_rad = 2.0 * Math.PI / sides;
+
+			List<gp_Pnt> vertices = new List<gp_Pnt>();
+
+			for( int i = 0; i < sides; i++ ) {
+				double angle_rad = angleOffset - i * angleStep_rad;
+				gp_Pnt vertex = new gp_Pnt(
+					circumradius * Math.Cos( angle_rad ),
+					circumradius * Math.Sin( angle_rad ),
+					0
+				);
+				vertices.Add( vertex );
+			}
+
+			vertices.Add( vertices[ 0 ] );
+
+			for( int i = 0; i < vertices.Count - 1; i++ ) {
+				AddStraightEdgePoints( resultList, vertices[ i ], vertices[ i + 1 ], toolVec, transformation );
+			}
+
+			return resultList;
+		}
+
+		static List<CADPoint> GenerateRoundedPolygonPath( int sides, double sideLength, double cornerRadius, double angleOffset, gp_Trsf transformation, double circumradius )
+		{
+			List<CADPoint> resultList = new List<CADPoint>();
+			gp_Dir toolVec = new gp_Dir( 0, 0, 1 );
+			double angleStep_rad = 2.0 * Math.PI / sides;
+
+			double interiorAngle_rad = ( sides - 2 ) * Math.PI / sides;
+			double halfAngle_rad = interiorAngle_rad / 2.0;
+			double tanHalfAngle_rad = Math.Tan( halfAngle_rad );
+			double sinHalfAngle_rad = Math.Sin( halfAngle_rad );
+
+			if( tanHalfAngle_rad < DEFAULT_PRECISION_MIN_ERROR || sinHalfAngle_rad < DEFAULT_PRECISION_MIN_ERROR ) {
+				return GenerateSharpPolygonPath( sides, circumradius, angleOffset, transformation );
+			}
+
+			double tangentDistance = cornerRadius / tanHalfAngle_rad;
+			double centerDistance = cornerRadius / sinHalfAngle_rad;
+
 			List<gp_Pnt> vertices = new List<gp_Pnt>();
 			for( int i = 0; i < sides; i++ ) {
-				double angle = angleOffset - i * angleStep;
+				double angle_rad = angleOffset - i * angleStep_rad;
 				vertices.Add( new gp_Pnt(
-					circumradius * Math.Cos( angle ),
-					circumradius * Math.Sin( angle ),
+					circumradius * Math.Cos( angle_rad ),
+					circumradius * Math.Sin( angle_rad ),
 					0
 				) );
 			}
 
-			// check if edge length is sufficient for the corner radius
 			double edgeLength = vertices[ 0 ].Distance( vertices[ 1 ] );
 			if( tangentDistance * 2 > edgeLength ) {
-				GenerateSharpPolygonPath( sides, circumradius, angleOffset, transformation, out resultList );
-				return;
+				return GenerateSharpPolygonPath( sides, circumradius, angleOffset, transformation );
 			}
 
-			// calculate edge start/end points after corner filleting
 			List<gp_Pnt> edgeStarts = new List<gp_Pnt>();
 			List<gp_Pnt> edgeEnds = new List<gp_Pnt>();
 
@@ -427,8 +348,7 @@ namespace MyCAM.Helper
 
 				gp_Vec edgeVec = new gp_Vec( currentVertex, nextVertex );
 				if( edgeVec.Magnitude() <= DEFAULT_PRECISION_MIN_ERROR ) {
-					GenerateSharpPolygonPath( sides, circumradius, angleOffset, transformation, out resultList );
-					return;
+					return GenerateSharpPolygonPath( sides, circumradius, angleOffset, transformation );
 				}
 
 				edgeVec.Normalize();
@@ -448,64 +368,58 @@ namespace MyCAM.Helper
 				edgeEnds.Add( edgeEnd );
 
 				if( edgeStart.Distance( edgeEnd ) <= DEFAULT_PRECISION_MIN_ERROR ) {
-					GenerateSharpPolygonPath( sides, circumradius, angleOffset, transformation, out resultList );
-					return;
+					return GenerateSharpPolygonPath( sides, circumradius, angleOffset, transformation );
 				}
 			}
 
-			// generate path segments alternating between straight lines and arcs
 			for( int i = 0; i < sides; i++ ) {
-				// straight line segment
 				AddStraightEdgePoints( resultList, edgeStarts[ i ], edgeEnds[ i ], toolVec, transformation );
 
-				// corner arc
 				int nextVertexIndex = ( i + 1 ) % sides;
 				AddCornerArc( resultList, edgeEnds[ i ], edgeStarts[ nextVertexIndex ], vertices[ nextVertexIndex ],
 					cornerRadius, centerDistance, toolVec, transformation );
 			}
+
+			return resultList;
 		}
 
-		static void GenerateRunwayPath( double length, double width, gp_Trsf transformation, out List<IOrientationPoint> resultList )
+		static void AddCornerArc( List<CADPoint> resultList, gp_Pnt beginPoint, gp_Pnt endPoint, gp_Pnt vertex, double radius, double centerDistance, gp_Dir toolVec, gp_Trsf transformation )
 		{
-			resultList = new List<IOrientationPoint>();
-			gp_Dir toolVec = new gp_Dir( 0, 0, 1 );
-			double radius = width / 2.0;
-			double straightLength = length - width; // total length minus the two semicircles
-			double halfStraight = straightLength / 2.0;
+			gp_Vec vec1 = new gp_Vec( vertex, beginPoint );
+			gp_Vec vec2 = new gp_Vec( vertex, endPoint );
 
-			// Starting point: top of right semicircle (halfStraight, radius)
-			gp_Pnt rightSemicircleCenter = new gp_Pnt( halfStraight, 0, 0 );
-			gp_Pnt leftSemicircleCenter = new gp_Pnt( -halfStraight, 0, 0 );
+			if( vec1.Magnitude() < DEFAULT_PRECISION_MIN_ERROR || vec2.Magnitude() < DEFAULT_PRECISION_MIN_ERROR ) {
+				return;
+			}
 
-			// 1. Right semicircle (from top to bottom, clockwise: 90¢X to -90¢X)
-			AddSemicircle( resultList, rightSemicircleCenter, radius, Math.PI / 2.0, -Math.PI / 2.0,
-				toolVec, transformation );
+			vec1.Normalize();
+			vec2.Normalize();
 
-			// 2. Bottom edge (from right to left)
-			gp_Pnt bottomStart = new gp_Pnt( halfStraight, -radius, 0 );
-			gp_Pnt bottomEnd = new gp_Pnt( -halfStraight, -radius, 0 );
-			AddStraightEdgePoints( resultList, bottomStart, bottomEnd, toolVec, transformation );
+			gp_Vec bisector = vec1.Added( vec2 );
+			if( bisector.Magnitude() < DEFAULT_PRECISION_MIN_ERROR ) {
+				return;
+			}
+			bisector.Normalize();
 
-			// 3. Left semicircle (from bottom to top, clockwise: -90¢X to 90¢X)
-			AddSemicircle( resultList, leftSemicircleCenter, radius, -Math.PI / 2.0, Math.PI / 2.0,
-				toolVec, transformation );
+			gp_Pnt arcCenter = new gp_Pnt(
+				vertex.X() + bisector.X() * centerDistance,
+				vertex.Y() + bisector.Y() * centerDistance,
+				vertex.Z()
+			);
 
-			// 4. Top edge (from left to right)
-			gp_Pnt topStart = new gp_Pnt( -halfStraight, radius, 0 );
-			gp_Pnt topEnd = new gp_Pnt( halfStraight, radius, 0 );
-			AddStraightEdgePoints( resultList, topStart, topEnd, toolVec, transformation );
-		}
+			double dist1 = arcCenter.Distance( beginPoint );
+			double dist2 = arcCenter.Distance( endPoint );
+			if( Math.Abs( dist1 - radius ) > DEFAULT_PRECISION_MIN_ERROR || Math.Abs( dist2 - radius ) > DEFAULT_PRECISION_MIN_ERROR ) {
+				return;
+			}
 
-		static void AddSemicircle( List<IOrientationPoint> resultList, gp_Pnt center, double radius, double startAngle, double endAngle, gp_Dir toolVec, gp_Trsf transformation )
-		{
-			// ensure clockwise direction
-			double angleDiff = DiscreteUtility.GetClockwiseAngleDiff( startAngle, endAngle );
+			double startAngle_rad = Math.Atan2( beginPoint.Y() - arcCenter.Y(), beginPoint.X() - arcCenter.X() );
+			double endAngle_rad = Math.Atan2( endPoint.Y() - arcCenter.Y(), endPoint.X() - arcCenter.X() );
+			double angleDiff = DiscreteUtility.GetClockwiseAngleDiff( startAngle_rad, endAngle_rad );
 
-			// calculate number of segments based on arc length
 			double arcLength = Math.Abs( angleDiff ) * radius;
 			int segmentsByLength = Math.Max( 1, (int)Math.Ceiling( arcLength / DEFAULT_PRECISION_MAX_LENGTH ) );
 
-			// calculate number of segments based on chord height (deflection)
 			int segmentsByDeflection = int.MaxValue;
 			if( radius > DISCRETE_MAX_DEFLECTION ) {
 				double cosValue = 1.0 - ( DISCRETE_MAX_DEFLECTION / radius );
@@ -515,29 +429,30 @@ namespace MyCAM.Helper
 				}
 			}
 
-			// use the more restrictive (larger) number of segments
 			int segments = Math.Max( segmentsByLength, segmentsByDeflection );
 
 			for( int j = 0; j < segments; j++ ) {
 				double t = (double)j / segments;
-				double angle = startAngle + t * angleDiff;
+				double angle_rad = startAngle_rad + t * angleDiff;
 
 				gp_Pnt arcPoint = new gp_Pnt(
-					center.X() + radius * Math.Cos( angle ),
-					center.Y() + radius * Math.Sin( angle ),
+					arcCenter.X() + radius * Math.Cos( angle_rad ),
+					arcCenter.Y() + radius * Math.Sin( angle_rad ),
 					0
 				);
 
-				// tangent and normal directions
-				gp_Dir arcTangent = DiscreteUtility.GetClockwiseTangent( angle );
-				gp_Dir arcNormal = DiscreteUtility.GetRadialNormal( center, arcPoint, radius );
+				gp_Dir arcTangent = DiscreteUtility.GetClockwiseTangent( angle_rad );
+				gp_Dir arcNormal = DiscreteUtility.GetRadialNormal( arcCenter, arcPoint, radius );
 
-				// create orientation point
-				resultList.Add( DiscreteUtility.CreateOrientationPoint( arcPoint, toolVec, arcNormal, arcTangent, transformation ) );
+				resultList.Add( CreateCADPoint( arcPoint, toolVec, arcNormal, arcTangent, transformation ) );
 			}
 		}
 
-		static void AddStraightEdgePoints( List<IOrientationPoint> resultList, gp_Pnt startPnt, gp_Pnt endPnt, gp_Dir toolVec, gp_Trsf transformation )
+		#endregion
+
+		#region Common Helper Methods
+
+		static void AddStraightEdgePoints( List<CADPoint> resultList, gp_Pnt startPnt, gp_Pnt endPnt, gp_Dir toolVec, gp_Trsf transformation )
 		{
 			gp_Vec edgeVec = new gp_Vec( startPnt, endPnt );
 			double edgeLength = edgeVec.Magnitude();
@@ -560,129 +475,34 @@ namespace MyCAM.Helper
 					0
 				);
 
-				// create orientation point
-				resultList.Add( DiscreteUtility.CreateOrientationPoint( edgePoint, toolVec, normal, tangent, transformation ) );
+				resultList.Add( CreateCADPoint( edgePoint, toolVec, normal, tangent, transformation ) );
 			}
 		}
 
-		static void AddCornerArc( List<IOrientationPoint> resultList, gp_Pnt tangentPoint1, gp_Pnt tangentPoint2, gp_Pnt vertex, double radius, double centerDistance, gp_Dir toolVec, gp_Trsf transformation )
+		static CADPoint CreateCADPoint( gp_Pnt localPoint, gp_Dir localToolVec, gp_Dir localNormal, gp_Dir localTangent, gp_Trsf transformation )
 		{
-			gp_Vec vec1 = new gp_Vec( vertex, tangentPoint1 );
-			gp_Vec vec2 = new gp_Vec( vertex, tangentPoint2 );
-
-			if( vec1.Magnitude() < DEFAULT_PRECISION_MIN_ERROR || vec2.Magnitude() < DEFAULT_PRECISION_MIN_ERROR ) {
-				return;
-			}
-
-			vec1.Normalize();
-			vec2.Normalize();
-
-			gp_Vec bisector = vec1.Added( vec2 );
-			if( bisector.Magnitude() < DEFAULT_PRECISION_MIN_ERROR ) {
-				return;
-			}
-			bisector.Normalize();
-
-			gp_Pnt arcCenter = new gp_Pnt(
-				vertex.X() + bisector.X() * centerDistance,
-				vertex.Y() + bisector.Y() * centerDistance,
-				vertex.Z()
+			return new CADPoint(
+				localPoint.Transformed( transformation ),
+				localToolVec.Transformed( transformation ),
+				localNormal.Transformed( transformation ),
+				localTangent.Transformed( transformation )
 			);
-
-			// verify arc center
-			double dist1 = arcCenter.Distance( tangentPoint1 );
-			double dist2 = arcCenter.Distance( tangentPoint2 );
-			if( Math.Abs( dist1 - radius ) > DEFAULT_PRECISION_MIN_ERROR || Math.Abs( dist2 - radius ) > DEFAULT_PRECISION_MIN_ERROR ) {
-				return;
-			}
-
-			double startAngle = Math.Atan2( tangentPoint1.Y() - arcCenter.Y(), tangentPoint1.X() - arcCenter.X() );
-			double endAngle = Math.Atan2( tangentPoint2.Y() - arcCenter.Y(), tangentPoint2.X() - arcCenter.X() );
-
-			// ensure clockwise direction (negative angle difference)
-			double angleDiff = DiscreteUtility.GetClockwiseAngleDiff( startAngle, endAngle );
-
-			// calculate number of segments based on arc length
-			double arcLength = Math.Abs( angleDiff ) * radius;
-			int segmentsByLength = Math.Max( 1, (int)Math.Ceiling( arcLength / DEFAULT_PRECISION_MAX_LENGTH ) );
-
-			// calculate number of segments based on chord height (deflection)
-			int segmentsByDeflection = int.MaxValue;
-			if( radius > DISCRETE_MAX_DEFLECTION ) {
-				double cosValue = 1.0 - ( DISCRETE_MAX_DEFLECTION / radius );
-				if( cosValue >= -1.0 && cosValue <= 1.0 ) {
-					double angleStepForDeflection = 2.0 * Math.Acos( cosValue );
-					segmentsByDeflection = Math.Max( 1, (int)Math.Ceiling( Math.Abs( angleDiff ) / angleStepForDeflection ) );
-				}
-			}
-
-			// use the more restrictive (larger) number of segments
-			int segments = Math.Max( segmentsByLength, segmentsByDeflection );
-
-			for( int j = 0; j < segments; j++ ) {
-				double t = (double)j / segments;
-				double angle = startAngle + t * angleDiff;
-
-				gp_Pnt arcPoint = new gp_Pnt(
-					arcCenter.X() + radius * Math.Cos( angle ),
-					arcCenter.Y() + radius * Math.Sin( angle ),
-					0
-				);
-
-				// tangent and normal directions
-				gp_Dir arcTangent = DiscreteUtility.GetClockwiseTangent( angle );
-				gp_Dir arcNormal = DiscreteUtility.GetRadialNormal( arcCenter, arcPoint, radius );
-
-				// create orientation point
-				resultList.Add( DiscreteUtility.CreateOrientationPoint( arcPoint, toolVec, arcNormal, arcTangent, transformation ) );
-			}
 		}
-
-		static void GenerateSharpPolygonPath( int sides, double circumradius, double angleOffset, gp_Trsf transformation, out List<IOrientationPoint> resultList )
-		{
-			resultList = new List<IOrientationPoint>();
-			gp_Dir toolVec = new gp_Dir( 0, 0, 1 );
-			double angleStep = 2.0 * Math.PI / sides;
-
-			// generate polygon vertices in clockwise order
-			List<gp_Pnt> vertices = new List<gp_Pnt>();
-
-			for( int i = 0; i < sides; i++ ) {
-				// clockwise: reverse the angle direction
-				double angle = angleOffset - i * angleStep;
-				gp_Pnt vertex = new gp_Pnt(
-					circumradius * Math.Cos( angle ),
-					circumradius * Math.Sin( angle ),
-					0
-				);
-				vertices.Add( vertex );
-			}
-
-			// close the polygon
-			vertices.Add( vertices[ 0 ] );
-
-			// generate points along each edge
-			for( int i = 0; i < vertices.Count - 1; i++ ) {
-				AddStraightEdgePoints( resultList, vertices[ i ], vertices[ i + 1 ], toolVec, transformation );
-			}
-		}
-
-		#region Helper Methods
 
 		static double CalculateMaxCornerRadius( int sides, double sideLength )
 		{
-			double interiorAngle = ( sides - 2 ) * Math.PI / sides;
-			double halfAngle = interiorAngle / 2.0;
-			double tanHalfAngle = Math.Tan( halfAngle );
+			double interiorAngle_rad = ( sides - 2 ) * Math.PI / sides;
+			double halfAngle_rad = interiorAngle_rad / 2.0;
+			double tanHalfAngle_rad = Math.Tan( halfAngle_rad );
 
-			if( tanHalfAngle < DEFAULT_PRECISION_MIN_ERROR ) {
+			if( tanHalfAngle_rad < DEFAULT_PRECISION_MIN_ERROR ) {
 				return 0;
 			}
 
 			double maxTangentDistance = sideLength / 2.0;
-			double maxRadius = maxTangentDistance * tanHalfAngle;
+			double maxRadius = maxTangentDistance * tanHalfAngle_rad;
 
-			return maxRadius * 0.9; // 90% safety margin
+			return maxRadius * 0.9;
 		}
 
 		static double GetPolygonAngleOffset( int sides )
@@ -703,7 +523,6 @@ namespace MyCAM.Helper
 
 		#endregion
 
-		// Default precision values
 		const double DEFAULT_PRECISION_MIN_ERROR = 0.001;
 		const double DISCRETE_MAX_DEFLECTION = 0.01;
 		const double DEFAULT_PRECISION_MAX_LENGTH = 1.0;

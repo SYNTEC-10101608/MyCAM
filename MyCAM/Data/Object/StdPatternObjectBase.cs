@@ -80,7 +80,7 @@ namespace MyCAM.Data
 			gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( m_ContourPathObject.GeomData.RefCenterDir, m_GeomData.IsCoordinateReversed, m_GeomData.RotatedAngle_deg );
 
 			// factory automatically determines the correct Cache type based on GeomData type
-			m_StdPatternCache = (StdPatternCacheBase)PathCacheFactory.CreateStdPatternCache( refCoord, m_GeomData, m_CraftData );
+			m_StdPatternCache = (StdPatternCacheBase)PathCacheFactory.CreateStdPatternCache( m_GeomData, m_CraftData );
 		}
 
 		protected IStdPatternGeomData m_GeomData;

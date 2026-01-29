@@ -1,9 +1,12 @@
-﻿namespace MyCAM.Data
+﻿using OCC.gp;
+
+namespace MyCAM.Data
 {
 	public class RectangleGeomData : StdPatternGeomDataBase
 	{
-		public RectangleGeomData( double width, double height, double cornerRadius, double rotatedAngle_deg, bool isCoordinateReversed )
+		public RectangleGeomData( gp_Ax3 refCoordinate, double width, double height, double cornerRadius, double rotatedAngle_deg, bool isCoordinateReversed )
 		{
+			m_RefCoord = refCoordinate;
 			m_Width = width;
 			m_Length = height;
 			m_CornerRadius = cornerRadius;
@@ -60,13 +63,16 @@
 			}
 			set
 			{
-				m_CornerRadius = value;
+				if( m_CornerRadius != value ) {
+					m_CornerRadius = value;
+					//ParameterChanged.Invoke();
+				}
 			}
 		}
 
 		public override IGeomData Clone()
 		{
-			return new RectangleGeomData( m_Width, m_Length, m_CornerRadius, m_RotatedAngle_deg, m_IsCoordinateReversed );
+			return new RectangleGeomData( m_RefCoord, m_Width, m_Length, m_CornerRadius, m_RotatedAngle_deg, m_IsCoordinateReversed );
 		}
 
 		public const double DEFAULT_CORNER_RADIUS = 5.0;

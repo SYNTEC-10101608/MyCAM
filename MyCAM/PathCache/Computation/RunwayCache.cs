@@ -1,5 +1,6 @@
 ﻿using MyCAM.Data;
 using MyCAM.Helper;
+using MyCAM.Helper.CAM;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
@@ -9,41 +10,62 @@ namespace MyCAM.PathCache
 {
 	public class RunwayCache : StdPatternCacheBase
 	{
-		public RunwayCache( gp_Ax3 refCoord, IStdPatternGeomData geomData, CraftData craftData )
-			: base( refCoord, craftData )
+		public RunwayCache( IStdPatternGeomData geomData, CraftData craftData )
+			: base( craftData )
 		{
 			if( geomData == null || !( geomData is RunwayGeomData runwayGeomData ) ) {
 				throw new ArgumentNullException( "RunwayCache constructing argument error - invalid geomData" );
 			}
 			m_RunwayGeomData = runwayGeomData;
-			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( refCoord, runwayGeomData );
+			BuildCADPointList();
 			BuildCAMPointList();
+		}
+
+		protected override void BuildCADPointList()
+		{
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RunwayGeomData );
+			m_MainPathCADPointList = Discretize();
 		}
 
 		protected override void BuildCAMPointList()
 		{
 			ClearCraftDataDirty();
+
+			// set reference point (for runway, it's the left arc center)
 			m_RefPoint = RunwayRefPoint();
 
-			// build initial CAM point list
-			m_StartCAMPointList = new List<CAMPoint>();
-			for( int i = 0; i < m_StartCADPointList.Count; i++ ) {
-				CADPoint cadPoint = m_StartCADPointList[ i ];
-				CAMPoint camPoint = new CAMPoint( cadPoint );
-				m_StartCAMPointList.Add( camPoint );
-			}
-			SetStartPoint();
+			SetMainPathCAMPoint();
+			SetStartPointList();
+
+			// calculate max over cut length
 			m_MaxOverCutLength = OverCutHelper.GetMaxOverCutLength( m_RunwayGeomData, m_CraftData.StartPointIndex );
 
-			// set over cut
-			List<IOrientationPoint> camPointOverCutList = m_StartCAMPointList.Cast<IOrientationPoint>().ToList();
-			OverCutHelper.SetStdPatternOverCut( m_RefCoord, m_RunwayGeomData, camPointOverCutList, m_CraftData.OverCutLength, out List<IOrientationPoint> overCutPointList );
+			// set over cut using unified method
+			List<IOrientationPoint> mainPathOriPointList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
+			OverCutHelper.SetOverCut( mainPathOriPointList, out List<IOrientationPoint> overCutPointList, m_CraftData.OverCutLength, isClosed: true );
 			m_OverCutCAMPointList = overCutPointList.Cast<CAMPoint>().ToList();
 
 			// set lead
 			List<IOrientationPoint> mainPointList = m_StartCAMPointList.Cast<IOrientationPoint>().ToList();
 			LeadHelper.SetLeadIn( mainPointList, out List<IOrientationPoint> leadInPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
 			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
+		}
+
+		protected override List<CADPoint> Discretize()
+		{
+			if( m_RunwayGeomData == null || m_RunwayGeomData.RefCoord == null ) {
+				return new List<CADPoint>();
+			}
+
+			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_RunwayGeomData.RefCoord );
+			List<CADPoint> discretizedPoints = StdPatternDiscreteFactory.DiscretizeRunway( m_RunwayGeomData.Length, m_RunwayGeomData.Width, transformation );
+
+			// ensure all start points are included in the discretized list
+			if( m_StartCADPointList != null && m_StartCADPointList.Count > 0 ) {
+				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( discretizedPoints, m_StartCADPointList, m_RunwayGeomData );
+			}
+
+			return discretizedPoints;
 		}
 
 		CAMPoint RunwayRefPoint()
@@ -70,9 +92,9 @@ namespace MyCAM.PathCache
 
 			// transform local coordinates to world coordinate system
 			gp_Ax3 targetCoordSystem = new gp_Ax3(
-				m_RefCoord.Location(),
-				m_RefCoord.Direction(),
-				m_RefCoord.XDirection()
+				m_RunwayGeomData.RefCoord.Location(),
+				m_RunwayGeomData.RefCoord.Direction(),
+				m_RunwayGeomData.RefCoord.XDirection()
 			);
 			gp_Trsf transformation = new gp_Trsf();
 			transformation.SetTransformation( targetCoordSystem, new gp_Ax3() );
@@ -81,11 +103,11 @@ namespace MyCAM.PathCache
 			return new CAMPoint(
 				new CADPoint(
 					worldLeftArcCenter,
-					m_RefCoord.Direction(),
-					m_RefCoord.XDirection(),
-					m_RefCoord.YDirection()
+					m_RunwayGeomData.RefCoord.Direction(),
+					m_RunwayGeomData.RefCoord.XDirection(),
+					m_RunwayGeomData.RefCoord.YDirection()
 				),
-				m_RefCoord.Direction()
+				m_RunwayGeomData.RefCoord.Direction()
 			);
 		}
 

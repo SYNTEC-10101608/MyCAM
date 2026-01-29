@@ -12,7 +12,7 @@ namespace MyCAM.Data
 
 	public class CraftData
 	{
-	
+
 
 		public CraftData()
 		{

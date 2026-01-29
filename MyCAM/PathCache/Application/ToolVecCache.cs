@@ -3,7 +3,7 @@ using MyCAM.Data;
 
 namespace MyCAM.PathCache
 {
-	internal class ToolVecCache : MainPathPointCache, IToolVecCache
+	internal class ToolVecCache : StartPointRendererCache, IToolVecCache
 	{
 		private readonly CraftData m_CraftData;
 

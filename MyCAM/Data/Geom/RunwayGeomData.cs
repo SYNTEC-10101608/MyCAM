@@ -1,9 +1,12 @@
-﻿namespace MyCAM.Data
+﻿using OCC.gp;
+
+namespace MyCAM.Data
 {
 	public class RunwayGeomData : StdPatternGeomDataBase
 	{
-		public RunwayGeomData( double length, double width, double rotatedAngle_deg, bool isCoordinateReversed )
+		public RunwayGeomData( gp_Ax3 refCoord, double length, double width, double rotatedAngle_deg, bool isCoordinateReversed )
 		{
+			m_RefCoord = refCoord;
 			m_Length = length;
 			m_Width = width;
 			m_RotatedAngle_deg = rotatedAngle_deg;
@@ -52,7 +55,7 @@
 
 		public override IGeomData Clone()
 		{
-			return new RunwayGeomData( m_Length, m_Width, m_RotatedAngle_deg, m_IsCoordinateReversed );
+			return new RunwayGeomData( m_RefCoord, m_Length, m_Width, m_RotatedAngle_deg, m_IsCoordinateReversed );
 		}
 
 		public const double DEFAULT_LENGTH = 40.0;
