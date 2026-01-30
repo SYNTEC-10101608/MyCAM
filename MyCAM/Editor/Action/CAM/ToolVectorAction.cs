@@ -65,10 +65,6 @@ namespace MyCAM.Editor
 
 			// modify tool vector
 			bool isModified = m_ToolVecCache.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
-
-			// Calculate master/slave from A/B angles using the current editing point
-			// If not modified, use the values from InitIKResult (already in degrees from GetToolVecModify)
-			// If modified, use the stored values directly
 			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, master_deg, slave_deg, m_CraftData.InterpolateType );
 
 			// back up old data
@@ -164,7 +160,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		bool CalABAngleToPreCtrlPntToolVec( int nSelectIndex, out Tuple<double, double> param )
+		bool CalABAngleToKeep( int nSelectIndex, out Tuple<double, double> abAngle_deg )
 		{
 			// get this modify point cam point
 			CADPoint toModifyCADPnt = m_ProcessCADPointList[ nSelectIndex ];
@@ -172,7 +168,7 @@ namespace MyCAM.Editor
 
 			// get previous control point tool vector
 			gp_Dir assignDir = GetPreCtrlPntToolVec( m_ProcessCADPointList, m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsPathReverse, m_GeomData.IsClosed );
-			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyCAMPnt, out param );
+			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyCAMPnt, out abAngle_deg );
 			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
 				return true;
 			}
@@ -183,13 +179,13 @@ namespace MyCAM.Editor
 			return false;
 		}
 
-		bool CalABAngleToZDir( int nSelectIndex, out Tuple<double, double> param )
+		bool CalABAngleToZDir( int nSelectIndex, out Tuple<double, double> abAngle_deg )
 		{
 			// get this modify point cam point
 			CADPoint toModifyCADPnt = m_ProcessCADPointList[ nSelectIndex ];
 			CAMPoint toModifyCAMPnt = new CAMPoint( toModifyCADPnt );
 			gp_Dir assignDir = new gp_Dir( 0, 0, 1 );
-			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyCAMPnt, out param );
+			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyCAMPnt, out abAngle_deg );
 			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
 				return true;
 			}
@@ -202,23 +198,23 @@ namespace MyCAM.Editor
 
 		void SetToolVecOfKeep( int nSelectIndex, ToolVectorDlg toolVecForm )
 		{
-			bool GetParamSuccess = CalABAngleToPreCtrlPntToolVec( nSelectIndex, out Tuple<double, double> abAngles );
+			bool GetParamSuccess = CalABAngleToKeep( nSelectIndex, out Tuple<double, double> abAngles_deg );
 			if( GetParamSuccess ) {
 
 				// Calculate MS angles from AB angles
-				Tuple<double, double> msAngles = CalculateMSAngleFromABAngle( abAngles.Item1, abAngles.Item2 );
-				toolVecForm.SetABAngleFromTargetVec( abAngles, msAngles );
+				Tuple<double, double> msAngles_deg = CalculateMSAngleFromABAngle( abAngles_deg.Item1, abAngles_deg.Item2 );
+				toolVecForm.SetAngleFromTargetVec( abAngles_deg, msAngles_deg );
 			}
 		}
 
 		void SetToolVecOfZDir( int nSelectIndex, ToolVectorDlg toolVecForm )
 		{
-			bool GetParamSuccess = CalABAngleToZDir( nSelectIndex, out Tuple<double, double> abAngles );
+			bool GetParamSuccess = CalABAngleToZDir( nSelectIndex, out Tuple<double, double> abAngles_deg );
 			if( GetParamSuccess ) {
 
 				// Calculate MS angles from AB angles
-				Tuple<double, double> msAngles = CalculateMSAngleFromABAngle( abAngles.Item1, abAngles.Item2 );
-				toolVecForm.SetABAngleFromTargetVec( abAngles, msAngles );
+				Tuple<double, double> msAngles_deg = CalculateMSAngleFromABAngle( abAngles_deg.Item1, abAngles_deg.Item2 );
+				toolVecForm.SetAngleFromTargetVec( abAngles_deg, msAngles_deg );
 			}
 		}
 

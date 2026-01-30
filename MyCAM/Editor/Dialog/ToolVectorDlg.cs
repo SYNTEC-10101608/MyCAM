@@ -88,7 +88,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void SetABAngleFromTargetVec( Tuple<double, double> abAngles_deg, Tuple<double, double> msAngles_deg )
+		public void SetAngleFromTargetVec( Tuple<double, double> abAngles_deg, Tuple<double, double> msAngles_deg )
 		{
 			SetABAngleBack( abAngles_deg );
 			SetMSAngleBack( msAngles_deg );

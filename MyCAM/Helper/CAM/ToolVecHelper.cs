@@ -29,10 +29,10 @@ namespace MyCAM.Helper
 			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, isClosed, interpolateType );
 		}
 
-		public static ECalAngleResult GetABAngleToTargetVec( gp_Dir assignDir, ISetToolVecPoint toModifyPnt, out Tuple<double, double> param )
+		public static ECalAngleResult GetABAngleToTargetVec( gp_Dir assignDir, ISetToolVecPoint toModifyPnt, out Tuple<double, double> abAngle_deg )
 		{
 			ECalAngleResult CalResult = GetABAngleToTargetVec( toModifyPnt, assignDir, out double dRA_rad, out double dRB_rad );
-			param = new Tuple<double, double>( dRA_rad, dRB_rad );
+			abAngle_deg = new Tuple<double, double>( dRA_rad, dRB_rad );
 			return CalResult;
 		}
 
