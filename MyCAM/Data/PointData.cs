@@ -90,6 +90,18 @@ namespace MyCAM.Data
 			set;
 		}
 
+		double ModMaster_rad
+		{
+			get;
+			set;
+		}
+
+		double ModSlave_rad
+		{
+			get;
+			set;
+		}
+
 		gp_Dir TangentVec
 		{
 			get;
@@ -140,6 +152,18 @@ namespace MyCAM.Data
 		gp_Dir ToolVec
 		{
 			get;
+		}
+
+		double ModMaster_rad
+		{
+			get;
+			set;
+		}
+
+		double ModSlave_rad
+		{
+			get;
+			set;
 		}
 
 		// sorry, but this is the best way to solve the problem now
@@ -230,12 +254,12 @@ namespace MyCAM.Data
 			get; set;
 		}
 
-		public double ModMaster_deg
+		public double ModMaster_rad
 		{
 			get; set;
 		}
 
-		public double ModSlave_deg
+		public double ModSlave_rad
 		{
 			get; set;
 		}

@@ -104,20 +104,11 @@ namespace MyCAM.Helper
 
 		public static Tuple<double, double> GetABAngleFromMSAngle( double dMaster_deg, double dSlave_deg, ISetToolVecPoint toolVecPoint )
 		{
-			// Get machine data
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			// Use helper to convert MS to ToolVec
+			gp_Dir toolVec = ConvertMSToToolVec( dMaster_deg, dSlave_deg );
+			if( toolVec == null ) {
 				return new Tuple<double, double>( 0, 0 );
 			}
-
-			// Create PostSolver
-			PostSolver postSolver = new PostSolver( machineData );
-
-			// Convert degrees to radians for FK solver
-			double dMaster_rad = dMaster_deg * Math.PI / 180.0;
-			double dSlave_rad = dSlave_deg * Math.PI / 180.0;
-
-			// Use PostSolver API to get the tool vector from master/slave angles
-			gp_Dir toolVec = postSolver.SolveToolVec( dMaster_rad, dSlave_rad );
 
 			// Use GetABAngleToTargetVec to convert tool vector to A/B angles
 			ECalAngleResult result = GetABAngleToTargetVec( toolVecPoint, toolVec, out double dRA_deg, out double dRB_deg );
@@ -136,7 +127,7 @@ namespace MyCAM.Helper
 				return;
 			}
 			if( interpolateType == EToolVecInterpolateType.VectorInterpolation ) {
-				ApplyVectorInterpolation( ref toolVecPointList, toolVecModifyMap, isClosed );
+				ApplyMSInterpolation( ref toolVecPointList, toolVecModifyMap, isClosed );
 				return;
 			}
 			if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
@@ -145,19 +136,17 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static List<Tuple<gp_Vec, gp_Vec>> GetIntervalToolVec( List<Tuple<int, int>> interpolateIntervalList, List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
+		static List<Tuple<double, double, double, double>> GetIntervalMSAngles( List<Tuple<int, int>> interpolateIntervalList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
 		{
-			List<Tuple<gp_Vec, gp_Vec>> result = new List<Tuple<gp_Vec, gp_Vec>>();
+			List<Tuple<double, double, double, double>> result = new List<Tuple<double, double, double, double>>();
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
 				int nStartIndex = interpolateIntervalList[ i ].Item1;
 				int nEndIndex = interpolateIntervalList[ i ].Item2;
-				gp_Vec startVec = GetVecFromABAngle( toolVecPointList[ nStartIndex ],
-					toolVecModifyMap[ nStartIndex ].RA_deg * Math.PI / 180,
-					toolVecModifyMap[ nStartIndex ].RB_deg * Math.PI / 180 );
-				gp_Vec endVec = GetVecFromABAngle( toolVecPointList[ nEndIndex ],
-					toolVecModifyMap[ nEndIndex ].RA_deg * Math.PI / 180,
-					toolVecModifyMap[ nEndIndex ].RB_deg * Math.PI / 180 );
-				result.Add( new Tuple<gp_Vec, gp_Vec>( startVec, endVec ) );
+				double dStartMaster_deg = toolVecModifyMap[ nStartIndex ].Master_deg;
+				double dStartSlave_deg = toolVecModifyMap[ nStartIndex ].Slave_deg;
+				double dEndMaster_deg = toolVecModifyMap[ nEndIndex ].Master_deg;
+				double dEndSlave_deg = toolVecModifyMap[ nEndIndex ].Slave_deg;
+				result.Add( new Tuple<double, double, double, double>( dStartMaster_deg, dStartSlave_deg, dEndMaster_deg, dEndSlave_deg ) );
 			}
 			return result;
 		}
@@ -227,8 +216,8 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static void InterpolateToolVec( ref List<ISetToolVecPoint> toolVecPointList,
-			int nStartIndex, int nEndIndex, gp_Vec startVec, gp_Vec endVec )
+		static void InterpolateToolVecByMS( ref List<ISetToolVecPoint> toolVecPointList,
+				int nStartIndex, int nEndIndex, double dStartMaster_deg, double dStartSlave_deg, double dEndMaster_deg, double dEndSlave_deg )
 		{
 			// consider wrapped
 			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + toolVecPointList.Count : nEndIndex;
@@ -239,18 +228,24 @@ namespace MyCAM.Helper
 				totaldistance += toolVecPointList[ i % toolVecPointList.Count ].Point.SquareDistance( toolVecPointList[ ( i + 1 ) % toolVecPointList.Count ].Point );
 			}
 
-			// get the quaternion for interpolation
-			gp_Quaternion q12 = new gp_Quaternion( startVec, endVec );
-			gp_QuaternionSLerp slerp = new gp_QuaternionSLerp( new gp_Quaternion(), q12 );
+			// interpolate master/slave angles and convert to tool vector
 			double accumulatedDistance = 0;
 			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
 				double t = accumulatedDistance / totaldistance;
 				accumulatedDistance += toolVecPointList[ i % toolVecPointList.Count ].Point.SquareDistance( toolVecPointList[ ( i + 1 ) % toolVecPointList.Count ].Point );
-				gp_Quaternion q = new gp_Quaternion();
-				slerp.Interpolate( t, ref q );
-				gp_Trsf trsf = new gp_Trsf();
-				trsf.SetRotation( q );
-				toolVecPointList[ i % toolVecPointList.Count ].ToolVec = new gp_Dir( startVec.Transformed( trsf ) );
+
+				// Interpolate M/S angles
+				double dInterpMaster_deg = dStartMaster_deg + ( dEndMaster_deg - dStartMaster_deg ) * t;
+				double dInterpSlave_deg = dStartSlave_deg + ( dEndSlave_deg - dStartSlave_deg ) * t;
+
+				// Convert M/S to ToolVec
+				gp_Dir toolVec = ConvertMSToToolVec( dInterpMaster_deg, dInterpSlave_deg );
+				if( toolVec != null ) {
+					int index = i % toolVecPointList.Count;
+					toolVecPointList[ index ].ToolVec = toolVec;
+					toolVecPointList[ index ].ModMaster_rad = dInterpMaster_deg * Math.PI / 180.0;
+					toolVecPointList[ index ].ModSlave_rad = dInterpSlave_deg * Math.PI / 180.0;
+				}
 			}
 		}
 
@@ -332,15 +327,22 @@ namespace MyCAM.Helper
 			return false;
 		}
 
-		static void ApplyVectorInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, bool isClosed )
+		static void ApplyMSInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, bool isClosed )
 		{
 			// all tool vector are modified to the same value, no need to do interpolation
 			if( toolVecModifyMap.Count == 1 ) {
-				gp_Vec newVec = GetVecFromABAngle( toolVecPointList[ toolVecModifyMap.Keys.First() ],
-					toolVecModifyMap.Values.First().RA_deg * Math.PI / 180,
-					toolVecModifyMap.Values.First().RB_deg * Math.PI / 180 );
+				double dMaster_deg = toolVecModifyMap.Values.First().Master_deg;
+				double dSlave_deg = toolVecModifyMap.Values.First().Slave_deg;
+				gp_Dir newToolVec = ConvertMSToToolVec( dMaster_deg, dSlave_deg );
+				if( newToolVec == null ) {
+					return;
+				}
+				double dMaster_rad = dMaster_deg * Math.PI / 180.0;
+				double dSlave_rad = dSlave_deg * Math.PI / 180.0;
 				foreach( ISetToolVecPoint toolVecPoint in toolVecPointList ) {
-					toolVecPoint.ToolVec = new gp_Dir( newVec.XYZ() );
+					toolVecPoint.ToolVec = newToolVec;
+					toolVecPoint.ModMaster_rad = dMaster_rad;
+					toolVecPoint.ModSlave_rad = dSlave_rad;
 				}
 				return;
 			}
@@ -348,8 +350,8 @@ namespace MyCAM.Helper
 			// get the interpolate interval list
 			List<Tuple<int, int>> interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap, isClosed );
 
-			// get the control point tool vector for each interval
-			List<Tuple<gp_Vec, gp_Vec>> ctrlPntToolVec = GetIntervalToolVec( interpolateIntervalList, toolVecPointList, toolVecModifyMap );
+			// get the control point master/slave angles for each interval
+			List<Tuple<double, double, double, double>> ctrlPntMSAngles = GetIntervalMSAngles( interpolateIntervalList, toolVecModifyMap );
 
 			// modify the tool vector
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
@@ -357,7 +359,9 @@ namespace MyCAM.Helper
 				// get start and end index
 				int nStartIndex = interpolateIntervalList[ i ].Item1;
 				int nEndIndex = interpolateIntervalList[ i ].Item2;
-				InterpolateToolVec( ref toolVecPointList, nStartIndex, nEndIndex, ctrlPntToolVec[ i ].Item1, ctrlPntToolVec[ i ].Item2 );
+				InterpolateToolVecByMS( ref toolVecPointList, nStartIndex, nEndIndex,
+					ctrlPntMSAngles[ i ].Item1, ctrlPntMSAngles[ i ].Item2,
+					ctrlPntMSAngles[ i ].Item3, ctrlPntMSAngles[ i ].Item4 );
 			}
 			return;
 		}
@@ -393,6 +397,24 @@ namespace MyCAM.Helper
 					ctrlPntToolVec[ i ].dStart_RA_deg, ctrlPntToolVec[ i ].dStart_RB_deg,
 					ctrlPntToolVec[ i ].dEnd_RA_deg, ctrlPntToolVec[ i ].dEnd_RB_deg );
 			}
+		}
+
+		static gp_Dir ConvertMSToToolVec( double dMaster_deg, double dSlave_deg )
+		{
+			// Get machine data
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return null;
+			}
+
+			// Create PostSolver
+			PostSolver postSolver = new PostSolver( machineData );
+
+			// Convert degrees to radians for FK solver
+			double dMaster_rad = dMaster_deg * Math.PI / 180.0;
+			double dSlave_rad = dSlave_deg * Math.PI / 180.0;
+
+			// Use PostSolver API to get the tool vector from master/slave angles
+			return postSolver.SolveToolVec( dMaster_rad, dSlave_rad );
 		}
 
 		const double TOO_LARGE_ANGLE_DEG = 60.0;
