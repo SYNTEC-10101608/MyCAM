@@ -78,6 +78,18 @@ namespace MyCAM.Data
 			get;
 		}
 
+		double InitMaster_rad
+		{
+			get;
+			set;
+		}
+
+		double InitSlave_rad
+		{
+			get;
+			set;
+		}
+
 		gp_Dir TangentVec
 		{
 			get;

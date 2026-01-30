@@ -86,8 +86,10 @@ namespace MyCAM.Helper
 			CAMPoint p = ( toolVecPoint as CAMPoint ).Clone();
 			p.ToolVec = new gp_Dir( toolVec.XYZ() );
 
-			// Use SolveIK to get master/slave angles (initial values = 0, 0)
-			IKSolveResult result = postSolver.SolveIK( p, 0, 0, out double dMaster_rad, out double dSlave_rad );
+			// Use SolveIK to get master/slave angles
+			double dM_In = p.InitMaster_rad;
+			double dS_In = p.InitSlave_rad;
+			IKSolveResult result = postSolver.SolveIK( p, dM_In, dS_In, out double dMaster_rad, out double dSlave_rad );
 
 			if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution || result == IKSolveResult.OutOfRange ) {
 				return new Tuple<double, double>( 0, 0 );
