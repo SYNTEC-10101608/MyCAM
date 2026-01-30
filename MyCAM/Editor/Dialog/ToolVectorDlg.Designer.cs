@@ -32,8 +32,6 @@
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.m_pnlTiltColot = new System.Windows.Forms.Panel();
 			this.m_TiltAngleHint = new System.Windows.Forms.Label();
-			this.m_lblFixDirHint = new System.Windows.Forms.Label();
-			this.m_pnlFixedDirColor = new System.Windows.Forms.Panel();
 			this.splitter1 = new System.Windows.Forms.Splitter();
 			this.m_gbxParam = new System.Windows.Forms.GroupBox();
 			this.m_tbxSlave = new System.Windows.Forms.TextBox();
@@ -46,7 +44,6 @@
 			this.m_tbxAngleA = new System.Windows.Forms.TextBox();
 			this.m_lblBDeg = new System.Windows.Forms.Label();
 			this.m_lblADeg = new System.Windows.Forms.Label();
-			this.m_rbtFixedDir = new System.Windows.Forms.RadioButton();
 			this.m_rbtTiltAngleCase = new System.Windows.Forms.RadioButton();
 			this.m_rbtVecSpaceCase = new System.Windows.Forms.RadioButton();
 			this.m_btnRemove = new System.Windows.Forms.Button();
@@ -61,11 +58,8 @@
 			this.m_gpInterpolation.Controls.Add(this.panel1);
 			this.m_gpInterpolation.Controls.Add(this.m_pnlTiltColot);
 			this.m_gpInterpolation.Controls.Add(this.m_TiltAngleHint);
-			this.m_gpInterpolation.Controls.Add(this.m_lblFixDirHint);
-			this.m_gpInterpolation.Controls.Add(this.m_pnlFixedDirColor);
 			this.m_gpInterpolation.Controls.Add(this.splitter1);
 			this.m_gpInterpolation.Controls.Add(this.m_gbxParam);
-			this.m_gpInterpolation.Controls.Add(this.m_rbtFixedDir);
 			this.m_gpInterpolation.Controls.Add(this.m_rbtTiltAngleCase);
 			this.m_gpInterpolation.Controls.Add(this.m_rbtVecSpaceCase);
 			this.m_gpInterpolation.Location = new System.Drawing.Point(13, 14);
@@ -116,26 +110,6 @@
 			this.m_TiltAngleHint.Size = new System.Drawing.Size(97, 15);
 			this.m_TiltAngleHint.TabIndex = 7;
 			this.m_TiltAngleHint.Text = "編修姿態呈現";
-			// 
-			// m_lblFixDirHint
-			// 
-			this.m_lblFixDirHint.AutoSize = true;
-			this.m_lblFixDirHint.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-			this.m_lblFixDirHint.Location = new System.Drawing.Point(44, 158);
-			this.m_lblFixDirHint.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.m_lblFixDirHint.Name = "m_lblFixDirHint";
-			this.m_lblFixDirHint.Size = new System.Drawing.Size(97, 15);
-			this.m_lblFixDirHint.TabIndex = 6;
-			this.m_lblFixDirHint.Text = "路徑姿態呈現";
-			// 
-			// m_pnlFixedDirColor
-			// 
-			this.m_pnlFixedDirColor.BackColor = System.Drawing.Color.SkyBlue;
-			this.m_pnlFixedDirColor.Location = new System.Drawing.Point(148, 154);
-			this.m_pnlFixedDirColor.Margin = new System.Windows.Forms.Padding(4);
-			this.m_pnlFixedDirColor.Name = "m_pnlFixedDirColor";
-			this.m_pnlFixedDirColor.Size = new System.Drawing.Size(19, 20);
-			this.m_pnlFixedDirColor.TabIndex = 5;
 			// 
 			// splitter1
 			// 
@@ -272,19 +246,6 @@
 			this.m_lblADeg.TabIndex = 1;
 			this.m_lblADeg.Text = "前傾角";
 			// 
-			// m_rbtFixedDir
-			// 
-			this.m_rbtFixedDir.AutoSize = true;
-			this.m_rbtFixedDir.Location = new System.Drawing.Point(24, 130);
-			this.m_rbtFixedDir.Margin = new System.Windows.Forms.Padding(4);
-			this.m_rbtFixedDir.Name = "m_rbtFixedDir";
-			this.m_rbtFixedDir.Size = new System.Drawing.Size(100, 19);
-			this.m_rbtFixedDir.TabIndex = 2;
-			this.m_rbtFixedDir.TabStop = true;
-			this.m_rbtFixedDir.Text = "定姿態插值";
-			this.m_rbtFixedDir.UseVisualStyleBackColor = true;
-			this.m_rbtFixedDir.CheckedChanged += new System.EventHandler(this.m_rbtFixedDir_CheckedChanged);
-			// 
 			// m_rbtTiltAngleCase
 			// 
 			this.m_rbtTiltAngleCase.AutoSize = true;
@@ -367,14 +328,11 @@
 		private System.Windows.Forms.TextBox m_tbxAngleA;
 		private System.Windows.Forms.Label m_lblBDeg;
 		private System.Windows.Forms.Label m_lblADeg;
-		private System.Windows.Forms.RadioButton m_rbtFixedDir;
 		private System.Windows.Forms.RadioButton m_rbtTiltAngleCase;
 		private System.Windows.Forms.RadioButton m_rbtVecSpaceCase;
 		private System.Windows.Forms.Splitter splitter1;
 		private System.Windows.Forms.Button m_btnRemove;
 		private System.Windows.Forms.Button m_btnOK;
-		private System.Windows.Forms.Label m_lblFixDirHint;
-		private System.Windows.Forms.Panel m_pnlFixedDirColor;
 		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.Panel m_pnlTiltColot;
 		private System.Windows.Forms.Label m_TiltAngleHint;

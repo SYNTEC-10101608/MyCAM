@@ -76,8 +76,8 @@ namespace MyCAM.Editor
 			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
 			toolVecForm.RaiseKeep += () => SetToolVecOfKeep( nIndex, toolVecForm );
 			toolVecForm.RaiseZDir += () => SetToolVecOfZDir( nIndex, toolVecForm );
-			toolVecForm.RaiseUpdateMSAngleFromABAngle += ( angleA, angleB ) => UpdateMSAngleFromABAngle( angleA, angleB, toolVecForm );
-			toolVecForm.RaiseUpdateABAngleFromMSAngle += ( master, slave ) => UpdateABAngleFromMSAngle( master, slave, toolVecForm );
+			toolVecForm.RaiseCalculateMSAngleFromABAngle = ( angleA, angleB ) => CalculateMSAngleFromABAngle( angleA, angleB );
+			toolVecForm.RaiseCalculateABAngleFromMSAngle = ( master, slave ) => CalculateABAngleFromMSAngle( master, slave );
 			toolVecForm.Preview += ( ToolVec ) => SetToolVecParamAndPeview( nIndex, ToolVec );
 			toolVecForm.Confirm += ( ToolVec ) => ConfirmSetting( nIndex, ToolVec );
 			toolVecForm.Cancel += () => CancelSetting( nIndex );
@@ -202,38 +202,40 @@ namespace MyCAM.Editor
 
 		void SetToolVecOfKeep( int nSelectIndex, ToolVectorDlg toolVecForm )
 		{
-			bool GetParamSuccess = CalABAngleToPreCtrlPntToolVec( nSelectIndex, out Tuple<double, double> param );
+			bool GetParamSuccess = CalABAngleToPreCtrlPntToolVec( nSelectIndex, out Tuple<double, double> abAngles );
 			if( GetParamSuccess ) {
-				toolVecForm.SetABAngleBack( param );
+
+				// Calculate MS angles from AB angles
+				Tuple<double, double> msAngles = CalculateMSAngleFromABAngle( abAngles.Item1, abAngles.Item2 );
+				toolVecForm.SetABAngleFromTargetVec( abAngles, msAngles );
 			}
 		}
 
 		void SetToolVecOfZDir( int nSelectIndex, ToolVectorDlg toolVecForm )
 		{
-			bool GetParamSuccess = CalABAngleToZDir( nSelectIndex, out Tuple<double, double> param );
+			bool GetParamSuccess = CalABAngleToZDir( nSelectIndex, out Tuple<double, double> abAngles );
 			if( GetParamSuccess ) {
-				toolVecForm.SetABAngleBack( param );
+
+				// Calculate MS angles from AB angles
+				Tuple<double, double> msAngles = CalculateMSAngleFromABAngle( abAngles.Item1, abAngles.Item2 );
+				toolVecForm.SetABAngleFromTargetVec( abAngles, msAngles );
 			}
 		}
 
-		void UpdateMSAngleFromABAngle( double angleA_deg, double angleB_deg, ToolVectorDlg toolVecForm )
+		Tuple<double, double> CalculateMSAngleFromABAngle( double angleA_deg, double angleB_deg )
 		{
-			// Get the current editing point index from the form's context
 			if( m_CurrentEditingCAMPoint == null ) {
-				return;
+				return new Tuple<double, double>( 0, 0 );
 			}
-			Tuple<double, double> msAngle = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, m_CurrentEditingCAMPoint );
-			toolVecForm.SetMSAngleBack( msAngle );
+			return ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, m_CurrentEditingCAMPoint );
 		}
 
-		void UpdateABAngleFromMSAngle( double master_deg, double slave_deg, ToolVectorDlg toolVecForm )
+		Tuple<double, double> CalculateABAngleFromMSAngle( double master_deg, double slave_deg )
 		{
-			// Get the current editing point for coordinate system
 			if( m_CurrentEditingCAMPoint == null ) {
-				return;
+				return new Tuple<double, double>( 0, 0 );
 			}
-			Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_CurrentEditingCAMPoint );
-			toolVecForm.SetABAngleBack( abAngles );
+			return ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_CurrentEditingCAMPoint );
 		}
 
 		void SetToolVecParamAndPeview( int VecIndex, ToolVecParam toolVecParam )
@@ -246,35 +248,15 @@ namespace MyCAM.Editor
 		// remove or ok button clicked
 		void ConfirmSetting( int VecIndex, ToolVecParam toolVecParam )
 		{
-			// fixdir can't remove point
-			if( toolVecParam.InterpolateType == EToolVecInterpolateType.FixedDir ) {
-
-				// this point originally is not modify point
-				if( m_BackupToolVecParam.IsModified == false ) {
-
-					// while dialog show up, user click other solution , will add this pnt modify
-					m_CraftData.RemoveToolVecModify( VecIndex );
-				}
-
-				// this pnt originally is modify point
-				else {
-
-					// set original value back
-					SetABAngle( VecIndex, m_BackupToolVecParam );
-				}
+			// user remove pnt
+			if( toolVecParam.IsModified == false ) {
+				m_CraftData.RemoveToolVecModify( VecIndex );
 			}
+			// user add / adjust pnt
 			else {
-
-				// user remove pnt
-				if( toolVecParam.IsModified == false ) {
-					m_CraftData.RemoveToolVecModify( VecIndex );
-				}
-
-				// user add / adjust pnt
-				else {
-					SetABAngle( VecIndex, toolVecParam );
-				}
+				SetABAngle( VecIndex, toolVecParam );
 			}
+
 			SetInterpolateType( toolVecParam );
 			SetToolVecDone();
 		}

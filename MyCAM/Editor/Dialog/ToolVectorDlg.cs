@@ -48,14 +48,17 @@ namespace MyCAM.Editor
 			Slave_deg = dSlave_deg;
 			InterpolateType = interpolateType;
 		}
+
+		public const double MAX_Angle = 60.0;
+		public const double MIN_Angle = -60.0;
 	}
 
 	public partial class ToolVectorDlg : EditDialogBase<ToolVecParam>
 	{
 		public Action RaiseKeep;
 		public Action RaiseZDir;
-		public Action<double, double> RaiseUpdateMSAngleFromABAngle;
-		public Action<double, double> RaiseUpdateABAngleFromMSAngle;
+		public Func<double, double, Tuple<double, double>> RaiseCalculateMSAngleFromABAngle;
+		public Func<double, double, Tuple<double, double>> RaiseCalculateABAngleFromMSAngle;
 
 		public ToolVectorDlg( ToolVecParam toolVecParam, bool isPathReverse )
 		{
@@ -75,11 +78,6 @@ namespace MyCAM.Editor
 
 			// initialize modify type
 			switch( toolVecParam.InterpolateType ) {
-				case EToolVecInterpolateType.FixedDir:
-					m_rbtFixedDir.Checked = true;
-					m_gbxParam.Enabled = false;
-					m_btnRemove.Enabled = false;
-					break;
 				case EToolVecInterpolateType.TiltAngleInterpolation:
 					m_rbtTiltAngleCase.Checked = true;
 					break;
@@ -90,23 +88,15 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void SetABAngleBack( Tuple<double, double> ToolVecParam )
+		public void SetABAngleFromTargetVec( Tuple<double, double> abAngles_deg, Tuple<double, double> msAngles_deg )
 		{
-			if( ToolVecParam.Item1 < MIN_Angle || ToolVecParam.Item1 > MAX_Angle ||
-				ToolVecParam.Item2 < MIN_Angle || ToolVecParam.Item2 > MAX_Angle ) {
+			SetABAngleBack( abAngles_deg );
+			SetMSAngleBack( msAngles_deg );
+			if( !CheckABAngleRange( abAngles_deg.Item1, abAngles_deg.Item2 ) ) {
 				return;
 			}
-			m_tbxAngleA.Text = m_IsPathRevese ? ( -ToolVecParam.Item1 ).ToString( "F3" ) : ToolVecParam.Item1.ToString( "F3" );
-			m_tbxAngleB.Text = m_IsPathRevese ? ( -ToolVecParam.Item2 ).ToString( "F3" ) : ToolVecParam.Item2.ToString( "F3" );
 			PreviewToolVecResult();
 		}
-
-		public void SetMSAngleBack( Tuple<double, double> MSAngleParam )
-		{
-			m_tbxMaster.Text = MSAngleParam.Item1.ToString( "F3" );
-			m_tbxSlave.Text = MSAngleParam.Item2.ToString( "F3" );
-		}
-
 
 		protected override void OnShown( EventArgs e )
 		{
@@ -116,26 +106,28 @@ namespace MyCAM.Editor
 
 		ToolVecParam m_ToolVecParam;
 
+		void PreviewToolVecResult()
+		{
+			if( !SaveToolVecParam() ) {
+				return;
+			}
+			SaveInterpolateType();
+			RaisePreview( m_ToolVecParam );
+		}
+
 		void m_btnOK_Click( object sender, EventArgs e )
 		{
-			if( CheckParamValid() ) {
-				SaveInterpolateType();
-
-				// fixed dir do not need to save angle (it would not change this pnt AB Angle)
-				if( m_ToolVecParam.InterpolateType != EToolVecInterpolateType.FixedDir ) {
-					SaveABAngle();
-				}
-				RaiseConfirm( m_ToolVecParam );
+			if( !SaveToolVecParam() ) {
+				return;
 			}
+			SaveInterpolateType();
+			RaiseConfirm( m_ToolVecParam );
 			Close();
 		}
 
 		void SaveInterpolateType()
 		{
-			if( m_rbtFixedDir.Checked ) {
-				m_ToolVecParam.InterpolateType = EToolVecInterpolateType.FixedDir;
-			}
-			else if( m_rbtTiltAngleCase.Checked ) {
+			if( m_rbtTiltAngleCase.Checked ) {
 				m_ToolVecParam.InterpolateType = EToolVecInterpolateType.TiltAngleInterpolation;
 			}
 			else {
@@ -143,13 +135,23 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void SaveABAngle()
+		bool SaveToolVecParam()
 		{
 			m_ToolVecParam.IsModified = true;
-			m_ToolVecParam.AngleA_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleA.Text ) : double.Parse( m_tbxAngleA.Text );
-			m_ToolVecParam.AngleB_deg = m_IsPathRevese ? -double.Parse( m_tbxAngleB.Text ) : double.Parse( m_tbxAngleB.Text );
-			m_ToolVecParam.Master_deg = double.Parse( m_tbxMaster.Text );
-			m_ToolVecParam.Slave_deg = double.Parse( m_tbxSlave.Text );
+			if( !GetABAngleFromDialog( out double angleA_deg, out double angleB_deg ) ) {
+				return false;
+			}
+			if( !CheckABAngleRange( angleA_deg, angleB_deg ) ) {
+				return false;
+			}
+			if( !GetMSAngleFromDialog( out double master_deg, out double slave_deg ) ) {
+				return false;
+			}
+			m_ToolVecParam.AngleA_deg = angleA_deg;
+			m_ToolVecParam.AngleB_deg = angleB_deg;
+			m_ToolVecParam.Master_deg = master_deg;
+			m_ToolVecParam.Slave_deg = slave_deg;
+			return true;
 		}
 
 		void m_btnRemove_Click( object sender, EventArgs e )
@@ -160,88 +162,52 @@ namespace MyCAM.Editor
 			Close();
 		}
 
-		bool CheckParamValid()
-		{
-			if( !double.TryParse( m_tbxAngleA.Text, out double angleA_deg )
-					|| !double.TryParse( m_tbxAngleB.Text, out double angleB_deg ) ) {
-				MyApp.Logger.ShowOnLogPanel( "無效字串", MyApp.NoticeType.Warning );
-				return false;
-			}
-			if( angleA_deg < MIN_Angle || angleA_deg > MAX_Angle ||
-			   angleB_deg < MIN_Angle || angleB_deg > MAX_Angle ) {
-				MyApp.Logger.ShowOnLogPanel( "角度必須在 -60~+60 範圍內", MyApp.NoticeType.Warning );
-				return false;
-			}
-			return true;
-		}
-
 		void m_tbxAngleA_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Enter ) {
-				UpdateMSAngleFromABAngle();
-				PreviewToolVecResult();
+				HandleABAngleChanged();
 			}
 		}
 
 		void m_tbxAngleB_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Enter ) {
-				UpdateMSAngleFromABAngle();
-				PreviewToolVecResult();
+				HandleABAngleChanged();
 			}
 		}
 
 		void m_tbxMaster_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Enter ) {
-				UpdateABAngleFromMSAngle();
-				PreviewToolVecResult();
+				HandleMSAngleChanged();
 			}
 		}
 
 		void m_tbxSlave_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Enter ) {
-				UpdateABAngleFromMSAngle();
-				PreviewToolVecResult();
+				HandleMSAngleChanged();
 			}
 		}
 
 		void m_tbxAngleA_Leave( object sender, EventArgs e )
 		{
-			UpdateMSAngleFromABAngle();
-			PreviewToolVecResult();
+			HandleABAngleChanged();
 		}
 
 		void m_tbxAngleB_Leave( object sender, EventArgs e )
 		{
-			UpdateMSAngleFromABAngle();
-			PreviewToolVecResult();
+			HandleABAngleChanged();
 		}
 
 		void m_tbxMaster_Leave( object sender, EventArgs e )
 		{
-			UpdateABAngleFromMSAngle();
-			PreviewToolVecResult();
+			HandleMSAngleChanged();
 		}
 
 		void m_tbxSlave_Leave( object sender, EventArgs e )
 		{
-			UpdateABAngleFromMSAngle();
-			PreviewToolVecResult();
-		}
-
-		void PreviewToolVecResult()
-		{
-			if( CheckParamValid() ) {
-				SaveInterpolateType();
-
-				// fixed dir do not have to set AB angle
-				if( m_rbtFixedDir.Checked == false ) {
-					SaveABAngle();
-				}
-				RaisePreview( m_ToolVecParam );
-			}
+			HandleMSAngleChanged();
 		}
 
 		void m_btnKeep_Click( object sender, EventArgs e )
@@ -264,42 +230,105 @@ namespace MyCAM.Editor
 			PreviewToolVecResult();
 		}
 
-		void m_rbtFixedDir_CheckedChanged( object sender, EventArgs e )
+		bool CheckABAngleRange( double angleA_deg, double angleB_deg )
 		{
-			if( m_rbtFixedDir.Checked ) {
-				m_gbxParam.Enabled = false;
-				m_btnRemove.Enabled = false;
+			if( angleA_deg < ToolVecParam.MIN_Angle || angleA_deg > ToolVecParam.MAX_Angle ||
+				angleB_deg < ToolVecParam.MIN_Angle || angleB_deg > ToolVecParam.MAX_Angle ) {
+				MyApp.Logger.ShowOnLogPanel( "角度必須在 -60~+60 範圍內", MyApp.NoticeType.Warning );
+				return false;
 			}
-			else {
-				m_gbxParam.Enabled = true;
-				m_btnRemove.Enabled = true;
+			return true;
+		}
+
+		void HandleABAngleChanged()
+		{
+			// Get AB angles from dialog
+			if( !GetABAngleFromDialog( out double angleA_deg, out double angleB_deg ) ) {
+				return;
 			}
+
+			// Check if AB angles are in valid range
+			if( !CheckABAngleRange( angleA_deg, angleB_deg ) ) {
+				return;
+			}
+
+			// Calculate MS angles from AB angles
+			if( RaiseCalculateMSAngleFromABAngle != null ) {
+				Tuple<double, double> msAngles_deg = RaiseCalculateMSAngleFromABAngle( angleA_deg, angleB_deg );
+				SetMSAngleBack( msAngles_deg );
+			}
+
+			// Preview the result
 			PreviewToolVecResult();
 		}
 
-		void UpdateMSAngleFromABAngle()
+		void HandleMSAngleChanged()
 		{
-			if( !double.TryParse( m_tbxAngleA.Text, out double angleA_deg ) ||
-				!double.TryParse( m_tbxAngleB.Text, out double angleB_deg ) ) {
+			// Get MS angles from dialog
+			if( !GetMSAngleFromDialog( out double master_deg, out double slave_deg ) ) {
 				return;
 			}
-			// Convert to actual angles (considering path reverse)
-			double actualAngleA = m_IsPathRevese ? -angleA_deg : angleA_deg;
-			double actualAngleB = m_IsPathRevese ? -angleB_deg : angleB_deg;
-			RaiseUpdateMSAngleFromABAngle?.Invoke( actualAngleA, actualAngleB );
+
+			// Calculate AB angles from MS angles
+			if( RaiseCalculateABAngleFromMSAngle != null ) {
+				Tuple<double, double> abAngles_deg = RaiseCalculateABAngleFromMSAngle( master_deg, slave_deg );
+
+				// Fill back AB angles to textboxes
+				SetABAngleBack( abAngles_deg );
+
+				// Check if calculated AB angles are in valid range
+				if( !CheckABAngleRange( abAngles_deg.Item1, abAngles_deg.Item2 ) ) {
+					return;
+				}
+			}
+
+			// Preview the result
+			PreviewToolVecResult();
 		}
 
-		void UpdateABAngleFromMSAngle()
+		bool GetABAngleFromDialog( out double angleA_deg, out double angleB_deg )
 		{
-			if( !double.TryParse( m_tbxMaster.Text, out double master_deg ) ||
-				!double.TryParse( m_tbxSlave.Text, out double slave_deg ) ) {
-				return;
+			// Parse AB angles from textboxes
+			angleA_deg = 0;
+			angleB_deg = 0;
+			if( !double.TryParse( m_tbxAngleA.Text, out angleA_deg ) ||
+				!double.TryParse( m_tbxAngleB.Text, out angleB_deg ) ) {
+				MyApp.Logger.ShowOnLogPanel( "無效字串", MyApp.NoticeType.Warning );
+				return false;
 			}
-			RaiseUpdateABAngleFromMSAngle?.Invoke( master_deg, slave_deg );
+
+			// Convert to actual angles (considering path reverse)
+			angleA_deg = m_IsPathRevese ? -angleA_deg : angleA_deg;
+			angleB_deg = m_IsPathRevese ? -angleB_deg : angleB_deg;
+			return true;
+		}
+
+		bool GetMSAngleFromDialog( out double master_deg, out double slave_deg )
+		{
+			// Parse MS angles from textboxes
+			master_deg = 0;
+			slave_deg = 0;
+			if( !double.TryParse( m_tbxMaster.Text, out master_deg ) ||
+				!double.TryParse( m_tbxSlave.Text, out slave_deg ) ) {
+				MyApp.Logger.ShowOnLogPanel( "無效字串", MyApp.NoticeType.Warning );
+				return false;
+			}
+			return true;
+		}
+
+		// trigger by event loop
+		void SetMSAngleBack( Tuple<double, double> MSAngleParam_deg )
+		{
+			m_tbxMaster.Text = MSAngleParam_deg.Item1.ToString( "F3" );
+			m_tbxSlave.Text = MSAngleParam_deg.Item2.ToString( "F3" );
+		}
+
+		void SetABAngleBack( Tuple<double, double> ABAngleParam_deg )
+		{
+			m_tbxAngleA.Text = m_IsPathRevese ? ( -ABAngleParam_deg.Item1 ).ToString( "F3" ) : ABAngleParam_deg.Item1.ToString( "F3" );
+			m_tbxAngleB.Text = m_IsPathRevese ? ( -ABAngleParam_deg.Item2 ).ToString( "F3" ) : ABAngleParam_deg.Item2.ToString( "F3" );
 		}
 
 		bool m_IsPathRevese = false;
-		const double MAX_Angle = 60.0;
-		const double MIN_Angle = -60.0;
 	}
 }
