@@ -47,7 +47,7 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public CAMPoint GetPointByCADIndex( int cadIndex )
+		public ISetToolVecPoint GetPointByCADIndex( int cadIndex )
 		{
 			if( m_PathCache.CADToCAMIndexMap.ContainsKey( cadIndex ) ) {
 				int camIndex = m_PathCache.CADToCAMIndexMap[ cadIndex ];

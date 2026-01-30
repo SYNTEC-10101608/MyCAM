@@ -106,6 +106,8 @@ namespace MyCAM.Data
 			get;
 			set;
 		}
+
+		ISetToolVecPoint Clone();
 	}
 
 	public interface IOrientationPoint
@@ -258,6 +260,11 @@ namespace MyCAM.Data
 		}
 
 		IProcessPoint IProcessPoint.Clone()
+		{
+			return Clone();
+		}
+
+		ISetToolVecPoint ISetToolVecPoint.Clone()
 		{
 			return Clone();
 		}
