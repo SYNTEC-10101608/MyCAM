@@ -121,7 +121,6 @@ namespace MyCAM.PathCache
 					m_ConnectCAMPointMap.Add( camPoint, connectedCAMPoint );
 				}
 			}
-			CraeteIndexMap();
 
 			// solve initial IK
 			SolveInitIK();
@@ -136,6 +135,7 @@ namespace MyCAM.PathCache
 			// set start point and orientation
 			SetStartPoint();
 			SetOrientation();
+			CraeteIndexMap();
 
 			// close the loop if is closed
 			if( m_IsClose && m_CAMPointList.Count > 0 ) {
