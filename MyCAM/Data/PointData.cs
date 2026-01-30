@@ -187,7 +187,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return m_CADPoint.NormalVec_1st;
+				return m_InitToolVec;
 			}
 		}
 
