@@ -26,7 +26,7 @@ namespace MyCAM.Editor
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
 				throw new ArgumentException( "Cannot get CraftData by pathID: " + pathID );
 			}
-			if( !PathCacheProvider.TryGetToolVecCache( pathID, out m_ToolVecCache ) ) {
+			if( !PathCacheProvider.TryGetToolVecPackage( pathID, out m_ToolVecCache ) ) {
 				throw new ArgumentException( "Cannot get ToolVecCache by pathID: " + pathID );
 			}
 			if( !DataGettingHelper.GetGeomDataByID( pathID, out m_GeomData ) ) {
@@ -341,7 +341,7 @@ namespace MyCAM.Editor
 		// to storage which vertex keep show high light point on viewer
 		AIS_Shape m_KeepedHighLightPoint = null;
 		CraftData m_CraftData = null;
-		IToolVecCache m_ToolVecCache = null;
+		ToolVecPackage m_ToolVecCache = null;
 		List<string> m_PathIDList = null;
 		const int DEFAULT_SELECT_INDEX = -1;
 		IGeomData m_GeomData;

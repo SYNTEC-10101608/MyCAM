@@ -1,6 +1,4 @@
 using MyCAM.Data;
-using MyCAM.Helper;
-using MyCAM.Post;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
@@ -82,17 +80,6 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public List<Tuple<double, double>> InitIKResult
-		{
-			get
-			{
-				if( m_IsCraftDataDirty ) {
-					BuildCAMPointList();
-				}
-				return m_InitIKResult;
-			}
-		}
-
 		public double MaxOverCutLength
 		{
 			get
@@ -154,7 +141,6 @@ namespace MyCAM.PathCache
 		protected List<CAMPoint> m_StartCAMPointList = new List<CAMPoint>();
 		protected List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		protected List<CAMPoint> m_OverCutCAMPointList = new List<CAMPoint>();
-		protected List<Tuple<double, double>> m_InitIKResult = new List<Tuple<double, double>>();
 		protected CraftData m_CraftData;
 		protected CAMPoint m_RefPoint;
 		protected double m_MaxOverCutLength;

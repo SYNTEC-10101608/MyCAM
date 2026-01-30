@@ -1,6 +1,5 @@
 ﻿using MyCAM.Data;
 using OCC.gp;
-using System;
 using System.Collections.Generic;
 
 namespace MyCAM.PathCache
@@ -28,11 +27,6 @@ namespace MyCAM.PathCache
 		}
 
 		List<CADPoint> MainPathCADPointList
-		{
-			get;
-		}
-
-		List<Tuple<double, double>> InitIKResult
 		{
 			get;
 		}
@@ -159,7 +153,7 @@ namespace MyCAM.PathCache
 
 	public interface IToolVecCache : IMainPathCache
 	{
-		bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg, out double master_deg, out double slave_deg );
+		bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg );
 
 		bool IsToolVecModifyPoint( IProcessPoint point );
 

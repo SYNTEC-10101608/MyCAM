@@ -73,6 +73,7 @@
     <Compile Include="Helper\Simulation\SimulationHelper.cs" />
     <Compile Include="PathCache\Application\MainPathPointCache.cs" />
     <Compile Include="PathCache\Application\StdPatternMaxOverCutCache.cs" />
+    <Compile Include="PathCache\Application\Action\ToolVecPackage.cs" />
     <Compile Include="PathCache\Application\TraverseDataCache.cs" />
     <Compile Include="PathCache\Computation\CircleCache.cs" />
     <Compile Include="PathCache\Computation\ContourCache.cs" />

@@ -151,6 +151,22 @@ namespace MyCAM.PathCache
 			return true;
 		}
 
+		public static bool TryGetToolVecPackage( string szPathID, out ToolVecPackage package )
+		{
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				package = null;
+				return false;
+			}
+			ContourCache contourCache = _cache as ContourCache;
+			if( contourCache == null ) {
+				package = null;
+				return false;
+			}
+			package = new ToolVecPackage( contourCache, craftData );
+			return true;
+		}
+
 		// this call strategy to get correct cache by path type
 		static bool TryGetPathCacheAndCraftData<TCache>( string szPathID, out TCache cache, out CraftData craftData )
 			where TCache : class, IPathCache

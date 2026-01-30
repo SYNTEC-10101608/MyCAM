@@ -1,5 +1,4 @@
 using MyCAM.Data;
-using System;
 
 
 namespace MyCAM.PathCache
@@ -14,28 +13,16 @@ namespace MyCAM.PathCache
 			m_CraftData = craftData;
 		}
 
-		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg, out double master_deg, out double slave_deg )
+		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg )
 		{
 			if( m_CraftData.ToolVecModifyMap.ContainsKey( index ) ) {
 				dRA_deg = m_CraftData.ToolVecModifyMap[ index ].RA_deg;
 				dRB_deg = m_CraftData.ToolVecModifyMap[ index ].RB_deg;
-				master_deg = m_CraftData.ToolVecModifyMap[ index ].Master_deg;
-				slave_deg = m_CraftData.ToolVecModifyMap[ index ].Slave_deg;
 				return true;
 			}
 			else {
 				dRA_deg = 0;
 				dRB_deg = 0;
-
-				// get master and slave from InitIKResult and convert rad to deg
-				if( index >= 0 && index < m_PathCache.InitIKResult.Count ) {
-					master_deg = m_PathCache.InitIKResult[ index ].Item1 * 180.0 / Math.PI;
-					slave_deg = m_PathCache.InitIKResult[ index ].Item2 * 180.0 / Math.PI;
-				}
-				else {
-					master_deg = 0;
-					slave_deg = 0;
-				}
 				return false;
 			}
 		}
