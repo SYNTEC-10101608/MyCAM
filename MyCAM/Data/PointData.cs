@@ -153,7 +153,7 @@ namespace MyCAM.Data
 			m_ToolVec = new gp_Dir( toolVec.XYZ() );
 		}
 
-		public CAMPoint( CADPoint cadPoint, bool isToolVecReverse )
+		public CAMPoint( CADPoint cadPoint, bool isToolVecReverse, int initPathIndex )
 		{
 			m_CADPoint = cadPoint.Clone();
 			gp_Dir toolVec = isToolVecReverse ?
@@ -161,6 +161,7 @@ namespace MyCAM.Data
 				new gp_Dir( cadPoint.NormalVec_1st.XYZ() );
 			m_InitToolVec = new gp_Dir( toolVec.XYZ() );
 			m_ToolVec = new gp_Dir( toolVec.XYZ() );
+			m_InitPathIndex = initPathIndex;
 		}
 
 		public gp_Dir ToolVec
@@ -205,6 +206,34 @@ namespace MyCAM.Data
 			set;
 		}
 
+		public double InitMaster_rad
+		{
+			get; set;
+		}
+
+		public double InitSlave_rad
+		{
+			get; set;
+		}
+
+		public double ModMaster_deg
+		{
+			get; set;
+		}
+
+		public double ModSlave_deg
+		{
+			get; set;
+		}
+
+		public int InitPathIndex
+		{
+			get
+			{
+				return m_InitPathIndex;
+			}
+		}
+
 		public CAMPoint Clone()
 		{
 			return new CAMPoint( m_CADPoint.Clone(), m_ToolVec );
@@ -225,5 +254,6 @@ namespace MyCAM.Data
 		CADPoint m_CADPoint;
 		gp_Dir m_InitToolVec;
 		gp_Dir m_ToolVec;
+		int m_InitPathIndex;
 	}
 }

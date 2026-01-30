@@ -80,14 +80,14 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public List<Tuple<double, double>> InitIKResult
+		public Dictionary<int, int> CADToCAMIndexMap
 		{
 			get
 			{
 				if( m_IsCraftDataDirty ) {
 					BuildCAMPointList();
 				}
-				return m_InitIKResult;
+				return m_CADToCAMIndexMap;
 			}
 		}
 
@@ -112,15 +112,16 @@ namespace MyCAM.PathCache
 
 				// build CAM point
 				CADPoint cadPoint = m_CADPointList[ i ];
-				CAMPoint camPoint = new CAMPoint( cadPoint, m_CraftData.IsToolVecReverse );
+				CAMPoint camPoint = new CAMPoint( cadPoint, m_CraftData.IsToolVecReverse, i );
 				m_CAMPointList.Add( camPoint );
 
 				// build connection CAM point
 				if( m_ConnectCADPointMap.ContainsKey( cadPoint ) ) {
-					CAMPoint connectedCAMPoint = new CAMPoint( m_ConnectCADPointMap[ cadPoint ], m_CraftData.IsToolVecReverse );
+					CAMPoint connectedCAMPoint = new CAMPoint( m_ConnectCADPointMap[ cadPoint ], m_CraftData.IsToolVecReverse, i );
 					m_ConnectCAMPointMap.Add( camPoint, connectedCAMPoint );
 				}
 			}
+			CraeteIndexMap();
 
 			// solve initial IK
 			SolveInitIK();
@@ -159,10 +160,16 @@ namespace MyCAM.PathCache
 			m_LeadOutCAMPointList = leadOutPointList.Cast<CAMPoint>().ToList();
 		}
 
+		void CraeteIndexMap()
+		{
+			m_CADToCAMIndexMap.Clear();
+			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
+				m_CADToCAMIndexMap[ m_CAMPointList[ i ].InitPathIndex ] = i;
+			}
+		}
+
 		void SolveInitIK()
 		{
-			m_InitIKResult.Clear();
-
 			// arrange solver
 			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
 				throw new Exception( "ContourCache SolveInitIK get machine data failed" );
@@ -175,17 +182,20 @@ namespace MyCAM.PathCache
 
 			// solve IK
 			// solve IK
-			foreach( IProcessPoint point in m_CAMPointList ) {
+			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
+				IProcessPoint point = m_CAMPointList[ i ];
 				IKSolveResult ikResult = postSolver.SolveIK( point, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
 				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
-					m_InitIKResult.Add( new Tuple<double, double>( 0, 0 ) );
+					m_CAMPointList[ i ].InitMaster_rad = 0;
+					m_CAMPointList[ i ].InitSlave_rad = 0;
 					continue;
 				}
 				else if( ikResult == IKSolveResult.OutOfRange ) {
 
 					// temporary do nothing
 				}
-				m_InitIKResult.Add( new Tuple<double, double>( dLastProcessPathM, dLastProcessPathS ) );
+				m_CAMPointList[ i ].InitMaster_rad = dLastProcessPathM;
+				m_CAMPointList[ i ].InitSlave_rad = dLastProcessPathS;
 			}
 			return;
 		}
@@ -231,7 +241,7 @@ namespace MyCAM.PathCache
 		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
-		List<Tuple<double, double>> m_InitIKResult = new List<Tuple<double, double>>();
+		Dictionary<int, int> m_CADToCAMIndexMap = new Dictionary<int, int>();
 
 		// they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
