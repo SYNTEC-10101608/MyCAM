@@ -212,7 +212,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return m_CADPoint.Point;
+				return new gp_Pnt( m_CADPoint.Point.XYZ() );
 			}
 		}
 
@@ -220,7 +220,11 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return m_InitToolVec;
+				return new gp_Dir( m_InitToolVec.XYZ() );
+			}
+			private set
+			{
+				m_InitToolVec = new gp_Dir( value.XYZ() );
 			}
 		}
 
@@ -265,7 +269,16 @@ namespace MyCAM.Data
 
 		public CAMPoint Clone()
 		{
-			return new CAMPoint( m_CADPoint.Clone(), m_ToolVec );
+			CAMPoint newPoint = new CAMPoint( m_CADPoint.Clone() );
+			newPoint.InitToolVec = new gp_Dir( m_InitToolVec.XYZ() );
+			newPoint.ToolVec = new gp_Dir( m_ToolVec.XYZ() );
+			newPoint.InitMaster_rad = InitMaster_rad;
+			newPoint.InitSlave_rad = InitSlave_rad;
+			newPoint.ModMaster_rad = ModMaster_rad;
+			newPoint.ModSlave_rad = ModSlave_rad;
+			newPoint.IsToolVecModPoint = IsToolVecModPoint;
+			newPoint.InitPathIndex = InitPathIndex;
+			return newPoint;
 		}
 
 		// the explicit interface implementation

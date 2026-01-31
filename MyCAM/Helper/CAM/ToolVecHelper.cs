@@ -34,7 +34,7 @@ namespace MyCAM.Helper
 				}
 				toolVecPointList[ i ].IsToolVecModPoint = true;
 			}
-			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, isClosed, interpolateType );
+			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, interpolateType );
 		}
 
 		public static ECalAngleResult GetABAngleFromToolVec( gp_Dir targetDir, ISetToolVecPoint toolVecPoint, out Tuple<double, double> abAngle_deg )
@@ -131,7 +131,7 @@ namespace MyCAM.Helper
 
 		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList,
 			IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap,
-			bool isClosed, EToolVecInterpolateType interpolateType )
+			EToolVecInterpolateType interpolateType )
 		{
 			if( toolVecModifyMap.Count == 0 ) {
 				return;
@@ -212,7 +212,7 @@ namespace MyCAM.Helper
 
 			// interpolate A/B angles and convert to tool vector
 			double accumulatedDistance = 0;
-			for( int i = nStartIndex; i < nEndIndex; i++ ) {
+			for( int i = nStartIndex; i <= nEndIndex; i++ ) {
 				double t = accumulatedDistance / totaldistance;
 
 				// add accumulated distance if not the last point
