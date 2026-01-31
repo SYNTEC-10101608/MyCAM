@@ -377,11 +377,11 @@ namespace MyCAM.Post
 			m_IKSolver = solverBuilder.BuildIKSolver();
 		}
 
-		public IKSolveResult SolveIK( IProcessPoint point, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
+		public IKSolveResult SolveIK( gp_Dir toolVec, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
 		{
 			dM_Out = 0;
 			dS_Out = 0;
-			if( point == null || point.ToolVec == null ) {
+			if( toolVec == null ) {
 				return IKSolveResult.InvalidInput;
 			}
 
@@ -389,7 +389,7 @@ namespace MyCAM.Post
 			if( m_IKSolver.IsReverseMS ) {
 				(dS_In, dM_In) = (dM_In, dS_In);
 			}
-			IKSolveResult ikResult = m_IKSolver.Solve( point.ToolVec, dM_In, dS_In, out dM_Out, out dS_Out );
+			IKSolveResult ikResult = m_IKSolver.Solve( toolVec, dM_In, dS_In, out dM_Out, out dS_Out );
 
 			// swap the output master and slave axis if needed
 			if( m_IKSolver.IsReverseMS ) {

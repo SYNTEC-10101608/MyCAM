@@ -73,21 +73,30 @@ namespace MyCAM.Data
 			get;
 		}
 
+		gp_Dir TangentVec
+		{
+			get;
+		}
+
 		gp_Dir InitToolVec
 		{
 			get;
 		}
 
-		double InitMaster_rad
+		gp_Dir ToolVec
 		{
 			get;
 			set;
 		}
 
+		double InitMaster_rad
+		{
+			get;
+		}
+
 		double InitSlave_rad
 		{
 			get;
-			set;
 		}
 
 		double ModMaster_rad
@@ -102,21 +111,9 @@ namespace MyCAM.Data
 			set;
 		}
 
-		gp_Dir TangentVec
-		{
-			get;
-		}
-
-		gp_Dir ToolVec
-		{
-			get;
-			set;
-		}
-
 		bool IsToolVecModPoint
 		{
-			get;
-			set;
+			get; set;
 		}
 
 		ISetToolVecPoint Clone();
@@ -157,13 +154,11 @@ namespace MyCAM.Data
 		double ModMaster_rad
 		{
 			get;
-			set;
 		}
 
 		double ModSlave_rad
 		{
 			get;
-			set;
 		}
 
 		// sorry, but this is the best way to solve the problem now

@@ -83,13 +83,11 @@ namespace MyCAM.Helper
 
 			// Convert A/B angles to tool vector
 			gp_Vec toolVec = GetVecFromABAngle( toolVecPoint, dRA_deg * Math.PI / 180.0, dRB_deg * Math.PI / 180.0 );
-			CAMPoint p = ( toolVecPoint as CAMPoint ).Clone();
-			p.ToolVec = new gp_Dir( toolVec.XYZ() );
 
 			// Use SolveIK to get master/slave angles
-			double dM_In = p.InitMaster_rad;
-			double dS_In = p.InitSlave_rad;
-			IKSolveResult result = postSolver.SolveIK( p, dM_In, dS_In, out double dMaster_rad, out double dSlave_rad );
+			double dM_In = toolVecPoint.InitMaster_rad;
+			double dS_In = toolVecPoint.InitSlave_rad;
+			IKSolveResult result = postSolver.SolveIK( new gp_Dir( toolVec.XYZ() ), dM_In, dS_In, out double dMaster_rad, out double dSlave_rad );
 
 			if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution || result == IKSolveResult.OutOfRange ) {
 				return new Tuple<double, double>( 0, 0 );
