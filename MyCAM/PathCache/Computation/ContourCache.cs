@@ -183,8 +183,7 @@ namespace MyCAM.PathCache
 			// solve IK
 			// solve IK
 			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
-				IProcessPoint point = m_CAMPointList[ i ];
-				IKSolveResult ikResult = postSolver.SolveIK( point, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
+				IKSolveResult ikResult = postSolver.SolveIK( m_CAMPointList[ i ].InitToolVec, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
 				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
 					m_CAMPointList[ i ].InitMaster_rad = 0;
 					m_CAMPointList[ i ].InitSlave_rad = 0;
