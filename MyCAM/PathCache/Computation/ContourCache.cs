@@ -80,17 +80,6 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public Dictionary<int, int> CADToCAMIndexMap
-		{
-			get
-			{
-				if( m_IsCraftDataDirty ) {
-					BuildCAMPointList();
-				}
-				return m_CADToCAMIndexMap;
-			}
-		}
-
 		#endregion
 
 		#region API
@@ -105,21 +94,39 @@ namespace MyCAM.PathCache
 		{
 			m_IsCraftDataDirty = false;
 
-			// build initial CAM point list
+			// build initial CAM point list, not closed yet
 			m_CAMPointList = new List<CAMPoint>();
 			m_ConnectCAMPointMap.Clear();
 			for( int i = 0; i < m_CADPointList.Count; i++ ) {
 
 				// build CAM point
 				CADPoint cadPoint = m_CADPointList[ i ];
-				CAMPoint camPoint = new CAMPoint( cadPoint, m_CraftData.IsToolVecReverse, i );
+				CAMPoint camPoint = new CAMPoint( cadPoint, m_CraftData.IsToolVecReverse );
+				camPoint.InitPathIndex = i;
 				m_CAMPointList.Add( camPoint );
 
 				// build connection CAM point
 				if( m_ConnectCADPointMap.ContainsKey( cadPoint ) ) {
-					CAMPoint connectedCAMPoint = new CAMPoint( m_ConnectCADPointMap[ cadPoint ], m_CraftData.IsToolVecReverse, i );
+					CAMPoint connectedCAMPoint = new CAMPoint( m_ConnectCADPointMap[ cadPoint ], m_CraftData.IsToolVecReverse );
 					m_ConnectCAMPointMap.Add( camPoint, connectedCAMPoint );
 				}
+			}
+
+			// set start point and orientation
+			SetStartPoint();
+			SetOrientation();
+
+			// create index map consider the start point and orientation
+			CraeteIndexMap();
+
+			// close the loop if is closed
+			if( m_IsClose && m_CAMPointList.Count > 0 ) {
+				CAMPoint startPoint = m_CAMPointList[ 0 ];
+				CAMPoint closedCAMPoint = m_ConnectCAMPointMap.ContainsKey( startPoint )
+												? m_ConnectCAMPointMap[ startPoint ] // use connected point
+												: startPoint.Clone(); // or just clone the start point
+				closedCAMPoint.InitPathIndex = CLOSER_POINT_INDEX;
+				m_CAMPointList.Add( closedCAMPoint );
 			}
 
 			// solve initial IK
@@ -127,24 +134,8 @@ namespace MyCAM.PathCache
 
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, m_CraftData.ToolVecModifyMap, m_IsClose, m_CraftData.InterpolateType );
-			foreach( var oneConnect in m_ConnectCAMPointMap ) {
-				oneConnect.Value.ToolVec = oneConnect.Key.ToolVec;
-			}
-
-			// set start point and orientation
-			SetStartPoint();
-			SetOrientation();
-			CraeteIndexMap();
-
-			// close the loop if is closed
-			if( m_IsClose && m_CAMPointList.Count > 0 ) {
-				CAMPoint startPoint = m_CAMPointList[ 0 ];
-				CAMPoint connectedCAMPoint = m_ConnectCAMPointMap.ContainsKey( startPoint )
-												? m_ConnectCAMPointMap[ startPoint ]
-												: startPoint.Clone();
-				m_CAMPointList.Add( connectedCAMPoint );
-			}
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap = GetToolVecModifyMap();
+			ToolVecHelper.SetToolVec( ref toolVecPointList, toolVecModifyMap, m_IsClose, m_CraftData.InterpolateType );
 
 			// set over cut
 			List<IOrientationPoint> camPointOverCutList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
@@ -166,6 +157,21 @@ namespace MyCAM.PathCache
 			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
 				m_CADToCAMIndexMap[ m_CAMPointList[ i ].InitPathIndex ] = i;
 			}
+		}
+
+		Dictionary<int, ToolVecModifyData> GetToolVecModifyMap()
+		{
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
+			foreach( int oneIndex in m_CraftData.ToolVecModifyMap.Keys ) {
+				if( m_CADToCAMIndexMap.ContainsKey( oneIndex ) ) {
+					int camIndex = m_CADToCAMIndexMap[ oneIndex ];
+					toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
+				}
+				else if( oneIndex == CLOSER_POINT_INDEX && m_IsClose ) {
+					toolVecModifyMap[ oneIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
+				}
+			}
+			return toolVecModifyMap;
 		}
 
 		void SolveInitIK()
@@ -252,5 +258,7 @@ namespace MyCAM.PathCache
 		// flag to indicate craft data changed
 		bool m_IsCraftDataDirty = false;
 		bool m_IsClose = false;
+
+		const int CLOSER_POINT_INDEX = -1;
 	}
 }
