@@ -80,6 +80,17 @@ namespace MyCAM.PathCache
 			}
 		}
 
+		public Dictionary<int, int> CADToCAMIndexMap
+		{
+			get
+			{
+				if( m_IsCraftDataDirty ) {
+					BuildCAMPointList();
+				}
+				return m_CADToCAMIndexMap;
+			}
+		}
+
 		#endregion
 
 		#region API
