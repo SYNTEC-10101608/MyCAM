@@ -17,8 +17,13 @@ namespace MyCAM.Helper
 		}
 
 		public static void SetToolVec( ref List<ISetToolVecPoint> toolVecPointList,
-			IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, bool isClosed, EToolVecInterpolateType interpolateType )
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap, bool isClosed, EToolVecInterpolateType interpolateType )
 		{
+			// arrange the map for closed path
+			if( isClosed ) {
+				ArrageMapForClosedPath( ref toolVecModifyMap, toolVecPointList );
+			}
+
 			// mark the modified point
 			for( int i = 0; i < toolVecPointList.Count; i++ ) {
 				if( !toolVecModifyMap.ContainsKey( i ) ) {
@@ -219,6 +224,9 @@ namespace MyCAM.Helper
 		{
 			// consider wrapped
 			int nEndIndexModify = nEndIndex <= nStartIndex ? nEndIndex + toolVecPointList.Count : nEndIndex;
+			if( nEndIndex <= nStartIndex ) {
+				return;
+			}
 
 			// get the total distance for interpolation parameter
 			double totaldistance = 0;
@@ -228,7 +236,7 @@ namespace MyCAM.Helper
 
 			// interpolate master/slave angles and convert to tool vector
 			double accumulatedDistance = 0;
-			for( int i = nStartIndex; i < nEndIndexModify; i++ ) {
+			for( int i = nStartIndex; i <= nEndIndexModify; i++ ) {
 				double t = accumulatedDistance / totaldistance;
 				accumulatedDistance += toolVecPointList[ i % toolVecPointList.Count ].Point.SquareDistance( toolVecPointList[ ( i + 1 ) % toolVecPointList.Count ].Point );
 
@@ -415,9 +423,52 @@ namespace MyCAM.Helper
 			return postSolver.SolveToolVec( dMaster_rad, dSlave_rad );
 		}
 
+		static void ArrageMapForClosedPath( ref Dictionary<int, ToolVecModifyData> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList )
+		{
+			// when we dont have both 0 and CLOSED_POINT_INDEX, we add them in
+			if( !toolVecModifyMap.ContainsKey( 0 ) && !toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) ) {
+				toolVecModifyMap[ 0 ] = new ToolVecModifyData()
+				{
+					RA_deg = 0,
+					RB_deg = 0,
+					Master_deg = toolVecPointList[ 0 ].InitMaster_rad * 180.0 / Math.PI,
+					Slave_deg = toolVecPointList[ 0 ].InitSlave_rad * 180.0 / Math.PI
+				};
+				toolVecModifyMap[ CLOSED_POINT_INDEX ] = new ToolVecModifyData()
+				{
+					RA_deg = 0,
+					RB_deg = 0,
+					Master_deg = toolVecPointList[ toolVecPointList.Count - 1 ].InitMaster_rad * 180.0 / Math.PI,
+					Slave_deg = toolVecPointList[ toolVecPointList.Count - 1 ].InitSlave_rad * 180.0 / Math.PI
+				};
+			}
+
+			// when we have only CLOSED_POINT_INDEX, we copy it to index 0
+			else if( toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) && !toolVecModifyMap.ContainsKey( 0 ) ) {
+				toolVecModifyMap[ 0 ] = toolVecModifyMap[ CLOSED_POINT_INDEX ].Clone();
+			}
+
+			// when we have only 0, we copy it to index CLOSED_POINT_INDEX
+			else if( !toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) && toolVecModifyMap.ContainsKey( 0 ) ) {
+				toolVecModifyMap[ CLOSED_POINT_INDEX ] = toolVecModifyMap[ 0 ].Clone();
+			}
+
+			// both 0 and CLOSED_POINT_INDEX exist
+			else {
+				// do nothing
+			}
+
+			// reset CLOSED_POINT_INDEX
+			ToolVecModifyData closedPointData = toolVecModifyMap[ CLOSED_POINT_INDEX ];
+			toolVecModifyMap.Remove( CLOSED_POINT_INDEX );
+			toolVecModifyMap[ toolVecPointList.Count - 1 ] = closedPointData;
+		}
+
 		const double TOO_LARGE_ANGLE_DEG = 60.0;
 		const double PROJECT_TOLERANCE = 1e-3;
 		const double RADIUS_TOLERANCE = 1e-3;
+
+		const int CLOSED_POINT_INDEX = -1;
 
 		// information for tilt angle interpolation
 		struct TiltABAngle

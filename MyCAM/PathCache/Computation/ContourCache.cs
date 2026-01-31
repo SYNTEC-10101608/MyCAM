@@ -136,7 +136,7 @@ namespace MyCAM.PathCache
 				CAMPoint closedCAMPoint = m_ConnectCAMPointMap.ContainsKey( startPoint )
 												? m_ConnectCAMPointMap[ startPoint ] // use connected point
 												: startPoint.Clone(); // or just clone the start point
-				closedCAMPoint.InitPathIndex = CLOSER_POINT_INDEX;
+				closedCAMPoint.InitPathIndex = CLOSED_POINT_INDEX;
 				m_CAMPointList.Add( closedCAMPoint );
 			}
 
@@ -178,7 +178,7 @@ namespace MyCAM.PathCache
 					int camIndex = m_CADToCAMIndexMap[ oneIndex ];
 					toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
 				}
-				else if( oneIndex == CLOSER_POINT_INDEX && m_IsClose ) {
+				else if( oneIndex == CLOSED_POINT_INDEX && m_IsClose ) {
 					toolVecModifyMap[ oneIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
 				}
 			}
@@ -270,6 +270,6 @@ namespace MyCAM.PathCache
 		bool m_IsCraftDataDirty = false;
 		bool m_IsClose = false;
 
-		const int CLOSER_POINT_INDEX = -1;
+		const int CLOSED_POINT_INDEX = -1;
 	}
 }
