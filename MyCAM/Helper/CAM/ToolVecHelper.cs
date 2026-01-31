@@ -133,10 +133,10 @@ namespace MyCAM.Helper
 				ApplyMSInterpolation( ref toolVecPointList, toolVecModifyMap, isClosed );
 				return;
 			}
-			if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
-				ApplyTiltAngleInterpolation( ref toolVecPointList, toolVecModifyMap, isClosed );
-				return;
-			}
+			//if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
+			//	ApplyTiltAngleInterpolation( ref toolVecPointList, toolVecModifyMap, isClosed );
+			//	return;
+			//}
 		}
 
 		static List<Tuple<double, double, double, double>> GetIntervalMSAngles( List<Tuple<int, int>> interpolateIntervalList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )

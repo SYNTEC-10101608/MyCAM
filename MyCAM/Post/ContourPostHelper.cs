@@ -214,6 +214,8 @@ namespace MyCAM.Post
 			foreach( IProcessPoint point in pointList ) {
 				rotateAngleList.Add( new Tuple<double, double>( point.ModMaster_rad, point.ModSlave_rad ) );
 			}
+			dLastProcessPathM = rotateAngleList[ rotateAngleList.Count - 1 ].Item1;
+			dLastProcessPathS = rotateAngleList[ rotateAngleList.Count - 1 ].Item2;
 
 			// build post data
 			for( int i = 0; i < pointList.Count; i++ ) {

@@ -204,6 +204,8 @@ namespace MyCAM.PathCache
 				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
 					m_CAMPointList[ i ].InitMaster_rad = 0;
 					m_CAMPointList[ i ].InitSlave_rad = 0;
+					m_CAMPointList[ i ].ModMaster_rad = 0;
+					m_CAMPointList[ i ].ModSlave_rad = 0;
 					continue;
 				}
 				else if( ikResult == IKSolveResult.OutOfRange ) {
@@ -212,6 +214,8 @@ namespace MyCAM.PathCache
 				}
 				m_CAMPointList[ i ].InitMaster_rad = dLastProcessPathM;
 				m_CAMPointList[ i ].InitSlave_rad = dLastProcessPathS;
+				m_CAMPointList[ i ].ModMaster_rad = dLastProcessPathM;
+				m_CAMPointList[ i ].ModSlave_rad = dLastProcessPathS;
 			}
 			return;
 		}
