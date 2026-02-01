@@ -9,13 +9,13 @@ namespace MyCAM.Helper
 {
 	internal static class CollisionHelper
 	{
-		internal static bool CalCollisionResult( int frameCount, SimulationRequiredData calNeedData, Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap , out Dictionary<MachineComponentType, List<bool>> frameCollisionMap )
+		internal static bool CalCollisionResult( int frameCount, SimulationRequiredData calNeedData, Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap, out Dictionary<MachineComponentType, List<bool>> frameCollisionMap )
 		{
-			bool bCollisionOk = BuildCollision( frameCount, calNeedData.ChainListMap, calNeedData.FCLTest, FrameTransformMap, out  frameCollisionMap );
+			bool bCollisionOk = BuildCollision( frameCount, calNeedData.ChainListMap, calNeedData.FCLTest, FrameTransformMap, out frameCollisionMap );
 			return bCollisionOk;
 		}
 
-		static bool BuildCollision( int FrameCount, Dictionary<MachineComponentType, List<MachineComponentType>> ChainListMap, 
+		static bool BuildCollision( int FrameCount, Dictionary<MachineComponentType, List<MachineComponentType>> ChainListMap,
 			CollisionSolver FCLTest, Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap,
 			out Dictionary<MachineComponentType, List<bool>> FrameCollisionMap )
 		{
@@ -34,7 +34,7 @@ namespace MyCAM.Helper
 			for( int i = 0; i < FrameCount; i++ ) {
 				BuildPerFrameCollision( i, ChainListMap, FCLTest, FrameTransformMap, ref FrameCollisionMap );
 			}
-			BuildWorkPieceAndTool( FrameCount, FCLTest, FrameTransformMap, ref FrameCollisionMap );
+			//BuildWorkPieceAndTool( FrameCount, FCLTest, FrameTransformMap, ref FrameCollisionMap );
 			return true;
 		}
 
@@ -49,7 +49,9 @@ namespace MyCAM.Helper
 					if( compT == MachineComponentType.Base ) {
 						continue; // skip base
 					}
-					foreach( var compW in ChainListMap[ MachineComponentType.WorkPiece ] ) {
+					List<MachineComponentType> compWList = new List<MachineComponentType>( ChainListMap[ MachineComponentType.WorkPiece ] );
+					compWList.Add( MachineComponentType.WorkPiece ); // add workpiece itself
+					foreach( var compW in compWList ) {
 						if( compW == MachineComponentType.Base ) {
 							continue; // skip base
 						}
@@ -68,6 +70,7 @@ namespace MyCAM.Helper
 				FrameCollisionMap[ MachineComponentType.Master ].Add( collisionResiltSet.Contains( MachineComponentType.Master ) );
 				FrameCollisionMap[ MachineComponentType.Slave ].Add( collisionResiltSet.Contains( MachineComponentType.Slave ) );
 				FrameCollisionMap[ MachineComponentType.Tool ].Add( collisionResiltSet.Contains( MachineComponentType.Tool ) );
+				FrameCollisionMap[ MachineComponentType.WorkPiece ].Add( collisionResiltSet.Contains( MachineComponentType.WorkPiece ) );
 			}
 			catch( Exception ex ) {
 				MyApp.Logger.ShowOnLogPanel( $"模擬第{FrameIndex}禎運算失敗" + ex, MyApp.NoticeType.Warning );

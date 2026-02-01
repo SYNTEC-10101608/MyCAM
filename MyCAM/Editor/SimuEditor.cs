@@ -706,7 +706,7 @@ namespace MyCAM.Editor
 
 		#region Play Simulation
 
-		public void PlaySimulation( int intervalMs = 50 )
+		public void PlaySimulation( int intervalMs = 5 )
 		{
 			if( m_IsNeedReCal ) {
 				ClearCash();
@@ -755,7 +755,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			RefreshFrame();
-			m_CurrentFrameIndex += 3;
+			m_CurrentFrameIndex += 5;
 		}
 
 		#endregion
