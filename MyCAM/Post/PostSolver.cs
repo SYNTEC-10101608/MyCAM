@@ -360,11 +360,11 @@ namespace MyCAM.Post
 		{
 			get
 			{
-				return m_G54Offset;
+				return new gp_Vec( m_G54Offset.XYZ() );
 			}
 			set
 			{
-				m_G54Offset = new gp_Vec( value.X(), value.Y(), value.Z() );
+				m_G54Offset = new gp_Vec( value.XYZ() );
 			}
 		}
 
