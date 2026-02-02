@@ -2,6 +2,7 @@
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
+using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCC.TopTools;
@@ -23,11 +24,7 @@ namespace MyCAM.Editor
 				throw new ArgumentNullException( "IndexSelectAction constructing argument null" );
 			}
 			m_PathID = pathID;
-			if( !PathCacheProvider.TryGetStartPointCache( pathID, out IStartPointActionCache startPointCache ) ) {
-				throw new ArgumentException( "IndexSelectAction constructing argument invalid pathID" );
-			}
-
-			m_ProcessCADPointList = startPointCache.StartPointList.ToList();
+			m_PathPointList = GetPathPointList( m_PathID );
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}
@@ -120,8 +117,8 @@ namespace MyCAM.Editor
 			BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
 
 			// add points to the polygon
-			for( int i = 0; i < m_ProcessCADPointList.Count; i++ ) {
-				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_ProcessCADPointList[ i ].Point );
+			for( int i = 0; i < m_PathPointList.Count; i++ ) {
+				BRepBuilderAPI_MakeVertex vertexMaker = new BRepBuilderAPI_MakeVertex( m_PathPointList[ i ] );
 				polygonMaker.Add( vertexMaker.Vertex() );
 				m_VertexMap.Bind( vertexMaker.Vertex(), i );
 			}
@@ -135,8 +132,31 @@ namespace MyCAM.Editor
 			m_SelectedPointAIS.SetWidth( 1e-3 );
 		}
 
+		List<gp_Pnt> GetPathPointList( string szPathID )
+		{
+			// get path type
+			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType ) ) {
+				return new List<gp_Pnt>();
+			}
+			if( pathType == PathType.Contour ) {
+				if( !DataGettingHelper.GetGeomDataByID( szPathID, out IGeomData contourGeomData ) ) {
+					return new List<gp_Pnt>();
+				}
+				return ( contourGeomData as ContourGeomData )?.CADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
+			}
+			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
+				if( !DataGettingHelper.GetStdPatternCacheByID( szPathID, out StdPatternCacheBase stdPatternCache ) ) {
+					return new List<gp_Pnt>();
+				}
+				return stdPatternCache.StartPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
+			}
+			else {
+				return new List<gp_Pnt>();
+			}
+		}
+
 		protected string m_PathID;
-		protected List<ISetToolVecPoint> m_ProcessCADPointList;
+		protected List<gp_Pnt> m_PathPointList;
 
 		// map point on view to index on CAMData
 		protected TopTools_DataMapOfShapeInteger m_VertexMap;

@@ -1,4 +1,7 @@
-﻿namespace MyCAM.Data
+﻿using MyCAM.PathCache;
+using System;
+
+namespace MyCAM.Data
 {
 	public static class DataGettingHelper
 	{
@@ -7,7 +10,10 @@
 		internal static void Initialize( DataManager dataManager )
 		{
 			if( dataManager == null ) {
-				return;
+				throw new NullReferenceException( "DataManager reference is null in DataGettingHelper.Initialize()" );
+			}
+			if( dataManager.ObjectMap == null ) {
+				throw new NullReferenceException( "DataManager.ObjectMap is null in DataGettingHelper.Initialize()" );
 			}
 			m_DataManager = dataManager;
 		}
@@ -22,14 +28,14 @@
 			}
 
 			// check if the object exists and is a PathObject
-			if( m_DataManager?.ObjectMap == null
+			if( !m_DataManager.PathIDList.Contains( szPathID )
 				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
 				|| m_DataManager.ObjectMap[ szPathID ] == null
-				|| !( m_DataManager.ObjectMap[ szPathID ] is PathObject _pathObject ) ) {
+				|| !( m_DataManager.ObjectMap[ szPathID ].ObjectType == ObjectType.Path ) ) {
 				return false;
 			}
 
-			pathObject = _pathObject;
+			pathObject = m_DataManager.ObjectMap[ szPathID ] as PathObject;
 			return pathObject != null;
 		}
 
@@ -49,14 +55,13 @@
 			if( !GetPathObject( pathID, out PathObject pathObject ) ) {
 				return false;
 			}
+			if( pathObject.PathType == PathType.Contour ) {
+				geomData = ( pathObject as ContourPathObject )?.GeomData;
+			}
+			else if( IsStdPattern( pathObject.PathType ) ) {
+				geomData = ( pathObject as StdPatternObjectBase )?.GeomData;
+			}
 
-			// use unified GeomData property from StandardPatternBasedPathObject
-			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
-				geomData = standardPatternPathObject.GeomData;
-			}
-			else if( pathObject is ContourPathObject contourPathObject ) {
-				geomData = contourPathObject.GeomData;
-			}
 			return geomData != null;
 		}
 
@@ -70,23 +75,45 @@
 			return craftData != null;
 		}
 
-		public static bool GetContourPathObject( PathObject pathObject, out ContourPathObject contourPathObj )
+		public static bool GetPathCacheByID( string szPathID, out IPathCache contourCache )
 		{
-			contourPathObj = null;
-			if( pathObject == null ) {
+			contourCache = null;
+			if( !GetPathObject( szPathID, out PathObject pathObject ) ) {
 				return false;
 			}
+			if( pathObject.PathType == PathType.Contour ) {
+				contourCache = ( pathObject as ContourPathObject )?.ContourCache;
+			}
+			else if( IsStdPattern( pathObject.PathType ) ) {
+				contourCache = ( pathObject as StdPatternObjectBase )?.StdPatternCache;
+			}
+			return contourCache != null;
+		}
 
-			// use unified ContourPathObject property from StandardPatternBasedPathObject
-			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
-				contourPathObj = standardPatternPathObject.ContourPathObject;
-				return true;
+		public static bool GetContourCacheByID( string szPathID, out ContourCache contourCache )
+		{
+			contourCache = null;
+			if( !GetPathObject( szPathID, out PathObject pathObject ) ) {
+				return false;
 			}
-			else if( pathObject is ContourPathObject contourPathObject ) {
-				contourPathObj = contourPathObject;
-				return true;
+			if( pathObject.PathType != PathType.Contour ) {
+				return false;
 			}
-			return false;
+			contourCache = ( pathObject as ContourPathObject )?.ContourCache;
+			return contourCache != null;
+		}
+
+		public static bool GetStdPatternCacheByID( string szPathID, out StdPatternCacheBase stdPatternCache )
+		{
+			stdPatternCache = null;
+			if( !GetPathObject( szPathID, out PathObject pathObject ) ) {
+				return false;
+			}
+			if( !IsStdPattern( pathObject.PathType ) ) {
+				return false;
+			}
+			stdPatternCache = ( pathObject as StdPatternObjectBase )?.StdPatternCache;
+			return stdPatternCache != null;
 		}
 
 		public static bool GetShapeObject( string szObjID, out IShapeObject shape )
@@ -141,6 +168,17 @@
 		{
 			machineData = m_DataManager?.MachineData;
 			return machineData != null;
+		}
+
+		public static bool IsStdPattern( PathType pathType )
+		{
+			return pathType == PathType.Circle
+				|| pathType == PathType.Rectangle
+				|| pathType == PathType.Runway
+				|| pathType == PathType.Triangle
+				|| pathType == PathType.Square
+				|| pathType == PathType.Pentagon
+				|| pathType == PathType.Hexagon;
 		}
 	}
 }

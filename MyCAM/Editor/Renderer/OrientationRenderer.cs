@@ -151,42 +151,33 @@ namespace MyCAM.Editor.Renderer
 
 		IOrientationPoint GetFirstCAMPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetOrientationCache( pathID, out IOrientationCache orientationCache ) ) {
-				return null;
-			}
-			return orientationCache.MainPathStartPoint;
+			return CacheHelper.GetMainPathStartPoint( pathID );
 		}
 
 		IOrientationPoint GetLeadInFirstPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetOrientationCache( pathID, out IOrientationCache orientationCache ) ) {
-				return null;
-			}
-			return orientationCache.LeadInStartPoint;
+			return CacheHelper.GetLeadInStartPoint( pathID );
 		}
 
 		IOrientationPoint GetLeadOutLastPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetOrientationCache( pathID, out IOrientationCache orientationCache ) ) {
-				return null;
-			}
-			return orientationCache.LeadOutEndPoint;
+			return CacheHelper.GetLeadOutEndPoint( pathID );
 		}
 
 		LeadData GetLeadData( string pathID )
 		{
-			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
 				return null;
 			}
-			return leadCache.LeadData;
+			return craftData.LeadData;
 		}
 
 		bool GetIsPathReverse( string pathID )
 		{
-			if( !PathCacheProvider.TryGetPathReverseCache( pathID, out IPathReverseCache pathReverseCache ) ) {
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
 				return false;
 			}
-			return pathReverseCache.IsPathReverse;
+			return craftData.IsPathReverse;
 		}
 	}
 }

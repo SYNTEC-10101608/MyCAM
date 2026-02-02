@@ -467,6 +467,7 @@ namespace MyCAM.Editor
 			ShowAllCAMData();
 		}
 
+		// TODO: is it making sense to use cache here?
 		public void AutoSortProcess()
 		{
 			// one shot edit, no multi edit supported
@@ -476,10 +477,10 @@ namespace MyCAM.Editor
 			string szStartPathID = szPathIDList[ 0 ];
 
 			// get start point
-			if( !PathCacheProvider.TryGetProcessPathStartEndCache( szStartPathID, out IProcessPathStartEndCache processPathStartEndCache ) ) {
+			gp_Pnt currentPoint = CacheHelper.GetProcessStartPoint( szStartPathID ).Point;
+			if( currentPoint == null ) {
 				return;
 			}
-			gp_Pnt currentPoint = processPathStartEndCache.GetProcessStartPoint().Point;
 
 			// init data manager
 			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
@@ -499,11 +500,14 @@ namespace MyCAM.Editor
 					if( visited[ i ] ) {
 						continue;
 					}
-					if( !PathCacheProvider.TryGetProcessPathStartEndCache( pathIDList[ i ], out IProcessPathStartEndCache nextProcessPathStartEndCache ) ) {
-						return;
+					gp_Pnt nextStartPoint = CacheHelper.GetProcessStartPoint( pathIDList[ i ] ).Point;
+					double distanceSq;
+					if( nextStartPoint == null ) {
+						distanceSq = double.MaxValue;
 					}
-					gp_Pnt nextStartPoint = nextProcessPathStartEndCache.GetProcessStartPoint().Point;
-					double distanceSq = currentPoint.SquareDistance( nextStartPoint );
+					else {
+						distanceSq = currentPoint.SquareDistance( nextStartPoint );
+					}
 					if( distanceSq < minDistanceSq ) {
 						minDistanceSq = distanceSq;
 						nearestPoint = nextStartPoint;

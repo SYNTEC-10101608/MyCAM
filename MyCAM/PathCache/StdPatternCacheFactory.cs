@@ -3,17 +3,9 @@ using System;
 
 namespace MyCAM.PathCache
 {
-	internal static class PathCacheFactory
+	internal static class StdPatternCacheFactory
 	{
-		public static IContourCache CreateContourCache( IContourGeomData contourGeomData, CraftData craftData )
-		{
-			if( contourGeomData == null || craftData == null ) {
-				throw new ArgumentNullException( "ConourCache construct parameters null." );
-			}
-			return new ContourCache( (ContourGeomData)contourGeomData, craftData );
-		}
-
-		public static IStdPatternCache CreateStdPatternCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData )
+		public static StdPatternCacheBase CreateStdPatternCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData )
 		{
 			if( stdPatternGeomData == null || craftData == null ) {
 				throw new ArgumentNullException( "StdPatternCache construct parameters null." );
@@ -61,11 +53,11 @@ namespace MyCAM.PathCache
 
 	internal interface IStdPatternCacheStrategy
 	{
-		IStdPatternCache CreatePathCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData );
+		StdPatternCacheBase CreatePathCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData );
 	}
 
 	internal class StdPatternCacheStrategy<TPathCache> : IStdPatternCacheStrategy
-		where TPathCache : IStdPatternCache
+		where TPathCache : StdPatternCacheBase
 	{
 		readonly Func<IStdPatternGeomData, CraftData, TPathCache> m_PathCacheFactory;
 
@@ -74,7 +66,7 @@ namespace MyCAM.PathCache
 			m_PathCacheFactory = pathCacheFactory ?? throw new ArgumentNullException( nameof( pathCacheFactory ) );
 		}
 
-		public IStdPatternCache CreatePathCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData )
+		public StdPatternCacheBase CreatePathCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData )
 		{
 			if( stdPatternGeomData == null || craftData == null ) {
 				throw new ArgumentNullException( "PathCache construct parameters null." );

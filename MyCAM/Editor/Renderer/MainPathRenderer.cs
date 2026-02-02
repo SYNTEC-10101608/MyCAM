@@ -9,6 +9,7 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCViewer;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Editor
 {
@@ -125,12 +126,27 @@ namespace MyCAM.Editor
 			return polygonMaker.Wire();
 		}
 
-		IReadOnlyList<gp_Pnt> GetMainPathPointList( string pathID )
+		IReadOnlyList<gp_Pnt> GetMainPathPointList( string szPathID )
 		{
-			if( !PathCacheProvider.TryGetMainPathCache( pathID, out IMainPathRendererCache rendererPathCache ) ) {
-				return null;
+			// get path type
+			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType ) ) {
+				return new List<gp_Pnt>();
 			}
-			return rendererPathCache.MainPathPointList;
+			if( pathType == PathType.Contour ) {
+				if( !DataGettingHelper.GetGeomDataByID( szPathID, out IGeomData contourGeomData ) ) {
+					return new List<gp_Pnt>();
+				}
+				return ( contourGeomData as ContourGeomData )?.CADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
+			}
+			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
+				if( !DataGettingHelper.GetStdPatternCacheByID( szPathID, out StdPatternCacheBase stdPatternCache ) ) {
+					return new List<gp_Pnt>();
+				}
+				return stdPatternCache.MainPathCADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
+			}
+			else {
+				return new List<gp_Pnt>();
+			}
 		}
 
 		TopoDS_Wire GetWireFromPathID( string pathID )

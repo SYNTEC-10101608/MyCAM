@@ -22,14 +22,6 @@ namespace MyCAM.Data
 		void DoTransform( gp_Trsf transform );
 	}
 
-	public interface IRefCenterDir
-	{
-		gp_Ax1 RefCenterDir
-		{
-			get;
-		}
-	}
-
 	public interface IRotatable
 	{
 		double RotatedAngle_deg
@@ -38,7 +30,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	public interface IContourGeomData : IGeomData, ITransformableGeom, IRefCenterDir
+	public interface IContourGeomData : IGeomData, ITransformableGeom
 	{
 	}
 
@@ -50,6 +42,7 @@ namespace MyCAM.Data
 			set;
 		}
 
+		// TODO: this should be removed
 		bool IsCoordinateReversed
 		{
 			get;

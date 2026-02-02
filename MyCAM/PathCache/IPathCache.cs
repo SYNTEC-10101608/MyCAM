@@ -1,0 +1,42 @@
+﻿using MyCAM.Data;
+using OCC.gp;
+using System.Collections.Generic;
+
+namespace MyCAM.PathCache
+{
+	public interface IPathCache
+	{
+		List<CAMPoint> MainPathPointList
+		{
+			get;
+		}
+
+		List<CAMPoint> LeadInPointList
+		{
+			get;
+		}
+
+		List<CAMPoint> LeadOutPointList
+		{
+			get;
+		}
+
+		List<CAMPoint> OverCutPointList
+		{
+			get;
+		}
+	}
+
+	public interface ITransformableCache
+	{
+		void DoTransform( gp_Trsf transform );
+	}
+
+	public interface IContourCache : IPathCache, ITransformableCache
+	{
+	}
+
+	public interface IStdPatternCache : IPathCache, ITransformableCache
+	{
+	}
+}
