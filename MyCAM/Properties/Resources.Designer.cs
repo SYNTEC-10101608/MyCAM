@@ -143,6 +143,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Check {
+            get {
+                object obj = ResourceManager.GetObject("Check", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap CNC {
             get {
                 object obj = ResourceManager.GetObject("CNC", resourceCulture);
@@ -283,6 +293,26 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap NextCol {
+            get {
+                object obj = ResourceManager.GetObject("NextCol", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap NextPath {
+            get {
+                object obj = ResourceManager.GetObject("NextPath", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Overcut {
             get {
                 object obj = ResourceManager.GetObject("Overcut", resourceCulture);
@@ -316,6 +346,26 @@ namespace MyCAM.Properties {
         internal static System.Drawing.Bitmap PointCenter {
             get {
                 object obj = ResourceManager.GetObject("PointCenter", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap PreviousCol {
+            get {
+                object obj = ResourceManager.GetObject("PreviousCol", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap PreviousPath {
+            get {
+                object obj = ResourceManager.GetObject("PreviousPath", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -366,6 +416,26 @@ namespace MyCAM.Properties {
         internal static System.Drawing.Bitmap SewPart {
             get {
                 object obj = ResourceManager.GetObject("SewPart", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SlowDown {
+            get {
+                object obj = ResourceManager.GetObject("SlowDown", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SpeedUp {
+            get {
+                object obj = ResourceManager.GetObject("SpeedUp", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
