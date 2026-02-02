@@ -34,26 +34,28 @@
     <Pr ID="3035" Value="0" />
     <Pr ID="3036" Value="0" />
     <!--Mix Type-->
-    <Pr ID="3041" Value="0" />
-    <Pr ID="3042" Value="101200" />
+    <Pr ID="3041" Value="-17270" />
+    <Pr ID="3042" Value="104200" />
     <Pr ID="3043" Value="169480" />
-    <Pr ID="3044" Value="40810" />
-    <Pr ID="3045" Value="-384800" />
-    <Pr ID="3046" Value="-665670" />
+    <Pr ID="3044" Value="0" />
+    <Pr ID="3045" Value="0" />
+    <Pr ID="3046" Value="0" />
   </MachineData>
   <MachineTree>
     <Child Type="Base">
-      <Child Type="YAxis">
+	  <Child Type="YAxis">
         <Child Type="Slave">
           <Child Type="WorkPiece" />
-        </Child>
+		</Child>
       </Child>
-      <Child Type="XAxis">
+      <Child Type="XAxis"> 
         <Child Type="ZAxis">
           <Child Type="Master">
-            <Child Type="Tool" />
+            <Child Type="Tool">
+			  <Child Type="Laser" />
+            </Child>
           </Child>
-        </Child>
+		</Child>
       </Child>
     </Child>
   </MachineTree>

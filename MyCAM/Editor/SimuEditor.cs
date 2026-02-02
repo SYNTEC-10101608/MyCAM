@@ -1,17 +1,26 @@
-﻿using MyCAM.PathCache;
+﻿using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Editor.Renderer;
+using MyCAM.Helper;
+using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.AIS;
+using OCC.BRep;
 using OCC.BRepAlgoAPI;
+using OCC.BRepMesh;
 using OCC.BRepPrimAPI;
 using OCC.gp;
-using OCC.Graphic3d;
 using OCC.Poly;
 using OCC.Quantity;
-using OCC.RWStl;
 using OCC.TColStd;
+using OCC.TopAbs;
+using OCC.TopExp;
+using OCC.TopLoc;
+using OCC.TopoDS;
 using OCCViewer;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -22,44 +31,52 @@ namespace MyCAM.Editor
 		public SimuEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
-			// init frame transform map
-			m_FrameTransformMap[ MachineComponentType.Base ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.XAxis ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.YAxis ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.ZAxis ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.Master ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.Slave ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.Tool ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.WorkPiece ] = new List<gp_Trsf>();
+			m_MachineData = dataManager.MachineData;
+			m_PostSolver = new PostSolver( m_MachineData );
+			m_TraverseRender = new TraverseRenderer( m_Viewer, m_DataManager );
+			m_FCLTest = new CollisionSolver();
 
-			// init frame collision map
-			m_FrameCollisionMap[ MachineComponentType.Base ] = new List<bool>();
-			m_FrameCollisionMap[ MachineComponentType.XAxis ] = new List<bool>();
-			m_FrameCollisionMap[ MachineComponentType.YAxis ] = new List<bool>();
-			m_FrameCollisionMap[ MachineComponentType.ZAxis ] = new List<bool>();
-			m_FrameCollisionMap[ MachineComponentType.Master ] = new List<bool>();
-			m_FrameCollisionMap[ MachineComponentType.Slave ] = new List<bool>();
-			m_FrameCollisionMap[ MachineComponentType.Tool ] = new List<bool>();
-			m_FrameCollisionMap[ MachineComponentType.WorkPiece ] = new List<bool>();
+			// build chain list
+			m_ChainListMap.Clear();
+			BuildDefaultMachineTree();
+
+			// all chain need to be build before workpiece chain
+			BuildChainList( m_SimulationTreeRoot, new List<MachineComponentType>() );
+			BuildWorkpieceChain();
 		}
 
 		// simulation properties
 		MachineData m_MachineData;
 		PostSolver m_PostSolver;
 		CollisionSolver m_FCLTest;
+		MachineTreeNode m_SimulationTreeRoot = null;
 
 		// read from machine data
 		HashSet<MachineComponentType> m_WorkPieceChainSet = new HashSet<MachineComponentType>();
 		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
-		Dictionary<MachineComponentType, AIS_InteractiveObject> m_MachineShapeMap = new Dictionary<MachineComponentType, AIS_InteractiveObject>();
+		Dictionary<MachineComponentType, List<AIS_InteractiveObject>> m_MachineShapeMap = new Dictionary<MachineComponentType, List<AIS_InteractiveObject>>();
 
 		// calculated result
 		Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 		Dictionary<MachineComponentType, List<bool>> m_FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
 
 		// frame control
-		int m_FrameCount = 0;
-		int m_CurrentFrameIndex = 0;
+		const int INIT_FRAME_INDEX = 0;
+		const int INIT_FRAME_COUNT = 0;
+		int m_FrameCount = INIT_FRAME_COUNT;
+		int m_CurrentFrameIndex = INIT_FRAME_INDEX;
+		bool m_IsNeedReCal = true;
+		Timer m_PlayTimer;
+
+		// machinal UI
+		MachineAppearance m_MachineAppearance;
+		bool m_IsImportMachine = false;
+
+		// been solved IK point
+		List<PostData> m_PostDataList = new List<PostData>();
+
+		// traverse show on viewer
+		TraverseRenderer m_TraverseRender;
 
 		// editor
 		public override EEditorType Type
@@ -72,16 +89,33 @@ namespace MyCAM.Editor
 
 		public override void EditStart()
 		{
-			m_Viewer.KeyDown += OnKeyDown;
+			ShowSpecificCAM();
+
+			// set machineShapeBack
+			if( m_IsImportMachine ) {
+				ReShowMachine();
+				RegisterMeshForCollision();
+
+				// set map for workpieces, cause collision simulation need to refresh workpieces color
+				SetWorkPiecesMap();
+
+				// 這個步驟沒有導致畫布改變
+				RegisterWorkpieceForCollision();
+				m_Viewer.UpdateView();
+			}
+
+			// get post data
+			SetPostDataList();
+			m_IsNeedReCal = true;
 		}
 
 		public override void EditEnd()
 		{
-			m_Viewer.KeyDown -= OnKeyDown;
+			ClearCash();
+			ResetUI();
 		}
 
-		// APIs
-		public void ImportMachine()
+		public void ImportStl()
 		{
 			string szFolderName = string.Empty;
 			using( FolderBrowserDialog folderDialog = new FolderBrowserDialog() ) {
@@ -100,134 +134,428 @@ namespace MyCAM.Editor
 			if( string.IsNullOrEmpty( szFolderName ) ) {
 				return;
 			}
-			ReadMachineData( szFolderName );
+
+			// remove old data
+			RemoveMachineShape();
+			m_MachineShapeMap.Clear();
+			m_IsNeedReCal = true;
+			m_IsImportMachine = false;
+
+			// show stl on viewer
+			bool isReadSuccess = ReadStlToShowOnViewer( szFolderName );
+			if( isReadSuccess == false ) {
+				return;
+			}
+			RegisterMeshForCollision();
+
+			// this step doesn't cause canvas change
+			RegisterWorkpieceForCollision();
+
+			// set map for workpieces, cause collision simulation need to refresh workpieces color
+			SetWorkPiecesMap();
+			m_IsImportMachine = true;
 		}
 
-		public void BuildSimuData()
+		void BuildSimuData()
 		{
-			foreach( string szID in m_DataManager.PartIDList ) {
-				CraftData craftData = ( m_DataManager.ObjectMap[ szID ] as PathObject ).CraftData;
-				ContourCache contourCache = ( m_DataManager.ObjectMap[ szID ] as ContourPathObject ).ContourCache as ContourCache;
-				gp_Vec G54Offset = new gp_Vec( 40, -385, -640 );
-				m_PostSolver.G54Offset = G54Offset;
-				PostData simuPostData = null; // TODO: the implementation should be rework
-
-				// connecting post points of all process paths
-				List<PostPoint> currentPathPostPointList = ContourPostHelper.GetConcatenatedPostList( simuPostData );
-
-				// build frame by frame
-				foreach( var postPoint in currentPathPostPointList ) {
-
-					// set XYZ transform
-					Dictionary<MachineComponentType, gp_Trsf> transformMap = new Dictionary<MachineComponentType, gp_Trsf>();
-					gp_Trsf trsfX = new gp_Trsf();
-					trsfX.SetTranslation( new gp_Vec( postPoint.X + G54Offset.X(), 0, 0 ) );
-					if( m_WorkPieceChainSet.Contains( MachineComponentType.XAxis ) ) {
-						trsfX.Invert();
-					}
-					transformMap[ MachineComponentType.XAxis ] = trsfX;
-
-					gp_Trsf trsfY = new gp_Trsf();
-					trsfY.SetTranslation( new gp_Vec( 0, postPoint.Y + G54Offset.Y(), 0 ) );
-					if( m_WorkPieceChainSet.Contains( MachineComponentType.YAxis ) ) {
-						trsfY.Invert();
-					}
-					transformMap[ MachineComponentType.YAxis ] = trsfY;
-
-					gp_Trsf trsfZ = new gp_Trsf();
-					trsfZ.SetTranslation( new gp_Vec( 0, 0, postPoint.Z + G54Offset.Z() ) );
-					if( m_WorkPieceChainSet.Contains( MachineComponentType.ZAxis ) ) {
-						trsfZ.Invert();
-					}
-					transformMap[ MachineComponentType.ZAxis ] = trsfZ;
-
-					// set master rotation
-					gp_Pnt ptOnMaster = m_MachineData.PtOnMaster;
-					gp_Ax1 axisMaster = new gp_Ax1( ptOnMaster, m_MachineData.MasterRotateDir );
-					gp_Trsf trsfMaster = new gp_Trsf();
-					trsfMaster.SetRotation( axisMaster, postPoint.Master );
-					if( m_WorkPieceChainSet.Contains( MachineComponentType.Master ) ) {
-						trsfMaster.Invert();
-					}
-					transformMap[ MachineComponentType.Master ] = trsfMaster;
-
-					// set slave rotation
-					gp_Pnt ptOnSlave = m_MachineData.PtOnSlave;
-					gp_Ax1 axisSlave = new gp_Ax1( ptOnSlave, m_MachineData.SlaveRotateDir );
-					gp_Trsf trsfSlave = new gp_Trsf();
-					trsfSlave.SetRotation( axisSlave, postPoint.Slave );
-					if( m_WorkPieceChainSet.Contains( MachineComponentType.Slave ) ) {
-						trsfSlave.Invert();
-					}
-					transformMap[ MachineComponentType.Slave ] = trsfSlave;
-
-					// set tool and workpiece transform
-					transformMap[ MachineComponentType.Tool ] = new gp_Trsf();
-					gp_Trsf trsfWorkPiece = new gp_Trsf();
-					trsfWorkPiece.SetTranslation( G54Offset );
-					transformMap[ MachineComponentType.WorkPiece ] = trsfWorkPiece;
-
-					// set chain
-					gp_Trsf trsfAllX = GetComponentTrsf( transformMap, MachineComponentType.XAxis );
-					gp_Trsf trsfAllY = GetComponentTrsf( transformMap, MachineComponentType.YAxis );
-					gp_Trsf trsfAllZ = GetComponentTrsf( transformMap, MachineComponentType.ZAxis );
-					gp_Trsf trsfAllMaster = GetComponentTrsf( transformMap, MachineComponentType.Master );
-					gp_Trsf trsfAllSlave = GetComponentTrsf( transformMap, MachineComponentType.Slave );
-					gp_Trsf trsAllfTool = GetComponentTrsf( transformMap, MachineComponentType.Tool );
-					gp_Trsf trsfAllWorkPiece = GetComponentTrsf( transformMap, MachineComponentType.WorkPiece );
-					m_FrameTransformMap[ MachineComponentType.XAxis ].Add( trsfAllX );
-					m_FrameTransformMap[ MachineComponentType.YAxis ].Add( trsfAllY );
-					m_FrameTransformMap[ MachineComponentType.ZAxis ].Add( trsfAllZ );
-					m_FrameTransformMap[ MachineComponentType.Master ].Add( trsfAllMaster );
-					m_FrameTransformMap[ MachineComponentType.Slave ].Add( trsfAllSlave );
-					m_FrameTransformMap[ MachineComponentType.Tool ].Add( trsAllfTool );
-					m_FrameTransformMap[ MachineComponentType.WorkPiece ].Add( trsfAllWorkPiece );
-
-					// set collision
-					HashSet<MachineComponentType> collisionResiltSet = new HashSet<MachineComponentType>();
-					foreach( var compT in m_ChainListMap[ MachineComponentType.Tool ] ) {
-						if( compT == MachineComponentType.Base ) {
-							continue; // skip base
-						}
-						foreach( var compW in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
-							if( compW == MachineComponentType.Base ) {
-								continue; // skip base
-							}
-							if( m_FCLTest.CheckCollision( compT.ToString(), compW.ToString(),
-								ConvertTransform( m_FrameTransformMap[ compT ].Last() ),
-								ConvertTransform( m_FrameTransformMap[ compW ].Last() ) ) ) {
-								collisionResiltSet.Add( compT );
-								collisionResiltSet.Add( compW );
-							}
-						}
-					}
-					m_FrameCollisionMap[ MachineComponentType.XAxis ].Add( collisionResiltSet.Contains( MachineComponentType.XAxis ) );
-					m_FrameCollisionMap[ MachineComponentType.YAxis ].Add( collisionResiltSet.Contains( MachineComponentType.YAxis ) );
-					m_FrameCollisionMap[ MachineComponentType.ZAxis ].Add( collisionResiltSet.Contains( MachineComponentType.ZAxis ) );
-					m_FrameCollisionMap[ MachineComponentType.Master ].Add( collisionResiltSet.Contains( MachineComponentType.Master ) );
-					m_FrameCollisionMap[ MachineComponentType.Slave ].Add( collisionResiltSet.Contains( MachineComponentType.Slave ) );
-
-					m_FrameCount++;
+			if( m_FCLTest == null || m_PostSolver == null || m_PostSolver.G54Offset == null || m_DataManager.PathIDList == null || m_DataManager.PathIDList.Count == 0 ) {
+				return;
+			}
+			if( m_IsImportMachine == false ) {
+				bool isSetSuccesss = GetDefaultStl();
+				if( isSetSuccesss == false ) {
+					return;
 				}
 			}
-			// CAMData camData = m_CADManager.GetCAMDataList()[ 0 ];
 
+			// need last path end point's vector to calculate exit pnt
+			IProcessPoint lastpathLastPoint = GetProcessEndPoint( m_DataManager.PathIDList.Last() );
+			SimulationRequiredData calNeedData = new SimulationRequiredData()
+			{
+				EachPathIKPostDataList = m_PostDataList,
+				LastPathLastPnt = lastpathLastPoint,
+				EntryAndExitData = m_DataManager.EntryAndExitData,
+				PostSolver = m_PostSolver,
+				WorkPiecesChaintSet = m_WorkPieceChainSet,
+				MachineData = m_MachineData,
+				ChainListMap = m_ChainListMap,
+				FCLTest = m_FCLTest,
+			};
+			bool bFrameCalDone = SimulationHelper.BuildSimuData( calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out int frameCount );
+			if( !bFrameCalDone ) {
+				MyApp.Logger.ShowOnLogPanel( "模擬資料建立失敗", MyApp.NoticeType.Warning );
+				return;
+			}
+			bool bCollisionCalDone = CollisionHelper.CalCollisionResult( frameCount, calNeedData, frameTransformMap, out Dictionary<MachineComponentType, List<bool>> frameCollisionMap );
+			if( !bCollisionCalDone ) {
+				MyApp.Logger.ShowOnLogPanel( "防碰撞資料建立失敗", MyApp.NoticeType.Warning );
+				return;
+			}
+			m_FrameCollisionMap = frameCollisionMap;
+			m_FrameTransformMap = frameTransformMap;
+			m_FrameCount = frameCount;
 		}
 
-		gp_Trsf GetComponentTrsf( Dictionary<MachineComponentType, gp_Trsf> transformMap, MachineComponentType type )
+		void ClearCash()
 		{
-			gp_Trsf trsf = new gp_Trsf();
-			foreach( var parent in m_ChainListMap[ type ] ) {
-				if( parent == MachineComponentType.Base ) {
-					continue; // base is not transformed
+			m_IsNeedReCal = false;
+			m_FrameCount = INIT_FRAME_COUNT;
+			m_CurrentFrameIndex = INIT_FRAME_INDEX;
+			foreach( var key in m_FrameTransformMap.Keys.ToList() ) {
+				m_FrameTransformMap[ key ].Clear();
+			}
+		}
+
+		#region Init
+
+		void SetPostDataList()
+		{
+			List<PostData> postDataList = GetPostDataList();
+			m_PostDataList = postDataList;
+		}
+
+		List<PostData> GetPostDataList()
+		{
+			NCWriter writer = new NCWriter( m_DataManager );
+			bool bSuccess = writer.ConvertContourSuccess( out string szErrorMessage, out List<PostData> postDataList );
+			if( !bSuccess ) {
+				MyApp.Logger.ShowOnLogPanel( "後處理失敗, 無法生成模擬: " + szErrorMessage, MyApp.NoticeType.Warning );
+				return new List<PostData>();
+			}
+			return postDataList;
+		}
+
+		void BuildChainList( MachineTreeNode root, List<MachineComponentType> chainList )
+		{
+			if( root == null ) {
+				return;
+			}
+			m_ChainListMap[ root.Type ] = chainList;
+			foreach( MachineTreeNode child in root.Children ) {
+				BuildChainList( child, new List<MachineComponentType>( chainList ) { root.Type } );
+			}
+		}
+
+		// this chain calcution will be reverse
+		void BuildWorkpieceChain()
+		{
+			m_WorkPieceChainSet.Clear();
+
+			// protection
+			if( m_ChainListMap == null || m_ChainListMap.ContainsKey( MachineComponentType.WorkPiece ) == false ) {
+				return;
+			}
+			foreach( MachineComponentType type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
+				m_WorkPieceChainSet.Add( type );
+			}
+		}
+
+		#endregion
+
+		#region UI Setting
+
+		// for leaving simu editor
+		void ResetUI()
+		{
+			RemoveAllCAMData();
+			ResetAIS();
+			RemoveMachineShape();
+			m_MachineShapeMap.Clear();
+		}
+
+		void RemoveAllCAMData()
+		{
+			List<string> pathIDList = m_DataManager.PathIDList;
+			m_TraverseRender.Remove();
+			m_Viewer.UpdateView();
+		}
+
+		// transform AIS back as original
+		void ResetAIS()
+		{
+			if( m_Viewer == null || m_MachineShapeMap == null ) {
+				return;
+			}
+			foreach( KeyValuePair<MachineComponentType, List<AIS_InteractiveObject>> mapItem in m_MachineShapeMap ) {
+				MachineComponentType type = mapItem.Key;
+				List<AIS_InteractiveObject> aisList = mapItem.Value;
+				if( aisList == null ) {
+					continue;
 				}
-				if( transformMap.ContainsKey( parent ) ) {
-					trsf.Multiply( transformMap[ parent ] );
+				foreach( AIS_InteractiveObject shape_AIS in aisList ) {
+					if( shape_AIS == null ) {
+						continue;
+					}
+					// transform back
+					shape_AIS.SetLocalTransformation( new gp_Trsf() );
+					if( type == MachineComponentType.WorkPiece ) {
+						shape_AIS.SetLocalTransformation( new gp_Trsf() );
+						shape_AIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY70 ) );
+						shape_AIS.Attributes().SetFaceBoundaryDraw( true );
+						shape_AIS.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+						shape_AIS.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
+						shape_AIS.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
+						shape_AIS.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
+					}
 				}
 			}
-			trsf.Multiply( transformMap[ type ] );
-			return trsf;
 		}
+
+		void RemoveMachineShape()
+		{
+			if( m_Viewer == null || m_MachineShapeMap == null ) {
+				return;
+			}
+			AIS_InteractiveContext aisContext = m_Viewer.GetAISContext();
+			foreach( var machinePart in m_MachineShapeMap ) {
+
+				// workpiece still need to show on viewer
+				if( machinePart.Value != null && machinePart.Key != MachineComponentType.WorkPiece ) {
+					foreach( var machine_AIS in machinePart.Value ) {
+						if( machine_AIS != null ) {
+							aisContext.Remove( machine_AIS, false );
+						}
+					}
+				}
+			}
+		}
+
+		// helpers for multi-shape handling per component type
+		void AddMachineShapeToMap( MachineComponentType type, AIS_InteractiveObject machineAIS )
+		{
+			if( machineAIS == null ) {
+				return;
+			}
+			if( !m_MachineShapeMap.ContainsKey( type ) ) {
+				m_MachineShapeMap[ type ] = new List<AIS_InteractiveObject>();
+			}
+			m_MachineShapeMap[ type ].Add( machineAIS );
+		}
+
+		void ApplyTransformToAll( MachineComponentType type, gp_Trsf trsf )
+		{
+			foreach( var aisList in GetMachineShapes( type ) ) {
+				aisList?.SetLocalTransformation( trsf );
+			}
+		}
+
+		void ReShowMachine()
+		{
+			ShowMachineAISOnViewer( m_MachineAppearance );
+			BuildLaserAIS();
+		}
+
+		void RegisterMeshForCollision()
+		{
+			if( m_MachineAppearance == null ) {
+				return;
+			}
+			foreach( var componentType in m_MachineAppearance.Meshes.Keys ) {
+				if( componentType == MachineComponentType.UnKnow ) {
+					continue;
+				}
+				if( !m_MachineAppearance.Meshes.ContainsKey( componentType ) ) {
+					continue;
+				}
+				if( m_MachineAppearance.Meshes[ componentType ] == null ) {
+					continue;
+				}
+				Poly_Triangulation triangulation = m_MachineAppearance.Meshes[ componentType ];
+				MeshShape( triangulation, out List<double> vertexList, out List<int> indexList );
+				m_FCLTest.AddModel( componentType.ToString(), indexList.ToArray(), vertexList.ToArray() );
+			}
+		}
+
+		void RegisterWorkpieceForCollision()
+		{
+			List<AIS_Shape> workpieceShapes = new List<AIS_Shape>();
+
+			// get all workpiece shapes
+			foreach( var ID in m_DataManager.PartIDList ) {
+				workpieceShapes.Add( m_ViewManager.ViewObjectMap[ ID ].AISHandle as AIS_Shape );
+			}
+
+			// turn workpiece shapes as 1 triangulation
+			bool isTranDone = BuildMergedTriangulation( workpieceShapes, out Poly_Triangulation workPiecesTrian );
+			if( isTranDone == false ) {
+				return;
+			}
+
+			// register to collision solver
+			MeshShape( workPiecesTrian, out List<double> vertexListWP, out List<int> indexListWP );
+			m_FCLTest.AddModel( MachineComponentType.WorkPiece.ToString(), indexListWP.ToArray(), vertexListWP.ToArray() );
+		}
+
+		void ShowTraverse( List<string> pathIDList )
+		{
+			m_TraverseRender.Show();
+			m_Viewer.UpdateView();
+		}
+
+		void ShowSpecificCAM()
+		{
+			// take all path IDs
+			List<string> pathIDList = m_DataManager.PathIDList;
+			ShowTraverse( pathIDList );
+		}
+
+		void ShowMachineAISOnViewer( MachineAppearance machineAppearance )
+		{
+			if( machineAppearance == null ) {
+				return;
+			}
+			foreach( var componentType in machineAppearance.AisObjects.Keys ) {
+				if( componentType == MachineComponentType.UnKnow ) {
+					continue;
+				}
+				if( !machineAppearance.AisObjects.ContainsKey( componentType ) ) {
+					continue;
+				}
+				if( machineAppearance.AisObjects[ componentType ] == null ) {
+					continue;
+				}
+				m_Viewer.GetAISContext().Display( machineAppearance.AisObjects[ componentType ], false );
+				AddMachineShapeToMap( componentType, machineAppearance.AisObjects[ componentType ] );
+			}
+		}
+
+		void SetWorkPiecesMap()
+		{
+			if( m_DataManager.PartIDList == null || m_DataManager.PartIDList.Count == 0 ) {
+				return;
+			}
+			foreach( var ID in m_DataManager.PartIDList ) {
+				AddMachineShapeToMap( MachineComponentType.WorkPiece, m_ViewManager.ViewObjectMap[ ID ].AISHandle as AIS_Shape );
+			}
+		}
+
+		void MeshShape( Poly_Triangulation tri, out List<double> vertexList, out List<int> indexList )
+		{
+			vertexList = new List<double>();
+			indexList = new List<int>();
+
+			// vertex
+			for( int i = 1; i <= tri.NbNodes(); i++ ) {
+				gp_Pnt p = tri.Node( i );
+				vertexList.Add( p.X() );
+				vertexList.Add( p.Y() );
+				vertexList.Add( p.Z() );
+			}
+
+			// index
+			for( int i = 1; i <= tri.NbTriangles(); i++ ) {
+				Poly_Triangle triangle = tri.Triangle( i );
+				int index1 = 0;
+				int index2 = 0;
+				int index3 = 0;
+				triangle.Get( ref index1, ref index2, ref index3 );
+				indexList.Add( index1 - 1 ); // convert to zero-based index
+				indexList.Add( index2 - 1 );
+				indexList.Add( index3 - 1 );
+			}
+
+		}
+
+		bool BuildMergedTriangulation( List<AIS_Shape> aisShapes, out Poly_Triangulation merged, double deflection = 0.1 )
+		{
+			merged = new Poly_Triangulation();
+			if( aisShapes == null ) {
+				return false;
+			}
+			if( aisShapes.Count == 0 ) {
+				return false;
+			}
+
+			List<gp_Pnt> globalVertices = new List<gp_Pnt>();
+			List<Poly_Triangle> globalTriangles = new List<Poly_Triangle>();
+			int vertexOffset = 0;
+
+			foreach( AIS_Shape ais in aisShapes ) {
+				if( ais == null )
+					continue;
+
+				TopoDS_Shape shape = ais.Shape();
+				if( shape == null )
+					continue;
+
+				// Ensure triangulation
+				new BRepMesh_IncrementalMesh( shape, deflection );
+
+				// Traverse faces
+				for( TopExp_Explorer exp = new TopExp_Explorer( shape, TopAbs_ShapeEnum.TopAbs_FACE );
+					 exp.More();
+					 exp.Next() ) {
+					TopoDS_Face face = TopoDS.ToFace( exp.Current() );
+
+					TopLoc_Location loc = new TopLoc_Location();
+					Poly_Triangulation tri = BRep_Tool.Triangulation( face, ref loc );
+
+					if( tri == null || tri.IsNull() ) {
+						continue;
+					}
+
+					gp_Trsf trsf = loc.Transformation();
+					int nbNodes = tri.NbNodes();
+					for( int i = 1; i <= nbNodes; i++ ) {
+						gp_Pnt p = tri.Node( i ).Transformed( trsf );
+						globalVertices.Add( p );
+					}
+
+					int nbTriangles = tri.NbTriangles();
+					for( int i = 1; i <= nbTriangles; i++ ) {
+						Poly_Triangle t = tri.Triangle( i );
+						int a = 0;
+						int b = 0;
+						int c = 0;
+						t.Get( ref a, ref b, ref c );
+
+						globalTriangles.Add( new Poly_Triangle(
+							a + vertexOffset,
+							b + vertexOffset,
+							c + vertexOffset ) );
+					}
+
+					vertexOffset += nbNodes;
+				}
+			}
+
+			if( globalVertices.Count == 0 || globalTriangles.Count == 0 )
+				throw new InvalidOperationException( "No triangulation generated from AIS_Shapes." );
+
+			// -----------------------
+			// Build merged Poly_Triangulation
+			// -----------------------
+			merged = new Poly_Triangulation(
+						globalVertices.Count,
+						globalTriangles.Count,
+						false // no UVs
+					);
+
+			// Set vertices
+			for( int i = 0; i < globalVertices.Count; i++ ) {
+				merged.SetNode( i + 1, globalVertices[ i ] ); // Node 1-based
+			}
+
+			// Set triangles
+			for( int i = 0; i < globalTriangles.Count; i++ ) {
+				merged.SetTriangle( i + 1, globalTriangles[ i ] ); // Triangle 1-based
+			}
+
+			// Optional: compute normals
+			try {
+				merged.ComputeNormals();
+			}
+			catch {
+				// ignore if not supported
+				return false;
+			}
+
+			return true;
+		}
+
+		#endregion
+
+		#region Refresh Simultion Result
 
 		void RefreshFrame()
 		{
@@ -238,104 +566,40 @@ namespace MyCAM.Editor
 				m_CurrentFrameIndex = m_FrameCount - 1;
 			}
 			if( m_CurrentFrameIndex >= m_FrameCount ) {
-				m_CurrentFrameIndex = 0;
+				return;
 			}
 
 			// refresh position
-			m_MachineShapeMap[ MachineComponentType.XAxis ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.XAxis ][ m_CurrentFrameIndex ] );
-			m_MachineShapeMap[ MachineComponentType.YAxis ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.YAxis ][ m_CurrentFrameIndex ] );
-			m_MachineShapeMap[ MachineComponentType.ZAxis ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.ZAxis ][ m_CurrentFrameIndex ] );
-			m_MachineShapeMap[ MachineComponentType.Master ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.Master ][ m_CurrentFrameIndex ] );
-			m_MachineShapeMap[ MachineComponentType.Slave ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.Slave ][ m_CurrentFrameIndex ] );
-			m_MachineShapeMap[ MachineComponentType.Tool ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.Tool ][ m_CurrentFrameIndex ] );
-			m_MachineShapeMap[ MachineComponentType.WorkPiece ].SetLocalTransformation( m_FrameTransformMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ] );
+			ApplyTransformToAll( MachineComponentType.Laser, m_FrameTransformMap[ MachineComponentType.Laser ][ m_CurrentFrameIndex ] );
+			ApplyTransformToAll( MachineComponentType.Tool, m_FrameTransformMap[ MachineComponentType.Tool ][ m_CurrentFrameIndex ] );
+			ApplyTransformToAll( MachineComponentType.WorkPiece, m_FrameTransformMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ] );
+			ApplyTransformToAll( MachineComponentType.Slave, m_FrameTransformMap[ MachineComponentType.Slave ][ m_CurrentFrameIndex ] );
+			ApplyTransformToAll( MachineComponentType.Master, m_FrameTransformMap[ MachineComponentType.Master ][ m_CurrentFrameIndex ] );
+
+			// traverse transformation is the same as workpiece
+			m_TraverseRender.Trans( m_FrameTransformMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ] );
 
 			// refresh color
-			RefreshComponentColor( MachineComponentType.XAxis );
-			RefreshComponentColor( MachineComponentType.YAxis );
-			RefreshComponentColor( MachineComponentType.ZAxis );
 			RefreshComponentColor( MachineComponentType.Master );
 			RefreshComponentColor( MachineComponentType.Slave );
+			RefreshComponentColor( MachineComponentType.Tool );
+			RefrshWorkPieces();
 			m_Viewer.UpdateView();
 		}
 
 		void RefreshComponentColor( MachineComponentType type )
 		{
-			SetMeshColor( m_MachineShapeMap[ type ] as AIS_Triangulation, type, m_FrameCollisionMap[ type ][ m_CurrentFrameIndex ] );
-			m_Viewer.GetAISContext().Redisplay( m_MachineShapeMap[ type ], false );
-		}
-
-		// TODO: read machine data from file
-		void ReadMachineData( string szFolderName )
-		{
-			ReadMixTest();
-
-			Poly_Triangulation shapeBase = RWStl.ReadFile( szFolderName + "\\Base.stl" );
-			Poly_Triangulation shapeX = RWStl.ReadFile( szFolderName + "\\X.stl" );
-			Poly_Triangulation shapeY = RWStl.ReadFile( szFolderName + "\\Y.stl" );
-			Poly_Triangulation shapeZ = RWStl.ReadFile( szFolderName + "\\Z.stl" );
-			Poly_Triangulation shapeMaster = RWStl.ReadFile( szFolderName + "\\Master.stl" );
-			Poly_Triangulation shapeSlave = RWStl.ReadFile( szFolderName + "\\Slave.stl" );
-
-			m_MachineShapeMap.Clear();
-			AIS_Triangulation baseAIS = CreateMeshAIS( shapeBase, MachineComponentType.Base );
-			m_Viewer.GetAISContext().Display( baseAIS, false );
-			m_MachineShapeMap[ MachineComponentType.Base ] = baseAIS;
-			AIS_Triangulation xAIS = CreateMeshAIS( shapeX, MachineComponentType.XAxis );
-			m_Viewer.GetAISContext().Display( xAIS, false );
-			m_MachineShapeMap[ MachineComponentType.XAxis ] = xAIS;
-			AIS_Triangulation yAIS = CreateMeshAIS( shapeY, MachineComponentType.YAxis );
-			m_Viewer.GetAISContext().Display( yAIS, false );
-			m_MachineShapeMap[ MachineComponentType.YAxis ] = yAIS;
-			AIS_Triangulation zAIS = CreateMeshAIS( shapeZ, MachineComponentType.ZAxis );
-			m_Viewer.GetAISContext().Display( zAIS, false );
-			m_MachineShapeMap[ MachineComponentType.ZAxis ] = zAIS;
-			AIS_Triangulation masterAIS = CreateMeshAIS( shapeMaster, MachineComponentType.Master );
-			m_Viewer.GetAISContext().Display( masterAIS, false );
-			m_MachineShapeMap[ MachineComponentType.Master ] = masterAIS;
-			AIS_Triangulation slaveAIS = CreateMeshAIS( shapeSlave, MachineComponentType.Slave );
-			m_Viewer.GetAISContext().Display( slaveAIS, false );
-			m_MachineShapeMap[ MachineComponentType.Slave ] = slaveAIS;
-
-			m_FCLTest = new CollisionSolver();
-			MeshShape( shapeX, out List<double> vertexListX, out List<int> indexListX );
-			m_FCLTest.AddModel( MachineComponentType.XAxis.ToString(), indexListX.ToArray(), vertexListX.ToArray() );
-			MeshShape( shapeY, out List<double> vertexListY, out List<int> indexListY );
-			m_FCLTest.AddModel( MachineComponentType.YAxis.ToString(), indexListY.ToArray(), vertexListY.ToArray() );
-			MeshShape( shapeZ, out List<double> vertexListZ, out List<int> indexListZ );
-			m_FCLTest.AddModel( MachineComponentType.ZAxis.ToString(), indexListZ.ToArray(), vertexListZ.ToArray() );
-			MeshShape( shapeMaster, out List<double> vertexListMaster, out List<int> indexListMaster );
-			m_FCLTest.AddModel( MachineComponentType.Master.ToString(), indexListMaster.ToArray(), vertexListMaster.ToArray() );
-			MeshShape( shapeSlave, out List<double> vertexListSlave, out List<int> indexListSlave );
-			m_FCLTest.AddModel( MachineComponentType.Slave.ToString(), indexListSlave.ToArray(), vertexListSlave.ToArray() );
-
-			// make tool
-			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 0.2, 1 );
-			BRepPrimAPI_MakeCylinder makeTool2 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -1 ), new gp_Dir( 0, 0, -1 ) ), 0.2, 1 );
-			BRepAlgoAPI_Fuse makeTool = new BRepAlgoAPI_Fuse( makeTool1.Shape(), makeTool2.Shape() );
-			AIS_Shape toolAIS = new AIS_Shape( makeTool.Shape() );
-			toolAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			toolAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
-			toolAIS.SetTransparency( 0.8f );
-			m_MachineShapeMap[ MachineComponentType.Tool ] = toolAIS;
-			m_Viewer.GetAISContext().Display( m_MachineShapeMap[ MachineComponentType.Tool ], false );
-
-			// make workpiece
-			m_MachineShapeMap[ MachineComponentType.WorkPiece ] = m_ViewManager.ViewObjectMap[ m_DataManager.PartIDList[ 0 ] ].AISHandle as AIS_Shape;
-			m_Viewer.UpdateView();
-		}
-
-		AIS_Triangulation CreateMeshAIS( Poly_Triangulation mesh, MachineComponentType type )
-		{
-			AIS_Triangulation resultAIS = new AIS_Triangulation( mesh );
-
-			// set material aspect, this matter since the default material gives wrong color effect
-			Graphic3d_MaterialAspect baseAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_UserDefined );
-			resultAIS.SetMaterial( baseAspect );
-
-			// set color
-			SetMeshColor( resultAIS, type, false );
-			return resultAIS;
+			bool isCollision = m_FrameCollisionMap[ type ][ m_CurrentFrameIndex ];
+			foreach( var obj in GetMachineShapes( type ) ) {
+				var tri = obj as AIS_Triangulation;
+				if( tri != null ) {
+					SetMeshColor( tri, type, isCollision );
+					m_Viewer.GetAISContext().Redisplay( tri, false );
+				}
+				else {
+					m_Viewer.GetAISContext().Redisplay( obj, false );
+				}
+			}
 		}
 
 		void SetMeshColor( AIS_Triangulation meshAIS, MachineComponentType type, bool isCollision )
@@ -378,216 +642,272 @@ namespace MyCAM.Editor
 			meshAIS.SetColors( colorArray );
 		}
 
-		void ReadSpindleTest()
+		void RefrshWorkPieces()
 		{
-			m_MachineData = new SpindleTypeMachineData();
-			m_MachineData.ToolDirection = ToolDirection.Z;
-			m_MachineData.MasterRotaryAxis = RotaryAxis.Z;
-			m_MachineData.SlaveRotaryAxis = RotaryAxis.X;
-			m_MachineData.MasterRotaryDirection = RotaryDirection.RightHand;
-			m_MachineData.SlaveRotaryDirection = RotaryDirection.RightHand;
-			m_MachineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			m_MachineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			m_MachineData.ToolLength = 2.0;
-			( m_MachineData as SpindleTypeMachineData ).ToolToSlaveVec = new gp_Vec( -101.20, -0.19, 169.43 );
-			( m_MachineData as SpindleTypeMachineData ).SlaveToMasterVec = new gp_Vec( -252.70, 0, 362.98 ) - ( m_MachineData as SpindleTypeMachineData ).ToolToSlaveVec;
+			bool isCollision = m_FrameCollisionMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ];
+			foreach( string ID in m_DataManager.PartIDList ) {
+				if( isCollision ) {
+					m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PINK ) );
+				}
+				else {
+					m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY70 ) );
+					m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().SetFaceBoundaryDraw( true );
+					m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+					m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
+				}
+			}
+		}
 
+		#endregion
+
+		#region Read Stl
+
+		bool ReadStlToShowOnViewer( string szFolderName )
+		{
+			// input check
+			if( m_Viewer == null || m_ViewManager == null || m_DataManager == null ) {
+				return false;
+			}
+			bool isReadOK = ReadAllMachineStl( szFolderName );
+			if( isReadOK == false ) {
+				return false;
+			}
+			ShowMachineAISOnViewer( m_MachineAppearance );
+			BuildLaserAIS();
+			m_Viewer.UpdateView();
+			return true;
+		}
+
+		bool ReadAllMachineStl( string szFolderName )
+		{
+
+			bool bLoadSuccess = MachineMeshToAISHelper.LoadMachineAppearance( szFolderName, out MachineAppearance machineAppearance );
+			if( bLoadSuccess == false ) {
+				return false;
+			}
+			m_MachineAppearance = machineAppearance;
+			return true;
+		}
+
+		void BuildLaserAIS()
+		{
+			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 0.2, 1 );
+			BRepPrimAPI_MakeCylinder makeTool2 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -1 ), new gp_Dir( 0, 0, -1 ) ), 0.2, 1 );
+			BRepAlgoAPI_Fuse makeTool = new BRepAlgoAPI_Fuse( makeTool1.Shape(), makeTool2.Shape() );
+			AIS_Shape toolAIS = new AIS_Shape( makeTool.Shape() );
+			toolAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			toolAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
+			toolAIS.SetTransparency( 0.8f );
+			AddMachineShapeToMap( MachineComponentType.Laser, toolAIS );
+			m_Viewer.GetAISContext().Display( toolAIS, false );
+		}
+
+		#endregion
+
+		#region Play Simulation
+
+		public void PlaySimulation( int intervalMs = 5 )
+		{
+			if( m_IsNeedReCal ) {
+				ClearCash();
+				BuildSimuData();
+				m_IsNeedReCal = false;
+				m_CurrentFrameIndex = 0;
+			}
+
+			if( m_FrameCount <= 0 ) {
+				return;
+			}
+
+			// initialize timer
+			if( m_PlayTimer == null ) {
+				m_PlayTimer = new Timer();
+				m_PlayTimer.Tick += OnPlayTimerTick;
+			}
+			m_PlayTimer.Interval = intervalMs > 0 ? intervalMs : 300;
+			m_PlayTimer.Start();
+		}
+
+		public void StopSimulation()
+		{
+			if( m_PlayTimer != null ) {
+				m_PlayTimer.Stop();
+			}
+			m_CurrentFrameIndex = 0;
+		}
+
+		public void PauseSimulation()
+		{
+			if( m_PlayTimer != null ) {
+				m_PlayTimer.Stop();
+			}
+		}
+
+		void OnPlayTimerTick( object sender, System.EventArgs e )
+		{
+			if( m_FrameCount <= 0 ) {
+				StopSimulation();
+				return;
+			}
+
+			if( m_CurrentFrameIndex >= m_FrameCount ) {
+				StopSimulation();
+				return;
+			}
+			RefreshFrame();
+			m_CurrentFrameIndex += 5;
+		}
+
+		#endregion
+
+		#region Default Machine Chain
+
+		void BuildDefaultMachineTree()
+		{
+			switch( m_MachineData.FiveAxisType ) {
+				case FiveAxisType.Table:
+					m_SimulationTreeRoot = BuildDefaultTableTree();
+					break;
+				case FiveAxisType.Mix:
+					m_SimulationTreeRoot = BuildDefaultMIxTree();
+					break;
+				case FiveAxisType.Spindle:
+				default:
+					m_SimulationTreeRoot = BuildDefaultSpindleTree();
+					break;
+			}
+		}
+
+		MachineTreeNode BuildDefaultSpindleTree()
+		{
 			// build machine tree
+			MachineTreeNode BaseNode = new MachineTreeNode( MachineComponentType.Base );
 			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
 			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
 			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
 			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
 			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
 			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
+			MachineTreeNode LaserNode = new MachineTreeNode( MachineComponentType.Laser );
 			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-			m_MachineData.RootNode.AddChild( XNode );
+
+			// base node first child
+			BaseNode.AddChild( XNode );
 			XNode.AddChild( YNode );
 			YNode.AddChild( ZNode );
 			ZNode.AddChild( MasterNode );
 			MasterNode.AddChild( SlaveNode );
 			SlaveNode.AddChild( ToolNode );
-			m_MachineData.RootNode.AddChild( WorkPieceNode );
+			ToolNode.AddChild( LaserNode );
 
-			// build chain list
-			m_ChainListMap.Clear();
-			BuildChainList( m_MachineData.RootNode, new List<MachineComponentType>() );
-			m_WorkPieceChainSet.Clear();
-			foreach( var type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
-				m_WorkPieceChainSet.Add( type );
-			}
-
-			// build solver
-			m_PostSolver = new PostSolver( m_MachineData );
+			// base node sceond child
+			BaseNode.AddChild( WorkPieceNode );
+			return BaseNode;
 		}
 
-		void ReadTableTest()
+		MachineTreeNode BuildDefaultTableTree()
 		{
-			m_MachineData = new TableTypeMachineData();
-			m_MachineData.ToolDirection = ToolDirection.Z;
-			m_MachineData.MasterRotaryAxis = RotaryAxis.Y;
-			m_MachineData.SlaveRotaryAxis = RotaryAxis.Z;
-			m_MachineData.MasterRotaryDirection = RotaryDirection.LeftHand;
-			m_MachineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
-			m_MachineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			m_MachineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			m_MachineData.ToolLength = 2.0;
-			( m_MachineData as TableTypeMachineData ).MCSToMasterVec = new gp_Vec( -80.51, 73.81, -129.55 );
-			( m_MachineData as TableTypeMachineData ).MasterToSlaveVec = new gp_Vec( -80.43, -71.67, -94.55 ) - ( m_MachineData as TableTypeMachineData ).MCSToMasterVec;
-
 			// build machine tree
+			MachineTreeNode BaseNode = new MachineTreeNode( MachineComponentType.Base );
 			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
 			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
 			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
 			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
 			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
 			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
+			MachineTreeNode LaserNode = new MachineTreeNode( MachineComponentType.Laser );
 			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-			m_MachineData.RootNode.AddChild( YNode );
-			YNode.AddChild( XNode );
-			XNode.AddChild( MasterNode );
+
+			// base node first child
+			BaseNode.AddChild( MasterNode );
 			MasterNode.AddChild( SlaveNode );
 			SlaveNode.AddChild( WorkPieceNode );
-			m_MachineData.RootNode.AddChild( ZNode );
+
+			// base node second child
+			BaseNode.AddChild( YNode );
+			YNode.AddChild( XNode );
+			XNode.AddChild( ZNode );
 			ZNode.AddChild( ToolNode );
-
-			// build chain list
-			m_ChainListMap.Clear();
-			BuildChainList( m_MachineData.RootNode, new List<MachineComponentType>() );
-			m_WorkPieceChainSet.Clear();
-			foreach( var type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
-				m_WorkPieceChainSet.Add( type );
-			}
-
-			// build solver
-			m_PostSolver = new PostSolver( m_MachineData );
+			ToolNode.AddChild( LaserNode );
+			return BaseNode;
 		}
 
-		void ReadMixTest()
+		MachineTreeNode BuildDefaultMIxTree()
 		{
-			m_MachineData = new MixTypeMachineData();
-			m_MachineData.ToolDirection = ToolDirection.Z;
-			m_MachineData.MasterRotaryAxis = RotaryAxis.Y;
-			m_MachineData.SlaveRotaryAxis = RotaryAxis.Z;
-			m_MachineData.MasterRotaryDirection = RotaryDirection.RightHand;
-			m_MachineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
-			m_MachineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			m_MachineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			m_MachineData.ToolLength = 2.0;
-			( m_MachineData as MixTypeMachineData ).ToolToMasterVec = new gp_Vec( 0, 101.2, 169.48 );
-			( m_MachineData as MixTypeMachineData ).MCSToSlaveVec = new gp_Vec( 40.81, -384.80, -665.67 );
-
 			// build machine tree
+			MachineTreeNode BaseNode = new MachineTreeNode( MachineComponentType.Base );
 			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
 			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
 			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
 			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
 			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
 			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
+			MachineTreeNode LaserNode = new MachineTreeNode( MachineComponentType.Laser );
 			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-			m_MachineData.RootNode.AddChild( YNode );
-			YNode.AddChild( SlaveNode );
+
+			// base node first child
+			BaseNode.AddChild( SlaveNode );
 			SlaveNode.AddChild( WorkPieceNode );
-			m_MachineData.RootNode.AddChild( XNode );
-			XNode.AddChild( ZNode );
+
+			// base node second child
+			BaseNode.AddChild( XNode );
+			XNode.AddChild( YNode );
+			YNode.AddChild( ZNode );
 			ZNode.AddChild( MasterNode );
 			MasterNode.AddChild( ToolNode );
-
-			// build chain list
-			m_ChainListMap.Clear();
-			BuildChainList( m_MachineData.RootNode, new List<MachineComponentType>() );
-			m_WorkPieceChainSet.Clear();
-			foreach( var type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
-				m_WorkPieceChainSet.Add( type );
-			}
-
-			// build solver
-			m_PostSolver = new PostSolver( m_MachineData );
+			ToolNode.AddChild( LaserNode );
+			return BaseNode;
 		}
 
-		void BuildChainList( MachineTreeNode root, List<MachineComponentType> chainList )
+		bool GetDefaultStl()
 		{
-			if( root == null ) {
-				return;
+			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+			string szFolderName;
+			switch( m_MachineData.FiveAxisType ) {
+				case FiveAxisType.Table:
+					szFolderName = Path.Combine( exeDir, "Table" );
+					break;
+				case FiveAxisType.Mix:
+					szFolderName = Path.Combine( exeDir, "Mix" );
+					break;
+				case FiveAxisType.Spindle:
+				default:
+					szFolderName = Path.Combine( exeDir, "Spindle" );
+					break;
 			}
-			m_ChainListMap[ root.Type ] = chainList;
-			foreach( MachineTreeNode child in root.Children ) {
-				BuildChainList( child, new List<MachineComponentType>( chainList ) { root.Type } );
+			// show stl on viewer
+			bool isReadSuccess = ReadStlToShowOnViewer( szFolderName );
+			if( isReadSuccess == false ) {
+				return false;
 			}
+			RegisterMeshForCollision();
+
+			// 這個步驟沒有導致畫布改變
+			RegisterWorkpieceForCollision();
+
+			// set map for workpieces, cause collision simulation need to refresh workpieces color
+			SetWorkPiecesMap();
+			m_IsNeedReCal = true;
+			m_IsImportMachine = true;
+			return true;
 		}
 
-		void MeshShape( Poly_Triangulation tri, out List<double> vertexList, out List<int> indexList )
+		#endregion
+
+		IEnumerable<AIS_InteractiveObject> GetMachineShapes( MachineComponentType type )
 		{
-			vertexList = new List<double>();
-			indexList = new List<int>();
-
-			// vertex
-			for( int i = 1; i <= tri.NbNodes(); i++ ) {
-				gp_Pnt p = tri.Node( i );
-				vertexList.Add( p.X() );
-				vertexList.Add( p.Y() );
-				vertexList.Add( p.Z() );
+			if( m_MachineShapeMap.TryGetValue( type, out var list ) ) {
+				return list;
 			}
-
-			// index
-			for( int i = 1; i <= tri.NbTriangles(); i++ ) {
-				Poly_Triangle triangle = tri.Triangle( i );
-				int index1 = 0;
-				int index2 = 0;
-				int index3 = 0;
-				triangle.Get( ref index1, ref index2, ref index3 );
-				indexList.Add( index1 - 1 ); // convert to zero-based index
-				indexList.Add( index2 - 1 );
-				indexList.Add( index3 - 1 );
-			}
-
+			return Enumerable.Empty<AIS_InteractiveObject>();
 		}
 
-		double[] ConvertTransform( gp_Trsf trsf )
+		IProcessPoint GetProcessEndPoint( string pathID )
 		{
-			gp_Mat matR = trsf.GetRotation().GetMatrix();
-			gp_XYZ vecT = trsf.TranslationPart();
-			double[] result = new double[ 12 ];
-
-			// the rotation part
-			result[ 0 ] = matR.Value( 1, 1 );
-			result[ 1 ] = matR.Value( 1, 2 );
-			result[ 2 ] = matR.Value( 1, 3 );
-			result[ 3 ] = matR.Value( 2, 1 );
-			result[ 4 ] = matR.Value( 2, 2 );
-			result[ 5 ] = matR.Value( 2, 3 );
-			result[ 6 ] = matR.Value( 3, 1 );
-			result[ 7 ] = matR.Value( 3, 2 );
-			result[ 8 ] = matR.Value( 3, 3 );
-
-			// the translation part
-			result[ 9 ] = vecT.X();
-			result[ 10 ] = vecT.Y();
-			result[ 11 ] = vecT.Z();
-			return result;
-		}
-
-		// TODO: this is temporary for testing
-		void OnKeyDown( KeyEventArgs e )
-		{
-			// import
-			if( e.Control && e.KeyCode == Keys.I ) {
-				ImportMachine();
+			if( !PathCacheProvider.TryGetTraverseDataCache( pathID, out ITraverseDataCache traverseDataCache ) ) {
+				return null;
 			}
-
-			// build
-			if( e.Control && e.KeyCode == Keys.B ) {
-				BuildSimuData();
-			}
-
-			// refresh frame
-			if( e.KeyCode == Keys.Down ) {
-				m_CurrentFrameIndex += 1;
-				RefreshFrame();
-			}
-			if( e.KeyCode == Keys.Up ) {
-				m_CurrentFrameIndex -= 1;
-				RefreshFrame();
-			}
+			return traverseDataCache.GetProcessEndPoint();
 		}
 	}
 }

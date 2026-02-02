@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MyCAM.Data
 {
-	internal class PostData : ITraversePostData
+	public class PostData : ITraversePostData
 	{
 		public List<PostPoint> LeadInPostPointList
 		{
@@ -124,7 +124,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	internal class PostPoint
+	public class PostPoint
 	{
 		public double X
 		{

@@ -68,6 +68,9 @@
     <Compile Include="Helper\Canvas\DrawHelper.cs" />
     <Compile Include="Helper\Coupler\StdPatternCraftCoupler.cs" />
     <Compile Include="Helper\FormShow\DialogShowHelper.cs" />
+    <Compile Include="Helper\Simulation\CollisionHelper.cs" />
+    <Compile Include="Helper\Simulation\MachineMeshToAISHelper.cs" />
+    <Compile Include="Helper\Simulation\SimulationHelper.cs" />
     <Compile Include="PathCache\Application\MainPathPointCache.cs" />
     <Compile Include="PathCache\Application\StdPatternMaxOverCutCache.cs" />
     <Compile Include="PathCache\Application\TraverseDataCache.cs" />

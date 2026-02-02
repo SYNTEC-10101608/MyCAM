@@ -33,6 +33,7 @@
 
 	public enum MachineComponentType
 	{
+		UnKnow = -1,
 		Base = 0,
 		XAxis = 1,
 		YAxis = 2,
@@ -40,7 +41,8 @@
 		Master = 4,
 		Slave = 5,
 		WorkPiece = 6,
-		Tool = 7,
+		Laser = 7,
+		Tool = 8,
 	}
 
 	public enum MachinePrValue
