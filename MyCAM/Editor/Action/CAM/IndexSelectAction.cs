@@ -9,6 +9,7 @@ using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -22,11 +23,11 @@ namespace MyCAM.Editor
 				throw new ArgumentNullException( "IndexSelectAction constructing argument null" );
 			}
 			m_PathID = pathID;
-			if( !PathCacheProvider.TryGetMainPathCache( pathID, out IMainPathCache mainPathCache ) ) {
+			if( !PathCacheProvider.TryGetStartPointCache( pathID, out IStartPointActionCache startPointCache ) ) {
 				throw new ArgumentException( "IndexSelectAction constructing argument invalid pathID" );
 			}
 
-			m_ProcessCADPointList = mainPathCache.GetMainPathCADPointList();
+			m_ProcessCADPointList = startPointCache.StartPointList.ToList();
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}
@@ -135,7 +136,7 @@ namespace MyCAM.Editor
 		}
 
 		protected string m_PathID;
-		protected List<CADPoint> m_ProcessCADPointList;
+		protected List<ISetToolVecPoint> m_ProcessCADPointList;
 
 		// map point on view to index on CAMData
 		protected TopTools_DataMapOfShapeInteger m_VertexMap;

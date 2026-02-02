@@ -1,5 +1,4 @@
 using MyCAM.Data;
-using OCC.gp;
 using System;
 
 namespace MyCAM.PathCache
@@ -14,16 +13,16 @@ namespace MyCAM.PathCache
 			return new ContourCache( (ContourGeomData)contourGeomData, craftData );
 		}
 
-		public static IStdPatternCache CreateStdPatternCache( gp_Ax3 refCoord, IStdPatternGeomData stdPatternGeomData, CraftData craftData )
+		public static IStdPatternCache CreateStdPatternCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData )
 		{
-			if( refCoord == null || stdPatternGeomData == null || craftData == null ) {
+			if( stdPatternGeomData == null || craftData == null ) {
 				throw new ArgumentNullException( "StdPatternCache construct parameters null." );
 			}
 			IStdPatternCacheStrategy strategy = GetStrategy( stdPatternGeomData.PathType );
 			if( strategy == null ) {
 				throw new ArgumentException( $"No strategy found for PathType: {stdPatternGeomData.PathType}" );
 			}
-			return strategy.CreatePathCache( refCoord, stdPatternGeomData, craftData );
+			return strategy.CreatePathCache( stdPatternGeomData, craftData );
 		}
 
 		static IStdPatternCacheStrategy GetStrategy( PathType pathType )
@@ -48,39 +47,39 @@ namespace MyCAM.PathCache
 
 		static readonly IStdPatternCacheStrategy s_CircleStrategy =
 			new StdPatternCacheStrategy<CircleCache>(
-				( coord, geom, craft ) => new CircleCache( coord, geom, craft ) );
+				( geom, craft ) => new CircleCache( geom, craft ) );
 		static readonly IStdPatternCacheStrategy s_RectangleStrategy =
 			new StdPatternCacheStrategy<RectangleCache>(
-				( coord, geom, craft ) => new RectangleCache( coord, geom, craft ) );
+				( geom, craft ) => new RectangleCache( geom, craft ) );
 		static readonly IStdPatternCacheStrategy s_RunwayStrategy =
 			new StdPatternCacheStrategy<RunwayCache>(
-				( coord, geom, craft ) => new RunwayCache( coord, geom, craft ) );
+				( geom, craft ) => new RunwayCache( geom, craft ) );
 		static readonly IStdPatternCacheStrategy s_PolygonStrategy =
 			new StdPatternCacheStrategy<PolygonCache>(
-				( coord, geom, craft ) => new PolygonCache( coord, geom, craft ) );
+				( geom, craft ) => new PolygonCache( geom, craft ) );
 	}
 
 	internal interface IStdPatternCacheStrategy
 	{
-		IStdPatternCache CreatePathCache( gp_Ax3 refCoord, IStdPatternGeomData stdPatternGeomData, CraftData craftData );
+		IStdPatternCache CreatePathCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData );
 	}
 
 	internal class StdPatternCacheStrategy<TPathCache> : IStdPatternCacheStrategy
 		where TPathCache : IStdPatternCache
 	{
-		readonly Func<gp_Ax3, IStdPatternGeomData, CraftData, TPathCache> m_PathCacheFactory;
+		readonly Func<IStdPatternGeomData, CraftData, TPathCache> m_PathCacheFactory;
 
-		public StdPatternCacheStrategy( Func<gp_Ax3, IStdPatternGeomData, CraftData, TPathCache> pathCacheFactory )
+		public StdPatternCacheStrategy( Func<IStdPatternGeomData, CraftData, TPathCache> pathCacheFactory )
 		{
 			m_PathCacheFactory = pathCacheFactory ?? throw new ArgumentNullException( nameof( pathCacheFactory ) );
 		}
 
-		public IStdPatternCache CreatePathCache( gp_Ax3 refCoord, IStdPatternGeomData stdPatternGeomData, CraftData craftData )
+		public IStdPatternCache CreatePathCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData )
 		{
-			if( refCoord == null || stdPatternGeomData == null || craftData == null ) {
+			if( stdPatternGeomData == null || craftData == null ) {
 				throw new ArgumentNullException( "PathCache construct parameters null." );
 			}
-			return m_PathCacheFactory( refCoord, stdPatternGeomData, craftData );
+			return m_PathCacheFactory( stdPatternGeomData, craftData );
 		}
 	}
 }

@@ -40,8 +40,8 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_PathCache.MainPathPointList.Count > 0 ) {
-					return m_PathCache.MainPathPointList.First().Clone();
+				if( m_PathCache.StartPointList.Count > 0 ) {
+					return m_PathCache.StartPointList.First().Clone();
 				}
 				return null;
 			}

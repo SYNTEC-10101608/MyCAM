@@ -226,14 +226,14 @@ namespace MyCAM.Post
 		{
 			if( !PathCacheProvider.TryGetLeadCache( szID, out ILeadCache leadCache )
 				|| !PathCacheProvider.TryGetStdPatternRefPointCache( szID, out IStdPatternRefPointCache refPointCache )
-				|| !PathCacheProvider.TryGetMainPathStartPointCache( szID, out IMainPathStartPointCache mainPathStartPointCache )
+				|| !PathCacheProvider.TryGetMainPathStartPointCache( szID, out IStartPointRendererCache mainPathStartPointCache )
 				|| !PathCacheProvider.TryGetProcessPathStartEndCache( szID, out IProcessPathStartEndCache processPathStartEndCache )
 				|| !PathCacheProvider.TryGetTraverseDataCache( szID, out ITraverseDataCache traverseDataCache ) ) {
 				return null;
 			}
 			return new StdPatternNCPackage(
 						refPointCache.GetProcessRefPoint(),
-						mainPathStartPointCache.GetMainPathStartCAMPoint(),
+						mainPathStartPointCache.GetStartCAMPoint(),
 						traverseDataCache.TraverseData,
 						processPathStartEndCache.GetProcessStartPoint(),
 						processPathStartEndCache.GetProcessEndPoint(),

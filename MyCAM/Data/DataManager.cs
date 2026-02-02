@@ -27,6 +27,11 @@ namespace MyCAM.Data
 		public Action<List<string>> FeatureAdded;
 		public Action<List<string>> PathAdded;
 
+		// Custom shape-to-ID mapping (e.g., for MainPathRenderer wires)
+		readonly TopTools_DataMapOfShapeInteger m_ShapeToIDHashMap = new TopTools_DataMapOfShapeInteger();
+		readonly Dictionary<int, string> m_HashToIDDict = new Dictionary<int, string>();
+		readonly Dictionary<int, TopoDS_Shape> m_HashToShapeDict = new Dictionary<int, TopoDS_Shape>();
+
 		// TODO: this is temp solution
 		public DataManager()
 		{
@@ -287,6 +292,16 @@ namespace MyCAM.Data
 			if( shape == null || shape.IsNull() ) {
 				return string.Empty;
 			}
+
+			// First try custom mappings (e.g., MainPathRenderer wires)
+			if( m_ShapeToIDHashMap.IsBound( shape ) ) {
+				int idHash = m_ShapeToIDHashMap.Find( shape );
+				if( m_HashToIDDict.TryGetValue( idHash, out string id ) ) {
+					return id;
+				}
+			}
+
+			// Fall back to ObjectMap
 			foreach( var model in ObjectMap.Values ) {
 				if( !DataGettingHelper.GetShapeObject( model.UID, out IShapeObject shapeObject ) ) {
 					continue;
@@ -296,6 +311,54 @@ namespace MyCAM.Data
 				}
 			}
 			return string.Empty;
+		}
+
+		public TopoDS_Shape GetShapeByUID( string id )
+		{
+			if( string.IsNullOrEmpty( id ) ) {
+				return null;
+			}
+
+			// First try custom mappings (e.g., MainPathRenderer wires)
+			int idHash = id.GetHashCode();
+			if( m_HashToShapeDict.TryGetValue( idHash, out TopoDS_Shape customShape ) ) {
+				return customShape;
+			}
+
+			// Fall back to ObjectMap
+			if( ObjectMap.ContainsKey( id ) ) {
+				if( DataGettingHelper.GetShapeObject( id, out IShapeObject shapeObject ) ) {
+					return shapeObject.Shape;
+				}
+			}
+
+			return null;
+		}
+
+		public void RegisterShapeIDMapping( TopoDS_Shape shape, string id )
+		{
+			if( shape == null || shape.IsNull() || string.IsNullOrEmpty( id ) ) {
+				return;
+			}
+
+			int idHash = id.GetHashCode();
+			m_ShapeToIDHashMap.Bind( shape, idHash );
+			m_HashToIDDict[ idHash ] = id;
+			m_HashToShapeDict[ idHash ] = shape;
+		}
+
+		public void UnregisterShapeIDMapping( TopoDS_Shape shape )
+		{
+			if( shape == null || shape.IsNull() ) {
+				return;
+			}
+
+			if( m_ShapeToIDHashMap.IsBound( shape ) ) {
+				int idHash = m_ShapeToIDHashMap.Find( shape );
+				m_ShapeToIDHashMap.UnBind( shape );
+				m_HashToIDDict.Remove( idHash );
+				m_HashToShapeDict.Remove( idHash );
+			}
 		}
 
 		void ResetShapeIDs()

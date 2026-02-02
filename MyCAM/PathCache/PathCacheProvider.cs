@@ -79,7 +79,7 @@ namespace MyCAM.PathCache
 			return true;
 		}
 
-		public static bool TryGetMainPathStartPointCache( string szPathID, out IMainPathStartPointCache cache )
+		public static bool TryGetMainPathStartPointCache( string szPathID, out IStartPointRendererCache cache )
 		{
 			IPathCache _cache;
 			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
@@ -87,7 +87,7 @@ namespace MyCAM.PathCache
 				return false;
 			}
 
-			cache = new MainPathStartPointCache( _cache );
+			cache = new StartPointRendererCache( _cache );
 			return true;
 		}
 
@@ -148,6 +148,29 @@ namespace MyCAM.PathCache
 			}
 
 			cache = new ToolVecCache( _cache, craftData );
+			return true;
+		}
+
+		public static bool TryGetMainPathCache( string szPathID, out IMainPathRendererCache cache )
+		{
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				cache = null;
+				return false;
+			}
+
+			cache = new MainPathPointRendererCache( _cache );
+			return true;
+		}
+
+		public static bool TryGetStartPointCache( string szPathID, out IStartPointActionCache cache )
+		{
+			IPathCache _cache;
+			if( !TryGetPathCacheAndCraftData( szPathID, out _cache, out CraftData craftData ) ) {
+				cache = null;
+				return false;
+			}
+			cache = new StartPointActionCache( _cache );
 			return true;
 		}
 

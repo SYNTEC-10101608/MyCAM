@@ -156,13 +156,14 @@ namespace MyCAM.Editor
 
 		bool CalABAngleToPreCtrlPntToolVec( int nSelectIndex, out Tuple<double, double> param )
 		{
-			// get this modify point cam point
-			CADPoint toModifyCADPnt = m_ProcessCADPointList[ nSelectIndex ];
-			CAMPoint toModifyCAMPnt = new CAMPoint( toModifyCADPnt );
+			// get this modify point - use ISetToolVecPoint from base class
+			ISetToolVecPoint toModifyPoint = m_ProcessCADPointList[ nSelectIndex ];
 
 			// get previous control point tool vector
 			gp_Dir assignDir = GetPreCtrlPntToolVec( m_ProcessCADPointList, m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsToolVecReverse, m_CraftData.IsPathReverse, m_GeomData.IsClosed );
-			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyCAMPnt, m_CraftData.IsToolVecReverse, out param );
+			
+			// Use ISetToolVecPoint directly for calculation
+			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyPoint, m_CraftData.IsToolVecReverse, out param );
 			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
 				return true;
 			}
@@ -175,11 +176,11 @@ namespace MyCAM.Editor
 
 		bool CalABAngleToZDir( int nSelectIndex, out Tuple<double, double> param )
 		{
-			// get this modify point cam point
-			CADPoint toModifyCADPnt = m_ProcessCADPointList[ nSelectIndex ];
-			CAMPoint toModifyCAMPnt = new CAMPoint( toModifyCADPnt );
+			// get this modify point - use ISetToolVecPoint from base class
+			ISetToolVecPoint toModifyPoint = m_ProcessCADPointList[ nSelectIndex ];
+			
 			gp_Dir assignDir = new gp_Dir( 0, 0, 1 );
-			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyCAMPnt, m_CraftData.IsToolVecReverse, out param );
+			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyPoint, m_CraftData.IsToolVecReverse, out param );
 			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
 				return true;
 			}
@@ -262,18 +263,20 @@ namespace MyCAM.Editor
 			SetToolVecDone();
 		}
 
-		gp_Dir GetPreCtrlPntToolVec( List<CADPoint> oriCADPntList, IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap, int nTargetPntIdx, bool isToolVecReverse, bool isPathReverse, bool isClosePath )
+		gp_Dir GetPreCtrlPntToolVec( List<ISetToolVecPoint> processPointList, IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap, int nTargetPntIdx, bool isToolVecReverse, bool isPathReverse, bool isClosePath )
 		{
 			List<int> ctrlPntIndexList = toolVecModifyMap.Keys.ToList();
 			int preCtrlIndex = GetPreCtrlPntIndex( nTargetPntIdx, ctrlPntIndexList, isPathReverse, isClosePath );
 
-			// do not have previous control point, return the target point tool vector
+			// do not have previous control point, return the target point initial tool vector
 			if( preCtrlIndex == DEFAULT_SELECT_INDEX || preCtrlIndex == nTargetPntIdx ) {
-				return oriCADPntList[ nTargetPntIdx ].NormalVec_1st;
+				return processPointList[ nTargetPntIdx ].InitToolVec;
 			}
+			
 			Tuple<double, double> ctrlPntInfo = toolVecModifyMap[ preCtrlIndex ];
-			CAMPoint preCtrlCAMPnt = new CAMPoint( oriCADPntList[ preCtrlIndex ] );
-			gp_Vec targetVec = ToolVecHelper.GetVecFromABAngle( preCtrlCAMPnt,
+			ISetToolVecPoint preCtrlPoint = processPointList[ preCtrlIndex ];
+			
+			gp_Vec targetVec = ToolVecHelper.GetVecFromABAngle( preCtrlPoint,
 				ctrlPntInfo.Item1 * Math.PI / 180.0,
 				ctrlPntInfo.Item2 * Math.PI / 180.0,
 				isToolVecReverse );

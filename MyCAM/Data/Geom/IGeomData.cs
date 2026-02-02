@@ -44,10 +44,18 @@ namespace MyCAM.Data
 
 	public interface IStdPatternGeomData : IGeomData, ITransformableGeom, IRotatable
 	{
+		gp_Ax3 RefCoord
+		{
+			get;
+			set;
+		}
+
 		bool IsCoordinateReversed
 		{
 			get;
 			set;
 		}
+
+		void SetRefCoord( gp_Ax3 refCoordinate );
 	}
 }

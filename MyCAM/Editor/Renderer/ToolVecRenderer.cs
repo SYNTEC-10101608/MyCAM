@@ -121,7 +121,7 @@ namespace MyCAM.Editor.Renderer
 			if( !PathCacheProvider.TryGetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
 				return null;
 			}
-			return toolVecCache.MainPathPointList;
+			return toolVecCache.StartPointList;
 		}
 
 		// TODO: the method is kepp casting same thing in a loop, optimize it later
