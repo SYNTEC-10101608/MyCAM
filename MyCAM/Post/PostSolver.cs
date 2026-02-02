@@ -307,9 +307,9 @@ namespace MyCAM.Post
 		gp_Dir m_SlaveRotateDir;
 	}
 
-	internal class PostSolver
+	public class PostSolver
 	{
-		public PostSolver( MachineData machineData )
+		internal PostSolver( MachineData machineData )
 		{
 			if( machineData == null ) {
 				throw new ArgumentException( "Invalid machine data" );
@@ -358,9 +358,13 @@ namespace MyCAM.Post
 
 		public gp_Vec G54Offset
 		{
+			get
+			{
+				return new gp_Vec( m_G54Offset.XYZ() );
+			}
 			set
 			{
-				m_G54Offset = new gp_Vec( value.X(), value.Y(), value.Z() );
+				m_G54Offset = new gp_Vec( value.XYZ() );
 			}
 		}
 

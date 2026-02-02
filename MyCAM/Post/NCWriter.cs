@@ -98,6 +98,40 @@ namespace MyCAM.Post
 			}
 		}
 
+		public bool ConvertContourSuccess( out string errorMessage, out List<PostData> postDataList )
+		{
+			errorMessage = string.Empty;
+			postDataList = new List<PostData>();
+			try {
+				// to keep last point of previous path
+				PathEndInfo endInfoOfPreviousPath = null;
+				PathType pathType;
+				for( int i = 0; i < m_PathIDList.Count; i++ ) {
+					if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
+						continue;
+					}
+					pathType = pathObject.PathType;
+					if( pathType == PathType.Contour ) {
+
+						// solve all post data of the path
+						if( !ContourPostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
+							endInfoOfPreviousPath, m_EntryAndExitData,
+							out PostData postData, out endInfoOfPreviousPath ) ) {
+
+							errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
+							return false;
+						}
+						postDataList.Add( postData );
+					}
+				}
+				return true;
+			}
+			catch( Exception ex ) {
+				errorMessage = ex.Message;
+				return false;
+			}
+		}
+
 		void WriteCutting( PostData currentPathPostData, int N_Index )
 		{
 			// the N code
