@@ -59,9 +59,6 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// Store the current editing point for later use in MS/AB angle conversions
-			CADPoint editingCADPnt = m_ProcessCADPointList[ nIndex ];
-
 			// modify tool vector
 			bool isModified = m_ToolVecPackage.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
 			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, master_deg, slave_deg, m_CraftData.InterpolateType );
@@ -165,7 +162,7 @@ namespace MyCAM.Editor
 			ISetToolVecPoint pointToModify = m_ToolVecPackage.GetPointByCADIndex( nSelectIndex ).Clone();
 
 			// get previous control point tool vector
-			gp_Dir assignDir = GetPreCtrlPntToolVec( m_ProcessCADPointList, m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsPathReverse, m_GeomData.IsClosed );
+			gp_Dir assignDir = GetPreCtrlPntToolVec( m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsPathReverse, m_GeomData.IsClosed );
 			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleFromToolVec( assignDir, pointToModify, out abAngle_deg );
 			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
 				return true;
@@ -263,15 +260,10 @@ namespace MyCAM.Editor
 			SetToolVecDone();
 		}
 
-		gp_Dir GetPreCtrlPntToolVec( List<CADPoint> oriCADPntList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nTargetPntIdx, bool isPathReverse, bool isClosePath )
+		gp_Dir GetPreCtrlPntToolVec( IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nTargetPntIdx, bool isPathReverse, bool isClosePath )
 		{
 			List<int> ctrlPntIndexList = toolVecModifyMap.Keys.ToList();
 			int preCtrlIndex = GetPreCtrlPntIndex( nTargetPntIdx, ctrlPntIndexList, isPathReverse, isClosePath );
-
-			// do not have previous control point, return the target point tool vector
-			if( preCtrlIndex == DEFAULT_SELECT_INDEX || preCtrlIndex == nTargetPntIdx ) {
-				return oriCADPntList[ nTargetPntIdx ].NormalVec_1st;
-			}
 			ISetToolVecPoint preCtrlPoint = m_ToolVecPackage.GetPointByCADIndex( preCtrlIndex ).Clone();
 			return new gp_Dir( preCtrlPoint.ToolVec.XYZ() );
 		}
