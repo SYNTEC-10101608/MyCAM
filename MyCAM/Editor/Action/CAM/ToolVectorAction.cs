@@ -26,7 +26,7 @@ namespace MyCAM.Editor
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
 				throw new ArgumentException( "Cannot get CraftData by pathID: " + pathID );
 			}
-			if( !PathCacheProvider.TryGetToolVecCache( pathID, out m_ToolVecCache ) ) {
+			if( !PathCacheProvider.TryGetToolVecPackage( pathID, out m_ToolVecPackage ) ) {
 				throw new ArgumentException( "Cannot get ToolVecCache by pathID: " + pathID );
 			}
 			if( !DataGettingHelper.GetGeomDataByID( pathID, out m_GeomData ) ) {
@@ -60,14 +60,16 @@ namespace MyCAM.Editor
 			}
 
 			// modify tool vector
-			bool isModified = m_ToolVecCache.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg );
-			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, m_CraftData.InterpolateType );
+			bool isModified = m_ToolVecPackage.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
+			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, master_deg, slave_deg, m_CraftData.InterpolateType );
 
 			// back up old data
-			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, m_CraftData.InterpolateType );
+			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, master_deg, slave_deg, m_CraftData.InterpolateType );
 			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
 			toolVecForm.RaiseKeep += () => SetToolVecOfKeep( nIndex, toolVecForm );
 			toolVecForm.RaiseZDir += () => SetToolVecOfZDir( nIndex, toolVecForm );
+			toolVecForm.RaiseCalculateMSAngleFromABAngle = ( angleA, angleB ) => CalculateMSAngleFromABAngle( nIndex, angleA, angleB );
+			toolVecForm.RaiseCalculateABAngleFromMSAngle = ( master, slave ) => CalculateABAngleFromMSAngle( nIndex, master, slave );
 			toolVecForm.Preview += ( ToolVec ) => SetToolVecParamAndPeview( nIndex, ToolVec );
 			toolVecForm.Confirm += ( ToolVec ) => ConfirmSetting( nIndex, ToolVec );
 			toolVecForm.Cancel += () => CancelSetting( nIndex );
@@ -131,7 +133,7 @@ namespace MyCAM.Editor
 
 		void SetABAngle( int VecIndex, ToolVecParam toolVecParam )
 		{
-			m_CraftData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg );
+			m_CraftData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg, toolVecParam.Master_deg, toolVecParam.Slave_deg );
 		}
 
 		void DrawVertexOnViewer( TopoDS_Shape selectedVertex )
@@ -154,16 +156,14 @@ namespace MyCAM.Editor
 			}
 		}
 
-		bool CalABAngleToPreCtrlPntToolVec( int nSelectIndex, out Tuple<double, double> param )
+		bool CalABAngleToKeep( int nSelectIndex, out Tuple<double, double> abAngle_deg )
 		{
-			// get this modify point - use ISetToolVecPoint from base class
-			ISetToolVecPoint toModifyPoint = m_ProcessCADPointList[ nSelectIndex ];
+			// get this modify point cam point
+			ISetToolVecPoint pointToModify = m_ToolVecPackage.GetPointByCADIndex( nSelectIndex ).Clone();
 
 			// get previous control point tool vector
-			gp_Dir assignDir = GetPreCtrlPntToolVec( m_ProcessCADPointList, m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsToolVecReverse, m_CraftData.IsPathReverse, m_GeomData.IsClosed );
-			
-			// Use ISetToolVecPoint directly for calculation
-			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyPoint, m_CraftData.IsToolVecReverse, out param );
+			gp_Dir assignDir = GetPreCtrlPntToolVec( m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsPathReverse, m_GeomData.IsClosed );
+			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleFromToolVec( assignDir, pointToModify, out abAngle_deg );
 			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
 				return true;
 			}
@@ -174,13 +174,12 @@ namespace MyCAM.Editor
 			return false;
 		}
 
-		bool CalABAngleToZDir( int nSelectIndex, out Tuple<double, double> param )
+		bool CalABAngleToZDir( int nSelectIndex, out Tuple<double, double> abAngle_deg )
 		{
-			// get this modify point - use ISetToolVecPoint from base class
-			ISetToolVecPoint toModifyPoint = m_ProcessCADPointList[ nSelectIndex ];
-			
+			// get this modify point cam point
+			ISetToolVecPoint pointToModify = m_ToolVecPackage.GetPointByCADIndex( nSelectIndex ).Clone();
 			gp_Dir assignDir = new gp_Dir( 0, 0, 1 );
-			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleToTargetVec( assignDir, toModifyPoint, m_CraftData.IsToolVecReverse, out param );
+			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleFromToolVec( assignDir, pointToModify, out abAngle_deg );
 			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
 				return true;
 			}
@@ -193,18 +192,36 @@ namespace MyCAM.Editor
 
 		void SetToolVecOfKeep( int nSelectIndex, ToolVectorDlg toolVecForm )
 		{
-			bool GetParamSuccess = CalABAngleToPreCtrlPntToolVec( nSelectIndex, out Tuple<double, double> param );
+			bool GetParamSuccess = CalABAngleToKeep( nSelectIndex, out Tuple<double, double> abAngles_deg );
 			if( GetParamSuccess ) {
-				toolVecForm.SetParamBack( param );
+
+				// Calculate MS angles from AB angles
+				Tuple<double, double> msAngles_deg = CalculateMSAngleFromABAngle( nSelectIndex, abAngles_deg.Item1, abAngles_deg.Item2 );
+				toolVecForm.SetAngleFromTargetVec( abAngles_deg, msAngles_deg );
 			}
 		}
 
 		void SetToolVecOfZDir( int nSelectIndex, ToolVectorDlg toolVecForm )
 		{
-			bool GetParamSuccess = CalABAngleToZDir( nSelectIndex, out Tuple<double, double> param );
+			bool GetParamSuccess = CalABAngleToZDir( nSelectIndex, out Tuple<double, double> abAngles_deg );
 			if( GetParamSuccess ) {
-				toolVecForm.SetParamBack( param );
+
+				// Calculate MS angles from AB angles
+				Tuple<double, double> msAngles_deg = CalculateMSAngleFromABAngle( nSelectIndex, abAngles_deg.Item1, abAngles_deg.Item2 );
+				toolVecForm.SetAngleFromTargetVec( abAngles_deg, msAngles_deg );
 			}
+		}
+
+		Tuple<double, double> CalculateMSAngleFromABAngle( int nSelectIndex, double angleA_deg, double angleB_deg )
+		{
+			ISetToolVecPoint point = m_ToolVecPackage.GetPointByCADIndex( nSelectIndex ).Clone();
+			return ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, point );
+		}
+
+		Tuple<double, double> CalculateABAngleFromMSAngle( int nSelectIndex, double master_deg, double slave_deg )
+		{
+			ISetToolVecPoint point = m_ToolVecPackage.GetPointByCADIndex( nSelectIndex ).Clone();
+			return ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, point );
 		}
 
 		void SetToolVecParamAndPeview( int VecIndex, ToolVecParam toolVecParam )
@@ -217,35 +234,15 @@ namespace MyCAM.Editor
 		// remove or ok button clicked
 		void ConfirmSetting( int VecIndex, ToolVecParam toolVecParam )
 		{
-			// fixdir can't remove point
-			if( toolVecParam.InterpolateType == EToolVecInterpolateType.FixedDir ) {
-
-				// this point originally is not modify point
-				if( m_BackupToolVecParam.IsModified == false ) {
-
-					// while dialog show up, user click other solution , will add this pnt modify
-					m_CraftData.RemoveToolVecModify( VecIndex );
-				}
-
-				// this pnt originally is modify point
-				else {
-
-					// set original value back
-					SetABAngle( VecIndex, m_BackupToolVecParam );
-				}
+			// user remove pnt
+			if( toolVecParam.IsModified == false ) {
+				m_CraftData.RemoveToolVecModify( VecIndex );
 			}
+			// user add / adjust pnt
 			else {
-
-				// user remove pnt
-				if( toolVecParam.IsModified == false ) {
-					m_CraftData.RemoveToolVecModify( VecIndex );
-				}
-
-				// user add / adjust pnt
-				else {
-					SetABAngle( VecIndex, toolVecParam );
-				}
+				SetABAngle( VecIndex, toolVecParam );
 			}
+
 			SetInterpolateType( toolVecParam );
 			SetToolVecDone();
 		}
@@ -263,24 +260,12 @@ namespace MyCAM.Editor
 			SetToolVecDone();
 		}
 
-		gp_Dir GetPreCtrlPntToolVec( List<ISetToolVecPoint> processPointList, IReadOnlyDictionary<int, Tuple<double, double>> toolVecModifyMap, int nTargetPntIdx, bool isToolVecReverse, bool isPathReverse, bool isClosePath )
+		gp_Dir GetPreCtrlPntToolVec( IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nTargetPntIdx, bool isPathReverse, bool isClosePath )
 		{
 			List<int> ctrlPntIndexList = toolVecModifyMap.Keys.ToList();
 			int preCtrlIndex = GetPreCtrlPntIndex( nTargetPntIdx, ctrlPntIndexList, isPathReverse, isClosePath );
-
-			// do not have previous control point, return the target point initial tool vector
-			if( preCtrlIndex == DEFAULT_SELECT_INDEX || preCtrlIndex == nTargetPntIdx ) {
-				return processPointList[ nTargetPntIdx ].InitToolVec;
-			}
-			
-			Tuple<double, double> ctrlPntInfo = toolVecModifyMap[ preCtrlIndex ];
-			ISetToolVecPoint preCtrlPoint = processPointList[ preCtrlIndex ];
-			
-			gp_Vec targetVec = ToolVecHelper.GetVecFromABAngle( preCtrlPoint,
-				ctrlPntInfo.Item1 * Math.PI / 180.0,
-				ctrlPntInfo.Item2 * Math.PI / 180.0,
-				isToolVecReverse );
-			return new gp_Dir( targetVec.XYZ() );
+			ISetToolVecPoint preCtrlPoint = m_ToolVecPackage.GetPointByCADIndex( preCtrlIndex ).Clone();
+			return new gp_Dir( preCtrlPoint.ToolVec.XYZ() );
 		}
 
 		int GetPreCtrlPntIndex( int targetIndex, List<int> ctrlPntIndexList, bool isReverse, bool isClosePath )
@@ -337,7 +322,7 @@ namespace MyCAM.Editor
 		// to storage which vertex keep show high light point on viewer
 		AIS_Shape m_KeepedHighLightPoint = null;
 		CraftData m_CraftData = null;
-		IToolVecCache m_ToolVecCache = null;
+		ToolVecPackage m_ToolVecPackage = null;
 		List<string> m_PathIDList = null;
 		const int DEFAULT_SELECT_INDEX = -1;
 		IGeomData m_GeomData;

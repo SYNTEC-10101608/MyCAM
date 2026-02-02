@@ -135,7 +135,7 @@ namespace MyCAM.Post
 			// solve IK
 			Tuple<double, double> rotateAngleList = new Tuple<double, double>( 0, 0 );
 			CAMPoint camPoint = point as CAMPoint;
-			IKSolveResult ikResult = postSolver.SolveIK( camPoint, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
+			IKSolveResult ikResult = postSolver.SolveIK( camPoint.ToolVec, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
 			if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
 				return false;
 			}
