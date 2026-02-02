@@ -1080,8 +1080,8 @@ namespace MyCAM.FileManager
 							: new TraverseDataDTO();
 			OverCutLength = craftData.OverCutLength;
 			InterpolateType = craftData.InterpolateType;
-			ToolVecModifyMap = ( craftData.ToolVecModifyMap ?? new Dictionary<int, Tuple<double, double>>() )
-				.Select( kvp => new ToolVecMapDTO( kvp.Key, kvp.Value.Item1, kvp.Value.Item2 ) )
+			ToolVecModifyMap = ( craftData.ToolVecModifyMap ?? new Dictionary<int, ToolVecModifyData>() )
+				.Select( kvp => new ToolVecMapDTO( kvp.Key, kvp.Value.RA_deg, kvp.Value.RB_deg, kvp.Value.Master_deg, kvp.Value.Slave_deg ) )
 				.ToList();
 		}
 
@@ -1090,7 +1090,10 @@ namespace MyCAM.FileManager
 			if( ToolVecModifyMap == null || LeadData == null || TraverseData == null ) {
 				throw new ArgumentException( "ContourCache deserialization failed." );
 			}
-			Dictionary<int, Tuple<double, double>> toolVecModifyMap = ToolVecModifyMap.ToDictionary( ToolVecModifyData => ToolVecModifyData.Index, ToolVecModifyData => Tuple.Create( ToolVecModifyData.Value1, ToolVecModifyData.Value2 ) );
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap = ToolVecModifyMap.ToDictionary(
+				dto => dto.Index,
+				dto => new ToolVecModifyData( dto.RA_deg, dto.RB_deg, dto.MasterAngle_deg, dto.SlaveAngle_deg )
+			);
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
 			EToolVecInterpolateType interpolateType = InterpolateType;
@@ -1471,13 +1474,25 @@ namespace MyCAM.FileManager
 			set;
 		}
 
-		public double Value1
+		public double RA_deg
 		{
 			get;
 			set;
 		}
 
-		public double Value2
+		public double RB_deg
+		{
+			get;
+			set;
+		}
+
+		public double MasterAngle_deg
+		{
+			get;
+			set;
+		}
+
+		public double SlaveAngle_deg
 		{
 			get;
 			set;
@@ -1488,11 +1503,13 @@ namespace MyCAM.FileManager
 		{
 		}
 
-		internal ToolVecMapDTO( int index, double value1, double value2 )
+		internal ToolVecMapDTO( int index, double ra_deg, double rb_deg, double masterAngle_deg, double slaveAngle_deg )
 		{
 			Index = index;
-			Value1 = value1;
-			Value2 = value2;
+			RA_deg = ra_deg;
+			RB_deg = rb_deg;
+			MasterAngle_deg = masterAngle_deg;
+			SlaveAngle_deg = slaveAngle_deg;
 		}
 	}
 

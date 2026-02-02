@@ -73,12 +73,12 @@ namespace MyCAM.Data
 			get;
 		}
 
-		gp_Dir InitToolVec
+		gp_Dir TangentVec
 		{
 			get;
 		}
 
-		gp_Dir TangentVec
+		gp_Dir InitToolVec
 		{
 			get;
 		}
@@ -89,11 +89,34 @@ namespace MyCAM.Data
 			set;
 		}
 
-		bool IsToolVecModPoint
+		double InitMaster_rad
+		{
+			get;
+		}
+
+		double InitSlave_rad
+		{
+			get;
+		}
+
+		double ModMaster_rad
 		{
 			get;
 			set;
 		}
+
+		double ModSlave_rad
+		{
+			get;
+			set;
+		}
+
+		bool IsToolVecModPoint
+		{
+			get; set;
+		}
+
+		ISetToolVecPoint Clone();
 	}
 
 	public interface IOrientationPoint
@@ -128,6 +151,16 @@ namespace MyCAM.Data
 			get;
 		}
 
+		double ModMaster_rad
+		{
+			get;
+		}
+
+		double ModSlave_rad
+		{
+			get;
+		}
+
 		// sorry, but this is the best way to solve the problem now
 		bool IsToolVecModPoint
 		{
@@ -142,12 +175,24 @@ namespace MyCAM.Data
 		public CAMPoint( CADPoint cadPoint )
 		{
 			m_CADPoint = cadPoint.Clone();
+			m_InitToolVec = new gp_Dir( cadPoint.NormalVec_1st.XYZ() );
 			m_ToolVec = new gp_Dir( cadPoint.NormalVec_1st.XYZ() );
 		}
 
 		public CAMPoint( CADPoint cadPoint, gp_Dir toolVec )
 		{
 			m_CADPoint = cadPoint.Clone();
+			m_InitToolVec = new gp_Dir( cadPoint.NormalVec_1st.XYZ() );
+			m_ToolVec = new gp_Dir( toolVec.XYZ() );
+		}
+
+		public CAMPoint( CADPoint cadPoint, bool isToolVecReverse )
+		{
+			m_CADPoint = cadPoint.Clone();
+			gp_Dir toolVec = isToolVecReverse ?
+				new gp_Dir( cadPoint.NormalVec_1st.Reversed().XYZ() ) :
+				new gp_Dir( cadPoint.NormalVec_1st.XYZ() );
+			m_InitToolVec = new gp_Dir( toolVec.XYZ() );
 			m_ToolVec = new gp_Dir( toolVec.XYZ() );
 		}
 
@@ -167,7 +212,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return m_CADPoint.Point;
+				return new gp_Pnt( m_CADPoint.Point.XYZ() );
 			}
 		}
 
@@ -175,7 +220,11 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return m_CADPoint.NormalVec_1st;
+				return new gp_Dir( m_InitToolVec.XYZ() );
+			}
+			private set
+			{
+				m_InitToolVec = new gp_Dir( value.XYZ() );
 			}
 		}
 
@@ -193,9 +242,43 @@ namespace MyCAM.Data
 			set;
 		}
 
+		public double InitMaster_rad
+		{
+			get; set;
+		}
+
+		public double InitSlave_rad
+		{
+			get; set;
+		}
+
+		public double ModMaster_rad
+		{
+			get; set;
+		}
+
+		public double ModSlave_rad
+		{
+			get; set;
+		}
+
+		public int InitPathIndex
+		{
+			get; set;
+		}
+
 		public CAMPoint Clone()
 		{
-			return new CAMPoint( m_CADPoint.Clone(), m_ToolVec );
+			CAMPoint newPoint = new CAMPoint( m_CADPoint.Clone() );
+			newPoint.InitToolVec = new gp_Dir( m_InitToolVec.XYZ() );
+			newPoint.ToolVec = new gp_Dir( m_ToolVec.XYZ() );
+			newPoint.InitMaster_rad = InitMaster_rad;
+			newPoint.InitSlave_rad = InitSlave_rad;
+			newPoint.ModMaster_rad = ModMaster_rad;
+			newPoint.ModSlave_rad = ModSlave_rad;
+			newPoint.IsToolVecModPoint = IsToolVecModPoint;
+			newPoint.InitPathIndex = InitPathIndex;
+			return newPoint;
 		}
 
 		// the explicit interface implementation
@@ -209,8 +292,14 @@ namespace MyCAM.Data
 			return Clone();
 		}
 
+		ISetToolVecPoint ISetToolVecPoint.Clone()
+		{
+			return Clone();
+		}
+
 		// using backing field to prevent modified outside
 		CADPoint m_CADPoint;
+		gp_Dir m_InitToolVec;
 		gp_Dir m_ToolVec;
 	}
 }
