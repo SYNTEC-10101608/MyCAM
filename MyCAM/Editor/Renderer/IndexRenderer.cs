@@ -1,5 +1,5 @@
-using MyCAM.PathCache;
 using MyCAM.Data;
+using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.gp;
 using OCC.Quantity;
@@ -77,10 +77,10 @@ namespace MyCAM.Editor.Renderer
 
 		gp_Pnt GetMainPathStartPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetMainPathStartPointCache( pathID, out IMainPathStartPointCache startPnt ) ) {
+			if( !PathCacheProvider.TryGetMainPathStartPointCache( pathID, out IStartPointRendererCache startPnt ) ) {
 				return null;
 			}
-			return startPnt.GetMainPathStartCAMPoint().Point;
+			return startPnt.GetStartCAMPoint().Point;
 		}
 	}
 }

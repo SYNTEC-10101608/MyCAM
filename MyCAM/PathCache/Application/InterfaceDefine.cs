@@ -30,6 +30,11 @@ namespace MyCAM.PathCache
 		{
 			get;
 		}
+
+		List<CAMPoint> StartPointList
+		{
+			get;
+		}
 	}
 
 	public interface ITransformableCache
@@ -69,11 +74,6 @@ namespace MyCAM.PathCache
 		IProcessPoint GetProcessStartPoint();
 
 		IProcessPoint GetProcessEndPoint();
-	}
-
-	public interface IMainPathStartPointCache
-	{
-		IProcessPoint GetMainPathStartCAMPoint();
 	}
 
 	public interface IOrientationCache
@@ -147,11 +147,9 @@ namespace MyCAM.PathCache
 		{
 			get;
 		}
-
-		List<CADPoint> GetMainPathCADPointList();
 	}
 
-	public interface IToolVecCache : IMainPathCache
+	public interface IToolVecCache : IStartPointRendererCache
 	{
 		bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg );
 
@@ -159,4 +157,38 @@ namespace MyCAM.PathCache
 
 		bool GetToolVecInterpolateType( out EToolVecInterpolateType interpolateType );
 	}
+
+	#region Action Cache Interfaces
+
+	public interface IStartPointActionCache
+	{
+		IReadOnlyList<ISetToolVecPoint> StartPointList
+		{
+			get;
+		}
+	}
+
+	#endregion
+
+	#region Renderer Cache Interfaces
+
+	public interface IMainPathRendererCache
+	{
+		IReadOnlyList<gp_Pnt> MainPathPointList
+		{
+			get;
+		}
+	}
+
+	public interface IStartPointRendererCache
+	{
+		IProcessPoint GetStartCAMPoint();
+
+		IReadOnlyList<IProcessPoint> StartPointList
+		{
+			get;
+		}
+	}
+
+	#endregion
 }

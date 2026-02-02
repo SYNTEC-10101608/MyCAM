@@ -1,12 +1,15 @@
-﻿namespace MyCAM.Data
+﻿using OCC.gp;
+
+namespace MyCAM.Data
 {
 	public class PolygonGeomData : StdPatternGeomDataBase
 	{
-		public PolygonGeomData( int sides, double sideLength, double cornerRadius, double rotatedAngle_deg, bool isCoordinateReversed )
+		public PolygonGeomData( gp_Ax3 refCoord, int sides, double sideLength, double cornerRadius, double rotatedAngle_deg, bool isCoordinateReversed )
 		{
 			if( sides < 3 || sides > 6 ) {
 				throw new System.ArgumentOutOfRangeException( nameof( sides ), "Polygon must have 3 to 6 sides" );
 			}
+			m_RefCoord = refCoord;
 			Sides = sides;
 			m_SideLength = sideLength;
 			m_CornerRadius = cornerRadius;
@@ -77,7 +80,7 @@
 
 		public override IGeomData Clone()
 		{
-			return new PolygonGeomData( Sides, m_SideLength, m_CornerRadius, m_RotatedAngle_deg, m_IsCoordinateReversed );
+			return new PolygonGeomData( m_RefCoord, Sides, m_SideLength, m_CornerRadius, m_RotatedAngle_deg, m_IsCoordinateReversed );
 		}
 
 		public const int DEFAULT_SIDES = 3;

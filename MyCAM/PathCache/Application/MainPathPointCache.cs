@@ -20,10 +20,5 @@ namespace MyCAM.PathCache
 				return m_PathCache.MainPathPointList.Cast<IProcessPoint>().ToList();
 			}
 		}
-
-		public List<CADPoint> GetMainPathCADPointList()
-		{
-			return m_PathCache.MainPathCADPointList;
-		}
 	}
 }

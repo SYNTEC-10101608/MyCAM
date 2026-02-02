@@ -683,6 +683,12 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public gp_Ax3DTO RefCoord
+		{
+			get;
+			set;
+		} = new gp_Ax3DTO();
+
 		// parameterless constructor (for XmlSerializer)
 		internal CircleGeomDataDTO()
 		{
@@ -696,11 +702,13 @@ namespace MyCAM.FileManager
 			Diameter = geomData.Diameter;
 			RotatedAngle_deg = geomData.RotatedAngle_deg;
 			IsCoordinateReversed = geomData.IsCoordinateReversed;
+			RefCoord = new gp_Ax3DTO( geomData.RefCoord );
 		}
 
 		internal CircleGeomData ToCircleGeomData()
 		{
-			return new CircleGeomData( Diameter, RotatedAngle_deg, IsCoordinateReversed );
+			gp_Ax3 refCoord = RefCoord != null ? RefCoord.ToAx3() : new gp_Ax3();
+			return new CircleGeomData( refCoord, Diameter, RotatedAngle_deg, IsCoordinateReversed );
 		}
 	}
 
@@ -736,6 +744,12 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public gp_Ax3DTO ReferCoord
+		{
+			get;
+			set;
+		} = new gp_Ax3DTO();
+
 		// parameterless constructor (for XmlSerializer)
 		internal RectangleGeomDataDTO()
 		{
@@ -751,11 +765,13 @@ namespace MyCAM.FileManager
 			CornerRadius = geomData.CornerRadius;
 			RotatedAngle_deg = geomData.RotatedAngle_deg;
 			IsCoordinateReversed = geomData.IsCoordinateReversed;
+			ReferCoord = new gp_Ax3DTO( geomData.RefCoord );
 		}
 
 		internal RectangleGeomData ToRectangleGeomData()
 		{
-			return new RectangleGeomData( Width, Length, CornerRadius, RotatedAngle_deg, IsCoordinateReversed );
+			gp_Ax3 refCoord = ReferCoord != null ? ReferCoord.ToAx3() : new gp_Ax3();
+			return new RectangleGeomData( refCoord, Width, Length, CornerRadius, RotatedAngle_deg, IsCoordinateReversed );
 		}
 	}
 
@@ -791,6 +807,12 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public gp_Ax3DTO ReferCoord
+		{
+			get;
+			set;
+		} = new gp_Ax3DTO();
+
 		// parameterless constructor (for XmlSerializer)
 		internal PolygonGeomDataDTO()
 		{
@@ -806,11 +828,13 @@ namespace MyCAM.FileManager
 			CornerRadius = geomData.CornerRadius;
 			RotatedAngle_deg = geomData.RotatedAngle_deg;
 			IsCoordinateReversed = geomData.IsCoordinateReversed;
+			ReferCoord = new gp_Ax3DTO( geomData.RefCoord );
 		}
 
 		internal PolygonGeomData ToPolygonGeomData()
 		{
-			return new PolygonGeomData( Sides, SideLength, CornerRadius, RotatedAngle_deg, IsCoordinateReversed );
+			gp_Ax3 refCoord = ReferCoord != null ? ReferCoord.ToAx3() : new gp_Ax3();
+			return new PolygonGeomData( refCoord, Sides, SideLength, CornerRadius, RotatedAngle_deg, IsCoordinateReversed );
 		}
 	}
 
@@ -840,6 +864,12 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public gp_Ax3DTO ReferCoord
+		{
+			get;
+			set;
+		} = new gp_Ax3DTO();
+
 		// parameterless constructor (for XmlSerializer)
 		internal RunwayGeomDataDTO()
 		{
@@ -854,11 +884,103 @@ namespace MyCAM.FileManager
 			Width = geomData.Width;
 			RotatedAngle_deg = geomData.RotatedAngle_deg;
 			IsCoordinateReversed = geomData.IsCoordinateReversed;
+			ReferCoord = new gp_Ax3DTO( geomData.RefCoord );
 		}
 
 		internal RunwayGeomData ToRunwayGeomData()
 		{
-			return new RunwayGeomData( Length, Width, RotatedAngle_deg, IsCoordinateReversed );
+			gp_Ax3 refCoord = ReferCoord != null ? ReferCoord.ToAx3() : new gp_Ax3();
+			return new RunwayGeomData( refCoord, Length, Width, RotatedAngle_deg, IsCoordinateReversed );
+		}
+	}
+
+	public class gp_Ax3DTO
+	{
+		// Location (origin point)
+		public double Location_X
+		{
+			get; set;
+		}
+		public double Location_Y
+		{
+			get; set;
+		}
+		public double Location_Z
+		{
+			get; set;
+		}
+
+		// Direction (Z axis)
+		public double Direction_X
+		{
+			get; set;
+		}
+		public double Direction_Y
+		{
+			get; set;
+		}
+		public double Direction_Z
+		{
+			get; set;
+		}
+
+		// XDirection (X axis)
+		public double XDirection_X
+		{
+			get; set;
+		}
+		public double XDirection_Y
+		{
+			get; set;
+		}
+		public double XDirection_Z
+		{
+			get; set;
+		}
+
+		// parameterless constructor (for XmlSerializer)
+		public gp_Ax3DTO()
+		{
+		}
+
+		internal gp_Ax3DTO( gp_Ax3 ax3 )
+		{
+			if( ax3 == null ) {
+				// Default coordinate system (origin at 0,0,0, Z = (0,0,1), X = (1,0,0))
+				Location_X = 0;
+				Location_Y = 0;
+				Location_Z = 0;
+				Direction_X = 0;
+				Direction_Y = 0;
+				Direction_Z = 1;
+				XDirection_X = 1;
+				XDirection_Y = 0;
+				XDirection_Z = 0;
+				return;
+			}
+
+			gp_Pnt location = ax3.Location();
+			Location_X = location.X();
+			Location_Y = location.Y();
+			Location_Z = location.Z();
+
+			gp_Dir direction = ax3.Direction();
+			Direction_X = direction.X();
+			Direction_Y = direction.Y();
+			Direction_Z = direction.Z();
+
+			gp_Dir xDirection = ax3.XDirection();
+			XDirection_X = xDirection.X();
+			XDirection_Y = xDirection.Y();
+			XDirection_Z = xDirection.Z();
+		}
+
+		internal gp_Ax3 ToAx3()
+		{
+			gp_Pnt location = new gp_Pnt( Location_X, Location_Y, Location_Z );
+			gp_Dir direction = new gp_Dir( Direction_X, Direction_Y, Direction_Z );
+			gp_Dir xDirection = new gp_Dir( XDirection_X, XDirection_Y, XDirection_Z );
+			return new gp_Ax3( location, direction, xDirection );
 		}
 	}
 

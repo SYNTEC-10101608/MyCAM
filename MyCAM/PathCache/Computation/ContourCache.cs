@@ -80,6 +80,14 @@ namespace MyCAM.PathCache
 			}
 		}
 
+		public List<CAMPoint> StartPointList
+		{
+			get
+			{
+				return m_CAMPointList.Select( camPoint => camPoint ).ToList();
+			}
+		}
+
 		#endregion
 
 		#region API
