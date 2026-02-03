@@ -5,14 +5,28 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public struct ToolVecParam
+	public class ToolVecParam
 	{
-		public bool IsModified
+		public EToolVecInterpolateType InterpolateType
 		{
 			get; set;
 		}
 
-		public EToolVecInterpolateType InterpolateType
+		public ToolVecIndexParam IndexParam
+		{
+			get; set;
+		}
+
+		public ToolVecParam( EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal, ToolVecIndexParam indexParam = null )
+		{
+			InterpolateType = interpolateType;
+			IndexParam = indexParam;
+		}
+	}
+
+	public class ToolVecIndexParam
+	{
+		public bool IsModified
 		{
 			get; set;
 		}
@@ -37,20 +51,14 @@ namespace MyCAM.Editor
 			get; set;
 		}
 
-		public ToolVecParam( bool isModified = false, double dAngleA_deg = 0, double dAngelB_deg = 0,
-			double dMaster_deg = 0, double dSlave_deg = 0,
-			EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
+		public ToolVecIndexParam( double angleA_deg = 0.0, double angleB_deg = 0.0, double master_deg = 0.0, double slave_deg = 0.0, bool isModified = false )
 		{
+			AngleA_deg = angleA_deg;
+			AngleB_deg = angleB_deg;
+			Master_deg = master_deg;
+			Slave_deg = slave_deg;
 			IsModified = isModified;
-			AngleA_deg = dAngleA_deg;
-			AngleB_deg = dAngelB_deg;
-			Master_deg = dMaster_deg;
-			Slave_deg = dSlave_deg;
-			InterpolateType = interpolateType;
 		}
-
-		public const double MAX_Angle = 60.0;
-		public const double MIN_Angle = -60.0;
 	}
 
 	public partial class ToolVectorDlg : EditDialogBase<ToolVecParam>
@@ -66,17 +74,14 @@ namespace MyCAM.Editor
 			InitializeComponent();
 			m_ToolVecParam = toolVecParam;
 			m_IsPathRevese = isPathReverse;
+			ResetToolVecParam( toolVecParam );
+		}
 
-			// initialize textbox
-			m_tbxAngleA.Text = m_IsPathRevese ? ( -m_ToolVecParam.AngleA_deg ).ToString( "F3" ) : m_ToolVecParam.AngleA_deg.ToString( "F3" );
-			m_tbxAngleB.Text = m_IsPathRevese ? ( -m_ToolVecParam.AngleB_deg ).ToString( "F3" ) : m_ToolVecParam.AngleB_deg.ToString( "F3" );
-			m_tbxMaster.Text = m_ToolVecParam.Master_deg.ToString( "F3" );
-			m_tbxSlave.Text = m_ToolVecParam.Slave_deg.ToString( "F3" );
+		public void ResetToolVecParam( ToolVecParam toolVecParam )
+		{
+			m_ToolVecParam = toolVecParam;
 
-			// initialize button
-			m_btnRemove.Visible = m_ToolVecParam.IsModified;
-
-			// initialize modify type
+			// update modify type
 			switch( toolVecParam.InterpolateType ) {
 				case EToolVecInterpolateType.VectorInterpolation:
 					m_rbtVecSpace.Checked = true;
@@ -88,6 +93,27 @@ namespace MyCAM.Editor
 					m_rbtInit.Checked = true;
 					break;
 			}
+
+			// get index param
+			ToolVecIndexParam indexParam = toolVecParam.IndexParam;
+
+			// no selected index param, disable edit UI
+			if( indexParam == null ) {
+				m_tbxAngleA.Enabled = false;
+				m_tbxAngleB.Enabled = false;
+				m_tbxMaster.Enabled = false;
+				m_tbxSlave.Enabled = false;
+				m_btnRemove.Visible = false;
+				return;
+			}
+
+			// update index edit UI
+			m_tbxAngleA.Text = m_IsPathRevese ? ( -indexParam.AngleA_deg ).ToString( "F3" ) : indexParam.AngleA_deg.ToString( "F3" );
+			m_tbxAngleB.Text = m_IsPathRevese ? ( -indexParam.AngleB_deg ).ToString( "F3" ) : indexParam.AngleB_deg.ToString( "F3" );
+			m_tbxMaster.Text = indexParam.Master_deg.ToString( "F3" );
+			m_tbxSlave.Text = indexParam.Slave_deg.ToString( "F3" );
+			m_IsModified = indexParam.IsModified;
+			m_btnRemove.Visible = indexParam.IsModified;
 		}
 
 		public void SetAngleFromTargetVec( Tuple<double, double> abAngles_deg, Tuple<double, double> msAngles_deg )
@@ -142,7 +168,7 @@ namespace MyCAM.Editor
 
 		bool SaveToolVecParam()
 		{
-			m_ToolVecParam.IsModified = true;
+			m_ToolVecParam.IndexParam.IsModified = true;
 			if( !GetABAngleFromDialog( out double angleA_deg, out double angleB_deg ) ) {
 				return false;
 			}
@@ -152,17 +178,17 @@ namespace MyCAM.Editor
 			if( !GetMSAngleFromDialog( out double master_deg, out double slave_deg ) ) {
 				return false;
 			}
-			m_ToolVecParam.AngleA_deg = angleA_deg;
-			m_ToolVecParam.AngleB_deg = angleB_deg;
-			m_ToolVecParam.Master_deg = master_deg;
-			m_ToolVecParam.Slave_deg = slave_deg;
+			m_ToolVecParam.IndexParam.AngleA_deg = angleA_deg;
+			m_ToolVecParam.IndexParam.AngleB_deg = angleB_deg;
+			m_ToolVecParam.IndexParam.Master_deg = master_deg;
+			m_ToolVecParam.IndexParam.Slave_deg = slave_deg;
 			return true;
 		}
 
 		void m_btnRemove_Click( object sender, EventArgs e )
 		{
 			// set flag to this tool vec is need to erase
-			m_ToolVecParam.IsModified = false;
+			m_ToolVecParam.IndexParam.IsModified = false;
 			RaiseConfirm( m_ToolVecParam );
 			Close();
 		}
@@ -237,8 +263,8 @@ namespace MyCAM.Editor
 
 		bool CheckABAngleRange( double angleA_deg, double angleB_deg )
 		{
-			if( angleA_deg < ToolVecParam.MIN_Angle || angleA_deg > ToolVecParam.MAX_Angle ||
-				angleB_deg < ToolVecParam.MIN_Angle || angleB_deg > ToolVecParam.MAX_Angle ) {
+			if( angleA_deg < MIN_Angle || angleA_deg > MAX_Angle ||
+				angleB_deg < MIN_Angle || angleB_deg > MAX_Angle ) {
 				MyApp.Logger.ShowOnLogPanel( "角度必須在 -60~+60 範圍內", MyApp.NoticeType.Warning );
 				return false;
 			}
@@ -335,5 +361,9 @@ namespace MyCAM.Editor
 		}
 
 		bool m_IsPathRevese = false;
+		bool m_IsModified = false;
+
+		public const double MAX_Angle = 60.0;
+		public const double MIN_Angle = -60.0;
 	}
 }

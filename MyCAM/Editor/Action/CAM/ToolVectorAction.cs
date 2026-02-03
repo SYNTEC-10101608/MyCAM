@@ -40,6 +40,27 @@ namespace MyCAM.Editor
 		public Action<List<string>> PropertyChanged;
 		public Action<EActionStatus> RaiseEditingToolVecDlg;
 
+		public override void Start()
+		{
+			base.Start();
+
+			// modify tool vector
+			ToolVecParam toolVecParam = new ToolVecParam( m_CraftData.InterpolateType, null );
+
+			// back up old data
+			m_ToolVecDlg = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
+			m_ToolVecDlg.RaiseKeep += () => SetToolVecOfKeep( m_nSelectIndex, m_ToolVecDlg );
+			m_ToolVecDlg.RaiseZDir += () => SetToolVecOfZDir( m_nSelectIndex, m_ToolVecDlg );
+			m_ToolVecDlg.RaiseCalculateMSAngleFromABAngle = ( angleA, angleB ) => CalculateMSAngleFromABAngle( m_nSelectIndex, angleA, angleB );
+			m_ToolVecDlg.RaiseCalculateABAngleFromMSAngle = ( master, slave ) => CalculateABAngleFromMSAngle( m_nSelectIndex, master, slave );
+			m_ToolVecDlg.Preview += ( ToolVec ) => SetToolVecParamAndPeview( m_nSelectIndex, ToolVec );
+
+			// when editing a point lock the main form
+			RaiseEditingToolVecDlg?.Invoke( EActionStatus.Start );
+
+			m_ToolVecDlg.Show( MyApp.MainForm );
+		}
+
 		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
 			// editing tool vector, do not allow other operation
@@ -49,32 +70,17 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			int nIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
-			if( nIndex == DEFAULT_SELECT_INDEX ) {
+
+			// update select index
+			m_nSelectIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
+			if( m_nSelectIndex == DEFAULT_SELECT_INDEX ) {
 				return;
 			}
 
 			// modify tool vector
-			bool isModified = m_DataHandler.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
-			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, master_deg, slave_deg, m_CraftData.InterpolateType );
-
-			// back up old data
-			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, master_deg, slave_deg, m_CraftData.InterpolateType );
-			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
-			toolVecForm.RaiseKeep += () => SetToolVecOfKeep( nIndex, toolVecForm );
-			toolVecForm.RaiseZDir += () => SetToolVecOfZDir( nIndex, toolVecForm );
-			toolVecForm.RaiseCalculateMSAngleFromABAngle = ( angleA, angleB ) => CalculateMSAngleFromABAngle( nIndex, angleA, angleB );
-			toolVecForm.RaiseCalculateABAngleFromMSAngle = ( master, slave ) => CalculateABAngleFromMSAngle( nIndex, master, slave );
-			toolVecForm.Preview += ( ToolVec ) => SetToolVecParamAndPeview( nIndex, ToolVec );
-			toolVecForm.Confirm += ( ToolVec ) => ConfirmSetting( nIndex, ToolVec );
-			toolVecForm.Cancel += () => CancelSetting( nIndex );
-
-			// when editing a point lock the main form
-			RaiseEditingToolVecDlg?.Invoke( EActionStatus.Start );
-
-			// when editing a point, cannot select other points but still show selected point
-			LockSelectedVertexHighLight( selectedVertex );
-			toolVecForm.Show( MyApp.MainForm );
+			bool isModified = m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
+			ToolVecParam toolVecParam = new ToolVecParam( m_CraftData.InterpolateType, new ToolVecIndexParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModified ) );
+			m_ToolVecDlg.ResetToolVecParam( toolVecParam );
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
@@ -126,9 +132,9 @@ namespace MyCAM.Editor
 			m_CraftData.InterpolateType = toolVecParam.InterpolateType;
 		}
 
-		void SetABAngle( int VecIndex, ToolVecParam toolVecParam )
+		void SetIndexAngleParam( int VecIndex, ToolVecIndexParam indexParam )
 		{
-			m_CraftData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg, toolVecParam.Master_deg, toolVecParam.Slave_deg );
+			m_CraftData.SetToolVecModify( VecIndex, indexParam.AngleA_deg, indexParam.AngleB_deg, indexParam.Master_deg, indexParam.Slave_deg );
 		}
 
 		void DrawVertexOnViewer( TopoDS_Shape selectedVertex )
@@ -222,37 +228,8 @@ namespace MyCAM.Editor
 		void SetToolVecParamAndPeview( int VecIndex, ToolVecParam toolVecParam )
 		{
 			SetInterpolateType( toolVecParam );
-			SetABAngle( VecIndex, toolVecParam );
+			SetIndexAngleParam( VecIndex, toolVecParam.IndexParam );
 			PropertyChanged?.Invoke( m_PathIDList );
-		}
-
-		// remove or ok button clicked
-		void ConfirmSetting( int VecIndex, ToolVecParam toolVecParam )
-		{
-			// user remove pnt
-			if( toolVecParam.IsModified == false ) {
-				m_CraftData.RemoveToolVecModify( VecIndex );
-			}
-			// user add / adjust pnt
-			else {
-				SetABAngle( VecIndex, toolVecParam );
-			}
-
-			SetInterpolateType( toolVecParam );
-			SetToolVecDone();
-		}
-
-		void CancelSetting( int VecIndex )
-		{
-			// this point is not modify point when dialog show up
-			if( m_BackupToolVecParam.IsModified == false ) {
-				m_CraftData.RemoveToolVecModify( VecIndex );
-			}
-			else {
-				SetABAngle( VecIndex, m_BackupToolVecParam );
-			}
-			SetInterpolateType( m_BackupToolVecParam );
-			SetToolVecDone();
 		}
 
 		gp_Dir GetPreCtrlPntToolVec( IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nTargetPntIdx, bool isPathReverse, bool isClosePath )
@@ -319,7 +296,9 @@ namespace MyCAM.Editor
 		ToolVecActionDataHandler m_DataHandler = null;
 		CraftData m_CraftData;
 		List<string> m_PathIDList = null;
+		int m_nSelectIndex = DEFAULT_SELECT_INDEX;
 		const int DEFAULT_SELECT_INDEX = -1;
+		ToolVectorDlg m_ToolVecDlg = null;
 	}
 
 	class ToolVecActionDataHandler
