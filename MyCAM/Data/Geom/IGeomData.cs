@@ -48,7 +48,7 @@ namespace MyCAM.Data
 			get;
 			set;
 		}
-
+		// TOD: use field above
 		void SetRefCoord( gp_Ax3 refCoordinate );
 	}
 }
