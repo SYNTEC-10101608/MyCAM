@@ -5,163 +5,112 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public struct ToolVecParam
+	public partial class ToolVectorDlg : EditDialogBase<EToolVecInterpolateType>
 	{
-		public bool IsModified
-		{
-			get; set;
-		}
+		public Action SetKeep;
+		public Action SetZdir;
+		public Action SetRevert;
+		public Action<double, double> MSAngleChanged;
+		public Action<double, double> ABAngleChanged;
+		public Action<EToolVecInterpolateType> TypeChanged;
+		public Action AddEditIndex;
+		public Action RemoveEditIndex;
+		public Action SwitchStartEnd;
 
-		public EToolVecInterpolateType InterpolateType
-		{
-			get; set;
-		}
-
-		public double AngleA_deg
-		{
-			get; set;
-		}
-
-		public double AngleB_deg
-		{
-			get; set;
-		}
-
-		public double Master_deg
-		{
-			get; set;
-		}
-
-		public double Slave_deg
-		{
-			get; set;
-		}
-
-		public ToolVecParam( bool isModified = false, double dAngleA_deg = 0, double dAngelB_deg = 0,
-			double dMaster_deg = 0, double dSlave_deg = 0,
-			EToolVecInterpolateType interpolateType = EToolVecInterpolateType.VectorInterpolation )
-		{
-			IsModified = isModified;
-			AngleA_deg = dAngleA_deg;
-			AngleB_deg = dAngelB_deg;
-			Master_deg = dMaster_deg;
-			Slave_deg = dSlave_deg;
-			InterpolateType = interpolateType;
-		}
-
-		public const double MAX_Angle = 60.0;
-		public const double MIN_Angle = -60.0;
-	}
-
-	public partial class ToolVectorDlg : EditDialogBase<ToolVecParam>
-	{
-		public Action RaiseKeep;
-		public Action RaiseZDir;
-		public Func<double, double, Tuple<double, double>> RaiseCalculateMSAngleFromABAngle;
-		public Func<double, double, Tuple<double, double>> RaiseCalculateABAngleFromMSAngle;
-
-		public ToolVectorDlg( ToolVecParam toolVecParam, bool isPathReverse )
+		public ToolVectorDlg( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse, RotaryAxisConfig config )
 		{
 			// struct would not be null
 			InitializeComponent();
-			m_ToolVecParam = toolVecParam;
 			m_IsPathRevese = isPathReverse;
+			ResetType( type );
+			ResetToolVecParam( param );
 
-			// initialize textbox
+			// update rotary axis name
+			m_RotaryAxisConfig = config;
+			m_lblMaster.Text = m_RotaryAxisConfig.MasterName;
+			m_lblSlave.Text = m_RotaryAxisConfig.SlaveName;
+			if( m_RotaryAxisConfig.RotaryAxis == ETypeOfRotaryAxis.Master ) {
+				m_btnRotaryPos.Text = m_RotaryAxisConfig.MasterName + " +";
+				m_btnRotaryNeg.Text = m_RotaryAxisConfig.MasterName + " -";
+			}
+			else {
+				m_btnRotaryPos.Text = m_RotaryAxisConfig.SlaveName + " +";
+				m_btnRotaryNeg.Text = m_RotaryAxisConfig.SlaveName + " -";
+			}
+		}
+
+		public void ResetType( EToolVecInterpolateType type )
+		{
+			bSuppressTypeChangedEvent = true;
+
+			// update modify type
+			switch( type ) {
+				case EToolVecInterpolateType.VectorInterpolation:
+					m_rbtVecSpace.Checked = true;
+					break;
+				case EToolVecInterpolateType.TiltAngleInterpolation:
+					m_rbtTilt.Checked = true;
+					break;
+				default:
+					m_rbtNormal.Checked = true;
+					break;
+			}
+			bSuppressTypeChangedEvent = false;
+		}
+
+		public void ResetToolVecParam( ToolVecParam toolVecParam )
+		{
+			bSuppressValueChangedEvent = true;
+			m_ToolVecParam = toolVecParam;
+
+			// no selected index param, disable edit UI
+			if( m_ToolVecParam == null ) {
+				m_gbxIndexParam.Enabled = false;
+				return;
+			}
+
+			// update index edit UI
+			m_gbxIndexParam.Enabled = true;
 			m_tbxAngleA.Text = m_IsPathRevese ? ( -m_ToolVecParam.AngleA_deg ).ToString( "F3" ) : m_ToolVecParam.AngleA_deg.ToString( "F3" );
 			m_tbxAngleB.Text = m_IsPathRevese ? ( -m_ToolVecParam.AngleB_deg ).ToString( "F3" ) : m_ToolVecParam.AngleB_deg.ToString( "F3" );
 			m_tbxMaster.Text = m_ToolVecParam.Master_deg.ToString( "F3" );
 			m_tbxSlave.Text = m_ToolVecParam.Slave_deg.ToString( "F3" );
-
-			// initialize button
-			m_btnRemove.Visible = m_ToolVecParam.IsModified;
-
-			// initialize modify type
-			switch( toolVecParam.InterpolateType ) {
-				case EToolVecInterpolateType.TiltAngleInterpolation:
-					m_rbtTiltAngleCase.Checked = true;
-					break;
-				case EToolVecInterpolateType.VectorInterpolation:
-				default:
-					m_rbtVecSpaceCase.Checked = true;
-					break;
-			}
+			m_btnRemove.Enabled = m_ToolVecParam.IsModified;
+			m_btnAdd.Enabled = !m_ToolVecParam.IsModified;
+			bSuppressValueChangedEvent = false;
 		}
 
-		public void SetAngleFromTargetVec( Tuple<double, double> abAngles_deg, Tuple<double, double> msAngles_deg )
+		public void EnableStartEndSwitch( bool enable )
 		{
-			SetABAngleBack( abAngles_deg );
-			SetMSAngleBack( msAngles_deg );
-			if( !CheckABAngleRange( abAngles_deg.Item1, abAngles_deg.Item2 ) ) {
+			m_btnSwitchStartEnd.Visible = enable;
+		}
+
+
+		// UI event - interpolate type changed
+		void m_rbtNormal_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseTypeChanged( EToolVecInterpolateType.Normal );
+		}
+
+		void m_rbtVecSpace_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseTypeChanged( EToolVecInterpolateType.VectorInterpolation );
+		}
+
+		void m_rbtTilt_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseTypeChanged( EToolVecInterpolateType.TiltAngleInterpolation );
+		}
+
+		void RaiseTypeChanged( EToolVecInterpolateType type )
+		{
+			if( bSuppressTypeChangedEvent ) {
 				return;
 			}
-			PreviewToolVecResult();
+			TypeChanged?.Invoke( type );
 		}
 
-		protected override void OnShown( EventArgs e )
-		{
-			base.OnShown( e );
-			PreviewToolVecResult();
-		}
-
-		ToolVecParam m_ToolVecParam;
-
-		void PreviewToolVecResult()
-		{
-			if( !SaveToolVecParam() ) {
-				return;
-			}
-			SaveInterpolateType();
-			RaisePreview( m_ToolVecParam );
-		}
-
-		void m_btnOK_Click( object sender, EventArgs e )
-		{
-			if( !SaveToolVecParam() ) {
-				return;
-			}
-			SaveInterpolateType();
-			RaiseConfirm( m_ToolVecParam );
-			Close();
-		}
-
-		void SaveInterpolateType()
-		{
-			if( m_rbtTiltAngleCase.Checked ) {
-				m_ToolVecParam.InterpolateType = EToolVecInterpolateType.TiltAngleInterpolation;
-			}
-			else {
-				m_ToolVecParam.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
-			}
-		}
-
-		bool SaveToolVecParam()
-		{
-			m_ToolVecParam.IsModified = true;
-			if( !GetABAngleFromDialog( out double angleA_deg, out double angleB_deg ) ) {
-				return false;
-			}
-			if( !CheckABAngleRange( angleA_deg, angleB_deg ) ) {
-				return false;
-			}
-			if( !GetMSAngleFromDialog( out double master_deg, out double slave_deg ) ) {
-				return false;
-			}
-			m_ToolVecParam.AngleA_deg = angleA_deg;
-			m_ToolVecParam.AngleB_deg = angleB_deg;
-			m_ToolVecParam.Master_deg = master_deg;
-			m_ToolVecParam.Slave_deg = slave_deg;
-			return true;
-		}
-
-		void m_btnRemove_Click( object sender, EventArgs e )
-		{
-			// set flag to this tool vec is need to erase
-			m_ToolVecParam.IsModified = false;
-			RaiseConfirm( m_ToolVecParam );
-			Close();
-		}
-
+		// UI event - Index param value changed
 		void m_tbxAngleA_KeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Enter ) {
@@ -174,6 +123,16 @@ namespace MyCAM.Editor
 			if( e.KeyCode == Keys.Enter ) {
 				HandleABAngleChanged();
 			}
+		}
+
+		void m_tbxAngleA_Leave( object sender, EventArgs e )
+		{
+			HandleABAngleChanged();
+		}
+
+		void m_tbxAngleB_Leave( object sender, EventArgs e )
+		{
+			HandleABAngleChanged();
 		}
 
 		void m_tbxMaster_KeyDown( object sender, KeyEventArgs e )
@@ -190,16 +149,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void m_tbxAngleA_Leave( object sender, EventArgs e )
-		{
-			HandleABAngleChanged();
-		}
-
-		void m_tbxAngleB_Leave( object sender, EventArgs e )
-		{
-			HandleABAngleChanged();
-		}
-
 		void m_tbxMaster_Leave( object sender, EventArgs e )
 		{
 			HandleMSAngleChanged();
@@ -210,80 +159,32 @@ namespace MyCAM.Editor
 			HandleMSAngleChanged();
 		}
 
-		void m_btnKeep_Click( object sender, EventArgs e )
-		{
-			RaiseKeep();
-		}
-
-		void m_btnZDir_Click( object sender, EventArgs e )
-		{
-			RaiseZDir();
-		}
-
-		void m_rbtVecSpaceCase_CheckedChanged( object sender, EventArgs e )
-		{
-			PreviewToolVecResult();
-		}
-
-		void m_rbtTiltAngleCase_CheckedChanged( object sender, EventArgs e )
-		{
-			PreviewToolVecResult();
-		}
-
-		bool CheckABAngleRange( double angleA_deg, double angleB_deg )
-		{
-			if( angleA_deg < ToolVecParam.MIN_Angle || angleA_deg > ToolVecParam.MAX_Angle ||
-				angleB_deg < ToolVecParam.MIN_Angle || angleB_deg > ToolVecParam.MAX_Angle ) {
-				MyApp.Logger.ShowOnLogPanel( "角度必須在 -60~+60 範圍內", MyApp.NoticeType.Warning );
-				return false;
-			}
-			return true;
-		}
-
 		void HandleABAngleChanged()
 		{
+			if( bSuppressValueChangedEvent ) {
+				return;
+			}
+
 			// Get AB angles from dialog
 			if( !GetABAngleFromDialog( out double angleA_deg, out double angleB_deg ) ) {
 				return;
 			}
-
-			// Check if AB angles are in valid range
-			if( !CheckABAngleRange( angleA_deg, angleB_deg ) ) {
-				return;
-			}
-
-			// Calculate MS angles from AB angles
-			if( RaiseCalculateMSAngleFromABAngle != null ) {
-				Tuple<double, double> msAngles_deg = RaiseCalculateMSAngleFromABAngle( angleA_deg, angleB_deg );
-				SetMSAngleBack( msAngles_deg );
-			}
-
-			// Preview the result
-			PreviewToolVecResult();
+			ABAngleChanged?.Invoke( angleA_deg, angleB_deg );
+			ResetToolVecParam( m_ToolVecParam );
 		}
 
 		void HandleMSAngleChanged()
 		{
+			if( bSuppressValueChangedEvent ) {
+				return;
+			}
+
 			// Get MS angles from dialog
 			if( !GetMSAngleFromDialog( out double master_deg, out double slave_deg ) ) {
 				return;
 			}
-
-			// Calculate AB angles from MS angles
-			if( RaiseCalculateABAngleFromMSAngle != null ) {
-				Tuple<double, double> abAngles_deg = RaiseCalculateABAngleFromMSAngle( master_deg, slave_deg );
-
-				// Fill back AB angles to textboxes
-				SetABAngleBack( abAngles_deg );
-
-				// Check if calculated AB angles are in valid range
-				if( !CheckABAngleRange( abAngles_deg.Item1, abAngles_deg.Item2 ) ) {
-					return;
-				}
-			}
-
-			// Preview the result
-			PreviewToolVecResult();
+			MSAngleChanged?.Invoke( master_deg, slave_deg );
+			ResetToolVecParam( m_ToolVecParam );
 		}
 
 		bool GetABAngleFromDialog( out double angleA_deg, out double angleB_deg )
@@ -316,19 +217,155 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		// trigger by event loop
-		void SetMSAngleBack( Tuple<double, double> MSAngleParam_deg )
+		// UI event - Index Param button
+		void m_btnKeep_Click( object sender, EventArgs e )
 		{
-			m_tbxMaster.Text = MSAngleParam_deg.Item1.ToString( "F3" );
-			m_tbxSlave.Text = MSAngleParam_deg.Item2.ToString( "F3" );
+			SetTarget( SetKeep );
 		}
 
-		void SetABAngleBack( Tuple<double, double> ABAngleParam_deg )
+		void m_btnZDir_Click( object sender, EventArgs e )
 		{
-			m_tbxAngleA.Text = m_IsPathRevese ? ( -ABAngleParam_deg.Item1 ).ToString( "F3" ) : ABAngleParam_deg.Item1.ToString( "F3" );
-			m_tbxAngleB.Text = m_IsPathRevese ? ( -ABAngleParam_deg.Item2 ).ToString( "F3" ) : ABAngleParam_deg.Item2.ToString( "F3" );
+			SetTarget( SetZdir );
+		}
+
+		void m_btnRevert_Click( object sender, EventArgs e )
+		{
+			SetTarget( SetRevert );
+		}
+
+		void SetTarget( Action setTargetFunc )
+		{
+			setTargetFunc?.Invoke();
+			ResetToolVecParam( m_ToolVecParam );
+		}
+
+		void m_btnAdd_Click( object sender, EventArgs e )
+		{
+			AddEditIndex?.Invoke();
+			m_btnAdd.Enabled = false;
+			m_btnRemove.Enabled = true;
+		}
+
+		void m_btnRemove_Click( object sender, EventArgs e )
+		{
+			RemoveEditIndex?.Invoke();
+			m_btnAdd.Enabled = true;
+			m_btnRemove.Enabled = false;
+		}
+
+		void m_btnSwitchStartEnd_Click( object sender, EventArgs e )
+		{
+			SwitchStartEnd?.Invoke();
+		}
+
+		void m_btnRotaryPos_Click( object sender, EventArgs e )
+		{
+			bSuppressValueChangedEvent = true;
+			GetMSAngleFromDialog( out double master_deg, out double slave_deg );
+			if( m_RotaryAxisConfig.RotaryAxis == ETypeOfRotaryAxis.Master ) {
+				master_deg += 180;
+				slave_deg = -slave_deg;
+				m_tbxMaster.Text = master_deg.ToString( "F3" );
+				m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			}
+			else {
+				master_deg = -master_deg;
+				slave_deg += 180;
+				m_tbxMaster.Text = master_deg.ToString( "F3" );
+				m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			}
+			bSuppressValueChangedEvent = false;
+			HandleMSAngleChanged();
+		}
+
+		void m_btnRotaryNeg_Click( object sender, EventArgs e )
+		{
+			bSuppressValueChangedEvent = true;
+			GetMSAngleFromDialog( out double master_deg, out double slave_deg );
+			if( m_RotaryAxisConfig.RotaryAxis == ETypeOfRotaryAxis.Master ) {
+				master_deg -= 180;
+				slave_deg = -slave_deg;
+				m_tbxMaster.Text = master_deg.ToString( "F3" );
+				m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			}
+			else {
+				master_deg = -master_deg;
+				slave_deg -= 180;
+				m_tbxMaster.Text = master_deg.ToString( "F3" );
+				m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			}
+			bSuppressValueChangedEvent = false;
+			HandleMSAngleChanged();
 		}
 
 		bool m_IsPathRevese = false;
+		ToolVecParam m_ToolVecParam;
+
+		RotaryAxisConfig m_RotaryAxisConfig;
+
+		bool bSuppressTypeChangedEvent = false;
+		bool bSuppressValueChangedEvent = false;
+	}
+
+	public class ToolVecParam
+	{
+		public bool IsModified
+		{
+			get; set;
+		}
+
+		public double AngleA_deg
+		{
+			get; set;
+		}
+
+		public double AngleB_deg
+		{
+			get; set;
+		}
+
+		public double Master_deg
+		{
+			get; set;
+		}
+
+		public double Slave_deg
+		{
+			get; set;
+		}
+
+		public ToolVecParam( double angleA_deg = 0.0, double angleB_deg = 0.0, double master_deg = 0.0, double slave_deg = 0.0, bool isModified = false )
+		{
+			AngleA_deg = angleA_deg;
+			AngleB_deg = angleB_deg;
+			Master_deg = master_deg;
+			Slave_deg = slave_deg;
+			IsModified = isModified;
+		}
+	}
+
+	// to determin which is the rotating one
+	public enum ETypeOfRotaryAxis
+	{
+		Master,
+		Slave,
+	}
+
+	public class RotaryAxisConfig
+	{
+		public ETypeOfRotaryAxis RotaryAxis
+		{
+			get; set;
+		}
+
+		public string MasterName
+		{
+			get; set;
+		}
+
+		public string SlaveName
+		{
+			get; set;
+		}
 	}
 }

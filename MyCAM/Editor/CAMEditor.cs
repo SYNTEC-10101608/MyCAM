@@ -1,6 +1,7 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
+using MyCAM.Helper;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.AIS;
@@ -363,22 +364,35 @@ namespace MyCAM.Editor
 			ShowCAMData( szPathIDList );
 		}
 
-		public void SetInterpolateTypeAsFixedDir()
+		// TODO: this is temp version
+		public void SetFixedToolVec()
 		{
 			// one shot edit, multi edit supported
 			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
 			foreach( string szPathID in szPathIDList ) {
-				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+				if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType )
+					|| pathType != PathType.Contour ) {
 					continue;
 				}
-				if( craftData.InterpolateType == EToolVecInterpolateType.FixedDir ) {
-					craftData.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData )
+					|| !DataGettingHelper.GetGeomDataByID( szPathID, out IGeomData geomData ) ) {
+					continue;
 				}
-				else {
-					craftData.InterpolateType = EToolVecInterpolateType.FixedDir;
-				}
+
+				// clear all tool vec modify data
+				craftData.ClearToolVecModify();
+				craftData.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
+
+				// get averge tool vec
+				gp_Dir avgDir = ( geomData as ContourGeomData ).RefCenterDir.Direction();
+
+				// get ms angle
+				Tuple<double, double> avgMS_deg = ToolVecHelper.GetMSAngleFromToolVec( avgDir, 0, 0 );
+
+				// set average ms to start point
+				craftData.SetToolVecModify( craftData.StartPointIndex, 0, 0, avgMS_deg.Item1, avgMS_deg.Item2 );
 			}
 			ShowCAMData( szPathIDList );
 		}
@@ -499,8 +513,7 @@ namespace MyCAM.Editor
 
 			// init data manager
 			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
-			m_DataManager.PathIDList.Clear();
-			m_DataManager.PathIDList.Add( szStartPathID );
+			List<string> newPathIDList = new List<string> { szStartPathID };
 
 			// visited path recorded container
 			bool[] visited = new bool[ pathIDList.Count ];
@@ -533,12 +546,14 @@ namespace MyCAM.Editor
 					currentPoint = nearestPoint;
 					visited[ nearestIdx ] = true;
 					visitedCount++;
-					m_DataManager.PathIDList.Add( pathIDList[ nearestIdx ] );
+					newPathIDList.Add( pathIDList[ nearestIdx ] );
 				}
 				else {
 					break;
 				}
 			}
+			m_DataManager.PathIDList.Clear();
+			m_DataManager.PathIDList.AddRange( newPathIDList );
 
 			// select focus on first path
 			if( m_DefaultAction is SelectPathAction selectAction ) {
@@ -804,12 +819,21 @@ namespace MyCAM.Editor
 		protected override void OnEditActionEnd( IEditorAction action )
 		{
 			// these action will show dialog, need to lock ui
+<<<<<<< .mine
+			if( action.ActionType == EditActionType.OverCut
+				|| action.ActionType == EditActionType.SetLead
+				|| action.ActionType == EditActionType.SetTraverse
+				|| action.ActionType == EditActionType.ToolVec ) {
+
+
+=======
 			if( action.ActionType == EditActionType.OverCut ||
 				action.ActionType == EditActionType.SetLead ||
 				action.ActionType == EditActionType.SetTraverse ||
 				action.ActionType == EditActionType.SetPattern ||
 				action.ActionType == EditActionType.PathEdit
 				) {
+>>>>>>> .theirs
 
 				// unlock main form
 				m_TreeView.Enabled = true;
