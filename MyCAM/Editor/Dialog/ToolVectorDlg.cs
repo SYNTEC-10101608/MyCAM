@@ -39,7 +39,7 @@ namespace MyCAM.Editor
 
 		public ToolVecParam( bool isModified = false, double dAngleA_deg = 0, double dAngelB_deg = 0,
 			double dMaster_deg = 0, double dSlave_deg = 0,
-			EToolVecInterpolateType interpolateType = EToolVecInterpolateType.VectorInterpolation )
+			EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
 		{
 			IsModified = isModified;
 			AngleA_deg = dAngleA_deg;
@@ -78,12 +78,14 @@ namespace MyCAM.Editor
 
 			// initialize modify type
 			switch( toolVecParam.InterpolateType ) {
-				case EToolVecInterpolateType.TiltAngleInterpolation:
-					m_rbtTiltAngleCase.Checked = true;
-					break;
 				case EToolVecInterpolateType.VectorInterpolation:
+					m_rbtVecSpace.Checked = true;
+					break;
+				case EToolVecInterpolateType.TiltAngleInterpolation:
+					m_rbtTiltAngleSpace.Checked = true;
+					break;
 				default:
-					m_rbtVecSpaceCase.Checked = true;
+					m_rbtInit.Checked = true;
 					break;
 			}
 		}
@@ -127,11 +129,14 @@ namespace MyCAM.Editor
 
 		void SaveInterpolateType()
 		{
-			if( m_rbtTiltAngleCase.Checked ) {
+			if( m_rbtTiltAngleSpace.Checked ) {
 				m_ToolVecParam.InterpolateType = EToolVecInterpolateType.TiltAngleInterpolation;
 			}
-			else {
+			else if( m_rbtVecSpace.Checked ) {
 				m_ToolVecParam.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
+			}
+			else {
+				m_ToolVecParam.InterpolateType = EToolVecInterpolateType.Normal;
 			}
 		}
 

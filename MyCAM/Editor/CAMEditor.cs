@@ -365,22 +365,7 @@ namespace MyCAM.Editor
 
 		public void SetInterpolateTypeAsFixedDir()
 		{
-			// one shot edit, multi edit supported
-			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
-				return;
-			}
-			foreach( string szPathID in szPathIDList ) {
-				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
-					continue;
-				}
-				if( craftData.InterpolateType == EToolVecInterpolateType.FixedDir ) {
-					craftData.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
-				}
-				else {
-					craftData.InterpolateType = EToolVecInterpolateType.FixedDir;
-				}
-			}
-			ShowCAMData( szPathIDList );
+			// TODO: implement this
 		}
 
 		public void SetTraverseData()

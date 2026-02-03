@@ -133,16 +133,14 @@ namespace MyCAM.Helper
 			IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap,
 			EToolVecInterpolateType interpolateType )
 		{
-			if( toolVecModifyMap.Count == 0 ) {
+			if( toolVecModifyMap.Count == 0 || interpolateType == EToolVecInterpolateType.Normal ) {
 				return;
 			}
 			if( interpolateType == EToolVecInterpolateType.VectorInterpolation ) {
 				ApplyMSAngleInterpolation( ref toolVecPointList, toolVecModifyMap );
-				return;
 			}
-			if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
+			else if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
 				ApplyTiltAngleInterpolation( ref toolVecPointList, toolVecModifyMap );
-				return;
 			}
 		}
 
