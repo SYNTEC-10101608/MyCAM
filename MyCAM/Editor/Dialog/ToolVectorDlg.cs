@@ -5,62 +5,6 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public class ToolVecParam
-	{
-		public EToolVecInterpolateType InterpolateType
-		{
-			get; set;
-		}
-
-		public ToolVecIndexParam IndexParam
-		{
-			get; set;
-		}
-
-		public ToolVecParam( EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal, ToolVecIndexParam indexParam = null )
-		{
-			InterpolateType = interpolateType;
-			IndexParam = indexParam;
-		}
-	}
-
-	public class ToolVecIndexParam
-	{
-		public bool IsModified
-		{
-			get; set;
-		}
-
-		public double AngleA_deg
-		{
-			get; set;
-		}
-
-		public double AngleB_deg
-		{
-			get; set;
-		}
-
-		public double Master_deg
-		{
-			get; set;
-		}
-
-		public double Slave_deg
-		{
-			get; set;
-		}
-
-		public ToolVecIndexParam( double angleA_deg = 0.0, double angleB_deg = 0.0, double master_deg = 0.0, double slave_deg = 0.0, bool isModified = false )
-		{
-			AngleA_deg = angleA_deg;
-			AngleB_deg = angleB_deg;
-			Master_deg = master_deg;
-			Slave_deg = slave_deg;
-			IsModified = isModified;
-		}
-	}
-
 	public partial class ToolVectorDlg : EditDialogBase<ToolVecParam>
 	{
 		public Action RaiseKeep;
@@ -365,5 +309,61 @@ namespace MyCAM.Editor
 
 		public const double MAX_Angle = 60.0;
 		public const double MIN_Angle = -60.0;
+	}
+
+	public class ToolVecParam
+	{
+		public EToolVecInterpolateType InterpolateType
+		{
+			get; set;
+		}
+
+		public ToolVecIndexParam IndexParam
+		{
+			get; set;
+		}
+
+		public ToolVecParam( EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal, ToolVecIndexParam indexParam = null )
+		{
+			InterpolateType = interpolateType;
+			IndexParam = indexParam;
+		}
+	}
+
+	public class ToolVecIndexParam
+	{
+		public bool IsModified
+		{
+			get; set;
+		}
+
+		public double AngleA_deg
+		{
+			get; set;
+		}
+
+		public double AngleB_deg
+		{
+			get; set;
+		}
+
+		public double Master_deg
+		{
+			get; set;
+		}
+
+		public double Slave_deg
+		{
+			get; set;
+		}
+
+		public ToolVecIndexParam( double angleA_deg = 0.0, double angleB_deg = 0.0, double master_deg = 0.0, double slave_deg = 0.0, bool isModified = false )
+		{
+			AngleA_deg = angleA_deg;
+			AngleB_deg = angleB_deg;
+			Master_deg = master_deg;
+			Slave_deg = slave_deg;
+			IsModified = isModified;
+		}
 	}
 }
