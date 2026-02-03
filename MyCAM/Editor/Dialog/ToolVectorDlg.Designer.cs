@@ -30,22 +30,18 @@
 			this.m_gbxInterpolation = new System.Windows.Forms.GroupBox();
 			this.m_tbInterType = new System.Windows.Forms.TableLayoutPanel();
 			this.m_pnlTiltColor = new System.Windows.Forms.Panel();
-			this.m_rbtInit = new System.Windows.Forms.RadioButton();
+			this.m_rbtNormal = new System.Windows.Forms.RadioButton();
 			this.m_rbtVecSpace = new System.Windows.Forms.RadioButton();
-			this.m_rbtTiltAngleSpace = new System.Windows.Forms.RadioButton();
+			this.m_rbtTilt = new System.Windows.Forms.RadioButton();
 			this.m_lblVecSpaceHint = new System.Windows.Forms.Label();
-			this.m_TiltAngleHint = new System.Windows.Forms.Label();
+			this.m_TiltHint = new System.Windows.Forms.Label();
 			this.m_lblNormalHint = new System.Windows.Forms.Label();
 			this.m_pnlVecSpaceColor = new System.Windows.Forms.Panel();
 			this.m_pnlNormalColor = new System.Windows.Forms.Panel();
 			this.splitter1 = new System.Windows.Forms.Splitter();
 			this.m_gbxIndexParam = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.m_btnRevert = new System.Windows.Forms.Button();
 			this.m_btnMasterNeg = new System.Windows.Forms.Button();
-			this.m_btnRemove = new System.Windows.Forms.Button();
-			this.m_btnZDir = new System.Windows.Forms.Button();
-			this.m_btnKeep = new System.Windows.Forms.Button();
 			this.m_lblADeg = new System.Windows.Forms.Label();
 			this.m_lblBDeg = new System.Windows.Forms.Label();
 			this.m_lblMaster = new System.Windows.Forms.Label();
@@ -55,7 +51,11 @@
 			this.m_btnMasterPos = new System.Windows.Forms.Button();
 			this.m_tbxAngleB = new System.Windows.Forms.TextBox();
 			this.m_tbxMaster = new System.Windows.Forms.TextBox();
-			this.btn_Add = new System.Windows.Forms.Button();
+			this.m_btnAdd = new System.Windows.Forms.Button();
+			this.m_btnRemove = new System.Windows.Forms.Button();
+			this.m_btnKeep = new System.Windows.Forms.Button();
+			this.m_btnZDir = new System.Windows.Forms.Button();
+			this.m_btnRevert = new System.Windows.Forms.Button();
 			this.m_gbxInterpolation.SuspendLayout();
 			this.m_tbInterType.SuspendLayout();
 			this.m_gbxIndexParam.SuspendLayout();
@@ -80,11 +80,11 @@
 			this.m_tbInterType.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
 			this.m_tbInterType.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
 			this.m_tbInterType.Controls.Add(this.m_pnlTiltColor, 1, 5);
-			this.m_tbInterType.Controls.Add(this.m_rbtInit, 0, 0);
+			this.m_tbInterType.Controls.Add(this.m_rbtNormal, 0, 0);
 			this.m_tbInterType.Controls.Add(this.m_rbtVecSpace, 0, 2);
-			this.m_tbInterType.Controls.Add(this.m_rbtTiltAngleSpace, 0, 4);
+			this.m_tbInterType.Controls.Add(this.m_rbtTilt, 0, 4);
 			this.m_tbInterType.Controls.Add(this.m_lblVecSpaceHint, 0, 3);
-			this.m_tbInterType.Controls.Add(this.m_TiltAngleHint, 0, 5);
+			this.m_tbInterType.Controls.Add(this.m_TiltHint, 0, 5);
 			this.m_tbInterType.Controls.Add(this.m_lblNormalHint, 0, 1);
 			this.m_tbInterType.Controls.Add(this.m_pnlVecSpaceColor, 1, 3);
 			this.m_tbInterType.Controls.Add(this.m_pnlNormalColor, 1, 1);
@@ -108,17 +108,17 @@
 			this.m_pnlTiltColor.Size = new System.Drawing.Size(14, 16);
 			this.m_pnlTiltColor.TabIndex = 11;
 			// 
-			// m_rbtInit
+			// m_rbtNormal
 			// 
-			this.m_rbtInit.AutoSize = true;
-			this.m_rbtInit.Location = new System.Drawing.Point(3, 3);
-			this.m_rbtInit.Name = "m_rbtInit";
-			this.m_rbtInit.Size = new System.Drawing.Size(106, 16);
-			this.m_rbtInit.TabIndex = 0;
-			this.m_rbtInit.TabStop = true;
-			this.m_rbtInit.Text = "曲面法向 (默認)";
-			this.m_rbtInit.UseVisualStyleBackColor = true;
-			this.m_rbtInit.CheckedChanged += new System.EventHandler(this.m_rbtVecSpaceCase_CheckedChanged);
+			this.m_rbtNormal.AutoSize = true;
+			this.m_rbtNormal.Location = new System.Drawing.Point(3, 3);
+			this.m_rbtNormal.Name = "m_rbtNormal";
+			this.m_rbtNormal.Size = new System.Drawing.Size(106, 16);
+			this.m_rbtNormal.TabIndex = 0;
+			this.m_rbtNormal.TabStop = true;
+			this.m_rbtNormal.Text = "曲面法向 (默認)";
+			this.m_rbtNormal.UseVisualStyleBackColor = true;
+			this.m_rbtNormal.CheckedChanged += new System.EventHandler(this.m_rbtNormal_CheckedChanged);
 			// 
 			// m_rbtVecSpace
 			// 
@@ -130,18 +130,19 @@
 			this.m_rbtVecSpace.TabStop = true;
 			this.m_rbtVecSpace.Text = "旋轉軸插值";
 			this.m_rbtVecSpace.UseVisualStyleBackColor = true;
-			this.m_rbtVecSpace.CheckedChanged += new System.EventHandler(this.m_rbtTiltAngleCase_CheckedChanged);
+			this.m_rbtVecSpace.CheckedChanged += new System.EventHandler(this.m_rbtVecSpace_CheckedChanged);
 			// 
-			// m_rbtTiltAngleSpace
+			// m_rbtTilt
 			// 
-			this.m_rbtTiltAngleSpace.AutoSize = true;
-			this.m_rbtTiltAngleSpace.Location = new System.Drawing.Point(3, 103);
-			this.m_rbtTiltAngleSpace.Name = "m_rbtTiltAngleSpace";
-			this.m_rbtTiltAngleSpace.Size = new System.Drawing.Size(71, 16);
-			this.m_rbtTiltAngleSpace.TabIndex = 9;
-			this.m_rbtTiltAngleSpace.TabStop = true;
-			this.m_rbtTiltAngleSpace.Text = "傾角插值";
-			this.m_rbtTiltAngleSpace.UseVisualStyleBackColor = true;
+			this.m_rbtTilt.AutoSize = true;
+			this.m_rbtTilt.Location = new System.Drawing.Point(3, 103);
+			this.m_rbtTilt.Name = "m_rbtTilt";
+			this.m_rbtTilt.Size = new System.Drawing.Size(71, 16);
+			this.m_rbtTilt.TabIndex = 9;
+			this.m_rbtTilt.TabStop = true;
+			this.m_rbtTilt.Text = "傾角插值";
+			this.m_rbtTilt.UseVisualStyleBackColor = true;
+			this.m_rbtTilt.CheckedChanged += new System.EventHandler(this.m_rbtTilt_CheckedChanged);
 			// 
 			// m_lblVecSpaceHint
 			// 
@@ -153,15 +154,15 @@
 			this.m_lblVecSpaceHint.TabIndex = 8;
 			this.m_lblVecSpaceHint.Text = "編修姿態呈現";
 			// 
-			// m_TiltAngleHint
+			// m_TiltHint
 			// 
-			this.m_TiltAngleHint.AutoSize = true;
-			this.m_TiltAngleHint.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-			this.m_TiltAngleHint.Location = new System.Drawing.Point(3, 125);
-			this.m_TiltAngleHint.Name = "m_TiltAngleHint";
-			this.m_TiltAngleHint.Size = new System.Drawing.Size(77, 12);
-			this.m_TiltAngleHint.TabIndex = 7;
-			this.m_TiltAngleHint.Text = "編修姿態呈現";
+			this.m_TiltHint.AutoSize = true;
+			this.m_TiltHint.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+			this.m_TiltHint.Location = new System.Drawing.Point(3, 125);
+			this.m_TiltHint.Name = "m_TiltHint";
+			this.m_TiltHint.Size = new System.Drawing.Size(77, 12);
+			this.m_TiltHint.TabIndex = 7;
+			this.m_TiltHint.Text = "編修姿態呈現";
 			// 
 			// m_lblNormalHint
 			// 
@@ -223,7 +224,7 @@
 			this.tableLayoutPanel1.Controls.Add(this.m_btnMasterPos, 2, 2);
 			this.tableLayoutPanel1.Controls.Add(this.m_tbxAngleB, 1, 1);
 			this.tableLayoutPanel1.Controls.Add(this.m_tbxMaster, 1, 2);
-			this.tableLayoutPanel1.Controls.Add(this.btn_Add, 0, 4);
+			this.tableLayoutPanel1.Controls.Add(this.m_btnAdd, 0, 4);
 			this.tableLayoutPanel1.Controls.Add(this.m_btnRemove, 1, 4);
 			this.tableLayoutPanel1.Controls.Add(this.m_btnKeep, 0, 5);
 			this.tableLayoutPanel1.Controls.Add(this.m_btnZDir, 1, 5);
@@ -243,15 +244,6 @@
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(185, 156);
 			this.tableLayoutPanel1.TabIndex = 0;
 			// 
-			// m_btnRevert
-			// 
-			this.m_btnRevert.Location = new System.Drawing.Point(123, 128);
-			this.m_btnRevert.Name = "m_btnRevert";
-			this.m_btnRevert.Size = new System.Drawing.Size(54, 19);
-			this.m_btnRevert.TabIndex = 12;
-			this.m_btnRevert.Text = "原始";
-			this.m_btnRevert.UseVisualStyleBackColor = true;
-			// 
 			// m_btnMasterNeg
 			// 
 			this.m_btnMasterNeg.Location = new System.Drawing.Point(123, 78);
@@ -260,36 +252,6 @@
 			this.m_btnMasterNeg.TabIndex = 18;
 			this.m_btnMasterNeg.Text = "C-";
 			this.m_btnMasterNeg.UseVisualStyleBackColor = true;
-			// 
-			// m_btnRemove
-			// 
-			this.m_btnRemove.Location = new System.Drawing.Point(63, 103);
-			this.m_btnRemove.Name = "m_btnRemove";
-			this.m_btnRemove.Size = new System.Drawing.Size(54, 19);
-			this.m_btnRemove.TabIndex = 10;
-			this.m_btnRemove.Text = "刪除";
-			this.m_btnRemove.UseVisualStyleBackColor = true;
-			this.m_btnRemove.Click += new System.EventHandler(this.m_btnRemove_Click);
-			// 
-			// m_btnZDir
-			// 
-			this.m_btnZDir.Location = new System.Drawing.Point(63, 128);
-			this.m_btnZDir.Name = "m_btnZDir";
-			this.m_btnZDir.Size = new System.Drawing.Size(54, 19);
-			this.m_btnZDir.TabIndex = 12;
-			this.m_btnZDir.Text = "Z 方向";
-			this.m_btnZDir.UseVisualStyleBackColor = true;
-			this.m_btnZDir.Click += new System.EventHandler(this.m_btnZDir_Click);
-			// 
-			// m_btnKeep
-			// 
-			this.m_btnKeep.Location = new System.Drawing.Point(3, 128);
-			this.m_btnKeep.Name = "m_btnKeep";
-			this.m_btnKeep.Size = new System.Drawing.Size(54, 19);
-			this.m_btnKeep.TabIndex = 11;
-			this.m_btnKeep.Text = "保持";
-			this.m_btnKeep.UseVisualStyleBackColor = true;
-			this.m_btnKeep.Click += new System.EventHandler(this.m_btnKeep_Click);
 			// 
 			// m_lblADeg
 			// 
@@ -388,14 +350,55 @@
 			this.m_tbxMaster.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxMaster_KeyDown);
 			this.m_tbxMaster.Leave += new System.EventHandler(this.m_tbxMaster_Leave);
 			// 
-			// btn_Add
+			// m_btnAdd
 			// 
-			this.btn_Add.Location = new System.Drawing.Point(3, 103);
-			this.btn_Add.Name = "btn_Add";
-			this.btn_Add.Size = new System.Drawing.Size(54, 19);
-			this.btn_Add.TabIndex = 13;
-			this.btn_Add.Text = "新增";
-			this.btn_Add.UseVisualStyleBackColor = true;
+			this.m_btnAdd.Location = new System.Drawing.Point(3, 103);
+			this.m_btnAdd.Name = "m_btnAdd";
+			this.m_btnAdd.Size = new System.Drawing.Size(54, 19);
+			this.m_btnAdd.TabIndex = 13;
+			this.m_btnAdd.Text = "新增";
+			this.m_btnAdd.UseVisualStyleBackColor = true;
+			this.m_btnAdd.Click += new System.EventHandler(this.m_btnAdd_Click);
+			// 
+			// m_btnRemove
+			// 
+			this.m_btnRemove.Location = new System.Drawing.Point(63, 103);
+			this.m_btnRemove.Name = "m_btnRemove";
+			this.m_btnRemove.Size = new System.Drawing.Size(54, 19);
+			this.m_btnRemove.TabIndex = 10;
+			this.m_btnRemove.Text = "刪除";
+			this.m_btnRemove.UseVisualStyleBackColor = true;
+			this.m_btnRemove.Click += new System.EventHandler(this.m_btnRemove_Click);
+			// 
+			// m_btnKeep
+			// 
+			this.m_btnKeep.Location = new System.Drawing.Point(3, 128);
+			this.m_btnKeep.Name = "m_btnKeep";
+			this.m_btnKeep.Size = new System.Drawing.Size(54, 19);
+			this.m_btnKeep.TabIndex = 11;
+			this.m_btnKeep.Text = "保持";
+			this.m_btnKeep.UseVisualStyleBackColor = true;
+			this.m_btnKeep.Click += new System.EventHandler(this.m_btnKeep_Click);
+			// 
+			// m_btnZDir
+			// 
+			this.m_btnZDir.Location = new System.Drawing.Point(63, 128);
+			this.m_btnZDir.Name = "m_btnZDir";
+			this.m_btnZDir.Size = new System.Drawing.Size(54, 19);
+			this.m_btnZDir.TabIndex = 12;
+			this.m_btnZDir.Text = "Z 方向";
+			this.m_btnZDir.UseVisualStyleBackColor = true;
+			this.m_btnZDir.Click += new System.EventHandler(this.m_btnZDir_Click);
+			// 
+			// m_btnRevert
+			// 
+			this.m_btnRevert.Location = new System.Drawing.Point(123, 128);
+			this.m_btnRevert.Name = "m_btnRevert";
+			this.m_btnRevert.Size = new System.Drawing.Size(54, 19);
+			this.m_btnRevert.TabIndex = 12;
+			this.m_btnRevert.Text = "原始";
+			this.m_btnRevert.UseVisualStyleBackColor = true;
+			this.m_btnRevert.Click += new System.EventHandler(this.m_btnRevert_Click);
 			// 
 			// ToolVectorDlg
 			// 
@@ -432,12 +435,12 @@
 		private System.Windows.Forms.Label m_lblBDeg;
 		private System.Windows.Forms.Label m_lblADeg;
 		private System.Windows.Forms.RadioButton m_rbtVecSpace;
-		private System.Windows.Forms.RadioButton m_rbtInit;
+		private System.Windows.Forms.RadioButton m_rbtNormal;
 		private System.Windows.Forms.Splitter splitter1;
 		private System.Windows.Forms.Button m_btnRemove;
 		private System.Windows.Forms.Panel m_pnlNormalColor;
 		private System.Windows.Forms.Panel m_pnlVecSpaceColor;
-		private System.Windows.Forms.Label m_TiltAngleHint;
+		private System.Windows.Forms.Label m_TiltHint;
 		private System.Windows.Forms.Label m_lblVecSpaceHint;
 		private System.Windows.Forms.TextBox m_tbxSlave;
 		private System.Windows.Forms.TextBox m_tbxMaster;
@@ -445,12 +448,12 @@
 		private System.Windows.Forms.Label m_lblMaster;
 		private System.Windows.Forms.Panel m_pnlTiltColor;
 		private System.Windows.Forms.Label m_lblNormalHint;
-		private System.Windows.Forms.RadioButton m_rbtTiltAngleSpace;
+		private System.Windows.Forms.RadioButton m_rbtTilt;
 		private System.Windows.Forms.Button m_btnMasterNeg;
 		private System.Windows.Forms.Button m_btnMasterPos;
 		private System.Windows.Forms.TableLayoutPanel m_tbInterType;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-		private System.Windows.Forms.Button btn_Add;
+		private System.Windows.Forms.Button m_btnAdd;
 		private System.Windows.Forms.Button m_btnRevert;
 	}
 }

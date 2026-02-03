@@ -49,10 +49,10 @@ namespace MyCAM.Editor
 
 			// back up old data
 			m_ToolVecDlg = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
-			m_ToolVecDlg.RaiseKeep += () => SetToolVecOfKeep( m_nSelectIndex, m_ToolVecDlg );
-			m_ToolVecDlg.RaiseZDir += () => SetToolVecOfZDir( m_nSelectIndex, m_ToolVecDlg );
-			m_ToolVecDlg.RaiseCalculateMSAngleFromABAngle = ( angleA, angleB ) => CalculateMSAngleFromABAngle( m_nSelectIndex, angleA, angleB );
-			m_ToolVecDlg.RaiseCalculateABAngleFromMSAngle = ( master, slave ) => CalculateABAngleFromMSAngle( m_nSelectIndex, master, slave );
+			m_ToolVecDlg.SetKeep += () => SetToolVecOfKeep( m_nSelectIndex, m_ToolVecDlg );
+			m_ToolVecDlg.SetZdir += () => SetToolVecOfZDir( m_nSelectIndex, m_ToolVecDlg );
+			m_ToolVecDlg.MSAngleChanged = ( angleA, angleB ) => CalculateMSAngleFromABAngle( m_nSelectIndex, angleA, angleB );
+			m_ToolVecDlg.ABAngleChanged = ( master, slave ) => CalculateABAngleFromMSAngle( m_nSelectIndex, master, slave );
 			m_ToolVecDlg.Preview += ( ToolVec ) => SetToolVecParamAndPeview( m_nSelectIndex, ToolVec );
 
 			// when editing a point lock the main form
