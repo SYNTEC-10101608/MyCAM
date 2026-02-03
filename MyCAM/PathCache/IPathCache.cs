@@ -38,5 +38,24 @@ namespace MyCAM.PathCache
 
 	public interface IStdPatternCache : IPathCache, ITransformableCache
 	{
+		List<CADPoint> KeyCADPointList
+		{
+			get;
+		}
+
+		List<CAMPoint> KeyCAMPointList
+		{
+			get;
+		}
+
+		List<CADPoint> MainPathCADPointList
+		{
+			get;
+		}
+
+		CAMPoint RefPoint
+		{
+			get;
+		}
 	}
 }

@@ -5,7 +5,7 @@ namespace MyCAM.PathCache
 {
 	internal static class StdPatternCacheFactory
 	{
-		public static StdPatternCacheBase CreateStdPatternCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData )
+		public static IStdPatternCache CreateStdPatternCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData )
 		{
 			if( stdPatternGeomData == null || craftData == null ) {
 				throw new ArgumentNullException( "StdPatternCache construct parameters null." );
@@ -53,11 +53,11 @@ namespace MyCAM.PathCache
 
 	internal interface IStdPatternCacheStrategy
 	{
-		StdPatternCacheBase CreatePathCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData );
+		IStdPatternCache CreatePathCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData );
 	}
 
 	internal class StdPatternCacheStrategy<TPathCache> : IStdPatternCacheStrategy
-		where TPathCache : StdPatternCacheBase
+		where TPathCache : IStdPatternCache
 	{
 		readonly Func<IStdPatternGeomData, CraftData, TPathCache> m_PathCacheFactory;
 
@@ -66,7 +66,7 @@ namespace MyCAM.PathCache
 			m_PathCacheFactory = pathCacheFactory ?? throw new ArgumentNullException( nameof( pathCacheFactory ) );
 		}
 
-		public StdPatternCacheBase CreatePathCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData )
+		public IStdPatternCache CreatePathCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData )
 		{
 			if( stdPatternGeomData == null || craftData == null ) {
 				throw new ArgumentNullException( "PathCache construct parameters null." );

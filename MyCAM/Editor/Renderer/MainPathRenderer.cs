@@ -139,7 +139,7 @@ namespace MyCAM.Editor
 				return ( contourGeomData as ContourGeomData )?.CADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
 			}
 			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
-				if( !DataGettingHelper.GetStdPatternCacheByID( szPathID, out StdPatternCacheBase stdPatternCache ) ) {
+				if( !DataGettingHelper.GetStdPatternCacheByID( szPathID, out IStdPatternCache stdPatternCache ) ) {
 					return new List<gp_Pnt>();
 				}
 				return stdPatternCache.MainPathCADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();

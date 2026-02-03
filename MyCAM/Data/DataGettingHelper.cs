@@ -103,7 +103,7 @@ namespace MyCAM.Data
 			return contourCache != null;
 		}
 
-		public static bool GetStdPatternCacheByID( string szPathID, out StdPatternCacheBase stdPatternCache )
+		public static bool GetStdPatternCacheByID( string szPathID, out IStdPatternCache stdPatternCache )
 		{
 			stdPatternCache = null;
 			if( !GetPathObject( szPathID, out PathObject pathObject ) ) {

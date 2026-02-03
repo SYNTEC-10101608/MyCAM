@@ -224,7 +224,7 @@ namespace MyCAM.Post
 
 		StdPatternNCPackage BuildPackageByID_StandardPattern( string szID )
 		{
-			if( !DataGettingHelper.GetStdPatternCacheByID( szID, out StdPatternCacheBase stdPatternCache ) ) {
+			if( !DataGettingHelper.GetStdPatternCacheByID( szID, out IStdPatternCache stdPatternCache ) ) {
 				return null;
 			}
 			if( !DataGettingHelper.GetCraftDataByID( szID, out CraftData craftData ) ) {

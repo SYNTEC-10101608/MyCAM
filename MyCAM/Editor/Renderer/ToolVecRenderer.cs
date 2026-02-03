@@ -133,10 +133,10 @@ namespace MyCAM.Editor.Renderer
 
 			// for standard pattern
 			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
-				if( !DataGettingHelper.GetStdPatternCacheByID( pathID, out StdPatternCacheBase stdPatternCache ) ) {
+				if( !DataGettingHelper.GetStdPatternCacheByID( pathID, out IStdPatternCache stdPatternCache ) ) {
 					return null;
 				}
-				return stdPatternCache.StartPointList;
+				return stdPatternCache.KeyCAMPointList;
 			}
 
 			// other type path do not support tool vec

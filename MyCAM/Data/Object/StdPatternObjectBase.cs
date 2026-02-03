@@ -51,7 +51,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		public StdPatternCacheBase StdPatternCache
+		public IStdPatternCache StdPatternCache
 		{
 			get
 			{
@@ -80,7 +80,7 @@ namespace MyCAM.Data
 		}
 
 		protected IStdPatternGeomData m_GeomData;
-		protected StdPatternCacheBase m_StdPatternCache;
+		protected IStdPatternCache m_StdPatternCache;
 		protected ContourPathObject m_ContourPathObject;
 	}
 }

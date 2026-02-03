@@ -22,24 +22,21 @@ namespace MyCAM.Data
 		void DoTransform( gp_Trsf transform );
 	}
 
-	public interface IRotatable
-	{
-		double RotatedAngle_deg
-		{
-			get; set;
-		}
-	}
-
 	public interface IContourGeomData : IGeomData, ITransformableGeom
 	{
 	}
 
-	public interface IStdPatternGeomData : IGeomData, ITransformableGeom, IRotatable
+	public interface IStdPatternGeomData : IGeomData, ITransformableGeom
 	{
 		gp_Ax3 RefCoord
 		{
 			get;
 			set;
+		}
+
+		double RotatedAngle_deg
+		{
+			get; set;
 		}
 
 		// TODO: this should be removed
@@ -48,6 +45,7 @@ namespace MyCAM.Data
 			get;
 			set;
 		}
+
 		// TOD: use field above
 		void SetRefCoord( gp_Ax3 refCoordinate );
 	}
