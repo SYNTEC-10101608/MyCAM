@@ -22,27 +22,11 @@ namespace MyCAM.Data
 		void DoTransform( gp_Trsf transform );
 	}
 
-	public interface IRefCenterDir
-	{
-		gp_Ax1 RefCenterDir
-		{
-			get;
-		}
-	}
-
-	public interface IRotatable
-	{
-		double RotatedAngle_deg
-		{
-			get; set;
-		}
-	}
-
-	public interface IContourGeomData : IGeomData, ITransformableGeom, IRefCenterDir
+	public interface IContourGeomData : IGeomData, ITransformableGeom
 	{
 	}
 
-	public interface IStdPatternGeomData : IGeomData, ITransformableGeom, IRotatable
+	public interface IStdPatternGeomData : IGeomData, ITransformableGeom
 	{
 		gp_Ax3 RefCoord
 		{
@@ -50,12 +34,19 @@ namespace MyCAM.Data
 			set;
 		}
 
+		double RotatedAngle_deg
+		{
+			get; set;
+		}
+
+		// TODO: this should be removed
 		bool IsCoordinateReversed
 		{
 			get;
 			set;
 		}
 
+		// TOD: use field above
 		void SetRefCoord( gp_Ax3 refCoordinate );
 	}
 }

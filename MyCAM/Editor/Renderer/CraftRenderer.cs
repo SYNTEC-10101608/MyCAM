@@ -164,42 +164,42 @@ namespace MyCAM.Editor.Renderer
 
 		IReadOnlyList<IProcessPoint> GetLeadInPointList( string pathID )
 		{
-			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !DataGettingHelper.GetPathCacheByID( pathID, out IPathCache pathCache ) ) {
 				return null;
 			}
-			return leadCache.LeadInCAMPointList;
+			return pathCache.LeadInPointList;
 		}
 
 		IReadOnlyList<IProcessPoint> GetLeadOutPointList( string pathID )
 		{
-			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !DataGettingHelper.GetPathCacheByID( pathID, out IPathCache pathCache ) ) {
 				return null;
 			}
-			return leadCache.LeadOutCAMPointList;
+			return pathCache.LeadOutPointList;
 		}
 
 		IReadOnlyList<IProcessPoint> GetOverCutPointList( string pathID )
 		{
-			if( !PathCacheProvider.TryGetOverCutCache( pathID, out IOverCutCache overCutCache ) ) {
+			if( !DataGettingHelper.GetPathCacheByID( pathID, out IPathCache pathCache ) ) {
 				return null;
 			}
-			return overCutCache.OverCutCAMPointList;
+			return pathCache.OverCutPointList;
 		}
 
 		LeadData GetLeadData( string pathID )
 		{
-			if( !PathCacheProvider.TryGetLeadCache( pathID, out ILeadCache leadCache ) ) {
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
 				return null;
 			}
-			return leadCache.LeadData;
+			return craftData.LeadData;
 		}
 
 		double GetOverCutLength( string pathID )
 		{
-			if( !PathCacheProvider.TryGetOverCutCache( pathID, out IOverCutCache overCutCache ) ) {
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
 				return 0.0;
 			}
-			return overCutCache.OverCutLength;
+			return craftData.OverCutLength;
 		}
 	}
 }

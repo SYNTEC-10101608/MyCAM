@@ -902,12 +902,10 @@ namespace MyCAM.Editor
 			return Enumerable.Empty<AIS_InteractiveObject>();
 		}
 
+		// TODO: figure out
 		IProcessPoint GetProcessEndPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetTraverseDataCache( pathID, out ITraverseDataCache traverseDataCache ) ) {
-				return null;
-			}
-			return traverseDataCache.GetProcessEndPoint();
+			return CacheHelper.GetProcessEndPoint( pathID );
 		}
 	}
 }

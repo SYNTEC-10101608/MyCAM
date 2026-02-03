@@ -57,7 +57,7 @@ namespace MyCAM.Editor.Renderer
 						toolVecAISList.Add( toolVecAIS );
 						continue;
 					}
-					if( IsToolVecModifyPoint( szPathID, point ) ) {
+					if( point.IsToolVecModPoint ) {
 						if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
 							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_ORANGE ) );
 						}
@@ -118,30 +118,39 @@ namespace MyCAM.Editor.Renderer
 
 		IReadOnlyList<IProcessPoint> GetToolVecPointList( string pathID )
 		{
-			if( !PathCacheProvider.TryGetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
+			// get path type
+			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) ) {
 				return null;
 			}
-			return toolVecCache.StartPointList;
-		}
 
-		// TODO: the method is kepp casting same thing in a loop, optimize it later
-		bool IsToolVecModifyPoint( string pathID, IProcessPoint point )
-		{
-			if( !PathCacheProvider.TryGetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
-				return false;
+			// for contour
+			if( pathType == PathType.Contour ) {
+				if( !DataGettingHelper.GetContourCacheByID( pathID, out ContourCache contourCache ) ) {
+					return null;
+				}
+				return contourCache.MainPathPointList;
 			}
-			return toolVecCache.IsToolVecModifyPoint( point );
+
+			// for standard pattern
+			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
+				if( !DataGettingHelper.GetStdPatternCacheByID( pathID, out IStdPatternCache stdPatternCache ) ) {
+					return null;
+				}
+				return stdPatternCache.KeyCAMPointList;
+			}
+
+			// other type path do not support tool vec
+			else {
+				return null;
+			}
 		}
 
 		EToolVecInterpolateType GetInterpolateType( string pathID )
 		{
-			if( !PathCacheProvider.TryGetToolVecCache( pathID, out IToolVecCache toolVecCache ) ) {
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
 				return EToolVecInterpolateType.VectorInterpolation;
 			}
-			if( toolVecCache.GetToolVecInterpolateType( out EToolVecInterpolateType interpolateType ) ) {
-				return interpolateType;
-			}
-			return EToolVecInterpolateType.VectorInterpolation;
+			return craftData.InterpolateType;
 		}
 	}
 }

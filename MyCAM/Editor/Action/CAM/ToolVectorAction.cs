@@ -21,17 +21,12 @@ namespace MyCAM.Editor
 		public ToolVectorAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
 			: base( dataManager, viewer, treeView, viewManager, pathID )
 		{
-			// checked in base constructor
-			m_PathIDList = new List<string>() { pathID };
+			// get craft data by pathID
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
 				throw new ArgumentException( "Cannot get CraftData by pathID: " + pathID );
 			}
-			if( !PathCacheProvider.TryGetToolVecPackage( pathID, out m_ToolVecPackage ) ) {
-				throw new ArgumentException( "Cannot get ToolVecCache by pathID: " + pathID );
-			}
-			if( !DataGettingHelper.GetGeomDataByID( pathID, out m_GeomData ) ) {
-				throw new ArgumentException( "Cannot get GeomData by pathID: " + pathID );
-			}
+			m_DataHandler = new ToolVecActionDataHandler( pathID );
+			m_PathIDList = new List<string>() { pathID };
 		}
 
 		public override EditActionType ActionType
@@ -60,7 +55,7 @@ namespace MyCAM.Editor
 			}
 
 			// modify tool vector
-			bool isModified = m_ToolVecPackage.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
+			bool isModified = m_DataHandler.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
 			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, master_deg, slave_deg, m_CraftData.InterpolateType );
 
 			// back up old data
@@ -159,10 +154,10 @@ namespace MyCAM.Editor
 		bool CalABAngleToKeep( int nSelectIndex, out Tuple<double, double> abAngle_deg )
 		{
 			// get this modify point cam point
-			ISetToolVecPoint pointToModify = m_ToolVecPackage.GetPointByCADIndex( nSelectIndex ).Clone();
+			ISetToolVecPoint pointToModify = m_DataHandler.GetPointByCADIndex( nSelectIndex ).Clone();
 
 			// get previous control point tool vector
-			gp_Dir assignDir = GetPreCtrlPntToolVec( m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsPathReverse, m_GeomData.IsClosed );
+			gp_Dir assignDir = GetPreCtrlPntToolVec( m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsPathReverse, m_DataHandler.IsClosed() );
 			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleFromToolVec( assignDir, pointToModify, out abAngle_deg );
 			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
 				return true;
@@ -177,7 +172,7 @@ namespace MyCAM.Editor
 		bool CalABAngleToZDir( int nSelectIndex, out Tuple<double, double> abAngle_deg )
 		{
 			// get this modify point cam point
-			ISetToolVecPoint pointToModify = m_ToolVecPackage.GetPointByCADIndex( nSelectIndex ).Clone();
+			ISetToolVecPoint pointToModify = m_DataHandler.GetPointByCADIndex( nSelectIndex ).Clone();
 			gp_Dir assignDir = new gp_Dir( 0, 0, 1 );
 			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleFromToolVec( assignDir, pointToModify, out abAngle_deg );
 			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
@@ -214,13 +209,13 @@ namespace MyCAM.Editor
 
 		Tuple<double, double> CalculateMSAngleFromABAngle( int nSelectIndex, double angleA_deg, double angleB_deg )
 		{
-			ISetToolVecPoint point = m_ToolVecPackage.GetPointByCADIndex( nSelectIndex ).Clone();
+			ISetToolVecPoint point = m_DataHandler.GetPointByCADIndex( nSelectIndex ).Clone();
 			return ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, point );
 		}
 
 		Tuple<double, double> CalculateABAngleFromMSAngle( int nSelectIndex, double master_deg, double slave_deg )
 		{
-			ISetToolVecPoint point = m_ToolVecPackage.GetPointByCADIndex( nSelectIndex ).Clone();
+			ISetToolVecPoint point = m_DataHandler.GetPointByCADIndex( nSelectIndex ).Clone();
 			return ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, point );
 		}
 
@@ -264,7 +259,7 @@ namespace MyCAM.Editor
 		{
 			List<int> ctrlPntIndexList = toolVecModifyMap.Keys.ToList();
 			int preCtrlIndex = GetPreCtrlPntIndex( nTargetPntIdx, ctrlPntIndexList, isPathReverse, isClosePath );
-			ISetToolVecPoint preCtrlPoint = m_ToolVecPackage.GetPointByCADIndex( preCtrlIndex ).Clone();
+			ISetToolVecPoint preCtrlPoint = m_DataHandler.GetPointByCADIndex( preCtrlIndex ).Clone();
 			return new gp_Dir( preCtrlPoint.ToolVec.XYZ() );
 		}
 
@@ -321,10 +316,99 @@ namespace MyCAM.Editor
 
 		// to storage which vertex keep show high light point on viewer
 		AIS_Shape m_KeepedHighLightPoint = null;
-		CraftData m_CraftData = null;
-		ToolVecPackage m_ToolVecPackage = null;
+		ToolVecActionDataHandler m_DataHandler = null;
+		CraftData m_CraftData;
 		List<string> m_PathIDList = null;
 		const int DEFAULT_SELECT_INDEX = -1;
-		IGeomData m_GeomData;
+	}
+
+	class ToolVecActionDataHandler
+	{
+		public ToolVecActionDataHandler( string szPathID )
+		{
+			// check ID is a contour path
+			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType )
+				|| pathType != PathType.Contour ) {
+				throw new ArgumentException( "PathID is not a contour path: " + szPathID );
+			}
+
+			// get craft data by pathID
+			if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+				throw new ArgumentException( "Cannot get CraftData by pathID: " + szPathID );
+			}
+			m_CraftData = craftData;
+
+			// get cache by pathID
+			if( !DataGettingHelper.GetContourCacheByID( szPathID, out ContourCache pathCache ) ) {
+				throw new ArgumentException( "Cannot get ContourCache by pathID: " + szPathID );
+			}
+			m_PathCache = pathCache;
+
+			// get geom data by pathID
+			if( !DataGettingHelper.GetGeomDataByID( szPathID, out IGeomData geomData ) ) {
+				throw new ArgumentException( "Cannot get GeomData by pathID: " + szPathID );
+			}
+			m_GeomData = geomData as ContourGeomData;
+		}
+
+		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg, out double master_deg, out double slave_deg )
+		{
+			if( m_CraftData.ToolVecModifyMap.ContainsKey( index ) ) {
+				dRA_deg = m_CraftData.ToolVecModifyMap[ index ].RA_deg;
+				dRB_deg = m_CraftData.ToolVecModifyMap[ index ].RB_deg;
+				master_deg = m_CraftData.ToolVecModifyMap[ index ].Master_deg;
+				slave_deg = m_CraftData.ToolVecModifyMap[ index ].Slave_deg;
+				return true;
+			}
+			else {
+				dRA_deg = 0;
+				dRB_deg = 0;
+
+				// get CAM map index
+				if( m_PathCache.CADToCAMIndexMap.ContainsKey( index ) ) {
+					int camIndex = m_PathCache.CADToCAMIndexMap[ index ];
+
+					// get master and slave from InitIKResult and convert rad to deg
+					if( camIndex >= 0 && camIndex < m_PathCache.MainPathPointList.Count ) {
+						master_deg = m_PathCache.MainPathPointList[ camIndex ].InitMaster_rad * 180.0 / Math.PI;
+						slave_deg = m_PathCache.MainPathPointList[ camIndex ].InitSlave_rad * 180.0 / Math.PI;
+					}
+					else {
+						master_deg = 0;
+						slave_deg = 0;
+					}
+				}
+				else {
+					master_deg = 0;
+					slave_deg = 0;
+				}
+				return false;
+			}
+		}
+
+		public ISetToolVecPoint GetPointByCADIndex( int cadIndex )
+		{
+			if( m_PathCache.CADToCAMIndexMap.ContainsKey( cadIndex ) ) {
+				int camIndex = m_PathCache.CADToCAMIndexMap[ cadIndex ];
+				if( camIndex >= 0 && camIndex < m_PathCache.MainPathPointList.Count ) {
+					return m_PathCache.MainPathPointList[ camIndex ];
+				}
+			}
+			return null;
+		}
+
+		public EToolVecInterpolateType GetInterpolateType()
+		{
+			return m_CraftData.InterpolateType;
+		}
+
+		public bool IsClosed()
+		{
+			return m_GeomData.IsClosed;
+		}
+
+		readonly CraftData m_CraftData;
+		readonly ContourCache m_PathCache;
+		readonly ContourGeomData m_GeomData;
 	}
 }

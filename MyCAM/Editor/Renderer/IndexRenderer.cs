@@ -77,10 +77,7 @@ namespace MyCAM.Editor.Renderer
 
 		gp_Pnt GetMainPathStartPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetMainPathStartPointCache( pathID, out IStartPointRendererCache startPnt ) ) {
-				return null;
-			}
-			return startPnt.GetStartCAMPoint().Point;
+			return new gp_Pnt( CacheHelper.GetMainPathStartPoint( pathID ).Point.XYZ() );
 		}
 	}
 }

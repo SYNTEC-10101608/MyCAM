@@ -67,7 +67,7 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 			foreach( string pathID in m_DataManager.PathIDList ) {
-		
+
 				if( m_FrogLeapAISDict.ContainsKey( pathID ) ) {
 					foreach( AIS_Shape shapeAIS in m_FrogLeapAISDict[ pathID ] ) {
 						shapeAIS.SetLocalTransformation( theTrsf );
@@ -298,26 +298,19 @@ namespace MyCAM.Editor.Renderer
 
 		IProcessPoint GetProcessStartPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetTraverseDataCache( pathID, out ITraverseDataCache traverseDataCache ) ) {
-				return null;
-			}
-			return traverseDataCache.GetProcessStartPoint();
+			return CacheHelper.GetProcessStartPoint( pathID );
 		}
 
 		IProcessPoint GetProcessEndPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetTraverseDataCache( pathID, out ITraverseDataCache traverseDataCache ) ) {
-				return null;
-			}
-			return traverseDataCache.GetProcessEndPoint();
+			return CacheHelper.GetProcessEndPoint( pathID );
 		}
-
 		TraverseData GetTraverseData( string pathID )
 		{
-			if( !PathCacheProvider.TryGetTraverseDataCache( pathID, out ITraverseDataCache traverseDataCache ) ) {
-				return new TraverseData();
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
+				return null;
 			}
-			return traverseDataCache.TraverseData;
+			return craftData.TraverseData;
 		}
 
 		static List<(gp_Pnt start, gp_Pnt end)> GetTraverseLineSegments( TraversePathResult traverseResult, TraverseData traverseData )

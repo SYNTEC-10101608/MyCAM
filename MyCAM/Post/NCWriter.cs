@@ -203,43 +203,42 @@ namespace MyCAM.Post
 
 		ContourNCPackage BuildPackageByID( string szID )
 		{
-			if( !PathCacheProvider.TryGetLeadCache( szID, out ILeadCache leadCache )
-				|| !PathCacheProvider.TryGetOverCutCache( szID, out IOverCutCache overCutCache )
-				|| !PathCacheProvider.TryGetProcessPathStartEndCache( szID, out IProcessPathStartEndCache processPathStartEndCache )
-				|| !PathCacheProvider.TryGetTraverseDataCache( szID, out ITraverseDataCache traverseDataCache )
-				|| !PathCacheProvider.TryGetMainPathCache( szID, out IMainPathCache mainPathCache ) ) {
+			if( !DataGettingHelper.GetCraftDataByID( szID, out CraftData craftData ) ) {
+				return null;
+			}
+			if( !DataGettingHelper.GetContourCacheByID( szID, out ContourCache contourCache ) ) {
 				return null;
 			}
 			return new ContourNCPackage(
-				leadCache.LeadData,
-				overCutCache.OverCutLength,
-				mainPathCache.MainPathPointList,
-				leadCache.LeadInCAMPointList,
-				leadCache.LeadOutCAMPointList,
-				overCutCache.OverCutCAMPointList,
-				traverseDataCache.TraverseData,
-				traverseDataCache.GetProcessStartPoint(),
-				traverseDataCache.GetProcessEndPoint() );
+				craftData.LeadData,
+				craftData.OverCutLength,
+				contourCache.MainPathPointList,
+				contourCache.LeadInPointList,
+				contourCache.LeadOutPointList,
+				contourCache.OverCutPointList,
+				craftData.TraverseData,
+				CacheHelper.GetProcessStartPoint( szID ),
+				CacheHelper.GetProcessEndPoint( szID )
+			);
 		}
 
 		StdPatternNCPackage BuildPackageByID_StandardPattern( string szID )
 		{
-			if( !PathCacheProvider.TryGetLeadCache( szID, out ILeadCache leadCache )
-				|| !PathCacheProvider.TryGetStdPatternRefPointCache( szID, out IStdPatternRefPointCache refPointCache )
-				|| !PathCacheProvider.TryGetMainPathStartPointCache( szID, out IStartPointRendererCache mainPathStartPointCache )
-				|| !PathCacheProvider.TryGetProcessPathStartEndCache( szID, out IProcessPathStartEndCache processPathStartEndCache )
-				|| !PathCacheProvider.TryGetTraverseDataCache( szID, out ITraverseDataCache traverseDataCache ) ) {
+			if( !DataGettingHelper.GetStdPatternCacheByID( szID, out IStdPatternCache stdPatternCache ) ) {
+				return null;
+			}
+			if( !DataGettingHelper.GetCraftDataByID( szID, out CraftData craftData ) ) {
 				return null;
 			}
 			return new StdPatternNCPackage(
-						refPointCache.GetProcessRefPoint(),
-						mainPathStartPointCache.GetStartCAMPoint(),
-						traverseDataCache.TraverseData,
-						processPathStartEndCache.GetProcessStartPoint(),
-						processPathStartEndCache.GetProcessEndPoint(),
-						leadCache.LeadData,
-						leadCache.LeadInCAMPointList
-					);
+				stdPatternCache.RefPoint,
+				CacheHelper.GetMainPathStartPoint( szID ),
+				craftData.TraverseData,
+				CacheHelper.GetProcessStartPoint( szID ),
+				CacheHelper.GetProcessEndPoint( szID ),
+				craftData.LeadData,
+				stdPatternCache.LeadInPointList
+			);
 		}
 	}
 }

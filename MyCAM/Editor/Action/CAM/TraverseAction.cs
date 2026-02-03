@@ -309,26 +309,21 @@ namespace MyCAM.Editor
 
 		IProcessPoint GetProcessStartPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetTraverseDataCache( pathID, out ITraverseDataCache traverseDataCache ) ) {
-				return null;
-			}
-			return traverseDataCache.GetProcessStartPoint();
+			return CacheHelper.GetProcessStartPoint( pathID );
 		}
 
 		IProcessPoint GetProcessEndPoint( string pathID )
 		{
-			if( !PathCacheProvider.TryGetTraverseDataCache( pathID, out ITraverseDataCache traverseDataCache ) ) {
-				return null;
-			}
-			return traverseDataCache.GetProcessEndPoint();
+			return CacheHelper.GetProcessEndPoint( pathID );
 		}
 
+		// TODO: data protection
 		TraverseData GetTraverseData( string pathID )
 		{
-			if( !PathCacheProvider.TryGetTraverseDataCache( pathID, out ITraverseDataCache traverseDataCache ) ) {
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
 				return new TraverseData();
 			}
-			return traverseDataCache.TraverseData;
+			return craftData.TraverseData;
 		}
 
 		#endregion

@@ -72,22 +72,6 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public List<CADPoint> MainPathCADPointList
-		{
-			get
-			{
-				return m_CADPointList;
-			}
-		}
-
-		public List<CAMPoint> StartPointList
-		{
-			get
-			{
-				return m_CAMPointList.Select( camPoint => camPoint ).ToList();
-			}
-		}
-
 		public Dictionary<int, int> CADToCAMIndexMap
 		{
 			get

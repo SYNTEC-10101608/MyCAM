@@ -79,7 +79,7 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public List<CADPoint> StartCADPointList
+		public List<CADPoint> KeyCADPointList
 		{
 			get
 			{
@@ -95,7 +95,7 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		public List<CAMPoint> StartPointList
+		public List<CAMPoint> KeyCAMPointList
 		{
 			get
 			{

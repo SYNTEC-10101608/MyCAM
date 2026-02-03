@@ -100,7 +100,7 @@ namespace MyCAM.Editor
 				if( !DataGettingHelper.GetPathObject( szID, out PathObject pathObject ) ) {
 					continue;
 				}
-				if( !DataGettingHelper.GetContourPathObject( pathObject, out ContourPathObject contourPathObject ) ) {
+				if( !GetContourPathObject( pathObject, out ContourPathObject contourPathObject ) ) {
 					continue;
 				}
 
@@ -179,6 +179,25 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( trihedron, false );
 			}
 			m_TrihedronList.Clear();
+		}
+
+		bool GetContourPathObject( PathObject pathObject, out ContourPathObject contourPathObj )
+		{
+			contourPathObj = null;
+			if( pathObject == null ) {
+				return false;
+			}
+
+			// use unified ContourPathObject property from StandardPatternBasedPathObject
+			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
+				contourPathObj = standardPatternPathObject.ContourPathObject;
+				return true;
+			}
+			else if( pathObject is ContourPathObject contourPathObject ) {
+				contourPathObj = contourPathObject;
+				return true;
+			}
+			return false;
 		}
 
 		ViewManager m_ViewManager;

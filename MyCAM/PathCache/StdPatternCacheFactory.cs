@@ -3,16 +3,8 @@ using System;
 
 namespace MyCAM.PathCache
 {
-	internal static class PathCacheFactory
+	internal static class StdPatternCacheFactory
 	{
-		public static IContourCache CreateContourCache( IContourGeomData contourGeomData, CraftData craftData )
-		{
-			if( contourGeomData == null || craftData == null ) {
-				throw new ArgumentNullException( "ConourCache construct parameters null." );
-			}
-			return new ContourCache( (ContourGeomData)contourGeomData, craftData );
-		}
-
 		public static IStdPatternCache CreateStdPatternCache( IStdPatternGeomData stdPatternGeomData, CraftData craftData )
 		{
 			if( stdPatternGeomData == null || craftData == null ) {
