@@ -1,7 +1,6 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
-using MyCAM.PathCache;
 using System;
 using System.Collections.Generic;
 
@@ -78,18 +77,19 @@ namespace MyCAM.Editor
 			}
 		}
 
+		// TODO: fix it
 		bool IsValidOverCut( double overcut )
 		{
 			bool isValid = true;
-			foreach( string szID in m_PathIDList ) {
-				PathCacheProvider.TryGetStdPatternMaxOverCutCache( szID, out IStdPatternMaxOverCutCache overCutCache );
-				if( overCutCache != null ) {
-					if( overcut > overCutCache.GetMaxOverCutLength() ) {
-						isValid = false;
-						break;
-					}
-				}
-			}
+			//foreach( string szID in m_PathIDList ) {
+			//	PathCacheProvider.TryGetStdPatternMaxOverCutCache( szID, out IStdPatternMaxOverCutCache overCutCache );
+			//	if( overCutCache != null ) {
+			//		if( overcut > overCutCache.GetMaxOverCutLength() ) {
+			//			isValid = false;
+			//			break;
+			//		}
+			//	}
+			//}
 			return isValid;
 		}
 

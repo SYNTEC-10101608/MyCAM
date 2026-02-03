@@ -1,5 +1,4 @@
-﻿using MyCAM.Helper;
-using MyCAM.PathCache;
+﻿using MyCAM.PathCache;
 using OCC.gp;
 using OCC.TopoDS;
 
@@ -77,10 +76,7 @@ namespace MyCAM.Data
 
 		void InitializeCache()
 		{
-			gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( m_ContourPathObject.GeomData.RefCenterDir, m_GeomData.IsCoordinateReversed, m_GeomData.RotatedAngle_deg );
-
-			// factory automatically determines the correct Cache type based on GeomData type
-			m_StdPatternCache = (StdPatternCacheBase)PathCacheFactory.CreateStdPatternCache( m_GeomData, m_CraftData );
+			m_StdPatternCache = StdPatternCacheFactory.CreateStdPatternCache( m_GeomData, m_CraftData );
 		}
 
 		protected IStdPatternGeomData m_GeomData;
