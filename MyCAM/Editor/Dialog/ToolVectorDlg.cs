@@ -275,6 +275,30 @@ namespace MyCAM.Editor
 			SwitchStartEnd();
 		}
 
+		void m_btnMasterPos_Click( object sender, EventArgs e )
+		{
+			bSuppressValueChangedEvent = true;
+			GetMSAngleFromDialog( out double master_deg, out double slave_deg );
+			master_deg += 180;
+			slave_deg = -slave_deg;
+			m_tbxMaster.Text = master_deg.ToString( "F3" );
+			m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			bSuppressValueChangedEvent = false;
+			HandleMSAngleChanged();
+		}
+
+		void m_btnMasterNeg_Click( object sender, EventArgs e )
+		{
+			bSuppressValueChangedEvent = true;
+			GetMSAngleFromDialog( out double master_deg, out double slave_deg );
+			master_deg -= 180;
+			slave_deg = -slave_deg;
+			m_tbxMaster.Text = master_deg.ToString( "F3" );
+			m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			bSuppressValueChangedEvent = false;
+			HandleMSAngleChanged();
+		}
+
 		bool m_IsPathRevese = false;
 		ToolVecParam m_ToolVecParam;
 

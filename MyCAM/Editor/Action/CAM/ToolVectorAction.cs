@@ -65,10 +65,13 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.SwitchStartEnd += () => OnSwitchStartEnd();
 			m_ToolVecDlg.EnableStartEndSwitch( false );
 			m_ToolVecDlg.Cancel += End;
-
-			// TODO: lock the main form when editing
-			RaiseEditingToolVecDlg?.Invoke( EActionStatus.Start );
 			m_ToolVecDlg.Show( MyApp.MainForm );
+		}
+
+		public override void End()
+		{
+			UnlockSelectedVertexHighLight();
+			base.End();
 		}
 
 		protected override void ViewerMouseClick( MouseEventArgs e )
@@ -469,7 +472,7 @@ namespace MyCAM.Editor
 		{
 			SetInterpolateType();
 			SetIndexAngleParam();
-			if( m_ToolVecParam.IsModified || bForceUpdate ) {
+			if( ( m_ToolVecParam != null && m_ToolVecParam.IsModified ) || bForceUpdate ) {
 				PropertyChanged?.Invoke( m_PathIDList );
 			}
 		}
@@ -481,6 +484,10 @@ namespace MyCAM.Editor
 
 		void SetIndexAngleParam()
 		{
+			if( m_ToolVecParam == null ) {
+				return;
+			}
+
 			// remove modify data
 			if( !m_ToolVecParam.IsModified ) {
 				m_CraftData.RemoveToolVecModify( m_nSelectIndex );
@@ -560,28 +567,28 @@ namespace MyCAM.Editor
 				dRB_deg = 0;
 
 				// get CAM map index
+				int camIndex = 0;
 				if( index == CLOSED_POINT_INDEX ) {
-
-					// closed point, get last point
-					index = m_PathCache.MainPathPointList.Count - 1;
+					camIndex = m_PathCache.MainPathPointList.Count - 1;
 				}
-				if( m_PathCache.CADToCAMIndexMap.ContainsKey( index ) ) {
-					int camIndex = m_PathCache.CADToCAMIndexMap[ index ];
+				else if( m_PathCache.CADToCAMIndexMap.ContainsKey( index ) ) {
+					camIndex = m_PathCache.CADToCAMIndexMap[ index ];
+				}
+				else {
+					master_deg = 0;
+					slave_deg = 0;
+					return false;
+				}
 
-					// get master and slave from cache
-					if( camIndex >= 0 && camIndex < m_PathCache.MainPathPointList.Count ) {
-						master_deg = m_PathCache.MainPathPointList[ camIndex ].ModMaster_rad * 180.0 / Math.PI;
-						slave_deg = m_PathCache.MainPathPointList[ camIndex ].ModSlave_rad * 180.0 / Math.PI;
+				// get master and slave from cache
+				if( camIndex >= 0 && camIndex < m_PathCache.MainPathPointList.Count ) {
+					master_deg = m_PathCache.MainPathPointList[ camIndex ].ModMaster_rad * 180.0 / Math.PI;
+					slave_deg = m_PathCache.MainPathPointList[ camIndex ].ModSlave_rad * 180.0 / Math.PI;
 
-						// get AB angles from master and slave
-						Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_PathCache.MainPathPointList[ camIndex ] );
-						dRA_deg = abAngles.Item1;
-						dRB_deg = abAngles.Item2;
-					}
-					else {
-						master_deg = 0;
-						slave_deg = 0;
-					}
+					// get AB angles from master and slave
+					Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_PathCache.MainPathPointList[ camIndex ] );
+					dRA_deg = abAngles.Item1;
+					dRB_deg = abAngles.Item2;
 				}
 				else {
 					master_deg = 0;
@@ -598,6 +605,9 @@ namespace MyCAM.Editor
 				if( camIndex >= 0 && camIndex < m_PathCache.MainPathPointList.Count ) {
 					return m_PathCache.MainPathPointList[ camIndex ];
 				}
+			}
+			else if( cadIndex == CLOSED_POINT_INDEX ) {
+				return m_PathCache.MainPathPointList.Last();
 			}
 			return null;
 		}

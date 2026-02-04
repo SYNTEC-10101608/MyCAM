@@ -757,9 +757,10 @@ namespace MyCAM.Editor
 		protected override void OnEditActionStart( IEditorAction action )
 		{
 			base.OnEditActionStart( action );
-			if( action.ActionType == EditActionType.OverCut ||
-				action.ActionType == EditActionType.SetLead ||
-				action.ActionType == EditActionType.SetTraverse ) {
+			if( action.ActionType == EditActionType.OverCut
+				|| action.ActionType == EditActionType.SetLead
+				|| action.ActionType == EditActionType.SetTraverse
+				|| action.ActionType == EditActionType.ToolVec ) {
 
 				// lock main form
 				m_TreeView.Enabled = false;
@@ -773,10 +774,10 @@ namespace MyCAM.Editor
 		protected override void OnEditActionEnd( IEditorAction action )
 		{
 			// these action will show dialog, need to lock ui
-			if( action.ActionType == EditActionType.OverCut ||
-				action.ActionType == EditActionType.SetLead ||
-				action.ActionType == EditActionType.SetTraverse
-				) {
+			if( action.ActionType == EditActionType.OverCut
+				|| action.ActionType == EditActionType.SetLead
+				|| action.ActionType == EditActionType.SetTraverse
+				|| action.ActionType == EditActionType.ToolVec ) {
 
 				// unlock main form
 				m_TreeView.Enabled = true;

@@ -254,6 +254,7 @@
 			this.m_btnMasterNeg.TabIndex = 18;
 			this.m_btnMasterNeg.Text = "C-";
 			this.m_btnMasterNeg.UseVisualStyleBackColor = true;
+			this.m_btnMasterNeg.Click += new System.EventHandler(this.m_btnMasterNeg_Click);
 			// 
 			// m_lblADeg
 			// 
@@ -331,6 +332,7 @@
 			this.m_btnMasterPos.TabIndex = 17;
 			this.m_btnMasterPos.Text = "C+";
 			this.m_btnMasterPos.UseVisualStyleBackColor = true;
+			this.m_btnMasterPos.Click += new System.EventHandler(this.m_btnMasterPos_Click);
 			// 
 			// m_tbxAngleB
 			// 
