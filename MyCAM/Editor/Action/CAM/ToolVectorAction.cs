@@ -64,6 +64,7 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.RemoveEditIndex += () => OnRemoveEditIndex();
 			m_ToolVecDlg.SwitchStartEnd += () => OnSwitchStartEnd();
 			m_ToolVecDlg.EnableStartEndSwitch( false );
+			m_ToolVecDlg.Cancel += End;
 
 			// TODO: lock the main form when editing
 			RaiseEditingToolVecDlg?.Invoke( EActionStatus.Start );
@@ -120,7 +121,8 @@ namespace MyCAM.Editor
 
 				// update dialog
 				m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
-				m_ToolVecDlg.EnableStartEndSwitch( m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() && m_DataHandler.IsClosed() );
+				m_ToolVecDlg.EnableStartEndSwitch( ( m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() || m_nSelectIndex == CLOSED_POINT_INDEX )
+													&& m_DataHandler.IsClosed() );
 			}
 		}
 
@@ -369,7 +371,7 @@ namespace MyCAM.Editor
 		{
 			if( angleA_deg < MIN_TiltAngle || angleA_deg > MAX_TiltAngle ||
 				angleB_deg < MIN_TiltAngle || angleB_deg > MAX_TiltAngle ) {
-				MyApp.Logger.ShowOnLogPanel( "角度必須在 -60~+60 範圍內", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( "傾角值過大，角度必須在 -60~+60 範圍內", MyApp.NoticeType.Warning );
 				return false;
 			}
 			return true;
@@ -558,6 +560,11 @@ namespace MyCAM.Editor
 				dRB_deg = 0;
 
 				// get CAM map index
+				if( index == CLOSED_POINT_INDEX ) {
+
+					// closed point, get last point
+					index = m_PathCache.MainPathPointList.Count - 1;
+				}
 				if( m_PathCache.CADToCAMIndexMap.ContainsKey( index ) ) {
 					int camIndex = m_PathCache.CADToCAMIndexMap[ index ];
 
@@ -568,6 +575,8 @@ namespace MyCAM.Editor
 
 						// get AB angles from master and slave
 						Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_PathCache.MainPathPointList[ camIndex ] );
+						dRA_deg = abAngles.Item1;
+						dRB_deg = abAngles.Item2;
 					}
 					else {
 						master_deg = 0;
