@@ -48,7 +48,7 @@ namespace MyCAM.Editor
 			m_InterpolateType = m_CraftData.InterpolateType;
 
 			// init index param
-			m_nSelectIndex = DEFAULT_SELECT_INDEX;
+			m_nSelectIndex = NULL_SELECT_INDEX;
 			m_SelectedPoint = null;
 			m_ToolVecParam = null;
 
@@ -62,6 +62,8 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.TypeChanged += ( type ) => OnTypeChanged( type );
 			m_ToolVecDlg.AddEditIndex += () => OnAddEditIndex();
 			m_ToolVecDlg.RemoveEditIndex += () => OnRemoveEditIndex();
+			m_ToolVecDlg.SwitchStartEnd += () => OnSwitchStartEnd();
+			m_ToolVecDlg.EnableStartEndSwitch( false );
 
 			// TODO: lock the main form when editing
 			RaiseEditingToolVecDlg?.Invoke( EActionStatus.Start );
@@ -80,8 +82,9 @@ namespace MyCAM.Editor
 			UnlockSelectedVertexHighLight();
 
 			// update select index
-			m_nSelectIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
-			if( m_nSelectIndex == DEFAULT_SELECT_INDEX ) {
+			int? nSelectIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
+			if( nSelectIndex == null ) {
+				m_nSelectIndex = NULL_SELECT_INDEX;
 				return;
 			}
 
@@ -92,6 +95,7 @@ namespace MyCAM.Editor
 
 			// update dialog
 			m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
+			m_ToolVecDlg.EnableStartEndSwitch( m_DataHandler.IsStartIndex( m_nSelectIndex ) && m_DataHandler.IsClosed() );
 
 			// lock selected vertex high light
 			LockSelectedVertexHighLight( selectedVertex );
@@ -180,7 +184,7 @@ namespace MyCAM.Editor
 		SolveTargetResult OnSetKeep()
 		{
 			SolveTargetResult result = new SolveTargetResult() { IsValid = false };
-			if( m_nSelectIndex == DEFAULT_SELECT_INDEX ) {
+			if( m_nSelectIndex == NULL_SELECT_INDEX ) {
 				return result;
 			}
 			bool getAngleOK = CalABAngleToKeep( m_nSelectIndex, out Tuple<double, double> abAngles_deg );
@@ -333,6 +337,13 @@ namespace MyCAM.Editor
 			}
 		}
 
+		void OnSwitchStartEnd()
+		{
+			if( !m_DataHandler.IsStartIndex( m_nSelectIndex ) ) {
+				return;
+			}
+		}
+
 		bool CheckABAngleRange( double angleA_deg, double angleB_deg )
 		{
 			if( angleA_deg < MIN_TiltAngle || angleA_deg > MAX_TiltAngle ||
@@ -385,7 +396,7 @@ namespace MyCAM.Editor
 		{
 			// keep the list in order
 			ctrlPntIndexList.Sort();
-			int result = DEFAULT_SELECT_INDEX;
+			int result = NULL_SELECT_INDEX;
 
 			// find the last index which small than targetIndex
 			if( isReverse == false ) {
@@ -404,7 +415,7 @@ namespace MyCAM.Editor
 				}
 
 				// if not found, return the last value of the list (circular logic)
-				if( result == DEFAULT_SELECT_INDEX && ctrlPntIndexList.Count > 0 ) {
+				if( result == NULL_SELECT_INDEX && ctrlPntIndexList.Count > 0 ) {
 					result = ctrlPntIndexList.Last();
 				}
 			}
@@ -423,7 +434,7 @@ namespace MyCAM.Editor
 				}
 
 				// if not found, return the first value of the list (circular logic)
-				if( result == DEFAULT_SELECT_INDEX && ctrlPntIndexList.Count > 0 ) {
+				if( result == NULL_SELECT_INDEX && ctrlPntIndexList.Count > 0 ) {
 					result = ctrlPntIndexList.First();
 				}
 			}
@@ -460,7 +471,7 @@ namespace MyCAM.Editor
 
 
 		// index param
-		int m_nSelectIndex = DEFAULT_SELECT_INDEX;
+		int m_nSelectIndex = NULL_SELECT_INDEX;
 		ToolVecParam m_ToolVecParam = null;
 		ISetToolVecPoint m_SelectedPoint = null;
 
@@ -477,7 +488,10 @@ namespace MyCAM.Editor
 		// angle limit
 		public const double MAX_TiltAngle = 60.0;
 		public const double MIN_TiltAngle = -60.0;
-		const int DEFAULT_SELECT_INDEX = -1;
+
+		// null select index as -999, -1 is used for closed point index
+		const int NULL_SELECT_INDEX = -999;
+		const int CLOSED_POINT_INDEX = -1;
 	}
 
 	class ToolVecActionDataHandler
@@ -558,6 +572,15 @@ namespace MyCAM.Editor
 		public bool IsClosed()
 		{
 			return m_GeomData.IsClosed;
+		}
+
+		public bool IsStartIndex( int cadIndex )
+		{
+			if( m_PathCache.CADToCAMIndexMap.ContainsKey( cadIndex ) ) {
+				int camIndex = m_PathCache.CADToCAMIndexMap[ cadIndex ];
+				return camIndex == 0;
+			}
+			return false;
 		}
 
 		readonly CraftData m_CraftData;

@@ -75,21 +75,21 @@ namespace MyCAM.Editor
 			IsPausedSelectMode = false;
 		}
 
-		protected int GetSelectIndex( out TopoDS_Shape selectedShape )
+		protected int? GetSelectIndex( out TopoDS_Shape selectedShape )
 		{
 			selectedShape = new TopoDS_Shape();
 			m_Viewer.Select();
 			m_Viewer.GetAISContext().InitSelected();
 			if( !m_Viewer.GetAISContext().MoreSelected() ) {
-				return -1;
+				return null;
 			}
 			selectedShape = m_Viewer.GetAISContext().SelectedShape();
 			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
-				return -1;
+				return null;
 			}
 			TopoDS_Vertex selectedVertex = TopoDS.ToVertex( selectedShape );
 			if( m_VertexMap.IsBound( selectedVertex ) == false ) {
-				return -1;
+				return null;
 			}
 			return m_VertexMap.Find( selectedVertex );
 		}
