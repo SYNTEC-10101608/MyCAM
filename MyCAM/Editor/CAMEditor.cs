@@ -469,8 +469,7 @@ namespace MyCAM.Editor
 
 			// init data manager
 			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
-			m_DataManager.PathIDList.Clear();
-			m_DataManager.PathIDList.Add( szStartPathID );
+			List<string> newPathIDList = new List<string> { szStartPathID };
 
 			// visited path recorded container
 			bool[] visited = new bool[ pathIDList.Count ];
@@ -503,12 +502,14 @@ namespace MyCAM.Editor
 					currentPoint = nearestPoint;
 					visited[ nearestIdx ] = true;
 					visitedCount++;
-					m_DataManager.PathIDList.Add( pathIDList[ nearestIdx ] );
+					newPathIDList.Add( pathIDList[ nearestIdx ] );
 				}
 				else {
 					break;
 				}
 			}
+			m_DataManager.PathIDList.Clear();
+			m_DataManager.PathIDList.AddRange( newPathIDList );
 
 			// select focus on first path
 			if( m_DefaultAction is SelectPathAction selectAction ) {
