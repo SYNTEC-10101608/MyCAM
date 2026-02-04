@@ -9,14 +9,14 @@ namespace MyCAM.Editor
 	{
 		public Func<SolveTargetResult> SetKeep;
 		public Func<SolveTargetResult> SetZdir;
-		public Action SetRevert;
-		public Action Add;
-		public Action Remove;
+		public Func<SolveTargetResult> SetRevert;
 		public Func<double, double, SolveABResult> MSAngleChanged;
 		public Func<double, double, SolveMSResult> ABAngleChanged;
 		public Action<EToolVecInterpolateType> TypeChanged;
+		public Action AddEditIndex;
+		public Action RemoveEditIndex;
 
-		public ToolVectorDlg( EToolVecInterpolateType type, ToolVecIndexParam param, bool isPathReverse )
+		public ToolVectorDlg( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse )
 		{
 			// struct would not be null
 			InitializeComponent();
@@ -44,7 +44,7 @@ namespace MyCAM.Editor
 			bSuppressTypeChangedEvent = false;
 		}
 
-		public void ResetToolVecParam( ToolVecIndexParam toolVecParam )
+		public void ResetToolVecParam( ToolVecParam toolVecParam )
 		{
 			bSuppressValueChangedEvent = true;
 			m_ToolVecParam = toolVecParam;
@@ -221,23 +221,22 @@ namespace MyCAM.Editor
 		// UI event - Index Param button
 		void m_btnKeep_Click( object sender, EventArgs e )
 		{
-			SolveTargetResult result = SetKeep();
-
-			// update param if valid, if not, keep original param
-			if( result.IsValid ) {
-				m_ToolVecParam.AngleA_deg = result.AngleA_deg;
-				m_ToolVecParam.AngleB_deg = result.AngleB_deg;
-				m_ToolVecParam.Master_deg = result.Master_deg;
-				m_ToolVecParam.Slave_deg = result.Slave_deg;
-			}
-
-			// update dialog
-			ResetToolVecParam( m_ToolVecParam );
+			SetTarget( SetKeep );
 		}
 
 		void m_btnZDir_Click( object sender, EventArgs e )
 		{
-			SolveTargetResult result = SetZdir();
+			SetTarget( SetZdir );
+		}
+
+		void m_btnRevert_Click( object sender, EventArgs e )
+		{
+			SetTarget( SetRevert );
+		}
+
+		void SetTarget( Func<SolveTargetResult> setTargetFunc )
+		{
+			SolveTargetResult result = setTargetFunc();
 
 			// update param if valid, if not, keep original param
 			if( result.IsValid ) {
@@ -253,18 +252,20 @@ namespace MyCAM.Editor
 
 		void m_btnAdd_Click( object sender, EventArgs e )
 		{
+			AddEditIndex();
+			m_btnAdd.Enabled = false;
+			m_btnRemove.Enabled = true;
 		}
 
 		void m_btnRemove_Click( object sender, EventArgs e )
 		{
-		}
-
-		void m_btnRevert_Click( object sender, EventArgs e )
-		{
+			RemoveEditIndex();
+			m_btnAdd.Enabled = true;
+			m_btnRemove.Enabled = false;
 		}
 
 		bool m_IsPathRevese = false;
-		ToolVecIndexParam m_ToolVecParam;
+		ToolVecParam m_ToolVecParam;
 
 		bool bSuppressTypeChangedEvent = false;
 		bool bSuppressValueChangedEvent = false;
@@ -357,7 +358,7 @@ namespace MyCAM.Editor
 		}
 	}
 
-	public class ToolVecIndexParam
+	public class ToolVecParam
 	{
 		public bool IsModified
 		{
@@ -384,7 +385,7 @@ namespace MyCAM.Editor
 			get; set;
 		}
 
-		public ToolVecIndexParam( double angleA_deg = 0.0, double angleB_deg = 0.0, double master_deg = 0.0, double slave_deg = 0.0, bool isModified = false )
+		public ToolVecParam( double angleA_deg = 0.0, double angleB_deg = 0.0, double master_deg = 0.0, double slave_deg = 0.0, bool isModified = false )
 		{
 			AngleA_deg = angleA_deg;
 			AngleB_deg = angleB_deg;
