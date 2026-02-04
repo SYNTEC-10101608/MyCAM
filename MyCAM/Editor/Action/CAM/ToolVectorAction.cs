@@ -82,23 +82,12 @@ namespace MyCAM.Editor
 			UnlockSelectedVertexHighLight();
 
 			// update select index
-			int? nSelectIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
-			if( nSelectIndex == null ) {
-				m_nSelectIndex = NULL_SELECT_INDEX;
-				return;
-			}
-
-			// update index param
-			m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
-			bool isModified = m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
-			m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModified );
-
-			// update dialog
-			m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
-			m_ToolVecDlg.EnableStartEndSwitch( m_DataHandler.IsStartIndex( m_nSelectIndex ) && m_DataHandler.IsClosed() );
+			int? _nSelectIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
+			int nSelectIndex = _nSelectIndex ?? NULL_SELECT_INDEX;
 
 			// lock selected vertex high light
 			LockSelectedVertexHighLight( selectedVertex );
+			OnSelectedIndexChanged( nSelectIndex );
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
@@ -109,6 +98,29 @@ namespace MyCAM.Editor
 			}
 			if( e.KeyCode == Keys.Escape ) {
 				End();
+			}
+		}
+
+		void OnSelectedIndexChanged( int nSelectIndex )
+		{
+			m_nSelectIndex = nSelectIndex;
+
+			// no select
+			if( nSelectIndex == NULL_SELECT_INDEX ) {
+				m_SelectedPoint = null;
+				m_ToolVecParam = null;
+				m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
+			}
+
+			// with select
+			else {
+				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
+				bool isModified = m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
+				m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModified );
+
+				// update dialog
+				m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
+				m_ToolVecDlg.EnableStartEndSwitch( m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() && m_DataHandler.IsClosed() );
 			}
 		}
 
@@ -339,8 +351,17 @@ namespace MyCAM.Editor
 
 		void OnSwitchStartEnd()
 		{
-			if( !m_DataHandler.IsStartIndex( m_nSelectIndex ) ) {
-				return;
+			// at start index, switch to end index
+			if( m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() ) {
+				OnSelectedIndexChanged( CLOSED_POINT_INDEX );
+			}
+
+			// at end index, switch to start index
+			else if( m_nSelectIndex == CLOSED_POINT_INDEX ) {
+				OnSelectedIndexChanged( m_DataHandler.GetStartPointCADIndex() );
+			}
+			else {
+				// do nothing if not start or end index
 			}
 		}
 
@@ -540,10 +561,13 @@ namespace MyCAM.Editor
 				if( m_PathCache.CADToCAMIndexMap.ContainsKey( index ) ) {
 					int camIndex = m_PathCache.CADToCAMIndexMap[ index ];
 
-					// get master and slave from InitIKResult and convert rad to deg
+					// get master and slave from cache
 					if( camIndex >= 0 && camIndex < m_PathCache.MainPathPointList.Count ) {
-						master_deg = m_PathCache.MainPathPointList[ camIndex ].InitMaster_rad * 180.0 / Math.PI;
-						slave_deg = m_PathCache.MainPathPointList[ camIndex ].InitSlave_rad * 180.0 / Math.PI;
+						master_deg = m_PathCache.MainPathPointList[ camIndex ].ModMaster_rad * 180.0 / Math.PI;
+						slave_deg = m_PathCache.MainPathPointList[ camIndex ].ModSlave_rad * 180.0 / Math.PI;
+
+						// get AB angles from master and slave
+						Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_PathCache.MainPathPointList[ camIndex ] );
 					}
 					else {
 						master_deg = 0;
@@ -574,17 +598,18 @@ namespace MyCAM.Editor
 			return m_GeomData.IsClosed;
 		}
 
-		public bool IsStartIndex( int cadIndex )
+		public int GetStartPointCADIndex()
 		{
-			if( m_PathCache.CADToCAMIndexMap.ContainsKey( cadIndex ) ) {
-				int camIndex = m_PathCache.CADToCAMIndexMap[ cadIndex ];
-				return camIndex == 0;
+			if( m_PathCache.MainPathPointList.Count > 0 ) {
+				return m_PathCache.MainPathPointList[ 0 ].InitPathIndex;
 			}
-			return false;
+			return NULL_SELECT_INDEX;
 		}
 
 		readonly CraftData m_CraftData;
 		readonly ContourCache m_PathCache;
 		readonly ContourGeomData m_GeomData;
+		const int NULL_SELECT_INDEX = -999;
+		const int CLOSED_POINT_INDEX = -1;
 	}
 }
