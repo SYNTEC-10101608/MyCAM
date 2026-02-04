@@ -447,9 +447,13 @@ namespace MyCAM.Editor
 
 		void SetIndexAngleParam()
 		{
+			// remove modify data
 			if( !m_ToolVecParam.IsModified ) {
+				m_CraftData.RemoveToolVecModify( m_nSelectIndex );
 				return;
 			}
+
+			// set modify data
 			m_CraftData.SetToolVecModify( m_nSelectIndex,
 				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg );
 		}
