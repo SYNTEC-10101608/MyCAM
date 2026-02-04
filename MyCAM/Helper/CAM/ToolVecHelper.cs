@@ -23,9 +23,6 @@ namespace MyCAM.Helper
 			if( isClosed ) {
 				ArrageMapForClosedPath( ref toolVecModifyMap, toolVecPointList );
 			}
-			else {
-				ArrangeMapForOpenPath( ref toolVecModifyMap, toolVecPointList );
-			}
 
 			// mark the modified point
 			for( int i = 0; i < toolVecPointList.Count; i++ ) {
@@ -34,6 +31,7 @@ namespace MyCAM.Helper
 				}
 				toolVecPointList[ i ].IsToolVecModPoint = true;
 			}
+			AddStartAndEndIndex( ref toolVecModifyMap, toolVecPointList );
 			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, interpolateType );
 		}
 
@@ -409,46 +407,17 @@ namespace MyCAM.Helper
 
 		static void ArrageMapForClosedPath( ref Dictionary<int, ToolVecModifyData> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList )
 		{
-			// when we dont have both 0 and CLOSED_POINT_INDEX, we add them in
-			if( !toolVecModifyMap.ContainsKey( 0 ) && !toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) ) {
-				toolVecModifyMap[ 0 ] = new ToolVecModifyData()
-				{
-					RA_deg = 0,
-					RB_deg = 0,
-					Master_deg = toolVecPointList[ 0 ].InitMaster_rad * 180.0 / Math.PI,
-					Slave_deg = toolVecPointList[ 0 ].InitSlave_rad * 180.0 / Math.PI
-				};
-				toolVecModifyMap[ CLOSED_POINT_INDEX ] = new ToolVecModifyData()
-				{
-					RA_deg = 0,
-					RB_deg = 0,
-					Master_deg = toolVecPointList[ toolVecPointList.Count - 1 ].InitMaster_rad * 180.0 / Math.PI,
-					Slave_deg = toolVecPointList[ toolVecPointList.Count - 1 ].InitSlave_rad * 180.0 / Math.PI
-				};
+			if( !toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) ) {
+				return;
 			}
 
-			// when we have only CLOSED_POINT_INDEX, we copy it to index 0
-			else if( toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) && !toolVecModifyMap.ContainsKey( 0 ) ) {
-				toolVecModifyMap[ 0 ] = toolVecModifyMap[ CLOSED_POINT_INDEX ].Clone();
-			}
-
-			// when we have only 0, we copy it to index CLOSED_POINT_INDEX
-			else if( !toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) && toolVecModifyMap.ContainsKey( 0 ) ) {
-				toolVecModifyMap[ CLOSED_POINT_INDEX ] = toolVecModifyMap[ 0 ].Clone();
-			}
-
-			// both 0 and CLOSED_POINT_INDEX exist
-			else {
-				// do nothing
-			}
-
-			// reset CLOSED_POINT_INDEX
+			// reset CLOSED_POINT_INDEX to last index
 			ToolVecModifyData closedPointData = toolVecModifyMap[ CLOSED_POINT_INDEX ];
 			toolVecModifyMap.Remove( CLOSED_POINT_INDEX );
 			toolVecModifyMap[ toolVecPointList.Count - 1 ] = closedPointData;
 		}
 
-		static void ArrangeMapForOpenPath( ref Dictionary<int, ToolVecModifyData> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList )
+		static void AddStartAndEndIndex( ref Dictionary<int, ToolVecModifyData> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList )
 		{
 			// add index 0 if not exist
 			if( !toolVecModifyMap.ContainsKey( 0 ) ) {
