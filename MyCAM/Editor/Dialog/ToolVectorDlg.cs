@@ -7,11 +7,11 @@ namespace MyCAM.Editor
 {
 	public partial class ToolVectorDlg : EditDialogBase<EToolVecInterpolateType>
 	{
-		public Func<SolveTargetResult> SetKeep;
-		public Func<SolveTargetResult> SetZdir;
-		public Func<SolveTargetResult> SetRevert;
-		public Func<double, double, SolveABResult> MSAngleChanged;
-		public Func<double, double, SolveMSResult> ABAngleChanged;
+		public Action SetKeep;
+		public Action SetZdir;
+		public Action SetRevert;
+		public Action<double, double> MSAngleChanged;
+		public Action<double, double> ABAngleChanged;
 		public Action<EToolVecInterpolateType> TypeChanged;
 		public Action AddEditIndex;
 		public Action RemoveEditIndex;
@@ -94,7 +94,7 @@ namespace MyCAM.Editor
 			if( bSuppressTypeChangedEvent ) {
 				return;
 			}
-			TypeChanged( type );
+			TypeChanged?.Invoke( type );
 		}
 
 		// UI event - Index param value changed
@@ -156,17 +156,7 @@ namespace MyCAM.Editor
 			if( !GetABAngleFromDialog( out double angleA_deg, out double angleB_deg ) ) {
 				return;
 			}
-
-			// Calculate MS angles from AB angles
-			SolveMSResult msResult = ABAngleChanged( angleA_deg, angleB_deg );
-
-			// update MS angles if valid
-			if( msResult.IsValid ) {
-				m_ToolVecParam.Master_deg = msResult.Master_deg;
-				m_ToolVecParam.Slave_deg = msResult.Slave_deg;
-			}
-
-			// update dialog
+			ABAngleChanged?.Invoke( angleA_deg, angleB_deg );
 			ResetToolVecParam( m_ToolVecParam );
 		}
 
@@ -180,17 +170,7 @@ namespace MyCAM.Editor
 			if( !GetMSAngleFromDialog( out double master_deg, out double slave_deg ) ) {
 				return;
 			}
-
-			// Calculate AB angles from MS angles
-			SolveABResult abResult = MSAngleChanged( master_deg, slave_deg );
-
-			// update AB angles if valid
-			if( abResult.IsValid ) {
-				m_ToolVecParam.AngleA_deg = abResult.AngleA_deg;
-				m_ToolVecParam.AngleB_deg = abResult.AngleB_deg;
-			}
-
-			// update dialog
+			MSAngleChanged?.Invoke( master_deg, slave_deg );
 			ResetToolVecParam( m_ToolVecParam );
 		}
 
@@ -240,39 +220,29 @@ namespace MyCAM.Editor
 			SetTarget( SetRevert );
 		}
 
-		void SetTarget( Func<SolveTargetResult> setTargetFunc )
+		void SetTarget( Action setTargetFunc )
 		{
-			SolveTargetResult result = setTargetFunc();
-
-			// update param if valid, if not, keep original param
-			if( result.IsValid ) {
-				m_ToolVecParam.AngleA_deg = result.AngleA_deg;
-				m_ToolVecParam.AngleB_deg = result.AngleB_deg;
-				m_ToolVecParam.Master_deg = result.Master_deg;
-				m_ToolVecParam.Slave_deg = result.Slave_deg;
-			}
-
-			// update dialog
+			setTargetFunc?.Invoke();
 			ResetToolVecParam( m_ToolVecParam );
 		}
 
 		void m_btnAdd_Click( object sender, EventArgs e )
 		{
-			AddEditIndex();
+			AddEditIndex?.Invoke();
 			m_btnAdd.Enabled = false;
 			m_btnRemove.Enabled = true;
 		}
 
 		void m_btnRemove_Click( object sender, EventArgs e )
 		{
-			RemoveEditIndex();
+			RemoveEditIndex?.Invoke();
 			m_btnAdd.Enabled = true;
 			m_btnRemove.Enabled = false;
 		}
 
 		void m_btnSwitchStartEnd_Click( object sender, EventArgs e )
 		{
-			SwitchStartEnd();
+			SwitchStartEnd?.Invoke();
 		}
 
 		void m_btnMasterPos_Click( object sender, EventArgs e )
@@ -304,93 +274,6 @@ namespace MyCAM.Editor
 
 		bool bSuppressTypeChangedEvent = false;
 		bool bSuppressValueChangedEvent = false;
-	}
-
-	public struct SolveTargetResult
-	{
-		public bool IsValid
-		{
-			get; set;
-		}
-
-		public double AngleA_deg
-		{
-			get; set;
-		}
-
-		public double AngleB_deg
-		{
-			get; set;
-		}
-
-		public double Master_deg
-		{
-			get; set;
-		}
-
-		public double Slave_deg
-		{
-			get; set;
-		}
-
-		public SolveTargetResult( bool isValid = false, double angleA_deg = 0.0, double angleB_deg = 0.0, double master_deg = 0.0, double slave_deg = 0.0 )
-		{
-			IsValid = isValid;
-			AngleA_deg = angleA_deg;
-			AngleB_deg = angleB_deg;
-			Master_deg = master_deg;
-			Slave_deg = slave_deg;
-		}
-	}
-
-	public struct SolveABResult
-	{
-		public bool IsValid
-		{
-			get; set;
-		}
-
-		public double AngleA_deg
-		{
-			get; set;
-		}
-
-		public double AngleB_deg
-		{
-			get; set;
-		}
-
-		public SolveABResult( bool isValid = false, double angleA_deg = 0.0, double angleB_deg = 0.0 )
-		{
-			IsValid = isValid;
-			AngleA_deg = angleA_deg;
-			AngleB_deg = angleB_deg;
-		}
-	}
-
-	public struct SolveMSResult
-	{
-		public bool IsValid
-		{
-			get; set;
-		}
-
-		public double Master_deg
-		{
-			get; set;
-		}
-
-		public double Slave_deg
-		{
-			get; set;
-		}
-
-		public SolveMSResult( bool isValid = false, double master_deg = 0.0, double slave_deg = 0.0 )
-		{
-			IsValid = isValid;
-			Master_deg = master_deg;
-			Slave_deg = slave_deg;
-		}
 	}
 
 	public class ToolVecParam

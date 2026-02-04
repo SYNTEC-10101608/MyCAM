@@ -171,11 +171,10 @@ namespace MyCAM.Editor
 		}
 
 		// dialog event
-		SolveTargetResult OnSetRevert()
+		void OnSetRevert()
 		{
-			SolveTargetResult result = new SolveTargetResult() { IsValid = false };
 			if( m_SelectedPoint == null ) {
-				return result;
+				return;
 			}
 
 			// point exists, get original MS angles
@@ -186,101 +185,80 @@ namespace MyCAM.Editor
 				m_ToolVecParam.AngleB_deg = 0;
 			}
 			SetToolVecParamAndPeview();
-
-			// return result
-			return new SolveTargetResult()
-			{
-				IsValid = true,
-				AngleA_deg = 0,
-				AngleB_deg = 0,
-				Master_deg = m_SelectedPoint.InitMaster_rad * 180.0 / Math.PI,
-				Slave_deg = m_SelectedPoint.InitSlave_rad * 180.0 / Math.PI
-			};
 		}
 
-		SolveTargetResult OnSetKeep()
+		void OnSetKeep()
 		{
-			SolveTargetResult result = new SolveTargetResult() { IsValid = false };
 			if( m_nSelectIndex == NULL_SELECT_INDEX ) {
-				return result;
-			}
-			bool getAngleOK = CalABAngleToKeep( m_nSelectIndex, out Tuple<double, double> abAngles_deg );
-			bool checkRangeOK = CheckABAngleRange( abAngles_deg.Item1, abAngles_deg.Item2 );
-			if( !getAngleOK || !checkRangeOK ) {
-				return result;
+				return;
 			}
 
-			// Calculate MS angles from AB angles
+			// get previous control point
+			List<int> ctrlPntIndexList = m_CraftData.ToolVecModifyMap.Keys.ToList();
+			int preCtrlPntIndex = GetPreCtrlPntIndex( m_nSelectIndex, ctrlPntIndexList, m_CraftData.IsPathReverse, m_DataHandler.IsClosed() );
+			ISetToolVecPoint preCtrlPoint = m_DataHandler.GetPointByCADIndex( preCtrlPntIndex );
+			if( preCtrlPoint == null ) {
+				return;
+			}
+
+			// Calculate AB angles from previous control point MS angles
 			if( m_SelectedPoint == null ) {
-				return result;
+				return;
 			}
-			Tuple<double, double> msAngles_deg = ToolVecHelper.GetMSAngleFromABAngle( abAngles_deg.Item1, abAngles_deg.Item2, m_SelectedPoint );
-
-			// valid result, trigger update
-			if( m_ToolVecParam != null ) {
-				m_ToolVecParam.Master_deg = msAngles_deg.Item1;
-				m_ToolVecParam.Slave_deg = msAngles_deg.Item2;
-				m_ToolVecParam.AngleA_deg = abAngles_deg.Item1;
-				m_ToolVecParam.AngleB_deg = abAngles_deg.Item2;
-			}
-			SetToolVecParamAndPeview();
-
-			// return result
-			return new SolveTargetResult()
-			{
-				IsValid = true,
-				AngleA_deg = abAngles_deg.Item1,
-				AngleB_deg = abAngles_deg.Item2,
-				Master_deg = msAngles_deg.Item1,
-				Slave_deg = msAngles_deg.Item2
-			};
-		}
-
-		SolveTargetResult OnSetZDir()
-		{
-			SolveTargetResult result = new SolveTargetResult() { IsValid = false };
-			bool getAngleOK = CalABAngleToZDir( out Tuple<double, double> abAngles_deg );
-			bool checkRangeOK = CheckABAngleRange( abAngles_deg.Item1, abAngles_deg.Item2 );
-			if( !getAngleOK || !checkRangeOK ) {
-				return result;
-			}
-
-			// Calculate MS angles from AB angles
-			if( m_SelectedPoint == null ) {
-				return result;
-			}
-			Tuple<double, double> msAngles_deg = ToolVecHelper.GetMSAngleFromABAngle( abAngles_deg.Item1, abAngles_deg.Item2, m_SelectedPoint );
-
-			// valid result, trigger update
-			if( m_ToolVecParam != null ) {
-				m_ToolVecParam.Master_deg = msAngles_deg.Item1;
-				m_ToolVecParam.Slave_deg = msAngles_deg.Item2;
-				m_ToolVecParam.AngleA_deg = abAngles_deg.Item1;
-				m_ToolVecParam.AngleB_deg = abAngles_deg.Item2;
-			}
-			SetToolVecParamAndPeview();
-
-			// return result
-			return new SolveTargetResult()
-			{
-				IsValid = true,
-				AngleA_deg = abAngles_deg.Item1,
-				AngleB_deg = abAngles_deg.Item2,
-				Master_deg = msAngles_deg.Item1,
-				Slave_deg = msAngles_deg.Item2
-			};
-		}
-
-		SolveMSResult OnABAngleChanged( double angleA_deg, double angleB_deg )
-		{
-			SolveMSResult result = new SolveMSResult() { IsValid = false };
+			Tuple<double, double> abAngles_deg =
+				ToolVecHelper.GetABAngleFromMSAngle( preCtrlPoint.ModMaster_rad * 180.0 / Math.PI,
+														preCtrlPoint.ModSlave_rad * 180.0 / Math.PI,
+														m_SelectedPoint );
 
 			// check angle range
+			if( !CheckABAngleRange( abAngles_deg.Item1, abAngles_deg.Item2 ) ) {
+				return;
+			}
+
+			// valid result, trigger update
+			if( m_ToolVecParam != null ) {
+				m_ToolVecParam.Master_deg = preCtrlPoint.ModMaster_rad * 180.0 / Math.PI;
+				m_ToolVecParam.Slave_deg = preCtrlPoint.ModSlave_rad * 180.0 / Math.PI;
+				m_ToolVecParam.AngleA_deg = abAngles_deg.Item1;
+				m_ToolVecParam.AngleB_deg = abAngles_deg.Item2;
+			}
+			SetToolVecParamAndPeview();
+		}
+
+		void OnSetZDir()
+		{
+			// calculate MS angles from Z direction
+			if( m_SelectedPoint == null ) {
+				return;
+			}
+			Tuple<double, double> msAngles_deg = ToolVecHelper.GetMSAngleFromToolVec( new gp_Dir( 0, 0, 1 ), m_SelectedPoint );
+
+			// calculate AB angles from MS angles
+			Tuple<double, double> abAngles_deg = ToolVecHelper.GetABAngleFromMSAngle( msAngles_deg.Item1, msAngles_deg.Item2, m_SelectedPoint );
+
+			// check angle range
+			if( !CheckABAngleRange( abAngles_deg.Item1, abAngles_deg.Item2 ) ) {
+				return;
+			}
+
+			// valid result, trigger update
+			if( m_ToolVecParam != null ) {
+				m_ToolVecParam.Master_deg = msAngles_deg.Item1;
+				m_ToolVecParam.Slave_deg = msAngles_deg.Item2;
+				m_ToolVecParam.AngleA_deg = abAngles_deg.Item1;
+				m_ToolVecParam.AngleB_deg = abAngles_deg.Item2;
+			}
+			SetToolVecParamAndPeview();
+		}
+
+		void OnABAngleChanged( double angleA_deg, double angleB_deg )
+		{
+			// check angle range
 			if( !CheckABAngleRange( angleA_deg, angleB_deg ) ) {
-				return result;
+				return;
 			}
 			if( m_SelectedPoint == null ) {
-				return result;
+				return;
 			}
 			Tuple<double, double> msAngle_deg = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, m_SelectedPoint );
 
@@ -292,27 +270,18 @@ namespace MyCAM.Editor
 				m_ToolVecParam.AngleB_deg = angleB_deg;
 			}
 			SetToolVecParamAndPeview();
-
-			// return result
-			return new SolveMSResult()
-			{
-				IsValid = true,
-				Master_deg = msAngle_deg.Item1,
-				Slave_deg = msAngle_deg.Item2
-			};
 		}
 
-		SolveABResult OnMSAngleChanged( double master_deg, double slave_deg )
+		void OnMSAngleChanged( double master_deg, double slave_deg )
 		{
-			SolveABResult result = new SolveABResult() { IsValid = false };
 			if( m_SelectedPoint == null ) {
-				return result;
+				return;
 			}
 			Tuple<double, double> abAngle_deg = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_SelectedPoint );
 
 			// check angle range
 			if( !CheckABAngleRange( abAngle_deg.Item1, abAngle_deg.Item2 ) ) {
-				return result;
+				return;
 			}
 
 			// valid result, trigger update
@@ -323,13 +292,6 @@ namespace MyCAM.Editor
 				m_ToolVecParam.Slave_deg = slave_deg;
 			}
 			SetToolVecParamAndPeview();
-
-			return new SolveABResult()
-			{
-				IsValid = true,
-				AngleA_deg = abAngle_deg.Item1,
-				AngleB_deg = abAngle_deg.Item2
-			};
 		}
 
 		void OnTypeChanged( EToolVecInterpolateType type )
@@ -474,6 +436,11 @@ namespace MyCAM.Editor
 			SetIndexAngleParam();
 			if( ( m_ToolVecParam != null && m_ToolVecParam.IsModified ) || bForceUpdate ) {
 				PropertyChanged?.Invoke( m_PathIDList );
+			}
+
+			// update cache point
+			if( m_SelectedPoint != null && m_nSelectIndex != NULL_SELECT_INDEX ) {
+				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 			}
 		}
 
