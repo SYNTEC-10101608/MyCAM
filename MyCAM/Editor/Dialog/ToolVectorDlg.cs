@@ -15,6 +15,7 @@ namespace MyCAM.Editor
 		public Action<EToolVecInterpolateType> TypeChanged;
 		public Action AddEditIndex;
 		public Action RemoveEditIndex;
+		public Action SwitchStartEnd;
 
 		public ToolVectorDlg( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse )
 		{
@@ -64,6 +65,11 @@ namespace MyCAM.Editor
 			m_btnRemove.Enabled = m_ToolVecParam.IsModified;
 			m_btnAdd.Enabled = !m_ToolVecParam.IsModified;
 			bSuppressValueChangedEvent = false;
+		}
+
+		public void EnableStartEndSwitch( bool enable )
+		{
+			m_btnSwitchStartEnd.Visible = enable;
 		}
 
 
@@ -262,6 +268,11 @@ namespace MyCAM.Editor
 			RemoveEditIndex();
 			m_btnAdd.Enabled = true;
 			m_btnRemove.Enabled = false;
+		}
+
+		void m_btnSwitchStartEnd_Click( object sender, EventArgs e )
+		{
+			SwitchStartEnd();
 		}
 
 		bool m_IsPathRevese = false;

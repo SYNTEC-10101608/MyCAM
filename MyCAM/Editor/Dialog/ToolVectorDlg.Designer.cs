@@ -56,6 +56,7 @@
 			this.m_btnKeep = new System.Windows.Forms.Button();
 			this.m_btnZDir = new System.Windows.Forms.Button();
 			this.m_btnRevert = new System.Windows.Forms.Button();
+			this.m_btnSwitchStartEnd = new System.Windows.Forms.Button();
 			this.m_gbxInterpolation.SuspendLayout();
 			this.m_tbInterType.SuspendLayout();
 			this.m_gbxIndexParam.SuspendLayout();
@@ -229,6 +230,7 @@
 			this.tableLayoutPanel1.Controls.Add(this.m_btnKeep, 0, 5);
 			this.tableLayoutPanel1.Controls.Add(this.m_btnZDir, 1, 5);
 			this.tableLayoutPanel1.Controls.Add(this.m_btnRevert, 2, 5);
+			this.tableLayoutPanel1.Controls.Add(this.m_btnSwitchStartEnd, 2, 4);
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(6, 16);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
 			this.tableLayoutPanel1.RowCount = 9;
@@ -400,6 +402,16 @@
 			this.m_btnRevert.UseVisualStyleBackColor = true;
 			this.m_btnRevert.Click += new System.EventHandler(this.m_btnRevert_Click);
 			// 
+			// m_btnSwitchStartEnd
+			// 
+			this.m_btnSwitchStartEnd.Location = new System.Drawing.Point(123, 103);
+			this.m_btnSwitchStartEnd.Name = "m_btnSwitchStartEnd";
+			this.m_btnSwitchStartEnd.Size = new System.Drawing.Size(54, 19);
+			this.m_btnSwitchStartEnd.TabIndex = 19;
+			this.m_btnSwitchStartEnd.Text = "起 / 終";
+			this.m_btnSwitchStartEnd.UseVisualStyleBackColor = true;
+			this.m_btnSwitchStartEnd.Click += new System.EventHandler(this.m_btnSwitchStartEnd_Click);
+			// 
 			// ToolVectorDlg
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -455,5 +467,6 @@
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.Button m_btnAdd;
 		private System.Windows.Forms.Button m_btnRevert;
+		private System.Windows.Forms.Button m_btnSwitchStartEnd;
 	}
 }
