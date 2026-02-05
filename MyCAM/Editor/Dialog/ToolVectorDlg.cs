@@ -17,13 +17,26 @@ namespace MyCAM.Editor
 		public Action RemoveEditIndex;
 		public Action SwitchStartEnd;
 
-		public ToolVectorDlg( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse )
+		public ToolVectorDlg( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse, RotaryAxisConfig config )
 		{
 			// struct would not be null
 			InitializeComponent();
 			m_IsPathRevese = isPathReverse;
 			ResetType( type );
 			ResetToolVecParam( param );
+
+			// update rotary axis name
+			m_RotaryAxisConfig = config;
+			m_lblMaster.Text = m_RotaryAxisConfig.MasterName;
+			m_lblSlave.Text = m_RotaryAxisConfig.SlaveName;
+			if( m_RotaryAxisConfig.RotaryAxis == ETypeOfRotaryAxis.Master ) {
+				m_btnRotaryPos.Text = m_RotaryAxisConfig.MasterName + " +";
+				m_btnRotaryNeg.Text = m_RotaryAxisConfig.MasterName + " -";
+			}
+			else {
+				m_btnRotaryPos.Text = m_RotaryAxisConfig.SlaveName + " +";
+				m_btnRotaryNeg.Text = m_RotaryAxisConfig.SlaveName + " -";
+			}
 		}
 
 		public void ResetType( EToolVecInterpolateType type )
@@ -245,32 +258,50 @@ namespace MyCAM.Editor
 			SwitchStartEnd?.Invoke();
 		}
 
-		void m_btnMasterPos_Click( object sender, EventArgs e )
+		void m_btnRotaryPos_Click( object sender, EventArgs e )
 		{
 			bSuppressValueChangedEvent = true;
 			GetMSAngleFromDialog( out double master_deg, out double slave_deg );
-			master_deg += 180;
-			slave_deg = -slave_deg;
-			m_tbxMaster.Text = master_deg.ToString( "F3" );
-			m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			if( m_RotaryAxisConfig.RotaryAxis == ETypeOfRotaryAxis.Master ) {
+				master_deg += 180;
+				slave_deg = -slave_deg;
+				m_tbxMaster.Text = master_deg.ToString( "F3" );
+				m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			}
+			else {
+				master_deg = -master_deg;
+				slave_deg += 180;
+				m_tbxMaster.Text = master_deg.ToString( "F3" );
+				m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			}
 			bSuppressValueChangedEvent = false;
 			HandleMSAngleChanged();
 		}
 
-		void m_btnMasterNeg_Click( object sender, EventArgs e )
+		void m_btnRotaryNeg_Click( object sender, EventArgs e )
 		{
 			bSuppressValueChangedEvent = true;
 			GetMSAngleFromDialog( out double master_deg, out double slave_deg );
-			master_deg -= 180;
-			slave_deg = -slave_deg;
-			m_tbxMaster.Text = master_deg.ToString( "F3" );
-			m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			if( m_RotaryAxisConfig.RotaryAxis == ETypeOfRotaryAxis.Master ) {
+				master_deg -= 180;
+				slave_deg = -slave_deg;
+				m_tbxMaster.Text = master_deg.ToString( "F3" );
+				m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			}
+			else {
+				master_deg = -master_deg;
+				slave_deg -= 180;
+				m_tbxMaster.Text = master_deg.ToString( "F3" );
+				m_tbxSlave.Text = slave_deg.ToString( "F3" );
+			}
 			bSuppressValueChangedEvent = false;
 			HandleMSAngleChanged();
 		}
 
 		bool m_IsPathRevese = false;
 		ToolVecParam m_ToolVecParam;
+
+		RotaryAxisConfig m_RotaryAxisConfig;
 
 		bool bSuppressTypeChangedEvent = false;
 		bool bSuppressValueChangedEvent = false;
@@ -310,6 +341,31 @@ namespace MyCAM.Editor
 			Master_deg = master_deg;
 			Slave_deg = slave_deg;
 			IsModified = isModified;
+		}
+	}
+
+	// to determin which is the rotating one
+	public enum ETypeOfRotaryAxis
+	{
+		Master,
+		Slave,
+	}
+
+	public class RotaryAxisConfig
+	{
+		public ETypeOfRotaryAxis RotaryAxis
+		{
+			get; set;
+		}
+
+		public string MasterName
+		{
+			get; set;
+		}
+
+		public string SlaveName
+		{
+			get; set;
 		}
 	}
 }

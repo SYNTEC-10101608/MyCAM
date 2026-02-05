@@ -25,6 +25,7 @@ namespace MyCAM.Editor
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
 				throw new ArgumentException( "Cannot get CraftData by pathID: " + pathID );
 			}
+			m_RotaryAxisConfig = CreateRotaryAxisConfig();
 			m_DataHandler = new ToolVecActionDataHandler( pathID );
 			m_PathIDList = new List<string>() { pathID };
 		}
@@ -53,7 +54,7 @@ namespace MyCAM.Editor
 			m_ToolVecParam = null;
 
 			// init dialog
-			m_ToolVecDlg = new ToolVectorDlg( m_CraftData.InterpolateType, m_ToolVecParam, m_CraftData.IsPathReverse );
+			m_ToolVecDlg = new ToolVectorDlg( m_CraftData.InterpolateType, m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );
 			m_ToolVecDlg.SetKeep += () => OnSetKeep();
 			m_ToolVecDlg.SetZdir += () => OnSetZDir();
 			m_ToolVecDlg.SetRevert += () => OnSetRevert();
@@ -466,6 +467,38 @@ namespace MyCAM.Editor
 				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg );
 		}
 
+		// rotary axis config
+		RotaryAxisConfig CreateRotaryAxisConfig()
+		{
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				throw new InvalidOperationException( "Cannot get machine data" );
+			}
+			RotaryAxisConfig config = new RotaryAxisConfig();
+			config.MasterName = ConvertRotaryAxisName( machineData.MasterRotaryAxis );
+			config.SlaveName = ConvertRotaryAxisName( machineData.SlaveRotaryAxis );
+			if( machineData.FiveAxisType == FiveAxisType.Table || machineData.FiveAxisType == FiveAxisType.Mix ) {
+				config.RotaryAxis = ETypeOfRotaryAxis.Slave;
+			}
+			else {
+				config.RotaryAxis = ETypeOfRotaryAxis.Master;
+			}
+			return config;
+		}
+
+		string ConvertRotaryAxisName( RotaryAxis axis )
+		{
+			switch( axis ) {
+				case RotaryAxis.X:
+					return "A";
+				case RotaryAxis.Y:
+					return "B";
+				case RotaryAxis.Z:
+					return "C";
+				default:
+					return "";
+			}
+		}
+
 
 		// index param
 		int m_nSelectIndex = NULL_SELECT_INDEX;
@@ -476,6 +509,7 @@ namespace MyCAM.Editor
 		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.Normal;
 		ToolVecActionDataHandler m_DataHandler = null;
 		CraftData m_CraftData = null;
+		RotaryAxisConfig m_RotaryAxisConfig = null;
 
 		// action data
 		List<string> m_PathIDList = null;

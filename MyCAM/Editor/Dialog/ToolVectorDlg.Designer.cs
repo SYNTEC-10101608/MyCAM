@@ -41,14 +41,14 @@
 			this.splitter1 = new System.Windows.Forms.Splitter();
 			this.m_gbxIndexParam = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.m_btnMasterNeg = new System.Windows.Forms.Button();
+			this.m_btnRotaryNeg = new System.Windows.Forms.Button();
 			this.m_lblADeg = new System.Windows.Forms.Label();
 			this.m_lblBDeg = new System.Windows.Forms.Label();
 			this.m_lblMaster = new System.Windows.Forms.Label();
 			this.m_lblSlave = new System.Windows.Forms.Label();
 			this.m_tbxSlave = new System.Windows.Forms.TextBox();
 			this.m_tbxAngleA = new System.Windows.Forms.TextBox();
-			this.m_btnMasterPos = new System.Windows.Forms.Button();
+			this.m_btnRotaryPos = new System.Windows.Forms.Button();
 			this.m_tbxAngleB = new System.Windows.Forms.TextBox();
 			this.m_tbxMaster = new System.Windows.Forms.TextBox();
 			this.m_btnAdd = new System.Windows.Forms.Button();
@@ -215,14 +215,14 @@
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
-			this.tableLayoutPanel1.Controls.Add(this.m_btnMasterNeg, 2, 3);
+			this.tableLayoutPanel1.Controls.Add(this.m_btnRotaryNeg, 2, 3);
 			this.tableLayoutPanel1.Controls.Add(this.m_lblADeg, 0, 0);
 			this.tableLayoutPanel1.Controls.Add(this.m_lblBDeg, 0, 1);
 			this.tableLayoutPanel1.Controls.Add(this.m_lblMaster, 0, 2);
 			this.tableLayoutPanel1.Controls.Add(this.m_lblSlave, 0, 3);
 			this.tableLayoutPanel1.Controls.Add(this.m_tbxSlave, 1, 3);
 			this.tableLayoutPanel1.Controls.Add(this.m_tbxAngleA, 1, 0);
-			this.tableLayoutPanel1.Controls.Add(this.m_btnMasterPos, 2, 2);
+			this.tableLayoutPanel1.Controls.Add(this.m_btnRotaryPos, 2, 2);
 			this.tableLayoutPanel1.Controls.Add(this.m_tbxAngleB, 1, 1);
 			this.tableLayoutPanel1.Controls.Add(this.m_tbxMaster, 1, 2);
 			this.tableLayoutPanel1.Controls.Add(this.m_btnAdd, 0, 4);
@@ -246,15 +246,15 @@
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(185, 156);
 			this.tableLayoutPanel1.TabIndex = 0;
 			// 
-			// m_btnMasterNeg
+			// m_btnRotaryNeg
 			// 
-			this.m_btnMasterNeg.Location = new System.Drawing.Point(123, 78);
-			this.m_btnMasterNeg.Name = "m_btnMasterNeg";
-			this.m_btnMasterNeg.Size = new System.Drawing.Size(54, 19);
-			this.m_btnMasterNeg.TabIndex = 18;
-			this.m_btnMasterNeg.Text = "C-";
-			this.m_btnMasterNeg.UseVisualStyleBackColor = true;
-			this.m_btnMasterNeg.Click += new System.EventHandler(this.m_btnMasterNeg_Click);
+			this.m_btnRotaryNeg.Location = new System.Drawing.Point(123, 78);
+			this.m_btnRotaryNeg.Name = "m_btnRotaryNeg";
+			this.m_btnRotaryNeg.Size = new System.Drawing.Size(54, 19);
+			this.m_btnRotaryNeg.TabIndex = 18;
+			this.m_btnRotaryNeg.Text = "C-";
+			this.m_btnRotaryNeg.UseVisualStyleBackColor = true;
+			this.m_btnRotaryNeg.Click += new System.EventHandler(this.m_btnRotaryNeg_Click);
 			// 
 			// m_lblADeg
 			// 
@@ -324,15 +324,15 @@
 			this.m_tbxAngleA.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxAngleA_KeyDown);
 			this.m_tbxAngleA.Leave += new System.EventHandler(this.m_tbxAngleA_Leave);
 			// 
-			// m_btnMasterPos
+			// m_btnRotaryPos
 			// 
-			this.m_btnMasterPos.Location = new System.Drawing.Point(123, 53);
-			this.m_btnMasterPos.Name = "m_btnMasterPos";
-			this.m_btnMasterPos.Size = new System.Drawing.Size(54, 19);
-			this.m_btnMasterPos.TabIndex = 17;
-			this.m_btnMasterPos.Text = "C+";
-			this.m_btnMasterPos.UseVisualStyleBackColor = true;
-			this.m_btnMasterPos.Click += new System.EventHandler(this.m_btnMasterPos_Click);
+			this.m_btnRotaryPos.Location = new System.Drawing.Point(123, 53);
+			this.m_btnRotaryPos.Name = "m_btnRotaryPos";
+			this.m_btnRotaryPos.Size = new System.Drawing.Size(54, 19);
+			this.m_btnRotaryPos.TabIndex = 17;
+			this.m_btnRotaryPos.Text = "C+";
+			this.m_btnRotaryPos.UseVisualStyleBackColor = true;
+			this.m_btnRotaryPos.Click += new System.EventHandler(this.m_btnRotaryPos_Click);
 			// 
 			// m_tbxAngleB
 			// 
@@ -463,8 +463,8 @@
 		private System.Windows.Forms.Panel m_pnlTiltColor;
 		private System.Windows.Forms.Label m_lblNormalHint;
 		private System.Windows.Forms.RadioButton m_rbtTilt;
-		private System.Windows.Forms.Button m_btnMasterNeg;
-		private System.Windows.Forms.Button m_btnMasterPos;
+		private System.Windows.Forms.Button m_btnRotaryNeg;
+		private System.Windows.Forms.Button m_btnRotaryPos;
 		private System.Windows.Forms.TableLayoutPanel m_tbInterType;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.Button m_btnAdd;
