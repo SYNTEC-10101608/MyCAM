@@ -1,4 +1,5 @@
 ﻿using OCC.gp;
+using System;
 using System.Collections.Generic;
 
 namespace MyCAM.Data
@@ -10,15 +11,13 @@ namespace MyCAM.Data
 			get;
 		}
 
-		public gp_Ax3 RefCoord
+		public event Action CADFactorChanged;
+
+		public gp_Ax1 RefCenterDir
 		{
 			get
 			{
-				return m_RefCoord;
-			}
-			set
-			{
-				m_RefCoord = value;
+				return m_RefCenterDir;
 			}
 		}
 
@@ -38,7 +37,10 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				m_RotatedAngle_deg = value;
+				if( m_RotatedAngle_deg != value ) {
+					m_RotatedAngle_deg = value;
+					CADFactorChanged?.Invoke();
+				}
 			}
 		}
 
@@ -50,7 +52,10 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				m_IsCoordinateReversed = value;
+				if( m_IsCoordinateReversed != value ) {
+					m_IsCoordinateReversed = value;
+					CADFactorChanged?.Invoke();
+				}
 			}
 		}
 
@@ -61,14 +66,19 @@ namespace MyCAM.Data
 
 		public abstract IGeomData Clone();
 
-		public void SetRefCoord( gp_Ax3 refCoord )
+		public void SetRefCenterDir( gp_Ax1 refCenterDir )
 		{
-			m_RefCoord = refCoord;
+			m_RefCenterDir = refCenterDir;
+		}
+
+		protected void OnCADFactorChanged()
+		{
+			CADFactorChanged?.Invoke();
 		}
 
 		protected double m_RotatedAngle_deg;
 		protected bool m_IsCoordinateReversed;
 		protected List<CADPoint> m_CADPointList;
-		protected gp_Ax3 m_RefCoord = new gp_Ax3();
+		protected gp_Ax1 m_RefCenterDir = new gp_Ax1();
 	}
 }

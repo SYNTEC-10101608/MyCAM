@@ -11,39 +11,32 @@ namespace MyCAM.PathCache
 	public class RectangleCache : StdPatternCacheBase
 	{
 		public RectangleCache( IStdPatternGeomData geomData, CraftData craftData )
-			: base( craftData )
+			: base( geomData, craftData )
 		{
 			if( geomData == null || !( geomData is RectangleGeomData rectangleGeomData ) ) {
 				throw new ArgumentNullException( "RectangleCache constructing argument error - invalid geomData" );
 			}
 			m_RectangleGeomData = rectangleGeomData;
-			BuildCADPointList();
-			BuildCAMPointList();
+			BuildCADCAMPointList();
 		}
 
-		protected override void BuildCADPointList()
+		protected override void BuildCADCAMPointList()
 		{
-			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RectangleGeomData );
+			ClearCADFactorDirty();
+			SetCenterDir();
+			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, m_RectangleGeomData.IsCoordinateReversed );
+			SetRefCoordSelfRotated( m_RectangleGeomData.RotatedAngle_deg );
+			m_RefPoint = new CAMPoint( new CADPoint( m_RefCoord.Location(), m_RefCoord.Direction(), m_RefCoord.XDirection(), m_RefCoord.YDirection() ), m_RefCoord.Direction() );
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, m_RectangleGeomData );
 			m_MainPathCADPointList = Discretize();
+			BuildCAMPointList();
 		}
 
 		protected override void BuildCAMPointList()
 		{
-			ClearCraftDataDirty();
-
-			// set reference point
-			m_RefPoint = new CAMPoint(
-				new CADPoint(
-					m_RectangleGeomData.RefCoord.Location(),
-					m_RectangleGeomData.RefCoord.Direction(),
-					m_RectangleGeomData.RefCoord.XDirection(),
-					m_RectangleGeomData.RefCoord.YDirection()
-				),
-				m_RectangleGeomData.RefCoord.Direction()
-			);
-
-			SetMainPathCAMPoint();
-			SetStartPointList();
+			ClearCAMFactorDirty();
+			SetPathCAMPoint();
+			SetStartPoint();
 
 			// calculate max over cut length
 			m_MaxOverCutLength = OverCutHelper.GetMaxOverCutLength( m_RectangleGeomData, m_CraftData.StartPointIndex );
@@ -61,19 +54,24 @@ namespace MyCAM.PathCache
 
 		protected override List<CADPoint> Discretize()
 		{
-			if( m_RectangleGeomData == null || m_RectangleGeomData.RefCoord == null ) {
+			if( m_RectangleGeomData == null || m_RefCoord == null ) {
 				return new List<CADPoint>();
 			}
 
-			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_RectangleGeomData.RefCoord );
+			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_RefCoord );
 			List<CADPoint> discretizedPoints = StdPatternDiscreteFactory.DiscretizeRectangle( m_RectangleGeomData.Width, m_RectangleGeomData.Length, m_RectangleGeomData.CornerRadius, transformation );
 
 			// ensure all start points are included in the discretized list
 			if( m_StartCADPointList != null && m_StartCADPointList.Count > 0 ) {
-				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( discretizedPoints, m_StartCADPointList, m_RectangleGeomData );
+				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( m_RefCoord, discretizedPoints, m_StartCADPointList, m_RectangleGeomData );
 			}
 
 			return discretizedPoints;
+		}
+
+		protected override void SetCenterDir()
+		{
+			m_ComputeRefCenterDir = m_RectangleGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
 		}
 
 		RectangleGeomData m_RectangleGeomData;

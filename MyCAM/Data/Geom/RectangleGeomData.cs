@@ -4,9 +4,9 @@ namespace MyCAM.Data
 {
 	public class RectangleGeomData : StdPatternGeomDataBase
 	{
-		public RectangleGeomData( gp_Ax3 refCoordinate, double width, double height, double cornerRadius, double rotatedAngle_deg, bool isCoordinateReversed )
+		public RectangleGeomData( gp_Ax1 refCenterDir, double width, double height, double cornerRadius, double rotatedAngle_deg, bool isCoordinateReversed )
 		{
-			m_RefCoord = refCoordinate;
+			m_RefCenterDir = refCenterDir;
 			m_Width = width;
 			m_Length = height;
 			m_CornerRadius = cornerRadius;
@@ -39,7 +39,10 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				m_Width = value;
+				if( m_Width != value ) {
+					m_Width = value;
+					OnCADFactorChanged();
+				}
 			}
 		}
 
@@ -51,7 +54,10 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				m_Length = value;
+				if( m_Length != value ) {
+					m_Length = value;
+					OnCADFactorChanged();
+				}
 			}
 		}
 
@@ -65,14 +71,14 @@ namespace MyCAM.Data
 			{
 				if( m_CornerRadius != value ) {
 					m_CornerRadius = value;
-					//ParameterChanged.Invoke();
+					OnCADFactorChanged();
 				}
 			}
 		}
 
 		public override IGeomData Clone()
 		{
-			return new RectangleGeomData( m_RefCoord, m_Width, m_Length, m_CornerRadius, m_RotatedAngle_deg, m_IsCoordinateReversed );
+			return new RectangleGeomData( m_RefCenterDir, m_Width, m_Length, m_CornerRadius, m_RotatedAngle_deg, m_IsCoordinateReversed );
 		}
 
 		public const double DEFAULT_CORNER_RADIUS = 5.0;

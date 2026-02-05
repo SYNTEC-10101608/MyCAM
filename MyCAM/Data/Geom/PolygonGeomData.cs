@@ -4,13 +4,13 @@ namespace MyCAM.Data
 {
 	public class PolygonGeomData : StdPatternGeomDataBase
 	{
-		public PolygonGeomData( gp_Ax3 refCoord, int sides, double sideLength, double cornerRadius, double rotatedAngle_deg, bool isCoordinateReversed )
+		public PolygonGeomData( gp_Ax1 refCenterDir, int sides, double sideLength, double cornerRadius, double rotatedAngle_deg, bool isCoordinateReversed )
 		{
 			if( sides < 3 || sides > 6 ) {
 				throw new System.ArgumentOutOfRangeException( nameof( sides ), "Polygon must have 3 to 6 sides" );
 			}
-			m_RefCoord = refCoord;
-			Sides = sides;
+			m_RefCenterDir = refCenterDir;
+			m_Sides = sides;
 			m_SideLength = sideLength;
 			m_CornerRadius = cornerRadius;
 			m_RotatedAngle_deg = rotatedAngle_deg;
@@ -22,7 +22,7 @@ namespace MyCAM.Data
 			if( sides < 3 || sides > 6 ) {
 				throw new System.ArgumentOutOfRangeException( nameof( sides ), "Polygon must have 3 to 6 sides" );
 			}
-			Sides = sides;
+			m_Sides = sides;
 			m_SideLength = DEFAULT_SIDE_LENGTH;
 			m_CornerRadius = DEFAULT_CORNER_RADIUS;
 			m_RotatedAngle_deg = DEFAULT_ROTATED_ANGLE;
@@ -50,8 +50,20 @@ namespace MyCAM.Data
 
 		public int Sides
 		{
-			get;
-			private set;
+			get
+			{
+				return m_Sides;
+			}
+			set
+			{
+				if( m_Sides != value ) {
+					if( value < 3 || value > 6 ) {
+						throw new System.ArgumentOutOfRangeException( nameof( Sides ), "Polygon must have 3 to 6 sides" );
+					}
+					m_Sides = value;
+					OnCADFactorChanged();
+				}
+			}
 		}
 
 		public double SideLength
@@ -62,7 +74,10 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				m_SideLength = value;
+				if( m_SideLength != value ) {
+					m_SideLength = value;
+					OnCADFactorChanged();
+				}
 			}
 		}
 
@@ -74,13 +89,16 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				m_CornerRadius = value;
+				if( m_CornerRadius != value ) {
+					m_CornerRadius = value;
+					OnCADFactorChanged();
+				}
 			}
 		}
 
 		public override IGeomData Clone()
 		{
-			return new PolygonGeomData( m_RefCoord, Sides, m_SideLength, m_CornerRadius, m_RotatedAngle_deg, m_IsCoordinateReversed );
+			return new PolygonGeomData( m_RefCenterDir, Sides, m_SideLength, m_CornerRadius, m_RotatedAngle_deg, m_IsCoordinateReversed );
 		}
 
 		public const int DEFAULT_SIDES = 3;
@@ -89,5 +107,6 @@ namespace MyCAM.Data
 		public const double DEFAULT_ROTATED_ANGLE = 0.0;
 		double m_SideLength;
 		double m_CornerRadius;
+		int m_Sides;
 	}
 }

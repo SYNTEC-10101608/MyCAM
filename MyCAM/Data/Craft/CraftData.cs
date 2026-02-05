@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCC.gp;
+using System;
 using System.Collections.Generic;
 
 namespace MyCAM.Data
@@ -56,8 +57,6 @@ namespace MyCAM.Data
 
 	public class CraftData
 	{
-
-
 		public CraftData()
 		{
 			SubscribeSubParamChanged();
@@ -89,7 +88,8 @@ namespace MyCAM.Data
 			SubscribeSubParamChanged();
 		}
 
-		public Action ParameterChanged;
+		public Action CAMFactorChanged;
+		public Action CADFactorChanged;
 
 		public int StartPointIndex
 		{
@@ -101,7 +101,7 @@ namespace MyCAM.Data
 			{
 				if( m_StartPointIndex != value ) {
 					m_StartPointIndex = value;
-					ParameterChanged?.Invoke();
+					CAMFactorChanged?.Invoke();
 				}
 			}
 		}
@@ -116,7 +116,7 @@ namespace MyCAM.Data
 			{
 				if( m_IsPathReverse != value ) {
 					m_IsPathReverse = value;
-					ParameterChanged?.Invoke();
+					CAMFactorChanged?.Invoke();
 				}
 			}
 		}
@@ -139,7 +139,7 @@ namespace MyCAM.Data
 				}
 				if( m_LeadData != value ) {
 					m_LeadData = value;
-					ParameterChanged?.Invoke();
+					CAMFactorChanged?.Invoke();
 				}
 			}
 		}
@@ -154,7 +154,7 @@ namespace MyCAM.Data
 			{
 				if( m_OverCutLength != value ) {
 					m_OverCutLength = value;
-					ParameterChanged?.Invoke();
+					CAMFactorChanged?.Invoke();
 				}
 			}
 		}
@@ -169,7 +169,29 @@ namespace MyCAM.Data
 			{
 				if( m_IsToolVecReverse != value ) {
 					m_IsToolVecReverse = value;
-					ParameterChanged?.Invoke();
+					CAMFactorChanged?.Invoke();
+				}
+			}
+		}
+
+		public gp_Trsf CumulativeTrsfMatrix
+		{
+			get
+			{
+				// to prevent null value
+				if( m_CumulativeTrsfMatrix == null ) {
+					m_CumulativeTrsfMatrix = new gp_Trsf();
+				}
+				return m_CumulativeTrsfMatrix;
+			}
+			set
+			{
+				if( value == null ) {
+					value = new gp_Trsf();
+				}
+				if( m_CumulativeTrsfMatrix != value ) {
+					m_CumulativeTrsfMatrix = value;
+					CADFactorChanged?.Invoke();
 				}
 			}
 		}
@@ -184,7 +206,7 @@ namespace MyCAM.Data
 			{
 				if( m_InterpolateType != value ) {
 					m_InterpolateType = value;
-					ParameterChanged?.Invoke();
+					CAMFactorChanged?.Invoke();
 				}
 			}
 		}
@@ -215,7 +237,7 @@ namespace MyCAM.Data
 				}
 				if( m_TraverseData != value ) {
 					m_TraverseData = value;
-					ParameterChanged?.Invoke();
+					CAMFactorChanged?.Invoke();
 				}
 			}
 		}
@@ -229,7 +251,7 @@ namespace MyCAM.Data
 			else {
 				m_ToolVecModifyMap.Add( index, new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg ) );
 			}
-			ParameterChanged?.Invoke();
+			CAMFactorChanged?.Invoke();
 		}
 
 		public void RemoveToolVecModify( int index )
@@ -237,7 +259,7 @@ namespace MyCAM.Data
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
 				m_ToolVecModifyMap.Remove( index );
 			}
-			ParameterChanged?.Invoke();
+			CAMFactorChanged?.Invoke();
 		}
 
 		void SubscribeSubParamChanged()
@@ -248,7 +270,7 @@ namespace MyCAM.Data
 
 		void SubParamChanged()
 		{
-			ParameterChanged?.Invoke();
+			CAMFactorChanged?.Invoke();
 		}
 
 		int m_StartPointIndex = 0;
@@ -259,5 +281,6 @@ namespace MyCAM.Data
 		Dictionary<int, ToolVecModifyData> m_ToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
+		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();
 	}
 }

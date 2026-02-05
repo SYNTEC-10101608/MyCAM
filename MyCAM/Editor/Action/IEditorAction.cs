@@ -37,6 +37,7 @@ namespace MyCAM.Editor
 		SetTraverse,
 		SetEntryAndExitParam,
 		SetPattern,
+		PathEdit,
 
 		// File
 		ImportProjectFile,

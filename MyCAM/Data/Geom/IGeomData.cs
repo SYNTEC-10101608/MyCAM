@@ -1,4 +1,5 @@
 ﻿using OCC.gp;
+using System;
 
 namespace MyCAM.Data
 {
@@ -28,10 +29,11 @@ namespace MyCAM.Data
 
 	public interface IStdPatternGeomData : IGeomData, ITransformableGeom
 	{
-		gp_Ax3 RefCoord
+		event Action CADFactorChanged;
+
+		gp_Ax1 RefCenterDir
 		{
 			get;
-			set;
 		}
 
 		double RotatedAngle_deg
@@ -47,6 +49,6 @@ namespace MyCAM.Data
 		}
 
 		// TOD: use field above
-		void SetRefCoord( gp_Ax3 refCoordinate );
+		void SetRefCenterDir( gp_Ax1 refCenterDir );
 	}
 }

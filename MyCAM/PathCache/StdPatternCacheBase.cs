@@ -7,14 +7,16 @@ namespace MyCAM.PathCache
 {
 	public abstract class StdPatternCacheBase : IStdPatternCache
 	{
-		protected StdPatternCacheBase( CraftData craftData )
+		protected StdPatternCacheBase( IStdPatternGeomData geomData, CraftData craftData )
 		{
 			if( craftData == null ) {
 				throw new ArgumentNullException( "StdPatternCacheBase constructing argument null" );
 			}
-
 			m_CraftData = craftData;
-			m_CraftData.ParameterChanged += SetCraftDataDirty;
+			m_CraftData.CAMFactorChanged += SetCAMFactorDirty;
+			m_CraftData.CADFactorChanged += SetCADFactorDirty;
+			m_ComputeRefCenterDir = geomData.RefCenterDir.MakeCopy();
+			geomData.CADFactorChanged += SetCADFactorDirty;
 		}
 
 		#region Computation Result
@@ -23,7 +25,10 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_IsCraftDataDirty ) {
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				else if( m_IsCAMFactorDirty ) {
 					BuildCAMPointList();
 				}
 				return m_CAMPointList;
@@ -34,7 +39,10 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_IsCraftDataDirty ) {
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				else if( m_IsCAMFactorDirty ) {
 					BuildCAMPointList();
 				}
 				return m_LeadInCAMPointList;
@@ -53,7 +61,10 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_IsCraftDataDirty ) {
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				else if( m_IsCAMFactorDirty ) {
 					BuildCAMPointList();
 				}
 				return m_OverCutCAMPointList;
@@ -64,7 +75,10 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_IsCraftDataDirty ) {
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				else if( m_IsCAMFactorDirty ) {
 					BuildCAMPointList();
 				}
 				return m_RefPoint;
@@ -75,6 +89,9 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
 				return m_MainPathCADPointList;
 			}
 		}
@@ -83,6 +100,9 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
 				return m_StartCADPointList;
 			}
 		}
@@ -91,6 +111,9 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
 				return m_MaxOverCutLength;
 			}
 		}
@@ -99,7 +122,32 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
 				return m_StartCAMPointList;
+			}
+		}
+
+		public gp_Ax3 RefCoord
+		{
+			get
+			{
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				return m_RefCoord;
+			}
+		}
+
+		public gp_Ax1 ComputeRefCenterDir
+		{
+			get
+			{
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				return m_ComputeRefCenterDir;
 			}
 		}
 
@@ -109,54 +157,58 @@ namespace MyCAM.PathCache
 
 		public void DoTransform( gp_Trsf transform )
 		{
-			foreach( CADPoint cadPoint in m_StartCADPointList ) {
-				cadPoint.Transform( transform );
-			}
-			foreach( CADPoint cadPoint in m_MainPathCADPointList ) {
-				cadPoint.Transform( transform );
-			}
-			m_RefCoord.Transform( transform );
-			BuildCAMPointList();
+			BuildCADCAMPointList();
 		}
 
 		#endregion
 
 		#region Protected Members
 
-		protected abstract void BuildCADPointList();
+		protected abstract void BuildCADCAMPointList();
 
 		protected abstract void BuildCAMPointList();
 
 		protected abstract List<CADPoint> Discretize();
 
-		protected void SetCraftDataDirty()
+		protected void SetCAMFactorDirty()
 		{
-			if( !m_IsCraftDataDirty ) {
-				m_IsCraftDataDirty = true;
+			if( !m_IsCAMFactorDirty ) {
+				m_IsCAMFactorDirty = true;
 			}
 		}
 
-		protected void ClearCraftDataDirty()
+		protected void ClearCAMFactorDirty()
 		{
-			m_IsCraftDataDirty = false;
+			m_IsCAMFactorDirty = false;
+		}
+
+		protected void SetCADFactorDirty()
+		{
+			if( !m_IsCADFactorDirty ) {
+				m_IsCADFactorDirty = true;
+			}
+		}
+
+		protected void ClearCADFactorDirty()
+		{
+			m_IsCADFactorDirty = false;
 		}
 
 		#endregion
 
 		#region Start Point Management
 
-
-		protected void SetStartPointList()
+		protected void SetStartPoint()
 		{
 			if( m_CraftData.StartPointIndex < 0 || m_CraftData.StartPointIndex >= m_StartCADPointList.Count ) {
 				return;
 			}
 
-			// rearrange start point list and build CAMPoint list
-			m_StartCAMPointList = ResortCAMPointList( m_StartCADPointList, m_CraftData.StartPointIndex );
+			List<CADPoint> resortedList = ResortCADPointList( m_StartCADPointList, m_CraftData.StartPointIndex );
+			m_StartCAMPointList = ConvertToCAMPoints( resortedList );
 		}
 
-		protected void SetMainPathCAMPoint()
+		protected void SetPathCAMPoint()
 		{
 			if( m_CraftData.StartPointIndex < 0 || m_CraftData.StartPointIndex >= m_StartCADPointList.Count ) {
 				return;
@@ -168,9 +220,8 @@ namespace MyCAM.PathCache
 				return;
 			}
 
-			// rearrange main path and build CAMPoint list
-			m_MainPathCADPointList = ResortList( m_MainPathCADPointList, mainPathIndex, m_CraftData.IsPathReverse );
-			m_CAMPointList = ConvertToCAMPointList( m_MainPathCADPointList );
+			List<CADPoint> resortedList = ResortCADPointList( m_MainPathCADPointList, mainPathIndex );
+			m_CAMPointList = ConvertToCAMPoints( resortedList );
 
 			// add closing point to main path (for closed loop)
 			if( m_CAMPointList.Count > 0 ) {
@@ -179,70 +230,53 @@ namespace MyCAM.PathCache
 			}
 		}
 
+		protected void SetRefCoordSelfRotated( double rotationAngle_deg )
+		{
+			const double ANGLE_TOLERANCE_DEG = 0.0001;
+			if( Math.Abs( rotationAngle_deg ) > ANGLE_TOLERANCE_DEG ) {
+				double rotationAngleInRadians = rotationAngle_deg * Math.PI / 180.0;
+				gp_Ax1 rotationAxis = new gp_Ax1( m_RefCoord.Location(), m_RefCoord.Direction() );
+				m_RefCoord.Rotate( rotationAxis, rotationAngleInRadians );
+			}
+		}
+
+		protected abstract void SetCenterDir();
+
 		#endregion
 
 		#region Helper Methods
 
-		List<CAMPoint> ResortCAMPointList( List<CADPoint> cadPointList, int startIndex )
+		List<CADPoint> ResortCADPointList( List<CADPoint> cadPointList, int startIndex )
 		{
 			if( cadPointList == null || cadPointList.Count == 0 ) {
-				return new List<CAMPoint>();
+				return new List<CADPoint>();
 			}
 
-			// calculate effective start index
 			int effectiveStartIndex = startIndex % cadPointList.Count;
 			if( effectiveStartIndex < 0 ) {
 				effectiveStartIndex += cadPointList.Count;
 			}
 
-			// build and rearrange in one pass
-			List<CAMPoint> camPointList = new List<CAMPoint>();
-
+			List<CADPoint> resortedList = new List<CADPoint>( cadPointList.Count );
 			for( int i = 0; i < cadPointList.Count; i++ ) {
 				int sourceIndex = ( i + effectiveStartIndex ) % cadPointList.Count;
-				camPointList.Add( new CAMPoint( cadPointList[ sourceIndex ] ) );
+				resortedList.Add( cadPointList[ sourceIndex ].Clone() );
 			}
-			return camPointList;
+			return resortedList;
 		}
 
-		List<CAMPoint> ConvertToCAMPointList( List<CADPoint> cadPointList )
+		List<CAMPoint> ConvertToCAMPoints( List<CADPoint> cadPointList )
 		{
+			if( cadPointList == null || cadPointList.Count == 0 ) {
+				return new List<CAMPoint>();
+			}
+
 			List<CAMPoint> camPointList = new List<CAMPoint>( cadPointList.Count );
 			foreach( CADPoint cadPoint in cadPointList ) {
-				camPointList.Add( new CAMPoint( cadPoint ) );
+				CADPoint point = cadPoint.Clone();
+				camPointList.Add( new CAMPoint( point ) );
 			}
 			return camPointList;
-		}
-
-		List<T> ResortList<T>( List<T> sourceList, int startIndex, bool isReverse )
-		{
-			if( sourceList == null || sourceList.Count == 0 ) {
-				return new List<T>();
-			}
-
-			if( startIndex < 0 || startIndex >= sourceList.Count ) {
-				return new List<T>( sourceList );
-			}
-
-			List<T> rearrangedList = new List<T>( sourceList.Count );
-			int count = sourceList.Count;
-
-			if( isReverse ) {
-				// reverse direction: go backwards from start index
-				for( int i = 0; i < count; i++ ) {
-					int index = ( startIndex - i + count ) % count;
-					rearrangedList.Add( sourceList[ index ] );
-				}
-			}
-			else {
-				// forward direction: go forwards from start index
-				for( int i = 0; i < count; i++ ) {
-					int index = ( startIndex + i ) % count;
-					rearrangedList.Add( sourceList[ index ] );
-				}
-			}
-
-			return rearrangedList;
 		}
 
 		int GetMainPathStartPointIndex( int startPointIndexInStartList )
@@ -254,7 +288,6 @@ namespace MyCAM.PathCache
 			CADPoint startPoint = m_StartCADPointList[ startPointIndexInStartList ];
 			const double TOLERANCE = 0.001;
 
-			// find matching point in MainPathCADPointList
 			for( int i = 0; i < m_MainPathCADPointList.Count; i++ ) {
 				double distSq = startPoint.Point.SquareDistance( m_MainPathCADPointList[ i ].Point );
 				if( distSq < TOLERANCE ) {
@@ -269,6 +302,7 @@ namespace MyCAM.PathCache
 		#region Protected Fields
 
 		protected gp_Ax3 m_RefCoord;
+		protected gp_Ax1 m_ComputeRefCenterDir;
 		protected List<CADPoint> m_MainPathCADPointList = new List<CADPoint>();
 		protected List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
 		protected List<CADPoint> m_StartCADPointList = new List<CADPoint>();
@@ -278,7 +312,8 @@ namespace MyCAM.PathCache
 		protected CraftData m_CraftData;
 		protected CAMPoint m_RefPoint;
 		protected double m_MaxOverCutLength;
-		protected bool m_IsCraftDataDirty = false;
+		protected bool m_IsCAMFactorDirty = false;
+		protected bool m_IsCADFactorDirty = false;
 
 		#endregion
 	}

@@ -7,7 +7,7 @@ namespace MyCAM.Helper
 {
 	public static class StdPatternHelper
 	{
-		public static gp_Ax3 GetPatternRefCoord( gp_Ax1 refCenterDir, bool isCoordinateReverse, double rotationAngle_deg )
+		public static gp_Ax3 GetPatternRefCoord( gp_Ax1 refCenterDir, bool isCoordinateReverse, double rotationAngle_deg = 0 )
 		{
 			gp_Pnt centerPoint = refCenterDir.Location();
 			gp_Dir normalDir = refCenterDir.Direction();

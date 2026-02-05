@@ -7,7 +7,7 @@ namespace MyCAM.Helper.CAM
 {
 	internal class StartPointHelper
 	{
-		public static List<CADPoint> EnsureStartPointsIncluded( List<CADPoint> discretizedPoints, List<CADPoint> startPoints, IStdPatternGeomData geomData )
+		public static List<CADPoint> EnsureStartPointsIncluded( gp_Ax3 coordinate, List<CADPoint> discretizedPoints, List<CADPoint> startPoints, IStdPatternGeomData geomData )
 		{
 			if( discretizedPoints == null || discretizedPoints.Count == 0 || startPoints == null || startPoints.Count == 0 || geomData == null ) {
 				return discretizedPoints;
@@ -17,7 +17,7 @@ namespace MyCAM.Helper.CAM
 
 			foreach( CADPoint startPoint in startPoints ) {
 				// find the insertion index for the start point
-				int nInsertIndex = FindInsertIndex( discretizedPoints, startPoint, geomData, POINT_MATCH_TOLERANCE, out bool isMatch );
+				int nInsertIndex = FindInsertIndex( coordinate, discretizedPoints, startPoint, geomData, POINT_MATCH_TOLERANCE, out bool isMatch );
 
 				if( isMatch ) {
 					// start point already exists, no need to insert
@@ -38,7 +38,7 @@ namespace MyCAM.Helper.CAM
 
 		#region Start Point Insertion Helper Methods
 
-		static int FindInsertIndex( List<CADPoint> discretizedPoints, CADPoint startPoint, IStdPatternGeomData geomData, double tolerance, out bool isMatch )
+		static int FindInsertIndex( gp_Ax3 coordinate, List<CADPoint> discretizedPoints, CADPoint startPoint, IStdPatternGeomData geomData, double tolerance, out bool isMatch )
 		{
 			isMatch = false;
 
@@ -57,22 +57,22 @@ namespace MyCAM.Helper.CAM
 
 			// circle uses angle-based insertion, others use segment projection
 			if( geomData.PathType == PathType.Circle && geomData is CircleGeomData circleData ) {
-				return GetIndexByAngle( discretizedPoints, startPoint, circleData );
+				return GetIndexByAngle( coordinate, discretizedPoints, startPoint, circleData );
 			}
 			else {
 				return GetIndexBySegmentProj( discretizedPoints, startPoint );
 			}
 		}
 
-		static int GetIndexByAngle( List<CADPoint> discretizedPoints, CADPoint startPoint, CircleGeomData circleData )
+		static int GetIndexByAngle( gp_Ax3 coordinate, List<CADPoint> discretizedPoints, CADPoint startPoint, CircleGeomData circleData )
 		{
 			if( circleData == null || discretizedPoints.Count == 0 ) {
 				return 0;
 			}
 
-			gp_Pnt center = circleData.RefCoord.Location();
-			gp_Dir xDir = circleData.RefCoord.XDirection();
-			gp_Dir yDir = circleData.RefCoord.YDirection();
+			gp_Pnt center = coordinate.Location();
+			gp_Dir xDir = coordinate.XDirection();
+			gp_Dir yDir = coordinate.YDirection();
 
 			double startAngle = CalculateAngle( center, startPoint.Point, xDir, yDir );
 

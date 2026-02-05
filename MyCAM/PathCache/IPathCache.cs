@@ -25,6 +25,16 @@ namespace MyCAM.PathCache
 		{
 			get;
 		}
+
+		gp_Ax3 RefCoord
+		{
+			get;
+		}
+
+		gp_Ax1 ComputeRefCenterDir
+		{
+			get;
+		}
 	}
 
 	public interface ITransformableCache

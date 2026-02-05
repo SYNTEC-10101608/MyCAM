@@ -7,7 +7,7 @@ namespace MyCAM.Helper
 {
 	internal static class StdPatternStartPointListFactory
 	{
-		public static List<CADPoint> GetStartPointList( IStdPatternGeomData geomData )
+		public static List<CADPoint> GetStartPointList( gp_Ax3 coordinate, IStdPatternGeomData geomData )
 		{
 			if( geomData == null ) {
 				throw new ArgumentNullException( nameof( geomData ) );
@@ -16,19 +16,19 @@ namespace MyCAM.Helper
 			List<CADPoint> startPointList;
 			switch( geomData.PathType ) {
 				case PathType.Circle:
-					startPointList = GetStartPointListTyped<CircleGeomData>( geomData, GetCircleStartPointList );
+					startPointList = GetStartPointListTyped<CircleGeomData>( coordinate, geomData, GetCircleStartPointList );
 					break;
 				case PathType.Rectangle:
-					startPointList = GetStartPointListTyped<RectangleGeomData>( geomData, GetRectangleStartPointList );
+					startPointList = GetStartPointListTyped<RectangleGeomData>( coordinate, geomData, GetRectangleStartPointList );
 					break;
 				case PathType.Runway:
-					startPointList = GetStartPointListTyped<RunwayGeomData>( geomData, GetRunwayStartPointList );
+					startPointList = GetStartPointListTyped<RunwayGeomData>( coordinate, geomData, GetRunwayStartPointList );
 					break;
 				case PathType.Triangle:
 				case PathType.Square:
 				case PathType.Pentagon:
 				case PathType.Hexagon:
-					startPointList = GetStartPointListTyped<PolygonGeomData>( geomData, GetPolygonStartPointList );
+					startPointList = GetStartPointListTyped<PolygonGeomData>( coordinate, geomData, GetPolygonStartPointList );
 					break;
 				default:
 					throw new ArgumentException( $"Unsupported geometry type: {geomData.PathType}" );
@@ -38,41 +38,41 @@ namespace MyCAM.Helper
 
 		#region Type-Safe Conversion Helper
 
-		static List<CADPoint> GetStartPointListTyped<TGeomData>( IStdPatternGeomData geomData, Func<TGeomData, List<CADPoint>> generator ) where TGeomData : class, IStdPatternGeomData
+		static List<CADPoint> GetStartPointListTyped<TGeomData>( gp_Ax3 coordinate, IStdPatternGeomData geomData, Func<gp_Ax3, TGeomData, List<CADPoint>> generator ) where TGeomData : class, IStdPatternGeomData
 		{
 			TGeomData typedData = geomData as TGeomData;
-			if( typedData == null ) {
+			if( typedData == null || coordinate == null ) {
 				throw new InvalidOperationException(
 					$"Geometry data type mismatch: expected {typeof( TGeomData ).Name} for PathType.{geomData.PathType}, but got {geomData.GetType().Name}"
 				);
 			}
-			return generator( typedData );
+			return generator( coordinate, typedData );
 		}
 
 		#endregion
 
 		#region Private Methods for Each Geometry Type
 
-		static List<CADPoint> GetCircleStartPointList( CircleGeomData circleData )
+		static List<CADPoint> GetCircleStartPointList( gp_Ax3 coordinate, CircleGeomData circleData )
 		{
 			double radius = circleData.Diameter / 2.0;
 
 			// calculate intersection point along X-axis direction
-			gp_Dir xDirection = circleData.RefCoord.XDirection();
+			gp_Dir xDirection = coordinate.XDirection();
 			gp_Vec radiusVector = new gp_Vec( xDirection.XYZ() * radius );
-			gp_Pnt intersectionPoint = circleData.RefCoord.Location().Translated( radiusVector );
+			gp_Pnt intersectionPoint = coordinate.Location().Translated( radiusVector );
 
 			// define vectors
-			gp_Dir normal = circleData.RefCoord.Direction();
+			gp_Dir normal = coordinate.Direction();
 			gp_Dir radialIn = xDirection.Reversed();
-			gp_Dir tangent = circleData.RefCoord.YDirection().Reversed();
+			gp_Dir tangent = coordinate.YDirection().Reversed();
 
 			CADPoint cadPoint = new CADPoint( intersectionPoint, normal, radialIn, tangent );
 
 			return new List<CADPoint> { cadPoint };
 		}
 
-		static List<CADPoint> GetRectangleStartPointList( RectangleGeomData rectData )
+		static List<CADPoint> GetRectangleStartPointList( gp_Ax3 coordinate, RectangleGeomData rectData )
 		{
 			double halfLength = rectData.Length / 2.0;
 			double halfWidth = rectData.Width / 2.0;
@@ -95,7 +95,7 @@ namespace MyCAM.Helper
 			gp_Dir local_N2_S_Neg = local_Y_pos;
 			gp_Dir local_Tan_S_Neg = local_X_neg;
 
-			gp_Trsf transformation = CreateCoordTransformation( rectData.RefCoord );
+			gp_Trsf transformation = CreateCoordTransformation( coordinate );
 
 			CADPoint cad_L_Pos = TransformCADPoint(
 				local_Pnt_L_Pos, local_N1_L_Pos, local_N2_L_Pos, local_Tan_L_Pos, transformation
@@ -108,7 +108,7 @@ namespace MyCAM.Helper
 			return new List<CADPoint> { cad_L_Pos, cad_S_Neg };
 		}
 
-		static List<CADPoint> GetRunwayStartPointList( RunwayGeomData runwayData )
+		static List<CADPoint> GetRunwayStartPointList( gp_Ax3 coordinate, RunwayGeomData runwayData )
 		{
 			double length = runwayData.Length;
 			double width = runwayData.Width;
@@ -134,7 +134,7 @@ namespace MyCAM.Helper
 			gp_Dir local_N2_BottomEdge = local_Y_pos;
 			gp_Dir local_Tan_BottomEdge = local_X_neg;
 
-			gp_Trsf transformation = CreateCoordTransformation( runwayData.RefCoord );
+			gp_Trsf transformation = CreateCoordTransformation( coordinate );
 
 			CADPoint cad_RightArc = TransformCADPoint(
 				local_Pnt_RightArc, local_N1_RightArc, local_N2_RightArc, local_Tan_RightArc, transformation
@@ -147,7 +147,7 @@ namespace MyCAM.Helper
 			return new List<CADPoint> { cad_RightArc, cad_BottomEdge };
 		}
 
-		static List<CADPoint> GetPolygonStartPointList( PolygonGeomData polygonData )
+		static List<CADPoint> GetPolygonStartPointList( gp_Ax3 coordinate, PolygonGeomData polygonData )
 		{
 			int sides = polygonData.Sides;
 			double sideLength = polygonData.SideLength;
@@ -161,7 +161,7 @@ namespace MyCAM.Helper
 			gp_Dir local_Z_pos = gp.DZ();
 
 			// create coordinate system transformation
-			gp_Trsf coordTransformation = CreateCoordTransformation( polygonData.RefCoord );
+			gp_Trsf coordTransformation = CreateCoordTransformation( coordinate );
 
 			// find the edge that intersects negative Y-axis
 			int startEdgeIndex = FindNegativeYAxisIntersectingEdge( sides, angleOffset, angleStep );

@@ -18,12 +18,12 @@ namespace MyCAM.PathCache
 			if( geomData.CADPointList.Count == 0 ) {
 				throw new ArgumentException( "ContourCache constructing argument empty cadPointList" );
 			}
-			m_CADPointList = geomData.CADPointList;
-			m_ConnectCADPointMap = geomData.ConnectPointMap;
+			m_ContourGeomData = geomData;
 			m_CraftData = craftData;
 			m_IsClose = geomData.IsClosed;
-			m_CraftData.ParameterChanged += SetCraftDataDirty;
-			BuildCAMPointList();
+			m_CraftData.CAMFactorChanged += SetCAMDataDirty;
+			m_CraftData.CADFactorChanged += SetCADDataDirty;
+			BuildCADCAMPointList();
 		}
 
 		#region computation result
@@ -32,7 +32,10 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_IsCraftDataDirty ) {
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				else if( m_IsCAMFactorDirty ) {
 					BuildCAMPointList();
 				}
 				return m_CAMPointList;
@@ -43,7 +46,7 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_IsCraftDataDirty ) {
+				if( m_IsCAMFactorDirty ) {
 					BuildCAMPointList();
 				}
 				return m_LeadInCAMPointList;
@@ -54,7 +57,7 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_IsCraftDataDirty ) {
+				if( m_IsCAMFactorDirty ) {
 					BuildCAMPointList();
 				}
 				return m_LeadOutCAMPointList;
@@ -65,7 +68,7 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_IsCraftDataDirty ) {
+				if( m_IsCAMFactorDirty ) {
 					BuildCAMPointList();
 				}
 				return m_OverCutPointList;
@@ -76,10 +79,43 @@ namespace MyCAM.PathCache
 		{
 			get
 			{
-				if( m_IsCraftDataDirty ) {
+				if( m_IsCAMFactorDirty ) {
 					BuildCAMPointList();
 				}
 				return m_CADToCAMIndexMap;
+			}
+		}
+
+		public gp_Ax3 RefCoord
+		{
+			get
+			{
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				return m_RefCoord;
+			}
+		}
+
+		public gp_Ax1 ComputeRefCenterDir
+		{
+			get
+			{
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				return m_ComputeRefCenterDir;
+			}
+		}
+
+		public List<CADPoint> TrsfCADPointList
+		{
+			get
+			{
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				return m_CADPointList;
 			}
 		}
 
@@ -89,13 +125,35 @@ namespace MyCAM.PathCache
 		// when the shape has tranform, need to call this to update the cache info
 		public void DoTransform( gp_Trsf trasform )
 		{
-			BuildCAMPointList();
+			BuildCADCAMPointList();
 		}
 		#endregion
 
+		void BuildCADCAMPointList()
+		{
+			m_IsCADFactorDirty = false;
+			SetCenterDir();
+			m_CADPointList = m_ContourGeomData.CADPointList.Select( p => p.Clone() ).ToList();
+			for( int i = 0; i < m_CADPointList.Count; i++ ) {
+				m_CADPointList[ i ].Transform( m_CraftData.CumulativeTrsfMatrix );
+			}
+
+			m_ConnectCADPointMap.Clear();
+			foreach( var kvp in m_ContourGeomData.ConnectPointMap ) {
+				CADPoint transformedKey = kvp.Key.Clone();
+				transformedKey.Transform( m_CraftData.CumulativeTrsfMatrix );
+				CADPoint transformedValue = kvp.Value.Clone();
+				transformedValue.Transform( m_CraftData.CumulativeTrsfMatrix );
+				m_ConnectCADPointMap.Add( transformedKey, transformedValue );
+			}
+
+			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, false );
+			BuildCAMPointList();
+		}
+
 		void BuildCAMPointList()
 		{
-			m_IsCraftDataDirty = false;
+			m_IsCAMFactorDirty = false;
 
 			// build initial CAM point list, not closed yet
 			m_CAMPointList = new List<CAMPoint>();
@@ -120,7 +178,7 @@ namespace MyCAM.PathCache
 			SetOrientation();
 
 			// create index map consider the start point and orientation
-			CraeteIndexMap();
+			CreateIndexMap();
 
 			// close the loop if is closed
 			if( m_IsClose && m_CAMPointList.Count > 0 ) {
@@ -154,7 +212,7 @@ namespace MyCAM.PathCache
 			m_LeadOutCAMPointList = leadOutPointList.Cast<CAMPoint>().ToList();
 		}
 
-		void CraeteIndexMap()
+		void CreateIndexMap()
 		{
 			m_CADToCAMIndexMap.Clear();
 			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
@@ -239,11 +297,23 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		void SetCraftDataDirty()
+		void SetCAMDataDirty()
 		{
-			if( !m_IsCraftDataDirty ) {
-				m_IsCraftDataDirty = true;
+			if( !m_IsCAMFactorDirty ) {
+				m_IsCAMFactorDirty = true;
 			}
+		}
+
+		void SetCADDataDirty()
+		{
+			if( !m_IsCADFactorDirty ) {
+				m_IsCADFactorDirty = true;
+			}
+		}
+
+		void SetCenterDir()
+		{
+			m_ComputeRefCenterDir = m_ContourGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
 		}
 
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
@@ -263,9 +333,13 @@ namespace MyCAM.PathCache
 		Dictionary<CADPoint, CADPoint> m_ConnectCADPointMap = new Dictionary<CADPoint, CADPoint>();
 
 		// flag to indicate craft data changed
-		bool m_IsCraftDataDirty = false;
+		bool m_IsCAMFactorDirty = false;
+		bool m_IsCADFactorDirty = false;
 		bool m_IsClose = false;
 
+		gp_Ax3 m_RefCoord = new gp_Ax3();
+		gp_Ax1 m_ComputeRefCenterDir = new gp_Ax1();
+		ContourGeomData m_ContourGeomData = null;
 		const int CLOSED_POINT_INDEX = -1;
 	}
 }
