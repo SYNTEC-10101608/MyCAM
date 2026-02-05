@@ -343,44 +343,6 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		bool CalABAngleToKeep( int nSelectIndex, out Tuple<double, double> abAngle_deg )
-		{
-			// get previous control point tool vector
-			gp_Dir assignDir = GetPreCtrlPntToolVec( m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsPathReverse, m_DataHandler.IsClosed() );
-			return CalculateABAngleToTarget( assignDir, out abAngle_deg );
-		}
-
-		bool CalABAngleToZDir( out Tuple<double, double> abAngle_deg )
-		{
-			gp_Dir assignDir = new gp_Dir( 0, 0, 1 );
-			return CalculateABAngleToTarget( assignDir, out abAngle_deg );
-		}
-
-		bool CalculateABAngleToTarget( gp_Dir assignDir, out Tuple<double, double> abAngle_deg )
-		{
-			if( m_SelectedPoint == null ) {
-				abAngle_deg = new Tuple<double, double>( 0, 0 );
-				return false;
-			}
-			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleFromToolVec( assignDir, m_SelectedPoint, out abAngle_deg );
-			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
-				return true;
-			}
-			if( calResult == ToolVecHelper.ECalAngleResult.TooLargeAngle ) {
-				MyApp.Logger.ShowOnLogPanel( "目標向量與原始向量夾角過大", MyApp.NoticeType.Warning, true );
-				return false;
-			}
-			return false;
-		}
-
-		gp_Dir GetPreCtrlPntToolVec( IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nTargetPntIdx, bool isPathReverse, bool isClosePath )
-		{
-			List<int> ctrlPntIndexList = toolVecModifyMap.Keys.ToList();
-			int preCtrlIndex = GetPreCtrlPntIndex( nTargetPntIdx, ctrlPntIndexList, isPathReverse, isClosePath );
-			ISetToolVecPoint preCtrlPoint = m_DataHandler.GetPointByCADIndex( preCtrlIndex );
-			return new gp_Dir( preCtrlPoint.ToolVec.XYZ() );
-		}
-
 		int GetPreCtrlPntIndex( int targetIndex, List<int> ctrlPntIndexList, bool isReverse, bool isClosePath )
 		{
 			// keep the list in order
