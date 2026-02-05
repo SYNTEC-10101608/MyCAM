@@ -264,16 +264,15 @@ namespace MyCAM.Post
 			// start with the initial tool direction
 			gp_Dir toolDir = new gp_Dir( m_ToolVec );
 
-			// for table type, rotations are reversed (left-hand rule)
-			// apply slave rotation (reversed)
-			gp_Trsf slaveTrsf = new gp_Trsf();
-			slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_SlaveRotateDir ), -slaveAngle );
-			toolDir.Transform( slaveTrsf );
-
 			// apply master rotation (reversed)
 			gp_Trsf masterTrsf = new gp_Trsf();
-			masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), -masterAngle );
+			masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), -masterAngle ); // left-hand rule
 			toolDir.Transform( masterTrsf );
+
+			// apply slave rotation (reversed)
+			gp_Trsf slaveTrsf = new gp_Trsf();
+			slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_SlaveRotateDir ), -slaveAngle ); // left-hand rule
+			toolDir.Transform( slaveTrsf );
 
 			return toolDir;
 		}
@@ -343,16 +342,15 @@ namespace MyCAM.Post
 			// start with the initial tool direction
 			gp_Dir toolDir = new gp_Dir( m_ToolVec );
 
-			// for mix type, slave uses left-hand rule (reversed)
-			// apply slave rotation (reversed)
-			gp_Trsf slaveTrsf = new gp_Trsf();
-			slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_SlaveRotateDir ), -slaveAngle );
-			toolDir.Transform( slaveTrsf );
-
-			// apply master rotation (right-hand)
+			// apply master rotation (reversed)
 			gp_Trsf masterTrsf = new gp_Trsf();
 			masterTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_MasterRotateDir ), masterAngle );
 			toolDir.Transform( masterTrsf );
+
+			// apply slave rotation (reversed)
+			gp_Trsf slaveTrsf = new gp_Trsf();
+			slaveTrsf.SetRotation( new gp_Ax1( new gp_Pnt(), m_SlaveRotateDir ), -slaveAngle ); // left-hand rule
+			toolDir.Transform( slaveTrsf );
 
 			return toolDir;
 		}
