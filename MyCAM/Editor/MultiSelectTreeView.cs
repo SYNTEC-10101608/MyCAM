@@ -16,6 +16,11 @@ namespace MyCAM.Editor
 		// event for selection changes
 		public event EventHandler SelectionChanged;
 
+		public bool isAllowMultiSelect
+		{
+			get; set;
+		} = true;
+
 		public MultiSelectTreeView()
 		{
 			// enable keyboard support
@@ -89,6 +94,9 @@ namespace MyCAM.Editor
 
 		public void SelectAll()
 		{
+			if (isAllowMultiSelect == false ) {
+				return;
+			}
 			ClearSelection();
 			foreach( TreeNode n in GetAllNodes( this.Nodes ) ) {
 				m_SelectedNodes.Add( n );
@@ -121,7 +129,7 @@ namespace MyCAM.Editor
 			bool ctrl = ( ModifierKeys & Keys.Control ) == Keys.Control;
 			bool shift = ( ModifierKeys & Keys.Shift ) == Keys.Shift;
 
-			if( !ctrl && !shift ) {
+			if( !ctrl && !shift || !isAllowMultiSelect ) {
 
 				// normal click: clear selection, select this node
 				ClearSelection();

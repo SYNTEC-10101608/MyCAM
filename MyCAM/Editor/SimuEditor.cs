@@ -2,6 +2,7 @@
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
+using MyCAM.Helper.Simulation;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.AIS;
@@ -12,7 +13,6 @@ using OCC.BRepPrimAPI;
 using OCC.gp;
 using OCC.Poly;
 using OCC.Quantity;
-using OCC.TColStd;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopLoc;
@@ -28,13 +28,24 @@ namespace MyCAM.Editor
 {
 	internal class SimuEditor : EditorBase
 	{
+		public Action<bool> ReadStlSuccess;
+
 		public SimuEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
-			m_MachineData = dataManager.MachineData;
+		}
+
+		public void Init()
+		{
+			m_MachineData = m_DataManager.MachineData;
 			m_PostSolver = new PostSolver( m_MachineData );
 			m_TraverseRender = new TraverseRenderer( m_Viewer, m_DataManager );
-			m_FCLTest = new CollisionSolver();
+			m_MachineRender = new MachineRender( m_Viewer, m_DataManager );
+			m_DefaultAction = new SelectPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+
+			// user change tree node will change which frame index to show
+			( m_DefaultAction as SelectPathAction ).SelectionChange += OnPathSelectionChange;
+			m_collisionEngine = new CollisionSolver();
 
 			// build chain list
 			m_ChainListMap.Clear();
@@ -43,40 +54,80 @@ namespace MyCAM.Editor
 			// all chain need to be build before workpiece chain
 			BuildChainList( m_SimulationTreeRoot, new List<MachineComponentType>() );
 			BuildWorkpieceChain();
+
+			// import machine stl
+			bool isImportSuccess = ImportMachine();
+			ReadStlSuccess?.Invoke( isImportSuccess );
+
+			// import false still can calculate FK
+			if( isImportSuccess == false ) {
+				MyApp.Logger.ShowOnLogPanel( "機構圖檔讀取失敗", MyApp.NoticeType.Warning );
+				return;
+			}
 		}
 
 		// simulation properties
 		MachineData m_MachineData;
 		PostSolver m_PostSolver;
-		CollisionSolver m_FCLTest;
+		CollisionSolver m_collisionEngine;
 		MachineTreeNode m_SimulationTreeRoot = null;
 
 		// read from machine data
 		HashSet<MachineComponentType> m_WorkPieceChainSet = new HashSet<MachineComponentType>();
 		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
-		Dictionary<MachineComponentType, List<AIS_InteractiveObject>> m_MachineShapeMap = new Dictionary<MachineComponentType, List<AIS_InteractiveObject>>();
 
 		// calculated result
 		Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 		Dictionary<MachineComponentType, List<bool>> m_FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
+		List<SimuData.ResultData.PathStartEndIndex> m_PathStartEndIndex = new List<SimuData.ResultData.PathStartEndIndex>();
+		List<bool> m_CollisionFrame = new List<bool>();
 
 		// frame control
 		const int INIT_FRAME_INDEX = 0;
 		const int INIT_FRAME_COUNT = 0;
+		const int INIT_PATH_INDEX = 0;
+		const int INIT_SPEED_LEVEL = 2;
 		int m_FrameCount = INIT_FRAME_COUNT;
 		int m_CurrentFrameIndex = INIT_FRAME_INDEX;
+		int m_CurrentPathValue;
 		bool m_IsNeedReCal = true;
 		Timer m_PlayTimer;
 
 		// machinal UI
-		MachineAppearance m_MachineAppearance;
 		bool m_IsImportMachine = false;
+		MachineMeshes m_MachineMeshes;
+		MachineAIS m_MachineAIS;
 
 		// been solved IK point
 		List<PostData> m_PostDataList = new List<PostData>();
 
-		// traverse show on viewer
+		// render
 		TraverseRenderer m_TraverseRender;
+		MachineRender m_MachineRender;
+
+		// speed should refer to which defined in SimuData
+		int m_SpeedLevel = INIT_SPEED_LEVEL;
+
+		// property for trigger change tree node highlight
+		int CurrentPath
+		{
+			get
+			{
+				return m_CurrentPathValue;
+			}
+			set
+			{
+				m_CurrentPathValue = value;
+				ChangeSelectTree();
+			}
+		}
+
+		enum SimuCalStatus
+		{
+			Faild,
+			FrameCalDone,
+			CollisionCalDone
+		}
 
 		// editor
 		public override EEditorType Type
@@ -89,19 +140,23 @@ namespace MyCAM.Editor
 
 		public override void EditStart()
 		{
-			ShowSpecificCAM();
+			base.EditStart();
+
+			// init tree
+			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
+			m_ViewManager.PathNode.ExpandAll();
+			if( m_TreeView is MultiSelectTreeView treeView ) {
+				treeView.isAllowMultiSelect = false;
+			}
+			ShowTraverse();
 
 			// set machineShapeBack
+			// show ais -> regist shape for collision
 			if( m_IsImportMachine ) {
-				ReShowMachine();
-				RegisterMeshForCollision();
-
-				// set map for workpieces, cause collision simulation need to refresh workpieces color
-				SetWorkPiecesMap();
-
-				// 這個步驟沒有導致畫布改變
-				RegisterWorkpieceForCollision();
-				m_Viewer.UpdateView();
+				BuildLaserAIS();
+				m_MachineRender.SetMachineAIS( m_MachineAIS );
+				m_MachineRender.Show( true );
+				RegisterAllSimuMemberForCollision();
 			}
 
 			// get post data
@@ -111,100 +166,214 @@ namespace MyCAM.Editor
 
 		public override void EditEnd()
 		{
+			StopSimulation();
 			ClearCash();
 			ResetUI();
+
+			// clear tree
+			m_TreeView.Nodes.Clear();
+			if( m_TreeView is MultiSelectTreeView treeView ) {
+				treeView.isAllowMultiSelect = true;
+			}
+			base.EditEnd();
 		}
 
-		public void ImportStl()
-		{
-			string szFolderName = string.Empty;
-			using( FolderBrowserDialog folderDialog = new FolderBrowserDialog() ) {
-				folderDialog.ShowNewFolderButton = false;
+		#region Play Simulation
 
-				// show folder dialog
-				if( folderDialog.ShowDialog() != DialogResult.OK ) {
+		public void PlayPrePath()
+		{
+			bool isRunning = m_PlayTimer.Enabled;
+			PauseSimulation();
+			CalSimulationResult();
+
+			// protection
+			if( m_FrameCount <= INIT_FRAME_INDEX ) {
+				return;
+			}
+			if( CurrentPath <= INIT_PATH_INDEX ) {
+				CurrentPath = INIT_PATH_INDEX;
+			}
+			else {
+
+				// change index to previous path start index
+				m_CurrentFrameIndex = m_PathStartEndIndex[ CurrentPath - 1 ].StartIndex;
+
+				// trigger tree select change
+				CurrentPath--;
+			}
+			if( isRunning == false ) {
+				RefreshFrame();
+				return;
+			}
+			Play();
+		}
+
+		public void PlayNextPath()
+		{
+			bool isRunning = m_PlayTimer.Enabled;
+			PauseSimulation();
+			CalSimulationResult();
+
+			// protection
+			if( m_FrameCount <= INIT_FRAME_INDEX ) {
+				return;
+			}
+			if( CurrentPath <= INIT_PATH_INDEX ) {
+				CurrentPath = INIT_PATH_INDEX;
+			}
+
+			// it is already last path
+			if( CurrentPath >= m_DataManager.PathIDList.Count - 1 ) {
+
+				// change index to last path start index
+				m_CurrentFrameIndex = m_PathStartEndIndex[ CurrentPath ].StartIndex;
+			}
+			else {
+				// change index to next path start index
+				m_CurrentFrameIndex = m_PathStartEndIndex[ CurrentPath + 1 ].StartIndex;
+
+				// trigger tree select change
+				CurrentPath++;
+			}
+			if( isRunning == false ) {
+				RefreshFrame();
+				return;
+			}
+			Play();
+		}
+
+		public void MoveToPreCollision()
+		{
+			// becaus if enable tree , the action of refresh tree will triger to select frist index of that path
+			PauseSimulation( false );
+
+			// if simulation result haven't been calculated
+			CalSimulationResult();
+			if( m_FrameCount <= INIT_FRAME_INDEX ) {
+				return;
+			}
+
+			// find the last collision before this point
+			for( int i = m_CurrentFrameIndex - 1; i >= 0; i-- ) {
+				if( m_CollisionFrame[ i ] ) {
+					m_CurrentFrameIndex = i;
+					RefreshFrame();
+					RefreshTree();
+					m_TreeView.Enabled = true;
 					return;
 				}
-
-				// get the folder name
-				szFolderName = folderDialog.SelectedPath;
 			}
-
-			// get the file name
-			if( string.IsNullOrEmpty( szFolderName ) ) {
-				return;
-			}
-
-			// remove old data
-			RemoveMachineShape();
-			m_MachineShapeMap.Clear();
-			m_IsNeedReCal = true;
-			m_IsImportMachine = false;
-
-			// show stl on viewer
-			bool isReadSuccess = ReadStlToShowOnViewer( szFolderName );
-			if( isReadSuccess == false ) {
-				return;
-			}
-			RegisterMeshForCollision();
-
-			// this step doesn't cause canvas change
-			RegisterWorkpieceForCollision();
-
-			// set map for workpieces, cause collision simulation need to refresh workpieces color
-			SetWorkPiecesMap();
-			m_IsImportMachine = true;
+			MyApp.Logger.ShowOnLogPanel( "已到達第一個碰撞點", MyApp.NoticeType.Hint );
+			m_TreeView.Enabled = true;
 		}
 
-		void BuildSimuData()
+		public void MoveToNextCollision()
 		{
-			if( m_FCLTest == null || m_PostSolver == null || m_PostSolver.G54Offset == null || m_DataManager.PathIDList == null || m_DataManager.PathIDList.Count == 0 ) {
+			// becaus if enable tree , the action of refresh tree will triger to select frist index of that path
+			PauseSimulation( false );
+
+			// if simulation result haven't been calculated
+			CalSimulationResult();
+			if( m_FrameCount <= INIT_FRAME_INDEX ) {
 				return;
 			}
-			if( m_IsImportMachine == false ) {
-				bool isSetSuccesss = GetDefaultStl();
-				if( isSetSuccesss == false ) {
+			for( int i = m_CurrentFrameIndex + 1; i < m_FrameCount; i++ ) {
+				if( m_CollisionFrame[ i ] ) {
+					m_CurrentFrameIndex = i;
+					RefreshFrame();
+					RefreshTree();
+					m_TreeView.Enabled = true;
 					return;
 				}
 			}
-
-			// need last path end point's vector to calculate exit pnt
-			IProcessPoint lastpathLastPoint = GetProcessEndPoint( m_DataManager.PathIDList.Last() );
-			SimulationRequiredData calNeedData = new SimulationRequiredData()
-			{
-				EachPathIKPostDataList = m_PostDataList,
-				LastPathLastPnt = lastpathLastPoint,
-				EntryAndExitData = m_DataManager.EntryAndExitData,
-				PostSolver = m_PostSolver,
-				WorkPiecesChaintSet = m_WorkPieceChainSet,
-				MachineData = m_MachineData,
-				ChainListMap = m_ChainListMap,
-				FCLTest = m_FCLTest,
-			};
-			bool bFrameCalDone = SimulationHelper.BuildSimuData( calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out int frameCount );
-			if( !bFrameCalDone ) {
-				MyApp.Logger.ShowOnLogPanel( "模擬資料建立失敗", MyApp.NoticeType.Warning );
-				return;
-			}
-			bool bCollisionCalDone = CollisionHelper.CalCollisionResult( frameCount, calNeedData, frameTransformMap, out Dictionary<MachineComponentType, List<bool>> frameCollisionMap );
-			if( !bCollisionCalDone ) {
-				MyApp.Logger.ShowOnLogPanel( "防碰撞資料建立失敗", MyApp.NoticeType.Warning );
-				return;
-			}
-			m_FrameCollisionMap = frameCollisionMap;
-			m_FrameTransformMap = frameTransformMap;
-			m_FrameCount = frameCount;
+			MyApp.Logger.ShowOnLogPanel( "已到達最後一個碰撞點", MyApp.NoticeType.Hint );
+			m_TreeView.Enabled = true;
 		}
 
-		void ClearCash()
+		public void SpeedUp()
 		{
-			m_IsNeedReCal = false;
-			m_FrameCount = INIT_FRAME_COUNT;
+			if( m_SpeedLevel < SimuData.SpeedData.SpeedRateSheet.Count - 1 ) {
+				m_SpeedLevel++;
+				if( m_PlayTimer != null ) {
+
+					// set new interval
+					m_PlayTimer.Interval = SimuData.SpeedData.SpeedRateSheet[ m_SpeedLevel ].Interval;
+				}
+			}
+		}
+
+		public void SlowDown()
+		{
+			if( m_SpeedLevel > 0 ) {
+				m_SpeedLevel--;
+				if( m_PlayTimer != null ) {
+					m_PlayTimer.Interval = SimuData.SpeedData.SpeedRateSheet[ m_SpeedLevel ].Interval;
+				}
+			}
+		}
+
+		public void PlaySimulation()
+		{
+			CalSimulationResult();
+			if( m_FrameCount <= INIT_FRAME_INDEX ) {
+				return;
+			}
+			Play();
+		}
+
+		public void CheckExitCollision()
+		{
+			PauseSimulation();
+			CalSimulationResult();
+			if( m_CollisionFrame != null && m_CollisionFrame.Count > 0 ) {
+				if( m_CollisionFrame.Contains( true ) ) {
+					MyApp.Logger.ShowOnLogPanel( "路徑有碰撞,請檢察模擬結果", MyApp.NoticeType.Warning, true );
+					return;
+				}
+				MyApp.Logger.ShowOnLogPanel( "路徑沒有碰撞", MyApp.NoticeType.Warning, true );
+			}
+		}
+
+		public void StopSimulation()
+		{
+			if( m_PlayTimer != null ) {
+				m_PlayTimer.Stop();
+			}
+			m_TreeView.Enabled = true;
 			m_CurrentFrameIndex = INIT_FRAME_INDEX;
-			foreach( var key in m_FrameTransformMap.Keys.ToList() ) {
-				m_FrameTransformMap[ key ].Clear();
+
+			// will trigger tree select change
+			CurrentPath = INIT_PATH_INDEX;
+			RefreshFrame();
+		}
+
+		public void PauseSimulation( bool enableTreeView = true )
+		{
+			if( m_PlayTimer != null ) {
+				m_PlayTimer.Stop();
+			}
+			if( enableTreeView ) {
+				m_TreeView.Enabled = true;
+			}
+			else {
+				m_TreeView.Enabled = false;
 			}
 		}
+
+
+		void Play()
+		{
+			// initialize timer
+			if( m_PlayTimer == null ) {
+				m_PlayTimer = new Timer();
+				m_PlayTimer.Tick += OnPlayTimerTick;
+			}
+			m_PlayTimer.Interval = SimuData.SpeedData.SpeedRateSheet[ m_SpeedLevel ].Interval;
+			m_PlayTimer.Start();
+			m_TreeView.Enabled = false;
+		}
+
+		#endregion
 
 		#region Init
 
@@ -252,118 +421,179 @@ namespace MyCAM.Editor
 
 		#endregion
 
-		#region UI Setting
+		#region Calculate Simulation Result
 
-		// for leaving simu editor
-		void ResetUI()
+		SimuCalStatus BuildSimuData( out SimuData.ResultData.SimuCalResult simuCalResult )
 		{
-			RemoveAllCAMData();
-			ResetAIS();
-			RemoveMachineShape();
-			m_MachineShapeMap.Clear();
+			simuCalResult = new SimuData.ResultData.SimuCalResult();
+
+			// get data to cal traverse path and all FK result
+			SimuData.RequiredData.SimuInputSet calNeedData = GetSimulationInputData();
+
+			// get frame transformation map
+			bool bFrameCalDone = SimulationHelper.BuildFrameTransMap( calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out List<SimuData.ResultData.PathStartEndIndex> pathStartEndIndexList, out int frameCount );
+			if( !bFrameCalDone ) {
+				return SimuCalStatus.Faild;
+			}
+
+			// record traf result
+			simuCalResult.FrameTrasfMap = frameTransformMap;
+			simuCalResult.FrameCount = frameCount;
+			simuCalResult.PathStartEndIdxList = pathStartEndIndexList;
+
+			// get collision result
+			bool bCollisionCalDone = CollisionHelper.CalCollisionResult( frameCount, calNeedData, frameTransformMap, out Dictionary<MachineComponentType, List<bool>> frameCollisionMap );
+			if( !bCollisionCalDone ) {
+				return SimuCalStatus.FrameCalDone; ;
+			}
+			simuCalResult.FrameCollisionMap = frameCollisionMap;
+			return SimuCalStatus.CollisionCalDone;
 		}
 
-		void RemoveAllCAMData()
+		SimuData.RequiredData.SimuInputSet GetSimulationInputData()
 		{
-			List<string> pathIDList = m_DataManager.PathIDList;
-			m_TraverseRender.Remove();
-			m_Viewer.UpdateView();
+			SimuData.RequiredData.SimuInputSet calNeedData = new SimuData.RequiredData.SimuInputSet();
+
+			// protection
+			if( m_DataManager == null || m_DataManager.PathIDList == null || m_DataManager.PathIDList.Count == 0 ) {
+				return calNeedData;
+			}
+
+			// need last path end point's vector to calculate exit pnt
+			IProcessPoint lastpathLastPoint = GetProcessEndPoint( m_DataManager.PathIDList.Last() );
+			calNeedData = new SimuData.RequiredData.SimuInputSet()
+			{
+				EachPathIKPostDataList = m_PostDataList,
+				LastPathLastPnt = lastpathLastPoint,
+				EntryAndExitData = m_DataManager.EntryAndExitData,
+				PostSolver = m_PostSolver,
+				WorkPiecesChaintSet = m_WorkPieceChainSet,
+				MachineData = m_MachineData,
+				ChainListMap = m_ChainListMap,
+				CollisionEngine = m_collisionEngine,
+			};
+			return calNeedData;
 		}
 
-		// transform AIS back as original
-		void ResetAIS()
+		IProcessPoint GetProcessEndPoint( string pathID )
 		{
-			if( m_Viewer == null || m_MachineShapeMap == null ) {
+			return CacheHelper.GetProcessEndPoint( pathID );
+		}
+
+		void RecordCollisionFrame()
+		{
+			if( m_FrameCollisionMap == null ) {
 				return;
 			}
-			foreach( KeyValuePair<MachineComponentType, List<AIS_InteractiveObject>> mapItem in m_MachineShapeMap ) {
-				MachineComponentType type = mapItem.Key;
-				List<AIS_InteractiveObject> aisList = mapItem.Value;
-				if( aisList == null ) {
-					continue;
-				}
-				foreach( AIS_InteractiveObject shape_AIS in aisList ) {
-					if( shape_AIS == null ) {
-						continue;
-					}
-					// transform back
-					shape_AIS.SetLocalTransformation( new gp_Trsf() );
-					if( type == MachineComponentType.WorkPiece ) {
-						shape_AIS.SetLocalTransformation( new gp_Trsf() );
-						shape_AIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY70 ) );
-						shape_AIS.Attributes().SetFaceBoundaryDraw( true );
-						shape_AIS.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
-						shape_AIS.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
-						shape_AIS.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
-						shape_AIS.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
-					}
-				}
-			}
-		}
+			// initialize list with false
+			m_CollisionFrame = Enumerable.Repeat( false, m_FrameCount ).ToList();
 
-		void RemoveMachineShape()
-		{
-			if( m_Viewer == null || m_MachineShapeMap == null ) {
-				return;
-			}
-			AIS_InteractiveContext aisContext = m_Viewer.GetAISContext();
-			foreach( var machinePart in m_MachineShapeMap ) {
+			// each component
+			foreach( KeyValuePair<MachineComponentType, List<bool>> collisionList in m_FrameCollisionMap ) {
+				if( collisionList.Value != null && collisionList.Value.Count > INIT_FRAME_COUNT && m_FrameCount == collisionList.Value.Count ) {
+					for( int i = 0; i < collisionList.Value.Count; i++ ) {
+						if( collisionList.Value[ i ] ) {
 
-				// workpiece still need to show on viewer
-				if( machinePart.Value != null && machinePart.Key != MachineComponentType.WorkPiece ) {
-					foreach( var machine_AIS in machinePart.Value ) {
-						if( machine_AIS != null ) {
-							aisContext.Remove( machine_AIS, false );
+							// if any component is collision in this frame, then this frame is collision frame
+							m_CollisionFrame[ i ] = true;
 						}
 					}
 				}
 			}
 		}
 
-		// helpers for multi-shape handling per component type
-		void AddMachineShapeToMap( MachineComponentType type, AIS_InteractiveObject machineAIS )
+		void ClearCash()
 		{
-			if( machineAIS == null ) {
+			m_IsNeedReCal = true;
+			m_FrameCount = INIT_FRAME_COUNT;
+			m_CurrentFrameIndex = INIT_FRAME_INDEX;
+			m_CollisionFrame.Clear();
+			m_PathStartEndIndex.Clear();
+			m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
+			m_FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
+		}
+
+		#endregion
+
+		#region UI Setting
+
+		// for leaving simu editor
+		void ResetUI()
+		{
+			RemoveAllCAMData();
+			ResetWorkPieceAIS();
+			m_MachineRender.Remove();
+			m_Viewer.UpdateView();
+		}
+
+		void RefreshTree()
+		{
+			int currentPathIndex = GetCurrentPathByframe();
+
+			// it will trigger tree select change
+			if( currentPathIndex < INIT_PATH_INDEX ) {
+				currentPathIndex = INIT_PATH_INDEX;
 				return;
 			}
-			if( !m_MachineShapeMap.ContainsKey( type ) ) {
-				m_MachineShapeMap[ type ] = new List<AIS_InteractiveObject>();
-			}
-			m_MachineShapeMap[ type ].Add( machineAIS );
+			CurrentPath = currentPathIndex;
 		}
 
-		void ApplyTransformToAll( MachineComponentType type, gp_Trsf trsf )
+		void RemoveAllCAMData()
 		{
-			foreach( var aisList in GetMachineShapes( type ) ) {
-				aisList?.SetLocalTransformation( trsf );
-			}
+			m_TraverseRender.Remove();
 		}
 
-		void ReShowMachine()
+		// transform AIS back to original
+		void ResetWorkPieceAIS()
 		{
-			ShowMachineAISOnViewer( m_MachineAppearance );
-			BuildLaserAIS();
-		}
-
-		void RegisterMeshForCollision()
-		{
-			if( m_MachineAppearance == null ) {
+			if( m_Viewer == null ) {
 				return;
 			}
-			foreach( var componentType in m_MachineAppearance.Meshes.Keys ) {
+			foreach( string ID in m_DataManager.PartIDList ) {
+				m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetLocalTransformation( new gp_Trsf() );
+				m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY70 ) );
+				m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().SetFaceBoundaryDraw( true );
+				m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+				m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
+				m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
+				m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
+			}
+		}
+
+		void RegisterAllSimuMemberForCollision()
+		{
+			RegisterMachineForCollision();
+			RegisterWorkpieceForCollision();
+		}
+
+		void RegisterMachineForCollision()
+		{
+			if( m_MachineMeshes == null ) {
+				return;
+			}
+			foreach( var componentType in m_MachineMeshes.Meshes.Keys ) {
 				if( componentType == MachineComponentType.UnKnow ) {
 					continue;
 				}
-				if( !m_MachineAppearance.Meshes.ContainsKey( componentType ) ) {
+				if( !m_MachineMeshes.Meshes.ContainsKey( componentType ) ) {
 					continue;
 				}
-				if( m_MachineAppearance.Meshes[ componentType ] == null ) {
+				if( m_MachineMeshes.Meshes[ componentType ] == null || m_MachineMeshes.Meshes[ componentType ].IsNull() ) {
 					continue;
 				}
-				Poly_Triangulation triangulation = m_MachineAppearance.Meshes[ componentType ];
+				Poly_Triangulation triangulation = m_MachineMeshes.Meshes[ componentType ];
 				MeshShape( triangulation, out List<double> vertexList, out List<int> indexList );
-				m_FCLTest.AddModel( componentType.ToString(), indexList.ToArray(), vertexList.ToArray() );
+				m_collisionEngine.AddModel( componentType.ToString(), indexList.ToArray(), vertexList.ToArray() );
 			}
+		}
+
+		void OnPathSelectionChange()
+		{
+			// is not triggered by simulation, because simulation will disable treeview
+			if( m_TreeView.Enabled == false ) {
+				return;
+			}
+			ChangeSimuPath();
 		}
 
 		void RegisterWorkpieceForCollision()
@@ -383,50 +613,13 @@ namespace MyCAM.Editor
 
 			// register to collision solver
 			MeshShape( workPiecesTrian, out List<double> vertexListWP, out List<int> indexListWP );
-			m_FCLTest.AddModel( MachineComponentType.WorkPiece.ToString(), indexListWP.ToArray(), vertexListWP.ToArray() );
+			m_collisionEngine.AddModel( MachineComponentType.WorkPiece.ToString(), indexListWP.ToArray(), vertexListWP.ToArray() );
 		}
 
-		void ShowTraverse( List<string> pathIDList )
+		void ShowTraverse()
 		{
 			m_TraverseRender.Show();
 			m_Viewer.UpdateView();
-		}
-
-		void ShowSpecificCAM()
-		{
-			// take all path IDs
-			List<string> pathIDList = m_DataManager.PathIDList;
-			ShowTraverse( pathIDList );
-		}
-
-		void ShowMachineAISOnViewer( MachineAppearance machineAppearance )
-		{
-			if( machineAppearance == null ) {
-				return;
-			}
-			foreach( var componentType in machineAppearance.AisObjects.Keys ) {
-				if( componentType == MachineComponentType.UnKnow ) {
-					continue;
-				}
-				if( !machineAppearance.AisObjects.ContainsKey( componentType ) ) {
-					continue;
-				}
-				if( machineAppearance.AisObjects[ componentType ] == null ) {
-					continue;
-				}
-				m_Viewer.GetAISContext().Display( machineAppearance.AisObjects[ componentType ], false );
-				AddMachineShapeToMap( componentType, machineAppearance.AisObjects[ componentType ] );
-			}
-		}
-
-		void SetWorkPiecesMap()
-		{
-			if( m_DataManager.PartIDList == null || m_DataManager.PartIDList.Count == 0 ) {
-				return;
-			}
-			foreach( var ID in m_DataManager.PartIDList ) {
-				AddMachineShapeToMap( MachineComponentType.WorkPiece, m_ViewManager.ViewObjectMap[ ID ].AISHandle as AIS_Shape );
-			}
 		}
 
 		void MeshShape( Poly_Triangulation tri, out List<double> vertexList, out List<int> indexList )
@@ -453,95 +646,89 @@ namespace MyCAM.Editor
 				indexList.Add( index2 - 1 );
 				indexList.Add( index3 - 1 );
 			}
-
 		}
 
-		bool BuildMergedTriangulation( List<AIS_Shape> aisShapes, out Poly_Triangulation merged, double deflection = 0.1 )
+		bool BuildMergedTriangulation( List<AIS_Shape> aisShapeList, out Poly_Triangulation merged, double deflection = 0.1 )
 		{
 			merged = new Poly_Triangulation();
-			if( aisShapes == null ) {
-				return false;
-			}
-			if( aisShapes.Count == 0 ) {
+			if( aisShapeList == null || aisShapeList.Count == 0 ) {
 				return false;
 			}
 
+			// all shape vertex ( world coordinates )
 			List<gp_Pnt> globalVertices = new List<gp_Pnt>();
 			List<Poly_Triangle> globalTriangles = new List<Poly_Triangle>();
 			int vertexOffset = 0;
 
-			foreach( AIS_Shape ais in aisShapes ) {
-				if( ais == null )
+			foreach( AIS_Shape ais in aisShapeList ) {
+				if( ais == null ) {
 					continue;
-
+				}
 				TopoDS_Shape shape = ais.Shape();
-				if( shape == null )
+				if( shape == null ) {
 					continue;
+				}
 
-				// Ensure triangulation
+				// ensure triangulation
 				new BRepMesh_IncrementalMesh( shape, deflection );
 
-				// Traverse faces
+				// get face ( Poly_Triangulation is on face)
 				for( TopExp_Explorer exp = new TopExp_Explorer( shape, TopAbs_ShapeEnum.TopAbs_FACE );
 					 exp.More();
 					 exp.Next() ) {
 					TopoDS_Face face = TopoDS.ToFace( exp.Current() );
 
-					TopLoc_Location loc = new TopLoc_Location();
-					Poly_Triangulation tri = BRep_Tool.Triangulation( face, ref loc );
+					// world coordinates
+					TopLoc_Location worldCoordinate = new TopLoc_Location();
 
-					if( tri == null || tri.IsNull() ) {
+					// is face local coordinates
+					Poly_Triangulation faceLocalTri = BRep_Tool.Triangulation( face, ref worldCoordinate );
+
+					if( faceLocalTri == null || faceLocalTri.IsNull() ) {
 						continue;
 					}
-
-					gp_Trsf trsf = loc.Transformation();
-					int nbNodes = tri.NbNodes();
+					gp_Trsf trsf = worldCoordinate.Transformation();
+					int nbNodes = faceLocalTri.NbNodes();
 					for( int i = 1; i <= nbNodes; i++ ) {
-						gp_Pnt p = tri.Node( i ).Transformed( trsf );
+						gp_Pnt p = faceLocalTri.Node( i ).Transformed( trsf );
 						globalVertices.Add( p );
 					}
-
-					int nbTriangles = tri.NbTriangles();
+					int nbTriangles = faceLocalTri.NbTriangles();
 					for( int i = 1; i <= nbTriangles; i++ ) {
-						Poly_Triangle t = tri.Triangle( i );
+						Poly_Triangle faceTriangle = faceLocalTri.Triangle( i );
 						int a = 0;
 						int b = 0;
 						int c = 0;
-						t.Get( ref a, ref b, ref c );
-
+						faceTriangle.Get( ref a, ref b, ref c );
 						globalTriangles.Add( new Poly_Triangle(
 							a + vertexOffset,
 							b + vertexOffset,
 							c + vertexOffset ) );
 					}
-
 					vertexOffset += nbNodes;
 				}
 			}
-
-			if( globalVertices.Count == 0 || globalTriangles.Count == 0 )
-				throw new InvalidOperationException( "No triangulation generated from AIS_Shapes." );
-
-			// -----------------------
-			// Build merged Poly_Triangulation
-			// -----------------------
+			if( globalVertices.Count == 0 || globalTriangles.Count == 0 ) {
+				merged = new Poly_Triangulation();
+				return false;
+			}
 			merged = new Poly_Triangulation(
 						globalVertices.Count,
 						globalTriangles.Count,
 						false // no UVs
 					);
 
-			// Set vertices
+			// set vertices
 			for( int i = 0; i < globalVertices.Count; i++ ) {
 				merged.SetNode( i + 1, globalVertices[ i ] ); // Node 1-based
 			}
 
-			// Set triangles
+			// set triangles
 			for( int i = 0; i < globalTriangles.Count; i++ ) {
 				merged.SetTriangle( i + 1, globalTriangles[ i ] ); // Triangle 1-based
 			}
 
-			// Optional: compute normals
+			// optional: compute normals
 			try {
 				merged.ComputeNormals();
 			}
@@ -551,6 +738,17 @@ namespace MyCAM.Editor
 			}
 
 			return true;
+		}
+
+		void ChangeSelectTree()
+		{
+			if( m_DefaultAction is SelectPathAction selectAction ) {
+				selectAction.ClearSelection();
+				if( CurrentPath < INIT_PATH_INDEX || CurrentPath >= m_DataManager.PathIDList.Count ) {
+					return;
+				}
+				selectAction.SelectPathByID( m_DataManager.PathIDList[ CurrentPath ] );
+			}
 		}
 
 		#endregion
@@ -563,87 +761,32 @@ namespace MyCAM.Editor
 				return;
 			}
 			if( m_CurrentFrameIndex < 0 ) {
-				m_CurrentFrameIndex = m_FrameCount - 1;
+				return;
 			}
 			if( m_CurrentFrameIndex >= m_FrameCount ) {
 				return;
 			}
-
-			// refresh position
-			ApplyTransformToAll( MachineComponentType.Laser, m_FrameTransformMap[ MachineComponentType.Laser ][ m_CurrentFrameIndex ] );
-			ApplyTransformToAll( MachineComponentType.Tool, m_FrameTransformMap[ MachineComponentType.Tool ][ m_CurrentFrameIndex ] );
-			ApplyTransformToAll( MachineComponentType.WorkPiece, m_FrameTransformMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ] );
-			ApplyTransformToAll( MachineComponentType.Slave, m_FrameTransformMap[ MachineComponentType.Slave ][ m_CurrentFrameIndex ] );
-			ApplyTransformToAll( MachineComponentType.Master, m_FrameTransformMap[ MachineComponentType.Master ][ m_CurrentFrameIndex ] );
+			m_MachineRender.TransAndSetColor( m_CurrentFrameIndex );
 
 			// traverse transformation is the same as workpiece
 			m_TraverseRender.Trans( m_FrameTransformMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ] );
-
-			// refresh color
-			RefreshComponentColor( MachineComponentType.Master );
-			RefreshComponentColor( MachineComponentType.Slave );
-			RefreshComponentColor( MachineComponentType.Tool );
-			RefrshWorkPieces();
+			RenderWorkPieces();
 			m_Viewer.UpdateView();
 		}
 
-		void RefreshComponentColor( MachineComponentType type )
+		void RenderWorkPieces()
 		{
-			bool isCollision = m_FrameCollisionMap[ type ][ m_CurrentFrameIndex ];
-			foreach( var obj in GetMachineShapes( type ) ) {
-				var tri = obj as AIS_Triangulation;
-				if( tri != null ) {
-					SetMeshColor( tri, type, isCollision );
-					m_Viewer.GetAISContext().Redisplay( tri, false );
-				}
-				else {
-					m_Viewer.GetAISContext().Redisplay( obj, false );
-				}
-			}
+			SetWorkPieceTransform();
+			SetWorkPiecesColor();
 		}
 
-		void SetMeshColor( AIS_Triangulation meshAIS, MachineComponentType type, bool isCollision )
+		void SetWorkPiecesColor()
 		{
-			// get color rgb
-			Quantity_Color color;
-			if( isCollision ) {
-				color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED );
+			if( m_FrameCollisionMap == null
+			|| m_FrameCollisionMap.ContainsKey( MachineComponentType.WorkPiece ) == false
+			|| m_CurrentFrameIndex >= m_FrameCollisionMap[ MachineComponentType.WorkPiece ].Count ) {
+				return;
 			}
-			else {
-				switch( type ) {
-					case MachineComponentType.XAxis:
-						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PINK );
-						break;
-					case MachineComponentType.YAxis:
-						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN );
-						break;
-					case MachineComponentType.ZAxis:
-						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE );
-						break;
-					case MachineComponentType.Master:
-						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_YELLOW );
-						break;
-					case MachineComponentType.Slave:
-						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE );
-						break;
-					default:
-						color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY );
-						break;
-				}
-			}
-			int R = (int)( color.Red() * 255 );
-			int G = (int)( color.Green() * 255 );
-			int B = (int)( color.Blue() * 255 );
-			int alpha = 255;
-			int colorValue = ( alpha << 24 ) | ( B << 16 ) | ( G << 8 ) | R;
-
-			// set mesh color
-			TColStd_HArray1OfInteger colorArray = new TColStd_HArray1OfInteger( 1, meshAIS.GetTriangulation().NbNodes(), colorValue );
-			meshAIS.SetColors( colorArray );
-		}
-
-		void RefrshWorkPieces()
-		{
 			bool isCollision = m_FrameCollisionMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ];
 			foreach( string ID in m_DataManager.PartIDList ) {
 				if( isCollision ) {
@@ -658,11 +801,24 @@ namespace MyCAM.Editor
 			}
 		}
 
+		void SetWorkPieceTransform()
+		{
+			if( m_FrameTransformMap == null
+			|| m_FrameTransformMap.ContainsKey( MachineComponentType.WorkPiece ) == false
+			|| m_CurrentFrameIndex >= m_FrameTransformMap[ MachineComponentType.WorkPiece ].Count ) {
+				return;
+			}
+			gp_Trsf trsf = m_FrameTransformMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ];
+			foreach( string ID in m_DataManager.PartIDList ) {
+				m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetLocalTransformation( trsf );
+			}
+		}
+
 		#endregion
 
 		#region Read Stl
 
-		bool ReadStlToShowOnViewer( string szFolderName )
+		bool ReadStlAndGetAIS( string szFolderName )
 		{
 			// input check
 			if( m_Viewer == null || m_ViewManager == null || m_DataManager == null ) {
@@ -672,20 +828,22 @@ namespace MyCAM.Editor
 			if( isReadOK == false ) {
 				return false;
 			}
-			ShowMachineAISOnViewer( m_MachineAppearance );
 			BuildLaserAIS();
-			m_Viewer.UpdateView();
 			return true;
 		}
 
 		bool ReadAllMachineStl( string szFolderName )
 		{
-
-			bool bLoadSuccess = MachineMeshToAISHelper.LoadMachineAppearance( szFolderName, out MachineAppearance machineAppearance );
-			if( bLoadSuccess == false ) {
+			bool isGetMesh = ReadMachineMeshHelper.LoadMachineMeshes( szFolderName, out MachineMeshes machineMeshes );
+			if( isGetMesh == false ) {
 				return false;
 			}
-			m_MachineAppearance = machineAppearance;
+			bool isGetMachineAis = MeshesToAISHelper.ConvertMeshesListToAIS( machineMeshes, out MachineAIS machineAppearance );
+			if( isGetMachineAis == false ) {
+				return false;
+			}
+			m_MachineMeshes = machineMeshes;
+			m_MachineAIS = machineAppearance;
 			return true;
 		}
 
@@ -694,52 +852,104 @@ namespace MyCAM.Editor
 			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 0.2, 1 );
 			BRepPrimAPI_MakeCylinder makeTool2 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -1 ), new gp_Dir( 0, 0, -1 ) ), 0.2, 1 );
 			BRepAlgoAPI_Fuse makeTool = new BRepAlgoAPI_Fuse( makeTool1.Shape(), makeTool2.Shape() );
-			AIS_Shape toolAIS = new AIS_Shape( makeTool.Shape() );
-			toolAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			toolAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
-			toolAIS.SetTransparency( 0.8f );
-			AddMachineShapeToMap( MachineComponentType.Laser, toolAIS );
-			m_Viewer.GetAISContext().Display( toolAIS, false );
+			AIS_Shape LaserAIS = new AIS_Shape( makeTool.Shape() );
+			LaserAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			LaserAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
+			LaserAIS.SetTransparency( 0.8f );
+			m_MachineAIS.AISList[ MachineComponentType.Laser ] = LaserAIS;
+			m_Viewer.GetAISContext().Display( LaserAIS, false );
 		}
 
 		#endregion
 
 		#region Play Simulation
 
-		public void PlaySimulation( int intervalMs = 5 )
+		int GetCurrentPathByframe()
 		{
-			if( m_IsNeedReCal ) {
-				ClearCash();
-				BuildSimuData();
-				m_IsNeedReCal = false;
-				m_CurrentFrameIndex = 0;
+			for( int i = 0; i < m_PathStartEndIndex.Count; i++ ) {
+				if( m_CurrentFrameIndex >= m_PathStartEndIndex[ i ].StartIndex && m_CurrentFrameIndex <= m_PathStartEndIndex[ i ].EndIndex ) {
+					return i;
+				}
 			}
+			return -1;
+		}
 
-			if( m_FrameCount <= 0 ) {
+		void ChangeSimuPath()
+		{
+			List<string> selectedIDs = m_DefaultAction.GetSelectedIDs();
+			if( selectedIDs == null || selectedIDs.Count != 1 ) {
 				return;
 			}
+			string selectedID = selectedIDs.First();
 
-			// initialize timer
-			if( m_PlayTimer == null ) {
-				m_PlayTimer = new Timer();
-				m_PlayTimer.Tick += OnPlayTimerTick;
+			for( int i = 0; i < m_DataManager.PathIDList.Count; i++ ) {
+				if( string.Equals( m_DataManager.PathIDList[ i ], selectedID, StringComparison.Ordinal ) ) {
+					m_CurrentFrameIndex = FindStartIndex( i );
+					break;
+				}
 			}
-			m_PlayTimer.Interval = intervalMs > 0 ? intervalMs : 300;
-			m_PlayTimer.Start();
 		}
 
-		public void StopSimulation()
+		int FindStartIndex( int pathIndex )
 		{
-			if( m_PlayTimer != null ) {
-				m_PlayTimer.Stop();
+			if( m_PathStartEndIndex == null ) {
+				return 0;
 			}
-			m_CurrentFrameIndex = 0;
+			if( pathIndex >= m_PathStartEndIndex.Count ) {
+				return 0;
+			}
+			return m_PathStartEndIndex[ pathIndex ].StartIndex;
 		}
 
-		public void PauseSimulation()
+		bool ImportMachine()
 		{
-			if( m_PlayTimer != null ) {
-				m_PlayTimer.Stop();
+			bool isSetSuccesss = GetDefaultStl();
+			if( isSetSuccesss == false ) {
+				m_IsImportMachine = false;
+				return false;
+			}
+
+			// set flag
+			m_IsImportMachine = true;
+			return true;
+		}
+
+		void CalSimulationResult()
+		{
+			if( m_DataManager == null || m_DataManager.PathIDList == null || m_DataManager.PathIDList.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "尚無路徑能夠參與模擬", MyApp.NoticeType.Hint );
+				return;
+			}
+			if( m_IsNeedReCal ) {
+				ClearCash();
+				SimuCalStatus status = BuildSimuData( out SimuData.ResultData.SimuCalResult simuCalResult );
+
+				// set result to m_
+				SetSimuResult( status, simuCalResult );
+
+				// after all data is ready
+				RecordCollisionFrame();
+				m_MachineRender.SetSimuData( m_FrameTransformMap, m_FrameCollisionMap );
+				m_IsNeedReCal = false;
+			}
+		}
+
+		void SetSimuResult( SimuCalStatus status, SimuData.ResultData.SimuCalResult simuCalResult )
+		{
+			if( status == SimuCalStatus.Faild ) {
+				MyApp.Logger.ShowOnLogPanel( "模擬計算失敗，請確認機台設定及路徑設定是否正確", MyApp.NoticeType.Warning );
+				return;
+			}
+			m_FrameTransformMap = simuCalResult.FrameTrasfMap ?? new Dictionary<MachineComponentType, List<gp_Trsf>>();
+			m_FrameCount = simuCalResult.FrameCount;
+			m_PathStartEndIndex = simuCalResult.PathStartEndIdxList ?? new List<SimuData.ResultData.PathStartEndIndex>();
+			if( status == SimuCalStatus.FrameCalDone ) {
+				MyApp.Logger.ShowOnLogPanel( "模擬計算完成，但碰撞計算失敗", MyApp.NoticeType.Warning );
+				return;
+			}
+			if( status == SimuCalStatus.CollisionCalDone ) {
+				m_FrameCollisionMap = simuCalResult.FrameCollisionMap;
+				return;
 			}
 		}
 
@@ -749,13 +959,46 @@ namespace MyCAM.Editor
 				StopSimulation();
 				return;
 			}
+			if( m_CurrentFrameIndex >= m_FrameCount - 1 ) {
+				StopSimulation();
+				return;
+			}
 
-			if( m_CurrentFrameIndex >= m_FrameCount ) {
+			// UI would not change anymore so no need to simu
+			if( m_IsImportMachine == false ) {
 				StopSimulation();
 				return;
 			}
 			RefreshFrame();
-			m_CurrentFrameIndex += 5;
+			CalNextFrameIndex();
+		}
+
+		void CalNextFrameIndex()
+		{
+			int nCurrentPathIndex = GetCurrentPathByframe();
+			int nNextFrameIndex = m_CurrentFrameIndex + SimuData.SpeedData.SpeedRateSheet[ m_SpeedLevel ].FrameIncrease >= m_FrameCount
+							? m_FrameCount - 1 // move too far
+							: m_CurrentFrameIndex + SimuData.SpeedData.SpeedRateSheet[ m_SpeedLevel ].FrameIncrease;
+			int lastCollisionIndex = nNextFrameIndex;
+
+			// get the last collision frame
+			for( int i = m_CurrentFrameIndex + 1; i <= nNextFrameIndex; i++ ) {
+				if( m_CollisionFrame[ i ] ) {
+					lastCollisionIndex = i;
+				}
+			}
+			if( lastCollisionIndex != nNextFrameIndex ) {
+				m_CurrentFrameIndex = lastCollisionIndex;
+			}
+			else {
+				m_CurrentFrameIndex = nNextFrameIndex;
+			}
+			int newPathIndex = GetCurrentPathByframe();
+			if( nCurrentPathIndex != newPathIndex ) {
+
+				// trigger tree select change
+				CurrentPath = newPathIndex;
+			}
 		}
 
 		#endregion
@@ -766,97 +1009,27 @@ namespace MyCAM.Editor
 		{
 			switch( m_MachineData.FiveAxisType ) {
 				case FiveAxisType.Table:
-					m_SimulationTreeRoot = BuildDefaultTableTree();
+					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultTableTreeDef );
 					break;
 				case FiveAxisType.Mix:
-					m_SimulationTreeRoot = BuildDefaultMIxTree();
+					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultMixTreeDef );
 					break;
 				case FiveAxisType.Spindle:
 				default:
-					m_SimulationTreeRoot = BuildDefaultSpindleTree();
+					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultSpindleTreeDef );
 					break;
 			}
 		}
 
-		MachineTreeNode BuildDefaultSpindleTree()
+		MachineTreeNode BuildTree( SimuData.TreeData.MachineTreeDef treeDefnition )
 		{
-			// build machine tree
-			MachineTreeNode BaseNode = new MachineTreeNode( MachineComponentType.Base );
-			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
-			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
-			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
-			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
-			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
-			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
-			MachineTreeNode LaserNode = new MachineTreeNode( MachineComponentType.Laser );
-			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-
-			// base node first child
-			BaseNode.AddChild( XNode );
-			XNode.AddChild( YNode );
-			YNode.AddChild( ZNode );
-			ZNode.AddChild( MasterNode );
-			MasterNode.AddChild( SlaveNode );
-			SlaveNode.AddChild( ToolNode );
-			ToolNode.AddChild( LaserNode );
-
-			// base node sceond child
-			BaseNode.AddChild( WorkPieceNode );
-			return BaseNode;
-		}
-
-		MachineTreeNode BuildDefaultTableTree()
-		{
-			// build machine tree
-			MachineTreeNode BaseNode = new MachineTreeNode( MachineComponentType.Base );
-			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
-			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
-			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
-			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
-			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
-			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
-			MachineTreeNode LaserNode = new MachineTreeNode( MachineComponentType.Laser );
-			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-
-			// base node first child
-			BaseNode.AddChild( MasterNode );
-			MasterNode.AddChild( SlaveNode );
-			SlaveNode.AddChild( WorkPieceNode );
-
-			// base node second child
-			BaseNode.AddChild( YNode );
-			YNode.AddChild( XNode );
-			XNode.AddChild( ZNode );
-			ZNode.AddChild( ToolNode );
-			ToolNode.AddChild( LaserNode );
-			return BaseNode;
-		}
-
-		MachineTreeNode BuildDefaultMIxTree()
-		{
-			// build machine tree
-			MachineTreeNode BaseNode = new MachineTreeNode( MachineComponentType.Base );
-			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
-			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
-			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
-			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
-			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
-			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
-			MachineTreeNode LaserNode = new MachineTreeNode( MachineComponentType.Laser );
-			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-
-			// base node first child
-			BaseNode.AddChild( SlaveNode );
-			SlaveNode.AddChild( WorkPieceNode );
-
-			// base node second child
-			BaseNode.AddChild( XNode );
-			XNode.AddChild( YNode );
-			YNode.AddChild( ZNode );
-			ZNode.AddChild( MasterNode );
-			MasterNode.AddChild( ToolNode );
-			ToolNode.AddChild( LaserNode );
-			return BaseNode;
+			MachineTreeNode baseNode = new MachineTreeNode( treeDefnition.Type );
+			if( treeDefnition.Children != null ) {
+				foreach( var child in treeDefnition.Children ) {
+					baseNode.AddChild( BuildTree( child ) );
+				}
+			}
+			return baseNode;
 		}
 
 		bool GetDefaultStl()
@@ -876,36 +1049,13 @@ namespace MyCAM.Editor
 					break;
 			}
 			// show stl on viewer
-			bool isReadSuccess = ReadStlToShowOnViewer( szFolderName );
+			bool isReadSuccess = ReadStlAndGetAIS( szFolderName );
 			if( isReadSuccess == false ) {
 				return false;
 			}
-			RegisterMeshForCollision();
-
-			// 這個步驟沒有導致畫布改變
-			RegisterWorkpieceForCollision();
-
-			// set map for workpieces, cause collision simulation need to refresh workpieces color
-			SetWorkPiecesMap();
-			m_IsNeedReCal = true;
-			m_IsImportMachine = true;
 			return true;
 		}
 
 		#endregion
-
-		IEnumerable<AIS_InteractiveObject> GetMachineShapes( MachineComponentType type )
-		{
-			if( m_MachineShapeMap.TryGetValue( type, out var list ) ) {
-				return list;
-			}
-			return Enumerable.Empty<AIS_InteractiveObject>();
-		}
-
-		// TODO: figure out
-		IProcessPoint GetProcessEndPoint( string pathID )
-		{
-			return CacheHelper.GetProcessEndPoint( pathID );
-		}
 	}
 }

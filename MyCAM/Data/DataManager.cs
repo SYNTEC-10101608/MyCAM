@@ -383,6 +383,21 @@ namespace MyCAM.Data
 
 		// machine data
 		MachineData m_MachineData = null;
+		readonly SpindleTypeMachineData m_DefaultMachineData = new SpindleTypeMachineData()
+		{
+			ToolDirection = ToolDirection.Z,
+			MasterRotaryAxis = RotaryAxis.Z,
+			SlaveRotaryAxis = RotaryAxis.X,
+			MasterRotaryDirection = RotaryDirection.RightHand,
+			SlaveRotaryDirection = RotaryDirection.LeftHand,
+			MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
+			SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
+			ToolLength = 2.0,
+			ToolToSlaveVec = new gp_Vec( -101.2, -0.19, 169.43 ),
+			SlaveToMasterVec = new gp_Vec( -151.5, 0.190, 193.550 ),
+		};
+
+		/*
 		readonly MixTypeMachineData m_DefaultMachineData = new MixTypeMachineData()
 		{
 			ToolDirection = ToolDirection.Z,
@@ -393,9 +408,10 @@ namespace MyCAM.Data
 			MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
 			SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
 			ToolLength = 2.0,
-			ToolToMasterVec = new gp_Vec( 0, 101.2, 169.48 ),
-			MCSToSlaveVec = new gp_Vec( 40.81, -384.80, -665.67 ),
+			ToolToMasterVec = new gp_Vec( -17.27, 104.2, 169.48 ),
+			MCSToSlaveVec = new gp_Vec( 0, 0, 0 ),
 		};
+		*/
 
 		// entry & exit data
 		EntryAndExitData m_EntryAndExitData = new EntryAndExitData();
