@@ -265,7 +265,7 @@ namespace MyCAM.Data
 		public void ClearToolVecModify()
 		{
 			m_ToolVecModifyMap.Clear();
-			ParameterChanged?.Invoke();
+			CAMFactorChanged?.Invoke();
 		}
 
 		void SubscribeSubParamChanged()
