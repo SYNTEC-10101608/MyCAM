@@ -32,11 +32,11 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			int nIndex = GetSelectIndex( out _ );
-			if( nIndex == -1 ) {
+			int? nIndex = GetSelectIndex( out _ );
+			if( nIndex == null ) {
 				return;
 			}
-			m_CraftData.StartPointIndex = nIndex;
+			m_CraftData.StartPointIndex = nIndex.Value;
 
 			// update coupler craft data
 			if( m_DataManager.ObjectMap[ m_PathID ] is StdPatternObjectBase stdPatternObject && stdPatternObject.GeomData != null ) {

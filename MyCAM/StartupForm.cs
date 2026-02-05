@@ -347,7 +347,7 @@ namespace MyCAM
 
 		void m_tsbFixedToolVec_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.SetInterpolateTypeAsFixedDir();
+			m_CAMEditor.SetFixedToolVec();
 		}
 
 		// sort

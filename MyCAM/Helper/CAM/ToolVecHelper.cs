@@ -23,9 +23,6 @@ namespace MyCAM.Helper
 			if( isClosed ) {
 				ArrageMapForClosedPath( ref toolVecModifyMap, toolVecPointList );
 			}
-			else {
-				ArrangeMapForOpenPath( ref toolVecModifyMap, toolVecPointList );
-			}
 
 			// mark the modified point
 			for( int i = 0; i < toolVecPointList.Count; i++ ) {
@@ -34,6 +31,7 @@ namespace MyCAM.Helper
 				}
 				toolVecPointList[ i ].IsToolVecModPoint = true;
 			}
+			AddStartAndEndIndex( ref toolVecModifyMap, toolVecPointList, isClosed );
 			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, interpolateType );
 		}
 
@@ -104,6 +102,37 @@ namespace MyCAM.Helper
 			return ECalAngleResult.Done;
 		}
 
+		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint )
+		{
+			double dM_In = toolVecPoint.ModMaster_rad;
+			double dS_In = toolVecPoint.ModSlave_rad;
+			return GetMSAngleFromToolVec( toolVec, dM_In, dS_In );
+		}
+
+		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, double dM_In, double dS_In )
+		{
+			// Get machine data
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
+
+			// Create PostSolver
+			PostSolver postSolver = new PostSolver( machineData );
+			IKSolveResult result = postSolver.SolveIK( toolVec, dM_In, dS_In, out double dMaster_rad, out double dSlave_rad );
+			if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
+			else if( result == IKSolveResult.OutOfRange ) {
+				// out of range, but still return the angles
+			}
+
+			// Convert radians to degrees
+			double dMaster_deg = dMaster_rad * 180.0 / Math.PI;
+			double dSlave_deg = dSlave_rad * 180.0 / Math.PI;
+
+			return new Tuple<double, double>( dMaster_deg, dSlave_deg );
+		}
+
 		public static Tuple<double, double> GetMSAngleFromABAngle( double dRA_deg, double dRB_deg, ISetToolVecPoint toolVecPoint )
 		{
 			// Convert A/B angles to tool vector
@@ -136,13 +165,15 @@ namespace MyCAM.Helper
 			if( toolVecModifyMap.Count == 0 ) {
 				return;
 			}
-			if( interpolateType == EToolVecInterpolateType.VectorInterpolation ) {
-				ApplyMSAngleInterpolation( ref toolVecPointList, toolVecModifyMap );
-				return;
+			if( interpolateType == EToolVecInterpolateType.Normal ) {
+				SolveAllPathIK( ref toolVecPointList, toolVecModifyMap );
 			}
-			if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
+			else if( interpolateType == EToolVecInterpolateType.VectorInterpolation ) {
+				ApplyMSAngleInterpolation( ref toolVecPointList, toolVecModifyMap );
+			}
+			else if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
 				ApplyTiltAngleInterpolation( ref toolVecPointList, toolVecModifyMap );
-				return;
+				SolveAllPathIK( ref toolVecPointList, toolVecModifyMap );
 			}
 		}
 
@@ -229,18 +260,13 @@ namespace MyCAM.Helper
 					dInterpRA_rad * Math.PI / 180,
 					dInterpRB_rad * Math.PI / 180 );
 
-				// get MS angles from tool vector
-				Tuple<double, double> msAngle_deg = GetMSAngleFromToolVec( ModifyVec, toolVecPointList[ i ] );
-
 				// set the modified data
 				toolVecPointList[ i ].ToolVec = ModifyVec;
-				toolVecPointList[ i ].ModMaster_rad = msAngle_deg.Item1 * Math.PI / 180.0;
-				toolVecPointList[ i ].ModSlave_rad = msAngle_deg.Item2 * Math.PI / 180.0;
 			}
 		}
 
 		static void InterpolateToolVecByMS( ref List<ISetToolVecPoint> toolVecPointList,
-				int nStartIndex, int nEndIndex, double dStartMaster_deg, double dStartSlave_deg, double dEndMaster_deg, double dEndSlave_deg )
+			int nStartIndex, int nEndIndex, double dStartMaster_deg, double dStartSlave_deg, double dEndMaster_deg, double dEndSlave_deg )
 		{
 			if( nEndIndex <= nStartIndex ) {
 				return;
@@ -330,31 +356,143 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint )
+		static void SolveAllPathIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
 		{
 			// Get machine data
 			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
-				return new Tuple<double, double>( 0, 0 );
+				return;
 			}
 
 			// Create PostSolver
 			PostSolver postSolver = new PostSolver( machineData );
-			double dM_In = toolVecPoint.InitMaster_rad;
-			double dS_In = toolVecPoint.InitSlave_rad;
-			IKSolveResult result = postSolver.SolveIK( toolVec, dM_In, dS_In, out double dMaster_rad, out double dSlave_rad );
+			double dM = toolVecModifyMap[ 0 ].Master_deg * Math.PI / 180.0;
+			double dS = toolVecModifyMap[ 0 ].Slave_deg * Math.PI / 180.0;
 
-			if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution ) {
-				return new Tuple<double, double>( 0, 0 );
+			// sigularity tag list
+			List<bool> singularTagList = new List<bool>();
+			for( int i = 0; i < toolVecPointList.Count; i++ ) {
+				IKSolveResult result = postSolver.SolveIK( toolVecPointList[ i ].ToolVec, dM, dS, out dM, out dS );
+				if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution ) {
+					continue;
+				}
+				else if( result == IKSolveResult.OutOfRange ) {
+					// out of range, but still set the angles
+				}
+
+				// check singularity
+				if( result == IKSolveResult.MasterInfinityOfSolution || result == IKSolveResult.SlaveInfinityOfSolution ) {
+					singularTagList.Add( true );
+				}
+				else {
+					singularTagList.Add( false );
+				}
+				toolVecPointList[ i ].ModMaster_rad = dM;
+				toolVecPointList[ i ].ModSlave_rad = dS;
 			}
-			else if( result == IKSolveResult.OutOfRange ) {
-				// out of range, but still return the angles
+
+			// filter singular points and apply results directly to toolVecPointList
+			bool bFilterMaster = machineData.FiveAxisType == FiveAxisType.Spindle; // which axis is going to filter
+			FilterSingularPoints( ref toolVecPointList, singularTagList, bFilterMaster );
+		}
+
+		static void FilterSingularPoints( ref List<ISetToolVecPoint> pointList, List<bool> singularTagList, bool bFilterMaster )
+		{
+			const int FIRST_INDEX = 0;
+			if( pointList == null || singularTagList == null ||
+				pointList.Count == 0 || pointList.Count != singularTagList.Count ) {
+				return;
 			}
+			int nPathPntCount = singularTagList.Count;
+			int i = 0;
 
-			// Convert radians to degrees
-			double dMaster_deg = dMaster_rad * 180.0 / Math.PI;
-			double dSlave_deg = dSlave_rad * 180.0 / Math.PI;
+			// find singular regions and interpolate
+			while( i < nPathPntCount ) {
 
-			return new Tuple<double, double>( dMaster_deg, dSlave_deg );
+				// skip non-singular points or points with IsToolVecModPoint == true
+				if( !singularTagList[ i ] || pointList[ i ].IsToolVecModPoint ) {
+					i++;
+					continue;
+				}
+
+				// found a singular point, find the range [regionStart, regionEnd]
+				int regionStart = i;
+				int regionEnd = i;
+
+				// extend to find the complete singular region (singular and not IsToolVecModPoint)
+				// 1. did not exceed the last point
+				// 2. is singular point
+				// 3. is not IsToolVecModPoint
+				while( regionEnd < nPathPntCount && singularTagList[ regionEnd ] && !pointList[ regionEnd ].IsToolVecModPoint ) {
+					regionEnd++;
+				}
+				regionEnd--; // back to last singular point
+
+				// determine start values for interpolation
+				double startM, startS;
+				if( regionStart == FIRST_INDEX ) {
+					// rule 3: if first point is singular, use its value
+					startM = pointList[ FIRST_INDEX ].ModMaster_rad;
+					startS = pointList[ FIRST_INDEX ].ModSlave_rad;
+				}
+				else {
+					// use n-1 value
+					startM = pointList[ regionStart - 1 ].ModMaster_rad;
+					startS = pointList[ regionStart - 1 ].ModSlave_rad;
+				}
+
+				// determine end values for interpolation
+				double endM, endS;
+				if( regionEnd == nPathPntCount - 1 ) {
+					// rule 4: if last point is singular, use its value
+					endM = pointList[ nPathPntCount - 1 ].ModMaster_rad;
+					endS = pointList[ nPathPntCount - 1 ].ModSlave_rad;
+				}
+				else {
+					// use m+1 value
+					endM = pointList[ regionEnd + 1 ].ModMaster_rad;
+					endS = pointList[ regionEnd + 1 ].ModSlave_rad;
+				}
+
+				// calculate cumulative path lengths for interpolation
+				List<double> cumulativeLength = new List<double>();
+				double totalLength = 0.0;
+				for( int j = regionStart; j <= regionEnd; j++ ) {
+
+					// first singular pnt is start point && this point is interpolation pnt
+					if( j == FIRST_INDEX ) {
+						cumulativeLength.Add( 0.0 );
+					}
+					else {
+						gp_Pnt p1 = pointList[ j - 1 ].Point;
+						gp_Pnt p2 = pointList[ j ].Point;
+						double segmentLength = p1.Distance( p2 );
+						totalLength += segmentLength;
+						cumulativeLength.Add( totalLength );
+					}
+				}
+
+				// regionEnd is not the last point of this path
+				if( regionEnd != nPathPntCount - 1 ) {
+					gp_Pnt p1 = pointList[ regionEnd ].Point;
+					gp_Pnt p2 = pointList[ regionEnd + 1 ].Point;
+					double segmentLength = p1.Distance( p2 );
+					totalLength += segmentLength;
+				}
+
+				// linear interpolation along path length and apply directly to pointList
+				for( int j = regionStart; j <= regionEnd; j++ ) {
+					double t = ( totalLength > GEOM_TOLERANCE ) ? ( cumulativeLength[ j - regionStart ] / totalLength ) : 0.0;
+					double interpolatedM = startM + t * ( endM - startM );
+					double interpolatedS = startS + t * ( endS - startS );
+
+					// interpolate the axis with infinity solution only
+					pointList[ j ].ModMaster_rad = bFilterMaster ? interpolatedM : pointList[ j ].ModMaster_rad;
+					pointList[ j ].ModSlave_rad = bFilterMaster ? pointList[ j ].ModSlave_rad : interpolatedS;
+				}
+
+				// move to next region
+				i = regionEnd + 1;
+			}
 		}
 
 		static gp_Dir ConvertMSAngleToToolVec( double dMaster_deg, double dSlave_deg )
@@ -411,49 +549,27 @@ namespace MyCAM.Helper
 
 		static void ArrageMapForClosedPath( ref Dictionary<int, ToolVecModifyData> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList )
 		{
-			// when we dont have both 0 and CLOSED_POINT_INDEX, we add them in
-			if( !toolVecModifyMap.ContainsKey( 0 ) && !toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) ) {
-				toolVecModifyMap[ 0 ] = new ToolVecModifyData()
-				{
-					RA_deg = 0,
-					RB_deg = 0,
-					Master_deg = toolVecPointList[ 0 ].InitMaster_rad * 180.0 / Math.PI,
-					Slave_deg = toolVecPointList[ 0 ].InitSlave_rad * 180.0 / Math.PI
-				};
-				toolVecModifyMap[ CLOSED_POINT_INDEX ] = new ToolVecModifyData()
-				{
-					RA_deg = 0,
-					RB_deg = 0,
-					Master_deg = toolVecPointList[ toolVecPointList.Count - 1 ].InitMaster_rad * 180.0 / Math.PI,
-					Slave_deg = toolVecPointList[ toolVecPointList.Count - 1 ].InitSlave_rad * 180.0 / Math.PI
-				};
+			if( !toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) ) {
+				return;
 			}
 
-			// when we have only CLOSED_POINT_INDEX, we copy it to index 0
-			else if( toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) && !toolVecModifyMap.ContainsKey( 0 ) ) {
-				toolVecModifyMap[ 0 ] = toolVecModifyMap[ CLOSED_POINT_INDEX ].Clone();
-			}
-
-			// when we have only 0, we copy it to index CLOSED_POINT_INDEX
-			else if( !toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) && toolVecModifyMap.ContainsKey( 0 ) ) {
-				toolVecModifyMap[ CLOSED_POINT_INDEX ] = toolVecModifyMap[ 0 ].Clone();
-			}
-
-			// both 0 and CLOSED_POINT_INDEX exist
-			else {
-				// do nothing
-			}
-
-			// reset CLOSED_POINT_INDEX
+			// reset CLOSED_POINT_INDEX to last index
 			ToolVecModifyData closedPointData = toolVecModifyMap[ CLOSED_POINT_INDEX ];
 			toolVecModifyMap.Remove( CLOSED_POINT_INDEX );
 			toolVecModifyMap[ toolVecPointList.Count - 1 ] = closedPointData;
 		}
 
-		static void ArrangeMapForOpenPath( ref Dictionary<int, ToolVecModifyData> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList )
+		static void AddStartAndEndIndex( ref Dictionary<int, ToolVecModifyData> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList, bool isClosed )
 		{
 			// add index 0 if not exist
+			int lastIndex = toolVecPointList.Count - 1;
 			if( !toolVecModifyMap.ContainsKey( 0 ) ) {
+
+				// if close and last index exist, copy the data
+				if( isClosed && toolVecModifyMap.ContainsKey( lastIndex ) ) {
+					toolVecModifyMap[ 0 ] = toolVecModifyMap[ lastIndex ].Clone();
+					return;
+				}
 				toolVecModifyMap[ 0 ] = new ToolVecModifyData()
 				{
 					RA_deg = 0,
@@ -464,8 +580,13 @@ namespace MyCAM.Helper
 			}
 
 			// add index last if not exist
-			int lastIndex = toolVecPointList.Count - 1;
 			if( !toolVecModifyMap.ContainsKey( lastIndex ) ) {
+
+				// if close and index 0 exist, copy the data
+				if( isClosed && toolVecModifyMap.ContainsKey( 0 ) ) {
+					toolVecModifyMap[ lastIndex ] = toolVecModifyMap[ 0 ].Clone();
+					return;
+				}
 				toolVecModifyMap[ lastIndex ] = new ToolVecModifyData()
 				{
 					RA_deg = 0,
@@ -480,6 +601,7 @@ namespace MyCAM.Helper
 		const double BIG_AB_ANGLE = 999.0;
 		const double PROJECT_TOLERANCE = 1e-3;
 		const double RADIUS_TOLERANCE = 1e-3;
+		const double GEOM_TOLERANCE = 1e-3;
 
 		const int CLOSED_POINT_INDEX = -1;
 

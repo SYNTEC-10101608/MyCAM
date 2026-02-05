@@ -25,6 +25,7 @@ namespace MyCAM.Editor
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
 				throw new ArgumentException( "Cannot get CraftData by pathID: " + pathID );
 			}
+			m_RotaryAxisConfig = CreateRotaryAxisConfig();
 			m_DataHandler = new ToolVecActionDataHandler( pathID );
 			m_PathIDList = new List<string>() { pathID };
 		}
@@ -40,6 +41,40 @@ namespace MyCAM.Editor
 		public Action<List<string>> PropertyChanged;
 		public Action<EActionStatus> RaiseEditingToolVecDlg;
 
+		public override void Start()
+		{
+			base.Start();
+
+			// init global param
+			m_InterpolateType = m_CraftData.InterpolateType;
+
+			// init index param
+			m_nSelectIndex = NULL_SELECT_INDEX;
+			m_SelectedPoint = null;
+			m_ToolVecParam = null;
+
+			// init dialog
+			m_ToolVecDlg = new ToolVectorDlg( m_CraftData.InterpolateType, m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );
+			m_ToolVecDlg.SetKeep += () => OnSetKeep();
+			m_ToolVecDlg.SetZdir += () => OnSetZDir();
+			m_ToolVecDlg.SetRevert += () => OnSetRevert();
+			m_ToolVecDlg.ABAngleChanged = ( angleA, angleB ) => OnABAngleChanged( angleA, angleB );
+			m_ToolVecDlg.MSAngleChanged = ( master, slave ) => OnMSAngleChanged( master, slave );
+			m_ToolVecDlg.TypeChanged += ( type ) => OnTypeChanged( type );
+			m_ToolVecDlg.AddEditIndex += () => OnAddEditIndex();
+			m_ToolVecDlg.RemoveEditIndex += () => OnRemoveEditIndex();
+			m_ToolVecDlg.SwitchStartEnd += () => OnSwitchStartEnd();
+			m_ToolVecDlg.EnableStartEndSwitch( false );
+			m_ToolVecDlg.Cancel += End;
+			m_ToolVecDlg.Show( MyApp.MainForm );
+		}
+
+		public override void End()
+		{
+			UnlockSelectedVertexHighLight();
+			base.End();
+		}
+
 		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
 			// editing tool vector, do not allow other operation
@@ -49,32 +84,15 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			int nIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
-			if( nIndex == DEFAULT_SELECT_INDEX ) {
-				return;
-			}
+			UnlockSelectedVertexHighLight();
 
-			// modify tool vector
-			bool isModified = m_DataHandler.GetToolVecModify( nIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
-			ToolVecParam toolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, master_deg, slave_deg, m_CraftData.InterpolateType );
+			// update select index
+			int? _nSelectIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
+			int nSelectIndex = _nSelectIndex ?? NULL_SELECT_INDEX;
 
-			// back up old data
-			m_BackupToolVecParam = new ToolVecParam( isModified, angleA_deg, angleB_deg, master_deg, slave_deg, m_CraftData.InterpolateType );
-			ToolVectorDlg toolVecForm = new ToolVectorDlg( toolVecParam, m_CraftData.IsPathReverse );
-			toolVecForm.RaiseKeep += () => SetToolVecOfKeep( nIndex, toolVecForm );
-			toolVecForm.RaiseZDir += () => SetToolVecOfZDir( nIndex, toolVecForm );
-			toolVecForm.RaiseCalculateMSAngleFromABAngle = ( angleA, angleB ) => CalculateMSAngleFromABAngle( nIndex, angleA, angleB );
-			toolVecForm.RaiseCalculateABAngleFromMSAngle = ( master, slave ) => CalculateABAngleFromMSAngle( nIndex, master, slave );
-			toolVecForm.Preview += ( ToolVec ) => SetToolVecParamAndPeview( nIndex, ToolVec );
-			toolVecForm.Confirm += ( ToolVec ) => ConfirmSetting( nIndex, ToolVec );
-			toolVecForm.Cancel += () => CancelSetting( nIndex );
-
-			// when editing a point lock the main form
-			RaiseEditingToolVecDlg?.Invoke( EActionStatus.Start );
-
-			// when editing a point, cannot select other points but still show selected point
+			// lock selected vertex high light
 			LockSelectedVertexHighLight( selectedVertex );
-			toolVecForm.Show( MyApp.MainForm );
+			OnSelectedIndexChanged( nSelectIndex );
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
@@ -88,6 +106,30 @@ namespace MyCAM.Editor
 			}
 		}
 
+		void OnSelectedIndexChanged( int nSelectIndex )
+		{
+			m_nSelectIndex = nSelectIndex;
+
+			// no select
+			if( nSelectIndex == NULL_SELECT_INDEX ) {
+				m_SelectedPoint = null;
+				m_ToolVecParam = null;
+				m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
+			}
+
+			// with select
+			else {
+				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
+				bool isModified = m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
+				m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModified );
+
+				// update dialog
+				m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
+				m_ToolVecDlg.EnableStartEndSwitch( ( m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() || m_nSelectIndex == CLOSED_POINT_INDEX )
+													&& m_DataHandler.IsClosed() );
+			}
+		}
+
 		void LockSelectedVertexHighLight( TopoDS_Shape selectedVertex )
 		{
 			if( selectedVertex == null || selectedVertex.IsNull() ) {
@@ -96,7 +138,6 @@ namespace MyCAM.Editor
 
 			// show selected vertex on viewer, because pause select mode woud clear select
 			DrawVertexOnViewer( selectedVertex );
-			Pause();
 		}
 
 		void UnlockSelectedVertexHighLight()
@@ -108,27 +149,6 @@ namespace MyCAM.Editor
 				m_Viewer.GetAISContext().Remove( m_KeepedHighLightPoint, true );
 				m_KeepedHighLightPoint = null;
 			}
-			Resume();
-		}
-
-		void SetToolVecDone()
-		{
-			// unlock main form
-			RaiseEditingToolVecDlg?.Invoke( EActionStatus.End );
-
-			// unlock viewer
-			UnlockSelectedVertexHighLight();
-			PropertyChanged?.Invoke( m_PathIDList );
-		}
-
-		void SetInterpolateType( ToolVecParam toolVecParam )
-		{
-			m_CraftData.InterpolateType = toolVecParam.InterpolateType;
-		}
-
-		void SetABAngle( int VecIndex, ToolVecParam toolVecParam )
-		{
-			m_CraftData.SetToolVecModify( VecIndex, toolVecParam.AngleA_deg, toolVecParam.AngleB_deg, toolVecParam.Master_deg, toolVecParam.Slave_deg );
 		}
 
 		void DrawVertexOnViewer( TopoDS_Shape selectedVertex )
@@ -151,175 +171,267 @@ namespace MyCAM.Editor
 			}
 		}
 
-		bool CalABAngleToKeep( int nSelectIndex, out Tuple<double, double> abAngle_deg )
+		// dialog event
+		void OnSetRevert()
 		{
-			// get this modify point cam point
-			ISetToolVecPoint pointToModify = m_DataHandler.GetPointByCADIndex( nSelectIndex ).Clone();
-
-			// get previous control point tool vector
-			gp_Dir assignDir = GetPreCtrlPntToolVec( m_CraftData.ToolVecModifyMap, nSelectIndex, m_CraftData.IsPathReverse, m_DataHandler.IsClosed() );
-			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleFromToolVec( assignDir, pointToModify, out abAngle_deg );
-			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
-				return true;
+			if( m_SelectedPoint == null ) {
+				return;
 			}
-			if( calResult == ToolVecHelper.ECalAngleResult.TooLargeAngle ) {
-				MyApp.Logger.ShowOnLogPanel( "目標向量與原始向量夾角過大", MyApp.NoticeType.Warning, true );
+
+			// point exists, get original MS angles
+			if( m_ToolVecParam != null ) {
+				m_ToolVecParam.Master_deg = m_SelectedPoint.InitMaster_rad * 180.0 / Math.PI;
+				m_ToolVecParam.Slave_deg = m_SelectedPoint.InitSlave_rad * 180.0 / Math.PI;
+				m_ToolVecParam.AngleA_deg = 0;
+				m_ToolVecParam.AngleB_deg = 0;
+			}
+			SetToolVecParamAndPeview();
+		}
+
+		void OnSetKeep()
+		{
+			if( m_nSelectIndex == NULL_SELECT_INDEX ) {
+				return;
+			}
+			ISetToolVecPoint preCtrlPoint = m_DataHandler.GetPreCtrlPoint( m_nSelectIndex );
+			if( preCtrlPoint == null ) {
+				return;
+			}
+
+			// Calculate AB angles from previous control point MS angles
+			if( m_SelectedPoint == null ) {
+				return;
+			}
+			Tuple<double, double> abAngles_deg =
+				ToolVecHelper.GetABAngleFromMSAngle( preCtrlPoint.ModMaster_rad * 180.0 / Math.PI,
+														preCtrlPoint.ModSlave_rad * 180.0 / Math.PI,
+														m_SelectedPoint );
+
+			// check angle range
+			if( !CheckABAngleRange( abAngles_deg.Item1, abAngles_deg.Item2 ) ) {
+				return;
+			}
+
+			// valid result, trigger update
+			if( m_ToolVecParam != null ) {
+				m_ToolVecParam.Master_deg = preCtrlPoint.ModMaster_rad * 180.0 / Math.PI;
+				m_ToolVecParam.Slave_deg = preCtrlPoint.ModSlave_rad * 180.0 / Math.PI;
+				m_ToolVecParam.AngleA_deg = abAngles_deg.Item1;
+				m_ToolVecParam.AngleB_deg = abAngles_deg.Item2;
+			}
+			SetToolVecParamAndPeview();
+		}
+
+		void OnSetZDir()
+		{
+			// calculate MS angles from Z direction
+			if( m_SelectedPoint == null ) {
+				return;
+			}
+			Tuple<double, double> msAngles_deg = ToolVecHelper.GetMSAngleFromToolVec( new gp_Dir( 0, 0, 1 ), m_SelectedPoint );
+
+			// calculate AB angles from MS angles
+			Tuple<double, double> abAngles_deg = ToolVecHelper.GetABAngleFromMSAngle( msAngles_deg.Item1, msAngles_deg.Item2, m_SelectedPoint );
+
+			// check angle range
+			if( !CheckABAngleRange( abAngles_deg.Item1, abAngles_deg.Item2 ) ) {
+				return;
+			}
+
+			// valid result, trigger update
+			if( m_ToolVecParam != null ) {
+				m_ToolVecParam.Master_deg = msAngles_deg.Item1;
+				m_ToolVecParam.Slave_deg = msAngles_deg.Item2;
+				m_ToolVecParam.AngleA_deg = abAngles_deg.Item1;
+				m_ToolVecParam.AngleB_deg = abAngles_deg.Item2;
+			}
+			SetToolVecParamAndPeview();
+		}
+
+		void OnABAngleChanged( double angleA_deg, double angleB_deg )
+		{
+			// check angle range
+			if( !CheckABAngleRange( angleA_deg, angleB_deg ) ) {
+				return;
+			}
+			if( m_SelectedPoint == null ) {
+				return;
+			}
+			Tuple<double, double> msAngle_deg = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, m_SelectedPoint );
+
+			// valid result, trigger update
+			if( m_ToolVecParam != null ) {
+				m_ToolVecParam.Master_deg = msAngle_deg.Item1;
+				m_ToolVecParam.Slave_deg = msAngle_deg.Item2;
+				m_ToolVecParam.AngleA_deg = angleA_deg;
+				m_ToolVecParam.AngleB_deg = angleB_deg;
+			}
+			SetToolVecParamAndPeview();
+		}
+
+		void OnMSAngleChanged( double master_deg, double slave_deg )
+		{
+			if( m_SelectedPoint == null ) {
+				return;
+			}
+			Tuple<double, double> abAngle_deg = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_SelectedPoint );
+
+			// check angle range
+			if( !CheckABAngleRange( abAngle_deg.Item1, abAngle_deg.Item2 ) ) {
+				return;
+			}
+
+			// valid result, trigger update
+			if( m_ToolVecParam != null ) {
+				m_ToolVecParam.AngleA_deg = abAngle_deg.Item1;
+				m_ToolVecParam.AngleB_deg = abAngle_deg.Item2;
+				m_ToolVecParam.Master_deg = master_deg;
+				m_ToolVecParam.Slave_deg = slave_deg;
+			}
+			SetToolVecParamAndPeview();
+		}
+
+		void OnTypeChanged( EToolVecInterpolateType type )
+		{
+			m_InterpolateType = type;
+			SetToolVecParamAndPeview( true );
+		}
+
+		void OnAddEditIndex()
+		{
+			if( m_ToolVecParam != null ) {
+				m_ToolVecParam.IsModified = true;
+				SetToolVecParamAndPeview( true );
+			}
+		}
+
+		void OnRemoveEditIndex()
+		{
+			if( m_ToolVecParam != null ) {
+				m_ToolVecParam.IsModified = false;
+				SetToolVecParamAndPeview( true );
+			}
+		}
+
+		void OnSwitchStartEnd()
+		{
+			// at start index, switch to end index
+			if( m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() ) {
+				OnSelectedIndexChanged( CLOSED_POINT_INDEX );
+			}
+
+			// at end index, switch to start index
+			else if( m_nSelectIndex == CLOSED_POINT_INDEX ) {
+				OnSelectedIndexChanged( m_DataHandler.GetStartPointCADIndex() );
+			}
+			else {
+				// do nothing if not start or end index
+			}
+		}
+
+		bool CheckABAngleRange( double angleA_deg, double angleB_deg )
+		{
+			if( angleA_deg < MIN_TiltAngle || angleA_deg > MAX_TiltAngle ||
+				angleB_deg < MIN_TiltAngle || angleB_deg > MAX_TiltAngle ) {
+				MyApp.Logger.ShowOnLogPanel( "傾角值過大，角度必須在 -60~+60 範圍內", MyApp.NoticeType.Warning );
 				return false;
 			}
-			return false;
+			return true;
 		}
 
-		bool CalABAngleToZDir( int nSelectIndex, out Tuple<double, double> abAngle_deg )
+		// update
+		void SetToolVecParamAndPeview( bool bForceUpdate = false )
 		{
-			// get this modify point cam point
-			ISetToolVecPoint pointToModify = m_DataHandler.GetPointByCADIndex( nSelectIndex ).Clone();
-			gp_Dir assignDir = new gp_Dir( 0, 0, 1 );
-			ToolVecHelper.ECalAngleResult calResult = ToolVecHelper.GetABAngleFromToolVec( assignDir, pointToModify, out abAngle_deg );
-			if( calResult == ToolVecHelper.ECalAngleResult.Done ) {
-				return true;
+			SetInterpolateType();
+			SetIndexAngleParam();
+			if( ( m_ToolVecParam != null && m_ToolVecParam.IsModified ) || bForceUpdate ) {
+				PropertyChanged?.Invoke( m_PathIDList );
 			}
-			if( calResult == ToolVecHelper.ECalAngleResult.TooLargeAngle ) {
-				MyApp.Logger.ShowOnLogPanel( "目標向量與原始向量夾角過大", MyApp.NoticeType.Warning, true );
-				return false;
-			}
-			return false;
-		}
 
-		void SetToolVecOfKeep( int nSelectIndex, ToolVectorDlg toolVecForm )
-		{
-			bool GetParamSuccess = CalABAngleToKeep( nSelectIndex, out Tuple<double, double> abAngles_deg );
-			if( GetParamSuccess ) {
-
-				// Calculate MS angles from AB angles
-				Tuple<double, double> msAngles_deg = CalculateMSAngleFromABAngle( nSelectIndex, abAngles_deg.Item1, abAngles_deg.Item2 );
-				toolVecForm.SetAngleFromTargetVec( abAngles_deg, msAngles_deg );
+			// update cache point
+			if( m_SelectedPoint != null && m_nSelectIndex != NULL_SELECT_INDEX ) {
+				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 			}
 		}
 
-		void SetToolVecOfZDir( int nSelectIndex, ToolVectorDlg toolVecForm )
+		void SetInterpolateType()
 		{
-			bool GetParamSuccess = CalABAngleToZDir( nSelectIndex, out Tuple<double, double> abAngles_deg );
-			if( GetParamSuccess ) {
-
-				// Calculate MS angles from AB angles
-				Tuple<double, double> msAngles_deg = CalculateMSAngleFromABAngle( nSelectIndex, abAngles_deg.Item1, abAngles_deg.Item2 );
-				toolVecForm.SetAngleFromTargetVec( abAngles_deg, msAngles_deg );
-			}
+			m_CraftData.InterpolateType = m_InterpolateType;
 		}
 
-		Tuple<double, double> CalculateMSAngleFromABAngle( int nSelectIndex, double angleA_deg, double angleB_deg )
+		void SetIndexAngleParam()
 		{
-			ISetToolVecPoint point = m_DataHandler.GetPointByCADIndex( nSelectIndex ).Clone();
-			return ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, point );
-		}
-
-		Tuple<double, double> CalculateABAngleFromMSAngle( int nSelectIndex, double master_deg, double slave_deg )
-		{
-			ISetToolVecPoint point = m_DataHandler.GetPointByCADIndex( nSelectIndex ).Clone();
-			return ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, point );
-		}
-
-		void SetToolVecParamAndPeview( int VecIndex, ToolVecParam toolVecParam )
-		{
-			SetInterpolateType( toolVecParam );
-			SetABAngle( VecIndex, toolVecParam );
-			PropertyChanged?.Invoke( m_PathIDList );
-		}
-
-		// remove or ok button clicked
-		void ConfirmSetting( int VecIndex, ToolVecParam toolVecParam )
-		{
-			// user remove pnt
-			if( toolVecParam.IsModified == false ) {
-				m_CraftData.RemoveToolVecModify( VecIndex );
-			}
-			// user add / adjust pnt
-			else {
-				SetABAngle( VecIndex, toolVecParam );
+			if( m_ToolVecParam == null ) {
+				return;
 			}
 
-			SetInterpolateType( toolVecParam );
-			SetToolVecDone();
+			// remove modify data
+			if( !m_ToolVecParam.IsModified ) {
+				m_CraftData.RemoveToolVecModify( m_nSelectIndex );
+				return;
+			}
+
+			// set modify data
+			m_CraftData.SetToolVecModify( m_nSelectIndex,
+				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg );
 		}
 
-		void CancelSetting( int VecIndex )
+		// rotary axis config
+		RotaryAxisConfig CreateRotaryAxisConfig()
 		{
-			// this point is not modify point when dialog show up
-			if( m_BackupToolVecParam.IsModified == false ) {
-				m_CraftData.RemoveToolVecModify( VecIndex );
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				throw new InvalidOperationException( "Cannot get machine data" );
+			}
+			RotaryAxisConfig config = new RotaryAxisConfig();
+			config.MasterName = ConvertRotaryAxisName( machineData.MasterRotaryAxis );
+			config.SlaveName = ConvertRotaryAxisName( machineData.SlaveRotaryAxis );
+			if( machineData.FiveAxisType == FiveAxisType.Table || machineData.FiveAxisType == FiveAxisType.Mix ) {
+				config.RotaryAxis = ETypeOfRotaryAxis.Slave;
 			}
 			else {
-				SetABAngle( VecIndex, m_BackupToolVecParam );
+				config.RotaryAxis = ETypeOfRotaryAxis.Master;
 			}
-			SetInterpolateType( m_BackupToolVecParam );
-			SetToolVecDone();
+			return config;
 		}
 
-		gp_Dir GetPreCtrlPntToolVec( IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nTargetPntIdx, bool isPathReverse, bool isClosePath )
+		string ConvertRotaryAxisName( RotaryAxis axis )
 		{
-			List<int> ctrlPntIndexList = toolVecModifyMap.Keys.ToList();
-			int preCtrlIndex = GetPreCtrlPntIndex( nTargetPntIdx, ctrlPntIndexList, isPathReverse, isClosePath );
-			ISetToolVecPoint preCtrlPoint = m_DataHandler.GetPointByCADIndex( preCtrlIndex ).Clone();
-			return new gp_Dir( preCtrlPoint.ToolVec.XYZ() );
+			switch( axis ) {
+				case RotaryAxis.X:
+					return "A";
+				case RotaryAxis.Y:
+					return "B";
+				case RotaryAxis.Z:
+					return "C";
+				default:
+					return "";
+			}
 		}
 
-		int GetPreCtrlPntIndex( int targetIndex, List<int> ctrlPntIndexList, bool isReverse, bool isClosePath )
-		{
-			// keep the list in order
-			ctrlPntIndexList.Sort();
-			int result = DEFAULT_SELECT_INDEX;
 
-			// find the last index which small than targetIndex
-			if( isReverse == false ) {
-				foreach( int nIndex in ctrlPntIndexList ) {
-					if( nIndex < targetIndex ) {
-						result = nIndex;
-					}
-					else {
-						break;
-					}
-				}
+		// index param
+		int m_nSelectIndex = NULL_SELECT_INDEX;
+		ToolVecParam m_ToolVecParam = null;
+		ISetToolVecPoint m_SelectedPoint = null;
 
-				// unclose path do not find pre ctrl pnt index
-				if( isClosePath == false ) {
-					return targetIndex;
-				}
-
-				// if not found, return the last value of the list (circular logic)
-				if( result == DEFAULT_SELECT_INDEX && ctrlPntIndexList.Count > 0 ) {
-					result = ctrlPntIndexList.Last();
-				}
-			}
-			else {
-				// find the first index which larger than targetIndex
-				foreach( int nIndex in ctrlPntIndexList ) {
-					if( nIndex > targetIndex ) {
-						result = nIndex;
-						break;
-					}
-				}
-
-				// unclose path do not find next ctrl pnt index
-				if( isClosePath == false ) {
-					return targetIndex;
-				}
-
-				// if not found, return the first value of the list (circular logic)
-				if( result == DEFAULT_SELECT_INDEX && ctrlPntIndexList.Count > 0 ) {
-					result = ctrlPntIndexList.First();
-				}
-			}
-			return result;
-		}
-
-		ToolVecParam m_BackupToolVecParam;
-
-		// to storage which vertex keep show high light point on viewer
-		AIS_Shape m_KeepedHighLightPoint = null;
+		// global param
+		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.Normal;
 		ToolVecActionDataHandler m_DataHandler = null;
-		CraftData m_CraftData;
+		CraftData m_CraftData = null;
+		RotaryAxisConfig m_RotaryAxisConfig = null;
+
+		// action data
 		List<string> m_PathIDList = null;
-		const int DEFAULT_SELECT_INDEX = -1;
+		AIS_Shape m_KeepedHighLightPoint = null;
+		ToolVectorDlg m_ToolVecDlg = null;
+
+		// angle limit
+		public const double MAX_TiltAngle = 60.0;
+		public const double MIN_TiltAngle = -60.0;
+
+		// null select index as -999, -1 is used for closed point index
+		const int NULL_SELECT_INDEX = -999;
+		const int CLOSED_POINT_INDEX = -1;
 	}
 
 	class ToolVecActionDataHandler
@@ -351,13 +463,13 @@ namespace MyCAM.Editor
 			m_GeomData = geomData as ContourGeomData;
 		}
 
-		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg, out double master_deg, out double slave_deg )
+		public bool GetToolVecModify( int cadIndex, out double dRA_deg, out double dRB_deg, out double master_deg, out double slave_deg )
 		{
-			if( m_CraftData.ToolVecModifyMap.ContainsKey( index ) ) {
-				dRA_deg = m_CraftData.ToolVecModifyMap[ index ].RA_deg;
-				dRB_deg = m_CraftData.ToolVecModifyMap[ index ].RB_deg;
-				master_deg = m_CraftData.ToolVecModifyMap[ index ].Master_deg;
-				slave_deg = m_CraftData.ToolVecModifyMap[ index ].Slave_deg;
+			if( m_CraftData.ToolVecModifyMap.ContainsKey( cadIndex ) ) {
+				dRA_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].RA_deg;
+				dRB_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].RB_deg;
+				master_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].Master_deg;
+				slave_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].Slave_deg;
 				return true;
 			}
 			else {
@@ -365,18 +477,28 @@ namespace MyCAM.Editor
 				dRB_deg = 0;
 
 				// get CAM map index
-				if( m_PathCache.CADToCAMIndexMap.ContainsKey( index ) ) {
-					int camIndex = m_PathCache.CADToCAMIndexMap[ index ];
+				int camIndex = 0;
+				if( cadIndex == CLOSED_POINT_INDEX ) {
+					camIndex = m_PathCache.MainPathPointList.Count - 1;
+				}
+				else if( m_PathCache.CADToCAMIndexMap.ContainsKey( cadIndex ) ) {
+					camIndex = m_PathCache.CADToCAMIndexMap[ cadIndex ];
+				}
+				else {
+					master_deg = 0;
+					slave_deg = 0;
+					return false;
+				}
 
-					// get master and slave from InitIKResult and convert rad to deg
-					if( camIndex >= 0 && camIndex < m_PathCache.MainPathPointList.Count ) {
-						master_deg = m_PathCache.MainPathPointList[ camIndex ].InitMaster_rad * 180.0 / Math.PI;
-						slave_deg = m_PathCache.MainPathPointList[ camIndex ].InitSlave_rad * 180.0 / Math.PI;
-					}
-					else {
-						master_deg = 0;
-						slave_deg = 0;
-					}
+				// get master and slave from cache
+				if( camIndex >= 0 && camIndex < m_PathCache.MainPathPointList.Count ) {
+					master_deg = m_PathCache.MainPathPointList[ camIndex ].ModMaster_rad * 180.0 / Math.PI;
+					slave_deg = m_PathCache.MainPathPointList[ camIndex ].ModSlave_rad * 180.0 / Math.PI;
+
+					// get AB angles from master and slave
+					Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_PathCache.MainPathPointList[ camIndex ] );
+					dRA_deg = abAngles.Item1;
+					dRB_deg = abAngles.Item2;
 				}
 				else {
 					master_deg = 0;
@@ -394,12 +516,10 @@ namespace MyCAM.Editor
 					return m_PathCache.MainPathPointList[ camIndex ];
 				}
 			}
+			else if( cadIndex == CLOSED_POINT_INDEX ) {
+				return m_PathCache.MainPathPointList.Last();
+			}
 			return null;
-		}
-
-		public EToolVecInterpolateType GetInterpolateType()
-		{
-			return m_CraftData.InterpolateType;
 		}
 
 		public bool IsClosed()
@@ -407,8 +527,40 @@ namespace MyCAM.Editor
 			return m_GeomData.IsClosed;
 		}
 
+		public int GetStartPointCADIndex()
+		{
+			if( m_PathCache.MainPathPointList.Count > 0 ) {
+				return m_PathCache.MainPathPointList[ 0 ].InitPathIndex;
+			}
+			return NULL_SELECT_INDEX;
+		}
+
+		public ISetToolVecPoint GetPreCtrlPoint( int cadIndex )
+		{
+			int camIndex = 0;
+			if( m_PathCache.CADToCAMIndexMap.ContainsKey( cadIndex ) ) {
+				camIndex = m_PathCache.CADToCAMIndexMap[ cadIndex ];
+			}
+			else if( cadIndex == CLOSED_POINT_INDEX ) {
+				camIndex = m_PathCache.MainPathPointList.Count - 1;
+			}
+			else {
+				return null;
+			}
+
+			// find previous control point
+			for( int i = camIndex - 1; i >= 0; i-- ) {
+				if( m_PathCache.MainPathPointList[ i ].IsToolVecModPoint ) {
+					return m_PathCache.MainPathPointList[ i ];
+				}
+			}
+			return null;
+		}
+
 		readonly CraftData m_CraftData;
 		readonly ContourCache m_PathCache;
 		readonly ContourGeomData m_GeomData;
+		const int NULL_SELECT_INDEX = -999;
+		const int CLOSED_POINT_INDEX = -1;
 	}
 }
