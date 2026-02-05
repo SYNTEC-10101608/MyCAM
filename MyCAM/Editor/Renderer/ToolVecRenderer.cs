@@ -51,15 +51,12 @@ namespace MyCAM.Editor.Renderer
 					IProcessPoint point = toolVecPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
 
-					// fixed dir show green, modified point do not show
-					if( interpolateType == EToolVecInterpolateType.FixedDir ) {
-						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_SKYBLUE ) );
-						toolVecAISList.Add( toolVecAIS );
-						continue;
-					}
 					if( point.IsToolVecModPoint ) {
-						if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
+						if( interpolateType == EToolVecInterpolateType.VectorInterpolation ) {
 							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_ORANGE ) );
+						}
+						else if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
+							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_CYAN ) );
 						}
 						else {
 							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
@@ -148,7 +145,7 @@ namespace MyCAM.Editor.Renderer
 		EToolVecInterpolateType GetInterpolateType( string pathID )
 		{
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
-				return EToolVecInterpolateType.VectorInterpolation;
+				return EToolVecInterpolateType.Normal;
 			}
 			return craftData.InterpolateType;
 		}

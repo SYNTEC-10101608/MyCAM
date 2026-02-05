@@ -6,9 +6,9 @@ namespace MyCAM.Data
 {
 	public enum EToolVecInterpolateType
 	{
+		Normal,
 		VectorInterpolation,
 		TiltAngleInterpolation,
-		FixedDir,
 	}
 
 	public class ToolVecModifyData
@@ -262,6 +262,12 @@ namespace MyCAM.Data
 			CAMFactorChanged?.Invoke();
 		}
 
+		public void ClearToolVecModify()
+		{
+			m_ToolVecModifyMap.Clear();
+			CAMFactorChanged?.Invoke();
+		}
+
 		void SubscribeSubParamChanged()
 		{
 			m_LeadData.PropertyChanged += SubParamChanged;
@@ -277,7 +283,7 @@ namespace MyCAM.Data
 		bool m_IsPathReverse = false;
 		LeadData m_LeadData = new LeadData();
 		double m_OverCutLength = 0;
-		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.VectorInterpolation;
+		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.Normal;
 		Dictionary<int, ToolVecModifyData> m_ToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
