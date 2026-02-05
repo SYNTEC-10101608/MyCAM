@@ -96,6 +96,8 @@ namespace MyCAM
 
 			// simu editor
 			m_SimuEditor = new SimuEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+			m_SimuEditor.ReadStlSuccess = OnMachineStlReadSuccess;
+			m_SimuEditor.Init();
 
 			// start with CAD editor
 			SwitchEditor( EEditorType.CAD );
@@ -779,6 +781,13 @@ namespace MyCAM
 			m_tsbShowTraverse.Visible = isVisible;
 		}
 
+		void OnMachineStlReadSuccess( bool isReadSuccess )
+		{
+			if( isReadSuccess == false ) {
+				m_tsmiSimulation.Enabled = false;
+			}
+		}
+
 		#endregion
 
 		// switch editor
@@ -1155,11 +1164,6 @@ namespace MyCAM
 			VisibleCAMQuickToolBarButtons( false );
 		}
 
-		void m_tsbImportStl_Click( object sender, EventArgs e )
-		{
-			m_SimuEditor.ImportStl();
-		}
-
 		void m_btnPlay_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.PlaySimulation();
@@ -1176,5 +1180,40 @@ namespace MyCAM
 		}
 
 		#endregion
+
+		void m_btnPreviousPath_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.PlayPrePath();
+		}
+
+		void m_btnNextPath_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.PlayNextPath();
+		}
+
+		void m_btnPreCollision_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.MoveToPreCollision();
+		}
+
+		void m_btnNextCol_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.MoveToNextCollision();
+		}
+
+		void m_btnSpeedUp_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.SpeedUp();
+		}
+
+		void m_btnSlowDonw_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.SlowDown();
+		}
+
+		private void m_btnCheck_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.CheckExitCollision();
+		}
 	}
 }

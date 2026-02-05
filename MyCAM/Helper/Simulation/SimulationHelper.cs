@@ -21,51 +21,58 @@ using System.Linq;
 
 namespace MyCAM.Helper
 {
-	internal struct SimulationResult
+	public interface IPathSimuData
 	{
-		public int FrameCount;
-		public Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap;
-		public Dictionary<MachineComponentType, List<bool>> FrameCollisionMap;
-
-		public SimulationResult( Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, Dictionary<MachineComponentType, List<bool>> frameCollisionMap, int framCount )
+		IReadOnlyList<PostPoint> TraversePoints
 		{
-			FrameTransformMap = frameTransformMap;
-			FrameCollisionMap = frameCollisionMap;
-			FrameCount = framCount;
+			get;
+		}
+		IReadOnlyList<PostPoint> PathPoints
+		{
+			get;
+		}
+		IReadOnlyList<PostPoint> ExitPoints
+		{
+			get;
 		}
 	}
 
-	internal struct SimulationRequiredData
+	public class PathSimuIKData : IPathSimuData
 	{
-		public List<PostData> EachPathIKPostDataList;
+		public readonly List<PostPoint> TraversePntIKList;
+		public readonly List<PostPoint> PathPntIKList;
+		public readonly List<PostPoint> ExitPntIKList;
 
-		// lastPathLastPnt is for exit path calculation
-		public IProcessPoint LastPathLastPnt;
-		public EntryAndExitData EntryAndExitData;
-		public PostSolver PostSolver;
-		public HashSet<MachineComponentType> WorkPiecesChaintSet;
-		public MachineData MachineData;
-		public Dictionary<MachineComponentType, List<MachineComponentType>> ChainListMap;
-		public CollisionSolver FCLTest;
+		// IPathSimuData mapping
+		public IReadOnlyList<PostPoint> TraversePoints => TraversePntIKList;
+		public IReadOnlyList<PostPoint> PathPoints => PathPntIKList;
+		public IReadOnlyList<PostPoint> ExitPoints => ExitPntIKList;
 
-		public SimulationRequiredData( List<PostData> eachPathIKPostDataList, IProcessPoint lastPathLastPnt, EntryAndExitData entryAndExitData, PostSolver postSolver, HashSet<MachineComponentType> workPiecesChaintSet, MachineData machineData, Dictionary<MachineComponentType, List<MachineComponentType>> chainListMap, CollisionSolver fCLTest )
+		public PathSimuIKData()
 		{
-			EachPathIKPostDataList = eachPathIKPostDataList;
-			LastPathLastPnt = lastPathLastPnt;
-			EntryAndExitData = entryAndExitData;
-			PostSolver = postSolver;
-			WorkPiecesChaintSet = workPiecesChaintSet;
-			MachineData = machineData;
-			ChainListMap = chainListMap;
-			FCLTest = fCLTest;
+			TraversePntIKList = new List<PostPoint>();
+			PathPntIKList = new List<PostPoint>();
+			ExitPntIKList = new List<PostPoint>();
+		}
+
+		public PathSimuIKData( List<PostPoint> traverPntList, List<PostPoint> pathPntList, List<PostPoint> exitPntList )
+		{
+			TraversePntIKList = traverPntList;
+			PathPntIKList = pathPntList;
+			ExitPntIKList = exitPntList;
 		}
 	}
 
-	public class PathSimuFKData
+	public class PathSimuFKData : IPathSimuData
 	{
 		public readonly List<PostPoint> TraversePntFKList;
 		public readonly List<PostPoint> PathPntFKList;
 		public readonly List<PostPoint> ExitPntFKList;
+
+		// IPathSimuData mapping
+		public IReadOnlyList<PostPoint> TraversePoints => TraversePntFKList;
+		public IReadOnlyList<PostPoint> PathPoints => PathPntFKList;
+		public IReadOnlyList<PostPoint> ExitPoints => ExitPntFKList;
 
 		public PathSimuFKData()
 		{
@@ -73,6 +80,7 @@ namespace MyCAM.Helper
 			PathPntFKList = new List<PostPoint>();
 			ExitPntFKList = new List<PostPoint>();
 		}
+
 		public PathSimuFKData( List<PostPoint> traverPntList, List<PostPoint> pathPntList, List<PostPoint> exitPntList )
 		{
 			TraversePntFKList = traverPntList;
@@ -83,16 +91,24 @@ namespace MyCAM.Helper
 
 	public static class SimulationHelper
 	{
-		internal static bool BuildSimuData( SimulationRequiredData calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out int frameCount )
+		internal static bool BuildFrameTransMap( SimuData.RequiredData.SimuInputSet calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out List<SimuData.ResultData.PathStartEndIndex> pathStartEndIndexList, out int frameCount )
 		{
 			frameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
+			pathStartEndIndexList = new List<SimuData.ResultData.PathStartEndIndex>();
 			frameCount = 0;
 
 			// build full path FK point list (each path is connected)
-			bool BSolveDone = BuildPathFKList( calNeedData.EachPathIKPostDataList, calNeedData.LastPathLastPnt, calNeedData.EntryAndExitData, calNeedData.PostSolver, out List<PathSimuFKData> pathFKPntList );
-			if( !BSolveDone ) {
+			bool bGetWholePathIK = GetWholePathIKPnt( calNeedData.EachPathIKPostDataList, calNeedData.LastPathLastPnt, calNeedData.EntryAndExitData, calNeedData.PostSolver, out List<PathSimuIKData> pathIKPntList );
+			if( !bGetWholePathIK ) {
 				return false;
 			}
+			bool bSolveFKDone = BuildPathFKList( pathIKPntList, calNeedData.PostSolver, out List<PathSimuFKData> pathFKPntList );
+			if( !bSolveFKDone ) {
+				return false;
+			}
+
+			pathStartEndIndexList = GetPathStartEndIndex( pathFKPntList );
+
 			// build frame transform map
 			bool bFrameOk = BuildFrame( pathFKPntList, calNeedData.PostSolver, calNeedData.WorkPiecesChaintSet, calNeedData.MachineData, calNeedData.ChainListMap, out frameTransformMap, out frameCount );
 			return bFrameOk;
@@ -102,41 +118,90 @@ namespace MyCAM.Helper
 		const double DISCRETE_MAX_EDGE_LENGTH = 1.0;
 		const double TOLERANCE = 1e-3;
 
+		static List<SimuData.ResultData.PathStartEndIndex> GetPathStartEndIndex( IEnumerable<IPathSimuData> pathFKPntList )
+		{
+			int nCurrentIndex = 0;
+			List<SimuData.ResultData.PathStartEndIndex> pathIndexList = new List<SimuData.ResultData.PathStartEndIndex>();
+			foreach( IPathSimuData pathData in pathFKPntList ) {
+				int tempStartIndex = nCurrentIndex;
+				if( pathData.TraversePoints != null && pathData.TraversePoints.Count > 0 ) {
+					if( nCurrentIndex == 0 ) {
+						nCurrentIndex += pathData.TraversePoints.Count - 1;
+					}
+					else {
+						nCurrentIndex += pathData.TraversePoints.Count;
+					}
+				}
+				if( pathData.PathPoints != null && pathData.PathPoints.Count > 0 ) {
+
+					if( nCurrentIndex == 0 ) {
+						nCurrentIndex += pathData.PathPoints.Count - 1;
+					}
+					else {
+						nCurrentIndex += pathData.PathPoints.Count;
+					}
+				}
+				if( pathData.ExitPoints != null && pathData.ExitPoints.Count > 0 ) {
+					nCurrentIndex += pathData.ExitPoints.Count;
+				}
+				SimuData.ResultData.PathStartEndIndex pathStartEndIndex = new SimuData.ResultData.PathStartEndIndex( tempStartIndex, nCurrentIndex );
+				pathIndexList.Add( pathStartEndIndex );
+				nCurrentIndex++;
+			}
+			return pathIndexList;
+		}
+
 		#region Solve Path FK Point List
 
-		static bool BuildPathFKList( List<PostData> PostDataList, IProcessPoint lastPathLastPnt, EntryAndExitData entryAndExitData, PostSolver PostSolver, out List<PathSimuFKData> pathSimuPntList )
+		static bool BuildPathFKList( List<PathSimuIKData> pathIKPntList, PostSolver PostSolver, out List<PathSimuFKData> pathSimuPntList )
 		{
 			pathSimuPntList = new List<PathSimuFKData>();
+			if( pathIKPntList == null || pathIKPntList.Count == 0 || PostSolver == null ) {
+				return false;
+			}
+			PostPoint prePathLastPnt = new PostPoint();
+			foreach( PathSimuIKData pathIKList in pathIKPntList ) {
+				List<PostPoint> traverseFKPntList = ConvertIKPntToFKPnt( pathIKList.TraversePntIKList, PostSolver );
+				List<PostPoint> processPathFKPntList = ConvertIKPntToFKPnt( pathIKList.PathPntIKList, PostSolver );
+				List<PostPoint> exitFKPntList = ConvertIKPntToFKPnt( pathIKList.ExitPntIKList, PostSolver );
+				pathSimuPntList.Add( new PathSimuFKData( traverseFKPntList, processPathFKPntList, exitFKPntList ) );
+			}
+			return true;
+		}
+
+		static bool GetWholePathIKPnt( List<PostData> PostDataList, IProcessPoint lastPathLastPnt, EntryAndExitData entryAndExitData, PostSolver PostSolver, out List<PathSimuIKData> pathSimuPntList )
+		{
+			pathSimuPntList = new List<PathSimuIKData>();
 			if( PostDataList == null || PostDataList.Count == 0 || lastPathLastPnt == null || entryAndExitData == null || PostSolver == null ) {
 				return false;
 			}
 			PostPoint prePathLastPnt = new PostPoint();
 			foreach( PostData currentPostData in PostDataList ) {
-				List<PostPoint> traversePntList = new List<PostPoint>();
+				List<PostPoint> traverseIKPntList = new List<PostPoint>();
 
 				// traverse path
 				if( currentPostData == PostDataList.First() ) {
-					traversePntList = GetTraverseFKPntList( currentPostData, PostSolver, true, null );
+					traverseIKPntList = GetTraversIKPnt( currentPostData, PostSolver, true, null );
 				}
 				else {
-					traversePntList = GetTraverseFKPntList( currentPostData, PostSolver, false, prePathLastPnt );
+					traverseIKPntList = GetTraversIKPnt( currentPostData, PostSolver, false, prePathLastPnt );
 				}
 
 				// main path
-				List<PostPoint> processPathFKPntList = GetPathFKPnt( currentPostData, PostSolver );
+				List<PostPoint> processPathIKPntList = GetPathIKPnt( currentPostData, PostSolver );
 				prePathLastPnt = GetLastProcess( currentPostData );
 
 				// exit path
-				PathSimuFKData pathSimuPnt = new PathSimuFKData();
-				List<PostPoint> exitFKPntList = new List<PostPoint>();
+				PathSimuIKData pathSimuIKPnt = new PathSimuIKData();
+				List<PostPoint> exitIKPntList = new List<PostPoint>();
 				if( currentPostData == PostDataList.Last() ) {
-					exitFKPntList = GetExitPathFKPnt( lastPathLastPnt, entryAndExitData, prePathLastPnt, PostSolver );
-					pathSimuPnt = new PathSimuFKData( traversePntList, processPathFKPntList, exitFKPntList );
+					exitIKPntList = GetExitPathIKPnt( lastPathLastPnt, entryAndExitData, prePathLastPnt, PostSolver );
+					pathSimuIKPnt = new PathSimuIKData( traverseIKPntList, processPathIKPntList, exitIKPntList );
 				}
 				else {
-					pathSimuPnt = new PathSimuFKData( traversePntList, processPathFKPntList, new List<PostPoint>() );
+					pathSimuIKPnt = new PathSimuIKData( traverseIKPntList, processPathIKPntList, new List<PostPoint>() );
 				}
-				pathSimuPntList.Add( pathSimuPnt );
+				pathSimuPntList.Add( pathSimuIKPnt );
 			}
 			return true;
 		}
@@ -152,9 +217,8 @@ namespace MyCAM.Helper
 			return postData.MainPathPostPointList.Last().Clone();
 		}
 
-		static List<PostPoint> GetExitPathFKPnt( IProcessPoint lastPathLastPnt, EntryAndExitData entryAndExitData, PostPoint pathEndPoint, PostSolver postSolver )
+		static List<PostPoint> GetExitPathIKPnt( IProcessPoint lastPathLastPnt, EntryAndExitData entryAndExitData, PostPoint pathEndPoint, PostSolver postSolver )
 		{
-			List<PostPoint> FKPntList = new List<PostPoint>();
 			// calculate exit point
 			IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathLastPnt, entryAndExitData.ExitDistance );
 			PostPoint exitPostPnt = new PostPoint()
@@ -166,42 +230,28 @@ namespace MyCAM.Helper
 				Slave = pathEndPoint.Slave
 			};
 			bool bSuccess = BuildLinearTraverseIKPnt( pathEndPoint, exitPostPnt, out List<PostPoint> IKPntList );
-			if( !bSuccess ) {
-				return FKPntList;
+			if( bSuccess == false ) {
+				return new List<PostPoint>();
 			}
-			FKPntList = ConvertIKPntToFKPnt( IKPntList, postSolver );
-			return FKPntList;
+			return IKPntList;
 		}
 
-		static List<PostPoint> GetPathFKPnt( PostData postData, PostSolver postSolver )
+		static List<PostPoint> GetPathIKPnt( PostData postData, PostSolver postSolver )
 		{
-			List<PostPoint> pathFKPntList = new List<PostPoint>();
+			List<PostPoint> pathIKPntList = new List<PostPoint>();
 			if( postData.LeadInPostPointList != null ) {
-				List<PostPoint> leadInFKPntList = ConvertIKPntToFKPnt( postData.LeadInPostPointList, postSolver );
-				if( leadInFKPntList != null && leadInFKPntList.Count > 0 ) {
-					pathFKPntList.AddRange( leadInFKPntList );
-				}
-
+				pathIKPntList.AddRange( postData.LeadInPostPointList );
 			}
 			if( postData.MainPathPostPointList != null ) {
-				List<PostPoint> mainPathFKPntList = ConvertIKPntToFKPnt( postData.MainPathPostPointList, postSolver );
-				if( mainPathFKPntList != null && mainPathFKPntList.Count > 0 ) {
-					pathFKPntList.AddRange( mainPathFKPntList );
-				}
+				pathIKPntList.AddRange( postData.MainPathPostPointList );
 			}
 			if( postData.OverCutPostPointList != null ) {
-				List<PostPoint> overCutFKPntList = ConvertIKPntToFKPnt( postData.OverCutPostPointList, postSolver );
-				if( overCutFKPntList != null && overCutFKPntList.Count > 0 ) {
-					pathFKPntList.AddRange( overCutFKPntList );
-				}
+				pathIKPntList.AddRange( postData.OverCutPostPointList );
 			}
 			if( postData.LeadOutPostPointList != null ) {
-				List<PostPoint> leadOutFKPntList = ConvertIKPntToFKPnt( postData.LeadOutPostPointList, postSolver );
-				if( leadOutFKPntList != null && leadOutFKPntList.Count > 0 ) {
-					pathFKPntList.AddRange( leadOutFKPntList );
-				}
+				pathIKPntList.AddRange( postData.LeadOutPostPointList );
 			}
-			return pathFKPntList;
+			return pathIKPntList;
 		}
 
 		#endregion
@@ -246,7 +296,6 @@ namespace MyCAM.Helper
 				MyApp.Logger.ShowOnLogPanel( "缺少軸向旋轉方向", MyApp.NoticeType.Warning );
 				return false;
 			}
-
 			MachineComponentType axisToolStickOn = GetToolStickOnWhichAxis( chainListMap );
 
 			// each path
@@ -664,7 +713,7 @@ namespace MyCAM.Helper
 
 		#region Build Traverse FK Point List
 
-		static List<PostPoint> GetTraverseFKPntList( PostData postData, PostSolver postSolver, bool isFirstPath = false, PostPoint prePathLastPnt = null )
+		static List<PostPoint> GetTraversIKPnt( PostData postData, PostSolver postSolver, bool isFirstPath = false, PostPoint prePathLastPnt = null )
 		{
 			if( postData == null || postSolver == null ) {
 				return new List<PostPoint>();
@@ -674,20 +723,19 @@ namespace MyCAM.Helper
 				if( !bSuccess ) {
 					return new List<PostPoint>();
 				}
-				List<PostPoint> FKPnList = ConvertIKPntToFKPnt( IKPnList, postSolver );
-				return FKPnList;
+				return IKPnList;
 			}
 			bool needLift = false;
 
-			List<PostPoint> wholeTraversePntList = new List<PostPoint>();
+			List<PostPoint> wholeTraverseIKPntList = new List<PostPoint>();
 			// lift up
 			if( postData.LiftUpPostPoint != null ) {
 				bool bSuccess = BuildLinearTraverseIKPnt( prePathLastPnt, postData.LiftUpPostPoint, out List<PostPoint> IKPnList );
 				if( !bSuccess ) {
 					return new List<PostPoint>();
 				}
-				List<PostPoint> liftUpPntFKPntList = ConvertIKPntToFKPnt( IKPnList, postSolver );
-				wholeTraversePntList.AddRange( liftUpPntFKPntList );
+
+				wholeTraverseIKPntList.AddRange( IKPnList );
 				needLift = true;
 			}
 
@@ -696,23 +744,24 @@ namespace MyCAM.Helper
 				if( IKPnList == null || IKPnList.Count == 0 ) {
 					return new List<PostPoint>();
 				}
-				List<PostPoint> FKPntList = ConvertIKPntToFKPnt( IKPnList, postSolver );
-				wholeTraversePntList.AddRange( FKPntList );
-				return wholeTraversePntList;
+				wholeTraverseIKPntList.AddRange( IKPnList );
+				return wholeTraverseIKPntList;
 			}
 			else {
 				List<PostPoint> IKPnList = MovementAndCutDownIKPnt( prePathLastPnt, postData );
 				if( IKPnList == null || IKPnList.Count == 0 ) {
 					return new List<PostPoint>();
 				}
-				List<PostPoint> FKPntList = ConvertIKPntToFKPnt( IKPnList, postSolver );
-				wholeTraversePntList.AddRange( FKPntList );
-				return wholeTraversePntList;
+				wholeTraverseIKPntList.AddRange( IKPnList );
+				return wholeTraverseIKPntList;
 			}
 		}
 
 		static List<PostPoint> ConvertIKPntToFKPnt( List<PostPoint> IKpostPntList, PostSolver PostSolver )
 		{
+			if( IKpostPntList == null || IKpostPntList.Count == 0 || PostSolver == null ) {
+				return new List<PostPoint>();
+			}
 			List<PostPoint> FKPntList = new List<PostPoint>();
 			foreach( PostPoint postPoint in IKpostPntList ) {
 				bool bSuccess = BuildFKPostPnt( PostSolver, postPoint.Clone(), out PostPoint FKPoint );

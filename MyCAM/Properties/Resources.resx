@@ -241,4 +241,25 @@
   <data name="Stop" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Stop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="NextPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\NextPath.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PreviousPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\PreviousPath.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="NextCol" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\NextCol.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PreviousCol" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\PreviousCol.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SpeedUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\SpeedUp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SlowDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\SlowDown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Check" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\Check.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
