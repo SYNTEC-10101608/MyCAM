@@ -193,11 +193,7 @@ namespace MyCAM.Editor
 			if( m_nSelectIndex == NULL_SELECT_INDEX ) {
 				return;
 			}
-
-			// get previous control point
-			List<int> ctrlPntIndexList = m_CraftData.ToolVecModifyMap.Keys.ToList();
-			int preCtrlPntIndex = GetPreCtrlPntIndex( m_nSelectIndex, ctrlPntIndexList, m_CraftData.IsPathReverse, m_DataHandler.IsClosed() );
-			ISetToolVecPoint preCtrlPoint = m_DataHandler.GetPointByCADIndex( preCtrlPntIndex );
+			ISetToolVecPoint preCtrlPoint = m_DataHandler.GetPreCtrlPoint( m_nSelectIndex );
 			if( preCtrlPoint == null ) {
 				return;
 			}
@@ -343,55 +339,6 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		int GetPreCtrlPntIndex( int targetIndex, List<int> ctrlPntIndexList, bool isReverse, bool isClosePath )
-		{
-			// keep the list in order
-			ctrlPntIndexList.Sort();
-			int result = NULL_SELECT_INDEX;
-
-			// find the last index which small than targetIndex
-			if( isReverse == false ) {
-				foreach( int nIndex in ctrlPntIndexList ) {
-					if( nIndex < targetIndex ) {
-						result = nIndex;
-					}
-					else {
-						break;
-					}
-				}
-
-				// unclose path do not find pre ctrl pnt index
-				if( isClosePath == false ) {
-					return targetIndex;
-				}
-
-				// if not found, return the last value of the list (circular logic)
-				if( result == NULL_SELECT_INDEX && ctrlPntIndexList.Count > 0 ) {
-					result = ctrlPntIndexList.Last();
-				}
-			}
-			else {
-				// find the first index which larger than targetIndex
-				foreach( int nIndex in ctrlPntIndexList ) {
-					if( nIndex > targetIndex ) {
-						result = nIndex;
-						break;
-					}
-				}
-
-				// unclose path do not find next ctrl pnt index
-				if( isClosePath == false ) {
-					return targetIndex;
-				}
-
-				// if not found, return the first value of the list (circular logic)
-				if( result == NULL_SELECT_INDEX && ctrlPntIndexList.Count > 0 ) {
-					result = ctrlPntIndexList.First();
-				}
-			}
-			return result;
-		}
-
 		// update
 		void SetToolVecParamAndPeview( bool bForceUpdate = false )
 		{
@@ -516,13 +463,13 @@ namespace MyCAM.Editor
 			m_GeomData = geomData as ContourGeomData;
 		}
 
-		public bool GetToolVecModify( int index, out double dRA_deg, out double dRB_deg, out double master_deg, out double slave_deg )
+		public bool GetToolVecModify( int cadIndex, out double dRA_deg, out double dRB_deg, out double master_deg, out double slave_deg )
 		{
-			if( m_CraftData.ToolVecModifyMap.ContainsKey( index ) ) {
-				dRA_deg = m_CraftData.ToolVecModifyMap[ index ].RA_deg;
-				dRB_deg = m_CraftData.ToolVecModifyMap[ index ].RB_deg;
-				master_deg = m_CraftData.ToolVecModifyMap[ index ].Master_deg;
-				slave_deg = m_CraftData.ToolVecModifyMap[ index ].Slave_deg;
+			if( m_CraftData.ToolVecModifyMap.ContainsKey( cadIndex ) ) {
+				dRA_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].RA_deg;
+				dRB_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].RB_deg;
+				master_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].Master_deg;
+				slave_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].Slave_deg;
 				return true;
 			}
 			else {
@@ -531,11 +478,11 @@ namespace MyCAM.Editor
 
 				// get CAM map index
 				int camIndex = 0;
-				if( index == CLOSED_POINT_INDEX ) {
+				if( cadIndex == CLOSED_POINT_INDEX ) {
 					camIndex = m_PathCache.MainPathPointList.Count - 1;
 				}
-				else if( m_PathCache.CADToCAMIndexMap.ContainsKey( index ) ) {
-					camIndex = m_PathCache.CADToCAMIndexMap[ index ];
+				else if( m_PathCache.CADToCAMIndexMap.ContainsKey( cadIndex ) ) {
+					camIndex = m_PathCache.CADToCAMIndexMap[ cadIndex ];
 				}
 				else {
 					master_deg = 0;
@@ -586,6 +533,28 @@ namespace MyCAM.Editor
 				return m_PathCache.MainPathPointList[ 0 ].InitPathIndex;
 			}
 			return NULL_SELECT_INDEX;
+		}
+
+		public ISetToolVecPoint GetPreCtrlPoint( int cadIndex )
+		{
+			int camIndex = 0;
+			if( m_PathCache.CADToCAMIndexMap.ContainsKey( cadIndex ) ) {
+				camIndex = m_PathCache.CADToCAMIndexMap[ cadIndex ];
+			}
+			else if( cadIndex == CLOSED_POINT_INDEX ) {
+				camIndex = m_PathCache.MainPathPointList.Count - 1;
+			}
+			else {
+				return null;
+			}
+
+			// find previous control point
+			for( int i = camIndex - 1; i >= 0; i-- ) {
+				if( m_PathCache.MainPathPointList[ i ].IsToolVecModPoint ) {
+					return m_PathCache.MainPathPointList[ i ];
+				}
+			}
+			return null;
 		}
 
 		readonly CraftData m_CraftData;
