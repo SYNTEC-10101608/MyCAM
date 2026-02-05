@@ -64,7 +64,14 @@
     <Compile Include="CNC\ConnectDlg.Designer.cs">
       <DependentUpon>ConnectDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Renderer\MainPathRenderer.cs" />
+    <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
+    <Compile Include="Editor\Dialog\PathEditDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\PathEditDlg.Designer.cs">
+      <DependentUpon>PathEditDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
     <Compile Include="Helper\CAM\StartPointHelper.cs" />
     <Compile Include="Helper\Canvas\DrawHelper.cs" />
@@ -240,6 +247,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\EntryAndExitDlg.resx">
       <DependentUpon>EntryAndExitDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\PathEditDlg.resx">
+      <DependentUpon>PathEditDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\PatternSettingDlg.resx">
       <DependentUpon>PatternSettingDlg.cs</DependentUpon>

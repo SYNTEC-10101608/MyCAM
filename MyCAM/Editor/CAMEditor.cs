@@ -76,7 +76,7 @@ namespace MyCAM.Editor
 			m_CraftRenderer = new CraftRenderer( m_Viewer, m_DataManager );
 			m_ToolVecRenderer = new ToolVecRenderer( m_Viewer, m_DataManager );
 			m_TraverseRenderer = new TraverseRenderer( m_Viewer, m_DataManager );
-			m_MainPathRenderer = new MainPathRenderer( m_Viewer, m_ViewManager, m_DataManager );
+			m_MainPathRenderer = new PathRenderer( m_Viewer, m_ViewManager, m_DataManager );
 		}
 
 		public const string PATH_NODE_PREFIX = "Path_";
@@ -88,7 +88,7 @@ namespace MyCAM.Editor
 		CraftRenderer m_CraftRenderer;
 		ToolVecRenderer m_ToolVecRenderer;
 		TraverseRenderer m_TraverseRenderer;
-		MainPathRenderer m_MainPathRenderer;
+		PathRenderer m_MainPathRenderer;
 
 		// editor
 		public override EEditorType Type
@@ -425,6 +425,21 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetPathEdit()
+		{
+			if( IsSameAction( EditActionType.PathEdit ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
+
+			PathEditAction action = new PathEditAction( m_DataManager, szPathIDList, m_Viewer );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
+		}
+
 		#endregion
 
 		// sort API
@@ -645,7 +660,7 @@ namespace MyCAM.Editor
 
 		void ShowCAMData( List<string> pathIDList )
 		{
-			m_MainPathRenderer.Show();
+			m_MainPathRenderer.Show( pathIDList );
 			m_ToolVecRenderer.Show( pathIDList );
 			m_OrientationRenderer.Show( pathIDList );
 			m_IndexRenderer.Show();
@@ -773,7 +788,9 @@ namespace MyCAM.Editor
 			base.OnEditActionStart( action );
 			if( action.ActionType == EditActionType.OverCut ||
 				action.ActionType == EditActionType.SetLead ||
-				action.ActionType == EditActionType.SetTraverse ) {
+				action.ActionType == EditActionType.SetTraverse ||
+				action.ActionType == EditActionType.SetPattern ||
+				action.ActionType == EditActionType.PathEdit ) {
 
 				// lock main form
 				m_TreeView.Enabled = false;
@@ -789,7 +806,9 @@ namespace MyCAM.Editor
 			// these action will show dialog, need to lock ui
 			if( action.ActionType == EditActionType.OverCut ||
 				action.ActionType == EditActionType.SetLead ||
-				action.ActionType == EditActionType.SetTraverse
+				action.ActionType == EditActionType.SetTraverse ||
+				action.ActionType == EditActionType.SetPattern ||
+				action.ActionType == EditActionType.PathEdit
 				) {
 
 				// unlock main form

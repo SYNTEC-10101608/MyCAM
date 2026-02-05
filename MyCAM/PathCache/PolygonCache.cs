@@ -11,39 +11,32 @@ namespace MyCAM.PathCache
 	public class PolygonCache : StdPatternCacheBase
 	{
 		public PolygonCache( IStdPatternGeomData geomData, CraftData craftData )
-			: base( craftData )
+			: base( geomData, craftData )
 		{
 			if( geomData == null || !( geomData is PolygonGeomData polygonGeomData ) ) {
 				throw new ArgumentNullException( "PolygonCache constructing argument error - invalid geomData" );
 			}
 			m_PolygonGeomData = polygonGeomData;
-			BuildCADPointList();
-			BuildCAMPointList();
+			BuildCADCAMPointList();
 		}
 
-		protected override void BuildCADPointList()
+		protected override void BuildCADCAMPointList()
 		{
-			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_PolygonGeomData );
+			ClearCADFactorDirty();
+			SetCenterDir();
+			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, m_PolygonGeomData.IsCoordinateReversed );
+			SetRefCoordSelfRotated( m_PolygonGeomData.RotatedAngle_deg );
+			m_RefPoint = new CAMPoint( new CADPoint( m_RefCoord.Location(), m_RefCoord.Direction(), m_RefCoord.XDirection(), m_RefCoord.YDirection() ), m_RefCoord.Direction() );
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, m_PolygonGeomData );
 			m_MainPathCADPointList = Discretize();
+			BuildCAMPointList();
 		}
 
 		protected override void BuildCAMPointList()
 		{
-			ClearCraftDataDirty();
-
-			// set reference point
-			m_RefPoint = new CAMPoint(
-				new CADPoint(
-					m_PolygonGeomData.RefCoord.Location(),
-					m_PolygonGeomData.RefCoord.Direction(),
-					m_PolygonGeomData.RefCoord.XDirection(),
-					m_PolygonGeomData.RefCoord.YDirection()
-				),
-				m_PolygonGeomData.RefCoord.Direction()
-			);
-
-			SetMainPathCAMPoint();
-			SetStartPointList();
+			ClearCAMFactorDirty();
+			SetPathCAMPoint();
+			SetStartPoint();
 
 			// calculate max over cut length
 			m_MaxOverCutLength = OverCutHelper.GetMaxOverCutLength( m_PolygonGeomData, m_CraftData.StartPointIndex );
@@ -61,19 +54,24 @@ namespace MyCAM.PathCache
 
 		protected override List<CADPoint> Discretize()
 		{
-			if( m_PolygonGeomData == null || m_PolygonGeomData.RefCoord == null ) {
+			if( m_PolygonGeomData == null || m_RefCoord == null ) {
 				return new List<CADPoint>();
 			}
 
-			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_PolygonGeomData.RefCoord );
+			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_RefCoord );
 			List<CADPoint> discretizedPoints = StdPatternDiscreteFactory.DiscretizePolygon( m_PolygonGeomData.Sides, m_PolygonGeomData.SideLength, m_PolygonGeomData.CornerRadius, transformation );
 
 			// ensure all start points are included in the discretized list
 			if( m_StartCADPointList != null && m_StartCADPointList.Count > 0 ) {
-				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( discretizedPoints, m_StartCADPointList, m_PolygonGeomData );
+				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( m_RefCoord, discretizedPoints, m_StartCADPointList, m_PolygonGeomData );
 			}
 
 			return discretizedPoints;
+		}
+
+		protected override void SetCenterDir()
+		{
+			m_ComputeRefCenterDir = m_PolygonGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
 		}
 
 		PolygonGeomData m_PolygonGeomData;

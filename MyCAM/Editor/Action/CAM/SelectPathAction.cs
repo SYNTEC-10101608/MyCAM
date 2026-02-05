@@ -29,6 +29,7 @@ namespace MyCAM.Editor
 				SyncSelectionFromSet();
 			}
 		}
+
 		protected override void ActivateObject()
 		{
 			foreach( var pathID in m_DataManager.PathIDList ) {

@@ -72,5 +72,16 @@ namespace MyCAM.Helper
 			planeAIS.SetTransparency( transparency );
 			return planeAIS;
 		}
+
+		public static AIS_Trihedron GetTrihedronAIS( gp_Ax2 ax2, double size = 10.0, Quantity_NameOfColor color = Quantity_NameOfColor.Quantity_NOC_WHITE )
+		{
+			AIS_Trihedron trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
+			trihedron.SetColor( new Quantity_Color( color ) );
+			trihedron.SetSize( size );
+			trihedron.SetAxisColor( new Quantity_Color( color ) );
+			trihedron.SetTextColor( new Quantity_Color( color ) );
+			trihedron.SetArrowColor( new Quantity_Color( color ) );
+			return trihedron;
+		}
 	}
 }

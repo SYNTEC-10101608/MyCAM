@@ -139,16 +139,16 @@ namespace MyCAM.Editor
 				return new List<gp_Pnt>();
 			}
 			if( pathType == PathType.Contour ) {
-				if( !DataGettingHelper.GetGeomDataByID( szPathID, out IGeomData contourGeomData ) ) {
+				if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache pathCache ) ) {
 					return new List<gp_Pnt>();
 				}
-				return ( contourGeomData as ContourGeomData )?.CADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
+				return ( pathCache as ContourCache )?.TrsfCADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
 			}
 			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
 				if( !DataGettingHelper.GetStdPatternCacheByID( szPathID, out IStdPatternCache stdPatternCache ) ) {
 					return new List<gp_Pnt>();
 				}
-				return stdPatternCache.KeyCAMPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
+				return stdPatternCache.KeyCADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
 			}
 			else {
 				return new List<gp_Pnt>();

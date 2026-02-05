@@ -13,12 +13,12 @@ using System.Linq;
 
 namespace MyCAM.Editor
 {
-	internal class MainPathRenderer : CAMRendererBase
+	internal class PathRenderer : CAMRendererBase
 	{
 		readonly Dictionary<string, AIS_Shape> m_MainPathAISDict = new Dictionary<string, AIS_Shape>();
 		ViewManager m_ViewManager;
 
-		public MainPathRenderer( Viewer viewer, ViewManager viewManager, DataManager dataManager )
+		public PathRenderer( Viewer viewer, ViewManager viewManager, DataManager dataManager )
 			: base( viewer, dataManager )
 		{
 			m_ViewManager = viewManager;
@@ -26,7 +26,12 @@ namespace MyCAM.Editor
 
 		public override void Show( bool bUpdate = false )
 		{
-			Remove();
+			Show( m_DataManager.PathIDList, bUpdate );
+		}
+
+		public void Show( List<string> pathIDList, bool bUpdate = false )
+		{
+			Remove( pathIDList );
 
 			if( !m_IsShow ) {
 				if( bUpdate ) {
@@ -35,7 +40,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			foreach( string pathID in m_DataManager.PathIDList ) {
+			foreach( string pathID in pathIDList ) {
 				IReadOnlyList<gp_Pnt> pointList = GetMainPathPointList( pathID );
 				if( pointList == null || pointList.Count < 2 ) {
 					continue;
@@ -101,20 +106,27 @@ namespace MyCAM.Editor
 
 		TopoDS_Wire CreatePolylineWire( IReadOnlyList<gp_Pnt> pointList )
 		{
+			const double DIST_TOLERANCE = 1e-3;
 			if( pointList == null || pointList.Count < 2 ) {
 				return null;
 			}
 
 			BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
 
-			foreach( gp_Pnt point in pointList ) {
-				polygonMaker.Add( point );
-			}
-
 			if( pointList.Count > 2 ) {
+
 				gp_Pnt firstPoint = pointList[ 0 ];
 				gp_Pnt lastPoint = pointList[ pointList.Count - 1 ];
-				if( firstPoint.Distance( lastPoint ) < 1e-6 ) {
+
+				// check if the polyline is closed, if yes, do not add the last point again to avoid MoveTo error
+				bool isClosed = firstPoint.IsEqual( lastPoint, DIST_TOLERANCE );
+				int nComputedPoints = isClosed ? pointList.Count - 1 : pointList.Count;
+
+				for( int i = 0; i < nComputedPoints; i++ ) {
+					polygonMaker.Add( pointList[ i ] );
+				}
+
+				if( isClosed ) {
 					polygonMaker.Close();
 				}
 			}
@@ -133,16 +145,16 @@ namespace MyCAM.Editor
 				return new List<gp_Pnt>();
 			}
 			if( pathType == PathType.Contour ) {
-				if( !DataGettingHelper.GetGeomDataByID( szPathID, out IGeomData contourGeomData ) ) {
+				if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache contourCache ) ) {
 					return new List<gp_Pnt>();
 				}
-				return ( contourGeomData as ContourGeomData )?.CADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
+				return ( contourCache as ContourCache )?.MainPathPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
 			}
 			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
 				if( !DataGettingHelper.GetStdPatternCacheByID( szPathID, out IStdPatternCache stdPatternCache ) ) {
 					return new List<gp_Pnt>();
 				}
-				return stdPatternCache.MainPathCADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
+				return stdPatternCache.MainPathPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
 			}
 			else {
 				return new List<gp_Pnt>();

@@ -11,39 +11,36 @@ namespace MyCAM.PathCache
 	public class CircleCache : StdPatternCacheBase
 	{
 		public CircleCache( IStdPatternGeomData geomData, CraftData craftData )
-			: base( craftData )
+			: base( geomData, craftData )
 		{
 			if( geomData == null || !( geomData is CircleGeomData circleGeomData ) ) {
 				throw new ArgumentNullException( "CircleCache constructing argument error - invalid geomData" );
 			}
 			m_CircleGeomData = circleGeomData;
-			BuildCADPointList();
-			BuildCAMPointList();
+			BuildCADCAMPointList();
 		}
 
-		protected override void BuildCADPointList()
+		protected override void BuildCADCAMPointList()
 		{
-			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_CircleGeomData );
+			ClearCADFactorDirty();
+
+			// build CAD data
+			SetCenterDir();
+			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, m_CircleGeomData.IsCoordinateReversed );
+			SetRefCoordSelfRotated( m_CircleGeomData.RotatedAngle_deg );
+			m_RefPoint = new CAMPoint( new CADPoint( m_RefCoord.Location(), m_RefCoord.Direction(), m_RefCoord.XDirection(), m_RefCoord.YDirection() ), m_RefCoord.Direction() );
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, m_CircleGeomData );
 			m_MainPathCADPointList = Discretize();
+
+			// build CAM data
+			BuildCAMPointList();
 		}
 
 		protected override void BuildCAMPointList()
 		{
-			ClearCraftDataDirty();
-
-			// set reference point
-			m_RefPoint = new CAMPoint(
-				new CADPoint(
-					m_CircleGeomData.RefCoord.Location(),
-					m_CircleGeomData.RefCoord.Direction(),
-					m_CircleGeomData.RefCoord.XDirection(),
-					m_CircleGeomData.RefCoord.YDirection()
-				),
-				m_CircleGeomData.RefCoord.Direction()
-			);
-
-			SetMainPathCAMPoint();
-			SetStartPointList();
+			ClearCAMFactorDirty();
+			SetPathCAMPoint();
+			SetStartPoint();
 
 			// calculate max over cut length
 			m_MaxOverCutLength = OverCutHelper.GetMaxOverCutLength( m_CircleGeomData, m_CraftData.StartPointIndex );
@@ -61,19 +58,24 @@ namespace MyCAM.PathCache
 
 		protected override List<CADPoint> Discretize()
 		{
-			if( m_CircleGeomData == null || m_CircleGeomData.RefCoord == null ) {
+			if( m_CircleGeomData == null || m_RefCoord == null ) {
 				return new List<CADPoint>();
 			}
 
-			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_CircleGeomData.RefCoord );
+			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_RefCoord );
 			List<CADPoint> discretizedPoints = StdPatternDiscreteFactory.DiscretizeCircle( m_CircleGeomData.Diameter, transformation );
 
 			// ensure all start points are included in the discretized list
 			if( m_StartCADPointList != null && m_StartCADPointList.Count > 0 ) {
-				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( discretizedPoints, m_StartCADPointList, m_CircleGeomData );
+				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( m_RefCoord, discretizedPoints, m_StartCADPointList, m_CircleGeomData );
 			}
 
 			return discretizedPoints;
+		}
+
+		protected override void SetCenterDir()
+		{
+			m_ComputeRefCenterDir = m_CircleGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
 		}
 
 		CircleGeomData m_CircleGeomData;

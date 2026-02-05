@@ -2,10 +2,9 @@
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using MyCAM.Helper;
+using MyCAM.PathCache;
 using OCC.AIS;
-using OCC.Geom;
 using OCC.gp;
-using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
@@ -95,32 +94,101 @@ namespace MyCAM.Editor
 		void PatternCreate( IStdPatternGeomData standardPatternGeomData )
 		{
 			RemoveTrihedron();
-			TopoDS_Shape shape = null;
 			foreach( var szID in m_szPathIDList ) {
-				if( !DataGettingHelper.GetPathObject( szID, out PathObject pathObject ) ) {
-					continue;
-				}
-				if( !GetContourPathObject( pathObject, out ContourPathObject contourPathObject ) ) {
-					continue;
-				}
-
-				if( standardPatternGeomData == null ) {
-					shape = contourPathObject.Shape;
-				}
-				else {
-					shape = StdPatternHelper.GetPathWire( contourPathObject.GeomData.RefCenterDir, standardPatternGeomData );
-					if( shape == null || shape.IsNull() ) {
-						continue;
-					}
-
-					gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( contourPathObject.GeomData.RefCenterDir, standardPatternGeomData.IsCoordinateReversed, standardPatternGeomData.RotatedAngle_deg );
-					ShowStdPatternTrihedron( refCoord );
-					standardPatternGeomData.SetRefCoord( refCoord );
-				}
-
-				m_DataManager.ObjectMap[ szID ] = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, pathObject );
+				ProcessSinglePath( szID, standardPatternGeomData );
 			}
 			m_Viewer.UpdateView();
+		}
+
+		void ProcessSinglePath( string szID, IStdPatternGeomData standardPatternGeomData )
+		{
+			// GeomData needs to be copied because it will be used in different paths.
+			IStdPatternGeomData stdPatternGeomDataClone = ( standardPatternGeomData != null ) ? (IStdPatternGeomData)standardPatternGeomData.Clone() : null;
+
+			// get path object
+			if( !DataGettingHelper.GetPathObject( szID, out PathObject pathObject ) ) {
+				return;
+			}
+
+			// get contour path object
+			if( !GetContourPathObject( pathObject, out ContourPathObject contourPathObject ) ) {
+				return;
+			}
+
+			TopoDS_Shape shape = CreatePatternShape( szID, contourPathObject, stdPatternGeomDataClone );
+			if( shape == null || shape.IsNull() ) {
+				return;
+			}
+
+			if( !DataGettingHelper.GetGeomDataByID( szID, out IGeomData oldGeomData ) ) {
+				return;
+			}
+
+			UpdateGeomDataForPath( szID, oldGeomData, contourPathObject, stdPatternGeomDataClone );
+		}
+
+		TopoDS_Shape CreatePatternShape( string szID, ContourPathObject contourPathObject, IStdPatternGeomData standardPatternGeomData )
+		{
+			if( standardPatternGeomData == null ) {
+				return contourPathObject.Shape;
+			}
+
+			// create pattern shape
+			TopoDS_Shape shape = StdPatternHelper.GetPathWire( contourPathObject.GeomData.RefCenterDir, standardPatternGeomData );
+			if( shape == null || shape.IsNull() ) {
+				return null;
+			}
+
+			// show trihedron temporarily
+			// TODO： refcoord should take form cache computed refcoord
+			ShowStdPatternTrihedron( szID, standardPatternGeomData );
+
+			// update geom data ref center dir
+			standardPatternGeomData.SetRefCenterDir( contourPathObject.GeomData.RefCenterDir );
+
+			return shape;
+		}
+
+		void UpdateGeomDataForPath( string szID, IGeomData oldGeomData, ContourPathObject contourPathObject, IStdPatternGeomData standardPatternGeomData )
+		{
+			// should convert to contour
+			if( oldGeomData.PathType != PathType.Contour && standardPatternGeomData == null ) {
+				m_DataManager.ObjectMap[ szID ] = contourPathObject;
+			}
+
+			// should check if update geom data
+			else if( standardPatternGeomData != null && oldGeomData.PathType == standardPatternGeomData.PathType ) {
+				UpdateGeomData( oldGeomData, standardPatternGeomData );
+			}
+			else {
+
+				// create new path object
+				PathObject newPathObject = CreatePathObject( szID, contourPathObject.Shape, standardPatternGeomData, contourPathObject, m_BackUpPathObjectList[ szID ] );
+				if( newPathObject != null ) {
+					m_DataManager.ObjectMap[ szID ] = newPathObject;
+				}
+			}
+		}
+
+		void UpdateGeomData( IGeomData oldGeomData, IStdPatternGeomData standardPatternGeomData )
+		{
+			switch( oldGeomData.PathType ) {
+				case PathType.Circle:
+					UpdateCircleGeomData( oldGeomData as CircleGeomData, standardPatternGeomData as CircleGeomData );
+					break;
+				case PathType.Rectangle:
+					UpdateRectangleGeomData( oldGeomData as RectangleGeomData, standardPatternGeomData as RectangleGeomData );
+					break;
+				case PathType.Runway:
+					UpdateRunwayGeomData( oldGeomData as RunwayGeomData, standardPatternGeomData as RunwayGeomData );
+					break;
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					UpdatePolygonGeomData( oldGeomData as PolygonGeomData, standardPatternGeomData as PolygonGeomData );
+					break;
+			}
 		}
 
 		void PatternRestore()
@@ -137,37 +205,14 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		PathObject CreatePathObject( string szID, TopoDS_Shape shape, IStdPatternGeomData standardPatternGeomData, ContourPathObject contourPathObject, PathObject originalPathObject )
+		void ShowStdPatternTrihedron( string szID, IStdPatternGeomData standardPatternGeomData )
 		{
-			CraftData craftData = new CraftData();
-			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
-			switch( pathType ) {
-				case PathType.Circle:
-					return new CirclePathObject( szID, shape, standardPatternGeomData as CircleGeomData, craftData, contourPathObject );
-				case PathType.Rectangle:
-					return new RectanglePathObject( szID, shape, standardPatternGeomData as RectangleGeomData, craftData, contourPathObject );
-				case PathType.Runway:
-					return new RunwayPathObject( szID, shape, standardPatternGeomData as RunwayGeomData, craftData, contourPathObject );
-				case PathType.Triangle:
-				case PathType.Square:
-				case PathType.Pentagon:
-				case PathType.Hexagon:
-					return new PolygonPathObject( szID, shape, standardPatternGeomData as PolygonGeomData, craftData, contourPathObject );
-				case PathType.Contour:
-				default:
-					return contourPathObject;
+			gp_Ax1 refCenterDir = new gp_Ax1();
+			if( DataGettingHelper.GetPathCacheByID( szID, out IPathCache pathCache ) ) {
+				refCenterDir = pathCache.ComputeRefCenterDir;
 			}
-		}
-
-		void ShowStdPatternTrihedron( gp_Ax3 refCoord )
-		{
-			gp_Ax2 ax2 = refCoord.Ax2();
-			AIS_Trihedron trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
-			trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			trihedron.SetSize( 10.0 );
-			trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-			trihedron.SetArrowColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
+			gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( refCenterDir, standardPatternGeomData.IsCoordinateReversed, standardPatternGeomData.RotatedAngle_deg );
+			AIS_Trihedron trihedron = DrawHelper.GetTrihedronAIS( refCoord.Ax2() );
 			m_Viewer.GetAISContext().Display( trihedron, false );
 			m_Viewer.GetAISContext().Deactivate( trihedron );
 			m_TrihedronList.Add( trihedron );
@@ -198,6 +243,107 @@ namespace MyCAM.Editor
 				return true;
 			}
 			return false;
+		}
+
+		void UpdateCircleGeomData( CircleGeomData oldGeomData, CircleGeomData newGeomData )
+		{
+			if( oldGeomData == null || newGeomData == null ) {
+				return;
+			}
+			if( oldGeomData.Diameter != newGeomData.Diameter ) {
+				oldGeomData.Diameter = newGeomData.Diameter;
+			}
+			if( oldGeomData.IsCoordinateReversed != newGeomData.IsCoordinateReversed ) {
+				oldGeomData.IsCoordinateReversed = newGeomData.IsCoordinateReversed;
+			}
+			if( oldGeomData.RotatedAngle_deg != newGeomData.RotatedAngle_deg ) {
+				oldGeomData.RotatedAngle_deg = newGeomData.RotatedAngle_deg;
+			}
+		}
+
+		void UpdateRectangleGeomData( RectangleGeomData oldGeomData, RectangleGeomData newGeomData )
+		{
+			if( oldGeomData == null || newGeomData == null ) {
+				return;
+			}
+			if( oldGeomData.Width != newGeomData.Width ) {
+				oldGeomData.Width = newGeomData.Width;
+			}
+			if( oldGeomData.Length != newGeomData.Length ) {
+				oldGeomData.Length = newGeomData.Length;
+			}
+			if( oldGeomData.CornerRadius != newGeomData.CornerRadius ) {
+				oldGeomData.CornerRadius = newGeomData.CornerRadius;
+			}
+			if( oldGeomData.IsCoordinateReversed != newGeomData.IsCoordinateReversed ) {
+				oldGeomData.IsCoordinateReversed = newGeomData.IsCoordinateReversed;
+			}
+			if( oldGeomData.RotatedAngle_deg != newGeomData.RotatedAngle_deg ) {
+				oldGeomData.RotatedAngle_deg = newGeomData.RotatedAngle_deg;
+			}
+		}
+
+		void UpdatePolygonGeomData( PolygonGeomData oldGeomData, PolygonGeomData newGeomData )
+		{
+			if( oldGeomData == null || newGeomData == null ) {
+				return;
+			}
+			if( oldGeomData.Sides != newGeomData.Sides ) {
+				oldGeomData.Sides = newGeomData.Sides;
+			}
+			if( oldGeomData.SideLength != newGeomData.SideLength ) {
+				oldGeomData.SideLength = newGeomData.SideLength;
+			}
+			if( oldGeomData.CornerRadius != newGeomData.CornerRadius ) {
+				oldGeomData.CornerRadius = newGeomData.CornerRadius;
+			}
+			if( oldGeomData.IsCoordinateReversed != newGeomData.IsCoordinateReversed ) {
+				oldGeomData.IsCoordinateReversed = newGeomData.IsCoordinateReversed;
+			}
+			if( oldGeomData.RotatedAngle_deg != newGeomData.RotatedAngle_deg ) {
+				oldGeomData.RotatedAngle_deg = newGeomData.RotatedAngle_deg;
+			}
+		}
+
+		void UpdateRunwayGeomData( RunwayGeomData oldGeomData, RunwayGeomData newGeomData )
+		{
+			if( oldGeomData == null || newGeomData == null ) {
+				return;
+			}
+			if( oldGeomData.Width != newGeomData.Width ) {
+				oldGeomData.Width = newGeomData.Width;
+			}
+			if( oldGeomData.Length != newGeomData.Length ) {
+				oldGeomData.Length = newGeomData.Length;
+			}
+			if( oldGeomData.IsCoordinateReversed != newGeomData.IsCoordinateReversed ) {
+				oldGeomData.IsCoordinateReversed = newGeomData.IsCoordinateReversed;
+			}
+			if( oldGeomData.RotatedAngle_deg != newGeomData.RotatedAngle_deg ) {
+				oldGeomData.RotatedAngle_deg = newGeomData.RotatedAngle_deg;
+			}
+		}
+
+		PathObject CreatePathObject( string szID, TopoDS_Shape shape, IStdPatternGeomData standardPatternGeomData, ContourPathObject contourPathObject, PathObject originalPathObject )
+		{
+			CraftData craftData = new CraftData();
+			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
+			switch( pathType ) {
+				case PathType.Circle:
+					return new CirclePathObject( szID, shape, standardPatternGeomData as CircleGeomData, craftData, contourPathObject );
+				case PathType.Rectangle:
+					return new RectanglePathObject( szID, shape, standardPatternGeomData as RectangleGeomData, craftData, contourPathObject );
+				case PathType.Runway:
+					return new RunwayPathObject( szID, shape, standardPatternGeomData as RunwayGeomData, craftData, contourPathObject );
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					return new PolygonPathObject( szID, shape, standardPatternGeomData as PolygonGeomData, craftData, contourPathObject );
+				case PathType.Contour:
+				default:
+					return contourPathObject;
+			}
 		}
 
 		ViewManager m_ViewManager;

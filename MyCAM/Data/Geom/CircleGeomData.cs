@@ -4,9 +4,9 @@ namespace MyCAM.Data
 {
 	public class CircleGeomData : StdPatternGeomDataBase
 	{
-		public CircleGeomData( gp_Ax3 refCoord, double diameter, double rotatedAngle_deg, bool isCoordinateReversed )
+		public CircleGeomData( gp_Ax1 refCenterDir, double diameter, double rotatedAngle_deg, bool isCoordinateReversed )
 		{
-			m_RefCoord = refCoord;
+			m_RefCenterDir = refCenterDir;
 			m_Diameter = diameter;
 			m_RotatedAngle_deg = rotatedAngle_deg;
 			m_IsCoordinateReversed = isCoordinateReversed;
@@ -35,13 +35,16 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				m_Diameter = value;
+				if( m_Diameter != value ) {
+					m_Diameter = value;
+					OnCADFactorChanged();
+				}
 			}
 		}
 
 		public override IGeomData Clone()
 		{
-			return new CircleGeomData( m_RefCoord, m_Diameter, m_RotatedAngle_deg, m_IsCoordinateReversed );
+			return new CircleGeomData( m_RefCenterDir, m_Diameter, m_RotatedAngle_deg, m_IsCoordinateReversed );
 		}
 
 		public const double DEFAULT_DIAMETER = 20.0;

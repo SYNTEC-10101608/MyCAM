@@ -11,31 +11,34 @@ namespace MyCAM.PathCache
 	public class RunwayCache : StdPatternCacheBase
 	{
 		public RunwayCache( IStdPatternGeomData geomData, CraftData craftData )
-			: base( craftData )
+			: base( geomData, craftData )
 		{
 			if( geomData == null || !( geomData is RunwayGeomData runwayGeomData ) ) {
 				throw new ArgumentNullException( "RunwayCache constructing argument error - invalid geomData" );
 			}
 			m_RunwayGeomData = runwayGeomData;
-			BuildCADPointList();
-			BuildCAMPointList();
+			BuildCADCAMPointList();
 		}
 
-		protected override void BuildCADPointList()
+		protected override void BuildCADCAMPointList()
 		{
-			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RunwayGeomData );
+			ClearCADFactorDirty();
+			SetCenterDir();
+			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, m_RunwayGeomData.IsCoordinateReversed );
+			SetRefCoordSelfRotated( m_RunwayGeomData.RotatedAngle_deg );
+
+			// set reference point (for runway, it's the left arc center)
+			m_RefPoint = RunwayRefPoint();
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, m_RunwayGeomData );
 			m_MainPathCADPointList = Discretize();
+			BuildCAMPointList();
 		}
 
 		protected override void BuildCAMPointList()
 		{
-			ClearCraftDataDirty();
-
-			// set reference point (for runway, it's the left arc center)
-			m_RefPoint = RunwayRefPoint();
-
-			SetMainPathCAMPoint();
-			SetStartPointList();
+			ClearCAMFactorDirty();
+			SetPathCAMPoint();
+			SetStartPoint();
 
 			// calculate max over cut length
 			m_MaxOverCutLength = OverCutHelper.GetMaxOverCutLength( m_RunwayGeomData, m_CraftData.StartPointIndex );
@@ -53,16 +56,16 @@ namespace MyCAM.PathCache
 
 		protected override List<CADPoint> Discretize()
 		{
-			if( m_RunwayGeomData == null || m_RunwayGeomData.RefCoord == null ) {
+			if( m_RunwayGeomData == null || m_RefCoord == null ) {
 				return new List<CADPoint>();
 			}
 
-			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_RunwayGeomData.RefCoord );
+			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_RefCoord );
 			List<CADPoint> discretizedPoints = StdPatternDiscreteFactory.DiscretizeRunway( m_RunwayGeomData.Length, m_RunwayGeomData.Width, transformation );
 
 			// ensure all start points are included in the discretized list
 			if( m_StartCADPointList != null && m_StartCADPointList.Count > 0 ) {
-				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( discretizedPoints, m_StartCADPointList, m_RunwayGeomData );
+				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( m_RefCoord, discretizedPoints, m_StartCADPointList, m_RunwayGeomData );
 			}
 
 			return discretizedPoints;
@@ -92,9 +95,9 @@ namespace MyCAM.PathCache
 
 			// transform local coordinates to world coordinate system
 			gp_Ax3 targetCoordSystem = new gp_Ax3(
-				m_RunwayGeomData.RefCoord.Location(),
-				m_RunwayGeomData.RefCoord.Direction(),
-				m_RunwayGeomData.RefCoord.XDirection()
+				m_RefCoord.Location(),
+				m_RefCoord.Direction(),
+				m_RefCoord.XDirection()
 			);
 			gp_Trsf transformation = new gp_Trsf();
 			transformation.SetTransformation( targetCoordSystem, new gp_Ax3() );
@@ -103,12 +106,17 @@ namespace MyCAM.PathCache
 			return new CAMPoint(
 				new CADPoint(
 					worldLeftArcCenter,
-					m_RunwayGeomData.RefCoord.Direction(),
-					m_RunwayGeomData.RefCoord.XDirection(),
-					m_RunwayGeomData.RefCoord.YDirection()
+					m_RefCoord.Direction(),
+					m_RefCoord.XDirection(),
+					m_RefCoord.YDirection()
 				),
-				m_RunwayGeomData.RefCoord.Direction()
+				m_RefCoord.Direction()
 			);
+		}
+
+		protected override void SetCenterDir()
+		{
+			m_ComputeRefCenterDir = m_RunwayGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
 		}
 
 		RunwayGeomData m_RunwayGeomData;

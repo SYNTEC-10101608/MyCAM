@@ -4,9 +4,9 @@ namespace MyCAM.Data
 {
 	public class RunwayGeomData : StdPatternGeomDataBase
 	{
-		public RunwayGeomData( gp_Ax3 refCoord, double length, double width, double rotatedAngle_deg, bool isCoordinateReversed )
+		public RunwayGeomData( gp_Ax1 refCenterDir, double length, double width, double rotatedAngle_deg, bool isCoordinateReversed )
 		{
-			m_RefCoord = refCoord;
+			m_RefCenterDir = refCenterDir;
 			m_Length = length;
 			m_Width = width;
 			m_RotatedAngle_deg = rotatedAngle_deg;
@@ -37,7 +37,10 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				m_Length = value;
+				if( m_Length != value ) {
+					m_Length = value;
+					OnCADFactorChanged();
+				}
 			}
 		}
 
@@ -49,13 +52,16 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				m_Width = value;
+				if( m_Width != value ) {
+					m_Width = value;
+					OnCADFactorChanged();
+				}
 			}
 		}
 
 		public override IGeomData Clone()
 		{
-			return new RunwayGeomData( m_RefCoord, m_Length, m_Width, m_RotatedAngle_deg, m_IsCoordinateReversed );
+			return new RunwayGeomData( m_RefCenterDir, m_Length, m_Width, m_RotatedAngle_deg, m_IsCoordinateReversed );
 		}
 
 		public const double DEFAULT_LENGTH = 40.0;

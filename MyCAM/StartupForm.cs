@@ -380,6 +380,11 @@ namespace MyCAM
 			m_CAMEditor.SetStandardPattern();
 		}
 
+		void m_tsbPathEdit_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathEdit();
+		}
+
 		// convert NC
 		void m_tsbConvertNC_Click( object sender, EventArgs e )
 		{
