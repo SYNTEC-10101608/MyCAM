@@ -1008,6 +1008,12 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public gp_TrsfDTO CumulativeTrsfMatrix
+		{
+			get;
+			set;
+		} = new gp_TrsfDTO();
+
 		public TraverseDataDTO TraverseData
 		{
 			get;
@@ -1050,6 +1056,9 @@ namespace MyCAM.FileManager
 			IsPathReverse = craftData.IsPathReverse;
 			IsToolVecReverse = craftData.IsToolVecReverse;
 			StartPoint = craftData.StartPointIndex;
+			CumulativeTrsfMatrix = craftData.CumulativeTrsfMatrix != null
+									? new gp_TrsfDTO( craftData.CumulativeTrsfMatrix )
+									: new gp_TrsfDTO();
 			LeadData = craftData.LeadData != null
 						? new LeadDataDTO( craftData.LeadData )
 						: new LeadDataDTO();
@@ -1066,7 +1075,7 @@ namespace MyCAM.FileManager
 		internal CraftData ToCraftData()
 		{
 			if( ToolVecModifyMap == null || LeadData == null || TraverseData == null ) {
-				throw new ArgumentException( "ContourCache deserialization failed." );
+				throw new ArgumentException( "CraftData deserialization failed." );
 			}
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = ToolVecModifyMap.ToDictionary(
 				dto => dto.Index,
@@ -1075,7 +1084,15 @@ namespace MyCAM.FileManager
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
 			EToolVecInterpolateType interpolateType = InterpolateType;
-			return new CraftData( StartPoint, IsPathReverse, leadData, OverCutLength, toolVecModifyMap, IsToolVecReverse, interpolateType, traverseData );
+
+			CraftData craftData = new CraftData( StartPoint, IsPathReverse, leadData, OverCutLength, toolVecModifyMap, IsToolVecReverse, interpolateType, traverseData );
+
+			// Set properties not in constructor
+			craftData.CumulativeTrsfMatrix = CumulativeTrsfMatrix != null
+												? CumulativeTrsfMatrix.ToTrsf()
+												: new gp_Trsf();
+
+			return craftData;
 		}
 	}
 
@@ -1555,6 +1572,132 @@ namespace MyCAM.FileManager
 				Vertex_ID = VertexID,
 				Path_ID = PathID,
 			};
+		}
+	}
+
+	public class gp_TrsfDTO
+	{
+		// Transformation matrix values (3x4 matrix)
+		// Row 1
+		public double M11
+		{
+			get; set;
+		}
+		public double M12
+		{
+			get; set;
+		}
+		public double M13
+		{
+			get; set;
+		}
+		public double M14
+		{
+			get; set;
+		}
+
+		// Row 2
+		public double M21
+		{
+			get; set;
+		}
+		public double M22
+		{
+			get; set;
+		}
+		public double M23
+		{
+			get; set;
+		}
+		public double M24
+		{
+			get; set;
+		}
+
+		// Row 3
+		public double M31
+		{
+			get; set;
+		}
+		public double M32
+		{
+			get; set;
+		}
+		public double M33
+		{
+			get; set;
+		}
+		public double M34
+		{
+			get; set;
+		}
+
+		// parameterless constructor (for XmlSerializer)
+		public gp_TrsfDTO()
+		{
+			// Initialize as identity matrix
+			M11 = 1;
+			M12 = 0;
+			M13 = 0;
+			M14 = 0;
+			M21 = 0;
+			M22 = 1;
+			M23 = 0;
+			M24 = 0;
+			M31 = 0;
+			M32 = 0;
+			M33 = 1;
+			M34 = 0;
+		}
+
+		internal gp_TrsfDTO( gp_Trsf trsf )
+		{
+			if( trsf == null ) {
+				// Initialize as identity matrix
+				M11 = 1;
+				M12 = 0;
+				M13 = 0;
+				M14 = 0;
+				M21 = 0;
+				M22 = 1;
+				M23 = 0;
+				M24 = 0;
+				M31 = 0;
+				M32 = 0;
+				M33 = 1;
+				M34 = 0;
+				return;
+			}
+
+			// Get transformation matrix values
+			// gp_Trsf uses Value(row, col) method where indices are 1-based
+			M11 = trsf.Value( 1, 1 );
+			M12 = trsf.Value( 1, 2 );
+			M13 = trsf.Value( 1, 3 );
+			M14 = trsf.Value( 1, 4 );
+			M21 = trsf.Value( 2, 1 );
+			M22 = trsf.Value( 2, 2 );
+			M23 = trsf.Value( 2, 3 );
+			M24 = trsf.Value( 2, 4 );
+			M31 = trsf.Value( 3, 1 );
+			M32 = trsf.Value( 3, 2 );
+			M33 = trsf.Value( 3, 3 );
+			M34 = trsf.Value( 3, 4 );
+		}
+
+		internal gp_Trsf ToTrsf()
+		{
+			gp_Trsf trsf = new gp_Trsf();
+
+			// Set transformation matrix values
+			// gp_Trsf uses SetValues method to set the matrix
+			trsf.SetValues(
+				M11, M12, M13, M14,
+				M21, M22, M23, M24,
+				M31, M32, M33, M34
+			);
+
+			return trsf;
 		}
 	}
 }
