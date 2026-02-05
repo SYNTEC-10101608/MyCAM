@@ -104,6 +104,13 @@ namespace MyCAM.Helper
 
 		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint )
 		{
+			double dM_In = toolVecPoint.ModMaster_rad;
+			double dS_In = toolVecPoint.ModSlave_rad;
+			return GetMSAngleFromToolVec( toolVec, dM_In, dS_In );
+		}
+
+		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, double dM_In, double dS_In )
+		{
 			// Get machine data
 			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
 				return new Tuple<double, double>( 0, 0 );
@@ -111,10 +118,7 @@ namespace MyCAM.Helper
 
 			// Create PostSolver
 			PostSolver postSolver = new PostSolver( machineData );
-			double dM_In = toolVecPoint.ModMaster_rad;
-			double dS_In = toolVecPoint.ModSlave_rad;
 			IKSolveResult result = postSolver.SolveIK( toolVec, dM_In, dS_In, out double dMaster_rad, out double dSlave_rad );
-
 			if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution ) {
 				return new Tuple<double, double>( 0, 0 );
 			}

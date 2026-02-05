@@ -238,6 +238,12 @@ namespace MyCAM.Data
 			ParameterChanged?.Invoke();
 		}
 
+		public void ClearToolVecModify()
+		{
+			m_ToolVecModifyMap.Clear();
+			ParameterChanged?.Invoke();
+		}
+
 		void SubscribeSubParamChanged()
 		{
 			m_LeadData.PropertyChanged += SubParamChanged;

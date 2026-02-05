@@ -1,6 +1,7 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
+using MyCAM.Helper;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.AIS;
@@ -363,9 +364,37 @@ namespace MyCAM.Editor
 			ShowCAMData( szPathIDList );
 		}
 
-		public void SetInterpolateTypeAsFixedDir()
+		// TODO: this is temp version
+		public void SetFixedToolVec()
 		{
-			// TODO: implement this
+			// one shot edit, multi edit supported
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
+			foreach( string szPathID in szPathIDList ) {
+				if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType )
+					|| pathType != PathType.Contour ) {
+					continue;
+				}
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData )
+					|| !DataGettingHelper.GetGeomDataByID( szPathID, out IGeomData geomData ) ) {
+					continue;
+				}
+
+				// clear all tool vec modify data
+				craftData.ClearToolVecModify();
+				craftData.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
+
+				// get averge tool vec
+				gp_Dir avgDir = ( geomData as ContourGeomData ).RefCenterDir.Direction();
+
+				// get ms angle
+				Tuple<double, double> avgMS_deg = ToolVecHelper.GetMSAngleFromToolVec( avgDir, 0, 0 );
+
+				// set average ms to start point
+				craftData.SetToolVecModify( craftData.StartPointIndex, 0, 0, avgMS_deg.Item1, avgMS_deg.Item2 );
+			}
+			ShowCAMData( szPathIDList );
 		}
 
 		public void SetTraverseData()
