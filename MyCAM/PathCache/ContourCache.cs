@@ -201,7 +201,6 @@ namespace MyCAM.PathCache
 					continue;
 				}
 				else if( ikResult == IKSolveResult.OutOfRange ) {
-
 					// temporary do nothing
 				}
 				m_CAMPointList[ i ].InitMaster_rad = dLastProcessPathM;

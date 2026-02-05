@@ -364,6 +364,8 @@ namespace MyCAM.Helper
 			double dM = toolVecModifyMap[ 0 ].Master_deg * Math.PI / 180.0;
 			double dS = toolVecModifyMap[ 0 ].Slave_deg * Math.PI / 180.0;
 
+			// sigularity tag list
+			List<bool> singularTagList = new List<bool>();
 			for( int i = 0; i < toolVecPointList.Count; i++ ) {
 				IKSolveResult result = postSolver.SolveIK( toolVecPointList[ i ].ToolVec, dM, dS, out dM, out dS );
 				if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution ) {
@@ -372,8 +374,118 @@ namespace MyCAM.Helper
 				else if( result == IKSolveResult.OutOfRange ) {
 					// out of range, but still set the angles
 				}
+
+				// check singularity
+				if( result == IKSolveResult.MasterInfinityOfSolution || result == IKSolveResult.SlaveInfinityOfSolution ) {
+					singularTagList.Add( true );
+				}
+				else {
+					singularTagList.Add( false );
+				}
 				toolVecPointList[ i ].ModMaster_rad = dM;
 				toolVecPointList[ i ].ModSlave_rad = dS;
+			}
+
+			// filter singular points and apply results directly to toolVecPointList
+			bool bFilterMaster = machineData.FiveAxisType == FiveAxisType.Spindle;
+			FilterSingularPoints( ref toolVecPointList, singularTagList, bFilterMaster );
+		}
+
+		static void FilterSingularPoints( ref List<ISetToolVecPoint> pointList, List<bool> singularTagList, bool bFilterMaster )
+		{
+			const int FIRST_INDEX = 0;
+			if( pointList == null || singularTagList == null ||
+				pointList.Count == 0 || pointList.Count != singularTagList.Count ) {
+				return;
+			}
+			int nPathPntCount = singularTagList.Count;
+			int i = 0;
+
+			// find singular regions and interpolate
+			while( i < nPathPntCount ) {
+
+				// skip non-singular points or points with IsToolVecModPoint == true
+				if( !singularTagList[ i ] || pointList[ i ].IsToolVecModPoint ) {
+					i++;
+					continue;
+				}
+
+				// found a singular point, find the range [regionStart, regionEnd]
+				int regionStart = i;
+				int regionEnd = i;
+
+				// extend to find the complete singular region (singular and not IsToolVecModPoint)
+				// 1. did not exceed the last point
+				// 2. is singular point
+				// 3. is not IsToolVecModPoint
+				while( regionEnd < nPathPntCount && singularTagList[ regionEnd ] && !pointList[ regionEnd ].IsToolVecModPoint ) {
+					regionEnd++;
+				}
+				regionEnd--; // back to last singular point
+
+				// determine start values for interpolation
+				double startM, startS;
+				if( regionStart == FIRST_INDEX ) {
+					// rule 3: if first point is singular, use its value
+					startM = pointList[ FIRST_INDEX ].ModMaster_rad;
+					startS = pointList[ FIRST_INDEX ].ModSlave_rad;
+				}
+				else {
+					// use n-1 value
+					startM = pointList[ regionStart - 1 ].ModMaster_rad;
+					startS = pointList[ regionStart - 1 ].ModSlave_rad;
+				}
+
+				// determine end values for interpolation
+				double endM, endS;
+				if( regionEnd == nPathPntCount - 1 ) {
+					// rule 4: if last point is singular, use its value
+					endM = pointList[ nPathPntCount - 1 ].ModMaster_rad;
+					endS = pointList[ nPathPntCount - 1 ].ModSlave_rad;
+				}
+				else {
+					// use m+1 value
+					endM = pointList[ regionEnd + 1 ].ModMaster_rad;
+					endS = pointList[ regionEnd + 1 ].ModSlave_rad;
+				}
+
+				// calculate cumulative path lengths for interpolation
+				List<double> cumulativeLength = new List<double>();
+				double totalLength = 0.0;
+				for( int j = regionStart; j <= regionEnd; j++ ) {
+
+					// first singular pnt is start point && this point is interpolation pnt
+					if( j == FIRST_INDEX ) {
+						cumulativeLength.Add( 0.0 );
+					}
+					else {
+						gp_Pnt p1 = pointList[ j - 1 ].Point;
+						gp_Pnt p2 = pointList[ j ].Point;
+						double segmentLength = p1.Distance( p2 );
+						totalLength += segmentLength;
+						cumulativeLength.Add( totalLength );
+					}
+				}
+
+				// regionEnd is not the last point of this path
+				if( regionEnd != nPathPntCount - 1 ) {
+					gp_Pnt p1 = pointList[ regionEnd ].Point;
+					gp_Pnt p2 = pointList[ regionEnd + 1 ].Point;
+					double segmentLength = p1.Distance( p2 );
+					totalLength += segmentLength;
+				}
+
+				// linear interpolation along path length and apply directly to pointList
+				for( int j = regionStart; j <= regionEnd; j++ ) {
+					double t = ( totalLength > GEOM_TOLERANCE ) ? ( cumulativeLength[ j - regionStart ] / totalLength ) : 0.0;
+					double interpolatedM = startM + t * ( endM - startM );
+					double interpolatedS = startS + t * ( endS - startS );
+					pointList[ j ].ModMaster_rad = bFilterMaster ? interpolatedM : pointList[ j ].ModMaster_rad;
+					pointList[ j ].ModSlave_rad = bFilterMaster ? pointList[ j ].ModSlave_rad : interpolatedS;
+				}
+
+				// move to next region
+				i = regionEnd + 1;
 			}
 		}
 
@@ -483,6 +595,7 @@ namespace MyCAM.Helper
 		const double BIG_AB_ANGLE = 999.0;
 		const double PROJECT_TOLERANCE = 1e-3;
 		const double RADIUS_TOLERANCE = 1e-3;
+		const double GEOM_TOLERANCE = 1e-3;
 
 		const int CLOSED_POINT_INDEX = -1;
 
