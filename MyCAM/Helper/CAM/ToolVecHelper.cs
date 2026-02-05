@@ -387,7 +387,7 @@ namespace MyCAM.Helper
 			}
 
 			// filter singular points and apply results directly to toolVecPointList
-			bool bFilterMaster = machineData.FiveAxisType == FiveAxisType.Spindle;
+			bool bFilterMaster = machineData.FiveAxisType == FiveAxisType.Spindle; // which axis is going to filter
 			FilterSingularPoints( ref toolVecPointList, singularTagList, bFilterMaster );
 		}
 
@@ -480,6 +480,8 @@ namespace MyCAM.Helper
 					double t = ( totalLength > GEOM_TOLERANCE ) ? ( cumulativeLength[ j - regionStart ] / totalLength ) : 0.0;
 					double interpolatedM = startM + t * ( endM - startM );
 					double interpolatedS = startS + t * ( endS - startS );
+
+					// interpolate the axis with infinity solution only
 					pointList[ j ].ModMaster_rad = bFilterMaster ? interpolatedM : pointList[ j ].ModMaster_rad;
 					pointList[ j ].ModSlave_rad = bFilterMaster ? pointList[ j ].ModSlave_rad : interpolatedS;
 				}
