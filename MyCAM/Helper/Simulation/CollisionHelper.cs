@@ -30,7 +30,6 @@ namespace MyCAM.Helper
 			FrameCollisionMap[ MachineComponentType.Slave ] = new List<bool>();
 			FrameCollisionMap[ MachineComponentType.Laser ] = new List<bool>();
 			FrameCollisionMap[ MachineComponentType.WorkPiece ] = new List<bool>();
-			FrameCollisionMap[ MachineComponentType.Tool ] = new List<bool>();
 			for( int i = 0; i < FrameCount; i++ ) {
 				BuildPerFrameCollision( i, ChainListMap, FCLTest, FrameTransformMap, ref FrameCollisionMap );
 			}
@@ -65,7 +64,6 @@ namespace MyCAM.Helper
 				FrameCollisionMap[ MachineComponentType.ZAxis ].Add( collisionResiltSet.Contains( MachineComponentType.ZAxis ) );
 				FrameCollisionMap[ MachineComponentType.Master ].Add( collisionResiltSet.Contains( MachineComponentType.Master ) );
 				FrameCollisionMap[ MachineComponentType.Slave ].Add( collisionResiltSet.Contains( MachineComponentType.Slave ) );
-				FrameCollisionMap[ MachineComponentType.Tool ].Add( collisionResiltSet.Contains( MachineComponentType.Tool ) );
 				FrameCollisionMap[ MachineComponentType.WorkPiece ].Add( collisionResiltSet.Contains( MachineComponentType.WorkPiece ) );
 			}
 			catch( Exception ex ) {

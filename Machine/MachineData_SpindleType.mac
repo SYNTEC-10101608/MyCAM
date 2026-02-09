@@ -48,7 +48,7 @@
           <Child Type="ZAxis">
             <Child Type="Master">
               <Child Type="Slave">
-                <Child Type="Tool" />
+                <Child Type="Laser" />
               </Child>
             </Child>
           </Child>

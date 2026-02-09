@@ -42,7 +42,6 @@
 		Slave = 5,
 		WorkPiece = 6,
 		Laser = 7,
-		Tool = 8,
 	}
 
 	public enum MachinePrValue

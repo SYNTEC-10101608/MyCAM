@@ -182,7 +182,10 @@ namespace MyCAM.Editor
 
 		public void PlayPrePath()
 		{
-			bool isRunning = m_PlayTimer.Enabled;
+			bool isRunning = false;
+			if( m_PlayTimer != null ) {
+				isRunning = m_PlayTimer.Enabled;
+			}
 			PauseSimulation();
 			CalSimulationResult();
 
@@ -210,7 +213,10 @@ namespace MyCAM.Editor
 
 		public void PlayNextPath()
 		{
-			bool isRunning = m_PlayTimer.Enabled;
+			bool isRunning = false;
+			if( m_PlayTimer != null ) {
+				isRunning = m_PlayTimer.Enabled;
+			}
 			PauseSimulation();
 			CalSimulationResult();
 
@@ -857,7 +863,6 @@ namespace MyCAM.Editor
 			LaserAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
 			LaserAIS.SetTransparency( 0.8f );
 			m_MachineAIS.AISList[ MachineComponentType.Laser ] = LaserAIS;
-			m_Viewer.GetAISContext().Display( LaserAIS, false );
 		}
 
 		#endregion

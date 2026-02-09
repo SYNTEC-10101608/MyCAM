@@ -258,15 +258,6 @@ namespace MyCAM.Helper
 
 		#region Build Frame Transform Map
 
-		static MachineComponentType GetToolStickOnWhichAxis( Dictionary<MachineComponentType, List<MachineComponentType>> chainListMap )
-		{
-			if( chainListMap == null || !chainListMap.ContainsKey( MachineComponentType.Tool ) || chainListMap[ MachineComponentType.Tool ].Count == 0 ) {
-				return MachineComponentType.UnKnow;
-			}
-			List<MachineComponentType> toolParents = chainListMap[ MachineComponentType.Tool ];
-			return toolParents.Last();
-		}
-
 		static bool BuildFrame( List<PathSimuFKData> pathFKPntList, PostSolver postSolver, HashSet<MachineComponentType> workPiecesChaintSet, MachineData machineData, Dictionary<MachineComponentType, List<MachineComponentType>> chainListMap, out Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap, out int frameCount )
 		{
 			frameCount = 0;
@@ -276,7 +267,6 @@ namespace MyCAM.Helper
 			}
 
 			// init frame transform map
-			m_FrameTransformMap[ MachineComponentType.Tool ] = new List<gp_Trsf>();
 			m_FrameTransformMap[ MachineComponentType.XAxis ] = new List<gp_Trsf>();
 			m_FrameTransformMap[ MachineComponentType.YAxis ] = new List<gp_Trsf>();
 			m_FrameTransformMap[ MachineComponentType.ZAxis ] = new List<gp_Trsf>();
@@ -296,7 +286,6 @@ namespace MyCAM.Helper
 				MyApp.Logger.ShowOnLogPanel( "缺少軸向旋轉方向", MyApp.NoticeType.Warning );
 				return false;
 			}
-			MachineComponentType axisToolStickOn = GetToolStickOnWhichAxis( chainListMap );
 
 			// each path
 			foreach( var simuFKData in pathFKPntList ) {
@@ -305,21 +294,21 @@ namespace MyCAM.Helper
 				if( simuFKData.TraversePntFKList != null && simuFKData.TraversePntFKList.Count > 0 ) {
 					foreach( var postpoint in simuFKData.TraversePntFKList ) {
 						FKToFrameTranfResult( postpoint, G54Offset, workPiecesChaintSet,
-						machineData, chainListMap, axisToolStickOn, ref m_FrameTransformMap );
+						machineData, chainListMap, ref m_FrameTransformMap );
 						frameCount++;
 					}
 				}
 				if( simuFKData.PathPntFKList != null && simuFKData.PathPntFKList.Count > 0 ) {
 					foreach( var postpoint in simuFKData.PathPntFKList ) {
 						FKToFrameTranfResult( postpoint, G54Offset, workPiecesChaintSet,
-						machineData, chainListMap, axisToolStickOn, ref m_FrameTransformMap );
+						machineData, chainListMap, ref m_FrameTransformMap );
 						frameCount++;
 					}
 				}
 				if( simuFKData.ExitPntFKList != null && simuFKData.ExitPntFKList.Count > 0 ) {
 					foreach( var postpoint in simuFKData.ExitPntFKList ) {
 						FKToFrameTranfResult( postpoint, G54Offset, workPiecesChaintSet,
-						machineData, chainListMap, axisToolStickOn, ref m_FrameTransformMap );
+						machineData, chainListMap, ref m_FrameTransformMap );
 						frameCount++;
 					}
 				}
@@ -329,7 +318,7 @@ namespace MyCAM.Helper
 
 		static void FKToFrameTranfResult( PostPoint FKPnt, gp_Vec G54Offset, HashSet<MachineComponentType> workPiecesChaintSet,
 			MachineData machineData, Dictionary<MachineComponentType, List<MachineComponentType>> chainListMap,
-			MachineComponentType axisToolStickOn, ref Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap )
+			ref Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap )
 		{
 			try {
 				// set XYZ transform
@@ -344,14 +333,6 @@ namespace MyCAM.Helper
 				gp_Trsf trsfSlave = GetComponentTrsf( transformMap, MachineComponentType.Slave, chainListMap );
 				gp_Trsf trsLaser = GetComponentTrsf( transformMap, MachineComponentType.Laser, chainListMap );
 				gp_Trsf trsfAllWorkPiece = GetComponentTrsf( transformMap, MachineComponentType.WorkPiece, chainListMap );
-
-				// tool will transform according to which axis it stick on
-				gp_Trsf trsfTool = new gp_Trsf();
-				if( axisToolStickOn != MachineComponentType.UnKnow ) {
-
-					// if dont know tool stick on which axis , tool do not need to transform
-					trsfTool = GetComponentTrsf( transformMap, axisToolStickOn, chainListMap );
-				}
 				m_FrameTransformMap[ MachineComponentType.XAxis ].Add( trsfX );
 				m_FrameTransformMap[ MachineComponentType.YAxis ].Add( trsfY );
 				m_FrameTransformMap[ MachineComponentType.ZAxis ].Add( trsfZ );
@@ -359,7 +340,6 @@ namespace MyCAM.Helper
 				m_FrameTransformMap[ MachineComponentType.Slave ].Add( trsfSlave );
 				m_FrameTransformMap[ MachineComponentType.Laser ].Add( trsLaser );
 				m_FrameTransformMap[ MachineComponentType.WorkPiece ].Add( trsfAllWorkPiece );
-				m_FrameTransformMap[ MachineComponentType.Tool ].Add( trsfTool );
 			}
 			catch( Exception ex ) {
 				MyApp.Logger.ShowOnLogPanel( $"特定畫面計算失敗: {ex.Message}", MyApp.NoticeType.Warning );

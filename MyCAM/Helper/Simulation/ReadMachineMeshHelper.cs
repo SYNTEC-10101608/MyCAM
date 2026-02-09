@@ -62,12 +62,12 @@ namespace MyCAM.Helper
 				return false;
 			}
 			// read stl files
-			string[] stlNames = { "Base", "X", "Y", "Z", "Master", "Slave", "Tool" };
+			string[] stlNames = { "Base", "X", "Y", "Z", "Master", "Slave" };
 
 			foreach( string name in stlNames ) {
 				string filePath = Path.Combine( szFolderName, name + ".stl" );
 				if( !File.Exists( filePath ) ) {
-					if( name == "Master" || name == "Slave" || name == "Tool" ) {
+					if( name == "Master" || name == "Slave") {
 						AnnounceWrning( ReadStlResult.FileNotFound, name );
 						return false;
 					}
@@ -92,9 +92,6 @@ namespace MyCAM.Helper
 						break;
 					case "Slave":
 						machineMeshes.Meshes[ MachineComponentType.Slave ] = mesh;
-						break;
-					case "Tool":
-						machineMeshes.Meshes[ MachineComponentType.Tool ] = mesh;
 						break;
 					default:
 						break;

@@ -77,12 +77,18 @@ namespace MyCAM.Editor.Renderer
 					if( aisObj == null ) {
 						continue;
 					}
+
+					// machine part
 					if( aisObj is AIS_Triangulation tri ) {
 						ResetAIS( tri, keyValue.Key );
 						m_Viewer.GetAISContext().Display( tri, false );
+						m_Viewer.GetAISContext().Deactivate( tri );
 					}
+
+					// laser light
 					else {
 						m_Viewer.GetAISContext().Display( aisObj, false );
+						m_Viewer.GetAISContext().Deactivate( aisObj );
 					}
 				}
 			}
