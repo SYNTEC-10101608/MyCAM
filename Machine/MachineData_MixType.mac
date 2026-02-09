@@ -51,9 +51,7 @@
       <Child Type="XAxis"> 
         <Child Type="ZAxis">
           <Child Type="Master">
-            <Child Type="Tool">
-			  <Child Type="Laser" />
-            </Child>
+			<Child Type="Laser" />
           </Child>
 		</Child>
       </Child>

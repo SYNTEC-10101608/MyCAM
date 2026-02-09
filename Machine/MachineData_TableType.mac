@@ -53,7 +53,7 @@
         </Child>
       </Child>
       <Child Type="ZAxis">
-        <Child Type="Tool" />
+        <Child Type="Laser" />
       </Child>
     </Child>
   </MachineTree>

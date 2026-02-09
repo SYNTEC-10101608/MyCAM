@@ -1,7 +1,6 @@
 ﻿using MyCAM.Post;
 using OCC.gp;
 using System.Collections.Generic;
-using System.Security.Policy;
 
 namespace MyCAM.Data
 {
@@ -29,7 +28,7 @@ namespace MyCAM.Data
 						new MachineTreeDef( MachineComponentType.YAxis,
 							new MachineTreeDef( MachineComponentType.ZAxis,
 								new MachineTreeDef( MachineComponentType.Master,
-									new MachineTreeDef( MachineComponentType.Tool, new MachineTreeDef( MachineComponentType.Laser ) ) ) ) ) )
+									new MachineTreeDef( MachineComponentType.Laser, new MachineTreeDef( MachineComponentType.Laser ) ) ) ) ) )
 				);
 
 			public static readonly MachineTreeDef DefaultTableTreeDef =
@@ -40,8 +39,7 @@ namespace MyCAM.Data
 					new MachineTreeDef( MachineComponentType.YAxis,
 						new MachineTreeDef( MachineComponentType.XAxis,
 							new MachineTreeDef( MachineComponentType.ZAxis,
-								new MachineTreeDef( MachineComponentType.Tool,
-									new MachineTreeDef( MachineComponentType.Laser ) ) ) ) )
+								new MachineTreeDef( MachineComponentType.Laser ) ) ) )
 				);
 
 			public static readonly MachineTreeDef DefaultSpindleTreeDef =
@@ -51,8 +49,7 @@ namespace MyCAM.Data
 							new MachineTreeDef( MachineComponentType.ZAxis,
 								new MachineTreeDef( MachineComponentType.Master,
 									new MachineTreeDef( MachineComponentType.Slave,
-										new MachineTreeDef( MachineComponentType.Tool,
-											new MachineTreeDef( MachineComponentType.Laser ) ) ) ) ) ) ),
+										new MachineTreeDef( MachineComponentType.Laser ) ) ) ) ) ),
 					new MachineTreeDef( MachineComponentType.WorkPiece )
 				);
 		}
