@@ -67,5 +67,10 @@ namespace MyCAM.PathCache
 		{
 			get;
 		}
+
+		IStdPatternGeomData ComputeGeomData
+		{
+			get;
+		}
 	}
 }

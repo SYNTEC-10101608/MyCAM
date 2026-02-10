@@ -37,6 +37,8 @@
 			this.m_lblRefCoordType = new System.Windows.Forms.Label();
 			this.m_cmbRefCoordType = new System.Windows.Forms.ComboBox();
 			this.m_btnConfirm = new System.Windows.Forms.Button();
+			this.m_btnClear = new System.Windows.Forms.Button();
+			this.m_btnReset = new System.Windows.Forms.Button();
 			this.m_gpbMove.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownZ)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownY)).BeginInit();
@@ -99,27 +101,27 @@
 			this.m_lblZ.AutoSize = true;
 			this.m_lblZ.Location = new System.Drawing.Point(31, 147);
 			this.m_lblZ.Name = "m_lblZ";
-			this.m_lblZ.Size = new System.Drawing.Size(26, 15);
+			this.m_lblZ.Size = new System.Drawing.Size(58, 15);
 			this.m_lblZ.TabIndex = 4;
-			this.m_lblZ.Text = "Z：";
+			this.m_lblZ.Text = "Z(增量)：";
 			// 
 			// m_lblY
 			// 
 			this.m_lblY.AutoSize = true;
 			this.m_lblY.Location = new System.Drawing.Point(31, 112);
 			this.m_lblY.Name = "m_lblY";
-			this.m_lblY.Size = new System.Drawing.Size(26, 15);
+			this.m_lblY.Size = new System.Drawing.Size(58, 15);
 			this.m_lblY.TabIndex = 3;
-			this.m_lblY.Text = "Y：";
+			this.m_lblY.Text = "Y(增量)：";
 			// 
 			// m_lblX
 			// 
 			this.m_lblX.AutoSize = true;
 			this.m_lblX.Location = new System.Drawing.Point(31, 71);
 			this.m_lblX.Name = "m_lblX";
-			this.m_lblX.Size = new System.Drawing.Size(26, 15);
+			this.m_lblX.Size = new System.Drawing.Size(58, 15);
 			this.m_lblX.TabIndex = 2;
-			this.m_lblX.Text = "X：";
+			this.m_lblX.Text = "X(增量)：";
 			// 
 			// m_lblRefCoordType
 			// 
@@ -152,11 +154,35 @@
 			this.m_btnConfirm.UseVisualStyleBackColor = true;
 			this.m_btnConfirm.Click += new System.EventHandler(this.m_btnConfirm_Click);
 			// 
+			// m_btnClear
+			// 
+			this.m_btnClear.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.m_btnClear.Location = new System.Drawing.Point(111, 222);
+			this.m_btnClear.Name = "m_btnClear";
+			this.m_btnClear.Size = new System.Drawing.Size(75, 23);
+			this.m_btnClear.TabIndex = 2;
+			this.m_btnClear.Text = "清除";
+			this.m_btnClear.UseVisualStyleBackColor = true;
+			this.m_btnClear.Click += new System.EventHandler(this.m_btnClear_Click);
+			// 
+			// m_btnReset
+			// 
+			this.m_btnReset.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.m_btnReset.Location = new System.Drawing.Point(26, 222);
+			this.m_btnReset.Name = "m_btnReset";
+			this.m_btnReset.Size = new System.Drawing.Size(75, 23);
+			this.m_btnReset.TabIndex = 3;
+			this.m_btnReset.Text = "重置";
+			this.m_btnReset.UseVisualStyleBackColor = true;
+			this.m_btnReset.Click += new System.EventHandler(this.m_btnReset_Click);
+			// 
 			// PathEditDlg
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(283, 257);
+			this.Controls.Add(this.m_btnReset);
+			this.Controls.Add(this.m_btnClear);
 			this.Controls.Add(this.m_btnConfirm);
 			this.Controls.Add(this.m_gpbMove);
 			this.Name = "PathEditDlg";
@@ -183,5 +209,7 @@
 		private System.Windows.Forms.Label m_lblY;
 		private System.Windows.Forms.Label m_lblX;
 		private System.Windows.Forms.Button m_btnConfirm;
+		private System.Windows.Forms.Button m_btnClear;
+		private System.Windows.Forms.Button m_btnReset;
 	}
 }

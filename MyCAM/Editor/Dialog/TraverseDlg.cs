@@ -14,6 +14,7 @@ namespace MyCAM.Editor
 
 		void InitializeControlAndFieldValue( TraverseData Data )
 		{
+			SetNumericUpDownRange();
 			if( Data == null ) {
 				m_NumericUpDownCutDownDistance.Value = (decimal)m_CutDownDistance;
 				m_NumericUpDownFollowSafeDistance.Value = (decimal)m_FollowSafeDistance;
@@ -39,6 +40,20 @@ namespace MyCAM.Editor
 			m_FrogLeapDistance = Data.FrogLeapDistance;
 			m_IsSafePlaneChecked = Data.IsSafePlaneEnable;
 			m_SafePlaneDistance = Data.SafePlaneDistance;
+		}
+
+		void SetNumericUpDownRange()
+		{
+			m_NumericUpDownCutDownDistance.Maximum = decimal.MaxValue;
+			m_NumericUpDownCutDownDistance.Minimum = 0;
+			m_NumericUpDownFollowSafeDistance.Maximum = decimal.MaxValue;
+			m_NumericUpDownFollowSafeDistance.Minimum = 0;
+			m_NumericUpDownLiftUpDistance.Maximum = decimal.MaxValue;
+			m_NumericUpDownLiftUpDistance.Minimum = 0;
+			m_NumericUpDownFrogLeapDistance.Maximum = decimal.MaxValue;
+			m_NumericUpDownFrogLeapDistance.Minimum = 0;
+			m_NumericUpDownSafePlaneDistance.Maximum = decimal.MaxValue;
+			m_NumericUpDownSafePlaneDistance.Minimum = 0;
 		}
 
 		protected override void OnShown( EventArgs e )
@@ -197,7 +212,18 @@ namespace MyCAM.Editor
 
 		void m_btnConfirm_Click( object sender, EventArgs e )
 		{
+			GetValuesOfControls();
 			RaiseConfirm( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );
+		}
+
+		void GetValuesOfControls()
+		{
+			m_CutDownDistance = (double)m_NumericUpDownCutDownDistance.Value;
+			m_FollowSafeDistance = (double)m_NumericUpDownFollowSafeDistance.Value;
+			m_LifUpDistance = (double)m_NumericUpDownLiftUpDistance.Value;
+			m_FrogLeapDistance = (double)m_NumericUpDownFrogLeapDistance.Value;
+			m_IsSafePlaneChecked = m_chkSafePlane.Checked;
+			m_SafePlaneDistance = (double)m_NumericUpDownSafePlaneDistance.Value;
 		}
 
 		double m_CutDownDistance = TraverseData.CUT_DOWN_DISTANCE;

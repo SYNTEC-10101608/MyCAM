@@ -107,7 +107,7 @@ namespace MyCAM.Editor
 		{
 			if( m_SafePlaneAIS != null ) {
 				m_Viewer.GetAISContext().Remove( m_SafePlaneAIS, false );
-				m_SafePlaneLine = null;
+				m_SafePlaneAIS = null;
 			}
 			if( m_SafePlaneArrow != null ) {
 				m_Viewer.GetAISContext().Remove( m_SafePlaneArrow, false );

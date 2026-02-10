@@ -70,11 +70,7 @@ namespace MyCAM.Post
 								errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
 								return false;
 							}
-							if( !DataGettingHelper.GetGeomDataByID( m_PathIDList[ i ], out IGeomData geomData ) ) {
-								errorMessage = "路徑資訊取得錯誤，路徑：" + ( i + 1 ).ToString();
-								return false;
-							}
-							WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, geomData, i + 1 );
+							WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, package.GeomData, i + 1 );
 						}
 					}
 
@@ -157,7 +153,7 @@ namespace MyCAM.Post
 			return;
 		}
 
-		void WriteStandardPatternCutting( PathType type, StdPatternPostData currentPathPostData, CraftData craftData, IGeomData geomData, int N_Index )
+		void WriteStandardPatternCutting( PathType type, StdPatternPostData currentPathPostData, CraftData craftData, IStdPatternGeomData geomData, int N_Index )
 		{
 			StdPatternNCWriter.WriteStandardPatternCutting( m_StreamWriter, type, currentPathPostData, craftData, geomData, N_Index,
 				m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
@@ -237,7 +233,8 @@ namespace MyCAM.Post
 				CacheHelper.GetProcessStartPoint( szID ),
 				CacheHelper.GetProcessEndPoint( szID ),
 				craftData.LeadData,
-				stdPatternCache.LeadInPointList
+				stdPatternCache.LeadInPointList,
+				stdPatternCache.ComputeGeomData
 			);
 		}
 	}

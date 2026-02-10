@@ -38,6 +38,7 @@ namespace MyCAM.Editor
 		SetEntryAndExitParam,
 		SetPattern,
 		PathEdit,
+		PathCompensation,
 
 		// File
 		ImportProjectFile,

@@ -39,6 +39,7 @@ namespace MyCAM.Editor.Dialog
 					m_RefCoordinateType = RefCoordinateType.World;
 					break;
 			}
+			GetValuesOfControls();
 			m_PathEditData = new PathEditData( m_RefCoordinateType, m_XOffset, m_YOffset, m_ZOffset );
 			RaisePreview( m_PathEditData );
 		}
@@ -65,7 +66,7 @@ namespace MyCAM.Editor.Dialog
 			if( m_XOffset == (double)m_NumUpDownX.Value ) {
 				return;
 			}
-			m_XOffset = (double)m_NumUpDownX.Value;
+			GetValuesOfControls();
 			m_PathEditData = new PathEditData( m_RefCoordinateType, m_XOffset, m_YOffset, m_ZOffset );
 			RaisePreview( m_PathEditData );
 		}
@@ -92,7 +93,7 @@ namespace MyCAM.Editor.Dialog
 			if( m_YOffset == (double)m_NumUpDownY.Value ) {
 				return;
 			}
-			m_YOffset = (double)m_NumUpDownY.Value;
+			GetValuesOfControls();
 			m_PathEditData = new PathEditData( m_RefCoordinateType, m_XOffset, m_YOffset, m_ZOffset );
 			RaisePreview( m_PathEditData );
 		}
@@ -119,15 +120,47 @@ namespace MyCAM.Editor.Dialog
 			if( m_ZOffset == (double)m_NumUpDownZ.Value ) {
 				return;
 			}
-			m_ZOffset = (double)m_NumUpDownZ.Value;
+			GetValuesOfControls();
 			m_PathEditData = new PathEditData( m_RefCoordinateType, m_XOffset, m_YOffset, m_ZOffset );
 			RaisePreview( m_PathEditData );
 		}
 
+		void m_btnClear_Click( object sender, EventArgs e )
+		{
+			ClearValues();
+			m_PathEditData = new PathEditData( m_RefCoordinateType, m_XOffset, m_YOffset, m_ZOffset );
+			RaisePreview( m_PathEditData );
+		}
+
+		void m_btnReset_Click( object sender, EventArgs e )
+		{
+			ClearValues();
+			m_PathEditData = new PathEditData( m_RefCoordinateType, m_XOffset, m_YOffset, m_ZOffset );
+			RaiseReset( m_PathEditData );
+		}
+
 		void m_btnConfirm_Click( object sender, EventArgs e )
 		{
+			GetValuesOfControls();
 			m_PathEditData = new PathEditData( m_RefCoordinateType, m_XOffset, m_YOffset, m_ZOffset );
 			RaiseConfirm( m_PathEditData );
+		}
+
+		void GetValuesOfControls()
+		{
+			m_XOffset = (double)m_NumUpDownX.Value;
+			m_YOffset = (double)m_NumUpDownY.Value;
+			m_ZOffset = (double)m_NumUpDownZ.Value;
+		}
+
+		void ClearValues()
+		{
+			m_XOffset = 0;
+			m_YOffset = 0;
+			m_ZOffset = 0;
+			m_NumUpDownX.Value = 0;
+			m_NumUpDownY.Value = 0;
+			m_NumUpDownZ.Value = 0;
 		}
 
 		RefCoordinateType m_RefCoordinateType;

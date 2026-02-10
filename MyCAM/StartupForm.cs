@@ -387,6 +387,11 @@ namespace MyCAM
 			m_CAMEditor.SetPathEdit();
 		}
 
+		void m_tsbPathCompensation_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathCompensation();
+		}
+
 		// convert NC
 		void m_tsbConvertNC_Click( object sender, EventArgs e )
 		{
@@ -651,6 +656,7 @@ namespace MyCAM
 			m_tsbMoveDown.Enabled = editableInfo.IsMoveProcessEditable;
 			m_tsbAutoOrder.Enabled = editableInfo.IsAutoOrderEditable;
 			m_tsbReverse.Enabled = editableInfo.IsPathReverseEditable;
+			m_tsbPathCompensation.Enabled = editableInfo.IsPathCompensateEditable;
 		}
 
 		// path type change event

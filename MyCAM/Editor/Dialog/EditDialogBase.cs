@@ -16,6 +16,7 @@ namespace MyCAM.Editor
 		public Action<TEditDataType> Preview;
 		public Action<TEditDataType> Confirm;
 		public Action Cancel;
+		public Action<TEditDataType> Reset;
 
 		public new void Show( IWin32Window owner = null )
 		{
@@ -59,6 +60,11 @@ namespace MyCAM.Editor
 			if( m_ConfirmCheck == false && e.CloseReason == CloseReason.UserClosing ) {
 				Cancel?.Invoke();
 			}
+		}
+
+		protected virtual void RaiseReset( TEditDataType data )
+		{
+			Reset?.Invoke( data );
 		}
 
 		protected override void OnFormClosed( FormClosedEventArgs e )

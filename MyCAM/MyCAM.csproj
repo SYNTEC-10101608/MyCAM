@@ -64,7 +64,14 @@
     <Compile Include="CNC\ConnectDlg.Designer.cs">
       <DependentUpon>ConnectDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
+    <Compile Include="Editor\Dialog\PathCompensateDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\PathCompensateDlg.Designer.cs">
+      <DependentUpon>PathCompensateDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Dialog\PathEditDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -248,6 +255,9 @@
     <EmbeddedResource Include="CNC\ConnectDlg.resx">
       <DependentUpon>ConnectDlg.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\PathCompensateDlg.resx">
+      <DependentUpon>PathCompensateDlg.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\EntryAndExitDlg.resx">
       <DependentUpon>EntryAndExitDlg.cs</DependentUpon>
     </EmbeddedResource>
@@ -334,6 +344,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\BottomView.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PathEdit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PathCompensate.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

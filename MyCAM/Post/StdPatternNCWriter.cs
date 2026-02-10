@@ -212,7 +212,7 @@ namespace MyCAM.Post
 	internal static class StdPatternNCWriter
 	{
 		public static void WriteStandardPatternCutting( StreamWriter writer, PathType pathType, StdPatternPostData postData,
-			CraftData craftData, IGeomData geomData, int nIndex,
+			CraftData craftData, IStdPatternGeomData geomData, int nIndex,
 			string masterAxisName, string slaveAxisName, RotaryAxis masterRotaryAxis, RotaryAxis slaveRotaryAxis )
 		{
 			if( writer == null || postData == null || craftData == null || geomData == null ) {

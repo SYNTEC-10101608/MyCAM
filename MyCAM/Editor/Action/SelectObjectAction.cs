@@ -210,16 +210,14 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().InitSelected();
 			while( m_Viewer.GetAISContext().MoreSelected() ) {
 				TopoDS_Shape selectedShape = m_Viewer.GetAISContext().SelectedShape();
-				if( selectedShape == null || selectedShape.IsNull() ) {
-					continue;
-				}
+				if( selectedShape != null && !selectedShape.IsNull() ) {
 
-				// find the corresponding UID
-				string szUID = m_DataManager.GetUIDByShape( selectedShape );
-				if( string.IsNullOrEmpty( szUID ) ) {
-					continue;
+					// find the corresponding UID
+					string szUID = m_DataManager.GetUIDByShape( selectedShape );
+					if( !string.IsNullOrEmpty( szUID ) ) {
+						m_SelectedIDSet.Add( szUID );
+					}
 				}
-				m_SelectedIDSet.Add( szUID );
 				m_Viewer.GetAISContext().NextSelected();
 			}
 			SyncSelectionFromSet();
