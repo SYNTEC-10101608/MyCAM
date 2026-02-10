@@ -2,14 +2,11 @@
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
-using MyCAM.Helper.Simulation;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.BRep;
-using OCC.BRepAlgoAPI;
 using OCC.BRepMesh;
-using OCC.BRepPrimAPI;
 using OCC.gp;
 using OCC.Poly;
 using OCC.Quantity;
@@ -20,7 +17,6 @@ using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -56,11 +52,11 @@ namespace MyCAM.Editor
 			BuildWorkpieceChain();
 
 			// import machine stl
-			bool isImportSuccess = ImportMachine();
-			ReadStlSuccess?.Invoke( isImportSuccess );
+			bool isMachineAISReady = m_MachineRender.IsWithMachineAIS;
+			ReadStlSuccess?.Invoke( isMachineAISReady );
 
 			// import false still can calculate FK
-			if( isImportSuccess == false ) {
+			if( isMachineAISReady == false ) {
 				MyApp.Logger.ShowOnLogPanel( "機構圖檔讀取失敗", MyApp.NoticeType.Warning );
 				return;
 			}
@@ -95,8 +91,6 @@ namespace MyCAM.Editor
 
 		// machinal UI
 		bool m_IsImportMachine = false;
-		MachineMeshes m_MachineMeshes;
-		MachineAIS m_MachineAIS;
 
 		// been solved IK point
 		List<PostData> m_PostDataList = new List<PostData>();
@@ -150,11 +144,11 @@ namespace MyCAM.Editor
 			}
 			ShowTraverse();
 
+
 			// set machineShapeBack
 			// show ais -> regist shape for collision
-			if( m_IsImportMachine ) {
-				BuildLaserAIS();
-				m_MachineRender.SetMachineAIS( m_MachineAIS );
+			if( m_MachineRender.IsWithMachineAIS ) {
+				m_IsImportMachine = true;
 				m_MachineRender.Show( true );
 				RegisterAllSimuMemberForCollision();
 			}
@@ -574,20 +568,20 @@ namespace MyCAM.Editor
 
 		void RegisterMachineForCollision()
 		{
-			if( m_MachineMeshes == null ) {
+			if( m_DataManager.MachineMeshes == null ) {
 				return;
 			}
-			foreach( var componentType in m_MachineMeshes.Meshes.Keys ) {
+			foreach( var componentType in m_DataManager.MachineMeshes.Meshes.Keys ) {
 				if( componentType == MachineComponentType.UnKnow ) {
 					continue;
 				}
-				if( !m_MachineMeshes.Meshes.ContainsKey( componentType ) ) {
+				if( !m_DataManager.MachineMeshes.Meshes.ContainsKey( componentType ) ) {
 					continue;
 				}
-				if( m_MachineMeshes.Meshes[ componentType ] == null || m_MachineMeshes.Meshes[ componentType ].IsNull() ) {
+				if( m_DataManager.MachineMeshes.Meshes[ componentType ] == null || m_DataManager.MachineMeshes.Meshes[ componentType ].IsNull() ) {
 					continue;
 				}
-				Poly_Triangulation triangulation = m_MachineMeshes.Meshes[ componentType ];
+				Poly_Triangulation triangulation = m_DataManager.MachineMeshes.Meshes[ componentType ];
 				MeshShape( triangulation, out List<double> vertexList, out List<int> indexList );
 				m_collisionEngine.AddModel( componentType.ToString(), indexList.ToArray(), vertexList.ToArray() );
 			}
@@ -822,51 +816,6 @@ namespace MyCAM.Editor
 
 		#endregion
 
-		#region Read Stl
-
-		bool ReadStlAndGetAIS( string szFolderName )
-		{
-			// input check
-			if( m_Viewer == null || m_ViewManager == null || m_DataManager == null ) {
-				return false;
-			}
-			bool isReadOK = ReadAllMachineStl( szFolderName );
-			if( isReadOK == false ) {
-				return false;
-			}
-			BuildLaserAIS();
-			return true;
-		}
-
-		bool ReadAllMachineStl( string szFolderName )
-		{
-			bool isGetMesh = ReadMachineMeshHelper.LoadMachineMeshes( szFolderName, out MachineMeshes machineMeshes );
-			if( isGetMesh == false ) {
-				return false;
-			}
-			bool isGetMachineAis = MeshesToAISHelper.ConvertMeshesListToAIS( machineMeshes, out MachineAIS machineAppearance );
-			if( isGetMachineAis == false ) {
-				return false;
-			}
-			m_MachineMeshes = machineMeshes;
-			m_MachineAIS = machineAppearance;
-			return true;
-		}
-
-		void BuildLaserAIS()
-		{
-			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 0.2, 1 );
-			BRepPrimAPI_MakeCylinder makeTool2 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, -1 ), new gp_Dir( 0, 0, -1 ) ), 0.2, 1 );
-			BRepAlgoAPI_Fuse makeTool = new BRepAlgoAPI_Fuse( makeTool1.Shape(), makeTool2.Shape() );
-			AIS_Shape LaserAIS = new AIS_Shape( makeTool.Shape() );
-			LaserAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			LaserAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
-			LaserAIS.SetTransparency( 0.8f );
-			m_MachineAIS.AISList[ MachineComponentType.Laser ] = LaserAIS;
-		}
-
-		#endregion
-
 		#region Play Simulation
 
 		int GetCurrentPathByframe()
@@ -904,19 +853,6 @@ namespace MyCAM.Editor
 				return 0;
 			}
 			return m_PathStartEndIndex[ pathIndex ].StartIndex;
-		}
-
-		bool ImportMachine()
-		{
-			bool isSetSuccesss = GetDefaultStl();
-			if( isSetSuccesss == false ) {
-				m_IsImportMachine = false;
-				return false;
-			}
-
-			// set flag
-			m_IsImportMachine = true;
-			return true;
 		}
 
 		void CalSimulationResult()
@@ -1010,7 +946,7 @@ namespace MyCAM.Editor
 
 		#region Default Machine Chain
 
-		void BuildDefaultMachineTree()
+		public void BuildDefaultMachineTree()
 		{
 			switch( m_MachineData.FiveAxisType ) {
 				case FiveAxisType.Table:
@@ -1035,30 +971,6 @@ namespace MyCAM.Editor
 				}
 			}
 			return baseNode;
-		}
-
-		bool GetDefaultStl()
-		{
-			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
-			string szFolderName;
-			switch( m_MachineData.FiveAxisType ) {
-				case FiveAxisType.Table:
-					szFolderName = Path.Combine( exeDir, "Table" );
-					break;
-				case FiveAxisType.Mix:
-					szFolderName = Path.Combine( exeDir, "Mix" );
-					break;
-				case FiveAxisType.Spindle:
-				default:
-					szFolderName = Path.Combine( exeDir, "Spindle" );
-					break;
-			}
-			// show stl on viewer
-			bool isReadSuccess = ReadStlAndGetAIS( szFolderName );
-			if( isReadSuccess == false ) {
-				return false;
-			}
-			return true;
 		}
 
 		#endregion

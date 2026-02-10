@@ -1,4 +1,5 @@
-﻿using OCC.gp;
+﻿using MyCAM.Helper;
+using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
@@ -85,6 +86,24 @@ namespace MyCAM.Data
 			get; private set;
 		}
 
+		// for machine render to get
+		public MachineMeshes MachineMeshes
+		{
+			get
+			{
+				if( m_MachineMeshes == null ) {
+					return new MachineMeshes();
+				}
+				return m_MachineMeshes;
+			}
+			set
+			{
+				if( value != null ) {
+					m_MachineMeshes = value;
+				}
+			}
+		}
+
 		public MachineData MachineData
 		{
 			get
@@ -98,6 +117,9 @@ namespace MyCAM.Data
 			{
 				if( value != null ) {
 					m_MachineData = value;
+
+					// get machine data trigger chain rebuild
+					BuildChain();
 				}
 			}
 		}
@@ -415,5 +437,70 @@ namespace MyCAM.Data
 
 		// entry & exit data
 		EntryAndExitData m_EntryAndExitData = new EntryAndExitData();
+
+		// machine meshes
+		public MachineMeshes m_MachineMeshes = new MachineMeshes();
+		public HashSet<MachineComponentType> m_WorkPieceChainSet = new HashSet<MachineComponentType>();
+		public Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
+		public MachineTreeNode m_SimulationTreeRoot = null;
+
+		void BuildChain()
+		{
+			BuildDefaultMachineTree();
+			BuildMachineChainList( m_SimulationTreeRoot, new List<MachineComponentType>() );
+			BuildWorkpieceChain();
+		}
+
+		void BuildDefaultMachineTree()
+		{
+			switch( m_MachineData.FiveAxisType ) {
+				case FiveAxisType.Table:
+					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultTableTreeDef );
+					break;
+				case FiveAxisType.Mix:
+					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultMixTreeDef );
+					break;
+				case FiveAxisType.Spindle:
+				default:
+					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultSpindleTreeDef );
+					break;
+			}
+		}
+
+		// root node should be base node
+		void BuildMachineChainList( MachineTreeNode root, List<MachineComponentType> chainList )
+		{
+			if( root == null ) {
+				return;
+			}
+			m_ChainListMap[ root.Type ] = chainList;
+			foreach( MachineTreeNode child in root.Children ) {
+				BuildMachineChainList( child, new List<MachineComponentType>( chainList ) { root.Type } );
+			}
+		}
+
+		void BuildWorkpieceChain()
+		{
+			m_WorkPieceChainSet.Clear();
+
+			// protection
+			if( m_ChainListMap == null || m_ChainListMap.ContainsKey( MachineComponentType.WorkPiece ) == false ) {
+				return;
+			}
+			foreach( MachineComponentType type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
+				m_WorkPieceChainSet.Add( type );
+			}
+		}
+
+		MachineTreeNode BuildTree( SimuData.TreeData.MachineTreeDef treeDefnition )
+		{
+			MachineTreeNode baseNode = new MachineTreeNode( treeDefnition.Type );
+			if( treeDefnition.Children != null ) {
+				foreach( var child in treeDefnition.Children ) {
+					baseNode.AddChild( BuildTree( child ) );
+				}
+			}
+			return baseNode;
+		}
 	}
 }
