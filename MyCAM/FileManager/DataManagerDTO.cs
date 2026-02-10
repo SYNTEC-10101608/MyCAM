@@ -260,17 +260,17 @@ namespace MyCAM.FileManager
 		public string UID
 		{
 			get; set;
-		} = string.Empty;
+		}
 
 		public TopoShapeDTO Shape
 		{
 			get; set;
-		} = new TopoShapeDTO();
+		}
 
 		public ObjectType ObjectType
 		{
 			get; set;
-		} = ObjectType.Part;
+		}
 
 		// constructor for XmlSerializer
 		internal IObjectDTO()
