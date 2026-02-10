@@ -30,7 +30,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			private set;
-		} = new List<IObjectDTO>();
+		}
 
 		[XmlArray( "PartIDListDTO" )]
 		[XmlArrayItem( "PartID" )]
@@ -38,7 +38,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			private set;
-		} = new List<string>();
+		}
 
 		[XmlArray( "PathIDListDTO" )]
 		[XmlArrayItem( "PathID" )]
@@ -46,19 +46,19 @@ namespace MyCAM.FileManager
 		{
 			get;
 			private set;
-		} = new List<string>();
+		}
 
 		public ShapeIDsDTO ShapeIDList
 		{
 			get;
 			set;
-		} = new ShapeIDsDTO();
+		}
 
 		public EntryAndExitDataDTO EntryAndExitData
 		{
 			get;
 			set;
-		} = new EntryAndExitDataDTO();
+		}
 
 		#endregion
 
@@ -144,7 +144,6 @@ namespace MyCAM.FileManager
 				if( objectData.Value is PartObject part ) {
 					PartObjectDTO partDataDTO = new PartObjectDTO( part );
 					ObjectDataMap.Add( partDataDTO );
-					continue;
 				}
 			}
 		}
@@ -211,7 +210,6 @@ namespace MyCAM.FileManager
 				if( entry is PartObjectDTO partDataDTO ) {
 					PartObject partObject = partDataDTO.PartDTOToPartData();
 					objectMap.Add( partDataDTO.UID, partObject );
-					continue;
 				}
 			}
 			return objectMap;
@@ -232,8 +230,8 @@ namespace MyCAM.FileManager
 		List<string> PathIDListDTOToPathList()
 		{
 			List<string> pathIDList = new List<string>();
-			if( PathIDList == null ) {
-				throw new ArgumentNullException( "PathIDList deserialization failed." );
+			if( PathIDList == null || PathIDList.Count == 0 ) {
+				throw new ArgumentException( "PathIDList deserialization failed." );
 			}
 			foreach( var pathID in PathIDList ) {
 				pathIDList.Add( pathID );
@@ -326,13 +324,13 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new CraftDataDTO();
+		}
 
-		public PathType PathType
+		public PathType? PathType
 		{
 			get;
 			set;
-		} = PathType.Contour;
+		}
 	}
 
 	public class ContourPathObjectDTO : PathObjectDTO
@@ -341,7 +339,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new ContourGeomDataDTO();
+		}
 
 		internal ContourPathObjectDTO()
 		{
@@ -355,7 +353,7 @@ namespace MyCAM.FileManager
 			UID = pathObject.UID;
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
-			PathType = PathType.Contour;
+			PathType = Data.PathType.Contour;
 			if( pathObject is ContourPathObject contourPathObject ) {
 				GeomData = new ContourGeomDataDTO( (ContourGeomData)contourPathObject.GeomData );
 			}
@@ -385,13 +383,13 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new CircleGeomDataDTO();
+		}
 
 		public ContourPathObjectDTO ContourPathObject
 		{
 			get;
 			set;
-		} = new ContourPathObjectDTO();
+		}
 
 		internal CirclePathObjectDTO()
 		{
@@ -405,7 +403,7 @@ namespace MyCAM.FileManager
 			UID = pathObject.UID;
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
-			PathType = PathType.Circle;
+			PathType = Data.PathType.Circle;
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				GeomData = new CircleGeomDataDTO( (CircleGeomData)standardPatternPathObject.GeomData );
 				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
@@ -438,13 +436,13 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new RectangleGeomDataDTO();
+		}
 
 		public ContourPathObjectDTO ContourPathObject
 		{
 			get;
 			set;
-		} = new ContourPathObjectDTO();
+		}
 
 		internal RectanglePathObjectDTO()
 		{
@@ -458,7 +456,7 @@ namespace MyCAM.FileManager
 			UID = pathObject.UID;
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
-			PathType = PathType.Rectangle;
+			PathType = Data.PathType.Rectangle;
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				GeomData = new RectangleGeomDataDTO( (RectangleGeomData)standardPatternPathObject.GeomData );
 				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
@@ -491,13 +489,13 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new PolygonGeomDataDTO();
+		}
 
 		public ContourPathObjectDTO ContourPathObject
 		{
 			get;
 			set;
-		} = new ContourPathObjectDTO();
+		}
 
 		internal PolygonPathObjectDTO()
 		{
@@ -517,7 +515,7 @@ namespace MyCAM.FileManager
 				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
 			}
 			else {
-				PathType = PathType.Triangle; // Default
+				PathType = Data.PathType.Triangle; // Default
 				GeomData = new PolygonGeomDataDTO();
 				ContourPathObject = new ContourPathObjectDTO();
 			}
@@ -545,13 +543,13 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new RunwayGeomDataDTO();
+		}
 
 		public ContourPathObjectDTO ContourPathObject
 		{
 			get;
 			set;
-		} = new ContourPathObjectDTO();
+		}
 
 		internal RunwayPathObjectDTO()
 		{
@@ -565,7 +563,7 @@ namespace MyCAM.FileManager
 			UID = pathObject.UID;
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
-			PathType = PathType.Runway;
+			PathType = Data.PathType.Runway;
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				GeomData = new RunwayGeomDataDTO( (RunwayGeomData)standardPatternPathObject.GeomData );
 				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
@@ -594,7 +592,7 @@ namespace MyCAM.FileManager
 
 	public class ContourGeomDataDTO
 	{
-		public bool IsClosed
+		public bool? IsClosed
 		{
 			get;
 			set;
@@ -606,7 +604,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new List<CADPointDTO>();
+		}
 
 		[XmlArray( "ConnectPointMapDTO" )]
 		[XmlArrayItem( "ConnectPointPairDTO" )]
@@ -614,7 +612,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new List<ConnectPointPairDTO>();
+		}
 
 		internal ContourGeomDataDTO()
 		{
@@ -633,10 +631,12 @@ namespace MyCAM.FileManager
 			}
 
 			// Convert ConnectPointMap to list of pairs
-			// Key is index in CADPointList, Value is separate CADPoint (connection point)
+			var pointIndexMap = new Dictionary<CADPoint, int>();
+			for( int i = 0; i < geomData.CADPointList.Count; i++ ) {
+				pointIndexMap[ geomData.CADPointList[ i ] ] = i;
+			}
 			foreach( var kvp in geomData.ConnectPointMap ) {
-				int keyIndex = geomData.CADPointList.IndexOf( kvp.Key );
-				if( keyIndex >= 0 ) {
+				if( pointIndexMap.TryGetValue( kvp.Key, out int keyIndex ) ) {
 					ConnectPointMap.Add( new ConnectPointPairDTO( keyIndex, new CADPointDTO( kvp.Value ) ) );
 				}
 			}
@@ -644,7 +644,7 @@ namespace MyCAM.FileManager
 
 		internal ContourGeomData ToContourGeomData()
 		{
-			if( CADPointList == null || ConnectPointMap == null ) {
+			if( CADPointList == null || ConnectPointMap == null || !IsClosed.HasValue ) {
 				throw new ArgumentException( "ContourGeomData deserialization failed." );
 			}
 
@@ -654,31 +654,31 @@ namespace MyCAM.FileManager
 			// Key is from CADPointList by index, Value is separate CADPoint
 			Dictionary<CADPoint, CADPoint> connectPointMap = new Dictionary<CADPoint, CADPoint>();
 			foreach( var pair in ConnectPointMap ) {
-				if( pair.KeyIndex >= 0 && pair.KeyIndex < cadPointList.Count && pair.ValuePoint != null ) {
+				if( pair.KeyIndex.HasValue && pair.KeyIndex.Value >= 0 && pair.KeyIndex.Value < cadPointList.Count && pair.ValuePoint != null ) {
 					CADPoint valuePoint = pair.ValuePoint.ToCADPoint();
-					connectPointMap[ cadPointList[ pair.KeyIndex ] ] = valuePoint;
+					connectPointMap[ cadPointList[ pair.KeyIndex.Value ] ] = valuePoint;
 				}
 			}
 
-			return new ContourGeomData( cadPointList, connectPointMap, IsClosed );
+			return new ContourGeomData( cadPointList, connectPointMap, IsClosed.Value );
 		}
 	}
 
 	public class CircleGeomDataDTO
 	{
-		public double Diameter
+		public double? Diameter
 		{
 			get;
 			set;
 		}
 
-		public double RotatedAngle_deg
+		public double? RotatedAngle_deg
 		{
 			get;
 			set;
 		}
 
-		public bool IsCoordinateReversed
+		public bool? IsCoordinateReversed
 		{
 			get;
 			set;
@@ -688,7 +688,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new gp_Ax1DTO();
+		}
 
 		// parameterless constructor (for XmlSerializer)
 		internal CircleGeomDataDTO()
@@ -708,38 +708,41 @@ namespace MyCAM.FileManager
 
 		internal CircleGeomData ToCircleGeomData()
 		{
-			gp_Ax1 refCenterDir = RefCenterDir != null ? RefCenterDir.ToAx1() : new gp_Ax1();
-			return new CircleGeomData( refCenterDir, Diameter, RotatedAngle_deg, IsCoordinateReversed );
+			if( RefCenterDir == null || !Diameter.HasValue || !RotatedAngle_deg.HasValue || !IsCoordinateReversed.HasValue ) {
+				throw new ArgumentException( "CircleGeomData deserialization failed." );
+			}
+			gp_Ax1 refCenterDir = RefCenterDir.ToAx1();
+			return new CircleGeomData( refCenterDir, Diameter.Value, RotatedAngle_deg.Value, IsCoordinateReversed.Value );
 		}
 	}
 
 	public class RectangleGeomDataDTO
 	{
-		public double Width
+		public double? Width
 		{
 			get;
 			set;
 		}
 
-		public double Length
+		public double? Length
 		{
 			get;
 			set;
 		}
 
-		public double CornerRadius
+		public double? CornerRadius
 		{
 			get;
 			set;
 		}
 
-		public double RotatedAngle_deg
+		public double? RotatedAngle_deg
 		{
 			get;
 			set;
 		}
 
-		public bool IsCoordinateReversed
+		public bool? IsCoordinateReversed
 		{
 			get;
 			set;
@@ -749,7 +752,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new gp_Ax1DTO();
+		}
 
 		// parameterless constructor (for XmlSerializer)
 		internal RectangleGeomDataDTO()
@@ -771,38 +774,41 @@ namespace MyCAM.FileManager
 
 		internal RectangleGeomData ToRectangleGeomData()
 		{
-			gp_Ax1 refCenterDir = RefCenterDir != null ? RefCenterDir.ToAx1() : new gp_Ax1();
-			return new RectangleGeomData( refCenterDir, Width, Length, CornerRadius, RotatedAngle_deg, IsCoordinateReversed );
+			if( RefCenterDir == null || !Width.HasValue || !Length.HasValue || !CornerRadius.HasValue || !RotatedAngle_deg.HasValue || !IsCoordinateReversed.HasValue ) {
+				throw new ArgumentException( "RectangleGeomData deserialization failed." );
+			}
+			gp_Ax1 refCenterDir = RefCenterDir.ToAx1();
+			return new RectangleGeomData( refCenterDir, Width.Value, Length.Value, CornerRadius.Value, RotatedAngle_deg.Value, IsCoordinateReversed.Value );
 		}
 	}
 
 	public class PolygonGeomDataDTO
 	{
-		public int Sides
+		public int? Sides
 		{
 			get;
 			set;
 		}
 
-		public double SideLength
+		public double? SideLength
 		{
 			get;
 			set;
 		}
 
-		public double CornerRadius
+		public double? CornerRadius
 		{
 			get;
 			set;
 		}
 
-		public double RotatedAngle_deg
+		public double? RotatedAngle_deg
 		{
 			get;
 			set;
 		}
 
-		public bool IsCoordinateReversed
+		public bool? IsCoordinateReversed
 		{
 			get;
 			set;
@@ -812,7 +818,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new gp_Ax1DTO();
+		}
 
 		// parameterless constructor (for XmlSerializer)
 		internal PolygonGeomDataDTO()
@@ -834,32 +840,35 @@ namespace MyCAM.FileManager
 
 		internal PolygonGeomData ToPolygonGeomData()
 		{
-			gp_Ax1 refCenterDir = RefCenterDir != null ? RefCenterDir.ToAx1() : new gp_Ax1();
-			return new PolygonGeomData( refCenterDir, Sides, SideLength, CornerRadius, RotatedAngle_deg, IsCoordinateReversed );
+			if( RefCenterDir == null || !Sides.HasValue || !SideLength.HasValue || !CornerRadius.HasValue || !RotatedAngle_deg.HasValue || !IsCoordinateReversed.HasValue ) {
+				throw new ArgumentException( "PolygonGeomData deserialization failed." );
+			}
+			gp_Ax1 refCenterDir = RefCenterDir.ToAx1();
+			return new PolygonGeomData( refCenterDir, Sides.Value, SideLength.Value, CornerRadius.Value, RotatedAngle_deg.Value, IsCoordinateReversed.Value );
 		}
 	}
 
 	public class RunwayGeomDataDTO
 	{
-		public double Length
+		public double? Length
 		{
 			get;
 			set;
 		}
 
-		public double Width
+		public double? Width
 		{
 			get;
 			set;
 		}
 
-		public double RotatedAngle_deg
+		public double? RotatedAngle_deg
 		{
 			get;
 			set;
 		}
 
-		public bool IsCoordinateReversed
+		public bool? IsCoordinateReversed
 		{
 			get;
 			set;
@@ -869,7 +878,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new gp_Ax1DTO();
+		}
 
 		// parameterless constructor (for XmlSerializer)
 		internal RunwayGeomDataDTO()
@@ -890,37 +899,40 @@ namespace MyCAM.FileManager
 
 		internal RunwayGeomData ToRunwayGeomData()
 		{
-			gp_Ax1 refCenterDir = RefCenterDir != null ? RefCenterDir.ToAx1() : new gp_Ax1();
-			return new RunwayGeomData( refCenterDir, Length, Width, RotatedAngle_deg, IsCoordinateReversed );
+			if( RefCenterDir == null || !Length.HasValue || !Width.HasValue || !RotatedAngle_deg.HasValue || !IsCoordinateReversed.HasValue ) {
+				throw new ArgumentException( "RunwayGeomData deserialization failed." );
+			}
+			gp_Ax1 refCenterDir = RefCenterDir.ToAx1();
+			return new RunwayGeomData( refCenterDir, Length.Value, Width.Value, RotatedAngle_deg.Value, IsCoordinateReversed.Value );
 		}
 	}
 
 	public class gp_Ax1DTO
 	{
 		// Location (origin point)
-		public double Location_X
+		public double? Location_X
 		{
 			get; set;
 		}
-		public double Location_Y
+		public double? Location_Y
 		{
 			get; set;
 		}
-		public double Location_Z
+		public double? Location_Z
 		{
 			get; set;
 		}
 
 		// Direction (axis direction)
-		public double Direction_X
+		public double? Direction_X
 		{
 			get; set;
 		}
-		public double Direction_Y
+		public double? Direction_Y
 		{
 			get; set;
 		}
-		public double Direction_Z
+		public double? Direction_Z
 		{
 			get; set;
 		}
@@ -933,13 +945,6 @@ namespace MyCAM.FileManager
 		internal gp_Ax1DTO( gp_Ax1 ax1 )
 		{
 			if( ax1 == null ) {
-				// Default axis (origin at 0,0,0, direction = Z axis (0,0,1))
-				Location_X = 0;
-				Location_Y = 0;
-				Location_Z = 0;
-				Direction_X = 0;
-				Direction_Y = 0;
-				Direction_Z = 1;
 				return;
 			}
 
@@ -956,15 +961,19 @@ namespace MyCAM.FileManager
 
 		internal gp_Ax1 ToAx1()
 		{
-			gp_Pnt location = new gp_Pnt( Location_X, Location_Y, Location_Z );
-			gp_Dir direction = new gp_Dir( Direction_X, Direction_Y, Direction_Z );
+			if( !Location_X.HasValue || !Location_Y.HasValue || !Location_Z.HasValue ||
+				!Direction_X.HasValue || !Direction_Y.HasValue || !Direction_Z.HasValue ) {
+				throw new ArgumentException( "gp_Ax1 deserialization failed." );
+			}
+			gp_Pnt location = new gp_Pnt( Location_X.Value, Location_Y.Value, Location_Z.Value );
+			gp_Dir direction = new gp_Dir( Direction_X.Value, Direction_Y.Value, Direction_Z.Value );
 			return new gp_Ax1( location, direction );
 		}
 	}
 
 	public class ConnectPointPairDTO
 	{
-		public int KeyIndex
+		public int? KeyIndex
 		{
 			get;
 			set;
@@ -990,19 +999,19 @@ namespace MyCAM.FileManager
 	public class CraftDataDTO
 	{
 		// properties
-		public bool IsPathReverse
+		public bool? IsPathReverse
 		{
 			get;
 			set;
 		}
 
-		public bool IsToolVecReverse
+		public bool? IsToolVecReverse
 		{
 			get;
 			set;
 		}
 
-		public int StartPoint
+		public int? StartPoint
 		{
 			get;
 			set;
@@ -1012,37 +1021,37 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = new gp_TrsfDTO();
+		}
 
 		public TraverseDataDTO TraverseData
 		{
 			get;
 			set;
-		} = new TraverseDataDTO();
+		}
 
 		public LeadDataDTO LeadData
 		{
 			get;
 			set;
-		} = new LeadDataDTO();
+		}
 
-		public double OverCutLength
+		public double? OverCutLength
 		{
 			get;
 			set;
 		}
 
-		public EToolVecInterpolateType InterpolateType
+		public EToolVecInterpolateType? InterpolateType
 		{
 			get;
 			set;
-		} = EToolVecInterpolateType.VectorInterpolation;
+		}
 
 		public List<ToolVecMapDTO> ToolVecModifyMap
 		{
 			get;
 			set;
-		} = new List<ToolVecMapDTO>();
+		}
 
 		internal CraftDataDTO()
 		{
@@ -1074,23 +1083,26 @@ namespace MyCAM.FileManager
 
 		internal CraftData ToCraftData()
 		{
-			if( ToolVecModifyMap == null || LeadData == null || TraverseData == null ) {
+			if( ToolVecModifyMap == null || LeadData == null || TraverseData == null ||
+				!StartPoint.HasValue || !IsPathReverse.HasValue || !OverCutLength.HasValue ||
+				!IsToolVecReverse.HasValue || !InterpolateType.HasValue ) {
 				throw new ArgumentException( "CraftData deserialization failed." );
 			}
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = ToolVecModifyMap.ToDictionary(
-				dto => dto.Index,
-				dto => new ToolVecModifyData( dto.RA_deg, dto.RB_deg, dto.MasterAngle_deg, dto.SlaveAngle_deg )
+				dto => dto.Index.Value,
+				dto => new ToolVecModifyData( dto.RA_deg.Value, dto.RB_deg.Value, dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value )
 			);
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
-			EToolVecInterpolateType interpolateType = InterpolateType;
+			EToolVecInterpolateType interpolateType = InterpolateType.Value;
 
-			CraftData craftData = new CraftData( StartPoint, IsPathReverse, leadData, OverCutLength, toolVecModifyMap, IsToolVecReverse, interpolateType, traverseData );
+			CraftData craftData = new CraftData( StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap, IsToolVecReverse.Value, interpolateType, traverseData );
 
 			// Set properties not in constructor
-			craftData.CumulativeTrsfMatrix = CumulativeTrsfMatrix != null
-												? CumulativeTrsfMatrix.ToTrsf()
-												: new gp_Trsf();
+			if( CumulativeTrsfMatrix == null ) {
+				throw new ArgumentException( "CraftData.CumulativeTrsfMatrix deserialization failed." );
+			}
+			craftData.CumulativeTrsfMatrix = CumulativeTrsfMatrix.ToTrsf();
 
 			return craftData;
 		}
@@ -1098,35 +1110,35 @@ namespace MyCAM.FileManager
 
 	public class TraverseDataDTO
 	{
-		public double LiftUpDistance
+		public double? LiftUpDistance
 		{
 			get;
 			set;
 		}
 
-		public double CutDownDistance
+		public double? CutDownDistance
 		{
 			get;
 			set;
 		}
 
-		public double FollowSafeDistance
+		public double? FollowSafeDistance
 		{
 			get;
 			set;
 		}
 
-		public double FrogLeapDistance
+		public double? FrogLeapDistance
 		{
 			get; set;
 		}
 
-		public double SafePlaneDistance
+		public double? SafePlaneDistance
 		{
 			get; set;
 		}
 
-		public bool IsSafePlaneChecked
+		public bool? IsSafePlaneChecked
 		{
 			get; set;
 		}
@@ -1151,25 +1163,29 @@ namespace MyCAM.FileManager
 
 		internal TraverseData ToTraverseData()
 		{
-			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance, IsSafePlaneChecked, SafePlaneDistance );
+			if( !LiftUpDistance.HasValue || !CutDownDistance.HasValue || !FollowSafeDistance.HasValue ||
+				!FrogLeapDistance.HasValue || !IsSafePlaneChecked.HasValue || !SafePlaneDistance.HasValue ) {
+				throw new ArgumentException( "TraverseData deserialization failed." );
+			}
+			return new TraverseData( LiftUpDistance.Value, CutDownDistance.Value, FollowSafeDistance.Value, FrogLeapDistance.Value, IsSafePlaneChecked.Value, SafePlaneDistance.Value );
 		}
 	}
 
 	public class EntryAndExitDataDTO
 	{
-		public double EntryDistance
+		public double? EntryDistance
 		{
 			get;
 			set;
 		}
 
-		public double ExitDistance
+		public double? ExitDistance
 		{
 			get;
 			set;
 		}
 
-		public double FollowSafeDistance
+		public double? FollowSafeDistance
 		{
 			get;
 			set;
@@ -1192,49 +1208,52 @@ namespace MyCAM.FileManager
 
 		internal EntryAndExitData ToEntryAndExitData()
 		{
-			return new EntryAndExitData( EntryDistance, ExitDistance, FollowSafeDistance );
+			if( !EntryDistance.HasValue || !ExitDistance.HasValue || !FollowSafeDistance.HasValue ) {
+				throw new ArgumentException( "EntryAndExitData deserialization failed." );
+			}
+			return new EntryAndExitData( EntryDistance.Value, ExitDistance.Value, FollowSafeDistance.Value );
 		}
 	}
 
 	public class LeadDataDTO
 	{
-		public double LeadInStraightLength
+		public double? LeadInStraightLength
 		{
 			get;
 			set;
 		}
 
-		public double LeadInArcLength
+		public double? LeadInArcLength
 		{
 			get;
 			set;
 		}
 
-		public double LeadOutStraightLength
+		public double? LeadOutStraightLength
 		{
 			get;
 			set;
 		}
 
-		public double LeadOutArcLength
+		public double? LeadOutArcLength
 		{
 			get;
 			set;
 		}
 
-		public double LeadInAngle
+		public double? LeadInAngle
 		{
 			get;
 			set;
 		}
 
-		public double LeadOutAngle
+		public double? LeadOutAngle
 		{
 			get;
 			set;
 		}
 
-		public bool IsChangeLeadDirection
+		public bool? IsChangeLeadDirection
 		{
 			get;
 			set;
@@ -1262,80 +1281,85 @@ namespace MyCAM.FileManager
 
 		internal LeadData ToLeadData()
 		{
-			return new LeadData( LeadInStraightLength, LeadInArcLength, LeadInAngle, LeadOutStraightLength, LeadOutArcLength, LeadOutAngle, IsChangeLeadDirection );
+			if( !LeadInStraightLength.HasValue || !LeadInArcLength.HasValue || !LeadInAngle.HasValue ||
+				!LeadOutStraightLength.HasValue || !LeadOutArcLength.HasValue || !LeadOutAngle.HasValue ||
+				!IsChangeLeadDirection.HasValue ) {
+				throw new ArgumentException( "LeadData deserialization failed." );
+			}
+			return new LeadData( LeadInStraightLength.Value, LeadInArcLength.Value, LeadInAngle.Value, LeadOutStraightLength.Value, LeadOutArcLength.Value, LeadOutAngle.Value, IsChangeLeadDirection.Value );
 		}
 	}
 
 	public class CADPointDTO
 	{
 		// properties
-		public double X
+		public double? X
 		{
 			get;
 			set;
 		}
 
-		public double Y
+		public double? Y
 		{
 			get;
 			set;
 		}
 
-		public double Z
+		public double? Z
 		{
 			get;
 			set;
 		}
 
-		public double Normal1_X
+		public double? Normal1_X
 		{
 			get;
 			set;
 		}
 
-		public double Normal1_Y
+		public double? Normal1_Y
 		{
 			get;
 			set;
 		}
 
-		public double Normal1_Z
+		public double? Normal1_Z
 		{
 			get;
 			set;
 		}
 
-		public double Normal2_X
+		public double? Normal2_X
 		{
 			get;
 			set;
 		}
 
-		public double Normal2_Y
+		public double? Normal2_Y
 		{
 			get;
 			set;
 		}
 
-		public double Normal2_Z
+		public double? Normal2_Z
 		{
 			get;
 			set;
 		}
 
-		public double Tangent_X
+		public double? Tangent_X
 		{
 			get;
 			set;
 		}
 
-		public double Tangent_Y
+		public double? Tangent_Y
 		{
 			get;
 			set;
 		}
 
-		public double Tangent_Z
+		public double? Tangent_Z
 		{
 			get;
 			set;
@@ -1369,10 +1393,16 @@ namespace MyCAM.FileManager
 		// DTO → CADPoint
 		internal CADPoint ToCADPoint()
 		{
-			gp_Pnt point = new gp_Pnt( X, Y, Z );
-			gp_Dir n1 = new gp_Dir( Normal1_X, Normal1_Y, Normal1_Z );
-			gp_Dir n2 = new gp_Dir( Normal2_X, Normal2_Y, Normal2_Z );
-			gp_Dir t = new gp_Dir( Tangent_X, Tangent_Y, Tangent_Z );
+			if( !X.HasValue || !Y.HasValue || !Z.HasValue ||
+				!Normal1_X.HasValue || !Normal1_Y.HasValue || !Normal1_Z.HasValue ||
+				!Normal2_X.HasValue || !Normal2_Y.HasValue || !Normal2_Z.HasValue ||
+				!Tangent_X.HasValue || !Tangent_Y.HasValue || !Tangent_Z.HasValue ) {
+				throw new ArgumentException( "CADPoint deserialization failed." );
+			}
+			gp_Pnt point = new gp_Pnt( X.Value, Y.Value, Z.Value );
+			gp_Dir n1 = new gp_Dir( Normal1_X.Value, Normal1_Y.Value, Normal1_Z.Value );
+			gp_Dir n2 = new gp_Dir( Normal2_X.Value, Normal2_Y.Value, Normal2_Z.Value );
+			gp_Dir t = new gp_Dir( Tangent_X.Value, Tangent_Y.Value, Tangent_Z.Value );
 			return new CADPoint( point, n1, n2, t );
 		}
 	}
@@ -1383,7 +1413,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		} = string.Empty;
+		}
 
 		// parameterless constructor (for XmlSerializer, required)
 		internal TopoShapeDTO()
@@ -1463,31 +1493,31 @@ namespace MyCAM.FileManager
 
 	public class ToolVecMapDTO
 	{
-		public int Index
+		public int? Index
 		{
 			get;
 			set;
 		}
 
-		public double RA_deg
+		public double? RA_deg
 		{
 			get;
 			set;
 		}
 
-		public double RB_deg
+		public double? RB_deg
 		{
 			get;
 			set;
 		}
 
-		public double MasterAngle_deg
+		public double? MasterAngle_deg
 		{
 			get;
 			set;
 		}
 
-		public double SlaveAngle_deg
+		public double? SlaveAngle_deg
 		{
 			get;
 			set;
@@ -1510,37 +1540,37 @@ namespace MyCAM.FileManager
 
 	public class ShapeIDsDTO
 	{
-		public int SolidID
+		public int? SolidID
 		{
 			get; set;
 		}
 
-		public int ShellID
+		public int? ShellID
 		{
 			get; set;
 		}
 
-		public int FaceID
+		public int? FaceID
 		{
 			get; set;
 		}
 
-		public int WireID
+		public int? WireID
 		{
 			get; set;
 		}
 
-		public int EdgeID
+		public int? EdgeID
 		{
 			get; set;
 		}
 
-		public int VertexID
+		public int? VertexID
 		{
 			get; set;
 		}
 
-		public int PathID
+		public int? PathID
 		{
 			get; set;
 		}
@@ -1562,15 +1592,19 @@ namespace MyCAM.FileManager
 
 		internal ShapeIDsStruct ToShapeIDStruct()
 		{
+			if( !SolidID.HasValue || !ShellID.HasValue || !FaceID.HasValue ||
+				!WireID.HasValue || !EdgeID.HasValue || !VertexID.HasValue || !PathID.HasValue ) {
+				throw new ArgumentException( "ShapeIDsStruct deserialization failed." );
+			}
 			return new ShapeIDsStruct()
 			{
-				Solid_ID = SolidID,
-				Shell_ID = ShellID,
-				Face_ID = FaceID,
-				Wire_ID = WireID,
-				Edge_ID = EdgeID,
-				Vertex_ID = VertexID,
-				Path_ID = PathID,
+				Solid_ID = SolidID.Value,
+				Shell_ID = ShellID.Value,
+				Face_ID = FaceID.Value,
+				Wire_ID = WireID.Value,
+				Edge_ID = EdgeID.Value,
+				Vertex_ID = VertexID.Value,
+				Path_ID = PathID.Value,
 			};
 		}
 	}
@@ -1579,55 +1613,55 @@ namespace MyCAM.FileManager
 	{
 		// Transformation matrix values (3x4 matrix)
 		// Row 1
-		public double M11
+		public double? M11
 		{
 			get; set;
 		}
-		public double M12
+		public double? M12
 		{
 			get; set;
 		}
-		public double M13
+		public double? M13
 		{
 			get; set;
 		}
-		public double M14
+		public double? M14
 		{
 			get; set;
 		}
 
 		// Row 2
-		public double M21
+		public double? M21
 		{
 			get; set;
 		}
-		public double M22
+		public double? M22
 		{
 			get; set;
 		}
-		public double M23
+		public double? M23
 		{
 			get; set;
 		}
-		public double M24
+		public double? M24
 		{
 			get; set;
 		}
 
 		// Row 3
-		public double M31
+		public double? M31
 		{
 			get; set;
 		}
-		public double M32
+		public double? M32
 		{
 			get; set;
 		}
-		public double M33
+		public double? M33
 		{
 			get; set;
 		}
-		public double M34
+		public double? M34
 		{
 			get; set;
 		}
@@ -1635,37 +1669,11 @@ namespace MyCAM.FileManager
 		// parameterless constructor (for XmlSerializer)
 		public gp_TrsfDTO()
 		{
-			// Initialize as identity matrix
-			M11 = 1;
-			M12 = 0;
-			M13 = 0;
-			M14 = 0;
-			M21 = 0;
-			M22 = 1;
-			M23 = 0;
-			M24 = 0;
-			M31 = 0;
-			M32 = 0;
-			M33 = 1;
-			M34 = 0;
 		}
 
 		internal gp_TrsfDTO( gp_Trsf trsf )
 		{
 			if( trsf == null ) {
-				// Initialize as identity matrix
-				M11 = 1;
-				M12 = 0;
-				M13 = 0;
-				M14 = 0;
-				M21 = 0;
-				M22 = 1;
-				M23 = 0;
-				M24 = 0;
-				M31 = 0;
-				M32 = 0;
-				M33 = 1;
-				M34 = 0;
 				return;
 			}
 
@@ -1687,14 +1695,19 @@ namespace MyCAM.FileManager
 
 		internal gp_Trsf ToTrsf()
 		{
+			if( !M11.HasValue || !M12.HasValue || !M13.HasValue || !M14.HasValue ||
+				!M21.HasValue || !M22.HasValue || !M23.HasValue || !M24.HasValue ||
+				!M31.HasValue || !M32.HasValue || !M33.HasValue || !M34.HasValue ) {
+				throw new ArgumentException( "gp_Trsf deserialization failed." );
+			}
 			gp_Trsf trsf = new gp_Trsf();
 
 			// Set transformation matrix values
 			// gp_Trsf uses SetValues method to set the matrix
 			trsf.SetValues(
-				M11, M12, M13, M14,
-				M21, M22, M23, M24,
-				M31, M32, M33, M34
+				M11.Value, M12.Value, M13.Value, M14.Value,
+				M21.Value, M22.Value, M23.Value, M24.Value,
+				M31.Value, M32.Value, M33.Value, M34.Value
 			);
 
 			return trsf;
