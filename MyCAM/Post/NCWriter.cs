@@ -34,12 +34,12 @@ namespace MyCAM.Post
 
 		public StreamWriter Writer => m_StreamWriter;
 
-		public bool ConvertSuccess( string fileName, string localFilePath, out string errorMessage )
+		public bool ConvertSuccess( string fileName, string szTempFilePath, out string errorMessage )
 		{
 			errorMessage = string.Empty;
 
 			try {
-				using( m_StreamWriter = new StreamWriter( localFilePath ) ) {
+				using( m_StreamWriter = new StreamWriter( szTempFilePath ) ) {
 					m_StreamWriter.WriteLine( "%@MACRO" );
 					m_StreamWriter.WriteLine( "G43.4 P1;" ); // G43.4 新動程
 					m_StreamWriter.WriteLine( "G65 P\"FileStart\" X\"Material1\" Y\"1.0\";" ); // 三點校正					

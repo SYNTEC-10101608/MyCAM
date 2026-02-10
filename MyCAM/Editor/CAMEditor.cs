@@ -584,28 +584,72 @@ namespace MyCAM.Editor
 		{
 			// stop current action
 			EndActionIfNotDefault();
-			NCWriter writer = new NCWriter( m_DataManager );
-			const string NC_FILE_DEFAULT_NAME = "MachingNC.nc";
-			string szLocalFilePath = Path.Combine( Directory.GetCurrentDirectory(), NC_FILE_DEFAULT_NAME );
-			bool bNCCreateSuccess = writer.ConvertSuccess( NC_FILE_DEFAULT_NAME, szLocalFilePath, out string szCreateErrorMessage );
+			const string NC_FILE_DEFAULT_NAME = "FiveAxisProgram.nc";
+			using( SaveFileDialog saveFileDialog = new SaveFileDialog() ) {
+				saveFileDialog.Filter = "NC Files (*.nc)|*.nc|All Files (*.*)|*.*";
+				saveFileDialog.DefaultExt = "nc";
+				saveFileDialog.FileName = NC_FILE_DEFAULT_NAME;
+				saveFileDialog.Title = "儲存 NC 檔案";
+				saveFileDialog.RestoreDirectory = true;
 
-			if( !bNCCreateSuccess ) {
-				MyApp.Logger.ShowOnLogPanel( $"[NC轉出狀態]轉出NC失敗: {szCreateErrorMessage}\n" + "[檔案傳輸狀態]傳輸NC檔案失敗", MyApp.NoticeType.Error );
-				return;
-			}
+				if( saveFileDialog.ShowDialog() != DialogResult.OK ) {
+					return;
+				}
 
-			// transmit file if CNC IP is set
-			if( string.IsNullOrWhiteSpace( MyApp.CNCIP ) ) {
-				MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + "[檔案傳輸狀態]未與控制器進行連線，檔案無法傳輸", MyApp.NoticeType.Warning, true );
-			}
-			else {
-				bool bTransmitSuccess = FTPTransmission.FileTransmit( szLocalFilePath, MyApp.CNCIP, NC_FILE_DEFAULT_NAME, out string szTransmitErrorMessage );
+				string szSaveFilePath = saveFileDialog.FileName;
+				string szFileName = Path.GetFileName( szSaveFilePath );
+				string szTempFilePath = Path.Combine( Path.GetTempPath(), NC_FILE_DEFAULT_NAME );
+				NCWriter writer = new NCWriter( m_DataManager );
+				bool bNCCreateSuccess = writer.ConvertSuccess( szFileName, szTempFilePath, out string szCreateErrorMessage );
 
-				if( bTransmitSuccess ) {
-					MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + "[檔案傳輸狀態]傳輸NC檔案成功", MyApp.NoticeType.Hint, true );
+				if( !bNCCreateSuccess ) {
+					MyApp.Logger.ShowOnLogPanel( $"[NC轉出狀態]轉出NC失敗: {szCreateErrorMessage}\n" + "[檔案傳輸狀態]傳輸NC檔案失敗", MyApp.NoticeType.Error );
+
+					if( File.Exists( szTempFilePath ) ) {
+						try {
+							File.Delete( szTempFilePath );
+						}
+						catch {
+
+							// this would not happen often, but still need to handle
+							MyApp.Logger.ShowOnLogPanel( $"[清理臨時檔案] 刪除失敗: {szTempFilePath}", MyApp.NoticeType.Warning );
+						}
+					}
+					return;
+				}
+
+				try {
+					File.Copy( szTempFilePath, szSaveFilePath, true );
+					File.Delete( szTempFilePath );
+				}
+				catch( Exception ex ) {
+					MyApp.Logger.ShowOnLogPanel( $"[NC轉出狀態]儲存檔案失敗: {ex.Message}", MyApp.NoticeType.Error );
+					if( File.Exists( szTempFilePath ) ) {
+						try {
+							File.Delete( szTempFilePath );
+						}
+						catch {
+
+							// this would not happen often, but still need to handle
+							MyApp.Logger.ShowOnLogPanel( $"[清理臨時檔案] 刪除失敗: {szTempFilePath}", MyApp.NoticeType.Warning );
+						}
+					}
+					return;
+				}
+
+				// transmit file if CNC IP is set
+				if( string.IsNullOrWhiteSpace( MyApp.CNCIP ) ) {
+					MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + "[檔案傳輸狀態]未與控制器進行連線，檔案無法傳輸", MyApp.NoticeType.Warning, true );
 				}
 				else {
-					MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + $"[檔案傳輸狀態]傳輸NC檔案失敗：{szTransmitErrorMessage}", MyApp.NoticeType.Warning, true );
+					bool bTransmitSuccess = FTPTransmission.FileTransmit( szSaveFilePath, MyApp.CNCIP, szFileName, out string szTransmitErrorMessage );
+
+					if( bTransmitSuccess ) {
+						MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + "[檔案傳輸狀態]傳輸NC檔案成功", MyApp.NoticeType.Hint, true );
+					}
+					else {
+						MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + $"[檔案傳輸狀態]傳輸NC檔案失敗：{szTransmitErrorMessage}", MyApp.NoticeType.Warning, true );
+					}
 				}
 			}
 		}
