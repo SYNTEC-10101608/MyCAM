@@ -30,7 +30,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			private set;
-		}
+		} = new List<IObjectDTO>();
 
 		[XmlArray( "PartIDListDTO" )]
 		[XmlArrayItem( "PartID" )]
@@ -38,7 +38,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			private set;
-		}
+		} = new List<string>();
 
 		[XmlArray( "PathIDListDTO" )]
 		[XmlArrayItem( "PathID" )]
@@ -46,7 +46,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			private set;
-		}
+		} = new List<string>();
 
 		public ShapeIDsDTO ShapeIDList
 		{
@@ -604,7 +604,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		}
+		} = new List<CADPointDTO>();
 
 		[XmlArray( "ConnectPointMapDTO" )]
 		[XmlArrayItem( "ConnectPointPairDTO" )]
@@ -612,7 +612,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		}
+		} = new List<ConnectPointPairDTO>();
 
 		internal ContourGeomDataDTO()
 		{
@@ -647,7 +647,9 @@ namespace MyCAM.FileManager
 			if( CADPointList == null || ConnectPointMap == null || !IsClosed.HasValue ) {
 				throw new ArgumentException( "ContourGeomData deserialization failed." );
 			}
-
+			if( CADPointList.Count == 0 ) {
+				throw new ArgumentException( "ContourGeomData deserialization failed: CADPointList is empty." );
+			}
 			List<CADPoint> cadPointList = CADPointList.Select( cadPointDTO => cadPointDTO.ToCADPoint() ).ToList();
 
 			// Reconstruct ConnectPointMap
@@ -1051,7 +1053,7 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		}
+		} = new List<ToolVecMapDTO>();
 
 		internal CraftDataDTO()
 		{
