@@ -60,6 +60,46 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
+		public void Trans( gp_Trsf trsf, bool bUpdate = false )
+		{
+			foreach( KeyValuePair<string, List<AIS_Line>> kvp in m_LeadInAISDict ) {
+				foreach( var line in kvp.Value ) {
+					if( line == null ) {
+						continue;
+					}
+					line.SetLocalTransformation( trsf );
+				}
+			}
+			foreach( KeyValuePair<string, List<AIS_Line>> kvp in m_LeadOutAISDict ) {
+				foreach( var line in kvp.Value ) {
+					if( line == null ) {
+						continue;
+					}
+					line.SetLocalTransformation( trsf );
+				}
+			}
+			foreach( KeyValuePair<string, List<AIS_Line>> kvp in m_OverCutAISDict ) {
+				foreach( var line in kvp.Value ) {
+					if( line == null ) {
+						continue;
+					}
+					line.SetLocalTransformation( trsf );
+				}
+			}
+			if( bUpdate ) {
+				UpdateView();
+			}
+		}
+
+		public void Reset( bool bUpdate = false )
+		{
+			gp_Trsf trsf = new gp_Trsf();
+			Trans(trsf, bUpdate);
+			if( bUpdate ) {
+				UpdateView();
+			}
+		}
+
 		void ShowLeadInLine( List<string> pathIDList )
 		{
 			ShowLeadLine( pathIDList, m_LeadInAISDict, GetLeadInPointList );

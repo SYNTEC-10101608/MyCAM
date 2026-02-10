@@ -29,6 +29,41 @@ namespace MyCAM.Editor
 			MakeSelectPoint();
 		}
 
+
+		public void TranfAndRebuildMap( gp_Trsf trsf, int oriHighLightIdx, out TopoDS_Shape oriHighLightVtx )
+		{
+			// rebuild transformed vertex map, and get the original vertex for selected index
+			oriHighLightVtx = new TopoDS_Shape();
+			if( m_PathPointList == null || m_PathPointList.Count == 0 ) return;
+
+			List<gp_Pnt> newPntList = new List<gp_Pnt>( m_PathPointList.Count );
+			foreach( gp_Pnt point in m_PathPointList ) {
+				gp_Pnt copyPnt = new gp_Pnt( point.X(), point.Y(), point.Z() );
+				copyPnt.Transform( trsf );
+				newPntList.Add( copyPnt );
+			}
+			TopTools_DataMapOfShapeInteger tempVertexMap = new TopTools_DataMapOfShapeInteger();
+			BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
+			for( int i = 0; i < newPntList.Count; i++ ) {
+				TopoDS_Vertex vtx = new BRepBuilderAPI_MakeVertex( newPntList[ i ] ).Vertex();
+				polygonMaker.Add( vtx );
+				if( i == oriHighLightIdx ) {
+					oriHighLightVtx = vtx;
+				}
+				tempVertexMap.Bind( vtx, i );
+			}
+			if( !polygonMaker.IsDone() ) {
+				return;
+			}
+
+			HideSelectPoint();
+			TopoDS_Wire wire = polygonMaker.Wire();
+			m_SelectedPointAIS = new AIS_Shape( wire );
+			m_SelectedPointAIS.SetWidth( 1e-3 );
+			ShowSelectPoint();
+			m_VertexMap = tempVertexMap;
+		}
+
 		public override void Start()
 		{
 			base.Start();
