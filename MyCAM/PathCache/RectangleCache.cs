@@ -27,8 +27,13 @@ namespace MyCAM.PathCache
 			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, m_RectangleGeomData.IsCoordinateReversed );
 			SetRefCoordSelfRotated( m_RectangleGeomData.RotatedAngle_deg );
 			m_RefPoint = new CAMPoint( new CADPoint( m_RefCoord.Location(), m_RefCoord.Direction(), m_RefCoord.XDirection(), m_RefCoord.YDirection() ), m_RefCoord.Direction() );
-			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, m_RectangleGeomData );
-			m_MainPathCADPointList = Discretize();
+
+			// Create compensated geom data for calculation
+			// Compensated distance: negative = shrink inward, positive = expand outward
+			m_ComputeGeomData = CreateCompensatedGeomData();
+
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, m_ComputeGeomData );
+			m_MainPathCADPointList = Discretize( (RectangleGeomData)m_ComputeGeomData );
 			BuildCAMPointList();
 		}
 
@@ -52,26 +57,62 @@ namespace MyCAM.PathCache
 			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
 		}
 
-		protected override List<CADPoint> Discretize()
+		protected override void SetCenterDir()
 		{
-			if( m_RectangleGeomData == null || m_RefCoord == null ) {
+			m_ComputeRefCenterDir = m_RectangleGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
+		}
+
+		RectangleGeomData CreateCompensatedGeomData()
+		{
+			double compensatedDist = m_CraftData.CompensatedDistance;
+			if( compensatedDist == 0 ) {
+				return m_RectangleGeomData;
+			}
+
+			// Calculate compensated dimensions
+			// For rectangle: subtract/add compensation distance from all sides
+			double compensatedWidth = m_RectangleGeomData.Width + 2 * compensatedDist;
+			double compensatedLength = m_RectangleGeomData.Length + 2 * compensatedDist;
+			double compensatedCornerRadius = 0;
+			if( m_RectangleGeomData.CornerRadius != 0 ) {
+				compensatedCornerRadius = m_RectangleGeomData.CornerRadius + compensatedDist;
+			}
+
+			// Ensure dimensions are positive
+			if( compensatedWidth <= 0 || compensatedLength <= 0 ) {
+				throw new ArgumentException( $"Compensated dimensions invalid: Width={compensatedWidth}, Length={compensatedLength}. CompensatedDistance={compensatedDist} is too large." );
+			}
+
+			// If corner radius becomes non-positive after compensation, set to 0 (sharp corner rectangle)
+			if( compensatedCornerRadius <= 0 ) {
+				compensatedCornerRadius = 0;
+			}
+
+			return new RectangleGeomData(
+				m_RectangleGeomData.RefCenterDir,
+				compensatedWidth,
+				compensatedLength,
+				compensatedCornerRadius,
+				m_RectangleGeomData.RotatedAngle_deg,
+				m_RectangleGeomData.IsCoordinateReversed
+			);
+		}
+
+		List<CADPoint> Discretize( RectangleGeomData geomData )
+		{
+			if( geomData == null || m_RefCoord == null ) {
 				return new List<CADPoint>();
 			}
 
 			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_RefCoord );
-			List<CADPoint> discretizedPoints = StdPatternDiscreteFactory.DiscretizeRectangle( m_RectangleGeomData.Width, m_RectangleGeomData.Length, m_RectangleGeomData.CornerRadius, transformation );
+			List<CADPoint> discretizedPoints = StdPatternDiscreteFactory.DiscretizeRectangle( geomData.Width, geomData.Length, geomData.CornerRadius, transformation );
 
 			// ensure all start points are included in the discretized list
 			if( m_StartCADPointList != null && m_StartCADPointList.Count > 0 ) {
-				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( m_RefCoord, discretizedPoints, m_StartCADPointList, m_RectangleGeomData );
+				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( m_RefCoord, discretizedPoints, m_StartCADPointList, geomData );
 			}
 
 			return discretizedPoints;
-		}
-
-		protected override void SetCenterDir()
-		{
-			m_ComputeRefCenterDir = m_RectangleGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
 		}
 
 		RectangleGeomData m_RectangleGeomData;

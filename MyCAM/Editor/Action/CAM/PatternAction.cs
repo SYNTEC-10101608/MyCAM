@@ -38,7 +38,6 @@ namespace MyCAM.Editor
 				m_BackUpPathObjectList.Add( pathID, dataManager.ObjectMap[ pathID ] as PathObject );
 			}
 			m_Viewer = viewer;
-			m_ViewManager = viewManager;
 			m_szPathIDList = szPathIDList;
 		}
 
@@ -140,11 +139,10 @@ namespace MyCAM.Editor
 			}
 
 			// show trihedron temporarily
-			// TODO： refcoord should take form cache computed refcoord
 			ShowStdPatternTrihedron( szID, standardPatternGeomData );
 
 			// update geom data ref center dir
-			standardPatternGeomData.SetRefCenterDir( contourPathObject.GeomData.RefCenterDir );
+			standardPatternGeomData.RefCenterDir = contourPathObject.GeomData.RefCenterDir;
 
 			return shape;
 		}
@@ -288,9 +286,6 @@ namespace MyCAM.Editor
 			if( oldGeomData == null || newGeomData == null ) {
 				return;
 			}
-			if( oldGeomData.Sides != newGeomData.Sides ) {
-				oldGeomData.Sides = newGeomData.Sides;
-			}
 			if( oldGeomData.SideLength != newGeomData.SideLength ) {
 				oldGeomData.SideLength = newGeomData.SideLength;
 			}
@@ -346,7 +341,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		ViewManager m_ViewManager;
 		Viewer m_Viewer;
 		List<string> m_szPathIDList = new List<string>();
 		List<AIS_Trihedron> m_TrihedronList = new List<AIS_Trihedron>();

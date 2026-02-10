@@ -7,8 +7,7 @@ namespace MyCAM.Post
 {
 	internal class StdPatternNCPackage : INCPackage
 	{
-		public StdPatternNCPackage( IProcessPoint refPoint, IProcessPoint startPoint, TraverseData traverseData, IProcessPoint processStartPoint,
-			IProcessPoint processEndPoint, LeadData leadData, IReadOnlyList<IProcessPoint> leadInCAMPointList )
+		public StdPatternNCPackage( IProcessPoint refPoint, IProcessPoint startPoint, TraverseData traverseData, IProcessPoint processStartPoint, IProcessPoint processEndPoint, LeadData leadData, IReadOnlyList<IProcessPoint> leadInCAMPointList, IStdPatternGeomData geomData )
 		{
 			RefPoint = refPoint ?? throw new ArgumentNullException( nameof( refPoint ) );
 			StartPoint = startPoint ?? throw new ArgumentNullException( nameof( startPoint ) );
@@ -17,6 +16,7 @@ namespace MyCAM.Post
 			ProcessEndPoint = processEndPoint;
 			LeadData = leadData ?? throw new ArgumentNullException( nameof( leadData ) );
 			LeadInCAMPointList = leadInCAMPointList ?? throw new ArgumentNullException( nameof( leadInCAMPointList ) );
+			GeomData = geomData ?? throw new ArgumentNullException( nameof( geomData ) );
 		}
 
 		public IProcessPoint RefPoint
@@ -50,6 +50,11 @@ namespace MyCAM.Post
 		}
 
 		public IReadOnlyList<IProcessPoint> LeadInCAMPointList
+		{
+			get; private set;
+		}
+
+		public IStdPatternGeomData GeomData
 		{
 			get; private set;
 		}

@@ -36,6 +36,7 @@ namespace MyCAM.Editor
 			pathEditFrom.Confirm += ConfirmPathEditData;
 			pathEditFrom.Preview += PreviewPathEditData;
 			pathEditFrom.Cancel += CancelPathEditData;
+			pathEditFrom.Reset += ResetPathEditData;
 			pathEditFrom.Show( MyApp.MainForm );
 			PropertyChanged?.Invoke( m_PathIDList );
 		}
@@ -68,9 +69,21 @@ namespace MyCAM.Editor
 
 		void CancelPathEditData()
 		{
-			RestoreBackupTrsfMatrices();
+			for( int i = 0; i < m_BackupTrsfMatrixList.Count; i++ ) {
+				m_CraftDataList[ i ].CumulativeTrsfMatrix = m_BackupTrsfMatrixList[ i ];
+			}
 			PropertyChanged?.Invoke( m_PathIDList );
 			End();
+		}
+
+		void ResetPathEditData( PathEditData data )
+		{
+			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
+				m_CraftDataList[ i ].CumulativeTrsfMatrix = new gp_Trsf();
+			}
+			DisplayRefCoordinates( new PathEditData( data.RefCoordType, 0, 0, 0 ) );
+			PropertyChanged?.Invoke( m_PathIDList );
+			m_IsResetClicked = true;
 		}
 
 		void UpdatePathData( PathEditData data )
@@ -99,8 +112,7 @@ namespace MyCAM.Editor
 		void RestoreBackupTrsfMatrices()
 		{
 			for( int i = 0; i < m_BackupTrsfMatrixList.Count; i++ ) {
-				m_CraftDataList[ i ].CumulativeTrsfMatrix = m_CraftDataList[ i ].CumulativeTrsfMatrix.Inverted();
-				m_CraftDataList[ i ].CumulativeTrsfMatrix = m_BackupTrsfMatrixList[ i ].MakeCopy();
+				m_CraftDataList[ i ].CumulativeTrsfMatrix = m_IsResetClicked ? new gp_Trsf() : m_BackupTrsfMatrixList[ i ].MakeCopy();
 			}
 		}
 
@@ -216,6 +228,7 @@ namespace MyCAM.Editor
 		List<gp_Trsf> m_BackupTrsfMatrixList;
 		List<AIS_Trihedron> m_RefCoordTrihedronList = new List<AIS_Trihedron>();
 		Viewer m_Viewer;
+		bool m_IsResetClicked = false;
 	}
 
 	public enum RefCoordinateType

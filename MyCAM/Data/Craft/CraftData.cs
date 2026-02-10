@@ -196,6 +196,21 @@ namespace MyCAM.Data
 			}
 		}
 
+		public double CompensatedDistance
+		{
+			get
+			{
+				return m_CompensatedDistance;
+			}
+			set
+			{
+				if( m_CompensatedDistance != value ) {
+					m_CompensatedDistance = value;
+					CADFactorChanged?.Invoke();
+				}
+			}
+		}
+
 		public EToolVecInterpolateType InterpolateType
 		{
 			get
@@ -288,5 +303,6 @@ namespace MyCAM.Data
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();
+		double m_CompensatedDistance = 0;
 	}
 }

@@ -27,10 +27,14 @@ namespace MyCAM.PathCache
 			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, m_RunwayGeomData.IsCoordinateReversed );
 			SetRefCoordSelfRotated( m_RunwayGeomData.RotatedAngle_deg );
 
+			// Create compensated geom data for calculation
+			// Compensated distance: negative = shrink inward, positive = expand outward
+			m_ComputeGeomData = CreateCompensatedGeomData();
+
 			// set reference point (for runway, it's the left arc center)
-			m_RefPoint = RunwayRefPoint();
-			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, m_RunwayGeomData );
-			m_MainPathCADPointList = Discretize();
+			m_RefPoint = RunwayRefPoint( (RunwayGeomData)m_ComputeGeomData );
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, m_ComputeGeomData );
+			m_MainPathCADPointList = Discretize( (RunwayGeomData)m_ComputeGeomData );
 			BuildCAMPointList();
 		}
 
@@ -54,28 +58,33 @@ namespace MyCAM.PathCache
 			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
 		}
 
-		protected override List<CADPoint> Discretize()
+		protected override void SetCenterDir()
 		{
-			if( m_RunwayGeomData == null || m_RefCoord == null ) {
+			m_ComputeRefCenterDir = m_RunwayGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
+		}
+
+		List<CADPoint> Discretize( RunwayGeomData geomData )
+		{
+			if( geomData == null || m_RefCoord == null ) {
 				return new List<CADPoint>();
 			}
 
 			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_RefCoord );
-			List<CADPoint> discretizedPoints = StdPatternDiscreteFactory.DiscretizeRunway( m_RunwayGeomData.Length, m_RunwayGeomData.Width, transformation );
+			List<CADPoint> discretizedPoints = StdPatternDiscreteFactory.DiscretizeRunway( geomData.Length, geomData.Width, transformation );
 
 			// ensure all start points are included in the discretized list
 			if( m_StartCADPointList != null && m_StartCADPointList.Count > 0 ) {
-				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( m_RefCoord, discretizedPoints, m_StartCADPointList, m_RunwayGeomData );
+				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( m_RefCoord, discretizedPoints, m_StartCADPointList, geomData );
 			}
 
 			return discretizedPoints;
 		}
 
-		CAMPoint RunwayRefPoint()
+		CAMPoint RunwayRefPoint( RunwayGeomData geomData )
 		{
 			// calculate runway parameters
-			double length = m_RunwayGeomData.Length;
-			double width = m_RunwayGeomData.Width;
+			double length = geomData.Length;
+			double width = geomData.Width;
 			double radius = width / 2.0;
 			double straightLength = length - width;
 
@@ -114,9 +123,30 @@ namespace MyCAM.PathCache
 			);
 		}
 
-		protected override void SetCenterDir()
+		RunwayGeomData CreateCompensatedGeomData()
 		{
-			m_ComputeRefCenterDir = m_RunwayGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
+			double compensatedDist = m_CraftData.CompensatedDistance;
+			if( compensatedDist == 0 ) {
+				return m_RunwayGeomData;
+			}
+
+			// Calculate compensated dimensions
+			// For runway: length and width both affected
+			double compensatedLength = m_RunwayGeomData.Length + 2 * compensatedDist;
+			double compensatedWidth = m_RunwayGeomData.Width + 2 * compensatedDist;
+
+			// Ensure dimensions are positive
+			if( compensatedLength <= 0 || compensatedWidth <= 0 ) {
+				throw new ArgumentException( $"Compensated dimensions invalid: Length={compensatedLength}, Width={compensatedWidth}. CompensatedDistance={compensatedDist} is too large." );
+			}
+
+			return new RunwayGeomData(
+				m_RunwayGeomData.RefCenterDir,
+				compensatedLength,
+				compensatedWidth,
+				m_RunwayGeomData.RotatedAngle_deg,
+				m_RunwayGeomData.IsCoordinateReversed
+			);
 		}
 
 		RunwayGeomData m_RunwayGeomData;

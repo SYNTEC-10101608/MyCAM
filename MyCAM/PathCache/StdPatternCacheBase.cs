@@ -151,6 +151,17 @@ namespace MyCAM.PathCache
 			}
 		}
 
+		public IStdPatternGeomData ComputeGeomData
+		{
+			get
+			{
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				return m_ComputeGeomData;
+			}
+		}
+
 		#endregion
 
 		#region Common Methods
@@ -167,8 +178,6 @@ namespace MyCAM.PathCache
 		protected abstract void BuildCADCAMPointList();
 
 		protected abstract void BuildCAMPointList();
-
-		protected abstract List<CADPoint> Discretize();
 
 		protected void SetCAMFactorDirty()
 		{
@@ -314,6 +323,7 @@ namespace MyCAM.PathCache
 		protected double m_MaxOverCutLength;
 		protected bool m_IsCAMFactorDirty = false;
 		protected bool m_IsCADFactorDirty = false;
+		protected IStdPatternGeomData m_ComputeGeomData;
 
 		#endregion
 	}

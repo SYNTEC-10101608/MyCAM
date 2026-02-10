@@ -19,6 +19,11 @@ namespace MyCAM.Data
 			{
 				return m_RefCenterDir;
 			}
+			set
+			{
+				// this only be set once when constructing GeomData, if it's changed later, it means the pattern is changed to another one, which is not supported currently, so no need to trigger CADFactorChanged event
+				m_RefCenterDir = value;
+			}
 		}
 
 		public bool IsClosed
@@ -65,11 +70,6 @@ namespace MyCAM.Data
 		}
 
 		public abstract IGeomData Clone();
-
-		public void SetRefCenterDir( gp_Ax1 refCenterDir )
-		{
-			m_RefCenterDir = refCenterDir;
-		}
 
 		protected void OnCADFactorChanged()
 		{

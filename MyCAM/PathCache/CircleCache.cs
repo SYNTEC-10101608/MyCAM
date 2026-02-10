@@ -29,8 +29,10 @@ namespace MyCAM.PathCache
 			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, m_CircleGeomData.IsCoordinateReversed );
 			SetRefCoordSelfRotated( m_CircleGeomData.RotatedAngle_deg );
 			m_RefPoint = new CAMPoint( new CADPoint( m_RefCoord.Location(), m_RefCoord.Direction(), m_RefCoord.XDirection(), m_RefCoord.YDirection() ), m_RefCoord.Direction() );
-			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, m_CircleGeomData );
-			m_MainPathCADPointList = Discretize();
+
+			m_ComputeGeomData = CreateCompensatedGeomData();
+			m_StartCADPointList = StdPatternStartPointListFactory.GetStartPointList( m_RefCoord, m_ComputeGeomData );
+			m_MainPathCADPointList = Discretize( (CircleGeomData)m_ComputeGeomData );
 
 			// build CAM data
 			BuildCAMPointList();
@@ -56,26 +58,50 @@ namespace MyCAM.PathCache
 			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
 		}
 
-		protected override List<CADPoint> Discretize()
+		protected override void SetCenterDir()
 		{
-			if( m_CircleGeomData == null || m_RefCoord == null ) {
+			m_ComputeRefCenterDir = m_CircleGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
+		}
+
+		List<CADPoint> Discretize( CircleGeomData geomData )
+		{
+			if( geomData == null || m_RefCoord == null ) {
 				return new List<CADPoint>();
 			}
 
 			gp_Trsf transformation = DiscreteUtility.CreateCoordTransformation( m_RefCoord );
-			List<CADPoint> discretizedPoints = StdPatternDiscreteFactory.DiscretizeCircle( m_CircleGeomData.Diameter, transformation );
+			List<CADPoint> discretizedPoints = StdPatternDiscreteFactory.DiscretizeCircle( geomData.Diameter, transformation );
 
 			// ensure all start points are included in the discretized list
 			if( m_StartCADPointList != null && m_StartCADPointList.Count > 0 ) {
-				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( m_RefCoord, discretizedPoints, m_StartCADPointList, m_CircleGeomData );
+				discretizedPoints = StartPointHelper.EnsureStartPointsIncluded( m_RefCoord, discretizedPoints, m_StartCADPointList, geomData );
 			}
 
 			return discretizedPoints;
 		}
 
-		protected override void SetCenterDir()
+		CircleGeomData CreateCompensatedGeomData()
 		{
-			m_ComputeRefCenterDir = m_CircleGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
+			double compensatedDist = m_CraftData.CompensatedDistance;
+			if( compensatedDist == 0 ) {
+				return m_CircleGeomData;
+			}
+
+			// Calculate compensated diameter
+			// For circle: add/subtract compensation distance from radius (so 2× for diameter)
+			double compensatedDiameter = m_CircleGeomData.Diameter + 2 * compensatedDist;
+
+			// Ensure diameter is positive
+			if( compensatedDiameter <= 0 ) {
+				throw new ArgumentException( $"Compensated diameter invalid: Diameter={compensatedDiameter}. CompensatedDistance={compensatedDist} is too large." );
+			}
+
+			return new CircleGeomData(
+				m_CircleGeomData.RefCenterDir,
+				compensatedDiameter,
+				m_CircleGeomData.RotatedAngle_deg,
+				m_CircleGeomData.IsCoordinateReversed
+			);
 		}
 
 		CircleGeomData m_CircleGeomData;

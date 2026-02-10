@@ -1025,6 +1025,12 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public double CompensatedDistance
+		{
+			get;
+			set;
+		}
+
 		public TraverseDataDTO TraverseData
 		{
 			get;
@@ -1070,6 +1076,7 @@ namespace MyCAM.FileManager
 			CumulativeTrsfMatrix = craftData.CumulativeTrsfMatrix != null
 									? new gp_TrsfDTO( craftData.CumulativeTrsfMatrix )
 									: new gp_TrsfDTO();
+			CompensatedDistance = craftData.CompensatedDistance;
 			LeadData = craftData.LeadData != null
 						? new LeadDataDTO( craftData.LeadData )
 						: new LeadDataDTO();
@@ -1105,7 +1112,8 @@ namespace MyCAM.FileManager
 				throw new ArgumentException( "CraftData.CumulativeTrsfMatrix deserialization failed." );
 			}
 			craftData.CumulativeTrsfMatrix = CumulativeTrsfMatrix.ToTrsf();
-
+			// Set properties not in constructor
+			craftData.CompensatedDistance = CompensatedDistance;
 			return craftData;
 		}
 	}

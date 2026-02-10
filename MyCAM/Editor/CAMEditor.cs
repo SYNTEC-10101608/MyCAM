@@ -35,6 +35,7 @@ namespace MyCAM.Editor
 			IsTraverseEditable = true;
 			IsMoveProcessEditable = true;
 			IsAutoOrderEditable = true;
+			IsPathCompensateEditable = true;
 		}
 
 		public bool IsStartPointEditable;
@@ -47,6 +48,7 @@ namespace MyCAM.Editor
 		public bool IsTraverseEditable;
 		public bool IsMoveProcessEditable;
 		public bool IsAutoOrderEditable;
+		public bool IsPathCompensateEditable;
 	}
 
 	internal class CAMEditor : EditorBase
@@ -454,6 +456,20 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetPathCompensation()
+		{
+			if( IsSameAction( EditActionType.PathCompensation ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
+			PathCompensationAction action = new PathCompensationAction( m_DataManager, szPathIDList );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
+		}
+
 		#endregion
 
 		// sort API
@@ -653,6 +669,10 @@ namespace MyCAM.Editor
 					editableInfo.IsToolVecEditable = false;
 					editableInfo.IsToolVecReverseEditable = false;
 					editableInfo.IsFixedToolVecEditable = false;
+				}
+
+				if( geomData.PathType == PathType.Contour ) {
+					editableInfo.IsPathCompensateEditable = false;
 				}
 			}
 			PathPropertyChanged?.Invoke( editableInfo );

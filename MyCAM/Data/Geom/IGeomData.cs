@@ -34,11 +34,13 @@ namespace MyCAM.Data
 		gp_Ax1 RefCenterDir
 		{
 			get;
+			set;
 		}
 
 		double RotatedAngle_deg
 		{
-			get; set;
+			get;
+			set;
 		}
 
 		// TODO: this should be removed
@@ -47,8 +49,5 @@ namespace MyCAM.Data
 			get;
 			set;
 		}
-
-		// TOD: use field above
-		void SetRefCenterDir( gp_Ax1 refCenterDir );
 	}
 }
