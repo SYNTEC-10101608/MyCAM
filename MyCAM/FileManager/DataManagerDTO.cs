@@ -326,7 +326,7 @@ namespace MyCAM.FileManager
 			set;
 		}
 
-		public PathType? PathType
+		public PathType PathType
 		{
 			get;
 			set;
@@ -353,7 +353,7 @@ namespace MyCAM.FileManager
 			UID = pathObject.UID;
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
-			PathType = Data.PathType.Contour;
+			PathType = PathType.Contour;
 			if( pathObject is ContourPathObject contourPathObject ) {
 				GeomData = new ContourGeomDataDTO( (ContourGeomData)contourPathObject.GeomData );
 			}
@@ -403,7 +403,7 @@ namespace MyCAM.FileManager
 			UID = pathObject.UID;
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
-			PathType = Data.PathType.Circle;
+			PathType = PathType.Circle;
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				GeomData = new CircleGeomDataDTO( (CircleGeomData)standardPatternPathObject.GeomData );
 				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
@@ -456,7 +456,7 @@ namespace MyCAM.FileManager
 			UID = pathObject.UID;
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
-			PathType = Data.PathType.Rectangle;
+			PathType = PathType.Rectangle;
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				GeomData = new RectangleGeomDataDTO( (RectangleGeomData)standardPatternPathObject.GeomData );
 				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
@@ -515,7 +515,7 @@ namespace MyCAM.FileManager
 				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
 			}
 			else {
-				PathType = Data.PathType.Triangle; // Default
+				PathType = PathType.Triangle; // Default
 				GeomData = new PolygonGeomDataDTO();
 				ContourPathObject = new ContourPathObjectDTO();
 			}
@@ -563,7 +563,7 @@ namespace MyCAM.FileManager
 			UID = pathObject.UID;
 			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
-			PathType = Data.PathType.Runway;
+			PathType = PathType.Runway;
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				GeomData = new RunwayGeomDataDTO( (RunwayGeomData)standardPatternPathObject.GeomData );
 				ContourPathObject = new ContourPathObjectDTO( standardPatternPathObject.ContourPathObject );
