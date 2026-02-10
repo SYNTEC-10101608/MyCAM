@@ -2,6 +2,7 @@
 using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Helper
 {
@@ -14,24 +15,18 @@ namespace MyCAM.Helper
 			if( mainPointList.Count == 0 || overCutLength == 0 || !isClosed ) {
 				return;
 			}
-
-			int endPointIndex = mainPointList.Count - 1;
 			double dTotalOverCutLength = 0;
 
 			// end point is the start of over cut
-			overCutPointList.Add( mainPointList[ endPointIndex ].Clone() );
-
-			// traverse the path from end point onwards (wrapping around for closed paths)
-			for( int i = 0; i < mainPointList.Count; i++ ) {
-				int currentIndex = ( endPointIndex + i ) % mainPointList.Count;
-				int nextIndex = ( endPointIndex + i + 1 ) % mainPointList.Count;
+			overCutPointList.Add( mainPointList.Last().Clone() );
+			for( int i = 0; i < mainPointList.Count - 1; i++ ) {
 
 				// get this edge distance
-				double dDistance = mainPointList[ currentIndex ].Point.Distance( mainPointList[ nextIndex ].Point );
+				double dDistance = mainPointList[ i ].Point.Distance( mainPointList[ i + 1 ].Point );
 				if( dTotalOverCutLength + dDistance < overCutLength ) {
 
 					// still within overcut length → take next point directly
-					overCutPointList.Add( mainPointList[ nextIndex ].Clone() );
+					overCutPointList.Add( mainPointList[ i + 1 ].Clone() );
 					dTotalOverCutLength += dDistance;
 				}
 				else {
@@ -43,10 +38,10 @@ namespace MyCAM.Helper
 					}
 
 					// compute new point along segment
-					gp_Pnt overCutEndPoint = GetExactOverCutEndPoint( mainPointList[ currentIndex ].Point, mainPointList[ nextIndex ].Point, dRemain );
+					gp_Pnt overCutEndPoint = GetExactOverCutEndPoint( mainPointList[ i ].Point, mainPointList[ i + 1 ].Point, dRemain );
 
 					// interpolate tool vector
-					DiscreteUtility.InterpolateVecBetween2Point( mainPointList[ currentIndex ], mainPointList[ nextIndex ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
+					DiscreteUtility.InterpolateVecBetween2Point( mainPointList[ i ], mainPointList[ i + 1 ], overCutEndPoint, out gp_Dir endPointToolVec, out gp_Dir endPointTangentVec );
 
 					// create new cam point
 					IOrientationPoint camPoint = BuildOverCutPoint( overCutEndPoint, endPointToolVec, endPointTangentVec );
