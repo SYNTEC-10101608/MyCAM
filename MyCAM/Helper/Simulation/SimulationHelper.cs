@@ -471,12 +471,26 @@ namespace MyCAM.Helper
 					traverseIKPoints.AddRange( moveOnPlaneIKList );
 				}
 
-				bSuccess = BuildLinearTraverseIKPnt( pathPostData.CutDownPostSafePlanePoint, pathPostData.ProcessStartPoint, out List<PostPoint> moveToStartIKList );
-				if( bSuccess ) {
-					traverseIKPoints.AddRange( moveToStartIKList );
+				if( pathPostData.CutDownPostPoint != null ) {
+					bSuccess = BuildLinearTraverseIKPnt( pathPostData.CutDownPostSafePlanePoint, pathPostData.CutDownPostPoint, out List<PostPoint> moveToCutDownIKList );
+					if( bSuccess ) {
+						traverseIKPoints.AddRange( moveToCutDownIKList );
+					}
+
+					bSuccess = BuildLinearTraverseIKPnt( pathPostData.CutDownPostPoint, pathPostData.ProcessStartPoint, out List<PostPoint> moveToStartIKList );
+					if( bSuccess ) {
+						traverseIKPoints.AddRange( moveToStartIKList );
+					}
+				}
+				else {
+					bSuccess = BuildLinearTraverseIKPnt( pathPostData.CutDownPostSafePlanePoint, pathPostData.ProcessStartPoint, out List<PostPoint> moveToCutDownIKList );
+					if( bSuccess ) {
+						traverseIKPoints.AddRange( moveToCutDownIKList );
+					}
 				}
 				return traverseIKPoints;
 			}
+
 			//  move directly + cut down
 			if( pathPostData.CutDownPostPoint != null ) {
 				bSuccess = BuildLinearTraverseIKPnt( traversStartPnt, pathPostData.CutDownPostPoint, out List<PostPoint> moveDirectlyIKList );
@@ -519,7 +533,7 @@ namespace MyCAM.Helper
 
 				// interpolate master and slave values
 				pnt.Master = startPostPnt.Master + dMasterStep * i;
-				pnt.Slave = startPostPnt.Slave + dSlaveStep * 1;
+				pnt.Slave = startPostPnt.Slave + dSlaveStep * i;
 				IKpostPointList.Add( pnt );
 			}
 			return true;
