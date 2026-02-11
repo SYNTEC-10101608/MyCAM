@@ -263,8 +263,9 @@
 			this.m_lblStartOrEnd.AutoSize = true;
 			this.m_lblStartOrEnd.Location = new System.Drawing.Point(97, 179);
 			this.m_lblStartOrEnd.Name = "m_lblStartOrEnd";
-			this.m_lblStartOrEnd.Size = new System.Drawing.Size(0, 12);
+			this.m_lblStartOrEnd.Size = new System.Drawing.Size(65, 12);
 			this.m_lblStartOrEnd.TabIndex = 1;
+			this.m_lblStartOrEnd.Text = "當前位置：";
 			// 
 			// tableLayoutPanel1
 			// 
