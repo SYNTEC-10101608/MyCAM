@@ -28,6 +28,8 @@
 		private void InitializeComponent()
 		{
 			this.m_gbxInterpolation = new System.Windows.Forms.GroupBox();
+			this.m_btnNext = new System.Windows.Forms.Button();
+			this.m_btnPrev = new System.Windows.Forms.Button();
 			this.m_tbInterType = new System.Windows.Forms.TableLayoutPanel();
 			this.m_pnlTiltColor = new System.Windows.Forms.Panel();
 			this.m_rbtNormal = new System.Windows.Forms.RadioButton();
@@ -65,15 +67,37 @@
 			// 
 			// m_gbxInterpolation
 			// 
+			this.m_gbxInterpolation.Controls.Add(this.m_btnNext);
+			this.m_gbxInterpolation.Controls.Add(this.m_btnPrev);
 			this.m_gbxInterpolation.Controls.Add(this.m_tbInterType);
 			this.m_gbxInterpolation.Controls.Add(this.splitter1);
 			this.m_gbxInterpolation.Controls.Add(this.m_gbxIndexParam);
 			this.m_gbxInterpolation.Location = new System.Drawing.Point(10, 11);
 			this.m_gbxInterpolation.Name = "m_gbxInterpolation";
-			this.m_gbxInterpolation.Size = new System.Drawing.Size(392, 214);
+			this.m_gbxInterpolation.Size = new System.Drawing.Size(392, 234);
 			this.m_gbxInterpolation.TabIndex = 0;
 			this.m_gbxInterpolation.TabStop = false;
 			this.m_gbxInterpolation.Text = "插值方案";
+			// 
+			// m_btnNext
+			// 
+			this.m_btnNext.Location = new System.Drawing.Point(133, 196);
+			this.m_btnNext.Name = "m_btnNext";
+			this.m_btnNext.Size = new System.Drawing.Size(40, 23);
+			this.m_btnNext.TabIndex = 7;
+			this.m_btnNext.Text = "->";
+			this.m_btnNext.UseVisualStyleBackColor = true;
+			this.m_btnNext.Click += new System.EventHandler(this.m_btnNext_Click);
+			// 
+			// m_btnPrev
+			// 
+			this.m_btnPrev.Location = new System.Drawing.Point(10, 196);
+			this.m_btnPrev.Name = "m_btnPrev";
+			this.m_btnPrev.Size = new System.Drawing.Size(40, 23);
+			this.m_btnPrev.TabIndex = 6;
+			this.m_btnPrev.Text = "<-";
+			this.m_btnPrev.UseVisualStyleBackColor = true;
+			this.m_btnPrev.Click += new System.EventHandler(this.m_btnPrev_Click);
 			// 
 			// m_tbInterType
 			// 
@@ -195,7 +219,7 @@
 			// 
 			this.splitter1.Location = new System.Drawing.Point(3, 18);
 			this.splitter1.Name = "splitter1";
-			this.splitter1.Size = new System.Drawing.Size(1, 193);
+			this.splitter1.Size = new System.Drawing.Size(1, 213);
 			this.splitter1.TabIndex = 4;
 			this.splitter1.TabStop = false;
 			// 
@@ -418,7 +442,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(412, 232);
+			this.ClientSize = new System.Drawing.Size(412, 257);
 			this.Controls.Add(this.m_gbxInterpolation);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Margin = new System.Windows.Forms.Padding(2);
@@ -470,5 +494,7 @@
 		private System.Windows.Forms.Button m_btnAdd;
 		private System.Windows.Forms.Button m_btnRevert;
 		private System.Windows.Forms.Button m_btnSwitchStartEnd;
+		private System.Windows.Forms.Button m_btnNext;
+		private System.Windows.Forms.Button m_btnPrev;
 	}
 }

@@ -16,6 +16,7 @@ namespace MyCAM.Editor
 		public Action AddEditIndex;
 		public Action RemoveEditIndex;
 		public Action SwitchStartEnd;
+		public Action<bool> MoveIndex;
 
 		public ToolVectorDlg( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse, RotaryAxisConfig config )
 		{
@@ -296,6 +297,17 @@ namespace MyCAM.Editor
 			}
 			bSuppressValueChangedEvent = false;
 			HandleMSAngleChanged();
+		}
+
+		// index moving
+		void m_btnPrev_Click( object sender, EventArgs e )
+		{
+			MoveIndex?.Invoke( false );
+		}
+
+		void m_btnNext_Click( object sender, EventArgs e )
+		{
+			MoveIndex?.Invoke( true );
 		}
 
 		bool m_IsPathRevese = false;

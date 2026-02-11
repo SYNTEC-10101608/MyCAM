@@ -65,6 +65,7 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.AddEditIndex += () => OnAddEditIndex();
 			m_ToolVecDlg.RemoveEditIndex += () => OnRemoveEditIndex();
 			m_ToolVecDlg.SwitchStartEnd += () => OnSwitchStartEnd();
+			m_ToolVecDlg.MoveIndex += ( isNext ) => OnMoveIndex( isNext );
 			m_ToolVecDlg.EnableStartEndSwitch( false );
 			m_ToolVecDlg.Cancel += End;
 			m_ToolVecDlg.Show( MyApp.MainForm );
@@ -333,6 +334,15 @@ namespace MyCAM.Editor
 			else {
 				// do nothing if not start or end index
 			}
+		}
+
+		void OnMoveIndex( bool isNext )
+		{
+			int newIndex = m_DataHandler.GetPrevOrNextCADIndex( isNext, m_nSelectIndex );
+			if( newIndex == NULL_SELECT_INDEX || newIndex == m_nSelectIndex ) {
+				return;
+			}
+			OnSelectedIndexChanged( newIndex );
 		}
 
 		bool CheckABAngleRange( double angleA_deg, double angleB_deg )
@@ -612,6 +622,49 @@ namespace MyCAM.Editor
 				}
 			}
 			return null;
+		}
+
+		public int GetPrevOrNextCADIndex( bool isNext, int currentCADIndex )
+		{
+			// convert to cam index
+			int camIndex = 0;
+			if( m_PathCache.CADToCAMIndexMap.ContainsKey( currentCADIndex ) ) {
+				camIndex = m_PathCache.CADToCAMIndexMap[ currentCADIndex ];
+			}
+			else if( currentCADIndex == CLOSED_POINT_INDEX ) {
+				camIndex = m_PathCache.MainPathPointList.Count - 1;
+			}
+			else {
+				return NULL_SELECT_INDEX;
+			}
+
+			// cam index++ or cam index--
+			if( isNext ) {
+				camIndex++;
+			}
+			else {
+				camIndex--;
+			}
+
+			// when cam index < 0, cam index = 0
+			if( camIndex < 0 ) {
+				camIndex = 0;
+			}
+
+			// when cam index >= count, cam index = count - 1
+			else if( camIndex >= m_PathCache.MainPathPointList.Count ) {
+				camIndex = m_PathCache.MainPathPointList.Count - 1;
+			}
+
+			// convert back to cad index
+			if( IsClosed() && camIndex == m_PathCache.MainPathPointList.Count - 1 ) {
+
+				// at the end point of closed path, return closed point index
+				return CLOSED_POINT_INDEX;
+			}
+			else {
+				return m_PathCache.MainPathPointList[ camIndex ].InitPathIndex;
+			}
 		}
 
 		readonly CraftData m_CraftData;
