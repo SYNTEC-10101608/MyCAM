@@ -77,6 +77,12 @@ namespace MyCAM
 				m_DataManager = new DataManager();
 				MyApp.Logger.ShowOnLogPanel( "使用默認機構專案檔", MyApp.NoticeType.Warning );
 			}
+
+			// get machine mesh by type, so data manager need to be builded already
+			bool isGetSuccess = GetMachineMesh( m_DataManager.MachineData.FiveAxisType, out MachineMeshes machineMeshes );
+			if( isGetSuccess ) {
+				m_DataManager.MachineMeshes = machineMeshes;
+			}
 			DataGettingHelper.Initialize( m_DataManager );
 
 			// CAD Editor
@@ -906,6 +912,26 @@ namespace MyCAM
 				MyApp.Logger.ShowOnLogPanel( $"讀取機構檔案失敗：\n{ex.Message},使用默認機構參數", MyApp.NoticeType.Error );
 				return false;
 			}
+		}
+
+		bool GetMachineMesh( FiveAxisType fiveAxis, out MachineMeshes machineMeshes )
+		{
+			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+			string szFolderName;
+			switch( fiveAxis ) {
+				case FiveAxisType.Table:
+					szFolderName = Path.Combine( exeDir, "Table" );
+					break;
+				case FiveAxisType.Mix:
+					szFolderName = Path.Combine( exeDir, "Mix" );
+					break;
+				case FiveAxisType.Spindle:
+				default:
+					szFolderName = Path.Combine( exeDir, "Spindle" );
+					break;
+			}
+			bool isGetMesh = ReadMachineMeshHelper.LoadMachineMeshes( szFolderName, out machineMeshes );
+			return isGetMesh;
 		}
 
 		void SaveMachineData()
