@@ -91,13 +91,14 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			UnlockSelectedVertexHighLight();
 
 			// update select index
 			int? _nSelectIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
 			int nSelectIndex = _nSelectIndex ?? NULL_SELECT_INDEX;
-
-			// lock selected vertex high light
+			if( nSelectIndex == NULL_SELECT_INDEX || nSelectIndex == m_nSelectIndex ) {
+				return;
+			}
+			UnlockSelectedVertexHighLight();
 			LockSelectedVertexHighLight( selectedVertex );
 			OnSelectedIndexChanged( nSelectIndex );
 		}
