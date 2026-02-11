@@ -28,6 +28,8 @@
 		private void InitializeComponent()
 		{
 			this.m_gbxInterpolation = new System.Windows.Forms.GroupBox();
+			this.m_btnToEnd = new System.Windows.Forms.Button();
+			this.m_btnToStart = new System.Windows.Forms.Button();
 			this.m_btnNext = new System.Windows.Forms.Button();
 			this.m_btnPrev = new System.Windows.Forms.Button();
 			this.m_tbInterType = new System.Windows.Forms.TableLayoutPanel();
@@ -67,6 +69,8 @@
 			// 
 			// m_gbxInterpolation
 			// 
+			this.m_gbxInterpolation.Controls.Add(this.m_btnToEnd);
+			this.m_gbxInterpolation.Controls.Add(this.m_btnToStart);
 			this.m_gbxInterpolation.Controls.Add(this.m_btnNext);
 			this.m_gbxInterpolation.Controls.Add(this.m_btnPrev);
 			this.m_gbxInterpolation.Controls.Add(this.m_tbInterType);
@@ -79,9 +83,29 @@
 			this.m_gbxInterpolation.TabStop = false;
 			this.m_gbxInterpolation.Text = "插值方案";
 			// 
+			// m_btnToEnd
+			// 
+			this.m_btnToEnd.Location = new System.Drawing.Point(133, 196);
+			this.m_btnToEnd.Name = "m_btnToEnd";
+			this.m_btnToEnd.Size = new System.Drawing.Size(40, 23);
+			this.m_btnToEnd.TabIndex = 9;
+			this.m_btnToEnd.Text = ">|";
+			this.m_btnToEnd.UseVisualStyleBackColor = true;
+			this.m_btnToEnd.Click += new System.EventHandler(this.m_btnToEnd_Click);
+			// 
+			// m_btnToStart
+			// 
+			this.m_btnToStart.Location = new System.Drawing.Point(10, 196);
+			this.m_btnToStart.Name = "m_btnToStart";
+			this.m_btnToStart.Size = new System.Drawing.Size(40, 23);
+			this.m_btnToStart.TabIndex = 8;
+			this.m_btnToStart.Text = "|<";
+			this.m_btnToStart.UseVisualStyleBackColor = true;
+			this.m_btnToStart.Click += new System.EventHandler(this.m_btnToStart_Click);
+			// 
 			// m_btnNext
 			// 
-			this.m_btnNext.Location = new System.Drawing.Point(133, 196);
+			this.m_btnNext.Location = new System.Drawing.Point(93, 196);
 			this.m_btnNext.Name = "m_btnNext";
 			this.m_btnNext.Size = new System.Drawing.Size(40, 23);
 			this.m_btnNext.TabIndex = 7;
@@ -91,7 +115,7 @@
 			// 
 			// m_btnPrev
 			// 
-			this.m_btnPrev.Location = new System.Drawing.Point(10, 196);
+			this.m_btnPrev.Location = new System.Drawing.Point(50, 196);
 			this.m_btnPrev.Name = "m_btnPrev";
 			this.m_btnPrev.Size = new System.Drawing.Size(40, 23);
 			this.m_btnPrev.TabIndex = 6;
@@ -496,5 +520,7 @@
 		private System.Windows.Forms.Button m_btnSwitchStartEnd;
 		private System.Windows.Forms.Button m_btnNext;
 		private System.Windows.Forms.Button m_btnPrev;
+		private System.Windows.Forms.Button m_btnToEnd;
+		private System.Windows.Forms.Button m_btnToStart;
 	}
 }

@@ -66,6 +66,7 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.RemoveEditIndex += () => OnRemoveEditIndex();
 			m_ToolVecDlg.SwitchStartEnd += () => OnSwitchStartEnd();
 			m_ToolVecDlg.MoveIndex += ( isNext ) => OnMoveIndex( isNext );
+			m_ToolVecDlg.ToStartOrEnd += ( toStart ) => OnToStartOrEnd( toStart );
 			m_ToolVecDlg.EnableStartEndSwitch( false );
 			m_ToolVecDlg.Cancel += End;
 			m_ToolVecDlg.Show( MyApp.MainForm );
@@ -114,6 +115,9 @@ namespace MyCAM.Editor
 
 		void OnSelectedIndexChanged( int nSelectIndex )
 		{
+			if( m_nSelectIndex == nSelectIndex ) {
+				return;
+			}
 			m_nSelectIndex = nSelectIndex;
 
 			// no select
@@ -339,10 +343,19 @@ namespace MyCAM.Editor
 		void OnMoveIndex( bool isNext )
 		{
 			int newIndex = m_DataHandler.GetPrevOrNextCADIndex( isNext, m_nSelectIndex );
-			if( newIndex == NULL_SELECT_INDEX || newIndex == m_nSelectIndex ) {
-				return;
-			}
 			OnSelectedIndexChanged( newIndex );
+		}
+
+		void OnToStartOrEnd( bool toStart )
+		{
+			if( m_DataHandler.IsClosed() ) {
+				OnSelectedIndexChanged( toStart ? m_DataHandler.GetStartPointCADIndex() : CLOSED_POINT_INDEX );
+			}
+
+			// for open path, just use 0 and last index of CAD
+			else {
+				OnSelectedIndexChanged( toStart ? 0 : m_PathPointList.Count - 1 );
+			}
 		}
 
 		bool CheckABAngleRange( double angleA_deg, double angleB_deg )
