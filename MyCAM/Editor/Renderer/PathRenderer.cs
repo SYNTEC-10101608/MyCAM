@@ -163,6 +163,13 @@ namespace MyCAM.Editor
 					m_MainPathAISDict.Remove( pathID );
 				}
 			}
+
+			foreach( string pathID in pathIDList ) {
+				if( m_OriginalPathAISDict.TryGetValue( pathID, out AIS_Shape oriPathAIS ) ) {
+					m_Viewer.GetAISContext().Remove( oriPathAIS, false );
+					m_OriginalPathAISDict.Remove( pathID );
+				}
+			}
 		}
 
 		TopoDS_Wire CreatePolylineWire( IReadOnlyList<gp_Pnt> pointList )
