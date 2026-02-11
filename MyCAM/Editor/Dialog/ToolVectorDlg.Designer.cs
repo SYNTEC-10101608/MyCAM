@@ -44,6 +44,7 @@
 			this.m_pnlNormalColor = new System.Windows.Forms.Panel();
 			this.splitter1 = new System.Windows.Forms.Splitter();
 			this.m_gbxIndexParam = new System.Windows.Forms.GroupBox();
+			this.m_lblStartOrEnd = new System.Windows.Forms.Label();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.m_btnRotaryNeg = new System.Windows.Forms.Button();
 			this.m_lblADeg = new System.Windows.Forms.Label();
@@ -249,12 +250,21 @@
 			// 
 			// m_gbxIndexParam
 			// 
+			this.m_gbxIndexParam.Controls.Add(this.m_lblStartOrEnd);
 			this.m_gbxIndexParam.Controls.Add(this.tableLayoutPanel1);
 			this.m_gbxIndexParam.Location = new System.Drawing.Point(179, 18);
 			this.m_gbxIndexParam.Name = "m_gbxIndexParam";
-			this.m_gbxIndexParam.Size = new System.Drawing.Size(206, 182);
+			this.m_gbxIndexParam.Size = new System.Drawing.Size(206, 210);
 			this.m_gbxIndexParam.TabIndex = 3;
 			this.m_gbxIndexParam.TabStop = false;
+			// 
+			// m_lblStartOrEnd
+			// 
+			this.m_lblStartOrEnd.AutoSize = true;
+			this.m_lblStartOrEnd.Location = new System.Drawing.Point(97, 179);
+			this.m_lblStartOrEnd.Name = "m_lblStartOrEnd";
+			this.m_lblStartOrEnd.Size = new System.Drawing.Size(0, 12);
+			this.m_lblStartOrEnd.TabIndex = 1;
 			// 
 			// tableLayoutPanel1
 			// 
@@ -480,6 +490,7 @@
 			this.m_tbInterType.ResumeLayout(false);
 			this.m_tbInterType.PerformLayout();
 			this.m_gbxIndexParam.ResumeLayout(false);
+			this.m_gbxIndexParam.PerformLayout();
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
 			this.ResumeLayout(false);
@@ -522,5 +533,6 @@
 		private System.Windows.Forms.Button m_btnPrev;
 		private System.Windows.Forms.Button m_btnToEnd;
 		private System.Windows.Forms.Button m_btnToStart;
+		private System.Windows.Forms.Label m_lblStartOrEnd;
 	}
 }

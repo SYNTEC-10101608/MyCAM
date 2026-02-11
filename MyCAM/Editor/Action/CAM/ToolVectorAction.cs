@@ -67,7 +67,7 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.SwitchStartEnd += () => OnSwitchStartEnd();
 			m_ToolVecDlg.MoveIndex += ( isNext ) => OnMoveIndex( isNext );
 			m_ToolVecDlg.ToStartOrEnd += ( toStart ) => OnToStartOrEnd( toStart );
-			m_ToolVecDlg.EnableStartEndSwitch( false );
+			m_ToolVecDlg.EnableStartEndSwitch( false, false );
 			m_ToolVecDlg.Cancel += End;
 			m_ToolVecDlg.Show( MyApp.MainForm );
 			RaiseActionStart?.Invoke( true );
@@ -135,8 +135,11 @@ namespace MyCAM.Editor
 
 				// update dialog
 				m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
-				m_ToolVecDlg.EnableStartEndSwitch( ( m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() || m_nSelectIndex == CLOSED_POINT_INDEX )
-													&& m_DataHandler.IsClosed() );
+
+				// check is at start or end point for closed path
+				bool start = m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() && m_DataHandler.IsClosed();
+				bool end = m_nSelectIndex == CLOSED_POINT_INDEX && m_DataHandler.IsClosed();
+				m_ToolVecDlg.EnableStartEndSwitch( start || end, start );
 			}
 			RefreshSimuResult();
 		}

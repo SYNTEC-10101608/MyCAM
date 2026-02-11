@@ -82,9 +82,11 @@ namespace MyCAM.Editor
 			bSuppressValueChangedEvent = false;
 		}
 
-		public void EnableStartEndSwitch( bool enable )
+		public void EnableStartEndSwitch( bool enable, bool start )
 		{
 			m_btnSwitchStartEnd.Visible = enable;
+			m_lblStartOrEnd.Visible = enable;
+			m_lblStartOrEnd.Text = start ? "當前位置：起點" : "當前位置：終點";
 		}
 
 
