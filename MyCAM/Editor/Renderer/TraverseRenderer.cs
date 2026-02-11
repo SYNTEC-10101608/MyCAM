@@ -58,21 +58,36 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		public void Trans( gp_Trsf theTrsf )
+		public void Trans( gp_Trsf trsf, bool bUpdate = false )
 		{
 			foreach( var tra in m_TraverseAISDict ) {
 				List<AIS_Line> lineLIst = tra.Value;
 				foreach( AIS_Line line in lineLIst ) {
-					line.SetLocalTransformation( theTrsf );
+					if( line != null ) {
+						line.SetLocalTransformation( trsf );
+					}
 				}
 			}
 			foreach( string pathID in m_DataManager.PathIDList ) {
-
 				if( m_FrogLeapAISDict.ContainsKey( pathID ) ) {
 					foreach( AIS_Shape shapeAIS in m_FrogLeapAISDict[ pathID ] ) {
-						shapeAIS.SetLocalTransformation( theTrsf );
+						if( shapeAIS != null ) {
+							shapeAIS.SetLocalTransformation( trsf );
+						}
 					}
 				}
+			}
+			if( bUpdate ) {
+				UpdateView();
+			}
+		}
+
+		public void Reset( bool bUpdate = false )
+		{
+			gp_Trsf trsf = new gp_Trsf();
+			Trans( trsf, bUpdate );
+			if( bUpdate ) {
+				UpdateView();
 			}
 		}
 

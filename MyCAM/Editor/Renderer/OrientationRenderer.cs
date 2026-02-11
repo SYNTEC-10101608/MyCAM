@@ -61,6 +61,40 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
+		public void Trans( gp_Trsf trsf, bool bUpdate = false )
+		{
+			foreach( var oriAIS in m_OrientationAISDict ) {
+				if( oriAIS.Value == null ) {
+					continue;
+				}
+				oriAIS.Value.SetLocalTransformation( trsf );
+			}
+			foreach( var leadinOriAIS in m_LeadInOrientationAISDict ) {
+				if( leadinOriAIS.Value == null ) {
+					continue;
+				}
+				leadinOriAIS.Value.SetLocalTransformation( trsf );
+			}
+			foreach( var leadoutOriAis in m_LeadOutOrientationAISDict ) {
+				if( leadoutOriAis.Value == null ) {
+					continue;
+				}
+				leadoutOriAis.Value.SetLocalTransformation( trsf );
+			}
+			if( bUpdate ) {
+				UpdateView();
+			}
+		}
+
+		public void Reset( bool bUpdate = false )
+		{
+			gp_Trsf trsf = new gp_Trsf();
+			Trans( trsf, bUpdate );
+			if( bUpdate ) {
+				UpdateView();
+			}
+		}
+
 		void ShowPathOrientation( List<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
