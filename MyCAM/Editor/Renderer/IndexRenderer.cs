@@ -75,58 +75,6 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		public void ShowTrans( gp_Trsf trsf, bool bUpdate = false )
-		{
-			Remove();
-
-			// no need to show
-			if( !m_IsShow ) {
-				if( bUpdate ) {
-					UpdateView();
-				}
-				return;
-			}
-
-			// create text label
-			int nCurrentIndex = 0;
-			foreach( string pathID in m_DataManager.PathIDList ) {
-				gp_Pnt location = GetMainPathStartPoint( pathID );
-				gp_Pnt newLocation = location.Transformed( trsf );
-				if( newLocation == null ) {
-					continue;
-				}
-				string szIndex = ( ++nCurrentIndex ).ToString();
-
-				// create text label ais
-				AIS_TextLabel textLabel = new AIS_TextLabel();
-				textLabel.SetText( new TCollection_ExtendedString( szIndex ) );
-				textLabel.SetPosition( newLocation );
-				textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-				textLabel.SetHeight( 20 );
-				textLabel.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
-				m_IndexList.Add( textLabel );
-			}
-
-			// display text label
-			foreach( AIS_TextLabel textLabel in m_IndexList ) {
-				m_Viewer.GetAISContext().Display( textLabel, false );
-				m_Viewer.GetAISContext().Deactivate( textLabel );
-			}
-
-			if( bUpdate ) {
-				UpdateView();
-			}
-		}
-
-		public void Reset( bool bUpdate = false )
-		{
-			gp_Trsf trsf = new gp_Trsf();
-			ShowTrans( trsf, bUpdate );
-			if( bUpdate ) {
-				UpdateView();
-			}
-		}
-
 		gp_Pnt GetMainPathStartPoint( string pathID )
 		{
 			return new gp_Pnt( CacheHelper.GetMainPathStartPoint( pathID ).Point.XYZ() );

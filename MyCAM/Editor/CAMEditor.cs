@@ -80,7 +80,6 @@ namespace MyCAM.Editor
 			m_ToolVecRenderer = new ToolVecRenderer( m_Viewer, m_DataManager );
 			m_TraverseRenderer = new TraverseRenderer( m_Viewer, m_DataManager );
 			m_MainPathRenderer = new PathRenderer( m_Viewer, m_ViewManager, m_DataManager );
-			m_MachineRender = new MachineRender( m_Viewer, m_DataManager );
 		}
 
 		public const string PATH_NODE_PREFIX = "Path_";
@@ -93,7 +92,6 @@ namespace MyCAM.Editor
 		ToolVecRenderer m_ToolVecRenderer;
 		TraverseRenderer m_TraverseRenderer;
 		PathRenderer m_MainPathRenderer;
-		MachineRender m_MachineRender;
 
 		// editor
 		public override EEditorType Type
@@ -341,31 +339,14 @@ namespace MyCAM.Editor
 				return;
 			}
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
-			action.RaiseTrans += SetTrans;
-			action.RaiseActionStart += ToolVecActionStartIO;
+			action.PropertyChanged += ShowCAMData;
 
+			// when editing tool vec dilog show/close, need disable/enable main form
+			action.RaiseEditingToolVecDlg += ( isStart ) =>
+			{
+				RaiseWithDlgActionStatusChange?.Invoke( isStart );
+			};
 			StartEditAction( action );
-		}
-		void ToolVecActionStartIO( bool isStart )
-		{
-			if( isStart ) {
-				m_MachineRender.Show();
-			}
-			else {
-				m_MachineRender.Remove();
-				m_ToolVecRenderer.Reset();
-				m_TraverseRenderer.Reset();
-				m_OrientationRenderer.Reset();
-				m_IndexRenderer.Reset();
-				m_MainPathRenderer.Reset();
-				m_CraftRenderer.Reset();
-				foreach( string ID in m_DataManager.PartIDList ) {
-					m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetLocalTransformation( new gp_Trsf() );
-				}
-				m_Viewer.AxoView();
-				m_Viewer.ZoomAllView();
-			}
-			m_Viewer.UpdateView();
 		}
 
 		public void SetToolVecReverse()
@@ -767,30 +748,6 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		void ShowTransedCAMData( gp_Trsf trsf )
-		{
-			// draw with translated location
-			m_MainPathRenderer.ShowTrans( trsf );
-			m_ToolVecRenderer.ShowTrans( trsf );
-			m_IndexRenderer.ShowTrans( trsf );
-
-			// do not need to redraw ,just need trsf
-			m_OrientationRenderer.Trans( trsf );
-			m_CraftRenderer.Trans( trsf );
-			m_TraverseRenderer.Trans( trsf );
-		}
-
-		void SetTrans( Dictionary<MachineComponentType, List<gp_Trsf>> transMap )
-		{
-			m_MachineRender.ShowToolVecEditResult( transMap );
-			ShowTransedCAMData( transMap[ MachineComponentType.WorkPiece ].Last() );
-			foreach( string ID in m_DataManager.PartIDList ) {
-				m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetLocalTransformation( transMap[ MachineComponentType.WorkPiece ].Last() );
-			}
-			m_Viewer.UpdateView();
-
-		}
-
 		void RemoveAllCAMData()
 		{
 			List<string> pathIDList = m_DataManager.PathIDList;
@@ -908,12 +865,11 @@ namespace MyCAM.Editor
 		protected override void OnEditActionStart( IEditorAction action )
 		{
 			base.OnEditActionStart( action );
-			if( action.ActionType == EditActionType.OverCut
-				|| action.ActionType == EditActionType.SetLead
-				|| action.ActionType == EditActionType.SetTraverse
-				|| action.ActionType == EditActionType.SetPattern
-				|| action.ActionType == EditActionType.PathEdit
-				|| action.ActionType == EditActionType.ToolVec ) {
+			if( action.ActionType == EditActionType.OverCut ||
+				action.ActionType == EditActionType.SetLead ||
+				action.ActionType == EditActionType.SetTraverse ||
+				action.ActionType == EditActionType.SetPattern ||
+				action.ActionType == EditActionType.PathEdit ) {
 
 				// lock main form
 				m_TreeView.Enabled = false;
@@ -927,11 +883,11 @@ namespace MyCAM.Editor
 		protected override void OnEditActionEnd( IEditorAction action )
 		{
 			// these action will show dialog, need to lock ui
-			if( action.ActionType == EditActionType.OverCut
-				|| action.ActionType == EditActionType.SetLead
-				|| action.ActionType == EditActionType.SetTraverse
-				|| action.ActionType == EditActionType.SetPattern
-				|| action.ActionType == EditActionType.PathEdit
+			if( action.ActionType == EditActionType.OverCut ||
+				action.ActionType == EditActionType.SetLead ||
+				action.ActionType == EditActionType.SetTraverse ||
+				action.ActionType == EditActionType.SetPattern ||
+				action.ActionType == EditActionType.PathEdit
 				|| action.ActionType == EditActionType.ToolVec ) {
 
 				// unlock main form

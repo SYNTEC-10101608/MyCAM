@@ -92,61 +92,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void ShowTrans( gp_Trsf trsf, bool bUpdate = false )
-		{
-
-			Remove( m_DataManager.PathIDList );
-
-			if( !m_IsShow ) {
-				if( bUpdate ) {
-					UpdateView();
-				}
-				return;
-			}
-
-			foreach( string pathID in m_DataManager.PathIDList ) {
-				IReadOnlyList<gp_Pnt> pointList = GetMainPathPointList( pathID );
-				if( pointList == null || pointList.Count < 2 ) {
-					continue;
-				}
-
-				TopoDS_Wire pathWire = CreatePolylineWire( pointList );
-				if( pathWire == null || pathWire.IsNull() ) {
-					continue;
-				}
-
-				AIS_Shape pathAIS = new AIS_Shape( pathWire );
-				pathAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
-				pathAIS.SetWidth( 3.0 );
-				pathAIS.SetLocalTransformation( trsf );
-
-				// Register to DataManager for shape-ID mapping
-				m_DataManager.RegisterShapeIDMapping( pathWire, pathID );
-
-				// Local storage
-				m_MainPathAISDict.Add( pathID, pathAIS );
-
-				if( m_ViewManager.ViewObjectMap.ContainsKey( pathID ) ) {
-					m_ViewManager.ViewObjectMap.Remove( pathID );
-				}
-				m_ViewManager.ViewObjectMap.Add( pathID, new ViewObject( pathAIS ) );
-				m_Viewer.GetAISContext().Display( pathAIS, false );
-			}
-
-			if( bUpdate ) {
-				UpdateView();
-			}
-		}
-
-		public void Reset( bool bUpdate = false )
-		{
-			gp_Trsf theTrsf = new gp_Trsf();
-			ShowTrans( theTrsf, bUpdate );
-			if( bUpdate ) {
-				UpdateView();
-			}
-		}
-
 		void RemovePaths( List<string> pathIDList )
 		{
 			// Unregister from DataManager
@@ -161,6 +106,13 @@ namespace MyCAM.Editor
 				if( m_MainPathAISDict.TryGetValue( pathID, out AIS_Shape pathAIS ) ) {
 					m_Viewer.GetAISContext().Remove( pathAIS, false );
 					m_MainPathAISDict.Remove( pathID );
+				}
+			}
+
+			foreach( string pathID in pathIDList ) {
+				if( m_OriginalPathAISDict.TryGetValue( pathID, out AIS_Shape oriPathAIS ) ) {
+					m_Viewer.GetAISContext().Remove( oriPathAIS, false );
+					m_OriginalPathAISDict.Remove( pathID );
 				}
 			}
 		}

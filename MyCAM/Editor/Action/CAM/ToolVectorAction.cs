@@ -2,7 +2,6 @@
 using MyCAM.Data;
 using MyCAM.Helper;
 using MyCAM.PathCache;
-using MyCAM.Post;
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.gp;
@@ -39,8 +38,8 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public Action<Dictionary<MachineComponentType, List<gp_Trsf>>> RaiseTrans;
-		public Action<bool> RaiseActionStart;
+		public Action<List<string>> PropertyChanged;
+		public Action<EActionStatus> RaiseEditingToolVecDlg;
 
 		public override void Start()
 		{
@@ -68,15 +67,11 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.EnableStartEndSwitch( false );
 			m_ToolVecDlg.Cancel += End;
 			m_ToolVecDlg.Show( MyApp.MainForm );
-			RaiseActionStart?.Invoke( true );
 		}
 
 		public override void End()
 		{
-			const int DEFAULT_INDEX = 0;
-			TranfAndRebuildMap( new gp_Trsf(), DEFAULT_INDEX, out _ );
 			UnlockSelectedVertexHighLight();
-			RaiseActionStart?.Invoke( false );
 			base.End();
 		}
 
@@ -133,7 +128,6 @@ namespace MyCAM.Editor
 				m_ToolVecDlg.EnableStartEndSwitch( ( m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() || m_nSelectIndex == CLOSED_POINT_INDEX )
 													&& m_DataHandler.IsClosed() );
 			}
-			RefreshSimuResult();
 		}
 
 		void LockSelectedVertexHighLight( TopoDS_Shape selectedVertex )
@@ -152,7 +146,7 @@ namespace MyCAM.Editor
 			if( m_KeepedHighLightPoint != null ) {
 
 				// true means update viewer
-				m_Viewer.GetAISContext().Remove( m_KeepedHighLightPoint, false );
+				m_Viewer.GetAISContext().Remove( m_KeepedHighLightPoint, true );
 				m_KeepedHighLightPoint = null;
 			}
 		}
@@ -173,7 +167,7 @@ namespace MyCAM.Editor
 				m_KeepedHighLightPoint.Attributes().SetPointAspect( pointAspect );
 
 				// refresh viewer
-				m_Viewer.GetAISContext().Display( m_KeepedHighLightPoint, false );
+				m_Viewer.GetAISContext().Display( m_KeepedHighLightPoint, true );
 			}
 		}
 
@@ -350,9 +344,9 @@ namespace MyCAM.Editor
 		{
 			SetInterpolateType();
 			SetIndexAngleParam();
-
-			// trigger viewer refresh
-			RefreshSimuResult();
+			if( ( m_ToolVecParam != null && m_ToolVecParam.IsModified ) || bForceUpdate ) {
+				PropertyChanged?.Invoke( m_PathIDList );
+			}
 
 			// update cache point
 			if( m_SelectedPoint != null && m_nSelectIndex != NULL_SELECT_INDEX ) {
@@ -380,57 +374,6 @@ namespace MyCAM.Editor
 			// set modify data
 			m_CraftData.SetToolVecModify( m_nSelectIndex,
 				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg );
-		}
-
-		void RefreshSimuResult()
-		{
-			bool isCalSuccess = CalSimuTranfResult( out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap );
-			if( !isCalSuccess ) {
-				return;
-			}
-			// output vertex is the shape of high light
-			TranfAndRebuildMap( frameTransformMap[ MachineComponentType.WorkPiece ].Last(), m_nSelectIndex, out TopoDS_Shape vertexhighlight );
-
-			// remove old hight light
-			UnlockSelectedVertexHighLight();
-
-			// re high light
-			LockSelectedVertexHighLight( vertexhighlight );
-			RaiseTrans?.Invoke( frameTransformMap );
-		}
-
-		bool CalSimuTranfResult( out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap )
-		{
-			frameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
-			if( m_SelectedPoint == null ) {
-				return false;
-			}
-			PostPoint G54pnt = new PostPoint()
-			{
-				X = m_SelectedPoint.Point.x,
-				Y = m_SelectedPoint.Point.y,
-				Z = m_SelectedPoint.Point.z,
-				Master = m_ToolVecParam.Master_deg * Math.PI / 180.0,
-				Slave = m_ToolVecParam.Slave_deg * Math.PI / 180.0
-			};
-
-			// create PostSolver
-			PostSolver postSolver = new PostSolver( m_DataManager.MachineData );
-			bool calSuccess = SimulationHelper.BuildFKPostPnt( postSolver, G54pnt, out PostPoint FKpnt );
-			if( !calSuccess ) {
-				MyApp.Logger.ShowOnLogPanel( "無法計算出雷射頭位置", MyApp.NoticeType.Warning );
-				return false;
-			}
-			// init frame transform map
-			frameTransformMap[ MachineComponentType.XAxis ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.YAxis ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.ZAxis ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.Master ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.Slave ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.Laser ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.WorkPiece ] = new List<gp_Trsf>();
-			SimulationHelper.FKToFrameTranfResult( FKpnt, postSolver.G54Offset, m_DataManager.m_WorkPieceChainSet, m_DataManager.MachineData, m_DataManager.m_ChainListMap, ref frameTransformMap );
-			return true;
 		}
 
 		// rotary axis config

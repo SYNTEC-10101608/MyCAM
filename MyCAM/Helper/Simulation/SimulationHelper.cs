@@ -114,27 +114,6 @@ namespace MyCAM.Helper
 			return bFrameOk;
 		}
 
-		internal static bool BuildFKPostPnt( PostSolver PostSolver, PostPoint IKpostPoint, out PostPoint FKPoint )
-		{
-			FKPoint = null;
-			if( PostSolver == null || IKpostPoint == null ) {
-				return false;
-			}
-			PostPoint temPostPnt = IKpostPoint.Clone();
-			gp_Pnt pointG54 = new gp_Pnt( temPostPnt.X, temPostPnt.Y, temPostPnt.Z );
-			gp_Vec tcpOffset = PostSolver.SolveFK( temPostPnt.Master, temPostPnt.Slave, pointG54 );
-			gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
-			FKPoint = new PostPoint()
-			{
-				X = pointMCS.X(),
-				Y = pointMCS.Y(),
-				Z = pointMCS.Z(),
-				Master = temPostPnt.Master,
-				Slave = temPostPnt.Slave
-			};
-			return true;
-		}
-
 		const double DISCRETE_MAX_DEFLECTION = 0.01;
 		const double DISCRETE_MAX_EDGE_LENGTH = 1.0;
 		const double TOLERANCE = 1e-3;
@@ -337,7 +316,7 @@ namespace MyCAM.Helper
 			return true;
 		}
 
-		public static void FKToFrameTranfResult( PostPoint FKPnt, gp_Vec G54Offset, HashSet<MachineComponentType> workPiecesChaintSet,
+		static void FKToFrameTranfResult( PostPoint FKPnt, gp_Vec G54Offset, HashSet<MachineComponentType> workPiecesChaintSet,
 			MachineData machineData, Dictionary<MachineComponentType, List<MachineComponentType>> chainListMap,
 			ref Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap )
 		{
@@ -786,6 +765,27 @@ namespace MyCAM.Helper
 				FKPntList.Add( FKPoint );
 			}
 			return FKPntList;
+		}
+
+		static bool BuildFKPostPnt( PostSolver PostSolver, PostPoint IKpostPoint, out PostPoint FKPoint )
+		{
+			FKPoint = null;
+			if( PostSolver == null || IKpostPoint == null ) {
+				return false;
+			}
+			PostPoint temPostPnt = IKpostPoint.Clone();
+			gp_Pnt pointG54 = new gp_Pnt( temPostPnt.X, temPostPnt.Y, temPostPnt.Z );
+			gp_Vec tcpOffset = PostSolver.SolveFK( temPostPnt.Master, temPostPnt.Slave, pointG54 );
+			gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
+			FKPoint = new PostPoint()
+			{
+				X = pointMCS.X(),
+				Y = pointMCS.Y(),
+				Z = pointMCS.Z(),
+				Master = temPostPnt.Master,
+				Slave = temPostPnt.Slave
+			};
+			return true;
 		}
 
 		#endregion

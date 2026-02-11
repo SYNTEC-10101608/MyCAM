@@ -67,7 +67,7 @@ namespace MyCAM.Helper
 			foreach( string name in stlNames ) {
 				string filePath = Path.Combine( szFolderName, name + ".stl" );
 				if( !File.Exists( filePath ) ) {
-					if( name == "Master" || name == "Slave" ) {
+					if( name == "Master" || name == "Slave") {
 						AnnounceWrning( ReadStlResult.FileNotFound, name );
 						return false;
 					}
