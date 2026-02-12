@@ -124,6 +124,30 @@ namespace MyCAM.Data
 			}
 		}
 
+		public HashSet<MachineComponentType> WorkPieceChain
+		{
+			get
+			{
+				return m_WorkPieceChain;
+			}
+		}
+
+		public Dictionary<MachineComponentType, List<MachineComponentType>> MachineChainListMap
+		{
+			get
+			{
+				return m_ChainListMap;
+			}
+		}
+
+		public MachineTreeNode SimulationTreeRoot
+		{
+			get
+			{
+				return m_SimulationTreeRoot;
+			}
+		}
+
 		public EntryAndExitData EntryAndExitData
 		{
 			get
@@ -439,10 +463,10 @@ namespace MyCAM.Data
 		EntryAndExitData m_EntryAndExitData = new EntryAndExitData();
 
 		// machine meshes
-		public MachineMeshes m_MachineMeshes = new MachineMeshes();
-		public HashSet<MachineComponentType> m_WorkPieceChainSet = new HashSet<MachineComponentType>();
-		public Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
-		public MachineTreeNode m_SimulationTreeRoot = null;
+		MachineMeshes m_MachineMeshes = new MachineMeshes();
+		HashSet<MachineComponentType> m_WorkPieceChain = new HashSet<MachineComponentType>();
+		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
+		MachineTreeNode m_SimulationTreeRoot = null;
 
 		void BuildChain()
 		{
@@ -481,14 +505,14 @@ namespace MyCAM.Data
 
 		void BuildWorkpieceChain()
 		{
-			m_WorkPieceChainSet.Clear();
+			m_WorkPieceChain.Clear();
 
 			// protection
 			if( m_ChainListMap == null || m_ChainListMap.ContainsKey( MachineComponentType.WorkPiece ) == false ) {
 				return;
 			}
 			foreach( MachineComponentType type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
-				m_WorkPieceChainSet.Add( type );
+				m_WorkPieceChain.Add( type );
 			}
 		}
 

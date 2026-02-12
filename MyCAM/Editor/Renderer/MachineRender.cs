@@ -3,7 +3,6 @@ using MyCAM.Data;
 using MyCAM.Helper;
 using MyCAM.Helper.Simulation;
 using OCC.AIS;
-using OCC.BRepAlgoAPI;
 using OCC.BRepPrimAPI;
 using OCC.gp;
 using OCC.Graphic3d;
@@ -32,105 +31,14 @@ namespace MyCAM.Editor.Renderer
 
 			// set dictionary after all ais is ready
 			SetMachineAIS();
-
 		}
-
-		#region convert mesh to AIS
 
 		// let outer know if we have valid AIS to display
 		public bool IsWithMachineAIS
 		{
 			get
 			{
-				return m_MachineAIS != null && m_MachineAIS.AISList != null && m_MachineAIS.AISList.Count > 0;
-			}
-		}
-
-		void GetMeshesListToAIS( MachineMeshes machineMeshes )
-		{
-			MachineAIS machineAppearance = new MachineAIS();
-			if( machineMeshes == null ) {
-				AnnounceWrning( MeshesToAISResult.ArgumentNull );
-				return;
-			}
-			foreach( KeyValuePair<MachineComponentType, Poly_Triangulation> keyValue in machineMeshes.Meshes ) {
-
-				// do not have mash data
-				if( keyValue.Value == null ) {
-					AnnounceWrning( MeshesToAISResult.InvalidMesh, keyValue.Key );
-					continue;
-				}
-				if( machineAppearance.AISList.ContainsKey( keyValue.Key ) == false ) {
-					AnnounceWrning( MeshesToAISResult.InvalidMesh, keyValue.Key );
-					continue;
-				}
-				machineAppearance.AISList[ keyValue.Key ] = ConvertMeshToAIS( keyValue.Value );
-			}
-			m_MachineAIS = machineAppearance;
-		}
-
-		void BuildLaserAIS()
-		{
-			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 0.2, m_DataManager.MachineData.ToolLength);
-			AIS_Shape LaserAIS = new AIS_Shape( makeTool1.Shape() );
-			LaserAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			LaserAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
-			LaserAIS.SetTransparency( 0.8f );
-			m_MachineAIS.AISList[ MachineComponentType.Laser ] = LaserAIS;
-		}
-
-		enum MeshesToAISResult
-		{
-			Success,
-			ArgumentNull,
-			InvalidMesh,
-			UnknownError
-		}
-
-		AIS_Triangulation ConvertMeshToAIS( Poly_Triangulation mesh )
-		{
-			if( mesh == null || mesh.NbNodes() <= 0 || mesh.NbTriangles() <= 0 ) {
-				return null;
-			}
-			AIS_Triangulation resultAIS = new AIS_Triangulation( mesh );
-
-			// set material aspect, this matter since the default material gives wrong color effect
-			Graphic3d_MaterialAspect baseAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_UserDefined );
-			resultAIS.SetMaterial( baseAspect );
-			return resultAIS;
-		}
-
-		void AnnounceWrning( MeshesToAISResult result, MachineComponentType componentType = MachineComponentType.UnKnow )
-		{
-			if( result != MeshesToAISResult.Success ) {
-				switch( result ) {
-					case MeshesToAISResult.ArgumentNull:
-						MyApp.Logger.ShowOnLogPanel( $"機構網格資訊錯誤", MyApp.NoticeType.Warning );
-						break;
-					case MeshesToAISResult.InvalidMesh:
-						//MyApp.Logger.ShowOnLogPanel( $"{componentType} 原始網格資訊讀取失敗", MyApp.NoticeType.Warning );
-						break;
-					case MeshesToAISResult.UnknownError:
-					default:
-						//MyApp.Logger.ShowOnLogPanel( $"{componentType} STL讀取失敗，發生未知錯誤", MyApp.NoticeType.Warning );
-						break;
-				}
-				return;
-			}
-		}
-
-		#endregion
-
-		void SetMachineAIS()
-		{
-			if( m_MachineAIS == null || m_MachineAIS.AISList == null || m_MachineAIS.AISList.Count == 0 ) {
-				return;
-			}
-			m_MachineAISDict.Clear();
-			foreach( KeyValuePair<MachineComponentType, AIS_InteractiveObject> kv in m_MachineAIS.AISList ) {
-				m_MachineAISDict[ kv.Key ] = kv.Value != null
-											? new List<AIS_InteractiveObject> { kv.Value }
-											: new List<AIS_InteractiveObject>();
+				return m_MachineAISDict != null && m_MachineAISDict.Count >= MIN_Machine_Part;
 			}
 		}
 
@@ -224,6 +132,8 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
+		const int MIN_Machine_Part = 2;
+
 		// set back to initial position and color
 		void ResetAIS( AIS_InteractiveObject aisShape, MachineComponentType type )
 		{
@@ -236,7 +146,7 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		public void TransAndSetColor( int frameIndex , bool isNeedUpdate = false)
+		public void TransAndSetColor( int frameIndex, bool isNeedUpdate = false )
 		{
 			TransForm( frameIndex );
 			SetColor( frameIndex );
@@ -327,5 +237,96 @@ namespace MyCAM.Editor.Renderer
 			}
 			return Enumerable.Empty<AIS_InteractiveObject>();
 		}
+
+		#region convert mesh to AIS
+
+		void GetMeshesListToAIS( MachineMeshes machineMeshes )
+		{
+			MachineAIS machineAppearance = new MachineAIS();
+			if( machineMeshes == null ) {
+				AnnounceWrning( MeshesToAISResult.ArgumentNull );
+				return;
+			}
+			foreach( KeyValuePair<MachineComponentType, Poly_Triangulation> keyValue in machineMeshes.Meshes ) {
+
+				// do not have mash data
+				if( keyValue.Value == null ) {
+					AnnounceWrning( MeshesToAISResult.InvalidMesh, keyValue.Key );
+					continue;
+				}
+				if( machineAppearance.AISList.ContainsKey( keyValue.Key ) == false ) {
+					AnnounceWrning( MeshesToAISResult.InvalidMesh, keyValue.Key );
+					continue;
+				}
+				machineAppearance.AISList[ keyValue.Key ] = ConvertMeshToAIS( keyValue.Value );
+			}
+			m_MachineAIS = machineAppearance;
+		}
+
+		void BuildLaserAIS()
+		{
+			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 0.2, m_DataManager.MachineData.ToolLength );
+			AIS_Shape LaserAIS = new AIS_Shape( makeTool1.Shape() );
+			LaserAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			LaserAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
+			LaserAIS.SetTransparency( 0.8f );
+			m_MachineAIS.AISList[ MachineComponentType.Laser ] = LaserAIS;
+		}
+
+		enum MeshesToAISResult
+		{
+			Success,
+			ArgumentNull,
+			InvalidMesh,
+			UnknownError
+		}
+
+		AIS_Triangulation ConvertMeshToAIS( Poly_Triangulation mesh )
+		{
+			if( mesh == null || mesh.NbNodes() <= 0 || mesh.NbTriangles() <= 0 ) {
+				return null;
+			}
+			AIS_Triangulation resultAIS = new AIS_Triangulation( mesh );
+
+			// set material aspect, this matter since the default material gives wrong color effect
+			Graphic3d_MaterialAspect baseAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_UserDefined );
+			resultAIS.SetMaterial( baseAspect );
+			return resultAIS;
+		}
+
+		void AnnounceWrning( MeshesToAISResult result, MachineComponentType componentType = MachineComponentType.UnKnow )
+		{
+			if( result != MeshesToAISResult.Success ) {
+				switch( result ) {
+					case MeshesToAISResult.ArgumentNull:
+						MyApp.Logger.ShowOnLogPanel( $"機構網格資訊錯誤", MyApp.NoticeType.Warning );
+						break;
+					case MeshesToAISResult.InvalidMesh:
+						//MyApp.Logger.ShowOnLogPanel( $"{componentType} 原始網格資訊讀取失敗", MyApp.NoticeType.Warning );
+						break;
+					case MeshesToAISResult.UnknownError:
+					default:
+						//MyApp.Logger.ShowOnLogPanel( $"{componentType} STL讀取失敗，發生未知錯誤", MyApp.NoticeType.Warning );
+						break;
+				}
+				return;
+			}
+		}
+
+		void SetMachineAIS()
+		{
+			if( m_MachineAIS == null || m_MachineAIS.AISList == null || m_MachineAIS.AISList.Count == 0 ) {
+				return;
+			}
+			m_MachineAISDict.Clear();
+			foreach( KeyValuePair<MachineComponentType, AIS_InteractiveObject> kv in m_MachineAIS.AISList ) {
+				if( kv.Value == null ) {
+					continue;
+				}
+				m_MachineAISDict[ kv.Key ] = new List<AIS_InteractiveObject> { kv.Value };
+			}
+		}
+
+		#endregion
 	}
 }

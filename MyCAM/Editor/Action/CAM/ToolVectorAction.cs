@@ -456,7 +456,7 @@ namespace MyCAM.Editor
 			frameTransformMap[ MachineComponentType.Slave ] = new List<gp_Trsf>();
 			frameTransformMap[ MachineComponentType.Laser ] = new List<gp_Trsf>();
 			frameTransformMap[ MachineComponentType.WorkPiece ] = new List<gp_Trsf>();
-			SimulationHelper.FKToFrameTranfResult( FKpnt, postSolver.G54Offset, m_DataManager.m_WorkPieceChainSet, m_DataManager.MachineData, m_DataManager.m_ChainListMap, ref frameTransformMap );
+			SimulationHelper.FKToFrameTranfResult( FKpnt, postSolver.G54Offset, m_DataManager.WorkPieceChain, m_DataManager.MachineData, m_DataManager.MachineChainListMap, ref frameTransformMap );
 			return true;
 		}
 

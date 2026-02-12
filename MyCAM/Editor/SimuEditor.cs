@@ -45,11 +45,9 @@ namespace MyCAM.Editor
 
 			// build chain list
 			m_ChainListMap.Clear();
-			BuildDefaultMachineTree();
-
-			// all chain need to be build before workpiece chain
-			BuildChainList( m_SimulationTreeRoot, new List<MachineComponentType>() );
-			BuildWorkpieceChain();
+			m_ChainListMap = m_DataManager.MachineChainListMap;
+			m_SimulationTreeRoot = m_DataManager.SimulationTreeRoot;
+			m_WorkPieceChainSet = m_DataManager.WorkPieceChain;
 
 			// import machine stl
 			bool isMachineAISReady = m_MachineRender.IsWithMachineAIS;
@@ -392,31 +390,6 @@ namespace MyCAM.Editor
 				return new List<PostData>();
 			}
 			return postDataList;
-		}
-
-		void BuildChainList( MachineTreeNode root, List<MachineComponentType> chainList )
-		{
-			if( root == null ) {
-				return;
-			}
-			m_ChainListMap[ root.Type ] = chainList;
-			foreach( MachineTreeNode child in root.Children ) {
-				BuildChainList( child, new List<MachineComponentType>( chainList ) { root.Type } );
-			}
-		}
-
-		// this chain calcution will be reverse
-		void BuildWorkpieceChain()
-		{
-			m_WorkPieceChainSet.Clear();
-
-			// protection
-			if( m_ChainListMap == null || m_ChainListMap.ContainsKey( MachineComponentType.WorkPiece ) == false ) {
-				return;
-			}
-			foreach( MachineComponentType type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
-				m_WorkPieceChainSet.Add( type );
-			}
 		}
 
 		#endregion
