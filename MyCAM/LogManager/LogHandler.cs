@@ -41,8 +41,8 @@ namespace MyCAM.LogManager
 
 		Panel m_PanelShowMessage;
 		readonly Color ERROR_Color = Color.FromArgb( 253, 99, 132 );
-		readonly Color WARNING_Color = Color.Yellow;
-		readonly Color NORMAL_HintColor = Color.White;
+		readonly Color WARNING_Color = Color.YellowGreen;
+		readonly Color NORMAL_HintColor = Color.Black;
 
 		void AddLog( string message, Color color, MessageBoxIcon icon, bool needMessageBox )
 		{
