@@ -122,9 +122,8 @@ namespace MyCAM.Post
 
 			// over-cut
 			if( currentPathNCPack.OverCutLength != 0 && currentPathNCPack.OverCutCAMPointList.Count > 0 ) {
-				if( !SolveProcessPath( postSolver, currentPathNCPack.OverCutCAMPointList,
-					out List<PostPoint> overCutG54,
-					ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
+				if( !BuildProcessPath( currentPathNCPack.OverCutCAMPointList, dLastPointProcess_M, dLastPointProcess_S,
+					out List<PostPoint> overCutG54 ) ) {
 					return false;
 				}
 				pathG54PostData.OverCutPostPointList.AddRange( overCutG54 );
