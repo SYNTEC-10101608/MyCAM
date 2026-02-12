@@ -1025,7 +1025,7 @@ namespace MyCAM.FileManager
 			set;
 		}
 
-		public double CompensatedDistance
+		public double? CompensatedDistance
 		{
 			get;
 			set;
@@ -1094,7 +1094,7 @@ namespace MyCAM.FileManager
 		{
 			if( ToolVecModifyMap == null || LeadData == null || TraverseData == null ||
 				!StartPoint.HasValue || !IsPathReverse.HasValue || !OverCutLength.HasValue ||
-				!IsToolVecReverse.HasValue || !InterpolateType.HasValue ) {
+				!IsToolVecReverse.HasValue || !InterpolateType.HasValue || !CompensatedDistance.HasValue ) {
 				throw new ArgumentException( "CraftData deserialization failed." );
 			}
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = ToolVecModifyMap.ToDictionary(
@@ -1112,8 +1112,9 @@ namespace MyCAM.FileManager
 				throw new ArgumentException( "CraftData.CumulativeTrsfMatrix deserialization failed." );
 			}
 			craftData.CumulativeTrsfMatrix = CumulativeTrsfMatrix.ToTrsf();
+
 			// Set properties not in constructor
-			craftData.CompensatedDistance = CompensatedDistance;
+			craftData.CompensatedDistance = CompensatedDistance.Value;
 			return craftData;
 		}
 	}

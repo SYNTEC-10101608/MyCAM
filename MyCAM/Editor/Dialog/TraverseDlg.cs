@@ -53,7 +53,7 @@ namespace MyCAM.Editor
 			m_NumericUpDownFrogLeapDistance.Maximum = decimal.MaxValue;
 			m_NumericUpDownFrogLeapDistance.Minimum = 0;
 			m_NumericUpDownSafePlaneDistance.Maximum = decimal.MaxValue;
-			m_NumericUpDownSafePlaneDistance.Minimum = 0;
+			m_NumericUpDownSafePlaneDistance.Minimum = decimal.MinValue;
 		}
 
 		protected override void OnShown( EventArgs e )

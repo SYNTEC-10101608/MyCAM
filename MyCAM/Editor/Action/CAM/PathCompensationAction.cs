@@ -1,6 +1,7 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
+using MyCAM.PathCache;
 using System;
 using System.Collections.Generic;
 
@@ -12,6 +13,7 @@ namespace MyCAM.Editor
 			: base( dataManager, pathIDList )
 		{
 			BackupCompensatedDist();
+			BackupGeomData();
 		}
 
 		public override EditActionType ActionType
@@ -32,6 +34,22 @@ namespace MyCAM.Editor
 			}
 		}
 
+		void BackupGeomData()
+		{
+			m_BackupGeomDataList.Clear();
+			foreach( var pathID in m_PathIDList ) {
+				if( !DataGettingHelper.GetPathCacheByID( pathID, out IPathCache pathCache ) ) {
+					continue;
+				}
+				if( pathCache is IStdPatternCache stdPatternCache ) {
+					m_BackupGeomDataList.Add( stdPatternCache.ComputeGeomData );
+				}
+				else {
+					continue;
+				}
+			}
+		}
+
 		public override void Start()
 		{
 			base.Start();
@@ -40,17 +58,13 @@ namespace MyCAM.Editor
 			compensateDlg.Confirm += ConfirmCompensatedDist;
 			compensateDlg.Cancel += CancelCompensatedDist;
 			compensateDlg.Reset += RestoreCompensatedDist;
+			compensateDlg.IsGeomConstraintExceedsLimit = IsGeomConstraintExceedsLimit;
 			compensateDlg.Show( MyApp.MainForm );
 			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
 		void PreviewCompensatedDist( double compensatedDist )
 		{
-			CheckGeomConstraint( compensatedDist, out bool exceedsLimit );
-			if( exceedsLimit ) {
-				return;
-			}
-
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
 				m_CraftDataList[ i ].CompensatedDistance = isResetClicked ? 0 : m_BackupCompensatedDistList[ i ];
 			}
@@ -63,11 +77,6 @@ namespace MyCAM.Editor
 
 		void ConfirmCompensatedDist( double compensatedDist )
 		{
-			CheckGeomConstraint( compensatedDist, out bool exceedsLimit );
-			if( exceedsLimit ) {
-				return;
-			}
-
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
 				m_CraftDataList[ i ].CompensatedDistance = isResetClicked ? 0 : m_BackupCompensatedDistList[ i ];
 			}
@@ -100,33 +109,19 @@ namespace MyCAM.Editor
 			isResetClicked = true;
 		}
 
-		void CheckGeomConstraint( double compensatedDist, out bool exceedsLimit )
+		bool IsGeomConstraintExceedsLimit( double compensatedDist )
 		{
-			exceedsLimit = false;
-			GetPathGeomDataList( out List<IStdPatternGeomData> pathGeomDataList );
-			for( int i = 0; i < pathGeomDataList.Count; i++ ) {
-				double constraint = GetGeomDataMinCompensation( pathGeomDataList[ i ] );
-				if( constraint > m_CraftDataList[ i ].CompensatedDistance + compensatedDist ) {
-					exceedsLimit = true;
-					MyApp.Logger.ShowOnLogPanel( "路徑超出補償範圍，請調整補償數值", MyApp.NoticeType.Warning, true );
+			if( isResetClicked ) {
+				return false;
+			}
+			for( int i = 0; i < m_BackupGeomDataList.Count; i++ ) {
+				double constraint = GetGeomDataMinCompensation( m_BackupGeomDataList[ i ] );
+				if( constraint > compensatedDist ) {
+					MyApp.Logger.ShowOnLogPanel( "路徑超出補償範圍，請調整補償數值", MyApp.NoticeType.Warning, false );
+					return true;
 				}
 			}
-		}
-
-		void GetPathGeomDataList( out List<IStdPatternGeomData> pathGeomDataList )
-		{
-			pathGeomDataList = new List<IStdPatternGeomData>();
-			foreach( var pathID in m_PathIDList ) {
-				if( !DataGettingHelper.GetGeomDataByID( pathID, out IGeomData geomData ) ) {
-					continue;
-				}
-				if( DataGettingHelper.IsStdPattern( geomData.PathType ) ) {
-					pathGeomDataList.Add( (IStdPatternGeomData)geomData );
-				}
-				else {
-					continue;
-				}
-			}
+			return false;
 		}
 
 		double GetGeomDataMinCompensation( IStdPatternGeomData geomData )
@@ -152,6 +147,7 @@ namespace MyCAM.Editor
 		}
 
 		List<double> m_BackupCompensatedDistList = new List<double>();
+		List<IStdPatternGeomData> m_BackupGeomDataList = new List<IStdPatternGeomData>();
 		bool isResetClicked = false;
 	}
 }

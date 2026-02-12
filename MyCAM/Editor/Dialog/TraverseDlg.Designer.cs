@@ -155,11 +155,11 @@
 			// 
 			this.m_lblSafePlaneDistance.AutoSize = true;
 			this.m_lblSafePlaneDistance.Font = new System.Drawing.Font("Arial", 9F);
-			this.m_lblSafePlaneDistance.Location = new System.Drawing.Point(50, 200);
+			this.m_lblSafePlaneDistance.Location = new System.Drawing.Point(64, 202);
 			this.m_lblSafePlaneDistance.Name = "m_lblSafePlaneDistance";
-			this.m_lblSafePlaneDistance.Size = new System.Drawing.Size(31, 15);
+			this.m_lblSafePlaneDistance.Size = new System.Drawing.Size(62, 15);
 			this.m_lblSafePlaneDistance.TabIndex = 31;
-			this.m_lblSafePlaneDistance.Text = "距離";
+			this.m_lblSafePlaneDistance.Text = "Z平面位置";
 			// 
 			// m_lblSafePlaneDistanceUnit
 			// 

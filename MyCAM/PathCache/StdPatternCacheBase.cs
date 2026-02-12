@@ -151,6 +151,7 @@ namespace MyCAM.PathCache
 			}
 		}
 
+		// Note: the compensated geom data is created based on the original geom data and the compensated distance, which is used for CAM point calculation. It will not be updated when CAM factor changed, but will be updated when CAD factor changed.
 		public IStdPatternGeomData ComputeGeomData
 		{
 			get
