@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -9,6 +10,8 @@ namespace MyCAM.Editor.Dialog
 			InitializeComponent();
 			Initialization();
 		}
+
+		public Func<double, bool> IsGeomConstraintExceedsLimit;
 
 		void Initialization()
 		{
@@ -36,6 +39,11 @@ namespace MyCAM.Editor.Dialog
 
 		void SetCompensateValue()
 		{
+			bool isExceedsLimit = IsGeomConstraintExceedsLimit?.Invoke( (double)m_NumUpDownCompensate.Value ) ?? false;
+			if( isExceedsLimit ) {
+				m_NumUpDownCompensate.Value = (decimal)m_CompensateData;
+				return;
+			}
 			m_CompensateData = (double)m_NumUpDownCompensate.Value;
 			RaisePreview( m_CompensateData );
 		}
@@ -56,6 +64,12 @@ namespace MyCAM.Editor.Dialog
 
 		void m_btnConfirm_Click( object sender, System.EventArgs e )
 		{
+			bool isExceedsLimit = IsGeomConstraintExceedsLimit?.Invoke( (double)m_NumUpDownCompensate.Value ) ?? false;
+			if( isExceedsLimit ) {
+				m_NumUpDownCompensate.Value = (decimal)m_CompensateData;
+				return;
+			}
+			m_CompensateData = (double)m_NumUpDownCompensate.Value;
 			RaiseConfirm( m_CompensateData );
 		}
 

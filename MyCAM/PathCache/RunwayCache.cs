@@ -137,7 +137,7 @@ namespace MyCAM.PathCache
 
 			// Ensure dimensions are positive
 			if( compensatedLength <= 0 || compensatedWidth <= 0 ) {
-				throw new ArgumentException( $"Compensated dimensions invalid: Length={compensatedLength}, Width={compensatedWidth}. CompensatedDistance={compensatedDist} is too large." );
+				return m_RunwayGeomData;
 			}
 
 			return new RunwayGeomData(

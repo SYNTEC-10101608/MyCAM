@@ -93,7 +93,7 @@ namespace MyCAM.PathCache
 
 			// Ensure diameter is positive
 			if( compensatedDiameter <= 0 ) {
-				throw new ArgumentException( $"Compensated diameter invalid: Diameter={compensatedDiameter}. CompensatedDistance={compensatedDist} is too large." );
+				return m_CircleGeomData;
 			}
 
 			return new CircleGeomData(

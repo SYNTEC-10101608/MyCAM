@@ -114,7 +114,7 @@ namespace MyCAM.PathCache
 
 			// Ensure side length is positive
 			if( compensatedSideLength <= 0 ) {
-				throw new ArgumentException( $"Compensated side length invalid: SideLength={compensatedSideLength}. CompensatedDistance={compensatedDist} is too large." );
+				return m_PolygonGeomData;
 			}
 
 			// If corner radius becomes non-positive after compensation, set to 0 (sharp corner polygon)

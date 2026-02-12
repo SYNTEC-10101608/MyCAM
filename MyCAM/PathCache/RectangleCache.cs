@@ -80,7 +80,7 @@ namespace MyCAM.PathCache
 
 			// Ensure dimensions are positive
 			if( compensatedWidth <= 0 || compensatedLength <= 0 ) {
-				throw new ArgumentException( $"Compensated dimensions invalid: Width={compensatedWidth}, Length={compensatedLength}. CompensatedDistance={compensatedDist} is too large." );
+				return m_RectangleGeomData;
 			}
 
 			// If corner radius becomes non-positive after compensation, set to 0 (sharp corner rectangle)
