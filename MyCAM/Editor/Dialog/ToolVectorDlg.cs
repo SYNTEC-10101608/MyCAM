@@ -16,6 +16,8 @@ namespace MyCAM.Editor
 		public Action AddEditIndex;
 		public Action RemoveEditIndex;
 		public Action SwitchStartEnd;
+		public Action<bool> MoveIndex;
+		public Action<bool> ToStartOrEnd;
 
 		public ToolVectorDlg( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse, RotaryAxisConfig config )
 		{
@@ -80,9 +82,11 @@ namespace MyCAM.Editor
 			bSuppressValueChangedEvent = false;
 		}
 
-		public void EnableStartEndSwitch( bool enable )
+		public void EnableStartEndSwitch( bool enable, bool start )
 		{
 			m_btnSwitchStartEnd.Visible = enable;
+			m_lblStartOrEnd.Visible = enable;
+			m_lblStartOrEnd.Text = start ? "當前位置：起點" : "當前位置：終點";
 		}
 
 
@@ -296,6 +300,27 @@ namespace MyCAM.Editor
 			}
 			bSuppressValueChangedEvent = false;
 			HandleMSAngleChanged();
+		}
+
+		// index moving
+		void m_btnPrev_Click( object sender, EventArgs e )
+		{
+			MoveIndex?.Invoke( false );
+		}
+
+		void m_btnNext_Click( object sender, EventArgs e )
+		{
+			MoveIndex?.Invoke( true );
+		}
+
+		void m_btnToStart_Click( object sender, EventArgs e )
+		{
+			ToStartOrEnd?.Invoke( true );
+		}
+
+		void m_btnToEnd_Click( object sender, EventArgs e )
+		{
+			ToStartOrEnd?.Invoke( false );
 		}
 
 		bool m_IsPathRevese = false;

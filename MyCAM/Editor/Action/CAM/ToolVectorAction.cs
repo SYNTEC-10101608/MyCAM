@@ -65,7 +65,9 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.AddEditIndex += () => OnAddEditIndex();
 			m_ToolVecDlg.RemoveEditIndex += () => OnRemoveEditIndex();
 			m_ToolVecDlg.SwitchStartEnd += () => OnSwitchStartEnd();
-			m_ToolVecDlg.EnableStartEndSwitch( false );
+			m_ToolVecDlg.MoveIndex += ( isNext ) => OnMoveIndex( isNext );
+			m_ToolVecDlg.ToStartOrEnd += ( toStart ) => OnToStartOrEnd( toStart );
+			m_ToolVecDlg.EnableStartEndSwitch( false, false );
 			m_ToolVecDlg.Cancel += End;
 			m_ToolVecDlg.Show( MyApp.MainForm );
 			RaiseActionStart?.Invoke( true );
@@ -89,13 +91,14 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-			UnlockSelectedVertexHighLight();
 
 			// update select index
 			int? _nSelectIndex = GetSelectIndex( out TopoDS_Shape selectedVertex );
 			int nSelectIndex = _nSelectIndex ?? NULL_SELECT_INDEX;
-
-			// lock selected vertex high light
+			if( nSelectIndex == NULL_SELECT_INDEX || nSelectIndex == m_nSelectIndex ) {
+				return;
+			}
+			UnlockSelectedVertexHighLight();
 			LockSelectedVertexHighLight( selectedVertex );
 			OnSelectedIndexChanged( nSelectIndex );
 		}
@@ -113,6 +116,9 @@ namespace MyCAM.Editor
 
 		void OnSelectedIndexChanged( int nSelectIndex )
 		{
+			if( m_nSelectIndex == nSelectIndex ) {
+				return;
+			}
 			m_nSelectIndex = nSelectIndex;
 
 			// no select
@@ -130,8 +136,11 @@ namespace MyCAM.Editor
 
 				// update dialog
 				m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
-				m_ToolVecDlg.EnableStartEndSwitch( ( m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() || m_nSelectIndex == CLOSED_POINT_INDEX )
-													&& m_DataHandler.IsClosed() );
+
+				// check is at start or end point for closed path
+				bool start = m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() && m_DataHandler.IsClosed();
+				bool end = m_nSelectIndex == CLOSED_POINT_INDEX && m_DataHandler.IsClosed();
+				m_ToolVecDlg.EnableStartEndSwitch( start || end, start );
 			}
 			RefreshSimuResult();
 		}
@@ -332,6 +341,24 @@ namespace MyCAM.Editor
 			}
 			else {
 				// do nothing if not start or end index
+			}
+		}
+
+		void OnMoveIndex( bool isNext )
+		{
+			int newIndex = m_DataHandler.GetPrevOrNextCADIndex( isNext, m_nSelectIndex );
+			OnSelectedIndexChanged( newIndex );
+		}
+
+		void OnToStartOrEnd( bool toStart )
+		{
+			if( m_DataHandler.IsClosed() ) {
+				OnSelectedIndexChanged( toStart ? m_DataHandler.GetStartPointCADIndex() : CLOSED_POINT_INDEX );
+			}
+
+			// for open path, just use 0 and last index of CAD
+			else {
+				OnSelectedIndexChanged( toStart ? 0 : m_PathPointList.Count - 1 );
 			}
 		}
 
@@ -612,6 +639,49 @@ namespace MyCAM.Editor
 				}
 			}
 			return null;
+		}
+
+		public int GetPrevOrNextCADIndex( bool isNext, int currentCADIndex )
+		{
+			// convert to cam index
+			int camIndex = 0;
+			if( m_PathCache.CADToCAMIndexMap.ContainsKey( currentCADIndex ) ) {
+				camIndex = m_PathCache.CADToCAMIndexMap[ currentCADIndex ];
+			}
+			else if( currentCADIndex == CLOSED_POINT_INDEX ) {
+				camIndex = m_PathCache.MainPathPointList.Count - 1;
+			}
+			else {
+				return NULL_SELECT_INDEX;
+			}
+
+			// cam index++ or cam index--
+			if( isNext ) {
+				camIndex++;
+			}
+			else {
+				camIndex--;
+			}
+
+			// when cam index < 0, cam index = 0
+			if( camIndex < 0 ) {
+				camIndex = 0;
+			}
+
+			// when cam index >= count, cam index = count - 1
+			else if( camIndex >= m_PathCache.MainPathPointList.Count ) {
+				camIndex = m_PathCache.MainPathPointList.Count - 1;
+			}
+
+			// convert back to cad index
+			if( IsClosed() && camIndex == m_PathCache.MainPathPointList.Count - 1 ) {
+
+				// at the end point of closed path, return closed point index
+				return CLOSED_POINT_INDEX;
+			}
+			else {
+				return m_PathCache.MainPathPointList[ camIndex ].InitPathIndex;
+			}
 		}
 
 		readonly CraftData m_CraftData;
