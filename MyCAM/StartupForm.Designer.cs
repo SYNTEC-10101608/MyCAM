@@ -52,6 +52,8 @@
 			this.m_tsbSetTraverseData = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbEntryAndExitSetting = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbPatternSetting = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbPathEdit = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbPathCompensation = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbConvertNC = new System.Windows.Forms.ToolStripButton();
 			this.m_tscLevel1Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsSimuFunc = new System.Windows.Forms.ToolStrip();
@@ -111,8 +113,6 @@
 			this.m_tsbShowTraverse = new System.Windows.Forms.ToolStripButton();
 			this.m_panBackGround = new System.Windows.Forms.TableLayoutPanel();
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.m_tsbPathEdit = new System.Windows.Forms.ToolStripButton();
-			this.m_tsbPathCompensation = new System.Windows.Forms.ToolStripButton();
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_tscLevel1Container.ContentPanel.SuspendLayout();
@@ -370,6 +370,28 @@
 			this.m_tsbPatternSetting.Text = "toolStripButton1";
 			this.m_tsbPatternSetting.ToolTipText = "設定圖元";
 			this.m_tsbPatternSetting.Click += new System.EventHandler(this.m_tsbPatternSetting_Click);
+			// 
+			// m_tsbPathEdit
+			// 
+			this.m_tsbPathEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbPathEdit.Image = global::MyCAM.Properties.Resources.PathEdit;
+			this.m_tsbPathEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbPathEdit.Name = "m_tsbPathEdit";
+			this.m_tsbPathEdit.Size = new System.Drawing.Size(44, 41);
+			this.m_tsbPathEdit.Text = "路徑編輯";
+			this.m_tsbPathEdit.ToolTipText = "路徑編輯";
+			this.m_tsbPathEdit.Click += new System.EventHandler(this.m_tsbPathEdit_Click);
+			// 
+			// m_tsbPathCompensation
+			// 
+			this.m_tsbPathCompensation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbPathCompensation.Image = global::MyCAM.Properties.Resources.PathCompensate;
+			this.m_tsbPathCompensation.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbPathCompensation.Name = "m_tsbPathCompensation";
+			this.m_tsbPathCompensation.Size = new System.Drawing.Size(44, 41);
+			this.m_tsbPathCompensation.Text = "路徑補償";
+			this.m_tsbPathCompensation.ToolTipText = "路徑補償";
+			this.m_tsbPathCompensation.Click += new System.EventHandler(this.m_tsbPathCompensation_Click);
 			// 
 			// m_tsbConvertNC
 			// 
@@ -853,9 +875,10 @@
 			// m_pnlLog
 			// 
 			this.m_pnlLog.AutoScroll = true;
-			this.m_pnlLog.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(90)))), ((int)(((byte)(119)))));
+			this.m_pnlLog.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(239)))), ((int)(((byte)(244)))));
 			this.m_panBackGround.SetColumnSpan(this.m_pnlLog, 2);
 			this.m_pnlLog.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_pnlLog.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_pnlLog.Location = new System.Drawing.Point(3, 437);
 			this.m_pnlLog.Name = "m_pnlLog";
 			this.m_pnlLog.Size = new System.Drawing.Size(1590, 49);
@@ -1055,28 +1078,6 @@
 			this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
 			this.contextMenuStrip1.Name = "contextMenuStrip1";
 			this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
-			// 
-			// m_tsbPathEdit
-			// 
-			this.m_tsbPathEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_tsbPathEdit.Image = global::MyCAM.Properties.Resources.PathEdit;
-			this.m_tsbPathEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbPathEdit.Name = "m_tsbPathEdit";
-			this.m_tsbPathEdit.Size = new System.Drawing.Size(44, 41);
-			this.m_tsbPathEdit.Text = "路徑編輯";
-			this.m_tsbPathEdit.ToolTipText = "路徑編輯";
-			this.m_tsbPathEdit.Click += new System.EventHandler(this.m_tsbPathEdit_Click);
-			// 
-			// m_tsbPathCompensation
-			// 
-			this.m_tsbPathCompensation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_tsbPathCompensation.Image = global::MyCAM.Properties.Resources.PathCompensate;
-			this.m_tsbPathCompensation.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbPathCompensation.Name = "m_tsbPathCompensation";
-			this.m_tsbPathCompensation.Size = new System.Drawing.Size(44, 41);
-			this.m_tsbPathCompensation.Text = "路徑補償";
-			this.m_tsbPathCompensation.ToolTipText = "路徑補償";
-			this.m_tsbPathCompensation.Click += new System.EventHandler(this.m_tsbPathCompensation_Click);
 			// 
 			// StartupForm
 			// 
