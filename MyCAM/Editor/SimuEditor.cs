@@ -384,7 +384,7 @@ namespace MyCAM.Editor
 		List<PostData> GetPostDataList()
 		{
 			NCWriter writer = new NCWriter( m_DataManager );
-			bool bSuccess = writer.ConvertContourSuccess( out string szErrorMessage, out List<PostData> postDataList );
+			bool bSuccess = writer.ConvertPostDataListSuccess( out string szErrorMessage, out List<PostData> postDataList );
 			if( !bSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "後處理失敗, 無法生成模擬: " + szErrorMessage, MyApp.NoticeType.Warning );
 				return new List<PostData>();
@@ -417,7 +417,8 @@ namespace MyCAM.Editor
 			// get collision result
 			bool bCollisionCalDone = CollisionHelper.CalCollisionResult( frameCount, calNeedData, frameTransformMap, out Dictionary<MachineComponentType, List<bool>> frameCollisionMap );
 			if( !bCollisionCalDone ) {
-				return SimuCalStatus.FrameCalDone; ;
+				return SimuCalStatus.FrameCalDone;
+				;
 			}
 			simuCalResult.FrameCollisionMap = frameCollisionMap;
 			return SimuCalStatus.CollisionCalDone;

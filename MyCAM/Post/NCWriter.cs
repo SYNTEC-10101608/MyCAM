@@ -94,7 +94,7 @@ namespace MyCAM.Post
 			}
 		}
 
-		public bool ConvertContourSuccess( out string errorMessage, out List<PostData> postDataList )
+		public bool ConvertPostDataListSuccess( out string errorMessage, out List<PostData> postDataList )
 		{
 			errorMessage = string.Empty;
 			postDataList = new List<PostData>();
@@ -119,12 +119,77 @@ namespace MyCAM.Post
 						}
 						postDataList.Add( postData );
 					}
+					else {
+						StdPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
+						if( !StdPatternPostHelper.SolvePath( m_PostSolver, package, endInfoOfPreviousPath, m_EntryAndExitData,
+							out StdPatternPostData stdPostData, out endInfoOfPreviousPath ) ) {
+							errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
+							return false;
+						}
+
+						if( !ContourPostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
+							endInfoOfPreviousPath, m_EntryAndExitData,
+							out PostData postData, out _ ) ) {
+
+							errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
+							return false;
+						}
+
+						// TODO：this is temporary solution to make standard pattern post data compatible with std pattern contour post data, which is used for tool path display in process setting form. We will refactor the code structure later to avoid this kind of workaround.
+						ApplyStdPatternPostDataToPostData( postData, stdPostData );
+						postDataList.Add( postData );
+					}
 				}
 				return true;
 			}
 			catch( Exception ex ) {
 				errorMessage = ex.Message;
 				return false;
+			}
+		}
+
+		void ApplyStdPatternPostDataToPostData( PostData postData, StdPatternPostData stdPostData )
+		{
+			// Update main path points
+			for( int j = 0; j < postData.MainPathPostPointList.Count; j++ ) {
+				postData.MainPathPostPointList[ j ].Master = stdPostData.RefPoint.Master;
+				postData.MainPathPostPointList[ j ].Slave = stdPostData.RefPoint.Slave;
+			}
+
+			// Update lead-in points
+			if( postData.LeadInPostPointList.Count != 0 ) {
+				foreach( var postPoint in postData.LeadInPostPointList ) {
+					postPoint.Master = stdPostData.RefPoint.Master;
+					postPoint.Slave = stdPostData.RefPoint.Slave;
+				}
+			}
+
+			// Update over-cut points
+			if( postData.OverCutPostPointList.Count != 0 ) {
+				foreach( var postPoint in postData.OverCutPostPointList ) {
+					postPoint.Master = stdPostData.RefPoint.Master;
+					postPoint.Slave = stdPostData.RefPoint.Slave;
+				}
+			}
+
+			// Update traverse points
+			if( postData.LiftUpPostPoint != null ) {
+				postData.LiftUpPostPoint = stdPostData.LiftUpPostPoint;
+			}
+			if( postData.CutDownPostPoint != null ) {
+				postData.CutDownPostPoint = stdPostData.CutDownPostPoint;
+			}
+			if( postData.LiftUpPostSafePlanePoint != null ) {
+				postData.LiftUpPostSafePlanePoint = stdPostData.LiftUpPostSafePlanePoint;
+			}
+			if( postData.CutDownPostSafePlanePoint != null ) {
+				postData.CutDownPostSafePlanePoint = stdPostData.CutDownPostSafePlanePoint;
+			}
+			if( postData.FrogLeapMidPostPoint != null ) {
+				postData.FrogLeapMidPostPoint = stdPostData.FrogLeapMidPostPoint;
+			}
+			if( postData.ProcessStartPoint != null ) {
+				postData.ProcessStartPoint = stdPostData.ProcessStartPoint;
 			}
 		}
 
@@ -202,16 +267,16 @@ namespace MyCAM.Post
 			if( !DataGettingHelper.GetCraftDataByID( szID, out CraftData craftData ) ) {
 				return null;
 			}
-			if( !DataGettingHelper.GetContourCacheByID( szID, out ContourCache contourCache ) ) {
+			if( !DataGettingHelper.GetPathCacheByID( szID, out IPathCache pathCache ) ) {
 				return null;
 			}
 			return new ContourNCPackage(
 				craftData.LeadData,
 				craftData.OverCutLength,
-				contourCache.MainPathPointList,
-				contourCache.LeadInPointList,
-				contourCache.LeadOutPointList,
-				contourCache.OverCutPointList,
+				pathCache.MainPathPointList,
+				pathCache.LeadInPointList,
+				pathCache.LeadOutPointList,
+				pathCache.OverCutPointList,
 				craftData.TraverseData,
 				CacheHelper.GetProcessStartPoint( szID ),
 				CacheHelper.GetProcessEndPoint( szID )
