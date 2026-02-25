@@ -38,6 +38,10 @@ namespace MyCAM.Editor
 
 		public void ReverseSelection()
 		{
+			// is not allow at single select mode
+			if( isAllowMultiSelect == false ) {
+				return;
+			}
 			foreach( TreeNode node in GetAllNodes( this.Nodes ) ) {
 				if( m_SelectedNodes.Contains( node ) ) {
 					m_SelectedNodes.Remove( node );
@@ -94,7 +98,7 @@ namespace MyCAM.Editor
 
 		public void SelectAll()
 		{
-			if (isAllowMultiSelect == false ) {
+			if( isAllowMultiSelect == false ) {
 				return;
 			}
 			ClearSelection();
@@ -139,10 +143,12 @@ namespace MyCAM.Editor
 			else if( ctrl ) {
 
 				// ctrl click: toggle this node
-				if( m_SelectedNodes.Contains( node ) )
+				if( m_SelectedNodes.Contains( node ) ) {
 					UnselectNode( node );
-				else
+				}
+				else {
 					SelectNode( node );
+				}
 				m_AnchorNode = node;
 			}
 			else if( shift ) {

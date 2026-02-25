@@ -1243,9 +1243,19 @@ namespace MyCAM
 			m_SimuEditor.SlowDown();
 		}
 
-		private void m_btnCheck_Click( object sender, EventArgs e )
+		void m_btnCheck_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.CheckExitCollision();
+		}
+
+		void m_btnPrePoint_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.PrePoint();
+		}
+
+		void m_btnNextPoint_Click( object sender, EventArgs e )
+		{
+			m_SimuEditor.NextPoint();
 		}
 	}
 }

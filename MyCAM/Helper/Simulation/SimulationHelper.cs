@@ -91,7 +91,7 @@ namespace MyCAM.Helper
 
 	public static class SimulationHelper
 	{
-		internal static bool BuildFrameTransMap( SimuData.RequiredData.SimuInputSet calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out List<SimuData.ResultData.PathStartEndIndex> pathStartEndIndexList, out int frameCount )
+		internal static bool BuildFrameTransMap( SimuData.SimuRequiredData.SimuInputSet calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out List<SimuData.ResultData.PathStartEndIndex> pathStartEndIndexList, out int frameCount )
 		{
 			frameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 			pathStartEndIndexList = new List<SimuData.ResultData.PathStartEndIndex>();
@@ -341,29 +341,41 @@ namespace MyCAM.Helper
 			MachineData machineData, Dictionary<MachineComponentType, List<MachineComponentType>> chainListMap,
 			ref Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap )
 		{
-			try {
-				// set XYZ transform
-				Dictionary<MachineComponentType, gp_Trsf> transformMap = new Dictionary<MachineComponentType, gp_Trsf>();
-				transformMap = BuildTransformMapPerFrame( FKPnt, G54Offset, workPiecesChaintSet, machineData );
-
-				// set chain
-				gp_Trsf trsfX = GetComponentTrsf( transformMap, MachineComponentType.XAxis, chainListMap );
-				gp_Trsf trsfY = GetComponentTrsf( transformMap, MachineComponentType.YAxis, chainListMap );
-				gp_Trsf trsfZ = GetComponentTrsf( transformMap, MachineComponentType.ZAxis, chainListMap );
-				gp_Trsf trsfMaster = GetComponentTrsf( transformMap, MachineComponentType.Master, chainListMap );
-				gp_Trsf trsfSlave = GetComponentTrsf( transformMap, MachineComponentType.Slave, chainListMap );
-				gp_Trsf trsLaser = GetComponentTrsf( transformMap, MachineComponentType.Laser, chainListMap );
-				gp_Trsf trsfAllWorkPiece = GetComponentTrsf( transformMap, MachineComponentType.WorkPiece, chainListMap );
-				m_FrameTransformMap[ MachineComponentType.XAxis ].Add( trsfX );
-				m_FrameTransformMap[ MachineComponentType.YAxis ].Add( trsfY );
-				m_FrameTransformMap[ MachineComponentType.ZAxis ].Add( trsfZ );
-				m_FrameTransformMap[ MachineComponentType.Master ].Add( trsfMaster );
-				m_FrameTransformMap[ MachineComponentType.Slave ].Add( trsfSlave );
-				m_FrameTransformMap[ MachineComponentType.Laser ].Add( trsLaser );
-				m_FrameTransformMap[ MachineComponentType.WorkPiece ].Add( trsfAllWorkPiece );
+			// protection
+			if( workPiecesChaintSet == null
+				|| workPiecesChaintSet.Count == 0
+				|| machineData == null
+				|| chainListMap == null
+				|| chainListMap.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( $"畫面計算失敗", MyApp.NoticeType.Warning );
+				return;
 			}
-			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"特定畫面計算失敗: {ex.Message}", MyApp.NoticeType.Warning );
+			if( m_FrameTransformMap == null ) {
+				m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
+				return;
+			}
+
+			// set XYZ transform
+			Dictionary<MachineComponentType, gp_Trsf> transformMap = BuildTransformMapPerFrame( FKPnt, G54Offset, workPiecesChaintSet, machineData );
+
+			// all relevant component types
+			var types = new[]
+			{
+				MachineComponentType.XAxis,
+				MachineComponentType.YAxis,
+				MachineComponentType.ZAxis,
+				MachineComponentType.Master,
+				MachineComponentType.Slave,
+				MachineComponentType.Laser,
+				MachineComponentType.WorkPiece
+			};
+
+			// calculate each component transform and record to frame transform map
+			foreach( MachineComponentType type in types ) {
+				gp_Trsf trsf = GetComponentTrsf( transformMap, type, chainListMap );
+				if( !m_FrameTransformMap.ContainsKey( type ) )
+					m_FrameTransformMap[ type ] = new List<gp_Trsf>();
+				m_FrameTransformMap[ type ].Add( trsf );
 			}
 		}
 

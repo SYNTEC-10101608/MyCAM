@@ -87,14 +87,12 @@ namespace MyCAM.Editor.Renderer
 
 					// machine part
 					if( aisObj is AIS_Triangulation tri ) {
-						ResetAIS( tri, keyValue.Key );
 						m_Viewer.GetAISContext().Display( tri, false );
 						m_Viewer.GetAISContext().Deactivate( tri );
 					}
 
 					// laser light
 					else {
-						ResetAIS( aisObj, keyValue.Key );
 						m_Viewer.GetAISContext().Display( aisObj, false );
 						m_Viewer.GetAISContext().Deactivate( aisObj );
 					}
@@ -124,6 +122,8 @@ namespace MyCAM.Editor.Renderer
 					if( aisObject == null ) {
 						continue;
 					}
+					// set ais back to ori coordinate
+					ResetAIS( aisObject, keyValue.Key );
 					m_Viewer.GetAISContext().Remove( aisObject, false );
 				}
 			}
