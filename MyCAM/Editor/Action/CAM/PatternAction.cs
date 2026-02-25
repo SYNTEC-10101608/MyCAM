@@ -36,6 +36,7 @@ namespace MyCAM.Editor
 					m_BackFirstPathType = geomData.PathType;
 				}
 				m_BackUpPathObjectList.Add( pathID, dataManager.ObjectMap[ pathID ] as PathObject );
+				m_BackUpGeomDataList.Add( pathID, geomData.Clone() );
 			}
 			m_Viewer = viewer;
 			m_szPathIDList = szPathIDList;
@@ -114,6 +115,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			// TODO：shape isn't necessary
 			TopoDS_Shape shape = CreatePatternShape( szID, contourPathObject, stdPatternGeomDataClone );
 			if( shape == null || shape.IsNull() ) {
 				return;
@@ -123,7 +125,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			UpdateGeomDataForPath( szID, oldGeomData, contourPathObject, stdPatternGeomDataClone );
+			UpdateGeomDataForPath( szID, shape, oldGeomData, contourPathObject, stdPatternGeomDataClone );
 		}
 
 		TopoDS_Shape CreatePatternShape( string szID, ContourPathObject contourPathObject, IStdPatternGeomData standardPatternGeomData )
@@ -138,16 +140,10 @@ namespace MyCAM.Editor
 				return null;
 			}
 
-			// show trihedron temporarily
-			ShowStdPatternTrihedron( szID, standardPatternGeomData );
-
-			// update geom data ref center dir
-			standardPatternGeomData.RefCenterDir = contourPathObject.GeomData.RefCenterDir;
-
 			return shape;
 		}
 
-		void UpdateGeomDataForPath( string szID, IGeomData oldGeomData, ContourPathObject contourPathObject, IStdPatternGeomData standardPatternGeomData )
+		void UpdateGeomDataForPath( string szID, TopoDS_Shape shape, IGeomData oldGeomData, ContourPathObject contourPathObject, IStdPatternGeomData standardPatternGeomData )
 		{
 			// should convert to contour
 			if( oldGeomData.PathType != PathType.Contour && standardPatternGeomData == null ) {
@@ -156,12 +152,15 @@ namespace MyCAM.Editor
 
 			// should check if update geom data
 			else if( standardPatternGeomData != null && oldGeomData.PathType == standardPatternGeomData.PathType ) {
+				ShowStdPatternTrihedron( szID, standardPatternGeomData, false );
 				UpdateGeomData( oldGeomData, standardPatternGeomData );
 			}
 			else {
+				standardPatternGeomData.RefCenterDir = contourPathObject.GeomData.RefCenterDir;
+				ShowStdPatternTrihedron( szID, standardPatternGeomData, true );
 
 				// create new path object
-				PathObject newPathObject = CreatePathObject( szID, contourPathObject.Shape, standardPatternGeomData, contourPathObject, m_BackUpPathObjectList[ szID ] );
+				PathObject newPathObject = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, m_BackUpPathObjectList[ szID ] );
 				if( newPathObject != null ) {
 					m_DataManager.ObjectMap[ szID ] = newPathObject;
 				}
@@ -192,22 +191,48 @@ namespace MyCAM.Editor
 		void PatternRestore()
 		{
 			RemoveTrihedron();
-			TopoDS_Shape shape = null;
 			foreach( var szID in m_szPathIDList ) {
 				if( !m_BackUpPathObjectList.ContainsKey( szID ) || m_BackUpPathObjectList[ szID ] == null ) {
 					continue;
 				}
-				shape = m_BackUpPathObjectList[ szID ].Shape;
+				if( m_BackUpPathObjectList[ szID ].PathType != PathType.Contour && ( m_DataManager.ObjectMap[ szID ] as PathObject ).PathType == m_BackUpPathObjectList[ szID ].PathType ) {
+
+					// reset geom data to back up value, because the path object may be reused if only geom data is updated in PatternCreate
+					switch( m_BackUpPathObjectList[ szID ].PathType ) {
+						case PathType.Circle:
+							UpdateCircleGeomData( ( m_BackUpPathObjectList[ szID ] as CirclePathObject ).GeomData as CircleGeomData, ( m_BackUpGeomDataList[ szID ] as CircleGeomData ) );
+							break;
+						case PathType.Rectangle:
+							UpdateRectangleGeomData( ( m_BackUpPathObjectList[ szID ] as RectanglePathObject ).GeomData as RectangleGeomData, ( m_BackUpGeomDataList[ szID ] as RectangleGeomData ) );
+							break;
+						case PathType.Runway:
+							UpdateRunwayGeomData( ( m_BackUpPathObjectList[ szID ] as RunwayPathObject ).GeomData as RunwayGeomData, ( m_BackUpGeomDataList[ szID ] as RunwayGeomData ) );
+							break;
+						case PathType.Triangle:
+						case PathType.Square:
+						case PathType.Pentagon:
+						case PathType.Hexagon:
+							UpdatePolygonGeomData( ( m_BackUpPathObjectList[ szID ] as PolygonPathObject ).GeomData as PolygonGeomData, ( m_BackUpGeomDataList[ szID ] as PolygonGeomData ) );
+							break;
+						default:
+							break;
+					}
+				}
 				m_DataManager.ObjectMap[ szID ] = m_BackUpPathObjectList[ szID ];
 			}
 			m_Viewer.UpdateView();
 		}
 
-		void ShowStdPatternTrihedron( string szID, IStdPatternGeomData standardPatternGeomData )
+		void ShowStdPatternTrihedron( string szID, IStdPatternGeomData standardPatternGeomData, bool isTypeChanged )
 		{
 			gp_Ax1 refCenterDir = new gp_Ax1();
-			if( DataGettingHelper.GetPathCacheByID( szID, out IPathCache pathCache ) ) {
-				refCenterDir = pathCache.ComputeRefCenterDir;
+			if( isTypeChanged ) {
+				refCenterDir = standardPatternGeomData.RefCenterDir;
+			}
+			else {
+				if( DataGettingHelper.GetPathCacheByID( szID, out IPathCache pathCache ) ) {
+					refCenterDir = pathCache.ComputeRefCenterDir;
+				}
 			}
 			gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( refCenterDir, standardPatternGeomData.IsCoordinateReversed, standardPatternGeomData.RotatedAngle_deg );
 			AIS_Trihedron trihedron = DrawHelper.GetTrihedronAIS( refCoord.Ax2() );
@@ -347,5 +372,6 @@ namespace MyCAM.Editor
 		IGeomData m_GeomData;
 		PathType m_BackFirstPathType;
 		Dictionary<string, PathObject> m_BackUpPathObjectList = new Dictionary<string, PathObject>();
+		Dictionary<string, IGeomData> m_BackUpGeomDataList = new Dictionary<string, IGeomData>();
 	}
 }
