@@ -86,7 +86,7 @@ namespace MyCAM.Data
 			};
 		}
 
-		public class RequiredData
+		public class SimuRequiredData
 		{
 			internal struct SimuInputSet
 			{

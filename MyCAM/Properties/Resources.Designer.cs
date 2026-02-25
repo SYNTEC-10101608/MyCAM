@@ -313,6 +313,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap NextPoint {
+            get {
+                object obj = ResourceManager.GetObject("NextPoint", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Overcut {
             get {
                 object obj = ResourceManager.GetObject("Overcut", resourceCulture);
@@ -366,6 +376,16 @@ namespace MyCAM.Properties {
         internal static System.Drawing.Bitmap PointCenter {
             get {
                 object obj = ResourceManager.GetObject("PointCenter", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap PrePoint {
+            get {
+                object obj = ResourceManager.GetObject("PrePoint", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

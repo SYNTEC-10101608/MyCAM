@@ -9,7 +9,7 @@ namespace MyCAM.Helper
 {
 	internal static class CollisionHelper
 	{
-		internal static bool CalCollisionResult( int frameCount, SimuData.RequiredData.SimuInputSet calNeedData, Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap, out Dictionary<MachineComponentType, List<bool>> frameCollisionMap )
+		internal static bool CalCollisionResult( int frameCount, SimuData.SimuRequiredData.SimuInputSet calNeedData, Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap, out Dictionary<MachineComponentType, List<bool>> frameCollisionMap )
 		{
 			bool bCollisionOk = BuildCollision( frameCount, calNeedData.ChainListMap, calNeedData.CollisionEngine, FrameTransformMap, out frameCollisionMap );
 			return bCollisionOk;
@@ -20,6 +20,9 @@ namespace MyCAM.Helper
 			out Dictionary<MachineComponentType, List<bool>> FrameCollisionMap )
 		{
 			FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
+			if( ChainListMap == null || ChainListMap.Count == 0 ) {
+				return false;
+			}
 
 			// init frame collision map
 			FrameCollisionMap[ MachineComponentType.Base ] = new List<bool>();

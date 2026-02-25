@@ -137,6 +137,9 @@ namespace MyCAM.Editor
 			// init tree
 			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
 			m_ViewManager.PathNode.ExpandAll();
+
+			// haven't calculate simu result, can't use tree to select which path want to play
+			m_TreeView.Enabled = false;
 			if( m_TreeView is MultiSelectTreeView treeView ) {
 				treeView.isAllowMultiSelect = false;
 			}
@@ -185,6 +188,8 @@ namespace MyCAM.Editor
 			if( m_FrameCount <= INIT_FRAME_INDEX ) {
 				return;
 			}
+
+			// is already first path, if so, stay in first path and frame 0
 			if( CurrentPath <= INIT_PATH_INDEX ) {
 				CurrentPath = INIT_PATH_INDEX;
 			}
@@ -248,6 +253,7 @@ namespace MyCAM.Editor
 			// if simulation result haven't been calculated
 			CalSimulationResult();
 			if( m_FrameCount <= INIT_FRAME_INDEX ) {
+				m_TreeView.Enabled = true;
 				return;
 			}
 
@@ -273,6 +279,7 @@ namespace MyCAM.Editor
 			// if simulation result haven't been calculated
 			CalSimulationResult();
 			if( m_FrameCount <= INIT_FRAME_INDEX ) {
+				m_TreeView.Enabled = true;
 				return;
 			}
 			for( int i = m_CurrentFrameIndex + 1; i < m_FrameCount; i++ ) {
@@ -285,6 +292,64 @@ namespace MyCAM.Editor
 				}
 			}
 			MyApp.Logger.ShowOnLogPanel( "已到達最後一個碰撞點", MyApp.NoticeType.Hint );
+			m_TreeView.Enabled = true;
+		}
+
+		public void PrePoint()
+		{
+			// becaus if enable tree , the action of refresh tree will triger to select frist index of that path
+			PauseSimulation( false );
+			CalSimulationResult();
+
+			// protection
+			if( m_FrameCount <= INIT_FRAME_INDEX ) {
+				m_TreeView.Enabled = true;
+				return;
+			}
+
+			// now is at the path start point
+			if( m_CurrentFrameIndex == m_PathStartEndIndex[ CurrentPath ].StartIndex ) {
+
+				if( CurrentPath > INIT_PATH_INDEX ) {
+					// trigger tree select change
+					CurrentPath--;
+				}
+			}
+			if( m_CurrentFrameIndex <= INIT_FRAME_INDEX ) {
+				m_CurrentFrameIndex = INIT_FRAME_INDEX;
+			}
+			else {
+				m_CurrentFrameIndex--;
+			}
+			RefreshFrame();
+			m_TreeView.Enabled = true;
+		}
+
+		public void NextPoint()
+		{
+			// becaus if enable tree , the action of refresh tree will triger to select frist index of that path
+			PauseSimulation( false );
+			CalSimulationResult();
+
+			// protection
+			if( m_FrameCount <= INIT_FRAME_INDEX ) {
+				m_TreeView.Enabled = true;
+				return;
+			}
+
+			// is already at last frame of last path
+			if( m_CurrentFrameIndex == m_PathStartEndIndex.Last().EndIndex ) {
+				return;
+			}
+
+			// now is at the path end point
+			if( m_CurrentFrameIndex == m_PathStartEndIndex[ CurrentPath ].EndIndex ) {
+
+				// trigger tree select change
+				CurrentPath++;
+			}
+			m_CurrentFrameIndex++;
+			RefreshFrame();
 			m_TreeView.Enabled = true;
 		}
 
@@ -358,7 +423,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-
 		void Play()
 		{
 			// initialize timer
@@ -398,10 +462,23 @@ namespace MyCAM.Editor
 
 		SimuCalStatus BuildSimuData( out SimuData.ResultData.SimuCalResult simuCalResult )
 		{
+			const int EMPTY_Collection = 0;
 			simuCalResult = new SimuData.ResultData.SimuCalResult();
 
 			// get data to cal traverse path and all FK result
-			SimuData.RequiredData.SimuInputSet calNeedData = GetSimulationInputData();
+			SimuData.SimuRequiredData.SimuInputSet calNeedData = GetSimulationInputData();
+
+			// protection
+			if( calNeedData.MachineData == null
+				|| calNeedData.ChainListMap == null
+				|| calNeedData.PostSolver == null
+				|| calNeedData.WorkPiecesChaintSet == null
+				|| calNeedData.CollisionEngine == null
+				|| calNeedData.WorkPiecesChaintSet.Count == EMPTY_Collection
+				|| calNeedData.ChainListMap.Count == EMPTY_Collection
+				 ) {
+				return SimuCalStatus.Faild;
+			}
 
 			// get frame transformation map
 			bool bFrameCalDone = SimulationHelper.BuildFrameTransMap( calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out List<SimuData.ResultData.PathStartEndIndex> pathStartEndIndexList, out int frameCount );
@@ -424,9 +501,9 @@ namespace MyCAM.Editor
 			return SimuCalStatus.CollisionCalDone;
 		}
 
-		SimuData.RequiredData.SimuInputSet GetSimulationInputData()
+		SimuData.SimuRequiredData.SimuInputSet GetSimulationInputData()
 		{
-			SimuData.RequiredData.SimuInputSet calNeedData = new SimuData.RequiredData.SimuInputSet();
+			SimuData.SimuRequiredData.SimuInputSet calNeedData = new SimuData.SimuRequiredData.SimuInputSet();
 
 			// protection
 			if( m_DataManager == null || m_DataManager.PathIDList == null || m_DataManager.PathIDList.Count == 0 ) {
@@ -435,7 +512,7 @@ namespace MyCAM.Editor
 
 			// need last path end point's vector to calculate exit pnt
 			IProcessPoint lastpathLastPoint = GetProcessEndPoint( m_DataManager.PathIDList.Last() );
-			calNeedData = new SimuData.RequiredData.SimuInputSet()
+			calNeedData = new SimuData.SimuRequiredData.SimuInputSet()
 			{
 				EachPathIKPostDataList = m_PostDataList,
 				LastPathLastPnt = lastpathLastPoint,

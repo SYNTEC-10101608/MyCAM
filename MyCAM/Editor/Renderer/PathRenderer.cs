@@ -94,9 +94,7 @@ namespace MyCAM.Editor
 
 		public void ShowTrans( gp_Trsf trsf, bool bUpdate = false )
 		{
-
 			Remove( m_DataManager.PathIDList );
-
 			if( !m_IsShow ) {
 				if( bUpdate ) {
 					UpdateView();
@@ -105,6 +103,8 @@ namespace MyCAM.Editor
 			}
 
 			foreach( string pathID in m_DataManager.PathIDList ) {
+				// Show original path if there is any compensation or transformation applied, to visualize the difference
+				ShowOriginalPath( pathID, trsf );
 				IReadOnlyList<gp_Pnt> pointList = GetMainPathPointList( pathID );
 				if( pointList == null || pointList.Count < 2 ) {
 					continue;
@@ -266,8 +266,9 @@ namespace MyCAM.Editor
 			return pathlist;
 		}
 
-		void ShowOriginalPath( string pathID )
+		void ShowOriginalPath( string pathID, gp_Trsf trsf = null )
 		{
+			trsf = trsf ?? new gp_Trsf();
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
 				return;
 			}
@@ -293,6 +294,7 @@ namespace MyCAM.Editor
 			}
 
 			AIS_Shape oriPathAIS = new AIS_Shape( pathOriWire );
+			oriPathAIS.SetLocalTransformation( trsf );
 			oriPathAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_DEEPSKYBLUE1 ) );
 			oriPathAIS.SetWidth( 2.0 );
 

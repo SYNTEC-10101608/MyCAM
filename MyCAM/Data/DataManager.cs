@@ -40,6 +40,9 @@ namespace MyCAM.Data
 			PartIDList = new List<string>();
 			PathIDList = new List<string>();
 			m_MachineData = m_DefaultMachineData;
+
+			// get machine data trigger chain rebuild
+			BuildChain();
 		}
 
 		public void ResetDataManger( Dictionary<string, IObject> objectMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData )
@@ -109,7 +112,8 @@ namespace MyCAM.Data
 			get
 			{
 				if( m_MachineData == null ) {
-					return m_DefaultMachineData;
+					m_MachineData = m_DefaultMachineData;
+					BuildChain();
 				}
 				return m_MachineData;
 			}

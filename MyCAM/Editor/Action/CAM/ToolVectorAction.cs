@@ -69,7 +69,13 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.ToStartOrEnd += ( toStart ) => OnToStartOrEnd( toStart );
 			m_ToolVecDlg.EnableStartEndSwitch( false, false );
 			m_ToolVecDlg.Cancel += End;
+
+			// switch select on start point, and change form UI( show start point toolvec param) 
+			int nStartPntIndex = m_DataHandler.GetStartPointCADIndex();
+			OnSelectedIndexChanged( nStartPntIndex );
 			m_ToolVecDlg.Show( MyApp.MainForm );
+
+			// show machine
 			RaiseActionStart?.Invoke( true );
 		}
 
@@ -413,6 +419,14 @@ namespace MyCAM.Editor
 		{
 			bool isCalSuccess = CalSimuTranfResult( out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap );
 			if( !isCalSuccess ) {
+				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
+				return;
+			}
+			if( frameTransformMap == null
+				|| !frameTransformMap.ContainsKey( MachineComponentType.WorkPiece )
+				|| frameTransformMap[ MachineComponentType.WorkPiece ] == null
+				|| frameTransformMap[ MachineComponentType.WorkPiece ].Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
 				return;
 			}
 			// output vertex is the shape of high light

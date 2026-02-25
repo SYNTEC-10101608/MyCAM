@@ -341,9 +341,12 @@ namespace MyCAM.Editor
 				return;
 			}
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
+
+			// register before init, cause init will change select node to start point, machine need to translate
 			action.RaiseTrans += SetTrans;
 			action.RaiseActionStart += ToolVecActionStartIO;
 
+			// trigger select on star point and translate machine
 			StartEditAction( action );
 		}
 		void ToolVecActionStartIO( bool isStart )
