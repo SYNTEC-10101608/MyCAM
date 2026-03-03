@@ -133,6 +133,7 @@ namespace MyCAM.Editor.Renderer
 		}
 
 		const int MIN_Machine_Part = 2;
+		const double TRANSPARENCY = 0.8;
 
 		// set back to initial position and color
 		void ResetAIS( AIS_InteractiveObject aisShape, MachineComponentType type )
@@ -211,7 +212,7 @@ namespace MyCAM.Editor.Renderer
 			}
 			else {
 				color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_LIGHTGRAY );
-				transparency = 0.4;
+				transparency = TRANSPARENCY;
 			}
 			int R = (int)( color.Red() * 255 );
 			int G = (int)( color.Green() * 255 );
@@ -269,7 +270,7 @@ namespace MyCAM.Editor.Renderer
 			AIS_Shape LaserAIS = new AIS_Shape( makeTool1.Shape() );
 			LaserAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			LaserAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
-			LaserAIS.SetTransparency( 0.8f );
+			LaserAIS.SetTransparency( TRANSPARENCY );
 			m_MachineAIS.AISList[ MachineComponentType.Laser ] = LaserAIS;
 		}
 
@@ -291,6 +292,7 @@ namespace MyCAM.Editor.Renderer
 			// set material aspect, this matter since the default material gives wrong color effect
 			Graphic3d_MaterialAspect baseAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_UserDefined );
 			resultAIS.SetMaterial( baseAspect );
+			resultAIS.SetTransparency( TRANSPARENCY );
 			return resultAIS;
 		}
 
@@ -302,11 +304,11 @@ namespace MyCAM.Editor.Renderer
 						MyApp.Logger.ShowOnLogPanel( $"機構網格資訊錯誤", MyApp.NoticeType.Warning );
 						break;
 					case MeshesToAISResult.InvalidMesh:
-						//MyApp.Logger.ShowOnLogPanel( $"{componentType} 原始網格資訊讀取失敗", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( $"{componentType} 原始網格資訊讀取失敗", MyApp.NoticeType.Warning );
 						break;
 					case MeshesToAISResult.UnknownError:
 					default:
-						//MyApp.Logger.ShowOnLogPanel( $"{componentType} STL讀取失敗，發生未知錯誤", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( $"{componentType} STL讀取失敗，發生未知錯誤", MyApp.NoticeType.Warning );
 						break;
 				}
 				return;
