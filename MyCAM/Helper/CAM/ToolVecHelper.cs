@@ -35,10 +35,69 @@ namespace MyCAM.Helper
 			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, interpolateType );
 		}
 
-		public static ECalAngleResult GetABAngleFromToolVec( gp_Dir targetDir, ISetToolVecPoint toolVecPoint, out Tuple<double, double> abAngle_deg )
+		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint )
+		{
+			double dM_In = toolVecPoint.ModMaster_rad;
+			double dS_In = toolVecPoint.ModSlave_rad;
+			return GetMSAngleFromToolVec( toolVec, dM_In, dS_In );
+		}
+
+		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, double dM_In, double dS_In )
+		{
+			// Get machine data
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
+
+			// Create PostSolver
+			PostSolver postSolver = new PostSolver( machineData );
+			IKSolveResult result = postSolver.SolveIK( toolVec, dM_In, dS_In, out double dMaster_rad, out double dSlave_rad );
+			if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
+			else if( result == IKSolveResult.OutOfRange ) {
+				// out of range, but still return the angles
+			}
+
+			// Convert radians to degrees
+			double dMaster_deg = dMaster_rad * 180.0 / Math.PI;
+			double dSlave_deg = dSlave_rad * 180.0 / Math.PI;
+
+			return new Tuple<double, double>( dMaster_deg, dSlave_deg );
+		}
+
+		public static Tuple<double, double> GetMSAngleFromABAngle( double dRA_deg, double dRB_deg, ISetToolVecPoint toolVecPoint )
+		{
+			// Convert A/B angles to tool vector
+			gp_Dir toolVec = ConvertABAngleToToolVec( toolVecPoint, dRA_deg * Math.PI / 180.0, dRB_deg * Math.PI / 180.0 );
+			if( toolVec == null ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
+
+			// get M/S angles from tool vector
+			return GetMSAngleFromToolVec( toolVec, toolVecPoint );
+		}
+
+		public static Tuple<double, double> GetABAngleFromMSAngle( double dMaster_deg, double dSlave_deg, ISetToolVecPoint toolVecPoint )
+		{
+			// Use helper to convert MS to ToolVec
+			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
+			if( toolVec == null ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
+
+			// get A/B angles from tool vector
+			ECalAngleResult result = GetABAngleFromToolVec( toolVec, toolVecPoint, out Tuple<double, double> abAngle_deg );
+			return abAngle_deg;
+		}
+
+		static ECalAngleResult GetABAngleFromToolVec( gp_Dir targetDir, ISetToolVecPoint toolVecPoint, out Tuple<double, double> abAngle_deg )
 		{
 			abAngle_deg = new Tuple<double, double>( 0, 0 );
 			if( toolVecPoint == null || targetDir == null ) {
+
+				// we return a big value for process to identify
+				abAngle_deg = new Tuple<double, double>( BIG_AB_ANGLE, BIG_AB_ANGLE );
 				return ECalAngleResult.DataError;
 			}
 			gp_Dir newCoordX = toolVecPoint.TangentVec;
@@ -100,62 +159,6 @@ namespace MyCAM.Helper
 			// rad -> deg
 			abAngle_deg = new Tuple<double, double>( dRA_rad * 180.0 / Math.PI, dRB_rad * 180.0 / Math.PI );
 			return ECalAngleResult.Done;
-		}
-
-		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint )
-		{
-			double dM_In = toolVecPoint.ModMaster_rad;
-			double dS_In = toolVecPoint.ModSlave_rad;
-			return GetMSAngleFromToolVec( toolVec, dM_In, dS_In );
-		}
-
-		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, double dM_In, double dS_In )
-		{
-			// Get machine data
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
-				return new Tuple<double, double>( 0, 0 );
-			}
-
-			// Create PostSolver
-			PostSolver postSolver = new PostSolver( machineData );
-			IKSolveResult result = postSolver.SolveIK( toolVec, dM_In, dS_In, out double dMaster_rad, out double dSlave_rad );
-			if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution ) {
-				return new Tuple<double, double>( 0, 0 );
-			}
-			else if( result == IKSolveResult.OutOfRange ) {
-				// out of range, but still return the angles
-			}
-
-			// Convert radians to degrees
-			double dMaster_deg = dMaster_rad * 180.0 / Math.PI;
-			double dSlave_deg = dSlave_rad * 180.0 / Math.PI;
-
-			return new Tuple<double, double>( dMaster_deg, dSlave_deg );
-		}
-
-		public static Tuple<double, double> GetMSAngleFromABAngle( double dRA_deg, double dRB_deg, ISetToolVecPoint toolVecPoint )
-		{
-			// Convert A/B angles to tool vector
-			gp_Dir toolVec = ConvertABAngleToToolVec( toolVecPoint, dRA_deg * Math.PI / 180.0, dRB_deg * Math.PI / 180.0 );
-			if( toolVec == null ) {
-				return new Tuple<double, double>( 0, 0 );
-			}
-
-			// get M/S angles from tool vector
-			return GetMSAngleFromToolVec( toolVec, toolVecPoint );
-		}
-
-		public static Tuple<double, double> GetABAngleFromMSAngle( double dMaster_deg, double dSlave_deg, ISetToolVecPoint toolVecPoint )
-		{
-			// Use helper to convert MS to ToolVec
-			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
-			if( toolVec == null ) {
-				return new Tuple<double, double>( 0, 0 );
-			}
-
-			// get A/B angles from tool vector
-			ECalAngleResult result = GetABAngleFromToolVec( toolVec, toolVecPoint, out Tuple<double, double> abAngle_deg );
-			return abAngle_deg;
 		}
 
 		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList,
