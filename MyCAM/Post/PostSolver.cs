@@ -94,7 +94,24 @@ namespace MyCAM.Post
 
 			if( chooseResult != (int)IKSolveResult.NoError ) {
 
-				// solvanle but can not choose a valid solution within range
+				// try to choose again without range limit
+				int new_ChooseResult = FiveAxisSolver.ChooseSolution(
+				dM1, dS1, dM2, dS2,
+				dM_In, dS_In,
+				out dM_Out, out dS_Out,
+				SolutionType.ShortestDist,
+				0, 0,
+				0, 0,
+				1,  // Master axis rotation direction (right-hand)
+				1,  // Slave axis rotation direction (right-hand)
+				SolverConstants.IU_TO_BLU_ROTARY );
+
+				// still can not choose a valid solution
+				if( new_ChooseResult != (int)IKSolveResult.NoError ) {
+					return (IKSolveResult)new_ChooseResult;
+				}
+
+				// solvable but can not choose a valid solution within range
 				return IKSolveResult.OutOfRange;
 			}
 			return (IKSolveResult)solveResult;
