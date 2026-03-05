@@ -66,6 +66,12 @@
     </Compile>
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
+    <Compile Include="Editor\Dialog\ControllerDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\ControllerDlg.Designer.cs">
+      <DependentUpon>ControllerDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Dialog\PathCompensateDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -254,6 +260,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CNC\ConnectDlg.resx">
       <DependentUpon>ConnectDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\ControllerDlg.resx">
+      <DependentUpon>ControllerDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\PathCompensateDlg.resx">
       <DependentUpon>PathCompensateDlg.cs</DependentUpon>
