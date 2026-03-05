@@ -18,10 +18,13 @@ namespace MyCAM.Editor.Dialog
 			// initialize numeric up down controls
 			m_NumUpDownX.Maximum = decimal.MaxValue;
 			m_NumUpDownX.Minimum = decimal.MinValue;
+			m_NumUpDownX.DecimalPlaces = 3;
 			m_NumUpDownY.Maximum = decimal.MaxValue;
 			m_NumUpDownY.Minimum = decimal.MinValue;
+			m_NumUpDownY.DecimalPlaces = 3;
 			m_NumUpDownZ.Maximum = decimal.MaxValue;
 			m_NumUpDownZ.Minimum = decimal.MinValue;
+			m_NumUpDownZ.DecimalPlaces = 3;
 		}
 
 		void PathEditDlg_Shown( object sender, EventArgs e )

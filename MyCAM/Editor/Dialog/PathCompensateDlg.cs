@@ -18,6 +18,7 @@ namespace MyCAM.Editor.Dialog
 			// initialize numeric up down controls
 			m_NumUpDownCompensate.Maximum = decimal.MaxValue;
 			m_NumUpDownCompensate.Minimum = decimal.MinValue;
+			m_NumUpDownCompensate.DecimalPlaces = 3;
 		}
 
 		void m_NumUpDownCompensate_Click( object sender, System.EventArgs e )
