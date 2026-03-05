@@ -303,16 +303,6 @@ namespace MyCAM.Editor
 		}
 
 		// index moving
-		void m_btnPrev_Click( object sender, EventArgs e )
-		{
-			MoveIndex?.Invoke( false );
-		}
-
-		void m_btnNext_Click( object sender, EventArgs e )
-		{
-			MoveIndex?.Invoke( true );
-		}
-
 		void m_btnToStart_Click( object sender, EventArgs e )
 		{
 			ToStartOrEnd?.Invoke( true );
@@ -330,6 +320,52 @@ namespace MyCAM.Editor
 
 		bool bSuppressTypeChangedEvent = false;
 		bool bSuppressValueChangedEvent = false;
+		Timer m_Timer;
+		const int TIMER_INTERVAL = 10;
+
+		void m_btnNext_MouseDown( object sender, MouseEventArgs e )
+		{
+			// initialize timer
+			if( m_Timer == null ) {
+				m_Timer = new Timer();
+			}
+			m_Timer.Tick += MoveToNextTick;
+			m_Timer.Interval = TIMER_INTERVAL;
+			m_Timer.Start();
+		}
+
+		void m_btnNext_MouseUp( object sender, MouseEventArgs e )
+		{
+			m_Timer?.Stop();
+			m_Timer.Tick -= MoveToNextTick;
+		}
+
+		void m_btnPrev_MouseDown( object sender, MouseEventArgs e )
+		{
+			// initialize timer
+			if( m_Timer == null ) {
+				m_Timer = new Timer();
+			}
+			m_Timer.Tick += MoveToLastTick;
+			m_Timer.Interval = TIMER_INTERVAL;
+			m_Timer.Start();
+		}
+
+		void m_btnPrev_MouseUp( object sender, MouseEventArgs e )
+		{
+			m_Timer?.Stop();
+			m_Timer.Tick -= MoveToLastTick;
+		}
+
+		void MoveToNextTick( object sender, EventArgs e )
+		{
+			MoveIndex?.Invoke( true );
+		}
+
+		void MoveToLastTick( object sender, EventArgs e )
+		{
+			MoveIndex?.Invoke( false );
+		}
 	}
 
 	public class ToolVecParam

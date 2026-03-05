@@ -145,7 +145,6 @@ namespace MyCAM.Editor
 			}
 			ShowTraverse();
 
-
 			// set machineShapeBack
 			// show ais -> regist shape for collision
 			if( m_MachineRender.IsWithMachineAIS ) {
