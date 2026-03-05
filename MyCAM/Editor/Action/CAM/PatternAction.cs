@@ -134,6 +134,10 @@ namespace MyCAM.Editor
 				return contourPathObject.Shape;
 			}
 
+			if( contourPathObject?.GeomData == null ) {
+				return null;
+			}
+
 			// create pattern shape
 			TopoDS_Shape shape = StdPatternHelper.GetPathWire( contourPathObject.GeomData.RefCenterDir, standardPatternGeomData );
 			if( shape == null || shape.IsNull() ) {
@@ -156,13 +160,19 @@ namespace MyCAM.Editor
 				UpdateGeomData( oldGeomData, standardPatternGeomData );
 			}
 			else {
-				standardPatternGeomData.RefCenterDir = contourPathObject.GeomData.RefCenterDir;
-				ShowStdPatternTrihedron( szID, standardPatternGeomData, true );
+				if( standardPatternGeomData != null ) {
+					if( contourPathObject?.GeomData != null ) {
+						standardPatternGeomData.RefCenterDir = contourPathObject.GeomData.RefCenterDir;
+					}
+					ShowStdPatternTrihedron( szID, standardPatternGeomData, true );
+				}
 
 				// create new path object
-				PathObject newPathObject = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, m_BackUpPathObjectList[ szID ] );
-				if( newPathObject != null ) {
-					m_DataManager.ObjectMap[ szID ] = newPathObject;
+				if( m_BackUpPathObjectList.ContainsKey( szID ) ) {
+					PathObject newPathObject = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, m_BackUpPathObjectList[ szID ] );
+					if( newPathObject != null ) {
+						m_DataManager.ObjectMap[ szID ] = newPathObject;
+					}
 				}
 			}
 		}
@@ -195,9 +205,19 @@ namespace MyCAM.Editor
 				if( !m_BackUpPathObjectList.ContainsKey( szID ) || m_BackUpPathObjectList[ szID ] == null ) {
 					continue;
 				}
-				if( m_BackUpPathObjectList[ szID ].PathType != PathType.Contour && ( m_DataManager.ObjectMap[ szID ] as PathObject ).PathType == m_BackUpPathObjectList[ szID ].PathType ) {
+				if( !m_DataManager.ObjectMap.ContainsKey( szID ) ) {
+					continue;
+				}
+				PathObject currentPathObject = m_DataManager.ObjectMap[ szID ] as PathObject;
+				if( currentPathObject == null ) {
+					continue;
+				}
+				if( m_BackUpPathObjectList[ szID ].PathType != PathType.Contour && currentPathObject.PathType == m_BackUpPathObjectList[ szID ].PathType ) {
 
 					// reset geom data to back up value, because the path object may be reused if only geom data is updated in PatternCreate
+					if( !m_BackUpGeomDataList.ContainsKey( szID ) ) {
+						continue;
+					}
 					switch( m_BackUpPathObjectList[ szID ].PathType ) {
 						case PathType.Circle:
 							UpdateCircleGeomData( ( m_BackUpPathObjectList[ szID ] as CirclePathObject ).GeomData as CircleGeomData, ( m_BackUpGeomDataList[ szID ] as CircleGeomData ) );
@@ -225,6 +245,10 @@ namespace MyCAM.Editor
 
 		void ShowStdPatternTrihedron( string szID, IStdPatternGeomData standardPatternGeomData, bool isTypeChanged )
 		{
+			if( standardPatternGeomData == null ) {
+				return;
+			}
+
 			gp_Ax1 refCenterDir = new gp_Ax1();
 			if( isTypeChanged ) {
 				refCenterDir = standardPatternGeomData.RefCenterDir;
@@ -236,6 +260,10 @@ namespace MyCAM.Editor
 			}
 			gp_Ax3 refCoord = StdPatternHelper.GetPatternRefCoord( refCenterDir, standardPatternGeomData.IsCoordinateReversed, standardPatternGeomData.RotatedAngle_deg );
 			AIS_Trihedron trihedron = DrawHelper.GetTrihedronAIS( refCoord.Ax2() );
+			if( trihedron == null ) {
+				return;
+			}
+
 			m_Viewer.GetAISContext().Display( trihedron, false );
 			m_Viewer.GetAISContext().Deactivate( trihedron );
 			m_TrihedronList.Add( trihedron );
@@ -244,7 +272,9 @@ namespace MyCAM.Editor
 		void RemoveTrihedron()
 		{
 			foreach( var trihedron in m_TrihedronList ) {
-				m_Viewer.GetAISContext().Remove( trihedron, false );
+				if( trihedron != null ) {
+					m_Viewer.GetAISContext().Remove( trihedron, false );
+				}
 			}
 			m_TrihedronList.Clear();
 		}
@@ -346,7 +376,11 @@ namespace MyCAM.Editor
 
 		PathObject CreatePathObject( string szID, TopoDS_Shape shape, IStdPatternGeomData standardPatternGeomData, ContourPathObject contourPathObject, PathObject originalPathObject )
 		{
-			CraftData craftData = new CraftData();
+			if( contourPathObject == null ) {
+				return null;
+			}
+
+			CraftData craftData = originalPathObject?.CraftData ?? new CraftData();
 			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
 			switch( pathType ) {
 				case PathType.Circle:
