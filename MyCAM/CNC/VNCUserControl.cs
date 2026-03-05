@@ -16,19 +16,52 @@ namespace VNCFormsApp
 
 	public partial class VNCUserControl : UserControl
 	{
+		// syntec controller need to set as the same 4:3 aspect ratio
+		const int CONTROLLER_WIDTH = 400;
+		const int CONTROLLER_HEIGHT = 300;
+
 		internal VNCConnectionResult ConnectionResult
 		{
 			get;
 			private set;
 		}
 
-		public VNCUserControl( int nWidth, int nHeight, string szIP )
+		public VNCUserControl( string szIP )
 		{
 			InitializeComponent();
-			ConnectionResult = StartUltraVNC( nWidth, nHeight, szIP );
+			ConnectionResult = StartUltraVNC( CONTROLLER_WIDTH, CONTROLLER_HEIGHT, szIP );
 		}
 
-		public void WindowResize( int nWidth, int nHeight )
+		public void ScreenResizeByParentSize( int nParentWidth, int nParentHeight, out int nVNCStartX, out int nVNCStartY )
+		{
+			if( nParentWidth <= 0 || nParentHeight <= 0 ) {
+				nVNCStartX = 0;
+				nVNCStartY = 0;
+				return;
+			}
+			const int CONTROLLER_Width = 4;
+			const int CONTROLLER_Height = 3;
+			int nVNCWidth;
+			int nVNCHeight;
+
+			// calculate the scaling ratio based on parent size and controller aspect ratio
+			int dWidthRatio = nParentWidth / CONTROLLER_Width;
+			int dHeightRatio = nParentHeight / CONTROLLER_Height;
+			int baseRatio = Math.Min( dWidthRatio, dHeightRatio );
+
+			// cal VNC screen resized size
+			nVNCWidth = CONTROLLER_Width * baseRatio;
+			nVNCHeight = CONTROLLER_Height * baseRatio;
+
+			// resize VNC screen
+			VNCScreenResize( nVNCWidth, nVNCHeight );
+
+			// screen start position (to set on parent)
+			nVNCStartX = ( nParentWidth - nVNCWidth ) / 2;
+			nVNCStartY = ( nParentHeight - nVNCHeight ) / 2;
+		}
+
+		public void VNCScreenResize( int nWidth, int nHeight )
 		{
 			Width = nWidth;
 			Height = nHeight;

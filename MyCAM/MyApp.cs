@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using VNCFormsApp;
 
 namespace MyCAM.App
 {
@@ -56,6 +57,19 @@ namespace MyCAM.App
 					throw new InvalidOperationException( "Logger還沒初始化，請先設定 MainForm。" );
 				}
 				return m_Logger;
+			}
+		}
+
+		public static VNCUserControl VNCScreen
+		{
+			get => m_VNCUserControl;
+			set
+			{
+				if( m_VNCUserControl != null ) {
+					m_VNCUserControl.CloseVNCProcess();
+					m_VNCUserControl.Dispose();
+				}
+				m_VNCUserControl = value;
 			}
 		}
 
@@ -188,6 +202,7 @@ namespace MyCAM.App
 		static Form m_MainForm;
 		static LogHandler m_Logger;
 		static Panel m_LogPanel;
+		static VNCUserControl m_VNCUserControl;
 		static readonly List<DialogEventInfo> m_RegisteredDialogs = new List<DialogEventInfo>();
 
 		class DialogEventInfo

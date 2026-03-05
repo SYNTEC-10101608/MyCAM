@@ -8,9 +8,11 @@ namespace MyCAM.Editor.Dialog
 		public ConnectDlg()
 		{
 			InitializeComponent();
+			m_txbIP.Text = DEFAULT_IP;
 		}
 
 		public event Action<string> ConfirmEvent;
+		const string DEFAULT_IP = "192.168.1.200";
 
 		void m_btnConfirm_Click( object sender, EventArgs e )
 		{
@@ -21,7 +23,7 @@ namespace MyCAM.Editor.Dialog
 				return;
 			}
 
-			ConfirmEvent.Invoke( ip );
+			ConfirmEvent?.Invoke( ip );
 		}
 
 		bool IsValidIP( string ip )

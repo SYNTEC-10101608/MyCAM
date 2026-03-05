@@ -118,6 +118,16 @@ namespace MyCAM
 			}
 		}
 
+		protected override void WndProc( ref Message m )
+		{
+			base.WndProc( ref m );
+			if( m.Msg == WINDOWS_Drag_Event ) {
+				AdjustToCurrentScreen();
+			}
+		}
+
+		const int WINDOWS_Drag_Event = 0x0232;
+
 		// view properties
 		Viewer m_Viewer;
 		TreeView m_TreeView;
@@ -846,6 +856,10 @@ namespace MyCAM
 			// default is cad mode
 			RefreshToolStripLayout( EUIStatus.File );
 			VisibleCAMQuickToolBarButtons( false );
+
+			// fixed single border
+			FormBorderStyle = FormBorderStyle.FixedSingle;
+			WindowState = FormWindowState.Maximized;
 		}
 
 		// this setting is for main form to know what situation ui need to refresh as what look like
@@ -871,6 +885,11 @@ namespace MyCAM
 				m_tscLevel2Container,
 				m_tscLevel3Container
 			};
+		}
+
+		void AdjustToCurrentScreen()
+		{
+			WindowState = FormWindowState.Maximized;
 		}
 
 		#region Get machine data
@@ -1042,140 +1061,126 @@ namespace MyCAM
 
 		#region VNC Connection
 
-		static readonly IntPtr HWND_TOPMOST = new IntPtr( -1 );
-		static readonly IntPtr HWND_NOTOPMOST = new IntPtr( -2 );
-		const uint SWP_NOMOVE = 0x0002;
-		const uint SWP_NOSIZE = 0x0001;
-		const uint SWP_SHOWWINDOW = 0x0040;
-		const double CONTROLLER_SCREEN_RATIO = 0.56;
-
-		// Track the currently open ConnectDlg
-		ConnectDlg m_CurrentConnectDlg = null;
-
-		#region Dll Import
-		[System.Runtime.InteropServices.DllImport( "user32.dll" )]
-		static extern bool SetWindowPos( IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags );
-
-		#endregion
-
-		void m_tsbVNCConnection_Click( object sender, EventArgs e )
+		bool SetAndDoConnect()
 		{
-			// If a ConnectDlg is already open, focus on it and return
-			if( m_CurrentConnectDlg != null && !m_CurrentConnectDlg.IsDisposed ) {
-				m_CurrentConnectDlg.Focus();
-				m_CurrentConnectDlg.BringToFront();
-				return;
-			}
+			bool isConnectSuccess = false;
 
 			// Create new ConnectDlg
-			m_CurrentConnectDlg = new ConnectDlg();
-
-			// Show the dialog and set focus
-			m_CurrentConnectDlg.Show( MyApp.MainForm );
-			m_CurrentConnectDlg.Focus();
-			m_CurrentConnectDlg.BringToFront();
+			ConnectDlg ConnectDlg = new ConnectDlg();
 
 			// Handle form closed event to clear reference
-			m_CurrentConnectDlg.FormClosed += ( s, args ) =>
+			ConnectDlg.FormClosed += ( s, args ) =>
 			{
-				m_CurrentConnectDlg = null;
+				ConnectDlg = null;
 			};
 
 			// Handle confirm event
-			m_CurrentConnectDlg.ConfirmEvent += ( ip ) =>
+			ConnectDlg.ConfirmEvent += ( ip ) =>
 			{
-				VNCUserControl newVNCControl = DoVNCConnect( ip );
-
+				CleanupVNCConnections();
+				MyApp.CNCIP = null;
+				VNCUserControl newVNCControl = new VNCUserControl( ip );
+				MyApp.VNCScreen = newVNCControl;
+				ConnectDlg.Close();
 				switch( newVNCControl.ConnectionResult ) {
 					case VNCConnectionResult.Success:
-						m_CurrentConnectDlg.Close();
-						newVNCControl.WindowResize( m_panVNC.Width, (int)( m_panVNC.Width * CONTROLLER_SCREEN_RATIO ) );
 						MyApp.CNCIP = ip;
+						isConnectSuccess = true;
 						break;
-
 					case VNCConnectionResult.FileNotFound:
 						MessageBox.Show( MyApp.MainForm, "找不到VNC執行檔，請確認VNC執行檔與程式執行檔在同一資料夾下", "外部程式調用錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
 						break;
-
 					case VNCConnectionResult.ConnectionFailed:
 						MessageBox.Show( MyApp.MainForm, "無法連線到指定IP位置", "連線錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
 						break;
-
 					case VNCConnectionResult.OtherError:
 						MessageBox.Show( MyApp.MainForm, "VNC連線過程發生未知錯誤", "連線錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
 						break;
 				}
 			};
+
+			// Show the dialog and set focus
+			ConnectDlg.ShowDialog( MyApp.MainForm );
+			return isConnectSuccess;
 		}
 
-		VNCUserControl DoVNCConnect( string szIP )
+		void m_tsbVNCConnection_Click( object sender, EventArgs e )
 		{
-			CleanupVNCConnections();
-			VNCUserControl newVNCControl = new VNCUserControl( m_panVNC.Width, (int)( m_panVNC.Width * CONTROLLER_SCREEN_RATIO ), szIP );
-			newVNCControl.Dock = DockStyle.Fill;
-			newVNCControl.Location = new Point( 0, 0 );
+			bool isConnectSuccess = SetAndDoConnect();
 
-			m_panVNC.Controls.Add( newVNCControl );
-			m_panVNC.Visible = true;
-
-			SetWindowPos( this.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
-			SetWindowPos( this.Handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
-			return newVNCControl;
+			// if connect success and in vertical screen, show vnc screen
+			if( isConnectSuccess && m_panVNC.Visible ) {
+				MyApp.VNCScreen.ScreenResizeByParentSize( m_panVNC.Width, m_panVNC.Height, out int nVNCStartX, out int nVNCStartY );
+				MyApp.VNCScreen.Location = new Point( nVNCStartX, nVNCStartY );
+				m_panVNC.Controls.Add( MyApp.VNCScreen );
+			}
 		}
 
 		void CleanupVNCConnections()
 		{
-			if( m_panVNC != null ) {
-				foreach( Control ctrl in m_panVNC.Controls ) {
-					if( ctrl is VNCUserControl vncControl ) {
-						vncControl.CloseVNCProcess();
-						vncControl.Dispose();
-					}
-				}
-				m_panVNC.Controls.Clear();
+			if( MyApp.VNCScreen != null ) {
+				MyApp.VNCScreen.CloseVNCProcess();
+				MyApp.VNCScreen.Dispose();
+				MyApp.VNCScreen = null;
+			}
+		}
+
+		void SetVerticalScreenMode( bool isVertical )
+		{
+			if( isVertical ) {
+				m_panVNC.Visible = true;
+				m_tsbController.Visible = false;
+				m_panVNC.Controls.Add( MyApp.VNCScreen );
+			}
+
+			// hide VNC screen and show controller entrance when in horizontal screen
+			else {
+				m_panVNC.Visible = false;
+				m_tsbController.Visible = true;
+				m_panVNC.Controls.Remove( MyApp.VNCScreen );
 			}
 		}
 
 		void StartupForm_Resize( object sender, EventArgs e )
 		{
-#if DEBUG
-
-			if( this.Width > this.Height ) {
-				m_panVNC.Visible = false;
-
-				// VNC
-				this.m_panBackGround.RowStyles[ 2 ].SizeType = SizeType.Absolute;
-				this.m_panBackGround.RowStyles[ 2 ].Height = 0;
+			bool isVertical = Height > Width;
+			if( isVertical ) {
+				SetVerticalScreenMode( isVertical );
 
 				// CADCAM
-				this.m_panBackGround.RowStyles[ 0 ].SizeType = SizeType.Percent;
-				this.m_panBackGround.RowStyles[ 0 ].Height = 90;
+				m_panBackGround.RowStyles[ 0 ].SizeType = SizeType.Percent;
+				m_panBackGround.RowStyles[ 0 ].Height = 47;
 
 				// Log
-				this.m_panBackGround.RowStyles[ 1 ].SizeType = SizeType.Percent;
-				this.m_panBackGround.RowStyles[ 1 ].Height = 10;
+				m_panBackGround.RowStyles[ 1 ].SizeType = SizeType.Percent;
+				m_panBackGround.RowStyles[ 1 ].Height = 6;
+
+				// VNC
+				m_panBackGround.RowStyles[ 2 ].SizeType = SizeType.Percent;
+				m_panBackGround.RowStyles[ 2 ].Height = 47;
+
+				// resize VNC and reset position 
+				if( m_panVNC.Controls.Count != 0 ) {
+					( (VNCUserControl)m_panVNC.Controls[ 0 ] ).ScreenResizeByParentSize( m_panVNC.Width, m_panVNC.Height, out int nVNCStartX, out int nVNCStartY );
+					m_panVNC.Controls[ 0 ].Location = new Point( nVNCStartX, nVNCStartY );
+				}
+				return;
 			}
 			else {
-				m_panVNC.Visible = true;
-
-				// CADCAM
-				this.m_panBackGround.RowStyles[ 0 ].SizeType = SizeType.Percent;
-				this.m_panBackGround.RowStyles[ 0 ].Height = 47;
-
-				// Log
-				this.m_panBackGround.RowStyles[ 1 ].SizeType = SizeType.Percent;
-				this.m_panBackGround.RowStyles[ 1 ].Height = 6;
+				SetVerticalScreenMode( isVertical );
 
 				// VNC
-				this.m_panBackGround.RowStyles[ 2 ].SizeType = SizeType.Percent;
-				this.m_panBackGround.RowStyles[ 2 ].Height = 47;
+				m_panBackGround.RowStyles[ 2 ].SizeType = SizeType.Absolute;
+				m_panBackGround.RowStyles[ 2 ].Height = 0;
 
-				if( m_panVNC.Controls.Count != 0 ) {
-					( (VNCUserControl)m_panVNC.Controls[ 0 ] ).WindowResize( m_panVNC.Width, (int)( m_panVNC.Width * CONTROLLER_SCREEN_RATIO ) );
-				}
+				// CADCAM
+				m_panBackGround.RowStyles[ 0 ].SizeType = SizeType.Percent;
+				m_panBackGround.RowStyles[ 0 ].Height = 90;
+
+				// Log
+				m_panBackGround.RowStyles[ 1 ].SizeType = SizeType.Percent;
+				m_panBackGround.RowStyles[ 1 ].Height = 10;
 			}
-
-#endif
 		}
 
 		void StartupForm_FormClosing( object sender, FormClosingEventArgs e )
@@ -1256,6 +1261,24 @@ namespace MyCAM
 		void m_btnNextPoint_Click( object sender, EventArgs e )
 		{
 			m_SimuEditor.NextPoint();
+		}
+
+		void m_tsbController_Click( object sender, EventArgs e )
+		{
+			bool isConnectSuccess = true;
+			if( string.IsNullOrWhiteSpace( MyApp.CNCIP ) ) {
+				isConnectSuccess = SetAndDoConnect();
+			}
+			if( isConnectSuccess == false ) {
+				return;
+			}
+			ControllerDlg controllerDlg = new ControllerDlg();
+
+			// show dialog at center of main form
+			controllerDlg.StartPosition = FormStartPosition.Manual;
+			controllerDlg.Location = MyApp.CalculateDialogCenterLocation( controllerDlg );
+			controllerDlg.PutVNCOnDlg();
+			controllerDlg.ShowDialog( MyApp.MainForm );
 		}
 	}
 }
