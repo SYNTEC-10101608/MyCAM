@@ -304,11 +304,11 @@ namespace MyCAM.Editor.Renderer
 						MyApp.Logger.ShowOnLogPanel( $"機構網格資訊錯誤", MyApp.NoticeType.Warning );
 						break;
 					case MeshesToAISResult.InvalidMesh:
-						MyApp.Logger.ShowOnLogPanel( $"{componentType} 原始網格資訊讀取失敗", MyApp.NoticeType.Warning );
+						// MyApp.Logger.ShowOnLogPanel( $"{componentType} 原始網格資訊讀取失敗", MyApp.NoticeType.Warning );
 						break;
 					case MeshesToAISResult.UnknownError:
 					default:
-						MyApp.Logger.ShowOnLogPanel( $"{componentType} STL讀取失敗，發生未知錯誤", MyApp.NoticeType.Warning );
+						// MyApp.Logger.ShowOnLogPanel( $"{componentType} STL讀取失敗，發生未知錯誤", MyApp.NoticeType.Warning );
 						break;
 				}
 				return;
