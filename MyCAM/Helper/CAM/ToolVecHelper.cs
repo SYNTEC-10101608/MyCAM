@@ -37,13 +37,12 @@ namespace MyCAM.Helper
 
 		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint )
 		{
+			if( toolVec == null || toolVecPoint == null ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
 			double dM_In = toolVecPoint.ModMaster_rad;
 			double dS_In = toolVecPoint.ModSlave_rad;
-			return GetMSAngleFromToolVec( toolVec, dM_In, dS_In );
-		}
 
-		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, double dM_In, double dS_In )
-		{
 			// Get machine data
 			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
 				return new Tuple<double, double>( 0, 0 );
@@ -66,8 +65,21 @@ namespace MyCAM.Helper
 			return new Tuple<double, double>( dMaster_deg, dSlave_deg );
 		}
 
+		public static Tuple<double, double> GetABAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint )
+		{
+			if( toolVec == null || toolVecPoint == null ) {
+				return new Tuple<double, double>( BIG_AB_ANGLE, BIG_AB_ANGLE );
+			}
+			ECalAngleResult result = GetABAngleFromToolVec( toolVec, toolVecPoint, out Tuple<double, double> abAngle_deg );
+			return abAngle_deg;
+		}
+
 		public static Tuple<double, double> GetMSAngleFromABAngle( double dRA_deg, double dRB_deg, ISetToolVecPoint toolVecPoint )
 		{
+			if( toolVecPoint == null ) {
+				return new Tuple<double, double>( 0, 0 );
+			}
+
 			// Convert A/B angles to tool vector
 			gp_Dir toolVec = ConvertABAngleToToolVec( toolVecPoint, dRA_deg * Math.PI / 180.0, dRB_deg * Math.PI / 180.0 );
 			if( toolVec == null ) {
@@ -80,6 +92,10 @@ namespace MyCAM.Helper
 
 		public static Tuple<double, double> GetABAngleFromMSAngle( double dMaster_deg, double dSlave_deg, ISetToolVecPoint toolVecPoint )
 		{
+			if( toolVecPoint == null ) {
+				return new Tuple<double, double>( BIG_AB_ANGLE, BIG_AB_ANGLE );
+			}
+
 			// Use helper to convert MS to ToolVec
 			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
 			if( toolVec == null ) {
