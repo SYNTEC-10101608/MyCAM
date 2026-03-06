@@ -409,14 +409,21 @@ namespace MyCAM.Editor
 				craftData.ClearToolVecModify();
 				craftData.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
 
+				// get start point
+				ToolVecActionDataHandler dataHandler = new ToolVecActionDataHandler( szPathID );
+				ISetToolVecPoint startPoint = dataHandler.GetPointByCADIndex( dataHandler.GetStartPointCADIndex() );
+
 				// get averge tool vec
 				gp_Dir avgDir = ( geomData as ContourGeomData ).RefCenterDir.Direction();
 
 				// get ms angle
-				Tuple<double, double> avgMS_deg = ToolVecHelper.GetMSAngleFromToolVec( avgDir, 0, 0 );
+				Tuple<double, double> avgMS_deg = ToolVecHelper.GetMSAngleFromToolVec( avgDir, startPoint );
+
+				// get ab angle
+				Tuple<double, double> avgAB_deg = ToolVecHelper.GetABAngleFromToolVec( avgDir, startPoint );
 
 				// set average ms to start point
-				craftData.SetToolVecModify( craftData.StartPointIndex, 0, 0, avgMS_deg.Item1, avgMS_deg.Item2 );
+				craftData.SetToolVecModify( craftData.StartPointIndex, avgAB_deg.Item1, avgAB_deg.Item2, avgMS_deg.Item1, avgMS_deg.Item2 );
 			}
 			ShowCAMData( szPathIDList );
 		}
