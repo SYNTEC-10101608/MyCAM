@@ -173,6 +173,9 @@ namespace MyCAM.Editor
 			if( !GetABAngleFromDialog( out double angleA_deg, out double angleB_deg ) ) {
 				return;
 			}
+			if( angleA_deg == m_ToolVecParam.AngleA_deg && angleB_deg == m_ToolVecParam.AngleB_deg ) {
+				return;
+			}
 			ABAngleChanged?.Invoke( angleA_deg, angleB_deg );
 			ResetToolVecParam( m_ToolVecParam );
 		}
@@ -185,6 +188,9 @@ namespace MyCAM.Editor
 
 			// Get MS angles from dialog
 			if( !GetMSAngleFromDialog( out double master_deg, out double slave_deg ) ) {
+				return;
+			}
+			if( master_deg == m_ToolVecParam.Master_deg && slave_deg == m_ToolVecParam.Slave_deg ) {
 				return;
 			}
 			MSAngleChanged?.Invoke( master_deg, slave_deg );
