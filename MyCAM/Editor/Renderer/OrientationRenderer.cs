@@ -108,6 +108,10 @@ namespace MyCAM.Editor.Renderer
 					orientationDir.Reverse();
 				}
 				AIS_Shape orientationAIS = DrawHelper.GetOrientationAIS( showPoint, orientationDir );
+
+				// set color
+				orientationAIS.SetColor( new OCC.Quantity.Quantity_Color( OCC.Quantity.Quantity_NameOfColor.Quantity_NOC_YELLOW ) );
+				orientationAIS.SetWidth( 4.0 );
 				m_OrientationAISDict.Add( szPathID, orientationAIS );
 			}
 
