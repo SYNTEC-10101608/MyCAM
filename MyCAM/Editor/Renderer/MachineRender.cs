@@ -21,16 +21,12 @@ namespace MyCAM.Editor.Renderer
 		readonly Dictionary<MachineComponentType, List<AIS_InteractiveObject>> m_MachineAISDict = new Dictionary<MachineComponentType, List<AIS_InteractiveObject>>();
 		readonly Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 		readonly Dictionary<MachineComponentType, List<bool>> m_FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
-		MachineAIS m_MachineAIS = new MachineAIS();
 
 		public MachineRender( Viewer viewer, DataManager dataManager )
 			: base( viewer, dataManager )
 		{
 			GetMeshesListToAIS( dataManager.MachineMeshes );
 			BuildLaserAIS();
-
-			// set dictionary after all ais is ready
-			SetMachineAIS();
 		}
 
 		// let outer know if we have valid AIS to display
@@ -98,6 +94,7 @@ namespace MyCAM.Editor.Renderer
 					}
 				}
 			}
+
 			if( bUpdate ) {
 				UpdateView();
 			}
@@ -133,7 +130,7 @@ namespace MyCAM.Editor.Renderer
 		}
 
 		const int MIN_Machine_Part = 2;
-		const double TRANSPARENCY = 0.8;
+		const double TRANSPARENCY = 0.5;
 
 		// set back to initial position and color
 		void ResetAIS( AIS_InteractiveObject aisShape, MachineComponentType type )
@@ -187,7 +184,21 @@ namespace MyCAM.Editor.Renderer
 			foreach( var aisObj in GetMachineShapes( type ) ) {
 				AIS_Triangulation tri = aisObj as AIS_Triangulation;
 				if( tri != null ) {
-					SetMeshColor( tri, type, isCollision );
+
+					// this frame is collision frame
+					if( isCollision ) {
+						SetMeshColor( tri, type, isCollision );
+
+						// use other material to set color
+						var defaul_Aspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_UserDefined );
+						tri.SetMaterial( defaul_Aspect );
+					}
+					else {
+						SetMeshColor( tri, type, isCollision );
+						var plasticAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_PLASTIC );
+						tri.SetMaterial( plasticAspect );
+						tri.SetTransparency( TRANSPARENCY );
+					}
 					m_Viewer.GetAISContext().Redisplay( tri, false );
 				}
 				else {
@@ -203,25 +214,14 @@ namespace MyCAM.Editor.Renderer
 				type == MachineComponentType.UnKnow ) {
 				return;
 			}
-			Quantity_Color color;
-			double transparency;
+			Quantity_Color color = new Quantity_Color();
 
+			// get color
 			if( isCollision ) {
 				color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED );
-				transparency = 0.0;
 			}
-			else {
-				color = new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_LIGHTGRAY );
-				transparency = TRANSPARENCY;
-			}
-			int R = (int)( color.Red() * 255 );
-			int G = (int)( color.Green() * 255 );
-			int B = (int)( color.Blue() * 255 );
-			int colorValue = ( B << 16 ) | ( G << 8 ) | R;
-			int nbNodes = meshAIS.GetTriangulation().NbNodes();
-			var colorArray = new TColStd_HArray1OfInteger( 1, nbNodes, colorValue );
+			var colorArray = GetMeshColorArray( meshAIS.GetTriangulation(), color );
 			meshAIS.SetColors( colorArray );
-			meshAIS.SetTransparency( transparency );
 		}
 
 		void ApplyTransForComponent( MachineComponentType type, gp_Trsf trsf )
@@ -259,9 +259,8 @@ namespace MyCAM.Editor.Renderer
 					AnnounceWrning( MeshesToAISResult.InvalidMesh, keyValue.Key );
 					continue;
 				}
-				machineAppearance.AISList[ keyValue.Key ] = ConvertMeshToAIS( keyValue.Value );
+				m_MachineAISDict[ keyValue.Key ] = new List<AIS_InteractiveObject> { ConvertMeshToAIS( keyValue.Value, keyValue.Key ) };
 			}
-			m_MachineAIS = machineAppearance;
 		}
 
 		void BuildLaserAIS()
@@ -271,7 +270,7 @@ namespace MyCAM.Editor.Renderer
 			LaserAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
 			LaserAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
 			LaserAIS.SetTransparency( TRANSPARENCY );
-			m_MachineAIS.AISList[ MachineComponentType.Laser ] = LaserAIS;
+			m_MachineAISDict[ MachineComponentType.Laser ] = new List<AIS_InteractiveObject> { LaserAIS };
 		}
 
 		enum MeshesToAISResult
@@ -282,7 +281,7 @@ namespace MyCAM.Editor.Renderer
 			UnknownError
 		}
 
-		AIS_Triangulation ConvertMeshToAIS( Poly_Triangulation mesh )
+		AIS_Triangulation ConvertMeshToAIS( Poly_Triangulation mesh, MachineComponentType type )
 		{
 			if( mesh == null || mesh.NbNodes() <= 0 || mesh.NbTriangles() <= 0 ) {
 				return null;
@@ -290,10 +289,21 @@ namespace MyCAM.Editor.Renderer
 			AIS_Triangulation resultAIS = new AIS_Triangulation( mesh );
 
 			// set material aspect, this matter since the default material gives wrong color effect
-			Graphic3d_MaterialAspect baseAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_UserDefined );
+			Graphic3d_MaterialAspect baseAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_PLASTIC );
 			resultAIS.SetMaterial( baseAspect );
 			resultAIS.SetTransparency( TRANSPARENCY );
 			return resultAIS;
+		}
+
+		TColStd_HArray1OfInteger GetMeshColorArray( Poly_Triangulation mesh, Quantity_Color color )
+		{
+			int R = (int)( color.Red() * 255 );
+			int G = (int)( color.Green() * 255 );
+			int B = (int)( color.Blue() * 255 );
+			int colorValue = ( B << 16 ) | ( G << 8 ) | R;
+			int nbNodes = mesh.NbNodes();
+			var colorArray = new TColStd_HArray1OfInteger( 1, nbNodes, colorValue );
+			return colorArray;
 		}
 
 		void AnnounceWrning( MeshesToAISResult result, MachineComponentType componentType = MachineComponentType.UnKnow )
@@ -312,20 +322,6 @@ namespace MyCAM.Editor.Renderer
 						break;
 				}
 				return;
-			}
-		}
-
-		void SetMachineAIS()
-		{
-			if( m_MachineAIS == null || m_MachineAIS.AISList == null || m_MachineAIS.AISList.Count == 0 ) {
-				return;
-			}
-			m_MachineAISDict.Clear();
-			foreach( KeyValuePair<MachineComponentType, AIS_InteractiveObject> kv in m_MachineAIS.AISList ) {
-				if( kv.Value == null ) {
-					continue;
-				}
-				m_MachineAISDict[ kv.Key ] = new List<AIS_InteractiveObject> { kv.Value };
 			}
 		}
 
