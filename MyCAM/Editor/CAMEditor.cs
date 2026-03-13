@@ -344,8 +344,7 @@ namespace MyCAM.Editor
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
 
 			// register before init, cause init will change select node to start point, machine need to translate
-			action.PropertyChanged += ShowCAMData;
-			action.SimuPositionChanged += SetTrans;
+			action.RaiseTrans += SetTrans;
 			action.RaiseActionStart += ToolVecActionStartIO;
 
 			// trigger select on star point and translate machine
@@ -839,9 +838,12 @@ namespace MyCAM.Editor
 
 		void ShowTransedCAMData( gp_Trsf trsf )
 		{
-			m_MainPathRenderer.Trans( trsf );
-			m_ToolVecRenderer.Trans( trsf );
+			// draw with translated location
+			m_MainPathRenderer.ShowTrans( trsf );
+			m_ToolVecRenderer.ShowTrans( trsf );
 			m_IndexRenderer.ShowTrans( trsf );
+
+			// do not need to redraw ,just need trsf
 			m_OrientationRenderer.Trans( trsf );
 			m_CraftRenderer.Trans( trsf );
 			m_TraverseRenderer.Trans( trsf );

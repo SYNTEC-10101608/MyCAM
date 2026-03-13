@@ -39,8 +39,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public Action<List<string>> PropertyChanged;
-		public Action<Dictionary<MachineComponentType, List<gp_Trsf>>> SimuPositionChanged;
+		public Action<Dictionary<MachineComponentType, List<gp_Trsf>>> RaiseTrans;
 		public Action<bool> RaiseActionStart;
 
 		public override void Start()
@@ -385,19 +384,8 @@ namespace MyCAM.Editor
 			SetInterpolateType();
 			SetIndexAngleParam();
 
-			// update display
-			if( ( m_ToolVecParam != null && m_ToolVecParam.IsModified ) || bForceUpdate ) {
-
-				// property changed, the cam display object need to update
-				PropertyChanged?.Invoke( m_PathIDList );
-
-				// and also transform the display for simulation
-				RefreshSimuResult();
-			}
-			else {
-				// only transform result without update cam display
-				RefreshSimuResult();
-			}
+			// trigger viewer refresh
+			RefreshSimuResult();
 
 			// update cache point
 			if( m_SelectedPoint != null && m_nSelectIndex != NULL_SELECT_INDEX ) {
@@ -449,7 +437,7 @@ namespace MyCAM.Editor
 
 			// re high light
 			LockSelectedVertexHighLight( vertexhighlight );
-			SimuPositionChanged?.Invoke( frameTransformMap );
+			RaiseTrans?.Invoke( frameTransformMap );
 		}
 
 		bool CalSimuTranfResult( out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap )

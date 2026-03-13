@@ -104,11 +104,56 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		public void Trans( gp_Trsf trsf, bool bUpdate = false )
+		public void ShowTrans( gp_Trsf trsf, bool bUpdate = false )
 		{
-			foreach( List<AIS_Line> toolVecAISList in m_ToolVecAISDict.Values ) {
-				foreach( AIS_Line toolVecAIS in toolVecAISList ) {
+			Remove( m_DataManager.PathIDList );
+
+			// no need to show
+			if( !m_IsShow ) {
+				if( bUpdate ) {
+					UpdateView();
+				}
+				return;
+			}
+
+			// build tool vec
+			foreach( string szPathID in m_DataManager.PathIDList ) {
+				IReadOnlyList<IProcessPoint> toolVecPointList = GetToolVecPointList( szPathID );
+				EToolVecInterpolateType interpolateType = GetInterpolateType( szPathID );
+				if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
+					continue;
+				}
+				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
+				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
+				for( int i = 0; i < toolVecPointList.Count; i++ ) {
+					IProcessPoint point = toolVecPointList[ i ];
+					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
+
+					if( point.IsToolVecModPoint ) {
+						if( interpolateType == EToolVecInterpolateType.VectorInterpolation ) {
+							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_ORANGE ) );
+						}
+						else if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
+							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_CYAN ) );
+						}
+						else {
+							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
+						}
+						toolVecAIS.SetWidth( 4 );
+					}
 					toolVecAIS.SetLocalTransformation( trsf );
+					toolVecAISList.Add( toolVecAIS );
+				}
+			}
+
+			// display the tool vec
+			foreach( string szPathID in m_DataManager.PathIDList ) {
+				if( m_ToolVecAISDict.ContainsKey( szPathID ) ) {
+					List<AIS_Line> toolVecAISList = m_ToolVecAISDict[ szPathID ];
+					foreach( AIS_Line toolVecAIS in toolVecAISList ) {
+						m_Viewer.GetAISContext().Display( toolVecAIS, false );
+						m_Viewer.GetAISContext().Deactivate( toolVecAIS );
+					}
 				}
 			}
 			if( bUpdate ) {
@@ -119,7 +164,7 @@ namespace MyCAM.Editor.Renderer
 		public void Reset( bool bUpdate = false )
 		{
 			gp_Trsf trsf = new gp_Trsf();
-			Trans( trsf, bUpdate );
+			ShowTrans( trsf, bUpdate );
 			if( bUpdate ) {
 				UpdateView();
 			}
