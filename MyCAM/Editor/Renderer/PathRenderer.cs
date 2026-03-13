@@ -33,50 +33,7 @@ namespace MyCAM.Editor
 
 		public void Show( List<string> pathIDList, bool bUpdate = false )
 		{
-			Remove( pathIDList );
-
-			if( !m_IsShow ) {
-				if( bUpdate ) {
-					UpdateView();
-				}
-				return;
-			}
-
-			foreach( string pathID in pathIDList ) {
-
-				// Show original path if there is any compensation or transformation applied, to visualize the difference
-				ShowOriginalPath( pathID );
-
-				IReadOnlyList<gp_Pnt> pointList = GetMainPathPointList( pathID );
-				if( pointList == null || pointList.Count < 2 ) {
-					continue;
-				}
-
-				TopoDS_Wire pathWire = CreatePolylineWire( pointList );
-				if( pathWire == null || pathWire.IsNull() ) {
-					continue;
-				}
-
-				AIS_Shape pathAIS = new AIS_Shape( pathWire );
-				pathAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
-				pathAIS.SetWidth( 3.0 );
-
-				// Register to DataManager for shape-ID mapping
-				m_DataManager.RegisterShapeIDMapping( pathWire, pathID );
-
-				// Local storage
-				m_MainPathAISDict.Add( pathID, pathAIS );
-
-				if( m_ViewManager.ViewObjectMap.ContainsKey( pathID ) ) {
-					m_ViewManager.ViewObjectMap.Remove( pathID );
-				}
-				m_ViewManager.ViewObjectMap.Add( pathID, new ViewObject( pathAIS ) );
-				m_Viewer.GetAISContext().Display( pathAIS, false );
-			}
-
-			if( bUpdate ) {
-				UpdateView();
-			}
+			ShowSpecifyPath( pathIDList, bUpdate );
 		}
 
 		public override void Remove( bool bUpdate = false )
@@ -94,7 +51,12 @@ namespace MyCAM.Editor
 
 		public void ShowTrans( gp_Trsf trsf, bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList );
+			ShowSpecifyPath( m_DataManager.PathIDList, bUpdate, trsf );
+		}
+
+		void ShowSpecifyPath( List<string> pathIDList, bool bUpdate, gp_Trsf trsf = null )
+		{
+			Remove( pathIDList );
 			if( !m_IsShow ) {
 				if( bUpdate ) {
 					UpdateView();
@@ -102,9 +64,12 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			foreach( string pathID in m_DataManager.PathIDList ) {
+			// render each path
+			foreach( string pathID in pathIDList ) {
+
 				// Show original path if there is any compensation or transformation applied, to visualize the difference
 				ShowOriginalPath( pathID, trsf );
+
 				IReadOnlyList<gp_Pnt> pointList = GetMainPathPointList( pathID );
 				if( pointList == null || pointList.Count < 2 ) {
 					continue;
@@ -115,10 +80,14 @@ namespace MyCAM.Editor
 					continue;
 				}
 
+				// set AIS param
 				AIS_Shape pathAIS = new AIS_Shape( pathWire );
-				pathAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
+				int nPathColorIdx = GetColorIndex( pathID );
+				pathAIS.SetColor( new Quantity_Color( TECH_Layer_Color_List[ nPathColorIdx ] ) );
 				pathAIS.SetWidth( 3.0 );
-				pathAIS.SetLocalTransformation( trsf );
+				if( trsf != null ) {
+					pathAIS.SetLocalTransformation( trsf );
+				}
 
 				// Register to DataManager for shape-ID mapping
 				m_DataManager.RegisterShapeIDMapping( pathWire, pathID );
@@ -145,6 +114,41 @@ namespace MyCAM.Editor
 			if( bUpdate ) {
 				UpdateView();
 			}
+		}
+
+		readonly List<Quantity_NameOfColor> TECH_Layer_Color_List = new List<Quantity_NameOfColor> {
+		Quantity_NameOfColor.Quantity_NOC_BLUE,
+		Quantity_NameOfColor.Quantity_NOC_DARKORANGE2,
+		Quantity_NameOfColor.Quantity_NOC_PURPLE,
+		Quantity_NameOfColor.Quantity_NOC_YELLOW2,
+		Quantity_NameOfColor.Quantity_NOC_GREEN3,
+		Quantity_NameOfColor.Quantity_NOC_TOMATO2,
+		Quantity_NameOfColor.Quantity_NOC_YELLOWGREEN,
+		Quantity_NameOfColor.Quantity_NOC_BROWN,
+		Quantity_NameOfColor.Quantity_NOC_MAGENTA1,
+		Quantity_NameOfColor.Quantity_NOC_CYAN1,
+		};
+
+		int GetColorIndex( string pathID )
+		{
+			int nColorIdx = 0;
+			if( !m_DataManager.ObjectMap.TryGetValue( pathID, out var obj ) ) {
+				return nColorIdx;
+			}
+			PathObject pathObj = obj as PathObject;
+			if( pathObj == null ) {
+				return nColorIdx;
+			}
+			bool isGetDataCraftSuccess = DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData );
+			if( !isGetDataCraftSuccess || craftData == null ) {
+				return nColorIdx;
+			}
+			int nTechLayer = craftData.TechLayer;
+			nColorIdx = nTechLayer - 1;
+			if( nColorIdx < 0 || nColorIdx >= TECH_Layer_Color_List.Count ) {
+				nColorIdx = 0;
+			}
+			return nColorIdx;
 		}
 
 		void RemovePaths( List<string> pathIDList )

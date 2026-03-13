@@ -35,8 +35,6 @@ namespace MyCAM.Post
 			IProcessPoint processEndPoint
 			)
 		{
-			LeadData = leadData;
-			OverCutLength = overCutLength;
 			CAMPointList = camPointList;
 			LeadInCAMPointList = leadInCAMPointList;
 			LeadOutCAMPointList = leadOutCAMPointList;
@@ -44,16 +42,6 @@ namespace MyCAM.Post
 			TraverseData = traverseData;
 			ProcessStartPoint = processStartPoint;
 			ProcessEndPoint = processEndPoint;
-		}
-
-		public LeadData LeadData
-		{
-			get;
-		}
-
-		public double OverCutLength
-		{
-			get;
 		}
 
 		public IReadOnlyList<IProcessPoint> CAMPointList
@@ -121,7 +109,7 @@ namespace MyCAM.Post
 			pathG54PostData.ProcessStartPoint = pathG54PostData.MainPathPostPointList[ 0 ];
 
 			// over-cut
-			if( currentPathNCPack.OverCutLength != 0 && currentPathNCPack.OverCutCAMPointList.Count > 0 ) {
+			if( currentPathNCPack.OverCutCAMPointList.Count > 0 ) {
 				if( !BuildProcessPath( currentPathNCPack.OverCutCAMPointList, dLastPointProcess_M, dLastPointProcess_S,
 					out List<PostPoint> overCutG54 ) ) {
 					return false;
