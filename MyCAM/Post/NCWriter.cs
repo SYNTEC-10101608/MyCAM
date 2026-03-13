@@ -52,6 +52,7 @@ namespace MyCAM.Post
 							continue;
 						}
 						pathType = pathObject.PathType;
+						int nPathLayer = pathObject.CraftData.TechLayer;
 						if( pathType == PathType.Contour ) {
 
 							// solve all post data of the path
@@ -61,7 +62,7 @@ namespace MyCAM.Post
 								errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
 								return false;
 							}
-							WriteCutting( postData, i + 1 );
+							WriteCutting( postData, i + 1, nPathLayer );
 						}
 						else {
 							StdPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
@@ -193,12 +194,12 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteCutting( PostData currentPathPostData, int N_Index )
+		void WriteCutting( PostData currentPathPostData, int N_Index, int nLayIndex = 1 )
 		{
 			// the N code
 			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
 			m_StreamWriter.WriteLine( "N" + N_Index );
-			m_StreamWriter.WriteLine( "G65 P\"LoadParameter\" H1;" );
+			m_StreamWriter.WriteLine( $"G65 P\"LoadParameter\" H{nLayIndex};" );
 
 			// traverse from previous path to current path
 			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData,

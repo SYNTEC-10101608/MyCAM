@@ -185,6 +185,7 @@ namespace MyCAM
 
 			// not in cam editing viewer tool bar cam buttons can't be used
 			VisibleCAMQuickToolBarButtons( false );
+			VisibleTechLayerButtons( false );
 		}
 
 		// back to CAD editor
@@ -195,6 +196,7 @@ namespace MyCAM
 
 			// not in cam editing viewer tool bar cam buttons can't be used
 			VisibleCAMQuickToolBarButtons( false );
+			VisibleTechLayerButtons( false );
 		}
 
 		// go to CAM editor
@@ -208,6 +210,7 @@ namespace MyCAM
 
 			// during cam editing viewer tool bar cam buttons can be used
 			VisibleCAMQuickToolBarButtons( true );
+			VisibleTechLayerButtons( true );
 		}
 
 		// import part
@@ -803,6 +806,11 @@ namespace MyCAM
 			m_tsbShowTraverse.Visible = isVisible;
 		}
 
+		void VisibleTechLayerButtons( bool isVisible )
+		{
+			m_tsLayer.Visible = isVisible;
+		}
+
 		void OnMachineStlReadSuccess( bool isReadSuccess )
 		{
 			if( isReadSuccess == false ) {
@@ -856,6 +864,7 @@ namespace MyCAM
 			// default is cad mode
 			RefreshToolStripLayout( EUIStatus.File );
 			VisibleCAMQuickToolBarButtons( false );
+			VisibleTechLayerButtons( false );
 
 			// fixed single border
 			FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -1194,11 +1203,14 @@ namespace MyCAM
 
 		void m_tsmiSimulation_Click( object sender, EventArgs e )
 		{
-			SwitchEditor( EEditorType.Simulation );
 			RefreshToolStripLayout( EUIStatus.Simulation );
 
 			// not in cam editing viewer tool bar cam buttons can't be used
 			VisibleCAMQuickToolBarButtons( false );
+			VisibleTechLayerButtons( false );
+
+			// refresh main form UI layout, before start simu editor because start simu editor will trigger show machine
+			SwitchEditor( EEditorType.Simulation );
 		}
 
 		void m_btnPlay_Click( object sender, EventArgs e )
@@ -1280,5 +1292,56 @@ namespace MyCAM
 			controllerDlg.PutVNCOnDlg();
 			controllerDlg.ShowDialog( MyApp.MainForm );
 		}
+
+		void m_tsbLayer1_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathLayer( 1 );
+		}
+
+		void m_tsbLayer2_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathLayer( 2 );
+		}
+
+		void m_tsbLayer3_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathLayer( 3 );
+		}
+
+		void m_tsbLayer4_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathLayer( 4 );
+		}
+
+		void m_tsbLayer5_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathLayer( 5 );
+		}
+
+		void m_tsbLayer6_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathLayer( 6 );
+		}
+
+		void m_tsbLayer7_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathLayer( 7 );
+		}
+
+		void m_tsbLayer8_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathLayer( 8 );
+		}
+
+		void m_tsbLayer9_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathLayer( 9 );
+		}
+
+		void m_tsbLayer10_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetPathLayer( 10 );
+		}
+
 	}
 }

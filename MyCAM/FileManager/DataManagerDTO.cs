@@ -1001,6 +1001,12 @@ namespace MyCAM.FileManager
 	public class CraftDataDTO
 	{
 		// properties
+		public int? TechLayer
+		{
+			get;
+			set;
+		}
+
 		public bool? IsPathReverse
 		{
 			get;
@@ -1070,6 +1076,7 @@ namespace MyCAM.FileManager
 			if( craftData == null ) {
 				return;
 			}
+			TechLayer = craftData.TechLayer;
 			IsPathReverse = craftData.IsPathReverse;
 			IsToolVecReverse = craftData.IsToolVecReverse;
 			StartPoint = craftData.StartPointIndex;
@@ -1097,6 +1104,11 @@ namespace MyCAM.FileManager
 				!IsToolVecReverse.HasValue || !InterpolateType.HasValue || !CompensatedDistance.HasValue ) {
 				throw new ArgumentException( "CraftData deserialization failed." );
 			}
+
+			// backward compatibility
+			if( !TechLayer.HasValue ) {
+				TechLayer = DEFAULT_TECH_LAYER;
+			}
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = ToolVecModifyMap.ToDictionary(
 				dto => dto.Index.Value,
 				dto => new ToolVecModifyData( dto.RA_deg.Value, dto.RB_deg.Value, dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value )
@@ -1105,7 +1117,7 @@ namespace MyCAM.FileManager
 			TraverseData traverseData = TraverseData.ToTraverseData();
 			EToolVecInterpolateType interpolateType = InterpolateType.Value;
 
-			CraftData craftData = new CraftData( StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap, IsToolVecReverse.Value, interpolateType, traverseData );
+			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap, IsToolVecReverse.Value, interpolateType, traverseData );
 
 			// Set properties not in constructor
 			if( CumulativeTrsfMatrix == null ) {
@@ -1117,6 +1129,8 @@ namespace MyCAM.FileManager
 			craftData.CompensatedDistance = CompensatedDistance.Value;
 			return craftData;
 		}
+
+		const int DEFAULT_TECH_LAYER = 1;
 	}
 
 	public class TraverseDataDTO

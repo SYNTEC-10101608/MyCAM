@@ -63,7 +63,9 @@ namespace MyCAM.Data
 		}
 
 		// this constructor is used when reading from file
-		public CraftData( int startPoint,
+		public CraftData(
+			int techLayer,
+			int startPoint,
 			bool isPathReverse,
 			LeadData leadData,
 			double overCutLength,
@@ -72,6 +74,7 @@ namespace MyCAM.Data
 			EToolVecInterpolateType interpolateType,
 			TraverseData traverseData )
 		{
+			m_TechLayer = techLayer;
 			m_StartPointIndex = startPoint;
 			m_IsPathReverse = isPathReverse;
 			m_LeadData = leadData;
@@ -90,6 +93,24 @@ namespace MyCAM.Data
 
 		public Action CAMFactorChanged;
 		public Action CADFactorChanged;
+
+		public int TechLayer
+		{
+			get
+			{
+				return m_TechLayer;
+			}
+			set
+			{
+				if( m_TechLayer != value ) {
+					if( value < DEFAULT_TECH_LAYER ) {
+						m_TechLayer = DEFAULT_TECH_LAYER;
+						return;
+					}
+					m_TechLayer = value;
+				}
+			}
+		}
 
 		public int StartPointIndex
 		{
@@ -294,6 +315,8 @@ namespace MyCAM.Data
 			CAMFactorChanged?.Invoke();
 		}
 
+		const int DEFAULT_TECH_LAYER = 1;
+		int m_TechLayer = DEFAULT_TECH_LAYER;
 		int m_StartPointIndex = 0;
 		bool m_IsPathReverse = false;
 		LeadData m_LeadData = new LeadData();

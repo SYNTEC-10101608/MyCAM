@@ -499,6 +499,24 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetPathLayer(int nTechLayer)
+		{
+			// one shot edit, multi edit supported
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
+			foreach( string szPathID in szPathIDList ) {
+				if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType ) ) {
+					continue;
+				}
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+					continue;
+				}
+				craftData.TechLayer = nTechLayer;
+			}
+			m_MainPathRenderer.Show( szPathIDList );
+		}
+
 		#endregion
 
 		// sort API
