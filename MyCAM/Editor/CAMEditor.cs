@@ -11,6 +11,7 @@ using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
+using OCC.V3d;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -349,6 +350,7 @@ namespace MyCAM.Editor
 			// trigger select on star point and translate machine
 			StartEditAction( action );
 		}
+
 		void ToolVecActionStartIO( bool isStart )
 		{
 			if( isStart ) {
@@ -362,13 +364,70 @@ namespace MyCAM.Editor
 				m_IndexRenderer.Reset();
 				m_MainPathRenderer.Reset();
 				m_CraftRenderer.Reset();
-				foreach( string ID in m_DataManager.PartIDList ) {
-					m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetLocalTransformation( new gp_Trsf() );
-				}
-				m_Viewer.AxoView();
-				m_Viewer.ZoomAllView();
+				SetWorkPieceDisplayTransform( new gp_Trsf() );
 			}
 			m_Viewer.UpdateView();
+		}
+
+		void SetWorkPieceDisplayTransform( gp_Trsf trsf = null )
+		{
+			if( trsf == null ) {
+				return;
+			}
+
+			// backup previous transformation for camera update
+			gp_Trsf prevTrsf = null;
+			if( m_DataManager.PartIDList.Count > 0 ) {
+				prevTrsf = m_ViewManager.ViewObjectMap[ m_DataManager.PartIDList.First() ]?.AISHandle?.LocalTransformation();
+			}
+			if( prevTrsf == null ) {
+				prevTrsf = new gp_Trsf();
+			}
+
+			// transform the workpiece display
+			foreach( string ID in m_DataManager.PartIDList ) {
+				m_ViewManager.ViewObjectMap[ ID ]?.AISHandle?.SetLocalTransformation( trsf );
+			}
+
+			// apply camera follow
+			V3d_View view = m_Viewer.GetView();
+			if( view == null ) {
+				return;
+			}
+
+			// calculate relative transformation (delta)
+			// deltaTrsf = newTrsf * oldTrsf^-1
+			gp_Trsf inversePrevious = prevTrsf.Inverted();
+			gp_Trsf deltaTrsf = trsf.Multiplied( inversePrevious );
+
+			// get current camera parameters
+			double eyeX = 0, eyeY = 0, eyeZ = 0;
+			double atX = 0, atY = 0, atZ = 0;
+			double upX = 0, upY = 0, upZ = 0;
+
+			view.Eye( ref eyeX, ref eyeY, ref eyeZ );
+			view.At( ref atX, ref atY, ref atZ );
+			view.Up( ref upX, ref upY, ref upZ );
+
+			// apply only the delta transformation to camera
+			gp_Pnt oldEye = new gp_Pnt( eyeX, eyeY, eyeZ );
+			gp_Pnt oldAt = new gp_Pnt( atX, atY, atZ );
+			gp_Dir oldUp = new gp_Dir( upX, upY, upZ );
+
+			gp_Pnt newEye = oldEye.Transformed( deltaTrsf );
+			gp_Pnt newAt = oldAt.Transformed( deltaTrsf );
+			gp_Dir newUp = oldUp.Transformed( deltaTrsf );
+
+			// disable immediate view update to prevent flickering
+			bool previousImmediateUpdate = view.SetImmediateUpdate( false );
+
+			// apply new camera parameters
+			view.SetEye( newEye.X(), newEye.Y(), newEye.Z() );
+			view.SetAt( newAt.X(), newAt.Y(), newAt.Z() );
+			view.SetUp( newUp.X(), newUp.Y(), newUp.Z() );
+
+			// restore immediate update and update view once
+			view.SetImmediateUpdate( previousImmediateUpdate );
 		}
 
 		public void SetToolVecReverse()
@@ -792,13 +851,14 @@ namespace MyCAM.Editor
 
 		void SetTrans( Dictionary<MachineComponentType, List<gp_Trsf>> transMap )
 		{
-			m_MachineRender.ShowToolVecEditResult( transMap );
-			ShowTransedCAMData( transMap[ MachineComponentType.WorkPiece ].Last() );
-			foreach( string ID in m_DataManager.PartIDList ) {
-				m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetLocalTransformation( transMap[ MachineComponentType.WorkPiece ].Last() );
-			}
-			m_Viewer.UpdateView();
+			// update camera FIRST before setting any transformations
+			gp_Trsf workPieceTrsf = transMap[ MachineComponentType.WorkPiece ].Last();
 
+			// show
+			m_MachineRender.ShowToolVecEditResult( transMap );
+			ShowTransedCAMData( workPieceTrsf );
+			SetWorkPieceDisplayTransform( workPieceTrsf );
+			m_Viewer.UpdateView();
 		}
 
 		void RemoveAllCAMData()
