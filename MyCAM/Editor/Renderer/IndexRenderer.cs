@@ -75,6 +75,7 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
+		// the text lebel can't use SetLocalTransformation, so just rebuild them
 		public void ShowTrans( gp_Trsf trsf, bool bUpdate = false )
 		{
 			Remove();

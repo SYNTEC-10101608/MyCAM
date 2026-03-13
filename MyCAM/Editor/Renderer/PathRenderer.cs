@@ -92,45 +92,13 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void ShowTrans( gp_Trsf trsf, bool bUpdate = false )
+		public void Trans( gp_Trsf trsf, bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList );
-			if( !m_IsShow ) {
-				if( bUpdate ) {
-					UpdateView();
-				}
-				return;
+			foreach( var mainPathAIS in m_MainPathAISDict.Values ) {
+				mainPathAIS.SetLocalTransformation( trsf );
 			}
-
-			foreach( string pathID in m_DataManager.PathIDList ) {
-				// Show original path if there is any compensation or transformation applied, to visualize the difference
-				ShowOriginalPath( pathID, trsf );
-				IReadOnlyList<gp_Pnt> pointList = GetMainPathPointList( pathID );
-				if( pointList == null || pointList.Count < 2 ) {
-					continue;
-				}
-
-				TopoDS_Wire pathWire = CreatePolylineWire( pointList );
-				if( pathWire == null || pathWire.IsNull() ) {
-					continue;
-				}
-
-				AIS_Shape pathAIS = new AIS_Shape( pathWire );
-				pathAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
-				pathAIS.SetWidth( 3.0 );
-				pathAIS.SetLocalTransformation( trsf );
-
-				// Register to DataManager for shape-ID mapping
-				m_DataManager.RegisterShapeIDMapping( pathWire, pathID );
-
-				// Local storage
-				m_MainPathAISDict.Add( pathID, pathAIS );
-
-				if( m_ViewManager.ViewObjectMap.ContainsKey( pathID ) ) {
-					m_ViewManager.ViewObjectMap.Remove( pathID );
-				}
-				m_ViewManager.ViewObjectMap.Add( pathID, new ViewObject( pathAIS ) );
-				m_Viewer.GetAISContext().Display( pathAIS, false );
+			foreach( var oriPathAIS in m_OriginalPathAISDict.Values ) {
+				oriPathAIS.SetLocalTransformation( trsf );
 			}
 
 			if( bUpdate ) {
@@ -141,7 +109,7 @@ namespace MyCAM.Editor
 		public void Reset( bool bUpdate = false )
 		{
 			gp_Trsf theTrsf = new gp_Trsf();
-			ShowTrans( theTrsf, bUpdate );
+			Trans( theTrsf, bUpdate );
 			if( bUpdate ) {
 				UpdateView();
 			}
