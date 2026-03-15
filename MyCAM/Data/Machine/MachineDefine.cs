@@ -94,5 +94,8 @@
 		public const string MASTER_LIMIMT_END_PARAM_NAME = "Master_End";
 		public const string SLAVE_LIMIMT_START_PARAM_NAME = "Slave_Start";
 		public const string SLAVE_LIMIMT_END_PARAM_NAME = "Slave_End";
+		public const string SIMULATION_OFFSET_X = "Simulation_Offset_X";
+		public const string SIMULATION_OFFSET_Y = "Simulation_Offset_Y";
+		public const string SIMULATION_OFFSET_Z = "Simulation_Offset_Z";
 	}
 }

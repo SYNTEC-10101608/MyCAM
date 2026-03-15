@@ -102,7 +102,7 @@ namespace MyCAM.Helper
 			if( !bGetWholePathIK ) {
 				return false;
 			}
-			bool bSolveFKDone = BuildPathFKList( pathIKPntList, calNeedData.PostSolver, out List<PathSimuFKData> pathFKPntList );
+			bool bSolveFKDone = BuildPathFKList( pathIKPntList, calNeedData.PostSolver, calNeedData.MachineData.SimulationOffset, out List<PathSimuFKData> pathFKPntList );
 			if( !bSolveFKDone ) {
 				return false;
 			}
@@ -114,7 +114,7 @@ namespace MyCAM.Helper
 			return bFrameOk;
 		}
 
-		internal static bool BuildFKPostPnt( PostSolver PostSolver, PostPoint IKpostPoint, out PostPoint FKPoint )
+		internal static bool BuildFKPostPnt( PostSolver PostSolver, PostPoint IKpostPoint, out PostPoint FKPoint, gp_Vec simuOffset = null )
 		{
 			FKPoint = null;
 			if( PostSolver == null || IKpostPoint == null ) {
@@ -122,7 +122,7 @@ namespace MyCAM.Helper
 			}
 			PostPoint temPostPnt = IKpostPoint.Clone();
 			gp_Pnt pointG54 = new gp_Pnt( temPostPnt.X, temPostPnt.Y, temPostPnt.Z );
-			gp_Vec tcpOffset = PostSolver.SolveFK( temPostPnt.Master, temPostPnt.Slave, pointG54 );
+			gp_Vec tcpOffset = PostSolver.SolveFK( temPostPnt.Master, temPostPnt.Slave, pointG54, simuOffset );
 			gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
 			FKPoint = new PostPoint()
 			{
@@ -174,7 +174,7 @@ namespace MyCAM.Helper
 
 		#region Solve Path FK Point List
 
-		static bool BuildPathFKList( List<PathSimuIKData> pathIKPntList, PostSolver PostSolver, out List<PathSimuFKData> pathSimuPntList )
+		static bool BuildPathFKList( List<PathSimuIKData> pathIKPntList, PostSolver PostSolver, gp_Vec simulationOffset, out List<PathSimuFKData> pathSimuPntList )
 		{
 			pathSimuPntList = new List<PathSimuFKData>();
 			if( pathIKPntList == null || pathIKPntList.Count == 0 || PostSolver == null ) {
@@ -182,9 +182,9 @@ namespace MyCAM.Helper
 			}
 			PostPoint prePathLastPnt = new PostPoint();
 			foreach( PathSimuIKData pathIKList in pathIKPntList ) {
-				List<PostPoint> traverseFKPntList = ConvertIKPntToFKPnt( pathIKList.TraversePntIKList, PostSolver );
-				List<PostPoint> processPathFKPntList = ConvertIKPntToFKPnt( pathIKList.PathPntIKList, PostSolver );
-				List<PostPoint> exitFKPntList = ConvertIKPntToFKPnt( pathIKList.ExitPntIKList, PostSolver );
+				List<PostPoint> traverseFKPntList = ConvertIKPntToFKPnt( pathIKList.TraversePntIKList, PostSolver, simulationOffset );
+				List<PostPoint> processPathFKPntList = ConvertIKPntToFKPnt( pathIKList.PathPntIKList, PostSolver, simulationOffset );
+				List<PostPoint> exitFKPntList = ConvertIKPntToFKPnt( pathIKList.ExitPntIKList, PostSolver, simulationOffset );
 				pathSimuPntList.Add( new PathSimuFKData( traverseFKPntList, processPathFKPntList, exitFKPntList ) );
 			}
 			return true;
@@ -296,7 +296,7 @@ namespace MyCAM.Helper
 			m_FrameTransformMap[ MachineComponentType.Laser ] = new List<gp_Trsf>();
 			m_FrameTransformMap[ MachineComponentType.WorkPiece ] = new List<gp_Trsf>();
 
-			gp_Vec G54Offset = postSolver.G54Offset;
+			gp_Vec G54Offset = machineData.SimulationOffset;
 
 			// build frame by frame (with guard against invalid machine data)
 			if( machineData.PtOnMaster == null || machineData.PtOnSlave == null ) {
@@ -783,14 +783,14 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static List<PostPoint> ConvertIKPntToFKPnt( List<PostPoint> IKpostPntList, PostSolver PostSolver )
+		static List<PostPoint> ConvertIKPntToFKPnt( List<PostPoint> IKpostPntList, PostSolver PostSolver, gp_Vec simuOffset = null )
 		{
 			if( IKpostPntList == null || IKpostPntList.Count == 0 || PostSolver == null ) {
 				return new List<PostPoint>();
 			}
 			List<PostPoint> FKPntList = new List<PostPoint>();
 			foreach( PostPoint postPoint in IKpostPntList ) {
-				bool bSuccess = BuildFKPostPnt( PostSolver, postPoint.Clone(), out PostPoint FKPoint );
+				bool bSuccess = BuildFKPostPnt( PostSolver, postPoint.Clone(), out PostPoint FKPoint, simuOffset );
 				if( !bSuccess ) {
 					return new List<PostPoint>();
 				}

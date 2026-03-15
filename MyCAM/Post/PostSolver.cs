@@ -421,10 +421,13 @@ namespace MyCAM.Post
 			return ikResult;
 		}
 
-		public gp_Vec SolveFK( double dM, double dS, gp_Pnt pointG54 )
+		public gp_Vec SolveFK( double dM, double dS, gp_Pnt pointG54 , gp_Vec offset)
 		{
 			if( pointG54 == null ) {
 				return new gp_Vec();
+			}
+			if( offset != null ) {
+				return m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54.XYZ() ), offset );
 			}
 			return m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54.XYZ() ), m_G54Offset );
 		}

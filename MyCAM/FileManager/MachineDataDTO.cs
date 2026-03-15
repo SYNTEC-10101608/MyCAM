@@ -104,6 +104,11 @@ namespace MyCAM.FileManager
 			get; set;
 		} = new gp_XYZDTO();
 
+		public gp_Vec_DTO SimulationOffset
+		{
+			get; set;
+		} = new gp_Vec_DTO();
+
 		public double ToolLength
 		{
 			get; set;
@@ -147,6 +152,7 @@ namespace MyCAM.FileManager
 			SlaveRotaryDirection = data.SlaveRotaryDirection;
 			MasterTiltedVec_deg = new gp_XYZDTO( data.MasterTiltedVec_deg );
 			SlaveTiltedVec_deg = new gp_XYZDTO( data.SlaveTiltedVec_deg );
+			SimulationOffset = new gp_Vec_DTO( data.SimulationOffset );
 			ToolLength = data.ToolLength;
 			MasterAxisStart_deg = data.MasterAxisStart_deg;
 			MasterAxisEnd_deg = data.MasterAxisEnd_deg;
@@ -194,6 +200,7 @@ namespace MyCAM.FileManager
 				SlaveRotaryDirection = SlaveRotaryDirection,
 				MasterTiltedVec_deg = MasterTiltedVec_deg.ToXYZ(),
 				SlaveTiltedVec_deg = SlaveTiltedVec_deg.ToXYZ(),
+				SimulationOffset = SimulationOffset.ToVec(),
 				ToolLength = ToolLength,
 				MasterAxisStart_deg = MasterAxisStart_deg,
 				MasterAxisEnd_deg = MasterAxisEnd_deg,
@@ -246,6 +253,7 @@ namespace MyCAM.FileManager
 				SlaveRotaryDirection = SlaveRotaryDirection,
 				MasterTiltedVec_deg = MasterTiltedVec_deg.ToXYZ(),
 				SlaveTiltedVec_deg = SlaveTiltedVec_deg.ToXYZ(),
+				SimulationOffset = SimulationOffset.ToVec(),
 				ToolLength = ToolLength,
 				MasterAxisStart_deg = MasterAxisStart_deg,
 				MasterAxisEnd_deg = MasterAxisEnd_deg,
@@ -298,6 +306,7 @@ namespace MyCAM.FileManager
 				SlaveRotaryDirection = SlaveRotaryDirection,
 				MasterTiltedVec_deg = MasterTiltedVec_deg.ToXYZ(),
 				SlaveTiltedVec_deg = SlaveTiltedVec_deg.ToXYZ(),
+				SimulationOffset = SimulationOffset.ToVec(),
 				ToolLength = ToolLength,
 				MasterAxisStart_deg = MasterAxisStart_deg,
 				MasterAxisEnd_deg = MasterAxisEnd_deg,
