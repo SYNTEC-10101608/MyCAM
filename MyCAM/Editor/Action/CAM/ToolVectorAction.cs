@@ -5,6 +5,7 @@ using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.Aspect;
+using OCC.Geom;
 using OCC.gp;
 using OCC.Prs3d;
 using OCC.Quantity;
@@ -75,6 +76,8 @@ namespace MyCAM.Editor
 			OnSelectedIndexChanged( nStartPntIndex );
 			m_ToolVecDlg.Show( MyApp.MainForm );
 
+			// when start, show G54 trihedron at simulation offset position
+			ShowG54Trihedron( new gp_Pnt( m_DataManager.MachineData.SimulationOffset.x, m_DataManager.MachineData.SimulationOffset.y, m_DataManager.MachineData.SimulationOffset.z ) );
 			// show machine
 			RaiseActionStart?.Invoke( true );
 		}
@@ -84,6 +87,7 @@ namespace MyCAM.Editor
 			const int DEFAULT_INDEX = 0;
 			TranfAndRebuildMap( new gp_Trsf(), DEFAULT_INDEX, out _ );
 			UnlockSelectedVertexHighLight();
+			RemoveG54();
 			RaiseActionStart?.Invoke( false );
 			base.End();
 		}
@@ -117,6 +121,37 @@ namespace MyCAM.Editor
 			}
 			if( e.KeyCode == Keys.Escape ) {
 				End();
+			}
+		}
+
+		// UI Setting
+
+		void ShowG54Trihedron( gp_Pnt position )
+		{
+			// remove existing trihedron if it exists
+			if( m_G54Trihedron != null ) {
+				m_Viewer.GetAISContext().Remove( m_G54Trihedron, false );
+			}
+
+			// create coordinate system at specified position
+			gp_Ax2 ax2 = new gp_Ax2( position, new gp_Dir( 0, 0, 1 ), new gp_Dir( 1, 0, 0 ) );
+			m_G54Trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
+			m_G54Trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+
+			// small size and gray color to make it not eye-catching, just for reference
+			m_G54Trihedron.SetSize( 50.0 );
+			m_G54Trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			m_G54Trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			m_G54Trihedron.SetArrowColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			m_Viewer.GetAISContext().Display( m_G54Trihedron, false );
+			m_Viewer.GetAISContext().Deactivate( m_G54Trihedron );
+		}
+
+		void RemoveG54()
+		{
+			if( m_G54Trihedron != null ) {
+				m_Viewer.GetAISContext().Remove( m_G54Trihedron, false );
+				m_G54Trihedron = null;
 			}
 		}
 
@@ -417,7 +452,12 @@ namespace MyCAM.Editor
 
 		void RefreshSimuResult()
 		{
-			bool isCalSuccess = CalSimuTranfResult( out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap );
+			bool isGetMachineData = DataGettingHelper.GetMachineData( out MachineData machineData );
+			if( !isGetMachineData ) {
+				MyApp.Logger.ShowOnLogPanel( "無法獲得機構資訊", MyApp.NoticeType.Warning );
+				return;
+			}
+			bool isCalSuccess = CalSimuTranfResult( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap );
 			if( !isCalSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
 				return;
@@ -440,12 +480,18 @@ namespace MyCAM.Editor
 			RaiseTrans?.Invoke( frameTransformMap );
 		}
 
-		bool CalSimuTranfResult( out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap )
+		bool CalSimuTranfResult( MachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap )
 		{
 			frameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 			if( m_SelectedPoint == null ) {
 				return false;
 			}
+			if( machineData == null ) {
+				return false;
+			}
+
+			// set default offset
+			gp_Vec simuOffset = machineData.SimulationOffset ?? new gp_Vec();
 			PostPoint G54pnt = new PostPoint()
 			{
 				X = m_SelectedPoint.Point.x,
@@ -457,7 +503,7 @@ namespace MyCAM.Editor
 
 			// create PostSolver
 			PostSolver postSolver = new PostSolver( m_DataManager.MachineData );
-			bool calSuccess = SimulationHelper.BuildFKPostPnt( postSolver, G54pnt, out PostPoint FKpnt );
+			bool calSuccess = SimulationHelper.BuildFKPostPnt( postSolver, G54pnt, out PostPoint FKpnt, simuOffset );
 			if( !calSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "無法計算出雷射頭位置", MyApp.NoticeType.Warning );
 				return false;
@@ -470,7 +516,7 @@ namespace MyCAM.Editor
 			frameTransformMap[ MachineComponentType.Slave ] = new List<gp_Trsf>();
 			frameTransformMap[ MachineComponentType.Laser ] = new List<gp_Trsf>();
 			frameTransformMap[ MachineComponentType.WorkPiece ] = new List<gp_Trsf>();
-			SimulationHelper.FKToFrameTranfResult( FKpnt, postSolver.G54Offset, m_DataManager.WorkPieceChain, m_DataManager.MachineData, m_DataManager.MachineChainListMap, ref frameTransformMap );
+			SimulationHelper.FKToFrameTranfResult( FKpnt, machineData.SimulationOffset, m_DataManager.WorkPieceChain, machineData, m_DataManager.MachineChainListMap, ref frameTransformMap );
 			return true;
 		}
 
@@ -530,6 +576,9 @@ namespace MyCAM.Editor
 		// null select index as -999, -1 is used for closed point index
 		const int NULL_SELECT_INDEX = -999;
 		const int CLOSED_POINT_INDEX = -1;
+
+		// UI element
+		AIS_Trihedron m_G54Trihedron;
 	}
 
 	class ToolVecActionDataHandler

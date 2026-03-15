@@ -7,6 +7,7 @@ using MyCAM.Post;
 using OCC.AIS;
 using OCC.BRep;
 using OCC.BRepMesh;
+using OCC.Geom;
 using OCC.gp;
 using OCC.Poly;
 using OCC.Quantity;
@@ -90,6 +91,9 @@ namespace MyCAM.Editor
 		// machinal UI
 		bool m_IsImportMachine = false;
 
+		// UI element
+		AIS_Trihedron m_G54Trihedron;
+
 		// been solved IK point
 		List<PostData> m_PostDataList = new List<PostData>();
 
@@ -156,6 +160,14 @@ namespace MyCAM.Editor
 			// get post data
 			SetPostDataList();
 			m_IsNeedReCal = true;
+
+			bool isGetMachineDataSuccess = DataGettingHelper.GetMachineData( out MachineData machineData );
+			if( !isGetMachineDataSuccess ) {
+				return;
+			}
+
+			// draw new trihedron for G54
+			ShowG54Trihedron( new gp_Pnt( machineData.SimulationOffset.x, machineData.SimulationOffset.y, machineData.SimulationOffset.z ) );
 		}
 
 		public override void EditEnd()
@@ -163,6 +175,7 @@ namespace MyCAM.Editor
 			StopSimulation();
 			ClearCash();
 			ResetUI();
+			RemoveG54();
 
 			// clear tree
 			m_TreeView.Nodes.Clear();
@@ -453,6 +466,36 @@ namespace MyCAM.Editor
 				return new List<PostData>();
 			}
 			return postDataList;
+		}
+
+
+		void ShowG54Trihedron( gp_Pnt position )
+		{
+			// remove existing trihedron if it exists
+			if( m_G54Trihedron != null ) {
+				m_Viewer.GetAISContext().Remove( m_G54Trihedron, false );
+			}
+
+			// create coordinate system at specified position
+			gp_Ax2 ax2 = new gp_Ax2( position, new gp_Dir( 0, 0, 1 ), new gp_Dir( 1, 0, 0 ) );
+			m_G54Trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
+			m_G54Trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+
+			// small size and gray color to make it not eye-catching, just for reference
+			m_G54Trihedron.SetSize( 50.0 );
+			m_G54Trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			m_G54Trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			m_G54Trihedron.SetArrowColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			m_Viewer.GetAISContext().Display( m_G54Trihedron, false );
+			m_Viewer.GetAISContext().Deactivate( m_G54Trihedron );
+		}
+
+		void RemoveG54()
+		{
+			if( m_G54Trihedron != null ) {
+				m_Viewer.GetAISContext().Remove( m_G54Trihedron, false );
+				m_G54Trihedron = null;
+			}
 		}
 
 		#endregion

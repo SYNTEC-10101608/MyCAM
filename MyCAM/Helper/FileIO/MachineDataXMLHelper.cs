@@ -344,6 +344,20 @@ namespace MyCAM.Helper
 				return machineDTOContainer;
 			}
 
+			// simulation offset
+			machineDataDTO.SimulationOffset.X = GetPrValue<double>( machineData, MachineParamName.SIMULATION_OFFSET_X, out prValueStatus, dRatioBluToMM );
+			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+				machineDataDTO.SimulationOffset.X = 0;
+			}
+			machineDataDTO.SimulationOffset.Y = GetPrValue<double>( machineData, MachineParamName.SIMULATION_OFFSET_Y, out prValueStatus, dRatioBluToMM );
+			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+				machineDataDTO.SimulationOffset.Y = 0;
+			}
+			machineDataDTO.SimulationOffset.Z = GetPrValue<double>( machineData, MachineParamName.SIMULATION_OFFSET_Z, out prValueStatus, dRatioBluToMM );
+			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+				machineDataDTO.SimulationOffset.Z = 0;
+			}
+
 			machineDataDTO.MasterTiltedVec_deg.X = GetPrValue<double>( machineData, (int)MachinePrValue.MasterTiltedVec_X, out prValueStatus, dRatioBluToMM );
 			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
 				nErrorPrIndex = (int)MachinePrValue.MasterTiltedVec_X;

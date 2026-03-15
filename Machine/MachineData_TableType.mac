@@ -19,6 +19,10 @@
 	<Pr ID="Master_End" Value="0" />
 	<Pr ID="Slave_Start" Value="0" />
 	<Pr ID="Slave_End" Value="0" />
+	<!--Simulation Offset-->
+	<Pr ID="Simulation_Offset_X" Value="0" />
+	<Pr ID="Simulation_Offset_Y" Value="0" />
+	<Pr ID="Simulation_Offset_Z" Value="0" />
     <!--Spindle Type-->
     <Pr ID="3021" Value="0" />
     <Pr ID="3022" Value="0" />

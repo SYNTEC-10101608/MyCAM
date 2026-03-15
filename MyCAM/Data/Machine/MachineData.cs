@@ -81,6 +81,11 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		public gp_Vec SimulationOffset
+		{
+			get; set;
+		}
+
 		public double ToolLength
 		{
 			get; set;
