@@ -291,6 +291,11 @@ namespace MyCAM.Editor.Renderer
 			// set material aspect, this matter since the default material gives wrong color effect
 			Graphic3d_MaterialAspect baseAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_PLASTIC );
 			resultAIS.SetMaterial( baseAspect );
+
+			// set color
+			Quantity_Color color = new Quantity_Color();
+			var colorArray = GetMeshColorArray( resultAIS.GetTriangulation(), color );
+			resultAIS.SetColors( colorArray );
 			resultAIS.SetTransparency( TRANSPARENCY );
 			return resultAIS;
 		}
