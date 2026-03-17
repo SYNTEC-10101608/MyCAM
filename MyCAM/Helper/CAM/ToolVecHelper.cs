@@ -257,7 +257,7 @@ namespace MyCAM.Helper
 				if( i >= toolVecPointList.Count - 1 ) {
 					break;
 				}
-				totaldistance += toolVecPointList[ i ].Point.SquareDistance( toolVecPointList[ ( i + 1 ) ].Point );
+				totaldistance += toolVecPointList[ i ].Point.Distance( toolVecPointList[ ( i + 1 ) ].Point );
 			}
 
 			// interpolate A/B angles and convert to tool vector
@@ -267,7 +267,7 @@ namespace MyCAM.Helper
 
 				// add accumulated distance if not the last point
 				if( i < nEndIndex ) {
-					accumulatedDistance += toolVecPointList[ i ].Point.SquareDistance( toolVecPointList[ ( i + 1 ) ].Point );
+					accumulatedDistance += toolVecPointList[ i ].Point.Distance( toolVecPointList[ ( i + 1 ) ].Point );
 				}
 
 				// Interpolate A/B angles
@@ -297,7 +297,7 @@ namespace MyCAM.Helper
 				if( i >= toolVecPointList.Count - 1 ) {
 					break;
 				}
-				totaldistance += toolVecPointList[ i ].Point.SquareDistance( toolVecPointList[ ( i + 1 ) ].Point );
+				totaldistance += toolVecPointList[ i ].Point.Distance( toolVecPointList[ ( i + 1 ) ].Point );
 			}
 
 			// interpolate master/slave angles and convert to tool vector
@@ -307,7 +307,7 @@ namespace MyCAM.Helper
 
 				// add accumulated distance if not the last point
 				if( i < nEndIndex ) {
-					accumulatedDistance += toolVecPointList[ i ].Point.SquareDistance( toolVecPointList[ ( i + 1 ) ].Point );
+					accumulatedDistance += toolVecPointList[ i ].Point.Distance( toolVecPointList[ ( i + 1 ) ].Point );
 				}
 
 				// Interpolate M/S angles
