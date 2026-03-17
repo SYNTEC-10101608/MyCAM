@@ -380,7 +380,7 @@ namespace MyCAM.Editor
 				return null;
 			}
 
-			CraftData craftData = originalPathObject?.CraftData ?? new CraftData();
+			CraftData craftData = new CraftData();
 			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
 			switch( pathType ) {
 				case PathType.Circle:
