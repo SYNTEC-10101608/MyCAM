@@ -442,8 +442,6 @@ namespace MyCAM.Data
 			SlaveRotaryDirection = RotaryDirection.LeftHand,
 			MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
 			SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
-			SimulationOffset = new gp_Vec( 0, 0, 0 ),
-			ToolLength = 2.0,
 			ToolToSlaveVec = new gp_Vec( -101.2, -0.19, 169.43 ),
 			SlaveToMasterVec = new gp_Vec( -151.5, 0.190, 193.550 ),
 		};
@@ -458,8 +456,6 @@ namespace MyCAM.Data
 			SlaveRotaryDirection = RotaryDirection.LeftHand,
 			MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
 			SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
-			SimulationOffset = new gp_Vec( 0, 0, 0 ),
-			ToolLength = 2.0,
 			ToolToMasterVec = new gp_Vec( -17.27, 104.2, 169.48 ),
 			MCSToSlaveVec = new gp_Vec( 0, 0, 0 ),
 		};
