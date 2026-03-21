@@ -421,7 +421,7 @@ namespace MyCAM.Post
 			return ikResult;
 		}
 
-		public gp_Vec SolveFK( double dM, double dS, gp_Pnt pointG54 , gp_Vec offset)
+		public gp_Vec SolveFK( double dM, double dS, gp_Pnt pointG54, gp_Vec offset )
 		{
 			if( pointG54 == null ) {
 				return new gp_Vec();
@@ -429,24 +429,12 @@ namespace MyCAM.Post
 			if( offset != null ) {
 				return m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54.XYZ() ), offset );
 			}
-			return m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54.XYZ() ), m_G54Offset );
+			return m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54.XYZ() ), new gp_Vec() );
 		}
 
 		public gp_Dir SolveToolVec( double dM, double dS )
 		{
 			return m_FKSolver.SolveToolVec( dM, dS );
-		}
-
-		public gp_Vec G54Offset
-		{
-			get
-			{
-				return new gp_Vec( m_G54Offset.XYZ() );
-			}
-			set
-			{
-				m_G54Offset = new gp_Vec( value.XYZ() );
-			}
 		}
 
 		// solver builder factory
@@ -469,7 +457,6 @@ namespace MyCAM.Post
 
 		IKSolver m_IKSolver;
 		FKSolver m_FKSolver;
-		gp_Vec m_G54Offset = new gp_Vec();
 	}
 
 	internal interface ISolverBuilder

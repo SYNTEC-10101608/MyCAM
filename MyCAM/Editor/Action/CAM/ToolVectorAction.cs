@@ -1,11 +1,11 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.AIS;
 using OCC.Aspect;
-using OCC.Geom;
 using OCC.gp;
 using OCC.Prs3d;
 using OCC.Quantity;
@@ -30,6 +30,7 @@ namespace MyCAM.Editor
 			m_RotaryAxisConfig = CreateRotaryAxisConfig();
 			m_DataHandler = new ToolVecActionDataHandler( pathID );
 			m_PathIDList = new List<string>() { pathID };
+			m_CoordIcon = new CoordIconRenderer( viewer, dataManager );
 		}
 
 		public override EditActionType ActionType
@@ -71,13 +72,22 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.EnableStartEndSwitch( false, false );
 			m_ToolVecDlg.Cancel += End;
 
+			// draw new trihedron for G54 must before change to start point
+			// because change to start point will trigger coord trasform
+			bool isGetMachineData = DataGettingHelper.GetMachineData( out MachineData machineData );
+			if( isGetMachineData ) {
+				gp_Pnt position = new gp_Pnt( machineData.SimulationOffset.x, machineData.SimulationOffset.y, machineData.SimulationOffset.z );
+				m_CoordIcon.Show( position );
+			}
+			else {
+				m_CoordIcon.Show();
+			}
+
 			// switch select on start point, and change form UI( show start point toolvec param) 
 			int nStartPntIndex = m_DataHandler.GetStartPointCADIndex();
 			OnSelectedIndexChanged( nStartPntIndex );
 			m_ToolVecDlg.Show( MyApp.MainForm );
 
-			// when start, show G54 trihedron at simulation offset position
-			ShowG54Trihedron( new gp_Pnt( m_DataManager.MachineData.SimulationOffset.x, m_DataManager.MachineData.SimulationOffset.y, m_DataManager.MachineData.SimulationOffset.z ) );
 			// show machine
 			RaiseActionStart?.Invoke( true );
 		}
@@ -87,7 +97,7 @@ namespace MyCAM.Editor
 			const int DEFAULT_INDEX = 0;
 			TranfAndRebuildMap( new gp_Trsf(), DEFAULT_INDEX, out _ );
 			UnlockSelectedVertexHighLight();
-			RemoveG54();
+			m_CoordIcon.Remove();
 			RaiseActionStart?.Invoke( false );
 			base.End();
 		}
@@ -125,36 +135,6 @@ namespace MyCAM.Editor
 		}
 
 		// UI Setting
-
-		void ShowG54Trihedron( gp_Pnt position )
-		{
-			// remove existing trihedron if it exists
-			if( m_G54Trihedron != null ) {
-				m_Viewer.GetAISContext().Remove( m_G54Trihedron, false );
-			}
-
-			// create coordinate system at specified position
-			gp_Ax2 ax2 = new gp_Ax2( position, new gp_Dir( 0, 0, 1 ), new gp_Dir( 1, 0, 0 ) );
-			m_G54Trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
-			m_G54Trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-
-			// small size and gray color to make it not eye-catching, just for reference
-			m_G54Trihedron.SetSize( 50.0 );
-			m_G54Trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			m_G54Trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			m_G54Trihedron.SetArrowColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			m_Viewer.GetAISContext().Display( m_G54Trihedron, false );
-			m_Viewer.GetAISContext().Deactivate( m_G54Trihedron );
-		}
-
-		void RemoveG54()
-		{
-			if( m_G54Trihedron != null ) {
-				m_Viewer.GetAISContext().Remove( m_G54Trihedron, false );
-				m_G54Trihedron = null;
-			}
-		}
-
 		void OnSelectedIndexChanged( int nSelectIndex )
 		{
 			if( m_nSelectIndex == nSelectIndex ) {
@@ -477,6 +457,9 @@ namespace MyCAM.Editor
 
 			// re high light
 			LockSelectedVertexHighLight( vertexhighlight );
+
+			// trihedron also need to change according to workpiece
+			m_CoordIcon.Trans( frameTransformMap[ MachineComponentType.WorkPiece ].Last() );
 			RaiseTrans?.Invoke( frameTransformMap );
 		}
 
@@ -577,8 +560,8 @@ namespace MyCAM.Editor
 		const int NULL_SELECT_INDEX = -999;
 		const int CLOSED_POINT_INDEX = -1;
 
-		// UI element
-		AIS_Trihedron m_G54Trihedron;
+		// coord icon 
+		CoordIconRenderer m_CoordIcon;
 	}
 
 	class ToolVecActionDataHandler

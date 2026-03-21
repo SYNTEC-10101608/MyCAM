@@ -39,6 +39,9 @@ namespace MyCAM.Data
 		protected MachineData()
 		{
 			RootNode = new MachineTreeNode( MachineComponentType.Base );
+
+			// unnessary value, just for initialization to avoid null reference exception
+			SimulationOffset = new gp_Vec( 0, 0, 0 );
 		}
 
 		public abstract FiveAxisType FiveAxisType

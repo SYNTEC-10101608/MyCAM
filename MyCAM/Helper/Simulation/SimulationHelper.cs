@@ -385,6 +385,15 @@ namespace MyCAM.Helper
 		   HashSet<MachineComponentType> workPiecesChainSet,
 		   MachineData machineData )
 		{
+			// protection
+			if( thisFramePostPnt == null || machineData == null ) {
+				MyApp.Logger.ShowOnLogPanel( $"畫面計算失敗", MyApp.NoticeType.Warning );
+				return new Dictionary<MachineComponentType, gp_Trsf>();
+			}
+			if( g54 == null ) {
+				g54 = new gp_Vec( 0, 0, 0 );
+			}
+
 			// record each component transform at this frame
 			Dictionary<MachineComponentType, gp_Trsf> componentTrsfMap = new Dictionary<MachineComponentType, gp_Trsf>();
 

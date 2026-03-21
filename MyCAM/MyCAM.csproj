@@ -84,6 +84,7 @@
     <Compile Include="Editor\Dialog\PathEditDlg.Designer.cs">
       <DependentUpon>PathEditDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Renderer\CoordIconRenderer.cs" />
     <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Data\Simulation\SimuData.cs" />
     <Compile Include="Editor\Renderer\MachineRender.cs" />

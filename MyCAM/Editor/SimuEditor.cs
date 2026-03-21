@@ -7,7 +7,6 @@ using MyCAM.Post;
 using OCC.AIS;
 using OCC.BRep;
 using OCC.BRepMesh;
-using OCC.Geom;
 using OCC.gp;
 using OCC.Poly;
 using OCC.Quantity;
@@ -37,6 +36,7 @@ namespace MyCAM.Editor
 			m_MachineData = m_DataManager.MachineData;
 			m_PostSolver = new PostSolver( m_MachineData );
 			m_TraverseRender = new TraverseRenderer( m_Viewer, m_DataManager );
+			m_CoordIconRender = new CoordIconRenderer( m_Viewer, m_DataManager );
 			m_MachineRender = new MachineRender( m_Viewer, m_DataManager );
 			m_DefaultAction = new SelectPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 
@@ -91,15 +91,13 @@ namespace MyCAM.Editor
 		// machinal UI
 		bool m_IsImportMachine = false;
 
-		// UI element
-		AIS_Trihedron m_G54Trihedron;
-
 		// been solved IK point
 		List<PostData> m_PostDataList = new List<PostData>();
 
 		// render
 		TraverseRenderer m_TraverseRender;
 		MachineRender m_MachineRender;
+		CoordIconRenderer m_CoordIconRender;
 
 		// speed should refer to which defined in SimuData
 		int m_SpeedLevel = INIT_SPEED_LEVEL;
@@ -167,7 +165,8 @@ namespace MyCAM.Editor
 			}
 
 			// draw new trihedron for G54
-			ShowG54Trihedron( new gp_Pnt( machineData.SimulationOffset.x, machineData.SimulationOffset.y, machineData.SimulationOffset.z ) );
+			gp_Pnt position = new gp_Pnt( machineData.SimulationOffset.x, machineData.SimulationOffset.y, machineData.SimulationOffset.z );
+			m_CoordIconRender.Show( position );
 		}
 
 		public override void EditEnd()
@@ -175,7 +174,6 @@ namespace MyCAM.Editor
 			StopSimulation();
 			ClearCash();
 			ResetUI();
-			RemoveG54();
 
 			// clear tree
 			m_TreeView.Nodes.Clear();
@@ -468,36 +466,6 @@ namespace MyCAM.Editor
 			return postDataList;
 		}
 
-
-		void ShowG54Trihedron( gp_Pnt position )
-		{
-			// remove existing trihedron if it exists
-			if( m_G54Trihedron != null ) {
-				m_Viewer.GetAISContext().Remove( m_G54Trihedron, false );
-			}
-
-			// create coordinate system at specified position
-			gp_Ax2 ax2 = new gp_Ax2( position, new gp_Dir( 0, 0, 1 ), new gp_Dir( 1, 0, 0 ) );
-			m_G54Trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
-			m_G54Trihedron.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-
-			// small size and gray color to make it not eye-catching, just for reference
-			m_G54Trihedron.SetSize( 50.0 );
-			m_G54Trihedron.SetAxisColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			m_G54Trihedron.SetTextColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			m_G54Trihedron.SetArrowColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
-			m_Viewer.GetAISContext().Display( m_G54Trihedron, false );
-			m_Viewer.GetAISContext().Deactivate( m_G54Trihedron );
-		}
-
-		void RemoveG54()
-		{
-			if( m_G54Trihedron != null ) {
-				m_Viewer.GetAISContext().Remove( m_G54Trihedron, false );
-				m_G54Trihedron = null;
-			}
-		}
-
 		#endregion
 
 		#region Calculate Simulation Result
@@ -616,6 +584,7 @@ namespace MyCAM.Editor
 			RemoveAllCAMData();
 			ResetWorkPieceAIS();
 			m_MachineRender.Remove();
+			m_CoordIconRender.Remove();
 			m_Viewer.UpdateView();
 		}
 
@@ -863,6 +832,9 @@ namespace MyCAM.Editor
 
 			// traverse transformation is the same as workpiece
 			m_TraverseRender.Trans( m_FrameTransformMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ] );
+
+			// coord icon also need to change according to workpiece
+			m_CoordIconRender.Trans( m_FrameTransformMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ] );
 			RenderWorkPieces();
 			m_Viewer.UpdateView();
 		}
