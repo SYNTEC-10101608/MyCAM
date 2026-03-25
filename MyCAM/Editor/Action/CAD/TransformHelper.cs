@@ -42,6 +42,14 @@ namespace MyCAM.Editor
 				oneTransformable.DoTransform( m_3PTransform );
 			}
 
+			// do transform for calibration data
+			if( DataGettingHelper.GetREFPnt( out CalibrationData calibrationData ) ) {
+				calibrationData.DoTransform( m_3PTransform );
+
+				// calibrationData get from DataGettingHelper is been clone not pointer, so need to set back
+				m_DataManager.CalibrationData = calibrationData;
+			}
+
 			// update viewer
 			foreach( var szObjID in transformObjIDList ) {
 				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szObjID ].AISHandle );

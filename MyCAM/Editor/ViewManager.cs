@@ -28,17 +28,17 @@ namespace MyCAM.Editor
 			return aisShape;
 		}
 
-		public static AIS_Shape CreateFeatureAIS( TopoDS_Shape shape )
+		public static AIS_Shape CreateFeatureAIS( TopoDS_Shape shape, Quantity_NameOfColor color = COLOR_FEATURE_DEFAULT )
 		{
 			AIS_Shape aisShape = new AIS_Shape( shape );
 			aisShape.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			aisShape.SetColor( new Quantity_Color( COLOR_FEATURE_DEFAULT ) );
+			aisShape.SetColor( new Quantity_Color( color ) );
 			aisShape.SetWidth( LINE_WIDTH );
 
 			// Vertex style
 			if( shape.ShapeType() == TopAbs_ShapeEnum.TopAbs_VERTEX ) {
 				aisShape.Attributes().PointAspect().SetTypeOfMarker( Aspect_TypeOfMarker.Aspect_TOM_BALL );
-				aisShape.Attributes().PointAspect().SetColor( new Quantity_Color( COLOR_FEATURE_DEFAULT ) );
+				aisShape.Attributes().PointAspect().SetColor( new Quantity_Color( color ) );
 				aisShape.Attributes().PointAspect().SetScale( POINT_SIZE );
 			}
 			return aisShape;

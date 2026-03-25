@@ -58,7 +58,13 @@ namespace MyCAM.FileManager
 		{
 			get;
 			set;
-		}
+		} = new EntryAndExitDataDTO();
+
+		public CalibrationDataDTO PartCalibrationData
+		{
+			get;
+			set;
+		} = new CalibrationDataDTO();
 
 		#endregion
 
@@ -77,16 +83,17 @@ namespace MyCAM.FileManager
 			ToPathIDListDTO( dataManager.PathIDList );
 			ToShapeIDDTO( dataManager.GetShapeIDsForDTO() );
 			ToEntryAndExitDataDTO( dataManager.EntryAndExitData );
-
+			ToPartCalibrationDataDTO( dataManager.CalibrationData );
 		}
 
-		internal void DataMgrDTO2Data( out Dictionary<string, IObject> objectDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData )
+		internal void DataMgrDTO2Data( out Dictionary<string, IObject> objectDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData, out CalibrationData calibrationData )
 		{
 			objectDataMap = ObjectMapDTOToObjectMap();
 			partIDList = PartIDListDTOToPartList();
 			pathIDList = PathIDListDTOToPathList();
 			shapeIDs = ShapeIDDTOToShapeIDStruct();
 			entryAndExitData = EntryAndExitDTOToEntryAndExitData();
+			calibrationData = PartCalibrationDTOToCalibrationData();
 		}
 
 		#region Generate DTO
@@ -176,6 +183,11 @@ namespace MyCAM.FileManager
 			EntryAndExitData = new EntryAndExitDataDTO( entryAndExitData );
 		}
 
+		void ToPartCalibrationDataDTO( CalibrationData calibrationData )
+		{
+			PartCalibrationData = new CalibrationDataDTO( calibrationData );
+		}
+
 		#endregion
 
 		#region Generate Data by DTO
@@ -230,7 +242,7 @@ namespace MyCAM.FileManager
 		List<string> PathIDListDTOToPathList()
 		{
 			List<string> pathIDList = new List<string>();
-			if( PathIDList == null || PathIDList.Count == 0 ) {
+			if( PathIDList == null ) {
 				throw new ArgumentException( "PathIDList deserialization failed." );
 			}
 			foreach( var pathID in PathIDList ) {
@@ -247,6 +259,11 @@ namespace MyCAM.FileManager
 		EntryAndExitData EntryAndExitDTOToEntryAndExitData()
 		{
 			return EntryAndExitData.ToEntryAndExitData();
+		}
+
+		CalibrationData PartCalibrationDTOToCalibrationData()
+		{
+			return PartCalibrationData.ToCalibrationData();
 		}
 
 		#endregion
@@ -1234,9 +1251,97 @@ namespace MyCAM.FileManager
 		internal EntryAndExitData ToEntryAndExitData()
 		{
 			if( !EntryDistance.HasValue || !ExitDistance.HasValue || !FollowSafeDistance.HasValue ) {
-				throw new ArgumentException( "EntryAndExitData deserialization failed." );
+				return new EntryAndExitData();
 			}
 			return new EntryAndExitData( EntryDistance.Value, ExitDistance.Value, FollowSafeDistance.Value );
+		}
+	}
+
+	public class CalibrationDataDTO
+	{
+		public gp_PntDTO REFPnt1
+		{
+			get;
+			set;
+		}
+
+		public gp_PntDTO REFPnt2
+		{
+			get;
+			set;
+		}
+
+		public gp_PntDTO REFPnt3
+		{
+			get;
+			set;
+		}
+
+		// parameterless constructor (for XmlSerializer)
+		internal CalibrationDataDTO()
+		{
+		}
+
+		internal CalibrationDataDTO( CalibrationData calibrationData )
+		{
+			if( calibrationData == null || calibrationData.IsBeenSet == false ) {
+				return;
+			}
+			REFPnt1 = new gp_PntDTO( calibrationData.Ref_Pnt1 );
+			REFPnt2 = new gp_PntDTO( calibrationData.Ref_Pnt2 );
+			REFPnt3 = new gp_PntDTO( calibrationData.Ref_Pnt3 );
+		}
+
+		internal CalibrationData ToCalibrationData()
+		{
+			if( REFPnt1 == null || REFPnt2 == null || REFPnt3 == null ) {
+				return new CalibrationData();
+			}
+			return new CalibrationData( REFPnt1.ToPnt(), REFPnt2.ToPnt(), REFPnt3.ToPnt() );
+		}
+	}
+
+	public class gp_PntDTO
+	{
+		public double? X
+		{
+			get;
+			set;
+		}
+
+		public double? Y
+		{
+			get;
+			set;
+		}
+
+		public double? Z
+		{
+			get;
+			set;
+		}
+
+		// parameterless constructor (for XmlSerializer)
+		internal gp_PntDTO()
+		{
+		}
+
+		internal gp_PntDTO( gp_Pnt point )
+		{
+			if( point == null ) {
+				return;
+			}
+			X = point.X();
+			Y = point.Y();
+			Z = point.Z();
+		}
+
+		internal gp_Pnt ToPnt()
+		{
+			if( !X.HasValue || !Y.HasValue || !Z.HasValue ) {
+				throw new ArgumentException( "gp_Pnt deserialization failed." );
+			}
+			return new gp_Pnt( X.Value, Y.Value, Z.Value );
 		}
 	}
 

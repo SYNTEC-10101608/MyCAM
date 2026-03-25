@@ -173,7 +173,7 @@ namespace OCCTool
 			double dStartU = 0;
 			double dEndU = 0;
 			Geom_Curve geomCurve = BRep_Tool.Curve( edge, ref dStartU, ref dEndU );
-			Geom_Circle geom_Circle = ComputeCircle( geomCurve, 1e-3, dStartU, dEndU,
+			Geom_Circle geom_Circle = ComputeCircle( geomCurve, 1e-1, dStartU, dEndU,
 				out double cf, out double cl, out double deviation );
 			if( geom_Circle != null ) {
 				p = geom_Circle.Location();
@@ -285,7 +285,7 @@ namespace OCCTool
 			double dDistance = p1.Distance( p2 );
 
 			// compare edge length and distance (arc and sine)
-			const double dToleranceRatio = 1e-3;
+			const double dToleranceRatio = 1e-1;
 			if( Math.Abs( ( dEdgeLength - dDistance ) / dDistance ) < dToleranceRatio ) {
 				return true;
 			}
