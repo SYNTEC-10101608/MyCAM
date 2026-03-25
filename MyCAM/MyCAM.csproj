@@ -230,6 +230,7 @@
     <Compile Include="Editor\CAMEditor.cs" />
     <Compile Include="LogManager\LogHandler.cs" />
     <Compile Include="Helper\CAM\OverCutHelper.cs" />
+    <Compile Include="Post\CustPostWriter.cs" />
     <Compile Include="Post\FiveAxisSolver.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="CNC\FTPTransmission.cs" />
@@ -318,9 +319,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonData\CommonData.csproj">
+      <Project>{c5376e98-c3ea-4cf1-839c-122eb0a9300b}</Project>
+      <Name>CommonData</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FALicenseChecker\FALicenseChecker.csproj">
       <Project>{e32a7b86-9b99-4ce4-adf5-60134e7a4640}</Project>
       <Name>FALicenseChecker</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FileTranslator\FileTranslator.csproj">
+      <Project>{ae1bdd40-83c0-4e22-81c0-3fc63dd82462}</Project>
+      <Name>FileTranslator</Name>
     </ProjectReference>
     <ProjectReference Include="..\OCCTool\OCCTool.csproj">
       <Project>{e9c0ab57-4558-4baf-b154-b20169a256fe}</Project>

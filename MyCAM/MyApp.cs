@@ -1,4 +1,6 @@
-﻿using MyCAM.Editor;
+﻿using CommonData;
+using FileTranslator;
+using MyCAM.Editor;
 using MyCAM.LogManager;
 using System;
 using System.Collections.Generic;
@@ -11,6 +13,8 @@ namespace MyCAM.App
 	internal static class MyApp
 	{
 		static string m_szCNCIP = string.Empty;
+
+		const string CUST_post_file_Name = "CustPost.cpf";
 
 		public enum NoticeType
 		{
@@ -71,6 +75,11 @@ namespace MyCAM.App
 				}
 				m_VNCUserControl = value;
 			}
+		}
+
+		public static CustPost CustomizedPostInfo
+		{
+			get => m_CustPost;
 		}
 
 		#region Show Dialog at Form Center
@@ -199,11 +208,52 @@ namespace MyCAM.App
 
 		#endregion
 
+		#region Read Customized Post File
+
+		public static void SetCustPost()
+		{
+			// read cust post file
+			string filePath = System.IO.Path.Combine( AppDomain.CurrentDomain.BaseDirectory, CUST_post_file_Name );
+			if( !System.IO.File.Exists( filePath ) ) {
+				Logger.ShowOnLogPanel( $"客製後處理檔案不存在", NoticeType.Hint );
+
+				// use default value
+				m_CustPost = new CustPost(); 
+				return;
+			}
+			string fileContent;
+
+			// protect io exception
+			try {
+				fileContent = System.IO.File.ReadAllText( filePath );
+			}
+			catch( Exception ) {
+				Logger.ShowOnLogPanel( $"讀取客製化後處理器檔案失敗", NoticeType.Error );
+				
+				// use default value
+				m_CustPost = new CustPost();
+				return;
+			}
+
+			// translate to DTO
+			TxtToCustPostTranslator custPostTranslater = new TxtToCustPostTranslator();
+			bool isGetAllCustContent =  custPostTranslater.Translate( fileContent, out CustPost post );
+			if (isGetAllCustContent == false ) {
+				Logger.ShowOnLogPanel( $"客製化後處理器檔案內容不完整或格式錯誤，請確認檔案內容。", NoticeType.Error, true );
+			}
+			
+			// store info
+			m_CustPost = post;
+		}
+
+		#endregion
+
 		static Form m_MainForm;
 		static LogHandler m_Logger;
 		static Panel m_LogPanel;
 		static VNCUserControl m_VNCUserControl;
 		static readonly List<DialogEventInfo> m_RegisteredDialogs = new List<DialogEventInfo>();
+		static CustPost m_CustPost = null;
 
 		class DialogEventInfo
 		{

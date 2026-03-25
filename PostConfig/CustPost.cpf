@@ -1,0 +1,23 @@
+<Header>
+%@MACRO
+G43.4 P1;
+G65 P"FileStart" X"Material1" Y"1.0";
+
+<Tail>
+G65 P"FileEnd";
+M30;
+
+<PathHeader>
+// Cutting{PathIndex}
+N{PathIndex}
+G65 P"LoadParameter" H{LayerIndex};
+
+<PathTail>
+G65 P"LASER_OFF";
+
+<StdPathHeader>
+// Cutting{PathIndex}
+N{PathIndex}
+G65 P"LoadParameter" H{LayerIndex};
+
+<StdPathTail>
