@@ -108,6 +108,9 @@ namespace MyCAM
 			// start with CAD editor
 			SwitchEditor( EEditorType.CAD );
 			DefaultUISetting();
+
+			// Get cust post data
+			MyApp.SetCustPost();
 		}
 
 		public Panel GetLogPanel

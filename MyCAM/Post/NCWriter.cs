@@ -1,4 +1,5 @@
-﻿using MyCAM.Data;
+﻿using MyCAM.App;
+using MyCAM.Data;
 using MyCAM.PathCache;
 using System;
 using System.Collections.Generic;
@@ -37,12 +38,12 @@ namespace MyCAM.Post
 		public bool ConvertSuccess( string fileName, string szTempFilePath, out string errorMessage )
 		{
 			errorMessage = string.Empty;
-
 			try {
 				using( m_StreamWriter = new StreamWriter( szTempFilePath ) ) {
-					m_StreamWriter.WriteLine( "%@MACRO" );
-					m_StreamWriter.WriteLine( "G43.4 P1;" ); // G43.4 新動程
-					m_StreamWriter.WriteLine( "G65 P\"FileStart\" X\"Material1\" Y\"1.0\";" ); // 三點校正					
+
+					// file header
+					CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.Header,
+						new Dictionary<string, string> { } );
 
 					// to keep last point of previous path
 					PathEndInfo endInfoOfPreviousPath = null;
@@ -84,8 +85,9 @@ namespace MyCAM.Post
 						NCWriterHelper.WriteLinearTraverse( m_StreamWriter, exitPoint, 0,
 							m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
 					}
-					m_StreamWriter.WriteLine( "G65 P\"FileEnd\";" );
-					m_StreamWriter.WriteLine( "M30;" ); // 程式結束
+
+					// file tail
+					CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.Tail, new Dictionary<string, string> { } );
 				}
 				return true;
 			}
@@ -196,10 +198,14 @@ namespace MyCAM.Post
 
 		void WriteCutting( PostData currentPathPostData, int N_Index, int nLayIndex = 1 )
 		{
-			// the N code
-			m_StreamWriter.WriteLine( "// Cutting" + N_Index );
-			m_StreamWriter.WriteLine( "N" + N_Index );
-			m_StreamWriter.WriteLine( $"G65 P\"LoadParameter\" H{nLayIndex};" );
+			// Header
+			Dictionary<string, string> varDict = new Dictionary<string, string> {
+				{ "PathIndex", N_Index.ToString() },
+				{ "LayerIndex", nLayIndex.ToString() }
+			};
+
+			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.PathHeader, varDict );
+
 
 			// traverse from previous path to current path
 			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData,
@@ -214,8 +220,8 @@ namespace MyCAM.Post
 			WriteOneProcessPath( currentPathPostData.OverCutPostPointList );
 			WriteOneProcessPath( currentPathPostData.LeadOutPostPointList );
 
-			// end cutting
-			m_StreamWriter.WriteLine( "G65 P\"LASER_OFF\";" );
+			// path tail
+			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.PathTail, varDict );
 			return;
 		}
 

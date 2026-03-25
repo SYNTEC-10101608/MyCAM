@@ -1,5 +1,7 @@
+using MyCAM.App;
 using MyCAM.Data;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -219,10 +221,13 @@ namespace MyCAM.Post
 				throw new ArgumentNullException( "StandardPatternNCWriter arguments cannot be null" );
 			}
 
-			// write comment and N code
-			writer.WriteLine( "// Cutting" + nIndex );
-			writer.WriteLine( "N" + nIndex );
-			writer.WriteLine( $"G65 P\"LoadParameter\" H{craftData.TechLayer};" );
+			Dictionary<string, string> varDict = new Dictionary<string, string> {
+				{ "PathIndex", nIndex.ToString() },
+				{ "LayerIndex", craftData.TechLayer.ToString() }
+			};
+
+			// header
+			CustPostWriter.WriteCustomizedSection( writer, MyApp.CustomizedPostInfo?.StdPathHeader, varDict );
 
 			// write traverse section
 			NCWriterHelper.WriteTraverse( writer, postData, masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
@@ -230,6 +235,9 @@ namespace MyCAM.Post
 			// get strategy and write cutting code
 			IStdPatternNCStrategy strategy = StandardPatternNCStrategyFactory.GetStrategy( pathType );
 			strategy.WriteNCCode( writer, postData, craftData, geomData, masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
+
+			// tail
+			CustPostWriter.WriteCustomizedSection( writer, MyApp.CustomizedPostInfo?.StdPathTail, varDict );
 		}
 	}
 }
