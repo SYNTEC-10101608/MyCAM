@@ -170,6 +170,16 @@ namespace MyCAM.Data
 			return machineData != null;
 		}
 
+		public static bool GetREFPnt( out CalibrationData calibrationData )
+		{
+			if( m_DataManager == null ) {
+				calibrationData = null;
+				return false;
+			}
+			calibrationData = m_DataManager.CalibrationData.Clone();
+			return calibrationData != null;
+		}
+
 		public static bool IsStdPattern( PathType pathType )
 		{
 			return pathType == PathType.Circle

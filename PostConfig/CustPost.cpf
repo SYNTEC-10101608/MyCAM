@@ -1,5 +1,4 @@
 <Header>
-%@MACRO
 G43.4 P1;
 G65 P"FileStart" X"Material1" Y"1.0";
 

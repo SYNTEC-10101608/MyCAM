@@ -1346,5 +1346,9 @@ namespace MyCAM
 			m_CAMEditor.SetPathLayer( 10 );
 		}
 
+		void m_tsbCalibrationPnt_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetCalibrationREF();
+		}
 	}
 }

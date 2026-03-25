@@ -576,6 +576,21 @@ namespace MyCAM.Editor
 			m_MainPathRenderer.Show( szPathIDList );
 		}
 
+		public void SetCalibrationREF()
+		{
+			if (m_DataManager.PartIDList.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先新增工件", MyApp.NoticeType.Hint );
+				return;
+			}
+
+			if( IsSameAction( EditActionType.CalibrationREF ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			CalibrationREFAction action = new CalibrationREFAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+			StartEditAction( action );
+		}
+
 		#endregion
 
 		// sort API

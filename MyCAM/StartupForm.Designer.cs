@@ -55,6 +55,7 @@
 			this.m_tsbPatternSetting = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbPathEdit = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbPathCompensation = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbCalibrationPnt = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbConvertNC = new System.Windows.Forms.ToolStripButton();
 			this.m_tscLevel1Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsSimuFunc = new System.Windows.Forms.ToolStrip();
@@ -111,6 +112,7 @@
 			this.m_tsbLayer7 = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbLayer8 = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbLayer9 = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbLayer10 = new System.Windows.Forms.ToolStripButton();
 			this.m_tsViewerToolBar = new System.Windows.Forms.ToolStrip();
 			this.m_tsbAXO = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbXPos = new System.Windows.Forms.ToolStripButton();
@@ -126,7 +128,6 @@
 			this.m_tsbShowTraverse = new System.Windows.Forms.ToolStripButton();
 			this.m_panBackGround = new System.Windows.Forms.TableLayoutPanel();
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.m_tsbLayer10 = new System.Windows.Forms.ToolStripButton();
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_tscLevel1Container.ContentPanel.SuspendLayout();
@@ -236,6 +237,7 @@
             this.m_tsbPatternSetting,
             this.m_tsbPathEdit,
             this.m_tsbPathCompensation,
+            this.m_tsbCalibrationPnt,
             this.m_tsbConvertNC});
 			this.m_tsCAMFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCAMFunction.Name = "m_tsCAMFunction";
@@ -416,6 +418,16 @@
 			this.m_tsbPathCompensation.ToolTipText = "路徑補償";
 			this.m_tsbPathCompensation.Click += new System.EventHandler(this.m_tsbPathCompensation_Click);
 			// 
+			// m_tsbCalibrationPnt
+			// 
+			this.m_tsbCalibrationPnt.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbCalibrationPnt.Image = global::MyCAM.Properties.Resources.Calibration;
+			this.m_tsbCalibrationPnt.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbCalibrationPnt.Name = "m_tsbCalibrationPnt";
+			this.m_tsbCalibrationPnt.Size = new System.Drawing.Size(44, 24);
+			this.m_tsbCalibrationPnt.Text = "三點校正參考點";
+			this.m_tsbCalibrationPnt.Click += new System.EventHandler(this.m_tsbCalibrationPnt_Click);
+			// 
 			// m_tsbConvertNC
 			// 
 			this.m_tsbConvertNC.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -431,10 +443,10 @@
 			// 
 			// m_tscLevel1Container.ContentPanel
 			// 
+			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCAMFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsSimuFunc);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsFileFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCADFunction);
-			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCAMFunction);
 			this.m_tscLevel1Container.ContentPanel.Size = new System.Drawing.Size(1596, 27);
 			this.m_tscLevel1Container.Dock = System.Windows.Forms.DockStyle.Top;
 			this.m_tscLevel1Container.Location = new System.Drawing.Point(0, 27);
@@ -957,9 +969,9 @@
             this.m_tsbLayer8,
             this.m_tsbLayer9,
             this.m_tsbLayer10});
-			this.m_tsLayer.Location = new System.Drawing.Point(1311, 0);
+			this.m_tsLayer.Location = new System.Drawing.Point(1326, 0);
 			this.m_tsLayer.Name = "m_tsLayer";
-			this.m_tsLayer.Size = new System.Drawing.Size(40, 430);
+			this.m_tsLayer.Size = new System.Drawing.Size(25, 430);
 			this.m_tsLayer.TabIndex = 3;
 			this.m_tsLayer.Text = "toolStrip1";
 			// 
@@ -1083,6 +1095,19 @@
 			this.m_tsbLayer9.Text = "9";
 			this.m_tsbLayer9.ToolTipText = "圖層9";
 			this.m_tsbLayer9.Click += new System.EventHandler(this.m_tsbLayer9_Click);
+			// 
+			// m_tsbLayer10
+			// 
+			this.m_tsbLayer10.AutoSize = false;
+			this.m_tsbLayer10.BackColor = System.Drawing.Color.Cyan;
+			this.m_tsbLayer10.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsbLayer10.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbLayer10.Image")));
+			this.m_tsbLayer10.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbLayer10.Name = "m_tsbLayer10";
+			this.m_tsbLayer10.Size = new System.Drawing.Size(24, 24);
+			this.m_tsbLayer10.Text = "10";
+			this.m_tsbLayer10.ToolTipText = "圖層10";
+			this.m_tsbLayer10.Click += new System.EventHandler(this.m_tsbLayer10_Click);
 			// 
 			// m_tsViewerToolBar
 			// 
@@ -1269,19 +1294,6 @@
 			this.contextMenuStrip1.Name = "contextMenuStrip1";
 			this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
 			// 
-			// m_tsbLayer10
-			// 
-			this.m_tsbLayer10.AutoSize = false;
-			this.m_tsbLayer10.BackColor = System.Drawing.Color.Cyan;
-			this.m_tsbLayer10.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsbLayer10.Image = ((System.Drawing.Image)(resources.GetObject("m_tsbLayer10.Image")));
-			this.m_tsbLayer10.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbLayer10.Name = "m_tsbLayer10";
-			this.m_tsbLayer10.Size = new System.Drawing.Size(24, 24);
-			this.m_tsbLayer10.Text = "10";
-			this.m_tsbLayer10.ToolTipText = "圖層10";
-			this.m_tsbLayer10.Click += new System.EventHandler(this.m_tsbLayer10_Click);
-			// 
 			// StartupForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1438,6 +1450,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbLayer8;
 		private System.Windows.Forms.ToolStripButton m_tsbLayer9;
 		private System.Windows.Forms.ToolStripButton m_tsbLayer10;
+		private System.Windows.Forms.ToolStripButton m_tsbCalibrationPnt;
 	}
 }
 

@@ -40,6 +40,13 @@ namespace MyCAM.Post
 			errorMessage = string.Empty;
 			try {
 				using( m_StreamWriter = new StreamWriter( szTempFilePath ) ) {
+					m_StreamWriter.WriteLine( "%@MACRO" );
+
+					// check if need to write calibration point
+					bool isNeed = NeedToWriteCalibrationPnt( out CalibrationData calibrationData );
+					if( isNeed ) {
+						m_StreamWriter.WriteLine( $"G65 P\"REFPOINT_SET\" X1={calibrationData.Ref_Pnt1.x.ToString( "F3" )} Y1={calibrationData.Ref_Pnt1.y.ToString( "F3" )} Z1={calibrationData.Ref_Pnt1.z.ToString( "F3" )} X2={calibrationData.Ref_Pnt2.x.ToString( "F3" )} Y2={calibrationData.Ref_Pnt2.y.ToString( "F3" )} Z2={calibrationData.Ref_Pnt2.z.ToString( "F3" )} X3={calibrationData.Ref_Pnt3.x.ToString( "F3" )} Y3={calibrationData.Ref_Pnt3.y.ToString( "F3" )} Z3={calibrationData.Ref_Pnt3.z.ToString( "F3" )};" );
+					}
 
 					// file header
 					CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.Header,
@@ -308,6 +315,16 @@ namespace MyCAM.Post
 				stdPatternCache.LeadInPointList,
 				stdPatternCache.ComputeGeomData
 			);
+		}
+
+		bool NeedToWriteCalibrationPnt( out CalibrationData calibrationData )
+		{
+			// get calibration data
+			bool isGetREFPointSuccess = DataGettingHelper.GetREFPnt( out calibrationData );
+			if( isGetREFPointSuccess && calibrationData != null && calibrationData.IsBeenSet ) {
+				return true;
+			}
+			return false;
 		}
 	}
 }

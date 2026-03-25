@@ -45,7 +45,7 @@ namespace MyCAM.Data
 			BuildChain();
 		}
 
-		public void ResetDataManger( Dictionary<string, IObject> objectMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData )
+		public void ResetDataManger( Dictionary<string, IObject> objectMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData, CalibrationData calibration )
 		{
 			// check shape map is mach with partList & pathList
 			Dictionary<string, IObject> checkedObjectMap = new Dictionary<string, IObject>();
@@ -71,6 +71,7 @@ namespace MyCAM.Data
 			PartIDList = checkedPartIDList;
 			PathIDList = checkedPathIDList;
 			EntryAndExitData = entryAndExitData;
+			CalibrationData = calibration;
 			ResetShapeIDsByDTO( shapeIDs );
 		}
 
@@ -169,6 +170,23 @@ namespace MyCAM.Data
 			}
 		}
 
+		public CalibrationData CalibrationData
+		{
+			get
+			{
+				if( m_CalibrationData == null ) {
+					m_CalibrationData = new CalibrationData();
+				}
+				return m_CalibrationData;
+			}
+			set
+			{
+				if( value != null ) {
+					m_CalibrationData = value;
+				}
+			}
+		}
+
 		public void AddPart( TopoDS_Shape newShape )
 		{
 			if( newShape == null || newShape.IsNull() ) {
@@ -184,6 +202,7 @@ namespace MyCAM.Data
 			ObjectMap.Clear();
 			PartIDList.Clear();
 			PathIDList.Clear();
+			ClearObjectCommandData();
 
 			// update all datas
 			foreach( var objectData in newPartObjectList ) {
@@ -191,6 +210,12 @@ namespace MyCAM.Data
 				PartIDList.Add( objectData.UID );
 			}
 			PartChanged?.Invoke();
+		}
+
+		void ClearObjectCommandData()
+		{
+			EntryAndExitData = new EntryAndExitData();
+			CalibrationData = new CalibrationData();
 		}
 
 		public void AddReferenceFeature( TopoDS_Shape newFeature )
@@ -463,6 +488,9 @@ namespace MyCAM.Data
 
 		// entry & exit data
 		EntryAndExitData m_EntryAndExitData = new EntryAndExitData();
+
+		// calibration data
+		CalibrationData m_CalibrationData = new CalibrationData();
 
 		// machine meshes
 		MachineMeshes m_MachineMeshes = new MachineMeshes();
