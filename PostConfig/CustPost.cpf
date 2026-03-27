@@ -7,16 +7,18 @@ G65 P"FileEnd";
 M30;
 
 <PathHeader>
-// Cutting{PathIndex}
-N{PathIndex}
-G65 P"LoadParameter" H{LayerIndex};
+G65 P"LASER_ON";
 
 <PathTail>
 G65 P"LASER_OFF";
 
 <StdPathHeader>
+
+<StdPathTail>
+
+<TraverseHeader>
 // Cutting{PathIndex}
 N{PathIndex}
 G65 P"LoadParameter" H{LayerIndex};
 
-<StdPathTail>
+<TraverseTail>

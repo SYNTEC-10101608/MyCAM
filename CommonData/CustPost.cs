@@ -1,4 +1,6 @@
-﻿namespace CommonData
+﻿using System.Collections.Generic;
+
+namespace CommonData
 {
 	public class CustPost
 	{
@@ -32,6 +34,16 @@
 			get;
 		} = string.Empty;
 
+		public string TraverseHeader
+		{
+			get;
+		} = string.Empty;
+
+		public string TraverseTail
+		{
+			get;
+		} = string.Empty;
+
 		// constructor with default content
 		public CustPost()
 		{
@@ -41,23 +53,57 @@
 			PathTail = DEFAULT_PathTail;
 			StdPathHeader = DEFAULT_StdPathHeader;
 			StdPathTail = DEFAULT_StdPathTail;
+			TraverseHeader = DEFAULT_TraverseHeader;
+			TraverseTail = DEFAULT_TraverseTail;
 		}
 
-		public CustPost( string header, string tail, string pathHeader, string pathTail, string stdPathHeader, string stdPathTail )
+		public CustPost( Dictionary<string, string> custPostMap)
 		{
-			Header = header;
-			Tail = tail;
-			PathHeader = pathHeader;
-			PathTail = pathTail;
-			StdPathHeader = stdPathHeader;
-			StdPathTail = stdPathTail;
+			if ( custPostMap.TryGetValue( EPostSection.Header.ToString(), out var headerContent ) ) {
+				Header = headerContent;
+			}
+			if ( custPostMap.TryGetValue( EPostSection.Tail.ToString(), out var tailContent ) ) {
+				Tail = tailContent;
+			}
+			if ( custPostMap.TryGetValue( EPostSection.PathHeader.ToString(), out var pathHeaderContent ) ) {
+				PathHeader = pathHeaderContent;
+			}
+			if ( custPostMap.TryGetValue( EPostSection.PathTail.ToString(), out var pathTailContent ) ) {
+				PathTail = pathTailContent;
+			}
+			if ( custPostMap.TryGetValue( EPostSection.StdPathHeader.ToString(), out var stdPathHeaderContent ) ) {
+				StdPathHeader = stdPathHeaderContent;
+			}
+			if ( custPostMap.TryGetValue( EPostSection.StdPathTail.ToString(), out var stdPathTailContent ) ) {
+				StdPathTail = stdPathTailContent;
+			}
+			if ( custPostMap.TryGetValue( EPostSection.TraverseHeader.ToString(), out var traverseHeaderContent ) ) {
+				TraverseHeader = traverseHeaderContent;
+			}
+			if ( custPostMap.TryGetValue( EPostSection.TraverseTail.ToString(), out var traverseTailContent ) ) {
+				TraverseTail = traverseTailContent;
+			}
 		}
 
-		public const string DEFAULT_Header = "%@MACRO\nG43.4 P1;\nG65 P\"FileStart\" X\"Material1\" Y\"1.0\";";
+		public const string DEFAULT_Header = "G43.4 P1;\nG65 P\"FileStart\" X\"Material1\" Y\"1.0\";";
 		public const string DEFAULT_Tail = "G65 P\"FileEnd\";\nM30;";
-		public const string DEFAULT_PathHeader = "// Cutting{PathIndex}\nN{PathIndex}\nG65 P\"LoadParameter\" H{LayerIndex};";
+		public const string DEFAULT_PathHeader = "G65 P\"LASER_ON\";";
 		public const string DEFAULT_PathTail = "G65 P\"LASER_OFF\";";
-		public const string DEFAULT_StdPathHeader = "// Cutting{PathIndex}\nN{PathIndex}\nG65 P\"LoadParameter\" H{LayerIndex};";
+		public const string DEFAULT_StdPathHeader = "";
 		public const string DEFAULT_StdPathTail = "";
+		public const string DEFAULT_TraverseHeader = "// Cutting{PathIndex}\nN{PathIndex}\nG65 P\"LoadParameter\" H{LayerIndex};";
+		public const string DEFAULT_TraverseTail = "";
+
+		public enum EPostSection
+		{
+			Header,
+			Tail,
+			PathHeader,
+			PathTail,
+			StdPathHeader,
+			StdPathTail,
+			TraverseHeader,
+			TraverseTail
+		}
 	}
 }

@@ -226,11 +226,17 @@ namespace MyCAM.Post
 				{ "LayerIndex", craftData.TechLayer.ToString() }
 			};
 
-			// header
-			CustPostWriter.WriteCustomizedSection( writer, MyApp.CustomizedPostInfo?.StdPathHeader, varDict );
+			// traverse header
+			CustPostWriter.WriteCustomizedSection( writer, MyApp.CustomizedPostInfo?.TraverseHeader, varDict );
 
 			// write traverse section
 			NCWriterHelper.WriteTraverse( writer, postData, masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
+
+			// traverse tail
+			CustPostWriter.WriteCustomizedSection( writer, MyApp.CustomizedPostInfo?.TraverseTail, varDict );
+
+			// header
+			CustPostWriter.WriteCustomizedSection( writer, MyApp.CustomizedPostInfo?.StdPathHeader, varDict );
 
 			// get strategy and write cutting code
 			IStdPatternNCStrategy strategy = StandardPatternNCStrategyFactory.GetStrategy( pathType );
