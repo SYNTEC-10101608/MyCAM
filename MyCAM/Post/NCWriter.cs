@@ -211,17 +211,20 @@ namespace MyCAM.Post
 				{ "LayerIndex", nLayIndex.ToString() }
 			};
 
-			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.PathHeader, varDict );
-
+			// traverse header
+			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.TraverseHeader, varDict );
 
 			// traverse from previous path to current path
 			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData,
 				m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
 
-			// start cutting
-			m_StreamWriter.WriteLine( "G65 P\"LASER_ON\";" );
+			// traverse tail
+			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.TraverseTail, varDict );
 
-			// write each process path
+			// path header			
+			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.PathHeader, varDict );
+
+			// start cutting, write each process path
 			WriteOneProcessPath( currentPathPostData.LeadInPostPointList );
 			WriteOneProcessPath( currentPathPostData.MainPathPostPointList );
 			WriteOneProcessPath( currentPathPostData.OverCutPostPointList );

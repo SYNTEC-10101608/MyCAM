@@ -15,12 +15,14 @@ namespace FileTranslator
 			// default values for each section
 			Dictionary<string, string> defaultContentDict = new Dictionary<string, string>()
 			{
-				{ "Header", CustPost.DEFAULT_Header },
-				{ "Tail", CustPost.DEFAULT_Tail },
-				{ "PathHeader", CustPost.DEFAULT_PathHeader },
-				{ "PathTail", CustPost.DEFAULT_PathTail },
-				{ "StdPathHeader", CustPost.DEFAULT_StdPathHeader },
-				{ "StdPathTail", CustPost.DEFAULT_StdPathTail }
+				{ CustPost.EPostSection.Header.ToString(), CustPost.DEFAULT_Header },
+				{ CustPost.EPostSection.Tail.ToString(), CustPost.DEFAULT_Tail },
+				{ CustPost.EPostSection.PathHeader.ToString(), CustPost.DEFAULT_PathHeader },
+				{ CustPost.EPostSection.PathTail.ToString(), CustPost.DEFAULT_PathTail },
+				{ CustPost.EPostSection.StdPathHeader.ToString(), CustPost.DEFAULT_StdPathHeader },
+				{ CustPost.EPostSection.StdPathTail.ToString(), CustPost.DEFAULT_StdPathTail },
+				{ CustPost.EPostSection.TraverseHeader.ToString(), CustPost.DEFAULT_TraverseHeader },
+				{ CustPost.EPostSection.TraverseTail.ToString(), CustPost.DEFAULT_TraverseTail }
 			};
 
 			// flag to indicate if all sections exist in txt
@@ -38,7 +40,7 @@ namespace FileTranslator
 					isAllExist = false;
 				}
 			}
-			custPost = new CustPost( defaultContentDict[ "Header" ], defaultContentDict[ "Tail" ], defaultContentDict[ "PathHeader" ], defaultContentDict[ "PathTail" ], defaultContentDict[ "StdPathHeader" ], defaultContentDict[ "StdPathTail" ] );
+			custPost = new CustPost( defaultContentDict );
 			return isAllExist;
 		}
 
