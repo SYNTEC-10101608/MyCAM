@@ -390,6 +390,7 @@ namespace MyCAM.Post
 			ISolverBuilder solverBuilder = CreateSolverBuilder( machineData );
 			m_FKSolver = solverBuilder.BuildFKSolver();
 			m_IKSolver = solverBuilder.BuildIKSolver();
+			m_MasterRotateDir = machineData.MasterRotateDir;
 		}
 
 		public IKSolveResult SolveIK( gp_Dir toolVec, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
@@ -437,6 +438,19 @@ namespace MyCAM.Post
 			return m_FKSolver.SolveToolVec( dM, dS );
 		}
 
+		public bool IsToolVecSingular( double dM_rad, double dS_rad )
+		{
+			gp_Dir toolVec = SolveToolVec( dM_rad, dS_rad );
+			if( toolVec == null || m_MasterRotateDir == null ) {
+				return false;
+			}
+
+			// check if tool vec is within tolerance of master rotate dir (singular point)
+			double angleTolerance_rad = SINGULAR_TOLERANCE_DEG * Math.PI / 180.0;
+			return toolVec.IsEqual( m_MasterRotateDir, angleTolerance_rad )
+				|| toolVec.IsOpposite( m_MasterRotateDir, angleTolerance_rad );
+		}
+
 		// solver builder factory
 		ISolverBuilder CreateSolverBuilder( MachineData machineData )
 		{
@@ -457,6 +471,9 @@ namespace MyCAM.Post
 
 		IKSolver m_IKSolver;
 		FKSolver m_FKSolver;
+		gp_Dir m_MasterRotateDir;
+
+		const double SINGULAR_TOLERANCE_DEG = 0.001;
 	}
 
 	internal interface ISolverBuilder

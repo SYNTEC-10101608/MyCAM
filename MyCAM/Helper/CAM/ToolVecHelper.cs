@@ -618,16 +618,50 @@ namespace MyCAM.Helper
 
 		public static Tuple<double, double> FlipRotaryAxis( double master_deg, double slave_deg, bool isMasterAxis, bool isPositive )
 		{
+			// check if current tool vector is at singular point
+			bool isSingular = IsSingular( master_deg, slave_deg );
+
 			double offset = isPositive ? 180 : -180;
 			if( isMasterAxis ) {
 				master_deg += offset;
-				slave_deg = -slave_deg;
+
+				// at singular point, the non-rotating axis keeps its value
+				if( !isSingular ) {
+					slave_deg = FlipNonRotatingAxis( slave_deg );
+				}
 			}
 			else {
-				master_deg = -master_deg;
 				slave_deg += offset;
+
+				// at singular point, the non-rotating axis keeps its value
+				if( !isSingular ) {
+					master_deg = FlipNonRotatingAxis( master_deg );
+				}
 			}
 			return new Tuple<double, double>( master_deg, slave_deg );
+		}
+
+		static bool IsSingular( double master_deg, double slave_deg )
+		{
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return false;
+			}
+			PostSolver postSolver = new PostSolver( machineData );
+			double dM_rad = master_deg * Math.PI / 180.0;
+			double dS_rad = slave_deg * Math.PI / 180.0;
+			return postSolver.IsToolVecSingular( dM_rad, dS_rad );
+		}
+
+		// flip non-rotating axis: 0 -> 180, ±180 -> 0, otherwise negate
+		static double FlipNonRotatingAxis( double value_deg )
+		{
+			if( Math.Abs( value_deg ) < FLIP_ZERO_TOLERANCE ) {
+				return 180;
+			}
+			if( Math.Abs( Math.Abs( value_deg ) - 180 ) < FLIP_ZERO_TOLERANCE ) {
+				return 0;
+			}
+			return -value_deg;
 		}
 
 		const double MAX_TILTED_ANGLE_DEG = 60.0;
@@ -635,6 +669,7 @@ namespace MyCAM.Helper
 		const double PROJECT_TOLERANCE = 1e-3;
 		const double RADIUS_TOLERANCE = 1e-3;
 		const double GEOM_TOLERANCE = 1e-3;
+		const double FLIP_ZERO_TOLERANCE = 1e-3;
 
 		const int CLOSED_POINT_INDEX = -1;
 
