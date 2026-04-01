@@ -69,6 +69,7 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.SwitchStartEnd += () => OnSwitchStartEnd();
 			m_ToolVecDlg.MoveIndex += ( isNext ) => OnMoveIndex( isNext );
 			m_ToolVecDlg.ToStartOrEnd += ( toStart ) => OnToStartOrEnd( toStart );
+			m_ToolVecDlg.FlipRotaryAxis += ( isPositive ) => OnFlipRotaryAxis( isPositive );
 			m_ToolVecDlg.EnableStartEndSwitch( false, false );
 			m_ToolVecDlg.Cancel += End;
 
@@ -325,6 +326,17 @@ namespace MyCAM.Editor
 				m_ToolVecParam.Slave_deg = slave_deg;
 			}
 			SetToolVecParamAndPeview();
+		}
+
+		void OnFlipRotaryAxis( bool isPositive )
+		{
+			if( m_ToolVecParam == null || m_SelectedPoint == null ) {
+				return;
+			}
+			Tuple<double, double> rotated = ToolVecHelper.FlipRotaryAxis(
+				m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg,
+				m_RotaryAxisConfig.RotaryAxis == ETypeOfRotaryAxis.Master, isPositive );
+			OnMSAngleChanged( rotated.Item1, rotated.Item2 );
 		}
 
 		void OnTypeChanged( EToolVecInterpolateType type )

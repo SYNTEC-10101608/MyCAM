@@ -616,6 +616,20 @@ namespace MyCAM.Helper
 			}
 		}
 
+		public static Tuple<double, double> FlipRotaryAxis( double master_deg, double slave_deg, bool isMasterAxis, bool isPositive )
+		{
+			double offset = isPositive ? 180 : -180;
+			if( isMasterAxis ) {
+				master_deg += offset;
+				slave_deg = -slave_deg;
+			}
+			else {
+				master_deg = -master_deg;
+				slave_deg += offset;
+			}
+			return new Tuple<double, double>( master_deg, slave_deg );
+		}
+
 		const double MAX_TILTED_ANGLE_DEG = 60.0;
 		const double BIG_AB_ANGLE = 999.0;
 		const double PROJECT_TOLERANCE = 1e-3;
