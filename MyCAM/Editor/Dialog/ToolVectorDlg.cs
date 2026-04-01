@@ -272,11 +272,13 @@ namespace MyCAM.Editor
 		void m_btnRotaryPos_Click( object sender, EventArgs e )
 		{
 			FlipRotaryAxis?.Invoke( true );
+			ResetToolVecParam( m_ToolVecParam );
 		}
 
 		void m_btnRotaryNeg_Click( object sender, EventArgs e )
 		{
 			FlipRotaryAxis?.Invoke( false );
+			ResetToolVecParam( m_ToolVecParam );
 		}
 
 		// index moving
