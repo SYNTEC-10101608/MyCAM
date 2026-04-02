@@ -46,7 +46,7 @@ namespace MyCAM.Post
 					bool isNeed = NeedToWriteCalibrationPnt( out CalibrationData calibrationData );
 					if( isNeed ) {
 						m_StreamWriter.WriteLine( $"G65 P\"REFPOINT_SET\" X1={calibrationData.Ref_Pnt1.x.ToString( "F3" )} Y1={calibrationData.Ref_Pnt1.y.ToString( "F3" )} Z1={calibrationData.Ref_Pnt1.z.ToString( "F3" )} X2={calibrationData.Ref_Pnt2.x.ToString( "F3" )} Y2={calibrationData.Ref_Pnt2.y.ToString( "F3" )} Z2={calibrationData.Ref_Pnt2.z.ToString( "F3" )} X3={calibrationData.Ref_Pnt3.x.ToString( "F3" )} Y3={calibrationData.Ref_Pnt3.y.ToString( "F3" )} Z3={calibrationData.Ref_Pnt3.z.ToString( "F3" )};" );
-						m_StreamWriter.WriteLine( $"G65 P\"CALPOINT_SET\" X1=0.000 Y1=0.000 Z1=0.000 X2=0.000 Y2=0.000 Z2=0.000 X3=0.000 Y3=0.000 Z3=0.000" );
+						m_StreamWriter.WriteLine( $"G65 P\"CALPOINT_SET\" X1=0.000 Y1=0.000 Z1=0.000 X2=0.000 Y2=0.000 Z2=0.000 X3=0.000 Y3=0.000 Z3=0.000;" );
 					}
 
 					// file header
