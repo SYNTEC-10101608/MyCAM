@@ -252,9 +252,10 @@ namespace MyCAM.Helper
 
 		static bool IsOverCalAngle( gp_Dir dirA, gp_Dir dirB )
 		{
+			// rad will be in 0~PI
 			double dAngleRad = dirA.Angle( dirB );
 			double dSingleDeg = dAngleRad * 180 / Math.PI;
-			if( dSingleDeg > MAX_TILTED_ANGLE_DEG ) {
+			if( dSingleDeg - MAX_TILTED_ANGLE_DEG > GEOM_TOLERANCE ) {
 				return true;
 			}
 			return false;
