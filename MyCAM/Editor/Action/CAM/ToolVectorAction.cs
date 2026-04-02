@@ -69,6 +69,7 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.SwitchStartEnd += () => OnSwitchStartEnd();
 			m_ToolVecDlg.MoveIndex += ( isNext ) => OnMoveIndex( isNext );
 			m_ToolVecDlg.ToStartOrEnd += ( toStart ) => OnToStartOrEnd( toStart );
+			m_ToolVecDlg.FlipRotaryAxis += ( isPositive ) => OnFlipRotaryAxis( isPositive );
 			m_ToolVecDlg.EnableStartEndSwitch( false, false );
 			m_ToolVecDlg.Cancel += End;
 
@@ -327,6 +328,15 @@ namespace MyCAM.Editor
 			SetToolVecParamAndPeview();
 		}
 
+		void OnFlipRotaryAxis( bool isPositive )
+		{
+			if( m_ToolVecParam == null || m_SelectedPoint == null ) {
+				return;
+			}
+			Tuple<double, double> rotated = ToolVecHelper.FlipRotaryAxis( m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, isPositive );
+			OnMSAngleChanged( rotated.Item1, rotated.Item2 );
+		}
+
 		void OnTypeChanged( EToolVecInterpolateType type )
 		{
 			m_InterpolateType = type;
@@ -513,10 +523,10 @@ namespace MyCAM.Editor
 			config.MasterName = ConvertRotaryAxisName( machineData.MasterRotaryAxis );
 			config.SlaveName = ConvertRotaryAxisName( machineData.SlaveRotaryAxis );
 			if( machineData.FiveAxisType == FiveAxisType.Table || machineData.FiveAxisType == FiveAxisType.Mix ) {
-				config.RotaryAxis = ETypeOfRotaryAxis.Slave;
+				config.RotaryAxisName = config.SlaveName;
 			}
 			else {
-				config.RotaryAxis = ETypeOfRotaryAxis.Master;
+				config.RotaryAxisName = config.MasterName;
 			}
 			return config;
 		}
