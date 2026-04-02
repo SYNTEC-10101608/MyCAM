@@ -618,11 +618,20 @@ namespace MyCAM.Helper
 
 		public static Tuple<double, double> FlipRotaryAxis( double master_deg, double slave_deg, bool isPositive )
 		{
+			// Get machine data to determine which axis is rotary (±180)
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return new Tuple<double, double>( master_deg, slave_deg );
+			}
+
 			// check if current tool vector is at singular point
 			bool isSingular = IsSingular( master_deg, slave_deg );
 
-			// temp
-			bool isMasterAxis = true;
+			// Spindle: master ±180, Table/Mix: slave ±180
+			bool isMasterAxis = machineData.FiveAxisType == FiveAxisType.Spindle;
+
+			// Determine if ToolDir is parallel to the rotary axis direction
+			gp_Dir rotaryDir = isMasterAxis ? machineData.MasterRotateDir : machineData.SlaveRotateDir;
+			bool isToolDirParallelToRotary = machineData.ToolDir.IsParallel( rotaryDir, PARALLEL_TOLERANCE );
 
 			double offset = isPositive ? 180 : -180;
 			if( isMasterAxis ) {
@@ -630,7 +639,7 @@ namespace MyCAM.Helper
 
 				// at singular point, the non-rotating axis keeps its value
 				if( !isSingular ) {
-					slave_deg = FlipNonRotatingAxis( slave_deg );
+					slave_deg = FlipNonRotatingAxis( slave_deg, isToolDirParallelToRotary );
 				}
 			}
 			else {
@@ -638,7 +647,7 @@ namespace MyCAM.Helper
 
 				// at singular point, the non-rotating axis keeps its value
 				if( !isSingular ) {
-					master_deg = FlipNonRotatingAxis( master_deg );
+					master_deg = FlipNonRotatingAxis( master_deg, isToolDirParallelToRotary );
 				}
 			}
 			return new Tuple<double, double>( master_deg, slave_deg );
@@ -655,16 +664,23 @@ namespace MyCAM.Helper
 			return postSolver.IsToolVecSingular( dM_rad, dS_rad );
 		}
 
-		// flip non-rotating axis: 0 -> 180, ±180 -> 0, otherwise negate
-		static double FlipNonRotatingAxis( double value_deg )
+		// flip non-rotating axis based on ToolDir and rotary axis relationship
+		// isParallel = true  (X-mirror): v -> -v
+		// isParallel = false (Y-mirror): v -> sign(v)*180 - v
+		static double FlipNonRotatingAxis( double value_deg, bool isParallel )
 		{
+			// X-mirror: negate the value
+			if( isParallel ) {
+				return -value_deg;
+			}
+
+			// Y-mirror: supplementary angle
+			// handle zero case explicitly to avoid sign ambiguity
 			if( Math.Abs( value_deg ) < FLIP_ZERO_TOLERANCE ) {
-				return 180;
+				return 180.0;
 			}
-			if( Math.Abs( Math.Abs( value_deg ) - 180 ) < FLIP_ZERO_TOLERANCE ) {
-				return 0;
-			}
-			return -value_deg;
+			double sign = value_deg > 0 ? 1.0 : -1.0;
+			return sign * 180.0 - value_deg;
 		}
 
 		const double MAX_TILTED_ANGLE_DEG = 60.0;
@@ -673,6 +689,7 @@ namespace MyCAM.Helper
 		const double RADIUS_TOLERANCE = 1e-3;
 		const double GEOM_TOLERANCE = 1e-3;
 		const double FLIP_ZERO_TOLERANCE = 1e-3;
+		const double PARALLEL_TOLERANCE = 1e-3;
 
 		const int CLOSED_POINT_INDEX = -1;
 
