@@ -333,9 +333,7 @@ namespace MyCAM.Editor
 			if( m_ToolVecParam == null || m_SelectedPoint == null ) {
 				return;
 			}
-			Tuple<double, double> rotated = ToolVecHelper.FlipRotaryAxis(
-				m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg,
-				m_RotaryAxisConfig.RotaryAxis == ETypeOfRotaryAxis.Master, isPositive );
+			Tuple<double, double> rotated = ToolVecHelper.FlipRotaryAxis( m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, isPositive );
 			OnMSAngleChanged( rotated.Item1, rotated.Item2 );
 		}
 
@@ -525,10 +523,10 @@ namespace MyCAM.Editor
 			config.MasterName = ConvertRotaryAxisName( machineData.MasterRotaryAxis );
 			config.SlaveName = ConvertRotaryAxisName( machineData.SlaveRotaryAxis );
 			if( machineData.FiveAxisType == FiveAxisType.Table || machineData.FiveAxisType == FiveAxisType.Mix ) {
-				config.RotaryAxis = ETypeOfRotaryAxis.Slave;
+				config.RotaryAxisName = config.SlaveName;
 			}
 			else {
-				config.RotaryAxis = ETypeOfRotaryAxis.Master;
+				config.RotaryAxisName = config.MasterName;
 			}
 			return config;
 		}

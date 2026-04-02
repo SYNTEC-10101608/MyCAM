@@ -616,10 +616,13 @@ namespace MyCAM.Helper
 			}
 		}
 
-		public static Tuple<double, double> FlipRotaryAxis( double master_deg, double slave_deg, bool isMasterAxis, bool isPositive )
+		public static Tuple<double, double> FlipRotaryAxis( double master_deg, double slave_deg, bool isPositive )
 		{
 			// check if current tool vector is at singular point
 			bool isSingular = IsSingular( master_deg, slave_deg );
+
+			// temp
+			bool isMasterAxis = true;
 
 			double offset = isPositive ? 180 : -180;
 			if( isMasterAxis ) {

@@ -32,14 +32,8 @@ namespace MyCAM.Editor
 			m_RotaryAxisConfig = config;
 			m_lblMaster.Text = m_RotaryAxisConfig.MasterName;
 			m_lblSlave.Text = m_RotaryAxisConfig.SlaveName;
-			if( m_RotaryAxisConfig.RotaryAxis == ETypeOfRotaryAxis.Master ) {
-				m_btnRotaryPos.Text = m_RotaryAxisConfig.MasterName + " +";
-				m_btnRotaryNeg.Text = m_RotaryAxisConfig.MasterName + " -";
-			}
-			else {
-				m_btnRotaryPos.Text = m_RotaryAxisConfig.SlaveName + " +";
-				m_btnRotaryNeg.Text = m_RotaryAxisConfig.SlaveName + " -";
-			}
+			m_btnRotaryPos.Text = m_RotaryAxisConfig.RotaryAxisName + " +";
+			m_btnRotaryNeg.Text = m_RotaryAxisConfig.RotaryAxisName + " -";
 		}
 
 		public void ResetType( EToolVecInterpolateType type )
@@ -384,16 +378,10 @@ namespace MyCAM.Editor
 		}
 	}
 
-	// to determin which is the rotating one
-	public enum ETypeOfRotaryAxis
-	{
-		Master,
-		Slave,
-	}
-
 	public class RotaryAxisConfig
 	{
-		public ETypeOfRotaryAxis RotaryAxis
+		// the one can be flipped by +-180
+		public string RotaryAxisName
 		{
 			get; set;
 		}
