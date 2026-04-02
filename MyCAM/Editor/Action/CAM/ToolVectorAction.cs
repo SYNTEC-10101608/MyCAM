@@ -397,7 +397,7 @@ namespace MyCAM.Editor
 		{
 			if( angleA_deg < MIN_TiltAngle || angleA_deg > MAX_TiltAngle ||
 				angleB_deg < MIN_TiltAngle || angleB_deg > MAX_TiltAngle ) {
-				MyApp.Logger.ShowOnLogPanel( "傾角值過大，角度必須在 -60~+60 範圍內", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( "傾角值過大，角度必須在 -90~+90 範圍內", MyApp.NoticeType.Warning );
 				return false;
 			}
 			return true;
@@ -563,8 +563,8 @@ namespace MyCAM.Editor
 		ToolVectorDlg m_ToolVecDlg = null;
 
 		// angle limit
-		public const double MAX_TiltAngle = 60.0;
-		public const double MIN_TiltAngle = -60.0;
+		public const double MAX_TiltAngle = 90.0;
+		public const double MIN_TiltAngle = -90.0;
 
 		// null select index as -999, -1 is used for closed point index
 		const int NULL_SELECT_INDEX = -999;
