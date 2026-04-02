@@ -390,6 +390,14 @@ namespace MyCAM.Post
 			ISolverBuilder solverBuilder = CreateSolverBuilder( machineData );
 			m_FKSolver = solverBuilder.BuildFKSolver();
 			m_IKSolver = solverBuilder.BuildIKSolver();
+
+			// for type with table, the mathematical master and slave axis are reversed
+			if( machineData.FiveAxisType == FiveAxisType.Table || machineData.FiveAxisType == FiveAxisType.Mix ) {
+				m_MathmeticalMasterDir = machineData.SlaveRotateDir;
+			}
+			else {
+				m_MathmeticalMasterDir = machineData.MasterRotateDir;
+			}
 		}
 
 		public IKSolveResult SolveIK( gp_Dir toolVec, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
@@ -437,6 +445,19 @@ namespace MyCAM.Post
 			return m_FKSolver.SolveToolVec( dM, dS );
 		}
 
+		public bool IsToolVecSingular( double dM_rad, double dS_rad )
+		{
+			gp_Dir toolVec = SolveToolVec( dM_rad, dS_rad );
+			if( toolVec == null || m_MathmeticalMasterDir == null ) {
+				return false;
+			}
+
+			// check if tool vec is within tolerance of master rotate dir (singular point)
+			double angleTolerance_rad = SINGULAR_TOLERANCE_DEG * Math.PI / 180.0;
+			return toolVec.IsEqual( m_MathmeticalMasterDir, angleTolerance_rad )
+				|| toolVec.IsOpposite( m_MathmeticalMasterDir, angleTolerance_rad );
+		}
+
 		// solver builder factory
 		ISolverBuilder CreateSolverBuilder( MachineData machineData )
 		{
@@ -457,6 +478,11 @@ namespace MyCAM.Post
 
 		IKSolver m_IKSolver;
 		FKSolver m_FKSolver;
+
+		// u can say: mathmatical master, the rotary axus, the one may have infinity of solution...
+		gp_Dir m_MathmeticalMasterDir;
+
+		const double SINGULAR_TOLERANCE_DEG = 0.001;
 	}
 
 	internal interface ISolverBuilder
