@@ -55,6 +55,57 @@ namespace MyCAM.Data
 		}
 	}
 
+	public class ToolVecModifyData2
+	{
+		public double RA_deg
+		{
+			get; set;
+		}
+
+		public double RB_deg
+		{
+			get; set;
+		}
+
+		public double Master_deg
+		{
+			get; set;
+		}
+
+		public double Slave_deg
+		{
+			get; set;
+		}
+
+		public EToolVecInterpolateType InterpolateType
+		{
+			get; set;
+		} = EToolVecInterpolateType.Normal;
+
+		public ToolVecModifyData2()
+		{
+			RA_deg = 0;
+			RB_deg = 0;
+			Master_deg = 0;
+			Slave_deg = 0;
+		}
+
+		public ToolVecModifyData2( double ra_deg, double rb_deg, double master_deg, double slave_deg, EToolVecInterpolateType interpolateType )
+		{
+			RA_deg = ra_deg;
+			RB_deg = rb_deg;
+			Master_deg = master_deg;
+			Slave_deg = slave_deg;
+			InterpolateType = interpolateType;
+		}
+
+		public ToolVecModifyData2 Clone()
+		{
+			return new ToolVecModifyData2( RA_deg, RB_deg, Master_deg, Slave_deg, InterpolateType );
+		}
+	}
+
+
 	public class CraftData
 	{
 		public CraftData()
@@ -255,6 +306,14 @@ namespace MyCAM.Data
 			}
 		}
 
+		public Dictionary<int, ToolVecModifyData2> ToolVecModifyMap2
+		{
+			get
+			{
+				return m_ToolVecModifyMap2;
+			}
+		}
+
 		public TraverseData TraverseData
 		{
 			get
@@ -323,6 +382,7 @@ namespace MyCAM.Data
 		double m_OverCutLength = 0;
 		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.Normal;
 		Dictionary<int, ToolVecModifyData> m_ToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
+		Dictionary<int, ToolVecModifyData2> m_ToolVecModifyMap2 = new Dictionary<int, ToolVecModifyData2>();
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();
