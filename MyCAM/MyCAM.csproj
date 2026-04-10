@@ -65,6 +65,7 @@
       <DependentUpon>ConnectDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Data\Craft\CalibrationData.cs" />
+    <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
     <Compile Include="Editor\Action\CAM\CalibrationREFAction.cs" />
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />

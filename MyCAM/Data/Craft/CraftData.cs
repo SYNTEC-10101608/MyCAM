@@ -1,6 +1,7 @@
 ﻿using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -306,7 +307,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		public Dictionary<int, ToolVecModifyData2> ToolVecModifyMap2
+		public ToolVecModifyMap ToolVecModifyMap2
 		{
 			get
 			{
@@ -338,21 +339,21 @@ namespace MyCAM.Data
 		}
 
 		// API for outside modification
-		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg, double master_deg, double slave_deg )
+		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg, double master_deg, double slave_deg, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
 		{
-			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				m_ToolVecModifyMap[ index ] = new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg );
+			if( m_ToolVecModifyMap2.ContainsKey( index ) ) {
+				m_ToolVecModifyMap2[ index ] = new ToolVecModifyData2( dRA_deg, dRB_deg, master_deg, slave_deg, m_ToolVecModifyMap2[ index ].InterpolateType );
 			}
 			else {
-				m_ToolVecModifyMap.Add( index, new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg ) );
+				m_ToolVecModifyMap2.Add( index, new ToolVecModifyData2( dRA_deg, dRB_deg, master_deg, slave_deg, interpolateType ) );
 			}
 			CAMFactorChanged?.Invoke();
 		}
 
 		public void RemoveToolVecModify( int index )
 		{
-			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				m_ToolVecModifyMap.Remove( index );
+			if( m_ToolVecModifyMap2.ContainsKey( index ) ) {
+				m_ToolVecModifyMap2.Remove( index );
 			}
 			CAMFactorChanged?.Invoke();
 		}
@@ -382,10 +383,12 @@ namespace MyCAM.Data
 		double m_OverCutLength = 0;
 		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.Normal;
 		Dictionary<int, ToolVecModifyData> m_ToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
-		Dictionary<int, ToolVecModifyData2> m_ToolVecModifyMap2 = new Dictionary<int, ToolVecModifyData2>();
+		ToolVecModifyMap m_ToolVecModifyMap2 = new ToolVecModifyMap();
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();
 		double m_CompensatedDistance = 0;
 	}
+
+	
 }
