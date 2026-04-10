@@ -10,7 +10,7 @@ namespace MyCAM.Helper
 	public static class ToolVecHelper
 	{
 		public static void SetToolVec( ref List<ISetToolVecPoint> toolVecPointList,
-			Dictionary<int, ToolVecModifyData> toolVecModifyMap, bool isClosed, EToolVecInterpolateType interpolateType )
+			Dictionary<int, ToolVecModifyData2> toolVecModifyMap, bool isClosed, EToolVecInterpolateType interpolateType )
 		{
 			// arrange the map for closed path
 			if( isClosed ) {
@@ -104,7 +104,7 @@ namespace MyCAM.Helper
 		}
 
 		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList,
-			IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap,
+			IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap,
 			EToolVecInterpolateType interpolateType )
 		{
 			if( toolVecModifyMap.Count == 0 ) {
@@ -122,7 +122,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static List<MSAngle> GetIntervalMSAngles( List<Tuple<int, int>> interpolateIntervalList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
+		static List<MSAngle> GetIntervalMSAngles( List<Tuple<int, int>> interpolateIntervalList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap )
 		{
 			List<MSAngle> result = new List<MSAngle>();
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
@@ -140,7 +140,7 @@ namespace MyCAM.Helper
 			return result;
 		}
 
-		static List<TiltABAngle> GetIntervalABAngles( List<Tuple<int, int>> interpolateIntervalList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
+		static List<TiltABAngle> GetIntervalABAngles( List<Tuple<int, int>> interpolateIntervalList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap )
 		{
 			List<TiltABAngle> result = new List<TiltABAngle>();
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
@@ -158,7 +158,7 @@ namespace MyCAM.Helper
 
 
 		static List<Tuple<int, int>> GetInterpolateIntervalList(
-			IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
+			IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap )
 		{
 			// sort the modify data by index
 			List<int> indexInOrder = toolVecModifyMap.Keys.ToList();
@@ -261,7 +261,7 @@ namespace MyCAM.Helper
 			return false;
 		}
 
-		static void ApplyMSAngleInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
+		static void ApplyMSAngleInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap )
 		{
 			// get the interpolate interval list
 			List<Tuple<int, int>> interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap );
@@ -282,7 +282,7 @@ namespace MyCAM.Helper
 			return;
 		}
 
-		static void ApplyTiltAngleInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
+		static void ApplyTiltAngleInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap )
 		{
 			// get the interpolate interval list
 			List<Tuple<int, int>> interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap );
@@ -302,7 +302,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static void SolveAllPathIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
+		static void SolveAllPathIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap )
 		{
 			// Get machine data
 			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
@@ -665,19 +665,19 @@ namespace MyCAM.Helper
 			return new gp_Dir( Vx, Vy, Vz );
 		}
 
-		static void ArrageMapForClosedPath( ref Dictionary<int, ToolVecModifyData> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList )
+		static void ArrageMapForClosedPath( ref Dictionary<int, ToolVecModifyData2> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList )
 		{
 			if( !toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) ) {
 				return;
 			}
 
 			// reset CLOSED_POINT_INDEX to last index
-			ToolVecModifyData closedPointData = toolVecModifyMap[ CLOSED_POINT_INDEX ];
+			ToolVecModifyData2 closedPointData = toolVecModifyMap[ CLOSED_POINT_INDEX ];
 			toolVecModifyMap.Remove( CLOSED_POINT_INDEX );
 			toolVecModifyMap[ toolVecPointList.Count - 1 ] = closedPointData;
 		}
 
-		static void AddStartAndEndIndex( ref Dictionary<int, ToolVecModifyData> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList, bool isClosed )
+		static void AddStartAndEndIndex( ref Dictionary<int, ToolVecModifyData2> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList, bool isClosed )
 		{
 			// add index 0 if not exist
 			int lastIndex = toolVecPointList.Count - 1;
@@ -688,7 +688,7 @@ namespace MyCAM.Helper
 					toolVecModifyMap[ 0 ] = toolVecModifyMap[ lastIndex ].Clone();
 					return;
 				}
-				toolVecModifyMap[ 0 ] = new ToolVecModifyData()
+				toolVecModifyMap[ 0 ] = new ToolVecModifyData2()
 				{
 					RA_deg = 0,
 					RB_deg = 0,
@@ -705,7 +705,7 @@ namespace MyCAM.Helper
 					toolVecModifyMap[ lastIndex ] = toolVecModifyMap[ 0 ].Clone();
 					return;
 				}
-				toolVecModifyMap[ lastIndex ] = new ToolVecModifyData()
+				toolVecModifyMap[ lastIndex ] = new ToolVecModifyData2()
 				{
 					RA_deg = 0,
 					RB_deg = 0,

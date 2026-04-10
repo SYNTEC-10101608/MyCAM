@@ -195,7 +195,7 @@ namespace MyCAM.PathCache
 
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
-			Dictionary<int, ToolVecModifyData> toolVecModifyMap = GetToolVecModifyMap();
+			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = GetToolVecModifyMap();
 			ToolVecHelper.SetToolVec( ref toolVecPointList, toolVecModifyMap, m_IsClose, m_CraftData.InterpolateType );
 
 			// set over cut
@@ -220,16 +220,16 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		Dictionary<int, ToolVecModifyData> GetToolVecModifyMap()
+		Dictionary<int, ToolVecModifyData2> GetToolVecModifyMap()
 		{
-			Dictionary<int, ToolVecModifyData> toolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
-			foreach( int oneIndex in m_CraftData.ToolVecModifyMap.Keys ) {
+			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = new Dictionary<int, ToolVecModifyData2>();
+			foreach( int oneIndex in m_CraftData.ToolVecModifyMap2.Keys ) {
 				if( m_CADToCAMIndexMap.ContainsKey( oneIndex ) ) {
 					int camIndex = m_CADToCAMIndexMap[ oneIndex ];
-					toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
+					toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap2[ oneIndex ].Clone();
 				}
 				else if( oneIndex == CLOSED_POINT_INDEX && m_IsClose ) {
-					toolVecModifyMap[ oneIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
+					toolVecModifyMap[ oneIndex ] = m_CraftData.ToolVecModifyMap2[ oneIndex ].Clone();
 				}
 			}
 			return toolVecModifyMap;
