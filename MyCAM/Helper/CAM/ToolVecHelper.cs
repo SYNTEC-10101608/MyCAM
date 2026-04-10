@@ -681,9 +681,11 @@ namespace MyCAM.Helper
 		{
 			// add index 0 if not exist
 			int lastIndex = toolVecPointList.Count - 1;
+
+			// first point is not modify point
 			if( !toolVecModifyMap.ContainsKey( 0 ) ) {
 
-				// if close and last index exist, copy the data
+				// if close and last index exist, copy the vector data but interpolate type is set as same as next index
 				if( isClosed && toolVecModifyMap.ContainsKey( lastIndex ) ) {
 					toolVecModifyMap[ 0 ] = toolVecModifyMap[ lastIndex ].Clone();
 					return;

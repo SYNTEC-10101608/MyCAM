@@ -70,6 +70,18 @@ namespace MyCAM.Editor
 			m_lblStartOrEnd.Text = start ? "當前位置：起點" : "當前位置：終點";
 		}
 
+		public void LockCbx( bool isNeedLock, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
+		{
+			if( isNeedLock ) {
+				m_cbxInterpolateType.SelectedIndex = -1;
+				m_cbxInterpolateType.Enabled = false;
+				return;
+			}
+			m_cbxInterpolateType.Enabled = true;
+			m_cbxInterpolateType.SelectedIndex = (int)interpolateType;
+
+		}
+
 
 		// UI event - interpolate type changed
 		void m_cbxInterpolateType_SelectedIndexChanged( object sender, EventArgs e )

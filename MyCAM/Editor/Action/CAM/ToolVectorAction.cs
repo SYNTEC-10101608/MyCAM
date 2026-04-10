@@ -13,6 +13,7 @@ using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -160,12 +161,15 @@ namespace MyCAM.Editor
 				m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
 
 				// check is at start or end point for closed path
-				bool start = m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() && m_DataHandler.IsClosed();
-				bool end = m_nSelectIndex == CLOSED_POINT_INDEX && m_DataHandler.IsClosed();
-				m_ToolVecDlg.EnableStartEndSwitch( start || end, start );
+				m_IsStartPnt = m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() && m_DataHandler.IsClosed();
+				m_IsEndPnt = m_nSelectIndex == CLOSED_POINT_INDEX && m_DataHandler.IsClosed();
+				m_ToolVecDlg.EnableStartEndSwitch( m_IsStartPnt || m_IsEndPnt, m_IsStartPnt );
 			}
+			UIProtection();
 			RefreshSimuResult();
 		}
+		bool m_IsStartPnt;
+		bool m_IsEndPnt;
 
 		void LockSelectedVertexHighLight( TopoDS_Shape selectedVertex )
 		{
@@ -340,7 +344,13 @@ namespace MyCAM.Editor
 		void OnTypeChanged( EToolVecInterpolateType type )
 		{
 			m_InterpolateType = type;
-			SetToolVecParamAndPeview( true );
+			SetInterpolationMode();
+		}
+
+		void SetInterpolationMode()
+		{
+			GetNextModfiyIndexInterpolate( out int NextDataIndex );
+			m_CraftData.ToolVecModifyMap2[ NextDataIndex ].InterpolateType = m_InterpolateType;
 		}
 
 		void OnAddEditIndex()
@@ -403,6 +413,17 @@ namespace MyCAM.Editor
 			return true;
 		}
 
+		void UIProtection()
+		{
+			if( m_IsStartPnt || m_IsEndPnt || m_SelectedPoint.IsToolVecModPoint ) {
+				m_ToolVecDlg.LockCbx( true );
+				return;
+			}
+			EToolVecInterpolateType interpolateType = GetNextModfiyIndexInterpolate(out int NextDataIndex);
+			m_ToolVecDlg.LockCbx( false, interpolateType );
+
+		}
+
 		// update
 		void SetToolVecParamAndPeview( bool bForceUpdate = false )
 		{
@@ -415,6 +436,8 @@ namespace MyCAM.Editor
 			if( m_SelectedPoint != null && m_nSelectIndex != NULL_SELECT_INDEX ) {
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 			}
+
+			UIProtection();
 		}
 
 		void SetIndexAngleParam()
@@ -429,9 +452,63 @@ namespace MyCAM.Editor
 				return;
 			}
 
+
+			// find next modified point index
+			EToolVecInterpolateType interpolateType = GetNextModfiyIndexInterpolate(out int NextDataIndex);
 			// set modify data
 			m_CraftData.SetToolVecModify( m_nSelectIndex,
-				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg );
+				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, interpolateType );
+		}
+
+		EToolVecInterpolateType GetNextModfiyIndexInterpolate(out int key)
+		{
+			ToolVecModifyData2 candidate = null;
+			 key =-1;
+
+			if( m_CraftData.IsPathReverse == false ) {
+				// find the smallest key > m_nSelectIndex
+				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
+					if( kvp.Key > m_nSelectIndex ) {
+						candidate = kvp.Value;
+						key = kvp.Key;
+						break;
+					}
+				}
+
+				// fallback: find the smallest key < m_nSelectIndex (first item in sorted order that is less)
+				if( candidate == null ) {
+					foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
+						if( kvp.Key < m_nSelectIndex ) {
+							candidate = kvp.Value;
+							key = kvp.Key;
+							break;
+						}
+					}
+				}
+			}
+			else {
+				// reversed path: find the largest key < m_nSelectIndex
+				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
+					if( kvp.Key < m_nSelectIndex ) {
+						key = kvp.Key;
+						candidate = kvp.Value; // keep updating; sorted ascending, so last match is the largest
+					}
+					else {
+						break;
+					}
+				}
+
+				// fallback: find the largest key > m_nSelectIndex
+				if( candidate == null ) {
+					foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
+						if( kvp.Key > m_nSelectIndex ) {
+							key = kvp.Key;
+							candidate = kvp.Value; // keep updating to get the largest
+						}
+					}
+				}
+			}
+			return candidate != null ? candidate.InterpolateType : EToolVecInterpolateType.Normal;
 		}
 
 		void RefreshSimuResult()
