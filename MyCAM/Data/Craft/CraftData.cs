@@ -7,7 +7,7 @@ namespace MyCAM.Data
 {
 	public enum EToolVecInterpolateType
 	{
-		Normal,
+		Normal = 0,
 		VectorInterpolation,
 		TiltAngleInterpolation,
 	}

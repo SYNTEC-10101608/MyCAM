@@ -57,7 +57,7 @@ namespace MyCAM.Editor
 			m_ToolVecParam = null;
 
 			// init dialog
-			m_ToolVecDlg = new ToolVectorDlg( m_CraftData.InterpolateType, m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );
+			m_ToolVecDlg = new m_lblInter( m_CraftData.InterpolateType, m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );
 			m_ToolVecDlg.SetKeep += () => OnSetKeep();
 			m_ToolVecDlg.SetZdir += () => OnSetZDir();
 			m_ToolVecDlg.SetRevert += () => OnSetRevert();
@@ -406,7 +406,6 @@ namespace MyCAM.Editor
 		// update
 		void SetToolVecParamAndPeview( bool bForceUpdate = false )
 		{
-			SetInterpolateType();
 			SetIndexAngleParam();
 
 			// trigger viewer refresh
@@ -416,11 +415,6 @@ namespace MyCAM.Editor
 			if( m_SelectedPoint != null && m_nSelectIndex != NULL_SELECT_INDEX ) {
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 			}
-		}
-
-		void SetInterpolateType()
-		{
-			m_CraftData.InterpolateType = m_InterpolateType;
 		}
 
 		void SetIndexAngleParam()
@@ -560,7 +554,7 @@ namespace MyCAM.Editor
 		// action data
 		List<string> m_PathIDList = null;
 		AIS_Shape m_KeepedHighLightPoint = null;
-		ToolVectorDlg m_ToolVecDlg = null;
+		m_lblInter m_ToolVecDlg = null;
 
 		// angle limit
 		public const double MAX_TiltAngle = 90.0;
