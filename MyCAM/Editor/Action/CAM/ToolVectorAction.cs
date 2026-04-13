@@ -13,7 +13,6 @@ using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -350,7 +349,26 @@ namespace MyCAM.Editor
 		void SetInterpolationMode()
 		{
 			GetNextModfiyIndexInterpolate( out int NextDataIndex );
-			m_CraftData.ToolVecModifyMap2[ NextDataIndex ].InterpolateType = m_InterpolateType;
+			int nNextModifyIdx = GetNextModifyIndex();
+			if( m_CraftData.ToolVecModifyMap2.ContainsKey( nNextModifyIdx ) ) {
+				m_CraftData.ToolVecModifyMap2[ NextDataIndex ].InterpolateType = m_InterpolateType;
+			}
+			else {
+				if( nNextModifyIdx == CLOSED_POINT_INDEX ) {
+
+					bool isModified = m_DataHandler.GetToolVecModify( CLOSED_POINT_INDEX, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
+					ToolVecParam toolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModified );
+
+					ToolVecModifyData2 toolVecModifyData = new ToolVecModifyData2
+					{
+						RA_deg = 0,
+						RB_deg = 0,
+						Master_deg = master_deg,
+						Slave_deg = slave_deg,
+					};
+					m_CraftData.ToolVecModifyMap2.Add( CLOSED_POINT_INDEX, toolVecModifyData );
+				}
+			}
 		}
 
 		void OnAddEditIndex()
@@ -419,7 +437,7 @@ namespace MyCAM.Editor
 				m_ToolVecDlg.LockCbx( true );
 				return;
 			}
-			EToolVecInterpolateType interpolateType = GetNextModfiyIndexInterpolate(out int NextDataIndex);
+			EToolVecInterpolateType interpolateType = GetNextModfiyIndexInterpolate( out int NextDataIndex );
 			m_ToolVecDlg.LockCbx( false, interpolateType );
 
 		}
@@ -454,61 +472,101 @@ namespace MyCAM.Editor
 
 
 			// find next modified point index
-			EToolVecInterpolateType interpolateType = GetNextModfiyIndexInterpolate(out int NextDataIndex);
+			EToolVecInterpolateType interpolateType = GetPreModifyIndexInterpolate( out int NextDataIndex );
 			// set modify data
 			m_CraftData.SetToolVecModify( m_nSelectIndex,
 				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, interpolateType );
 		}
 
-		EToolVecInterpolateType GetNextModfiyIndexInterpolate(out int key)
+		EToolVecInterpolateType GetPreModifyIndexInterpolate( out int key )
 		{
 			ToolVecModifyData2 candidate = null;
-			 key =-1;
+			key = -1;
+			int nStartIndex = m_DataHandler.GetStartPointCADIndex();
 
-			if( m_CraftData.IsPathReverse == false ) {
-				// find the smallest key > m_nSelectIndex
+
+			// 這個點在起點之前
+			if( m_nSelectIndex < nStartIndex ) {
+
+				// 找0~當前這個點之前最大的
 				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-					if( kvp.Key > m_nSelectIndex ) {
-						candidate = kvp.Value;
+					if( kvp.Key < m_nSelectIndex && kvp.Key > 0 ) {
 						key = kvp.Key;
-						break;
+						candidate = kvp.Value;
 					}
 				}
 
-				// fallback: find the smallest key < m_nSelectIndex (first item in sorted order that is less)
 				if( candidate == null ) {
+					// 起點到最尾端中最大的
 					foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-						if( kvp.Key < m_nSelectIndex ) {
-							candidate = kvp.Value;
+
+						// 在當前起點之後最大的
+						if( kvp.Key > nStartIndex && kvp.Key < m_DataHandler.GetTotalCADPointCount() - 1 ) {
 							key = kvp.Key;
-							break;
+							candidate = kvp.Value;
 						}
+					}
+				}
+				return candidate != null ? candidate.InterpolateType : EToolVecInterpolateType.Normal;
+
+			}
+			else {
+
+				//find the largest key < m_nSelectIndex
+				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
+
+					// 在當前起點之後最大的
+					if( kvp.Key < m_nSelectIndex && kvp.Key >= nStartIndex ) {
+						key = kvp.Key;
+						candidate = kvp.Value;
+					}
+				}
+
+				return candidate != null ? candidate.InterpolateType : EToolVecInterpolateType.Normal;
+			}
+		}
+
+		int GetNextModifyIndex()
+		{
+			int key = -1;
+			int nStartIndex = m_DataHandler.GetStartPointCADIndex();
+
+			// 這個點在現在的起點之前
+			if( m_nSelectIndex < nStartIndex ) {
+				// find the smallest key > m_nSelectIndex
+				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
+					if( kvp.Key > m_nSelectIndex && kvp.Key < nStartIndex ) {
+						key = kvp.Key;
+						break;
 					}
 				}
 			}
 			else {
-				// reversed path: find the largest key < m_nSelectIndex
+
+				// find the smallest key > m_nSelectIndex
 				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-					if( kvp.Key < m_nSelectIndex ) {
+					if( kvp.Key > m_nSelectIndex ) {
 						key = kvp.Key;
-						candidate = kvp.Value; // keep updating; sorted ascending, so last match is the largest
-					}
-					else {
 						break;
 					}
 				}
-
-				// fallback: find the largest key > m_nSelectIndex
-				if( candidate == null ) {
-					foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-						if( kvp.Key > m_nSelectIndex ) {
-							key = kvp.Key;
-							candidate = kvp.Value; // keep updating to get the largest
-						}
-					}
-				}
 			}
-			return candidate != null ? candidate.InterpolateType : EToolVecInterpolateType.Normal;
+			return key;
+		}
+
+		EToolVecInterpolateType GetNextModfiyIndexInterpolate( out int key )
+		{
+			ToolVecModifyData2 candidate = null;
+			key = -1;
+			int nStartIndex = m_DataHandler.GetStartPointCADIndex();
+			int GetNextModifyInx = GetNextModifyIndex();
+			if( GetNextModifyInx != -1 ) {
+				candidate = m_CraftData.ToolVecModifyMap2[ GetNextModifyInx ];
+				key = GetNextModifyInx;
+				return candidate.InterpolateType;
+			}
+			// 拿終點
+			return m_CraftData.StartPntToolVecData.EndPnt.InterpolateType;
 		}
 
 		void RefreshSimuResult()
@@ -676,11 +734,11 @@ namespace MyCAM.Editor
 
 		public bool GetToolVecModify( int cadIndex, out double dRA_deg, out double dRB_deg, out double master_deg, out double slave_deg )
 		{
-			if( m_CraftData.ToolVecModifyMap.ContainsKey( cadIndex ) ) {
-				dRA_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].RA_deg;
-				dRB_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].RB_deg;
-				master_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].Master_deg;
-				slave_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].Slave_deg;
+			if( m_CraftData.ToolVecModifyMap2.ContainsKey( cadIndex ) ) {
+				dRA_deg = m_CraftData.ToolVecModifyMap2[ cadIndex ].RA_deg;
+				dRB_deg = m_CraftData.ToolVecModifyMap2[ cadIndex ].RB_deg;
+				master_deg = m_CraftData.ToolVecModifyMap2[ cadIndex ].Master_deg;
+				slave_deg = m_CraftData.ToolVecModifyMap2[ cadIndex ].Slave_deg;
 				return true;
 			}
 			else {
@@ -809,6 +867,11 @@ namespace MyCAM.Editor
 			else {
 				return m_PathCache.MainPathPointList[ camIndex ].InitPathIndex;
 			}
+		}
+
+		public int GetTotalCADPointCount()
+		{
+			return m_PathCache.CADToCAMIndexMap.Count;
 		}
 
 		readonly CraftData m_CraftData;

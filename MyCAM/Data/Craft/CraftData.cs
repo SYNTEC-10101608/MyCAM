@@ -106,6 +106,25 @@ namespace MyCAM.Data
 		}
 	}
 
+	public class StartPntToolVecParam
+	{
+		public ToolVecModifyData2 StartPnt
+		{
+			get; set;
+		}
+
+		public ToolVecModifyData2 EndPnt
+		{
+			get; set;
+		}
+
+		public StartPntToolVecParam( ToolVecModifyData2 startPntData, ToolVecModifyData2 endPntData )
+		{
+			StartPnt = startPntData;
+			EndPnt = endPntData;
+		}
+	}
+
 
 	public class CraftData
 	{
@@ -307,6 +326,21 @@ namespace MyCAM.Data
 			}
 		}
 
+		public StartPntToolVecParam StartPntToolVecData
+		{
+			get
+			{
+				return m_StartPntToolVecData;
+			}
+			set
+			{
+				if( m_StartPntToolVecData != value ) {
+					m_StartPntToolVecData = value;
+					CAMFactorChanged?.Invoke();
+				}
+			}
+		}
+
 		public ToolVecModifyMap ToolVecModifyMap2
 		{
 			get
@@ -384,6 +418,7 @@ namespace MyCAM.Data
 		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.Normal;
 		Dictionary<int, ToolVecModifyData> m_ToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
 		ToolVecModifyMap m_ToolVecModifyMap2 = new ToolVecModifyMap();
+		StartPntToolVecParam m_StartPntToolVecData = new StartPntToolVecParam( new ToolVecModifyData2(), new ToolVecModifyData2() );
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();
