@@ -70,13 +70,20 @@ namespace MyCAM.Editor
 			m_lblStartOrEnd.Text = start ? "當前位置：起點" : "當前位置：終點";
 		}
 
-		public void LockCbx( bool isNeedLock, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
+		public void LockCbx( bool isNeedLock, bool isStartPnt = false, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
 		{
 			if( isNeedLock ) {
 				m_cbxInterpolateType.SelectedIndex = -1;
 				m_cbxInterpolateType.Enabled = false;
+
+				if( isStartPnt ) {
+					m_btnAdd.Enabled = false;
+					m_btnRemove.Enabled = false; 
+				}
 				return;
 			}
+			m_btnAdd.Enabled = true;
+			m_btnRemove.Enabled = true;
 			m_cbxInterpolateType.Enabled = true;
 			m_cbxInterpolateType.SelectedIndex = (int)interpolateType;
 

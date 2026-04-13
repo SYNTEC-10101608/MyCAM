@@ -24,6 +24,9 @@ namespace MyCAM.PathCache
 			m_CraftData.CAMFactorChanged += SetCAMDataDirty;
 			m_CraftData.CADFactorChanged += SetCADDataDirty;
 			BuildCADCAMPointList();
+
+			// build default start/end point tool vec data after tool vec is set
+			BuildDefaultStartPntToolVecData();
 		}
 
 		#region computation result
@@ -313,6 +316,37 @@ namespace MyCAM.PathCache
 		void SetCenterDir()
 		{
 			m_ComputeRefCenterDir = m_ContourGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
+		}
+
+		void ClearToolVecMap()
+		{
+			m_CraftData.ToolVecModifyMap2.Clear();
+		}
+
+		void BuildDefaultStartPntToolVecData()
+		{
+			if( m_CAMPointList.Count == 0 ) {
+				return;
+			}
+
+			CAMPoint startPnt = m_CAMPointList.First();
+			CAMPoint endPnt = m_CAMPointList.Last();
+
+			// build start point tool vec data
+			ToolVecModifyData2 startData = BuildToolVecModifyData( startPnt );
+
+			// build end point tool vec data
+			ToolVecModifyData2 endData = BuildToolVecModifyData( endPnt );
+
+			m_CraftData.StartPntToolVecData = new StartPntToolVecParam( startData, endData );
+		}
+
+		ToolVecModifyData2 BuildToolVecModifyData( CAMPoint camPoint )
+		{
+			double master_deg = camPoint.ModMaster_rad * 180.0 / Math.PI;
+			double slave_deg = camPoint.ModSlave_rad * 180.0 / Math.PI;
+			Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, camPoint );
+			return new ToolVecModifyData2( abAngles.Item1, abAngles.Item2, master_deg, slave_deg, EToolVecInterpolateType.Normal );
 		}
 
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();

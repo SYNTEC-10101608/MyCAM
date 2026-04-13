@@ -153,15 +153,33 @@ namespace MyCAM.Editor
 			// with select
 			else {
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
-				bool isModified = m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
-				m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModified );
-
-				// update dialog
-				m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
 
 				// check is at start or end point for closed path
 				m_IsStartPnt = m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() && m_DataHandler.IsClosed();
 				m_IsEndPnt = m_nSelectIndex == CLOSED_POINT_INDEX && m_DataHandler.IsClosed();
+				if( m_IsStartPnt ) {
+					m_ToolVecParam = new ToolVecParam(
+						m_CraftData.StartPntToolVecData.StartPnt.RA_deg,
+						m_CraftData.StartPntToolVecData.StartPnt.RB_deg,
+						m_CraftData.StartPntToolVecData.StartPnt.Master_deg,
+						m_CraftData.StartPntToolVecData.StartPnt.Slave_deg
+					);
+				}
+				else if( m_IsEndPnt ) {
+					m_ToolVecParam = new ToolVecParam(
+						m_CraftData.StartPntToolVecData.EndPnt.RA_deg,
+						m_CraftData.StartPntToolVecData.EndPnt.RB_deg,
+						m_CraftData.StartPntToolVecData.EndPnt.Master_deg,
+						m_CraftData.StartPntToolVecData.EndPnt.Slave_deg
+					);
+				}
+				else {
+					m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
+					m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg );
+				}
+
+				// update dialog
+				m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
 				m_ToolVecDlg.EnableStartEndSwitch( m_IsStartPnt || m_IsEndPnt, m_IsStartPnt );
 			}
 			UIProtection();
@@ -355,18 +373,7 @@ namespace MyCAM.Editor
 			}
 			else {
 				if( nNextModifyIdx == CLOSED_POINT_INDEX ) {
-
-					bool isModified = m_DataHandler.GetToolVecModify( CLOSED_POINT_INDEX, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
-					ToolVecParam toolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModified );
-
-					ToolVecModifyData2 toolVecModifyData = new ToolVecModifyData2
-					{
-						RA_deg = 0,
-						RB_deg = 0,
-						Master_deg = master_deg,
-						Slave_deg = slave_deg,
-					};
-					m_CraftData.ToolVecModifyMap2.Add( CLOSED_POINT_INDEX, toolVecModifyData );
+					m_CraftData.StartPntToolVecData.EndPnt.InterpolateType = m_InterpolateType;
 				}
 			}
 		}
@@ -434,12 +441,15 @@ namespace MyCAM.Editor
 		void UIProtection()
 		{
 			if( m_IsStartPnt || m_IsEndPnt || m_SelectedPoint.IsToolVecModPoint ) {
+				m_ToolVecDlg.LockCbx( true, true );
+				return;
+			}
+			if( m_SelectedPoint.IsToolVecModPoint ) {
 				m_ToolVecDlg.LockCbx( true );
 				return;
 			}
 			EToolVecInterpolateType interpolateType = GetNextModfiyIndexInterpolate( out int NextDataIndex );
-			m_ToolVecDlg.LockCbx( false, interpolateType );
-
+			m_ToolVecDlg.LockCbx( false, false, interpolateType );
 		}
 
 		// update
@@ -463,6 +473,30 @@ namespace MyCAM.Editor
 			if( m_ToolVecParam == null ) {
 				return;
 			}
+			if( m_IsStartPnt ) {
+				ToolVecModifyData2 startPntData = new ToolVecModifyData2()
+				{
+					RA_deg = m_ToolVecParam.AngleA_deg,
+					RB_deg = m_ToolVecParam.AngleB_deg,
+					Master_deg = m_ToolVecParam.Master_deg,
+					Slave_deg = m_ToolVecParam.Slave_deg,
+					InterpolateType = m_CraftData.StartPntToolVecData.StartPnt.InterpolateType
+				};
+				m_CraftData.StartPntToolVecData.StartPnt = startPntData;
+				return;
+			}
+			if ( m_IsEndPnt ) {
+				ToolVecModifyData2 endPntData = new ToolVecModifyData2()
+				{
+					RA_deg = m_ToolVecParam.AngleA_deg,
+					RB_deg = m_ToolVecParam.AngleB_deg,
+					Master_deg = m_ToolVecParam.Master_deg,
+					Slave_deg = m_ToolVecParam.Slave_deg,
+					InterpolateType = m_CraftData.StartPntToolVecData.EndPnt.InterpolateType
+				};
+				m_CraftData.StartPntToolVecData.EndPnt = endPntData;
+				return;
+			}
 
 			// remove modify data
 			if( !m_ToolVecParam.IsModified ) {
@@ -470,60 +504,67 @@ namespace MyCAM.Editor
 				return;
 			}
 
-
 			// find next modified point index
-			EToolVecInterpolateType interpolateType = GetPreModifyIndexInterpolate( out int NextDataIndex );
+			EToolVecInterpolateType interpolateType = GetPreModifyIndexInterpolate();
 			// set modify data
 			m_CraftData.SetToolVecModify( m_nSelectIndex,
 				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, interpolateType );
 		}
 
-		EToolVecInterpolateType GetPreModifyIndexInterpolate( out int key )
-		{
-			ToolVecModifyData2 candidate = null;
-			key = -1;
-			int nStartIndex = m_DataHandler.GetStartPointCADIndex();
 
+
+
+		int GetPreModifyIndex()
+		{
+			int nStartIndex = m_DataHandler.GetStartPointCADIndex();
+			int preIdx = -1;
 
 			// 這個點在起點之前
 			if( m_nSelectIndex < nStartIndex ) {
 
 				// 找0~當前這個點之前最大的
 				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-					if( kvp.Key < m_nSelectIndex && kvp.Key > 0 ) {
-						key = kvp.Key;
-						candidate = kvp.Value;
+					if( kvp.Key < m_nSelectIndex ) {
+						preIdx = kvp.Key;
 					}
 				}
+				if( preIdx != -1 ) {
+					return preIdx;
+				}
 
-				if( candidate == null ) {
+				// 如果沒有，找起點到最尾端中最大的
+				if( preIdx == -1 ) {
 					// 起點到最尾端中最大的
 					foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
 
 						// 在當前起點之後最大的
 						if( kvp.Key > nStartIndex && kvp.Key < m_DataHandler.GetTotalCADPointCount() - 1 ) {
-							key = kvp.Key;
-							candidate = kvp.Value;
+							preIdx = kvp.Key;
 						}
 					}
-				}
-				return candidate != null ? candidate.InterpolateType : EToolVecInterpolateType.Normal;
 
+				}
+				return preIdx;
 			}
 			else {
-
-				//find the largest key < m_nSelectIndex
 				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-
-					// 在當前起點之後最大的
-					if( kvp.Key < m_nSelectIndex && kvp.Key >= nStartIndex ) {
-						key = kvp.Key;
-						candidate = kvp.Value;
+					if( kvp.Key < m_nSelectIndex ) {
+						preIdx = kvp.Key;
 					}
 				}
-
-				return candidate != null ? candidate.InterpolateType : EToolVecInterpolateType.Normal;
+				return preIdx;
 			}
+		}
+
+		EToolVecInterpolateType GetPreModifyIndexInterpolate()
+		{
+			int nPreIdx = GetPreModifyIndex();
+
+			// 有找到前一段
+			if( nPreIdx != -1 ) {
+				return m_CraftData.ToolVecModifyMap2[ nPreIdx ].InterpolateType;
+			}
+			return EToolVecInterpolateType.Normal;
 		}
 
 		int GetNextModifyIndex()
@@ -540,31 +581,45 @@ namespace MyCAM.Editor
 						break;
 					}
 				}
+				return key;
 			}
-			else {
 
-				// find the smallest key > m_nSelectIndex
+			// 這個點在起點之後
+			else {
 				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
+
+					// 找到比他大的index
 					if( kvp.Key > m_nSelectIndex ) {
 						key = kvp.Key;
-						break;
+						return key;
 					}
 				}
+
+				// 從index 0 開始找到起點前
+				if( key == -1 ) {
+					foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
+
+						// 最小的index，且在起點之前
+						if( kvp.Key < nStartIndex ) {
+							key = kvp.Key;
+							break;
+						}
+					}
+				}
+				return key;
 			}
-			return key;
 		}
 
 		EToolVecInterpolateType GetNextModfiyIndexInterpolate( out int key )
 		{
 			ToolVecModifyData2 candidate = null;
-			key = -1;
-			int nStartIndex = m_DataHandler.GetStartPointCADIndex();
-			int GetNextModifyInx = GetNextModifyIndex();
-			if( GetNextModifyInx != -1 ) {
-				candidate = m_CraftData.ToolVecModifyMap2[ GetNextModifyInx ];
-				key = GetNextModifyInx;
+			key = GetNextModifyIndex();
+			if( key != -1 ) {
+
+				candidate = m_CraftData.ToolVecModifyMap2[ key ];
 				return candidate.InterpolateType;
 			}
+
 			// 拿終點
 			return m_CraftData.StartPntToolVecData.EndPnt.InterpolateType;
 		}
