@@ -1,7 +1,6 @@
 ﻿using OCC.gp;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -207,9 +206,18 @@ namespace MyCAM.Data
 			{
 				if( m_IsPathReverse != value ) {
 					m_IsPathReverse = value;
+					ChangeStartToolVecData();
 					CAMFactorChanged?.Invoke();
 				}
 			}
+		}
+
+		void ChangeStartToolVecData()
+		{
+			ToolVecModifyData2 temStartPnt = StartPntToolVecData.StartPnt.Clone();	
+			ToolVecModifyData2 temEndPnt = StartPntToolVecData.EndPnt.Clone();
+			StartPntToolVecParam newStartPntToolVecData = new StartPntToolVecParam( temStartPnt, temEndPnt );
+			StartPntToolVecData = newStartPntToolVecData;
 		}
 
 		public LeadData LeadData
@@ -386,7 +394,14 @@ namespace MyCAM.Data
 		public void RemoveToolVecModify( int index )
 		{
 			if( m_ToolVecModifyMap2.ContainsKey( index ) ) {
-				m_ToolVecModifyMap2.Remove( index );
+				bool isFoundNext = FindNextMapIndex( index, out int nNextIdx );
+				if( isFoundNext ) {
+					m_ToolVecModifyMap2.Remove( index, nNextIdx );
+				}
+				else {
+					EToolVecInterpolateType removedType = m_ToolVecModifyMap2[ index ].InterpolateType;
+					StartPntToolVecData.EndPnt.InterpolateType = removedType;
+				}
 			}
 			CAMFactorChanged?.Invoke();
 		}
@@ -408,6 +423,195 @@ namespace MyCAM.Data
 			CAMFactorChanged?.Invoke();
 		}
 
+		public bool FindNextMapIndex( int currentIdx, out int nextIdx )
+		{
+			int StartPntIdx = m_StartPointIndex;
+			bool isPathReverse = m_IsPathReverse;
+			// find the smallest key that is greater than the removed key
+			nextIdx = -1;
+			bool found = false;
+
+			// 現在index比起點大
+			if( currentIdx > StartPntIdx ) {
+
+				// 路徑正向
+				if( isPathReverse == false ) {
+
+					// 從現在位置找到路徑尾中最小的
+					foreach( int k in ToolVecModifyMap2.Keys ) {
+						if( k > currentIdx ) {
+							nextIdx = k;
+							found = true;
+							break;
+						}
+					}
+
+					// 從目前起點到最後都沒有,找0~起點前最小的
+					if( found == false ) {
+						foreach( int k in ToolVecModifyMap2.Keys ) {
+							if( k > StartPntIdx ) {
+								break;
+							}
+							if( k < currentIdx ) {
+								nextIdx = k;
+								found = true;
+								break;
+							}
+						}
+					}
+				}
+
+				// 反向
+				else {
+
+					// 從起點位置找到現在
+					foreach( int k in ToolVecModifyMap2.Keys ) {
+						if( k > currentIdx ) {
+							break;
+						}
+						if( k < currentIdx && k > StartPntIdx ) {
+							nextIdx = k;
+							found = true;
+						}
+					}
+				}
+			}
+
+			// 現在位置在起點之前
+			else {
+
+				// 路徑正向
+				if( isPathReverse == false ) {
+					foreach( int k in ToolVecModifyMap2.Keys ) {
+						if( k > StartPntIdx ) {
+							break;
+						}
+						if( k > currentIdx ) {
+							nextIdx = k;
+							found = true;
+							break;
+						}
+					}
+				}
+
+				// 路徑反向
+				else {
+
+					// 從現在位置往前找到0
+					foreach( int k in ToolVecModifyMap2.Keys ) {
+						if( k > currentIdx ) {
+							break;
+						}
+						nextIdx = k;
+						found = true;
+					}
+
+					// 沒有找到,從路徑尾找到目前起點位置中最大的
+					if( found == false ) {
+
+						foreach( int k in ToolVecModifyMap2.Keys ) {
+							if( k < StartPntIdx ) {
+								continue;
+							}
+							nextIdx = k;
+							found = true;
+						}
+					}
+				}
+
+			}
+
+			return found;
+		}
+
+		public bool FindPreMapIndex( int currentIdx, out int preIdx )
+		{
+			int StartPntIdx = m_StartPointIndex;
+			bool isPathReverse = m_IsPathReverse;
+			preIdx = -1;
+			bool found = false;
+
+			// 現在index比起點大
+			if( currentIdx > StartPntIdx ) {
+
+				// 路徑正向
+				if( isPathReverse == false ) {
+
+					//從起點找到現在位置中最大的
+					foreach( int k in ToolVecModifyMap2.Keys ) {
+						if( k > StartPntIdx && k < currentIdx ) {
+							preIdx = k;
+							found = true;
+						}
+					}
+				}
+
+				// 反向
+				else {
+
+					// 從現在位置找到路徑尾
+					foreach( int k in ToolVecModifyMap2.Keys ) {
+						if( k > currentIdx ) {
+							preIdx = k;
+							break;
+						}
+					}
+
+					if( found == false ) {
+						foreach( int k in ToolVecModifyMap2.Keys ) {
+							if( k < StartPntIdx ) {
+								preIdx = k;
+								found = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			// 現在位置在起點之前
+			else {
+
+				// 路徑正向
+				if( isPathReverse == false ) {
+
+					// 從0找到這個點中最大的
+					foreach( int k in ToolVecModifyMap2.Keys ) {
+						if( k < currentIdx ) {
+							preIdx = k;
+							found = true;
+						}
+					}
+
+
+					// 從起點到路徑尾中最大的
+					if( found == false ) {
+						foreach( int k in ToolVecModifyMap2.Keys ) {
+							if( k > StartPntIdx ) {
+								preIdx = k;
+								found = true;
+							}
+						}
+					}
+				}
+
+				// 路徑反向
+				else {
+
+					// 從現在位置找到起點
+					foreach( int k in ToolVecModifyMap2.Keys ) {
+						if( k > currentIdx ) {
+							preIdx = k;
+							found = true;
+							break;
+						}
+					}
+				}
+			}
+
+			return found;
+		}
+
 		const int DEFAULT_TECH_LAYER = 1;
 		int m_TechLayer = DEFAULT_TECH_LAYER;
 		int m_StartPointIndex = 0;
@@ -424,5 +628,5 @@ namespace MyCAM.Data
 		double m_CompensatedDistance = 0;
 	}
 
-	
+
 }

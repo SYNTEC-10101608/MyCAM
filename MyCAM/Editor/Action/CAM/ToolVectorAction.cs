@@ -366,15 +366,12 @@ namespace MyCAM.Editor
 
 		void SetInterpolationMode()
 		{
-			GetNextModfiyIndexInterpolate( out int NextDataIndex );
-			int nNextModifyIdx = GetNextModifyIndex();
-			if( m_CraftData.ToolVecModifyMap2.ContainsKey( nNextModifyIdx ) ) {
-				m_CraftData.ToolVecModifyMap2[ NextDataIndex ].InterpolateType = m_InterpolateType;
+			bool isGetNextModfiyIndex = m_CraftData.FindNextMapIndex( m_nSelectIndex, out int nNextIdx );
+			if ( isGetNextModfiyIndex) {
+				m_CraftData.ToolVecModifyMap2[ nNextIdx ].InterpolateType = m_InterpolateType;
 			}
 			else {
-				if( nNextModifyIdx == CLOSED_POINT_INDEX ) {
-					m_CraftData.StartPntToolVecData.EndPnt.InterpolateType = m_InterpolateType;
-				}
+				m_CraftData.StartPntToolVecData.EndPnt.InterpolateType = m_InterpolateType;
 			}
 		}
 
@@ -441,7 +438,7 @@ namespace MyCAM.Editor
 		void UIProtection()
 		{
 			// cbx need to be lock
-			if( m_IsStartPnt || m_IsEndPnt) {
+			if( m_IsStartPnt || m_IsEndPnt ) {
 				m_ToolVecDlg.LockCbx( true, false, false, true );
 				return;
 			}
@@ -450,7 +447,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			EToolVecInterpolateType interpolateType = GetNextModfiyIndexInterpolate( out int NextDataIndex );
-			m_ToolVecDlg.LockCbx( false, false,true, false ,interpolateType );
+			m_ToolVecDlg.LockCbx( false, false, true, false, interpolateType );
 		}
 
 		// update
@@ -485,7 +482,7 @@ namespace MyCAM.Editor
 				m_CraftData.StartPntToolVecData.StartPnt = startPntData;
 				return;
 			}
-			if ( m_IsEndPnt ) {
+			if( m_IsEndPnt ) {
 				ToolVecModifyData2 endPntData = new ToolVecModifyData2()
 				{
 					RA_deg = m_ToolVecParam.AngleA_deg,
@@ -505,120 +502,35 @@ namespace MyCAM.Editor
 			}
 
 			// find next modified point index
-			EToolVecInterpolateType interpolateType = GetPreModifyIndexInterpolate();
+			EToolVecInterpolateType interpolateType = GetNextModifyIndexInterpolate();
 			// set modify data
 			m_CraftData.SetToolVecModify( m_nSelectIndex,
 				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, interpolateType );
 		}
 
-		int GetPreModifyIndex()
+		EToolVecInterpolateType GetNextModifyIndexInterpolate()
 		{
-			int nStartIndex = m_DataHandler.GetStartPointCADIndex();
-			int preIdx = -1;
+			bool isFound = m_CraftData.FindNextMapIndex( m_nSelectIndex, out int nPreIdx );
 
-			// 這個點在起點之前
-			if( m_nSelectIndex < nStartIndex ) {
-
-				// 找0~當前這個點之前最大的
-				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-					if( kvp.Key < m_nSelectIndex ) {
-						preIdx = kvp.Key;
-					}
-				}
-				if( preIdx != -1 ) {
-					return preIdx;
-				}
-
-				// 如果沒有，找起點到最尾端中最大的
-				if( preIdx == -1 ) {
-					// 起點到最尾端中最大的
-					foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-
-						// 在當前起點之後最大的
-						if( kvp.Key > nStartIndex && kvp.Key < m_DataHandler.GetTotalCADPointCount() - 1 ) {
-							preIdx = kvp.Key;
-						}
-					}
-
-				}
-				return preIdx;
+			if ( !isFound ) {
+				return m_CraftData.StartPntToolVecData.EndPnt.InterpolateType;
 			}
 			else {
-				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-					if( kvp.Key < m_nSelectIndex ) {
-						preIdx = kvp.Key;
-					}
-				}
-				return preIdx;
-			}
-		}
-
-		EToolVecInterpolateType GetPreModifyIndexInterpolate()
-		{
-			int nPreIdx = GetPreModifyIndex();
-
-			// 有找到前一段
-			if( nPreIdx != -1 ) {
 				return m_CraftData.ToolVecModifyMap2[ nPreIdx ].InterpolateType;
 			}
-			return EToolVecInterpolateType.Normal;
 		}
 
-		int GetNextModifyIndex()
-		{
-			int key = -1;
-			int nStartIndex = m_DataHandler.GetStartPointCADIndex();
-
-			// 這個點在現在的起點之前
-			if( m_nSelectIndex < nStartIndex ) {
-				// find the smallest key > m_nSelectIndex
-				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-					if( kvp.Key > m_nSelectIndex && kvp.Key < nStartIndex ) {
-						key = kvp.Key;
-						break;
-					}
-				}
-				return key;
-			}
-
-			// 這個點在起點之後
-			else {
-				foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-
-					// 找到比他大的index
-					if( kvp.Key > m_nSelectIndex ) {
-						key = kvp.Key;
-						return key;
-					}
-				}
-
-				// 從index 0 開始找到起點前
-				if( key == -1 ) {
-					foreach( var kvp in m_CraftData.ToolVecModifyMap2 ) {
-
-						// 最小的index，且在起點之前
-						if( kvp.Key < nStartIndex ) {
-							key = kvp.Key;
-							break;
-						}
-					}
-				}
-				return key;
-			}
-		}
 
 		EToolVecInterpolateType GetNextModfiyIndexInterpolate( out int key )
 		{
-			ToolVecModifyData2 candidate = null;
-			key = GetNextModifyIndex();
-			if( key != -1 ) {
+			bool isFound = m_CraftData.FindNextMapIndex( m_nSelectIndex, out key );
 
-				candidate = m_CraftData.ToolVecModifyMap2[ key ];
-				return candidate.InterpolateType;
+			if (isFound) {
+				return m_CraftData.ToolVecModifyMap2[ key ].InterpolateType;
 			}
-
-			// 拿終點
-			return m_CraftData.StartPntToolVecData.EndPnt.InterpolateType;
+			else {
+				return m_CraftData.StartPntToolVecData.EndPnt.InterpolateType;
+			}
 		}
 
 		void RefreshSimuResult()
