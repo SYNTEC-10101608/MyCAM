@@ -58,8 +58,6 @@ namespace MyCAM.Editor
 			m_tbxAngleB.Text = m_IsPathRevese ? ( -m_ToolVecParam.AngleB_deg ).ToString( "F3" ) : m_ToolVecParam.AngleB_deg.ToString( "F3" );
 			m_tbxMaster.Text = m_ToolVecParam.Master_deg.ToString( "F3" );
 			m_tbxSlave.Text = m_ToolVecParam.Slave_deg.ToString( "F3" );
-			m_btnRemove.Enabled = m_ToolVecParam.IsModified;
-			m_btnAdd.Enabled = !m_ToolVecParam.IsModified;
 			bSuppressValueChangedEvent = false;
 		}
 
@@ -70,8 +68,10 @@ namespace MyCAM.Editor
 			m_lblStartOrEnd.Text = start ? "當前位置：起點" : "當前位置：終點";
 		}
 
-		public void LockCbx( bool isNeedLock, bool isStartPnt = false, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
+		public void LockCbx( bool isNeedLock, bool isEnableRemove, bool isEnableAdd, bool isStartPnt = false, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
 		{
+			m_btnAdd.Enabled = isEnableAdd;
+			m_btnRemove.Enabled = isEnableRemove;
 			if( isNeedLock ) {
 				m_cbxInterpolateType.SelectedIndex = -1;
 				m_cbxInterpolateType.Enabled = false;
@@ -80,10 +80,11 @@ namespace MyCAM.Editor
 					m_btnAdd.Enabled = false;
 					m_btnRemove.Enabled = false; 
 				}
-				return;
+				else {
+
+				}
+					return;
 			}
-			m_btnAdd.Enabled = true;
-			m_btnRemove.Enabled = true;
 			m_cbxInterpolateType.Enabled = true;
 			m_cbxInterpolateType.SelectedIndex = (int)interpolateType;
 

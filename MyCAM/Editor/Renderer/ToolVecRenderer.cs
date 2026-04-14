@@ -28,58 +28,7 @@ namespace MyCAM.Editor.Renderer
 
 		public void Show( List<string> pathIDList, bool bUpdate = false )
 		{
-			Remove( pathIDList );
-
-			// no need to show
-			if( !m_IsShow ) {
-				if( bUpdate ) {
-					UpdateView();
-				}
-				return;
-			}
-
-			// build tool vec
-			foreach( string szPathID in pathIDList ) {
-				IReadOnlyList<IProcessPoint> toolVecPointList = GetToolVecPointList( szPathID );
-				EToolVecInterpolateType interpolateType = GetInterpolateType( szPathID );
-				if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
-					continue;
-				}
-				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
-				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
-				for( int i = 0; i < toolVecPointList.Count; i++ ) {
-					IProcessPoint point = toolVecPointList[ i ];
-					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
-
-					if( point.IsToolVecModPoint ) {
-						if( interpolateType == EToolVecInterpolateType.VectorInterpolation ) {
-							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_ORANGE ) );
-						}
-						else if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
-							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_CYAN ) );
-						}
-						else {
-							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-						}
-						toolVecAIS.SetWidth( 4 );
-					}
-					toolVecAISList.Add( toolVecAIS );
-				}
-			}
-
-			// display the tool vec
-			foreach( string szPathID in pathIDList ) {
-				if( m_ToolVecAISDict.ContainsKey( szPathID ) ) {
-					List<AIS_Line> toolVecAISList = m_ToolVecAISDict[ szPathID ];
-					foreach( AIS_Line toolVecAIS in toolVecAISList ) {
-						m_Viewer.GetAISContext().Display( toolVecAIS, false );
-						m_Viewer.GetAISContext().Deactivate( toolVecAIS );
-					}
-				}
-			}
-			if( bUpdate ) {
-				UpdateView();
-			}
+			BuildAndDisplay( pathIDList, null, bUpdate );
 		}
 
 		public override void Remove( bool bUpdate = false )
@@ -106,7 +55,18 @@ namespace MyCAM.Editor.Renderer
 
 		public void ShowTrans( gp_Trsf trsf, bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList );
+			BuildAndDisplay( m_DataManager.PathIDList, trsf, bUpdate );
+		}
+
+		public void Reset( bool bUpdate = false )
+		{
+			gp_Trsf trsf = new gp_Trsf();
+			ShowTrans( trsf, bUpdate );
+		}
+
+		void BuildAndDisplay( List<string> pathIDList, gp_Trsf trsf, bool bUpdate )
+		{
+			Remove( pathIDList );
 
 			// no need to show
 			if( !m_IsShow ) {
@@ -117,7 +77,7 @@ namespace MyCAM.Editor.Renderer
 			}
 
 			// build tool vec
-			foreach( string szPathID in m_DataManager.PathIDList ) {
+			foreach( string szPathID in pathIDList ) {
 				IReadOnlyList<IProcessPoint> toolVecPointList = GetToolVecPointList( szPathID );
 				EToolVecInterpolateType interpolateType = GetInterpolateType( szPathID );
 				if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
@@ -128,7 +88,15 @@ namespace MyCAM.Editor.Renderer
 				for( int i = 0; i < toolVecPointList.Count; i++ ) {
 					IProcessPoint point = toolVecPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
-
+					if( i == 0 || i == toolVecPointList.Count - 1 ) {
+						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+						toolVecAIS.SetWidth( 4 );
+						if( trsf != null ) {
+							toolVecAIS.SetLocalTransformation( trsf );
+						}
+						toolVecAISList.Add( toolVecAIS );
+						continue;
+					}
 					if( point.IsToolVecModPoint ) {
 						if( interpolateType == EToolVecInterpolateType.VectorInterpolation ) {
 							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_ORANGE ) );
@@ -141,13 +109,15 @@ namespace MyCAM.Editor.Renderer
 						}
 						toolVecAIS.SetWidth( 4 );
 					}
-					toolVecAIS.SetLocalTransformation( trsf );
+					if( trsf != null ) {
+						toolVecAIS.SetLocalTransformation( trsf );
+					}
 					toolVecAISList.Add( toolVecAIS );
 				}
 			}
 
 			// display the tool vec
-			foreach( string szPathID in m_DataManager.PathIDList ) {
+			foreach( string szPathID in pathIDList ) {
 				if( m_ToolVecAISDict.ContainsKey( szPathID ) ) {
 					List<AIS_Line> toolVecAISList = m_ToolVecAISDict[ szPathID ];
 					foreach( AIS_Line toolVecAIS in toolVecAISList ) {
@@ -156,15 +126,6 @@ namespace MyCAM.Editor.Renderer
 					}
 				}
 			}
-			if( bUpdate ) {
-				UpdateView();
-			}
-		}
-
-		public void Reset( bool bUpdate = false )
-		{
-			gp_Trsf trsf = new gp_Trsf();
-			ShowTrans( trsf, bUpdate );
 			if( bUpdate ) {
 				UpdateView();
 			}

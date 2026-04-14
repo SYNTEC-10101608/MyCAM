@@ -440,16 +440,17 @@ namespace MyCAM.Editor
 
 		void UIProtection()
 		{
-			if( m_IsStartPnt || m_IsEndPnt || m_SelectedPoint.IsToolVecModPoint ) {
-				m_ToolVecDlg.LockCbx( true, true );
+			// cbx need to be lock
+			if( m_IsStartPnt || m_IsEndPnt) {
+				m_ToolVecDlg.LockCbx( true, false, false, true );
 				return;
 			}
 			if( m_SelectedPoint.IsToolVecModPoint ) {
-				m_ToolVecDlg.LockCbx( true );
+				m_ToolVecDlg.LockCbx( true, true, false );
 				return;
 			}
 			EToolVecInterpolateType interpolateType = GetNextModfiyIndexInterpolate( out int NextDataIndex );
-			m_ToolVecDlg.LockCbx( false, false, interpolateType );
+			m_ToolVecDlg.LockCbx( false, false,true, false ,interpolateType );
 		}
 
 		// update
@@ -464,7 +465,6 @@ namespace MyCAM.Editor
 			if( m_SelectedPoint != null && m_nSelectIndex != NULL_SELECT_INDEX ) {
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 			}
-
 			UIProtection();
 		}
 
@@ -510,9 +510,6 @@ namespace MyCAM.Editor
 			m_CraftData.SetToolVecModify( m_nSelectIndex,
 				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, interpolateType );
 		}
-
-
-
 
 		int GetPreModifyIndex()
 		{
