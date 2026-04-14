@@ -98,6 +98,7 @@
     <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Data\Simulation\SimuData.cs" />
     <Compile Include="Editor\Renderer\MachineRender.cs" />
+    <Compile Include="Editor\Renderer\ToolVecEditRender.cs" />
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
     <Compile Include="Helper\CAM\StartPointHelper.cs" />
     <Compile Include="Helper\Canvas\DrawHelper.cs" />

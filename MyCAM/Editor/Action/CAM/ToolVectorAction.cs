@@ -31,6 +31,7 @@ namespace MyCAM.Editor
 			m_DataHandler = new ToolVecActionDataHandler( pathID );
 			m_PathIDList = new List<string>() { pathID };
 			m_CoordIcon = new CoordIconRenderer( viewer, dataManager );
+			m_ToolVecEditRender = new ToolVecEditRender( viewer, dataManager );
 		}
 
 		public override EditActionType ActionType
@@ -72,6 +73,7 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.FlipRotaryAxis += ( isPositive ) => OnFlipRotaryAxis( isPositive );
 			m_ToolVecDlg.EnableStartEndSwitch( false, false );
 			m_ToolVecDlg.Cancel += End;
+			m_ToolVecEditRender.Show( m_PathIDList );
 
 			// draw new trihedron for G54 must before change to start point
 			// because change to start point will trigger coord trasform
@@ -99,6 +101,7 @@ namespace MyCAM.Editor
 			TranfAndRebuildMap( new gp_Trsf(), DEFAULT_INDEX, out _ );
 			UnlockSelectedVertexHighLight();
 			m_CoordIcon.Remove();
+			m_ToolVecEditRender.Remove();
 			RaiseActionStart?.Invoke( false );
 			base.End();
 		}
@@ -187,6 +190,7 @@ namespace MyCAM.Editor
 		}
 		bool m_IsStartPnt;
 		bool m_IsEndPnt;
+		ToolVecEditRender m_ToolVecEditRender;
 
 		void LockSelectedVertexHighLight( TopoDS_Shape selectedVertex )
 		{
@@ -361,19 +365,10 @@ namespace MyCAM.Editor
 		void OnTypeChanged( EToolVecInterpolateType type )
 		{
 			m_InterpolateType = type;
-			SetInterpolationMode();
+			m_CraftData.SetInterpolationMode( m_nSelectIndex, m_InterpolateType );
+			m_ToolVecEditRender.Show( m_PathIDList, true );
 		}
 
-		void SetInterpolationMode()
-		{
-			bool isGetNextModfiyIndex = m_CraftData.FindNextMapIndex( m_nSelectIndex, out int nNextIdx );
-			if ( isGetNextModfiyIndex) {
-				m_CraftData.ToolVecModifyMap2[ nNextIdx ].InterpolateType = m_InterpolateType;
-			}
-			else {
-				m_CraftData.StartPntToolVecData.EndPnt.InterpolateType = m_InterpolateType;
-			}
-		}
 
 		void OnAddEditIndex()
 		{
@@ -463,6 +458,8 @@ namespace MyCAM.Editor
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 			}
 			UIProtection();
+
+			m_ToolVecEditRender.Show( m_PathIDList, true );
 		}
 
 		void SetIndexAngleParam()
@@ -512,7 +509,7 @@ namespace MyCAM.Editor
 		{
 			bool isFound = m_CraftData.FindNextMapIndex( m_nSelectIndex, out int nPreIdx );
 
-			if ( !isFound ) {
+			if( !isFound ) {
 				return m_CraftData.StartPntToolVecData.EndPnt.InterpolateType;
 			}
 			else {
@@ -525,7 +522,7 @@ namespace MyCAM.Editor
 		{
 			bool isFound = m_CraftData.FindNextMapIndex( m_nSelectIndex, out key );
 
-			if (isFound) {
+			if( isFound ) {
 				return m_CraftData.ToolVecModifyMap2[ key ].InterpolateType;
 			}
 			else {

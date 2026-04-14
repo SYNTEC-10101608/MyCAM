@@ -19,11 +19,39 @@ namespace MyCAM.Editor
 		readonly Dictionary<string, AIS_Shape> m_MainPathAISDict = new Dictionary<string, AIS_Shape>();
 		readonly Dictionary<string, AIS_Shape> m_OriginalPathAISDict = new Dictionary<string, AIS_Shape>();
 		ViewManager m_ViewManager;
+		bool m_IsPauseRefresh = false;
 
 		public PathRenderer( Viewer viewer, ViewManager viewManager, DataManager dataManager )
 			: base( viewer, dataManager )
 		{
 			m_ViewManager = viewManager;
+		}
+
+		public void SetPauseRefresh( bool isPause )
+		{
+			if( m_IsPauseRefresh == isPause ) {
+				return;
+			}
+			m_IsPauseRefresh = isPause;
+			if( isPause ) {
+				// hide all managed AIS objects without destroying them
+				foreach( var kvp in m_MainPathAISDict ) {
+					m_Viewer.GetAISContext().Erase( kvp.Value, false );
+				}
+				foreach( var kvp in m_OriginalPathAISDict ) {
+					m_Viewer.GetAISContext().Erase( kvp.Value, false );
+				}
+			}
+			else {
+				// re-display all managed AIS objects
+				foreach( var kvp in m_MainPathAISDict ) {
+					m_Viewer.GetAISContext().Display( kvp.Value, false );
+				}
+				foreach( var kvp in m_OriginalPathAISDict ) {
+					m_Viewer.GetAISContext().Display( kvp.Value, false );
+					m_Viewer.GetAISContext().Deactivate( kvp.Value );
+				}
+			}
 		}
 
 		public override void Show( bool bUpdate = false )
@@ -56,6 +84,11 @@ namespace MyCAM.Editor
 
 		void ShowSpecifyPath( List<string> pathIDList, bool bUpdate, gp_Trsf trsf = null )
 		{
+			// paused, do not rebuild or display
+			if( m_IsPauseRefresh ) {
+				return;
+			}
+
 			Remove( pathIDList );
 			if( !m_IsShow ) {
 				if( bUpdate ) {

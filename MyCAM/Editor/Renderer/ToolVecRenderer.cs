@@ -15,10 +15,36 @@ namespace MyCAM.Editor.Renderer
 	internal class ToolVecRenderer : CAMRendererBase
 	{
 		readonly Dictionary<string, List<AIS_Line>> m_ToolVecAISDict = new Dictionary<string, List<AIS_Line>>();
+		bool m_IsPauseRefresh = false;
 
 		public ToolVecRenderer( Viewer viewer, DataManager dataManager )
 			: base( viewer, dataManager )
 		{
+		}
+
+		public void SetPauseRefresh( bool isPause )
+		{
+			if( m_IsPauseRefresh == isPause ) {
+				return;
+			}
+			m_IsPauseRefresh = isPause;
+			if( isPause ) {
+				// hide all managed AIS objects without destroying them
+				foreach( var kvp in m_ToolVecAISDict ) {
+					foreach( AIS_Line toolVecAIS in kvp.Value ) {
+						m_Viewer.GetAISContext().Erase( toolVecAIS, false );
+					}
+				}
+			}
+			else {
+				// re-display all managed AIS objects
+				foreach( var kvp in m_ToolVecAISDict ) {
+					foreach( AIS_Line toolVecAIS in kvp.Value ) {
+						m_Viewer.GetAISContext().Display( toolVecAIS, false );
+						m_Viewer.GetAISContext().Deactivate( toolVecAIS );
+					}
+				}
+			}
 		}
 
 		public override void Show( bool bUpdate = false )
@@ -66,6 +92,11 @@ namespace MyCAM.Editor.Renderer
 
 		void BuildAndDisplay( List<string> pathIDList, gp_Trsf trsf, bool bUpdate )
 		{
+			// paused, do not rebuild or display
+			if( m_IsPauseRefresh ) {
+				return;
+			}
+
 			Remove( pathIDList );
 
 			// no need to show

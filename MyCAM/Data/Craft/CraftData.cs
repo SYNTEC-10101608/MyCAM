@@ -406,6 +406,19 @@ namespace MyCAM.Data
 			CAMFactorChanged?.Invoke();
 		}
 
+		public void SetInterpolationMode( int nCurrentIdx , EToolVecInterpolateType interpolateType )
+		{
+			bool isGetNextModfiyIndex = FindNextMapIndex( nCurrentIdx, out int nNextIdx );
+			if( isGetNextModfiyIndex ) {
+				ToolVecModifyMap2[ nNextIdx ].InterpolateType = interpolateType;
+			}
+			else {
+				StartPntToolVecData.EndPnt.InterpolateType = interpolateType;
+			}
+			CAMFactorChanged?.Invoke();
+
+		}
+
 		public void ClearToolVecModify()
 		{
 			m_ToolVecModifyMap.Clear();

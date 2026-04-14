@@ -231,9 +231,10 @@ namespace MyCAM.PathCache
 					int camIndex = m_CADToCAMIndexMap[ oneIndex ];
 					toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap2[ oneIndex ].Clone();
 				}
-				else if( oneIndex == CLOSED_POINT_INDEX && m_IsClose ) {
-					toolVecModifyMap[ oneIndex ] = m_CraftData.ToolVecModifyMap2[ oneIndex ].Clone();
-				}
+			}
+			toolVecModifyMap[ 0 ] = m_CraftData.StartPntToolVecData.StartPnt.Clone();
+			if( m_IsClose ) {
+				toolVecModifyMap[ CLOSED_POINT_INDEX ] = m_CraftData.StartPntToolVecData.EndPnt.Clone();
 			}
 			return toolVecModifyMap;
 		}

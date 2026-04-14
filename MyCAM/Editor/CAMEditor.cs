@@ -341,6 +341,9 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
+
+			m_MainPathRenderer.SetPauseRefresh( true );
+			m_ToolVecRenderer.SetPauseRefresh( true );
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
 
 			// register before init, cause init will change select node to start point, machine need to translate
