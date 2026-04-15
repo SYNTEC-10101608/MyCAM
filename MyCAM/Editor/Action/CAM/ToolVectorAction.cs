@@ -450,7 +450,6 @@ namespace MyCAM.Editor
 		{
 			SetIndexAngleParam();
 
-			m_ToolVecEditRender.Show( m_PathIDList, true );
 			// trigger viewer refresh
 			RefreshSimuResult();
 

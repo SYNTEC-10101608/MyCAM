@@ -139,9 +139,9 @@ namespace MyCAM.Helper
 				double dStart_Slave_deg = toolVecModifyMap[ interpolateIntervalList[ i ].Item1 ].Slave_deg;
 				gp_Dir toolVec = ConvertMSAngleToToolVec( dStart_Master_deg, dStart_Slave_deg );
 				if( toolVec != null ) {
-					toolVecPointList[ i ].ToolVec = toolVec;
-					toolVecPointList[ i ].ModMaster_rad = dStart_Master_deg * Math.PI / 180.0;
-					toolVecPointList[ i ].ModSlave_rad = dStart_Slave_deg * Math.PI / 180.0;
+					toolVecPointList[ interpolateIntervalList[ i ].Item1 ].ToolVec = toolVec;
+					toolVecPointList[ interpolateIntervalList[ i ].Item1 ].ModMaster_rad = dStart_Master_deg * Math.PI / 180.0;
+					toolVecPointList[ interpolateIntervalList[ i ].Item1 ].ModSlave_rad = dStart_Slave_deg * Math.PI / 180.0;
 				}
 			}
 

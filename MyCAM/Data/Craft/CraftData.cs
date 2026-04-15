@@ -1,6 +1,7 @@
 ﻿using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -191,6 +192,7 @@ namespace MyCAM.Data
 			{
 				if( m_StartPointIndex != value ) {
 					m_StartPointIndex = value;
+					ClearToolVecModify();
 					CAMFactorChanged?.Invoke();
 				}
 			}
@@ -207,6 +209,7 @@ namespace MyCAM.Data
 				if( m_IsPathReverse != value ) {
 					m_IsPathReverse = value;
 					ChangeStartToolVecData();
+					OffsetModifyData();
 					CAMFactorChanged?.Invoke();
 				}
 			}
@@ -214,13 +217,57 @@ namespace MyCAM.Data
 
 		void ChangeStartToolVecData()
 		{
-			if (StartPntToolVecData == null ) {
+			if( StartPntToolVecData == null ) {
 				return;
 			}
-			ToolVecModifyData2 temStartPnt = StartPntToolVecData.StartPnt.Clone();	
+			ToolVecModifyData2 temStartPnt = StartPntToolVecData.StartPnt.Clone();
 			ToolVecModifyData2 temEndPnt = StartPntToolVecData.EndPnt.Clone();
-			StartPntToolVecParam newStartPntToolVecData = new StartPntToolVecParam(temEndPnt , temStartPnt );
+			StartPntToolVecParam newStartPntToolVecData = new StartPntToolVecParam( temEndPnt, temStartPnt );
 			StartPntToolVecData = newStartPntToolVecData;
+		}
+
+		void OffsetModifyData()
+		{
+			int nPreKeyIdx = -1;
+			if( m_IsPathReverse ) {
+
+				// get next index interpolate type as this idx type
+				foreach( int k in ToolVecModifyMap2.Keys ) {
+					if( k == ToolVecModifyMap2.Keys.Min() ) {
+						nPreKeyIdx = k;
+						continue;
+					}
+
+					// 上一個人拿現在的插值方案
+					ToolVecModifyMap2[ nPreKeyIdx ].InterpolateType = ToolVecModifyMap2[ k ].InterpolateType;
+					nPreKeyIdx = k;
+				}
+				// the last idx type is startpnt( before reverse it is the end) type
+				ToolVecModifyMap2[ nPreKeyIdx ].InterpolateType = StartPntToolVecData.StartPnt.InterpolateType;
+				return;
+			}
+
+			EToolVecInterpolateType preRegionInterpolateTYpe = EToolVecInterpolateType.Normal;
+			foreach( int k in ToolVecModifyMap2.Keys ) {
+
+				// get pre idx type as current type
+				if( k == ToolVecModifyMap2.Keys.Min() ) {
+					preRegionInterpolateTYpe = ToolVecModifyMap2[ k ].InterpolateType;
+
+					// the first idx is Startpnt( before reverse it is the end) type
+					ToolVecModifyMap2[ k ].InterpolateType = StartPntToolVecData.StartPnt.InterpolateType;
+					continue;
+
+				}
+
+				// record type
+				EToolVecInterpolateType curInterpolateType = ToolVecModifyMap2[ k ].InterpolateType;
+
+				// set this idx type as pre idx type
+				ToolVecModifyMap2[ k ].InterpolateType = preRegionInterpolateTYpe;
+				preRegionInterpolateTYpe = curInterpolateType;
+			}
+			StartPntToolVecData.EndPnt.InterpolateType = preRegionInterpolateTYpe;
 		}
 
 		public LeadData LeadData
@@ -410,7 +457,7 @@ namespace MyCAM.Data
 			CAMFactorChanged?.Invoke();
 		}
 
-		public void SetInterpolationMode( int nCurrentIdx , EToolVecInterpolateType interpolateType )
+		public void SetInterpolationMode( int nCurrentIdx, EToolVecInterpolateType interpolateType )
 		{
 			bool isGetNextModfiyIndex = FindNextMapIndex( nCurrentIdx, out int nNextIdx );
 			if( isGetNextModfiyIndex ) {
@@ -425,7 +472,7 @@ namespace MyCAM.Data
 
 		public void ClearToolVecModify()
 		{
-			m_ToolVecModifyMap.Clear();
+			m_ToolVecModifyMap2.Clear();
 			CAMFactorChanged?.Invoke();
 		}
 
