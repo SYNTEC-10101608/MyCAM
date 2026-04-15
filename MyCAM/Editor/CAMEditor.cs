@@ -343,7 +343,7 @@ namespace MyCAM.Editor
 			}
 
 			m_MainPathRenderer.SetPauseRefresh( true );
-			m_ToolVecRenderer.SetPauseRefresh( true );
+			 m_ToolVecRenderer.SetPauseRefresh( true );
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
 
 			// register before init, cause init will change select node to start point, machine need to translate
@@ -563,7 +563,7 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void SetPathLayer(int nTechLayer)
+		public void SetPathLayer( int nTechLayer )
 		{
 			// one shot edit, multi edit supported
 			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
@@ -583,7 +583,7 @@ namespace MyCAM.Editor
 
 		public void SetCalibrationREF()
 		{
-			if (m_DataManager.PartIDList.Count == 0 ) {
+			if( m_DataManager.PartIDList.Count == 0 ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先新增工件", MyApp.NoticeType.Hint );
 				return;
 			}

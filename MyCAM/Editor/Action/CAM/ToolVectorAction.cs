@@ -441,7 +441,7 @@ namespace MyCAM.Editor
 				m_ToolVecDlg.LockCbx( true, true, false );
 				return;
 			}
-			EToolVecInterpolateType interpolateType = GetNextModfiyIndexInterpolate( out int NextDataIndex );
+			EToolVecInterpolateType interpolateType = GetNextModifyIndexInterpolate( );
 			m_ToolVecDlg.LockCbx( false, false, true, false, interpolateType );
 		}
 
@@ -458,8 +458,6 @@ namespace MyCAM.Editor
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 			}
 			UIProtection();
-
-			
 		}
 
 		void SetIndexAngleParam()
@@ -500,6 +498,7 @@ namespace MyCAM.Editor
 
 			// find next modified point index
 			EToolVecInterpolateType interpolateType = GetNextModifyIndexInterpolate();
+			
 			// set modify data
 			m_CraftData.SetToolVecModify( m_nSelectIndex,
 				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, interpolateType );
@@ -507,26 +506,13 @@ namespace MyCAM.Editor
 
 		EToolVecInterpolateType GetNextModifyIndexInterpolate()
 		{
-			bool isFound = m_CraftData.FindNextMapIndex( m_nSelectIndex, out int nPreIdx );
+			bool isFound = m_CraftData.FindNextMapIndex( m_nSelectIndex, out int nNextIdx );
 
 			if( !isFound ) {
 				return m_CraftData.StartPntToolVecData.EndPnt.InterpolateType;
 			}
 			else {
-				return m_CraftData.ToolVecModifyMap2[ nPreIdx ].InterpolateType;
-			}
-		}
-
-
-		EToolVecInterpolateType GetNextModfiyIndexInterpolate( out int key )
-		{
-			bool isFound = m_CraftData.FindNextMapIndex( m_nSelectIndex, out key );
-
-			if( isFound ) {
-				return m_CraftData.ToolVecModifyMap2[ key ].InterpolateType;
-			}
-			else {
-				return m_CraftData.StartPntToolVecData.EndPnt.InterpolateType;
+				return m_CraftData.ToolVecModifyMap2[ nNextIdx ].InterpolateType;
 			}
 		}
 
@@ -562,8 +548,7 @@ namespace MyCAM.Editor
 			m_CoordIcon.Trans( frameTransformMap[ MachineComponentType.WorkPiece ].Last() );
 
 			// update camera FIRST before setting any transformations
-			gp_Trsf workPieceTrsf = frameTransformMap[ MachineComponentType.WorkPiece ].Last();
-			m_ToolVecEditRender.ShowTrans( workPieceTrsf );
+			m_ToolVecEditRender.ShowTrans( frameTransformMap[ MachineComponentType.WorkPiece ].Last() );
 			RaiseTrans?.Invoke( frameTransformMap );
 		}
 

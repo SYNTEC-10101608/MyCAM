@@ -202,8 +202,10 @@ namespace MyCAM.PathCache
 
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
+
+			// 拿到控制點姿態
 			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = GetToolVecModifyMap();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, toolVecModifyMap, m_IsClose, m_CraftData.InterpolateType, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList );
+			ToolVecHelper.SetToolVec( ref toolVecPointList, toolVecModifyMap, m_IsClose, m_CraftData.InterpolateType, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList, m_CraftData.IsPathReverse );
 			m_interpolateTypeRegion = interpolateRegionList;
 
 			// set over cut
@@ -237,9 +239,22 @@ namespace MyCAM.PathCache
 					toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap2[ oneIndex ].Clone();
 				}
 			}
-			toolVecModifyMap[ 0 ] = m_CraftData.StartPntToolVecData.StartPnt.Clone();
+			if( m_CraftData.IsPathReverse ) {
+				toolVecModifyMap[ 0 ] = m_CraftData.StartPntToolVecData.EndPnt.Clone();
+				
+			}
+			else {
+				toolVecModifyMap[ 0 ] = m_CraftData.StartPntToolVecData.StartPnt.Clone();
+			}
+				
 			if( m_IsClose ) {
-				toolVecModifyMap[ CLOSED_POINT_INDEX ] = m_CraftData.StartPntToolVecData.EndPnt.Clone();
+				if( m_CraftData.IsPathReverse ) {
+					toolVecModifyMap[ CLOSED_POINT_INDEX ] = m_CraftData.StartPntToolVecData.StartPnt.Clone();
+				}
+				else {
+					toolVecModifyMap[ CLOSED_POINT_INDEX ] = m_CraftData.StartPntToolVecData.EndPnt.Clone();
+				}
+				
 			}
 			return toolVecModifyMap;
 		}
@@ -328,11 +343,6 @@ namespace MyCAM.PathCache
 		void SetCenterDir()
 		{
 			m_ComputeRefCenterDir = m_ContourGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
-		}
-
-		void ClearToolVecMap()
-		{
-			m_CraftData.ToolVecModifyMap2.Clear();
 		}
 
 		void SetDefaultStartEndToolVecParam()

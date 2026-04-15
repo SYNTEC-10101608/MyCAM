@@ -4,13 +4,14 @@ using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace MyCAM.Helper
 {
 	public static class ToolVecHelper
 	{
 		public static void SetToolVec( ref List<ISetToolVecPoint> toolVecPointList,
-			Dictionary<int, ToolVecModifyData2> toolVecModifyMap, bool isClosed, EToolVecInterpolateType interpolateType, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList )
+			Dictionary<int, ToolVecModifyData2> toolVecModifyMap, bool isClosed, EToolVecInterpolateType interpolateType, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList, bool isPathReverse )
 		{
 			// arrange the map for closed path
 			if( isClosed ) {
@@ -24,7 +25,7 @@ namespace MyCAM.Helper
 				}
 				toolVecPointList[ i ].IsToolVecModPoint = true;
 			}
-			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, interpolateType, out interpolateRegionList );
+			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, interpolateType, out interpolateRegionList, isPathReverse );
 		}
 
 		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint )
@@ -104,7 +105,7 @@ namespace MyCAM.Helper
 
 		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList,
 			IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap,
-			EToolVecInterpolateType interpolateType, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateIntervalList )
+			EToolVecInterpolateType interpolateType, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateIntervalList, bool isPathReverse )
 		{
 			if( toolVecModifyMap.Count == 0 ) {
 				interpolateIntervalList = new List<Tuple<int, int, EToolVecInterpolateType>>();
@@ -112,7 +113,7 @@ namespace MyCAM.Helper
 			}
 
 			// get the interpolate interval list
-			interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap );
+			interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap, isPathReverse );
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
 				if( interpolateIntervalList[ i ].Item3 == EToolVecInterpolateType.VectorInterpolation ) {
 					ApplyMSAngleInterpolation( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
@@ -160,14 +161,20 @@ namespace MyCAM.Helper
 
 
 		public static List<Tuple<int, int, EToolVecInterpolateType>> GetInterpolateIntervalList(
-			IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap )
+			IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap, bool isPathReverse )
 		{
 			// sort the modify data by index
 			List<int> indexInOrder = toolVecModifyMap.Keys.ToList();
 			indexInOrder.Sort();
 			List<Tuple<int, int, EToolVecInterpolateType>> intervalList = new List<Tuple<int, int, EToolVecInterpolateType>>();
 			for( int i = 0; i < indexInOrder.Count - 1; i++ ) {
-				intervalList.Add( new Tuple<int, int, EToolVecInterpolateType>( indexInOrder[ i ], indexInOrder[ i + 1 ], toolVecModifyMap[ indexInOrder[ i + 1 ] ].InterpolateType ) );
+				if( isPathReverse ) {
+					intervalList.Add( new Tuple<int, int, EToolVecInterpolateType>( indexInOrder[ i ], indexInOrder[ i + 1 ], toolVecModifyMap[ indexInOrder[ i  ] ].InterpolateType ) );
+				}
+				else {
+					intervalList.Add( new Tuple<int, int, EToolVecInterpolateType>( indexInOrder[ i ], indexInOrder[ i + 1 ], toolVecModifyMap[ indexInOrder[ i + 1 ] ].InterpolateType ) );
+				}
+					
 			}
 			return intervalList;
 		}
@@ -414,7 +421,12 @@ namespace MyCAM.Helper
 
 			// filter singular points and apply results directly to toolVecPointList
 			bool bFilterMaster = machineData.FiveAxisType == FiveAxisType.Spindle; // which axis is going to filter
-			FilterSingularPoints( ref toolVecPointList, singularTagList, bFilterMaster );
+
+
+			// 我要拿 toolVecPointList[ nStartIdx]~[nEndIdx]的指標
+
+			List<ISetToolVecPoint> toolVecPointList2 = toolVecPointList.GetRange( nStartIdx, nEndIdx - nStartIdx + 1 );
+			FilterSingularPoints( ref toolVecPointList2, singularTagList, bFilterMaster );
 		}
 
 		static void FilterSingularPoints( ref List<ISetToolVecPoint> pointList, List<bool> singularTagList, bool bFilterMaster )
