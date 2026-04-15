@@ -138,6 +138,10 @@ namespace MyCAM.PathCache
 				m_CADPointList[ i ].Transform( m_CraftData.CumulativeTrsfMatrix );
 			}
 
+			// apply local CAD point displacement
+			m_CADPointList = ContourEditHelper.ApplyCADPointModify(
+				m_CADPointList, m_CraftData.CADPointModifyMap, m_IsClose );
+
 			m_ConnectCADPointMap.Clear();
 			foreach( var kvp in m_ContourGeomData.ConnectPointMap ) {
 				CADPoint transformedKey = kvp.Key.Clone();
