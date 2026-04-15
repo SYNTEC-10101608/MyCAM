@@ -214,9 +214,12 @@ namespace MyCAM.Data
 
 		void ChangeStartToolVecData()
 		{
+			if (StartPntToolVecData == null ) {
+				return;
+			}
 			ToolVecModifyData2 temStartPnt = StartPntToolVecData.StartPnt.Clone();	
 			ToolVecModifyData2 temEndPnt = StartPntToolVecData.EndPnt.Clone();
-			StartPntToolVecParam newStartPntToolVecData = new StartPntToolVecParam( temStartPnt, temEndPnt );
+			StartPntToolVecParam newStartPntToolVecData = new StartPntToolVecParam(temEndPnt , temStartPnt );
 			StartPntToolVecData = newStartPntToolVecData;
 		}
 
@@ -401,6 +404,7 @@ namespace MyCAM.Data
 				else {
 					EToolVecInterpolateType removedType = m_ToolVecModifyMap2[ index ].InterpolateType;
 					StartPntToolVecData.EndPnt.InterpolateType = removedType;
+					m_ToolVecModifyMap2.Remove( index );
 				}
 			}
 			CAMFactorChanged?.Invoke();
@@ -476,7 +480,6 @@ namespace MyCAM.Data
 
 				// 反向
 				else {
-
 					// 從起點位置找到現在
 					foreach( int k in ToolVecModifyMap2.Keys ) {
 						if( k > currentIdx ) {
@@ -634,7 +637,7 @@ namespace MyCAM.Data
 		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.Normal;
 		Dictionary<int, ToolVecModifyData> m_ToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
 		ToolVecModifyMap m_ToolVecModifyMap2 = new ToolVecModifyMap();
-		StartPntToolVecParam m_StartPntToolVecData = new StartPntToolVecParam( new ToolVecModifyData2(), new ToolVecModifyData2() );
+		StartPntToolVecParam m_StartPntToolVecData = null;
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();

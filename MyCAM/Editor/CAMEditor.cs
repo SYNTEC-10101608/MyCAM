@@ -360,6 +360,8 @@ namespace MyCAM.Editor
 				m_MachineRender.Show();
 			}
 			else {
+				m_MainPathRenderer.SetPauseRefresh( false );
+				m_ToolVecRenderer.SetPauseRefresh( false );
 				m_MachineRender.Remove();
 				m_ToolVecRenderer.Reset();
 				m_TraverseRenderer.Reset();

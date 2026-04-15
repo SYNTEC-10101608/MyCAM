@@ -2,6 +2,7 @@
 using MyCAM.Helper;
 using MyCAM.Post;
 using OCC.gp;
+using OCC.SWIG;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace MyCAM.PathCache
 			BuildCADCAMPointList();
 
 			// build default start/end point tool vec data after tool vec is set
-			BuildDefaultStartPntToolVecData();
+			// BuildDefaultStartPntToolVecData();
 		}
 
 		#region computation result
@@ -196,10 +197,14 @@ namespace MyCAM.PathCache
 			// solve initial IK
 			SolveInitIK();
 
+			// use origin IK result as default start/end point tool vec data
+			SetDefaultStartEndToolVecParam();
+
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
 			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = GetToolVecModifyMap();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, toolVecModifyMap, m_IsClose, m_CraftData.InterpolateType );
+			ToolVecHelper.SetToolVec( ref toolVecPointList, toolVecModifyMap, m_IsClose, m_CraftData.InterpolateType, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList );
+			m_interpolateTypeRegion = interpolateRegionList;
 
 			// set over cut
 			List<IOrientationPoint> camPointOverCutList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
@@ -237,6 +242,12 @@ namespace MyCAM.PathCache
 				toolVecModifyMap[ CLOSED_POINT_INDEX ] = m_CraftData.StartPntToolVecData.EndPnt.Clone();
 			}
 			return toolVecModifyMap;
+		}
+
+		List<Tuple<int, int, EToolVecInterpolateType>> m_interpolateTypeRegion;
+		public List<Tuple<int, int, EToolVecInterpolateType>> GetMapedModifyMap()
+		{
+			return m_interpolateTypeRegion;
 		}
 
 		void SolveInitIK()
@@ -324,22 +335,13 @@ namespace MyCAM.PathCache
 			m_CraftData.ToolVecModifyMap2.Clear();
 		}
 
-		void BuildDefaultStartPntToolVecData()
+		void SetDefaultStartEndToolVecParam()
 		{
-			if( m_CAMPointList.Count == 0 ) {
-				return;
+			if( m_CraftData.StartPntToolVecData == null ) {
+				ToolVecModifyData2 startPnt = BuildToolVecModifyData( m_CAMPointList.First().Clone() );
+				ToolVecModifyData2 endPnt = BuildToolVecModifyData( m_CAMPointList.Last().Clone() );
+				m_CraftData.StartPntToolVecData = new StartPntToolVecParam( startPnt, endPnt );
 			}
-
-			CAMPoint startPnt = m_CAMPointList.First();
-			CAMPoint endPnt = m_CAMPointList.Last();
-
-			// build start point tool vec data
-			ToolVecModifyData2 startData = BuildToolVecModifyData( startPnt );
-
-			// build end point tool vec data
-			ToolVecModifyData2 endData = BuildToolVecModifyData( endPnt );
-
-			m_CraftData.StartPntToolVecData = new StartPntToolVecParam( startData, endData );
 		}
 
 		ToolVecModifyData2 BuildToolVecModifyData( CAMPoint camPoint )

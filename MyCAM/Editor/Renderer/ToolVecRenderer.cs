@@ -5,6 +5,7 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
+using System;
 using System.Collections.Generic;
 
 namespace MyCAM.Editor.Renderer
@@ -106,7 +107,7 @@ namespace MyCAM.Editor.Renderer
 				}
 				return;
 			}
-
+			Console.WriteLine( "被放上去" );
 			// build tool vec
 			foreach( string szPathID in pathIDList ) {
 				IReadOnlyList<IProcessPoint> toolVecPointList = GetToolVecPointList( szPathID );

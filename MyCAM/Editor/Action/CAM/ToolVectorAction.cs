@@ -31,7 +31,7 @@ namespace MyCAM.Editor
 			m_DataHandler = new ToolVecActionDataHandler( pathID );
 			m_PathIDList = new List<string>() { pathID };
 			m_CoordIcon = new CoordIconRenderer( viewer, dataManager );
-			m_ToolVecEditRender = new ToolVecEditRender( viewer, dataManager );
+			m_ToolVecEditRender = new ToolVecEditRender( viewer, dataManager, m_PathIDList );
 		}
 
 		public override EditActionType ActionType
@@ -450,6 +450,7 @@ namespace MyCAM.Editor
 		{
 			SetIndexAngleParam();
 
+			m_ToolVecEditRender.Show( m_PathIDList, true );
 			// trigger viewer refresh
 			RefreshSimuResult();
 
@@ -459,7 +460,7 @@ namespace MyCAM.Editor
 			}
 			UIProtection();
 
-			m_ToolVecEditRender.Show( m_PathIDList, true );
+			
 		}
 
 		void SetIndexAngleParam()
@@ -560,6 +561,10 @@ namespace MyCAM.Editor
 
 			// trihedron also need to change according to workpiece
 			m_CoordIcon.Trans( frameTransformMap[ MachineComponentType.WorkPiece ].Last() );
+
+			// update camera FIRST before setting any transformations
+			gp_Trsf workPieceTrsf = frameTransformMap[ MachineComponentType.WorkPiece ].Last();
+			m_ToolVecEditRender.ShowTrans( workPieceTrsf );
 			RaiseTrans?.Invoke( frameTransformMap );
 		}
 
