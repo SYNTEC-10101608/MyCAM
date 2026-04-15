@@ -55,6 +55,43 @@ namespace MyCAM.Data
 		}
 	}
 
+	public class CADPointModifyData
+	{
+		public double DX
+		{
+			get; set;
+		}
+
+		public double DY
+		{
+			get; set;
+		}
+
+		public double DZ
+		{
+			get; set;
+		}
+
+		public CADPointModifyData()
+		{
+			DX = 0;
+			DY = 0;
+			DZ = 0;
+		}
+
+		public CADPointModifyData( double dx, double dy, double dz )
+		{
+			DX = dx;
+			DY = dy;
+			DZ = dz;
+		}
+
+		public CADPointModifyData Clone()
+		{
+			return new CADPointModifyData( DX, DY, DZ );
+		}
+	}
+
 	public class CraftData
 	{
 		public CraftData()
@@ -72,7 +109,8 @@ namespace MyCAM.Data
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap,
 			bool isToolVecReverse,
 			EToolVecInterpolateType interpolateType,
-			TraverseData traverseData )
+			TraverseData traverseData,
+			Dictionary<int, CADPointModifyData> cadPointModifyMap = null )
 		{
 			m_TechLayer = techLayer;
 			m_StartPointIndex = startPoint;
@@ -83,6 +121,12 @@ namespace MyCAM.Data
 			if( toolVecModifyMap != null ) {
 				foreach( var kvp in toolVecModifyMap ) {
 					m_ToolVecModifyMap.Add( kvp.Key, kvp.Value.Clone() );
+				}
+			}
+			m_CADPointModifyMap = new Dictionary<int, CADPointModifyData>();
+			if( cadPointModifyMap != null ) {
+				foreach( var kvp in cadPointModifyMap ) {
+					m_CADPointModifyMap.Add( kvp.Key, kvp.Value.Clone() );
 				}
 			}
 			m_IsToolVecReverse = isToolVecReverse;
@@ -304,6 +348,39 @@ namespace MyCAM.Data
 			CAMFactorChanged?.Invoke();
 		}
 
+		public Dictionary<int, CADPointModifyData> CADPointModifyMap
+		{
+			get
+			{
+				return m_CADPointModifyMap;
+			}
+		}
+
+		public void SetCADPointModify( int index, double dx, double dy, double dz )
+		{
+			if( m_CADPointModifyMap.ContainsKey( index ) ) {
+				m_CADPointModifyMap[ index ] = new CADPointModifyData( dx, dy, dz );
+			}
+			else {
+				m_CADPointModifyMap.Add( index, new CADPointModifyData( dx, dy, dz ) );
+			}
+			CADFactorChanged?.Invoke();
+		}
+
+		public void RemoveCADPointModify( int index )
+		{
+			if( m_CADPointModifyMap.ContainsKey( index ) ) {
+				m_CADPointModifyMap.Remove( index );
+			}
+			CADFactorChanged?.Invoke();
+		}
+
+		public void ClearCADPointModify()
+		{
+			m_CADPointModifyMap.Clear();
+			CADFactorChanged?.Invoke();
+		}
+
 		void SubscribeSubParamChanged()
 		{
 			m_LeadData.PropertyChanged += SubParamChanged;
@@ -327,5 +404,6 @@ namespace MyCAM.Data
 		TraverseData m_TraverseData = new TraverseData();
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();
 		double m_CompensatedDistance = 0;
+		Dictionary<int, CADPointModifyData> m_CADPointModifyMap = new Dictionary<int, CADPointModifyData>();
 	}
 }
