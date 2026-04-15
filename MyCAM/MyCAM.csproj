@@ -67,6 +67,7 @@
     <Compile Include="Data\Craft\CalibrationData.cs" />
     <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
     <Compile Include="Editor\Action\CAM\CalibrationREFAction.cs" />
+    <Compile Include="Editor\Action\CAM\ContourEditAction.cs" />
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
     <Compile Include="Editor\Dialog\CalibrationREFDlg.cs">
@@ -76,6 +77,13 @@
       <DependentUpon>CalibrationREFDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Renderer\PathRenderer.cs" />
+    <Compile Include="Editor\Dialog\ContourEditDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\ContourEditDlg.Designer.cs">
+      <DependentUpon>ContourEditDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Renderer\EditPointRenderer.cs" />
     <Compile Include="Editor\Renderer\REFPointRenderer.cs" />
     <Compile Include="Editor\Dialog\ControllerDlg.cs">
       <SubType>Form</SubType>
@@ -102,6 +110,7 @@
     <Compile Include="Editor\Renderer\ToolVecEditRender.cs" />
     <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
+    <Compile Include="Helper\CAM\ContourEditHelper.cs" />
     <Compile Include="Helper\CAM\StartPointHelper.cs" />
     <Compile Include="Helper\Canvas\DrawHelper.cs" />
     <Compile Include="Helper\Coupler\StdPatternCraftCoupler.cs" />
@@ -280,6 +289,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\ControllerDlg.resx">
       <DependentUpon>ControllerDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\ContourEditDlg.resx">
+      <DependentUpon>ContourEditDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\PathCompensateDlg.resx">
       <DependentUpon>PathCompensateDlg.cs</DependentUpon>

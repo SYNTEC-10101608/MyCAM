@@ -433,9 +433,9 @@ namespace MyCAM.Editor
 			view.SetUp( newUp.X(), newUp.Y(), newUp.Z() );
 
 			if( isUnLockViewerUpdate ) {
-				// restore immediate update and update view once
-				view.SetImmediateUpdate( previousImmediateUpdate );
-			}
+			// restore immediate update and update view once
+			view.SetImmediateUpdate( previousImmediateUpdate );
+		}
 		}
 
 		public void SetToolVecReverse()
@@ -524,7 +524,7 @@ namespace MyCAM.Editor
 					};
 					craftData.StartPntToolVecData.EndPnt = endPntData.Clone();
 					craftData.StartPntToolVecData.StartPnt = startPntData.Clone();
-				}
+			}
 				else {
 					craftData.StartPntToolVecData.EndPnt = startPntData.Clone();
 					craftData.StartPntToolVecData.StartPnt = startPntData.Clone();
@@ -601,6 +601,27 @@ namespace MyCAM.Editor
 			}
 			PathCompensationAction action = new PathCompensationAction( m_DataManager, szPathIDList );
 			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
+		}
+
+		public void SetContourEdit()
+		{
+			// action edit, no multi edit supported
+			if( IsSameAction( EditActionType.ContourEdit ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
+				return;
+			}
+			string szPathID = szPathIDList[ 0 ];
+			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType )
+				|| pathType != PathType.Contour ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]此功能僅支援輪廓路徑", MyApp.NoticeType.Hint );
+				return;
+			}
+			ContourEditAction action = new ContourEditAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathID );
+			action.PropertyChanged += () => ShowCAMData( new List<string>() { szPathID } );
 			StartEditAction( action );
 		}
 
@@ -1062,7 +1083,8 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern
 				|| action.ActionType == EditActionType.PathEdit
-				|| action.ActionType == EditActionType.ToolVec ) {
+				|| action.ActionType == EditActionType.ToolVec
+				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// lock main form
 				m_TreeView.Enabled = false;
@@ -1081,7 +1103,8 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern
 				|| action.ActionType == EditActionType.PathEdit
-				|| action.ActionType == EditActionType.ToolVec ) {
+				|| action.ActionType == EditActionType.ToolVec
+				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// unlock main form
 				m_TreeView.Enabled = true;

@@ -21,15 +21,15 @@ namespace MyCAM.Data
 			{
 				if( m_StartPnt == null ) {
 					m_StartPnt = new ToolVecModifyData();
-				}
+		}
 				return m_StartPnt;
 			}
 			set
-			{
+		{
 				if( m_StartPnt != value ) {
 					m_StartPnt = value;
 					PropertyChanged?.Invoke();
-				}
+		}
 			}
 		}
 
@@ -39,15 +39,15 @@ namespace MyCAM.Data
 			{
 				if( m_EndPnt == null ) {
 					m_EndPnt = new ToolVecModifyData();
-				}
+		}
 				return m_EndPnt;
 			}
 			set
-			{
+		{
 				if( m_EndPnt != value ) {
 					m_EndPnt = value;
 					PropertyChanged?.Invoke();
-				}
+		}
 			}
 		}
 
@@ -66,6 +66,43 @@ namespace MyCAM.Data
 
 		ToolVecModifyData m_EndPnt;
 		ToolVecModifyData m_StartPnt;
+		}
+
+	public class ContourEditData
+	{
+		public double DX
+		{
+			get; set;
+		}
+
+		public double DY
+		{
+			get; set;
+		}
+
+		public double DZ
+		{
+			get; set;
+		}
+
+		public ContourEditData()
+		{
+			DX = 0;
+			DY = 0;
+			DZ = 0;
+		}
+
+		public ContourEditData( double dx, double dy, double dz )
+		{
+			DX = dx;
+			DY = dy;
+			DZ = dz;
+		}
+
+		public ContourEditData Clone()
+		{
+			return new ContourEditData( DX, DY, DZ );
+		}
 	}
 
 	public class CraftData
@@ -84,8 +121,9 @@ namespace MyCAM.Data
 			double overCutLength,
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap2,
 			StartPntToolVecParam startPntToolVecData,
-		bool isToolVecReverse,
-			TraverseData traverseData )
+			bool isToolVecReverse,
+			TraverseData traverseData,
+			Dictionary<int, ContourEditData> contourEditMap )
 		{
 			m_TechLayer = techLayer;
 			m_StartPointIndex = startPoint;
@@ -99,6 +137,12 @@ namespace MyCAM.Data
 			}
 			if( startPntToolVecData != null ) {
 				m_StartPntToolVecData = startPntToolVecData;
+			}
+			m_ContourEditMap = new Dictionary<int, ContourEditData>();
+			if( contourEditMap != null ) {
+				foreach( var kvp in contourEditMap ) {
+					m_ContourEditMap.Add( kvp.Key, kvp.Value.Clone() );
+				}
 			}
 			m_IsToolVecReverse = isToolVecReverse;
 			m_TraverseData = traverseData;
@@ -326,8 +370,8 @@ namespace MyCAM.Data
 					else {
 						EToolVecInterpolateType removedType = m_ToolVecModifyMap[ index ].InterpolateType;
 						StartPntToolVecData.EndPnt.InterpolateType = removedType;
-						m_ToolVecModifyMap.Remove( index );
-					}
+				m_ToolVecModifyMap.Remove( index );
+			}
 				}
 				else {
 
@@ -439,6 +483,39 @@ namespace MyCAM.Data
 			return found;
 		}
 
+		public Dictionary<int, ContourEditData> ContourEditMap
+		{
+			get
+			{
+				return m_ContourEditMap;
+			}
+		}
+
+		public void SetContourEditPoint( int index, double dx, double dy, double dz )
+		{
+			if( m_ContourEditMap.ContainsKey( index ) ) {
+				m_ContourEditMap[ index ] = new ContourEditData( dx, dy, dz );
+			}
+			else {
+				m_ContourEditMap.Add( index, new ContourEditData( dx, dy, dz ) );
+			}
+			CADFactorChanged?.Invoke();
+		}
+
+		public void RemoveContourEditPoint( int index )
+		{
+			if( m_ContourEditMap.ContainsKey( index ) ) {
+				m_ContourEditMap.Remove( index );
+			}
+			CADFactorChanged?.Invoke();
+		}
+
+		public void ClearContourEditPoint()
+		{
+			m_ContourEditMap.Clear();
+			CADFactorChanged?.Invoke();
+		}
+
 		void SubscribeSubParamChanged()
 		{
 			m_LeadData.PropertyChanged += SubParamChanged;
@@ -476,6 +553,7 @@ namespace MyCAM.Data
 		TraverseData m_TraverseData = new TraverseData();
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();
 		double m_CompensatedDistance = 0;
+		Dictionary<int, ContourEditData> m_ContourEditMap = new Dictionary<int, ContourEditData>();
 	}
 
 

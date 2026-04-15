@@ -54,6 +54,11 @@ namespace MyCAM.Data
 			m_TangentVec.Transform( transform );
 		}
 
+		public void Translate( gp_Vec vec )
+		{
+			m_Point.Translate( vec );
+		}
+
 		public CADPoint Clone()
 		{
 			return new CADPoint( Point, NormalVec_1st, NormalVec_2nd, TangentVec );
