@@ -411,7 +411,7 @@ namespace MyCAM
 
 		void m_tsbPathCompensation_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.SetPathCompensation();
+			m_CAMEditor.SetContourEdit();
 		}
 
 		// convert NC

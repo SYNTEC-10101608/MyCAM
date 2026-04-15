@@ -558,7 +558,28 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void SetPathLayer(int nTechLayer)
+		public void SetContourEdit()
+		{
+			// action edit, no multi edit supported
+			if( IsSameAction( EditActionType.ContourEdit ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
+				return;
+			}
+			string szPathID = szPathIDList[ 0 ];
+			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType )
+				|| pathType != PathType.Contour ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]此功能僅支援輪廓路徑", MyApp.NoticeType.Hint );
+				return;
+			}
+			ContourEditAction action = new ContourEditAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathID );
+			action.PropertyChanged += () => ShowCAMData( new List<string>() { szPathID } );
+			StartEditAction( action );
+		}
+
+		public void SetPathLayer( int nTechLayer )
 		{
 			// one shot edit, multi edit supported
 			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
@@ -578,7 +599,7 @@ namespace MyCAM.Editor
 
 		public void SetCalibrationREF()
 		{
-			if (m_DataManager.PartIDList.Count == 0 ) {
+			if( m_DataManager.PartIDList.Count == 0 ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先新增工件", MyApp.NoticeType.Hint );
 				return;
 			}
@@ -1016,7 +1037,8 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern
 				|| action.ActionType == EditActionType.PathEdit
-				|| action.ActionType == EditActionType.ToolVec ) {
+				|| action.ActionType == EditActionType.ToolVec
+				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// lock main form
 				m_TreeView.Enabled = false;
@@ -1035,7 +1057,8 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern
 				|| action.ActionType == EditActionType.PathEdit
-				|| action.ActionType == EditActionType.ToolVec ) {
+				|| action.ActionType == EditActionType.ToolVec
+				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// unlock main form
 				m_TreeView.Enabled = true;
