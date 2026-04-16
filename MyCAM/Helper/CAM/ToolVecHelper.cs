@@ -274,29 +274,6 @@ namespace MyCAM.Helper
 			return false;
 		}
 
-		/*
-		static void ApplyMSAngleInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap )
-		{
-			// get the interpolate interval list
-			List<Tuple<int, int>> interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap );
-
-			// get the control point master/slave angles for each interval
-			List<MSAngle> ctrlPntMSAngles = GetIntervalMSAngles( interpolateIntervalList, toolVecModifyMap );
-
-			// modify the tool vector
-			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
-
-				// get start and end index
-				int nStartIndex = interpolateIntervalList[ i ].Item1;
-				int nEndIndex = interpolateIntervalList[ i ].Item2;
-				InterpolateToolVecByMS( ref toolVecPointList, nStartIndex, nEndIndex,
-					ctrlPntMSAngles[ i ].dStart_Master_deg, ctrlPntMSAngles[ i ].dStart_Slave_deg,
-					ctrlPntMSAngles[ i ].dEnd_Master_deg, ctrlPntMSAngles[ i ].dEnd_Slave_deg );
-			}
-			return;
-		}
-		*/
-
 		static void ApplyMSAngleInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap, int startIndex, int endIndex )
 		{
 			MSAngle msStartAngleParam = new MSAngle
@@ -325,67 +302,6 @@ namespace MyCAM.Helper
 			InterpolateToolVecByTilt( ref toolVecPointList, startIndex, endIndex,
 					tiltABAngle.dStart_RA_deg, tiltABAngle.dStart_RB_deg,
 					tiltABAngle.dEnd_RA_deg, tiltABAngle.dEnd_RB_deg );
-		}
-
-		/*
-		static void ApplyTiltAngleInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap )
-		{
-			// get the interpolate interval list
-			List<Tuple<int, int>> interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap );
-
-			// get the control point tool vector for each interval
-			List<TiltABAngle> ctrlPntToolVec = GetIntervalABAngles( interpolateIntervalList, toolVecModifyMap );
-
-			// modify the tool vector
-			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
-
-				// get start and end index
-				int nStartIndex = interpolateIntervalList[ i ].Item1;
-				int nEndIndex = interpolateIntervalList[ i ].Item2;
-				InterpolateToolVecByTilt( ref toolVecPointList, nStartIndex, nEndIndex,
-					ctrlPntToolVec[ i ].dStart_RA_deg, ctrlPntToolVec[ i ].dStart_RB_deg,
-					ctrlPntToolVec[ i ].dEnd_RA_deg, ctrlPntToolVec[ i ].dEnd_RB_deg );
-			}
-		}
-		*/
-
-		static void SolveAllPathIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap )
-		{
-			// Get machine data
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
-				return;
-			}
-
-			// Create PostSolver
-			PostSolver postSolver = new PostSolver( machineData );
-			double dM = toolVecModifyMap[ 0 ].Master_deg * Math.PI / 180.0;
-			double dS = toolVecModifyMap[ 0 ].Slave_deg * Math.PI / 180.0;
-
-			// sigularity tag list
-			List<bool> singularTagList = new List<bool>();
-			for( int i = 0; i < toolVecPointList.Count; i++ ) {
-				IKSolveResult result = postSolver.SolveIK( toolVecPointList[ i ].ToolVec, dM, dS, out dM, out dS );
-				if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution ) {
-					continue;
-				}
-				else if( result == IKSolveResult.OutOfRange ) {
-					// out of range, but still set the angles
-				}
-
-				// check singularity
-				if( result == IKSolveResult.MasterInfinityOfSolution || result == IKSolveResult.SlaveInfinityOfSolution ) {
-					singularTagList.Add( true );
-				}
-				else {
-					singularTagList.Add( false );
-				}
-				toolVecPointList[ i ].ModMaster_rad = dM;
-				toolVecPointList[ i ].ModSlave_rad = dS;
-			}
-
-			// filter singular points and apply results directly to toolVecPointList
-			bool bFilterMaster = machineData.FiveAxisType == FiveAxisType.Spindle; // which axis is going to filter
-			FilterSingularPoints( ref toolVecPointList, singularTagList, bFilterMaster );
 		}
 
 		static void SolveRegionIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap, int nStartIdx, int nEndIdx, bool isWithInterpolate )

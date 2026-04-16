@@ -1232,6 +1232,7 @@ namespace MyCAM.FileManager
 					throw new ArgumentException( "CraftData deserialization failed: Old version file missing InterpolateType field." );
 				}
 
+				// old version do not have InterpolateType in each entry
 				EToolVecInterpolateType globalInterpolateType = InterpolateType.Value;
 
 				// Old ToolVecMapDTO format: index matching StartPoint = StartPnt, index -1 = EndPnt

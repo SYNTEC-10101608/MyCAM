@@ -11,50 +11,6 @@ namespace MyCAM.Data
 		TiltAngleInterpolation,
 	}
 
-	public class ToolVecModifyData
-	{
-		public double RA_deg
-		{
-			get; set;
-		}
-
-		public double RB_deg
-		{
-			get; set;
-		}
-
-		public double Master_deg
-		{
-			get; set;
-		}
-
-		public double Slave_deg
-		{
-			get; set;
-		}
-
-		public ToolVecModifyData()
-		{
-			RA_deg = 0;
-			RB_deg = 0;
-			Master_deg = 0;
-			Slave_deg = 0;
-		}
-
-		public ToolVecModifyData( double ra_deg, double rb_deg, double master_deg, double slave_deg )
-		{
-			RA_deg = ra_deg;
-			RB_deg = rb_deg;
-			Master_deg = master_deg;
-			Slave_deg = slave_deg;
-		}
-
-		public ToolVecModifyData Clone()
-		{
-			return new ToolVecModifyData( RA_deg, RB_deg, Master_deg, Slave_deg );
-		}
-	}
-
 	public class ToolVecModifyData2
 	{
 		public double RA_deg
@@ -470,11 +426,10 @@ namespace MyCAM.Data
 			nextIdx = -1;
 			bool found = false;
 
-			// 現在index比起點大
 			if( currentIdx > StartPntIdx ) {
 
 
-				// 從現在位置找到路徑尾中最小的
+				// find the smallest key that is greater than currentIdx till the end
 				foreach( int k in ToolVecModifyMap2.Keys ) {
 					if( k > currentIdx ) {
 						nextIdx = k;
@@ -483,7 +438,7 @@ namespace MyCAM.Data
 					}
 				}
 
-				// 從目前起點到最後都沒有,找0~起點前最小的
+				// cant find, then find the smallest key that is smaller than start point index
 				if( found == false ) {
 					foreach( int k in ToolVecModifyMap2.Keys ) {
 						if( k > StartPntIdx ) {
@@ -498,7 +453,6 @@ namespace MyCAM.Data
 				}
 			}
 
-			// 現在位置在起點之前
 			else {
 
 				foreach( int k in ToolVecModifyMap2.Keys ) {
@@ -512,21 +466,18 @@ namespace MyCAM.Data
 					}
 				}
 			}
-
 			return found;
 		}
 
 		public bool FindPreMapIndex( int currentIdx, out int preIdx )
 		{
 			int StartPntIdx = m_StartPointIndex;
-			bool isPathReverse = m_IsPathReverse;
 			preIdx = -1;
 			bool found = false;
 
-			// 現在index比起點大
 			if( currentIdx > StartPntIdx ) {
 
-				//從起點找到現在位置中最大的
+				//find the biggest key that is smaller than currentIdx and bigger than start point index
 				foreach( int k in ToolVecModifyMap2.Keys ) {
 					if( k > currentIdx ) {
 						break;
@@ -537,10 +488,8 @@ namespace MyCAM.Data
 					}
 				}
 			}
-
-			// 現在位置在起點之前
 			else {
-				// 從0找到這個點中最大的
+				// find the biggest key that is smaller than currentIdx
 				foreach( int k in ToolVecModifyMap2.Keys ) {
 					if( k < currentIdx ) {
 						preIdx = k;
@@ -548,7 +497,7 @@ namespace MyCAM.Data
 					}
 				}
 
-				// 從起點到路徑尾中最大的
+				// find th biggest key that is bigger than start point index
 				if( found == false ) {
 					foreach( int k in ToolVecModifyMap2.Keys ) {
 						if( k > StartPntIdx ) {

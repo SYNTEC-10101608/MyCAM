@@ -526,7 +526,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// triger rebuild campointlist
+			// trigger rebuild cam point list
 			m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 			bool isCalSuccess = CalSimuTranfResult( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap );
 			if( !isCalSuccess ) {
