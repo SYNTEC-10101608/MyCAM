@@ -11,10 +11,6 @@ using System.Collections.Generic;
 
 namespace MyCAM.Editor.Renderer
 {
-	/// <summary>
-	/// Renderer for tool vectors and paths during pose editing.
-	/// Combines the rendering of ToolVecRenderer and PathRenderer into a single class.
-	/// </summary>
 	internal class ToolVecEditRender : CAMRendererBase
 	{
 		// tool vec
@@ -60,12 +56,6 @@ namespace MyCAM.Editor.Renderer
 			BuildAndDisplay( m_PathIDList, trsf, bUpdate );
 		}
 
-		/// <summary>
-		/// Lightweight transform update: only updates SetLocalTransformation on existing AIS objects
-		/// without removing and rebuilding them. This keeps the renderer in sync with other renderers
-		/// (machine, traverse, workpiece) that also use SetLocalTransformation.
-		/// If no AIS objects exist yet, falls back to full ShowTrans.
-		/// </summary>
 		public void Trans( gp_Trsf trsf, bool bUpdate = false )
 		{
 			// if no AIS objects exist, fall back to full rebuild
