@@ -10,6 +10,7 @@ using OCC.gp;
 using OCC.Prs3d;
 using OCC.Quantity;
 using OCC.TopoDS;
+using OCC.V3d;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public Action<Dictionary<MachineComponentType, List<gp_Trsf>>> RaiseTrans;
+		public Action<Dictionary<MachineComponentType, List<gp_Trsf>>, bool> RaiseTrans;
 		public Action<bool> RaiseActionStart;
 
 		public override void Start()
@@ -177,8 +178,8 @@ namespace MyCAM.Editor
 					);
 				}
 				else {
-					m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
-					m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg );
+					bool isModify = m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
+					m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModify );
 				}
 
 				// update dialog
@@ -366,7 +367,9 @@ namespace MyCAM.Editor
 		{
 			m_InterpolateType = type;
 			m_CraftData.SetInterpolationMode( m_nSelectIndex, m_InterpolateType );
-			m_ToolVecEditRender.Show( m_PathIDList, true );
+			// trigger viewer refresh
+			RefreshSimuResult();
+			UIProtection();
 		}
 
 
@@ -441,7 +444,7 @@ namespace MyCAM.Editor
 				m_ToolVecDlg.LockCbx( true, true, false );
 				return;
 			}
-			EToolVecInterpolateType interpolateType = GetNextModifyIndexInterpolate( );
+			EToolVecInterpolateType interpolateType = GetNextModifyIndexInterpolate();
 			m_ToolVecDlg.LockCbx( false, false, true, false, interpolateType );
 		}
 
@@ -495,10 +498,9 @@ namespace MyCAM.Editor
 				m_CraftData.RemoveToolVecModify( m_nSelectIndex );
 				return;
 			}
-
 			// find next modified point index
 			EToolVecInterpolateType interpolateType = GetNextModifyIndexInterpolate();
-			
+
 			// set modify data
 			m_CraftData.SetToolVecModify( m_nSelectIndex,
 				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, interpolateType );
@@ -523,6 +525,9 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( "無法獲得機構資訊", MyApp.NoticeType.Warning );
 				return;
 			}
+
+			// triger rebuild campointlist
+			m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 			bool isCalSuccess = CalSimuTranfResult( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap );
 			if( !isCalSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
@@ -548,8 +553,11 @@ namespace MyCAM.Editor
 			m_CoordIcon.Trans( frameTransformMap[ MachineComponentType.WorkPiece ].Last() );
 
 			// update camera FIRST before setting any transformations
+			RaiseTrans?.Invoke( frameTransformMap, false );
 			m_ToolVecEditRender.ShowTrans( frameTransformMap[ MachineComponentType.WorkPiece ].Last() );
-			RaiseTrans?.Invoke( frameTransformMap );
+			V3d_View view = m_Viewer.GetView();
+			view.SetImmediateUpdate( true );
+			m_Viewer.UpdateView();
 		}
 
 		bool CalSimuTranfResult( MachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap )
@@ -569,8 +577,8 @@ namespace MyCAM.Editor
 				X = m_SelectedPoint.Point.x,
 				Y = m_SelectedPoint.Point.y,
 				Z = m_SelectedPoint.Point.z,
-				Master = m_ToolVecParam.Master_deg * Math.PI / 180.0,
-				Slave = m_ToolVecParam.Slave_deg * Math.PI / 180.0
+				Master = m_SelectedPoint.ModMaster_rad,
+				Slave = m_SelectedPoint.ModSlave_rad,
 			};
 
 			// create PostSolver

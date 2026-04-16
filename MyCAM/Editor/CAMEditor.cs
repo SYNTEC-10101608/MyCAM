@@ -374,7 +374,7 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		void SetWorkPieceDisplayTransform( gp_Trsf trsf = null )
+		void SetWorkPieceDisplayTransform( gp_Trsf trsf = null, bool isUnLockViewerUpdate = true )
 		{
 			if( trsf == null ) {
 				return;
@@ -431,8 +431,10 @@ namespace MyCAM.Editor
 			view.SetAt( newAt.X(), newAt.Y(), newAt.Z() );
 			view.SetUp( newUp.X(), newUp.Y(), newUp.Z() );
 
-			// restore immediate update and update view once
-			view.SetImmediateUpdate( previousImmediateUpdate );
+			if( isUnLockViewerUpdate ) {
+				// restore immediate update and update view once
+				view.SetImmediateUpdate( previousImmediateUpdate );
+			}
 		}
 
 		public void SetToolVecReverse()
@@ -887,7 +889,7 @@ namespace MyCAM.Editor
 			m_TraverseRenderer.Trans( trsf );
 		}
 
-		void SetTrans( Dictionary<MachineComponentType, List<gp_Trsf>> transMap )
+		void SetTrans( Dictionary<MachineComponentType, List<gp_Trsf>> transMap , bool isUnLockViewerUpdate = true)
 		{
 			// update camera FIRST before setting any transformations
 			gp_Trsf workPieceTrsf = transMap[ MachineComponentType.WorkPiece ].Last();
@@ -895,7 +897,7 @@ namespace MyCAM.Editor
 			// show
 			m_MachineRender.ShowToolVecEditResult( transMap );
 			ShowTransedCAMData( workPieceTrsf );
-			SetWorkPieceDisplayTransform( workPieceTrsf );
+			SetWorkPieceDisplayTransform( workPieceTrsf , isUnLockViewerUpdate );
 			m_Viewer.UpdateView();
 		}
 
