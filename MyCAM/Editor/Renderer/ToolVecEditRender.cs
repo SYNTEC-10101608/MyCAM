@@ -134,35 +134,10 @@ namespace MyCAM.Editor.Renderer
 
 		void BuildAndDisplayToolVec( List<string> pathIDList, gp_Trsf trsf )
 		{
-			// build tool vec
-			foreach( string szPathID in pathIDList ) {
-				IReadOnlyList<IProcessPoint> toolVecPointList = GetToolVecPointList( szPathID );
-				if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
-					continue;
-				}
-				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
-				m_ToolVecAISDict.Add( szPathID, toolVecAISList );
-				for( int i = 0; i < toolVecPointList.Count; i++ ) {
-					IProcessPoint point = toolVecPointList[ i ];
-					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
-					if( i == 0 || i == toolVecPointList.Count - 1 ) {
-						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-						toolVecAIS.SetWidth( 4 );
-						if( trsf != null ) {
-							toolVecAIS.SetLocalTransformation( trsf );
-						}
-						toolVecAISList.Add( toolVecAIS );
-						continue;
-					}
-					if( point.IsToolVecModPoint ) {
-						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-						toolVecAIS.SetWidth( 4 );
-					}
-					if( trsf != null ) {
-						toolVecAIS.SetLocalTransformation( trsf );
-					}
-					toolVecAISList.Add( toolVecAIS );
-				}
+			// build tool vec using shared helper
+			Dictionary<string, List<AIS_Line>> built = RendererHelper.BuildToolVecAISDict( pathIDList, trsf );
+			foreach( var kvp in built ) {
+				m_ToolVecAISDict.Add( kvp.Key, kvp.Value );
 			}
 
 			// display the tool vec

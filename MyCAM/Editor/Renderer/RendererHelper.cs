@@ -17,7 +17,7 @@ namespace MyCAM.Editor.Renderer
 	/// </summary>
 	internal static class RendererHelper
 	{
-	#region Data Retrieval
+		#region Data Retrieval
 
 		/// <summary>
 		/// Get the main path point list for a given path ID.
@@ -106,7 +106,9 @@ namespace MyCAM.Editor.Renderer
 				for( int i = 0; i < toolVecPointList.Count; i++ ) {
 					IProcessPoint point = toolVecPointList[ i ];
 					AIS_Line toolVecAIS = CreateVecAIS( point.Point, point.ToolVec );
-					if( point.IsToolVecModPoint ) {
+					// first and last points are always highlighted red
+					bool isEndPoint = ( i == 0 || i == toolVecPointList.Count - 1 );
+					if( isEndPoint || point.IsToolVecModPoint ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
 					}
