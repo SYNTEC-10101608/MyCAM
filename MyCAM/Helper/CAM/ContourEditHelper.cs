@@ -66,7 +66,6 @@ namespace MyCAM.Helper
 
 				// Clamp to first control point; no extrapolation.
 				workMap[ 0 ] = workMap[ sortedKeys[ 0 ] ].Clone();
-				sortedKeys.Insert( 0, 0 );
 			}
 
 			// --- fill lastIndex if missing ---
@@ -74,7 +73,6 @@ namespace MyCAM.Helper
 
 				// Clamp to last control point; no extrapolation.
 				workMap[ lastIndex ] = workMap[ sortedKeys[ sortedKeys.Count - 1 ] ].Clone();
-				sortedKeys.Add( lastIndex );
 			}
 		}
 
@@ -96,11 +94,9 @@ namespace MyCAM.Helper
 			if( sortedKeys.Count == 1 ) {
 				if( !hasLast ) {
 					workMap[ lastIndex ] = workMap[ firstCtrl ].Clone();
-					sortedKeys.Add( lastIndex );
 				}
 				if( !hasFirst ) {
 					workMap[ 0 ] = workMap[ lastCtrl ].Clone();
-					sortedKeys.Insert( 0, 0 );
 				}
 				return;
 			}
@@ -123,7 +119,6 @@ namespace MyCAM.Helper
 					? distLastCtrlToEnd / totalWrapDist
 					: 0.0;
 				workMap[ lastIndex ] = Lerp( dataLast, dataFirst, t );
-				sortedKeys.Add( lastIndex );
 			}
 
 			if( !hasFirst ) {
@@ -132,11 +127,9 @@ namespace MyCAM.Helper
 					? ( distLastCtrlToEnd + gapDist ) / totalWrapDist
 					: 0.0;
 				workMap[ 0 ] = Lerp( dataLast, dataFirst, t );
-				sortedKeys.Insert( 0, 0 );
 			}
 		}
 
-		// Interpolate and apply displacements across every consecutive control-point interval.
 		static void ApplyDisplacementInterpolation(
 			List<CADPoint> pointList,
 			IReadOnlyDictionary<int, CADPointModifyData> workMap )
@@ -155,8 +148,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		// Linearly interpolate displacement for interior points in (startIdx, endIdx) by arc length.
-		// Control points at startIdx and endIdx are excluded; they will be translated later.
+		// Interpolate "in" the interval, the control points are not modified here
 		static void InterpolateInterval(
 			List<CADPoint> pointList,
 			IReadOnlyDictionary<int, CADPointModifyData> workMap,
@@ -167,15 +159,11 @@ namespace MyCAM.Helper
 			if( endIdx - startIdx < 2 ) {
 				return;
 			}
-
 			CADPointModifyData startData = workMap[ startIdx ];
 			CADPointModifyData endData = workMap[ endIdx ];
 
 			// Step 1: accumulate total arc length using original (not yet translated) positions.
-			double totalDist = 0.0;
-			for( int i = startIdx; i < endIdx; i++ ) {
-				totalDist += pointList[ i ].Point.Distance( pointList[ i + 1 ].Point );
-			}
+			double totalDist = AccumulatedDistance( pointList, startIdx, endIdx );
 
 			// Step 2: pre-compute t for every interior index using original positions.
 			int interiorCount = endIdx - startIdx - 1;
@@ -193,7 +181,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		// Apply a displacement vector to a CADPoint (position only; direction vectors are unaffected).
+		// Apply the displacement to the given point.
 		static void ApplyDisplacement( CADPoint cadPoint, CADPointModifyData disp )
 		{
 			if( Math.Abs( disp.DX ) < GEOM_TOLERANCE &&
