@@ -347,14 +347,6 @@ namespace MyCAM.Data
 			}
 		}
 
-		public Dictionary<int, ToolVecModifyData> ToolVecModifyMap
-		{
-			get
-			{
-				return m_ToolVecModifyMap;
-			}
-		}
-
 		public StartPntToolVecParam StartPntToolVecData
 		{
 			get
@@ -590,7 +582,6 @@ namespace MyCAM.Data
 		LeadData m_LeadData = new LeadData();
 		double m_OverCutLength = 0;
 		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.Normal;
-		Dictionary<int, ToolVecModifyData> m_ToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
 		ToolVecModifyMap m_ToolVecModifyMap2 = new ToolVecModifyMap();
 		StartPntToolVecParam m_StartPntToolVecData = new StartPntToolVecParam();
 		bool m_IsToolVecReverse = false;
