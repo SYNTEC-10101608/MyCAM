@@ -19,9 +19,6 @@ namespace MyCAM.Editor.Renderer
 	{
 		#region Data Retrieval
 
-		/// <summary>
-		/// Get the main path point list for a given path ID.
-		/// </summary>
 		public static IReadOnlyList<gp_Pnt> GetMainPathPointList( string szPathID )
 		{
 			// get path type
@@ -49,9 +46,6 @@ namespace MyCAM.Editor.Renderer
 
 		#region AIS Creation
 
-		/// <summary>
-		/// Create a polyline wire from a list of points.
-		/// </summary>
 		public static TopoDS_Wire CreatePolylineWire( IReadOnlyList<gp_Pnt> pointList )
 		{
 			const double DIST_TOLERANCE = 1e-3;
@@ -90,9 +84,6 @@ namespace MyCAM.Editor.Renderer
 
 		#region Tool Vec
 
-		/// <summary>
-		/// Build a dictionary of AIS_Line lists for tool vectors, keyed by path ID.
-		/// </summary>
 		public static Dictionary<string, List<AIS_Line>> BuildToolVecAISDict( List<string> pathIDList, gp_Trsf trsf )
 		{
 			Dictionary<string, List<AIS_Line>> result = new Dictionary<string, List<AIS_Line>>();

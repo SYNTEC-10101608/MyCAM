@@ -1,9 +1,6 @@
 using MyCAM.Data;
-using MyCAM.PathCache;
 using OCC.AIS;
-using OCC.Geom;
 using OCC.gp;
-using OCC.Quantity;
 using OCCViewer;
 using System.Collections.Generic;
 
@@ -124,44 +121,6 @@ namespace MyCAM.Editor.Renderer
 			}
 			if( bUpdate ) {
 				UpdateView();
-			}
-		}
-
-		AIS_Line GetVecAIS( gp_Pnt point, gp_Dir dir )
-		{
-			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 10 );
-			AIS_Line lineAIS = new AIS_Line( new Geom_CartesianPoint( point ), new Geom_CartesianPoint( endPoint ) );
-			lineAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLUE ) );
-			lineAIS.SetWidth( 1 );
-			return lineAIS;
-		}
-
-		IReadOnlyList<IProcessPoint> GetToolVecPointList( string pathID )
-		{
-			// get path type
-			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) ) {
-				return null;
-			}
-
-			// for contour
-			if( pathType == PathType.Contour ) {
-				if( !DataGettingHelper.GetContourCacheByID( pathID, out ContourCache contourCache ) ) {
-					return null;
-				}
-				return contourCache.MainPathPointList;
-			}
-
-			// for standard pattern
-			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
-				if( !DataGettingHelper.GetStdPatternCacheByID( pathID, out IStdPatternCache stdPatternCache ) ) {
-					return null;
-				}
-				return stdPatternCache.KeyCAMPointList;
-			}
-
-			// other type path do not support tool vec
-			else {
-				return null;
 			}
 		}
 	}
