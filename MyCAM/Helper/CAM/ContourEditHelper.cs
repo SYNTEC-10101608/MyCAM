@@ -154,39 +154,52 @@ namespace MyCAM.Helper
 			List<int> sortedKeys = workMap.Keys.ToList();
 			sortedKeys.Sort();
 
+			// Interpolate interior points of every interval first (control points are not touched here).
 			for( int k = 0; k < sortedKeys.Count - 1; k++ ) {
 				InterpolateInterval( pointList, workMap, sortedKeys[ k ], sortedKeys[ k + 1 ] );
 			}
+
+			// Apply the recorded displacement to every control point after all interpolation is done.
+			foreach( KeyValuePair<int, CADPointModifyData> entry in workMap ) {
+				ApplyDisplacement( pointList[ entry.Key ], entry.Value );
+			}
 		}
 
-		// Linearly interpolate displacement for all points in [startIdx, endIdx] by arc length.
+		// Linearly interpolate displacement for interior points in (startIdx, endIdx) by arc length.
+		// Control points at startIdx and endIdx are excluded; they will be translated later.
 		static void InterpolateInterval(
 			List<CADPoint> pointList,
 			IReadOnlyDictionary<int, CADPointModifyData> workMap,
 			int startIdx,
 			int endIdx )
 		{
-			if( endIdx <= startIdx ) {
+			// No interior points when the interval spans one step or less.
+			if( endIdx - startIdx < 2 ) {
 				return;
 			}
 
 			CADPointModifyData startData = workMap[ startIdx ];
 			CADPointModifyData endData = workMap[ endIdx ];
 
-			// accumulate total arc length of this interval
+			// Step 1: accumulate total arc length using original (not yet translated) positions.
 			double totalDist = 0.0;
 			for( int i = startIdx; i < endIdx; i++ ) {
 				totalDist += pointList[ i ].Point.Distance( pointList[ i + 1 ].Point );
 			}
 
+			// Step 2: pre-compute t for every interior index using original positions.
+			int interiorCount = endIdx - startIdx - 1;
+			double[] tValues = new double[ interiorCount ];
 			double accumulated = 0.0;
-			for( int i = startIdx; i <= endIdx; i++ ) {
-				double t = ( totalDist > GEOM_TOLERANCE ) ? accumulated / totalDist : 0.0;
-				ApplyDisplacement( pointList[ i ], Lerp( startData, endData, t ) );
+			for( int i = startIdx; i < endIdx - 1; i++ ) {
+				accumulated += pointList[ i ].Point.Distance( pointList[ i + 1 ].Point );
+				tValues[ i - startIdx ] = ( totalDist > GEOM_TOLERANCE ) ? accumulated / totalDist : 0.0;
+			}
 
-				if( i < endIdx ) {
-					accumulated += pointList[ i ].Point.Distance( pointList[ i + 1 ].Point );
-				}
+			// Step 3: apply interpolated displacement to interior points only.
+			for( int i = startIdx + 1; i < endIdx; i++ ) {
+				double t = tValues[ i - startIdx - 1 ];
+				ApplyDisplacement( pointList[ i ], Lerp( startData, endData, t ) );
 			}
 		}
 
