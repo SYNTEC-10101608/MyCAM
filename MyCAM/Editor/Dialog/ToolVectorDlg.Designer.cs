@@ -403,6 +403,7 @@
 			// 
 			this.tableLayoutPanel1.SetColumnSpan(this.m_cbxInterpolateType, 2);
 			this.m_cbxInterpolateType.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.m_cbxInterpolateType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.m_cbxInterpolateType.FormattingEnabled = true;
 			this.m_cbxInterpolateType.Items.AddRange(new object[] {
             "曲面法向量",
