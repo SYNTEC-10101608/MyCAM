@@ -4,7 +4,6 @@ using OCC.gp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace MyCAM.Helper
 {
@@ -114,16 +113,21 @@ namespace MyCAM.Helper
 
 			// get the interpolate interval list
 			interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap, isPathReverse );
+			bool isWithInterpolate = false;
+			if( interpolateIntervalList.Count > 1 ) {
+				isWithInterpolate = true;
+			}
+			SetControlPoint( ref toolVecPointList, interpolateIntervalList, toolVecModifyMap );
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
 				if( interpolateIntervalList[ i ].Item3 == EToolVecInterpolateType.VectorInterpolation ) {
 					ApplyMSAngleInterpolation( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
 				}
 				else if( interpolateIntervalList[ i ].Item3 == EToolVecInterpolateType.Normal ) {
-					SolveRegionIK( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
+					SolveRegionIK( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2, isWithInterpolate );
 				}
 				else if( interpolateIntervalList[ i ].Item3 == EToolVecInterpolateType.TiltAngleInterpolation ) {
 					ApplyTiltAngleInterpolation( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
-					SolveRegionIK( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
+					SolveRegionIK( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2, isWithInterpolate );
 				}
 			}
 			SetControlPoint( ref toolVecPointList, interpolateIntervalList, toolVecModifyMap );
@@ -169,12 +173,12 @@ namespace MyCAM.Helper
 			List<Tuple<int, int, EToolVecInterpolateType>> intervalList = new List<Tuple<int, int, EToolVecInterpolateType>>();
 			for( int i = 0; i < indexInOrder.Count - 1; i++ ) {
 				if( isPathReverse ) {
-					intervalList.Add( new Tuple<int, int, EToolVecInterpolateType>( indexInOrder[ i ], indexInOrder[ i + 1 ], toolVecModifyMap[ indexInOrder[ i  ] ].InterpolateType ) );
+					intervalList.Add( new Tuple<int, int, EToolVecInterpolateType>( indexInOrder[ i ], indexInOrder[ i + 1 ], toolVecModifyMap[ indexInOrder[ i ] ].InterpolateType ) );
 				}
 				else {
 					intervalList.Add( new Tuple<int, int, EToolVecInterpolateType>( indexInOrder[ i ], indexInOrder[ i + 1 ], toolVecModifyMap[ indexInOrder[ i + 1 ] ].InterpolateType ) );
 				}
-					
+
 			}
 			return intervalList;
 		}
@@ -384,7 +388,7 @@ namespace MyCAM.Helper
 			FilterSingularPoints( ref toolVecPointList, singularTagList, bFilterMaster );
 		}
 
-		static void SolveRegionIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap, int nStartIdx, int nEndIdx )
+		static void SolveRegionIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap, int nStartIdx, int nEndIdx, bool isWithInterpolate )
 		{
 			// Get machine data
 			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
@@ -398,8 +402,9 @@ namespace MyCAM.Helper
 
 			// sigularity tag list
 			List<bool> singularTagList = new List<bool>();
-
+			nEndIdx = isWithInterpolate ? nEndIdx - 1 : nEndIdx;
 			for( int i = nStartIdx; i <= nEndIdx; i++ ) {
+
 				IKSolveResult result = postSolver.SolveIK( toolVecPointList[ i ].ToolVec, dM, dS, out dM, out dS );
 				if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution ) {
 					continue;
@@ -424,8 +429,12 @@ namespace MyCAM.Helper
 
 
 			// 我要拿 toolVecPointList[ nStartIdx]~[nEndIdx]的指標
+			int range = isWithInterpolate ? nEndIdx - nStartIdx + 2 : nEndIdx - nStartIdx + 1;
+			List<ISetToolVecPoint> toolVecPointList2 = toolVecPointList.GetRange( nStartIdx, range );
+			if( isWithInterpolate ) {
+				singularTagList.Add( false );
+			}
 
-			List<ISetToolVecPoint> toolVecPointList2 = toolVecPointList.GetRange( nStartIdx, nEndIdx - nStartIdx + 1 );
 			FilterSingularPoints( ref toolVecPointList2, singularTagList, bFilterMaster );
 		}
 
