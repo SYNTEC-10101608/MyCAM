@@ -343,7 +343,8 @@ namespace MyCAM.Editor
 			}
 
 			m_MainPathRenderer.SetPauseRefresh( true );
-			 m_ToolVecRenderer.SetPauseRefresh( true );
+			m_ToolVecRenderer.SetPauseRefresh( true );
+			m_TraverseRenderer.SetPauseRefresh( true );
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
 
 			// register before init, cause init will change select node to start point, machine need to translate
@@ -362,6 +363,7 @@ namespace MyCAM.Editor
 			else {
 				m_MainPathRenderer.SetPauseRefresh( false );
 				m_ToolVecRenderer.SetPauseRefresh( false );
+				m_TraverseRenderer.SetPauseRefresh( false );
 				m_MachineRender.Remove();
 				m_ToolVecRenderer.Reset();
 				m_TraverseRenderer.Reset();
@@ -889,7 +891,7 @@ namespace MyCAM.Editor
 			m_TraverseRenderer.Trans( trsf );
 		}
 
-		void SetTrans( Dictionary<MachineComponentType, List<gp_Trsf>> transMap , bool isUnLockViewerUpdate = true)
+		void SetTrans( Dictionary<MachineComponentType, List<gp_Trsf>> transMap, bool isUnLockViewerUpdate = true )
 		{
 			// update camera FIRST before setting any transformations
 			gp_Trsf workPieceTrsf = transMap[ MachineComponentType.WorkPiece ].Last();
@@ -897,7 +899,7 @@ namespace MyCAM.Editor
 			// show
 			m_MachineRender.ShowToolVecEditResult( transMap );
 			ShowTransedCAMData( workPieceTrsf );
-			SetWorkPieceDisplayTransform( workPieceTrsf , isUnLockViewerUpdate );
+			SetWorkPieceDisplayTransform( workPieceTrsf, isUnLockViewerUpdate );
 			m_Viewer.UpdateView();
 		}
 

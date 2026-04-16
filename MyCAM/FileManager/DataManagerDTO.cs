@@ -1078,11 +1078,11 @@ namespace MyCAM.FileManager
 			set;
 		}
 
-		public List<ToolVecMapDTO> ToolVecModifyMap
+		public List<ToolVecMap2DTO> ToolVecModifyMap
 		{
 			get;
 			set;
-		} = new List<ToolVecMapDTO>();
+		} = new List<ToolVecMap2DTO>();
 
 		public List<ToolVecMap2DTO> ToolVecModifyMap2
 		{
@@ -1131,7 +1131,7 @@ namespace MyCAM.FileManager
 
 		internal CraftData ToCraftData()
 		{
-			if( ToolVecModifyMap == null || LeadData == null || TraverseData == null ||
+			if( ( ToolVecModifyMap == null && ToolVecModifyMap2 == null ) || LeadData == null || TraverseData == null ||
 				!StartPoint.HasValue || !IsPathReverse.HasValue || !OverCutLength.HasValue ||
 				!IsToolVecReverse.HasValue || !InterpolateType.HasValue || !CompensatedDistance.HasValue ) {
 				throw new ArgumentException( "CraftData deserialization failed." );
@@ -1141,15 +1141,28 @@ namespace MyCAM.FileManager
 			if( !TechLayer.HasValue ) {
 				TechLayer = DEFAULT_TECH_LAYER;
 			}
-			Dictionary<int, ToolVecModifyData> toolVecModifyMap = ToolVecModifyMap.ToDictionary(
-				dto => dto.Index.Value,
-				dto => new ToolVecModifyData( dto.RA_deg.Value, dto.RB_deg.Value, dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value )
-			);
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
 			EToolVecInterpolateType interpolateType = InterpolateType.Value;
 
-			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap, IsToolVecReverse.Value, interpolateType, traverseData );
+			// Old files without InterpolateType per entry will have it as null, falling back to the global interpolateType.
+			Dictionary<int, ToolVecModifyData2> toolVecModifyMap2 = new Dictionary<int, ToolVecModifyData2>();
+			List<ToolVecMap2DTO> sourceMap = ( ToolVecModifyMap2 != null && ToolVecModifyMap2.Count > 0 )
+				? ToolVecModifyMap2
+				: ToolVecModifyMap;
+			if( sourceMap != null ) {
+				foreach( var dto in sourceMap ) {
+					if( dto.Index.HasValue ) {
+						toolVecModifyMap2[ dto.Index.Value ] =
+							new ToolVecModifyData2( dto.RA_deg.Value, dto.RB_deg.Value, dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value, dto.InterpolateType ?? interpolateType );
+					}
+				}
+			}
+
+			// Build StartPntToolVecData
+			StartPntToolVecParam startPntToolVecParam = StartPntToolVecData?.ToStartPntToolVecParam();
+
+			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap2, startPntToolVecParam, IsToolVecReverse.Value, interpolateType, traverseData );
 
 			// Set properties not in constructor
 			if( CumulativeTrsfMatrix == null ) {
@@ -1159,21 +1172,6 @@ namespace MyCAM.FileManager
 
 			// Set properties not in constructor
 			craftData.CompensatedDistance = CompensatedDistance.Value;
-
-			// Restore ToolVecModifyMap2
-			if( ToolVecModifyMap2 != null ) {
-				foreach( var dto in ToolVecModifyMap2 ) {
-					if( dto.Index.HasValue ) {
-						craftData.ToolVecModifyMap2.Add( dto.Index.Value,
-							new ToolVecModifyData2( dto.RA_deg.Value, dto.RB_deg.Value, dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value, dto.InterpolateType ?? EToolVecInterpolateType.Normal ) );
-					}
-				}
-			}
-
-			// Restore StartPntToolVecData
-			if( StartPntToolVecData != null ) {
-				craftData.StartPntToolVecData = StartPntToolVecData.ToStartPntToolVecParam();
-			}
 
 			return craftData;
 		}
@@ -1649,53 +1647,6 @@ namespace MyCAM.FileManager
 				if( File.Exists( tempFile ) )
 					File.Delete( tempFile );
 			}
-		}
-	}
-
-	public class ToolVecMapDTO
-	{
-		public int? Index
-		{
-			get;
-			set;
-		}
-
-		public double? RA_deg
-		{
-			get;
-			set;
-		}
-
-		public double? RB_deg
-		{
-			get;
-			set;
-		}
-
-		public double? MasterAngle_deg
-		{
-			get;
-			set;
-		}
-
-		public double? SlaveAngle_deg
-		{
-			get;
-			set;
-		}
-
-		// parameterless constructor(for XmlSerializer)
-		internal ToolVecMapDTO()
-		{
-		}
-
-		internal ToolVecMapDTO( int index, double ra_deg, double rb_deg, double masterAngle_deg, double slaveAngle_deg )
-		{
-			Index = index;
-			RA_deg = ra_deg;
-			RB_deg = rb_deg;
-			MasterAngle_deg = masterAngle_deg;
-			SlaveAngle_deg = slaveAngle_deg;
 		}
 	}
 

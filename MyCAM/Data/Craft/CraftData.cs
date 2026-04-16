@@ -168,7 +168,8 @@ namespace MyCAM.Data
 			bool isPathReverse,
 			LeadData leadData,
 			double overCutLength,
-			Dictionary<int, ToolVecModifyData> toolVecModifyMap,
+			Dictionary<int, ToolVecModifyData2> toolVecModifyMap2,
+			StartPntToolVecParam startPntToolVecData,
 			bool isToolVecReverse,
 			EToolVecInterpolateType interpolateType,
 			TraverseData traverseData )
@@ -178,11 +179,13 @@ namespace MyCAM.Data
 			m_IsPathReverse = isPathReverse;
 			m_LeadData = leadData;
 			m_OverCutLength = overCutLength;
-			m_ToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
-			if( toolVecModifyMap != null ) {
-				foreach( var kvp in toolVecModifyMap ) {
-					m_ToolVecModifyMap.Add( kvp.Key, kvp.Value.Clone() );
+			if( toolVecModifyMap2 != null ) {
+				foreach( var kvp in toolVecModifyMap2 ) {
+					m_ToolVecModifyMap2.Add( kvp.Key, kvp.Value.Clone() );
 				}
+			}
+			if( startPntToolVecData != null ) {
+				m_StartPntToolVecData = startPntToolVecData;
 			}
 			m_IsToolVecReverse = isToolVecReverse;
 			m_InterpolateType = interpolateType;
