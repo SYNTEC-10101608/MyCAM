@@ -1,7 +1,6 @@
 ﻿using OCC.gp;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -108,14 +107,41 @@ namespace MyCAM.Data
 
 	public class StartPntToolVecParam
 	{
+		public Action PropertyChanged;
+
 		public ToolVecModifyData2 StartPnt
 		{
-			get; set;
+			get
+			{
+				return m_StartPnt;
+			}
+			set
+			{
+				if( m_StartPnt != value ) {
+					m_StartPnt = value;
+					PropertyChanged?.Invoke();
+				}
+			}
 		}
+
 
 		public ToolVecModifyData2 EndPnt
 		{
-			get; set;
+			get
+			{
+				return m_EndPnt;
+			}
+			set
+			{
+				if( m_EndPnt != value ) {
+					m_EndPnt = value;
+					PropertyChanged?.Invoke();
+				}
+			}
+		}
+
+		public StartPntToolVecParam()
+		{
 		}
 
 		public StartPntToolVecParam( ToolVecModifyData2 startPntData, ToolVecModifyData2 endPntData )
@@ -123,6 +149,9 @@ namespace MyCAM.Data
 			StartPnt = startPntData;
 			EndPnt = endPntData;
 		}
+
+		ToolVecModifyData2 m_EndPnt;
+		ToolVecModifyData2 m_StartPnt;
 	}
 
 	public class CraftData
@@ -335,7 +364,13 @@ namespace MyCAM.Data
 			set
 			{
 				if( m_StartPntToolVecData != value ) {
+					if( m_StartPntToolVecData != null ) {
+						m_StartPntToolVecData.PropertyChanged -= SubParamChanged;
+					}
 					m_StartPntToolVecData = value;
+					if( m_StartPntToolVecData != null ) {
+						m_StartPntToolVecData.PropertyChanged += SubParamChanged;
+					}
 					CAMFactorChanged?.Invoke();
 				}
 			}
@@ -387,7 +422,7 @@ namespace MyCAM.Data
 		public void RemoveToolVecModify( int index )
 		{
 			if( m_ToolVecModifyMap2.ContainsKey( index ) ) {
-				if (IsPathReverse == false ) {
+				if( IsPathReverse == false ) {
 					bool isFoundNext = FindNextMapIndex( index, out int nNextIdx );
 					if( isFoundNext ) {
 						m_ToolVecModifyMap2.Remove( index, nNextIdx );
@@ -441,6 +476,7 @@ namespace MyCAM.Data
 		{
 			m_LeadData.PropertyChanged += SubParamChanged;
 			m_TraverseData.PropertyChanged += SubParamChanged;
+			m_StartPntToolVecData.PropertyChanged += SubParamChanged;
 		}
 
 		void SubParamChanged()
@@ -452,7 +488,6 @@ namespace MyCAM.Data
 		public bool FindNextMapIndex( int currentIdx, out int nextIdx )
 		{
 			int StartPntIdx = m_StartPointIndex;
-			bool isPathReverse = m_IsPathReverse;
 			// find the smallest key that is greater than the removed key
 			nextIdx = -1;
 			bool found = false;
@@ -461,47 +496,28 @@ namespace MyCAM.Data
 			if( currentIdx > StartPntIdx ) {
 
 
-				// 路徑正向
+				// 從現在位置找到路徑尾中最小的
+				foreach( int k in ToolVecModifyMap2.Keys ) {
+					if( k > currentIdx ) {
+						nextIdx = k;
+						found = true;
+						break;
+					}
+				}
 
-
-					// 從現在位置找到路徑尾中最小的
+				// 從目前起點到最後都沒有,找0~起點前最小的
+				if( found == false ) {
 					foreach( int k in ToolVecModifyMap2.Keys ) {
-						if( k > currentIdx ) {
+						if( k > StartPntIdx ) {
+							break;
+						}
+						if( k < currentIdx ) {
 							nextIdx = k;
 							found = true;
 							break;
-						}
-					}
-
-					// 從目前起點到最後都沒有,找0~起點前最小的
-					if( found == false ) {
-						foreach( int k in ToolVecModifyMap2.Keys ) {
-							if( k > StartPntIdx ) {
-								break;
-							}
-							if( k < currentIdx ) {
-								nextIdx = k;
-								found = true;
-								break;
-							}
-						}
-					}
-				
-				/*
-				// 反向
-				else {
-					// 從起點位置找到現在
-					foreach( int k in ToolVecModifyMap2.Keys ) {
-						if( k > currentIdx ) {
-							break;
-						}
-						if( k < currentIdx && k > StartPntIdx ) {
-							nextIdx = k;
-							found = true;
 						}
 					}
 				}
-				*/
 			}
 
 			// 現在位置在起點之前
@@ -517,37 +533,7 @@ namespace MyCAM.Data
 						break;
 					}
 				}
-
-
-				/*
-				// 路徑反向
-				else {
-
-					// 從現在位置往前找到0
-					foreach( int k in ToolVecModifyMap2.Keys ) {
-						if( k > currentIdx ) {
-							break;
-						}
-						nextIdx = k;
-						found = true;
-					}
-
-					// 沒有找到,從路徑尾找到目前起點位置中最大的
-					if( found == false ) {
-
-						foreach( int k in ToolVecModifyMap2.Keys ) {
-							if( k < StartPntIdx ) {
-								continue;
-							}
-							nextIdx = k;
-							found = true;
-						}
-					}
-				}
-				*/
-
 			}
-
 
 			return found;
 		}
@@ -606,7 +592,7 @@ namespace MyCAM.Data
 		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.Normal;
 		Dictionary<int, ToolVecModifyData> m_ToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
 		ToolVecModifyMap m_ToolVecModifyMap2 = new ToolVecModifyMap();
-		StartPntToolVecParam m_StartPntToolVecData = null;
+		StartPntToolVecParam m_StartPntToolVecData = new StartPntToolVecParam();
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();

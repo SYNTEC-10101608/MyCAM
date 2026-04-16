@@ -347,7 +347,7 @@ namespace MyCAM.PathCache
 
 		void SetDefaultStartEndToolVecParam()
 		{
-			if( m_CraftData.StartPntToolVecData == null ) {
+			if( m_CraftData.StartPntToolVecData == null || m_CraftData.StartPntToolVecData.StartPnt == null || m_CraftData.StartPntToolVecData.EndPnt == null ) {
 				ToolVecModifyData2 startPnt = BuildToolVecModifyData( m_CAMPointList.First().Clone() );
 				ToolVecModifyData2 endPnt = BuildToolVecModifyData( m_CAMPointList.Last().Clone() );
 				m_CraftData.StartPntToolVecData = new StartPntToolVecParam( startPnt, endPnt );
