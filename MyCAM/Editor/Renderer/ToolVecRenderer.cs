@@ -5,7 +5,6 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
-using System;
 using System.Collections.Generic;
 
 namespace MyCAM.Editor.Renderer
@@ -97,7 +96,6 @@ namespace MyCAM.Editor.Renderer
 			if( m_IsPauseRefresh ) {
 				return;
 			}
-
 			Remove( pathIDList );
 
 			// no need to show
@@ -120,7 +118,7 @@ namespace MyCAM.Editor.Renderer
 					IProcessPoint point = toolVecPointList[ i ];
 					AIS_Line toolVecAIS = GetVecAIS( point.Point, point.ToolVec );
 					if( i == 0 || i == toolVecPointList.Count - 1 ) {
-						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
 						if( trsf != null ) {
 							toolVecAIS.SetLocalTransformation( trsf );
@@ -129,15 +127,7 @@ namespace MyCAM.Editor.Renderer
 						continue;
 					}
 					if( point.IsToolVecModPoint ) {
-						if( interpolateType == EToolVecInterpolateType.VectorInterpolation ) {
-							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_ORANGE ) );
-						}
-						else if( interpolateType == EToolVecInterpolateType.TiltAngleInterpolation ) {
-							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_CYAN ) );
-						}
-						else {
-							toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
-						}
+						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
 					}
 					if( trsf != null ) {
