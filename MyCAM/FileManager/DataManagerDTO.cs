@@ -1146,7 +1146,7 @@ namespace MyCAM.FileManager
 			TraverseData traverseData = TraverseData.ToTraverseData();
 
 			// Build ToolVecModifyMap from file data
-			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion );
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap = BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion );
 
 			// Build StartPntToolVecData
 			StartPntToolVecParam startPntToolVecParam = BuildStartPntToolVecParam( sourceMap_OldVersion );
@@ -1166,9 +1166,9 @@ namespace MyCAM.FileManager
 			return craftData;
 		}
 
-		Dictionary<int, ToolVecModifyData2> BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion )
+		Dictionary<int, ToolVecModifyData> BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion )
 		{
-			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = new Dictionary<int, ToolVecModifyData2>();
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
 			sourceMap_OldVersion = null;
 
 			// Determine which version of ToolVecModifyMap to use
@@ -1184,7 +1184,7 @@ namespace MyCAM.FileManager
 						// Use the InterpolateType from the entry, default to Normal if null
 						EToolVecInterpolateType entryInterpolateType = dto.InterpolateType ?? EToolVecInterpolateType.Normal;
 						toolVecModifyMap[ dto.Index.Value ] =
-							new ToolVecModifyData2( dto.RA_deg.Value, dto.RB_deg.Value,
+							new ToolVecModifyData( dto.RA_deg.Value, dto.RB_deg.Value,
 													dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value,
 													entryInterpolateType );
 					}
@@ -1204,7 +1204,7 @@ namespace MyCAM.FileManager
 				foreach( var dto in ToolVecModifyMap ) {
 					if( dto.Index.HasValue ) {
 						toolVecModifyMap[ dto.Index.Value ] =
-							new ToolVecModifyData2( dto.RA_deg ?? 0, dto.RB_deg ?? 0,
+							new ToolVecModifyData( dto.RA_deg ?? 0, dto.RB_deg ?? 0,
 													dto.MasterAngle_deg ?? 0, dto.SlaveAngle_deg ?? 0,
 													globalInterpolateType );
 					}
@@ -1240,16 +1240,16 @@ namespace MyCAM.FileManager
 				ToolVecMapDTO indexNeg1Entry = sourceMap_OldVersion.FirstOrDefault( d => d.Index.HasValue && d.Index.Value == -1 );
 
 				if( index0Entry != null || indexNeg1Entry != null ) {
-					ToolVecModifyData2 startPnt = null;
-					ToolVecModifyData2 endPnt = null;
+					ToolVecModifyData startPnt = null;
+					ToolVecModifyData endPnt = null;
 
 					if( index0Entry != null ) {
-						startPnt = new ToolVecModifyData2( index0Entry.RA_deg ?? 0, index0Entry.RB_deg ?? 0,
+						startPnt = new ToolVecModifyData( index0Entry.RA_deg ?? 0, index0Entry.RB_deg ?? 0,
 															index0Entry.MasterAngle_deg ?? 0, index0Entry.SlaveAngle_deg ?? 0,
 															globalInterpolateType );
 					}
 					if( indexNeg1Entry != null ) {
-						endPnt = new ToolVecModifyData2( indexNeg1Entry.RA_deg ?? 0, indexNeg1Entry.RB_deg ?? 0,
+						endPnt = new ToolVecModifyData( indexNeg1Entry.RA_deg ?? 0, indexNeg1Entry.RB_deg ?? 0,
 														  indexNeg1Entry.MasterAngle_deg ?? 0, indexNeg1Entry.SlaveAngle_deg ?? 0,
 														  globalInterpolateType );
 					}
@@ -1882,7 +1882,7 @@ namespace MyCAM.FileManager
 		{
 		}
 
-		internal ToolVecModifyData2DTO( ToolVecModifyData2 data )
+		internal ToolVecModifyData2DTO( ToolVecModifyData data )
 		{
 			if( data == null ) {
 				return;
@@ -1894,9 +1894,9 @@ namespace MyCAM.FileManager
 			InterpolateType = data.InterpolateType;
 		}
 
-		internal ToolVecModifyData2 ToToolVecModifyData2()
+		internal ToolVecModifyData ToToolVecModifyData2()
 		{
-			return new ToolVecModifyData2(
+			return new ToolVecModifyData(
 				RA_deg ?? 0,
 				RB_deg ?? 0,
 				Master_deg ?? 0,
@@ -1938,8 +1938,8 @@ namespace MyCAM.FileManager
 
 		internal StartPntToolVecParam ToStartPntToolVecParam()
 		{
-			ToolVecModifyData2 startPnt = StartPnt?.ToToolVecModifyData2();
-			ToolVecModifyData2 endPnt = EndPnt?.ToToolVecModifyData2();
+			ToolVecModifyData startPnt = StartPnt?.ToToolVecModifyData2();
+			ToolVecModifyData endPnt = EndPnt?.ToToolVecModifyData2();
 			return new StartPntToolVecParam( startPnt, endPnt );
 		}
 	}

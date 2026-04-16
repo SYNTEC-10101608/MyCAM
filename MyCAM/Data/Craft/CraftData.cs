@@ -11,61 +11,11 @@ namespace MyCAM.Data
 		TiltAngleInterpolation,
 	}
 
-	public class ToolVecModifyData2
-	{
-		public double RA_deg
-		{
-			get; set;
-		}
-
-		public double RB_deg
-		{
-			get; set;
-		}
-
-		public double Master_deg
-		{
-			get; set;
-		}
-
-		public double Slave_deg
-		{
-			get; set;
-		}
-
-		public EToolVecInterpolateType InterpolateType
-		{
-			get; set;
-		} = EToolVecInterpolateType.Normal;
-
-		public ToolVecModifyData2()
-		{
-			RA_deg = 0;
-			RB_deg = 0;
-			Master_deg = 0;
-			Slave_deg = 0;
-		}
-
-		public ToolVecModifyData2( double ra_deg, double rb_deg, double master_deg, double slave_deg, EToolVecInterpolateType interpolateType )
-		{
-			RA_deg = ra_deg;
-			RB_deg = rb_deg;
-			Master_deg = master_deg;
-			Slave_deg = slave_deg;
-			InterpolateType = interpolateType;
-		}
-
-		public ToolVecModifyData2 Clone()
-		{
-			return new ToolVecModifyData2( RA_deg, RB_deg, Master_deg, Slave_deg, InterpolateType );
-		}
-	}
-
 	public class StartPntToolVecParam
 	{
 		public Action PropertyChanged;
 
-		public ToolVecModifyData2 StartPnt
+		public ToolVecModifyData StartPnt
 		{
 			get
 			{
@@ -81,7 +31,7 @@ namespace MyCAM.Data
 		}
 
 
-		public ToolVecModifyData2 EndPnt
+		public ToolVecModifyData EndPnt
 		{
 			get
 			{
@@ -100,14 +50,14 @@ namespace MyCAM.Data
 		{
 		}
 
-		public StartPntToolVecParam( ToolVecModifyData2 startPntData, ToolVecModifyData2 endPntData )
+		public StartPntToolVecParam( ToolVecModifyData startPntData, ToolVecModifyData endPntData )
 		{
 			StartPnt = startPntData;
 			EndPnt = endPntData;
 		}
 
-		ToolVecModifyData2 m_EndPnt;
-		ToolVecModifyData2 m_StartPnt;
+		ToolVecModifyData m_EndPnt;
+		ToolVecModifyData m_StartPnt;
 	}
 
 	public class CraftData
@@ -124,7 +74,7 @@ namespace MyCAM.Data
 			bool isPathReverse,
 			LeadData leadData,
 			double overCutLength,
-			Dictionary<int, ToolVecModifyData2> toolVecModifyMap2,
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap2,
 			StartPntToolVecParam startPntToolVecData,
 		bool isToolVecReverse,
 			TraverseData traverseData )
@@ -345,10 +295,10 @@ namespace MyCAM.Data
 		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg, double master_deg, double slave_deg, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
 		{
 			if( m_ToolVecModifyMap2.ContainsKey( index ) ) {
-				m_ToolVecModifyMap2[ index ] = new ToolVecModifyData2( dRA_deg, dRB_deg, master_deg, slave_deg, m_ToolVecModifyMap2[ index ].InterpolateType );
+				m_ToolVecModifyMap2[ index ] = new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg, m_ToolVecModifyMap2[ index ].InterpolateType );
 			}
 			else {
-				m_ToolVecModifyMap2.Add( index, new ToolVecModifyData2( dRA_deg, dRB_deg, master_deg, slave_deg, interpolateType ) );
+				m_ToolVecModifyMap2.Add( index, new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg, interpolateType ) );
 			}
 			CAMFactorChanged?.Invoke();
 		}

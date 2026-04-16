@@ -204,7 +204,7 @@ namespace MyCAM.PathCache
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
 
 			// 拿到控制點姿態
-			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = GetToolVecModifyMap();
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap = GetToolVecModifyMap();
 			ToolVecHelper.SetToolVec( ref toolVecPointList, toolVecModifyMap, m_IsClose, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList, m_CraftData.IsPathReverse );
 			m_interpolateTypeRegion = interpolateRegionList;
 
@@ -230,9 +230,9 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		Dictionary<int, ToolVecModifyData2> GetToolVecModifyMap()
+		Dictionary<int, ToolVecModifyData> GetToolVecModifyMap()
 		{
-			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = new Dictionary<int, ToolVecModifyData2>();
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
 			foreach( int oneIndex in m_CraftData.ToolVecModifyMap2.Keys ) {
 				if( m_CADToCAMIndexMap.ContainsKey( oneIndex ) ) {
 					int camIndex = m_CADToCAMIndexMap[ oneIndex ];
@@ -348,18 +348,18 @@ namespace MyCAM.PathCache
 		void SetDefaultStartEndToolVecParam()
 		{
 			if( m_CraftData.StartPntToolVecData == null || m_CraftData.StartPntToolVecData.StartPnt == null || m_CraftData.StartPntToolVecData.EndPnt == null ) {
-				ToolVecModifyData2 startPnt = BuildToolVecModifyData( m_CAMPointList.First().Clone() );
-				ToolVecModifyData2 endPnt = BuildToolVecModifyData( m_CAMPointList.Last().Clone() );
+				ToolVecModifyData startPnt = BuildToolVecModifyData( m_CAMPointList.First().Clone() );
+				ToolVecModifyData endPnt = BuildToolVecModifyData( m_CAMPointList.Last().Clone() );
 				m_CraftData.StartPntToolVecData = new StartPntToolVecParam( startPnt, endPnt );
 			}
 		}
 
-		ToolVecModifyData2 BuildToolVecModifyData( CAMPoint camPoint )
+		ToolVecModifyData BuildToolVecModifyData( CAMPoint camPoint )
 		{
 			double master_deg = camPoint.ModMaster_rad * 180.0 / Math.PI;
 			double slave_deg = camPoint.ModSlave_rad * 180.0 / Math.PI;
 			Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, camPoint );
-			return new ToolVecModifyData2( abAngles.Item1, abAngles.Item2, master_deg, slave_deg, EToolVecInterpolateType.Normal );
+			return new ToolVecModifyData( abAngles.Item1, abAngles.Item2, master_deg, slave_deg, EToolVecInterpolateType.Normal );
 		}
 
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();

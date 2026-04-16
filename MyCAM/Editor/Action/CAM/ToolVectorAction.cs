@@ -469,7 +469,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			if( m_IsStartPnt ) {
-				ToolVecModifyData2 startPntData = new ToolVecModifyData2()
+				ToolVecModifyData startPntData = new ToolVecModifyData()
 				{
 					RA_deg = m_ToolVecParam.AngleA_deg,
 					RB_deg = m_ToolVecParam.AngleB_deg,
@@ -481,7 +481,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			if( m_IsEndPnt ) {
-				ToolVecModifyData2 endPntData = new ToolVecModifyData2()
+				ToolVecModifyData endPntData = new ToolVecModifyData()
 				{
 					RA_deg = m_ToolVecParam.AngleA_deg,
 					RB_deg = m_ToolVecParam.AngleB_deg,
