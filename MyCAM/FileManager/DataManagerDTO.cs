@@ -1144,13 +1144,36 @@ namespace MyCAM.FileManager
 
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
+
+			// Build ToolVecModifyMap from file data
+			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion );
+
+			// Build StartPntToolVecData
+			StartPntToolVecParam startPntToolVecParam = BuildStartPntToolVecParam( sourceMap_OldVersion );
+
+			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value,
+												  leadData, OverCutLength.Value, toolVecModifyMap,
+												  startPntToolVecParam, IsToolVecReverse.Value, traverseData );
+
+			// Set properties not in constructor
+			if( CumulativeTrsfMatrix == null ) {
+				throw new ArgumentException( "CraftData.CumulativeTrsfMatrix deserialization failed." );
+			}
+			craftData.CumulativeTrsfMatrix = CumulativeTrsfMatrix.ToTrsf();
+
+			craftData.CompensatedDistance = CompensatedDistance.Value;
+
+			return craftData;
+		}
+
+		Dictionary<int, ToolVecModifyData2> BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion )
+		{
 			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = new Dictionary<int, ToolVecModifyData2>();
+			sourceMap_OldVersion = null;
 
 			// Determine which version of ToolVecModifyMap to use
 			bool isNewVersion = ToolVecModifyMap_New != null && ToolVecModifyMap_New.Count > 0;
 			bool isOldVersion = ToolVecModifyMap != null && ToolVecModifyMap.Count > 0;
-
-			List<ToolVecMapDTO> sourceMap_OldVersion = null;
 
 			if( isNewVersion ) {
 				// Case 1: New version file (has ToolVecModifyMap_New node)
@@ -1192,15 +1215,23 @@ namespace MyCAM.FileManager
 				throw new ArgumentException( "CraftData deserialization failed: ToolVecModifyMap data is missing or empty." );
 			}
 
-			// Build StartPntToolVecData
-			// If StartPntToolVecData node does not exist, create an empty StartPntToolVecParam (StartPnt and EndPnt are null)
-			StartPntToolVecParam startPntToolVecParam = StartPntToolVecData != null
-				? StartPntToolVecData.ToStartPntToolVecParam()
-				: new StartPntToolVecParam();
+			return toolVecModifyMap;
+		}
+
+		StartPntToolVecParam BuildStartPntToolVecParam( List<ToolVecMapDTO> sourceMap_OldVersion )
+		{
+			// If StartPntToolVecData node exists, use it directly
+			if( StartPntToolVecData != null ) {
+				return StartPntToolVecData.ToStartPntToolVecParam();
+			}
 
 			// Backward compatibility: if StartPntToolVecData node was absent and we're reading old version,
 			// try to build StartPnt/EndPnt from entries with index matching StartPoint and -1
-			if( sourceMap_OldVersion != null && StartPntToolVecData == null ) {
+			if( sourceMap_OldVersion != null ) {
+				if( !InterpolateType.HasValue ) {
+					throw new ArgumentException( "CraftData deserialization failed: Old version file missing InterpolateType field." );
+				}
+
 				EToolVecInterpolateType globalInterpolateType = InterpolateType.Value;
 
 				// Old ToolVecMapDTO format: index matching StartPoint = StartPnt, index -1 = EndPnt
@@ -1221,29 +1252,21 @@ namespace MyCAM.FileManager
 														  indexNeg1Entry.MasterAngle_deg ?? 0, indexNeg1Entry.SlaveAngle_deg ?? 0,
 														  globalInterpolateType );
 					}
+
+					// If only one is present, clone it for the other
 					if( startPnt != null && endPnt == null ) {
 						endPnt = startPnt.Clone();
 					}
 					else if( endPnt != null && startPnt == null ) {
 						startPnt = endPnt.Clone();
 					}
-					startPntToolVecParam = new StartPntToolVecParam( startPnt, endPnt );
+
+					return new StartPntToolVecParam( startPnt, endPnt );
 				}
 			}
 
-			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value,
-												  leadData, OverCutLength.Value, toolVecModifyMap,
-												  startPntToolVecParam, IsToolVecReverse.Value, traverseData );
-
-			// Set properties not in constructor
-			if( CumulativeTrsfMatrix == null ) {
-				throw new ArgumentException( "CraftData.CumulativeTrsfMatrix deserialization failed." );
-			}
-			craftData.CumulativeTrsfMatrix = CumulativeTrsfMatrix.ToTrsf();
-
-			craftData.CompensatedDistance = CompensatedDistance.Value;
-
-			return craftData;
+			// No StartPntToolVecData found, return empty param
+			return new StartPntToolVecParam();
 		}
 
 		const int DEFAULT_TECH_LAYER = 1;
