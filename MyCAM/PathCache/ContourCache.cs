@@ -205,7 +205,7 @@ namespace MyCAM.PathCache
 
 			// 拿到控制點姿態
 			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = GetToolVecModifyMap();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, toolVecModifyMap, m_IsClose, m_CraftData.InterpolateType, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList, m_CraftData.IsPathReverse );
+			ToolVecHelper.SetToolVec( ref toolVecPointList, toolVecModifyMap, m_IsClose, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList, m_CraftData.IsPathReverse );
 			m_interpolateTypeRegion = interpolateRegionList;
 
 			// set over cut

@@ -475,7 +475,6 @@ namespace MyCAM.Editor
 
 				// clear all tool vec modify data
 				craftData.ClearToolVecModify();
-				craftData.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
 
 				// get start point
 				ToolVecActionDataHandler dataHandler = new ToolVecActionDataHandler( szPathID );

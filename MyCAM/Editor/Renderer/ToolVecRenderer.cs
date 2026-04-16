@@ -195,7 +195,7 @@ namespace MyCAM.Editor.Renderer
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
 				return EToolVecInterpolateType.Normal;
 			}
-			return craftData.InterpolateType;
+			return craftData.StartPntToolVecData?.EndPnt?.InterpolateType ?? EToolVecInterpolateType.Normal;
 		}
 	}
 }

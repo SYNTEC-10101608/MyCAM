@@ -51,7 +51,7 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// init global param
-			m_InterpolateType = m_CraftData.InterpolateType;
+			m_InterpolateType = m_CraftData.StartPntToolVecData?.EndPnt?.InterpolateType ?? EToolVecInterpolateType.Normal;
 
 			// init index param
 			m_nSelectIndex = NULL_SELECT_INDEX;
@@ -59,7 +59,7 @@ namespace MyCAM.Editor
 			m_ToolVecParam = null;
 
 			// init dialog
-			m_ToolVecDlg = new m_lblInter( m_CraftData.InterpolateType, m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );
+			m_ToolVecDlg = new m_lblInter( m_InterpolateType, m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );
 			m_ToolVecDlg.SetKeep += () => OnSetKeep();
 			m_ToolVecDlg.SetZdir += () => OnSetZDir();
 			m_ToolVecDlg.SetRevert += () => OnSetRevert();

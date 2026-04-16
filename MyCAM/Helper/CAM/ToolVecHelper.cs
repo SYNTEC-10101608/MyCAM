@@ -10,7 +10,7 @@ namespace MyCAM.Helper
 	public static class ToolVecHelper
 	{
 		public static void SetToolVec( ref List<ISetToolVecPoint> toolVecPointList,
-			Dictionary<int, ToolVecModifyData2> toolVecModifyMap, bool isClosed, EToolVecInterpolateType interpolateType, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList, bool isPathReverse )
+			Dictionary<int, ToolVecModifyData2> toolVecModifyMap, bool isClosed, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList, bool isPathReverse )
 		{
 			// arrange the map for closed path
 			if( isClosed ) {
@@ -24,7 +24,7 @@ namespace MyCAM.Helper
 				}
 				toolVecPointList[ i ].IsToolVecModPoint = true;
 			}
-			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, interpolateType, out interpolateRegionList, isPathReverse );
+			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, out interpolateRegionList, isPathReverse );
 		}
 
 		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint )
@@ -104,7 +104,7 @@ namespace MyCAM.Helper
 
 		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList,
 			IReadOnlyDictionary<int, ToolVecModifyData2> toolVecModifyMap,
-			EToolVecInterpolateType interpolateType, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateIntervalList, bool isPathReverse )
+			out List<Tuple<int, int, EToolVecInterpolateType>> interpolateIntervalList, bool isPathReverse )
 		{
 			if( toolVecModifyMap.Count == 0 ) {
 				interpolateIntervalList = new List<Tuple<int, int, EToolVecInterpolateType>>();

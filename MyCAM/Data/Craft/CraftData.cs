@@ -170,8 +170,7 @@ namespace MyCAM.Data
 			double overCutLength,
 			Dictionary<int, ToolVecModifyData2> toolVecModifyMap2,
 			StartPntToolVecParam startPntToolVecData,
-			bool isToolVecReverse,
-			EToolVecInterpolateType interpolateType,
+		bool isToolVecReverse,
 			TraverseData traverseData )
 		{
 			m_TechLayer = techLayer;
@@ -188,7 +187,6 @@ namespace MyCAM.Data
 				m_StartPntToolVecData = startPntToolVecData;
 			}
 			m_IsToolVecReverse = isToolVecReverse;
-			m_InterpolateType = interpolateType;
 			m_TraverseData = traverseData;
 			SubscribeSubParamChanged();
 		}
@@ -331,21 +329,6 @@ namespace MyCAM.Data
 				if( m_CompensatedDistance != value ) {
 					m_CompensatedDistance = value;
 					CADFactorChanged?.Invoke();
-				}
-			}
-		}
-
-		public EToolVecInterpolateType InterpolateType
-		{
-			get
-			{
-				return m_InterpolateType;
-			}
-			set
-			{
-				if( m_InterpolateType != value ) {
-					m_InterpolateType = value;
-					CAMFactorChanged?.Invoke();
 				}
 			}
 		}
@@ -584,7 +567,6 @@ namespace MyCAM.Data
 		bool m_IsPathReverse = false;
 		LeadData m_LeadData = new LeadData();
 		double m_OverCutLength = 0;
-		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.Normal;
 		ToolVecModifyMap m_ToolVecModifyMap2 = new ToolVecModifyMap();
 		StartPntToolVecParam m_StartPntToolVecData = new StartPntToolVecParam();
 		bool m_IsToolVecReverse = false;

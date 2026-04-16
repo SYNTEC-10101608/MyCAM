@@ -1120,7 +1120,6 @@ namespace MyCAM.FileManager
 							? new TraverseDataDTO( craftData.TraverseData )
 							: new TraverseDataDTO();
 			OverCutLength = craftData.OverCutLength;
-			InterpolateType = craftData.InterpolateType;
 			ToolVecModifyMap_New = craftData.ToolVecModifyMap2.ToDictionary()
 				.Select( kvp => new ToolVecMap2DTO( kvp.Key, kvp.Value.RA_deg, kvp.Value.RB_deg, kvp.Value.Master_deg, kvp.Value.Slave_deg, kvp.Value.InterpolateType ) )
 				.ToList();
@@ -1147,7 +1146,7 @@ namespace MyCAM.FileManager
 			EToolVecInterpolateType interpolateType = InterpolateType.Value;
 
 			// Old files without InterpolateType per entry will have it as null, falling back to the global interpolateType.
-			Dictionary<int, ToolVecModifyData2> toolVecModifyMap2 = new Dictionary<int, ToolVecModifyData2>();
+			Dictionary<int, ToolVecModifyData2> toolVecModifyMap = new Dictionary<int, ToolVecModifyData2>();
 
 			// Determine which source map to use and populate toolVecModifyMap2
 			List<ToolVecMap2DTO> sourceMap_NewVersion = null;
@@ -1158,7 +1157,7 @@ namespace MyCAM.FileManager
 				sourceMap_NewVersion = ToolVecModifyMap_New;
 				foreach( var dto in sourceMap_NewVersion ) {
 					if( dto.Index.HasValue ) {
-						toolVecModifyMap2[ dto.Index.Value ] =
+						toolVecModifyMap[ dto.Index.Value ] =
 							new ToolVecModifyData2( dto.RA_deg.Value, dto.RB_deg.Value, dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value, dto.InterpolateType ?? interpolateType );
 					}
 				}
@@ -1168,7 +1167,7 @@ namespace MyCAM.FileManager
 				sourceMap_OldVersion = ToolVecModifyMap;
 				foreach( var dto in sourceMap_OldVersion ) {
 					if( dto.Index.HasValue ) {
-						toolVecModifyMap2[ dto.Index.Value ] =
+						toolVecModifyMap[ dto.Index.Value ] =
 							new ToolVecModifyData2( dto.RA_deg ?? 0, dto.RB_deg ?? 0, dto.MasterAngle_deg ?? 0, dto.SlaveAngle_deg ?? 0, interpolateType );
 					}
 				}
@@ -1209,7 +1208,7 @@ namespace MyCAM.FileManager
 			}
 
 
-			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap2, startPntToolVecParam, IsToolVecReverse.Value, interpolateType, traverseData );
+			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap, startPntToolVecParam, IsToolVecReverse.Value, traverseData );
 
 			// Set properties not in constructor
 			if( CumulativeTrsfMatrix == null ) {
