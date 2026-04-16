@@ -1,4 +1,4 @@
-using MyCAM.Data;
+ï»¿using MyCAM.Data;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
@@ -8,10 +8,6 @@ namespace MyCAM.Helper
 {
 	public static class ContourEditHelper
 	{
-		// Apply CAD point local displacement to cadPointList.
-		// cadPointModifyMap : key = original CAD index, value = displacement data (DX, DY, DZ)
-		// isClosed          : whether the contour is a closed path (no closing point appended yet)
-		// Returns a new list of CADPoints with displacements applied (deep copy, input is not modified).
 		public static List<CADPoint> ApplyCADPointModify(
 			List<CADPoint> cadPointList,
 			IReadOnlyDictionary<int, CADPointModifyData> cadPointModifyMap,
@@ -30,12 +26,10 @@ namespace MyCAM.Helper
 			}
 
 			// build a working copy of the map so we can add boundary control points
-			Dictionary<int, CADPointModifyData> workMap = cadPointModifyMap
-				.ToDictionary( kvp => kvp.Key, kvp => kvp.Value.Clone() );
-
+			Dictionary<int, CADPointModifyData> workMap =
+				cadPointModifyMap.ToDictionary( kvp => kvp.Key, kvp => kvp.Value.Clone() );
 			AddBoundaryControlPoints( ref workMap, result, isClosed );
 			ApplyDisplacementInterpolation( result, workMap );
-
 			return result;
 		}
 
@@ -47,23 +41,20 @@ namespace MyCAM.Helper
 		{
 			List<int> sortedKeys = workMap.Keys.ToList();
 			sortedKeys.Sort();
-
 			bool hasFirst = workMap.ContainsKey( 0 );
 			bool hasLast = workMap.ContainsKey( pointList.Count - 1 );
-
 			if( hasFirst && hasLast ) {
 				return;
 			}
-
 			if( isClosed ) {
-				AddBoundaryControlPointsClosed( ref workMap, pointList, sortedKeys );
+				AddBoundaryControlPoints_Closed( ref workMap, pointList, sortedKeys );
 			}
 			else {
-				AddBoundaryControlPointsOpen( ref workMap, pointList, sortedKeys );
+				AddBoundaryControlPoints_Open( ref workMap, pointList, sortedKeys );
 			}
 		}
 
-		static void AddBoundaryControlPointsOpen(
+		static void AddBoundaryControlPoints_Open(
 			ref Dictionary<int, CADPointModifyData> workMap,
 			List<CADPoint> pointList,
 			List<int> sortedKeys )
@@ -72,37 +63,22 @@ namespace MyCAM.Helper
 
 			// --- fill index 0 if missing ---
 			if( !workMap.ContainsKey( 0 ) ) {
-				if( sortedKeys.Count == 1 ) {
-					workMap[ 0 ] = workMap[ sortedKeys[ 0 ] ].Clone();
-				}
-				else {
-					int idxA = sortedKeys[ 0 ];
-					int idxB = sortedKeys[ 1 ];
-					double dist_AB = AccumulatedDistance( pointList, idxA, idxB );
-					double dist_0A = AccumulatedDistance( pointList, 0, idxA );
-					workMap[ 0 ] = ExtrapolateBackward( workMap[ idxA ], workMap[ idxB ], dist_AB, dist_0A );
-				}
+
+				// Clamp to first control point; no extrapolation.
+				workMap[ 0 ] = workMap[ sortedKeys[ 0 ] ].Clone();
 				sortedKeys.Insert( 0, 0 );
 			}
 
 			// --- fill lastIndex if missing ---
 			if( !workMap.ContainsKey( lastIndex ) ) {
-				if( sortedKeys.Count == 1 ) {
-					workMap[ lastIndex ] = workMap[ sortedKeys[ 0 ] ].Clone();
-				}
-				else {
-					int n = sortedKeys.Count;
-					int idxA = sortedKeys[ n - 2 ];
-					int idxB = sortedKeys[ n - 1 ];
-					double dist_AB = AccumulatedDistance( pointList, idxA, idxB );
-					double dist_B_last = AccumulatedDistance( pointList, idxB, lastIndex );
-					workMap[ lastIndex ] = ExtrapolateForward( workMap[ idxA ], workMap[ idxB ], dist_AB, dist_B_last );
-				}
+
+				// Clamp to last control point; no extrapolation.
+				workMap[ lastIndex ] = workMap[ sortedKeys[ sortedKeys.Count - 1 ] ].Clone();
 				sortedKeys.Add( lastIndex );
 			}
 		}
 
-		static void AddBoundaryControlPointsClosed(
+		static void AddBoundaryControlPoints_Closed(
 			ref Dictionary<int, CADPointModifyData> workMap,
 			List<CADPoint> pointList,
 			List<int> sortedKeys )
@@ -110,25 +86,39 @@ namespace MyCAM.Helper
 			int lastIndex = pointList.Count - 1;
 			bool hasFirst = workMap.ContainsKey( 0 );
 			bool hasLast = workMap.ContainsKey( lastIndex );
-
 			if( hasFirst && hasLast ) {
 				return;
 			}
-
-			// Treat the path as a ring: the wrap-around interval goes from lastCtrl ¡÷ lastIndex ¡÷ 0 ¡÷ firstCtrl.
-			// totalWrapDist = dist(lastCtrl ¡÷ lastIndex) + dist(0 ¡÷ firstCtrl)
 			int firstCtrl = sortedKeys[ 0 ];
 			int lastCtrl = sortedKeys[ sortedKeys.Count - 1 ];
 
+			// Single control point: clamp both boundary points to that value.
+			if( sortedKeys.Count == 1 ) {
+				if( !hasLast ) {
+					workMap[ lastIndex ] = workMap[ firstCtrl ].Clone();
+					sortedKeys.Add( lastIndex );
+				}
+				if( !hasFirst ) {
+					workMap[ 0 ] = workMap[ lastCtrl ].Clone();
+					sortedKeys.Insert( 0, 0 );
+				}
+				return;
+			}
+
+			// Treat the path as a ring: the wrap-around interval goes from
 			CADPointModifyData dataFirst = workMap[ firstCtrl ];
 			CADPointModifyData dataLast = workMap[ lastCtrl ];
-
 			double distLastCtrlToEnd = AccumulatedDistance( pointList, lastCtrl, lastIndex );
 			double distStartToFirstCtrl = AccumulatedDistance( pointList, 0, firstCtrl );
-			double totalWrapDist = distLastCtrlToEnd + distStartToFirstCtrl;
+
+			// gapDist accounts for the closing step between lastIndex and index 0.
+			double gapDist = pointList[ lastIndex ].Point.Distance( pointList[ 0 ].Point );
+
+			// lastCtrl â†’ lastIndex â†’ [gap] â†’ 0 â†’ firstCtrl.
+			double totalWrapDist = distLastCtrlToEnd + gapDist + distStartToFirstCtrl;
 
 			if( !hasLast ) {
-				// lastIndex lies at distLastCtrlToEnd into the wrap-around interval
+				// lastIndex is distLastCtrlToEnd into the wrap-around interval.
 				double t = ( totalWrapDist > GEOM_TOLERANCE )
 					? distLastCtrlToEnd / totalWrapDist
 					: 0.0;
@@ -137,9 +127,9 @@ namespace MyCAM.Helper
 			}
 
 			if( !hasFirst ) {
-				// index 0 lies at the same seam position as lastIndex on the ring
+				// index 0 is distLastCtrlToEnd + gapDist into the wrap-around interval.
 				double t = ( totalWrapDist > GEOM_TOLERANCE )
-					? distLastCtrlToEnd / totalWrapDist
+					? ( distLastCtrlToEnd + gapDist ) / totalWrapDist
 					: 0.0;
 				workMap[ 0 ] = Lerp( dataLast, dataFirst, t );
 				sortedKeys.Insert( 0, 0 );
@@ -231,32 +221,6 @@ namespace MyCAM.Helper
 				a.DX + ( b.DX - a.DX ) * t,
 				a.DY + ( b.DY - a.DY ) * t,
 				a.DZ + ( b.DZ - a.DZ ) * t );
-		}
-
-		// Extrapolate backward from A by dist_0A, using the slope of A¡÷B.
-		static CADPointModifyData ExtrapolateBackward(
-			CADPointModifyData dataA,
-			CADPointModifyData dataB,
-			double dist_AB,
-			double dist_0A )
-		{
-			if( dist_AB < GEOM_TOLERANCE ) {
-				return dataA.Clone();
-			}
-			return Lerp( dataA, dataB, -dist_0A / dist_AB );
-		}
-
-		// Extrapolate forward past B by dist_B_end, using the slope of A¡÷B.
-		static CADPointModifyData ExtrapolateForward(
-			CADPointModifyData dataA,
-			CADPointModifyData dataB,
-			double dist_AB,
-			double dist_B_end )
-		{
-			if( dist_AB < GEOM_TOLERANCE ) {
-				return dataB.Clone();
-			}
-			return Lerp( dataA, dataB, 1.0 + dist_B_end / dist_AB );
 		}
 
 		const double GEOM_TOLERANCE = 1e-3;
