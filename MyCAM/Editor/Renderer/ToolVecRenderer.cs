@@ -108,7 +108,6 @@ namespace MyCAM.Editor.Renderer
 			// build tool vec
 			foreach( string szPathID in pathIDList ) {
 				IReadOnlyList<IProcessPoint> toolVecPointList = GetToolVecPointList( szPathID );
-				EToolVecInterpolateType interpolateType = GetInterpolateType( szPathID );
 				if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
 					continue;
 				}
@@ -188,14 +187,6 @@ namespace MyCAM.Editor.Renderer
 			else {
 				return null;
 			}
-		}
-
-		EToolVecInterpolateType GetInterpolateType( string pathID )
-		{
-			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
-				return EToolVecInterpolateType.Normal;
-			}
-			return craftData.StartPntToolVecData?.EndPnt?.InterpolateType ?? EToolVecInterpolateType.Normal;
 		}
 	}
 }

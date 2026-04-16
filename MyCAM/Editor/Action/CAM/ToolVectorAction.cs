@@ -51,7 +51,7 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// init global param
-			m_InterpolateType = m_CraftData.StartPntToolVecData?.EndPnt?.InterpolateType ?? EToolVecInterpolateType.Normal;
+			m_InterpolateType =  EToolVecInterpolateType.Normal;
 
 			// init index param
 			m_nSelectIndex = NULL_SELECT_INDEX;

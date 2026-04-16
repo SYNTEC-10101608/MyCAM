@@ -1,6 +1,5 @@
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
-using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.gp;
 using OCC.Quantity;
@@ -15,6 +14,19 @@ namespace MyCAM.Editor
 {
 	internal class PathRenderer : CAMRendererBase
 	{
+		static readonly List<Quantity_NameOfColor> TECH_Layer_Color_List = new List<Quantity_NameOfColor> {
+			Quantity_NameOfColor.Quantity_NOC_BLUE,
+			Quantity_NameOfColor.Quantity_NOC_DARKORANGE2,
+			Quantity_NameOfColor.Quantity_NOC_PURPLE,
+			Quantity_NameOfColor.Quantity_NOC_YELLOW2,
+			Quantity_NameOfColor.Quantity_NOC_GREEN3,
+			Quantity_NameOfColor.Quantity_NOC_TOMATO2,
+			Quantity_NameOfColor.Quantity_NOC_YELLOWGREEN,
+			Quantity_NameOfColor.Quantity_NOC_BROWN,
+			Quantity_NameOfColor.Quantity_NOC_MAGENTA1,
+			Quantity_NameOfColor.Quantity_NOC_CYAN1,
+		};
+
 		readonly Dictionary<string, AIS_Shape> m_MainPathAISDict = new Dictionary<string, AIS_Shape>();
 		readonly Dictionary<string, AIS_Shape> m_OriginalPathAISDict = new Dictionary<string, AIS_Shape>();
 		ViewManager m_ViewManager;
@@ -114,8 +126,8 @@ namespace MyCAM.Editor
 
 				// set AIS param
 				AIS_Shape pathAIS = new AIS_Shape( pathWire );
-				int nPathColorIdx = RendererHelper.GetColorIndex( pathID, m_DataManager );
-				pathAIS.SetColor( new Quantity_Color( RendererHelper.TECH_Layer_Color_List[ nPathColorIdx ] ) );
+				int nPathColorIdx = GetColorIndex( pathID );
+				pathAIS.SetColor( new Quantity_Color( TECH_Layer_Color_List[ nPathColorIdx ] ) );
 				pathAIS.SetWidth( 3.0 );
 				if( trsf != null ) {
 					pathAIS.SetLocalTransformation( trsf );
@@ -222,7 +234,7 @@ namespace MyCAM.Editor
 			}
 
 			if( pathType == PathType.Contour ) {
-				if( craftData.CompensatedDistance == 0 && RendererHelper.IsIdentityTransform( craftData.CumulativeTrsfMatrix ) ) {
+				if( craftData.CompensatedDistance == 0 && IsIdentityTransform( craftData.CumulativeTrsfMatrix ) ) {
 					return;
 				}
 			}
@@ -245,6 +257,62 @@ namespace MyCAM.Editor
 			m_OriginalPathAISDict.Add( pathID, oriPathAIS );
 			m_Viewer.GetAISContext().Display( oriPathAIS, false );
 			m_Viewer.GetAISContext().Deactivate( oriPathAIS );
+		}
+
+		int GetColorIndex( string pathID )
+		{
+			int nColorIdx = 0;
+			if( !m_DataManager.ObjectMap.TryGetValue( pathID, out var obj ) ) {
+				return nColorIdx;
+			}
+			PathObject pathObj = obj as PathObject;
+			if( pathObj == null ) {
+				return nColorIdx;
+			}
+			bool isGetDataCraftSuccess = DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData );
+			if( !isGetDataCraftSuccess || craftData == null ) {
+				return nColorIdx;
+			}
+			int nTechLayer = craftData.TechLayer;
+			nColorIdx = nTechLayer - 1;
+			if( nColorIdx < 0 || nColorIdx >= TECH_Layer_Color_List.Count ) {
+				nColorIdx = 0;
+			}
+			return nColorIdx;
+		}
+
+		static bool IsIdentityTransform( gp_Trsf trsf )
+		{
+			const double TOLERANCE = 1e-3;
+			if( trsf == null ) {
+				return true;
+			}
+
+			// Check if translation part is zero
+			gp_XYZ translation = trsf.TranslationPart();
+			if( Math.Abs( translation.X() ) > TOLERANCE ||
+				Math.Abs( translation.Y() ) > TOLERANCE ||
+				Math.Abs( translation.Z() ) > TOLERANCE ) {
+				return false;
+			}
+
+			// Check if scale factor is 1
+			if( Math.Abs( trsf.ScaleFactor() - 1.0 ) > TOLERANCE ) {
+				return false;
+			}
+
+			// Check if rotation part is identity matrix
+			gp_Mat rotationMatrix = trsf.GetRotation().GetMatrix();
+			for( int i = 1; i <= 3; i++ ) {
+				for( int j = 1; j <= 3; j++ ) {
+					double expectedValue = ( i == j ) ? 1.0 : 0.0;
+					if( Math.Abs( rotationMatrix.Value( i, j ) - expectedValue ) > TOLERANCE ) {
+						return false;
+					}
+				}
+			}
+
+			return true;
 		}
 	}
 }
