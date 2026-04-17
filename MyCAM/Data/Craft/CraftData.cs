@@ -260,7 +260,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		public ToolVecModifyMap ToolVecModifyMap2
+		public ToolVecModifyMap ToolVecModifyMap
 		{
 			get
 			{
@@ -340,7 +340,7 @@ namespace MyCAM.Data
 		{
 			bool isGetNextModfiyIndex = FindNextMapIndex( nCurrentIdx, out int nNextIdx );
 			if( isGetNextModfiyIndex ) {
-				ToolVecModifyMap2[ nNextIdx ].InterpolateType = interpolateType;
+				ToolVecModifyMap[ nNextIdx ].InterpolateType = interpolateType;
 			}
 			else {
 				StartPntToolVecData.EndPnt.InterpolateType = interpolateType;
@@ -380,7 +380,7 @@ namespace MyCAM.Data
 
 
 				// find the smallest key that is greater than currentIdx till the end
-				foreach( int k in ToolVecModifyMap2.Keys ) {
+				foreach( int k in ToolVecModifyMap.Keys ) {
 					if( k > currentIdx ) {
 						nextIdx = k;
 						found = true;
@@ -390,7 +390,7 @@ namespace MyCAM.Data
 
 				// cant find, then find the smallest key that is smaller than start point index
 				if( found == false ) {
-					foreach( int k in ToolVecModifyMap2.Keys ) {
+					foreach( int k in ToolVecModifyMap.Keys ) {
 						if( k > StartPntIdx ) {
 							break;
 						}
@@ -405,7 +405,7 @@ namespace MyCAM.Data
 
 			else {
 
-				foreach( int k in ToolVecModifyMap2.Keys ) {
+				foreach( int k in ToolVecModifyMap.Keys ) {
 					if( k > StartPntIdx ) {
 						break;
 					}
@@ -428,7 +428,7 @@ namespace MyCAM.Data
 			if( currentIdx > StartPntIdx ) {
 
 				//find the biggest key that is smaller than currentIdx and bigger than start point index
-				foreach( int k in ToolVecModifyMap2.Keys ) {
+				foreach( int k in ToolVecModifyMap.Keys ) {
 					if( k > currentIdx ) {
 						break;
 					}
@@ -440,7 +440,7 @@ namespace MyCAM.Data
 			}
 			else {
 				// find the biggest key that is smaller than currentIdx
-				foreach( int k in ToolVecModifyMap2.Keys ) {
+				foreach( int k in ToolVecModifyMap.Keys ) {
 					if( k < currentIdx ) {
 						preIdx = k;
 						found = true;
@@ -449,7 +449,7 @@ namespace MyCAM.Data
 
 				// find th biggest key that is bigger than start point index
 				if( found == false ) {
-					foreach( int k in ToolVecModifyMap2.Keys ) {
+					foreach( int k in ToolVecModifyMap.Keys ) {
 						if( k > StartPntIdx ) {
 							preIdx = k;
 							found = true;

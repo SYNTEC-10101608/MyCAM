@@ -1120,7 +1120,7 @@ namespace MyCAM.FileManager
 							? new TraverseDataDTO( craftData.TraverseData )
 							: new TraverseDataDTO();
 			OverCutLength = craftData.OverCutLength;
-			ToolVecModifyMap_New = craftData.ToolVecModifyMap2.ToDictionary()
+			ToolVecModifyMap_New = craftData.ToolVecModifyMap.ToDictionary()
 				.Select( kvp => new ToolVecMap2DTO( kvp.Key, kvp.Value.RA_deg, kvp.Value.RB_deg, kvp.Value.Master_deg, kvp.Value.Slave_deg, kvp.Value.InterpolateType ) )
 				.ToList();
 			if( craftData.StartPntToolVecData != null ) {

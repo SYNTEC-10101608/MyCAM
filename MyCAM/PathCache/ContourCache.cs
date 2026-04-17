@@ -233,15 +233,14 @@ namespace MyCAM.PathCache
 		Dictionary<int, ToolVecModifyData> GetToolVecModifyMap()
 		{
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
-			foreach( int oneIndex in m_CraftData.ToolVecModifyMap2.Keys ) {
+			foreach( int oneIndex in m_CraftData.ToolVecModifyMap.Keys ) {
 				if( m_CADToCAMIndexMap.ContainsKey( oneIndex ) ) {
 					int camIndex = m_CADToCAMIndexMap[ oneIndex ];
-					toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap2[ oneIndex ].Clone();
+					toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
 				}
 			}
 			if( m_CraftData.IsPathReverse ) {
 				toolVecModifyMap[ 0 ] = m_CraftData.StartPntToolVecData.EndPnt.Clone();
-				
 			}
 			else {
 				toolVecModifyMap[ 0 ] = m_CraftData.StartPntToolVecData.StartPnt.Clone();

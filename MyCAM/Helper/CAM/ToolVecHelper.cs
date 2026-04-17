@@ -680,7 +680,7 @@ namespace MyCAM.Helper
 
 		public static void ArrageMapForClosedPath( ref Dictionary<int, ToolVecModifyData> toolVecModifyMap, List<ISetToolVecPoint> toolVecPointList )
 		{
-			// 沒有最後一個控制點
+			// without control point at the end of closed path
 			if( !toolVecModifyMap.ContainsKey( CLOSED_POINT_INDEX ) ) {
 				return;
 			}

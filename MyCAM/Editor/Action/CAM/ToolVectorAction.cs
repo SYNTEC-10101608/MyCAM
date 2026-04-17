@@ -514,7 +514,7 @@ namespace MyCAM.Editor
 				return m_CraftData.StartPntToolVecData.EndPnt.InterpolateType;
 			}
 			else {
-				return m_CraftData.ToolVecModifyMap2[ nNextIdx ].InterpolateType;
+				return m_CraftData.ToolVecModifyMap[ nNextIdx ].InterpolateType;
 			}
 		}
 
@@ -692,11 +692,11 @@ namespace MyCAM.Editor
 
 		public bool GetToolVecModify( int cadIndex, out double dRA_deg, out double dRB_deg, out double master_deg, out double slave_deg )
 		{
-			if( m_CraftData.ToolVecModifyMap2.ContainsKey( cadIndex ) ) {
-				dRA_deg = m_CraftData.ToolVecModifyMap2[ cadIndex ].RA_deg;
-				dRB_deg = m_CraftData.ToolVecModifyMap2[ cadIndex ].RB_deg;
-				master_deg = m_CraftData.ToolVecModifyMap2[ cadIndex ].Master_deg;
-				slave_deg = m_CraftData.ToolVecModifyMap2[ cadIndex ].Slave_deg;
+			if( m_CraftData.ToolVecModifyMap.ContainsKey( cadIndex ) ) {
+				dRA_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].RA_deg;
+				dRB_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].RB_deg;
+				master_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].Master_deg;
+				slave_deg = m_CraftData.ToolVecModifyMap[ cadIndex ].Slave_deg;
 				return true;
 			}
 			else {
