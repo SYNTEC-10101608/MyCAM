@@ -490,7 +490,16 @@ namespace MyCAM.Editor
 				Tuple<double, double> avgAB_deg = ToolVecHelper.GetABAngleFromToolVec( avgDir, startPoint );
 
 				// set average ms to start point
-				craftData.SetToolVecModify( craftData.StartPointIndex, avgAB_deg.Item1, avgAB_deg.Item2, avgMS_deg.Item1, avgMS_deg.Item2 );
+				ToolVecModifyData endPntData = new ToolVecModifyData()
+				{
+					RA_deg = avgAB_deg.Item1,
+					RB_deg = avgAB_deg.Item2,
+					Master_deg = avgMS_deg.Item1,
+					Slave_deg = avgMS_deg.Item2,
+					InterpolateType = EToolVecInterpolateType.VectorInterpolation
+				};
+				craftData.StartPntToolVecData.EndPnt = endPntData.Clone();
+				craftData.StartPntToolVecData.StartPnt = endPntData.Clone();
 			}
 			ShowCAMData( szPathIDList );
 		}
