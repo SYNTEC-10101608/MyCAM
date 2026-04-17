@@ -1171,27 +1171,11 @@ namespace MyCAM.FileManager
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
 			sourceMap_OldVersion = null;
 
-			// Determine which version of ToolVecModifyMap to use
-			bool isNewVersion = ToolVecModifyMap_New != null;
-			bool isOldVersion = ToolVecModifyMap != null ;
+			// Determine which version of ToolVecModifyMap to use;
+			// if do not have any control pnt , toolVecModifyMap will still not be empty(construct protection)
+			bool isOldVersion = ToolVecModifyMap != null && ToolVecModifyMap.Count > 0;
 
-			if( isNewVersion ) {
-				// Case 1: New version file (has ToolVecModifyMap_New node)
-				// Read from ToolVecModifyMap_New, each entry has its own InterpolateType
-				foreach( var dto in ToolVecModifyMap_New ) {
-					if( dto.Index.HasValue && dto.RA_deg.HasValue && dto.RB_deg.HasValue &&
-						dto.MasterAngle_deg.HasValue && dto.SlaveAngle_deg.HasValue ) {
-						// Use the InterpolateType from the entry, default to Normal if null
-						EToolVecInterpolateType entryInterpolateType = dto.InterpolateType ?? EToolVecInterpolateType.Normal;
-						toolVecModifyMap[ dto.Index.Value ] =
-							new ToolVecModifyData( dto.RA_deg.Value, dto.RB_deg.Value,
-													dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value,
-													entryInterpolateType );
-					}
-				}
-			}
-			else if( isOldVersion ) {
-				// Case 2: Old version file (has ToolVecModifyMap node but no ToolVecModifyMap_New)
+			if( isOldVersion ) {
 				// Need InterpolateType from global field
 				if( !InterpolateType.HasValue ) {
 					throw new ArgumentException( "CraftData deserialization failed: Old version file missing InterpolateType field." );
@@ -1211,10 +1195,19 @@ namespace MyCAM.FileManager
 				}
 			}
 			else {
-				// Case 2-1: Neither new nor old ToolVecModifyMap found - file is corrupt
-				throw new ArgumentException( "CraftData deserialization failed: ToolVecModifyMap data is missing or empty." );
+				// Read from ToolVecModifyMap_New, each entry has its own InterpolateType
+				foreach( var dto in ToolVecModifyMap_New ) {
+					if( dto.Index.HasValue && dto.RA_deg.HasValue && dto.RB_deg.HasValue &&
+						dto.MasterAngle_deg.HasValue && dto.SlaveAngle_deg.HasValue ) {
+						// Use the InterpolateType from the entry, default to Normal if null
+						EToolVecInterpolateType entryInterpolateType = dto.InterpolateType ?? EToolVecInterpolateType.Normal;
+						toolVecModifyMap[ dto.Index.Value ] =
+							new ToolVecModifyData( dto.RA_deg.Value, dto.RB_deg.Value,
+													dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value,
+													entryInterpolateType );
+					}
+				}
 			}
-
 			return toolVecModifyMap;
 		}
 
@@ -1236,21 +1229,21 @@ namespace MyCAM.FileManager
 				EToolVecInterpolateType globalInterpolateType = InterpolateType.Value;
 
 				// Old ToolVecMapDTO format: index matching StartPoint = StartPnt, index -1 = EndPnt
-				ToolVecMapDTO index0Entry = sourceMap_OldVersion.FirstOrDefault( d => d.Index.HasValue && d.Index.Value == StartPoint );
-				ToolVecMapDTO indexNeg1Entry = sourceMap_OldVersion.FirstOrDefault( d => d.Index.HasValue && d.Index.Value == -1 );
+				ToolVecMapDTO startPntToolVecData = sourceMap_OldVersion.FirstOrDefault( d => d.Index.HasValue && d.Index.Value == StartPoint );
+				ToolVecMapDTO EndPntToolVecData = sourceMap_OldVersion.FirstOrDefault( d => d.Index.HasValue && d.Index.Value == -1 );
 
-				if( index0Entry != null || indexNeg1Entry != null ) {
+				if( startPntToolVecData != null || EndPntToolVecData != null ) {
 					ToolVecModifyData startPnt = null;
 					ToolVecModifyData endPnt = null;
 
-					if( index0Entry != null ) {
-						startPnt = new ToolVecModifyData( index0Entry.RA_deg ?? 0, index0Entry.RB_deg ?? 0,
-															index0Entry.MasterAngle_deg ?? 0, index0Entry.SlaveAngle_deg ?? 0,
+					if( startPntToolVecData != null ) {
+						startPnt = new ToolVecModifyData( startPntToolVecData.RA_deg ?? 0, startPntToolVecData.RB_deg ?? 0,
+															startPntToolVecData.MasterAngle_deg ?? 0, startPntToolVecData.SlaveAngle_deg ?? 0,
 															globalInterpolateType );
 					}
-					if( indexNeg1Entry != null ) {
-						endPnt = new ToolVecModifyData( indexNeg1Entry.RA_deg ?? 0, indexNeg1Entry.RB_deg ?? 0,
-														  indexNeg1Entry.MasterAngle_deg ?? 0, indexNeg1Entry.SlaveAngle_deg ?? 0,
+					if( EndPntToolVecData != null ) {
+						endPnt = new ToolVecModifyData( EndPntToolVecData.RA_deg ?? 0, EndPntToolVecData.RB_deg ?? 0,
+														  EndPntToolVecData.MasterAngle_deg ?? 0, EndPntToolVecData.SlaveAngle_deg ?? 0,
 														  globalInterpolateType );
 					}
 
@@ -1261,7 +1254,6 @@ namespace MyCAM.FileManager
 					else if( endPnt != null && startPnt == null ) {
 						startPnt = endPnt.Clone();
 					}
-
 					return new StartPntToolVecParam( startPnt, endPnt );
 				}
 			}

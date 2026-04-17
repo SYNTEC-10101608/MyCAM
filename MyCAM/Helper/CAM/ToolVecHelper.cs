@@ -200,7 +200,7 @@ namespace MyCAM.Helper
 			// interpolate A/B angles and convert to tool vector
 			double accumulatedDistance = 0;
 			for( int i = nStartIndex; i <= nEndIndex; i++ ) {
-				double t = accumulatedDistance / totaldistance;
+				double t = ( totaldistance > GEOM_TOLERANCE ) ? ( accumulatedDistance / totaldistance ) : 0.0;
 
 				// add accumulated distance if not the last point
 				if( i < nEndIndex ) {
@@ -240,7 +240,7 @@ namespace MyCAM.Helper
 			// interpolate master/slave angles and convert to tool vector
 			double accumulatedDistance = 0;
 			for( int i = nStartIndex; i <= nEndIndex; i++ ) {
-				double t = accumulatedDistance / totaldistance;
+				double t = ( totaldistance > GEOM_TOLERANCE ) ? ( accumulatedDistance / totaldistance ) : 0.0;
 
 				// add accumulated distance if not the last point
 				if( i < nEndIndex ) {
@@ -491,6 +491,7 @@ namespace MyCAM.Helper
 
 				// we return a big value for process to identify
 				abAngle_deg = new Tuple<double, double>( BIG_AB_ANGLE, BIG_AB_ANGLE );
+				return;
 			}
 
 			// turn the target dir (world coord) to ToolVec coordinate system

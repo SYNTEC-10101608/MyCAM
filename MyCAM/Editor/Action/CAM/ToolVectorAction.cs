@@ -158,6 +158,13 @@ namespace MyCAM.Editor
 			else {
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 
+				// check if point is valid
+				if( m_SelectedPoint == null ) {
+					m_ToolVecParam = null;
+					m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
+					return;
+				}
+
 				// check is at start or end point for closed path
 				m_IsStartPnt = m_nSelectIndex == m_DataHandler.GetStartPointCADIndex();
 				if( m_DataHandler.IsClosed() ) {
@@ -322,7 +329,7 @@ namespace MyCAM.Editor
 			if( !CheckABAngleRange( angleA_deg, angleB_deg ) ) {
 				return;
 			}
-			if( m_SelectedPoint == null ) {
+			if( !IsValidToolVecState() ) {
 				return;
 			}
 			Tuple<double, double> msAngle_deg = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, m_SelectedPoint );
@@ -339,7 +346,7 @@ namespace MyCAM.Editor
 
 		void OnMSAngleChanged( double master_deg, double slave_deg )
 		{
-			if( m_SelectedPoint == null ) {
+			if( !IsValidToolVecState() ) {
 				return;
 			}
 			Tuple<double, double> abAngle_deg = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_SelectedPoint );
@@ -361,7 +368,7 @@ namespace MyCAM.Editor
 
 		void OnFlipRotaryAxis( bool isPositive )
 		{
-			if( m_ToolVecParam == null || m_SelectedPoint == null ) {
+			if( !IsValidToolVecState() ) {
 				return;
 			}
 			Tuple<double, double> rotated = ToolVecHelper.FlipRotaryAxis( m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, isPositive );
@@ -430,6 +437,9 @@ namespace MyCAM.Editor
 
 			// for open path, just use 0 and last index of CAD
 			else {
+				if( m_PathPointList == null || m_PathPointList.Count == 0 ) {
+					return;
+				}
 				OnSelectedIndexChanged( toStart ? 0 : m_PathPointList.Count - 1 );
 			}
 		}
@@ -444,6 +454,35 @@ namespace MyCAM.Editor
 			return true;
 		}
 
+		bool IsValidToolVecState()
+		{
+			return m_ToolVecParam != null && m_SelectedPoint != null;
+		}
+
+		bool ValidateFrameTransformMap( Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap )
+		{
+			if( frameTransformMap == null
+				|| !frameTransformMap.ContainsKey( MachineComponentType.WorkPiece )
+				|| frameTransformMap[ MachineComponentType.WorkPiece ] == null
+				|| frameTransformMap[ MachineComponentType.WorkPiece ].Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
+				return false;
+			}
+			return true;
+		}
+
+		ToolVecModifyData CreateToolVecModifyData( EToolVecInterpolateType interpolateType )
+		{
+			return new ToolVecModifyData()
+			{
+				RA_deg = m_ToolVecParam.AngleA_deg,
+				RB_deg = m_ToolVecParam.AngleB_deg,
+				Master_deg = m_ToolVecParam.Master_deg,
+				Slave_deg = m_ToolVecParam.Slave_deg,
+				InterpolateType = interpolateType
+			};
+		}
+
 		void UIProtection()
 		{
 			// cbx need to be lock
@@ -451,7 +490,7 @@ namespace MyCAM.Editor
 				m_ToolVecDlg.LockCbx( true, false, false, true );
 				return;
 			}
-			if( m_SelectedPoint.IsToolVecModPoint ) {
+			if( m_SelectedPoint != null && m_SelectedPoint.IsToolVecModPoint ) {
 				m_ToolVecDlg.LockCbx( true, true, false );
 				return;
 			}
@@ -485,26 +524,12 @@ namespace MyCAM.Editor
 				return;
 			}
 			if( m_IsStartPnt ) {
-				ToolVecModifyData startPntData = new ToolVecModifyData()
-				{
-					RA_deg = m_ToolVecParam.AngleA_deg,
-					RB_deg = m_ToolVecParam.AngleB_deg,
-					Master_deg = m_ToolVecParam.Master_deg,
-					Slave_deg = m_ToolVecParam.Slave_deg,
-					InterpolateType = m_CraftData.StartPntToolVecData.StartPnt.InterpolateType
-				};
+				ToolVecModifyData startPntData = CreateToolVecModifyData( m_CraftData.StartPntToolVecData.StartPnt.InterpolateType );
 				m_CraftData.StartPntToolVecData.StartPnt = startPntData;
 				return;
 			}
 			if( m_IsEndPnt ) {
-				ToolVecModifyData endPntData = new ToolVecModifyData()
-				{
-					RA_deg = m_ToolVecParam.AngleA_deg,
-					RB_deg = m_ToolVecParam.AngleB_deg,
-					Master_deg = m_ToolVecParam.Master_deg,
-					Slave_deg = m_ToolVecParam.Slave_deg,
-					InterpolateType = m_CraftData.StartPntToolVecData.EndPnt.InterpolateType
-				};
+				ToolVecModifyData endPntData = CreateToolVecModifyData( m_CraftData.StartPntToolVecData.EndPnt.InterpolateType );
 				m_CraftData.StartPntToolVecData.EndPnt = endPntData;
 				return;
 			}
@@ -551,11 +576,7 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
 				return;
 			}
-			if( frameTransformMap == null
-				|| !frameTransformMap.ContainsKey( MachineComponentType.WorkPiece )
-				|| frameTransformMap[ MachineComponentType.WorkPiece ] == null
-				|| frameTransformMap[ MachineComponentType.WorkPiece ].Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
+			if( !ValidateFrameTransformMap( frameTransformMap ) ) {
 				return;
 			}
 			// output vertex is the shape of high light
