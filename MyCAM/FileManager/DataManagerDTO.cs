@@ -1084,6 +1084,18 @@ namespace MyCAM.FileManager
 			set;
 		} = new List<ToolVecMapDTO>();
 
+		public List<ToolVecMap2DTO> ToolVecModifyMap_New
+		{
+			get;
+			set;
+		} = new List<ToolVecMap2DTO>();
+
+		public StartPntToolVecParamDTO StartPntToolVecData
+		{
+			get;
+			set;
+		}
+
 		internal CraftDataDTO()
 		{
 		}
@@ -1108,33 +1120,40 @@ namespace MyCAM.FileManager
 							? new TraverseDataDTO( craftData.TraverseData )
 							: new TraverseDataDTO();
 			OverCutLength = craftData.OverCutLength;
-			InterpolateType = craftData.InterpolateType;
-			ToolVecModifyMap = ( craftData.ToolVecModifyMap ?? new Dictionary<int, ToolVecModifyData>() )
-				.Select( kvp => new ToolVecMapDTO( kvp.Key, kvp.Value.RA_deg, kvp.Value.RB_deg, kvp.Value.Master_deg, kvp.Value.Slave_deg ) )
+			ToolVecModifyMap_New = craftData.ToolVecModifyMap.ToDictionary()
+				.Select( kvp => new ToolVecMap2DTO( kvp.Key, kvp.Value.RA_deg, kvp.Value.RB_deg, kvp.Value.Master_deg, kvp.Value.Slave_deg, kvp.Value.InterpolateType ) )
 				.ToList();
+			if( craftData.StartPntToolVecData != null ) {
+				StartPntToolVecData = new StartPntToolVecParamDTO( craftData.StartPntToolVecData );
+			}
 		}
 
 		internal CraftData ToCraftData()
 		{
-			if( ToolVecModifyMap == null || LeadData == null || TraverseData == null ||
+			// Validate required fields
+			if( LeadData == null || TraverseData == null ||
 				!StartPoint.HasValue || !IsPathReverse.HasValue || !OverCutLength.HasValue ||
-				!IsToolVecReverse.HasValue || !InterpolateType.HasValue || !CompensatedDistance.HasValue ) {
-				throw new ArgumentException( "CraftData deserialization failed." );
+				!IsToolVecReverse.HasValue || !CompensatedDistance.HasValue ) {
+				throw new ArgumentException( "CraftData deserialization failed: Missing required fields." );
 			}
 
-			// backward compatibility
+			// Backward compatibility for TechLayer
 			if( !TechLayer.HasValue ) {
 				TechLayer = DEFAULT_TECH_LAYER;
 			}
-			Dictionary<int, ToolVecModifyData> toolVecModifyMap = ToolVecModifyMap.ToDictionary(
-				dto => dto.Index.Value,
-				dto => new ToolVecModifyData( dto.RA_deg.Value, dto.RB_deg.Value, dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value )
-			);
+
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
-			EToolVecInterpolateType interpolateType = InterpolateType.Value;
 
-			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap, IsToolVecReverse.Value, interpolateType, traverseData );
+			// Build ToolVecModifyMap from file data
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap = BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion );
+
+			// Build StartPntToolVecData
+			StartPntToolVecParam startPntToolVecParam = BuildStartPntToolVecParam( sourceMap_OldVersion );
+
+			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value,
+												  leadData, OverCutLength.Value, toolVecModifyMap,
+												  startPntToolVecParam, IsToolVecReverse.Value, traverseData );
 
 			// Set properties not in constructor
 			if( CumulativeTrsfMatrix == null ) {
@@ -1142,9 +1161,105 @@ namespace MyCAM.FileManager
 			}
 			craftData.CumulativeTrsfMatrix = CumulativeTrsfMatrix.ToTrsf();
 
-			// Set properties not in constructor
 			craftData.CompensatedDistance = CompensatedDistance.Value;
+
 			return craftData;
+		}
+
+		Dictionary<int, ToolVecModifyData> BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion )
+		{
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
+			sourceMap_OldVersion = null;
+
+			// Determine which version of ToolVecModifyMap to use;
+			// if do not have any control pnt , toolVecModifyMap will still not be empty(construct protection)
+			bool isOldVersion = ToolVecModifyMap != null && ToolVecModifyMap.Count > 0;
+
+			if( isOldVersion ) {
+				// Need InterpolateType from global field
+				if( !InterpolateType.HasValue ) {
+					throw new ArgumentException( "CraftData deserialization failed: Old version file missing InterpolateType field." );
+				}
+
+				EToolVecInterpolateType globalInterpolateType = InterpolateType.Value;
+				sourceMap_OldVersion = ToolVecModifyMap;
+
+				// Read from ToolVecModifyMap, apply global InterpolateType to all entries
+				foreach( var dto in ToolVecModifyMap ) {
+					if( dto.Index.HasValue ) {
+						toolVecModifyMap[ dto.Index.Value ] =
+							new ToolVecModifyData( dto.RA_deg ?? 0, dto.RB_deg ?? 0,
+													dto.MasterAngle_deg ?? 0, dto.SlaveAngle_deg ?? 0,
+													globalInterpolateType );
+					}
+				}
+			}
+			else {
+				// Read from ToolVecModifyMap_New, each entry has its own InterpolateType
+				foreach( var dto in ToolVecModifyMap_New ) {
+					if( dto.Index.HasValue && dto.RA_deg.HasValue && dto.RB_deg.HasValue &&
+						dto.MasterAngle_deg.HasValue && dto.SlaveAngle_deg.HasValue ) {
+						// Use the InterpolateType from the entry, default to Normal if null
+						EToolVecInterpolateType entryInterpolateType = dto.InterpolateType ?? EToolVecInterpolateType.Normal;
+						toolVecModifyMap[ dto.Index.Value ] =
+							new ToolVecModifyData( dto.RA_deg.Value, dto.RB_deg.Value,
+													dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value,
+													entryInterpolateType );
+					}
+				}
+			}
+			return toolVecModifyMap;
+		}
+
+		StartPntToolVecParam BuildStartPntToolVecParam( List<ToolVecMapDTO> sourceMap_OldVersion )
+		{
+			// If StartPntToolVecData node exists, use it directly
+			if( StartPntToolVecData != null ) {
+				return StartPntToolVecData.ToStartPntToolVecParam();
+			}
+
+			// Backward compatibility: if StartPntToolVecData node was absent and we're reading old version,
+			// try to build StartPnt/EndPnt from entries with index matching StartPoint and -1
+			if( sourceMap_OldVersion != null ) {
+				if( !InterpolateType.HasValue ) {
+					throw new ArgumentException( "CraftData deserialization failed: Old version file missing InterpolateType field." );
+				}
+
+				// old version do not have InterpolateType in each entry
+				EToolVecInterpolateType globalInterpolateType = InterpolateType.Value;
+
+				// Old ToolVecMapDTO format: index matching StartPoint = StartPnt, index -1 = EndPnt
+				ToolVecMapDTO startPntToolVecData = sourceMap_OldVersion.FirstOrDefault( d => d.Index.HasValue && d.Index.Value == StartPoint );
+				ToolVecMapDTO EndPntToolVecData = sourceMap_OldVersion.FirstOrDefault( d => d.Index.HasValue && d.Index.Value == -1 );
+
+				if( startPntToolVecData != null || EndPntToolVecData != null ) {
+					ToolVecModifyData startPnt = null;
+					ToolVecModifyData endPnt = null;
+
+					if( startPntToolVecData != null ) {
+						startPnt = new ToolVecModifyData( startPntToolVecData.RA_deg ?? 0, startPntToolVecData.RB_deg ?? 0,
+															startPntToolVecData.MasterAngle_deg ?? 0, startPntToolVecData.SlaveAngle_deg ?? 0,
+															globalInterpolateType );
+					}
+					if( EndPntToolVecData != null ) {
+						endPnt = new ToolVecModifyData( EndPntToolVecData.RA_deg ?? 0, EndPntToolVecData.RB_deg ?? 0,
+														  EndPntToolVecData.MasterAngle_deg ?? 0, EndPntToolVecData.SlaveAngle_deg ?? 0,
+														  globalInterpolateType );
+					}
+
+					// If only one is present, clone it for the other
+					if( startPnt != null && endPnt == null ) {
+						endPnt = startPnt.Clone();
+					}
+					else if( endPnt != null && startPnt == null ) {
+						startPnt = endPnt.Clone();
+					}
+					return new StartPntToolVecParam( startPnt, endPnt );
+				}
+			}
+
+			// No StartPntToolVecData found, return empty param
+			return new StartPntToolVecParam();
 		}
 
 		const int DEFAULT_TECH_LAYER = 1;
@@ -1621,6 +1736,7 @@ namespace MyCAM.FileManager
 		}
 	}
 
+	// Legacy DTO: used in old save files where ToolVecModifyMap contained ToolVecMapDTO elements (no InterpolateType field)
 	public class ToolVecMapDTO
 	{
 		public int? Index
@@ -1653,7 +1769,7 @@ namespace MyCAM.FileManager
 			set;
 		}
 
-		// parameterless constructor(for XmlSerializer)
+		// parameterless constructor (for XmlSerializer)
 		internal ToolVecMapDTO()
 		{
 		}
@@ -1665,6 +1781,158 @@ namespace MyCAM.FileManager
 			RB_deg = rb_deg;
 			MasterAngle_deg = masterAngle_deg;
 			SlaveAngle_deg = slaveAngle_deg;
+		}
+	}
+
+	public class ToolVecMap2DTO
+	{
+		public int? Index
+		{
+			get;
+			set;
+		}
+
+		public double? RA_deg
+		{
+			get;
+			set;
+		}
+
+		public double? RB_deg
+		{
+			get;
+			set;
+		}
+
+		public double? MasterAngle_deg
+		{
+			get;
+			set;
+		}
+
+		public double? SlaveAngle_deg
+		{
+			get;
+			set;
+		}
+
+		public EToolVecInterpolateType? InterpolateType
+		{
+			get;
+			set;
+		}
+
+		// parameterless constructor(for XmlSerializer)
+		internal ToolVecMap2DTO()
+		{
+		}
+
+		internal ToolVecMap2DTO( int index, double ra_deg, double rb_deg, double masterAngle_deg, double slaveAngle_deg, EToolVecInterpolateType interpolateType )
+		{
+			Index = index;
+			RA_deg = ra_deg;
+			RB_deg = rb_deg;
+			MasterAngle_deg = masterAngle_deg;
+			SlaveAngle_deg = slaveAngle_deg;
+			InterpolateType = interpolateType;
+		}
+	}
+
+	public class ToolVecModifyData2DTO
+	{
+		public double? RA_deg
+		{
+			get;
+			set;
+		}
+
+		public double? RB_deg
+		{
+			get;
+			set;
+		}
+
+		public double? Master_deg
+		{
+			get;
+			set;
+		}
+
+		public double? Slave_deg
+		{
+			get;
+			set;
+		}
+
+		public EToolVecInterpolateType? InterpolateType
+		{
+			get;
+			set;
+		}
+
+		internal ToolVecModifyData2DTO()
+		{
+		}
+
+		internal ToolVecModifyData2DTO( ToolVecModifyData data )
+		{
+			if( data == null ) {
+				return;
+			}
+			RA_deg = data.RA_deg;
+			RB_deg = data.RB_deg;
+			Master_deg = data.Master_deg;
+			Slave_deg = data.Slave_deg;
+			InterpolateType = data.InterpolateType;
+		}
+
+		internal ToolVecModifyData ToToolVecModifyData2()
+		{
+			return new ToolVecModifyData(
+				RA_deg ?? 0,
+				RB_deg ?? 0,
+				Master_deg ?? 0,
+				Slave_deg ?? 0,
+				InterpolateType ?? EToolVecInterpolateType.Normal );
+		}
+	}
+
+	public class StartPntToolVecParamDTO
+	{
+		public ToolVecModifyData2DTO StartPnt
+		{
+			get;
+			set;
+		}
+
+		public ToolVecModifyData2DTO EndPnt
+		{
+			get;
+			set;
+		}
+
+		internal StartPntToolVecParamDTO()
+		{
+		}
+
+		internal StartPntToolVecParamDTO( StartPntToolVecParam param )
+		{
+			if( param == null ) {
+				return;
+			}
+			if( param.StartPnt != null ) {
+				StartPnt = new ToolVecModifyData2DTO( param.StartPnt );
+			}
+			if( param.EndPnt != null ) {
+				EndPnt = new ToolVecModifyData2DTO( param.EndPnt );
+			}
+		}
+
+		internal StartPntToolVecParam ToStartPntToolVecParam()
+		{
+			ToolVecModifyData startPnt = StartPnt?.ToToolVecModifyData2();
+			ToolVecModifyData endPnt = EndPnt?.ToToolVecModifyData2();
+			return new StartPntToolVecParam( startPnt, endPnt );
 		}
 	}
 

@@ -24,6 +24,9 @@ namespace MyCAM.PathCache
 			m_CraftData.CAMFactorChanged += SetCAMDataDirty;
 			m_CraftData.CADFactorChanged += SetCADDataDirty;
 			BuildCADCAMPointList();
+
+			// build default start/end point tool vec data after tool vec is set
+			// BuildDefaultStartPntToolVecData();
 		}
 
 		#region computation result
@@ -193,10 +196,18 @@ namespace MyCAM.PathCache
 			// solve initial IK
 			SolveInitIK();
 
+			// use origin IK result as default start/end point tool vec data
+			SetDefaultStartEndToolVecParam();
+
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
+
+			// get all control point index ( include start and end point);
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = GetToolVecModifyMap();
-			ToolVecHelper.SetToolVec( ref toolVecPointList, toolVecModifyMap, m_IsClose, m_CraftData.InterpolateType );
+			ToolVecHelper.SetToolVec( ref toolVecPointList, toolVecModifyMap, m_IsClose, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList, m_CraftData.IsPathReverse );
+
+			// for tool vec dialog select action to no current index interpolate type
+			m_interpolateTypeRegion = interpolateRegionList;
 
 			// set over cut
 			List<IOrientationPoint> camPointOverCutList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
@@ -228,11 +239,38 @@ namespace MyCAM.PathCache
 					int camIndex = m_CADToCAMIndexMap[ oneIndex ];
 					toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
 				}
-				else if( oneIndex == CLOSED_POINT_INDEX && m_IsClose ) {
-					toolVecModifyMap[ oneIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
+			}
+			if( m_CraftData.IsPathReverse ) {
+				toolVecModifyMap[ 0 ] = m_CraftData.StartPntToolVecData.EndPnt.Clone();
+			}
+			else {
+				toolVecModifyMap[ 0 ] = m_CraftData.StartPntToolVecData.StartPnt.Clone();
+			}
+
+			if( m_IsClose ) {
+				if( m_CraftData.IsPathReverse ) {
+					toolVecModifyMap[ CLOSED_POINT_INDEX ] = m_CraftData.StartPntToolVecData.StartPnt.Clone();
+				}
+				else {
+					toolVecModifyMap[ CLOSED_POINT_INDEX ] = m_CraftData.StartPntToolVecData.EndPnt.Clone();
+				}
+			}
+			else {
+				int nLastIndex = m_CADPointList.Count - 1;
+				if( m_CraftData.IsPathReverse ) {
+					toolVecModifyMap[ nLastIndex ] = m_CraftData.StartPntToolVecData.StartPnt.Clone();
+				}
+				else {
+					toolVecModifyMap[ nLastIndex ] = m_CraftData.StartPntToolVecData.EndPnt.Clone();
 				}
 			}
 			return toolVecModifyMap;
+		}
+
+		List<Tuple<int, int, EToolVecInterpolateType>> m_interpolateTypeRegion;
+		public List<Tuple<int, int, EToolVecInterpolateType>> GetMapedModifyMap()
+		{
+			return m_interpolateTypeRegion;
 		}
 
 		void SolveInitIK()
@@ -313,6 +351,23 @@ namespace MyCAM.PathCache
 		void SetCenterDir()
 		{
 			m_ComputeRefCenterDir = m_ContourGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
+		}
+
+		void SetDefaultStartEndToolVecParam()
+		{
+			if( m_CraftData.StartPntToolVecData == null || m_CraftData.StartPntToolVecData.StartPnt == null || m_CraftData.StartPntToolVecData.EndPnt == null ) {
+				ToolVecModifyData startPnt = BuildToolVecModifyData( m_CAMPointList.First().Clone() );
+				ToolVecModifyData endPnt = BuildToolVecModifyData( m_CAMPointList.Last().Clone() );
+				m_CraftData.StartPntToolVecData = new StartPntToolVecParam( startPnt, endPnt );
+			}
+		}
+
+		ToolVecModifyData BuildToolVecModifyData( CAMPoint camPoint )
+		{
+			double master_deg = camPoint.ModMaster_rad * 180.0 / Math.PI;
+			double slave_deg = camPoint.ModSlave_rad * 180.0 / Math.PI;
+			Tuple<double, double> abAngles = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, camPoint );
+			return new ToolVecModifyData( abAngles.Item1, abAngles.Item2, master_deg, slave_deg, EToolVecInterpolateType.Normal );
 		}
 
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();

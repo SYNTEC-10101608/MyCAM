@@ -65,6 +65,7 @@
       <DependentUpon>ConnectDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Data\Craft\CalibrationData.cs" />
+    <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
     <Compile Include="Editor\Action\CAM\CalibrationREFAction.cs" />
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Editor\Dialog\CalibrationREFDlg.Designer.cs">
       <DependentUpon>CalibrationREFDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Editor\Renderer\REFPointRenderer.cs" />
     <Compile Include="Editor\Dialog\ControllerDlg.cs">
       <SubType>Form</SubType>
@@ -94,9 +96,11 @@
       <DependentUpon>PathEditDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Renderer\CoordIconRenderer.cs" />
-    <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Data\Simulation\SimuData.cs" />
     <Compile Include="Editor\Renderer\MachineRender.cs" />
+    <Compile Include="Editor\Renderer\RendererHelper.cs" />
+    <Compile Include="Editor\Renderer\ToolVecEditRender.cs" />
+    <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
     <Compile Include="Helper\CAM\StartPointHelper.cs" />
     <Compile Include="Helper\Canvas\DrawHelper.cs" />
@@ -184,7 +188,6 @@
     <Compile Include="Editor\Renderer\ICAMRenderer.cs" />
     <Compile Include="Editor\Renderer\IndexRenderer.cs" />
     <Compile Include="Editor\Renderer\OrientationRenderer.cs" />
-    <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
     <Compile Include="Editor\Renderer\TraverseRenderer.cs" />
     <Compile Include="Editor\SimuEditor.cs" />
     <Compile Include="Data\Craft\LeadData.cs" />

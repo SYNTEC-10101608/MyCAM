@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public partial class ToolVectorDlg : EditDialogBase<EToolVecInterpolateType>
+	public partial class m_lblInter : EditDialogBase<EToolVecInterpolateType>
 	{
 		public Action SetKeep;
 		public Action SetZdir;
@@ -20,12 +20,12 @@ namespace MyCAM.Editor
 		public Action<bool> ToStartOrEnd;
 		public Action<bool> FlipRotaryAxis;
 
-		public ToolVectorDlg( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse, RotaryAxisConfig config )
+		public m_lblInter( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse, RotaryAxisConfig config )
 		{
 			// struct would not be null
 			InitializeComponent();
 			m_IsPathRevese = isPathReverse;
-			ResetType( type );
+			ResetType(  );
 			ResetToolVecParam( param );
 
 			// update rotary axis name
@@ -36,23 +36,9 @@ namespace MyCAM.Editor
 			m_btnRotaryNeg.Text = m_RotaryAxisConfig.RotaryAxisName + " -";
 		}
 
-		public void ResetType( EToolVecInterpolateType type )
+		public void ResetType( )
 		{
-			bSuppressTypeChangedEvent = true;
-
-			// update modify type
-			switch( type ) {
-				case EToolVecInterpolateType.VectorInterpolation:
-					m_rbtVecSpace.Checked = true;
-					break;
-				case EToolVecInterpolateType.TiltAngleInterpolation:
-					m_rbtTilt.Checked = true;
-					break;
-				default:
-					m_rbtNormal.Checked = true;
-					break;
-			}
-			bSuppressTypeChangedEvent = false;
+			m_cbxInterpolateType.SelectedIndex = (int)EToolVecInterpolateType.Normal;
 		}
 
 		public void ResetToolVecParam( ToolVecParam toolVecParam )
@@ -72,8 +58,6 @@ namespace MyCAM.Editor
 			m_tbxAngleB.Text = m_IsPathRevese ? ( -m_ToolVecParam.AngleB_deg ).ToString( "F3" ) : m_ToolVecParam.AngleB_deg.ToString( "F3" );
 			m_tbxMaster.Text = m_ToolVecParam.Master_deg.ToString( "F3" );
 			m_tbxSlave.Text = m_ToolVecParam.Slave_deg.ToString( "F3" );
-			m_btnRemove.Enabled = m_ToolVecParam.IsModified;
-			m_btnAdd.Enabled = !m_ToolVecParam.IsModified;
 			bSuppressValueChangedEvent = false;
 		}
 
@@ -84,30 +68,39 @@ namespace MyCAM.Editor
 			m_lblStartOrEnd.Text = start ? "當前位置：起點" : "當前位置：終點";
 		}
 
+		public void LockCbx( bool isNeedLock, bool isEnableRemove, bool isEnableAdd, bool isStartPnt = false, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
+		{
+			m_btnAdd.Enabled = isEnableAdd;
+			m_btnRemove.Enabled = isEnableRemove;
+			if( isNeedLock ) {
+				m_cbxInterpolateType.SelectedIndex = -1;
+				m_cbxInterpolateType.Enabled = false;
+
+				if( isStartPnt ) {
+					m_btnAdd.Enabled = false;
+					m_btnRemove.Enabled = false; 
+				}
+				else {
+
+				}
+					return;
+			}
+			m_cbxInterpolateType.Enabled = true;
+			m_cbxInterpolateType.SelectedIndex = (int)interpolateType;
+
+		}
+
 
 		// UI event - interpolate type changed
-		void m_rbtNormal_CheckedChanged( object sender, EventArgs e )
+		void m_cbxInterpolateType_SelectedIndexChanged( object sender, EventArgs e )
 		{
-			RaiseTypeChanged( EToolVecInterpolateType.Normal );
-		}
-
-		void m_rbtVecSpace_CheckedChanged( object sender, EventArgs e )
-		{
-			RaiseTypeChanged( EToolVecInterpolateType.VectorInterpolation );
-		}
-
-		void m_rbtTilt_CheckedChanged( object sender, EventArgs e )
-		{
-			RaiseTypeChanged( EToolVecInterpolateType.TiltAngleInterpolation );
-		}
-
-		void RaiseTypeChanged( EToolVecInterpolateType type )
-		{
-			if( bSuppressTypeChangedEvent ) {
+			if( m_cbxInterpolateType.SelectedIndex < 0 ) {
 				return;
 			}
-			TypeChanged?.Invoke( type );
+			EToolVecInterpolateType selectedType = (EToolVecInterpolateType)m_cbxInterpolateType.SelectedIndex;
+			TypeChanged?.Invoke( selectedType );
 		}
+
 
 		// UI event - Index param value changed
 		void m_tbxAngleA_KeyDown( object sender, KeyEventArgs e )
@@ -291,7 +284,6 @@ namespace MyCAM.Editor
 
 		RotaryAxisConfig m_RotaryAxisConfig;
 
-		bool bSuppressTypeChangedEvent = false;
 		bool bSuppressValueChangedEvent = false;
 		Timer m_Timer;
 		const int TIMER_INTERVAL = 10;
@@ -368,13 +360,19 @@ namespace MyCAM.Editor
 			get; set;
 		}
 
-		public ToolVecParam( double angleA_deg = 0.0, double angleB_deg = 0.0, double master_deg = 0.0, double slave_deg = 0.0, bool isModified = false )
+		public EToolVecInterpolateType InterpolateType
+		{
+			get; set;
+		}
+
+		public ToolVecParam( double angleA_deg = 0.0, double angleB_deg = 0.0, double master_deg = 0.0, double slave_deg = 0.0, bool isModified = false , EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal)
 		{
 			AngleA_deg = angleA_deg;
 			AngleB_deg = angleB_deg;
 			Master_deg = master_deg;
 			Slave_deg = slave_deg;
 			IsModified = isModified;
+			InterpolateType = interpolateType;
 		}
 	}
 

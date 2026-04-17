@@ -341,6 +341,7 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
+
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
 
 			// register before init, cause init will change select node to start point, machine need to translate
@@ -355,8 +356,14 @@ namespace MyCAM.Editor
 		{
 			if( isStart ) {
 				m_MachineRender.Show();
+				m_MainPathRenderer.SetPauseRefresh( true );
+				m_ToolVecRenderer.SetPauseRefresh( true );
+				m_TraverseRenderer.SetPauseRefresh( true );
 			}
 			else {
+				m_MainPathRenderer.SetPauseRefresh( false );
+				m_ToolVecRenderer.SetPauseRefresh( false );
+				m_TraverseRenderer.SetPauseRefresh( false );
 				m_MachineRender.Remove();
 				m_ToolVecRenderer.Reset();
 				m_TraverseRenderer.Reset();
@@ -369,7 +376,7 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		void SetWorkPieceDisplayTransform( gp_Trsf trsf = null )
+		void SetWorkPieceDisplayTransform( gp_Trsf trsf = null, bool isUnLockViewerUpdate = true )
 		{
 			if( trsf == null ) {
 				return;
@@ -426,8 +433,10 @@ namespace MyCAM.Editor
 			view.SetAt( newAt.X(), newAt.Y(), newAt.Z() );
 			view.SetUp( newUp.X(), newUp.Y(), newUp.Z() );
 
-			// restore immediate update and update view once
-			view.SetImmediateUpdate( previousImmediateUpdate );
+			if( isUnLockViewerUpdate ) {
+				// restore immediate update and update view once
+				view.SetImmediateUpdate( previousImmediateUpdate );
+			}
 		}
 
 		public void SetToolVecReverse()
@@ -466,7 +475,6 @@ namespace MyCAM.Editor
 
 				// clear all tool vec modify data
 				craftData.ClearToolVecModify();
-				craftData.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
 
 				// get start point
 				ToolVecActionDataHandler dataHandler = new ToolVecActionDataHandler( szPathID );
@@ -482,7 +490,16 @@ namespace MyCAM.Editor
 				Tuple<double, double> avgAB_deg = ToolVecHelper.GetABAngleFromToolVec( avgDir, startPoint );
 
 				// set average ms to start point
-				craftData.SetToolVecModify( craftData.StartPointIndex, avgAB_deg.Item1, avgAB_deg.Item2, avgMS_deg.Item1, avgMS_deg.Item2 );
+				ToolVecModifyData endPntData = new ToolVecModifyData()
+				{
+					RA_deg = avgAB_deg.Item1,
+					RB_deg = avgAB_deg.Item2,
+					Master_deg = avgMS_deg.Item1,
+					Slave_deg = avgMS_deg.Item2,
+					InterpolateType = EToolVecInterpolateType.VectorInterpolation
+				};
+				craftData.StartPntToolVecData.EndPnt = endPntData.Clone();
+				craftData.StartPntToolVecData.StartPnt = endPntData.Clone();
 			}
 			ShowCAMData( szPathIDList );
 		}
@@ -558,7 +575,7 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void SetPathLayer(int nTechLayer)
+		public void SetPathLayer( int nTechLayer )
 		{
 			// one shot edit, multi edit supported
 			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
@@ -578,7 +595,7 @@ namespace MyCAM.Editor
 
 		public void SetCalibrationREF()
 		{
-			if (m_DataManager.PartIDList.Count == 0 ) {
+			if( m_DataManager.PartIDList.Count == 0 ) {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先新增工件", MyApp.NoticeType.Hint );
 				return;
 			}
@@ -882,7 +899,7 @@ namespace MyCAM.Editor
 			m_TraverseRenderer.Trans( trsf );
 		}
 
-		void SetTrans( Dictionary<MachineComponentType, List<gp_Trsf>> transMap )
+		void SetTrans( Dictionary<MachineComponentType, List<gp_Trsf>> transMap, bool isUnLockViewerUpdate = true )
 		{
 			// update camera FIRST before setting any transformations
 			gp_Trsf workPieceTrsf = transMap[ MachineComponentType.WorkPiece ].Last();
@@ -890,7 +907,7 @@ namespace MyCAM.Editor
 			// show
 			m_MachineRender.ShowToolVecEditResult( transMap );
 			ShowTransedCAMData( workPieceTrsf );
-			SetWorkPieceDisplayTransform( workPieceTrsf );
+			SetWorkPieceDisplayTransform( workPieceTrsf, isUnLockViewerUpdate );
 			m_Viewer.UpdateView();
 		}
 
