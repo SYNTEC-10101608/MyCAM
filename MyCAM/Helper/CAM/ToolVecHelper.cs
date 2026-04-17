@@ -113,21 +113,17 @@ namespace MyCAM.Helper
 
 			// get the interpolate interval list
 			interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap, isPathReverse );
-			bool isWithInterpolate = true;
-			if( interpolateIntervalList.Count > 1 ) {
-				isWithInterpolate = true;
-			}
 			SetControlPoint( ref toolVecPointList, interpolateIntervalList, toolVecModifyMap );
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
 				if( interpolateIntervalList[ i ].Item3 == EToolVecInterpolateType.VectorInterpolation ) {
 					ApplyMSAngleInterpolation( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
 				}
 				else if( interpolateIntervalList[ i ].Item3 == EToolVecInterpolateType.Normal ) {
-					SolveRegionIK( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2, isWithInterpolate );
+					SolveRegionIK( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
 				}
 				else if( interpolateIntervalList[ i ].Item3 == EToolVecInterpolateType.TiltAngleInterpolation ) {
 					ApplyTiltAngleInterpolation( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
-					SolveRegionIK( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2, isWithInterpolate );
+					SolveRegionIK( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
 				}
 			}
 			SetControlPoint( ref toolVecPointList, interpolateIntervalList, toolVecModifyMap );
@@ -306,7 +302,8 @@ namespace MyCAM.Helper
 					tiltABAngle.dEnd_RA_deg, tiltABAngle.dEnd_RB_deg );
 		}
 
-		static void SolveRegionIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nStartIdx, int nEndIdx, bool isWithInterpolate )
+		// bool isWithInterpolate == false means end point involve solve IK directly
+		static void SolveRegionIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nStartIdx, int nEndIdx, bool isWithInterpolate = true )
 		{
 			// Get machine data
 			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
