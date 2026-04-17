@@ -374,6 +374,12 @@ namespace MyCAM.Editor
 			m_CraftData.SetInterpolationMode( m_nSelectIndex, m_InterpolateType );
 			// trigger viewer refresh
 			RefreshSimuResult();
+
+			// update dialog, cause change type miaght change is point param
+			bool isModify = m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
+			m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModify );
+			m_ToolVecDlg.ResetToolVecParam(m_ToolVecParam );
+			m_ToolVecDlg.EnableStartEndSwitch(m_IsStartPnt || m_IsEndPnt, m_IsStartPnt );
 			UIProtection();
 		}
 
@@ -456,12 +462,16 @@ namespace MyCAM.Editor
 		// update
 		void SetToolVecParamAndPeview( bool bForceUpdate = false )
 		{
-
 			SetIndexAngleParam();
 
-			// trigger viewer refresh
-			RefreshSimuResult();
-
+			if ( m_ToolVecParam.IsModified ) {
+				RefreshSimuResult();
+			}
+			else {
+				// trigger viewer refresh
+				RefreshSimuResult( false );
+			}
+				
 			// update cache point
 			if( m_SelectedPoint != null && m_nSelectIndex != NULL_SELECT_INDEX ) {
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
@@ -524,7 +534,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void RefreshSimuResult()
+		void RefreshSimuResult(bool isEditModifyPnt = true)
 		{
 			bool isGetMachineData = DataGettingHelper.GetMachineData( out MachineData machineData );
 			if( !isGetMachineData ) {
@@ -533,8 +543,10 @@ namespace MyCAM.Editor
 			}
 
 			// trigger rebuild cam point list
-			m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
-			bool isCalSuccess = CalSimuTranfResult( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap );
+			if( isEditModifyPnt ) {
+				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
+			}
+			bool isCalSuccess = CalSimuTranfResult( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, isEditModifyPnt  );
 			if( !isCalSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
 				return;
@@ -566,7 +578,7 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		bool CalSimuTranfResult( MachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap )
+		bool CalSimuTranfResult( MachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap , bool isEditModifyPnt)
 		{
 			frameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 			if( m_SelectedPoint == null ) {
@@ -578,14 +590,32 @@ namespace MyCAM.Editor
 
 			// set default offset
 			gp_Vec simuOffset = machineData.SimulationOffset ?? new gp_Vec();
-			PostPoint G54pnt = new PostPoint()
-			{
-				X = m_SelectedPoint.Point.x,
-				Y = m_SelectedPoint.Point.y,
-				Z = m_SelectedPoint.Point.z,
-				Master = m_SelectedPoint.ModMaster_rad,
-				Slave = m_SelectedPoint.ModSlave_rad,
-			};
+			PostPoint G54pnt;
+
+			// get the real IK solved result to preview
+			if( isEditModifyPnt ) {
+				G54pnt = new PostPoint()
+				{
+					X = m_SelectedPoint.Point.x,
+					Y = m_SelectedPoint.Point.y,
+					Z = m_SelectedPoint.Point.z,
+					Master = m_SelectedPoint.ModMaster_rad,
+					Slave = m_SelectedPoint.ModSlave_rad,
+				};
+			}
+
+			// user want to know this unmodify point vector
+			else {
+				G54pnt = new PostPoint()
+				{
+					X = m_SelectedPoint.Point.x,
+					Y = m_SelectedPoint.Point.y,
+					Z = m_SelectedPoint.Point.z,
+					Master = m_ToolVecParam.Master_deg * Math.PI / 180.0,
+					Slave = m_ToolVecParam.Slave_deg * Math.PI / 180.0
+				};
+			}
+
 
 			// create PostSolver
 			PostSolver postSolver = new PostSolver( m_DataManager.MachineData );

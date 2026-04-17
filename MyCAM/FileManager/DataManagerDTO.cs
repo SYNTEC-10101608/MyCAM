@@ -1172,8 +1172,8 @@ namespace MyCAM.FileManager
 			sourceMap_OldVersion = null;
 
 			// Determine which version of ToolVecModifyMap to use
-			bool isNewVersion = ToolVecModifyMap_New != null && ToolVecModifyMap_New.Count > 0;
-			bool isOldVersion = ToolVecModifyMap != null && ToolVecModifyMap.Count > 0;
+			bool isNewVersion = ToolVecModifyMap_New != null;
+			bool isOldVersion = ToolVecModifyMap != null ;
 
 			if( isNewVersion ) {
 				// Case 1: New version file (has ToolVecModifyMap_New node)
