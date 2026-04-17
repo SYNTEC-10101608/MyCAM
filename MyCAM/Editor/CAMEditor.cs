@@ -366,9 +366,7 @@ namespace MyCAM.Editor
 				m_TraverseRenderer.SetPauseRefresh( false );
 				m_MachineRender.Remove();
 				m_ToolVecRenderer.Reset();
-
-				// edit tool vec might change start point tool vec, renender need to redraw
-				m_TraverseRenderer.Show();
+				m_TraverseRenderer.Reset();
 				m_OrientationRenderer.Reset();
 				m_IndexRenderer.Reset();
 				m_MainPathRenderer.Reset();
