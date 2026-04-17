@@ -17,9 +17,47 @@ namespace MyCAM.Editor.Renderer
 {
 	internal class TraverseRenderer : CAMRendererBase
 	{
+		bool m_IsPauseRefresh = false;
+
 		public TraverseRenderer( Viewer viewer, DataManager dataManager )
 			: base( viewer, dataManager )
 		{
+		}
+
+		public void SetPauseRefresh( bool isPause )
+		{
+			if( m_IsPauseRefresh == isPause ) {
+				return;
+			}
+			m_IsPauseRefresh = isPause;
+			if( isPause ) {
+				// hide all managed AIS objects without destroying them
+				foreach( var kvp in m_TraverseAISDict ) {
+					foreach( AIS_Line lineAIS in kvp.Value ) {
+						m_Viewer.GetAISContext().Erase( lineAIS, false );
+					}
+				}
+				foreach( var kvp in m_FrogLeapAISDict ) {
+					foreach( AIS_Shape shapeAIS in kvp.Value ) {
+						m_Viewer.GetAISContext().Erase( shapeAIS, false );
+					}
+				}
+			}
+			else {
+				// re-display all managed AIS objects
+				foreach( var kvp in m_TraverseAISDict ) {
+					foreach( AIS_Line lineAIS in kvp.Value ) {
+						m_Viewer.GetAISContext().Display( lineAIS, false );
+						m_Viewer.GetAISContext().Deactivate( lineAIS );
+					}
+				}
+				foreach( var kvp in m_FrogLeapAISDict ) {
+					foreach( AIS_Shape shapeAIS in kvp.Value ) {
+						m_Viewer.GetAISContext().Display( shapeAIS, false );
+						m_Viewer.GetAISContext().Deactivate( shapeAIS );
+					}
+				}
+			}
 		}
 
 		public override void Show( bool bUpdate = false )

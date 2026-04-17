@@ -10,6 +10,7 @@ using OCC.gp;
 using OCC.Prs3d;
 using OCC.Quantity;
 using OCC.TopoDS;
+using OCC.V3d;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,7 @@ namespace MyCAM.Editor
 			m_DataHandler = new ToolVecActionDataHandler( pathID );
 			m_PathIDList = new List<string>() { pathID };
 			m_CoordIcon = new CoordIconRenderer( viewer, dataManager );
+			m_ToolVecEditRender = new ToolVecEditRender( viewer, dataManager, m_PathIDList );
 		}
 
 		public override EditActionType ActionType
@@ -41,7 +43,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public Action<Dictionary<MachineComponentType, List<gp_Trsf>>> RaiseTrans;
+		public Action<Dictionary<MachineComponentType, List<gp_Trsf>>, bool> RaiseTrans;
 		public Action<bool> RaiseActionStart;
 
 		public override void Start()
@@ -49,7 +51,7 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// init global param
-			m_InterpolateType = m_CraftData.InterpolateType;
+			m_InterpolateType = EToolVecInterpolateType.Normal;
 
 			// init index param
 			m_nSelectIndex = NULL_SELECT_INDEX;
@@ -57,7 +59,7 @@ namespace MyCAM.Editor
 			m_ToolVecParam = null;
 
 			// init dialog
-			m_ToolVecDlg = new ToolVectorDlg( m_CraftData.InterpolateType, m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );
+			m_ToolVecDlg = new m_lblInter( m_InterpolateType, m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );
 			m_ToolVecDlg.SetKeep += () => OnSetKeep();
 			m_ToolVecDlg.SetZdir += () => OnSetZDir();
 			m_ToolVecDlg.SetRevert += () => OnSetRevert();
@@ -72,6 +74,7 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.FlipRotaryAxis += ( isPositive ) => OnFlipRotaryAxis( isPositive );
 			m_ToolVecDlg.EnableStartEndSwitch( false, false );
 			m_ToolVecDlg.Cancel += End;
+			m_ToolVecEditRender.Show( m_PathIDList );
 
 			// draw new trihedron for G54 must before change to start point
 			// because change to start point will trigger coord trasform
@@ -99,6 +102,7 @@ namespace MyCAM.Editor
 			TranfAndRebuildMap( new gp_Trsf(), DEFAULT_INDEX, out _ );
 			UnlockSelectedVertexHighLight();
 			m_CoordIcon.Remove();
+			m_ToolVecEditRender.Remove();
 			RaiseActionStart?.Invoke( false );
 			base.End();
 		}
@@ -153,19 +157,54 @@ namespace MyCAM.Editor
 			// with select
 			else {
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
-				bool isModified = m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
-				m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModified );
+
+				// check if point is valid
+				if( m_SelectedPoint == null ) {
+					m_ToolVecParam = null;
+					m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
+					return;
+				}
+
+				// check is at start or end point for closed path
+				m_IsStartPnt = m_nSelectIndex == m_DataHandler.GetStartPointCADIndex();
+				if( m_DataHandler.IsClosed() ) {
+					m_IsEndPnt = m_nSelectIndex == CLOSED_POINT_INDEX;
+				}
+				else {
+					m_IsEndPnt = m_nSelectIndex == m_DataHandler.GetTotalCADPointCount() - 1;
+				}
+
+				if( m_IsStartPnt && m_CraftData.IsPathReverse == false || m_IsEndPnt && m_CraftData.IsPathReverse ) {
+					m_ToolVecParam = new ToolVecParam(
+						m_CraftData.StartPntToolVecData.StartPnt.RA_deg,
+						m_CraftData.StartPntToolVecData.StartPnt.RB_deg,
+						m_CraftData.StartPntToolVecData.StartPnt.Master_deg,
+						m_CraftData.StartPntToolVecData.StartPnt.Slave_deg
+					);
+				}
+				else if( m_IsEndPnt && m_CraftData.IsPathReverse == false || m_IsStartPnt && m_CraftData.IsPathReverse ) {
+					m_ToolVecParam = new ToolVecParam(
+						m_CraftData.StartPntToolVecData.EndPnt.RA_deg,
+						m_CraftData.StartPntToolVecData.EndPnt.RB_deg,
+						m_CraftData.StartPntToolVecData.EndPnt.Master_deg,
+						m_CraftData.StartPntToolVecData.EndPnt.Slave_deg
+					);
+				}
+				else {
+					bool isModify = m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
+					m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModify );
+				}
 
 				// update dialog
 				m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
-
-				// check is at start or end point for closed path
-				bool start = m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() && m_DataHandler.IsClosed();
-				bool end = m_nSelectIndex == CLOSED_POINT_INDEX && m_DataHandler.IsClosed();
-				m_ToolVecDlg.EnableStartEndSwitch( start || end, start );
+				m_ToolVecDlg.EnableStartEndSwitch( m_IsStartPnt || m_IsEndPnt, m_IsStartPnt );
 			}
+			UIProtection();
 			RefreshSimuResult();
 		}
+		bool m_IsStartPnt;
+		bool m_IsEndPnt;
+		ToolVecEditRender m_ToolVecEditRender;
 
 		void LockSelectedVertexHighLight( TopoDS_Shape selectedVertex )
 		{
@@ -291,7 +330,7 @@ namespace MyCAM.Editor
 			if( !CheckABAngleRange( angleA_deg, angleB_deg ) ) {
 				return;
 			}
-			if( m_SelectedPoint == null ) {
+			if( !IsValidToolVecState() ) {
 				return;
 			}
 			Tuple<double, double> msAngle_deg = ToolVecHelper.GetMSAngleFromABAngle( angleA_deg, angleB_deg, m_SelectedPoint );
@@ -308,7 +347,7 @@ namespace MyCAM.Editor
 
 		void OnMSAngleChanged( double master_deg, double slave_deg )
 		{
-			if( m_SelectedPoint == null ) {
+			if( !IsValidToolVecState() ) {
 				return;
 			}
 			Tuple<double, double> abAngle_deg = ToolVecHelper.GetABAngleFromMSAngle( master_deg, slave_deg, m_SelectedPoint );
@@ -330,7 +369,7 @@ namespace MyCAM.Editor
 
 		void OnFlipRotaryAxis( bool isPositive )
 		{
-			if( m_ToolVecParam == null || m_SelectedPoint == null ) {
+			if( !IsValidToolVecState() ) {
 				return;
 			}
 			Tuple<double, double> rotated = ToolVecHelper.FlipRotaryAxis( m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, isPositive );
@@ -340,8 +379,18 @@ namespace MyCAM.Editor
 		void OnTypeChanged( EToolVecInterpolateType type )
 		{
 			m_InterpolateType = type;
-			SetToolVecParamAndPeview( true );
+			m_CraftData.SetInterpolationMode( m_nSelectIndex, m_InterpolateType );
+			// trigger viewer refresh
+			RefreshSimuResult();
+
+			// update dialog, cause change type miaght change is point param
+			bool isModify = m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
+			m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModify );
+			m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
+			m_ToolVecDlg.EnableStartEndSwitch( m_IsStartPnt || m_IsEndPnt, m_IsStartPnt );
+			UIProtection();
 		}
+
 
 		void OnAddEditIndex()
 		{
@@ -389,6 +438,9 @@ namespace MyCAM.Editor
 
 			// for open path, just use 0 and last index of CAD
 			else {
+				if( m_PathPointList == null || m_PathPointList.Count == 0 ) {
+					return;
+				}
 				OnSelectedIndexChanged( toStart ? 0 : m_PathPointList.Count - 1 );
 			}
 		}
@@ -403,29 +455,83 @@ namespace MyCAM.Editor
 			return true;
 		}
 
+		bool IsValidToolVecState()
+		{
+			return m_ToolVecParam != null && m_SelectedPoint != null;
+		}
+
+		bool ValidateFrameTransformMap( Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap )
+		{
+			if( frameTransformMap == null
+				|| !frameTransformMap.ContainsKey( MachineComponentType.WorkPiece )
+				|| frameTransformMap[ MachineComponentType.WorkPiece ] == null
+				|| frameTransformMap[ MachineComponentType.WorkPiece ].Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
+				return false;
+			}
+			return true;
+		}
+
+		ToolVecModifyData CreateToolVecModifyData( EToolVecInterpolateType interpolateType )
+		{
+			return new ToolVecModifyData()
+			{
+				RA_deg = m_ToolVecParam.AngleA_deg,
+				RB_deg = m_ToolVecParam.AngleB_deg,
+				Master_deg = m_ToolVecParam.Master_deg,
+				Slave_deg = m_ToolVecParam.Slave_deg,
+				InterpolateType = interpolateType
+			};
+		}
+
+		void UIProtection()
+		{
+			// cbx need to be lock
+			if( m_IsStartPnt || m_IsEndPnt ) {
+				m_ToolVecDlg.LockCbx( true, false, false, true );
+				return;
+			}
+			if( m_SelectedPoint != null && m_SelectedPoint.IsToolVecModPoint ) {
+				m_ToolVecDlg.LockCbx( true, true, false );
+				return;
+			}
+			EToolVecInterpolateType interpolateType = GetNextModifyIndexInterpolate();
+			m_ToolVecDlg.LockCbx( false, false, true, false, interpolateType );
+		}
+
 		// update
 		void SetToolVecParamAndPeview( bool bForceUpdate = false )
 		{
-			SetInterpolateType();
 			SetIndexAngleParam();
 
-			// trigger viewer refresh
-			RefreshSimuResult();
+			if( m_ToolVecParam.IsModified ) {
+				RefreshSimuResult();
+			}
+			else {
+				// trigger viewer refresh
+				RefreshSimuResult( false );
+			}
 
 			// update cache point
 			if( m_SelectedPoint != null && m_nSelectIndex != NULL_SELECT_INDEX ) {
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 			}
-		}
-
-		void SetInterpolateType()
-		{
-			m_CraftData.InterpolateType = m_InterpolateType;
+			UIProtection();
 		}
 
 		void SetIndexAngleParam()
 		{
 			if( m_ToolVecParam == null ) {
+				return;
+			}
+			if( m_IsStartPnt ) {
+				ToolVecModifyData startPntData = CreateToolVecModifyData( m_CraftData.StartPntToolVecData.StartPnt.InterpolateType );
+				m_CraftData.StartPntToolVecData.StartPnt = startPntData;
+				return;
+			}
+			if( m_IsEndPnt ) {
+				ToolVecModifyData endPntData = CreateToolVecModifyData( m_CraftData.StartPntToolVecData.EndPnt.InterpolateType );
+				m_CraftData.StartPntToolVecData.EndPnt = endPntData;
 				return;
 			}
 
@@ -434,29 +540,44 @@ namespace MyCAM.Editor
 				m_CraftData.RemoveToolVecModify( m_nSelectIndex );
 				return;
 			}
+			// find next modified point index
+			EToolVecInterpolateType interpolateType = GetNextModifyIndexInterpolate();
 
 			// set modify data
 			m_CraftData.SetToolVecModify( m_nSelectIndex,
-				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg );
+				m_ToolVecParam.AngleA_deg, m_ToolVecParam.AngleB_deg, m_ToolVecParam.Master_deg, m_ToolVecParam.Slave_deg, interpolateType );
 		}
 
-		void RefreshSimuResult()
+		EToolVecInterpolateType GetNextModifyIndexInterpolate()
+		{
+			bool isFound = m_CraftData.FindNextMapIndex( m_nSelectIndex, out int nNextIdx );
+
+			if( !isFound ) {
+				return m_CraftData.StartPntToolVecData.EndPnt.InterpolateType;
+			}
+			else {
+				return m_CraftData.ToolVecModifyMap[ nNextIdx ].InterpolateType;
+			}
+		}
+
+		void RefreshSimuResult( bool isEditModifyPnt = true )
 		{
 			bool isGetMachineData = DataGettingHelper.GetMachineData( out MachineData machineData );
 			if( !isGetMachineData ) {
 				MyApp.Logger.ShowOnLogPanel( "無法獲得機構資訊", MyApp.NoticeType.Warning );
 				return;
 			}
-			bool isCalSuccess = CalSimuTranfResult( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap );
+
+			// trigger rebuild cam point list
+			if( isEditModifyPnt ) {
+				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
+			}
+			bool isCalSuccess = CalSimuTranfResult( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, isEditModifyPnt );
 			if( !isCalSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
 				return;
 			}
-			if( frameTransformMap == null
-				|| !frameTransformMap.ContainsKey( MachineComponentType.WorkPiece )
-				|| frameTransformMap[ MachineComponentType.WorkPiece ] == null
-				|| frameTransformMap[ MachineComponentType.WorkPiece ].Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
+			if( !ValidateFrameTransformMap( frameTransformMap ) ) {
 				return;
 			}
 			// output vertex is the shape of high light
@@ -470,10 +591,16 @@ namespace MyCAM.Editor
 
 			// trihedron also need to change according to workpiece
 			m_CoordIcon.Trans( frameTransformMap[ MachineComponentType.WorkPiece ].Last() );
-			RaiseTrans?.Invoke( frameTransformMap );
+
+			// update camera FIRST before setting any transformations
+			RaiseTrans?.Invoke( frameTransformMap, false );
+			m_ToolVecEditRender.ShowTrans( frameTransformMap[ MachineComponentType.WorkPiece ].Last() );
+			V3d_View view = m_Viewer.GetView();
+			view.SetImmediateUpdate( true );
+			m_Viewer.UpdateView();
 		}
 
-		bool CalSimuTranfResult( MachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap )
+		bool CalSimuTranfResult( MachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, bool isEditModifyPnt )
 		{
 			frameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 			if( m_SelectedPoint == null ) {
@@ -485,14 +612,32 @@ namespace MyCAM.Editor
 
 			// set default offset
 			gp_Vec simuOffset = machineData.SimulationOffset ?? new gp_Vec();
-			PostPoint G54pnt = new PostPoint()
-			{
-				X = m_SelectedPoint.Point.x,
-				Y = m_SelectedPoint.Point.y,
-				Z = m_SelectedPoint.Point.z,
-				Master = m_ToolVecParam.Master_deg * Math.PI / 180.0,
-				Slave = m_ToolVecParam.Slave_deg * Math.PI / 180.0
-			};
+			PostPoint G54pnt;
+
+			// get the real IK solved result to preview
+			if( isEditModifyPnt ) {
+				G54pnt = new PostPoint()
+				{
+					X = m_SelectedPoint.Point.x,
+					Y = m_SelectedPoint.Point.y,
+					Z = m_SelectedPoint.Point.z,
+					Master = m_SelectedPoint.ModMaster_rad,
+					Slave = m_SelectedPoint.ModSlave_rad,
+				};
+			}
+
+			// user want to know this unmodify point vector
+			else {
+				G54pnt = new PostPoint()
+				{
+					X = m_SelectedPoint.Point.x,
+					Y = m_SelectedPoint.Point.y,
+					Z = m_SelectedPoint.Point.z,
+					Master = m_ToolVecParam.Master_deg * Math.PI / 180.0,
+					Slave = m_ToolVecParam.Slave_deg * Math.PI / 180.0
+				};
+			}
+
 
 			// create PostSolver
 			PostSolver postSolver = new PostSolver( m_DataManager.MachineData );
@@ -560,7 +705,7 @@ namespace MyCAM.Editor
 		// action data
 		List<string> m_PathIDList = null;
 		AIS_Shape m_KeepedHighLightPoint = null;
-		ToolVectorDlg m_ToolVecDlg = null;
+		m_lblInter m_ToolVecDlg = null;
 
 		// angle limit
 		public const double MAX_TiltAngle = 90.0;
@@ -738,6 +883,11 @@ namespace MyCAM.Editor
 			else {
 				return m_PathCache.MainPathPointList[ camIndex ].InitPathIndex;
 			}
+		}
+
+		public int GetTotalCADPointCount()
+		{
+			return m_PathCache.CADToCAMIndexMap.Count;
 		}
 
 		readonly CraftData m_CraftData;

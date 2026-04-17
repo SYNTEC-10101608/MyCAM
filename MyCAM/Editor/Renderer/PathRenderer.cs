@@ -1,8 +1,6 @@
-﻿using MyCAM.Data;
+using MyCAM.Data;
 using MyCAM.Editor.Renderer;
-using MyCAM.PathCache;
 using OCC.AIS;
-using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.Quantity;
 using OCC.TopAbs;
@@ -16,14 +14,55 @@ namespace MyCAM.Editor
 {
 	internal class PathRenderer : CAMRendererBase
 	{
+		static readonly List<Quantity_NameOfColor> TECH_Layer_Color_List = new List<Quantity_NameOfColor> {
+			Quantity_NameOfColor.Quantity_NOC_BLUE,
+			Quantity_NameOfColor.Quantity_NOC_DARKORANGE2,
+			Quantity_NameOfColor.Quantity_NOC_PURPLE,
+			Quantity_NameOfColor.Quantity_NOC_YELLOW2,
+			Quantity_NameOfColor.Quantity_NOC_GREEN3,
+			Quantity_NameOfColor.Quantity_NOC_TOMATO2,
+			Quantity_NameOfColor.Quantity_NOC_YELLOWGREEN,
+			Quantity_NameOfColor.Quantity_NOC_BROWN,
+			Quantity_NameOfColor.Quantity_NOC_MAGENTA1,
+			Quantity_NameOfColor.Quantity_NOC_CYAN1,
+		};
+
 		readonly Dictionary<string, AIS_Shape> m_MainPathAISDict = new Dictionary<string, AIS_Shape>();
 		readonly Dictionary<string, AIS_Shape> m_OriginalPathAISDict = new Dictionary<string, AIS_Shape>();
 		ViewManager m_ViewManager;
+		bool m_IsPauseRefresh = false;
 
 		public PathRenderer( Viewer viewer, ViewManager viewManager, DataManager dataManager )
 			: base( viewer, dataManager )
 		{
 			m_ViewManager = viewManager;
+		}
+
+		public void SetPauseRefresh( bool isPause )
+		{
+			if( m_IsPauseRefresh == isPause ) {
+				return;
+			}
+			m_IsPauseRefresh = isPause;
+			if( isPause ) {
+				// hide all managed AIS objects without destroying them
+				foreach( var kvp in m_MainPathAISDict ) {
+					m_Viewer.GetAISContext().Erase( kvp.Value, false );
+				}
+				foreach( var kvp in m_OriginalPathAISDict ) {
+					m_Viewer.GetAISContext().Erase( kvp.Value, false );
+				}
+			}
+			else {
+				// re-display all managed AIS objects
+				foreach( var kvp in m_MainPathAISDict ) {
+					m_Viewer.GetAISContext().Display( kvp.Value, false );
+				}
+				foreach( var kvp in m_OriginalPathAISDict ) {
+					m_Viewer.GetAISContext().Display( kvp.Value, false );
+					m_Viewer.GetAISContext().Deactivate( kvp.Value );
+				}
+			}
 		}
 
 		public override void Show( bool bUpdate = false )
@@ -56,6 +95,11 @@ namespace MyCAM.Editor
 
 		void ShowSpecifyPath( List<string> pathIDList, bool bUpdate, gp_Trsf trsf = null )
 		{
+			// paused, do not rebuild or display
+			if( m_IsPauseRefresh ) {
+				return;
+			}
+
 			Remove( pathIDList );
 			if( !m_IsShow ) {
 				if( bUpdate ) {
@@ -70,12 +114,12 @@ namespace MyCAM.Editor
 				// Show original path if there is any compensation or transformation applied, to visualize the difference
 				ShowOriginalPath( pathID, trsf );
 
-				IReadOnlyList<gp_Pnt> pointList = GetMainPathPointList( pathID );
+				IReadOnlyList<gp_Pnt> pointList = RendererHelper.GetMainPathPointList( pathID );
 				if( pointList == null || pointList.Count < 2 ) {
 					continue;
 				}
 
-				TopoDS_Wire pathWire = CreatePolylineWire( pointList );
+				TopoDS_Wire pathWire = RendererHelper.CreatePolylineWire( pointList );
 				if( pathWire == null || pathWire.IsNull() ) {
 					continue;
 				}
@@ -116,41 +160,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		readonly List<Quantity_NameOfColor> TECH_Layer_Color_List = new List<Quantity_NameOfColor> {
-		Quantity_NameOfColor.Quantity_NOC_BLUE,
-		Quantity_NameOfColor.Quantity_NOC_DARKORANGE2,
-		Quantity_NameOfColor.Quantity_NOC_PURPLE,
-		Quantity_NameOfColor.Quantity_NOC_YELLOW2,
-		Quantity_NameOfColor.Quantity_NOC_GREEN3,
-		Quantity_NameOfColor.Quantity_NOC_TOMATO2,
-		Quantity_NameOfColor.Quantity_NOC_YELLOWGREEN,
-		Quantity_NameOfColor.Quantity_NOC_BROWN,
-		Quantity_NameOfColor.Quantity_NOC_MAGENTA1,
-		Quantity_NameOfColor.Quantity_NOC_CYAN1,
-		};
-
-		int GetColorIndex( string pathID )
-		{
-			int nColorIdx = 0;
-			if( !m_DataManager.ObjectMap.TryGetValue( pathID, out var obj ) ) {
-				return nColorIdx;
-			}
-			PathObject pathObj = obj as PathObject;
-			if( pathObj == null ) {
-				return nColorIdx;
-			}
-			bool isGetDataCraftSuccess = DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData );
-			if( !isGetDataCraftSuccess || craftData == null ) {
-				return nColorIdx;
-			}
-			int nTechLayer = craftData.TechLayer;
-			nColorIdx = nTechLayer - 1;
-			if( nColorIdx < 0 || nColorIdx >= TECH_Layer_Color_List.Count ) {
-				nColorIdx = 0;
-			}
-			return nColorIdx;
-		}
-
 		void RemovePaths( List<string> pathIDList )
 		{
 			// Unregister from DataManager
@@ -173,63 +182,6 @@ namespace MyCAM.Editor
 					m_Viewer.GetAISContext().Remove( oriPathAIS, false );
 					m_OriginalPathAISDict.Remove( pathID );
 				}
-			}
-		}
-
-		TopoDS_Wire CreatePolylineWire( IReadOnlyList<gp_Pnt> pointList )
-		{
-			const double DIST_TOLERANCE = 1e-3;
-			if( pointList == null || pointList.Count < 2 ) {
-				return null;
-			}
-
-			BRepBuilderAPI_MakePolygon polygonMaker = new BRepBuilderAPI_MakePolygon();
-
-			if( pointList.Count > 2 ) {
-
-				gp_Pnt firstPoint = pointList[ 0 ];
-				gp_Pnt lastPoint = pointList[ pointList.Count - 1 ];
-
-				// check if the polyline is closed, if yes, do not add the last point again to avoid MoveTo error
-				bool isClosed = firstPoint.IsEqual( lastPoint, DIST_TOLERANCE );
-				int nComputedPoints = isClosed ? pointList.Count - 1 : pointList.Count;
-
-				for( int i = 0; i < nComputedPoints; i++ ) {
-					polygonMaker.Add( pointList[ i ] );
-				}
-
-				if( isClosed ) {
-					polygonMaker.Close();
-				}
-			}
-
-			if( !polygonMaker.IsDone() ) {
-				return null;
-			}
-
-			return polygonMaker.Wire();
-		}
-
-		IReadOnlyList<gp_Pnt> GetMainPathPointList( string szPathID )
-		{
-			// get path type
-			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType ) ) {
-				return new List<gp_Pnt>();
-			}
-			if( pathType == PathType.Contour ) {
-				if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache contourCache ) ) {
-					return new List<gp_Pnt>();
-				}
-				return ( contourCache as ContourCache )?.MainPathPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
-			}
-			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
-				if( !DataGettingHelper.GetStdPatternCacheByID( szPathID, out IStdPatternCache stdPatternCache ) ) {
-					return new List<gp_Pnt>();
-				}
-				return stdPatternCache.MainPathPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
-			}
-			else {
-				return new List<gp_Pnt>();
 			}
 		}
 
@@ -292,7 +244,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			TopoDS_Wire pathOriWire = CreatePolylineWire( originalPointList );
+			TopoDS_Wire pathOriWire = RendererHelper.CreatePolylineWire( originalPointList );
 			if( pathOriWire == null || pathOriWire.IsNull() ) {
 				return;
 			}
@@ -307,7 +259,29 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Deactivate( oriPathAIS );
 		}
 
-		bool IsIdentityTransform( gp_Trsf trsf )
+		int GetColorIndex( string pathID )
+		{
+			int nColorIdx = 0;
+			if( !m_DataManager.ObjectMap.TryGetValue( pathID, out var obj ) ) {
+				return nColorIdx;
+			}
+			PathObject pathObj = obj as PathObject;
+			if( pathObj == null ) {
+				return nColorIdx;
+			}
+			bool isGetDataCraftSuccess = DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData );
+			if( !isGetDataCraftSuccess || craftData == null ) {
+				return nColorIdx;
+			}
+			int nTechLayer = craftData.TechLayer;
+			nColorIdx = nTechLayer - 1;
+			if( nColorIdx < 0 || nColorIdx >= TECH_Layer_Color_List.Count ) {
+				nColorIdx = 0;
+			}
+			return nColorIdx;
+		}
+
+		static bool IsIdentityTransform( gp_Trsf trsf )
 		{
 			const double TOLERANCE = 1e-3;
 			if( trsf == null ) {
@@ -340,6 +314,5 @@ namespace MyCAM.Editor
 
 			return true;
 		}
-
 	}
 }
