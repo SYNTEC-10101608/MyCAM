@@ -113,7 +113,7 @@ namespace MyCAM.Helper
 
 			// get the interpolate interval list
 			interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap, isPathReverse );
-			bool isWithInterpolate = false;
+			bool isWithInterpolate = true;
 			if( interpolateIntervalList.Count > 1 ) {
 				isWithInterpolate = true;
 			}
@@ -160,25 +160,27 @@ namespace MyCAM.Helper
 				toolVecPointList[ toolVecPointList.Count - 1 ].ModMaster_rad = dEnd_Master_deg * Math.PI / 180.0;
 				toolVecPointList[ toolVecPointList.Count - 1 ].ModSlave_rad = dEnd_Slave_deg * Math.PI / 180.0;
 			}
-
 		}
 
-
-		public static List<Tuple<int, int, EToolVecInterpolateType>> GetInterpolateIntervalList(
+		static List<Tuple<int, int, EToolVecInterpolateType>> GetInterpolateIntervalList(
 			IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, bool isPathReverse )
 		{
+			List<Tuple<int, int, EToolVecInterpolateType>> intervalList = new List<Tuple<int, int, EToolVecInterpolateType>>();
+			if( toolVecModifyMap == null || toolVecModifyMap.Count == 0 ) {
+				return intervalList;
+			}
 			// sort the modify data by index
 			List<int> indexInOrder = toolVecModifyMap.Keys.ToList();
 			indexInOrder.Sort();
-			List<Tuple<int, int, EToolVecInterpolateType>> intervalList = new List<Tuple<int, int, EToolVecInterpolateType>>();
 			for( int i = 0; i < indexInOrder.Count - 1; i++ ) {
 				if( isPathReverse ) {
+
+					// get this region head interpolate type (is still end of region, but path is reverse so end will be reverse as start)
 					intervalList.Add( new Tuple<int, int, EToolVecInterpolateType>( indexInOrder[ i ], indexInOrder[ i + 1 ], toolVecModifyMap[ indexInOrder[ i ] ].InterpolateType ) );
 				}
 				else {
 					intervalList.Add( new Tuple<int, int, EToolVecInterpolateType>( indexInOrder[ i ], indexInOrder[ i + 1 ], toolVecModifyMap[ indexInOrder[ i + 1 ] ].InterpolateType ) );
 				}
-
 			}
 			return intervalList;
 		}
@@ -343,8 +345,7 @@ namespace MyCAM.Helper
 			// filter singular points and apply results directly to toolVecPointList
 			bool bFilterMaster = machineData.FiveAxisType == FiveAxisType.Spindle; // which axis is going to filter
 
-
-			// 我要拿 toolVecPointList[ nStartIdx]~[nEndIdx]的指標
+			// get the pointer of toolVecPointList[ nStartIdx]~[nEndIdx]
 			int range = isWithInterpolate ? nEndIdx - nStartIdx + 2 : nEndIdx - nStartIdx + 1;
 			List<ISetToolVecPoint> toolVecPointList2 = toolVecPointList.GetRange( nStartIdx, range );
 			if( isWithInterpolate ) {

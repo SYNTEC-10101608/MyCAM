@@ -317,8 +317,6 @@ namespace MyCAM.Data
 						m_ToolVecModifyMap.Remove( index );
 					}
 				}
-
-				// 反向
 				else {
 					{
 						bool isFoundPre = FindPreMapIndex( index, out int nPreIdx );
@@ -331,7 +329,6 @@ namespace MyCAM.Data
 
 					}
 				}
-
 			}
 			CAMFactorChanged?.Invoke();
 		}

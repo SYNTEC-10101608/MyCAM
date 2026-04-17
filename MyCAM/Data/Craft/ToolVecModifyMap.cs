@@ -63,17 +63,17 @@ namespace MyCAM.Data
 		}
 
 		
-		public void Remove( int removeKey, int nNextIdxKey )
+		public void Remove( int removeKey, int nBeOverwriteIdx )
 		{
 			if( !m_Map.ContainsKey( removeKey ) ) {
 				return;
 			}
 			EToolVecInterpolateType removeType = m_Map[ removeKey ].InterpolateType;
 			m_Map.Remove( removeKey );
-			if( !m_Map.ContainsKey( nNextIdxKey ) ) {
+			if( !m_Map.ContainsKey( nBeOverwriteIdx ) ) {
 				return;
 			}
-			m_Map[ nNextIdxKey ].InterpolateType = removeType;
+			m_Map[ nBeOverwriteIdx ].InterpolateType = removeType;
 		}
 
 		public void Remove( int removeKey )

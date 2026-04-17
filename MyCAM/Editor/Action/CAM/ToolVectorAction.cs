@@ -51,7 +51,7 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// init global param
-			m_InterpolateType =  EToolVecInterpolateType.Normal;
+			m_InterpolateType = EToolVecInterpolateType.Normal;
 
 			// init index param
 			m_nSelectIndex = NULL_SELECT_INDEX;
@@ -159,8 +159,13 @@ namespace MyCAM.Editor
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 
 				// check is at start or end point for closed path
-				m_IsStartPnt = m_nSelectIndex == m_DataHandler.GetStartPointCADIndex() && m_DataHandler.IsClosed();
-				m_IsEndPnt = m_nSelectIndex == CLOSED_POINT_INDEX && m_DataHandler.IsClosed();
+				m_IsStartPnt = m_nSelectIndex == m_DataHandler.GetStartPointCADIndex();
+				if( m_DataHandler.IsClosed() ) {
+					m_IsEndPnt = m_nSelectIndex == CLOSED_POINT_INDEX;
+				}
+				else {
+					m_IsEndPnt = m_nSelectIndex == m_DataHandler.GetTotalCADPointCount() - 1;
+				}
 				if( m_IsStartPnt ) {
 					m_ToolVecParam = new ToolVecParam(
 						m_CraftData.StartPntToolVecData.StartPnt.RA_deg,
@@ -451,6 +456,7 @@ namespace MyCAM.Editor
 		// update
 		void SetToolVecParamAndPeview( bool bForceUpdate = false )
 		{
+
 			SetIndexAngleParam();
 
 			// trigger viewer refresh
