@@ -1,6 +1,5 @@
 using MyCAM.App;
 using MyCAM.Data;
-using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.Prs3d;
@@ -8,7 +7,6 @@ using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -21,10 +19,6 @@ namespace MyCAM.Editor
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
 				throw new ArgumentException( "Cannot get CraftData by pathID: " + pathID );
 			}
-			if( !DataGettingHelper.GetContourCacheByID( pathID, out m_ContourCache ) ) {
-				throw new ArgumentException( "Cannot get ContourCache by pathID: " + pathID );
-			}
-			m_PathIDList = new List<string>() { pathID };
 		}
 
 		public override EditActionType ActionType
@@ -35,23 +29,21 @@ namespace MyCAM.Editor
 			}
 		}
 
-		// Raised after each data change so CAMEditor can refresh the view
 		public Action PropertyChanged;
 
 		public override void Start()
 		{
 			base.Start();
 
-			m_nSelectIndex = NULL_SELECT_INDEX;
-			m_Param = null;
-
+			// create dialog
 			m_Dlg = new ContourEditDlg();
 			m_Dlg.AddEditIndex += OnAddEditIndex;
 			m_Dlg.RemoveEditIndex += OnRemoveEditIndex;
 			m_Dlg.DisplacementChanged += OnDisplacementChanged;
 			m_Dlg.Cancel += End;
 
-			m_Dlg.ResetParam( m_Param );
+			// default to first point
+			OnSelectedIndexChanged( 0 );
 			m_Dlg.Show( MyApp.MainForm );
 		}
 
@@ -69,13 +61,11 @@ namespace MyCAM.Editor
 			if( e.Button != MouseButtons.Left ) {
 				return;
 			}
-
 			int? hit = GetSelectIndex( out TopoDS_Shape selectedVertex );
 			int nSelectIndex = hit ?? NULL_SELECT_INDEX;
 			if( nSelectIndex == NULL_SELECT_INDEX || nSelectIndex == m_nSelectIndex ) {
 				return;
 			}
-
 			UnlockHighLight();
 			LockHighLight( selectedVertex );
 			OnSelectedIndexChanged( nSelectIndex );
@@ -91,8 +81,6 @@ namespace MyCAM.Editor
 			}
 		}
 
-		// ---- selection ----
-
 		void OnSelectedIndexChanged( int nSelectIndex )
 		{
 			if( m_nSelectIndex == nSelectIndex ) {
@@ -100,25 +88,18 @@ namespace MyCAM.Editor
 			}
 			m_nSelectIndex = nSelectIndex;
 
+			// should not happen, but just in case
 			if( nSelectIndex == NULL_SELECT_INDEX ) {
 				m_Param = null;
 				m_Dlg.ResetParam( null );
 				return;
 			}
 
-			bool isModified = m_CraftData.CADPointModifyMap.ContainsKey( nSelectIndex );
-			double dx = 0, dy = 0, dz = 0;
-			if( isModified ) {
-				CADPointModifyData data = m_CraftData.CADPointModifyMap[ nSelectIndex ];
-				dx = data.DX;
-				dy = data.DY;
-				dz = data.DZ;
-			}
+			// refresh dialog
+			GetParamFormIndex( nSelectIndex, out double dx, out double dy, out double dz, out bool isModified );
 			m_Param = new ContourEditParam( dx, dy, dz, isModified );
 			m_Dlg.ResetParam( m_Param );
 		}
-
-		// ---- dialog events ----
 
 		void OnAddEditIndex()
 		{
@@ -128,12 +109,16 @@ namespace MyCAM.Editor
 			if( m_Param != null ) {
 				m_Param.IsModified = true;
 			}
+
 			// commit to data with current (zero) displacement
 			double dx = m_Param?.DX ?? 0;
 			double dy = m_Param?.DY ?? 0;
 			double dz = m_Param?.DZ ?? 0;
 			m_CraftData.SetCADPointModify( m_nSelectIndex, dx, dy, dz );
 			PropertyChanged?.Invoke();
+
+			// refresh dialog
+			m_Dlg.ResetParam( m_Param );
 		}
 
 		void OnRemoveEditIndex()
@@ -149,6 +134,9 @@ namespace MyCAM.Editor
 			}
 			m_CraftData.RemoveCADPointModify( m_nSelectIndex );
 			PropertyChanged?.Invoke();
+
+			// refresh dialog
+			m_Dlg.ResetParam( m_Param );
 		}
 
 		void OnDisplacementChanged( double dx, double dy, double dz )
@@ -161,9 +149,10 @@ namespace MyCAM.Editor
 			m_Param.DZ = dz;
 			m_CraftData.SetCADPointModify( m_nSelectIndex, dx, dy, dz );
 			PropertyChanged?.Invoke();
-		}
 
-		// ---- highlight helpers (mirror ToolVectorAction) ----
+			// refresh dialog
+			m_Dlg.ResetParam( m_Param );
+		}
 
 		void LockHighLight( TopoDS_Shape selectedVertex )
 		{
@@ -189,18 +178,37 @@ namespace MyCAM.Editor
 			}
 		}
 
-		// ---- fields ----
+		void GetParamFormIndex( int nSelectIndex, out double dx, out double dy, out double dz, out bool isModified )
+		{
+			dx = 0;
+			dy = 0;
+			dz = 0;
+			isModified = false;
+			if( nSelectIndex == NULL_SELECT_INDEX ) {
+				return;
+			}
+			isModified = m_CraftData.CADPointModifyMap.ContainsKey( nSelectIndex );
+			if( isModified ) {
+				CADPointModifyData data = m_CraftData.CADPointModifyMap[ nSelectIndex ];
+				dx = data.DX;
+				dy = data.DY;
+				dz = data.DZ;
+			}
+			return;
+		}
 
+		// edit param
 		int m_nSelectIndex = NULL_SELECT_INDEX;
 		ContourEditParam m_Param = null;
-
 		readonly CraftData m_CraftData;
-		readonly ContourCache m_ContourCache;
-		readonly List<string> m_PathIDList;
 
+		// dlg
 		ContourEditDlg m_Dlg = null;
+
+		// interactive highlight
 		AIS_Shape m_HighLightPoint = null;
 
+		// constants
 		const int NULL_SELECT_INDEX = -999;
 	}
 }

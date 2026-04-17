@@ -23,8 +23,8 @@ namespace MyCAM.Editor
 			m_bSuppressValueChanged = true;
 			m_Param = param;
 
+			// should not happen, but just in case
 			if( m_Param == null ) {
-				// no selection: disable everything
 				m_gbxIndexParam.Enabled = false;
 				m_tbxDX.Text = string.Empty;
 				m_tbxDY.Text = string.Empty;
@@ -37,13 +37,9 @@ namespace MyCAM.Editor
 			m_tbxDX.Text = m_Param.DX.ToString( "F3" );
 			m_tbxDY.Text = m_Param.DY.ToString( "F3" );
 			m_tbxDZ.Text = m_Param.DZ.ToString( "F3" );
-
-			// existing control point: enable edit & remove, disable add
-			// non-control point: enable add, disable edit & remove
 			m_btnAdd.Enabled = !m_Param.IsModified;
 			m_btnRemove.Enabled = m_Param.IsModified;
 			SetInputEnabled( m_Param.IsModified );
-
 			m_bSuppressValueChanged = false;
 		}
 
@@ -105,17 +101,11 @@ namespace MyCAM.Editor
 		void m_btnAdd_Click( object sender, EventArgs e )
 		{
 			AddEditIndex?.Invoke();
-			m_btnAdd.Enabled = false;
-			m_btnRemove.Enabled = true;
-			SetInputEnabled( true );
 		}
 
 		void m_btnRemove_Click( object sender, EventArgs e )
 		{
 			RemoveEditIndex?.Invoke();
-			m_btnAdd.Enabled = true;
-			m_btnRemove.Enabled = false;
-			SetInputEnabled( false );
 		}
 
 		bool GetDisplacementFromDialog( out double dx, out double dy, out double dz )
