@@ -342,9 +342,6 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			m_MainPathRenderer.SetPauseRefresh( true );
-			m_ToolVecRenderer.SetPauseRefresh( true );
-			m_TraverseRenderer.SetPauseRefresh( true );
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
 
 			// register before init, cause init will change select node to start point, machine need to translate
@@ -359,6 +356,9 @@ namespace MyCAM.Editor
 		{
 			if( isStart ) {
 				m_MachineRender.Show();
+				m_MainPathRenderer.SetPauseRefresh( true );
+				m_ToolVecRenderer.SetPauseRefresh( true );
+				m_TraverseRenderer.SetPauseRefresh( true );
 			}
 			else {
 				m_MainPathRenderer.SetPauseRefresh( false );
