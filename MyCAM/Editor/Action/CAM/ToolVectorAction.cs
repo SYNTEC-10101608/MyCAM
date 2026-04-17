@@ -173,7 +173,8 @@ namespace MyCAM.Editor
 				else {
 					m_IsEndPnt = m_nSelectIndex == m_DataHandler.GetTotalCADPointCount() - 1;
 				}
-				if( m_IsStartPnt ) {
+
+				if( m_IsStartPnt && m_CraftData.IsPathReverse == false || m_IsEndPnt && m_CraftData.IsPathReverse ) {
 					m_ToolVecParam = new ToolVecParam(
 						m_CraftData.StartPntToolVecData.StartPnt.RA_deg,
 						m_CraftData.StartPntToolVecData.StartPnt.RB_deg,
@@ -181,7 +182,7 @@ namespace MyCAM.Editor
 						m_CraftData.StartPntToolVecData.StartPnt.Slave_deg
 					);
 				}
-				else if( m_IsEndPnt ) {
+				else if( m_IsEndPnt && m_CraftData.IsPathReverse == false || m_IsStartPnt && m_CraftData.IsPathReverse ) {
 					m_ToolVecParam = new ToolVecParam(
 						m_CraftData.StartPntToolVecData.EndPnt.RA_deg,
 						m_CraftData.StartPntToolVecData.EndPnt.RB_deg,
@@ -385,8 +386,8 @@ namespace MyCAM.Editor
 			// update dialog, cause change type miaght change is point param
 			bool isModify = m_DataHandler.GetToolVecModify( m_nSelectIndex, out double angleA_deg, out double angleB_deg, out double master_deg, out double slave_deg );
 			m_ToolVecParam = new ToolVecParam( angleA_deg, angleB_deg, master_deg, slave_deg, isModify );
-			m_ToolVecDlg.ResetToolVecParam(m_ToolVecParam );
-			m_ToolVecDlg.EnableStartEndSwitch(m_IsStartPnt || m_IsEndPnt, m_IsStartPnt );
+			m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
+			m_ToolVecDlg.EnableStartEndSwitch( m_IsStartPnt || m_IsEndPnt, m_IsStartPnt );
 			UIProtection();
 		}
 
@@ -503,14 +504,14 @@ namespace MyCAM.Editor
 		{
 			SetIndexAngleParam();
 
-			if ( m_ToolVecParam.IsModified ) {
+			if( m_ToolVecParam.IsModified ) {
 				RefreshSimuResult();
 			}
 			else {
 				// trigger viewer refresh
 				RefreshSimuResult( false );
 			}
-				
+
 			// update cache point
 			if( m_SelectedPoint != null && m_nSelectIndex != NULL_SELECT_INDEX ) {
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
@@ -559,7 +560,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void RefreshSimuResult(bool isEditModifyPnt = true)
+		void RefreshSimuResult( bool isEditModifyPnt = true )
 		{
 			bool isGetMachineData = DataGettingHelper.GetMachineData( out MachineData machineData );
 			if( !isGetMachineData ) {
@@ -571,7 +572,7 @@ namespace MyCAM.Editor
 			if( isEditModifyPnt ) {
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nSelectIndex );
 			}
-			bool isCalSuccess = CalSimuTranfResult( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, isEditModifyPnt  );
+			bool isCalSuccess = CalSimuTranfResult( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, isEditModifyPnt );
 			if( !isCalSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
 				return;
@@ -599,7 +600,7 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		bool CalSimuTranfResult( MachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap , bool isEditModifyPnt)
+		bool CalSimuTranfResult( MachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, bool isEditModifyPnt )
 		{
 			frameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 			if( m_SelectedPoint == null ) {
