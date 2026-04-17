@@ -86,7 +86,7 @@ namespace MyCAM.Data
 			m_OverCutLength = overCutLength;
 			if( toolVecModifyMap2 != null ) {
 				foreach( var kvp in toolVecModifyMap2 ) {
-					m_ToolVecModifyMap2.Add( kvp.Key, kvp.Value.Clone() );
+					m_ToolVecModifyMap.Add( kvp.Key, kvp.Value.Clone() );
 				}
 			}
 			if( startPntToolVecData != null ) {
@@ -264,7 +264,7 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return m_ToolVecModifyMap2;
+				return m_ToolVecModifyMap;
 			}
 		}
 
@@ -294,27 +294,27 @@ namespace MyCAM.Data
 		// API for outside modification
 		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg, double master_deg, double slave_deg, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
 		{
-			if( m_ToolVecModifyMap2.ContainsKey( index ) ) {
-				m_ToolVecModifyMap2[ index ] = new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg, m_ToolVecModifyMap2[ index ].InterpolateType );
+			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
+				m_ToolVecModifyMap[ index ] = new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg, m_ToolVecModifyMap[ index ].InterpolateType );
 			}
 			else {
-				m_ToolVecModifyMap2.Add( index, new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg, interpolateType ) );
+				m_ToolVecModifyMap.Add( index, new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg, interpolateType ) );
 			}
 			CAMFactorChanged?.Invoke();
 		}
 
 		public void RemoveToolVecModify( int index )
 		{
-			if( m_ToolVecModifyMap2.ContainsKey( index ) ) {
+			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
 				if( IsPathReverse == false ) {
 					bool isFoundNext = FindNextMapIndex( index, out int nNextIdx );
 					if( isFoundNext ) {
-						m_ToolVecModifyMap2.Remove( index, nNextIdx );
+						m_ToolVecModifyMap.Remove( index, nNextIdx );
 					}
 					else {
-						EToolVecInterpolateType removedType = m_ToolVecModifyMap2[ index ].InterpolateType;
+						EToolVecInterpolateType removedType = m_ToolVecModifyMap[ index ].InterpolateType;
 						StartPntToolVecData.EndPnt.InterpolateType = removedType;
-						m_ToolVecModifyMap2.Remove( index );
+						m_ToolVecModifyMap.Remove( index );
 					}
 				}
 
@@ -323,10 +323,10 @@ namespace MyCAM.Data
 					{
 						bool isFoundPre = FindPreMapIndex( index, out int nPreIdx );
 						if( isFoundPre ) {
-							m_ToolVecModifyMap2.Remove( index, nPreIdx );
+							m_ToolVecModifyMap.Remove( index, nPreIdx );
 						}
 						else {
-							m_ToolVecModifyMap2.Remove( index );
+							m_ToolVecModifyMap.Remove( index );
 						}
 
 					}
@@ -351,7 +351,7 @@ namespace MyCAM.Data
 
 		public void ClearToolVecModify()
 		{
-			m_ToolVecModifyMap2.Clear();
+			m_ToolVecModifyMap.Clear();
 			StartPntToolVecData = null;
 			CAMFactorChanged?.Invoke();
 		}
@@ -466,7 +466,7 @@ namespace MyCAM.Data
 		bool m_IsPathReverse = false;
 		LeadData m_LeadData = new LeadData();
 		double m_OverCutLength = 0;
-		ToolVecModifyMap m_ToolVecModifyMap2 = new ToolVecModifyMap();
+		ToolVecModifyMap m_ToolVecModifyMap = new ToolVecModifyMap();
 		StartPntToolVecParam m_StartPntToolVecData = new StartPntToolVecParam();
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
