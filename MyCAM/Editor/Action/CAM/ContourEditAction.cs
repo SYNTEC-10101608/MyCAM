@@ -1,9 +1,6 @@
 using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
-using OCC.Aspect;
-using OCC.Prs3d;
-using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
@@ -49,7 +46,6 @@ namespace MyCAM.Editor
 
 		public override void End()
 		{
-			UnlockHighLight();
 			base.End();
 		}
 
@@ -66,8 +62,6 @@ namespace MyCAM.Editor
 			if( nSelectIndex == NULL_SELECT_INDEX || nSelectIndex == m_nSelectIndex ) {
 				return;
 			}
-			UnlockHighLight();
-			LockHighLight( selectedVertex );
 			OnSelectedIndexChanged( nSelectIndex );
 		}
 
@@ -152,30 +146,6 @@ namespace MyCAM.Editor
 
 			// refresh dialog
 			m_Dlg.ResetParam( m_Param );
-		}
-
-		void LockHighLight( TopoDS_Shape selectedVertex )
-		{
-			if( selectedVertex == null || selectedVertex.IsNull() ) {
-				return;
-			}
-			m_HighLightPoint = new AIS_Shape( selectedVertex );
-
-			Prs3d_PointAspect pointAspect = new Prs3d_PointAspect(
-				Aspect_TypeOfMarker.Aspect_TOM_BALL,
-				new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ),
-				3.0f
-			);
-			m_HighLightPoint.Attributes().SetPointAspect( pointAspect );
-			m_Viewer.GetAISContext().Display( m_HighLightPoint, false );
-		}
-
-		void UnlockHighLight()
-		{
-			if( m_HighLightPoint != null ) {
-				m_Viewer.GetAISContext().Remove( m_HighLightPoint, false );
-				m_HighLightPoint = null;
-			}
 		}
 
 		void GetParamFormIndex( int nSelectIndex, out double dx, out double dy, out double dz, out bool isModified )
