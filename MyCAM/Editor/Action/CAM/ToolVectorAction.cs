@@ -524,12 +524,12 @@ namespace MyCAM.Editor
 			if( m_ToolVecParam == null ) {
 				return;
 			}
-			if( m_IsStartPnt ) {
+			if( m_IsStartPnt && m_CraftData.IsPathReverse == false || m_IsEndPnt && m_CraftData.IsPathReverse ) {
 				ToolVecModifyData startPntData = CreateToolVecModifyData( m_CraftData.StartPntToolVecData.StartPnt.InterpolateType );
 				m_CraftData.StartPntToolVecData.StartPnt = startPntData;
 				return;
 			}
-			if( m_IsEndPnt ) {
+			if( m_IsEndPnt && m_CraftData.IsPathReverse == false || m_IsStartPnt && m_CraftData.IsPathReverse ) {
 				ToolVecModifyData endPntData = CreateToolVecModifyData( m_CraftData.StartPntToolVecData.EndPnt.InterpolateType );
 				m_CraftData.StartPntToolVecData.EndPnt = endPntData;
 				return;
