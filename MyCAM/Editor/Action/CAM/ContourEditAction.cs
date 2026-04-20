@@ -1,5 +1,6 @@
 using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Editor.Renderer;
 using OCC.AIS;
 using OCC.TopoDS;
 using OCCViewer;
@@ -42,10 +43,15 @@ namespace MyCAM.Editor
 			// default to first point
 			OnSelectedIndexChanged( 0 );
 			m_Dlg.Show( MyApp.MainForm );
+
+			// show edit point marks
+			m_EditPointRenderer = new EditPointRenderer( m_Viewer, m_PathID );
+			m_EditPointRenderer.Show( true );
 		}
 
 		public override void End()
 		{
+			m_EditPointRenderer?.Remove( true );
 			base.End();
 		}
 
@@ -110,6 +116,7 @@ namespace MyCAM.Editor
 			double dz = m_Param?.DZ ?? 0;
 			m_CraftData.SetCADPointModify( m_nSelectIndex, dx, dy, dz );
 			PropertyChanged?.Invoke();
+			m_EditPointRenderer?.Show( true );
 
 			// refresh dialog
 			m_Dlg.ResetParam( m_Param );
@@ -128,6 +135,7 @@ namespace MyCAM.Editor
 			}
 			m_CraftData.RemoveCADPointModify( m_nSelectIndex );
 			PropertyChanged?.Invoke();
+			m_EditPointRenderer?.Show( true );
 
 			// refresh dialog
 			m_Dlg.ResetParam( m_Param );
@@ -143,6 +151,7 @@ namespace MyCAM.Editor
 			m_Param.DZ = dz;
 			m_CraftData.SetCADPointModify( m_nSelectIndex, dx, dy, dz );
 			PropertyChanged?.Invoke();
+			m_EditPointRenderer?.Show( true );
 
 			// refresh dialog
 			m_Dlg.ResetParam( m_Param );
@@ -166,6 +175,9 @@ namespace MyCAM.Editor
 			}
 			return;
 		}
+
+		// renderer
+		EditPointRenderer m_EditPointRenderer = null;
 
 		// edit param
 		int m_nSelectIndex = NULL_SELECT_INDEX;

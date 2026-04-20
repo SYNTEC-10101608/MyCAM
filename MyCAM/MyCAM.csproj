@@ -81,6 +81,7 @@
     <Compile Include="Editor\Dialog\ContourEditDlg.Designer.cs">
       <DependentUpon>ContourEditDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Renderer\EditPointRenderer.cs" />
     <Compile Include="Editor\Renderer\REFPointRenderer.cs" />
     <Compile Include="Editor\Dialog\ControllerDlg.cs">
       <SubType>Form</SubType>
