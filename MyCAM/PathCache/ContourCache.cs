@@ -115,7 +115,7 @@ namespace MyCAM.PathCache
 				if( m_IsCADFactorDirty ) {
 					BuildCADCAMPointList();
 				}
-				return m_CADPointList;
+				return m_TrsfCADPointList;
 			}
 		}
 
@@ -133,14 +133,16 @@ namespace MyCAM.PathCache
 		{
 			m_IsCADFactorDirty = false;
 			SetCenterDir();
-			m_CADPointList = m_ContourGeomData.CADPointList.Select( p => p.Clone() ).ToList();
-			for( int i = 0; i < m_CADPointList.Count; i++ ) {
-				m_CADPointList[ i ].Transform( m_CraftData.CumulativeTrsfMatrix );
+
+			// global transform only (no local edit)
+			m_TrsfCADPointList = m_ContourGeomData.CADPointList.Select( p => p.Clone() ).ToList();
+			for( int i = 0; i < m_TrsfCADPointList.Count; i++ ) {
+				m_TrsfCADPointList[ i ].Transform( m_CraftData.CumulativeTrsfMatrix );
 			}
 
-			// apply local CAD point displacement
+			// apply local CAD point displacement on top of global transform
 			m_CADPointList = ContourEditHelper.ApplyCADPointModify(
-				m_CADPointList, m_CraftData.CADPointModifyMap, m_IsClose );
+				m_TrsfCADPointList.Select( p => p.Clone() ).ToList(), m_CraftData.CADPointModifyMap, m_IsClose );
 
 			m_ConnectCADPointMap.Clear();
 			foreach( var kvp in m_ContourGeomData.ConnectPointMap ) {
@@ -330,7 +332,8 @@ namespace MyCAM.PathCache
 
 		// they are sibling pointer, and change the declare order
 		CraftData m_CraftData;
-		List<CADPoint> m_CADPointList = new List<CADPoint>();
+		List<CADPoint> m_TrsfCADPointList = new List<CADPoint>(); // global transform only, no local edit
+		List<CADPoint> m_CADPointList = new List<CADPoint>();     // global transform + local edit, used by CAM pipeline
 
 		// for CAD point connection
 		Dictionary<CADPoint, CADPoint> m_ConnectCADPointMap = new Dictionary<CADPoint, CADPoint>();
