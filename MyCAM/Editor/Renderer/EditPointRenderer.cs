@@ -7,6 +7,7 @@ using OCC.gp;
 using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
+using System;
 using System.Collections.Generic;
 
 namespace MyCAM.Editor.Renderer
@@ -50,13 +51,12 @@ namespace MyCAM.Editor.Renderer
             }
 
             var aisContext = m_Viewer.GetAISContext();
+            var cadPointList = contourCache.TrsfCADPointList;
 
             foreach( var kvp in craftData.CADPointModifyMap ) {
                 int cadIndex = kvp.Key;
                 CADPointModifyData modifyData = kvp.Value;
 
-                // get CAD point position
-                var cadPointList = contourCache.TrsfCADPointList;
                 if( cadIndex < 0 || cadIndex >= cadPointList.Count ) {
                     continue;
                 }
@@ -68,23 +68,16 @@ namespace MyCAM.Editor.Renderer
                 aisContext.Deactivate( cadMark );
                 m_CADMarkList.Add( cadMark );
 
-                // skip CAM mark and line when there is no offset
-                bool hasOffset = modifyData.DX != 0 || modifyData.DY != 0 || modifyData.DZ != 0;
+                // skip CAM mark and line when offset is negligible
+                bool hasOffset = Math.Abs( modifyData.DX ) > OFFSET_THRESHOLD
+                              || Math.Abs( modifyData.DY ) > OFFSET_THRESHOLD
+                              || Math.Abs( modifyData.DZ ) > OFFSET_THRESHOLD;
                 if( !hasOffset ) {
                     continue;
                 }
 
-                // get CAM point via CAD¡÷CAM index mapping
-                var cadToCAMIndexMap = contourCache.CADToCAMIndexMap;
-                if( !cadToCAMIndexMap.ContainsKey( cadIndex ) ) {
-                    continue;
-                }
-                int camIndex = cadToCAMIndexMap[ cadIndex ];
-                var camPointList = contourCache.MainPathPointList;
-                if( camIndex < 0 || camIndex >= camPointList.Count ) {
-                    continue;
-                }
-                gp_Pnt camPnt = camPointList[ camIndex ].Point;
+                // CAM position = CAD position + recorded displacement (interpolation passes through control points exactly)
+                gp_Pnt camPnt = new gp_Pnt( cadPnt.X() + modifyData.DX, cadPnt.Y() + modifyData.DY, cadPnt.Z() + modifyData.DZ );
 
                 // draw CAM mark
                 AIS_Shape camMark = CreatePointMark( camPnt, CAM_MARK_COLOR );
@@ -93,7 +86,7 @@ namespace MyCAM.Editor.Renderer
                 m_CAMMarkList.Add( camMark );
 
                 // draw offset line between CAD and CAM point
-                AIS_Line offsetLine = DrawHelper.GetLineAIS( cadPnt, camPnt, OFFSET_LINE_COLOR );
+                AIS_Line offsetLine = DrawHelper.GetLineAIS( cadPnt, camPnt, OFFSET_LINE_COLOR, OFFSET_LINE_WIDTH, true );
                 aisContext.Display( offsetLine, false );
                 aisContext.Deactivate( offsetLine );
                 m_OffsetLineList.Add( offsetLine );
@@ -146,7 +139,9 @@ namespace MyCAM.Editor.Renderer
         }
 
         const Quantity_NameOfColor CAD_MARK_COLOR = Quantity_NameOfColor.Quantity_NOC_ORANGE;
-        const Quantity_NameOfColor CAM_MARK_COLOR = Quantity_NameOfColor.Quantity_NOC_GREEN;
-        const Quantity_NameOfColor OFFSET_LINE_COLOR = Quantity_NameOfColor.Quantity_NOC_WHITE;
+        const Quantity_NameOfColor CAM_MARK_COLOR = Quantity_NameOfColor.Quantity_NOC_BLUE;
+        const Quantity_NameOfColor OFFSET_LINE_COLOR = Quantity_NameOfColor.Quantity_NOC_BLACK;
+        const double OFFSET_LINE_WIDTH = 1.5;
+        const double OFFSET_THRESHOLD = 1e-3;
     }
 }
