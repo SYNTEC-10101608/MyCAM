@@ -110,7 +110,7 @@ namespace MyCAM.Data
 			bool isToolVecReverse,
 			EToolVecInterpolateType interpolateType,
 			TraverseData traverseData,
-			Dictionary<int, CADPointModifyData> cadPointModifyMap = null )
+			Dictionary<int, CADPointModifyData> cadPointModifyMap )
 		{
 			m_TechLayer = techLayer;
 			m_StartPointIndex = startPoint;

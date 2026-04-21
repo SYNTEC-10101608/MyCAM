@@ -1084,6 +1084,12 @@ namespace MyCAM.FileManager
 			set;
 		} = new List<ToolVecMapDTO>();
 
+		public List<CADPointMapDTO> CADPointModifyMap
+		{
+			get;
+			set;
+		} = new List<CADPointMapDTO>();
+
 		internal CraftDataDTO()
 		{
 		}
@@ -1112,6 +1118,9 @@ namespace MyCAM.FileManager
 			ToolVecModifyMap = ( craftData.ToolVecModifyMap ?? new Dictionary<int, ToolVecModifyData>() )
 				.Select( kvp => new ToolVecMapDTO( kvp.Key, kvp.Value.RA_deg, kvp.Value.RB_deg, kvp.Value.Master_deg, kvp.Value.Slave_deg ) )
 				.ToList();
+			CADPointModifyMap = ( craftData.CADPointModifyMap ?? new Dictionary<int, CADPointModifyData>() )
+				.Select( kvp => new CADPointMapDTO( kvp.Key, kvp.Value.DX, kvp.Value.DY, kvp.Value.DZ ) )
+				.ToList();
 		}
 
 		internal CraftData ToCraftData()
@@ -1130,11 +1139,15 @@ namespace MyCAM.FileManager
 				dto => dto.Index.Value,
 				dto => new ToolVecModifyData( dto.RA_deg.Value, dto.RB_deg.Value, dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value )
 			);
+			Dictionary<int, CADPointModifyData> cadPointModifyMap = CADPointModifyMap.ToDictionary(
+					dto => dto.Index.Value,
+					dto => new CADPointModifyData( dto.DX.Value, dto.DY.Value, dto.DZ.Value )
+			);
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
 			EToolVecInterpolateType interpolateType = InterpolateType.Value;
 
-			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap, IsToolVecReverse.Value, interpolateType, traverseData );
+			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap, IsToolVecReverse.Value, interpolateType, traverseData, cadPointModifyMap );
 
 			// Set properties not in constructor
 			if( CumulativeTrsfMatrix == null ) {
@@ -1665,6 +1678,46 @@ namespace MyCAM.FileManager
 			RB_deg = rb_deg;
 			MasterAngle_deg = masterAngle_deg;
 			SlaveAngle_deg = slaveAngle_deg;
+		}
+	}
+
+	public class CADPointMapDTO
+	{
+		public int? Index
+		{
+			get;
+			set;
+		}
+
+		public double? DX
+		{
+			get;
+			set;
+		}
+
+		public double? DY
+		{
+			get;
+			set;
+		}
+
+		public double? DZ
+		{
+			get;
+			set;
+		}
+
+		// parameterless constructor (for XmlSerializer)
+		internal CADPointMapDTO()
+		{
+		}
+
+		internal CADPointMapDTO( int index, double dx, double dy, double dz )
+		{
+			Index = index;
+			DX = dx;
+			DY = dy;
+			DZ = dz;
 		}
 	}
 
