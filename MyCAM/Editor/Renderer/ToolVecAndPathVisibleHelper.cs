@@ -11,14 +11,9 @@ using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
-	/// <summary>
-	/// Shared utility methods for CAM renderers to eliminate code duplication
-	/// across ToolVecRenderer, ToolVecEditRender, and PathRenderer.
-	/// </summary>
-	internal static class RendererHelper
+	internal static class ToolVecAndPathVisibleHelper
 	{
-		#region Data Retrieval
-
+		// get all main point
 		public static IReadOnlyList<gp_Pnt> GetMainPathPointList( string szPathID )
 		{
 			// get path type
@@ -42,10 +37,7 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		#endregion
-
-		#region AIS Creation
-
+		// draw polyline wire for main path
 		public static TopoDS_Wire CreatePolylineWire( IReadOnlyList<gp_Pnt> pointList )
 		{
 			const double DIST_TOLERANCE = 1e-3;
@@ -80,8 +72,6 @@ namespace MyCAM.Editor.Renderer
 			return polygonMaker.Wire();
 		}
 
-		#endregion
-
 		#region Tool Vec
 
 		public static Dictionary<string, List<AIS_Line>> BuildToolVecAISDict( List<string> pathIDList, gp_Trsf trsf )
@@ -89,6 +79,7 @@ namespace MyCAM.Editor.Renderer
 			Dictionary<string, List<AIS_Line>> result = new Dictionary<string, List<AIS_Line>>();
 			foreach( string szPathID in pathIDList ) {
 				IReadOnlyList<IProcessPoint> toolVecPointList = GetToolVecPointList( szPathID );
+				DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData );
 				if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
 					continue;
 				}
@@ -98,8 +89,8 @@ namespace MyCAM.Editor.Renderer
 					IProcessPoint point = toolVecPointList[ i ];
 					AIS_Line toolVecAIS = CreateVecAIS( point.Point, point.ToolVec );
 					// first and last points are always highlighted red
-					bool isEndPoint = ( i == 0 || i == toolVecPointList.Count - 1 );
-					if( isEndPoint || point.IsToolVecModPoint ) {
+					bool isModifiedStartEndPnt = i == 0 && craftData.StartPntToolVecData.StartPnt.AngleData != null || i == toolVecPointList.Count - 1 && craftData.StartPntToolVecData.EndPnt.AngleData != null;
+					if( isModifiedStartEndPnt || point.IsToolVecModPoint ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
 					}

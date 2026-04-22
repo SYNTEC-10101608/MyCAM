@@ -104,7 +104,7 @@ namespace MyCAM.Editor.Renderer
 			}
 
 			// build tool vec using shared helper
-			Dictionary<string, List<AIS_Line>> built = RendererHelper.BuildToolVecAISDict( pathIDList, trsf );
+			Dictionary<string, List<AIS_Line>> built = ToolVecAndPathVisibleHelper.BuildToolVecAISDict( pathIDList, trsf );
 			foreach( var kvp in built ) {
 				m_ToolVecAISDict.Add( kvp.Key, kvp.Value );
 			}

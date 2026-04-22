@@ -3,28 +3,16 @@ using MyCAM.Post;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Helper
 {
 	public static class ToolVecHelper
 	{
-		public static void SetToolVec( ref List<ISetToolVecPoint> toolVecPointList,
-			Dictionary<int, ToolVecModifyData> toolVecModifyMap, bool isClosed, out List<Tuple<int, int, EToolVecInterpolateType>> interpolateRegionList, bool isPathReverse )
+		public static void SetToolVec( ref List<ISetToolVecPoint> toolVecPointList, List<Tuple<int, int, EToolVecInterpolateType>> regionTypeList, Dictionary<int, ToolVecModifyData> camToolVecModifyMap, bool isFirstPntIsControlPnt, bool isLastPntControlPoint )
 		{
-			// arrange the map for closed path
-			if( isClosed ) {
-				ArrageMapForClosedPath( ref toolVecModifyMap, toolVecPointList );
-			}
-
-			// mark the modified point
-			for( int i = 0; i < toolVecPointList.Count; i++ ) {
-				if( !toolVecModifyMap.ContainsKey( i ) ) {
-					continue;
-				}
-				toolVecPointList[ i ].IsToolVecModPoint = true;
-			}
-			ModifyToolVec( ref toolVecPointList, toolVecModifyMap, out interpolateRegionList, isPathReverse );
+			// control point do not involve into interpolation
+			SetControlPoint( ref toolVecPointList, regionTypeList, camToolVecModifyMap, isFirstPntIsControlPnt, isLastPntControlPoint );
+			ModifyToolVec( ref toolVecPointList, regionTypeList, camToolVecModifyMap, isLastPntControlPoint );
 		}
 
 		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint )
@@ -102,42 +90,49 @@ namespace MyCAM.Helper
 			return abAngle_deg;
 		}
 
-		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList,
-			IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap,
-			out List<Tuple<int, int, EToolVecInterpolateType>> interpolateIntervalList, bool isPathReverse )
+		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList, List<Tuple<int, int, EToolVecInterpolateType>> regionTypeList, Dictionary<int, ToolVecModifyData> camToolVecModifyMap, bool isLastPntIsControlPnt )
 		{
-			if( toolVecModifyMap.Count == 0 ) {
-				interpolateIntervalList = new List<Tuple<int, int, EToolVecInterpolateType>>();
+			if( regionTypeList.Count == 0 ) {
 				return;
 			}
+			for( int i = 0; i < regionTypeList.Count; i++ ) {
+				if( regionTypeList[ i ].Item3 == EToolVecInterpolateType.VectorInterpolation ) {
+					ApplyMSAngleInterpolation( ref toolVecPointList, camToolVecModifyMap, regionTypeList[ i ].Item1, regionTypeList[ i ].Item2 );
+				}
+				else if( regionTypeList[ i ].Item3 == EToolVecInterpolateType.Normal ) {
 
-			// get the interpolate interval list
-			interpolateIntervalList = GetInterpolateIntervalList( toolVecModifyMap, isPathReverse );
-			SetControlPoint( ref toolVecPointList, interpolateIntervalList, toolVecModifyMap );
-			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
-				if( interpolateIntervalList[ i ].Item3 == EToolVecInterpolateType.VectorInterpolation ) {
-					ApplyMSAngleInterpolation( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
+					// this flag is used to determine whether the end point of this region is control point or not, which will involve into IK solving directly
+					bool isEndPntIsCtrlPnt = true;
+					if( i == regionTypeList.Count - 1 && isLastPntIsControlPnt == false ) {
+						isEndPntIsCtrlPnt = false;
+					}
+					SolveRegionIK( ref toolVecPointList, camToolVecModifyMap, regionTypeList[ i ].Item1, regionTypeList[ i ].Item2, isEndPntIsCtrlPnt );
 				}
-				else if( interpolateIntervalList[ i ].Item3 == EToolVecInterpolateType.Normal ) {
-					SolveRegionIK( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
-				}
-				else if( interpolateIntervalList[ i ].Item3 == EToolVecInterpolateType.TiltAngleInterpolation ) {
-					ApplyTiltAngleInterpolation( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
-					SolveRegionIK( ref toolVecPointList, toolVecModifyMap, interpolateIntervalList[ i ].Item1, interpolateIntervalList[ i ].Item2 );
+				else if( regionTypeList[ i ].Item3 == EToolVecInterpolateType.TiltAngleInterpolation ) {
+					ApplyTiltAngleInterpolation( ref toolVecPointList, camToolVecModifyMap, regionTypeList[ i ].Item1, regionTypeList[ i ].Item2 );
+
+					bool isEndPntIsCtrlPnt = true;
+					if( i == regionTypeList.Count - 1 && isLastPntIsControlPnt == false ) {
+						isEndPntIsCtrlPnt = false;
+					}
+					SolveRegionIK( ref toolVecPointList, camToolVecModifyMap, regionTypeList[ i ].Item1, regionTypeList[ i ].Item2, isEndPntIsCtrlPnt );
 				}
 			}
-			SetControlPoint( ref toolVecPointList, interpolateIntervalList, toolVecModifyMap );
-
 		}
 
-		static void SetControlPoint( ref List<ISetToolVecPoint> toolVecPointList, List<Tuple<int, int, EToolVecInterpolateType>> interpolateIntervalList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap )
+		static void SetControlPoint( ref List<ISetToolVecPoint> toolVecPointList, List<Tuple<int, int, EToolVecInterpolateType>> interpolateIntervalList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, bool isFisrtPntIsCtrlPnt, bool isLastPntIsCtrlPnt )
 		{
 			if( interpolateIntervalList == null || interpolateIntervalList.Count == 0 ) {
 				return;
 			}
 			for( int i = 0; i < interpolateIntervalList.Count; i++ ) {
-				double dStart_Master_deg = toolVecModifyMap[ interpolateIntervalList[ i ].Item1 ].Master_deg;
-				double dStart_Slave_deg = toolVecModifyMap[ interpolateIntervalList[ i ].Item1 ].Slave_deg;
+
+				// first pnt is not control pnt
+				if( i == 0 && !isFisrtPntIsCtrlPnt || toolVecModifyMap[ interpolateIntervalList[ i ].Item1 ].AngleData == null ) {
+					continue;
+				}
+				double dStart_Master_deg = toolVecModifyMap[ interpolateIntervalList[ i ].Item1 ].AngleData.Master_deg;
+				double dStart_Slave_deg = toolVecModifyMap[ interpolateIntervalList[ i ].Item1 ].AngleData.Slave_deg;
 				gp_Dir toolVec = ConvertMSAngleToToolVec( dStart_Master_deg, dStart_Slave_deg );
 				if( toolVec != null ) {
 					toolVecPointList[ interpolateIntervalList[ i ].Item1 ].ToolVec = toolVec;
@@ -146,10 +141,17 @@ namespace MyCAM.Helper
 				}
 			}
 
+			// last point is not control pnt
+			if( !isLastPntIsCtrlPnt ) {
+				return;
+			}
 			// last control point
 			int lastIndex = interpolateIntervalList[ interpolateIntervalList.Count - 1 ].Item2;
-			double dEnd_Master_deg = toolVecModifyMap[ lastIndex ].Master_deg;
-			double dEnd_Slave_deg = toolVecModifyMap[ lastIndex ].Slave_deg;
+			if( toolVecModifyMap[ lastIndex ].AngleData == null ) {
+				return;
+			}
+			double dEnd_Master_deg = toolVecModifyMap[ lastIndex ].AngleData.Master_deg;
+			double dEnd_Slave_deg = toolVecModifyMap[ lastIndex ].AngleData.Slave_deg;
 			gp_Dir lastToolVec = ConvertMSAngleToToolVec( dEnd_Master_deg, dEnd_Slave_deg );
 			if( lastToolVec != null ) {
 				toolVecPointList[ toolVecPointList.Count - 1 ].ToolVec = lastToolVec;
@@ -158,33 +160,13 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static List<Tuple<int, int, EToolVecInterpolateType>> GetInterpolateIntervalList(
-			IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, bool isPathReverse )
-		{
-			List<Tuple<int, int, EToolVecInterpolateType>> intervalList = new List<Tuple<int, int, EToolVecInterpolateType>>();
-			if( toolVecModifyMap == null || toolVecModifyMap.Count == 0 ) {
-				return intervalList;
-			}
-			// sort the modify data by index
-			List<int> indexInOrder = toolVecModifyMap.Keys.ToList();
-			indexInOrder.Sort();
-			for( int i = 0; i < indexInOrder.Count - 1; i++ ) {
-				if( isPathReverse ) {
-
-					// get this region head interpolate type (is still end of region, but path is reverse so end will be reverse as start)
-					intervalList.Add( new Tuple<int, int, EToolVecInterpolateType>( indexInOrder[ i ], indexInOrder[ i + 1 ], toolVecModifyMap.ContainsKey( indexInOrder[ i ] ) ? toolVecModifyMap[ indexInOrder[ i ] ].InterpolateType : EToolVecInterpolateType.Normal ) );
-				}
-				else {
-					intervalList.Add( new Tuple<int, int, EToolVecInterpolateType>( indexInOrder[ i ], indexInOrder[ i + 1 ], toolVecModifyMap.ContainsKey( indexInOrder[ i + 1 ] ) ? toolVecModifyMap[ indexInOrder[ i + 1 ] ].InterpolateType : EToolVecInterpolateType.Normal ) );
-				}
-			}
-			return intervalList;
-		}
-
 		static void InterpolateToolVecByTilt( ref List<ISetToolVecPoint> toolVecPointList,
 			int nStartIndex, int nEndIndex, double dStartRA_Deg, double dStartRB_Deg, double dEndRA_Deg, double dEndRB_Deg )
 		{
 			if( nEndIndex <= nStartIndex ) {
+				return;
+			}
+			if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
 				return;
 			}
 
@@ -274,12 +256,18 @@ namespace MyCAM.Helper
 
 		static void ApplyMSAngleInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int startIndex, int endIndex )
 		{
+			if( !toolVecModifyMap.TryGetValue( startIndex, out ToolVecModifyData startData ) ||
+				!toolVecModifyMap.TryGetValue( endIndex, out ToolVecModifyData endData ) ||
+				startData == null || endData == null ||
+				startData.AngleData == null || endData.AngleData == null ) {
+				return;
+			}
 			MSAngle msStartAngleParam = new MSAngle
 			{
-				dStart_Master_deg = toolVecModifyMap[ startIndex ].Master_deg,
-				dStart_Slave_deg = toolVecModifyMap[ startIndex ].Slave_deg,
-				dEnd_Master_deg = toolVecModifyMap[ endIndex ].Master_deg,
-				dEnd_Slave_deg = toolVecModifyMap[ endIndex ].Slave_deg
+				dStart_Master_deg = startData.AngleData.Master_deg,
+				dStart_Slave_deg = startData.AngleData.Slave_deg,
+				dEnd_Master_deg = endData.AngleData.Master_deg,
+				dEnd_Slave_deg = endData.AngleData.Slave_deg
 			};
 
 			InterpolateToolVecByMS( ref toolVecPointList, startIndex, endIndex,
@@ -290,34 +278,50 @@ namespace MyCAM.Helper
 
 		static void ApplyTiltAngleInterpolation( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int startIndex, int endIndex )
 		{
+			if( !toolVecModifyMap.TryGetValue( startIndex, out ToolVecModifyData startData ) ||
+				!toolVecModifyMap.TryGetValue( endIndex, out ToolVecModifyData endData ) ||
+				startData == null || endData == null ||
+				startData.AngleData == null || endData.AngleData == null ) {
+				return;
+			}
 			TiltABAngle tiltABAngle = new TiltABAngle
 			{
-				dStart_RA_deg = toolVecModifyMap[ startIndex ].RA_deg,
-				dStart_RB_deg = toolVecModifyMap[ startIndex ].RB_deg,
-				dEnd_RA_deg = toolVecModifyMap[ endIndex ].RA_deg,
-				dEnd_RB_deg = toolVecModifyMap[ endIndex ].RB_deg
+				dStart_RA_deg = startData.AngleData.RA_deg,
+				dStart_RB_deg = startData.AngleData.RB_deg,
+				dEnd_RA_deg = endData.AngleData.RA_deg,
+				dEnd_RB_deg = endData.AngleData.RB_deg
 			};
 			InterpolateToolVecByTilt( ref toolVecPointList, startIndex, endIndex,
 					tiltABAngle.dStart_RA_deg, tiltABAngle.dStart_RB_deg,
 					tiltABAngle.dEnd_RA_deg, tiltABAngle.dEnd_RB_deg );
 		}
 
-		// bool isWithInterpolate == false means end point involve solve IK directly
-		static void SolveRegionIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nStartIdx, int nEndIdx, bool isWithInterpolate = true )
+		// endPointIsCtrlPnt == false means end point involve solve IK directly
+		static void SolveRegionIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nStartIdx, int nEndIdx, bool endPointIsCtrlPnt = true )
 		{
 			// Get machine data
 			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
 				return;
 			}
+			if( !toolVecModifyMap.TryGetValue( nStartIdx, out ToolVecModifyData startData ) ||
+				startData == null || startData.AngleData == null ) {
+				return;
+			}
+			if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
+				return;
+			}
+			if( nStartIdx < 0 || nStartIdx >= toolVecPointList.Count ) {
+				return;
+			}
 
 			// Create PostSolver
 			PostSolver postSolver = new PostSolver( machineData );
-			double dM = toolVecModifyMap[ nStartIdx ].Master_deg * Math.PI / 180.0;
-			double dS = toolVecModifyMap[ nStartIdx ].Slave_deg * Math.PI / 180.0;
+			double dM = startData.AngleData.Master_deg * Math.PI / 180.0;
+			double dS = startData.AngleData.Slave_deg * Math.PI / 180.0;
 
 			// sigularity tag list
 			List<bool> singularTagList = new List<bool>();
-			nEndIdx = isWithInterpolate ? nEndIdx - 1 : nEndIdx;
+			nEndIdx = endPointIsCtrlPnt ? nEndIdx - 1 : nEndIdx;
 			for( int i = nStartIdx; i <= nEndIdx; i++ ) {
 
 				IKSolveResult result = postSolver.SolveIK( toolVecPointList[ i ].ToolVec, dM, dS, out dM, out dS );
@@ -342,14 +346,19 @@ namespace MyCAM.Helper
 			// filter singular points and apply results directly to toolVecPointList
 			bool bFilterMaster = machineData.FiveAxisType == FiveAxisType.Spindle; // which axis is going to filter
 
-			// get the pointer of toolVecPointList[ nStartIdx]~[nEndIdx]
-			int range = isWithInterpolate ? nEndIdx - nStartIdx + 2 : nEndIdx - nStartIdx + 1;
-			List<ISetToolVecPoint> toolVecPointList2 = toolVecPointList.GetRange( nStartIdx, range );
-			if( isWithInterpolate ) {
+			// get the pointer of toolVecPointList[nStartIdx]~[nEndIdx] to do filtering
+			int range = endPointIsCtrlPnt ? nEndIdx - nStartIdx + 2 : nEndIdx - nStartIdx + 1;
+			if( nStartIdx + range > toolVecPointList.Count ) {
+				range = toolVecPointList.Count - nStartIdx;
+			}
+			if( range <= 0 ) {
+				return;
+			}
+			List<ISetToolVecPoint> regionToolVecPointList = toolVecPointList.GetRange( nStartIdx, range );
+			if( endPointIsCtrlPnt ) {
 				singularTagList.Add( false );
 			}
-
-			FilterSingularPoints( ref toolVecPointList2, singularTagList, bFilterMaster );
+			FilterSingularPoints( ref regionToolVecPointList, singularTagList, bFilterMaster );
 		}
 
 		static void FilterSingularPoints( ref List<ISetToolVecPoint> pointList, List<bool> singularTagList, bool bFilterMaster )

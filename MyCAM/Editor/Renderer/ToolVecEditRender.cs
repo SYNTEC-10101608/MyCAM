@@ -135,7 +135,7 @@ namespace MyCAM.Editor.Renderer
 		void BuildAndDisplayToolVec( List<string> pathIDList, gp_Trsf trsf )
 		{
 			// build tool vec using shared helper
-			Dictionary<string, List<AIS_Line>> built = RendererHelper.BuildToolVecAISDict( pathIDList, trsf );
+			Dictionary<string, List<AIS_Line>> built = ToolVecAndPathVisibleHelper.BuildToolVecAISDict( pathIDList, trsf );
 			foreach( var kvp in built ) {
 				m_ToolVecAISDict.Add( kvp.Key, kvp.Value );
 			}
@@ -160,7 +160,7 @@ namespace MyCAM.Editor.Renderer
 		{
 			// render each path
 			foreach( string pathID in pathIDList ) {
-				IReadOnlyList<gp_Pnt> pointList = RendererHelper.GetMainPathPointList( pathID );
+				IReadOnlyList<gp_Pnt> pointList = ToolVecAndPathVisibleHelper.GetMainPathPointList( pathID );
 				if( pointList == null || pointList.Count < 2 ) {
 					continue;
 				}
@@ -171,7 +171,7 @@ namespace MyCAM.Editor.Renderer
 
 				if( intervalList == null || intervalList.Count == 0 ) {
 					// no interval data, render as single wire with default color
-					TopoDS_Wire pathWire = RendererHelper.CreatePolylineWire( pointList );
+					TopoDS_Wire pathWire = ToolVecAndPathVisibleHelper.CreatePolylineWire( pointList );
 					if( pathWire == null || pathWire.IsNull() ) {
 						continue;
 					}
@@ -203,7 +203,7 @@ namespace MyCAM.Editor.Renderer
 							segmentPoints.Add( pointList[ i ] );
 						}
 
-						TopoDS_Wire segmentWire = RendererHelper.CreatePolylineWire( segmentPoints );
+						TopoDS_Wire segmentWire = ToolVecAndPathVisibleHelper.CreatePolylineWire( segmentPoints );
 						if( segmentWire == null || segmentWire.IsNull() ) {
 							continue;
 						}

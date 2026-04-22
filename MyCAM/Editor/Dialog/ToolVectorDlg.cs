@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public partial class m_lblInter : EditDialogBase<EToolVecInterpolateType>
+	public partial class ToolVectorDlg : EditDialogBase<EToolVecInterpolateType>
 	{
 		public Action SetKeep;
 		public Action SetZdir;
@@ -20,12 +20,12 @@ namespace MyCAM.Editor
 		public Action<bool> ToStartOrEnd;
 		public Action<bool> FlipRotaryAxis;
 
-		public m_lblInter( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse, RotaryAxisConfig config )
+		public ToolVectorDlg( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse, RotaryAxisConfig config )
 		{
 			// struct would not be null
 			InitializeComponent();
 			m_IsPathRevese = isPathReverse;
-			ResetType(  );
+			ResetType();
 			ResetToolVecParam( param );
 
 			// update rotary axis name
@@ -36,7 +36,7 @@ namespace MyCAM.Editor
 			m_btnRotaryNeg.Text = m_RotaryAxisConfig.RotaryAxisName + " -";
 		}
 
-		public void ResetType( )
+		public void ResetType()
 		{
 			m_cbxInterpolateType.SelectedIndex = (int)EToolVecInterpolateType.Normal;
 		}
@@ -68,26 +68,27 @@ namespace MyCAM.Editor
 			m_lblStartOrEnd.Text = start ? "當前位置：起點" : "當前位置：終點";
 		}
 
-		public void LockCbx( bool isNeedLock, bool isEnableRemove, bool isEnableAdd, bool isStartPnt = false, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
+		public void UIControlProtection( bool isControlPnt, bool isStartEndPnt = false, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
 		{
-			m_btnAdd.Enabled = isEnableAdd;
-			m_btnRemove.Enabled = isEnableRemove;
-			if( isNeedLock ) {
+			// is control pnt
+			if( isControlPnt ) {
+				m_btnAdd.Enabled = false;
+				m_btnRemove.Enabled = true;
 				m_cbxInterpolateType.SelectedIndex = -1;
 				m_cbxInterpolateType.Enabled = false;
-
-				if( isStartPnt ) {
-					m_btnAdd.Enabled = false;
-					m_btnRemove.Enabled = false; 
+			}
+			else {
+				m_btnAdd.Enabled = true;
+				m_btnRemove.Enabled = false;
+				if( isStartEndPnt ) {
+					m_cbxInterpolateType.SelectedIndex = -1;
+					m_cbxInterpolateType.Enabled = false;
 				}
 				else {
-
+					m_cbxInterpolateType.Enabled = true;
+					m_cbxInterpolateType.SelectedIndex = (int)interpolateType;
 				}
-					return;
 			}
-			m_cbxInterpolateType.Enabled = true;
-			m_cbxInterpolateType.SelectedIndex = (int)interpolateType;
-
 		}
 
 
@@ -365,7 +366,7 @@ namespace MyCAM.Editor
 			get; set;
 		}
 
-		public ToolVecParam( double angleA_deg = 0.0, double angleB_deg = 0.0, double master_deg = 0.0, double slave_deg = 0.0, bool isModified = false , EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal)
+		public ToolVecParam( double angleA_deg = 0.0, double angleB_deg = 0.0, double master_deg = 0.0, double slave_deg = 0.0, bool isModified = false, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
 		{
 			AngleA_deg = angleA_deg;
 			AngleB_deg = angleB_deg;

@@ -341,7 +341,6 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
-
 			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
 
 			// register before init, cause init will change select node to start point, machine need to translate
@@ -490,16 +489,46 @@ namespace MyCAM.Editor
 				Tuple<double, double> avgAB_deg = ToolVecHelper.GetABAngleFromToolVec( avgDir, startPoint );
 
 				// set average ms to start point
-				ToolVecModifyData endPntData = new ToolVecModifyData()
+				ToolVecModifyData startPntData = new ToolVecModifyData()
 				{
-					RA_deg = avgAB_deg.Item1,
-					RB_deg = avgAB_deg.Item2,
-					Master_deg = avgMS_deg.Item1,
-					Slave_deg = avgMS_deg.Item2,
+					AngleData = new ToolVecAngleData()
+					{
+						RA_deg = avgAB_deg.Item1,
+						RB_deg = avgAB_deg.Item2,
+						Master_deg = avgMS_deg.Item1,
+						Slave_deg = avgMS_deg.Item2
+					},
 					InterpolateType = EToolVecInterpolateType.VectorInterpolation
 				};
-				craftData.StartPntToolVecData.EndPnt = endPntData.Clone();
-				craftData.StartPntToolVecData.StartPnt = endPntData.Clone();
+
+				if( dataHandler.IsClosed() == false ) {
+					ISetToolVecPoint endPoint = dataHandler.GetPointByCADIndex( dataHandler.GetEndPointCADIndex() );
+
+					// get ms angle
+					Tuple<double, double> avgMS_deg_EndPnt = ToolVecHelper.GetMSAngleFromToolVec( avgDir, endPoint );
+
+					// get ab angle
+					Tuple<double, double> avgAB_deg_EndPnt = ToolVecHelper.GetABAngleFromToolVec( avgDir, endPoint );
+
+					// set average ms to start point
+					ToolVecModifyData endPntData = new ToolVecModifyData()
+					{
+						AngleData = new ToolVecAngleData()
+						{
+							RA_deg = avgAB_deg_EndPnt.Item1,
+							RB_deg = avgAB_deg_EndPnt.Item2,
+							Master_deg = avgMS_deg_EndPnt.Item1,
+							Slave_deg = avgMS_deg_EndPnt.Item2
+						},
+						InterpolateType = EToolVecInterpolateType.VectorInterpolation
+					};
+					craftData.StartPntToolVecData.EndPnt = endPntData.Clone();
+					craftData.StartPntToolVecData.StartPnt = startPntData.Clone();
+				}
+				else {
+					craftData.StartPntToolVecData.EndPnt = startPntData.Clone();
+					craftData.StartPntToolVecData.StartPnt = startPntData.Clone();
+				}
 			}
 			ShowCAMData( szPathIDList );
 		}

@@ -98,7 +98,7 @@
     <Compile Include="Editor\Renderer\CoordIconRenderer.cs" />
     <Compile Include="Data\Simulation\SimuData.cs" />
     <Compile Include="Editor\Renderer\MachineRender.cs" />
-    <Compile Include="Editor\Renderer\RendererHelper.cs" />
+    <Compile Include="Editor\Renderer\ToolVecAndPathVisibleHelper.cs" />
     <Compile Include="Editor\Renderer\ToolVecEditRender.cs" />
     <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
