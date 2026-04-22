@@ -141,8 +141,8 @@ namespace MyCAM.PathCache
 			}
 
 			// apply local CAD point displacement on top of global transform
-			m_CADPointList = ContourEditHelper.ApplyCADPointModify(
-				m_TrsfCADPointList.Select( p => p.Clone() ).ToList(), m_CraftData.CADPointModifyMap, m_IsClose );
+			m_CADPointList = ContourEditHelper.ApplyContourEdit(
+				m_TrsfCADPointList.Select( p => p.Clone() ).ToList(), m_CraftData.ContourEditMap, m_IsClose );
 
 			m_ConnectCADPointMap.Clear();
 			foreach( var kvp in m_ContourGeomData.ConnectPointMap ) {

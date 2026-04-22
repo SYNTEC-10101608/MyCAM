@@ -9,188 +9,188 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class ContourEditAction : IndexSelectAction
-	{
-		public ContourEditAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
-			: base( dataManager, viewer, treeView, viewManager, pathID )
-		{
-			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
-				throw new ArgumentException( "Cannot get CraftData by pathID: " + pathID );
-			}
-		}
+    internal class ContourEditAction : IndexSelectAction
+    {
+        public ContourEditAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
+            : base( dataManager, viewer, treeView, viewManager, pathID )
+        {
+            if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
+                throw new ArgumentException( "Cannot get CraftData by pathID: " + pathID );
+            }
+        }
 
-		public override EditActionType ActionType
-		{
-			get
-			{
-				return EditActionType.ContourEdit;
-			}
-		}
+        public override EditActionType ActionType
+        {
+            get
+            {
+                return EditActionType.ContourEdit;
+            }
+        }
 
-		public Action PropertyChanged;
+        public Action PropertyChanged;
 
-		public override void Start()
-		{
-			base.Start();
+        public override void Start()
+        {
+            base.Start();
 
-			// create dialog
-			m_Dlg = new ContourEditDlg();
-			m_Dlg.AddEditIndex += OnAddEditIndex;
-			m_Dlg.RemoveEditIndex += OnRemoveEditIndex;
-			m_Dlg.DisplacementChanged += OnDisplacementChanged;
-			m_Dlg.Cancel += End;
+            // create dialog
+            m_Dlg = new ContourEditDlg();
+            m_Dlg.AddEditIndex += OnAddEditIndex;
+            m_Dlg.RemoveEditIndex += OnRemoveEditIndex;
+            m_Dlg.DisplacementChanged += OnDisplacementChanged;
+            m_Dlg.Cancel += End;
 
-			// default to first point
-			OnSelectedIndexChanged( 0 );
-			m_Dlg.Show( MyApp.MainForm );
+            // default to first point
+            OnSelectedIndexChanged( 0 );
+            m_Dlg.Show( MyApp.MainForm );
 
-			// show edit point marks
-			m_EditPointRenderer = new EditPointRenderer( m_Viewer, m_PathID );
-			m_EditPointRenderer.Show( true );
-		}
+            // show edit point marks
+            m_EditPointRenderer = new EditPointRenderer( m_Viewer, m_PathID );
+            m_EditPointRenderer.Show( true );
+        }
 
-		public override void End()
-		{
-			m_EditPointRenderer?.Remove( true );
-			base.End();
-		}
+        public override void End()
+        {
+            m_EditPointRenderer?.Remove( true );
+            base.End();
+        }
 
-		protected override void ViewerMouseClick( MouseEventArgs e )
-		{
-			if( IsPausedSelectMode ) {
-				return;
-			}
-			if( e.Button != MouseButtons.Left ) {
-				return;
-			}
-			int? hit = GetSelectIndex( out TopoDS_Shape selectedVertex );
-			int nSelectIndex = hit ?? NULL_SELECT_INDEX;
-			if( nSelectIndex == NULL_SELECT_INDEX || nSelectIndex == m_nSelectIndex ) {
-				return;
-			}
-			OnSelectedIndexChanged( nSelectIndex );
-		}
+        protected override void ViewerMouseClick( MouseEventArgs e )
+        {
+            if( IsPausedSelectMode ) {
+                return;
+            }
+            if( e.Button != MouseButtons.Left ) {
+                return;
+            }
+            int? hit = GetSelectIndex( out TopoDS_Shape selectedVertex );
+            int nSelectIndex = hit ?? NULL_SELECT_INDEX;
+            if( nSelectIndex == NULL_SELECT_INDEX || nSelectIndex == m_nSelectIndex ) {
+                return;
+            }
+            OnSelectedIndexChanged( nSelectIndex );
+        }
 
-		protected override void ViewerKeyDown( KeyEventArgs e )
-		{
-			if( IsPausedSelectMode ) {
-				return;
-			}
-			if( e.KeyCode == Keys.Escape ) {
-				End();
-			}
-		}
+        protected override void ViewerKeyDown( KeyEventArgs e )
+        {
+            if( IsPausedSelectMode ) {
+                return;
+            }
+            if( e.KeyCode == Keys.Escape ) {
+                End();
+            }
+        }
 
-		void OnSelectedIndexChanged( int nSelectIndex )
-		{
-			if( m_nSelectIndex == nSelectIndex ) {
-				return;
-			}
-			m_nSelectIndex = nSelectIndex;
+        void OnSelectedIndexChanged( int nSelectIndex )
+        {
+            if( m_nSelectIndex == nSelectIndex ) {
+                return;
+            }
+            m_nSelectIndex = nSelectIndex;
 
-			// should not happen, but just in case
-			if( nSelectIndex == NULL_SELECT_INDEX ) {
-				m_Param = null;
-				m_Dlg.ResetParam( null );
-				return;
-			}
+            // should not happen, but just in case
+            if( nSelectIndex == NULL_SELECT_INDEX ) {
+                m_Param = null;
+                m_Dlg.ResetParam( null );
+                return;
+            }
 
-			// refresh dialog
-			GetParamFormIndex( nSelectIndex, out double dx, out double dy, out double dz, out bool isModified );
-			m_Param = new ContourEditParam( dx, dy, dz, isModified );
-			m_Dlg.ResetParam( m_Param );
-		}
+            // refresh dialog
+            GetParamFormIndex( nSelectIndex, out double dx, out double dy, out double dz, out bool isModified );
+            m_Param = new ContourEditParam( dx, dy, dz, isModified );
+            m_Dlg.ResetParam( m_Param );
+        }
 
-		void OnAddEditIndex()
-		{
-			if( m_nSelectIndex == NULL_SELECT_INDEX ) {
-				return;
-			}
-			if( m_Param != null ) {
-				m_Param.IsModified = true;
-			}
+        void OnAddEditIndex()
+        {
+            if( m_nSelectIndex == NULL_SELECT_INDEX ) {
+                return;
+            }
+            if( m_Param != null ) {
+                m_Param.IsModified = true;
+            }
 
-			// commit to data with current (zero) displacement
-			double dx = m_Param?.DX ?? 0;
-			double dy = m_Param?.DY ?? 0;
-			double dz = m_Param?.DZ ?? 0;
-			m_CraftData.SetCADPointModify( m_nSelectIndex, dx, dy, dz );
-			PropertyChanged?.Invoke();
-			m_EditPointRenderer?.Show( true );
+            // commit to data with current (zero) displacement
+            double dx = m_Param?.DX ?? 0;
+            double dy = m_Param?.DY ?? 0;
+            double dz = m_Param?.DZ ?? 0;
+            m_CraftData.SetContourEditPoint( m_nSelectIndex, dx, dy, dz );
+            PropertyChanged?.Invoke();
+            m_EditPointRenderer?.Show( true );
 
-			// refresh dialog
-			m_Dlg.ResetParam( m_Param );
-		}
+            // refresh dialog
+            m_Dlg.ResetParam( m_Param );
+        }
 
-		void OnRemoveEditIndex()
-		{
-			if( m_nSelectIndex == NULL_SELECT_INDEX ) {
-				return;
-			}
-			if( m_Param != null ) {
-				m_Param.IsModified = false;
-				m_Param.DX = 0;
-				m_Param.DY = 0;
-				m_Param.DZ = 0;
-			}
-			m_CraftData.RemoveCADPointModify( m_nSelectIndex );
-			PropertyChanged?.Invoke();
-			m_EditPointRenderer?.Show( true );
+        void OnRemoveEditIndex()
+        {
+            if( m_nSelectIndex == NULL_SELECT_INDEX ) {
+                return;
+            }
+            if( m_Param != null ) {
+                m_Param.IsModified = false;
+                m_Param.DX = 0;
+                m_Param.DY = 0;
+                m_Param.DZ = 0;
+            }
+            m_CraftData.RemoveContourEditPoint( m_nSelectIndex );
+            PropertyChanged?.Invoke();
+            m_EditPointRenderer?.Show( true );
 
-			// refresh dialog
-			m_Dlg.ResetParam( m_Param );
-		}
+            // refresh dialog
+            m_Dlg.ResetParam( m_Param );
+        }
 
-		void OnDisplacementChanged( double dx, double dy, double dz )
-		{
-			if( m_nSelectIndex == NULL_SELECT_INDEX || m_Param == null ) {
-				return;
-			}
-			m_Param.DX = dx;
-			m_Param.DY = dy;
-			m_Param.DZ = dz;
-			m_CraftData.SetCADPointModify( m_nSelectIndex, dx, dy, dz );
-			PropertyChanged?.Invoke();
-			m_EditPointRenderer?.Show( true );
+        void OnDisplacementChanged( double dx, double dy, double dz )
+        {
+            if( m_nSelectIndex == NULL_SELECT_INDEX || m_Param == null ) {
+                return;
+            }
+            m_Param.DX = dx;
+            m_Param.DY = dy;
+            m_Param.DZ = dz;
+            m_CraftData.SetContourEditPoint( m_nSelectIndex, dx, dy, dz );
+            PropertyChanged?.Invoke();
+            m_EditPointRenderer?.Show( true );
 
-			// refresh dialog
-			m_Dlg.ResetParam( m_Param );
-		}
+            // refresh dialog
+            m_Dlg.ResetParam( m_Param );
+        }
 
-		void GetParamFormIndex( int nSelectIndex, out double dx, out double dy, out double dz, out bool isModified )
-		{
-			dx = 0;
-			dy = 0;
-			dz = 0;
-			isModified = false;
-			if( nSelectIndex == NULL_SELECT_INDEX ) {
-				return;
-			}
-			isModified = m_CraftData.CADPointModifyMap.ContainsKey( nSelectIndex );
-			if( isModified ) {
-				CADPointModifyData data = m_CraftData.CADPointModifyMap[ nSelectIndex ];
-				dx = data.DX;
-				dy = data.DY;
-				dz = data.DZ;
-			}
-			return;
-		}
+        void GetParamFormIndex( int nSelectIndex, out double dx, out double dy, out double dz, out bool isModified )
+        {
+            dx = 0;
+            dy = 0;
+            dz = 0;
+            isModified = false;
+            if( nSelectIndex == NULL_SELECT_INDEX ) {
+                return;
+            }
+            isModified = m_CraftData.ContourEditMap.ContainsKey( nSelectIndex );
+            if( isModified ) {
+                ContourEditData data = m_CraftData.ContourEditMap[ nSelectIndex ];
+                dx = data.DX;
+                dy = data.DY;
+                dz = data.DZ;
+            }
+            return;
+        }
 
-		// renderer
-		EditPointRenderer m_EditPointRenderer = null;
+        // renderer
+        EditPointRenderer m_EditPointRenderer = null;
 
-		// edit param
-		int m_nSelectIndex = NULL_SELECT_INDEX;
-		ContourEditParam m_Param = null;
-		readonly CraftData m_CraftData;
+        // edit param
+        int m_nSelectIndex = NULL_SELECT_INDEX;
+        ContourEditParam m_Param = null;
+        readonly CraftData m_CraftData;
 
-		// dlg
-		ContourEditDlg m_Dlg = null;
+        // dlg
+        ContourEditDlg m_Dlg = null;
 
-		// interactive highlight
-		AIS_Shape m_HighLightPoint = null;
+        // interactive highlight
+        AIS_Shape m_HighLightPoint = null;
 
-		// constants
-		const int NULL_SELECT_INDEX = -999;
-	}
+        // constants
+        const int NULL_SELECT_INDEX = -999;
+    }
 }

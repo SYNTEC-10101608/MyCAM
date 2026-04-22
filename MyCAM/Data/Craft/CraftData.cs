@@ -55,7 +55,7 @@ namespace MyCAM.Data
 		}
 	}
 
-	public class CADPointModifyData
+	public class ContourEditData
 	{
 		public double DX
 		{
@@ -72,23 +72,23 @@ namespace MyCAM.Data
 			get; set;
 		}
 
-		public CADPointModifyData()
+		public ContourEditData()
 		{
 			DX = 0;
 			DY = 0;
 			DZ = 0;
 		}
 
-		public CADPointModifyData( double dx, double dy, double dz )
+		public ContourEditData( double dx, double dy, double dz )
 		{
 			DX = dx;
 			DY = dy;
 			DZ = dz;
 		}
 
-		public CADPointModifyData Clone()
+		public ContourEditData Clone()
 		{
-			return new CADPointModifyData( DX, DY, DZ );
+			return new ContourEditData( DX, DY, DZ );
 		}
 	}
 
@@ -110,7 +110,7 @@ namespace MyCAM.Data
 			bool isToolVecReverse,
 			EToolVecInterpolateType interpolateType,
 			TraverseData traverseData,
-			Dictionary<int, CADPointModifyData> cadPointModifyMap )
+			Dictionary<int, ContourEditData> contourEditMap )
 		{
 			m_TechLayer = techLayer;
 			m_StartPointIndex = startPoint;
@@ -123,10 +123,10 @@ namespace MyCAM.Data
 					m_ToolVecModifyMap.Add( kvp.Key, kvp.Value.Clone() );
 				}
 			}
-			m_CADPointModifyMap = new Dictionary<int, CADPointModifyData>();
-			if( cadPointModifyMap != null ) {
-				foreach( var kvp in cadPointModifyMap ) {
-					m_CADPointModifyMap.Add( kvp.Key, kvp.Value.Clone() );
+			m_ContourEditMap = new Dictionary<int, ContourEditData>();
+			if( contourEditMap != null ) {
+				foreach( var kvp in contourEditMap ) {
+					m_ContourEditMap.Add( kvp.Key, kvp.Value.Clone() );
 				}
 			}
 			m_IsToolVecReverse = isToolVecReverse;
@@ -348,36 +348,36 @@ namespace MyCAM.Data
 			CAMFactorChanged?.Invoke();
 		}
 
-		public Dictionary<int, CADPointModifyData> CADPointModifyMap
+		public Dictionary<int, ContourEditData> ContourEditMap
 		{
 			get
 			{
-				return m_CADPointModifyMap;
+				return m_ContourEditMap;
 			}
 		}
 
-		public void SetCADPointModify( int index, double dx, double dy, double dz )
+		public void SetContourEditPoint( int index, double dx, double dy, double dz )
 		{
-			if( m_CADPointModifyMap.ContainsKey( index ) ) {
-				m_CADPointModifyMap[ index ] = new CADPointModifyData( dx, dy, dz );
+			if( m_ContourEditMap.ContainsKey( index ) ) {
+				m_ContourEditMap[ index ] = new ContourEditData( dx, dy, dz );
 			}
 			else {
-				m_CADPointModifyMap.Add( index, new CADPointModifyData( dx, dy, dz ) );
+				m_ContourEditMap.Add( index, new ContourEditData( dx, dy, dz ) );
 			}
 			CADFactorChanged?.Invoke();
 		}
 
-		public void RemoveCADPointModify( int index )
+		public void RemoveContourEditPoint( int index )
 		{
-			if( m_CADPointModifyMap.ContainsKey( index ) ) {
-				m_CADPointModifyMap.Remove( index );
+			if( m_ContourEditMap.ContainsKey( index ) ) {
+				m_ContourEditMap.Remove( index );
 			}
 			CADFactorChanged?.Invoke();
 		}
 
-		public void ClearCADPointModify()
+		public void ClearContourEditPoint()
 		{
-			m_CADPointModifyMap.Clear();
+			m_ContourEditMap.Clear();
 			CADFactorChanged?.Invoke();
 		}
 
@@ -404,6 +404,6 @@ namespace MyCAM.Data
 		TraverseData m_TraverseData = new TraverseData();
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();
 		double m_CompensatedDistance = 0;
-		Dictionary<int, CADPointModifyData> m_CADPointModifyMap = new Dictionary<int, CADPointModifyData>();
+		Dictionary<int, ContourEditData> m_ContourEditMap = new Dictionary<int, ContourEditData>();
 	}
 }

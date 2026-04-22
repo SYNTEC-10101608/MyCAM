@@ -1084,11 +1084,11 @@ namespace MyCAM.FileManager
 			set;
 		} = new List<ToolVecMapDTO>();
 
-		public List<CADPointMapDTO> CADPointModifyMap
+		public List<ContourEditMapDTO> ContourEditMap
 		{
 			get;
 			set;
-		} = new List<CADPointMapDTO>();
+		} = new List<ContourEditMapDTO>();
 
 		internal CraftDataDTO()
 		{
@@ -1118,8 +1118,8 @@ namespace MyCAM.FileManager
 			ToolVecModifyMap = ( craftData.ToolVecModifyMap ?? new Dictionary<int, ToolVecModifyData>() )
 				.Select( kvp => new ToolVecMapDTO( kvp.Key, kvp.Value.RA_deg, kvp.Value.RB_deg, kvp.Value.Master_deg, kvp.Value.Slave_deg ) )
 				.ToList();
-			CADPointModifyMap = ( craftData.CADPointModifyMap ?? new Dictionary<int, CADPointModifyData>() )
-				.Select( kvp => new CADPointMapDTO( kvp.Key, kvp.Value.DX, kvp.Value.DY, kvp.Value.DZ ) )
+			ContourEditMap = ( craftData.ContourEditMap ?? new Dictionary<int, ContourEditData>() )
+				.Select( kvp => new ContourEditMapDTO( kvp.Key, kvp.Value.DX, kvp.Value.DY, kvp.Value.DZ ) )
 				.ToList();
 		}
 
@@ -1139,15 +1139,15 @@ namespace MyCAM.FileManager
 				dto => dto.Index.Value,
 				dto => new ToolVecModifyData( dto.RA_deg.Value, dto.RB_deg.Value, dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value )
 			);
-			Dictionary<int, CADPointModifyData> cadPointModifyMap = CADPointModifyMap.ToDictionary(
+			Dictionary<int, ContourEditData> contourEditMap = ContourEditMap.ToDictionary(
 					dto => dto.Index.Value,
-					dto => new CADPointModifyData( dto.DX.Value, dto.DY.Value, dto.DZ.Value )
+					dto => new ContourEditData( dto.DX.Value, dto.DY.Value, dto.DZ.Value )
 			);
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
 			EToolVecInterpolateType interpolateType = InterpolateType.Value;
 
-			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap, IsToolVecReverse.Value, interpolateType, traverseData, cadPointModifyMap );
+			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap, IsToolVecReverse.Value, interpolateType, traverseData, contourEditMap );
 
 			// Set properties not in constructor
 			if( CumulativeTrsfMatrix == null ) {
@@ -1681,7 +1681,7 @@ namespace MyCAM.FileManager
 		}
 	}
 
-	public class CADPointMapDTO
+	public class ContourEditMapDTO
 	{
 		public int? Index
 		{
@@ -1708,11 +1708,11 @@ namespace MyCAM.FileManager
 		}
 
 		// parameterless constructor (for XmlSerializer)
-		internal CADPointMapDTO()
+		internal ContourEditMapDTO()
 		{
 		}
 
-		internal CADPointMapDTO( int index, double dx, double dy, double dz )
+		internal ContourEditMapDTO( int index, double dx, double dy, double dz )
 		{
 			Index = index;
 			DX = dx;

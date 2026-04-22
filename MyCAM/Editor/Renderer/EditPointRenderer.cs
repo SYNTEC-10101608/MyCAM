@@ -53,9 +53,9 @@ namespace MyCAM.Editor.Renderer
             var aisContext = m_Viewer.GetAISContext();
             var cadPointList = contourCache.TrsfCADPointList;
 
-            foreach( var kvp in craftData.CADPointModifyMap ) {
+            foreach( var kvp in craftData.ContourEditMap ) {
                 int cadIndex = kvp.Key;
-                CADPointModifyData modifyData = kvp.Value;
+                ContourEditData modifyData = kvp.Value;
 
                 if( cadIndex < 0 || cadIndex >= cadPointList.Count ) {
                     continue;
