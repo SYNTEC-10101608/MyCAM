@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Editor
 {
-	partial class m_lblInter
+	partial class ToolVectorDlg
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -62,35 +62,35 @@
 			// 
 			// m_btnToStart
 			// 
-			this.m_btnToStart.Location = new System.Drawing.Point(202, 372);
+			this.m_btnToStart.Location = new System.Drawing.Point(159, 372);
 			this.m_btnToStart.Margin = new System.Windows.Forms.Padding(4);
 			this.m_btnToStart.Name = "m_btnToStart";
-			this.m_btnToStart.Size = new System.Drawing.Size(53, 29);
+			this.m_btnToStart.Size = new System.Drawing.Size(85, 29);
 			this.m_btnToStart.TabIndex = 8;
-			this.m_btnToStart.Text = "|<";
+			this.m_btnToStart.Text = "至起點";
 			this.m_btnToStart.UseVisualStyleBackColor = true;
 			this.m_btnToStart.Click += new System.EventHandler(this.m_btnToStart_Click);
 			// 
 			// m_btnNext
 			// 
-			this.m_btnNext.Location = new System.Drawing.Point(327, 372);
+			this.m_btnNext.Location = new System.Drawing.Point(342, 372);
 			this.m_btnNext.Margin = new System.Windows.Forms.Padding(4);
 			this.m_btnNext.Name = "m_btnNext";
-			this.m_btnNext.Size = new System.Drawing.Size(53, 29);
+			this.m_btnNext.Size = new System.Drawing.Size(80, 29);
 			this.m_btnNext.TabIndex = 7;
-			this.m_btnNext.Text = "->";
+			this.m_btnNext.Text = "後一點";
 			this.m_btnNext.UseVisualStyleBackColor = true;
 			this.m_btnNext.MouseDown += new System.Windows.Forms.MouseEventHandler(this.m_btnNext_MouseDown);
 			this.m_btnNext.MouseUp += new System.Windows.Forms.MouseEventHandler(this.m_btnNext_MouseUp);
 			// 
 			// m_btnPrev
 			// 
-			this.m_btnPrev.Location = new System.Drawing.Point(266, 372);
+			this.m_btnPrev.Location = new System.Drawing.Point(252, 372);
 			this.m_btnPrev.Margin = new System.Windows.Forms.Padding(4);
 			this.m_btnPrev.Name = "m_btnPrev";
-			this.m_btnPrev.Size = new System.Drawing.Size(53, 29);
+			this.m_btnPrev.Size = new System.Drawing.Size(82, 29);
 			this.m_btnPrev.TabIndex = 6;
-			this.m_btnPrev.Text = "<-";
+			this.m_btnPrev.Text = "前一點";
 			this.m_btnPrev.UseVisualStyleBackColor = true;
 			this.m_btnPrev.MouseDown += new System.Windows.Forms.MouseEventHandler(this.m_btnPrev_MouseDown);
 			this.m_btnPrev.MouseUp += new System.Windows.Forms.MouseEventHandler(this.m_btnPrev_MouseUp);
@@ -417,16 +417,16 @@
 			// 
 			// m_btnToEnd
 			// 
-			this.m_btnToEnd.Location = new System.Drawing.Point(392, 372);
+			this.m_btnToEnd.Location = new System.Drawing.Point(423, 372);
 			this.m_btnToEnd.Margin = new System.Windows.Forms.Padding(4);
 			this.m_btnToEnd.Name = "m_btnToEnd";
-			this.m_btnToEnd.Size = new System.Drawing.Size(53, 29);
+			this.m_btnToEnd.Size = new System.Drawing.Size(74, 29);
 			this.m_btnToEnd.TabIndex = 9;
-			this.m_btnToEnd.Text = ">|";
+			this.m_btnToEnd.Text = "至終點";
 			this.m_btnToEnd.UseVisualStyleBackColor = true;
 			this.m_btnToEnd.Click += new System.EventHandler(this.m_btnToEnd_Click);
 			// 
-			// m_lblInter
+			// ToolVectorDlg
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -440,7 +440,7 @@
 			this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.Name = "m_lblInter";
+			this.Name = "ToolVectorDlg";
 			this.ShowIcon = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "姿態";

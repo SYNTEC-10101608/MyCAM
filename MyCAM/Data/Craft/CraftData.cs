@@ -19,6 +19,9 @@ namespace MyCAM.Data
 		{
 			get
 			{
+				if( m_StartPnt == null ) {
+					m_StartPnt = new ToolVecModifyData();
+				}
 				return m_StartPnt;
 			}
 			set
@@ -30,11 +33,13 @@ namespace MyCAM.Data
 			}
 		}
 
-
 		public ToolVecModifyData EndPnt
 		{
 			get
 			{
+				if( m_EndPnt == null ) {
+					m_EndPnt = new ToolVecModifyData();
+				}
 				return m_EndPnt;
 			}
 			set
@@ -46,8 +51,11 @@ namespace MyCAM.Data
 			}
 		}
 
+		// init both start and end point as null ToolVecAngleData, and also with default interpolation type
 		public StartPntToolVecParam()
 		{
+			StartPnt = new ToolVecModifyData();
+			EndPnt = new ToolVecModifyData();
 		}
 
 		public StartPntToolVecParam( ToolVecModifyData startPntData, ToolVecModifyData endPntData )
@@ -144,6 +152,7 @@ namespace MyCAM.Data
 			{
 				if( m_IsPathReverse != value ) {
 					m_IsPathReverse = value;
+					ChangeStartPntParam();
 					CAMFactorChanged?.Invoke();
 				}
 			}
@@ -294,11 +303,12 @@ namespace MyCAM.Data
 		// API for outside modification
 		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg, double master_deg, double slave_deg, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
 		{
+			ToolVecAngleData angleData = new ToolVecAngleData( dRA_deg, dRB_deg, master_deg, slave_deg );
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				m_ToolVecModifyMap[ index ] = new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg, m_ToolVecModifyMap[ index ].InterpolateType );
+				m_ToolVecModifyMap[ index ] = new ToolVecModifyData( angleData, m_ToolVecModifyMap[ index ].InterpolateType );
 			}
 			else {
-				m_ToolVecModifyMap.Add( index, new ToolVecModifyData( dRA_deg, dRB_deg, master_deg, slave_deg, interpolateType ) );
+				m_ToolVecModifyMap.Add( index, new ToolVecModifyData( angleData, interpolateType ) );
 			}
 			CAMFactorChanged?.Invoke();
 		}
@@ -307,6 +317,8 @@ namespace MyCAM.Data
 		{
 			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
 				if( IsPathReverse == false ) {
+
+					// the interpolat type will be set to next modify idx 
 					bool isFoundNext = FindNextMapIndex( index, out int nNextIdx );
 					if( isFoundNext ) {
 						m_ToolVecModifyMap.Remove( index, nNextIdx );
@@ -318,16 +330,10 @@ namespace MyCAM.Data
 					}
 				}
 				else {
-					{
-						bool isFoundPre = FindPreMapIndex( index, out int nPreIdx );
-						if( isFoundPre ) {
-							m_ToolVecModifyMap.Remove( index, nPreIdx );
-						}
-						else {
-							m_ToolVecModifyMap.Remove( index );
-						}
 
-					}
+					// this region interpolate type in revese case is record at pre index
+					// remove this index means pre region will include this region, so type do not have to change )
+					m_ToolVecModifyMap.Remove( index );
 				}
 			}
 			CAMFactorChanged?.Invoke();
@@ -340,7 +346,16 @@ namespace MyCAM.Data
 				ToolVecModifyMap[ nNextIdx ].InterpolateType = interpolateType;
 			}
 			else {
-				StartPntToolVecData.EndPnt.InterpolateType = interpolateType;
+				if( IsPathReverse ) {
+
+					// first region is record on first pnt (in reverse case this region type is recorded at preidx)
+					StartPntToolVecData.StartPnt.InterpolateType = interpolateType;
+				}
+
+				// last region is record on end pnt
+				else {
+					StartPntToolVecData.EndPnt.InterpolateType = interpolateType;
+				}
 			}
 			CAMFactorChanged?.Invoke();
 
@@ -349,32 +364,42 @@ namespace MyCAM.Data
 		public void ClearToolVecModify()
 		{
 			m_ToolVecModifyMap.Clear();
-			StartPntToolVecData = null;
+			StartPntToolVecData = new StartPntToolVecParam();
 			CAMFactorChanged?.Invoke();
 		}
 
-		void SubscribeSubParamChanged()
+		public bool IsStartPntModified( bool isStartIdx, out ToolVecAngleData toolVecAngleData, out EToolVecInterpolateType type )
 		{
-			m_LeadData.PropertyChanged += SubParamChanged;
-			m_TraverseData.PropertyChanged += SubParamChanged;
-			m_StartPntToolVecData.PropertyChanged += SubParamChanged;
+			toolVecAngleData = null;
+			type = EToolVecInterpolateType.Normal;
+			if( isStartIdx ) {
+				if( StartPntToolVecData != null && StartPntToolVecData.StartPnt != null && StartPntToolVecData.StartPnt.AngleData != null ) {
+					toolVecAngleData = StartPntToolVecData.StartPnt.AngleData;
+					type = StartPntToolVecData.StartPnt.InterpolateType;
+					return true;
+				}
+				return false;
+			}
+
+			// is end idx
+			if( StartPntToolVecData != null && StartPntToolVecData.EndPnt != null && StartPntToolVecData.EndPnt.AngleData != null ) {
+				toolVecAngleData = StartPntToolVecData.EndPnt.AngleData;
+				type = StartPntToolVecData.EndPnt.InterpolateType;
+				return true;
+			}
+			return false;
 		}
 
-		void SubParamChanged()
-		{
-			CAMFactorChanged?.Invoke();
-		}
-
-
+		// let path know this region type (region type is record at the end of region )
 		public bool FindNextMapIndex( int currentIdx, out int nextIdx )
 		{
 			int StartPntIdx = m_StartPointIndex;
+
 			// find the smallest key that is greater than the removed key
 			nextIdx = -1;
 			bool found = false;
 
 			if( currentIdx > StartPntIdx ) {
-
 
 				// find the smallest key that is greater than currentIdx till the end
 				foreach( int k in ToolVecModifyMap.Keys ) {
@@ -399,9 +424,7 @@ namespace MyCAM.Data
 					}
 				}
 			}
-
 			else {
-
 				foreach( int k in ToolVecModifyMap.Keys ) {
 					if( k > StartPntIdx ) {
 						break;
@@ -416,45 +439,29 @@ namespace MyCAM.Data
 			return found;
 		}
 
-		public bool FindPreMapIndex( int currentIdx, out int preIdx )
+		void SubscribeSubParamChanged()
 		{
-			int StartPntIdx = m_StartPointIndex;
-			preIdx = -1;
-			bool found = false;
+			m_LeadData.PropertyChanged += SubParamChanged;
+			m_TraverseData.PropertyChanged += SubParamChanged;
+			m_StartPntToolVecData.PropertyChanged += SubParamChanged;
+		}
 
-			if( currentIdx > StartPntIdx ) {
+		void SubParamChanged()
+		{
+			CAMFactorChanged?.Invoke();
+		}
 
-				//find the biggest key that is smaller than currentIdx and bigger than start point index
-				foreach( int k in ToolVecModifyMap.Keys ) {
-					if( k > currentIdx ) {
-						break;
-					}
-					if( k > StartPntIdx && k < currentIdx ) {
-						preIdx = k;
-						found = true;
-					}
-				}
+		void ChangeStartPntParam()
+		{
+			if( StartPntToolVecData == null ) {
+				StartPntToolVecData = new StartPntToolVecParam();
+				return;
 			}
-			else {
-				// find the biggest key that is smaller than currentIdx
-				foreach( int k in ToolVecModifyMap.Keys ) {
-					if( k < currentIdx ) {
-						preIdx = k;
-						found = true;
-					}
-				}
 
-				// find th biggest key that is bigger than start point index
-				if( found == false ) {
-					foreach( int k in ToolVecModifyMap.Keys ) {
-						if( k > StartPntIdx ) {
-							preIdx = k;
-							found = true;
-						}
-					}
-				}
-			}
-			return found;
+			// change angle data
+			ToolVecModifyData newEnd = StartPntToolVecData.StartPnt;
+			ToolVecModifyData newStart = StartPntToolVecData.EndPnt;
+			StartPntToolVecData = new StartPntToolVecParam( newStart, newEnd );
 		}
 
 		const int DEFAULT_TECH_LAYER = 1;

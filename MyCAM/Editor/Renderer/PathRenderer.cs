@@ -114,12 +114,12 @@ namespace MyCAM.Editor
 				// Show original path if there is any compensation or transformation applied, to visualize the difference
 				ShowOriginalPath( pathID, trsf );
 
-				IReadOnlyList<gp_Pnt> pointList = RendererHelper.GetMainPathPointList( pathID );
+				IReadOnlyList<gp_Pnt> pointList = ToolVecAndPathVisibleHelper.GetMainPathPointList( pathID );
 				if( pointList == null || pointList.Count < 2 ) {
 					continue;
 				}
 
-				TopoDS_Wire pathWire = RendererHelper.CreatePolylineWire( pointList );
+				TopoDS_Wire pathWire = ToolVecAndPathVisibleHelper.CreatePolylineWire( pointList );
 				if( pathWire == null || pathWire.IsNull() ) {
 					continue;
 				}
@@ -244,7 +244,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			TopoDS_Wire pathOriWire = RendererHelper.CreatePolylineWire( originalPointList );
+			TopoDS_Wire pathOriWire = ToolVecAndPathVisibleHelper.CreatePolylineWire( originalPointList );
 			if( pathOriWire == null || pathOriWire.IsNull() ) {
 				return;
 			}

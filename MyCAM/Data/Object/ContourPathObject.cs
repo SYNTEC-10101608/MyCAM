@@ -37,6 +37,7 @@ namespace MyCAM.Data
 			m_ContourGeomData = geomData;
 			m_CraftData = craftData;
 			m_ContourCache = new ContourCache( m_ContourGeomData, m_CraftData );
+			BuildUnClosePathStartEndPntParam();
 		}
 
 		public ContourGeomData GeomData
@@ -74,6 +75,27 @@ namespace MyCAM.Data
 
 			// Step3:recalculate cache, currently dont really need gp_trsf
 			m_ContourCache.DoTransform( transform );
+		}
+
+		// old file may have no start end point param for unclosed path
+		void BuildUnClosePathStartEndPntParam()
+		{
+			if( m_ContourGeomData.IsClosed ) {
+				return;
+			}
+			int lastIndex = m_ContourCache.MainPathPointList.Count - 1;
+
+			// cad end point is in the map
+			m_CraftData.ToolVecModifyMap.TryGetValue( lastIndex, out ToolVecModifyData toolVecModifyData );
+			if (toolVecModifyData == null ) {
+				return;
+			}
+			ToolVecModifyData modifyData = toolVecModifyData.Clone();
+			if( m_CraftData.IsPathReverse ) {
+				m_CraftData.StartPntToolVecData.StartPnt = modifyData;
+				return;
+			}
+			m_CraftData.StartPntToolVecData.EndPnt = modifyData;
 		}
 
 		bool DetermineIfClosed( TopoDS_Shape shapeData )

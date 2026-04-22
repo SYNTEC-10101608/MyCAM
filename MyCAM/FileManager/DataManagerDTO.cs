@@ -1121,10 +1121,15 @@ namespace MyCAM.FileManager
 							: new TraverseDataDTO();
 			OverCutLength = craftData.OverCutLength;
 			ToolVecModifyMap_New = craftData.ToolVecModifyMap.ToDictionary()
-				.Select( kvp => new ToolVecMap2DTO( kvp.Key, kvp.Value.RA_deg, kvp.Value.RB_deg, kvp.Value.Master_deg, kvp.Value.Slave_deg, kvp.Value.InterpolateType ) )
+				.Select( kvp => new ToolVecMap2DTO( kvp.Key, kvp.Value.AngleData, kvp.Value.InterpolateType ) )
 				.ToList();
+
 			if( craftData.StartPntToolVecData != null ) {
 				StartPntToolVecData = new StartPntToolVecParamDTO( craftData.StartPntToolVecData );
+			}
+			else {
+				// create empty node
+				StartPntToolVecData = new StartPntToolVecParamDTO();
 			}
 		}
 
@@ -1144,16 +1149,14 @@ namespace MyCAM.FileManager
 
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
-
-			// Build ToolVecModifyMap from file data
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion );
-
-			// Build StartPntToolVecData
-			StartPntToolVecParam startPntToolVecParam = BuildStartPntToolVecParam( sourceMap_OldVersion );
-
+			StartPntToolVecParam startPntToolVecParam = BuildStartPntToolVecParam( sourceMap_OldVersion, IsPathReverse.Value );
 			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value,
-												  leadData, OverCutLength.Value, toolVecModifyMap,
-												  startPntToolVecParam, IsToolVecReverse.Value, traverseData );
+												 leadData, OverCutLength.Value, toolVecModifyMap,
+												 startPntToolVecParam, IsToolVecReverse.Value, traverseData );
+
+			// old version may have start/end point in ToolVecModifyMap, those are move to StartPntToolVecData
+			RemoveOldMapStartEndPoint( craftData );
 
 			// Set properties not in constructor
 			if( CumulativeTrsfMatrix == null ) {
@@ -1166,17 +1169,59 @@ namespace MyCAM.FileManager
 			return craftData;
 		}
 
-		Dictionary<int, ToolVecModifyData> BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion )
+		void RemoveOldMapStartEndPoint( CraftData craftData )
+		{
+			if( craftData.ToolVecModifyMap.ContainsKey( StartPoint.Value ) ) {
+				craftData.ToolVecModifyMap.Remove( StartPoint.Value );
+			}
+			if( craftData.ToolVecModifyMap.ContainsKey( LAST_POINT_INDEX ) ) {
+				craftData.ToolVecModifyMap.Remove( LAST_POINT_INDEX );
+			}
+		}
+
+		Dictionary<int, ToolVecModifyData> ToToolVecModifyMap()
 		{
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
-			sourceMap_OldVersion = null;
+			if( ToolVecModifyMap_New == null ) {
+				return toolVecModifyMap;
+			}
 
-			// Determine which version of ToolVecModifyMap to use;
+			// Read from ToolVecModifyMap_New, each entry has its own InterpolateType
+			foreach( var dto in ToolVecModifyMap_New ) {
+				if( dto.Index.HasValue ) {
+					toolVecModifyMap[ dto.Index.Value ] = dto.ToToolVecModifyData();
+				}
+			}
+			return toolVecModifyMap;
+		}
+
+		Dictionary<int, ToolVecModifyData> ToToolVecModifyMap( EToolVecInterpolateType globalInterpolateType )
+		{
+			Dictionary<int, ToolVecModifyData> toolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
+			if( ToolVecModifyMap == null ) {
+				return toolVecModifyMap;
+			}
+
+			// read from ToolVecModifyMap(old data), apply global InterpolateType to all entries
+			foreach( ToolVecMapDTO dto in ToolVecModifyMap ) {
+				if( dto.Index.HasValue ) {
+					toolVecModifyMap[ dto.Index.Value ] = dto.ToToolVecModifyData( globalInterpolateType );
+				}
+				else {
+					throw new ArgumentException( "CraftData deserialization failed: ToolVecModifyMap entry missing Index." );
+				}
+			}
+			return toolVecModifyMap;
+		}
+
+		Dictionary<int, ToolVecModifyData> BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion )
+		{
+			sourceMap_OldVersion = null;
 			// if do not have any control pnt , toolVecModifyMap will still not be empty(construct protection)
 			bool isOldVersion = ToolVecModifyMap != null && ToolVecModifyMap.Count > 0;
 
 			if( isOldVersion ) {
-				// Need InterpolateType from global field
+				// need InterpolateType from global field
 				if( !InterpolateType.HasValue ) {
 					throw new ArgumentException( "CraftData deserialization failed: Old version file missing InterpolateType field." );
 				}
@@ -1184,85 +1229,72 @@ namespace MyCAM.FileManager
 				EToolVecInterpolateType globalInterpolateType = InterpolateType.Value;
 				sourceMap_OldVersion = ToolVecModifyMap;
 
-				// Read from ToolVecModifyMap, apply global InterpolateType to all entries
-				foreach( var dto in ToolVecModifyMap ) {
-					if( dto.Index.HasValue ) {
-						toolVecModifyMap[ dto.Index.Value ] =
-							new ToolVecModifyData( dto.RA_deg ?? 0, dto.RB_deg ?? 0,
-													dto.MasterAngle_deg ?? 0, dto.SlaveAngle_deg ?? 0,
-													globalInterpolateType );
-					}
-				}
+				// Use new method for legacy ToolVecModifyMap deserialization
+				return ToToolVecModifyMap( globalInterpolateType );
 			}
 			else {
-				// Read from ToolVecModifyMap_New, each entry has its own InterpolateType
-				foreach( var dto in ToolVecModifyMap_New ) {
-					if( dto.Index.HasValue && dto.RA_deg.HasValue && dto.RB_deg.HasValue &&
-						dto.MasterAngle_deg.HasValue && dto.SlaveAngle_deg.HasValue ) {
-						// Use the InterpolateType from the entry, default to Normal if null
-						EToolVecInterpolateType entryInterpolateType = dto.InterpolateType ?? EToolVecInterpolateType.Normal;
-						toolVecModifyMap[ dto.Index.Value ] =
-							new ToolVecModifyData( dto.RA_deg.Value, dto.RB_deg.Value,
-													dto.MasterAngle_deg.Value, dto.SlaveAngle_deg.Value,
-													entryInterpolateType );
-					}
-				}
+				// Use new method for ToolVecModifyMap_New deserialization
+				return ToToolVecModifyMap();
 			}
-			return toolVecModifyMap;
 		}
 
-		StartPntToolVecParam BuildStartPntToolVecParam( List<ToolVecMapDTO> sourceMap_OldVersion )
+		StartPntToolVecParam BuildStartPntToolVecParam( List<ToolVecMapDTO> sourceMap_OldVersion, bool isPathReverse )
 		{
-			// If StartPntToolVecData node exists, use it directly
+			// new version with StartPntToolVecData
 			if( StartPntToolVecData != null ) {
 				return StartPntToolVecData.ToStartPntToolVecParam();
 			}
 
-			// Backward compatibility: if StartPntToolVecData node was absent and we're reading old version,
-			// try to build StartPnt/EndPnt from entries with index matching StartPoint and -1
-			if( sourceMap_OldVersion != null ) {
-				if( !InterpolateType.HasValue ) {
-					throw new ArgumentException( "CraftData deserialization failed: Old version file missing InterpolateType field." );
-				}
-
-				// old version do not have InterpolateType in each entry
-				EToolVecInterpolateType globalInterpolateType = InterpolateType.Value;
-
-				// Old ToolVecMapDTO format: index matching StartPoint = StartPnt, index -1 = EndPnt
-				ToolVecMapDTO startPntToolVecData = sourceMap_OldVersion.FirstOrDefault( d => d.Index.HasValue && d.Index.Value == StartPoint );
-				ToolVecMapDTO EndPntToolVecData = sourceMap_OldVersion.FirstOrDefault( d => d.Index.HasValue && d.Index.Value == -1 );
-
-				if( startPntToolVecData != null || EndPntToolVecData != null ) {
-					ToolVecModifyData startPnt = null;
-					ToolVecModifyData endPnt = null;
-
-					if( startPntToolVecData != null ) {
-						startPnt = new ToolVecModifyData( startPntToolVecData.RA_deg ?? 0, startPntToolVecData.RB_deg ?? 0,
-															startPntToolVecData.MasterAngle_deg ?? 0, startPntToolVecData.SlaveAngle_deg ?? 0,
-															globalInterpolateType );
-					}
-					if( EndPntToolVecData != null ) {
-						endPnt = new ToolVecModifyData( EndPntToolVecData.RA_deg ?? 0, EndPntToolVecData.RB_deg ?? 0,
-														  EndPntToolVecData.MasterAngle_deg ?? 0, EndPntToolVecData.SlaveAngle_deg ?? 0,
-														  globalInterpolateType );
-					}
-
-					// If only one is present, clone it for the other
-					if( startPnt != null && endPnt == null ) {
-						endPnt = startPnt.Clone();
-					}
-					else if( endPnt != null && startPnt == null ) {
-						startPnt = endPnt.Clone();
-					}
-					return new StartPntToolVecParam( startPnt, endPnt );
-				}
+			// old version without map
+			if( sourceMap_OldVersion == null ) {
+				return new StartPntToolVecParam();
 			}
 
-			// No StartPntToolVecData found, return empty param
-			return new StartPntToolVecParam();
+			// old version only have 1 interpolate type for all points
+			if( !InterpolateType.HasValue ) {
+				throw new ArgumentException( "CraftData deserialization failed: Old version file missing InterpolateType field." );
+			}
+			EToolVecInterpolateType globalInterpolateType = InterpolateType.Value;
+
+			// find start and end point data from old version
+			ToolVecMapDTO startData = sourceMap_OldVersion.FirstOrDefault( d => d.Index.HasValue && d.Index.Value == StartPoint );
+			ToolVecMapDTO endData = sourceMap_OldVersion.FirstOrDefault( d => d.Index.HasValue && d.Index.Value == LAST_POINT_INDEX );
+
+			if( startData == null && endData == null ) {
+				return new StartPntToolVecParam();
+			}
+
+			// get start / end data from DTO
+			ToolVecModifyData startPnt = CreateToolVecModifyDataFromDTO( startData, globalInterpolateType );
+			ToolVecModifyData endPnt = CreateToolVecModifyDataFromDTO( endData, globalInterpolateType );
+
+			// swap start and end when path is reversed
+			if( isPathReverse ) {
+				ToolVecModifyData temp = startPnt;
+				startPnt = endPnt;
+				endPnt = temp;
+			}
+			return new StartPntToolVecParam( startPnt, endPnt );
+		}
+
+		ToolVecModifyData CreateToolVecModifyDataFromDTO( ToolVecMapDTO dto, EToolVecInterpolateType interpolateType )
+		{
+			if( dto == null ) {
+				return new ToolVecModifyData( interpolateType );
+			}
+
+			ToolVecAngleData angleData = new ToolVecAngleData(
+				dto.RA_deg ?? 0,
+				dto.RB_deg ?? 0,
+				dto.MasterAngle_deg ?? 0,
+				dto.SlaveAngle_deg ?? 0
+			);
+
+			return new ToolVecModifyData( angleData, interpolateType );
 		}
 
 		const int DEFAULT_TECH_LAYER = 1;
+		const int LAST_POINT_INDEX = -1;
 	}
 
 	public class TraverseDataDTO
@@ -1782,6 +1814,22 @@ namespace MyCAM.FileManager
 			MasterAngle_deg = masterAngle_deg;
 			SlaveAngle_deg = slaveAngle_deg;
 		}
+
+		// DTO conversion method, similar to ToLeadData()
+		internal ToolVecModifyData ToToolVecModifyData( EToolVecInterpolateType interpolateType )
+		{
+			if( !Index.HasValue || !RA_deg.HasValue || !RB_deg.HasValue || !MasterAngle_deg.HasValue || !SlaveAngle_deg.HasValue ) {
+				throw new ArgumentException( "ToolVecMapDTO deserialization failed: Index is required." );
+			}
+			ToolVecAngleData angleData = new ToolVecAngleData(
+				RA_deg ?? 0,
+				RB_deg ?? 0,
+				MasterAngle_deg ?? 0,
+				SlaveAngle_deg ?? 0
+			);
+
+			return new ToolVecModifyData( angleData, interpolateType );
+		}
 	}
 
 	public class ToolVecMap2DTO
@@ -1792,29 +1840,11 @@ namespace MyCAM.FileManager
 			set;
 		}
 
-		public double? RA_deg
+		public ToolVecAngleDataDTO AngleDataDTO
 		{
 			get;
 			set;
-		}
-
-		public double? RB_deg
-		{
-			get;
-			set;
-		}
-
-		public double? MasterAngle_deg
-		{
-			get;
-			set;
-		}
-
-		public double? SlaveAngle_deg
-		{
-			get;
-			set;
-		}
+		} = new ToolVecAngleDataDTO();
 
 		public EToolVecInterpolateType? InterpolateType
 		{
@@ -1827,288 +1857,370 @@ namespace MyCAM.FileManager
 		{
 		}
 
-		internal ToolVecMap2DTO( int index, double ra_deg, double rb_deg, double masterAngle_deg, double slaveAngle_deg, EToolVecInterpolateType interpolateType )
+		internal ToolVecMap2DTO( int index, ToolVecAngleData toolVecAngleData, EToolVecInterpolateType interpolateType )
 		{
 			Index = index;
-			RA_deg = ra_deg;
-			RB_deg = rb_deg;
-			MasterAngle_deg = masterAngle_deg;
-			SlaveAngle_deg = slaveAngle_deg;
+			AngleDataDTO = new ToolVecAngleDataDTO( toolVecAngleData );
 			InterpolateType = interpolateType;
 		}
-	}
 
-	public class ToolVecModifyData2DTO
-	{
-		public double? RA_deg
+		/// <summary>
+		/// Convert ToolVecMap2DTO to ToolVecModifyData
+		/// </summary>
+		/// <returns>ToolVecModifyData object</returns>
+		internal ToolVecModifyData ToToolVecModifyData()
 		{
-			get;
-			set;
-		}
-
-		public double? RB_deg
-		{
-			get;
-			set;
-		}
-
-		public double? Master_deg
-		{
-			get;
-			set;
-		}
-
-		public double? Slave_deg
-		{
-			get;
-			set;
-		}
-
-		public EToolVecInterpolateType? InterpolateType
-		{
-			get;
-			set;
-		}
-
-		internal ToolVecModifyData2DTO()
-		{
-		}
-
-		internal ToolVecModifyData2DTO( ToolVecModifyData data )
-		{
-			if( data == null ) {
-				return;
-			}
-			RA_deg = data.RA_deg;
-			RB_deg = data.RB_deg;
-			Master_deg = data.Master_deg;
-			Slave_deg = data.Slave_deg;
-			InterpolateType = data.InterpolateType;
-		}
-
-		internal ToolVecModifyData ToToolVecModifyData2()
-		{
-			return new ToolVecModifyData(
-				RA_deg ?? 0,
-				RB_deg ?? 0,
-				Master_deg ?? 0,
-				Slave_deg ?? 0,
-				InterpolateType ?? EToolVecInterpolateType.Normal );
-		}
-	}
-
-	public class StartPntToolVecParamDTO
-	{
-		public ToolVecModifyData2DTO StartPnt
-		{
-			get;
-			set;
-		}
-
-		public ToolVecModifyData2DTO EndPnt
-		{
-			get;
-			set;
-		}
-
-		internal StartPntToolVecParamDTO()
-		{
-		}
-
-		internal StartPntToolVecParamDTO( StartPntToolVecParam param )
-		{
-			if( param == null ) {
-				return;
-			}
-			if( param.StartPnt != null ) {
-				StartPnt = new ToolVecModifyData2DTO( param.StartPnt );
-			}
-			if( param.EndPnt != null ) {
-				EndPnt = new ToolVecModifyData2DTO( param.EndPnt );
-			}
-		}
-
-		internal StartPntToolVecParam ToStartPntToolVecParam()
-		{
-			ToolVecModifyData startPnt = StartPnt?.ToToolVecModifyData2();
-			ToolVecModifyData endPnt = EndPnt?.ToToolVecModifyData2();
-			return new StartPntToolVecParam( startPnt, endPnt );
-		}
-	}
-
-	public class ShapeIDsDTO
-	{
-		public int? SolidID
-		{
-			get; set;
-		}
-
-		public int? ShellID
-		{
-			get; set;
-		}
-
-		public int? FaceID
-		{
-			get; set;
-		}
-
-		public int? WireID
-		{
-			get; set;
-		}
-
-		public int? EdgeID
-		{
-			get; set;
-		}
-
-		public int? VertexID
-		{
-			get; set;
-		}
-
-		public int? PathID
-		{
-			get; set;
-		}
-
-		internal ShapeIDsDTO()
-		{
-		}
-
-		internal ShapeIDsDTO( ShapeIDsStruct shapeIDsStruct )
-		{
-			SolidID = shapeIDsStruct.Solid_ID;
-			ShellID = shapeIDsStruct.Shell_ID;
-			FaceID = shapeIDsStruct.Face_ID;
-			WireID = shapeIDsStruct.Wire_ID;
-			EdgeID = shapeIDsStruct.Edge_ID;
-			VertexID = shapeIDsStruct.Vertex_ID;
-			PathID = shapeIDsStruct.Path_ID;
-		}
-
-		internal ShapeIDsStruct ToShapeIDStruct()
-		{
-			if( !SolidID.HasValue || !ShellID.HasValue || !FaceID.HasValue ||
-				!WireID.HasValue || !EdgeID.HasValue || !VertexID.HasValue || !PathID.HasValue ) {
-				throw new ArgumentException( "ShapeIDsStruct deserialization failed." );
-			}
-			return new ShapeIDsStruct()
-			{
-				Solid_ID = SolidID.Value,
-				Shell_ID = ShellID.Value,
-				Face_ID = FaceID.Value,
-				Wire_ID = WireID.Value,
-				Edge_ID = EdgeID.Value,
-				Vertex_ID = VertexID.Value,
-				Path_ID = PathID.Value,
-			};
-		}
-	}
-
-	public class gp_TrsfDTO
-	{
-		// Transformation matrix values (3x4 matrix)
-		// Row 1
-		public double? M11
-		{
-			get; set;
-		}
-		public double? M12
-		{
-			get; set;
-		}
-		public double? M13
-		{
-			get; set;
-		}
-		public double? M14
-		{
-			get; set;
-		}
-
-		// Row 2
-		public double? M21
-		{
-			get; set;
-		}
-		public double? M22
-		{
-			get; set;
-		}
-		public double? M23
-		{
-			get; set;
-		}
-		public double? M24
-		{
-			get; set;
-		}
-
-		// Row 3
-		public double? M31
-		{
-			get; set;
-		}
-		public double? M32
-		{
-			get; set;
-		}
-		public double? M33
-		{
-			get; set;
-		}
-		public double? M34
-		{
-			get; set;
-		}
-
-		// parameterless constructor (for XmlSerializer)
-		public gp_TrsfDTO()
-		{
-		}
-
-		internal gp_TrsfDTO( gp_Trsf trsf )
-		{
-			if( trsf == null ) {
-				return;
+			if( !Index.HasValue ) {
+				throw new ArgumentException( "ToolVecMap2DTO deserialization failed: Index is required." );
 			}
 
-			// Get transformation matrix values
-			// gp_Trsf uses Value(row, col) method where indices are 1-based
-			M11 = trsf.Value( 1, 1 );
-			M12 = trsf.Value( 1, 2 );
-			M13 = trsf.Value( 1, 3 );
-			M14 = trsf.Value( 1, 4 );
-			M21 = trsf.Value( 2, 1 );
-			M22 = trsf.Value( 2, 2 );
-			M23 = trsf.Value( 2, 3 );
-			M24 = trsf.Value( 2, 4 );
-			M31 = trsf.Value( 3, 1 );
-			M32 = trsf.Value( 3, 2 );
-			M33 = trsf.Value( 3, 3 );
-			M34 = trsf.Value( 3, 4 );
-		}
+			// Use the InterpolateType from the entry, default to Normal if null
+			EToolVecInterpolateType entryInterpolateType = InterpolateType ?? EToolVecInterpolateType.Normal;
+			ToolVecAngleData angleData = AngleDataDTO?.ToToolVecAngleData();
 
-		internal gp_Trsf ToTrsf()
-		{
-			if( !M11.HasValue || !M12.HasValue || !M13.HasValue || !M14.HasValue ||
-				!M21.HasValue || !M22.HasValue || !M23.HasValue || !M24.HasValue ||
-				!M31.HasValue || !M32.HasValue || !M33.HasValue || !M34.HasValue ) {
-				throw new ArgumentException( "gp_Trsf deserialization failed." );
-			}
-			gp_Trsf trsf = new gp_Trsf();
-
-			// Set transformation matrix values
-			// gp_Trsf uses SetValues method to set the matrix
-			trsf.SetValues(
-				M11.Value, M12.Value, M13.Value, M14.Value,
-				M21.Value, M22.Value, M23.Value, M24.Value,
-				M31.Value, M32.Value, M33.Value, M34.Value
-			);
-
-			return trsf;
+			return new ToolVecModifyData( angleData, entryInterpolateType );
 		}
 	}
 }
+
+public class ToolVecModifyData2DTO
+{
+	public ToolVecAngleDataDTO AngleData
+	{
+		get;
+		set;
+	}
+
+	public EToolVecInterpolateType? InterpolateType
+	{
+		get;
+		set;
+	} = EToolVecInterpolateType.Normal;
+
+	internal ToolVecModifyData2DTO()
+	{
+		// use empty AngleData to ensure XML node exists, and mark it as null
+		AngleData = new ToolVecAngleDataDTO();
+		AngleData.IsNull = true;
+	}
+
+	internal ToolVecModifyData2DTO( ToolVecModifyData data )
+	{
+		if( data == null ) {
+			// build empty AngleData to ensure XML node exists
+			AngleData = new ToolVecAngleDataDTO();
+			AngleData.IsNull = true;
+			return;
+		}
+
+		// even if data.AngleData is null, to ensure XML node exists
+		if( data.AngleData != null ) {
+			AngleData = new ToolVecAngleDataDTO( data.AngleData );
+		}
+		else {
+			AngleData = new ToolVecAngleDataDTO();
+		}
+		InterpolateType = data.InterpolateType;
+	}
+
+	internal ToolVecModifyData ToToolVecModifyData()
+	{
+		ToolVecAngleData angleData = AngleData?.ToToolVecAngleData();
+		EToolVecInterpolateType interpolateType = InterpolateType ?? EToolVecInterpolateType.Normal;
+		return new ToolVecModifyData( angleData, interpolateType );
+	}
+}
+
+public class ToolVecAngleDataDTO
+{
+	public double? RA_deg
+	{
+		get;
+		set;
+	}
+
+	public double? RB_deg
+	{
+		get;
+		set;
+	}
+
+	public double? MasterAngle_deg
+	{
+		get;
+		set;
+	}
+
+	public double? SlaveAngle_deg
+	{
+		get;
+		set;
+	}
+
+	// null tag to 
+	public bool IsNull
+	{
+		get;
+		set;
+	} = false;
+
+	internal ToolVecAngleDataDTO()
+	{
+		IsNull = true;
+		return;
+	}
+
+	internal ToolVecAngleDataDTO( ToolVecAngleData data )
+	{
+		if( data == null ) {
+			IsNull = true;
+			return;
+		}
+		IsNull = false;
+		RA_deg = data.RA_deg;
+		RB_deg = data.RB_deg;
+		MasterAngle_deg = data.Master_deg;
+		SlaveAngle_deg = data.Slave_deg;
+	}
+
+	internal ToolVecAngleData ToToolVecAngleData()
+	{
+		if( IsNull ) {
+			return new ToolVecAngleData();
+		}
+		if( !RA_deg.HasValue || !RB_deg.HasValue || !MasterAngle_deg.HasValue || !SlaveAngle_deg.HasValue ) {
+			throw new ArgumentException( "ToolVecMapDTO deserialization failed: Index is required." );
+		}
+		double RA_Value = RA_deg ?? 0;
+		double RB_Value = RB_deg ?? 0;
+		double MasterAngle_Value = MasterAngle_deg ?? 0;
+		double SlaveAngle_Value = SlaveAngle_deg ?? 0;
+		return new ToolVecAngleData( RA_Value, RB_Value, MasterAngle_Value, SlaveAngle_Value );
+	}
+}
+
+public class StartPntToolVecParamDTO
+{
+	public ToolVecModifyData2DTO StartPnt
+	{
+		get;
+		set;
+	}
+
+	public ToolVecModifyData2DTO EndPnt
+	{
+		get;
+		set;
+	}
+
+	internal StartPntToolVecParamDTO()
+	{
+	}
+
+	internal StartPntToolVecParamDTO( StartPntToolVecParam param )
+	{
+		if( param == null ) {
+
+			// build default node
+			StartPnt = new ToolVecModifyData2DTO();
+			EndPnt = new ToolVecModifyData2DTO();
+			return;
+		}
+		if( param.StartPnt != null ) {
+			StartPnt = new ToolVecModifyData2DTO( param.StartPnt );
+		}
+		else {
+			StartPnt = new ToolVecModifyData2DTO();
+		}
+		if( param.EndPnt != null ) {
+			EndPnt = new ToolVecModifyData2DTO( param.EndPnt );
+		}
+		else {
+			EndPnt = new ToolVecModifyData2DTO();
+		}
+	}
+
+	internal StartPntToolVecParam ToStartPntToolVecParam()
+	{
+		ToolVecModifyData startPnt = StartPnt?.ToToolVecModifyData();
+		ToolVecModifyData endPnt = EndPnt?.ToToolVecModifyData();
+		return new StartPntToolVecParam( startPnt, endPnt );
+	}
+}
+
+public class ShapeIDsDTO
+{
+	public int? SolidID
+	{
+		get; set;
+	}
+
+	public int? ShellID
+	{
+		get; set;
+	}
+
+	public int? FaceID
+	{
+		get; set;
+	}
+
+	public int? WireID
+	{
+		get; set;
+	}
+
+	public int? EdgeID
+	{
+		get; set;
+	}
+
+	public int? VertexID
+	{
+		get; set;
+	}
+
+	public int? PathID
+	{
+		get; set;
+	}
+
+	internal ShapeIDsDTO()
+	{
+	}
+
+	internal ShapeIDsDTO( ShapeIDsStruct shapeIDsStruct )
+	{
+		SolidID = shapeIDsStruct.Solid_ID;
+		ShellID = shapeIDsStruct.Shell_ID;
+		FaceID = shapeIDsStruct.Face_ID;
+		WireID = shapeIDsStruct.Wire_ID;
+		EdgeID = shapeIDsStruct.Edge_ID;
+		VertexID = shapeIDsStruct.Vertex_ID;
+		PathID = shapeIDsStruct.Path_ID;
+	}
+
+	internal ShapeIDsStruct ToShapeIDStruct()
+	{
+		if( !SolidID.HasValue || !ShellID.HasValue || !FaceID.HasValue ||
+			!WireID.HasValue || !EdgeID.HasValue || !VertexID.HasValue || !PathID.HasValue ) {
+			throw new ArgumentException( "ShapeIDsStruct deserialization failed." );
+		}
+		return new ShapeIDsStruct()
+		{
+			Solid_ID = SolidID.Value,
+			Shell_ID = ShellID.Value,
+			Face_ID = FaceID.Value,
+			Wire_ID = WireID.Value,
+			Edge_ID = EdgeID.Value,
+			Vertex_ID = VertexID.Value,
+			Path_ID = PathID.Value,
+		};
+	}
+}
+
+public class gp_TrsfDTO
+{
+	// Transformation matrix values (3x4 matrix)
+	// Row 1
+	public double? M11
+	{
+		get; set;
+	}
+	public double? M12
+	{
+		get; set;
+	}
+	public double? M13
+	{
+		get; set;
+	}
+	public double? M14
+	{
+		get; set;
+	}
+
+	// Row 2
+	public double? M21
+	{
+		get; set;
+	}
+	public double? M22
+	{
+		get; set;
+	}
+	public double? M23
+	{
+		get; set;
+	}
+	public double? M24
+	{
+		get; set;
+	}
+
+	// Row 3
+	public double? M31
+	{
+		get; set;
+	}
+	public double? M32
+	{
+		get; set;
+	}
+	public double? M33
+	{
+		get; set;
+	}
+	public double? M34
+	{
+		get; set;
+	}
+
+	// parameterless constructor (for XmlSerializer)
+	public gp_TrsfDTO()
+	{
+	}
+
+	internal gp_TrsfDTO( gp_Trsf trsf )
+	{
+		if( trsf == null ) {
+			return;
+		}
+
+		// Get transformation matrix values
+		// gp_Trsf uses Value(row, col) method where indices are 1-based
+		M11 = trsf.Value( 1, 1 );
+		M12 = trsf.Value( 1, 2 );
+		M13 = trsf.Value( 1, 3 );
+		M14 = trsf.Value( 1, 4 );
+		M21 = trsf.Value( 2, 1 );
+		M22 = trsf.Value( 2, 2 );
+		M23 = trsf.Value( 2, 3 );
+		M24 = trsf.Value( 2, 4 );
+		M31 = trsf.Value( 3, 1 );
+		M32 = trsf.Value( 3, 2 );
+		M33 = trsf.Value( 3, 3 );
+		M34 = trsf.Value( 3, 4 );
+	}
+
+	internal gp_Trsf ToTrsf()
+	{
+		if( !M11.HasValue || !M12.HasValue || !M13.HasValue || !M14.HasValue ||
+			!M21.HasValue || !M22.HasValue || !M23.HasValue || !M24.HasValue ||
+			!M31.HasValue || !M32.HasValue || !M33.HasValue || !M34.HasValue ) {
+			throw new ArgumentException( "gp_Trsf deserialization failed." );
+		}
+		gp_Trsf trsf = new gp_Trsf();
+
+		// Set transformation matrix values
+		// gp_Trsf uses SetValues method to set the matrix
+		trsf.SetValues(
+			M11.Value, M12.Value, M13.Value, M14.Value,
+			M21.Value, M22.Value, M23.Value, M24.Value,
+			M31.Value, M32.Value, M33.Value, M34.Value
+		);
+
+		return trsf;
+	}
+}
+

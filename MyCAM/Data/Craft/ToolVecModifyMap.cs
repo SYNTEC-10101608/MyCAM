@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace MyCAM.Data
@@ -34,6 +35,9 @@ namespace MyCAM.Data
 		{
 			get
 			{
+				if( !m_Map.ContainsKey( key ) ) {
+					return new ToolVecModifyData();
+				}
 				return m_Map[ key ];
 			}
 			set
@@ -54,33 +58,41 @@ namespace MyCAM.Data
 
 		public void Add( int key, ToolVecModifyData value )
 		{
-			Set( key, value );
+			if( value == null ) {
+				throw new ArgumentNullException( nameof( value ), "ToolVecModifyData cannot be null" );
+			}
+			if( m_Map.ContainsKey( key ) ) {
+				throw new ArgumentException( $"Key {key} already exists in ToolVecModifyMap" );
+			}
+			m_Map[ key ] = value;
 		}
 
 		public void Set( int key, ToolVecModifyData value )
 		{
+			if( value == null ) {
+				throw new ArgumentNullException( nameof( value ), "ToolVecModifyData cannot be null" );
+			}
 			m_Map[ key ] = value;
 		}
 
-		
-		public void Remove( int removeKey, int nBeOverwriteIdx )
+		// remove the key and set the interpolate type to the be overwrite key
+		public void Remove( int removeKey, int beOverwriteIdx )
 		{
 			if( !m_Map.ContainsKey( removeKey ) ) {
 				return;
 			}
 			EToolVecInterpolateType removeType = m_Map[ removeKey ].InterpolateType;
 			m_Map.Remove( removeKey );
-			if( !m_Map.ContainsKey( nBeOverwriteIdx ) ) {
+			if( !m_Map.ContainsKey( beOverwriteIdx ) ) {
 				return;
 			}
-			m_Map[ nBeOverwriteIdx ].InterpolateType = removeType;
+			m_Map[ beOverwriteIdx ].InterpolateType = removeType;
 		}
 
 		public void Remove( int removeKey )
 		{
 			m_Map.Remove( removeKey );
 		}
-
 
 		public void Clear()
 		{
@@ -99,6 +111,55 @@ namespace MyCAM.Data
 	}
 
 	public class ToolVecModifyData
+	{
+		public ToolVecAngleData AngleData
+		{
+			get
+			{
+				return m_AngleData;
+			}
+			set
+			{
+				m_AngleData = value;
+			}
+		}
+
+		public EToolVecInterpolateType InterpolateType
+		{
+			get; set;
+		} = EToolVecInterpolateType.Normal;
+
+		public ToolVecModifyData()
+		{
+			m_AngleData = null;
+			InterpolateType = EToolVecInterpolateType.Normal;
+		}
+
+		// allow angle data can be null ( it can just set interpolate type)
+		public ToolVecModifyData( EToolVecInterpolateType interpolateType )
+		{
+			m_AngleData = null;
+			InterpolateType = interpolateType;
+		}
+
+		public ToolVecModifyData( ToolVecAngleData toolVecAngleData, EToolVecInterpolateType interpolateType )
+		{
+			m_AngleData = toolVecAngleData;
+			InterpolateType = interpolateType;
+		}
+
+		public ToolVecModifyData Clone()
+		{
+			if( m_AngleData == null ) {
+				return new ToolVecModifyData( InterpolateType );
+			}
+			return new ToolVecModifyData( m_AngleData.Clone(), InterpolateType );
+		}
+
+		ToolVecAngleData m_AngleData;
+	}
+
+	public class ToolVecAngleData
 	{
 		public double RA_deg
 		{
@@ -120,33 +181,21 @@ namespace MyCAM.Data
 			get; set;
 		}
 
-		public EToolVecInterpolateType InterpolateType
+		public ToolVecAngleData()
 		{
-			get; set;
-		} = EToolVecInterpolateType.Normal;
-
-		public ToolVecModifyData()
-		{
-			RA_deg = 0;
-			RB_deg = 0;
-			Master_deg = 0;
-			Slave_deg = 0;
 		}
 
-		public ToolVecModifyData( double ra_deg, double rb_deg, double master_deg, double slave_deg, EToolVecInterpolateType interpolateType )
+		public ToolVecAngleData( double ra_deg, double rb_deg, double master_deg, double slave_deg )
 		{
 			RA_deg = ra_deg;
 			RB_deg = rb_deg;
 			Master_deg = master_deg;
 			Slave_deg = slave_deg;
-			InterpolateType = interpolateType;
 		}
 
-		public ToolVecModifyData Clone()
+		public ToolVecAngleData Clone()
 		{
-			return new ToolVecModifyData( RA_deg, RB_deg, Master_deg, Slave_deg, InterpolateType );
+			return new ToolVecAngleData( RA_deg, RB_deg, Master_deg, Slave_deg );
 		}
 	}
-
-
 }
