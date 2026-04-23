@@ -433,9 +433,9 @@ namespace MyCAM.Editor
 			view.SetUp( newUp.X(), newUp.Y(), newUp.Z() );
 
 			if( isUnLockViewerUpdate ) {
-			// restore immediate update and update view once
-			view.SetImmediateUpdate( previousImmediateUpdate );
-		}
+				// restore immediate update and update view once
+				view.SetImmediateUpdate( previousImmediateUpdate );
+			}
 		}
 
 		public void SetToolVecReverse()
@@ -474,6 +474,7 @@ namespace MyCAM.Editor
 
 				// clear all tool vec modify data
 				craftData.ClearToolVecModify();
+				craftData.StartPntToolVecData = new StartPntToolVecParam();
 
 				// get start point
 				ToolVecActionDataHandler dataHandler = new ToolVecActionDataHandler( szPathID );
@@ -488,46 +489,19 @@ namespace MyCAM.Editor
 				// get ab angle
 				Tuple<double, double> avgAB_deg = ToolVecHelper.GetABAngleFromToolVec( avgDir, startPoint );
 
-				// set average ms to start point
-				ToolVecModifyData startPntData = new ToolVecModifyData()
+				ToolVecAngleData Angle = new ToolVecAngleData()
 				{
-					AngleData = new ToolVecAngleData()
-					{
-						RA_deg = avgAB_deg.Item1,
-						RB_deg = avgAB_deg.Item2,
-						Master_deg = avgMS_deg.Item1,
-						Slave_deg = avgMS_deg.Item2
-					},
-					InterpolateType = EToolVecInterpolateType.VectorInterpolation
+					RA_deg = avgAB_deg.Item1,
+					RB_deg = avgAB_deg.Item2,
+					Master_deg = avgMS_deg.Item1,
+					Slave_deg = avgMS_deg.Item2
 				};
-
-				if( dataHandler.IsClosed() == false ) {
-					ISetToolVecPoint endPoint = dataHandler.GetPointByCADIndex( dataHandler.GetEndPointCADIndex() );
-
-					// get ms angle
-					Tuple<double, double> avgMS_deg_EndPnt = ToolVecHelper.GetMSAngleFromToolVec( avgDir, endPoint );
-
-					// get ab angle
-					Tuple<double, double> avgAB_deg_EndPnt = ToolVecHelper.GetABAngleFromToolVec( avgDir, endPoint );
-
-					// set average ms to start point
-					ToolVecModifyData endPntData = new ToolVecModifyData()
-					{
-						AngleData = new ToolVecAngleData()
-						{
-							RA_deg = avgAB_deg_EndPnt.Item1,
-							RB_deg = avgAB_deg_EndPnt.Item2,
-							Master_deg = avgMS_deg_EndPnt.Item1,
-							Slave_deg = avgMS_deg_EndPnt.Item2
-						},
-						InterpolateType = EToolVecInterpolateType.VectorInterpolation
-					};
-					craftData.StartPntToolVecData.EndPnt = endPntData.Clone();
-					craftData.StartPntToolVecData.StartPnt = startPntData.Clone();
-			}
+				if( craftData.IsPathReverse ) {
+					craftData.StartPntToolVecData.StartPnt = new ToolVecModifyData( Angle, EToolVecInterpolateType.VectorInterpolation );
+				}
 				else {
-					craftData.StartPntToolVecData.EndPnt = startPntData.Clone();
-					craftData.StartPntToolVecData.StartPnt = startPntData.Clone();
+					craftData.StartPntToolVecData.StartPnt = new ToolVecModifyData( Angle, EToolVecInterpolateType.Normal );
+					craftData.StartPntToolVecData.EndPnt.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
 				}
 			}
 			ShowCAMData( szPathIDList );

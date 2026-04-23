@@ -21,15 +21,15 @@ namespace MyCAM.Data
 			{
 				if( m_StartPnt == null ) {
 					m_StartPnt = new ToolVecModifyData();
-		}
+				}
 				return m_StartPnt;
 			}
 			set
-		{
+			{
 				if( m_StartPnt != value ) {
 					m_StartPnt = value;
 					PropertyChanged?.Invoke();
-		}
+				}
 			}
 		}
 
@@ -39,15 +39,15 @@ namespace MyCAM.Data
 			{
 				if( m_EndPnt == null ) {
 					m_EndPnt = new ToolVecModifyData();
-		}
+				}
 				return m_EndPnt;
 			}
 			set
-		{
+			{
 				if( m_EndPnt != value ) {
 					m_EndPnt = value;
 					PropertyChanged?.Invoke();
-		}
+				}
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace MyCAM.Data
 
 		ToolVecModifyData m_EndPnt;
 		ToolVecModifyData m_StartPnt;
-		}
+	}
 
 	public class ContourEditData
 	{
@@ -196,7 +196,7 @@ namespace MyCAM.Data
 			{
 				if( m_IsPathReverse != value ) {
 					m_IsPathReverse = value;
-					ChangeStartPntParam();
+					ClearToolVecModify();
 					CAMFactorChanged?.Invoke();
 				}
 			}
@@ -370,8 +370,8 @@ namespace MyCAM.Data
 					else {
 						EToolVecInterpolateType removedType = m_ToolVecModifyMap[ index ].InterpolateType;
 						StartPntToolVecData.EndPnt.InterpolateType = removedType;
-				m_ToolVecModifyMap.Remove( index );
-			}
+						m_ToolVecModifyMap.Remove( index );
+					}
 				}
 				else {
 
