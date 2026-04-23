@@ -173,6 +173,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ContourEdit {
+            get {
+                object obj = ResourceManager.GetObject("ContourEdit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap DeletePath {
             get {
                 object obj = ResourceManager.GetObject("DeletePath", resourceCulture);
