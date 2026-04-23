@@ -1166,9 +1166,8 @@ namespace MyCAM.FileManager
 			StartPntToolVecParam startPntToolVecParam = BuildStartPntToolVecParam( sourceMap_OldVersion, IsPathReverse.Value );
 			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value,
 												 leadData, OverCutLength.Value, toolVecModifyMap,
-												 startPntToolVecParam, IsToolVecReverse.Value, traverseData );
+												 startPntToolVecParam, IsToolVecReverse.Value, traverseData, contourEditMap );
 
-			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value, leadData, OverCutLength.Value, toolVecModifyMap, IsToolVecReverse.Value, interpolateType, traverseData, contourEditMap );
 			// old version may have start/end point in ToolVecModifyMap, those are move to StartPntToolVecData
 			RemoveOldMapStartEndPoint( craftData );
 
@@ -1834,7 +1833,7 @@ namespace MyCAM.FileManager
 		{
 			if( !Index.HasValue || !RA_deg.HasValue || !RB_deg.HasValue || !MasterAngle_deg.HasValue || !SlaveAngle_deg.HasValue ) {
 				throw new ArgumentException( "ToolVecMapDTO deserialization failed: Index is required." );
-	}
+			}
 			ToolVecAngleData angleData = new ToolVecAngleData(
 				RA_deg ?? 0,
 				RB_deg ?? 0,
