@@ -364,8 +364,7 @@ namespace MyCAM
 
 		void m_tsbTooVecReverse_Click( object sender, EventArgs e )
 		{
-			//m_CAMEditor.SetToolVecReverse();
-			m_CAMEditor.SetContourEdit();
+			m_CAMEditor.SetToolVecReverse();
 		}
 
 		void m_tsbFixedToolVec_Click( object sender, EventArgs e )
