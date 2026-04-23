@@ -1132,10 +1132,10 @@ namespace MyCAM.FileManager
 
 			if( craftData.StartPntToolVecData != null ) {
 				StartPntToolVecData = new StartPntToolVecParamDTO( craftData.StartPntToolVecData );
-			ContourEditMap = ( craftData.ContourEditMap ?? new Dictionary<int, ContourEditData>() )
-				.Select( kvp => new ContourEditMapDTO( kvp.Key, kvp.Value.DX, kvp.Value.DY, kvp.Value.DZ ) )
-				.ToList();
-		}
+				ContourEditMap = ( craftData.ContourEditMap ?? new Dictionary<int, ContourEditData>() )
+					.Select( kvp => new ContourEditMapDTO( kvp.Key, kvp.Value.DX, kvp.Value.DY, kvp.Value.DZ ) )
+					.ToList();
+			}
 			else {
 				// create empty node
 				StartPntToolVecData = new StartPntToolVecParamDTO();
@@ -1999,7 +1999,7 @@ public class ToolVecAngleDataDTO
 	internal ToolVecAngleData ToToolVecAngleData()
 	{
 		if( IsNull ) {
-			return new ToolVecAngleData();
+			return null;
 		}
 		if( !RA_deg.HasValue || !RB_deg.HasValue || !MasterAngle_deg.HasValue || !SlaveAngle_deg.HasValue ) {
 			throw new ArgumentException( "ToolVecMapDTO deserialization failed: Index is required." );
@@ -2055,225 +2055,225 @@ public class StartPntToolVecParamDTO
 
 	internal StartPntToolVecParam ToStartPntToolVecParam()
 	{
-		ToolVecModifyData startPnt = StartPnt?.ToToolVecModifyData();
-		ToolVecModifyData endPnt = EndPnt?.ToToolVecModifyData();
+		ToolVecModifyData startPnt = StartPnt == null ? new ToolVecModifyData() : StartPnt.ToToolVecModifyData();
+		ToolVecModifyData endPnt = EndPnt == null ? new ToolVecModifyData() : EndPnt.ToToolVecModifyData();
 		return new StartPntToolVecParam( startPnt, endPnt );
 	}
 }
 
-	public class ContourEditMapDTO
+public class ContourEditMapDTO
+{
+	public int? Index
 	{
-		public int? Index
-		{
-			get;
-			set;
-		}
-
-		public double? DX
-		{
-			get;
-			set;
-		}
-
-		public double? DY
-		{
-			get;
-			set;
-		}
-
-		public double? DZ
-		{
-			get;
-			set;
-		}
-
-		// parameterless constructor (for XmlSerializer)
-		internal ContourEditMapDTO()
-		{
-		}
-
-		internal ContourEditMapDTO( int index, double dx, double dy, double dz )
-		{
-			Index = index;
-			DX = dx;
-			DY = dy;
-			DZ = dz;
-		}
+		get;
+		set;
 	}
 
-	public class ShapeIDsDTO
+	public double? DX
 	{
-		public int? SolidID
-		{
-			get; set;
-		}
-
-		public int? ShellID
-		{
-			get; set;
-		}
-
-		public int? FaceID
-		{
-			get; set;
-		}
-
-		public int? WireID
-		{
-			get; set;
-		}
-
-		public int? EdgeID
-		{
-			get; set;
-		}
-
-		public int? VertexID
-		{
-			get; set;
-		}
-
-		public int? PathID
-		{
-			get; set;
-		}
-
-		internal ShapeIDsDTO()
-		{
-		}
-
-		internal ShapeIDsDTO( ShapeIDsStruct shapeIDsStruct )
-		{
-			SolidID = shapeIDsStruct.Solid_ID;
-			ShellID = shapeIDsStruct.Shell_ID;
-			FaceID = shapeIDsStruct.Face_ID;
-			WireID = shapeIDsStruct.Wire_ID;
-			EdgeID = shapeIDsStruct.Edge_ID;
-			VertexID = shapeIDsStruct.Vertex_ID;
-			PathID = shapeIDsStruct.Path_ID;
-		}
-
-		internal ShapeIDsStruct ToShapeIDStruct()
-		{
-			if( !SolidID.HasValue || !ShellID.HasValue || !FaceID.HasValue ||
-				!WireID.HasValue || !EdgeID.HasValue || !VertexID.HasValue || !PathID.HasValue ) {
-				throw new ArgumentException( "ShapeIDsStruct deserialization failed." );
-			}
-			return new ShapeIDsStruct()
-			{
-				Solid_ID = SolidID.Value,
-				Shell_ID = ShellID.Value,
-				Face_ID = FaceID.Value,
-				Wire_ID = WireID.Value,
-				Edge_ID = EdgeID.Value,
-				Vertex_ID = VertexID.Value,
-				Path_ID = PathID.Value,
-			};
-		}
+		get;
+		set;
 	}
 
-	public class gp_TrsfDTO
+	public double? DY
 	{
-		// Transformation matrix values (3x4 matrix)
-		// Row 1
-		public double? M11
-		{
-			get; set;
-		}
-		public double? M12
-		{
-			get; set;
-		}
-		public double? M13
-		{
-			get; set;
-		}
-		public double? M14
-		{
-			get; set;
-		}
-
-		// Row 2
-		public double? M21
-		{
-			get; set;
-		}
-		public double? M22
-		{
-			get; set;
-		}
-		public double? M23
-		{
-			get; set;
-		}
-		public double? M24
-		{
-			get; set;
-		}
-
-		// Row 3
-		public double? M31
-		{
-			get; set;
-		}
-		public double? M32
-		{
-			get; set;
-		}
-		public double? M33
-		{
-			get; set;
-		}
-		public double? M34
-		{
-			get; set;
-		}
-
-		// parameterless constructor (for XmlSerializer)
-		public gp_TrsfDTO()
-		{
-		}
-
-		internal gp_TrsfDTO( gp_Trsf trsf )
-		{
-			if( trsf == null ) {
-				return;
-			}
-
-			// Get transformation matrix values
-			// gp_Trsf uses Value(row, col) method where indices are 1-based
-			M11 = trsf.Value( 1, 1 );
-			M12 = trsf.Value( 1, 2 );
-			M13 = trsf.Value( 1, 3 );
-			M14 = trsf.Value( 1, 4 );
-			M21 = trsf.Value( 2, 1 );
-			M22 = trsf.Value( 2, 2 );
-			M23 = trsf.Value( 2, 3 );
-			M24 = trsf.Value( 2, 4 );
-			M31 = trsf.Value( 3, 1 );
-			M32 = trsf.Value( 3, 2 );
-			M33 = trsf.Value( 3, 3 );
-			M34 = trsf.Value( 3, 4 );
-		}
-
-		internal gp_Trsf ToTrsf()
-		{
-			if( !M11.HasValue || !M12.HasValue || !M13.HasValue || !M14.HasValue ||
-				!M21.HasValue || !M22.HasValue || !M23.HasValue || !M24.HasValue ||
-				!M31.HasValue || !M32.HasValue || !M33.HasValue || !M34.HasValue ) {
-				throw new ArgumentException( "gp_Trsf deserialization failed." );
-			}
-			gp_Trsf trsf = new gp_Trsf();
-
-			// Set transformation matrix values
-			// gp_Trsf uses SetValues method to set the matrix
-			trsf.SetValues(
-				M11.Value, M12.Value, M13.Value, M14.Value,
-				M21.Value, M22.Value, M23.Value, M24.Value,
-				M31.Value, M32.Value, M33.Value, M34.Value
-			);
-
-			return trsf;
-		}
+		get;
+		set;
 	}
+
+	public double? DZ
+	{
+		get;
+		set;
+	}
+
+	// parameterless constructor (for XmlSerializer)
+	internal ContourEditMapDTO()
+	{
+	}
+
+	internal ContourEditMapDTO( int index, double dx, double dy, double dz )
+	{
+		Index = index;
+		DX = dx;
+		DY = dy;
+		DZ = dz;
+	}
+}
+
+public class ShapeIDsDTO
+{
+	public int? SolidID
+	{
+		get; set;
+	}
+
+	public int? ShellID
+	{
+		get; set;
+	}
+
+	public int? FaceID
+	{
+		get; set;
+	}
+
+	public int? WireID
+	{
+		get; set;
+	}
+
+	public int? EdgeID
+	{
+		get; set;
+	}
+
+	public int? VertexID
+	{
+		get; set;
+	}
+
+	public int? PathID
+	{
+		get; set;
+	}
+
+	internal ShapeIDsDTO()
+	{
+	}
+
+	internal ShapeIDsDTO( ShapeIDsStruct shapeIDsStruct )
+	{
+		SolidID = shapeIDsStruct.Solid_ID;
+		ShellID = shapeIDsStruct.Shell_ID;
+		FaceID = shapeIDsStruct.Face_ID;
+		WireID = shapeIDsStruct.Wire_ID;
+		EdgeID = shapeIDsStruct.Edge_ID;
+		VertexID = shapeIDsStruct.Vertex_ID;
+		PathID = shapeIDsStruct.Path_ID;
+	}
+
+	internal ShapeIDsStruct ToShapeIDStruct()
+	{
+		if( !SolidID.HasValue || !ShellID.HasValue || !FaceID.HasValue ||
+			!WireID.HasValue || !EdgeID.HasValue || !VertexID.HasValue || !PathID.HasValue ) {
+			throw new ArgumentException( "ShapeIDsStruct deserialization failed." );
+		}
+		return new ShapeIDsStruct()
+		{
+			Solid_ID = SolidID.Value,
+			Shell_ID = ShellID.Value,
+			Face_ID = FaceID.Value,
+			Wire_ID = WireID.Value,
+			Edge_ID = EdgeID.Value,
+			Vertex_ID = VertexID.Value,
+			Path_ID = PathID.Value,
+		};
+	}
+}
+
+public class gp_TrsfDTO
+{
+	// Transformation matrix values (3x4 matrix)
+	// Row 1
+	public double? M11
+	{
+		get; set;
+	}
+	public double? M12
+	{
+		get; set;
+	}
+	public double? M13
+	{
+		get; set;
+	}
+	public double? M14
+	{
+		get; set;
+	}
+
+	// Row 2
+	public double? M21
+	{
+		get; set;
+	}
+	public double? M22
+	{
+		get; set;
+	}
+	public double? M23
+	{
+		get; set;
+	}
+	public double? M24
+	{
+		get; set;
+	}
+
+	// Row 3
+	public double? M31
+	{
+		get; set;
+	}
+	public double? M32
+	{
+		get; set;
+	}
+	public double? M33
+	{
+		get; set;
+	}
+	public double? M34
+	{
+		get; set;
+	}
+
+	// parameterless constructor (for XmlSerializer)
+	public gp_TrsfDTO()
+	{
+	}
+
+	internal gp_TrsfDTO( gp_Trsf trsf )
+	{
+		if( trsf == null ) {
+			return;
+		}
+
+		// Get transformation matrix values
+		// gp_Trsf uses Value(row, col) method where indices are 1-based
+		M11 = trsf.Value( 1, 1 );
+		M12 = trsf.Value( 1, 2 );
+		M13 = trsf.Value( 1, 3 );
+		M14 = trsf.Value( 1, 4 );
+		M21 = trsf.Value( 2, 1 );
+		M22 = trsf.Value( 2, 2 );
+		M23 = trsf.Value( 2, 3 );
+		M24 = trsf.Value( 2, 4 );
+		M31 = trsf.Value( 3, 1 );
+		M32 = trsf.Value( 3, 2 );
+		M33 = trsf.Value( 3, 3 );
+		M34 = trsf.Value( 3, 4 );
+	}
+
+	internal gp_Trsf ToTrsf()
+	{
+		if( !M11.HasValue || !M12.HasValue || !M13.HasValue || !M14.HasValue ||
+			!M21.HasValue || !M22.HasValue || !M23.HasValue || !M24.HasValue ||
+			!M31.HasValue || !M32.HasValue || !M33.HasValue || !M34.HasValue ) {
+			throw new ArgumentException( "gp_Trsf deserialization failed." );
+		}
+		gp_Trsf trsf = new gp_Trsf();
+
+		// Set transformation matrix values
+		// gp_Trsf uses SetValues method to set the matrix
+		trsf.SetValues(
+			M11.Value, M12.Value, M13.Value, M14.Value,
+			M21.Value, M22.Value, M23.Value, M24.Value,
+			M31.Value, M32.Value, M33.Value, M34.Value
+		);
+
+		return trsf;
+	}
+}
 
