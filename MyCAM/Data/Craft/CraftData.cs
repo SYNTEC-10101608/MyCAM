@@ -417,18 +417,18 @@ namespace MyCAM.Data
 			toolVecAngleData = null;
 			type = EToolVecInterpolateType.Normal;
 			if( isStartIdx ) {
+				type = StartPntToolVecData.StartPnt.InterpolateType;
 				if( StartPntToolVecData != null && StartPntToolVecData.StartPnt != null && StartPntToolVecData.StartPnt.AngleData != null ) {
 					toolVecAngleData = StartPntToolVecData.StartPnt.AngleData;
-					type = StartPntToolVecData.StartPnt.InterpolateType;
 					return true;
 				}
 				return false;
 			}
 
 			// is end idx
+			type = StartPntToolVecData.EndPnt.InterpolateType;
 			if( StartPntToolVecData != null && StartPntToolVecData.EndPnt != null && StartPntToolVecData.EndPnt.AngleData != null ) {
 				toolVecAngleData = StartPntToolVecData.EndPnt.AngleData;
-				type = StartPntToolVecData.EndPnt.InterpolateType;
 				return true;
 			}
 			return false;

@@ -247,10 +247,45 @@ namespace MyCAM.PathCache
 
 		InterpolatePreprocessingResult InterpolatePreprocessing( ref List<ISetToolVecPoint> toolVecPointList )
 		{
+			bool isLastPntControlPoint = m_CraftData.IsStartPntModified( false, out _, out EToolVecInterpolateType endPntInterpolateType );
+			bool isFirstPntIsControlPnt = m_CraftData.IsStartPntModified( true, out _, out EToolVecInterpolateType startPntInterpolateType );
+
+			// only start pnt is contrl pnt && no other modify pnt
+			bool isSpecialCase = isFirstPntIsControlPnt && !isLastPntControlPoint && m_CraftData.ToolVecModifyMap.Count == 0;
+			if( isSpecialCase ) {
+
+				// user only want c+/c- with normal solve IK (end pnt involve)
+				// path reverse interpolate type record at region head
+				if( m_CraftData.IsPathReverse ) {
+					if( startPntInterpolateType == EToolVecInterpolateType.Normal ) {
+						return NormalCasePreprocessing( ref toolVecPointList );
+					}
+				}
+				else {
+					if( endPntInterpolateType == EToolVecInterpolateType.Normal ) {
+						return NormalCasePreprocessing( ref toolVecPointList );
+					}
+				}
+				Dictionary<int, ToolVecModifyData> camToolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
+				SetStartAndEndPntInMapForSpecialCase( ref toolVecPointList, ref camToolVecModifyMap );
+				List<Tuple<int, int, EToolVecInterpolateType>> regionTypeList = GetInterpolateIntervalList( camToolVecModifyMap );
+				return new InterpolatePreprocessingResult
+				{
+					CamToolVecModifyMap = camToolVecModifyMap,
+					RegionTypeList = regionTypeList,
+					IsLastPntControlPoint = false,
+					IsFirstPntControlPnt = true
+				};
+			}
+			return NormalCasePreprocessing( ref toolVecPointList );
+		}
+
+		InterpolatePreprocessingResult NormalCasePreprocessing( ref List<ISetToolVecPoint> toolVecPointList )
+		{
 			// get all control point index ( include start and end point)
 			Dictionary<int, ToolVecModifyData> camToolVecModifyMap = GetCAMToolVecModifyMap();
 			SetAsModifyPnt( ref toolVecPointList, camToolVecModifyMap );
-			SetStartAndEndPntIntoRegion( ref toolVecPointList, ref camToolVecModifyMap );
+			SetStartAndEndPntIntoMap( ref toolVecPointList, ref camToolVecModifyMap );
 			List<Tuple<int, int, EToolVecInterpolateType>> regionTypeList = GetInterpolateIntervalList( camToolVecModifyMap );
 			bool isLastPntControlPoint = m_CraftData.IsStartPntModified( false, out _, out _ );
 			bool isFirstPntIsControlPnt = m_CraftData.IsStartPntModified( true, out _, out _ );
@@ -264,6 +299,7 @@ namespace MyCAM.PathCache
 			};
 		}
 
+
 		void SetAsModifyPnt( ref List<ISetToolVecPoint> toolVecPointList, Dictionary<int, ToolVecModifyData> camToolVecModifyMap )
 		{
 			if( toolVecPointList == null || camToolVecModifyMap == null ) {
@@ -276,7 +312,33 @@ namespace MyCAM.PathCache
 			}
 		}
 
-		void SetStartAndEndPntIntoRegion( ref List<ISetToolVecPoint> toolVecPointList, ref Dictionary<int, ToolVecModifyData> toolVecModifyMap )
+		void SetStartAndEndPntInMapForSpecialCase( ref List<ISetToolVecPoint> toolVecPointList, ref Dictionary<int, ToolVecModifyData> toolVecModifyMap )
+		{
+			if( m_CraftData.StartPntToolVecData.StartPnt == null || m_CraftData.StartPntToolVecData.StartPnt.AngleData == null ) {
+				return;
+
+			}
+			if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
+				return;
+			}
+			// set region head
+			toolVecModifyMap[ 0 ] = m_CraftData.StartPntToolVecData.StartPnt.Clone();
+
+			// start pnt is not modified pnt (breveling case start pnt must be control point)
+			toolVecPointList[ 0 ].IsToolVecModPoint = true;
+
+			// last region end
+			int nLastIndex = m_CAMPointList.Count - 1;
+
+			// get end interpolate type
+			toolVecModifyMap[ nLastIndex ] = m_CraftData.StartPntToolVecData.EndPnt.Clone();
+
+			//clone start pnt angle data to end pnt
+			toolVecModifyMap[ nLastIndex ].AngleData = m_CraftData.StartPntToolVecData.StartPnt.AngleData.Clone();
+		}
+
+
+		void SetStartAndEndPntIntoMap( ref List<ISetToolVecPoint> toolVecPointList, ref Dictionary<int, ToolVecModifyData> toolVecModifyMap )
 		{
 			if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
 				return;
