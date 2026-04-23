@@ -409,6 +409,11 @@ namespace MyCAM
 			m_CAMEditor.SetPathEdit();
 		}
 
+		void m_BtnContourEdit_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetContourEdit();
+		}
+
 		void m_tsbPathCompensation_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SetPathCompensation();
