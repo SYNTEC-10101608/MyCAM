@@ -40,6 +40,7 @@ namespace MyCAM.Editor
 		PathEdit,
 		PathCompensation,
 		CalibrationREF,
+		ContourEdit,
 
 		// File
 		ImportProjectFile,
