@@ -94,7 +94,7 @@ namespace MyCAM.Editor.Renderer
 		public void Reset( bool bUpdate = false )
 		{
 			gp_Trsf trsf = new gp_Trsf();
-			Trans(trsf, bUpdate);
+			Trans( trsf, bUpdate );
 			if( bUpdate ) {
 				UpdateView();
 			}

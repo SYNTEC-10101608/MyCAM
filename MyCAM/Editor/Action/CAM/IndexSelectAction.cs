@@ -34,7 +34,8 @@ namespace MyCAM.Editor
 		{
 			// rebuild transformed vertex map, and get the original vertex for selected index
 			oriHighLightVtx = new TopoDS_Shape();
-			if( m_PathPointList == null || m_PathPointList.Count == 0 ) return;
+			if( m_PathPointList == null || m_PathPointList.Count == 0 )
+				return;
 
 			List<gp_Pnt> newPntList = new List<gp_Pnt>( m_PathPointList.Count );
 			foreach( gp_Pnt point in m_PathPointList ) {

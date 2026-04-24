@@ -57,30 +57,30 @@ namespace CommonData
 			TraverseTail = DEFAULT_TraverseTail;
 		}
 
-		public CustPost( Dictionary<string, string> custPostMap)
+		public CustPost( Dictionary<string, string> custPostMap )
 		{
-			if ( custPostMap.TryGetValue( EPostSection.Header.ToString(), out var headerContent ) ) {
+			if( custPostMap.TryGetValue( EPostSection.Header.ToString(), out var headerContent ) ) {
 				Header = headerContent;
 			}
-			if ( custPostMap.TryGetValue( EPostSection.Tail.ToString(), out var tailContent ) ) {
+			if( custPostMap.TryGetValue( EPostSection.Tail.ToString(), out var tailContent ) ) {
 				Tail = tailContent;
 			}
-			if ( custPostMap.TryGetValue( EPostSection.PathHeader.ToString(), out var pathHeaderContent ) ) {
+			if( custPostMap.TryGetValue( EPostSection.PathHeader.ToString(), out var pathHeaderContent ) ) {
 				PathHeader = pathHeaderContent;
 			}
-			if ( custPostMap.TryGetValue( EPostSection.PathTail.ToString(), out var pathTailContent ) ) {
+			if( custPostMap.TryGetValue( EPostSection.PathTail.ToString(), out var pathTailContent ) ) {
 				PathTail = pathTailContent;
 			}
-			if ( custPostMap.TryGetValue( EPostSection.StdPathHeader.ToString(), out var stdPathHeaderContent ) ) {
+			if( custPostMap.TryGetValue( EPostSection.StdPathHeader.ToString(), out var stdPathHeaderContent ) ) {
 				StdPathHeader = stdPathHeaderContent;
 			}
-			if ( custPostMap.TryGetValue( EPostSection.StdPathTail.ToString(), out var stdPathTailContent ) ) {
+			if( custPostMap.TryGetValue( EPostSection.StdPathTail.ToString(), out var stdPathTailContent ) ) {
 				StdPathTail = stdPathTailContent;
 			}
-			if ( custPostMap.TryGetValue( EPostSection.TraverseHeader.ToString(), out var traverseHeaderContent ) ) {
+			if( custPostMap.TryGetValue( EPostSection.TraverseHeader.ToString(), out var traverseHeaderContent ) ) {
 				TraverseHeader = traverseHeaderContent;
 			}
-			if ( custPostMap.TryGetValue( EPostSection.TraverseTail.ToString(), out var traverseTailContent ) ) {
+			if( custPostMap.TryGetValue( EPostSection.TraverseTail.ToString(), out var traverseTailContent ) ) {
 				TraverseTail = traverseTailContent;
 			}
 		}

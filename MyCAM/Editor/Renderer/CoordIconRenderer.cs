@@ -32,7 +32,7 @@ namespace MyCAM.Editor.Renderer
 
 		public void ShowTrihedron( gp_Pnt position, bool bUpdate = false )
 		{
-			if (m_CoordIconAIS != null ) {
+			if( m_CoordIconAIS != null ) {
 				m_Viewer.GetAISContext().Remove( m_CoordIconAIS, false );
 			}
 
