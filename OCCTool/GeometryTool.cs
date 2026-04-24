@@ -9,12 +9,14 @@ using OCC.GeomAbs;
 using OCC.GeomAdaptor;
 using OCC.gp;
 using OCC.GProp;
+using OCC.IntCurvesFace;
 using OCC.Precision;
 using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using System;
+using System.Collections.Generic;
 
 namespace OCCTool
 {
@@ -266,6 +268,186 @@ namespace OCCTool
 			}
 			edge = brepEdge.Edge();
 			return true;
+		}
+
+		public static List<gp_Ax1> BuildRayAxesFromBBox( gp_Dir rayDir, BoundingBox bbox )
+		{
+			if( rayDir == null || bbox == null ) {
+				return new List<gp_Ax1>();
+			}
+
+			// rayDir must be a principal axis (X, Y, or Z)
+			bool isAlongX = rayDir.IsParallel( new gp_Dir( 1, 0, 0 ), 1e-3 );
+			bool isAlongY = rayDir.IsParallel( new gp_Dir( 0, 1, 0 ), 1e-3 );
+			bool isAlongZ = rayDir.IsParallel( new gp_Dir( 0, 0, 1 ), 1e-3 );
+			if( isAlongX == false && isAlongY == false && isAlongZ == false ) {
+				return new List<gp_Ax1>();
+			}
+
+			// Build ray strategies from bbox center toward 4 corner midpoints along the given axis.
+			// The two axes perpendicular to rayDir are used to offset origin toward bbox corners.
+			// Strategy order: center → mid-to-right-upper → mid-to-left-upper → mid-to-left-lower → mid-to-right-lower
+			double cx = bbox.XCenter;
+			double cy = bbox.YCenter;
+			double cz = bbox.ZCenter;
+			double xMin = bbox.Xmin, xMax = bbox.Xmax;
+			double yMin = bbox.Ymin, yMax = bbox.Ymax;
+			double zMin = bbox.Zmin, zMax = bbox.Zmax;
+
+			// Determine the two axes perpendicular to rayDir
+			// and generate 4 corner midpoint candidates on that plane
+			double ox1, oy1, oz1; // right-upper
+			double ox2, oy2, oz2; // left-upper
+			double ox3, oy3, oz3; // left-lower
+			double ox4, oy4, oz4; // right-lower
+
+			if( isAlongX ) {
+				// along X, perpendicular plane: Y-Z
+				ox1 = cx;
+				oy1 = ( cy + yMax ) / 2.0;
+				oz1 = ( cz + zMax ) / 2.0;
+				ox2 = cx;
+				oy2 = ( cy + yMin ) / 2.0;
+				oz2 = ( cz + zMax ) / 2.0;
+				ox3 = cx;
+				oy3 = ( cy + yMin ) / 2.0;
+				oz3 = ( cz + zMin ) / 2.0;
+				ox4 = cx;
+				oy4 = ( cy + yMax ) / 2.0;
+				oz4 = ( cz + zMin ) / 2.0;
+			}
+			else if( isAlongY ) {
+				// along Y, perpendicular plane: X-Z
+				ox1 = ( cx + xMax ) / 2.0;
+				oy1 = cy;
+				oz1 = ( cz + zMax ) / 2.0;
+				ox2 = ( cx + xMin ) / 2.0;
+				oy2 = cy;
+				oz2 = ( cz + zMax ) / 2.0;
+				ox3 = ( cx + xMin ) / 2.0;
+				oy3 = cy;
+				oz3 = ( cz + zMin ) / 2.0;
+				ox4 = ( cx + xMax ) / 2.0;
+				oy4 = cy;
+				oz4 = ( cz + zMin ) / 2.0;
+			}
+			else {
+				// along Z, perpendicular plane: X-Y
+				ox1 = ( cx + xMax ) / 2.0;
+				oy1 = ( cy + yMax ) / 2.0;
+				oz1 = cz;
+				ox2 = ( cx + xMin ) / 2.0;
+				oy2 = ( cy + yMax ) / 2.0;
+				oz2 = cz;
+				ox3 = ( cx + xMin ) / 2.0;
+				oy3 = ( cy + yMin ) / 2.0;
+				oz3 = cz;
+				ox4 = ( cx + xMax ) / 2.0;
+				oy4 = ( cy + yMin ) / 2.0;
+				oz4 = cz;
+			}
+
+			return new List<gp_Ax1>
+			{
+				new gp_Ax1( new gp_Pnt( cx,  cy,  cz  ), rayDir ), // center
+				new gp_Ax1( new gp_Pnt( ox1, oy1, oz1 ), rayDir ), // mid to right-upper
+				new gp_Ax1( new gp_Pnt( ox2, oy2, oz2 ), rayDir ), // mid to left-upper
+				new gp_Ax1( new gp_Pnt( ox3, oy3, oz3 ), rayDir ), // mid to left-lower
+				new gp_Ax1( new gp_Pnt( ox4, oy4, oz4 ), rayDir ), // mid to right-lower
+			};
+		}
+
+		// Check if a ray (defined by origin and direction) can potentially intersect a bounding box.
+		public static bool RayIntersectsBBox( gp_Pnt rayOrigin, gp_Dir rayDir, BoundingBox bbox )
+		{
+			if( rayOrigin == null || rayDir == null || bbox == null ) {
+				return false;
+			}
+
+			bool isAlongX = rayDir.IsParallel( new gp_Dir( 1, 0, 0 ), 1e-3 );
+			bool isAlongY = rayDir.IsParallel( new gp_Dir( 0, 1, 0 ), 1e-3 );
+			bool isAlongZ = rayDir.IsParallel( new gp_Dir( 0, 0, 1 ), 1e-3 );
+			if( isAlongX == false && isAlongY == false && isAlongZ == false ) {
+				return false;
+			}
+
+			if( isAlongX ) {
+				// along X
+				return rayOrigin.Y() >= bbox.Ymin && rayOrigin.Y() <= bbox.Ymax
+					&& rayOrigin.Z() >= bbox.Zmin && rayOrigin.Z() <= bbox.Zmax;
+			}
+			else if( isAlongY ) {
+				// along Y
+				return rayOrigin.X() >= bbox.Xmin && rayOrigin.X() <= bbox.Xmax
+					&& rayOrigin.Z() >= bbox.Zmin && rayOrigin.Z() <= bbox.Zmax;
+			}
+			else {
+				// along Z
+				return rayOrigin.X() >= bbox.Xmin && rayOrigin.X() <= bbox.Xmax
+					&& rayOrigin.Y() >= bbox.Ymin && rayOrigin.Y() <= bbox.Ymax;
+			}
+		}
+
+		public static bool FindOutermostFaceAlongPrincipalAxis( List<TopoDS_Face> faceList, gp_Pnt rayOrigin, gp_Dir rayDir, out TopoDS_Face outermostFace )
+		{
+			outermostFace = null;
+			if( faceList == null || rayOrigin == null || rayDir == null ) {
+				return false;
+			}
+			double maxProjection = double.MinValue;
+
+			gp_Lin ray = new gp_Lin( rayOrigin, rayDir );
+
+			bool isAlongX = rayDir.IsParallel( new gp_Dir( 1, 0, 0 ), 1e-3 );
+			bool isAlongY = rayDir.IsParallel( new gp_Dir( 0, 1, 0 ), 1e-3 );
+			bool isAlongZ = rayDir.IsParallel( new gp_Dir( 0, 0, 1 ), 1e-3 );
+			if( isAlongX == false && isAlongY == false && isAlongZ == false ) {
+				return false;
+			}
+
+			foreach( TopoDS_Face face in faceList ) {
+				BoundingBox bbox = new BoundingBox( face );
+
+				// Phase 1: BBox pre-filter on the two axes perpendicular to rayDir
+				bool passes;
+				if( isAlongX ) {
+					passes = rayOrigin.Y() >= bbox.Ymin && rayOrigin.Y() <= bbox.Ymax
+						&& rayOrigin.Z() >= bbox.Zmin && rayOrigin.Z() <= bbox.Zmax;
+				}
+				else if( isAlongY ) {
+					passes = rayOrigin.X() >= bbox.Xmin && rayOrigin.X() <= bbox.Xmax
+						&& rayOrigin.Z() >= bbox.Zmin && rayOrigin.Z() <= bbox.Zmax;
+				}
+				else {
+					// along Z
+					passes = rayOrigin.X() >= bbox.Xmin && rayOrigin.X() <= bbox.Xmax
+						&& rayOrigin.Y() >= bbox.Ymin && rayOrigin.Y() <= bbox.Ymax;
+				}
+
+				if( passes == false ) {
+					continue;
+				}
+
+				// Phase 2: Precise intersection
+				IntCurvesFace_ShapeIntersector intersector = new IntCurvesFace_ShapeIntersector();
+				intersector.Load( face, 1e-6 );
+				intersector.Perform( ray, double.MinValue, double.MaxValue );
+
+				if( intersector.IsDone() == false || intersector.NbPnt() == 0 ) {
+					continue;
+				}
+
+				// Since rayDir is a principal axis, projection = the corresponding coordinate directly
+				for( int i = 1; i <= intersector.NbPnt(); i++ ) {
+					gp_Pnt pnt = intersector.Pnt( i );
+					double projection = isAlongX ? pnt.X() : ( isAlongY ? pnt.Y() : pnt.Z() );
+					if( projection > maxProjection ) {
+						maxProjection = projection;
+						outermostFace = face;
+					}
+				}
+			}
+			return outermostFace != null;
 		}
 
 		// private

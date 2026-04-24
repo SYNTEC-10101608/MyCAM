@@ -129,6 +129,8 @@
 			this.m_tsbManualTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsb3PntTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAxisTransform = new System.Windows.Forms.ToolStripButton();
+			this.m_tsAutoFindAlienatedWorkPieceBoundary = new System.Windows.Forms.ToolStripButton();
+			this.m_tsAutoFindScretchWorkPieceBoundary = new System.Windows.Forms.ToolStripButton();
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_tscLevel1Container.ContentPanel.SuspendLayout();
@@ -341,6 +343,8 @@
 			this.m_tsAddPathSubFunc.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_tsAddPathSubFunc.ImageScalingSize = new System.Drawing.Size(24, 24);
 			this.m_tsAddPathSubFunc.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.m_tsAutoFindAlienatedWorkPieceBoundary,
+			this.m_tsAutoFindScretchWorkPieceBoundary,
             this.m_tsbSelectD1ContFace,
             this.m_tsbSelPath_FreeBound,
             this.m_tsbSelPath_Manual});
@@ -349,6 +353,26 @@
 			this.m_tsAddPathSubFunc.Size = new System.Drawing.Size(1596, 30);
 			this.m_tsAddPathSubFunc.TabIndex = 5;
 			this.m_tsAddPathSubFunc.Text = "tsAddPathSubFunc";
+			// 
+			// m_tsAutoFindAlienatedWorkPieceBoundary
+			// 
+			this.m_tsAutoFindAlienatedWorkPieceBoundary.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsAutoFindAlienatedWorkPieceBoundary.Image = ( (System.Drawing.Image)( resources.GetObject( "m_tsAutoFindAlienatedWorkPieceBoundary.Image" ) ) );
+			this.m_tsAutoFindAlienatedWorkPieceBoundary.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsAutoFindAlienatedWorkPieceBoundary.Name = "m_tsAutoFindAlienatedWorkPieceBoundary";
+			this.m_tsAutoFindAlienatedWorkPieceBoundary.Size = new System.Drawing.Size( 148, 27 );
+			this.m_tsAutoFindAlienatedWorkPieceBoundary.Text = "異形蓋件-生成路徑";
+			this.m_tsAutoFindAlienatedWorkPieceBoundary.Click += new System.EventHandler( this.m_tsAutoFindAlienatedWorkPieceBoundary_Click );
+			// 
+			// m_tsAutoFindScretchWorkPieceBoundary
+			// 
+			this.m_tsAutoFindScretchWorkPieceBoundary.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsAutoFindScretchWorkPieceBoundary.Image = ((System.Drawing.Image)(resources.GetObject("m_tsAutoFindScretchWorkPieceBoundary.Image")));
+			this.m_tsAutoFindScretchWorkPieceBoundary.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsAutoFindScretchWorkPieceBoundary.Name = "m_tsAutoFindScretchWorkPieceBoundary";
+			this.m_tsAutoFindScretchWorkPieceBoundary.Size = new System.Drawing.Size(148, 27);
+			this.m_tsAutoFindScretchWorkPieceBoundary.Text = "管拉件-生成路徑";
+			this.m_tsAutoFindScretchWorkPieceBoundary.Click += new System.EventHandler(this.m_tsAutoFindStretchedWorkPieceBoundary_Click);
 			// 
 			// m_tsManualTrans
 			// 
@@ -1464,6 +1488,8 @@
 		private System.Windows.Forms.ToolStripButton m_tsbLayer10;
 		private System.Windows.Forms.ToolStripButton m_tsbCalibrationPnt;
 		private System.Windows.Forms.ToolStripButton m_BtnContourEdit;
+		private System.Windows.Forms.ToolStripButton m_tsAutoFindAlienatedWorkPieceBoundary;
+		private System.Windows.Forms.ToolStripButton m_tsAutoFindScretchWorkPieceBoundary;
 	}
 }
 

@@ -144,18 +144,40 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// BFS all D1 continuous faces
-			List<TopoDS_Face> allD1ContFaceList = new List<TopoDS_Face>( faceBFSQueue );
+			List<TopoDS_Face> d1ContinuousFaceList = BFSFindD1ContFaces( faceBFSQueue );
+
+			m_Viewer.GetAISContext().ClearSelected( false );
+
+			// select all D1 continuous faces
+			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
+				foreach( TopoDS_Face oneFace in d1ContinuousFaceList ) {
+					if( faceAISPair.Face.IsEqual( oneFace ) ) {
+						m_Viewer.GetAISContext().AddOrRemoveSelected( faceAISPair.AIS, false );
+					}
+				}
+			}
+			m_Viewer.UpdateView();
+		}
+
+		// Accept externally specified seed face for D1 continuous face search (used by auto flow)
+		public List<TopoDS_Face> FindD1ContFaces( TopoDS_Face faceBFSQueue )
+		{
+			return BFSFindD1ContFaces( new List<TopoDS_Face> { faceBFSQueue } );
+		}
+
+		// BFS core: find all D1 continuous faces starting from a set of seed faces
+		List<TopoDS_Face> BFSFindD1ContFaces( List<TopoDS_Face> faceBFSQueue )
+		{
+			List<TopoDS_Face> pendingFaces = new List<TopoDS_Face>( faceBFSQueue );
+			List<TopoDS_Face> allD1ContinuousFaceList = new List<TopoDS_Face>( faceBFSQueue );
 			TopTools_MapOfShape visitedFaceMap = new TopTools_MapOfShape();
 			TopTools_MapOfShape visitedEdgeMap = new TopTools_MapOfShape();
 			foreach( TopoDS_Face oneFace in faceBFSQueue ) {
 				visitedFaceMap.Add( oneFace );
 			}
-			while( faceBFSQueue.Count > 0 ) {
-
-				// get the first face in the queue
-				TopoDS_Face currentFace = faceBFSQueue[ 0 ];
-				faceBFSQueue.RemoveAt( 0 );
+			while( pendingFaces.Count > 0 ) {
+				TopoDS_Face currentFace = pendingFaces[ 0 ];
+				pendingFaces.RemoveAt( 0 );
 
 				// get all edges of the current face
 				List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
@@ -181,30 +203,26 @@ namespace MyCAM.Editor
 						TopoDS_Face oneConnectedFace = TopoDS.ToFace( _oneConnectedFace );
 						if( GeometryTool.IsD1Cont( currentFace, oneConnectedFace, oneEdge ) ) {
 							visitedFaceMap.Add( oneConnectedFace );
-							allD1ContFaceList.Add( oneConnectedFace );
-							faceBFSQueue.Add( oneConnectedFace );
+							allD1ContinuousFaceList.Add( oneConnectedFace );
+							pendingFaces.Add( oneConnectedFace );
 						}
 					}
 				}
 			}
-			m_Viewer.GetAISContext().ClearSelected( false );
-
-			// select all D1 continuous faces
-			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
-				foreach( TopoDS_Face oneFace in allD1ContFaceList ) {
-					if( faceAISPair.Face.IsEqual( oneFace ) ) {
-						m_Viewer.GetAISContext().AddOrRemoveSelected( faceAISPair.AIS, false );
-					}
-				}
-			}
-			m_Viewer.UpdateView();
+			return allD1ContinuousFaceList;
 		}
 
 		public List<TopoDS_Shape> GetResult()
 		{
-			List<TopoDS_Face> extractedFaceList = GetSelectedFace();
+			// delegate to GetResultFromFaces with the current viewer selection
+			return GetResultFromFaces( GetSelectedFace() );
+		}
+
+		// sew the input face list and return the resulting shape list (could be single shell, multiple shells, or some free faces)
+		public List<TopoDS_Shape> GetResultFromFaces( List<TopoDS_Face> extractedFaceList )
+		{
 			List<TopoDS_Shape> faceGroupList = new List<TopoDS_Shape>();
-			if( extractedFaceList.Count == 0 ) {
+			if( extractedFaceList == null || extractedFaceList.Count == 0 ) {
 				return faceGroupList;
 			}
 

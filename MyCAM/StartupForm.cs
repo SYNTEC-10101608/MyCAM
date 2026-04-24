@@ -45,7 +45,7 @@ namespace MyCAM
 			m_Viewer = new Viewer();
 			bool bSucess = m_Viewer.InitViewer( m_panViewer );
 			if( !bSucess ) {
-				MyApp.Logger.ShowOnLogPanel( "初始化Viewer錯誤", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( "初始化Viewer錯誤，請檢查套件是否安裝齊全", MyApp.NoticeType.Error );
 				return;
 			}
 			m_Viewer.UpdateView();
@@ -307,6 +307,16 @@ namespace MyCAM
 		void m_tsbAddPath_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.StartSelectFace();
+		}
+
+		void m_tsAutoFindAlienatedWorkPieceBoundary_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.AutoFindAlienatedWorkPieceFaceAndSelectFreeBound();
+		}
+
+		void m_tsAutoFindStretchedWorkPieceBoundary_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.AutoFindStretchedWorkPieceFaceAndSelectFreeBound();
 		}
 
 		void m_tsbSelectD1ContFace_Click( object sender, EventArgs e )
