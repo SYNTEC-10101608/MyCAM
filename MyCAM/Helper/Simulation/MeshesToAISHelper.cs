@@ -1,8 +1,5 @@
-﻿using MyCAM.App;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using OCC.AIS;
-using OCC.Graphic3d;
-using OCC.Poly;
 using System;
 using System.Collections.Generic;
 

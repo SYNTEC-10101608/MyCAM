@@ -1,7 +1,6 @@
 using MyCAM.Data;
 using MyCAM.PathCache;
 using OCC.AIS;
-using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCC.TopoDS;

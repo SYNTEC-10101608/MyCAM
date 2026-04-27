@@ -87,7 +87,7 @@ namespace MyCAM.Data
 
 			// cad end point is in the map
 			m_CraftData.ToolVecModifyMap.TryGetValue( lastIndex, out ToolVecModifyData toolVecModifyData );
-			if (toolVecModifyData == null ) {
+			if( toolVecModifyData == null ) {
 				return;
 			}
 			ToolVecModifyData modifyData = toolVecModifyData.Clone();

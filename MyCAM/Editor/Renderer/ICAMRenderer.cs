@@ -1,5 +1,3 @@
-using OCCViewer;
-
 namespace MyCAM.Editor.Renderer
 {
 	/// <summary>
