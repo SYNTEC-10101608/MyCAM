@@ -13,7 +13,7 @@ namespace MyCAM.Post
 			}
 			// replace variables in content (even if empty)
 			string replaced = ReplaceVariables( content, variableDict );
-			if (replaced == string.Empty ) {
+			if( replaced == string.Empty ) {
 				return;
 			}
 			writer.WriteLine( replaced );

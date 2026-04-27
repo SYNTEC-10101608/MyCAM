@@ -218,7 +218,7 @@ namespace MyCAM.App
 				Logger.ShowOnLogPanel( $"客製後處理檔案不存在", NoticeType.Hint );
 
 				// use default value
-				m_CustPost = new CustPost(); 
+				m_CustPost = new CustPost();
 				return;
 			}
 			string fileContent;
@@ -229,7 +229,7 @@ namespace MyCAM.App
 			}
 			catch( Exception ) {
 				Logger.ShowOnLogPanel( $"讀取客製化後處理器檔案失敗", NoticeType.Error );
-				
+
 				// use default value
 				m_CustPost = new CustPost();
 				return;
@@ -237,11 +237,11 @@ namespace MyCAM.App
 
 			// translate to DTO
 			TxtToCustPostTranslator custPostTranslater = new TxtToCustPostTranslator();
-			bool isGetAllCustContent =  custPostTranslater.Translate( fileContent, out CustPost post );
-			if (isGetAllCustContent == false ) {
+			bool isGetAllCustContent = custPostTranslater.Translate( fileContent, out CustPost post );
+			if( isGetAllCustContent == false ) {
 				Logger.ShowOnLogPanel( $"客製化後處理器檔案內容不完整或格式錯誤，請確認檔案內容。", NoticeType.Error, true );
 			}
-			
+
 			// store info
 			m_CustPost = post;
 		}
