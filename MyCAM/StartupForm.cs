@@ -29,7 +29,7 @@ namespace MyCAM
 		{
 #if !DEBUG
 			if( FALicenseChecker.LicenseChecker.IsLicenseActivated() == false ) {
-				MyApp.Logger.ShowOnLogPanel( "授權流程不正確", MyApp.NoticeType.Error);
+				MyApp.Logger.ShowOnLogPanel( "授權流程不正確", MyApp.NoticeType.Error );
 				Environment.Exit( 0 );
 			}
 #endif
@@ -258,6 +258,11 @@ namespace MyCAM
 		void m_tsbAddPoint_PointCenter_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.AddPoint( AddPointType.TwoVertexMidPoint );
+		}
+
+		void m_tsbAddPoint_BoundingBoxCenter_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.AddPoint( AddPointType.BoundingBoxCenter );
 		}
 
 		// manual transform

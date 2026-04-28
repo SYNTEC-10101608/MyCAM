@@ -18,6 +18,7 @@ namespace MyCAM.Editor
 		CircArcCenter = 0,
 		EdgeMidPoint = 1,
 		TwoVertexMidPoint = 2,
+		BoundingBoxCenter = 3,
 	}
 
 	internal class AddPointAction : KeyMouseActionBase

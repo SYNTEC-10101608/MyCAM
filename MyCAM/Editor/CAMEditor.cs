@@ -5,7 +5,6 @@ using MyCAM.Helper;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.AIS;
-using OCC.BRep;
 using OCC.gp;
 using OCC.ShapeAnalysis;
 using OCC.TopAbs;
@@ -1237,11 +1236,7 @@ namespace MyCAM.Editor
 		// Returns null if no visible workpiece exists.
 		BoundingBox GetVisibleWorkpieceBBox()
 		{
-			BRep_Builder builder = new BRep_Builder();
-			TopoDS_Compound compound = new TopoDS_Compound();
-			builder.MakeCompound( ref compound );
-			bool hasShape = false;
-
+			List<TopoDS_Shape> shapeList = new List<TopoDS_Shape>();
 			foreach( string partID in m_DataManager.PartIDList ) {
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
@@ -1249,15 +1244,12 @@ namespace MyCAM.Editor
 				if( DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObject ) == false ) {
 					continue;
 				}
-				TopoDS_Shape compoundAsShape = compound;
-				builder.Add( ref compoundAsShape, shapeObject.Shape );
-				compound = TopoDS.ToCompound( compoundAsShape );
-				hasShape = true;
+				shapeList.Add( shapeObject.Shape );
 			}
-
-			if( hasShape == false ) {
+			if( shapeList.Count == 0 ) {
 				return null;
 			}
+			TopoDS_Shape compound = ShapeTool.MakeCompound( shapeList );
 			return new BoundingBox( compound );
 		}
 	}
