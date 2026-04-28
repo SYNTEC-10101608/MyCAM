@@ -1,6 +1,8 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
+using OCC.BRepBuilderAPI;
+using OCC.gp;
 using OCC.IFSelect;
 using OCC.IGESControl;
 using OCC.STEPControl;
@@ -127,6 +129,11 @@ namespace MyCAM.Editor
 				( m_CurrentAction.ActionType == EditActionType.AddPoint_EdgeMidPoint && type == AddPointType.EdgeMidPoint ) ||
 				( m_CurrentAction.ActionType == EditActionType.AddPoint_TwoVertexMidPoint && type == AddPointType.TwoVertexMidPoint ) ) {
 				m_CurrentAction.End();
+				return;
+			}
+			if( type == AddPointType.BoundingBoxCenter ) {
+				EndActionIfNotDefault();
+				AddBoundingBoxCenterPoint();
 				return;
 			}
 			AddPointAction action = new AddPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, type );
@@ -308,6 +315,45 @@ namespace MyCAM.Editor
 				return false;
 			}
 			return true;
+		}
+
+		void AddBoundingBoxCenterPoint()
+		{
+			// Need at least one part
+			if( m_DataManager.PartIDList.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "無零件資料", MyApp.NoticeType.Warning );
+				return;
+			}
+
+			// Collect raw part shapes
+			List<TopoDS_Shape> shapeList = new List<TopoDS_Shape>();
+			foreach( var partID in m_DataManager.PartIDList ) {
+				// Exclude part been produced by user
+				if( partID.StartsWith( "Ref_" ) ) {
+					continue;
+				}
+				if( DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObject ) == false ) {
+					continue;
+				}
+				shapeList.Add( shapeObject.Shape );
+			}
+			if( shapeList.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( "無零件資料", MyApp.NoticeType.Warning );
+				return;
+			}
+
+			// Make compound and get bounding box center
+			TopoDS_Shape compound = ShapeTool.MakeCompound( shapeList );
+			BoundingBox bbox = new BoundingBox( compound );
+			gp_Pnt center = new gp_Pnt( bbox.XCenter, bbox.YCenter, bbox.ZCenter );
+
+			// Create vertex and add to manager
+			BRepBuilderAPI_MakeVertex makeVertex = new BRepBuilderAPI_MakeVertex( center );
+			if( !makeVertex.IsDone() ) {
+				MyApp.Logger.ShowOnLogPanel( "建立點位失敗", MyApp.NoticeType.Warning );
+				return;
+			}
+			m_DataManager.AddReferenceFeature( makeVertex.Vertex() );
 		}
 
 		// edit actions
