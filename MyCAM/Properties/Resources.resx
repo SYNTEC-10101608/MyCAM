@@ -118,166 +118,160 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="AddFeature" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resource\AddFeature.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="EntryAndExit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_EntryAndExit" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\EntryAndExit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="SaveProjectFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="File_SaveProjectFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\SaveProjectFile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="CNC" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resource\CNC.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="AxisTrans" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAD_AxisTrans" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\AxisTrans.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MoveUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_MoveUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\MoveUp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Play" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_Play" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Play.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="PathEdit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_PathEdit" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\PathEdit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ThreePntTrans" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_ThreePntTrans" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\ThreePntTrans.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MainView" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="View_MainView" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\MainView.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="BackView" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="View_BackView" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\BackView.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Overcut" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_Overcut" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Overcut.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="StartPointSetting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_StartPointSetting" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\StartPointSetting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="SewPart" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAD_SewPart" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\SewPart.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="TopView" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="View_TopView" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\TopView.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_Pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Stop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_Stop" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Stop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Reverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_Reverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Reverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Import3DFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="File_Import3DFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Import3DFile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ReadProjectFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="File_ReadProjectFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\ReadProjectFile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="PointCenter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAD_PointCenter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\PointCenter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Transform" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resource\Transform.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="CAD_BoundingBoxCenter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\BoundingBoxCenter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="TwoVertexConnect" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAD_TwoVertexConnect" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\TwoVertexConnect.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ToolVec" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_ToolVec" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\ToolVec.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="DeletePath" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_DeletePath" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\DeletePath.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Lead" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_Lead" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Lead.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="BottomView" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="View_BottomView" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\BottomView.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="G54" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resource\G54.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ToolVecReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_ToolVecReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\ToolVecReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AddPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_AddPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\AddPath.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="FixedToolVec" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_FixedToolVec" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\FixedToolVec.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="NCFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_NCFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\NCFile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ManualTransform" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAD_ManualTransform" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\ManualTransform.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Axo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="View_Axo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Axo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AcrCenter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAD_AcrCenter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\AcrCenter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="TraverseParam" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_TraverseParam" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\TraverseParam.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="StandardPattern" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_StandardPattern" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\StandardPattern.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="LeftView" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="View_LeftView" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\LeftView.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Right View" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="View_Right View" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Right View.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="EdgeCenter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAD_EdgeCenter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\EdgeCenter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AutoOrder" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_AutoOrder" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\AutoOrder.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MoveDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_MoveDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\MoveDown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="PathCompensate" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_PathCompensate" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\PathCompensate.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="NextPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_NextPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\NextPath.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="PreviousPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_PreviousPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\PreviousPath.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="NextCol" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_NextCol" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\NextCol.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="PreviousCol" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_PreviousCol" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\PreviousCol.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="SpeedUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_SpeedUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\SpeedUp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="SlowDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_SlowDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\SlowDown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Check" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_Check" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Check.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="NextPoint" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_NextPoint" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\NextPoint.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="PrePoint" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Simu_PrePoint" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\PrePoint.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Calibration" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_Calibration" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Calibration.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ContourEdit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="CAM_ContourEdit" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\ContourEdit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CAM_OptimizeIK" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\OptimizeIK.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
