@@ -63,9 +63,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap AcrCenter {
+        internal static System.Drawing.Bitmap CAD_AcrCenter {
             get {
-                object obj = ResourceManager.GetObject("AcrCenter", resourceCulture);
+                object obj = ResourceManager.GetObject("CAD_AcrCenter", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap AddFeature {
+        internal static System.Drawing.Bitmap CAD_AxisTrans {
             get {
-                object obj = ResourceManager.GetObject("AddFeature", resourceCulture);
+                object obj = ResourceManager.GetObject("CAD_AxisTrans", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap AddPath {
+        internal static System.Drawing.Bitmap CAD_EdgeCenter {
             get {
-                object obj = ResourceManager.GetObject("AddPath", resourceCulture);
+                object obj = ResourceManager.GetObject("CAD_EdgeCenter", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap AutoOrder {
+        internal static System.Drawing.Bitmap CAD_ManualTransform {
             get {
-                object obj = ResourceManager.GetObject("AutoOrder", resourceCulture);
+                object obj = ResourceManager.GetObject("CAD_ManualTransform", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +103,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap AxisTrans {
+        internal static System.Drawing.Bitmap CAD_PointCenter {
             get {
-                object obj = ResourceManager.GetObject("AxisTrans", resourceCulture);
+                object obj = ResourceManager.GetObject("CAD_PointCenter", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -113,9 +113,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Axo {
+        internal static System.Drawing.Bitmap CAD_SewPart {
             get {
-                object obj = ResourceManager.GetObject("Axo", resourceCulture);
+                object obj = ResourceManager.GetObject("CAD_SewPart", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -123,9 +123,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap BackView {
+        internal static System.Drawing.Bitmap CAD_TwoVertexConnect {
             get {
-                object obj = ResourceManager.GetObject("BackView", resourceCulture);
+                object obj = ResourceManager.GetObject("CAD_TwoVertexConnect", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -133,9 +133,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap BottomView {
+        internal static System.Drawing.Bitmap CAM_AddPath {
             get {
-                object obj = ResourceManager.GetObject("BottomView", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_AddPath", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -143,9 +143,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Calibration {
+        internal static System.Drawing.Bitmap CAM_AutoOrder {
             get {
-                object obj = ResourceManager.GetObject("Calibration", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_AutoOrder", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -153,9 +153,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Check {
+        internal static System.Drawing.Bitmap CAM_Calibration {
             get {
-                object obj = ResourceManager.GetObject("Check", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_Calibration", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -163,9 +163,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap CNC {
+        internal static System.Drawing.Bitmap CAM_ContourEdit {
             get {
-                object obj = ResourceManager.GetObject("CNC", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_ContourEdit", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -173,9 +173,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ContourEdit {
+        internal static System.Drawing.Bitmap CAM_DeletePath {
             get {
-                object obj = ResourceManager.GetObject("ContourEdit", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_DeletePath", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -183,9 +183,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap DeletePath {
+        internal static System.Drawing.Bitmap CAM_EntryAndExit {
             get {
-                object obj = ResourceManager.GetObject("DeletePath", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_EntryAndExit", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -193,9 +193,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap EdgeCenter {
+        internal static System.Drawing.Bitmap CAM_FixedToolVec {
             get {
-                object obj = ResourceManager.GetObject("EdgeCenter", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_FixedToolVec", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -203,9 +203,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap EntryAndExit {
+        internal static System.Drawing.Bitmap CAM_Lead {
             get {
-                object obj = ResourceManager.GetObject("EntryAndExit", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_Lead", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -213,9 +213,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap FixedToolVec {
+        internal static System.Drawing.Bitmap CAM_MoveDown {
             get {
-                object obj = ResourceManager.GetObject("FixedToolVec", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_MoveDown", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -223,9 +223,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap G54 {
+        internal static System.Drawing.Bitmap CAM_MoveUp {
             get {
-                object obj = ResourceManager.GetObject("G54", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_MoveUp", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -233,9 +233,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Import3DFile {
+        internal static System.Drawing.Bitmap CAM_NCFile {
             get {
-                object obj = ResourceManager.GetObject("Import3DFile", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_NCFile", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -243,9 +243,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Lead {
+        internal static System.Drawing.Bitmap CAM_Overcut {
             get {
-                object obj = ResourceManager.GetObject("Lead", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_Overcut", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -253,9 +253,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap LeftView {
+        internal static System.Drawing.Bitmap CAM_PathCompensate {
             get {
-                object obj = ResourceManager.GetObject("LeftView", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_PathCompensate", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -263,9 +263,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap MainView {
+        internal static System.Drawing.Bitmap CAM_PathEdit {
             get {
-                object obj = ResourceManager.GetObject("MainView", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_PathEdit", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -273,9 +273,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ManualTransform {
+        internal static System.Drawing.Bitmap CAM_Reverse {
             get {
-                object obj = ResourceManager.GetObject("ManualTransform", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_Reverse", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -283,9 +283,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap MoveDown {
+        internal static System.Drawing.Bitmap CAM_StandardPattern {
             get {
-                object obj = ResourceManager.GetObject("MoveDown", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_StandardPattern", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -293,9 +293,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap MoveUp {
+        internal static System.Drawing.Bitmap CAM_StartPointSetting {
             get {
-                object obj = ResourceManager.GetObject("MoveUp", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_StartPointSetting", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -303,9 +303,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap NCFile {
+        internal static System.Drawing.Bitmap CAM_ThreePntTrans {
             get {
-                object obj = ResourceManager.GetObject("NCFile", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_ThreePntTrans", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -313,9 +313,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap NextCol {
+        internal static System.Drawing.Bitmap CAM_ToolVec {
             get {
-                object obj = ResourceManager.GetObject("NextCol", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_ToolVec", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -323,9 +323,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap NextPath {
+        internal static System.Drawing.Bitmap CAM_ToolVecReverse {
             get {
-                object obj = ResourceManager.GetObject("NextPath", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_ToolVecReverse", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -333,9 +333,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap NextPoint {
+        internal static System.Drawing.Bitmap CAM_TraverseParam {
             get {
-                object obj = ResourceManager.GetObject("NextPoint", resourceCulture);
+                object obj = ResourceManager.GetObject("CAM_TraverseParam", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -343,9 +343,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Overcut {
+        internal static System.Drawing.Bitmap File_Import3DFile {
             get {
-                object obj = ResourceManager.GetObject("Overcut", resourceCulture);
+                object obj = ResourceManager.GetObject("File_Import3DFile", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -353,9 +353,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PathCompensate {
+        internal static System.Drawing.Bitmap File_ReadProjectFile {
             get {
-                object obj = ResourceManager.GetObject("PathCompensate", resourceCulture);
+                object obj = ResourceManager.GetObject("File_ReadProjectFile", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -363,9 +363,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PathEdit {
+        internal static System.Drawing.Bitmap File_SaveProjectFile {
             get {
-                object obj = ResourceManager.GetObject("PathEdit", resourceCulture);
+                object obj = ResourceManager.GetObject("File_SaveProjectFile", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -373,9 +373,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pause {
+        internal static System.Drawing.Bitmap Simu_Check {
             get {
-                object obj = ResourceManager.GetObject("Pause", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_Check", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -383,9 +383,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Play {
+        internal static System.Drawing.Bitmap Simu_NextCol {
             get {
-                object obj = ResourceManager.GetObject("Play", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_NextCol", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -393,9 +393,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PointCenter {
+        internal static System.Drawing.Bitmap Simu_NextPath {
             get {
-                object obj = ResourceManager.GetObject("PointCenter", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_NextPath", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -403,9 +403,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PrePoint {
+        internal static System.Drawing.Bitmap Simu_NextPoint {
             get {
-                object obj = ResourceManager.GetObject("PrePoint", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_NextPoint", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -413,9 +413,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PreviousCol {
+        internal static System.Drawing.Bitmap Simu_Pause {
             get {
-                object obj = ResourceManager.GetObject("PreviousCol", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_Pause", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -423,9 +423,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PreviousPath {
+        internal static System.Drawing.Bitmap Simu_Play {
             get {
-                object obj = ResourceManager.GetObject("PreviousPath", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_Play", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -433,9 +433,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ReadProjectFile {
+        internal static System.Drawing.Bitmap Simu_PrePoint {
             get {
-                object obj = ResourceManager.GetObject("ReadProjectFile", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_PrePoint", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -443,9 +443,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Reverse {
+        internal static System.Drawing.Bitmap Simu_PreviousCol {
             get {
-                object obj = ResourceManager.GetObject("Reverse", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_PreviousCol", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -453,9 +453,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Right_View {
+        internal static System.Drawing.Bitmap Simu_PreviousPath {
             get {
-                object obj = ResourceManager.GetObject("Right View", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_PreviousPath", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -463,9 +463,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap SaveProjectFile {
+        internal static System.Drawing.Bitmap Simu_SlowDown {
             get {
-                object obj = ResourceManager.GetObject("SaveProjectFile", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_SlowDown", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -473,9 +473,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap SewPart {
+        internal static System.Drawing.Bitmap Simu_SpeedUp {
             get {
-                object obj = ResourceManager.GetObject("SewPart", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_SpeedUp", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -483,9 +483,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap SlowDown {
+        internal static System.Drawing.Bitmap Simu_Stop {
             get {
-                object obj = ResourceManager.GetObject("SlowDown", resourceCulture);
+                object obj = ResourceManager.GetObject("Simu_Stop", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -493,9 +493,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap SpeedUp {
+        internal static System.Drawing.Bitmap View_Axo {
             get {
-                object obj = ResourceManager.GetObject("SpeedUp", resourceCulture);
+                object obj = ResourceManager.GetObject("View_Axo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -503,9 +503,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap StandardPattern {
+        internal static System.Drawing.Bitmap View_BackView {
             get {
-                object obj = ResourceManager.GetObject("StandardPattern", resourceCulture);
+                object obj = ResourceManager.GetObject("View_BackView", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -513,9 +513,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap StartPointSetting {
+        internal static System.Drawing.Bitmap View_BottomView {
             get {
-                object obj = ResourceManager.GetObject("StartPointSetting", resourceCulture);
+                object obj = ResourceManager.GetObject("View_BottomView", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -523,9 +523,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Stop {
+        internal static System.Drawing.Bitmap View_LeftView {
             get {
-                object obj = ResourceManager.GetObject("Stop", resourceCulture);
+                object obj = ResourceManager.GetObject("View_LeftView", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -533,9 +533,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ThreePntTrans {
+        internal static System.Drawing.Bitmap View_MainView {
             get {
-                object obj = ResourceManager.GetObject("ThreePntTrans", resourceCulture);
+                object obj = ResourceManager.GetObject("View_MainView", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -543,9 +543,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ToolVec {
+        internal static System.Drawing.Bitmap View_Right_View {
             get {
-                object obj = ResourceManager.GetObject("ToolVec", resourceCulture);
+                object obj = ResourceManager.GetObject("View_Right View", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -553,49 +553,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ToolVecReverse {
+        internal static System.Drawing.Bitmap View_TopView {
             get {
-                object obj = ResourceManager.GetObject("ToolVecReverse", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap TopView {
-            get {
-                object obj = ResourceManager.GetObject("TopView", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Transform {
-            get {
-                object obj = ResourceManager.GetObject("Transform", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap TraverseParam {
-            get {
-                object obj = ResourceManager.GetObject("TraverseParam", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap TwoVertexConnect {
-            get {
-                object obj = ResourceManager.GetObject("TwoVertexConnect", resourceCulture);
+                object obj = ResourceManager.GetObject("View_TopView", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

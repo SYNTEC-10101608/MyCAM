@@ -404,7 +404,7 @@
 			// m_tsbPathEdit
 			// 
 			this.m_tsbPathEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_tsbPathEdit.Image = global::MyCAM.Properties.Resources.PathEdit;
+			this.m_tsbPathEdit.Image = global::MyCAM.Properties.Resources.CAM_PathEdit;
 			this.m_tsbPathEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbPathEdit.Name = "m_tsbPathEdit";
 			this.m_tsbPathEdit.Size = new System.Drawing.Size(44, 24);
@@ -415,7 +415,7 @@
 			// m_BtnContourEdit
 			// 
 			this.m_BtnContourEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_BtnContourEdit.Image = global::MyCAM.Properties.Resources.ContourEdit;
+			this.m_BtnContourEdit.Image = global::MyCAM.Properties.Resources.CAM_ContourEdit;
 			this.m_BtnContourEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_BtnContourEdit.Name = "m_BtnContourEdit";
 			this.m_BtnContourEdit.Size = new System.Drawing.Size(44, 24);
@@ -425,7 +425,7 @@
 			// m_tsbPathCompensation
 			// 
 			this.m_tsbPathCompensation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_tsbPathCompensation.Image = global::MyCAM.Properties.Resources.PathCompensate;
+			this.m_tsbPathCompensation.Image = global::MyCAM.Properties.Resources.CAM_PathCompensate;
 			this.m_tsbPathCompensation.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbPathCompensation.Name = "m_tsbPathCompensation";
 			this.m_tsbPathCompensation.Size = new System.Drawing.Size(44, 24);
@@ -436,7 +436,7 @@
 			// m_tsbCalibrationPnt
 			// 
 			this.m_tsbCalibrationPnt.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_tsbCalibrationPnt.Image = global::MyCAM.Properties.Resources.Calibration;
+			this.m_tsbCalibrationPnt.Image = global::MyCAM.Properties.Resources.CAM_Calibration;
 			this.m_tsbCalibrationPnt.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbCalibrationPnt.Name = "m_tsbCalibrationPnt";
 			this.m_tsbCalibrationPnt.Size = new System.Drawing.Size(44, 24);
@@ -496,7 +496,7 @@
 			// m_btnPlay
 			// 
 			this.m_btnPlay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnPlay.Image = global::MyCAM.Properties.Resources.Play;
+			this.m_btnPlay.Image = global::MyCAM.Properties.Resources.Simu_Play;
 			this.m_btnPlay.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnPlay.Name = "m_btnPlay";
 			this.m_btnPlay.Size = new System.Drawing.Size(44, 24);
@@ -506,7 +506,7 @@
 			// m_btnPause
 			// 
 			this.m_btnPause.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnPause.Image = global::MyCAM.Properties.Resources.Pause;
+			this.m_btnPause.Image = global::MyCAM.Properties.Resources.Simu_Pause;
 			this.m_btnPause.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnPause.Name = "m_btnPause";
 			this.m_btnPause.Size = new System.Drawing.Size(44, 24);
@@ -516,7 +516,7 @@
 			// m_btnStop
 			// 
 			this.m_btnStop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnStop.Image = global::MyCAM.Properties.Resources.Stop;
+			this.m_btnStop.Image = global::MyCAM.Properties.Resources.Simu_Stop;
 			this.m_btnStop.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnStop.Name = "m_btnStop";
 			this.m_btnStop.Size = new System.Drawing.Size(44, 24);
@@ -527,7 +527,7 @@
 			// m_btnPreviousPath
 			// 
 			this.m_btnPreviousPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnPreviousPath.Image = global::MyCAM.Properties.Resources.PreviousPath;
+			this.m_btnPreviousPath.Image = global::MyCAM.Properties.Resources.Simu_PreviousPath;
 			this.m_btnPreviousPath.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnPreviousPath.Name = "m_btnPreviousPath";
 			this.m_btnPreviousPath.Size = new System.Drawing.Size(44, 24);
@@ -537,7 +537,7 @@
 			// m_btnNextPath
 			// 
 			this.m_btnNextPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnNextPath.Image = global::MyCAM.Properties.Resources.NextPath;
+			this.m_btnNextPath.Image = global::MyCAM.Properties.Resources.Simu_NextPath;
 			this.m_btnNextPath.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnNextPath.Name = "m_btnNextPath";
 			this.m_btnNextPath.Size = new System.Drawing.Size(44, 24);
@@ -547,7 +547,7 @@
 			// m_btnPreCollision
 			// 
 			this.m_btnPreCollision.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnPreCollision.Image = global::MyCAM.Properties.Resources.PreviousCol;
+			this.m_btnPreCollision.Image = global::MyCAM.Properties.Resources.Simu_PreviousCol;
 			this.m_btnPreCollision.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnPreCollision.Name = "m_btnPreCollision";
 			this.m_btnPreCollision.Size = new System.Drawing.Size(44, 24);
@@ -557,7 +557,7 @@
 			// m_btnNextCol
 			// 
 			this.m_btnNextCol.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnNextCol.Image = global::MyCAM.Properties.Resources.NextCol;
+			this.m_btnNextCol.Image = global::MyCAM.Properties.Resources.Simu_NextCol;
 			this.m_btnNextCol.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnNextCol.Name = "m_btnNextCol";
 			this.m_btnNextCol.Size = new System.Drawing.Size(44, 24);
@@ -567,7 +567,7 @@
 			// m_btnPrePoint
 			// 
 			this.m_btnPrePoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnPrePoint.Image = global::MyCAM.Properties.Resources.PrePoint;
+			this.m_btnPrePoint.Image = global::MyCAM.Properties.Resources.Simu_PrePoint;
 			this.m_btnPrePoint.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnPrePoint.Name = "m_btnPrePoint";
 			this.m_btnPrePoint.Size = new System.Drawing.Size(44, 24);
@@ -577,7 +577,7 @@
 			// m_btnNextPoint
 			// 
 			this.m_btnNextPoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnNextPoint.Image = global::MyCAM.Properties.Resources.NextPoint;
+			this.m_btnNextPoint.Image = global::MyCAM.Properties.Resources.Simu_NextPoint;
 			this.m_btnNextPoint.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnNextPoint.Name = "m_btnNextPoint";
 			this.m_btnNextPoint.Size = new System.Drawing.Size(44, 24);
@@ -588,7 +588,7 @@
 			// m_btnSpeedUp
 			// 
 			this.m_btnSpeedUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnSpeedUp.Image = global::MyCAM.Properties.Resources.SpeedUp;
+			this.m_btnSpeedUp.Image = global::MyCAM.Properties.Resources.Simu_SpeedUp;
 			this.m_btnSpeedUp.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnSpeedUp.Name = "m_btnSpeedUp";
 			this.m_btnSpeedUp.Size = new System.Drawing.Size(44, 24);
@@ -598,7 +598,7 @@
 			// m_btnSlowDonw
 			// 
 			this.m_btnSlowDonw.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnSlowDonw.Image = global::MyCAM.Properties.Resources.SlowDown;
+			this.m_btnSlowDonw.Image = global::MyCAM.Properties.Resources.Simu_SlowDown;
 			this.m_btnSlowDonw.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnSlowDonw.Name = "m_btnSlowDonw";
 			this.m_btnSlowDonw.Size = new System.Drawing.Size(44, 24);
@@ -609,7 +609,7 @@
 			// m_btnCheck
 			// 
 			this.m_btnCheck.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.m_btnCheck.Image = global::MyCAM.Properties.Resources.Check;
+			this.m_btnCheck.Image = global::MyCAM.Properties.Resources.Simu_Check;
 			this.m_btnCheck.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnCheck.Name = "m_btnCheck";
 			this.m_btnCheck.Size = new System.Drawing.Size(44, 24);
