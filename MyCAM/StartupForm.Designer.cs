@@ -478,11 +478,11 @@
 			this.m_tscLevel1Container.ContentPanel.Controls.Add( this.m_tsCAMFunction );
 			this.m_tscLevel1Container.ContentPanel.Controls.Add( this.m_tsSimuFunc );
 			this.m_tscLevel1Container.ContentPanel.Controls.Add( this.m_tsFileFunction );
-			this.m_tscLevel1Container.ContentPanel.Size = new System.Drawing.Size( 1596, 27 );
+			this.m_tscLevel1Container.ContentPanel.Size = new System.Drawing.Size( 1596, 50 );
 			this.m_tscLevel1Container.Dock = System.Windows.Forms.DockStyle.Top;
 			this.m_tscLevel1Container.Location = new System.Drawing.Point( 0, 27 );
 			this.m_tscLevel1Container.Name = "m_tscLevel1Container";
-			this.m_tscLevel1Container.Size = new System.Drawing.Size( 1596, 52 );
+			this.m_tscLevel1Container.Size = new System.Drawing.Size( 1596, 75 );
 			this.m_tscLevel1Container.TabIndex = 5;
 			this.m_tscLevel1Container.Text = "toolStripContainer1";
 			// 
@@ -711,100 +711,109 @@
 			// 
 			// m_tsbSewPart
 			// 
-			this.m_tsbSewPart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbSewPart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbSewPart.Image = global::MyCAM.Properties.Resources.CAD_SewPart;
 			this.m_tsbSewPart.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbSewPart.Name = "m_tsbSewPart";
 			this.m_tsbSewPart.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbSewPart.Text = "模型縫補";
+			this.m_tsbSewPart.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbSewPart.ToolTipText = "模型縫補";
 			this.m_tsbSewPart.Click += new System.EventHandler( this.m_tsbSewPart_Click );
 			// 
 			// m_tsbAddPoint_AcrCenter
 			// 
-			this.m_tsbAddPoint_AcrCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAddPoint_AcrCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbAddPoint_AcrCenter.Image = global::MyCAM.Properties.Resources.CAD_AcrCenter;
 			this.m_tsbAddPoint_AcrCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAddPoint_AcrCenter.Name = "m_tsbAddPoint_AcrCenter";
 			this.m_tsbAddPoint_AcrCenter.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddPoint_AcrCenter.Text = "新增圓弧中心";
+			this.m_tsbAddPoint_AcrCenter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbAddPoint_AcrCenter.ToolTipText = "新增圓弧中心";
 			this.m_tsbAddPoint_AcrCenter.Click += new System.EventHandler( this.m_tsbAddPoint_AcrCenter_Click );
 			// 
 			// m_tsbAddPoint_EdgeCenter
 			// 
-			this.m_tsbAddPoint_EdgeCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAddPoint_EdgeCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbAddPoint_EdgeCenter.Image = global::MyCAM.Properties.Resources.CAD_EdgeCenter;
 			this.m_tsbAddPoint_EdgeCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAddPoint_EdgeCenter.Name = "m_tsbAddPoint_EdgeCenter";
 			this.m_tsbAddPoint_EdgeCenter.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddPoint_EdgeCenter.Text = "新增線段中心";
+			this.m_tsbAddPoint_EdgeCenter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbAddPoint_EdgeCenter.ToolTipText = "新增線段中心";
 			this.m_tsbAddPoint_EdgeCenter.Click += new System.EventHandler( this.m_tsbAddPoint_EdgeCenter_Click );
 			// 
 			// m_tsbAddPoint_PointCenter
 			// 
-			this.m_tsbAddPoint_PointCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAddPoint_PointCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbAddPoint_PointCenter.Image = global::MyCAM.Properties.Resources.CAD_PointCenter;
 			this.m_tsbAddPoint_PointCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAddPoint_PointCenter.Name = "m_tsbAddPoint_PointCenter";
 			this.m_tsbAddPoint_PointCenter.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddPoint_PointCenter.Text = "新增兩點中心";
+			this.m_tsbAddPoint_PointCenter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbAddPoint_PointCenter.ToolTipText = "新增兩點中心";
 			this.m_tsbAddPoint_PointCenter.Click += new System.EventHandler( this.m_tsbAddPoint_PointCenter_Click );
 			// 
 			// m_tsbAddPoint_BoundingBoxCenter
 			// 
-			this.m_tsbAddPoint_BoundingBoxCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAddPoint_BoundingBoxCenter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbAddPoint_BoundingBoxCenter.Image = global::MyCAM.Properties.Resources.CAD_BoundingBoxCenter;
 			this.m_tsbAddPoint_BoundingBoxCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAddPoint_BoundingBoxCenter.Name = "m_tsbAddPoint_BoundingBoxCenter";
 			this.m_tsbAddPoint_BoundingBoxCenter.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddPoint_BoundingBoxCenter.Text = "新增包圍盒中心";
+			this.m_tsbAddPoint_BoundingBoxCenter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbAddPoint_BoundingBoxCenter.ToolTipText = "新增包圍盒中心";
 			this.m_tsbAddPoint_BoundingBoxCenter.Click += new System.EventHandler( this.m_tsbAddPoint_BoundingBoxCenter_Click );
 			// 
 			// m_tsbAddLine_TwoVertexConnect
 			// 
-			this.m_tsbAddLine_TwoVertexConnect.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAddLine_TwoVertexConnect.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbAddLine_TwoVertexConnect.Image = global::MyCAM.Properties.Resources.CAD_TwoVertexConnect;
 			this.m_tsbAddLine_TwoVertexConnect.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAddLine_TwoVertexConnect.Name = "m_tsbAddLine_TwoVertexConnect";
 			this.m_tsbAddLine_TwoVertexConnect.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddLine_TwoVertexConnect.Text = "新增兩點連線";
+			this.m_tsbAddLine_TwoVertexConnect.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbAddLine_TwoVertexConnect.ToolTipText = "新增兩點連線";
 			this.m_tsbAddLine_TwoVertexConnect.Click += new System.EventHandler( this.m_tsbAddLine_TwoVertexConnect_Click );
 			// 
 			// m_tsbManualTransform
 			// 
-			this.m_tsbManualTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbManualTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbManualTransform.Image = global::MyCAM.Properties.Resources.CAD_ManualTransform;
 			this.m_tsbManualTransform.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbManualTransform.Name = "m_tsbManualTransform";
 			this.m_tsbManualTransform.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbManualTransform.Text = "手動轉換";
+			this.m_tsbManualTransform.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbManualTransform.ToolTipText = "手動轉換";
 			this.m_tsbManualTransform.Click += new System.EventHandler( this.m_tsbManualTransform_Click );
 			// 
 			// m_tsb3PntTransform
 			// 
-			this.m_tsb3PntTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsb3PntTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsb3PntTransform.Image = global::MyCAM.Properties.Resources.CAM_ThreePntTrans;
 			this.m_tsb3PntTransform.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsb3PntTransform.Name = "m_tsb3PntTransform";
 			this.m_tsb3PntTransform.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsb3PntTransform.Text = "三點轉換";
+			this.m_tsb3PntTransform.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsb3PntTransform.ToolTipText = "三點轉換";
 			this.m_tsb3PntTransform.Click += new System.EventHandler( this.m_tsb3PntTransform_Click );
 			// 
 			// m_tsbAxisTransform
 			// 
-			this.m_tsbAxisTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAxisTransform.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbAxisTransform.Image = global::MyCAM.Properties.Resources.CAD_AxisTrans;
 			this.m_tsbAxisTransform.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAxisTransform.Name = "m_tsbAxisTransform";
 			this.m_tsbAxisTransform.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAxisTransform.Text = "軸向轉換";
+			this.m_tsbAxisTransform.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbAxisTransform.ToolTipText = "軸向轉換";
 			this.m_tsbAxisTransform.Click += new System.EventHandler( this.m_tsbAxisTransform_Click );
 			// 
