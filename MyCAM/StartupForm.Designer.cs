@@ -257,6 +257,7 @@
 			this.m_tsbAddPath.Name = "m_tsbAddPath";
 			this.m_tsbAddPath.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddPath.Text = "新增路徑";
+			this.m_tsbAddPath.ToolTipText = "新增路徑";
 			this.m_tsbAddPath.Click += new System.EventHandler( this.m_tsbAddPath_Click );
 			// 
 			// m_tsbDeletePath
@@ -267,6 +268,7 @@
 			this.m_tsbDeletePath.Name = "m_tsbDeletePath";
 			this.m_tsbDeletePath.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbDeletePath.Text = "刪除路徑";
+			this.m_tsbDeletePath.ToolTipText = "刪除路徑";
 			this.m_tsbDeletePath.Click += new System.EventHandler( this.m_tsbDeletePath_Click );
 			// 
 			// m_tsbStartPoint
@@ -277,6 +279,7 @@
 			this.m_tsbStartPoint.Name = "m_tsbStartPoint";
 			this.m_tsbStartPoint.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbStartPoint.Text = "起點";
+			this.m_tsbStartPoint.ToolTipText = "起點";
 			this.m_tsbStartPoint.Click += new System.EventHandler( this.m_tsbStartPoint_Click );
 			// 
 			// m_tsbReverse
@@ -287,6 +290,7 @@
 			this.m_tsbReverse.Name = "m_tsbReverse";
 			this.m_tsbReverse.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbReverse.Text = "反向";
+			this.m_tsbReverse.ToolTipText = "反向";
 			this.m_tsbReverse.Click += new System.EventHandler( this.m_tsbReverse_Click );
 			// 
 			// m_tsbSetLead
@@ -297,6 +301,7 @@
 			this.m_tsbSetLead.Name = "m_tsbSetLead";
 			this.m_tsbSetLead.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbSetLead.Text = "引線";
+			this.m_tsbSetLead.ToolTipText = "引線";
 			this.m_tsbSetLead.Click += new System.EventHandler( this.m_tsbSetLead_Click );
 			// 
 			// m_tsbOverCut
@@ -307,6 +312,7 @@
 			this.m_tsbOverCut.Name = "m_tsbOverCut";
 			this.m_tsbOverCut.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbOverCut.Text = "過切";
+			this.m_tsbOverCut.ToolTipText = "過切";
 			this.m_tsbOverCut.Click += new System.EventHandler( this.m_tsbOverCut_Click );
 			// 
 			// m_tsbToolVecReverse
@@ -317,6 +323,7 @@
 			this.m_tsbToolVecReverse.Name = "m_tsbToolVecReverse";
 			this.m_tsbToolVecReverse.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbToolVecReverse.Text = "姿態反向";
+			this.m_tsbToolVecReverse.ToolTipText = "姿態反向";
 			this.m_tsbToolVecReverse.Click += new System.EventHandler( this.m_tsbTooVecReverse_Click );
 			// 
 			// m_tsbToolVec
@@ -327,6 +334,7 @@
 			this.m_tsbToolVec.Name = "m_tsbToolVec";
 			this.m_tsbToolVec.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbToolVec.Text = "姿態";
+			this.m_tsbToolVec.ToolTipText = "姿態";
 			this.m_tsbToolVec.Click += new System.EventHandler( this.m_tsbToolVec_Click );
 			// 
 			// m_tsbFixedToolVec
@@ -337,6 +345,7 @@
 			this.m_tsbFixedToolVec.Name = "m_tsbFixedToolVec";
 			this.m_tsbFixedToolVec.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbFixedToolVec.Text = "定姿態切割";
+			this.m_tsbFixedToolVec.ToolTipText = "定姿態切割";
 			this.m_tsbFixedToolVec.Click += new System.EventHandler( this.m_tsbFixedToolVec_Click );
 			// 
 			// m_tsbMoveUp
@@ -347,6 +356,7 @@
 			this.m_tsbMoveUp.Name = "m_tsbMoveUp";
 			this.m_tsbMoveUp.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbMoveUp.Text = "順序往前";
+			this.m_tsbMoveUp.ToolTipText = "順序往前";
 			this.m_tsbMoveUp.Click += new System.EventHandler( this.m_tsbMoveUp_Click );
 			// 
 			// m_tsbMoveDown
@@ -357,6 +367,7 @@
 			this.m_tsbMoveDown.Name = "m_tsbMoveDown";
 			this.m_tsbMoveDown.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbMoveDown.Text = "順序往後";
+			this.m_tsbMoveDown.ToolTipText = "順序往後";
 			this.m_tsbMoveDown.Click += new System.EventHandler( this.m_tsbMoveDown_Click );
 			// 
 			// m_tsbAutoOrder
@@ -367,6 +378,7 @@
 			this.m_tsbAutoOrder.Name = "m_tsbAutoOrder";
 			this.m_tsbAutoOrder.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAutoOrder.Text = "自動排序";
+			this.m_tsbAutoOrder.ToolTipText = "自動排序";
 			this.m_tsbAutoOrder.Click += new System.EventHandler( this.m_tsbAutoOrder_Click );
 			// 
 			// m_tsbSetTraverseData
@@ -377,6 +389,7 @@
 			this.m_tsbSetTraverseData.Name = "m_tsbSetTraverseData";
 			this.m_tsbSetTraverseData.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbSetTraverseData.Text = "空移參數設定";
+			this.m_tsbSetTraverseData.ToolTipText = "空移參數設定";
 			this.m_tsbSetTraverseData.Click += new System.EventHandler( this.m_tsbSetTraverseData_Click );
 			// 
 			// m_tsbEntryAndExitSetting
@@ -387,6 +400,7 @@
 			this.m_tsbEntryAndExitSetting.Name = "m_tsbEntryAndExitSetting";
 			this.m_tsbEntryAndExitSetting.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbEntryAndExitSetting.Text = "進入/退出";
+			this.m_tsbEntryAndExitSetting.ToolTipText = "進入/退出";
 			this.m_tsbEntryAndExitSetting.Click += new System.EventHandler( this.m_tsbEntryAndExitSetting_Click );
 			// 
 			// m_tsbPatternSetting
@@ -396,7 +410,7 @@
 			this.m_tsbPatternSetting.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbPatternSetting.Name = "m_tsbPatternSetting";
 			this.m_tsbPatternSetting.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbPatternSetting.Text = "toolStripButton1";
+			this.m_tsbPatternSetting.Text = "設定圖元";
 			this.m_tsbPatternSetting.ToolTipText = "設定圖元";
 			this.m_tsbPatternSetting.Click += new System.EventHandler( this.m_tsbPatternSetting_Click );
 			// 
@@ -419,6 +433,7 @@
 			this.m_BtnContourEdit.Name = "m_BtnContourEdit";
 			this.m_BtnContourEdit.Size = new System.Drawing.Size( 44, 24 );
 			this.m_BtnContourEdit.Text = "輪廓編輯";
+			this.m_BtnContourEdit.ToolTipText = "輪廓編輯";
 			this.m_BtnContourEdit.Click += new System.EventHandler( this.m_BtnContourEdit_Click );
 			// 
 			// m_tsbPathCompensation
@@ -440,6 +455,7 @@
 			this.m_tsbCalibrationPnt.Name = "m_tsbCalibrationPnt";
 			this.m_tsbCalibrationPnt.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbCalibrationPnt.Text = "三點校正參考點";
+			this.m_tsbCalibrationPnt.ToolTipText = "三點校正參考點";
 			this.m_tsbCalibrationPnt.Click += new System.EventHandler( this.m_tsbCalibrationPnt_Click );
 			// 
 			// m_tsbConvertNC
@@ -450,6 +466,7 @@
 			this.m_tsbConvertNC.Name = "m_tsbConvertNC";
 			this.m_tsbConvertNC.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbConvertNC.Text = "轉出NC";
+			this.m_tsbConvertNC.ToolTipText = "轉出NC";
 			this.m_tsbConvertNC.Click += new System.EventHandler( this.m_tsbConvertNC_Click );
 			// 
 			// m_tscLevel1Container
@@ -500,6 +517,7 @@
 			this.m_btnPlay.Name = "m_btnPlay";
 			this.m_btnPlay.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnPlay.Text = "播放模擬";
+			this.m_btnPlay.ToolTipText = "播放模擬";
 			this.m_btnPlay.Click += new System.EventHandler( this.m_btnPlay_Click );
 			// 
 			// m_btnPause
@@ -510,6 +528,7 @@
 			this.m_btnPause.Name = "m_btnPause";
 			this.m_btnPause.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnPause.Text = "暫停";
+			this.m_btnPause.ToolTipText = "暫停";
 			this.m_btnPause.Click += new System.EventHandler( this.m_btnPause_Click );
 			// 
 			// m_btnStop
@@ -520,6 +539,7 @@
 			this.m_btnStop.Name = "m_btnStop";
 			this.m_btnStop.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnStop.Text = "停止";
+			this.m_btnStop.ToolTipText = "停止";
 			this.m_btnStop.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
 			this.m_btnStop.Click += new System.EventHandler( this.m_btnStop_Click );
 			// 
@@ -531,6 +551,7 @@
 			this.m_btnPreviousPath.Name = "m_btnPreviousPath";
 			this.m_btnPreviousPath.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnPreviousPath.Text = "模擬上一條路徑";
+			this.m_btnPreviousPath.ToolTipText = "模擬上一條路徑";
 			this.m_btnPreviousPath.Click += new System.EventHandler( this.m_btnPreviousPath_Click );
 			// 
 			// m_btnNextPath
@@ -541,6 +562,7 @@
 			this.m_btnNextPath.Name = "m_btnNextPath";
 			this.m_btnNextPath.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnNextPath.Text = "模擬下一條路徑";
+			this.m_btnNextPath.ToolTipText = "模擬下一條路徑";
 			this.m_btnNextPath.Click += new System.EventHandler( this.m_btnNextPath_Click );
 			// 
 			// m_btnPreCollision
@@ -551,6 +573,7 @@
 			this.m_btnPreCollision.Name = "m_btnPreCollision";
 			this.m_btnPreCollision.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnPreCollision.Text = "移至上一個碰撞點";
+			this.m_btnPreCollision.ToolTipText = "移至上一個碰撞點";
 			this.m_btnPreCollision.Click += new System.EventHandler( this.m_btnPreCollision_Click );
 			// 
 			// m_btnNextCol
@@ -561,6 +584,7 @@
 			this.m_btnNextCol.Name = "m_btnNextCol";
 			this.m_btnNextCol.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnNextCol.Text = "移至下一個碰撞點";
+			this.m_btnNextCol.ToolTipText = "移至下一個碰撞點";
 			this.m_btnNextCol.Click += new System.EventHandler( this.m_btnNextCol_Click );
 			// 
 			// m_btnPrePoint
@@ -571,6 +595,7 @@
 			this.m_btnPrePoint.Name = "m_btnPrePoint";
 			this.m_btnPrePoint.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnPrePoint.Text = "上一個點";
+			this.m_btnPrePoint.ToolTipText = "上一個點";
 			this.m_btnPrePoint.Click += new System.EventHandler( this.m_btnPrePoint_Click );
 			// 
 			// m_btnNextPoint
@@ -592,6 +617,7 @@
 			this.m_btnSpeedUp.Name = "m_btnSpeedUp";
 			this.m_btnSpeedUp.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnSpeedUp.Text = "加速";
+			this.m_btnSpeedUp.ToolTipText = "加速";
 			this.m_btnSpeedUp.Click += new System.EventHandler( this.m_btnSpeedUp_Click );
 			// 
 			// m_btnSlowDonw
@@ -613,6 +639,7 @@
 			this.m_btnCheck.Name = "m_btnCheck";
 			this.m_btnCheck.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnCheck.Text = "檢查";
+			this.m_btnCheck.ToolTipText = "檢查";
 			this.m_btnCheck.Click += new System.EventHandler( this.m_btnCheck_Click );
 			// 
 			// m_tsFileFunction
@@ -637,6 +664,7 @@
 			this.m_tsbImport3DFile.Name = "m_tsbImport3DFile";
 			this.m_tsbImport3DFile.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbImport3DFile.Text = "匯入3D模型";
+			this.m_tsbImport3DFile.ToolTipText = "匯入3D模型";
 			this.m_tsbImport3DFile.Click += new System.EventHandler( this.m_tsbImport3DFile_Click );
 			// 
 			// m_tsbReadProjectFile
@@ -647,6 +675,7 @@
 			this.m_tsbReadProjectFile.Name = "m_tsbReadProjectFile";
 			this.m_tsbReadProjectFile.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbReadProjectFile.Text = "匯入專案檔";
+			this.m_tsbReadProjectFile.ToolTipText = "匯入專案檔";
 			this.m_tsbReadProjectFile.Click += new System.EventHandler( this.m_tsbImportProjectFile_Click );
 			// 
 			// m_tsbSaveProjectFile
@@ -657,6 +686,7 @@
 			this.m_tsbSaveProjectFile.Name = "m_tsbSaveProjectFile";
 			this.m_tsbSaveProjectFile.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbSaveProjectFile.Text = "儲存專案檔";
+			this.m_tsbSaveProjectFile.ToolTipText = "儲存專案檔";
 			this.m_tsbSaveProjectFile.Click += new System.EventHandler( this.m_tsbSaveProjectFile_Click );
 			// 
 			// m_tsCADFunction
@@ -687,6 +717,7 @@
 			this.m_tsbSewPart.Name = "m_tsbSewPart";
 			this.m_tsbSewPart.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbSewPart.Text = "模型縫補";
+			this.m_tsbSewPart.ToolTipText = "模型縫補";
 			this.m_tsbSewPart.Click += new System.EventHandler( this.m_tsbSewPart_Click );
 			// 
 			// m_tsbAddPoint_AcrCenter
@@ -697,6 +728,7 @@
 			this.m_tsbAddPoint_AcrCenter.Name = "m_tsbAddPoint_AcrCenter";
 			this.m_tsbAddPoint_AcrCenter.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddPoint_AcrCenter.Text = "新增圓弧中心";
+			this.m_tsbAddPoint_AcrCenter.ToolTipText = "新增圓弧中心";
 			this.m_tsbAddPoint_AcrCenter.Click += new System.EventHandler( this.m_tsbAddPoint_AcrCenter_Click );
 			// 
 			// m_tsbAddPoint_EdgeCenter
@@ -707,6 +739,7 @@
 			this.m_tsbAddPoint_EdgeCenter.Name = "m_tsbAddPoint_EdgeCenter";
 			this.m_tsbAddPoint_EdgeCenter.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddPoint_EdgeCenter.Text = "新增線段中心";
+			this.m_tsbAddPoint_EdgeCenter.ToolTipText = "新增線段中心";
 			this.m_tsbAddPoint_EdgeCenter.Click += new System.EventHandler( this.m_tsbAddPoint_EdgeCenter_Click );
 			// 
 			// m_tsbAddPoint_PointCenter
@@ -717,6 +750,7 @@
 			this.m_tsbAddPoint_PointCenter.Name = "m_tsbAddPoint_PointCenter";
 			this.m_tsbAddPoint_PointCenter.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddPoint_PointCenter.Text = "新增兩點中心";
+			this.m_tsbAddPoint_PointCenter.ToolTipText = "新增兩點中心";
 			this.m_tsbAddPoint_PointCenter.Click += new System.EventHandler( this.m_tsbAddPoint_PointCenter_Click );
 			// 
 			// m_tsbAddPoint_BoundingBoxCenter
@@ -727,6 +761,7 @@
 			this.m_tsbAddPoint_BoundingBoxCenter.Name = "m_tsbAddPoint_BoundingBoxCenter";
 			this.m_tsbAddPoint_BoundingBoxCenter.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddPoint_BoundingBoxCenter.Text = "新增包圍盒中心";
+			this.m_tsbAddPoint_BoundingBoxCenter.ToolTipText = "新增包圍盒中心";
 			this.m_tsbAddPoint_BoundingBoxCenter.Click += new System.EventHandler( this.m_tsbAddPoint_BoundingBoxCenter_Click );
 			// 
 			// m_tsbAddLine_TwoVertexConnect
@@ -737,6 +772,7 @@
 			this.m_tsbAddLine_TwoVertexConnect.Name = "m_tsbAddLine_TwoVertexConnect";
 			this.m_tsbAddLine_TwoVertexConnect.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddLine_TwoVertexConnect.Text = "新增兩點連線";
+			this.m_tsbAddLine_TwoVertexConnect.ToolTipText = "新增兩點連線";
 			this.m_tsbAddLine_TwoVertexConnect.Click += new System.EventHandler( this.m_tsbAddLine_TwoVertexConnect_Click );
 			// 
 			// m_tsbManualTransform
@@ -747,6 +783,7 @@
 			this.m_tsbManualTransform.Name = "m_tsbManualTransform";
 			this.m_tsbManualTransform.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbManualTransform.Text = "手動轉換";
+			this.m_tsbManualTransform.ToolTipText = "手動轉換";
 			this.m_tsbManualTransform.Click += new System.EventHandler( this.m_tsbManualTransform_Click );
 			// 
 			// m_tsb3PntTransform
@@ -757,6 +794,7 @@
 			this.m_tsb3PntTransform.Name = "m_tsb3PntTransform";
 			this.m_tsb3PntTransform.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsb3PntTransform.Text = "三點轉換";
+			this.m_tsb3PntTransform.ToolTipText = "三點轉換";
 			this.m_tsb3PntTransform.Click += new System.EventHandler( this.m_tsb3PntTransform_Click );
 			// 
 			// m_tsbAxisTransform
@@ -767,6 +805,7 @@
 			this.m_tsbAxisTransform.Name = "m_tsbAxisTransform";
 			this.m_tsbAxisTransform.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAxisTransform.Text = "軸向轉換";
+			this.m_tsbAxisTransform.ToolTipText = "軸向轉換";
 			this.m_tsbAxisTransform.Click += new System.EventHandler( this.m_tsbAxisTransform_Click );
 			// 
 			// m_tscLevel2Container
@@ -1235,6 +1274,7 @@
 			this.m_tsbShowVec.Name = "m_tsbShowVec";
 			this.m_tsbShowVec.Size = new System.Drawing.Size( 27, 24 );
 			this.m_tsbShowVec.Text = "顯示姿態";
+			this.m_tsbShowVec.ToolTipText = "顯示姿態";
 			this.m_tsbShowVec.CheckedChanged += new System.EventHandler( this.m_tsbShowVec_CheckedChanged );
 			// 
 			// m_tsbShowOrder
@@ -1248,6 +1288,7 @@
 			this.m_tsbShowOrder.Name = "m_tsbShowOrder";
 			this.m_tsbShowOrder.Size = new System.Drawing.Size( 27, 24 );
 			this.m_tsbShowOrder.Text = "顯示順序";
+			this.m_tsbShowOrder.ToolTipText = "顯示順序";
 			this.m_tsbShowOrder.CheckedChanged += new System.EventHandler( this.m_tsbShowOrder_CheckedChanged );
 			// 
 			// m_tsbShowOrientation
@@ -1261,6 +1302,7 @@
 			this.m_tsbShowOrientation.Name = "m_tsbShowOrientation";
 			this.m_tsbShowOrientation.Size = new System.Drawing.Size( 27, 24 );
 			this.m_tsbShowOrientation.Text = "顯示路徑方向";
+			this.m_tsbShowOrientation.ToolTipText = "顯示路徑方向";
 			this.m_tsbShowOrientation.CheckedChanged += new System.EventHandler( this.m_tsbShowOrientation_CheckedChanged );
 			// 
 			// m_tsbShowTraverse
@@ -1274,6 +1316,7 @@
 			this.m_tsbShowTraverse.Name = "m_tsbShowTraverse";
 			this.m_tsbShowTraverse.Size = new System.Drawing.Size( 27, 24 );
 			this.m_tsbShowTraverse.Text = "顯示抬下刀路徑";
+			this.m_tsbShowTraverse.ToolTipText = "顯示抬下刀路徑";
 			this.m_tsbShowTraverse.CheckedChanged += new System.EventHandler( this.m_tsbShowTraverse_CheckedChanged );
 			// 
 			// m_panBackGround
