@@ -541,6 +541,30 @@ namespace MyCAM.Data
 			StartPntToolVecData = new StartPntToolVecParam( newStart, newEnd );
 		}
 
+		public double InitMaster_rad
+		{
+			get
+			{
+				return m_InitMaster_rad;
+			}
+			set
+			{
+				m_InitMaster_rad = value;
+			}
+		}
+
+		public double InitSlave_rad
+		{
+			get
+			{
+				return m_InitSlave_rad;
+			}
+			set
+			{
+				m_InitSlave_rad = value;
+			}
+		}
+
 		const int DEFAULT_TECH_LAYER = 1;
 		int m_TechLayer = DEFAULT_TECH_LAYER;
 		int m_StartPointIndex = 0;
@@ -553,6 +577,8 @@ namespace MyCAM.Data
 		TraverseData m_TraverseData = new TraverseData();
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();
 		double m_CompensatedDistance = 0;
+		double m_InitMaster_rad = 0;
+		double m_InitSlave_rad = 0;
 		Dictionary<int, ContourEditData> m_ContourEditMap = new Dictionary<int, ContourEditData>();
 	}
 

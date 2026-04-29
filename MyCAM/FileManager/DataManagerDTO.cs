@@ -1102,6 +1102,18 @@ namespace MyCAM.FileManager
 			set;
 		} = new List<ContourEditMapDTO>();
 
+		public double? InitMaster_rad
+		{
+			get;
+			set;
+		}
+
+		public double? InitSlave_rad
+		{
+			get;
+			set;
+		}
+
 		internal CraftDataDTO()
 		{
 		}
@@ -1140,6 +1152,8 @@ namespace MyCAM.FileManager
 				// create empty node
 				StartPntToolVecData = new StartPntToolVecParamDTO();
 			}
+			InitMaster_rad = craftData.InitMaster_rad;
+			InitSlave_rad = craftData.InitSlave_rad;
 		}
 
 		internal CraftData ToCraftData()
@@ -1178,6 +1192,8 @@ namespace MyCAM.FileManager
 			craftData.CumulativeTrsfMatrix = CumulativeTrsfMatrix.ToTrsf();
 
 			craftData.CompensatedDistance = CompensatedDistance.Value;
+			craftData.InitMaster_rad = InitMaster_rad ?? 0.0;
+			craftData.InitSlave_rad = InitSlave_rad ?? 0.0;
 
 			return craftData;
 		}

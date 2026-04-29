@@ -811,6 +811,45 @@ namespace MyCAM.Editor
 			ShowAllCAMData();
 		}
 
+		public void AutoOptimizeIKContinuity()
+		{
+			// one-shot action, no path selection required
+			EndActionIfNotDefault();
+
+			List<string> pathIDList = m_DataManager.PathIDList;
+			if( pathIDList.Count == 0 ) {
+				return;
+			}
+
+			double prevMaster_rad = 0;
+			double prevSlave_rad = 0;
+
+			foreach( string szPathID in pathIDList ) {
+				if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType )
+					|| pathType != PathType.Contour ) {
+					// skip non-contour but keep previous MS for next contour path
+					continue;
+				}
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+					continue;
+				}
+
+				// write previous path end MS as initial value for this path's IK solve
+				craftData.InitMaster_rad = prevMaster_rad;
+				craftData.InitSlave_rad = prevSlave_rad;
+
+				// trigger cache rebuild
+				craftData.CAMFactorChanged?.Invoke();
+
+				// read this path's end MS for next path
+				if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
+					prevMaster_rad = endMaster_rad;
+					prevSlave_rad = endSlave_rad;
+				}
+			}
+			ShowAllCAMData();
+		}
+
 		// convert NC
 		public void ConverNC()
 		{

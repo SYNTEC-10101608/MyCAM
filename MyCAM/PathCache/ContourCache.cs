@@ -409,9 +409,9 @@ namespace MyCAM.PathCache
 			}
 			PostSolver postSolver = new PostSolver( machineData );
 
-			// init master and slave angle
-			double dLastProcessPathM = 0;
-			double dLastProcessPathS = 0;
+			// init master and slave angle, use CraftData reference values if set
+			double dLastProcessPathM = m_CraftData.InitMaster_rad;
+			double dLastProcessPathS = m_CraftData.InitSlave_rad;
 
 			// solve IK
 			// solve IK

@@ -108,5 +108,21 @@ namespace MyCAM.PathCache
 			}
 			return camPoint;
 		}
+
+		public static bool GetMainPathEndMS( string szPathID, out double master_rad, out double slave_rad )
+		{
+			master_rad = 0;
+			slave_rad = 0;
+			if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache pathCache ) ) {
+				return false;
+			}
+			if( pathCache.MainPathPointList == null || pathCache.MainPathPointList.Count == 0 ) {
+				return false;
+			}
+			CAMPoint endPoint = pathCache.MainPathPointList.Last();
+			master_rad = endPoint.ModMaster_rad;
+			slave_rad = endPoint.ModSlave_rad;
+			return true;
+		}
 	}
 }
