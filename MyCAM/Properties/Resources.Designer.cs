@@ -83,9 +83,9 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap CAD_EdgeCenter {
+        internal static System.Drawing.Bitmap CAD_BoundingBoxCenter {
             get {
-                object obj = ResourceManager.GetObject("CAD_EdgeCenter", resourceCulture);
+                object obj = ResourceManager.GetObject("CAD_BoundingBoxCenter", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,13 +93,13 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap CAD_BoundingBoxCenter {
+        internal static System.Drawing.Bitmap CAD_EdgeCenter {
             get {
-                object obj = ResourceManager.GetObject("CAD_BoundingBoxCenter", resourceCulture);
+                object obj = ResourceManager.GetObject("CAD_EdgeCenter", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -246,6 +246,16 @@ namespace MyCAM.Properties {
         internal static System.Drawing.Bitmap CAM_NCFile {
             get {
                 object obj = ResourceManager.GetObject("CAM_NCFile", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap CAM_OptimizeIK {
+            get {
+                object obj = ResourceManager.GetObject("CAM_OptimizeIK", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
