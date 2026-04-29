@@ -251,221 +251,241 @@
 			// 
 			// m_tsbAddPath
 			// 
-			this.m_tsbAddPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAddPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbAddPath.Image = global::MyCAM.Properties.Resources.CAM_AddPath;
 			this.m_tsbAddPath.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAddPath.Name = "m_tsbAddPath";
 			this.m_tsbAddPath.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAddPath.Text = "新增路徑";
+			this.m_tsbAddPath.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbAddPath.ToolTipText = "新增路徑";
 			this.m_tsbAddPath.Click += new System.EventHandler( this.m_tsbAddPath_Click );
 			// 
 			// m_tsbDeletePath
 			// 
-			this.m_tsbDeletePath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbDeletePath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbDeletePath.Image = global::MyCAM.Properties.Resources.CAM_DeletePath;
 			this.m_tsbDeletePath.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbDeletePath.Name = "m_tsbDeletePath";
 			this.m_tsbDeletePath.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbDeletePath.Text = "刪除路徑";
+			this.m_tsbDeletePath.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbDeletePath.ToolTipText = "刪除路徑";
 			this.m_tsbDeletePath.Click += new System.EventHandler( this.m_tsbDeletePath_Click );
 			// 
 			// m_tsbStartPoint
 			// 
-			this.m_tsbStartPoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbStartPoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbStartPoint.Image = global::MyCAM.Properties.Resources.CAM_StartPointSetting;
 			this.m_tsbStartPoint.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbStartPoint.Name = "m_tsbStartPoint";
 			this.m_tsbStartPoint.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbStartPoint.Text = "起點";
+			this.m_tsbStartPoint.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbStartPoint.ToolTipText = "起點";
 			this.m_tsbStartPoint.Click += new System.EventHandler( this.m_tsbStartPoint_Click );
 			// 
 			// m_tsbReverse
 			// 
-			this.m_tsbReverse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbReverse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbReverse.Image = global::MyCAM.Properties.Resources.CAM_Reverse;
 			this.m_tsbReverse.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbReverse.Name = "m_tsbReverse";
 			this.m_tsbReverse.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbReverse.Text = "反向";
+			this.m_tsbReverse.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbReverse.ToolTipText = "反向";
 			this.m_tsbReverse.Click += new System.EventHandler( this.m_tsbReverse_Click );
 			// 
 			// m_tsbSetLead
 			// 
-			this.m_tsbSetLead.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbSetLead.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbSetLead.Image = global::MyCAM.Properties.Resources.CAM_Lead;
 			this.m_tsbSetLead.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbSetLead.Name = "m_tsbSetLead";
 			this.m_tsbSetLead.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbSetLead.Text = "引線";
+			this.m_tsbSetLead.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbSetLead.ToolTipText = "引線";
 			this.m_tsbSetLead.Click += new System.EventHandler( this.m_tsbSetLead_Click );
 			// 
 			// m_tsbOverCut
 			// 
-			this.m_tsbOverCut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbOverCut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbOverCut.Image = global::MyCAM.Properties.Resources.CAM_Overcut;
 			this.m_tsbOverCut.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbOverCut.Name = "m_tsbOverCut";
 			this.m_tsbOverCut.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbOverCut.Text = "過切";
+			this.m_tsbOverCut.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbOverCut.ToolTipText = "過切";
 			this.m_tsbOverCut.Click += new System.EventHandler( this.m_tsbOverCut_Click );
 			// 
 			// m_tsbToolVecReverse
 			// 
-			this.m_tsbToolVecReverse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbToolVecReverse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbToolVecReverse.Image = global::MyCAM.Properties.Resources.CAM_ToolVecReverse;
 			this.m_tsbToolVecReverse.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbToolVecReverse.Name = "m_tsbToolVecReverse";
 			this.m_tsbToolVecReverse.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbToolVecReverse.Text = "姿態反向";
+			this.m_tsbToolVecReverse.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbToolVecReverse.ToolTipText = "姿態反向";
 			this.m_tsbToolVecReverse.Click += new System.EventHandler( this.m_tsbTooVecReverse_Click );
 			// 
 			// m_tsbToolVec
 			// 
-			this.m_tsbToolVec.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbToolVec.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbToolVec.Image = global::MyCAM.Properties.Resources.CAM_ToolVec;
 			this.m_tsbToolVec.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbToolVec.Name = "m_tsbToolVec";
 			this.m_tsbToolVec.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbToolVec.Text = "姿態";
-			this.m_tsbToolVec.ToolTipText = "姿態";
+			this.m_tsbToolVec.Text = "姿態調適";
+			this.m_tsbToolVec.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbToolVec.ToolTipText = "姿態調適";
 			this.m_tsbToolVec.Click += new System.EventHandler( this.m_tsbToolVec_Click );
 			// 
 			// m_tsbFixedToolVec
 			// 
-			this.m_tsbFixedToolVec.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbFixedToolVec.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbFixedToolVec.Image = global::MyCAM.Properties.Resources.CAM_FixedToolVec;
 			this.m_tsbFixedToolVec.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbFixedToolVec.Name = "m_tsbFixedToolVec";
 			this.m_tsbFixedToolVec.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbFixedToolVec.Text = "定姿態切割";
-			this.m_tsbFixedToolVec.ToolTipText = "定姿態切割";
+			this.m_tsbFixedToolVec.Text = "鎖軸切割";
+			this.m_tsbFixedToolVec.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbFixedToolVec.ToolTipText = "鎖軸切割";
 			this.m_tsbFixedToolVec.Click += new System.EventHandler( this.m_tsbFixedToolVec_Click );
 			// 
 			// m_tsbMoveUp
 			// 
-			this.m_tsbMoveUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbMoveUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbMoveUp.Image = global::MyCAM.Properties.Resources.CAM_MoveUp;
 			this.m_tsbMoveUp.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbMoveUp.Name = "m_tsbMoveUp";
 			this.m_tsbMoveUp.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbMoveUp.Text = "順序往前";
+			this.m_tsbMoveUp.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbMoveUp.ToolTipText = "順序往前";
 			this.m_tsbMoveUp.Click += new System.EventHandler( this.m_tsbMoveUp_Click );
 			// 
 			// m_tsbMoveDown
 			// 
-			this.m_tsbMoveDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbMoveDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbMoveDown.Image = global::MyCAM.Properties.Resources.CAM_MoveDown;
 			this.m_tsbMoveDown.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbMoveDown.Name = "m_tsbMoveDown";
 			this.m_tsbMoveDown.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbMoveDown.Text = "順序往後";
+			this.m_tsbMoveDown.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbMoveDown.ToolTipText = "順序往後";
 			this.m_tsbMoveDown.Click += new System.EventHandler( this.m_tsbMoveDown_Click );
 			// 
 			// m_tsbAutoOrder
 			// 
-			this.m_tsbAutoOrder.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbAutoOrder.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbAutoOrder.Image = global::MyCAM.Properties.Resources.CAM_AutoOrder;
 			this.m_tsbAutoOrder.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAutoOrder.Name = "m_tsbAutoOrder";
 			this.m_tsbAutoOrder.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbAutoOrder.Text = "自動排序";
+			this.m_tsbAutoOrder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbAutoOrder.ToolTipText = "自動排序";
 			this.m_tsbAutoOrder.Click += new System.EventHandler( this.m_tsbAutoOrder_Click );
 			// 
 			// m_tsbSetTraverseData
 			// 
-			this.m_tsbSetTraverseData.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbSetTraverseData.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbSetTraverseData.Image = global::MyCAM.Properties.Resources.CAM_TraverseParam;
 			this.m_tsbSetTraverseData.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbSetTraverseData.Name = "m_tsbSetTraverseData";
 			this.m_tsbSetTraverseData.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbSetTraverseData.Text = "空移參數設定";
-			this.m_tsbSetTraverseData.ToolTipText = "空移參數設定";
+			this.m_tsbSetTraverseData.Text = "空移";
+			this.m_tsbSetTraverseData.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbSetTraverseData.ToolTipText = "空移";
 			this.m_tsbSetTraverseData.Click += new System.EventHandler( this.m_tsbSetTraverseData_Click );
 			// 
 			// m_tsbEntryAndExitSetting
 			// 
-			this.m_tsbEntryAndExitSetting.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbEntryAndExitSetting.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbEntryAndExitSetting.Image = global::MyCAM.Properties.Resources.CAM_EntryAndExit;
 			this.m_tsbEntryAndExitSetting.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbEntryAndExitSetting.Name = "m_tsbEntryAndExitSetting";
 			this.m_tsbEntryAndExitSetting.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbEntryAndExitSetting.Text = "進入/退出";
+			this.m_tsbEntryAndExitSetting.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbEntryAndExitSetting.ToolTipText = "進入/退出";
 			this.m_tsbEntryAndExitSetting.Click += new System.EventHandler( this.m_tsbEntryAndExitSetting_Click );
 			// 
 			// m_tsbPatternSetting
 			// 
-			this.m_tsbPatternSetting.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbPatternSetting.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbPatternSetting.Image = global::MyCAM.Properties.Resources.CAM_StandardPattern;
 			this.m_tsbPatternSetting.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbPatternSetting.Name = "m_tsbPatternSetting";
 			this.m_tsbPatternSetting.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbPatternSetting.Text = "設定圖元";
-			this.m_tsbPatternSetting.ToolTipText = "設定圖元";
+			this.m_tsbPatternSetting.Text = "標準圖元";
+			this.m_tsbPatternSetting.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbPatternSetting.ToolTipText = "標準圖元";
 			this.m_tsbPatternSetting.Click += new System.EventHandler( this.m_tsbPatternSetting_Click );
 			// 
 			// m_tsbPathEdit
 			// 
-			this.m_tsbPathEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbPathEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbPathEdit.Image = global::MyCAM.Properties.Resources.CAM_PathEdit;
 			this.m_tsbPathEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbPathEdit.Name = "m_tsbPathEdit";
 			this.m_tsbPathEdit.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbPathEdit.Text = "路徑編輯";
+			this.m_tsbPathEdit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbPathEdit.ToolTipText = "路徑編輯";
 			this.m_tsbPathEdit.Click += new System.EventHandler( this.m_tsbPathEdit_Click );
 			// 
 			// m_BtnContourEdit
 			// 
-			this.m_BtnContourEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_BtnContourEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_BtnContourEdit.Image = global::MyCAM.Properties.Resources.CAM_ContourEdit;
 			this.m_BtnContourEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_BtnContourEdit.Name = "m_BtnContourEdit";
 			this.m_BtnContourEdit.Size = new System.Drawing.Size( 44, 24 );
 			this.m_BtnContourEdit.Text = "輪廓編輯";
+			this.m_BtnContourEdit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_BtnContourEdit.ToolTipText = "輪廓編輯";
 			this.m_BtnContourEdit.Click += new System.EventHandler( this.m_BtnContourEdit_Click );
 			// 
 			// m_tsbPathCompensation
 			// 
-			this.m_tsbPathCompensation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbPathCompensation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbPathCompensation.Image = global::MyCAM.Properties.Resources.CAM_PathCompensate;
 			this.m_tsbPathCompensation.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbPathCompensation.Name = "m_tsbPathCompensation";
 			this.m_tsbPathCompensation.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbPathCompensation.Text = "路徑補償";
+			this.m_tsbPathCompensation.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbPathCompensation.ToolTipText = "路徑補償";
 			this.m_tsbPathCompensation.Click += new System.EventHandler( this.m_tsbPathCompensation_Click );
 			// 
 			// m_tsbCalibrationPnt
 			// 
-			this.m_tsbCalibrationPnt.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbCalibrationPnt.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbCalibrationPnt.Image = global::MyCAM.Properties.Resources.CAM_Calibration;
 			this.m_tsbCalibrationPnt.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbCalibrationPnt.Name = "m_tsbCalibrationPnt";
 			this.m_tsbCalibrationPnt.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbCalibrationPnt.Text = "三點校正參考點";
-			this.m_tsbCalibrationPnt.ToolTipText = "三點校正參考點";
+			this.m_tsbCalibrationPnt.Text = "三點校正";
+			this.m_tsbCalibrationPnt.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbCalibrationPnt.ToolTipText = "三點校正";
 			this.m_tsbCalibrationPnt.Click += new System.EventHandler( this.m_tsbCalibrationPnt_Click );
 			// 
 			// m_tsbConvertNC
 			// 
-			this.m_tsbConvertNC.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbConvertNC.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbConvertNC.Image = global::MyCAM.Properties.Resources.CAM_NCFile;
 			this.m_tsbConvertNC.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbConvertNC.Name = "m_tsbConvertNC";
 			this.m_tsbConvertNC.Size = new System.Drawing.Size( 44, 24 );
 			this.m_tsbConvertNC.Text = "轉出NC";
+			this.m_tsbConvertNC.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbConvertNC.ToolTipText = "轉出NC";
 			this.m_tsbConvertNC.Click += new System.EventHandler( this.m_tsbConvertNC_Click );
 			// 
@@ -511,135 +531,146 @@
 			// 
 			// m_btnPlay
 			// 
-			this.m_btnPlay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnPlay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnPlay.Image = global::MyCAM.Properties.Resources.Simu_Play;
 			this.m_btnPlay.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnPlay.Name = "m_btnPlay";
 			this.m_btnPlay.Size = new System.Drawing.Size( 44, 24 );
-			this.m_btnPlay.Text = "播放模擬";
-			this.m_btnPlay.ToolTipText = "播放模擬";
+			this.m_btnPlay.Text = "播放";
+			this.m_btnPlay.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_btnPlay.ToolTipText = "播放";
 			this.m_btnPlay.Click += new System.EventHandler( this.m_btnPlay_Click );
 			// 
 			// m_btnPause
 			// 
-			this.m_btnPause.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnPause.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnPause.Image = global::MyCAM.Properties.Resources.Simu_Pause;
 			this.m_btnPause.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnPause.Name = "m_btnPause";
 			this.m_btnPause.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnPause.Text = "暫停";
+			this.m_btnPause.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_btnPause.ToolTipText = "暫停";
 			this.m_btnPause.Click += new System.EventHandler( this.m_btnPause_Click );
 			// 
 			// m_btnStop
 			// 
-			this.m_btnStop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnStop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnStop.Image = global::MyCAM.Properties.Resources.Simu_Stop;
 			this.m_btnStop.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnStop.Name = "m_btnStop";
 			this.m_btnStop.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnStop.Text = "停止";
 			this.m_btnStop.ToolTipText = "停止";
-			this.m_btnStop.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+			this.m_btnStop.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_btnStop.Click += new System.EventHandler( this.m_btnStop_Click );
 			// 
 			// m_btnPreviousPath
 			// 
-			this.m_btnPreviousPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnPreviousPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnPreviousPath.Image = global::MyCAM.Properties.Resources.Simu_PreviousPath;
 			this.m_btnPreviousPath.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnPreviousPath.Name = "m_btnPreviousPath";
 			this.m_btnPreviousPath.Size = new System.Drawing.Size( 44, 24 );
-			this.m_btnPreviousPath.Text = "模擬上一條路徑";
-			this.m_btnPreviousPath.ToolTipText = "模擬上一條路徑";
+			this.m_btnPreviousPath.Text = "前路徑";
+			this.m_btnPreviousPath.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_btnPreviousPath.ToolTipText = "前路徑";
 			this.m_btnPreviousPath.Click += new System.EventHandler( this.m_btnPreviousPath_Click );
 			// 
 			// m_btnNextPath
 			// 
-			this.m_btnNextPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnNextPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnNextPath.Image = global::MyCAM.Properties.Resources.Simu_NextPath;
 			this.m_btnNextPath.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnNextPath.Name = "m_btnNextPath";
 			this.m_btnNextPath.Size = new System.Drawing.Size( 44, 24 );
-			this.m_btnNextPath.Text = "模擬下一條路徑";
-			this.m_btnNextPath.ToolTipText = "模擬下一條路徑";
+			this.m_btnNextPath.Text = "後路徑";
+			this.m_btnNextPath.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_btnNextPath.ToolTipText = "後路徑";
 			this.m_btnNextPath.Click += new System.EventHandler( this.m_btnNextPath_Click );
 			// 
 			// m_btnPreCollision
 			// 
-			this.m_btnPreCollision.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnPreCollision.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnPreCollision.Image = global::MyCAM.Properties.Resources.Simu_PreviousCol;
 			this.m_btnPreCollision.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnPreCollision.Name = "m_btnPreCollision";
 			this.m_btnPreCollision.Size = new System.Drawing.Size( 44, 24 );
-			this.m_btnPreCollision.Text = "移至上一個碰撞點";
-			this.m_btnPreCollision.ToolTipText = "移至上一個碰撞點";
+			this.m_btnPreCollision.Text = "前碰撞點";
+			this.m_btnPreCollision.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_btnPreCollision.ToolTipText = "前碰撞點";
 			this.m_btnPreCollision.Click += new System.EventHandler( this.m_btnPreCollision_Click );
 			// 
 			// m_btnNextCol
 			// 
-			this.m_btnNextCol.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnNextCol.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnNextCol.Image = global::MyCAM.Properties.Resources.Simu_NextCol;
 			this.m_btnNextCol.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnNextCol.Name = "m_btnNextCol";
 			this.m_btnNextCol.Size = new System.Drawing.Size( 44, 24 );
-			this.m_btnNextCol.Text = "移至下一個碰撞點";
-			this.m_btnNextCol.ToolTipText = "移至下一個碰撞點";
+			this.m_btnNextCol.Text = "後碰撞點";
+			this.m_btnNextCol.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_btnNextCol.ToolTipText = "後碰撞點";
 			this.m_btnNextCol.Click += new System.EventHandler( this.m_btnNextCol_Click );
 			// 
 			// m_btnPrePoint
 			// 
-			this.m_btnPrePoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnPrePoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnPrePoint.Image = global::MyCAM.Properties.Resources.Simu_PrePoint;
 			this.m_btnPrePoint.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnPrePoint.Name = "m_btnPrePoint";
 			this.m_btnPrePoint.Size = new System.Drawing.Size( 44, 24 );
-			this.m_btnPrePoint.Text = "上一個點";
-			this.m_btnPrePoint.ToolTipText = "上一個點";
+			this.m_btnPrePoint.Text = "上一步";
+			this.m_btnPrePoint.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_btnPrePoint.ToolTipText = "上一步";
 			this.m_btnPrePoint.Click += new System.EventHandler( this.m_btnPrePoint_Click );
 			// 
 			// m_btnNextPoint
 			// 
-			this.m_btnNextPoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnNextPoint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnNextPoint.Image = global::MyCAM.Properties.Resources.Simu_NextPoint;
 			this.m_btnNextPoint.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnNextPoint.Name = "m_btnNextPoint";
 			this.m_btnNextPoint.Size = new System.Drawing.Size( 44, 24 );
-			this.m_btnNextPoint.Text = "下一個點";
-			this.m_btnNextPoint.ToolTipText = "下一個點";
+			this.m_btnNextPoint.Text = "下一步";
+			this.m_btnNextPoint.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_btnNextPoint.ToolTipText = "下一步";
 			this.m_btnNextPoint.Click += new System.EventHandler( this.m_btnNextPoint_Click );
 			// 
 			// m_btnSpeedUp
 			// 
-			this.m_btnSpeedUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnSpeedUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnSpeedUp.Image = global::MyCAM.Properties.Resources.Simu_SpeedUp;
 			this.m_btnSpeedUp.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnSpeedUp.Name = "m_btnSpeedUp";
 			this.m_btnSpeedUp.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnSpeedUp.Text = "加速";
+			this.m_btnSpeedUp.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_btnSpeedUp.ToolTipText = "加速";
 			this.m_btnSpeedUp.Click += new System.EventHandler( this.m_btnSpeedUp_Click );
 			// 
 			// m_btnSlowDonw
 			// 
-			this.m_btnSlowDonw.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnSlowDonw.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnSlowDonw.Image = global::MyCAM.Properties.Resources.Simu_SlowDown;
 			this.m_btnSlowDonw.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnSlowDonw.Name = "m_btnSlowDonw";
 			this.m_btnSlowDonw.Size = new System.Drawing.Size( 44, 24 );
 			this.m_btnSlowDonw.Text = "減速";
+			this.m_btnSlowDonw.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_btnSlowDonw.ToolTipText = "減速";
 			this.m_btnSlowDonw.Click += new System.EventHandler( this.m_btnSlowDonw_Click );
 			// 
 			// m_btnCheck
 			// 
-			this.m_btnCheck.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_btnCheck.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_btnCheck.Image = global::MyCAM.Properties.Resources.Simu_Check;
 			this.m_btnCheck.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_btnCheck.Name = "m_btnCheck";
 			this.m_btnCheck.Size = new System.Drawing.Size( 44, 24 );
-			this.m_btnCheck.Text = "檢查";
-			this.m_btnCheck.ToolTipText = "檢查";
+			this.m_btnCheck.Text = "碰撞檢查";
+			this.m_btnCheck.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_btnCheck.ToolTipText = "碰撞檢查";
 			this.m_btnCheck.Click += new System.EventHandler( this.m_btnCheck_Click );
 			// 
 			// m_tsFileFunction
@@ -658,35 +689,38 @@
 			// 
 			// m_tsbImport3DFile
 			// 
-			this.m_tsbImport3DFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbImport3DFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbImport3DFile.Image = global::MyCAM.Properties.Resources.File_Import3DFile;
 			this.m_tsbImport3DFile.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbImport3DFile.Name = "m_tsbImport3DFile";
 			this.m_tsbImport3DFile.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbImport3DFile.Text = "匯入3D模型";
-			this.m_tsbImport3DFile.ToolTipText = "匯入3D模型";
+			this.m_tsbImport3DFile.Text = "3D模型";
+			this.m_tsbImport3DFile.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbImport3DFile.ToolTipText = "3D模型";
 			this.m_tsbImport3DFile.Click += new System.EventHandler( this.m_tsbImport3DFile_Click );
 			// 
 			// m_tsbReadProjectFile
 			// 
-			this.m_tsbReadProjectFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbReadProjectFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbReadProjectFile.Image = global::MyCAM.Properties.Resources.File_ReadProjectFile;
 			this.m_tsbReadProjectFile.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbReadProjectFile.Name = "m_tsbReadProjectFile";
 			this.m_tsbReadProjectFile.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbReadProjectFile.Text = "匯入專案檔";
-			this.m_tsbReadProjectFile.ToolTipText = "匯入專案檔";
+			this.m_tsbReadProjectFile.Text = "匯入專案";
+			this.m_tsbReadProjectFile.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbReadProjectFile.ToolTipText = "匯入專案";
 			this.m_tsbReadProjectFile.Click += new System.EventHandler( this.m_tsbImportProjectFile_Click );
 			// 
 			// m_tsbSaveProjectFile
 			// 
-			this.m_tsbSaveProjectFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.m_tsbSaveProjectFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.ImageAndText;
 			this.m_tsbSaveProjectFile.Image = global::MyCAM.Properties.Resources.File_SaveProjectFile;
 			this.m_tsbSaveProjectFile.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbSaveProjectFile.Name = "m_tsbSaveProjectFile";
 			this.m_tsbSaveProjectFile.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbSaveProjectFile.Text = "儲存專案檔";
-			this.m_tsbSaveProjectFile.ToolTipText = "儲存專案檔";
+			this.m_tsbSaveProjectFile.Text = "儲存專案";
+			this.m_tsbSaveProjectFile.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbSaveProjectFile.ToolTipText = "儲存專案";
 			this.m_tsbSaveProjectFile.Click += new System.EventHandler( this.m_tsbSaveProjectFile_Click );
 			// 
 			// m_tsCADFunction
@@ -728,9 +762,9 @@
 			this.m_tsbAddPoint_AcrCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAddPoint_AcrCenter.Name = "m_tsbAddPoint_AcrCenter";
 			this.m_tsbAddPoint_AcrCenter.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbAddPoint_AcrCenter.Text = "新增圓弧中心";
+			this.m_tsbAddPoint_AcrCenter.Text = "圓弧中心";
 			this.m_tsbAddPoint_AcrCenter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_tsbAddPoint_AcrCenter.ToolTipText = "新增圓弧中心";
+			this.m_tsbAddPoint_AcrCenter.ToolTipText = "圓弧中心";
 			this.m_tsbAddPoint_AcrCenter.Click += new System.EventHandler( this.m_tsbAddPoint_AcrCenter_Click );
 			// 
 			// m_tsbAddPoint_EdgeCenter
@@ -740,9 +774,9 @@
 			this.m_tsbAddPoint_EdgeCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAddPoint_EdgeCenter.Name = "m_tsbAddPoint_EdgeCenter";
 			this.m_tsbAddPoint_EdgeCenter.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbAddPoint_EdgeCenter.Text = "新增線段中心";
+			this.m_tsbAddPoint_EdgeCenter.Text = "線段中心";
 			this.m_tsbAddPoint_EdgeCenter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_tsbAddPoint_EdgeCenter.ToolTipText = "新增線段中心";
+			this.m_tsbAddPoint_EdgeCenter.ToolTipText = "線段中心";
 			this.m_tsbAddPoint_EdgeCenter.Click += new System.EventHandler( this.m_tsbAddPoint_EdgeCenter_Click );
 			// 
 			// m_tsbAddPoint_PointCenter
@@ -752,9 +786,9 @@
 			this.m_tsbAddPoint_PointCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAddPoint_PointCenter.Name = "m_tsbAddPoint_PointCenter";
 			this.m_tsbAddPoint_PointCenter.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbAddPoint_PointCenter.Text = "新增兩點中心";
+			this.m_tsbAddPoint_PointCenter.Text = "兩點中心";
 			this.m_tsbAddPoint_PointCenter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_tsbAddPoint_PointCenter.ToolTipText = "新增兩點中心";
+			this.m_tsbAddPoint_PointCenter.ToolTipText = "兩點中心";
 			this.m_tsbAddPoint_PointCenter.Click += new System.EventHandler( this.m_tsbAddPoint_PointCenter_Click );
 			// 
 			// m_tsbAddPoint_BoundingBoxCenter
@@ -764,9 +798,9 @@
 			this.m_tsbAddPoint_BoundingBoxCenter.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAddPoint_BoundingBoxCenter.Name = "m_tsbAddPoint_BoundingBoxCenter";
 			this.m_tsbAddPoint_BoundingBoxCenter.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbAddPoint_BoundingBoxCenter.Text = "新增包圍盒中心";
+			this.m_tsbAddPoint_BoundingBoxCenter.Text = "包圍盒中心";
 			this.m_tsbAddPoint_BoundingBoxCenter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_tsbAddPoint_BoundingBoxCenter.ToolTipText = "新增包圍盒中心";
+			this.m_tsbAddPoint_BoundingBoxCenter.ToolTipText = "包圍盒中心";
 			this.m_tsbAddPoint_BoundingBoxCenter.Click += new System.EventHandler( this.m_tsbAddPoint_BoundingBoxCenter_Click );
 			// 
 			// m_tsbAddLine_TwoVertexConnect
@@ -776,9 +810,9 @@
 			this.m_tsbAddLine_TwoVertexConnect.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbAddLine_TwoVertexConnect.Name = "m_tsbAddLine_TwoVertexConnect";
 			this.m_tsbAddLine_TwoVertexConnect.Size = new System.Drawing.Size( 44, 24 );
-			this.m_tsbAddLine_TwoVertexConnect.Text = "新增兩點連線";
+			this.m_tsbAddLine_TwoVertexConnect.Text = "兩點連線";
 			this.m_tsbAddLine_TwoVertexConnect.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_tsbAddLine_TwoVertexConnect.ToolTipText = "新增兩點連線";
+			this.m_tsbAddLine_TwoVertexConnect.ToolTipText = "兩點連線";
 			this.m_tsbAddLine_TwoVertexConnect.Click += new System.EventHandler( this.m_tsbAddLine_TwoVertexConnect_Click );
 			// 
 			// m_tsbManualTransform
