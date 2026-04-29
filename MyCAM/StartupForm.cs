@@ -387,6 +387,11 @@ namespace MyCAM
 			m_CAMEditor.SetFixedToolVec();
 		}
 
+		void m_tsbOptimizeIK_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.AutoOptimizeIKContinuity();
+		}
+
 		// sort
 		void m_tsbMoveUp_Click( object sender, EventArgs e )
 		{

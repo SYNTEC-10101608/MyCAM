@@ -848,6 +848,7 @@ namespace MyCAM.Editor
 				}
 			}
 			ShowAllCAMData();
+			MyApp.Logger.ShowOnLogPanel( "[操作完成]已完成起點旋轉軸自動優化", MyApp.NoticeType.Hint );
 		}
 
 		// convert NC
