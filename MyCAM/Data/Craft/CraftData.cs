@@ -9,6 +9,8 @@ namespace MyCAM.Data
 		Normal = 0,
 		VectorInterpolation,
 		TiltAngleInterpolation,
+		MasterNormalSlaveInterpolation,
+		MasterInterpolationSlaveNormal,
 	}
 
 	public class StartPntToolVecParam
@@ -526,19 +528,6 @@ namespace MyCAM.Data
 		void SubParamChanged()
 		{
 			CAMFactorChanged?.Invoke();
-		}
-
-		void ChangeStartPntParam()
-		{
-			if( StartPntToolVecData == null ) {
-				StartPntToolVecData = new StartPntToolVecParam();
-				return;
-			}
-
-			// change angle data
-			ToolVecModifyData newEnd = StartPntToolVecData.StartPnt;
-			ToolVecModifyData newStart = StartPntToolVecData.EndPnt;
-			StartPntToolVecData = new StartPntToolVecParam( newStart, newEnd );
 		}
 
 		public double InitMaster_rad

@@ -34,6 +34,9 @@ namespace MyCAM.Editor
 			m_lblSlave.Text = m_RotaryAxisConfig.SlaveName;
 			m_btnRotaryPos.Text = m_RotaryAxisConfig.RotaryAxisName + " +";
 			m_btnRotaryNeg.Text = m_RotaryAxisConfig.RotaryAxisName + " -";
+
+			// update interpolation type combo box with actual axis names
+			UpdateInterpolateTypeNames();
 		}
 
 		public void ResetType()
@@ -331,6 +334,27 @@ namespace MyCAM.Editor
 		void MoveToLastTick( object sender, EventArgs e )
 		{
 			MoveIndex?.Invoke( false );
+		}
+
+		void UpdateInterpolateTypeNames()
+		{
+			if( m_RotaryAxisConfig == null ) {
+				return;
+			}
+			string masterName = m_RotaryAxisConfig.MasterName ?? "主軸";
+			string slaveName = m_RotaryAxisConfig.SlaveName ?? "從軸";
+
+			// index 3: MasterNormalSlaveInterpolation => "A軸法向量且C軸插值"
+			if( m_cbxInterpolateType.Items.Count > (int)EToolVecInterpolateType.MasterNormalSlaveInterpolation ) {
+				m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterNormalSlaveInterpolation ] =
+					masterName + "軸法向量且" + slaveName + "軸插值";
+			}
+
+			// index 4: MasterInterpolationSlaveNormal => "C軸插值且A軸法向量"
+			if( m_cbxInterpolateType.Items.Count > (int)EToolVecInterpolateType.MasterInterpolationSlaveNormal ) {
+				m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterInterpolationSlaveNormal ] =
+					slaveName + "軸法向量且" + masterName + "軸插值";
+			}
 		}
 	}
 

@@ -257,12 +257,16 @@ namespace MyCAM.PathCache
 				// user only want c+/c- with normal solve IK (end pnt involve)
 				// path reverse interpolate type record at region head
 				if( m_CraftData.IsPathReverse ) {
-					if( startPntInterpolateType == EToolVecInterpolateType.Normal ) {
+					if( startPntInterpolateType == EToolVecInterpolateType.Normal
+						|| endPntInterpolateType == EToolVecInterpolateType.MasterNormalSlaveInterpolation
+						|| endPntInterpolateType == EToolVecInterpolateType.MasterInterpolationSlaveNormal ) {
 						return NormalCasePreprocessing( ref toolVecPointList );
 					}
 				}
 				else {
-					if( endPntInterpolateType == EToolVecInterpolateType.Normal ) {
+					if( endPntInterpolateType == EToolVecInterpolateType.Normal
+						|| endPntInterpolateType == EToolVecInterpolateType.MasterNormalSlaveInterpolation
+						|| endPntInterpolateType == EToolVecInterpolateType.MasterInterpolationSlaveNormal ) {
 						return NormalCasePreprocessing( ref toolVecPointList );
 					}
 				}

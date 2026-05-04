@@ -606,6 +606,8 @@ namespace MyCAM
 					case EditActionType.SelectPath:
 						m_tsbSelectD1ContFace.Enabled = true;
 						m_tsbSelPath_FreeBound.Enabled = true;
+						m_tsAutoFindAlienatedWorkPieceBoundary.Enabled = true;
+						m_tsAutoFindScretchWorkPieceBoundary.Enabled = true;
 						m_tsbAddPath.BackColor = DEFAULT_BtnColor;
 						m_tsbSelPath_Manual.BackColor = DEFAULT_BtnColor;
 						break;
@@ -660,6 +662,8 @@ namespace MyCAM
 					m_tsbSelPath_Manual.BackColor = ON_ButtonColor;
 					m_tsbSelectD1ContFace.Enabled = false;
 					m_tsbSelPath_FreeBound.Enabled = false;
+					m_tsAutoFindAlienatedWorkPieceBoundary.Enabled = false;
+					m_tsAutoFindScretchWorkPieceBoundary.Enabled = false;
 					break;
 				case EditActionType.StartPoint:
 					m_tsbStartPoint.BackColor = ON_ButtonColor;
