@@ -190,8 +190,12 @@ namespace MyCAM.Editor.Renderer
 						EToolVecInterpolateType interpType = interval.Item3;
 
 						// clamp to valid range
-						if( startIdx < 0 ) { startIdx = 0; }
-						if( endIdx >= pointList.Count ) { endIdx = pointList.Count - 1; }
+						if( startIdx < 0 ) {
+							startIdx = 0;
+						}
+						if( endIdx >= pointList.Count ) {
+							endIdx = pointList.Count - 1;
+						}
 						if( endIdx - startIdx < 1 ) {
 							continue;
 						}
@@ -249,6 +253,10 @@ namespace MyCAM.Editor.Renderer
 					return Quantity_NameOfColor.Quantity_NOC_ORANGE;
 				case EToolVecInterpolateType.TiltAngleInterpolation:
 					return Quantity_NameOfColor.Quantity_NOC_CYAN1;
+				case EToolVecInterpolateType.MasterNormalSlaveInterpolation:
+					return Quantity_NameOfColor.Quantity_NOC_YELLOW;
+				case EToolVecInterpolateType.MasterInterpolationSlaveNormal:
+					return Quantity_NameOfColor.Quantity_NOC_MAGENTA1;
 				case EToolVecInterpolateType.Normal:
 				default:
 					return Quantity_NameOfColor.Quantity_NOC_BLUE;
