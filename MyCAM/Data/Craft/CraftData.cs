@@ -125,13 +125,15 @@ namespace MyCAM.Data
 			StartPntToolVecParam startPntToolVecData,
 			bool isToolVecReverse,
 			TraverseData traverseData,
-			Dictionary<int, ContourEditData> contourEditMap )
+			Dictionary<int, ContourEditData> contourEditMap,
+			Dictionary<int, double> microJointStartIdxMap )
 		{
 			m_TechLayer = techLayer;
 			m_StartPointIndex = startPoint;
 			m_IsPathReverse = isPathReverse;
 			m_LeadData = leadData;
 			m_OverCutLength = overCutLength;
+			m_MicroJointStartIdxMap = microJointStartIdxMap;
 			if( toolVecModifyMap2 != null ) {
 				foreach( var kvp in toolVecModifyMap2 ) {
 					m_ToolVecModifyMap.Add( kvp.Key, kvp.Value.Clone() );
@@ -185,6 +187,17 @@ namespace MyCAM.Data
 					ClearToolVecModify();
 					CAMFactorChanged?.Invoke();
 				}
+			}
+		}
+
+		public Dictionary<int, double> MicroJointStartIdxMap
+		{
+			get
+			{
+				if( m_MicroJointStartIdxMap == null ) {
+					m_MicroJointStartIdxMap = new Dictionary<int, double>();
+				}
+				return m_MicroJointStartIdxMap;
 			}
 		}
 
@@ -518,6 +531,26 @@ namespace MyCAM.Data
 			CADFactorChanged?.Invoke();
 		}
 
+		public void ClearMicroJointStartIdx()
+		{
+			m_MicroJointStartIdxMap.Clear();
+			CAMFactorChanged?.Invoke();
+		}
+
+		public void AddMicroJointStartIdx( int index, double length )
+		{
+			m_MicroJointStartIdxMap[ index ] = length;
+			CAMFactorChanged?.Invoke();
+		}
+
+		public void RemoveMicroJointStartIdx( int index )
+		{
+			if( m_MicroJointStartIdxMap.ContainsKey( index ) ) {
+				m_MicroJointStartIdxMap.Remove( index );
+				CAMFactorChanged?.Invoke();
+			}
+		}
+
 		void SubscribeSubParamChanged()
 		{
 			m_LeadData.PropertyChanged += SubParamChanged;
@@ -557,6 +590,7 @@ namespace MyCAM.Data
 		const int DEFAULT_TECH_LAYER = 1;
 		int m_TechLayer = DEFAULT_TECH_LAYER;
 		int m_StartPointIndex = 0;
+		Dictionary<int, double> m_MicroJointStartIdxMap = new Dictionary<int, double>();
 		bool m_IsPathReverse = false;
 		LeadData m_LeadData = new LeadData();
 		double m_OverCutLength = 0;

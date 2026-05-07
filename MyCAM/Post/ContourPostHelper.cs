@@ -215,7 +215,9 @@ namespace MyCAM.Post
 					Y = pointG54.Y(),
 					Z = pointG54.Z(),
 					Master = rotateAngleList[ i ].Item1,
-					Slave = rotateAngleList[ i ].Item2
+					Slave = rotateAngleList[ i ].Item2,
+					IsMicroJointEnd = pointList[ i ].IsMicroJointEnd,
+					IsMicroJointStart = pointList[ i ].IsMicroJointStart
 				};
 				resultG54.Add( frameDataG54 );
 			}

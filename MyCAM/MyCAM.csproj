@@ -76,6 +76,13 @@
     <Compile Include="Editor\Dialog\CalibrationREFDlg.Designer.cs">
       <DependentUpon>CalibrationREFDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Action\CAM\MicroJointAction.cs" />
+    <Compile Include="Editor\Dialog\MicroJointDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\MicroJointDlg.Designer.cs">
+      <DependentUpon>MicroJointDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Editor\Dialog\ContourEditDlg.cs">
       <SubType>Form</SubType>
@@ -111,6 +118,7 @@
     <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
     <Compile Include="Helper\CAM\ContourEditHelper.cs" />
+    <Compile Include="Helper\CAM\MicroJointHelper.cs" />
     <Compile Include="Helper\CAM\StartPointHelper.cs" />
     <Compile Include="Helper\Canvas\DrawHelper.cs" />
     <Compile Include="Helper\Coupler\StdPatternCraftCoupler.cs" />
@@ -292,6 +300,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\ContourEditDlg.resx">
       <DependentUpon>ContourEditDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\MicroJointDlg.resx">
+      <DependentUpon>MicroJointDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\PathCompensateDlg.resx">
       <DependentUpon>PathCompensateDlg.cs</DependentUpon>

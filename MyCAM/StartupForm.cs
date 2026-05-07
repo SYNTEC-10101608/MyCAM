@@ -448,6 +448,11 @@ namespace MyCAM
 			// m_SimuEditor.EditStart();
 		}
 
+		void m_tsbMicroJoint_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetMicroJoint();
+		}
+
 		#region Viewer tool bar click action
 
 		void m_tsbShowVec_CheckedChanged( object sender, EventArgs e )
@@ -614,6 +619,9 @@ namespace MyCAM
 					case EditActionType.StartPoint:
 						m_tsbStartPoint.BackColor = DEFAULT_BtnColor;
 						break;
+					case EditActionType.MicroJoint:
+						m_tsbMicroJoint.BackColor = DEFAULT_BtnColor;
+						break;
 					case EditActionType.SetLead:
 						m_tsbSetLead.BackColor = DEFAULT_BtnColor;
 
@@ -667,6 +675,9 @@ namespace MyCAM
 					break;
 				case EditActionType.StartPoint:
 					m_tsbStartPoint.BackColor = ON_ButtonColor;
+					break;
+				case EditActionType.MicroJoint:
+					m_tsbMicroJoint.BackColor = ON_ButtonColor;
 					break;
 				case EditActionType.SetLead:
 					m_tsbSetLead.BackColor = ON_ButtonColor;
@@ -825,8 +836,8 @@ namespace MyCAM
 
 		void EnableAllCAMEnterance()
 		{
-			foreach( ToolStripButton btn in m_tsCAMFunction.Items ) {
-				btn.Enabled = true;
+			foreach( ToolStripItem item in m_tsCAMFunction.Items ) {
+				item.Enabled = true;
 			}
 		}
 

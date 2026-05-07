@@ -120,6 +120,9 @@ namespace MyCAM.Editor
 				return null;
 			}
 			selectedShape = m_Viewer.GetAISContext().SelectedShape();
+			if( selectedShape == null || selectedShape.IsNull() ) {
+				return null;
+			}
 			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
 				return null;
 			}
