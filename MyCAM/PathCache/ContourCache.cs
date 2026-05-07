@@ -1,5 +1,6 @@
 ﻿using MyCAM.Data;
 using MyCAM.Helper;
+using MyCAM.Helper.CAM;
 using MyCAM.Post;
 using OCC.gp;
 using System;
@@ -210,6 +211,9 @@ namespace MyCAM.PathCache
 
 			// for tool vec dialog select action to no current index interpolate type
 			m_interpolateTypeRegion = preprocessingResult.RegionTypeList;
+
+			// mark micro joint start and end pnt
+			SetMicroJoint( ref m_CAMPointList );
 
 			// set over cut
 			List<IOrientationPoint> camPointOverCutList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
@@ -484,6 +488,28 @@ namespace MyCAM.PathCache
 		{
 			m_ComputeRefCenterDir = m_ContourGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
 		}
+
+
+		void SetMicroJoint(ref List<CAMPoint> camPointList)
+		{
+			// set micro joint
+			List<Tuple<int, double>> microJointStartCAMIdxList = GetMicroJointStartCAMIdx();
+			MicroJointHelper.SetMicroJoint( ref camPointList, microJointStartCAMIdxList );
+		}
+
+		List<Tuple<int, double>> GetMicroJointStartCAMIdx()
+		{
+			List<Tuple<int, double>> microJointStartCAMIdxList = new List<Tuple<int, double>>();
+			foreach( int oneIndex in m_CraftData.MicroJointStartIdxMap.Keys ) {
+				if( m_CADToCAMIndexMap.ContainsKey( oneIndex ) ) {
+					double microJointLength = m_CraftData.MicroJointStartIdxMap[ oneIndex ];
+					int camIndex = m_CADToCAMIndexMap[ oneIndex ];
+					microJointStartCAMIdxList.Add( new Tuple<int, double>( camIndex, microJointLength ) );
+				}
+			}
+			return microJointStartCAMIdxList;
+		}
+
 
 		struct InterpolatePreprocessingResult
 		{

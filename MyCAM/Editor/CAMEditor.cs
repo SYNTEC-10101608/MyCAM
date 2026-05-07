@@ -702,6 +702,20 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetMicroJoint()
+		{
+			if( IsSameAction( EditActionType.MicroJoint ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
+				return;
+			}
+			MicroJointAction action = new MicroJointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
+		}
+
 		#endregion
 
 		// sort API

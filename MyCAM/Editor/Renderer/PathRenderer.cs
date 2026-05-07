@@ -1,10 +1,13 @@
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
+using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.gp;
 using OCC.Quantity;
+using OCC.TCollection;
 using OCC.TopAbs;
 using OCC.TopoDS;
+using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -29,6 +32,7 @@ namespace MyCAM.Editor
 
 		readonly Dictionary<string, AIS_Shape> m_MainPathAISDict = new Dictionary<string, AIS_Shape>();
 		readonly Dictionary<string, AIS_Shape> m_OriginalPathAISDict = new Dictionary<string, AIS_Shape>();
+		readonly Dictionary<string, List<AIS_TextLabel>> m_MicroJointLabelsDict = new Dictionary<string, List<AIS_TextLabel>>();
 		ViewManager m_ViewManager;
 		bool m_IsPauseRefresh = false;
 
@@ -52,6 +56,11 @@ namespace MyCAM.Editor
 				foreach( var kvp in m_OriginalPathAISDict ) {
 					m_Viewer.GetAISContext().Erase( kvp.Value, false );
 				}
+				foreach( var kvp in m_MicroJointLabelsDict ) {
+					foreach( var label in kvp.Value ) {
+						m_Viewer.GetAISContext().Erase( label, false );
+					}
+				}
 			}
 			else {
 				// re-display all managed AIS objects
@@ -61,6 +70,12 @@ namespace MyCAM.Editor
 				foreach( var kvp in m_OriginalPathAISDict ) {
 					m_Viewer.GetAISContext().Display( kvp.Value, false );
 					m_Viewer.GetAISContext().Deactivate( kvp.Value );
+				}
+				foreach( var kvp in m_MicroJointLabelsDict ) {
+					foreach( var label in kvp.Value ) {
+						m_Viewer.GetAISContext().Display( label, false );
+						m_Viewer.GetAISContext().Deactivate( label );
+					}
 				}
 			}
 		}
@@ -139,6 +154,9 @@ namespace MyCAM.Editor
 				// Local storage
 				m_MainPathAISDict.Add( pathID, pathAIS );
 
+				// Show MicroJoint markers
+				ShowMicroJointMarkers( pathID, trsf );
+
 				if( m_ViewManager.ViewObjectMap.ContainsKey( pathID ) ) {
 					m_ViewManager.ViewObjectMap.Remove( pathID );
 				}
@@ -162,7 +180,7 @@ namespace MyCAM.Editor
 
 		void RemovePaths( List<string> pathIDList )
 		{
-			// Unregister from DataManager
+			// unregister from DataManager
 			foreach( string pathID in pathIDList ) {
 				TopoDS_Wire wire = GetWireFromPathID( pathID );
 				if( wire != null && !wire.IsNull() ) {
@@ -181,6 +199,16 @@ namespace MyCAM.Editor
 				if( m_OriginalPathAISDict.TryGetValue( pathID, out AIS_Shape oriPathAIS ) ) {
 					m_Viewer.GetAISContext().Remove( oriPathAIS, false );
 					m_OriginalPathAISDict.Remove( pathID );
+				}
+			}
+
+			// remove MicroJoint labels
+			foreach( string pathID in pathIDList ) {
+				if( m_MicroJointLabelsDict.TryGetValue( pathID, out List<AIS_TextLabel> labels ) ) {
+					foreach( var label in labels ) {
+						m_Viewer.GetAISContext().Remove( label, false );
+					}
+					m_MicroJointLabelsDict.Remove( pathID );
 				}
 			}
 		}
@@ -259,6 +287,79 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Deactivate( oriPathAIS );
 		}
 
+		void ShowMicroJointMarkers( string pathID, gp_Trsf trsf = null )
+		{
+			// get CAMPoint list with MicroJoint information
+			List<CAMPoint> camPointList = GetCAMPointList( pathID );
+			if( camPointList == null || camPointList.Count == 0 ) {
+				return;
+			}
+			List<AIS_TextLabel> microJointLabels = new List<AIS_TextLabel>();
+
+			// create markers for MicroJoint start points
+			for( int i = 0; i < camPointList.Count; i++ ) {
+				CAMPoint camPoint = camPointList[ i ];
+				if( camPoint.IsMicroJointStart ) {
+					DrawMicroJointMarrk( camPoint.Point, "MJ¡¶", Quantity_NameOfColor.Quantity_NOC_GREEN,
+						trsf, microJointLabels );
+				}
+				if( camPoint.IsMicroJointEnd ) {
+					DrawMicroJointMarrk( camPoint.Point, "MJ¡¿", Quantity_NameOfColor.Quantity_NOC_RED,
+						trsf, microJointLabels );
+				}
+			}
+			if( microJointLabels.Count > 0 ) {
+				m_MicroJointLabelsDict.Add( pathID, microJointLabels );
+			}
+		}
+
+		void DrawMicroJointMarrk( gp_Pnt point, string labelText, Quantity_NameOfColor color,
+			gp_Trsf trsf, List<AIS_TextLabel> labelsList )
+		{
+			if( point == null ) {
+				return;
+			}
+
+			// create text label
+			AIS_TextLabel label = new AIS_TextLabel();
+			label.SetText( new TCollection_ExtendedString( labelText ) );
+			label.SetColor( new Quantity_Color( color ) );
+			label.SetPosition( point );
+			label.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
+			if( trsf != null ) {
+				label.SetLocalTransformation( trsf );
+			}
+
+			// add to list and display
+			labelsList.Add( label );
+			m_Viewer.GetAISContext().Display( label, false );
+
+			// label should not be selectable
+			m_Viewer.GetAISContext().Deactivate( label );
+		}
+
+		List<CAMPoint> GetCAMPointList( string pathID )
+		{
+			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) ) {
+				return null;
+			}
+
+			if( pathType == PathType.Contour ) {
+				if( !DataGettingHelper.GetContourCacheByID( pathID, out ContourCache contourCache ) ) {
+					return null;
+				}
+				return contourCache.MainPathPointList;
+			}
+			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
+				if( !DataGettingHelper.GetStdPatternCacheByID( pathID, out IStdPatternCache stdPatternCache ) ) {
+					return null;
+				}
+				return stdPatternCache.KeyCAMPointList?.Cast<CAMPoint>().ToList();
+			}
+
+			return null;
+		}
+
 		int GetColorIndex( string pathID )
 		{
 			int nColorIdx = 0;
@@ -288,7 +389,7 @@ namespace MyCAM.Editor
 				return true;
 			}
 
-			// Check if translation part is zero
+			// check if translation part is zero
 			gp_XYZ translation = trsf.TranslationPart();
 			if( Math.Abs( translation.X() ) > TOLERANCE ||
 				Math.Abs( translation.Y() ) > TOLERANCE ||
@@ -296,12 +397,12 @@ namespace MyCAM.Editor
 				return false;
 			}
 
-			// Check if scale factor is 1
+			// check if scale factor is 1
 			if( Math.Abs( trsf.ScaleFactor() - 1.0 ) > TOLERANCE ) {
 				return false;
 			}
 
-			// Check if rotation part is identity matrix
+			// check if rotation part is identity matrix
 			gp_Mat rotationMatrix = trsf.GetRotation().GetMatrix();
 			for( int i = 1; i <= 3; i++ ) {
 				for( int j = 1; j <= 3; j++ ) {
@@ -311,7 +412,6 @@ namespace MyCAM.Editor
 					}
 				}
 			}
-
 			return true;
 		}
 	}

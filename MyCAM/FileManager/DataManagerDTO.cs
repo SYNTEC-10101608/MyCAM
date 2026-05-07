@@ -1102,6 +1102,14 @@ namespace MyCAM.FileManager
 			set;
 		} = new List<ContourEditMapDTO>();
 
+		[XmlArray( "MicroJointStartIdxDict" )]
+		[XmlArrayItem( "MicroJointItem" )]
+		public List<MicroJointItemDTO> MicroJointStartIdxDict
+		{
+			get;
+			set;
+		} = new List<MicroJointItemDTO>();
+
 		public double? InitMaster_rad
 		{
 			get;
@@ -1138,10 +1146,12 @@ namespace MyCAM.FileManager
 							? new TraverseDataDTO( craftData.TraverseData )
 							: new TraverseDataDTO();
 			OverCutLength = craftData.OverCutLength;
+			MicroJointStartIdxDict = craftData.MicroJointStartIdxMap
+				.Select( kvp => new MicroJointItemDTO { Index = kvp.Key, Value = kvp.Value } )
+				.ToList();
 			ToolVecModifyMap_New = craftData.ToolVecModifyMap.ToDictionary()
 				.Select( kvp => new ToolVecMap2DTO( kvp.Key, kvp.Value.AngleData, kvp.Value.InterpolateType ) )
 				.ToList();
-
 			if( craftData.StartPntToolVecData != null ) {
 				StartPntToolVecData = new StartPntToolVecParamDTO( craftData.StartPntToolVecData );
 				ContourEditMap = ( craftData.ContourEditMap ?? new Dictionary<int, ContourEditData>() )
@@ -1177,10 +1187,12 @@ namespace MyCAM.FileManager
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion );
+			Dictionary<int, double> microJointStartIdxMap = BuildMicroJointIdxMap();
 			StartPntToolVecParam startPntToolVecParam = BuildStartPntToolVecParam( sourceMap_OldVersion, IsPathReverse.Value );
 			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value,
-												 leadData, OverCutLength.Value, toolVecModifyMap,
-												 startPntToolVecParam, IsToolVecReverse.Value, traverseData, contourEditMap );
+																 leadData, OverCutLength.Value, toolVecModifyMap,
+																 startPntToolVecParam, IsToolVecReverse.Value, traverseData, contourEditMap,
+																 microJointStartIdxMap );
 
 			// old version may have start/end point in ToolVecModifyMap, those are move to StartPntToolVecData
 			RemoveOldMapStartEndPoint( craftData );
@@ -1190,7 +1202,6 @@ namespace MyCAM.FileManager
 				throw new ArgumentException( "CraftData.CumulativeTrsfMatrix deserialization failed." );
 			}
 			craftData.CumulativeTrsfMatrix = CumulativeTrsfMatrix.ToTrsf();
-
 			craftData.CompensatedDistance = CompensatedDistance.Value;
 			craftData.InitMaster_rad = InitMaster_rad ?? 0.0;
 			craftData.InitSlave_rad = InitSlave_rad ?? 0.0;
@@ -1320,6 +1331,11 @@ namespace MyCAM.FileManager
 			);
 
 			return new ToolVecModifyData( angleData, interpolateType );
+		}
+
+		Dictionary<int, double> BuildMicroJointIdxMap()
+		{
+			return MicroJointStartIdxDict?.ToDictionary( item => item.Index, item => item.Value ) ?? new Dictionary<int, double>();
 		}
 
 		const int DEFAULT_TECH_LAYER = 1;
@@ -2114,6 +2130,32 @@ public class ContourEditMapDTO
 		DX = dx;
 		DY = dy;
 		DZ = dz;
+	}
+}
+
+public class MicroJointItemDTO
+{
+	public int Index
+	{
+		get;
+		set;
+	}
+
+	public double Value
+	{
+		get;
+		set;
+	}
+
+	// parameterless constructor (for XmlSerializer)
+	public MicroJointItemDTO()
+	{
+	}
+
+	public MicroJointItemDTO( int index, double value )
+	{
+		Index = index;
+		Value = value;
 	}
 }
 

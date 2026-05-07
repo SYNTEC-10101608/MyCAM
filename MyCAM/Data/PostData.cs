@@ -151,6 +151,16 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		public bool IsMicroJointStart
+		{
+			get; set;
+		} = false;
+
+		public bool IsMicroJointEnd
+		{
+			get; set;
+		}= false;
+
 		public PostPoint Clone()
 		{
 			PostPoint newPoint = new PostPoint();
@@ -159,6 +169,8 @@ namespace MyCAM.Data
 			newPoint.Z = Z;
 			newPoint.Master = Master;
 			newPoint.Slave = Slave;
+			newPoint.IsMicroJointStart = IsMicroJointStart;
+			newPoint.IsMicroJointEnd = IsMicroJointEnd;
 			return newPoint;
 		}
 	}

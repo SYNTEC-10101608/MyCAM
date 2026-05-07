@@ -121,6 +121,16 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		bool IsMicroJointStart
+		{
+			get; set;
+		}
+
+		bool IsMicroJointEnd
+		{
+			get; set;
+		}
+
 		ISetToolVecPoint Clone();
 	}
 
@@ -164,6 +174,16 @@ namespace MyCAM.Data
 		double ModSlave_rad
 		{
 			get;
+		}
+
+		bool IsMicroJointStart
+		{
+			get; set;
+		}
+
+		bool IsMicroJointEnd
+		{
+			get; set;
 		}
 
 		// sorry, but this is the best way to solve the problem now
@@ -271,6 +291,16 @@ namespace MyCAM.Data
 		{
 			get; set;
 		}
+
+		public bool IsMicroJointStart
+		{
+			get; set;
+		} = false;
+
+		public bool IsMicroJointEnd
+		{
+			get; set;
+		} = false;
 
 		public CAMPoint Clone()
 		{

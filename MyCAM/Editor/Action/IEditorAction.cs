@@ -41,6 +41,7 @@ namespace MyCAM.Editor
 		PathCompensation,
 		CalibrationREF,
 		ContourEdit,
+		MicroJoint,
 
 		// File
 		ImportProjectFile,
