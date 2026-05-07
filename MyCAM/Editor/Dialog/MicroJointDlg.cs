@@ -69,7 +69,7 @@ namespace MyCAM.Editor
 		bool ValidateInput()
 		{
 			if( double.TryParse( m_tbxMicroJointLength.Text, out double result ) && result > 0 ) {
-				m_tbxMicroJointLength.Text = Math.Round( result, 3).ToString();
+				m_tbxMicroJointLength.Text = Math.Round( result, 3 ).ToString();
 				return true;
 			}
 			return false;

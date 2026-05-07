@@ -79,6 +79,20 @@ namespace MyCAM.Editor
 			}
 		}
 
+		public override void End()
+		{
+			// this end is triiger by other editor will need to close Dlg
+			if( m_Dialog != null && !m_Dialog.IsDisposed ) {
+
+				// avoid other event cause error after dialog closed
+				m_Dialog.Cancel -= End;
+				m_Dialog.Close();
+				m_Dialog.Dispose();
+				m_Dialog = null;
+			}
+			base.End();
+		}
+
 		const int DEFAULT_UnselectIdx = -1;
 		const double DEFAULT_Length = 2;
 		MicroJointDlg m_Dialog;
