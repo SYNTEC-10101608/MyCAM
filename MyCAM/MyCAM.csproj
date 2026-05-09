@@ -76,6 +76,12 @@
     <Compile Include="Editor\Dialog\CalibrationREFDlg.Designer.cs">
       <DependentUpon>CalibrationREFDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Dialog\ManualTransformDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\ManualTransformDlg.Designer.cs">
+      <DependentUpon>ManualTransformDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Action\CAM\MicroJointAction.cs" />
     <Compile Include="Editor\Dialog\MicroJointDlg.cs">
       <SubType>Form</SubType>
@@ -318,6 +324,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\SewPartDlg.resx">
       <DependentUpon>SewPartDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\ManualTransformDlg.resx">
+      <DependentUpon>ManualTransformDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\TraverseDlg.resx">
       <DependentUpon>TraverseDlg.cs</DependentUpon>

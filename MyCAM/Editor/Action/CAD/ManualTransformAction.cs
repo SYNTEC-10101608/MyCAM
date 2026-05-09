@@ -5,6 +5,7 @@ using OCC.Aspect;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.Quantity;
+using OCC.SelectMgr;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
@@ -18,11 +19,11 @@ namespace MyCAM.Editor
 {
 	internal enum ETrsfConstraintType
 	{
+		Point,
 		Axial,
 		AxialParallel,
 		Plane,
-		PlaneParallel,
-		Point,
+		PlaneParallel
 	}
 
 	internal class ManualTransformAction : KeyMouseActionBase
@@ -42,6 +43,9 @@ namespace MyCAM.Editor
 			}
 		}
 
+		public Action<bool> SelectionStatusChanged;
+		public Action<int> G54RefIndexChanged;
+
 		public override void Start()
 		{
 			base.Start();
@@ -51,16 +55,6 @@ namespace MyCAM.Editor
 
 			// disable tree view
 			m_TreeView.Enabled = false;
-
-			// activate
-			foreach( var partID in m_DataManager.PartIDList ) {
-				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
-					continue;
-				}
-				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Edge );
-				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Face );
-				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)AISActiveMode.Vertex );
-			}
 
 			// show transform part and G54 coordinate system
 			ShowG54Coord();
@@ -88,14 +82,65 @@ namespace MyCAM.Editor
 
 		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
-			if( e.Button == MouseButtons.Left ) {
-				if( ( Control.ModifierKeys & Keys.Control ) == Keys.Control ) {
-					m_Viewer.Select( AIS_SelectionScheme.AIS_SelectionScheme_XOR );
-				}
-				else {
-					m_Viewer.Select( AIS_SelectionScheme.AIS_SelectionScheme_Replace );
+			if( e.Button != MouseButtons.Left ) {
+				return;
+			}
+
+			// if nothing is detected (clicked empty space), keep current selection unchanged
+			if( !m_Viewer.GetAISContext().HasDetected() ) {
+				return;
+			}
+
+			// select with Replace to detect what sub-shape user clicked
+			m_Viewer.Select( AIS_SelectionScheme.AIS_SelectionScheme_Replace );
+
+			if( m_Viewer.GetAISContext().NbSelected() == 0 ) {
+				return;
+			}
+
+			// get both the shape and the entity owner (sub-shape level)
+			m_Viewer.GetAISContext().InitSelected();
+			if( !m_Viewer.GetAISContext().MoreSelected() ) {
+				return;
+			}
+			TopoDS_Shape clickedShape = m_Viewer.GetAISContext().SelectedShape();
+			SelectMgr_EntityOwner clickedOwner = m_Viewer.GetAISContext().SelectedOwner();
+
+			if( clickedShape == null || clickedShape.IsNull() ) {
+				return;
+			}
+
+			// determine identity: G54 (ref) or workpiece
+			CheckRefOrWorkpieceObject( clickedShape, out bool isRef, out bool isWorkpiece );
+			if( !isRef && !isWorkpiece ) {
+				return;
+			}
+
+			if( isRef ) {
+				m_RefShape = clickedShape;
+				m_RefG54AIS = FindG54AISByShape( clickedShape );
+
+				// notify dialog to sync dropdown
+				int dropdownIndex = GetG54DropdownIndex( clickedShape );
+				if( dropdownIndex >= 0 ) {
+					G54RefIndexChanged?.Invoke( dropdownIndex );
 				}
 			}
+			else {
+				// clicking the same workpiece shape deselects it
+				if( m_WorkpieceShape != null && clickedShape.IsEqual( m_WorkpieceShape ) ) {
+					m_WorkpieceShape = null;
+					m_WorkpieceOwner = null;
+				}
+				else {
+					m_WorkpieceShape = clickedShape;
+					m_WorkpieceOwner = clickedOwner;
+				}
+				SelectionStatusChanged?.Invoke( m_WorkpieceShape != null );
+			}
+
+			// rebuild visual selection using entity owners for sub-shape precision
+			RebuildVisualSelection();
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
@@ -105,14 +150,218 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void ApplyTransform( ETrsfConstraintType type )
+		public bool ApplyTransform( ETrsfConstraintType type )
 		{
-			SetConstraint( type );
+			if( m_RefShape == null || m_WorkpieceShape == null ) {
+				return false;
+			}
+
+			// create constraint
+			IConstraint c = null;
+			switch( type ) {
+				case ETrsfConstraintType.Axial:
+					c = new AxialConstraint( m_RefShape, m_WorkpieceShape );
+					break;
+				case ETrsfConstraintType.AxialParallel:
+					c = new AxialParallelConstraint( m_RefShape, m_WorkpieceShape );
+					break;
+				case ETrsfConstraintType.Plane:
+					c = new PlaneConstraint( m_RefShape, m_WorkpieceShape );
+					break;
+				case ETrsfConstraintType.PlaneParallel:
+					c = new PlaneParallelConstraint( m_RefShape, m_WorkpieceShape );
+					break;
+				case ETrsfConstraintType.Point:
+					c = new PointConstraint( m_RefShape, m_WorkpieceShape );
+					break;
+				default:
+					return false;
+			}
+			if( !c.IsValid() ) {
+				MyApp.Logger.ShowOnLogPanel( "對齊無效，請重新選擇工件上適當的元素", MyApp.NoticeType.Warning );
+				return false;
+			}
+			gp_Trsf trsf = c.SolveConstraint();
+			ExecuteTransform( trsf );
+			m_Viewer.GetAISContext().ClearSelected( true );
+
+			// reset stored selections after applying transform
+			m_RefShape = null;
+			m_WorkpieceShape = null;
+			m_RefG54AIS = null;
+			m_WorkpieceOwner = null;
+			SelectionStatusChanged?.Invoke( false );
+			return true;
 		}
 
-		public void TransformDone()
+		public void SwitchConstrainMethod( ETrsfConstraintType type )
 		{
-			End();
+			// store current mode for index mapping
+			m_CurrentMode = type;
+
+			// deactivate all workpiece shapes
+			foreach( var partID in m_DataManager.PartIDList ) {
+				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
+					continue;
+				}
+				m_Viewer.GetAISContext().Deactivate( m_ViewManager.ViewObjectMap[ partID ].AISHandle );
+			}
+
+			// deactivate all G54 shapes first
+			foreach( AIS_Shape ais in m_G54AISList ) {
+				m_Viewer.GetAISContext().Deactivate( ais );
+			}
+
+			// G54AISList index: [0]=XY face, [1]=YZ face, [2]=XZ face, [3]=X axis, [4]=Y axis, [5]=Z axis, [6]=origin
+			AISActiveMode workpieceMode;
+			switch( type ) {
+				case ETrsfConstraintType.Point:
+					workpieceMode = AISActiveMode.Vertex;
+
+					// point mode: only origin vertex selectable on G54
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ 6 ], (int)AISActiveMode.Vertex );
+					break;
+
+				case ETrsfConstraintType.Axial:
+				case ETrsfConstraintType.AxialParallel:
+					workpieceMode = AISActiveMode.Edge;
+
+					// axis mode: only X/Y/Z axis edges selectable on G54
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ 3 ], (int)AISActiveMode.Edge );
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ 4 ], (int)AISActiveMode.Edge );
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ 5 ], (int)AISActiveMode.Edge );
+					break;
+
+				case ETrsfConstraintType.Plane:
+				case ETrsfConstraintType.PlaneParallel:
+					workpieceMode = AISActiveMode.Face;
+
+					// plane mode: only XY/YZ/XZ planes selectable on G54
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ 0 ], (int)AISActiveMode.Face );
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ 1 ], (int)AISActiveMode.Face );
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ 2 ], (int)AISActiveMode.Face );
+					break;
+
+				default:
+					return;
+			}
+
+			// activate workpiece with the corresponding mode
+			foreach( var partID in m_DataManager.PartIDList ) {
+				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
+					continue;
+				}
+				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle, (int)workpieceMode );
+			}
+
+			// clear stored selections and visual selection when mode changes
+			m_RefShape = null;
+			m_RefG54AIS = null;
+			m_WorkpieceShape = null;
+			m_WorkpieceOwner = null;
+			m_Viewer.GetAISContext().ClearSelected( false );
+			m_Viewer.GetAISContext().UpdateCurrentViewer();
+			SelectionStatusChanged?.Invoke( false );
+		}
+
+		public void SetG54RefFromDropDown( int dropdownIndex )
+		{
+			// G54AISList: [0]=XY face, [1]=YZ face, [2]=XZ face, [3]=X axis, [4]=Y axis, [5]=Z axis, [6]=origin
+			int aisIndex;
+			switch( m_CurrentMode ) {
+				case ETrsfConstraintType.Point:
+					aisIndex = 6;
+					break;
+				case ETrsfConstraintType.Axial:
+				case ETrsfConstraintType.AxialParallel:
+					aisIndex = 3 + dropdownIndex;
+					break;
+				case ETrsfConstraintType.Plane:
+				case ETrsfConstraintType.PlaneParallel:
+					aisIndex = dropdownIndex;
+					break;
+				default:
+					return;
+			}
+			if( aisIndex < 0 || aisIndex >= m_G54AISList.Count ) {
+				return;
+			}
+
+			AIS_Shape targetAIS = m_G54AISList[ aisIndex ];
+
+			// store shape for constraint logic
+			m_RefShape = targetAIS.Shape();
+
+			// store AIS for visual highlight (G54 shapes are single-shape AIS, safe to use AIS-level selection)
+			m_RefG54AIS = targetAIS;
+
+			RebuildVisualSelection();
+			SelectionStatusChanged?.Invoke( m_WorkpieceShape != null );
+		}
+
+		int GetG54DropdownIndex( TopoDS_Shape shape )
+		{
+			switch( m_CurrentMode ) {
+				case ETrsfConstraintType.Point:
+					return 0;
+				case ETrsfConstraintType.Axial:
+				case ETrsfConstraintType.AxialParallel:
+					for( int i = 0; i < 3; i++ ) {
+						if( ContainsSubShape( m_G54AISList[ 3 + i ].Shape(), shape ) ) {
+							return i;
+						}
+					}
+					break;
+				case ETrsfConstraintType.Plane:
+				case ETrsfConstraintType.PlaneParallel:
+					for( int i = 0; i < 3; i++ ) {
+						if( ContainsSubShape( m_G54AISList[ i ].Shape(), shape ) ) {
+							return i;
+						}
+					}
+					break;
+			}
+			return -1;
+		}
+
+		AIS_Shape FindG54AISByShape( TopoDS_Shape shape )
+		{
+			foreach( AIS_Shape ais in m_G54AISList ) {
+				if( ContainsSubShape( ais.Shape(), shape ) ) {
+					return ais;
+				}
+			}
+			return null;
+		}
+
+		void RebuildVisualSelection()
+		{
+			m_Viewer.GetAISContext().ClearSelected( false );
+
+			// G54 ref: each G54 AIS is a single shape, AIS-level selection is precise
+			if( m_RefG54AIS != null ) {
+				m_Viewer.GetAISContext().AddOrRemoveSelected( m_RefG54AIS, false );
+			}
+
+			// workpiece move: use EntityOwner
+			if( m_WorkpieceOwner != null ) {
+				m_Viewer.GetAISContext().AddOrRemoveSelected( m_WorkpieceOwner, false );
+			}
+
+			m_Viewer.GetAISContext().UpdateCurrentViewer();
+		}
+
+		bool ContainsSubShape( TopoDS_Shape parent, TopoDS_Shape sub )
+		{
+			TopAbs_ShapeEnum subType = sub.ShapeType();
+			TopExp_Explorer exp = new TopExp_Explorer( parent, subType );
+			while( exp.More() ) {
+				if( exp.Current().IsEqual( sub ) ) {
+					return true;
+				}
+				exp.Next();
+			}
+			return false;
 		}
 
 		void MakeG54Coord()
@@ -201,7 +450,7 @@ namespace MyCAM.Editor
 
 			// Y AIS
 			AIS_Shape aisY = new AIS_Shape( edgeY.Edge() );
-			aisY.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GREEN ) );
+			aisY.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_ORANGE ) );
 			aisY.SetWidth( 2.0f ); // make Y axis thicker
 			m_G54AISList.Add( aisY );
 
@@ -239,184 +488,66 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void GetRefAndMoveObject( out TopoDS_Shape refShape, out TopoDS_Shape moveShape )
-		{
-			refShape = null;
-			moveShape = null;
-			m_Viewer.GetAISContext().InitSelected();
-			int test = m_Viewer.GetAISContext().NbSelected();
-			int nCount = 0;
-			List<TopoDS_Shape> selectedShapeList = new List<TopoDS_Shape>();
-			while( m_Viewer.GetAISContext().MoreSelected() ) {
-				nCount++;
-				if( nCount > 2 ) {
-					return;
-				}
-				selectedShapeList.Add( m_Viewer.GetAISContext().SelectedShape() );
-				m_Viewer.GetAISContext().NextSelected();
-			}
-			if( nCount != 2 ) {
-				return;
-			}
-			CheckRefOrMoveObject( selectedShapeList[ 0 ], out bool isRef1, out bool isMove1 );
-			CheckRefOrMoveObject( selectedShapeList[ 1 ], out bool isRef2, out bool isMove2 );
-			if( isRef1 && isMove2 ) {
-				refShape = selectedShapeList[ 0 ];
-				moveShape = selectedShapeList[ 1 ];
-			}
-			else if( isRef2 && isMove1 ) {
-				refShape = selectedShapeList[ 1 ];
-				moveShape = selectedShapeList[ 0 ];
-			}
-			else {
-				return;
-			}
-		}
-
-		void CheckRefOrMoveObject( TopoDS_Shape sel, out bool isRef, out bool isMove )
+		void CheckRefOrWorkpieceObject( TopoDS_Shape sel, out bool isRef, out bool isWorkpiece )
 		{
 			isRef = false;
-			isMove = false;
+			isWorkpiece = false;
 			if( sel == null ) {
 				return;
 			}
-			if( sel.ShapeType() == TopAbs_ShapeEnum.TopAbs_FACE ) {
-				TopExp_Explorer expRef = new TopExp_Explorer( m_G54Shape, TopAbs_ShapeEnum.TopAbs_FACE );
-				while( expRef.More() ) {
-					TopoDS_Shape face = expRef.Current();
-					if( sel.IsEqual( face ) ) {
-						isRef = true;
-						return;
-					}
-					expRef.Next();
-				}
-				foreach( var partID in m_DataManager.PartIDList ) {
 
-					// skip invisible objects
-					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
-						continue;
-					}
-					if( !DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObj ) ) {
-						continue;
-					}
-					TopExp_Explorer expMove = new TopExp_Explorer( shapeObj.Shape, TopAbs_ShapeEnum.TopAbs_FACE );
-					while( expMove.More() ) {
-						TopoDS_Shape face = expMove.Current();
-						if( sel.IsEqual( face ) ) {
-							isMove = true;
-							return;
-						}
-						expMove.Next();
-					}
-				}
-			}
-			else if( sel.ShapeType() == TopAbs_ShapeEnum.TopAbs_EDGE ) {
-				TopExp_Explorer expRef = new TopExp_Explorer( m_G54Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
-				while( expRef.More() ) {
-					TopoDS_Shape face = expRef.Current();
-					if( sel.IsEqual( face ) ) {
-						isRef = true;
-						return;
-					}
-					expRef.Next();
-				}
-				foreach( var partID in m_DataManager.PartIDList ) {
+			TopAbs_ShapeEnum shapeType = sel.ShapeType();
 
-					// skip invisible objects
-					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
-						continue;
-					}
-					if( !DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObj ) ) {
-						continue;
-					}
-					TopExp_Explorer expMove = new TopExp_Explorer( shapeObj.Shape, TopAbs_ShapeEnum.TopAbs_EDGE );
-					while( expMove.More() ) {
-						TopoDS_Shape face = expMove.Current();
-						if( sel.IsEqual( face ) ) {
-							isMove = true;
-							return;
-						}
-						expMove.Next();
-					}
-				}
-			}
-			else if( sel.ShapeType() == TopAbs_ShapeEnum.TopAbs_VERTEX ) {
-				TopExp_Explorer expRef = new TopExp_Explorer( m_G54Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
-				while( expRef.More() ) {
-					TopoDS_Shape vertex = expRef.Current();
-					if( sel.IsEqual( vertex ) ) {
-						isRef = true;
-						return;
-					}
-					expRef.Next();
-				}
-				foreach( var partID in m_DataManager.PartIDList ) {
-
-					// skip invisible objects
-					if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
-						continue;
-					}
-					if( !DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObj ) ) {
-						continue;
-					}
-					TopExp_Explorer expMove = new TopExp_Explorer( shapeObj.Shape, TopAbs_ShapeEnum.TopAbs_VERTEX );
-					while( expMove.More() ) {
-						TopoDS_Shape vertex = expMove.Current();
-						if( sel.IsEqual( vertex ) ) {
-							isMove = true;
-							return;
-						}
-						expMove.Next();
-					}
-				}
-			}
-		}
-
-		void SetConstraint( ETrsfConstraintType type )
-		{
-			GetRefAndMoveObject( out TopoDS_Shape refShape, out TopoDS_Shape moveShape );
-			if( refShape == null || moveShape == null ) {
+			// only handle selectable sub-shape types
+			if( shapeType != TopAbs_ShapeEnum.TopAbs_FACE &&
+				shapeType != TopAbs_ShapeEnum.TopAbs_EDGE &&
+				shapeType != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
 				return;
 			}
 
-			// create constraint
-			IConstraint c = null;
-			switch( type ) {
-				case ETrsfConstraintType.Axial:
-					c = new AxialConstraint( refShape, moveShape );
-					break;
-				case ETrsfConstraintType.AxialParallel:
-					c = new AxialParallelConstraint( refShape, moveShape );
-					break;
-				case ETrsfConstraintType.Plane:
-					c = new PlaneConstraint( refShape, moveShape );
-					break;
-				case ETrsfConstraintType.PlaneParallel:
-					c = new PlaneParallelConstraint( refShape, moveShape );
-					break;
-				case ETrsfConstraintType.Point:
-					c = new PointConstraint( refShape, moveShape );
-					break;
-				default:
+			// check if it belongs to G54
+			TopExp_Explorer expRef = new TopExp_Explorer( m_G54Shape, shapeType );
+			while( expRef.More() ) {
+				if( sel.IsEqual( expRef.Current() ) ) {
+					isRef = true;
 					return;
+				}
+				expRef.Next();
 			}
-			if( !c.IsValid() ) {
-				MyApp.Logger.ShowOnLogPanel( "約束無效。請選擇有效的參考並移動工件", MyApp.NoticeType.Warning );
-				return;
+
+			// check if it belongs to any visible workpiece
+			foreach( var partID in m_DataManager.PartIDList ) {
+				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
+					continue;
+				}
+				if( !DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObj ) ) {
+					continue;
+				}
+				TopExp_Explorer expWorkpiece = new TopExp_Explorer( shapeObj.Shape, shapeType );
+				while( expWorkpiece.More() ) {
+					if( sel.IsEqual( expWorkpiece.Current() ) ) {
+						isWorkpiece = true;
+						return;
+					}
+					expWorkpiece.Next();
+				}
 			}
-			gp_Trsf trsf = c.SolveConstraint();
-			ApplyTransform( trsf );
-			m_Viewer.GetAISContext().ClearSelected( true );
 		}
 
-		void ApplyTransform( gp_Trsf trsf )
+		void ExecuteTransform( gp_Trsf trsf )
 		{
 			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, trsf );
 			transformHelper.TransformData();
 		}
 
+		// stored selections: one from G54, one from workpiece
+		ETrsfConstraintType m_CurrentMode;
 		TopoDS_Shape m_G54Shape;
 		List<AIS_Shape> m_G54AISList;
-		bool m_IsControlPress = false;
+
+		TopoDS_Shape m_RefShape;
+		AIS_Shape m_RefG54AIS;
+		TopoDS_Shape m_WorkpieceShape;
+		SelectMgr_EntityOwner m_WorkpieceOwner;
 	}
 }
