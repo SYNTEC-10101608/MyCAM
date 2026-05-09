@@ -804,9 +804,9 @@
 			this.m_tsbManualTransform.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbManualTransform.Name = "m_tsbManualTransform";
 			this.m_tsbManualTransform.Size = new System.Drawing.Size(73, 47);
-			this.m_tsbManualTransform.Text = "手動轉換";
+			this.m_tsbManualTransform.Text = "工件對齊";
 			this.m_tsbManualTransform.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_tsbManualTransform.ToolTipText = "手動轉換";
+			this.m_tsbManualTransform.ToolTipText = "工件對齊";
 			this.m_tsbManualTransform.Click += new System.EventHandler(this.m_tsbManualTransform_Click);
 			// 
 			// m_tsb3PntTransform

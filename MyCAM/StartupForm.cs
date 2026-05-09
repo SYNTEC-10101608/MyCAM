@@ -160,9 +160,6 @@ namespace MyCAM
 			CAM,
 			Simulation,
 
-			// cad function	
-			ManualTransForm,
-
 			// cam function
 			AddPath,
 			ManualSelectPath,
@@ -268,7 +265,7 @@ namespace MyCAM
 		// manual transform
 		void m_tsbManualTransform_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.StartManaulTransform();
+			m_CADEditor.StartManualTransform();
 		}
 
 		void m_tsbManualTransPlane_Click( object sender, EventArgs e )
@@ -552,13 +549,7 @@ namespace MyCAM
 				return;
 			}
 
-			// action start, need to relay out
-			if( action == EditActionType.ManualTransform ) {
-				RefreshToolStripLayout( EUIStatus.ManualTransForm );
-			}
-			else {
-				RefreshToolStripLayout( EUIStatus.CAD );
-			}
+			RefreshToolStripLayout( EUIStatus.CAD );
 
 			// turn on light
 			switch( action ) {
@@ -923,9 +914,6 @@ namespace MyCAM
 				{ EUIStatus.CAD , new List<Control>() { m_tsCADFunction } },
 				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction } },
 				{ EUIStatus.Simulation, new List<Control>() { m_tsSimuFunc } },
-
-				// cad function
-				{ EUIStatus.ManualTransForm, new List<Control>(){m_tsCADFunction, m_tsManualTrans } },
 				
 				// cam function
 				{ EUIStatus.AddPath, new List<Control>(){ m_tsCAMFunction, m_tsAddPathSubFunc } },
