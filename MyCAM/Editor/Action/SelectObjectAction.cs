@@ -90,6 +90,13 @@ namespace MyCAM.Editor
 		protected override void ViewerMouseDown( MouseEventArgs e )
 		{
 			if( e.Button == MouseButtons.Left ) {
+
+				// record initial mouse position for drag detection
+				m_MouseDownX = e.X;
+				m_MouseDownY = e.Y;
+				m_IsDragging = false;
+
+				// setup rubber band
 				int modifiedY = m_Viewer.Height - e.Y;
 				m_RubberBandStartX = e.X;
 				m_RubberBandStartY = modifiedY;
@@ -103,16 +110,24 @@ namespace MyCAM.Editor
 		protected override void ViewerMouseMove( MouseEventArgs e )
 		{
 			if( e.Button == MouseButtons.Left ) {
-				int modifiedY = m_Viewer.Height - e.Y;
-				int minX = Math.Min( m_RubberBandStartX, e.X );
-				int minY = Math.Min( m_RubberBandStartY, modifiedY );
-				int maxX = Math.Max( m_RubberBandStartX, e.X );
-				int maxY = Math.Max( m_RubberBandStartY, modifiedY );
-				m_RubberBand.SetRectangle( minX, minY, maxX, maxY );
-				m_Viewer.GetAISContext().Redisplay( m_RubberBand, true ); // UpdateView does not work here
+				// check if mouse moved beyond drag threshold
+				int deltaX = Math.Abs( e.X - m_MouseDownX );
+				int deltaY = Math.Abs( e.Y - m_MouseDownY );
 
-				// update dragging flag
-				m_IsDragging = true;
+				// only set dragging if mouse moved more than threshold
+				// because viewer reget focuse will trigger MouseMove even
+				if( deltaX > DRAG_THRESHOLD || deltaY > DRAG_THRESHOLD ) {
+					m_IsDragging = true;
+
+					// update rubber band
+					int modifiedY = m_Viewer.Height - e.Y;
+					int minX = Math.Min( m_RubberBandStartX, e.X );
+					int minY = Math.Min( m_RubberBandStartY, modifiedY );
+					int maxX = Math.Max( m_RubberBandStartX, e.X );
+					int maxY = Math.Max( m_RubberBandStartY, modifiedY );
+					m_RubberBand.SetRectangle( minX, minY, maxX, maxY );
+					m_Viewer.GetAISContext().Redisplay( m_RubberBand, true ); // UpdateView does not work here
+				}
 			}
 		}
 
@@ -135,10 +150,8 @@ namespace MyCAM.Editor
 					m_Viewer.SelectRectangle( minX, minY, maxX, maxY );
 				}
 				SyncSelectionFromView();
-
-				// update dragging flag
-				m_IsDragging = false;
 			}
+			m_IsDragging = false;
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
@@ -284,7 +297,12 @@ namespace MyCAM.Editor
 		int m_RubberBandStartY = 0;
 		int m_SelectStartX = 0;
 		int m_SelectStartY = 0;
+		int m_MouseDownX = 0;
+		int m_MouseDownY = 0;
 		bool m_IsDragging = false;
+
+		// pixels - prevent unintended drag from focus change
+		const int DRAG_THRESHOLD = 3;
 
 		// selection sync
 		protected HashSet<string> m_SelectedIDSet;

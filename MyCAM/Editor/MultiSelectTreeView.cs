@@ -16,6 +16,9 @@ namespace MyCAM.Editor
 		// event for selection changes
 		public event EventHandler SelectionChanged;
 
+		// event for node double click
+		public event TreeNodeMouseClickEventHandler NodeDoubleClicked;
+
 		public bool isAllowMultiSelect
 		{
 			get; set;
@@ -34,6 +37,9 @@ namespace MyCAM.Editor
 
 			// avoid collapse
 			this.BeforeCollapse += MultiSelectTreeView_BeforeCollapse;
+
+			// subscribe to double click
+			this.NodeMouseDoubleClick += MultiSelectTreeView_NodeMouseDoubleClick;
 		}
 
 		public void ReverseSelection()
@@ -278,6 +284,34 @@ namespace MyCAM.Editor
 			}
 		}
 
+		public void SetFlagNode( TreeNode node, bool setFlag )
+		{
+			if( node == null ) {
+				return;
+			}
+
+			// original text without flag
+			string originalText = node.Text;
+			if( originalText.EndsWith( " 🚩" ) ) {
+				originalText = originalText.Substring( 0, originalText.Length - 3 );
+			}
+
+			if( setFlag ) {
+
+				// change font style
+				node.NodeFont = new Font( this.Font, FontStyle.Bold );
+				node.Text = originalText + " 🚩";
+				node.ForeColor = Color.Red;
+
+			}
+			else {
+				// reset font style
+				node.NodeFont = this.Font;
+				node.Text = originalText;
+				node.ForeColor = this.ForeColor;
+			}
+		}
+
 		IEnumerable<TreeNode> GetAllNodes( TreeNodeCollection nodes )
 		{
 			foreach( TreeNode n in nodes ) {
@@ -328,6 +362,11 @@ namespace MyCAM.Editor
 		void MultiSelectTreeView_BeforeCollapse( object sender, TreeViewCancelEventArgs e )
 		{
 			e.Cancel = true;
+		}
+
+		void MultiSelectTreeView_NodeMouseDoubleClick( object sender, TreeNodeMouseClickEventArgs e )
+		{
+			NodeDoubleClicked?.Invoke( this, e );
 		}
 
 		void SelectNodeWithoutAnchor( TreeNode node )

@@ -11,6 +11,8 @@ namespace MyCAM.Editor.Renderer
 		protected readonly Viewer m_Viewer;
 		protected readonly DataManager m_DataManager;
 		protected bool m_IsShow = true;
+		protected bool m_IsPauseRefreshAndHide = false;
+		protected bool m_IsPauseRefresh = false;
 
 		protected CAMRendererBase( Viewer viewer, DataManager dataManager )
 		{
@@ -25,6 +27,17 @@ namespace MyCAM.Editor.Renderer
 		public void SetShow( bool isShow )
 		{
 			m_IsShow = isShow;
+		}
+
+		public virtual void SetPauseRefreshAndHide( bool isPause )
+		{
+			m_IsPauseRefreshAndHide = isPause;
+			m_IsPauseRefresh = isPause;
+		}
+
+		public virtual void SetPauseRefresh( bool isPause )
+		{
+			m_IsPauseRefresh = isPause;
 		}
 
 		public void UpdateView()

@@ -22,6 +22,26 @@ namespace MyCAM.Editor.Renderer
 		{
 		}
 
+		public override void SetPauseRefreshAndHide( bool isPause )
+		{
+			if( m_IsPauseRefreshAndHide == isPause ) {
+				return;
+			}
+			base.SetPauseRefreshAndHide( isPause );
+			if( isPause ) {
+				// hide all managed AIS objects without destroying them
+				HideAllShapes( m_OrientationAISDict );
+				HideAllShapes( m_LeadInOrientationAISDict );
+				HideAllShapes( m_LeadOutOrientationAISDict );
+			}
+			else {
+				// re-display all managed AIS objects
+				ReDisplayAllShapes( m_OrientationAISDict );
+				ReDisplayAllShapes( m_LeadInOrientationAISDict );
+				ReDisplayAllShapes( m_LeadOutOrientationAISDict );
+			}
+		}
+
 		public override void Show( bool bUpdate = false )
 		{
 			Show( m_DataManager.PathIDList, bUpdate );
@@ -29,6 +49,10 @@ namespace MyCAM.Editor.Renderer
 
 		public void Show( List<string> pathIDList, bool bUpdate = false )
 		{
+			// paused, do not rebuild or display
+			if( m_IsPauseRefreshAndHide ) {
+				return;
+			}
 			Remove( pathIDList );
 
 			// no need to show
@@ -183,6 +207,25 @@ namespace MyCAM.Editor.Renderer
 				if( orientationDict.ContainsKey( szPathID ) ) {
 					m_Viewer.GetAISContext().Remove( orientationDict[ szPathID ], false );
 					orientationDict.Remove( szPathID );
+				}
+			}
+		}
+
+		void HideAllShapes( Dictionary<string, AIS_Shape> shapeDict )
+		{
+			foreach( var kvp in shapeDict ) {
+				if( kvp.Value != null ) {
+					m_Viewer.GetAISContext().Erase( kvp.Value, false );
+				}
+			}
+		}
+
+		void ReDisplayAllShapes( Dictionary<string, AIS_Shape> shapeDict )
+		{
+			foreach( var kvp in shapeDict ) {
+				if( kvp.Value != null ) {
+					m_Viewer.GetAISContext().Display( kvp.Value, false );
+					m_Viewer.GetAISContext().Deactivate( kvp.Value );
 				}
 			}
 		}

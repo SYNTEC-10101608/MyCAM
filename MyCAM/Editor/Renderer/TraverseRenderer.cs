@@ -17,19 +17,18 @@ namespace MyCAM.Editor.Renderer
 {
 	internal class TraverseRenderer : CAMRendererBase
 	{
-		bool m_IsPauseRefresh = false;
 
 		public TraverseRenderer( Viewer viewer, DataManager dataManager )
 			: base( viewer, dataManager )
 		{
 		}
 
-		public void SetPauseRefresh( bool isPause )
+		public override void SetPauseRefreshAndHide( bool isPause )
 		{
-			if( m_IsPauseRefresh == isPause ) {
+			if( m_IsPauseRefreshAndHide == isPause ) {
 				return;
 			}
-			m_IsPauseRefresh = isPause;
+			base.SetPauseRefreshAndHide( isPause );
 			if( isPause ) {
 				// hide all managed AIS objects without destroying them
 				foreach( var kvp in m_TraverseAISDict ) {
@@ -67,6 +66,10 @@ namespace MyCAM.Editor.Renderer
 
 		public void Show( List<string> pathIDList, bool bUpdate = false )
 		{
+			// paused, do not rebuild or display
+			if( m_IsPauseRefreshAndHide ) {
+				return;
+			}
 			List<string> pathsToUpdate = GetPathsToUpdate( pathIDList );
 			Remove( pathsToUpdate );
 			if( !m_IsShow ) {

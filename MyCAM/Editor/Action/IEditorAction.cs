@@ -42,6 +42,7 @@ namespace MyCAM.Editor
 		CalibrationREF,
 		ContourEdit,
 		MicroJoint,
+		ManualOrder,
 
 		// File
 		ImportProjectFile,

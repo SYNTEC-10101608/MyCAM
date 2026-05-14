@@ -34,7 +34,6 @@ namespace MyCAM.Editor
 		readonly Dictionary<string, AIS_Shape> m_OriginalPathAISDict = new Dictionary<string, AIS_Shape>();
 		readonly Dictionary<string, List<AIS_TextLabel>> m_MicroJointLabelsDict = new Dictionary<string, List<AIS_TextLabel>>();
 		ViewManager m_ViewManager;
-		bool m_IsPauseRefresh = false;
 
 		public PathRenderer( Viewer viewer, ViewManager viewManager, DataManager dataManager )
 			: base( viewer, dataManager )
@@ -42,12 +41,12 @@ namespace MyCAM.Editor
 			m_ViewManager = viewManager;
 		}
 
-		public void SetPauseRefresh( bool isPause )
+		public override void SetPauseRefreshAndHide( bool isPause )
 		{
-			if( m_IsPauseRefresh == isPause ) {
+			if( m_IsPauseRefreshAndHide == isPause ) {
 				return;
 			}
-			m_IsPauseRefresh = isPause;
+			base.SetPauseRefreshAndHide( isPause );
 			if( isPause ) {
 				// hide all managed AIS objects without destroying them
 				foreach( var kvp in m_MainPathAISDict ) {
@@ -111,7 +110,7 @@ namespace MyCAM.Editor
 		void ShowSpecifyPath( List<string> pathIDList, bool bUpdate, gp_Trsf trsf = null )
 		{
 			// paused, do not rebuild or display
-			if( m_IsPauseRefresh ) {
+			if( m_IsPauseRefreshAndHide || m_IsPauseRefresh ) {
 				return;
 			}
 

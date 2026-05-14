@@ -23,6 +23,27 @@ namespace MyCAM.Editor.Renderer
 		{
 		}
 
+		public override void SetPauseRefreshAndHide( bool isPause )
+		{
+			if( m_IsPauseRefreshAndHide == isPause ) {
+				return;
+			}
+			base.SetPauseRefreshAndHide( isPause );
+			if( isPause ) {
+
+				// hide all AIS
+				HideAllLines( m_LeadInAISDict );
+				HideAllLines( m_LeadOutAISDict );
+				HideAllLines( m_OverCutAISDict );
+			}
+			else {
+				// re-display all AIS objects
+				ReDisplayAllLine( m_LeadInAISDict );
+				ReDisplayAllLine( m_LeadOutAISDict );
+				ReDisplayAllLine( m_OverCutAISDict );
+			}
+		}
+
 		public override void Show( bool bUpdate = false )
 		{
 			Show( m_DataManager.PathIDList, bUpdate );
@@ -30,6 +51,10 @@ namespace MyCAM.Editor.Renderer
 
 		public void Show( List<string> pathIDList, bool bUpdate = false )
 		{
+			// paused, do not rebuild or display
+			if( m_IsPauseRefreshAndHide ) {
+				return;
+			}
 			Remove( pathIDList );
 			if( !m_IsShow ) {
 				if( bUpdate ) {
@@ -198,6 +223,25 @@ namespace MyCAM.Editor.Renderer
 					}
 					lineDict[ szPathID ].Clear();
 					lineDict.Remove( szPathID );
+				}
+			}
+		}
+
+		void HideAllLines( Dictionary<string, List<AIS_Line>> lineDict )
+		{
+			foreach( var kvp in lineDict ) {
+				foreach( AIS_Line line in kvp.Value ) {
+					m_Viewer.GetAISContext().Erase( line, false );
+				}
+			}
+		}
+
+		void ReDisplayAllLine( Dictionary<string, List<AIS_Line>> lineDict )
+		{
+			foreach( var kvp in lineDict ) {
+				foreach( AIS_Line line in kvp.Value ) {
+					m_Viewer.GetAISContext().Display( line, false );
+					m_Viewer.GetAISContext().Deactivate( line );
 				}
 			}
 		}

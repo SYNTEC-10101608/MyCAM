@@ -8,7 +8,6 @@ namespace MyCAM.Editor
 	internal class SelectPathAction : SelectObjectAction
 	{
 		public Action RemovePath;
-		public Action<bool> PathOrderMove;
 
 		public SelectPathAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
@@ -65,8 +64,12 @@ namespace MyCAM.Editor
 					continue;
 				}
 
+				string nodeText = node.Text;
+				if( nodeText.EndsWith( " 🚩" ) ) {
+					nodeText = nodeText.Substring( 0, nodeText.Length - 3 );
+				}
 				// the node text is "Path_xxx", xxx is the order of path in pathID list
-				if( int.TryParse( node.Text.Substring( CAMEditor.PATH_NODE_PERFIX_LENGTH ), out int index ) ) {
+				if( int.TryParse( nodeText.Substring( CAMEditor.PATH_NODE_PERFIX_LENGTH ), out int index ) ) {
 
 					// check index, note that index is 1 based
 					if( index < 1 || index > m_DataManager.PathIDList.Count ) {
@@ -98,7 +101,6 @@ namespace MyCAM.Editor
 				( m_TreeView as MultiSelectTreeView ).SelectNode( m_ViewManager.TreeNodeMap[ szNodeID ] );
 			}
 			m_bSuppressTreeViewSync = false;
-
 			// sync to view
 			m_Viewer.GetAISContext().ClearSelected( false );
 			foreach( string szUID in m_SelectedIDSet ) {

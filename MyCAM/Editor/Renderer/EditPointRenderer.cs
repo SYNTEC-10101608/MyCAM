@@ -126,6 +126,11 @@ namespace MyCAM.Editor.Renderer
 			m_IsShow = isShow;
 		}
 
+		public void SetPauseRefreshAndHide( bool isPause )
+		{
+			// EditPointRenderer does not need to implement pause functionality
+		}
+
 		public void UpdateView()
 		{
 			m_Viewer.UpdateView();
