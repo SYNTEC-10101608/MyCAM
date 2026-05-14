@@ -223,29 +223,19 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap CAM_ManualOrder {
+            get {
+                object obj = ResourceManager.GetObject("CAM_ManualOrder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap CAM_MicroJoint {
             get {
                 object obj = ResourceManager.GetObject("CAM_MicroJoint", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap CAM_MoveDown {
-            get {
-                object obj = ResourceManager.GetObject("CAM_MoveDown", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap CAM_MoveUp {
-            get {
-                object obj = ResourceManager.GetObject("CAM_MoveUp", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

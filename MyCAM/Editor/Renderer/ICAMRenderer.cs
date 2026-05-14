@@ -24,6 +24,12 @@ namespace MyCAM.Editor.Renderer
 		void SetShow( bool isShow );
 
 		/// <summary>
+		/// Set whether to pause refresh operations
+		/// </summary>
+		/// <param name="isPause">True to pause, false to resume</param>
+		void SetPauseRefreshAndHide( bool isPause );
+
+		/// <summary>
 		/// Update the view after rendering
 		/// </summary>
 		void UpdateView();

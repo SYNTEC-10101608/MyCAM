@@ -35,7 +35,6 @@ namespace MyCAM.Editor
 			IsToolVecReverseEditable = true;
 			IsFixedToolVecEditable = true;
 			IsTraverseEditable = true;
-			IsMoveProcessEditable = true;
 			IsAutoOrderEditable = true;
 			IsPathCompensateEditable = true;
 		}
@@ -48,7 +47,6 @@ namespace MyCAM.Editor
 		public bool IsToolVecReverseEditable;
 		public bool IsFixedToolVecEditable;
 		public bool IsTraverseEditable;
-		public bool IsMoveProcessEditable;
 		public bool IsAutoOrderEditable;
 		public bool IsPathCompensateEditable;
 	}
@@ -73,7 +71,6 @@ namespace MyCAM.Editor
 			m_DefaultAction = new SelectPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			( m_DefaultAction as SelectPathAction ).SelectionChange += OnPathSelectionChange;
 			( m_DefaultAction as SelectPathAction ).RemovePath += RemovePath;
-			( m_DefaultAction as SelectPathAction ).PathOrderMove += MoveProcess;
 
 			// Initialize renderers
 			m_IndexRenderer = new IndexRenderer( m_Viewer, m_DataManager );
@@ -425,14 +422,14 @@ namespace MyCAM.Editor
 		{
 			if( isStart ) {
 				m_MachineRender.Show();
-				m_MainPathRenderer.SetPauseRefresh( true );
-				m_ToolVecRenderer.SetPauseRefresh( true );
-				m_TraverseRenderer.SetPauseRefresh( true );
+				m_MainPathRenderer.SetPauseRefreshAndHide( true );
+				m_ToolVecRenderer.SetPauseRefreshAndHide( true );
+				m_TraverseRenderer.SetPauseRefreshAndHide( true );
 			}
 			else {
-				m_MainPathRenderer.SetPauseRefresh( false );
-				m_ToolVecRenderer.SetPauseRefresh( false );
-				m_TraverseRenderer.SetPauseRefresh( false );
+				m_MainPathRenderer.SetPauseRefreshAndHide( false );
+				m_ToolVecRenderer.SetPauseRefreshAndHide( false );
+				m_TraverseRenderer.SetPauseRefreshAndHide( false );
 				m_MachineRender.Remove();
 				m_ToolVecRenderer.Reset();
 				m_TraverseRenderer.Reset();
@@ -719,43 +716,42 @@ namespace MyCAM.Editor
 		#endregion
 
 		// sort API
-		public void MoveProcess( bool bUp )
+		public void SetManualOrder()
 		{
-			// one shot edit, no multi edit supported
-			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+			if( IsSameAction( EditActionType.ManualOrder ) ) {
+				m_CurrentAction.End();
 				return;
 			}
-			string szPathID = szPathIDList[ 0 ];
-			int nIndex = m_DataManager.PathIDList.IndexOf( szPathID );
+			EndActionIfNotDefault();
+			ManualOrderAction action = new ManualOrderAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+			action.ShowOrderData += ShowAllCAMData;
+			action.RaiseActionStart += ManualStartIO;
 
-			// check boundary
-			if( nIndex < 0 || nIndex > m_DataManager.PathIDList.Count - 1
-				|| bUp && nIndex == 0
-				|| !bUp && nIndex == m_DataManager.PathIDList.Count - 1 ) {
-				return;
-			}
+			StartEditAction( action );
+		}
 
-			// move process
-			m_DataManager.PathIDList.RemoveAt( nIndex );
-			int newIndex;
-			if( bUp ) {
-				newIndex = nIndex - 1;
-				m_DataManager.PathIDList.Insert( newIndex, szPathID );
+		void ManualStartIO( bool isStart )
+		{
+			if( isStart ) {
+				m_ToolVecRenderer.SetPauseRefreshAndHide( true );
+				m_MainPathRenderer.SetPauseRefresh( true );
+				m_TraverseRenderer.SetPauseRefreshAndHide( true );
+				m_CraftRenderer.SetPauseRefreshAndHide( true );
+				m_OrientationRenderer.SetPauseRefreshAndHide( true );
 			}
 			else {
-				newIndex = nIndex + 1;
-				m_DataManager.PathIDList.Insert( newIndex, szPathID );
-			}
 
-			// tree view select moved node
-			string newNodeID = PATH_NODE_PREFIX + ( newIndex + 1 ).ToString();
-			if( m_ViewManager.TreeNodeMap.ContainsKey( newNodeID ) ) {
-				if( m_DefaultAction is SelectPathAction selectAction ) {
-					selectAction.ClearSelection();
-					selectAction.SelectPathByID( szPathID );
-				}
+				// re-display all data
+				m_ToolVecRenderer.SetPauseRefreshAndHide( false );
+				m_MainPathRenderer.SetPauseRefresh( false );
+				m_TraverseRenderer.SetPauseRefreshAndHide( false );
+				m_CraftRenderer.SetPauseRefreshAndHide( false );
+				m_OrientationRenderer.SetPauseRefreshAndHide( false );
+
+				// traverse will change during order change
+				m_TraverseRenderer.Show();
 			}
-			ShowAllCAMData();
+			m_Viewer.UpdateView();
 		}
 
 		// TODO: is it making sense to use cache here?
@@ -978,7 +974,6 @@ namespace MyCAM.Editor
 			if( szPathIDList.Count > 1 ) {
 				editableInfo.IsStartPointEditable = false;
 				editableInfo.IsToolVecEditable = false;
-				editableInfo.IsMoveProcessEditable = false;
 				editableInfo.IsAutoOrderEditable = false;
 			}
 
@@ -1182,6 +1177,7 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.SetPattern
 				|| action.ActionType == EditActionType.PathEdit
 				|| action.ActionType == EditActionType.ToolVec
+				|| action.ActionType == EditActionType.MicroJoint
 				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// lock main form
@@ -1202,6 +1198,7 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.SetPattern
 				|| action.ActionType == EditActionType.PathEdit
 				|| action.ActionType == EditActionType.ToolVec
+				|| action.ActionType == EditActionType.MicroJoint
 				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// unlock main form

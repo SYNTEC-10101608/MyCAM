@@ -68,6 +68,7 @@
     <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
     <Compile Include="Editor\Action\CAM\CalibrationREFAction.cs" />
     <Compile Include="Editor\Action\CAM\ContourEditAction.cs" />
+    <Compile Include="Editor\Action\CAM\ManualOrderAction.cs" />
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
     <Compile Include="Editor\Dialog\CalibrationREFDlg.cs">
@@ -88,6 +89,12 @@
     </Compile>
     <Compile Include="Editor\Dialog\MicroJointDlg.Designer.cs">
       <DependentUpon>MicroJointDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Dialog\OrderDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\OrderDialog.Designer.cs">
+      <DependentUpon>OrderDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Editor\Dialog\ContourEditDlg.cs">
@@ -309,6 +316,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\MicroJointDlg.resx">
       <DependentUpon>MicroJointDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\OrderDialog.resx">
+      <DependentUpon>OrderDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\PathCompensateDlg.resx">
       <DependentUpon>PathCompensateDlg.cs</DependentUpon>

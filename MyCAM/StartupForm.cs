@@ -390,14 +390,9 @@ namespace MyCAM
 		}
 
 		// sort
-		void m_tsbMoveUp_Click( object sender, EventArgs e )
+		void m_tsbManualOrder_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.MoveProcess( true );
-		}
-
-		void m_tsbMoveDown_Click( object sender, EventArgs e )
-		{
-			m_CAMEditor.MoveProcess( false );
+			m_CAMEditor.SetManualOrder();
 		}
 
 		void m_tsbAutoOrder_Click( object sender, EventArgs e )
@@ -634,6 +629,10 @@ namespace MyCAM
 						m_tsbEntryAndExitSetting.BackColor = DEFAULT_BtnColor;
 						OnCAMDlgActionStatusChange( actionStatus );
 						break;
+					case EditActionType.ManualOrder:
+						m_tsbManualOrder.BackColor = DEFAULT_BtnColor;
+						OnCAMDlgActionStatusChange( actionStatus );
+						break;
 					default:
 						break;
 				}
@@ -691,6 +690,10 @@ namespace MyCAM
 					m_tsbEntryAndExitSetting.BackColor = ON_ButtonColor;
 					OnCAMDlgActionStatusChange( actionStatus );
 					break;
+				case EditActionType.ManualOrder:
+					m_tsbManualOrder.BackColor = ON_ButtonColor;
+					OnCAMDlgActionStatusChange( actionStatus );
+					break;
 				default:
 					break;
 			}
@@ -705,8 +708,6 @@ namespace MyCAM
 			m_tsbToolVec.Enabled = editableInfo.IsToolVecEditable;
 			m_tsbToolVecReverse.Enabled = editableInfo.IsToolVecReverseEditable;
 			m_tsbFixedToolVec.Enabled = editableInfo.IsFixedToolVecEditable;
-			m_tsbMoveUp.Enabled = editableInfo.IsMoveProcessEditable;
-			m_tsbMoveDown.Enabled = editableInfo.IsMoveProcessEditable;
 			m_tsbAutoOrder.Enabled = editableInfo.IsAutoOrderEditable;
 			m_tsbReverse.Enabled = editableInfo.IsPathReverseEditable;
 			m_tsbPathCompensation.Enabled = editableInfo.IsPathCompensateEditable;
@@ -1234,14 +1235,12 @@ namespace MyCAM
 
 		void m_tsmiSimulation_Click( object sender, EventArgs e )
 		{
+			SwitchEditor( EEditorType.Simulation );
 			RefreshToolStripLayout( EUIStatus.Simulation );
 
 			// not in cam editing viewer tool bar cam buttons can't be used
 			VisibleCAMQuickToolBarButtons( false );
 			VisibleTechLayerButtons( false );
-
-			// refresh main form UI layout, before start simu editor because start simu editor will trigger show machine
-			SwitchEditor( EEditorType.Simulation );
 		}
 
 		void m_btnPlay_Click( object sender, EventArgs e )
