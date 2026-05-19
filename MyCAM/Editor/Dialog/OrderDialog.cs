@@ -73,9 +73,7 @@ namespace MyCAM.Editor
 
 		// ---- UI events ----
 
-		protected 
-
-		void m_rbSequentialOrder_CheckedChanged( object sender, EventArgs e )
+		protected void m_rbSequentialOrder_CheckedChanged( object sender, EventArgs e )
 		{
 			if( m_bSuppressValueChanged ) {
 				return;
@@ -101,7 +99,7 @@ namespace MyCAM.Editor
 
 		void m_btnApply_Click( object sender, EventArgs e )
 		{
-			Confirm?.Invoke( );
+			Confirm?.Invoke();
 		}
 
 		void m_btnMoveToTop_Click( object sender, EventArgs e )

@@ -151,6 +151,8 @@
 			this.Controls.Add(this.m_gbxOrderMode);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Margin = new System.Windows.Forms.Padding(4);
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
 			this.Name = "OrderDialog";
 			this.Padding = new System.Windows.Forms.Padding(9);
 			this.Text = "路徑排序";
