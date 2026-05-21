@@ -47,6 +47,7 @@ namespace MyCAM.Editor
 		// File
 		ImportProjectFile,
 		SaveProjectFile,
+		ImportDxfGlass,
 	}
 
 	internal interface IEditorAction
