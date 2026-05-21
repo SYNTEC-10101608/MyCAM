@@ -181,8 +181,10 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			gp_Pnt bboxCenter = new gp_Pnt( bbox.XCenter, bbox.YCenter, bbox.ZCenter );
+
 			List<gp_Ax1> AlienatedStrategies = GeometryTool.BuildRayAxesFromBBox( new gp_Dir( 0, 0, 1 ), bbox );
-			AutoFindOutesetFaceAndAddPath( AlienatedStrategies );
+			AutoFindOutesetFaceAndAddPath( AlienatedStrategies, bboxCenter );
 		}
 
 		// Auto find outermost face along X/Y axis, then process D1 continuous faces and free boundaries
@@ -200,6 +202,8 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			gp_Pnt bboxCenter = new gp_Pnt( bbox.XCenter, bbox.YCenter, bbox.ZCenter );
+
 			// Build strategies along +X then +Y, interleaved by priority
 			// (center along X, center along Y, then corner midpoints for both)
 			List<gp_Ax1> strategiesX = GeometryTool.BuildRayAxesFromBBox( new gp_Dir( 1, 0, 0 ), bbox );
@@ -215,7 +219,8 @@ namespace MyCAM.Editor
 					stretchedStrategies.Add( strategiesY[ i ] );
 				}
 			}
-			AutoFindOutesetFaceAndAddPath( stretchedStrategies );
+
+			AutoFindOutesetFaceAndAddPath( stretchedStrategies, bboxCenter );
 		}
 
 		public void SelectD1ContFace()
@@ -1210,7 +1215,7 @@ namespace MyCAM.Editor
 		}
 
 		// Shared: auto find outermost face by ray strategies, then find D1 faces and add free boundary paths
-		void AutoFindOutesetFaceAndAddPath( List<gp_Ax1> strategies )
+		void AutoFindOutesetFaceAndAddPath( List<gp_Ax1> strategies, gp_Pnt referenceCenter )
 		{
 			// Step 1: For each strategy, collect bbox-filtered face candidates and find the outermost intersected face
 			TopoDS_Face outerTargetFace = null;
@@ -1219,7 +1224,7 @@ namespace MyCAM.Editor
 				if( bboxFilteredFaces.Count == 0 ) {
 					continue;
 				}
-				if( GeometryTool.FindOutermostFaceAlongPrincipalAxis( bboxFilteredFaces, strategy.Location(), strategy.Direction(), out outerTargetFace ) ) {
+				if( GeometryTool.FindOutermostFaceAlongPrincipalAxis( bboxFilteredFaces, strategy.Location(), strategy.Direction(), referenceCenter, out outerTargetFace ) ) {
 					break;
 				}
 			}
@@ -1254,8 +1259,6 @@ namespace MyCAM.Editor
 			AddPathsFromFaceGroup( sewedFaceGroupList );
 		}
 
-		// Collect visible faces only from parts whose bounding box intersects the given ray.
-		// This avoids face-level processing on parts that cannot possibly intersect.
 		List<TopoDS_Face> GetVisibleFaceCandidatesByRay( gp_Ax1 strategy )
 		{
 			List<TopoDS_Face> faceList = new List<TopoDS_Face>();
@@ -1283,8 +1286,6 @@ namespace MyCAM.Editor
 			return faceList;
 		}
 
-		// Build compound of all visible workpieces and return its bounding box.
-		// Returns null if no visible workpiece exists.
 		BoundingBox GetVisibleWorkpieceBBox()
 		{
 			List<TopoDS_Shape> shapeList = new List<TopoDS_Shape>();
