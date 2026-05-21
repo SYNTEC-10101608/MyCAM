@@ -35,6 +35,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="netDxf">
+      <HintPath>..\reference\netdxf\netDxf.dll</HintPath>
+    </Reference>
     <Reference Include="OCCCSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\reference\OCCCSharp.dll</HintPath>
@@ -66,6 +69,7 @@
     </Compile>
     <Compile Include="Data\Craft\CalibrationData.cs" />
     <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
+    <Compile Include="Editor\Action\CAD\GlassDXFImportAction.cs" />
     <Compile Include="Editor\Action\CAM\CalibrationREFAction.cs" />
     <Compile Include="Editor\Action\CAM\ContourEditAction.cs" />
     <Compile Include="Editor\Action\CAM\ManualOrderAction.cs" />
@@ -76,6 +80,12 @@
     </Compile>
     <Compile Include="Editor\Dialog\CalibrationREFDlg.Designer.cs">
       <DependentUpon>CalibrationREFDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Dialog\GlassDXFImportDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\GlassDXFImportDlg.Designer.cs">
+      <DependentUpon>GlassDXFImportDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Dialog\ManualTransformDlg.cs">
       <SubType>Form</SubType>
@@ -135,6 +145,7 @@
     <Compile Include="Helper\CAM\StartPointHelper.cs" />
     <Compile Include="Helper\Canvas\DrawHelper.cs" />
     <Compile Include="Helper\Coupler\StdPatternCraftCoupler.cs" />
+    <Compile Include="Helper\FileIO\DxfReader.cs" />
     <Compile Include="Helper\FormShow\DialogShowHelper.cs" />
     <Compile Include="Helper\Simulation\CollisionHelper.cs" />
     <Compile Include="Helper\Simulation\MeshesToAISHelper.cs" />
@@ -313,6 +324,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\ContourEditDlg.resx">
       <DependentUpon>ContourEditDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\GlassDXFImportDlg.resx">
+      <DependentUpon>GlassDXFImportDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\MicroJointDlg.resx">
       <DependentUpon>MicroJointDlg.cs</DependentUpon>

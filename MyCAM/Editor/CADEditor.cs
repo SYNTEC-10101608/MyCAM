@@ -21,7 +21,8 @@ namespace MyCAM.Editor
 	{
 		BREP = 0,
 		STEP = 1,
-		IGES = 2
+		IGES = 2,
+		DXF = 3
 	}
 
 	internal class CADEditor : EditorBase
@@ -71,6 +72,7 @@ namespace MyCAM.Editor
 			OpenFileDialog openDialog = new OpenFileDialog();
 			string filter = "STEP Files (*.stp;*.step)|*.stp;*.step|" +
 							"IGES Files (*.igs;*.iges)|*.igs;*.iges|" +
+							"DXF Files (*.dxf)|*.dxf|" +
 							"All files (*.*)|*.*";
 			openDialog.Filter = filter;
 
@@ -90,7 +92,17 @@ namespace MyCAM.Editor
 			if( szFileExtension == ".stp" || szFileExtension == ".step" ) {
 				format = FileFormat.STEP;
 			}
-			ReadFileData( format, szFileName );
+			if( szFileExtension == ".dxf" ) {
+				format = FileFormat.DXF;
+			}
+
+			if( format == FileFormat.DXF ) {
+				GlassDXFImportAction action = new GlassDXFImportAction( m_DataManager, szFileName );
+				StartEditAction( action );
+			}
+			else {
+				ReadFileData( format, szFileName );
+			}
 		}
 
 		public void ImportProjectFile()

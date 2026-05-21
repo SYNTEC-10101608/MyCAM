@@ -1,8 +1,14 @@
 ﻿using MyCAM.Data;
 using OCC.BOPTools;
+using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.GCPnts;
+using OCC.Geom;
+using OCC.Geom2d;
+using OCC.GeomLProp;
 using OCC.gp;
+using OCC.Precision;
+using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using System;
@@ -82,11 +88,7 @@ namespace MyCAM.Helper
 				gp_Pnt point = adC.Value( U );
 
 				// get shell normal (1st)
-				gp_Dir normalVec_1st = new gp_Dir();
-				BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, shellFace, U, ref normalVec_1st );
-				if( shellFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-					normalVec_1st.Reverse();
-				}
+				gp_Dir normalVec_1st = GetSurfaceNormal( edge, shellFace, U );
 
 				// TODO: get solid normal (2nd)
 				gp_Dir normalVec_2nd = new gp_Dir( normalVec_1st.XYZ() );
@@ -157,6 +159,45 @@ namespace MyCAM.Helper
 			gp_Pnt p = new gp_Pnt( xValue / nPointNumber, yValue / nPointNumber, zValue / nPointNumber );
 			gp_Dir d = new gp_Dir( xDirValue / nPointNumber, yDirValue / nPointNumber, zDirValue / nPointNumber );
 			refCoord = new gp_Ax1( p, d );
+		}
+
+		static gp_Dir GetSurfaceNormal( TopoDS_Edge edge, TopoDS_Face face, double param )
+		{
+			Geom_Surface surf = BRep_Tool.Surface( face );
+
+			double first2d = 0, last2d = 0;
+			Geom2d_Curve pcurve = BRep_Tool.CurveOnSurface( edge, face, ref first2d, ref last2d );
+
+			double u, v;
+			if( pcurve != null ) {
+				gp_Pnt2d uv = pcurve.Value( param );
+				u = uv.X();
+				v = uv.Y();
+			}
+			else {
+				// No PCurve → reverse-compute UV from 3D point
+				BRepAdaptor_Curve adC = new BRepAdaptor_Curve( edge );
+				gp_Pnt pt = adC.Value( param );
+				ShapeAnalysis_Surface sas = new ShapeAnalysis_Surface( surf );
+				gp_Pnt2d uv = sas.ValueOfUV( pt, 1e-4 );
+				u = uv.X();
+				v = uv.Y();
+			}
+
+			GeomLProp_SLProps props = new GeomLProp_SLProps( surf, u, v, 1, Precision.Confusion() );
+			if( props.IsNormalDefined() ) {
+				gp_Dir normal = props.Normal();
+				if( face.Orientation() == TopAbs_Orientation.TopAbs_REVERSED )
+					normal.Reverse();
+				return normal;
+			}
+
+			// fallback
+			gp_Dir fallback = new gp_Dir();
+			BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, face, param, ref fallback );
+			if( face.Orientation() == TopAbs_Orientation.TopAbs_REVERSED )
+				fallback.Reverse();
+			return fallback;
 		}
 
 		const double DISCRETE_MAX_DEFLECTION = 0.01;
