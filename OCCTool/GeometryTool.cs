@@ -388,13 +388,12 @@ namespace OCCTool
 			}
 		}
 
-		public static bool FindOutermostFaceAlongPrincipalAxis( List<TopoDS_Face> faceList, gp_Pnt rayOrigin, gp_Dir rayDir, out TopoDS_Face outermostFace )
+		public static bool FindOutermostFaceAlongPrincipalAxis( List<TopoDS_Face> faceList, gp_Pnt rayOrigin, gp_Dir rayDir, gp_Pnt referenceCenter, out TopoDS_Face outermostFace )
 		{
 			outermostFace = null;
-			if( faceList == null || rayOrigin == null || rayDir == null ) {
+			if( faceList == null || rayOrigin == null || rayDir == null || referenceCenter == null ) {
 				return false;
 			}
-			double maxProjection = double.MinValue;
 
 			gp_Lin ray = new gp_Lin( rayOrigin, rayDir );
 
@@ -404,6 +403,8 @@ namespace OCCTool
 			if( isAlongX == false && isAlongY == false && isAlongZ == false ) {
 				return false;
 			}
+
+			double maxDistance = -1.0;
 
 			foreach( TopoDS_Face face in faceList ) {
 				BoundingBox bbox = new BoundingBox( face );
@@ -437,12 +438,22 @@ namespace OCCTool
 					continue;
 				}
 
-				// Since rayDir is a principal axis, projection = the corresponding coordinate directly
+				// Phase 3: Find the intersection point farthest from the reference center along the ray axis
 				for( int i = 1; i <= intersector.NbPnt(); i++ ) {
 					gp_Pnt pnt = intersector.Pnt( i );
-					double projection = isAlongX ? pnt.X() : ( isAlongY ? pnt.Y() : pnt.Z() );
-					if( projection > maxProjection ) {
-						maxProjection = projection;
+					double distance;
+					if( isAlongX ) {
+						distance = Math.Abs( pnt.X() - referenceCenter.X() );
+					}
+					else if( isAlongY ) {
+						distance = Math.Abs( pnt.Y() - referenceCenter.Y() );
+					}
+					else {
+						distance = Math.Abs( pnt.Z() - referenceCenter.Z() );
+					}
+
+					if( distance > maxDistance ) {
+						maxDistance = distance;
 						outermostFace = face;
 					}
 				}
