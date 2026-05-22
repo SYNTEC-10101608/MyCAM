@@ -28,9 +28,9 @@
 		private void InitializeComponent()
 		{
 			this.m_gpbMove = new System.Windows.Forms.GroupBox();
-			this.m_NumUpDownZ = new System.Windows.Forms.NumericUpDown();
-			this.m_NumUpDownY = new System.Windows.Forms.NumericUpDown();
-			this.m_NumUpDownX = new System.Windows.Forms.NumericUpDown();
+			this.m_NumUpDownZ = new MyCAM.Editor.DebouncedNumericUpDown();
+			this.m_NumUpDownY = new MyCAM.Editor.DebouncedNumericUpDown();
+			this.m_NumUpDownX = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_lblZ = new System.Windows.Forms.Label();
 			this.m_lblY = new System.Windows.Forms.Label();
 			this.m_lblX = new System.Windows.Forms.Label();
@@ -70,9 +70,7 @@
 			this.m_NumUpDownZ.Size = new System.Drawing.Size(120, 21);
 			this.m_NumUpDownZ.TabIndex = 7;
 			this.m_NumUpDownZ.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			this.m_NumUpDownZ.Click += new System.EventHandler(this.m_NumUpDownZ_Click);
-			this.m_NumUpDownZ.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_NumUpDownZ_KeyDown);
-			this.m_NumUpDownZ.Leave += new System.EventHandler(this.m_NumUpDownZ_Leave);
+			this.m_NumUpDownZ.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownZ_DebouncedValueChanged);
 			// 
 			// m_NumUpDownY
 			// 
@@ -81,9 +79,7 @@
 			this.m_NumUpDownY.Size = new System.Drawing.Size(120, 21);
 			this.m_NumUpDownY.TabIndex = 6;
 			this.m_NumUpDownY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			this.m_NumUpDownY.Click += new System.EventHandler(this.m_NumUpDownY_Click);
-			this.m_NumUpDownY.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_NumUpDownY_KeyDown);
-			this.m_NumUpDownY.Leave += new System.EventHandler(this.m_NumUpDownY_Leave);
+			this.m_NumUpDownY.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownY_DebouncedValueChanged);
 			// 
 			// m_NumUpDownX
 			// 
@@ -92,9 +88,7 @@
 			this.m_NumUpDownX.Size = new System.Drawing.Size(120, 21);
 			this.m_NumUpDownX.TabIndex = 5;
 			this.m_NumUpDownX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			this.m_NumUpDownX.Click += new System.EventHandler(this.m_NumUpDownX_Click);
-			this.m_NumUpDownX.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_NumUpDownX_KeyDown);
-			this.m_NumUpDownX.Leave += new System.EventHandler(this.m_NumUpDownX_Leave);
+			this.m_NumUpDownX.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownX_DebouncedValueChanged);
 			// 
 			// m_lblZ
 			// 
@@ -202,9 +196,9 @@
 		private System.Windows.Forms.GroupBox m_gpbMove;
 		private System.Windows.Forms.Label m_lblRefCoordType;
 		private System.Windows.Forms.ComboBox m_cmbRefCoordType;
-		private System.Windows.Forms.NumericUpDown m_NumUpDownZ;
-		private System.Windows.Forms.NumericUpDown m_NumUpDownY;
-		private System.Windows.Forms.NumericUpDown m_NumUpDownX;
+		private MyCAM.Editor.DebouncedNumericUpDown m_NumUpDownZ;
+		private MyCAM.Editor.DebouncedNumericUpDown m_NumUpDownY;
+		private MyCAM.Editor.DebouncedNumericUpDown m_NumUpDownX;
 		private System.Windows.Forms.Label m_lblZ;
 		private System.Windows.Forms.Label m_lblY;
 		private System.Windows.Forms.Label m_lblX;

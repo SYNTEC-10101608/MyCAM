@@ -28,27 +28,33 @@
 		private void InitializeComponent()
 		{
 			this.m_LeadInAngleUnit = new System.Windows.Forms.Label();
-			this.m_tbxLeadInAngle = new System.Windows.Forms.TextBox();
+			this.m_tbxLeadInAngle = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_lblLeadInAngle = new System.Windows.Forms.Label();
-			this.m_tbxLeadInArcLength = new System.Windows.Forms.TextBox();
+			this.m_tbxLeadInArcLength = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_LeadInLegnthUnit = new System.Windows.Forms.Label();
 			this.m_btnOK = new System.Windows.Forms.Button();
 			this.m_lblLeadInLength = new System.Windows.Forms.Label();
 			this.m_chkFlip = new System.Windows.Forms.CheckBox();
 			this.m_lblLeadOutLength = new System.Windows.Forms.Label();
 			this.m_LeadOutAngleUnit = new System.Windows.Forms.Label();
-			this.m_tbxLeadOutArcLength = new System.Windows.Forms.TextBox();
+			this.m_tbxLeadOutArcLength = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_LeadOutLegnthUnit = new System.Windows.Forms.Label();
-			this.m_tbxLeadOutAngle = new System.Windows.Forms.TextBox();
+			this.m_tbxLeadOutAngle = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_lblLeadOutAngle = new System.Windows.Forms.Label();
 			this.m_lblLeadIn = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
-			this.m_tbxLeadInStraightLength = new System.Windows.Forms.TextBox();
+			this.m_tbxLeadInStraightLength = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
-			this.m_tbxLeadOutStraightLength = new System.Windows.Forms.TextBox();
+			this.m_tbxLeadOutStraightLength = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.label5 = new System.Windows.Forms.Label();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInAngle)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInArcLength)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutArcLength)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutAngle)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInStraightLength)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutStraightLength)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// m_LeadInAngleUnit
@@ -62,12 +68,14 @@
 			// 
 			// m_tbxLeadInAngle
 			// 
+			this.m_tbxLeadInAngle.DecimalPlaces = 3;
+			this.m_tbxLeadInAngle.Minimum = 0;
+			this.m_tbxLeadInAngle.Maximum = 180;
 			this.m_tbxLeadInAngle.Location = new System.Drawing.Point(100, 110);
 			this.m_tbxLeadInAngle.Name = "m_tbxLeadInAngle";
 			this.m_tbxLeadInAngle.Size = new System.Drawing.Size(63, 22);
 			this.m_tbxLeadInAngle.TabIndex = 3;
-			this.m_tbxLeadInAngle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxLeadInAngle_KeyDown);
-			this.m_tbxLeadInAngle.Leave += new System.EventHandler(this.m_tbxLeadInAngle_Leave);
+			this.m_tbxLeadInAngle.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadIn_DebouncedValueChanged);
 			// 
 			// m_lblLeadInAngle
 			// 
@@ -80,12 +88,15 @@
 			// 
 			// m_tbxLeadInArcLength
 			// 
+			this.m_tbxLeadInArcLength.DecimalPlaces = 3;
+			this.m_tbxLeadInArcLength.Increment = 0.5m;
+			this.m_tbxLeadInArcLength.Minimum = 0;
+			this.m_tbxLeadInArcLength.Maximum = 99999;
 			this.m_tbxLeadInArcLength.Location = new System.Drawing.Point(100, 75);
 			this.m_tbxLeadInArcLength.Name = "m_tbxLeadInArcLength";
 			this.m_tbxLeadInArcLength.Size = new System.Drawing.Size(63, 22);
 			this.m_tbxLeadInArcLength.TabIndex = 2;
-			this.m_tbxLeadInArcLength.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxLeadInArcLength_KeyDown);
-			this.m_tbxLeadInArcLength.Leave += new System.EventHandler(this.m_tbxLeadInArcLength_Leave);
+			this.m_tbxLeadInArcLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadIn_DebouncedValueChanged);
 			// 
 			// m_LeadInLegnthUnit
 			// 
@@ -146,12 +157,15 @@
 			// 
 			// m_tbxLeadOutArcLength
 			// 
+			this.m_tbxLeadOutArcLength.DecimalPlaces = 3;
+			this.m_tbxLeadOutArcLength.Increment = 0.5m;
+			this.m_tbxLeadOutArcLength.Minimum = 0;
+			this.m_tbxLeadOutArcLength.Maximum = 99999;
 			this.m_tbxLeadOutArcLength.Location = new System.Drawing.Point(100, 225);
 			this.m_tbxLeadOutArcLength.Name = "m_tbxLeadOutArcLength";
 			this.m_tbxLeadOutArcLength.Size = new System.Drawing.Size(63, 22);
 			this.m_tbxLeadOutArcLength.TabIndex = 11;
-			this.m_tbxLeadOutArcLength.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxLeadOutArcLength_KeyDown);
-			this.m_tbxLeadOutArcLength.Leave += new System.EventHandler(this.m_tbxLeadOutArcLength_Leave);
+			this.m_tbxLeadOutArcLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadOut_DebouncedValueChanged);
 			// 
 			// m_LeadOutLegnthUnit
 			// 
@@ -164,12 +178,14 @@
 			// 
 			// m_tbxLeadOutAngle
 			// 
+			this.m_tbxLeadOutAngle.DecimalPlaces = 3;
+			this.m_tbxLeadOutAngle.Minimum = 0;
+			this.m_tbxLeadOutAngle.Maximum = 180;
 			this.m_tbxLeadOutAngle.Location = new System.Drawing.Point(100, 265);
 			this.m_tbxLeadOutAngle.Name = "m_tbxLeadOutAngle";
 			this.m_tbxLeadOutAngle.Size = new System.Drawing.Size(63, 22);
 			this.m_tbxLeadOutAngle.TabIndex = 12;
-			this.m_tbxLeadOutAngle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxLeadOutAngle_KeyDown);
-			this.m_tbxLeadOutAngle.Leave += new System.EventHandler(this.m_tbxLeadOutAngle_Leave);
+			this.m_tbxLeadOutAngle.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadOut_DebouncedValueChanged);
 			// 
 			// m_lblLeadOutAngle
 			// 
@@ -201,12 +217,15 @@
 			// 
 			// m_tbxLeadInStraightLength
 			// 
+			this.m_tbxLeadInStraightLength.DecimalPlaces = 3;
+			this.m_tbxLeadInStraightLength.Increment = 0.5m;
+			this.m_tbxLeadInStraightLength.Minimum = 0;
+			this.m_tbxLeadInStraightLength.Maximum = 99999;
 			this.m_tbxLeadInStraightLength.Location = new System.Drawing.Point(100, 40);
 			this.m_tbxLeadInStraightLength.Name = "m_tbxLeadInStraightLength";
 			this.m_tbxLeadInStraightLength.Size = new System.Drawing.Size(63, 22);
 			this.m_tbxLeadInStraightLength.TabIndex = 17;
-			this.m_tbxLeadInStraightLength.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxLeadInStraightLength_KeyDown);
-			this.m_tbxLeadInStraightLength.Leave += new System.EventHandler(this.m_tbxLeadInStraightLength_Leave);
+			this.m_tbxLeadInStraightLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadIn_DebouncedValueChanged);
 			// 
 			// label2
 			// 
@@ -238,12 +257,15 @@
 			// 
 			// m_tbxLeadOutStraightLength
 			// 
+			this.m_tbxLeadOutStraightLength.DecimalPlaces = 3;
+			this.m_tbxLeadOutStraightLength.Increment = 0.5m;
+			this.m_tbxLeadOutStraightLength.Minimum = 0;
+			this.m_tbxLeadOutStraightLength.Maximum = 99999;
 			this.m_tbxLeadOutStraightLength.Location = new System.Drawing.Point(100, 190);
 			this.m_tbxLeadOutStraightLength.Name = "m_tbxLeadOutStraightLength";
 			this.m_tbxLeadOutStraightLength.Size = new System.Drawing.Size(63, 22);
 			this.m_tbxLeadOutStraightLength.TabIndex = 21;
-			this.m_tbxLeadOutStraightLength.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxLeadOutStraightLength_KeyDown);
-			this.m_tbxLeadOutStraightLength.Leave += new System.EventHandler(this.m_tbxLeadOutStraightLength_Leave);
+			this.m_tbxLeadOutStraightLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxLeadOut_DebouncedValueChanged);
 			// 
 			// label5
 			// 
@@ -288,6 +310,12 @@
 			this.ShowIcon = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "引線";
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInAngle)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInArcLength)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutArcLength)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutAngle)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadInStraightLength)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxLeadOutStraightLength)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -295,8 +323,8 @@
 
 		#endregion
 		private System.Windows.Forms.Label m_lblLeadInAngle;
-		private System.Windows.Forms.TextBox m_tbxLeadInAngle;
-		private System.Windows.Forms.TextBox m_tbxLeadInArcLength;
+		private MyCAM.Editor.DebouncedNumericUpDown m_tbxLeadInAngle;
+		private MyCAM.Editor.DebouncedNumericUpDown m_tbxLeadInArcLength;
 		private System.Windows.Forms.Label m_LeadInLegnthUnit;
 		private System.Windows.Forms.Label m_LeadInAngleUnit;
 		private System.Windows.Forms.Button m_btnOK;
@@ -304,17 +332,17 @@
 		private System.Windows.Forms.CheckBox m_chkFlip;
 		private System.Windows.Forms.Label m_lblLeadOutLength;
 		private System.Windows.Forms.Label m_LeadOutAngleUnit;
-		private System.Windows.Forms.TextBox m_tbxLeadOutArcLength;
+		private MyCAM.Editor.DebouncedNumericUpDown m_tbxLeadOutArcLength;
 		private System.Windows.Forms.Label m_LeadOutLegnthUnit;
-		private System.Windows.Forms.TextBox m_tbxLeadOutAngle;
+		private MyCAM.Editor.DebouncedNumericUpDown m_tbxLeadOutAngle;
 		private System.Windows.Forms.Label m_lblLeadOutAngle;
 		private System.Windows.Forms.Label m_lblLeadIn;
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TextBox m_tbxLeadInStraightLength;
+		private MyCAM.Editor.DebouncedNumericUpDown m_tbxLeadInStraightLength;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.TextBox m_tbxLeadOutStraightLength;
+		private MyCAM.Editor.DebouncedNumericUpDown m_tbxLeadOutStraightLength;
 		private System.Windows.Forms.Label label5;
 	}
 }

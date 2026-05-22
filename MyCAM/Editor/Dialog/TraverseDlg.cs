@@ -62,120 +62,28 @@ namespace MyCAM.Editor
 			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );
 		}
 
-		void m_NumericUpDownCutDownDistance_Click( object sender, EventArgs e )
+		void m_NumericUpDownCutDownDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			SetCutDownDistance();
+			m_CutDownDistance = (double)m_NumericUpDownCutDownDistance.Value;
+			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );
 		}
 
-		void m_NumericUpDownCutDownDistance_KeyDown( object sender, KeyEventArgs e )
+		void m_NumericUpDownFollowSafeDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			if( e.KeyCode != Keys.Enter ) {
-				return;
-			}
-			SetCutDownDistance();
+			m_FollowSafeDistance = (double)m_NumericUpDownFollowSafeDistance.Value;
+			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );
 		}
 
-		void m_NumericUpDownCutDownDistance_Leave( object sender, EventArgs e )
+		void m_NumericUpDownLiftUpDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			SetCutDownDistance();
+			m_LifUpDistance = (double)m_NumericUpDownLiftUpDistance.Value;
+			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );
 		}
 
-		void SetCutDownDistance()
+		void m_NumericUpDownFrogLeapDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
-			if( double.TryParse( m_NumericUpDownCutDownDistance.Text, out double cutDownDistance ) && cutDownDistance >= 0 && cutDownDistance < double.MaxValue ) {
-				m_CutDownDistance = cutDownDistance;
-				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );
-			}
-			else {
-				m_NumericUpDownCutDownDistance.Text = m_CutDownDistance.ToString();
-			}
-		}
-
-		void m_NumericUpDownFollowSafeDistance_Click( object sender, EventArgs e )
-		{
-			SetFollowSafeDistance();
-		}
-
-		void m_NumericUpDownFollowSafeDistance_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode != Keys.Enter ) {
-				return;
-			}
-			SetFollowSafeDistance();
-		}
-
-		void m_NumericUpDownFollowSafeDistance_Leave( object sender, EventArgs e )
-		{
-			SetFollowSafeDistance();
-		}
-
-		void SetFollowSafeDistance()
-		{
-			if( double.TryParse( m_NumericUpDownFollowSafeDistance.Text, out double followSafeDistance ) && followSafeDistance >= 0 && followSafeDistance < double.MaxValue ) {
-				m_FollowSafeDistance = followSafeDistance;
-				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );
-			}
-			else {
-				m_NumericUpDownFollowSafeDistance.Text = m_FollowSafeDistance.ToString();
-			}
-		}
-
-		void m_NumericUpDownLiftUpDistance_Click( object sender, EventArgs e )
-		{
-			SetLiftUpDistance();
-		}
-
-		void m_NumericUpDownLiftUpDistance_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode != Keys.Enter ) {
-				return;
-			}
-			SetLiftUpDistance();
-		}
-
-		void m_NumericUpDownLiftUpDistance_Leave( object sender, EventArgs e )
-		{
-			SetLiftUpDistance();
-		}
-
-		void SetLiftUpDistance()
-		{
-			if( double.TryParse( m_NumericUpDownLiftUpDistance.Text, out double liftUpDistance ) && liftUpDistance >= 0 && liftUpDistance < double.MaxValue ) {
-				m_LifUpDistance = liftUpDistance;
-				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );
-			}
-			else {
-				m_NumericUpDownLiftUpDistance.Text = m_LifUpDistance.ToString();
-			}
-		}
-
-		void m_NumericUpDownFrogLeapDistance_Click( object sender, EventArgs e )
-		{
-			SetFrogLeapDistance();
-		}
-
-		void m_NumericUpDownFrogLeapDistance_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode != Keys.Enter ) {
-				return;
-			}
-			SetFrogLeapDistance();
-		}
-
-		void m_NumericUpDownFrogLeapDistance_Leave( object sender, EventArgs e )
-		{
-			SetFrogLeapDistance();
-		}
-
-		void SetFrogLeapDistance()
-		{
-			if( double.TryParse( m_NumericUpDownFrogLeapDistance.Text, out double frogLeapDistance ) && frogLeapDistance >= 0 && frogLeapDistance < double.MaxValue ) {
-				m_FrogLeapDistance = frogLeapDistance;
-				RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );
-			}
-			else {
-				m_NumericUpDownFrogLeapDistance.Text = m_FrogLeapDistance.ToString();
-			}
+			m_FrogLeapDistance = (double)m_NumericUpDownFrogLeapDistance.Value;
+			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );
 		}
 
 		void m_chkSafePlane_CheckedChanged( object sender, EventArgs e )
@@ -186,25 +94,7 @@ namespace MyCAM.Editor
 			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );
 		}
 
-		void m_NumericUpDownSafePlaneDistance_Click( object sender, EventArgs e )
-		{
-			SetNumericUpDownSafePlaneDistance();
-		}
-
-		void m_NumericUpDownSafePlaneDistance_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode != Keys.Enter ) {
-				return;
-			}
-			SetNumericUpDownSafePlaneDistance();
-		}
-
-		void m_NumericUpDownSafePlaneDistance_Leave( object sender, EventArgs e )
-		{
-			SetNumericUpDownSafePlaneDistance();
-		}
-
-		void SetNumericUpDownSafePlaneDistance()
+		void m_NumericUpDownSafePlaneDistance_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			m_SafePlaneDistance = (double)m_NumericUpDownSafePlaneDistance.Value;
 			RaisePreview( new TraverseData( m_LifUpDistance, m_CutDownDistance, m_FollowSafeDistance, m_FrogLeapDistance, m_IsSafePlaneChecked, m_SafePlaneDistance ) );

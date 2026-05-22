@@ -57,10 +57,10 @@ namespace MyCAM.Editor
 
 			// update index edit UI
 			m_gbxIndexParam.Enabled = true;
-			m_tbxAngleA.Text = m_IsPathRevese ? ( -m_ToolVecParam.AngleA_deg ).ToString( "F3" ) : m_ToolVecParam.AngleA_deg.ToString( "F3" );
-			m_tbxAngleB.Text = m_IsPathRevese ? ( -m_ToolVecParam.AngleB_deg ).ToString( "F3" ) : m_ToolVecParam.AngleB_deg.ToString( "F3" );
-			m_tbxMaster.Text = m_ToolVecParam.Master_deg.ToString( "F3" );
-			m_tbxSlave.Text = m_ToolVecParam.Slave_deg.ToString( "F3" );
+			m_tbxAngleA.Value = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleA_deg : m_ToolVecParam.AngleA_deg );
+			m_tbxAngleB.Value = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleB_deg : m_ToolVecParam.AngleB_deg );
+			m_tbxMaster.Value = (decimal)m_ToolVecParam.Master_deg;
+			m_tbxSlave.Value = (decimal)m_ToolVecParam.Slave_deg;
 			bSuppressValueChangedEvent = false;
 		}
 
@@ -106,51 +106,23 @@ namespace MyCAM.Editor
 		}
 
 
-		// UI event - Index param value changed
-		void m_tbxAngleA_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				HandleABAngleChanged();
-			}
-		}
-
-		void m_tbxAngleB_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				HandleABAngleChanged();
-			}
-		}
-
-		void m_tbxAngleA_Leave( object sender, EventArgs e )
+		// UI event - Index param value changed (debounced)
+		void m_tbxAngleA_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleABAngleChanged();
 		}
 
-		void m_tbxAngleB_Leave( object sender, EventArgs e )
+		void m_tbxAngleB_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleABAngleChanged();
 		}
 
-		void m_tbxMaster_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				HandleMSAngleChanged();
-			}
-		}
-
-		void m_tbxSlave_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				HandleMSAngleChanged();
-			}
-		}
-
-		void m_tbxMaster_Leave( object sender, EventArgs e )
+		void m_tbxMaster_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleMSAngleChanged();
 		}
 
-		void m_tbxSlave_Leave( object sender, EventArgs e )
+		void m_tbxSlave_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleMSAngleChanged();
 		}
@@ -191,14 +163,8 @@ namespace MyCAM.Editor
 
 		bool GetABAngleFromDialog( out double angleA_deg, out double angleB_deg )
 		{
-			// Parse AB angles from textboxes
-			angleA_deg = 0;
-			angleB_deg = 0;
-			if( !double.TryParse( m_tbxAngleA.Text, out angleA_deg ) ||
-				!double.TryParse( m_tbxAngleB.Text, out angleB_deg ) ) {
-				MyApp.Logger.ShowOnLogPanel( "無效字串", MyApp.NoticeType.Warning );
-				return false;
-			}
+			angleA_deg = (double)m_tbxAngleA.Value;
+			angleB_deg = (double)m_tbxAngleB.Value;
 
 			// Convert to actual angles (considering path reverse)
 			angleA_deg = m_IsPathRevese ? -angleA_deg : angleA_deg;
@@ -208,14 +174,8 @@ namespace MyCAM.Editor
 
 		bool GetMSAngleFromDialog( out double master_deg, out double slave_deg )
 		{
-			// Parse MS angles from textboxes
-			master_deg = 0;
-			slave_deg = 0;
-			if( !double.TryParse( m_tbxMaster.Text, out master_deg ) ||
-				!double.TryParse( m_tbxSlave.Text, out slave_deg ) ) {
-				MyApp.Logger.ShowOnLogPanel( "無效字串", MyApp.NoticeType.Warning );
-				return false;
-			}
+			master_deg = (double)m_tbxMaster.Value;
+			slave_deg = (double)m_tbxSlave.Value;
 			return true;
 		}
 

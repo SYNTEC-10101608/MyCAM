@@ -29,9 +29,10 @@
 		{
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.m_lblSewTol = new System.Windows.Forms.Label();
-			this.m_txbSewTol = new System.Windows.Forms.TextBox();
+			this.m_txbSewTol = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_btnOK = new System.Windows.Forms.Button();
 			this.tableLayoutPanel1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_txbSewTol)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -64,11 +65,14 @@
 			// m_txbSewTol
 			// 
 			this.m_txbSewTol.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+			this.m_txbSewTol.DecimalPlaces = 3;
+			this.m_txbSewTol.Minimum = 0.001m;
+			this.m_txbSewTol.Maximum = 99999;
+			this.m_txbSewTol.Increment = 0.01m;
 			this.m_txbSewTol.Location = new System.Drawing.Point(91, 9);
 			this.m_txbSewTol.Name = "m_txbSewTol";
 			this.m_txbSewTol.Size = new System.Drawing.Size(82, 22);
 			this.m_txbSewTol.TabIndex = 1;
-			this.m_txbSewTol.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbSewTol_KeyDown);
 			// 
 			// m_btnOK
 			// 
@@ -92,6 +96,7 @@
 			this.ShowIcon = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "縫補設置";
+			((System.ComponentModel.ISupportInitialize)(this.m_txbSewTol)).EndInit();
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
 			this.ResumeLayout(false);
@@ -102,7 +107,7 @@
 
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.Label m_lblSewTol;
-		private System.Windows.Forms.TextBox m_txbSewTol;
+		private MyCAM.Editor.DebouncedNumericUpDown m_txbSewTol;
 		private System.Windows.Forms.Button m_btnOK;
 	}
 }

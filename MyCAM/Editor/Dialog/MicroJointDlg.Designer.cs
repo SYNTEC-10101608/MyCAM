@@ -18,9 +18,10 @@
         {
 			this.m_btnCancel = new System.Windows.Forms.Button();
 			this.m_lblLength = new System.Windows.Forms.Label();
-			this.m_tbxMicroJointLength = new System.Windows.Forms.TextBox();
+			this.m_tbxMicroJointLength = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_btnClearAll = new System.Windows.Forms.Button();
 			this.m_btnDelete = new System.Windows.Forms.Button();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxMicroJointLength)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// m_btnCancel
@@ -45,12 +46,15 @@
 			// 
 			// m_tbxMicroJointLength
 			// 
+			this.m_tbxMicroJointLength.DecimalPlaces = 3;
+			this.m_tbxMicroJointLength.Minimum = 0.001m;
+			this.m_tbxMicroJointLength.Maximum = 99999;
+			this.m_tbxMicroJointLength.Increment = 0.1m;
 			this.m_tbxMicroJointLength.Location = new System.Drawing.Point(90, 29);
 			this.m_tbxMicroJointLength.Name = "m_tbxMicroJointLength";
 			this.m_tbxMicroJointLength.Size = new System.Drawing.Size(100, 25);
 			this.m_tbxMicroJointLength.TabIndex = 4;
-			this.m_tbxMicroJointLength.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTextBoxKeyDown);
-			this.m_tbxMicroJointLength.Leave += new System.EventHandler(this.OnTextBoxLeave);
+			this.m_tbxMicroJointLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxMicroJointLength_DebouncedValueChanged);
 			// 
 			// m_btnClearAll
 			// 
@@ -91,6 +95,7 @@
 			this.Padding = new System.Windows.Forms.Padding(9);
 			this.Text = "編輯微連";
 			this.TopMost = true;
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxMicroJointLength)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -99,7 +104,7 @@
         #endregion
         System.Windows.Forms.Button m_btnCancel;
 		private System.Windows.Forms.Label m_lblLength;
-		private System.Windows.Forms.TextBox m_tbxMicroJointLength;
+		private MyCAM.Editor.DebouncedNumericUpDown m_tbxMicroJointLength;
 		private System.Windows.Forms.Button m_btnClearAll;
 		private System.Windows.Forms.Button m_btnDelete;
 	}

@@ -19,21 +19,10 @@ namespace MyCAM.Editor.Dialog
 			m_NumUpDownCompensate.Maximum = decimal.MaxValue;
 			m_NumUpDownCompensate.Minimum = decimal.MinValue;
 			m_NumUpDownCompensate.DecimalPlaces = 3;
+			m_NumUpDownCompensate.Increment = 0.25m;
 		}
 
-		void m_NumUpDownCompensate_Click( object sender, System.EventArgs e )
-		{
-			SetCompensateValue();
-		}
-
-		void m_NumUpDownCompensate_KeyDown( object sender, System.Windows.Forms.KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				SetCompensateValue();
-			}
-		}
-
-		void m_NumUpDownCompensate_Leave( object sender, System.EventArgs e )
+		void m_NumUpDownCompensate_DebouncedValueChanged( object sender, System.EventArgs e )
 		{
 			SetCompensateValue();
 		}

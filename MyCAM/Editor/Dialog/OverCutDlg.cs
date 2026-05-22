@@ -10,21 +10,14 @@ namespace MyCAM.Editor.Dialog
 		{
 			InitializeComponent();
 			m_OverCutLength = overCutLength;
-			m_tbxOverCutLength.Text = m_OverCutLength.ToString();
+			m_tbxOverCutLength.Value = (decimal)m_OverCutLength;
 		}
 
 		public Func<double, bool> CheckValueGeomRestriction;
 
-		void m_tbxOverCutLength_Leave( object sender, EventArgs e )
+		void m_tbxOverCutLength_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			PreviewOverCutResult();
-		}
-
-		void m_tbxOverCutLength_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				PreviewOverCutResult();
-			}
 		}
 
 		void m_btnSure_Click( object sender, EventArgs e )
@@ -43,10 +36,7 @@ namespace MyCAM.Editor.Dialog
 
 		bool IsValidParam()
 		{
-			if( !double.TryParse( m_tbxOverCutLength.Text, out double dOverCutLength ) ) {
-				MyApp.Logger.ShowOnLogPanel( "無效字串", MyApp.NoticeType.Warning );
-				return false;
-			}
+			double dOverCutLength = (double)m_tbxOverCutLength.Value;
 			if( dOverCutLength < 0 ) {
 				MyApp.Logger.ShowOnLogPanel( "長度需要大於0", MyApp.NoticeType.Warning );
 				return false;

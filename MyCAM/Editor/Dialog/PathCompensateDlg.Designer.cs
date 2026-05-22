@@ -28,7 +28,7 @@
 		private void InitializeComponent()
 		{
 			this.m_lblCompensate = new System.Windows.Forms.Label();
-			this.m_NumUpDownCompensate = new System.Windows.Forms.NumericUpDown();
+			this.m_NumUpDownCompensate = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_btnConfirm = new System.Windows.Forms.Button();
 			this.m_btnClear = new System.Windows.Forms.Button();
 			this.m_btnReset = new System.Windows.Forms.Button();
@@ -53,9 +53,7 @@
 			this.m_NumUpDownCompensate.Size = new System.Drawing.Size(146, 21);
 			this.m_NumUpDownCompensate.TabIndex = 1;
 			this.m_NumUpDownCompensate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			this.m_NumUpDownCompensate.Click += new System.EventHandler(this.m_NumUpDownCompensate_Click);
-			this.m_NumUpDownCompensate.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_NumUpDownCompensate_KeyDown);
-			this.m_NumUpDownCompensate.Leave += new System.EventHandler(this.m_NumUpDownCompensate_Leave);
+			this.m_NumUpDownCompensate.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownCompensate_DebouncedValueChanged);
 			// 
 			// m_btnConfirm
 			// 
@@ -108,7 +106,7 @@
 		#endregion
 
 		private System.Windows.Forms.Label m_lblCompensate;
-		private System.Windows.Forms.NumericUpDown m_NumUpDownCompensate;
+		private MyCAM.Editor.DebouncedNumericUpDown m_NumUpDownCompensate;
 		private System.Windows.Forms.Button m_btnConfirm;
 		private System.Windows.Forms.Button m_btnClear;
 		private System.Windows.Forms.Button m_btnReset;
