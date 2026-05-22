@@ -28,9 +28,10 @@
 		private void InitializeComponent()
 		{
 			this.m_lblOverCutLength = new System.Windows.Forms.Label();
-			this.m_tbxOverCutLength = new System.Windows.Forms.TextBox();
+			this.m_tbxOverCutLength = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_OverCutUnit = new System.Windows.Forms.Label();
 			this.m_btnSure = new System.Windows.Forms.Button();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxOverCutLength)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// m_lblOverCutLength
@@ -44,12 +45,15 @@
 			// 
 			// m_tbxOverCutLength
 			// 
+			this.m_tbxOverCutLength.DecimalPlaces = 3;
+			this.m_tbxOverCutLength.Increment = 0.5m;
+			this.m_tbxOverCutLength.Minimum = 0;
+			this.m_tbxOverCutLength.Maximum = 99999;
 			this.m_tbxOverCutLength.Location = new System.Drawing.Point(88, 18);
 			this.m_tbxOverCutLength.Name = "m_tbxOverCutLength";
 			this.m_tbxOverCutLength.Size = new System.Drawing.Size(92, 22);
 			this.m_tbxOverCutLength.TabIndex = 1;
-			this.m_tbxOverCutLength.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxOverCutLength_KeyDown);
-			this.m_tbxOverCutLength.Leave += new System.EventHandler(this.m_tbxOverCutLength_Leave);
+			this.m_tbxOverCutLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxOverCutLength_DebouncedValueChanged);
 			// 
 			// m_OverCutUnit
 			// 
@@ -83,6 +87,7 @@
 			this.Name = "OverCutForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "過切";
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxOverCutLength)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -91,7 +96,7 @@
 		#endregion
 
 		private System.Windows.Forms.Label m_lblOverCutLength;
-		private System.Windows.Forms.TextBox m_tbxOverCutLength;
+		private MyCAM.Editor.DebouncedNumericUpDown m_tbxOverCutLength;
 		private System.Windows.Forms.Label m_OverCutUnit;
 		private System.Windows.Forms.Button m_btnSure;
 	}

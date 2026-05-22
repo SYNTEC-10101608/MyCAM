@@ -19,12 +19,15 @@ namespace MyCAM.Editor.Dialog
 			m_NumUpDownX.Maximum = decimal.MaxValue;
 			m_NumUpDownX.Minimum = decimal.MinValue;
 			m_NumUpDownX.DecimalPlaces = 3;
+			m_NumUpDownX.Increment = 0.25m;
 			m_NumUpDownY.Maximum = decimal.MaxValue;
 			m_NumUpDownY.Minimum = decimal.MinValue;
 			m_NumUpDownY.DecimalPlaces = 3;
+			m_NumUpDownY.Increment = 0.25m;
 			m_NumUpDownZ.Maximum = decimal.MaxValue;
 			m_NumUpDownZ.Minimum = decimal.MinValue;
 			m_NumUpDownZ.DecimalPlaces = 3;
+			m_NumUpDownZ.Increment = 0.25m;
 		}
 
 		void PathEditDlg_Shown( object sender, EventArgs e )
@@ -47,24 +50,7 @@ namespace MyCAM.Editor.Dialog
 			RaisePreview( m_PathEditData );
 		}
 
-		void m_NumUpDownX_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				SetXOffsetValue();
-			}
-		}
-
-		void m_NumUpDownX_Leave( object sender, EventArgs e )
-		{
-			SetXOffsetValue();
-		}
-
-		void m_NumUpDownX_Click( object sender, EventArgs e )
-		{
-			SetXOffsetValue();
-		}
-
-		void SetXOffsetValue()
+		void m_NumUpDownX_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			if( m_XOffset == (double)m_NumUpDownX.Value ) {
 				return;
@@ -74,24 +60,7 @@ namespace MyCAM.Editor.Dialog
 			RaisePreview( m_PathEditData );
 		}
 
-		void m_NumUpDownY_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				SetYOffsetValue();
-			}
-		}
-
-		void m_NumUpDownY_Leave( object sender, EventArgs e )
-		{
-			SetYOffsetValue();
-		}
-
-		void m_NumUpDownY_Click( object sender, EventArgs e )
-		{
-			SetYOffsetValue();
-		}
-
-		void SetYOffsetValue()
+		void m_NumUpDownY_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			if( m_YOffset == (double)m_NumUpDownY.Value ) {
 				return;
@@ -101,24 +70,7 @@ namespace MyCAM.Editor.Dialog
 			RaisePreview( m_PathEditData );
 		}
 
-		void m_NumUpDownZ_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				SetZOffsetValue();
-			}
-		}
-
-		void m_NumUpDownZ_Leave( object sender, EventArgs e )
-		{
-			SetZOffsetValue();
-		}
-
-		void m_NumUpDownZ_Click( object sender, EventArgs e )
-		{
-			SetZOffsetValue();
-		}
-
-		void SetZOffsetValue()
+		void m_NumUpDownZ_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			if( m_ZOffset == (double)m_NumUpDownZ.Value ) {
 				return;

@@ -19,14 +19,17 @@ namespace MyCAM.Editor
 			this.m_gbxIndexParam = new System.Windows.Forms.GroupBox();
 			this.m_tableParams = new System.Windows.Forms.TableLayoutPanel();
 			this.m_lblDX = new System.Windows.Forms.Label();
-			this.m_tbxDX = new System.Windows.Forms.TextBox();
+			this.m_tbxDX = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_lblDY = new System.Windows.Forms.Label();
-			this.m_tbxDY = new System.Windows.Forms.TextBox();
+			this.m_tbxDY = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_lblDZ = new System.Windows.Forms.Label();
-			this.m_tbxDZ = new System.Windows.Forms.TextBox();
+			this.m_tbxDZ = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_lblUnit = new System.Windows.Forms.Label();
 			this.m_btnRemove = new System.Windows.Forms.Button();
 			this.m_btnAdd = new System.Windows.Forms.Button();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxDX)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxDY)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxDZ)).BeginInit();
 			this.m_gbxIndexParam.SuspendLayout();
 			this.m_tableParams.SuspendLayout();
 			this.SuspendLayout();
@@ -83,13 +86,16 @@ namespace MyCAM.Editor
 			// m_tbxDX
 			// 
 			this.m_tbxDX.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+			this.m_tbxDX.DecimalPlaces = 3;
+			this.m_tbxDX.Increment = 0.25m;
+			this.m_tbxDX.Minimum = -99999;
+			this.m_tbxDX.Maximum = 99999;
 			this.m_tbxDX.Location = new System.Drawing.Point(49, 4);
 			this.m_tbxDX.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
 			this.m_tbxDX.Name = "m_tbxDX";
 			this.m_tbxDX.Size = new System.Drawing.Size(175, 25);
 			this.m_tbxDX.TabIndex = 1;
-			this.m_tbxDX.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxDX_KeyDown);
-			this.m_tbxDX.Leave += new System.EventHandler(this.m_tbxDX_Leave);
+			this.m_tbxDX.DebouncedValueChanged += new System.EventHandler(this.m_tbxDX_DebouncedValueChanged);
 			// 
 			// m_lblDY
 			// 
@@ -105,13 +111,16 @@ namespace MyCAM.Editor
 			// m_tbxDY
 			// 
 			this.m_tbxDY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+			this.m_tbxDY.DecimalPlaces = 3;
+			this.m_tbxDY.Increment = 0.25m;
+			this.m_tbxDY.Minimum = -99999;
+			this.m_tbxDY.Maximum = 99999;
 			this.m_tbxDY.Location = new System.Drawing.Point(49, 36);
 			this.m_tbxDY.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
 			this.m_tbxDY.Name = "m_tbxDY";
 			this.m_tbxDY.Size = new System.Drawing.Size(175, 25);
 			this.m_tbxDY.TabIndex = 3;
-			this.m_tbxDY.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxDY_KeyDown);
-			this.m_tbxDY.Leave += new System.EventHandler(this.m_tbxDY_Leave);
+			this.m_tbxDY.DebouncedValueChanged += new System.EventHandler(this.m_tbxDY_DebouncedValueChanged);
 			// 
 			// m_lblDZ
 			// 
@@ -127,13 +136,16 @@ namespace MyCAM.Editor
 			// m_tbxDZ
 			// 
 			this.m_tbxDZ.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+			this.m_tbxDZ.DecimalPlaces = 3;
+			this.m_tbxDZ.Increment = 0.25m;
+			this.m_tbxDZ.Minimum = -99999;
+			this.m_tbxDZ.Maximum = 99999;
 			this.m_tbxDZ.Location = new System.Drawing.Point(49, 68);
 			this.m_tbxDZ.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
 			this.m_tbxDZ.Name = "m_tbxDZ";
 			this.m_tbxDZ.Size = new System.Drawing.Size(175, 25);
 			this.m_tbxDZ.TabIndex = 5;
-			this.m_tbxDZ.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_tbxDZ_KeyDown);
-			this.m_tbxDZ.Leave += new System.EventHandler(this.m_tbxDZ_Leave);
+			this.m_tbxDZ.DebouncedValueChanged += new System.EventHandler(this.m_tbxDZ_DebouncedValueChanged);
 			// 
 			// m_lblUnit
 			// 
@@ -185,6 +197,9 @@ namespace MyCAM.Editor
 			this.m_gbxIndexParam.ResumeLayout(false);
 			this.m_tableParams.ResumeLayout(false);
 			this.m_tableParams.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxDX)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxDY)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_tbxDZ)).EndInit();
 			this.ResumeLayout(false);
 
         }
@@ -195,12 +210,12 @@ namespace MyCAM.Editor
         System.Windows.Forms.Button m_btnAdd;
         System.Windows.Forms.Button m_btnRemove;
         System.Windows.Forms.TableLayoutPanel m_tableParams;
-        System.Windows.Forms.Label m_lblDX;
-        System.Windows.Forms.TextBox m_tbxDX;
-        System.Windows.Forms.Label m_lblDY;
-        System.Windows.Forms.TextBox m_tbxDY;
-        System.Windows.Forms.Label m_lblDZ;
-        System.Windows.Forms.TextBox m_tbxDZ;
+		System.Windows.Forms.Label m_lblDX;
+		MyCAM.Editor.DebouncedNumericUpDown m_tbxDX;
+		System.Windows.Forms.Label m_lblDY;
+		MyCAM.Editor.DebouncedNumericUpDown m_tbxDY;
+		System.Windows.Forms.Label m_lblDZ;
+		MyCAM.Editor.DebouncedNumericUpDown m_tbxDZ;
         System.Windows.Forms.Label m_lblUnit;
     }
 }

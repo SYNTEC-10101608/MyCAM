@@ -39,11 +39,11 @@
 			this.m_lblSafePlaneDistance = new System.Windows.Forms.Label();
 			this.m_lblSafePlaneDistanceUnit = new System.Windows.Forms.Label();
 			this.m_btnConfirm = new System.Windows.Forms.Button();
-			this.m_NumericUpDownSafePlaneDistance = new System.Windows.Forms.NumericUpDown();
-			this.m_NumericUpDownLiftUpDistance = new System.Windows.Forms.NumericUpDown();
-			this.m_NumericUpDownCutDownDistance = new System.Windows.Forms.NumericUpDown();
-			this.m_NumericUpDownFollowSafeDistance = new System.Windows.Forms.NumericUpDown();
-			this.m_NumericUpDownFrogLeapDistance = new System.Windows.Forms.NumericUpDown();
+			this.m_NumericUpDownSafePlaneDistance = new MyCAM.Editor.DebouncedNumericUpDown();
+			this.m_NumericUpDownLiftUpDistance = new MyCAM.Editor.DebouncedNumericUpDown();
+			this.m_NumericUpDownCutDownDistance = new MyCAM.Editor.DebouncedNumericUpDown();
+			this.m_NumericUpDownFollowSafeDistance = new MyCAM.Editor.DebouncedNumericUpDown();
+			this.m_NumericUpDownFrogLeapDistance = new MyCAM.Editor.DebouncedNumericUpDown();
 			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownSafePlaneDistance)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownLiftUpDistance)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_NumericUpDownCutDownDistance)).BeginInit();
@@ -198,9 +198,7 @@
 			this.m_NumericUpDownSafePlaneDistance.Name = "m_NumericUpDownSafePlaneDistance";
 			this.m_NumericUpDownSafePlaneDistance.Size = new System.Drawing.Size(92, 21);
 			this.m_NumericUpDownSafePlaneDistance.TabIndex = 34;
-			this.m_NumericUpDownSafePlaneDistance.Click += new System.EventHandler(this.m_NumericUpDownSafePlaneDistance_Click);
-			this.m_NumericUpDownSafePlaneDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_NumericUpDownSafePlaneDistance_KeyDown);
-			this.m_NumericUpDownSafePlaneDistance.Leave += new System.EventHandler(this.m_NumericUpDownSafePlaneDistance_Leave);
+			this.m_NumericUpDownSafePlaneDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownSafePlaneDistance_DebouncedValueChanged);
 			// 
 			// m_NumericUpDownLiftUpDistance
 			// 
@@ -210,9 +208,7 @@
 			this.m_NumericUpDownLiftUpDistance.Name = "m_NumericUpDownLiftUpDistance";
 			this.m_NumericUpDownLiftUpDistance.Size = new System.Drawing.Size(92, 21);
 			this.m_NumericUpDownLiftUpDistance.TabIndex = 35;
-			this.m_NumericUpDownLiftUpDistance.Click += new System.EventHandler(this.m_NumericUpDownLiftUpDistance_Click);
-			this.m_NumericUpDownLiftUpDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_NumericUpDownLiftUpDistance_KeyDown);
-			this.m_NumericUpDownLiftUpDistance.Leave += new System.EventHandler(this.m_NumericUpDownLiftUpDistance_Leave);
+			this.m_NumericUpDownLiftUpDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownLiftUpDistance_DebouncedValueChanged);
 			// 
 			// m_NumericUpDownCutDownDistance
 			// 
@@ -222,9 +218,7 @@
 			this.m_NumericUpDownCutDownDistance.Name = "m_NumericUpDownCutDownDistance";
 			this.m_NumericUpDownCutDownDistance.Size = new System.Drawing.Size(92, 21);
 			this.m_NumericUpDownCutDownDistance.TabIndex = 36;
-			this.m_NumericUpDownCutDownDistance.Click += new System.EventHandler(this.m_NumericUpDownCutDownDistance_Click);
-			this.m_NumericUpDownCutDownDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_NumericUpDownCutDownDistance_KeyDown);
-			this.m_NumericUpDownCutDownDistance.Leave += new System.EventHandler(this.m_NumericUpDownCutDownDistance_Leave);
+			this.m_NumericUpDownCutDownDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownCutDownDistance_DebouncedValueChanged);
 			// 
 			// m_NumericUpDownFollowSafeDistance
 			// 
@@ -234,9 +228,7 @@
 			this.m_NumericUpDownFollowSafeDistance.Name = "m_NumericUpDownFollowSafeDistance";
 			this.m_NumericUpDownFollowSafeDistance.Size = new System.Drawing.Size(92, 21);
 			this.m_NumericUpDownFollowSafeDistance.TabIndex = 37;
-			this.m_NumericUpDownFollowSafeDistance.Click += new System.EventHandler(this.m_NumericUpDownFollowSafeDistance_Click);
-			this.m_NumericUpDownFollowSafeDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_NumericUpDownFollowSafeDistance_KeyDown);
-			this.m_NumericUpDownFollowSafeDistance.Leave += new System.EventHandler(this.m_NumericUpDownFollowSafeDistance_Leave);
+			this.m_NumericUpDownFollowSafeDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownFollowSafeDistance_DebouncedValueChanged);
 			// 
 			// m_NumericUpDownFrogLeapDistance
 			// 
@@ -246,9 +238,7 @@
 			this.m_NumericUpDownFrogLeapDistance.Name = "m_NumericUpDownFrogLeapDistance";
 			this.m_NumericUpDownFrogLeapDistance.Size = new System.Drawing.Size(92, 21);
 			this.m_NumericUpDownFrogLeapDistance.TabIndex = 38;
-			this.m_NumericUpDownFrogLeapDistance.Click += new System.EventHandler(this.m_NumericUpDownFrogLeapDistance_Click);
-			this.m_NumericUpDownFrogLeapDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_NumericUpDownFrogLeapDistance_KeyDown);
-			this.m_NumericUpDownFrogLeapDistance.Leave += new System.EventHandler(this.m_NumericUpDownFrogLeapDistance_Leave);
+			this.m_NumericUpDownFrogLeapDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownFrogLeapDistance_DebouncedValueChanged);
 			// 
 			// TraverseDlg
 			// 
@@ -300,10 +290,10 @@
 		private System.Windows.Forms.Label m_lblSafePlaneDistance;
 		private System.Windows.Forms.Label m_lblSafePlaneDistanceUnit;
 		private System.Windows.Forms.Button m_btnConfirm;
-		private System.Windows.Forms.NumericUpDown m_NumericUpDownSafePlaneDistance;
-		private System.Windows.Forms.NumericUpDown m_NumericUpDownLiftUpDistance;
-		private System.Windows.Forms.NumericUpDown m_NumericUpDownCutDownDistance;
-		private System.Windows.Forms.NumericUpDown m_NumericUpDownFollowSafeDistance;
-		private System.Windows.Forms.NumericUpDown m_NumericUpDownFrogLeapDistance;
+		private MyCAM.Editor.DebouncedNumericUpDown m_NumericUpDownSafePlaneDistance;
+		private MyCAM.Editor.DebouncedNumericUpDown m_NumericUpDownLiftUpDistance;
+		private MyCAM.Editor.DebouncedNumericUpDown m_NumericUpDownCutDownDistance;
+		private MyCAM.Editor.DebouncedNumericUpDown m_NumericUpDownFollowSafeDistance;
+		private MyCAM.Editor.DebouncedNumericUpDown m_NumericUpDownFrogLeapDistance;
 	}
 }

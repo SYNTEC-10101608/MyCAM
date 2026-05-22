@@ -28,11 +28,13 @@ namespace MyCAM.Editor.Dialog
         private void InitializeComponent()
         {
             this.m_lblRadius = new System.Windows.Forms.Label();
-            this.m_tbxRadius = new System.Windows.Forms.TextBox();
+            this.m_tbxRadius = new MyCAM.Editor.DebouncedNumericUpDown();
             this.m_lblHeight = new System.Windows.Forms.Label();
-            this.m_tbxHeight = new System.Windows.Forms.TextBox();
+            this.m_tbxHeight = new MyCAM.Editor.DebouncedNumericUpDown();
             this.m_btnOK = new System.Windows.Forms.Button();
             this.m_btnCancel = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.m_tbxRadius)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.m_tbxHeight)).BeginInit();
             this.SuspendLayout();
             // 
             // m_lblRadius
@@ -46,11 +48,14 @@ namespace MyCAM.Editor.Dialog
             // 
             // m_tbxRadius
             // 
+            this.m_tbxRadius.DecimalPlaces = 3;
+            this.m_tbxRadius.Minimum = 0;
+            this.m_tbxRadius.Maximum = 10000;
+            this.m_tbxRadius.Value = 300;
             this.m_tbxRadius.Location = new System.Drawing.Point( 160, 18 );
             this.m_tbxRadius.Name = "m_tbxRadius";
             this.m_tbxRadius.Size = new System.Drawing.Size( 100, 22 );
             this.m_tbxRadius.TabIndex = 1;
-            this.m_tbxRadius.Text = "300";
             // 
             // m_lblHeight
             // 
@@ -63,11 +68,14 @@ namespace MyCAM.Editor.Dialog
             // 
             // m_tbxHeight
             // 
+            this.m_tbxHeight.DecimalPlaces = 3;
+            this.m_tbxHeight.Minimum = 0.001m;
+            this.m_tbxHeight.Maximum = 99999;
+            this.m_tbxHeight.Value = 100;
             this.m_tbxHeight.Location = new System.Drawing.Point( 160, 58 );
             this.m_tbxHeight.Name = "m_tbxHeight";
             this.m_tbxHeight.Size = new System.Drawing.Size( 100, 22 );
             this.m_tbxHeight.TabIndex = 3;
-            this.m_tbxHeight.Text = "100";
             // 
             // m_btnOK
             // 
@@ -107,6 +115,8 @@ namespace MyCAM.Editor.Dialog
             this.Name = "GlassDXFImportDlg";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "¬Á¼þ¦±­±§ë¼v";
+            ((System.ComponentModel.ISupportInitialize)(this.m_tbxRadius)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.m_tbxHeight)).EndInit();
             this.ResumeLayout( false );
             this.PerformLayout();
         }
@@ -114,9 +124,9 @@ namespace MyCAM.Editor.Dialog
         #endregion
 
         private System.Windows.Forms.Label m_lblRadius;
-        private System.Windows.Forms.TextBox m_tbxRadius;
+        private MyCAM.Editor.DebouncedNumericUpDown m_tbxRadius;
         private System.Windows.Forms.Label m_lblHeight;
-        private System.Windows.Forms.TextBox m_tbxHeight;
+        private MyCAM.Editor.DebouncedNumericUpDown m_tbxHeight;
         private System.Windows.Forms.Button m_btnOK;
         private System.Windows.Forms.Button m_btnCancel;
     }

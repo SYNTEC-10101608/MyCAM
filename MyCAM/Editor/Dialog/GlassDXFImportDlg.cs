@@ -17,7 +17,8 @@ namespace MyCAM.Editor.Dialog
 
 		void BtnOK_Click( object sender, EventArgs e )
 		{
-			if( !double.TryParse( m_tbxRadius.Text, out double radius ) || radius < 0 || radius > MAX_RADIUS ) {
+			double radius = (double)m_tbxRadius.Value;
+			if( radius < 0 || radius > MAX_RADIUS ) {
 				MyApp.Logger.ShowOnLogPanel( $"圓球半徑需介於 0 ~ {MAX_RADIUS} mm", MyApp.NoticeType.Warning, true );
 				return;
 			}
@@ -31,7 +32,8 @@ namespace MyCAM.Editor.Dialog
 				return;
 			}
 
-			if( !double.TryParse( m_tbxHeight.Text, out double height ) || height <= 0 || height >= radius ) {
+			double height = (double)m_tbxHeight.Value;
+			if( height <= 0 || height >= radius ) {
 				MyApp.Logger.ShowOnLogPanel( $"曲面高度需為大於 0 且小於 R({radius}) 的正數", MyApp.NoticeType.Warning, true );
 				return;
 			}

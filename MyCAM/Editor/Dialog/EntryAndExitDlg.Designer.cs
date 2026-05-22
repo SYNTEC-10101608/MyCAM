@@ -30,14 +30,17 @@
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.m_lblExitDistanceUnit = new System.Windows.Forms.Label();
 			this.m_lblEntryDistanceUnit = new System.Windows.Forms.Label();
-			this.m_txbEntryDistance = new System.Windows.Forms.TextBox();
-			this.m_txbExitDistance = new System.Windows.Forms.TextBox();
+			this.m_txbEntryDistance = new MyCAM.Editor.DebouncedNumericUpDown();
+			this.m_txbExitDistance = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_lblEntryDistance = new System.Windows.Forms.Label();
 			this.m_lblExitDistance = new System.Windows.Forms.Label();
 			this.m_btnConfirm = new System.Windows.Forms.Button();
 			this.m_lblFollowSafeDistance = new System.Windows.Forms.Label();
-			this.m_txbFollowSafeDistance = new System.Windows.Forms.TextBox();
+			this.m_txbFollowSafeDistance = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_lblFollowSafeDistanceUnit = new System.Windows.Forms.Label();
+			((System.ComponentModel.ISupportInitialize)(this.m_txbEntryDistance)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_txbExitDistance)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_txbFollowSafeDistance)).BeginInit();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -90,23 +93,27 @@
 			// 
 			// m_txbEntryDistance
 			// 
+			this.m_txbEntryDistance.DecimalPlaces = 3;
+			this.m_txbEntryDistance.Minimum = 0;
+			this.m_txbEntryDistance.Maximum = 99999;
 			this.m_txbEntryDistance.Location = new System.Drawing.Point(104, 5);
 			this.m_txbEntryDistance.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.m_txbEntryDistance.Name = "m_txbEntryDistance";
 			this.m_txbEntryDistance.Size = new System.Drawing.Size(92, 22);
 			this.m_txbEntryDistance.TabIndex = 7;
-			this.m_txbEntryDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbEntryDistance_KeyDown);
-			this.m_txbEntryDistance.Leave += new System.EventHandler(this.m_txbEntryDistance_Leave);
+			this.m_txbEntryDistance.DebouncedValueChanged += new System.EventHandler(this.m_txbEntryDistance_DebouncedValueChanged);
 			// 
 			// m_txbExitDistance
 			// 
+			this.m_txbExitDistance.DecimalPlaces = 3;
+			this.m_txbExitDistance.Minimum = 0;
+			this.m_txbExitDistance.Maximum = 99999;
 			this.m_txbExitDistance.Location = new System.Drawing.Point(104, 35);
 			this.m_txbExitDistance.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.m_txbExitDistance.Name = "m_txbExitDistance";
 			this.m_txbExitDistance.Size = new System.Drawing.Size(92, 22);
 			this.m_txbExitDistance.TabIndex = 8;
-			this.m_txbExitDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbExitDistance_KeyDown);
-			this.m_txbExitDistance.Leave += new System.EventHandler(this.m_txbExitDistance_Leave);
+			this.m_txbExitDistance.DebouncedValueChanged += new System.EventHandler(this.m_txbExitDistance_DebouncedValueChanged);
 			// 
 			// m_lblEntryDistance
 			// 
@@ -151,13 +158,15 @@
 			// 
 			// m_txbFollowSafeDistance
 			// 
+			this.m_txbFollowSafeDistance.DecimalPlaces = 3;
+			this.m_txbFollowSafeDistance.Minimum = 0;
+			this.m_txbFollowSafeDistance.Maximum = 99999;
 			this.m_txbFollowSafeDistance.Location = new System.Drawing.Point(104, 65);
 			this.m_txbFollowSafeDistance.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.m_txbFollowSafeDistance.Name = "m_txbFollowSafeDistance";
 			this.m_txbFollowSafeDistance.Size = new System.Drawing.Size(92, 22);
 			this.m_txbFollowSafeDistance.TabIndex = 14;
-			this.m_txbFollowSafeDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbFollowSafeDistance_KeyDown);
-			this.m_txbFollowSafeDistance.Leave += new System.EventHandler(this.m_txbFollowSafeDistance_Leave);
+			this.m_txbFollowSafeDistance.DebouncedValueChanged += new System.EventHandler(this.m_txbFollowSafeDistance_DebouncedValueChanged);
 			// 
 			// m_lblFollowSafeDistanceUnit
 			// 
@@ -177,6 +186,9 @@
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.Name = "EntryAndExitDlg";
 			this.Text = "進入/退出";
+			((System.ComponentModel.ISupportInitialize)(this.m_txbEntryDistance)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_txbExitDistance)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_txbFollowSafeDistance)).EndInit();
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
 			this.ResumeLayout(false);
@@ -189,12 +201,12 @@
 		private System.Windows.Forms.Button m_btnConfirm;
 		private System.Windows.Forms.Label m_lblExitDistanceUnit;
 		private System.Windows.Forms.Label m_lblEntryDistanceUnit;
-		private System.Windows.Forms.TextBox m_txbEntryDistance;
-		private System.Windows.Forms.TextBox m_txbExitDistance;
+		private MyCAM.Editor.DebouncedNumericUpDown m_txbEntryDistance;
+		private MyCAM.Editor.DebouncedNumericUpDown m_txbExitDistance;
 		private System.Windows.Forms.Label m_lblEntryDistance;
 		private System.Windows.Forms.Label m_lblExitDistance;
 		private System.Windows.Forms.Label m_lblFollowSafeDistance;
-		private System.Windows.Forms.TextBox m_txbFollowSafeDistance;
+		private MyCAM.Editor.DebouncedNumericUpDown m_txbFollowSafeDistance;
 		private System.Windows.Forms.Label m_lblFollowSafeDistanceUnit;
 	}
 }

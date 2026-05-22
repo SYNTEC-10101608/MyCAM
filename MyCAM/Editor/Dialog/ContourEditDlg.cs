@@ -26,17 +26,17 @@ namespace MyCAM.Editor
 			// should not happen, but just in case
 			if( m_Param == null ) {
 				m_gbxIndexParam.Enabled = false;
-				m_tbxDX.Text = string.Empty;
-				m_tbxDY.Text = string.Empty;
-				m_tbxDZ.Text = string.Empty;
+				m_tbxDX.Value = 0;
+				m_tbxDY.Value = 0;
+				m_tbxDZ.Value = 0;
 				m_bSuppressValueChanged = false;
 				return;
 			}
 
 			m_gbxIndexParam.Enabled = true;
-			m_tbxDX.Text = m_Param.DX.ToString( "F3" );
-			m_tbxDY.Text = m_Param.DY.ToString( "F3" );
-			m_tbxDZ.Text = m_Param.DZ.ToString( "F3" );
+			m_tbxDX.Value = (decimal)m_Param.DX;
+			m_tbxDY.Value = (decimal)m_Param.DY;
+			m_tbxDZ.Value = (decimal)m_Param.DZ;
 			m_btnAdd.Enabled = !m_Param.IsModified;
 			m_btnRemove.Enabled = m_Param.IsModified;
 			SetInputEnabled( m_Param.IsModified );
@@ -45,38 +45,17 @@ namespace MyCAM.Editor
 
 		// ---- UI events ----
 
-		void m_tbxDX_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				HandleDisplacementChanged();
-			}
-		}
-
-		void m_tbxDY_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				HandleDisplacementChanged();
-			}
-		}
-
-		void m_tbxDZ_KeyDown( object sender, KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				HandleDisplacementChanged();
-			}
-		}
-
-		void m_tbxDX_Leave( object sender, EventArgs e )
+		void m_tbxDX_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleDisplacementChanged();
 		}
 
-		void m_tbxDY_Leave( object sender, EventArgs e )
+		void m_tbxDY_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleDisplacementChanged();
 		}
 
-		void m_tbxDZ_Leave( object sender, EventArgs e )
+		void m_tbxDZ_DebouncedValueChanged( object sender, EventArgs e )
 		{
 			HandleDisplacementChanged();
 		}
@@ -110,15 +89,9 @@ namespace MyCAM.Editor
 
 		bool GetDisplacementFromDialog( out double dx, out double dy, out double dz )
 		{
-			dx = 0;
-			dy = 0;
-			dz = 0;
-			if( !double.TryParse( m_tbxDX.Text, out dx ) ||
-				!double.TryParse( m_tbxDY.Text, out dy ) ||
-				!double.TryParse( m_tbxDZ.Text, out dz ) ) {
-				MyApp.Logger.ShowOnLogPanel( "µL®Ä¦r¦ê", MyApp.NoticeType.Warning );
-				return false;
-			}
+			dx = (double)m_tbxDX.Value;
+			dy = (double)m_tbxDY.Value;
+			dz = (double)m_tbxDZ.Value;
 			return true;
 		}
 
