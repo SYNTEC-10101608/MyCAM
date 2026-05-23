@@ -279,11 +279,6 @@ namespace MyCAM.FileManager
 			get; set;
 		}
 
-		public TopoShapeDTO Shape
-		{
-			get; set;
-		}
-
 		public ObjectType ObjectType
 		{
 			get; set;
@@ -297,6 +292,11 @@ namespace MyCAM.FileManager
 
 	public class PartObjectDTO : IObjectDTO
 	{
+		public TopoShapeDTO Shape
+		{
+			get; set;
+		}
+
 		// constructor for XmlSerializer
 		internal PartObjectDTO()
 		{
@@ -368,7 +368,6 @@ namespace MyCAM.FileManager
 				return;
 			}
 			UID = pathObject.UID;
-			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
 			PathType = PathType.Contour;
 			if( pathObject is ContourPathObject contourPathObject ) {
@@ -384,13 +383,12 @@ namespace MyCAM.FileManager
 		internal ContourPathObject PathDTOToContourPathObject()
 		{
 			// protection
-			if( Shape == null || string.IsNullOrEmpty( UID ) || GeomData == null ) {
+			if( string.IsNullOrEmpty( UID ) || GeomData == null ) {
 				throw new ArgumentNullException( "PathObject deserialization failed." );
 			}
-			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
 			CraftData craftData = CraftData.ToCraftData();
 			ContourGeomData geomData = GeomData.ToContourGeomData();
-			return new ContourPathObject( UID, shape, geomData, craftData );
+			return new ContourPathObject( UID, null, geomData, craftData );
 		}
 	}
 
@@ -418,7 +416,6 @@ namespace MyCAM.FileManager
 				return;
 			}
 			UID = pathObject.UID;
-			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
 			PathType = PathType.Circle;
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
@@ -436,14 +433,13 @@ namespace MyCAM.FileManager
 		internal CirclePathObject PathDTOToCirclePathObject()
 		{
 			// protection
-			if( Shape == null || string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
+			if( string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
 				throw new ArgumentNullException( "CirclePathObject deserialization failed." );
 			}
-			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
 			CraftData craftData = CraftData.ToCraftData();
 			CircleGeomData geomData = GeomData.ToCircleGeomData();
 			ContourPathObject contourPathObject = ContourPathObject.PathDTOToContourPathObject();
-			return new CirclePathObject( UID, shape, geomData, craftData, contourPathObject );
+			return new CirclePathObject( UID, geomData, craftData, contourPathObject );
 		}
 	}
 
@@ -471,7 +467,6 @@ namespace MyCAM.FileManager
 				return;
 			}
 			UID = pathObject.UID;
-			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
 			PathType = PathType.Rectangle;
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
@@ -489,14 +484,13 @@ namespace MyCAM.FileManager
 		internal RectanglePathObject PathDTOToRectanglePathObject()
 		{
 			// protection
-			if( Shape == null || string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
+			if( string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
 				throw new ArgumentNullException( "RectanglePathObject deserialization failed." );
 			}
-			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
 			CraftData craftData = CraftData.ToCraftData();
 			RectangleGeomData geomData = GeomData.ToRectangleGeomData();
 			ContourPathObject contourPathObject = ContourPathObject.PathDTOToContourPathObject();
-			return new RectanglePathObject( UID, shape, geomData, craftData, contourPathObject );
+			return new RectanglePathObject( UID, geomData, craftData, contourPathObject );
 		}
 	}
 
@@ -524,7 +518,6 @@ namespace MyCAM.FileManager
 				return;
 			}
 			UID = pathObject.UID;
-			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
 				PathType = pathObject.PathType; // Use the actual PathType from PathObject (which gets it from PolygonGeomData)
@@ -543,14 +536,13 @@ namespace MyCAM.FileManager
 		internal PolygonPathObject PathDTOToPolygonPathObject()
 		{
 			// protection
-			if( Shape == null || string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
+			if( string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
 				throw new ArgumentNullException( "PolygonPathObject deserialization failed." );
 			}
-			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
 			CraftData craftData = CraftData.ToCraftData();
 			PolygonGeomData geomData = GeomData.ToPolygonGeomData();
 			ContourPathObject contourPathObject = ContourPathObject.PathDTOToContourPathObject();
-			return new PolygonPathObject( UID, shape, geomData, craftData, contourPathObject );
+			return new PolygonPathObject( UID, geomData, craftData, contourPathObject );
 		}
 	}
 
@@ -578,7 +570,6 @@ namespace MyCAM.FileManager
 				return;
 			}
 			UID = pathObject.UID;
-			Shape = new TopoShapeDTO( pathObject.Shape );
 			ObjectType = ObjectType.Path;
 			PathType = PathType.Runway;
 			if( pathObject is StdPatternObjectBase standardPatternPathObject ) {
@@ -596,14 +587,13 @@ namespace MyCAM.FileManager
 		internal RunwayPathObject PathDTOToRunwayPathObject()
 		{
 			// protection
-			if( Shape == null || string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
+			if( string.IsNullOrEmpty( UID ) || GeomData == null || ContourPathObject == null ) {
 				throw new ArgumentNullException( "RunwayPathObject deserialization failed." );
 			}
-			TopoDS_Shape shape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
 			CraftData craftData = CraftData.ToCraftData();
 			RunwayGeomData geomData = GeomData.ToRunwayGeomData();
 			ContourPathObject contourPathObject = ContourPathObject.PathDTOToContourPathObject();
-			return new RunwayPathObject( UID, shape, geomData, craftData, contourPathObject );
+			return new RunwayPathObject( UID, geomData, craftData, contourPathObject );
 		}
 	}
 

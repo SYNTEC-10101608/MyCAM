@@ -1,7 +1,6 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.FileManager;
-using OCC.AIS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -67,56 +66,22 @@ namespace MyCAM.Editor
 
 		void UpdateAllViewData()
 		{
-			// clear the tree view and viewer
-			m_ViewManager.PartNode.Nodes.Clear();
-			m_ViewManager.PathNode.Nodes.Clear();
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Remove( viewObject.AISHandle, false );
-			}
+			m_ViewManager.ClearAll();
 
-			// update view manager data
-			m_ViewManager.ViewObjectMap.Clear();
-			m_ViewManager.TreeNodeMap.Clear();
-
-			// buill part tree
+			// build part
 			foreach( var szNewDataID in m_DataManager.PartIDList ) {
-				PartObject data = (PartObject)m_DataManager.ObjectMap[ szNewDataID ];
-
-				// add node to the tree view
-				TreeNode node = new TreeNode( data.UID );
-				m_ViewManager.PartNode.Nodes.Add( node );
-				m_ViewManager.TreeNodeMap.Add( data.UID, node );
-
-				// add shape to the viewer
 				if( !DataGettingHelper.GetShapeObject( szNewDataID, out IShapeObject shapeObject ) ) {
 					continue;
 				}
-				AIS_Shape aisShape = ViewHelper.CreatePartAIS( shapeObject.Shape );
-				m_ViewManager.ViewObjectMap.Add( data.UID, new ViewObject( aisShape ) );
-				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
+				m_ViewManager.AddPart( szNewDataID, shapeObject.Shape );
 			}
 
-			// build path tree
-			m_ViewManager.PathNode.Nodes.Clear();
-			int nodeStartIndex = 1;
+			// build path tree and view
 			for( int i = 0; i < m_DataManager.PathIDList.Count; i++ ) {
 				string pathID = m_DataManager.PathIDList[ i ];
-
-				// get tree node text
-				string szNodeText = PATH_NODE_PREFIX + nodeStartIndex.ToString();
-				TreeNode node = new TreeNode( szNodeText );
-				m_ViewManager.PathNode.Nodes.Add( node );
-
-				// key is "Path_xxx" wich show on tree text, value is the node
-				m_ViewManager.TreeNodeMap.Add( szNodeText, node );
-
-				// add a new shape to the viewer
-				if( !DataGettingHelper.GetShapeObject( pathID, out IShapeObject shapeObject ) ) {
-					continue;
-				}
-				AIS_Shape aisShape = ViewHelper.CreatePathAIS( shapeObject.Shape );
-				m_ViewManager.ViewObjectMap.Add( pathID, new ViewObject( aisShape ) );
-				nodeStartIndex++;
+				string szNodeText = PATH_NODE_PREFIX + ( i + 1 ).ToString();
+				m_ViewManager.AddPathNode( szNodeText );
+				m_ViewManager.AddPath( pathID );
 			}
 
 			// update tree view and viewer

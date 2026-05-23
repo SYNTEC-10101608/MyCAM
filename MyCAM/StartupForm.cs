@@ -63,7 +63,7 @@ namespace MyCAM
 			ShowG54Trihedron();
 
 			// view manager
-			m_ViewManager = new ViewManager();
+			m_ViewManager = new ViewManager( m_Viewer );
 
 			// CAD Manager
 			if( GetMachineDataSuccess( out MachineData machineData ) ) {

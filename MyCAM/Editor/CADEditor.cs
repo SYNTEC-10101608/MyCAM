@@ -1,6 +1,5 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
-using OCC.AIS;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.IFSelect;
@@ -268,31 +267,13 @@ namespace MyCAM.Editor
 		// manager events
 		void OnPartChanged()
 		{
-			// clear the tree view and viewer
-			m_ViewManager.PartNode.Nodes.Clear();
-			m_ViewManager.PathNode.Nodes.Clear();
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Remove( viewObject.AISHandle, false );
-			}
+			m_ViewManager.ClearAll();
 
-			// update view manager data
-			m_ViewManager.ViewObjectMap.Clear();
-			m_ViewManager.TreeNodeMap.Clear();
 			foreach( var szNewDataID in m_DataManager.PartIDList ) {
-				PartObject data = (PartObject)m_DataManager.ObjectMap[ szNewDataID ];
-
-				// add node to the tree view
-				TreeNode node = new TreeNode( data.UID );
-				m_ViewManager.PartNode.Nodes.Add( node );
-				m_ViewManager.TreeNodeMap.Add( data.UID, node );
-
-				// add shape to the viewer
 				if( !DataGettingHelper.GetShapeObject( szNewDataID, out IShapeObject shapeObject ) ) {
 					continue;
 				}
-				AIS_Shape aisShape = ViewHelper.CreatePartAIS( shapeObject.Shape );
-				m_ViewManager.ViewObjectMap.Add( data.UID, new ViewObject( aisShape ) );
-				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
+				m_ViewManager.AddPart( szNewDataID, shapeObject.Shape );
 			}
 
 			// update tree view and viewer
@@ -308,18 +289,10 @@ namespace MyCAM.Editor
 					return;
 				}
 
-				// add a new node to the tree view
-				TreeNode node = new TreeNode( szID );
-				m_ViewManager.PartNode.Nodes.Add( node );
-				m_ViewManager.TreeNodeMap.Add( szID, node );
-
-				// add a new shape to the viewer
 				if( !DataGettingHelper.GetShapeObject( szID, out IShapeObject shapeObj ) ) {
 					continue;
 				}
-				AIS_Shape aisShape = ViewHelper.CreateFeatureAIS( shapeObj.Shape );
-				m_ViewManager.ViewObjectMap.Add( szID, new ViewObject( aisShape ) );
-				m_Viewer.GetAISContext().Display( aisShape, false ); // this will also activate
+				m_ViewManager.AddPart( szID, shapeObj.Shape, true );
 			}
 
 			// update tree view and viewer

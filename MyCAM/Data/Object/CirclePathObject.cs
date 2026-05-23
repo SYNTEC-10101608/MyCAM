@@ -1,17 +1,15 @@
-﻿using OCC.TopoDS;
-
-namespace MyCAM.Data
+﻿namespace MyCAM.Data
 {
 	internal class CirclePathObject : StdPatternObjectBase
 	{
-		internal CirclePathObject( string szUID, TopoDS_Shape shape, CircleGeomData circleGeomData, ContourPathObject contourPathObject )
-			: base( szUID, shape, circleGeomData, contourPathObject )
+		internal CirclePathObject( string szUID, CircleGeomData circleGeomData, ContourPathObject contourPathObject )
+			: base( szUID, circleGeomData, contourPathObject )
 		{
 		}
 
 		// read file
-		internal CirclePathObject( string szUID, TopoDS_Shape shape, CircleGeomData circleGeomData, CraftData craftData, ContourPathObject contourPathObject )
-			: base( szUID, shape, circleGeomData, craftData, contourPathObject )
+		internal CirclePathObject( string szUID, CircleGeomData circleGeomData, CraftData craftData, ContourPathObject contourPathObject )
+			: base( szUID, circleGeomData, craftData, contourPathObject )
 		{
 		}
 

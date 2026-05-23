@@ -1,11 +1,11 @@
 using MyCAM.Data;
+using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.gp;
 using OCC.Quantity;
 using OCC.TCollection;
-using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
@@ -17,28 +17,12 @@ namespace MyCAM.Editor
 {
 	internal class PathRenderer : CAMRendererBase
 	{
-		static readonly List<Quantity_NameOfColor> TECH_Layer_Color_List = new List<Quantity_NameOfColor> {
-			Quantity_NameOfColor.Quantity_NOC_BLUE,
-			Quantity_NameOfColor.Quantity_NOC_DARKORANGE2,
-			Quantity_NameOfColor.Quantity_NOC_PURPLE,
-			Quantity_NameOfColor.Quantity_NOC_YELLOW2,
-			Quantity_NameOfColor.Quantity_NOC_GREEN3,
-			Quantity_NameOfColor.Quantity_NOC_TOMATO2,
-			Quantity_NameOfColor.Quantity_NOC_YELLOWGREEN,
-			Quantity_NameOfColor.Quantity_NOC_BROWN,
-			Quantity_NameOfColor.Quantity_NOC_MAGENTA1,
-			Quantity_NameOfColor.Quantity_NOC_CYAN1,
-		};
-
-		readonly Dictionary<string, AIS_Shape> m_MainPathAISDict = new Dictionary<string, AIS_Shape>();
 		readonly Dictionary<string, AIS_Shape> m_OriginalPathAISDict = new Dictionary<string, AIS_Shape>();
 		readonly Dictionary<string, List<AIS_TextLabel>> m_MicroJointLabelsDict = new Dictionary<string, List<AIS_TextLabel>>();
-		ViewManager m_ViewManager;
 
-		public PathRenderer( Viewer viewer, ViewManager viewManager, DataManager dataManager )
+		public PathRenderer( Viewer viewer, DataManager dataManager )
 			: base( viewer, dataManager )
 		{
-			m_ViewManager = viewManager;
 		}
 
 		public override void SetPauseRefreshAndHide( bool isPause )
@@ -48,10 +32,6 @@ namespace MyCAM.Editor
 			}
 			base.SetPauseRefreshAndHide( isPause );
 			if( isPause ) {
-				// hide all managed AIS objects without destroying them
-				foreach( var kvp in m_MainPathAISDict ) {
-					m_Viewer.GetAISContext().Erase( kvp.Value, false );
-				}
 				foreach( var kvp in m_OriginalPathAISDict ) {
 					m_Viewer.GetAISContext().Erase( kvp.Value, false );
 				}
@@ -62,10 +42,6 @@ namespace MyCAM.Editor
 				}
 			}
 			else {
-				// re-display all managed AIS objects
-				foreach( var kvp in m_MainPathAISDict ) {
-					m_Viewer.GetAISContext().Display( kvp.Value, false );
-				}
 				foreach( var kvp in m_OriginalPathAISDict ) {
 					m_Viewer.GetAISContext().Display( kvp.Value, false );
 					m_Viewer.GetAISContext().Deactivate( kvp.Value );
@@ -109,7 +85,6 @@ namespace MyCAM.Editor
 
 		void ShowSpecifyPath( List<string> pathIDList, bool bUpdate, gp_Trsf trsf = null )
 		{
-			// paused, do not rebuild or display
 			if( m_IsPauseRefreshAndHide || m_IsPauseRefresh ) {
 				return;
 			}
@@ -122,45 +97,9 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// render each path
 			foreach( string pathID in pathIDList ) {
-
-				// Show original path if there is any compensation or transformation applied, to visualize the difference
 				ShowOriginalPath( pathID, trsf );
-
-				IReadOnlyList<gp_Pnt> pointList = ToolVecAndPathVisibleHelper.GetMainPathPointList( pathID );
-				if( pointList == null || pointList.Count < 2 ) {
-					continue;
-				}
-
-				TopoDS_Wire pathWire = ToolVecAndPathVisibleHelper.CreatePolylineWire( pointList );
-				if( pathWire == null || pathWire.IsNull() ) {
-					continue;
-				}
-
-				// set AIS param
-				AIS_Shape pathAIS = new AIS_Shape( pathWire );
-				int nPathColorIdx = GetColorIndex( pathID );
-				pathAIS.SetColor( new Quantity_Color( TECH_Layer_Color_List[ nPathColorIdx ] ) );
-				pathAIS.SetWidth( 3.0 );
-				if( trsf != null ) {
-					pathAIS.SetLocalTransformation( trsf );
-				}
-
-				// Register to DataManager for shape-ID mapping
-				m_DataManager.RegisterShapeIDMapping( pathWire, pathID );
-
-				// Local storage
-				m_MainPathAISDict.Add( pathID, pathAIS );
-
-				// Show MicroJoint markers
 				ShowMicroJointMarkers( pathID, trsf );
-
-				if( m_ViewManager.ViewObjectMap.ContainsKey( pathID ) ) {
-					m_ViewManager.ViewObjectMap.Remove( pathID );
-				}
-				m_ViewManager.ViewObjectMap.Add( pathID, new ViewObject( pathAIS ) );
-				m_Viewer.GetAISContext().Display( pathAIS, false );
 			}
 
 			if( bUpdate ) {
@@ -179,21 +118,6 @@ namespace MyCAM.Editor
 
 		void RemovePaths( List<string> pathIDList )
 		{
-			// unregister from DataManager
-			foreach( string pathID in pathIDList ) {
-				TopoDS_Wire wire = GetWireFromPathID( pathID );
-				if( wire != null && !wire.IsNull() ) {
-					m_DataManager.UnregisterShapeIDMapping( wire );
-				}
-			}
-
-			foreach( string pathID in pathIDList ) {
-				if( m_MainPathAISDict.TryGetValue( pathID, out AIS_Shape pathAIS ) ) {
-					m_Viewer.GetAISContext().Remove( pathAIS, false );
-					m_MainPathAISDict.Remove( pathID );
-				}
-			}
-
 			foreach( string pathID in pathIDList ) {
 				if( m_OriginalPathAISDict.TryGetValue( pathID, out AIS_Shape oriPathAIS ) ) {
 					m_Viewer.GetAISContext().Remove( oriPathAIS, false );
@@ -201,7 +125,6 @@ namespace MyCAM.Editor
 				}
 			}
 
-			// remove MicroJoint labels
 			foreach( string pathID in pathIDList ) {
 				if( m_MicroJointLabelsDict.TryGetValue( pathID, out List<AIS_TextLabel> labels ) ) {
 					foreach( var label in labels ) {
@@ -210,20 +133,6 @@ namespace MyCAM.Editor
 					m_MicroJointLabelsDict.Remove( pathID );
 				}
 			}
-		}
-
-		TopoDS_Wire GetWireFromPathID( string pathID )
-		{
-			if( !m_MainPathAISDict.TryGetValue( pathID, out AIS_Shape pathAIS ) ) {
-				return null;
-			}
-
-			TopoDS_Shape shape = pathAIS.Shape();
-			if( shape == null || shape.IsNull() || shape.ShapeType() != TopAbs_ShapeEnum.TopAbs_WIRE ) {
-				return null;
-			}
-
-			return TopoDS.ToWire( shape );
 		}
 
 		IReadOnlyList<gp_Pnt> GetPathOriginalCADPointList( string pathID )
@@ -357,28 +266,6 @@ namespace MyCAM.Editor
 			}
 
 			return null;
-		}
-
-		int GetColorIndex( string pathID )
-		{
-			int nColorIdx = 0;
-			if( !m_DataManager.ObjectMap.TryGetValue( pathID, out var obj ) ) {
-				return nColorIdx;
-			}
-			PathObject pathObj = obj as PathObject;
-			if( pathObj == null ) {
-				return nColorIdx;
-			}
-			bool isGetDataCraftSuccess = DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData );
-			if( !isGetDataCraftSuccess || craftData == null ) {
-				return nColorIdx;
-			}
-			int nTechLayer = craftData.TechLayer;
-			nColorIdx = nTechLayer - 1;
-			if( nColorIdx < 0 || nColorIdx >= TECH_Layer_Color_List.Count ) {
-				nColorIdx = 0;
-			}
-			return nColorIdx;
 		}
 
 		static bool IsIdentityTransform( gp_Trsf trsf )

@@ -226,7 +226,7 @@ namespace MyCAM.Editor
 				if( selectedShape != null && !selectedShape.IsNull() ) {
 
 					// find the corresponding UID
-					string szUID = m_DataManager.GetUIDByShape( selectedShape );
+					string szUID = m_ViewManager.GetUIDByShape( selectedShape );
 					if( !string.IsNullOrEmpty( szUID ) ) {
 						m_SelectedIDSet.Add( szUID );
 					}
@@ -248,7 +248,7 @@ namespace MyCAM.Editor
 				if( node == null || string.IsNullOrEmpty( node.Text ) ) {
 					continue;
 				}
-				bool hasShape = m_DataManager.GetShapeByUID( node.Text ) != null;
+				bool hasShape = m_ViewManager.GetShapeByUID( node.Text ) != null;
 
 				if( hasShape ) {
 					m_SelectedIDSet.Add( node.Text );
