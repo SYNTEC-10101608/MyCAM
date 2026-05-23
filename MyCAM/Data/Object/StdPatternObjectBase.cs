@@ -1,15 +1,14 @@
 ﻿using MyCAM.PathCache;
 using OCC.gp;
-using OCC.TopoDS;
 
 namespace MyCAM.Data
 {
 	internal abstract class StdPatternObjectBase : PathObject
 	{
-		protected StdPatternObjectBase( string szUID, TopoDS_Shape shape, IStdPatternGeomData geomData, ContourPathObject contourPathObject )
-			: base( szUID, shape )
+		protected StdPatternObjectBase( string szUID, IStdPatternGeomData geomData, ContourPathObject contourPathObject )
+			: base( szUID )
 		{
-			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || geomData == null || contourPathObject == null ) {
+			if( string.IsNullOrEmpty( szUID ) || geomData == null || contourPathObject == null ) {
 				throw new System.ArgumentNullException( "StandardPatternBasedPathObject constructing argument null" );
 			}
 
@@ -21,10 +20,10 @@ namespace MyCAM.Data
 		}
 
 
-		protected StdPatternObjectBase( string szUID, TopoDS_Shape shape, IStdPatternGeomData geomData, CraftData craftData, ContourPathObject contourPathObject )
-			: base( szUID, shape )
+		protected StdPatternObjectBase( string szUID, IStdPatternGeomData geomData, CraftData craftData, ContourPathObject contourPathObject )
+			: base( szUID )
 		{
-			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || geomData == null || craftData == null || contourPathObject == null ) {
+			if( string.IsNullOrEmpty( szUID ) || geomData == null || craftData == null || contourPathObject == null ) {
 				throw new System.ArgumentNullException( "StandardPatternBasedPathObject constructing argument null" );
 			}
 
@@ -61,16 +60,13 @@ namespace MyCAM.Data
 
 		public override void DoTransform( gp_Trsf transform )
 		{
-			// Step1: transform shape first
-			base.DoTransform( transform );
-
-			// Step2: then transform geom data, currently do nothing since transform is not depends on geom data
+			// Step1: transform geom data, currently do nothing since transform is not depends on geom data
 			m_GeomData.DoTransform( transform );
 
-			// Step3: recalculate cache
+			// Step2: recalculate cache
 			m_StdPatternCache.DoTransform( transform );
 
-			// Step4: transform the underlying contour path object
+			// Step3: transform the underlying contour path object
 			m_ContourPathObject.DoTransform( transform );
 		}
 

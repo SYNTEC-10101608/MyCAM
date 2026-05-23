@@ -82,10 +82,10 @@ namespace MyCAM.Editor
 			m_PathIDList = pathIDList;
 
 			foreach( string szID in m_PathIDList ) {
-				if( !m_DataManager.ObjectMap.ContainsKey( szID ) ) {
-					throw new ArgumentException( "LeadAction constructing argument pathIDList contains invalid path ID" );
+				if( !DataGettingHelper.GetCraftDataByID( szID, out CraftData craftData ) ) {
+					throw new ArgumentException( "EditAction constructing argument pathIDList contains invalid path ID" );
 				}
-				m_CraftDataList.Add( ( dataManager.ObjectMap[ szID ] as PathObject ).CraftData );
+				m_CraftDataList.Add( craftData );
 			}
 		}
 

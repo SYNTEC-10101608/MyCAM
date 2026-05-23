@@ -616,6 +616,7 @@ namespace MyCAM.Editor
 				m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY70 ) );
 				m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
 			}
+			m_ViewManager.ShowPathTrsf( new gp_Trsf() );
 		}
 
 		void RegisterAllSimuMemberForCollision()
@@ -873,6 +874,7 @@ namespace MyCAM.Editor
 			foreach( string ID in m_DataManager.PartIDList ) {
 				m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetLocalTransformation( trsf );
 			}
+			m_ViewManager.ShowPathTrsf( trsf );
 		}
 
 		#endregion

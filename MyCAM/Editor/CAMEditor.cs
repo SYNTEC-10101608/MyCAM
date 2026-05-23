@@ -78,7 +78,7 @@ namespace MyCAM.Editor
 			m_CraftRenderer = new CraftRenderer( m_Viewer, m_DataManager );
 			m_ToolVecRenderer = new ToolVecRenderer( m_Viewer, m_DataManager );
 			m_TraverseRenderer = new TraverseRenderer( m_Viewer, m_DataManager );
-			m_MainPathRenderer = new PathRenderer( m_Viewer, m_ViewManager, m_DataManager );
+			m_MainPathRenderer = new PathRenderer( m_Viewer, m_DataManager );
 			m_MachineRender = new MachineRender( m_Viewer, m_DataManager );
 		}
 
@@ -120,11 +120,6 @@ namespace MyCAM.Editor
 			// clear tree
 			m_TreeView.Nodes.Clear();
 
-			// clear viewer
-			foreach( var pathID in m_DataManager.PathIDList ) {
-				AIS_InteractiveObject obj = m_ViewManager.ViewObjectMap[ pathID ].AISHandle;
-				m_Viewer.GetAISContext().Remove( obj, false );
-			}
 			RemoveAllCAMData();
 		}
 
@@ -316,22 +311,20 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			int removeCount = szPathIDList.Count;
+
 			foreach( var item in szPathIDList ) {
 				string szPathID = item;
-				int originalIndex = m_DataManager.PathIDList.IndexOf( szPathID );
 
 				// remove from data manager
 				m_DataManager.RemovePath( szPathID );
 
 				// remove from viewer
-				if( m_ViewManager.ViewObjectMap.ContainsKey( szPathID ) ) {
-					m_Viewer.GetAISContext().Remove( m_ViewManager.ViewObjectMap[ szPathID ].AISHandle, false );
-					m_ViewManager.ViewObjectMap.Remove( szPathID );
-				}
+				m_ViewManager.RemovePath( szPathID );
 			}
 
-			// Rebuild tree nodes with correct indices after removal
-			RebuildTreeNodes();
+			// remove path tree nodes from the end
+			m_ViewManager.RemovePathNodes( removeCount );
 
 			// clear selection after remove path
 			m_DefaultAction.ClearSelection();
@@ -440,6 +433,7 @@ namespace MyCAM.Editor
 				m_TraverseRenderer.Reset();
 				m_OrientationRenderer.Reset();
 				m_IndexRenderer.Reset();
+				m_ViewManager.ShowPathTrsf( new gp_Trsf() );
 				m_MainPathRenderer.Reset();
 				m_CraftRenderer.Reset();
 				SetWorkPieceDisplayTransform( new gp_Trsf() );
@@ -686,6 +680,7 @@ namespace MyCAM.Editor
 				}
 				craftData.TechLayer = nTechLayer;
 			}
+			m_ViewManager.UpdatePaths( szPathIDList );
 			m_MainPathRenderer.Show( szPathIDList );
 		}
 
@@ -955,9 +950,7 @@ namespace MyCAM.Editor
 					continue;
 				}
 				string szNodeID = PATH_NODE_PREFIX + nodeIndex.ToString();
-				TreeNode node = new TreeNode( szNodeID );
-				m_ViewManager.PathNode.Nodes.Add( node );
-				m_ViewManager.TreeNodeMap.Add( szNodeID, node );
+				m_ViewManager.AddPathNode( szNodeID );
 			}
 
 			// update tree view and viewer
@@ -1025,6 +1018,7 @@ namespace MyCAM.Editor
 
 		void ShowCAMData( List<string> pathIDList )
 		{
+			m_ViewManager.UpdatePaths( pathIDList );
 			m_MainPathRenderer.Show( pathIDList );
 			m_ToolVecRenderer.Show( pathIDList );
 			m_OrientationRenderer.Show( pathIDList );
@@ -1037,6 +1031,7 @@ namespace MyCAM.Editor
 		void ShowTransedCAMData( gp_Trsf trsf )
 		{
 			// draw with translated location
+			m_ViewManager.ShowPathTrsf( trsf );
 			m_MainPathRenderer.ShowTrans( trsf );
 			m_ToolVecRenderer.ShowTrans( trsf );
 			m_IndexRenderer.ShowTrans( trsf );
@@ -1145,33 +1140,6 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		void RebuildTreeNodes()
-		{
-			// Clear existing tree nodes and mappings
-			m_ViewManager.PathNode.Nodes.Clear();
-
-			// Remove old path node mappings
-			var keysToRemove = m_ViewManager.TreeNodeMap.Keys
-				.Where( key => key.StartsWith( PATH_NODE_PREFIX ) )
-				.ToList();
-
-			foreach( var key in keysToRemove ) {
-				m_ViewManager.TreeNodeMap.Remove( key );
-			}
-
-			// Rebuild tree nodes with correct indices
-			for( int i = 0; i < m_DataManager.PathIDList.Count; i++ ) {
-				string pathID = m_DataManager.PathIDList[ i ];
-				string szNodeID = PATH_NODE_PREFIX + ( i + 1 ).ToString(); // 1-based index
-
-				TreeNode node = new TreeNode( szNodeID );
-				m_ViewManager.PathNode.Nodes.Add( node );
-				m_ViewManager.TreeNodeMap.Add( szNodeID, node );
-			}
-
-			// Expand all nodes
-			m_ViewManager.PathNode.ExpandAll();
-		}
 		// edit actions
 		protected override void OnEditActionStart( IEditorAction action )
 		{

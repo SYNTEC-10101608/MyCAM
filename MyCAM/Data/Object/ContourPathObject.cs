@@ -12,7 +12,7 @@ namespace MyCAM.Data
 	public class ContourPathObject : PathObject
 	{
 		public ContourPathObject( string szUID, TopoDS_Shape shape, List<PathEdge5D> pathDataList )
-			: base( szUID, shape )
+			: base( szUID )
 		{
 			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || pathDataList == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
@@ -29,9 +29,9 @@ namespace MyCAM.Data
 
 		// this is for the file read constructor
 		public ContourPathObject( string szUID, TopoDS_Shape shape, ContourGeomData geomData, CraftData craftData )
-			: base( szUID, shape )
+			: base( szUID )
 		{
-			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || geomData == null || craftData == null ) {
+			if( string.IsNullOrEmpty( szUID ) || geomData == null || craftData == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
 			m_ContourGeomData = geomData;
@@ -66,14 +66,10 @@ namespace MyCAM.Data
 
 		public override void DoTransform( gp_Trsf transform )
 		{
-			// fix:
-			// Step1:tranform shape first
-			base.DoTransform( transform );
-
-			// Step2:then transform the geom data
+			// Step1:transform the geom data
 			m_ContourGeomData.DoTransform( transform );
 
-			// Step3:recalculate cache, currently dont really need gp_trsf
+			// Step2:recalculate cache, currently dont really need gp_trsf
 			m_ContourCache.DoTransform( transform );
 		}
 

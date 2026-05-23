@@ -82,20 +82,14 @@ namespace MyCAM.Data
 		}
 	}
 
-	public abstract class PathObject : IObject, IShapeObject, ITransformableObject
+	public abstract class PathObject : IObject, ITransformableObject
 	{
-		protected PathObject( string szUID, TopoDS_Shape shape )
+		protected PathObject( string szUID )
 		{
 			UID = szUID;
-			Shape = shape;
 		}
 
 		public string UID
-		{
-			get; private set;
-		}
-
-		public TopoDS_Shape Shape
 		{
 			get; private set;
 		}
@@ -123,11 +117,6 @@ namespace MyCAM.Data
 
 		public virtual void DoTransform( gp_Trsf transform )
 		{
-			BRepBuilderAPI_Transform shapeTransform = new BRepBuilderAPI_Transform( Shape, transform );
-			if( !shapeTransform.IsDone() ) {
-				return;
-			}
-			Shape = shapeTransform.Shape();
 		}
 
 		protected CraftData m_CraftData;

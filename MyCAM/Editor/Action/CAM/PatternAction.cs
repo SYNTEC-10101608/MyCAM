@@ -115,39 +115,14 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// TODO：shape isn't necessary
-			TopoDS_Shape shape = CreatePatternShape( szID, contourPathObject, stdPatternGeomDataClone );
-			if( shape == null || shape.IsNull() ) {
-				return;
-			}
-
 			if( !DataGettingHelper.GetGeomDataByID( szID, out IGeomData oldGeomData ) ) {
 				return;
 			}
 
-			UpdateGeomDataForPath( szID, shape, oldGeomData, contourPathObject, stdPatternGeomDataClone );
+			UpdateGeomDataForPath( szID, oldGeomData, contourPathObject, stdPatternGeomDataClone );
 		}
 
-		TopoDS_Shape CreatePatternShape( string szID, ContourPathObject contourPathObject, IStdPatternGeomData standardPatternGeomData )
-		{
-			if( standardPatternGeomData == null ) {
-				return contourPathObject.Shape;
-			}
-
-			if( contourPathObject?.GeomData == null ) {
-				return null;
-			}
-
-			// create pattern shape
-			TopoDS_Shape shape = StdPatternHelper.GetPathWire( contourPathObject.GeomData.RefCenterDir, standardPatternGeomData );
-			if( shape == null || shape.IsNull() ) {
-				return null;
-			}
-
-			return shape;
-		}
-
-		void UpdateGeomDataForPath( string szID, TopoDS_Shape shape, IGeomData oldGeomData, ContourPathObject contourPathObject, IStdPatternGeomData standardPatternGeomData )
+		void UpdateGeomDataForPath( string szID, IGeomData oldGeomData, ContourPathObject contourPathObject, IStdPatternGeomData standardPatternGeomData )
 		{
 			// should convert to contour
 			if( oldGeomData.PathType != PathType.Contour && standardPatternGeomData == null ) {
@@ -169,7 +144,7 @@ namespace MyCAM.Editor
 
 				// create new path object
 				if( m_BackUpPathObjectList.ContainsKey( szID ) ) {
-					PathObject newPathObject = CreatePathObject( szID, shape, standardPatternGeomData, contourPathObject, m_BackUpPathObjectList[ szID ] );
+					PathObject newPathObject = CreatePathObject( szID, standardPatternGeomData, contourPathObject, m_BackUpPathObjectList[ szID ] );
 					if( newPathObject != null ) {
 						m_DataManager.ObjectMap[ szID ] = newPathObject;
 					}
@@ -374,7 +349,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		PathObject CreatePathObject( string szID, TopoDS_Shape shape, IStdPatternGeomData standardPatternGeomData, ContourPathObject contourPathObject, PathObject originalPathObject )
+		PathObject CreatePathObject( string szID, IStdPatternGeomData standardPatternGeomData, ContourPathObject contourPathObject, PathObject originalPathObject )
 		{
 			if( contourPathObject == null ) {
 				return null;
@@ -384,16 +359,16 @@ namespace MyCAM.Editor
 			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
 			switch( pathType ) {
 				case PathType.Circle:
-					return new CirclePathObject( szID, shape, standardPatternGeomData as CircleGeomData, craftData, contourPathObject );
+					return new CirclePathObject( szID, standardPatternGeomData as CircleGeomData, craftData, contourPathObject );
 				case PathType.Rectangle:
-					return new RectanglePathObject( szID, shape, standardPatternGeomData as RectangleGeomData, craftData, contourPathObject );
+					return new RectanglePathObject( szID, standardPatternGeomData as RectangleGeomData, craftData, contourPathObject );
 				case PathType.Runway:
-					return new RunwayPathObject( szID, shape, standardPatternGeomData as RunwayGeomData, craftData, contourPathObject );
+					return new RunwayPathObject( szID, standardPatternGeomData as RunwayGeomData, craftData, contourPathObject );
 				case PathType.Triangle:
 				case PathType.Square:
 				case PathType.Pentagon:
 				case PathType.Hexagon:
-					return new PolygonPathObject( szID, shape, standardPatternGeomData as PolygonGeomData, craftData, contourPathObject );
+					return new PolygonPathObject( szID, standardPatternGeomData as PolygonGeomData, craftData, contourPathObject );
 				case PathType.Contour:
 				default:
 					return contourPathObject;
