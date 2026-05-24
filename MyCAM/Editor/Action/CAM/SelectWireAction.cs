@@ -149,10 +149,12 @@ namespace MyCAM.Editor
 		{
 			if( e.Button == MouseButtons.Left ) {
 				if( m_Viewer.GetAISContext().DetectedOwner().IsNull()
-					|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
-					m_Viewer.GetAISContext().ClearSelected( true );
-					return;
-				}
+						|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
+						if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
+							m_Viewer.GetAISContext().ClearSelected( true );
+						}
+						return;
+					}
 				AIS_InteractiveObject detectedObject = m_Viewer.GetAISContext().DetectedInteractive();
 				if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
 					m_Viewer.GetAISContext().ClearSelected( false );
@@ -165,7 +167,12 @@ namespace MyCAM.Editor
 		protected override void ViewerMouseDoubleClick( MouseEventArgs e )
 		{
 			if( e.Button == MouseButtons.Left ) {
-				SelectClosedWire();
+				if( m_Viewer.GetAISContext().DetectedOwner().IsNull()
+					|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
+					return;
+				}
+				AIS_InteractiveObject detectedObject = m_Viewer.GetAISContext().DetectedInteractive();
+				SelectClosedWireFromDetected( detectedObject );
 			}
 		}
 
@@ -176,40 +183,42 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void SelectClosedWire()
+		void SelectClosedWireFromDetected( AIS_InteractiveObject detectedObject )
 		{
-			List<TopoDS_Edge> selectedEdges = GetSelectedEdgeList();
-			if( selectedEdges.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇邊", MyApp.NoticeType.Hint );
+			// get the edge from the detected AIS object
+			AIS_Shape detectedAISShape = AIS_Shape.DownCast( detectedObject );
+			if( detectedAISShape == null || detectedAISShape.IsNull() ) {
+				return;
+			}
+			TopoDS_Shape detectedShape = detectedAISShape.Shape();
+			if( detectedShape == null || detectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_EDGE ) {
+				return;
+			}
+			TopoDS_Edge detectedEdge = TopoDS.ToEdge( detectedShape );
+
+			// find the wire that contains this edge
+			List<EdgeHandle> wireHandles = null;
+			foreach( var handle in m_EdgeAISPairList ) {
+				if( handle.Edge.IsEqual( detectedEdge ) ) {
+					m_EdgeHandleToWireMap.TryGetValue( handle, out wireHandles );
+					break;
+				}
+			}
+			if( wireHandles == null ) {
 				return;
 			}
 
-			// find all selected edge handles
-			List<EdgeHandle> selectedHandles = new List<EdgeHandle>();
-			foreach( var selectedEdge in selectedEdges ) {
-				foreach( var handle in m_EdgeAISPairList ) {
-					if( handle.Edge.IsEqual( selectedEdge ) ) {
-						selectedHandles.Add( handle );
-						break;
-					}
-				}
+			// clear current selection if Ctrl is not held
+			if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
+				m_Viewer.GetAISContext().ClearSelected( false );
+			}
+			else {
+				// undo the single-click toggle on the detected edge
+				m_Viewer.GetAISContext().AddOrRemoveSelected( detectedAISShape, false );
 			}
 
-			// collect all wire handles that belong to the same wires as selected edges
-			HashSet<EdgeHandle> allWireHandles = new HashSet<EdgeHandle>();
-			foreach( var handle in selectedHandles ) {
-				if( m_EdgeHandleToWireMap.TryGetValue( handle, out var wireHandles ) ) {
-					foreach( var wireHandle in wireHandles ) {
-						allWireHandles.Add( wireHandle );
-					}
-				}
-			}
-
-			// clear current selection
-			m_Viewer.GetAISContext().ClearSelected( false );
-
-			// select all edges that belong to the same wires
-			foreach( var handle in allWireHandles ) {
+			// select all edges that belong to the same wire
+			foreach( var handle in wireHandles ) {
 				m_Viewer.GetAISContext().AddOrRemoveSelected( handle.AIS, false );
 			}
 			m_Viewer.UpdateView();
