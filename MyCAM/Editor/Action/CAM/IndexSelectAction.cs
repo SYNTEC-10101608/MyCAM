@@ -15,9 +15,11 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal abstract class IndexSelectAction : KeyMouseActionBase
+	internal class IndexSelectAction : KeyMouseActionBase
 	{
-		protected IndexSelectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
+		public Action<int, TopoDS_Shape> IndexChanged;
+
+		public IndexSelectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
 			if( string.IsNullOrEmpty( pathID ) ) {
@@ -65,20 +67,17 @@ namespace MyCAM.Editor
 			m_VertexMap = tempVertexMap;
 		}
 
+		public override EditActionType ActionType
+		{
+			get { return EditActionType.SelectObject; }
+		}
+
 		public override void Start()
 		{
 			base.Start();
 
 			// clear selection
 			m_Viewer.GetAISContext().ClearSelected( true );
-
-			// disable tree view
-			m_TreeView.Enabled = false;
-
-			// deactivate all
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
-			}
 
 			// show select point
 			ShowSelectPoint();
@@ -89,26 +88,21 @@ namespace MyCAM.Editor
 			// clear selection
 			m_Viewer.GetAISContext().ClearSelected( true );
 
-			// enable tree view
-			m_TreeView.Enabled = true;
-
 			// hide select point
 			HideSelectPoint();
 			base.End();
 		}
 
-		public void Pause()
+		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
-			// stop active mode
-			HideSelectPoint();
-			IsPausedSelectMode = true;
-		}
-
-		public void Resume()
-		{
-			// open active mode
-			ShowSelectPoint();
-			IsPausedSelectMode = false;
+			if( e.Button != MouseButtons.Left ) {
+				return;
+			}
+			int? index = GetSelectIndex( out TopoDS_Shape selectedShape );
+			if( index == null ) {
+				return;
+			}
+			IndexChanged?.Invoke( index.Value, selectedShape );
 		}
 
 		protected int? GetSelectIndex( out TopoDS_Shape selectedShape )
@@ -201,7 +195,6 @@ namespace MyCAM.Editor
 		protected TopTools_DataMapOfShapeInteger m_VertexMap;
 		protected AIS_Shape m_SelectedPointAIS;
 
-		// flag to check is pause mode or not
-		protected bool IsPausedSelectMode = false;
+
 	}
 }

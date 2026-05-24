@@ -1,6 +1,7 @@
 ﻿using MyCAM.Data;
 using OCCViewer;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -26,6 +27,37 @@ namespace MyCAM.Editor
 
 				// Sync the selection to both tree view and viewer
 				SyncSelectionFromSet();
+			}
+		}
+
+		public void ExcludeFromSelection( string pathID )
+		{
+			if( string.IsNullOrEmpty( pathID ) ) {
+				return;
+			}
+			if( m_ExcludedIDSet == null ) {
+				m_ExcludedIDSet = new HashSet<string>();
+			}
+			m_ExcludedIDSet.Add( pathID );
+			m_SelectedIDSet.Remove( pathID );
+
+			// deactivate excluded path on viewer
+			if( m_ViewManager.ViewObjectMap.ContainsKey( pathID ) ) {
+				m_Viewer.GetAISContext().Deactivate( m_ViewManager.ViewObjectMap[ pathID ].AISHandle );
+			}
+		}
+
+		public void RestoreFromExclusion( string pathID )
+		{
+			if( string.IsNullOrEmpty( pathID ) || m_ExcludedIDSet == null ) {
+				return;
+			}
+			m_ExcludedIDSet.Remove( pathID );
+			m_SelectedIDSet.Add( pathID );
+
+			// re-activate restored path on viewer
+			if( m_ViewManager.ViewObjectMap.ContainsKey( pathID ) ) {
+				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ pathID ].AISHandle );
 			}
 		}
 
@@ -60,22 +92,25 @@ namespace MyCAM.Editor
 
 			// get the selected ID
 			foreach( TreeNode node in ( m_TreeView as MultiSelectTreeView ).SelectedNodes ) {
-				if( node == null || string.IsNullOrEmpty( node.Text ) || node == m_ViewManager.PathNode ) {
+				if( node == null || node == m_ViewManager.PathNode ) {
 					continue;
 				}
 
-				string nodeText = node.Text;
-				if( nodeText.EndsWith( " 🚩" ) ) {
-					nodeText = nodeText.Substring( 0, nodeText.Length - 3 );
+				// use Tag for ID mapping to avoid dependency on display text
+				string nodeID = node.Tag as string;
+				if( string.IsNullOrEmpty( nodeID ) ) {
+					continue;
 				}
-				// the node text is "Path_xxx", xxx is the order of path in pathID list
-				if( int.TryParse( nodeText.Substring( CAMEditor.PATH_NODE_PERFIX_LENGTH ), out int index ) ) {
+				if( int.TryParse( nodeID.Substring( CAMEditor.PATH_NODE_PERFIX_LENGTH ), out int index ) ) {
 
 					// check index, note that index is 1 based
 					if( index < 1 || index > m_DataManager.PathIDList.Count ) {
 						continue;
 					}
 					string szPathID = m_DataManager.PathIDList[ index - 1 ];
+					if( m_ExcludedIDSet != null && m_ExcludedIDSet.Contains( szPathID ) ) {
+						continue;
+					}
 					m_SelectedIDSet.Add( szPathID );
 				}
 			}
@@ -116,5 +151,7 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 			SelectionChange?.Invoke();
 		}
+
+		HashSet<string> m_ExcludedIDSet;
 	}
 }

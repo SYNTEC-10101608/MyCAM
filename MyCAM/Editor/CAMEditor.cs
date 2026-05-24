@@ -344,9 +344,10 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
-			action.PropertyChanged += ShowCAMData;
-			StartEditAction( action );
+			EndActionIfNotDefault();
+				StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First(), m_DefaultAction as SelectPathAction );
+				action.PropertyChanged += ShowCAMData;
+				StartEditAction( action );
 		}
 
 		public void SetReverse()
@@ -406,7 +407,8 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
-			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
+			EndActionIfNotDefault();
+			ToolVectorAction action = new ToolVectorAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First(), m_DefaultAction as SelectPathAction );
 
 			// register before init, cause init will change select node to start point, machine need to translate
 			action.RaiseTrans += SetTrans;
@@ -660,9 +662,10 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]此功能僅支援輪廓路徑", MyApp.NoticeType.Hint );
 				return;
 			}
-			ContourEditAction action = new ContourEditAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathID );
-			action.PropertyChanged += () => ShowCAMData( new List<string>() { szPathID } );
-			StartEditAction( action );
+			EndActionIfNotDefault();
+				ContourEditAction action = new ContourEditAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathID, m_DefaultAction as SelectPathAction );
+				action.PropertyChanged += ShowCAMData;
+				StartEditAction( action );
 		}
 
 		public void SetPathLayer( int nTechLayer )
@@ -708,9 +711,10 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
-			MicroJointAction action = new MicroJointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First() );
-			action.PropertyChanged += ShowCAMData;
-			StartEditAction( action );
+			EndActionIfNotDefault();
+				MicroJointAction action = new MicroJointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First(), m_DefaultAction as SelectPathAction );
+				action.PropertyChanged += ShowCAMData;
+				StartEditAction( action );
 		}
 
 		#endregion
@@ -723,7 +727,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			EndActionIfNotDefault();
-			ManualOrderAction action = new ManualOrderAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+			ManualOrderAction action = new ManualOrderAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, m_DefaultAction as SelectPathAction );
 			action.ShowOrderData += ShowAllCAMData;
 			action.RaiseActionStart += ManualStartIO;
 
