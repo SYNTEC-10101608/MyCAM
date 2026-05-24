@@ -109,10 +109,12 @@ namespace MyCAM.Editor
 		{
 			if( e.Button == MouseButtons.Left ) {
 				if( m_Viewer.GetAISContext().DetectedOwner().IsNull()
-					|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
-					m_Viewer.GetAISContext().ClearSelected( true );
-					return;
-				}
+						|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
+						if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
+							m_Viewer.GetAISContext().ClearSelected( true );
+						}
+						return;
+					}
 				AIS_InteractiveObject detectedObject = m_Viewer.GetAISContext().DetectedInteractive();
 				if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
 					m_Viewer.GetAISContext().ClearSelected( false );
@@ -125,7 +127,12 @@ namespace MyCAM.Editor
 		protected override void ViewerMouseDoubleClick( MouseEventArgs e )
 		{
 			if( e.Button == MouseButtons.Left ) {
-				SelectD1ContFace();
+				if( m_Viewer.GetAISContext().DetectedOwner().IsNull()
+					|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
+					return;
+				}
+				AIS_InteractiveObject detectedObject = m_Viewer.GetAISContext().DetectedInteractive();
+				SelectD1ContFaceFromDetected( detectedObject );
 			}
 		}
 
@@ -147,6 +154,42 @@ namespace MyCAM.Editor
 			List<TopoDS_Face> d1ContinuousFaceList = BFSFindD1ContFaces( faceBFSQueue );
 
 			m_Viewer.GetAISContext().ClearSelected( false );
+
+			// select all D1 continuous faces
+			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
+				foreach( TopoDS_Face oneFace in d1ContinuousFaceList ) {
+					if( faceAISPair.Face.IsEqual( oneFace ) ) {
+						m_Viewer.GetAISContext().AddOrRemoveSelected( faceAISPair.AIS, false );
+					}
+				}
+			}
+			m_Viewer.UpdateView();
+		}
+
+		void SelectD1ContFaceFromDetected( AIS_InteractiveObject detectedObject )
+		{
+			// get the face from the detected AIS object
+			AIS_Shape detectedAISShape = AIS_Shape.DownCast( detectedObject );
+			if( detectedAISShape == null || detectedAISShape.IsNull() ) {
+				return;
+			}
+			TopoDS_Shape detectedShape = detectedAISShape.Shape();
+			if( detectedShape == null || detectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_FACE ) {
+				return;
+			}
+			TopoDS_Face detectedFace = TopoDS.ToFace( detectedShape );
+
+			// BFS from only the detected face
+			List<TopoDS_Face> d1ContinuousFaceList = BFSFindD1ContFaces( new List<TopoDS_Face> { detectedFace } );
+
+			// clear current selection if Ctrl is not held
+			if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
+				m_Viewer.GetAISContext().ClearSelected( false );
+			}
+			else {
+				// undo the single-click toggle on the detected face
+				m_Viewer.GetAISContext().AddOrRemoveSelected( detectedAISShape, false );
+			}
 
 			// select all D1 continuous faces
 			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
