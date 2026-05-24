@@ -5,6 +5,7 @@ using OCC.Aspect;
 using OCC.gp;
 using OCC.Quantity;
 using OCC.TopAbs;
+using OCC.TopLoc;
 using OCC.TopoDS;
 using OCC.TopTools;
 using OCCViewer;
@@ -386,6 +387,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			TreeNode node = new TreeNode( nodeID );
+			node.Tag = nodeID;
 			PathNode.Nodes.Add( node );
 			TreeNodeMap.Add( nodeID, node );
 		}
@@ -437,8 +439,9 @@ namespace MyCAM.Editor
 				return string.Empty;
 			}
 
-			if( m_ShapeToIDHashMap.IsBound( shape ) ) {
-				int idHash = m_ShapeToIDHashMap.Find( shape );
+			TopoDS_Shape regShape = shape.Located( new TopLoc_Location() );
+			if( m_ShapeToIDHashMap.IsBound( regShape ) ) {
+				int idHash = m_ShapeToIDHashMap.Find( regShape );
 				if( m_HashToIDDict.TryGetValue( idHash, out string id ) ) {
 					return id;
 				}
@@ -467,10 +470,11 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			TopoDS_Shape regShape = shape.Located( new TopLoc_Location() );
 			int idHash = id.GetHashCode();
-			m_ShapeToIDHashMap.Bind( shape, idHash );
+			m_ShapeToIDHashMap.Bind( regShape, idHash );
 			m_HashToIDDict[ idHash ] = id;
-			m_HashToShapeDict[ idHash ] = shape;
+			m_HashToShapeDict[ idHash ] = regShape;
 		}
 
 		void UnregisterShapeIDMapping( TopoDS_Shape shape )
@@ -479,9 +483,10 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			if( m_ShapeToIDHashMap.IsBound( shape ) ) {
-				int idHash = m_ShapeToIDHashMap.Find( shape );
-				m_ShapeToIDHashMap.UnBind( shape );
+			TopoDS_Shape regShape = shape.Located( new TopLoc_Location() );
+			if( m_ShapeToIDHashMap.IsBound( regShape ) ) {
+				int idHash = m_ShapeToIDHashMap.Find( regShape );
+				m_ShapeToIDHashMap.UnBind( regShape );
 				m_HashToIDDict.Remove( idHash );
 				m_HashToShapeDict.Remove( idHash );
 			}

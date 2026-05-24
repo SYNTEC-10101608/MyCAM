@@ -3,22 +3,23 @@ using MyCAM.Data;
 using OCC.AIS;
 using OCCViewer;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class ManualOrderAction : SelectPathAction
+	internal class ManualOrderAction : KeyMouseActionBase
 	{
 		public Action ShowOrderData;
 		public Action<bool> RaiseActionStart;
 
-		public ManualOrderAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+		public ManualOrderAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, SelectPathAction selectPathAction )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
 			m_OrderMode = OrderMode.Sequential;
 			m_CurrentFlagIndex = 0;
-			m_TreeView = treeView;
+			m_SelectPathAction = selectPathAction;
 		}
 
 		public override EditActionType ActionType
@@ -32,6 +33,10 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
+
+			// start the shared select path action
+			m_SelectPathAction.Start();
+
 			m_OrderDialog = new OrderDialog();
 			m_OrderDialog.OrderModeChanged += ( mode ) => ChangeOrderMode( mode );
 			m_OrderDialog.EnterKeyPressed += HandleSequentialOrderEnter;
@@ -53,7 +58,7 @@ namespace MyCAM.Editor
 
 		public override void End()
 		{
-			// this end is triiger by other editor will need to close Dlg
+			// this end is triggered by other editor will need to close Dlg
 			if( m_OrderDialog != null && !m_OrderDialog.IsDisposed ) {
 
 				// unsubscribe events to avoid errors after dialog closed
@@ -75,19 +80,12 @@ namespace MyCAM.Editor
 				multiSelectTreeView.NodeDoubleClicked -= TreeViewNodeDoubleClick;
 			}
 
-			ClearSelection();
+			// end the shared select path action
+			m_SelectPathAction.End();
+
 			ClearFlagPath();
 			RaiseActionStart?.Invoke( false );
 			base.End();
-		}
-
-		protected override void OnKeyDown( KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Enter ) {
-				HandleSequentialOrderEnter();
-				e.Handled = true;
-			}
-			base.OnKeyDown( e );
 		}
 
 		protected override void ViewerMouseDoubleClick( MouseEventArgs e )
@@ -105,6 +103,22 @@ namespace MyCAM.Editor
 				if( m_OrderMode == OrderMode.Sequential ) {
 					ChangeFlagIndex();
 				}
+			}
+		}
+
+		protected override void ViewerKeyDown( KeyEventArgs e )
+		{
+			if( e.KeyCode == Keys.Enter ) {
+				HandleSequentialOrderEnter();
+				e.Handled = true;
+			}
+		}
+
+		protected override void TreeViewKeyDown( object sender, KeyEventArgs e )
+		{
+			if( e.KeyCode == Keys.Enter ) {
+				HandleSequentialOrderEnter();
+				e.Handled = true;
 			}
 		}
 
@@ -170,8 +184,9 @@ namespace MyCAM.Editor
 			// update flag display
 			HighLightFlagPath();
 
-			// clear selection
-			ClearSelection();
+			// re-select the moved path to sync tree view
+			m_SelectPathAction.ClearSelection();
+			m_SelectPathAction.SelectPathByID( uniquePathID );
 			ShowOrderData?.Invoke();
 		}
 
@@ -189,12 +204,9 @@ namespace MyCAM.Editor
 			if( m_OrderMode == OrderMode.Sequential ) {
 				HighLightFlagPath();
 			}
-			// tree view select moved node
-			string nodeID = PATH_NODE_PREFIX + ( m_CurrentFlagIndex + 1 ).ToString(); // 1-based index
-			if( m_ViewManager.TreeNodeMap.ContainsKey( nodeID ) ) {
-				ClearSelection();
-				SelectPathByID( uniquePathID );
-			}
+			// re-select the moved path to sync tree view
+			m_SelectPathAction.ClearSelection();
+			m_SelectPathAction.SelectPathByID( uniquePathID );
 			ShowOrderData?.Invoke();
 		}
 
@@ -224,13 +236,10 @@ namespace MyCAM.Editor
 				m_DataManager.PathIDList.Insert( newIndex, uniquePathID );
 			}
 
-			string nodeID = PATH_NODE_PREFIX + ( newIndex + 1 ).ToString();
-			// tree view select moved node
-			if( m_ViewManager.TreeNodeMap.ContainsKey( nodeID ) ) {
-				ClearSelection();
-				SelectPathByID( uniquePathID );
-			}
-			ShowOrderData();
+			// re-select the moved path to sync tree view
+			m_SelectPathAction.ClearSelection();
+			m_SelectPathAction.SelectPathByID( uniquePathID );
+			ShowOrderData?.Invoke();
 		}
 
 		bool GetSelectUniqueIDAndOrderIdx( out string uniquePathID, out int pathOrderIdx )
@@ -239,20 +248,21 @@ namespace MyCAM.Editor
 			pathOrderIdx = -1;
 
 			// get current selected path
-			if( m_SelectedIDSet.Count != 1 ) {
+			List<string> selectedIDs = m_SelectPathAction.GetSelectedIDs();
+			if( selectedIDs.Count != 1 ) {
 
-				if( m_SelectedIDSet.Count == 0 ) {
+				if( selectedIDs.Count == 0 ) {
 					MyApp.Logger.ShowOnLogPanel( "[操作提醒]未選取任何路徑", MyApp.NoticeType.Hint );
 				}
 				else {
 
 					// only handle single selection
 					MyApp.Logger.ShowOnLogPanel( "[操作提醒]本功能僅支援單路徑選擇", MyApp.NoticeType.Hint );
-					ClearSelection();
+					m_SelectPathAction.ClearSelection();
 				}
 				return false;
 			}
-			uniquePathID = m_SelectedIDSet.First();
+			uniquePathID = selectedIDs.First();
 			pathOrderIdx = m_DataManager.PathIDList.IndexOf( uniquePathID );
 			if( pathOrderIdx == -1 ) {
 				return false;
@@ -294,12 +304,11 @@ namespace MyCAM.Editor
 			}
 		}
 
+		SelectPathAction m_SelectPathAction;
 		TreeNode m_FlagNode;
 		OrderDialog m_OrderDialog;
 		OrderMode m_OrderMode;
 		int m_CurrentFlagIndex;
 		const int START_Indx = 0;
-		public const string PATH_NODE_PREFIX = "Path_";
-		public const int PATH_NODE_PERFIX_LENGTH = 5;
 	}
 }
