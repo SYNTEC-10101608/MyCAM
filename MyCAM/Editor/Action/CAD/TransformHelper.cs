@@ -50,18 +50,21 @@ namespace MyCAM.Editor
 				m_DataManager.CalibrationData = calibrationData;
 			}
 
-			// update viewer
-			foreach( var szObjID in transformObjIDList ) {
-				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szObjID ].AISHandle );
+			// update viewer for part
+			foreach( string szPartID in m_DataManager.PartIDList ) {
+				AIS_Shape oneAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szPartID ].AISHandle );
 				if( oneAIS == null || oneAIS.IsNull() ) {
 					continue;
 				}
-				if( !DataGettingHelper.GetShapeObject( szObjID, out IShapeObject szObjShape ) ) {
+				if( !DataGettingHelper.GetShapeObject( szPartID, out IShapeObject szObjShape ) ) {
 					continue;
 				}
 				oneAIS.SetShape( szObjShape.Shape );
 				m_Viewer.GetAISContext().Redisplay( oneAIS, false );
 			}
+
+			// update viewer for path
+			m_ViewManager.UpdatePaths( m_DataManager.PathIDList );
 			m_Viewer.UpdateView();
 		}
 
