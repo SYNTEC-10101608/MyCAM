@@ -1,6 +1,6 @@
-﻿using MyCAM.App;
-using MyCAM.Data;
+﻿using MyCAM.Data;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -307,13 +307,13 @@ namespace MyCAM.Editor
 			// index 3: MasterNormalSlaveInterpolation => "A軸法向量且C軸插值"
 			if( m_cbxInterpolateType.Items.Count > (int)EToolVecInterpolateType.MasterNormalSlaveInterpolation ) {
 				m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterNormalSlaveInterpolation ] =
-					masterName + "軸法向量且" + slaveName + "軸插值";
+					 slaveName + "軸平滑";
 			}
 
 			// index 4: MasterInterpolationSlaveNormal => "C軸插值且A軸法向量"
 			if( m_cbxInterpolateType.Items.Count > (int)EToolVecInterpolateType.MasterInterpolationSlaveNormal ) {
 				m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterInterpolationSlaveNormal ] =
-					slaveName + "軸法向量且" + masterName + "軸插值";
+					masterName + "軸平滑";
 			}
 		}
 	}

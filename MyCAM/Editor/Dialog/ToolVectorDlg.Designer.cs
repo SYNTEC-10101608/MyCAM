@@ -450,11 +450,11 @@
             this.m_cbxInterpolateType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.m_cbxInterpolateType.FormattingEnabled = true;
             this.m_cbxInterpolateType.Items.AddRange(new object[] {
-            "曲面法向量",
-            "旋轉軸插值",
-            "傾角插值",
-            "主軸法向量且從軸插值",
-            "從軸法向量且主軸插值"});
+            "維持默認",
+            "旋轉軸平滑",
+            "傾角切坡口",
+            "從軸平滑",
+            "主軸平滑"});
             this.m_cbxInterpolateType.Location = new System.Drawing.Point(135, 163);
             this.m_cbxInterpolateType.Name = "m_cbxInterpolateType";
             this.m_cbxInterpolateType.Size = new System.Drawing.Size(204, 23);
