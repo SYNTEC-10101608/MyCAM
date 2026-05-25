@@ -7,6 +7,7 @@ using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
+using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,8 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using TpCADCore;
+using TpCADUI;
 using VNCFormsApp;
 
 namespace MyCAM
@@ -227,6 +230,24 @@ namespace MyCAM
 		void m_tsbSaveProjectFile_Click( object sender, EventArgs e )
 		{
 			m_CADEditor.SaveProjectFile();
+		}
+
+		void m_tsbAddTube_Click( object sender, EventArgs e )
+		{
+			CADEditMainForm form = new CADEditMainForm();
+			form.SetCadMapToModify( null );
+			form.CreateNewTube += CreateTube;
+			form.StartPosition = FormStartPosition.Manual;
+			form.Location = new Point( this.Location.X, this.Location.Y );
+			form.Size = new Size( this.Width, this.Height );
+			form.ShowDialog( this );
+		}
+
+		void CreateTube( TopoDS_Shape rawTubeShape, CADFeatureParamMap cadMap, bool isModifying, ref bool isCancelImport, ref bool bImportSuccess )
+		{
+			isCancelImport = false;
+			bImportSuccess = true;
+			m_CADEditor.ImportTube( rawTubeShape );
 		}
 
 		// sew part

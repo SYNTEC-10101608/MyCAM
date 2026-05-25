@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Circle" Content="圓" />
+  <Message ID="Rectangle" Content="矩形" />
+  <Message ID="Oval" Content="橢圓" />
+  <Message ID="FlatOval" Content="跑道" />
+  <Message ID="DShape" Content="D形" />
+  <Message ID="VShape" Content="尖角V槽" />
+  <Message ID="BothSide" Content="圓角V槽" />
+  <Message ID="OneSide" Content="單側圓角V槽" />
+  <Message ID="MainTube" Content="主管" />
+  <Message ID="EndCutter" Content="切斷" />
+  <Message ID="BranchTube" Content="支管" />
+  <Message ID="BendingNotch" Content="V槽" />
+  <Message ID="ErrorCode_OK" Content="完成" />
+  <Message ID="ErrorCode_NullParam" Content="流程錯誤 - 參數為 null" />
+  <Message ID="ErrorCode_NoMainTube" Content="流程錯誤 - 主管為 null" />
+  <Message ID="ErrorCode_NoSelectedObject" Content="流程錯誤 - 特徵為 null" />
+  <Message ID="ErrorCode_InvalidParam" Content="不合理的參數" />
+  <Message ID="ErrorCode_MakeShapeFailed" Content="無法生成特徵" />
+  <Message ID="ErrorCode_CanNotRemoveMainTube" Content="不可移除主管" />
+  <Message ID="ErrorCode_ImportFileFailed" Content="匯入失敗" />
+  <Message ID="ErrorCode_SaveFileFailed" Content="存檔失敗" />
+  <Message ID="CADConstraint_FailCreateMainTube" Content="因管件最大包覆圓直徑限制，無法生成該類型的主管" />
+  <Message ID="CADConstraint_TubeLengthTooLong" Content="管長需小於等於加工中管件長度限制" />
+  <Message ID="CADConstraint_DiameterTooLarge" Content="直徑需小於等於管件最大包覆圓直徑" />
+  <Message ID="CADConstraint_DiagonalTooLarge" Content="對角線長度需小於等於管件最大包覆圓直徑" />
+  <Message ID="CADConstraint_HeightTooLarge" Content="高需小於等於管件最大包覆圓直徑" />
+  <Message ID="CADConstraint_TwoTimesRadiusTooLarge" Content="兩倍半徑需小於等於管件最大包覆圓直徑" />
+  <Message ID="CADConstraint_WidthTooLarge" Content="寬需小於等於管徑最大包覆圓直徑" />
+</ResMap>

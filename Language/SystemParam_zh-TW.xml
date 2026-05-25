@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <!-- Page Name -->
+  <Message ID="Page::GasParam" Content="氣體參數" />
+  <Message ID="Page::ProcessMovementParam" Content="加工移動參數" />
+  <Message ID="Page::PullMaterialMainMachineParam" Content="拉料主機參數" />
+  <Message ID="Page::FindMaterialFrontTipParam" Content="尋料頭參數" />
+  <Message ID="Page::FindMaterialEndTipParam" Content="尋料尾參數" />
+  <Message ID="Page::RackParam" Content="料架參數" />
+  <!-- Parameter setting -->
+  <!-- Group -->
+  <Message ID="Param::GasWashingPressure1" Content="一號氣洗管壓力" />
+  <Message ID="Param::GasWashingPressure2" Content="二號氣洗管壓力" />
+  <Message ID="Param::GasWashingTime1" Content="一號氣洗管時間" />
+  <Message ID="Param::GasWashingTime2" Content="二號氣洗管時間" />
+  <Message ID="Param::GasChangeDelayTime" Content="換氣延時" />
+  <Message ID="Param::GasControlDelayTime" Content="氣體控制延遲時間" />
+  <!-- Group -->
+  <Message ID="Param::DefaultSpeedOfCutterMovingDown" Content="預設下刀速度" />
+  <Message ID="Param::ShiftSpeed" Content="空移速度" />
+  <Message ID="Param::FrameDryRunSpeed" Content="走邊框速度" />
+  <Message ID="Param::GoToZeroSpeed" Content="回零速度" />
+  <Message ID="Param::FrogLeapStartingHeight" Content="蛙跳起始高度" />
+  <Message ID="Param::FrogLeapFunction" Content="蛙跳功能開關" />
+  <Message ID="Param::FrogLeapOn" Content="開" />
+  <Message ID="Param::FrogLeapOff" Content="關" />
+  <Message ID="Param::FrogLeapPr401" Content="蛙跳Pr401 切削時的加減速時間" />
+  <Message ID="Param::FrogLeapPr402" Content="蛙跳Pr402 1G重力加速度加減速時間" />
+  <Message ID="Param::FrogLeapPr405" Content="蛙跳Pr405 切削時的最高速度" />
+  <Message ID="Param::FrogLeapPr406" Content="蛙跳Pr406 轉角參考速度" />
+  <Message ID="Param::FrogLeapPr408" Content="蛙跳Pr408 半徑5mm圓弧切削參考速度" />
+  <Message ID="Param::CuttingTouchDelayTime" Content="切割碰板延時" />
+  <Message ID="Param::PositioningTouchDelayTime" Content="空移碰板延時" />
+  <Message ID="Param::PiercingTouchDelayTime" Content="穿孔碰板延時" />
+  <Message ID="Param::EnableLockZ" Content="Z軸鎖定" />
+  <Message ID="Param::PositioningLockZ" Content="空移不上抬距離" />
+  <Message ID="Param::LaserOnCompensationTime" Content="雷射開光補償時間" />
+  <Message ID="Param::LaserOffCompensationTime" Content="雷射關光補償時間" />
+  <Message ID="Param::ArcCuttingReferenceSpeed" Content="圓弧切削參考速度" />
+  <Message ID="Param::XJogSpeed" Content="X軸一般吋動速度" />
+  <Message ID="Param::YJogSpeed" Content="Y軸一般吋動速度" />
+  <Message ID="Param::ChuckJogSpeed" Content="卡盤軸一般吋動速度" />
+  <!-- Group -->
+  <Message ID="Param::EdgeSeekSpeed" Content="尋邊速度" />
+  <Message ID="Param::EdgeSeekHeight" Content="尋邊高度" />
+  <Message ID="Param::EdgeSeekSensitivity" Content="尋邊靈敏度" />
+  <Message ID="Param::ExtendLength" Content="端面伸出長度" />
+  <!-- Group -->
+  <Message ID="Param::TubeAxialOriginAndLoadingSensorDistance" Content="管長軸原點與入料感測距離" />
+  <Message ID="Param::FindEndTipSpeed" Content="找料尾速度" />
+  <Message ID="Param::FindEndTipReturnSpeed" Content="找料尾回退速度" />
+  <Message ID="Param::EndTipDistanceLimit" Content="料尾極限距離" />
+</ResMap>

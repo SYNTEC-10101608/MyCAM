@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Center_X_Y" Content="X位置" />
+  <Message ID="Center_X_X" Content="Y位置" />
+  <Message ID="Center_Y_Y" Content="Y位置" />
+  <Message ID="Center_Y_X" Content="X位置" />
+  <Message ID="Center_Z" Content="Z位置" />
+  <Message ID="SelfRotateAngle_deg" Content="自轉角度" />
+  <Message ID="AAngle_deg_Y" Content="A角度 (X旋轉)" />
+  <Message ID="AAngle_deg_X" Content="B角度 (Y旋轉)" />
+  <Message ID="BAngle_deg_Y" Content="B角度 (Y旋轉)" />
+  <Message ID="BAngle_deg_X" Content="A角度 (X旋轉)" />
+  <Message ID="Shape" Content="幾何參數" />
+  <Message ID="IntersectDir" Content="相貫方向" />
+  <Message ID="IsCutThrough" Content="完全貫穿" />
+  <Message ID="Length" Content="支管長度" />
+  <Message ID="ArrayParam" Content="陣列參數" />
+</ResMap>

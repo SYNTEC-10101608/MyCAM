@@ -73,6 +73,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap CAD_AddTube {
+            get {
+                object obj = ResourceManager.GetObject("CAD_AddTube", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap CAD_AxisTrans {
             get {
                 object obj = ResourceManager.GetObject("CAD_AxisTrans", resourceCulture);

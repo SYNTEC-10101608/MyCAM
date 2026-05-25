@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="I51" Content="冷水機警報" />
+  <Message ID="I53" Content="雷射源警報" />
+  <Message ID="I54" Content="安全感應" />
+  <Message ID="I55" Content="開始" />
+  <Message ID="I56" Content="停止" />
+  <Message ID="I57" Content="急停" /> 
+  <Message ID="I200" Content="入料感測" />
+  <Message ID="I201" Content="" />
+  
+  <Message ID="O2" Content="雷射源Enable" />
+
+  <Message ID="O200" Content="夾鉗放" />
+  <Message ID="O201" Content="夾鉗夾" />
+  <Message ID="O202" Content="卡盤放" />
+  <Message ID="O203" Content="卡盤夾" />
+  <Message ID="O204" Content="" />
+  <Message ID="O206" Content="" />
+  
+  <Message ID="O0" Content="氮氣" />
+  <Message ID="O8" Content="氧氣" />
+  <Message ID="O9" Content="空氣" />
+  
+  <Message ID="I400" Content="料架自動模式" />
+  <Message ID="I401" Content="揹料上" />
+  <Message ID="I402" Content="揹料下" />
+  <Message ID="I403" Content="有料1" />
+  <Message ID="I404" Content="有料2" />
+  <Message ID="I405" Content="有料3" />
+  <Message ID="I406" Content="揹料軸有料" />
+  <Message ID="I407" Content="" />
+
+  <Message ID="O400" Content="料夾放" />
+  <Message ID="O401" Content="料夾夾" />
+  <Message ID="O402" Content="推料退" />
+  <Message ID="O403" Content="推料進" />
+  <Message ID="O404" Content="接料下" />
+  <Message ID="O405" Content="接料上" />
+  <Message ID="O406" Content="壓料打開" />
+  <Message ID="O407" Content="壓料夾緊" />
+  <Message ID="O408" Content="限制缸下" />
+  <Message ID="O409" Content="限制缸上" />
+</ResMap>

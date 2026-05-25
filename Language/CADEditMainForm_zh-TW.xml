@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="m_tsbtnMainTube_Circle" Content="圓" />
+  <Message ID="m_tsbtnMainTube_Rectangle" Content="矩形" />
+  <Message ID="m_tsbtnMainTube_Oval" Content="橢圓" />
+  <Message ID="m_tsbtnMainTube_FlatOval" Content="跑道" />
+  <Message ID="m_tsbtnMainTube_DShape" Content="D形" />
+  <Message ID="m_tsbtnEndCutter" Content="切斷" />
+  <Message ID="m_tsbtnBranchTube_Circle" Content="圓" />
+  <Message ID="m_tsbtnBranchTube_Rectangle" Content="矩形" />
+  <Message ID="m_tsbtnBranchTube_Oval" Content="橢圓" />
+  <Message ID="m_tsbtnBranchTube_FlatOval" Content="跑道" />
+  <Message ID="m_tsbtnBranchTube_DShape" Content="D形" />
+  <Message ID="m_tsbtnBendingNotch_VShape" Content="尖角V槽" />
+  <Message ID="m_tsbtnBendingNotch_BothSide" Content="圓角V槽" />
+  <Message ID="m_tsbtnBendingNotch_OneSide" Content="單側圓角V槽" />
+  <Message ID="m_tsbtnX_Pos" Content="X+" />
+  <Message ID="m_tsbtnX_Neg" Content="X-" />
+  <Message ID="m_tsbtnY_Pos" Content="Y+" />
+  <Message ID="m_tsbtnY_Neg" Content="Y-" />
+  <Message ID="m_tsbtnZ_Pos" Content="Z+" />
+  <Message ID="m_tsbtnZ_Neg" Content="Z-" />
+  <Message ID="m_tsbtnDir_Pos" Content="特徵方向+" />
+  <Message ID="m_tsbtnDir_Neg" Content="特徵方向-" />
+  <Message ID="m_tsbtnISO" Content="等角投影" />
+  <Message ID="m_tsbtnZoomToFit" Content="最適大小" />
+  <Message ID="m_tsbtnNew" Content="新建" />
+  <Message ID="m_tsbtnImport" Content="匯入" />
+  <Message ID="m_tsbtnSave" Content="存檔" />
+  <Message ID="m_tsbtnSaveAs" Content="另存新檔" />
+  <Message ID="m_tsbtnUndo" Content="復原" />
+  <Message ID="m_tsbtnRedo" Content="重作" />
+  <Message ID="m_tsbtnExport" Content="匯出" />
+  <Message ID="ExportReadFailed" Content="無法識別的管材類型" />
+</ResMap>

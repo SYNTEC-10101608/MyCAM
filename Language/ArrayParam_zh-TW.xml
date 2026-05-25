@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="LinearCount" Content="直線陣列數量" />
+  <Message ID="LinearDistance" Content="直線陣列間距" />
+  <Message ID="LinearDirection" Content="直線陣列方向" />
+  <Message ID="AngularCount" Content="圓周陣列數量" />
+  <Message ID="AngularDistance" Content="圓周陣列間距" />
+  <Message ID="AngularDirection" Content="圓周陣列方向" />
+</ResMap>
