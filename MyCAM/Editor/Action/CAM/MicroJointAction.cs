@@ -14,23 +14,13 @@ namespace MyCAM.Editor
 		public MicroJointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID, SelectPathAction pathIndexAction )
 			: base( dataManager )
 		{
-			if( viewer == null || treeView == null || viewManager == null || pathIndexAction == null ) {
-				throw new ArgumentNullException( "MicroJointAction constructing argument null" );
-			}
-			if( string.IsNullOrEmpty( pathID ) ) {
-				throw new ArgumentException( "MicroJointAction constructing argument pathID invalid" );
-			}
 			m_Viewer = viewer;
 			m_TreeView = treeView;
 			m_ViewManager = viewManager;
+
+			// for path index control
 			m_PathIndexAction = pathIndexAction;
 			m_CurrentPathID = pathID;
-
-			m_PathIDList = new List<string>() { pathID };
-			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
-				throw new ArgumentException( "MicroJointAction constructing argument pathID invalid path ID" );
-			}
-			m_CraftData = craftData;
 		}
 
 		public override EditActionType ActionType
@@ -47,10 +37,10 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 
-			// start path index action
-			m_PathIndexAction.Start();
-			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
+			// setup initial path
+			SetupPath( m_CurrentPathID );
 
+			// create dialog
 			m_Dialog = new MicroJointDlg();
 			m_Dialog.ClearAllAction = OnClearAllClicked;
 			m_Dialog.DeleteAction = OnDeleteClicked;
@@ -58,9 +48,9 @@ namespace MyCAM.Editor
 			m_Dialog.Cancel += End;
 			m_Dialog.Show( MyApp.MainForm );
 
-			// change dlg button state
-			DisableDlgDeleteButton( true );
-			ChangeClearAllState();
+			// start path index action
+			m_PathIndexAction.Start();
+			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
 
 			// activate point selection for initial path
 			ActivatePointSelection();
@@ -68,7 +58,7 @@ namespace MyCAM.Editor
 
 		public override void End()
 		{
-			DeactivatePointSelection();
+			DeactivatePointSelection( m_CurrentPathID );
 
 			// cleanup path index action
 			m_PathIndexAction.SelectionChange -= OnPathIndexChanged;
@@ -86,6 +76,29 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
+		void SetupPath( string pathID )
+		{
+			if( string.IsNullOrEmpty( pathID ) ) {
+				End();
+				return;
+			}
+
+			// validate new path (contour only)
+			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
+				MyApp.Logger.ShowOnLogPanel( $"路徑 {pathID} 不是輪廓路徑，無法編輯", MyApp.NoticeType.Warning );
+				End();
+				return;
+			}
+
+			// init data for current path
+			m_CurrentPathID = pathID;
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
+				MyApp.Logger.ShowOnLogPanel( $"無法獲取路徑 {pathID} 的加工資訊", MyApp.NoticeType.Warning );
+				End();
+				return;
+			}
+		}
+
 		void ActivatePointSelection()
 		{
 			m_PathIndexAction.ExcludeFromSelection( m_CurrentPathID );
@@ -95,38 +108,12 @@ namespace MyCAM.Editor
 			ChangeClearAllState();
 		}
 
-		void DeactivatePointSelection()
+		void DeactivatePointSelection( string szOldPathID )
 		{
+			m_CurrentSelectIndex = DEFAULT_UnselectIdx;
+
 			DestroyPointIndexAction();
-			m_PathIndexAction.RestoreFromExclusion( m_CurrentPathID );
-		}
-
-		void OnPathIndexChanged()
-		{
-			List<string> selectedIDs = m_PathIndexAction.GetSelectedIDs();
-			if( selectedIDs.Count != 1 ) {
-				return;
-			}
-			string newPathID = selectedIDs.First();
-			if( newPathID == m_CurrentPathID ) {
-				return;
-			}
-
-			// validate new path
-			if( !DataGettingHelper.GetCraftDataByID( newPathID, out CraftData newCraftData ) ) {
-				return;
-			}
-
-			// cleanup old state
-			DeactivatePointSelection();
-
-			// switch to new path
-			m_CurrentPathID = newPathID;
-			m_CraftData = newCraftData;
-			m_PathIDList = new List<string>() { newPathID };
-
-			// activate point selection for new path
-			ActivatePointSelection();
+			m_PathIndexAction.RestoreFromExclusion( szOldPathID );
 		}
 
 		void CreatePointIndexAction( string pathID )
@@ -145,6 +132,26 @@ namespace MyCAM.Editor
 			}
 		}
 
+		void OnPathIndexChanged()
+		{
+			List<string> selectedIDs = m_PathIndexAction.GetSelectedIDs();
+			if( selectedIDs.Count != 1 ) {
+				return;
+			}
+			string newPathID = selectedIDs.First();
+			if( newPathID == m_CurrentPathID ) {
+				return;
+			}
+			string szOldPathID = m_CurrentPathID;
+			SetupPath( newPathID );
+
+			// cleanup old state
+			DeactivatePointSelection( szOldPathID );
+
+			// activate point selection for new path
+			ActivatePointSelection();
+		}
+
 		void OnPointIndexChanged( int nIndex, TopoDS_Shape selectedVertex )
 		{
 			m_CurrentSelectIndex = nIndex;
@@ -160,7 +167,7 @@ namespace MyCAM.Editor
 			else {
 				double newLength = m_Dialog?.GetMicroJointLength() ?? DEFAULT_Length;
 				m_CraftData.AddMicroJointStartIdx( nIndex, newLength );
-				PropertyChanged?.Invoke( m_PathIDList );
+				PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
 			}
 
 			// this pnt is micro joint start pnt
@@ -170,11 +177,16 @@ namespace MyCAM.Editor
 
 		const int DEFAULT_UnselectIdx = -1;
 		const double DEFAULT_Length = 2;
-		MicroJointDlg m_Dialog;
-		int m_CurrentSelectIndex = DEFAULT_UnselectIdx;
-		CraftData m_CraftData;
-		List<string> m_PathIDList;
+
+		// path index control
 		string m_CurrentPathID;
+		CraftData m_CraftData;
+
+		// point index control
+		int m_CurrentSelectIndex = DEFAULT_UnselectIdx;
+
+		// action utility
+		MicroJointDlg m_Dialog;
 
 		// composition references
 		Viewer m_Viewer;
@@ -188,7 +200,7 @@ namespace MyCAM.Editor
 		void OnClearAllClicked()
 		{
 			m_CraftData.ClearMicroJointStartIdx();
-			PropertyChanged?.Invoke( m_PathIDList );
+			PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
 			DisableDlgDeleteButton( true );
 			ChangeClearAllState();
 		}
@@ -197,7 +209,7 @@ namespace MyCAM.Editor
 		{
 			if( m_CurrentSelectIndex != DEFAULT_UnselectIdx && m_CraftData.MicroJointStartIdxMap.ContainsKey( m_CurrentSelectIndex ) ) {
 				m_CraftData.RemoveMicroJointStartIdx( m_CurrentSelectIndex );
-				PropertyChanged?.Invoke( m_PathIDList );
+				PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
 				DisableDlgDeleteButton( true );
 				ChangeClearAllState();
 			}
@@ -207,7 +219,7 @@ namespace MyCAM.Editor
 		{
 			if( m_CurrentSelectIndex != DEFAULT_UnselectIdx && m_CraftData.MicroJointStartIdxMap.ContainsKey( m_CurrentSelectIndex ) ) {
 				m_CraftData.AddMicroJointStartIdx( m_CurrentSelectIndex, newLength );
-				PropertyChanged?.Invoke( m_PathIDList );
+				PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
 			}
 		}
 

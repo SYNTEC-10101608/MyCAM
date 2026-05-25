@@ -1,7 +1,6 @@
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
-using OCC.AIS;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
@@ -16,21 +15,13 @@ namespace MyCAM.Editor
 		public ContourEditAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID, SelectPathAction pathIndexAction )
 			: base( dataManager )
 		{
-			if( viewer == null || treeView == null || viewManager == null || pathIndexAction == null ) {
-				throw new ArgumentNullException( "ContourEditAction constructing argument null" );
-			}
-			if( string.IsNullOrEmpty( pathID ) ) {
-				throw new ArgumentException( "ContourEditAction constructing argument pathID invalid" );
-			}
 			m_Viewer = viewer;
 			m_TreeView = treeView;
 			m_ViewManager = viewManager;
+
+			// for path index control
 			m_PathIndexAction = pathIndexAction;
 			m_CurrentPathID = pathID;
-
-			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
-				throw new ArgumentException( "Cannot get CraftData by pathID: " + pathID );
-			}
 		}
 
 		public override EditActionType ActionType
@@ -47,9 +38,8 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 
-			// start path index action
-			m_PathIndexAction.Start();
-			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
+			// setup initial path
+			SetupPath( m_CurrentPathID );
 
 			// create dialog
 			m_Dlg = new ContourEditDlg();
@@ -57,10 +47,11 @@ namespace MyCAM.Editor
 			m_Dlg.RemoveEditIndex += OnRemoveEditIndex;
 			m_Dlg.DisplacementChanged += OnDisplacementChanged;
 			m_Dlg.Cancel += End;
-
-			// default to first point
-			OnSelectedIndexChanged( 0 );
 			m_Dlg.Show( MyApp.MainForm );
+
+			// start path index action
+			m_PathIndexAction.Start();
+			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
 
 			// activate point selection for initial path
 			ActivatePointSelection();
@@ -68,7 +59,7 @@ namespace MyCAM.Editor
 
 		public override void End()
 		{
-			DeactivatePointSelection();
+			DeactivatePointSelection( m_CurrentPathID );
 
 			// cleanup path index action
 			m_PathIndexAction.SelectionChange -= OnPathIndexChanged;
@@ -86,10 +77,27 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		void ActivatePointSelection()
+		void SetupPath( string pathID )
 		{
-			m_PathIndexAction.ExcludeFromSelection( m_CurrentPathID );
-			CreatePointIndexAction( m_CurrentPathID );
+			if( string.IsNullOrEmpty( pathID ) ) {
+				End();
+				return;
+			}
+
+			// validate new path (contour only)
+			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
+				MyApp.Logger.ShowOnLogPanel( $"路徑 {pathID} 不是輪廓路徑，無法編輯", MyApp.NoticeType.Warning );
+				End();
+				return;
+			}
+
+			// init data for current path
+			m_CurrentPathID = pathID;
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
+				MyApp.Logger.ShowOnLogPanel( $"無法獲取路徑 {pathID} 的加工資訊", MyApp.NoticeType.Warning );
+				End();
+				return;
+			}
 
 			// show edit point marks
 			m_EditPointRenderer?.Remove( true );
@@ -97,45 +105,24 @@ namespace MyCAM.Editor
 			m_EditPointRenderer.Show( true );
 		}
 
-		void DeactivatePointSelection()
+		void ActivatePointSelection()
 		{
-			DestroyPointIndexAction();
-			m_PathIndexAction.RestoreFromExclusion( m_CurrentPathID );
-		}
+			m_PathIndexAction.ExcludeFromSelection( m_CurrentPathID );
+			CreatePointIndexAction( m_CurrentPathID );
 
-		void OnPathIndexChanged()
-		{
-			List<string> selectedIDs = m_PathIndexAction.GetSelectedIDs();
-			if( selectedIDs.Count != 1 ) {
-				return;
-			}
-			string newPathID = selectedIDs.First();
-			if( newPathID == m_CurrentPathID ) {
-				return;
-			}
-
-			// validate new path (contour only)
-			if( !DataGettingHelper.GetPathType( newPathID, out PathType pathType ) || pathType != PathType.Contour ) {
-				return;
-			}
-			if( !DataGettingHelper.GetCraftDataByID( newPathID, out CraftData newCraftData ) ) {
-				return;
-			}
-
-			// cleanup old state
-			DeactivatePointSelection();
-
-			// switch to new path
-			m_CurrentPathID = newPathID;
-			m_CraftData = newCraftData;
 			m_nSelectIndex = NULL_SELECT_INDEX;
 			m_Param = null;
 
-			// activate point selection for new path
-			ActivatePointSelection();
+			OnSelectedPointIndexChanged( 0 );
+		}
 
-			// default to first point
-			OnSelectedIndexChanged( 0 );
+		void DeactivatePointSelection( string szOldPathID )
+		{
+			m_nSelectIndex = NULL_SELECT_INDEX;
+			m_Param = null;
+
+			DestroyPointIndexAction();
+			m_PathIndexAction.RestoreFromExclusion( szOldPathID );
 		}
 
 		void CreatePointIndexAction( string pathID )
@@ -154,15 +141,35 @@ namespace MyCAM.Editor
 			}
 		}
 
+		void OnPathIndexChanged()
+		{
+			List<string> selectedIDs = m_PathIndexAction.GetSelectedIDs();
+			if( selectedIDs.Count != 1 ) {
+				return;
+			}
+			string newPathID = selectedIDs.First();
+			if( newPathID == m_CurrentPathID ) {
+				return;
+			}
+			string szOldPathID = m_CurrentPathID;
+			SetupPath( newPathID );
+
+			// cleanup old state
+			DeactivatePointSelection( szOldPathID );
+
+			// activate point selection for new path
+			ActivatePointSelection();
+		}
+
 		void OnPointIndexChanged( int nSelectIndex, TopoDS_Shape selectedVertex )
 		{
 			if( nSelectIndex == m_nSelectIndex ) {
 				return;
 			}
-			OnSelectedIndexChanged( nSelectIndex );
+			OnSelectedPointIndexChanged( nSelectIndex );
 		}
 
-		void OnSelectedIndexChanged( int nSelectIndex )
+		void OnSelectedPointIndexChanged( int nSelectIndex )
 		{
 			if( m_nSelectIndex == nSelectIndex ) {
 				return;
@@ -257,22 +264,19 @@ namespace MyCAM.Editor
 			return;
 		}
 
-		// renderer
-		EditPointRenderer m_EditPointRenderer = null;
+		// path index control
+		string m_CurrentPathID;
+		CraftData m_CraftData;
 
-		// edit param
+		// point index control
 		int m_nSelectIndex = NULL_SELECT_INDEX;
 		ContourEditParam m_Param = null;
-		CraftData m_CraftData;
-		string m_CurrentPathID;
 
-		// dlg
+		// action utility
+		EditPointRenderer m_EditPointRenderer = null;
 		ContourEditDlg m_Dlg = null;
 
-		// interactive highlight
-		AIS_Shape m_HighLightPoint = null;
-
-		// constants
+		// null point index as -999, -1 is used for closed point index
 		const int NULL_SELECT_INDEX = -999;
 
 		// composition references

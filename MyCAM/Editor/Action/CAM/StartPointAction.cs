@@ -1,4 +1,5 @@
-﻿using MyCAM.Data;
+﻿using MyCAM.App;
+using MyCAM.Data;
 using MyCAM.Helper;
 using OCC.TopoDS;
 using OCCViewer;
@@ -14,23 +15,13 @@ namespace MyCAM.Editor
 		public StartPointAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID, SelectPathAction pathIndexAction )
 			: base( dataManager )
 		{
-			if( viewer == null || treeView == null || viewManager == null || pathIndexAction == null ) {
-				throw new ArgumentNullException( "StartPointAction constructing argument null" );
-			}
-			if( string.IsNullOrEmpty( pathID ) ) {
-				throw new ArgumentException( "StartPointAction constructing argument pathID invalid" );
-			}
 			m_Viewer = viewer;
 			m_TreeView = treeView;
 			m_ViewManager = viewManager;
+
+			// for path index control
 			m_PathIndexAction = pathIndexAction;
 			m_CurrentPathID = pathID;
-
-			m_PathIDList = new List<string>() { pathID };
-			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
-				throw new ArgumentException( "StartPointAction constructing argument pathID invalid path ID" );
-			}
-			m_CraftData = craftData;
 		}
 
 		public override EditActionType ActionType
@@ -47,12 +38,15 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 
-			// start path index action
-			m_PathIndexAction.Start();
-			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
+			// setup initial path
+			SetupPath( m_CurrentPathID );
 
 			// register ESC key
 			m_Viewer.KeyDown += OnViewerKeyDown;
+
+			// start path index action
+			m_PathIndexAction.Start();
+			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
 
 			// activate point selection for initial path
 			ActivatePointSelection();
@@ -60,7 +54,7 @@ namespace MyCAM.Editor
 
 		public override void End()
 		{
-			DeactivatePointSelection();
+			DeactivatePointSelection( m_CurrentPathID );
 
 			// unregister ESC key
 			m_Viewer.KeyDown -= OnViewerKeyDown;
@@ -79,44 +73,32 @@ namespace MyCAM.Editor
 			}
 		}
 
+		void SetupPath( string pathID )
+		{
+			if( string.IsNullOrEmpty( pathID ) ) {
+				End();
+				return;
+			}
+
+			// init data for current path
+			m_CurrentPathID = pathID;
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
+				MyApp.Logger.ShowOnLogPanel( $"無法獲取路徑 {pathID} 的加工資訊", MyApp.NoticeType.Warning );
+				End();
+				return;
+			}
+		}
+
 		void ActivatePointSelection()
 		{
 			m_PathIndexAction.ExcludeFromSelection( m_CurrentPathID );
 			CreatePointIndexAction( m_CurrentPathID );
 		}
 
-		void DeactivatePointSelection()
+		void DeactivatePointSelection( string szOldPathID )
 		{
 			DestroyPointIndexAction();
-			m_PathIndexAction.RestoreFromExclusion( m_CurrentPathID );
-		}
-
-		void OnPathIndexChanged()
-		{
-			List<string> selectedIDs = m_PathIndexAction.GetSelectedIDs();
-			if( selectedIDs.Count != 1 ) {
-				return;
-			}
-			string newPathID = selectedIDs.First();
-			if( newPathID == m_CurrentPathID ) {
-				return;
-			}
-
-			// validate new path
-			if( !DataGettingHelper.GetCraftDataByID( newPathID, out CraftData newCraftData ) ) {
-				return;
-			}
-
-			// cleanup old state
-			DeactivatePointSelection();
-
-			// switch to new path
-			m_CurrentPathID = newPathID;
-			m_CraftData = newCraftData;
-			m_PathIDList = new List<string>() { newPathID };
-
-			// activate point selection for new path
-			ActivatePointSelection();
+			m_PathIndexAction.RestoreFromExclusion( szOldPathID );
 		}
 
 		void CreatePointIndexAction( string pathID )
@@ -135,6 +117,26 @@ namespace MyCAM.Editor
 			}
 		}
 
+		void OnPathIndexChanged()
+		{
+			List<string> selectedIDs = m_PathIndexAction.GetSelectedIDs();
+			if( selectedIDs.Count != 1 ) {
+				return;
+			}
+			string newPathID = selectedIDs.First();
+			if( newPathID == m_CurrentPathID ) {
+				return;
+			}
+			string szOldPathID = m_CurrentPathID;
+			SetupPath( newPathID );
+
+			// cleanup old state
+			DeactivatePointSelection( szOldPathID );
+
+			// activate point selection for new path
+			ActivatePointSelection();
+		}
+
 		void OnPointIndexChanged( int nIndex, TopoDS_Shape selectedVertex )
 		{
 			m_CraftData.StartPointIndex = nIndex;
@@ -144,13 +146,13 @@ namespace MyCAM.Editor
 				StdPatternCraftCoupler stdPatternCraftCoupler = new StdPatternCraftCoupler();
 				stdPatternCraftCoupler.HandleCouplerCraftForStartPoint( ref m_CraftData, stdPatternObject.GeomData );
 			}
-			PropertyChanged?.Invoke( m_PathIDList );
+			PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
 			m_Viewer.GetAISContext().ClearSelected( true );
 		}
 
-		CraftData m_CraftData;
-		List<string> m_PathIDList;
+		// path index control
 		string m_CurrentPathID;
+		CraftData m_CraftData;
 
 		// composition references
 		Viewer m_Viewer;
