@@ -27,16 +27,14 @@ namespace MyCAM.Editor
 			m_Viewer = viewer;
 			m_TreeView = treeView;
 			m_ViewManager = viewManager;
+
+			// for path index control
 			m_PathIndexAction = pathIndexAction;
 			m_CurrentPathID = pathID;
 
-			// get craft data by pathID
-			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
-				throw new ArgumentException( "Cannot get CraftData by pathID: " + pathID );
-			}
+			// for edit action
 			m_RotaryAxisConfig = CreateRotaryAxisConfig();
-			m_CoordIcon = new CoordIconRenderer( viewer, dataManager );
-			SetupPathData( pathID );
+			m_CoordIconRenderer = new CoordIconRenderer( viewer, dataManager );
 		}
 
 		public override EditActionType ActionType
@@ -54,12 +52,8 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 
-			// start path index action
-			m_PathIndexAction.Start();
-			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
-
-			// init global param
-			m_InterpolateType = EToolVecInterpolateType.Normal;
+			// we have a original path index
+			SetupPath( m_CurrentPathID );
 
 			// init dialog
 			m_ToolVecDlg = new ToolVectorDlg( m_InterpolateType, m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );
@@ -77,21 +71,25 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.FlipRotaryAxis += ( isPositive ) => OnFlipRotaryAxis( isPositive );
 			m_ToolVecDlg.EnableStartEndSwitch( false, false );
 			m_ToolVecDlg.Cancel += End;
+			m_ToolVecDlg.Show( MyApp.MainForm );
 
 			// draw new trihedron for G54 must before change to start point
 			// because change to start point will trigger coord trasform
 			bool isGetMachineData = DataGettingHelper.GetMachineData( out MachineData machineData );
 			if( isGetMachineData ) {
 				gp_Pnt position = new gp_Pnt( machineData.SimulationOffset.x, machineData.SimulationOffset.y, machineData.SimulationOffset.z );
-				m_CoordIcon.Show( position );
+				m_CoordIconRenderer.Show( position );
 			}
 			else {
-				m_CoordIcon.Show();
+				m_CoordIconRenderer.Show();
 			}
 
-			// activate point selection for initial path
+			// start path index action
+			m_PathIndexAction.Start();
+			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
+
+			// start point index action, this will enter the start point
 			ActivatePointSelection();
-			m_ToolVecDlg.Show( MyApp.MainForm );
 
 			// show machine
 			RaiseActionStart?.Invoke( true );
@@ -99,25 +97,42 @@ namespace MyCAM.Editor
 
 		public override void End()
 		{
-			DeactivatePointSelection();
-			m_CoordIcon.Remove();
-			m_ToolVecEditRender.Remove();
+			// end point index action
+			DeactivatePointSelection( m_CurrentPathID );
 
-			// cleanup path index action
+			// end path index action// cleanup path index action
 			m_PathIndexAction.SelectionChange -= OnPathIndexChanged;
 			m_PathIndexAction.End();
+
+			// clear render
+			m_CoordIconRenderer.Remove(); // global
+			m_ToolVecEditRender.Remove(); // path
 
 			RaiseActionStart?.Invoke( false );
 			base.End();
 		}
 
-		void SetupPathData( string pathID )
+		void SetupPath( string pathID )
 		{
+			if( string.IsNullOrEmpty( pathID ) ) {
+				End();
+				return;
+			}
+
+			// init data for current path
+			m_CurrentPathID = pathID;
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
+				MyApp.Logger.ShowOnLogPanel( $"無法獲取路徑 {pathID} 的加工資訊", MyApp.NoticeType.Warning );
+				End();
+				return;
+			}
 			m_DataHandler = new ToolVecActionDataHandler( pathID );
-			m_PathIDList = new List<string>() { pathID };
+
+			// init render for current path
+			List<string> pathIDList = new List<string>() { pathID };
 			m_ToolVecEditRender?.Remove();
-			m_ToolVecEditRender = new ToolVecEditRender( m_Viewer, m_DataManager, m_PathIDList );
-			m_ToolVecEditRender.Show( m_PathIDList );
+			m_ToolVecEditRender = new ToolVecEditRender( m_Viewer, m_DataManager, pathIDList );
+			m_ToolVecEditRender.Show( pathIDList );
 		}
 
 		void ActivatePointSelection()
@@ -133,43 +148,16 @@ namespace MyCAM.Editor
 			OnSelectedPointIndexChanged( nStartPntIndex );
 		}
 
-		void DeactivatePointSelection()
+		void DeactivatePointSelection( string szOldPathID )
 		{
 			UnlockSelectedVertexHighLight();
-			if( m_PointIndexAction != null ) {
-				m_PointIndexAction.TranfAndRebuildMap( new gp_Trsf(), 0, out _ );
-			}
+
+			m_nPointIndex = NULL_POINT_INDEX;
+			m_SelectedPoint = null;
+			m_ToolVecParam = null;
+
 			DestroyPointIndexAction();
-			m_PathIndexAction.RestoreFromExclusion( m_CurrentPathID );
-		}
-
-		// path switching
-		void OnPathIndexChanged()
-		{
-			List<string> selectedIDs = m_PathIndexAction.GetSelectedIDs();
-			if( selectedIDs.Count != 1 ) {
-				return;
-			}
-			string newPathID = selectedIDs.First();
-			if( newPathID == m_CurrentPathID ) {
-				return;
-			}
-
-			// validate new path
-			if( !DataGettingHelper.GetCraftDataByID( newPathID, out CraftData newCraftData ) ) {
-				return;
-			}
-
-			// cleanup old state
-			DeactivatePointSelection();
-
-			// switch to new path
-			m_CurrentPathID = newPathID;
-			m_CraftData = newCraftData;
-			SetupPathData( newPathID );
-
-			// activate point selection for new path
-			ActivatePointSelection();
+			m_PathIndexAction.RestoreFromExclusion( szOldPathID );
 		}
 
 		void CreatePointIndexAction( string pathID )
@@ -186,6 +174,27 @@ namespace MyCAM.Editor
 				m_PointIndexAction.End();
 				m_PointIndexAction = null;
 			}
+		}
+
+		// path switching
+		void OnPathIndexChanged()
+		{
+			List<string> selectedIDs = m_PathIndexAction.GetSelectedIDs();
+			if( selectedIDs.Count != 1 ) {
+				return;
+			}
+			string newPathID = selectedIDs.First();
+			if( newPathID == m_CurrentPathID ) {
+				return;
+			}
+			string szOldPathID = m_CurrentPathID;
+			SetupPath( newPathID );
+
+			// cleanup old state
+			DeactivatePointSelection( szOldPathID );
+
+			// activate point selection for new path
+			ActivatePointSelection();
 		}
 
 		void OnPointIndexChanged( int nSelectIndex, TopoDS_Shape selectedVertex )
@@ -743,7 +752,7 @@ namespace MyCAM.Editor
 			LockSelectedVertexHighLight( vertexhighlight );
 
 			// trihedron also need to change according to workpiece
-			m_CoordIcon.Trans( frameTransformMap[ MachineComponentType.WorkPiece ].Last() );
+			m_CoordIconRenderer.Trans( frameTransformMap[ MachineComponentType.WorkPiece ].Last() );
 
 			// false means pause the viewer, because m_ToolVecEditRender will cause viewer flash
 			RaiseTrans?.Invoke( frameTransformMap, false );
@@ -849,6 +858,11 @@ namespace MyCAM.Editor
 		}
 
 
+		// path index param
+		string m_CurrentPathID;
+		ToolVecActionDataHandler m_DataHandler = null;
+		CraftData m_CraftData = null;
+
 		// point index param
 		int m_nPointIndex = NULL_POINT_INDEX;
 		ToolVecParam m_ToolVecParam = null;
@@ -856,12 +870,9 @@ namespace MyCAM.Editor
 
 		// global param
 		EToolVecInterpolateType m_InterpolateType = EToolVecInterpolateType.Normal;
-		ToolVecActionDataHandler m_DataHandler = null;
-		CraftData m_CraftData = null;
 		RotaryAxisConfig m_RotaryAxisConfig = null;
 
 		// action data
-		List<string> m_PathIDList = null;
 		AIS_Shape m_KeepedHighLightPoint = null;
 		ToolVectorDlg m_ToolVecDlg = null;
 
@@ -873,13 +884,13 @@ namespace MyCAM.Editor
 		const int NULL_POINT_INDEX = -999;
 		const int CLOSED_POINT_INDEX = -1;
 
-		// coord icon 
-		CoordIconRenderer m_CoordIcon;
+		// renderer
+		CoordIconRenderer m_CoordIconRenderer; // global
+		ToolVecEditRender m_ToolVecEditRender; // path
 
 		// start or end point flag
 		bool m_IsStartPnt;
 		bool m_IsEndPnt;
-		ToolVecEditRender m_ToolVecEditRender;
 
 		// composition references
 		Viewer m_Viewer;
@@ -887,7 +898,6 @@ namespace MyCAM.Editor
 		ViewManager m_ViewManager;
 		SelectPathAction m_PathIndexAction;
 		IndexSelectAction m_PointIndexAction;
-		string m_CurrentPathID;
 	}
 
 	class ToolVecActionDataHandler
