@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="BendingRadius" Content="折彎半徑" />
+  <Message ID="BendingAngle_deg" Content="折彎角度" />
+  <Message ID="IsOverCut" Content="壁厚過切" />
+  <Message ID="JointGapLength" Content="拼接口長度" />
+</ResMap>

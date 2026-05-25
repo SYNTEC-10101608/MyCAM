@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Title" Content="調變曲線設定" />
+  <Message ID="Vel" Content="速度 (%)" />
+  <Message ID="Power" Content="功率 (%)" />
+  <Message ID="Freq" Content="頻率 (%)" />
+  <Message ID="Duty" Content="占空比 (%)" />
+  <Message ID="m_btnAdd" Content="新增" />
+  <Message ID="m_btnDelete" Content="刪除" />
+  <Message ID="m_btnConfirm" Content="確認" />
+  <Message ID="m_btnCancel" Content="取消" />
+  
+  <Message ID="Hint_SelectFirst" Content="請選擇一筆資料" />
+  <Message ID="Hint_LastRowCanNotAdd" Content="無法新增在最後一列" />
+  <Message ID="Hint_AlreadyExistXCanNotAdd" Content="已存在該速度座標，無法再新增" />
+  <Message ID="Hint_MaxRowCanNotAdd" Content="已達座標資料上限，無法再新增" />
+  <Message ID="Hint_FirstRowCanNotDelete" Content="無法刪除速度為0%的座標" />
+  <Message ID="Hint_LastRowCanNotDelete" Content="無法刪除速度為100%的座標" />
+</ResMap>

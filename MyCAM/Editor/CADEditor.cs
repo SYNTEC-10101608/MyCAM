@@ -264,6 +264,17 @@ namespace MyCAM.Editor
 			( (ManualTransformAction)m_CurrentAction ).ApplyTransform( type );
 		}
 
+		public void ImportTube( TopoDS_Shape tubeShape )
+		{
+			// rotate the tube around X+ by 90deg to make a Z+ direction
+			gp_Ax1 rotationAxis = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) );
+			gp_Trsf rotation = new gp_Trsf();
+			rotation.SetRotation( rotationAxis, Math.PI / 2 );
+			BRepBuilderAPI_Transform transformer = new BRepBuilderAPI_Transform( tubeShape, rotation );
+			tubeShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { transformer.Shape() } );
+			m_DataManager.AddPart( tubeShape );
+		}
+
 		// manager events
 		void OnPartChanged()
 		{

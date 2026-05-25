@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Title" Content="徑向補償設定" />
+  <Message ID="m_btnSave" Content="儲存" />
+</ResMap>

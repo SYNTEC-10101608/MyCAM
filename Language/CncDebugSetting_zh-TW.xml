@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <!-- 标签设定 -->
+  <Message ID="Input1" Content="自定義" />
+  <Message ID="Input2" Content="擋塊定位速度" />
+  <Message ID="Input3" Content="擋塊後退速度" />
+  <Message ID="Input4" Content="擋塊後退距離" />
+  <Message ID="Input5" Content="自定義" />
+  <Message ID="Input6" Content="送料速度" />
+  <Message ID="Input7" Content="送料減速距離" />
+  <Message ID="Input8" Content="送料減速速度" />
+  <Message ID="Input9" Content="管材總長" />
+  <Message ID="Input10" Content="自定義" />
+  <Message ID="Input11" Content="舊料已切次數" />
+  <Message ID="Input12" Content="管材可切次數" />
+  <Message ID="Input13" Content="自定義" />
+  <Message ID="Input14" Content="自定義" />
+  <Message ID="Input15" Content="自定義" />
+  <Message ID="Input16" Content="自定義" />
+  <Message ID="Input17" Content="自定義" />
+  <Message ID="Input18" Content="自定義" />
+  <Message ID="Input19" Content="自定義" />
+  <Message ID="Input20" Content="自定義" />
+  <!-- 按钮设定 -->
+  <Message ID="Button1" Content="回機械零點" />
+  <Message ID="Button2" Content="復位" />
+  <Message ID="Button3" Content="回中" />
+  <Message ID="Button4" Content="卡盤氣缸" />
+  <Message ID="Button5" Content="自由切割" />
+  <Message ID="Button6" Content="送料氣缸" />
+  <Message ID="Button7" Content="單次切割標記" />
+  <Message ID="Button8" Content="自定義" />
+  <Message ID="Button9" Content="自定義" />
+  <Message ID="Button10" Content="自定義" />
+  <Message ID="Button11" Content="自定義" />
+  <Message ID="Button12" Content="自定義" />
+  <Message ID="Button13" Content="自定義" />
+  <Message ID="Button14" Content="自定義" />
+  <Message ID="Button15" Content="自定義" />
+</ResMap>

@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="IsOverCut" Content="壁厚過切" />
+  <Message ID="Side" Content="V槽方向" />
+</ResMap>

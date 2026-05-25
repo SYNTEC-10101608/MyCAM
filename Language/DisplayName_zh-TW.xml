@@ -1,0 +1,12 @@
+<ResMap>
+  <Message ID="zh-TW" Content="繁體中文" />
+  <Message ID="zh-CN" Content="簡體中文" />
+  <Message ID="en-US" Content="英文" />
+  <Message ID="ja-JP" Content="日文" />
+  <Message ID="ru-RU" Content="俄文" />
+  <Message ID="vi-VN" Content="越南文" />
+  <Message ID="tr-TR" Content="土耳其文" />
+  <Message ID="de-DE" Content="德文" />
+  <Message ID="id-ID" Content="印尼文" />
+  <Message ID="ko-KR" Content="韓文" />
+</ResMap>

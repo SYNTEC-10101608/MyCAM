@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Shape" Content="幾何參數" />
+  <Message ID="YPos_Y" Content="Y位置" />
+  <Message ID="YPos_X" Content="X位置" />
+  <Message ID="GapFromButtom" Content="距底邊距離" />
+  <Message ID="BAngle_deg_Y" Content="B角度 (Y旋轉)" />
+  <Message ID="BAngle_deg_X" Content="A角度 (X旋轉)" />
+  <Message ID="ArrayParam" Content="陣列參數" />
+</ResMap>

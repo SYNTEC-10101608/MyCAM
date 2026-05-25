@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="CrossSection" Content="截面參數" />
+  <Message ID="Length" Content="管長" />
+</ResMap>
