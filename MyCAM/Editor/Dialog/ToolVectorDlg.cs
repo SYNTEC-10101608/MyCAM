@@ -1,6 +1,5 @@
 ﻿using MyCAM.Data;
 using System;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -137,7 +136,8 @@ namespace MyCAM.Editor
 			if( !GetABAngleFromDialog( out double angleA_deg, out double angleB_deg ) ) {
 				return;
 			}
-			if( angleA_deg == m_ToolVecParam.AngleA_deg && angleB_deg == m_ToolVecParam.AngleB_deg ) {
+			if( Math.Abs( angleA_deg - m_ToolVecParam.AngleA_deg ) <= DOUBLE_COMPARISON_EPSILON
+				&& Math.Abs( angleB_deg - m_ToolVecParam.AngleB_deg ) <= DOUBLE_COMPARISON_EPSILON ) {
 				return;
 			}
 			ABAngleChanged?.Invoke( angleA_deg, angleB_deg );
@@ -154,7 +154,8 @@ namespace MyCAM.Editor
 			if( !GetMSAngleFromDialog( out double master_deg, out double slave_deg ) ) {
 				return;
 			}
-			if( master_deg == m_ToolVecParam.Master_deg && slave_deg == m_ToolVecParam.Slave_deg ) {
+			if( Math.Abs( master_deg - m_ToolVecParam.Master_deg ) <= DOUBLE_COMPARISON_EPSILON
+				&& Math.Abs( slave_deg - m_ToolVecParam.Slave_deg ) <= DOUBLE_COMPARISON_EPSILON ) {
 				return;
 			}
 			MSAngleChanged?.Invoke( master_deg, slave_deg );
@@ -316,6 +317,8 @@ namespace MyCAM.Editor
 					masterName + "軸平滑";
 			}
 		}
+
+		const double DOUBLE_COMPARISON_EPSILON = 1e-6;
 	}
 
 	public class ToolVecParam
