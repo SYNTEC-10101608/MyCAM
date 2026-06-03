@@ -1380,7 +1380,7 @@
             this.MainMenuStrip = this.m_msMode;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "StartupForm";
-            this.Text = "新代激光五軸切割 0.24.1";
+            this.Text = "新代激光五軸切割 0.24.2";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.StartupForm_FormClosing);
             this.Resize += new System.EventHandler(this.StartupForm_Resize);
             this.m_msMode.ResumeLayout(false);
