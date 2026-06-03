@@ -7,6 +7,7 @@ using OCC.gce;
 using OCC.Geom;
 using OCC.GeomAbs;
 using OCC.GeomAdaptor;
+using OCC.GeomLib;
 using OCC.gp;
 using OCC.GProp;
 using OCC.IntCurvesFace;
@@ -91,18 +92,35 @@ namespace OCCTool
 		{
 			p = new gp_Pnt();
 			dir = new gp_Dir();
-			BRepAdaptor_Surface surface = new BRepAdaptor_Surface( face );
-			if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_Plane ) {
-				p = surface.Plane().Location();
-				dir = surface.Plane().Axis().Direction();
-				if( face.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-					dir.Reverse();
-				}
-				return true;
-			}
-			else {
+			if( face == null || face.IsNull() ) {
 				return false;
 			}
+			BRepAdaptor_Surface surface = new BRepAdaptor_Surface( face );
+
+			// normal plane
+			if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_Plane ) {
+				return ExtractPlaneData( surface.Plane(), face, out p, out dir );
+			}
+
+			// other face type use planar checker to check
+			try {
+				double dTolerance = CalFaceFittingTolerance( face );
+				Geom_Surface geomSurface = BRep_Tool.Surface( face );
+				if( geomSurface == null || geomSurface.IsNull() ) {
+					return false;
+				}
+				GeomLib_IsPlanarSurface planarChecker = new GeomLib_IsPlanarSurface( geomSurface, dTolerance );
+				if( planarChecker.IsPlanar() ) {
+					gp_Pln plane = planarChecker.Plan();
+					return ExtractPlaneData( plane, face, out p, out dir );
+				}
+			}
+			catch {
+				p = new gp_Pnt();
+				dir = new gp_Dir();
+				return false;
+			}
+			return false;
 		}
 
 		public static bool IsAxialSymmetrySurface( TopoDS_Face face, out gp_Pnt p, out gp_Dir dir )
@@ -235,7 +253,8 @@ namespace OCCTool
 			gp_Dir d2 = VectorTool.GetFaceNormalVec( f2, pMiddle );
 
 			// check if the normals are parallel or reversed
-			return d1.IsParallel( d2, 1e-3 );
+			double dTolerance = 0.087;
+			return d1.IsParallel( d2, dTolerance );
 		}
 
 		public static bool IsEdgeBelongFace( TopoDS_Edge edge, TopoDS_Face face )
@@ -485,6 +504,64 @@ namespace OCCTool
 			else {
 				return false;
 			}
+		}
+
+		static bool ExtractPlaneData( gp_Pln plane, TopoDS_Face face, out gp_Pnt p, out gp_Dir dir )
+		{
+			p = new gp_Pnt();
+			dir = new gp_Dir();
+
+			// check face is valid
+			if( face == null || face.IsNull() || plane == null ) {
+				return false;
+			}
+
+			// get plane location
+			p = plane.Location();
+			if( p == null ) {
+				p = new gp_Pnt();
+				return false;
+			}
+
+			// get plane normal direction
+			gp_Ax1 axis = plane.Axis();
+			if( axis == null ) {
+				return false;
+			}
+			dir = axis.Direction();
+			if( dir == null ) {
+				dir = new gp_Dir();
+				return false;
+			}
+
+			// reverse direction if face orientation is reversed
+			if( face.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				dir.Reverse();
+			}
+			return true;
+		}
+
+		static double CalFaceFittingTolerance( TopoDS_Face face )
+		{
+			const double DEFAULT_TOLERANCE = 1e-3;
+			if( face == null || face.IsNull() ) {
+				return DEFAULT_TOLERANCE;
+			}
+			BoundingBox bbox = new BoundingBox( face );
+			double dCharacteristicSize = Math.Max(
+				Math.Max( bbox.XLength, bbox.YLength ),
+				bbox.ZLength
+			);
+
+			// check if characteristic size is valid
+			if( dCharacteristicSize <= 0 || double.IsNaN( dCharacteristicSize ) || double.IsInfinity( dCharacteristicSize ) ) {
+				return DEFAULT_TOLERANCE;
+			}
+			double dTolerance = dCharacteristicSize * 0.01;
+			if( dTolerance < 0 || dTolerance == double.NaN || dTolerance == double.PositiveInfinity ) {
+				return DEFAULT_TOLERANCE;
+			}
+			return dCharacteristicSize * 0.01;
 		}
 
 		static Geom_Circle ComputeCircle(
