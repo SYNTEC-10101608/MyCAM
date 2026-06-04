@@ -29,7 +29,7 @@ namespace MyCAM.Helper
         /// <param name="w2">指標b(尺寸變異)權重</param>
         /// <returns>最佳迴轉軸</returns>
         public static gp_Ax1 FindRevolutionAxis( TopoDS_Shape shape, out double axisHalfLength,
-            int binCount = 10, double sectionDeflection = 0.1,
+            int binCount = 10, double sectionDeflection = 1,
             double w1 = 1.0, double w2 = 1.0 )
         {
             axisHalfLength = 0;
@@ -60,13 +60,24 @@ namespace MyCAM.Helper
             List<gp_Pnt> allPoints = new List<gp_Pnt>();
             List<KeyValuePair<gp_Pnt, gp_Pnt>> allEdges = new List<KeyValuePair<gp_Pnt, gp_Pnt>>();
             GetMeshData( shape, sectionDeflection, allPoints, allEdges );
-            double[] scores = new double[3];
+            double[] aValues = new double[3];
+            double[] bValues = new double[3];
             for( int i = 0; i < 3; i++ ) {
                 gp_Dir axisDir = new gp_Dir( axes[i] );
                 gp_Ax1 candidateAxis = new gp_Ax1( obbCenter, axisDir );
                 double candidateHalfLength = halfSizes[i];
 
-                scores[i] = EvaluateAxisWithEdges( allEdges, allPoints, candidateAxis, candidateHalfLength, obbDiagonal, binCount, w1, w2 );
+                EvaluateAxisWithEdges( allEdges, allPoints, candidateAxis, candidateHalfLength, obbDiagonal, binCount, out aValues[i], out bValues[i] );
+            }
+
+            // Normalize a and b across candidates, then compute combined scores
+            double maxA = Math.Max( aValues[0], Math.Max( aValues[1], aValues[2] ) );
+            double maxB = Math.Max( bValues[0], Math.Max( bValues[1], bValues[2] ) );
+            double[] scores = new double[3];
+            for( int i = 0; i < 3; i++ ) {
+                double aNorm = maxA > 1e-15 ? aValues[i] / maxA : 0;
+                double bNorm = maxB > 1e-15 ? bValues[i] / maxB : 0;
+                scores[i] = Math.Sqrt( w1 * aNorm * aNorm + w2 * bNorm * bNorm );
             }
 
             // Step 5-6: Select best axis with degeneracy handling
@@ -113,20 +124,17 @@ namespace MyCAM.Helper
             }
 
             // Write diagnostic log
-            WriteDiagnosticLog( obbCenter, axes, halfSizes, obbDiagonal, scores, bestIndex, binCount, sectionDeflection, w1, w2, shape );
+            WriteDiagnosticLog( obbCenter, axes, halfSizes, obbDiagonal, aValues, bValues, scores, bestIndex, binCount, sectionDeflection, w1, w2, shape );
 
             return resultAxis;
         }
 
-        static double EvaluateAxis( List<gp_Pnt> allPoints, gp_Ax1 axis, double axisHalfLength,
-            double obbDiagonal, int binCount, double w1, double w2 )
+        static void EvaluateAxisWithEdges( List<KeyValuePair<gp_Pnt, gp_Pnt>> edges, List<gp_Pnt> allPoints,
+            gp_Ax1 axis, double axisHalfLength, double obbDiagonal, int binCount, out double a, out double b )
         {
-            return EvaluateAxisWithEdges( null, allPoints, axis, axisHalfLength, obbDiagonal, binCount, w1, w2 );
-        }
+            a = double.MaxValue;
+            b = double.MaxValue;
 
-        static double EvaluateAxisWithEdges( List<KeyValuePair<gp_Pnt, gp_Pnt>> edges, List<gp_Pnt> allPoints,
-            gp_Ax1 axis, double axisHalfLength, double obbDiagonal, int binCount, double w1, double w2 )
-        {
             gp_Pnt axisOrigin = axis.Location();
             gp_Vec axisVec = new gp_Vec( axis.Direction() );
 
@@ -162,26 +170,22 @@ namespace MyCAM.Helper
                     double tMax = Math.Max( t1, t2 );
 
                     // Find bin boundaries crossed by this edge
-                    // Bin boundaries are at: -axisHalfLength + k * binWidth, for k=1..binCount-1
                     int kStart = (int)Math.Ceiling( ( tMin + axisHalfLength ) / binWidth );
                     int kEnd = (int)Math.Floor( ( tMax + axisHalfLength ) / binWidth );
 
                     for( int k = kStart; k <= kEnd; k++ ) {
                         if( k < 1 || k >= binCount ) continue;
                         double tBoundary = -axisHalfLength + k * binWidth;
-                        // Interpolation parameter along edge
                         double denom = t2 - t1;
                         if( Math.Abs( denom ) < 1e-15 ) continue;
                         double alpha = ( tBoundary - t1 ) / denom;
                         if( alpha < 0.0 || alpha > 1.0 ) continue;
 
-                        // Interpolate 3D point
                         double px = edge.Key.X() + alpha * ( edge.Value.X() - edge.Key.X() );
                         double py = edge.Key.Y() + alpha * ( edge.Value.Y() - edge.Key.Y() );
                         double pz = edge.Key.Z() + alpha * ( edge.Value.Z() - edge.Key.Z() );
                         gp_Pnt interpPt = new gp_Pnt( px, py, pz );
 
-                        // Add to both adjacent bins (k-1 and k)
                         bins[k - 1].Add( interpPt );
                         if( k < binCount ) bins[k].Add( interpPt );
                     }
@@ -216,17 +220,15 @@ namespace MyCAM.Helper
                 equivalentRadii.Add( sumR / n );
             }
 
-            if( centroidDistances.Count == 0 ) return double.MaxValue;
+            if( centroidDistances.Count == 0 ) return;
 
             double sumSqA = centroidDistances.Sum( d => { double norm = d / obbDiagonal; return norm * norm; } );
-            double a = Math.Sqrt( sumSqA / centroidDistances.Count );
+            a = Math.Sqrt( sumSqA / centroidDistances.Count );
 
             double meanR = equivalentRadii.Average();
             double sumSqB = equivalentRadii.Sum( r => ( r - meanR ) * ( r - meanR ) );
             double stdR = Math.Sqrt( sumSqB / equivalentRadii.Count );
-            double b = stdR / obbDiagonal;
-
-            return Math.Sqrt( w1 * a * a + w2 * b * b );
+            b = stdR / obbDiagonal;
         }
 
         static List<gp_Pnt> GetMeshPoints( TopoDS_Shape shape, double deflection )
@@ -282,7 +284,7 @@ namespace MyCAM.Helper
         }
 
         static void WriteDiagnosticLog( gp_Pnt obbCenter, gp_XYZ[] axes, double[] halfSizes, double obbDiagonal,
-            double[] scores, int bestIndex, int binCount, double sectionDeflection, double w1, double w2, TopoDS_Shape shape )
+            double[] aValues, double[] bValues, double[] scores, int bestIndex, int binCount, double sectionDeflection, double w1, double w2, TopoDS_Shape shape )
         {
             try {
                 string[] axisNames = new string[] { "X", "Y", "Z" };
@@ -297,12 +299,20 @@ namespace MyCAM.Helper
                 GetMeshData( shape, sectionDeflection, allPoints, allEdges );
                 sb.AppendLine( $"Total mesh points: {allPoints.Count}" );
                 sb.AppendLine( $"Total mesh edges: {allEdges.Count}" );
+
+                double maxA = Math.Max( aValues[0], Math.Max( aValues[1], aValues[2] ) );
+                double maxB = Math.Max( bValues[0], Math.Max( bValues[1], bValues[2] ) );
+                sb.AppendLine( $"Normalization: maxA={maxA:F8}, maxB={maxB:F8}" );
                 sb.AppendLine();
 
                 for( int i = 0; i < 3; i++ ) {
                     sb.AppendLine( $"--- Candidate Axis {axisNames[i]} ---" );
                     sb.AppendLine( $"  Direction: ({axes[i].X():F6}, {axes[i].Y():F6}, {axes[i].Z():F6})" );
                     sb.AppendLine( $"  HalfSize: {halfSizes[i]:F6}" );
+                    double aNorm = maxA > 1e-15 ? aValues[i] / maxA : 0;
+                    double bNorm = maxB > 1e-15 ? bValues[i] / maxB : 0;
+                    sb.AppendLine( $"  Raw a={aValues[i]:F8}, b={bValues[i]:F8}" );
+                    sb.AppendLine( $"  Normalized a={aNorm:F8}, b={bNorm:F8}" );
                     sb.AppendLine( $"  Combined Score: {scores[i]:F8}" );
 
                     gp_Vec axisVec = new gp_Vec( new gp_Dir( axes[i] ) );
