@@ -1,5 +1,6 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Helper;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.IFSelect;
@@ -353,6 +354,24 @@ namespace MyCAM.Editor
 
 			// add the read shape to the manager
 			m_DataManager.AddPart( oneShape );
+
+			// test: find revolution axis and add as reference feature
+			try {
+				gp_Ax1 revAxis = RevolutionAxisHelper.FindRevolutionAxis( oneShape, out double axisHalfLen );
+				if( axisHalfLen > 1e-12 ) {
+					gp_Pnt axisPt = revAxis.Location();
+					gp_Vec axisVec = new gp_Vec( revAxis.Direction() );
+					gp_Pnt p1 = new gp_Pnt( axisPt.XYZ() - axisVec.XYZ() * axisHalfLen );
+					gp_Pnt p2 = new gp_Pnt( axisPt.XYZ() + axisVec.XYZ() * axisHalfLen );
+					BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( p1, p2 );
+					if( edgeMaker.IsDone() ) {
+						m_DataManager.AddReferenceFeature( edgeMaker.Edge() );
+					}
+				}
+			}
+			catch( Exception ) {
+				// revolution axis detection failed, skip
+			}
 		}
 
 		List<string> GetSelectedIDList()
