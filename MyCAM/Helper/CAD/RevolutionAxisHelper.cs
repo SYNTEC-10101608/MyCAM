@@ -56,15 +56,17 @@ namespace MyCAM.Helper
                 return new gp_Ax1( obbCenter, new gp_Dir( 0, 0, 1 ) );
             }
 
-            // Step 2-4: Get mesh points once, then evaluate each candidate axis
-            List<gp_Pnt> allPoints = GetMeshPoints( shape, sectionDeflection );
+            // Step 2-4: Get mesh points and edges once, then evaluate each candidate axis
+            List<gp_Pnt> allPoints = new List<gp_Pnt>();
+            List<KeyValuePair<gp_Pnt, gp_Pnt>> allEdges = new List<KeyValuePair<gp_Pnt, gp_Pnt>>();
+            GetMeshData( shape, sectionDeflection, allPoints, allEdges );
             double[] scores = new double[3];
             for( int i = 0; i < 3; i++ ) {
                 gp_Dir axisDir = new gp_Dir( axes[i] );
                 gp_Ax1 candidateAxis = new gp_Ax1( obbCenter, axisDir );
                 double candidateHalfLength = halfSizes[i];
 
-                scores[i] = EvaluateAxis( allPoints, candidateAxis, candidateHalfLength, obbDiagonal, binCount, w1, w2 );
+                scores[i] = EvaluateAxisWithEdges( allEdges, allPoints, candidateAxis, candidateHalfLength, obbDiagonal, binCount, w1, w2 );
             }
 
             // Step 5-6: Select best axis with degeneracy handling
@@ -119,6 +121,12 @@ namespace MyCAM.Helper
         static double EvaluateAxis( List<gp_Pnt> allPoints, gp_Ax1 axis, double axisHalfLength,
             double obbDiagonal, int binCount, double w1, double w2 )
         {
+            return EvaluateAxisWithEdges( null, allPoints, axis, axisHalfLength, obbDiagonal, binCount, w1, w2 );
+        }
+
+        static double EvaluateAxisWithEdges( List<KeyValuePair<gp_Pnt, gp_Pnt>> edges, List<gp_Pnt> allPoints,
+            gp_Ax1 axis, double axisHalfLength, double obbDiagonal, int binCount, double w1, double w2 )
+        {
             gp_Pnt axisOrigin = axis.Location();
             gp_Vec axisVec = new gp_Vec( axis.Direction() );
 
@@ -129,6 +137,8 @@ namespace MyCAM.Helper
             }
 
             double fullLength = 2.0 * axisHalfLength;
+
+            // Add original mesh vertices to bins
             foreach( gp_Pnt pt in allPoints ) {
                 gp_Vec ptVec = new gp_Vec( axisOrigin, pt );
                 double proj = ptVec.Dot( axisVec );
@@ -137,6 +147,45 @@ namespace MyCAM.Helper
                 if( binIdx < 0 ) binIdx = 0;
                 if( binIdx >= binCount ) binIdx = binCount - 1;
                 bins[binIdx].Add( pt );
+            }
+
+            // Interpolate edge crossings at bin boundaries
+            if( edges != null ) {
+                double binWidth = fullLength / binCount;
+                foreach( var edge in edges ) {
+                    gp_Vec v1 = new gp_Vec( axisOrigin, edge.Key );
+                    gp_Vec v2 = new gp_Vec( axisOrigin, edge.Value );
+                    double t1 = v1.Dot( axisVec );
+                    double t2 = v2.Dot( axisVec );
+
+                    double tMin = Math.Min( t1, t2 );
+                    double tMax = Math.Max( t1, t2 );
+
+                    // Find bin boundaries crossed by this edge
+                    // Bin boundaries are at: -axisHalfLength + k * binWidth, for k=1..binCount-1
+                    int kStart = (int)Math.Ceiling( ( tMin + axisHalfLength ) / binWidth );
+                    int kEnd = (int)Math.Floor( ( tMax + axisHalfLength ) / binWidth );
+
+                    for( int k = kStart; k <= kEnd; k++ ) {
+                        if( k < 1 || k >= binCount ) continue;
+                        double tBoundary = -axisHalfLength + k * binWidth;
+                        // Interpolation parameter along edge
+                        double denom = t2 - t1;
+                        if( Math.Abs( denom ) < 1e-15 ) continue;
+                        double alpha = ( tBoundary - t1 ) / denom;
+                        if( alpha < 0.0 || alpha > 1.0 ) continue;
+
+                        // Interpolate 3D point
+                        double px = edge.Key.X() + alpha * ( edge.Value.X() - edge.Key.X() );
+                        double py = edge.Key.Y() + alpha * ( edge.Value.Y() - edge.Key.Y() );
+                        double pz = edge.Key.Z() + alpha * ( edge.Value.Z() - edge.Key.Z() );
+                        gp_Pnt interpPt = new gp_Pnt( px, py, pz );
+
+                        // Add to both adjacent bins (k-1 and k)
+                        bins[k - 1].Add( interpPt );
+                        if( k < binCount ) bins[k].Add( interpPt );
+                    }
+                }
             }
 
             // Evaluate each bin
@@ -183,7 +232,13 @@ namespace MyCAM.Helper
         static List<gp_Pnt> GetMeshPoints( TopoDS_Shape shape, double deflection )
         {
             List<gp_Pnt> points = new List<gp_Pnt>();
+            GetMeshData( shape, deflection, points, null );
+            return points;
+        }
 
+        static void GetMeshData( TopoDS_Shape shape, double deflection,
+            List<gp_Pnt> outPoints, List<KeyValuePair<gp_Pnt, gp_Pnt>> outEdges )
+        {
             BRepMesh_IncrementalMesh mesh = new BRepMesh_IncrementalMesh( shape, deflection );
             mesh.Perform();
 
@@ -196,19 +251,34 @@ namespace MyCAM.Helper
                     if( tri != null && !tri.IsNull() ) {
                         gp_Trsf trsf = loc.IsIdentity() ? new gp_Trsf() : loc.Transformation();
                         int nbNodes = tri.NbNodes();
+
+                        // Collect transformed nodes
+                        gp_Pnt[] nodes = new gp_Pnt[nbNodes + 1]; // 1-indexed
                         for( int i = 1; i <= nbNodes; i++ ) {
                             gp_Pnt pt = tri.Node( i );
                             if( !loc.IsIdentity() ) {
                                 pt.Transform( trsf );
                             }
-                            points.Add( pt );
+                            nodes[i] = pt;
+                            outPoints.Add( pt );
+                        }
+
+                        // Collect edges from triangles
+                        if( outEdges != null ) {
+                            int nbTri = tri.NbTriangles();
+                            for( int i = 1; i <= nbTri; i++ ) {
+                                Poly_Triangle triangle = tri.Triangle( i );
+                                int n1 = 0, n2 = 0, n3 = 0;
+                                triangle.Get( ref n1, ref n2, ref n3 );
+                                outEdges.Add( new KeyValuePair<gp_Pnt, gp_Pnt>( nodes[n1], nodes[n2] ) );
+                                outEdges.Add( new KeyValuePair<gp_Pnt, gp_Pnt>( nodes[n2], nodes[n3] ) );
+                                outEdges.Add( new KeyValuePair<gp_Pnt, gp_Pnt>( nodes[n3], nodes[n1] ) );
+                            }
                         }
                     }
                 }
                 explorer.Next();
             }
-
-            return points;
         }
 
         static void WriteDiagnosticLog( gp_Pnt obbCenter, gp_XYZ[] axes, double[] halfSizes, double obbDiagonal,
@@ -222,8 +292,11 @@ namespace MyCAM.Helper
                 sb.AppendLine( $"OBB Center: ({obbCenter.X():F4}, {obbCenter.Y():F4}, {obbCenter.Z():F4})" );
                 sb.AppendLine( $"OBB Diagonal: {obbDiagonal:F6}" );
 
-                List<gp_Pnt> allPoints = GetMeshPoints( shape, sectionDeflection );
+                List<gp_Pnt> allPoints = new List<gp_Pnt>();
+                List<KeyValuePair<gp_Pnt, gp_Pnt>> allEdges = new List<KeyValuePair<gp_Pnt, gp_Pnt>>();
+                GetMeshData( shape, sectionDeflection, allPoints, allEdges );
                 sb.AppendLine( $"Total mesh points: {allPoints.Count}" );
+                sb.AppendLine( $"Total mesh edges: {allEdges.Count}" );
                 sb.AppendLine();
 
                 for( int i = 0; i < 3; i++ ) {
@@ -237,6 +310,8 @@ namespace MyCAM.Helper
                     for( int b = 0; b < binCount; b++ ) bins.Add( new List<gp_Pnt>() );
 
                     double fullLength = 2.0 * halfSizes[i];
+
+                    // Add original vertices to bins
                     foreach( gp_Pnt pt in allPoints ) {
                         gp_Vec ptVec = new gp_Vec( obbCenter, pt );
                         double proj = ptVec.Dot( axisVec );
@@ -245,6 +320,37 @@ namespace MyCAM.Helper
                         if( binIdx < 0 ) binIdx = 0;
                         if( binIdx >= binCount ) binIdx = binCount - 1;
                         bins[binIdx].Add( pt );
+                    }
+
+                    // Interpolate edge crossings at bin boundaries
+                    double binWidth = fullLength / binCount;
+                    foreach( var edge in allEdges ) {
+                        gp_Vec v1 = new gp_Vec( obbCenter, edge.Key );
+                        gp_Vec v2 = new gp_Vec( obbCenter, edge.Value );
+                        double t1 = v1.Dot( axisVec );
+                        double t2 = v2.Dot( axisVec );
+                        double tMin = Math.Min( t1, t2 );
+                        double tMax = Math.Max( t1, t2 );
+
+                        int kStart = (int)Math.Ceiling( ( tMin + halfSizes[i] ) / binWidth );
+                        int kEnd = (int)Math.Floor( ( tMax + halfSizes[i] ) / binWidth );
+
+                        for( int k = kStart; k <= kEnd; k++ ) {
+                            if( k < 1 || k >= binCount ) continue;
+                            double tBoundary = -halfSizes[i] + k * binWidth;
+                            double denom = t2 - t1;
+                            if( Math.Abs( denom ) < 1e-15 ) continue;
+                            double alpha = ( tBoundary - t1 ) / denom;
+                            if( alpha < 0.0 || alpha > 1.0 ) continue;
+
+                            double px = edge.Key.X() + alpha * ( edge.Value.X() - edge.Key.X() );
+                            double py = edge.Key.Y() + alpha * ( edge.Value.Y() - edge.Key.Y() );
+                            double pz = edge.Key.Z() + alpha * ( edge.Value.Z() - edge.Key.Z() );
+                            gp_Pnt interpPt = new gp_Pnt( px, py, pz );
+
+                            bins[k - 1].Add( interpPt );
+                            if( k < binCount ) bins[k].Add( interpPt );
+                        }
                     }
 
                     List<double> centroidDists = new List<double>();
