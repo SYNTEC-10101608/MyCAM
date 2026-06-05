@@ -19,6 +19,9 @@ namespace MyCAM.Helper
 {
     public static class RevolutionAxisHelper
     {
+        const double ZeroTolerance = 1e-12;
+        const double DivisionTolerance = 1e-15;
+        const double DegeneracyTolerance = 1e-6;
         /// <summary>
         /// 找出 shape 的最佳迴轉軸候選
         /// </summary>
@@ -51,7 +54,7 @@ namespace MyCAM.Helper
                 halfSizes[1] * halfSizes[1] +
                 halfSizes[2] * halfSizes[2] );
 
-            if( obbDiagonal < 1e-12 ) {
+            if( obbDiagonal < ZeroTolerance ) {
                 axisHalfLength = 0;
                 return new gp_Ax1( obbCenter, new gp_Dir( 0, 0, 1 ) );
             }
@@ -67,7 +70,7 @@ namespace MyCAM.Helper
                 gp_Ax1 candidateAxis = new gp_Ax1( obbCenter, axisDir );
                 double candidateHalfLength = halfSizes[i];
 
-                EvaluateAxisWithEdges( allEdges, allPoints, candidateAxis, candidateHalfLength, obbDiagonal, binCount, out aValues[i], out bValues[i] );
+                EvaluateAxisWithEdges( allEdges, allPoints, candidateAxis, candidateHalfLength, binCount, out aValues[i], out bValues[i] );
             }
 
             // Normalize a and b across candidates, then compute combined scores
@@ -75,8 +78,8 @@ namespace MyCAM.Helper
             double maxB = Math.Max( bValues[0], Math.Max( bValues[1], bValues[2] ) );
             double[] scores = new double[3];
             for( int i = 0; i < 3; i++ ) {
-                double aNorm = maxA > 1e-15 ? aValues[i] / maxA : 0;
-                double bNorm = maxB > 1e-15 ? bValues[i] / maxB : 0;
+                double aNorm = maxA > DivisionTolerance ? aValues[i] / maxA : 0;
+                double bNorm = maxB > DivisionTolerance ? bValues[i] / maxB : 0;
                 scores[i] = Math.Sqrt( w1 * aNorm * aNorm + w2 * bNorm * bNorm );
             }
 
@@ -94,7 +97,7 @@ namespace MyCAM.Helper
             double maxScore = scores.Max();
             double minScore = scores.Min();
             gp_Ax1 resultAxis;
-            if( maxScore - minScore < 1e-6 ) {
+            if( maxScore - minScore < DegeneracyTolerance ) {
                 // Pick longest axis
                 int longestIndex = 0;
                 double longestHalf = halfSizes[0];
@@ -107,7 +110,7 @@ namespace MyCAM.Helper
                 // If axis lengths also within 1e-6, return Z axis
                 double maxHalf = halfSizes.Max();
                 double minHalf = halfSizes.Min();
-                if( maxHalf - minHalf < 1e-6 ) {
+                if( maxHalf - minHalf < DegeneracyTolerance ) {
                     axisHalfLength = halfSizes[2];
                     bestIndex = 2;
                     resultAxis = new gp_Ax1( obbCenter, new gp_Dir( zAxis ) );
@@ -130,7 +133,7 @@ namespace MyCAM.Helper
         }
 
         static void EvaluateAxisWithEdges( List<KeyValuePair<gp_Pnt, gp_Pnt>> edges, List<gp_Pnt> allPoints,
-            gp_Ax1 axis, double axisHalfLength, double obbDiagonal, int binCount, out double a, out double b )
+            gp_Ax1 axis, double axisHalfLength, int binCount, out double a, out double b )
         {
             a = double.MaxValue;
             b = double.MaxValue;
@@ -177,7 +180,7 @@ namespace MyCAM.Helper
                         if( k < 1 || k >= binCount ) continue;
                         double tBoundary = -axisHalfLength + k * binWidth;
                         double denom = t2 - t1;
-                        if( Math.Abs( denom ) < 1e-15 ) continue;
+                        if( Math.Abs( denom ) < DivisionTolerance ) continue;
                         double alpha = ( tBoundary - t1 ) / denom;
                         if( alpha < 0.0 || alpha > 1.0 ) continue;
 
@@ -222,20 +225,12 @@ namespace MyCAM.Helper
 
             if( centroidDistances.Count == 0 ) return;
 
-            double sumSqA = centroidDistances.Sum( d => { double norm = d / obbDiagonal; return norm * norm; } );
+            double sumSqA = centroidDistances.Sum( d => d * d );
             a = Math.Sqrt( sumSqA / centroidDistances.Count );
 
             double meanR = equivalentRadii.Average();
             double sumSqB = equivalentRadii.Sum( r => ( r - meanR ) * ( r - meanR ) );
-            double stdR = Math.Sqrt( sumSqB / equivalentRadii.Count );
-            b = stdR / obbDiagonal;
-        }
-
-        static List<gp_Pnt> GetMeshPoints( TopoDS_Shape shape, double deflection )
-        {
-            List<gp_Pnt> points = new List<gp_Pnt>();
-            GetMeshData( shape, deflection, points, null );
-            return points;
+            b = Math.Sqrt( sumSqB / equivalentRadii.Count );
         }
 
         static void GetMeshData( TopoDS_Shape shape, double deflection,
@@ -243,6 +238,9 @@ namespace MyCAM.Helper
         {
             BRepMesh_IncrementalMesh mesh = new BRepMesh_IncrementalMesh( shape, deflection );
             mesh.Perform();
+
+            int globalNodeOffset = 0;
+            HashSet<long> edgeSet = outEdges != null ? new HashSet<long>() : null;
 
             TopExp_Explorer explorer = new TopExp_Explorer( shape, TopAbs_ShapeEnum.TopAbs_FACE );
             while( explorer.More() ) {
@@ -265,21 +263,34 @@ namespace MyCAM.Helper
                             outPoints.Add( pt );
                         }
 
-                        // Collect edges from triangles
+                        // Collect unique edges from triangles
                         if( outEdges != null ) {
                             int nbTri = tri.NbTriangles();
                             for( int i = 1; i <= nbTri; i++ ) {
                                 Poly_Triangle triangle = tri.Triangle( i );
                                 int n1 = 0, n2 = 0, n3 = 0;
                                 triangle.Get( ref n1, ref n2, ref n3 );
-                                outEdges.Add( new KeyValuePair<gp_Pnt, gp_Pnt>( nodes[n1], nodes[n2] ) );
-                                outEdges.Add( new KeyValuePair<gp_Pnt, gp_Pnt>( nodes[n2], nodes[n3] ) );
-                                outEdges.Add( new KeyValuePair<gp_Pnt, gp_Pnt>( nodes[n3], nodes[n1] ) );
+                                AddUniqueEdge( outEdges, edgeSet, nodes, n1, n2, globalNodeOffset );
+                                AddUniqueEdge( outEdges, edgeSet, nodes, n2, n3, globalNodeOffset );
+                                AddUniqueEdge( outEdges, edgeSet, nodes, n3, n1, globalNodeOffset );
                             }
                         }
+
+                        globalNodeOffset += nbNodes;
                     }
                 }
                 explorer.Next();
+            }
+        }
+
+        static void AddUniqueEdge( List<KeyValuePair<gp_Pnt, gp_Pnt>> outEdges, HashSet<long> edgeSet,
+            gp_Pnt[] nodes, int localA, int localB, int globalOffset )
+        {
+            int ga = globalOffset + localA;
+            int gb = globalOffset + localB;
+            long key = ga < gb ? ((long)ga << 32) | (long)gb : ((long)gb << 32) | (long)ga;
+            if( edgeSet.Add( key ) ) {
+                outEdges.Add( new KeyValuePair<gp_Pnt, gp_Pnt>( nodes[localA], nodes[localB] ) );
             }
         }
 
@@ -309,8 +320,8 @@ namespace MyCAM.Helper
                     sb.AppendLine( $"--- Candidate Axis {axisNames[i]} ---" );
                     sb.AppendLine( $"  Direction: ({axes[i].X():F6}, {axes[i].Y():F6}, {axes[i].Z():F6})" );
                     sb.AppendLine( $"  HalfSize: {halfSizes[i]:F6}" );
-                    double aNorm = maxA > 1e-15 ? aValues[i] / maxA : 0;
-                    double bNorm = maxB > 1e-15 ? bValues[i] / maxB : 0;
+                    double aNorm = maxA > DivisionTolerance ? aValues[i] / maxA : 0;
+                    double bNorm = maxB > DivisionTolerance ? bValues[i] / maxB : 0;
                     sb.AppendLine( $"  Raw a={aValues[i]:F8}, b={bValues[i]:F8}" );
                     sb.AppendLine( $"  Normalized a={aNorm:F8}, b={bNorm:F8}" );
                     sb.AppendLine( $"  Combined Score: {scores[i]:F8}" );
@@ -349,7 +360,7 @@ namespace MyCAM.Helper
                             if( k < 1 || k >= binCount ) continue;
                             double tBoundary = -halfSizes[i] + k * binWidth;
                             double denom = t2 - t1;
-                            if( Math.Abs( denom ) < 1e-15 ) continue;
+                            if( Math.Abs( denom ) < DivisionTolerance ) continue;
                             double alpha = ( tBoundary - t1 ) / denom;
                             if( alpha < 0.0 || alpha > 1.0 ) continue;
 
@@ -394,13 +405,11 @@ namespace MyCAM.Helper
                     }
 
                     if( centroidDists.Count > 0 ) {
-                        double rmsA = Math.Sqrt( centroidDists.Sum( d => ( d / obbDiagonal ) * ( d / obbDiagonal ) ) / centroidDists.Count );
+                        double rmsA = Math.Sqrt( centroidDists.Sum( d => d * d ) / centroidDists.Count );
                         double meanR = equivRadii.Average();
                         double stdR = Math.Sqrt( equivRadii.Sum( r => ( r - meanR ) * ( r - meanR ) ) / equivRadii.Count );
-                        double normB = stdR / obbDiagonal;
-                        sb.AppendLine( $"  >> Indicator a (centroid RMS/diag): {rmsA:F8}" );
-                        sb.AppendLine( $"  >> Indicator b (stdR/diag): {normB:F8}" );
-                        sb.AppendLine( $"  >> Combined: {Math.Sqrt( w1 * rmsA * rmsA + w2 * normB * normB ):F8}" );
+                        sb.AppendLine( $"  >> Indicator a (centroid RMS): {rmsA:F8}" );
+                        sb.AppendLine( $"  >> Indicator b (stdR): {stdR:F8}" );
                     }
                     sb.AppendLine();
                 }
