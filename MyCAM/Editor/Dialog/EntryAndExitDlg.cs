@@ -15,15 +15,15 @@ namespace MyCAM.Editor
 		void InitializeControlAndFieldValue( EntryAndExitData data )
 		{
 			if( data == null ) {
-				m_txbEntryDistance.Value = (decimal)m_EntryDistance;
-				m_txbExitDistance.Value = (decimal)m_ExitDistance;
+				m_txbEntryDistance.SilentSetValue = (decimal)m_EntryDistance;
+				m_txbExitDistance.SilentSetValue = (decimal)m_ExitDistance;
 				return;
 			}
 
 			// set control value
-			m_txbEntryDistance.Value = (decimal)data.EntryDistance;
-			m_txbExitDistance.Value = (decimal)data.ExitDistance;
-			m_txbFollowSafeDistance.Value = (decimal)data.FollowSafeDistance;
+			m_txbEntryDistance.SilentSetValue = (decimal)data.EntryDistance;
+			m_txbExitDistance.SilentSetValue = (decimal)data.ExitDistance;
+			m_txbFollowSafeDistance.SilentSetValue = (decimal)data.FollowSafeDistance;
 
 			// set field value
 			m_EntryDistance = data.EntryDistance;

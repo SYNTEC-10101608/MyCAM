@@ -9,6 +9,7 @@ namespace MyCAM.Editor
 		public Action SetKeep;
 		public Action SetZdir;
 		public Action SetRevert;
+		public Action Clear;
 		public Action<double, double> MSAngleChanged;
 		public Action<double, double> ABAngleChanged;
 		public Action<EToolVecInterpolateType> TypeChanged;
@@ -16,10 +17,11 @@ namespace MyCAM.Editor
 		public Action RemoveEditIndex;
 		public Action SwitchStartEnd;
 		public Action<bool> MoveIndex;
+		public Action<bool> MoveCtrlPnt;
 		public Action<bool> ToStartOrEnd;
 		public Action<bool> FlipRotaryAxis;
 
-		public ToolVectorDlg( EToolVecInterpolateType type, ToolVecParam param, bool isPathReverse, RotaryAxisConfig config )
+		public ToolVectorDlg( EToolVecInterpolateType type, ref ToolVecParam param, bool isPathReverse, RotaryAxisConfig config )
 		{
 			// struct would not be null
 			InitializeComponent();
@@ -45,7 +47,6 @@ namespace MyCAM.Editor
 
 		public void ResetToolVecParam( ToolVecParam toolVecParam )
 		{
-			bSuppressValueChangedEvent = true;
 			m_ToolVecParam = toolVecParam;
 
 			// no selected index param, disable edit UI
@@ -56,11 +57,10 @@ namespace MyCAM.Editor
 
 			// update index edit UI
 			m_gbxIndexParam.Enabled = true;
-			m_tbxAngleA.Value = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleA_deg : m_ToolVecParam.AngleA_deg );
-			m_tbxAngleB.Value = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleB_deg : m_ToolVecParam.AngleB_deg );
-			m_tbxMaster.Value = (decimal)m_ToolVecParam.Master_deg;
-			m_tbxSlave.Value = (decimal)m_ToolVecParam.Slave_deg;
-			bSuppressValueChangedEvent = false;
+			m_tbxAngleA.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleA_deg : m_ToolVecParam.AngleA_deg );
+			m_tbxAngleB.SilentSetValue = (decimal)( m_IsPathRevese ? -m_ToolVecParam.AngleB_deg : m_ToolVecParam.AngleB_deg );
+			m_tbxMaster.SilentSetValue = (decimal)m_ToolVecParam.Master_deg;
+			m_tbxSlave.SilentSetValue = (decimal)m_ToolVecParam.Slave_deg;
 		}
 
 		public void EnableStartEndSwitch( bool enable, bool start )
@@ -104,7 +104,6 @@ namespace MyCAM.Editor
 			TypeChanged?.Invoke( selectedType );
 		}
 
-
 		// UI event - Index param value changed (debounced)
 		void m_tbxAngleA_DebouncedValueChanged( object sender, EventArgs e )
 		{
@@ -128,10 +127,6 @@ namespace MyCAM.Editor
 
 		void HandleABAngleChanged()
 		{
-			if( bSuppressValueChangedEvent ) {
-				return;
-			}
-
 			// Get AB angles from dialog
 			if( !GetABAngleFromDialog( out double angleA_deg, out double angleB_deg ) ) {
 				return;
@@ -146,10 +141,6 @@ namespace MyCAM.Editor
 
 		void HandleMSAngleChanged()
 		{
-			if( bSuppressValueChangedEvent ) {
-				return;
-			}
-
 			// Get MS angles from dialog
 			if( !GetMSAngleFromDialog( out double master_deg, out double slave_deg ) ) {
 				return;
@@ -249,7 +240,6 @@ namespace MyCAM.Editor
 
 		RotaryAxisConfig m_RotaryAxisConfig;
 
-		bool bSuppressValueChangedEvent = false;
 		Timer m_Timer;
 		const int TIMER_INTERVAL = 10;
 
@@ -287,6 +277,16 @@ namespace MyCAM.Editor
 			m_Timer.Tick -= MoveToLastTick;
 		}
 
+		void m_btnPreCtrlPnt_Click( object sender, EventArgs e )
+		{
+			MoveCtrlPnt?.Invoke( false );
+		}
+
+		void m_btnNextCtrlPnt_Click( object sender, EventArgs e )
+		{
+			MoveCtrlPnt?.Invoke( true );
+		}
+
 		void MoveToNextTick( object sender, EventArgs e )
 		{
 			MoveIndex?.Invoke( true );
@@ -295,6 +295,11 @@ namespace MyCAM.Editor
 		void MoveToLastTick( object sender, EventArgs e )
 		{
 			MoveIndex?.Invoke( false );
+		}
+
+		void m_btnClear_Click( object sender, EventArgs e )
+		{
+			Clear?.Invoke();
 		}
 
 		void UpdateInterpolateTypeNames()
@@ -316,6 +321,10 @@ namespace MyCAM.Editor
 				m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterInterpolationSlaveNormal ] =
 					masterName + "軸平滑";
 			}
+
+			// update color legend labels
+			m_lblLegendSlave.Text = slaveName + "軸平滑";
+			m_lblLegendMaster.Text = masterName + "軸平滑";
 		}
 
 		const double DOUBLE_COMPARISON_EPSILON = 1e-6;

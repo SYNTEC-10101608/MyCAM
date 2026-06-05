@@ -75,18 +75,18 @@ namespace MyCAM.Data
 			m_Map[ key ] = value;
 		}
 
-		// remove the key and set the interpolate type to the be overwrite key
-		public void Remove( int removeKey, int beOverwriteIdx )
+		// remove the control point and transfer its interpolation type to the next point
+		public void RemoveAndTransferInterpolation( int removeKey, int nextPointIdx )
 		{
 			if( !m_Map.ContainsKey( removeKey ) ) {
 				return;
 			}
 			EToolVecInterpolateType removeType = m_Map[ removeKey ].InterpolateType;
 			m_Map.Remove( removeKey );
-			if( !m_Map.ContainsKey( beOverwriteIdx ) ) {
+			if( !m_Map.ContainsKey( nextPointIdx ) ) {
 				return;
 			}
-			m_Map[ beOverwriteIdx ].InterpolateType = removeType;
+			m_Map[ nextPointIdx ].InterpolateType = removeType;
 		}
 
 		public void Remove( int removeKey )

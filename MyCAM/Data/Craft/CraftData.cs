@@ -360,64 +360,66 @@ namespace MyCAM.Data
 		}
 
 		// API for outside modification
-		public void SetToolVecModify( int index, double dRA_deg, double dRB_deg, double master_deg, double slave_deg, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
+		public void ChangeToolVecModify( int index, double dRA_deg, double dRB_deg, double master_deg, double slave_deg )
 		{
+			if( m_ToolVecModifyMap == null || !m_ToolVecModifyMap.ContainsKey( index ) ) {
+				return;
+			}
 			ToolVecAngleData angleData = new ToolVecAngleData( dRA_deg, dRB_deg, master_deg, slave_deg );
-			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				m_ToolVecModifyMap[ index ] = new ToolVecModifyData( angleData, m_ToolVecModifyMap[ index ].InterpolateType );
-			}
-			else {
-				m_ToolVecModifyMap.Add( index, new ToolVecModifyData( angleData, interpolateType ) );
-			}
+			m_ToolVecModifyMap[ index ] = new ToolVecModifyData( angleData, m_ToolVecModifyMap[ index ].InterpolateType );
 			CAMFactorChanged?.Invoke();
 		}
 
-		public void RemoveToolVecModify( int index )
+		public void AddToolVecModify( int index, double dRA_deg, double dRB_deg, double master_deg, double slave_deg, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
 		{
-			if( m_ToolVecModifyMap.ContainsKey( index ) ) {
-				if( IsPathReverse == false ) {
-
-					// the interpolat type will be set to next modify idx 
-					bool isFoundNext = FindNextMapIndex( index, out int nNextIdx );
-					if( isFoundNext ) {
-						m_ToolVecModifyMap.Remove( index, nNextIdx );
-					}
-					else {
-						EToolVecInterpolateType removedType = m_ToolVecModifyMap[ index ].InterpolateType;
-						StartPntToolVecData.EndPnt.InterpolateType = removedType;
-						m_ToolVecModifyMap.Remove( index );
-					}
-				}
-				else {
-
-					// this region interpolate type in revese case is record at pre index
-					// remove this index means pre region will include this region, so type do not have to change )
-					m_ToolVecModifyMap.Remove( index );
-				}
+			if( m_ToolVecModifyMap == null ) {
+				return;
 			}
+			ToolVecAngleData angleData = new ToolVecAngleData( dRA_deg, dRB_deg, master_deg, slave_deg );
+			m_ToolVecModifyMap.Add( index, new ToolVecModifyData( angleData, interpolateType ) );
 			CAMFactorChanged?.Invoke();
 		}
 
-		public void SetInterpolationMode( int nCurrentIdx, EToolVecInterpolateType interpolateType )
+		public void RemoveCtrlPntAndTransInterpolation( int nPntIdx, int nNextIdx )
 		{
-			bool isGetNextModfiyIndex = FindNextMapIndex( nCurrentIdx, out int nNextIdx );
-			if( isGetNextModfiyIndex ) {
-				ToolVecModifyMap[ nNextIdx ].InterpolateType = interpolateType;
+			if( m_ToolVecModifyMap == null || !m_ToolVecModifyMap.ContainsKey( nPntIdx ) ) {
+				return;
+			}
+			m_ToolVecModifyMap.RemoveAndTransferInterpolation( nPntIdx, nNextIdx );
+			CAMFactorChanged?.Invoke();
+		}
+
+		public void RemoveCtrlPnt( int nPntIdx )
+		{
+			if( m_ToolVecModifyMap == null || !m_ToolVecModifyMap.ContainsKey( nPntIdx ) ) {
+				return;
+			}
+			m_ToolVecModifyMap.Remove( nPntIdx );
+			CAMFactorChanged?.Invoke();
+		}
+
+		public void SetInterpolationTypeAtPnt( int nCtrlPntIdx, EToolVecInterpolateType interpolateType )
+		{
+			if( m_ToolVecModifyMap == null || !m_ToolVecModifyMap.ContainsKey( nCtrlPntIdx ) ) {
+				return;
+			}
+			m_ToolVecModifyMap[ nCtrlPntIdx ].InterpolateType = interpolateType;
+			CAMFactorChanged?.Invoke();
+		}
+
+		// change start end pnt type should trigger CAMFactorChanged
+		public void SetInterpolationTypeAtStartPnt( bool isStartIdx, EToolVecInterpolateType interpolateType )
+		{
+			if( StartPntToolVecData == null ) {
+				StartPntToolVecData = new StartPntToolVecParam();
+			}
+			if( isStartIdx ) {
+				StartPntToolVecData.StartPnt.InterpolateType = interpolateType;
 			}
 			else {
-				if( IsPathReverse ) {
-
-					// first region is record on first pnt (in reverse case this region type is recorded at preidx)
-					StartPntToolVecData.StartPnt.InterpolateType = interpolateType;
-				}
-
-				// last region is record on end pnt
-				else {
-					StartPntToolVecData.EndPnt.InterpolateType = interpolateType;
-				}
+				StartPntToolVecData.EndPnt.InterpolateType = interpolateType;
 			}
 			CAMFactorChanged?.Invoke();
-
 		}
 
 		public void ClearToolVecModify()
@@ -447,55 +449,6 @@ namespace MyCAM.Data
 				return true;
 			}
 			return false;
-		}
-
-		// let path know this region type (region type is record at the end of region )
-		public bool FindNextMapIndex( int currentIdx, out int nextIdx )
-		{
-			int StartPntIdx = m_StartPointIndex;
-
-			// find the smallest key that is greater than the removed key
-			nextIdx = -1;
-			bool found = false;
-
-			if( currentIdx > StartPntIdx ) {
-
-				// find the smallest key that is greater than currentIdx till the end
-				foreach( int k in ToolVecModifyMap.Keys ) {
-					if( k > currentIdx ) {
-						nextIdx = k;
-						found = true;
-						break;
-					}
-				}
-
-				// cant find, then find the smallest key that is smaller than start point index
-				if( found == false ) {
-					foreach( int k in ToolVecModifyMap.Keys ) {
-						if( k > StartPntIdx ) {
-							break;
-						}
-						if( k < currentIdx ) {
-							nextIdx = k;
-							found = true;
-							break;
-						}
-					}
-				}
-			}
-			else {
-				foreach( int k in ToolVecModifyMap.Keys ) {
-					if( k > StartPntIdx ) {
-						break;
-					}
-					if( k > currentIdx ) {
-						nextIdx = k;
-						found = true;
-						break;
-					}
-				}
-			}
-			return found;
 		}
 
 		public Dictionary<int, ContourEditData> ContourEditMap
@@ -604,6 +557,4 @@ namespace MyCAM.Data
 		double m_InitSlave_rad = 0;
 		Dictionary<int, ContourEditData> m_ContourEditMap = new Dictionary<int, ContourEditData>();
 	}
-
-
 }

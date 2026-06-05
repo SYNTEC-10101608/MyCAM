@@ -490,7 +490,7 @@ namespace MyCAM.PathCache
 		}
 
 
-		void SetMicroJoint(ref List<CAMPoint> camPointList)
+		void SetMicroJoint( ref List<CAMPoint> camPointList )
 		{
 			// set micro joint
 			List<Tuple<int, double>> microJointStartCAMIdxList = GetMicroJointStartCAMIdx();
