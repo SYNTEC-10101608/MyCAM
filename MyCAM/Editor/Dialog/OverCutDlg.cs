@@ -10,7 +10,7 @@ namespace MyCAM.Editor.Dialog
 		{
 			InitializeComponent();
 			m_OverCutLength = overCutLength;
-			m_tbxOverCutLength.Value = (decimal)m_OverCutLength;
+			m_tbxOverCutLength.SilentSetValue = (decimal)m_OverCutLength;
 		}
 
 		public Func<double, bool> CheckValueGeomRestriction;

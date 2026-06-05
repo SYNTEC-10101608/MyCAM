@@ -4,6 +4,7 @@ using OCC.AIS;
 using OCC.gp;
 using OCC.Quantity;
 using OCC.TopoDS;
+using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -214,6 +215,7 @@ namespace MyCAM.Editor.Renderer
 						AIS_Shape segmentAIS = new AIS_Shape( segmentWire );
 						segmentAIS.SetColor( new Quantity_Color( GetInterpolateColor( interpType ) ) );
 						segmentAIS.SetWidth( 3.0 );
+						segmentAIS.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Top );
 						if( trsf != null ) {
 							segmentAIS.SetLocalTransformation( trsf );
 						}

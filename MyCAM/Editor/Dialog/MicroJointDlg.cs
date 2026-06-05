@@ -14,12 +14,12 @@ namespace MyCAM.Editor
 		public MicroJointDlg()
 		{
 			InitializeComponent();
-			m_tbxMicroJointLength.Value = (decimal)DEFAULT_LENGTH;
+			m_tbxMicroJointLength.SilentSetValue = (decimal)DEFAULT_LENGTH;
 		}
 
 		public void SetMicroJointLength( double length )
 		{
-			m_tbxMicroJointLength.Value = (decimal)length;
+			m_tbxMicroJointLength.SilentSetValue = (decimal)length;
 		}
 
 		public double GetMicroJointLength()
