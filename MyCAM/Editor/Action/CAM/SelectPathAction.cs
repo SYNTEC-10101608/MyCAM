@@ -80,7 +80,6 @@ namespace MyCAM.Editor
 			if( e.KeyCode == Keys.Delete ) {
 				RemovePath?.Invoke();
 			}
-			base.OnKeyDown( e );
 		}
 
 		protected override void SyncSelectionFromTree()

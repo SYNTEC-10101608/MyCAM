@@ -178,67 +178,8 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			ManualTransformDlg dlg = new ManualTransformDlg();
 			ManualTransformAction action = new ManualTransformAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
-
-			// when user changes method, update canvas selection mode
-			dlg.ConstraintMethodChanged += ( type ) =>
-			{
-				action.SwitchConstrainMethod( type );
-			};
-
-			// when user selects a G54 axis/plane from dropdown, highlight it on canvas
-			dlg.G54AxisPlaneSelectionChanged += ( selectedIndex ) =>
-			{
-				action.SetG54RefFromDropDown( selectedIndex );
-			};
-
-			// when user manually clicks a G54 shape on canvas, sync the list
-			action.G54RefIndexChanged += ( index ) =>
-			{
-				dlg.SetG54ComboBoxIndex( index );
-			};
-
-			// update workpiece selection status on dlg
-			action.SelectionStatusChanged += ( isWorkpieceSelected ) =>
-			{
-				dlg.UpdateSelectionStatusAndEnableConfirm( isWorkpieceSelected );
-			};
-
-			dlg.Confirm += ( type ) =>
-			{
-				bool isSuccess = action.ApplyTransform( type );
-				if( isSuccess ) {
-					// transform applied, close dialog and end action
-					dlg.MarkConfirmSuccess();
-					dlg.Close();
-					m_CurrentAction?.End();
-				}
-				else {
-					// constraint invalid, keep dialog open and show red hint
-					dlg.ShowConstraintError( "對齊無效，選取的物件並非平面、直線、或正圓弧，請重新選擇" );
-				}
-			};
-
-			dlg.Cancel += () =>
-			{
-				if( m_CurrentAction?.ActionType == EditActionType.ManualTransform ) {
-					m_CurrentAction.End();
-				}
-			};
-
-			// if action ends from viewer ESC, close dialog
-			action.EndAction += ( _ ) =>
-			{
-				if( !dlg.IsDisposed ) {
-					dlg.Close();
-				}
-			};
-
-			action.SwitchConstrainMethod( ETrsfConstraintType.Point );
-			action.SetG54RefFromDropDown( 0 );
-			dlg.Show( MyApp.MainForm );
 		}
 
 		public void StartAxisTransform()
@@ -410,6 +351,12 @@ namespace MyCAM.Editor
 				return;
 			}
 			m_DataManager.AddReferenceFeature( makeVertex.Vertex() );
+
+			// Align bounding box center to G54 origin (0,0,0)
+			gp_Trsf trsf = new gp_Trsf();
+			trsf.SetTranslation( center, new gp_Pnt( 0, 0, 0 ) );
+			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, trsf );
+			transformHelper.TransformData();
 		}
 
 		// edit actions

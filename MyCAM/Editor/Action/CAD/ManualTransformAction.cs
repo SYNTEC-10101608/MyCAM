@@ -43,15 +43,9 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public Action<bool> SelectionStatusChanged;
-		public Action<int> G54RefIndexChanged;
-
 		public override void Start()
 		{
 			base.Start();
-
-			// clear selection
-			m_Viewer.GetAISContext().ClearSelected( false );
 
 			// disable tree view
 			m_TreeView.Enabled = false;
@@ -59,10 +53,20 @@ namespace MyCAM.Editor
 			// show transform part and G54 coordinate system
 			ShowG54Coord();
 			m_Viewer.UpdateView();
+
+			// create and show dialog
+			ShowManualTransformDialog();
 		}
 
 		public override void End()
 		{
+			// close dialog if still open — unhook Cancel to prevent it calling End() again
+			if( m_ManualTransformDlg != null && !m_ManualTransformDlg.IsDisposed ) {
+				m_ManualTransformDlg.Cancel = null;
+				m_ManualTransformDlg.Close();
+			}
+			m_ManualTransformDlg = null;
+
 			// clear selection
 			m_Viewer.GetAISContext().ClearSelected( false );
 
@@ -122,8 +126,8 @@ namespace MyCAM.Editor
 
 				// notify dialog to sync dropdown
 				int dropdownIndex = GetG54DropdownIndex( clickedShape );
-				if( dropdownIndex >= 0 ) {
-					G54RefIndexChanged?.Invoke( dropdownIndex );
+				if( dropdownIndex >= 0 && m_ManualTransformDlg != null && !m_ManualTransformDlg.IsDisposed ) {
+					m_ManualTransformDlg.SetG54ComboBoxIndex( dropdownIndex );
 				}
 			}
 			else {
@@ -136,18 +140,11 @@ namespace MyCAM.Editor
 					m_WorkpieceShape = clickedShape;
 					m_WorkpieceOwner = clickedOwner;
 				}
-				SelectionStatusChanged?.Invoke( m_WorkpieceShape != null );
+				UpdateConfirmButtonState();
 			}
 
 			// rebuild visual selection using entity owners for sub-shape precision
 			RebuildVisualSelection();
-		}
-
-		protected override void ViewerKeyDown( KeyEventArgs e )
-		{
-			if( e.KeyCode == Keys.Escape ) {
-				End();
-			}
 		}
 
 		public bool ApplyTransform( ETrsfConstraintType type )
@@ -178,7 +175,6 @@ namespace MyCAM.Editor
 					return false;
 			}
 			if( !c.IsValid() ) {
-				MyApp.Logger.ShowOnLogPanel( "對齊無效，請重新選擇工件上適當的元素", MyApp.NoticeType.Warning );
 				return false;
 			}
 			gp_Trsf trsf = c.SolveConstraint();
@@ -190,7 +186,7 @@ namespace MyCAM.Editor
 			m_WorkpieceShape = null;
 			m_RefG54AIS = null;
 			m_WorkpieceOwner = null;
-			SelectionStatusChanged?.Invoke( false );
+			UpdateConfirmButtonState();
 			return true;
 		}
 
@@ -219,7 +215,7 @@ namespace MyCAM.Editor
 					workpieceMode = AISActiveMode.Vertex;
 
 					// point mode: only origin vertex selectable on G54
-					m_Viewer.GetAISContext().Activate( m_G54AISList[ 6 ], (int)AISActiveMode.Vertex );
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ (int)EG54AISIndex.Origin ], (int)AISActiveMode.Vertex );
 					break;
 
 				case ETrsfConstraintType.Axial:
@@ -227,9 +223,9 @@ namespace MyCAM.Editor
 					workpieceMode = AISActiveMode.Edge;
 
 					// axis mode: only X/Y/Z axis edges selectable on G54
-					m_Viewer.GetAISContext().Activate( m_G54AISList[ 3 ], (int)AISActiveMode.Edge );
-					m_Viewer.GetAISContext().Activate( m_G54AISList[ 4 ], (int)AISActiveMode.Edge );
-					m_Viewer.GetAISContext().Activate( m_G54AISList[ 5 ], (int)AISActiveMode.Edge );
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ (int)EG54AISIndex.XAxis ], (int)AISActiveMode.Edge );
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ (int)EG54AISIndex.YAxis ], (int)AISActiveMode.Edge );
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ (int)EG54AISIndex.ZAxis ], (int)AISActiveMode.Edge );
 					break;
 
 				case ETrsfConstraintType.Plane:
@@ -237,9 +233,9 @@ namespace MyCAM.Editor
 					workpieceMode = AISActiveMode.Face;
 
 					// plane mode: only XY/YZ/XZ planes selectable on G54
-					m_Viewer.GetAISContext().Activate( m_G54AISList[ 0 ], (int)AISActiveMode.Face );
-					m_Viewer.GetAISContext().Activate( m_G54AISList[ 1 ], (int)AISActiveMode.Face );
-					m_Viewer.GetAISContext().Activate( m_G54AISList[ 2 ], (int)AISActiveMode.Face );
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ (int)EG54AISIndex.XYFace ], (int)AISActiveMode.Face );
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ (int)EG54AISIndex.YZFace ], (int)AISActiveMode.Face );
+					m_Viewer.GetAISContext().Activate( m_G54AISList[ (int)EG54AISIndex.XZFace ], (int)AISActiveMode.Face );
 					break;
 
 				default:
@@ -261,7 +257,7 @@ namespace MyCAM.Editor
 			m_WorkpieceOwner = null;
 			m_Viewer.GetAISContext().ClearSelected( false );
 			m_Viewer.GetAISContext().UpdateCurrentViewer();
-			SelectionStatusChanged?.Invoke( false );
+			UpdateConfirmButtonState();
 		}
 
 		public void SetG54RefFromDropDown( int dropdownIndex )
@@ -270,11 +266,11 @@ namespace MyCAM.Editor
 			int aisIndex;
 			switch( m_CurrentMode ) {
 				case ETrsfConstraintType.Point:
-					aisIndex = 6;
+					aisIndex = (int)EG54AISIndex.Origin;
 					break;
 				case ETrsfConstraintType.Axial:
 				case ETrsfConstraintType.AxialParallel:
-					aisIndex = 3 + dropdownIndex;
+					aisIndex = (int)EG54AISIndex.XAxis + dropdownIndex;
 					break;
 				case ETrsfConstraintType.Plane:
 				case ETrsfConstraintType.PlaneParallel:
@@ -296,7 +292,49 @@ namespace MyCAM.Editor
 			m_RefG54AIS = targetAIS;
 
 			RebuildVisualSelection();
-			SelectionStatusChanged?.Invoke( m_WorkpieceShape != null );
+		}
+
+		void ShowManualTransformDialog()
+		{
+			m_ManualTransformDlg = new ManualTransformDlg();
+
+			m_ManualTransformDlg.ConstraintMethodChanged += ( type ) =>
+			{
+				SwitchConstrainMethod( type );
+			};
+
+			m_ManualTransformDlg.G54AxisPlaneSelectionChanged += ( selectedIndex ) =>
+			{
+				SetG54RefFromDropDown( selectedIndex );
+			};
+
+			m_ManualTransformDlg.Confirm += ( type ) =>
+			{
+				bool isSuccess = ApplyTransform( type );
+				if( isSuccess ) {
+					m_ManualTransformDlg.MarkConfirmSuccess();
+					End();
+				}
+				else {
+					m_ManualTransformDlg.ShowConstraintError( "對齊無效，選取的物件並非平面、直線、或正圓弧，請重新選擇" );
+				}
+			};
+
+			m_ManualTransformDlg.Cancel += () =>
+			{
+				End();
+			};
+
+			m_ManualTransformDlg.Initialize();
+			m_ManualTransformDlg.Show( MyApp.MainForm );
+		}
+
+		void UpdateConfirmButtonState()
+		{
+			bool isWorkpieceSelected = m_WorkpieceShape != null;
+			if( m_ManualTransformDlg != null && !m_ManualTransformDlg.IsDisposed ) {
+				m_ManualTransformDlg.UpdateSelectionStatusAndEnableConfirm( isWorkpieceSelected );
+			}
 		}
 
 		int GetG54DropdownIndex( TopoDS_Shape shape )
@@ -307,7 +345,7 @@ namespace MyCAM.Editor
 				case ETrsfConstraintType.Axial:
 				case ETrsfConstraintType.AxialParallel:
 					for( int i = 0; i < 3; i++ ) {
-						if( ContainsSubShape( m_G54AISList[ 3 + i ].Shape(), shape ) ) {
+						if( ContainsSubShape( m_G54AISList[ (int)EG54AISIndex.XAxis + i ].Shape(), shape ) ) {
 							return i;
 						}
 					}
@@ -315,7 +353,7 @@ namespace MyCAM.Editor
 				case ETrsfConstraintType.Plane:
 				case ETrsfConstraintType.PlaneParallel:
 					for( int i = 0; i < 3; i++ ) {
-						if( ContainsSubShape( m_G54AISList[ i ].Shape(), shape ) ) {
+						if( ContainsSubShape( m_G54AISList[ (int)EG54AISIndex.XYFace + i ].Shape(), shape ) ) {
 							return i;
 						}
 					}
@@ -549,5 +587,18 @@ namespace MyCAM.Editor
 		AIS_Shape m_RefG54AIS;
 		TopoDS_Shape m_WorkpieceShape;
 		SelectMgr_EntityOwner m_WorkpieceOwner;
+
+		ManualTransformDlg m_ManualTransformDlg;
+
+		enum EG54AISIndex
+		{
+			XYFace = 0,
+			YZFace = 1,
+			XZFace = 2,
+			XAxis = 3,
+			YAxis = 4,
+			ZAxis = 5,
+			Origin = 6
+		}
 	}
 }
