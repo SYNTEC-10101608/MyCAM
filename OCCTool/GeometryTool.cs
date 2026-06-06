@@ -1,5 +1,7 @@
-﻿using OCC.BRep;
+﻿using OCC.Bnd;
+using OCC.BRep;
 using OCC.BRepAdaptor;
+using OCC.BRepBndLib;
 using OCC.BRepBuilderAPI;
 using OCC.BRepGProp;
 using OCC.ElCLib;
@@ -152,6 +154,20 @@ namespace OCCTool
 				p = surface.AxeOfRevolution().Location();
 				dir = surface.AxeOfRevolution().Direction();
 				return true;
+			}
+			else if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_BSplineSurface ) {
+				Geom_Surface geomSurface = BRep_Tool.Surface( face );
+				if( geomSurface is Geom_BSplineSurface bsplineSurface ) {
+					return TryFitRotationAxisToBSplineSurface( face, bsplineSurface, out p, out dir );
+				}
+				return false;
+			}
+			else if( surface.GetSurfaceType() == GeomAbs_SurfaceType.GeomAbs_BezierSurface ) {
+				Geom_Surface geomSurface = BRep_Tool.Surface( face );
+				if( geomSurface is Geom_BezierSurface bezierSurface ) {
+					return TryFitRotationAxisToBezierSurface( face, bezierSurface, out p, out dir );
+				}
+				return false;
 			}
 			else {
 				return false;
@@ -658,5 +674,291 @@ namespace OCCTool
 
 			return true;
 		}
+
+		#region BSpline Revolution Surface Detection
+
+		const double ROTATION_AXIS_TOLERANCE = 1e-2;
+
+		delegate void SurfaceD1Evaluator( double u, double v, ref gp_Pnt pnt, ref gp_Vec d1u, ref gp_Vec d1v );
+
+		static bool TryFitRotationAxisToParametricSurface(
+			TopoDS_Face face,
+			int nU,
+			int nV,
+			double uMin,
+			double uMax,
+			double vMin,
+			double vMax,
+			SurfaceD1Evaluator surfaceEvaluator,
+			out gp_Pnt p,
+			out gp_Dir dir )
+		{
+			p = new gp_Pnt();
+			dir = new gp_Dir();
+
+			try {
+				// get sample points
+				List<gp_Pnt> points = new List<gp_Pnt>();
+				List<gp_Dir> normals = new List<gp_Dir>();
+
+				for( int i = 0; i < nU; i++ ) {
+					double u = uMin + ( uMax - uMin ) * i / ( nU - 1 );
+					for( int j = 0; j < nV; j++ ) {
+						double v = vMin + ( vMax - vMin ) * j / ( nV - 1 );
+
+						gp_Pnt pnt = new gp_Pnt();
+						gp_Vec d1u = new gp_Vec();
+						gp_Vec d1v = new gp_Vec();
+						surfaceEvaluator( u, v, ref pnt, ref d1u, ref d1v );
+						gp_Vec normal = d1u.Crossed( d1v );
+
+						// filter singular points where normal cannot be defined
+						if( normal.Magnitude() > 1e-10 ) {
+							normal.Normalize();
+							points.Add( pnt );
+							normals.Add( new gp_Dir( normal ) );
+						}
+					}
+				}
+				if( points.Count < 4 ) {
+					return false;
+				}
+
+				// find intersection points of non-parallel normal lines
+				List<gp_Pnt> intersections = new List<gp_Pnt>();
+				double diagonalLength = GetFaceBoundingBoxDiagonal( face );
+
+				// 1% of bounding box diagonal
+				double maxDistance = diagonalLength * 0.01;
+
+				for( int i = 0; i < normals.Count - 1; i++ ) {
+					for( int j = i + 1; j < normals.Count; j++ ) {
+
+						// skip parallel normals (not useful)
+						double dotProduct = Math.Abs( normals[ i ].Dot( normals[ j ] ) );
+						if( 1.0 - dotProduct < 1e-6 ) {
+							continue;
+						}
+
+						// compute closest points between two normal lines
+						var closestPoints = ComputeClosestPointsBetween3DLine( points[ i ], normals[ i ], points[ j ], normals[ j ] );
+						if( closestPoints.Success ) {
+							double distance = closestPoints.Point1.Distance( closestPoints.Point2 );
+
+							// if the lines nearly intersect, record the midpoint
+							if( distance < maxDistance ) {
+								gp_Pnt midPoint = new gp_Pnt(
+									( closestPoints.Point1.X() + closestPoints.Point2.X() ) / 2.0,
+									( closestPoints.Point1.Y() + closestPoints.Point2.Y() ) / 2.0,
+									( closestPoints.Point1.Z() + closestPoints.Point2.Z() ) / 2.0
+								);
+								intersections.Add( midPoint );
+							}
+						}
+					}
+				}
+
+				// need sufficient intersection points to fit a reliable axis
+				if( intersections.Count < 4 ) {
+					return false;
+				}
+
+				// fit a line in 3D point
+				if( !FitLineToPoints( intersections, out gp_Dir axisDir, out gp_Pnt axisPnt, out double error ) ) {
+					return false;
+				}
+
+				// normalize error relative to face size
+				double errorNormalized = error / diagonalLength;
+
+				// check if the fitted axis is within acceptable tolerance
+				if( errorNormalized < ROTATION_AXIS_TOLERANCE ) {
+					p = axisPnt;
+					dir = axisDir;
+					return true;
+				}
+				return false;
+			}
+			catch {
+				return false;
+			}
+		}
+
+		static bool TryFitRotationAxisToBSplineSurface( TopoDS_Face face, Geom_BSplineSurface bsplineSurface, out gp_Pnt p, out gp_Dir dir )
+		{
+			int nU = Math.Max( 5, Math.Min( 10, bsplineSurface.NbUPoles() / 2 ) );
+			int nV = Math.Max( 5, Math.Min( 10, bsplineSurface.NbVPoles() / 2 ) );
+
+			double uMin = bsplineSurface.UKnot( 1 );
+			double uMax = bsplineSurface.UKnot( bsplineSurface.NbUKnots() );
+			double vMin = bsplineSurface.VKnot( 1 );
+			double vMax = bsplineSurface.VKnot( bsplineSurface.NbVKnots() );
+
+			return TryFitRotationAxisToParametricSurface(
+				face, nU, nV, uMin, uMax, vMin, vMax,
+				bsplineSurface.D1,
+				out p, out dir );
+		}
+
+		static bool TryFitRotationAxisToBezierSurface( TopoDS_Face face, Geom_BezierSurface bezierSurface, out gp_Pnt p, out gp_Dir dir )
+		{
+			int nU = Math.Max( 5, Math.Min( 10, bezierSurface.NbUPoles() ) );
+			int nV = Math.Max( 5, Math.Min( 10, bezierSurface.NbVPoles() ) );
+
+			double uMin = 0.0;
+			double uMax = 1.0;
+			double vMin = 0.0;
+			double vMax = 1.0;
+
+			return TryFitRotationAxisToParametricSurface(
+				face, nU, nV, uMin, uMax, vMin, vMax,
+				bezierSurface.D1,
+				out p, out dir );
+		}
+
+		static bool FitLineToPoints( List<gp_Pnt> points, out gp_Dir direction, out gp_Pnt point, out double error )
+		{
+			direction = null;
+			point = new gp_Pnt();
+			error = double.PositiveInfinity;
+
+			if( points.Count < 2 ) {
+				return false;
+			}
+
+			double sumX = 0, sumY = 0, sumZ = 0;
+			foreach( var p in points ) {
+				sumX += p.X();
+				sumY += p.Y();
+				sumZ += p.Z();
+			}
+
+			gp_Pnt centroid = new gp_Pnt(
+				sumX / points.Count,
+				sumY / points.Count,
+				sumZ / points.Count
+			);
+
+			double[,] covMatrix = new double[ 3, 3 ];
+			foreach( var p in points ) {
+				double dx = p.X() - centroid.X();
+				double dy = p.Y() - centroid.Y();
+				double dz = p.Z() - centroid.Z();
+
+				covMatrix[ 0, 0 ] += dx * dx;
+				covMatrix[ 0, 1 ] += dx * dy;
+				covMatrix[ 0, 2 ] += dx * dz;
+				covMatrix[ 1, 0 ] += dy * dx;
+				covMatrix[ 1, 1 ] += dy * dy;
+				covMatrix[ 1, 2 ] += dy * dz;
+				covMatrix[ 2, 0 ] += dz * dx;
+				covMatrix[ 2, 1 ] += dz * dy;
+				covMatrix[ 2, 2 ] += dz * dz;
+			}
+
+			var eigenResult = ComputeLargestEigenvector3x3( covMatrix );
+			if( !eigenResult.Success ) {
+				return false;
+			}
+
+			direction = new gp_Dir( eigenResult.Vx, eigenResult.Vy, eigenResult.Vz );
+			point = centroid;
+			error = CalculateFittingError( points, centroid, direction );
+			return true;
+		}
+
+		static (bool Success, gp_Pnt Point1, gp_Pnt Point2) ComputeClosestPointsBetween3DLine( gp_Pnt p1, gp_Dir dir1, gp_Pnt p2, gp_Dir dir2 )
+		{
+			try {
+				double p1_x = p1.X(), p1_y = p1.Y(), p1_z = p1.Z();
+				double u1_x = dir1.X(), u1_y = dir1.Y(), u1_z = dir1.Z();
+				double p2_x = p2.X(), p2_y = p2.Y(), p2_z = p2.Z();
+				double u2_x = dir2.X(), u2_y = dir2.Y(), u2_z = dir2.Z();
+
+				double t1_t1_coef = u1_x * u1_x + u1_y * u1_y + u1_z * u1_z;
+				double t1_t2_coef = -2.0 * ( u1_x * u2_x + u1_y * u2_y + u1_z * u2_z );
+				double t2_t2_coef = u2_x * u2_x + u2_y * u2_y + u2_z * u2_z;
+
+				double t1_coef = 2.0 * ( p1_x * u1_x + p1_y * u1_y + p1_z * u1_z - p2_x * u1_x - p2_y * u1_y - p2_z * u1_z );
+				double t2_coef = 2.0 * ( -p1_x * u2_x - p1_y * u2_y - p1_z * u2_z + p2_x * u2_x + p2_y * u2_y + p2_z * u2_z );
+
+				double a11 = 2.0 * t1_t1_coef;
+				double a12 = t1_t2_coef;
+				double a21 = t1_t2_coef;
+				double a22 = 2.0 * t2_t2_coef;
+
+				double det = a11 * a22 - a12 * a21;
+				if( Math.Abs( det ) < 1e-10 ) {
+					return (false, null, null);
+				}
+
+				double t1 = -( t1_coef * a22 - t2_coef * a12 ) / det;
+				double t2 = -( a11 * t2_coef - a21 * t1_coef ) / det;
+
+				gp_Pnt point1 = new gp_Pnt( p1_x + t1 * u1_x, p1_y + t1 * u1_y, p1_z + t1 * u1_z );
+				gp_Pnt point2 = new gp_Pnt( p2_x + t2 * u2_x, p2_y + t2 * u2_y, p2_z + t2 * u2_z );
+
+				return (true, point1, point2);
+			}
+			catch {
+				return (false, null, null);
+			}
+		}
+
+		static double CalculateFittingError( List<gp_Pnt> points, gp_Pnt axisPnt, gp_Dir axisDir )
+		{
+			double sumError = 0;
+			foreach( var pt in points ) {
+				gp_Vec v = new gp_Vec( axisPnt, pt );
+				double projection = v.Dot( new gp_Vec( axisDir ) );
+				gp_Pnt projectedPnt = axisPnt.Translated( new gp_Vec( axisDir ).Multiplied( projection ) );
+				sumError += pt.Distance( projectedPnt );
+			}
+			return sumError / points.Count;
+		}
+
+		static (bool Success, double Vx, double Vy, double Vz) ComputeLargestEigenvector3x3( double[,] A )
+		{
+			try {
+				double vx = 1.0, vy = 0.0, vz = 0.0;
+
+				for( int iter = 0; iter < 30; iter++ ) {
+					double newVx = A[ 0, 0 ] * vx + A[ 0, 1 ] * vy + A[ 0, 2 ] * vz;
+					double newVy = A[ 1, 0 ] * vx + A[ 1, 1 ] * vy + A[ 1, 2 ] * vz;
+					double newVz = A[ 2, 0 ] * vx + A[ 2, 1 ] * vy + A[ 2, 2 ] * vz;
+
+					double mag = Math.Sqrt( newVx * newVx + newVy * newVy + newVz * newVz );
+					if( mag < 1e-10 ) {
+						return (false, 0, 0, 0);
+					}
+
+					vx = newVx / mag;
+					vy = newVy / mag;
+					vz = newVz / mag;
+				}
+
+				return (true, vx, vy, vz);
+			}
+			catch {
+				return (false, 0, 0, 0);
+			}
+		}
+
+		static double GetFaceBoundingBoxDiagonal( TopoDS_Face face )
+		{
+			Bnd_Box box = new Bnd_Box();
+			BRepBndLib.Add( face, ref box );
+
+			double xMin = 0.0, yMin = 0.0, zMin = 0.0, xMax = 0.0, yMax = 0.0, zMax = 0.0;
+			box.Get( ref xMin, ref yMin, ref zMin, ref xMax, ref yMax, ref zMax );
+
+			double dx = xMax - xMin;
+			double dy = yMax - yMin;
+			double dz = zMax - zMin;
+
+			return Math.Sqrt( dx * dx + dy * dy + dz * dz );
+		}
+
+		#endregion
 	}
 }
