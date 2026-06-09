@@ -135,24 +135,39 @@ namespace MyCAM.PathCache
 			m_IsCADFactorDirty = false;
 			SetCenterDir();
 
+			// apply contour offset on raw geometry (before transform and local edit)
+			List<CADPoint> sourceCADPointList = m_ContourGeomData.CADPointList;
+			if( Math.Abs( m_CraftData.CompensatedDistance ) > 1e-6 && m_IsClose ) {
+				List<CADPoint> offsetResult = ContourOffsetHelper.ApplyOffset(
+					m_ContourGeomData.CADPointList,
+					m_ContourGeomData.ConnectPointMap,
+					m_CraftData.CompensatedDistance,
+					m_IsClose,
+					out m_OffsetPointCount );
+				if( offsetResult != null ) {
+					sourceCADPointList = offsetResult;
+				}
+				else {
+					// offset degenerated the entire path, fall back to original
+					m_OffsetPointCount = m_ContourGeomData.CADPointList.Count;
+					sourceCADPointList = m_ContourGeomData.CADPointList;
+				}
+			}
+			else {
+				m_OffsetPointCount = m_ContourGeomData.CADPointList.Count;
+			}
+
 			// global transform only (no local edit)
-			m_TrsfCADPointList = m_ContourGeomData.CADPointList.Select( p => p.Clone() ).ToList();
+			m_TrsfCADPointList = sourceCADPointList.Select( p => p.Clone() ).ToList();
 			for( int i = 0; i < m_TrsfCADPointList.Count; i++ ) {
 				m_TrsfCADPointList[ i ].Transform( m_CraftData.CumulativeTrsfMatrix );
 			}
 
 			// apply local CAD point displacement on top of global transform
 			m_CADPointList = ContourEditHelper.ApplyContourEdit(
-				m_TrsfCADPointList.Select( p => p.Clone() ).ToList(), m_CraftData.ContourEditMap, m_IsClose );
+				m_TrsfCADPointList.Select( p => p.Clone() ).ToList(), ClampContourEditMap(), m_IsClose );
 
 			m_ConnectCADPointMap.Clear();
-			foreach( var kvp in m_ContourGeomData.ConnectPointMap ) {
-				CADPoint transformedKey = kvp.Key.Clone();
-				transformedKey.Transform( m_CraftData.CumulativeTrsfMatrix );
-				CADPoint transformedValue = kvp.Value.Clone();
-				transformedValue.Transform( m_CraftData.CumulativeTrsfMatrix );
-				m_ConnectCADPointMap.Add( transformedKey, transformedValue );
-			}
 
 			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, false );
 			BuildCAMPointList();
@@ -241,9 +256,12 @@ namespace MyCAM.PathCache
 		{
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = new Dictionary<int, ToolVecModifyData>();
 			foreach( int oneIndex in m_CraftData.ToolVecModifyMap.Keys ) {
-				if( m_CADToCAMIndexMap.ContainsKey( oneIndex ) ) {
-					int camIndex = m_CADToCAMIndexMap[ oneIndex ];
-					toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
+				int clampedIndex = ClampIndex( oneIndex );
+				if( m_CADToCAMIndexMap.ContainsKey( clampedIndex ) ) {
+					int camIndex = m_CADToCAMIndexMap[ clampedIndex ];
+					if( !toolVecModifyMap.ContainsKey( camIndex ) ) {
+						toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
+					}
 				}
 			}
 			return toolVecModifyMap;
@@ -445,11 +463,12 @@ namespace MyCAM.PathCache
 
 		void SetStartPoint()
 		{
-			// rearrange cam points to start from the start index
-			if( m_CraftData.StartPointIndex != 0 ) {
+			// rearrange cam points to start from the start index (clamped after offset)
+			int startIdx = ClampIndex( m_CraftData.StartPointIndex );
+			if( startIdx != 0 ) {
 				List<CAMPoint> newCAMPointList = new List<CAMPoint>();
 				for( int i = 0; i < m_CAMPointList.Count; i++ ) {
-					newCAMPointList.Add( m_CAMPointList[ ( i + m_CraftData.StartPointIndex ) % m_CAMPointList.Count ] );
+					newCAMPointList.Add( m_CAMPointList[ ( i + startIdx ) % m_CAMPointList.Count ] );
 				}
 				m_CAMPointList = newCAMPointList;
 			}
@@ -489,6 +508,33 @@ namespace MyCAM.PathCache
 			m_ComputeRefCenterDir = m_ContourGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
 		}
 
+		/// <summary>
+		/// Clamp ContourEditMap indices to valid range after offset may have reduced point count.
+		/// </summary>
+		Dictionary<int, ContourEditData> ClampContourEditMap()
+		{
+			if( m_CraftData.ContourEditMap == null || m_CraftData.ContourEditMap.Count == 0 ) {
+				return m_CraftData.ContourEditMap;
+			}
+			int maxIndex = m_TrsfCADPointList.Count - 1;
+			Dictionary<int, ContourEditData> clamped = new Dictionary<int, ContourEditData>();
+			foreach( var kvp in m_CraftData.ContourEditMap ) {
+				int idx = Math.Min( kvp.Key, maxIndex );
+				if( !clamped.ContainsKey( idx ) ) {
+					clamped[ idx ] = kvp.Value;
+				}
+			}
+			return clamped;
+		}
+
+		int ClampIndex( int index )
+		{
+			if( m_OffsetPointCount <= 0 ) {
+				return 0;
+			}
+			return Math.Min( index, m_OffsetPointCount - 1 );
+		}
+
 
 		void SetMicroJoint( ref List<CAMPoint> camPointList )
 		{
@@ -501,9 +547,10 @@ namespace MyCAM.PathCache
 		{
 			List<Tuple<int, double>> microJointStartCAMIdxList = new List<Tuple<int, double>>();
 			foreach( int oneIndex in m_CraftData.MicroJointStartIdxMap.Keys ) {
-				if( m_CADToCAMIndexMap.ContainsKey( oneIndex ) ) {
+				int clampedIndex = ClampIndex( oneIndex );
+				if( m_CADToCAMIndexMap.ContainsKey( clampedIndex ) ) {
 					double microJointLength = m_CraftData.MicroJointStartIdxMap[ oneIndex ];
-					int camIndex = m_CADToCAMIndexMap[ oneIndex ];
+					int camIndex = m_CADToCAMIndexMap[ clampedIndex ];
 					microJointStartCAMIdxList.Add( new Tuple<int, double>( camIndex, microJointLength ) );
 				}
 			}
@@ -535,6 +582,9 @@ namespace MyCAM.PathCache
 
 		// for CAD point connection
 		Dictionary<CADPoint, CADPoint> m_ConnectCADPointMap = new Dictionary<CADPoint, CADPoint>();
+
+		// offset result tracking
+		int m_OffsetPointCount = 0;
 
 		// flag to indicate craft data changed
 		bool m_IsCAMFactorDirty = false;

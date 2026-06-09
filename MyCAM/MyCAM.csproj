@@ -153,6 +153,7 @@
     <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
     <Compile Include="Helper\CAM\ContourEditHelper.cs" />
+    <Compile Include="Helper\CAM\ContourOffsetHelper.cs" />
     <Compile Include="Helper\CAM\MicroJointHelper.cs" />
     <Compile Include="Helper\CAM\StartPointHelper.cs" />
     <Compile Include="Helper\Canvas\DrawHelper.cs" />
