@@ -219,7 +219,7 @@ namespace MyCAM.Helper
                     gp_Pnt p4 = points[ nextOfOutgoing ].Point.Point;
 
                     gp_Pnt intersection = GeometryTool.FindIntersectPoint(
-                        p1, p2, p3, p4,
+                        p1, p2, p4, p3,
                         out IntersectType typeL1, out IntersectType typeL2 );
 
                     if( typeL1 == IntersectType.NoIntersect ) {
