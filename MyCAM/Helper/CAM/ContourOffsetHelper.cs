@@ -46,6 +46,9 @@ namespace MyCAM.Helper
                 return null;
             }
 
+            // Step C.5: detect collapsed arc regions and mark as corner pairs
+            DetectCollapsedArcs( offsetPoints );
+
             // Step D: resolve corner intersections
             if( !ResolveCornerIntersections( offsetPoints ) ) {
                 return null;
@@ -170,6 +173,143 @@ namespace MyCAM.Helper
             CADPoint result = point.Clone();
             result.Translate( displacement );
             return result;
+        }
+
+        #endregion
+
+        #region Step C.5: Detect collapsed arc regions
+
+        /// <summary>
+        /// Detect arc regions that collapsed due to offset exceeding curvature radius.
+        /// For each point, compare the actual path direction (to next alive point) with the stored TangentVec.
+        /// If dot product < 0, the point has flipped. Collapsed regions are marked and converted to corner pairs.
+        /// </summary>
+        static void DetectCollapsedArcs( List<OffsetPoint> points )
+        {
+            int count = points.Count;
+            if( count < MIN_VALID_POINT_COUNT ) {
+                return;
+            }
+
+            // compute "leaving direction flipped" flag for each alive point
+            bool[] isFlipped = new bool[ count ];
+            for( int i = 0; i < count; i++ ) {
+                if( points[ i ].IsRemoved ) {
+                    isFlipped[ i ] = false;
+                    continue;
+                }
+                int nextIdx = FindNextAlive( points, i );
+                if( nextIdx < 0 ) {
+                    isFlipped[ i ] = false;
+                    continue;
+                }
+                gp_Vec actualDir = new gp_Vec( points[ i ].Point.Point, points[ nextIdx ].Point.Point );
+                if( actualDir.Magnitude() < GEOM_TOLERANCE ) {
+                    isFlipped[ i ] = false;
+                    continue;
+                }
+                gp_Vec storedTangent = new gp_Vec( points[ i ].Point.TangentVec );
+                double dot = actualDir.Dot( storedTangent );
+                isFlipped[ i ] = dot < 0;
+            }
+
+            // state machine scan: find collapsed regions (circular)
+            // A collapsed region starts at the first point where leaving direction flips,
+            // and ends at the first point where leaving direction recovers.
+            List<Tuple<int, int>> collapsedRegions = FindCollapsedRegions( points, isFlipped );
+
+            // process each collapsed region
+            foreach( var region in collapsedRegions ) {
+                int pinIdx = region.Item1;
+                int poutIdx = region.Item2;
+                MarkCollapsedRegion( points, pinIdx, poutIdx );
+            }
+        }
+
+        static List<Tuple<int, int>> FindCollapsedRegions( List<OffsetPoint> points, bool[] isFlipped )
+        {
+            List<Tuple<int, int>> regions = new List<Tuple<int, int>>();
+            int count = points.Count;
+
+            // find a starting point that is alive and not flipped (to avoid starting inside a collapsed region)
+            int startScan = -1;
+            for( int i = 0; i < count; i++ ) {
+                if( !points[ i ].IsRemoved && !isFlipped[ i ] ) {
+                    startScan = i;
+                    break;
+                }
+            }
+            if( startScan < 0 ) {
+                // all points flipped: entire path collapsed
+                return regions;
+            }
+
+            // scan circularly from startScan
+            int pinIdx = -1;
+            int scanned = 0;
+            int current = startScan;
+
+            while( scanned < count ) {
+                if( points[ current ].IsRemoved ) {
+                    current = ( current + 1 ) % count;
+                    scanned++;
+                    continue;
+                }
+
+                if( pinIdx < 0 ) {
+                    // NORMAL state: looking for collapse start
+                    if( isFlipped[ current ] ) {
+                        // the previous alive point is Pin (it has valid arrival but flipped leaving)
+                        int prev = FindPrevAlive( points, current );
+                        if( prev >= 0 ) {
+                            pinIdx = prev;
+                        }
+                    }
+                }
+                else {
+                    // COLLAPSED state: looking for collapse end
+                    if( !isFlipped[ current ] ) {
+                        // current point is Pout (it has flipped arrival but valid leaving)
+                        regions.Add( new Tuple<int, int>( pinIdx, current ) );
+                        pinIdx = -1;
+                    }
+                }
+
+                current = ( current + 1 ) % count;
+                scanned++;
+            }
+
+            // if we ended in collapsed state, the region wraps around
+            if( pinIdx >= 0 ) {
+                // pout is the first non-flipped alive point we started scanning from
+                regions.Add( new Tuple<int, int>( pinIdx, startScan ) );
+            }
+
+            return regions;
+        }
+
+        static void MarkCollapsedRegion( List<OffsetPoint> points, int pinIdx, int poutIdx )
+        {
+            int count = points.Count;
+
+            // mark Pin as corner incoming
+            points[ pinIdx ].IsCorner = true;
+            points[ pinIdx ].IsOutgoing = false;
+
+            // mark Pout as corner outgoing
+            points[ poutIdx ].IsCorner = true;
+            points[ poutIdx ].IsOutgoing = true;
+
+            // remove all points between Pin and Pout (exclusive, circular)
+            int current = FindNextAlive( points, pinIdx );
+            while( current >= 0 && current != poutIdx ) {
+                points[ current ].IsRemoved = true;
+                current = FindNextAlive( points, current );
+                // safety: if we somehow loop back to pinIdx, break
+                if( current == pinIdx ) {
+                    break;
+                }
+            }
         }
 
         #endregion
