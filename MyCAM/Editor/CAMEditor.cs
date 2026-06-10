@@ -997,10 +997,6 @@ namespace MyCAM.Editor
 					editableInfo.IsToolVecReverseEditable = false;
 					editableInfo.IsFixedToolVecEditable = false;
 				}
-
-				if( geomData.PathType == PathType.Contour ) {
-					editableInfo.IsPathCompensateEditable = false;
-				}
 			}
 			PathPropertyChanged?.Invoke( editableInfo );
 		}
