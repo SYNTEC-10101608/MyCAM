@@ -30,7 +30,6 @@ namespace MyCAM.Helper
                 return cadPointList.Select( p => p.Clone() ).ToList();
             }
             if( !isClosed ) {
-                // offset only supports closed contours for now
                 newPointCount = cadPointList.Count;
                 return cadPointList.Select( p => p.Clone() ).ToList();
             }
@@ -43,13 +42,13 @@ namespace MyCAM.Helper
 
             // Step C: offset all points, expanding corners into 2 points
             List<OffsetPoint> offsetPoints = BuildOffsetPointList( cadPointList, cornerConnectMap, offsetDistance );
-            if( offsetPoints.Count < 3 ) {
+            if( offsetPoints.Count < MIN_VALID_POINT_COUNT ) {
                 return null;
             }
 
             // Step D: resolve corner intersections
             if( !ResolveCornerIntersections( offsetPoints ) ) {
-                return null; // entire path degenerated
+                return null;
             }
 
             // Step E: collect surviving points
@@ -60,7 +59,13 @@ namespace MyCAM.Helper
                 }
             }
 
-            if( result.Count < 3 ) {
+            if( result.Count < MIN_VALID_POINT_COUNT ) {
+                return null;
+            }
+
+            // Step F: remove duplicate points (circular)
+            result = RemoveDuplicatePoints( result );
+            if( result.Count < MIN_VALID_POINT_COUNT ) {
                 return null;
             }
 
@@ -97,7 +102,7 @@ namespace MyCAM.Helper
 
         #endregion
 
-        #region Step B: Filter false corners (tangent change < 5 degrees)
+        #region Step B: Filter false corners (tangent change < threshold)
 
         static void FilterFalseCorners(
             List<CADPoint> cadPointList,
@@ -106,10 +111,9 @@ namespace MyCAM.Helper
             List<int> falseCorners = new List<int>();
             foreach( var kvp in cornerConnectMap ) {
                 int cornerIndex = kvp.Key;
-                CADPoint incomingPoint = kvp.Value;   // previous edge end (incoming tangent)
-                CADPoint outgoingPoint = cadPointList[ cornerIndex ]; // current edge start (outgoing tangent)
+                CADPoint incomingPoint = kvp.Value;
+                CADPoint outgoingPoint = cadPointList[ cornerIndex ];
 
-                // compare tangent directions
                 double angleDeg = GetAngleBetweenDirs( incomingPoint.TangentVec, outgoingPoint.TangentVec );
                 if( angleDeg < CORNER_ANGLE_THRESHOLD_DEG ) {
                     falseCorners.Add( cornerIndex );
@@ -133,20 +137,16 @@ namespace MyCAM.Helper
 
             for( int i = 0; i < cadPointList.Count; i++ ) {
                 if( cornerConnectMap.ContainsKey( i ) ) {
-                    // Corner point: produce 2 offset points (incoming, then outgoing)
                     CADPoint incomingPoint = cornerConnectMap[ i ];
                     CADPoint outgoingPoint = cadPointList[ i ];
 
-                    // incoming offset (from value point - previous edge's end)
                     CADPoint offsetIncoming = OffsetSinglePoint( incomingPoint, offsetDistance );
                     result.Add( new OffsetPoint( offsetIncoming, i, true, false ) );
 
-                    // outgoing offset (from key point - current edge's start)
                     CADPoint offsetOutgoing = OffsetSinglePoint( outgoingPoint, offsetDistance );
                     result.Add( new OffsetPoint( offsetOutgoing, i, true, true ) );
                 }
                 else {
-                    // Normal point: single offset
                     CADPoint offsetPoint = OffsetSinglePoint( cadPointList[ i ], offsetDistance );
                     result.Add( new OffsetPoint( offsetPoint, i, false, false ) );
                 }
@@ -156,19 +156,16 @@ namespace MyCAM.Helper
 
         static CADPoint OffsetSinglePoint( CADPoint point, double distance )
         {
-            // offset direction = TangentVec ¡Ñ NormalVec_1st
             gp_Vec tangent = new gp_Vec( point.TangentVec );
             gp_Vec normal = new gp_Vec( point.NormalVec_1st );
             gp_Vec offsetDir = tangent.Crossed( normal );
 
             double mag = offsetDir.Magnitude();
             if( mag < GEOM_TOLERANCE ) {
-                // fallback: can't compute offset direction, just clone
                 return point.Clone();
             }
             offsetDir.Normalize();
 
-            // translate point
             gp_Vec displacement = offsetDir * distance;
             CADPoint result = point.Clone();
             result.Translate( displacement );
@@ -181,8 +178,7 @@ namespace MyCAM.Helper
 
         static bool ResolveCornerIntersections( List<OffsetPoint> points )
         {
-            // Find all corner pairs (incoming, outgoing) and resolve them
-            int maxIterations = points.Count * points.Count; // safety limit
+            int maxIterations = points.Count * MAX_ITERATION_FACTOR;
             int iteration = 0;
 
             while( iteration < maxIterations ) {
@@ -194,25 +190,21 @@ namespace MyCAM.Helper
                         continue;
                     }
 
-                    // find the paired incoming point (should be immediately before)
                     int incomingIdx = FindPrevAlive( points, i );
                     if( incomingIdx < 0 || !points[ incomingIdx ].IsCorner || points[ incomingIdx ].IsOutgoing ) {
                         continue;
                     }
 
-                    // L1: from prev of incoming ¡÷ incoming
                     int prevOfIncoming = FindPrevAlive( points, incomingIdx );
                     if( prevOfIncoming < 0 ) {
                         continue;
                     }
 
-                    // L2: from outgoing ¡÷ next of outgoing
                     int nextOfOutgoing = FindNextAlive( points, i );
                     if( nextOfOutgoing < 0 ) {
                         continue;
                     }
 
-                    // compute intersection
                     gp_Pnt p1 = points[ prevOfIncoming ].Point.Point;
                     gp_Pnt p2 = points[ incomingIdx ].Point.Point;
                     gp_Pnt p3 = points[ i ].Point.Point;
@@ -223,7 +215,6 @@ namespace MyCAM.Helper
                         out IntersectType typeL1, out IntersectType typeL2 );
 
                     if( typeL1 == IntersectType.NoIntersect ) {
-                        // parallel lines: just remove the corner pair
                         points[ incomingIdx ].IsRemoved = true;
                         points[ i ].IsRemoved = true;
                         foundUnresolved = true;
@@ -231,58 +222,43 @@ namespace MyCAM.Helper
                     }
 
                     if( typeL1 == IntersectType.Extend && typeL2 == IntersectType.Extend ) {
-                        // Both extend: insert intersection point between incoming and outgoing
                         CADPoint interpPoint = InterpolateCADPoint(
-                            points[ incomingIdx ].Point, points[ i ].Point, 0.5, intersection );
+                            points[ incomingIdx ].Point, points[ i ].Point, CORNER_INTERPOLATION_PARAM, intersection );
                         OffsetPoint insertedPoint = new OffsetPoint( interpPoint, points[ i ].OriginalIndex, false, false );
 
-                        // Replace the corner pair with the intersection point
                         points[ incomingIdx ].IsRemoved = true;
                         points[ i ].IsRemoved = true;
 
-                        // insert after the outgoing position
                         points.Insert( i + 1, insertedPoint );
                         foundUnresolved = true;
-                        break; // restart scan since indices shifted
+                        break;
                     }
                     else {
-                        // Inbetween or ReverseExtend on at least one side: degenerate
-                        // Remove the offending endpoint and retry
                         if( typeL1 == IntersectType.Inbetween || typeL1 == IntersectType.ReverseExtend ) {
-                            // L1 has self-intersection issue: remove prev of incoming, demote incoming
                             points[ prevOfIncoming ].IsRemoved = true;
-
-                            // the incoming point now becomes the new L1 endpoint
-                            // update its position to be the same (it's still a corner incoming)
-                            // but L1 is now (prev-prev, incoming)
                         }
                         if( typeL2 == IntersectType.Inbetween || typeL2 == IntersectType.ReverseExtend ) {
-                            // L2 has self-intersection issue: remove next of outgoing, demote outgoing
                             points[ nextOfOutgoing ].IsRemoved = true;
                         }
 
                         foundUnresolved = true;
-                        break; // restart scan
+                        break;
                     }
                 }
 
                 if( !foundUnresolved ) {
-                    break; // all corners resolved
+                    break;
                 }
 
-                // check if we have enough points left
                 int aliveCount = points.Count( p => !p.IsRemoved );
-                if( aliveCount < 3 ) {
+                if( aliveCount < MIN_VALID_POINT_COUNT ) {
                     return false;
                 }
             }
 
-            return points.Count( p => !p.IsRemoved ) >= 3;
+            return points.Count( p => !p.IsRemoved ) >= MIN_VALID_POINT_COUNT;
         }
 
-        /// <summary>
-        /// Find previous alive point index (circular).
-        /// </summary>
         static int FindPrevAlive( List<OffsetPoint> points, int currentIdx )
         {
             int count = points.Count;
@@ -295,9 +271,6 @@ namespace MyCAM.Helper
             return -1;
         }
 
-        /// <summary>
-        /// Find next alive point index (circular).
-        /// </summary>
         static int FindNextAlive( List<OffsetPoint> points, int currentIdx )
         {
             int count = points.Count;
@@ -312,11 +285,39 @@ namespace MyCAM.Helper
 
         #endregion
 
+        #region Step F: Remove duplicate points
+
+        static List<CADPoint> RemoveDuplicatePoints( List<CADPoint> points )
+        {
+            if( points == null || points.Count <= 1 ) {
+                return points;
+            }
+
+            List<CADPoint> result = new List<CADPoint> { points[ 0 ] };
+            for( int i = 1; i < points.Count; i++ ) {
+                double dist = points[ i ].Point.Distance( result[ result.Count - 1 ].Point );
+                if( dist >= DUPLICATE_POINT_TOLERANCE ) {
+                    result.Add( points[ i ] );
+                }
+            }
+
+            // circular check: compare last point with first point
+            if( result.Count > 1 ) {
+                double closingDist = result[ result.Count - 1 ].Point.Distance( result[ 0 ].Point );
+                if( closingDist < DUPLICATE_POINT_TOLERANCE ) {
+                    result.RemoveAt( result.Count - 1 );
+                }
+            }
+
+            return result;
+        }
+
+        #endregion
+
         #region Utilities
 
         static CADPoint InterpolateCADPoint( CADPoint a, CADPoint b, double t, gp_Pnt overridePosition )
         {
-            // Lerp vectors
             gp_Dir normal1st = LerpDir( a.NormalVec_1st, b.NormalVec_1st, t );
             gp_Dir normal2nd = LerpDir( a.NormalVec_2nd, b.NormalVec_2nd, t );
             gp_Dir tangent = LerpDir( a.TangentVec, b.TangentVec, t );
@@ -361,13 +362,21 @@ namespace MyCAM.Helper
             public CADPoint Point;
             public int OriginalIndex;
             public bool IsCorner;
-            public bool IsOutgoing; // true = outgoing side of corner, false = incoming side
+            public bool IsOutgoing;
             public bool IsRemoved;
         }
 
         #endregion
 
+        #region Constants
+
         const double GEOM_TOLERANCE = 1e-6;
+        const double DUPLICATE_POINT_TOLERANCE = 1e-3;
         const double CORNER_ANGLE_THRESHOLD_DEG = 5.0;
+        const double CORNER_INTERPOLATION_PARAM = 0.5;
+        const int MIN_VALID_POINT_COUNT = 3;
+        const int MAX_ITERATION_FACTOR = 100;
+
+        #endregion
     }
 }
