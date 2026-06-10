@@ -19,18 +19,18 @@ namespace MyCAM.Helper
             Dictionary<CADPoint, CADPoint> connectPointMap,
             double offsetDistance,
             bool isClosed,
-            out int newPointCount )
+            out List<int> originalIndexMap )
         {
-            newPointCount = 0;
+            originalIndexMap = null;
             if( cadPointList == null || cadPointList.Count == 0 ) {
                 return cadPointList;
             }
             if( Math.Abs( offsetDistance ) < GEOM_TOLERANCE ) {
-                newPointCount = cadPointList.Count;
+                originalIndexMap = Enumerable.Range( 0, cadPointList.Count ).ToList();
                 return cadPointList.Select( p => p.Clone() ).ToList();
             }
             if( !isClosed ) {
-                newPointCount = cadPointList.Count;
+                originalIndexMap = Enumerable.Range( 0, cadPointList.Count ).ToList();
                 return cadPointList.Select( p => p.Clone() ).ToList();
             }
 
@@ -54,11 +54,13 @@ namespace MyCAM.Helper
                 return null;
             }
 
-            // Step E: collect surviving points
+            // Step E: collect surviving points and their original index mapping
             List<CADPoint> result = new List<CADPoint>();
+            List<int> indexMap = new List<int>();
             for( int i = 0; i < offsetPoints.Count; i++ ) {
                 if( !offsetPoints[ i ].IsRemoved ) {
                     result.Add( offsetPoints[ i ].Point );
+                    indexMap.Add( offsetPoints[ i ].OriginalIndex );
                 }
             }
 
@@ -66,13 +68,13 @@ namespace MyCAM.Helper
                 return null;
             }
 
-            // Step F: remove duplicate points (circular)
-            result = RemoveDuplicatePoints( result );
+            // Step F: remove duplicate points (circular), keeping index map in sync
+            RemoveDuplicatePoints( ref result, ref indexMap );
             if( result.Count < MIN_VALID_POINT_COUNT ) {
                 return null;
             }
 
-            newPointCount = result.Count;
+            originalIndexMap = indexMap;
             return result;
         }
 
@@ -144,14 +146,14 @@ namespace MyCAM.Helper
                     CADPoint outgoingPoint = cadPointList[ i ];
 
                     CADPoint offsetIncoming = OffsetSinglePoint( incomingPoint, offsetDistance );
-                    result.Add( new OffsetPoint( offsetIncoming, i, true, false ) );
+                    result.Add( new OffsetPoint( offsetIncoming, OFFSET_GENERATED_INDEX, true, false, i ) );
 
                     CADPoint offsetOutgoing = OffsetSinglePoint( outgoingPoint, offsetDistance );
-                    result.Add( new OffsetPoint( offsetOutgoing, i, true, true ) );
+                    result.Add( new OffsetPoint( offsetOutgoing, OFFSET_GENERATED_INDEX, true, true, i ) );
                 }
                 else {
                     CADPoint offsetPoint = OffsetSinglePoint( cadPointList[ i ], offsetDistance );
-                    result.Add( new OffsetPoint( offsetPoint, i, false, false ) );
+                    result.Add( new OffsetPoint( offsetPoint, i, false, false, INVALID_CORNER_INDEX ) );
                 }
             }
             return result;
@@ -290,22 +292,34 @@ namespace MyCAM.Helper
 
         static void MarkCollapsedRegion( List<OffsetPoint> points, int pinIdx, int poutIdx )
         {
-            int count = points.Count;
+            // determine the InheritedCornerIndex for this collapsed region
+            int firstRemoved = FindNextAlive( points, pinIdx );
+            int cornerIdx = INVALID_CORNER_INDEX;
+            if( firstRemoved >= 0 && firstRemoved != poutIdx ) {
+                cornerIdx = points[ firstRemoved ].OriginalIndex;
+                if( cornerIdx == OFFSET_GENERATED_INDEX ) {
+                    cornerIdx = points[ firstRemoved ].InheritedCornerIndex;
+                }
+            }
+            if( cornerIdx == INVALID_CORNER_INDEX || cornerIdx == OFFSET_GENERATED_INDEX ) {
+                cornerIdx = points[ pinIdx ].OriginalIndex;
+            }
 
             // mark Pin as corner incoming
             points[ pinIdx ].IsCorner = true;
             points[ pinIdx ].IsOutgoing = false;
+            points[ pinIdx ].InheritedCornerIndex = cornerIdx;
 
             // mark Pout as corner outgoing
             points[ poutIdx ].IsCorner = true;
             points[ poutIdx ].IsOutgoing = true;
+            points[ poutIdx ].InheritedCornerIndex = cornerIdx;
 
             // remove all points between Pin and Pout (exclusive, circular)
             int current = FindNextAlive( points, pinIdx );
             while( current >= 0 && current != poutIdx ) {
                 points[ current ].IsRemoved = true;
                 current = FindNextAlive( points, current );
-                // safety: if we somehow loop back to pinIdx, break
                 if( current == pinIdx ) {
                     break;
                 }
@@ -364,7 +378,8 @@ namespace MyCAM.Helper
                     if( typeL1 == IntersectType.Extend && typeL2 == IntersectType.Extend ) {
                         CADPoint interpPoint = InterpolateCADPoint(
                             points[ incomingIdx ].Point, points[ i ].Point, CORNER_INTERPOLATION_PARAM, intersection );
-                        OffsetPoint insertedPoint = new OffsetPoint( interpPoint, points[ i ].OriginalIndex, false, false );
+                        int inheritedIdx = points[ i ].InheritedCornerIndex;
+                        OffsetPoint insertedPoint = new OffsetPoint( interpPoint, inheritedIdx, false, false, INVALID_CORNER_INDEX );
 
                         // mark corner pair as resolved, keep them alive
                         points[ incomingIdx ].IsCorner = false;
@@ -381,12 +396,14 @@ namespace MyCAM.Helper
                             points[ incomingIdx ].IsRemoved = true;
                             points[ prevOfIncoming ].IsCorner = true;
                             points[ prevOfIncoming ].IsOutgoing = false;
+                            points[ prevOfIncoming ].InheritedCornerIndex = points[ incomingIdx ].InheritedCornerIndex;
                         }
                         // L2 self-intersection: remove outgoing, promote nextOfOutgoing as new corner outgoing
                         if( typeL2 == IntersectType.Inbetween || typeL2 == IntersectType.ReverseExtend ) {
                             points[ i ].IsRemoved = true;
                             points[ nextOfOutgoing ].IsCorner = true;
                             points[ nextOfOutgoing ].IsOutgoing = true;
+                            points[ nextOfOutgoing ].InheritedCornerIndex = points[ i ].InheritedCornerIndex;
                         }
 
                         foundUnresolved = true;
@@ -435,30 +452,34 @@ namespace MyCAM.Helper
 
         #region Step F: Remove duplicate points
 
-        static List<CADPoint> RemoveDuplicatePoints( List<CADPoint> points )
+        static void RemoveDuplicatePoints( ref List<CADPoint> points, ref List<int> indexMap )
         {
-            if( points == null || points.Count <= 1 ) {
-                return points;
-            }
+			if( points == null || points.Count <= 1 ) {
+				return;
+			}
 
-            List<CADPoint> result = new List<CADPoint> { points[ 0 ] };
-            for( int i = 1; i < points.Count; i++ ) {
-                double dist = points[ i ].Point.Distance( result[ result.Count - 1 ].Point );
-                if( dist >= DUPLICATE_POINT_TOLERANCE ) {
-                    result.Add( points[ i ] );
-                }
-            }
+			List<CADPoint> resultPoints = new List<CADPoint> { points[ 0 ] };
+			List<int> resultMap = new List<int> { indexMap[ 0 ] };
+			for( int i = 1; i < points.Count; i++ ) {
+				double dist = points[ i ].Point.Distance( resultPoints[ resultPoints.Count - 1 ].Point );
+				if( dist >= DUPLICATE_POINT_TOLERANCE ) {
+					resultPoints.Add( points[ i ] );
+					resultMap.Add( indexMap[ i ] );
+				}
+			}
 
-            // circular check: compare last point with first point
-            if( result.Count > 1 ) {
-                double closingDist = result[ result.Count - 1 ].Point.Distance( result[ 0 ].Point );
-                if( closingDist < DUPLICATE_POINT_TOLERANCE ) {
-                    result.RemoveAt( result.Count - 1 );
-                }
-            }
+			// circular check: compare last point with first point
+			if( resultPoints.Count > 1 ) {
+				double closingDist = resultPoints[ resultPoints.Count - 1 ].Point.Distance( resultPoints[ 0 ].Point );
+				if( closingDist < DUPLICATE_POINT_TOLERANCE ) {
+					resultPoints.RemoveAt( resultPoints.Count - 1 );
+					resultMap.RemoveAt( resultMap.Count - 1 );
+				}
+			}
 
-            return result;
-        }
+			points = resultPoints;
+			indexMap = resultMap;
+		}
 
         #endregion
 
@@ -498,17 +519,19 @@ namespace MyCAM.Helper
 
         class OffsetPoint
         {
-            public OffsetPoint( CADPoint point, int originalIndex, bool isCorner, bool isOutgoing )
+            public OffsetPoint( CADPoint point, int originalIndex, bool isCorner, bool isOutgoing, int inheritedCornerIndex )
             {
                 Point = point;
                 OriginalIndex = originalIndex;
                 IsCorner = isCorner;
                 IsOutgoing = isOutgoing;
                 IsRemoved = false;
+                InheritedCornerIndex = inheritedCornerIndex;
             }
 
             public CADPoint Point;
             public int OriginalIndex;
+            public int InheritedCornerIndex;
             public bool IsCorner;
             public bool IsOutgoing;
             public bool IsRemoved;
@@ -518,6 +541,8 @@ namespace MyCAM.Helper
 
         #region Constants
 
+        public const int OFFSET_GENERATED_INDEX = -2;
+        const int INVALID_CORNER_INDEX = -3;
         const double GEOM_TOLERANCE = 1e-6;
         const double DUPLICATE_POINT_TOLERANCE = 1e-3;
         const double CORNER_ANGLE_THRESHOLD_DEG = 5.0;
