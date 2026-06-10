@@ -215,8 +215,8 @@ namespace MyCAM.Helper
                         out IntersectType typeL1, out IntersectType typeL2 );
 
                     if( typeL1 == IntersectType.NoIntersect ) {
-                        points[ incomingIdx ].IsRemoved = true;
-                        points[ i ].IsRemoved = true;
+                        points[ incomingIdx ].IsCorner = false;
+                        points[ i ].IsCorner = false;
                         foundUnresolved = true;
                         continue;
                     }
@@ -226,19 +226,27 @@ namespace MyCAM.Helper
                             points[ incomingIdx ].Point, points[ i ].Point, CORNER_INTERPOLATION_PARAM, intersection );
                         OffsetPoint insertedPoint = new OffsetPoint( interpPoint, points[ i ].OriginalIndex, false, false );
 
-                        points[ incomingIdx ].IsRemoved = true;
-                        points[ i ].IsRemoved = true;
+                        // mark corner pair as resolved, keep them alive
+                        points[ incomingIdx ].IsCorner = false;
+                        points[ i ].IsCorner = false;
 
-                        points.Insert( i + 1, insertedPoint );
+                        // insert intersection point between incoming and outgoing
+                        points.Insert( i, insertedPoint );
                         foundUnresolved = true;
                         break;
                     }
                     else {
+                        // L1 self-intersection: remove incoming, promote prevOfIncoming as new corner incoming
                         if( typeL1 == IntersectType.Inbetween || typeL1 == IntersectType.ReverseExtend ) {
-                            points[ prevOfIncoming ].IsRemoved = true;
+                            points[ incomingIdx ].IsRemoved = true;
+                            points[ prevOfIncoming ].IsCorner = true;
+                            points[ prevOfIncoming ].IsOutgoing = false;
                         }
+                        // L2 self-intersection: remove outgoing, promote nextOfOutgoing as new corner outgoing
                         if( typeL2 == IntersectType.Inbetween || typeL2 == IntersectType.ReverseExtend ) {
-                            points[ nextOfOutgoing ].IsRemoved = true;
+                            points[ i ].IsRemoved = true;
+                            points[ nextOfOutgoing ].IsCorner = true;
+                            points[ nextOfOutgoing ].IsOutgoing = true;
                         }
 
                         foundUnresolved = true;
