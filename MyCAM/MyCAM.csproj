@@ -192,6 +192,13 @@
     <Compile Include="Data\Object\StdPatternObjectBase.cs" />
     <Compile Include="Data\PointData.cs" />
     <Compile Include="Data\PostData.cs" />
+    <Compile Include="Editor\Action\CAD\AxisTransformAction.cs" />
+    <Compile Include="Editor\Dialog\AxisTransformDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\AxisTransformDlg.Designer.cs">
+      <DependentUpon>AxisTransformDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Data\Craft\TraverseData.cs" />
     <Compile Include="Editor\Action\CAD\AddLineAction.cs" />
     <Compile Include="Editor\Action\CAD\AxisTransformAction.cs" />
@@ -327,6 +334,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CNC\ConnectDlg.resx">
       <DependentUpon>ConnectDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\AxisTransformDlg.resx">
+      <DependentUpon>AxisTransformDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\CalibrationREFDlg.resx">
       <DependentUpon>CalibrationREFDlg.cs</DependentUpon>
