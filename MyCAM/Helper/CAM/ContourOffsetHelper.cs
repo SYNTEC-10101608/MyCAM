@@ -57,7 +57,10 @@ namespace MyCAM.Helper
 				return null;
 			}
 
-			// Step F: collect surviving points and their original index mapping
+			// Step F: mark duplicate points as removed
+			MarkDuplicatePoints( offsetPoints );
+
+			// Step G: collect surviving points and their original index mapping
 			List<CADPoint> result = new List<CADPoint>();
 			List<int> indexMap = new List<int>();
 			for( int i = 0; i < offsetPoints.Count; i++ ) {
@@ -66,14 +69,6 @@ namespace MyCAM.Helper
 					indexMap.Add( offsetPoints[ i ].OriginalIndex );
 				}
 			}
-
-			// result points count validation
-			if( result.Count < MIN_VALID_POINT_COUNT ) {
-				return null;
-			}
-
-			// Step G: remove duplicate points (circular), keeping index map in sync
-			RemoveDuplicatePoints( ref result, ref indexMap );
 
 			// result points count validation
 			if( result.Count < MIN_VALID_POINT_COUNT ) {
@@ -483,35 +478,28 @@ namespace MyCAM.Helper
 
 		#endregion
 
-		#region Step G: Remove duplicate points
+		#region Step F: Mark duplicate points
 
-		static void RemoveDuplicatePoints( ref List<CADPoint> points, ref List<int> indexMap )
+		static void MarkDuplicatePoints( List<OffsetPoint> points )
 		{
 			if( points == null || points.Count <= 1 ) {
 				return;
 			}
 
-			List<CADPoint> resultPoints = new List<CADPoint> { points[ 0 ] };
-			List<int> resultMap = new List<int> { indexMap[ 0 ] };
-			for( int i = 1; i < points.Count; i++ ) {
-				double dist = points[ i ].Point.Distance( resultPoints[ resultPoints.Count - 1 ].Point );
-				if( dist >= DUPLICATE_POINT_TOLERANCE ) {
-					resultPoints.Add( points[ i ] );
-					resultMap.Add( indexMap[ i ] );
+			int count = points.Count;
+			for( int i = 0; i < count; i++ ) {
+				if( points[ i ].IsRemoved ) {
+					continue;
+				}
+				int nextIdx = FindNextAlive( points, i );
+				if( nextIdx < 0 || nextIdx == i ) {
+					continue;
+				}
+				double dist = points[ i ].Point.Point.Distance( points[ nextIdx ].Point.Point );
+				if( dist < DUPLICATE_POINT_TOLERANCE ) {
+					points[ nextIdx ].IsRemoved = true;
 				}
 			}
-
-			// circular check: compare last point with first point
-			if( resultPoints.Count > 1 ) {
-				double closingDist = resultPoints[ resultPoints.Count - 1 ].Point.Distance( resultPoints[ 0 ].Point );
-				if( closingDist < DUPLICATE_POINT_TOLERANCE ) {
-					resultPoints.RemoveAt( resultPoints.Count - 1 );
-					resultMap.RemoveAt( resultMap.Count - 1 );
-				}
-			}
-
-			points = resultPoints;
-			indexMap = resultMap;
 		}
 
 		#endregion
