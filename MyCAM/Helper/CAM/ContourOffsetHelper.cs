@@ -397,10 +397,19 @@ namespace MyCAM.Helper
 
 					// the convex corner
 					if( typeL1 == IntersectType.Extend && typeL2 == IntersectType.Extend ) {
+
+						// insert a new point at the intersection
+						double distFromIncoming = points[ incomingIdx ].Point.Point.Distance( intersection );
+						double distFromOutgoing = points[ i ].Point.Point.Distance( intersection );
+						double t = ( distFromIncoming + distFromOutgoing ) > GEOM_TOLERANCE
+							? distFromIncoming / ( distFromIncoming + distFromOutgoing )
+							: CORNER_INTERPOLATION_PARAM;
 						CADPoint interpPoint = InterpolateCADPoint(
-							points[ incomingIdx ].Point, points[ i ].Point, CORNER_INTERPOLATION_PARAM, intersection );
+							points[ incomingIdx ].Point, points[ i ].Point, t, intersection );
+
+						// the new point inherits the corner index from the outgoing point
 						int inheritedIdx = points[ i ].InheritedCornerIndex;
-						OffsetPoint insertedPoint = new OffsetPoint( interpPoint, inheritedIdx, false, false, INVALID_CORNER_INDEX );
+						OffsetPoint insertedPoint = new OffsetPoint( interpPoint, inheritedIdx, false, false, inheritedIdx );
 
 						// mark corner pair as resolved, keep them alive
 						points[ incomingIdx ].IsCorner = false;
