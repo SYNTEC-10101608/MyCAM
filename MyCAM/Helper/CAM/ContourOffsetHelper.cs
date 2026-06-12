@@ -58,7 +58,9 @@ namespace MyCAM.Helper
 			}
 
 			// Step F: mark duplicate points as removed
-			MarkDuplicatePoints( offsetPoints );
+			if( !MarkDuplicatePoints( ref offsetPoints ) ) {
+				return null;
+			}
 
 			// Step G: collect surviving points and their original index mapping
 			List<CADPoint> result = new List<CADPoint>();
@@ -224,7 +226,7 @@ namespace MyCAM.Helper
 				MarkCollapsedRegion( points, pinIdx, poutIdx );
 			}
 
-			return points.Count( p => !p.IsRemoved ) > MIN_VALID_POINT_COUNT;
+			return points.Count( p => !p.IsRemoved ) >= MIN_VALID_POINT_COUNT;
 		}
 
 		static List<Tuple<int, int>> FindCollapsedRegions( List<OffsetPoint> points, bool[] isFlipped )
@@ -449,7 +451,7 @@ namespace MyCAM.Helper
 				}
 			}
 
-			return points.Count( p => !p.IsRemoved ) > MIN_VALID_POINT_COUNT;
+			return points.Count( p => !p.IsRemoved ) >= MIN_VALID_POINT_COUNT;
 		}
 
 		static int FindPrevAlive( List<OffsetPoint> points, int currentIdx )
@@ -480,10 +482,10 @@ namespace MyCAM.Helper
 
 		#region Step F: Mark duplicate points
 
-		static void MarkDuplicatePoints( List<OffsetPoint> points )
+		static bool MarkDuplicatePoints( ref List<OffsetPoint> points )
 		{
 			if( points == null || points.Count <= 1 ) {
-				return;
+				return false;
 			}
 
 			int count = points.Count;
@@ -491,15 +493,22 @@ namespace MyCAM.Helper
 				if( points[ i ].IsRemoved ) {
 					continue;
 				}
-				int nextIdx = FindNextAlive( points, i );
-				if( nextIdx < 0 || nextIdx == i ) {
-					continue;
-				}
-				double dist = points[ i ].Point.Point.Distance( points[ nextIdx ].Point.Point );
-				if( dist < DUPLICATE_POINT_TOLERANCE ) {
-					points[ nextIdx ].IsRemoved = true;
+				while( true ) {
+					int nextIdx = FindNextAlive( points, i );
+					if( nextIdx < 0 || nextIdx == i ) {
+						break;
+					}
+					double dist = points[ i ].Point.Point.Distance( points[ nextIdx ].Point.Point );
+					if( dist < DUPLICATE_POINT_TOLERANCE ) {
+						points[ nextIdx ].IsRemoved = true;
+					}
+					else {
+						break;
+					}
 				}
 			}
+
+			return points.Count( p => !p.IsRemoved ) >= MIN_VALID_POINT_COUNT;
 		}
 
 		#endregion
