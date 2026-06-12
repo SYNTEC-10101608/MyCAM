@@ -41,6 +41,15 @@ namespace MyCAM.Editor
 			if( m_PathPointList == null || m_PathPointList.Count == 0 )
 				return;
 
+			// translate original highlight index to offset index when OriginalIndexMap is available
+			if( m_OriginalIndexMap != null ) {
+				for(int i = 0; i < m_OriginalIndexMap.Count; i++ ) {
+					if( m_OriginalIndexMap[ i ] == oriHighLightIdx ) {
+						oriHighLightIdx = i;
+						break;
+					}
+				}
+			}
 			List<gp_Pnt> newPntList = new List<gp_Pnt>( m_PathPointList.Count );
 			foreach( gp_Pnt point in m_PathPointList ) {
 				gp_Pnt copyPnt = new gp_Pnt( point.X(), point.Y(), point.Z() );
