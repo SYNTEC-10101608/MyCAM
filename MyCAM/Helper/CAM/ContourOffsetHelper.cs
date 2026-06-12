@@ -48,10 +48,12 @@ namespace MyCAM.Helper
 			}
 
 			// Step D: detect collapsed arc regions and mark as corner pairs
-			DetectCollapsedArcs( ref offsetPoints );
+			if( !DetectCollapsedArcs( ref offsetPoints ) ) {
+				return null;
+			}
 
 			// Step E: resolve corner intersections
-			if( !ResolveCornerIntersections( offsetPoints ) ) {
+			if( !ResolveCornerIntersections( ref offsetPoints ) ) {
 				return null;
 			}
 
@@ -186,11 +188,11 @@ namespace MyCAM.Helper
 
 		#region Step D: Detect collapsed arc regions
 
-		static void DetectCollapsedArcs( ref List<OffsetPoint> points )
+		static bool DetectCollapsedArcs( ref List<OffsetPoint> points )
 		{
 			int count = points.Count;
 			if( count < MIN_VALID_POINT_COUNT ) {
-				return;
+				return false;
 			}
 
 			// compute "leaving direction flipped" flag for each alive point
@@ -226,6 +228,8 @@ namespace MyCAM.Helper
 				int poutIdx = region.Item2;
 				MarkCollapsedRegion( points, pinIdx, poutIdx );
 			}
+
+			return points.Count( p => !p.IsRemoved ) >= MIN_VALID_POINT_COUNT;
 		}
 
 		static List<Tuple<int, int>> FindCollapsedRegions( List<OffsetPoint> points, bool[] isFlipped )
@@ -334,7 +338,7 @@ namespace MyCAM.Helper
 
 		#region Step E: Resolve corner intersections
 
-		static bool ResolveCornerIntersections( List<OffsetPoint> points )
+		static bool ResolveCornerIntersections( ref List<OffsetPoint> points )
 		{
 			int maxIterations = points.Count * MAX_ITERATION_FACTOR;
 			int iteration = 0;
