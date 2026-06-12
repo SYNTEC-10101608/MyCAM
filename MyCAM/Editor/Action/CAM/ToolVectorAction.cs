@@ -1310,23 +1310,31 @@ namespace MyCAM.Editor
 				return NULL_POINT_INDEX;
 			}
 
-			// cam index++ or cam index--
-			if( isNext ) {
-				camIndex++;
-			}
-			else {
-				camIndex--;
-			}
+			// cam index++ or cam index--, skip generated points (InitPathIndex == OFFSET_GENERATED_INDEX)
+			int count = m_PathCache.MainPathPointList.Count;
+			int maxSteps = count;
+			int step = 0;
+			do {
+				if( isNext ) {
+					camIndex++;
+				}
+				else {
+					camIndex--;
+				}
+				step++;
 
-			// when cam index < 0, cam index = 0
-			if( camIndex < 0 ) {
-				camIndex = 0;
+				// clamp
+				if( camIndex < 0 ) {
+					camIndex = 0;
+					break;
+				}
+				else if( camIndex >= count ) {
+					camIndex = count - 1;
+					break;
+				}
 			}
-
-			// when cam index >= count, cam index = count - 1
-			else if( camIndex >= m_PathCache.MainPathPointList.Count ) {
-				camIndex = m_PathCache.MainPathPointList.Count - 1;
-			}
+			while( step < maxSteps &&
+				m_PathCache.MainPathPointList[ camIndex ].InitPathIndex == ContourOffsetHelper.OFFSET_GENERATED_INDEX );
 
 			// convert back to cad index
 			if( IsClosed() && camIndex == m_PathCache.MainPathPointList.Count - 1 ) {

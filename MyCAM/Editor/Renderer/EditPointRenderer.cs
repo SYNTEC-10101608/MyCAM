@@ -52,15 +52,26 @@ namespace MyCAM.Editor.Renderer
 
 			var aisContext = m_Viewer.GetAISContext();
 			var cadPointList = contourCache.TrsfCADPointList;
+			var originalIndexMap = contourCache.OriginalIndexMap;
 
 			foreach( var kvp in craftData.ContourEditMap ) {
-				int cadIndex = kvp.Key;
+				int oriCADIndex = kvp.Key;
 				ContourEditData modifyData = kvp.Value;
 
-				if( cadIndex < 0 || cadIndex >= cadPointList.Count ) {
+				// convert ori CAD index to offset index
+				int offsetIndex = FindOffsetIndex( originalIndexMap, oriCADIndex );
+				if( offsetIndex < 0 || offsetIndex >= cadPointList.Count ) {
 					continue;
 				}
-				gp_Pnt cadPnt = cadPointList[ cadIndex ].Point;
+
+				// TrsfCADPointList now contains the final result (offset + transform + edit)
+				// camPnt = final position (already includes displacement)
+				// cadPnt = base position (final position minus displacement)
+				gp_Pnt camPnt = cadPointList[ offsetIndex ].Point;
+				gp_Pnt cadPnt = new gp_Pnt(
+					camPnt.X() - modifyData.DX,
+					camPnt.Y() - modifyData.DY,
+					camPnt.Z() - modifyData.DZ );
 
 				// draw CAD mark
 				AIS_Shape cadMark = CreatePointMark( cadPnt, CAD_MARK_COLOR );
@@ -75,9 +86,6 @@ namespace MyCAM.Editor.Renderer
 				if( !hasOffset ) {
 					continue;
 				}
-
-				// CAM position = CAD position + recorded displacement (interpolation passes through control points exactly)
-				gp_Pnt camPnt = new gp_Pnt( cadPnt.X() + modifyData.DX, cadPnt.Y() + modifyData.DY, cadPnt.Z() + modifyData.DZ );
 
 				// draw CAM mark
 				AIS_Shape camMark = CreatePointMark( camPnt, CAM_MARK_COLOR );
@@ -95,6 +103,19 @@ namespace MyCAM.Editor.Renderer
 			if( bUpdate ) {
 				UpdateView();
 			}
+		}
+
+		int FindOffsetIndex( List<int> originalIndexMap, int oriCADIndex )
+		{
+			if( originalIndexMap == null ) {
+				return oriCADIndex;
+			}
+			for( int i = 0; i < originalIndexMap.Count; i++ ) {
+				if( originalIndexMap[ i ] == oriCADIndex ) {
+					return i;
+				}
+			}
+			return -1;
 		}
 
 		public void Remove( bool bUpdate = false )
