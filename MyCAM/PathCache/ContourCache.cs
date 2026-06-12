@@ -165,8 +165,7 @@ namespace MyCAM.PathCache
 			m_CADPointList = ContourEditHelper.ApplyContourEdit(
 				m_TrsfCADPointList.Select( p => p.Clone() ).ToList(), FilterContourEditMap(), m_IsClose );
 
-			m_ConnectCADPointMap.Clear();
-
+			// compute reference coordinate system based on transformed geometry
 			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, false );
 			BuildCAMPointList();
 		}
