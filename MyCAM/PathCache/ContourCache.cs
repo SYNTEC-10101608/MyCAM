@@ -145,15 +145,6 @@ namespace MyCAM.PathCache
 			m_CADPointList = ContourEditHelper.ApplyContourEdit(
 				m_TrsfCADPointList.Select( p => p.Clone() ).ToList(), m_CraftData.ContourEditMap, m_IsClose );
 
-			m_ConnectCADPointMap.Clear();
-			foreach( var kvp in m_ContourGeomData.ConnectPointMap ) {
-				CADPoint transformedKey = kvp.Key.Clone();
-				transformedKey.Transform( m_CraftData.CumulativeTrsfMatrix );
-				CADPoint transformedValue = kvp.Value.Clone();
-				transformedValue.Transform( m_CraftData.CumulativeTrsfMatrix );
-				m_ConnectCADPointMap.Add( transformedKey, transformedValue );
-			}
-
 			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, false );
 			BuildCAMPointList();
 		}
@@ -164,7 +155,6 @@ namespace MyCAM.PathCache
 
 			// build initial CAM point list, not closed yet
 			m_CAMPointList = new List<CAMPoint>();
-			m_ConnectCAMPointMap.Clear();
 			for( int i = 0; i < m_CADPointList.Count; i++ ) {
 
 				// build CAM point
@@ -172,12 +162,6 @@ namespace MyCAM.PathCache
 				CAMPoint camPoint = new CAMPoint( cadPoint, m_CraftData.IsToolVecReverse );
 				camPoint.InitPathIndex = i;
 				m_CAMPointList.Add( camPoint );
-
-				// build connection CAM point
-				if( m_ConnectCADPointMap.ContainsKey( cadPoint ) ) {
-					CAMPoint connectedCAMPoint = new CAMPoint( m_ConnectCADPointMap[ cadPoint ], m_CraftData.IsToolVecReverse );
-					m_ConnectCAMPointMap.Add( camPoint, connectedCAMPoint );
-				}
 			}
 
 			// set start point and orientation
@@ -190,9 +174,7 @@ namespace MyCAM.PathCache
 			// close the loop if is closed
 			if( m_IsClose && m_CAMPointList.Count > 0 ) {
 				CAMPoint startPoint = m_CAMPointList[ 0 ];
-				CAMPoint closedCAMPoint = m_ConnectCAMPointMap.ContainsKey( startPoint )
-												? m_ConnectCAMPointMap[ startPoint ] // use connected point
-												: startPoint.Clone(); // or just clone the start point
+				CAMPoint closedCAMPoint = startPoint.Clone();
 				closedCAMPoint.InitPathIndex = CLOSED_POINT_INDEX;
 				m_CAMPointList.Add( closedCAMPoint );
 			}
@@ -522,7 +504,6 @@ namespace MyCAM.PathCache
 		List<CAMPoint> m_CAMPointList = new List<CAMPoint>();
 
 		// for CAM point connection
-		Dictionary<CAMPoint, CAMPoint> m_ConnectCAMPointMap = new Dictionary<CAMPoint, CAMPoint>();
 		List<CAMPoint> m_LeadInCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_LeadOutCAMPointList = new List<CAMPoint>();
 		List<CAMPoint> m_OverCutPointList = new List<CAMPoint>();
@@ -532,9 +513,6 @@ namespace MyCAM.PathCache
 		CraftData m_CraftData;
 		List<CADPoint> m_TrsfCADPointList = new List<CADPoint>(); // global transform only, no local edit
 		List<CADPoint> m_CADPointList = new List<CADPoint>();     // global transform + local edit, used by CAM pipeline
-
-		// for CAD point connection
-		Dictionary<CADPoint, CADPoint> m_ConnectCADPointMap = new Dictionary<CADPoint, CADPoint>();
 
 		// flag to indicate craft data changed
 		bool m_IsCAMFactorDirty = false;
