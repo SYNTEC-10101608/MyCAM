@@ -63,19 +63,21 @@ namespace OCCTool
 
 			// Compute the midpoint of the shortest segment
 			gp_Pnt midpoint = new gp_Pnt( ( closestPointOnLine1.XYZ() + closestPointOnLine2.XYZ() ) / 2 );
-			if( t <= 0 ) {
+			const double TOLERANCE = 1e-3;
+
+			if( t <= -TOLERANCE ) {
 				TypeL1 = IntersectType.ReverseExtend;
 			}
-			else if( t >= 1 ) {
+			else if( t >= 1 + TOLERANCE ) {
 				TypeL1 = IntersectType.Extend;
 			}
 			else {
 				TypeL1 = IntersectType.Inbetween;
 			}
-			if( s <= 0 ) {
+			if( s <= -TOLERANCE ) {
 				TypeL2 = IntersectType.ReverseExtend;
 			}
-			else if( s >= 1 ) {
+			else if( s >= 1 + TOLERANCE ) {
 				TypeL2 = IntersectType.Extend;
 			}
 			else {

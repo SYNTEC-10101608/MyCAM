@@ -229,7 +229,7 @@ namespace MyCAM.Helper
 				MarkCollapsedRegion( points, pinIdx, poutIdx );
 			}
 
-			return points.Count( p => !p.IsRemoved ) >= MIN_VALID_POINT_COUNT;
+			return points.Count( p => !p.IsRemoved ) > MIN_VALID_POINT_COUNT;
 		}
 
 		static List<Tuple<int, int>> FindCollapsedRegions( List<OffsetPoint> points, bool[] isFlipped )
@@ -345,37 +345,48 @@ namespace MyCAM.Helper
 
 			while( iteration < maxIterations ) {
 				iteration++;
+
+				// to check if we need a next iteration
 				bool foundUnresolved = false;
 
+				// solve each corner pair
 				for( int i = 0; i < points.Count; i++ ) {
+
+					// find the out going index
 					if( points[ i ].IsRemoved || !points[ i ].IsCorner || !points[ i ].IsOutgoing ) {
 						continue;
 					}
 
+					// find the corresponding incoming index
 					int incomingIdx = FindPrevAlive( points, i );
 					if( incomingIdx < 0 || !points[ incomingIdx ].IsCorner || points[ incomingIdx ].IsOutgoing ) {
 						continue;
 					}
 
+					// find the corresponding previous of oincoming
 					int prevOfIncoming = FindPrevAlive( points, incomingIdx );
 					if( prevOfIncoming < 0 ) {
 						continue;
 					}
 
+					// find the corresponding next of outgoing
 					int nextOfOutgoing = FindNextAlive( points, i );
 					if( nextOfOutgoing < 0 ) {
 						continue;
 					}
 
+					// i is the out going index
 					gp_Pnt p1 = points[ prevOfIncoming ].Point.Point;
 					gp_Pnt p2 = points[ incomingIdx ].Point.Point;
 					gp_Pnt p3 = points[ i ].Point.Point;
 					gp_Pnt p4 = points[ nextOfOutgoing ].Point.Point;
 
+					// for the definition of API¡Awe need to put line2 as P4-P3
 					gp_Pnt intersection = GeometryTool.FindIntersectPoint(
 						p1, p2, p4, p3,
 						out IntersectType typeL1, out IntersectType typeL2 );
 
+					// basicly should not happened, just a safety check
 					if( typeL1 == IntersectType.NoIntersect ) {
 						points[ incomingIdx ].IsCorner = false;
 						points[ i ].IsCorner = false;
@@ -383,6 +394,8 @@ namespace MyCAM.Helper
 						continue;
 					}
 
+
+					// the convex corner
 					if( typeL1 == IntersectType.Extend && typeL2 == IntersectType.Extend ) {
 						CADPoint interpPoint = InterpolateCADPoint(
 							points[ incomingIdx ].Point, points[ i ].Point, CORNER_INTERPOLATION_PARAM, intersection );
@@ -398,7 +411,10 @@ namespace MyCAM.Helper
 						foundUnresolved = true;
 						break;
 					}
+
+					// the concave corner
 					else {
+
 						// L1 self-intersection: remove incoming, promote prevOfIncoming as new corner incoming
 						if( typeL1 == IntersectType.Inbetween || typeL1 == IntersectType.ReverseExtend ) {
 							points[ incomingIdx ].IsRemoved = true;
@@ -406,6 +422,7 @@ namespace MyCAM.Helper
 							points[ prevOfIncoming ].IsOutgoing = false;
 							points[ prevOfIncoming ].InheritedCornerIndex = points[ incomingIdx ].InheritedCornerIndex;
 						}
+
 						// L2 self-intersection: remove outgoing, promote nextOfOutgoing as new corner outgoing
 						if( typeL2 == IntersectType.Inbetween || typeL2 == IntersectType.ReverseExtend ) {
 							points[ i ].IsRemoved = true;
@@ -423,13 +440,12 @@ namespace MyCAM.Helper
 					break;
 				}
 
-				int aliveCount = points.Count( p => !p.IsRemoved );
-				if( aliveCount < MIN_VALID_POINT_COUNT ) {
+				if( points.Count( p => !p.IsRemoved ) < MIN_VALID_POINT_COUNT ) {
 					return false;
 				}
 			}
 
-			return points.Count( p => !p.IsRemoved ) >= MIN_VALID_POINT_COUNT;
+			return points.Count( p => !p.IsRemoved ) > MIN_VALID_POINT_COUNT;
 		}
 
 		static int FindPrevAlive( List<OffsetPoint> points, int currentIdx )
