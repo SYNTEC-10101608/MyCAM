@@ -193,11 +193,14 @@ namespace MyCAM.PathCache
 				}
 			}
 
+			// create initial index map (original index -> initial position) for SetStartPoint lookup
+			CreateIndexMap();
+
 			// set start point and orientation
 			SetStartPoint();
 			SetOrientation();
 
-			// create index map consider the start point and orientation
+			// rebuild index map to reflect final order after start point and orientation
 			CreateIndexMap();
 
 			// close the loop if is closed
@@ -509,7 +512,8 @@ namespace MyCAM.PathCache
 		}
 
 		/// <summary>
-		/// Filter ContourEditMap to only include indices that survive offset.
+		/// Filter ContourEditMap to only include indices that survive offset,
+		/// and remap keys from original CAD indices to offset list positions.
 		/// </summary>
 		Dictionary<int, ContourEditData> FilterContourEditMap()
 		{
@@ -519,11 +523,18 @@ namespace MyCAM.PathCache
 			if( m_OffsetIndexMap == null ) {
 				return m_CraftData.ContourEditMap;
 			}
-			HashSet<int> survivingIndices = new HashSet<int>( m_OffsetIndexMap );
+			// build reverse map: original index -> offset list position
+			Dictionary<int, int> originalToOffsetPos = new Dictionary<int, int>();
+			for( int i = 0; i < m_OffsetIndexMap.Count; i++ ) {
+				int origIdx = m_OffsetIndexMap[ i ];
+				if( !originalToOffsetPos.ContainsKey( origIdx ) ) {
+					originalToOffsetPos[ origIdx ] = i;
+				}
+			}
 			Dictionary<int, ContourEditData> filtered = new Dictionary<int, ContourEditData>();
 			foreach( var kvp in m_CraftData.ContourEditMap ) {
-				if( survivingIndices.Contains( kvp.Key ) ) {
-					filtered[ kvp.Key ] = kvp.Value;
+				if( originalToOffsetPos.ContainsKey( kvp.Key ) ) {
+					filtered[ originalToOffsetPos[ kvp.Key ] ] = kvp.Value;
 				}
 			}
 			return filtered;
