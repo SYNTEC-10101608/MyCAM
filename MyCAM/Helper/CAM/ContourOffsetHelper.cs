@@ -186,11 +186,6 @@ namespace MyCAM.Helper
 
 		#region Step D: Detect collapsed arc regions
 
-		/// <summary>
-		/// Detect arc regions that collapsed due to offset exceeding curvature radius.
-		/// For each point, compare the actual path direction (to next alive point) with the stored TangentVec.
-		/// If dot product < 0, the point has flipped. Collapsed regions are marked and converted to corner pairs.
-		/// </summary>
 		static void DetectCollapsedArcs( ref List<OffsetPoint> points )
 		{
 			int count = points.Count;
@@ -201,6 +196,8 @@ namespace MyCAM.Helper
 			// compute "leaving direction flipped" flag for each alive point
 			bool[] isFlipped = new bool[ count ];
 			for( int i = 0; i < count; i++ ) {
+
+				// should not happened in current design, just a safety check
 				if( points[ i ].IsRemoved ) {
 					isFlipped[ i ] = false;
 					continue;
@@ -220,9 +217,7 @@ namespace MyCAM.Helper
 				isFlipped[ i ] = dot < 0;
 			}
 
-			// state machine scan: find collapsed regions (circular)
-			// A collapsed region starts at the first point where leaving direction flips,
-			// and ends at the first point where leaving direction recovers.
+			// find collapsed regions based on flipped flags (Pin is the first flipped point, Pout is the first non-flipped point)
 			List<Tuple<int, int>> collapsedRegions = FindCollapsedRegions( points, isFlipped );
 
 			// process each collapsed region
@@ -235,50 +230,58 @@ namespace MyCAM.Helper
 
 		static List<Tuple<int, int>> FindCollapsedRegions( List<OffsetPoint> points, bool[] isFlipped )
 		{
+			// tuple(in, out)
 			List<Tuple<int, int>> regions = new List<Tuple<int, int>>();
 			int count = points.Count;
 
 			// find a starting point that is alive and not flipped (to avoid starting inside a collapsed region)
 			int startScan = -1;
 			for( int i = 0; i < count; i++ ) {
+
+				// in current design, there should be no removed point at this stage, just a safety check
 				if( !points[ i ].IsRemoved && !isFlipped[ i ] ) {
 					startScan = i;
 					break;
 				}
 			}
 			if( startScan < 0 ) {
+
 				// all points flipped: entire path collapsed
 				return regions;
 			}
 
 			// scan circularly from startScan
-			int pinIdx = -1;
+			const int NORMAL_STATE_INDEX = -1;
+			int pinIdx = NORMAL_STATE_INDEX;
 			int scanned = 0;
 			int current = startScan;
 
 			while( scanned < count ) {
+
+				// in current design, there should be no removed point at this stage, just a safety check
 				if( points[ current ].IsRemoved ) {
 					current = ( current + 1 ) % count;
 					scanned++;
 					continue;
 				}
 
-				if( pinIdx < 0 ) {
+				if( pinIdx == NORMAL_STATE_INDEX ) {
+
 					// NORMAL state: looking for collapse start
 					if( isFlipped[ current ] ) {
-						// the previous alive point is Pin (it has valid arrival but flipped leaving)
-						int prev = FindPrevAlive( points, current );
-						if( prev >= 0 ) {
-							pinIdx = prev;
-						}
+
+						// current is Pin (its leaving edge is flipped)
+						pinIdx = current;
 					}
 				}
 				else {
+
 					// COLLAPSED state: looking for collapse end
 					if( !isFlipped[ current ] ) {
+
 						// current point is Pout (it has flipped arrival but valid leaving)
 						regions.Add( new Tuple<int, int>( pinIdx, current ) );
-						pinIdx = -1;
+						pinIdx = NORMAL_STATE_INDEX;
 					}
 				}
 
@@ -287,7 +290,8 @@ namespace MyCAM.Helper
 			}
 
 			// if we ended in collapsed state, the region wraps around
-			if( pinIdx >= 0 ) {
+			if( pinIdx != NORMAL_STATE_INDEX ) {
+
 				// pout is the first non-flipped alive point we started scanning from
 				regions.Add( new Tuple<int, int>( pinIdx, startScan ) );
 			}
@@ -297,17 +301,12 @@ namespace MyCAM.Helper
 
 		static void MarkCollapsedRegion( List<OffsetPoint> points, int pinIdx, int poutIdx )
 		{
-			// determine the InheritedCornerIndex for this collapsed region
-			int firstRemoved = FindNextAlive( points, pinIdx );
-			int cornerIdx = INVALID_CORNER_INDEX;
-			if( firstRemoved >= 0 && firstRemoved != poutIdx ) {
-				cornerIdx = points[ firstRemoved ].OriginalIndex;
-				if( cornerIdx == OFFSET_GENERATED_INDEX ) {
-					cornerIdx = points[ firstRemoved ].InheritedCornerIndex;
-				}
-			}
-			if( cornerIdx == INVALID_CORNER_INDEX || cornerIdx == OFFSET_GENERATED_INDEX ) {
-				cornerIdx = points[ pinIdx ].OriginalIndex;
+			// determine the InheritedCornerIndex from the outgoing point (consistent with Step C convention)
+			int cornerIdx = points[ poutIdx ].OriginalIndex;
+
+			// should not happened in current design, just a safety check
+			if( cornerIdx == OFFSET_GENERATED_INDEX ) {
+				cornerIdx = points[ poutIdx ].InheritedCornerIndex;
 			}
 
 			// mark Pin as corner incoming
@@ -322,7 +321,7 @@ namespace MyCAM.Helper
 
 			// remove all points between Pin and Pout (exclusive, circular)
 			int current = FindNextAlive( points, pinIdx );
-			while( current >= 0 && current != poutIdx ) {
+			while( current != IVALID_SEARCH_INDEX && current != poutIdx ) {
 				points[ current ].IsRemoved = true;
 				current = FindNextAlive( points, current );
 				if( current == pinIdx ) {
@@ -438,7 +437,7 @@ namespace MyCAM.Helper
 					return idx;
 				}
 			}
-			return -1;
+			return IVALID_SEARCH_INDEX;
 		}
 
 		static int FindNextAlive( List<OffsetPoint> points, int currentIdx )
@@ -450,7 +449,7 @@ namespace MyCAM.Helper
 					return idx;
 				}
 			}
-			return -1;
+			return IVALID_SEARCH_INDEX;
 		}
 
 		#endregion
@@ -548,6 +547,7 @@ namespace MyCAM.Helper
 
 		public const int OFFSET_GENERATED_INDEX = -2;
 		const int INVALID_CORNER_INDEX = -3;
+		const int IVALID_SEARCH_INDEX = -1;
 		const double GEOM_TOLERANCE = 1e-3;
 		const double DUPLICATE_POINT_TOLERANCE = 1e-3;
 		const double CORNER_ANGLE_THRESHOLD_DEG = 5.0;
