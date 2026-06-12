@@ -135,37 +135,25 @@ namespace MyCAM.PathCache
 			m_IsCADFactorDirty = false;
 			SetCenterDir();
 
-			// apply contour offset on raw geometry (before transform and local edit)
-			List<CADPoint> sourceCADPointList = m_ContourGeomData.CADPointList;
-			m_OffsetIndexMap = null;
-			if( Math.Abs( m_CraftData.CompensatedDistance ) > 1e-6 && m_IsClose ) {
-				List<CADPoint> offsetResult = ContourOffsetHelper.ApplyOffset(
-					m_ContourGeomData.CADPointList,
-					m_ContourGeomData.ConnectPointMap,
-					m_CraftData.CompensatedDistance,
-					m_IsClose,
-					out m_OffsetIndexMap );
-				if( offsetResult != null ) {
-					sourceCADPointList = offsetResult;
-				}
-				else {
-					// offset degenerated the entire path, fall back to original
-					m_OffsetIndexMap = null;
-					sourceCADPointList = m_ContourGeomData.CADPointList;
-				}
-			}
-
 			// global transform only (no local edit)
-			m_TrsfCADPointList = sourceCADPointList.Select( p => p.Clone() ).ToList();
+			m_TrsfCADPointList = m_ContourGeomData.CADPointList.Select( p => p.Clone() ).ToList();
 			for( int i = 0; i < m_TrsfCADPointList.Count; i++ ) {
 				m_TrsfCADPointList[ i ].Transform( m_CraftData.CumulativeTrsfMatrix );
 			}
 
 			// apply local CAD point displacement on top of global transform
 			m_CADPointList = ContourEditHelper.ApplyContourEdit(
-				m_TrsfCADPointList.Select( p => p.Clone() ).ToList(), FilterContourEditMap(), m_IsClose );
+				m_TrsfCADPointList.Select( p => p.Clone() ).ToList(), m_CraftData.ContourEditMap, m_IsClose );
 
-			// compute reference coordinate system based on transformed geometry
+			m_ConnectCADPointMap.Clear();
+			foreach( var kvp in m_ContourGeomData.ConnectPointMap ) {
+				CADPoint transformedKey = kvp.Key.Clone();
+				transformedKey.Transform( m_CraftData.CumulativeTrsfMatrix );
+				CADPoint transformedValue = kvp.Value.Clone();
+				transformedValue.Transform( m_CraftData.CumulativeTrsfMatrix );
+				m_ConnectCADPointMap.Add( transformedKey, transformedValue );
+			}
+
 			m_RefCoord = StdPatternHelper.GetPatternRefCoord( m_ComputeRefCenterDir, false );
 			BuildCAMPointList();
 		}
@@ -182,7 +170,7 @@ namespace MyCAM.PathCache
 				// build CAM point
 				CADPoint cadPoint = m_CADPointList[ i ];
 				CAMPoint camPoint = new CAMPoint( cadPoint, m_CraftData.IsToolVecReverse );
-				camPoint.InitPathIndex = GetOriginalIndex( i );
+				camPoint.InitPathIndex = i;
 				m_CAMPointList.Add( camPoint );
 
 				// build connection CAM point
@@ -192,14 +180,11 @@ namespace MyCAM.PathCache
 				}
 			}
 
-			// create initial index map (original index -> initial position) for SetStartPoint lookup
-			CreateIndexMap();
-
 			// set start point and orientation
 			SetStartPoint();
 			SetOrientation();
 
-			// rebuild index map to reflect final order after start point and orientation
+			// create index map consider the start point and orientation
 			CreateIndexMap();
 
 			// close the loop if is closed
@@ -258,9 +243,7 @@ namespace MyCAM.PathCache
 			foreach( int oneIndex in m_CraftData.ToolVecModifyMap.Keys ) {
 				if( m_CADToCAMIndexMap.ContainsKey( oneIndex ) ) {
 					int camIndex = m_CADToCAMIndexMap[ oneIndex ];
-					if( !toolVecModifyMap.ContainsKey( camIndex ) ) {
-						toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
-					}
+					toolVecModifyMap[ camIndex ] = m_CraftData.ToolVecModifyMap[ oneIndex ].Clone();
 				}
 			}
 			return toolVecModifyMap;
@@ -463,16 +446,12 @@ namespace MyCAM.PathCache
 		void SetStartPoint()
 		{
 			// rearrange cam points to start from the start index
-			int startIdx = FindNearestSurvivingIndex( m_CraftData.StartPointIndex );
-			if( m_CADToCAMIndexMap.ContainsKey( startIdx ) ) {
-				int camStartIdx = m_CADToCAMIndexMap[ startIdx ];
-				if( camStartIdx != 0 ) {
-					List<CAMPoint> newCAMPointList = new List<CAMPoint>();
-					for( int i = 0; i < m_CAMPointList.Count; i++ ) {
-						newCAMPointList.Add( m_CAMPointList[ ( i + camStartIdx ) % m_CAMPointList.Count ] );
-					}
-					m_CAMPointList = newCAMPointList;
+			if( m_CraftData.StartPointIndex != 0 ) {
+				List<CAMPoint> newCAMPointList = new List<CAMPoint>();
+				for( int i = 0; i < m_CAMPointList.Count; i++ ) {
+					newCAMPointList.Add( m_CAMPointList[ ( i + m_CraftData.StartPointIndex ) % m_CAMPointList.Count ] );
 				}
+				m_CAMPointList = newCAMPointList;
 			}
 		}
 
@@ -508,69 +487,6 @@ namespace MyCAM.PathCache
 		void SetCenterDir()
 		{
 			m_ComputeRefCenterDir = m_ContourGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
-		}
-
-		/// <summary>
-		/// Filter ContourEditMap to only include indices that survive offset,
-		/// and remap keys from original CAD indices to offset list positions.
-		/// </summary>
-		Dictionary<int, ContourEditData> FilterContourEditMap()
-		{
-			if( m_CraftData.ContourEditMap == null || m_CraftData.ContourEditMap.Count == 0 ) {
-				return m_CraftData.ContourEditMap;
-			}
-			if( m_OffsetIndexMap == null ) {
-				return m_CraftData.ContourEditMap;
-			}
-			// build reverse map: original index -> offset list position
-			Dictionary<int, int> originalToOffsetPos = new Dictionary<int, int>();
-			for( int i = 0; i < m_OffsetIndexMap.Count; i++ ) {
-				int origIdx = m_OffsetIndexMap[ i ];
-				if( !originalToOffsetPos.ContainsKey( origIdx ) ) {
-					originalToOffsetPos[ origIdx ] = i;
-				}
-			}
-			Dictionary<int, ContourEditData> filtered = new Dictionary<int, ContourEditData>();
-			foreach( var kvp in m_CraftData.ContourEditMap ) {
-				if( originalToOffsetPos.ContainsKey( kvp.Key ) ) {
-					filtered[ originalToOffsetPos[ kvp.Key ] ] = kvp.Value;
-				}
-			}
-			return filtered;
-		}
-
-		/// <summary>
-		/// Get the original CAD index for a given offset list position.
-		/// </summary>
-		int GetOriginalIndex( int offsetListPosition )
-		{
-			if( m_OffsetIndexMap == null || offsetListPosition >= m_OffsetIndexMap.Count ) {
-				return offsetListPosition;
-			}
-			return m_OffsetIndexMap[ offsetListPosition ];
-		}
-
-		/// <summary>
-		/// Find the nearest surviving original index by searching backward (circular for closed path).
-		/// </summary>
-		int FindNearestSurvivingIndex( int targetIndex )
-		{
-			if( m_OffsetIndexMap == null || m_OffsetIndexMap.Count == 0 ) {
-				return targetIndex;
-			}
-			// check if targetIndex exists in the offset map
-			if( m_CADToCAMIndexMap.ContainsKey( targetIndex ) ) {
-				return targetIndex;
-			}
-			// search backward
-			int originalCount = m_ContourGeomData.CADPointList.Count;
-			for( int step = 1; step < originalCount; step++ ) {
-				int candidate = ( targetIndex - step + originalCount ) % originalCount;
-				if( m_CADToCAMIndexMap.ContainsKey( candidate ) ) {
-					return candidate;
-				}
-			}
-			return 0;
 		}
 
 
@@ -619,9 +535,6 @@ namespace MyCAM.PathCache
 
 		// for CAD point connection
 		Dictionary<CADPoint, CADPoint> m_ConnectCADPointMap = new Dictionary<CADPoint, CADPoint>();
-
-		// offset result tracking
-		List<int> m_OffsetIndexMap = null;
 
 		// flag to indicate craft data changed
 		bool m_IsCAMFactorDirty = false;
