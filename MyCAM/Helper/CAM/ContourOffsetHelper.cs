@@ -133,19 +133,29 @@ namespace MyCAM.Helper
 			Dictionary<int, CADPoint> cornerConnectMap,
 			double offsetDistance )
 		{
+			// to record all data needed for offset process
 			List<OffsetPoint> result = new List<OffsetPoint>();
 
+			// offset each point
 			for( int i = 0; i < cadPointList.Count; i++ ) {
+
+				// the point is a corner
 				if( cornerConnectMap.ContainsKey( i ) ) {
+
+					// by cureent design, the souce point of corner is always the outgoing point, and the incoming point is from ConnectPointMap
 					CADPoint incomingPoint = cornerConnectMap[ i ];
 					CADPoint outgoingPoint = cadPointList[ i ];
 
+					// add offset incoming point first (corner, incoming)
 					CADPoint offsetIncoming = OffsetSinglePoint( incomingPoint, offsetDistance );
 					result.Add( new OffsetPoint( offsetIncoming, OFFSET_GENERATED_INDEX, true, false, i ) );
 
+					// add offset outgoing point second (corner, outgoing)
 					CADPoint offsetOutgoing = OffsetSinglePoint( outgoingPoint, offsetDistance );
 					result.Add( new OffsetPoint( offsetOutgoing, OFFSET_GENERATED_INDEX, true, true, i ) );
 				}
+
+				// the point is not a corner, just offset normally
 				else {
 					CADPoint offsetPoint = OffsetSinglePoint( cadPointList[ i ], offsetDistance );
 					result.Add( new OffsetPoint( offsetPoint, i, false, false, INVALID_CORNER_INDEX ) );
@@ -538,7 +548,7 @@ namespace MyCAM.Helper
 
 		public const int OFFSET_GENERATED_INDEX = -2;
 		const int INVALID_CORNER_INDEX = -3;
-		const double GEOM_TOLERANCE = 1e-6;
+		const double GEOM_TOLERANCE = 1e-3;
 		const double DUPLICATE_POINT_TOLERANCE = 1e-3;
 		const double CORNER_ANGLE_THRESHOLD_DEG = 5.0;
 		const double CORNER_INTERPOLATION_PARAM = 0.5;
