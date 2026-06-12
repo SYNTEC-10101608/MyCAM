@@ -92,17 +92,9 @@ namespace MyCAM.Helper
 				return cornerMap;
 			}
 
-			// ConnectPointMap keys are references that exist in cadPointList
-			foreach( var kvp in connectPointMap ) {
-				int index = -1;
-				for( int i = 0; i < cadPointList.Count; i++ ) {
-					if( ReferenceEquals( cadPointList[ i ], kvp.Key ) ) {
-						index = i;
-						break;
-					}
-				}
-				if( index >= 0 ) {
-					cornerMap[ index ] = kvp.Value;
+			for( int i = 0; i < cadPointList.Count; i++ ) {
+				if( connectPointMap.ContainsKey( cadPointList[ i ] ) ) {
+					cornerMap[ i ] = connectPointMap[ cadPointList[ i ] ];
 				}
 			}
 			return cornerMap;
