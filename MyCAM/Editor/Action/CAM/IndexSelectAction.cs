@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using MyCAM.Helper;
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
@@ -27,6 +28,7 @@ namespace MyCAM.Editor
 			}
 			m_PathID = pathID;
 			m_PathPointList = GetPathPointList( m_PathID );
+			m_OriginalIndexMap = GetOriginalIndexMap( m_PathID );
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			MakeSelectPoint();
 		}
@@ -39,6 +41,15 @@ namespace MyCAM.Editor
 			if( m_PathPointList == null || m_PathPointList.Count == 0 )
 				return;
 
+			// translate original highlight index to offset index when OriginalIndexMap is available
+			if( m_OriginalIndexMap != null ) {
+				for(int i = 0; i < m_OriginalIndexMap.Count; i++ ) {
+					if( m_OriginalIndexMap[ i ] == oriHighLightIdx ) {
+						oriHighLightIdx = i;
+						break;
+					}
+				}
+			}
 			List<gp_Pnt> newPntList = new List<gp_Pnt>( m_PathPointList.Count );
 			foreach( gp_Pnt point in m_PathPointList ) {
 				gp_Pnt copyPnt = new gp_Pnt( point.X(), point.Y(), point.Z() );
@@ -124,7 +135,17 @@ namespace MyCAM.Editor
 			if( m_VertexMap.IsBound( selectedVertex ) == false ) {
 				return null;
 			}
-			return m_VertexMap.Find( selectedVertex );
+			int offsetIndex = m_VertexMap.Find( selectedVertex );
+
+			// translate offset index to ori CAD index when OriginalIndexMap is available
+			if( m_OriginalIndexMap != null && offsetIndex >= 0 && offsetIndex < m_OriginalIndexMap.Count ) {
+				int oriIndex = m_OriginalIndexMap[ offsetIndex ];
+				if( oriIndex == ContourOffsetHelper.OFFSET_GENERATED_INDEX ) {
+					return null;
+				}
+				return oriIndex;
+			}
+			return offsetIndex;
 		}
 
 		protected void ShowSelectPoint()
@@ -188,8 +209,21 @@ namespace MyCAM.Editor
 			}
 		}
 
+		List<int> GetOriginalIndexMap( string szPathID )
+		{
+			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType ) || pathType != PathType.Contour ) {
+				return null;
+			}
+			if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache pathCache ) ) {
+				return null;
+			}
+			ContourCache contourCache = pathCache as ContourCache;
+			return contourCache?.OriginalIndexMap;
+		}
+
 		protected string m_PathID;
 		protected List<gp_Pnt> m_PathPointList;
+		List<int> m_OriginalIndexMap;
 
 		// map point on view to index on CAMData
 		protected TopTools_DataMapOfShapeInteger m_VertexMap;

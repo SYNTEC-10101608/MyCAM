@@ -475,7 +475,7 @@ namespace MyCAM.Editor
 
 		void SetInterpolationMode( int nCurrentIdx, EToolVecInterpolateType interpolateType )
 		{
-			bool isGetNextModfiyIndex = FindNextCtrlPntIdx( nCurrentIdx, out int nNextIdx );
+			bool isGetNextModfiyIndex = m_DataHandler.FindNextCtrlPntIdx( nCurrentIdx, out int nNextIdx );
 			if( isGetNextModfiyIndex ) {
 				m_CraftData.SetInterpolationTypeAtPnt( nNextIdx, interpolateType );
 			}
@@ -572,6 +572,7 @@ namespace MyCAM.Editor
 				FindPreCtrlPnt();
 			}
 		}
+
 		void OnToStartOrEnd( bool toStart )
 		{
 			if( m_DataHandler.IsClosed() ) {
@@ -765,7 +766,7 @@ namespace MyCAM.Editor
 		{
 			if( m_CraftData.ToolVecModifyMap.ContainsKey( m_nPointIndex ) ) {
 				if( m_CraftData.IsPathReverse == false ) {
-					bool isFoundNext = FindNextCtrlPntIdx( m_nPointIndex, out int nNextIdx );
+					bool isFoundNext = m_DataHandler.FindNextCtrlPntIdx( m_nPointIndex, out int nNextIdx );
 					if( isFoundNext ) {
 						m_CraftData.RemoveCtrlPntAndTransInterpolation( m_nPointIndex, nNextIdx );
 					}
@@ -806,7 +807,7 @@ namespace MyCAM.Editor
 
 		EToolVecInterpolateType GetNextModifyIndexInterpolate()
 		{
-			bool isFound = FindNextCtrlPntIdx( m_nPointIndex, out int nNextIdx );
+			bool isFound = m_DataHandler.FindNextCtrlPntIdx( m_nPointIndex, out int nNextIdx );
 			if( !isFound ) {
 				if( m_CraftData.StartPntToolVecData == null ) {
 					return EToolVecInterpolateType.Normal;
@@ -836,8 +837,8 @@ namespace MyCAM.Editor
 
 			bool isReverse = m_CraftData.IsPathReverse;
 			bool isFound = isReverse
-				? FindPreCtrlPntIdx( m_nPointIndex, out int targetIdx )
-				: FindNextCtrlPntIdx( m_nPointIndex, out targetIdx );
+				? m_DataHandler.FindPreCtrlPntIdx( m_nPointIndex, out int targetIdx )
+				: m_DataHandler.FindNextCtrlPntIdx( m_nPointIndex, out targetIdx );
 
 			// if no control point found, check if end point is a control point
 			if( !isFound && m_CraftData.StartPntToolVecData.EndPnt.AngleData != null ) {
@@ -863,8 +864,8 @@ namespace MyCAM.Editor
 			int currentIdx = ( m_nPointIndex == CLOSED_POINT_INDEX ) ? m_DataHandler.GetStartPointCADIndex() : m_nPointIndex;
 			bool isReverse = m_CraftData.IsPathReverse;
 			bool isFound = isReverse
-				? FindNextCtrlPntIdx( currentIdx, out int targetIdx )
-				: FindPreCtrlPntIdx( currentIdx, out targetIdx );
+				? m_DataHandler.FindNextCtrlPntIdx( currentIdx, out int targetIdx )
+				: m_DataHandler.FindPreCtrlPntIdx( currentIdx, out targetIdx );
 
 			// if no control point found, check if start point is a control point
 			if( !isFound && m_CraftData.StartPntToolVecData.StartPnt.AngleData != null ) {
@@ -877,104 +878,6 @@ namespace MyCAM.Editor
 			else {
 				MyApp.Logger.ShowOnLogPanel( "[操作提醒]沒有前個控制點", MyApp.NoticeType.Hint );
 			}
-		}
-
-		bool FindNextCtrlPntIdx( int currentIdx, out int nextIdx )
-		{
-			int StartPntIdx = m_CraftData.StartPointIndex;
-
-			// find the smallest key that is greater than the removed key
-			nextIdx = -1;
-			bool found = false;
-
-			if( currentIdx >= StartPntIdx ) {
-
-				// find the smallest key that is greater than currentIdx till the end
-				foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
-					if( k > currentIdx ) {
-						nextIdx = k;
-						found = true;
-						break;
-					}
-				}
-
-				// cant find, then find the smallest key that is smaller than start point index
-				if( found == false ) {
-					foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
-						if( k > StartPntIdx ) {
-							break;
-						}
-						if( k < currentIdx ) {
-							nextIdx = k;
-							found = true;
-							break;
-						}
-					}
-				}
-			}
-			else {
-
-				// find the smallest key that is greater than currentIdx till the start point index
-				foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
-					if( k > StartPntIdx ) {
-						break;
-					}
-					if( k > currentIdx ) {
-						nextIdx = k;
-						found = true;
-						break;
-					}
-				}
-			}
-			return found;
-		}
-
-		bool FindPreCtrlPntIdx( int currentIdx, out int preIdx )
-		{
-			int StartPntIdx = m_CraftData.StartPointIndex;
-
-			// find the greatest key that is smaller than the removed key
-			preIdx = -1;
-			bool found = false;
-
-			if( currentIdx > StartPntIdx ) {
-
-				// find the greatest key that is smaller than currentIdx till the end
-				foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
-					if( k < StartPntIdx ) {
-						continue;
-					}
-					if( k < currentIdx ) {
-						preIdx = k;
-						found = true;
-					}
-				}
-			}
-			else {
-
-				// find the greatest key that is smaller than currentIdx
-				foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
-					if( k > StartPntIdx ) {
-						break;
-					}
-					if( k < currentIdx ) {
-						preIdx = k;
-						found = true;
-					}
-				}
-
-				// cant find, then find the greatest key that is greater than start point index
-				if( found == false ) {
-					foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
-						if( k < StartPntIdx ) {
-							continue;
-						}
-						preIdx = k;
-						found = true;
-					}
-				}
-			}
-			return found;
 		}
 
 		#endregion
@@ -1310,23 +1213,31 @@ namespace MyCAM.Editor
 				return NULL_POINT_INDEX;
 			}
 
-			// cam index++ or cam index--
-			if( isNext ) {
-				camIndex++;
-			}
-			else {
-				camIndex--;
-			}
+			// cam index++ or cam index--, skip generated points (InitPathIndex == OFFSET_GENERATED_INDEX)
+			int count = m_PathCache.MainPathPointList.Count;
+			int maxSteps = count;
+			int step = 0;
+			do {
+				if( isNext ) {
+					camIndex++;
+				}
+				else {
+					camIndex--;
+				}
+				step++;
 
-			// when cam index < 0, cam index = 0
-			if( camIndex < 0 ) {
-				camIndex = 0;
+				// clamp
+				if( camIndex < 0 ) {
+					camIndex = 0;
+					break;
+				}
+				else if( camIndex >= count ) {
+					camIndex = count - 1;
+					break;
+				}
 			}
-
-			// when cam index >= count, cam index = count - 1
-			else if( camIndex >= m_PathCache.MainPathPointList.Count ) {
-				camIndex = m_PathCache.MainPathPointList.Count - 1;
-			}
+			while( step < maxSteps &&
+				m_PathCache.MainPathPointList[ camIndex ].InitPathIndex == ContourOffsetHelper.OFFSET_GENERATED_INDEX );
 
 			// convert back to cad index
 			if( IsClosed() && camIndex == m_PathCache.MainPathPointList.Count - 1 ) {
@@ -1337,6 +1248,122 @@ namespace MyCAM.Editor
 			else {
 				return m_PathCache.MainPathPointList[ camIndex ].InitPathIndex;
 			}
+		}
+
+		public bool FindNextCtrlPntIdx( int currentIdx, out int nextIdx )
+		{
+			int StartPntIdx = m_CraftData.StartPointIndex;
+
+			// find the smallest key that is greater than the removed key
+			nextIdx = -1;
+			bool found = false;
+
+			if( currentIdx >= StartPntIdx ) {
+
+				// find the smallest key that is greater than currentIdx till the end
+				foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
+					if( !m_PathCache.CADToCAMIndexMap.ContainsKey( k ) ) {
+						continue;
+					}
+					if( k > currentIdx ) {
+						nextIdx = k;
+						found = true;
+						break;
+					}
+				}
+
+				// cant find, then find the smallest key that is smaller than start point index
+				if( found == false ) {
+					foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
+						if( !m_PathCache.CADToCAMIndexMap.ContainsKey( k ) ) {
+							continue;
+						}
+						if( k > StartPntIdx ) {
+							break;
+						}
+						if( k < currentIdx ) {
+							nextIdx = k;
+							found = true;
+							break;
+						}
+					}
+				}
+			}
+			else {
+
+				// find the smallest key that is greater than currentIdx till the start point index
+				foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
+					if( !m_PathCache.CADToCAMIndexMap.ContainsKey( k ) ) {
+						continue;
+					}
+					if( k > StartPntIdx ) {
+						break;
+					}
+					if( k > currentIdx ) {
+						nextIdx = k;
+						found = true;
+						break;
+					}
+				}
+			}
+			return found;
+		}
+
+		public bool FindPreCtrlPntIdx( int currentIdx, out int preIdx )
+		{
+			int StartPntIdx = m_CraftData.StartPointIndex;
+
+			// find the greatest key that is smaller than the removed key
+			preIdx = -1;
+			bool found = false;
+
+			if( currentIdx > StartPntIdx ) {
+
+				// find the greatest key that is smaller than currentIdx till the end
+				foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
+					if( !m_PathCache.CADToCAMIndexMap.ContainsKey( k ) ) {
+						continue;
+					}
+					if( k < StartPntIdx ) {
+						continue;
+					}
+					if( k < currentIdx ) {
+						preIdx = k;
+						found = true;
+					}
+				}
+			}
+			else {
+
+				// find the greatest key that is smaller than currentIdx
+				foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
+					if( !m_PathCache.CADToCAMIndexMap.ContainsKey( k ) ) {
+						continue;
+					}
+					if( k > StartPntIdx ) {
+						break;
+					}
+					if( k < currentIdx ) {
+						preIdx = k;
+						found = true;
+					}
+				}
+
+				// cant find, then find the greatest key that is greater than start point index
+				if( found == false ) {
+					foreach( int k in m_CraftData.ToolVecModifyMap.Keys ) {
+						if( !m_PathCache.CADToCAMIndexMap.ContainsKey( k ) ) {
+							continue;
+						}
+						if( k < StartPntIdx ) {
+							continue;
+						}
+						preIdx = k;
+						found = true;
+					}
+				}
+			}
+			return found;
 		}
 
 		readonly CraftData m_CraftData;
