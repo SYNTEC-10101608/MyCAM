@@ -758,39 +758,14 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
+		// TODO: is it making sense to use cache here?
 		public void AutoSortProcess()
 		{
-			EndActionIfNotDefault();
-
-			// create a new SelectPathAction for the sort action
-			SelectPathAction sortSelectAction = new SelectPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
-
-			AutoSortPathAction action = new AutoSortPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, sortSelectAction );
-			action.SortCompleted += ( newPathIDList ) =>
-			{
-				// apply new order
-				m_DataManager.PathIDList.Clear();
-				m_DataManager.PathIDList.AddRange( newPathIDList );
-
-				// optimize IK continuity after sorting
-				AutoOptimizeIKContinuity();
-
-				// select focus on first path
-				if( m_DefaultAction is SelectPathAction selectAction ) {
-					selectAction.ClearSelection();
-					selectAction.SelectPathByID( m_DataManager.PathIDList.First() );
-				}
-				ShowAllCAMData();
-			};
-
-			StartEditAction( action );
-		}
-
-		void AutoSortProcessWithStartPath( string szStartPathID )
-		{
-			if( string.IsNullOrEmpty( szStartPathID ) ) {
+			// one shot edit, no multi edit supported
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, false ) ) {
 				return;
 			}
+			string szStartPathID = szPathIDList[ 0 ];
 
 			// get start point
 			gp_Pnt currentPoint = CacheHelper.GetProcessStartPoint( szStartPathID ).Point;
@@ -848,183 +823,6 @@ namespace MyCAM.Editor
 				selectAction.SelectPathByID( m_DataManager.PathIDList.First() );
 			}
 			ShowAllCAMData();
-		}
-
-		public void AutoSortProcessByExtrusionThenRotation( bool isExtrusionDescending, bool isRotationStartDescending )
-		{
-			AutoSortProcessForCylinder( isAxialFirst: true, isPrimaryDescending: isExtrusionDescending, isSecondaryStartDescending: isRotationStartDescending );
-		}
-
-		public void AutoSortProcessByRotationThenExtrusion( bool isRotationDescending, bool isExtrusionStartDescending )
-		{
-			AutoSortProcessForCylinder( isAxialFirst: false, isPrimaryDescending: isRotationDescending, isSecondaryStartDescending: isExtrusionStartDescending );
-		}
-
-		void AutoSortProcessForCylinder( bool isAxialFirst, bool isPrimaryDescending, bool isSecondaryStartDescending )
-		{
-			EndActionIfNotDefault();
-			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
-			if( pathIDList.Count == 0 ) {
-				return;
-			}
-
-			// step 1: axis direction from machine master rotary axis
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
-				return;
-			}
-			gp_Dir axisDir = machineData.MasterRotateDir;
-
-			// step 2: axis location from workpiece bounding box center
-			gp_Pnt axisLocation = new gp_Pnt( 0, 0, 0 );
-			BoundingBox bbox = GetVisibleWorkpieceBBox();
-			if( bbox != null ) {
-				axisLocation = new gp_Pnt( bbox.XCenter, bbox.YCenter, bbox.ZCenter );
-			}
-
-			// step 3: build reference frame perpendicular to axis for angle measurement
-			gp_Dir refX = BuildPerpendicularDir( axisDir );
-			gp_Dir refY = new gp_Dir( axisDir.Crossed( refX ).XYZ() );
-
-			// step 4: convert each path center to unrolled 2D coordinate (axial, angular)
-			List<CylinderSortInfo> pathInfoList = new List<CylinderSortInfo>();
-			foreach( string pathID in pathIDList ) {
-				if( !DataGettingHelper.GetPathCacheByID( pathID, out IPathCache pathCache ) ) {
-					continue;
-				}
-
-				// use pre-computed center from cache
-				gp_Pnt center = pathCache.ComputeRefCenterDir.Location();
-
-				// vector from axis location to center
-				double vx = center.X() - axisLocation.X();
-				double vy = center.Y() - axisLocation.Y();
-				double vz = center.Z() - axisLocation.Z();
-
-				// axial coordinate: projection on axis direction
-				double axial = vx * axisDir.X() + vy * axisDir.Y() + vz * axisDir.Z();
-
-				// radial vector: remove axial component
-				double radialX = vx - axial * axisDir.X();
-				double radialY = vy - axial * axisDir.Y();
-				double radialZ = vz - axial * axisDir.Z();
-
-				// angular coordinate: atan2 on perpendicular frame, normalized to [0, 2PI)
-				double projX = radialX * refX.X() + radialY * refX.Y() + radialZ * refX.Z();
-				double projY = radialX * refY.X() + radialY * refY.Y() + radialZ * refY.Z();
-				double angular = 0;
-				double radialLength = Math.Sqrt( projX * projX + projY * projY );
-
-				if( radialLength > RADIAL_EPSILON ) {
-					angular = Math.Atan2( projY, projX );
-					if( angular < 0 ) {
-						angular += 2.0 * Math.PI;
-					}
-				}
-				pathInfoList.Add( new CylinderSortInfo( pathID, axial, angular ) );
-			}
-			if( pathInfoList.Count == 0 ) {
-				return;
-			}
-
-			// step 5: snake sort with direction control
-			List<string> newPathIDList = SortCylinderPathSnake( pathInfoList, isAxialFirst, isPrimaryDescending, isSecondaryStartDescending );
-
-			// apply new order
-			m_DataManager.PathIDList.Clear();
-			m_DataManager.PathIDList.AddRange( newPathIDList );
-
-			// select focus on first path
-			if( m_DefaultAction is SelectPathAction selectAction ) {
-				selectAction.ClearSelection();
-				selectAction.SelectPathByID( m_DataManager.PathIDList.First() );
-			}
-			ShowAllCAMData();
-		}
-
-		List<string> SortCylinderPathSnake( List<CylinderSortInfo> pathInfoList, bool isAxialFirst, bool isPrimaryDescending, bool isSecondaryStartDescending )
-		{
-			// compute dynamic tolerance: 1/10 of the data spread in primary direction
-			double primaryTolerance = ComputeGroupTolerance( pathInfoList, isAxialFirst );
-
-			// sort by primary value ascending to assign group index
-			List<CylinderSortInfo> sorted = isAxialFirst
-				? pathInfoList.OrderBy( info => info.Axial ).ToList()
-				: pathInfoList.OrderBy( info => info.Angular ).ToList();
-
-			// values within tolerance of the previous one belong to the same group
-			int groupIndex = 0;
-			double prevValue = isAxialFirst ? sorted[ 0 ].Axial : sorted[ 0 ].Angular;
-			foreach( CylinderSortInfo info in sorted ) {
-				double currentValue = isAxialFirst ? info.Axial : info.Angular;
-				if( currentValue - prevValue > primaryTolerance ) {
-					groupIndex++;
-				}
-				info.GroupIndex = groupIndex;
-				prevValue = currentValue;
-			}
-
-			int totalGroups = groupIndex + 1;
-
-			// traverse groups in primary direction order
-			List<string> result = new List<string>();
-			for( int i = 0; i < totalGroups; i++ ) {
-				int g = isPrimaryDescending ? ( totalGroups - 1 - i ) : i;
-				List<CylinderSortInfo> groupPaths = sorted.Where( info => info.GroupIndex == g ).ToList();
-
-				// snake: alternate secondary direction each group
-				bool isDescending = ( i % 2 == 0 ) ? isSecondaryStartDescending : !isSecondaryStartDescending;
-
-				if( isDescending ) {
-					groupPaths = isAxialFirst
-						? groupPaths.OrderByDescending( info => info.Angular ).ToList()
-						: groupPaths.OrderByDescending( info => info.Axial ).ToList();
-				}
-				else {
-					groupPaths = isAxialFirst
-						? groupPaths.OrderBy( info => info.Angular ).ToList()
-						: groupPaths.OrderBy( info => info.Axial ).ToList();
-				}
-				result.AddRange( groupPaths.Select( info => info.PathID ) );
-			}
-			return result;
-		}
-
-		double ComputeGroupTolerance( List<CylinderSortInfo> pathInfoList, bool isAxialFirst )
-		{
-			double minValue, maxValue;
-			if( isAxialFirst ) {
-				minValue = pathInfoList.Min( info => info.Axial );
-				maxValue = pathInfoList.Max( info => info.Axial );
-			}
-			else {
-				minValue = pathInfoList.Min( info => info.Angular );
-				maxValue = pathInfoList.Max( info => info.Angular );
-			}
-
-			double spread = maxValue - minValue;
-
-			// fallback: if all paths are at the same position, use a small absolute tolerance
-			if( spread < RADIAL_EPSILON ) {
-				return RADIAL_EPSILON;
-			}
-			int TOLERANCE = 50;
-			return spread / TOLERANCE;
-		}
-
-		gp_Dir BuildPerpendicularDir( gp_Dir axisDir )
-		{
-			// choose a vector not parallel to axisDir
-			gp_Dir candidate;
-			if( Math.Abs( axisDir.X() ) < 0.9 ) {
-				candidate = new gp_Dir( 1, 0, 0 );
-			}
-			else {
-				candidate = new gp_Dir( 0, 1, 0 );
-			}
-
-			// cross product to get perpendicular direction
-			gp_XYZ cross = axisDir.XYZ().Crossed( candidate.XYZ() );
-			return new gp_Dir( cross );
 		}
 
 		public void AutoOptimizeIKContinuity()
@@ -1357,15 +1155,14 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.PathEdit
 				|| action.ActionType == EditActionType.ToolVec
 				|| action.ActionType == EditActionType.MicroJoint
-				|| action.ActionType == EditActionType.ContourEdit
-				|| action.ActionType == EditActionType.AutoSortPath ) {
+				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// lock main form
 				m_TreeView.Enabled = false;
 				RaiseWithDlgActionStatusChange?.Invoke( EActionStatus.Start );
 			}
 
-			// change display
+			// chnage display
 			RaiseCAMActionStatusChange( action.ActionType, EActionStatus.Start );
 		}
 
@@ -1478,42 +1275,6 @@ namespace MyCAM.Editor
 			}
 			TopoDS_Shape compound = ShapeTool.MakeCompound( shapeList );
 			return new BoundingBox( compound );
-		}
-
-		// below this radial length the angular coordinate is meaningless
-		const double RADIAL_EPSILON = 1e-6;
-
-		// grouping tolerance
-		const double GROUP_TOLERANCE_DIVISOR = 50.0;
-
-		class CylinderSortInfo
-		{
-			public CylinderSortInfo( string pathID, double axial, double angular )
-			{
-				PathID = pathID;
-				Axial = axial;
-				Angular = angular;
-			}
-
-			public string PathID
-			{
-				get;
-			}
-
-			public double Axial
-			{
-				get; set;
-			}
-
-			public double Angular
-			{
-				get; set;
-			}
-
-			public int GroupIndex
-			{
-				get; set;
-			}
 		}
 	}
 }

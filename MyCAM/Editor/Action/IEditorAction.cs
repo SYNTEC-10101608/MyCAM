@@ -43,7 +43,6 @@ namespace MyCAM.Editor
 		ContourEdit,
 		MicroJoint,
 		ManualOrder,
-		AutoSortPath,
 
 		// File
 		ImportProjectFile,

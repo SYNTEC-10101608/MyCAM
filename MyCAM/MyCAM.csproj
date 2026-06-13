@@ -79,7 +79,6 @@
     <Compile Include="Data\Craft\CalibrationData.cs" />
     <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
     <Compile Include="Editor\Action\CAD\GlassDXFImportAction.cs" />
-    <Compile Include="Editor\Action\CAM\AutoSortPathAction.cs" />
     <Compile Include="Editor\Action\CAM\CalibrationREFAction.cs" />
     <Compile Include="Editor\Action\CAM\ContourEditAction.cs" />
     <Compile Include="Editor\Action\CAM\ManualOrderAction.cs" />
@@ -100,12 +99,6 @@
     <Compile Include="Editor\Dialog\GlassDXFImportDlg.Designer.cs">
       <DependentUpon>GlassDXFImportDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Dialog\AutoSortPathDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editor\Dialog\AutoSortPathDlg.Designer.cs">
-      <DependentUpon>AutoSortPathDlg.cs</DependentUpon>
-    </Compile>
     <Compile Include="Editor\Dialog\ManualTransformDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -125,7 +118,6 @@
     <Compile Include="Editor\Dialog\OrderDialog.Designer.cs">
       <DependentUpon>OrderDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Dialog\SortParams.cs" />
     <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Editor\Dialog\ContourEditDlg.cs">
       <SubType>Form</SubType>
@@ -167,7 +159,6 @@
     <Compile Include="Helper\Coupler\StdPatternCraftCoupler.cs" />
     <Compile Include="Helper\FileIO\DxfReader.cs" />
     <Compile Include="Helper\FormShow\DialogShowHelper.cs" />
-    <Compile Include="Helper\CAM\PathSortHelper.cs" />
     <Compile Include="Helper\Simulation\CollisionHelper.cs" />
     <Compile Include="Helper\Simulation\MeshesToAISHelper.cs" />
     <Compile Include="Helper\Simulation\ReadMachineMeshHelper.cs" />
@@ -360,9 +351,6 @@
       <DependentUpon>GlassDXFImportDlg.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editor\Dialog\AutoSortPathDlg.resx">
-      <DependentUpon>AutoSortPathDlg.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\MicroJointDlg.resx">
       <DependentUpon>MicroJointDlg.cs</DependentUpon>
     </EmbeddedResource>
@@ -475,33 +463,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\PathCompensate.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Sort_ExtrusionFirst_FromBottom_Clockwise.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\Sort_ExtrusionFirst_FromBottom_Clockwise.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\Sort_ExtrusionFirst_FromBottom_Counterclockwise.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\Sort_ExtrusionFirst_FromTop_Clockwise.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\Sort_ExtrusionFirst_FromTop_Counterclockwise.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\Sort_RotationFirst_FromBottom_Clockwise.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\Sort_RotationFirst_FromBottom_Counterclockwise.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\Sort_RotationFirst_FromTop_Clockwise.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\Sort_RotationFirst_FromTop_Counterclockwise.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
