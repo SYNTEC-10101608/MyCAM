@@ -87,10 +87,9 @@
 			// 
 			// m_btnToStart
 			// 
-			this.m_btnToStart.Location = new System.Drawing.Point(7, 20);
-			this.m_btnToStart.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnToStart.Location = new System.Drawing.Point(5, 16);
 			this.m_btnToStart.Name = "m_btnToStart";
-			this.m_btnToStart.Size = new System.Drawing.Size(85, 29);
+			this.m_btnToStart.Size = new System.Drawing.Size(64, 23);
 			this.m_btnToStart.TabIndex = 8;
 			this.m_btnToStart.Text = "至起點";
 			this.m_btnToStart.UseVisualStyleBackColor = true;
@@ -98,10 +97,9 @@
 			// 
 			// m_btnNext
 			// 
-			this.m_btnNext.Location = new System.Drawing.Point(97, 20);
-			this.m_btnNext.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnNext.Location = new System.Drawing.Point(73, 16);
 			this.m_btnNext.Name = "m_btnNext";
-			this.m_btnNext.Size = new System.Drawing.Size(80, 29);
+			this.m_btnNext.Size = new System.Drawing.Size(60, 23);
 			this.m_btnNext.TabIndex = 7;
 			this.m_btnNext.Text = "後一點";
 			this.m_btnNext.UseVisualStyleBackColor = true;
@@ -110,10 +108,9 @@
 			// 
 			// m_btnPrev
 			// 
-			this.m_btnPrev.Location = new System.Drawing.Point(7, 20);
-			this.m_btnPrev.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnPrev.Location = new System.Drawing.Point(5, 16);
 			this.m_btnPrev.Name = "m_btnPrev";
-			this.m_btnPrev.Size = new System.Drawing.Size(82, 29);
+			this.m_btnPrev.Size = new System.Drawing.Size(62, 23);
 			this.m_btnPrev.TabIndex = 6;
 			this.m_btnPrev.Text = "前一點";
 			this.m_btnPrev.UseVisualStyleBackColor = true;
@@ -123,21 +120,19 @@
 			// m_gbxIndexParam
 			// 
 			this.m_gbxIndexParam.Controls.Add(this.tableLayoutPanel1);
-			this.m_gbxIndexParam.Location = new System.Drawing.Point(33, 49);
-			this.m_gbxIndexParam.Margin = new System.Windows.Forms.Padding(4);
+			this.m_gbxIndexParam.Location = new System.Drawing.Point(25, 39);
 			this.m_gbxIndexParam.Name = "m_gbxIndexParam";
-			this.m_gbxIndexParam.Padding = new System.Windows.Forms.Padding(4);
-			this.m_gbxIndexParam.Size = new System.Drawing.Size(508, 370);
+			this.m_gbxIndexParam.Size = new System.Drawing.Size(381, 296);
 			this.m_gbxIndexParam.TabIndex = 3;
 			this.m_gbxIndexParam.TabStop = false;
 			// 
 			// tableLayoutPanel1
 			// 
 			this.tableLayoutPanel1.ColumnCount = 4;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 132F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 105F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 105F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 139F));
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 99F));
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 79F));
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 79F));
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 104F));
 			this.tableLayoutPanel1.Controls.Add(this.m_btnClear, 3, 7);
 			this.tableLayoutPanel1.Controls.Add(this.m_lblStartOrEnd, 2, 6);
 			this.tableLayoutPanel1.Controls.Add(this.m_lblSetBtn, 0, 7);
@@ -162,29 +157,27 @@
 			this.tableLayoutPanel1.Controls.Add(this.m_lblOnePntToolVecAdjust, 0, 0);
 			this.tableLayoutPanel1.Controls.Add(this.m, 0, 4);
 			this.tableLayoutPanel1.Controls.Add(this.m_cbxInterpolateType, 1, 4);
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(8, 20);
-			this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4);
+			this.tableLayoutPanel1.Location = new System.Drawing.Point(6, 16);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
 			this.tableLayoutPanel1.RowCount = 10;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(481, 331);
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(361, 265);
 			this.tableLayoutPanel1.TabIndex = 0;
 			// 
 			// m_btnClear
 			// 
-			this.m_btnClear.Location = new System.Drawing.Point(346, 284);
-			this.m_btnClear.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnClear.Location = new System.Drawing.Point(260, 227);
 			this.m_btnClear.Name = "m_btnClear";
-			this.m_btnClear.Size = new System.Drawing.Size(126, 32);
+			this.m_btnClear.Size = new System.Drawing.Size(94, 26);
 			this.m_btnClear.TabIndex = 8;
 			this.m_btnClear.Text = "清除所有控制點";
 			this.m_btnClear.UseVisualStyleBackColor = true;
@@ -195,10 +188,9 @@
 			this.m_lblStartOrEnd.AutoSize = true;
 			this.tableLayoutPanel1.SetColumnSpan(this.m_lblStartOrEnd, 2);
 			this.m_lblStartOrEnd.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_lblStartOrEnd.Location = new System.Drawing.Point(241, 240);
-			this.m_lblStartOrEnd.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.m_lblStartOrEnd.Location = new System.Drawing.Point(181, 192);
 			this.m_lblStartOrEnd.Name = "m_lblStartOrEnd";
-			this.m_lblStartOrEnd.Size = new System.Drawing.Size(236, 40);
+			this.m_lblStartOrEnd.Size = new System.Drawing.Size(177, 32);
 			this.m_lblStartOrEnd.TabIndex = 1;
 			this.m_lblStartOrEnd.Text = "當前位置：";
 			this.m_lblStartOrEnd.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -207,9 +199,10 @@
 			// 
 			this.m_lblSetBtn.AutoSize = true;
 			this.m_lblSetBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_lblSetBtn.Location = new System.Drawing.Point(3, 280);
+			this.m_lblSetBtn.Location = new System.Drawing.Point(2, 224);
+			this.m_lblSetBtn.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblSetBtn.Name = "m_lblSetBtn";
-			this.m_lblSetBtn.Size = new System.Drawing.Size(126, 40);
+			this.m_lblSetBtn.Size = new System.Drawing.Size(95, 32);
 			this.m_lblSetBtn.TabIndex = 21;
 			this.m_lblSetBtn.Text = "姿態設置";
 			this.m_lblSetBtn.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -217,10 +210,9 @@
 			// m_btnAdd
 			// 
 			this.m_btnAdd.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_btnAdd.Location = new System.Drawing.Point(136, 284);
-			this.m_btnAdd.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnAdd.Location = new System.Drawing.Point(102, 227);
 			this.m_btnAdd.Name = "m_btnAdd";
-			this.m_btnAdd.Size = new System.Drawing.Size(97, 32);
+			this.m_btnAdd.Size = new System.Drawing.Size(73, 26);
 			this.m_btnAdd.TabIndex = 13;
 			this.m_btnAdd.Text = "新增";
 			this.m_btnAdd.UseVisualStyleBackColor = true;
@@ -229,10 +221,9 @@
 			// m_btnRemove
 			// 
 			this.m_btnRemove.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_btnRemove.Location = new System.Drawing.Point(241, 284);
-			this.m_btnRemove.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnRemove.Location = new System.Drawing.Point(181, 227);
 			this.m_btnRemove.Name = "m_btnRemove";
-			this.m_btnRemove.Size = new System.Drawing.Size(97, 32);
+			this.m_btnRemove.Size = new System.Drawing.Size(73, 26);
 			this.m_btnRemove.TabIndex = 10;
 			this.m_btnRemove.Text = "刪除";
 			this.m_btnRemove.UseVisualStyleBackColor = true;
@@ -241,10 +232,9 @@
 			// m_btnKeep
 			// 
 			this.m_btnKeep.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_btnKeep.Location = new System.Drawing.Point(241, 204);
-			this.m_btnKeep.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnKeep.Location = new System.Drawing.Point(181, 163);
 			this.m_btnKeep.Name = "m_btnKeep";
-			this.m_btnKeep.Size = new System.Drawing.Size(97, 32);
+			this.m_btnKeep.Size = new System.Drawing.Size(73, 26);
 			this.m_btnKeep.TabIndex = 11;
 			this.m_btnKeep.Text = "保持前姿態";
 			this.m_btnKeep.UseVisualStyleBackColor = true;
@@ -253,10 +243,9 @@
 			// m_btnZDir
 			// 
 			this.m_btnZDir.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_btnZDir.Location = new System.Drawing.Point(136, 204);
-			this.m_btnZDir.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnZDir.Location = new System.Drawing.Point(102, 163);
 			this.m_btnZDir.Name = "m_btnZDir";
-			this.m_btnZDir.Size = new System.Drawing.Size(97, 32);
+			this.m_btnZDir.Size = new System.Drawing.Size(73, 26);
 			this.m_btnZDir.TabIndex = 12;
 			this.m_btnZDir.Text = "朝Z方向";
 			this.m_btnZDir.UseVisualStyleBackColor = true;
@@ -264,10 +253,9 @@
 			// 
 			// m_btnRevert
 			// 
-			this.m_btnRevert.Location = new System.Drawing.Point(346, 204);
-			this.m_btnRevert.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnRevert.Location = new System.Drawing.Point(260, 163);
 			this.m_btnRevert.Name = "m_btnRevert";
-			this.m_btnRevert.Size = new System.Drawing.Size(101, 32);
+			this.m_btnRevert.Size = new System.Drawing.Size(76, 26);
 			this.m_btnRevert.TabIndex = 12;
 			this.m_btnRevert.Text = "原始";
 			this.m_btnRevert.UseVisualStyleBackColor = true;
@@ -275,10 +263,9 @@
 			// 
 			// m_btnRotaryNeg
 			// 
-			this.m_btnRotaryNeg.Location = new System.Drawing.Point(346, 124);
-			this.m_btnRotaryNeg.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnRotaryNeg.Location = new System.Drawing.Point(260, 99);
 			this.m_btnRotaryNeg.Name = "m_btnRotaryNeg";
-			this.m_btnRotaryNeg.Size = new System.Drawing.Size(72, 23);
+			this.m_btnRotaryNeg.Size = new System.Drawing.Size(54, 18);
 			this.m_btnRotaryNeg.TabIndex = 18;
 			this.m_btnRotaryNeg.Text = "C-";
 			this.m_btnRotaryNeg.UseVisualStyleBackColor = true;
@@ -289,9 +276,10 @@
 			this.m_lblADeg.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.m_lblADeg.AutoSize = true;
-			this.m_lblADeg.Location = new System.Drawing.Point(135, 0);
+			this.m_lblADeg.Location = new System.Drawing.Point(101, 0);
+			this.m_lblADeg.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblADeg.Name = "m_lblADeg";
-			this.m_lblADeg.Size = new System.Drawing.Size(52, 40);
+			this.m_lblADeg.Size = new System.Drawing.Size(41, 32);
 			this.m_lblADeg.TabIndex = 1;
 			this.m_lblADeg.Text = "前傾角";
 			// 
@@ -300,9 +288,10 @@
 			this.m_lblBDeg.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.m_lblBDeg.AutoSize = true;
-			this.m_lblBDeg.Location = new System.Drawing.Point(135, 40);
+			this.m_lblBDeg.Location = new System.Drawing.Point(101, 32);
+			this.m_lblBDeg.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblBDeg.Name = "m_lblBDeg";
-			this.m_lblBDeg.Size = new System.Drawing.Size(52, 40);
+			this.m_lblBDeg.Size = new System.Drawing.Size(41, 32);
 			this.m_lblBDeg.TabIndex = 4;
 			this.m_lblBDeg.Text = "側傾角";
 			// 
@@ -311,9 +300,10 @@
 			this.m_lblMaster.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.m_lblMaster.AutoSize = true;
-			this.m_lblMaster.Location = new System.Drawing.Point(135, 80);
+			this.m_lblMaster.Location = new System.Drawing.Point(101, 64);
+			this.m_lblMaster.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblMaster.Name = "m_lblMaster";
-			this.m_lblMaster.Size = new System.Drawing.Size(16, 40);
+			this.m_lblMaster.Size = new System.Drawing.Size(13, 32);
 			this.m_lblMaster.TabIndex = 13;
 			this.m_lblMaster.Text = "C";
 			// 
@@ -322,17 +312,18 @@
 			this.m_lblSlave.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.m_lblSlave.AutoSize = true;
-			this.m_lblSlave.Location = new System.Drawing.Point(135, 120);
+			this.m_lblSlave.Location = new System.Drawing.Point(101, 96);
+			this.m_lblSlave.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblSlave.Name = "m_lblSlave";
-			this.m_lblSlave.Size = new System.Drawing.Size(17, 40);
+			this.m_lblSlave.Size = new System.Drawing.Size(13, 32);
 			this.m_lblSlave.TabIndex = 16;
 			this.m_lblSlave.Text = "A";
 			// 
 			// m_tbxSlave
 			// 
 			this.m_tbxSlave.DecimalPlaces = 3;
-			this.m_tbxSlave.Location = new System.Drawing.Point(240, 122);
-			this.m_tbxSlave.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.m_tbxSlave.Location = new System.Drawing.Point(180, 98);
+			this.m_tbxSlave.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_tbxSlave.Maximum = new decimal(new int[] {
             99999,
             0,
@@ -344,15 +335,15 @@
             0,
             -2147483648});
 			this.m_tbxSlave.Name = "m_tbxSlave";
-			this.m_tbxSlave.Size = new System.Drawing.Size(73, 25);
+			this.m_tbxSlave.Size = new System.Drawing.Size(55, 22);
 			this.m_tbxSlave.TabIndex = 14;
 			this.m_tbxSlave.DebouncedValueChanged += new System.EventHandler(this.m_tbxSlave_DebouncedValueChanged);
 			// 
 			// m_tbxAngleA
 			// 
 			this.m_tbxAngleA.DecimalPlaces = 3;
-			this.m_tbxAngleA.Location = new System.Drawing.Point(240, 2);
-			this.m_tbxAngleA.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.m_tbxAngleA.Location = new System.Drawing.Point(180, 2);
+			this.m_tbxAngleA.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_tbxAngleA.Maximum = new decimal(new int[] {
             99999,
             0,
@@ -364,16 +355,15 @@
             0,
             -2147483648});
 			this.m_tbxAngleA.Name = "m_tbxAngleA";
-			this.m_tbxAngleA.Size = new System.Drawing.Size(73, 25);
+			this.m_tbxAngleA.Size = new System.Drawing.Size(55, 22);
 			this.m_tbxAngleA.TabIndex = 4;
 			this.m_tbxAngleA.DebouncedValueChanged += new System.EventHandler(this.m_tbxAngleA_DebouncedValueChanged);
 			// 
 			// m_btnRotaryPos
 			// 
-			this.m_btnRotaryPos.Location = new System.Drawing.Point(346, 84);
-			this.m_btnRotaryPos.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnRotaryPos.Location = new System.Drawing.Point(260, 67);
 			this.m_btnRotaryPos.Name = "m_btnRotaryPos";
-			this.m_btnRotaryPos.Size = new System.Drawing.Size(72, 23);
+			this.m_btnRotaryPos.Size = new System.Drawing.Size(54, 18);
 			this.m_btnRotaryPos.TabIndex = 17;
 			this.m_btnRotaryPos.Text = "C+";
 			this.m_btnRotaryPos.UseVisualStyleBackColor = true;
@@ -382,8 +372,8 @@
 			// m_tbxAngleB
 			// 
 			this.m_tbxAngleB.DecimalPlaces = 3;
-			this.m_tbxAngleB.Location = new System.Drawing.Point(240, 42);
-			this.m_tbxAngleB.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.m_tbxAngleB.Location = new System.Drawing.Point(180, 34);
+			this.m_tbxAngleB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_tbxAngleB.Maximum = new decimal(new int[] {
             99999,
             0,
@@ -395,15 +385,15 @@
             0,
             -2147483648});
 			this.m_tbxAngleB.Name = "m_tbxAngleB";
-			this.m_tbxAngleB.Size = new System.Drawing.Size(73, 25);
+			this.m_tbxAngleB.Size = new System.Drawing.Size(55, 22);
 			this.m_tbxAngleB.TabIndex = 4;
 			this.m_tbxAngleB.DebouncedValueChanged += new System.EventHandler(this.m_tbxAngleB_DebouncedValueChanged);
 			// 
 			// m_tbxMaster
 			// 
 			this.m_tbxMaster.DecimalPlaces = 3;
-			this.m_tbxMaster.Location = new System.Drawing.Point(240, 82);
-			this.m_tbxMaster.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.m_tbxMaster.Location = new System.Drawing.Point(180, 66);
+			this.m_tbxMaster.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_tbxMaster.Maximum = new decimal(new int[] {
             99999,
             0,
@@ -415,17 +405,16 @@
             0,
             -2147483648});
 			this.m_tbxMaster.Name = "m_tbxMaster";
-			this.m_tbxMaster.Size = new System.Drawing.Size(73, 25);
+			this.m_tbxMaster.Size = new System.Drawing.Size(55, 22);
 			this.m_tbxMaster.TabIndex = 15;
 			this.m_tbxMaster.DebouncedValueChanged += new System.EventHandler(this.m_tbxMaster_DebouncedValueChanged);
 			// 
 			// m_btnSwitchStartEnd
 			// 
 			this.m_btnSwitchStartEnd.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_btnSwitchStartEnd.Location = new System.Drawing.Point(136, 244);
-			this.m_btnSwitchStartEnd.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnSwitchStartEnd.Location = new System.Drawing.Point(102, 195);
 			this.m_btnSwitchStartEnd.Name = "m_btnSwitchStartEnd";
-			this.m_btnSwitchStartEnd.Size = new System.Drawing.Size(97, 32);
+			this.m_btnSwitchStartEnd.Size = new System.Drawing.Size(73, 26);
 			this.m_btnSwitchStartEnd.TabIndex = 19;
 			this.m_btnSwitchStartEnd.Text = "起 / 終";
 			this.m_btnSwitchStartEnd.UseVisualStyleBackColor = true;
@@ -435,9 +424,10 @@
 			// 
 			this.m_lblToolDirQuickSetBtn.AutoSize = true;
 			this.m_lblToolDirQuickSetBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_lblToolDirQuickSetBtn.Location = new System.Drawing.Point(3, 200);
+			this.m_lblToolDirQuickSetBtn.Location = new System.Drawing.Point(2, 160);
+			this.m_lblToolDirQuickSetBtn.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblToolDirQuickSetBtn.Name = "m_lblToolDirQuickSetBtn";
-			this.m_lblToolDirQuickSetBtn.Size = new System.Drawing.Size(126, 40);
+			this.m_lblToolDirQuickSetBtn.Size = new System.Drawing.Size(95, 32);
 			this.m_lblToolDirQuickSetBtn.TabIndex = 20;
 			this.m_lblToolDirQuickSetBtn.Text = "姿態方向快捷鍵";
 			this.m_lblToolDirQuickSetBtn.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -446,9 +436,10 @@
 			// 
 			this.m_lblStartEnd.AutoSize = true;
 			this.m_lblStartEnd.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_lblStartEnd.Location = new System.Drawing.Point(3, 240);
+			this.m_lblStartEnd.Location = new System.Drawing.Point(2, 192);
+			this.m_lblStartEnd.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblStartEnd.Name = "m_lblStartEnd";
-			this.m_lblStartEnd.Size = new System.Drawing.Size(126, 40);
+			this.m_lblStartEnd.Size = new System.Drawing.Size(95, 32);
 			this.m_lblStartEnd.TabIndex = 22;
 			this.m_lblStartEnd.Text = "起終點切換";
 			this.m_lblStartEnd.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -457,9 +448,10 @@
 			// 
 			this.m_lblOnePntToolVecAdjust.AutoSize = true;
 			this.m_lblOnePntToolVecAdjust.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_lblOnePntToolVecAdjust.Location = new System.Drawing.Point(3, 0);
+			this.m_lblOnePntToolVecAdjust.Location = new System.Drawing.Point(2, 0);
+			this.m_lblOnePntToolVecAdjust.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblOnePntToolVecAdjust.Name = "m_lblOnePntToolVecAdjust";
-			this.m_lblOnePntToolVecAdjust.Size = new System.Drawing.Size(126, 40);
+			this.m_lblOnePntToolVecAdjust.Size = new System.Drawing.Size(95, 32);
 			this.m_lblOnePntToolVecAdjust.TabIndex = 23;
 			this.m_lblOnePntToolVecAdjust.Text = "單點姿態資訊";
 			this.m_lblOnePntToolVecAdjust.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -468,9 +460,10 @@
 			// 
 			this.m.AutoSize = true;
 			this.m.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m.Location = new System.Drawing.Point(3, 160);
+			this.m.Location = new System.Drawing.Point(2, 128);
+			this.m.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m.Name = "m";
-			this.m.Size = new System.Drawing.Size(126, 40);
+			this.m.Size = new System.Drawing.Size(95, 32);
 			this.m.TabIndex = 24;
 			this.m.Text = "插值方案";
 			this.m.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -487,9 +480,10 @@
             "傾角切坡口",
             "從軸平滑",
             "主軸平滑"});
-			this.m_cbxInterpolateType.Location = new System.Drawing.Point(135, 163);
+			this.m_cbxInterpolateType.Location = new System.Drawing.Point(101, 130);
+			this.m_cbxInterpolateType.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_cbxInterpolateType.Name = "m_cbxInterpolateType";
-			this.m_cbxInterpolateType.Size = new System.Drawing.Size(204, 23);
+			this.m_cbxInterpolateType.Size = new System.Drawing.Size(154, 20);
 			this.m_cbxInterpolateType.TabIndex = 25;
 			this.m_cbxInterpolateType.SelectedIndexChanged += new System.EventHandler(this.m_cbxInterpolateType_SelectedIndexChanged);
 			// 
@@ -505,9 +499,11 @@
 			this.m_gbxColorLegend.Controls.Add(this.m_lblLegendSlave);
 			this.m_gbxColorLegend.Controls.Add(this.m_pnlColorMaster);
 			this.m_gbxColorLegend.Controls.Add(this.m_lblLegendMaster);
-			this.m_gbxColorLegend.Location = new System.Drawing.Point(33, 7);
+			this.m_gbxColorLegend.Location = new System.Drawing.Point(25, 6);
+			this.m_gbxColorLegend.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_gbxColorLegend.Name = "m_gbxColorLegend";
-			this.m_gbxColorLegend.Size = new System.Drawing.Size(476, 44);
+			this.m_gbxColorLegend.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.m_gbxColorLegend.Size = new System.Drawing.Size(357, 35);
 			this.m_gbxColorLegend.TabIndex = 13;
 			this.m_gbxColorLegend.TabStop = false;
 			this.m_gbxColorLegend.Text = "插值方案";
@@ -516,17 +512,19 @@
 			// 
 			this.m_pnlColorNormal.BackColor = System.Drawing.Color.Blue;
 			this.m_pnlColorNormal.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.m_pnlColorNormal.Location = new System.Drawing.Point(10, 21);
+			this.m_pnlColorNormal.Location = new System.Drawing.Point(8, 17);
+			this.m_pnlColorNormal.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_pnlColorNormal.Name = "m_pnlColorNormal";
-			this.m_pnlColorNormal.Size = new System.Drawing.Size(16, 16);
+			this.m_pnlColorNormal.Size = new System.Drawing.Size(12, 13);
 			this.m_pnlColorNormal.TabIndex = 0;
 			// 
 			// m_lblLegendNormal
 			// 
 			this.m_lblLegendNormal.AutoSize = true;
-			this.m_lblLegendNormal.Location = new System.Drawing.Point(28, 22);
+			this.m_lblLegendNormal.Location = new System.Drawing.Point(21, 18);
+			this.m_lblLegendNormal.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblLegendNormal.Name = "m_lblLegendNormal";
-			this.m_lblLegendNormal.Size = new System.Drawing.Size(37, 15);
+			this.m_lblLegendNormal.Size = new System.Drawing.Size(29, 12);
 			this.m_lblLegendNormal.TabIndex = 1;
 			this.m_lblLegendNormal.Text = "維持";
 			// 
@@ -534,17 +532,19 @@
 			// 
 			this.m_pnlColorRotary.BackColor = System.Drawing.Color.Orange;
 			this.m_pnlColorRotary.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.m_pnlColorRotary.Location = new System.Drawing.Point(74, 20);
+			this.m_pnlColorRotary.Location = new System.Drawing.Point(56, 16);
+			this.m_pnlColorRotary.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_pnlColorRotary.Name = "m_pnlColorRotary";
-			this.m_pnlColorRotary.Size = new System.Drawing.Size(16, 16);
+			this.m_pnlColorRotary.Size = new System.Drawing.Size(12, 13);
 			this.m_pnlColorRotary.TabIndex = 2;
 			// 
 			// m_lblLegendRotary
 			// 
 			this.m_lblLegendRotary.AutoSize = true;
-			this.m_lblLegendRotary.Location = new System.Drawing.Point(92, 21);
+			this.m_lblLegendRotary.Location = new System.Drawing.Point(69, 17);
+			this.m_lblLegendRotary.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblLegendRotary.Name = "m_lblLegendRotary";
-			this.m_lblLegendRotary.Size = new System.Drawing.Size(82, 15);
+			this.m_lblLegendRotary.Size = new System.Drawing.Size(65, 12);
 			this.m_lblLegendRotary.TabIndex = 3;
 			this.m_lblLegendRotary.Text = "旋轉軸平滑";
 			// 
@@ -552,17 +552,19 @@
 			// 
 			this.m_pnlColorBevel.BackColor = System.Drawing.Color.Cyan;
 			this.m_pnlColorBevel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.m_pnlColorBevel.Location = new System.Drawing.Point(181, 20);
+			this.m_pnlColorBevel.Location = new System.Drawing.Point(136, 16);
+			this.m_pnlColorBevel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_pnlColorBevel.Name = "m_pnlColorBevel";
-			this.m_pnlColorBevel.Size = new System.Drawing.Size(16, 16);
+			this.m_pnlColorBevel.Size = new System.Drawing.Size(12, 13);
 			this.m_pnlColorBevel.TabIndex = 4;
 			// 
 			// m_lblLegendBevel
 			// 
 			this.m_lblLegendBevel.AutoSize = true;
-			this.m_lblLegendBevel.Location = new System.Drawing.Point(199, 21);
+			this.m_lblLegendBevel.Location = new System.Drawing.Point(149, 17);
+			this.m_lblLegendBevel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblLegendBevel.Name = "m_lblLegendBevel";
-			this.m_lblLegendBevel.Size = new System.Drawing.Size(82, 15);
+			this.m_lblLegendBevel.Size = new System.Drawing.Size(65, 12);
 			this.m_lblLegendBevel.TabIndex = 5;
 			this.m_lblLegendBevel.Text = "傾角切坡口";
 			// 
@@ -570,17 +572,19 @@
 			// 
 			this.m_pnlColorSlave.BackColor = System.Drawing.Color.Yellow;
 			this.m_pnlColorSlave.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.m_pnlColorSlave.Location = new System.Drawing.Point(289, 21);
+			this.m_pnlColorSlave.Location = new System.Drawing.Point(217, 17);
+			this.m_pnlColorSlave.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_pnlColorSlave.Name = "m_pnlColorSlave";
-			this.m_pnlColorSlave.Size = new System.Drawing.Size(16, 16);
+			this.m_pnlColorSlave.Size = new System.Drawing.Size(12, 13);
 			this.m_pnlColorSlave.TabIndex = 6;
 			// 
 			// m_lblLegendSlave
 			// 
 			this.m_lblLegendSlave.AutoSize = true;
-			this.m_lblLegendSlave.Location = new System.Drawing.Point(307, 22);
+			this.m_lblLegendSlave.Location = new System.Drawing.Point(230, 18);
+			this.m_lblLegendSlave.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblLegendSlave.Name = "m_lblLegendSlave";
-			this.m_lblLegendSlave.Size = new System.Drawing.Size(67, 15);
+			this.m_lblLegendSlave.Size = new System.Drawing.Size(53, 12);
 			this.m_lblLegendSlave.TabIndex = 7;
 			this.m_lblLegendSlave.Text = "從軸平滑";
 			// 
@@ -588,26 +592,27 @@
 			// 
 			this.m_pnlColorMaster.BackColor = System.Drawing.Color.Magenta;
 			this.m_pnlColorMaster.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.m_pnlColorMaster.Location = new System.Drawing.Point(384, 21);
+			this.m_pnlColorMaster.Location = new System.Drawing.Point(288, 17);
+			this.m_pnlColorMaster.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_pnlColorMaster.Name = "m_pnlColorMaster";
-			this.m_pnlColorMaster.Size = new System.Drawing.Size(16, 16);
+			this.m_pnlColorMaster.Size = new System.Drawing.Size(12, 13);
 			this.m_pnlColorMaster.TabIndex = 8;
 			// 
 			// m_lblLegendMaster
 			// 
 			this.m_lblLegendMaster.AutoSize = true;
-			this.m_lblLegendMaster.Location = new System.Drawing.Point(402, 22);
+			this.m_lblLegendMaster.Location = new System.Drawing.Point(302, 18);
+			this.m_lblLegendMaster.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.m_lblLegendMaster.Name = "m_lblLegendMaster";
-			this.m_lblLegendMaster.Size = new System.Drawing.Size(67, 15);
+			this.m_lblLegendMaster.Size = new System.Drawing.Size(53, 12);
 			this.m_lblLegendMaster.TabIndex = 9;
 			this.m_lblLegendMaster.Text = "主軸平滑";
 			// 
 			// m_btnToEnd
 			// 
-			this.m_btnToEnd.Location = new System.Drawing.Point(100, 20);
-			this.m_btnToEnd.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnToEnd.Location = new System.Drawing.Point(75, 16);
 			this.m_btnToEnd.Name = "m_btnToEnd";
-			this.m_btnToEnd.Size = new System.Drawing.Size(74, 29);
+			this.m_btnToEnd.Size = new System.Drawing.Size(56, 23);
 			this.m_btnToEnd.TabIndex = 9;
 			this.m_btnToEnd.Text = "至終點";
 			this.m_btnToEnd.UseVisualStyleBackColor = true;
@@ -617,9 +622,11 @@
 			// 
 			this.m_gpbStartPnt.Controls.Add(this.m_btnToEnd);
 			this.m_gpbStartPnt.Controls.Add(this.m_btnToStart);
-			this.m_gpbStartPnt.Location = new System.Drawing.Point(12, 426);
+			this.m_gpbStartPnt.Location = new System.Drawing.Point(9, 341);
+			this.m_gpbStartPnt.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_gpbStartPnt.Name = "m_gpbStartPnt";
-			this.m_gpbStartPnt.Size = new System.Drawing.Size(186, 57);
+			this.m_gpbStartPnt.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.m_gpbStartPnt.Size = new System.Drawing.Size(140, 46);
 			this.m_gpbStartPnt.TabIndex = 10;
 			this.m_gpbStartPnt.TabStop = false;
 			this.m_gpbStartPnt.Text = "起終點轉換";
@@ -628,9 +635,11 @@
 			// 
 			this.m_gpbPnt.Controls.Add(this.m_btnNext);
 			this.m_gpbPnt.Controls.Add(this.m_btnPrev);
-			this.m_gpbPnt.Location = new System.Drawing.Point(204, 426);
+			this.m_gpbPnt.Location = new System.Drawing.Point(153, 341);
+			this.m_gpbPnt.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_gpbPnt.Name = "m_gpbPnt";
-			this.m_gpbPnt.Size = new System.Drawing.Size(186, 57);
+			this.m_gpbPnt.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.m_gpbPnt.Size = new System.Drawing.Size(140, 46);
 			this.m_gpbPnt.TabIndex = 11;
 			this.m_gpbPnt.TabStop = false;
 			this.m_gpbPnt.Text = "前後點轉換";
@@ -639,19 +648,20 @@
 			// 
 			this.m_gpbCtrlPnt.Controls.Add(this.m_btnNextCtrlPnt);
 			this.m_gpbCtrlPnt.Controls.Add(this.m_btnPreCtrlPnt);
-			this.m_gpbCtrlPnt.Location = new System.Drawing.Point(396, 426);
+			this.m_gpbCtrlPnt.Location = new System.Drawing.Point(297, 341);
+			this.m_gpbCtrlPnt.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.m_gpbCtrlPnt.Name = "m_gpbCtrlPnt";
-			this.m_gpbCtrlPnt.Size = new System.Drawing.Size(190, 57);
+			this.m_gpbCtrlPnt.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.m_gpbCtrlPnt.Size = new System.Drawing.Size(142, 46);
 			this.m_gpbCtrlPnt.TabIndex = 12;
 			this.m_gpbCtrlPnt.TabStop = false;
 			this.m_gpbCtrlPnt.Text = "控制點轉換";
 			// 
 			// m_btnNextCtrlPnt
 			// 
-			this.m_btnNextCtrlPnt.Location = new System.Drawing.Point(97, 21);
-			this.m_btnNextCtrlPnt.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnNextCtrlPnt.Location = new System.Drawing.Point(73, 17);
 			this.m_btnNextCtrlPnt.Name = "m_btnNextCtrlPnt";
-			this.m_btnNextCtrlPnt.Size = new System.Drawing.Size(86, 29);
+			this.m_btnNextCtrlPnt.Size = new System.Drawing.Size(64, 23);
 			this.m_btnNextCtrlPnt.TabIndex = 7;
 			this.m_btnNextCtrlPnt.Text = "後控制點";
 			this.m_btnNextCtrlPnt.UseVisualStyleBackColor = true;
@@ -659,10 +669,9 @@
 			// 
 			// m_btnPreCtrlPnt
 			// 
-			this.m_btnPreCtrlPnt.Location = new System.Drawing.Point(7, 21);
-			this.m_btnPreCtrlPnt.Margin = new System.Windows.Forms.Padding(4);
+			this.m_btnPreCtrlPnt.Location = new System.Drawing.Point(5, 17);
 			this.m_btnPreCtrlPnt.Name = "m_btnPreCtrlPnt";
-			this.m_btnPreCtrlPnt.Size = new System.Drawing.Size(87, 29);
+			this.m_btnPreCtrlPnt.Size = new System.Drawing.Size(65, 23);
 			this.m_btnPreCtrlPnt.TabIndex = 6;
 			this.m_btnPreCtrlPnt.Text = "前控制點";
 			this.m_btnPreCtrlPnt.UseVisualStyleBackColor = true;
@@ -670,16 +679,16 @@
 			// 
 			// ToolVectorDlg
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(599, 494);
+			this.ClientSize = new System.Drawing.Size(449, 395);
 			this.Controls.Add(this.m_gpbCtrlPnt);
 			this.Controls.Add(this.m_gbxColorLegend);
 			this.Controls.Add(this.m_gbxIndexParam);
 			this.Controls.Add(this.m_gpbStartPnt);
 			this.Controls.Add(this.m_gpbPnt);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-			this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "ToolVectorDlg";

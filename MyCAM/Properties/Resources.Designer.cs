@@ -133,6 +133,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap CAD_Revolution {
+            get {
+                object obj = ResourceManager.GetObject("CAD_Revolution", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap CAD_SewPart {
             get {
                 object obj = ResourceManager.GetObject("CAD_SewPart", resourceCulture);

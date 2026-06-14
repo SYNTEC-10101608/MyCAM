@@ -219,7 +219,20 @@ namespace MyCAM
 		// import part
 		void m_tsbImport3DFile_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.Import3DFile();
+			m_CADEditor.Import3DFile(out _);
+		}
+
+		void m_tsbAddRevolution_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.Import3DFile(out TopoDS_Shape fileShape, true);
+			bool isDone = m_CADEditor.AdjustRevolutionPart(fileShape);
+			if (!isDone ) {
+				MyApp.Logger.ShowOnLogPanel( "[操作提醒]迴轉軸辨識失敗", MyApp.NoticeType.Warning );
+				return;
+			}
+			SwitchEditor( EEditorType.CAM );
+			m_CAMEditor.AutoFindStretchedWorkPieceFaceAndSelectFreeBound();
+			SwitchEditor( EEditorType.CAD );
 		}
 
 		void m_tsbImportProjectFile_Click( object sender, EventArgs e )

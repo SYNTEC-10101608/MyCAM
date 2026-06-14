@@ -1,5 +1,6 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Helper;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.IFSelect;
@@ -64,15 +65,28 @@ namespace MyCAM.Editor
 		}
 
 		// APIs
-		public void Import3DFile()
+		public void Import3DFile( out TopoDS_Shape fileShape, bool isRevolutionPart = false )
 		{
+			fileShape = null;
+
 			// stop current action
 			EndActionIfNotDefault();
 			OpenFileDialog openDialog = new OpenFileDialog();
-			string filter = "STEP Files (*.stp;*.step)|*.stp;*.step|" +
-							"IGES Files (*.igs;*.iges)|*.igs;*.iges|" +
-							"DXF Files (*.dxf)|*.dxf|" +
-							"All files (*.*)|*.*";
+
+			string filter;
+
+			if( isRevolutionPart ) {
+				filter = "STEP Files (*.stp;*.step)|*.stp;*.step|" +
+										"IGES Files (*.igs;*.iges)|*.igs;*.iges";
+			}
+			else {
+				filter = "STEP Files (*.stp;*.step)|*.stp;*.step|" +
+										"IGES Files (*.igs;*.iges)|*.igs;*.iges|" +
+										"DXF Files (*.dxf)|*.dxf|" +
+										"All files (*.*)|*.*";
+			}
+
+
 			openDialog.Filter = filter;
 
 			// show file dialog
@@ -100,8 +114,17 @@ namespace MyCAM.Editor
 				StartEditAction( action );
 			}
 			else {
-				ReadFileData( format, szFileName );
+				ReadFileData( format, szFileName, out fileShape );
 			}
+		}
+
+		public bool AdjustRevolutionPart( TopoDS_Shape shape )
+		{
+			bool isSuccess = RingShapedIdentifyHelper.SetRevolutionToG54( shape, out TopoDS_Shape replacedShape );
+			if (isSuccess ) {
+				m_DataManager.AddPart( replacedShape );
+			}
+			return isSuccess;
 		}
 
 		public void ImportProjectFile()
@@ -253,8 +276,10 @@ namespace MyCAM.Editor
 		}
 
 		// private methods
-		void ReadFileData( FileFormat format, string szFileName )
+		void ReadFileData( FileFormat format, string szFileName, out TopoDS_Shape oneShape )
 		{
+			oneShape = null;
+
 			// read the file
 			XSControl_Reader Reader;
 			switch( format ) {
@@ -285,7 +310,7 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
 				return;
 			}
-			TopoDS_Shape oneShape = Reader.OneShape();
+			oneShape = Reader.OneShape();
 			if( oneShape == null || oneShape.IsNull() ) {
 				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
 				return;

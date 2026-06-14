@@ -127,6 +127,7 @@
 			this.m_tsbShowTraverse = new System.Windows.Forms.ToolStripButton();
 			this.m_panBackGround = new System.Windows.Forms.TableLayoutPanel();
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.m_tsbAddRevolution = new System.Windows.Forms.ToolStripButton();
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_tscLevel1Container.ContentPanel.SuspendLayout();
@@ -498,7 +499,8 @@
             this.m_tsbImport3DFile,
             this.m_tsbReadProjectFile,
             this.m_tsbSaveProjectFile,
-            this.m_tsbAddTube});
+            this.m_tsbAddTube,
+            this.m_tsbAddRevolution});
 			this.m_tsFileFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsFileFunction.Name = "m_tsFileFunction";
 			this.m_tsFileFunction.Size = new System.Drawing.Size(1596, 50);
@@ -1301,6 +1303,16 @@
 			this.contextMenuStrip1.Name = "contextMenuStrip1";
 			this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
 			// 
+			// m_tsbAddRevolution
+			// 
+			this.m_tsbAddRevolution.Image = global::MyCAM.Properties.Resources.CAD_Revolution;
+			this.m_tsbAddRevolution.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbAddRevolution.Name = "m_tsbAddRevolution";
+			this.m_tsbAddRevolution.Size = new System.Drawing.Size(47, 47);
+			this.m_tsbAddRevolution.Text = "迴轉體";
+			this.m_tsbAddRevolution.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbAddRevolution.Click += new System.EventHandler(this.m_tsbAddRevolution_Click);
+			// 
 			// StartupForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1456,6 +1468,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbMicroJoint;
 		private System.Windows.Forms.ToolStripButton m_tsbManualOrder;
 		private System.Windows.Forms.ToolStripButton m_tsbAddTube;
+		private System.Windows.Forms.ToolStripButton m_tsbAddRevolution;
 	}
 }
 
