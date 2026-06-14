@@ -110,11 +110,11 @@ namespace MyCAM.Editor
 			if( e.Button == MouseButtons.Left ) {
 				if( m_Viewer.GetAISContext().DetectedOwner().IsNull()
 						|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
-						if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
-							m_Viewer.GetAISContext().ClearSelected( true );
-						}
-						return;
+					if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
+						m_Viewer.GetAISContext().ClearSelected( true );
 					}
+					return;
+				}
 				AIS_InteractiveObject detectedObject = m_Viewer.GetAISContext().DetectedInteractive();
 				if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
 					m_Viewer.GetAISContext().ClearSelected( false );
@@ -211,48 +211,7 @@ namespace MyCAM.Editor
 		// BFS core: find all D1 continuous faces starting from a set of seed faces
 		List<TopoDS_Face> BFSFindD1ContFaces( List<TopoDS_Face> faceBFSQueue )
 		{
-			List<TopoDS_Face> pendingFaces = new List<TopoDS_Face>( faceBFSQueue );
-			List<TopoDS_Face> allD1ContinuousFaceList = new List<TopoDS_Face>( faceBFSQueue );
-			TopTools_MapOfShape visitedFaceMap = new TopTools_MapOfShape();
-			TopTools_MapOfShape visitedEdgeMap = new TopTools_MapOfShape();
-			foreach( TopoDS_Face oneFace in faceBFSQueue ) {
-				visitedFaceMap.Add( oneFace );
-			}
-			while( pendingFaces.Count > 0 ) {
-				TopoDS_Face currentFace = pendingFaces[ 0 ];
-				pendingFaces.RemoveAt( 0 );
-
-				// get all edges of the current face
-				List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
-				TopExp_Explorer exp = new TopExp_Explorer( currentFace, TopAbs_ShapeEnum.TopAbs_EDGE );
-				for( ; exp.More(); exp.Next() ) {
-					if( visitedEdgeMap.Contains( exp.Current() ) ) {
-						continue;
-					}
-					edgeList.Add( TopoDS.ToEdge( exp.Current() ) );
-					visitedEdgeMap.Add( exp.Current() );
-				}
-
-				// find all D1 continuous faces
-				foreach( TopoDS_Edge oneEdge in edgeList ) {
-					foreach( TopoDS_Shape _oneConnectedFace in m_EdgeFaceMap.FindFromKey( oneEdge ) ) {
-
-						// check visited
-						if( visitedFaceMap.Contains( _oneConnectedFace ) ) {
-							continue;
-						}
-
-						// check D1 continuity
-						TopoDS_Face oneConnectedFace = TopoDS.ToFace( _oneConnectedFace );
-						if( GeometryTool.IsD1Cont( currentFace, oneConnectedFace, oneEdge ) ) {
-							visitedFaceMap.Add( oneConnectedFace );
-							allD1ContinuousFaceList.Add( oneConnectedFace );
-							pendingFaces.Add( oneConnectedFace );
-						}
-					}
-				}
-			}
-			return allD1ContinuousFaceList;
+			return GeometryTool.FindD1ContinuousFaces( faceBFSQueue, m_EdgeFaceMap );
 		}
 
 		public List<TopoDS_Shape> GetResult()

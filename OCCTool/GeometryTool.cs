@@ -1,4 +1,5 @@
 ﻿using OCC.Bnd;
+using OCC.BOPTools;
 using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.BRepBndLib;
@@ -7,9 +8,11 @@ using OCC.BRepGProp;
 using OCC.ElCLib;
 using OCC.gce;
 using OCC.Geom;
+using OCC.Geom2d;
 using OCC.GeomAbs;
 using OCC.GeomAdaptor;
 using OCC.GeomLib;
+using OCC.GeomLProp;
 using OCC.gp;
 using OCC.GProp;
 using OCC.IntCurvesFace;
@@ -18,6 +21,7 @@ using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
+using OCC.TopTools;
 using System;
 using System.Collections.Generic;
 
@@ -959,6 +963,134 @@ namespace OCCTool
 			double dz = zMax - zMin;
 
 			return Math.Sqrt( dx * dx + dy * dy + dz * dz );
+		}
+
+		#endregion
+
+		#region Face Topology Analysis
+
+		public static List<TopoDS_Face> FindD1ContinuousFaces(
+			List<TopoDS_Face> seedFaces,
+			TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap )
+		{
+			List<TopoDS_Face> result = new List<TopoDS_Face>();
+
+			if( seedFaces == null || seedFaces.Count == 0 || edgeFaceMap == null ) {
+				return result;
+			}
+
+			List<TopoDS_Face> pendingFaces = new List<TopoDS_Face>( seedFaces );
+			List<TopoDS_Face> allD1ContinuousFaceList = new List<TopoDS_Face>( seedFaces );
+			TopTools_MapOfShape visitedFaceMap = new TopTools_MapOfShape();
+			TopTools_MapOfShape visitedEdgeMap = new TopTools_MapOfShape();
+
+			foreach( TopoDS_Face oneFace in seedFaces ) {
+				visitedFaceMap.Add( oneFace );
+			}
+
+			while( pendingFaces.Count > 0 ) {
+				TopoDS_Face currentFace = pendingFaces[ 0 ];
+				pendingFaces.RemoveAt( 0 );
+
+				// get all edges of the current face
+				List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
+				TopExp_Explorer exp = new TopExp_Explorer( currentFace, TopAbs_ShapeEnum.TopAbs_EDGE );
+				for( ; exp.More(); exp.Next() ) {
+					if( visitedEdgeMap.Contains( exp.Current() ) ) {
+						continue;
+					}
+					edgeList.Add( TopoDS.ToEdge( exp.Current() ) );
+					visitedEdgeMap.Add( exp.Current() );
+				}
+
+				// find all D1 continuous faces
+				foreach( TopoDS_Edge oneEdge in edgeList ) {
+					foreach( TopoDS_Shape _oneConnectedFace in edgeFaceMap.FindFromKey( oneEdge ) ) {
+
+						// check visited
+						if( visitedFaceMap.Contains( _oneConnectedFace ) ) {
+							continue;
+						}
+
+						// check D1 continuity
+						TopoDS_Face oneConnectedFace = TopoDS.ToFace( _oneConnectedFace );
+						if( IsD1Cont( currentFace, oneConnectedFace, oneEdge ) ) {
+							visitedFaceMap.Add( oneConnectedFace );
+							allD1ContinuousFaceList.Add( oneConnectedFace );
+							pendingFaces.Add( oneConnectedFace );
+						}
+					}
+				}
+			}
+			return allD1ContinuousFaceList;
+		}
+
+
+		public static gp_Dir GetSurfaceNormal( TopoDS_Edge edge, TopoDS_Face face, double param )
+		{
+			// step 1: safety check
+			if( edge == null || edge.IsNull() || face == null || face.IsNull() ) {
+				return null;
+			}
+
+			// step 2: get face surface
+			Geom_Surface surf = BRep_Tool.Surface( face );
+			if( surf == null ) {
+				return null;
+			}
+
+			// step 3: create adaptor with (edge, face)
+			// this ensures correct parameter range and direction
+			BRepAdaptor_Curve adC = new BRepAdaptor_Curve( edge, face );
+
+			// step 4: calculate uv parameters
+			double u, v;
+			double first2d = 0, last2d = 0;
+
+			// try to get pcurve safely
+			Geom2d_Curve pcurve = null;
+			bool hasPCurve = false;
+
+			pcurve = BRep_Tool.CurveOnSurface( edge, face, ref first2d, ref last2d );
+			hasPCurve = ( pcurve != null && !pcurve.IsNull() );
+
+			if( hasPCurve ) {
+				// method a: use pcurve (more accurate)
+				gp_Pnt2d uv = pcurve.Value( param );
+				u = uv.X();
+				v = uv.Y();
+			}
+			else {
+				// method b: inverse calc uv (from 3d point)
+				// using adaptor that considers face direction
+				gp_Pnt pt = adC.Value( param );
+				ShapeAnalysis_Surface sas = new ShapeAnalysis_Surface( surf );
+				gp_Pnt2d uv = sas.ValueOfUV( pt, Precision.Confusion() );
+				u = uv.X();
+				v = uv.Y();
+			}
+
+			// step 5: calculate normal vector
+			GeomLProp_SLProps props = new GeomLProp_SLProps( surf, u, v, 1, Precision.Confusion() );
+			if( props.IsNormalDefined() ) {
+				gp_Dir normal = props.Normal();
+
+				// adjust normal based on face orientation
+				if( face.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+					normal.Reverse();
+				}
+
+				return normal;
+			}
+
+			// step 6: fallback method
+			gp_Dir fallback = new gp_Dir();
+			BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, face, param, ref fallback );
+
+			if( face.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				fallback.Reverse();
+			}
+			return fallback;
 		}
 
 		#endregion

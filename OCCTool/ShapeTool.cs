@@ -22,6 +22,14 @@ namespace OCCTool
 			return sewing.SewedShape();
 		}
 
+		public static TopoDS_Shape SewShape( TopoDS_Shape shape, double dSewingTolerance = 1e-3 )
+		{
+			BRepBuilderAPI_Sewing sewing = new BRepBuilderAPI_Sewing( dSewingTolerance );
+			sewing.Add( shape );
+			sewing.Perform();
+			return sewing.SewedShape();
+		}
+
 		public static TopoDS_Shape MakeCompound( List<TopoDS_Shape> shapeList )
 		{
 			TopoDS_Compound compound = new TopoDS_Compound();
@@ -33,7 +41,206 @@ namespace OCCTool
 			}
 			return compound;
 		}
+
+		public static bool FlipShapeUpsideDown( TopoDS_Shape shape, out TopoDS_Shape flippedShape, gp_Pnt rotationCenter = null )
+		{
+			flippedShape = null;
+
+			try {
+				if( shape == null || shape.IsNull() ) {
+					return false;
+				}
+				if( rotationCenter == null ) {
+					rotationCenter = new gp_Pnt( 0, 0, 0 );
+				}
+
+				// rotate 180 degrees around X-axis
+				gp_Ax1 xAxis = new gp_Ax1( rotationCenter, new gp_Dir( 1, 0, 0 ) );
+				gp_Trsf trsf = new gp_Trsf();
+				trsf.SetRotation( xAxis, Math.PI );
+				BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( shape, trsf, true );
+				if( !transform.IsDone() ) {
+					return false;
+				}
+				flippedShape = transform.Shape();
+				return true;
+			}
+			catch {
+				return false;
+			}
+		}
+
+		public static bool MoveShapeBottomToZ0( TopoDS_Shape shape, out TopoDS_Shape movedShape )
+		{
+			movedShape = null;
+
+			try {
+				if( shape == null || shape.IsNull() ) {
+					return false;
+				}
+
+				// 步驟 1: 獲取 BBox
+				Bnd_Box bbox = new Bnd_Box();
+				BRepBndLib.AddOptimal( shape, ref bbox );
+
+				if( bbox.IsVoid() ) {
+					return false;
+				}
+
+				double xmin = 0, ymin = 0, zmin = 0, xmax = 0, ymax = 0, zmax = 0;
+				bbox.Get( ref xmin, ref ymin, ref zmin, ref xmax, ref ymax, ref zmax );
+
+				// 步驟 2: 計算平移向量（只移動 Z）
+				gp_Vec translation = new gp_Vec( 0, 0, -zmin );
+
+				// 步驟 3: 應用平移
+				gp_Trsf trsf = new gp_Trsf();
+				trsf.SetTranslation( translation );
+
+				BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( shape, trsf, true );
+
+				if( !transform.IsDone() ) {
+					return false;
+				}
+
+				movedShape = transform.Shape();
+				return true;
+			}
+			catch {
+				return false;
+			}
+		}
+
+		public static bool AlignOBBToXYAxes(
+			TopoDS_Shape shape,
+			out TopoDS_Shape alignedShape
+		)
+		{
+			alignedShape = null;
+
+			try {
+				if( shape == null || shape.IsNull() ) {
+					return false;
+				}
+
+				// Step 1: Calculate OBB
+				Bnd_OBB obb = new Bnd_OBB();
+				BRepBndLib.AddOBB( shape, ref obb, true, true, true );
+
+				if( obb.IsVoid() ) {
+					return false;
+				}
+
+				// Step 2: Get OBB X direction (principal axis)
+				gp_XYZ xDirectionXYZ = obb.XDirection();
+				gp_Dir xDirection = new gp_Dir( xDirectionXYZ );
+
+				// Step 3: Calculate rotation angle to align X direction to coordinate X axis
+				// atan2(y, x) returns the angle between the vector and X axis
+				double angle = Math.Atan2( xDirection.Y(), xDirection.X() );
+
+				// Step 4: Rotate around Z-axis at origin by -angle to align OBB X direction to coordinate X axis
+				gp_Ax1 zAxisAtOrigin = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
+
+				gp_Trsf trsf = new gp_Trsf();
+				trsf.SetRotation( zAxisAtOrigin, -angle );
+
+				// Step 5: Apply transformation
+				BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( shape, trsf, true );
+
+				if( !transform.IsDone() ) {
+					return false;
+				}
+
+				alignedShape = transform.Shape();
+				return true;
+			}
+			catch {
+				return false;
+			}
+		}
+
+		public static bool AlignOBBToXYAxesKeepAxisCentered( TopoDS_Shape shape, out TopoDS_Shape alignedShape )
+		{
+			alignedShape = null;
+
+			try {
+				if( shape == null || shape.IsNull() ) {
+					return false;
+				}
+
+				// Step 1: Calculate OBB
+				Bnd_OBB obb = new Bnd_OBB();
+				BRepBndLib.AddOBB( shape, ref obb, true, true, true );
+
+				if( obb.IsVoid() ) {
+					return false;
+				}
+
+				// Step 2: Get OBB X direction (principal axis)
+				gp_XYZ xDirectionXYZ = obb.XDirection();
+				gp_Dir xDirection = new gp_Dir( xDirectionXYZ );
+
+				// Step 3: Calculate rotation angle to align X direction to coordinate X axis
+				// Project OBB X-direction onto XY plane and calculate angle
+				double angle = Math.Atan2( xDirection.Y(), xDirection.X() );
+
+				// Step 4: Rotate around Z-axis at ORIGIN (0,0,0), not OBB center
+				// This keeps the revolution axis at (0,0,z)
+				gp_Ax1 zAxisAtOrigin = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
+
+				gp_Trsf rotationTrsf = new gp_Trsf();
+				rotationTrsf.SetRotation( zAxisAtOrigin, -angle );
+
+				// Step 5: Apply rotation
+				BRepBuilderAPI_Transform transform1 = new BRepBuilderAPI_Transform( shape, rotationTrsf, true );
+
+				if( !transform1.IsDone() ) {
+					return false;
+				}
+
+				TopoDS_Shape rotatedShape = transform1.Shape();
+
+				// Step 6: Re-center to (0,0) in case rotation caused slight drift
+				// Calculate bounding box to find current center
+				Bnd_Box bbox = new Bnd_Box();
+				BRepBndLib.AddOptimal( rotatedShape, ref bbox );
+
+				if( bbox.IsVoid() ) {
+					alignedShape = rotatedShape;
+					return true;
+				}
+
+				double xmin = 0, ymin = 0, zmin = 0, xmax = 0, ymax = 0, zmax = 0;
+				bbox.Get( ref xmin, ref ymin, ref zmin, ref xmax, ref ymax, ref zmax );
+
+				// Calculate XY center
+				double xCenter = ( xmin + xmax ) / 2.0;
+				double yCenter = ( ymin + ymax ) / 2.0;
+
+				// Step 7: Translate to center XY at origin (keep Z unchanged)
+				gp_Vec recenterVec = new gp_Vec( -xCenter, -yCenter, 0 );
+				gp_Trsf recenterTrsf = new gp_Trsf();
+				recenterTrsf.SetTranslation( recenterVec );
+
+				BRepBuilderAPI_Transform transform2 = new BRepBuilderAPI_Transform( rotatedShape, recenterTrsf, true );
+
+				if( !transform2.IsDone() ) {
+					alignedShape = rotatedShape;
+					return true;
+				}
+
+				alignedShape = transform2.Shape();
+				return true;
+			}
+			catch {
+				return false;
+			}
+		}
+
 	}
+
+
 
 	public class BoundingBox
 	{

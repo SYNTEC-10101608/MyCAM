@@ -160,6 +160,7 @@
     <Compile Include="Helper\Coupler\StdPatternCraftCoupler.cs" />
     <Compile Include="Helper\FileIO\DxfReader.cs" />
     <Compile Include="Helper\FormShow\DialogShowHelper.cs" />
+    <Compile Include="Helper\RevolutionRecognition\RingShapedIdentifyHelper.cs" />
     <Compile Include="Helper\Simulation\CollisionHelper.cs" />
     <Compile Include="Helper\Simulation\MeshesToAISHelper.cs" />
     <Compile Include="Helper\Simulation\ReadMachineMeshHelper.cs" />

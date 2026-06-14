@@ -11,6 +11,7 @@ using OCC.Precision;
 using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopoDS;
+using OCCTool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -163,41 +164,7 @@ namespace MyCAM.Helper
 
 		static gp_Dir GetSurfaceNormal( TopoDS_Edge edge, TopoDS_Face face, double param )
 		{
-			Geom_Surface surf = BRep_Tool.Surface( face );
-
-			double first2d = 0, last2d = 0;
-			Geom2d_Curve pcurve = BRep_Tool.CurveOnSurface( edge, face, ref first2d, ref last2d );
-
-			double u, v;
-			if( pcurve != null ) {
-				gp_Pnt2d uv = pcurve.Value( param );
-				u = uv.X();
-				v = uv.Y();
-			}
-			else {
-				// No PCurve → reverse-compute UV from 3D point
-				BRepAdaptor_Curve adC = new BRepAdaptor_Curve( edge );
-				gp_Pnt pt = adC.Value( param );
-				ShapeAnalysis_Surface sas = new ShapeAnalysis_Surface( surf );
-				gp_Pnt2d uv = sas.ValueOfUV( pt, 1e-4 );
-				u = uv.X();
-				v = uv.Y();
-			}
-
-			GeomLProp_SLProps props = new GeomLProp_SLProps( surf, u, v, 1, Precision.Confusion() );
-			if( props.IsNormalDefined() ) {
-				gp_Dir normal = props.Normal();
-				if( face.Orientation() == TopAbs_Orientation.TopAbs_REVERSED )
-					normal.Reverse();
-				return normal;
-			}
-
-			// fallback
-			gp_Dir fallback = new gp_Dir();
-			BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, face, param, ref fallback );
-			if( face.Orientation() == TopAbs_Orientation.TopAbs_REVERSED )
-				fallback.Reverse();
-			return fallback;
+			return GeometryTool.GetSurfaceNormal( edge, face, param );
 		}
 
 		const double DISCRETE_MAX_DEFLECTION = 0.01;
