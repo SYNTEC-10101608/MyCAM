@@ -64,6 +64,7 @@
 			this.m_tsbReadProjectFile = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSaveProjectFile = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAddTube = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbAddRevolution = new System.Windows.Forms.ToolStripButton();
 			this.m_tsCADFunction = new System.Windows.Forms.ToolStrip();
 			this.m_tsbSewPart = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAddPoint_AcrCenter = new System.Windows.Forms.ToolStripButton();
@@ -127,7 +128,6 @@
 			this.m_tsbShowTraverse = new System.Windows.Forms.ToolStripButton();
 			this.m_panBackGround = new System.Windows.Forms.TableLayoutPanel();
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.m_tsbAddRevolution = new System.Windows.Forms.ToolStripButton();
 			this.m_msMode.SuspendLayout();
 			this.m_tsCAMFunction.SuspendLayout();
 			this.m_tscLevel1Container.ContentPanel.SuspendLayout();
@@ -497,10 +497,10 @@
 			this.m_tsFileFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
 			this.m_tsFileFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsbImport3DFile,
+            this.m_tsbAddRevolution,
             this.m_tsbReadProjectFile,
             this.m_tsbSaveProjectFile,
-            this.m_tsbAddTube,
-            this.m_tsbAddRevolution});
+            this.m_tsbAddTube});
 			this.m_tsFileFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsFileFunction.Name = "m_tsFileFunction";
 			this.m_tsFileFunction.Size = new System.Drawing.Size(1596, 50);
@@ -550,6 +550,16 @@
 			this.m_tsbAddTube.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbAddTube.ToolTipText = "設計管件";
 			this.m_tsbAddTube.Click += new System.EventHandler(this.m_tsbAddTube_Click);
+			// 
+			// m_tsbAddRevolution
+			// 
+			this.m_tsbAddRevolution.Image = global::MyCAM.Properties.Resources.CAD_Revolution;
+			this.m_tsbAddRevolution.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbAddRevolution.Name = "m_tsbAddRevolution";
+			this.m_tsbAddRevolution.Size = new System.Drawing.Size(47, 47);
+			this.m_tsbAddRevolution.Text = "迴轉體";
+			this.m_tsbAddRevolution.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbAddRevolution.Click += new System.EventHandler(this.m_tsbAddRevolution_Click);
 			// 
 			// m_tsCADFunction
 			// 
@@ -1303,16 +1313,6 @@
 			this.contextMenuStrip1.Name = "contextMenuStrip1";
 			this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
 			// 
-			// m_tsbAddRevolution
-			// 
-			this.m_tsbAddRevolution.Image = global::MyCAM.Properties.Resources.CAD_Revolution;
-			this.m_tsbAddRevolution.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsbAddRevolution.Name = "m_tsbAddRevolution";
-			this.m_tsbAddRevolution.Size = new System.Drawing.Size(47, 47);
-			this.m_tsbAddRevolution.Text = "迴轉體";
-			this.m_tsbAddRevolution.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_tsbAddRevolution.Click += new System.EventHandler(this.m_tsbAddRevolution_Click);
-			// 
 			// StartupForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1327,7 +1327,7 @@
 			this.MainMenuStrip = this.m_msMode;
 			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "StartupForm";
-			this.Text = "新代激光五軸切割 0.25.0";
+			this.Text = "新代激光五軸切割 0.26.0";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.StartupForm_FormClosing);
 			this.Resize += new System.EventHandler(this.StartupForm_Resize);
 			this.m_msMode.ResumeLayout(false);
