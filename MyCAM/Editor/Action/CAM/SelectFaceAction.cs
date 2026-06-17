@@ -74,9 +74,7 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = false;
 
 			// hide all shape
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
-			}
+			m_ViewManager.EraseAll();
 
 			// show part for selction
 			ShowPart();
@@ -91,13 +89,15 @@ namespace MyCAM.Editor
 			// enable tree view
 			m_TreeView.Enabled = true;
 
-			// show all shape
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				if( viewObject.Visible ) {
-					m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
-					m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
+			// show all shape ( path is not allow to hide )
+			foreach( var partID in m_DataManager.PartIDList ) {
+				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
+					continue;
 				}
+				m_ViewManager.DisplayPart( partID );
 			}
+			m_ViewManager.DisplayPaths( m_DataManager.PathIDList );
+			m_ViewManager.DeactiveAll();
 
 			// hide part for selction
 			HidePart();

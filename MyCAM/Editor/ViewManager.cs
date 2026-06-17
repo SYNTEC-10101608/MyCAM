@@ -165,6 +165,36 @@ namespace MyCAM.Editor
 			get; private set;
 		}
 
+		public void EraseAll()
+		{
+			foreach( ViewObject viewObject in ViewObjectMap.Values ) {
+				if( viewObject == null ) {
+					return;
+				}
+				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
+			}
+		}
+
+		public void ShowAll()
+		{
+			foreach( ViewObject viewObject in ViewObjectMap.Values ) {
+				if( viewObject == null ) {
+					return;
+				}
+				m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
+			}
+		}
+
+		public void DeactiveAll()
+		{
+			foreach( ViewObject viewObject in ViewObjectMap.Values ) {
+				if( viewObject == null ) {
+					return;
+				}
+				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
+			}
+		}
+
 		#region Part Management
 
 		public void AddPart( string partID, TopoDS_Shape shape, bool isFeature = false )
@@ -226,11 +256,206 @@ namespace MyCAM.Editor
 			}
 		}
 
+		// origin shape need to be change
+		public void ChangePartShape( string partID, TopoDS_Shape newShape )
+		{
+			// validate input
+			if( string.IsNullOrEmpty( partID ) || newShape == null || newShape.IsNull() ) {
+				return;
+			}
+
+			// check if part exists in view
+			if( !ViewObjectMap.ContainsKey( partID ) ) {
+				return;
+			}
+
+			// get existing AIS object
+			AIS_Shape partAIS = AIS_Shape.DownCast( ViewObjectMap[ partID ].AISHandle );
+			if( partAIS == null || partAIS.IsNull() ) {
+				return;
+			}
+
+			// unregister old shape-ID mapping
+			TopoDS_Shape oldShape = partAIS.Shape();
+			if( oldShape != null && !oldShape.IsNull() ) {
+				UnregisterShapeIDMapping( oldShape );
+			}
+
+			// update shape and register new mapping
+			partAIS.SetShape( newShape );
+			RegisterShapeIDMapping( newShape, partID );
+
+			// redisplay in viewer
+			m_Viewer.GetAISContext().Redisplay( partAIS, false );
+		}
+
+		public void UpdateParts( List<string> partIDList )
+		{
+			foreach( string partID in partIDList ) {
+				// get updated shape from data
+				if( !DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObj ) ) {
+					continue;
+				}
+				ChangePartShape( partID, shapeObj.Shape );
+			}
+		}
+
+		public void ErasePart( string partID )
+		{
+			if( m_PartIDSet == null || m_PartIDSet.Contains( partID ) == false ) {
+				return;
+			}
+			if( ViewObjectMap == null || !ViewObjectMap.ContainsKey( partID ) ) {
+				return;
+			}
+			ViewObject viewObject = ViewObjectMap[ partID ];
+			if( viewObject == null ) {
+				return;
+			}
+			m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
+		}
+
+		public void EraseParts( List<string> partIDList )
+		{
+			foreach( string partID in partIDList ) {
+				ErasePart( partID );
+			}
+		}
+
+		public void DisplayParts( List<string> partIDList )
+		{
+			foreach( string partID in partIDList ) {
+				DisplayPart( partID );
+			}
+		}
+
+		public void DisplayPart( string partID )
+		{
+			if( m_PartIDSet == null || m_PartIDSet.Contains( partID ) == false ) {
+				return;
+			}
+			if( ViewObjectMap == null || !ViewObjectMap.ContainsKey( partID ) ) {
+				return;
+			}
+			ViewObject viewObject = ViewObjectMap[ partID ];
+			if( viewObject == null ) {
+				return;
+			}
+			m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
+		}
+
+		public void DeactiveParts( List<string> partIDList )
+		{
+			foreach( string partID in partIDList ) {
+				DeactivePart( partID );
+			}
+		}
+
+		public void DeactivePart( string partID )
+		{
+			if( m_PartIDSet == null || m_PartIDSet.Contains( partID ) == false ) {
+				return;
+			}
+			if( ViewObjectMap == null || !ViewObjectMap.ContainsKey( partID ) ) {
+				return;
+			}
+			ViewObject viewObject = ViewObjectMap[ partID ];
+			if( viewObject == null ) {
+				return;
+			}
+			m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
+		}
+
+		public void ActiveParts( List<string> partIDList )
+		{
+			foreach( string partID in partIDList ) {
+				ActivePart( partID );
+			}
+		}
+
+		public void ActivePart( string partID )
+		{
+			if( m_PartIDSet == null || m_PartIDSet.Contains( partID ) == false ) {
+				return;
+			}
+			if( ViewObjectMap == null || !ViewObjectMap.ContainsKey( partID ) ) {
+				return;
+			}
+			ViewObject viewObject = ViewObjectMap[ partID ];
+			if( viewObject == null ) {
+				return;
+			}
+			m_Viewer.GetAISContext().Activate( viewObject.AISHandle );
+		}
+
 		public void ClearParts()
 		{
 			List<string> partIDs = new List<string>( m_PartIDSet );
 			foreach( string id in partIDs ) {
 				RemovePart( id );
+			}
+		}
+
+		public void ChangePartColor(string partID, Quantity_Color color )
+		{
+			if( m_PartIDSet == null || m_PartIDSet.Contains( partID ) == false ) {
+				return;
+			}
+			if( ViewObjectMap == null || !ViewObjectMap.ContainsKey( partID ) ) {
+				return;
+			}
+			ViewObject viewObject = ViewObjectMap[ partID ];
+			if( viewObject == null ) {
+				return;
+			}
+			viewObject.AISHandle.SetColor( color );
+		}
+
+		public void ResetPartColor( string partID )
+		{
+			if( m_PartIDSet == null || m_PartIDSet.Contains( partID ) == false ) {
+				return;
+			}
+			if( ViewObjectMap == null || !ViewObjectMap.ContainsKey( partID ) ) {
+				return;
+			}
+			ViewObject viewObject = ViewObjectMap[ partID ];
+			if( viewObject == null ) {
+				return;
+			}
+			viewObject.AISHandle.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY70 ) );
+			viewObject.AISHandle.Attributes().SetFaceBoundaryDraw( true );
+			viewObject.AISHandle.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+			viewObject.AISHandle.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
+		}
+
+		public void ShowPartsTrsf( List<string> partIDList, gp_Trsf trsf )
+		{
+			foreach( string partID in partIDList ) {
+				ShowPartTrsf( partID, trsf );
+			}
+		}
+
+		public void ShowPartTrsf( string partID, gp_Trsf trsf )
+		{
+			if ( m_PartIDSet == null || m_PartIDSet.Contains( partID ) == false ) {
+				return;
+			}
+			if ( ViewObjectMap == null || !ViewObjectMap.ContainsKey( partID ) ) {
+				return;
+			}
+			ViewObject viewObject = ViewObjectMap[ partID ];
+			if( viewObject == null || viewObject.AISHandle == null ) {
+				return;
+			}
+			viewObject.AISHandle.SetLocalTransformation( trsf );
+		}
+
+		public void ResetPartColorAndTransAsDefault()
+		{
+			foreach( string partID in m_PartIDSet ) {
+				ResetPartColor( partID );
+				ShowPartTrsf( partID, new gp_Trsf() );
 			}
 		}
 
@@ -289,6 +514,9 @@ namespace MyCAM.Editor
 
 			// unregister shape-ID mapping
 			ViewObject viewObject = ViewObjectMap[ pathID ];
+			if ( viewObject == null ) {
+				return;
+			}
 			AIS_Shape pathAIS = viewObject.AISHandle as AIS_Shape;
 			if( pathAIS != null ) {
 				TopoDS_Shape shape = pathAIS.Shape();
@@ -375,6 +603,104 @@ namespace MyCAM.Editor
 					viewObject.AISHandle.SetLocalTransformation( trsf );
 				}
 			}
+		}
+
+		public void DeactivePath( List<string> pathIDList )
+		{
+			foreach( string pathID in pathIDList ) {
+				if( ViewObjectMap.TryGetValue( pathID, out ViewObject viewObject ) ) {
+					m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
+				}
+			}
+		}
+
+		public void ErasePaths( List<string> pathIDList )
+		{
+			foreach( string pathID in pathIDList ) {
+				ErasePath( pathID );
+			}
+		}
+
+		public void DisplayPaths( List<string> pathIDList )
+		{
+			foreach( string pathID in pathIDList ) {
+				DisplayPath( pathID );
+			}
+		}
+
+		public void DisplayPath( string pathID )
+		{
+			if( m_PathIDSet == null || m_PathIDSet.Contains( pathID ) == false ) {
+				return;
+			}
+			if( ViewObjectMap == null || !ViewObjectMap.ContainsKey( pathID ) ) {
+				return;
+			}
+			ViewObject viewObject = ViewObjectMap[ pathID ];
+			if (viewObject == null || viewObject.Visible == false ) {
+				return;
+			}
+			m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
+		}
+
+
+		public void ErasePath( string pathID )
+		{
+			if( m_PathIDSet == null || m_PathIDSet.Contains( pathID ) == false ) {
+				return;
+			}
+			if( ViewObjectMap == null || !ViewObjectMap.ContainsKey( pathID ) ) {
+				return;
+			}
+			ViewObject viewObject = ViewObjectMap[ pathID ];
+			if ( viewObject == null ) {
+				return;
+			}
+			m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
+		}
+
+		public void ActivePaths( List<string> pathIDList )
+		{
+			foreach( string pathID in pathIDList ) {
+				ActivePath( pathID );
+			}
+		}
+
+		public void ActivePath( string pathID )
+		{
+			if( m_PathIDSet == null || m_PathIDSet.Contains( pathID ) == false ) {
+				return;
+			}
+			if( ViewObjectMap == null || !ViewObjectMap.ContainsKey( pathID ) ) {
+				return;
+			}
+			ViewObject viewObject = ViewObjectMap[ pathID ];
+			if( viewObject == null ) {
+				return;
+			}
+			m_Viewer.GetAISContext().Activate( viewObject.AISHandle );
+		}
+
+		public void DeactivePaths( List<string> pathIDList )
+		{
+			foreach( string pathID in pathIDList ) {
+				DeactivePath( pathID );
+			}
+		}	
+
+		public void DeactivePath( string pathID )
+		{
+			if( m_PathIDSet == null || m_PathIDSet.Contains( pathID ) == false ) {
+				return;
+			}
+			if( ViewObjectMap == null || !ViewObjectMap.ContainsKey( pathID ) ) {
+				return;
+			}
+			ViewObject viewObject = ViewObjectMap[ pathID ];
+			if( viewObject == null ) {
+				return;
+			}
+			m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
 		}
 
 		#endregion

@@ -42,9 +42,7 @@ namespace MyCAM.Editor
 			m_SelectedIDSet.Remove( pathID );
 
 			// deactivate excluded path on viewer
-			if( m_ViewManager.ViewObjectMap.ContainsKey( pathID ) ) {
-				m_Viewer.GetAISContext().Deactivate( m_ViewManager.ViewObjectMap[ pathID ].AISHandle );
-			}
+			m_ViewManager.DeactivePath( pathID );
 		}
 
 		public void RestoreFromExclusion( string pathID )
@@ -56,23 +54,17 @@ namespace MyCAM.Editor
 			m_SelectedIDSet.Add( pathID );
 
 			// re-activate restored path on viewer
-			if( m_ViewManager.ViewObjectMap.ContainsKey( pathID ) ) {
-				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ pathID ].AISHandle );
-			}
+			m_ViewManager.ActivePath( pathID );
 		}
 
 		protected override void ActivateObject()
 		{
-			foreach( var pathID in m_DataManager.PathIDList ) {
-				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ pathID ].AISHandle );
-			}
+			m_ViewManager.ActivePaths( m_DataManager.PathIDList );
 		}
 
 		protected override void DeactivateObject()
 		{
-			foreach( var pathID in m_DataManager.PathIDList ) {
-				m_Viewer.GetAISContext().Deactivate( m_ViewManager.ViewObjectMap[ pathID ].AISHandle );
-			}
+			m_ViewManager.DeactivePaths( m_DataManager.PathIDList );
 		}
 
 		protected override void OnKeyDown( KeyEventArgs e )

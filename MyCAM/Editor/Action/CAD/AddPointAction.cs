@@ -64,9 +64,7 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = true;
 
 			// deactivate
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
-			}
+			m_ViewManager.DeactiveAll();
 			base.End();
 		}
 

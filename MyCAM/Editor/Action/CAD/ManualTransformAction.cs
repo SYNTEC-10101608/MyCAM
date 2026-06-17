@@ -74,9 +74,7 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = true;
 
 			// deactivate
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
-			}
+			m_ViewManager.DeactiveAll();
 
 			// hide part and G54 coordinate system
 			HideG54Coord();
@@ -200,7 +198,7 @@ namespace MyCAM.Editor
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
 				}
-				m_Viewer.GetAISContext().Deactivate( m_ViewManager.ViewObjectMap[ partID ].AISHandle );
+				m_ViewManager.DeactivePart( partID );
 			}
 
 			// deactivate all G54 shapes first

@@ -83,6 +83,7 @@ namespace MyCAM.Editor
 				m_ViewManager.AddPathNode( szNodeText );
 				m_ViewManager.AddPath( pathID );
 			}
+			m_ViewManager.DeactivePaths( m_DataManager.PathIDList );
 
 			// update tree view and viewer
 			m_ViewManager.PartNode.ExpandAll();

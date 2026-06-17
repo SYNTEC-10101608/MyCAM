@@ -114,9 +114,7 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = false;
 
 			// hide all shape
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
-			}
+			m_ViewManager.EraseAll();
 
 			// show element for selction
 			ShowElement();
@@ -132,12 +130,16 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = true;
 
 			// show all shape
-			foreach( ViewObject viewObject in m_ViewManager.ViewObjectMap.Values ) {
-				if( viewObject.Visible ) {
-					m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
-					m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
+			foreach( var partID in m_DataManager.PartIDList ) {
+				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
+					continue;
 				}
+				m_ViewManager.DisplayPart( partID );
 			}
+			m_ViewManager.DisplayPaths( m_DataManager.PathIDList );
+
+			// deactive all shape
+			m_ViewManager.DeactiveAll();
 
 			// hide element for selection
 			HideElement();
@@ -150,11 +152,11 @@ namespace MyCAM.Editor
 			if( e.Button == MouseButtons.Left ) {
 				if( m_Viewer.GetAISContext().DetectedOwner().IsNull()
 						|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
-						if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
-							m_Viewer.GetAISContext().ClearSelected( true );
-						}
-						return;
+					if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
+						m_Viewer.GetAISContext().ClearSelected( true );
 					}
+					return;
+				}
 				AIS_InteractiveObject detectedObject = m_Viewer.GetAISContext().DetectedInteractive();
 				if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
 					m_Viewer.GetAISContext().ClearSelected( false );

@@ -49,22 +49,8 @@ namespace MyCAM.Editor
 			m_TreeView.Enabled = false;
 
 			// hide all visible parts
-			foreach( string szID in m_DataManager.PartIDList ) {
-				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
-				if( viewObject.Visible == false ) {
-					continue;
-				}
-				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
-			}
-
 			// hide all paths
-			foreach( string szID in m_DataManager.PathIDList ) {
-				if( !m_ViewManager.ViewObjectMap.ContainsKey( szID ) ) {
-					continue;
-				}
-				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
-				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
-			}
+			m_ViewManager.EraseAll();
 
 			ShowManipulationShape();
 			m_Viewer.UpdateView();
@@ -101,19 +87,14 @@ namespace MyCAM.Editor
 			foreach( string szID in m_DataManager.PartIDList ) {
 				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
 				if( viewObject.Visible ) {
-					m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
-					m_Viewer.GetAISContext().Deactivate( viewObject.AISHandle );
+					m_ViewManager.DisplayPart( szID );
+					m_ViewManager.DeactivePart( szID );
 				}
 			}
 
 			// show all paths (TransformHelper already updated path geometry)
-			foreach( string szID in m_DataManager.PathIDList ) {
-				if( !m_ViewManager.ViewObjectMap.ContainsKey( szID ) ) {
-					continue;
-				}
-				ViewObject viewObject = m_ViewManager.ViewObjectMap[ szID ];
-				m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
-			}
+			m_ViewManager.DisplayPaths( m_DataManager.PathIDList );
+			m_ViewManager.DeactivePaths( m_DataManager.PathIDList );
 
 			HideManipulationShape();
 			m_Viewer.UpdateView();

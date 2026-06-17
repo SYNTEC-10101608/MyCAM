@@ -459,9 +459,7 @@ namespace MyCAM.Editor
 			}
 
 			// transform the workpiece display
-			foreach( string ID in m_DataManager.PartIDList ) {
-				m_ViewManager.ViewObjectMap[ ID ]?.AISHandle?.SetLocalTransformation( trsf );
-			}
+			m_ViewManager.ShowPartsTrsf( m_DataManager.PartIDList, trsf );
 
 			// apply camera follow
 			V3d_View view = m_Viewer.GetView();
