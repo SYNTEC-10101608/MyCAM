@@ -14,6 +14,7 @@ using OCC.V3d;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -140,6 +141,7 @@ namespace MyCAM.Editor
 		void ActivatePointSelection()
 		{
 			m_PathIndexAction.ExcludeFromSelection( m_CurrentPathID );
+			m_ViewManager.ErasePath( m_CurrentPathID );
 			CreatePointIndexAction( m_CurrentPathID );
 
 			m_nPointIndex = NULL_POINT_INDEX;
@@ -160,6 +162,7 @@ namespace MyCAM.Editor
 
 			DestroyPointIndexAction();
 			m_PathIndexAction.RestoreFromExclusion( szOldPathID );
+			m_ViewManager.DisplayPath( szOldPathID );
 		}
 
 		void CreatePointIndexAction( string pathID )
@@ -194,7 +197,7 @@ namespace MyCAM.Editor
 
 			// cleanup old state
 			DeactivatePointSelection( szOldPathID );
-
+			
 			// activate point selection for new path
 			ActivatePointSelection();
 		}

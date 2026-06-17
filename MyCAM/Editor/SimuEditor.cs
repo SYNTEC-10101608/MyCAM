@@ -611,11 +611,7 @@ namespace MyCAM.Editor
 			if( m_Viewer == null ) {
 				return;
 			}
-			foreach( string ID in m_DataManager.PartIDList ) {
-				m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetLocalTransformation( new gp_Trsf() );
-				m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY70 ) );
-				m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
-			}
+			m_ViewManager.ResetPartColorAndTransAsDefault();
 			m_ViewManager.ShowPathTrsf( new gp_Trsf() );
 		}
 
@@ -852,13 +848,10 @@ namespace MyCAM.Editor
 			bool isCollision = m_FrameCollisionMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ];
 			foreach( string ID in m_DataManager.PartIDList ) {
 				if( isCollision ) {
-					m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PINK ) );
+					m_ViewManager.ChangePartColor( ID, new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PINK ) );
 				}
 				else {
-					m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY70 ) );
-					m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().SetFaceBoundaryDraw( true );
-					m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
-					m_ViewManager.ViewObjectMap[ ID ].AISHandle.Attributes().FaceBoundaryAspect().SetWidth( 0.5 );
+					m_ViewManager.ResetPartColor( ID );
 				}
 			}
 		}
@@ -871,9 +864,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			gp_Trsf trsf = m_FrameTransformMap[ MachineComponentType.WorkPiece ][ m_CurrentFrameIndex ];
-			foreach( string ID in m_DataManager.PartIDList ) {
-				m_ViewManager.ViewObjectMap[ ID ].AISHandle.SetLocalTransformation( trsf );
-			}
+			m_ViewManager.ShowPartsTrsf( m_DataManager.PartIDList, trsf );
 			m_ViewManager.ShowPathTrsf( trsf );
 		}
 

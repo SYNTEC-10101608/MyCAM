@@ -43,7 +43,7 @@ namespace MyCAM.Editor
 
 			// translate original highlight index to offset index when OriginalIndexMap is available
 			if( m_OriginalIndexMap != null ) {
-				for(int i = 0; i < m_OriginalIndexMap.Count; i++ ) {
+				for( int i = 0; i < m_OriginalIndexMap.Count; i++ ) {
 					if( m_OriginalIndexMap[ i ] == oriHighLightIdx ) {
 						oriHighLightIdx = i;
 						break;
@@ -129,6 +129,7 @@ namespace MyCAM.Editor
 				return null;
 			}
 			if( selectedShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
+				m_Viewer.GetAISContext().ClearSelected( false );
 				return null;
 			}
 			TopoDS_Vertex selectedVertex = TopoDS.ToVertex( selectedShape );

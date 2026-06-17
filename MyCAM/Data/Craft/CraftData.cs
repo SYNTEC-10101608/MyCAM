@@ -403,6 +403,9 @@ namespace MyCAM.Data
 			if( m_ToolVecModifyMap == null || !m_ToolVecModifyMap.ContainsKey( nCtrlPntIdx ) ) {
 				return;
 			}
+			if( m_ToolVecModifyMap[ nCtrlPntIdx ].InterpolateType == interpolateType ) {
+				return;
+			}
 			m_ToolVecModifyMap[ nCtrlPntIdx ].InterpolateType = interpolateType;
 			CAMFactorChanged?.Invoke();
 		}
@@ -414,9 +417,15 @@ namespace MyCAM.Data
 				StartPntToolVecData = new StartPntToolVecParam();
 			}
 			if( isStartIdx ) {
+				if( StartPntToolVecData.StartPnt.InterpolateType == interpolateType ) {
+					return;
+				}
 				StartPntToolVecData.StartPnt.InterpolateType = interpolateType;
 			}
 			else {
+				if( StartPntToolVecData.EndPnt.InterpolateType == interpolateType ) {
+					return;
+				}
 				StartPntToolVecData.EndPnt.InterpolateType = interpolateType;
 			}
 			CAMFactorChanged?.Invoke();

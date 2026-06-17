@@ -53,15 +53,8 @@ namespace MyCAM.Editor
 				}
 				sewable.SewShape( dSewTol );
 
-				// update the viewer
-				if( !m_ViewManager.ViewObjectMap.ContainsKey( szPartID ) ) {
-					continue;
-				}
-				AIS_Shape partAIS = AIS_Shape.DownCast( m_ViewManager.ViewObjectMap[ szPartID ].AISHandle );
-				if( partAIS != null && !partAIS.IsNull() ) {
-					partAIS.SetShape( sewable.Shape );
-					m_Viewer.GetAISContext().Redisplay( partAIS, false );
-				}
+				// put the sewed shape back
+				m_ViewManager.ChangePartShape( szPartID, sewable.Shape );
 			}
 			m_Viewer.UpdateView();
 		}

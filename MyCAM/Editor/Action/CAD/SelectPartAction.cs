@@ -13,16 +13,12 @@ namespace MyCAM.Editor
 
 		protected override void ActivateObject()
 		{
-			foreach( var partID in m_DataManager.PartIDList ) {
-				m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ partID ].AISHandle );
-			}
+			m_ViewManager.ActiveParts( m_DataManager.PartIDList );
 		}
 
 		protected override void DeactivateObject()
 		{
-			foreach( var partID in m_DataManager.PartIDList ) {
-				m_Viewer.GetAISContext().Deactivate( m_ViewManager.ViewObjectMap[ partID ].AISHandle );
-			}
+			m_ViewManager.DeactiveParts( m_DataManager.PartIDList );
 		}
 	}
 }
