@@ -95,6 +95,7 @@ namespace MyCAM.Editor
 		TopoDS_Face BuildTargetFace( double radius, double height )
 		{
 			if( radius == 0 ) {
+
 				// Build a flat plane (large enough XY plane)
 				gp_Pln plane = new gp_Pln( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
 				BRepBuilderAPI_MakeFace faceMaker = new BRepBuilderAPI_MakeFace( plane, -FLAT_PLANE_SIZE, FLAT_PLANE_SIZE, -FLAT_PLANE_SIZE, FLAT_PLANE_SIZE );
@@ -107,6 +108,7 @@ namespace MyCAM.Editor
 			// Build spherical cap with given radius and height
 			gp_Ax3 ax3 = new gp_Ax3( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
 			gp_Sphere sphere = new gp_Sphere( ax3, radius );
+
 			// V parameter: from arccos((R-H)/R) to PI/2 (top of sphere)
 			double vMin = Math.PI / 2 - Math.Acos( ( radius - height ) / radius );
 			BRepBuilderAPI_MakeFace sphereFaceMaker = new BRepBuilderAPI_MakeFace( sphere, 0, 2 * Math.PI, vMin, Math.PI / 2 );
