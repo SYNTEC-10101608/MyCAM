@@ -14,7 +14,6 @@ using OCC.V3d;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -197,7 +196,7 @@ namespace MyCAM.Editor
 
 			// cleanup old state
 			DeactivatePointSelection( szOldPathID );
-			
+
 			// activate point selection for new path
 			ActivatePointSelection();
 		}
@@ -215,7 +214,9 @@ namespace MyCAM.Editor
 		// UI Setting
 		void OnSelectedPointIndexChanged( int nSelectIndex )
 		{
+			m_IsUpdatingUI = true;
 			if( m_nPointIndex == nSelectIndex ) {
+				m_IsUpdatingUI = false;
 				return;
 			}
 			m_nPointIndex = nSelectIndex;
@@ -224,6 +225,7 @@ namespace MyCAM.Editor
 			if( nSelectIndex == NULL_POINT_INDEX ) {
 				ResetToolVecState();
 				UIProtection();
+				m_IsUpdatingUI = false;
 				return;
 			}
 
@@ -234,6 +236,7 @@ namespace MyCAM.Editor
 			if( m_SelectedPoint == null ) {
 				ResetToolVecState();
 				UIProtection();
+				m_IsUpdatingUI = false;
 				return;
 			}
 
@@ -247,6 +250,7 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.ResetToolVecParam( m_ToolVecParam );
 			UIProtection();
 			RefreshSimuResult();
+			m_IsUpdatingUI = false;
 		}
 
 		void ResetToolVecState()
@@ -498,6 +502,10 @@ namespace MyCAM.Editor
 
 		void OnTypeChanged( EToolVecInterpolateType type )
 		{
+			// this even is trigger by UI refresh, do not have to set any value
+			if( m_IsUpdatingUI ) {
+				return;
+			}
 			m_InterpolateType = type;
 			SetInterpolationMode( m_nPointIndex, m_InterpolateType );
 
@@ -1067,6 +1075,9 @@ namespace MyCAM.Editor
 		ViewManager m_ViewManager;
 		SelectPathAction m_PathIndexAction;
 		IndexSelectAction m_PointIndexAction;
+
+		// flag to stop event raise to trigger onproperty change
+		bool m_IsUpdatingUI = false;
 	}
 
 	class ToolVecActionDataHandler
