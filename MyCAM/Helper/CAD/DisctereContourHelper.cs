@@ -1,14 +1,7 @@
 ﻿using MyCAM.Data;
-using OCC.BOPTools;
-using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.GCPnts;
-using OCC.Geom;
-using OCC.Geom2d;
-using OCC.GeomLProp;
 using OCC.gp;
-using OCC.Precision;
-using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
@@ -90,6 +83,11 @@ namespace MyCAM.Helper
 
 				// get shell normal (1st)
 				gp_Dir normalVec_1st = GetSurfaceNormal( edge, shellFace, U );
+
+				// no valid tool direction from this point, give z-direction as default normal
+				if( normalVec_1st == null ) {
+					normalVec_1st = new gp_Dir( 0, 0, 1 );
+				}
 
 				// TODO: get solid normal (2nd)
 				gp_Dir normalVec_2nd = new gp_Dir( normalVec_1st.XYZ() );
