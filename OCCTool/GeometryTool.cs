@@ -1035,7 +1035,7 @@ namespace OCCTool
 
 			// step 2: get face surface
 			Geom_Surface surf = BRep_Tool.Surface( face );
-			if( surf == null ) {
+			if( surf == null || surf.IsNull() ) {
 				return null;
 			}
 
@@ -1083,7 +1083,7 @@ namespace OCCTool
 				return normal;
 			}
 
-			// step 6: fallback method
+			// step 6: fallback method, suppose not getting a better result, just in case
 			gp_Dir fallback = new gp_Dir();
 			BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, face, param, ref fallback );
 
