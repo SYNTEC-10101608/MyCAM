@@ -280,4 +280,16 @@
   <data name="CAD_Revolution" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Revolution.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Sort_ExtrusionFirst_FromBottom_Counterclockwise" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\Sort_ExtrusionFirst_FromBottom_Counterclockwise.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Sort_ExtrusionFirst_FromTop_Counterclockwise" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\Sort_ExtrusionFirst_FromTop_Counterclockwise.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Sort_RotationFirst_FromTop_Clockwise" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\Sort_RotationFirst_FromTop_Clockwise.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Sort_RotationFirst_FromTop_Counterclockwise" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\Sort_RotationFirst_FromTop_Counterclockwise.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

@@ -4,7 +4,6 @@ using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
 using MyCAM.PathCache;
 using MyCAM.Post;
-using OCC.AIS;
 using OCC.gp;
 using OCC.ShapeAnalysis;
 using OCC.TopAbs;
@@ -345,9 +344,9 @@ namespace MyCAM.Editor
 			}
 
 			EndActionIfNotDefault();
-				StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First(), m_DefaultAction as SelectPathAction );
-				action.PropertyChanged += ShowCAMData;
-				StartEditAction( action );
+			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First(), m_DefaultAction as SelectPathAction );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
 		}
 
 		public void SetReverse()
@@ -661,9 +660,9 @@ namespace MyCAM.Editor
 				return;
 			}
 			EndActionIfNotDefault();
-				ContourEditAction action = new ContourEditAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathID, m_DefaultAction as SelectPathAction );
-				action.PropertyChanged += ShowCAMData;
-				StartEditAction( action );
+			ContourEditAction action = new ContourEditAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathID, m_DefaultAction as SelectPathAction );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
 		}
 
 		public void SetPathLayer( int nTechLayer )
@@ -710,9 +709,9 @@ namespace MyCAM.Editor
 				return;
 			}
 			EndActionIfNotDefault();
-				MicroJointAction action = new MicroJointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First(), m_DefaultAction as SelectPathAction );
-				action.PropertyChanged += ShowCAMData;
-				StartEditAction( action );
+			MicroJointAction action = new MicroJointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First(), m_DefaultAction as SelectPathAction );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
 		}
 
 		#endregion
@@ -756,71 +755,34 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		// TODO: is it making sense to use cache here?
 		public void AutoSortProcess()
 		{
-			// one shot edit, no multi edit supported
-			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, false ) ) {
-				return;
-			}
-			string szStartPathID = szPathIDList[ 0 ];
-
-			// get start point
-			gp_Pnt currentPoint = CacheHelper.GetProcessStartPoint( szStartPathID ).Point;
-			if( currentPoint == null ) {
+			if( IsSameAction( EditActionType.AutoSortPath ) ) {
+				m_CurrentAction.End();
 				return;
 			}
 
-			// init data manager
-			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
-			List<string> newPathIDList = new List<string> { szStartPathID };
+			EndActionIfNotDefault();
 
-			// visited path recorded container
-			bool[] visited = new bool[ pathIDList.Count ];
-			int startIdx = pathIDList.IndexOf( szStartPathID );
-			visited[ startIdx ] = true;
-			int visitedCount = 1;
-			while( visitedCount < pathIDList.Count ) {
-				double minDistanceSq = double.MaxValue;
-				int nearestIdx = -1;
-				gp_Pnt nearestPoint = null;
-				for( int i = 0; i < pathIDList.Count; i++ ) {
-					if( visited[ i ] ) {
-						continue;
-					}
-					gp_Pnt nextStartPoint = CacheHelper.GetProcessStartPoint( pathIDList[ i ] ).Point;
-					double distanceSq;
-					if( nextStartPoint == null ) {
-						distanceSq = double.MaxValue;
-					}
-					else {
-						distanceSq = currentPoint.SquareDistance( nextStartPoint );
-					}
-					if( distanceSq < minDistanceSq ) {
-						minDistanceSq = distanceSq;
-						nearestPoint = nextStartPoint;
-						nearestIdx = i;
-					}
-				}
-				if( nearestIdx != -1 ) {
-					currentPoint = nearestPoint;
-					visited[ nearestIdx ] = true;
-					visitedCount++;
-					newPathIDList.Add( pathIDList[ nearestIdx ] );
-				}
-				else {
-					break;
-				}
-			}
-			m_DataManager.PathIDList.Clear();
-			m_DataManager.PathIDList.AddRange( newPathIDList );
+			AutoSortPathAction action = new AutoSortPathAction( m_DataManager, m_DefaultAction as SelectPathAction );
+			action.SortCompleted += ( newPathIDList ) =>
+			{
+				// apply new order
+				m_DataManager.PathIDList.Clear();
+				m_DataManager.PathIDList.AddRange( newPathIDList );
 
-			// select focus on first path
-			if( m_DefaultAction is SelectPathAction selectAction ) {
-				selectAction.ClearSelection();
-				selectAction.SelectPathByID( m_DataManager.PathIDList.First() );
-			}
-			ShowAllCAMData();
+				// optimize IK continuity after sorting
+				AutoOptimizeIKContinuity();
+
+				// reset select to first path after sort, to avoid confusion, and also trigger select related data refresh
+				if( m_DefaultAction is SelectPathAction selectAction ) {
+					selectAction.ClearSelection();
+					selectAction.SelectPathByID( m_DataManager.PathIDList.First() );
+				}
+				ShowAllCAMData();
+			};
+
+			StartEditAction( action );
 		}
 
 		public void AutoOptimizeIKContinuity()
@@ -1156,7 +1118,7 @@ namespace MyCAM.Editor
 				RaiseWithDlgActionStatusChange?.Invoke( EActionStatus.Start );
 			}
 
-			// chnage display
+			// change display
 			RaiseCAMActionStatusChange( action.ActionType, EActionStatus.Start );
 		}
 
