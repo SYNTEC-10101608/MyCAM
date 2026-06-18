@@ -364,7 +364,6 @@
 		private System.Windows.Forms.NumericUpDown m_nudZ;
 		private System.Windows.Forms.NumericUpDown m_nudRy;
 		private System.Windows.Forms.NumericUpDown m_nudRz;
-		private System.Windows.Forms.Button m_btnConfirm;
 		private System.Windows.Forms.Label m_lblStepDis;
 		private System.Windows.Forms.GroupBox m_grpDisplacement;
 		private System.Windows.Forms.GroupBox m_grpRotation;

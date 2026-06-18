@@ -2,6 +2,7 @@
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -9,6 +10,20 @@ namespace MyCAM.Editor
 	internal class SelectPathAction : SelectObjectAction
 	{
 		public Action RemovePath;
+
+		// single select mode: only allow one path to be selected at a time
+		public bool isSingleSelectMode
+		{
+			get { return m_SingleSelectMode; }
+			set
+			{
+				m_SingleSelectMode = value;
+				// sync TreeView's multi-select permission
+				if( m_TreeView is MultiSelectTreeView multiTree ) {
+					multiTree.isAllowMultiSelect = !value;
+				}
+			}
+		}
 
 		public SelectPathAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
@@ -21,11 +36,13 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// Add the path ID to the selected set
+			// enforce single select: clear previous selection first
+			if( isSingleSelectMode ) {
+				m_SelectedIDSet.Clear();
+			}
+
 			if( !m_SelectedIDSet.Contains( pathID ) ) {
 				m_SelectedIDSet.Add( pathID );
-
-				// Sync the selection to both tree view and viewer
 				SyncSelectionFromSet();
 			}
 		}
@@ -51,7 +68,11 @@ namespace MyCAM.Editor
 				return;
 			}
 			m_ExcludedIDSet.Remove( pathID );
-			m_SelectedIDSet.Add( pathID );
+
+			// enforce single select: don't auto-add to selection
+			if( !isSingleSelectMode ) {
+				m_SelectedIDSet.Add( pathID );
+			}
 
 			// re-activate restored path on viewer
 			m_ViewManager.ActivePath( pathID );
@@ -71,6 +92,72 @@ namespace MyCAM.Editor
 		{
 			if( e.KeyCode == Keys.Delete ) {
 				RemovePath?.Invoke();
+			}
+		}
+
+		// block Ctrl+A / Ctrl+R in single select mode
+		protected override void ViewerKeyDown( KeyEventArgs e )
+		{
+			if( isSingleSelectMode ) {
+				// only forward non-select-all key events
+				OnKeyDown( e );
+				return;
+			}
+			base.ViewerKeyDown( e );
+		}
+
+		// block rubber band drag in single select mode
+		protected override void ViewerMouseDown( MouseEventArgs e )
+		{
+			if( isSingleSelectMode ) {
+				// do not setup rubber band, just record position for click detection
+				return;
+			}
+			base.ViewerMouseDown( e );
+		}
+
+		protected override void ViewerMouseMove( MouseEventArgs e )
+		{
+			if( isSingleSelectMode ) {
+				// do not draw rubber band
+				return;
+			}
+			base.ViewerMouseMove( e );
+		}
+
+		protected override void ViewerMouseUp( MouseEventArgs e )
+		{
+			if( isSingleSelectMode ) {
+				// do not perform rectangle selection
+				return;
+			}
+			base.ViewerMouseUp( e );
+		}
+
+		// single click: always replace selection (ignore Ctrl for XOR)
+		protected override void ViewerMouseClick( MouseEventArgs e )
+		{
+			if( isSingleSelectMode ) {
+				if( e.Button == MouseButtons.Left ) {
+					// always single replace select, ignore Ctrl modifier
+					m_Viewer.Select();
+					SyncSelectionFromView();
+				}
+				return;
+			}
+			base.ViewerMouseClick( e );
+		}
+
+		protected override void SyncSelectionFromView()
+		{
+			base.SyncSelectionFromView();
+
+			// enforce single select: keep only the last selected path
+			if( isSingleSelectMode && m_SelectedIDSet.Count > 1 ) {
+				string lastSelected = m_SelectedIDSet.Last();
+				m_SelectedIDSet.Clear();
+				m_SelectedIDSet.Add( lastSelected );
+				SyncSelectionFromSet();
 			}
 		}
 
@@ -105,6 +192,14 @@ namespace MyCAM.Editor
 					m_SelectedIDSet.Add( szPathID );
 				}
 			}
+
+			// enforce single select: keep only the last selected path
+			if( isSingleSelectMode && m_SelectedIDSet.Count > 1 ) {
+				string lastSelected = m_SelectedIDSet.Last();
+				m_SelectedIDSet.Clear();
+				m_SelectedIDSet.Add( lastSelected );
+			}
+
 			SyncSelectionFromSet();
 		}
 
@@ -143,6 +238,7 @@ namespace MyCAM.Editor
 			SelectionChange?.Invoke();
 		}
 
+		bool m_SingleSelectMode = false;
 		HashSet<string> m_ExcludedIDSet;
 	}
 }
