@@ -31,8 +31,7 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 
-			m_SelectPathAction.ClearSelection();
-			m_SelectPathAction.isSingleSelectMode = true;
+			m_SelectPathAction.EnterSingleSelectMode();
 			m_SelectPathAction.Start();
 			m_SelectPathAction.SelectionChange += OnSelectionChanged;
 
@@ -42,21 +41,11 @@ namespace MyCAM.Editor
 			m_Dialog.Show( MyApp.MainForm );
 		}
 
-		void StopSelectPathAction()
-		{
-			if( m_IsSelectPathActionStopped ) {
-				return;
-			}
-			m_IsSelectPathActionStopped = true;
-
-			m_SelectPathAction.SelectionChange -= OnSelectionChanged;
-			m_SelectPathAction.isSingleSelectMode = false;
-			m_SelectPathAction.End();
-		}
-
 		public override void End()
 		{
-			StopSelectPathAction();
+			m_SelectPathAction.SelectionChange -= OnSelectionChanged;
+			m_SelectPathAction.ExitSingleSelectMode();
+			m_SelectPathAction.End();
 
 			if( m_Dialog != null && !m_Dialog.IsDisposed ) {
 				m_Dialog.Confirm -= OnConfirm;
@@ -121,10 +110,6 @@ namespace MyCAM.Editor
 					break;
 			}
 
-			// Stop SelectPathAction first to prevent selection state conflicts
-			// when SortCompleted triggers path reordering or TreeView updates.
-			StopSelectPathAction();
-
 			if( result != null && result.Count > 0 ) {
 				SortCompleted?.Invoke( result );
 			}
@@ -173,6 +158,5 @@ namespace MyCAM.Editor
 
 		SelectPathAction m_SelectPathAction;
 		AutoSortPathDlg m_Dialog;
-		bool m_IsSelectPathActionStopped;
 	}
 }

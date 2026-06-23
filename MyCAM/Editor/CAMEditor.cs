@@ -772,7 +772,7 @@ namespace MyCAM.Editor
 				m_DataManager.PathIDList.AddRange( newPathIDList );
 
 				// optimize IK continuity after sorting
-				AutoOptimizeIKContinuity();
+				DoOptimizeIKContinuity();
 
 				// reset select to first path after sort, to avoid confusion, and also trigger select related data refresh
 				if( m_DefaultAction is SelectPathAction selectAction ) {
@@ -789,40 +789,7 @@ namespace MyCAM.Editor
 		{
 			// one-shot action, no path selection required
 			EndActionIfNotDefault();
-
-			List<string> pathIDList = m_DataManager.PathIDList;
-			if( pathIDList.Count == 0 ) {
-				return;
-			}
-
-			double prevMaster_rad = 0;
-			double prevSlave_rad = 0;
-
-			foreach( string szPathID in pathIDList ) {
-				if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType )
-					|| pathType != PathType.Contour ) {
-					// skip non-contour but keep previous MS for next contour path
-					continue;
-				}
-				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
-					continue;
-				}
-
-				// write previous path end MS as initial value for this path's IK solve
-				craftData.InitMaster_rad = prevMaster_rad;
-				craftData.InitSlave_rad = prevSlave_rad;
-
-				// trigger cache rebuild
-				craftData.CAMFactorChanged?.Invoke();
-
-				// read this path's end MS for next path
-				if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
-					prevMaster_rad = endMaster_rad;
-					prevSlave_rad = endSlave_rad;
-				}
-			}
-			ShowAllCAMData();
-			MyApp.Logger.ShowOnLogPanel( "[操作完成]已完成起點旋轉軸自動優化", MyApp.NoticeType.Hint );
+			DoOptimizeIKContinuity();
 		}
 
 		// convert NC
@@ -965,6 +932,43 @@ namespace MyCAM.Editor
 		{
 			ShowCAMData( szPathIDList );
 			PathShapeTypeChanged?.Invoke( type );
+		}
+
+		void DoOptimizeIKContinuity()
+		{
+			List<string> pathIDList = m_DataManager.PathIDList;
+			if( pathIDList.Count == 0 ) {
+				return;
+			}
+
+			double prevMaster_rad = 0;
+			double prevSlave_rad = 0;
+
+			foreach( string szPathID in pathIDList ) {
+				if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType )
+					|| pathType != PathType.Contour ) {
+					// skip non-contour but keep previous MS for next contour path
+					continue;
+				}
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+					continue;
+				}
+
+				// write previous path end MS as initial value for this path's IK solve
+				craftData.InitMaster_rad = prevMaster_rad;
+				craftData.InitSlave_rad = prevSlave_rad;
+
+				// trigger cache rebuild
+				craftData.CAMFactorChanged?.Invoke();
+
+				// read this path's end MS for next path
+				if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
+					prevMaster_rad = endMaster_rad;
+					prevSlave_rad = endSlave_rad;
+				}
+			}
+			ShowAllCAMData();
+			MyApp.Logger.ShowOnLogPanel( "[操作完成]已完成起點旋轉軸自動優化", MyApp.NoticeType.Hint );
 		}
 
 		#region Show CAM

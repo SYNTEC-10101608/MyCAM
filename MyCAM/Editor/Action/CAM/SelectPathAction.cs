@@ -1,8 +1,8 @@
-﻿using MyCAM.Data;
+﻿using MyCAM.App;
+using MyCAM.Data;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -28,6 +28,31 @@ namespace MyCAM.Editor
 		public SelectPathAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
+		}
+
+		public void EnterSingleSelectMode()
+		{
+			if( m_SingleSelectMode ) {
+				// already in single select mode, no action needed
+				return;
+			}
+
+			// clear any existing multi-selection before switching mode
+			ClearSelection();
+
+			// switch to single select mode
+			isSingleSelectMode = true;
+		}
+
+		public void ExitSingleSelectMode()
+		{
+			if( !m_SingleSelectMode ) {
+				// already in multi-select mode, no action needed
+				return;
+			}
+
+			// switch back to multi-select mode
+			isSingleSelectMode = false;
 		}
 
 		public void SelectPathByID( string pathID )
@@ -152,11 +177,13 @@ namespace MyCAM.Editor
 		{
 			base.SyncSelectionFromView();
 
-			// enforce single select: keep only the last selected path
 			if( isSingleSelectMode && m_SelectedIDSet.Count > 1 ) {
-				string lastSelected = m_SelectedIDSet.Last();
+				MyApp.Logger.ShowOnLogPanel(
+					string.Format( "[選取異常] 路徑單選模式下偵測到多重選取 ({0} 個項目)，已自動清除", m_SelectedIDSet.Count ),
+					MyApp.NoticeType.Hint );
+
+				// Clear all selections to restore valid state
 				m_SelectedIDSet.Clear();
-				m_SelectedIDSet.Add( lastSelected );
 				SyncSelectionFromSet();
 			}
 		}
@@ -193,11 +220,13 @@ namespace MyCAM.Editor
 				}
 			}
 
-			// enforce single select: keep only the last selected path
 			if( isSingleSelectMode && m_SelectedIDSet.Count > 1 ) {
-				string lastSelected = m_SelectedIDSet.Last();
+				MyApp.Logger.ShowOnLogPanel(
+					string.Format( "[選取異常] 路徑單選模式下從路徑樹偵測到多重選取 ({0} 個項目)，已自動清除", m_SelectedIDSet.Count ),
+					MyApp.NoticeType.Hint );
+
+				// Clear all selections to restore valid state
 				m_SelectedIDSet.Clear();
-				m_SelectedIDSet.Add( lastSelected );
 			}
 
 			SyncSelectionFromSet();
