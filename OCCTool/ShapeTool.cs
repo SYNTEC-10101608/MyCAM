@@ -42,9 +42,10 @@ namespace OCCTool
 			return compound;
 		}
 
-		public static bool FlipShapeUpsideDown( TopoDS_Shape shape, out TopoDS_Shape flippedShape, gp_Pnt rotationCenter = null )
+		public static bool FlipShapeUpsideDown( TopoDS_Shape shape, out TopoDS_Shape flippedShape, out gp_Trsf trsf, gp_Pnt rotationCenter = null )
 		{
 			flippedShape = null;
+			trsf = new gp_Trsf();
 
 			try {
 				if( shape == null || shape.IsNull() ) {
@@ -56,7 +57,6 @@ namespace OCCTool
 
 				// rotate 180 degrees around X-axis
 				gp_Ax1 xAxis = new gp_Ax1( rotationCenter, new gp_Dir( 1, 0, 0 ) );
-				gp_Trsf trsf = new gp_Trsf();
 				trsf.SetRotation( xAxis, Math.PI );
 				BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( shape, trsf, true );
 				if( !transform.IsDone() ) {
@@ -70,16 +70,17 @@ namespace OCCTool
 			}
 		}
 
-		public static bool MoveShapeBottomToZ0( TopoDS_Shape shape, out TopoDS_Shape movedShape )
+		public static bool MoveShapeBottomToZ0( TopoDS_Shape shape, out TopoDS_Shape movedShape, out gp_Trsf trsf )
 		{
 			movedShape = null;
+			trsf = new gp_Trsf();
 
 			try {
 				if( shape == null || shape.IsNull() ) {
 					return false;
 				}
 
-				// 步驟 1: 獲取 BBox
+				// step 1: get bounding box and find minimum Z
 				Bnd_Box bbox = new Bnd_Box();
 				BRepBndLib.AddOptimal( shape, ref bbox );
 
@@ -90,19 +91,15 @@ namespace OCCTool
 				double xmin = 0, ymin = 0, zmin = 0, xmax = 0, ymax = 0, zmax = 0;
 				bbox.Get( ref xmin, ref ymin, ref zmin, ref xmax, ref ymax, ref zmax );
 
-				// 步驟 2: 計算平移向量（只移動 Z）
+				// step 2: create translation vector to move minimum Z to 0
 				gp_Vec translation = new gp_Vec( 0, 0, -zmin );
 
-				// 步驟 3: 應用平移
-				gp_Trsf trsf = new gp_Trsf();
+				// step 3: apply translation
 				trsf.SetTranslation( translation );
-
 				BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( shape, trsf, true );
-
 				if( !transform.IsDone() ) {
 					return false;
 				}
-
 				movedShape = transform.Shape();
 				return true;
 			}
@@ -111,12 +108,15 @@ namespace OCCTool
 			}
 		}
 
-		public static bool AlignOBBToXYAxes(
-			TopoDS_Shape shape,
-			out TopoDS_Shape alignedShape
-		)
+		public static bool AlignOBBToXYAxes( TopoDS_Shape shape, out TopoDS_Shape alignedShape )
+		{
+			return AlignOBBToXYAxes( shape, out alignedShape, out _ );
+		}
+
+		public static bool AlignOBBToXYAxes( TopoDS_Shape shape, out TopoDS_Shape alignedShape, out gp_Trsf trsf )
 		{
 			alignedShape = null;
+			trsf = new gp_Trsf();
 
 			try {
 				if( shape == null || shape.IsNull() ) {
@@ -142,7 +142,6 @@ namespace OCCTool
 				// Step 4: Rotate around Z-axis at origin by -angle to align OBB X direction to coordinate X axis
 				gp_Ax1 zAxisAtOrigin = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
 
-				gp_Trsf trsf = new gp_Trsf();
 				trsf.SetRotation( zAxisAtOrigin, -angle );
 
 				// Step 5: Apply transformation

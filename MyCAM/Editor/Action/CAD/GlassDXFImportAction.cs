@@ -9,6 +9,7 @@ using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
+using OCCViewer;
 using System;
 using System.Collections.Generic;
 
@@ -16,13 +17,32 @@ namespace MyCAM.Editor
 {
 	internal class GlassDXFImportAction : EditActionBase
 	{
-		public GlassDXFImportAction( DataManager dataManager, string filePath )
+		public event Action ActionCompleted;
+
+		public bool IsImportSuccess
+		{
+			get; private set;
+		}
+
+		public string ImportedFileName
+		{
+			get; private set;
+		}
+
+		public GlassDXFImportAction( DataManager dataManager, Viewer viewer, ViewManager viewManager, string filePath )
 			: base( dataManager )
 		{
 			if( string.IsNullOrEmpty( filePath ) ) {
 				throw new ArgumentNullException( nameof( filePath ) );
 			}
+			if( viewer == null || viewManager == null ) {
+				throw new ArgumentNullException( "GlassDXFImportAction constructing argument null" );
+			}
 			m_FilePath = filePath;
+			m_Viewer = viewer;
+			m_ViewManager = viewManager;
+			IsImportSuccess = false;
+			ImportedFileName = System.IO.Path.GetFileName( filePath );
 		}
 
 		public override EditActionType ActionType
@@ -45,6 +65,12 @@ namespace MyCAM.Editor
 			// Execute import
 			ExecuteImport( m_FilePath, dlg.Radius, dlg.SurfaceHeight );
 			End();
+		}
+
+		public override void End()
+		{
+			ActionCompleted?.Invoke();
+			base.End();
 		}
 
 		void ExecuteImport( string szFileName, double radius, double height )
@@ -81,14 +107,22 @@ namespace MyCAM.Editor
 					partShapes.Add( wire );
 				}
 				TopoDS_Shape partCompound = ShapeTool.MakeCompound( partShapes );
-				m_DataManager.AddPart( partCompound );
 
 				// Build edge map and add path
 				TopTools_IndexedDataMapOfShapeListOfShape edgeMap = BuildEdgeMapForFace( projectedWires, targetFace );
-				m_DataManager.AddPath( projectedWires, edgeMap );
+
+				// Batch add part and paths without triggering events
+				m_DataManager.AddPartAndPathsSilently( partCompound, projectedWires, edgeMap );
+
+				// Manually update view
+				UpdateAllViewData();
+
+				// set import success
+				IsImportSuccess = true;
 			}
 			catch( Exception ex ) {
 				MyApp.Logger.ShowOnLogPanel( "DXF ¶×¤J¥¢±Ñ: " + ex.Message, MyApp.NoticeType.Error );
+				IsImportSuccess = false;
 			}
 		}
 
@@ -183,7 +217,15 @@ namespace MyCAM.Editor
 			return edgeMap;
 		}
 
+		void UpdateAllViewData()
+		{
+			m_ViewManager.RebuildAllViews( m_DataManager, true );
+			m_Viewer.UpdateView();
+		}
+
 		string m_FilePath;
+		Viewer m_Viewer;
+		ViewManager m_ViewManager;
 
 		// Offset multiplier: place wires at 1.2x radius above origin for projection
 		const double OFFSET_MULTIPLIER = 1.2;

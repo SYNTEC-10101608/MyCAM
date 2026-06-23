@@ -206,7 +206,7 @@ namespace MyCAM.Editor
 				if( string.IsNullOrEmpty( nodeID ) ) {
 					continue;
 				}
-				if( int.TryParse( nodeID.Substring( CAMEditor.PATH_NODE_PERFIX_LENGTH ), out int index ) ) {
+				if( int.TryParse( nodeID.Substring( CAMEditor.PATH_NODE_PREFIX_LENGTH ), out int index ) ) {
 
 					// check index, note that index is 1 based
 					if( index < 1 || index > m_DataManager.PathIDList.Count ) {

@@ -17,31 +17,43 @@ namespace MyCAM.Helper
 {
 	internal static class RingShapedIdentifyHelper
 	{
-		public static bool SetRevolutionToG54( TopoDS_Shape oneShape, out TopoDS_Shape replacedShape )
+		public static bool ComputeRevolutionToG54Transform( TopoDS_Shape oneShape, out gp_Trsf accumulatedTrsf )
 		{
-			replacedShape = new TopoDS_Shape();
+			accumulatedTrsf = new gp_Trsf();
 			bool isSuccess = GetRevolutionDirAndCenter( oneShape, out gp_Dir axisDir, out gp_Pnt centerPnt, out bool isFittingByCircle );
 
 			if( !isSuccess ) {
 				return false;
 			}
-			bool isDone = AlignAxisToZAndCenterXY( oneShape, axisDir, centerPnt, out TopoDS_Shape shape, out _ );
-			if( isDone ) {
 
-				bool isSliceDone = AnalyzeRevolutionShapeTaper( shape, out bool isTopWiderThanBottom );
-				if( isSliceDone && isTopWiderThanBottom ) {
-					ShapeTool.FlipShapeUpsideDown( shape, out TopoDS_Shape flippedShape, null );
+			// Step 1: Align axis to Z and center to XY
+			bool isDone = AlignAxisToZAndCenterXYWithTransform( oneShape, axisDir, centerPnt, out TopoDS_Shape shape, out gp_Trsf trsf1 );
+			if( !isDone ) {
+				return false;
+			}
+			accumulatedTrsf = trsf1;
+
+			// Step 2: Check if need to flip upside down
+			bool isSliceDone = AnalyzeRevolutionShapeTaper( shape, out bool isTopWiderThanBottom );
+			if( isSliceDone && isTopWiderThanBottom ) {
+				if( ShapeTool.FlipShapeUpsideDown( shape, out TopoDS_Shape flippedShape, out gp_Trsf trsf2, null ) ) {
 					if( flippedShape != null ) {
 						shape = flippedShape;
+						accumulatedTrsf = trsf2.Multiplied( accumulatedTrsf );
 					}
 				}
-				ShapeTool.MoveShapeBottomToZ0( shape, out TopoDS_Shape MovedShape );
+			}
 
-				if( isFittingByCircle == false ) {
-					ShapeTool.AlignOBBToXYAxes( MovedShape, out replacedShape );
-				}
-				else {
-					replacedShape = MovedShape;
+			// Step 3: Move bottom to Z=0
+			if( ShapeTool.MoveShapeBottomToZ0( shape, out TopoDS_Shape MovedShape, out gp_Trsf trsf3 ) ) {
+				shape = MovedShape;
+				accumulatedTrsf = trsf3.Multiplied( accumulatedTrsf );
+			}
+
+			// Step 4: Align OBB to XY axes if not fitting by circle
+			if( isFittingByCircle == false ) {
+				if( ShapeTool.AlignOBBToXYAxes( shape, out _, out gp_Trsf trsf4 ) ) {
+					accumulatedTrsf = trsf4.Multiplied( accumulatedTrsf );
 				}
 			}
 			return true;
@@ -1348,16 +1360,16 @@ namespace MyCAM.Helper
 
 		#endregion
 
-		static bool AlignAxisToZAndCenterXY(
+		static bool AlignAxisToZAndCenterXYWithTransform(
 			TopoDS_Shape shape,
 			gp_Dir axisDir,
 			gp_Pnt axisPoint,
 			out TopoDS_Shape transformedShape,
-			out gp_Pnt finalAxisPoint
-			   )
+			out gp_Trsf combinedTrsf
+			)
 		{
 			transformedShape = null;
-			finalAxisPoint = null;
+			combinedTrsf = new gp_Trsf();
 
 			if( shape == null || shape.IsNull() || axisDir == null || axisPoint == null ) {
 				return false;
@@ -1398,7 +1410,7 @@ namespace MyCAM.Helper
 			);
 
 			// step 4: combine transforms (rotate then translate)
-			gp_Trsf combinedTrsf = translationTrsf.Multiplied( rotationTrsf );
+			combinedTrsf = translationTrsf.Multiplied( rotationTrsf );
 
 			// step 5: apply transformation
 			BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( shape, combinedTrsf, true );
@@ -1409,8 +1421,6 @@ namespace MyCAM.Helper
 			}
 
 			transformedShape = transform.Shape();
-			// step 6: calculate final axis point (should be 0,0,z)
-			finalAxisPoint = axisPoint.Transformed( combinedTrsf );
 			return true;
 		}
 

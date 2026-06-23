@@ -12,6 +12,18 @@ namespace MyCAM.Editor
 {
 	internal class ReadProjectFileAction : EditActionBase
 	{
+		public event Action ActionCompleted;
+
+		public bool IsImportSuccess
+		{
+			get; private set;
+		}
+
+		public string ImportedFileName
+		{
+			get; private set;
+		}
+
 		public ReadProjectFileAction( DataManager dataManager, Viewer viewer, ViewManager viewManager )
 			: base( dataManager )
 		{
@@ -20,6 +32,8 @@ namespace MyCAM.Editor
 			}
 			m_Viewer = viewer;
 			m_ViewManager = viewManager;
+			IsImportSuccess = false;
+			ImportedFileName = string.Empty;
 		}
 
 		public override EditActionType ActionType
@@ -56,37 +70,29 @@ namespace MyCAM.Editor
 					// set back to data manager
 					m_DataManager.ResetDataManger( ObjectMap, partIDList, pathIDList, shapeIDs, entryAndExitData, calibrationData );
 					UpdateAllViewData();
+
+					// set import success and file name
+					IsImportSuccess = true;
+					ImportedFileName = Path.GetFileName( filePath );
 				}
 				catch( Exception ex ) {
 					MyApp.Logger.ShowOnLogPanel( $"讀取專案檔案失敗：\n{ex.Message}", MyApp.NoticeType.Error );
+					IsImportSuccess = false;
+					ImportedFileName = string.Empty;
 				}
 			}
 			End();
 		}
 
+		public override void End()
+		{
+			ActionCompleted?.Invoke();
+			base.End();
+		}
+
 		void UpdateAllViewData()
 		{
-			m_ViewManager.ClearAll();
-
-			// build part
-			foreach( var szNewDataID in m_DataManager.PartIDList ) {
-				if( !DataGettingHelper.GetShapeObject( szNewDataID, out IShapeObject shapeObject ) ) {
-					continue;
-				}
-				m_ViewManager.AddPart( szNewDataID, shapeObject.Shape );
-			}
-
-			// build path tree and view
-			for( int i = 0; i < m_DataManager.PathIDList.Count; i++ ) {
-				string pathID = m_DataManager.PathIDList[ i ];
-				string szNodeText = PATH_NODE_PREFIX + ( i + 1 ).ToString();
-				m_ViewManager.AddPathNode( szNodeText );
-				m_ViewManager.AddPath( pathID );
-			}
-			m_ViewManager.DeactivePaths( m_DataManager.PathIDList );
-
-			// update tree view and viewer
-			m_ViewManager.PartNode.ExpandAll();
+			m_ViewManager.RebuildAllViews( m_DataManager, true );
 			m_Viewer.UpdateView();
 		}
 
@@ -115,6 +121,5 @@ namespace MyCAM.Editor
 
 		Viewer m_Viewer;
 		ViewManager m_ViewManager;
-		const string PATH_NODE_PREFIX = "Path_";
 	}
 }

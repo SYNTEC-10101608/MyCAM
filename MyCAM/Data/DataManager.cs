@@ -184,27 +184,7 @@ namespace MyCAM.Data
 
 		public void AddPart( TopoDS_Shape newShape )
 		{
-			if( newShape == null || newShape.IsNull() ) {
-				return;
-			}
-			List<PartObject> newPartObjectList = ArrangePartObject( newShape );
-			if( newPartObjectList.Count == 0 ) {
-				return; // no valid object
-			}
-
-			// clear all datas
-			ResetShapeIDs();
-			ObjectMap.Clear();
-			PartIDList.Clear();
-			PathIDList.Clear();
-			ClearObjectCommandData();
-
-			// update all datas
-			foreach( var objectData in newPartObjectList ) {
-				ObjectMap[ objectData.UID ] = objectData;
-				PartIDList.Add( objectData.UID );
-			}
-			PartChanged?.Invoke();
+			ResetWithNewPart( newShape, out _ );
 		}
 
 		void ClearObjectCommandData()
@@ -226,7 +206,7 @@ namespace MyCAM.Data
 		}
 
 		// the edge map contains all edges in all wire to be add
-		public void AddPath( List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap )
+		public void AddPath( List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap, bool shouldTriggerEvent = true )
 		{
 			if( pathWireList == null || pathWireList.Count == 0 || allEdgeMap == null ) {
 				return;
@@ -269,7 +249,19 @@ namespace MyCAM.Data
 
 			// add to path ID list
 			PathIDList.AddRange( newPathIDList );
-			PathAdded?.Invoke( newPathIDList );
+
+			if( shouldTriggerEvent && newPathIDList.Count > 0 ) {
+				PathAdded?.Invoke( newPathIDList );
+			}
+		}
+
+		public void AddPartAndPathsSilently( TopoDS_Shape newPartShape, List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap )
+		{
+			ResetWithNewPart( newPartShape, out int nPartCount, false );
+			if( nPartCount == 0 ) {
+				return;
+			}
+			AddPath( pathWireList, allEdgeMap, false );
 		}
 
 		public void RemovePath( string pathID )
@@ -279,6 +271,35 @@ namespace MyCAM.Data
 			}
 			PathIDList.Remove( pathID );
 			ObjectMap.Remove( pathID );
+		}
+
+		void ResetWithNewPart( TopoDS_Shape newShape, out int partCount, bool shouldTriggerEvent = true )
+		{
+			partCount = 0;
+			if( newShape == null || newShape.IsNull() ) {
+				return;
+			}
+			List<PartObject> newPartObjectList = ArrangePartObject( newShape );
+			if( newPartObjectList.Count == 0 ) {
+				return;
+			}
+
+			ResetShapeIDs();
+			ObjectMap.Clear();
+			PartIDList.Clear();
+			PathIDList.Clear();
+			ClearObjectCommandData();
+
+			foreach( var objectData in newPartObjectList ) {
+				ObjectMap[ objectData.UID ] = objectData;
+				PartIDList.Add( objectData.UID );
+				partCount++;
+			}
+			if( shouldTriggerEvent ) {
+
+				// tell editor to refresh viewer
+				PartChanged?.Invoke();
+			}
 		}
 
 		public ShapeIDsStruct GetShapeIDsForDTO()

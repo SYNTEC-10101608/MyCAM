@@ -90,6 +90,7 @@ namespace MyCAM
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			m_CADEditor.RaiseCADActionStatusChange += OnCADActionStatusChange;
+			m_CADEditor.RaiseFileImported += OnProjectFileImported;
 
 			// CAM Editor
 			m_CAMEditor = new CAMEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -110,6 +111,7 @@ namespace MyCAM
 			// start with CAD editor
 			SwitchEditor( EEditorType.CAD );
 			DefaultUISetting();
+			Text = SOFTWARE_Name;
 
 			// Get cust post data
 			MyApp.SetCustPost();
@@ -154,6 +156,8 @@ namespace MyCAM
 		// UI color
 		readonly Color DEFAULT_BtnColor = SystemColors.Control;
 		readonly Color ON_ButtonColor = Color.FromArgb( 233, 180, 159 );
+
+		const string SOFTWARE_Name = "新代激光五軸切割 0.27.0";
 
 		enum EUIStatus
 		{
@@ -218,20 +222,12 @@ namespace MyCAM
 		// import part
 		void m_tsbImport3DFile_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.Import3DFile( out _ );
+			m_CADEditor.Import3DFile();
 		}
 
 		void m_tsbAddRevolution_Click( object sender, EventArgs e )
 		{
-			m_CADEditor.Import3DFile( out TopoDS_Shape fileShape, true );
-			bool isDone = m_CADEditor.AdjustRevolutionPart( fileShape );
-			if( !isDone ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]迴轉軸辨識失敗", MyApp.NoticeType.Warning );
-				return;
-			}
-			SwitchEditor( EEditorType.CAM );
-			m_CAMEditor.AutoFindStretchedWorkPieceFaceAndSelectFreeBound();
-			SwitchEditor( EEditorType.CAD );
+			m_CADEditor.ImportRingPart();
 		}
 
 		void m_tsbImportProjectFile_Click( object sender, EventArgs e )
@@ -344,14 +340,14 @@ namespace MyCAM
 			m_CAMEditor.StartSelectFace();
 		}
 
-		void m_tsAutoFindAlienatedWorkPieceBoundary_Click( object sender, EventArgs e )
+		void m_tsAddPathForHat_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.AutoFindAlienatedWorkPieceFaceAndSelectFreeBound();
+			m_CAMEditor.AutoFindHatPath();
 		}
 
-		void m_tsAutoFindStretchedWorkPieceBoundary_Click( object sender, EventArgs e )
+		void m_tsAddPathForTube_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.AutoFindStretchedWorkPieceFaceAndSelectFreeBound();
+			m_CAMEditor.AutoFindTubePath();
 		}
 
 		void m_tsbSelectD1ContFace_Click( object sender, EventArgs e )
@@ -605,6 +601,19 @@ namespace MyCAM
 			}
 		}
 
+		void OnProjectFileImported( bool isSuccess, string fileName )
+		{
+			if( isSuccess == false ) {
+				return;
+			}
+			if( !string.IsNullOrEmpty( fileName ) ) {
+				Text = $"{SOFTWARE_Name} - {fileName}";
+			}
+			else {
+				Text = $"{SOFTWARE_Name}";
+			}
+		}
+
 		// cam action change event
 		void OnCAMDlgActionStatusChange( EActionStatus actionStatus )
 		{
@@ -630,8 +639,8 @@ namespace MyCAM
 					case EditActionType.SelectPath:
 						m_tsbSelectD1ContFace.Enabled = true;
 						m_tsbSelPath_FreeBound.Enabled = true;
-						m_tsAutoFindAlienatedWorkPieceBoundary.Enabled = true;
-						m_tsAutoFindScretchWorkPieceBoundary.Enabled = true;
+						m_tsAddPathForHat.Enabled = true;
+						m_tsAddPathForTube.Enabled = true;
 						m_tsbAddPath.BackColor = DEFAULT_BtnColor;
 						m_tsbSelPath_Manual.BackColor = DEFAULT_BtnColor;
 						break;
@@ -693,8 +702,8 @@ namespace MyCAM
 					m_tsbSelPath_Manual.BackColor = ON_ButtonColor;
 					m_tsbSelectD1ContFace.Enabled = false;
 					m_tsbSelPath_FreeBound.Enabled = false;
-					m_tsAutoFindAlienatedWorkPieceBoundary.Enabled = false;
-					m_tsAutoFindScretchWorkPieceBoundary.Enabled = false;
+					m_tsAddPathForHat.Enabled = false;
+					m_tsAddPathForTube.Enabled = false;
 					break;
 				case EditActionType.StartPoint:
 					m_tsbStartPoint.BackColor = ON_ButtonColor;

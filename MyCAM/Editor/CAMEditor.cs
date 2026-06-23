@@ -5,11 +5,7 @@ using MyCAM.Helper;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.gp;
-using OCC.ShapeAnalysis;
-using OCC.TopAbs;
-using OCC.TopExp;
 using OCC.TopoDS;
-using OCC.TopTools;
 using OCC.V3d;
 using OCCTool;
 using OCCViewer;
@@ -82,7 +78,7 @@ namespace MyCAM.Editor
 		}
 
 		public const string PATH_NODE_PREFIX = "Path_";
-		public const int PATH_NODE_PERFIX_LENGTH = 5;
+		public const int PATH_NODE_PREFIX_LENGTH = 5;
 
 		// Renderers
 		IndexRenderer m_IndexRenderer;
@@ -161,7 +157,7 @@ namespace MyCAM.Editor
 		}
 
 		// Auto find top face along Z axis, then process D1 continuous faces and free boundaries
-		public void AutoFindAlienatedWorkPieceFaceAndSelectFreeBound()
+		public void AutoFindHatPath()
 		{
 			// Guard check - ensure workpiece exists
 			if( m_DataManager.PartIDList.Count == 0 ) {
@@ -182,7 +178,7 @@ namespace MyCAM.Editor
 		}
 
 		// Auto find outermost face along X/Y axis, then process D1 continuous faces and free boundaries
-		public void AutoFindStretchedWorkPieceFaceAndSelectFreeBound()
+		public void AutoFindTubePath()
 		{
 			// Guard check - ensure workpiece exists
 			if( m_DataManager.PartIDList.Count == 0 ) {
@@ -192,28 +188,10 @@ namespace MyCAM.Editor
 			}
 
 			BoundingBox bbox = GetVisibleWorkpieceBBox();
-			if( bbox == null ) {
+			bool isGetSuccess = FindWireOnOuterShellHelper.TubeStrategies( bbox, out gp_Pnt bboxCenter, out List<gp_Ax1> stretchedStrategies );
+			if( isGetSuccess == false ) {
 				return;
 			}
-
-			gp_Pnt bboxCenter = new gp_Pnt( bbox.XCenter, bbox.YCenter, bbox.ZCenter );
-
-			// Build strategies along +X then +Y, interleaved by priority
-			// (center along X, center along Y, then corner midpoints for both)
-			List<gp_Ax1> strategiesX = GeometryTool.BuildRayAxesFromBBox( new gp_Dir( 1, 0, 0 ), bbox );
-			List<gp_Ax1> strategiesY = GeometryTool.BuildRayAxesFromBBox( new gp_Dir( 0, 1, 0 ), bbox );
-
-			List<gp_Ax1> stretchedStrategies = new List<gp_Ax1>();
-			int maxCount = Math.Max( strategiesX.Count, strategiesY.Count );
-			for( int i = 0; i < maxCount; i++ ) {
-				if( i < strategiesX.Count ) {
-					stretchedStrategies.Add( strategiesX[ i ] );
-				}
-				if( i < strategiesY.Count ) {
-					stretchedStrategies.Add( strategiesY[ i ] );
-				}
-			}
-
 			AutoFindOutesetFaceAndAddPath( stretchedStrategies, bboxCenter );
 		}
 
@@ -241,7 +219,16 @@ namespace MyCAM.Editor
 			}
 
 			// Extract free boundaries and add paths
-			AddPathsFromFaceGroup( selectedFaceGroupList );
+			FindWireOnOuterShellHelper.WireFindingResult result = FindWireOnOuterShellHelper.ExtractFreeBoundariesFromFaceGroups( selectedFaceGroupList );
+			if( !result.IsSuccess ) {
+				string errorMessage = FindWireOnOuterShellHelper.GetWireFindingErrorMessage( result.Error );
+				MyApp.Logger.ShowOnLogPanel( errorMessage, MyApp.NoticeType.Hint );
+				EndActionIfNotDefault();
+				return;
+			}
+
+			// add paths to data manager
+			m_DataManager.AddPath( result.Wires, result.EdgeFaceMap );
 		}
 
 		public void StartSelectPath_Manual()
@@ -263,36 +250,6 @@ namespace MyCAM.Editor
 			}
 			SelectWireAction action = new SelectWireAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, selectedFaceGroupList );
 			StartEditAction( action );
-		}
-
-		// Shared: extract free boundaries from face group and add paths to data manager
-		void AddPathsFromFaceGroup( List<TopoDS_Shape> faceGroupList )
-		{
-			List<TopoDS_Wire> pathWireList = new List<TopoDS_Wire>();
-			TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
-
-			foreach( TopoDS_Shape oneFace in faceGroupList ) {
-				ShapeAnalysis_FreeBounds freeBounds = new ShapeAnalysis_FreeBounds( oneFace );
-
-				// Add to map
-				TopExp.MapShapesAndAncestors(
-					oneFace, TopAbs_ShapeEnum.TopAbs_EDGE,
-					TopAbs_ShapeEnum.TopAbs_FACE, ref edgeFaceMap );
-
-				// Get all closed wires
-				TopExp_Explorer wireExp = new TopExp_Explorer(
-					freeBounds.GetClosedWires(), TopAbs_ShapeEnum.TopAbs_WIRE );
-				while( wireExp.More() ) {
-					pathWireList.Add( TopoDS.ToWire( wireExp.Current() ) );
-					wireExp.Next();
-				}
-			}
-
-			if( pathWireList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]找不到封閉邊界", MyApp.NoticeType.Hint );
-				return;
-			}
-			m_DataManager.AddPath( pathWireList, edgeFaceMap );
 		}
 
 		public void EndSelectPath_Manual()
@@ -1149,51 +1106,33 @@ namespace MyCAM.Editor
 		// Shared: auto find outermost face by ray strategies, then find D1 faces and add free boundary paths
 		void AutoFindOutesetFaceAndAddPath( List<gp_Ax1> strategies, gp_Pnt referenceCenter )
 		{
-			// Step 1: For each strategy, collect bbox-filtered face candidates and find the outermost intersected face
-			TopoDS_Face outerTargetFace = null;
-			foreach( gp_Ax1 strategy in strategies ) {
-				List<TopoDS_Face> bboxFilteredFaces = GetVisibleFaceCandidatesByRay( strategy );
-				if( bboxFilteredFaces.Count == 0 ) {
-					continue;
-				}
-				if( GeometryTool.FindOutermostFaceAlongPrincipalAxis( bboxFilteredFaces, strategy.Location(), strategy.Direction(), referenceCenter, out outerTargetFace ) ) {
-					break;
-				}
-			}
-
-			if( outerTargetFace == null ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]找不到相交的面", MyApp.NoticeType.Hint );
-				EndActionIfNotDefault();
+			// get visible part shapes
+			List<TopoDS_Shape> partShapes = GetVisiblePartShapes();
+			if( partShapes.Count == 0 ) {
 				return;
 			}
 
-			// Step 2: Borrow SelectFaceAction's calculation to find D1 continuous faces from the outermost face
-			// Note: Does not start interactive mode, only uses the geometry calculation
-			SelectFaceAction faceSearchAction = new SelectFaceAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
-			List<TopoDS_Face> d1ContinuousFaceList = faceSearchAction.FindD1ContFaces( outerTargetFace );
-			if( d1ContinuousFaceList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]找不到 D1 連續面", MyApp.NoticeType.Hint );
-				EndActionIfNotDefault();
-				return;
-			}
+			// use FindWireOnOuterShellHelper to find wires on outer shell
+			FindWireOnOuterShellHelper.WireFindingResult result =
+				FindWireOnOuterShellHelper.FindWiresOnOuterShell( partShapes, strategies, referenceCenter );
 
-			// Step 3: Convert D1 continuous faces into sewn shape groups
-			List<TopoDS_Shape> sewedFaceGroupList = faceSearchAction.GetResultFromFaces( d1ContinuousFaceList );
-			if( sewedFaceGroupList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]面群組建立失敗", MyApp.NoticeType.Hint );
+			if( !result.IsSuccess ) {
+				string errorMessage = FindWireOnOuterShellHelper.GetWireFindingErrorMessage( result.Error );
+				MyApp.Logger.ShowOnLogPanel( errorMessage, MyApp.NoticeType.Hint );
 				EndActionIfNotDefault();
 				return;
 			}
 
 			m_CurrentAction.End();
 
-			// Step 4: Extract free boundaries from face groups and add as paths
-			AddPathsFromFaceGroup( sewedFaceGroupList );
+			// add paths to data manager
+			m_DataManager.AddPath( result.Wires, result.EdgeFaceMap );
 		}
 
-		List<TopoDS_Face> GetVisibleFaceCandidatesByRay( gp_Ax1 strategy )
+		// get visible part shapes for path generation
+		List<TopoDS_Shape> GetVisiblePartShapes()
 		{
-			List<TopoDS_Face> faceList = new List<TopoDS_Face>();
+			List<TopoDS_Shape> shapeList = new List<TopoDS_Shape>();
 			foreach( string partID in m_DataManager.PartIDList ) {
 				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
 					continue;
@@ -1201,21 +1140,9 @@ namespace MyCAM.Editor
 				if( DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObject ) == false ) {
 					continue;
 				}
-
-				// Part-level BBox pre-filter: skip entire part if ray cannot intersect
-				BoundingBox partBBox = new BoundingBox( shapeObject.Shape );
-				if( GeometryTool.RayIntersectsBBox( strategy.Location(), strategy.Direction(), partBBox ) == false ) {
-					continue;
-				}
-
-				// Collect all faces from this part
-				TopExp_Explorer exp = new TopExp_Explorer(
-					shapeObject.Shape, TopAbs_ShapeEnum.TopAbs_FACE );
-				for( ; exp.More(); exp.Next() ) {
-					faceList.Add( TopoDS.ToFace( exp.Current() ) );
-				}
+				shapeList.Add( shapeObject.Shape );
 			}
-			return faceList;
+			return shapeList;
 		}
 
 		BoundingBox GetVisibleWorkpieceBBox()

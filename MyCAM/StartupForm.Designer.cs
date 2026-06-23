@@ -90,8 +90,8 @@
 			this.m_btnCheck = new System.Windows.Forms.ToolStripButton();
 			this.m_tscLevel2Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsAddPathSubFunc = new System.Windows.Forms.ToolStrip();
-			this.m_tsAutoFindAlienatedWorkPieceBoundary = new System.Windows.Forms.ToolStripButton();
-			this.m_tsAutoFindScretchWorkPieceBoundary = new System.Windows.Forms.ToolStripButton();
+			this.m_tsAddPathForHat = new System.Windows.Forms.ToolStripButton();
+			this.m_tsAddPathForTube = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSelectD1ContFace = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSelPath_FreeBound = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSelPath_Manual = new System.Windows.Forms.ToolStripButton();
@@ -855,8 +855,8 @@
 			this.m_tsAddPathSubFunc.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_tsAddPathSubFunc.ImageScalingSize = new System.Drawing.Size(24, 24);
 			this.m_tsAddPathSubFunc.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsAutoFindAlienatedWorkPieceBoundary,
-            this.m_tsAutoFindScretchWorkPieceBoundary,
+            this.m_tsAddPathForHat,
+            this.m_tsAddPathForTube,
             this.m_tsbSelectD1ContFace,
             this.m_tsbSelPath_FreeBound,
             this.m_tsbSelPath_Manual});
@@ -866,23 +866,23 @@
 			this.m_tsAddPathSubFunc.TabIndex = 5;
 			this.m_tsAddPathSubFunc.Text = "tsAddPathSubFunc";
 			// 
-			// m_tsAutoFindAlienatedWorkPieceBoundary
+			// m_tsAddPathForHat
 			// 
-			this.m_tsAutoFindAlienatedWorkPieceBoundary.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsAutoFindAlienatedWorkPieceBoundary.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsAutoFindAlienatedWorkPieceBoundary.Name = "m_tsAutoFindAlienatedWorkPieceBoundary";
-			this.m_tsAutoFindAlienatedWorkPieceBoundary.Size = new System.Drawing.Size(112, 27);
-			this.m_tsAutoFindAlienatedWorkPieceBoundary.Text = "異形蓋件-生成路徑";
-			this.m_tsAutoFindAlienatedWorkPieceBoundary.Click += new System.EventHandler(this.m_tsAutoFindAlienatedWorkPieceBoundary_Click);
+			this.m_tsAddPathForHat.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsAddPathForHat.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsAddPathForHat.Name = "m_tsAddPathForHat";
+			this.m_tsAddPathForHat.Size = new System.Drawing.Size(112, 27);
+			this.m_tsAddPathForHat.Text = "異形蓋件-生成路徑";
+			this.m_tsAddPathForHat.Click += new System.EventHandler(this.m_tsAddPathForHat_Click);
 			// 
-			// m_tsAutoFindScretchWorkPieceBoundary
+			// m_tsAddPathForTube
 			// 
-			this.m_tsAutoFindScretchWorkPieceBoundary.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.m_tsAutoFindScretchWorkPieceBoundary.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_tsAutoFindScretchWorkPieceBoundary.Name = "m_tsAutoFindScretchWorkPieceBoundary";
-			this.m_tsAutoFindScretchWorkPieceBoundary.Size = new System.Drawing.Size(100, 27);
-			this.m_tsAutoFindScretchWorkPieceBoundary.Text = "管拉件-生成路徑";
-			this.m_tsAutoFindScretchWorkPieceBoundary.Click += new System.EventHandler(this.m_tsAutoFindStretchedWorkPieceBoundary_Click);
+			this.m_tsAddPathForTube.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.m_tsAddPathForTube.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsAddPathForTube.Name = "m_tsAddPathForTube";
+			this.m_tsAddPathForTube.Size = new System.Drawing.Size(100, 27);
+			this.m_tsAddPathForTube.Text = "管拉件-生成路徑";
+			this.m_tsAddPathForTube.Click += new System.EventHandler(this.m_tsAddPathForTube_Click);
 			// 
 			// m_tsbSelectD1ContFace
 			// 
@@ -1327,7 +1327,7 @@
 			this.MainMenuStrip = this.m_msMode;
 			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "StartupForm";
-			this.Text = "新代激光五軸切割 0.27.0";
+			this.Text = "新代激光五軸切割";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.StartupForm_FormClosing);
 			this.Resize += new System.EventHandler(this.StartupForm_Resize);
 			this.m_msMode.ResumeLayout(false);
@@ -1462,8 +1462,8 @@
 		private System.Windows.Forms.ToolStripButton m_tsbLayer10;
 		private System.Windows.Forms.ToolStripButton m_tsbCalibrationPnt;
 		private System.Windows.Forms.ToolStripButton m_BtnContourEdit;
-		private System.Windows.Forms.ToolStripButton m_tsAutoFindAlienatedWorkPieceBoundary;
-		private System.Windows.Forms.ToolStripButton m_tsAutoFindScretchWorkPieceBoundary;
+		private System.Windows.Forms.ToolStripButton m_tsAddPathForHat;
+		private System.Windows.Forms.ToolStripButton m_tsAddPathForTube;
 		private System.Windows.Forms.ToolStripButton m_tsbOptimizeIK;
 		private System.Windows.Forms.ToolStripButton m_tsbMicroJoint;
 		private System.Windows.Forms.ToolStripButton m_tsbManualOrder;

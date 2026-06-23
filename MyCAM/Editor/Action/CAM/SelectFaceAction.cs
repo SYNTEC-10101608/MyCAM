@@ -202,12 +202,6 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		// Accept externally specified seed face for D1 continuous face search (used by auto flow)
-		public List<TopoDS_Face> FindD1ContFaces( TopoDS_Face faceBFSQueue )
-		{
-			return BFSFindD1ContFaces( new List<TopoDS_Face> { faceBFSQueue } );
-		}
-
 		// BFS core: find all D1 continuous faces starting from a set of seed faces
 		List<TopoDS_Face> BFSFindD1ContFaces( List<TopoDS_Face> faceBFSQueue )
 		{
