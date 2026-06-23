@@ -202,7 +202,8 @@ namespace MyCAM.Editor
 					bool ctrl = ( ModifierKeys & Keys.Control ) == Keys.Control;
 					bool shift = ( ModifierKeys & Keys.Shift ) == Keys.Shift;
 
-					if( !ctrl && !shift ) {
+					// if no modifier or multi-select not allowed: clear selection and select next
+					if( !ctrl && !shift || !isAllowMultiSelect ) {
 						ClearSelection();
 						SelectNode( next );
 						m_AnchorNode = next;
