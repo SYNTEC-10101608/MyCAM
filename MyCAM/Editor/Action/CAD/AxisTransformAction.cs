@@ -5,7 +5,6 @@ using OCC.AIS;
 using OCC.BRep;
 using OCC.gp;
 using OCC.TopoDS;
-using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -289,7 +288,7 @@ namespace MyCAM.Editor
 				decimal deltaAngle = (decimal)( curAngle - prevAngle );
 
 				if( deltaAngle != 0 ) {
-					switch( (EAxisTransformDirection) m_ActiveAxisIndex ) {
+					switch( (EAxisTransformDirection)m_ActiveAxisIndex ) {
 						case EAxisTransformDirection.XAxis:
 							m_AxisTransformDlg.UpdateRotationFromManipulator( deltaAngle, 0, 0 );
 							break;
@@ -310,7 +309,7 @@ namespace MyCAM.Editor
 		{
 			double angleRad = 0;
 			switch( (EAxisTransformDirection)axisIndex ) {
-				case EAxisTransformDirection.XAxis: 
+				case EAxisTransformDirection.XAxis:
 					angleRad = Math.Atan2( trsf.Value( 3, 2 ), trsf.Value( 2, 2 ) );
 					break;
 				case EAxisTransformDirection.YAxis:

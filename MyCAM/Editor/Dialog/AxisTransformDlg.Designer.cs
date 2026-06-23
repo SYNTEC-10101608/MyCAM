@@ -65,7 +65,7 @@
 			this.m_lblX.Location = new System.Drawing.Point(15, 95);
 			this.m_lblX.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblX.Name = "m_lblX";
-			this.m_lblX.Size = new System.Drawing.Size(27, 27);
+			this.m_lblX.Size = new System.Drawing.Size(23, 22);
 			this.m_lblX.TabIndex = 2;
 			this.m_lblX.Text = "X";
 			// 
@@ -76,7 +76,7 @@
 			this.m_lblY.Location = new System.Drawing.Point(15, 154);
 			this.m_lblY.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblY.Name = "m_lblY";
-			this.m_lblY.Size = new System.Drawing.Size(28, 27);
+			this.m_lblY.Size = new System.Drawing.Size(22, 22);
 			this.m_lblY.TabIndex = 3;
 			this.m_lblY.Text = "Y";
 			// 
@@ -87,7 +87,7 @@
 			this.m_lblZ.Location = new System.Drawing.Point(15, 215);
 			this.m_lblZ.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblZ.Name = "m_lblZ";
-			this.m_lblZ.Size = new System.Drawing.Size(27, 27);
+			this.m_lblZ.Size = new System.Drawing.Size(22, 22);
 			this.m_lblZ.TabIndex = 4;
 			this.m_lblZ.Text = "Z";
 			// 
@@ -98,7 +98,7 @@
 			this.m_lblRx.Location = new System.Drawing.Point(26, 95);
 			this.m_lblRx.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblRx.Name = "m_lblRx";
-			this.m_lblRx.Size = new System.Drawing.Size(44, 27);
+			this.m_lblRx.Size = new System.Drawing.Size(37, 22);
 			this.m_lblRx.TabIndex = 5;
 			this.m_lblRx.Text = "RX";
 			// 
@@ -109,7 +109,7 @@
 			this.m_lblRy.Location = new System.Drawing.Point(26, 154);
 			this.m_lblRy.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblRy.Name = "m_lblRy";
-			this.m_lblRy.Size = new System.Drawing.Size(45, 27);
+			this.m_lblRy.Size = new System.Drawing.Size(36, 22);
 			this.m_lblRy.TabIndex = 6;
 			this.m_lblRy.Text = "RY";
 			// 
@@ -120,7 +120,7 @@
 			this.m_lblRz.Location = new System.Drawing.Point(26, 215);
 			this.m_lblRz.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblRz.Name = "m_lblRz";
-			this.m_lblRz.Size = new System.Drawing.Size(44, 27);
+			this.m_lblRz.Size = new System.Drawing.Size(36, 22);
 			this.m_lblRz.TabIndex = 7;
 			this.m_lblRz.Text = "RZ";
 			// 
@@ -129,7 +129,7 @@
 			this.m_nudX.Location = new System.Drawing.Point(59, 95);
 			this.m_nudX.Margin = new System.Windows.Forms.Padding(4);
 			this.m_nudX.Name = "m_nudX";
-			this.m_nudX.Size = new System.Drawing.Size(110, 30);
+			this.m_nudX.Size = new System.Drawing.Size(110, 26);
 			this.m_nudX.TabIndex = 8;
 			this.m_nudX.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudX_MouseWheel);
 			// 
@@ -138,7 +138,7 @@
 			this.m_nudY.Location = new System.Drawing.Point(59, 154);
 			this.m_nudY.Margin = new System.Windows.Forms.Padding(4);
 			this.m_nudY.Name = "m_nudY";
-			this.m_nudY.Size = new System.Drawing.Size(110, 30);
+			this.m_nudY.Size = new System.Drawing.Size(110, 26);
 			this.m_nudY.TabIndex = 9;
 			this.m_nudY.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudY_MouseWheel);
 			// 
@@ -157,7 +157,7 @@
             0,
             -2147483648});
 			this.m_nudRx.Name = "m_nudRx";
-			this.m_nudRx.Size = new System.Drawing.Size(110, 30);
+			this.m_nudRx.Size = new System.Drawing.Size(110, 26);
 			this.m_nudRx.TabIndex = 10;
 			this.m_nudRx.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudRx_MouseWheel);
 			// 
@@ -166,7 +166,7 @@
 			this.m_nudZ.Location = new System.Drawing.Point(59, 215);
 			this.m_nudZ.Margin = new System.Windows.Forms.Padding(4);
 			this.m_nudZ.Name = "m_nudZ";
-			this.m_nudZ.Size = new System.Drawing.Size(110, 30);
+			this.m_nudZ.Size = new System.Drawing.Size(110, 26);
 			this.m_nudZ.TabIndex = 11;
 			this.m_nudZ.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudZ_MouseWheel);
 			// 
@@ -185,7 +185,7 @@
             0,
             -2147483648});
 			this.m_nudRy.Name = "m_nudRy";
-			this.m_nudRy.Size = new System.Drawing.Size(110, 30);
+			this.m_nudRy.Size = new System.Drawing.Size(110, 26);
 			this.m_nudRy.TabIndex = 12;
 			this.m_nudRy.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudRy_MouseWheel);
 			// 
@@ -204,7 +204,7 @@
             0,
             -2147483648});
 			this.m_nudRz.Name = "m_nudRz";
-			this.m_nudRz.Size = new System.Drawing.Size(110, 30);
+			this.m_nudRz.Size = new System.Drawing.Size(110, 26);
 			this.m_nudRz.TabIndex = 13;
 			this.m_nudRz.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudRz_MouseWheel);
 			// 
@@ -248,7 +248,7 @@
 			this.m_lblStepDis.Location = new System.Drawing.Point(9, 42);
 			this.m_lblStepDis.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblStepDis.Name = "m_lblStepDis";
-			this.m_lblStepDis.Size = new System.Drawing.Size(81, 19);
+			this.m_lblStepDis.Size = new System.Drawing.Size(71, 16);
 			this.m_lblStepDis.TabIndex = 21;
 			this.m_lblStepDis.Text = "步進距離";
 			// 
@@ -274,7 +274,7 @@
 			// 
 			this.m_txbStepDistance.Location = new System.Drawing.Point(83, 37);
 			this.m_txbStepDistance.Name = "m_txbStepDistance";
-			this.m_txbStepDistance.Size = new System.Drawing.Size(100, 30);
+			this.m_txbStepDistance.Size = new System.Drawing.Size(100, 26);
 			this.m_txbStepDistance.TabIndex = 22;
 			this.m_txbStepDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbStepDistance_KeyDown);
 			this.m_txbStepDistance.Leave += new System.EventHandler(this.m_txbStepDistance_Leave);
@@ -301,7 +301,7 @@
 			// 
 			this.m_txbStepAngle.Location = new System.Drawing.Point(111, 40);
 			this.m_txbStepAngle.Name = "m_txbStepAngle";
-			this.m_txbStepAngle.Size = new System.Drawing.Size(100, 30);
+			this.m_txbStepAngle.Size = new System.Drawing.Size(100, 26);
 			this.m_txbStepAngle.TabIndex = 24;
 			this.m_txbStepAngle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbStepAngle_KeyDown);
 			this.m_txbStepAngle.Leave += new System.EventHandler(this.m_txbStepAngle_Leave);
@@ -313,13 +313,13 @@
 			this.m_lblStapAngle.Location = new System.Drawing.Point(26, 45);
 			this.m_lblStapAngle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblStapAngle.Name = "m_lblStapAngle";
-			this.m_lblStapAngle.Size = new System.Drawing.Size(81, 19);
+			this.m_lblStapAngle.Size = new System.Drawing.Size(71, 16);
 			this.m_lblStapAngle.TabIndex = 23;
 			this.m_lblStapAngle.Text = "步進角度";
 			// 
 			// AxisTransformDlg
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(585, 328);
 			this.Controls.Add(this.m_grpRotation);
@@ -328,6 +328,7 @@
 			this.Controls.Add(this.m_btnCancel);
 			this.Controls.Add(this.m_btnReset);
 			this.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "AxisTransformDlg";
 			this.Text = "軸向轉換";
