@@ -1,6 +1,5 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
-using MyCAM.Helper;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.IFSelect;
@@ -28,6 +27,7 @@ namespace MyCAM.Editor
 	internal class CADEditor : EditorBase
 	{
 		public Action<EditActionType, EActionStatus> RaiseCADActionStatusChange;
+		public Action<bool, string> RaiseFileImported;
 
 		public CADEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
@@ -65,28 +65,16 @@ namespace MyCAM.Editor
 		}
 
 		// APIs
-		public void Import3DFile( out TopoDS_Shape fileShape, bool isRevolutionPart = false )
+		public void Import3DFile()
 		{
-			fileShape = null;
-
 			// stop current action
 			EndActionIfNotDefault();
 			OpenFileDialog openDialog = new OpenFileDialog();
 
-			string filter;
-
-			if( isRevolutionPart ) {
-				filter = "STEP Files (*.stp;*.step)|*.stp;*.step|" +
-										"IGES Files (*.igs;*.iges)|*.igs;*.iges";
-			}
-			else {
-				filter = "STEP Files (*.stp;*.step)|*.stp;*.step|" +
+			string filter = "STEP Files (*.stp;*.step)|*.stp;*.step|" +
 										"IGES Files (*.igs;*.iges)|*.igs;*.iges|" +
 										"DXF Files (*.dxf)|*.dxf|" +
 										"All files (*.*)|*.*";
-			}
-
-
 			openDialog.Filter = filter;
 
 			// show file dialog
@@ -110,21 +98,17 @@ namespace MyCAM.Editor
 			}
 
 			if( format == FileFormat.DXF ) {
-				GlassDXFImportAction action = new GlassDXFImportAction( m_DataManager, szFileName );
+				GlassDXFImportAction action = new GlassDXFImportAction( m_DataManager, m_Viewer, m_ViewManager, szFileName );
+				action.ActionCompleted += () =>
+				{
+					m_DefaultAction.ClearSelection();
+					RaiseFileImported?.Invoke( action.IsImportSuccess, action.ImportedFileName );
+				};
 				StartEditAction( action );
 			}
 			else {
-				ReadFileData( format, szFileName, out fileShape );
+				ReadFileData( format, szFileName );
 			}
-		}
-
-		public bool AdjustRevolutionPart( TopoDS_Shape shape )
-		{
-			bool isSuccess = RingShapedIdentifyHelper.SetRevolutionToG54( shape, out TopoDS_Shape replacedShape );
-			if (isSuccess ) {
-				m_DataManager.AddPart( replacedShape );
-			}
-			return isSuccess;
 		}
 
 		public void ImportProjectFile()
@@ -132,6 +116,24 @@ namespace MyCAM.Editor
 			// stop current action
 			EndActionIfNotDefault();
 			ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_ViewManager );
+			action.ActionCompleted += () =>
+			{
+				m_DefaultAction.ClearSelection();
+				RaiseFileImported?.Invoke( action.IsImportSuccess, action.ImportedFileName );
+			};
+			StartEditAction( action );
+		}
+
+		public void ImportRingPart()
+		{
+			// stop current action
+			EndActionIfNotDefault();
+			PlaceRingShapeAction action = new PlaceRingShapeAction( m_DataManager, m_Viewer, m_ViewManager );
+			action.ActionCompleted += () =>
+			{
+				m_DefaultAction.ClearSelection();
+				RaiseFileImported?.Invoke( action.IsImportSuccess, action.ImportedFileName );
+			};
 			StartEditAction( action );
 		}
 
@@ -140,6 +142,9 @@ namespace MyCAM.Editor
 			// stop current action
 			EndActionIfNotDefault();
 			SaveProjectFileAction action = new SaveProjectFileAction( m_DataManager );
+			action.ActionCompleted += () => {
+				RaiseFileImported?.Invoke( action.IsSaveSuccess, action.SavedFileName );
+			};
 			StartEditAction( action );
 		}
 
@@ -237,6 +242,7 @@ namespace MyCAM.Editor
 			BRepBuilderAPI_Transform transformer = new BRepBuilderAPI_Transform( tubeShape, rotation );
 			tubeShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { transformer.Shape() } );
 			m_DataManager.AddPart( tubeShape );
+			RaiseFileImported?.Invoke( true, null );
 		}
 
 		// manager events
@@ -276,9 +282,9 @@ namespace MyCAM.Editor
 		}
 
 		// private methods
-		void ReadFileData( FileFormat format, string szFileName, out TopoDS_Shape oneShape )
+		void ReadFileData( FileFormat format, string szFileName )
 		{
-			oneShape = null;
+			TopoDS_Shape oneShape = null;
 
 			// read the file
 			XSControl_Reader Reader;
@@ -319,6 +325,8 @@ namespace MyCAM.Editor
 
 			// add the read shape to the manager
 			m_DataManager.AddPart( oneShape );
+			string szJustFileName = Path.GetFileName( szFileName );
+			RaiseFileImported?.Invoke( true, szJustFileName );
 		}
 
 		List<string> GetSelectedIDList()

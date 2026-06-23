@@ -396,7 +396,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void ChangePartColor(string partID, Quantity_Color color )
+		public void ChangePartColor( string partID, Quantity_Color color )
 		{
 			if( m_PartIDSet == null || m_PartIDSet.Contains( partID ) == false ) {
 				return;
@@ -438,10 +438,10 @@ namespace MyCAM.Editor
 
 		public void ShowPartTrsf( string partID, gp_Trsf trsf )
 		{
-			if ( m_PartIDSet == null || m_PartIDSet.Contains( partID ) == false ) {
+			if( m_PartIDSet == null || m_PartIDSet.Contains( partID ) == false ) {
 				return;
 			}
-			if ( ViewObjectMap == null || !ViewObjectMap.ContainsKey( partID ) ) {
+			if( ViewObjectMap == null || !ViewObjectMap.ContainsKey( partID ) ) {
 				return;
 			}
 			ViewObject viewObject = ViewObjectMap[ partID ];
@@ -514,7 +514,7 @@ namespace MyCAM.Editor
 
 			// unregister shape-ID mapping
 			ViewObject viewObject = ViewObjectMap[ pathID ];
-			if ( viewObject == null ) {
+			if( viewObject == null ) {
 				return;
 			}
 			AIS_Shape pathAIS = viewObject.AISHandle as AIS_Shape;
@@ -637,7 +637,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			ViewObject viewObject = ViewObjectMap[ pathID ];
-			if (viewObject == null || viewObject.Visible == false ) {
+			if( viewObject == null || viewObject.Visible == false ) {
 				return;
 			}
 			m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
@@ -653,7 +653,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			ViewObject viewObject = ViewObjectMap[ pathID ];
-			if ( viewObject == null ) {
+			if( viewObject == null ) {
 				return;
 			}
 			m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
@@ -686,7 +686,7 @@ namespace MyCAM.Editor
 			foreach( string pathID in pathIDList ) {
 				DeactivePath( pathID );
 			}
-		}	
+		}
 
 		public void DeactivePath( string pathID )
 		{
@@ -755,6 +755,37 @@ namespace MyCAM.Editor
 			PathNode.Nodes.Clear();
 		}
 
+		public void RebuildAllViews( DataManager dataManager, bool shouldExpandPartNode = true )
+		{
+			ClearAll();
+
+			// build part
+			foreach( var szNewDataID in dataManager.PartIDList ) {
+				if( !DataGettingHelper.GetShapeObject( szNewDataID, out IShapeObject shapeObject ) ) {
+					continue;
+				}
+				AddPart( szNewDataID, shapeObject.Shape );
+			}
+
+			// build path tree and view
+			for( int i = 0; i < dataManager.PathIDList.Count; i++ ) {
+				string pathID = dataManager.PathIDList[ i ];
+				string szNodeText = PATH_NODE_PREFIX + ( i + 1 ).ToString();
+				AddPathNode( szNodeText );
+				AddPath( pathID );
+			}
+
+			DeactiveAll();
+
+			// update tree view
+			if( shouldExpandPartNode ) {
+				PartNode.ExpandAll();
+			}
+			else {
+				PathNode.ExpandAll();
+			}
+		}
+
 		#endregion
 
 		#region Shape-ID Mapping
@@ -820,6 +851,8 @@ namespace MyCAM.Editor
 
 		#endregion
 
+		#region UI Render
+
 		int GetPathColorIndex( string pathID )
 		{
 			int nColorIdx = 0;
@@ -836,5 +869,9 @@ namespace MyCAM.Editor
 			}
 			return nColorIdx;
 		}
+
+		const string PATH_NODE_PREFIX = "Path_";
+
+		#endregion
 	}
 }

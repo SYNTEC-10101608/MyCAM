@@ -10,9 +10,23 @@ namespace MyCAM.Editor
 {
 	internal class SaveProjectFileAction : EditActionBase
 	{
+		public event Action ActionCompleted;
+
+		public bool IsSaveSuccess
+		{
+			get; private set;
+		}
+
+		public string SavedFileName
+		{
+			get; private set;
+		}
+
 		public SaveProjectFileAction( DataManager dataManager )
 			: base( dataManager )
 		{
+			IsSaveSuccess = false;
+			SavedFileName = string.Empty;
 		}
 
 		public override EditActionType ActionType
@@ -50,12 +64,24 @@ namespace MyCAM.Editor
 					using( FileStream fileStream = new FileStream( projectFilePath, FileMode.Create ) ) {
 						serializer.Serialize( fileStream, dataManagerDTO, serializerNameSpace );
 					}
+
+					// set save success and file name
+					IsSaveSuccess = true;
+					SavedFileName = Path.GetFileName( projectFilePath );
 				}
 				catch( Exception ex ) {
 					MyApp.Logger.ShowOnLogPanel( $"儲存檔案時發生錯誤：\n{ex.Message}", MyApp.NoticeType.Error );
+					IsSaveSuccess = false;
+					SavedFileName = string.Empty;
 				}
 			}
 			End();
+		}
+
+		public override void End()
+		{
+			ActionCompleted?.Invoke();
+			base.End();
 		}
 
 		static string GetProjectFileInfo()

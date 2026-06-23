@@ -1,5 +1,4 @@
 ﻿using MyCAM.Data;
-using OCC.AIS;
 using OCC.gp;
 using OCCViewer;
 using System.Collections.Generic;
@@ -16,7 +15,7 @@ namespace MyCAM.Editor
 			m_3PTransform = trsf;
 		}
 
-		public void TransformData()
+		public void TransformData( bool forceUpdate = true )
 		{
 			List<ITransformableObject> transformableList = new List<ITransformableObject>();
 			List<string> transformObjIDList = new List<string>();
@@ -53,7 +52,10 @@ namespace MyCAM.Editor
 			// update viewer for part and path
 			m_ViewManager.UpdateParts( m_DataManager.PartIDList );
 			m_ViewManager.UpdatePaths( m_DataManager.PathIDList );
-			m_Viewer.UpdateView();
+
+			if( forceUpdate ) {
+				m_Viewer.UpdateView();
+			}
 		}
 
 		Viewer m_Viewer;

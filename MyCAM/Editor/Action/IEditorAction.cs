@@ -49,6 +49,7 @@ namespace MyCAM.Editor
 		ImportProjectFile,
 		SaveProjectFile,
 		ImportDxfGlass,
+		PlaceRingShape,
 	}
 
 	internal interface IEditorAction
