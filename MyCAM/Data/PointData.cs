@@ -176,6 +176,22 @@ namespace MyCAM.Data
 			get;
 		}
 
+		// robot euler angles solved in cache stage
+		double A_rad
+		{
+			get;
+		}
+
+		double B_rad
+		{
+			get;
+		}
+
+		double C_rad
+		{
+			get;
+		}
+
 		bool IsMicroJointStart
 		{
 			get; set;
@@ -287,6 +303,22 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		// robot euler angles solved in cache stage
+		public double A_rad
+		{
+			get; set;
+		}
+
+		public double B_rad
+		{
+			get; set;
+		}
+
+		public double C_rad
+		{
+			get; set;
+		}
+
 		public int InitPathIndex
 		{
 			get; set;
@@ -311,6 +343,9 @@ namespace MyCAM.Data
 			newPoint.InitSlave_rad = InitSlave_rad;
 			newPoint.ModMaster_rad = ModMaster_rad;
 			newPoint.ModSlave_rad = ModSlave_rad;
+			newPoint.A_rad = A_rad;
+			newPoint.B_rad = B_rad;
+			newPoint.C_rad = C_rad;
 			newPoint.IsToolVecModPoint = IsToolVecModPoint;
 			newPoint.InitPathIndex = InitPathIndex;
 			return newPoint;

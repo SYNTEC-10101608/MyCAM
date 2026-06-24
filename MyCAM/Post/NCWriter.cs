@@ -250,9 +250,10 @@ namespace MyCAM.Post
 			string szX = postPoint.X.ToString( "F3" );
 			string szY = postPoint.Y.ToString( "F3" );
 			string szZ = postPoint.Z.ToString( "F3" );
-			string szRotaryAxisCommand = NCWriterHelper.GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI,
-				m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
-			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand};" );
+			string szA = ( postPoint.A * 180 / Math.PI ).ToString( "F3" );
+			string szB = ( postPoint.B * 180 / Math.PI ).ToString( "F3" );
+			string szC = ( postPoint.C * 180 / Math.PI ).ToString( "F3" );
+			m_StreamWriter.WriteLine( $"MOVL X{szX} Y{szY} Z{szZ} A{szA} B{szB} C{szC};" );
 
 			if( postPoint.IsMicroJointEnd ) {
 				m_StreamWriter.WriteLine( $"G65 P\"FlyCut\" X{szX} Y{szY} Z{szZ} S1;" );

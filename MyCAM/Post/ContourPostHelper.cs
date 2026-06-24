@@ -21,6 +21,22 @@ namespace MyCAM.Post
 		{
 			get; set;
 		}
+
+		// robot euler angles of the path end point
+		public double A
+		{
+			get; set;
+		}
+
+		public double B
+		{
+			get; set;
+		}
+
+		public double C
+		{
+			get; set;
+		}
 	}
 
 	internal class ContourNCPackage : INCPackage
@@ -160,7 +176,10 @@ namespace MyCAM.Post
 			{
 				EndCAMPoint = currentPathNCPack.ProcessEndPoint,
 				Master = dLastPointProcess_M,
-				Slave = dLastPointProcess_S
+				Slave = dLastPointProcess_S,
+				A = currentPathNCPack.ProcessEndPoint?.A_rad ?? 0,
+				B = currentPathNCPack.ProcessEndPoint?.B_rad ?? 0,
+				C = currentPathNCPack.ProcessEndPoint?.C_rad ?? 0
 			};
 			return true;
 		}
@@ -216,6 +235,9 @@ namespace MyCAM.Post
 					Z = pointG54.Z(),
 					Master = rotateAngleList[ i ].Item1,
 					Slave = rotateAngleList[ i ].Item2,
+					A = pointList[ i ].A_rad,
+					B = pointList[ i ].B_rad,
+					C = pointList[ i ].C_rad,
 					IsMicroJointEnd = pointList[ i ].IsMicroJointEnd,
 					IsMicroJointStart = pointList[ i ].IsMicroJointStart
 				};
@@ -239,7 +261,10 @@ namespace MyCAM.Post
 					Y = point.Point.Y(),
 					Z = point.Point.Z(),
 					Master = dM,
-					Slave = dS
+					Slave = dS,
+					A = point.A_rad,
+					B = point.B_rad,
+					C = point.C_rad
 				};
 				resultG54.Add( g54Point );
 			}

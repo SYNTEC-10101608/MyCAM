@@ -265,6 +265,79 @@ namespace MyCAM.PathCache
 			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
 			LeadHelper.SetLeadOut( mainPointList, overCutPointList2, out List<IOrientationPoint> leadOutPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
 			m_LeadOutCAMPointList = leadOutPointList.Cast<CAMPoint>().ToList();
+
+			// solve robot euler angles (ABC) for robot post processing
+			SolveRobotABC();
+		}
+
+		void SolveRobotABC()
+		{
+			// main path: solve euler angles per point from tool vec and tangent vec
+			foreach( CAMPoint point in m_CAMPointList ) {
+				SolvePointABC( point );
+			}
+			if( m_CAMPointList.Count == 0 ) {
+				return;
+			}
+
+			// lead / over-cut / lead-out keep a constant orientation:
+			// copy the main path endpoint ABC so they are not affected by tangent change
+			CAMPoint mainStartPoint = m_CAMPointList.First();
+			CAMPoint mainEndPoint = m_CAMPointList.Last();
+
+			// lead-in copies main path start orientation
+			if( m_LeadInCAMPointList != null ) {
+				foreach( CAMPoint point in m_LeadInCAMPointList ) {
+					CopyABC( mainStartPoint, point );
+				}
+			}
+
+			// over-cut copies main path end orientation
+			if( m_OverCutPointList != null ) {
+				foreach( CAMPoint point in m_OverCutPointList ) {
+					CopyABC( mainEndPoint, point );
+				}
+			}
+
+			// lead-out copies main path end orientation
+			if( m_LeadOutCAMPointList != null ) {
+				foreach( CAMPoint point in m_LeadOutCAMPointList ) {
+					CopyABC( mainEndPoint, point );
+				}
+			}
+		}
+
+		static void SolvePointABC( CAMPoint point )
+		{
+			double a = 0, b = 0, c = 0;
+			try {
+
+				// tool sys: Z along reversed tool vec, X along tangent vec
+				gp_Ax3 toolSys = new gp_Ax3( new gp_Pnt(), point.ToolVec.Reversed(), point.TangentVec );
+				gp_Trsf trsf = new gp_Trsf();
+				trsf.SetDisplacement( new gp_Ax3( new gp_Pnt(), new gp_Dir( 0, 0, 1 ), new gp_Dir( 1, 0, 0 ) ), toolSys );
+
+				// tool dir to quaternion then to euler angle
+				gp_Quaternion q = trsf.GetRotation();
+				q.GetEulerAngles( gp_EulerSequence.gp_Extrinsic_XYZ, ref a, ref b, ref c );
+			}
+			catch( Exception ) {
+
+				// degenerate tool/tangent direction, fallback to zero pose to avoid crash
+				a = 0;
+				b = 0;
+				c = 0;
+			}
+			point.A_rad = a;
+			point.B_rad = b;
+			point.C_rad = c;
+		}
+
+		static void CopyABC( CAMPoint source, CAMPoint target )
+		{
+			target.A_rad = source.A_rad;
+			target.B_rad = source.B_rad;
+			target.C_rad = source.C_rad;
 		}
 
 		void CreateIndexMap()

@@ -26,7 +26,10 @@ namespace MyCAM.Post
 					Y = result.LiftUpPoint.Point.Y(),
 					Z = result.LiftUpPoint.Point.Z(),
 					Master = endInfoOfPreviousPath.Master,
-					Slave = endInfoOfPreviousPath.Slave
+					Slave = endInfoOfPreviousPath.Slave,
+					A = endInfoOfPreviousPath.A,
+					B = endInfoOfPreviousPath.B,
+					C = endInfoOfPreviousPath.C
 				};
 			}
 
@@ -38,7 +41,10 @@ namespace MyCAM.Post
 					Y = result.FrogLeapMiddlePoint.Point.Y(),
 					Z = result.FrogLeapMiddlePoint.Point.Z(),
 					Master = ( endInfoOfPreviousPath.Master + pathG54PostData.ProcessStartPoint.Master ) / 2.0,
-					Slave = ( endInfoOfPreviousPath.Slave + pathG54PostData.ProcessStartPoint.Slave ) / 2.0
+					Slave = ( endInfoOfPreviousPath.Slave + pathG54PostData.ProcessStartPoint.Slave ) / 2.0,
+					A = ( endInfoOfPreviousPath.A + pathG54PostData.ProcessStartPoint.A ) / 2.0,
+					B = ( endInfoOfPreviousPath.B + pathG54PostData.ProcessStartPoint.B ) / 2.0,
+					C = ( endInfoOfPreviousPath.C + pathG54PostData.ProcessStartPoint.C ) / 2.0
 				};
 			}
 
@@ -50,7 +56,10 @@ namespace MyCAM.Post
 					Y = result.SafePlaneLiftUpProjPoint.Y(),
 					Z = result.SafePlaneLiftUpProjPoint.Z(),
 					Master = endInfoOfPreviousPath.Master,
-					Slave = endInfoOfPreviousPath.Slave
+					Slave = endInfoOfPreviousPath.Slave,
+					A = endInfoOfPreviousPath.A,
+					B = endInfoOfPreviousPath.B,
+					C = endInfoOfPreviousPath.C
 				};
 			}
 			if( result.SafePlaneCutDownProjPoint != null ) {
@@ -60,7 +69,10 @@ namespace MyCAM.Post
 					Y = result.SafePlaneCutDownProjPoint.Y(),
 					Z = result.SafePlaneCutDownProjPoint.Z(),
 					Master = pathG54PostData.ProcessStartPoint.Master,
-					Slave = pathG54PostData.ProcessStartPoint.Slave
+					Slave = pathG54PostData.ProcessStartPoint.Slave,
+					A = pathG54PostData.ProcessStartPoint.A,
+					B = pathG54PostData.ProcessStartPoint.B,
+					C = pathG54PostData.ProcessStartPoint.C
 				};
 			}
 
@@ -72,7 +84,10 @@ namespace MyCAM.Post
 					Y = result.CutDownPoint.Point.Y(),
 					Z = result.CutDownPoint.Point.Z(),
 					Master = pathG54PostData.ProcessStartPoint.Master,
-					Slave = pathG54PostData.ProcessStartPoint.Slave
+					Slave = pathG54PostData.ProcessStartPoint.Slave,
+					A = pathG54PostData.ProcessStartPoint.A,
+					B = pathG54PostData.ProcessStartPoint.B,
+					C = pathG54PostData.ProcessStartPoint.C
 				};
 			}
 			pathG54PostData.FollowSafeDistance = currentPathNCPack.TraverseData.FollowSafeDistance;
@@ -101,7 +116,10 @@ namespace MyCAM.Post
 				Y = entryPoint.Point.Y(),
 				Z = entryPoint.Point.Z(),
 				Master = pathG54PostData.ProcessStartPoint.Master,
-				Slave = pathG54PostData.ProcessStartPoint.Slave
+				Slave = pathG54PostData.ProcessStartPoint.Slave,
+				A = pathG54PostData.ProcessStartPoint.A,
+				B = pathG54PostData.ProcessStartPoint.B,
+				C = pathG54PostData.ProcessStartPoint.C
 			};
 			pathG54PostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 		}
@@ -124,7 +142,10 @@ namespace MyCAM.Post
 				Y = exitPoint.Point.Y(),
 				Z = exitPoint.Point.Z(),
 				Master = endInfoOfLastPath.Master,
-				Slave = endInfoOfLastPath.Slave
+				Slave = endInfoOfLastPath.Slave,
+				A = endInfoOfLastPath.A,
+				B = endInfoOfLastPath.B,
+				C = endInfoOfLastPath.C
 			};
 		}
 	}

@@ -151,6 +151,22 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		// robot euler angles for robot post processing
+		public double A
+		{
+			get; set;
+		}
+
+		public double B
+		{
+			get; set;
+		}
+
+		public double C
+		{
+			get; set;
+		}
+
 		public bool IsMicroJointStart
 		{
 			get; set;
@@ -169,6 +185,9 @@ namespace MyCAM.Data
 			newPoint.Z = Z;
 			newPoint.Master = Master;
 			newPoint.Slave = Slave;
+			newPoint.A = A;
+			newPoint.B = B;
+			newPoint.C = C;
 			newPoint.IsMicroJointStart = IsMicroJointStart;
 			newPoint.IsMicroJointEnd = IsMicroJointEnd;
 			return newPoint;
