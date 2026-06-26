@@ -172,7 +172,7 @@ namespace MyCAM
 		readonly Color DEFAULT_BtnColor = SystemColors.Control;
 		readonly Color ON_ButtonColor = Color.FromArgb( 233, 180, 159 );
 
-		const string SOFTWARE_Name = "新代激光五軸切割 0.27.0";
+		const string SOFTWARE_Name = "新代激光五軸切割 0.28.0";
 
 		enum EUIStatus
 		{
