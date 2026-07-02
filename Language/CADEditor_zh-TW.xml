@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="ImportFailed" Content="匯入失敗" />
+	<Message ID="PleaseSelectPart" Content="[操作提醒]請先選擇零件" />
+	<Message ID="NoPartData" Content="無零件資料" />
+	<Message ID="CreatePointFailed" Content="建立點位失敗" />
+</ResMap>

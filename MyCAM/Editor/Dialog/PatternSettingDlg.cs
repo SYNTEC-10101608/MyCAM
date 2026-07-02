@@ -1,4 +1,4 @@
-嚜簑sing MyCAM.Data;
+using MyCAM.Data;
 using System;
 using System.Windows.Forms;
 
@@ -11,7 +11,57 @@ namespace MyCAM.Editor.Dialog
 			m_StandardPatternGeomData = standardPatternGeomData;
 			m_PathType = standardPatternGeomData == null ? PathType.Contour : standardPatternGeomData.PathType;
 			InitializeComponent();
+			m_LanguageManager = new LanguageManager.LanguageManager( "PatternSettingDlg" );
+			ApplyResourcesToUI();
 			InitializeControlsValue();
+		}
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "PatternSettingDlg", this.Text );
+			label1.Text = m_LanguageManager.TryGetString( "m_lblPathType", label1.Text );
+			m_chkCoordReverse.Text = m_LanguageManager.TryGetString( "m_chkCoordReverse", m_chkCoordReverse.Text );
+			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnOK", m_btnConfirm.Text );
+
+			// circle panel labels
+			label6.Text = m_LanguageManager.TryGetString( "m_lblDiameter", label6.Text );
+			label7.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", label7.Text );
+
+			// rectangle panel labels
+			label2.Text = m_LanguageManager.TryGetString( "m_lblLength", label2.Text );
+			label3.Text = m_LanguageManager.TryGetString( "m_lblWidth", label3.Text );
+			label4.Text = m_LanguageManager.TryGetString( "m_lblCornerRadius", label4.Text );
+			label5.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", label5.Text );
+
+			// runway panel labels
+			label15.Text = m_LanguageManager.TryGetString( "m_lblLength", label15.Text );
+			label14.Text = m_LanguageManager.TryGetString( "m_lblWidth", label14.Text );
+			label12.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", label12.Text );
+
+			// polygon panel labels
+			label13.Text = m_LanguageManager.TryGetString( "m_lblSideLength", label13.Text );
+			label8.Text = m_LanguageManager.TryGetString( "m_lblCornerRadius", label8.Text );
+			label11.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", label11.Text );
+
+			// Update combo box items with localized strings
+			UpdatePathTypeComboBoxItems();
+		}
+
+		void UpdatePathTypeComboBoxItems()
+		{
+			int selectedIndex = m_cmbPathType.SelectedIndex;
+			m_cmbPathType.Items.Clear();
+
+			m_cmbPathType.Items.Add( m_LanguageManager.TryGetString( "PathType_Contour", PATH_TYPE_CONTOUR ) );
+			m_cmbPathType.Items.Add( m_LanguageManager.TryGetString( "PathType_Circle", PATH_TYPE_CIRCLE ) );
+			m_cmbPathType.Items.Add( m_LanguageManager.TryGetString( "PathType_Rectangle", PATH_TYPE_RECTANGLE ) );
+			m_cmbPathType.Items.Add( m_LanguageManager.TryGetString( "PathType_Runway", PATH_TYPE_RUNWAY ) );
+			m_cmbPathType.Items.Add( m_LanguageManager.TryGetString( "PathType_Triangle", PATH_TYPE_TRIANGLE ) );
+			m_cmbPathType.Items.Add( m_LanguageManager.TryGetString( "PathType_Square", PATH_TYPE_SQUARE ) );
+			m_cmbPathType.Items.Add( m_LanguageManager.TryGetString( "PathType_Pentagon", PATH_TYPE_PENTAGON ) );
+			m_cmbPathType.Items.Add( m_LanguageManager.TryGetString( "PathType_Hexagon", PATH_TYPE_HEXAGON ) );
+			if( selectedIndex >= 0 && selectedIndex < m_cmbPathType.Items.Count )
+				m_cmbPathType.SelectedIndex = selectedIndex;
 		}
 
 		void InitializeControlsValue()
@@ -672,7 +722,7 @@ namespace MyCAM.Editor.Dialog
 			const double EDGE_TANGENT_MULTIPLIER = 2.0;
 
 			// calculate interior angle and tangent distance
-			// interior angle = (n-2) * �� / n
+			// interior angle = (n-2) * π / n
 			double interiorAngle = ( sides - INTERIOR_ANGLE_NUMERATOR_OFFSET ) * Math.PI / sides;
 			double halfAngle = interiorAngle / EDGE_TANGENT_MULTIPLIER;
 			double tangentDistance = cornerRadius / Math.Tan( halfAngle );
@@ -704,5 +754,16 @@ namespace MyCAM.Editor.Dialog
 		double m_PolygonSideLength;
 		double m_PolygonCornerRadius;
 		double m_PolygonRotatedAngle_deg;
+
+		readonly LanguageManager.LanguageManager m_LanguageManager;
+
+		const string PATH_TYPE_CONTOUR = "輪廓";
+		const string PATH_TYPE_CIRCLE = "圓形";
+		const string PATH_TYPE_RECTANGLE = "長方形";
+		const string PATH_TYPE_RUNWAY = "跑道形";
+		const string PATH_TYPE_TRIANGLE = "三角形";
+		const string PATH_TYPE_SQUARE = "正方形";
+		const string PATH_TYPE_PENTAGON = "五角形";
+		const string PATH_TYPE_HEXAGON = "六角形";
 	}
 }

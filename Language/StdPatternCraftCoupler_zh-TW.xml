@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="HandleCouplerCraftFailed" Content="StdPatternCraftCoupler.HandleCouplerCraftForStartPoint 失敗: {0}" />
+</ResMap>

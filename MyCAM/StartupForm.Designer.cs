@@ -35,6 +35,7 @@
 			this.m_tsmiSimulation = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsbSetting = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsbVNCConnection = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsmiLanguage = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsbController = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsCAMFunction = new System.Windows.Forms.ToolStrip();
 			this.m_tsbAddPath = new System.Windows.Forms.ToolStripButton();
@@ -193,8 +194,9 @@
 			// 
 			// m_tsbSetting
 			// 
-			this.m_tsbSetting.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsbVNCConnection});
+			this.m_tsbSetting.DropDownItems.AddRange( new System.Windows.Forms.ToolStripItem[] {
+				this.m_tsbVNCConnection,
+				this.m_tsmiLanguage} );
 			this.m_tsbSetting.Name = "m_tsbSetting";
 			this.m_tsbSetting.Size = new System.Drawing.Size(43, 20);
 			this.m_tsbSetting.Text = "設定";
@@ -205,6 +207,12 @@
 			this.m_tsbVNCConnection.Size = new System.Drawing.Size(148, 22);
 			this.m_tsbVNCConnection.Text = "VNC連線設定";
 			this.m_tsbVNCConnection.Click += new System.EventHandler(this.m_tsbVNCConnection_Click);
+			// 
+			// m_tsmiLanguage
+			// 
+			this.m_tsmiLanguage.Name = "m_tsmiLanguage";
+			this.m_tsmiLanguage.Size = new System.Drawing.Size( 148, 22 );
+			this.m_tsmiLanguage.Text = "語系切換";
 			// 
 			// m_tsbController
 			// 
@@ -1019,7 +1027,7 @@
 			this.m_tsbLayer1.Name = "m_tsbLayer1";
 			this.m_tsbLayer1.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer1.Text = "1";
-			this.m_tsbLayer1.ToolTipText = "圖層1";
+			this.m_tsbLayer1.ToolTipText = "";
 			this.m_tsbLayer1.Click += new System.EventHandler(this.m_tsbLayer1_Click);
 			// 
 			// m_tsbLayer2
@@ -1030,7 +1038,7 @@
 			this.m_tsbLayer2.Name = "m_tsbLayer2";
 			this.m_tsbLayer2.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer2.Text = "2";
-			this.m_tsbLayer2.ToolTipText = "圖層2";
+			this.m_tsbLayer2.ToolTipText = "";
 			this.m_tsbLayer2.Click += new System.EventHandler(this.m_tsbLayer2_Click);
 			// 
 			// m_tsbLayer3
@@ -1042,7 +1050,7 @@
 			this.m_tsbLayer3.Name = "m_tsbLayer3";
 			this.m_tsbLayer3.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer3.Text = "3";
-			this.m_tsbLayer3.ToolTipText = "圖層3";
+			this.m_tsbLayer3.ToolTipText = "";
 			this.m_tsbLayer3.Click += new System.EventHandler(this.m_tsbLayer3_Click);
 			// 
 			// m_tsbLayer4
@@ -1053,7 +1061,7 @@
 			this.m_tsbLayer4.Name = "m_tsbLayer4";
 			this.m_tsbLayer4.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer4.Text = "4";
-			this.m_tsbLayer4.ToolTipText = "圖層4";
+			this.m_tsbLayer4.ToolTipText = "";
 			this.m_tsbLayer4.Click += new System.EventHandler(this.m_tsbLayer4_Click);
 			// 
 			// m_tsbLayer5
@@ -1065,7 +1073,7 @@
 			this.m_tsbLayer5.Name = "m_tsbLayer5";
 			this.m_tsbLayer5.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer5.Text = "5";
-			this.m_tsbLayer5.ToolTipText = "圖層5";
+			this.m_tsbLayer5.ToolTipText = "";
 			this.m_tsbLayer5.Click += new System.EventHandler(this.m_tsbLayer5_Click);
 			// 
 			// m_tsbLayer6
@@ -1076,7 +1084,7 @@
 			this.m_tsbLayer6.Name = "m_tsbLayer6";
 			this.m_tsbLayer6.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer6.Text = "6";
-			this.m_tsbLayer6.ToolTipText = "圖層6";
+			this.m_tsbLayer6.ToolTipText = "";
 			this.m_tsbLayer6.Click += new System.EventHandler(this.m_tsbLayer6_Click);
 			// 
 			// m_tsbLayer7
@@ -1087,7 +1095,7 @@
 			this.m_tsbLayer7.Name = "m_tsbLayer7";
 			this.m_tsbLayer7.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer7.Text = "7";
-			this.m_tsbLayer7.ToolTipText = "圖層7";
+			this.m_tsbLayer7.ToolTipText = "";
 			this.m_tsbLayer7.Click += new System.EventHandler(this.m_tsbLayer7_Click);
 			// 
 			// m_tsbLayer8
@@ -1099,7 +1107,7 @@
 			this.m_tsbLayer8.Name = "m_tsbLayer8";
 			this.m_tsbLayer8.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer8.Text = "8";
-			this.m_tsbLayer8.ToolTipText = "圖層8";
+			this.m_tsbLayer8.ToolTipText = "";
 			this.m_tsbLayer8.Click += new System.EventHandler(this.m_tsbLayer8_Click);
 			// 
 			// m_tsbLayer9
@@ -1110,7 +1118,7 @@
 			this.m_tsbLayer9.Name = "m_tsbLayer9";
 			this.m_tsbLayer9.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer9.Text = "9";
-			this.m_tsbLayer9.ToolTipText = "圖層9";
+			this.m_tsbLayer9.ToolTipText = "";
 			this.m_tsbLayer9.Click += new System.EventHandler(this.m_tsbLayer9_Click);
 			// 
 			// m_tsbLayer10
@@ -1121,7 +1129,7 @@
 			this.m_tsbLayer10.Name = "m_tsbLayer10";
 			this.m_tsbLayer10.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer10.Text = "10";
-			this.m_tsbLayer10.ToolTipText = "圖層10";
+			this.m_tsbLayer10.ToolTipText = "";
 			this.m_tsbLayer10.Click += new System.EventHandler(this.m_tsbLayer10_Click);
 			// 
 			// m_tsViewerToolBar
@@ -1242,8 +1250,8 @@
 			this.m_tsbShowVec.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowVec.Name = "m_tsbShowVec";
 			this.m_tsbShowVec.Size = new System.Drawing.Size(22, 24);
-			this.m_tsbShowVec.Text = "顯示姿態";
-			this.m_tsbShowVec.ToolTipText = "顯示姿態";
+			this.m_tsbShowVec.Text = "";
+			this.m_tsbShowVec.ToolTipText = "";
 			this.m_tsbShowVec.CheckedChanged += new System.EventHandler(this.m_tsbShowVec_CheckedChanged);
 			// 
 			// m_tsbShowOrder
@@ -1256,8 +1264,8 @@
 			this.m_tsbShowOrder.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowOrder.Name = "m_tsbShowOrder";
 			this.m_tsbShowOrder.Size = new System.Drawing.Size(22, 24);
-			this.m_tsbShowOrder.Text = "顯示順序";
-			this.m_tsbShowOrder.ToolTipText = "顯示順序";
+			this.m_tsbShowOrder.Text = "";
+			this.m_tsbShowOrder.ToolTipText = "";
 			this.m_tsbShowOrder.CheckedChanged += new System.EventHandler(this.m_tsbShowOrder_CheckedChanged);
 			// 
 			// m_tsbShowOrientation
@@ -1270,8 +1278,8 @@
 			this.m_tsbShowOrientation.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowOrientation.Name = "m_tsbShowOrientation";
 			this.m_tsbShowOrientation.Size = new System.Drawing.Size(22, 24);
-			this.m_tsbShowOrientation.Text = "顯示路徑方向";
-			this.m_tsbShowOrientation.ToolTipText = "顯示路徑方向";
+			this.m_tsbShowOrientation.Text = "";
+			this.m_tsbShowOrientation.ToolTipText = "";
 			this.m_tsbShowOrientation.CheckedChanged += new System.EventHandler(this.m_tsbShowOrientation_CheckedChanged);
 			// 
 			// m_tsbShowTraverse
@@ -1284,8 +1292,8 @@
 			this.m_tsbShowTraverse.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowTraverse.Name = "m_tsbShowTraverse";
 			this.m_tsbShowTraverse.Size = new System.Drawing.Size(22, 24);
-			this.m_tsbShowTraverse.Text = "顯示抬下刀路徑";
-			this.m_tsbShowTraverse.ToolTipText = "顯示抬下刀路徑";
+			this.m_tsbShowTraverse.Text = "";
+			this.m_tsbShowTraverse.ToolTipText = "";
 			this.m_tsbShowTraverse.CheckedChanged += new System.EventHandler(this.m_tsbShowTraverse_CheckedChanged);
 			// 
 			// m_panBackGround
@@ -1327,7 +1335,7 @@
 			this.MainMenuStrip = this.m_msMode;
 			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "StartupForm";
-			this.Text = "新代激光五軸切割";
+			this.Text = "新代雷射五軸切割";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.StartupForm_FormClosing);
 			this.Resize += new System.EventHandler(this.StartupForm_Resize);
 			this.m_msMode.ResumeLayout(false);
@@ -1469,6 +1477,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbManualOrder;
 		private System.Windows.Forms.ToolStripButton m_tsbAddTube;
 		private System.Windows.Forms.ToolStripButton m_tsbAddRevolution;
+		private System.Windows.Forms.ToolStripMenuItem m_tsmiLanguage;
 	}
 }
 

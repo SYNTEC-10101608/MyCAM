@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="CompensationExceedsLimit" Content="路径超出补偿范围，请调整补偿数值" />
+</ResMap>

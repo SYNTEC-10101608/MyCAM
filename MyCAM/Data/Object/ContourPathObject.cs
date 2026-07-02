@@ -110,12 +110,15 @@ namespace MyCAM.Data
 				return startPoint.IsEqual( endPoint, 1e-3 );
 			}
 			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"Error occurred while determining a closed path.: {ex.Message}", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "DetermineClosedPathError", DETERMINE_CLOSED_PATH_ERROR ), ex.Message ), MyApp.NoticeType.Warning );
 				return false;
 			}
 		}
 
 		ContourGeomData m_ContourGeomData;
 		ContourCache m_ContourCache;
+
+		const string DETERMINE_CLOSED_PATH_ERROR = "判斷路徑是否封閉時發生錯誤: {0}";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ContourPathObject" );
 	}
 }

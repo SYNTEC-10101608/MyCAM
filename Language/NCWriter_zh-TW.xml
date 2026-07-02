@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Error_PostProcessing" Content="後處理運算錯誤，路徑：{0}" />
+</ResMap>

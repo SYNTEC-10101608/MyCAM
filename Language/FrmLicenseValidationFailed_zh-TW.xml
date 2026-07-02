@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="FormTitle" Content="授權驗證失敗" />
+  <Message ID="m_btnExit" Content="結束程式" />
+  <Message ID="ButtonText_Retry" Content="重新輸入" />
+  <Message ID="ButtonText_RestartActivation" Content="重新進行產品授權" />
+  <Message ID="Hint_LicenseCodeInvalid" Content="授權碼無效或不被識別，請確認是否輸入正確或聯絡支援" />
+  <Message ID="Hint_LicenseFileInvalid" Content="授權資料已損毀或遭竄改，無法完成驗證" />
+  <Message ID="Hint_MachineMismatch" Content="此授權已綁定至其他電腦，偵測到本機硬體識別與授權不符" />
+  <Message ID="Hint_VersionMismatch" Content="當前軟體版本不符合授權要求" />
+</ResMap>

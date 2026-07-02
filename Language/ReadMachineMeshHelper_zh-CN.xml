@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="MeshFolderPathError" Content="机构文件夹路径错误" />
+	<Message ID="MeshFileMissing" Content="{0} 图文件缺漏" />
+	<Message ID="MeshFileReadFailed" Content="{0} 文件读取失败" />
+	<Message ID="MeshFileUnknownError" Content="{0} STL读取失败，发生未知错误" />
+</ResMap>

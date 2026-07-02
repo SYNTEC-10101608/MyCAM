@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="NotCircularArc" Content="非正圓弧" />
+	<Message ID="InvalidEdge" Content="錯誤線段" />
+	<Message ID="InvalidPoint" Content="非法點位" />
+</ResMap>

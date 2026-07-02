@@ -7,9 +7,7 @@ namespace FALicenseChecker
 		public FrmLicenseValidationFailed()
 		{
 			InitializeComponent();
-
-			Text = "授權驗證失敗";
-			m_btnExit.Text = "結束程式";
+			ApplyResourcesToUI();
 		}
 
 		public enum EButtonShowMode
@@ -28,34 +26,45 @@ namespace FALicenseChecker
 
 		public DialogResult ShowDialog( EButtonShowMode mode, EHintID hint )
 		{
+			// apply action button text; designer-time "Restart Activation" / "Retry" is kept as fallback when lookup misses
 			switch( mode ) {
 				case EButtonShowMode.Retry:
-					m_btnAction.Text = "重新輸入";
+					m_btnAction.Text = m_LanguageManager.TryGetString( "ButtonText_Retry", m_btnAction.Text );
 					break;
 				case EButtonShowMode.RestartActivation:
-					m_btnAction.Text = "重新進行產品授權";
+					m_btnAction.Text = m_LanguageManager.TryGetString( "ButtonText_RestartActivation", m_btnAction.Text );
 					break;
 				default:
 					break;
 			}
 
+			// apply hint label text; designer-time English hint is kept as fallback when lookup misses
 			switch( hint ) {
 				case EHintID.LicenseCodeInvalid:
-					lblHint.Text = "授權碼無效或不被識別，請確認是否輸入正確或聯絡支援";
+					lblHint.Text = m_LanguageManager.TryGetString( "Hint_LicenseCodeInvalid", lblHint.Text );
 					break;
 				case EHintID.LicenseFileInvalid:
-					lblHint.Text = "授權資料已損毀或遭竄改，無法完成驗證";
+					lblHint.Text = m_LanguageManager.TryGetString( "Hint_LicenseFileInvalid", lblHint.Text );
 					break;
 				case EHintID.MachineMismatch:
-					lblHint.Text = "此授權已綁定至其他電腦，偵測到本機硬體識別與授權不符";
+					lblHint.Text = m_LanguageManager.TryGetString( "Hint_MachineMismatch", lblHint.Text );
 					break;
 				case EHintID.VersionMismatch:
-					lblHint.Text = "當前軟體版本不符合授權要求";
+					lblHint.Text = m_LanguageManager.TryGetString( "Hint_VersionMismatch", lblHint.Text );
 					break;
 				default:
 					break;
 			}
 			return ShowDialog();
 		}
+
+		void ApplyResourcesToUI()
+		{
+			// form title and exit button; designer-time text is kept as fallback when lookup misses
+			this.Text = m_LanguageManager.TryGetString( "FormTitle", this.Text );
+			m_btnExit.Text = m_LanguageManager.TryGetString( "m_btnExit", m_btnExit.Text );
+		}
+
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "FrmLicenseValidationFailed" );
 	}
 }

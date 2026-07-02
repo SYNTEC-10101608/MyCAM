@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Width" Content="宽" />
+  <Message ID="Height" Content="高" />
+  <Message ID="Fillet" Content="导角半径" />
+</ResMap>

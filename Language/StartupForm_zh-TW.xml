@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="FormTitle" Content="新代雷射五軸切割 {0}" />
+	<Message ID="Log_LicenseInvalid" Content="授權流程不正確" />
+	<Message ID="Log_LicenseInvalidTitle" Content="授權錯誤" />
+	
+	<!-- 選單列 -->
+	<Message ID="m_tsmiFile" Content="檔案" />
+	<Message ID="m_tsmiCAD" Content="CAD" />
+	<Message ID="m_tsmiCAM" Content="CAM" />
+	<Message ID="m_tsmiSimulation" Content="模擬" />
+	<Message ID="m_tsbSetting" Content="設定" />
+	<Message ID="m_tsbVNCConnection" Content="VNC連線設定" />
+	<Message ID="m_tsmiLanguage" Content="語系切換" />
+	<Message ID="m_tsbController" Content="控制器" />
+
+	<!-- 檔案工具列 -->
+	<Message ID="m_tsbImport3DFile" Content="3D模型" />
+	<Message ID="m_tsbImport3DFile_ToolTip" Content="3D模型" />
+	<Message ID="m_tsbAddRevolution" Content="迴轉體" />
+	<Message ID="m_tsbAddRevolution_ToolTip" Content="迴轉體" />
+	<Message ID="m_tsbReadProjectFile" Content="匯入專案" />
+	<Message ID="m_tsbReadProjectFile_ToolTip" Content="匯入專案" />
+	<Message ID="m_tsbSaveProjectFile" Content="儲存專案" />
+	<Message ID="m_tsbSaveProjectFile_ToolTip" Content="儲存專案" />
+	<Message ID="m_tsbAddTube" Content="設計管件" />
+	<Message ID="m_tsbAddTube_ToolTip" Content="設計管件" />
+
+	<!-- CAD工具列 -->
+	<Message ID="m_tsbSewPart" Content="模型縫補" />
+	<Message ID="m_tsbSewPart_ToolTip" Content="模型縫補" />
+	<Message ID="m_tsbAddPoint_AcrCenter" Content="圓弧中心" />
+	<Message ID="m_tsbAddPoint_AcrCenter_ToolTip" Content="圓弧中心" />
+	<Message ID="m_tsbAddPoint_EdgeCenter" Content="線段中心" />
+	<Message ID="m_tsbAddPoint_EdgeCenter_ToolTip" Content="線段中心" />
+	<Message ID="m_tsbAddPoint_PointCenter" Content="兩點中心" />
+	<Message ID="m_tsbAddPoint_PointCenter_ToolTip" Content="兩點中心" />
+	<Message ID="m_tsbAddPoint_BoundingBoxCenter" Content="包圍盒中心" />
+	<Message ID="m_tsbAddPoint_BoundingBoxCenter_ToolTip" Content="包圍盒中心" />
+	<Message ID="m_tsbAddLine_TwoVertexConnect" Content="兩點連線" />
+	<Message ID="m_tsbAddLine_TwoVertexConnect_ToolTip" Content="兩點連線" />
+	<Message ID="m_tsbManualTransform" Content="工件對齊" />
+	<Message ID="m_tsbManualTransform_ToolTip" Content="工件對齊" />
+	<Message ID="m_tsb3PntTransform" Content="三點轉換" />
+	<Message ID="m_tsb3PntTransform_ToolTip" Content="三點轉換" />
+	<Message ID="m_tsbAxisTransform" Content="軸向轉換" />
+	<Message ID="m_tsbAxisTransform_ToolTip" Content="軸向轉換" />
+
+	<!-- CAM工具列 -->
+	<Message ID="m_tsbAddPath" Content="新增路徑" />
+	<Message ID="m_tsbAddPath_ToolTip" Content="新增路徑" />
+	<Message ID="m_tsbDeletePath" Content="刪除路徑" />
+	<Message ID="m_tsbDeletePath_ToolTip" Content="刪除路徑" />
+	<Message ID="m_tsbStartPoint" Content="起點" />
+	<Message ID="m_tsbStartPoint_ToolTip" Content="起點" />
+	<Message ID="m_tsbReverse" Content="反向" />
+	<Message ID="m_tsbReverse_ToolTip" Content="反向" />
+	<Message ID="m_tsbSetLead" Content="引線" />
+	<Message ID="m_tsbSetLead_ToolTip" Content="引線" />
+	<Message ID="m_tsbOverCut" Content="過切" />
+	<Message ID="m_tsbOverCut_ToolTip" Content="過切" />
+	<Message ID="m_tsbMicroJoint" Content="微連" />
+	<Message ID="m_tsbMicroJoint_ToolTip" Content="微連" />
+	<Message ID="m_tsbToolVecReverse" Content="姿態反向" />
+	<Message ID="m_tsbToolVecReverse_ToolTip" Content="姿態反向" />
+	<Message ID="m_tsbToolVec" Content="姿態調適" />
+	<Message ID="m_tsbToolVec_ToolTip" Content="姿態調適" />
+	<Message ID="m_tsbFixedToolVec" Content="鎖軸切割" />
+	<Message ID="m_tsbFixedToolVec_ToolTip" Content="鎖軸切割" />
+	<Message ID="m_tsbOptimizeIK" Content="優化軸向" />
+	<Message ID="m_tsbOptimizeIK_ToolTip" Content="優化軸向" />
+	<Message ID="m_tsbManualOrder" Content="手動排序" />
+	<Message ID="m_tsbManualOrder_ToolTip" Content="手動排序" />
+	<Message ID="m_tsbAutoOrder" Content="自動排序" />
+	<Message ID="m_tsbAutoOrder_ToolTip" Content="自動排序" />
+	<Message ID="m_tsbSetTraverseData" Content="空移" />
+	<Message ID="m_tsbSetTraverseData_ToolTip" Content="空移" />
+	<Message ID="m_tsbEntryAndExitSetting" Content="進入/退出" />
+	<Message ID="m_tsbEntryAndExitSetting_ToolTip" Content="進入/退出" />
+	<Message ID="m_tsbPatternSetting" Content="標準圖元" />
+	<Message ID="m_tsbPatternSetting_ToolTip" Content="標準圖元" />
+	<Message ID="m_tsbPathEdit" Content="路徑編輯" />
+	<Message ID="m_tsbPathEdit_ToolTip" Content="路徑編輯" />
+	<Message ID="m_BtnContourEdit" Content="輪廓編輯" />
+	<Message ID="m_BtnContourEdit_ToolTip" Content="輪廓編輯" />
+	<Message ID="m_tsbPathCompensation" Content="路徑補償" />
+	<Message ID="m_tsbPathCompensation_ToolTip" Content="路徑補償" />
+	<Message ID="m_tsbCalibrationPnt" Content="三點校正" />
+	<Message ID="m_tsbCalibrationPnt_ToolTip" Content="三點校正" />
+	<Message ID="m_tsbConvertNC" Content="轉出NC" />
+	<Message ID="m_tsbConvertNC_ToolTip" Content="轉出NC" />
+
+	<!-- 新增路徑子工具列 -->
+	<Message ID="m_tsAddPathForHat" Content="異形蓋件-生成路徑" />
+	<Message ID="m_tsAddPathForTube" Content="管拉件-生成路徑" />
+	<Message ID="m_tsbSelectD1ContFace" Content="沿D1邊新增路徑" />
+	<Message ID="m_tsbSelPath_FreeBound" Content="自由邊界" />
+	<Message ID="m_tsbSelPath_Manual" Content="手動選取邊界" />
+	<Message ID="m_tsbManualSelectPathOK" Content="確定選取" />
+
+	<!-- 模擬工具列 -->
+	<Message ID="m_btnPlay" Content="播放" />
+	<Message ID="m_btnPlay_ToolTip" Content="播放" />
+	<Message ID="m_btnPause" Content="暫停" />
+	<Message ID="m_btnPause_ToolTip" Content="暫停" />
+	<Message ID="m_btnStop" Content="停止" />
+	<Message ID="m_btnStop_ToolTip" Content="停止" />
+	<Message ID="m_btnPreviousPath" Content="前路徑" />
+	<Message ID="m_btnPreviousPath_ToolTip" Content="前路徑" />
+	<Message ID="m_btnNextPath" Content="後路徑" />
+	<Message ID="m_btnNextPath_ToolTip" Content="後路徑" />
+	<Message ID="m_btnPreCollision" Content="前碰撞點" />
+	<Message ID="m_btnPreCollision_ToolTip" Content="前碰撞點" />
+	<Message ID="m_btnNextCol" Content="後碰撞點" />
+	<Message ID="m_btnNextCol_ToolTip" Content="後碰撞點" />
+	<Message ID="m_btnPrePoint" Content="上一步" />
+	<Message ID="m_btnPrePoint_ToolTip" Content="上一步" />
+	<Message ID="m_btnNextPoint" Content="下一步" />
+	<Message ID="m_btnNextPoint_ToolTip" Content="下一步" />
+	<Message ID="m_btnSpeedUp" Content="加速" />
+	<Message ID="m_btnSpeedUp_ToolTip" Content="加速" />
+	<Message ID="m_btnSlowDonw" Content="減速" />
+	<Message ID="m_btnSlowDonw_ToolTip" Content="減速" />
+	<Message ID="m_btnCheck" Content="碰撞檢查" />
+	<Message ID="m_btnCheck_ToolTip" Content="碰撞檢查" />
+
+	<!-- 提示字串 -->
+	<Message ID="ShowVec" Content="顯示姿態" />
+	<Message ID="ShowOrder" Content="顯示順序" />
+	<Message ID="ShowOrientation" Content="顯示路徑方向" />
+	<Message ID="ShowTraverse" Content="顯示抬下刀路徑" />
+	<Message ID="Layer" Content="圖層{0}" />
+
+	<Message ID="Log_UseDefaultMachineProject" Content="使用默認機構專案檔" />
+	<Message ID="Log_MachineNodeNull" Content="機構參數節點為空,使用默認機構參數" />
+	<Message ID="Log_MachineFileNull" Content="機構檔案為空,使用默認機構參數" />
+	<Message ID="Log_MachineParamError" Content="機構參數錯誤(Pr:{0}),使用默認機構參數" />
+	<Message ID="Log_MachineTreeInvalid" Content="機構樹結構錯誤,使用默認機構樹" />
+	<Message ID="Log_MachineFileReadFailed" Content="讀取機構檔案失敗：\n{0},使用默認機構參數" />
+	<Message ID="Log_VNCFileNotFound" Content="找不到VNC執行檔，請確認VNC執行檔與程式執行檔在同一資料夾下" />
+	<Message ID="Log_VNCConnectFailed" Content="無法連線到指定IP位置" />
+	<Message ID="Log_VNCUnknownError" Content="VNC連線過程發生未知錯誤" />
+	<Message ID="Log_RevolutionFailed" Content="迴轉體建立失敗" />
+</ResMap>

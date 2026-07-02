@@ -314,7 +314,7 @@ namespace MyCAM.Editor
 					End();
 				}
 				else {
-					m_ManualTransformDlg.ShowConstraintError( "對齊無效，選取的物件並非平面、直線、或正圓弧，請重新選擇" );
+					m_ManualTransformDlg.ShowConstraintError( "ShowConstraintError" );
 				}
 			};
 

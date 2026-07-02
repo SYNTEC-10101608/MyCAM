@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Error_Title" Content="错误" />
+  <Message ID="Error_IsLicenseActivatedException" Content="授权验证发生异常：{0}" />
+  <Message ID="Error_LicenseFileEmpty" Content="授权文件为空或无法读取" />
+  <Message ID="Error_LicenseFileSignatureFailed" Content="授权文件签名验证失败" />
+  <Message ID="Error_LicenseFileNoSignature" Content="授权文件缺少签名字段" />
+  <Message ID="Error_LicenseMissingFields" Content="授权文件缺少必要字段（Customer/HWID）" />
+  <Message ID="Error_EntryAssemblyNull_Version" Content="无法获取程序集信息，版本验证失败" />
+  <Message ID="Error_ProductMismatch" Content="授权产品名称不符。预期：{0}，当前：{1}" />
+  <Message ID="Error_MinVersionNotMet" Content="授权最低版本需求不符。要求：{0}，当前：{1}" />
+  <Message ID="Error_MaxVersionExceeded" Content="授权版本超出限制。允许至：{0}，当前：{1}" />
+  <Message ID="Error_ReadLicenseFileFailed" Content="授权文件读取失败：{0}" />
+  <Message ID="Error_InstallLicenseFailed" Content="安装授权失败：{0}" />
+  <Message ID="Error_LicenseCodeEmpty" Content="授权码不得为空" />
+  <Message ID="Error_LicenseCodeNoSignature" Content="输入的授权码不含签名" />
+  <Message ID="Error_LicenseCodeInvalidBase64" Content="授权码格式无效（非 Base64）" />
+  <Message ID="Error_EntryAssemblyNull_Request" Content="无法获取程序集信息，无法生成激活请求" />
+  <Message ID="Error_ProductEmpty_Request" Content="产品名称不得为空，无法生成激活请求" />
+  <Message ID="Error_VersionEmpty_Request" Content="版本号不得为空，无法生成激活请求" />
+  <Message ID="Info_ActivationRequestGenerated" Content="授权激活请求文件已生成于：&#10;{0}&#10;&#10;请将此文件发送给供应商以获取授权代码。" />
+  <Message ID="Info_ActivationRequestGeneratedTitle" Content="授权请求已生成" />
+</ResMap>

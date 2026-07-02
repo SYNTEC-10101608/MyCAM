@@ -1,4 +1,4 @@
-ï»¿using MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRep;
@@ -95,7 +95,7 @@ namespace MyCAM.Editor
 
 					// check point coincidence
 					if( slectedPoint.IsEqual( m_1stPoint, 1e-6 ) ) {
-						MyApp.Logger.ShowOnLogPanel( "é‡åˆçš„ç¬¬äºŒå€‹é»", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CoincidentSecondPoint", COINCIDENT_SECOND_POINT ), MyApp.NoticeType.Warning );
 						return;
 					}
 					m_2ndPoint = slectedPoint;
@@ -107,7 +107,7 @@ namespace MyCAM.Editor
 
 					// check point coincidence
 					if( slectedPoint.IsEqual( m_1stPoint, 1e-6 ) || slectedPoint.IsEqual( m_2ndPoint, 1e-6 ) ) {
-						MyApp.Logger.ShowOnLogPanel( "é‡åˆçš„ç¬¬ä¸‰å€‹é»", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CoincidentThirdPoint", COINCIDENT_THIRD_POINT ), MyApp.NoticeType.Warning );
 						return;
 					}
 					m_3rdPoint = slectedPoint;
@@ -116,7 +116,7 @@ namespace MyCAM.Editor
 					gp_Vec v12 = new gp_Vec( m_1stPoint, m_2ndPoint );
 					gp_Vec v13 = new gp_Vec( m_1stPoint, m_3rdPoint );
 					if( v12.IsParallel( v13, 1e-3 ) ) {
-						MyApp.Logger.ShowOnLogPanel( "3é»å…±ç·š", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ThreePointsCollinear", THREE_POINTS_COLLINEAR ), MyApp.NoticeType.Warning );
 						return;
 					}
 
@@ -165,13 +165,13 @@ namespace MyCAM.Editor
 		void StartTrans( TransParam transParam )
 		{
 			if( !isValisParam( transParam ) ) {
-				MyApp.Logger.ShowOnLogPanel( "ç„¡æ•ˆçš„è»¸å‘åƒæ•¸", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "InvalidAxisParam", INVALID_AXIS_PARAM ), MyApp.NoticeType.Warning );
 				End();
 				return;
 			}
 			// create 3-point coordinate system
 			if( !VectorTool.Create3PCoordSystem( transParam.MachineP1, transParam.MachineP2, transParam.MachineP3, out gp_Ax3 machineCoordSys ) ) {
-				MyApp.Logger.ShowOnLogPanel( "ç„¡æ³•å‰µå»ºä¸‰é»åº§æ¨™ç³»", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotCreate3PCoordSystem", CANNOT_CREATE_3P_COORD_SYSTEM ), MyApp.NoticeType.Warning );
 				End();
 				return;
 			}
@@ -208,5 +208,12 @@ namespace MyCAM.Editor
 		gp_Trsf m_3PTransform;
 		AIS_TextLabel m_LabelO;
 		AIS_TextLabel m_LabelX;
+
+		const string COINCIDENT_SECOND_POINT = "­«¦Xªº²Ä¤G­ÓÂI";
+		const string COINCIDENT_THIRD_POINT = "­«¦Xªº²Ä¤T­ÓÂI";
+		const string THREE_POINTS_COLLINEAR = "3ÂI¦@½u";
+		const string INVALID_AXIS_PARAM = "µL®Äªº¶b¦V°Ñ¼Æ";
+		const string CANNOT_CREATE_3P_COORD_SYSTEM = "µLªk³Ğ«Ø¤TÂI®y¼Ğ¨t";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ThreePtTransformAction" );
 	}
 }

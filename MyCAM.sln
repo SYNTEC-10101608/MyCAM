@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileTranslator", "FileTrans
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonData", "CommonData\CommonData.csproj", "{C5376E98-C3EA-4CF1-839C-122EB0A9300B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanguageManager", "LanguageManager\LanguageManager.csproj", "{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -125,6 +127,18 @@ Global
 		{C5376E98-C3EA-4CF1-839C-122EB0A9300B}.Release|x64.Build.0 = Release|Any CPU
 		{C5376E98-C3EA-4CF1-839C-122EB0A9300B}.Release|x86.ActiveCfg = Release|Any CPU
 		{C5376E98-C3EA-4CF1-839C-122EB0A9300B}.Release|x86.Build.0 = Release|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Debug|x64.Build.0 = Debug|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Debug|x86.Build.0 = Debug|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Release|x64.ActiveCfg = Release|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Release|x64.Build.0 = Release|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Release|x86.ActiveCfg = Release|Any CPU
+		{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

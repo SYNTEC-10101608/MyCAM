@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="InvalidFlagPosition" Content="[操作提醒]旗標位置無效" />
+	<Message ID="NoPathSelected" Content="[操作提醒]未選取任何路徑" />
+	<Message ID="OnlySinglePathSelection" Content="[操作提醒]本功能僅支援單路徑選擇" />
+</ResMap>

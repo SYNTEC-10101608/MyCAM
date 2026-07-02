@@ -56,7 +56,7 @@ namespace MyCAM.Editor
 
 			// import false still can calculate FK
 			if( isMachineAISReady == false ) {
-				MyApp.Logger.ShowOnLogPanel( "機構圖檔讀取失敗", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "MachineFileReadFailed", MACHINE_FILE_READ_FAILED ), MyApp.NoticeType.Warning );
 				return;
 			}
 		}
@@ -277,7 +277,7 @@ namespace MyCAM.Editor
 					return;
 				}
 			}
-			MyApp.Logger.ShowOnLogPanel( "已到達第一個碰撞點", MyApp.NoticeType.Hint );
+			MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ReachedFirstCollision", REACHED_FIRST_COLLISION ), MyApp.NoticeType.Hint );
 			m_TreeView.Enabled = true;
 		}
 
@@ -301,7 +301,7 @@ namespace MyCAM.Editor
 					return;
 				}
 			}
-			MyApp.Logger.ShowOnLogPanel( "已到達最後一個碰撞點", MyApp.NoticeType.Hint );
+			MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ReachedLastCollision", REACHED_LAST_COLLISION ), MyApp.NoticeType.Hint );
 			m_TreeView.Enabled = true;
 		}
 
@@ -400,10 +400,10 @@ namespace MyCAM.Editor
 			CalSimulationResult();
 			if( m_CollisionFrame != null && m_CollisionFrame.Count > 0 ) {
 				if( m_CollisionFrame.Contains( true ) ) {
-					MyApp.Logger.ShowOnLogPanel( "路徑有碰撞,請檢察模擬結果", MyApp.NoticeType.Warning, true );
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PathHasCollision", PATH_HAS_COLLISION ), MyApp.NoticeType.Warning, true );
 					return;
 				}
-				MyApp.Logger.ShowOnLogPanel( "路徑沒有碰撞", MyApp.NoticeType.Warning, true );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PathNoCollision", PATH_NO_COLLISION ), MyApp.NoticeType.Warning, true );
 			}
 		}
 
@@ -460,7 +460,7 @@ namespace MyCAM.Editor
 			NCWriter writer = new NCWriter( m_DataManager );
 			bool bSuccess = writer.ConvertPostDataListSuccess( out string szErrorMessage, out List<PostData> postDataList );
 			if( !bSuccess ) {
-				MyApp.Logger.ShowOnLogPanel( "後處理失敗, 無法生成模擬: " + szErrorMessage, MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PostProcessFailed", POST_PROCESS_FAILED ) + szErrorMessage, MyApp.NoticeType.Warning );
 				return new List<PostData>();
 			}
 			return postDataList;
@@ -912,7 +912,7 @@ namespace MyCAM.Editor
 		void CalSimulationResult()
 		{
 			if( m_DataManager == null || m_DataManager.PathIDList == null || m_DataManager.PathIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "尚無路徑能夠參與模擬", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoPathForSimulation", NO_PATH_FOR_SIMULATION ), MyApp.NoticeType.Hint );
 				return;
 			}
 			if( m_IsNeedReCal ) {
@@ -932,14 +932,14 @@ namespace MyCAM.Editor
 		void SetSimuResult( SimuCalStatus status, SimuData.ResultData.SimuCalResult simuCalResult )
 		{
 			if( status == SimuCalStatus.Faild ) {
-				MyApp.Logger.ShowOnLogPanel( "模擬計算失敗，請確認機台設定及路徑設定是否正確", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "SimuCalcFailed", SIMU_CALC_FAILED ), MyApp.NoticeType.Warning );
 				return;
 			}
 			m_FrameTransformMap = simuCalResult.FrameTrasfMap ?? new Dictionary<MachineComponentType, List<gp_Trsf>>();
 			m_FrameCount = simuCalResult.FrameCount;
 			m_PathStartEndIndex = simuCalResult.PathStartEndIdxList ?? new List<SimuData.ResultData.PathStartEndIndex>();
 			if( status == SimuCalStatus.FrameCalDone ) {
-				MyApp.Logger.ShowOnLogPanel( "模擬計算完成，但碰撞計算失敗", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "SimuCalcDoneCollisionFailed", SIMU_CALC_DONE_COLLISION_FAILED ), MyApp.NoticeType.Warning );
 				return;
 			}
 			if( status == SimuCalStatus.CollisionCalDone ) {
@@ -1028,5 +1028,16 @@ namespace MyCAM.Editor
 		}
 
 		#endregion
+
+		const string MACHINE_FILE_READ_FAILED = "機構圖檔讀取失敗";
+		const string REACHED_FIRST_COLLISION = "已到達第一個碰撞點";
+		const string REACHED_LAST_COLLISION = "已到達最後一個碰撞點";
+		const string PATH_HAS_COLLISION = "路徑有碰撞,請檢察模擬結果";
+		const string PATH_NO_COLLISION = "路徑沒有碰撞";
+		const string POST_PROCESS_FAILED = "後處理失敗, 無法生成模擬: ";
+		const string NO_PATH_FOR_SIMULATION = "尚無路徑能夠參與模擬";
+		const string SIMU_CALC_FAILED = "模擬計算失敗，請確認機台設定及路徑設定是否正確";
+		const string SIMU_CALC_DONE_COLLISION_FAILED = "模擬計算完成，但碰撞計算失敗";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SimuEditor" );
 	}
 }

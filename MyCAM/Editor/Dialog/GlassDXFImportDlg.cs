@@ -1,6 +1,6 @@
+using MyCAM.App;
 using System;
 using System.Windows.Forms;
-using MyCAM.App;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -13,13 +13,26 @@ namespace MyCAM.Editor.Dialog
 		public GlassDXFImportDlg()
 		{
 			InitializeComponent();
+			m_LanguageManager = new LanguageManager.LanguageManager( "GlassDXFImportDlg" );
+			ApplyResourcesToUI();
+		}
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "GlassDXFImportDlg", this.Text );
+			m_lblRadius.Text = m_LanguageManager.TryGetString( "m_lblRadius", m_lblRadius.Text );
+			m_lblHeight.Text = m_LanguageManager.TryGetString( "m_lblHeight", m_lblHeight.Text );
+			m_btnOK.Text = m_LanguageManager.TryGetString( "m_btnOK", m_btnOK.Text );
+			m_btnCancel.Text = m_LanguageManager.TryGetString( "m_btnCancel", m_btnCancel.Text );
 		}
 
 		void BtnOK_Click( object sender, EventArgs e )
 		{
 			double radius = (double)m_tbxRadius.Value;
 			if( radius < 0 || radius > MAX_RADIUS ) {
-				MyApp.Logger.ShowOnLogPanel( $"圓球半徑需介於 0 ~ {MAX_RADIUS} mm", MyApp.NoticeType.Warning, true );
+
+				string message = string.Format( m_LanguageManager.TryGetString( "RadiusRangeError", RADIUS_RANGE_ERROR ), MAX_RADIUS );
+				MyApp.Logger.ShowOnLogPanel( message, MyApp.NoticeType.Warning, true );
 				return;
 			}
 
@@ -34,7 +47,9 @@ namespace MyCAM.Editor.Dialog
 
 			double height = (double)m_tbxHeight.Value;
 			if( height <= 0 || height >= radius ) {
-				MyApp.Logger.ShowOnLogPanel( $"曲面高度需為大於 0 且小於 R({radius}) 的正數", MyApp.NoticeType.Warning, true );
+
+				string message = string.Format( m_LanguageManager.TryGetString( "HeightRangeError", HEIGHT_RANGE_ERROR ), radius );
+				MyApp.Logger.ShowOnLogPanel( message, MyApp.NoticeType.Warning, true );
 				return;
 			}
 
@@ -51,5 +66,8 @@ namespace MyCAM.Editor.Dialog
 		}
 
 		const double MAX_RADIUS = 10000.0;
+		const string RADIUS_RANGE_ERROR = "圓球半徑需介於 0 ~ {0} mm";
+		const string HEIGHT_RANGE_ERROR = "曲面高度需為大於 0 且小於 R({0}) 的正數";
+		readonly LanguageManager.LanguageManager m_LanguageManager;
 	}
 }

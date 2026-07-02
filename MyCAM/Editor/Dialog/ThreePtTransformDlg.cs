@@ -1,4 +1,4 @@
-Ôªøusing MyCAM.App;
+using MyCAM.App;
 using OCC.gp;
 using System;
 
@@ -34,6 +34,7 @@ namespace MyCAM.Editor
 		public ThreePtTransformDlg( TransParam transParam )
 		{
 			InitializeComponent();
+			m_LanguageManager = new LanguageManager.LanguageManager( "ThreePtTransformDlg" );
 
 			// init cad textbox
 			tbxCADX1.Text = transParam.MachineP1.X().ToString( "F3" );
@@ -47,6 +48,17 @@ namespace MyCAM.Editor
 			tbxCADX3.Text = transParam.MachineP3.X().ToString( "F3" );
 			tbxCADY3.Text = transParam.MachineP3.Y().ToString( "F3" );
 			tbxCADZ3.Text = transParam.MachineP3.Z().ToString( "F3" );
+
+			ApplyResourcesToUI();
+		}
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "ThreePtTransformDlg", this.Text );
+			label1.Text = m_LanguageManager.TryGetString( "label1", label1.Text );
+			label2.Text = m_LanguageManager.TryGetString( "label2", label2.Text );
+			label3.Text = m_LanguageManager.TryGetString( "label3", label3.Text );
+			btnOK.Text = m_LanguageManager.TryGetString( "btnOK", btnOK.Text );
 		}
 
 		void btnOK_Click( object sender, EventArgs e )
@@ -61,7 +73,7 @@ namespace MyCAM.Editor
 				!double.TryParse( tbxMachineX3.Text, out double x3 ) ||
 				!double.TryParse( tbxMachineY3.Text, out double y3 ) ||
 				!double.TryParse( tbxMachineZ3.Text, out double z3 ) ) {
-				MyApp.Logger.ShowOnLogPanel( $"Ê©üÊ¢∞ÈªûÂ∫ßÊ®ôÁÑ°Êïà", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "InvalidMachineCoord", INVALID_MACHINE_COORD ), MyApp.NoticeType.Warning );
 				return;
 			}
 
@@ -74,7 +86,7 @@ namespace MyCAM.Editor
 			if( m_MachineP1.IsEqual( m_MachineP2, 1e-3 ) ||
 				m_MachineP1.IsEqual( m_MachineP3, 1e-3 ) ||
 				m_MachineP2.IsEqual( m_MachineP3, 1e-3 ) ) {
-				MyApp.Logger.ShowOnLogPanel( $"Ê©üÊ¢∞Èªû‰∏çËÉΩÈáçÂêà", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "MachinePointsCoincident", MACHINE_POINTS_COINCIDENT ), MyApp.NoticeType.Warning );
 				return;
 			}
 
@@ -82,7 +94,7 @@ namespace MyCAM.Editor
 			gp_Vec v12 = new gp_Vec( m_MachineP1, m_MachineP2 );
 			gp_Vec v13 = new gp_Vec( m_MachineP1, m_MachineP3 );
 			if( v12.IsParallel( v13, 1e-3 ) ) {
-				MyApp.Logger.ShowOnLogPanel( $"Ê©üÊ¢∞Èªû‰∏çËÉΩÂÖ±Á∑ö", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "MachinePointsCollinear", MACHINE_POINTS_COLLINEAR ), MyApp.NoticeType.Warning );
 				return;
 			}
 			RaiseConfirm( new TransParam( m_MachineP1, m_MachineP2, m_MachineP3 ) );
@@ -92,5 +104,10 @@ namespace MyCAM.Editor
 		gp_Pnt m_MachineP1;
 		gp_Pnt m_MachineP2;
 		gp_Pnt m_MachineP3;
+
+		const string INVALID_MACHINE_COORD = "æ˜±Ò¬IÆyº–µLÆƒ";
+		const string MACHINE_POINTS_COINCIDENT = "æ˜±Ò¬I§£Ø‡≠´¶X";
+		const string MACHINE_POINTS_COLLINEAR = "æ˜±Ò¬I§£Ø‡¶@Ωu";
+		readonly LanguageManager.LanguageManager m_LanguageManager;
 	}
 }

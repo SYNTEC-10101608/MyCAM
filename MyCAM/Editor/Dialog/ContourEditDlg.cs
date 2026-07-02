@@ -1,6 +1,4 @@
-using MyCAM.App;
 using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -14,6 +12,20 @@ namespace MyCAM.Editor
 		public ContourEditDlg()
 		{
 			InitializeComponent();
+			m_LanguageManager = new LanguageManager.LanguageManager( "ContourEditDlg" );
+			ApplyResourcesToUI();
+		}
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "ContourEditDlg", this.Text );
+			m_gbxIndexParam.Text = m_LanguageManager.TryGetString( "m_gbxIndexParam", m_gbxIndexParam.Text );
+			m_lblDX.Text = m_LanguageManager.TryGetString( "m_lblDX", m_lblDX.Text );
+			m_lblDY.Text = m_LanguageManager.TryGetString( "m_lblDY", m_lblDY.Text );
+			m_lblDZ.Text = m_LanguageManager.TryGetString( "m_lblDZ", m_lblDZ.Text );
+			m_lblUnit.Text = m_LanguageManager.TryGetString( "m_lblUnit", m_lblUnit.Text );
+			m_btnAdd.Text = m_LanguageManager.TryGetString( "m_btnAdd", m_btnAdd.Text );
+			m_btnRemove.Text = m_LanguageManager.TryGetString( "m_btnRemove", m_btnRemove.Text );
 		}
 
 		// Refresh the dialog UI to reflect the given param.
@@ -104,6 +116,8 @@ namespace MyCAM.Editor
 
 		bool m_bSuppressValueChanged = false;
 		ContourEditParam m_Param = null;
+
+		readonly LanguageManager.LanguageManager m_LanguageManager;
 	}
 
 	// Data transfer object between dialog and action

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="DetermineClosedPathError" Content="判斷路徑是否封閉時發生錯誤: {0}" />
+</ResMap>

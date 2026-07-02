@@ -1,4 +1,4 @@
-ï»¿using MyCAM.Data;
+using MyCAM.Data;
 using System;
 using System.Windows.Forms;
 
@@ -37,7 +37,40 @@ namespace MyCAM.Editor
 			m_btnRotaryNeg.Text = m_RotaryAxisConfig.RotaryAxisName + " -";
 
 			// update interpolation type combo box with actual axis names
+			ApplyResourcesToUI();
 			UpdateInterpolateTypeNames();
+		}
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "ToolVectorDlg", this.Text );
+			m_lblOnePntToolVecAdjust.Text = m_LanguageManager.TryGetString( "m_lblOnePntToolVecAdjust", m_lblOnePntToolVecAdjust.Text );
+			m_lblADeg.Text = m_LanguageManager.TryGetString( "m_lblADeg", m_lblADeg.Text );
+			m_lblBDeg.Text = m_LanguageManager.TryGetString( "m_lblBDeg", m_lblBDeg.Text );
+			m.Text = m_LanguageManager.TryGetString( "m", m.Text );
+			m_lblToolDirQuickSetBtn.Text = m_LanguageManager.TryGetString( "m_lblToolDirQuickSetBtn", m_lblToolDirQuickSetBtn.Text );
+			m_btnZDir.Text = m_LanguageManager.TryGetString( "m_btnZDir", m_btnZDir.Text );
+			m_btnKeep.Text = m_LanguageManager.TryGetString( "m_btnKeep", m_btnKeep.Text );
+			m_btnRevert.Text = m_LanguageManager.TryGetString( "m_btnRevert", m_btnRevert.Text );
+			m_lblStartEnd.Text = m_LanguageManager.TryGetString( "m_lblStartEnd", m_lblStartEnd.Text );
+			m_btnSwitchStartEnd.Text = m_LanguageManager.TryGetString( "m_btnSwitchStartEnd", m_btnSwitchStartEnd.Text );
+			m_lblSetBtn.Text = m_LanguageManager.TryGetString( "m_lblSetBtn", m_lblSetBtn.Text );
+			m_btnAdd.Text = m_LanguageManager.TryGetString( "m_btnAdd", m_btnAdd.Text );
+			m_btnRemove.Text = m_LanguageManager.TryGetString( "m_btnRemove", m_btnRemove.Text );
+			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
+			m_gpbStartPnt.Text = m_LanguageManager.TryGetString( "m_gpbStartPnt", m_gpbStartPnt.Text );
+			m_btnToStart.Text = m_LanguageManager.TryGetString( "m_btnToStart", m_btnToStart.Text );
+			m_gpbPnt.Text = m_LanguageManager.TryGetString( "m_gpbPnt", m_gpbPnt.Text );
+			m_btnPrev.Text = m_LanguageManager.TryGetString( "m_btnPrev", m_btnPrev.Text );
+			m_btnNext.Text = m_LanguageManager.TryGetString( "m_btnNext", m_btnNext.Text );
+			m_btnToEnd.Text = m_LanguageManager.TryGetString( "m_btnToEnd", m_btnToEnd.Text );
+			m_gpbCtrlPnt.Text = m_LanguageManager.TryGetString( "m_gpbCtrlPnt", m_gpbCtrlPnt.Text );
+			m_btnPreCtrlPnt.Text = m_LanguageManager.TryGetString( "m_btnPreCtrlPnt", m_btnPreCtrlPnt.Text );
+			m_btnNextCtrlPnt.Text = m_LanguageManager.TryGetString( "m_btnNextCtrlPnt", m_btnNextCtrlPnt.Text );
+			m_gbxColorLegend.Text = m_LanguageManager.TryGetString( "m_gbxColorLegend", m_gbxColorLegend.Text );
+			m_lblLegendNormal.Text = m_LanguageManager.TryGetString( "m_lblLegendNormal", m_lblLegendNormal.Text );
+			m_lblLegendRotary.Text = m_LanguageManager.TryGetString( "m_lblLegendRotary", m_lblLegendRotary.Text );
+			m_lblLegendBevel.Text = m_LanguageManager.TryGetString( "m_lblLegendBevel", m_lblLegendBevel.Text );
 		}
 
 		public void ResetType()
@@ -67,7 +100,8 @@ namespace MyCAM.Editor
 		{
 			m_btnSwitchStartEnd.Visible = enable;
 			m_lblStartOrEnd.Visible = enable;
-			m_lblStartOrEnd.Text = start ? "ç•¶å‰ä½ç½®ï¼šèµ·é»ž" : "ç•¶å‰ä½ç½®ï¼šçµ‚é»ž";
+
+			m_lblStartOrEnd.Text = start ? m_LanguageManager.TryGetString( "m_lblStartOrEnd_Start", START_OR_END_START ) : m_LanguageManager.TryGetString( "m_lblStartOrEnd_End", START_OR_END_END );
 		}
 
 		public void UIControlProtection( bool isControlPnt, bool isStartEndPnt = false, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
@@ -307,27 +341,44 @@ namespace MyCAM.Editor
 			if( m_RotaryAxisConfig == null ) {
 				return;
 			}
-			string masterName = m_RotaryAxisConfig.MasterName ?? "ä¸»è»¸";
-			string slaveName = m_RotaryAxisConfig.SlaveName ?? "å¾žè»¸";
+			string masterName = m_RotaryAxisConfig.MasterName;
+			string slaveName = m_RotaryAxisConfig.SlaveName;
 
-			// index 3: MasterNormalSlaveInterpolation => "Aè»¸æ³•å‘é‡ä¸”Cè»¸æ’å€¼"
-			if( m_cbxInterpolateType.Items.Count > (int)EToolVecInterpolateType.MasterNormalSlaveInterpolation ) {
-				m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterNormalSlaveInterpolation ] =
-					 slaveName + "è»¸å¹³æ»‘";
+			// Ensure we have enough items in the combo box
+			while( m_cbxInterpolateType.Items.Count < 5 ) {
+				m_cbxInterpolateType.Items.Add( "" );
 			}
 
-			// index 4: MasterInterpolationSlaveNormal => "Cè»¸æ’å€¼ä¸”Aè»¸æ³•å‘é‡"
-			if( m_cbxInterpolateType.Items.Count > (int)EToolVecInterpolateType.MasterInterpolationSlaveNormal ) {
-				m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterInterpolationSlaveNormal ] =
-					masterName + "è»¸å¹³æ»‘";
-			}
+			// index 0~2: fixed types, update via language manager
+			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.Normal ] =
+				m_LanguageManager.TryGetString( "InterpolateType_Normal", INTERPOLATE_TYPE_NORMAL );
+			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.VectorInterpolation ] =
+				m_LanguageManager.TryGetString( "InterpolateType_Rotary", INTERPOLATE_TYPE_ROTARY );
+			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.TiltAngleInterpolation ] =
+				m_LanguageManager.TryGetString( "InterpolateType_Bevel", INTERPOLATE_TYPE_BEVEL );
+
+			string szAxisSmooth = m_LanguageManager.TryGetString( "ToolVectorDlg_AxisSmooth", START_OR_END_END );
+
+			// index 3: MasterNormalSlaveInterpolation
+			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterNormalSlaveInterpolation ] =
+				 slaveName + szAxisSmooth;
+
+			// index 4: MasterInterpolationSlaveNormal
+			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterInterpolationSlaveNormal ] =
+				masterName + szAxisSmooth;
 
 			// update color legend labels
-			m_lblLegendSlave.Text = slaveName + "è»¸å¹³æ»‘";
-			m_lblLegendMaster.Text = masterName + "è»¸å¹³æ»‘";
+			m_lblLegendSlave.Text = slaveName + szAxisSmooth;
+			m_lblLegendMaster.Text = masterName + szAxisSmooth;
 		}
 
 		const double DOUBLE_COMPARISON_EPSILON = 1e-6;
+		const string INTERPOLATE_TYPE_NORMAL = "ºû«ùÀq»{";
+		const string INTERPOLATE_TYPE_ROTARY = "±ÛÂà¶b¥­·Æ";
+		const string INTERPOLATE_TYPE_BEVEL = "¶É¨¤¤Á©Y¤f";
+		const string START_OR_END_START = "·í«e¦ì¸m¡G°_ÂI";
+		const string START_OR_END_END = "·í«e¦ì¸m¡G²×ÂI";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ToolVectorDlg" );
 	}
 
 	public class ToolVecParam

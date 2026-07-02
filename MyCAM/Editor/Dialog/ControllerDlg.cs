@@ -1,4 +1,4 @@
-﻿using MyCAM.App;
+using MyCAM.App;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -9,7 +9,12 @@ namespace MyCAM.Editor.Dialog
 		public ControllerDlg()
 		{
 			InitializeComponent();
+			ApplyResourcesToUI();
+		}
 
+		public void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "ControllerDlg", this.Text );
 			// calculate and store original aspect ratio
 			m_DlgHeightAndWidthRatio = (double)ClientSize.Width / ClientSize.Height;
 
@@ -58,5 +63,7 @@ namespace MyCAM.Editor.Dialog
 			}
 			m_IsResizing = false;
 		}
+
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ControllerDlg" );
 	}
 }

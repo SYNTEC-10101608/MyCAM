@@ -1,4 +1,4 @@
-ï»¿using MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
@@ -231,7 +231,7 @@ namespace MyCAM.Editor
 			// get selected edge
 			TopTools_MapOfShape extractedEdgeSet = GetSelectedEdge();
 			if( extractedEdgeSet.Size() == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[æ“ä½œæé†’]æœªé¸å–ä»»ä½•è·¯å¾‘", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoPathSelected", NO_PATH_SELECTED ), MyApp.NoticeType.Hint );
 				End();
 				return;
 			}
@@ -367,5 +367,7 @@ namespace MyCAM.Editor
 		List<List<TopoDS_Edge>> m_FreeBoundWireList;
 		List<AIS_Shape> m_FaceGroupAISList;
 		Dictionary<EdgeHandle, List<EdgeHandle>> m_EdgeHandleToWireMap;
+		const string NO_PATH_SELECTED = "[¾Ş§@´£¿ô]¥¼¿ï¨ú¥ô¦ó¸ô®|";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SelectWireAction" );
 	}
 }

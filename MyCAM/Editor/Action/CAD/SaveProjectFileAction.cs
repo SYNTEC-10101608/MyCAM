@@ -40,7 +40,7 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			if( m_DataManager.PartIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "尚無工件能夠匯出專案檔", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoWorkpieceToExport", NO_WORKPIECE_TO_EXPORT ), MyApp.NoticeType.Warning );
 				End();
 				return;
 			}
@@ -70,7 +70,7 @@ namespace MyCAM.Editor
 					SavedFileName = Path.GetFileName( projectFilePath );
 				}
 				catch( Exception ex ) {
-					MyApp.Logger.ShowOnLogPanel( $"儲存檔案時發生錯誤：\n{ex.Message}", MyApp.NoticeType.Error );
+					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "SaveFileError", SAVE_FILE_ERROR ), ex.Message ), MyApp.NoticeType.Error );
 					IsSaveSuccess = false;
 					SavedFileName = string.Empty;
 				}
@@ -102,5 +102,9 @@ namespace MyCAM.Editor
 				}
 			}
 		}
+
+		const string NO_WORKPIECE_TO_EXPORT = "尚無工件能夠匯出專案檔";
+		const string SAVE_FILE_ERROR = "儲存檔案時發生錯誤：\n{0}";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SaveProjectFileAction" );
 	}
 }

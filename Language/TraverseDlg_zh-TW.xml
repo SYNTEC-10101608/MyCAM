@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="TraverseDlg" Content="空移參數設定" />
+    <Message ID="m_lblLiftUpDistance" Content="抬刀距離" />
+    <Message ID="m_lblCutDownDistance" Content="下刀距離" />
+    <Message ID="m_lblFollowSaveDistance" Content="隨動安全距離" />
+    <Message ID="m_chkSafePlane" Content="啟用安全平面" />
+    <Message ID="m_lblFrogLeapDistance" Content="蛙跳距離" />
+    <Message ID="m_lblSafePlaneDistance" Content="Z平面位置" />
+    <Message ID="m_btnConfirm" Content="確認" />
+</ResMap>

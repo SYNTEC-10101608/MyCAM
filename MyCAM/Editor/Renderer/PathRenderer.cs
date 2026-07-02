@@ -1,5 +1,4 @@
 using MyCAM.Data;
-using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.PathCache;
 using OCC.AIS;

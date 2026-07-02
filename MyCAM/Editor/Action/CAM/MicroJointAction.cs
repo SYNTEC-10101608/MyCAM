@@ -1,4 +1,4 @@
-ï»¿using MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.TopoDS;
 using OCCViewer;
@@ -85,7 +85,7 @@ namespace MyCAM.Editor
 
 			// validate new path (contour only)
 			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
-				MyApp.Logger.ShowOnLogPanel( $"è·¯å¾‘ {pathID} ä¸æ˜¯è¼ªå»“è·¯å¾‘ï¼Œç„¡æ³•ç·¨è¼¯", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NotContourPath", NOT_CONTOUR_PATH ), pathID ), MyApp.NoticeType.Warning );
 				End();
 				return;
 			}
@@ -93,7 +93,7 @@ namespace MyCAM.Editor
 			// init data for current path
 			m_CurrentPathID = pathID;
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
-				MyApp.Logger.ShowOnLogPanel( $"ç„¡æ³•ç²å–è·¯å¾‘ {pathID} çš„åŠ å·¥è³‡è¨Š", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathID ), MyApp.NoticeType.Warning );
 				End();
 				return;
 			}
@@ -245,6 +245,10 @@ namespace MyCAM.Editor
 		}
 
 		#endregion
+
+		const string NOT_CONTOUR_PATH = "¸ô®| {0} ¤£¬O½ü¹ø¸ô®|¡AµLªk½s¿è";
+		const string CANNOT_GET_PATH_CRAFT_INFO = "µLªkÀò¨ú¸ô®| {0} ªº¥[¤u¸ê°T";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "MicroJointAction" );
 	}
 }
 

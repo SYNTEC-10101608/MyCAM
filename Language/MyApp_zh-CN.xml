@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="LoggerNotInitialized" Content="Logger还没初始化,请先设定 MainForm。" />
+  <Message ID="MainFormNotInitialized" Content="MainForm还没初始化,请先设定 MainForm。" />
+  <Message ID="CustPostFileNotExist" Content="客制后处理档案不存在" />
+  <Message ID="ReadCustPostFileFailed" Content="读取客制化后处理器档案失败" />
+  <Message ID="CustPostFileContentError" Content="客制化后处理器档案内容不完整或格式错误,请确认档案内容。" />
+</ResMap>

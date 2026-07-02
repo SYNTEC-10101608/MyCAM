@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="CleanupTimerError" Content="清理 Timer 时发生错误: {0}" />
+</ResMap>

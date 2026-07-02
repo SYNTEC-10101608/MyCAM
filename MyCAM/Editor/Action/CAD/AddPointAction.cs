@@ -1,4 +1,4 @@
-ï»¿using MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
@@ -152,7 +152,7 @@ namespace MyCAM.Editor
 		{
 			bool isValidCircle = GeometryTool.IsCircularArc( edge, out gp_Pnt center, out _, out _ );
 			if( !isValidCircle ) {
-				MyApp.Logger.ShowOnLogPanel( "éæ­£åœ“å¼§", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NotCircularArc", NOT_CIRCULAR_ARC ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			AddToManager( center );
@@ -163,7 +163,7 @@ namespace MyCAM.Editor
 		{
 			bool isValidEdge = GeometryTool.GetEdgeMidPoint( edge, out gp_Pnt midPoint );
 			if( !isValidEdge ) {
-				MyApp.Logger.ShowOnLogPanel( "éŒ¯èª¤ç·šæ®µ", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "InvalidEdge", INVALID_EDGE ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			AddToManager( midPoint );
@@ -177,7 +177,7 @@ namespace MyCAM.Editor
 			}
 			bool isValidPoint = GeometryTool.GetTwoVertexMidPoint( vertex1, vertex2, out gp_Pnt midPoint );
 			if( !isValidPoint ) {
-				MyApp.Logger.ShowOnLogPanel( "éæ³•é»ä½", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "InvalidPoint", INVALID_POINT ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			AddToManager( midPoint );
@@ -196,5 +196,10 @@ namespace MyCAM.Editor
 		}
 
 		AddPointType m_AddPointType;
+
+		const string NOT_CIRCULAR_ARC = "[¾Ş§@´£¿ô]¿ï¨úªºÃä¤£¬O¶ê©·";
+		const string INVALID_EDGE = "[¾Ş§@´£¿ô]¿ï¨úªºÃäµL®Ä";
+		const string INVALID_POINT = "[¾Ş§@´£¿ô]¿ï¨úªºÂI¦ìµL®Ä";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "AddPointAction" );
 	}
 }

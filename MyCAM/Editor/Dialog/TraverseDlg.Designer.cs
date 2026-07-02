@@ -54,43 +54,39 @@
 			// m_lblLiftUpDistance
 			// 
 			this.m_lblLiftUpDistance.AutoSize = true;
-			this.m_lblLiftUpDistance.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_lblLiftUpDistance.Location = new System.Drawing.Point(28, 25);
 			this.m_lblLiftUpDistance.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
 			this.m_lblLiftUpDistance.Name = "m_lblLiftUpDistance";
-			this.m_lblLiftUpDistance.Size = new System.Drawing.Size(55, 15);
+			this.m_lblLiftUpDistance.Size = new System.Drawing.Size(69, 19);
 			this.m_lblLiftUpDistance.TabIndex = 26;
 			this.m_lblLiftUpDistance.Text = "抬刀距離";
 			// 
 			// m_lblCutDownDistance
 			// 
 			this.m_lblCutDownDistance.AutoSize = true;
-			this.m_lblCutDownDistance.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_lblCutDownDistance.Location = new System.Drawing.Point(28, 60);
 			this.m_lblCutDownDistance.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
 			this.m_lblCutDownDistance.Name = "m_lblCutDownDistance";
-			this.m_lblCutDownDistance.Size = new System.Drawing.Size(55, 15);
+			this.m_lblCutDownDistance.Size = new System.Drawing.Size(69, 19);
 			this.m_lblCutDownDistance.TabIndex = 21;
 			this.m_lblCutDownDistance.Text = "下刀距離";
 			// 
 			// m_lblFollowSaveDistance
 			// 
 			this.m_lblFollowSaveDistance.AutoSize = true;
-			this.m_lblFollowSaveDistance.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_lblFollowSaveDistance.Location = new System.Drawing.Point(28, 95);
 			this.m_lblFollowSaveDistance.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
 			this.m_lblFollowSaveDistance.Name = "m_lblFollowSaveDistance";
-			this.m_lblFollowSaveDistance.Size = new System.Drawing.Size(79, 15);
+			this.m_lblFollowSaveDistance.Size = new System.Drawing.Size(99, 19);
 			this.m_lblFollowSaveDistance.TabIndex = 20;
 			this.m_lblFollowSaveDistance.Text = "隨動安全距離";
 			// 
 			// m_chkSafePlane
 			// 
 			this.m_chkSafePlane.AutoSize = true;
-			this.m_chkSafePlane.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_chkSafePlane.Location = new System.Drawing.Point(28, 165);
 			this.m_chkSafePlane.Name = "m_chkSafePlane";
-			this.m_chkSafePlane.Size = new System.Drawing.Size(98, 19);
+			this.m_chkSafePlane.Size = new System.Drawing.Size(121, 23);
 			this.m_chkSafePlane.TabIndex = 28;
 			this.m_chkSafePlane.Text = "啟用安全平面";
 			this.m_chkSafePlane.UseVisualStyleBackColor = true;
@@ -99,82 +95,74 @@
 			// m_lblFrogLeapDistance
 			// 
 			this.m_lblFrogLeapDistance.AutoSize = true;
-			this.m_lblFrogLeapDistance.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_lblFrogLeapDistance.Location = new System.Drawing.Point(28, 130);
 			this.m_lblFrogLeapDistance.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
 			this.m_lblFrogLeapDistance.Name = "m_lblFrogLeapDistance";
-			this.m_lblFrogLeapDistance.Size = new System.Drawing.Size(55, 15);
+			this.m_lblFrogLeapDistance.Size = new System.Drawing.Size(69, 19);
 			this.m_lblFrogLeapDistance.TabIndex = 19;
 			this.m_lblFrogLeapDistance.Text = "蛙跳距離";
 			// 
 			// m_lblFollowSaveDistanceUnit
 			// 
 			this.m_lblFollowSaveDistanceUnit.AutoSize = true;
-			this.m_lblFollowSaveDistanceUnit.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_lblFollowSaveDistanceUnit.Location = new System.Drawing.Point(254, 95);
 			this.m_lblFollowSaveDistanceUnit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblFollowSaveDistanceUnit.Name = "m_lblFollowSaveDistanceUnit";
-			this.m_lblFollowSaveDistanceUnit.Size = new System.Drawing.Size(29, 15);
+			this.m_lblFollowSaveDistanceUnit.Size = new System.Drawing.Size(37, 19);
 			this.m_lblFollowSaveDistanceUnit.TabIndex = 22;
 			this.m_lblFollowSaveDistanceUnit.Text = "mm";
 			// 
 			// m_lblCutDownDistanceUnit
 			// 
 			this.m_lblCutDownDistanceUnit.AutoSize = true;
-			this.m_lblCutDownDistanceUnit.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_lblCutDownDistanceUnit.Location = new System.Drawing.Point(254, 60);
 			this.m_lblCutDownDistanceUnit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblCutDownDistanceUnit.Name = "m_lblCutDownDistanceUnit";
-			this.m_lblCutDownDistanceUnit.Size = new System.Drawing.Size(29, 15);
+			this.m_lblCutDownDistanceUnit.Size = new System.Drawing.Size(37, 19);
 			this.m_lblCutDownDistanceUnit.TabIndex = 23;
 			this.m_lblCutDownDistanceUnit.Text = "mm";
 			// 
 			// m_lblLiftUpDistanceUnit
 			// 
 			this.m_lblLiftUpDistanceUnit.AutoSize = true;
-			this.m_lblLiftUpDistanceUnit.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_lblLiftUpDistanceUnit.Location = new System.Drawing.Point(254, 25);
 			this.m_lblLiftUpDistanceUnit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblLiftUpDistanceUnit.Name = "m_lblLiftUpDistanceUnit";
-			this.m_lblLiftUpDistanceUnit.Size = new System.Drawing.Size(29, 15);
+			this.m_lblLiftUpDistanceUnit.Size = new System.Drawing.Size(37, 19);
 			this.m_lblLiftUpDistanceUnit.TabIndex = 24;
 			this.m_lblLiftUpDistanceUnit.Text = "mm";
 			// 
 			// m_lblFrogLeapDistanceUnit
 			// 
 			this.m_lblFrogLeapDistanceUnit.AutoSize = true;
-			this.m_lblFrogLeapDistanceUnit.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_lblFrogLeapDistanceUnit.Location = new System.Drawing.Point(254, 130);
 			this.m_lblFrogLeapDistanceUnit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblFrogLeapDistanceUnit.Name = "m_lblFrogLeapDistanceUnit";
-			this.m_lblFrogLeapDistanceUnit.Size = new System.Drawing.Size(29, 15);
+			this.m_lblFrogLeapDistanceUnit.Size = new System.Drawing.Size(37, 19);
 			this.m_lblFrogLeapDistanceUnit.TabIndex = 25;
 			this.m_lblFrogLeapDistanceUnit.Text = "mm";
 			// 
 			// m_lblSafePlaneDistance
 			// 
 			this.m_lblSafePlaneDistance.AutoSize = true;
-			this.m_lblSafePlaneDistance.Font = new System.Drawing.Font("Arial", 9F);
 			this.m_lblSafePlaneDistance.Location = new System.Drawing.Point(64, 202);
 			this.m_lblSafePlaneDistance.Name = "m_lblSafePlaneDistance";
-			this.m_lblSafePlaneDistance.Size = new System.Drawing.Size(62, 15);
+			this.m_lblSafePlaneDistance.Size = new System.Drawing.Size(78, 19);
 			this.m_lblSafePlaneDistance.TabIndex = 31;
 			this.m_lblSafePlaneDistance.Text = "Z平面位置";
 			// 
 			// m_lblSafePlaneDistanceUnit
 			// 
 			this.m_lblSafePlaneDistanceUnit.AutoSize = true;
-			this.m_lblSafePlaneDistanceUnit.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_lblSafePlaneDistanceUnit.Location = new System.Drawing.Point(254, 200);
 			this.m_lblSafePlaneDistanceUnit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblSafePlaneDistanceUnit.Name = "m_lblSafePlaneDistanceUnit";
-			this.m_lblSafePlaneDistanceUnit.Size = new System.Drawing.Size(29, 15);
+			this.m_lblSafePlaneDistanceUnit.Size = new System.Drawing.Size(37, 19);
 			this.m_lblSafePlaneDistanceUnit.TabIndex = 33;
 			this.m_lblSafePlaneDistanceUnit.Text = "mm";
 			// 
 			// m_btnConfirm
 			// 
-			this.m_btnConfirm.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_btnConfirm.Location = new System.Drawing.Point(212, 235);
 			this.m_btnConfirm.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.m_btnConfirm.Name = "m_btnConfirm";
@@ -188,61 +176,101 @@
 			// 
 			this.m_NumericUpDownSafePlaneDistance.DecimalPlaces = 3;
 			this.m_NumericUpDownSafePlaneDistance.Enabled = false;
-			this.m_NumericUpDownSafePlaneDistance.Font = new System.Drawing.Font("Arial", 9F);
 			this.m_NumericUpDownSafePlaneDistance.Location = new System.Drawing.Point(154, 200);
 			this.m_NumericUpDownSafePlaneDistance.Maximum = new decimal(new int[] {
             1410065407,
             2,
             0,
             0});
+			this.m_NumericUpDownSafePlaneDistance.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_NumericUpDownSafePlaneDistance.Name = "m_NumericUpDownSafePlaneDistance";
-			this.m_NumericUpDownSafePlaneDistance.Size = new System.Drawing.Size(92, 21);
+			this.m_NumericUpDownSafePlaneDistance.Size = new System.Drawing.Size(92, 27);
 			this.m_NumericUpDownSafePlaneDistance.TabIndex = 34;
 			this.m_NumericUpDownSafePlaneDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownSafePlaneDistance_DebouncedValueChanged);
 			// 
 			// m_NumericUpDownLiftUpDistance
 			// 
 			this.m_NumericUpDownLiftUpDistance.DecimalPlaces = 3;
-			this.m_NumericUpDownLiftUpDistance.Font = new System.Drawing.Font("Arial", 9F);
 			this.m_NumericUpDownLiftUpDistance.Location = new System.Drawing.Point(155, 25);
+			this.m_NumericUpDownLiftUpDistance.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_NumericUpDownLiftUpDistance.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_NumericUpDownLiftUpDistance.Name = "m_NumericUpDownLiftUpDistance";
-			this.m_NumericUpDownLiftUpDistance.Size = new System.Drawing.Size(92, 21);
+			this.m_NumericUpDownLiftUpDistance.Size = new System.Drawing.Size(92, 27);
 			this.m_NumericUpDownLiftUpDistance.TabIndex = 35;
 			this.m_NumericUpDownLiftUpDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownLiftUpDistance_DebouncedValueChanged);
 			// 
 			// m_NumericUpDownCutDownDistance
 			// 
 			this.m_NumericUpDownCutDownDistance.DecimalPlaces = 3;
-			this.m_NumericUpDownCutDownDistance.Font = new System.Drawing.Font("Arial", 9F);
 			this.m_NumericUpDownCutDownDistance.Location = new System.Drawing.Point(155, 60);
+			this.m_NumericUpDownCutDownDistance.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_NumericUpDownCutDownDistance.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_NumericUpDownCutDownDistance.Name = "m_NumericUpDownCutDownDistance";
-			this.m_NumericUpDownCutDownDistance.Size = new System.Drawing.Size(92, 21);
+			this.m_NumericUpDownCutDownDistance.Size = new System.Drawing.Size(92, 27);
 			this.m_NumericUpDownCutDownDistance.TabIndex = 36;
 			this.m_NumericUpDownCutDownDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownCutDownDistance_DebouncedValueChanged);
 			// 
 			// m_NumericUpDownFollowSafeDistance
 			// 
 			this.m_NumericUpDownFollowSafeDistance.DecimalPlaces = 3;
-			this.m_NumericUpDownFollowSafeDistance.Font = new System.Drawing.Font("Arial", 9F);
 			this.m_NumericUpDownFollowSafeDistance.Location = new System.Drawing.Point(155, 95);
+			this.m_NumericUpDownFollowSafeDistance.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_NumericUpDownFollowSafeDistance.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_NumericUpDownFollowSafeDistance.Name = "m_NumericUpDownFollowSafeDistance";
-			this.m_NumericUpDownFollowSafeDistance.Size = new System.Drawing.Size(92, 21);
+			this.m_NumericUpDownFollowSafeDistance.Size = new System.Drawing.Size(92, 27);
 			this.m_NumericUpDownFollowSafeDistance.TabIndex = 37;
 			this.m_NumericUpDownFollowSafeDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownFollowSafeDistance_DebouncedValueChanged);
 			// 
 			// m_NumericUpDownFrogLeapDistance
 			// 
 			this.m_NumericUpDownFrogLeapDistance.DecimalPlaces = 3;
-			this.m_NumericUpDownFrogLeapDistance.Font = new System.Drawing.Font("Arial", 9F);
 			this.m_NumericUpDownFrogLeapDistance.Location = new System.Drawing.Point(155, 130);
+			this.m_NumericUpDownFrogLeapDistance.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_NumericUpDownFrogLeapDistance.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_NumericUpDownFrogLeapDistance.Name = "m_NumericUpDownFrogLeapDistance";
-			this.m_NumericUpDownFrogLeapDistance.Size = new System.Drawing.Size(92, 21);
+			this.m_NumericUpDownFrogLeapDistance.Size = new System.Drawing.Size(92, 27);
 			this.m_NumericUpDownFrogLeapDistance.TabIndex = 38;
 			this.m_NumericUpDownFrogLeapDistance.DebouncedValueChanged += new System.EventHandler(this.m_NumericUpDownFrogLeapDistance_DebouncedValueChanged);
 			// 
 			// TraverseDlg
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(294, 276);
 			this.Controls.Add(this.m_NumericUpDownFrogLeapDistance);
@@ -262,7 +290,8 @@
 			this.Controls.Add(this.m_lblSafePlaneDistance);
 			this.Controls.Add(this.m_lblSafePlaneDistanceUnit);
 			this.Controls.Add(this.m_btnConfirm);
-			this.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.Name = "TraverseDlg";
 			this.Text = "空移參數設定";

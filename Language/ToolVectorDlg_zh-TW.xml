@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="ToolVectorDlg" Content="姿態調適" />
+	<Message ID="m_lblOnePntToolVecAdjust" Content="單點姿態資訊" />
+	<Message ID="m_lblADeg" Content="前傾角" />
+	<Message ID="m_lblBDeg" Content="側傾角" />
+	<Message ID="m_lblMaster" Content="C" />
+	<Message ID="m_lblSlave" Content="A" />
+	<Message ID="m" Content="插補方案" />
+	<Message ID="m_lblToolDirQuickSetBtn" Content="姿態方向快捷鍵" />
+	<Message ID="m_btnZDir" Content="朝Z方向" />
+	<Message ID="m_btnKeep" Content="保持前姿態" />
+	<Message ID="m_btnRevert" Content="原始" />
+	<Message ID="m_lblStartEnd" Content="起終點切換" />
+	<Message ID="m_btnSwitchStartEnd" Content="起/終" />
+	<Message ID="m_lblStartOrEnd_Start" Content="當前位置：起點" />
+	<Message ID="m_lblStartOrEnd_End" Content="當前位置：終點" />
+	<Message ID="m_lblSetBtn" Content="姿態設置" />
+	<Message ID="m_btnAdd" Content="新增" />
+	<Message ID="m_btnRemove" Content="刪除" />
+	<Message ID="m_btnClear" Content="清除所有控制點" />
+	<Message ID="m_gpbStartPnt" Content="起終點轉換" />
+	<Message ID="m_btnToStart" Content="至起點" />
+	<Message ID="m_gpbPnt" Content="前後點轉換" />
+	<Message ID="m_btnPrev" Content="前一點" />
+	<Message ID="m_btnNext" Content="後一點" />
+	<Message ID="m_btnToEnd" Content="至終點" />
+	<Message ID="m_gpbCtrlPnt" Content="控制點轉換" />
+	<Message ID="m_btnPreCtrlPnt" Content="前控制點" />
+	<Message ID="m_btnNextCtrlPnt" Content="後控制點" />
+	<Message ID="m_gbxColorLegend" Content="插值方案" />
+	<Message ID="m_lblLegendNormal" Content="維持" />
+	<Message ID="m_lblLegendRotary" Content="旋轉軸平滑" />
+	<Message ID="m_lblLegendBevel" Content="傾角切坡口" />
+	<Message ID="m_lblLegendMaster" Content="主軸" />
+	<Message ID="m_lblLegendSlave" Content="從軸" />
+	<Message ID="InterpolateType_Normal" Content="維持默認" />
+	<Message ID="InterpolateType_Rotary" Content="旋轉軸平滑" />
+	<Message ID="InterpolateType_Bevel" Content="傾角切坡口" />
+	<Message ID="ToolVectorDlg_AxisSmooth" Content="軸平滑" />
+</ResMap>

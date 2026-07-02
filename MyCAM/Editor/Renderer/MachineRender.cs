@@ -316,7 +316,7 @@ namespace MyCAM.Editor.Renderer
 			if( result != MeshesToAISResult.Success ) {
 				switch( result ) {
 					case MeshesToAISResult.ArgumentNull:
-						MyApp.Logger.ShowOnLogPanel( $"機構網格資訊錯誤", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "MachineMeshInfoError", MACHINE_MESH_INFO_ERROR ), MyApp.NoticeType.Warning );
 						break;
 					case MeshesToAISResult.InvalidMesh:
 						// MyApp.Logger.ShowOnLogPanel( $"{componentType} 原始網格資訊讀取失敗", MyApp.NoticeType.Warning );
@@ -331,5 +331,8 @@ namespace MyCAM.Editor.Renderer
 		}
 
 		#endregion
+
+		const string MACHINE_MESH_INFO_ERROR = "機構網格資訊錯誤";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "MachineRender" );
 	}
 }

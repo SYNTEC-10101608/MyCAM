@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="AxisTransformDlg" Content="軸向轉換" />
+    <Message ID="m_grpDisplacement" Content="平移" />
+    <Message ID="m_grpRotation" Content="旋轉" />
+    <Message ID="m_lblX" Content="X" />
+    <Message ID="m_lblY" Content="Y" />
+    <Message ID="m_lblZ" Content="Z" />
+    <Message ID="m_lblRx" Content="RX" />
+    <Message ID="m_lblRy" Content="RY" />
+    <Message ID="m_lblRz" Content="RZ" />
+    <Message ID="m_lblStepDis" Content="步進距離" />
+    <Message ID="m_lblStapAngle" Content="步進角度" />
+    <Message ID="m_btnOK" Content="確認" />
+    <Message ID="m_btnCancel" Content="取消" />
+    <Message ID="m_btnReset" Content="重設" />
+</ResMap>

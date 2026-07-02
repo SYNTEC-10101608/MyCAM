@@ -330,6 +330,7 @@
     </Compile>
     <Compile Include="Helper\CAD\StdPatternWireFactory.cs" />
     <Compile Include="Helper\CAD\StdPatternHelper.cs" />
+    <Compile Include="SettingManager\AppSettingManager.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -437,6 +438,10 @@
       <Project>{ae1bdd40-83c0-4e22-81c0-3fc63dd82462}</Project>
       <Name>FileTranslator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LanguageManager\LanguageManager.csproj">
+      <Project>{6aa4de88-e3b9-4a29-8df8-dc5dcd0a70cd}</Project>
+      <Name>LanguageManager</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OCCTool\OCCTool.csproj">
       <Project>{e9c0ab57-4558-4baf-b154-b20169a256fe}</Project>
       <Name>OCCTool</Name>
@@ -477,22 +482,10 @@
     <None Include="Resources\PathCompensate.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resource\Sort_ExtrusionFirst_FromBottom_Clockwise.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resource\Sort_ExtrusionFirst_FromBottom_Counterclockwise.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resource\Sort_ExtrusionFirst_FromTop_Clockwise.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resource\Sort_ExtrusionFirst_FromTop_Counterclockwise.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\Sort_RotationFirst_FromBottom_Clockwise.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\Sort_RotationFirst_FromBottom_Counterclockwise.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\Sort_RotationFirst_FromTop_Clockwise.png" />

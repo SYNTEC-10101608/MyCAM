@@ -27,11 +27,11 @@ namespace MyCAM.Editor
 			this.m_lblUnit = new System.Windows.Forms.Label();
 			this.m_btnRemove = new System.Windows.Forms.Button();
 			this.m_btnAdd = new System.Windows.Forms.Button();
+			this.m_gbxIndexParam.SuspendLayout();
+			this.m_tableParams.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.m_tbxDX)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_tbxDY)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_tbxDZ)).BeginInit();
-			this.m_gbxIndexParam.SuspendLayout();
-			this.m_tableParams.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// m_gbxIndexParam
@@ -41,7 +41,7 @@ namespace MyCAM.Editor
 			this.m_gbxIndexParam.Controls.Add(this.m_btnAdd);
 			this.m_gbxIndexParam.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_gbxIndexParam.Location = new System.Drawing.Point(9, 9);
-			this.m_gbxIndexParam.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_gbxIndexParam.Margin = new System.Windows.Forms.Padding(4);
 			this.m_gbxIndexParam.Name = "m_gbxIndexParam";
 			this.m_gbxIndexParam.Padding = new System.Windows.Forms.Padding(7, 8, 7, 8);
 			this.m_gbxIndexParam.Size = new System.Drawing.Size(251, 208);
@@ -62,7 +62,7 @@ namespace MyCAM.Editor
 			this.m_tableParams.Controls.Add(this.m_tbxDZ, 1, 2);
 			this.m_tableParams.Controls.Add(this.m_lblUnit, 0, 3);
 			this.m_tableParams.Location = new System.Drawing.Point(9, 25);
-			this.m_tableParams.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_tableParams.Margin = new System.Windows.Forms.Padding(4);
 			this.m_tableParams.Name = "m_tableParams";
 			this.m_tableParams.RowCount = 4;
 			this.m_tableParams.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
@@ -87,11 +87,23 @@ namespace MyCAM.Editor
 			// 
 			this.m_tbxDX.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this.m_tbxDX.DecimalPlaces = 3;
-			this.m_tbxDX.Increment = 0.25m;
-			this.m_tbxDX.Minimum = -99999;
-			this.m_tbxDX.Maximum = 99999;
+			this.m_tbxDX.Increment = new decimal(new int[] {
+            25,
+            0,
+            0,
+            131072});
 			this.m_tbxDX.Location = new System.Drawing.Point(49, 4);
-			this.m_tbxDX.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_tbxDX.Margin = new System.Windows.Forms.Padding(4);
+			this.m_tbxDX.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_tbxDX.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_tbxDX.Name = "m_tbxDX";
 			this.m_tbxDX.Size = new System.Drawing.Size(175, 25);
 			this.m_tbxDX.TabIndex = 1;
@@ -112,11 +124,23 @@ namespace MyCAM.Editor
 			// 
 			this.m_tbxDY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this.m_tbxDY.DecimalPlaces = 3;
-			this.m_tbxDY.Increment = 0.25m;
-			this.m_tbxDY.Minimum = -99999;
-			this.m_tbxDY.Maximum = 99999;
+			this.m_tbxDY.Increment = new decimal(new int[] {
+            25,
+            0,
+            0,
+            131072});
 			this.m_tbxDY.Location = new System.Drawing.Point(49, 36);
-			this.m_tbxDY.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_tbxDY.Margin = new System.Windows.Forms.Padding(4);
+			this.m_tbxDY.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_tbxDY.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_tbxDY.Name = "m_tbxDY";
 			this.m_tbxDY.Size = new System.Drawing.Size(175, 25);
 			this.m_tbxDY.TabIndex = 3;
@@ -137,11 +161,23 @@ namespace MyCAM.Editor
 			// 
 			this.m_tbxDZ.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this.m_tbxDZ.DecimalPlaces = 3;
-			this.m_tbxDZ.Increment = 0.25m;
-			this.m_tbxDZ.Minimum = -99999;
-			this.m_tbxDZ.Maximum = 99999;
+			this.m_tbxDZ.Increment = new decimal(new int[] {
+            25,
+            0,
+            0,
+            131072});
 			this.m_tbxDZ.Location = new System.Drawing.Point(49, 68);
-			this.m_tbxDZ.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_tbxDZ.Margin = new System.Windows.Forms.Padding(4);
+			this.m_tbxDZ.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_tbxDZ.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_tbxDZ.Name = "m_tbxDZ";
 			this.m_tbxDZ.Size = new System.Drawing.Size(175, 25);
 			this.m_tbxDZ.TabIndex = 5;
@@ -163,7 +199,7 @@ namespace MyCAM.Editor
 			// m_btnRemove
 			// 
 			this.m_btnRemove.Location = new System.Drawing.Point(125, 155);
-			this.m_btnRemove.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_btnRemove.Margin = new System.Windows.Forms.Padding(4);
 			this.m_btnRemove.Name = "m_btnRemove";
 			this.m_btnRemove.Size = new System.Drawing.Size(109, 35);
 			this.m_btnRemove.TabIndex = 7;
@@ -174,7 +210,7 @@ namespace MyCAM.Editor
 			// m_btnAdd
 			// 
 			this.m_btnAdd.Location = new System.Drawing.Point(9, 155);
-			this.m_btnAdd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_btnAdd.Margin = new System.Windows.Forms.Padding(4);
 			this.m_btnAdd.Name = "m_btnAdd";
 			this.m_btnAdd.Size = new System.Drawing.Size(109, 35);
 			this.m_btnAdd.TabIndex = 6;
@@ -189,9 +225,9 @@ namespace MyCAM.Editor
 			this.ClientSize = new System.Drawing.Size(269, 226);
 			this.Controls.Add(this.m_gbxIndexParam);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-			this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "ContourEditDlg";
-			this.Padding = new System.Windows.Forms.Padding(9, 9, 9, 9);
+			this.Padding = new System.Windows.Forms.Padding(9);
 			this.Text = "路徑點局部偏移";
 			this.TopMost = true;
 			this.m_gbxIndexParam.ResumeLayout(false);

@@ -124,7 +124,7 @@ namespace MyCAM.Editor
 			// init data for current path
 			m_CurrentPathID = pathID;
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
-				MyApp.Logger.ShowOnLogPanel( $"無法獲取路徑 {pathID} 的加工資訊", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathID ), MyApp.NoticeType.Warning );
 				End();
 				return;
 			}
@@ -613,7 +613,7 @@ namespace MyCAM.Editor
 		{
 			if( angleA_deg < MIN_TiltAngle || angleA_deg > MAX_TiltAngle ||
 				angleB_deg < MIN_TiltAngle || angleB_deg > MAX_TiltAngle ) {
-				MyApp.Logger.ShowOnLogPanel( "傾角值過大，角度必須在 -90~+90 範圍內", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "TiltAngleTooLarge", TILT_ANGLE_TOO_LARGE ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			return true;
@@ -628,9 +628,9 @@ namespace MyCAM.Editor
 		{
 			if( frameTransformMap == null
 				|| !frameTransformMap.ContainsKey( MachineComponentType.WorkPiece )
-				|| frameTransformMap[ MachineComponentType.WorkPiece ] == null
-				|| frameTransformMap[ MachineComponentType.WorkPiece ].Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
+					|| frameTransformMap[ MachineComponentType.WorkPiece ] == null
+					|| frameTransformMap[ MachineComponentType.WorkPiece ].Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotSimulatePose", CANNOT_SIMULATE_POSE ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			return true;
@@ -842,7 +842,7 @@ namespace MyCAM.Editor
 		{
 			// already at end point
 			if( m_DataHandler.IsClosed() && m_nPointIndex == CLOSED_POINT_INDEX ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]沒有下個控制點", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoNextControlPoint", NO_NEXT_CONTROL_POINT ), MyApp.NoticeType.Hint );
 				return;
 			}
 
@@ -860,7 +860,7 @@ namespace MyCAM.Editor
 				OnSelectedPointIndexChanged( targetIdx );
 			}
 			else {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]沒有下個控制點", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoNextControlPoint", NO_NEXT_CONTROL_POINT ), MyApp.NoticeType.Hint );
 			}
 		}
 
@@ -868,7 +868,7 @@ namespace MyCAM.Editor
 		{
 			// already at start point
 			if( m_DataHandler.IsClosed() && m_nPointIndex == m_DataHandler.GetStartPointCADIndex() ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]沒有前個控制點", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoPreControlPoint", NO_PRE_CONTROL_POINT ), MyApp.NoticeType.Hint );
 				return;
 			}
 
@@ -887,7 +887,7 @@ namespace MyCAM.Editor
 				OnSelectedPointIndexChanged( targetIdx );
 			}
 			else {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]沒有前個控制點", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoPreControlPoint", NO_PRE_CONTROL_POINT ), MyApp.NoticeType.Hint );
 			}
 		}
 
@@ -899,7 +899,7 @@ namespace MyCAM.Editor
 		{
 			bool isGetMachineData = DataGettingHelper.GetMachineData( out MachineData machineData );
 			if( !isGetMachineData ) {
-				MyApp.Logger.ShowOnLogPanel( "無法獲得機構資訊", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotGetMachineInfo", CANNOT_GET_MACHINE_INFO ), MyApp.NoticeType.Warning );
 				return;
 			}
 
@@ -911,11 +911,11 @@ namespace MyCAM.Editor
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nPointIndex );
 			}
 			bool isCalSuccess = CalSimuTranfResult( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, isEditModifyPnt );
-			if( !isCalSuccess ) {
-				MyApp.Logger.ShowOnLogPanel( "無法順利模擬該點姿態", MyApp.NoticeType.Warning );
-				return;
-			}
-			if( !ValidateFrameTransformMap( frameTransformMap ) ) {
+				if( !isCalSuccess ) {
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotSimulatePose", CANNOT_SIMULATE_POSE ), MyApp.NoticeType.Warning );
+					return;
+				}
+				if( !ValidateFrameTransformMap( frameTransformMap ) ) {
 				return;
 			}
 			// output vertex is the shape of high light
@@ -986,7 +986,7 @@ namespace MyCAM.Editor
 			PostSolver postSolver = new PostSolver( m_DataManager.MachineData );
 			bool calSuccess = SimulationHelper.BuildFKPostPnt( postSolver, G54pnt, out PostPoint FKpnt, simuOffset );
 			if( !calSuccess ) {
-				MyApp.Logger.ShowOnLogPanel( "無法計算出雷射頭位置", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotCalculateLaserHeadPosition", CANNOT_CALCULATE_LASER_HEAD_POSITION ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			// init frame transform map
@@ -1078,6 +1078,15 @@ namespace MyCAM.Editor
 
 		// flag to stop event raise to trigger onproperty change
 		bool m_IsUpdatingUI = false;
+
+		const string CANNOT_GET_PATH_CRAFT_INFO = "無法獲取路徑 {0} 的加工資訊";
+		const string TILT_ANGLE_TOO_LARGE = "傾斜角度超過限制範圍";
+		const string CANNOT_SIMULATE_POSE = "無法模擬姿態";
+		const string NO_NEXT_CONTROL_POINT = "沒有下一個控制點";
+		const string NO_PRE_CONTROL_POINT = "沒有上一個控制點";
+		const string CANNOT_GET_MACHINE_INFO = "無法獲取機台資訊";
+		const string CANNOT_CALCULATE_LASER_HEAD_POSITION = "無法計算雷射頭位置";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ToolVectorAction" );
 	}
 
 	class ToolVecActionDataHandler

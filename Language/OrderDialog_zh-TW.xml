@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="OrderDialog" Content="路徑排序" />
+    <Message ID="m_gbxOrderMode" Content="排序模式" />
+    <Message ID="m_rbSequentialOrder" Content="依次排序" />
+    <Message ID="m_rbPathSwap" Content="路徑置換" />
+    <Message ID="m_gbxContent_Sequential" Content="設定" />
+    <Message ID="m_gbxContent_Swap" Content="置換操作" />
+    <Message ID="m_lblSequentialDesc" Content="選擇路徑後，按下 Enter&#13;&#10;&#13;&#10;這條路徑會排列在當前旗標路徑之後。" />
+    <Message ID="m_btnMoveUp" Content="往前移動（順序變小）" />
+    <Message ID="m_btnMoveDown" Content="往後移動（順序變大）" />
+    <Message ID="m_btnMoveToTop" Content="置頂" />
+    <Message ID="m_btnApply" Content="確定" />
+</ResMap>

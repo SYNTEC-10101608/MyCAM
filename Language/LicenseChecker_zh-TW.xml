@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Error_Title" Content="錯誤" />
+  <Message ID="Error_IsLicenseActivatedException" Content="授權驗證發生例外：{0}" />
+  <Message ID="Error_LicenseFileEmpty" Content="授權檔案為空或無法讀取" />
+  <Message ID="Error_LicenseFileSignatureFailed" Content="授權檔案簽章驗證失敗" />
+  <Message ID="Error_LicenseFileNoSignature" Content="授權檔案缺少簽章欄位" />
+  <Message ID="Error_LicenseMissingFields" Content="授權檔案缺少必要欄位（Customer/HWID）" />
+  <Message ID="Error_EntryAssemblyNull_Version" Content="無法取得程式集資訊，版本驗證失敗" />
+  <Message ID="Error_ProductMismatch" Content="授權產品名稱不符。預期：{0}，目前：{1}" />
+  <Message ID="Error_MinVersionNotMet" Content="授權最低版本需求不符。要求：{0}，目前：{1}" />
+  <Message ID="Error_MaxVersionExceeded" Content="授權版本超出限制。允許至：{0}，目前：{1}" />
+  <Message ID="Error_ReadLicenseFileFailed" Content="授權檔案讀取失敗：{0}" />
+  <Message ID="Error_InstallLicenseFailed" Content="安裝授權失敗：{0}" />
+  <Message ID="Error_LicenseCodeEmpty" Content="授權碼不得為空" />
+  <Message ID="Error_LicenseCodeNoSignature" Content="輸入的授權碼不含簽章" />
+  <Message ID="Error_LicenseCodeInvalidBase64" Content="授權碼格式無效（非 Base64）" />
+  <Message ID="Error_EntryAssemblyNull_Request" Content="無法取得程式集資訊，無法產生啟動請求" />
+  <Message ID="Error_ProductEmpty_Request" Content="產品名稱不得為空，無法產生啟動請求" />
+  <Message ID="Error_VersionEmpty_Request" Content="版本號不得為空，無法產生啟動請求" />
+  <Message ID="Info_ActivationRequestGenerated" Content="授權啟動請求檔案產生於：&#10;{0}&#10;&#10;請將此檔案傳送給供應商以取得授權代碼。" />
+  <Message ID="Info_ActivationRequestGeneratedTitle" Content="授權請求已產生" />
+</ResMap>

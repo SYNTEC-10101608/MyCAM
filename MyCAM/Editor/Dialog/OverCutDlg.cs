@@ -1,6 +1,5 @@
-ï»¿using MyCAM.App;
+using MyCAM.App;
 using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -11,6 +10,15 @@ namespace MyCAM.Editor.Dialog
 			InitializeComponent();
 			m_OverCutLength = overCutLength;
 			m_tbxOverCutLength.SilentSetValue = (decimal)m_OverCutLength;
+			ApplyResourcesToUI();
+		}
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "OverCutDlg", this.Text );
+			m_lblOverCutLength.Text = m_LanguageManager.TryGetString( "m_lblOverCutLength", m_lblOverCutLength.Text );
+			m_OverCutUnit.Text = m_LanguageManager.TryGetString( "m_OverCutUnit", m_OverCutUnit.Text );
+			m_btnSure.Text = m_LanguageManager.TryGetString( "m_btnSure", m_btnSure.Text );
 		}
 
 		public Func<double, bool> CheckValueGeomRestriction;
@@ -38,11 +46,11 @@ namespace MyCAM.Editor.Dialog
 		{
 			double dOverCutLength = (double)m_tbxOverCutLength.Value;
 			if( dOverCutLength < 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "é•·åº¦éœ€è¦å¤§æ–¼0", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Error_NegativeLength", ERROR_NEGATIVE_LENGTH ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			if( CheckValueGeomRestriction?.Invoke( dOverCutLength ) == false ) {
-				MyApp.Logger.ShowOnLogPanel( "éŽåˆ‡é•·åº¦è¶…å‡ºå¹¾ä½•é™åˆ¶", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Error_ExceedGeometry", ERROR_EXCEED_GEOMETRY ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			m_OverCutLength = dOverCutLength;
@@ -50,5 +58,9 @@ namespace MyCAM.Editor.Dialog
 		}
 
 		double m_OverCutLength = 0;
+
+		const string ERROR_NEGATIVE_LENGTH = "ªø«×»Ý­n¤j©ó0";
+		const string ERROR_EXCEED_GEOMETRY = "¹L¤Áªø«×¶W¥X´X¦ó­­¨î";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "OverCutDlg" );
 	}
 }

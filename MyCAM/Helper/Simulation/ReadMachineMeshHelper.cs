@@ -32,6 +32,8 @@ namespace MyCAM.Helper
 
 	public class ReadMachineMeshHelper
 	{
+		static readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ReadMachineMeshHelper" );
+
 		public static bool LoadMachineMeshes( string szFolderPath, out MachineMeshes machineMeshes )
 		{
 			machineMeshes = new MachineMeshes();
@@ -135,20 +137,25 @@ namespace MyCAM.Helper
 			if( result != ReadStlResult.Success ) {
 				switch( result ) {
 					case ReadStlResult.ArgumentNull:
-						MyApp.Logger.ShowOnLogPanel( $"機構資料夾路徑錯誤", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "MeshFolderPathError", MESH_FOLDER_PATH_ERROR ), MyApp.NoticeType.Warning );
 						break;
 					case ReadStlResult.FileNotFound:
-						MyApp.Logger.ShowOnLogPanel( $"{fileName} 圖檔有缺漏", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "MeshFileMissing", MESH_FILE_MISSING ), fileName ), MyApp.NoticeType.Warning );
 						break;
 					case ReadStlResult.InvalidMesh:
-						MyApp.Logger.ShowOnLogPanel( $"{fileName} 檔案讀取失敗", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "MeshFileReadFailed", MESH_FILE_READ_FAILED ), fileName ), MyApp.NoticeType.Warning );
 						break;
 					case ReadStlResult.UnknownError:
-						MyApp.Logger.ShowOnLogPanel( $"{fileName} STL讀取失敗，發生未知錯誤", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "MeshFileUnknownError", MESH_FILE_UNKNOWN_ERROR ), fileName ), MyApp.NoticeType.Warning );
 						break;
 				}
 				return;
 			}
 		}
+
+		const string MESH_FOLDER_PATH_ERROR = "機構資料夾路徑錯誤";
+		const string MESH_FILE_MISSING = "{0} 圖檔有缺漏";
+		const string MESH_FILE_READ_FAILED = "{0} 檔案讀取失敗";
+		const string MESH_FILE_UNKNOWN_ERROR = "{0} STL讀取失敗，發生未知錯誤";
 	}
 }

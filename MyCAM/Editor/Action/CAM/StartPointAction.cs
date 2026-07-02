@@ -83,7 +83,7 @@ namespace MyCAM.Editor
 			// init data for current path
 			m_CurrentPathID = pathID;
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
-				MyApp.Logger.ShowOnLogPanel( $"無法獲取路徑 {pathID} 的加工資訊", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathID ), MyApp.NoticeType.Warning );
 				End();
 				return;
 			}
@@ -160,5 +160,8 @@ namespace MyCAM.Editor
 		ViewManager m_ViewManager;
 		SelectPathAction m_PathIndexAction;
 		IndexSelectAction m_PointIndexAction;
+
+		const string CANNOT_GET_PATH_CRAFT_INFO = "無法獲取路徑 {0} 的加工資訊";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "StartPointAction" );
 	}
 }

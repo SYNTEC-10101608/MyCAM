@@ -34,11 +34,9 @@
 		public AutoSortPathDlg()
 		{
 			InitializeComponent();
-			InitializeSortMethodComboBox();
-			InitializeAxisComboBox();
-			InitializeDirectionComboBoxes();
 			InitializeBandwidthControls();
 			LoadImages();
+			ApplyResourcesToUI();
 			UpdateSortMethodState();
 		}
 
@@ -48,45 +46,62 @@
 		{
 			m_SelectedPathID = pathID;
 			if( string.IsNullOrEmpty( pathID ) ) {
-				m_lblSelectedPath.Text = "未選取";
+				m_lblSelectedPath.Text = m_LanguageManager.TryGetString( "Status_NotSelected", m_lblSelectedPath.Text );
 				m_lblSelectedPath.ForeColor = System.Drawing.Color.Red;
 			}
 			else {
-				m_lblSelectedPath.Text = "已選取";
+				m_lblSelectedPath.Text = m_LanguageManager.TryGetString( "Status_Selected", m_lblSelectedPath.Text );
 				m_lblSelectedPath.ForeColor = System.Drawing.Color.Green;
 			}
 			UpdateSortMethodState();
 		}
 
-		void InitializeSortMethodComboBox()
+		void ApplyResourcesToUI()
 		{
+			this.Text = m_LanguageManager.TryGetString( "FormTitle", this.Text );
+			m_lblSortMethod.Text = m_LanguageManager.TryGetString( "m_lblSortMethod", m_lblSortMethod.Text );
+			m_lblPathHint.Text = m_LanguageManager.TryGetString( "m_lblPathHint", m_lblPathHint.Text );
+			m_lblCylinderAxis.Text = m_LanguageManager.TryGetString( "m_lblCylinderAxis", m_lblCylinderAxis.Text );
+			m_lblExtrusionDir.Text = m_LanguageManager.TryGetString( "m_lblExtrusionDir", m_lblExtrusionDir.Text );
+			m_lblRotationDir.Text = m_LanguageManager.TryGetString( "m_lblRotationDir", m_lblRotationDir.Text );
+			m_lblExtrusionBandwidth.Text = m_LanguageManager.TryGetString( "m_lblBandwidth", m_lblExtrusionBandwidth.Text );
+			m_lblRotationBandwidth.Text = m_LanguageManager.TryGetString( "m_lblBandwidth", m_lblRotationBandwidth.Text );
+			m_lblRotationUnit.Text = m_LanguageManager.TryGetString( "m_lblRotationUnit", m_lblRotationUnit.Text );
+			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
+
+			// Sort method combobox
+			int sortIdx = m_cmbSortMethod.SelectedIndex < 0 ? 0 : m_cmbSortMethod.SelectedIndex;
 			m_cmbSortMethod.Items.Clear();
-			m_cmbSortMethod.Items.Add( "最短路徑" );
-			m_cmbSortMethod.Items.Add( "圓管直排" );
-			m_cmbSortMethod.Items.Add( "圓管橫排" );
-			m_cmbSortMethod.SelectedIndex = 0;
-		}
 
-		void InitializeAxisComboBox()
-		{
+			m_cmbSortMethod.Items.Add( m_LanguageManager.TryGetString( "SortMethod_ShortestPath", SORT_METHOD_SHORTEST_PATH ) );
+			m_cmbSortMethod.Items.Add( m_LanguageManager.TryGetString( "SortMethod_CylinderVertical", SORT_METHOD_CYLINDER_VERTICAL ) );
+			m_cmbSortMethod.Items.Add( m_LanguageManager.TryGetString( "SortMethod_CylinderHorizontal", SORT_METHOD_CYLINDER_HORIZONTAL ) );
+			m_cmbSortMethod.SelectedIndex = sortIdx;
+
+			// Cylinder axis combobox
+			int axisIdx = m_cmbCylinderAxis.SelectedIndex < 0 ? 2 : m_cmbCylinderAxis.SelectedIndex;
 			m_cmbCylinderAxis.Items.Clear();
-			m_cmbCylinderAxis.Items.Add( "X 軸" );
-			m_cmbCylinderAxis.Items.Add( "Y 軸" );
-			m_cmbCylinderAxis.Items.Add( "Z 軸" );
-			m_cmbCylinderAxis.SelectedIndex = 2; // default Z
-		}
 
-		void InitializeDirectionComboBoxes()
-		{
+			m_cmbCylinderAxis.Items.Add( m_LanguageManager.TryGetString( "Axis_X", AXIS_X ) );
+			m_cmbCylinderAxis.Items.Add( m_LanguageManager.TryGetString( "Axis_Y", AXIS_Y ) );
+			m_cmbCylinderAxis.Items.Add( m_LanguageManager.TryGetString( "Axis_Z", AXIS_Z ) );
+			m_cmbCylinderAxis.SelectedIndex = axisIdx;
+
+			// Extrusion direction combobox
+			int extrusionIdx = m_cmbExtrusionDir.SelectedIndex < 0 ? 0 : m_cmbExtrusionDir.SelectedIndex;
 			m_cmbExtrusionDir.Items.Clear();
-			m_cmbExtrusionDir.Items.Add( "從上往下" );
-			m_cmbExtrusionDir.Items.Add( "從下往上" );
-			m_cmbExtrusionDir.SelectedIndex = 0;
 
+			m_cmbExtrusionDir.Items.Add( m_LanguageManager.TryGetString( "ExtrusionDir_FromTop", EXTRUSION_DIR_FROM_TOP ) );
+			m_cmbExtrusionDir.Items.Add( m_LanguageManager.TryGetString( "ExtrusionDir_FromBottom", EXTRUSION_DIR_FROM_BOTTOM ) );
+			m_cmbExtrusionDir.SelectedIndex = extrusionIdx;
+
+			// Rotation direction combobox
+			int rotationIdx = m_cmbRotationDir.SelectedIndex < 0 ? 0 : m_cmbRotationDir.SelectedIndex;
 			m_cmbRotationDir.Items.Clear();
-			m_cmbRotationDir.Items.Add( "順時針" );
-			m_cmbRotationDir.Items.Add( "逆時針" );
-			m_cmbRotationDir.SelectedIndex = 0;
+
+			m_cmbRotationDir.Items.Add( m_LanguageManager.TryGetString( "RotationDir_Clockwise", ROTATION_DIR_CLOCKWISE ) );
+			m_cmbRotationDir.Items.Add( m_LanguageManager.TryGetString( "RotationDir_Counterclockwise", ROTATION_DIR_COUNTERCLOCKWISE ) );
+			m_cmbRotationDir.SelectedIndex = rotationIdx;
 		}
 
 		void InitializeBandwidthControls()
@@ -165,22 +180,16 @@
 			if( method == SortMethod.CylinderHorizontal ) {
 				// rotation is hardcoded to counterclockwise, only extrusion direction varies
 				bool isFromUp = m_cmbExtrusionDir.SelectedIndex == 0;
-				if( isFromUp ) {
-					targetImage = m_imgExtrusionFirst_FromTop_Counterclockwise;
-				}
-				else {
-					targetImage = m_imgExtrusionFirst_FromBottom_Counterclockwise;
-				}
+				targetImage = isFromUp
+					? m_imgExtrusionFirst_FromTop_Counterclockwise
+					: m_imgExtrusionFirst_FromBottom_Counterclockwise;
 			}
 			else if( method == SortMethod.CylinderVertical ) {
 				// extrusion is hardcoded to "from top", only rotation direction varies
 				bool isClockwise = m_cmbRotationDir.SelectedIndex == 0;
-				if( isClockwise ) {
-					targetImage = m_imgRotationFirst_FromTop_Clockwise;
-				}
-				else {
-					targetImage = m_imgRotationFirst_FromTop_Counterclockwise;
-				}
+				targetImage = isClockwise
+					? m_imgRotationFirst_FromTop_Clockwise
+					: m_imgRotationFirst_FromTop_Counterclockwise;
 			}
 
 			m_picPreview.Image = targetImage;
@@ -270,5 +279,17 @@
 		System.Drawing.Image m_imgExtrusionFirst_FromBottom_Counterclockwise;
 		System.Drawing.Image m_imgRotationFirst_FromTop_Clockwise;
 		System.Drawing.Image m_imgRotationFirst_FromTop_Counterclockwise;
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "AutoSortPathDlg" );
+
+		const string SORT_METHOD_SHORTEST_PATH = "最短路徑";
+		const string SORT_METHOD_CYLINDER_VERTICAL = "圓管直排";
+		const string SORT_METHOD_CYLINDER_HORIZONTAL = "圓管橫排";
+		const string AXIS_X = "X 軸";
+		const string AXIS_Y = "Y 軸";
+		const string AXIS_Z = "Z 軸";
+		const string EXTRUSION_DIR_FROM_TOP = "從上往下";
+		const string EXTRUSION_DIR_FROM_BOTTOM = "從下往上";
+		const string ROTATION_DIR_CLOCKWISE = "順時針";
+		const string ROTATION_DIR_COUNTERCLOCKWISE = "逆時針";
 	}
 }

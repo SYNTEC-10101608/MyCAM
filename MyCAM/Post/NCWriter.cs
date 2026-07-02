@@ -68,7 +68,7 @@ namespace MyCAM.Post
 							if( !ContourPostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
 								endInfoOfPreviousPath, m_EntryAndExitData,
 								out PostData postData, out endInfoOfPreviousPath ) ) {
-								errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
+								errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), i + 1 );
 								return false;
 							}
 							WriteCutting( postData, i + 1, nPathLayer );
@@ -77,7 +77,7 @@ namespace MyCAM.Post
 							StdPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
 							if( !StdPatternPostHelper.SolvePath( m_PostSolver, package, endInfoOfPreviousPath, m_EntryAndExitData,
 								out StdPatternPostData postData, out endInfoOfPreviousPath ) ) {
-								errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
+								errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), i + 1 );
 								return false;
 							}
 							WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, package.GeomData, i + 1 );
@@ -125,7 +125,7 @@ namespace MyCAM.Post
 							endInfoOfPreviousPath, m_EntryAndExitData,
 							out PostData postData, out endInfoOfPreviousPath ) ) {
 
-							errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
+							errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), i + 1 );
 							return false;
 						}
 						postDataList.Add( postData );
@@ -134,7 +134,7 @@ namespace MyCAM.Post
 						StdPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
 						if( !StdPatternPostHelper.SolvePath( m_PostSolver, package, endInfoOfPreviousPath, m_EntryAndExitData,
 							out StdPatternPostData stdPostData, out endInfoOfPreviousPath ) ) {
-							errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
+							errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), i + 1 );
 							return false;
 						}
 
@@ -142,7 +142,7 @@ namespace MyCAM.Post
 							endInfoOfPreviousPath, m_EntryAndExitData,
 							out PostData postData, out _ ) ) {
 
-							errorMessage = "後處理運算錯誤，路徑：" + ( i + 1 ).ToString();
+							errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), i + 1 );
 							return false;
 						}
 
@@ -337,5 +337,8 @@ namespace MyCAM.Post
 			}
 			return false;
 		}
+
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "NCWriter" );
+		const string ERROR_POST_PROCESSING = "後處理運算錯誤，路徑：{0}";
 	}
 }

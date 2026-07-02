@@ -86,7 +86,7 @@ namespace MyCAM.Editor
 
 			// validate new path (contour only)
 			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
-				MyApp.Logger.ShowOnLogPanel( $"路徑 {pathID} 不是輪廓路徑，無法編輯", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NotContourPath", NOT_CONTOUR_PATH ), pathID ), MyApp.NoticeType.Warning );
 				End();
 				return;
 			}
@@ -94,7 +94,7 @@ namespace MyCAM.Editor
 			// init data for current path
 			m_CurrentPathID = pathID;
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
-				MyApp.Logger.ShowOnLogPanel( $"無法獲取路徑 {pathID} 的加工資訊", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathID ), MyApp.NoticeType.Warning );
 				End();
 				return;
 			}
@@ -279,11 +279,15 @@ namespace MyCAM.Editor
 		// null point index as -999, -1 is used for closed point index
 		const int NULL_SELECT_INDEX = -999;
 
+		const string NOT_CONTOUR_PATH = "路徑 {0} 不是輪廓路徑，無法編輯";
+		const string CANNOT_GET_PATH_CRAFT_INFO = "無法獲取路徑 {0} 的加工資訊";
+
 		// composition references
 		Viewer m_Viewer;
 		TreeView m_TreeView;
 		ViewManager m_ViewManager;
 		SelectPathAction m_PathIndexAction;
 		IndexSelectAction m_PointIndexAction;
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ContourEditAction" );
 	}
 }

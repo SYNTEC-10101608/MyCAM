@@ -1,4 +1,4 @@
-ï»¿using MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.TopAbs;
@@ -147,7 +147,7 @@ namespace MyCAM.Editor
 		{
 			List<TopoDS_Face> faceBFSQueue = GetSelectedFace();
 			if( faceBFSQueue.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[æ“ä½œæé†’]è«‹å…ˆé¸æ“‡é¢", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseSelectFace", PLEASE_SELECT_FACE ), MyApp.NoticeType.Hint );
 				return;
 			}
 
@@ -273,5 +273,7 @@ namespace MyCAM.Editor
 
 		List<FaceHandle> m_VisibleFaceAISPairList;
 		TopTools_IndexedDataMapOfShapeListOfShape m_EdgeFaceMap;
+		const string PLEASE_SELECT_FACE = "[¾Ş§@´£¿ô]½Ğ¥ı¿ï¾Ü­±";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SelectFaceAction" );
 	}
 }

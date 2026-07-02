@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="GlassDXFImportDlg" Content="玻璃DXF匯入" />
+	<Message ID="m_lblRadius" Content="圓球半徑(R)" />
+	<Message ID="m_lblHeight" Content="曲面高度(H)" />
+	<Message ID="m_lblNote" Content="註：R=0 時為平面模式" />
+	<Message ID="m_btnOK" Content="確認" />
+	<Message ID="m_btnCancel" Content="取消" />
+	<Message ID="RadiusRangeError" Content="圓球半徑需介於 0 ~ {0} mm" />
+	<Message ID="HeightRangeError" Content="曲面高度需為大於 0 且小於 R({0}) 的正數" />
+</ResMap>

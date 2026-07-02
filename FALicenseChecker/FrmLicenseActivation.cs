@@ -5,12 +5,16 @@ namespace FALicenseChecker
 {
 	public partial class FrmLicenseActivation : Form
 	{
+		static readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "FrmLicenseActivation" );
+
 		public FrmLicenseActivation()
 		{
 			InitializeComponent();
-			Text = "產品授權";
-			m_lblHint.Text = "輸入授權碼";
-			m_btnActivate.Text = "啟用";
+
+			// designer-time text is kept as fallback when lookup misses
+			this.Text = m_LanguageManager.TryGetString( "FrmLicenseActivation_Title", this.Text );
+			m_lblHint.Text = m_LanguageManager.TryGetString( "FrmLicenseActivation_Hint", m_lblHint.Text );
+			m_btnActivate.Text = m_LanguageManager.TryGetString( "FrmLicenseActivation_ActivateButton", m_btnActivate.Text );
 		}
 
 		public string LicenseCode

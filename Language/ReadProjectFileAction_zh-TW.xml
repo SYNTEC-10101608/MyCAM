@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="ReadProjectFileFailed" Content="讀取專案檔案失敗：&#xA;{0}" />
+	<Message ID="OpenProjectTitle" Content="開啟專案" />
+</ResMap>

@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="CoincidentSecondPoint" Content="重合的第二个点" />
+	<Message ID="CoincidentThirdPoint" Content="重合的第三个点" />
+	<Message ID="ThreePointsCollinear" Content="3点共线" />
+	<Message ID="InvalidAxisParam" Content="无效的轴向参数" />
+	<Message ID="CannotCreate3PCoordSystem" Content="无法创建三点坐标系" />
+</ResMap>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="NoIntersectedFace" Content="[操作提醒]找不到相交的面" />
+    <Message ID="NoD1ContinuousFaces" Content="[操作提醒]找不到 D1 连续面" />
+    <Message ID="SewFaceGroupFailed" Content="[操作提醒]面群组建立失败" />
+    <Message ID="NoClosedBoundaries" Content="[操作提醒]找不到封闭边界" />
+    <Message ID="UnknownError" Content="[操作提醒]未知错误" />
+</ResMap>
