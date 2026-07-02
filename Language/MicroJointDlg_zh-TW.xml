@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="MicroJointDlg" Content="編輯微連" />
+    <Message ID="m_lblLength" Content="微連長度" />
+    <Message ID="m_btnClearAll" Content="刪除所有微連" />
+    <Message ID="m_btnDelete" Content="刪除" />
+    <Message ID="m_btnCancel" Content="完成" />
+</ResMap>

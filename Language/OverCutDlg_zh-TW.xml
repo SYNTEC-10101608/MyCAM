@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="OverCutDlg" Content="過切" />
+	<Message ID="m_lblOverCutLength" Content="過切長度:" />
+	<Message ID="m_OverCutUnit" Content="mm" />
+	<Message ID="m_btnSure" Content="OK" />
+	<Message ID="Error_NegativeLength" Content="長度需要大於0" />
+	<Message ID="Error_ExceedGeometry" Content="過切長度超出幾何限制" />
+</ResMap>

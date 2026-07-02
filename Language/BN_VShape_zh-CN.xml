@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="BendingAngle_deg" Content="折弯角度" />
+  <Message ID="JointGapLength" Content="拼接口长度" />
+  <Message ID="ReliefHoleType" Content="释放孔类型" />
+  <Message ID="ReliefHole" Content="释放孔参数" />
+</ResMap>

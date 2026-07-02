@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
@@ -28,6 +28,26 @@ namespace MyCAM.Editor.Dialog
 			InitialControlBoundarySetting();
 			InitialControlValue();
 			RegisterValueChangedEvents();
+			ApplyResourcesToUI();
+		}
+
+		public void ApplyResourcesToUI()
+		{
+			// set the UI language
+			this.Text = m_LanguageManager.TryGetString( "AxisTransformDlg", this.Text );
+			m_grpDisplacement.Text = m_LanguageManager.TryGetString( "m_grpDisplacement", m_grpDisplacement.Text );
+			m_grpRotation.Text = m_LanguageManager.TryGetString( "m_grpRotation", m_grpRotation.Text );
+			m_lblX.Text = m_LanguageManager.TryGetString( "m_lblX", m_lblX.Text );
+			m_lblY.Text = m_LanguageManager.TryGetString( "m_lblY", m_lblY.Text );
+			m_lblZ.Text = m_LanguageManager.TryGetString( "m_lblZ", m_lblZ.Text );
+			m_lblRx.Text = m_LanguageManager.TryGetString( "m_lblRx", m_lblRx.Text );
+			m_lblRy.Text = m_LanguageManager.TryGetString( "m_lblRy", m_lblRy.Text );
+			m_lblRz.Text = m_LanguageManager.TryGetString( "m_lblRz", m_lblRz.Text );
+			m_lblStepDis.Text = m_LanguageManager.TryGetString( "m_lblStepDis", m_lblStepDis.Text );
+			m_lblStapAngle.Text = m_LanguageManager.TryGetString( "m_lblStapAngle", m_lblStapAngle.Text );
+			m_btnOK.Text = m_LanguageManager.TryGetString( "m_btnOK", m_btnOK.Text );
+			m_btnCancel.Text = m_LanguageManager.TryGetString( "m_btnCancel", m_btnCancel.Text );
+			m_btnReset.Text = m_LanguageManager.TryGetString( "m_btnReset", m_btnReset.Text );
 		}
 
 		internal void UpdateDisplacementFromManipulator( decimal dx, decimal dy, decimal dz )
@@ -300,5 +320,7 @@ namespace MyCAM.Editor.Dialog
 			foreach( var nud in GetRotationControls() )
 				yield return nud;
 		}
+
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "AxisTransformDlg" );
 	}
 }

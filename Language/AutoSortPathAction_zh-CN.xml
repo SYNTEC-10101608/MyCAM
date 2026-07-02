@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Log_InsufficientPaths" Content="[路径排序] 路径数量不足，至少需要 2 条路径" />
+  <Message ID="Log_SortFailed" Content="[路径排序] {0} 排序未能生成结果，请确认路径数据是否正确" />
+  <Message ID="SortMethod_ShortestPath" Content="最短路径" />
+  <Message ID="SortMethod_CylinderVertical" Content="圆筒垂直" />
+  <Message ID="SortMethod_CylinderHorizontal" Content="圆筒水平" />
+  <Message ID="SortMethod_Unknown" Content="未知" />
+</ResMap>

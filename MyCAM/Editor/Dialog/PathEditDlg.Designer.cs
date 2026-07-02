@@ -55,7 +55,6 @@
 			this.m_gpbMove.Controls.Add(this.m_lblX);
 			this.m_gpbMove.Controls.Add(this.m_lblRefCoordType);
 			this.m_gpbMove.Controls.Add(this.m_cmbRefCoordType);
-			this.m_gpbMove.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_gpbMove.Location = new System.Drawing.Point(12, 12);
 			this.m_gpbMove.Name = "m_gpbMove";
 			this.m_gpbMove.Size = new System.Drawing.Size(255, 204);
@@ -65,27 +64,60 @@
 			// 
 			// m_NumUpDownZ
 			// 
+			this.m_NumUpDownZ.DecimalPlaces = 3;
 			this.m_NumUpDownZ.Location = new System.Drawing.Point(104, 145);
+			this.m_NumUpDownZ.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_NumUpDownZ.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_NumUpDownZ.Name = "m_NumUpDownZ";
-			this.m_NumUpDownZ.Size = new System.Drawing.Size(120, 21);
+			this.m_NumUpDownZ.Size = new System.Drawing.Size(120, 27);
 			this.m_NumUpDownZ.TabIndex = 7;
 			this.m_NumUpDownZ.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			this.m_NumUpDownZ.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownZ_DebouncedValueChanged);
 			// 
 			// m_NumUpDownY
 			// 
+			this.m_NumUpDownY.DecimalPlaces = 3;
 			this.m_NumUpDownY.Location = new System.Drawing.Point(104, 110);
+			this.m_NumUpDownY.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_NumUpDownY.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_NumUpDownY.Name = "m_NumUpDownY";
-			this.m_NumUpDownY.Size = new System.Drawing.Size(120, 21);
+			this.m_NumUpDownY.Size = new System.Drawing.Size(120, 27);
 			this.m_NumUpDownY.TabIndex = 6;
 			this.m_NumUpDownY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			this.m_NumUpDownY.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownY_DebouncedValueChanged);
 			// 
 			// m_NumUpDownX
 			// 
+			this.m_NumUpDownX.DecimalPlaces = 3;
 			this.m_NumUpDownX.Location = new System.Drawing.Point(104, 71);
+			this.m_NumUpDownX.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_NumUpDownX.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_NumUpDownX.Name = "m_NumUpDownX";
-			this.m_NumUpDownX.Size = new System.Drawing.Size(120, 21);
+			this.m_NumUpDownX.Size = new System.Drawing.Size(120, 27);
 			this.m_NumUpDownX.TabIndex = 5;
 			this.m_NumUpDownX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			this.m_NumUpDownX.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownX_DebouncedValueChanged);
@@ -95,7 +127,7 @@
 			this.m_lblZ.AutoSize = true;
 			this.m_lblZ.Location = new System.Drawing.Point(31, 147);
 			this.m_lblZ.Name = "m_lblZ";
-			this.m_lblZ.Size = new System.Drawing.Size(58, 15);
+			this.m_lblZ.Size = new System.Drawing.Size(73, 19);
 			this.m_lblZ.TabIndex = 4;
 			this.m_lblZ.Text = "Z(增量)：";
 			// 
@@ -104,7 +136,7 @@
 			this.m_lblY.AutoSize = true;
 			this.m_lblY.Location = new System.Drawing.Point(31, 112);
 			this.m_lblY.Name = "m_lblY";
-			this.m_lblY.Size = new System.Drawing.Size(58, 15);
+			this.m_lblY.Size = new System.Drawing.Size(73, 19);
 			this.m_lblY.TabIndex = 3;
 			this.m_lblY.Text = "Y(增量)：";
 			// 
@@ -113,7 +145,7 @@
 			this.m_lblX.AutoSize = true;
 			this.m_lblX.Location = new System.Drawing.Point(31, 71);
 			this.m_lblX.Name = "m_lblX";
-			this.m_lblX.Size = new System.Drawing.Size(58, 15);
+			this.m_lblX.Size = new System.Drawing.Size(74, 19);
 			this.m_lblX.TabIndex = 2;
 			this.m_lblX.Text = "X(增量)：";
 			// 
@@ -122,7 +154,7 @@
 			this.m_lblRefCoordType.AutoSize = true;
 			this.m_lblRefCoordType.Location = new System.Drawing.Point(31, 24);
 			this.m_lblRefCoordType.Name = "m_lblRefCoordType";
-			this.m_lblRefCoordType.Size = new System.Drawing.Size(67, 15);
+			this.m_lblRefCoordType.Size = new System.Drawing.Size(84, 19);
 			this.m_lblRefCoordType.TabIndex = 1;
 			this.m_lblRefCoordType.Text = "參考坐標系";
 			// 
@@ -134,7 +166,7 @@
             "大地坐標系"});
 			this.m_cmbRefCoordType.Location = new System.Drawing.Point(104, 21);
 			this.m_cmbRefCoordType.Name = "m_cmbRefCoordType";
-			this.m_cmbRefCoordType.Size = new System.Drawing.Size(121, 23);
+			this.m_cmbRefCoordType.Size = new System.Drawing.Size(121, 27);
 			this.m_cmbRefCoordType.TabIndex = 0;
 			this.m_cmbRefCoordType.SelectedIndexChanged += new System.EventHandler(this.m_cmbRefCoordType_SelectedIndexChanged);
 			// 
@@ -150,7 +182,6 @@
 			// 
 			// m_btnClear
 			// 
-			this.m_btnClear.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_btnClear.Location = new System.Drawing.Point(111, 222);
 			this.m_btnClear.Name = "m_btnClear";
 			this.m_btnClear.Size = new System.Drawing.Size(75, 23);
@@ -161,7 +192,6 @@
 			// 
 			// m_btnReset
 			// 
-			this.m_btnReset.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_btnReset.Location = new System.Drawing.Point(26, 222);
 			this.m_btnReset.Name = "m_btnReset";
 			this.m_btnReset.Size = new System.Drawing.Size(75, 23);
@@ -172,13 +202,15 @@
 			// 
 			// PathEditDlg
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(283, 257);
 			this.Controls.Add(this.m_btnReset);
 			this.Controls.Add(this.m_btnClear);
 			this.Controls.Add(this.m_btnConfirm);
 			this.Controls.Add(this.m_gpbMove);
+			this.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Name = "PathEditDlg";
 			this.Text = "路徑編修";
 			this.Shown += new System.EventHandler(this.PathEditDlg_Shown);

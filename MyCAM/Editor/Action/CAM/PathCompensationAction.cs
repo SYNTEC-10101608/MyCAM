@@ -1,4 +1,4 @@
-ï»¿using MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using MyCAM.PathCache;
@@ -117,7 +117,7 @@ namespace MyCAM.Editor
 			for( int i = 0; i < m_BackupGeomDataList.Count; i++ ) {
 				double constraint = GetGeomDataMinCompensation( m_BackupGeomDataList[ i ] );
 				if( constraint > compensatedDist ) {
-					MyApp.Logger.ShowOnLogPanel( "è·¯å¾‘è¶…å‡ºè£œå„Ÿç¯„åœï¼Œè«‹èª¿æ•´è£œå„Ÿæ•¸å€¼", MyApp.NoticeType.Warning, false );
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CompensationExceedsLimit", COMPENSATION_EXCEEDS_LIMIT ), MyApp.NoticeType.Warning, false );
 					return true;
 				}
 			}
@@ -149,5 +149,7 @@ namespace MyCAM.Editor
 		List<double> m_BackupCompensatedDistList = new List<double>();
 		List<IStdPatternGeomData> m_BackupGeomDataList = new List<IStdPatternGeomData>();
 		bool isResetClicked = false;
+		const string COMPENSATION_EXCEEDS_LIMIT = "¸ô®|¶W¥X¸ÉÀv½d³ò¡A½Ğ½Õ¾ã¸ÉÀv¼Æ­È";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "PathCompensationAction" );
 	}
 }

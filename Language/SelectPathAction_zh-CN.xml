@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Log_MultiSelectError_View" Content="[选取异常] 路径单选模式下检测到多重选取 ({0} 个项目)，已自动清除" />
+  <Message ID="Log_MultiSelectError_Tree" Content="[选取异常] 路径单选模式下从路径树检测到多重选取 ({0} 个项目)，已自动清除" />
+</ResMap>

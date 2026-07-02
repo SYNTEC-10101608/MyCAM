@@ -1,4 +1,4 @@
-ï»¿using MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.TopAbs;
@@ -110,7 +110,7 @@ namespace MyCAM.Editor
 			}
 			bool isValidPoint = GeometryTool.CreateLineFromTwoVertex( vertex1, vertex2, out TopoDS_Edge edge );
 			if( !isValidPoint ) {
-				MyApp.Logger.ShowOnLogPanel( "ä¸åˆæ³•çš„å…©å€‹é»", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "InvalidTwoPoints", INVALID_TWO_POINTS ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			m_DataManager.AddReferenceFeature( edge );
@@ -118,5 +118,8 @@ namespace MyCAM.Editor
 		}
 
 		AddLineType m_AddLineType;
+
+		const string INVALID_TWO_POINTS = "[¾Ş§@´£¿ô]¿ï¨úªº¨âÂIµL®Ä¡AµLªk«Ø¥ß³s½u";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "AddLineAction" );
 	}
 }

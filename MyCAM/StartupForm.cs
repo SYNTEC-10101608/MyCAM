@@ -30,9 +30,17 @@ namespace MyCAM
 
 		public StartupForm()
 		{
+			// initialize app setting first, other modules depend on it
+			MyApp.InitAppSetting();
+
+			// apply saved UI language
+			LanguageManager.LanguageManager.CurrentUILanguage = MyApp.AppSetting.UILanguage;
+
+			m_LanguageManager = new LanguageManager.LanguageManager( "StartupForm" );
+
 #if !DEBUG
 			if( FALicenseChecker.LicenseChecker.IsLicenseActivated() == false ) {
-				MyApp.Logger.ShowOnLogPanel( "授權流程不正確", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_LicenseInvalid", LOG_LICENSE_INVALID ), MyApp.NoticeType.Error );
 				Environment.Exit( 0 );
 			}
 #endif
@@ -47,7 +55,7 @@ namespace MyCAM
 			m_Viewer = new Viewer();
 			bool bSucess = m_Viewer.InitViewer( m_panViewer );
 			if( !bSucess ) {
-				MyApp.Logger.ShowOnLogPanel( "初始化Viewer錯誤，請檢查套件是否安裝齊全", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_ViewerInitFailed", LOG_VIEWER_INIT_FAILED ), MyApp.NoticeType.Error );
 				return;
 			}
 			m_Viewer.UpdateView();
@@ -77,7 +85,7 @@ namespace MyCAM
 			else {
 				// get machine data fail, machine will be null(can't use)
 				m_DataManager = new DataManager();
-				MyApp.Logger.ShowOnLogPanel( "使用默認機構專案檔", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_UseDefaultMachineProject", LOG_USE_DEFAULT_MACHINE_PROJECT ), MyApp.NoticeType.Warning );
 			}
 
 			// get machine mesh by type, so data manager need to be builded already
@@ -111,10 +119,15 @@ namespace MyCAM
 			// start with CAD editor
 			SwitchEditor( EEditorType.CAD );
 			DefaultUISetting();
-			Text = SOFTWARE_Name;
 
 			// Get cust post data
 			MyApp.SetCustPost();
+
+			// init language switch menu
+			InitLanguageMenu();
+
+			// apply language resources to UI
+			ApplyResourcesToUI();
 		}
 
 		public Panel GetLogPanel
@@ -147,6 +160,11 @@ namespace MyCAM
 
 		const int WINDOWS_Drag_Event = 0x0232;
 
+		// language
+		readonly LanguageManager.LanguageManager m_LanguageManager;
+		const string CUSTOM_Root_Folder_Name = "Custom";
+		const string MACHINE_Data_File_Name = "MachineData.mac";
+
 		// view properties
 		Viewer m_Viewer;
 		TreeView m_TreeView;
@@ -172,7 +190,23 @@ namespace MyCAM
 		readonly Color DEFAULT_BtnColor = SystemColors.Control;
 		readonly Color ON_ButtonColor = Color.FromArgb( 233, 180, 159 );
 
-		const string SOFTWARE_Name = "新代激光五軸切割 0.28.0";
+		const string SOFTWARE_Version = "0.29.0";
+		const string SOFTWARE_Name = "新代雷射五軸切割 " + SOFTWARE_Version;
+
+		string m_currentImportedFileName = string.Empty;
+
+		const string LOG_LICENSE_INVALID = "授權流程不正確";
+		const string LOG_VIEWER_INIT_FAILED = "顯示器初始化失敗";
+		const string LOG_USE_DEFAULT_MACHINE_PROJECT = "使用默認機構專案檔";
+		const string LOG_MACHINE_NODE_NULL = "機構參數節點為空,使用默認機構參數";
+		const string LOG_MACHINE_FILE_NULL = "機構檔案為空,使用默認機構參數";
+		const string LOG_MACHINE_PARAM_ERROR = "機構參數錯誤(Pr:{0}),使用默認機構參數";
+		const string LOG_MACHINE_TREE_INVALID = "機構樹結構錯誤,使用默認機構樹";
+		const string LOG_MACHINE_FILE_READ_FAILED = "讀取機構檔案失敗：\n{0},使用默認機構參數";
+		const string LOG_MACHINE_FILE_SAVE_FAILED = "儲存機構檔案失敗：\n{0}";
+		const string LOG_VNC_FILE_NOT_FOUND = "找不到VNC執行檔，請確認VNC執行檔與程式執行檔在同一資料夾下";
+		const string LOG_VNC_CONNECT_FAILED = "無法連線到指定IP位置";
+		const string LOG_VNC_UNKNOWN_ERROR = "VNC連線過程發生未知錯誤";
 
 		enum EUIStatus
 		{
@@ -616,17 +650,23 @@ namespace MyCAM
 			}
 		}
 
+		void UpdateFormTitle()
+		{
+			string localizedBase = string.Format(
+				m_LanguageManager.TryGetString( "FormTitle", SOFTWARE_Name ),
+				SOFTWARE_Version );
+			Text = string.IsNullOrEmpty( m_currentImportedFileName )
+				? localizedBase
+				: $"{localizedBase} - {m_currentImportedFileName}";
+		}
+
 		void OnProjectFileImported( bool isSuccess, string fileName )
 		{
 			if( isSuccess == false ) {
 				return;
 			}
-			if( !string.IsNullOrEmpty( fileName ) ) {
-				Text = $"{SOFTWARE_Name} - {fileName}";
-			}
-			else {
-				Text = $"{SOFTWARE_Name}";
-			}
+			m_currentImportedFileName = fileName ?? string.Empty;
+			UpdateFormTitle();
 		}
 
 		// cam action change event
@@ -998,7 +1038,7 @@ namespace MyCAM
 
 			// get exe directory
 			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
-			string filePath = Path.Combine( exeDir, "MachineData.mac" );
+			string filePath = Path.Combine( exeDir, CUSTOM_Root_Folder_Name, MACHINE_Data_File_Name );
 			if( !File.Exists( filePath ) ) {
 				return false;
 			}
@@ -1010,23 +1050,23 @@ namespace MyCAM
 				machineData = MachineDataXMLHelper.ConvertMachineDataFileToMachineData( machineDataDoc, out EMachineDataLoadStatus status, out int nErrorPrIndex );
 				switch( status ) {
 					case EMachineDataLoadStatus.NullMachineDataNode:
-						MyApp.Logger.ShowOnLogPanel( "機構參數節點為空,使用默認機構參數", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_MachineNodeNull", LOG_MACHINE_NODE_NULL ), MyApp.NoticeType.Warning );
 						return false;
 					case EMachineDataLoadStatus.NullFile:
-						MyApp.Logger.ShowOnLogPanel( "機構檔案為空,使用默認機構參數", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_MachineFileNull", LOG_MACHINE_FILE_NULL ), MyApp.NoticeType.Warning );
 						return false;
 					case EMachineDataLoadStatus.InvalidPrValue:
-						MyApp.Logger.ShowOnLogPanel( $"機構參數錯誤(Pr:{nErrorPrIndex}),使用默認機構參數", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Log_MachineParamError", LOG_MACHINE_PARAM_ERROR ), nErrorPrIndex ), MyApp.NoticeType.Warning );
 						return false;
 					case EMachineDataLoadStatus.TreeInvalid:
-						MyApp.Logger.ShowOnLogPanel( "機構樹結構錯誤,使用默認機構樹", MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_MachineTreeInvalid", LOG_MACHINE_TREE_INVALID ), MyApp.NoticeType.Warning );
 						return true;
 					default:
 						return true;
 				}
 			}
 			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"讀取機構檔案失敗：\n{ex.Message},使用默認機構參數", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Log_MachineFileReadFailed", LOG_MACHINE_FILE_READ_FAILED ), ex.Message ), MyApp.NoticeType.Error );
 				return false;
 			}
 		}
@@ -1034,17 +1074,18 @@ namespace MyCAM
 		bool GetMachineMesh( FiveAxisType fiveAxis, out MachineMeshes machineMeshes )
 		{
 			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+			string machineConfigDir = Path.Combine( exeDir, CUSTOM_Root_Folder_Name );
 			string szFolderName;
 			switch( fiveAxis ) {
 				case FiveAxisType.Table:
-					szFolderName = Path.Combine( exeDir, "Table" );
+					szFolderName = Path.Combine( machineConfigDir, "Table" );
 					break;
 				case FiveAxisType.Mix:
-					szFolderName = Path.Combine( exeDir, "Mix" );
+					szFolderName = Path.Combine( machineConfigDir, "Mix" );
 					break;
 				case FiveAxisType.Spindle:
 				default:
-					szFolderName = Path.Combine( exeDir, "Spindle" );
+					szFolderName = Path.Combine( machineConfigDir, "Spindle" );
 					break;
 			}
 			bool isGetMesh = ReadMachineMeshHelper.LoadMachineMeshes( szFolderName, out machineMeshes );
@@ -1151,7 +1192,7 @@ namespace MyCAM
 				xmlDoc.Save( filePath );
 			}
 			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"儲存機構檔案失敗：\n{ex.Message}", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Log_MachineFileSaveFailed", LOG_MACHINE_FILE_SAVE_FAILED ), ex.Message ), MyApp.NoticeType.Error );
 			}
 		}
 
@@ -1186,13 +1227,13 @@ namespace MyCAM
 						isConnectSuccess = true;
 						break;
 					case VNCConnectionResult.FileNotFound:
-						MessageBox.Show( MyApp.MainForm, "找不到VNC執行檔，請確認VNC執行檔與程式執行檔在同一資料夾下", "外部程式調用錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_VNCFileNotFound", LOG_VNC_FILE_NOT_FOUND ), MyApp.NoticeType.Error, true );
 						break;
 					case VNCConnectionResult.ConnectionFailed:
-						MessageBox.Show( MyApp.MainForm, "無法連線到指定IP位置", "連線錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_VNCConnectFailed", LOG_VNC_CONNECT_FAILED ), MyApp.NoticeType.Error, true );
 						break;
 					case VNCConnectionResult.OtherError:
-						MessageBox.Show( MyApp.MainForm, "VNC連線過程發生未知錯誤", "連線錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_VNCUnknownError", LOG_VNC_UNKNOWN_ERROR ), MyApp.NoticeType.Error, true );
 						break;
 				}
 			};
@@ -1471,5 +1512,236 @@ namespace MyCAM
 		{
 			m_CAMEditor.SetCalibrationREF();
 		}
+
+		void ApplyResourcesToUI()
+		{
+			// form title
+			UpdateFormTitle();
+
+			// menu bar
+			m_tsmiFile.Text = m_LanguageManager.TryGetString( "m_tsmiFile", m_tsmiFile.Text );
+			m_tsmiCAD.Text = m_LanguageManager.TryGetString( "m_tsmiCAD", m_tsmiCAD.Text );
+			m_tsmiCAM.Text = m_LanguageManager.TryGetString( "m_tsmiCAM", m_tsmiCAM.Text );
+			m_tsmiSimulation.Text = m_LanguageManager.TryGetString( "m_tsmiSimulation", m_tsmiSimulation.Text );
+			m_tsbSetting.Text = m_LanguageManager.TryGetString( "m_tsbSetting", m_tsbSetting.Text );
+			m_tsbVNCConnection.Text = m_LanguageManager.TryGetString( "m_tsbVNCConnection", m_tsbVNCConnection.Text );
+			m_tsmiLanguage.Text = m_LanguageManager.TryGetString( "m_tsmiLanguage", m_tsmiLanguage.Text );
+			m_tsbController.Text = m_LanguageManager.TryGetString( "m_tsbController", m_tsbController.Text );
+
+			// file toolbar
+			m_tsbImport3DFile.Text = m_LanguageManager.TryGetString( "m_tsbImport3DFile", m_tsbImport3DFile.Text );
+			m_tsbImport3DFile.ToolTipText = m_LanguageManager.TryGetString( "m_tsbImport3DFile_ToolTip", m_tsbImport3DFile.ToolTipText );
+
+			m_tsbAddRevolution.Text = m_LanguageManager.TryGetString( "m_tsbAddRevolution", m_tsbAddRevolution.Text );
+			m_tsbAddRevolution.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddRevolution_ToolTip", m_tsbAddRevolution.ToolTipText );
+
+			m_tsbReadProjectFile.Text = m_LanguageManager.TryGetString( "m_tsbReadProjectFile", m_tsbReadProjectFile.Text );
+			m_tsbReadProjectFile.ToolTipText = m_LanguageManager.TryGetString( "m_tsbReadProjectFile_ToolTip", m_tsbReadProjectFile.ToolTipText );
+
+			m_tsbSaveProjectFile.Text = m_LanguageManager.TryGetString( "m_tsbSaveProjectFile", m_tsbSaveProjectFile.Text );
+			m_tsbSaveProjectFile.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSaveProjectFile_ToolTip", m_tsbSaveProjectFile.ToolTipText );
+
+			m_tsbAddTube.Text = m_LanguageManager.TryGetString( "m_tsbAddTube", m_tsbAddTube.Text );
+			m_tsbAddTube.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddTube_ToolTip", m_tsbAddTube.ToolTipText );
+
+			// cad toolbar
+			m_tsbSewPart.Text = m_LanguageManager.TryGetString( "m_tsbSewPart", m_tsbSewPart.Text );
+			m_tsbSewPart.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSewPart_ToolTip", m_tsbSewPart.ToolTipText );
+
+			m_tsbAddPoint_AcrCenter.Text = m_LanguageManager.TryGetString( "m_tsbAddPoint_AcrCenter", m_tsbAddPoint_AcrCenter.Text );
+			m_tsbAddPoint_AcrCenter.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPoint_AcrCenter_ToolTip", m_tsbAddPoint_AcrCenter.ToolTipText );
+
+			m_tsbAddPoint_EdgeCenter.Text = m_LanguageManager.TryGetString( "m_tsbAddPoint_EdgeCenter", m_tsbAddPoint_EdgeCenter.Text );
+			m_tsbAddPoint_EdgeCenter.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPoint_EdgeCenter_ToolTip", m_tsbAddPoint_EdgeCenter.ToolTipText );
+
+			m_tsbAddPoint_PointCenter.Text = m_LanguageManager.TryGetString( "m_tsbAddPoint_PointCenter", m_tsbAddPoint_PointCenter.Text );
+			m_tsbAddPoint_PointCenter.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPoint_PointCenter_ToolTip", m_tsbAddPoint_PointCenter.ToolTipText );
+
+			m_tsbAddPoint_BoundingBoxCenter.Text = m_LanguageManager.TryGetString( "m_tsbAddPoint_BoundingBoxCenter", m_tsbAddPoint_BoundingBoxCenter.Text );
+			m_tsbAddPoint_BoundingBoxCenter.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPoint_BoundingBoxCenter_ToolTip", m_tsbAddPoint_BoundingBoxCenter.ToolTipText );
+
+			m_tsbAddLine_TwoVertexConnect.Text = m_LanguageManager.TryGetString( "m_tsbAddLine_TwoVertexConnect", m_tsbAddLine_TwoVertexConnect.Text );
+			m_tsbAddLine_TwoVertexConnect.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddLine_TwoVertexConnect_ToolTip", m_tsbAddLine_TwoVertexConnect.ToolTipText );
+
+			m_tsbManualTransform.Text = m_LanguageManager.TryGetString( "m_tsbManualTransform", m_tsbManualTransform.Text );
+			m_tsbManualTransform.ToolTipText = m_LanguageManager.TryGetString( "m_tsbManualTransform_ToolTip", m_tsbManualTransform.ToolTipText );
+
+			m_tsb3PntTransform.Text = m_LanguageManager.TryGetString( "m_tsb3PntTransform", m_tsb3PntTransform.Text );
+			m_tsb3PntTransform.ToolTipText = m_LanguageManager.TryGetString( "m_tsb3PntTransform_ToolTip", m_tsb3PntTransform.ToolTipText );
+
+			m_tsbAxisTransform.Text = m_LanguageManager.TryGetString( "m_tsbAxisTransform", m_tsbAxisTransform.Text );
+			m_tsbAxisTransform.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAxisTransform_ToolTip", m_tsbAxisTransform.ToolTipText );
+
+			// cam toolbar
+			m_tsbAddPath.Text = m_LanguageManager.TryGetString( "m_tsbAddPath", m_tsbAddPath.Text );
+			m_tsbAddPath.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPath_ToolTip", m_tsbAddPath.ToolTipText );
+
+			m_tsbDeletePath.Text = m_LanguageManager.TryGetString( "m_tsbDeletePath", m_tsbDeletePath.Text );
+			m_tsbDeletePath.ToolTipText = m_LanguageManager.TryGetString( "m_tsbDeletePath_ToolTip", m_tsbDeletePath.ToolTipText );
+
+			m_tsbStartPoint.Text = m_LanguageManager.TryGetString( "m_tsbStartPoint", m_tsbStartPoint.Text );
+			m_tsbStartPoint.ToolTipText = m_LanguageManager.TryGetString( "m_tsbStartPoint_ToolTip", m_tsbStartPoint.ToolTipText );
+
+			m_tsbReverse.Text = m_LanguageManager.TryGetString( "m_tsbReverse", m_tsbReverse.Text );
+			m_tsbReverse.ToolTipText = m_LanguageManager.TryGetString( "m_tsbReverse_ToolTip", m_tsbReverse.ToolTipText );
+
+			m_tsbSetLead.Text = m_LanguageManager.TryGetString( "m_tsbSetLead", m_tsbSetLead.Text );
+			m_tsbSetLead.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSetLead_ToolTip", m_tsbSetLead.ToolTipText );
+
+			m_tsbOverCut.Text = m_LanguageManager.TryGetString( "m_tsbOverCut", m_tsbOverCut.Text );
+			m_tsbOverCut.ToolTipText = m_LanguageManager.TryGetString( "m_tsbOverCut_ToolTip", m_tsbOverCut.ToolTipText );
+
+			m_tsbMicroJoint.Text = m_LanguageManager.TryGetString( "m_tsbMicroJoint", m_tsbMicroJoint.Text );
+			m_tsbMicroJoint.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMicroJoint_ToolTip", m_tsbMicroJoint.ToolTipText );
+
+			m_tsbToolVecReverse.Text = m_LanguageManager.TryGetString( "m_tsbToolVecReverse", m_tsbToolVecReverse.Text );
+			m_tsbToolVecReverse.ToolTipText = m_LanguageManager.TryGetString( "m_tsbToolVecReverse_ToolTip", m_tsbToolVecReverse.ToolTipText );
+
+			m_tsbToolVec.Text = m_LanguageManager.TryGetString( "m_tsbToolVec", m_tsbToolVec.Text );
+			m_tsbToolVec.ToolTipText = m_LanguageManager.TryGetString( "m_tsbToolVec_ToolTip", m_tsbToolVec.ToolTipText );
+
+			m_tsbFixedToolVec.Text = m_LanguageManager.TryGetString( "m_tsbFixedToolVec", m_tsbFixedToolVec.Text );
+			m_tsbFixedToolVec.ToolTipText = m_LanguageManager.TryGetString( "m_tsbFixedToolVec_ToolTip", m_tsbFixedToolVec.ToolTipText );
+
+			m_tsbOptimizeIK.Text = m_LanguageManager.TryGetString( "m_tsbOptimizeIK", m_tsbOptimizeIK.Text );
+			m_tsbOptimizeIK.ToolTipText = m_LanguageManager.TryGetString( "m_tsbOptimizeIK_ToolTip", m_tsbOptimizeIK.ToolTipText );
+
+			m_tsbManualOrder.Text = m_LanguageManager.TryGetString( "m_tsbManualOrder", m_tsbManualOrder.Text );
+			m_tsbManualOrder.ToolTipText = m_LanguageManager.TryGetString( "m_tsbManualOrder_ToolTip", m_tsbManualOrder.ToolTipText );
+
+			m_tsbAutoOrder.Text = m_LanguageManager.TryGetString( "m_tsbAutoOrder", m_tsbAutoOrder.Text );
+			m_tsbAutoOrder.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAutoOrder_ToolTip", m_tsbAutoOrder.ToolTipText );
+
+			m_tsbSetTraverseData.Text = m_LanguageManager.TryGetString( "m_tsbSetTraverseData", m_tsbSetTraverseData.Text );
+			m_tsbSetTraverseData.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSetTraverseData_ToolTip", m_tsbSetTraverseData.ToolTipText );
+
+			m_tsbEntryAndExitSetting.Text = m_LanguageManager.TryGetString( "m_tsbEntryAndExitSetting", m_tsbEntryAndExitSetting.Text );
+			m_tsbEntryAndExitSetting.ToolTipText = m_LanguageManager.TryGetString( "m_tsbEntryAndExitSetting_ToolTip", m_tsbEntryAndExitSetting.ToolTipText );
+
+			m_tsbPatternSetting.Text = m_LanguageManager.TryGetString( "m_tsbPatternSetting", m_tsbPatternSetting.Text );
+			m_tsbPatternSetting.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPatternSetting_ToolTip", m_tsbPatternSetting.ToolTipText );
+
+			m_tsbPathEdit.Text = m_LanguageManager.TryGetString( "m_tsbPathEdit", m_tsbPathEdit.Text );
+			m_tsbPathEdit.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPathEdit_ToolTip", m_tsbPathEdit.ToolTipText );
+
+			m_BtnContourEdit.Text = m_LanguageManager.TryGetString( "m_BtnContourEdit", m_BtnContourEdit.Text );
+			m_BtnContourEdit.ToolTipText = m_LanguageManager.TryGetString( "m_BtnContourEdit_ToolTip", m_BtnContourEdit.ToolTipText );
+
+			m_tsbPathCompensation.Text = m_LanguageManager.TryGetString( "m_tsbPathCompensation", m_tsbPathCompensation.Text );
+			m_tsbPathCompensation.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPathCompensation_ToolTip", m_tsbPathCompensation.ToolTipText );
+
+			m_tsbCalibrationPnt.Text = m_LanguageManager.TryGetString( "m_tsbCalibrationPnt", m_tsbCalibrationPnt.Text );
+			m_tsbCalibrationPnt.ToolTipText = m_LanguageManager.TryGetString( "m_tsbCalibrationPnt_ToolTip", m_tsbCalibrationPnt.ToolTipText );
+
+			m_tsbConvertNC.Text = m_LanguageManager.TryGetString( "m_tsbConvertNC", m_tsbConvertNC.Text );
+			m_tsbConvertNC.ToolTipText = m_LanguageManager.TryGetString( "m_tsbConvertNC_ToolTip", m_tsbConvertNC.ToolTipText );
+
+			// add path sub function toolbar
+			m_tsAddPathForHat.Text = m_LanguageManager.TryGetString( "m_tsAddPathForHat", m_tsAddPathForHat.Text );
+			m_tsAddPathForTube.Text = m_LanguageManager.TryGetString( "m_tsAddPathForTube", m_tsAddPathForTube.Text );
+			m_tsbSelectD1ContFace.Text = m_LanguageManager.TryGetString( "m_tsbSelectD1ContFace", m_tsbSelectD1ContFace.Text );
+			m_tsbSelPath_FreeBound.Text = m_LanguageManager.TryGetString( "m_tsbSelPath_FreeBound", m_tsbSelPath_FreeBound.Text );
+			m_tsbSelPath_Manual.Text = m_LanguageManager.TryGetString( "m_tsbSelPath_Manual", m_tsbSelPath_Manual.Text );
+			m_tsbManualSelectPathOK.Text = m_LanguageManager.TryGetString( "m_tsbManualSelectPathOK", m_tsbManualSelectPathOK.Text );
+
+			// simulation toolbar
+			m_btnPlay.Text = m_LanguageManager.TryGetString( "m_btnPlay", m_btnPlay.Text );
+			m_btnPlay.ToolTipText = m_LanguageManager.TryGetString( "m_btnPlay_ToolTip", m_btnPlay.ToolTipText );
+
+			m_btnPause.Text = m_LanguageManager.TryGetString( "m_btnPause", m_btnPause.Text );
+			m_btnPause.ToolTipText = m_LanguageManager.TryGetString( "m_btnPause_ToolTip", m_btnPause.ToolTipText );
+
+			m_btnStop.Text = m_LanguageManager.TryGetString( "m_btnStop", m_btnStop.Text );
+			m_btnStop.ToolTipText = m_LanguageManager.TryGetString( "m_btnStop_ToolTip", m_btnStop.ToolTipText );
+
+			m_btnPreviousPath.Text = m_LanguageManager.TryGetString( "m_btnPreviousPath", m_btnPreviousPath.Text );
+			m_btnPreviousPath.ToolTipText = m_LanguageManager.TryGetString( "m_btnPreviousPath_ToolTip", m_btnPreviousPath.ToolTipText );
+
+			m_btnNextPath.Text = m_LanguageManager.TryGetString( "m_btnNextPath", m_btnNextPath.Text );
+			m_btnNextPath.ToolTipText = m_LanguageManager.TryGetString( "m_btnNextPath_ToolTip", m_btnNextPath.ToolTipText );
+
+			m_btnPreCollision.Text = m_LanguageManager.TryGetString( "m_btnPreCollision", m_btnPreCollision.Text );
+			m_btnPreCollision.ToolTipText = m_LanguageManager.TryGetString( "m_btnPreCollision_ToolTip", m_btnPreCollision.ToolTipText );
+
+			m_btnNextCol.Text = m_LanguageManager.TryGetString( "m_btnNextCol", m_btnNextCol.Text );
+			m_btnNextCol.ToolTipText = m_LanguageManager.TryGetString( "m_btnNextCol_ToolTip", m_btnNextCol.ToolTipText );
+
+			m_btnPrePoint.Text = m_LanguageManager.TryGetString( "m_btnPrePoint", m_btnPrePoint.Text );
+			m_btnPrePoint.ToolTipText = m_LanguageManager.TryGetString( "m_btnPrePoint_ToolTip", m_btnPrePoint.ToolTipText );
+
+			m_btnNextPoint.Text = m_LanguageManager.TryGetString( "m_btnNextPoint", m_btnNextPoint.Text );
+			m_btnNextPoint.ToolTipText = m_LanguageManager.TryGetString( "m_btnNextPoint_ToolTip", m_btnNextPoint.ToolTipText );
+
+			m_btnSpeedUp.Text = m_LanguageManager.TryGetString( "m_btnSpeedUp", m_btnSpeedUp.Text );
+			m_btnSpeedUp.ToolTipText = m_LanguageManager.TryGetString( "m_btnSpeedUp_ToolTip", m_btnSpeedUp.ToolTipText );
+
+			m_btnSlowDonw.Text = m_LanguageManager.TryGetString( "m_btnSlowDonw", m_btnSlowDonw.Text );
+			m_btnSlowDonw.ToolTipText = m_LanguageManager.TryGetString( "m_btnSlowDonw_ToolTip", m_btnSlowDonw.ToolTipText );
+
+			m_btnCheck.Text = m_LanguageManager.TryGetString( "m_btnCheck", m_btnCheck.Text );
+			m_btnCheck.ToolTipText = m_LanguageManager.TryGetString( "m_btnCheck_ToolTip", m_btnCheck.ToolTipText );
+
+			m_tsbShowVec.ToolTipText = m_LanguageManager.TryGetString( "ShowVec", m_tsbShowVec.ToolTipText );
+			m_tsbShowOrder.ToolTipText = m_LanguageManager.TryGetString( "ShowOrder", m_tsbShowOrder.ToolTipText );
+			m_tsbShowOrientation.ToolTipText = m_LanguageManager.TryGetString( "ShowOrientation", m_tsbShowOrientation.ToolTipText );
+			m_tsbShowTraverse.ToolTipText = m_LanguageManager.TryGetString( "ShowTraverse", m_tsbShowTraverse.ToolTipText );
+
+			m_tsbLayer1.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 1 );
+			m_tsbLayer2.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 2 );
+			m_tsbLayer3.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 3 );
+			m_tsbLayer4.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 4 );
+			m_tsbLayer5.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 5 );
+			m_tsbLayer6.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 6 );
+			m_tsbLayer7.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 7 );
+			m_tsbLayer8.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 8 );
+			m_tsbLayer9.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 9 );
+			m_tsbLayer10.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 10 );
+		}
+
+		void InitLanguageMenu()
+		{
+			m_tsmiLanguage.DropDownItems.Clear();
+			foreach( string szLanguage in LanguageManager.LanguageManager.CurrentSupportedLanguageList ) {
+				string szDisplayName = GetLanguageDisplayName( szLanguage );
+				ToolStripMenuItem item = new ToolStripMenuItem( szDisplayName );
+				item.Tag = szLanguage;
+
+				// capture loop variable for closure
+				string szCapturedLanguage = szLanguage;
+				item.Click += ( sender, e ) => OnLanguageMenuItemClick( szCapturedLanguage );
+				m_tsmiLanguage.DropDownItems.Add( item );
+			}
+			UpdateLanguageMenuCheckMark();
+		}
+
+		string GetLanguageDisplayName( string szLanguage )
+		{
+			string szNativeName = LanguageManager.LanguageManager.GetNativeNameByLanguage( szLanguage );
+			return string.IsNullOrEmpty( szNativeName ) ? szLanguage : szNativeName;
+		}
+
+		void OnLanguageMenuItemClick( string szLanguage )
+		{
+			// switch language
+			LanguageManager.LanguageManager.CurrentUILanguage = szLanguage;
+
+			// persist setting to file
+			MyApp.AppSetting.ApplyUILanguage( szLanguage );
+
+			// refresh StartupForm UI with the new language
+			ApplyResourcesToUI();
+			UpdateLanguageMenuCheckMark();
+		}
+
+		void UpdateLanguageMenuCheckMark()
+		{
+			foreach( ToolStripMenuItem item in m_tsmiLanguage.DropDownItems ) {
+				string szItemLanguage = item.Tag as string;
+				item.Checked = LanguageManager.LanguageManager.CompareLanguageTag(
+					szItemLanguage, LanguageManager.LanguageManager.CurrentUILanguage );
+			}
+		}
+
+		const string LAYER = "圖層";
 	}
 }

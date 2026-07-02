@@ -1,7 +1,8 @@
-ï»¿using CommonData;
+using CommonData;
 using FileTranslator;
 using MyCAM.Editor;
 using MyCAM.LogManager;
+using MyCAM.SettingManager;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -13,8 +14,14 @@ namespace MyCAM.App
 	internal static class MyApp
 	{
 		static string m_szCNCIP = string.Empty;
+		static AppSettingManager m_AppSetting = null;
 
+		const string CUSTOM_root_Folder_Name = "Custom";
 		const string CUST_post_file_Name = "CustPost.cpf";
+
+		const string LOG_CUST_POST_FILE_NOT_EXIST = "«È»s«á³B²zÀÉ®×¤£¦s¦b";
+		const string LOG_READ_CUST_POST_FILE_FAILED = "Åª¨ú«È»s¤Æ«á³B²z¾¹ÀÉ®×¥¢±Ñ";
+		const string LOG_CUST_POST_FILE_CONTENT_ERROR = "«È»s¤Æ«á³B²z¾¹ÀÉ®×¤º®e¤£§¹¾ã©Î®æ¦¡¿ù»~,½Ğ½T»{ÀÉ®×¤º®e¡C";
 
 		public enum NoticeType
 		{
@@ -58,9 +65,28 @@ namespace MyCAM.App
 			get
 			{
 				if( m_Logger == null ) {
-					throw new InvalidOperationException( "Loggeré‚„æ²’åˆå§‹åŒ–ï¼Œè«‹å…ˆè¨­å®š MainFormã€‚" );
+					throw new InvalidOperationException( m_LanguageManager.TryGetString( "LoggerNotInitialized", LOGGER_NOT_INITIALIZED ) );
 				}
 				return m_Logger;
+			}
+		}
+
+		public static AppSettingManager AppSetting
+		{
+			get
+			{
+				if( m_AppSetting == null ) {
+					throw new InvalidOperationException( "AppSetting is not initialized." );
+				}
+				return m_AppSetting;
+			}
+		}
+
+		// init app setting, should be called once at application startup before any setting access
+		public static void InitAppSetting()
+		{
+			if( m_AppSetting == null ) {
+				m_AppSetting = new AppSettingManager();
 			}
 		}
 
@@ -166,7 +192,7 @@ namespace MyCAM.App
 		static FromSizeInfo GetFormSizeInfo()
 		{
 			if( m_MainForm == null ) {
-				throw new InvalidOperationException( "MainFormé‚„æ²’åˆå§‹åŒ–ï¼Œè«‹å…ˆè¨­å®š MainFormã€‚" );
+				throw new InvalidOperationException( m_LanguageManager.TryGetString( "MainFormNotInitialized", MAIN_FORM_NOT_INITIALIZED ) );
 			}
 			FromSizeInfo mainFormInfo = new FromSizeInfo();
 			mainFormInfo.FormWidth = m_MainForm.Width;
@@ -180,7 +206,7 @@ namespace MyCAM.App
 		static Screen GetMainFormScreen()
 		{
 			if( m_MainForm == null ) {
-				throw new InvalidOperationException( "MainFormé‚„æ²’åˆå§‹åŒ–ï¼Œè«‹å…ˆè¨­å®š MainFormã€‚" );
+				throw new InvalidOperationException( m_LanguageManager.TryGetString( "MainFormNotInitialized", MAIN_FORM_NOT_INITIALIZED ) );
 			}
 			return Screen.FromControl( m_MainForm );
 		}
@@ -213,9 +239,9 @@ namespace MyCAM.App
 		public static void SetCustPost()
 		{
 			// read cust post file
-			string filePath = System.IO.Path.Combine( AppDomain.CurrentDomain.BaseDirectory, CUST_post_file_Name );
+			string filePath = System.IO.Path.Combine( AppDomain.CurrentDomain.BaseDirectory, CUSTOM_root_Folder_Name, CUST_post_file_Name );
 			if( !System.IO.File.Exists( filePath ) ) {
-				Logger.ShowOnLogPanel( $"å®¢è£½å¾Œè™•ç†æª”æ¡ˆä¸å­˜åœ¨", NoticeType.Hint );
+				Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CustPostFileNotExist", LOG_CUST_POST_FILE_NOT_EXIST ), NoticeType.Hint );
 
 				// use default value
 				m_CustPost = new CustPost();
@@ -228,7 +254,7 @@ namespace MyCAM.App
 				fileContent = System.IO.File.ReadAllText( filePath );
 			}
 			catch( Exception ) {
-				Logger.ShowOnLogPanel( $"è®€å–å®¢è£½åŒ–å¾Œè™•ç†å™¨æª”æ¡ˆå¤±æ•—", NoticeType.Error );
+				Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ReadCustPostFileFailed", LOG_READ_CUST_POST_FILE_FAILED ), NoticeType.Error );
 
 				// use default value
 				m_CustPost = new CustPost();
@@ -239,7 +265,7 @@ namespace MyCAM.App
 			TxtToCustPostTranslator custPostTranslater = new TxtToCustPostTranslator();
 			bool isGetAllCustContent = custPostTranslater.Translate( fileContent, out CustPost post );
 			if( isGetAllCustContent == false ) {
-				Logger.ShowOnLogPanel( $"å®¢è£½åŒ–å¾Œè™•ç†å™¨æª”æ¡ˆå…§å®¹ä¸å®Œæ•´æˆ–æ ¼å¼éŒ¯èª¤ï¼Œè«‹ç¢ºèªæª”æ¡ˆå…§å®¹ã€‚", NoticeType.Error, true );
+				Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CustPostFileContentError", LOG_CUST_POST_FILE_CONTENT_ERROR ), NoticeType.Error, true );
 			}
 
 			// store info
@@ -254,6 +280,9 @@ namespace MyCAM.App
 		static VNCUserControl m_VNCUserControl;
 		static readonly List<DialogEventInfo> m_RegisteredDialogs = new List<DialogEventInfo>();
 		static CustPost m_CustPost = null;
+		static readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "MyApp" );
+		const string MAIN_FORM_NOT_INITIALIZED = "MainFormÁÙ¨Sªì©l¤Æ,½Ğ¥ı³]©w MainForm¡C";
+		const string LOGGER_NOT_INITIALIZED = "LoggerÁÙ¨Sªì©l¤Æ,½Ğ¥ı³]©w Logger¡C";
 
 		class DialogEventInfo
 		{

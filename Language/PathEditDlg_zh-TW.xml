@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="PathEditDlg" Content="路徑編輯" />
+	<Message ID="m_lblRefCoordType" Content="座標系" />
+	<Message ID="RefCoordType_Local" Content="區域座標系" />
+	<Message ID="RefCoordType_World" Content="世界座標系" />
+	<Message ID="m_lblX" Content="X偏移" />
+	<Message ID="m_lblY" Content="Y偏移" />
+	<Message ID="m_lblZ" Content="Z偏移" />
+	<Message ID="m_btnConfirm" Content="確認" />
+	<Message ID="m_btnClear" Content="清除" />
+	<Message ID="m_btnReset" Content="重置" />
+</ResMap>

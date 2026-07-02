@@ -1,4 +1,4 @@
-ï»¿using System;
+using System;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -9,10 +9,18 @@ namespace MyCAM.Editor
 		{
 			InitializeComponent();
 			InitMethodComboBox();
+			ApplyResourcesToUI();
 		}
 
 		public Action<ETrsfConstraintType> ConstraintMethodChanged;
 		public Action<int> G54AxisPlaneSelectionChanged;
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "ManualTransformDlg", this.Text );
+			m_lblMethod.Text = m_LanguageManager.TryGetString( "m_lblMethod", m_lblMethod.Text );
+			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
+		}
 
 		public void Initialize()
 		{
@@ -46,11 +54,11 @@ namespace MyCAM.Editor
 
 			// update workpiece hint text
 			if( isWorkpieceSelected ) {
-				m_lblMoveStatus.Text = "âœ” å·¥ä»¶";
+				m_lblMoveStatus.Text = m_LanguageManager.TryGetString( "m_lblMoveStatus_Selected", m_lblMoveStatus.Text );
 				m_lblMoveStatus.ForeColor = System.Drawing.Color.Green;
 			}
 			else {
-				m_lblMoveStatus.Text = "âœ˜ å·¥ä»¶";
+				m_lblMoveStatus.Text = m_LanguageManager.TryGetString( "m_lblMoveStatus_NotSelected", m_lblMoveStatus.Text );
 				m_lblMoveStatus.ForeColor = System.Drawing.Color.Gray;
 			}
 		}
@@ -67,7 +75,7 @@ namespace MyCAM.Editor
 
 		public void ShowConstraintError( string message )
 		{
-			m_lblError.Text = message;
+			m_lblError.Text = m_LanguageManager.TryGetString( message, ALIGNMENT_INVALID );
 			m_lblError.Visible = true;
 		}
 
@@ -98,11 +106,11 @@ namespace MyCAM.Editor
 
 		void InitMethodComboBox()
 		{
-			m_cmbMethod.Items.Add( "é»å°é½Š" );          // Point
-			m_cmbMethod.Items.Add( "è»¸å‘å°é½Š" );        // Axial
-			m_cmbMethod.Items.Add( "è»¸å‘å¹³è¡Œ" );        // AxialParallel
-			m_cmbMethod.Items.Add( "å¹³é¢å°é½Š" );        // Plane
-			m_cmbMethod.Items.Add( "å¹³é¢å¹³è¡Œ" );        // PlaneParallel
+			m_cmbMethod.Items.Add( m_LanguageManager.TryGetString( "Method_Point", METHOD_POINT ) );
+			m_cmbMethod.Items.Add( m_LanguageManager.TryGetString( "Method_Axial", METHOD_AXIAL ) );
+			m_cmbMethod.Items.Add( m_LanguageManager.TryGetString( "Method_AxialParallel", METHOD_AXIAL_PARALLEL ) );
+			m_cmbMethod.Items.Add( m_LanguageManager.TryGetString( "Method_Plane", METHOD_PLANE ) );
+			m_cmbMethod.Items.Add( m_LanguageManager.TryGetString( "Method_PlaneParallel", METHOD_PLANE_PARALLEL ) );
 		}
 
 		void RefreshAxisPlaneComboBox( ETrsfConstraintType type )
@@ -111,22 +119,22 @@ namespace MyCAM.Editor
 
 			switch( type ) {
 				case ETrsfConstraintType.Point:
-					m_cmbAxisPlane.Items.Add( "åŸé»" );
-					m_lblAxisPlane.Text = "å°é½Šé»";
+					m_cmbAxisPlane.Items.Add( m_LanguageManager.TryGetString( "AxisPlane_Origin", AXIS_PLANE_ORIGIN ) );
+					m_lblAxisPlane.Text = m_LanguageManager.TryGetString( "m_lblAxisPlane", m_lblAxisPlane.Text );
 					break;
 				case ETrsfConstraintType.Axial:
 				case ETrsfConstraintType.AxialParallel:
-					m_cmbAxisPlane.Items.Add( "X è»¸" );
-					m_cmbAxisPlane.Items.Add( "Y è»¸" );
-					m_cmbAxisPlane.Items.Add( "Z è»¸" );
-					m_lblAxisPlane.Text = "å°é½Šè»¸";
+					m_cmbAxisPlane.Items.Add( m_LanguageManager.TryGetString( "AxisPlane_XAxis", AXIS_PLANE_X_AXIS ) );
+					m_cmbAxisPlane.Items.Add( m_LanguageManager.TryGetString( "AxisPlane_YAxis", AXIS_PLANE_Y_AXIS ) );
+					m_cmbAxisPlane.Items.Add( m_LanguageManager.TryGetString( "AxisPlane_ZAxis", AXIS_PLANE_Z_AXIS ) );
+					m_lblAxisPlane.Text = m_LanguageManager.TryGetString( "m_lblAxisPlane_Axis", m_lblAxisPlane.Text );
 					break;
 				case ETrsfConstraintType.Plane:
 				case ETrsfConstraintType.PlaneParallel:
-					m_cmbAxisPlane.Items.Add( "XY å¹³é¢" );
-					m_cmbAxisPlane.Items.Add( "YZ å¹³é¢" );
-					m_cmbAxisPlane.Items.Add( "XZ å¹³é¢" );
-					m_lblAxisPlane.Text = "å°é½Šé¢";
+					m_cmbAxisPlane.Items.Add( m_LanguageManager.TryGetString( "AxisPlane_XYPlane", AXIS_PLANE_XY_PLANE ) );
+					m_cmbAxisPlane.Items.Add( m_LanguageManager.TryGetString( "AxisPlane_YZPlane", AXIS_PLANE_YZ_PLANE ) );
+					m_cmbAxisPlane.Items.Add( m_LanguageManager.TryGetString( "AxisPlane_XZPlane", AXIS_PLANE_XZ_PLANE ) );
+					m_lblAxisPlane.Text = m_LanguageManager.TryGetString( "m_lblAxisPlane_Plane", m_lblAxisPlane.Text );
 					break;
 				default:
 					m_lblAxisPlane.Visible = false;
@@ -187,23 +195,43 @@ namespace MyCAM.Editor
 		{
 			switch( type ) {
 				case ETrsfConstraintType.Point:
-					return "è«‹åœ¨ç•«å¸ƒé¸æ“‡ä¸€å€‹å·¥ä»¶é»ï¼Œèˆ‡åŸé»å°é½Š";
+					return m_LanguageManager.TryGetString( "Guide_Point", GUIDE_POINT );
 				case ETrsfConstraintType.Axial:
-					return "è«‹åœ¨ç•«å¸ƒé¸æ“‡ä¸€æ¢å·¥ä»¶é‚Šï¼Œèˆ‡åº§æ¨™ç³»è»¸å‘å°é½Š";
+					return m_LanguageManager.TryGetString( "Guide_Axial", GUIDE_AXIAL );
 				case ETrsfConstraintType.AxialParallel:
-					return "è«‹åœ¨ç•«å¸ƒé¸æ“‡ä¸€æ¢å·¥ä»¶é‚Šï¼Œèˆ‡åº§æ¨™ç³»è»¸å‘å¹³è¡Œ";
+					return m_LanguageManager.TryGetString( "Guide_AxialParallel", GUIDE_AXIAL_PARALLEL );
 				case ETrsfConstraintType.Plane:
-					return "è«‹åœ¨ç•«å¸ƒé¸æ“‡ä¸€å€‹å·¥ä»¶é¢ï¼Œèˆ‡åº§æ¨™ç³»è»¸é¢å°é½Š";
+					return m_LanguageManager.TryGetString( "Guide_Plane", GUIDE_PLANE );
 				case ETrsfConstraintType.PlaneParallel:
-					return "è«‹åœ¨ç•«å¸ƒé¸æ“‡ä¸€å€‹å·¥ä»¶é¢ï¼Œèˆ‡åº§æ¨™ç³»è»¸é¢å¹³è¡Œ";
+					return m_LanguageManager.TryGetString( "Guide_PlaneParallel", GUIDE_PLANE_PARALLEL );
 				default:
-					return "è«‹å…ˆé¸æ“‡å°é½Šæ–¹æ³•";
+					return m_LanguageManager.TryGetString( "m_lblGuide_Default", GUIDE_DEFAULT );
 			}
 		}
 
 		const int DEFAULT_AXIS_PLANE_INDEX = 0;
+		const string GUIDE_POINT = "½Ğ¥ı±qÄ²±±¿ï¤@­Ó¤u¥ó­±ÂI¡A§@¬°°Ñ¦ÒÂI¦ì¸m";
+		const string GUIDE_AXIAL = "½Ğ¥ı±qÄ²±±¿ï¤@±ø¤u¥óÃä¡A§@¬°°Ñ¦Ò¤è¦V¶b";
+		const string GUIDE_AXIAL_PARALLEL = "½Ğ¥ı±qÄ²±±¿ï¤@±ø¤u¥óÃä¡A§@¬°°Ñ¦Ò¤è¦V¶b¡]¥­¦æ¡^";
+		const string GUIDE_PLANE = "½Ğ¥ı±qÄ²±±¿ï¤@­Ó¤u¥ó­±¡A§@¬°°Ñ¦Ò­±";
+		const string GUIDE_PLANE_PARALLEL = "½Ğ¥ı±qÄ²±±¿ï¤@­Ó¤u¥ó­±¡A§@¬°°Ñ¦Ò­±¡]¥­¦æ¡^";
+		const string GUIDE_DEFAULT = "½Ğ¿ï¾Ü¿é¤J¤è¦¡";
+		const string METHOD_POINT = "ÂI¹ï»ô";
+		const string METHOD_AXIAL = "¶b¦V¹ï»ô";
+		const string METHOD_AXIAL_PARALLEL = "¶b¦V¥­¦æ";
+		const string METHOD_PLANE = "¥­­±¹ï»ô";
+		const string METHOD_PLANE_PARALLEL = "¥­­±¥­¦æ";
+		const string AXIS_PLANE_ORIGIN = "­ìÂI";
+		const string AXIS_PLANE_X_AXIS = "X ¶b";
+		const string AXIS_PLANE_Y_AXIS = "Y ¶b";
+		const string AXIS_PLANE_Z_AXIS = "Z ¶b";
+		const string AXIS_PLANE_XY_PLANE = "XY ¥­­±";
+		const string AXIS_PLANE_YZ_PLANE = "YZ ¥­­±";
+		const string AXIS_PLANE_XZ_PLANE = "XZ ¥­­±";
+		const string ALIGNMENT_INVALID = "¹ï»ôµL®Ä¡A¿ï¨úªºª«¥ó¨Ã«D¥­­±¡Bª½½u¡B©Î¥¿¶ê©·¡A½Ğ­«·s¿ï¾Ü";
 
 		// Event handlers are enabled by default
 		bool m_enableEventHandlers = true;
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ManualTransformDlg" );
 	}
 }

@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="ManualTransformDlg" Content="工件對齊" />
+	<Message ID="m_lblMethod" Content="對齊方式" />
+	<Message ID="m_lblAxisPlane" Content="對齊點" />
+	<Message ID="m_lblAxisPlane_Axis" Content="對齊軸" />
+	<Message ID="m_lblAxisPlane_Plane" Content="對齊面" />
+	<Message ID="m_lblMoveStatus_Selected" Content="✔ 工件" />
+	<Message ID="m_lblMoveStatus_NotSelected" Content="✘ 工件" />
+	<Message ID="m_lblGuide_Default" Content="請先選擇對齊方式" />
+	<Message ID="m_btnConfirm" Content="OK" />
+	<Message ID="Method_Point" Content="點對齊" />
+	<Message ID="Method_Axial" Content="軸向對齊" />
+	<Message ID="Method_AxialParallel" Content="軸向平行" />
+	<Message ID="Method_Plane" Content="平面對齊" />
+	<Message ID="Method_PlaneParallel" Content="平面平行" />
+	<Message ID="AxisPlane_Origin" Content="原點" />
+	<Message ID="AxisPlane_XAxis" Content="X 軸" />
+	<Message ID="AxisPlane_YAxis" Content="Y 軸" />
+	<Message ID="AxisPlane_ZAxis" Content="Z 軸" />
+	<Message ID="AxisPlane_XYPlane" Content="XY 平面" />
+	<Message ID="AxisPlane_YZPlane" Content="YZ 平面" />
+	<Message ID="AxisPlane_XZPlane" Content="XZ 平面" />
+	<Message ID="Guide_Point" Content="請在畫布選擇一個工件點，與原點對齊" />
+	<Message ID="Guide_Axial" Content="請在畫布選擇一條工件邊，與座標系軸向對齊" />
+	<Message ID="Guide_AxialParallel" Content="請在畫布選擇一條工件邊，與座標系軸向平行" />
+	<Message ID="Guide_Plane" Content="請在畫布選擇一個工件面，與座標系軸面對齊" />
+	<Message ID="Guide_PlaneParallel" Content="請在畫布選擇一個工件面，與座標系軸面平行" />
+	<Message ID="ShowConstraintError" Content="對齊無效，選取的物件並非平面、直線、或正圓弧，請重新選擇" />
+</ResMap>

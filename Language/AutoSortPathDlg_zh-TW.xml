@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="FormTitle" Content="自動排序" />
+  <Message ID="m_lblSortMethod" Content="排序方式:" />
+  <Message ID="m_lblPathHint" Content="起始路徑:" />
+  <Message ID="m_lblCylinderAxis" Content="圓管軸向:" />
+  <Message ID="m_lblExtrusionDir" Content="拉伸軸方向:" />
+  <Message ID="m_lblRotationDir" Content="旋轉軸方向:" />
+  <Message ID="m_lblBandwidth" Content="分組帶寬:" />
+  <Message ID="m_lblRotationUnit" Content="度" />
+  <Message ID="m_btnConfirm" Content="確定" />
+  <Message ID="Status_NotSelected" Content="未選取" />
+  <Message ID="Status_Selected" Content="已選取" />
+  <Message ID="SortMethod_ShortestPath" Content="最短路徑" />
+  <Message ID="SortMethod_CylinderVertical" Content="圓管直排" />
+  <Message ID="SortMethod_CylinderHorizontal" Content="圓管橫排" />
+  <Message ID="Axis_X" Content="X 軸" />
+  <Message ID="Axis_Y" Content="Y 軸" />
+  <Message ID="Axis_Z" Content="Z 軸" />
+  <Message ID="ExtrusionDir_FromTop" Content="從上往下" />
+  <Message ID="ExtrusionDir_FromBottom" Content="從下往上" />
+  <Message ID="RotationDir_Clockwise" Content="順時針" />
+  <Message ID="RotationDir_Counterclockwise" Content="逆時針" />
+</ResMap>

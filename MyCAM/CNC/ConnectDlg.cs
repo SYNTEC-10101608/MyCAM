@@ -1,27 +1,31 @@
-﻿using System;
+﻿using MyCAM.App;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
 	public partial class ConnectDlg : Form
 	{
+
 		public ConnectDlg()
 		{
 			InitializeComponent();
-			m_txbIP.Text = DEFAULT_IP;
+			m_txbIP.Text = MyApp.AppSetting.CNCIP;
+			ApplyResourcesToUI();
 		}
 
-		public event Action<string> ConfirmEvent;
-		const string DEFAULT_IP = "192.168.1.200";
+		public event System.Action<string> ConfirmEvent;
 
-		void m_btnConfirm_Click( object sender, EventArgs e )
+		void m_btnConfirm_Click( object sender, System.EventArgs e )
 		{
 			string ip = m_txbIP.Text?.Trim();
 			if( string.IsNullOrEmpty( ip ) || !IsValidIP( ip ) ) {
-				m_lblTips.Text = "輸入格式錯誤，請以IPv4格式輸入";
+				m_lblTips.Text = m_LanguageManager.TryGetString( "Error_InvalidIPFormat", m_lblTips.Text );
 				m_lblTips.ForeColor = System.Drawing.Color.Red;
 				return;
 			}
+
+			// save confirmed IP to setting file
+			MyApp.AppSetting.ApplyCNCIP( ip );
 
 			ConfirmEvent?.Invoke( ip );
 		}
@@ -66,5 +70,15 @@ namespace MyCAM.Editor.Dialog
 
 			return true;
 		}
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "FormTitle", this.Text );
+			m_lblIP.Text = m_LanguageManager.TryGetString( "m_lblIP", m_lblIP.Text );
+			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
+			m_lblTips.Text = m_LanguageManager.TryGetString( "m_lblTips_Default", m_lblTips.Text );
+		}
+
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ConnectDlg" );
 	}
 }

@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="DXFImportFailedNoGeom" Content="DXF 导入失败: 无有效几何" />
+	<Message ID="BuildSurfaceFailed" Content="建构曲面失败" />
+	<Message ID="DXFProjectionFailed" Content="DXF 投影失败: 无有效投影结果" />
+	<Message ID="DXFImportException" Content="DXF 导入失败: " />
+</ResMap>

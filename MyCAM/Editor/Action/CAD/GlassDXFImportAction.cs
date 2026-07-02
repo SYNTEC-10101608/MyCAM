@@ -79,14 +79,14 @@ namespace MyCAM.Editor
 				Helper.FileIO.DxfReader reader = new Helper.FileIO.DxfReader();
 				TopoDS_Shape shape = reader.Read( szFileName );
 				if( shape == null || shape.IsNull() ) {
-					MyApp.Logger.ShowOnLogPanel( "DXF 匯入失敗: 無有效幾何", MyApp.NoticeType.Error );
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "DXFImportFailedNoGeom", DXF_IMPORT_FAILED_NO_GEOM ), MyApp.NoticeType.Error );
 					return;
 				}
 
 				// Build target face based on parameters
 				TopoDS_Face targetFace = BuildTargetFace( radius, height );
 				if( targetFace == null || targetFace.IsNull() ) {
-					MyApp.Logger.ShowOnLogPanel( "建構曲面失敗", MyApp.NoticeType.Error );
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "BuildSurfaceFailed", BUILD_SURFACE_FAILED ), MyApp.NoticeType.Error );
 					return;
 				}
 
@@ -96,7 +96,7 @@ namespace MyCAM.Editor
 				// Project DXF wires onto the target face
 				List<TopoDS_Wire> projectedWires = ProjectWiresOntoFace( shape, targetFace, projectionOffset );
 				if( projectedWires.Count == 0 ) {
-					MyApp.Logger.ShowOnLogPanel( "DXF 投影失敗: 無有效投影結果", MyApp.NoticeType.Error );
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "DXFProjectionFailed", DXF_PROJECTION_FAILED ), MyApp.NoticeType.Error );
 					return;
 				}
 
@@ -121,7 +121,7 @@ namespace MyCAM.Editor
 				IsImportSuccess = true;
 			}
 			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( "DXF 匯入失敗: " + ex.Message, MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "DXFImportException", DXF_IMPORT_EXCEPTION ) + ex.Message, MyApp.NoticeType.Error );
 				IsImportSuccess = false;
 			}
 		}
@@ -235,5 +235,11 @@ namespace MyCAM.Editor
 
 		// Half-size of the flat plane
 		const double FLAT_PLANE_SIZE = 5000.0;
+
+		const string DXF_IMPORT_FAILED_NO_GEOM = "DXF 匯入失敗: 無有效幾何";
+		const string BUILD_SURFACE_FAILED = "建構曲面失敗";
+		const string DXF_PROJECTION_FAILED = "DXF 投影失敗: 無有效投影結果";
+		const string DXF_IMPORT_EXCEPTION = "DXF 匯入失敗: ";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "GlassDXFImportAction" );
 	}
 }

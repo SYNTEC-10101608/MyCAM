@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="PathCompensateDlg" Content="路徑補償" />
+	<Message ID="m_lblCompensate" Content="補償距離(增量)" />
+	<Message ID="m_btnConfirm" Content="確認" />
+	<Message ID="m_btnClear" Content="清除" />
+	<Message ID="m_btnReset" Content="重置" />
+</ResMap>

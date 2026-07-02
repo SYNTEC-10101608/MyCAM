@@ -1,4 +1,4 @@
-ï»¿using MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using OCCViewer;
 using System;
@@ -179,7 +179,7 @@ namespace MyCAM.Editor
 
 			if( isSingleSelectMode && m_SelectedIDSet.Count > 1 ) {
 				MyApp.Logger.ShowOnLogPanel(
-					string.Format( "[é¸å–ç•°å¸¸] è·¯å¾‘å–®é¸æ¨¡å¼ä¸‹åµæ¸¬åˆ°å¤šé‡é¸å– ({0} å€‹é …ç›®)ï¼Œå·²è‡ªå‹•æ¸…é™¤", m_SelectedIDSet.Count ),
+					string.Format( m_LanguageManager.TryGetString( "Log_MultiSelectError_View", LOG_MULTI_SELECT_ERROR_VIEW ), m_SelectedIDSet.Count ),
 					MyApp.NoticeType.Hint );
 
 				// Clear all selections to restore valid state
@@ -222,7 +222,7 @@ namespace MyCAM.Editor
 
 			if( isSingleSelectMode && m_SelectedIDSet.Count > 1 ) {
 				MyApp.Logger.ShowOnLogPanel(
-					string.Format( "[é¸å–ç•°å¸¸] è·¯å¾‘å–®é¸æ¨¡å¼ä¸‹å¾è·¯å¾‘æ¨¹åµæ¸¬åˆ°å¤šé‡é¸å– ({0} å€‹é …ç›®)ï¼Œå·²è‡ªå‹•æ¸…é™¤", m_SelectedIDSet.Count ),
+					string.Format( m_LanguageManager.TryGetString( "Log_MultiSelectError_Tree", LOG_MULTI_SELECT_ERROR_TREE ), m_SelectedIDSet.Count ),
 					MyApp.NoticeType.Hint );
 
 				// Clear all selections to restore valid state
@@ -269,5 +269,8 @@ namespace MyCAM.Editor
 
 		bool m_SingleSelectMode = false;
 		HashSet<string> m_ExcludedIDSet;
+		LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SelectPathAction" );
+		const string LOG_MULTI_SELECT_ERROR_VIEW = "[¿ï¨ú²§±`] ¸ô®|³æ¿ï¼Ò¦¡¤U°»´ú¨ì¦h­«¿ï¨ú ({0} ­Ó¶µ¥Ø)¡A¤w¦Û°Ê²M°£";
+		const string LOG_MULTI_SELECT_ERROR_TREE = "[¿ï¨ú²§±`] ¸ô®|³æ¿ï¼Ò¦¡¤U±q¸ô®|¾ğ°»´ú¨ì¦h­«¿ï¨ú ({0} ­Ó¶µ¥Ø)¡A¤w¦Û°Ê²M°£";
 	}
 }

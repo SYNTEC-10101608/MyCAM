@@ -7,7 +7,18 @@ namespace MyCAM.Editor.Dialog
 		public PathCompensateDlg()
 		{
 			InitializeComponent();
+			m_LanguageManager = new LanguageManager.LanguageManager( "PathCompensateDlg" );
 			Initialization();
+			ApplyResourcesToUI();
+		}
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "PathCompensateDlg", this.Text );
+			m_lblCompensate.Text = m_LanguageManager.TryGetString( "m_lblCompensate", m_lblCompensate.Text );
+			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
+			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
+			m_btnReset.Text = m_LanguageManager.TryGetString( "m_btnReset", m_btnReset.Text );
 		}
 
 		public Func<double, bool> IsGeomConstraintExceedsLimit;
@@ -63,5 +74,6 @@ namespace MyCAM.Editor.Dialog
 		}
 
 		double m_CompensateData = 0.0;
+		readonly LanguageManager.LanguageManager m_LanguageManager;
 	}
 }

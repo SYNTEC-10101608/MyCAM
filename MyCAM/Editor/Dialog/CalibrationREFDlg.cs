@@ -1,4 +1,4 @@
-Ôªøusing MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.gp;
 using System;
@@ -15,9 +15,33 @@ namespace MyCAM.Editor.Dialog
 		public CalibrationREFDlg( CalibrationData data )
 		{
 			InitializeComponent();
+			m_LanguageManager = new LanguageManager.LanguageManager( "CalibrationREFDlg" );
 			m_CalibrationData = data;
 			SetUI();
 			Init();
+			ApplyResourcesToUI();
+		}
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "CalibrationREFDlg", this.Text );
+			m_gbPnt1.Text = m_LanguageManager.TryGetString( "m_gbPnt1", m_gbPnt1.Text );
+			m_gbPnt2.Text = m_LanguageManager.TryGetString( "m_gbPnt2", m_gbPnt2.Text );
+			m_gbPnt3.Text = m_LanguageManager.TryGetString( "m_gbPnt3", m_gbPnt3.Text );
+			m_LblPnt1X.Text = m_LanguageManager.TryGetString( "m_lblX", m_LblPnt1X.Text );
+			m_LblPnt1Y.Text = m_LanguageManager.TryGetString( "m_lblY", m_LblPnt1Y.Text );
+			m_LblPnt1Z.Text = m_LanguageManager.TryGetString( "m_lblZ", m_LblPnt1Z.Text );
+			m_LblPnt2X.Text = m_LanguageManager.TryGetString( "m_lblX", m_LblPnt2X.Text );
+			m_LblPnt2Y.Text = m_LanguageManager.TryGetString( "m_lblY", m_LblPnt2Y.Text );
+			m_LblPnt2Z.Text = m_LanguageManager.TryGetString( "m_lblZ", m_LblPnt2Z.Text );
+			m_LblPnt3X.Text = m_LanguageManager.TryGetString( "m_lblX", m_LblPnt3X.Text );
+			m_LblPnt3Y.Text = m_LanguageManager.TryGetString( "m_lblY", m_LblPnt3Y.Text );
+			m_LblPnt3Z.Text = m_LanguageManager.TryGetString( "m_lblZ", m_LblPnt3Z.Text );
+			m_btnDelPnt1.Text = m_LanguageManager.TryGetString( "m_btnDelete", m_btnDelPnt1.Text );
+			m_btnDelPnt2.Text = m_LanguageManager.TryGetString( "m_btnDelete", m_btnDelPnt2.Text );
+			m_btnDelPnt3.Text = m_LanguageManager.TryGetString( "m_btnDelete", m_btnDelPnt3.Text );
+			m_btnDeletAll.Text = m_LanguageManager.TryGetString( "m_btnDeletAll", m_btnDeletAll.Text );
+			m_btnSure.Text = m_LanguageManager.TryGetString( "m_btnSure", m_btnSure.Text );
 		}
 
 		public void Init()
@@ -280,21 +304,26 @@ namespace MyCAM.Editor.Dialog
 
 			// some point be set but not all
 			if( m_CalibrationData.IsBeenSet == false ) {
-				MyApp.Logger.ShowOnLogPanel( $"ÈúÄË¶Å‰∏âÂÄãÂèÉËÄÉÈªû", MyApp.NoticeType.Warning, true );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NeedThreeRefPoints", NEED_THREE_REF_POINTS ), MyApp.NoticeType.Warning, true );
 				return;
 			}
 			if( m_CalibrationData.Ref_Pnt1.IsEqual( m_CalibrationData.Ref_Pnt2, 1e-6 )
 				|| m_CalibrationData.Ref_Pnt1.IsEqual( m_CalibrationData.Ref_Pnt3, 1e-6 ) ) {
-				MyApp.Logger.ShowOnLogPanel( "ÂèÉËÄÉÈªûÈáçË¶Ü", MyApp.NoticeType.Warning, true );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "RefPointsDuplicate", REF_POINTS_DUPLICATE ), MyApp.NoticeType.Warning, true );
 				return;
 			}
 			gp_Vec v12 = new gp_Vec( m_CalibrationData.Ref_Pnt1, m_CalibrationData.Ref_Pnt2 );
 			gp_Vec v13 = new gp_Vec( m_CalibrationData.Ref_Pnt1, m_CalibrationData.Ref_Pnt3 );
 			if( v12.IsParallel( v13, 1e-3 ) ) {
-				MyApp.Logger.ShowOnLogPanel( "3ÈªûÂÖ±Á∑ö", MyApp.NoticeType.Warning, true );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ThreePointsCollinear", THREE_POINTS_COLLINEAR ), MyApp.NoticeType.Warning, true );
 				return;
 			}
 			RaiseConfirm( m_CalibrationData );
 		}
+
+		const string NEED_THREE_REF_POINTS = "ª›≠n§T≠”∞—¶“¬I";
+		const string REF_POINTS_DUPLICATE = "∞—¶“¬I≠´¬–";
+		const string THREE_POINTS_COLLINEAR = "3¬I¶@Ωu";
+		readonly LanguageManager.LanguageManager m_LanguageManager;
 	}
 }

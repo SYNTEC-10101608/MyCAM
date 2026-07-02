@@ -1,0 +1,23 @@
+<ResMap>
+  <Message ID="0" Content="默认材料" />
+  <Message ID="1" Content="不锈钢" />
+  <Message ID="2" Content="低碳钢" />
+  <Message ID="3" Content="中碳钢" />
+  <Message ID="4" Content="高碳钢" />
+  <Message ID="5" Content="铝合金" />
+  <Message ID="6" Content="红铜" />
+  <Message ID="7" Content="黄铜" />
+  <Message ID="8" Content="木材" />
+  <Message ID="9" Content="布料" />
+  <Message ID="10" Content="亚克力" />
+  <Message ID="11" Content="自订 11" />
+  <Message ID="12" Content="自订 12" />
+  <Message ID="13" Content="自订 13" />
+  <Message ID="14" Content="自订 14" />
+  <Message ID="15" Content="自订 15" />
+  <Message ID="16" Content="自订 16" />
+  <Message ID="17" Content="自订 17" />
+  <Message ID="18" Content="自订 18" />
+  <Message ID="19" Content="自订 19" />
+  <Message ID="20" Content="自订 20" />
+</ResMap>

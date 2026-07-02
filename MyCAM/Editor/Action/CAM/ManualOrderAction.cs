@@ -1,4 +1,4 @@
-ï»¿using MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCCViewer;
@@ -164,7 +164,7 @@ namespace MyCAM.Editor
 
 			// validate flag index before proceeding
 			if( m_CurrentFlagIndex < 0 || m_CurrentFlagIndex >= m_DataManager.PathIDList.Count ) {
-				MyApp.Logger.ShowOnLogPanel( "[æ“ä½œæé†’]æ——æ¨™ä½ç½®ç„¡æ•ˆ", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "InvalidFlagPosition", INVALID_FLAG_POSITION ), MyApp.NoticeType.Warning );
 				return;
 			}
 
@@ -252,12 +252,12 @@ namespace MyCAM.Editor
 			if( selectedIDs.Count != 1 ) {
 
 				if( selectedIDs.Count == 0 ) {
-					MyApp.Logger.ShowOnLogPanel( "[æ“ä½œæé†’]æœªé¸å–ä»»ä½•è·¯å¾‘", MyApp.NoticeType.Hint );
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoPathSelected", NO_PATH_SELECTED ), MyApp.NoticeType.Hint );
 				}
 				else {
 
 					// only handle single selection
-					MyApp.Logger.ShowOnLogPanel( "[æ“ä½œæé†’]æœ¬åŠŸèƒ½åƒ…æ”¯æ´å–®è·¯å¾‘é¸æ“‡", MyApp.NoticeType.Hint );
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "OnlySinglePathSelection", ONLY_SINGLE_PATH_SELECTION ), MyApp.NoticeType.Hint );
 					m_SelectPathAction.ClearSelection();
 				}
 				return false;
@@ -310,5 +310,10 @@ namespace MyCAM.Editor
 		OrderMode m_OrderMode;
 		int m_CurrentFlagIndex;
 		const int START_Indx = 0;
+
+		const string INVALID_FLAG_POSITION = "[¾Ş§@´£¿ô]ºX¼Ğ¦ì¸mµL®Ä";
+		const string NO_PATH_SELECTED = "[¾Ş§@´£¿ô]¥¼¿ï¨ú¥ô¦ó¸ô®|";
+		const string ONLY_SINGLE_PATH_SELECTION = "[¾Ş§@´£¿ô]¥»¥\¯à¶È¤ä´©³æ¸ô®|¿ï¾Ü";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ManualOrderAction" );
 	}
 }

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="PleaseAddWorkpiece" Content="[操作提醒]請先新增工件" />
+	<Message ID="PleaseSelectFace" Content="[操作提醒]請先選擇面" />
+	<Message ID="NoClosedBoundaryFound" Content="[操作提醒]找不到封閉邊界" />
+	<Message ID="OnlyContourPathSupported" Content="[操作提醒]此功能僅支援輪廓路徑" />
+	<Message ID="PleaseSelectPath" Content="[操作提醒]請先選擇路徑" />
+	<Message ID="OnlySinglePathEdit" Content="[操作提醒]只能選擇一個路徑進行編輯" />
+	<Message ID="AutoOptimizeIKDone" Content="[操作完成]已完成起點旋轉軸自動優化" />
+	<Message ID="NCExportFailedAndTransferFailed" Content="[NC轉出狀態]轉出NC失敗: {0}&#xA;[檔案傳輸狀態]傳輸NC檔案失敗" />
+	<Message ID="TempFileDeleteFailed" Content="[清理臨時檔案] 刪除失敗: {0}" />
+	<Message ID="NCFileSaveFailed" Content="[NC轉出狀態]儲存檔案失敗: {0}" />
+	<Message ID="NCExportSuccessNoController" Content="[NC轉出狀態]成功轉出NC&#xA;[檔案傳輸狀態]未與控制器進行連線，檔案無法傳輸" />
+	<Message ID="NCExportAndTransferSuccess" Content="[NC轉出狀態]成功轉出NC&#xA;[檔案傳輸狀態]傳輸NC檔案成功" />
+	<Message ID="NCExportSuccessTransferFailed" Content="[NC轉出狀態]成功轉出NC&#xA;[檔案傳輸狀態]傳輸NC檔案失敗：{0}" />
+	<Message ID="SaveNCFileTitle" Content="儲存 NC 檔案" />
+	<Message ID="NoIntersectingFaceFound" Content="[操作提醒]找不到相交的面" />
+	<Message ID="NoD1ContinuousFaceFound" Content="[操作提醒]找不到 D1 連續面" />
+	<Message ID="FaceGroupBuildFailed" Content="[操作提醒]面群組建立失敗" />
+	<Message ID="CAMEditor_OptimizeIKContinuityCompleted" Content="[操作完成]已完成起點旋轉軸自動優化" />
+</ResMap>

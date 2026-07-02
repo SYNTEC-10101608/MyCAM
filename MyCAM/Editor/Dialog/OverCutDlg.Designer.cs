@@ -37,54 +37,66 @@
 			// m_lblOverCutLength
 			// 
 			this.m_lblOverCutLength.AutoSize = true;
-			this.m_lblOverCutLength.Location = new System.Drawing.Point(19, 21);
+			this.m_lblOverCutLength.Location = new System.Drawing.Point(25, 26);
+			this.m_lblOverCutLength.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblOverCutLength.Name = "m_lblOverCutLength";
-			this.m_lblOverCutLength.Size = new System.Drawing.Size(56, 12);
+			this.m_lblOverCutLength.Size = new System.Drawing.Size(71, 15);
 			this.m_lblOverCutLength.TabIndex = 0;
 			this.m_lblOverCutLength.Text = "過切長度:";
 			// 
 			// m_tbxOverCutLength
 			// 
 			this.m_tbxOverCutLength.DecimalPlaces = 3;
-			this.m_tbxOverCutLength.Increment = 0.5m;
-			this.m_tbxOverCutLength.Minimum = 0;
-			this.m_tbxOverCutLength.Maximum = 99999;
-			this.m_tbxOverCutLength.Location = new System.Drawing.Point(88, 18);
+			this.m_tbxOverCutLength.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+			this.m_tbxOverCutLength.Location = new System.Drawing.Point(117, 22);
+			this.m_tbxOverCutLength.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_tbxOverCutLength.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
 			this.m_tbxOverCutLength.Name = "m_tbxOverCutLength";
-			this.m_tbxOverCutLength.Size = new System.Drawing.Size(92, 22);
+			this.m_tbxOverCutLength.Size = new System.Drawing.Size(123, 25);
 			this.m_tbxOverCutLength.TabIndex = 1;
 			this.m_tbxOverCutLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxOverCutLength_DebouncedValueChanged);
 			// 
 			// m_OverCutUnit
 			// 
 			this.m_OverCutUnit.AutoSize = true;
-			this.m_OverCutUnit.Location = new System.Drawing.Point(195, 21);
+			this.m_OverCutUnit.Location = new System.Drawing.Point(260, 26);
+			this.m_OverCutUnit.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_OverCutUnit.Name = "m_OverCutUnit";
-			this.m_OverCutUnit.Size = new System.Drawing.Size(23, 12);
+			this.m_OverCutUnit.Size = new System.Drawing.Size(29, 15);
 			this.m_OverCutUnit.TabIndex = 2;
 			this.m_OverCutUnit.Text = "mm";
 			// 
 			// m_btnSure
 			// 
-			this.m_btnSure.Location = new System.Drawing.Point(188, 52);
+			this.m_btnSure.Location = new System.Drawing.Point(251, 65);
+			this.m_btnSure.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
 			this.m_btnSure.Name = "m_btnSure";
-			this.m_btnSure.Size = new System.Drawing.Size(64, 24);
+			this.m_btnSure.Size = new System.Drawing.Size(85, 30);
 			this.m_btnSure.TabIndex = 3;
 			this.m_btnSure.Text = "OK";
 			this.m_btnSure.UseVisualStyleBackColor = true;
 			this.m_btnSure.Click += new System.EventHandler(this.m_btnSure_Click);
 			// 
-			// OverCutForm
+			// OverCutDlg
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(265, 94);
+			this.ClientSize = new System.Drawing.Size(353, 118);
 			this.Controls.Add(this.m_btnSure);
 			this.Controls.Add(this.m_OverCutUnit);
 			this.Controls.Add(this.m_tbxOverCutLength);
 			this.Controls.Add(this.m_lblOverCutLength);
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-			this.Name = "OverCutForm";
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+			this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.Name = "OverCutDlg";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "過切";
 			((System.ComponentModel.ISupportInitialize)(this.m_tbxOverCutLength)).EndInit();

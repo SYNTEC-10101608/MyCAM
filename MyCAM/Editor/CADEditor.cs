@@ -142,7 +142,8 @@ namespace MyCAM.Editor
 			// stop current action
 			EndActionIfNotDefault();
 			SaveProjectFileAction action = new SaveProjectFileAction( m_DataManager );
-			action.ActionCompleted += () => {
+			action.ActionCompleted += () =>
+			{
 				RaiseFileImported?.Invoke( action.IsSaveSuccess, action.SavedFileName );
 			};
 			StartEditAction( action );
@@ -306,19 +307,19 @@ namespace MyCAM.Editor
 
 			// check the status
 			if( status != IFSelect_ReturnStatus.IFSelect_RetDone ) {
-				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
 				return;
 			}
 			Reader.TransferRoots();
 
 			// prevent from empty shape or null shape
 			if( Reader.NbShapes() == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
 				return;
 			}
 			oneShape = Reader.OneShape();
 			if( oneShape == null || oneShape.IsNull() ) {
-				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
 				return;
 			}
 			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape } );
@@ -341,7 +342,7 @@ namespace MyCAM.Editor
 
 			// nothing selected
 			if( szIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇零件", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseSelectPart", PLEASE_SELECT_PART ), MyApp.NoticeType.Hint );
 				return false;
 			}
 			return true;
@@ -351,7 +352,7 @@ namespace MyCAM.Editor
 		{
 			// Need at least one part
 			if( m_DataManager.PartIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "無零件資料", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoPartData", NO_PART_DATA ), MyApp.NoticeType.Warning );
 				return;
 			}
 
@@ -368,7 +369,7 @@ namespace MyCAM.Editor
 				shapeList.Add( shapeObject.Shape );
 			}
 			if( shapeList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "無零件資料", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoPartData", NO_PART_DATA ), MyApp.NoticeType.Warning );
 				return;
 			}
 
@@ -380,7 +381,7 @@ namespace MyCAM.Editor
 			// Create vertex and add to manager
 			BRepBuilderAPI_MakeVertex makeVertex = new BRepBuilderAPI_MakeVertex( center );
 			if( !makeVertex.IsDone() ) {
-				MyApp.Logger.ShowOnLogPanel( "建立點位失敗", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CreatePointFailed", CREATE_POINT_FAILED ), MyApp.NoticeType.Warning );
 				return;
 			}
 			m_DataManager.AddReferenceFeature( makeVertex.Vertex() );
@@ -404,5 +405,11 @@ namespace MyCAM.Editor
 			RaiseCADActionStatusChange?.Invoke( action.ActionType, EActionStatus.End );
 			base.OnEditActionEnd( action );
 		}
+
+		const string CREATE_POINT_FAILED = "建立點位失敗";
+		const string IMPORT_FAILED = "匯入失敗";
+		const string PLEASE_SELECT_PART = "[操作提醒]請先選擇零件";
+		const string NO_PART_DATA = "無零件資料";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "CADEditor" );
 	}
 }

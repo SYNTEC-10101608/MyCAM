@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="MissingRotationCenter" Content="缺少旋轉中心設定" />
+	<Message ID="MissingRotationDirection" Content="缺少旋轉方向設定" />
+	<Message ID="FrameCalcFailed" Content="幀計算失敗" />
+	<Message ID="MissingChainMapEntry" Content="鏈列表中缺少 {0} 的映射項" />
+	<Message ID="GetComponentTrsfException" Content="獲取組件變換時發生異常: {0}" />
+</ResMap>

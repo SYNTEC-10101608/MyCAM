@@ -1,7 +1,6 @@
-Ôªøusing MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -30,6 +29,23 @@ namespace MyCAM.Editor.Dialog
 
 			// for std pattern lead setting disable lead out controls
 			IsStdPattern += SetLeadOutControlsEnabled;
+
+			ApplyResourcesToUI();
+		}
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "LeadDlg", this.Text );
+			m_lblLeadIn.Text = m_LanguageManager.TryGetString( "m_lblLeadIn", m_lblLeadIn.Text );
+			label1.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength", label1.Text );
+			label3.Text = m_LanguageManager.TryGetString( "m_lblLeadOut", label3.Text );
+			label4.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength", label4.Text );
+			m_lblLeadInAngle.Text = m_LanguageManager.TryGetString( "m_lblAngle", m_lblLeadInAngle.Text );
+			m_lblLeadOutAngle.Text = m_LanguageManager.TryGetString( "m_lblAngle", m_lblLeadOutAngle.Text );
+			m_lblLeadInLength.Text = m_LanguageManager.TryGetString( "m_lblRadius", m_lblLeadInLength.Text );
+			m_lblLeadOutLength.Text = m_LanguageManager.TryGetString( "m_lblRadius", m_lblLeadOutLength.Text );
+			m_chkFlip.Text = m_LanguageManager.TryGetString( "m_chkFlip", m_chkFlip.Text );
+			m_btnOK.Text = m_LanguageManager.TryGetString( "m_btnOK", m_btnOK.Text );
 		}
 
 		public Action<bool> IsStdPattern;
@@ -73,11 +89,11 @@ namespace MyCAM.Editor.Dialog
 			double dLeadInAngle = (double)m_tbxLeadInAngle.Value;
 			double dLeadOutAngle = (double)m_tbxLeadOutAngle.Value;
 			if( !IsValidAngle( dLeadInAngle ) ) {
-				MyApp.Logger.ShowOnLogPanel( "ËßíÂ∫¶ÂøÖÈ†àÂú®0 ~ 180ÁØÑÂúçÂÖß", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Error_AngleRange", ERROR_ANGLE_RANGE ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			if( !IsValidAngle( dLeadOutAngle ) ) {
-				MyApp.Logger.ShowOnLogPanel( "ËßíÂ∫¶ÂøÖÈ†àÂú®0 ~ 180ÁØÑÂúçÂÖß", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Error_AngleRange", ERROR_ANGLE_RANGE ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			return true;
@@ -125,6 +141,7 @@ namespace MyCAM.Editor.Dialog
 		const double DEFAULT_VALUE = 0;
 		LeadData m_LeadData;
 
-
+		const string ERROR_ANGLE_RANGE = "®§´◊•≤∂∑¶b0 ~ 180Ωd≥Ú§∫";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "LeadDlg" );
 	}
 }

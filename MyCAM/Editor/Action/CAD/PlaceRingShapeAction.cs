@@ -57,13 +57,13 @@ namespace MyCAM.Editor
 				return;
 			}
 			if( m_DataManager.PartIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]圖檔內沒有實體物件", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoSolidObjectInFile", NO_SOLID_OBJECT_IN_FILE ), MyApp.NoticeType.Hint );
 				End();
 				return;
 			}
 			bool isSuccess = RingShapedIdentifyHelper.ComputeRevolutionToG54Transform( fileShape, out gp_Trsf trsf );
 			if( isSuccess == false ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]迴轉體放置失敗", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "RevolutionPlaceFailed", REVOLUTION_PLACE_FAILED ), MyApp.NoticeType.Warning );
 				End();
 				return;
 			}
@@ -213,19 +213,19 @@ namespace MyCAM.Editor
 
 			// check the status
 			if( status != IFSelect_ReturnStatus.IFSelect_RetDone ) {
-				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
 				return;
 			}
 			Reader.TransferRoots();
 
 			// prevent from empty shape or null shape
 			if( Reader.NbShapes() == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
 				return;
 			}
 			oneShape = Reader.OneShape();
 			if( oneShape == null || oneShape.IsNull() ) {
-				MyApp.Logger.ShowOnLogPanel( "匯入失敗", MyApp.NoticeType.Error );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
 				return;
 			}
 			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape } );
@@ -236,5 +236,10 @@ namespace MyCAM.Editor
 
 		Viewer m_Viewer;
 		ViewManager m_ViewManager;
+
+		const string NO_SOLID_OBJECT_IN_FILE = "[操作提醒]圖檔內沒有實體物件";
+		const string REVOLUTION_PLACE_FAILED = "[操作提醒]迴轉體放置失敗";
+		const string IMPORT_FAILED = "匯入失敗";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "PlaceRingShapeAction" );
 	}
 }

@@ -299,12 +299,13 @@ namespace MyCAM.Helper
 			gp_Vec G54Offset = machineData.SimulationOffset;
 
 			// build frame by frame (with guard against invalid machine data)
+			var m_LanguageManager = new LanguageManager.LanguageManager( "SimulationHelper" );
 			if( machineData.PtOnMaster == null || machineData.PtOnSlave == null ) {
-				MyApp.Logger.ShowOnLogPanel( "缺少旋轉中心點的定義", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "MissingRotationCenter", MISSING_ROTATION_CENTER ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			if( machineData.MasterRotateDir == null || machineData.SlaveRotateDir == null ) {
-				MyApp.Logger.ShowOnLogPanel( "缺少軸向旋轉方向", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "MissingRotationDirection", MISSING_ROTATION_DIRECTION ), MyApp.NoticeType.Warning );
 				return false;
 			}
 
@@ -342,12 +343,13 @@ namespace MyCAM.Helper
 			ref Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap )
 		{
 			// protection
+			var langMgr = new LanguageManager.LanguageManager( "SimulationHelper" );
 			if( workPiecesChaintSet == null
 				|| workPiecesChaintSet.Count == 0
 				|| machineData == null
 				|| chainListMap == null
 				|| chainListMap.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( $"畫面計算失敗", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( langMgr.TryGetString( "FrameCalcFailed", FRAME_CALC_FAILED ), MyApp.NoticeType.Warning );
 				return;
 			}
 			if( m_FrameTransformMap == null ) {
@@ -386,8 +388,9 @@ namespace MyCAM.Helper
 		   MachineData machineData )
 		{
 			// protection
+			var langMgr = new LanguageManager.LanguageManager( "SimulationHelper" );
 			if( thisFramePostPnt == null || machineData == null ) {
-				MyApp.Logger.ShowOnLogPanel( $"畫面計算失敗", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( langMgr.TryGetString( "FrameCalcFailed", FRAME_CALC_FAILED ), MyApp.NoticeType.Warning );
 				return new Dictionary<MachineComponentType, gp_Trsf>();
 			}
 			if( g54 == null ) {
@@ -443,7 +446,8 @@ namespace MyCAM.Helper
 					return trsf;
 				}
 				if( !ChainListMap.ContainsKey( type ) ) {
-					MyApp.Logger.ShowOnLogPanel( $"ChainListMap 缺少機構: {type}", MyApp.NoticeType.Warning );
+					var langMgr = new LanguageManager.LanguageManager( "SimulationHelper" );
+					MyApp.Logger.ShowOnLogPanel( string.Format( langMgr.TryGetString( "MissingChainMapEntry", MISSING_CHAIN_MAP_ENTRY ), type ), MyApp.NoticeType.Warning );
 					return trsf;
 				}
 				foreach( MachineComponentType parent in ChainListMap[ type ] ) {
@@ -461,7 +465,8 @@ namespace MyCAM.Helper
 				}
 			}
 			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"GetComponentTrsf 計算失敗: {ex.Message}", MyApp.NoticeType.Warning );
+				var langMgr = new LanguageManager.LanguageManager( "SimulationHelper" );
+				MyApp.Logger.ShowOnLogPanel( string.Format( langMgr.TryGetString( "GetComponentTrsfException", GET_COMPONENT_TRSF_EXCEPTION ), ex.Message ), MyApp.NoticeType.Warning );
 			}
 			return trsf;
 		}
@@ -916,5 +921,11 @@ namespace MyCAM.Helper
 		}
 
 		#endregion
+
+		const string MISSING_ROTATION_CENTER = "缺少旋轉中心設定";
+		const string MISSING_ROTATION_DIRECTION = "缺少旋轉方向設定";
+		const string FRAME_CALC_FAILED = "幀計算失敗";
+		const string MISSING_CHAIN_MAP_ENTRY = "鏈列表中缺少 {0} 的映射項";
+		const string GET_COMPONENT_TRSF_EXCEPTION = "獲取組件變換時發生異常: {0}";
 	}
 }

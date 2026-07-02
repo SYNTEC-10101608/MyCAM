@@ -86,5 +86,11 @@
       <DependentUpon>FrmLicenseValidationFailed.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LanguageManager\LanguageManager.csproj">
+      <Project>{6aa4de88-e3b9-4a29-8df8-dc5dcd0a70cd}</Project>
+      <Name>LanguageManager</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

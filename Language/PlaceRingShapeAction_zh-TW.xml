@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="NoSolidObjectInFile" Content="[操作提醒]圖檔內沒有實體物件" />
+    <Message ID="RevolutionPlaceFailed" Content="[操作提醒]迴轉體放置失敗" />
+    <Message ID="ImportFailed" Content="匯入失敗" />
+</ResMap>

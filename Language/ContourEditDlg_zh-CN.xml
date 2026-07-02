@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="ContourEditDlg" Content="轮廓编辑" />
+	<Message ID="m_gbxIndexParam" Content="控制点参数" />
+	<Message ID="m_lblDX" Content="DX" />
+	<Message ID="m_lblDY" Content="DY" />
+	<Message ID="m_lblDZ" Content="DZ" />
+	<Message ID="m_lblUnit" Content="(单位：mm)" />
+	<Message ID="m_btnAdd" Content="新增" />
+	<Message ID="m_btnRemove" Content="移除" />
+</ResMap>

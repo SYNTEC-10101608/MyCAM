@@ -38,26 +38,35 @@
 			// m_lblCompensate
 			// 
 			this.m_lblCompensate.AutoSize = true;
-			this.m_lblCompensate.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_lblCompensate.Location = new System.Drawing.Point(12, 26);
+			this.m_lblCompensate.Location = new System.Drawing.Point(12, 27);
 			this.m_lblCompensate.Name = "m_lblCompensate";
-			this.m_lblCompensate.Size = new System.Drawing.Size(87, 15);
+			this.m_lblCompensate.Size = new System.Drawing.Size(109, 19);
 			this.m_lblCompensate.TabIndex = 0;
 			this.m_lblCompensate.Text = "補償距離(增量)";
 			// 
 			// m_NumUpDownCompensate
 			// 
-			this.m_NumUpDownCompensate.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_NumUpDownCompensate.Location = new System.Drawing.Point(105, 24);
+			this.m_NumUpDownCompensate.DecimalPlaces = 3;
+			this.m_NumUpDownCompensate.Location = new System.Drawing.Point(125, 24);
+			this.m_NumUpDownCompensate.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_NumUpDownCompensate.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
 			this.m_NumUpDownCompensate.Name = "m_NumUpDownCompensate";
-			this.m_NumUpDownCompensate.Size = new System.Drawing.Size(146, 21);
+			this.m_NumUpDownCompensate.Size = new System.Drawing.Size(146, 27);
 			this.m_NumUpDownCompensate.TabIndex = 1;
 			this.m_NumUpDownCompensate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			this.m_NumUpDownCompensate.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownCompensate_DebouncedValueChanged);
 			// 
 			// m_btnConfirm
 			// 
-			this.m_btnConfirm.Location = new System.Drawing.Point(176, 65);
+			this.m_btnConfirm.Location = new System.Drawing.Point(203, 65);
 			this.m_btnConfirm.Name = "m_btnConfirm";
 			this.m_btnConfirm.Size = new System.Drawing.Size(75, 23);
 			this.m_btnConfirm.TabIndex = 2;
@@ -67,7 +76,7 @@
 			// 
 			// m_btnClear
 			// 
-			this.m_btnClear.Location = new System.Drawing.Point(96, 65);
+			this.m_btnClear.Location = new System.Drawing.Point(112, 65);
 			this.m_btnClear.Name = "m_btnClear";
 			this.m_btnClear.Size = new System.Drawing.Size(75, 23);
 			this.m_btnClear.TabIndex = 3;
@@ -87,14 +96,16 @@
 			// 
 			// PathCompensateDlg
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(274, 112);
+			this.ClientSize = new System.Drawing.Size(295, 112);
 			this.Controls.Add(this.m_btnReset);
 			this.Controls.Add(this.m_btnClear);
 			this.Controls.Add(this.m_btnConfirm);
 			this.Controls.Add(this.m_NumUpDownCompensate);
 			this.Controls.Add(this.m_lblCompensate);
+			this.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Name = "PathCompensateDlg";
 			this.Text = "路徑補償";
 			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownCompensate)).EndInit();

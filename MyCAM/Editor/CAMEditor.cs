@@ -161,7 +161,7 @@ namespace MyCAM.Editor
 		{
 			// Guard check - ensure workpiece exists
 			if( m_DataManager.PartIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先新增工件", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseAddWorkpiece", PLEASE_ADD_WORKPIECE ), MyApp.NoticeType.Hint );
 				EndActionIfNotDefault();
 				return;
 			}
@@ -182,7 +182,7 @@ namespace MyCAM.Editor
 		{
 			// Guard check - ensure workpiece exists
 			if( m_DataManager.PartIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先新增工件", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseAddWorkpiece", PLEASE_ADD_WORKPIECE ), MyApp.NoticeType.Hint );
 				EndActionIfNotDefault();
 				return;
 			}
@@ -214,7 +214,7 @@ namespace MyCAM.Editor
 
 			// get path from free boundaries
 			if( selectedFaceGroupList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇面", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseSelectFace", PLEASE_SELECT_FACE ), MyApp.NoticeType.Hint );
 				return;
 			}
 
@@ -244,7 +244,7 @@ namespace MyCAM.Editor
 
 			// end all actions if no face is selected
 			if( selectedFaceGroupList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇面", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseSelectFace", PLEASE_SELECT_FACE ), MyApp.NoticeType.Hint );
 				m_CurrentAction.End();
 				return;
 			}
@@ -613,7 +613,7 @@ namespace MyCAM.Editor
 			string szPathID = szPathIDList[ 0 ];
 			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType )
 				|| pathType != PathType.Contour ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]此功能僅支援輪廓路徑", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "OnlyContourPathSupported", ONLY_CONTOUR_PATH_SUPPORTED ), MyApp.NoticeType.Hint );
 				return;
 			}
 			EndActionIfNotDefault();
@@ -644,7 +644,7 @@ namespace MyCAM.Editor
 		public void SetCalibrationREF()
 		{
 			if( m_DataManager.PartIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先新增工件", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseAddWorkpiece", PLEASE_ADD_WORKPIECE ), MyApp.NoticeType.Hint );
 				return;
 			}
 
@@ -759,7 +759,7 @@ namespace MyCAM.Editor
 				saveFileDialog.Filter = "NC Files (*.nc)|*.nc|All Files (*.*)|*.*";
 				saveFileDialog.DefaultExt = "nc";
 				saveFileDialog.FileName = NC_FILE_DEFAULT_NAME;
-				saveFileDialog.Title = "儲存 NC 檔案";
+				saveFileDialog.Title = m_LanguageManager.TryGetString( "SaveNCFileTitle", SAVE_NC_FILE_TITLE );
 				saveFileDialog.RestoreDirectory = true;
 
 				if( saveFileDialog.ShowDialog() != DialogResult.OK ) {
@@ -773,7 +773,7 @@ namespace MyCAM.Editor
 				bool bNCCreateSuccess = writer.ConvertSuccess( szFileName, szTempFilePath, out string szCreateErrorMessage );
 
 				if( !bNCCreateSuccess ) {
-					MyApp.Logger.ShowOnLogPanel( $"[NC轉出狀態]轉出NC失敗: {szCreateErrorMessage}\n" + "[檔案傳輸狀態]傳輸NC檔案失敗", MyApp.NoticeType.Error );
+					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NCExportFailedAndTransferFailed", NC_EXPORT_FAILED_AND_TRANSFER_FAILED ), szCreateErrorMessage ), MyApp.NoticeType.Error );
 
 					if( File.Exists( szTempFilePath ) ) {
 						try {
@@ -782,7 +782,7 @@ namespace MyCAM.Editor
 						catch {
 
 							// this would not happen often, but still need to handle
-							MyApp.Logger.ShowOnLogPanel( $"[清理臨時檔案] 刪除失敗: {szTempFilePath}", MyApp.NoticeType.Warning );
+							MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "TempFileDeleteFailed", TEMP_FILE_DELETE_FAILED ), szTempFilePath ), MyApp.NoticeType.Warning );
 						}
 					}
 					return;
@@ -793,7 +793,7 @@ namespace MyCAM.Editor
 					File.Delete( szTempFilePath );
 				}
 				catch( Exception ex ) {
-					MyApp.Logger.ShowOnLogPanel( $"[NC轉出狀態]儲存檔案失敗: {ex.Message}", MyApp.NoticeType.Error );
+					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NCFileSaveFailed", NC_FILE_SAVE_FAILED ), ex.Message ), MyApp.NoticeType.Error );
 					if( File.Exists( szTempFilePath ) ) {
 						try {
 							File.Delete( szTempFilePath );
@@ -801,24 +801,24 @@ namespace MyCAM.Editor
 						catch {
 
 							// this would not happen often, but still need to handle
-							MyApp.Logger.ShowOnLogPanel( $"[清理臨時檔案] 刪除失敗: {szTempFilePath}", MyApp.NoticeType.Warning );
+							MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "TempFileDeleteFailed", TEMP_FILE_DELETE_FAILED ), szTempFilePath ), MyApp.NoticeType.Warning );
 						}
 					}
 					return;
 				}
 
-				// transmit file if CNC IP is set
+				// transmit file
 				if( string.IsNullOrWhiteSpace( MyApp.CNCIP ) ) {
-					MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + "[檔案傳輸狀態]未與控制器進行連線，檔案無法傳輸", MyApp.NoticeType.Warning, true );
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NCExportSuccessNoController", NC_EXPORT_SUCCESS_NO_CONTROLLER ), MyApp.NoticeType.Warning, true );
 				}
 				else {
 					bool bTransmitSuccess = FTPTransmission.FileTransmit( szSaveFilePath, MyApp.CNCIP, szFileName, out string szTransmitErrorMessage );
 
 					if( bTransmitSuccess ) {
-						MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + "[檔案傳輸狀態]傳輸NC檔案成功", MyApp.NoticeType.Hint, true );
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NCExportAndTransferSuccess", NC_EXPORT_AND_TRANSFER_SUCCESS ), MyApp.NoticeType.Hint, true );
 					}
 					else {
-						MyApp.Logger.ShowOnLogPanel( "[NC轉出狀態]成功轉出NC\n" + $"[檔案傳輸狀態]傳輸NC檔案失敗：{szTransmitErrorMessage}", MyApp.NoticeType.Warning, true );
+						MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NCExportSuccessTransferFailed", NC_EXPORT_SUCCESS_TRANSFER_FAILED ), szTransmitErrorMessage ), MyApp.NoticeType.Warning, true );
 					}
 				}
 			}
@@ -925,7 +925,7 @@ namespace MyCAM.Editor
 				}
 			}
 			ShowAllCAMData();
-			MyApp.Logger.ShowOnLogPanel( "[操作完成]已完成起點旋轉軸自動優化", MyApp.NoticeType.Hint );
+			MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CAMEditor_OptimizeIKContinuityCompleted", OPTIMIZE_IK_CONTINUITY_COMPLETED ), MyApp.NoticeType.Hint );
 		}
 
 		#region Show CAM
@@ -1028,14 +1028,14 @@ namespace MyCAM.Editor
 
 			// nothing selected
 			if( szIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseSelectPath", PLEASE_SELECT_PATH ), MyApp.NoticeType.Hint );
 				EndActionIfNotDefault();
 				return false;
 			}
 
 			// multiple selected but not allowed
 			else if( isMutiEditable == false && szIDList.Count > 1 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]只能選擇一個路徑進行編輯", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "OnlySinglePathEdit", ONLY_SINGLE_PATH_EDIT ), MyApp.NoticeType.Hint );
 				EndActionIfNotDefault();
 				return false;
 			}
@@ -1049,13 +1049,13 @@ namespace MyCAM.Editor
 
 			// nothing selected
 			if( szIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]請先選擇路徑", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseSelectPath", PLEASE_SELECT_PATH ), MyApp.NoticeType.Hint );
 				return false;
 			}
 
 			// multiple selected but not allowed
 			else if( isMutiEditable == false && szIDList.Count > 1 ) {
-				MyApp.Logger.ShowOnLogPanel( "[操作提醒]只能選擇一個路徑進行編輯", MyApp.NoticeType.Hint );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "OnlySinglePathEdit", ONLY_SINGLE_PATH_EDIT ), MyApp.NoticeType.Hint );
 				return false;
 			}
 			return true;
@@ -1163,5 +1163,20 @@ namespace MyCAM.Editor
 			TopoDS_Shape compound = ShapeTool.MakeCompound( shapeList );
 			return new BoundingBox( compound );
 		}
+
+		const string PLEASE_ADD_WORKPIECE = "[操作提醒]請先新增工件";
+		const string PLEASE_SELECT_FACE = "[操作提醒]請先選擇面";
+		const string PLEASE_SELECT_PATH = "[操作提醒]請先選擇路徑";
+		const string ONLY_SINGLE_PATH_EDIT = "[操作提醒]只能選擇一個路徑進行編輯";
+		const string ONLY_CONTOUR_PATH_SUPPORTED = "[操作提醒]此功能僅支援輪廓路徑";
+		const string NC_EXPORT_FAILED_AND_TRANSFER_FAILED = "[NC轉出狀態]轉出NC失敗: {0}\n[檔案傳輸狀態]傳輸NC檔案失敗";
+		const string TEMP_FILE_DELETE_FAILED = "[清理臨時檔案] 刪除失敗: {0}";
+		const string NC_FILE_SAVE_FAILED = "[NC轉出狀態]儲存檔案失敗: {0}";
+		const string NC_EXPORT_SUCCESS_NO_CONTROLLER = "[NC轉出狀態]成功轉出NC\n[檔案傳輸狀態]未與控制器進行連線，檔案無法傳輸";
+		const string NC_EXPORT_AND_TRANSFER_SUCCESS = "[NC轉出狀態]成功轉出NC\n[檔案傳輸狀態]傳輸NC檔案成功";
+		const string NC_EXPORT_SUCCESS_TRANSFER_FAILED = "[NC轉出狀態]成功轉出NC\n[檔案傳輸狀態]傳輸NC檔案失敗：{0}";
+		const string OPTIMIZE_IK_CONTINUITY_COMPLETED = "[操作完成]已完成起點旋轉軸自動優化";
+		const string SAVE_NC_FILE_TITLE = "儲存 NC 檔案";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "CAMEditor" );
 	}
 }

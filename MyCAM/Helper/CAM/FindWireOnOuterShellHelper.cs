@@ -158,19 +158,26 @@ namespace MyCAM.Helper
 
 		public static string GetWireFindingErrorMessage( WireFindingError error )
 		{
+			var langMgr = new LanguageManager.LanguageManager( "FindWireOnOuterShellHelper" );
 			switch( error ) {
 				case WireFindingError.NoIntersectedFace:
-					return "[操作提醒]找不到相交的面";
+					return langMgr.TryGetString( "NoIntersectedFace", NO_INTERSECTED_FACE );
 				case WireFindingError.NoD1ContinuousFaces:
-					return "[操作提醒]找不到 D1 連續面";
+					return langMgr.TryGetString( "NoD1ContinuousFaces", NO_D1_CONTINUOUS_FACES );
 				case WireFindingError.SewFaceGroupFailed:
-					return "[操作提醒]面群組建立失敗";
+					return langMgr.TryGetString( "SewFaceGroupFailed", SEW_FACE_GROUP_FAILED );
 				case WireFindingError.NoClosedBoundaries:
-					return "[操作提醒]找不到封閉邊界";
+					return langMgr.TryGetString( "NoClosedBoundaries", NO_CLOSED_BOUNDARIES );
 				default:
-					return "[操作提醒]未知錯誤";
+					return langMgr.TryGetString( "UnknownError", UNKNOWN_ERROR );
 			}
 		}
+
+		const string NO_INTERSECTED_FACE = "[操作提醒]找不到相交的面";
+		const string NO_D1_CONTINUOUS_FACES = "[操作提醒]找不到 D1 連續面";
+		const string SEW_FACE_GROUP_FAILED = "[操作提醒]面群組建立失敗";
+		const string NO_CLOSED_BOUNDARIES = "[操作提醒]找不到封閉邊界";
+		const string UNKNOWN_ERROR = "[操作提醒]未知錯誤";
 
 		// use multiple ray strategies to find the outermost face
 		static TopoDS_Face FindOutermostFaceByStrategies(

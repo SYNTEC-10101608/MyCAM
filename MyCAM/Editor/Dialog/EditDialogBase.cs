@@ -112,7 +112,7 @@ namespace MyCAM.Editor
 				catch( ObjectDisposedException ) {
 				}
 				catch( Exception ex ) {
-					MyApp.Logger?.ShowOnLogPanel( $"清理 Timer 時發生錯誤: {ex.Message}", MyApp.NoticeType.Warning );
+					MyApp.Logger?.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CleanupTimerError", CLEANUP_TIMER_ERROR ), ex.Message ), MyApp.NoticeType.Warning );
 				}
 				finally {
 					m_MouseOperationTimer = null;
@@ -129,5 +129,8 @@ namespace MyCAM.Editor
 		}
 		protected bool m_ConfirmCheck = false;
 		Timer m_MouseOperationTimer;
+
+		const string CLEANUP_TIMER_ERROR = "清理 Timer 時發生錯誤: {0}";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "EditDialogBase" );
 	}
 }

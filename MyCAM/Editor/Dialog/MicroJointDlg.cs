@@ -1,6 +1,4 @@
-﻿using MyCAM.App;
 using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -15,6 +13,16 @@ namespace MyCAM.Editor
 		{
 			InitializeComponent();
 			m_tbxMicroJointLength.SilentSetValue = (decimal)DEFAULT_LENGTH;
+			ApplyResourcesToUI();
+		}
+
+		public void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "MicroJointDlg", this.Text );
+			m_lblLength.Text = m_LanguageManager.TryGetString( "m_lblLength", m_lblLength.Text );
+			m_btnClearAll.Text = m_LanguageManager.TryGetString( "m_btnClearAll", m_btnClearAll.Text );
+			m_btnDelete.Text = m_LanguageManager.TryGetString( "m_btnDelete", m_btnDelete.Text );
+			m_btnCancel.Text = m_LanguageManager.TryGetString( "m_btnCancel", m_btnCancel.Text );
 		}
 
 		public void SetMicroJointLength( double length )
@@ -60,5 +68,7 @@ namespace MyCAM.Editor
 		{
 			DeleteAction?.Invoke();
 		}
+
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "MicroJointDlg" );
 	}
 }

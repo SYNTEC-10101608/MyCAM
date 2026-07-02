@@ -1,4 +1,4 @@
-ï»¿using MyCAM.App;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.FileManager;
 using OCCViewer;
@@ -76,7 +76,7 @@ namespace MyCAM.Editor
 					ImportedFileName = Path.GetFileName( filePath );
 				}
 				catch( Exception ex ) {
-					MyApp.Logger.ShowOnLogPanel( $"è®€å–å°ˆæ¡ˆæª”æ¡ˆå¤±æ•—ï¼š\n{ex.Message}", MyApp.NoticeType.Error );
+					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "ReadProjectFileFailed", READ_PROJECT_FILE_FAILED ), ex.Message ), MyApp.NoticeType.Error );
 					IsImportSuccess = false;
 					ImportedFileName = string.Empty;
 				}
@@ -102,7 +102,7 @@ namespace MyCAM.Editor
 
 				// nly allow .saf files
 				fileDialog.Filter = "SFA Files (*.sfa)|*.sfa";
-				fileDialog.Title = "é–‹å•Ÿå°ˆæ¡ˆ";
+				fileDialog.Title = m_LanguageManager.TryGetString( "OpenProjectTitle", OPEN_PROJECT_TITLE );
 
 				// only can choose one file
 				fileDialog.Multiselect = false;
@@ -121,5 +121,8 @@ namespace MyCAM.Editor
 
 		Viewer m_Viewer;
 		ViewManager m_ViewManager;
+		const string READ_PROJECT_FILE_FAILED = "Åª¨ú±M®×ÀÉ®×¥¢±Ñ¡G\n{0}";
+		const string OPEN_PROJECT_TITLE = "¶}±Ò±M®×";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ReadProjectFileAction" );
 	}
 }

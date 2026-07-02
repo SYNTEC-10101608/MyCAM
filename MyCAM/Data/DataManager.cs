@@ -1,5 +1,5 @@
-﻿using MyCAM.Helper;
 using OCC.gp;
+using MyCAM.Helper;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;

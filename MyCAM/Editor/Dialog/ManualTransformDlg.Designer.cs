@@ -98,7 +98,7 @@
 			this.m_lblError.ForeColor = System.Drawing.Color.Red;
 			this.m_lblError.Location = new System.Drawing.Point( 20, 140 );
 			this.m_lblError.Name = "m_lblError";
-			this.m_lblError.Size = new System.Drawing.Size( 269, 17 );
+			this.m_lblError.Size = new System.Drawing.Size( 269, 34 );
 			this.m_lblError.TabIndex = 8;
 			this.m_lblError.Text = string.Empty;
 			this.m_lblError.Visible = false;
@@ -107,7 +107,7 @@
 			// 
 			this.m_btnConfirm.Enabled = false;
 			this.m_btnConfirm.Font = new System.Drawing.Font("Arial", 9F);
-			this.m_btnConfirm.Location = new System.Drawing.Point(219, 163);
+			this.m_btnConfirm.Location = new System.Drawing.Point(219, 180);
 			this.m_btnConfirm.Name = "m_btnConfirm";
 			this.m_btnConfirm.Size = new System.Drawing.Size(71, 29);
 			this.m_btnConfirm.TabIndex = 3;
@@ -119,7 +119,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 23F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(310, 205);
+			this.ClientSize = new System.Drawing.Size(310, 220);
 			this.Controls.Add(this.m_lblMethod);
 			this.Controls.Add(this.m_cmbMethod);
 			this.Controls.Add(this.m_lblAxisPlane);

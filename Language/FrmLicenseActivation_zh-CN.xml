@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="FrmLicenseActivation_Title" Content="产品授权" />
+  <Message ID="FrmLicenseActivation_Hint" Content="输入授权码" />
+  <Message ID="FrmLicenseActivation_ActivateButton" Content="启用" />
+</ResMap>

@@ -1,6 +1,5 @@
-﻿using MyCAM.Data;
+using MyCAM.Data;
 using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -10,6 +9,19 @@ namespace MyCAM.Editor
 		{
 			InitializeComponent();
 			InitializeControlAndFieldValue( data );
+			ApplyResourcesToUI();
+		}
+
+		public void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "TraverseDlg", this.Text );
+			m_lblLiftUpDistance.Text = m_LanguageManager.TryGetString( "m_lblLiftUpDistance", m_lblLiftUpDistance.Text );
+			m_lblCutDownDistance.Text = m_LanguageManager.TryGetString( "m_lblCutDownDistance", m_lblCutDownDistance.Text );
+			m_lblFollowSaveDistance.Text = m_LanguageManager.TryGetString( "m_lblFollowSaveDistance", m_lblFollowSaveDistance.Text );
+			m_chkSafePlane.Text = m_LanguageManager.TryGetString( "m_chkSafePlane", m_chkSafePlane.Text );
+			m_lblFrogLeapDistance.Text = m_LanguageManager.TryGetString( "m_lblFrogLeapDistance", m_lblFrogLeapDistance.Text );
+			m_lblSafePlaneDistance.Text = m_LanguageManager.TryGetString( "m_lblSafePlaneDistance", m_lblSafePlaneDistance.Text );
+			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
 		}
 
 		void InitializeControlAndFieldValue( TraverseData Data )
@@ -122,5 +134,7 @@ namespace MyCAM.Editor
 		double m_FrogLeapDistance = TraverseData.FROG_LEAP_DISTANCE;
 		double m_SafePlaneDistance = TraverseData.SAFE_PLANE_DISTANCE;
 		bool m_IsSafePlaneChecked = TraverseData.IS_SAFE_PLANE_CHECKED;
+
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "TraverseDlg" );
 	}
 }

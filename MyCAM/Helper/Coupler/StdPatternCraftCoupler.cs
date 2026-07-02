@@ -19,8 +19,10 @@ namespace MyCAM.Helper
 				}
 			}
 			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"StdPatternCraftCoupler.HandleCouplerCraftForStartPoint failed: {ex.Message}", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "HandleCouplerCraftFailed", HANDLE_COUPLER_CRAFT_FAILED ), ex.Message ), MyApp.NoticeType.Warning );
 			}
 		}
+		const string HANDLE_COUPLER_CRAFT_FAILED = "StdPatternCraftCoupler.HandleCouplerCraftForStartPoint 失敗: {0}";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "StdPatternCraftCoupler" );
 	}
 }

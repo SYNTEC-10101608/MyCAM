@@ -11,6 +11,7 @@ namespace MyCAM.Editor
 {
 	internal class AutoSortPathAction : EditActionBase
 	{
+
 		public AutoSortPathAction( DataManager dataManager, SelectPathAction selectPathAction )
 			: base( dataManager )
 		{
@@ -75,7 +76,7 @@ namespace MyCAM.Editor
 			// when precondition is not met (e.g. insufficient paths)
 			List<string> pathIDList = new List<string>( m_DataManager.PathIDList );
 			if( pathIDList.Count < 2 ) {
-				MyApp.Logger.ShowOnLogPanel( "[路徑排序] 路徑數量不足，至少需要 2 條路徑", MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_InsufficientPaths", LOG_INSUFFICIENT_PATHS ), MyApp.NoticeType.Warning );
 				return;
 			}
 
@@ -116,7 +117,7 @@ namespace MyCAM.Editor
 			else {
 				string methodName = GetSortMethodName( sortParams.Method );
 				MyApp.Logger.ShowOnLogPanel(
-					string.Format( "[路徑排序] {0}排序未產生有效結果，請確認路徑資料是否正確", methodName ),
+					string.Format( m_LanguageManager.TryGetString( "Log_SortFailed", LOG_SORT_FAILED ), methodName ),
 					MyApp.NoticeType.Warning );
 			}
 
@@ -137,17 +138,17 @@ namespace MyCAM.Editor
 			}
 		}
 
-		static string GetSortMethodName( SortMethod method )
+		string GetSortMethodName( SortMethod method )
 		{
 			switch( method ) {
 				case SortMethod.ShortestPath:
-					return "最短路徑";
+					return m_LanguageManager.TryGetString( "SortMethod_ShortestPath", SORT_METHOD_SHORTEST_PATH );
 				case SortMethod.CylinderVertical:
-					return "圓管直排";
+					return m_LanguageManager.TryGetString( "SortMethod_CylinderVertical", SORT_METHOD_CYLINDER_VERTICAL );
 				case SortMethod.CylinderHorizontal:
-					return "圓管橫排";
+					return m_LanguageManager.TryGetString( "SortMethod_CylinderHorizontal", SORT_METHOD_CYLINDER_HORIZONTAL );
 				default:
-					return "未知";
+					return m_LanguageManager.TryGetString( "SortMethod_Unknown", SORT_METHOD_UNKNOWN );
 			}
 		}
 
@@ -158,5 +159,12 @@ namespace MyCAM.Editor
 
 		SelectPathAction m_SelectPathAction;
 		AutoSortPathDlg m_Dialog;
+		const string LOG_INSUFFICIENT_PATHS = "[路徑排序] 路徑數量不足，至少需要 2 條路徑";
+		const string LOG_SORT_FAILED = "[路徑排序] {0}排序未產生有效結果，請確認路徑資料是否正確";
+		const string SORT_METHOD_SHORTEST_PATH = "最短路徑";
+		const string SORT_METHOD_CYLINDER_VERTICAL = "圓筒直排";
+		const string SORT_METHOD_CYLINDER_HORIZONTAL = "圓筒橫排";
+		const string SORT_METHOD_UNKNOWN = "未知";
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "AutoSortPathAction" );
 	}
 }

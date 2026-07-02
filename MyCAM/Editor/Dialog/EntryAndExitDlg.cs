@@ -1,6 +1,5 @@
-﻿using MyCAM.Data;
+using MyCAM.Data;
 using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -10,6 +9,16 @@ namespace MyCAM.Editor
 		{
 			InitializeComponent();
 			InitializeControlAndFieldValue( data );
+			ApplyResourcesToUI();
+		}
+
+		public void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "EntryAndExitDlg", this.Text );
+			m_lblEntryDistance.Text = m_LanguageManager.TryGetString( "m_lblEntryDistance", m_lblEntryDistance.Text );
+			m_lblExitDistance.Text = m_LanguageManager.TryGetString( "m_lblExitDistance", m_lblExitDistance.Text );
+			m_lblFollowSafeDistance.Text = m_LanguageManager.TryGetString( "m_lblFollowSafeDistance", m_lblFollowSafeDistance.Text );
+			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
 		}
 
 		void InitializeControlAndFieldValue( EntryAndExitData data )
@@ -57,5 +66,7 @@ namespace MyCAM.Editor
 		double m_EntryDistance = EntryAndExitData.ENTRY_DISTANCE;
 		double m_ExitDistance = EntryAndExitData.EXIT_DISTANCE;
 		double m_FollowSafeDistance = EntryAndExitData.FOLLOW_SAFE_DISTANCE;
+
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "EntryAndExitDlg" );
 	}
 }

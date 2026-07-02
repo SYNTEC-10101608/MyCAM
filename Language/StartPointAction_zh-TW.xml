@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="CannotGetPathCraftInfo" Content="無法獲取路徑 {0} 的加工資訊" />
+</ResMap>

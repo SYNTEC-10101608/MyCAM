@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="NoWorkpieceToExport" Content="尚無工件能夠匯出專案檔" />
+	<Message ID="SaveFileError" Content="儲存檔案時發生錯誤：&#xA;{0}" />
+	<Message ID="SaveProjectTitle" Content="儲存專案" />
+</ResMap>

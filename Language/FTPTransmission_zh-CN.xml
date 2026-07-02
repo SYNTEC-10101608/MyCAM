@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Error_LocalFileNotFound" Content="本机文件不存在或路径无效" />
+  <Message ID="Error_FTPServerIPInvalid" Content="FTP 服务器 IP 地址无效" />
+  <Message ID="Error_ConnectionFailed" Content="连接失败" />
+  <Message ID="Error_UploadFailed" Content="上传失败，状态码：{0}" />
+  <Message ID="Error_NetworkError" Content="网络错误：{0}" />
+  <Message ID="Error_UploadException" Content="上传异常：{0}" />
+</ResMap>

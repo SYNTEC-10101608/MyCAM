@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="ThreePtTransformDlg" Content="三点转换" />
+	<Message ID="m_gbCADCoord" Content="CAD坐标" />
+	<Message ID="m_gbMachineCoord" Content="机械坐标" />
+	<Message ID="label1" Content="第一点" />
+	<Message ID="label2" Content="第二点" />
+	<Message ID="label3" Content="第三点" />
+	<Message ID="btnOK" Content="确认" />
+	<Message ID="InvalidMachineCoord" Content="机械点坐标无效" />
+	<Message ID="MachinePointsCoincident" Content="机械点不能重合" />
+	<Message ID="MachinePointsCollinear" Content="机械点不能共线" />
+</ResMap>

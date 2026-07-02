@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Title" Content="孔切碎设定" />
+  <Message ID="m_lblShreddingInterval" Content="切碎间隔" />
+  <Message ID="m_btnOK" Content="确认" />
+  <Message ID="m_btnCancel" Content="取消" />
+  <Message ID="ApplyToAllCuttingPaths" Content="对所有切割路径生效" />
+  <Message ID="ApplyToSelectedCuttingPaths" Content="仅对所选切割路径生效" />
+  <Message ID="Error_InvalidInput" Content="无效的输入值，请输入>=0的整数" />
+  <Message ID="Error_NoCuttingPath" Content="不存在任何切割路径，无法使用此功能" />
+</ResMap>

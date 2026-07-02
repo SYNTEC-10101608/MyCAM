@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="m_lblWidth" Content="微连宽度" />
+  <Message ID="m_chkStartPointFirst" Content="起点优先新增" />
+  <Message ID="m_btnOK" Content="确认" />
+  <Message ID="InvalidValue" Content="不合法的输入值！" />
+</ResMap>

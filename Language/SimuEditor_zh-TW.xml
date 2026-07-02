@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="MachineFileReadFailed" Content="機構圖檔讀取失敗" />
+	<Message ID="ReachedFirstCollision" Content="已到達第一個碰撞點" />
+	<Message ID="ReachedLastCollision" Content="已到達最後一個碰撞點" />
+	<Message ID="PathHasCollision" Content="路徑有碰撞,請檢察模擬結果" />
+	<Message ID="PathNoCollision" Content="路徑沒有碰撞" />
+	<Message ID="PostProcessFailed" Content="後處理失敗, 無法生成模擬: " />
+	<Message ID="SimuFrameCalcFailed" Content="模擬第{0}禎運算失敗" />
+	<Message ID="NoPathForSimulation" Content="尚無路徑能夠參與模擬" />
+	<Message ID="SimuCalcFailed" Content="模擬計算失敗，請確認機台設定及路徑設定是否正確" />
+	<Message ID="SimuCalcDoneCollisionFailed" Content="模擬計算完成，但碰撞計算失敗" />
+</ResMap>

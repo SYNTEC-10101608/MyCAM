@@ -9,6 +9,8 @@ namespace MyCAM.Helper
 {
 	internal static class CollisionHelper
 	{
+		static readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SimuEditor" );
+
 		internal static bool CalCollisionResult( int frameCount, SimuData.SimuRequiredData.SimuInputSet calNeedData, Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap, out Dictionary<MachineComponentType, List<bool>> frameCollisionMap )
 		{
 			bool bCollisionOk = BuildCollision( frameCount, calNeedData.ChainListMap, calNeedData.CollisionEngine, FrameTransformMap, out frameCollisionMap );
@@ -70,7 +72,7 @@ namespace MyCAM.Helper
 				FrameCollisionMap[ MachineComponentType.WorkPiece ].Add( collisionResiltSet.Contains( MachineComponentType.WorkPiece ) );
 			}
 			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( $"模擬第{FrameIndex}禎運算失敗" + ex, MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "SimuFrameCalcFailed", SIMU_FRAME_CALC_FAILED ), FrameIndex ) + ex, MyApp.NoticeType.Warning );
 				return;
 			}
 		}
@@ -98,5 +100,7 @@ namespace MyCAM.Helper
 			result[ 11 ] = vecT.Z();
 			return result;
 		}
+
+		const string SIMU_FRAME_CALC_FAILED = "模擬第{0}禎運算失敗";
 	}
 }
