@@ -1075,8 +1075,17 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// lock main form
-				m_TreeView.Enabled = false;
 				RaiseWithDlgActionStatusChange?.Invoke( EActionStatus.Start );
+			}
+
+			if( action.ActionType == EditActionType.OverCut
+				|| action.ActionType == EditActionType.SetLead
+				|| action.ActionType == EditActionType.SetTraverse
+				|| action.ActionType == EditActionType.SetPattern
+				|| action.ActionType == EditActionType.PathEdit ) {
+
+				// for the dlg edit which not support chaging path so far
+				m_TreeView.Enabled = false;
 			}
 
 			// change display
@@ -1096,9 +1105,19 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// unlock main form
-				m_TreeView.Enabled = true;
 				RaiseWithDlgActionStatusChange?.Invoke( EActionStatus.End );
 			}
+
+			if( action.ActionType == EditActionType.OverCut
+				|| action.ActionType == EditActionType.SetLead
+				|| action.ActionType == EditActionType.SetTraverse
+				|| action.ActionType == EditActionType.SetPattern
+				|| action.ActionType == EditActionType.PathEdit ) {
+
+				// for the dlg edit which not support chaging path so far
+				m_TreeView.Enabled = true;
+			}
+
 			RaiseCAMActionStatusChange?.Invoke( action.ActionType, EActionStatus.End );
 			base.OnEditActionEnd( action );
 		}
