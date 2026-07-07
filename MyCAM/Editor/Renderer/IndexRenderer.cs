@@ -44,12 +44,7 @@ namespace MyCAM.Editor.Renderer
 				string szIndex = ( ++nCurrentIndex ).ToString();
 
 				// create text label ais
-				AIS_TextLabel textLabel = new AIS_TextLabel();
-				textLabel.SetText( new TCollection_ExtendedString( szIndex ) );
-				textLabel.SetPosition( location );
-				textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-				textLabel.SetHeight( 20 );
-				textLabel.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
+				AIS_TextLabel textLabel = CreateIndexLabelAIS( szIndex, location );
 				m_IndexList.Add( textLabel );
 			}
 
@@ -98,12 +93,7 @@ namespace MyCAM.Editor.Renderer
 				string szIndex = ( ++nCurrentIndex ).ToString();
 
 				// create text label ais
-				AIS_TextLabel textLabel = new AIS_TextLabel();
-				textLabel.SetText( new TCollection_ExtendedString( szIndex ) );
-				textLabel.SetPosition( newLocation );
-				textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_WHITE ) );
-				textLabel.SetHeight( 20 );
-				textLabel.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
+				AIS_TextLabel textLabel = CreateIndexLabelAIS( szIndex, newLocation );
 				m_IndexList.Add( textLabel );
 			}
 
@@ -130,6 +120,17 @@ namespace MyCAM.Editor.Renderer
 		gp_Pnt GetMainPathStartPoint( string pathID )
 		{
 			return new gp_Pnt( CacheHelper.GetMainPathStartPoint( pathID ).Point.XYZ() );
+		}
+
+		AIS_TextLabel CreateIndexLabelAIS( string szIndex, gp_Pnt location )
+		{
+			AIS_TextLabel textLabel = new AIS_TextLabel();
+			textLabel.SetText( new TCollection_ExtendedString( szIndex ) );
+			textLabel.SetPosition( location );
+			textLabel.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BLACK ) );
+			textLabel.SetHeight( 20 );
+			textLabel.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
+			return textLabel;
 		}
 	}
 }
