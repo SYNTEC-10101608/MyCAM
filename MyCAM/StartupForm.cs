@@ -207,6 +207,8 @@ namespace MyCAM
 		const string LOG_VNC_FILE_NOT_FOUND = "找不到VNC執行檔，請確認VNC執行檔與程式執行檔在同一資料夾下";
 		const string LOG_VNC_CONNECT_FAILED = "無法連線到指定IP位置";
 		const string LOG_VNC_UNKNOWN_ERROR = "VNC連線過程發生未知錯誤";
+		const string MSG_SAVE_BEFORE_EXIT_TITLE = "存檔確認";
+		const string MSG_SAVE_BEFORE_EXIT_WITH_DATA = "是否要在關閉前存檔？";
 
 		enum EUIStatus
 		{
@@ -1324,6 +1326,31 @@ namespace MyCAM
 
 		void StartupForm_FormClosing( object sender, FormClosingEventArgs e )
 		{
+			// check if there are any workpieces
+			if( m_DataManager != null && m_DataManager.PartIDList.Count > 0 ) {
+				string message = string.Format(
+					m_LanguageManager.TryGetString( "Msg_SaveBeforeExitWithData", MSG_SAVE_BEFORE_EXIT_WITH_DATA ),
+					m_DataManager.PartIDList.Count );
+				string title = m_LanguageManager.TryGetString( "Msg_SaveBeforeExitTitle", MSG_SAVE_BEFORE_EXIT_TITLE );
+
+				DialogResult result = MessageBox.Show(
+					message,
+					title,
+					MessageBoxButtons.YesNoCancel,
+					MessageBoxIcon.Question );
+
+				if( result == DialogResult.Yes ) {
+					// user wants to save
+					m_CADEditor.SaveProjectFile();
+				}
+				else if( result == DialogResult.Cancel ) {
+					// user cancelled the close operation
+					e.Cancel = true;
+					return;
+				}
+				// if No, continue closing without saving
+			}
+
 			CleanupVNCConnections();
 		}
 

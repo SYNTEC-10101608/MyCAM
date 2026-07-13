@@ -141,4 +141,8 @@
 	<Message ID="Log_VNCConnectFailed" Content="无法连线到指定IP位置" />
 	<Message ID="Log_VNCUnknownError" Content="VNC连线过程发生未知错误" />
 	<Message ID="Log_RevolutionFailed" Content="回转体建立失败" />
+
+	<!-- 存檔提示 -->
+	<Message ID="Msg_SaveBeforeExitTitle" Content="存档确认" />
+	<Message ID="Msg_SaveBeforeExitWithData" Content="是否要在关闭前存档？" />
 </ResMap>
