@@ -357,7 +357,7 @@ namespace MyCAM.Editor
 			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.TiltAngleInterpolation ] =
 				m_LanguageManager.TryGetString( "InterpolateType_Bevel", INTERPOLATE_TYPE_BEVEL );
 
-			string szAxisSmooth = m_LanguageManager.TryGetString( "ToolVectorDlg_AxisSmooth", START_OR_END_END );
+			string szAxisSmooth = m_LanguageManager.TryGetString( "ToolVectorDlg_AxisSmooth", AXIS_SMOOTH );
 
 			// index 3: MasterNormalSlaveInterpolation
 			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterNormalSlaveInterpolation ] =
@@ -378,6 +378,7 @@ namespace MyCAM.Editor
 		const string INTERPOLATE_TYPE_BEVEL = "傾角切坡口";
 		const string START_OR_END_START = "當前位置：起點";
 		const string START_OR_END_END = "當前位置：終點";
+		const string AXIS_SMOOTH = "軸平滑";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ToolVectorDlg" );
 	}
 
