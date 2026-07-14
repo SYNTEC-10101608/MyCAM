@@ -254,17 +254,27 @@ namespace MyCAM.PathCache
 			SetMicroJoint( ref m_CAMPointList );
 
 			// set over cut
-			List<IOrientationPoint> camPointOverCutList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
-			OverCutHelper.SetOverCut( camPointOverCutList, out List<IOrientationPoint> overCutPointList, m_CraftData.OverCutLength, m_IsClose );
-			m_OverCutPointList = overCutPointList.Cast<CAMPoint>().ToList();
+			IReadOnlyList<CAMPoint> copyedCAMPointList = m_CAMPointList.Select( p => p.Clone() ).ToList();
+			OverCutHelper.SetOverCut( copyedCAMPointList, out m_OverCutPointList, m_CraftData.OverCutLength, m_IsClose );
 
 			// set lead
-			List<IOrientationPoint> mainPointList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
-			List<IOrientationPoint> overCutPointList2 = m_OverCutPointList.Cast<IOrientationPoint>().ToList();
-			LeadHelper.SetLeadIn( mainPointList, out List<IOrientationPoint> leadInPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
-			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
-			LeadHelper.SetLeadOut( mainPointList, overCutPointList2, out List<IOrientationPoint> leadOutPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
-			m_LeadOutCAMPointList = leadOutPointList.Cast<CAMPoint>().ToList();
+			LeadHelper.SetLeadIn( m_CAMPointList.First().Clone(), out m_LeadInCAMPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
+
+			// get lead out start point (last over cut pnt if exist, otherwise last main path pnt)
+			CAMPoint leadOutStartPoint = GetLeadOutStartPnt();
+			LeadHelper.SetLeadOut( leadOutStartPoint, out m_LeadOutCAMPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
+		}
+
+		CAMPoint GetLeadOutStartPnt()
+		{
+			CAMPoint leadOutStartPoint;
+			if( m_OverCutPointList.Count > 0 ) {
+				leadOutStartPoint = m_OverCutPointList.Last();
+			}
+			else {
+				leadOutStartPoint = m_CAMPointList.Last();
+			}
+			return leadOutStartPoint;
 		}
 
 		void CreateIndexMap()
@@ -459,7 +469,6 @@ namespace MyCAM.PathCache
 			double dLastProcessPathM = m_CraftData.InitMaster_rad;
 			double dLastProcessPathS = m_CraftData.InitSlave_rad;
 
-			// solve IK
 			// solve IK
 			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
 				IKSolveResult ikResult = postSolver.SolveIK( m_CAMPointList[ i ].InitToolVec, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );

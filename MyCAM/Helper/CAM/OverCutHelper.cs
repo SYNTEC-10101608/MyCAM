@@ -8,17 +8,17 @@ namespace MyCAM.Helper
 {
 	public static class OverCutHelper
 	{
-		public static void SetOverCut( IReadOnlyList<IOrientationPoint> mainPointList, out List<IOrientationPoint> overCutPointList,
+		public static void SetOverCut( IReadOnlyList<CAMPoint> mainPointList, out List<CAMPoint> overCutPointList,
 			double overCutLength, bool isClosed, double overCutTolerance = OVERCUT_MATH_TOLERANCE )
 		{
-			overCutPointList = new List<IOrientationPoint>();
+			overCutPointList = new List<CAMPoint>();
 			if( mainPointList.Count == 0 || overCutLength == 0 || !isClosed ) {
 				return;
 			}
 			double dTotalOverCutLength = 0;
 
 			// end point is the start of over cut
-			IOrientationPoint endOfMain = mainPointList.Last().Clone();
+			CAMPoint endOfMain = mainPointList.Last().Clone();
 			overCutPointList.Add( BuildOverCutPoint( endOfMain, endOfMain.Point, endOfMain.TangentVec ) );
 			for( int i = 0; i < mainPointList.Count - 1; i++ ) {
 
@@ -87,11 +87,12 @@ namespace MyCAM.Helper
 			return 0;
 		}
 
-		static IOrientationPoint BuildOverCutPoint( IOrientationPoint endOfMain, gp_Pnt location, gp_Dir tangentVec )
+		static CAMPoint BuildOverCutPoint( CAMPoint endOfMain, gp_Pnt location, gp_Dir tangentVec )
 		{
 			gp_Dir toolVec = endOfMain.ToolVec;
 			CADPoint cadPoint = new CADPoint( location, toolVec, toolVec, tangentVec );
 			CAMPoint camPoint = new CAMPoint( cadPoint, toolVec );
+			SetOverPntMS( ref camPoint, endOfMain );
 			return camPoint;
 		}
 
@@ -147,6 +148,17 @@ namespace MyCAM.Helper
 
 			// Unconditionally rounded to three decimal places.
 			return Math.Floor( ( sideLength - 2 * tangentDistance ) / 2 * 1000 ) / 1000;
+		}
+
+		static void SetOverPntMS( ref CAMPoint overCutPnt, CAMPoint msComparisonPnt )
+		{
+			if( overCutPnt == null || msComparisonPnt == null ) {
+				return;
+			}
+			overCutPnt.InitMaster_rad = msComparisonPnt.InitMaster_rad;
+			overCutPnt.InitSlave_rad = msComparisonPnt.InitSlave_rad;
+			overCutPnt.ModMaster_rad = msComparisonPnt.ModMaster_rad;
+			overCutPnt.ModSlave_rad = msComparisonPnt.ModSlave_rad;
 		}
 
 		const double OVERCUT_MATH_TOLERANCE = 0.001;

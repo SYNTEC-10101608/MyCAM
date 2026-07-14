@@ -12,28 +12,20 @@ namespace MyCAM.Post
 		public NCWriter( DataManager dataManager )
 		{
 			// fix: check null argument
-			if( dataManager == null || dataManager.MachineData == null || dataManager.EntryAndExitData == null || dataManager.PathIDList == null ) {
+			if( dataManager == null || dataManager.EntryAndExitData == null || dataManager.PathIDList == null ) {
 				throw new ArgumentNullException( "NCWriter constructor argument is null." );
 			}
 			m_DataManager = dataManager;
 			m_PathIDList = dataManager.PathIDList;
-			m_MachineData = dataManager.MachineData;
-			m_PostSolver = new PostSolver( dataManager.MachineData );
-			m_MasterAxisName = ConvertRotaryAxisName( m_MachineData.MasterRotaryAxis );
-			m_SlaveAxisName = ConvertRotaryAxisName( m_MachineData.SlaveRotaryAxis );
+			m_AxisConfig = new AxisConfig( dataManager.MachineData );
 			m_EntryAndExitData = dataManager.EntryAndExitData;
 		}
 
 		DataManager m_DataManager;
 		IReadOnlyList<string> m_PathIDList;
 		StreamWriter m_StreamWriter;
-		PostSolver m_PostSolver;
-		MachineData m_MachineData;
-		string m_MasterAxisName = string.Empty;
-		string m_SlaveAxisName = string.Empty;
+		AxisConfig m_AxisConfig;
 		EntryAndExitData m_EntryAndExitData;
-
-		public StreamWriter Writer => m_StreamWriter;
 
 		public bool ConvertSuccess( string fileName, string szTempFilePath, out string errorMessage )
 		{
@@ -41,58 +33,18 @@ namespace MyCAM.Post
 			try {
 				using( m_StreamWriter = new StreamWriter( szTempFilePath ) ) {
 					m_StreamWriter.WriteLine( "%@MACRO" );
-
-					// check if need to write calibration point
-					bool isNeed = NeedToWriteCalibrationPnt( out CalibrationData calibrationData );
-					if( isNeed ) {
-						m_StreamWriter.WriteLine( $"G65 P\"REFPOINT_SET\" X1={calibrationData.Ref_Pnt1.x.ToString( "F3" )} Y1={calibrationData.Ref_Pnt1.y.ToString( "F3" )} Z1={calibrationData.Ref_Pnt1.z.ToString( "F3" )} X2={calibrationData.Ref_Pnt2.x.ToString( "F3" )} Y2={calibrationData.Ref_Pnt2.y.ToString( "F3" )} Z2={calibrationData.Ref_Pnt2.z.ToString( "F3" )} X3={calibrationData.Ref_Pnt3.x.ToString( "F3" )} Y3={calibrationData.Ref_Pnt3.y.ToString( "F3" )} Z3={calibrationData.Ref_Pnt3.z.ToString( "F3" )};" );
-						m_StreamWriter.WriteLine( $"G65 P\"CALPOINT_SET\" X1=0.000 Y1=0.000 Z1=0.000 X2=0.000 Y2=0.000 Z2=0.000 X3=0.000 Y3=0.000 Z3=0.000;" );
-					}
+					WriteCalibrationSection();
 
 					// file header
 					CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.Header,
-						new Dictionary<string, string> { } );
+						BuildFileHeaderDict() );
 
-					// to keep last point of previous path
-					PathEndInfo endInfoOfPreviousPath = null;
-					PathType pathType;
-					for( int i = 0; i < m_PathIDList.Count; i++ ) {
-						if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
-							continue;
-						}
-						pathType = pathObject.PathType;
-						int nPathLayer = pathObject.CraftData.TechLayer;
-						if( pathType == PathType.Contour ) {
-
-							// solve all post data of the path
-							if( !ContourPostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
-								endInfoOfPreviousPath, m_EntryAndExitData,
-								out PostData postData, out endInfoOfPreviousPath ) ) {
-								errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), i + 1 );
-								return false;
-							}
-							WriteCutting( postData, i + 1, nPathLayer );
-						}
-						else {
-							StdPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
-							if( !StdPatternPostHelper.SolvePath( m_PostSolver, package, endInfoOfPreviousPath, m_EntryAndExitData,
-								out StdPatternPostData postData, out endInfoOfPreviousPath ) ) {
-								errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), i + 1 );
-								return false;
-							}
-							WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, package.GeomData, i + 1 );
-						}
+					// process all paths
+					if( !ProcessAllPaths( out PathEndInfo endInfoOfLastPath, out errorMessage ) ) {
+						return false;
 					}
 
-					// write exit
-					if( m_PathIDList.Count > 0 ) {
-
-						// calculate exit point
-						PostTraverseBuilder.CalculateExit( endInfoOfPreviousPath, m_EntryAndExitData, out PostPoint exitPoint );
-						m_StreamWriter.WriteLine( "// Exit" );
-						NCWriterHelper.WriteLinearTraverse( m_StreamWriter, exitPoint, 0,
-							m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
-					}
+					WriteExitSection( endInfoOfLastPath );
 
 					// file tail
 					CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.Tail, new Dictionary<string, string> { } );
@@ -110,39 +62,24 @@ namespace MyCAM.Post
 			errorMessage = string.Empty;
 			postDataList = new List<PostData>();
 			try {
-				// to keep last point of previous path
-				PathEndInfo endInfoOfPreviousPath = null;
-				PathType pathType;
+				PathEndInfo endInfoOfLastPath = null;
 				for( int i = 0; i < m_PathIDList.Count; i++ ) {
 					if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
 						continue;
 					}
-					pathType = pathObject.PathType;
+					PathType pathType = pathObject.PathType;
 					if( pathType == PathType.Contour ) {
-
-						// solve all post data of the path
-						if( !ContourPostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
-							endInfoOfPreviousPath, m_EntryAndExitData,
-							out PostData postData, out endInfoOfPreviousPath ) ) {
-
-							errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), i + 1 );
+						if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
 							return false;
 						}
 						postDataList.Add( postData );
 					}
 					else {
-						StdPatternNCPackage package = BuildPackageByID_StandardPattern( m_PathIDList[ i ] );
-						if( !StdPatternPostHelper.SolvePath( m_PostSolver, package, endInfoOfPreviousPath, m_EntryAndExitData,
-							out StdPatternPostData stdPostData, out endInfoOfPreviousPath ) ) {
-							errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), i + 1 );
+						if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData stdPostData, out _, out errorMessage ) ) {
 							return false;
 						}
 
-						if( !ContourPostHelper.SolvePath( m_PostSolver, BuildPackageByID( m_PathIDList[ i ] ),
-							endInfoOfPreviousPath, m_EntryAndExitData,
-							out PostData postData, out _ ) ) {
-
-							errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), i + 1 );
+						if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
 							return false;
 						}
 
@@ -157,6 +94,124 @@ namespace MyCAM.Post
 				errorMessage = ex.Message;
 				return false;
 			}
+		}
+
+		void WriteCalibrationSection()
+		{
+			if( !NeedToWriteCalibrationPnt( out CalibrationData calibrationData ) ) {
+				return;
+			}
+			m_StreamWriter.WriteLine( $"G65 P\"REFPOINT_SET\" X1={calibrationData.Ref_Pnt1.x.ToString( "F3" )} Y1={calibrationData.Ref_Pnt1.y.ToString( "F3" )} Z1={calibrationData.Ref_Pnt1.z.ToString( "F3" )} X2={calibrationData.Ref_Pnt2.x.ToString( "F3" )} Y2={calibrationData.Ref_Pnt2.y.ToString( "F3" )} Z2={calibrationData.Ref_Pnt2.z.ToString( "F3" )} X3={calibrationData.Ref_Pnt3.x.ToString( "F3" )} Y3={calibrationData.Ref_Pnt3.y.ToString( "F3" )} Z3={calibrationData.Ref_Pnt3.z.ToString( "F3" )};" );
+			m_StreamWriter.WriteLine( $"G65 P\"CALPOINT_SET\" X1=0.000 Y1=0.000 Z1=0.000 X2=0.000 Y2=0.000 Z2=0.000 X3=0.000 Y3=0.000 Z3=0.000;" );
+		}
+
+		void WriteExitSection( PathEndInfo endInfoOfLastPath )
+		{
+			if( m_PathIDList.Count == 0 ) {
+				return;
+			}
+			PostTraverseBuilder.CalculateExit( endInfoOfLastPath, m_EntryAndExitData, out PostPoint exitPoint );
+			m_StreamWriter.WriteLine( "// Exit" );
+			NCWriterHelper.WriteLinearTraverse( m_StreamWriter, exitPoint, 0,
+				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
+		}
+
+		bool ProcessAllPaths( out PathEndInfo endInfoOfLastPath, out string errorMessage )
+		{
+			errorMessage = string.Empty;
+			endInfoOfLastPath = null;
+			for( int i = 0; i < m_PathIDList.Count; i++ ) {
+				if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
+					continue;
+				}
+				PathType pathType = pathObject.PathType;
+				int nPathLayer = pathObject.CraftData.TechLayer;
+				if( pathType == PathType.Contour ) {
+					if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
+						return false;
+					}
+					WriteCutting( postData, i + 1, nPathLayer );
+				}
+				else {
+					if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData postData, out StdPatternNCPackage package, out errorMessage ) ) {
+						return false;
+					}
+					WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, package.GeomData, i + 1 );
+				}
+			}
+			return true;
+		}
+
+		#region NC Package Builder
+
+		ContourNCPackage BuildPackageByID( string szID )
+		{
+			if( !DataGettingHelper.GetCraftDataByID( szID, out CraftData craftData ) ) {
+				return null;
+			}
+			if( !DataGettingHelper.GetPathCacheByID( szID, out IPathCache pathCache ) ) {
+				return null;
+			}
+			return new ContourNCPackage(
+				craftData.LeadData,
+				craftData.OverCutLength,
+				pathCache.MainPathPointList,
+				pathCache.LeadInPointList,
+				pathCache.LeadOutPointList,
+				pathCache.OverCutPointList,
+				craftData.TraverseData,
+				CacheHelper.GetProcessStartPoint( szID ),
+				CacheHelper.GetProcessEndPoint( szID )
+			);
+		}
+
+		StdPatternNCPackage BuildPackageByID_StandardPattern( string szID )
+		{
+			if( !DataGettingHelper.GetStdPatternCacheByID( szID, out IStdPatternCache stdPatternCache ) ) {
+				return null;
+			}
+			if( !DataGettingHelper.GetCraftDataByID( szID, out CraftData craftData ) ) {
+				return null;
+			}
+			return new StdPatternNCPackage(
+				stdPatternCache.RefPoint,
+				CacheHelper.GetMainPathStartPoint( szID ),
+				craftData.TraverseData,
+				CacheHelper.GetProcessStartPoint( szID ),
+				CacheHelper.GetProcessEndPoint( szID ),
+				craftData.LeadData,
+				stdPatternCache.LeadInPointList,
+				stdPatternCache.ComputeGeomData
+			);
+		}
+
+		#endregion
+
+		#region Build Post Data
+
+		bool GetContourPostData( int pathIndex, ref PathEndInfo endInfo, out PostData postData, out string errorMessage )
+		{
+			errorMessage = string.Empty;
+			postData = null;
+			if( !ContourPostHelper.GetPostData( BuildPackageByID( m_PathIDList[ pathIndex ] ),
+				endInfo, m_EntryAndExitData, out postData, out endInfo ) ) {
+				errorMessage = "後處理運算錯誤，路徑：" + ( pathIndex + 1 ).ToString();
+				return false;
+			}
+			return true;
+		}
+
+		bool GetStdPostData( int pathIndex, ref PathEndInfo endInfo, out StdPatternPostData postData, out StdPatternNCPackage package, out string errorMessage )
+		{
+			errorMessage = string.Empty;
+			postData = null;
+			package = BuildPackageByID_StandardPattern( m_PathIDList[ pathIndex ] );
+			if( !StdPatternPostHelper.GetPostData( package, endInfo, m_EntryAndExitData,
+				out postData, out endInfo ) ) {
+				errorMessage = "後處理運算錯誤，路徑：" + ( pathIndex + 1 ).ToString();
+				return false;
+			}
+			return true;
 		}
 
 		void ApplyStdPatternPostDataToPostData( PostData postData, StdPatternPostData stdPostData )
@@ -204,20 +259,20 @@ namespace MyCAM.Post
 			}
 		}
 
+		#endregion
+
+		#region Write Cutting
+
 		void WriteCutting( PostData currentPathPostData, int N_Index, int nLayIndex = 1 )
 		{
 			// Header
-			Dictionary<string, string> varDict = new Dictionary<string, string> {
-				{ "PathIndex", N_Index.ToString() },
-				{ "LayerIndex", nLayIndex.ToString() }
-			};
-
+			Dictionary<string, string> varDict = BuildPathDict( N_Index, nLayIndex );
 			// traverse header
 			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.TraverseHeader, varDict );
 
 			// traverse from previous path to current path
 			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData,
-				m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
+				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
 
 			// traverse tail
 			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.TraverseTail, varDict );
@@ -239,7 +294,7 @@ namespace MyCAM.Post
 		void WriteStandardPatternCutting( PathType type, StdPatternPostData currentPathPostData, CraftData craftData, IStdPatternGeomData geomData, int N_Index )
 		{
 			StdPatternNCWriter.WriteStandardPatternCutting( m_StreamWriter, type, currentPathPostData, craftData, geomData, N_Index,
-				m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
+				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
 		}
 
 		void WriteOnePoint( PostPoint postPoint )
@@ -251,7 +306,7 @@ namespace MyCAM.Post
 			string szY = postPoint.Y.ToString( "F3" );
 			string szZ = postPoint.Z.ToString( "F3" );
 			string szRotaryAxisCommand = NCWriterHelper.GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI,
-				m_MasterAxisName, m_SlaveAxisName, m_MachineData.MasterRotaryAxis, m_MachineData.SlaveRotaryAxis );
+				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
 			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand};" );
 
 			if( postPoint.IsMicroJointEnd ) {
@@ -273,61 +328,6 @@ namespace MyCAM.Post
 			}
 		}
 
-		string ConvertRotaryAxisName( RotaryAxis axis )
-		{
-			switch( axis ) {
-				case RotaryAxis.X:
-					return "A";
-				case RotaryAxis.Y:
-					return "B";
-				case RotaryAxis.Z:
-					return "C";
-				default:
-					return "";
-			}
-		}
-
-		ContourNCPackage BuildPackageByID( string szID )
-		{
-			if( !DataGettingHelper.GetCraftDataByID( szID, out CraftData craftData ) ) {
-				return null;
-			}
-			if( !DataGettingHelper.GetPathCacheByID( szID, out IPathCache pathCache ) ) {
-				return null;
-			}
-			return new ContourNCPackage(
-				craftData.LeadData,
-				craftData.OverCutLength,
-				pathCache.MainPathPointList,
-				pathCache.LeadInPointList,
-				pathCache.LeadOutPointList,
-				pathCache.OverCutPointList,
-				craftData.TraverseData,
-				CacheHelper.GetProcessStartPoint( szID ),
-				CacheHelper.GetProcessEndPoint( szID )
-			);
-		}
-
-		StdPatternNCPackage BuildPackageByID_StandardPattern( string szID )
-		{
-			if( !DataGettingHelper.GetStdPatternCacheByID( szID, out IStdPatternCache stdPatternCache ) ) {
-				return null;
-			}
-			if( !DataGettingHelper.GetCraftDataByID( szID, out CraftData craftData ) ) {
-				return null;
-			}
-			return new StdPatternNCPackage(
-				stdPatternCache.RefPoint,
-				CacheHelper.GetMainPathStartPoint( szID ),
-				craftData.TraverseData,
-				CacheHelper.GetProcessStartPoint( szID ),
-				CacheHelper.GetProcessEndPoint( szID ),
-				craftData.LeadData,
-				stdPatternCache.LeadInPointList,
-				stdPatternCache.ComputeGeomData
-			);
-		}
-
 		bool NeedToWriteCalibrationPnt( out CalibrationData calibrationData )
 		{
 			// get calibration data
@@ -338,7 +338,35 @@ namespace MyCAM.Post
 			return false;
 		}
 
-		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "NCWriter" );
-		const string ERROR_POST_PROCESSING = "後處理運算錯誤，路徑：{0}";
+		#endregion
+
+		#region Customized Variable Dic Maker
+
+		Dictionary<string, string> BuildFileHeaderDict()
+		{
+			if( m_PathIDList.Count == 0 ) {
+				return new Dictionary<string, string>();
+			}
+			IProcessPoint startPoint = CacheHelper.GetProcessStartPoint( m_PathIDList[ 0 ] );
+			if( startPoint == null ) {
+				return new Dictionary<string, string>();
+			}
+			return new Dictionary<string, string> {
+				{ "EntryMaster", ( startPoint.ModMaster_rad * 180 / Math.PI ).ToString( "F3" ) },
+				{ "EntrySlave", ( startPoint.ModSlave_rad * 180 / Math.PI ).ToString( "F3" ) }
+			};
+		}
+
+		Dictionary<string, string> BuildPathDict( int N_Index, int nLayIndex )
+		{
+			// Header
+			Dictionary<string, string> varDict = new Dictionary<string, string> {
+				{ "PathIndex", N_Index.ToString() },
+				{ "LayerIndex", nLayIndex.ToString() }
+			};
+			return varDict;
+		}
+
+		#endregion
 	}
 }

@@ -39,6 +39,8 @@ namespace MyCAM.PathCache
 
 		protected override void BuildCAMPointList()
 		{
+			// solve ref pnt toolvec to MS
+			SolveRefPntInitIK();
 			ClearCAMFactorDirty();
 			SetPathCAMPoint();
 			SetStartPoint();
@@ -47,14 +49,11 @@ namespace MyCAM.PathCache
 			m_MaxOverCutLength = OverCutHelper.GetMaxOverCutLength( m_RectangleGeomData, m_CraftData.StartPointIndex );
 
 			// set over cut using unified method
-			List<IOrientationPoint> mainPathOriPointList = m_CAMPointList.Cast<IOrientationPoint>().ToList();
-			OverCutHelper.SetOverCut( mainPathOriPointList, out List<IOrientationPoint> overCutPointList, m_CraftData.OverCutLength, isClosed: true );
-			m_OverCutCAMPointList = overCutPointList.Cast<CAMPoint>().ToList();
+			IReadOnlyList<CAMPoint> copyedCAMPntList = m_CAMPointList.Select( p => p.Clone() ).ToList();
+			OverCutHelper.SetOverCut( copyedCAMPntList, out m_OverCutCAMPointList, m_CraftData.OverCutLength, isClosed: true );
 
 			// set lead
-			List<IOrientationPoint> mainPointList = m_StartCAMPointList.Cast<IOrientationPoint>().ToList();
-			LeadHelper.SetLeadIn( mainPointList, out List<IOrientationPoint> leadInPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
-			m_LeadInCAMPointList = leadInPointList.Cast<CAMPoint>().ToList();
+			LeadHelper.SetLeadIn( m_StartCAMPointList.First().Clone(), out m_LeadInCAMPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
 		}
 
 		protected override void SetCenterDir()
