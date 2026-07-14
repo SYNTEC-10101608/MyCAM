@@ -1,4 +1,5 @@
 using MyCAM.Data;
+using MyCAM.Post;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
@@ -176,6 +177,36 @@ namespace MyCAM.PathCache
 
 		#region Protected Members
 
+		protected void SolveRefPntInitIK()
+		{
+			const double DEFAULT_RAD = 0;
+			// arrange solver
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				throw new Exception( "ContourCache SolveInitIK get machine data failed" );
+			}
+			PostSolver postSolver = new PostSolver( machineData );
+
+			// init master and slave angle, use CraftData reference values if set
+			double dLastProcessPathM = m_CraftData.InitMaster_rad;
+			double dLastProcessPathS = m_CraftData.InitSlave_rad;
+
+			IKSolveResult ikResult = postSolver.SolveIK( m_RefPoint.InitToolVec, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
+			if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
+				m_RefPoint.InitMaster_rad = DEFAULT_RAD;
+				m_RefPoint.InitSlave_rad = DEFAULT_RAD;
+				m_RefPoint.ModMaster_rad = DEFAULT_RAD;
+				m_RefPoint.ModSlave_rad = DEFAULT_RAD;
+				return;
+			}
+			else if( ikResult == IKSolveResult.OutOfRange ) {
+				// temporary do nothing
+			}
+			m_RefPoint.InitMaster_rad = dLastProcessPathM;
+			m_RefPoint.InitSlave_rad = dLastProcessPathS;
+			m_RefPoint.ModMaster_rad = dLastProcessPathM;
+			m_RefPoint.ModSlave_rad = dLastProcessPathS;
+		}
+
 		protected abstract void BuildCADCAMPointList();
 
 		protected abstract void BuildCAMPointList();
@@ -282,9 +313,16 @@ namespace MyCAM.PathCache
 			}
 
 			List<CAMPoint> camPointList = new List<CAMPoint>( cadPointList.Count );
+
+			// set each point MS same as reference point
 			foreach( CADPoint cadPoint in cadPointList ) {
 				CADPoint point = cadPoint.Clone();
-				camPointList.Add( new CAMPoint( point ) );
+				CAMPoint camPoint = new CAMPoint( point );
+				camPoint.InitMaster_rad = m_RefPoint.InitMaster_rad;
+				camPoint.InitSlave_rad = m_RefPoint.InitSlave_rad;
+				camPoint.ModMaster_rad = m_RefPoint.ModMaster_rad;
+				camPoint.ModSlave_rad = m_RefPoint.ModSlave_rad;
+				camPointList.Add( camPoint );
 			}
 			return camPointList;
 		}

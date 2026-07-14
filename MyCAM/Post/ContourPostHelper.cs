@@ -82,7 +82,7 @@ namespace MyCAM.Post
 
 	internal static class ContourPostHelper
 	{
-		public static bool SolvePath( PostSolver postSolver, ContourNCPackage currentPathNCPack,
+		public static bool GetPostData( ContourNCPackage currentPathNCPack,
 			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
 			out PostData pathG54PostData, out PathEndInfo currentPathtEndInfo )
 		{
@@ -91,18 +91,13 @@ namespace MyCAM.Post
 
 			// to make solution continuous
 			currentPathtEndInfo = new PathEndInfo();
-			if( postSolver == null || currentPathNCPack == null || entryAndExitData == null ) {
+			if( currentPathNCPack == null || entryAndExitData == null ) {
 				return false;
 			}
 
-			// to ensure joint space continuity of process path
-			double dLastPointProcess_M = endInfoOfPreviousPath?.Master ?? 0;
-			double dLastPointProcess_S = endInfoOfPreviousPath?.Slave ?? 0;
-
 			// main path
-			if( !SolveProcessPath( postSolver, currentPathNCPack.CAMPointList,
-				out List<PostPoint> mainG54,
-				ref dLastPointProcess_M, ref dLastPointProcess_S ) ) {
+			if( !ConvertCAMPntListToPostPntList( currentPathNCPack.CAMPointList,
+				out List<PostPoint> mainG54 ) ) {
 				return false;
 			}
 			pathG54PostData.MainPathPostPointList.AddRange( mainG54 );
@@ -110,7 +105,7 @@ namespace MyCAM.Post
 
 			// over-cut
 			if( currentPathNCPack.OverCutCAMPointList.Count > 0 ) {
-				if( !BuildProcessPath( currentPathNCPack.OverCutCAMPointList, dLastPointProcess_M, dLastPointProcess_S,
+				if( !ConvertCAMPntListToPostPntList( currentPathNCPack.OverCutCAMPointList,
 					out List<PostPoint> overCutG54 ) ) {
 					return false;
 				}
@@ -119,12 +114,7 @@ namespace MyCAM.Post
 
 			// lead-in
 			if( currentPathNCPack.LeadInCAMPointList.Count > 0 ) {
-				if( pathG54PostData.MainPathPostPointList.Count == 0 ) {
-					return false;
-				}
-				double startM = pathG54PostData.MainPathPostPointList[ 0 ].Master;
-				double startS = pathG54PostData.MainPathPostPointList[ 0 ].Slave;
-				if( !BuildProcessPath( currentPathNCPack.LeadInCAMPointList, startM, startS,
+				if( !ConvertCAMPntListToPostPntList( currentPathNCPack.LeadInCAMPointList,
 					out List<PostPoint> leadInG54 ) ) {
 					return false;
 				}
@@ -136,7 +126,7 @@ namespace MyCAM.Post
 
 			// lead-out
 			if( currentPathNCPack.LeadOutCAMPointList.Count > 0 ) {
-				if( !BuildProcessPath( currentPathNCPack.LeadOutCAMPointList, dLastPointProcess_M, dLastPointProcess_S,
+				if( !ConvertCAMPntListToPostPntList( currentPathNCPack.LeadOutCAMPointList,
 					out List<PostPoint> leadOutG54 ) ) {
 					return false;
 				}
@@ -159,37 +149,16 @@ namespace MyCAM.Post
 			currentPathtEndInfo = new PathEndInfo()
 			{
 				EndCAMPoint = currentPathNCPack.ProcessEndPoint,
-				Master = dLastPointProcess_M,
-				Slave = dLastPointProcess_S
+				Master = currentPathNCPack.ProcessEndPoint.ModMaster_rad,
+				Slave = currentPathNCPack.ProcessEndPoint.ModSlave_rad,
 			};
 			return true;
 		}
 
-		public static List<PostPoint> GetConcatenatedPostList( PostData postData )
-		{
-			List<PostPoint> result = new List<PostPoint>();
-			if( postData == null ) {
-				return result;
-			}
-			if( postData.LeadInPostPointList.Count > 0 ) {
-				result.AddRange( postData.LeadInPostPointList );
-			}
-			if( postData.MainPathPostPointList.Count > 0 ) {
-				result.AddRange( postData.MainPathPostPointList );
-			}
-			if( postData.OverCutPostPointList.Count > 0 ) {
-				result.AddRange( postData.OverCutPostPointList );
-			}
-			if( postData.LeadOutPostPointList.Count > 0 ) {
-				result.AddRange( postData.LeadOutPostPointList );
-			}
-			return result;
-		}
-
 		#region Private methods
 
-		static bool SolveProcessPath( PostSolver postSolver, IReadOnlyList<IProcessPoint> pointList,
-			out List<PostPoint> resultG54, ref double dLastProcessPathM, ref double dLastProcessPathS )
+		static bool ConvertCAMPntListToPostPntList( IReadOnlyList<IProcessPoint> pointList,
+			out List<PostPoint> resultG54 )
 		{
 			resultG54 = new List<PostPoint>();
 			if( pointList == null || pointList.Count == 0 ) {
@@ -201,8 +170,6 @@ namespace MyCAM.Post
 			foreach( IProcessPoint point in pointList ) {
 				rotateAngleList.Add( new Tuple<double, double>( point.ModMaster_rad, point.ModSlave_rad ) );
 			}
-			dLastProcessPathM = rotateAngleList[ rotateAngleList.Count - 1 ].Item1;
-			dLastProcessPathS = rotateAngleList[ rotateAngleList.Count - 1 ].Item2;
 
 			// build post data
 			for( int i = 0; i < pointList.Count; i++ ) {
@@ -224,29 +191,6 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		static bool BuildProcessPath( IReadOnlyList<IProcessPoint> camPointList, double dM, double dS, out List<PostPoint> resultG54 )
-		{
-			resultG54 = new List<PostPoint>();
-			if( camPointList == null || camPointList.Count == 0 ) {
-				return false;
-			}
-
-			// build G54 points
-			foreach( CAMPoint point in camPointList ) {
-				PostPoint g54Point = new PostPoint()
-				{
-					X = point.Point.X(),
-					Y = point.Point.Y(),
-					Z = point.Point.Z(),
-					Master = dM,
-					Slave = dS
-				};
-				resultG54.Add( g54Point );
-			}
-			return true;
-		}
 		#endregion
-
-		const double GEOM_TOLERANCE = 0.001;
 	}
 }

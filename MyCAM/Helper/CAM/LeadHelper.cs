@@ -11,13 +11,13 @@ namespace MyCAM.Helper
 {
 	public static class LeadHelper
 	{
-		public static void SetLeadIn( IReadOnlyList<IOrientationPoint> mainPointList,
-			out List<IOrientationPoint> leadInPointList,
+		public static void SetLeadIn( CAMPoint leadInStartPnt,
+			out List<CAMPoint> leadInPointList,
 			LeadData leadData, bool isPathReverse,
 			double maxDeflection = DISCRETE_MAX_DEFLECTION, double maxEdgeLength = DISCRETE_MAX_EDGE_LENGTH )
 		{
-			leadInPointList = new List<IOrientationPoint>();
-			if( mainPointList.Count == 0 ) {
+			leadInPointList = new List<CAMPoint>();
+			if( leadInStartPnt == null ) {
 				return;
 			}
 
@@ -31,43 +31,34 @@ namespace MyCAM.Helper
 			if( hasArc && hasLine ) {
 
 				// mixed lead: Arc + Line
-				leadInPointList = BuildMixedLeadLine( mainPointList[ 0 ], true,
+				leadInPointList = BuildMixedLeadLine( leadInStartPnt, true,
 					leadInParam.ArcLength, leadInParam.StraightLength, leadInParam.Angle_deg,
 					isChangeLeadDirection, isPathReverse, maxDeflection, maxEdgeLength );
 			}
 			else if( hasArc ) {
 
 				// arc only
-				leadInPointList = BuildArcLeadLine( mainPointList[ 0 ], true,
+				leadInPointList = BuildArcLeadLine( leadInStartPnt, true,
 					leadInParam.ArcLength, leadInParam.Angle_deg,
 					isChangeLeadDirection, isPathReverse, maxDeflection, maxEdgeLength );
 			}
 			else if( hasLine ) {
 
 				// line only
-				leadInPointList = BuildStraightLeadLine( mainPointList[ 0 ], true,
+				leadInPointList = BuildStraightLeadLine( leadInStartPnt, true,
 					leadInParam.StraightLength, leadInParam.Angle_deg,
 					isChangeLeadDirection, isPathReverse );
 			}
 		}
 
-		public static void SetLeadOut( IReadOnlyList<IOrientationPoint> mainPointList, IReadOnlyList<IOrientationPoint> overCutPointList,
-			out List<IOrientationPoint> leadOutPointList,
+		public static void SetLeadOut( CAMPoint leadOutStartPoint,
+			out List<CAMPoint> leadOutPointList,
 			LeadData leadData, bool isPathReverse,
 			double maxDeflection = DISCRETE_MAX_DEFLECTION, double maxEdgeLength = DISCRETE_MAX_EDGE_LENGTH )
 		{
-			leadOutPointList = new List<IOrientationPoint>();
-			if( mainPointList.Count == 0 ) {
+			leadOutPointList = new List<CAMPoint>();
+			if( leadOutStartPoint == null ) {
 				return;
-			}
-
-			// with over cut means lead out first point is over cut last point
-			IOrientationPoint leadOutStartPoint;
-			if( overCutPointList.Count > 0 ) {
-				leadOutStartPoint = overCutPointList[ overCutPointList.Count - 1 ];
-			}
-			else {
-				leadOutStartPoint = mainPointList[ mainPointList.Count - 1 ];
 			}
 
 			LeadGeom leadOutParam = leadData.LeadOut;
@@ -100,12 +91,12 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static List<IOrientationPoint> BuildMixedLeadLine( IOrientationPoint startOrEndPoint, bool isLeadIn,
+		static List<CAMPoint> BuildMixedLeadLine( CAMPoint startOrEndPoint, bool isLeadIn,
 			double arcLength, double lineLength, double angle,
 			bool isChangeLeadDirection, bool isPathReverse,
 			double dDeflection, double dMaxLength )
 		{
-			var resultList = new List<IOrientationPoint>();
+			var resultList = new List<CAMPoint>();
 
 			// protection
 			if( startOrEndPoint == null || arcLength <= 0 || angle <= 0 || lineLength <= 0 ) {
@@ -113,7 +104,7 @@ namespace MyCAM.Helper
 			}
 
 			// build arc part
-			List<IOrientationPoint> arcPoints = BuildArcLeadLine( startOrEndPoint, isLeadIn,
+			List<CAMPoint> arcPoints = BuildArcLeadLine( startOrEndPoint, isLeadIn,
 				arcLength, angle, isChangeLeadDirection, isPathReverse, dDeflection, dMaxLength );
 
 			if( arcPoints == null || arcPoints.Count == 0 ) {
@@ -134,9 +125,9 @@ namespace MyCAM.Helper
 			List<gp_Pnt> straightPoints = Get2PntSegmentPnt( arcEndPoint.Point, straightEndPoint, 1 );
 
 			// convert straight points to orientation points, skipping the first because it's the arc connection
-			List<IOrientationPoint> straightOri = new List<IOrientationPoint>();
+			List<CAMPoint> straightOri = new List<CAMPoint>();
 			for( int i = 1; i < straightPoints.Count; i++ ) {
-				straightOri.Add( BuildLeadLinePoint( straightPoints[ i ], straightDirection, startOrEndPoint.ToolVec ) );
+				straightOri.Add( BuildLeadLinePoint( startOrEndPoint, straightPoints[ i ], straightDirection, startOrEndPoint.ToolVec ) );
 			}
 
 			if( isLeadIn ) {
@@ -152,9 +143,9 @@ namespace MyCAM.Helper
 			return resultList;
 		}
 
-		static List<IOrientationPoint> BuildStraightLeadLine( IOrientationPoint StraightLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isPathReverse )
+		static List<CAMPoint> BuildStraightLeadLine( CAMPoint StraightLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isPathReverse )
 		{
-			List<IOrientationPoint> LeadPointList = new List<IOrientationPoint>();
+			List<CAMPoint> LeadPointList = new List<CAMPoint>();
 
 			// protection 
 			if( StraightLeadStartOrEndPoint == null || dLeadLineLength == 0 ) {
@@ -207,7 +198,7 @@ namespace MyCAM.Helper
 
 
 			for( int i = 0; i < leadPointList.Count; i++ ) {
-				IOrientationPoint leadPoint = BuildLeadLinePoint( leadPointList[ i ], endPointVector, startPoint.ToolVec );
+				CAMPoint leadPoint = BuildLeadLinePoint( StraightLeadStartOrEndPoint, leadPointList[ i ], endPointVector, startPoint.ToolVec );
 				LeadPointList.Add( leadPoint );
 			}
 
@@ -218,11 +209,11 @@ namespace MyCAM.Helper
 			return LeadPointList;
 		}
 
-		static List<IOrientationPoint> BuildArcLeadLine( IOrientationPoint CurveLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isPathReverse, double dDeflection, double dMaxLength )
+		static List<CAMPoint> BuildArcLeadLine( CAMPoint CurveLeadStartOrEndPoint, bool isLeadIn, double dLeadLineLength, double dLeadLineAngle, bool isChangeLeadDirection, bool isPathReverse, double dDeflection, double dMaxLength )
 		{
 			// protection
 			if( CurveLeadStartOrEndPoint == null || dLeadLineLength <= 0 || dLeadLineAngle <= 0 ) {
-				return new List<IOrientationPoint>();
+				return new List<CAMPoint>();
 			}
 
 			//  establish a coordinate system through this point and its direction vector and normal vector
@@ -289,10 +280,10 @@ namespace MyCAM.Helper
 			}
 
 			// create cad cam data
-			List<IOrientationPoint> resultList = new List<IOrientationPoint>();
+			List<CAMPoint> resultList = new List<CAMPoint>();
 			for( int i = 0; i < pts.Count; i++ ) {
 
-				IOrientationPoint leadPoint = BuildLeadLinePoint( pts[ i ], tangentDirList[ i ], CurveLeadStartOrEndPoint.ToolVec );
+				CAMPoint leadPoint = BuildLeadLinePoint( CurveLeadStartOrEndPoint, pts[ i ], tangentDirList[ i ], CurveLeadStartOrEndPoint.ToolVec );
 				resultList.Add( leadPoint );
 			}
 			return resultList;
@@ -403,7 +394,7 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static IOrientationPoint BuildLeadLinePoint( gp_Pnt point, gp_Dir tangentVec, gp_Dir toolVec )
+		static CAMPoint BuildLeadLinePoint( CAMPoint leadMSComparisonPnt, gp_Pnt point, gp_Dir tangentVec, gp_Dir toolVec )
 		{
 			CADPoint leadPoint = new CADPoint(
 				point,
@@ -412,7 +403,19 @@ namespace MyCAM.Helper
 				tangentVec
 				);
 			CAMPoint leadCAMPoint = new CAMPoint( leadPoint, toolVec );
+			SetLeadPntMS( ref leadCAMPoint, leadMSComparisonPnt );
 			return leadCAMPoint;
+		}
+
+		static void SetLeadPntMS( ref CAMPoint leadPnt, CAMPoint msComparisonPnt )
+		{
+			if( leadPnt == null || msComparisonPnt == null ) {
+				return;
+			}
+			leadPnt.InitMaster_rad = msComparisonPnt.InitMaster_rad;
+			leadPnt.InitSlave_rad = msComparisonPnt.InitSlave_rad;
+			leadPnt.ModMaster_rad = msComparisonPnt.ModMaster_rad;
+			leadPnt.ModSlave_rad = msComparisonPnt.ModSlave_rad;
 		}
 
 		const double DISCRETE_MAX_DEFLECTION = 0.01;

@@ -902,11 +902,6 @@ namespace MyCAM.Editor
 			double prevSlave_rad = 0;
 
 			foreach( string szPathID in pathIDList ) {
-				if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType )
-					|| pathType != PathType.Contour ) {
-					// skip non-contour but keep previous MS for next contour path
-					continue;
-				}
 				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}

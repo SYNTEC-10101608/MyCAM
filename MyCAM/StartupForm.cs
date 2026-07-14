@@ -515,9 +515,6 @@ namespace MyCAM
 		void m_tsbConvertNC_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.ConverNC();
-			// simulation
-			// m_CAMEditor.EditEnd();
-			// m_SimuEditor.EditStart();
 		}
 
 		void m_tsbMicroJoint_Click( object sender, EventArgs e )
