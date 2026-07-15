@@ -256,7 +256,7 @@ namespace MyCAM.Editor
 			// Redisplay manipulator with updated axes
 			m_Manipulator.SetPosition( m_RotationBasis );
 			m_Viewer.GetAISContext().Redisplay( m_Manipulator, true );
-		
+
 		}
 
 		void ResetManipulatorToG54()
@@ -274,9 +274,9 @@ namespace MyCAM.Editor
 			if( m_ActiveManipulatorMode == AIS_ManipulatorMode.AIS_MM_Translation ) {
 				gp_XYZ curTranslation = currentTrsf.TranslationPart();
 				gp_XYZ prevTranslation = m_PrevManipulatorTrsf.TranslationPart();
-				decimal dx = (decimal)( curTranslation.X() - prevTranslation.X() );
-				decimal dy = (decimal)( curTranslation.Y() - prevTranslation.Y() );
-				decimal dz = (decimal)( curTranslation.Z() - prevTranslation.Z() );
+				double dx = curTranslation.X() - prevTranslation.X();
+				double dy = curTranslation.Y() - prevTranslation.Y();
+				double dz = curTranslation.Z() - prevTranslation.Z();
 
 				if( dx != 0 || dy != 0 || dz != 0 ) {
 					m_AxisTransformDlg.UpdateDisplacementFromManipulator( dx, dy, dz );
@@ -285,7 +285,16 @@ namespace MyCAM.Editor
 			else if( m_ActiveManipulatorMode == AIS_ManipulatorMode.AIS_MM_Rotation ) {
 				double curAngle = ExtractRotationAngleDeg( currentTrsf, m_ActiveAxisIndex );
 				double prevAngle = ExtractRotationAngleDeg( m_PrevManipulatorTrsf, m_ActiveAxisIndex );
-				decimal deltaAngle = (decimal)( curAngle - prevAngle );
+				double deltaAngle = curAngle - prevAngle;
+
+				// Correct wrap-around when crossing ±180 deg boundary (e.g. +170 to -170 = +20, not -340).
+				// ExtractRotationAngleDeg returns [-180, 180] due to Acos range. Safe as MouseMove frequency ensures |delta| < 180.
+				if( deltaAngle > 180.0 ) {
+					deltaAngle -= 360.0;
+				}
+				else if( deltaAngle < -180.0 ) {
+					deltaAngle += 360.0;
+				}
 
 				if( deltaAngle != 0 ) {
 					switch( (EAxisTransformDirection)m_ActiveAxisIndex ) {
@@ -307,18 +316,40 @@ namespace MyCAM.Editor
 
 		double ExtractRotationAngleDeg( gp_Trsf trsf, int axisIndex )
 		{
-			double angleRad = 0;
+			// Get the manipulator's active axis direction in world coordinates
+			gp_Dir axisDir;
 			switch( (EAxisTransformDirection)axisIndex ) {
 				case EAxisTransformDirection.XAxis:
-					angleRad = Math.Atan2( trsf.Value( 3, 2 ), trsf.Value( 2, 2 ) );
+					axisDir = m_RotationBasis.XDirection();
 					break;
 				case EAxisTransformDirection.YAxis:
-					angleRad = Math.Atan2( trsf.Value( 1, 3 ), trsf.Value( 1, 1 ) );
+					axisDir = m_RotationBasis.YDirection();
 					break;
 				case EAxisTransformDirection.ZAxis:
-					angleRad = Math.Atan2( trsf.Value( 2, 1 ), trsf.Value( 1, 1 ) );
+					axisDir = m_RotationBasis.Direction();
+					break;
+				default:
+					axisDir = m_RotationBasis.XDirection();
 					break;
 			}
+
+			// Rotation matrix upper-left 3x3
+			// trace = 1 + 2*cos(theta), so cos(theta) = (trace - 1) / 2
+			double trace = trsf.Value( 1, 1 ) + trsf.Value( 2, 2 ) + trsf.Value( 3, 3 );
+			double cosTheta = ( trace - 1.0 ) / 2.0;
+
+			// clamp to avoid NaN from Acos due to floating-point error, acos is only defined for [-1, 1]
+			cosTheta = Math.Max( -1.0, Math.Min( 1.0, cosTheta ) );
+
+			// The sign of the rotation is determined by the axis of rotation extracted from
+			// the skew-symmetric part of the matrix, projected onto the manipulator's axis
+			double sx = trsf.Value( 3, 2 ) - trsf.Value( 2, 3 );
+			double sy = trsf.Value( 1, 3 ) - trsf.Value( 3, 1 );
+			double sz = trsf.Value( 2, 1 ) - trsf.Value( 1, 2 );
+			double signProjection = sx * axisDir.X() + sy * axisDir.Y() + sz * axisDir.Z();
+			double sign = signProjection >= 0 ? 1.0 : -1.0;
+
+			double angleRad = sign * Math.Acos( cosTheta );
 			return angleRad * 180.0 / Math.PI;
 		}
 

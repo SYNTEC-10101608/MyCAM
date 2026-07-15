@@ -11,16 +11,6 @@ namespace MyCAM.Editor.Dialog
 		internal Action FormConfirm;
 		internal Action FormCancel;
 		internal Action FormReset;
-		decimal m_RotationIncrement = 1;
-		decimal m_DisplacementIncrement = 1;
-		const decimal ANGLE_RANGE_DEG = 360;
-		const int DISPLACEMENT_DECIMAL_PLACES = 3;
-
-		// Previous values for delta calculation
-		readonly Dictionary<NumericUpDown, decimal> m_PrevValues = new Dictionary<NumericUpDown, decimal>();
-
-		// If value is change by action (not user input from dlg), ignore the ValueChanged event to prevent feedback loop
-		bool m_isIgnoreValueChange = false;
 
 		public AxisTransformDlg()
 		{
@@ -50,7 +40,7 @@ namespace MyCAM.Editor.Dialog
 			m_btnReset.Text = m_LanguageManager.TryGetString( "m_btnReset", m_btnReset.Text );
 		}
 
-		internal void UpdateDisplacementFromManipulator( decimal dx, decimal dy, decimal dz )
+		internal void UpdateDisplacementFromManipulator( double dx, double dy, double dz )
 		{
 			m_isIgnoreValueChange = true;
 			UpdateNumericValue( m_nudX, dx );
@@ -59,12 +49,12 @@ namespace MyCAM.Editor.Dialog
 			m_isIgnoreValueChange = false;
 		}
 
-		internal void UpdateRotationFromManipulator( decimal drx, decimal dry, decimal drz )
+		internal void UpdateRotationFromManipulator( double drx, double dry, double drz )
 		{
 			m_isIgnoreValueChange = true;
-			UpdateNumericValue( m_nudRx, drx, clampAngle: true );
-			UpdateNumericValue( m_nudRy, dry, clampAngle: true );
-			UpdateNumericValue( m_nudRz, drz, clampAngle: true );
+			UpdateRotationValueFromManipulator( m_nudRx, drx );
+			UpdateRotationValueFromManipulator( m_nudRy, dry );
+			UpdateRotationValueFromManipulator( m_nudRz, drz );
 			m_isIgnoreValueChange = false;
 		}
 
@@ -90,10 +80,11 @@ namespace MyCAM.Editor.Dialog
 
 		void InitialControlBoundarySetting()
 		{
-			// Set rotation controls
+			// Set rotation controls - allow unlimited rotation angle
 			foreach( var nud in GetRotationControls() ) {
-				nud.Maximum = ANGLE_RANGE_DEG;
-				nud.Minimum = -ANGLE_RANGE_DEG;
+				nud.Maximum = decimal.MaxValue;
+				nud.Minimum = decimal.MinValue;
+				nud.DecimalPlaces = ROTATION_DECIMAL_PLACES;
 			}
 
 			// Set displacement controls
@@ -223,16 +214,35 @@ namespace MyCAM.Editor.Dialog
 			}
 		}
 
-		void UpdateNumericValue( NumericUpDown nud, decimal delta, bool clampAngle = false )
+		// Update NumericUpDown by adding delta (used for displacement from manipulator)
+		void UpdateNumericValue( NumericUpDown nud, double delta )
 		{
-			decimal newValue = nud.Value + delta;
-			nud.Value = clampAngle ? ClampAngle( newValue ) : newValue;
+			if( delta == 0 ) {
+				return;
+			}
+
+			decimal newValue = nud.Value + (decimal)delta;
+			nud.Value = newValue;
 			m_PrevValues[ nud ] = nud.Value;
 		}
 
-		decimal ClampAngle( decimal value )
+		// Update rotation value from manipulator with integer-degree snapping
+		void UpdateRotationValueFromManipulator( NumericUpDown nud, double delta )
 		{
-			return Math.Max( -ANGLE_RANGE_DEG, Math.Min( ANGLE_RANGE_DEG, value ) );
+			if( delta == 0 ) {
+				return;
+			}
+
+			// Manipulator's underlying SetRotationSteps(1 deg) guarantees delta only changes
+			double intDegreeChange = Math.Round( delta, ROTATION_FROM_ACTION_PLACES );
+			if( intDegreeChange == 0 ) {
+				return;
+			}
+
+			// Apply integer change while preserving user-entered fractional part
+			decimal newValue = nud.Value + (decimal)intDegreeChange;
+			nud.Value = newValue;
+			m_PrevValues[ nud ] = nud.Value;
 		}
 
 		void m_btnOK_Click( object sender, EventArgs e )
@@ -273,14 +283,18 @@ namespace MyCAM.Editor.Dialog
 
 		void m_txbStepAngle_Leave( object sender, EventArgs e )
 		{
-			if( decimal.TryParse( m_txbStepAngle.Text, out decimal stepAngle ) && stepAngle > 0 && stepAngle <= ANGLE_RANGE_DEG ) {
+			if( decimal.TryParse( m_txbStepAngle.Text, out decimal stepAngle ) && stepAngle > 0 ) {
+				// Limit to specified decimal places
+				stepAngle = Math.Round( stepAngle, ROTATION_DECIMAL_PLACES );
 				m_RotationIncrement = stepAngle;
 				foreach( var nud in GetRotationControls() ) {
 					nud.Increment = stepAngle;
 				}
+				// Display with up to ROTATION_DECIMAL_PLACES digits (trailing zeros omitted)
+				m_txbStepAngle.Text = stepAngle.ToString( $"F{ROTATION_DECIMAL_PLACES}" );
 			}
 			else {
-				m_txbStepAngle.Text = m_RotationIncrement.ToString();
+				m_txbStepAngle.Text = m_RotationIncrement.ToString( $"F{ROTATION_DECIMAL_PLACES}" );
 			}
 		}
 
@@ -322,5 +336,17 @@ namespace MyCAM.Editor.Dialog
 		}
 
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "AxisTransformDlg" );
+
+		decimal m_RotationIncrement = 1;
+		decimal m_DisplacementIncrement = 1;
+		const int DISPLACEMENT_DECIMAL_PLACES = 3;
+		const int ROTATION_DECIMAL_PLACES = 3;
+		const int ROTATION_FROM_ACTION_PLACES = 0;
+
+		// Previous values for delta calculation
+		readonly Dictionary<NumericUpDown, decimal> m_PrevValues = new Dictionary<NumericUpDown, decimal>();
+
+		// If value is change by action (not user input from dlg), ignore the ValueChanged event to prevent feedback loop
+		bool m_isIgnoreValueChange = false;
 	}
 }
