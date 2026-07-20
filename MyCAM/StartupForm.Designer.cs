@@ -59,6 +59,7 @@
 			this.m_tsbPathCompensation = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbCalibrationPnt = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbConvertNC = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbMeasureCAM = new System.Windows.Forms.ToolStripButton();
 			this.m_tscLevel1Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsFileFunction = new System.Windows.Forms.ToolStrip();
 			this.m_tsbImport3DFile = new System.Windows.Forms.ToolStripButton();
@@ -75,6 +76,7 @@
 			this.m_tsbAddLine_TwoVertexConnect = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbManualTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsb3PntTransform = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbMeasureCAD = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAxisTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsSimuFunc = new System.Windows.Forms.ToolStrip();
 			this.m_btnPlay = new System.Windows.Forms.ToolStripButton();
@@ -247,7 +249,8 @@
             this.m_BtnContourEdit,
             this.m_tsbPathCompensation,
             this.m_tsbCalibrationPnt,
-            this.m_tsbConvertNC});
+			this.m_tsbConvertNC,
+			this.m_tsbMeasureCAM});
 			this.m_tsCAMFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCAMFunction.Name = "m_tsCAMFunction";
 			this.m_tsCAMFunction.Size = new System.Drawing.Size(1596, 50);
@@ -482,6 +485,17 @@
 			this.m_tsbConvertNC.ToolTipText = "轉出NC";
 			this.m_tsbConvertNC.Click += new System.EventHandler(this.m_tsbConvertNC_Click);
 			// 
+			// m_tsbMeasureCAM
+			// 
+			this.m_tsbMeasureCAM.Image = global::MyCAM.Properties.Resources.Measure;
+			this.m_tsbMeasureCAM.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbMeasureCAM.Name = "m_tsbMeasureCAM";
+			this.m_tsbMeasureCAM.Size = new System.Drawing.Size(59, 47);
+			this.m_tsbMeasureCAM.Text = "量測";
+			this.m_tsbMeasureCAM.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbMeasureCAM.ToolTipText = "量測";
+			this.m_tsbMeasureCAM.Click += new System.EventHandler(this.m_tsbMeasureCAM_Click);
+			// 
 			// m_tscLevel1Container
 			// 
 			// 
@@ -579,10 +593,11 @@
             this.m_tsbAddPoint_EdgeCenter,
             this.m_tsbAddPoint_PointCenter,
             this.m_tsbAddPoint_BoundingBoxCenter,
-            this.m_tsbAddLine_TwoVertexConnect,
-            this.m_tsbManualTransform,
-            this.m_tsb3PntTransform,
-            this.m_tsbAxisTransform});
+			this.m_tsbAddLine_TwoVertexConnect,
+			this.m_tsbManualTransform,
+			this.m_tsb3PntTransform,
+			this.m_tsbAxisTransform,
+			this.m_tsbMeasureCAD});
 			this.m_tsCADFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCADFunction.Name = "m_tsCADFunction";
 			this.m_tsCADFunction.Size = new System.Drawing.Size(1596, 50);
@@ -687,6 +702,17 @@
 			this.m_tsbAxisTransform.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbAxisTransform.ToolTipText = "軸向轉換";
 			this.m_tsbAxisTransform.Click += new System.EventHandler(this.m_tsbAxisTransform_Click);
+			// 
+			// m_tsbMeasureCAD
+			// 
+			this.m_tsbMeasureCAD.Image = global::MyCAM.Properties.Resources.Measure;
+			this.m_tsbMeasureCAD.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbMeasureCAD.Name = "m_tsbMeasureCAD";
+			this.m_tsbMeasureCAD.Size = new System.Drawing.Size(59, 47);
+			this.m_tsbMeasureCAD.Text = "量測";
+			this.m_tsbMeasureCAD.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbMeasureCAD.ToolTipText = "量測";
+			this.m_tsbMeasureCAD.Click += new System.EventHandler(this.m_tsbMeasureCAD_Click);
 			// 
 			// m_tsSimuFunc
 			// 
@@ -1401,6 +1427,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbManualSelectPathOK;
 		private System.Windows.Forms.ToolStripButton m_tsbSetTraverseData;
 		private System.Windows.Forms.ToolStripButton m_tsbConvertNC;
+		private System.Windows.Forms.ToolStripButton m_tsbMeasureCAM;
 		private System.Windows.Forms.ToolStripButton m_tsbAddPoint_AcrCenter;
 		private System.Windows.Forms.ToolStripButton m_tsbAddPoint_EdgeCenter;
 		private System.Windows.Forms.ToolStripButton m_tsbAddPoint_PointCenter;
@@ -1408,6 +1435,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbAddLine_TwoVertexConnect;
 		private System.Windows.Forms.ToolStripButton m_tsbManualTransform;
 		private System.Windows.Forms.ToolStripButton m_tsb3PntTransform;
+		private System.Windows.Forms.ToolStripButton m_tsbMeasureCAD;
 		private System.Windows.Forms.ToolStripButton m_tsbAxisTransform;
 		private System.Windows.Forms.ToolStrip m_tsFileFunction;
 		private System.Windows.Forms.ToolStripButton m_tsbImport3DFile;

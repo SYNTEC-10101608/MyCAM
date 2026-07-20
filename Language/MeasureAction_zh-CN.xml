@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="FormatPointCoordinate" Content="X: {0:F3}mm&#13;&#10;Y: {1:F3}mm&#13;&#10;Z: {2:F3}mm" />
+    <Message ID="FormatLineLength" Content="长度: {0:F3}mm" />
+    <Message ID="FormatCircleRadius" Content="半径: {0:F3}mm" />
+    <Message ID="FormatDistance" Content="距离: {0:F3}mm" />
+    <Message ID="FormatAngle" Content="夹角: {0:F3}°" />
+    <Message ID="NotCircularArc" Content="选取的边不是圆或圆弧" />
+    <Message ID="FirstPointSelected" Content="已选取第一个点，请选取第二个点" />
+    <Message ID="FirstLineSelected" Content="已选取第一条线，请选取第二条线" />
+    <Message ID="NotStraightLine" Content="选取的边不是直线" />
+    <Message ID="LinesNotIntersect" Content="两条线不相交，无法计算夹角" />
+</ResMap>

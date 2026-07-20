@@ -234,6 +234,17 @@ namespace MyCAM.Editor
 			( (ManualTransformAction)m_CurrentAction ).ApplyTransform( type );
 		}
 
+		public void StartMeasure()
+		{
+			if( m_CurrentAction.ActionType == EditActionType.Measure ) {
+				m_CurrentAction.End();
+				return;
+			}
+
+			MeasureAction action = new MeasureAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+			StartEditAction( action );
+		}
+
 		public void ImportTube( TopoDS_Shape tubeShape )
 		{
 			// rotate the tube around X+ by 90deg to make a Z+ direction
