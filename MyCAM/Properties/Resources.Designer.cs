@@ -413,6 +413,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
+        internal static System.Drawing.Bitmap Measure {
+            get {
+                object obj = ResourceManager.GetObject("Measure", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
         internal static System.Drawing.Bitmap Simu_Check {
             get {
                 object obj = ResourceManager.GetObject("Simu_Check", resourceCulture);

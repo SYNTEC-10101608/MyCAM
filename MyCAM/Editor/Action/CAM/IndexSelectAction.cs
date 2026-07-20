@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using MyCAM.Data;
 using MyCAM.Helper;
 using MyCAM.PathCache;
 using OCC.AIS;
@@ -180,12 +181,12 @@ namespace MyCAM.Editor
 			if( polygonMaker.IsDone() == false ) {
 				return;
 			}
-			TopoDS_Wire wire = polygonMaker.Wire();
-			m_SelectedPointAIS = new AIS_Shape( wire );
+						TopoDS_Wire wire = polygonMaker.Wire();
+						m_SelectedPointAIS = new AIS_Shape( wire );
 
-			// set invisible
-			m_SelectedPointAIS.SetWidth( 1e-3 );
-		}
+						// set invisible
+						m_SelectedPointAIS.SetWidth( 1e-3 );
+					}
 
 		List<gp_Pnt> GetPathPointList( string szPathID )
 		{

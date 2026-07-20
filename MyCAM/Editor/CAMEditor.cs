@@ -156,6 +156,17 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void StartMeasure()
+		{
+			if( m_CurrentAction.ActionType == EditActionType.Measure ) {
+				m_CurrentAction.End();
+				return;
+			}
+
+			MeasureAction action = new MeasureAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+			StartEditAction( action );
+		}
+
 		// Auto find top face along Z axis, then process D1 continuous faces and free boundaries
 		public void AutoFindHatPath()
 		{

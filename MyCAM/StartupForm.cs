@@ -373,6 +373,17 @@ namespace MyCAM
 			m_CADEditor.ApplyManualTransform( ETrsfConstraintType.Point );
 		}
 
+		// measure
+		void m_tsbMeasureCAD_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.StartMeasure();
+		}
+
+		void m_tsbMeasureCAM_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.StartMeasure();
+		}
+
 		// 3 point transform
 		void m_tsb3PntTransform_Click( object sender, EventArgs e )
 		{
@@ -617,6 +628,9 @@ namespace MyCAM
 					case EditActionType.ManualTransform:
 						m_tsbManualTransform.BackColor = DEFAULT_BtnColor;
 						return;
+					case EditActionType.Measure:
+						m_tsbMeasureCAD.BackColor = DEFAULT_BtnColor;
+						return;
 				}
 				return;
 			}
@@ -645,6 +659,9 @@ namespace MyCAM
 					return;
 				case EditActionType.ManualTransform:
 					m_tsbManualTransform.BackColor = ON_ButtonColor;
+					return;
+				case EditActionType.Measure:
+					m_tsbMeasureCAD.BackColor = ON_ButtonColor;
 					return;
 			}
 		}
@@ -729,6 +746,9 @@ namespace MyCAM
 						m_tsbManualOrder.BackColor = DEFAULT_BtnColor;
 						OnCAMDlgActionStatusChange( actionStatus );
 						break;
+					case EditActionType.Measure:
+						m_tsbMeasureCAM.BackColor = DEFAULT_BtnColor;
+						break;
 					default:
 						break;
 				}
@@ -789,6 +809,9 @@ namespace MyCAM
 				case EditActionType.ManualOrder:
 					m_tsbManualOrder.BackColor = ON_ButtonColor;
 					OnCAMDlgActionStatusChange( actionStatus );
+					break;
+				case EditActionType.Measure:
+					m_tsbMeasureCAM.BackColor = ON_ButtonColor;
 					break;
 				default:
 					break;
@@ -1596,6 +1619,9 @@ namespace MyCAM
 			m_tsbAxisTransform.Text = m_LanguageManager.TryGetString( "m_tsbAxisTransform", m_tsbAxisTransform.Text );
 			m_tsbAxisTransform.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAxisTransform_ToolTip", m_tsbAxisTransform.ToolTipText );
 
+			m_tsbMeasureCAD.Text = m_LanguageManager.TryGetString( "m_tsbMeasureCAD", m_tsbMeasureCAD.Text );
+			m_tsbMeasureCAD.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMeasureCAD_ToolTip", m_tsbMeasureCAD.ToolTipText );
+
 			// cam toolbar
 			m_tsbAddPath.Text = m_LanguageManager.TryGetString( "m_tsbAddPath", m_tsbAddPath.Text );
 			m_tsbAddPath.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPath_ToolTip", m_tsbAddPath.ToolTipText );
@@ -1659,6 +1685,9 @@ namespace MyCAM
 
 			m_tsbConvertNC.Text = m_LanguageManager.TryGetString( "m_tsbConvertNC", m_tsbConvertNC.Text );
 			m_tsbConvertNC.ToolTipText = m_LanguageManager.TryGetString( "m_tsbConvertNC_ToolTip", m_tsbConvertNC.ToolTipText );
+
+			m_tsbMeasureCAM.Text = m_LanguageManager.TryGetString( "m_tsbMeasureCAM", m_tsbMeasureCAM.Text );
+			m_tsbMeasureCAM.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMeasureCAM_ToolTip", m_tsbMeasureCAM.ToolTipText );
 
 			// add path sub function toolbar
 			m_tsAddPathForHat.Text = m_LanguageManager.TryGetString( "m_tsAddPathForHat", m_tsAddPathForHat.Text );

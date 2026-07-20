@@ -45,6 +45,8 @@
 	<Message ID="m_tsb3PntTransform_ToolTip" Content="三點轉換" />
 	<Message ID="m_tsbAxisTransform" Content="軸向轉換" />
 	<Message ID="m_tsbAxisTransform_ToolTip" Content="軸向轉換" />
+	<Message ID="m_tsbMeasureCAD" Content="量測" />
+	<Message ID="m_tsbMeasureCAD_ToolTip" Content="量測" />
 
 	<!-- CAM工具列 -->
 	<Message ID="m_tsbAddPath" Content="新增路徑" />
@@ -89,6 +91,8 @@
 	<Message ID="m_tsbCalibrationPnt_ToolTip" Content="三點校正" />
 	<Message ID="m_tsbConvertNC" Content="轉出NC" />
 	<Message ID="m_tsbConvertNC_ToolTip" Content="轉出NC" />
+	<Message ID="m_tsbMeasureCAM" Content="量測" />
+	<Message ID="m_tsbMeasureCAM_ToolTip" Content="量測" />
 
 	<!-- 新增路徑子工具列 -->
 	<Message ID="m_tsAddPathForHat" Content="異形蓋件-生成路徑" />

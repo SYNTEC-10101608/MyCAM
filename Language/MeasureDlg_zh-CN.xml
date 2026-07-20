@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="MeasureDlg" Content="量测" />
+  <Message ID="m_lblMethod" Content="量测方式" />
+  <Message ID="m_lblResult" Content="量测结果" />
+  <Message ID="Method_PointCoordinate" Content="点的坐标" />
+  <Message ID="Method_LineLength" Content="线段长度" />
+  <Message ID="Method_CircleArcRadius" Content="圆弧半径" />
+  <Message ID="Method_DistanceBetweenTwoPoints" Content="两点距离" />
+  <Message ID="Method_AngleBetweenLines" Content="两线夹角" />
+  <Message ID="Guide_PointCoordinate" Content="请点击一个工件上的顶点，以量测其坐标" />
+  <Message ID="Guide_LineLength" Content="请点击一条边，以量测其长度" />
+  <Message ID="Guide_CircleArcRadius" Content="请点击一个圆或圆弧边，以量测其半径" />
+  <Message ID="Guide_DistanceBetweenTwoPoints" Content="请依序点击两个顶点，以量测其距离" />
+  <Message ID="Guide_AngleBetweenLines" Content="请依序点击两条线段，以量测其夹角" />
+  <Message ID="m_lblGuide_Default" Content="请选择量测方式" />
+</ResMap>

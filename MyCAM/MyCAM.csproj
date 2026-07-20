@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -86,6 +86,7 @@
     <Compile Include="Editor\Action\CAM\ManualOrderAction.cs" />
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
+    <Compile Include="Editor\Action\MeasureAction.cs" />
     <Compile Include="Editor\Dialog\CalibrationREFDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -112,6 +113,10 @@
       <DependentUpon>ManualTransformDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Action\CAM\MicroJointAction.cs" />
+    <Compile Include="Editor\Dialog\MeasureDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\MeasureDlg.Designer.cs" />
     <Compile Include="Editor\Dialog\MicroJointDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -324,13 +329,13 @@
     <Compile Include="Post\StdPatternNCWriter.cs" />
     <Compile Include="Post\StdPatternPostHelper.cs" />
     <Compile Include="Post\NCWriterHelper.cs" />
+    <Compile Include="Helper\CAD\StdPatternWireFactory.cs" />
+    <Compile Include="Helper\CAD\StdPatternHelper.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Helper\CAD\StdPatternWireFactory.cs" />
-    <Compile Include="Helper\CAD\StdPatternHelper.cs" />
     <Compile Include="SettingManager\AppSettingManager.cs" />
     <Compile Include="StartupForm.cs">
       <SubType>Form</SubType>
@@ -454,6 +459,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\Axo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\Measure.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\StandardPattern.png" />

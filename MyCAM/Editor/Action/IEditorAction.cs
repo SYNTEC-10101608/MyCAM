@@ -26,6 +26,7 @@ namespace MyCAM.Editor
 		ManualTransform,
 		AxisTransform,
 		SewPart,
+		Measure,
 
 		// CAM
 		SelectFace,
