@@ -352,16 +352,9 @@ namespace LanguageManager
 				xmlDoc = XDocument.Load( szFilePath );
 			}
 			catch( Exception ex ) {
-				if( ex is XmlException ) {
-					MessageBox.Show( szMapConfigFileName + "_" + szLanguage + ".xml" + " file format error.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
-				}
-				else {
-					MessageBox.Show( ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
-				}
-				RDLogHandler?.Invoke( ex.ToString() );
+				LogXmlLoadError( szFilePath, ex );
 
-				// use throw to stop the program
-				throw;
+				return false;
 			}
 
 			if( xmlDoc == null ) {
@@ -541,6 +534,16 @@ namespace LanguageManager
 				}
 				EnsureRunHeader();
 				File.AppendAllText( DIAGNOSTIC_LOG_FILE_PATH, "[FileMissing] " + szFileName + Environment.NewLine );
+			}
+			RDLogHandler?.Invoke( errorMsg );
+		}
+
+		static void LogXmlLoadError( string szFilePath, Exception ex )
+		{
+			string errorMsg = "[LanguageManager] Failed to load xml file: " + szFilePath + ", " + ex.ToString();
+			lock( m_DiagnosticLogLock ) {
+				EnsureRunHeader();
+				File.AppendAllText( DIAGNOSTIC_LOG_FILE_PATH, "[XmlLoadError] " + szFilePath + " - " + ex.ToString() + Environment.NewLine );
 			}
 			RDLogHandler?.Invoke( errorMsg );
 		}

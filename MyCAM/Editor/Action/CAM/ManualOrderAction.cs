@@ -17,6 +17,10 @@ namespace MyCAM.Editor
 		public ManualOrderAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, SelectPathAction selectPathAction )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
+			if( selectPathAction == null ) {
+				throw new ArgumentNullException( nameof( selectPathAction ) );
+			}
+
 			m_OrderMode = OrderMode.Sequential;
 			m_CurrentFlagIndex = 0;
 			m_SelectPathAction = selectPathAction;
@@ -167,7 +171,7 @@ namespace MyCAM.Editor
 
 			// insert the selected path after the flag position
 			m_DataManager.PathIDList.RemoveAt( selectedIndex );
-			if( selectedIndex < m_CurrentFlagIndex ) {
+			if( selectedIndex <= m_CurrentFlagIndex ) {
 				m_DataManager.PathIDList.Insert( m_CurrentFlagIndex, uniquePathID );
 			}
 			else {
@@ -194,6 +198,14 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			if( m_DataManager?.PathIDList == null ) {
+				return;
+			}
+
+			if( selectedIndex < 0 || selectedIndex >= m_DataManager.PathIDList.Count ) {
+				return;
+			}
+
 			// move the selected path to top of the list
 			m_DataManager.PathIDList.RemoveAt( selectedIndex );
 			m_DataManager.PathIDList.Insert( START_Indx, uniquePathID );
@@ -211,6 +223,10 @@ namespace MyCAM.Editor
 		{
 			bool bGetSuccess = GetSelectUniqueIDAndOrderIdx( out string uniquePathID, out int selectIndex );
 			if( bGetSuccess == false ) {
+				return;
+			}
+
+			if( m_DataManager?.PathIDList == null ) {
 				return;
 			}
 
@@ -271,6 +287,10 @@ namespace MyCAM.Editor
 		{
 			ClearFlagPath();
 
+			if( m_DataManager?.PathIDList == null ) {
+				return;
+			}
+
 			// check index
 			if( m_CurrentFlagIndex < 0 || m_CurrentFlagIndex >= m_DataManager.PathIDList.Count ) {
 				return;
@@ -280,11 +300,14 @@ namespace MyCAM.Editor
 			string nodeID = CAMEditor.PATH_NODE_PREFIX + displayIndex.ToString();
 
 			// find node by id
-			if( !m_ViewManager.TreeNodeMap.ContainsKey( nodeID ) ) {
+			if( m_ViewManager?.TreeNodeMap == null || !m_ViewManager.TreeNodeMap.ContainsKey( nodeID ) ) {
 				return;
 			}
 
 			TreeNode node = m_ViewManager.TreeNodeMap[ nodeID ];
+			if( node == null ) {
+				return;
+			}
 			m_FlagNode = node;
 
 			// set flag display
