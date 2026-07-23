@@ -1,6 +1,5 @@
 using CommonData;
 using FileTranslator;
-using MyCAM.Editor;
 using MyCAM.LogManager;
 using MyCAM.SettingManager;
 using System;
@@ -109,60 +108,6 @@ namespace MyCAM.App
 		}
 
 		#region Show Dialog at Form Center
-
-		public static void RegistDialogMoveWithMainForm<TEditDataType>( EditDialogBase<TEditDataType> dialog )
-		{
-			// do not have main form
-			if( m_MainForm == null || dialog == null ) {
-				return;
-			}
-
-			// already registered
-			if( m_RegisteredDialogs.Exists( info => info.Dialog == dialog ) ) {
-				return;
-			}
-
-			// create event handler
-			EventHandler locationChangedHandler = ( sender, e ) =>
-			{
-				if( !dialog.IsDisposed && dialog.Visible ) {
-					dialog.OnParentLocationChange();
-				}
-			};
-			EventHandler sizeChangedHandler = ( sender, e ) =>
-			{
-				if( !dialog.IsDisposed && dialog.Visible ) {
-					dialog.OnParentLocationChange();
-				}
-			};
-			EventHandler mainFormActivatedHandler = ( sender, e ) =>
-			{
-				if( !dialog.IsDisposed && dialog.Visible ) {
-					m_MainForm.BeginInvoke( new Action( () =>
-					{
-						dialog.EnsureDialogOnTop();
-					} ) );
-				}
-			};
-
-			// regist main form event
-			m_MainForm.LocationChanged += locationChangedHandler;
-			m_MainForm.SizeChanged += sizeChangedHandler;
-			m_MainForm.Activated += mainFormActivatedHandler;
-
-			// save event info
-			DialogEventInfo eventInfo = new DialogEventInfo
-			{
-				Dialog = dialog,
-				LocationChangedHandler = locationChangedHandler,
-				SizeChangedHandler = sizeChangedHandler,
-				MainFormActivatedHandler = mainFormActivatedHandler
-			};
-			m_RegisteredDialogs.Add( eventInfo );
-
-			// when dialog closed, unregister it
-			dialog.FormClosed += ( sender, e ) => UnRegistDialogMoveWithMainForm( dialog );
-		}
 
 		public static Point CalculateDialogCenterLocation( Form dialog )
 		{

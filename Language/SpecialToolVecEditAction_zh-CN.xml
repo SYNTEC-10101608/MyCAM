@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+<Message ID="CannotGetGeomData" Content="无法获取路径 {0} 的几何信息" />
+<Message ID="CannotGetCraftData" Content="无法获取路径 {0} 的加工信息" />
+<Message ID="CannotGetMachineData" Content="无法获得机构信息" />
+<Message ID="PleaseSelectPath" Content="请先选择路径" />
+<Message ID="CannotSimulatePosture" Content="无法顺利模拟该点姿态" />
+<Message ID="CannotGetToolVectorInfo" Content="无法获取目标点的工具向量信息" />
+<Message ID="CannotGetMachineInfo" Content="无法获取机台信息" />
+<Message ID="MutiPathCantSetSameMSForFixDir" Content="多条路径无法设置相同曲面法向角度，请改为单选" />
+</ResMap>

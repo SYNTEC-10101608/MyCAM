@@ -1,4 +1,5 @@
 using MyCAM.Data;
+using MyCAM.Helper;
 
 namespace MyCAM.Post
 {
@@ -27,22 +28,8 @@ namespace MyCAM.Post
 		{
 			MasterRotaryAxis = machineData.MasterRotaryAxis;
 			SlaveRotaryAxis = machineData.SlaveRotaryAxis;
-			MasterAxisName = ConvertRotaryAxisName( MasterRotaryAxis );
-			SlaveAxisName = ConvertRotaryAxisName( SlaveRotaryAxis );
-		}
-
-		string ConvertRotaryAxisName( RotaryAxis axis )
-		{
-			switch( axis ) {
-				case RotaryAxis.X:
-					return "A";
-				case RotaryAxis.Y:
-					return "B";
-				case RotaryAxis.Z:
-					return "C";
-				default:
-					return "";
-			}
+			MasterAxisName = RotaryAxisHelper.ConvertRotaryAxisName( MasterRotaryAxis );
+			SlaveAxisName = RotaryAxisHelper.ConvertRotaryAxisName( SlaveRotaryAxis );
 		}
 	}
 }

@@ -135,6 +135,57 @@ namespace MyCAM.Helper
 			return true;
 		}
 
+		public static bool BuildSinglePointFrameTransform(
+			MachineData machineData,
+			gp_Pnt position,
+			double masterAngle_rad,
+			double slaveAngle_rad,
+			HashSet<MachineComponentType> workPieceChain,
+			Dictionary<MachineComponentType, List<MachineComponentType>> machineChainListMap,
+			out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap )
+		{
+			frameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
+
+			// validate input
+			if( machineData == null || position == null || workPieceChain == null || machineChainListMap == null ) {
+				return false;
+			}
+
+			// set default offset
+			gp_Vec simuOffset = machineData.SimulationOffset ?? new gp_Vec();
+
+			// create IK point (G54 coordinate)
+			PostPoint G54pnt = new PostPoint()
+			{
+				X = position.X(),
+				Y = position.Y(),
+				Z = position.Z(),
+				Master = masterAngle_rad,
+				Slave = slaveAngle_rad
+			};
+
+			// create PostSolver and solve FK
+			PostSolver postSolver = new PostSolver( machineData );
+			bool calSuccess = BuildFKPostPnt( postSolver, G54pnt, out PostPoint FKpnt, simuOffset );
+			if( !calSuccess ) {
+				return false;
+			}
+
+			// initialize frame transform map
+			frameTransformMap[ MachineComponentType.XAxis ] = new List<gp_Trsf>();
+			frameTransformMap[ MachineComponentType.YAxis ] = new List<gp_Trsf>();
+			frameTransformMap[ MachineComponentType.ZAxis ] = new List<gp_Trsf>();
+			frameTransformMap[ MachineComponentType.Master ] = new List<gp_Trsf>();
+			frameTransformMap[ MachineComponentType.Slave ] = new List<gp_Trsf>();
+			frameTransformMap[ MachineComponentType.Laser ] = new List<gp_Trsf>();
+			frameTransformMap[ MachineComponentType.WorkPiece ] = new List<gp_Trsf>();
+
+			// calculate frame transform
+			FKToFrameTranfResult( FKpnt, machineData.SimulationOffset, workPieceChain, machineData, machineChainListMap, ref frameTransformMap );
+
+			return true;
+		}
+
 		const double DISCRETE_MAX_DEFLECTION = 0.01;
 		const double DISCRETE_MAX_EDGE_LENGTH = 1.0;
 		const double TOLERANCE = 1e-3;

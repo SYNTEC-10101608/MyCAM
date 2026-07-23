@@ -66,6 +66,11 @@ namespace MyCAM.Data
 			EndPnt = endPntData;
 		}
 
+		public StartPntToolVecParam Clone()
+		{
+			return new StartPntToolVecParam( StartPnt.Clone(), EndPnt.Clone() );
+		}
+
 		ToolVecModifyData m_EndPnt;
 		ToolVecModifyData m_StartPnt;
 	}
@@ -126,7 +131,8 @@ namespace MyCAM.Data
 			bool isToolVecReverse,
 			TraverseData traverseData,
 			Dictionary<int, ContourEditData> contourEditMap,
-			Dictionary<int, double> microJointStartIdxMap )
+			Dictionary<int, double> microJointStartIdxMap,
+			SpecialToolVecData specialToolVecData = null )
 		{
 			m_TechLayer = techLayer;
 			m_StartPointIndex = startPoint;
@@ -150,6 +156,12 @@ namespace MyCAM.Data
 			}
 			m_IsToolVecReverse = isToolVecReverse;
 			m_TraverseData = traverseData;
+			if( specialToolVecData != null ) {
+				m_SpecialToolVecData = specialToolVecData;
+			}
+			else {
+				m_SpecialToolVecData = new SpecialToolVecData();
+			}
 			SubscribeSubParamChanged();
 		}
 
@@ -180,13 +192,29 @@ namespace MyCAM.Data
 			{
 				return m_StartPointIndex;
 			}
-			set
+			private set
 			{
 				if( m_StartPointIndex != value ) {
 					m_StartPointIndex = value;
-					ClearToolVecModify();
 					CAMFactorChanged?.Invoke();
 				}
+			}
+		}
+
+		public void SetStartPntIndex( int index )
+		{
+			if( StartPointIndex != index ) {
+				StartPointIndex = index;
+				ClearToolVecModify();
+				ClearSpecialToolVecData();
+			}
+		}
+		public void SetToolVecReverse( bool isPathReverse )
+		{
+			if( IsToolVecReverse != isPathReverse ) {
+				IsToolVecReverse = isPathReverse;
+				ClearToolVecModify();
+				ClearSpecialToolVecData();
 			}
 		}
 
@@ -261,7 +289,7 @@ namespace MyCAM.Data
 			{
 				return m_IsToolVecReverse;
 			}
-			set
+			private set
 			{
 				if( m_IsToolVecReverse != value ) {
 					m_IsToolVecReverse = value;
@@ -334,6 +362,19 @@ namespace MyCAM.Data
 			{
 				return m_ToolVecModifyMap;
 			}
+			set
+			{
+				if( m_ToolVecModifyMap != value ) {
+					if( m_ToolVecModifyMap != null ) {
+						m_ToolVecModifyMap.PropertyChanged -= SubParamChanged;
+					}
+					m_ToolVecModifyMap = value;
+					if( m_ToolVecModifyMap != null ) {
+						m_ToolVecModifyMap.PropertyChanged += SubParamChanged;
+					}
+					CAMFactorChanged?.Invoke();
+				}
+			}
 		}
 
 		public TraverseData TraverseData
@@ -359,6 +400,35 @@ namespace MyCAM.Data
 			}
 		}
 
+		public SpecialToolVecData SpecialToolVecData
+		{
+			get
+			{
+				// to prevent null value
+				if( m_SpecialToolVecData == null ) {
+					m_SpecialToolVecData = new SpecialToolVecData();
+				}
+				return m_SpecialToolVecData;
+			}
+		}
+
+		public void SetSpecialToolVecData( SpecialToolVecData specialToolVecData )
+		{
+			if( specialToolVecData == null ) {
+				return;
+			}
+			if( specialToolVecData.Type == m_SpecialToolVecData.Type &&
+				 specialToolVecData.MasterAngle_deg == m_SpecialToolVecData.MasterAngle_deg &&
+				 specialToolVecData.SlaveAngle_deg == m_SpecialToolVecData.SlaveAngle_deg ) {
+				return;
+			}
+			m_SpecialToolVecData = specialToolVecData;
+			if( m_SpecialToolVecData.Type != ESpecialToolVecType.Normal ) {
+				ClearToolVecModify();
+			}
+			CAMFactorChanged?.Invoke();
+		}
+
 		// API for outside modification
 		public void ChangeToolVecModify( int index, double dRA_deg, double dRB_deg, double master_deg, double slave_deg )
 		{
@@ -367,7 +437,6 @@ namespace MyCAM.Data
 			}
 			ToolVecAngleData angleData = new ToolVecAngleData( dRA_deg, dRB_deg, master_deg, slave_deg );
 			m_ToolVecModifyMap[ index ] = new ToolVecModifyData( angleData, m_ToolVecModifyMap[ index ].InterpolateType );
-			CAMFactorChanged?.Invoke();
 		}
 
 		public void AddToolVecModify( int index, double dRA_deg, double dRB_deg, double master_deg, double slave_deg, EToolVecInterpolateType interpolateType = EToolVecInterpolateType.Normal )
@@ -377,7 +446,6 @@ namespace MyCAM.Data
 			}
 			ToolVecAngleData angleData = new ToolVecAngleData( dRA_deg, dRB_deg, master_deg, slave_deg );
 			m_ToolVecModifyMap.Add( index, new ToolVecModifyData( angleData, interpolateType ) );
-			CAMFactorChanged?.Invoke();
 		}
 
 		public void RemoveCtrlPntAndTransInterpolation( int nPntIdx, int nNextIdx )
@@ -386,7 +454,6 @@ namespace MyCAM.Data
 				return;
 			}
 			m_ToolVecModifyMap.RemoveAndTransferInterpolation( nPntIdx, nNextIdx );
-			CAMFactorChanged?.Invoke();
 		}
 
 		public void RemoveCtrlPnt( int nPntIdx )
@@ -395,7 +462,6 @@ namespace MyCAM.Data
 				return;
 			}
 			m_ToolVecModifyMap.Remove( nPntIdx );
-			CAMFactorChanged?.Invoke();
 		}
 
 		public void SetInterpolationTypeAtPnt( int nCtrlPntIdx, EToolVecInterpolateType interpolateType )
@@ -435,6 +501,12 @@ namespace MyCAM.Data
 		{
 			m_ToolVecModifyMap.Clear();
 			StartPntToolVecData = new StartPntToolVecParam();
+			CAMFactorChanged?.Invoke();
+		}
+
+		public void ClearSpecialToolVecData()
+		{
+			m_SpecialToolVecData = new SpecialToolVecData();
 			CAMFactorChanged?.Invoke();
 		}
 
@@ -518,6 +590,7 @@ namespace MyCAM.Data
 			m_LeadData.PropertyChanged += SubParamChanged;
 			m_TraverseData.PropertyChanged += SubParamChanged;
 			m_StartPntToolVecData.PropertyChanged += SubParamChanged;
+			m_ToolVecModifyMap.PropertyChanged += SubParamChanged;
 		}
 
 		void SubParamChanged()
@@ -560,6 +633,7 @@ namespace MyCAM.Data
 		StartPntToolVecParam m_StartPntToolVecData = new StartPntToolVecParam();
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
+		SpecialToolVecData m_SpecialToolVecData = new SpecialToolVecData();
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();
 		double m_CompensatedDistance = 0;
 		double m_InitMaster_rad = 0;

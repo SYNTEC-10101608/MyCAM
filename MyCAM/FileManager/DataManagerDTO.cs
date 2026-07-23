@@ -1112,6 +1112,12 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public SpecialToolVecDataDTO SpecialToolVecData
+		{
+			get;
+			set;
+		}
+
 		internal CraftDataDTO()
 		{
 		}
@@ -1136,6 +1142,9 @@ namespace MyCAM.FileManager
 							? new TraverseDataDTO( craftData.TraverseData )
 							: new TraverseDataDTO();
 			OverCutLength = craftData.OverCutLength;
+			SpecialToolVecData = craftData.SpecialToolVecData != null
+								? new SpecialToolVecDataDTO( craftData.SpecialToolVecData )
+								: new SpecialToolVecDataDTO();
 			MicroJointStartIdxDict = craftData.MicroJointStartIdxMap
 				.Select( kvp => new MicroJointItemDTO { Index = kvp.Key, Value = kvp.Value } )
 				.ToList();
@@ -1179,10 +1188,11 @@ namespace MyCAM.FileManager
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion );
 			Dictionary<int, double> microJointStartIdxMap = BuildMicroJointIdxMap();
 			StartPntToolVecParam startPntToolVecParam = BuildStartPntToolVecParam( sourceMap_OldVersion, IsPathReverse.Value );
+			SpecialToolVecData specialToolVecData = BuildSpecialToolVecData();
 			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value,
 																 leadData, OverCutLength.Value, toolVecModifyMap,
 																 startPntToolVecParam, IsToolVecReverse.Value, traverseData, contourEditMap,
-																 microJointStartIdxMap );
+																 microJointStartIdxMap, specialToolVecData );
 
 			// old version may have start/end point in ToolVecModifyMap, those are move to StartPntToolVecData
 			RemoveOldMapStartEndPoint( craftData );
@@ -1328,8 +1338,75 @@ namespace MyCAM.FileManager
 			return MicroJointStartIdxDict?.ToDictionary( item => item.Index, item => item.Value ) ?? new Dictionary<int, double>();
 		}
 
+		SpecialToolVecData BuildSpecialToolVecData()
+		{
+			return SpecialToolVecData != null? SpecialToolVecData.ToSpecialToolVecData(): new SpecialToolVecData();
+		}
+
 		const int DEFAULT_TECH_LAYER = 1;
 		const int LAST_POINT_INDEX = -1;
+	}
+
+	public class SpecialToolVecDataDTO
+	{
+		public ESpecialToolVecType? Type
+		{
+			get;
+			set;
+		}
+
+		public bool? IsAxisOptimized
+		{
+			get;
+			set;
+		}
+
+		public double? MasterAngle_deg
+		{
+			get;
+			set;
+		}
+
+		public double? SlaveAngle_deg
+		{
+			get;
+			set;
+		}
+
+		internal SpecialToolVecDataDTO()
+		{
+		}
+
+		internal SpecialToolVecDataDTO( SpecialToolVecData data )
+		{
+			if( data == null ) {
+				return;
+			}
+			Type = data.Type;
+			MasterAngle_deg = data.MasterAngle_deg;
+			SlaveAngle_deg = data.SlaveAngle_deg;
+		}
+
+		internal SpecialToolVecData ToSpecialToolVecData()
+		{
+			bool isHasAnyValue = Type.HasValue || IsAxisOptimized.HasValue ||
+						  MasterAngle_deg.HasValue || SlaveAngle_deg.HasValue;
+
+			// no node in XML (old file without SpecialToolVecData), return default
+			if( !isHasAnyValue ) {
+				return new SpecialToolVecData();
+			}
+
+			if( !Type.HasValue ||
+				!MasterAngle_deg.HasValue || !SlaveAngle_deg.HasValue ) {
+				throw new ArgumentException( "TraverseData deserialization failed." );
+			}
+			return new SpecialToolVecData(
+				Type.Value,
+				MasterAngle_deg.Value,
+				SlaveAngle_deg.Value
+			);
+		}
 	}
 
 	public class TraverseDataDTO

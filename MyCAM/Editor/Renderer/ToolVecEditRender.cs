@@ -21,10 +21,19 @@ namespace MyCAM.Editor.Renderer
 		readonly Dictionary<string, AIS_Shape> m_OriginalPathAISDict = new Dictionary<string, AIS_Shape>();
 		List<string> m_PathIDList = new List<string>();
 
-		public ToolVecEditRender( Viewer viewer, DataManager dataManager, List<string> pathIDList )
+		public ToolVecEditRender( Viewer viewer, DataManager dataManager, List<string> pathIDList, bool isForSpecialToolVecEdit = false )
 			: base( viewer, dataManager )
 		{
 			m_PathIDList = pathIDList;
+			if( isForSpecialToolVecEdit ) {
+				m_RenderType = RenderType.SpecialToolVecEdit;
+			}
+		}
+
+		public enum RenderType
+		{
+			ToolVecEdit,
+			SpecialToolVecEdit
 		}
 
 		public override void Show( bool bUpdate = false )
@@ -134,8 +143,16 @@ namespace MyCAM.Editor.Renderer
 
 		void BuildAndDisplayToolVec( List<string> pathIDList, gp_Trsf trsf )
 		{
-			// build tool vec using shared helper
-			Dictionary<string, List<AIS_Line>> built = ToolVecAndPathVisibleHelper.BuildToolVecAISDict( pathIDList, trsf );
+			Dictionary<string, List<AIS_Line>> built = new Dictionary<string, List<AIS_Line>>();
+			if( m_RenderType == RenderType.ToolVecEdit ) {
+				
+				// build tool vec using shared helper
+				built = ToolVecAndPathVisibleHelper.BuildToolVecAISDict( pathIDList, trsf );
+
+			}
+			else {
+				built = ToolVecAndPathVisibleHelper.BuildSpecialToolVecAISDict( pathIDList, trsf );
+			}
 			foreach( var kvp in built ) {
 				m_ToolVecAISDict.Add( kvp.Key, kvp.Value );
 			}
@@ -158,6 +175,10 @@ namespace MyCAM.Editor.Renderer
 
 		void BuildAndDisplayPath( List<string> pathIDList, gp_Trsf trsf )
 		{
+			// special tool vec edit mode does not render paths
+			if( m_RenderType == RenderType.SpecialToolVecEdit ) {
+				return;
+			}
 			// render each path
 			foreach( string pathID in pathIDList ) {
 				IReadOnlyList<gp_Pnt> pointList = ToolVecAndPathVisibleHelper.GetMainPathPointList( pathID );
@@ -286,5 +307,7 @@ namespace MyCAM.Editor.Renderer
 		}
 
 		#endregion
+
+		RenderType m_RenderType = RenderType.ToolVecEdit;
 	}
 }

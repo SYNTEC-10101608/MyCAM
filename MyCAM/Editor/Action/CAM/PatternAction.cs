@@ -5,7 +5,6 @@ using MyCAM.Helper;
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.gp;
-using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -56,16 +55,27 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 			IStdPatternGeomData standardPatternGeomData = ( m_GeomData is IStdPatternGeomData ) ? (IStdPatternGeomData)m_GeomData.Clone() : null;
-			PatternSettingDlg patternFrom = new PatternSettingDlg( standardPatternGeomData );
-			patternFrom.Confirm += ConfirmPatternSetting;
-			patternFrom.Preview += PreviewPatternSetting;
-			patternFrom.Cancel += CancelPatternSetting;
-			patternFrom.Show( MyApp.MainForm );
+			m_Dlg = new PatternSettingDlg( standardPatternGeomData );
+			m_Dlg.Confirm = ConfirmPatternSetting;
+			m_Dlg.Preview = PreviewPatternSetting;
+			m_Dlg.Cancel = CancelPatternSetting;
+			m_Dlg.Show( MyApp.MainForm );
 		}
 
 		public override void End()
 		{
+			if( m_IsConfirmed == false ) {
+				PatternRestore();
+				PropertyChanged?.Invoke( m_BackFirstPathType, m_szPathIDList );
+			}
 			RemoveTrihedron();
+			if( m_Dlg != null ) {
+				m_Dlg.Preview = null;
+				m_Dlg.Confirm = null;
+				m_Dlg.Cancel = null;
+				m_Dlg.Close();
+				m_Dlg = null;
+			}
 			base.End();
 		}
 
@@ -81,13 +91,12 @@ namespace MyCAM.Editor
 			PatternCreate( standardPatternGeomData );
 			PathType pathType = ( standardPatternGeomData == null ) ? PathType.Contour : standardPatternGeomData.PathType;
 			PropertyChanged?.Invoke( pathType, m_szPathIDList );
+			m_IsConfirmed = true;
 			End();
 		}
 
 		void CancelPatternSetting()
 		{
-			PatternRestore();
-			PropertyChanged?.Invoke( m_BackFirstPathType, m_szPathIDList );
 			End();
 		}
 
@@ -382,5 +391,7 @@ namespace MyCAM.Editor
 		PathType m_BackFirstPathType;
 		Dictionary<string, PathObject> m_BackUpPathObjectList = new Dictionary<string, PathObject>();
 		Dictionary<string, IGeomData> m_BackUpGeomDataList = new Dictionary<string, IGeomData>();
+		PatternSettingDlg m_Dlg;
+		bool m_IsConfirmed = false;
 	}
 }

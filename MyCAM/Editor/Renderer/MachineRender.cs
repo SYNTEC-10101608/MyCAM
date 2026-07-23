@@ -110,6 +110,7 @@ namespace MyCAM.Editor.Renderer
 					}
 				}
 			}
+			Show();
 		}
 
 		public override void Remove( bool bUpdate = false )

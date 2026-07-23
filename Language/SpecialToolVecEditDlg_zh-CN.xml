@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="FormTitle" Content="孔姿态" />
+    <Message ID="m_gbxType" Content="孔姿态类型" />
+    <Message ID="m_rbtNormal" Content="默认" />
+    <Message ID="m_rbtnFixDir" Content="平均法向切割" />
+    <Message ID="m_rbtnZ" Content="朝Z" />
+    <Message ID="m_rbtnAssignMS" Content="锁轴切割" />
+    <Message ID="m_gbxMSDeg" Content="起点旋转轴角度" />
+    <Message ID="m_gbxCRotate" Content="主轴方向调整" />
+    <Message ID="m_gbxSwitchDir" Content="转至默认角度" />
+    <Message ID="m_btnZ" Content="转至朝Z" />
+    <Message ID="m_btnFixDir" Content="转至曲面法向" />
+    <Message ID="m_lblMDeg_Format" Content="{0}轴旋转角度" />
+    <Message ID="m_lblSDeg_Format" Content="{0}轴旋转角度" />
+    <Message ID="m_btnConfirm" Content="完成" />
+</ResMap>

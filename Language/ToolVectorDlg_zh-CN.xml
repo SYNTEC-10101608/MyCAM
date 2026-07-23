@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
-	<Message ID="ToolVectorDlg" Content="姿态调适" />
+	<Message ID="ToolVectorDlg" Content="飞边姿态" />
 	<Message ID="m_lblOnePntToolVecAdjust" Content="单点姿态信息" />
 	<Message ID="m_lblADeg" Content="前倾角" />
 	<Message ID="m_lblBDeg" Content="侧倾角" />

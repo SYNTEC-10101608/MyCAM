@@ -99,25 +99,61 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
+
+		public void ShowTrans( gp_Trsf trsf, bool bUpdate = false )
+		{
+			ShowTrans( m_DataManager.PathIDList, trsf, bUpdate );
+		}
+
+		public void ShowTrans( List<string> pathIDList, gp_Trsf trsf, bool bUpdate = false )
+		{
+			// paused, do not rebuild or display
+			if( m_IsPauseRefreshAndHide ) {
+				return;
+			}
+			List<string> pathsToUpdate = GetPathsToUpdate( pathIDList );
+			Remove( pathsToUpdate );
+			if( !m_IsShow ) {
+				if( bUpdate ) {
+					UpdateView();
+				}
+				return;
+			}
+			ShowTraversePathWithTrans( pathsToUpdate, trsf );
+			ShowEntryAndExitWithTrans( trsf );
+			DisplayTraverseLines( pathsToUpdate );
+			if( bUpdate ) {
+				UpdateView();
+			}
+		}
+
 		public void Trans( gp_Trsf trsf, bool bUpdate = false )
 		{
+			// if no AIS objects exist, fall back to full rebuild
+			if( m_TraverseAISDict.Count == 0 && m_FrogLeapAISDict.Count == 0 ) {
+				ShowTrans( trsf, bUpdate );
+				return;
+			}
+
+			// update transform on existing traverse line AIS objects
 			foreach( var tra in m_TraverseAISDict ) {
 				List<AIS_Line> lineLIst = tra.Value;
 				foreach( AIS_Line line in lineLIst ) {
-					if( line != null ) {
+					if( line != null && trsf != null ) {
 						line.SetLocalTransformation( trsf );
 					}
 				}
 			}
-			foreach( string pathID in m_DataManager.PathIDList ) {
-				if( m_FrogLeapAISDict.ContainsKey( pathID ) ) {
-					foreach( AIS_Shape shapeAIS in m_FrogLeapAISDict[ pathID ] ) {
-						if( shapeAIS != null ) {
-							shapeAIS.SetLocalTransformation( trsf );
-						}
+
+			// update transform on existing frog leap AIS objects
+			foreach( var kvp in m_FrogLeapAISDict ) {
+				foreach( AIS_Shape shapeAIS in kvp.Value ) {
+					if( shapeAIS != null && trsf != null ) {
+						shapeAIS.SetLocalTransformation( trsf );
 					}
 				}
 			}
+
 			if( bUpdate ) {
 				UpdateView();
 			}
@@ -126,13 +162,18 @@ namespace MyCAM.Editor.Renderer
 		public void Reset( bool bUpdate = false )
 		{
 			gp_Trsf trsf = new gp_Trsf();
-			Trans( trsf, bUpdate );
+			ShowTrans( trsf, bUpdate );
 			if( bUpdate ) {
 				UpdateView();
 			}
 		}
 
 		void ShowTraversePath( List<string> pathIDList )
+		{
+			ShowTraversePathWithTrans( pathIDList, null );
+		}
+
+		void ShowTraversePathWithTrans( List<string> pathIDList, gp_Trsf trsf )
 		{
 			foreach( string currentPathID in pathIDList ) {
 				string previousPathID = GetPreviousPathIDInAllPaths( currentPathID );
@@ -166,22 +207,25 @@ namespace MyCAM.Editor.Renderer
 						arcAIS.SetTransparency( 1 );
 						Prs3d_LineAspect prs3D_LineAspect = new Prs3d_LineAspect( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ), Aspect_TypeOfLine.Aspect_TOL_DASH, 1 );
 						arcAIS.Attributes().SetWireAspect( prs3D_LineAspect );
+						if( trsf != null ) {
+							arcAIS.SetLocalTransformation( trsf );
+						}
 						frogLeapShapeList.Add( arcAIS );
 
 						// lift up
 						if( currentTraverseData.LiftUpDistance > 0 && result.PreviousPathEnd.Point != null ) {
-							AddOneLinearTraverse( traverseLineList, result.PreviousPathEnd.Point, result.LiftUpPoint.Point );
+							AddOneLinearTraverseWithTrans( traverseLineList, result.PreviousPathEnd.Point, result.LiftUpPoint.Point, trsf );
 						}
 
 						// cut down
 						if( currentTraverseData.CutDownDistance > 0 && result.CurrentPathStart.Point != null ) {
-							AddOneLinearTraverse( traverseLineList, result.CutDownPoint.Point, result.CurrentPathStart.Point );
+							AddOneLinearTraverseWithTrans( traverseLineList, result.CutDownPoint.Point, result.CurrentPathStart.Point, trsf );
 						}
 					}
 					else {
 						List<(gp_Pnt start, gp_Pnt end)> segments = GetTraverseLineSegments( result, currentTraverseData );
 						foreach( var seg in segments ) {
-							AddOneLinearTraverse( traverseLineList, seg.start, seg.end );
+							AddOneLinearTraverseWithTrans( traverseLineList, seg.start, seg.end, trsf );
 						}
 					}
 				}
@@ -189,7 +233,7 @@ namespace MyCAM.Editor.Renderer
 				else {
 					List<(gp_Pnt start, gp_Pnt end)> segments = GetTraverseLineSegments( result, currentTraverseData );
 					foreach( var seg in segments ) {
-						AddOneLinearTraverse( traverseLineList, seg.start, seg.end );
+						AddOneLinearTraverseWithTrans( traverseLineList, seg.start, seg.end, trsf );
 					}
 				}
 
@@ -204,6 +248,11 @@ namespace MyCAM.Editor.Renderer
 
 		void ShowEntryAndExit()
 		{
+			ShowEntryAndExitWithTrans( null );
+		}
+
+		void ShowEntryAndExitWithTrans( gp_Trsf trsf )
+		{
 			if( m_DataManager.PathIDList.Count == 0 ) {
 				return;
 			}
@@ -216,7 +265,7 @@ namespace MyCAM.Editor.Renderer
 					IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
 					if( entryPoint != null ) {
 						List<AIS_Line> entryLineList = new List<AIS_Line>();
-						AddOneLinearTraverse( entryLineList, entryPoint.Point, firstPathStartPoint.Point );
+						AddOneLinearTraverseWithTrans( entryLineList, entryPoint.Point, firstPathStartPoint.Point, trsf );
 						m_TraverseAISDict[ KEY_ENTRY ] = entryLineList;
 					}
 				}
@@ -230,7 +279,7 @@ namespace MyCAM.Editor.Renderer
 					IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
 					if( exitPoint != null ) {
 						List<AIS_Line> exitLineList = new List<AIS_Line>();
-						AddOneLinearTraverse( exitLineList, lastPathEndPoint.Point, exitPoint.Point );
+						AddOneLinearTraverseWithTrans( exitLineList, lastPathEndPoint.Point, exitPoint.Point, trsf );
 						m_TraverseAISDict[ KEY_EXIT ] = exitLineList;
 					}
 				}
@@ -348,7 +397,15 @@ namespace MyCAM.Editor.Renderer
 
 		void AddOneLinearTraverse( List<AIS_Line> lineList, gp_Pnt startPnt, gp_Pnt endPnt )
 		{
+			AddOneLinearTraverseWithTrans( lineList, startPnt, endPnt, null );
+		}
+
+		void AddOneLinearTraverseWithTrans( List<AIS_Line> lineList, gp_Pnt startPnt, gp_Pnt endPnt, gp_Trsf trsf )
+		{
 			AIS_Line traverseAIS = DrawHelper.GetLineAIS( startPnt, endPnt, Quantity_NameOfColor.Quantity_NOC_RED, 1, true );
+			if( trsf != null ) {
+				traverseAIS.SetLocalTransformation( trsf );
+			}
 			lineList.Add( traverseAIS );
 		}
 

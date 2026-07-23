@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
-	public partial class AxisTransformDlg : Form
+	public partial class AxisTransformDlg : FormBase
 	{
 		internal Action<decimal, EAxisTransformDirection> Displace;
 		internal Action<decimal, EAxisTransformDirection> Rotate;

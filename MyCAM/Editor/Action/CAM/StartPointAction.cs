@@ -139,7 +139,7 @@ namespace MyCAM.Editor
 
 		void OnPointIndexChanged( int nIndex, TopoDS_Shape selectedVertex )
 		{
-			m_CraftData.StartPointIndex = nIndex;
+			m_CraftData.SetStartPntIndex( nIndex );
 
 			// update coupler craft data
 			if( m_DataManager.ObjectMap[ m_CurrentPathID ] is StdPatternObjectBase stdPatternObject && stdPatternObject.GeomData != null ) {

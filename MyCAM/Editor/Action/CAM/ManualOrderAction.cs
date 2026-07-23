@@ -60,16 +60,13 @@ namespace MyCAM.Editor
 		{
 			// this end is triggered by other editor will need to close Dlg
 			if( m_OrderDialog != null && !m_OrderDialog.IsDisposed ) {
-
-				// unsubscribe events to avoid errors after dialog closed
-				m_OrderDialog.OrderModeChanged -= ChangeOrderMode;
-				m_OrderDialog.EnterKeyPressed -= HandleSequentialOrderEnter;
-				m_OrderDialog.MoveToTop -= MoveToTop;
-				m_OrderDialog.MoveUp -= () => MoveProcess( true );
-				m_OrderDialog.MoveDown -= () => MoveProcess( false );
-				m_OrderDialog.Cancel -= End;
-				m_OrderDialog.Confirm -= End;
-
+				m_OrderDialog.OrderModeChanged = null;
+				m_OrderDialog.EnterKeyPressed = null;
+				m_OrderDialog.MoveToTop = null;
+				m_OrderDialog.MoveUp = null;
+				m_OrderDialog.MoveDown = null;
+				m_OrderDialog.Cancel = null;
+				m_OrderDialog.Confirm = null;
 				m_OrderDialog.CloseDialog();
 				m_OrderDialog.Dispose();
 				m_OrderDialog = null;
