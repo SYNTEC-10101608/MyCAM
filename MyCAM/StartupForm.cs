@@ -40,10 +40,10 @@ namespace MyCAM
 
 #if !DEBUG
 			if( FALicenseChecker.LicenseChecker.IsLicenseActivated() == false ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_LicenseInvalid", LOG_LICENSE_INVALID ), MyApp.NoticeType.Error );
 				Environment.Exit( 0 );
 			}
 #endif
+
 			// need to init befor myapp because myapp will use LogPanel
 			InitializeComponent();
 

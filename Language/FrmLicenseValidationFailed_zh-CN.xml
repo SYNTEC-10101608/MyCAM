@@ -8,4 +8,6 @@
   <Message ID="Hint_LicenseFileInvalid" Content="授权数据已损坏或遭篡改，无法完成验证" />
   <Message ID="Hint_MachineMismatch" Content="此授权已绑定至其他电脑，检测到本机硬件识别与授权不符" />
   <Message ID="Hint_VersionMismatch" Content="当前软件版本不符合授权要求" />
+  <Message ID="Hint_CheckerVersionMismatch" Content="授权档版号不符" />
+  <Message ID="Hint_LicenseExpired" Content="授权已过期，请重新申请或联系支持" />
 </ResMap>

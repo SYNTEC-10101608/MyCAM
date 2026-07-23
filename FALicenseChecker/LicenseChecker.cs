@@ -33,6 +33,7 @@ namespace FALicenseChecker
 
 	public static partial class LicenseChecker
 	{
+		const string LICENSE_CHECKER_VERSION = "1";
 		const string REQUEST_FILE_NAME = "ActivationRequest.txt";
 		const string LICENSE_FILE_NAME = "License.key";
 
@@ -51,6 +52,7 @@ namespace FALicenseChecker
 		const string ERROR_ENTRY_ASSEMBLY_NULL = "無法取得執行組件資訊（產生請求）";
 		const string ERROR_PRODUCT_EMPTY = "產品名稱為空（產生請求）";
 		const string ERROR_VERSION_EMPTY = "版本資訊為空（產生請求）";
+		const string ERROR_MACHINE_INFO_NOT_ENOUGH = "機器資訊不足（產生請求）";
 		const string INFO_ACTIVATION_REQUEST_GENERATED = "授權請求已產生：\n{0}";
 		const string INFO_ACTIVATION_REQUEST_TITLE = "授權請求";
 		const string ERROR_IS_LICENSE_ACTIVATED_EXCEPTION = "授權檢查發生例外：\n{0}";
@@ -63,15 +65,26 @@ namespace FALicenseChecker
 		const string ERROR_PRODUCT_MISMATCH = "授權產品不符：授權為 {0}，目前為 {1}";
 		const string ERROR_MIN_VERSION_NOT_MET = "目前版本低於授權最小版本：最小 {0}，目前 {1}";
 		const string ERROR_MAX_VERSION_EXCEEDED = "目前版本超過授權最大版本：最大 {0}，目前 {1}";
+		const string ERROR_LICENSE_EXPIRED = "授權已過期：到期日 {0}（UTC），目前 {1}（UTC）";
+		const string ERROR_EXPIRE_DATE_INVALID = "授權到期日格式錯誤：{0}";
 		const string ERROR_LICENSE_CODE_EMPTY = "授權碼為空";
 		const string ERROR_LICENSE_CODE_NO_SIGNATURE = "授權碼缺少簽章";
 
 		static readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "LicenseChecker" );
 
-		static bool ActivateLicense()
+		static readonly HashSet<string> s_InvalidHardwareValues = new System.Collections.Generic.HashSet<string>( System.StringComparer.OrdinalIgnoreCase )
+		{
+			"Default string",
+			"To Be Filled By O.E.M.",
+			"N/A",
+			"None",
+			"Unknown"
+		};
+
+		static bool ActivateLicense( OldLicenseInfo? oldLicenseInfo = null )
 		{
 			// License file does not exist.
-			GenerateActivationRequest();
+			GenerateActivationRequest( oldLicenseInfo );
 			FrmLicenseActivation frmLicenseActivation = new FrmLicenseActivation();
 			if( frmLicenseActivation.ShowDialog() != DialogResult.OK ) {
 				return false;
@@ -100,7 +113,7 @@ namespace FALicenseChecker
 						m_LanguageManager.TryGetString( "Error_Title", ERROR_TITLE ),
 						MessageBoxButtons.OK, MessageBoxIcon.Error );
 				return HandleLicenseValidationFailure( FrmLicenseValidationFailed.EButtonShowMode.RestartActivation, FrmLicenseValidationFailed.EHintID.LicenseFileInvalid );
-				}
+			}
 
 			// Parse license file into key-value pairs and extract signature.
 			if( !TryParseLicenseFile( lines, out Dictionary<string, string> keyValue, out List<string> orderedDataLines, out string szSignature ) ) {
@@ -169,8 +182,8 @@ namespace FALicenseChecker
 						m_LanguageManager.TryGetString( "Error_LicenseFileNoSignature", ERROR_LICENSE_FILE_NO_SIGNATURE ),
 						m_LanguageManager.TryGetString( "Error_Title", ERROR_TITLE ),
 						MessageBoxButtons.OK, MessageBoxIcon.Error );
-					return false;
-				}
+				return false;
+			}
 
 			return true;
 		}
@@ -184,13 +197,16 @@ namespace FALicenseChecker
 						m_LanguageManager.TryGetString( "Error_Title", ERROR_TITLE ),
 						MessageBoxButtons.OK, MessageBoxIcon.Error );
 				return HandleLicenseValidationFailure( FrmLicenseValidationFailed.EButtonShowMode.RestartActivation, FrmLicenseValidationFailed.EHintID.LicenseFileInvalid );
-				}
+			}
 
 			if( szCustomer == "SyntecRD" ) {
 				return true;
 			}
 
-			// Validate HWID.
+			// check version
+			if( !keyValue.TryGetValue( "LicenseCheckerVersion", out string szOldChckerVersion ) || !szOldChckerVersion.Equals( LICENSE_CHECKER_VERSION, System.StringComparison.OrdinalIgnoreCase ) ) {
+				return HandleLicenseValidationFailure( FrmLicenseValidationFailed.EButtonShowMode.RestartActivation, FrmLicenseValidationFailed.EHintID.CheckerVersionMismatch );
+			}
 			if( !IsHwidMatchCurrentMachineHash( szHwid ) ) {
 				return HandleLicenseValidationFailure( FrmLicenseValidationFailed.EButtonShowMode.RestartActivation, FrmLicenseValidationFailed.EHintID.MachineMismatch );
 			}
@@ -229,15 +245,64 @@ namespace FALicenseChecker
 						string.Format( m_LanguageManager.TryGetString( "Error_MinVersionNotMet", ERROR_MIN_VERSION_NOT_MET ), minVersion, asmName.Version ),
 						m_LanguageManager.TryGetString( "Error_Title", ERROR_TITLE ),
 						MessageBoxButtons.OK, MessageBoxIcon.Error );
-				return HandleLicenseValidationFailure( FrmLicenseValidationFailed.EButtonShowMode.RestartActivation, FrmLicenseValidationFailed.EHintID.VersionMismatch );
+				return HandleLicenseValidationFailure( FrmLicenseValidationFailed.EButtonShowMode.RestartActivation, FrmLicenseValidationFailed.EHintID.CADCAMVersionMismatch );
 			}
 			if( System.Version.TryParse( szMaxVersion, out System.Version maxVersion ) && asmName.Version > maxVersion ) {
 				MessageBox.Show(
 						string.Format( m_LanguageManager.TryGetString( "Error_MaxVersionExceeded", ERROR_MAX_VERSION_EXCEEDED ), maxVersion, asmName.Version ),
 						m_LanguageManager.TryGetString( "Error_Title", ERROR_TITLE ),
 						MessageBoxButtons.OK, MessageBoxIcon.Error );
-				return HandleLicenseValidationFailure( FrmLicenseValidationFailed.EButtonShowMode.RestartActivation, FrmLicenseValidationFailed.EHintID.VersionMismatch );
+				return HandleLicenseValidationFailure( FrmLicenseValidationFailed.EButtonShowMode.RestartActivation, FrmLicenseValidationFailed.EHintID.CADCAMVersionMismatch );
 			}
+			if( !ValidateExpireDateUtc( keyValue ) ) {
+				return false;
+			}
+			return true;
+		}
+
+		static bool ValidateExpireDateUtc( Dictionary<string, string> keyValue )
+		{
+			// get node
+			if( !keyValue.TryGetValue( "ExpireDateUtc", out string szExpireDateUtc ) ) {
+				MessageBox.Show(
+						m_LanguageManager.TryGetString( "Error_LicenseMissingFields", ERROR_LICENSE_MISSING_FIELDS ),
+						m_LanguageManager.TryGetString( "Error_Title", ERROR_TITLE ),
+						MessageBoxButtons.OK, MessageBoxIcon.Error );
+				return HandleLicenseValidationFailure( FrmLicenseValidationFailed.EButtonShowMode.RestartActivation, FrmLicenseValidationFailed.EHintID.LicenseFileInvalid );
+			}
+
+			// no expire date means no expiration
+			if( string.IsNullOrWhiteSpace( szExpireDateUtc ) ) {
+				return true;
+			}
+
+			// check time format
+			string[] expireDateFormats = new[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd" };
+			if( !System.DateTime.TryParseExact( szExpireDateUtc.Trim(), expireDateFormats,
+					System.Globalization.CultureInfo.InvariantCulture,
+					System.Globalization.DateTimeStyles.AssumeUniversal | System.Globalization.DateTimeStyles.AdjustToUniversal,
+					out System.DateTime expireDateUtc ) ) {
+				// The field exists but the value cannot be interpreted as a valid date/time.
+				MessageBox.Show(
+						string.Format( m_LanguageManager.TryGetString( "Error_ExpireDateInvalid", ERROR_EXPIRE_DATE_INVALID ), szExpireDateUtc ),
+						m_LanguageManager.TryGetString( "Error_Title", ERROR_TITLE ),
+						MessageBoxButtons.OK, MessageBoxIcon.Error );
+				return HandleLicenseValidationFailure( FrmLicenseValidationFailed.EButtonShowMode.RestartActivation, FrmLicenseValidationFailed.EHintID.LicenseFileInvalid );
+			}
+
+			// compare against the current UTC time to avoid time-zone dependent behavior.
+			System.DateTime nowUtc = System.DateTime.UtcNow;
+			if( nowUtc > expireDateUtc ) {
+
+				//license has expired
+				MessageBox.Show(
+						string.Format( m_LanguageManager.TryGetString( "Error_LicenseExpired", ERROR_LICENSE_EXPIRED ), expireDateUtc.ToString( "yyyy-MM-dd HH:mm:ss" ), nowUtc.ToString( "yyyy-MM-dd HH:mm:ss" ) ),
+						m_LanguageManager.TryGetString( "Error_Title", ERROR_TITLE ),
+						MessageBoxButtons.OK, MessageBoxIcon.Error );
+				return HandleLicenseValidationFailure( FrmLicenseValidationFailed.EButtonShowMode.RestartActivation, FrmLicenseValidationFailed.EHintID.LicenseExpired );
+			}
+
+			// time its valid
 			return true;
 		}
 
@@ -247,7 +312,20 @@ namespace FALicenseChecker
 			frmLicenseValidationFailed.ShowDialog( mode, hint );
 			if( frmLicenseValidationFailed.DialogResult == DialogResult.Retry ) {
 				if( mode == FrmLicenseValidationFailed.EButtonShowMode.RestartActivation ) {
+
+					//  get old license info before deleting
+					OldLicenseInfo? oldLicenseInfo = null;
+					if( IsLicenseFileExists() ) {
+						List<string> lines = ReadLicenseFile();
+						if( lines != null && TryParseLicenseFile( lines, out Dictionary<string, string> keyValue, out List<string> _, out string _ ) ) {
+							if( TryGetOldLicenseInfo( keyValue, out OldLicenseInfo info ) ) {
+								info.RenewalReason = hint.ToString();
+								oldLicenseInfo = info;
+							}
+						}
+					}
 					DeleteLicenseFile();
+					return ActivateLicense( oldLicenseInfo );
 				}
 				return IsLicenseActivated();
 			}
@@ -269,7 +347,7 @@ namespace FALicenseChecker
 						m_LanguageManager.TryGetString( "Error_Title", ERROR_TITLE ),
 						MessageBoxButtons.OK, MessageBoxIcon.Error );
 				return false;
-				}
+			}
 
 			try {
 				byte[] bytes = System.Convert.FromBase64String( szLicenseCode.Trim() );
@@ -284,7 +362,7 @@ namespace FALicenseChecker
 							m_LanguageManager.TryGetString( "Error_LicenseCodeNoSignature", ERROR_LICENSE_CODE_NO_SIGNATURE ),
 							m_LanguageManager.TryGetString( "Error_Title", ERROR_TITLE ),
 							MessageBoxButtons.OK, MessageBoxIcon.Error );
-						return false;
+					return false;
 				}
 
 				// ensure directory exists before writing license file
@@ -326,11 +404,14 @@ namespace FALicenseChecker
 
 		static bool IsHwidMatchCurrentMachineHash( string szHwid )
 		{
-			string szCurrentHash = ComputeMachineFingerprintHash( out string _ );
-			return string.Equals( szHwid, szCurrentHash, System.StringComparison.OrdinalIgnoreCase );
+			bool bSuccess = ComputeMachineFingerprintHash( out string szRawDetail, out string MachineHash, out _ );
+			if( bSuccess == false ) {
+				return false;
+			}
+			return string.Equals( szHwid, MachineHash, System.StringComparison.OrdinalIgnoreCase );
 		}
 
-		static void GenerateActivationRequest()
+		static void GenerateActivationRequest( OldLicenseInfo? oldLicenseInfo = null )
 		{
 			Assembly entry = Assembly.GetEntryAssembly();
 			if( entry == null ) {
@@ -362,15 +443,27 @@ namespace FALicenseChecker
 
 			string szBaseDir = System.AppDomain.CurrentDomain.BaseDirectory;
 			string szReqPath = Path.Combine( szBaseDir, REQUEST_FILE_NAME );
-			string szMachineHash = ComputeMachineFingerprintHash( out string szRawDetail );
+			bool isGetHashDone = ComputeMachineFingerprintHash( out string szRawDetail, out string szMachineHash, out string szScore );
 
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.AppendLine( $"RequestId={System.Guid.NewGuid():N}" );
 			stringBuilder.AppendLine( $"Product={szProduct}" );
 			stringBuilder.AppendLine( $"Version={szVersion}" );
+			stringBuilder.AppendLine( $"LicenseCheckerVersion={LICENSE_CHECKER_VERSION}" );
 			stringBuilder.AppendLine( $"FingerprintRaw={szRawDetail}" );
 			stringBuilder.AppendLine( $"MachineHash={szMachineHash}" );
+			stringBuilder.AppendLine( $"Score={szScore}" );
 			stringBuilder.AppendLine( $"RequestTimeUTC={System.DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}" );
+
+			if( oldLicenseInfo.HasValue ) {
+				OldLicenseInfo old = oldLicenseInfo.Value;
+				stringBuilder.AppendLine( $"OldLicenseCheckerVersion={old.LicenseCheckerVersion ?? string.Empty}" );
+				stringBuilder.AppendLine( $"OldCustomer={old.Customer ?? string.Empty}" );
+				stringBuilder.AppendLine( $"OldRequestTime={old.RequestTimeUTC ?? string.Empty}" );
+				stringBuilder.AppendLine( $"OldIssuedTime={old.IssueDateUTC ?? string.Empty}" );
+				stringBuilder.AppendLine( $"RenewalReason={old.RenewalReason ?? string.Empty}" );
+			}
+
 			File.WriteAllText( szReqPath, stringBuilder.ToString(), Encoding.UTF8 );
 
 			MessageBox.Show(
@@ -382,40 +475,71 @@ namespace FALicenseChecker
 		#region Get Machine Fingerprint and Hash
 
 		// Collect fingerprint and return its hash, also output the raw detail (rawDetail).
-		static string ComputeMachineFingerprintHash( out string szRawDetail )
+		static bool ComputeMachineFingerprintHash( out string szRawDetail, out string MachineHash, out string szScore )
 		{
+			MachineHash = string.Empty;
+			szScore = string.Empty;
+			const int MACHINE_FINGERPRINT_WEIGHT_BOARD_UUID = 35;
+			const int MACHINE_FINGERPRINT_WEIGHT_CPU = 25;
+			const int MACHINE_FINGERPRINT_WEIGHT_BASE_BOARD_SERIAL = 15;
+			const int MACHINE_FINGERPRINT_WEIGHT_BASE_BOARD = 10;
+			const int MACHINE_FINGERPRINT_WEIGHT_BIOS_SERIAL = 10;
+			const int MACHINE_FINGERPRINT_WEIGHT_DISK = 5;
+			const int MACHINE_FINGERPRINT_WEIGHT_THRESHOLD = 60;
+
 			var parts = new List<string>();
+			int weight = 0;
 
 			string uuid = GetWmiValue( "Win32_ComputerSystemProduct", "UUID" );
-			if( string.IsNullOrWhiteSpace( uuid ) == false ) {
-				parts.Add( "BoardUUID=" + uuid );
-			}
+			AppendHardwarePart( parts, ref weight, "BoardUUID", uuid, MACHINE_FINGERPRINT_WEIGHT_BOARD_UUID );
 
-			string baseBoard = GetWmiValue( "Win32_BaseBoard", "SerialNumber" );
-			if( string.IsNullOrWhiteSpace( baseBoard ) == false ) {
-				parts.Add( "BaseBoard=" + baseBoard );
-			}
+			string baseBoardSerial = GetWmiValue( "Win32_BaseBoard", "SerialNumber" );
+			AppendHardwarePart( parts, ref weight, "BaseBoardSerial", baseBoardSerial, MACHINE_FINGERPRINT_WEIGHT_BASE_BOARD_SERIAL );
+
+			string baseBoard = GetWmiValue( "Win32_BaseBoard", "Product" );
+			AppendHardwarePart( parts, ref weight, "BaseBoard", baseBoard, MACHINE_FINGERPRINT_WEIGHT_BASE_BOARD );
 
 			string cpuId = GetWmiValue( "Win32_Processor", "ProcessorId" );
-			if( string.IsNullOrWhiteSpace( cpuId ) == false ) {
-				parts.Add( "CPU=" + cpuId );
-			}
+			AppendHardwarePart( parts, ref weight, "CPU", cpuId, MACHINE_FINGERPRINT_WEIGHT_CPU );
+
+			string biosSerial = GetWmiValue( "Win32_BIOS", "SerialNumber" );
+			AppendHardwarePart( parts, ref weight, "BIOSSerial", biosSerial, MACHINE_FINGERPRINT_WEIGHT_BIOS_SERIAL );
 
 			string diskSerial = GetSystemDiskSerial();
-			if( string.IsNullOrWhiteSpace( diskSerial ) == false ) {
-				parts.Add( "Disk=" + diskSerial );
-			}
+			AppendHardwarePart( parts, ref weight, "Disk", diskSerial, MACHINE_FINGERPRINT_WEIGHT_DISK );
+			szScore = weight.ToString();
 
 			szRawDetail = string.Join( "|", parts );
-			const int MACHINE_FINGERPRINT_PARTS_REQUIRED = 4;
-			if( parts.Count != MACHINE_FINGERPRINT_PARTS_REQUIRED ) {
-				return string.Empty;
+			if( weight < MACHINE_FINGERPRINT_WEIGHT_THRESHOLD ) {
+				MessageBox.Show(
+					m_LanguageManager.TryGetString( "Error_Machine_Info_Lack", ERROR_MACHINE_INFO_NOT_ENOUGH ),
+					m_LanguageManager.TryGetString( "Error_Title", ERROR_TITLE ),
+					MessageBoxButtons.OK, MessageBoxIcon.Error );
+				return false;
 			}
 
 			using( var sha = SHA256.Create() ) {
 				var hash = sha.ComputeHash( Encoding.UTF8.GetBytes( szRawDetail ) );
 				var fullHex = System.BitConverter.ToString( hash ).Replace( "-", "" );
-				return fullHex.Substring( 0, 32 );
+				MachineHash = fullHex.Substring( 0, 32 );
+				return true;
+			}
+		}
+
+		static bool IsValidHardwareValue( string value )
+		{
+			return string.IsNullOrWhiteSpace( value ) == false
+				&& !s_InvalidHardwareValues.Contains( value );
+		}
+
+		static void AppendHardwarePart( List<string> parts, ref int weight, string key, string value, int partWeight )
+		{
+			if( string.IsNullOrWhiteSpace( value ) ) {
+				return;
+			}
+			if( IsValidHardwareValue( value ) ) {
+				weight += partWeight;
+				parts.Add( key + "=" + value );
 			}
 		}
 
@@ -448,6 +572,45 @@ namespace FALicenseChecker
 				}
 			}
 			return string.Empty;
+		}
+
+		#endregion
+
+		#region License Info
+
+		public struct OldLicenseInfo
+		{
+			public string IssueDateUTC;
+			public string RequestTimeUTC;
+			public string Customer;
+			public string LicenseCheckerVersion; // nullable
+			public string RenewalReason;         // nullable
+		}
+
+		public static bool TryGetOldLicenseInfo( Dictionary<string, string> keyValue, out OldLicenseInfo licenseInfo )
+		{
+			licenseInfo = new OldLicenseInfo();
+
+			if( !keyValue.TryGetValue( "IssueDateUTC", out string issueDateUTC ) || string.IsNullOrWhiteSpace( issueDateUTC ) ) {
+				return false;
+			}
+			if( !keyValue.TryGetValue( "RequestTimeUTC", out string requestTimeUTC ) || string.IsNullOrWhiteSpace( requestTimeUTC ) ) {
+				return false;
+			}
+			if( !keyValue.TryGetValue( "Customer", out string customer ) || string.IsNullOrWhiteSpace( customer ) ) {
+				return false;
+			}
+
+			keyValue.TryGetValue( "LicenseCheckerVersion", out string licenseCheckerVersion );
+
+			licenseInfo = new OldLicenseInfo
+			{
+				IssueDateUTC = issueDateUTC,
+				RequestTimeUTC = requestTimeUTC,
+				Customer = customer,
+				LicenseCheckerVersion = licenseCheckerVersion
+			};
+			return true;
 		}
 
 		#endregion
