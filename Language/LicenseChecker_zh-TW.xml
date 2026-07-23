@@ -18,6 +18,9 @@
   <Message ID="Error_EntryAssemblyNull_Request" Content="無法取得程式集資訊，無法產生啟動請求" />
   <Message ID="Error_ProductEmpty_Request" Content="產品名稱不得為空，無法產生啟動請求" />
   <Message ID="Error_VersionEmpty_Request" Content="版本號不得為空，無法產生啟動請求" />
+  <Message ID="Error_Machine_Info_Lack" Content="機器資訊不足，無法產生啟動請求" />
   <Message ID="Info_ActivationRequestGenerated" Content="授權啟動請求檔案產生於：&#10;{0}&#10;&#10;請將此檔案傳送給供應商以取得授權代碼。" />
   <Message ID="Info_ActivationRequestGeneratedTitle" Content="授權請求已產生" />
+  <Message ID="Error_LicenseExpired" Content="授權已過期：到期日 {0}（UTC），目前 {1}（UTC）" />
+  <Message ID="Error_ExpireDateInvalid" Content="授權到期日格式錯誤：{0}" />
 </ResMap>

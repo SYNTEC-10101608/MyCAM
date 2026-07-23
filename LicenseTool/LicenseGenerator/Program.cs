@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 
 namespace LicenseGenerator
 {
@@ -12,6 +14,24 @@ namespace LicenseGenerator
 			Console.WriteLine( "Needs existing ActivationRequest.txt in current directory" );
 			Console.WriteLine( "Type 'exit' to quit at any prompt" );
 			Console.WriteLine();
+
+			const string szRequestFile = "ActivationRequest.txt";
+			if( CheckRequestFileExists( szRequestFile ) == false ) {
+				return;
+			}
+
+			var reqDict = GenerateLicense.ParseKeyValueFile( szRequestFile );
+			if( CheckLicenseCheckerVersion( reqDict ) == false ) {
+				return;
+			}
+
+			if (CheckMachineMashIsNotEmpty( reqDict ) == false ) {
+				return;
+			}
+
+			PrintScore( reqDict );
+
+			PrintOldLicenseInfo( reqDict );
 
 			string szCustomer = PromptCustomer();
 			if( szCustomer == null ) {
@@ -44,7 +64,7 @@ namespace LicenseGenerator
 
 			try {
 				var result = GenerateLicense.Generate(
-					"ActivationRequest.txt",
+					szRequestFile,
 					szCustomer,
 					expireDateUtc,
 					szMinVer,
@@ -66,6 +86,66 @@ namespace LicenseGenerator
 			Console.WriteLine();
 			Console.WriteLine( "Press any key to exit..." );
 			Console.ReadKey();
+		}
+
+		static bool CheckRequestFileExists( string szRequestFile )
+		{
+			if( File.Exists( szRequestFile ) ) {
+				return true;
+			}
+			Console.WriteLine( $"Error: '{szRequestFile}' not found in current directory." );
+			Console.WriteLine();
+			Console.WriteLine( "Press any key to exit..." );
+			Console.ReadKey();
+			return false;
+		}
+
+		static bool CheckLicenseCheckerVersion( Dictionary<string, string> reqDict )
+		{
+			if( reqDict.TryGetValue( "LicenseCheckerVersion", out string szCheckerVersion ) && szCheckerVersion == "1" ) {
+				return true;
+			}
+			Console.WriteLine( "Error: ActivationRequest version is too old. License will not be issued." );
+			Console.WriteLine();
+			Console.WriteLine( "Press any key to exit..." );
+			Console.ReadKey();
+			return false;
+		}
+
+		static bool CheckMachineMashIsNotEmpty( Dictionary<string, string> reqDict )
+		{
+			if( reqDict.TryGetValue( "MachineHash", out string szMachineHash ) && ( szMachineHash != string.Empty || szMachineHash != null ) ) {
+				return true;
+			}
+			Console.WriteLine( "Error: Machine hash is empty." );
+			Console.WriteLine();
+			Console.WriteLine( "Press any key to exit..." );
+			Console.ReadKey();
+			return false;
+		}
+
+		static void PrintScore( Dictionary<string, string> reqDict )
+		{
+			if( reqDict.TryGetValue( "Score", out string szScore ) == false ) {
+				return;
+			}
+			Console.WriteLine( "=== Score ===" );
+			Console.WriteLine( $"Score: {szScore}" );
+			Console.WriteLine();
+		}
+
+		static void PrintOldLicenseInfo( Dictionary<string, string> reqDict )
+		{
+			if( GenerateLicense.TryReadOldLicenseInfo( reqDict, out string szOldCustomer, out string szOldLicenseCheckerVersion, out string szOldRequestTime, out string szOldIssuedTime, out string szRenewalReason ) == false ) {
+				return;
+			}
+			Console.WriteLine( "=== Old License Info ===" );
+			Console.WriteLine( $"OldCustomer: {szOldCustomer}" );
+			Console.WriteLine( $"OldLicenseCheckerVersion: {szOldLicenseCheckerVersion}" );
+			Console.WriteLine( $"OldRequestTime: {szOldRequestTime}" );
+			Console.WriteLine( $"OldIssuedTime: {szOldIssuedTime}" );
+			Console.WriteLine( $"RenewalReason: {szRenewalReason}" );
+			Console.WriteLine();
 		}
 
 		static string PromptCustomer()

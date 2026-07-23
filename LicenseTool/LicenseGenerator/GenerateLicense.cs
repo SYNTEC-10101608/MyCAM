@@ -33,6 +33,7 @@ namespace LicenseGenerator
 			string szFingerprintRaw = GetRequired( reqDict, "FingerprintRaw" );
 			string szMachineHash = GetRequired( reqDict, "MachineHash" );
 			string szRequestTimeUtc = GetRequired( reqDict, "RequestTimeUTC" );
+			string szLicenseCheckerVersion = GetRequired( reqDict, "LicenseCheckerVersion" );
 
 			// Will throw if invalid
 			IsActivationRequestValid( szProduct, szProductVersion, szRequestTimeUtc );
@@ -51,6 +52,7 @@ namespace LicenseGenerator
 			sb.AppendLine( $"MaxAppVersion={szMaxAppVersion ?? ""}" );
 			sb.AppendLine( $"RequestId={szRequestId}" );
 			sb.AppendLine( $"RequestTimeUTC={szRequestTimeUtc}" );
+			sb.AppendLine( $"LicenseCheckerVersion={szLicenseCheckerVersion}" );
 
 			string szBodyToSign = sb.ToString().TrimEnd();
 			string szSignature = SignBody( szBodyToSign );
@@ -89,14 +91,44 @@ namespace LicenseGenerator
 
 	internal static partial class GenerateLicense
 	{
+		internal static bool TryReadOldLicenseInfo( Dictionary<string, string> dict,
+													out string szOldCustomer,
+													out string szOldLicenseCheckerVersion,
+													out string szOldRequestTime,
+													out string szOldIssuedTime,
+													out string szRenewalReason )
+		{
+			dict.TryGetValue( "OldCustomer", out szOldCustomer );
+			dict.TryGetValue( "OldLicenseCheckerVersion", out szOldLicenseCheckerVersion );
+			dict.TryGetValue( "OldRequestTime", out szOldRequestTime );
+			dict.TryGetValue( "OldIssuedTime", out szOldIssuedTime );
+			dict.TryGetValue( "RenewalReason", out szRenewalReason );
+
+			return string.IsNullOrWhiteSpace( szOldCustomer ) == false ||
+				   string.IsNullOrWhiteSpace( szOldLicenseCheckerVersion ) == false ||
+				   string.IsNullOrWhiteSpace( szOldRequestTime ) == false ||
+				   string.IsNullOrWhiteSpace( szOldIssuedTime ) == false ||
+				   string.IsNullOrWhiteSpace( szRenewalReason ) == false;
+		}
+	}
+
+	internal static partial class GenerateLicense
+	{
 		const string PRIVATE_KEY_XML = "<RSAKeyValue><Modulus>zNT894WmvUZ/8pTV+8DK6giAjNhyMsBRuWpxetMPpOy6K9L3VqyZz5PbqzekKqOj0UUzZFmfQetut83wjiH3LOwBmmKXJZDP+P//4bJ5sgupLwklFlYtBfH6LpfZzgxL67jFY7nJGwhtUbw8iZdyVZls0FY03YKAwJKpl4PBq8jEGiRdrcK08SHMSsxjuts6Rp3YkZg1Qtk/z2xi6CLsoEHXuGW/aiZlFK0DLvcO6Eh4BQ5Ubw0KHZruRsSs2LNElyQLXN1OjRP4R8Mk/zpdosSrFjVF9OxhXaikxTCt4SVjl6MEEx8FgE759q8kqahxkwJuvPJ4ArAiZKSu4wuDIQ==</Modulus><Exponent>AQAB</Exponent><P>4qGM6KMqCRxEgnRv6q9atxAHiRO5rgfZ906E/uJ5xA0/b43jhSzTcl25IcjSoZb1qsRJUhkYu05DPHKi6DgTBcvi9J4gfJG/UHGmN/C1Gu+dAaXNs4OusZ1yqzf4Aw6ZCdNBHw2S04AxF0S95QIrVLX/botDytDHSDppEtX18Q8=</P><Q>52BByMcGpvJV2agmvfC2yDpMUv9u5cKFY57g1MsZb0cUxiLJ6LAoSNgbYyoo3XDTkj0zXEoPfZkvNB/uSfVvyWH5v9rkI2Nq94I15SSy1aPTsXq+C9QMpVqRrHGKdoCOS6XtQDwFhXZZpGS8dLqVGj6P/PHH2JzVgpO7VqXI6M8=</Q><DP>023t/JdEPy2dCKvCQYsIsaKFtS+u2Zo/kgYx82ysNug5F0SjT3orZhXkAo3NW61vUbo/wRTiytPPzFQSgVzW+mBlQttG6ZA7kLwGW0f4XcHPk1rw1hny34dJFE1p1shGpDDvHx5VrXV51wBtvHnSnPwR6jqIq20tjcfYgRcVlKc=</DP><DQ>iCfmzmYAjiGxT4JaOg/7H9zeqUDTW7WalUMbf119PDSSDv7N3nY7XpJ9m19l6NnKRxZosPiMIRcR5hScPz2FaPaU58fB1OleOwSO/qcX7gyYOKrIR2Gjh3LCor22A4InOnEMKm6nuSAqJEl7dR2PPIBwbyNAvUGdi1ewOI8aqZU=</DQ><InverseQ>VWNW4QO1nbzJOf23E/XDUK1apa74+hKkAq9804y+pSx0HnWKLBa3iOKR1lCUAyyCKAacTQNRkXn21YVUlRMJ6DC3QAjTRVkVU5gkGevOlijWEQ7mOO0iw6mupVC0N61eXpCIHYlOorxg62epU2gMfz57ZR4RSwIYIGTdGq5zgCI=</InverseQ><D>s5GtS5oBuUFK/fF5PsGfolhdyhwe0VtEyhYE8jaCKoXWGIFUkMmz9gSbuZiH9VGMVfQiv8DKG1I4uC50y0X/mYQ1S5FPDIHNsW9MdiKvCWWrpi6QMurNgb7HI33AViD1letgMLM5GNfkbpllQQJiG6TrfiF1KxQzp59rygaaDOvdaOQCpyIl4in2MKyuISflIzQBhR58IlBKVdSGUEKboXLsb3QpGmbikRieYhuB4L/pjpFrTlYFC0OoIAhZbCaJaAhApnLZbRhTmtqZV2VAcwWcBePevYO2p7DIYJHyEEd3PT/pDztfm09NhwXXOKWVVi9iE+1bRG22hZxiO9M7OQ==</D></RSAKeyValue>";
 
 		const string LICENSE_FILE_NAME = "license.key";
 
-		static Dictionary<string, string> ParseKeyValueFile( string szPath )
+		internal static Dictionary<string, string> ParseKeyValueFile( string szPath )
 		{
 			var dict = new Dictionary<string, string>( StringComparer.OrdinalIgnoreCase );
-			foreach( var line in File.ReadAllLines( szPath, Encoding.UTF8 ) ) {
+			string[] lines;
+			try {
+				lines = File.ReadAllLines( szPath, Encoding.UTF8 );
+			}
+			catch( Exception ex ) {
+				throw new InvalidDataException( $"Failed to read file '{szPath}': {ex.Message}", ex );
+			}
+			foreach( var line in lines ) {
 				if( string.IsNullOrWhiteSpace( line ) ) {
 					continue;
 				}

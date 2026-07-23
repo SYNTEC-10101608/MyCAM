@@ -52,45 +52,45 @@ namespace MyCAM
 				}
 				catch {
 
-							szErrorMessage = m_LanguageManager.TryGetString( "Error_ConnectionFailed", ERROR_CONNECTION_FAILED );
-							if( response != null ) {
-								response.Close();
-							}
-							return false;
-						}
-
-						byte[] fileContents = File.ReadAllBytes( szLocalFilePath );
-						uploadRequest.ContentLength = fileContents.Length;
-
-						using( Stream requestStream = uploadRequest.GetRequestStream() ) {
-							requestStream.Write( fileContents, 0, fileContents.Length );
-						}
-
-						// Get response
-						using( response = (FtpWebResponse)uploadRequest.GetResponse() ) {
-							if( response.StatusCode == FtpStatusCode.ClosingData ||
-								response.StatusCode == FtpStatusCode.FileActionOK ) {
-								return true;
-							}
-							else {
-								szErrorMessage = string.Format( m_LanguageManager.TryGetString( "Error_UploadFailed", ERROR_UPLOAD_FAILED ), response.StatusCode );
-								return false;
-							}
-						}
+					szErrorMessage = m_LanguageManager.TryGetString( "Error_ConnectionFailed", ERROR_CONNECTION_FAILED );
+					if( response != null ) {
+						response.Close();
 					}
-					catch( WebException webEx ) {
-						if( webEx.Response is FtpWebResponse ftpResponse ) {
-							szErrorMessage = ftpResponse.StatusDescription;
-						}
-						else {
-							szErrorMessage = string.Format( m_LanguageManager.TryGetString( "Error_NetworkError", ERROR_NETWORK_ERROR ), webEx.Message );
-						}
+					return false;
+				}
+
+				byte[] fileContents = File.ReadAllBytes( szLocalFilePath );
+				uploadRequest.ContentLength = fileContents.Length;
+
+				using( Stream requestStream = uploadRequest.GetRequestStream() ) {
+					requestStream.Write( fileContents, 0, fileContents.Length );
+				}
+
+				// Get response
+				using( response = (FtpWebResponse)uploadRequest.GetResponse() ) {
+					if( response.StatusCode == FtpStatusCode.ClosingData ||
+						response.StatusCode == FtpStatusCode.FileActionOK ) {
+						return true;
+					}
+					else {
+						szErrorMessage = string.Format( m_LanguageManager.TryGetString( "Error_UploadFailed", ERROR_UPLOAD_FAILED ), response.StatusCode );
 						return false;
 					}
-					catch( Exception ex ) {
-						szErrorMessage = string.Format( m_LanguageManager.TryGetString( "Error_UploadException", ERROR_UPLOAD_EXCEPTION ), ex.Message );
-						return false;
-					}
+				}
+			}
+			catch( WebException webEx ) {
+				if( webEx.Response is FtpWebResponse ftpResponse ) {
+					szErrorMessage = ftpResponse.StatusDescription;
+				}
+				else {
+					szErrorMessage = string.Format( m_LanguageManager.TryGetString( "Error_NetworkError", ERROR_NETWORK_ERROR ), webEx.Message );
+				}
+				return false;
+			}
+			catch( Exception ex ) {
+				szErrorMessage = string.Format( m_LanguageManager.TryGetString( "Error_UploadException", ERROR_UPLOAD_EXCEPTION ), ex.Message );
+				return false;
+			}
 		}
 	}
 }
