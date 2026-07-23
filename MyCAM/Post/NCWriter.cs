@@ -195,7 +195,7 @@ namespace MyCAM.Post
 			postData = null;
 			if( !ContourPostHelper.GetPostData( BuildPackageByID( m_PathIDList[ pathIndex ] ),
 				endInfo, m_EntryAndExitData, out postData, out endInfo ) ) {
-				errorMessage = "後處理運算錯誤，路徑：" + ( pathIndex + 1 ).ToString();
+				errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), pathIndex );
 				return false;
 			}
 			return true;
@@ -208,7 +208,7 @@ namespace MyCAM.Post
 			package = BuildPackageByID_StandardPattern( m_PathIDList[ pathIndex ] );
 			if( !StdPatternPostHelper.GetPostData( package, endInfo, m_EntryAndExitData,
 				out postData, out endInfo ) ) {
-				errorMessage = "後處理運算錯誤，路徑：" + ( pathIndex + 1 ).ToString();
+				errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), pathIndex );
 				return false;
 			}
 			return true;
@@ -368,5 +368,8 @@ namespace MyCAM.Post
 		}
 
 		#endregion
+
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "NCWriter" );
+		const string ERROR_POST_PROCESSING = "後處理運算錯誤，路徑：{0}";
 	}
 }
