@@ -385,7 +385,7 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		void ToolVecActionStartIO( bool isStart )
+		void ToolVecActionStartIO( bool isStart, bool isUpdatView = true )
 		{
 			if( isStart ) {
 				m_MachineRender.Show();
@@ -407,7 +407,9 @@ namespace MyCAM.Editor
 				m_CraftRenderer.Reset();
 				SetWorkPieceDisplayTransform( new gp_Trsf() );
 			}
-			m_Viewer.UpdateView();
+			if( isUpdatView ) {
+				m_Viewer.UpdateView();
+			}
 		}
 
 		void SetWorkPieceDisplayTransform( gp_Trsf trsf = null, bool isUnLockViewerUpdate = true )
@@ -483,61 +485,30 @@ namespace MyCAM.Editor
 				}
 
 				// toggle reverse state
-				craftData.IsToolVecReverse = !craftData.IsToolVecReverse;
+				craftData.SetToolVecReverse( !craftData.IsToolVecReverse );
 			}
 			ShowCAMData( szPathIDList );
 		}
 
-		// TODO: this is temp version
 		public void SetFixedToolVec()
 		{
-			// one shot edit, multi edit supported
-			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+			// action edit, no multi edit supported
+			if( IsSameAction( EditActionType.ToolVec ) ) {
+				m_CurrentAction.End();
 				return;
 			}
-			foreach( string szPathID in szPathIDList ) {
-				if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType )
-					|| pathType != PathType.Contour ) {
-					continue;
-				}
-				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData )
-					|| !DataGettingHelper.GetGeomDataByID( szPathID, out IGeomData geomData ) ) {
-					continue;
-				}
-
-				// clear all tool vec modify data
-				craftData.ClearToolVecModify();
-				craftData.StartPntToolVecData = new StartPntToolVecParam();
-
-				// get start point
-				ToolVecActionDataHandler dataHandler = new ToolVecActionDataHandler( szPathID );
-				ISetToolVecPoint startPoint = dataHandler.GetPointByCADIndex( dataHandler.GetStartPointCADIndex() );
-
-				// get averge tool vec
-				gp_Dir avgDir = ( geomData as ContourGeomData ).RefCenterDir.Direction();
-
-				// get ms angle
-				Tuple<double, double> avgMS_deg = ToolVecHelper.GetMSAngleFromToolVec( avgDir, startPoint );
-
-				// get ab angle
-				Tuple<double, double> avgAB_deg = ToolVecHelper.GetABAngleFromToolVec( avgDir, startPoint );
-
-				ToolVecAngleData Angle = new ToolVecAngleData()
-				{
-					RA_deg = avgAB_deg.Item1,
-					RB_deg = avgAB_deg.Item2,
-					Master_deg = avgMS_deg.Item1,
-					Slave_deg = avgMS_deg.Item2
-				};
-				if( craftData.IsPathReverse ) {
-					craftData.StartPntToolVecData.StartPnt = new ToolVecModifyData( Angle, EToolVecInterpolateType.VectorInterpolation );
-				}
-				else {
-					craftData.StartPntToolVecData.StartPnt = new ToolVecModifyData( Angle, EToolVecInterpolateType.Normal );
-					craftData.StartPntToolVecData.EndPnt.InterpolateType = EToolVecInterpolateType.VectorInterpolation;
-				}
+			EndActionIfNotDefault();
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
+				return;
 			}
-			ShowCAMData( szPathIDList );
+			SpecialToolVecEditAction action = new SpecialToolVecEditAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList, m_DefaultAction as SelectPathAction );
+			action.PropertyChanged += ShowCAMData;
+			action.RaiseTrans += SetTrans;
+			action.RaiseActionStart += ToolVecActionStartIO;
+			action.HideMachine += HideMachine;
+
+			// trigger translate machine
+			StartEditAction( action );
 		}
 
 		public void SetTraverseData()
@@ -978,6 +949,12 @@ namespace MyCAM.Editor
 			m_MachineRender.ShowToolVecEditResult( transMap );
 			ShowTransedCAMData( workPieceTrsf );
 			SetWorkPieceDisplayTransform( workPieceTrsf, isUnLockViewerUpdate );
+			m_Viewer.UpdateView();
+		}
+
+		void HideMachine()
+		{
+			m_MachineRender.Remove();
 			m_Viewer.UpdateView();
 		}
 

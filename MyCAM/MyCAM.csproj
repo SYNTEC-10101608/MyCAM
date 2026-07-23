@@ -77,6 +77,7 @@
       <DependentUpon>ConnectDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Data\Craft\CalibrationData.cs" />
+    <Compile Include="Data\Craft\SpecialToolVecData.cs" />
     <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
     <Compile Include="Editor\Action\CAD\GlassDXFImportAction.cs" />
     <Compile Include="Editor\Action\CAD\PlaceRingShapeAction.cs" />
@@ -95,6 +96,12 @@
     </Compile>
     <Compile Include="Editor\Dialog\DebouncedNumericUpDown.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\EditDialogBase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\FormBase.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Editor\Dialog\GlassDXFImportDlg.cs">
       <SubType>Form</SubType>
@@ -128,6 +135,12 @@
     </Compile>
     <Compile Include="Editor\Dialog\OrderDialog.Designer.cs">
       <DependentUpon>OrderDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Dialog\SpecialToolVecEditDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\SpecialToolVecEditDlg.Designer.cs">
+      <DependentUpon>SpecialToolVecEditDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Editor\Dialog\ContourEditDlg.cs">
@@ -167,6 +180,7 @@
     <Compile Include="Helper\CAM\ContourOffsetHelper.cs" />
     <Compile Include="Helper\CAM\FindWireOnOuterShellHelper.cs" />
     <Compile Include="Helper\CAM\MicroJointHelper.cs" />
+    <Compile Include="Helper\CAM\RotaryAxisHelper.cs" />
     <Compile Include="Helper\CAM\StartPointHelper.cs" />
     <Compile Include="Helper\Canvas\DrawHelper.cs" />
     <Compile Include="Helper\Coupler\StdPatternCraftCoupler.cs" />
@@ -226,9 +240,6 @@
     <Compile Include="Editor\Action\CAM\TraverseAction.cs" />
     <Compile Include="Editor\Action\CAD\ReadProjectFileAction.cs" />
     <Compile Include="Editor\Action\CAD\SaveProjectFileAction.cs" />
-    <Compile Include="Editor\Dialog\EditDialogBase.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Editor\Dialog\EntryAndExitDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -293,6 +304,7 @@
     <Compile Include="Editor\Action\CAD\ThreePtTransformAction.cs" />
     <Compile Include="Editor\Action\CAD\AddPointAction.cs" />
     <Compile Include="Editor\Action\CAM\ToolVectorAction.cs" />
+    <Compile Include="Editor\Action\CAM\SpecialToolVecEditAction.cs" />
     <Compile Include="Editor\Action\SelectObjectAction.cs" />
     <Compile Include="Editor\Action\IEditorAction.cs" />
     <Compile Include="Editor\Action\CAD\ManualTransformAction.cs" />
@@ -393,6 +405,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\ManualTransformDlg.resx">
       <DependentUpon>ManualTransformDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\SpecialToolVecEditDlg.resx">
+      <DependentUpon>SpecialToolVecEditDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\TraverseDlg.resx">
       <DependentUpon>TraverseDlg.cs</DependentUpon>

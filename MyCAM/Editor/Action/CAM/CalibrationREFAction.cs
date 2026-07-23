@@ -67,6 +67,10 @@ namespace MyCAM.Editor
 
 		public override void End()
 		{
+			if( m_IsConfirmed == false ) {
+				m_DataManager.CalibrationData = m_BackupData;
+			}
+
 			// clear selection
 			m_Viewer.GetAISContext().ClearSelected( false );
 
@@ -76,6 +80,17 @@ namespace MyCAM.Editor
 			// deactivate
 			DeactiveShapeVertexSelectMode();
 			RemoveREFAIsInfo();
+
+			if( m_Dlg != null ) {
+				m_Dlg.DeletePoint = null;
+				m_Dlg.DeleteAllPoints = null;
+				m_Dlg.DeleteKeyDown -= ViewerKeyDown;
+				m_Dlg.Confirm -= Confirm;
+				m_Dlg.Cancel -= CancelParamSetting;
+				m_Dlg.Preview -= PreviewREFPointResult;
+				m_Dlg.Close();
+				m_Dlg = null;
+			}
 			base.End();
 		}
 
@@ -167,6 +182,7 @@ namespace MyCAM.Editor
 
 		CalibrationData m_BackupData = null;
 		CalibrationREFDlg m_Dlg = null;
+		bool m_IsConfirmed = false;
 
 		#region UI init setting
 
@@ -195,6 +211,7 @@ namespace MyCAM.Editor
 		void Confirm( CalibrationData calibration )
 		{
 			m_DataManager.CalibrationData = calibration;
+			m_IsConfirmed = true;
 
 			// UI refresh will be called in End()
 			End();
@@ -202,7 +219,6 @@ namespace MyCAM.Editor
 
 		void CancelParamSetting()
 		{
-			m_DataManager.CalibrationData = m_BackupData;
 			End();
 		}
 

@@ -1,11 +1,10 @@
-﻿using MyCAM.App;
-using MyCAM.Helper.FormShow;
+using MyCAM.App;
 using System;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	public class EditDialogBase<TEditDataType> : Form
+	public class EditDialogBase<TEditDataType> : FormBase
 	{
 		protected EditDialogBase()
 		{
@@ -17,30 +16,6 @@ namespace MyCAM.Editor
 		public Action<TEditDataType> Confirm;
 		public Action Cancel;
 		public Action<TEditDataType> Reset;
-
-		public new void Show( IWin32Window owner = null )
-		{
-			MyApp.RegistDialogMoveWithMainForm( this );
-			DialogShowHelper.ShowCentered( this );
-		}
-
-		public void OnParentLocationChange()
-		{
-			DialogShowHelper.MoveToCenter( this );
-		}
-
-		public void EnsureDialogOnTop()
-		{
-			// mouse is not using
-			if( !IsViewerInMouseOperation() ) {
-				DialogShowHelper.EnsureDialogOnTop( this );
-			}
-
-			// mouse is using, start monitoring
-			else {
-				StartMouseOperationMonitoring();
-			}
-		}
 
 		protected virtual void RaisePreview( TEditDataType data )
 		{
@@ -67,70 +42,6 @@ namespace MyCAM.Editor
 			Reset?.Invoke( data );
 		}
 
-		protected override void OnFormClosed( FormClosedEventArgs e )
-		{
-			CleanupTimer();
-			base.OnFormClosed( e );
-		}
-
-		void StartMouseOperationMonitoring()
-		{
-			if( m_MouseOperationTimer != null ) {
-				return;
-			}
-			m_MouseOperationTimer = new Timer
-			{
-				Interval = 100
-			};
-			m_MouseOperationTimer.Tick += OnMouseOperationTimerTick;
-			m_MouseOperationTimer.Start();
-		}
-
-		void OnMouseOperationTimerTick( object sender, EventArgs e )
-		{
-			// mouse using done
-			if( !IsViewerInMouseOperation() ) {
-
-				// stop timer
-				CleanupTimer();
-
-				// put from to the front
-				if( !IsDisposed && Visible ) {
-					DialogShowHelper.EnsureDialogOnTop( this );
-				}
-			}
-		}
-
-		void CleanupTimer()
-		{
-			if( m_MouseOperationTimer != null ) {
-				try {
-					m_MouseOperationTimer.Tick -= OnMouseOperationTimerTick;
-					m_MouseOperationTimer.Stop();
-					m_MouseOperationTimer.Dispose();
-				}
-				catch( ObjectDisposedException ) {
-				}
-				catch( Exception ex ) {
-					MyApp.Logger?.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CleanupTimerError", CLEANUP_TIMER_ERROR ), ex.Message ), MyApp.NoticeType.Warning );
-				}
-				finally {
-					m_MouseOperationTimer = null;
-				}
-			}
-		}
-
-		bool IsViewerInMouseOperation()
-		{
-			// check is it mouse is clicked
-			return ( Control.MouseButtons & MouseButtons.Left ) == MouseButtons.Left ||
-				   ( Control.MouseButtons & MouseButtons.Right ) == MouseButtons.Right ||
-				   ( Control.MouseButtons & MouseButtons.Middle ) == MouseButtons.Middle;
-		}
 		protected bool m_ConfirmCheck = false;
-		Timer m_MouseOperationTimer;
-
-		const string CLEANUP_TIMER_ERROR = "清理 Timer 時發生錯誤: {0}";
-		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "EditDialogBase" );
 	}
 }

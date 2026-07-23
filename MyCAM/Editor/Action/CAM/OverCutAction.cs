@@ -34,33 +34,48 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// TODO: check all CAMData have same over cut length?
-			OverCutDlg overCutForm = new OverCutDlg( m_dOverCutBackupList[ 0 ] );
-			overCutForm.CheckValueGeomRestriction += IsValidOverCut;
+			m_Dlg = new OverCutDlg( m_dOverCutBackupList[ 0 ] );
+			m_Dlg.CheckValueGeomRestriction += IsValidOverCut;
+			m_Dlg.Preview = PreviewOverCutLength;
+			m_Dlg.Confirm = ConfirmOverCutLength;
+			m_Dlg.Cancel  = CancelOverCutLength;
 			PropertyChanged?.Invoke( m_PathIDList );
+			m_Dlg.Show( MyApp.MainForm );
+		}
 
-			// preview
-			overCutForm.Preview += ( overCutLength ) =>
-			{
-				SetOverCutLength( overCutLength );
-				PropertyChanged?.Invoke( m_PathIDList );
-			};
-
-			// confirm
-			overCutForm.Confirm += ( overCutLength ) =>
-			{
-				SetOverCutLength( overCutLength );
-				PropertyChanged?.Invoke( m_PathIDList );
-				End();
-			};
-
-			// cancel
-			overCutForm.Cancel += () =>
-			{
+		public override void End()
+		{
+			if( !m_IsConfirmed ) {
 				RestoreBackupOverCutLength();
 				PropertyChanged?.Invoke( m_PathIDList );
-				End();
-			};
-			overCutForm.Show( MyApp.MainForm );
+			}
+			if( m_Dlg != null ) {
+				m_Dlg.Preview  = null;
+				m_Dlg.Confirm  = null;
+				m_Dlg.Cancel   = null;
+				m_Dlg.Close();
+				m_Dlg = null;
+			}
+			base.End();
+		}
+
+		void PreviewOverCutLength( double overCutLength )
+		{
+			SetOverCutLength( overCutLength );
+			PropertyChanged?.Invoke( m_PathIDList );
+		}
+
+		void ConfirmOverCutLength( double overCutLength )
+		{
+			SetOverCutLength( overCutLength );
+			PropertyChanged?.Invoke( m_PathIDList );
+			m_IsConfirmed = true;
+			End();
+		}
+
+		void CancelOverCutLength()
+		{
+			End();
 		}
 
 		void SetOverCutLength( double dOverCutLength )
@@ -94,5 +109,7 @@ namespace MyCAM.Editor
 		}
 
 		readonly List<double> m_dOverCutBackupList;
+		bool m_IsConfirmed = false;
+		OverCutDlg m_Dlg;
 	}
 }

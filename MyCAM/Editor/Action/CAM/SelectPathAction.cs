@@ -3,6 +3,7 @@ using MyCAM.Data;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -72,6 +73,35 @@ namespace MyCAM.Editor
 			}
 		}
 
+		public void SelectPathByIDs( List<string> pathIDList )
+		{
+			if( pathIDList == null || pathIDList.Count == 0 ) {
+				return;
+			}
+			// enforce single select: only select the first ID
+			if( isSingleSelectMode ) {
+				if( pathIDList.Count > 1 ) {
+					MyApp.Logger.ShowOnLogPanel(
+						string.Format( m_LanguageManager.TryGetString( "Log_MultiSelectError_View", LOG_MULTI_SELECT_ERROR_VIEW ), m_SelectedIDSet.Count ),
+						MyApp.NoticeType.Hint );
+
+					// Clear all selections to restore valid state
+					m_SelectedIDSet.Clear();
+					SyncSelectionFromSet();
+					return;
+				}
+				SelectPathByID( pathIDList.First() );
+				return;
+			}
+
+			foreach( string pathID in pathIDList ) {
+				if( !string.IsNullOrEmpty( pathID ) && !m_SelectedIDSet.Contains( pathID ) ) {
+					m_SelectedIDSet.Add( pathID );
+				}
+			}
+			SyncSelectionFromSet();
+		}
+
 		public void ExcludeFromSelection( string pathID )
 		{
 			if( string.IsNullOrEmpty( pathID ) ) {
@@ -101,6 +131,40 @@ namespace MyCAM.Editor
 
 			// re-activate restored path on viewer
 			m_ViewManager.ActivePath( pathID );
+		}
+
+		// control whether standard pattern paths are selectable in this action
+		public bool CanSelectStdPattern
+		{
+			get { return m_CanSelectStdPattern; }
+			set
+			{
+				if( m_CanSelectStdPattern == value ) {
+					return;
+				}
+				m_CanSelectStdPattern = value;
+				if( value ) {
+					ShowStdPathAndNode();
+				}
+				else {
+					HideStdPathAndNode();
+				}
+			}
+		}
+
+		public static bool IsStdPatternPath( string pathID )
+		{
+			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) ) {
+				return false;
+			}
+			return DataGettingHelper.IsStdPattern( pathType );
+		}
+
+		public override void End()
+		{
+			// force restore std pattern paths/nodes in case caller forgot
+			CanSelectStdPattern = true;
+			base.End();
 		}
 
 		protected override void ActivateObject()
@@ -267,7 +331,48 @@ namespace MyCAM.Editor
 			SelectionChange?.Invoke();
 		}
 
+		void HideStdPathAndNode()
+		{
+			if( m_HiddenStdPatternNodes == null ) {
+				m_HiddenStdPatternNodes = new Dictionary<string, (TreeNode, int)>();
+			}
+			m_HiddenStdPatternNodes.Clear();
+			if( m_DataManager?.PathIDList == null ) {
+				return;
+			}
+			foreach( string pathID in m_DataManager.PathIDList ) {
+				if( !IsStdPatternPath( pathID ) ) {
+					continue;
+				}
+				m_ViewManager.ErasePath( pathID );
+				if( m_ViewManager.TreeNodeMap.TryGetValue( pathID, out TreeNode node ) ) {
+					int index = m_ViewManager.PathNode.Nodes.IndexOf( node );
+					m_ViewManager.PathNode.Nodes.Remove( node );
+					m_HiddenStdPatternNodes[ pathID ] = (node, index);
+				}
+			}
+			m_Viewer.UpdateView();
+		}
+
+		void ShowStdPathAndNode()
+		{
+			if( m_DataManager?.PathIDList == null || m_HiddenStdPatternNodes == null || m_HiddenStdPatternNodes.Count == 0 ) {
+				return;
+			}
+			foreach( var kvp in m_HiddenStdPatternNodes ) {
+				TreeNode node = kvp.Value.Node;
+				int index = kvp.Value.Index;
+				int insertAt = Math.Min( index, m_ViewManager.PathNode.Nodes.Count );
+				m_ViewManager.PathNode.Nodes.Insert( insertAt, node );
+				m_ViewManager.DisplayPath( kvp.Key );
+			}
+			m_HiddenStdPatternNodes.Clear();
+			m_Viewer.UpdateView();
+		}
+
 		bool m_SingleSelectMode = false;
+		bool m_CanSelectStdPattern = true;
+		Dictionary<string, (TreeNode Node, int Index)> m_HiddenStdPatternNodes = new Dictionary<string, (TreeNode, int)>();
 		HashSet<string> m_ExcludedIDSet;
 		LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SelectPathAction" );
 		const string LOG_MULTI_SELECT_ERROR_VIEW = "[選取異常] 路徑單選模式下偵測到多重選取 ({0} 個項目)，已自動清除";

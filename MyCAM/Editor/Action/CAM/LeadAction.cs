@@ -47,35 +47,49 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// TODO: check all CAMData has same lead param or not
-			LeadDlg leadDialog = new LeadDlg( m_BackupLeadDataList[ 0 ].Clone() );
+			m_LeadDialog = new LeadDlg( m_BackupLeadDataList[ 0 ].Clone() );
 			if( m_IsStdPattern ) {
-				leadDialog.IsStdPattern?.Invoke( false );
+				m_LeadDialog.IsStdPattern?.Invoke( false );
 			}
+			m_LeadDialog.Preview = PreviewLeadData;
+			m_LeadDialog.Confirm = ConfirmLeadData;
+			m_LeadDialog.Cancel  = CancelLeadData;
 			PropertyChanged?.Invoke( m_PathIDList );
+			m_LeadDialog.Show( MyApp.MainForm );
+		}
 
-			// preview
-			leadDialog.Preview += ( leadData ) =>
-			{
-				SetLeadDataForAll( leadData );
-				PropertyChanged?.Invoke( m_PathIDList );
-			};
-
-			// confirm
-			leadDialog.Confirm += ( leadData ) =>
-			{
-				SetLeadDataForAll( leadData );
-				PropertyChanged?.Invoke( m_PathIDList );
-				End();
-			};
-
-			// cancel
-			leadDialog.Cancel += () =>
-			{
+		public override void End()
+		{
+			if( !m_IsConfirmed ) {
 				RestoreBackupLeadDatas();
-				PropertyChanged?.Invoke( m_PathIDList );
-				End();
-			};
-			leadDialog.Show( MyApp.MainForm );
+			}
+			if( m_LeadDialog != null ) {
+				m_LeadDialog.Preview = null;
+				m_LeadDialog.Confirm = null;
+				m_LeadDialog.Cancel  = null;
+				m_LeadDialog.Close();
+				m_LeadDialog = null;
+			}
+			base.End();
+		}
+
+		void PreviewLeadData( LeadData leadData )
+		{
+			SetLeadDataForAll( leadData );
+			PropertyChanged?.Invoke( m_PathIDList );
+		}
+
+		void ConfirmLeadData( LeadData leadData )
+		{
+			SetLeadDataForAll( leadData );
+			PropertyChanged?.Invoke( m_PathIDList );
+			m_IsConfirmed = true;
+			End();
+		}
+
+		void CancelLeadData()
+		{
+			End();
 		}
 
 		void SetLeadDataForAll( LeadData leadData )
@@ -90,9 +104,12 @@ namespace MyCAM.Editor
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
 				m_CraftDataList[ i ].LeadData = m_BackupLeadDataList[ i ].Clone();
 			}
+			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
 		bool m_IsStdPattern = false;
+		bool m_IsConfirmed = false;
 		List<LeadData> m_BackupLeadDataList;
+		LeadDlg m_LeadDialog;
 	}
 }

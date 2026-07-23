@@ -48,12 +48,29 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// TODO: check all CAMData has same traverse param or not
-			TraverseDlg traverseDataFrom = new TraverseDlg( m_BackupTraverseDataList[ 0 ].Clone() );
+			m_Dlg = new TraverseDlg( m_BackupTraverseDataList[ 0 ].Clone() );
+			m_Dlg.Confirm = ConfirmTraverseData;
+			m_Dlg.Preview = PreviewTraverseData;
+			m_Dlg.Cancel = CancelTraverseData;
 			PropertyChanged?.Invoke( m_PathIDList );
-			traverseDataFrom.Confirm += ConfirmTraverseData;
-			traverseDataFrom.Preview += PreviewTraverseData;
-			traverseDataFrom.Cancel += CancelTraverseData;
-			traverseDataFrom.Show( MyApp.MainForm );
+			m_Dlg.Show( MyApp.MainForm );
+		}
+
+		public override void End()
+		{
+			if( m_IsConfirmed == false ) {
+				RestoreBackupTraverseDatas();
+				PropertyChanged?.Invoke( m_PathIDList );
+			}
+			RemoveSafePlaneVisualization();
+			if( m_Dlg != null ) {
+				m_Dlg.Preview = null;
+				m_Dlg.Confirm = null;
+				m_Dlg.Cancel = null;
+				m_Dlg.Close();
+				m_Dlg = null;
+			}
+			base.End();
 		}
 
 		void PreviewTraverseData( TraverseData data )
@@ -74,16 +91,13 @@ namespace MyCAM.Editor
 		void ConfirmTraverseData( TraverseData data )
 		{
 			SetTraverseData( data );
-			RemoveSafePlaneVisualization();
 			PropertyChanged?.Invoke( m_PathIDList );
+			m_IsConfirmed = true;
 			End();
 		}
 
 		void CancelTraverseData()
 		{
-			RestoreBackupTraverseDatas();
-			RemoveSafePlaneVisualization();
-			PropertyChanged?.Invoke( m_PathIDList );
 			End();
 		}
 
@@ -336,5 +350,7 @@ namespace MyCAM.Editor
 		double arrowHeight = 5.0;
 		double arrowRadius = 2.0;
 		List<TraverseData> m_BackupTraverseDataList;
+		TraverseDlg m_Dlg;
+		bool m_IsConfirmed = false;
 	}
 }

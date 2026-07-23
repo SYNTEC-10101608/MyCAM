@@ -63,6 +63,24 @@ namespace MyCAM.Editor
 			m_LastValue = this.Value;
 		}
 
+		public override void UpButton()
+		{
+			// disable up button when ReadOnly
+			if( ReadOnly ) {
+				return;
+			}
+			base.UpButton();
+		}
+
+		public override void DownButton()
+		{
+			// disable down button when ReadOnly
+			if( ReadOnly ) {
+				return;
+			}
+			base.DownButton();
+		}
+
 		protected override void OnValueChanged( EventArgs e )
 		{
 			base.OnValueChanged( e );
@@ -85,6 +103,11 @@ namespace MyCAM.Editor
 		{
 			if( e is HandledMouseEventArgs hme ) {
 				hme.Handled = true;
+			}
+
+			// disable mouse wheel when ReadOnly
+			if( ReadOnly ) {
+				return;
 			}
 
 			if( e.Delta > 0 ) {

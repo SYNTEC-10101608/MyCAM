@@ -32,18 +32,29 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			PathEditDlg pathEditFrom = new PathEditDlg();
-			pathEditFrom.Confirm += ConfirmPathEditData;
-			pathEditFrom.Preview += PreviewPathEditData;
-			pathEditFrom.Cancel += CancelPathEditData;
-			pathEditFrom.Reset += ResetPathEditData;
-			pathEditFrom.Show( MyApp.MainForm );
+			m_Dlg = new PathEditDlg();
+			m_Dlg.Confirm = ConfirmPathEditData;
+			m_Dlg.Preview = PreviewPathEditData;
+			m_Dlg.Cancel = CancelPathEditData;
+			m_Dlg.Reset = ResetPathEditData;
+			m_Dlg.Show( MyApp.MainForm );
 			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
 		public override void End()
 		{
+			if( !m_IsConfirmed ) {
+				RestoreBackupData();
+			}
 			RemoveTrihedron();
+			if( m_Dlg != null ) {
+				m_Dlg.Preview = null;
+				m_Dlg.Confirm = null;
+				m_Dlg.Cancel = null;
+				m_Dlg.Reset = null;
+				m_Dlg.Close();
+				m_Dlg = null;
+			}
 			base.End();
 		}
 
@@ -64,16 +75,21 @@ namespace MyCAM.Editor
 		void ConfirmPathEditData( PathEditData data )
 		{
 			UpdatePathData( data );
+			m_IsConfirmed = true;
 			End();
 		}
 
 		void CancelPathEditData()
 		{
+			End();
+		}
+
+		void RestoreBackupData()
+		{
 			for( int i = 0; i < m_BackupTrsfMatrixList.Count; i++ ) {
 				m_CraftDataList[ i ].CumulativeTrsfMatrix = m_BackupTrsfMatrixList[ i ];
 			}
 			PropertyChanged?.Invoke( m_PathIDList );
-			End();
 		}
 
 		void ResetPathEditData( PathEditData data )
@@ -229,6 +245,8 @@ namespace MyCAM.Editor
 		List<AIS_Trihedron> m_RefCoordTrihedronList = new List<AIS_Trihedron>();
 		Viewer m_Viewer;
 		bool m_IsResetClicked = false;
+		bool m_IsConfirmed = false;
+		PathEditDlg m_Dlg;
 	}
 
 	public enum RefCoordinateType

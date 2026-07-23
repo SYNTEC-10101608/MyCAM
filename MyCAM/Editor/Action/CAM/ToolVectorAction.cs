@@ -3,7 +3,6 @@ using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
 using MyCAM.PathCache;
-using MyCAM.Post;
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.gp;
@@ -33,7 +32,7 @@ namespace MyCAM.Editor
 			m_CurrentPathID = pathID;
 
 			// for edit action
-			m_RotaryAxisConfig = CreateRotaryAxisConfig();
+			m_RotaryAxisConfig = RotaryAxisHelper.CreateRotaryAxisConfig();
 			m_CoordIconRenderer = new CoordIconRenderer( viewer, dataManager );
 		}
 
@@ -46,7 +45,7 @@ namespace MyCAM.Editor
 		}
 
 		public Action<Dictionary<MachineComponentType, List<gp_Trsf>>, bool> RaiseTrans;
-		public Action<bool> RaiseActionStart;
+		public Action<bool, bool> RaiseActionStart;
 
 		public override void Start()
 		{
@@ -86,7 +85,8 @@ namespace MyCAM.Editor
 				m_CoordIconRenderer.Show();
 			}
 
-			// start path index action
+			// start path index action (disallow selecting std pattern paths in this action)
+			m_PathIndexAction.CanSelectStdPattern = false;
 			m_PathIndexAction.Start();
 			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
 
@@ -94,13 +94,15 @@ namespace MyCAM.Editor
 			ActivatePointSelection();
 
 			// show machine
-			RaiseActionStart?.Invoke( true );
+			RaiseActionStart?.Invoke( true, true );
 		}
 
 		public override void End()
 		{
 			// end point index action
 			DeactivatePointSelection( m_CurrentPathID );
+
+			SetBackupDataBack();
 
 			// end path index action// cleanup path index action
 			m_PathIndexAction.SelectionChange -= OnPathIndexChanged;
@@ -110,7 +112,26 @@ namespace MyCAM.Editor
 			m_CoordIconRenderer.Remove(); // global
 			m_ToolVecEditRender.Remove(); // path
 
-			RaiseActionStart?.Invoke( false );
+			if( m_ToolVecDlg != null ) {
+				m_ToolVecDlg.SetKeep = null;
+				m_ToolVecDlg.SetZdir = null;
+				m_ToolVecDlg.SetRevert = null;
+				m_ToolVecDlg.ABAngleChanged = null;
+				m_ToolVecDlg.MSAngleChanged = null;
+				m_ToolVecDlg.TypeChanged = null;
+				m_ToolVecDlg.AddEditIndex = null;
+				m_ToolVecDlg.RemoveEditIndex = null;
+				m_ToolVecDlg.SwitchStartEnd = null;
+				m_ToolVecDlg.MoveIndex = null;
+				m_ToolVecDlg.MoveCtrlPnt = null;
+				m_ToolVecDlg.ToStartOrEnd = null;
+				m_ToolVecDlg.FlipRotaryAxis = null;
+				m_ToolVecDlg.Clear = null;
+				m_ToolVecDlg.Cancel = null;
+				m_ToolVecDlg.Close();
+			}
+
+			RaiseActionStart?.Invoke( false, true );
 			base.End();
 		}
 
@@ -128,6 +149,8 @@ namespace MyCAM.Editor
 				End();
 				return;
 			}
+
+			TempRemoveSpecialToolVecData();
 			m_DataHandler = new ToolVecActionDataHandler( pathID );
 
 			// init render for current path
@@ -135,6 +158,14 @@ namespace MyCAM.Editor
 			m_ToolVecEditRender?.Remove();
 			m_ToolVecEditRender = new ToolVecEditRender( m_Viewer, m_DataManager, pathIDList );
 			m_ToolVecEditRender.Show( pathIDList );
+		}
+
+		void TempRemoveSpecialToolVecData()
+		{
+			m_BackupData = m_CraftData.SpecialToolVecData.Clone();
+			if( m_CraftData.SpecialToolVecData != null && m_CraftData.SpecialToolVecData.Type != ESpecialToolVecType.Normal ) {
+				m_CraftData.SetSpecialToolVecData( new SpecialToolVecData() );
+			}
 		}
 
 		void ActivatePointSelection()
@@ -187,6 +218,7 @@ namespace MyCAM.Editor
 			if( selectedIDs.Count != 1 ) {
 				return;
 			}
+			SetBackupDataBack();
 			string newPathID = selectedIDs.First();
 			if( newPathID == m_CurrentPathID ) {
 				return;
@@ -199,6 +231,23 @@ namespace MyCAM.Editor
 
 			// activate point selection for new path
 			ActivatePointSelection();
+		}
+
+		void SetBackupDataBack()
+		{
+			// do not have ctrl pnt
+			if( m_CraftData.ToolVecModifyMap.Count == 0 && IsStartEndNotCtrlPnt() ) {
+				m_CraftData.SetSpecialToolVecData( m_BackupData );
+			}
+		}
+
+		bool IsStartEndNotCtrlPnt()
+		{
+			if( m_CraftData.StartPntToolVecData.StartPnt.AngleData == null &&
+				m_CraftData.StartPntToolVecData.EndPnt.AngleData == null ) {
+				return true;
+			}
+			return false;
 		}
 
 		void OnPointIndexChanged( int nSelectIndex, TopoDS_Shape selectedVertex )
@@ -524,7 +573,16 @@ namespace MyCAM.Editor
 			if( m_ToolVecParam != null ) {
 				m_ToolVecParam.IsModified = true;
 				SetToolVecParamAndPreview( true );
+				ClearSpecialToolVecData();
 			}
+		}
+
+		void ClearSpecialToolVecData()
+		{
+			if( m_CraftData.SpecialToolVecData == null || m_CraftData.SpecialToolVecData.Type == ESpecialToolVecType.Normal ) {
+				return;
+			}
+			m_CraftData.SetSpecialToolVecData( new SpecialToolVecData() );
 		}
 
 		void OnRemoveEditIndex()
@@ -911,11 +969,11 @@ namespace MyCAM.Editor
 				m_SelectedPoint = m_DataHandler.GetPointByCADIndex( m_nPointIndex );
 			}
 			bool isCalSuccess = CalSimuTranfResult( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, isEditModifyPnt );
-				if( !isCalSuccess ) {
-					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotSimulatePose", CANNOT_SIMULATE_POSE ), MyApp.NoticeType.Warning );
-					return;
-				}
-				if( !ValidateFrameTransformMap( frameTransformMap ) ) {
+			if( !isCalSuccess ) {
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotSimulatePose", CANNOT_SIMULATE_POSE ), MyApp.NoticeType.Warning );
+				return;
+			}
+			if( !ValidateFrameTransformMap( frameTransformMap ) ) {
 				return;
 			}
 			// output vertex is the shape of high light
@@ -953,87 +1011,38 @@ namespace MyCAM.Editor
 				return false;
 			}
 
-			// set default offset
-			gp_Vec simuOffset = machineData.SimulationOffset ?? new gp_Vec();
-			PostPoint G54pnt;
+			// determine which MS angles to use
+			double masterAngle_rad;
+			double slaveAngle_rad;
 
 			// get the real IK solved result to preview
 			if( isEditModifyPnt ) {
-				G54pnt = new PostPoint()
-				{
-					X = m_SelectedPoint.Point.x,
-					Y = m_SelectedPoint.Point.y,
-					Z = m_SelectedPoint.Point.z,
-					Master = m_SelectedPoint.ModMaster_rad,
-					Slave = m_SelectedPoint.ModSlave_rad,
-				};
+				masterAngle_rad = m_SelectedPoint.ModMaster_rad;
+				slaveAngle_rad = m_SelectedPoint.ModSlave_rad;
 			}
-
 			// user want to know this unmodify point vector
 			else {
-				G54pnt = new PostPoint()
-				{
-					X = m_SelectedPoint.Point.x,
-					Y = m_SelectedPoint.Point.y,
-					Z = m_SelectedPoint.Point.z,
-					Master = m_ToolVecParam.Master_deg * Math.PI / 180.0,
-					Slave = m_ToolVecParam.Slave_deg * Math.PI / 180.0
-				};
+				masterAngle_rad = m_ToolVecParam.Master_deg * Math.PI / 180.0;
+				slaveAngle_rad = m_ToolVecParam.Slave_deg * Math.PI / 180.0;
 			}
 
-
-			// create PostSolver
-			PostSolver postSolver = new PostSolver( m_DataManager.MachineData );
-			bool calSuccess = SimulationHelper.BuildFKPostPnt( postSolver, G54pnt, out PostPoint FKpnt, simuOffset );
+			// call the new static API
+			bool calSuccess = SimulationHelper.BuildSinglePointFrameTransform(
+				machineData,
+				m_SelectedPoint.Point,
+				masterAngle_rad,
+				slaveAngle_rad,
+				m_DataManager.WorkPieceChain,
+				m_DataManager.MachineChainListMap,
+				out frameTransformMap );
 			if( !calSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotCalculateLaserHeadPosition", CANNOT_CALCULATE_LASER_HEAD_POSITION ), MyApp.NoticeType.Warning );
 				return false;
 			}
-			// init frame transform map
-			frameTransformMap[ MachineComponentType.XAxis ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.YAxis ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.ZAxis ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.Master ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.Slave ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.Laser ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.WorkPiece ] = new List<gp_Trsf>();
-			SimulationHelper.FKToFrameTranfResult( FKpnt, machineData.SimulationOffset, m_DataManager.WorkPieceChain, machineData, m_DataManager.MachineChainListMap, ref frameTransformMap );
 			return true;
 		}
 
 		#endregion
-
-		// rotary axis config
-		RotaryAxisConfig CreateRotaryAxisConfig()
-		{
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
-				throw new InvalidOperationException( "Cannot get machine data" );
-			}
-			RotaryAxisConfig config = new RotaryAxisConfig();
-			config.MasterName = ConvertRotaryAxisName( machineData.MasterRotaryAxis );
-			config.SlaveName = ConvertRotaryAxisName( machineData.SlaveRotaryAxis );
-			if( machineData.FiveAxisType == FiveAxisType.Table || machineData.FiveAxisType == FiveAxisType.Mix ) {
-				config.RotaryAxisName = config.SlaveName;
-			}
-			else {
-				config.RotaryAxisName = config.MasterName;
-			}
-			return config;
-		}
-
-		string ConvertRotaryAxisName( RotaryAxis axis )
-		{
-			switch( axis ) {
-				case RotaryAxis.X:
-					return "A";
-				case RotaryAxis.Y:
-					return "B";
-				case RotaryAxis.Z:
-					return "C";
-				default:
-					return "";
-			}
-		}
 
 		// path index param
 		string m_CurrentPathID;
@@ -1078,6 +1087,8 @@ namespace MyCAM.Editor
 
 		// flag to stop event raise to trigger onproperty change
 		bool m_IsUpdatingUI = false;
+
+		SpecialToolVecData m_BackupData = null;
 
 		const string CANNOT_GET_PATH_CRAFT_INFO = "無法獲取路徑 {0} 的加工資訊";
 		const string TILT_ANGLE_TOO_LARGE = "傾斜角度超過限制範圍";

@@ -84,6 +84,9 @@ namespace MyCAM.Editor.Renderer
 		{
 			gp_Trsf trsf = new gp_Trsf();
 			ShowTrans( trsf, bUpdate );
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
 		void BuildAndDisplay( List<string> pathIDList, gp_Trsf trsf, bool bUpdate )
@@ -102,10 +105,34 @@ namespace MyCAM.Editor.Renderer
 				return;
 			}
 
-			// build tool vec using shared helper
-			Dictionary<string, List<AIS_Line>> built = ToolVecAndPathVisibleHelper.BuildToolVecAISDict( pathIDList, trsf );
-			foreach( var kvp in built ) {
-				m_ToolVecAISDict.Add( kvp.Key, kvp.Value );
+			// separate paths into normal and special tool vec
+			List<string> normalPathIDList = new List<string>();
+			List<string> specialPathIDList = new List<string>();
+
+			foreach( string szPathID in pathIDList ) {
+				DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData );
+				if( craftData != null && craftData.SpecialToolVecData != null && craftData.SpecialToolVecData.Type != ESpecialToolVecType.Normal ) {
+					specialPathIDList.Add( szPathID );
+				}
+				else {
+					normalPathIDList.Add( szPathID );
+				}
+			}
+
+			// build normal tool vec using shared helper
+			if( normalPathIDList.Count > 0 ) {
+				Dictionary<string, List<AIS_Line>> normalBuilt = ToolVecAndPathVisibleHelper.BuildToolVecAISDict( normalPathIDList, trsf );
+				foreach( var kvp in normalBuilt ) {
+					m_ToolVecAISDict.Add( kvp.Key, kvp.Value );
+				}
+			}
+
+			// build special tool vec using shared helper
+			if( specialPathIDList.Count > 0 ) {
+				Dictionary<string, List<AIS_Line>> specialBuilt = ToolVecAndPathVisibleHelper.BuildSpecialToolVecAISDict( specialPathIDList, trsf );
+				foreach( var kvp in specialBuilt ) {
+					m_ToolVecAISDict.Add( kvp.Key, kvp.Value );
+				}
 			}
 
 			// display the tool vec

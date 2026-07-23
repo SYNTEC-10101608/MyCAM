@@ -53,14 +53,31 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			PathCompensateDlg compensateDlg = new PathCompensateDlg();
-			compensateDlg.Preview += PreviewCompensatedDist;
-			compensateDlg.Confirm += ConfirmCompensatedDist;
-			compensateDlg.Cancel += CancelCompensatedDist;
-			compensateDlg.Reset += RestoreCompensatedDist;
-			compensateDlg.IsGeomConstraintExceedsLimit = IsGeomConstraintExceedsLimit;
-			compensateDlg.Show( MyApp.MainForm );
+			m_Dlg = new PathCompensateDlg();
+			m_Dlg.Preview = PreviewCompensatedDist;
+			m_Dlg.Confirm = ConfirmCompensatedDist;
+			m_Dlg.Cancel += CancelCompensatedDist;
+			m_Dlg.Reset = RestoreCompensatedDist;
+			m_Dlg.IsGeomConstraintExceedsLimit = IsGeomConstraintExceedsLimit;
+			m_Dlg.Show( MyApp.MainForm );
 			PropertyChanged?.Invoke( m_PathIDList );
+		}
+
+		public override void End()
+		{
+			if( !m_IsConfirmed ) {
+				RestoreBackupData();
+			}
+			if( m_Dlg != null ) {
+				m_Dlg.Preview = null;
+				m_Dlg.Confirm = null;
+				m_Dlg.Cancel = null;
+				m_Dlg.Reset = null;
+				m_Dlg.IsGeomConstraintExceedsLimit = null;
+				m_Dlg.Close();
+				m_Dlg = null;
+			}
+			base.End();
 		}
 
 		void PreviewCompensatedDist( double compensatedDist )
@@ -84,20 +101,21 @@ namespace MyCAM.Editor
 				m_CraftDataList[ i ].CompensatedDistance += compensatedDist;
 			}
 			PropertyChanged?.Invoke( m_PathIDList );
-
-			// because Confirm will end the action, so no need to set isResetClicked to false
+			m_IsConfirmed = true;
 			End();
 		}
 
 		void CancelCompensatedDist()
 		{
+			End();
+		}
+
+		void RestoreBackupData()
+		{
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
 				m_CraftDataList[ i ].CompensatedDistance = m_BackupCompensatedDistList[ i ];
 			}
 			PropertyChanged?.Invoke( m_PathIDList );
-
-			// because Cancel will end the action, so no need to set isResetClicked to false
-			End();
 		}
 
 		void RestoreCompensatedDist( double compensatedDist )
@@ -149,6 +167,8 @@ namespace MyCAM.Editor
 		List<double> m_BackupCompensatedDistList = new List<double>();
 		List<IStdPatternGeomData> m_BackupGeomDataList = new List<IStdPatternGeomData>();
 		bool isResetClicked = false;
+		bool m_IsConfirmed = false;
+		PathCompensateDlg m_Dlg;
 		const string COMPENSATION_EXCEEDS_LIMIT = "路徑超出補償範圍，請調整補償數值";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "PathCompensationAction" );
 	}

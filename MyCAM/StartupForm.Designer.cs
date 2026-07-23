@@ -76,8 +76,8 @@
 			this.m_tsbAddLine_TwoVertexConnect = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbManualTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsb3PntTransform = new System.Windows.Forms.ToolStripButton();
-			this.m_tsbMeasureCAD = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAxisTransform = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbMeasureCAD = new System.Windows.Forms.ToolStripButton();
 			this.m_tsSimuFunc = new System.Windows.Forms.ToolStrip();
 			this.m_btnPlay = new System.Windows.Forms.ToolStripButton();
 			this.m_btnPause = new System.Windows.Forms.ToolStripButton();
@@ -196,9 +196,9 @@
 			// 
 			// m_tsbSetting
 			// 
-			this.m_tsbSetting.DropDownItems.AddRange( new System.Windows.Forms.ToolStripItem[] {
-				this.m_tsbVNCConnection,
-				this.m_tsmiLanguage} );
+			this.m_tsbSetting.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_tsbVNCConnection,
+            this.m_tsmiLanguage});
 			this.m_tsbSetting.Name = "m_tsbSetting";
 			this.m_tsbSetting.Size = new System.Drawing.Size(43, 20);
 			this.m_tsbSetting.Text = "設定";
@@ -213,7 +213,7 @@
 			// m_tsmiLanguage
 			// 
 			this.m_tsmiLanguage.Name = "m_tsmiLanguage";
-			this.m_tsmiLanguage.Size = new System.Drawing.Size( 148, 22 );
+			this.m_tsmiLanguage.Size = new System.Drawing.Size(148, 22);
 			this.m_tsmiLanguage.Text = "語系切換";
 			// 
 			// m_tsbController
@@ -249,8 +249,8 @@
             this.m_BtnContourEdit,
             this.m_tsbPathCompensation,
             this.m_tsbCalibrationPnt,
-			this.m_tsbConvertNC,
-			this.m_tsbMeasureCAM});
+            this.m_tsbConvertNC,
+            this.m_tsbMeasureCAM});
 			this.m_tsCAMFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCAMFunction.Name = "m_tsCAMFunction";
 			this.m_tsCAMFunction.Size = new System.Drawing.Size(1596, 50);
@@ -350,7 +350,7 @@
 			this.m_tsbToolVec.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbToolVec.Name = "m_tsbToolVec";
 			this.m_tsbToolVec.Size = new System.Drawing.Size(59, 47);
-			this.m_tsbToolVec.Text = "姿態調適";
+			this.m_tsbToolVec.Text = "飛邊姿態";
 			this.m_tsbToolVec.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbToolVec.ToolTipText = "姿態調適";
 			this.m_tsbToolVec.Click += new System.EventHandler(this.m_tsbToolVec_Click);
@@ -360,8 +360,8 @@
 			this.m_tsbFixedToolVec.Image = global::MyCAM.Properties.Resources.CAM_FixedToolVec;
 			this.m_tsbFixedToolVec.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbFixedToolVec.Name = "m_tsbFixedToolVec";
-			this.m_tsbFixedToolVec.Size = new System.Drawing.Size(59, 47);
-			this.m_tsbFixedToolVec.Text = "鎖軸切割";
+			this.m_tsbFixedToolVec.Size = new System.Drawing.Size(47, 47);
+			this.m_tsbFixedToolVec.Text = "孔姿態";
 			this.m_tsbFixedToolVec.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbFixedToolVec.ToolTipText = "鎖軸切割";
 			this.m_tsbFixedToolVec.Click += new System.EventHandler(this.m_tsbFixedToolVec_Click);
@@ -490,7 +490,7 @@
 			this.m_tsbMeasureCAM.Image = global::MyCAM.Properties.Resources.Measure;
 			this.m_tsbMeasureCAM.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbMeasureCAM.Name = "m_tsbMeasureCAM";
-			this.m_tsbMeasureCAM.Size = new System.Drawing.Size(59, 47);
+			this.m_tsbMeasureCAM.Size = new System.Drawing.Size(44, 47);
 			this.m_tsbMeasureCAM.Text = "量測";
 			this.m_tsbMeasureCAM.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbMeasureCAM.ToolTipText = "量測";
@@ -501,10 +501,10 @@
 			// 
 			// m_tscLevel1Container.ContentPanel
 			// 
-			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsFileFunction);
-			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCADFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCAMFunction);
 			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsSimuFunc);
+			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsFileFunction);
+			this.m_tscLevel1Container.ContentPanel.Controls.Add(this.m_tsCADFunction);
 			this.m_tscLevel1Container.ContentPanel.Size = new System.Drawing.Size(1596, 50);
 			this.m_tscLevel1Container.Dock = System.Windows.Forms.DockStyle.Top;
 			this.m_tscLevel1Container.Location = new System.Drawing.Point(0, 24);
@@ -593,11 +593,11 @@
             this.m_tsbAddPoint_EdgeCenter,
             this.m_tsbAddPoint_PointCenter,
             this.m_tsbAddPoint_BoundingBoxCenter,
-			this.m_tsbAddLine_TwoVertexConnect,
-			this.m_tsbManualTransform,
-			this.m_tsb3PntTransform,
-			this.m_tsbAxisTransform,
-			this.m_tsbMeasureCAD});
+            this.m_tsbAddLine_TwoVertexConnect,
+            this.m_tsbManualTransform,
+            this.m_tsb3PntTransform,
+            this.m_tsbAxisTransform,
+            this.m_tsbMeasureCAD});
 			this.m_tsCADFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCADFunction.Name = "m_tsCADFunction";
 			this.m_tsCADFunction.Size = new System.Drawing.Size(1596, 50);
@@ -708,7 +708,7 @@
 			this.m_tsbMeasureCAD.Image = global::MyCAM.Properties.Resources.Measure;
 			this.m_tsbMeasureCAD.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbMeasureCAD.Name = "m_tsbMeasureCAD";
-			this.m_tsbMeasureCAD.Size = new System.Drawing.Size(59, 47);
+			this.m_tsbMeasureCAD.Size = new System.Drawing.Size(44, 47);
 			this.m_tsbMeasureCAD.Text = "量測";
 			this.m_tsbMeasureCAD.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbMeasureCAD.ToolTipText = "量測";
@@ -1053,7 +1053,6 @@
 			this.m_tsbLayer1.Name = "m_tsbLayer1";
 			this.m_tsbLayer1.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer1.Text = "1";
-			this.m_tsbLayer1.ToolTipText = "";
 			this.m_tsbLayer1.Click += new System.EventHandler(this.m_tsbLayer1_Click);
 			// 
 			// m_tsbLayer2
@@ -1064,7 +1063,6 @@
 			this.m_tsbLayer2.Name = "m_tsbLayer2";
 			this.m_tsbLayer2.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer2.Text = "2";
-			this.m_tsbLayer2.ToolTipText = "";
 			this.m_tsbLayer2.Click += new System.EventHandler(this.m_tsbLayer2_Click);
 			// 
 			// m_tsbLayer3
@@ -1076,7 +1074,6 @@
 			this.m_tsbLayer3.Name = "m_tsbLayer3";
 			this.m_tsbLayer3.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer3.Text = "3";
-			this.m_tsbLayer3.ToolTipText = "";
 			this.m_tsbLayer3.Click += new System.EventHandler(this.m_tsbLayer3_Click);
 			// 
 			// m_tsbLayer4
@@ -1087,7 +1084,6 @@
 			this.m_tsbLayer4.Name = "m_tsbLayer4";
 			this.m_tsbLayer4.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer4.Text = "4";
-			this.m_tsbLayer4.ToolTipText = "";
 			this.m_tsbLayer4.Click += new System.EventHandler(this.m_tsbLayer4_Click);
 			// 
 			// m_tsbLayer5
@@ -1099,7 +1095,6 @@
 			this.m_tsbLayer5.Name = "m_tsbLayer5";
 			this.m_tsbLayer5.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer5.Text = "5";
-			this.m_tsbLayer5.ToolTipText = "";
 			this.m_tsbLayer5.Click += new System.EventHandler(this.m_tsbLayer5_Click);
 			// 
 			// m_tsbLayer6
@@ -1110,7 +1105,6 @@
 			this.m_tsbLayer6.Name = "m_tsbLayer6";
 			this.m_tsbLayer6.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer6.Text = "6";
-			this.m_tsbLayer6.ToolTipText = "";
 			this.m_tsbLayer6.Click += new System.EventHandler(this.m_tsbLayer6_Click);
 			// 
 			// m_tsbLayer7
@@ -1121,7 +1115,6 @@
 			this.m_tsbLayer7.Name = "m_tsbLayer7";
 			this.m_tsbLayer7.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer7.Text = "7";
-			this.m_tsbLayer7.ToolTipText = "";
 			this.m_tsbLayer7.Click += new System.EventHandler(this.m_tsbLayer7_Click);
 			// 
 			// m_tsbLayer8
@@ -1133,7 +1126,6 @@
 			this.m_tsbLayer8.Name = "m_tsbLayer8";
 			this.m_tsbLayer8.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer8.Text = "8";
-			this.m_tsbLayer8.ToolTipText = "";
 			this.m_tsbLayer8.Click += new System.EventHandler(this.m_tsbLayer8_Click);
 			// 
 			// m_tsbLayer9
@@ -1144,7 +1136,6 @@
 			this.m_tsbLayer9.Name = "m_tsbLayer9";
 			this.m_tsbLayer9.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer9.Text = "9";
-			this.m_tsbLayer9.ToolTipText = "";
 			this.m_tsbLayer9.Click += new System.EventHandler(this.m_tsbLayer9_Click);
 			// 
 			// m_tsbLayer10
@@ -1155,7 +1146,6 @@
 			this.m_tsbLayer10.Name = "m_tsbLayer10";
 			this.m_tsbLayer10.Size = new System.Drawing.Size(24, 24);
 			this.m_tsbLayer10.Text = "10";
-			this.m_tsbLayer10.ToolTipText = "";
 			this.m_tsbLayer10.Click += new System.EventHandler(this.m_tsbLayer10_Click);
 			// 
 			// m_tsViewerToolBar
@@ -1276,8 +1266,6 @@
 			this.m_tsbShowVec.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowVec.Name = "m_tsbShowVec";
 			this.m_tsbShowVec.Size = new System.Drawing.Size(22, 24);
-			this.m_tsbShowVec.Text = "";
-			this.m_tsbShowVec.ToolTipText = "";
 			this.m_tsbShowVec.CheckedChanged += new System.EventHandler(this.m_tsbShowVec_CheckedChanged);
 			// 
 			// m_tsbShowOrder
@@ -1290,8 +1278,6 @@
 			this.m_tsbShowOrder.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowOrder.Name = "m_tsbShowOrder";
 			this.m_tsbShowOrder.Size = new System.Drawing.Size(22, 24);
-			this.m_tsbShowOrder.Text = "";
-			this.m_tsbShowOrder.ToolTipText = "";
 			this.m_tsbShowOrder.CheckedChanged += new System.EventHandler(this.m_tsbShowOrder_CheckedChanged);
 			// 
 			// m_tsbShowOrientation
@@ -1304,8 +1290,6 @@
 			this.m_tsbShowOrientation.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowOrientation.Name = "m_tsbShowOrientation";
 			this.m_tsbShowOrientation.Size = new System.Drawing.Size(22, 24);
-			this.m_tsbShowOrientation.Text = "";
-			this.m_tsbShowOrientation.ToolTipText = "";
 			this.m_tsbShowOrientation.CheckedChanged += new System.EventHandler(this.m_tsbShowOrientation_CheckedChanged);
 			// 
 			// m_tsbShowTraverse
@@ -1318,8 +1302,6 @@
 			this.m_tsbShowTraverse.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbShowTraverse.Name = "m_tsbShowTraverse";
 			this.m_tsbShowTraverse.Size = new System.Drawing.Size(22, 24);
-			this.m_tsbShowTraverse.Text = "";
-			this.m_tsbShowTraverse.ToolTipText = "";
 			this.m_tsbShowTraverse.CheckedChanged += new System.EventHandler(this.m_tsbShowTraverse_CheckedChanged);
 			// 
 			// m_panBackGround

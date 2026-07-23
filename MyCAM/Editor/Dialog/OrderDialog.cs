@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal partial class OrderDialog : Form
+	internal partial class OrderDialog : FormBase
 	{
 		// --- events raised to Action ---
 		public Action<OrderMode> OrderModeChanged;

@@ -1,10 +1,9 @@
 using MyCAM.App;
 using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
-	public partial class GlassDXFImportDlg : Form
+	public partial class GlassDXFImportDlg : FormBase
 	{
 		public double Radius { get; private set; }
 		public double SurfaceHeight { get; private set; }

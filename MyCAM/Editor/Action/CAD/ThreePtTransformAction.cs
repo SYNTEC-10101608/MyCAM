@@ -74,6 +74,13 @@ namespace MyCAM.Editor
 
 			// deactivate
 			m_ViewManager.DeactiveAll();
+
+			if( m_dialog != null ) {
+				m_dialog.Confirm = null;
+				m_dialog.Cancel = null;
+				m_dialog.Close();
+				m_dialog = null;
+			}
 			base.End();
 		}
 
@@ -156,10 +163,10 @@ namespace MyCAM.Editor
 		void Show3PtTransformDialog()
 		{
 			// Create and show the 3-point transform dialog
-			ThreePtTransformDlg dialog = new ThreePtTransformDlg( new TransParam( m_1stPoint, m_2ndPoint, m_3rdPoint ) );
-			dialog.Confirm += ( transParam ) => StartTrans( transParam );
-			dialog.Cancel += () => End();
-			dialog.Show( MyApp.MainForm );
+			m_dialog = new ThreePtTransformDlg( new TransParam( m_1stPoint, m_2ndPoint, m_3rdPoint ) );
+			m_dialog.Confirm += ( transParam ) => StartTrans( transParam );
+			m_dialog.Cancel += () => End();
+			m_dialog.Show( MyApp.MainForm );
 		}
 
 		void StartTrans( TransParam transParam )
@@ -208,6 +215,7 @@ namespace MyCAM.Editor
 		gp_Trsf m_3PTransform;
 		AIS_TextLabel m_LabelO;
 		AIS_TextLabel m_LabelX;
+		ThreePtTransformDlg m_dialog;
 
 		const string COINCIDENT_SECOND_POINT = "重合的第二個點";
 		const string COINCIDENT_THIRD_POINT = "重合的第三個點";

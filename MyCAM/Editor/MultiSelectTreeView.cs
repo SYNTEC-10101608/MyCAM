@@ -95,11 +95,16 @@ namespace MyCAM.Editor
 			if( m_SelectedNodes.Count == 0 ) {
 				return;
 			}
+			ClearSelectionSilent();
+			OnSelectionChanged();
+		}
+
+		void ClearSelectionSilent()
+		{
 			foreach( var n in m_SelectedNodes.ToList() ) {
 				HighlightNode( n, false );
 			}
 			m_SelectedNodes.Clear();
-			OnSelectionChanged();
 		}
 
 		public void SelectAll()
@@ -142,7 +147,7 @@ namespace MyCAM.Editor
 			if( !ctrl && !shift || !isAllowMultiSelect ) {
 
 				// normal click: clear selection, select this node
-				ClearSelection();
+				ClearSelectionSilent();
 				SelectNode( node );
 				m_AnchorNode = node;
 			}
@@ -163,7 +168,7 @@ namespace MyCAM.Editor
 				if( m_AnchorNode == null ) {
 
 					// no anchor, behave like normal click but set anchor
-					ClearSelection();
+					ClearSelectionSilent();
 					SelectNodeWithoutAnchor( node );
 					m_AnchorNode = node;
 				}

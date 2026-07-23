@@ -7,6 +7,8 @@ namespace MyCAM.Data
 	{
 		readonly SortedDictionary<int, ToolVecModifyData> m_Map = new SortedDictionary<int, ToolVecModifyData>();
 
+		public Action PropertyChanged;
+
 		public int Count
 		{
 			get
@@ -43,6 +45,7 @@ namespace MyCAM.Data
 			set
 			{
 				m_Map[ key ] = value;
+				PropertyChanged?.Invoke();
 			}
 		}
 
@@ -65,6 +68,7 @@ namespace MyCAM.Data
 				throw new ArgumentException( $"Key {key} already exists in ToolVecModifyMap" );
 			}
 			m_Map[ key ] = value;
+			PropertyChanged?.Invoke();
 		}
 
 		public void Set( int key, ToolVecModifyData value )
@@ -73,6 +77,7 @@ namespace MyCAM.Data
 				throw new ArgumentNullException( nameof( value ), "ToolVecModifyData cannot be null" );
 			}
 			m_Map[ key ] = value;
+			PropertyChanged?.Invoke();
 		}
 
 		// remove the control point and transfer its interpolation type to the next point
@@ -84,24 +89,35 @@ namespace MyCAM.Data
 			EToolVecInterpolateType removeType = m_Map[ removeKey ].InterpolateType;
 			m_Map.Remove( removeKey );
 			if( !m_Map.ContainsKey( nextPointIdx ) ) {
+				PropertyChanged?.Invoke();
 				return;
 			}
 			m_Map[ nextPointIdx ].InterpolateType = removeType;
+			PropertyChanged?.Invoke();
 		}
 
 		public void Remove( int removeKey )
 		{
-			m_Map.Remove( removeKey );
+			if( m_Map.Remove( removeKey ) ) {
+				PropertyChanged?.Invoke();
+			}
 		}
 
 		public void Clear()
 		{
-			m_Map.Clear();
+			if( m_Map.Count > 0 ) {
+				m_Map.Clear();
+				PropertyChanged?.Invoke();
+			}
 		}
 
 		public Dictionary<int, ToolVecModifyData> ToDictionary()
 		{
-			return new Dictionary<int, ToolVecModifyData>( m_Map );
+			Dictionary<int, ToolVecModifyData> result = new Dictionary<int, ToolVecModifyData>( m_Map.Count );
+			foreach( KeyValuePair<int, ToolVecModifyData> kvp in m_Map ) {
+				result[ kvp.Key ] = kvp.Value.Clone();
+			}
+			return result;
 		}
 
 		public IEnumerator<KeyValuePair<int, ToolVecModifyData>> GetEnumerator()

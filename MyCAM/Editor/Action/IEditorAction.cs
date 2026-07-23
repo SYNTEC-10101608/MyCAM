@@ -45,6 +45,7 @@ namespace MyCAM.Editor
 		MicroJoint,
 		ManualOrder,
 		AutoSortPath,
+		SpecialToolVecEdit,
 
 		// File
 		ImportProjectFile,

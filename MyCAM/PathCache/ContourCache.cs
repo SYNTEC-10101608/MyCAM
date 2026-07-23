@@ -235,20 +235,9 @@ namespace MyCAM.PathCache
 				m_CAMPointList.Add( closedCAMPoint );
 			}
 
-			// solve initial IK
-			SolveInitIK();
-
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
-
-			// get the info for tool vec interpolation
-			InterpolatePreprocessingResult preprocessingResult = InterpolatePreprocessing( ref toolVecPointList );
-
-			// calculate tool vec for each point
-			ToolVecHelper.SetToolVec( ref toolVecPointList, preprocessingResult.RegionTypeList, preprocessingResult.CamToolVecModifyMap, preprocessingResult.IsFirstPntControlPnt, preprocessingResult.IsLastPntControlPoint );
-
-			// for tool vec dialog select action to no current index interpolate type
-			m_interpolateTypeRegion = preprocessingResult.RegionTypeList;
+			CalMSForEachPoint( toolVecPointList );
 
 			// mark micro joint start and end pnt
 			SetMicroJoint( ref m_CAMPointList );
@@ -277,6 +266,54 @@ namespace MyCAM.PathCache
 			return leadOutStartPoint;
 		}
 
+		void CalMSForEachPoint( List<ISetToolVecPoint> toolVecPointList )
+		{
+			if( m_CraftData.SpecialToolVecData.Type == ESpecialToolVecType.AssignMS ) {
+				ToolVecHelper.SetToolVecByAssignedMS( ref toolVecPointList, m_CraftData.SpecialToolVecData.MasterAngle_deg, m_CraftData.SpecialToolVecData.SlaveAngle_deg );
+				m_interpolateTypeRegion = new List<Tuple<int, int, EToolVecInterpolateType>>();
+			}
+			else {
+				SolveInitIK();
+
+				if( m_CraftData.SpecialToolVecData.Type != ESpecialToolVecType.Normal ) {
+					ToolVecHelper.SetByAssignedMSWithAutoIK( ref toolVecPointList, m_CraftData.SpecialToolVecData.MasterAngle_deg, m_CraftData.SpecialToolVecData.SlaveAngle_deg, m_CraftData.InitMaster_rad, m_CraftData.InitSlave_rad );
+					UpdateSpecialToolVecDataSilently();
+					m_interpolateTypeRegion = new List<Tuple<int, int, EToolVecInterpolateType>>();
+				}
+				else {
+					// get the info for tool vec interpolation
+					InterpolatePreprocessingResult preprocessingResult = InterpolatePreprocessing( ref toolVecPointList );
+
+					// calculate tool vec for each point
+					ToolVecHelper.SetToolVec( ref toolVecPointList, preprocessingResult.RegionTypeList, preprocessingResult.CamToolVecModifyMap, preprocessingResult.IsFirstPntControlPnt, preprocessingResult.IsLastPntControlPoint );
+
+					// for tool vec dialog select action to no current index interpolate type
+					m_interpolateTypeRegion = preprocessingResult.RegionTypeList;
+				}
+			}
+		}
+
+		void UpdateSpecialToolVecDataSilently()
+		{
+			if( m_CraftData.SpecialToolVecData.Type == ESpecialToolVecType.Normal ) {
+				return;
+			}
+
+			if( m_CAMPointList == null || m_CAMPointList.Count == 0 ) {
+				return;
+			}
+
+			CAMPoint startPnt = m_CAMPointList.First();
+			SpecialToolVecData newSpecialToolVecData = new SpecialToolVecData(
+				m_CraftData.SpecialToolVecData.Type,
+				startPnt.ModMaster_rad * 180.0 / Math.PI,
+				startPnt.ModSlave_rad * 180.0 / Math.PI );
+
+			// stop unsubscribe from CAMFactorChanged to prevent infinite loop
+			m_CraftData.CAMFactorChanged -= SetCAMDataDirty;
+			m_CraftData.SetSpecialToolVecData( newSpecialToolVecData );
+			m_CraftData.CAMFactorChanged += SetCAMDataDirty;
+		}
 		void CreateIndexMap()
 		{
 			m_CADToCAMIndexMap.Clear();
@@ -393,7 +430,6 @@ namespace MyCAM.PathCache
 			toolVecModifyMap[ nLastIndex ].AngleData = m_CraftData.StartPntToolVecData.StartPnt.AngleData.Clone();
 		}
 
-
 		void SetStartAndEndPntIntoMap( ref List<ISetToolVecPoint> toolVecPointList, ref Dictionary<int, ToolVecModifyData> toolVecModifyMap )
 		{
 			if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
@@ -450,8 +486,8 @@ namespace MyCAM.PathCache
 			return intervalList;
 		}
 
-
 		List<Tuple<int, int, EToolVecInterpolateType>> m_interpolateTypeRegion;
+
 		public List<Tuple<int, int, EToolVecInterpolateType>> GetMapedModifyMap()
 		{
 			return m_interpolateTypeRegion;
@@ -471,23 +507,29 @@ namespace MyCAM.PathCache
 
 			// solve IK
 			for( int i = 0; i < m_CAMPointList.Count; i++ ) {
-				IKSolveResult ikResult = postSolver.SolveIK( m_CAMPointList[ i ].InitToolVec, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
-				if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
-					m_CAMPointList[ i ].InitMaster_rad = 0;
-					m_CAMPointList[ i ].InitSlave_rad = 0;
-					m_CAMPointList[ i ].ModMaster_rad = 0;
-					m_CAMPointList[ i ].ModSlave_rad = 0;
-					continue;
-				}
-				else if( ikResult == IKSolveResult.OutOfRange ) {
-					// temporary do nothing
-				}
-				m_CAMPointList[ i ].InitMaster_rad = dLastProcessPathM;
-				m_CAMPointList[ i ].InitSlave_rad = dLastProcessPathS;
-				m_CAMPointList[ i ].ModMaster_rad = dLastProcessPathM;
-				m_CAMPointList[ i ].ModSlave_rad = dLastProcessPathS;
+				SolvIK( postSolver, m_CAMPointList[ i ], dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
 			}
+
 			return;
+		}
+
+		void SolvIK( PostSolver postSolver, CAMPoint camPoint, double dLastProcessPathM, double dLastProcessPathS, out double dOutLastProcessPathM, out double dOutLastProcessPathS )
+		{
+			IKSolveResult ikResult = postSolver.SolveIK( camPoint.InitToolVec, dLastProcessPathM, dLastProcessPathS, out dOutLastProcessPathM, out dOutLastProcessPathS );
+			if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
+				camPoint.InitMaster_rad = 0;
+				camPoint.InitSlave_rad = 0;
+				camPoint.ModMaster_rad = 0;
+				camPoint.ModSlave_rad = 0;
+				return;
+			}
+			else if( ikResult == IKSolveResult.OutOfRange ) {
+				// temporary do nothing
+			}
+			camPoint.InitMaster_rad = dOutLastProcessPathM;
+			camPoint.InitSlave_rad = dOutLastProcessPathS;
+			camPoint.ModMaster_rad = dOutLastProcessPathM;
+			camPoint.ModSlave_rad = dOutLastProcessPathS;
 		}
 
 		void SetStartPoint()
@@ -567,7 +609,6 @@ namespace MyCAM.PathCache
 			m_ComputeRefCenterDir = m_ContourGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
 		}
 
-
 		void SetMicroJoint( ref List<CAMPoint> camPointList )
 		{
 			// set micro joint
@@ -587,7 +628,6 @@ namespace MyCAM.PathCache
 			}
 			return microJointStartCAMIdxList;
 		}
-
 
 		struct InterpolatePreprocessingResult
 		{

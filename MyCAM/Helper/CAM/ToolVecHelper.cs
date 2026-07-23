@@ -3,6 +3,7 @@ using MyCAM.Post;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Helper
 {
@@ -84,11 +85,117 @@ namespace MyCAM.Helper
 				return new Tuple<double, double>( BIG_AB_ANGLE, BIG_AB_ANGLE );
 			}
 
-			// Use helper to convert MS to ToolVec
 			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
 			Tuple<double, double> abAngle_deg = GetABAngleFromToolVec( toolVec, toolVecPoint );
 			return abAngle_deg;
 		}
+
+		public static gp_Dir ConvertMSAngleToToolVec( double dMaster_deg, double dSlave_deg )
+		{
+			// Get machine data
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return null;
+			}
+
+			// Create PostSolver
+			PostSolver postSolver = new PostSolver( machineData );
+
+			// Convert degrees to radians for FK solver
+			double dMaster_rad = dMaster_deg * Math.PI / 180.0;
+			double dSlave_rad = dSlave_deg * Math.PI / 180.0;
+
+			// Use PostSolver API to get the tool vector from master/slave angles
+			return postSolver.SolveToolVec( dMaster_rad, dSlave_rad );
+		}
+
+		#region Special case of tool vector edit
+
+		public static void SetToolVecByAssignedMS( ref List<ISetToolVecPoint> toolVecPointList, double dMaster_deg, double dSlave_deg )
+		{
+			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
+			double dMaster_rad = dMaster_deg * Math.PI / 180.0;
+			double dSlave_rad = dSlave_deg * Math.PI / 180.0;
+			foreach( var pnt in toolVecPointList ) {
+				pnt.ModMaster_rad = dMaster_rad;
+				pnt.ModSlave_rad = dSlave_rad;
+				pnt.ToolVec = toolVec;
+			}
+		}
+
+		public static void SetByAssignedMSWithAutoIK( ref List<ISetToolVecPoint> toolVecPointList, double dMaster_deg, double dSlave_deg, double dLastProcessPathM, double dLastProcessPathS )
+		{
+			// Get machine data
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return;
+			}
+			// Create PostSolver
+			PostSolver postSolver = new PostSolver( machineData );
+			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
+			foreach( var pnt in toolVecPointList ) {
+				pnt.ToolVec = toolVec;
+			}
+			int nStartIdx = 0;
+			int nEndIdx = toolVecPointList.Count - 1;
+			SolveIKAndFilterSingularity( ref toolVecPointList, postSolver, machineData, nStartIdx, nEndIdx, dLastProcessPathM, dLastProcessPathS, false );
+		}
+
+		// this bevel do not joint auto optimize
+		public static void SetBevelByStartMS( ref List<ISetToolVecPoint> toolVecPointList, double dMaster_deg, double dSlave_deg )
+		{
+			// get machine data
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return;
+			}
+			// create PostSolver
+			PostSolver postSolver = new PostSolver( machineData );
+
+			// use MS data to cal dir
+			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
+
+			// use dir to cal AB angle
+			Tuple<double, double> abAngle_deg = GetABAngleFromToolVec( toolVec, toolVecPointList.First() );
+
+			// apply AB angle to all points
+			foreach( var pnt in toolVecPointList ) {
+				// Convert A/B to ToolVec
+				gp_Dir ModifyVec = ConvertABAngleToToolVec( pnt, abAngle_deg.Item1, abAngle_deg.Item2 );
+				pnt.ToolVec = ModifyVec;
+			}
+			int nStartIdx = 1;
+			int nEndIdx = toolVecPointList.Count - 1;
+
+			// Set first point MS
+			toolVecPointList.First().ModMaster_rad = dMaster_deg * Math.PI / 180.0;
+			toolVecPointList.First().ModSlave_rad = dSlave_deg * Math.PI / 180.0;
+			double dM = toolVecPointList.First().ModMaster_rad;
+			double dS = toolVecPointList.First().ModSlave_rad;
+			SolveIKAndFilterSingularity( ref toolVecPointList, postSolver, machineData, nStartIdx, nEndIdx, dM, dS, false );
+		}
+
+		public static void SetBevelCaseToolVecForAssingAB( ref List<ISetToolVecPoint> toolVecPointList, double dA_deg, double dB_deg, double dLastProcessPathM, double dLastProcessPathS )
+		{
+			// get machine data
+			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+				return;
+			}
+			// create PostSolver
+			PostSolver postSolver = new PostSolver( machineData );
+
+			// apply AB angle to all points
+			foreach( var pnt in toolVecPointList ) {
+
+				// convert A/B to ToolVec
+				gp_Dir ModifyVec = ConvertABAngleToToolVec( pnt, dA_deg, dB_deg );
+
+				// get machine data, abAngle_deg.Item2 );
+				pnt.ToolVec = ModifyVec;
+			}
+			int nStartIdx = 0;
+			int nEndIdx = toolVecPointList.Count - 1;
+			SolveIKAndFilterSingularity( ref toolVecPointList, postSolver, machineData, nStartIdx, nEndIdx, dLastProcessPathM, dLastProcessPathS, false );
+		}
+
+		#endregion
 
 		static void ModifyToolVec( ref List<ISetToolVecPoint> toolVecPointList, List<Tuple<int, int, EToolVecInterpolateType>> regionTypeList, Dictionary<int, ToolVecModifyData> camToolVecModifyMap, bool isLastPntIsControlPnt )
 		{
@@ -393,6 +500,11 @@ namespace MyCAM.Helper
 			double dM = startData.AngleData.Master_deg * Math.PI / 180.0;
 			double dS = startData.AngleData.Slave_deg * Math.PI / 180.0;
 
+			SolveIKAndFilterSingularity( ref toolVecPointList, postSolver, machineData, nStartIdx, nEndIdx, dM, dS, endPointIsCtrlPnt );
+		}
+
+		static void SolveIKAndFilterSingularity( ref List<ISetToolVecPoint> toolVecPointList, PostSolver postSolver, MachineData machineData, int nStartIdx, int nEndIdx, double dM, double dS, bool endPointIsCtrlPnt )
+		{
 			// sigularity tag list
 			List<bool> singularTagList = new List<bool>();
 			nEndIdx = endPointIsCtrlPnt ? nEndIdx - 1 : nEndIdx;
@@ -533,24 +645,6 @@ namespace MyCAM.Helper
 				// move to next region
 				i = regionEnd + 1;
 			}
-		}
-
-		static gp_Dir ConvertMSAngleToToolVec( double dMaster_deg, double dSlave_deg )
-		{
-			// Get machine data
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
-				return null;
-			}
-
-			// Create PostSolver
-			PostSolver postSolver = new PostSolver( machineData );
-
-			// Convert degrees to radians for FK solver
-			double dMaster_rad = dMaster_deg * Math.PI / 180.0;
-			double dSlave_rad = dSlave_deg * Math.PI / 180.0;
-
-			// Use PostSolver API to get the tool vector from master/slave angles
-			return postSolver.SolveToolVec( dMaster_rad, dSlave_rad );
 		}
 
 		static gp_Dir ConvertABAngleToToolVec( ISetToolVecPoint toolVecPoint, double dRA_Deg, double dRB_Deg )
@@ -845,6 +939,7 @@ namespace MyCAM.Helper
 		// flip non-rotating axis based on ToolDir and rotary axis relationship
 		// isParallel = true  (X-mirror): v -> -v
 		// isParallel = false (Y-mirror): v -> sign(v)*180 - v
+
 		static double FlipNonRotatingAxis( double value_deg, bool isParallel )
 		{
 			// X-mirror: negate the value

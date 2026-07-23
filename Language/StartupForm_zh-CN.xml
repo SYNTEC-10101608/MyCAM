@@ -65,10 +65,10 @@
 	<Message ID="m_tsbMicroJoint_ToolTip" Content="微连" />
 	<Message ID="m_tsbToolVecReverse" Content="姿态反向" />
 	<Message ID="m_tsbToolVecReverse_ToolTip" Content="姿态反向" />
-	<Message ID="m_tsbToolVec" Content="姿态调适" />
-	<Message ID="m_tsbToolVec_ToolTip" Content="姿态调适" />
-	<Message ID="m_tsbFixedToolVec" Content="锁轴切割" />
-	<Message ID="m_tsbFixedToolVec_ToolTip" Content="锁轴切割" />
+	<Message ID="m_tsbToolVec" Content="飞边姿态" />
+	<Message ID="m_tsbToolVec_ToolTip" Content="飞边姿态" />
+	<Message ID="m_tsbFixedToolVec" Content="孔姿态" />
+	<Message ID="m_tsbFixedToolVec_ToolTip" Content="孔姿态" />
 	<Message ID="m_tsbOptimizeIK" Content="优化轴向" />
 	<Message ID="m_tsbOptimizeIK_ToolTip" Content="优化轴向" />
 	<Message ID="m_tsbManualOrder" Content="手动排序" />

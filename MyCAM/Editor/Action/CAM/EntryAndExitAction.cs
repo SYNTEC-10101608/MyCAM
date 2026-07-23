@@ -25,11 +25,26 @@ namespace MyCAM.Editor
 		public override void Start()
 		{
 			base.Start();
-			EntryAndExitDlg entryAndExitDlg = new EntryAndExitDlg( m_DataManager.EntryAndExitData.Clone() );
-			entryAndExitDlg.Confirm += ConfirmEntryAndExitParam;
-			entryAndExitDlg.Preview += PreviewEntryAndExitParam;
-			entryAndExitDlg.Cancel += CancelEntryAndExitParam;
-			entryAndExitDlg.Show( MyApp.MainForm );
+			m_Dlg = new EntryAndExitDlg( m_DataManager.EntryAndExitData.Clone() );
+			m_Dlg.Confirm = ConfirmEntryAndExitParam;
+			m_Dlg.Preview = PreviewEntryAndExitParam;
+			m_Dlg.Cancel = CancelEntryAndExitParam;
+			m_Dlg.Show( MyApp.MainForm );
+		}
+
+		public override void End()
+		{
+			if( !m_IsConfirmed ) {
+				RestoreBackupData();
+			}
+			if( m_Dlg != null ) {
+				m_Dlg.Preview = null;
+				m_Dlg.Confirm = null;
+				m_Dlg.Cancel = null;
+				m_Dlg.Close();
+				m_Dlg = null;
+			}
+			base.End();
 		}
 
 		void PreviewEntryAndExitParam( EntryAndExitData data )
@@ -42,14 +57,19 @@ namespace MyCAM.Editor
 		{
 			SetEntryAndExitParam( data );
 			PropertyChanged?.Invoke();
+			m_IsConfirmed = true;
 			End();
 		}
 
 		void CancelEntryAndExitParam()
 		{
+			End();
+		}
+
+		void RestoreBackupData()
+		{
 			SetEntryAndExitParam( m_BackupData );
 			PropertyChanged?.Invoke();
-			End();
 		}
 
 		void SetEntryAndExitParam( EntryAndExitData data )
@@ -58,5 +78,7 @@ namespace MyCAM.Editor
 		}
 
 		EntryAndExitData m_BackupData;
+		EntryAndExitDlg m_Dlg;
+		bool m_IsConfirmed = false;
 	}
 }

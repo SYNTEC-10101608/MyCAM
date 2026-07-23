@@ -103,6 +103,26 @@ namespace MyCAM.Editor.Renderer
 			return result;
 		}
 
+		public static Dictionary<string, List<AIS_Line>> BuildSpecialToolVecAISDict( List<string> pathIDList, gp_Trsf trsf )
+		{
+			Dictionary<string, List<AIS_Line>> result = new Dictionary<string, List<AIS_Line>>();
+			foreach( string szPathID in pathIDList ) {
+				DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData );
+				if ( craftData == null || craftData.SpecialToolVecData == null || craftData.SpecialToolVecData.Type == ESpecialToolVecType.Normal ) {
+					continue;
+				}
+				List<AIS_Line> toolVecAISList = new List<AIS_Line>();
+				result.Add( szPathID, toolVecAISList );
+				CAMPoint statPnt = CacheHelper.GetMainPathStartPoint( szPathID );
+				AIS_Line toolVecAIS = CreateVecAIS( statPnt.Point, statPnt.ToolVec );
+				if( trsf != null ) {
+					toolVecAIS.SetLocalTransformation( trsf );
+				}
+				toolVecAISList.Add( toolVecAIS );			
+			}
+			return result;
+		}
+
 		static AIS_Line CreateVecAIS( gp_Pnt point, gp_Dir dir )
 		{
 			gp_Pnt endPoint = new gp_Pnt( point.XYZ() + dir.XYZ() * 10 );
