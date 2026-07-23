@@ -81,6 +81,7 @@
     <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
     <Compile Include="Editor\Action\CAD\GlassDXFImportAction.cs" />
     <Compile Include="Editor\Action\CAD\PlaceRingShapeAction.cs" />
+    <Compile Include="Editor\Action\CAD\WireDiscreteVertexAction.cs" />
     <Compile Include="Editor\Action\CAM\AutoSortPathAction.cs" />
     <Compile Include="Editor\Action\CAM\CalibrationREFAction.cs" />
     <Compile Include="Editor\Action\CAM\ContourEditAction.cs" />

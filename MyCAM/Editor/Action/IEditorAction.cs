@@ -27,6 +27,7 @@ namespace MyCAM.Editor
 		AxisTransform,
 		SewPart,
 		Measure,
+		WireDiscreteVertex,
 
 		// CAM
 		SelectFace,

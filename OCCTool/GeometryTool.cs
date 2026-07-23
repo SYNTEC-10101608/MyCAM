@@ -7,6 +7,7 @@ using OCC.BRepBuilderAPI;
 using OCC.BRepGProp;
 using OCC.ElCLib;
 using OCC.gce;
+using OCC.GCPnts;
 using OCC.Geom;
 using OCC.Geom2d;
 using OCC.GeomAbs;
@@ -37,6 +38,10 @@ namespace OCCTool
 
 	public class GeometryTool
 	{
+		// shared default discretization parameters, keep every caller consistent unless a specific reason to differ
+		public const double DEFAULT_DISCRETE_MAX_DEFLECTION = 0.01;  // max chord height error (mm)
+		public const double DEFAULT_DISCRETE_MAX_LENGTH = 1.0;       // max segment length (mm)
+
 		public static gp_Pnt FindIntersectPoint( gp_Pnt p1, gp_Pnt p2, gp_Pnt p3, gp_Pnt p4,
 			out IntersectType TypeL1, out IntersectType TypeL2 )
 		{
@@ -94,6 +99,47 @@ namespace OCCTool
 		public static bool IsApproximatelyLinear( TopoDS_Edge edge )
 		{
 			return IsApproximatelyLinear( edge, out _, out _ );
+		}
+
+		public static List<double> DiscretizeEdgeParameters( BRepAdaptor_Curve curveAdaptor, TopoDS_Edge edge,
+			double maxDeflection = DEFAULT_DISCRETE_MAX_DEFLECTION, double maxEdgeLength = DEFAULT_DISCRETE_MAX_LENGTH )
+		{
+			double startParam = curveAdaptor.FirstParameter();
+			double endParam = curveAdaptor.LastParameter();
+
+			// break the curve into segments with given deflection precision
+			GCPnts_QuasiUniformDeflection deflectionDiscretizer = new GCPnts_QuasiUniformDeflection( curveAdaptor, maxDeflection, startParam, endParam );
+
+			List<double> paramList = new List<double>();
+			if( !deflectionDiscretizer.IsDone() || deflectionDiscretizer.NbPoints() == 0 ) {
+				paramList.Add( startParam );
+				paramList.Add( endParam );
+			}
+			else {
+				// break the curve into further sub-segments with given max length
+				for( int i = 1; i < deflectionDiscretizer.NbPoints(); i++ ) {
+					paramList.Add( deflectionDiscretizer.Parameter( i ) );
+					double dLength = GCPnts_AbscissaPoint.Length( curveAdaptor, deflectionDiscretizer.Parameter( i ), deflectionDiscretizer.Parameter( i + 1 ) );
+
+					// add sub-segments if the length is greater than max length
+					if( dLength > maxEdgeLength ) {
+						int nSubSegmentCount = (int)Math.Ceiling( dLength / maxEdgeLength );
+						double dSubSegmentLength = ( deflectionDiscretizer.Parameter( i + 1 ) - deflectionDiscretizer.Parameter( i ) ) / nSubSegmentCount;
+
+						// using equal parameter to break the segment
+						for( int j = 1; j < nSubSegmentCount; j++ ) {
+							paramList.Add( deflectionDiscretizer.Parameter( i ) + j * dSubSegmentLength );
+						}
+					}
+				}
+				paramList.Add( deflectionDiscretizer.Parameter( deflectionDiscretizer.NbPoints() ) );
+			}
+
+			// reverse the segment parameters if the edge is reversed
+			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+				paramList.Reverse();
+			}
+			return paramList;
 		}
 
 		public static bool IsPlane( TopoDS_Face face, out gp_Pnt p, out gp_Dir dir )

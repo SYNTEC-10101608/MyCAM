@@ -1,11 +1,9 @@
 ﻿using MyCAM.Data;
 using OCC.BRepAdaptor;
-using OCC.GCPnts;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,7 +13,7 @@ namespace MyCAM.Helper
 	{
 		public static bool BuildContourGeomData( List<PathEdge5D> pathEdge5DList, bool isClosed,
 			out List<CADPoint> cadPointList, out Dictionary<CADPoint, CADPoint> connectPointMap,
-			double maxDeflection = DISCRETE_MAX_DEFLECTION, double maxEdgeLength = DISCRETE_MAX_EDGE_LENGTH )
+			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION, double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH )
 		{
 			cadPointList = new List<CADPoint>();
 			connectPointMap = new Dictionary<CADPoint, CADPoint>();
@@ -45,35 +43,9 @@ namespace MyCAM.Helper
 
 			// get curve parameters
 			BRepAdaptor_Curve adC = new BRepAdaptor_Curve( edge, shellFace );
-			double dStartU = adC.FirstParameter();
-			double dEndU = adC.LastParameter();
 
-			// break the curve into segments with given deflection precision
-			GCPnts_QuasiUniformDeflection qUD = new GCPnts_QuasiUniformDeflection( adC, maxDeflection, dStartU, dEndU );
-
-			// break the curve into segments with given max length
-			List<double> segmentParamList = new List<double>();
-			for( int i = 1; i < qUD.NbPoints(); i++ ) {
-				segmentParamList.Add( qUD.Parameter( i ) );
-				double dLength = GCPnts_AbscissaPoint.Length( adC, qUD.Parameter( i ), qUD.Parameter( i + 1 ) );
-
-				// add sub-segments if the length is greater than max length
-				if( dLength > maxEdgeLength ) {
-					int nSubSegmentCount = (int)Math.Ceiling( dLength / maxEdgeLength );
-					double dSubSegmentLength = ( qUD.Parameter( i + 1 ) - qUD.Parameter( i ) ) / nSubSegmentCount;
-
-					// using equal parameter to break the segment
-					for( int j = 1; j < nSubSegmentCount; j++ ) {
-						segmentParamList.Add( qUD.Parameter( i ) + j * dSubSegmentLength );
-					}
-				}
-			}
-			segmentParamList.Add( qUD.Parameter( qUD.NbPoints() ) );
-
-			// reverse the segment parameters if the edge is reversed
-			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-				segmentParamList.Reverse();
-			}
+			// discretization logic (deflection + max length + orientation)
+			List<double> segmentParamList = GeometryTool.DiscretizeEdgeParameters( adC, edge, maxDeflection, maxEdgeLength );
 
 			for( int i = 0; i < segmentParamList.Count; i++ ) {
 				double U = segmentParamList[ i ];
@@ -165,7 +137,5 @@ namespace MyCAM.Helper
 			return GeometryTool.GetSurfaceNormal( edge, face, param );
 		}
 
-		const double DISCRETE_MAX_DEFLECTION = 0.01;
-		const double DISCRETE_MAX_EDGE_LENGTH = 1.0;
 	}
 }
