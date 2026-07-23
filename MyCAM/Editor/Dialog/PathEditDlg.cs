@@ -49,6 +49,11 @@ namespace MyCAM.Editor.Dialog
 			m_NumUpDownZ.Minimum = decimal.MinValue;
 			m_NumUpDownZ.DecimalPlaces = 3;
 			m_NumUpDownZ.Increment = 0.25m;
+
+			// Trigger initial preview to display coordinate system
+			GetValuesOfControls();
+			m_PathEditData = new PathEditData( m_RefCoordinateType, m_XOffset, m_YOffset, m_ZOffset );
+			RaisePreview( m_PathEditData );
 		}
 
 		void PathEditDlg_Shown( object sender, EventArgs e )

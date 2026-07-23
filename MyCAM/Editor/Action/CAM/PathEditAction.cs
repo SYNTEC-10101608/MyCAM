@@ -164,7 +164,7 @@ namespace MyCAM.Editor
 
 		void DisplayTrihedron( gp_Ax3 refCoord )
 		{
-			AIS_Trihedron trihedron = DrawHelper.GetTrihedronAIS( refCoord.Ax2() );
+			AIS_Trihedron trihedron = DrawHelper.GetTrihedronAIS( refCoord.Ax2(), 10.0, OCC.Quantity.Quantity_NameOfColor.Quantity_NOC_RED );
 			m_RefCoordTrihedronList.Add( trihedron );
 			m_Viewer.GetAISContext().Display( trihedron, false );
 			m_Viewer.GetAISContext().Deactivate( trihedron );
