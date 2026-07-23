@@ -384,6 +384,12 @@ namespace MyCAM
 			m_CAMEditor.StartMeasure();
 		}
 
+		// wire discrete vertex
+		void m_tsbWireDiscreteVertex_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.StartWireDiscreteVertex();
+		}
+
 		// 3 point transform
 		void m_tsb3PntTransform_Click( object sender, EventArgs e )
 		{
@@ -631,6 +637,9 @@ namespace MyCAM
 					case EditActionType.Measure:
 						m_tsbMeasureCAD.BackColor = DEFAULT_BtnColor;
 						return;
+					case EditActionType.WireDiscreteVertex:
+						m_tsbWireDiscreteVertex.BackColor = DEFAULT_BtnColor;
+						return;
 				}
 				return;
 			}
@@ -662,6 +671,9 @@ namespace MyCAM
 					return;
 				case EditActionType.Measure:
 					m_tsbMeasureCAD.BackColor = ON_ButtonColor;
+					return;
+				case EditActionType.WireDiscreteVertex:
+					m_tsbWireDiscreteVertex.BackColor = ON_ButtonColor;
 					return;
 			}
 		}
@@ -1621,6 +1633,9 @@ namespace MyCAM
 
 			m_tsbMeasureCAD.Text = m_LanguageManager.TryGetString( "m_tsbMeasureCAD", m_tsbMeasureCAD.Text );
 			m_tsbMeasureCAD.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMeasureCAD_ToolTip", m_tsbMeasureCAD.ToolTipText );
+
+			m_tsbWireDiscreteVertex.Text = m_LanguageManager.TryGetString( "m_tsbWireDiscreteVertex", m_tsbWireDiscreteVertex.Text );
+			m_tsbWireDiscreteVertex.ToolTipText = m_LanguageManager.TryGetString( "m_tsbWireDiscreteVertex_ToolTip", m_tsbWireDiscreteVertex.ToolTipText );
 
 			// cam toolbar
 			m_tsbAddPath.Text = m_LanguageManager.TryGetString( "m_tsbAddPath", m_tsbAddPath.Text );

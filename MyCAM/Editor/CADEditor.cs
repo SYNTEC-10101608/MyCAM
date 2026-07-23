@@ -245,6 +245,17 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void StartWireDiscreteVertex()
+		{
+			if( m_CurrentAction.ActionType == EditActionType.WireDiscreteVertex ) {
+				m_CurrentAction.End();
+				return;
+			}
+
+			WireDiscreteVertexAction action = new WireDiscreteVertexAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+			StartEditAction( action );
+		}
+
 		public void ImportTube( TopoDS_Shape tubeShape )
 		{
 			// rotate the tube around X+ by 90deg to make a Z+ direction

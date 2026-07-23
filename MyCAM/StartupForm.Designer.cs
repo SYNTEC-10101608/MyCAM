@@ -78,6 +78,7 @@
 			this.m_tsb3PntTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAxisTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbMeasureCAD = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbWireDiscreteVertex = new System.Windows.Forms.ToolStripButton();
 			this.m_tsSimuFunc = new System.Windows.Forms.ToolStrip();
 			this.m_btnPlay = new System.Windows.Forms.ToolStripButton();
 			this.m_btnPause = new System.Windows.Forms.ToolStripButton();
@@ -487,7 +488,7 @@
 			// 
 			// m_tsbMeasureCAM
 			// 
-			this.m_tsbMeasureCAM.Image = global::MyCAM.Properties.Resources.Measure;
+			this.m_tsbMeasureCAM.Image = global::MyCAM.Properties.Resources.CAM_Measure;
 			this.m_tsbMeasureCAM.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbMeasureCAM.Name = "m_tsbMeasureCAM";
 			this.m_tsbMeasureCAM.Size = new System.Drawing.Size(44, 47);
@@ -588,16 +589,17 @@
 			this.m_tsCADFunction.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.m_tsCADFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
 			this.m_tsCADFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsbSewPart,
-            this.m_tsbAddPoint_AcrCenter,
-            this.m_tsbAddPoint_EdgeCenter,
-            this.m_tsbAddPoint_PointCenter,
-            this.m_tsbAddPoint_BoundingBoxCenter,
-            this.m_tsbAddLine_TwoVertexConnect,
-            this.m_tsbManualTransform,
-            this.m_tsb3PntTransform,
-            this.m_tsbAxisTransform,
-            this.m_tsbMeasureCAD});
+			this.m_tsbSewPart,
+			this.m_tsbAddPoint_AcrCenter,
+			this.m_tsbAddPoint_EdgeCenter,
+			this.m_tsbAddPoint_PointCenter,
+			this.m_tsbAddPoint_BoundingBoxCenter,
+			this.m_tsbAddLine_TwoVertexConnect,
+			this.m_tsbManualTransform,
+			this.m_tsb3PntTransform,
+			this.m_tsbAxisTransform,
+			this.m_tsbMeasureCAD,
+			this.m_tsbWireDiscreteVertex});
 			this.m_tsCADFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCADFunction.Name = "m_tsCADFunction";
 			this.m_tsCADFunction.Size = new System.Drawing.Size(1596, 50);
@@ -705,7 +707,7 @@
 			// 
 			// m_tsbMeasureCAD
 			// 
-			this.m_tsbMeasureCAD.Image = global::MyCAM.Properties.Resources.Measure;
+			this.m_tsbMeasureCAD.Image = global::MyCAM.Properties.Resources.CAM_Measure;
 			this.m_tsbMeasureCAD.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.m_tsbMeasureCAD.Name = "m_tsbMeasureCAD";
 			this.m_tsbMeasureCAD.Size = new System.Drawing.Size(44, 47);
@@ -713,6 +715,17 @@
 			this.m_tsbMeasureCAD.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbMeasureCAD.ToolTipText = "量測";
 			this.m_tsbMeasureCAD.Click += new System.EventHandler(this.m_tsbMeasureCAD_Click);
+			// 
+			// m_tsbWireDiscreteVertex
+			// 
+			this.m_tsbWireDiscreteVertex.Image = global::MyCAM.Properties.Resources.CAM_GenerateVertex;
+			this.m_tsbWireDiscreteVertex.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbWireDiscreteVertex.Name = "m_tsbWireDiscreteVertex";
+			this.m_tsbWireDiscreteVertex.Size = new System.Drawing.Size(59, 47);
+			this.m_tsbWireDiscreteVertex.Text = "建特徵點";
+			this.m_tsbWireDiscreteVertex.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbWireDiscreteVertex.ToolTipText = "選取零件的輪廓後，並在輪廓線條上產生特徵點";
+			this.m_tsbWireDiscreteVertex.Click += new System.EventHandler(this.m_tsbWireDiscreteVertex_Click);
 			// 
 			// m_tsSimuFunc
 			// 
@@ -1418,6 +1431,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbManualTransform;
 		private System.Windows.Forms.ToolStripButton m_tsb3PntTransform;
 		private System.Windows.Forms.ToolStripButton m_tsbMeasureCAD;
+		private System.Windows.Forms.ToolStripButton m_tsbWireDiscreteVertex;
 		private System.Windows.Forms.ToolStripButton m_tsbAxisTransform;
 		private System.Windows.Forms.ToolStrip m_tsFileFunction;
 		private System.Windows.Forms.ToolStripButton m_tsbImport3DFile;
