@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="LeadDlg" Content="Параметры ввода" />
+	<Message ID="m_lblLeadIn" Content="Вводная леска" />
+	<Message ID="m_lblLeadOut" Content="Выходная леска" />
+	<Message ID="m_lblLeadLineLength" Content="Длина прямой" />
+	<Message ID="m_lblAngle" Content="Угол" />
+	<Message ID="m_lblRadius" Content="Радиус" />
+	<Message ID="m_btnOK" Content="ОК" />
+	<Message ID="Error_AngleRange" Content="Угол должен быть в диапазоне от 0 до 180" />
+	<Message ID="m_chkFlip" Content="Разворот вводной лески" />
+</ResMap>

@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="PathEditDlg" Content="Редактирование пути" />
+	<Message ID="m_lblRefCoordType" Content="Система координат" />
+	<Message ID="RefCoordType_Local" Content="Локальная система координат" />
+	<Message ID="RefCoordType_World" Content="Мировая система координат" />
+	<Message ID="m_lblX" Content="Смещение X" />
+	<Message ID="m_lblY" Content="Смещение Y" />
+	<Message ID="m_lblZ" Content="Смещение Z" />
+	<Message ID="m_btnConfirm" Content="Подтвердить" />
+	<Message ID="m_btnClear" Content="Очистить" />
+	<Message ID="m_btnReset" Content="Сброс" />
+</ResMap>

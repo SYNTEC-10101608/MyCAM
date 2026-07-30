@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="ReadProjectFileFailed" Content="Ошибка чтения файла проекта:&#10;{0}" />
+	<Message ID="OpenProjectTitle" Content="Открыть проект" />
+</ResMap>

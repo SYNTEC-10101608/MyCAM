@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+  <Message ID="m_tsbtnMainTube_Circle" Content="Круг" />
+  <Message ID="m_tsbtnMainTube_Rectangle" Content="Прямоугольник" />
+  <Message ID="m_tsbtnMainTube_Oval" Content="Овал" />
+  <Message ID="m_tsbtnMainTube_FlatOval" Content="Трек" />
+  <Message ID="m_tsbtnMainTube_DShape" Content="D-образная" />
+  <Message ID="m_tsbtnEndCutter" Content="Обрезка" />
+  <Message ID="m_tsbtnBranchTube_Circle" Content="Круг" />
+  <Message ID="m_tsbtnBranchTube_Rectangle" Content="Прямоугольник" />
+  <Message ID="m_tsbtnBranchTube_Oval" Content="Овал" />
+  <Message ID="m_tsbtnBranchTube_FlatOval" Content="Трек" />
+  <Message ID="m_tsbtnBranchTube_DShape" Content="D-образная" />
+  <Message ID="m_tsbtnBendingNotch_VShape" Content="Острый V-паз" />
+  <Message ID="m_tsbtnBendingNotch_BothSide" Content="Круглый V-паз" />
+  <Message ID="m_tsbtnBendingNotch_OneSide" Content="Односторонний круглый V-паз" />
+  <Message ID="m_tsbtnX_Pos" Content="X+" />
+  <Message ID="m_tsbtnX_Neg" Content="X-" />
+  <Message ID="m_tsbtnY_Pos" Content="Y+" />
+  <Message ID="m_tsbtnY_Neg" Content="Y-" />
+  <Message ID="m_tsbtnZ_Pos" Content="Z+" />
+  <Message ID="m_tsbtnZ_Neg" Content="Z-" />
+  <Message ID="m_tsbtnDir_Pos" Content="Направление грани+" />
+  <Message ID="m_tsbtnDir_Neg" Content="Направление грани-" />
+  <Message ID="m_tsbtnISO" Content="Изометрическая проекция" />
+  <Message ID="m_tsbtnZoomToFit" Content="По размеру" />
+  <Message ID="m_tsbtnNew" Content="Создать" />
+  <Message ID="m_tsbtnImport" Content="Импорт" />
+  <Message ID="m_tsbtnSave" Content="Сохранить" />
+  <Message ID="m_tsbtnSaveAs" Content="Сохранить как" />
+  <Message ID="m_tsbtnUndo" Content="Отменить" />
+  <Message ID="m_tsbtnRedo" Content="Повторить" />
+  <Message ID="m_tsbtnExport" Content="Экспорт" />
+  <Message ID="ExportReadFailed" Content="Неидентифицированный тип трубки" />
+</ResMap>

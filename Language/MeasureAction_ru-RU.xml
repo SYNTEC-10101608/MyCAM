@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+    <Message ID="FormatPointCoordinate" Content="X: {0:F3}mm&#13;&#10;Y: {1:F3}mm&#13;&#10;Z: {2:F3}mm" />
+    <Message ID="FormatLineLength" Content="Длина: {0:F3}мм" />
+    <Message ID="FormatCircleRadius" Content="Радиус: {0:F3}мм" />
+    <Message ID="FormatDistance" Content="Расстояние: {0:F3}мм" />
+    <Message ID="FormatAngle" Content="Угол: {0:F3}°" />
+    <Message ID="NotCircularArc" Content="Выбранное ребро не является кругом или дугой" />
+    <Message ID="FirstPointSelected" Content="Первая точка выбрана, пожалуйста, выберите вторую точку" />
+    <Message ID="FirstLineSelected" Content="Первая линия выбрана, пожалуйста, выберите вторую линию" />
+    <Message ID="NotStraightLine" Content="Выбранное ребро не является прямой линией" />
+    <Message ID="LinesNotIntersect" Content="Две линии не пересекаются, угол не может быть рассчитан" />
+</ResMap>

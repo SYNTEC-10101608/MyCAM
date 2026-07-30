@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+  <Message ID="Center_X_Y" Content="Положение X" />
+  <Message ID="Center_X_X" Content="Положение Y" />
+  <Message ID="Center_Y_Y" Content="Положение Y" />
+  <Message ID="Center_Y_X" Content="Положение X" />
+  <Message ID="Center_Z" Content="Положение Z" />
+  <Message ID="SelfRotateAngle_deg" Content="Угол автоворота" />
+  <Message ID="AAngle_deg_Y" Content="Угол A (поворот X)" />
+  <Message ID="AAngle_deg_X" Content="Угол B (поворот Y)" />
+  <Message ID="BAngle_deg_Y" Content="Угол B (поворот Y)" />
+  <Message ID="BAngle_deg_X" Content="Угол A (поворот X)" />
+  <Message ID="Shape" Content="Геометрические параметры" />
+  <Message ID="IntersectDir" Content="Направление пересечения" />
+  <Message ID="IsCutThrough" Content="Полное проникновение" />
+  <Message ID="Length" Content="Длина ответвления" />
+  <Message ID="ArrayParam" Content="Параметры массива" />
+</ResMap>

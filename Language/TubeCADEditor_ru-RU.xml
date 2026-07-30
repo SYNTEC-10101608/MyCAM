@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+  <Message ID="Circle" Content="Круг" />
+  <Message ID="Rectangle" Content="Прямоугольник" />
+  <Message ID="Oval" Content="Овал" />
+  <Message ID="FlatOval" Content="Трек" />
+  <Message ID="DShape" Content="D-образная" />
+  <Message ID="VShape" Content="Острый V-паз" />
+  <Message ID="BothSide" Content="Круглый V-паз" />
+  <Message ID="OneSide" Content="Односторонний круглый V-паз" />
+  <Message ID="MainTube" Content="Основная труба" />
+  <Message ID="EndCutter" Content="Обрезка" />
+  <Message ID="BranchTube" Content="Ответвление" />
+  <Message ID="BendingNotch" Content="V-паз" />
+  <Message ID="ErrorCode_OK" Content="Завершено" />
+  <Message ID="ErrorCode_NullParam" Content="Ошибка процесса - параметр равен null" />
+  <Message ID="ErrorCode_NoMainTube" Content="Ошибка процесса - основная труба равна null" />
+  <Message ID="ErrorCode_NoSelectedObject" Content="Ошибка процесса - функция равна null" />
+  <Message ID="ErrorCode_InvalidParam" Content="Недопустимые параметры" />
+  <Message ID="ErrorCode_MakeShapeFailed" Content="Невозможно создать функцию" />
+  <Message ID="ErrorCode_CanNotRemoveMainTube" Content="Невозможно удалить основную трубку" />
+  <Message ID="ErrorCode_ImportFileFailed" Content="Ошибка импорта" />
+  <Message ID="ErrorCode_SaveFileFailed" Content="Ошибка сохранения" />
+  <Message ID="CADConstraint_FailCreateMainTube" Content="Невозможно создать этот тип основной трубки из-за ограничения максимального диаметра огибающего круга трубки" />
+  <Message ID="CADConstraint_TubeLengthTooLong" Content="Длина трубки должна быть меньше или равна ограничению длины трубки при обработке" />
+  <Message ID="CADConstraint_DiameterTooLarge" Content="Диаметр должен быть меньше или равен максимальному диаметру огибающего круга трубки" />
+  <Message ID="CADConstraint_DiagonalTooLarge" Content="Длина диагонали должна быть меньше или равна максимальному диаметру огибающего круга трубки" />
+  <Message ID="CADConstraint_HeightTooLarge" Content="Высота должна быть меньше или равна максимальному диаметру огибающего круга трубки" />
+  <Message ID="CADConstraint_TwoTimesRadiusTooLarge" Content="Удвоенный радиус должен быть меньше или равен максимальному диаметру огибающего круга трубки" />
+  <Message ID="CADConstraint_WidthTooLarge" Content="Ширина должна быть меньше или равна максимальному диаметру огибающего круга трубки" />
+</ResMap>

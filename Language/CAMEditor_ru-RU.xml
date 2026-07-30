@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="PleaseAddWorkpiece" Content="[Напоминание об операции] Пожалуйста, сначала добавьте деталь" />
+	<Message ID="PleaseSelectFace" Content="[Напоминание об операции] Пожалуйста, сначала выберите лицо" />
+	<Message ID="NoClosedBoundaryFound" Content="[Напоминание об операции] Замкнутая граница не найдена" />
+	<Message ID="OnlyContourPathSupported" Content="[Напоминание об операции] Эта функция поддерживает только контурные пути" />
+	<Message ID="PleaseSelectPath" Content="[Напоминание об операции] Пожалуйста, сначала выберите путь" />
+	<Message ID="OnlySinglePathEdit" Content="[Напоминание об операции] Для редактирования можно выбрать только один путь" />
+	<Message ID="AutoOptimizeIKDone" Content="[Операция завершена] Автоматическая оптимизация оси вращения начальной точки завершена" />
+	<Message ID="NCExportFailedAndTransferFailed" Content="[Статус вывода NC] Вывод NC не удался: {0}&#10;[Статус передачи файла] Передача файла NC не удалась" />
+	<Message ID="TempFileDeleteFailed" Content="[Очистка временных файлов] Ошибка удаления: {0}" />
+	<Message ID="NCFileSaveFailed" Content="[Статус вывода NC] Ошибка сохранения файла: {0}" />
+	<Message ID="NCExportSuccessNoController" Content="[Статус вывода NC] Успешный вывод NC&#10;[Статус передачи файла] Не подключено к контроллеру, файл не может быть передан" />
+	<Message ID="NCExportAndTransferSuccess" Content="[Статус вывода NC] Успешный вывод NC&#10;[Статус передачи файла] Успешная передача файла NC" />
+	<Message ID="NCExportSuccessTransferFailed" Content="[Статус вывода NC] Успешный вывод NC&#10;[Статус передачи файла] Ошибка передачи файла NC: {0}" />
+	<Message ID="SaveNCFileTitle" Content="Сохранить файл NC" />
+	<Message ID="NoIntersectingFaceFound" Content="[Напоминание об операции] Пересекающаяся грань не найдена" />
+	<Message ID="NoD1ContinuousFaceFound" Content="[Напоминание об операции] D1 непрерывная грань не найдена" />
+	<Message ID="FaceGroupBuildFailed" Content="[Напоминание об операции] Построение группы граней не удалось" />
+	<Message ID="CAMEditor_OptimizeIKContinuityCompleted" Content="[Операция завершена] Автоматическая оптимизация оси вращения начальной точки завершена" />
+</ResMap>

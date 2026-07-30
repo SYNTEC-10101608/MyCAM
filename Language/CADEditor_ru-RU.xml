@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="ImportFailed" Content="Ошибка импорта" />
+	<Message ID="PleaseSelectPart" Content="[Напоминание об операции] Пожалуйста, сначала выберите деталь" />
+	<Message ID="NoPartData" Content="Нет данных деталей" />
+	<Message ID="CreatePointFailed" Content="Ошибка создания точки" />
+</ResMap>
