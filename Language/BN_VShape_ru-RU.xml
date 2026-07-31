@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-  <Message ID="BendingAngle_deg" Content="Угол изгиба" />
-  <Message ID="JointGapLength" Content="Длина соединения" />
-  <Message ID="ReliefHoleType" Content="Тип выпускного отверстия" />
-  <Message ID="ReliefHole" Content="Параметры выпускного отверстия" />
-</ResMap>

@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-	<Message ID="EntryAndExitDlg" Content="Вход/Выход" />
-	<Message ID="m_lblEntryDistance" Content="Расстояние входа" />
-	<Message ID="m_lblExitDistance" Content="Расстояние выхода" />
-	<Message ID="m_lblFollowSafeDistance" Content="Следящее безопасное расстояние" />
-	<Message ID="m_btnConfirm" Content="Подтвердить" />
-</ResMap>

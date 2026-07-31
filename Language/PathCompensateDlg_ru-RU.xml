@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-	<Message ID="PathCompensateDlg" Content="Компенсация пути" />
-	<Message ID="m_lblCompensate" Content="Расстояние компенсации (приращение)" />
-	<Message ID="m_btnConfirm" Content="Подтвердить" />
-	<Message ID="m_btnClear" Content="Очистить" />
-	<Message ID="m_btnReset" Content="Сброс" />
-</ResMap>

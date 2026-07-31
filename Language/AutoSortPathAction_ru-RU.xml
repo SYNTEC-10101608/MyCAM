@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-  <Message ID="Log_InsufficientPaths" Content="[Сортировка пути] Недостаточно путей, требуется как минимум 2 пути" />
-  <Message ID="Log_SortFailed" Content="[Сортировка пути] {0} сортировка не дала результата, пожалуйста, проверьте правильность данных пути" />
-  <Message ID="SortMethod_ShortestPath" Content="Кратчайший путь" />
-  <Message ID="SortMethod_CylinderVertical" Content="Цилиндр вертикальный" />
-  <Message ID="SortMethod_CylinderHorizontal" Content="Цилиндр горизонтальный" />
-  <Message ID="SortMethod_Unknown" Content="Неизвестный" />
-</ResMap>

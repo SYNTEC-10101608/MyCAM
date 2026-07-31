@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-  <Message ID="Width" Content="Ширина" />
-  <Message ID="Height" Content="Высота" />
-  <Message ID="Fillet" Content="Радиус скругления" />
-</ResMap>

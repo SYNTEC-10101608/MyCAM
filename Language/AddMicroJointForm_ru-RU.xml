@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-  <Message ID="m_lblWidth" Content="Ширина микросвязи" />
-  <Message ID="m_chkStartPointFirst" Content="Начало приоритета добавления" />
-  <Message ID="m_btnOK" Content="Подтвердить" />
-  <Message ID="InvalidValue" Content="Недопустимое входное значение!" />
-</ResMap>

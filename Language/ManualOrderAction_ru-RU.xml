@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-	<Message ID="InvalidFlagPosition" Content="[Напоминание об операции] Недопустимое положение флага" />
-	<Message ID="NoPathSelected" Content="[Напоминание об операции] Путь не выбран" />
-	<Message ID="OnlySinglePathSelection" Content="[Напоминание об операции] Эта функция поддерживает только выбор одного пути" />
-</ResMap>

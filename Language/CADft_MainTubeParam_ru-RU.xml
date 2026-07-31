@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-  <Message ID="CrossSection" Content="Параметры сечения" />
-  <Message ID="Length" Content="Длина трубы" />
-</ResMap>

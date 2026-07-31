@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-  <Message ID="BendingRadius" Content="Радиус изгиба" />
-  <Message ID="BendingAngle_deg" Content="Угол изгиба" />
-  <Message ID="IsOverCut" Content="Избыточный рез стенки" />
-  <Message ID="JointGapLength" Content="Длина соединения" />
-</ResMap>

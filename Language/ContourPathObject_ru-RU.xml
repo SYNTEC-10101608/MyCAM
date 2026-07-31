@@ -1,4 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-    <Message ID="DetermineClosedPathError" Content="Ошибка при определении замкнутости пути: {0}" />
-</ResMap>

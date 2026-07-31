@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-  <Message ID="Error_LocalFileNotFound" Content="Локальный файл не существует или путь неверный" />
-  <Message ID="Error_FTPServerIPInvalid" Content="IP-адрес FTP-сервера недействителен" />
-  <Message ID="Error_ConnectionFailed" Content="Ошибка подключения" />
-  <Message ID="Error_UploadFailed" Content="Ошибка загрузки, код состояния: {0}" />
-  <Message ID="Error_NetworkError" Content="Ошибка сети: {0}" />
-  <Message ID="Error_UploadException" Content="Исключение загрузки: {0}" />
-</ResMap>

@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-  <Message ID="IsOverCut" Content="Избыточный рез стенки" />
-  <Message ID="Side" Content="Направление V-паза" />
-</ResMap>

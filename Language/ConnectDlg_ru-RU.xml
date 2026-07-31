@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-  <Message ID="FormTitle" Content="Параметры подключения" />
-  <Message ID="m_lblIP" Content="IP:" />
-  <Message ID="m_btnConfirm" Content="Подтвердить" />
-  <Message ID="m_lblTips_Default" Content="Пожалуйста, введите в формате IPv4" />
-  <Message ID="Error_InvalidIPFormat" Content="Неверный формат ввода, пожалуйста, введите в формате IPv4" />
-</ResMap>

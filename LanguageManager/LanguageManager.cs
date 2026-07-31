@@ -16,7 +16,6 @@ namespace LanguageManager
 		// supported languages
 		public const string CHINESE_Traditional = "zh-TW";
 		public const string CHINESE_Simplified = "zh-CN";
-		public const string RUSSIAN_RussianFederation = "ru-RU";
 
 		public static string CurrentUILanguage
 		{
@@ -296,7 +295,6 @@ namespace LanguageManager
 		static readonly Dictionary<string, LanguageData> m_SupportedLanguageDataMap = new Dictionary<string, LanguageData>(){
 			{ CHINESE_Traditional, new LanguageData(){ CNCParamValue = 1, NativeName = "繁體中文", DisplayName = InitDisplayName( CHINESE_Traditional ) } },
 			{ CHINESE_Simplified, new LanguageData(){ CNCParamValue = 119, NativeName = "简体中文", DisplayName = InitDisplayName( CHINESE_Simplified ) } },
-			{ RUSSIAN_RussianFederation, new LanguageData(){ CNCParamValue = 185, NativeName = "Русский", DisplayName = InitDisplayName( RUSSIAN_RussianFederation ) } },
 		};
 
 		static string m_szCurrentUILanguage = CHINESE_Traditional;

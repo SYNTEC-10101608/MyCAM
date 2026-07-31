@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-  <Message ID="LinearCount" Content="Количество линейного массива" />
-  <Message ID="LinearDistance" Content="Расстояние линейного массива" />
-  <Message ID="LinearDirection" Content="Направление линейного массива" />
-  <Message ID="AngularCount" Content="Количество кругового массива" />
-  <Message ID="AngularDistance" Content="Расстояние кругового массива" />
-  <Message ID="AngularDirection" Content="Направление кругового массива" />
-</ResMap>

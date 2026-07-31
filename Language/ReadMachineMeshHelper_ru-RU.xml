@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-	<Message ID="MeshFolderPathError" Content="Ошибка пути папки механизма" />
-	<Message ID="MeshFileMissing" Content="{0} файл изображения отсутствует" />
-	<Message ID="MeshFileReadFailed" Content="{0} ошибка чтения файла" />
-	<Message ID="MeshFileUnknownError" Content="{0} ошибка чтения STL, неизвестная ошибка" />
-</ResMap>

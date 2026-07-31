@@ -1,4 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-	<Message ID="CompensationExceedsLimit" Content="Путь выходит за пределы диапазона компенсации, пожалуйста, отрегулируйте значение компенсации" />
-</ResMap>

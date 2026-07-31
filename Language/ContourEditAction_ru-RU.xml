@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-	<Message ID="NotContourPath" Content="Путь {0} не является контурным путём и не может быть отредактирован" />
-	<Message ID="CannotGetPathCraftInfo" Content="Не удалось получить информацию о обработке пути {0}" />
-</ResMap>

@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ResMap>
-    <Message ID="NoIntersectedFace" Content="[Напоминание об операции] Пересекающаяся грань не найдена" />
-    <Message ID="NoD1ContinuousFaces" Content="[Напоминание об операции] D1 непрерывная грань не найдена" />
-    <Message ID="SewFaceGroupFailed" Content="[Напоминание об операции] Построение группы граней не удалось" />
-    <Message ID="NoClosedBoundaries" Content="[Напоминание об операции] Замкнутая граница не найдена" />
-    <Message ID="UnknownError" Content="[Напоминание об операции] Неизвестная ошибка" />
-</ResMap>
