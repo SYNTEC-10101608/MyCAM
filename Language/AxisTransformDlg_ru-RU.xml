@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="AxisTransformDlg" Content="Преобразование оси" />
+	<Message ID="m_grpDisplacement" Content="Смещение" />
+	<Message ID="m_grpRotation" Content="Вращение" />
+	<Message ID="m_lblX" Content="X" />
+	<Message ID="m_lblY" Content="Y" />
+	<Message ID="m_lblZ" Content="Z" />
+	<Message ID="m_lblRx" Content="RX" />
+	<Message ID="m_lblRy" Content="RY" />
+	<Message ID="m_lblRz" Content="RZ" />
+	<Message ID="m_lblStepDis" Content="Шаг смещения" />
+	<Message ID="m_lblStapAngle" Content="Шаг вращения" />
+	<Message ID="m_btnOK" Content="Подтвердить" />
+	<Message ID="m_btnCancel" Content="Отмена" />
+	<Message ID="m_btnReset" Content="Сброс" />
+</ResMap>

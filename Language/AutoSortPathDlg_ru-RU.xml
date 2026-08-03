@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+  <Message ID="FormTitle" Content="Автоматическая сортировка" />
+  <Message ID="m_lblSortMethod" Content="Способ сортировки:" />
+  <Message ID="m_lblPathHint" Content="Начальный путь:" />
+  <Message ID="m_lblCylinderAxis" Content="Направление оси круглой трубки:" />
+  <Message ID="m_lblExtrusionDir" Content="Направление оси растяжения:" />
+  <Message ID="m_lblRotationDir" Content="Направление оси вращения:" />
+  <Message ID="m_lblBandwidth" Content="Полоса пропускания группировки:" />
+  <Message ID="m_lblRotationUnit" Content="°" />
+  <Message ID="m_btnConfirm" Content="ОК" />
+  <Message ID="Status_NotSelected" Content="Не выбрано" />
+  <Message ID="Status_Selected" Content="Выбрано" />
+  <Message ID="SortMethod_ShortestPath" Content="Кратчайший путь" />
+  <Message ID="SortMethod_CylinderVertical" Content="Прямая сортировка круглой трубки" />
+  <Message ID="SortMethod_CylinderHorizontal" Content="Горизонтальная сортировка круглой трубки" />
+  <Message ID="Axis_X" Content="Ось X" />
+  <Message ID="Axis_Y" Content="Ось Y" />
+  <Message ID="Axis_Z" Content="Ось Z" />
+  <Message ID="ExtrusionDir_FromTop" Content="Сверху вниз" />
+  <Message ID="ExtrusionDir_FromBottom" Content="Снизу вверх" />
+  <Message ID="RotationDir_Clockwise" Content="По часовой стрелке" />
+  <Message ID="RotationDir_Counterclockwise" Content="Против часовой стрелки" />
+</ResMap>

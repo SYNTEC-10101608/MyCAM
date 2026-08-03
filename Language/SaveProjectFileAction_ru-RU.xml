@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="NoWorkpieceToExport" Content="Нет деталей для экспорта файла проекта" />
+	<Message ID="SaveFileError" Content="Ошибка при сохранении файла:&#10;{0}" />
+	<Message ID="SaveProjectTitle" Content="Сохранить проект" />
+</ResMap>

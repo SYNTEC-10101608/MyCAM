@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="CannotGetPathCraftInfo" Content="Не удалось получить информацию о обработке пути {0}" />
+</ResMap>

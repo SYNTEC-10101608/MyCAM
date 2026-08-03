@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="MissingRotationCenter" Content="Отсутствует настройка центра вращения" />
+	<Message ID="MissingRotationDirection" Content="Отсутствует настройка направления вращения" />
+	<Message ID="FrameCalcFailed" Content="Ошибка вычисления кадра" />
+	<Message ID="MissingChainMapEntry" Content="Отсутствует элемент сопоставления {0} в списке цепи" />
+	<Message ID="GetComponentTrsfException" Content="Исключение при получении преобразования компонента: {0}" />
+</ResMap>

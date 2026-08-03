@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="ContourEditDlg" Content="Редактирование контура" />
+	<Message ID="m_gbxIndexParam" Content="Параметры контрольной точки" />
+	<Message ID="m_lblDX" Content="DX" />
+	<Message ID="m_lblDY" Content="DY" />
+	<Message ID="m_lblDZ" Content="DZ" />
+	<Message ID="m_lblUnit" Content="(единица: мм)" />
+	<Message ID="m_btnAdd" Content="Добавить" />
+	<Message ID="m_btnRemove" Content="Удалить" />
+</ResMap>

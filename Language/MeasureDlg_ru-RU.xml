@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+  <Message ID="MeasureDlg" Content="Измерение" />
+  <Message ID="m_lblMethod" Content="Способ измерения" />
+  <Message ID="m_lblResult" Content="Результат измерения" />
+  <Message ID="Method_PointCoordinate" Content="Координаты точки" />
+  <Message ID="Method_LineLength" Content="Длина линии" />
+  <Message ID="Method_CircleArcRadius" Content="Радиус дуги" />
+  <Message ID="Method_DistanceBetweenTwoPoints" Content="Расстояние между двумя точками" />
+  <Message ID="Method_AngleBetweenLines" Content="Угол между двумя линиями" />
+  <Message ID="Guide_PointCoordinate" Content="Нажмите на вершину детали, чтобы измерить её координаты" />
+  <Message ID="Guide_LineLength" Content="Нажмите на ребро, чтобы измерить его длину" />
+  <Message ID="Guide_CircleArcRadius" Content="Нажмите на круг или дугу, чтобы измерить радиус" />
+  <Message ID="Guide_DistanceBetweenTwoPoints" Content="Нажмите на две вершины по очереди, чтобы измерить расстояние" />
+  <Message ID="Guide_AngleBetweenLines" Content="Нажмите на две линии по очереди, чтобы измерить угол" />
+  <Message ID="m_lblGuide_Default" Content="Пожалуйста, выберите способ измерения" />
+</ResMap>

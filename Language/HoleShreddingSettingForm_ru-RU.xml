@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+  <Message ID="Title" Content="Параметры измельчения отверстия" />
+  <Message ID="m_lblShreddingInterval" Content="Интервал измельчения" />
+  <Message ID="m_btnOK" Content="Подтвердить" />
+  <Message ID="m_btnCancel" Content="Отмена" />
+  <Message ID="ApplyToAllCuttingPaths" Content="Применяется ко всем путям резки" />
+  <Message ID="ApplyToSelectedCuttingPaths" Content="Применяется только к выбранным путям резки" />
+  <Message ID="Error_InvalidInput" Content="Недопустимое входное значение, введите целое число &gt;=0" />
+  <Message ID="Error_NoCuttingPath" Content="Путей резки не существует, эта функция не может быть использована" />
+</ResMap>

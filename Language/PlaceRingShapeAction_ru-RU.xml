@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+    <Message ID="NoSolidObjectInFile" Content="[Напоминание об операции] Нет твердых объектов в файле чертежа" />
+    <Message ID="RevolutionPlaceFailed" Content="[Напоминание об операции] Размещение тела вращения не удалось" />
+    <Message ID="ImportFailed" Content="Ошибка импорта" />
+</ResMap>

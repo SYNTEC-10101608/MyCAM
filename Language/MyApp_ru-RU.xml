@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+  <Message ID="LoggerNotInitialized" Content="Logger ещё не инициализирован, сначала настройте MainForm." />
+  <Message ID="MainFormNotInitialized" Content="MainForm ещё не инициализирован, сначала настройте MainForm." />
+  <Message ID="CustPostFileNotExist" Content="Файл пользовательского постпроцессора не существует" />
+  <Message ID="ReadCustPostFileFailed" Content="Не удалось прочитать файл пользовательского постпроцессора" />
+  <Message ID="CustPostFileContentError" Content="Содержимое файла пользовательского постпроцессора неполное или имеет неверный формат, пожалуйста, проверьте содержимое файла." />
+</ResMap>
