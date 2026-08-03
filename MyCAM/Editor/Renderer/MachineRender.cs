@@ -141,6 +141,9 @@ namespace MyCAM.Editor.Renderer
 			}
 			aisShape.SetLocalTransformation( new gp_Trsf() );
 			if( aisShape is AIS_Triangulation tri ) {
+				var plasticAspect = new Graphic3d_MaterialAspect( Graphic3d_NameOfMaterial.Graphic3d_NOM_PLASTIC );
+				tri.SetMaterial( plasticAspect );
+				tri.SetTransparency( TRANSPARENCY );
 				SetMeshColor( tri, type, false );
 			}
 		}

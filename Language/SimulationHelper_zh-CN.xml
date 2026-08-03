@@ -4,5 +4,4 @@
 	<Message ID="MissingRotationDirection" Content="缺少旋转方向设定" />
 	<Message ID="FrameCalcFailed" Content="帧计算失败" />
 	<Message ID="MissingChainMapEntry" Content="链列表中缺少 {0} 的映射项" />
-	<Message ID="GetComponentTrsfException" Content="获取组件变换时发生异常: {0}" />
 </ResMap>

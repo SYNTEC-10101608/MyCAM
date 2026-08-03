@@ -91,6 +91,23 @@ namespace MyCAM.Helper
 
 	public static class SimulationHelper
 	{
+		// shared cached LanguageManager to avoid per-frame allocations in hot paths.
+		static readonly LanguageManager.LanguageManager m_LangMgr = new LanguageManager.LanguageManager( "SimulationHelper" );
+
+		// record component need to simu
+		static readonly MachineComponentType[] s_ComponentTypes = new[]
+		{
+			MachineComponentType.XAxis,
+			MachineComponentType.YAxis,
+			MachineComponentType.ZAxis,
+			MachineComponentType.Master,
+			MachineComponentType.Slave,
+			MachineComponentType.Laser,
+			MachineComponentType.WorkPiece,
+		};
+
+		const int COMPONENT_COUNT = 7;
+
 		internal static bool BuildFrameTransMap( SimuData.SimuRequiredData.SimuInputSet calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out List<SimuData.ResultData.PathStartEndIndex> pathStartEndIndexList, out int frameCount )
 		{
 			frameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
@@ -102,6 +119,7 @@ namespace MyCAM.Helper
 			if( !bGetWholePathIK ) {
 				return false;
 			}
+
 			bool bSolveFKDone = BuildPathFKList( pathIKPntList, calNeedData.PostSolver, calNeedData.MachineData.SimulationOffset, out List<PathSimuFKData> pathFKPntList );
 			if( !bSolveFKDone ) {
 				return false;
@@ -150,6 +168,10 @@ namespace MyCAM.Helper
 			if( machineData == null || position == null || workPieceChain == null || machineChainListMap == null ) {
 				return false;
 			}
+			if( machineData.PtOnMaster == null || machineData.PtOnSlave == null
+				|| machineData.MasterRotateDir == null || machineData.SlaveRotateDir == null ) {
+				return false;
+			}
 
 			// set default offset
 			gp_Vec simuOffset = machineData.SimulationOffset ?? new gp_Vec();
@@ -171,18 +193,26 @@ namespace MyCAM.Helper
 				return false;
 			}
 
-			// initialize frame transform map
-			frameTransformMap[ MachineComponentType.XAxis ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.YAxis ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.ZAxis ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.Master ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.Slave ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.Laser ] = new List<gp_Trsf>();
-			frameTransformMap[ MachineComponentType.WorkPiece ] = new List<gp_Trsf>();
+			// flatten chain map into int[component index][parent indices] for fast lookup
+			int[][] chainIdx = BuildFlattenChainList( machineChainListMap );
 
-			// calculate frame transform
-			FKToFrameTranfResult( FKpnt, machineData.SimulationOffset, workPieceChain, machineData, machineChainListMap, ref frameTransformMap );
+			// per-component reusable buffer (single frame, so length == COMPONENT_COUNT)
+			gp_Trsf[] transformBuf = new gp_Trsf[ COMPONENT_COUNT ];
 
+			// single-frame lists (capacity 1 to avoid extra growth)
+			var lists = new List<gp_Trsf>[ COMPONENT_COUNT ];
+			for( int i = 0; i < COMPONENT_COUNT; i++ ) {
+				lists[ i ] = new List<gp_Trsf>( 1 );
+			}
+
+			// calculate frame transform via the flattened fast path
+			FKToFrameTranfResult( FKpnt, machineData.SimulationOffset, workPieceChain,
+				machineData, chainIdx, ref transformBuf, ref lists );
+
+			// materialize into the output Dictionary once
+			for( int i = 0; i < COMPONENT_COUNT; i++ ) {
+				frameTransformMap[ s_ComponentTypes[ i ] ] = lists[ i ];
+			}
 			return true;
 		}
 
@@ -338,27 +368,25 @@ namespace MyCAM.Helper
 				return false;
 			}
 
-			// init frame transform map
-			m_FrameTransformMap[ MachineComponentType.XAxis ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.YAxis ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.ZAxis ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.Master ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.Slave ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.Laser ] = new List<gp_Trsf>();
-			m_FrameTransformMap[ MachineComponentType.WorkPiece ] = new List<gp_Trsf>();
-
-			gp_Vec G54Offset = machineData.SimulationOffset;
-
 			// build frame by frame (with guard against invalid machine data)
-			var m_LanguageManager = new LanguageManager.LanguageManager( "SimulationHelper" );
 			if( machineData.PtOnMaster == null || machineData.PtOnSlave == null ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "MissingRotationCenter", MISSING_ROTATION_CENTER ), MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LangMgr.TryGetString( "MissingRotationCenter", MISSING_ROTATION_CENTER ), MyApp.NoticeType.Warning );
 				return false;
 			}
 			if( machineData.MasterRotateDir == null || machineData.SlaveRotateDir == null ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "MissingRotationDirection", MISSING_ROTATION_DIRECTION ), MyApp.NoticeType.Warning );
+				MyApp.Logger.ShowOnLogPanel( m_LangMgr.TryGetString( "MissingRotationDirection", MISSING_ROTATION_DIRECTION ), MyApp.NoticeType.Warning );
 				return false;
 			}
+
+			// [component][List<gp_Trsf>]
+			List<gp_Trsf>[] arrayWithTrsftList = CreateFrameTransformLists( pathFKPntList );
+
+			// int[component count][parent indices]
+			int[][] chainIdx = BuildFlattenChainList( chainListMap );
+
+			// buffer of component transforms (avoid repeated allocation)
+			gp_Trsf[] trsfBuffer = new gp_Trsf[ COMPONENT_COUNT ];
+			gp_Vec G54Offset = machineData.SimulationOffset;
 
 			// each path
 			foreach( var simuFKData in pathFKPntList ) {
@@ -367,105 +395,133 @@ namespace MyCAM.Helper
 				if( simuFKData.TraversePntFKList != null && simuFKData.TraversePntFKList.Count > 0 ) {
 					foreach( var postpoint in simuFKData.TraversePntFKList ) {
 						FKToFrameTranfResult( postpoint, G54Offset, workPiecesChaintSet,
-						machineData, chainListMap, ref m_FrameTransformMap );
+							machineData, chainIdx, ref trsfBuffer, ref arrayWithTrsftList );
 						frameCount++;
 					}
 				}
 				if( simuFKData.PathPntFKList != null && simuFKData.PathPntFKList.Count > 0 ) {
 					foreach( var postpoint in simuFKData.PathPntFKList ) {
 						FKToFrameTranfResult( postpoint, G54Offset, workPiecesChaintSet,
-						machineData, chainListMap, ref m_FrameTransformMap );
+							machineData, chainIdx, ref trsfBuffer, ref arrayWithTrsftList );
 						frameCount++;
 					}
 				}
 				if( simuFKData.ExitPntFKList != null && simuFKData.ExitPntFKList.Count > 0 ) {
 					foreach( var postpoint in simuFKData.ExitPntFKList ) {
 						FKToFrameTranfResult( postpoint, G54Offset, workPiecesChaintSet,
-						machineData, chainListMap, ref m_FrameTransformMap );
+							machineData, chainIdx, ref trsfBuffer, ref arrayWithTrsftList );
 						frameCount++;
 					}
 				}
 			}
+
+			// transform as output Dictionary once
+			for( int i = 0; i < COMPONENT_COUNT; i++ ) {
+				m_FrameTransformMap[ s_ComponentTypes[ i ] ] = arrayWithTrsftList[ i ];
+			}
 			return true;
 		}
 
-		public static void FKToFrameTranfResult( PostPoint FKPnt, gp_Vec G54Offset, HashSet<MachineComponentType> workPiecesChaintSet,
-			MachineData machineData, Dictionary<MachineComponentType, List<MachineComponentType>> chainListMap,
-			ref Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap )
+		// capacity the trsf for each frame
+		static List<gp_Trsf>[] CreateFrameTransformLists( List<PathSimuFKData> pathFKPntList )
 		{
-			// protection
-			var langMgr = new LanguageManager.LanguageManager( "SimulationHelper" );
-			if( workPiecesChaintSet == null
-				|| workPiecesChaintSet.Count == 0
-				|| machineData == null
-				|| chainListMap == null
-				|| chainListMap.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( langMgr.TryGetString( "FrameCalcFailed", FRAME_CALC_FAILED ), MyApp.NoticeType.Warning );
-				return;
+			int estimatedFrames = 0;
+			foreach( var simuFKData in pathFKPntList ) {
+				if( simuFKData.TraversePntFKList != null ) {
+					estimatedFrames += simuFKData.TraversePntFKList.Count;
+				}
+				if( simuFKData.PathPntFKList != null ) {
+					estimatedFrames += simuFKData.PathPntFKList.Count;
+				}
+				if( simuFKData.ExitPntFKList != null ) {
+					estimatedFrames += simuFKData.ExitPntFKList.Count;
+				}
 			}
-			if( m_FrameTransformMap == null ) {
-				m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
-				return;
+			var componentTrsfList = new List<gp_Trsf>[ COMPONENT_COUNT ];
+			for( int i = 0; i < COMPONENT_COUNT; i++ ) {
+				componentTrsfList[ i ] = new List<gp_Trsf>( estimatedFrames );
 			}
+			return componentTrsfList;
+		}
 
-			// set XYZ transform
-			Dictionary<MachineComponentType, gp_Trsf> transformMap = BuildTransformMapPerFrame( FKPnt, G54Offset, workPiecesChaintSet, machineData );
+		// flatten chainListMap into int[component index][parent indices]
+		static int[][] BuildFlattenChainList( Dictionary<MachineComponentType, List<MachineComponentType>> chainListMap )
+		{
+			int[][] chainIdx = new int[ COMPONENT_COUNT ][];
+			for( int i = 0; i < COMPONENT_COUNT; i++ ) {
+				MachineComponentType type = s_ComponentTypes[ i ];
+				if( !chainListMap.ContainsKey( type ) ) {
+					MyApp.Logger.ShowOnLogPanel( string.Format( m_LangMgr.TryGetString( "MissingChainMapEntry", MISSING_CHAIN_MAP_ENTRY ), type ), MyApp.NoticeType.Warning );
+					chainIdx[ i ] = new int[ 0 ];
+					continue;
+				}
+				var parents = chainListMap[ type ];
+				var tmp = new List<int>( parents.Count );
+				foreach( var parent in parents ) {
+					int pIdx = (int)parent;
 
-			// all relevant component types
-			var types = new[]
-			{
-				MachineComponentType.XAxis,
-				MachineComponentType.YAxis,
-				MachineComponentType.ZAxis,
-				MachineComponentType.Master,
-				MachineComponentType.Slave,
-				MachineComponentType.Laser,
-				MachineComponentType.WorkPiece
-			};
+					// skip Base / UnKnow (indices outside 0..COMPONENT_COUNT-1)
+					if( pIdx < 0 || pIdx >= COMPONENT_COUNT ) {
+						continue;
+					}
+					tmp.Add( pIdx );
+				}
+				chainIdx[ i ] = tmp.ToArray();
+			}
+			return chainIdx;
+		}
 
-			// calculate each component transform and record to frame transform map
-			foreach( MachineComponentType type in types ) {
-				gp_Trsf trsf = GetComponentTrsf( transformMap, type, chainListMap );
-				if( !m_FrameTransformMap.ContainsKey( type ) )
-					m_FrameTransformMap[ type ] = new List<gp_Trsf>();
-				m_FrameTransformMap[ type ].Add( trsf );
+		static void FKToFrameTranfResult( PostPoint FKPnt, gp_Vec G54Offset,
+			HashSet<MachineComponentType> workPiecesChaintSet, MachineData machineData,
+			int[][] chainIdx, ref gp_Trsf[] trsfBuffer, ref List<gp_Trsf>[] arrayWithTrsfList )
+		{
+			// per-frame component transforms into transformBuf[0..6]
+			BuildTransformArrayPerFrame( FKPnt, G54Offset, workPiecesChaintSet, machineData, ref trsfBuffer );
+
+			// calculate each component transform and append to its list
+			for( int i = 0; i < COMPONENT_COUNT; i++ ) {
+				gp_Trsf trsf = new gp_Trsf();
+				int[] parents = chainIdx[ i ];
+				for( int p = 0; p < parents.Length; p++ ) {
+					trsf.Multiply( trsfBuffer[ parents[ p ] ] );
+				}
+				trsf.Multiply( trsfBuffer[ i ] );
+				arrayWithTrsfList[ i ].Add( trsf );
 			}
 		}
 
-		static Dictionary<MachineComponentType, gp_Trsf> BuildTransformMapPerFrame(
-		   PostPoint thisFramePostPnt,
-		   gp_Vec g54,
-		   HashSet<MachineComponentType> workPiecesChainSet,
-		   MachineData machineData )
+		static void BuildTransformArrayPerFrame(
+			PostPoint thisFramePostPnt,
+			gp_Vec g54,
+			HashSet<MachineComponentType> workPiecesChainSet,
+			MachineData machineData,
+			ref gp_Trsf[] outBuf )
 		{
-			// protection
-			var langMgr = new LanguageManager.LanguageManager( "SimulationHelper" );
 			if( thisFramePostPnt == null || machineData == null ) {
-				MyApp.Logger.ShowOnLogPanel( langMgr.TryGetString( "FrameCalcFailed", FRAME_CALC_FAILED ), MyApp.NoticeType.Warning );
-				return new Dictionary<MachineComponentType, gp_Trsf>();
+				MyApp.Logger.ShowOnLogPanel( m_LangMgr.TryGetString( "FrameCalcFailed", FRAME_CALC_FAILED ), MyApp.NoticeType.Warning );
+				for( int i = 0; i < COMPONENT_COUNT; i++ ) {
+					outBuf[ i ] = new gp_Trsf();
+				}
+				return;
 			}
 			if( g54 == null ) {
 				g54 = new gp_Vec( 0, 0, 0 );
 			}
 
-			// record each component transform at this frame
-			Dictionary<MachineComponentType, gp_Trsf> componentTrsfMap = new Dictionary<MachineComponentType, gp_Trsf>();
-
 			// XYZ axis
-			componentTrsfMap[ MachineComponentType.XAxis ] = CreateAxisTranslation( thisFramePostPnt.X + g54.X(), 0, 0, workPiecesChainSet.Contains( MachineComponentType.XAxis ) );
-			componentTrsfMap[ MachineComponentType.YAxis ] = CreateAxisTranslation( 0, thisFramePostPnt.Y + g54.Y(), 0, workPiecesChainSet.Contains( MachineComponentType.YAxis ) );
-			componentTrsfMap[ MachineComponentType.ZAxis ] = CreateAxisTranslation( 0, 0, thisFramePostPnt.Z + g54.Z(), workPiecesChainSet.Contains( MachineComponentType.ZAxis ) );
+			outBuf[ (int)MachineComponentType.XAxis ] = CreateAxisTranslation( thisFramePostPnt.X + g54.X(), 0, 0, workPiecesChainSet.Contains( MachineComponentType.XAxis ) );
+			outBuf[ (int)MachineComponentType.YAxis ] = CreateAxisTranslation( 0, thisFramePostPnt.Y + g54.Y(), 0, workPiecesChainSet.Contains( MachineComponentType.YAxis ) );
+			outBuf[ (int)MachineComponentType.ZAxis ] = CreateAxisTranslation( 0, 0, thisFramePostPnt.Z + g54.Z(), workPiecesChainSet.Contains( MachineComponentType.ZAxis ) );
 
 			// rotational axis
-			componentTrsfMap[ MachineComponentType.Master ] = CreateAxisRotation( machineData.PtOnMaster, machineData.MasterRotateDir, thisFramePostPnt.Master, workPiecesChainSet.Contains( MachineComponentType.Master ) );
-			componentTrsfMap[ MachineComponentType.Slave ] = CreateAxisRotation( machineData.PtOnSlave, machineData.SlaveRotateDir, thisFramePostPnt.Slave, workPiecesChainSet.Contains( MachineComponentType.Slave ) );
+			outBuf[ (int)MachineComponentType.Master ] = CreateAxisRotation( machineData.PtOnMaster, machineData.MasterRotateDir, thisFramePostPnt.Master, workPiecesChainSet.Contains( MachineComponentType.Master ) );
+			outBuf[ (int)MachineComponentType.Slave ] = CreateAxisRotation( machineData.PtOnSlave, machineData.SlaveRotateDir, thisFramePostPnt.Slave, workPiecesChainSet.Contains( MachineComponentType.Slave ) );
 
 			// laser / workpiece
-			componentTrsfMap[ MachineComponentType.Laser ] = new gp_Trsf();
+			outBuf[ (int)MachineComponentType.Laser ] = new gp_Trsf();
 			gp_Trsf trsfWorkPiece = new gp_Trsf();
 			trsfWorkPiece.SetTranslation( g54 );
-			componentTrsfMap[ MachineComponentType.WorkPiece ] = trsfWorkPiece;
-			return componentTrsfMap;
+			outBuf[ (int)MachineComponentType.WorkPiece ] = trsfWorkPiece;
 		}
 
 		static gp_Trsf CreateAxisTranslation( double x, double y, double z, bool bNeedInvert )
@@ -487,39 +543,6 @@ namespace MyCAM.Helper
 				transform.Invert();
 			}
 			return transform;
-		}
-
-		static gp_Trsf GetComponentTrsf( Dictionary<MachineComponentType, gp_Trsf> transformMap, MachineComponentType type, Dictionary<MachineComponentType, List<MachineComponentType>> ChainListMap )
-		{
-			gp_Trsf trsf = new gp_Trsf();
-			try {
-				if( transformMap == null || ChainListMap == null ) {
-					return trsf;
-				}
-				if( !ChainListMap.ContainsKey( type ) ) {
-					var langMgr = new LanguageManager.LanguageManager( "SimulationHelper" );
-					MyApp.Logger.ShowOnLogPanel( string.Format( langMgr.TryGetString( "MissingChainMapEntry", MISSING_CHAIN_MAP_ENTRY ), type ), MyApp.NoticeType.Warning );
-					return trsf;
-				}
-				foreach( MachineComponentType parent in ChainListMap[ type ] ) {
-
-					// base is not transformed
-					if( parent == MachineComponentType.Base ) {
-						continue;
-					}
-					if( transformMap.ContainsKey( parent ) ) {
-						trsf.Multiply( transformMap[ parent ] );
-					}
-				}
-				if( transformMap.ContainsKey( type ) ) {
-					trsf.Multiply( transformMap[ type ] );
-				}
-			}
-			catch( Exception ex ) {
-				var langMgr = new LanguageManager.LanguageManager( "SimulationHelper" );
-				MyApp.Logger.ShowOnLogPanel( string.Format( langMgr.TryGetString( "GetComponentTrsfException", GET_COMPONENT_TRSF_EXCEPTION ), ex.Message ), MyApp.NoticeType.Warning );
-			}
-			return trsf;
 		}
 
 		#endregion
@@ -977,6 +1000,5 @@ namespace MyCAM.Helper
 		const string MISSING_ROTATION_DIRECTION = "缺少旋轉方向設定";
 		const string FRAME_CALC_FAILED = "幀計算失敗";
 		const string MISSING_CHAIN_MAP_ENTRY = "鏈列表中缺少 {0} 的映射項";
-		const string GET_COMPONENT_TRSF_EXCEPTION = "獲取組件變換時發生異常: {0}";
 	}
 }

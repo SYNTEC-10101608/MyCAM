@@ -101,6 +101,9 @@ namespace MyCAM.Data
 				public Dictionary<MachineComponentType, List<MachineComponentType>> ChainListMap;
 				public CollisionSolver CollisionEngine;
 
+				// it will be used before collision calculation, use AABB to filter out some impossible collision pairs
+				public Dictionary<string, (double[] Min, double[] Max)> AABBMap;
+
 				public SimuInputSet( List<PostData> eachPathIKPostDataList, IProcessPoint lastPathLastPnt, EntryAndExitData entryAndExitData, PostSolver postSolver, HashSet<MachineComponentType> workPiecesChaintSet, MachineData machineData, Dictionary<MachineComponentType, List<MachineComponentType>> chainListMap, CollisionSolver fCLTest )
 				{
 					EachPathIKPostDataList = eachPathIKPostDataList;
@@ -111,6 +114,7 @@ namespace MyCAM.Data
 					MachineData = machineData;
 					ChainListMap = chainListMap;
 					CollisionEngine = fCLTest;
+					AABBMap = null;
 				}
 			}
 		}
