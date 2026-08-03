@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+<Message ID="CannotGetGeomData" Content="Не удалось получить геометрическую информацию пути {0}" />
+<Message ID="CannotGetCraftData" Content="Не удалось получить информацию об обработке пути {0}" />
+<Message ID="CannotGetMachineData" Content="Не удалось получить информацию о механизме" />
+<Message ID="PleaseSelectPath" Content="Пожалуйста, сначала выберите путь" />
+<Message ID="CannotSimulatePosture" Content="Не удалось успешно смоделировать позу в этой точке" />
+<Message ID="CannotGetToolVectorInfo" Content="Не удалось получить информацию о векторе инструмента в целевой точке" />
+<Message ID="CannotGetMachineInfo" Content="Не удалось получить информацию о станке" />
+<Message ID="MutiPathCantSetSameMSForFixDir" Content="Для нескольких путей невозможно задать одинаковый угол нормали поверхности, пожалуйста, выберите только один" />
+</ResMap>

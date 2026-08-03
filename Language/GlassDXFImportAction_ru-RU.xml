@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="DXFImportFailedNoGeom" Content="Ошибка импорта DXF: нет допустимой геометрии" />
+	<Message ID="BuildSurfaceFailed" Content="Ошибка построения поверхности" />
+	<Message ID="DXFProjectionFailed" Content="Ошибка проецирования DXF: нет допустимого результата проецирования" />
+	<Message ID="DXFImportException" Content="Ошибка импорта DXF: " />
+</ResMap>

@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ResMap>
+	<Message ID="GlassDXFImportDlg" Content="Импорт DXF стекла" />
+	<Message ID="m_lblRadius" Content="Радиус сферы (R)" />
+	<Message ID="m_lblHeight" Content="Высота поверхности (H)" />
+	<Message ID="m_lblNote" Content="Примечание: при R=0 используется плоский режим" />
+	<Message ID="m_btnOK" Content="Подтвердить" />
+	<Message ID="m_btnCancel" Content="Отмена" />
+	<Message ID="RadiusRangeError" Content="Радиус сферы должен быть между 0 ~ {0} мм" />
+	<Message ID="HeightRangeError" Content="Высота поверхности должна быть положительным числом больше 0 и меньше R({0})" />
+</ResMap>
