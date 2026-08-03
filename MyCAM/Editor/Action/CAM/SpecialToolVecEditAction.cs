@@ -18,6 +18,7 @@ namespace MyCAM.Editor
 		public Action<Dictionary<MachineComponentType, List<gp_Trsf>>, bool> RaiseTrans;
 		public Action<bool, bool> RaiseActionStart;
 		public Action HideMachine;
+		public Action ResetPartUI;
 
 		public SpecialToolVecEditAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, List<string> pathIDList, SelectPathAction pathIndexAction )
 			: base( dataManager, pathIDList )
@@ -397,7 +398,7 @@ namespace MyCAM.Editor
 				SpecialToolVecData specialToolVecData = new SpecialToolVecData( m_Type, masterAngle_deg, slaveAngle_deg );
 				craftData.SetSpecialToolVecData( specialToolVecData );
 			}
-			RefreshUI();
+			RefreshSimuResult();
 		}
 
 
@@ -422,7 +423,7 @@ namespace MyCAM.Editor
 					SetAllPathAsNormalParam();
 					break;
 			}
-			RefreshUI();
+			RefreshSimuResult();
 		}
 
 		void OnFlipRotaryAxis( bool isPositive )
@@ -437,7 +438,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			m_Dlg.SetMSAngleSilent( specialToolVecData.MasterAngle_deg, specialToolVecData.SlaveAngle_deg );
-			RefreshUI();
+			RefreshSimuResult();
 		}
 
 		void SetFlipRotaryAxisData( bool isPositive )
@@ -481,7 +482,7 @@ namespace MyCAM.Editor
 				craftData.SetSpecialToolVecData( specialToolVecData );
 			}
 			m_Dlg.SetMSAngleSilent( MSAngle.Item1, MSAngle.Item2 );
-			RefreshUI();
+			RefreshSimuResult();
 		}
 
 		#endregion
@@ -594,7 +595,9 @@ namespace MyCAM.Editor
 			if( m_CurrentPathIDList.Count() == 0 ) {
 				HideMachine?.Invoke();
 				m_ToolVecEditRender?.Show();
+				ResetPartUI?.Invoke();
 				m_Viewer.UpdateView();
+				return;
 			}
 
 			bool isGotMachineData = DataGettingHelper.GetMachineData( out MachineData machineData );
@@ -615,6 +618,7 @@ namespace MyCAM.Editor
 			if( specialToolVecData.Type == ESpecialToolVecType.Normal ) {
 				HideMachine?.Invoke();
 				m_ToolVecEditRender?.Show();
+				ResetPartUI?.Invoke();
 				m_Viewer.UpdateView();
 				return;
 			}
@@ -623,6 +627,7 @@ namespace MyCAM.Editor
 			if( m_IsSingleSelcet == false && specialToolVecData.Type != ESpecialToolVecType.AssignMS ) {
 				HideMachine?.Invoke();
 				m_ToolVecEditRender?.Show();
+				ResetPartUI?.Invoke();
 				m_Viewer.UpdateView();
 				return;
 			}
@@ -699,11 +704,6 @@ namespace MyCAM.Editor
 				m_DataManager.MachineChainListMap,
 				out frameTransformMap );
 			return true;
-		}
-		void RefreshUI()
-		{
-			PropertyChanged?.Invoke( m_CurrentPathIDList );
-			RefreshSimuResult();
 		}
 
 		#endregion

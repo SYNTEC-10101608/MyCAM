@@ -719,6 +719,9 @@ namespace MyCAM
 					case EditActionType.Measure:
 						m_tsbMeasureCAM.BackColor = DEFAULT_BtnColor;
 						break;
+					case EditActionType.SpecialToolVecEdit:
+						m_tsbFixedToolVec.BackColor = DEFAULT_BtnColor;
+						break;
 					default:
 						break;
 				}
@@ -764,6 +767,9 @@ namespace MyCAM
 					break;
 				case EditActionType.Measure:
 					m_tsbMeasureCAM.BackColor = ON_ButtonColor;
+					break;
+				case EditActionType.SpecialToolVecEdit:
+					m_tsbFixedToolVec.BackColor = ON_ButtonColor;
 					break;
 				default:
 					break;

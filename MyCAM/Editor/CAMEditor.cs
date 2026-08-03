@@ -404,6 +404,7 @@ namespace MyCAM.Editor
 			action.RaiseTrans += SetTrans;
 			action.RaiseActionStart += ToolVecActionStartIO;
 			action.HideMachine += HideMachine;
+			action.ResetPartUI += ResetPartDisplay;
 
 			// trigger translate machine
 			StartEditAction( action );
@@ -761,8 +762,20 @@ namespace MyCAM.Editor
 					editableInfo.IsToolVecReverseEditable = false;
 					editableInfo.IsFixedToolVecEditable = false;
 				}
+				if( IsSelectSpecialPath( szPathIDList ) ) {
+					editableInfo.IsToolVecEditable = false;
+				}
 			}
 			PathPropertyChanged?.Invoke( editableInfo );
+		}
+
+		bool IsSelectSpecialPath( List<string> szPathIDList )
+		{
+			// only valid when the current action is SelectPathAction
+			if( !( m_CurrentAction is SelectPathAction ) ) {
+				return false;
+			}
+			return szPathIDList.Any( SelectPathAction.IsSpecialPath );
 		}
 
 		void OnPathShapeTypeChange( PathType type, List<string> szPathIDList )
@@ -854,6 +867,14 @@ namespace MyCAM.Editor
 		{
 			m_MachineRender.Remove();
 			m_Viewer.UpdateView();
+		}
+
+		// reset Part display (path / workpiece) back to un-transformed state without touching machine render
+		void ResetPartDisplay()
+		{
+			gp_Trsf identity = new gp_Trsf();
+			ShowTransedCAMData( identity );
+			SetWorkPieceDisplayTransform( identity, true );
 		}
 
 		void RemoveAllCAMData()

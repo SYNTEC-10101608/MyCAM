@@ -87,6 +87,7 @@ namespace MyCAM.Editor
 
 			// start path index action (disallow selecting std pattern paths in this action)
 			m_PathIndexAction.CanSelectStdPattern = false;
+			m_PathIndexAction.CanSelectSpecialPath = false;
 			m_PathIndexAction.Start();
 			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
 
