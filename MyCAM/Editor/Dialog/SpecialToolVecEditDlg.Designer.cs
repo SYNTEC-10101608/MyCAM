@@ -63,7 +63,7 @@ namespace MyCAM.Editor
 			this.m_rbtnFixDir.Name = "m_rbtnFixDir";
 			this.m_rbtnFixDir.Size = new System.Drawing.Size(95, 16);
 			this.m_rbtnFixDir.TabIndex = 1;
-			this.m_rbtnFixDir.Text = "平均法向切割";
+			this.m_rbtnFixDir.Text = "垂直曲面切割";
 			this.m_rbtnFixDir.UseVisualStyleBackColor = true;
 			this.m_rbtnFixDir.CheckedChanged += new System.EventHandler(this.m_rbtnFixDir_CheckedChanged);
 			// 
@@ -145,7 +145,7 @@ namespace MyCAM.Editor
 			this.m_btnFixDir.Name = "m_btnFixDir";
 			this.m_btnFixDir.Size = new System.Drawing.Size(93, 26);
 			this.m_btnFixDir.TabIndex = 9;
-			this.m_btnFixDir.Text = "轉至曲面法向";
+			this.m_btnFixDir.Text = "轉至垂直曲面";
 			this.m_btnFixDir.UseVisualStyleBackColor = true;
 			this.m_btnFixDir.Click += new System.EventHandler(this.m_btnFixDir_Click);
 			// 

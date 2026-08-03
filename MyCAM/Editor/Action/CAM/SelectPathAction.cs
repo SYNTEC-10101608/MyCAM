@@ -160,10 +160,51 @@ namespace MyCAM.Editor
 			return DataGettingHelper.IsStdPattern( pathType );
 		}
 
+		// control whether special-tool-vector paths are selectable in this action
+		public bool CanSelectSpecialPath
+		{
+			get { return m_CanSelectSpecialPath; }
+			set
+			{
+				if( m_CanSelectSpecialPath == value ) {
+					return;
+				}
+				m_CanSelectSpecialPath = value;
+				if( value ) {
+					ShowSpecialPathAndNode();
+				}
+				else {
+					HideSpecialPathAndNode();
+				}
+			}
+		}
+
+		public static bool IsSpecialPath( string pathID )
+		{
+			if( string.IsNullOrEmpty( pathID ) ) {
+				return false;
+			}
+			if( !DataGettingHelper.GetGeomDataByID( pathID, out IGeomData geomData ) ) {
+				return false;
+			}
+			if( geomData.PathType != PathType.Contour ) {
+				return false;
+			}
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
+				return false;
+			}
+			SpecialToolVecData specialToolVecData = craftData.SpecialToolVecData;
+			if( specialToolVecData == null ) {
+				return false;
+			}
+			return specialToolVecData.Type != ESpecialToolVecType.Normal;
+		}
+
 		public override void End()
 		{
 			// force restore std pattern paths/nodes in case caller forgot
 			CanSelectStdPattern = true;
+			CanSelectSpecialPath = true;
 			base.End();
 		}
 
@@ -370,9 +411,50 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
+		void HideSpecialPathAndNode()
+		{
+			if( m_HiddenSpecialPathNodes == null ) {
+				m_HiddenSpecialPathNodes = new Dictionary<string, (TreeNode, int)>();
+			}
+			m_HiddenSpecialPathNodes.Clear();
+			if( m_DataManager?.PathIDList == null ) {
+				return;
+			}
+			foreach( string pathID in m_DataManager.PathIDList ) {
+				if( !IsSpecialPath( pathID ) ) {
+					continue;
+				}
+				m_ViewManager.ErasePath( pathID );
+				if( m_ViewManager.TreeNodeMap.TryGetValue( pathID, out TreeNode node ) ) {
+					int index = m_ViewManager.PathNode.Nodes.IndexOf( node );
+					m_ViewManager.PathNode.Nodes.Remove( node );
+					m_HiddenSpecialPathNodes[ pathID ] = (node, index);
+				}
+			}
+			m_Viewer.UpdateView();
+		}
+
+		void ShowSpecialPathAndNode()
+		{
+			if( m_DataManager?.PathIDList == null || m_HiddenSpecialPathNodes == null || m_HiddenSpecialPathNodes.Count == 0 ) {
+				return;
+			}
+			foreach( var kvp in m_HiddenSpecialPathNodes ) {
+				TreeNode node = kvp.Value.Node;
+				int index = kvp.Value.Index;
+				int insertAt = Math.Min( index, m_ViewManager.PathNode.Nodes.Count );
+				m_ViewManager.PathNode.Nodes.Insert( insertAt, node );
+				m_ViewManager.DisplayPath( kvp.Key );
+			}
+			m_HiddenSpecialPathNodes.Clear();
+			m_Viewer.UpdateView();
+		}
+
 		bool m_SingleSelectMode = false;
 		bool m_CanSelectStdPattern = true;
+		bool m_CanSelectSpecialPath = true;
 		Dictionary<string, (TreeNode Node, int Index)> m_HiddenStdPatternNodes = new Dictionary<string, (TreeNode, int)>();
+		Dictionary<string, (TreeNode Node, int Index)> m_HiddenSpecialPathNodes = new Dictionary<string, (TreeNode, int)>();
 		HashSet<string> m_ExcludedIDSet;
 		LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SelectPathAction" );
 		const string LOG_MULTI_SELECT_ERROR_VIEW = "[選取異常] 路徑單選模式下偵測到多重選取 ({0} 個項目)，已自動清除";
