@@ -16,85 +16,85 @@
 
 	<!-- 文件工具列 -->
 	<Message ID="m_tsbImport3DFile" Content="3D模型" />
-	<Message ID="m_tsbImport3DFile_ToolTip" Content="3D模型" />
+	<Message ID="m_tsbImport3DFile_ToolTip" Content="导入3D模型零件" />
 	<Message ID="m_tsbAddRevolution" Content="回转体" />
-	<Message ID="m_tsbAddRevolution_ToolTip" Content="回转体" />
-	<Message ID="m_tsbReadProjectFile" Content="导入项目" />
-	<Message ID="m_tsbReadProjectFile_ToolTip" Content="导入项目" />
+	<Message ID="m_tsbAddRevolution_ToolTip" Content="导入回转体零件" />
+	<Message ID="m_tsbReadProjectFile" Content="汇入项目" />
+	<Message ID="m_tsbReadProjectFile_ToolTip" Content="汇入专案项目" />
 	<Message ID="m_tsbSaveProjectFile" Content="储存项目" />
-	<Message ID="m_tsbSaveProjectFile_ToolTip" Content="储存项目" />
+	<Message ID="m_tsbSaveProjectFile_ToolTip" Content="储存专案项目" />
 	<Message ID="m_tsbAddTube" Content="设计管件" />
-	<Message ID="m_tsbAddTube_ToolTip" Content="设计管件" />
+	<Message ID="m_tsbAddTube_ToolTip" Content="设计回转体零件" />
 
 	<!-- CAD工具列 -->
 	<Message ID="m_tsbSewPart" Content="模型缝补" />
-	<Message ID="m_tsbSewPart_ToolTip" Content="模型缝补" />
+	<Message ID="m_tsbSewPart_ToolTip" Content="对零件进行缝隙缝补" />
 	<Message ID="m_tsbAddPoint_AcrCenter" Content="圆弧中心" />
-	<Message ID="m_tsbAddPoint_AcrCenter_ToolTip" Content="圆弧中心" />
+	<Message ID="m_tsbAddPoint_AcrCenter_ToolTip" Content="生成所选圆弧的中心点" />
 	<Message ID="m_tsbAddPoint_EdgeCenter" Content="线段中心" />
-	<Message ID="m_tsbAddPoint_EdgeCenter_ToolTip" Content="线段中心" />
+	<Message ID="m_tsbAddPoint_EdgeCenter_ToolTip" Content="生成所选线段的中心点" />
 	<Message ID="m_tsbAddPoint_PointCenter" Content="两点中心" />
-	<Message ID="m_tsbAddPoint_PointCenter_ToolTip" Content="两点中心" />
+	<Message ID="m_tsbAddPoint_PointCenter_ToolTip" Content="生成所选两点的中心点" />
 	<Message ID="m_tsbAddPoint_BoundingBoxCenter" Content="包围盒中心" />
-	<Message ID="m_tsbAddPoint_BoundingBoxCenter_ToolTip" Content="包围盒中心" />
+	<Message ID="m_tsbAddPoint_BoundingBoxCenter_ToolTip" Content="在包围盒中心生成点，并将零件依照包围盒中心移动到座标原点" />
 	<Message ID="m_tsbAddLine_TwoVertexConnect" Content="两点连线" />
-	<Message ID="m_tsbAddLine_TwoVertexConnect_ToolTip" Content="两点连线" />
+	<Message ID="m_tsbAddLine_TwoVertexConnect_ToolTip" Content="生成所选两点的直线" />
 	<Message ID="m_tsbManualTransform" Content="工件对齐" />
-	<Message ID="m_tsbManualTransform_ToolTip" Content="工件对齐" />
+	<Message ID="m_tsbManualTransform_ToolTip" Content="将零件和座标轴进行对齐" />
 	<Message ID="m_tsb3PntTransform" Content="三点转换" />
-	<Message ID="m_tsb3PntTransform_ToolTip" Content="三点转换" />
+	<Message ID="m_tsb3PntTransform_ToolTip" Content="选取三点后，依照三点座标放置工件" />
 	<Message ID="m_tsbAxisTransform" Content="轴向转换" />
-	<Message ID="m_tsbAxisTransform_ToolTip" Content="轴向转换" />
+	<Message ID="m_tsbAxisTransform_ToolTip" Content="对零件进行偏移和旋转" />
 	<Message ID="m_tsbMeasureCAD" Content="量测" />
-	<Message ID="m_tsbMeasureCAD_ToolTip" Content="量测" />
+	<Message ID="m_tsbMeasureCAD_ToolTip" Content="量测距离或角度" />
 	<Message ID="m_tsbWireDiscreteVertex" Content="建特征点" />
 	<Message ID="m_tsbWireDiscreteVertex_ToolTip" Content="选取零件的轮廓后，并在轮廓线条上产生特征点" />
 
 	<!-- CAM工具列 -->
 	<Message ID="m_tsbAddPath" Content="新增路径" />
-	<Message ID="m_tsbAddPath_ToolTip" Content="新增路径" />
+	<Message ID="m_tsbAddPath_ToolTip" Content="选择新增路径的方式" />
 	<Message ID="m_tsbDeletePath" Content="删除路径" />
-	<Message ID="m_tsbDeletePath_ToolTip" Content="删除路径" />
+	<Message ID="m_tsbDeletePath_ToolTip" Content="删除选取的路径" />
 	<Message ID="m_tsbStartPoint" Content="起点" />
-	<Message ID="m_tsbStartPoint_ToolTip" Content="起点" />
+	<Message ID="m_tsbStartPoint_ToolTip" Content="选择路径的起点" />
 	<Message ID="m_tsbReverse" Content="反向" />
-	<Message ID="m_tsbReverse_ToolTip" Content="反向" />
+	<Message ID="m_tsbReverse_ToolTip" Content="反向选择的路径方向" />
 	<Message ID="m_tsbSetLead" Content="引线" />
-	<Message ID="m_tsbSetLead_ToolTip" Content="引线" />
+	<Message ID="m_tsbSetLead_ToolTip" Content="设定选择路径的引线参数" />
 	<Message ID="m_tsbOverCut" Content="过切" />
-	<Message ID="m_tsbOverCut_ToolTip" Content="过切" />
+	<Message ID="m_tsbOverCut_ToolTip" Content="设定选择路径的过切" />
 	<Message ID="m_tsbMicroJoint" Content="微连" />
-	<Message ID="m_tsbMicroJoint_ToolTip" Content="微连" />
+	<Message ID="m_tsbMicroJoint_ToolTip" Content="设定选择路径的微连" />
 	<Message ID="m_tsbToolVecReverse" Content="姿态反向" />
-	<Message ID="m_tsbToolVecReverse_ToolTip" Content="姿态反向" />
+	<Message ID="m_tsbToolVecReverse_ToolTip" Content="反向选择路径的姿态方向" />
 	<Message ID="m_tsbToolVec" Content="飞边姿态" />
-	<Message ID="m_tsbToolVec_ToolTip" Content="飞边姿态" />
+	<Message ID="m_tsbToolVec_ToolTip" Content="调整飞边路径的姿态" />
 	<Message ID="m_tsbFixedToolVec" Content="孔姿态" />
-	<Message ID="m_tsbFixedToolVec_ToolTip" Content="孔姿态" />
+	<Message ID="m_tsbFixedToolVec_ToolTip" Content="调整孔路径的姿态" />
 	<Message ID="m_tsbOptimizeIK" Content="优化轴向" />
-	<Message ID="m_tsbOptimizeIK_ToolTip" Content="优化轴向" />
+	<Message ID="m_tsbOptimizeIK_ToolTip" Content="优化所有路径之间的旋转轴角度" />
 	<Message ID="m_tsbManualOrder" Content="手动排序" />
-	<Message ID="m_tsbManualOrder_ToolTip" Content="手动排序" />
+	<Message ID="m_tsbManualOrder_ToolTip" Content="手动排序路径" />
 	<Message ID="m_tsbAutoOrder" Content="自动排序" />
-	<Message ID="m_tsbAutoOrder_ToolTip" Content="自动排序" />
+	<Message ID="m_tsbAutoOrder_ToolTip" Content="选择自动排序路径的方式" />
 	<Message ID="m_tsbSetTraverseData" Content="空移" />
-	<Message ID="m_tsbSetTraverseData_ToolTip" Content="空移" />
+	<Message ID="m_tsbSetTraverseData_ToolTip" Content="调整选择路径的空移方式" />
 	<Message ID="m_tsbEntryAndExitSetting" Content="进入/退出" />
-	<Message ID="m_tsbEntryAndExitSetting_ToolTip" Content="进入/退出" />
+	<Message ID="m_tsbEntryAndExitSetting_ToolTip" Content="调整进入和退出的距离" />
 	<Message ID="m_tsbPatternSetting" Content="标准图元" />
-	<Message ID="m_tsbPatternSetting_ToolTip" Content="标准图元" />
-	<Message ID="m_tsbPathEdit" Content="路径编辑" />
-	<Message ID="m_tsbPathEdit_ToolTip" Content="路径编辑" />
+	<Message ID="m_tsbPatternSetting_ToolTip" Content="设定选择路径为标准图元" />
+	<Message ID="m_tsbPathEdit" Content="位置补偿" />
+	<Message ID="m_tsbPathEdit_ToolTip" Content="设定选择路径的位置补偿量" />
 	<Message ID="m_BtnContourEdit" Content="轮廓编辑" />
-	<Message ID="m_BtnContourEdit_ToolTip" Content="轮廓编辑" />
-	<Message ID="m_tsbPathCompensation" Content="路径补偿" />
-	<Message ID="m_tsbPathCompensation_ToolTip" Content="路径补偿" />
+	<Message ID="m_BtnContourEdit_ToolTip" Content="调整选择路径的局部轮廓" />
+	<Message ID="m_tsbPathCompensation" Content="尺寸补偿" />
+	<Message ID="m_tsbPathCompensation_ToolTip" Content="设定选择路径的尺寸补偿量" />
 	<Message ID="m_tsbCalibrationPnt" Content="三点校正" />
-	<Message ID="m_tsbCalibrationPnt_ToolTip" Content="三点校正" />
+	<Message ID="m_tsbCalibrationPnt_ToolTip" Content="设定加工档的三点校正资讯" />
 	<Message ID="m_tsbConvertNC" Content="转出NC" />
-	<Message ID="m_tsbConvertNC_ToolTip" Content="转出NC" />
+	<Message ID="m_tsbConvertNC_ToolTip" Content="转出NC加工档" />
 	<Message ID="m_tsbMeasureCAM" Content="量测" />
-	<Message ID="m_tsbMeasureCAM_ToolTip" Content="量测" />
+	<Message ID="m_tsbMeasureCAM_ToolTip" Content="量测距离或角度" />
 
 	<!-- 新增路径子工具列 -->
 	<Message ID="m_tsAddPathForHat" Content="异形盖件-生成路径" />
@@ -106,29 +106,29 @@
 
 	<!-- 模拟工具列 -->
 	<Message ID="m_btnPlay" Content="播放" />
-	<Message ID="m_btnPlay_ToolTip" Content="播放" />
+	<Message ID="m_btnPlay_ToolTip" Content="播放模拟" />
 	<Message ID="m_btnPause" Content="暂停" />
-	<Message ID="m_btnPause_ToolTip" Content="暂停" />
+	<Message ID="m_btnPause_ToolTip" Content="暂停模拟" />
 	<Message ID="m_btnStop" Content="停止" />
-	<Message ID="m_btnStop_ToolTip" Content="停止" />
+	<Message ID="m_btnStop_ToolTip" Content="停止模拟并回到模拟起点" />
 	<Message ID="m_btnPreviousPath" Content="前路径" />
-	<Message ID="m_btnPreviousPath_ToolTip" Content="前路径" />
+	<Message ID="m_btnPreviousPath_ToolTip" Content="跳往前一路径" />
 	<Message ID="m_btnNextPath" Content="后路径" />
-	<Message ID="m_btnNextPath_ToolTip" Content="后路径" />
+	<Message ID="m_btnNextPath_ToolTip" Content="跳往后一路径" />
 	<Message ID="m_btnPreCollision" Content="前碰撞点" />
-	<Message ID="m_btnPreCollision_ToolTip" Content="前碰撞点" />
+	<Message ID="m_btnPreCollision_ToolTip" Content="跳往前一碰撞点" />
 	<Message ID="m_btnNextCol" Content="后碰撞点" />
-	<Message ID="m_btnNextCol_ToolTip" Content="后碰撞点" />
+	<Message ID="m_btnNextCol_ToolTip" Content="跳往后一碰撞点" />
 	<Message ID="m_btnPrePoint" Content="上一步" />
-	<Message ID="m_btnPrePoint_ToolTip" Content="上一步" />
+	<Message ID="m_btnPrePoint_ToolTip" Content="步进到前一步" />
 	<Message ID="m_btnNextPoint" Content="下一步" />
-	<Message ID="m_btnNextPoint_ToolTip" Content="下一步" />
+	<Message ID="m_btnNextPoint_ToolTip" Content="步进到后一步" />
 	<Message ID="m_btnSpeedUp" Content="加速" />
-	<Message ID="m_btnSpeedUp_ToolTip" Content="加速" />
+	<Message ID="m_btnSpeedUp_ToolTip" Content="加快模拟速度" />
 	<Message ID="m_btnSlowDonw" Content="减速" />
-	<Message ID="m_btnSlowDonw_ToolTip" Content="减速" />
+	<Message ID="m_btnSlowDonw_ToolTip" Content="减慢模拟速度" />
 	<Message ID="m_btnCheck" Content="碰撞检查" />
-	<Message ID="m_btnCheck_ToolTip" Content="碰撞检查" />
+	<Message ID="m_btnCheck_ToolTip" Content="检查是否有碰撞" />
 	
 	<!-- 提示字串 -->
 	<Message ID="ShowVec" Content="显示姿态" />
@@ -152,3 +152,6 @@
 	<Message ID="Msg_SaveBeforeExitTitle" Content="存档确认" />
 	<Message ID="Msg_SaveBeforeExitWithData" Content="是否要在关闭前存档？" />
 </ResMap>
+
+
+

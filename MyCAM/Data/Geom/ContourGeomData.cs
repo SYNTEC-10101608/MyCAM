@@ -1,5 +1,6 @@
 ﻿using MyCAM.Helper;
 using OCC.gp;
+using OCCTool;
 using System;
 using System.Collections.Generic;
 
@@ -7,7 +8,10 @@ namespace MyCAM.Data
 {
 	public class ContourGeomData : IContourGeomData
 	{
-		public ContourGeomData( List<PathEdge5D> pathDataList, bool isClosed )
+		public ContourGeomData( List<PathEdge5D> pathDataList, bool isClosed,
+			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
+			double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
+			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD )
 		{
 			if( pathDataList == null ) {
 				throw new ArgumentNullException( "ContourGeomData constructing argument null" );
@@ -17,7 +21,8 @@ namespace MyCAM.Data
 			}
 			m_IsClosed = isClosed;
 			DisctereContourHelper.BuildContourGeomData( pathDataList, isClosed,
-				out m_CADPointList, out m_ConnectPointMap );
+				out m_CADPointList, out m_ConnectPointMap,
+				maxDeflection, maxEdgeLength, discretizeMethod );
 			DisctereContourHelper.GetRefCenterDirFromContour( m_CADPointList, out m_RefCenterDir );
 		}
 

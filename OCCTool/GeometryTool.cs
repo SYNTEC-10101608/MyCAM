@@ -36,11 +36,23 @@ namespace OCCTool
 		NoIntersect
 	}
 
+	// discretization method used to break a curve into a set of parameters
+	public enum EDiscretizeMethod
+	{
+		// GCPnts_QuasiUniformDeflection: approximate chord height error, faster, points not evenly distributed by deflection
+		QuasiUniformDeflection,
+
+		// GCPnts_UniformDeflection: true chord height error, more accurate but more computation
+		UniformDeflection
+	}
+
 	public class GeometryTool
 	{
 		// shared default discretization parameters, keep every caller consistent unless a specific reason to differ
 		public const double DEFAULT_DISCRETE_MAX_DEFLECTION = 0.01;  // max chord height error (mm)
 		public const double DEFAULT_DISCRETE_MAX_LENGTH = 1.0;       // max segment length (mm)
+		public const EDiscretizeMethod DEFAULT_DISCRETIZE_METHOD = EDiscretizeMethod.QuasiUniformDeflection;
+		public const double DEFAULT_D1_CONTINUOUS_TOLERANCE = 0.087; // rad, ~5 degrees
 
 		public static gp_Pnt FindIntersectPoint( gp_Pnt p1, gp_Pnt p2, gp_Pnt p3, gp_Pnt p4,
 			out IntersectType TypeL1, out IntersectType TypeL2 )
@@ -102,43 +114,61 @@ namespace OCCTool
 		}
 
 		public static List<double> DiscretizeEdgeParameters( BRepAdaptor_Curve curveAdaptor, TopoDS_Edge edge,
-			double maxDeflection = DEFAULT_DISCRETE_MAX_DEFLECTION, double maxEdgeLength = DEFAULT_DISCRETE_MAX_LENGTH )
+			double maxDeflection = DEFAULT_DISCRETE_MAX_DEFLECTION, double maxEdgeLength = DEFAULT_DISCRETE_MAX_LENGTH,
+			EDiscretizeMethod discretizeMethod = DEFAULT_DISCRETIZE_METHOD )
 		{
 			double startParam = curveAdaptor.FirstParameter();
 			double endParam = curveAdaptor.LastParameter();
 
-			// break the curve into segments with given deflection precision
-			GCPnts_QuasiUniformDeflection deflectionDiscretizer = new GCPnts_QuasiUniformDeflection( curveAdaptor, maxDeflection, startParam, endParam );
-
-			List<double> paramList = new List<double>();
-			if( !deflectionDiscretizer.IsDone() || deflectionDiscretizer.NbPoints() == 0 ) {
-				paramList.Add( startParam );
-				paramList.Add( endParam );
+			// Create the appropriate discretizer and extract a parameter accessor + point count.
+			Func<int, double> getParameter;
+			int nbPoints;
+			if( discretizeMethod == EDiscretizeMethod.UniformDeflection ) {
+				var discretizer = new GCPnts_UniformDeflection( curveAdaptor, maxDeflection, true );
+				nbPoints = ( discretizer.IsDone() ? discretizer.NbPoints() : 0 );
+				getParameter = i => discretizer.Parameter( i );
 			}
 			else {
-				// break the curve into further sub-segments with given max length
-				for( int i = 1; i < deflectionDiscretizer.NbPoints(); i++ ) {
-					paramList.Add( deflectionDiscretizer.Parameter( i ) );
-					double dLength = GCPnts_AbscissaPoint.Length( curveAdaptor, deflectionDiscretizer.Parameter( i ), deflectionDiscretizer.Parameter( i + 1 ) );
+				var discretizer = new GCPnts_QuasiUniformDeflection( curveAdaptor, maxDeflection, startParam, endParam );
+				nbPoints = ( discretizer.IsDone() ? discretizer.NbPoints() : 0 );
+				getParameter = i => discretizer.Parameter( i );
+			}
 
-					// add sub-segments if the length is greater than max length
-					if( dLength > maxEdgeLength ) {
-						int nSubSegmentCount = (int)Math.Ceiling( dLength / maxEdgeLength );
-						double dSubSegmentLength = ( deflectionDiscretizer.Parameter( i + 1 ) - deflectionDiscretizer.Parameter( i ) ) / nSubSegmentCount;
-
-						// using equal parameter to break the segment
-						for( int j = 1; j < nSubSegmentCount; j++ ) {
-							paramList.Add( deflectionDiscretizer.Parameter( i ) + j * dSubSegmentLength );
-						}
-					}
-				}
-				paramList.Add( deflectionDiscretizer.Parameter( deflectionDiscretizer.NbPoints() ) );
+			List<double> paramList;
+			if( nbPoints == 0 ) {
+				paramList = new List<double>() { startParam, endParam };
+			}
+			else {
+				paramList = BuildParamListWithMaxLength( curveAdaptor, maxEdgeLength, getParameter, nbPoints );
 			}
 
 			// reverse the segment parameters if the edge is reversed
 			if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
 				paramList.Reverse();
 			}
+			return paramList;
+		}
+
+		static List<double> BuildParamListWithMaxLength( BRepAdaptor_Curve curveAdaptor, double maxEdgeLength,
+			Func<int, double> getParameter, int nbPoints )
+		{
+			List<double> paramList = new List<double>();
+			for( int i = 1; i < nbPoints; i++ ) {
+				paramList.Add( getParameter( i ) );
+				double dLength = GCPnts_AbscissaPoint.Length( curveAdaptor, getParameter( i ), getParameter( i + 1 ) );
+
+				// add sub-segments if the length is greater than max length
+				if( dLength > maxEdgeLength ) {
+					int nSubSegmentCount = (int)Math.Ceiling( dLength / maxEdgeLength );
+					double dSubSegmentLength = ( getParameter( i + 1 ) - getParameter( i ) ) / nSubSegmentCount;
+
+					// using equal parameter to break the segment
+					for( int j = 1; j < nSubSegmentCount; j++ ) {
+						paramList.Add( getParameter( i ) + j * dSubSegmentLength );
+					}
+				}
+			}
+			paramList.Add( getParameter( nbPoints ) );
 			return paramList;
 		}
 
@@ -298,7 +328,7 @@ namespace OCCTool
 			return true;
 		}
 
-		public static bool IsD1Cont( TopoDS_Face f1, TopoDS_Face f2, TopoDS_Edge sharingEdge )
+		public static bool IsD1Cont( TopoDS_Face f1, TopoDS_Face f2, TopoDS_Edge sharingEdge, double tolerance = DEFAULT_D1_CONTINUOUS_TOLERANCE )
 		{
 			if( f1 == null || f2 == null || sharingEdge == null
 				|| f1.IsNull() || f2.IsNull() || sharingEdge.IsNull() ) {
@@ -321,8 +351,7 @@ namespace OCCTool
 			gp_Dir d2 = VectorTool.GetFaceNormalVec( f2, pMiddle );
 
 			// check if the normals are parallel or reversed
-			double dTolerance = 0.087;
-			return d1.IsParallel( d2, dTolerance );
+			return d1.IsParallel( d2, tolerance );
 		}
 
 		public static bool IsEdgeBelongFace( TopoDS_Edge edge, TopoDS_Face face )
@@ -1017,7 +1046,8 @@ namespace OCCTool
 
 		public static List<TopoDS_Face> FindD1ContinuousFaces(
 			List<TopoDS_Face> seedFaces,
-			TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap )
+			TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap,
+			double d1Tolerance = DEFAULT_D1_CONTINUOUS_TOLERANCE )
 		{
 			List<TopoDS_Face> result = new List<TopoDS_Face>();
 
@@ -1060,7 +1090,7 @@ namespace OCCTool
 
 						// check D1 continuity
 						TopoDS_Face oneConnectedFace = TopoDS.ToFace( _oneConnectedFace );
-						if( IsD1Cont( currentFace, oneConnectedFace, oneEdge ) ) {
+						if( IsD1Cont( currentFace, oneConnectedFace, oneEdge, d1Tolerance ) ) {
 							visitedFaceMap.Add( oneConnectedFace );
 							allD1ContinuousFaceList.Add( oneConnectedFace );
 							pendingFaces.Add( oneConnectedFace );

@@ -216,10 +216,6 @@ namespace MyCAM
 			CAD,
 			CAM,
 			Simulation,
-
-			// cam function
-			AddPath,
-			ManualSelectPath,
 		}
 
 		void ShowG54Trihedron()
@@ -405,37 +401,7 @@ namespace MyCAM
 		// add path
 		void m_tsbAddPath_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.StartSelectFace();
-		}
-
-		void m_tsAddPathForHat_Click( object sender, EventArgs e )
-		{
-			m_CAMEditor.AutoFindHatPath();
-		}
-
-		void m_tsAddPathForTube_Click( object sender, EventArgs e )
-		{
-			m_CAMEditor.AutoFindTubePath();
-		}
-
-		void m_tsbSelectD1ContFace_Click( object sender, EventArgs e )
-		{
-			m_CAMEditor.SelectD1ContFace();
-		}
-
-		void m_tsbSelPath_FreeBound_Click( object sender, EventArgs e )
-		{
-			m_CAMEditor.SelectPath_FreeBound();
-		}
-
-		void m_tsbManualSelectPathOK_Click( object sender, EventArgs e )
-		{
-			m_CAMEditor.EndSelectPath_Manual();
-		}
-
-		void m_tsbSelPath_Manual_Click( object sender, EventArgs e )
-		{
-			m_CAMEditor.StartSelectPath_Manual();
+			m_CAMEditor.StartAddPath();
 		}
 
 		// remove path
@@ -716,16 +682,8 @@ namespace MyCAM
 				// cam action is done, back to default cam lay out,
 				RefreshToolStripLayout( EUIStatus.CAM );
 				switch( action ) {
-					case EditActionType.SelectFace:
+					case EditActionType.AddPath:
 						m_tsbAddPath.BackColor = DEFAULT_BtnColor;
-						break;
-					case EditActionType.SelectPath:
-						m_tsbSelectD1ContFace.Enabled = true;
-						m_tsbSelPath_FreeBound.Enabled = true;
-						m_tsAddPathForHat.Enabled = true;
-						m_tsAddPathForTube.Enabled = true;
-						m_tsbAddPath.BackColor = DEFAULT_BtnColor;
-						m_tsbSelPath_Manual.BackColor = DEFAULT_BtnColor;
 						break;
 					case EditActionType.StartPoint:
 						m_tsbStartPoint.BackColor = DEFAULT_BtnColor;
@@ -768,28 +726,10 @@ namespace MyCAM
 			}
 
 			// action start, need to relay out
-			if( action == EditActionType.SelectFace ) {
-				RefreshToolStripLayout( EUIStatus.AddPath );
-			}
-			else if( action == EditActionType.SelectPath ) {
-				RefreshToolStripLayout( EUIStatus.ManualSelectPath );
-			}
-			else {
-				RefreshToolStripLayout( EUIStatus.CAM );
-			}
+			RefreshToolStripLayout( EUIStatus.CAM );
 			switch( action ) {
-				case EditActionType.SelectFace:
+				case EditActionType.AddPath:
 					m_tsbAddPath.BackColor = ON_ButtonColor;
-					break;
-				case EditActionType.SelectPath:
-
-					// add path icon still need to light up
-					m_tsbAddPath.BackColor = ON_ButtonColor;
-					m_tsbSelPath_Manual.BackColor = ON_ButtonColor;
-					m_tsbSelectD1ContFace.Enabled = false;
-					m_tsbSelPath_FreeBound.Enabled = false;
-					m_tsAddPathForHat.Enabled = false;
-					m_tsAddPathForTube.Enabled = false;
 					break;
 				case EditActionType.StartPoint:
 					m_tsbStartPoint.BackColor = ON_ButtonColor;
@@ -1046,10 +986,6 @@ namespace MyCAM
 				{ EUIStatus.CAD , new List<Control>() { m_tsCADFunction } },
 				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction } },
 				{ EUIStatus.Simulation, new List<Control>() { m_tsSimuFunc } },
-				
-				// cam function
-				{ EUIStatus.AddPath, new List<Control>(){ m_tsCAMFunction, m_tsAddPathSubFunc } },
-				{ EUIStatus.ManualSelectPath, new List<Control>(){ m_tsCAMFunction, m_tsAddPathSubFunc, m_tsSelectPath } }
 			};
 			m_ToolStripLevelList = new List<ToolStripContainer>()
 			{
@@ -1703,14 +1639,6 @@ namespace MyCAM
 
 			m_tsbMeasureCAM.Text = m_LanguageManager.TryGetString( "m_tsbMeasureCAM", m_tsbMeasureCAM.Text );
 			m_tsbMeasureCAM.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMeasureCAM_ToolTip", m_tsbMeasureCAM.ToolTipText );
-
-			// add path sub function toolbar
-			m_tsAddPathForHat.Text = m_LanguageManager.TryGetString( "m_tsAddPathForHat", m_tsAddPathForHat.Text );
-			m_tsAddPathForTube.Text = m_LanguageManager.TryGetString( "m_tsAddPathForTube", m_tsAddPathForTube.Text );
-			m_tsbSelectD1ContFace.Text = m_LanguageManager.TryGetString( "m_tsbSelectD1ContFace", m_tsbSelectD1ContFace.Text );
-			m_tsbSelPath_FreeBound.Text = m_LanguageManager.TryGetString( "m_tsbSelPath_FreeBound", m_tsbSelPath_FreeBound.Text );
-			m_tsbSelPath_Manual.Text = m_LanguageManager.TryGetString( "m_tsbSelPath_Manual", m_tsbSelPath_Manual.Text );
-			m_tsbManualSelectPathOK.Text = m_LanguageManager.TryGetString( "m_tsbManualSelectPathOK", m_tsbManualSelectPathOK.Text );
 
 			// simulation toolbar
 			m_btnPlay.Text = m_LanguageManager.TryGetString( "m_btnPlay", m_btnPlay.Text );

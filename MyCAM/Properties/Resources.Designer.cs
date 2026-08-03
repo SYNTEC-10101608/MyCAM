@@ -113,6 +113,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
+        internal static System.Drawing.Bitmap CAD_GenerateVertex {
+            get {
+                object obj = ResourceManager.GetObject("CAD_GenerateVertex", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
         internal static System.Drawing.Bitmap CAD_ManualTransform {
             get {
                 object obj = ResourceManager.GetObject("CAD_ManualTransform", resourceCulture);
@@ -229,27 +239,7 @@ namespace MyCAM.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-
-        /// <summary>
-        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
-        /// </summary>
-        internal static System.Drawing.Bitmap CAM_GenerateVertex {
-            get {
-                object obj = ResourceManager.GetObject("CAM_GenerateVertex", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
-        /// <summary>
-        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
-        /// </summary>
-        internal static System.Drawing.Bitmap CAM_Measure {
-            get {
-                object obj = ResourceManager.GetObject("CAM_Measure", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
+        
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
@@ -266,6 +256,16 @@ namespace MyCAM.Properties {
         internal static System.Drawing.Bitmap CAM_ManualOrder {
             get {
                 object obj = ResourceManager.GetObject("CAM_ManualOrder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap CAM_Measure {
+            get {
+                object obj = ResourceManager.GetObject("CAM_Measure", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -430,26 +430,6 @@ namespace MyCAM.Properties {
             }
         }
         
-        /// <summary>
-        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
-        /// </summary>
-        internal static System.Drawing.Bitmap Measure {
-            get {
-                object obj = ResourceManager.GetObject("Measure", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
-        /// <summary>
-        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
-        /// </summary>
-        internal static System.Drawing.Bitmap GenerateVertex {
-            get {
-                object obj = ResourceManager.GetObject("GenerateVertex", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>

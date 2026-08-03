@@ -1,4 +1,3 @@
-using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
@@ -154,6 +153,7 @@ namespace MyCAM.Editor
 						|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
 					if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
 						m_Viewer.GetAISContext().ClearSelected( true );
+						SelectionChanged?.Invoke();
 					}
 					return;
 				}
@@ -163,6 +163,7 @@ namespace MyCAM.Editor
 				}
 				m_Viewer.GetAISContext().AddOrRemoveSelected( detectedObject, false );
 				m_Viewer.UpdateView();
+				SelectionChanged?.Invoke();
 			}
 		}
 
@@ -175,14 +176,13 @@ namespace MyCAM.Editor
 				}
 				AIS_InteractiveObject detectedObject = m_Viewer.GetAISContext().DetectedInteractive();
 				SelectClosedWireFromDetected( detectedObject );
+				SelectionChanged?.Invoke();
 			}
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
-			if( e.KeyCode == Keys.Escape ) {
-				End();
-			}
+			// Since this action is trigger by Addpath dlg ,no need to leave by Esc
 		}
 
 		void SelectClosedWireFromDetected( AIS_InteractiveObject detectedObject )
@@ -226,14 +226,15 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		public void SelectDone()
+		public string SelectDone(
+			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
+			double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
+			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD )
 		{
 			// get selected edge
 			TopTools_MapOfShape extractedEdgeSet = GetSelectedEdge();
 			if( extractedEdgeSet.Size() == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoPathSelected", NO_PATH_SELECTED ), MyApp.NoticeType.Hint );
-				End();
-				return;
+				return m_LanguageManager.TryGetString( "NoPathSelected", NO_PATH_SELECTED );
 			}
 
 			// series the selected edge if possible
@@ -264,8 +265,9 @@ namespace MyCAM.Editor
 			}
 
 			// update datas
-			m_DataManager.AddPath( pathWireList, m_EdgeFaceMap );
+			m_DataManager.AddPath( pathWireList, m_EdgeFaceMap, true, maxDeflection, maxEdgeLength, discretizeMethod );
 			End();
+			return null;
 		}
 
 		public static List<List<TopoDS_Edge>> FindSubWires( List<TopoDS_Edge> wire, TopTools_MapOfShape extractedEdgeSet )
@@ -367,6 +369,13 @@ namespace MyCAM.Editor
 		List<List<TopoDS_Edge>> m_FreeBoundWireList;
 		List<AIS_Shape> m_FaceGroupAISList;
 		Dictionary<EdgeHandle, List<EdgeHandle>> m_EdgeHandleToWireMap;
+
+		// Fired whenever the edge selection changes (click or double-click).
+		public event System.Action SelectionChanged;
+
+		// True when at least one edge is currently selected.
+		public bool HasSelection => GetSelectedEdge().Size() > 0;
+
 		const string NO_PATH_SELECTED = "[操作提醒]未選取任何路徑";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SelectWireAction" );
 	}

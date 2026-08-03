@@ -82,6 +82,7 @@
     <Compile Include="Editor\Action\CAD\GlassDXFImportAction.cs" />
     <Compile Include="Editor\Action\CAD\PlaceRingShapeAction.cs" />
     <Compile Include="Editor\Action\CAD\WireDiscreteVertexAction.cs" />
+    <Compile Include="Editor\Action\CAM\AddPathAction.cs" />
     <Compile Include="Editor\Action\CAM\AutoSortPathAction.cs" />
     <Compile Include="Editor\Action\CAM\CalibrationREFAction.cs" />
     <Compile Include="Editor\Action\CAM\ContourEditAction.cs" />
@@ -89,6 +90,12 @@
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
     <Compile Include="Editor\Action\MeasureAction.cs" />
+    <Compile Include="Editor\Dialog\AddPathDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\AddPathDlg.Designer.cs">
+      <DependentUpon>AddPathDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Dialog\CalibrationREFDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -363,6 +370,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CNC\ConnectDlg.resx">
       <DependentUpon>ConnectDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\AddPathDlg.resx">
+      <DependentUpon>AddPathDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\AxisTransformDlg.resx">
       <DependentUpon>AxisTransformDlg.cs</DependentUpon>

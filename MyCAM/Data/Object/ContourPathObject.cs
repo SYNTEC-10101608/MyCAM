@@ -11,7 +11,10 @@ namespace MyCAM.Data
 {
 	public class ContourPathObject : PathObject
 	{
-		public ContourPathObject( string szUID, TopoDS_Shape shape, List<PathEdge5D> pathDataList )
+		public ContourPathObject( string szUID, TopoDS_Shape shape, List<PathEdge5D> pathDataList,
+			double maxDeflection = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
+			double maxEdgeLength = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
+			OCCTool.EDiscretizeMethod discretizeMethod = OCCTool.GeometryTool.DEFAULT_DISCRETIZE_METHOD )
 			: base( szUID )
 		{
 			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || pathDataList == null ) {
@@ -22,7 +25,7 @@ namespace MyCAM.Data
 			}
 
 			bool isClosed = DetermineIfClosed( shape );
-			m_ContourGeomData = new ContourGeomData( pathDataList, isClosed );
+			m_ContourGeomData = new ContourGeomData( pathDataList, isClosed, maxDeflection, maxEdgeLength, discretizeMethod );
 			m_CraftData = new CraftData();
 			m_ContourCache = new ContourCache( m_ContourGeomData, m_CraftData );
 		}
