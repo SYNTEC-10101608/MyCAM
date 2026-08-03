@@ -67,6 +67,8 @@ namespace MyCAM.Editor
 		CollisionSolver m_collisionEngine;
 		MachineTreeNode m_SimulationTreeRoot = null;
 
+		readonly Dictionary<string, (double[] Min, double[] Max)> m_LocalAabbMap = new Dictionary<string, (double[] Min, double[] Max)>();
+
 		// read from machine data
 		HashSet<MachineComponentType> m_WorkPieceChainSet = new HashSet<MachineComponentType>();
 		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
@@ -532,6 +534,7 @@ namespace MyCAM.Editor
 				MachineData = m_MachineData,
 				ChainListMap = m_ChainListMap,
 				CollisionEngine = m_collisionEngine,
+				AABBMap = m_LocalAabbMap,
 			};
 			return calNeedData;
 		}
@@ -617,6 +620,7 @@ namespace MyCAM.Editor
 
 		void RegisterAllSimuMemberForCollision()
 		{
+			m_LocalAabbMap.Clear();
 			RegisterMachineForCollision();
 			RegisterWorkpieceForCollision();
 		}
@@ -638,7 +642,12 @@ namespace MyCAM.Editor
 				}
 				Poly_Triangulation triangulation = m_DataManager.MachineMeshes.Meshes[ componentType ];
 				MeshShape( triangulation, out List<double> vertexList, out List<int> indexList );
-				m_collisionEngine.AddModel( componentType.ToString(), indexList.ToArray(), vertexList.ToArray() );
+				double[] vertexArr = vertexList.ToArray();
+				m_collisionEngine.AddModel( componentType.ToString(), indexList.ToArray(), vertexArr );
+				var machineAABB = CollisionHelper.BuildLocalAABB( vertexArr );
+				if( machineAABB.HasValue ) {
+					m_LocalAabbMap[ componentType.ToString() ] = machineAABB.Value;
+				}
 			}
 		}
 
@@ -668,7 +677,12 @@ namespace MyCAM.Editor
 
 			// register to collision solver
 			MeshShape( workPiecesTrian, out List<double> vertexListWP, out List<int> indexListWP );
-			m_collisionEngine.AddModel( MachineComponentType.WorkPiece.ToString(), indexListWP.ToArray(), vertexListWP.ToArray() );
+			double[] vertexArrWP = vertexListWP.ToArray();
+			m_collisionEngine.AddModel( MachineComponentType.WorkPiece.ToString(), indexListWP.ToArray(), vertexArrWP );
+			var workpieceAABB = CollisionHelper.BuildLocalAABB( vertexArrWP );
+			if( workpieceAABB.HasValue ) {
+				m_LocalAabbMap[ MachineComponentType.WorkPiece.ToString() ] = workpieceAABB.Value;
+			}
 		}
 
 		void ShowTraverse()
