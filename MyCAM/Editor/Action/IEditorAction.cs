@@ -47,6 +47,7 @@ namespace MyCAM.Editor
 		ManualOrder,
 		AutoSortPath,
 		SpecialToolVecEdit,
+		AddPath,
 
 		// File
 		ImportProjectFile,

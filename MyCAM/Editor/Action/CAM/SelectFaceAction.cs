@@ -1,4 +1,3 @@
-using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.TopAbs;
@@ -28,9 +27,11 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public SelectFaceAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
+		public SelectFaceAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager,
+			double d1ThresholdDegrees = DEFAULT_D1_THRESHOLD_DEGREES )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
+			m_D1ToleranceRadians = d1ThresholdDegrees * System.Math.PI / 180.0;
 			m_VisibleFaceAISPairList = new List<FaceHandle>();
 			m_EdgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
 			foreach( var partID in m_DataManager.PartIDList ) {
@@ -61,6 +62,12 @@ namespace MyCAM.Editor
 			{
 				return EditActionType.SelectFace;
 			}
+		}
+
+		// update D1 continuity tolerance in real time (degrees), e.g. when user edits the AddPath dialog's D1 threshold
+		public void SetD1ThresholdDegrees( double d1ThresholdDegrees )
+		{
+			m_D1ToleranceRadians = d1ThresholdDegrees * System.Math.PI / 180.0;
 		}
 
 		public override void Start()
@@ -107,11 +114,16 @@ namespace MyCAM.Editor
 
 		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
+			if( m_isFrozen ) {
+				return;
+			}
+
 			if( e.Button == MouseButtons.Left ) {
 				if( m_Viewer.GetAISContext().DetectedOwner().IsNull()
 						|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
 					if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control ) {
 						m_Viewer.GetAISContext().ClearSelected( true );
+						SelectionChanged?.Invoke();
 					}
 					return;
 				}
@@ -121,11 +133,15 @@ namespace MyCAM.Editor
 				}
 				m_Viewer.GetAISContext().AddOrRemoveSelected( detectedObject, false );
 				m_Viewer.UpdateView();
+				SelectionChanged?.Invoke();
 			}
 		}
 
 		protected override void ViewerMouseDoubleClick( MouseEventArgs e )
 		{
+			if( m_isFrozen ) {
+				return;
+			}
 			if( e.Button == MouseButtons.Left ) {
 				if( m_Viewer.GetAISContext().DetectedOwner().IsNull()
 					|| m_Viewer.GetAISContext().DetectedOwner().HasSelectable() == false ) {
@@ -133,37 +149,13 @@ namespace MyCAM.Editor
 				}
 				AIS_InteractiveObject detectedObject = m_Viewer.GetAISContext().DetectedInteractive();
 				SelectD1ContFaceFromDetected( detectedObject );
+				SelectionChanged?.Invoke();
 			}
 		}
 
 		protected override void ViewerKeyDown( KeyEventArgs e )
 		{
-			if( e.KeyCode == Keys.Escape ) {
-				End();
-			}
-		}
-
-		public void SelectD1ContFace()
-		{
-			List<TopoDS_Face> faceBFSQueue = GetSelectedFace();
-			if( faceBFSQueue.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseSelectFace", PLEASE_SELECT_FACE ), MyApp.NoticeType.Hint );
-				return;
-			}
-
-			List<TopoDS_Face> d1ContinuousFaceList = BFSFindD1ContFaces( faceBFSQueue );
-
-			m_Viewer.GetAISContext().ClearSelected( false );
-
-			// select all D1 continuous faces
-			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
-				foreach( TopoDS_Face oneFace in d1ContinuousFaceList ) {
-					if( faceAISPair.Face.IsEqual( oneFace ) ) {
-						m_Viewer.GetAISContext().AddOrRemoveSelected( faceAISPair.AIS, false );
-					}
-				}
-			}
-			m_Viewer.UpdateView();
+			// Since this action is trigger by Addpath dlg ,no need to leave by Esc
 		}
 
 		void SelectD1ContFaceFromDetected( AIS_InteractiveObject detectedObject )
@@ -205,7 +197,7 @@ namespace MyCAM.Editor
 		// BFS core: find all D1 continuous faces starting from a set of seed faces
 		List<TopoDS_Face> BFSFindD1ContFaces( List<TopoDS_Face> faceBFSQueue )
 		{
-			return GeometryTool.FindD1ContinuousFaces( faceBFSQueue, m_EdgeFaceMap );
+			return GeometryTool.FindD1ContinuousFaces( faceBFSQueue, m_EdgeFaceMap, m_D1ToleranceRadians );
 		}
 
 		public List<TopoDS_Shape> GetResult()
@@ -248,6 +240,26 @@ namespace MyCAM.Editor
 			}
 		}
 
+		// Deactivate all face AIS so the user can no longer click/select, but keep the highlight visible.
+		public void Freeze()
+		{
+			m_isFrozen = true;
+			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
+				m_Viewer.GetAISContext().Deactivate( faceAISPair.AIS );
+			}
+			m_Viewer.UpdateView();
+		}
+
+		// Reactivate face AIS so the user can click/select again.
+		public void Unfreeze()
+		{
+			m_isFrozen = false;
+			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
+				m_Viewer.GetAISContext().Activate( faceAISPair.AIS, (int)AISActiveMode.Face );
+			}
+			m_Viewer.UpdateView();
+		}
+
 		void HidePart()
 		{
 			foreach( var faceAISPair in m_VisibleFaceAISPairList ) {
@@ -273,7 +285,17 @@ namespace MyCAM.Editor
 
 		List<FaceHandle> m_VisibleFaceAISPairList;
 		TopTools_IndexedDataMapOfShapeListOfShape m_EdgeFaceMap;
-		const string PLEASE_SELECT_FACE = "[操作提醒]請先選擇面";
-		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SelectFaceAction" );
+		bool m_isFrozen = false;
+
+		// Fired whenever the face selection changes (click or double-click).
+		public event System.Action SelectionChanged;
+
+		// True when at least one face is currently selected.
+		public bool HasSelection => GetSelectedFace().Count > 0;
+
+		// D1 tolerance in radians
+		double m_D1ToleranceRadians;
+
+		const double DEFAULT_D1_THRESHOLD_DEGREES = 5.0;
 	}
 }

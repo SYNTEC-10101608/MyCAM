@@ -13,7 +13,8 @@ namespace MyCAM.Helper
 	{
 		public static bool BuildContourGeomData( List<PathEdge5D> pathEdge5DList, bool isClosed,
 			out List<CADPoint> cadPointList, out Dictionary<CADPoint, CADPoint> connectPointMap,
-			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION, double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH )
+			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION, double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
+			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD )
 		{
 			cadPointList = new List<CADPoint>();
 			connectPointMap = new Dictionary<CADPoint, CADPoint>();
@@ -28,7 +29,7 @@ namespace MyCAM.Helper
 				TopoDS_Face solidFace = pathEdge5DList[ i ].ComponentFace; // TODO: set solid face
 				if( !GetEdgeSegmentPoints( TopoDS.ToEdge( edge ), shellFace, solidFace, i == 0, i == pathEdge5DList.Count - 1, isClosed,
 					ref cadPointList, ref connectPointMap,
-					maxDeflection, maxEdgeLength ) ) {
+					maxDeflection, maxEdgeLength, discretizeMethod ) ) {
 					return false;
 				}
 			}
@@ -37,7 +38,7 @@ namespace MyCAM.Helper
 
 		static bool GetEdgeSegmentPoints( TopoDS_Edge edge, TopoDS_Face shellFace, TopoDS_Face solidFace, bool bFirst, bool bLast, bool isClosed,
 			ref List<CADPoint> cadPointList, ref Dictionary<CADPoint, CADPoint> connectPointMap,
-			double maxDeflection, double maxEdgeLength )
+			double maxDeflection, double maxEdgeLength, EDiscretizeMethod discretizeMethod )
 		{
 			List<CADPoint> oneSegmentPointList = new List<CADPoint>();
 
@@ -45,7 +46,7 @@ namespace MyCAM.Helper
 			BRepAdaptor_Curve adC = new BRepAdaptor_Curve( edge, shellFace );
 
 			// discretization logic (deflection + max length + orientation)
-			List<double> segmentParamList = GeometryTool.DiscretizeEdgeParameters( adC, edge, maxDeflection, maxEdgeLength );
+			List<double> segmentParamList = GeometryTool.DiscretizeEdgeParameters( adC, edge, maxDeflection, maxEdgeLength, discretizeMethod );
 
 			for( int i = 0; i < segmentParamList.Count; i++ ) {
 				double U = segmentParamList[ i ];

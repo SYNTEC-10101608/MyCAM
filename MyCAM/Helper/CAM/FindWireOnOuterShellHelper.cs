@@ -46,7 +46,8 @@ namespace MyCAM.Helper
 		public static WireFindingResult FindWiresOnOuterShell(
 			List<TopoDS_Shape> partShapes,
 			List<gp_Ax1> rayStrategies,
-			gp_Pnt referenceCenter )
+			gp_Pnt referenceCenter,
+			double d1Tolerance = GeometryTool.DEFAULT_D1_CONTINUOUS_TOLERANCE )
 		{
 			// step 1: find outermost face using ray strategies
 			TopoDS_Face outerFace = FindOutermostFaceByStrategies( partShapes, rayStrategies, referenceCenter );
@@ -60,7 +61,7 @@ namespace MyCAM.Helper
 			}
 
 			// step 2: find D1 continuous faces from the outermost face
-			List<TopoDS_Face> d1FaceList = FindD1ContinuousFaces( outerFace, partShapes );
+			List<TopoDS_Face> d1FaceList = FindD1ContinuousFaces( outerFace, partShapes, d1Tolerance );
 
 			if( d1FaceList.Count == 0 ) {
 				return new WireFindingResult
@@ -231,13 +232,14 @@ namespace MyCAM.Helper
 		// find D1 continuous faces starting from a seed face
 		static List<TopoDS_Face> FindD1ContinuousFaces(
 			TopoDS_Face seedFace,
-			List<TopoDS_Shape> partShapes )
+			List<TopoDS_Shape> partShapes,
+			double d1Tolerance )
 		{
 			// build edge-face map for D1 continuity check
 			TopTools_IndexedDataMapOfShapeListOfShape edgeFaceMap = BuildEdgeFaceMap( partShapes );
 
 			// use GeometryTool's BFS algorithm to find D1 continuous faces
-			return GeometryTool.FindD1ContinuousFaces( new List<TopoDS_Face> { seedFace }, edgeFaceMap );
+			return GeometryTool.FindD1ContinuousFaces( new List<TopoDS_Face> { seedFace }, edgeFaceMap, d1Tolerance );
 		}
 
 		// sew face list into shells or keep as individual faces

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="AddPathDlg" Content="新增路径" />
+    <Message ID="m_grpStep1" Content="路径生成方式" />
+    <Message ID="m_rdoAutoHat" Content="自动生成路径-异形盖件" />
+    <Message ID="m_rdoAutoTube" Content="自动生成路径-管拉件" />
+    <Message ID="m_rdoManual" Content="手动生成路径" />
+    <Message ID="m_grpStep3" Content="路径生成方式" />
+    <Message ID="m_rdoAutoFromFace" Content="自动生成路径" />
+    <Message ID="m_rdoManualWire" Content="手动选择路径" />
+    <Message ID="m_chkShowAdvanced" Content="进阶参数" />
+    <Message ID="m_grpAdvanced" Content="进阶参数" />
+    <Message ID="m_lblD1Threshold" Content="D1 连续阀值:" />
+    <Message ID="m_lblDiscreteMode" Content="离散方式:" />
+    <Message ID="m_lblMaxChordError" Content="弦高误差:" />
+    <Message ID="m_lblMaxLineLength" Content="直线离散距离:" />
+    <Message ID="m_lblD1Unit" Content="deg" />
+    <Message ID="m_lblChordUnit" Content="mm" />
+    <Message ID="m_lblLineUnit" Content="mm" />
+    <Message ID="m_btnOK" Content="生成路径" />
+    <Message ID="m_btnNext" Content="下一步" />
+    <Message ID="DiscreteMode_QuasiUniformDeflection" Content="普通离散" />
+    <Message ID="DiscreteMode_UniformDeflection" Content="精确离散" />
+    <Message ID="Desc_Step2_Title" Content="选择欲生成路径的面" />
+    <Message ID="Desc_Step2_Hints" Content="滑鼠双击：连续面&#13;&#10;Ctrl：多选" />
+    <Message ID="Desc_Step4_Title" Content="选择欲生成的路径" />
+    <Message ID="Desc_Step4_Hints" Content="滑鼠双击：连续路径&#13;&#10;Ctrl：多选" />
+</ResMap>

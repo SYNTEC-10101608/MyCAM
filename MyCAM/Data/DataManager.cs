@@ -4,6 +4,7 @@ using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
+using OCCTool;
 using System;
 using System.Collections.Generic;
 
@@ -206,7 +207,10 @@ namespace MyCAM.Data
 		}
 
 		// the edge map contains all edges in all wire to be add
-		public void AddPath( List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap, bool shouldTriggerEvent = true )
+		public void AddPath( List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap, bool shouldTriggerEvent = true,
+			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
+			double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
+			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD )
 		{
 			if( pathWireList == null || pathWireList.Count == 0 || allEdgeMap == null ) {
 				return;
@@ -240,7 +244,8 @@ namespace MyCAM.Data
 				// add valid path
 				if( isValidPath ) {
 					string szID = "Path_" + ++m_PathID;
-					ContourPathObject contourPathObject = new ContourPathObject( szID, pathWire, pathElements );
+					ContourPathObject contourPathObject = new ContourPathObject( szID, pathWire, pathElements,
+						maxDeflection, maxEdgeLength, discretizeMethod );
 					contourPathObject.CraftData.TraverseData = new TraverseData();
 					ObjectMap[ szID ] = contourPathObject;
 					newPathIDList.Add( szID );

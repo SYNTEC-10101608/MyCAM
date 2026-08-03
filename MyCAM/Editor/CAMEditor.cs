@@ -1,13 +1,10 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
-using MyCAM.Helper;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.gp;
-using OCC.TopoDS;
 using OCC.V3d;
-using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -145,14 +142,19 @@ namespace MyCAM.Editor
 
 		// add/ remove path API
 
-		public void StartSelectFace()
+		public void StartAddPath()
 		{
-			// with on/off button, so end current action
-			if( IsSameAction( EditActionType.SelectFace ) || IsSameAction( EditActionType.SelectPath ) ) {
+			if( IsSameAction( EditActionType.AddPath ) ) {
 				m_CurrentAction?.End();
 				return;
 			}
-			SelectFaceAction action = new SelectFaceAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+
+			// no workpiece protect
+			if( m_DataManager.PartIDList.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseAddWorkpiece", PLEASE_ADD_WORKPIECE ), MyApp.NoticeType.Hint );
+				return;
+			}
+			AddPathAction action = new AddPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
 		}
 
@@ -165,110 +167,6 @@ namespace MyCAM.Editor
 
 			MeasureAction action = new MeasureAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 			StartEditAction( action );
-		}
-
-		// Auto find top face along Z axis, then process D1 continuous faces and free boundaries
-		public void AutoFindHatPath()
-		{
-			// Guard check - ensure workpiece exists
-			if( m_DataManager.PartIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseAddWorkpiece", PLEASE_ADD_WORKPIECE ), MyApp.NoticeType.Hint );
-				EndActionIfNotDefault();
-				return;
-			}
-
-			BoundingBox bbox = GetVisibleWorkpieceBBox();
-			if( bbox == null ) {
-				return;
-			}
-
-			gp_Pnt bboxCenter = new gp_Pnt( bbox.XCenter, bbox.YCenter, bbox.ZCenter );
-
-			List<gp_Ax1> AlienatedStrategies = GeometryTool.BuildRayAxesFromBBox( new gp_Dir( 0, 0, 1 ), bbox );
-			AutoFindOutesetFaceAndAddPath( AlienatedStrategies, bboxCenter );
-		}
-
-		// Auto find outermost face along X/Y axis, then process D1 continuous faces and free boundaries
-		public void AutoFindTubePath()
-		{
-			// Guard check - ensure workpiece exists
-			if( m_DataManager.PartIDList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseAddWorkpiece", PLEASE_ADD_WORKPIECE ), MyApp.NoticeType.Hint );
-				EndActionIfNotDefault();
-				return;
-			}
-
-			BoundingBox bbox = GetVisibleWorkpieceBBox();
-			bool isGetSuccess = FindWireOnOuterShellHelper.TubeStrategies( bbox, out gp_Pnt bboxCenter, out List<gp_Ax1> stretchedStrategies );
-			if( isGetSuccess == false ) {
-				return;
-			}
-			AutoFindOutesetFaceAndAddPath( stretchedStrategies, bboxCenter );
-		}
-
-		public void SelectD1ContFace()
-		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectFace ) {
-				return;
-			}
-			( (SelectFaceAction)m_CurrentAction ).SelectD1ContFace();
-		}
-
-		public void SelectPath_FreeBound()
-		{
-			// get selected face group from select face action
-			if( m_CurrentAction.ActionType != EditActionType.SelectFace ) {
-				return;
-			}
-			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
-			m_CurrentAction.End();
-
-			// get path from free boundaries
-			if( selectedFaceGroupList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseSelectFace", PLEASE_SELECT_FACE ), MyApp.NoticeType.Hint );
-				return;
-			}
-
-			// Extract free boundaries and add paths
-			FindWireOnOuterShellHelper.WireFindingResult result = FindWireOnOuterShellHelper.ExtractFreeBoundariesFromFaceGroups( selectedFaceGroupList );
-			if( !result.IsSuccess ) {
-				string errorMessage = FindWireOnOuterShellHelper.GetWireFindingErrorMessage( result.Error );
-				MyApp.Logger.ShowOnLogPanel( errorMessage, MyApp.NoticeType.Hint );
-				EndActionIfNotDefault();
-				return;
-			}
-
-			// add paths to data manager
-			m_DataManager.AddPath( result.Wires, result.EdgeFaceMap );
-		}
-
-		public void StartSelectPath_Manual()
-		{
-			// with on/off button, so can end current action first
-			if( IsSameAction( EditActionType.SelectPath ) || m_CurrentAction.ActionType != EditActionType.SelectFace ) {
-				m_CurrentAction.End();
-				return;
-			}
-
-			// previous action is select face action
-			List<TopoDS_Shape> selectedFaceGroupList = ( (SelectFaceAction)m_CurrentAction ).GetResult();
-
-			// end all actions if no face is selected
-			if( selectedFaceGroupList.Count == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseSelectFace", PLEASE_SELECT_FACE ), MyApp.NoticeType.Hint );
-				m_CurrentAction.End();
-				return;
-			}
-			SelectWireAction action = new SelectWireAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, selectedFaceGroupList );
-			StartEditAction( action );
-		}
-
-		public void EndSelectPath_Manual()
-		{
-			if( m_CurrentAction.ActionType != EditActionType.SelectPath ) {
-				return;
-			}
-			( (SelectWireAction)m_CurrentAction ).SelectDone();
 		}
 
 		public void RemovePath()
@@ -1105,69 +1003,7 @@ namespace MyCAM.Editor
 			base.OnEditActionEnd( action );
 		}
 
-		// Shared: auto find outermost face by ray strategies, then find D1 faces and add free boundary paths
-		void AutoFindOutesetFaceAndAddPath( List<gp_Ax1> strategies, gp_Pnt referenceCenter )
-		{
-			// get visible part shapes
-			List<TopoDS_Shape> partShapes = GetVisiblePartShapes();
-			if( partShapes.Count == 0 ) {
-				return;
-			}
-
-			// use FindWireOnOuterShellHelper to find wires on outer shell
-			FindWireOnOuterShellHelper.WireFindingResult result =
-				FindWireOnOuterShellHelper.FindWiresOnOuterShell( partShapes, strategies, referenceCenter );
-
-			if( !result.IsSuccess ) {
-				string errorMessage = FindWireOnOuterShellHelper.GetWireFindingErrorMessage( result.Error );
-				MyApp.Logger.ShowOnLogPanel( errorMessage, MyApp.NoticeType.Hint );
-				EndActionIfNotDefault();
-				return;
-			}
-
-			m_CurrentAction.End();
-
-			// add paths to data manager
-			m_DataManager.AddPath( result.Wires, result.EdgeFaceMap );
-		}
-
-		// get visible part shapes for path generation
-		List<TopoDS_Shape> GetVisiblePartShapes()
-		{
-			List<TopoDS_Shape> shapeList = new List<TopoDS_Shape>();
-			foreach( string partID in m_DataManager.PartIDList ) {
-				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
-					continue;
-				}
-				if( DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObject ) == false ) {
-					continue;
-				}
-				shapeList.Add( shapeObject.Shape );
-			}
-			return shapeList;
-		}
-
-		BoundingBox GetVisibleWorkpieceBBox()
-		{
-			List<TopoDS_Shape> shapeList = new List<TopoDS_Shape>();
-			foreach( string partID in m_DataManager.PartIDList ) {
-				if( m_ViewManager.ViewObjectMap[ partID ].Visible == false ) {
-					continue;
-				}
-				if( DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObject ) == false ) {
-					continue;
-				}
-				shapeList.Add( shapeObject.Shape );
-			}
-			if( shapeList.Count == 0 ) {
-				return null;
-			}
-			TopoDS_Shape compound = ShapeTool.MakeCompound( shapeList );
-			return new BoundingBox( compound );
-		}
-
 		const string PLEASE_ADD_WORKPIECE = "[操作提醒]請先新增工件";
-		const string PLEASE_SELECT_FACE = "[操作提醒]請先選擇面";
 		const string PLEASE_SELECT_PATH = "[操作提醒]請先選擇路徑";
 		const string ONLY_SINGLE_PATH_EDIT = "[操作提醒]只能選擇一個路徑進行編輯";
 		const string ONLY_CONTOUR_PATH_SUPPORTED = "[操作提醒]此功能僅支援輪廓路徑";
