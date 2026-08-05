@@ -77,7 +77,6 @@
 			this.m_tsbAxisTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbManualTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsb3PntTransform = new System.Windows.Forms.ToolStripButton();
-			this.m_tsbAxisTransform = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbMeasureCAD = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbWireDiscreteVertex = new System.Windows.Forms.ToolStripButton();
 			this.m_tsSimuFunc = new System.Windows.Forms.ToolStrip();
