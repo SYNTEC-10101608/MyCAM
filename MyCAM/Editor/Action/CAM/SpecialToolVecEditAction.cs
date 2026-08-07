@@ -19,6 +19,7 @@ namespace MyCAM.Editor
 		public Action<bool, bool> RaiseActionStart;
 		public Action HideMachine;
 		public Action ResetPartUI;
+		public Action NeedOptimizedIK;
 
 		public SpecialToolVecEditAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, List<string> pathIDList, SelectPathAction pathIndexAction )
 			: base( dataManager, pathIDList )
@@ -53,13 +54,15 @@ namespace MyCAM.Editor
 			m_Dlg.Cancel += OnFormClose;
 			m_Dlg.FlipRotaryAxis += OnFlipRotaryAxis;
 			m_Dlg.RotateToFixDir += OnRotateToFixDir;
+			m_Dlg.RotateToZDir += OnRotateToZDir;
 			UpdateDialogUI();
 			m_Dlg.Show();
 
-			// start path index action (disallow selecting std pattern paths in this action)
-			m_PathIndexAction.CanSelectStdPattern = false;
+			// start path index action
+			m_PathIndexAction.AddLockedPaths( CreatLockList() );
 			m_PathIndexAction.Start();
 			m_PathIndexAction.SelectionChange += OnPathSelectionChanged;
+			m_PathIndexAction.WithPathCantSelect += SelectPathAlert;
 
 			// show machine
 			RaiseActionStart?.Invoke( true, false );
@@ -85,6 +88,7 @@ namespace MyCAM.Editor
 				m_Dlg.Cancel = null;
 				m_Dlg.FlipRotaryAxis = null;
 				m_Dlg.RotateToFixDir = null;
+				m_Dlg.RotateToZDir = null;
 				m_Dlg.Close();
 				m_Dlg = null;
 			}
@@ -126,6 +130,7 @@ namespace MyCAM.Editor
 		const string CANNOT_GET_TOOL_VECTOR_INFO = "無法獲取目標點的工具向量資訊";
 		const string CANNOT_GET_MACHINE_INFO = "無法獲取機台資訊";
 		const string CANNOT_SET_SAME_MS_FOR_MULTI_FIXDIR = "多條路徑無法設置相同曲面法向角度，請改為單選";
+		const string PATH_CANNOT_SELECT = "選取到的路徑不支援孔姿態";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SpecialToolVecEditAction" );
 
 		#endregion
@@ -134,6 +139,19 @@ namespace MyCAM.Editor
 		{
 			End();
 			return;
+		}
+
+		IEnumerable<string> CreatLockList()
+		{
+			List<string> lockList = new List<string>();
+			foreach( string pathID in m_DataManager.PathIDList ) {
+
+				// is std pattern path, lock it
+				if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
+					lockList.Add( pathID );
+				}
+			}
+			return lockList;
 		}
 
 		void OnPathSelectionChanged()
@@ -151,6 +169,9 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			// trigger IK optimization
+			NeedOptimizedIK?.Invoke();
+
 			// update current path ID list
 			m_CurrentPathIDList = selectedPathIDs;
 
@@ -161,6 +182,11 @@ namespace MyCAM.Editor
 			RefreshSimuResult();
 		}
 
+		void SelectPathAlert()
+		{
+			MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "PathCannotSelect", PATH_CANNOT_SELECT ) ), MyApp.NoticeType.Warning );
+		}
+
 		void SwitchDlgType( ESpecialToolVecType type )
 		{
 			m_Dlg.SwitchType( type );
@@ -168,7 +194,6 @@ namespace MyCAM.Editor
 		}
 
 		#region Select action trigger UI change
-
 
 		void HandlePathSelection()
 		{
@@ -322,14 +347,32 @@ namespace MyCAM.Editor
 				return;
 			}
 			if( m_CurrentPathIDList.Count == 1 ) {
-				bool isGotCraftData = DataGettingHelper.GetCraftDataByID( m_CurrentPathIDList.First(), out CraftData craftData );
-				bool isGotDefaultMS = GetMSForAssignMode( m_CurrentPathIDList.First(), out Tuple<double, double> MSAngle );
-				if( isGotCraftData && isGotDefaultMS ) {
-					craftData.SetSpecialToolVecData( new SpecialToolVecData( ESpecialToolVecType.AssignMS, MSAngle.Item1, MSAngle.Item2 ) );
-				}
+				AssignMSUsingFixDirAngle();
 				return;
 			}
 
+			// servial path will get z dir with diff ms, so do not need to cal ms, all set as 0
+			AssignMSUsingDefaultAngle();
+		}
+
+		void AssignMSUsingFixDirAngle()
+		{
+			if( m_CurrentPathIDList.Count != 1 ) {
+				return;
+			}
+			bool isGotDefaultMS = GetMSForFixDirMode( m_CurrentPathIDList.FirstOrDefault(), out Tuple<double, double> MSAngle );
+			if( !isGotDefaultMS ) {
+				return;
+			}
+			SpecialToolVecData specialToolVecData = new SpecialToolVecData( ESpecialToolVecType.AssignMS, MSAngle.Item1, MSAngle.Item2 );
+			bool isGotCraftData = DataGettingHelper.GetCraftDataByID( m_CurrentPathIDList.FirstOrDefault(), out CraftData craftData );
+			if( isGotCraftData ) {
+				craftData.SetSpecialToolVecData( specialToolVecData );
+			}
+		}
+
+		void AssignMSUsingDefaultAngle()
+		{
 			// servial path will get z dir with diff ms, so do not need to cal ms, all set as 0
 			foreach( var pathID in m_CurrentPathIDList ) {
 				if( SelectPathAction.IsStdPatternPath( pathID ) ) {
@@ -369,7 +412,7 @@ namespace MyCAM.Editor
 				if( SelectPathAction.IsStdPatternPath( pathID ) ) {
 					continue;
 				}
-				bool isGotDefaultMS = GetMSForAssignMode( pathID, out Tuple<double, double> MSAngle );
+				bool isGotDefaultMS = GetMSAngleForZDir( pathID, out Tuple<double, double> MSAngle );
 				bool isGotCraftData = DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData );
 				if( isGotDefaultMS && isGotCraftData ) {
 					SpecialToolVecData specialData = new SpecialToolVecData( ESpecialToolVecType.ZDir, MSAngle.Item1, MSAngle.Item2 );
@@ -485,6 +528,37 @@ namespace MyCAM.Editor
 			RefreshSimuResult();
 		}
 
+
+		void OnRotateToZDir()
+		{
+			if( IsNoPathSelected() ) {
+				return;
+			}
+
+			// servial path will get z dir with diff ms, so do not need to cal ms, all set as 0
+			if( m_IsSingleSelcet == false ) {
+				AssignMSUsingDefaultAngle();
+			}
+
+			// is single select
+			else {
+				bool isGotDefaultMS = GetMSAngleForZDir( m_CurrentPathIDList.First(), out Tuple<double, double> MSAngle );
+				bool isGotCraftData = DataGettingHelper.GetCraftDataByID( m_CurrentPathIDList.First(), out CraftData craftData );
+				if( isGotDefaultMS && isGotCraftData ) {
+					SpecialToolVecData specialData = new SpecialToolVecData( ESpecialToolVecType.AssignMS, MSAngle.Item1, MSAngle.Item2 );
+					craftData.SetSpecialToolVecData( specialData );
+				}
+			}
+
+			// get special tool vec data for first path to update UI
+			bool isGetSpecialDataDone = GetPathSpecialToolVecData( m_CurrentPathIDList.FirstOrDefault(), out SpecialToolVecData specialToolVecData );
+			if( isGetSpecialDataDone == false ) {
+				return;
+			}
+			m_Dlg.SetMSAngleSilent( specialToolVecData.MasterAngle_deg, specialToolVecData.SlaveAngle_deg );
+			RefreshSimuResult();
+		}
+
 		#endregion
 
 		#region MS cal
@@ -523,7 +597,7 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		bool GetMSForAssignMode( string pathID, out Tuple<double, double> MSAngle )
+		bool GetMSAngleForZDir( string pathID, out Tuple<double, double> MSAngle )
 		{
 			MSAngle = new Tuple<double, double>( DEFAULT_Angle_Deg, DEFAULT_Angle_Deg );
 

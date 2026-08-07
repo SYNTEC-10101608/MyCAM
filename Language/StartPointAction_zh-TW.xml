@@ -1,4 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="CannotGetPathCraftInfo" Content="無法獲取路徑 {0} 的加工資訊" />
+	<Message ID="CannotGetPathGeomInfo" Content="無法獲取路徑 {0} 的幾何資訊" />
+	<Message ID="PathNotClosed" Content="路徑 {0} 不是封閉路徑" />
 </ResMap>

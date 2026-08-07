@@ -46,13 +46,17 @@ namespace MyCAM.Editor
 
 		public Action<Dictionary<MachineComponentType, List<gp_Trsf>>, bool> RaiseTrans;
 		public Action<bool, bool> RaiseActionStart;
+		public Action NeedOptimizedIK;
 
 		public override void Start()
 		{
 			base.Start();
 
-			// we have a original path index
-			SetupPath( m_CurrentPathID );
+			// setup original path index, if not valid, end this action
+			if( !SetupPath( m_CurrentPathID ) ) {
+				End();
+				return;
+			}
 
 			// init dialog
 			m_ToolVecDlg = new ToolVectorDlg( m_InterpolateType, ref m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );
@@ -85,11 +89,11 @@ namespace MyCAM.Editor
 				m_CoordIconRenderer.Show();
 			}
 
-			// start path index action (disallow selecting std pattern paths in this action)
-			m_PathIndexAction.CanSelectStdPattern = false;
-			m_PathIndexAction.CanSelectSpecialPath = false;
+			// start path index action
+			m_PathIndexAction.AddLockedPaths( CreatLockList() );
 			m_PathIndexAction.Start();
 			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
+			m_PathIndexAction.WithPathCantSelect += SelectPathAlert;
 
 			// start point index action, this will enter the start point
 			ActivatePointSelection();
@@ -136,19 +140,37 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		void SetupPath( string pathID )
+		IEnumerable<string> CreatLockList()
+		{
+			List<string> lockList = new List<string>();
+			foreach( string pathID in m_DataManager.PathIDList ) {
+
+				// is std pattern path, lock it
+				if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
+					lockList.Add( pathID );
+					continue;
+				}
+
+				// is special tool vector path, lock it
+				if( DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
+					if( craftData.SpecialToolVecData != null && craftData.SpecialToolVecData.Type != ESpecialToolVecType.Normal ) {
+						lockList.Add( pathID );
+					}
+				}
+			}
+			return lockList;
+		}
+
+		bool SetupPath( string pathID )
 		{
 			if( string.IsNullOrEmpty( pathID ) ) {
-				End();
-				return;
+				return false;
 			}
 
-			// init data for current path
-			m_CurrentPathID = pathID;
+			// check craft data
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
 				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathID ), MyApp.NoticeType.Warning );
-				End();
-				return;
+				return false;
 			}
 
 			TempRemoveSpecialToolVecData();
@@ -159,6 +181,10 @@ namespace MyCAM.Editor
 			m_ToolVecEditRender?.Remove();
 			m_ToolVecEditRender = new ToolVecEditRender( m_Viewer, m_DataManager, pathIDList );
 			m_ToolVecEditRender.Show( pathIDList );
+
+			// init data for current path
+			m_CurrentPathID = pathID;
+			return true;
 		}
 
 		void TempRemoveSpecialToolVecData()
@@ -219,19 +245,33 @@ namespace MyCAM.Editor
 			if( selectedIDs.Count != 1 ) {
 				return;
 			}
+
+			// trigger IK optimization
+			NeedOptimizedIK?.Invoke();
+
 			SetBackupDataBack();
 			string newPathID = selectedIDs.First();
 			if( newPathID == m_CurrentPathID ) {
 				return;
 			}
 			string szOldPathID = m_CurrentPathID;
-			SetupPath( newPathID );
+			if( !SetupPath( newPathID ) ) {
+				return;
+			}
+
+			// reset dialog path reverse state
+			m_ToolVecDlg.ResetPathReverse( m_CraftData.IsPathReverse );
 
 			// cleanup old state
 			DeactivatePointSelection( szOldPathID );
 
 			// activate point selection for new path
 			ActivatePointSelection();
+		}
+
+		void SelectPathAlert()
+		{
+			MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "PathCannotSelect", PATH_CANNOT_SELECT ) ), MyApp.NoticeType.Warning );
 		}
 
 		void SetBackupDataBack()
@@ -1098,6 +1138,7 @@ namespace MyCAM.Editor
 		const string NO_PRE_CONTROL_POINT = "沒有上一個控制點";
 		const string CANNOT_GET_MACHINE_INFO = "無法獲取機台資訊";
 		const string CANNOT_CALCULATE_LASER_HEAD_POSITION = "無法計算雷射頭位置";
+		const string PATH_CANNOT_SELECT = "選取到的路徑不支援飛邊姿態";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ToolVectorAction" );
 	}
 

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 <Message ID="CannotGetGeomData" Content="無法獲取路徑 {0} 的幾何資訊" />
 <Message ID="CannotGetCraftData" Content="無法獲取路徑 {0} 的加工資訊" />
@@ -8,4 +8,5 @@
 <Message ID="CannotGetToolVectorInfo" Content="無法獲取目標點的工具向量資訊" />
 <Message ID="CannotGetMachineInfo" Content="無法獲取機台資訊" />
 <Message ID="MutiPathCantSetSameMSForFixDir" Content="多條路徑無法設置相同曲面法向角度，請改為單選" />
+	<Message ID="PathCannotSelect" Content="選取到的路徑不支援孔姿態" />
 </ResMap>

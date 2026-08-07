@@ -606,8 +606,9 @@ namespace MyCAM
 					case EditActionType.WireDiscreteVertex:
 						m_tsbWireDiscreteVertex.BackColor = DEFAULT_BtnColor;
 						return;
+					default:
+						return;
 				}
-				return;
 			}
 
 			RefreshToolStripLayout( EUIStatus.CAD );
@@ -640,6 +641,8 @@ namespace MyCAM
 					return;
 				case EditActionType.WireDiscreteVertex:
 					m_tsbWireDiscreteVertex.BackColor = ON_ButtonColor;
+					return;
+				default:
 					return;
 			}
 		}
@@ -788,6 +791,8 @@ namespace MyCAM
 			m_tsbAutoOrder.Enabled = editableInfo.IsAutoOrderEditable;
 			m_tsbReverse.Enabled = editableInfo.IsPathReverseEditable;
 			m_tsbPathCompensation.Enabled = editableInfo.IsPathCompensateEditable;
+			m_tsbMicroJoint.Enabled = editableInfo.IsMicroJointEditable;
+			m_btnContourEdit.Enabled = editableInfo.IsContourEditable;
 		}
 
 		// path type change event
@@ -1631,8 +1636,8 @@ namespace MyCAM
 			m_tsbPathEdit.Text = m_LanguageManager.TryGetString( "m_tsbPathEdit", m_tsbPathEdit.Text );
 			m_tsbPathEdit.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPathEdit_ToolTip", m_tsbPathEdit.ToolTipText );
 
-			m_BtnContourEdit.Text = m_LanguageManager.TryGetString( "m_BtnContourEdit", m_BtnContourEdit.Text );
-			m_BtnContourEdit.ToolTipText = m_LanguageManager.TryGetString( "m_BtnContourEdit_ToolTip", m_BtnContourEdit.ToolTipText );
+			m_btnContourEdit.Text = m_LanguageManager.TryGetString( "m_BtnContourEdit", m_btnContourEdit.Text );
+			m_btnContourEdit.ToolTipText = m_LanguageManager.TryGetString( "m_BtnContourEdit_ToolTip", m_btnContourEdit.ToolTipText );
 
 			m_tsbPathCompensation.Text = m_LanguageManager.TryGetString( "m_tsbPathCompensation", m_tsbPathCompensation.Text );
 			m_tsbPathCompensation.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPathCompensation_ToolTip", m_tsbPathCompensation.ToolTipText );

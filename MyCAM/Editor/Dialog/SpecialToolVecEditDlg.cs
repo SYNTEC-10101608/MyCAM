@@ -9,6 +9,7 @@ namespace MyCAM.Editor
 		public Action<ESpecialToolVecType> TypeChanged;
 		public Action<bool> FlipRotaryAxis;
 		public Action RotateToFixDir;
+		public Action RotateToZDir;
 
 		public SpecialToolVecEditDlg( RotaryAxisConfig config )
 		{
@@ -281,7 +282,7 @@ namespace MyCAM.Editor
 
 		void m_btnZ_Click( object sender, EventArgs e )
 		{
-			TypeChanged?.Invoke( ESpecialToolVecType.AssignMS );
+			RotateToZDir?.Invoke();
 		}
 
 		void m_btnFixDir_Click( object sender, EventArgs e )

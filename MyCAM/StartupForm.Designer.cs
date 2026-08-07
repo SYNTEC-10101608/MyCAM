@@ -55,7 +55,7 @@
 			this.m_tsbOptimizeIK = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbPatternSetting = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbPathEdit = new System.Windows.Forms.ToolStripButton();
-			this.m_BtnContourEdit = new System.Windows.Forms.ToolStripButton();
+			this.m_btnContourEdit = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbPathCompensation = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbMeasureCAM = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbCalibrationPnt = new System.Windows.Forms.ToolStripButton();
@@ -247,7 +247,7 @@
 			this.m_tsbPatternSetting,
 			this.m_tsbPathEdit,
 			this.m_tsbPathCompensation,
-			this.m_BtnContourEdit,
+			this.m_btnContourEdit,
 			new System.Windows.Forms.ToolStripSeparator(),
 			// 7. measure
 			this.m_tsbMeasureCAM,
@@ -450,14 +450,14 @@
 			// 
 			// m_BtnContourEdit
 			// 
-			this.m_BtnContourEdit.Image = global::MyCAM.Properties.Resources.CAM_ContourEdit;
-			this.m_BtnContourEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_BtnContourEdit.Name = "m_BtnContourEdit";
-			this.m_BtnContourEdit.Size = new System.Drawing.Size(73, 47);
-			this.m_BtnContourEdit.Text = "輪廓編輯";
-			this.m_BtnContourEdit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_BtnContourEdit.ToolTipText = "調整選擇路徑的局部輪廓";
-			this.m_BtnContourEdit.Click += new System.EventHandler(this.m_BtnContourEdit_Click);
+			this.m_btnContourEdit.Image = global::MyCAM.Properties.Resources.CAM_ContourEdit;
+			this.m_btnContourEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_btnContourEdit.Name = "m_BtnContourEdit";
+			this.m_btnContourEdit.Size = new System.Drawing.Size(73, 47);
+			this.m_btnContourEdit.Text = "輪廓編輯";
+			this.m_btnContourEdit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_btnContourEdit.ToolTipText = "調整選擇路徑的局部輪廓";
+			this.m_btnContourEdit.Click += new System.EventHandler(this.m_BtnContourEdit_Click);
 			// 
 			// m_tsbPathCompensation
 			// 
@@ -1427,7 +1427,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbLayer9;
 		private System.Windows.Forms.ToolStripButton m_tsbLayer10;
 		private System.Windows.Forms.ToolStripButton m_tsbCalibrationPnt;
-		private System.Windows.Forms.ToolStripButton m_BtnContourEdit;
+		private System.Windows.Forms.ToolStripButton m_btnContourEdit;
 		private System.Windows.Forms.ToolStripButton m_tsbOptimizeIK;
 		private System.Windows.Forms.ToolStripButton m_tsbMicroJoint;
 		private System.Windows.Forms.ToolStripButton m_tsbManualOrder;

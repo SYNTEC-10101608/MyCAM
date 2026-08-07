@@ -7,4 +7,5 @@
 	<Message ID="NoPreControlPoint" Content="Нет предыдущей контрольной точки" />
 	<Message ID="CannotGetMachineInfo" Content="Не удалось получить информацию о станке" />
 	<Message ID="CannotCalculateLaserHeadPosition" Content="Не удалось рассчитать положение лазерной головки" />
+	<Message ID="PathCannotSelect" Content="Выбранный путь не поддерживает позу резки на лету" />
 </ResMap>

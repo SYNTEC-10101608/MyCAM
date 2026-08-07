@@ -1,4 +1,4 @@
-using MyCAM.Data;
+ï»¿using MyCAM.Data;
 using System;
 using System.Windows.Forms;
 
@@ -71,6 +71,11 @@ namespace MyCAM.Editor
 			m_lblLegendNormal.Text = m_LanguageManager.TryGetString( "m_lblLegendNormal", m_lblLegendNormal.Text );
 			m_lblLegendRotary.Text = m_LanguageManager.TryGetString( "m_lblLegendRotary", m_lblLegendRotary.Text );
 			m_lblLegendBevel.Text = m_LanguageManager.TryGetString( "m_lblLegendBevel", m_lblLegendBevel.Text );
+		}
+
+		public void ResetPathReverse( bool isReverse )
+		{
+			m_IsPathRevese = isReverse;
 		}
 
 		public void ResetType()
@@ -373,12 +378,12 @@ namespace MyCAM.Editor
 		}
 
 		const double DOUBLE_COMPARISON_EPSILON = 1e-6;
-		const string INTERPOLATE_TYPE_NORMAL = "ºû«ùÀq»{";
-		const string INTERPOLATE_TYPE_ROTARY = "±ÛÂà¶b¥­·Æ";
-		const string INTERPOLATE_TYPE_BEVEL = "¶É¨¤¤Á©Y¤f";
-		const string START_OR_END_START = "·í«e¦ì¸m¡G°_ÂI";
-		const string START_OR_END_END = "·í«e¦ì¸m¡G²×ÂI";
-		const string AXIS_SMOOTH = "¶b¥­·Æ";
+		const string INTERPOLATE_TYPE_NORMAL = "ç¶­æŒé»˜èª";
+		const string INTERPOLATE_TYPE_ROTARY = "æ—‹è½‰è»¸å¹³æ»‘";
+		const string INTERPOLATE_TYPE_BEVEL = "å‚¾è§’åˆ‡å¡å£";
+		const string START_OR_END_START = "ç•¶å‰ä½ç½®ï¼šèµ·é»";
+		const string START_OR_END_END = "ç•¶å‰ä½ç½®ï¼šçµ‚é»";
+		const string AXIS_SMOOTH = "è»¸å¹³æ»‘";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ToolVectorDlg" );
 	}
 
