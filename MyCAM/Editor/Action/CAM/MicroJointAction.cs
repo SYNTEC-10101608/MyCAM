@@ -1,4 +1,4 @@
-using MyCAM.App;
+ï»¿using MyCAM.App;
 using MyCAM.Data;
 using OCC.TopoDS;
 using OCCViewer;
@@ -38,7 +38,10 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// setup initial path
-			SetupPath( m_CurrentPathID );
+			if( !SetupPath( m_CurrentPathID ) ) {
+				End();
+				return;
+			}
 
 			// create dialog
 			m_Dialog = new MicroJointDlg();
@@ -76,27 +79,25 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		void SetupPath( string pathID )
+		bool SetupPath( string pathID )
 		{
 			if( string.IsNullOrEmpty( pathID ) ) {
-				End();
-				return;
+				return false;
 			}
 
 			// validate new path (contour only)
 			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
 				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NotContourPath", NOT_CONTOUR_PATH ), pathID ), MyApp.NoticeType.Warning );
-				End();
-				return;
+				return false;
 			}
 
 			// init data for current path
 			m_CurrentPathID = pathID;
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
 				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathID ), MyApp.NoticeType.Warning );
-				End();
-				return;
+				return false;
 			}
+			return true;
 		}
 
 		void ActivatePointSelection()
@@ -143,7 +144,9 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szOldPathID = m_CurrentPathID;
-			SetupPath( newPathID );
+			if( !SetupPath( newPathID ) ) {
+				return;
+			}
 
 			// cleanup old state
 			DeactivatePointSelection( szOldPathID );
@@ -246,8 +249,8 @@ namespace MyCAM.Editor
 
 		#endregion
 
-		const string NOT_CONTOUR_PATH = "¸ô®| {0} ¤£¬O½ü¹ø¸ô®|¡AµLªk½s¿è";
-		const string CANNOT_GET_PATH_CRAFT_INFO = "µLªkÀò¨ú¸ô®| {0} ªº¥[¤u¸ê°T";
+		const string NOT_CONTOUR_PATH = "è·¯å¾‘ {0} ä¸æ˜¯è¼ªå»“è·¯å¾‘ï¼Œç„¡æ³•ç·¨è¼¯";
+		const string CANNOT_GET_PATH_CRAFT_INFO = "ç„¡æ³•ç²å–è·¯å¾‘ {0} çš„åŠ å·¥è³‡è¨Š";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "MicroJointAction" );
 	}
 }

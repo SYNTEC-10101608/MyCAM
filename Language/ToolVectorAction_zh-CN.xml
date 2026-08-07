@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="CannotGetPathCraftInfo" Content="无法获取路径 {0} 的加工资讯" />
 	<Message ID="TiltAngleTooLarge" Content="倾斜角度超过限制范围" />
@@ -7,4 +7,5 @@
 	<Message ID="NoPreControlPoint" Content="没有上一个控制点" />
 	<Message ID="CannotGetMachineInfo" Content="无法获取机台资讯" />
 	<Message ID="CannotCalculateLaserHeadPosition" Content="无法计算激光头位置" />
+	<Message ID="PathCannotSelect" Content="选取到的路径不支持飞边姿态" />
 </ResMap>

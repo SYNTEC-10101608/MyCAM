@@ -39,7 +39,10 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// setup initial path
-			SetupPath( m_CurrentPathID );
+			if( !SetupPath( m_CurrentPathID ) ) {
+				End();
+				return;
+			}
 
 			// register ESC key
 			m_Viewer.KeyDown += OnViewerKeyDown;
@@ -73,20 +76,29 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void SetupPath( string pathID )
+		bool SetupPath( string pathID )
 		{
 			if( string.IsNullOrEmpty( pathID ) ) {
-				End();
-				return;
+				return false;
+			}
+
+			// check is closed path
+			if( !DataGettingHelper.GetGeomDataByID( pathID, out IGeomData geomData ) ) {
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathGeomInfo", CANNOT_GET_PATH_GEOM_INFO ), pathID ), MyApp.NoticeType.Warning );
+				return false;
+			}
+			if( !geomData.IsClosed ) {
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "PathNotClosed", PATH_NOT_CLOSED ), pathID ), MyApp.NoticeType.Warning );
+				return false;
 			}
 
 			// init data for current path
 			m_CurrentPathID = pathID;
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
 				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathID ), MyApp.NoticeType.Warning );
-				End();
-				return;
+				return false;
 			}
+			return true;
 		}
 
 		void ActivatePointSelection()
@@ -128,7 +140,9 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szOldPathID = m_CurrentPathID;
-			SetupPath( newPathID );
+			if( !SetupPath( newPathID ) ) {
+				return;
+			}
 
 			// cleanup old state
 			DeactivatePointSelection( szOldPathID );
@@ -162,6 +176,8 @@ namespace MyCAM.Editor
 		IndexSelectAction m_PointIndexAction;
 
 		const string CANNOT_GET_PATH_CRAFT_INFO = "無法獲取路徑 {0} 的加工資訊";
+		const string CANNOT_GET_PATH_GEOM_INFO = "無法獲取路徑 {0} 的幾何資訊";
+		const string PATH_NOT_CLOSED = "路徑 {0} 為非封閉路徑，無法設定起點";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "StartPointAction" );
 	}
 }

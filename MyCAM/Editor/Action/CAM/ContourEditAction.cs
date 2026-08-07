@@ -39,7 +39,10 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// setup initial path
-			SetupPath( m_CurrentPathID );
+			if( !SetupPath( m_CurrentPathID ) ) {
+				End();
+				return;
+			}
 
 			// create dialog
 			m_Dlg = new ContourEditDlg();
@@ -77,32 +80,30 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		void SetupPath( string pathID )
+		bool SetupPath( string pathID )
 		{
 			if( string.IsNullOrEmpty( pathID ) ) {
-				End();
-				return;
+				return false;
 			}
 
 			// validate new path (contour only)
 			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
 				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NotContourPath", NOT_CONTOUR_PATH ), pathID ), MyApp.NoticeType.Warning );
-				End();
-				return;
+				return false;
 			}
 
 			// init data for current path
 			m_CurrentPathID = pathID;
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out m_CraftData ) ) {
 				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathID ), MyApp.NoticeType.Warning );
-				End();
-				return;
+				return false;
 			}
 
 			// show edit point marks
 			m_EditPointRenderer?.Remove( true );
 			m_EditPointRenderer = new EditPointRenderer( m_Viewer, m_CurrentPathID );
 			m_EditPointRenderer.Show( true );
+			return true;
 		}
 
 		void ActivatePointSelection()
@@ -152,7 +153,9 @@ namespace MyCAM.Editor
 				return;
 			}
 			string szOldPathID = m_CurrentPathID;
-			SetupPath( newPathID );
+			if( !SetupPath( newPathID ) ) {
+				return;
+			}
 
 			// cleanup old state
 			DeactivatePointSelection( szOldPathID );

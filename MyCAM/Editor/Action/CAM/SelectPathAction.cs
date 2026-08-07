@@ -3,7 +3,6 @@ using MyCAM.Data;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -11,6 +10,7 @@ namespace MyCAM.Editor
 	internal class SelectPathAction : SelectObjectAction
 	{
 		public Action RemovePath;
+		public Action WithPathCantSelect;
 
 		// single select mode: only allow one path to be selected at a time
 		public bool isSingleSelectMode
@@ -29,6 +29,25 @@ namespace MyCAM.Editor
 		public SelectPathAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
+		}
+
+		// must be called before Start(); locked paths are cleared automatically on End().
+		public void AddLockedPaths( IEnumerable<string> pathIDs )
+		{
+			if( pathIDs == null ) {
+				return;
+			}
+			foreach( string pathID in pathIDs ) {
+				if( string.IsNullOrEmpty( pathID ) ) {
+					continue;
+				}
+
+				// silently ignore unknown paths
+				if( !m_DataManager.PathIDList.Contains( pathID ) ) {
+					continue;
+				}
+				m_LockedIDSet.Add( pathID );
+			}
 		}
 
 		public void EnterSingleSelectMode()
@@ -58,7 +77,7 @@ namespace MyCAM.Editor
 
 		public void SelectPathByID( string pathID )
 		{
-			if( string.IsNullOrEmpty( pathID ) ) {
+			if( !IsSelectable( pathID ) ) {
 				return;
 			}
 
@@ -73,33 +92,19 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void SelectPathByIDs( List<string> pathIDList )
+		bool IsSelectable( string pathID )
 		{
-			if( pathIDList == null || pathIDList.Count == 0 ) {
-				return;
+			if( string.IsNullOrEmpty( pathID ) ) {
+				return false;
 			}
-			// enforce single select: only select the first ID
-			if( isSingleSelectMode ) {
-				if( pathIDList.Count > 1 ) {
-					MyApp.Logger.ShowOnLogPanel(
-						string.Format( m_LanguageManager.TryGetString( "Log_MultiSelectError_View", LOG_MULTI_SELECT_ERROR_VIEW ), m_SelectedIDSet.Count ),
-						MyApp.NoticeType.Hint );
-
-					// Clear all selections to restore valid state
-					m_SelectedIDSet.Clear();
-					SyncSelectionFromSet();
-					return;
-				}
-				SelectPathByID( pathIDList.First() );
-				return;
+			if( m_ExcludedIDSet != null && m_ExcludedIDSet.Contains( pathID ) ) {
+				return false;
 			}
-
-			foreach( string pathID in pathIDList ) {
-				if( !string.IsNullOrEmpty( pathID ) && !m_SelectedIDSet.Contains( pathID ) ) {
-					m_SelectedIDSet.Add( pathID );
-				}
+			if( m_LockedIDSet.Contains( pathID ) ) {
+				WithPathCantSelect?.Invoke();
+				return false;
 			}
-			SyncSelectionFromSet();
+			return true;
 		}
 
 		public void ExcludeFromSelection( string pathID )
@@ -133,50 +138,12 @@ namespace MyCAM.Editor
 			m_ViewManager.ActivePath( pathID );
 		}
 
-		// control whether standard pattern paths are selectable in this action
-		public bool CanSelectStdPattern
-		{
-			get { return m_CanSelectStdPattern; }
-			set
-			{
-				if( m_CanSelectStdPattern == value ) {
-					return;
-				}
-				m_CanSelectStdPattern = value;
-				if( value ) {
-					ShowStdPathAndNode();
-				}
-				else {
-					HideStdPathAndNode();
-				}
-			}
-		}
-
 		public static bool IsStdPatternPath( string pathID )
 		{
 			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) ) {
 				return false;
 			}
 			return DataGettingHelper.IsStdPattern( pathType );
-		}
-
-		// control whether special-tool-vector paths are selectable in this action
-		public bool CanSelectSpecialPath
-		{
-			get { return m_CanSelectSpecialPath; }
-			set
-			{
-				if( m_CanSelectSpecialPath == value ) {
-					return;
-				}
-				m_CanSelectSpecialPath = value;
-				if( value ) {
-					ShowSpecialPathAndNode();
-				}
-				else {
-					HideSpecialPathAndNode();
-				}
-			}
 		}
 
 		public static bool IsSpecialPath( string pathID )
@@ -200,12 +167,23 @@ namespace MyCAM.Editor
 			return specialToolVecData.Type != ESpecialToolVecType.Normal;
 		}
 
+		public override void Start()
+		{
+			base.Start();
+
+			// enforce locked paths: deactivate on viewer and drop from current selection
+			foreach( string pathID in m_LockedIDSet ) {
+				m_ViewManager.DeactivePath( pathID );
+				m_SelectedIDSet.Remove( pathID );
+			}
+		}
+
 		public override void End()
 		{
-			// force restore std pattern paths/nodes in case caller forgot
-			CanSelectStdPattern = true;
-			CanSelectSpecialPath = true;
 			base.End();
+
+			// base.End() has already deactivated all paths; just release the lock list
+			m_LockedIDSet.Clear();
 		}
 
 		protected override void ActivateObject()
@@ -255,6 +233,12 @@ namespace MyCAM.Editor
 			base.ViewerMouseMove( e );
 		}
 
+		// in single select mode, disable XOR (Ctrl) selection so click always replaces
+		protected override bool AllowXorSelection
+		{
+			get { return !isSingleSelectMode; }
+		}
+
 		protected override void ViewerMouseUp( MouseEventArgs e )
 		{
 			if( isSingleSelectMode ) {
@@ -262,20 +246,6 @@ namespace MyCAM.Editor
 				return;
 			}
 			base.ViewerMouseUp( e );
-		}
-
-		// single click: always replace selection (ignore Ctrl for XOR)
-		protected override void ViewerMouseClick( MouseEventArgs e )
-		{
-			if( isSingleSelectMode ) {
-				if( e.Button == MouseButtons.Left ) {
-					// always single replace select, ignore Ctrl modifier
-					m_Viewer.Select();
-					SyncSelectionFromView();
-				}
-				return;
-			}
-			base.ViewerMouseClick( e );
 		}
 
 		protected override void SyncSelectionFromView()
@@ -318,7 +288,9 @@ namespace MyCAM.Editor
 						continue;
 					}
 					string szPathID = m_DataManager.PathIDList[ index - 1 ];
-					if( m_ExcludedIDSet != null && m_ExcludedIDSet.Contains( szPathID ) ) {
+
+					// this path is editing
+					if( !IsSelectable( szPathID ) ) {
 						continue;
 					}
 					m_SelectedIDSet.Add( szPathID );
@@ -372,90 +344,9 @@ namespace MyCAM.Editor
 			SelectionChange?.Invoke();
 		}
 
-		void HideStdPathAndNode()
-		{
-			if( m_HiddenStdPatternNodes == null ) {
-				m_HiddenStdPatternNodes = new Dictionary<string, (TreeNode, int)>();
-			}
-			m_HiddenStdPatternNodes.Clear();
-			if( m_DataManager?.PathIDList == null ) {
-				return;
-			}
-			foreach( string pathID in m_DataManager.PathIDList ) {
-				if( !IsStdPatternPath( pathID ) ) {
-					continue;
-				}
-				m_ViewManager.ErasePath( pathID );
-				if( m_ViewManager.TreeNodeMap.TryGetValue( pathID, out TreeNode node ) ) {
-					int index = m_ViewManager.PathNode.Nodes.IndexOf( node );
-					m_ViewManager.PathNode.Nodes.Remove( node );
-					m_HiddenStdPatternNodes[ pathID ] = (node, index);
-				}
-			}
-			m_Viewer.UpdateView();
-		}
-
-		void ShowStdPathAndNode()
-		{
-			if( m_DataManager?.PathIDList == null || m_HiddenStdPatternNodes == null || m_HiddenStdPatternNodes.Count == 0 ) {
-				return;
-			}
-			foreach( var kvp in m_HiddenStdPatternNodes ) {
-				TreeNode node = kvp.Value.Node;
-				int index = kvp.Value.Index;
-				int insertAt = Math.Min( index, m_ViewManager.PathNode.Nodes.Count );
-				m_ViewManager.PathNode.Nodes.Insert( insertAt, node );
-				m_ViewManager.DisplayPath( kvp.Key );
-			}
-			m_HiddenStdPatternNodes.Clear();
-			m_Viewer.UpdateView();
-		}
-
-		void HideSpecialPathAndNode()
-		{
-			if( m_HiddenSpecialPathNodes == null ) {
-				m_HiddenSpecialPathNodes = new Dictionary<string, (TreeNode, int)>();
-			}
-			m_HiddenSpecialPathNodes.Clear();
-			if( m_DataManager?.PathIDList == null ) {
-				return;
-			}
-			foreach( string pathID in m_DataManager.PathIDList ) {
-				if( !IsSpecialPath( pathID ) ) {
-					continue;
-				}
-				m_ViewManager.ErasePath( pathID );
-				if( m_ViewManager.TreeNodeMap.TryGetValue( pathID, out TreeNode node ) ) {
-					int index = m_ViewManager.PathNode.Nodes.IndexOf( node );
-					m_ViewManager.PathNode.Nodes.Remove( node );
-					m_HiddenSpecialPathNodes[ pathID ] = (node, index);
-				}
-			}
-			m_Viewer.UpdateView();
-		}
-
-		void ShowSpecialPathAndNode()
-		{
-			if( m_DataManager?.PathIDList == null || m_HiddenSpecialPathNodes == null || m_HiddenSpecialPathNodes.Count == 0 ) {
-				return;
-			}
-			foreach( var kvp in m_HiddenSpecialPathNodes ) {
-				TreeNode node = kvp.Value.Node;
-				int index = kvp.Value.Index;
-				int insertAt = Math.Min( index, m_ViewManager.PathNode.Nodes.Count );
-				m_ViewManager.PathNode.Nodes.Insert( insertAt, node );
-				m_ViewManager.DisplayPath( kvp.Key );
-			}
-			m_HiddenSpecialPathNodes.Clear();
-			m_Viewer.UpdateView();
-		}
-
 		bool m_SingleSelectMode = false;
-		bool m_CanSelectStdPattern = true;
-		bool m_CanSelectSpecialPath = true;
-		Dictionary<string, (TreeNode Node, int Index)> m_HiddenStdPatternNodes = new Dictionary<string, (TreeNode, int)>();
-		Dictionary<string, (TreeNode Node, int Index)> m_HiddenSpecialPathNodes = new Dictionary<string, (TreeNode, int)>();
 		HashSet<string> m_ExcludedIDSet;
+		HashSet<string> m_LockedIDSet = new HashSet<string>();
 		LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SelectPathAction" );
 		const string LOG_MULTI_SELECT_ERROR_VIEW = "[選取異常] 路徑單選模式下偵測到多重選取 ({0} 個項目)，已自動清除";
 		const string LOG_MULTI_SELECT_ERROR_TREE = "[選取異常] 路徑單選模式下從路徑樹偵測到多重選取 ({0} 個項目)，已自動清除";

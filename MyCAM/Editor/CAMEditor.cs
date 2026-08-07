@@ -29,6 +29,8 @@ namespace MyCAM.Editor
 			IsTraverseEditable = true;
 			IsAutoOrderEditable = true;
 			IsPathCompensateEditable = true;
+			IsMicroJointEditable = true;
+			IsContourEditable = true;
 		}
 
 		public bool IsStartPointEditable;
@@ -41,6 +43,8 @@ namespace MyCAM.Editor
 		public bool IsTraverseEditable;
 		public bool IsAutoOrderEditable;
 		public bool IsPathCompensateEditable;
+		public bool IsMicroJointEditable;
+		public bool IsContourEditable;
 	}
 
 	internal class CAMEditor : EditorBase
@@ -278,6 +282,7 @@ namespace MyCAM.Editor
 			// register before init, cause init will change select node to start point, machine need to translate
 			action.RaiseTrans += SetTrans;
 			action.RaiseActionStart += ToolVecActionStartIO;
+			action.NeedOptimizedIK += DoOptimizeIKContinuity;
 
 			// trigger select on star point and translate machine
 			StartEditAction( action );
@@ -304,6 +309,7 @@ namespace MyCAM.Editor
 				m_MainPathRenderer.Reset();
 				m_CraftRenderer.Reset();
 				SetWorkPieceDisplayTransform( new gp_Trsf() );
+				DoOptimizeIKContinuity();
 			}
 			if( isUpdatView ) {
 				m_Viewer.UpdateView();
@@ -405,6 +411,7 @@ namespace MyCAM.Editor
 			action.RaiseActionStart += ToolVecActionStartIO;
 			action.HideMachine += HideMachine;
 			action.ResetPartUI += ResetPartDisplay;
+			action.NeedOptimizedIK += DoOptimizeIKContinuity;
 
 			// trigger translate machine
 			StartEditAction( action );
@@ -741,6 +748,8 @@ namespace MyCAM.Editor
 			if( szPathIDList.Count > 1 ) {
 				editableInfo.IsStartPointEditable = false;
 				editableInfo.IsToolVecEditable = false;
+				editableInfo.IsMicroJointEditable = false;
+				editableInfo.IsContourEditable = false;
 				editableInfo.IsAutoOrderEditable = false;
 			}
 
@@ -761,6 +770,8 @@ namespace MyCAM.Editor
 					editableInfo.IsToolVecEditable = false;
 					editableInfo.IsToolVecReverseEditable = false;
 					editableInfo.IsFixedToolVecEditable = false;
+					editableInfo.IsMicroJointEditable = false;
+					editableInfo.IsContourEditable = false;
 				}
 				if( IsSelectSpecialPath( szPathIDList ) ) {
 					editableInfo.IsToolVecEditable = false;

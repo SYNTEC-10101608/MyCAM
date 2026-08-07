@@ -73,11 +73,17 @@ namespace MyCAM.Editor
 			return new List<string>( m_SelectedIDSet );
 		}
 
+		// in single select mode, disable XOR (Ctrl) selection so click always replaces
+		protected virtual bool AllowXorSelection
+		{
+			get { return true; }
+		}
+
 		protected override void ViewerMouseClick( MouseEventArgs e )
 		{
 			// single select
 			if( !m_IsDragging && e.Button == MouseButtons.Left ) {
-				if( ( Control.ModifierKeys & Keys.Control ) == Keys.Control ) {
+				if( AllowXorSelection && ( Control.ModifierKeys & Keys.Control ) == Keys.Control ) {
 					m_Viewer.Select( AIS_SelectionScheme.AIS_SelectionScheme_XOR );
 				}
 				else {

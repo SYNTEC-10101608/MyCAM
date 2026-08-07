@@ -1,4 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ResMap>
 	<Message ID="CannotGetPathCraftInfo" Content="Не удалось получить информацию о обработке пути {0}" />
+	<Message ID="CannotGetPathGeomInfo" Content="Не удалось получить геометрическую информацию о пути {0}" />
+	<Message ID="PathNotClosed" Content="Путь {0} не является замкнутым" />
 </ResMap>

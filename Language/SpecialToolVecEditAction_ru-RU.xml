@@ -8,4 +8,5 @@
 <Message ID="CannotGetToolVectorInfo" Content="Не удалось получить информацию о векторе инструмента в целевой точке" />
 <Message ID="CannotGetMachineInfo" Content="Не удалось получить информацию о станке" />
 <Message ID="MutiPathCantSetSameMSForFixDir" Content="Для нескольких путей невозможно задать одинаковый угол нормали поверхности, пожалуйста, выберите только один" />
+	<Message ID="PathCannotSelect" Content="Выбранный путь не поддерживает позу отверстия" />
 </ResMap>
