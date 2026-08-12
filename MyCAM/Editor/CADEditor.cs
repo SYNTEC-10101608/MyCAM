@@ -162,6 +162,22 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void StartDesignSupportBracket()
+		{
+			if( m_CurrentAction.ActionType == EditActionType.DesignSupportBracket ) {
+				m_CurrentAction.End();
+				return;
+			}
+
+			if( m_DataManager.PartIDList.Count == 0 ) {
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoPartData", NO_PART_DATA ), MyApp.NoticeType.Warning );
+				return;
+			}
+
+			DesignSupportBracketAction action = new DesignSupportBracketAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
+			StartEditAction( action );
+		}
+
 		public void AddPoint( AddPointType type )
 		{
 			// user reclick same action enterace
@@ -286,7 +302,7 @@ namespace MyCAM.Editor
 			m_DefaultAction.ClearSelection();
 		}
 
-		void OnFeatureAdded( List<string> newFeatureIDs )
+		void OnFeatureAdded( List<string> newFeatureIDs, bool bIsShownAsFeature )
 		{
 			foreach( string szID in newFeatureIDs ) {
 				if( string.IsNullOrEmpty( szID ) ) {
@@ -296,7 +312,7 @@ namespace MyCAM.Editor
 				if( !DataGettingHelper.GetShapeObject( szID, out IShapeObject shapeObj ) ) {
 					continue;
 				}
-				m_ViewManager.AddPart( szID, shapeObj.Shape, true );
+				m_ViewManager.AddPart( szID, shapeObj.Shape, bIsShownAsFeature );
 			}
 
 			// update tree view and viewer

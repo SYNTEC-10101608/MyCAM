@@ -196,6 +196,9 @@
   <data name="CAM_AddPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\AddPath.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="CAD_SupportBracket" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\SupportBracket.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="CAM_FixedToolVec" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\FixedToolVec.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -297,5 +300,11 @@
   </data>
   <data name="Sort_RotationFirst_FromTop_Counterclockwise" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resource\Sort_RotationFirst_FromTop_Counterclockwise.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Support_CrossGap" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\CrossGap.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Support_PinDimension" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resource\PinDimension.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="DesignSupportBracketDlg" Content="设计支架" />
+	<Message ID="m_lblHint" Content="请点选工件上要放置夹具的底面／侧面&#13;&#10;（支援 Ctrl 多选、双击连续面选取）" />
+	<Message ID="m_btnNext" Content="下一步" />
+	<Message ID="m_lblSectionBase" Content="底部大小" />
+	<Message ID="m_lblXExtension" Content="X 方向延伸距离" />
+	<Message ID="m_lblYExtension" Content="Y 方向延伸距离" />
+	<Message ID="m_lblSectionBracket" Content="支架位置" />
+	<Message ID="m_lblXPositionsTitle" Content="X 方向支架位置" />
+	<Message ID="m_lblYPositionsTitle" Content="Y 方向支架位置" />
+	<Message ID="m_btnAddXPosition" Content="+ 新增 X 支架位置" />
+	<Message ID="m_btnAddYPosition" Content="+ 新增 Y 支架位置" />
+	<Message ID="m_lblSectionBracketHeight" Content="支架高度" />
+	<Message ID="m_lblBaseThickness" Content="拼接高度(D底板厚度)" />
+	<Message ID="m_lblEngagementDepth" Content="支架咬合深度(A)" />
+	<Message ID="m_lblXPinCount" Content="X 方向拼接数量" />
+	<Message ID="m_lblYPinCount" Content="Y 方向拼接数量" />
+	<Message ID="m_lblWallThickness" Content="拼接宽度(C支架厚度)" />
+	<Message ID="m_lblRibHeight" Content="支架基础高度" />
+	<Message ID="m_lblZExtension" Content="工件离地距离" />
+	<Message ID="m_lblPinLength" Content="拼接长度(B)" />
+	<Message ID="m_lblSectionCrossFit" Content="咬合设计" />
+	<Message ID="m_lblSectionBracketCount" Content="底部拼接数量" />
+	<Message ID="m_lblSectionBottomPinSize" Content="底部插脚尺寸" />
+	<Message ID="m_btnBack" Content="上一步" />
+	<Message ID="m_btnGenerate" Content="产生" />
+	<Message ID="m_lblSaveDxfHint" Content="请选择 DXF 储存路径" />
+	<Message ID="m_btnBrowseSavePath" Content="浏览..." />
+	<Message ID="m_btnSaveDxf" Content="储存 DXF" />
+	<Message ID="m_dlgBrowseSavePath_Description" Content="选择保存文件夹" />
+	<Message ID="m_btnSkipSave" Content="略过" />
+	<Message ID="m_btnDeletePosition" Content="删除" />
+	<Message ID="Warn_BelowMinimum" Content="{0} 小于最小值 {1}" />
+	<Message ID="Warn_AboveMaximum" Content="{0} 大于最大值 {1}" />
+</ResMap>

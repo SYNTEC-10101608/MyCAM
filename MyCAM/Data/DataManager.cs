@@ -1,5 +1,5 @@
-using OCC.gp;
 using MyCAM.Helper;
+using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
@@ -26,7 +26,7 @@ namespace MyCAM.Data
 	internal class DataManager
 	{
 		public Action PartChanged;
-		public Action<List<string>> FeatureAdded;
+		public Action<List<string>, bool> FeatureAdded;
 		public Action<List<string>> PathAdded;
 
 		// TODO: this is temp solution
@@ -188,10 +188,36 @@ namespace MyCAM.Data
 			ResetWithNewPart( newShape, out _ );
 		}
 
+		// add a new part shape to the existing data without clearing existing parts/paths
+		public void AddAdditionalPart( TopoDS_Shape newShape )
+		{
+			if( newShape == null || newShape.IsNull() ) {
+				return;
+			}
+			List<PartObject> newPartObjectList = ArrangePartObject( newShape );
+			if( newPartObjectList.Count == 0 ) {
+				return;
+			}
+
+			List<string> newIDs = new List<string>( newPartObjectList.Count );
+			foreach( var objectData in newPartObjectList ) {
+				ObjectMap[ objectData.UID ] = objectData;
+				PartIDList.Add( objectData.UID );
+				newIDs.Add( objectData.UID );
+			}
+
+			RaiseFeatureAdded( newIDs, false );
+		}
+
 		void ClearObjectCommandData()
 		{
 			EntryAndExitData = new EntryAndExitData();
 			CalibrationData = new CalibrationData();
+		}
+
+		void RaiseFeatureAdded( List<string> ids, bool bIsShownAsFeature = true )
+		{
+			FeatureAdded?.Invoke( ids, bIsShownAsFeature );
 		}
 
 		public void AddReferenceFeature( TopoDS_Shape newFeature )
@@ -203,7 +229,7 @@ namespace MyCAM.Data
 			PartObject newData = new PartObject( szID, newFeature );
 			ObjectMap[ szID ] = newData;
 			PartIDList.Add( szID );
-			FeatureAdded?.Invoke( new List<string>() { szID } );
+			RaiseFeatureAdded( new List<string>() { szID } );
 		}
 
 		// the edge map contains all edges in all wire to be add

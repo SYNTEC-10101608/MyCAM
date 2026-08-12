@@ -29,6 +29,8 @@
 	<!-- CAD工具列 -->
 	<Message ID="m_tsbSewPart" Content="模型縫補" />
 	<Message ID="m_tsbSewPart_ToolTip" Content="對零件進行縫隙縫補" />
+	<Message ID="m_tsbDesignSupportBracket" Content="設計夾具" />
+	<Message ID="m_tsbDesignSupportBracket_ToolTip" Content="設計異形蓋件的簡易支架夾具" />
 	<Message ID="m_tsbAddPoint_AcrCenter" Content="圓弧中心" />
 	<Message ID="m_tsbAddPoint_AcrCenter_ToolTip" Content="生成所選圓弧的中心點" />
 	<Message ID="m_tsbAddPoint_EdgeCenter" Content="線段中心" />

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Error_NoFaceSelected" Content="請先選擇面" />
+  <Message ID="Error_PositionCount" Content="支架數量不能為0" />
+  <Message ID="Error_BuildShellFailed" Content="無法建立支撐面，請確認已選取足夠且相連的面" />
+  <Message ID="Error_FillShellFailed" Content="填補孔洞失敗，此工件暫不支援此功能" />
+  <Message ID="Error_FillShellBBoxDiverged" Content="填補孔洞後幾何範圍落差過大，此工件暫不支援此功能" />
+  <Message ID="Error_ExtractShellFailed" Content="填補孔洞後無法取得曲面，此工件暫不支援此功能" />
+  <Message ID="Error_SectionCalculationFailed" Content="截面計算失敗，請調整 X／Y 支架座標，避開孔洞或凹陷處" />
+  <Message ID="Error_SupportBuildFailed" Content="目前曲面的選擇無法生成支架，請更換所選的面" />
+  <Message ID="Error_NoSavePath" Content="請指定儲存路徑" />
+  <Message ID="Error_DxfExportFailed" Content="DXF 匯出失敗" />
+  <Message ID="Log_DxfSaved" Content="DXF 已儲存至：{0}" />
+  <Message ID="Error_ComputeBBoxFailed" Content="無法計算工件範圍" />
+  <Message ID="Error_XPositionDuplicate" Content="X方向支架座標有重複" />
+  <Message ID="Error_YPositionDuplicate" Content="Y方向支架座標有重複" />
+  <Message ID="Error_XPositionOutOfRange" Content="X方向支架座標超出工件範圍" />
+  <Message ID="Error_YPositionOutOfRange" Content="Y方向支架座標超出工件範圍" />
+  <Message ID="Error_PositionSuffix" Content="，請修正後再試。" />
+  <Message ID="Error_InvalidParamFormat" Content="參數格式錯誤：{0}" />
+  <Message ID="Error_InvalidIntParamFormat" Content="參數格式錯誤：{0}（需為正整數）" />
+  <Message ID="Error_BuildShellException" Content="面縫合時發生例外錯誤：{0}" />
+</ResMap>

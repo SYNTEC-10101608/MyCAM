@@ -1,33 +1,5 @@
 ﻿namespace MyCAM.Editor.Dialog
 {
-	public enum SortMethod
-	{
-		ShortestPath,
-		CylinderVertical,
-		CylinderHorizontal
-	}
-
-	public enum CylinderAxisType
-	{
-		X,
-		Y,
-		Z
-	}
-
-	public class SortParams
-	{
-		public SortMethod Method;
-		public CylinderAxisType CylinderAxis = CylinderAxisType.Z;
-		public bool IsExtrusionDescending;
-		public bool IsRotationDescending;
-
-		// group bandwidth settings
-		public double ExtrusionBandwidth_mm = DEFAULT_EXTRUSION_BANDWIDTH_MM;
-		public double RotationBandwidth_deg = DEFAULT_ROTATION_BANDWIDTH_DEG;
-
-		public const double DEFAULT_EXTRUSION_BANDWIDTH_MM = 5.0;
-		public const double DEFAULT_ROTATION_BANDWIDTH_DEG = 3.0;
-	}
 
 	public partial class AutoSortPathDlg : EditDialogBase<SortParams>
 	{
@@ -291,5 +263,34 @@
 		const string EXTRUSION_DIR_FROM_BOTTOM = "從下往上";
 		const string ROTATION_DIR_CLOCKWISE = "順時針";
 		const string ROTATION_DIR_COUNTERCLOCKWISE = "逆時針";
+	}
+
+	public enum SortMethod
+	{
+		ShortestPath,
+		CylinderVertical,
+		CylinderHorizontal
+	}
+
+	public enum CylinderAxisType
+	{
+		X,
+		Y,
+		Z
+	}
+
+	public class SortParams
+	{
+		public SortMethod Method;
+		public CylinderAxisType CylinderAxis = CylinderAxisType.Z;
+		public bool IsExtrusionDescending;
+		public bool IsRotationDescending;
+
+		// group bandwidth settings
+		public double ExtrusionBandwidth_mm = DEFAULT_EXTRUSION_BANDWIDTH_MM;
+		public double RotationBandwidth_deg = DEFAULT_ROTATION_BANDWIDTH_DEG;
+
+		public const double DEFAULT_EXTRUSION_BANDWIDTH_MM = 5.0;
+		public const double DEFAULT_ROTATION_BANDWIDTH_DEG = 3.0;
 	}
 }
