@@ -1,11 +1,16 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="ContourEditDlg" Content="Редактирование контура" />
 	<Message ID="m_gbxIndexParam" Content="Параметры контрольной точки" />
-	<Message ID="m_lblDX" Content="DX" />
-	<Message ID="m_lblDY" Content="DY" />
-	<Message ID="m_lblDZ" Content="DZ" />
+	<Message ID="m_lblDX" Content="Смещение по X" />
+	<Message ID="m_lblDY" Content="Смещение по Y" />
+	<Message ID="m_lblDZ" Content="Смещение по Z" />
 	<Message ID="m_lblUnit" Content="(единица: мм)" />
-	<Message ID="m_btnAdd" Content="Добавить" />
-	<Message ID="m_btnRemove" Content="Удалить" />
+	<Message ID="m_btnReset" Content="Сброс данных" />
+	<Message ID="m_btnClear" Content="Очистить данные" />
+	<Message ID="m_btnAdd" Content="Добавить контрольную точку" />
+	<Message ID="m_btnRemove" Content="Удалить контрольную точку" />
+	<Message ID="m_lblRefCoordType" Content="Система координат" />
+	<Message ID="RefCoordType_Local" Content="Локальная система координат" />
+	<Message ID="RefCoordType_World" Content="Мировая система координат" />
 </ResMap>

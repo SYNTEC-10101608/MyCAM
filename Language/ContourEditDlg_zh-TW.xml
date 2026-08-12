@@ -2,10 +2,15 @@
 <ResMap>
 	<Message ID="ContourEditDlg" Content="輪廓編輯" />
 	<Message ID="m_gbxIndexParam" Content="控制點參數" />
-	<Message ID="m_lblDX" Content="DX" />
-	<Message ID="m_lblDY" Content="DY" />
-	<Message ID="m_lblDZ" Content="DZ" />
+	<Message ID="m_lblDX" Content="X偏移" />
+	<Message ID="m_lblDY" Content="Y偏移" />
+	<Message ID="m_lblDZ" Content="Z偏移" />
 	<Message ID="m_lblUnit" Content="(單位：mm)" />
-	<Message ID="m_btnAdd" Content="新增" />
-	<Message ID="m_btnRemove" Content="移除" />
+	<Message ID="m_btnReset" Content="重置資料" />
+	<Message ID="m_btnClear" Content="清除資料" />
+	<Message ID="m_btnAdd" Content="新增控制點" />
+	<Message ID="m_btnRemove" Content="移除控制點" />
+	<Message ID="m_lblRefCoordType" Content="座標系" />
+	<Message ID="RefCoordType_Local" Content="區域座標系" />
+	<Message ID="RefCoordType_World" Content="世界座標系" />
 </ResMap>

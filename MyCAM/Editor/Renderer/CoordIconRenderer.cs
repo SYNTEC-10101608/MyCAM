@@ -14,6 +14,12 @@ namespace MyCAM.Editor.Renderer
 		{
 		}
 
+		public void SetAppearance( Quantity_NameOfColor color, double size )
+		{
+			m_Color = color;
+			m_Size = size;
+		}
+
 		public override void Show( bool bUpdate = false )
 		{
 			ShowTrihedron( null, bUpdate );
@@ -39,11 +45,11 @@ namespace MyCAM.Editor.Renderer
 			// build at origin and then move to position
 			var ax2 = new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ), new gp_Dir( 1, 0, 0 ) );
 			var trihedron = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
-			trihedron.SetColor( new Quantity_Color( DEFAULT_Color ) );
-			trihedron.SetSize( 50.0 );
-			trihedron.SetAxisColor( new Quantity_Color( DEFAULT_Color ) );
-			trihedron.SetTextColor( new Quantity_Color( DEFAULT_Color ) );
-			trihedron.SetArrowColor( new Quantity_Color( DEFAULT_Color ) );
+			trihedron.SetColor( new Quantity_Color( m_Color ) );
+			trihedron.SetSize( m_Size );
+			trihedron.SetAxisColor( new Quantity_Color( m_Color ) );
+			trihedron.SetTextColor( new Quantity_Color( m_Color ) );
+			trihedron.SetArrowColor( new Quantity_Color( m_Color ) );
 			m_Viewer.GetAISContext().Display( trihedron, false );
 			m_Viewer.GetAISContext().Deactivate( trihedron );
 			m_CoordIconAIS = trihedron;
@@ -68,6 +74,7 @@ namespace MyCAM.Editor.Renderer
 		}
 
 		AIS_Trihedron m_CoordIconAIS;
-		Quantity_NameOfColor DEFAULT_Color = Quantity_NameOfColor.Quantity_NOC_GRAY;
+		Quantity_NameOfColor m_Color = Quantity_NameOfColor.Quantity_NOC_GRAY;
+		double m_Size = 50.0;
 	}
 }

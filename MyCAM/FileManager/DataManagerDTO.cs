@@ -1340,7 +1340,7 @@ namespace MyCAM.FileManager
 
 		SpecialToolVecData BuildSpecialToolVecData()
 		{
-			return SpecialToolVecData != null? SpecialToolVecData.ToSpecialToolVecData(): new SpecialToolVecData();
+			return SpecialToolVecData != null ? SpecialToolVecData.ToSpecialToolVecData() : new SpecialToolVecData();
 		}
 
 		const int DEFAULT_TECH_LAYER = 1;
