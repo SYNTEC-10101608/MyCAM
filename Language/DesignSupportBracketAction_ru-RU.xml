@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="Error_NoFaceSelected" Content="Сначала выберите грань" />
+  <Message ID="Error_PositionCount" Content="Количество опор не может быть равно 0" />
+  <Message ID="Error_BuildShellFailed" Content="Не удалось создать опорную поверхность. Убедитесь, что выбрано достаточное количество смежных граней" />
+  <Message ID="Error_FillShellFailed" Content="Сбой заполнения отверстий. Эта функция временно не поддерживается для данной детали" />
+  <Message ID="Error_FillShellBBoxDiverged" Content="Слишком расхождение геометрических границ после заполнения отверстий. Эта функция временно не поддерживается для данной детали" />
+  <Message ID="Error_ExtractShellFailed" Content="Не удалось получить поверхность после заполнения отверстий. Эта функция временно не поддерживается для данной детали" />
+  <Message ID="Error_SectionCalculationFailed" Content="Сбой расчета сечения. Измените координаты опор по X/Y, чтобы избежать отверстий и углублений" />
+  <Message ID="Error_SupportBuildFailed" Content="Выбранная поверхность не позволяет создать опорную конструкцию. Пожалуйста, измените выбранную поверхность." />
+  <Message ID="Error_NoSavePath" Content="Укажите путь для сохранения" />
+  <Message ID="Error_DxfExportFailed" Content="Сбой экспорта DXF" />
+  <Message ID="Log_DxfSaved" Content="DXF сохранен в: {0}" />
+  <Message ID="Error_ComputeBBoxFailed" Content="Не удалось рассчитать габариты детали" />
+  <Message ID="Error_XPositionDuplicate" Content="Дублирование координат опор по оси X" />
+  <Message ID="Error_YPositionDuplicate" Content="Дублирование координат опор по оси Y" />
+  <Message ID="Error_XPositionOutOfRange" Content="Координата опоры по оси X выходит за пределы детали" />
+  <Message ID="Error_YPositionOutOfRange" Content="Координата опоры по оси Y выходит за пределы детали" />
+  <Message ID="Error_PositionSuffix" Content=", пожалуйста, исправьте и повторите попытку." />
+  <Message ID="Error_InvalidParamFormat" Content="Неверный формат параметра: {0}" />
+  <Message ID="Error_InvalidIntParamFormat" Content="Неверный формат параметра: {0} (требуется положительное целое число)" />
+  <Message ID="Error_BuildShellException" Content="Исключительная ошибка при сшивании граней: {0}" />
+</ResMap>

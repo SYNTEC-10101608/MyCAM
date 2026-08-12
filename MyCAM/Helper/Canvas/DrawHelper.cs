@@ -46,31 +46,82 @@ namespace MyCAM.Helper
 			gp_Pnt corner3 = new gp_Pnt( maxX, maxY, posZ );
 			gp_Pnt corner4 = new gp_Pnt( minX, maxY, posZ );
 
-			BRepBuilderAPI_MakeEdge edge1 = new BRepBuilderAPI_MakeEdge( corner1, corner2 );
-			BRepBuilderAPI_MakeEdge edge2 = new BRepBuilderAPI_MakeEdge( corner2, corner3 );
-			BRepBuilderAPI_MakeEdge edge3 = new BRepBuilderAPI_MakeEdge( corner3, corner4 );
-			BRepBuilderAPI_MakeEdge edge4 = new BRepBuilderAPI_MakeEdge( corner4, corner1 );
+			return CreatePlaneAISFromCorners( corner1, corner2, corner3, corner4, color, mode, transparency );
+		}
 
-			BRepBuilderAPI_MakeWire wireBuilder = new BRepBuilderAPI_MakeWire();
-			wireBuilder.Add( edge1.Edge() );
-			wireBuilder.Add( edge2.Edge() );
-			wireBuilder.Add( edge3.Edge() );
-			wireBuilder.Add( edge4.Edge() );
+		// creates a rectangular plane on a plane with fixed Y (i.e. an XZ plane), useful for XZ wall preview
+		public static AIS_Shape CreatePlaneAISOnXZPlane( double minX, double maxX, double minZ, double maxZ, double posY, Quantity_NameOfColor color = Quantity_NameOfColor.Quantity_NOC_ORANGE, AIS_DisplayMode mode = AIS_DisplayMode.AIS_Shaded, double transparency = 0.5 )
+		{
+			gp_Pnt corner1 = new gp_Pnt( minX, posY, minZ );
+			gp_Pnt corner2 = new gp_Pnt( maxX, posY, minZ );
+			gp_Pnt corner3 = new gp_Pnt( maxX, posY, maxZ );
+			gp_Pnt corner4 = new gp_Pnt( minX, posY, maxZ );
 
-			if( !wireBuilder.IsDone() ) {
+			return CreatePlaneAISFromCorners( corner1, corner2, corner3, corner4, color, mode, transparency );
+		}
+
+		// creates a rectangular plane on a plane with fixed X (i.e. a YZ plane), useful for YZ wall preview
+		public static AIS_Shape CreatePlaneAISOnYZPlane( double minY, double maxY, double minZ, double maxZ, double posX, Quantity_NameOfColor color = Quantity_NameOfColor.Quantity_NOC_ORANGE, AIS_DisplayMode mode = AIS_DisplayMode.AIS_Shaded, double transparency = 0.5 )
+		{
+			gp_Pnt corner1 = new gp_Pnt( posX, minY, minZ );
+			gp_Pnt corner2 = new gp_Pnt( posX, maxY, minZ );
+			gp_Pnt corner3 = new gp_Pnt( posX, maxY, maxZ );
+			gp_Pnt corner4 = new gp_Pnt( posX, minY, maxZ );
+
+			return CreatePlaneAISFromCorners( corner1, corner2, corner3, corner4, color, mode, transparency );
+		}
+
+		static AIS_Shape CreatePlaneAISFromCorners( gp_Pnt corner1, gp_Pnt corner2, gp_Pnt corner3, gp_Pnt corner4, Quantity_NameOfColor color, AIS_DisplayMode mode, double transparency )
+		{
+			// Check for degenerate cases where two corners are too close together, which would cause OCC to fail when creating edges or faces.
+			const double DEGENERATE_TOL = 1e-6;
+			if( corner1.Distance( corner2 ) < DEGENERATE_TOL ||
+				corner2.Distance( corner3 ) < DEGENERATE_TOL ||
+				corner3.Distance( corner4 ) < DEGENERATE_TOL ||
+				corner4.Distance( corner1 ) < DEGENERATE_TOL ) {
 				return null;
 			}
 
-			BRepBuilderAPI_MakeFace faceBuilder = new BRepBuilderAPI_MakeFace( wireBuilder.Wire() );
-			if( !faceBuilder.IsDone() ) {
+			try {
+				BRepBuilderAPI_MakeEdge edge1 = new BRepBuilderAPI_MakeEdge( corner1, corner2 );
+				BRepBuilderAPI_MakeEdge edge2 = new BRepBuilderAPI_MakeEdge( corner2, corner3 );
+				BRepBuilderAPI_MakeEdge edge3 = new BRepBuilderAPI_MakeEdge( corner3, corner4 );
+				BRepBuilderAPI_MakeEdge edge4 = new BRepBuilderAPI_MakeEdge( corner4, corner1 );
+
+				if( !edge1.IsDone() || !edge2.IsDone() || !edge3.IsDone() || !edge4.IsDone() ) {
+					return null;
+				}
+
+				BRepBuilderAPI_MakeWire wireBuilder = new BRepBuilderAPI_MakeWire();
+				wireBuilder.Add( edge1.Edge() );
+				wireBuilder.Add( edge2.Edge() );
+				wireBuilder.Add( edge3.Edge() );
+				wireBuilder.Add( edge4.Edge() );
+
+				if( !wireBuilder.IsDone() ) {
+					return null;
+				}
+
+				BRepBuilderAPI_MakeFace faceBuilder = new BRepBuilderAPI_MakeFace( wireBuilder.Wire() );
+				if( !faceBuilder.IsDone() ) {
+					return null;
+				}
+
+				AIS_Shape planeAIS = new AIS_Shape( faceBuilder.Face() );
+				planeAIS.SetColor( new Quantity_Color( color ) );
+				planeAIS.SetDisplayMode( (int)mode );
+				planeAIS.SetTransparency( transparency );
+
+				// draw an obvious boundary around the plane so it remains visible
+				// when viewed edge-on (side view) or when the fill blends with background
+				planeAIS.Attributes().SetFaceBoundaryDraw( true );
+				planeAIS.Attributes().FaceBoundaryAspect().SetColor( new Quantity_Color( color ) );
+				planeAIS.Attributes().FaceBoundaryAspect().SetWidth( 2.5 );
+				return planeAIS;
+			}
+			catch {
 				return null;
 			}
-
-			AIS_Shape planeAIS = new AIS_Shape( faceBuilder.Face() );
-			planeAIS.SetColor( new Quantity_Color( color ) );
-			planeAIS.SetDisplayMode( (int)mode );
-			planeAIS.SetTransparency( transparency );
-			return planeAIS;
 		}
 
 		public static AIS_Trihedron GetTrihedronAIS( gp_Ax2 ax2, double size = 10.0, Quantity_NameOfColor color = Quantity_NameOfColor.Quantity_NOC_WHITE )

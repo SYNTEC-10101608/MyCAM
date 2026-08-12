@@ -36,6 +36,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Clipper2Lib">
+      <HintPath>..\reference\Clipper2Lib.dll</HintPath>
+    </Reference>
     <Reference Include="netDxf">
       <HintPath>..\reference\netdxf\netDxf.dll</HintPath>
     </Reference>
@@ -79,6 +82,7 @@
     <Compile Include="Data\Craft\CalibrationData.cs" />
     <Compile Include="Data\Craft\SpecialToolVecData.cs" />
     <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
+    <Compile Include="Editor\Action\CAD\DesignSupportBracketAction.cs" />
     <Compile Include="Editor\Action\CAD\GlassDXFImportAction.cs" />
     <Compile Include="Editor\Action\CAD\PlaceRingShapeAction.cs" />
     <Compile Include="Editor\Action\CAD\WireDiscreteVertexAction.cs" />
@@ -105,6 +109,12 @@
     <Compile Include="Editor\Dialog\DebouncedNumericUpDown.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Editor\Dialog\DesignSupportBracketDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\DesignSupportBracketDlg.Designer.cs">
+      <DependentUpon>DesignSupportBracketDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Dialog\EditDialogBase.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,7 +127,9 @@
     <Compile Include="Editor\Dialog\GlassDXFImportDlg.Designer.cs">
       <DependentUpon>GlassDXFImportDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Dialog\AutoSortPathDlg.cs" />
+    <Compile Include="Editor\Dialog\AutoSortPathDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Editor\Dialog\AutoSortPathDlg.Designer.cs">
       <DependentUpon>AutoSortPathDlg.cs</DependentUpon>
     </Compile>
@@ -131,7 +143,9 @@
     <Compile Include="Editor\Dialog\MeasureDlg.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editor\Dialog\MeasureDlg.Designer.cs" />
+    <Compile Include="Editor\Dialog\MeasureDlg.Designer.cs">
+      <DependentUpon>MeasureDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Dialog\MicroJointDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -149,6 +163,9 @@
     </Compile>
     <Compile Include="Editor\Dialog\SpecialToolVecEditDlg.Designer.cs">
       <DependentUpon>SpecialToolVecEditDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Dialog\SupportPositionRow.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Editor\Dialog\ContourEditDlg.cs">
@@ -184,6 +201,7 @@
     <Compile Include="Editor\Renderer\ToolVecEditRender.cs" />
     <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
+    <Compile Include="Helper\CAD\SupportDesignHelper.cs" />
     <Compile Include="Helper\CAM\ContourEditHelper.cs" />
     <Compile Include="Helper\CAM\ContourOffsetHelper.cs" />
     <Compile Include="Helper\CAM\FindWireOnOuterShellHelper.cs" />
@@ -305,7 +323,7 @@
     <Compile Include="FileManager\DataManagerDTO.cs" />
     <Compile Include="MyApp.cs" />
     <Compile Include="Editor\Action\CAM\IndexSelectAction.cs" />
-    <Compile Include="Editor\Action\CAM\SelectFaceAction.cs" />
+    <Compile Include="Editor\Action\SelectFaceAction.cs" />
     <Compile Include="Editor\Action\CAM\SelectWireAction.cs" />
     <Compile Include="Editor\Action\CAM\StartPointAction.cs" />
     <Compile Include="Editor\Action\CAD\TransformConstraints.cs" />
@@ -527,6 +545,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\Sort_RotationFirst_FromTop_Counterclockwise.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\CrossGap.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\PinDimension.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\SupportBracket.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

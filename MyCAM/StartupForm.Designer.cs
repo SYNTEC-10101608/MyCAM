@@ -69,6 +69,7 @@
 			this.m_tsbSaveProjectFile = new System.Windows.Forms.ToolStripButton();
 			this.m_tsCADFunction = new System.Windows.Forms.ToolStrip();
 			this.m_tsbSewPart = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbDesignSupportBracket = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAddPoint_BoundingBoxCenter = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAddPoint_EdgeCenter = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAddPoint_PointCenter = new System.Windows.Forms.ToolStripButton();
@@ -601,6 +602,7 @@
 			this.m_tsCADFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
 			// sew part
 			this.m_tsbSewPart,
+			this.m_tsbDesignSupportBracket,
 			new System.Windows.Forms.ToolStripSeparator(),
 			// add point / line
 			this.m_tsbAddPoint_BoundingBoxCenter,
@@ -633,6 +635,17 @@
 			this.m_tsbSewPart.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbSewPart.ToolTipText = "對零件進行縫隙縫補";
 			this.m_tsbSewPart.Click += new System.EventHandler(this.m_tsbSewPart_Click);
+			// 
+			// m_tsbDesignSupportBracket
+			// 
+			this.m_tsbDesignSupportBracket.Image = global::MyCAM.Properties.Resources.CAD_SupportBracket;
+			this.m_tsbDesignSupportBracket.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbDesignSupportBracket.Name = "m_tsbDesignSupportBracket";
+			this.m_tsbDesignSupportBracket.Size = new System.Drawing.Size(73, 47);
+			this.m_tsbDesignSupportBracket.Text = "設計夾具";
+			this.m_tsbDesignSupportBracket.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbDesignSupportBracket.ToolTipText = "設計異形蓋件的簡易支架夾具";
+			this.m_tsbDesignSupportBracket.Click += new System.EventHandler(this.m_tsbDesignSupportBracket_Click);
 			// 
 			// m_tsbAddPoint_BoundingBoxCenter
 			// 
@@ -1375,6 +1388,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbSaveProjectFile;
 		private System.Windows.Forms.ToolStripButton m_tsbEntryAndExitSetting;
 		private System.Windows.Forms.ToolStripButton m_tsbSewPart;
+		private System.Windows.Forms.ToolStripButton m_tsbDesignSupportBracket;
 		private System.Windows.Forms.ToolStripButton m_tsbPatternSetting;
 		private System.Windows.Forms.ToolStripButton m_tsbFixedToolVec;
 		private System.Windows.Forms.Panel m_panVNC;

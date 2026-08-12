@@ -163,6 +163,16 @@ namespace MyCAM.Properties {
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
+        internal static System.Drawing.Bitmap CAD_SupportBracket {
+            get {
+                object obj = ResourceManager.GetObject("CAD_SupportBracket", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
         internal static System.Drawing.Bitmap CAD_TwoVertexConnect {
             get {
                 object obj = ResourceManager.GetObject("CAD_TwoVertexConnect", resourceCulture);
@@ -586,6 +596,26 @@ namespace MyCAM.Properties {
         internal static System.Drawing.Bitmap Sort_RotationFirst_FromTop_Counterclockwise {
             get {
                 object obj = ResourceManager.GetObject("Sort_RotationFirst_FromTop_Counterclockwise", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Support_CrossGap {
+            get {
+                object obj = ResourceManager.GetObject("Support_CrossGap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Support_PinDimension {
+            get {
+                object obj = ResourceManager.GetObject("Support_PinDimension", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

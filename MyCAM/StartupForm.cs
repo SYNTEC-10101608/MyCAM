@@ -404,6 +404,11 @@ namespace MyCAM
 			m_CAMEditor.StartAddPath();
 		}
 
+		void m_tsbDesignSupportBracket_Click( object sender, EventArgs e )
+		{
+			m_CADEditor.StartDesignSupportBracket();
+		}
+
 		// remove path
 		void m_tsbDeletePath_Click( object sender, EventArgs e )
 		{
@@ -606,6 +611,9 @@ namespace MyCAM
 					case EditActionType.WireDiscreteVertex:
 						m_tsbWireDiscreteVertex.BackColor = DEFAULT_BtnColor;
 						return;
+					case EditActionType.DesignSupportBracket:
+						m_tsbDesignSupportBracket.BackColor = DEFAULT_BtnColor;
+						return;
 					default:
 						return;
 				}
@@ -641,6 +649,9 @@ namespace MyCAM
 					return;
 				case EditActionType.WireDiscreteVertex:
 					m_tsbWireDiscreteVertex.BackColor = ON_ButtonColor;
+					return;
+				case EditActionType.DesignSupportBracket:
+					m_tsbDesignSupportBracket.BackColor = ON_ButtonColor;
 					return;
 				default:
 					return;
@@ -1553,6 +1564,9 @@ namespace MyCAM
 			// cad toolbar
 			m_tsbSewPart.Text = m_LanguageManager.TryGetString( "m_tsbSewPart", m_tsbSewPart.Text );
 			m_tsbSewPart.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSewPart_ToolTip", m_tsbSewPart.ToolTipText );
+
+			m_tsbDesignSupportBracket.Text = m_LanguageManager.TryGetString( "m_tsbDesignSupportBracket", m_tsbDesignSupportBracket.Text );
+			m_tsbDesignSupportBracket.ToolTipText = m_LanguageManager.TryGetString( "m_tsbDesignSupportBracket_ToolTip", m_tsbDesignSupportBracket.ToolTipText );
 
 			m_tsbAddPoint_AcrCenter.Text = m_LanguageManager.TryGetString( "m_tsbAddPoint_AcrCenter", m_tsbAddPoint_AcrCenter.Text );
 			m_tsbAddPoint_AcrCenter.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPoint_AcrCenter_ToolTip", m_tsbAddPoint_AcrCenter.ToolTipText );

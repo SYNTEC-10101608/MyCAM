@@ -29,6 +29,8 @@
 	
 	<Message ID="m_tsbSewPart" Content="Восстановление модели" />
 	<Message ID="m_tsbSewPart_ToolTip" Content="Восстановление модели" />
+	<Message ID="m_tsbDesignSupportBracket" Content="Проектирование приспособлений" />
+	<Message ID="m_tsbDesignSupportBracket_ToolTip" Content="Простое опорное приспособление для проектирования крышек неправильной формы" />
 	<Message ID="m_tsbAddPoint_AcrCenter" Content="Центр дуги" />
 	<Message ID="m_tsbAddPoint_AcrCenter_ToolTip" Content="Центр дуги" />
 	<Message ID="m_tsbAddPoint_EdgeCenter" Content="Центр линии" />

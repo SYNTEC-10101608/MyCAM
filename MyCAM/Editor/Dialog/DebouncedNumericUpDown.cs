@@ -61,6 +61,7 @@ namespace MyCAM.Editor
 			this.Increment = 1;
 
 			m_LastValue = this.Value;
+			RevertOnOutOfRange = true;
 		}
 
 		public override void UpButton()
@@ -81,6 +82,74 @@ namespace MyCAM.Editor
 			base.DownButton();
 		}
 
+		/// <summary>
+		/// When true, out-of-range or unparseable (including empty) input reverts to the last valid value
+		/// </summary>
+		[Category( "Behavior" )]
+		[DefaultValue( true )]
+		public bool RevertOnOutOfRange
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// Fires when an input value is rejected (out of range)
+		/// </summary>
+		[Category( "Behavior" )]
+		public event EventHandler<ValueRejectedEventArgs> ValueRejected;
+
+		protected override void OnLostFocus( EventArgs e )
+		{
+			if( RevertOnOutOfRange && !m_IsProgrammaticChange && string.IsNullOrWhiteSpace( Text ) ) {
+				RevertToLastValue( 0m, Minimum, isBelowMin: true );
+			}
+			base.OnLostFocus( e );
+		}
+
+		protected override void OnKeyDown( KeyEventArgs e )
+		{
+			if( e.KeyCode == Keys.Enter && RevertOnOutOfRange && !m_IsProgrammaticChange && string.IsNullOrWhiteSpace( Text ) ) {
+				RevertToLastValue( 0m, Minimum, isBelowMin: true );
+				e.Handled = true;
+				e.SuppressKeyPress = true;
+				return;
+			}
+			base.OnKeyDown( e );
+		}
+
+		protected override void ValidateEditText()
+		{
+			if( RevertOnOutOfRange && !m_IsProgrammaticChange ) {
+				if( !decimal.TryParse( Text, System.Globalization.NumberStyles.Number,
+					System.Globalization.CultureInfo.CurrentCulture, out decimal parsed ) ) {
+					// empty or unparseable input, treat as invalid
+					RevertToLastValue( 0m, Minimum, isBelowMin: true );
+					return;
+				}
+				if( parsed < Minimum ) {
+					RevertToLastValue( parsed, Minimum, isBelowMin: true );
+					return;
+				}
+				if( parsed > Maximum ) {
+					RevertToLastValue( parsed, Maximum, isBelowMin: false );
+					return;
+				}
+			}
+			base.ValidateEditText();
+		}
+
+		void RevertToLastValue( decimal inputValue, decimal limit, bool isBelowMin )
+		{
+			ValueRejected?.Invoke( this, new ValueRejectedEventArgs( inputValue, limit, isBelowMin ) );
+			// Directly set Text to bypass NumericUpDown's internal userEdit/ParseEditText/clamp flow.
+			string formatted = m_LastValue.ToString( "F" + DecimalPlaces,
+				System.Globalization.CultureInfo.CurrentCulture );
+			m_IsProgrammaticChange = true;
+			Text = formatted;
+			Value = m_LastValue;
+			m_IsProgrammaticChange = false;
+		}
+
 		protected override void OnValueChanged( EventArgs e )
 		{
 			base.OnValueChanged( e );
@@ -97,6 +166,46 @@ namespace MyCAM.Editor
 
 			m_DebounceTimer.Stop();
 			m_DebounceTimer.Start();
+		}
+
+		public bool RestrictInvalidCharacters
+		{
+			get; set;
+		}
+
+		protected override void OnKeyPress( KeyPressEventArgs e )
+		{
+			if( !RestrictInvalidCharacters ) {
+				base.OnKeyPress( e );
+				return;
+			}
+
+			char ch = e.KeyChar;
+
+			// always allow control keys (Backspace, Ctrl+C/V, etc.)
+			if( char.IsControl( ch ) ) {
+				base.OnKeyPress( e );
+				return;
+			}
+
+			// reject letters and other symbols (only digits, decimal separator, and '-' are candidates)
+			string decimalSeparator = System.Globalization.CultureInfo.CurrentCulture
+				.NumberFormat.NumberDecimalSeparator;
+			bool isDigit = char.IsDigit( ch );
+			bool isDecimalSeparator = decimalSeparator.Length == 1 && ch == decimalSeparator[ 0 ];
+			bool isNegativeSign = ch == '-';
+			if( !isDigit && !isDecimalSeparator && !isNegativeSign ) {
+				e.Handled = true;
+				return;
+			}
+
+			// reject '-' when the range does not allow negative values
+			if( isNegativeSign && Minimum >= 0 ) {
+				e.Handled = true;
+				return;
+			}
+
+			base.OnKeyPress( e );
 		}
 
 		protected override void OnMouseWheel( MouseEventArgs e )
@@ -145,5 +254,30 @@ namespace MyCAM.Editor
 		int m_DebounceInterval = 100;
 		bool m_IsProgrammaticChange = false;
 		decimal m_LastValue = 0;
+	}
+
+	public class ValueRejectedEventArgs : EventArgs
+	{
+		public decimal InputValue
+		{
+			get;
+		}
+
+		public decimal Limit
+		{
+			get;
+		}
+
+		public bool IsBelowMinimum
+		{
+			get;
+		}
+
+		public ValueRejectedEventArgs( decimal inputValue, decimal limit, bool isBelowMinimum )
+		{
+			InputValue = inputValue;
+			Limit = limit;
+			IsBelowMinimum = isBelowMinimum;
+		}
 	}
 }

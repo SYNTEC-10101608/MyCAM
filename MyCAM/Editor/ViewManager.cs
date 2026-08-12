@@ -197,7 +197,7 @@ namespace MyCAM.Editor
 
 		#region Part Management
 
-		public void AddPart( string partID, TopoDS_Shape shape, bool isFeature = false )
+		public void AddPart( string partID, TopoDS_Shape shape, bool bIsShownAsFeature = false )
 		{
 			// validate input
 			if( string.IsNullOrEmpty( partID ) || shape == null || shape.IsNull() ) {
@@ -207,8 +207,8 @@ namespace MyCAM.Editor
 			// ensure no duplicate entry
 			RemovePart( partID );
 
-			// create AIS object based on type (feature vs part)
-			AIS_Shape aisShape = isFeature
+			// create AIS object based on display style (feature-style vs part-style)
+			AIS_Shape aisShape = bIsShownAsFeature
 				? ViewHelper.CreateFeatureAIS( shape )
 				: ViewHelper.CreatePartAIS( shape );
 

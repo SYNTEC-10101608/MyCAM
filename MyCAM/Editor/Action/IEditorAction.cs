@@ -28,6 +28,7 @@ namespace MyCAM.Editor
 		SewPart,
 		Measure,
 		WireDiscreteVertex,
+		DesignSupportBracket,
 
 		// CAM
 		SelectFace,
