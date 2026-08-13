@@ -391,7 +391,7 @@ namespace MyCAM.Editor
 			End();
 		}
 
-		static TopoDS_Shell GetFirstShell( List<TopoDS_Shape> shapes )
+		TopoDS_Shell GetFirstShell( List<TopoDS_Shape> shapes )
 		{
 			if( shapes == null ) {
 				return null;
@@ -406,7 +406,7 @@ namespace MyCAM.Editor
 			return null;
 		}
 
-		static TopoDS_Shell GetShellFromShape( TopoDS_Shape shape )
+		TopoDS_Shell GetShellFromShape( TopoDS_Shape shape )
 		{
 			if( shape == null || shape.IsNull() ) {
 				return null;
@@ -424,7 +424,7 @@ namespace MyCAM.Editor
 			return TopoDS.ToShell( shape );
 		}
 
-		static bool IsFilledBBoxWithinTolerance( TopoDS_Shell originalShell, TopoDS_Shape filledShape )
+		bool IsFilledBBoxWithinTolerance( TopoDS_Shell originalShell, TopoDS_Shape filledShape )
 		{
 			try {
 				if( originalShell == null || originalShell.IsNull() ||
@@ -459,7 +459,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		static bool IsAxisWithinTolerance( double originalSpan, double filledSpan )
+		bool IsAxisWithinTolerance( double originalSpan, double filledSpan )
 		{
 			// Guard against degenerate original span (nearly zero); treat any measurable filled span as divergence.
 			if( originalSpan <= GEOMETRY_TOLERANCE ) {
