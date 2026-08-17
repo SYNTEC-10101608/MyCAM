@@ -2,14 +2,20 @@
 
 namespace MyCAM.Data
 {
-	class SpecialPointIndex
+	static class SpecialPointIndex
 	{
-		public const int OFFSET_GENERATED_INDEX = -2;
-		public const int MICRO_JOINT_GENERATED_INDEX = -3;
+		public const int CLOSED_POINT_INDEX = -1;
+		public const int OFFSET_GENERATED_POINT_INDEX = -2;
+		public const int MICRO_JOINT_GENERATED_POINT_INDEX = -3;
 
-		public static bool IsGeneratedIndex( int idx )
+		public static bool IsClosedPointIndex( int idx )
 		{
-			return idx == OFFSET_GENERATED_INDEX || idx == MICRO_JOINT_GENERATED_INDEX;
+			return idx == CLOSED_POINT_INDEX;
+		}
+
+		public static bool IsGeneratedPointIndex( int idx )
+		{
+			return idx == OFFSET_GENERATED_POINT_INDEX || idx == MICRO_JOINT_GENERATED_POINT_INDEX;
 		}
 	}
 

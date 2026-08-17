@@ -167,7 +167,7 @@ namespace MyCAM.Helper.CAM
 			camPoint.ModSlave_rad = startPoint.ModSlave_rad + ( endPoint.ModSlave_rad - startPoint.ModSlave_rad ) * ( dLength / startPnt.Distance( endPnt ) );
 			camPoint.IsToolVecModPoint = false;
 			camPoint.IsMicroJointEnd = true;
-			camPoint.InitPathIndex = SpecialPointIndex.MICRO_JOINT_GENERATED_INDEX;
+			camPoint.InitPathIndex = SpecialPointIndex.MICRO_JOINT_GENERATED_POINT_INDEX;
 
 			newCAMPoint = camPoint;
 			return true;

@@ -1189,7 +1189,7 @@ namespace MyCAM.Editor
 
 				// get CAM map index
 				int camIndex = 0;
-				if( cadIndex == CLOSED_POINT_INDEX ) {
+				if( SpecialPointIndex.IsClosedPointIndex( cadIndex ) ) {
 					camIndex = m_PathCache.MainPathPointList.Count - 1;
 				}
 				else if( m_PathCache.CADToCAMIndexMap.ContainsKey( cadIndex ) ) {
@@ -1227,7 +1227,7 @@ namespace MyCAM.Editor
 					return m_PathCache.MainPathPointList[ camIndex ];
 				}
 			}
-			else if( cadIndex == CLOSED_POINT_INDEX ) {
+			else if( SpecialPointIndex.IsClosedPointIndex( cadIndex ) ) {
 				return m_PathCache.MainPathPointList.Last();
 			}
 			return null;
@@ -1260,7 +1260,7 @@ namespace MyCAM.Editor
 			if( m_PathCache.CADToCAMIndexMap.ContainsKey( cadIndex ) ) {
 				camIndex = m_PathCache.CADToCAMIndexMap[ cadIndex ];
 			}
-			else if( cadIndex == CLOSED_POINT_INDEX ) {
+			else if( SpecialPointIndex.IsClosedPointIndex( cadIndex ) ) {
 				camIndex = m_PathCache.MainPathPointList.Count - 1;
 			}
 			else {
@@ -1283,7 +1283,7 @@ namespace MyCAM.Editor
 			if( m_PathCache.CADToCAMIndexMap.ContainsKey( currentCADIndex ) ) {
 				camIndex = m_PathCache.CADToCAMIndexMap[ currentCADIndex ];
 			}
-			else if( currentCADIndex == CLOSED_POINT_INDEX ) {
+			else if( SpecialPointIndex.IsClosedPointIndex( currentCADIndex ) ) {
 				camIndex = m_PathCache.MainPathPointList.Count - 1;
 			}
 			else {
@@ -1314,13 +1314,13 @@ namespace MyCAM.Editor
 				}
 			}
 			while( step < maxSteps &&
-				(SpecialPointIndex.IsGeneratedIndex( m_PathCache.MainPathPointList[ camIndex ].InitPathIndex )) );
+				(SpecialPointIndex.IsGeneratedPointIndex( m_PathCache.MainPathPointList[ camIndex ].InitPathIndex )) );
 
 			// convert back to cad index
 			if( IsClosed() && camIndex == m_PathCache.MainPathPointList.Count - 1 ) {
 
 				// at the end point of closed path, return closed point index
-				return CLOSED_POINT_INDEX;
+				return SpecialPointIndex.CLOSED_POINT_INDEX;
 			}
 			else {
 				return m_PathCache.MainPathPointList[ camIndex ].InitPathIndex;
@@ -1447,6 +1447,5 @@ namespace MyCAM.Editor
 		readonly ContourCache m_PathCache;
 		readonly ContourGeomData m_GeomData;
 		const int NULL_POINT_INDEX = -999;
-		const int CLOSED_POINT_INDEX = -1;
 	}
 }

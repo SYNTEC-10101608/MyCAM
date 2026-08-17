@@ -147,7 +147,7 @@ namespace MyCAM.Editor
 			// translate offset index to ori CAD index when OriginalIndexMap is available
 			if( m_OriginalIndexMap != null && offsetIndex >= 0 && offsetIndex < m_OriginalIndexMap.Count ) {
 				int oriIndex = m_OriginalIndexMap[ offsetIndex ];
-				if( SpecialPointIndex.IsGeneratedIndex( oriIndex ) ) {
+				if( SpecialPointIndex.IsGeneratedPointIndex( oriIndex ) ) {
 					return null;
 				}
 				return oriIndex;
