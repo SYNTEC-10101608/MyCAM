@@ -231,7 +231,7 @@ namespace MyCAM.PathCache
 			if( m_IsClose && m_CAMPointList.Count > 0 ) {
 				CAMPoint startPoint = m_CAMPointList[ 0 ];
 				CAMPoint closedCAMPoint = startPoint.Clone();
-				closedCAMPoint.InitPathIndex = CLOSED_POINT_INDEX;
+				closedCAMPoint.InitPathIndex = SpecialPointIndex.CLOSED_POINT_INDEX;
 				m_CAMPointList.Add( closedCAMPoint );
 			}
 
@@ -658,6 +658,5 @@ namespace MyCAM.PathCache
 		gp_Ax3 m_RefCoord = new gp_Ax3();
 		gp_Ax1 m_ComputeRefCenterDir = new gp_Ax1();
 		ContourGeomData m_ContourGeomData = null;
-		const int CLOSED_POINT_INDEX = -1;
 	}
 }
