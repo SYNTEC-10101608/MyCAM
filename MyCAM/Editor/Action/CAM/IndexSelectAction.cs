@@ -1,6 +1,4 @@
 ﻿using MyCAM.Data;
-using MyCAM.Data;
-using MyCAM.Helper;
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
@@ -28,13 +26,20 @@ namespace MyCAM.Editor
 				throw new ArgumentNullException( "IndexSelectAction constructing argument null" );
 			}
 			m_PathID = pathID;
-			m_PathPointList = GetPathPointList( m_PathID );
-			m_OriginalIndexMap = GetOriginalIndexMap( m_PathID );
-			m_VertexMap = new TopTools_DataMapOfShapeInteger();
-			MakeSelectPoint();
+			RebuildSelectionPoints();
 		}
 
+		// Rebuild selection points from the contourCache
+		public void UpdateSelectionPoints()
+		{
+			m_Viewer.GetAISContext().ClearSelected( true );
+			HideSelectPoint();
 
+			RebuildSelectionPoints();
+			ShowSelectPoint();
+		}
+
+		// Transform and rebuild selection points without reloading the contourCache
 		public void TranfAndRebuildMap( gp_Trsf trsf, int oriHighLightIdx, out TopoDS_Shape oriHighLightVtx )
 		{
 			// rebuild transformed vertex map, and get the original vertex for selected index
@@ -142,7 +147,7 @@ namespace MyCAM.Editor
 			// translate offset index to ori CAD index when OriginalIndexMap is available
 			if( m_OriginalIndexMap != null && offsetIndex >= 0 && offsetIndex < m_OriginalIndexMap.Count ) {
 				int oriIndex = m_OriginalIndexMap[ offsetIndex ];
-				if( oriIndex == ContourOffsetHelper.OFFSET_GENERATED_INDEX ) {
+				if( SpecialPointIndex.IsGeneratedIndex( oriIndex ) ) {
 					return null;
 				}
 				return oriIndex;
@@ -167,6 +172,16 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Remove( m_SelectedPointAIS, true );
 		}
 
+		void RebuildSelectionPoints()
+		{
+			m_PathPointList = GetPathPointList( m_PathID );
+			m_OriginalIndexMap = GetOriginalIndexMap( m_PathID );
+			m_VertexMap = new TopTools_DataMapOfShapeInteger();
+			m_SelectedPointAIS = null;
+
+			MakeSelectPoint();
+		}
+
 		void MakeSelectPoint()
 		{
 			// build wire from cad points
@@ -181,12 +196,12 @@ namespace MyCAM.Editor
 			if( polygonMaker.IsDone() == false ) {
 				return;
 			}
-						TopoDS_Wire wire = polygonMaker.Wire();
-						m_SelectedPointAIS = new AIS_Shape( wire );
+			TopoDS_Wire wire = polygonMaker.Wire();
+			m_SelectedPointAIS = new AIS_Shape( wire );
 
-						// set invisible
-						m_SelectedPointAIS.SetWidth( 1e-3 );
-					}
+			// set invisible
+			m_SelectedPointAIS.SetWidth( 1e-3 );
+		}
 
 		List<gp_Pnt> GetPathPointList( string szPathID )
 		{

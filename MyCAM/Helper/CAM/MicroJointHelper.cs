@@ -8,7 +8,7 @@ namespace MyCAM.Helper.CAM
 {
 	public static class MicroJointHelper
 	{
-		public static void SetMicroJoint( ref List<CAMPoint> camPointList, List<Tuple<int, double>> microJointStartIdxList )
+		public static void SetMicroJoint( ref List<CAMPoint> camPointList, ref Dictionary<int, int> CADToCAMIndexMap, List<Tuple<int, double>> microJointStartIdxList )
 		{
 			if( microJointStartIdxList == null || microJointStartIdxList.Count == 0 || camPointList == null || camPointList.Count == 0 ) {
 				return;
@@ -20,14 +20,25 @@ namespace MyCAM.Helper.CAM
 				}
 				camPointList[ microJointStartIdx.Item1 ].IsMicroJointStart = true;
 			}
-			SetMicroJointEnd( ref camPointList, ref microJointStartIdxList );
+			SetMicroJointEnd( ref camPointList, ref microJointStartIdxList, out List<int> insertIndexList );
+
+			// Update indices for inserted Micro Joint points
+			foreach( int nInsertIdx in insertIndexList ) {
+				foreach( int nCADIdx in CADToCAMIndexMap.Keys.ToList() ) {
+					if( CADToCAMIndexMap[ nCADIdx ] >= nInsertIdx ) {
+						CADToCAMIndexMap[ nCADIdx ]++;
+					}
+				}
+			}
 		}
 
 		const double TOLERANCE = 1e-3;
 		const double LENGTH_THRESHOLD = 2.0;
 
-		static void SetMicroJointEnd( ref List<CAMPoint> camPointList, ref List<Tuple<int, double>> microJointStartIdxList )
+		static void SetMicroJointEnd( ref List<CAMPoint> camPointList, ref List<Tuple<int, double>> microJointStartIdxList, out List<int> insertIndexList )
 		{
+			insertIndexList = new List<int>();
+
 			if( camPointList == null || camPointList.Count == 0 ) {
 				return;
 			}
@@ -41,6 +52,7 @@ namespace MyCAM.Helper.CAM
 					double microJointLength = microJointStartIdxList.FirstOrDefault( x => x.Item1 == i )?.Item2 ?? LENGTH_THRESHOLD;
 					CalMicroJointEndPnt( ref camPointList, i, microJointLength, out bool isAddPnt, out int nInsertIdx );
 					if( isAddPnt ) {
+						insertIndexList.Add( nInsertIdx );
 						UpdateCAMIdxAfterInsertion( ref microJointStartIdxList, nInsertIdx );
 					}
 				}
@@ -155,6 +167,8 @@ namespace MyCAM.Helper.CAM
 			camPoint.ModSlave_rad = startPoint.ModSlave_rad + ( endPoint.ModSlave_rad - startPoint.ModSlave_rad ) * ( dLength / startPnt.Distance( endPnt ) );
 			camPoint.IsToolVecModPoint = false;
 			camPoint.IsMicroJointEnd = true;
+			camPoint.InitPathIndex = SpecialPointIndex.MICRO_JOINT_GENERATED_INDEX;
+
 			newCAMPoint = camPoint;
 			return true;
 		}

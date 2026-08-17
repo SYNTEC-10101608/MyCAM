@@ -2,6 +2,7 @@
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
+using MyCAM.Helper.CAM;
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.Aspect;
@@ -1313,7 +1314,7 @@ namespace MyCAM.Editor
 				}
 			}
 			while( step < maxSteps &&
-				m_PathCache.MainPathPointList[ camIndex ].InitPathIndex == ContourOffsetHelper.OFFSET_GENERATED_INDEX );
+				(SpecialPointIndex.IsGeneratedIndex( m_PathCache.MainPathPointList[ camIndex ].InitPathIndex )) );
 
 			// convert back to cad index
 			if( IsClosed() && camIndex == m_PathCache.MainPathPointList.Count - 1 ) {

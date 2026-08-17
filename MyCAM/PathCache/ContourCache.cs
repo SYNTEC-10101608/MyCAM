@@ -240,7 +240,7 @@ namespace MyCAM.PathCache
 			CalMSForEachPoint( toolVecPointList );
 
 			// mark micro joint start and end pnt
-			SetMicroJoint( ref m_CAMPointList );
+			SetMicroJoint( ref m_CAMPointList, ref m_CADToCAMIndexMap );
 
 			// set over cut
 			IReadOnlyList<CAMPoint> copyedCAMPointList = m_CAMPointList.Select( p => p.Clone() ).ToList();
@@ -609,11 +609,11 @@ namespace MyCAM.PathCache
 			m_ComputeRefCenterDir = m_ContourGeomData.RefCenterDir.Transformed( m_CraftData.CumulativeTrsfMatrix );
 		}
 
-		void SetMicroJoint( ref List<CAMPoint> camPointList )
+		void SetMicroJoint( ref List<CAMPoint> camPointList, ref Dictionary<int, int> CADToCAMIndexMap )
 		{
 			// set micro joint
 			List<Tuple<int, double>> microJointStartCAMIdxList = GetMicroJointStartCAMIdx();
-			MicroJointHelper.SetMicroJoint( ref camPointList, microJointStartCAMIdxList );
+			MicroJointHelper.SetMicroJoint( ref camPointList, ref CADToCAMIndexMap, microJointStartCAMIdxList );
 		}
 
 		List<Tuple<int, double>> GetMicroJointStartCAMIdx()

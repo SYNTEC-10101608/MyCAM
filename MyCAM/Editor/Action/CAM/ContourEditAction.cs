@@ -301,6 +301,7 @@ namespace MyCAM.Editor
 		void UpdatePath()
 		{
 			PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
+			m_PointIndexAction.UpdateSelectionPoints();
 			m_EditPointRenderer?.Show( true );
 		}
 

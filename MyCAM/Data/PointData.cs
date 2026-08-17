@@ -2,6 +2,17 @@
 
 namespace MyCAM.Data
 {
+	class SpecialPointIndex
+	{
+		public const int OFFSET_GENERATED_INDEX = -2;
+		public const int MICRO_JOINT_GENERATED_INDEX = -3;
+
+		public static bool IsGeneratedIndex( int idx )
+		{
+			return idx == OFFSET_GENERATED_INDEX || idx == MICRO_JOINT_GENERATED_INDEX;
+		}
+	}
+
 	public class CADPoint
 	{
 		public CADPoint( gp_Pnt point, gp_Dir normalVec_1st, gp_Dir normalVec_2nd, gp_Dir tangentVec )
@@ -313,6 +324,8 @@ namespace MyCAM.Data
 			newPoint.ModSlave_rad = ModSlave_rad;
 			newPoint.IsToolVecModPoint = IsToolVecModPoint;
 			newPoint.InitPathIndex = InitPathIndex;
+			newPoint.IsMicroJointStart = IsMicroJointStart;
+			newPoint.IsMicroJointEnd = IsMicroJointEnd;
 			return newPoint;
 		}
 
