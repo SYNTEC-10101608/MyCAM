@@ -147,11 +147,11 @@ namespace MyCAM.Helper
 
 					// add offset incoming point first (corner, incoming)
 					CADPoint offsetIncoming = OffsetSinglePoint( incomingPoint, offsetDistance );
-					result.Add( new OffsetPoint( offsetIncoming, OFFSET_GENERATED_INDEX, true, false, i ) );
+					result.Add( new OffsetPoint( offsetIncoming, SpecialPointIndex.OFFSET_GENERATED_INDEX, true, false, i ) );
 
 					// add offset outgoing point second (corner, outgoing)
 					CADPoint offsetOutgoing = OffsetSinglePoint( outgoingPoint, offsetDistance );
-					result.Add( new OffsetPoint( offsetOutgoing, OFFSET_GENERATED_INDEX, true, true, i ) );
+					result.Add( new OffsetPoint( offsetOutgoing, SpecialPointIndex.OFFSET_GENERATED_INDEX, true, true, i ) );
 				}
 
 				// the point is not a corner, just offset normally
@@ -306,7 +306,7 @@ namespace MyCAM.Helper
 			int cornerIdx = points[ poutIdx ].OriginalIndex;
 
 			// should not happened in current design, just a safety check
-			if( cornerIdx == OFFSET_GENERATED_INDEX ) {
+			if( cornerIdx == SpecialPointIndex.OFFSET_GENERATED_INDEX ) {
 				cornerIdx = points[ poutIdx ].InheritedCornerIndex;
 			}
 
@@ -571,7 +571,6 @@ namespace MyCAM.Helper
 
 		#region Constants
 
-		public const int OFFSET_GENERATED_INDEX = -2;
 		const int INVALID_CORNER_INDEX = -3;
 		const int IVALID_SEARCH_INDEX = -1;
 		const double GEOM_TOLERANCE = 1e-3;
