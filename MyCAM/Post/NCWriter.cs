@@ -17,7 +17,7 @@ namespace MyCAM.Post
 			}
 			m_DataManager = dataManager;
 			m_PathIDList = dataManager.PathIDList;
-			m_AxisConfig = new AxisConfig( dataManager.MachineData );
+			m_AxisConfig = new AxisConfig( dataManager.MachineData as FiveAxisMachineData );
 			m_EntryAndExitData = dataManager.EntryAndExitData;
 		}
 

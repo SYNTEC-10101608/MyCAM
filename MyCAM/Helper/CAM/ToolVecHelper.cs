@@ -25,7 +25,7 @@ namespace MyCAM.Helper
 			double dS_In = toolVecPoint.ModSlave_rad;
 
 			// Get machine data
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				return new Tuple<double, double>( 0, 0 );
 			}
 
@@ -93,7 +93,7 @@ namespace MyCAM.Helper
 		public static gp_Dir ConvertMSAngleToToolVec( double dMaster_deg, double dSlave_deg )
 		{
 			// Get machine data
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				return null;
 			}
 
@@ -125,7 +125,7 @@ namespace MyCAM.Helper
 		public static void SetByAssignedMSWithAutoIK( ref List<ISetToolVecPoint> toolVecPointList, double dMaster_deg, double dSlave_deg, double dLastProcessPathM, double dLastProcessPathS )
 		{
 			// Get machine data
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				return;
 			}
 			// Create PostSolver
@@ -143,7 +143,7 @@ namespace MyCAM.Helper
 		public static void SetBevelByStartMS( ref List<ISetToolVecPoint> toolVecPointList, double dMaster_deg, double dSlave_deg )
 		{
 			// get machine data
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				return;
 			}
 			// create PostSolver
@@ -175,7 +175,7 @@ namespace MyCAM.Helper
 		public static void SetBevelCaseToolVecForAssingAB( ref List<ISetToolVecPoint> toolVecPointList, double dA_deg, double dB_deg, double dLastProcessPathM, double dLastProcessPathS )
 		{
 			// get machine data
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				return;
 			}
 			// create PostSolver
@@ -481,7 +481,7 @@ namespace MyCAM.Helper
 		static void SolveRegionIK( ref List<ISetToolVecPoint> toolVecPointList, IReadOnlyDictionary<int, ToolVecModifyData> toolVecModifyMap, int nStartIdx, int nEndIdx, bool endPointIsCtrlPnt = true )
 		{
 			// Get machine data
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				return;
 			}
 			if( !toolVecModifyMap.TryGetValue( nStartIdx, out ToolVecModifyData startData ) ||
@@ -503,7 +503,7 @@ namespace MyCAM.Helper
 			SolveIKAndFilterSingularity( ref toolVecPointList, postSolver, machineData, nStartIdx, nEndIdx, dM, dS, endPointIsCtrlPnt );
 		}
 
-		static void SolveIKAndFilterSingularity( ref List<ISetToolVecPoint> toolVecPointList, PostSolver postSolver, MachineData machineData, int nStartIdx, int nEndIdx, double dM, double dS, bool endPointIsCtrlPnt )
+		static void SolveIKAndFilterSingularity( ref List<ISetToolVecPoint> toolVecPointList, PostSolver postSolver, FiveAxisMachineData machineData, int nStartIdx, int nEndIdx, double dM, double dS, bool endPointIsCtrlPnt )
 		{
 			// sigularity tag list
 			List<bool> singularTagList = new List<bool>();
@@ -891,7 +891,7 @@ namespace MyCAM.Helper
 		public static Tuple<double, double> FlipRotaryAxis( double master_deg, double slave_deg, bool isPositive )
 		{
 			// Get machine data to determine which axis is rotary (±180)
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				return new Tuple<double, double>( master_deg, slave_deg );
 			}
 
@@ -927,7 +927,7 @@ namespace MyCAM.Helper
 
 		static bool IsSingular( double master_deg, double slave_deg )
 		{
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				return false;
 			}
 			PostSolver postSolver = new PostSolver( machineData );

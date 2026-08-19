@@ -34,12 +34,12 @@ namespace MyCAM.Helper
 	{
 		static readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ReadMachineMeshHelper" );
 
-		public static bool LoadMachineMeshes( string szFolderPath, out MachineMeshes machineMeshes )
+		public static bool LoadMachineMeshes( string szFolderPath, IMachineDataBase machineData, out MachineMeshes machineMeshes )
 		{
 			machineMeshes = new MachineMeshes();
 
 			// protection
-			if( string.IsNullOrEmpty( szFolderPath ) ) {
+			if( string.IsNullOrEmpty( szFolderPath ) || machineData == null ) {
 				AnnounceWrning( ReadStlResult.ArgumentNull );
 				return false;
 			}
@@ -50,54 +50,42 @@ namespace MyCAM.Helper
 				return false;
 			}
 			// get mesh from stl
-			bool bLoadSuccess = LoadMahineMesh( szFolderPath, ref machineMeshes );
+			bool bLoadSuccess = LoadMahineMesh( szFolderPath, machineData, ref machineMeshes );
 			if( bLoadSuccess == false ) {
 				return false;
 			}
 			return true;
 		}
 
-		static bool LoadMahineMesh( string szFolderName, ref MachineMeshes machineMeshes )
+		static bool LoadMahineMesh( string szFolderName, IMachineDataBase machineData, ref MachineMeshes machineMeshes )
 		{
-			if( machineMeshes == null ) {
+			if( machineMeshes == null || machineData == null ) {
 				AnnounceWrning( ReadStlResult.ArgumentNull );
 				return false;
 			}
-			// read stl files
-			string[] stlNames = { "Base", "X", "Y", "Z", "Master", "Slave" };
 
-			foreach( string name in stlNames ) {
-				string filePath = Path.Combine( szFolderName, name + ".stl" );
+			// get component file name by machine product
+			IReadOnlyDictionary<MachineComponentType, string> meshFileNameMap = machineData.MeshFileNameMap;
+			if( meshFileNameMap == null ) {
+				AnnounceWrning( ReadStlResult.ArgumentNull );
+				return false;
+			}
+
+			bool bAnyMeshLoaded = false;
+			foreach( KeyValuePair<MachineComponentType, string> nameEntry in meshFileNameMap ) {
+				MachineComponentType componentType = nameEntry.Key;
+				string filePath = Path.Combine( szFolderName, nameEntry.Value + ".stl" );
 				if( !File.Exists( filePath ) ) {
-					if( name == "Master" || name == "Slave" ) {
-						AnnounceWrning( ReadStlResult.FileNotFound, name );
-						return false;
-					}
 					continue;
 				}
-				Poly_Triangulation mesh = LoadStlAsMesh( filePath );
-				switch( name ) {
-					case "Base":
-						machineMeshes.Meshes[ MachineComponentType.Base ] = mesh;
-						break;
-					case "X":
-						machineMeshes.Meshes[ MachineComponentType.XAxis ] = mesh;
-						break;
-					case "Y":
-						machineMeshes.Meshes[ MachineComponentType.YAxis ] = mesh;
-						break;
-					case "Z":
-						machineMeshes.Meshes[ MachineComponentType.ZAxis ] = mesh;
-						break;
-					case "Master":
-						machineMeshes.Meshes[ MachineComponentType.Master ] = mesh;
-						break;
-					case "Slave":
-						machineMeshes.Meshes[ MachineComponentType.Slave ] = mesh;
-						break;
-					default:
-						break;
-				}
+				machineMeshes.Meshes[ componentType ] = LoadStlAsMesh( filePath );
+				bAnyMeshLoaded = true;
+			}
+
+			// fail when no mesh file could be loaded at all
+			if( !bAnyMeshLoaded ) {
+				AnnounceWrning( ReadStlResult.FileNotFound );
+				return false;
 			}
 			return true;
 		}

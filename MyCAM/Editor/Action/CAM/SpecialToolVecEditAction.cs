@@ -78,6 +78,7 @@ namespace MyCAM.Editor
 		{
 			// cleanup path index action
 			m_PathIndexAction.SelectionChange -= OnPathSelectionChanged;
+			m_PathIndexAction.WithPathCantSelect -= SelectPathAlert;
 			m_PathIndexAction.End();
 			m_ToolVecEditRender.Remove();
 
@@ -674,7 +675,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			bool isGotMachineData = DataGettingHelper.GetMachineData( out MachineData machineData );
+			bool isGotMachineData = DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData );
 			if( !isGotMachineData ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotGetMachineData", CANNOT_GET_MACHINE_DATA ), MyApp.NoticeType.Warning );
 				return;
@@ -753,7 +754,7 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		bool GetSimulationData( MachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, ISetToolVecPoint targetPnt )
+		bool GetSimulationData( FiveAxisMachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, ISetToolVecPoint targetPnt )
 		{
 			frameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 			if( targetPnt == null ) {
@@ -768,14 +769,13 @@ namespace MyCAM.Editor
 			double dMasterAngle_rad = targetPnt.ModMaster_rad;
 			double dSlaveAngle_rad = targetPnt.ModSlave_rad;
 
-			// call the new static API
-			bool calSuccess = SimulationHelper.BuildSinglePointFrameTransform(
+			// call the product builder api
+			PostPoint orientationPoint = new PostPoint() { Master = dMasterAngle_rad, Slave = dSlaveAngle_rad };
+			SimuPathBuilderBase simuPathBuilder = SimuPathBuilderFactory.Create( machineData );
+			bool calSuccess = simuPathBuilder.BuildSinglePointFrameTransform(
 				machineData,
 				targetPnt.Point,
-				dMasterAngle_rad,
-				dSlaveAngle_rad,
-				m_DataManager.WorkPieceChain,
-				m_DataManager.MachineChainListMap,
+				orientationPoint,
 				out frameTransformMap );
 			return true;
 		}

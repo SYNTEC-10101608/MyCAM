@@ -44,6 +44,20 @@
 		Laser = 5,
 		WorkPiece = 6,
 		Base = 7,
+
+		// articulated robot joints
+		Joint1 = 10,
+		Joint2 = 11,
+		Joint3 = 12,
+		Joint4 = 13,
+		Joint5 = 14,
+		Joint6 = 15,
+
+		// T0: flange face frame (ax3)
+		T0_Flange = 16,
+
+		// T1: tool coordinate frame (ax3)
+		T1_ToolFrame = 17,   
 	}
 
 	public enum MachinePrValue
@@ -99,5 +113,6 @@
 		public const string SIMULATION_OFFSET_X = "Simulation_Offset_X";
 		public const string SIMULATION_OFFSET_Y = "Simulation_Offset_Y";
 		public const string SIMULATION_OFFSET_Z = "Simulation_Offset_Z";
+		public const string FULL_MACHINE_SIMULATION = "Full_Machine_Simulation";
 	}
 }

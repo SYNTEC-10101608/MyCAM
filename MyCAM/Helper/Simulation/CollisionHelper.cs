@@ -47,88 +47,177 @@ namespace MyCAM.Helper
 
 		internal static bool CalCollisionResult( int frameCount, SimuData.SimuRequiredData.SimuInputSet calNeedData, Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap, out Dictionary<MachineComponentType, List<bool>> frameCollisionMap )
 		{
-			bool bCollisionOk = BuildCollision( frameCount, calNeedData.ChainListMap, calNeedData.CollisionEngine, calNeedData.AABBMap, FrameTransformMap, out frameCollisionMap );
+			bool bCollisionOk = BuildCollision( frameCount, calNeedData.MachineData, calNeedData.MachineData.ChainListMap, calNeedData.CollisionEngine, calNeedData.AABBMap, FrameTransformMap, out frameCollisionMap );
 			return bCollisionOk;
 		}
 
-		static bool BuildCollision( int FrameCount, Dictionary<MachineComponentType, List<MachineComponentType>> ChainListMap,
+		static bool BuildCollision( int FrameCount, IMachineDataBase MachineData, Dictionary<MachineComponentType, List<MachineComponentType>> ChainListMap,
 			CollisionSolver FCLTest, Dictionary<string, (double[] Min, double[] Max)> AABBMap,
 			Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap,
 			out Dictionary<MachineComponentType, List<bool>> FrameCollisionMap )
 		{
 			FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
-			if( ChainListMap == null || ChainListMap.Count == 0 ) {
+			if( MachineData == null || ChainListMap == null || ChainListMap.Count == 0 ) {
+				return false;
+			}
+			if( !ChainListMap.ContainsKey( MachineData.ToolChainLeaf ) || !ChainListMap.ContainsKey( MachineData.WorkPieceChainLeaf ) ) {
 				return false;
 			}
 
-			// init frame collision map
-			FrameCollisionMap[ MachineComponentType.Base ] = new List<bool>();
-			FrameCollisionMap[ MachineComponentType.XAxis ] = new List<bool>();
-			FrameCollisionMap[ MachineComponentType.YAxis ] = new List<bool>();
-			FrameCollisionMap[ MachineComponentType.ZAxis ] = new List<bool>();
-			FrameCollisionMap[ MachineComponentType.Master ] = new List<bool>();
-			FrameCollisionMap[ MachineComponentType.Slave ] = new List<bool>();
-			FrameCollisionMap[ MachineComponentType.Laser ] = new List<bool>();
-			FrameCollisionMap[ MachineComponentType.WorkPiece ] = new List<bool>();
+			// index in this list is the buffer index order 
+			IReadOnlyList<MachineComponentType> componentTypes = MachineData.ComponentTypes;
+			int componentCount = componentTypes.Count;
+
+			// component type -> buffer index
+			Dictionary<MachineComponentType, int> indexMap = new Dictionary<MachineComponentType, int>( componentCount );
+			for( int i = 0; i < componentCount; i++ ) {
+				indexMap[ componentTypes[ i ] ] = i;
+			}
+
+			// frameTrsfByIdx[componentIdx][frameIndex] = gp_Trsf
+			List<gp_Trsf>[] frameTrsfByIdx = new List<gp_Trsf>[ componentCount ];
+
+			// each component name
+			string[] componentNameByIdx = new string[ componentCount ];
+
+			// [ComponentIdx][boxSize]
+			(double[] Min, double[] Max)?[] aabbByIdx = new (double[] Min, double[] Max)?[ componentCount ];
+			for( int i = 0; i < componentCount; i++ ) {
+				MachineComponentType type = componentTypes[ i ];
+				string name = type.ToString();
+				componentNameByIdx[ i ] = name;
+				FrameTransformMap.TryGetValue( type, out frameTrsfByIdx[ i ] );
+				if( AABBMap != null && AABBMap.TryGetValue( name, out var box ) ) {
+					aabbByIdx[ i ] = box;
+				}
+			}
+
+			// toolChainIdx = [componentIdx, componentIdx, componentIdx, ..]
+			int[] toolChainIdx = FlattenChain( ChainListMap[ MachineData.ToolChainLeaf ], indexMap );
+			List<MachineComponentType> workChain = new List<MachineComponentType>( ChainListMap[ MachineData.WorkPieceChainLeaf ] );
+
+			// add workpiece itself
+			workChain.Add( MachineData.WorkPieceChainLeaf );
+
+			//  workChainIdx = [componentIdx, componentIdx, componentIdx, ..]
+			int[] workChainIdx = FlattenChain( workChain, indexMap );
+
+			// get the end of tool chain component idx
+			int toolLeafIdx = indexMap.TryGetValue( MachineData.ToolChainLeaf, out int leafIdx ) ? leafIdx : -1;
+
+			// collisionByIdx[componentIdx] = [false, false, true,  ...]  
+			List<bool>[] collisionByIdx = new List<bool>[ componentCount ];
+			for( int i = 0; i < componentCount; i++ ) {
+				collisionByIdx[ i ] = new List<bool>( FrameCount );
+			}
+
+			// each component trsf matrix => trsfCache[componentIdx] = double[12]  
+			double[][] trsfCache = new double[ componentCount ][];
 			for( int i = 0; i < FrameCount; i++ ) {
-				BuildPerFrameCollision( i, ChainListMap, FCLTest, AABBMap, FrameTransformMap, ref FrameCollisionMap );
+				BuildPerFrameCollision( i, toolChainIdx, workChainIdx, toolLeafIdx, FCLTest,
+					aabbByIdx, componentNameByIdx, frameTrsfByIdx, trsfCache, collisionByIdx );
+			}
+
+			// build output Dictionary once
+			for( int i = 0; i < componentCount; i++ ) {
+				FrameCollisionMap[ componentTypes[ i ] ] = collisionByIdx[ i ];
 			}
 			return true;
 		}
 
-		static void BuildPerFrameCollision( int FrameIndex, Dictionary<MachineComponentType, List<MachineComponentType>> ChainListMap,
-			CollisionSolver FCLTest, Dictionary<string, (double[] Min, double[] Max)> AabbMap,
-			Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap, ref Dictionary<MachineComponentType, List<bool>> FrameCollisionMap )
+		// flatten a component chain into buffer index array; components not in the simulated list ( e.g. Base ) are skipped
+		static int[] FlattenChain( List<MachineComponentType> chain, Dictionary<MachineComponentType, int> indexMap )
+		{
+			List<int> result = new List<int>( chain.Count );
+			foreach( MachineComponentType comp in chain ) {
+				if( indexMap.TryGetValue( comp, out int idx ) ) {
+					result.Add( idx );
+				}
+			}
+			return result.ToArray();
+		}
+
+		static void BuildPerFrameCollision( int FrameIndex, int[] ToolChainIdx, int[] WorkChainIdx, int ToolLeafIdx,
+			CollisionSolver FCLTest, (double[] Min, double[] Max)?[] AabbByIdx, string[] ComponentNameByIdx,
+			List<gp_Trsf>[] FrameTrsfByIdx, double[][] TrsfCache, List<bool>[] CollisionByIdx )
 		{
 			try {
-				// set collision
-				HashSet<MachineComponentType> collisionResiltSet = new HashSet<MachineComponentType>();
-				foreach( var compT in ChainListMap[ MachineComponentType.Laser ] ) {
-					if( compT == MachineComponentType.Base ) {
 
-						// skip base
-						continue; 
-					}
-					List<MachineComponentType> compWList = new List<MachineComponentType>( ChainListMap[ MachineComponentType.WorkPiece ] );
-					
-					// add workpiece itself
-					compWList.Add( MachineComponentType.WorkPiece );
+				// reset cache
+				Array.Clear( TrsfCache, 0, TrsfCache.Length );
 
-					// cache compT transform once per frame (shared across all compW iterations).
-					if( !FrameTransformMap.TryGetValue( compT, out var compTList ) || compTList.Count <= FrameIndex ) {
+				// to record this frame collision component
+				HashSet<int> collisionResultSet = new HashSet<int>();
+
+				// tool chain
+				foreach( int tIdx in ToolChainIdx ) {
+
+					// cache compT transform once per frame
+					double[] trsfToolSideComponent = GetFrameTrsf( tIdx, FrameIndex, FrameTrsfByIdx, TrsfCache );
+					if( trsfToolSideComponent == null ) {
 						continue;
 					}
-					string componentName_T = compT.ToString();
-					double[] trsfT = ConvertTransform( compTList[ FrameIndex ] );
 
-					foreach( var compW in compWList ) {
-						if( !FrameTransformMap.TryGetValue( compW, out var comWList ) || comWList.Count <= FrameIndex ) {
+					// work piece chain
+					foreach( int wIdx in WorkChainIdx ) {
+						double[] trsfWorkpieceSide = GetFrameTrsf( wIdx, FrameIndex, FrameTrsfByIdx, TrsfCache );
+						if( trsfWorkpieceSide == null ) {
 							continue;
 						}
-						string componentName_W = compW.ToString();
-						double[] trsfWorkpieceSide = ConvertTransform( comWList[ FrameIndex ] );
 
-						//  skip the expensive native FCL call if the world AABBs are disjoint.
-						if( !MayCollideByAABB( AabbMap, componentName_T, componentName_W, trsfT, trsfWorkpieceSide ) ) {
+						// skip the expensive native FCL call if the world AABBs are disjoint
+						if( !MayCollideByAABB( AabbByIdx[ tIdx ], AabbByIdx[ wIdx ], trsfToolSideComponent, trsfWorkpieceSide ) ) {
 							continue;
 						}
-						if( FCLTest.CheckCollision( componentName_T, componentName_W, trsfT, trsfWorkpieceSide ) ) {
-							collisionResiltSet.Add( compT );
-							collisionResiltSet.Add( compW );
+						if( FCLTest.CheckCollision( ComponentNameByIdx[ tIdx ], ComponentNameByIdx[ wIdx ], trsfToolSideComponent, trsfWorkpieceSide ) ) {
+
+							// record this frame collision component
+							collisionResultSet.Add( tIdx );
+							collisionResultSet.Add( wIdx );
 						}
 					}
 				}
-				FrameCollisionMap[ MachineComponentType.XAxis ].Add( collisionResiltSet.Contains( MachineComponentType.XAxis ) );
-				FrameCollisionMap[ MachineComponentType.YAxis ].Add( collisionResiltSet.Contains( MachineComponentType.YAxis ) );
-				FrameCollisionMap[ MachineComponentType.ZAxis ].Add( collisionResiltSet.Contains( MachineComponentType.ZAxis ) );
-				FrameCollisionMap[ MachineComponentType.Master ].Add( collisionResiltSet.Contains( MachineComponentType.Master ) );
-				FrameCollisionMap[ MachineComponentType.Slave ].Add( collisionResiltSet.Contains( MachineComponentType.Slave ) );
-				FrameCollisionMap[ MachineComponentType.WorkPiece ].Add( collisionResiltSet.Contains( MachineComponentType.WorkPiece ) );
+
+				// record result for every component except the tool leaf ( tool contacts the workpiece by design )
+				for( int i = 0; i < CollisionByIdx.Length; i++ ) {
+					if( i == ToolLeafIdx ) {
+						continue;
+					}
+					CollisionByIdx[ i ].Add( collisionResultSet.Contains( i ) );
+				}
 			}
 			catch( Exception ex ) {
 				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "SimuFrameCalcFailed", SIMU_FRAME_CALC_FAILED ), FrameIndex ) + ex, MyApp.NoticeType.Warning );
+
+				// keep every component list length consistent with frame count even if this frame failed
+				for( int i = 0; i < CollisionByIdx.Length; i++ ) {
+					if( i == ToolLeafIdx ) {
+						continue;
+					}
+					if( CollisionByIdx[ i ].Count <= FrameIndex ) {
+						CollisionByIdx[ i ].Add( false );
+					}
+				}
 				return;
 			}
+		}
+
+		// converted world transform of a component at a frame; cached once per frame, null when unavailable
+		static double[] GetFrameTrsf( int idx, int frameIndex, List<gp_Trsf>[] frameTrsfByIdx, double[][] trsfCache )
+		{
+			if( idx < 0 ) {
+				return null;
+			}
+			if( trsfCache[ idx ] != null ) {
+				return trsfCache[ idx ];
+			}
+			List<gp_Trsf> componentTrsfList = frameTrsfByIdx[ idx ];
+			if( componentTrsfList == null || componentTrsfList.Count <= frameIndex ) {
+				return null;
+			}
+			double[] trsf = ConvertTransform( componentTrsfList[ frameIndex ] );
+			trsfCache[ idx ] = trsf;
+			return trsf;
 		}
 
 		static double[] ConvertTransform( gp_Trsf trsf )
@@ -200,18 +289,14 @@ namespace MyCAM.Helper
 			}
 		}
 
-		static bool MayCollideByAABB( Dictionary<string, (double[] Min, double[] Max)> aabbMap,
-			string id1, string id2, double[] trsf1, double[] trsf2 )
+		static bool MayCollideByAABB( (double[] Min, double[] Max)? box1, (double[] Min, double[] Max)? box2,
+			double[] trsf1, double[] trsf2 )
 		{
-			if( aabbMap == null ) {
+			if( box1 == null || box2 == null ) {
 				return true;
 			}
-			if( !aabbMap.TryGetValue( id1, out var a ) ) {
-				return true;
-			}
-			if( !aabbMap.TryGetValue( id2, out var b ) ) {
-				return true;
-			}
+			var a = box1.Value;
+			var b = box2.Value;
 			ComputeWorldAABB( a.Min, a.Max, trsf1, out double aMinX, out double aMinY, out double aMinZ, out double aMaxX, out double aMaxY, out double aMaxZ );
 			ComputeWorldAABB( b.Min, b.Max, trsf2, out double bMinX, out double bMinY, out double bMinZ, out double bMaxX, out double bMaxY, out double bMaxZ );
 			if( aMaxX < bMinX || bMaxX < aMinX ) {

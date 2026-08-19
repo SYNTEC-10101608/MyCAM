@@ -496,7 +496,7 @@ namespace MyCAM.PathCache
 		void SolveInitIK()
 		{
 			// arrange solver
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				throw new Exception( "ContourCache SolveInitIK get machine data failed" );
 			}
 			PostSolver postSolver = new PostSolver( machineData );

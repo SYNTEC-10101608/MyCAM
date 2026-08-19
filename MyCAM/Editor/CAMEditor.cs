@@ -75,7 +75,7 @@ namespace MyCAM.Editor
 			m_ToolVecRenderer = new ToolVecRenderer( m_Viewer, m_DataManager );
 			m_TraverseRenderer = new TraverseRenderer( m_Viewer, m_DataManager );
 			m_MainPathRenderer = new PathRenderer( m_Viewer, m_DataManager );
-			m_MachineRender = new MachineRender( m_Viewer, m_DataManager );
+			m_MachineRender = MachineRenderFactory.Create( m_Viewer, m_DataManager );
 		}
 
 		public const string PATH_NODE_PREFIX = "Path_";
@@ -88,7 +88,7 @@ namespace MyCAM.Editor
 		ToolVecRenderer m_ToolVecRenderer;
 		TraverseRenderer m_TraverseRenderer;
 		PathRenderer m_MainPathRenderer;
-		MachineRender m_MachineRender;
+		MachineRenderBase m_MachineRender;
 
 		// editor
 		public override EEditorType Type

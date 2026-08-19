@@ -44,6 +44,8 @@
     <Pr ID="3044" Value="0" />
     <Pr ID="3045" Value="0" />
     <Pr ID="3046" Value="0" />
+	<!--Simulation Config-->
+	<Pr ID="Full_Machine_Simulation" Value="1" />
   </MachineData>
   <MachineTree>
     <Child Type="Base">

@@ -33,22 +33,16 @@ namespace MyCAM.Editor
 
 		public void Init()
 		{
-			m_MachineData = m_DataManager.MachineData;
+			m_MachineData = m_DataManager.MachineData as FiveAxisMachineData;
 			m_PostSolver = new PostSolver( m_MachineData );
 			m_TraverseRender = new TraverseRenderer( m_Viewer, m_DataManager );
 			m_CoordIconRender = new CoordIconRenderer( m_Viewer, m_DataManager );
-			m_MachineRender = new MachineRender( m_Viewer, m_DataManager );
+			m_MachineRender = MachineRenderFactory.Create( m_Viewer, m_DataManager );
 			m_DefaultAction = new SelectPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
 
 			// user change tree node will change which frame index to show
 			( m_DefaultAction as SelectPathAction ).SelectionChange += OnPathSelectionChange;
 			m_collisionEngine = new CollisionSolver();
-
-			// build chain list
-			m_ChainListMap.Clear();
-			m_ChainListMap = m_DataManager.MachineChainListMap;
-			m_SimulationTreeRoot = m_DataManager.SimulationTreeRoot;
-			m_WorkPieceChainSet = m_DataManager.WorkPieceChain;
 
 			// import machine stl
 			bool isMachineAISReady = m_MachineRender.IsWithMachineAIS;
@@ -59,19 +53,17 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "MachineFileReadFailed", MACHINE_FILE_READ_FAILED ), MyApp.NoticeType.Warning );
 				return;
 			}
+
+			// machine structure won't change so only need to register once
+			RegisterMachineForCollision();
 		}
 
 		// simulation properties
-		MachineData m_MachineData;
+		FiveAxisMachineData m_MachineData;
 		PostSolver m_PostSolver;
 		CollisionSolver m_collisionEngine;
-		MachineTreeNode m_SimulationTreeRoot = null;
 
 		readonly Dictionary<string, (double[] Min, double[] Max)> m_LocalAabbMap = new Dictionary<string, (double[] Min, double[] Max)>();
-
-		// read from machine data
-		HashSet<MachineComponentType> m_WorkPieceChainSet = new HashSet<MachineComponentType>();
-		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
 
 		// calculated result
 		Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
@@ -98,7 +90,7 @@ namespace MyCAM.Editor
 
 		// render
 		TraverseRenderer m_TraverseRender;
-		MachineRender m_MachineRender;
+		MachineRenderBase m_MachineRender;
 		CoordIconRenderer m_CoordIconRender;
 
 		// speed should refer to which defined in SimuData
@@ -120,7 +112,7 @@ namespace MyCAM.Editor
 
 		enum SimuCalStatus
 		{
-			Faild,
+			Failed,
 			FrameCalDone,
 			CollisionCalDone
 		}
@@ -154,14 +146,16 @@ namespace MyCAM.Editor
 			if( m_MachineRender.IsWithMachineAIS ) {
 				m_IsImportMachine = true;
 				m_MachineRender.Show( true );
-				RegisterAllSimuMemberForCollision();
+
+				// workpiece may change every time entering simulation, re-register each EditStart
+				RegisterWorkpieceForCollision();
 			}
 
 			// get post data
 			SetPostDataList();
 			m_IsNeedReCal = true;
 
-			bool isGetMachineDataSuccess = DataGettingHelper.GetMachineData( out MachineData machineData );
+			bool isGetMachineDataSuccess = DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData );
 			if( !isGetMachineDataSuccess ) {
 				return;
 			}
@@ -482,20 +476,21 @@ namespace MyCAM.Editor
 
 			// protection
 			if( calNeedData.MachineData == null
-				|| calNeedData.ChainListMap == null
+				|| calNeedData.MachineData.ChainListMap == null
 				|| calNeedData.PostSolver == null
-				|| calNeedData.WorkPiecesChaintSet == null
+				|| calNeedData.MachineData.WorkPieceChain == null
 				|| calNeedData.CollisionEngine == null
-				|| calNeedData.WorkPiecesChaintSet.Count == EMPTY_Collection
-				|| calNeedData.ChainListMap.Count == EMPTY_Collection
+				|| calNeedData.MachineData.WorkPieceChain.Count == EMPTY_Collection
+				|| calNeedData.MachineData.ChainListMap.Count == EMPTY_Collection
 				 ) {
-				return SimuCalStatus.Faild;
+				return SimuCalStatus.Failed;
 			}
 
 			// get frame transformation map
-			bool bFrameCalDone = SimulationHelper.BuildFrameTransMap( calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out List<SimuData.ResultData.PathStartEndIndex> pathStartEndIndexList, out int frameCount );
+			SimuPathBuilderBase simuPathBuilder = SimuPathBuilderFactory.Create( calNeedData.MachineData );
+			bool bFrameCalDone = simuPathBuilder.BuildFrameTransMap( calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out List<SimuData.ResultData.PathStartEndIndex> pathStartEndIndexList, out int frameCount );
 			if( !bFrameCalDone ) {
-				return SimuCalStatus.Faild;
+				return SimuCalStatus.Failed;
 			}
 
 			// record traf result
@@ -523,16 +518,14 @@ namespace MyCAM.Editor
 			}
 
 			// need last path end point's vector to calculate exit pnt
-			IProcessPoint lastpathLastPoint = GetProcessEndPoint( m_DataManager.PathIDList.Last() );
+			IProcessPoint lastPathLastPoint = GetProcessEndPoint( m_DataManager.PathIDList.Last() );
 			calNeedData = new SimuData.SimuRequiredData.SimuInputSet()
 			{
 				EachPathIKPostDataList = m_PostDataList,
-				LastPathLastPnt = lastpathLastPoint,
+				LastPathLastPnt = lastPathLastPoint,
 				EntryAndExitData = m_DataManager.EntryAndExitData,
 				PostSolver = m_PostSolver,
-				WorkPiecesChaintSet = m_WorkPieceChainSet,
 				MachineData = m_MachineData,
-				ChainListMap = m_ChainListMap,
 				CollisionEngine = m_collisionEngine,
 				AABBMap = m_LocalAabbMap,
 			};
@@ -618,13 +611,6 @@ namespace MyCAM.Editor
 			m_ViewManager.ShowPathTrsf( new gp_Trsf() );
 		}
 
-		void RegisterAllSimuMemberForCollision()
-		{
-			m_LocalAabbMap.Clear();
-			RegisterMachineForCollision();
-			RegisterWorkpieceForCollision();
-		}
-
 		void RegisterMachineForCollision()
 		{
 			if( m_DataManager.MachineMeshes == null ) {
@@ -662,6 +648,9 @@ namespace MyCAM.Editor
 
 		void RegisterWorkpieceForCollision()
 		{
+			// workpiece may change, remove the old workpiece AABB before re-registering
+			m_LocalAabbMap.Remove( MachineComponentType.WorkPiece.ToString() );
+
 			List<AIS_Shape> workpieceShapes = new List<AIS_Shape>();
 
 			// get all workpiece shapes
@@ -797,7 +786,7 @@ namespace MyCAM.Editor
 				merged.SetTriangle( i + 1, globalTriangles[ i ] ); // Triangle 1-based
 			}
 
-			// optional: compute normals
+			// optional: compute normal
 			try {
 				merged.ComputeNormals();
 			}
@@ -945,7 +934,7 @@ namespace MyCAM.Editor
 
 		void SetSimuResult( SimuCalStatus status, SimuData.ResultData.SimuCalResult simuCalResult )
 		{
-			if( status == SimuCalStatus.Faild ) {
+			if( status == SimuCalStatus.Failed ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "SimuCalcFailed", SIMU_CALC_FAILED ), MyApp.NoticeType.Warning );
 				return;
 			}
@@ -1008,37 +997,6 @@ namespace MyCAM.Editor
 				// trigger tree select change
 				CurrentPath = newPathIndex;
 			}
-		}
-
-		#endregion
-
-		#region Default Machine Chain
-
-		public void BuildDefaultMachineTree()
-		{
-			switch( m_MachineData.FiveAxisType ) {
-				case FiveAxisType.Table:
-					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultTableTreeDef );
-					break;
-				case FiveAxisType.Mix:
-					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultMixTreeDef );
-					break;
-				case FiveAxisType.Spindle:
-				default:
-					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultSpindleTreeDef );
-					break;
-			}
-		}
-
-		MachineTreeNode BuildTree( SimuData.TreeData.MachineTreeDef treeDefnition )
-		{
-			MachineTreeNode baseNode = new MachineTreeNode( treeDefnition.Type );
-			if( treeDefnition.Children != null ) {
-				foreach( var child in treeDefnition.Children ) {
-					baseNode.AddChild( BuildTree( child ) );
-				}
-			}
-			return baseNode;
 		}
 
 		#endregion

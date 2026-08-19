@@ -124,7 +124,8 @@ namespace MyCAM.Data
 		}
 	}
 
-	public class PostPoint
+	// shared per-point data across products ( machine coordinate point + microjoint flags )
+	public abstract class PostPointBase
 	{
 		public double X
 		{
@@ -141,6 +142,20 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		public bool IsMicroJointStart
+		{
+			get; set;
+		} = false;
+
+		public bool IsMicroJointEnd
+		{
+			get; set;
+		} = false;
+	}
+
+	// five-axis post point: shared point + master / slave rotary values
+	public class PostPoint : PostPointBase
+	{
 		public double Master
 		{
 			get; set;
@@ -151,16 +166,6 @@ namespace MyCAM.Data
 			get; set;
 		}
 
-		public bool IsMicroJointStart
-		{
-			get; set;
-		} = false;
-
-		public bool IsMicroJointEnd
-		{
-			get; set;
-		}= false;
-
 		public PostPoint Clone()
 		{
 			PostPoint newPoint = new PostPoint();
@@ -169,6 +174,75 @@ namespace MyCAM.Data
 			newPoint.Z = Z;
 			newPoint.Master = Master;
 			newPoint.Slave = Slave;
+			newPoint.IsMicroJointStart = IsMicroJointStart;
+			newPoint.IsMicroJointEnd = IsMicroJointEnd;
+			return newPoint;
+		}
+	}
+
+	// articulated robot post point: shared point + tool orientation ( A/B/C ) + joint angles ( C1~C6 )
+	public class ArticRobotPostPoint : PostPointBase
+	{
+		public double A
+		{
+			get; set;
+		}
+
+		public double B
+		{
+			get; set;
+		}
+
+		public double C
+		{
+			get; set;
+		}
+
+		public double C1
+		{
+			get; set;
+		}
+
+		public double C2
+		{
+			get; set;
+		}
+
+		public double C3
+		{
+			get; set;
+		}
+
+		public double C4
+		{
+			get; set;
+		}
+
+		public double C5
+		{
+			get; set;
+		}
+
+		public double C6
+		{
+			get; set;
+		}
+
+		public ArticRobotPostPoint Clone()
+		{
+			ArticRobotPostPoint newPoint = new ArticRobotPostPoint();
+			newPoint.X = X;
+			newPoint.Y = Y;
+			newPoint.Z = Z;
+			newPoint.A = A;
+			newPoint.B = B;
+			newPoint.C = C;
+			newPoint.C1 = C1;
+			newPoint.C2 = C2;
+			newPoint.C3 = C3;
+			newPoint.C4 = C4;
+			newPoint.C5 = C5;
+			newPoint.C6 = C6;
 			newPoint.IsMicroJointStart = IsMicroJointStart;
 			newPoint.IsMicroJointEnd = IsMicroJointEnd;
 			return newPoint;

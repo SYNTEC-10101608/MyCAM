@@ -24,7 +24,7 @@ namespace MyCAM.Post
 			get;
 		}
 
-		public AxisConfig( MachineData machineData )
+		public AxisConfig( FiveAxisMachineData machineData )
 		{
 			MasterRotaryAxis = machineData.MasterRotaryAxis;
 			SlaveRotaryAxis = machineData.SlaveRotaryAxis;

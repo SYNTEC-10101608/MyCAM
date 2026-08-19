@@ -81,7 +81,7 @@ namespace MyCAM.Editor
 
 			// draw new trihedron for G54 must before change to start point
 			// because change to start point will trigger coord trasform
-			bool isGetMachineData = DataGettingHelper.GetMachineData( out MachineData machineData );
+			bool isGetMachineData = DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData );
 			if( isGetMachineData ) {
 				gp_Pnt position = new gp_Pnt( machineData.SimulationOffset.x, machineData.SimulationOffset.y, machineData.SimulationOffset.z );
 				m_CoordIconRenderer.Show( position );
@@ -112,6 +112,7 @@ namespace MyCAM.Editor
 
 			// end path index action// cleanup path index action
 			m_PathIndexAction.SelectionChange -= OnPathIndexChanged;
+			m_PathIndexAction.WithPathCantSelect -= SelectPathAlert;
 			m_PathIndexAction.End();
 
 			// clear render
@@ -997,7 +998,7 @@ namespace MyCAM.Editor
 
 		void RefreshSimuResult( bool isEditModifyPnt = true )
 		{
-			bool isGetMachineData = DataGettingHelper.GetMachineData( out MachineData machineData );
+			bool isGetMachineData = DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData );
 			if( !isGetMachineData ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotGetMachineInfo", CANNOT_GET_MACHINE_INFO ), MyApp.NoticeType.Warning );
 				return;
@@ -1043,7 +1044,7 @@ namespace MyCAM.Editor
 			view.SetImmediateUpdate( true );
 		}
 
-		bool CalSimuTranfResult( MachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, bool isEditModifyPnt )
+		bool CalSimuTranfResult( FiveAxisMachineData machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, bool isEditModifyPnt )
 		{
 			frameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 			if( m_SelectedPoint == null ) {
@@ -1068,14 +1069,13 @@ namespace MyCAM.Editor
 				slaveAngle_rad = m_ToolVecParam.Slave_deg * Math.PI / 180.0;
 			}
 
-			// call the new static API
-			bool calSuccess = SimulationHelper.BuildSinglePointFrameTransform(
+			// call the product builder api
+			PostPoint orientationPoint = new PostPoint() { Master = masterAngle_rad, Slave = slaveAngle_rad };
+			SimuPathBuilderBase simuPathBuilder = SimuPathBuilderFactory.Create( machineData );
+			bool calSuccess = simuPathBuilder.BuildSinglePointFrameTransform(
 				machineData,
 				m_SelectedPoint.Point,
-				masterAngle_rad,
-				slaveAngle_rad,
-				m_DataManager.WorkPieceChain,
-				m_DataManager.MachineChainListMap,
+				orientationPoint,
 				out frameTransformMap );
 			if( !calSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotCalculateLaserHeadPosition", CANNOT_CALCULATE_LASER_HEAD_POSITION ), MyApp.NoticeType.Warning );

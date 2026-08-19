@@ -28,7 +28,7 @@ namespace MyCAM.Helper
 	{
 		#region generate XML from MachineData
 
-		internal static XDocument ConvertMachineDataAndTree2XML( MachineData machineData )
+		internal static XDocument ConvertMachineDataAndTree2XML( FiveAxisMachineData machineData )
 		{
 			if( machineData == null ) {
 				throw new ArgumentNullException( nameof( machineData ) );
@@ -105,6 +105,9 @@ namespace MyCAM.Helper
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.SlaveTiltedVec_X, machineDataDTO.SlaveTiltedVec_deg.X * dRatioMMToBlu );
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.SlaveTiltedVec_Y, machineDataDTO.SlaveTiltedVec_deg.Y * dRatioMMToBlu );
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.SlaveTiltedVec_Z, machineDataDTO.SlaveTiltedVec_deg.Z * dRatioMMToBlu );
+
+			// whole-machine simulation flag ( 0: off, 1: on )
+			ConvertPropertyToPrNode( root, MachineParamName.FULL_MACHINE_SIMULATION, machineDataDTO.FullMachineSimulation ? 1 : 0 );
 
 			// with default 0
 			double[] spindleValues = new double[ 6 ]; // 3021~3026
@@ -199,14 +202,14 @@ namespace MyCAM.Helper
 
 		#region deserialize XML to machine data
 
-		internal static MachineData ConvertMachineDataFileToMachineData( XDocument machineDataDoc, out EMachineDataLoadStatus status, out int nErrorPrIndex )
+		internal static FiveAxisMachineData ConvertMachineDataFileToMachineData( XDocument machineDataDoc, out EMachineDataLoadStatus status, out int nErrorPrIndex )
 		{
 			// default status
 			status = EMachineDataLoadStatus.ReadSuccess;
 			nErrorPrIndex = -1;
 
 			// default machine data
-			MachineData machineData = new MixTypeMachineData();
+			FiveAxisMachineData machineData = MachineDataFactory.CreateDefaultSpindle();
 			if( machineDataDoc == null ) {
 				status = EMachineDataLoadStatus.NullFile;
 				return machineData;
@@ -356,6 +359,15 @@ namespace MyCAM.Helper
 			machineDataDTO.SimulationOffset.Z = GetPrValue<double>( machineData, MachineParamName.SIMULATION_OFFSET_Z, out prValueStatus, dRatioBluToMM );
 			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
 				machineDataDTO.SimulationOffset.Z = 0;
+			}
+
+			// whole-machine simulation flag ( 0: off, 1: on ), default false for old files without this node
+			int nFullMachineSimulation = GetPrValue<int>( machineData, MachineParamName.FULL_MACHINE_SIMULATION, out prValueStatus );
+			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+				machineDataDTO.FullMachineSimulation = false;
+			}
+			else {
+				machineDataDTO.FullMachineSimulation = nFullMachineSimulation == 1;
 			}
 
 			machineDataDTO.MasterTiltedVec_deg.X = GetPrValue<double>( machineData, (int)MachinePrValue.MasterTiltedVec_X, out prValueStatus, dRatioBluToMM );
