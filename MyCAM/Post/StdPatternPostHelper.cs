@@ -76,19 +76,19 @@ namespace MyCAM.Post
 				return false;
 			}
 
-			if( !ConvertPorcessPntToPostPnt( currentPathNCPack.RefPoint, out PostPoint mainG54 ) ) {
+			if( !ConvertProcessPntToPostPnt( currentPathNCPack.RefPoint, out PostPoint mainG54 ) ) {
 				return false;
 			}
 			pathG54PostData.RefPoint = mainG54;
 
-			if( !ConvertPorcessPntToPostPnt( currentPathNCPack.StartPoint, out PostPoint processStartPoint ) ) {
+			if( !ConvertProcessPntToPostPnt( currentPathNCPack.StartPoint, out PostPoint processStartPoint ) ) {
 				return false;
 			}
 			pathG54PostData.ProcessStartPoint = processStartPoint;
 
 			// lead-in
 			if( currentPathNCPack.LeadInCAMPointList.Count > 0 ) {
-				if( !ConvertPorcessPntToPostPnt( currentPathNCPack.LeadInCAMPointList.First(), out processStartPoint ) ) {
+				if( !ConvertProcessPntToPostPnt( currentPathNCPack.LeadInCAMPointList.First(), out processStartPoint ) ) {
 					return false;
 				}
 
@@ -117,7 +117,7 @@ namespace MyCAM.Post
 			return true;
 		}
 
-		static bool ConvertPorcessPntToPostPnt( IProcessPoint point, out PostPoint resultG54 )
+		static bool ConvertProcessPntToPostPnt( IProcessPoint point, out PostPoint resultG54 )
 		{
 			resultG54 = new PostPoint();
 			if( point == null ) {

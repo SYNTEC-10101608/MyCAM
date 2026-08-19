@@ -82,15 +82,15 @@ namespace MyCAM.Post
 
 	internal static class ContourPostHelper
 	{
-		public static bool GetPostData( ContourNCPackage currentPathNCPack,
+		public static bool  GetPostData( ContourNCPackage currentPathNCPack,
 			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
-			out PostData pathG54PostData, out PathEndInfo currentPathtEndInfo )
+			out PostData pathG54PostData, out PathEndInfo currentPathEndInfo )
 		{
 			// for write NC file
 			pathG54PostData = new PostData();
 
 			// to make solution continuous
-			currentPathtEndInfo = new PathEndInfo();
+			currentPathEndInfo = new PathEndInfo();
 			if( currentPathNCPack == null || entryAndExitData == null ) {
 				return false;
 			}
@@ -146,7 +146,7 @@ namespace MyCAM.Post
 			}
 
 			// end info of current path
-			currentPathtEndInfo = new PathEndInfo()
+			currentPathEndInfo = new PathEndInfo()
 			{
 				EndCAMPoint = currentPathNCPack.ProcessEndPoint,
 				Master = currentPathNCPack.ProcessEndPoint.ModMaster_rad,

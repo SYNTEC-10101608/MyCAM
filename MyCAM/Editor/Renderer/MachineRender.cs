@@ -4,29 +4,43 @@ using MyCAM.Helper;
 using MyCAM.Helper.Simulation;
 using OCC.AIS;
 using OCC.BRepPrimAPI;
+using OCC.Geom;
 using OCC.gp;
 using OCC.Graphic3d;
 using OCC.Poly;
 using OCC.Quantity;
 using OCC.TColStd;
 using OCCViewer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 
 namespace MyCAM.Editor.Renderer
 {
-	internal class MachineRender : CAMRendererBase
+	internal abstract class MachineRenderBase : CAMRendererBase
 	{
 		readonly Dictionary<MachineComponentType, List<AIS_InteractiveObject>> m_MachineAISDict = new Dictionary<MachineComponentType, List<AIS_InteractiveObject>>();
 		readonly Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 		readonly Dictionary<MachineComponentType, List<bool>> m_FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
 
-		public MachineRender( Viewer viewer, DataManager dataManager )
+		protected MachineRenderBase( Viewer viewer, DataManager dataManager )
 			: base( viewer, dataManager )
 		{
 			GetMeshesListToAIS( dataManager.MachineMeshes );
-			BuildLaserAIS();
+			BuildComponentSpecificAIS();
+		}
+
+		// product-specific display ( five-axis: laser / articulated robot: flange frame )
+		protected abstract void BuildComponentSpecificAIS();
+
+		// expose AIS dictionary so subclasses can add product-specific components
+		protected Dictionary<MachineComponentType, List<AIS_InteractiveObject>> MachineAISDict
+		{
+			get
+			{
+				return m_MachineAISDict;
+			}
 		}
 
 		// let outer know if we have valid AIS to display
@@ -130,7 +144,7 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		const int MIN_Machine_Part = 2;
+		const int MIN_Machine_Part = 3;
 		const double TRANSPARENCY = 0.5;
 
 		// set back to initial position and color
@@ -267,16 +281,6 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		void BuildLaserAIS()
-		{
-			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, -1 ) ), 0.2, m_DataManager.MachineData.ToolLength );
-			AIS_Shape LaserAIS = new AIS_Shape( makeTool1.Shape() );
-			LaserAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
-			LaserAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
-			LaserAIS.SetTransparency( TRANSPARENCY );
-			m_MachineAISDict[ MachineComponentType.Laser ] = new List<AIS_InteractiveObject> { LaserAIS };
-		}
-
 		enum MeshesToAISResult
 		{
 			Success,
@@ -338,5 +342,78 @@ namespace MyCAM.Editor.Renderer
 
 		const string MACHINE_MESH_INFO_ERROR = "機構網格資訊錯誤";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "MachineRender" );
+	}
+
+	// five-axis machine render: adds the laser tool cylinder
+	internal class FiveAxisMachineRender : MachineRenderBase
+	{
+		public FiveAxisMachineRender( Viewer viewer, DataManager dataManager )
+			: base( viewer, dataManager )
+		{
+		}
+
+		// build laser tool cylinder for five-axis machine
+		protected override void BuildComponentSpecificAIS()
+		{
+			FiveAxisMachineData fiveAxisMachineData = m_DataManager.MachineData as FiveAxisMachineData;
+			if( fiveAxisMachineData == null ) {
+				return;
+			}
+
+			// laser points along the negated tool direction
+			gp_Dir laserDir = fiveAxisMachineData.ToolDir.Reversed();
+			BRepPrimAPI_MakeCylinder makeTool1 = new BRepPrimAPI_MakeCylinder( new gp_Ax2( new gp_Pnt( 0, 0, 0 ), laserDir ), 0.2, fiveAxisMachineData.ToolLength );
+			AIS_Shape LaserAIS = new AIS_Shape( makeTool1.Shape() );
+			LaserAIS.SetDisplayMode( (int)AIS_DisplayMode.AIS_Shaded );
+			LaserAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_PURPLE ) );
+			LaserAIS.SetTransparency( LASER_TRANSPARENCY );
+			MachineAISDict[ MachineComponentType.Laser ] = new List<AIS_InteractiveObject> { LaserAIS };
+		}
+
+		const double LASER_TRANSPARENCY = 0.5;
+	}
+
+	// articulated robot machine render: adds the flange coordinate frame
+	internal class ArticRobotMachineRender : MachineRenderBase
+	{
+		public ArticRobotMachineRender( Viewer viewer, DataManager dataManager )
+			: base( viewer, dataManager )
+		{
+		}
+
+		protected override void BuildComponentSpecificAIS()
+		{
+			ArticRobotMachineData articRobotMachineData = m_DataManager.MachineData as ArticRobotMachineData;
+			if( articRobotMachineData == null ) {
+				return;
+			}
+
+			// flange trihedron references the machine data's flange frame
+			gp_Ax3 flangeAx3 = articRobotMachineData.FlangeFrame;
+			gp_Ax2 ax2 = new gp_Ax2( flangeAx3.Location(), flangeAx3.Direction(), flangeAx3.XDirection() );
+			AIS_Trihedron flangeFrame = new AIS_Trihedron( new Geom_Axis2Placement( ax2 ) );
+			flangeFrame.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_GRAY ) );
+			flangeFrame.SetSize( FLANGE_FRAME_SIZE );
+			MachineAISDict[ MachineComponentType.T0_Flange ] = new List<AIS_InteractiveObject> { flangeFrame };
+		}
+
+		const double FLANGE_FRAME_SIZE = 50.0;
+	}
+
+	// create machine render based on machine product
+	internal static class MachineRenderFactory
+	{
+		public static MachineRenderBase Create( Viewer viewer, DataManager dataManager )
+		{
+			Product product = dataManager?.MachineData?.Product ?? Product.None;
+			switch( product ) {
+				case Product.FiveAxis:
+					return new FiveAxisMachineRender( viewer, dataManager );
+				case Product.ArticRobot:
+					return new ArticRobotMachineRender( viewer, dataManager );
+				default:
+					throw new NotSupportedException( $"Unsupported machine product: {product}" );
+			}
+		}
 	}
 }

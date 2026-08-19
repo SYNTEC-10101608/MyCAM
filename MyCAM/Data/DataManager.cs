@@ -104,7 +104,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		public MachineData MachineData
+		public IMachineDataBase MachineData
 		{
 			get
 			{
@@ -122,30 +122,6 @@ namespace MyCAM.Data
 					// get machine data trigger chain rebuild
 					BuildChain();
 				}
-			}
-		}
-
-		public HashSet<MachineComponentType> WorkPieceChain
-		{
-			get
-			{
-				return m_WorkPieceChain;
-			}
-		}
-
-		public Dictionary<MachineComponentType, List<MachineComponentType>> MachineChainListMap
-		{
-			get
-			{
-				return m_ChainListMap;
-			}
-		}
-
-		public MachineTreeNode SimulationTreeRoot
-		{
-			get
-			{
-				return m_SimulationTreeRoot;
 			}
 		}
 
@@ -207,17 +183,6 @@ namespace MyCAM.Data
 			}
 
 			RaiseFeatureAdded( newIDs, false );
-		}
-
-		void ClearObjectCommandData()
-		{
-			EntryAndExitData = new EntryAndExitData();
-			CalibrationData = new CalibrationData();
-		}
-
-		void RaiseFeatureAdded( List<string> ids, bool bIsShownAsFeature = true )
-		{
-			FeatureAdded?.Invoke( ids, bIsShownAsFeature );
 		}
 
 		public void AddReferenceFeature( TopoDS_Shape newFeature )
@@ -304,6 +269,31 @@ namespace MyCAM.Data
 			ObjectMap.Remove( pathID );
 		}
 
+		public ShapeIDsStruct GetShapeIDsForDTO()
+		{
+			return new ShapeIDsStruct()
+			{
+				Solid_ID = m_SolidID,
+				Shell_ID = m_ShellID,
+				Face_ID = m_FaceID,
+				Wire_ID = m_WireID,
+				Edge_ID = m_EdgeID,
+				Vertex_ID = m_VertexID,
+				Path_ID = m_PathID,
+			};
+		}
+
+		void ClearObjectCommandData()
+		{
+			EntryAndExitData = new EntryAndExitData();
+			CalibrationData = new CalibrationData();
+		}
+
+		void RaiseFeatureAdded( List<string> ids, bool bIsShownAsFeature = true )
+		{
+			FeatureAdded?.Invoke( ids, bIsShownAsFeature );
+		}
+
 		void ResetWithNewPart( TopoDS_Shape newShape, out int partCount, bool shouldTriggerEvent = true )
 		{
 			partCount = 0;
@@ -331,20 +321,6 @@ namespace MyCAM.Data
 				// tell editor to refresh viewer
 				PartChanged?.Invoke();
 			}
-		}
-
-		public ShapeIDsStruct GetShapeIDsForDTO()
-		{
-			return new ShapeIDsStruct()
-			{
-				Solid_ID = m_SolidID,
-				Shell_ID = m_ShellID,
-				Face_ID = m_FaceID,
-				Wire_ID = m_WireID,
-				Edge_ID = m_EdgeID,
-				Vertex_ID = m_VertexID,
-				Path_ID = m_PathID,
-			};
 		}
 
 		void ResetShapeIDsByDTO( ShapeIDsStruct structShapeIDs )
@@ -420,6 +396,11 @@ namespace MyCAM.Data
 			m_PathID = 0;
 		}
 
+		void BuildChain()
+		{
+			MachineChainBuilder.Build( m_MachineData );
+		}
+
 		// data ID
 		int m_SolidID = 0;
 		int m_ShellID = 0;
@@ -430,34 +411,8 @@ namespace MyCAM.Data
 		int m_PathID = 0;
 
 		// machine data
-		MachineData m_MachineData = null;
-		readonly SpindleTypeMachineData m_DefaultMachineData = new SpindleTypeMachineData()
-		{
-			ToolDirection = ToolDirection.Z,
-			MasterRotaryAxis = RotaryAxis.Z,
-			SlaveRotaryAxis = RotaryAxis.X,
-			MasterRotaryDirection = RotaryDirection.RightHand,
-			SlaveRotaryDirection = RotaryDirection.LeftHand,
-			MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
-			SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
-			ToolToSlaveVec = new gp_Vec( -101.2, -0.19, 169.43 ),
-			SlaveToMasterVec = new gp_Vec( -151.5, 0.190, 193.550 ),
-		};
-
-		/*
-		readonly MixTypeMachineData m_DefaultMachineData = new MixTypeMachineData()
-		{
-			ToolDirection = ToolDirection.Z,
-			MasterRotaryAxis = RotaryAxis.Y,
-			SlaveRotaryAxis = RotaryAxis.Z,
-			MasterRotaryDirection = RotaryDirection.RightHand,
-			SlaveRotaryDirection = RotaryDirection.LeftHand,
-			MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
-			SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 ),
-			ToolToMasterVec = new gp_Vec( -17.27, 104.2, 169.48 ),
-			MCSToSlaveVec = new gp_Vec( 0, 0, 0 ),
-		};
-		*/
+		IMachineDataBase m_MachineData = null;
+		readonly SpindleTypeMachineData m_DefaultMachineData = MachineDataFactory.CreateDefaultSpindle();
 
 		// entry & exit data
 		EntryAndExitData m_EntryAndExitData = new EntryAndExitData();
@@ -467,67 +422,5 @@ namespace MyCAM.Data
 
 		// machine meshes
 		MachineMeshes m_MachineMeshes = new MachineMeshes();
-		HashSet<MachineComponentType> m_WorkPieceChain = new HashSet<MachineComponentType>();
-		Dictionary<MachineComponentType, List<MachineComponentType>> m_ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
-		MachineTreeNode m_SimulationTreeRoot = null;
-
-		void BuildChain()
-		{
-			BuildDefaultMachineTree();
-			BuildMachineChainList( m_SimulationTreeRoot, new List<MachineComponentType>() );
-			BuildWorkpieceChain();
-		}
-
-		void BuildDefaultMachineTree()
-		{
-			switch( m_MachineData.FiveAxisType ) {
-				case FiveAxisType.Table:
-					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultTableTreeDef );
-					break;
-				case FiveAxisType.Mix:
-					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultMixTreeDef );
-					break;
-				case FiveAxisType.Spindle:
-				default:
-					m_SimulationTreeRoot = BuildTree( SimuData.TreeData.DefaultSpindleTreeDef );
-					break;
-			}
-		}
-
-		// root node should be base node
-		void BuildMachineChainList( MachineTreeNode root, List<MachineComponentType> chainList )
-		{
-			if( root == null ) {
-				return;
-			}
-			m_ChainListMap[ root.Type ] = chainList;
-			foreach( MachineTreeNode child in root.Children ) {
-				BuildMachineChainList( child, new List<MachineComponentType>( chainList ) { root.Type } );
-			}
-		}
-
-		void BuildWorkpieceChain()
-		{
-			m_WorkPieceChain.Clear();
-
-			// protection
-			if( m_ChainListMap == null || m_ChainListMap.ContainsKey( MachineComponentType.WorkPiece ) == false ) {
-				return;
-			}
-			foreach( MachineComponentType type in m_ChainListMap[ MachineComponentType.WorkPiece ] ) {
-				m_WorkPieceChain.Add( type );
-			}
-		}
-
-		MachineTreeNode BuildTree( SimuData.TreeData.MachineTreeDef treeDefnition )
-		{
-			MachineTreeNode baseNode = new MachineTreeNode( treeDefnition.Type );
-			if( treeDefnition.Children != null ) {
-				foreach( var child in treeDefnition.Children ) {
-					baseNode.AddChild( BuildTree( child ) );
-				}
-			}
-			return baseNode;
-		}
 	}
 }

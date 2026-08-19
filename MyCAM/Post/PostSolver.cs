@@ -390,7 +390,7 @@ namespace MyCAM.Post
 
 	public class PostSolver
 	{
-		internal PostSolver( MachineData machineData )
+		internal PostSolver( FiveAxisMachineData machineData )
 		{
 			if( machineData == null ) {
 				throw new ArgumentException( "Invalid machine data" );
@@ -467,7 +467,7 @@ namespace MyCAM.Post
 		}
 
 		// solver builder factory
-		ISolverBuilder CreateSolverBuilder( MachineData machineData )
+		ISolverBuilder CreateSolverBuilder( FiveAxisMachineData machineData )
 		{
 			if( machineData == null ) {
 				throw new ArgumentException( "Invalid machine data" );
@@ -501,7 +501,7 @@ namespace MyCAM.Post
 	}
 
 	internal abstract class SolverBuilderBase<TMachineData> : ISolverBuilder
-		where TMachineData : MachineData
+		where TMachineData : FiveAxisMachineData
 	{
 		protected SolverBuilderBase( TMachineData machineData )
 		{
@@ -538,8 +538,8 @@ namespace MyCAM.Post
 		public override IKSolver BuildIKSolver()
 		{
 			return new IKSolver( m_MachineData.ToolDir, m_MachineData.MasterRotateDir, m_MachineData.SlaveRotateDir,
-				m_MachineData.MasterAxisStart_deg, m_MachineData.MasterAxisEnd_deg,
-				m_MachineData.SlaveAxisStart_deg, m_MachineData.SlaveAxisEnd_deg, false );
+				m_MachineData.MasterAxis.LimitStart, m_MachineData.MasterAxis.LimitEnd,
+				m_MachineData.SlaveAxis.LimitStart, m_MachineData.SlaveAxis.LimitEnd, false );
 		}
 	}
 
@@ -566,8 +566,8 @@ namespace MyCAM.Post
 		{
 			// for table type, just exchange the master and slave axis
 			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir,
-				m_MachineData.SlaveAxisStart_deg, m_MachineData.SlaveAxisEnd_deg,
-				m_MachineData.MasterAxisStart_deg, m_MachineData.MasterAxisEnd_deg, true );
+				m_MachineData.SlaveAxis.LimitStart, m_MachineData.SlaveAxis.LimitEnd,
+				m_MachineData.MasterAxis.LimitStart, m_MachineData.MasterAxis.LimitEnd, true );
 		}
 	}
 
@@ -594,8 +594,8 @@ namespace MyCAM.Post
 		{
 			// for mix type, just exchange the master and slave axis
 			return new IKSolver( m_MachineData.ToolDir, m_MachineData.SlaveRotateDir, m_MachineData.MasterRotateDir,
-				m_MachineData.SlaveAxisStart_deg, m_MachineData.SlaveAxisEnd_deg,
-				m_MachineData.MasterAxisStart_deg, m_MachineData.MasterAxisEnd_deg, true );
+				m_MachineData.SlaveAxis.LimitStart, m_MachineData.SlaveAxis.LimitEnd,
+				m_MachineData.MasterAxis.LimitStart, m_MachineData.MasterAxis.LimitEnd, true );
 		}
 	}
 }

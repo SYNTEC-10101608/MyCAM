@@ -76,7 +76,7 @@ namespace MyCAM
 			m_ViewManager = new ViewManager( m_Viewer );
 
 			// CAD Manager
-			if( GetMachineDataSuccess( out MachineData machineData ) ) {
+			if( GetMachineDataSuccess( out FiveAxisMachineData machineData ) ) {
 				m_DataManager = new DataManager
 				{
 					MachineData = machineData
@@ -89,7 +89,7 @@ namespace MyCAM
 			}
 
 			// get machine mesh by type, so data manager need to be builded already
-			bool isGetSuccess = GetMachineMesh( m_DataManager.MachineData.FiveAxisType, out MachineMeshes machineMeshes );
+			bool isGetSuccess = GetMachineMesh( m_DataManager.MachineData, out MachineMeshes machineMeshes );
 			if( isGetSuccess ) {
 				m_DataManager.MachineMeshes = machineMeshes;
 			}
@@ -1024,7 +1024,7 @@ namespace MyCAM
 
 		#region Get machine data
 
-		bool GetMachineDataSuccess( out MachineData machineData )
+		bool GetMachineDataSuccess( out FiveAxisMachineData machineData )
 		{
 			machineData = null;
 
@@ -1063,129 +1063,31 @@ namespace MyCAM
 			}
 		}
 
-		bool GetMachineMesh( FiveAxisType fiveAxis, out MachineMeshes machineMeshes )
+		bool GetMachineMesh( IMachineDataBase machineData, out MachineMeshes machineMeshes )
 		{
-			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
-			string machineConfigDir = Path.Combine( exeDir, CUSTOM_Root_Folder_Name );
-			string szFolderName;
-			switch( fiveAxis ) {
-				case FiveAxisType.Table:
-					szFolderName = Path.Combine( machineConfigDir, "Table" );
-					break;
-				case FiveAxisType.Mix:
-					szFolderName = Path.Combine( machineConfigDir, "Mix" );
-					break;
-				case FiveAxisType.Spindle:
-				default:
-					szFolderName = Path.Combine( machineConfigDir, "Spindle" );
-					break;
+			machineMeshes = null;
+			if( machineData == null ) {
+				return false;
 			}
-			bool isGetMesh = ReadMachineMeshHelper.LoadMachineMeshes( szFolderName, out machineMeshes );
+			string szFolderName = GetMachineMeshFolderName( machineData );
+			bool isGetMesh = ReadMachineMeshHelper.LoadMachineMeshes( szFolderName, machineData, out machineMeshes );
 			return isGetMesh;
 		}
 
-		void SaveMachineData()
+		// resolve the machine mesh folder ( named after the product / five-axis type )
+		string GetMachineMeshFolderName( IMachineDataBase machineData )
 		{
-			// default machine data
-			MixTypeMachineData machineData = new MixTypeMachineData();
-			machineData.ToolDirection = ToolDirection.Z;
-			machineData.MasterRotaryAxis = RotaryAxis.Y;
-			machineData.SlaveRotaryAxis = RotaryAxis.Z;
-			machineData.MasterRotaryDirection = RotaryDirection.RightHand;
-			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
-			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.ToolLength = 2.0;
-			machineData.ToolToMasterVec = new gp_Vec( 0, 101.2, 169.48 );
-			machineData.MCSToSlaveVec = new gp_Vec( 40.81, -384.80, -665.67 );
-
-			// build machine tree
-			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
-			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
-			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
-			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
-			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
-			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Laser );
-			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-
-			machineData.RootNode.AddChild( YNode );
-			YNode.AddChild( SlaveNode );
-			SlaveNode.AddChild( WorkPieceNode );
-			machineData.RootNode.AddChild( XNode );
-			XNode.AddChild( ZNode );
-			ZNode.AddChild( MasterNode );
-			MasterNode.AddChild( ToolNode );
-
-
-			/*
-			SpindleTypeMachineData machineData = new SpindleTypeMachineData();
-			machineData.ToolDirection = ToolDirection.Z;
-			machineData.MasterRotaryAxis = RotaryAxis.Z;
-			machineData.SlaveRotaryAxis = RotaryAxis.X;
-			machineData.MasterRotaryDirection = RotaryDirection.RightHand;
-			machineData.SlaveRotaryDirection = RotaryDirection.RightHand;
-			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.ToolLength = 2.0;
-			machineData.ToolToSlaveVec = new gp_Vec( -101.20, -0.19, 169.43 );
-			machineData.SlaveToMasterVec = new gp_Vec( -252.70, 0, 362.98 ) - machineData.ToolToSlaveVec;
-			// build machine tree
-			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
-			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
-			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
-			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
-			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
-			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
-			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-			machineData.RootNode.AddChild( XNode );
-			XNode.AddChild( YNode );
-			YNode.AddChild( ZNode );
-			ZNode.AddChild( MasterNode );
-			MasterNode.AddChild( SlaveNode );
-			SlaveNode.AddChild( ToolNode );
-			machineData.RootNode.AddChild( WorkPieceNode );
-			*/
-
-			/*
-			TableTypeMachineData machineData = new TableTypeMachineData();
-			machineData.ToolDirection = ToolDirection.Z;
-			machineData.MasterRotaryAxis = RotaryAxis.Y;
-			machineData.SlaveRotaryAxis = RotaryAxis.Z;
-			machineData.MasterRotaryDirection = RotaryDirection.LeftHand;
-			machineData.SlaveRotaryDirection = RotaryDirection.LeftHand;
-			machineData.MasterTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.SlaveTiltedVec_deg = new gp_XYZ( 0, 0, 0 );
-			machineData.ToolLength = 2.0;
-			( machineData as TableTypeMachineData ).MCSToMasterVec = new gp_Vec( -80.51, 73.81, -129.55 );
-			( machineData as TableTypeMachineData ).MasterToSlaveVec = new gp_Vec( -80.43, -71.67, -94.55 ) - ( machineData as TableTypeMachineData ).MCSToMasterVec;
-
-			// build machine tree
-			MachineTreeNode XNode = new MachineTreeNode( MachineComponentType.XAxis );
-			MachineTreeNode YNode = new MachineTreeNode( MachineComponentType.YAxis );
-			MachineTreeNode ZNode = new MachineTreeNode( MachineComponentType.ZAxis );
-			MachineTreeNode MasterNode = new MachineTreeNode( MachineComponentType.Master );
-			MachineTreeNode SlaveNode = new MachineTreeNode( MachineComponentType.Slave );
-			MachineTreeNode ToolNode = new MachineTreeNode( MachineComponentType.Tool );
-			MachineTreeNode WorkPieceNode = new MachineTreeNode( MachineComponentType.WorkPiece );
-			machineData.RootNode.AddChild( YNode );
-			YNode.AddChild( XNode );
-			XNode.AddChild( MasterNode );
-			MasterNode.AddChild( SlaveNode );
-			SlaveNode.AddChild( WorkPieceNode );
-			machineData.RootNode.AddChild( ZNode );
-			ZNode.AddChild( ToolNode );
-			*/
-
-			// get exe directory
 			string exeDir = AppDomain.CurrentDomain.BaseDirectory;
-			string filePath = Path.Combine( exeDir, "MachineData.mac" );
-			try {
-				XDocument xmlDoc = MachineDataXMLHelper.ConvertMachineDataAndTree2XML( machineData );
-				xmlDoc.Save( filePath );
+			string machineConfigDir = Path.Combine( exeDir, CUSTOM_Root_Folder_Name );
+
+			// articulated robot meshes live in a dedicated folder
+			if( machineData.Product == Product.ArticRobot ) {
+				return Path.Combine( machineConfigDir, Product.ArticRobot.ToString() );
 			}
-			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Log_MachineFileSaveFailed", LOG_MACHINE_FILE_SAVE_FAILED ), ex.Message ), MyApp.NoticeType.Error );
-			}
+
+			// five-axis meshes live in a folder named after the five-axis type
+			FiveAxisType fiveAxis = ( machineData as FiveAxisMachineData )?.FiveAxisType ?? FiveAxisType.Spindle;
+			return Path.Combine( machineConfigDir, fiveAxis.ToString() );
 		}
 
 		#endregion

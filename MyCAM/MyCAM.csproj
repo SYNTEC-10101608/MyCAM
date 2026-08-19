@@ -83,6 +83,9 @@
     <Compile Include="Data\Craft\SpecialToolVecData.cs" />
     <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
     <Compile Include="Editor\Action\CAD\DesignSupportBracketAction.cs" />
+    <Compile Include="Data\Machine\ComponentInfo.cs" />
+    <Compile Include="Data\Machine\MachineChainBuilder.cs" />
+    <Compile Include="Data\Machine\MachineDataFactory.cs" />
     <Compile Include="Editor\Action\CAD\GlassDXFImportAction.cs" />
     <Compile Include="Editor\Action\CAD\PlaceRingShapeAction.cs" />
     <Compile Include="Editor\Action\CAD\WireDiscreteVertexAction.cs" />
@@ -215,9 +218,13 @@
     <Compile Include="Helper\RevolutionRecognition\RingShapedIdentifyHelper.cs" />
     <Compile Include="Helper\CAM\PathSortHelper.cs" />
     <Compile Include="Helper\Simulation\CollisionHelper.cs" />
+    <Compile Include="Helper\Simulation\FiveAxisSimuPathBuilder.cs" />
     <Compile Include="Helper\Simulation\MeshesToAISHelper.cs" />
+    <Compile Include="Helper\Simulation\PerFrameTransformBuilder.cs" />
     <Compile Include="Helper\Simulation\ReadMachineMeshHelper.cs" />
     <Compile Include="Helper\Simulation\SimulationHelper.cs" />
+    <Compile Include="Helper\Simulation\SimuPathBuilderBase.cs" />
+    <Compile Include="Helper\Simulation\SimuPathBuilderFactory.cs" />
     <Compile Include="PathCache\CacheHelper.cs" />
     <Compile Include="PathCache\CircleCache.cs" />
     <Compile Include="PathCache\ContourCache.cs" />

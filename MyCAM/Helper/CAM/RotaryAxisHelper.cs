@@ -8,7 +8,7 @@ namespace MyCAM.Helper
 	{
 		public static RotaryAxisConfig CreateRotaryAxisConfig()
 		{
-			if( !DataGettingHelper.GetMachineData( out MachineData machineData ) ) {
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				throw new InvalidOperationException( "Cannot get machine data" );
 			}
 

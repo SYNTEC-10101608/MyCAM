@@ -24,7 +24,7 @@ namespace MyCAM.FileManager
 
 	public static class MachineDataDTOManager
 	{
-		internal static MachineDataDTOContainer ToDTOContainer( MachineData machineData )
+		internal static MachineDataDTOContainer ToDTOContainer( FiveAxisMachineData machineData )
 		{
 			if( machineData == null ) {
 				return new MachineDataDTOContainer();
@@ -47,7 +47,7 @@ namespace MyCAM.FileManager
 			return new MachineDataDTOContainer { MachineDataDTO = machinDataDTO };
 		}
 
-		internal static MachineData ToMachineData( MachineDataDTOContainer container )
+		internal static FiveAxisMachineData ToMachineData( MachineDataDTOContainer container )
 		{
 			if( container == null || container.MachineDataDTO == null ) {
 				throw new ArgumentNullException( "MachineDataDTOConatiner deserialization failed." );
@@ -109,6 +109,11 @@ namespace MyCAM.FileManager
 			get; set;
 		} = new gp_Vec_DTO();
 
+		public bool FullMachineSimulation
+		{
+			get; set;
+		}
+
 		public double ToolLength
 		{
 			get; set;
@@ -137,10 +142,12 @@ namespace MyCAM.FileManager
 		// parameterless constructor for XmlSerializer
 		internal MachineDataDTO()
 		{
+			// default: do not run whole-machine simulation
+			FullMachineSimulation = false;
 		}
 
 		// constructor from MachineData
-		internal MachineDataDTO( MachineData data )
+		internal MachineDataDTO( FiveAxisMachineData data )
 		{
 			if( data == null ) {
 				return;
@@ -148,16 +155,17 @@ namespace MyCAM.FileManager
 			ToolDirection = data.ToolDirection;
 			MasterRotaryAxis = data.MasterRotaryAxis;
 			SlaveRotaryAxis = data.SlaveRotaryAxis;
-			MasterRotaryDirection = data.MasterRotaryDirection;
-			SlaveRotaryDirection = data.SlaveRotaryDirection;
+			MasterRotaryDirection = data.MasterAxis != null ? data.MasterAxis.RotaryDirection : RotaryDirection.None;
+			SlaveRotaryDirection = data.SlaveAxis != null ? data.SlaveAxis.RotaryDirection : RotaryDirection.None;
 			MasterTiltedVec_deg = new gp_XYZDTO( data.MasterTiltedVec_deg );
 			SlaveTiltedVec_deg = new gp_XYZDTO( data.SlaveTiltedVec_deg );
 			SimulationOffset = new gp_Vec_DTO( data.SimulationOffset );
+			FullMachineSimulation = data.FullMachineSimulation;
 			ToolLength = data.ToolLength;
-			MasterAxisStart_deg = data.MasterAxisStart_deg;
-			MasterAxisEnd_deg = data.MasterAxisEnd_deg;
-			SlaveAxisStart_deg = data.SlaveAxisStart_deg;
-			SlaveAxisEnd_deg = data.SlaveAxisEnd_deg;
+			MasterAxisStart_deg = data.MasterAxis != null ? data.MasterAxis.LimitStart : 0;
+			MasterAxisEnd_deg = data.MasterAxis != null ? data.MasterAxis.LimitEnd : 0;
+			SlaveAxisStart_deg = data.SlaveAxis != null ? data.SlaveAxis.LimitStart : 0;
+			SlaveAxisEnd_deg = data.SlaveAxis != null ? data.SlaveAxis.LimitEnd : 0;
 		}
 	}
 
@@ -196,19 +204,19 @@ namespace MyCAM.FileManager
 				ToolDirection = ToolDirection,
 				MasterRotaryAxis = MasterRotaryAxis,
 				SlaveRotaryAxis = SlaveRotaryAxis,
-				MasterRotaryDirection = MasterRotaryDirection,
-				SlaveRotaryDirection = SlaveRotaryDirection,
 				MasterTiltedVec_deg = MasterTiltedVec_deg.ToXYZ(),
 				SlaveTiltedVec_deg = SlaveTiltedVec_deg.ToXYZ(),
 				SimulationOffset = SimulationOffset.ToVec(),
+				FullMachineSimulation = FullMachineSimulation,
 				ToolLength = ToolLength,
-				MasterAxisStart_deg = MasterAxisStart_deg,
-				MasterAxisEnd_deg = MasterAxisEnd_deg,
-				SlaveAxisStart_deg = SlaveAxisStart_deg,
-				SlaveAxisEnd_deg = SlaveAxisEnd_deg,
 				ToolToSlaveVec = ToolToSlaveVec.ToVec(),
 				SlaveToMasterVec = SlaveToMasterVec.ToVec()
 			};
+
+			// cal rotate center by itself
+			spindleTypeData.InitRotateAxes(
+				MasterRotaryDirection, MasterAxisStart_deg, MasterAxisEnd_deg,
+				SlaveRotaryDirection, SlaveAxisStart_deg, SlaveAxisEnd_deg );
 			return spindleTypeData;
 		}
 	}
@@ -249,19 +257,19 @@ namespace MyCAM.FileManager
 				ToolDirection = ToolDirection,
 				MasterRotaryAxis = MasterRotaryAxis,
 				SlaveRotaryAxis = SlaveRotaryAxis,
-				MasterRotaryDirection = MasterRotaryDirection,
-				SlaveRotaryDirection = SlaveRotaryDirection,
 				MasterTiltedVec_deg = MasterTiltedVec_deg.ToXYZ(),
 				SlaveTiltedVec_deg = SlaveTiltedVec_deg.ToXYZ(),
 				SimulationOffset = SimulationOffset.ToVec(),
+				FullMachineSimulation = FullMachineSimulation,
 				ToolLength = ToolLength,
-				MasterAxisStart_deg = MasterAxisStart_deg,
-				MasterAxisEnd_deg = MasterAxisEnd_deg,
-				SlaveAxisStart_deg = SlaveAxisStart_deg,
-				SlaveAxisEnd_deg = SlaveAxisEnd_deg,
 				MasterToSlaveVec = MasterToSlaveVec.ToVec(),
 				MCSToMasterVec = MCSToMasterVec.ToVec()
 			};
+
+			// cal rotate center by itself
+			tableTypeData.InitRotateAxes(
+				MasterRotaryDirection, MasterAxisStart_deg, MasterAxisEnd_deg,
+				SlaveRotaryDirection, SlaveAxisStart_deg, SlaveAxisEnd_deg );
 			return tableTypeData;
 		}
 	}
@@ -302,19 +310,19 @@ namespace MyCAM.FileManager
 				ToolDirection = ToolDirection,
 				MasterRotaryAxis = MasterRotaryAxis,
 				SlaveRotaryAxis = SlaveRotaryAxis,
-				MasterRotaryDirection = MasterRotaryDirection,
-				SlaveRotaryDirection = SlaveRotaryDirection,
 				MasterTiltedVec_deg = MasterTiltedVec_deg.ToXYZ(),
 				SlaveTiltedVec_deg = SlaveTiltedVec_deg.ToXYZ(),
 				SimulationOffset = SimulationOffset.ToVec(),
+				FullMachineSimulation = FullMachineSimulation,
 				ToolLength = ToolLength,
-				MasterAxisStart_deg = MasterAxisStart_deg,
-				MasterAxisEnd_deg = MasterAxisEnd_deg,
-				SlaveAxisStart_deg = SlaveAxisStart_deg,
-				SlaveAxisEnd_deg = SlaveAxisEnd_deg,
 				ToolToMasterVec = ToolToMasterVec.ToVec(),
 				MCSToSlaveVec = MCSToSlaveVec.ToVec()
 			};
+
+			// cal rotate center by itself
+			mixTypeData.InitRotateAxes(
+				MasterRotaryDirection, MasterAxisStart_deg, MasterAxisEnd_deg,
+				SlaveRotaryDirection, SlaveAxisStart_deg, SlaveAxisEnd_deg );
 			return mixTypeData;
 		}
 	}
