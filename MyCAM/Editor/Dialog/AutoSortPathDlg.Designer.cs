@@ -279,7 +279,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.m_nudExtrusionBandwidth)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_nudRotationBandwidth)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_picPreview)).EndInit();
-			this.TopMost = true;
 			this.ResumeLayout( false );
 			this.PerformLayout();
 		}

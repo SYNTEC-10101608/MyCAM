@@ -9,12 +9,11 @@ namespace MyCAM.Editor
     {
         protected FormBase()
         {
-            TopMost = true;
         }
 
-        public new void Show( IWin32Window owner = null )
+        public new void Show( IWin32Window owner )
         {
-            DialogShowHelper.ShowCentered( this );
+            DialogShowHelper.ShowCentered( this, owner );
         }
     }
 }

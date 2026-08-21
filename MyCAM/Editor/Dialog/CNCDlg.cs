@@ -4,9 +4,9 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
-	public partial class ControllerDlg : Form
+	public partial class CNCDlg : Form
 	{
-		public ControllerDlg()
+		public CNCDlg()
 		{
 			InitializeComponent();
 			ApplyResourcesToUI();
@@ -14,12 +14,12 @@ namespace MyCAM.Editor.Dialog
 
 		public void ApplyResourcesToUI()
 		{
-			this.Text = m_LanguageManager.TryGetString( "ControllerDlg", this.Text );
+			this.Text = m_LanguageManager.TryGetString( "CNCDlg", this.Text );
 			// calculate and store original aspect ratio
 			m_DlgHeightAndWidthRatio = (double)ClientSize.Width / ClientSize.Height;
 
 			// subscribe to ResizeEnd event to maintain aspect ratio
-			ResizeEnd += ControllerDlg_ResizeEnd;
+			ResizeEnd += CNCDlg_ResizeEnd;
 		}
 
 		protected override void OnFormClosed( FormClosedEventArgs e )
@@ -43,7 +43,7 @@ namespace MyCAM.Editor.Dialog
 		// flag for preventing recursive resizing
 		bool m_IsResizing = false;
 
-		void ControllerDlg_ResizeEnd( object sender, System.EventArgs e )
+		void CNCDlg_ResizeEnd( object sender, System.EventArgs e )
 		{
 			// prevent recursive resizing
 			if( m_IsResizing ) {
@@ -64,6 +64,6 @@ namespace MyCAM.Editor.Dialog
 			m_IsResizing = false;
 		}
 
-		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ControllerDlg" );
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "CNCDlg" );
 	}
 }

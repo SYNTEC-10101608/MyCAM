@@ -108,7 +108,7 @@ namespace MyCAM.Editor
 				fileDialog.Multiselect = false;
 
 				// double click file or click ok
-				if( fileDialog.ShowDialog() == DialogResult.OK ) {
+				if( fileDialog.ShowDialog( MyApp.MainForm ) == DialogResult.OK ) {
 					return fileDialog.FileName;
 				}
 

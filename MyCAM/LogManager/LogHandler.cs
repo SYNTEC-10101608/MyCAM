@@ -60,7 +60,7 @@ namespace MyCAM.LogManager
 
 			// Show message box if needed
 			if( needMessageBox ) {
-				MessageBox.Show( message, "Message", MessageBoxButtons.OK, icon );
+				MessageBox.Show( MyApp.MainForm, message, "Message", MessageBoxButtons.OK, icon );
 			}
 		}
 	}

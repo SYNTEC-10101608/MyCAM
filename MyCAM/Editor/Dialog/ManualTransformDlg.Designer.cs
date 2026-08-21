@@ -132,7 +132,6 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Name = "ManualTransformDlg";
 			this.Text = "工件對齊";
-			this.TopMost = true;
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

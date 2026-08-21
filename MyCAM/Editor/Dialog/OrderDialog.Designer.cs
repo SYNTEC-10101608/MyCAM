@@ -156,7 +156,6 @@
 			this.Name = "OrderDialog";
 			this.Padding = new System.Windows.Forms.Padding(9);
 			this.Text = "路徑排序";
-			this.TopMost = true;
 			this.m_gbxOrderMode.ResumeLayout(false);
 			this.m_gbxOrderMode.PerformLayout();
 			this.m_gbxContent.ResumeLayout(false);

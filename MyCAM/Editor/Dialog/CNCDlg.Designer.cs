@@ -1,6 +1,6 @@
 ﻿namespace MyCAM.Editor.Dialog
 {
-	partial class ControllerDlg
+	partial class CNCDlg
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -29,7 +29,7 @@
 		{
 			this.SuspendLayout();
 			// 
-			// ControllerDlg
+			// CNCDlg
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -38,7 +38,7 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.Name = "ControllerDlg";
+			this.Name = "CNCDlg";
 			this.ShowIcon = false;
 			this.Text = "控制器";
 			this.ResumeLayout(false);

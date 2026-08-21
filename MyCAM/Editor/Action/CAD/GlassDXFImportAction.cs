@@ -56,7 +56,7 @@ namespace MyCAM.Editor
 
 			// Show parameter dialog
 			GlassDXFImportDlg dlg = new GlassDXFImportDlg();
-			dlg.ShowDialog();
+			dlg.ShowDialog( MyApp.MainForm );
 			if( !dlg.Accepted ) {
 				End();
 				return;
