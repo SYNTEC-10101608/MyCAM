@@ -1,5 +1,4 @@
 ﻿using OCC.Bnd;
-using OCC.BOPTools;
 using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.BRepBndLib;
@@ -1159,13 +1158,8 @@ namespace OCCTool
 				return normal;
 			}
 
-			// step 6: fallback method, suppose not getting a better result, just in case
-			gp_Dir fallback = new gp_Dir();
-			BOPTools_AlgoTools3D.GetNormalToFaceOnEdge( edge, face, param, ref fallback );
-
-			if( face.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
-				fallback.Reverse();
-			}
+			// can't get normal, return a fallback direction (Z-axis)
+			gp_Dir fallback = new gp_Dir( 0, 0, 1 );
 			return fallback;
 		}
 
