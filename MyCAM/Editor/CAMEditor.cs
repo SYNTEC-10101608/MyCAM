@@ -650,7 +650,7 @@ namespace MyCAM.Editor
 				saveFileDialog.Title = m_LanguageManager.TryGetString( "SaveNCFileTitle", SAVE_NC_FILE_TITLE );
 				saveFileDialog.RestoreDirectory = true;
 
-				if( saveFileDialog.ShowDialog() != DialogResult.OK ) {
+				if( saveFileDialog.ShowDialog( MyApp.MainForm ) != DialogResult.OK ) {
 					return;
 				}
 

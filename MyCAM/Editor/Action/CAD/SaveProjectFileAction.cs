@@ -92,7 +92,7 @@ namespace MyCAM.Editor
 				fileDialog.Title = "儲存專案";
 				fileDialog.OverwritePrompt = true;
 				fileDialog.AddExtension = true;
-				if( fileDialog.ShowDialog() == DialogResult.OK ) {
+				if( fileDialog.ShowDialog( MyApp.MainForm ) == DialogResult.OK ) {
 					return fileDialog.FileName;
 				}
 

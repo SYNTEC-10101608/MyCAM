@@ -88,7 +88,6 @@ namespace MyCAM.Editor
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "MeasureDlg";
             this.Text = "¶q´ú";
-            this.TopMost = true;
             this.ResumeLayout(false);
             this.PerformLayout();
 

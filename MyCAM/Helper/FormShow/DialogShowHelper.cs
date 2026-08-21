@@ -6,7 +6,7 @@ namespace MyCAM.Helper.FormShow
 {
 	internal static class DialogShowHelper
 	{
-		public static void ShowCentered( Form dialog )
+		public static void ShowCentered( Form dialog, IWin32Window owner )
 		{
 			SetFormConfig( dialog );
 
@@ -19,7 +19,7 @@ namespace MyCAM.Helper.FormShow
 				dialog.StartPosition = FormStartPosition.Manual;
 				dialog.Location = centerLocation;
 			}
-			dialog.Show();
+			dialog.Show( owner );
 		}
 
 		public static void MoveToCenter( Form dialog )

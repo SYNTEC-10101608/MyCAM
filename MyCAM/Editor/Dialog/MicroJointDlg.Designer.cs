@@ -94,7 +94,6 @@
 			this.Name = "MicroJointDlg";
 			this.Padding = new System.Windows.Forms.Padding(9);
 			this.Text = "編輯微連";
-			this.TopMost = true;
 			((System.ComponentModel.ISupportInitialize)(this.m_tbxMicroJointLength)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();

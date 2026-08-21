@@ -56,7 +56,7 @@ namespace MyCAM.Editor
 			m_Dlg.RotateToFixDir += OnRotateToFixDir;
 			m_Dlg.RotateToZDir += OnRotateToZDir;
 			UpdateDialogUI();
-			m_Dlg.Show();
+			m_Dlg.Show( MyApp.MainForm );
 
 			// start path index action
 			m_PathIndexAction.AddLockedPaths( CreatLockList() );

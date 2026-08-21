@@ -144,7 +144,7 @@ namespace MyCAM.Editor
 			openDialog.Filter = filter;
 
 			// show file dialog
-			if( openDialog.ShowDialog() != DialogResult.OK ) {
+			if( openDialog.ShowDialog( MyApp.MainForm ) != DialogResult.OK ) {
 				return;
 			}
 

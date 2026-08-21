@@ -140,13 +140,13 @@ namespace MyCAM
 
 		protected override void WndProc( ref Message m )
 		{
-			// prevent dragging main form when ControllerDlg is open
+			// prevent dragging main form when CNCDlg is open
 			const int NON_Client_Area_Button_Down = 0xA1;
 			const int HIT_Title_Bar = 2;
 
 			// preventing form from being dragged when cnc dlg is showed
 			if( m.Msg == NON_Client_Area_Button_Down && m.WParam.ToInt32() == HIT_Title_Bar ) {
-				if( m_ControllerDlg != null && !m_ControllerDlg.IsDisposed ) {
+				if( m_CNCDlg != null && !m_CNCDlg.IsDisposed ) {
 
 					return;
 				}
@@ -180,7 +180,7 @@ namespace MyCAM
 		IEditor m_CurrentEditor;
 
 		// controller dialog
-		ControllerDlg m_ControllerDlg;
+		CNCDlg m_CNCDlg;
 
 		// UI list
 		Dictionary<EUIStatus, List<Control>> m_UIStatusDic;
@@ -1133,7 +1133,7 @@ namespace MyCAM
 			};
 
 			// Show the dialog and set focus
-			ConnectDlg.ShowDialog( MyApp.MainForm );
+			ConnectDlg.ShowDialog( this );
 			return isConnectSuccess;
 		}
 
@@ -1226,6 +1226,7 @@ namespace MyCAM
 				string title = m_LanguageManager.TryGetString( "Msg_SaveBeforeExitTitle", MSG_SAVE_BEFORE_EXIT_TITLE );
 
 				DialogResult result = MessageBox.Show(
+					this,
 					message,
 					title,
 					MessageBoxButtons.YesNoCancel,
@@ -1332,15 +1333,15 @@ namespace MyCAM
 				return;
 			}
 
-			// check if ControllerDlg is already open
-			if( m_ControllerDlg != null && !m_ControllerDlg.IsDisposed ) {
+			// check if CNCDlg is already open
+			if( m_CNCDlg != null && !m_CNCDlg.IsDisposed ) {
 
 				// bring existing dialog to front
-				m_ControllerDlg.Activate();
-				m_ControllerDlg.BringToFront();
+				m_CNCDlg.Activate();
+				m_CNCDlg.BringToFront();
 
 				// set at middle of main form
-				m_ControllerDlg.Location = MyApp.CalculateDialogCenterLocation( m_ControllerDlg );
+				m_CNCDlg.Location = MyApp.CalculateDialogCenterLocation( m_CNCDlg );
 				return;
 			}
 
@@ -1351,30 +1352,27 @@ namespace MyCAM
 			// disable maximize and minimize button
 			MaximizeBox = false;
 			MinimizeBox = false;
-			m_ControllerDlg = new ControllerDlg();
+			m_CNCDlg = new CNCDlg();
 
 			// set owner to keep z order
-			m_ControllerDlg.Owner = MyApp.MainForm;
-
-			// keep dialog on top
-			m_ControllerDlg.TopMost = true;
+			m_CNCDlg.Owner = MyApp.MainForm;
 
 			// show dialog at center of main form
-			m_ControllerDlg.StartPosition = FormStartPosition.Manual;
-			m_ControllerDlg.Location = MyApp.CalculateDialogCenterLocation( m_ControllerDlg );
-			m_ControllerDlg.PutVNCOnDlg();
+			m_CNCDlg.StartPosition = FormStartPosition.Manual;
+			m_CNCDlg.Location = MyApp.CalculateDialogCenterLocation( m_CNCDlg );
+			m_CNCDlg.PutVNCOnDlg();
 
 			// subscribe to FormClosed event to clean up reference and restore main form state
-			m_ControllerDlg.FormClosed += ( s, args ) =>
+			m_CNCDlg.FormClosed += ( s, args ) =>
 			{
 				// restore main form maximize and minimize buttons
 				MaximizeBox = m_OriginalMaximizeBox;
 				MinimizeBox = m_OriginalMinimizeBox;
-				m_ControllerDlg = null;
+				m_CNCDlg = null;
 			};
 
 			// show as modeless dialog (allows main form interaction)
-			m_ControllerDlg.Show( MyApp.MainForm );
+			m_CNCDlg.Show( MyApp.MainForm );
 		}
 
 		void m_tsbLayer1_Click( object sender, EventArgs e )
