@@ -246,26 +246,8 @@ namespace MyCAM.Editor
 				}
 			}
 
-			// make wire
-			List<TopoDS_Wire> pathWireList = new List<TopoDS_Wire>();
-			foreach( var oneEdgeGroup in edgeGroupList ) {
-				if( oneEdgeGroup.Count == 0 ) {
-					continue;
-				}
-				BRepBuilderAPI_MakeWire wireMaker = new BRepBuilderAPI_MakeWire();
-				foreach( var oneEdge in oneEdgeGroup ) {
-					wireMaker.Add( oneEdge );
-					if( !wireMaker.IsDone() ) {
-						break;
-					}
-				}
-				if( wireMaker.IsDone() ) {
-					pathWireList.Add( wireMaker.Wire() );
-				}
-			}
-
-			// update datas
-			m_DataManager.AddPath( pathWireList, m_EdgeFaceMap, true, maxDeflection, maxEdgeLength, discretizeMethod );
+			// pass edge groups directly to AddPath (no wire construction, avoids edge rebuilding)
+			m_DataManager.AddPath( edgeGroupList, m_EdgeFaceMap, true, maxDeflection, maxEdgeLength, discretizeMethod );
 			End();
 			return null;
 		}
