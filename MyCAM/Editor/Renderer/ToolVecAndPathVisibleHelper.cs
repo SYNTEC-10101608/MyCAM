@@ -74,7 +74,7 @@ namespace MyCAM.Editor.Renderer
 
 		#region Tool Vec
 
-		public static Dictionary<string, List<AIS_Line>> BuildToolVecAISDict( List<string> pathIDList, gp_Trsf trsf )
+		public static Dictionary<string, List<AIS_Line>> BuildToolVecAISDict( List<string> pathIDList, gp_Trsf trsf, bool isStartEndWithSpecialColor = true )
 		{
 			Dictionary<string, List<AIS_Line>> result = new Dictionary<string, List<AIS_Line>>();
 			foreach( string szPathID in pathIDList ) {
@@ -90,7 +90,7 @@ namespace MyCAM.Editor.Renderer
 					AIS_Line toolVecAIS = CreateVecAIS( point.Point, point.ToolVec );
 					// first and last points are always highlighted red
 					bool isModifiedStartEndPnt = i == 0 && craftData.StartPntToolVecData.StartPnt.AngleData != null || i == toolVecPointList.Count - 1 && craftData.StartPntToolVecData.EndPnt.AngleData != null;
-					if( isModifiedStartEndPnt || point.IsToolVecModPoint ) {
+					if(( isModifiedStartEndPnt && isStartEndWithSpecialColor) || point.IsToolVecModPoint ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
 					}
