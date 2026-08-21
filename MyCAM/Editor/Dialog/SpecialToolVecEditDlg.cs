@@ -18,13 +18,6 @@ namespace MyCAM.Editor
 			ApplyResourcesToUI();
 		}
 
-		public void SetSinglePathUI( SpecialToolVecData data )
-		{
-			SwitchType( data.Type );
-			SetUIPermissions( data.Type, false );
-			SetParam( data );
-		}
-
 		public void SwitchType( ESpecialToolVecType type )
 		{
 			m_IsUpdatingTypeUI = true;
@@ -46,14 +39,10 @@ namespace MyCAM.Editor
 			m_IsUpdatingTypeUI = false;
 		}
 
-		public void SetUIPermissions( ESpecialToolVecType type, bool isNeedToChangeDefaultValue = true )
+		public void SetUIPermissions( bool enableMSDeg, bool enableSwitchDir )
 		{
-			bool isAssignMS = type == ESpecialToolVecType.AssignMS;
-			m_gbxMSDeg.Enabled = isAssignMS;
-			m_gbxMSDeg.Visible = isAssignMS;
-			if( m_gbxMSDeg.Enabled == false ) {
-				SetMSAngleSilent( DEFAULT_Angle_Deg, DEFAULT_Angle_Deg );
-			}
+			m_gbxMSDeg.Enabled = enableMSDeg;
+			m_gbxSwitchDir.Enabled = enableSwitchDir;
 		}
 
 		#region Set textbox value silently
@@ -100,15 +89,6 @@ namespace MyCAM.Editor
 		const double DEFAULT_Angle_Deg = 0;
 		bool m_IsUpdatingTypeUI = false;
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SpecialToolVecEditDlg" );
-
-		void SetParam( SpecialToolVecData data )
-		{
-			SetMSAngleSilent( DEFAULT_Angle_Deg, DEFAULT_Angle_Deg );
-			if( data.Type != ESpecialToolVecType.AssignMS ) {
-				return;
-			}
-			SetMSAngleSilent( data.MasterAngle_deg, data.SlaveAngle_deg );
-		}
 
 		void m_btnCancel_Click( object sender, EventArgs e )
 		{
@@ -184,25 +164,21 @@ namespace MyCAM.Editor
 		void SetAsDefaultMode()
 		{
 			CheckRadioButton( ESpecialToolVecType.Normal );
-			SetUIPermissions( ESpecialToolVecType.Normal );
 		}
 
 		void SetAsFixDirMode()
 		{
 			CheckRadioButton( ESpecialToolVecType.FixDir );
-			SetUIPermissions( ESpecialToolVecType.FixDir );
 		}
 
 		void SetAsAssignMSMode()
 		{
 			CheckRadioButton( ESpecialToolVecType.AssignMS );
-			SetUIPermissions( ESpecialToolVecType.AssignMS );
 		}
 
 		void SetAsZDirMode()
 		{
 			CheckRadioButton( ESpecialToolVecType.ZDir );
-			SetUIPermissions( ESpecialToolVecType.ZDir );
 		}
 
 		void TypeChange()

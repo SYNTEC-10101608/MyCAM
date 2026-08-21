@@ -144,15 +144,7 @@ namespace MyCAM.Editor.Renderer
 		void BuildAndDisplayToolVec( List<string> pathIDList, gp_Trsf trsf )
 		{
 			Dictionary<string, List<AIS_Line>> built = new Dictionary<string, List<AIS_Line>>();
-			if( m_RenderType == RenderType.ToolVecEdit ) {
-				
-				// build tool vec using shared helper
-				built = ToolVecAndPathVisibleHelper.BuildToolVecAISDict( pathIDList, trsf );
-
-			}
-			else {
-				built = ToolVecAndPathVisibleHelper.BuildSpecialToolVecAISDict( pathIDList, trsf );
-			}
+			built = ToolVecAndPathVisibleHelper.BuildToolVecAISDict( pathIDList, trsf, m_RenderType == RenderType.ToolVecEdit );
 			foreach( var kvp in built ) {
 				m_ToolVecAISDict.Add( kvp.Key, kvp.Value );
 			}

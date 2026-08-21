@@ -10,6 +10,8 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCViewer;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -561,8 +563,17 @@ namespace MyCAM.Editor
 
 			// unregister old shape mapping before replacing geometry
 			TopoDS_Shape oldShape = pathAIS.Shape();
+
+			// ask occ AIS_InteractiveContext if the path was selected before we replace the geometry
+			bool wasSelected = m_Viewer.GetAISContext().IsSelected( pathAIS );
 			if( oldShape != null && !oldShape.IsNull() ) {
 				UnregisterShapeIDMapping( oldShape );
+
+				if( wasSelected ) {
+
+					// detach selection
+					m_Viewer.GetAISContext().AddOrRemoveSelected( pathAIS, false );
+				}
 			}
 
 			// get updated path point data
@@ -587,6 +598,13 @@ namespace MyCAM.Editor
 			pathAIS.Set( pathWire );
 			RegisterShapeIDMapping( pathWire, pathID );
 			m_Viewer.GetAISContext().Redisplay( pathAIS, false );
+
+			// restore selection using the freshly built owner (clears the orphan residue)
+			if( wasSelected ) {
+
+				// reattach selection
+				m_Viewer.GetAISContext().AddOrRemoveSelected( pathAIS, false );
+			}
 		}
 
 		public void UpdatePaths( List<string> pathIDList )

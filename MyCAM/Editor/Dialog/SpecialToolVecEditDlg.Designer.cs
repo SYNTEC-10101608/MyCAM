@@ -215,6 +215,7 @@ namespace MyCAM.Editor
             0,
             -2147483648});
 			this.m_dbtnSlave.Name = "m_dbtnSlave";
+			this.m_dbtnSlave.RestrictInvalidCharacters = false;
 			this.m_dbtnSlave.Size = new System.Drawing.Size(55, 22);
 			this.m_dbtnSlave.TabIndex = 9;
 			this.m_dbtnSlave.DebouncedValueChanged += new System.EventHandler(this.m_dbtnSlave_DebouncedValueChanged);
@@ -235,6 +236,7 @@ namespace MyCAM.Editor
             0,
             -2147483648});
 			this.m_dbtnMaster.Name = "m_dbtnMaster";
+			this.m_dbtnMaster.RestrictInvalidCharacters = false;
 			this.m_dbtnMaster.Size = new System.Drawing.Size(55, 22);
 			this.m_dbtnMaster.TabIndex = 8;
 			this.m_dbtnMaster.DebouncedValueChanged += new System.EventHandler(this.m_dbtnMaster_DebouncedValueChanged);
