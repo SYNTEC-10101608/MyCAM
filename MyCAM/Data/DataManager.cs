@@ -1,4 +1,5 @@
 using MyCAM.Helper;
+using OCC.BRep;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopExp;
@@ -197,7 +198,7 @@ namespace MyCAM.Data
 			RaiseFeatureAdded( new List<string>() { szID } );
 		}
 
-		// the edge map contains all edges in all wire to be add
+		// NOTE: the wire must be extracted directly from the face geometry
 		public void AddPath( List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap, bool shouldTriggerEvent = true,
 			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
 			double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
@@ -206,48 +207,123 @@ namespace MyCAM.Data
 			if( pathWireList == null || pathWireList.Count == 0 || allEdgeMap == null ) {
 				return;
 			}
-			List<string> newPathIDList = new List<string>();
+
+			// Use the edge map to explode each wire into an ordered edge list, then call the overload that takes edge groups directly
+			List<List<TopoDS_Edge>> pathEdgeGroupList = new List<List<TopoDS_Edge>>();
 			foreach( var pathWire in pathWireList ) {
+				pathEdgeGroupList.Add( ExplodeWireToEdgeList( pathWire ) );
+			}
+			AddPath( pathEdgeGroupList, allEdgeMap, shouldTriggerEvent, maxDeflection, maxEdgeLength, discretizeMethod );
+		}
 
-				// explore the path wire to get edges and component faces
-				TopExp_Explorer exp = new TopExp_Explorer( pathWire, TopAbs_ShapeEnum.TopAbs_EDGE );
-				List<PathEdge5D> pathElements = new List<PathEdge5D>();
-				bool isValidPath = true;
-				while( exp.More() ) {
-					TopoDS_Edge oneEdge = TopoDS.ToEdge( exp.Current() );
+		// explode a wire into its ordered edge list
+		List<TopoDS_Edge> ExplodeWireToEdgeList( TopoDS_Wire pathWire )
+		{
+			List<TopoDS_Edge> edgeList = new List<TopoDS_Edge>();
+			if( pathWire == null ) {
+				return edgeList;
+			}
+			TopExp_Explorer exp = new TopExp_Explorer( pathWire, TopAbs_ShapeEnum.TopAbs_EDGE );
+			while( exp.More() ) {
+				edgeList.Add( TopoDS.ToEdge( exp.Current() ) );
+				exp.Next();
+			}
+			return edgeList;
+		}
 
-					// edge not found in the edge map
-					if( !allEdgeMap.Contains( oneEdge ) || allEdgeMap.FindFromKey( oneEdge ).Size() == 0 ) {
-						isValidPath = false;
-						break;
-					}
+		// overload that takes edge groups directly, bypassing wire construction
+		public void AddPath( List<List<TopoDS_Edge>> pathEdgeGroupList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap, bool shouldTriggerEvent = true,
+			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
+			double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
+			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD )
+		{
+			if( pathEdgeGroupList == null || pathEdgeGroupList.Count == 0 || allEdgeMap == null ) {
+				return;
+			}
 
-					// pick the first face from map, and it should be only one face
-					if( allEdgeMap.FindFromKey( oneEdge ).Size() != 1 ) {
-						isValidPath = false;
-						break;
-					}
-					TopoDS_Face oneFace = TopoDS.ToFace( allEdgeMap.FindFromKey( oneEdge ).First().Ptr );
-					pathElements.Add( new PathEdge5D( oneEdge, oneFace ) );
-					exp.Next();
+			// validate each edge group, build path elements, and add to the data manager
+			List<string> newPathIDList = new List<string>();
+			foreach( var edgeGroup in pathEdgeGroupList ) {
+				if( edgeGroup == null || edgeGroup.Count == 0 ) {
+					continue;
 				}
+
+				// validate edges and build path elements
+				List<PathEdge5D> pathElements = ValidateAndBuildPathElements( edgeGroup, allEdgeMap );
+				if( pathElements == null ) {
+					continue;
+				}
+
+				// determine if closed by comparing first and last edge endpoints
+				bool isClosed = DetermineIfClosed( pathElements );
 
 				// add valid path
-				if( isValidPath ) {
-					string szID = "Path_" + ++m_PathID;
-					ContourPathObject contourPathObject = new ContourPathObject( szID, pathWire, pathElements,
-						maxDeflection, maxEdgeLength, discretizeMethod );
-					contourPathObject.CraftData.TraverseData = new TraverseData();
-					ObjectMap[ szID ] = contourPathObject;
-					newPathIDList.Add( szID );
-				}
+				string szID = "Path_" + ++m_PathID;
+				ContourPathObject contourPathObject = new ContourPathObject( szID, pathElements, isClosed,
+					maxDeflection, maxEdgeLength, discretizeMethod );
+				contourPathObject.CraftData.TraverseData = new TraverseData();
+				ObjectMap[ szID ] = contourPathObject;
+				newPathIDList.Add( szID );
 			}
 
 			// add to path ID list
 			PathIDList.AddRange( newPathIDList );
 
+			// trigger event if needed
 			if( shouldTriggerEvent && newPathIDList.Count > 0 ) {
 				PathAdded?.Invoke( newPathIDList );
+			}
+		}
+
+		List<PathEdge5D> ValidateAndBuildPathElements( List<TopoDS_Edge> edgeGroup, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap )
+		{
+			List<PathEdge5D> pathElements = new List<PathEdge5D>();
+			foreach( var oneEdge in edgeGroup ) {
+
+				// edge not found in the edge map
+				if( !allEdgeMap.Contains( oneEdge ) || allEdgeMap.FindFromKey( oneEdge ).Size() == 0 ) {
+					return null;
+				}
+
+				// pick the first face from map, and it should be only one face
+				if( allEdgeMap.FindFromKey( oneEdge ).Size() != 1 ) {
+					return null;
+				}
+
+				// create a PathEdge5D object with the edge and its associated face
+				TopoDS_Face oneFace = TopoDS.ToFace( allEdgeMap.FindFromKey( oneEdge ).First().Ptr );
+				pathElements.Add( new PathEdge5D( oneEdge, oneFace ) );
+			}
+			return pathElements;
+		}
+
+		// determine if a path is closed by comparing first and last edge endpoints
+		bool DetermineIfClosed( List<PathEdge5D> pathElements )
+		{
+			if( pathElements == null ) {
+				return false;
+			}
+
+			// a valid path must have at least two edges to be considered closed
+			if( pathElements.Count < 2 ) {
+				return false;
+			}
+
+			try {
+				TopoDS_Vertex firstStart = new TopoDS_Vertex();
+				TopoDS_Vertex firstEnd = new TopoDS_Vertex();
+				TopExp.Vertices( pathElements[ 0 ].PathEdge, ref firstStart, ref firstEnd );
+
+				TopoDS_Vertex lastStart = new TopoDS_Vertex();
+				TopoDS_Vertex lastEnd = new TopoDS_Vertex();
+				TopExp.Vertices( pathElements[ pathElements.Count - 1 ].PathEdge, ref lastStart, ref lastEnd );
+
+				gp_Pnt firstPnt = BRep_Tool.Pnt( firstStart );
+				gp_Pnt lastPnt = BRep_Tool.Pnt( lastEnd );
+				return firstPnt.IsEqual( lastPnt, CONNECT_TOLERANCE );
+			}
+			catch {
+				return false;
 			}
 		}
 
@@ -409,6 +485,9 @@ namespace MyCAM.Data
 		int m_EdgeID = 0;
 		int m_VertexID = 0;
 		int m_PathID = 0;
+
+		// tolerance to judge if two path edge end points are at the same position
+		const double CONNECT_TOLERANCE = 1e-3;
 
 		// machine data
 		IMachineDataBase m_MachineData = null;

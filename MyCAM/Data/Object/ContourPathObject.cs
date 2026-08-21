@@ -11,20 +11,20 @@ namespace MyCAM.Data
 {
 	public class ContourPathObject : PathObject
 	{
-		public ContourPathObject( string szUID, TopoDS_Shape shape, List<PathEdge5D> pathDataList,
+		// overload that takes pre-computed isClosed flag, for callers that build path from edge list directly
+		public ContourPathObject( string szUID, List<PathEdge5D> pathDataList, bool isClosed,
 			double maxDeflection = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
 			double maxEdgeLength = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
 			OCCTool.EDiscretizeMethod discretizeMethod = OCCTool.GeometryTool.DEFAULT_DISCRETIZE_METHOD )
 			: base( szUID )
 		{
-			if( string.IsNullOrEmpty( szUID ) || shape == null || shape.IsNull() || pathDataList == null ) {
+			if( string.IsNullOrEmpty( szUID ) || pathDataList == null ) {
 				throw new ArgumentNullException( "ContourPathObject constructing argument null" );
 			}
 			if( pathDataList.Count == 0 ) {
 				throw new ArgumentException( "ContourPathObject constructing argument empty pathDataList" );
 			}
 
-			bool isClosed = DetermineIfClosed( shape );
 			m_ContourGeomData = new ContourGeomData( pathDataList, isClosed, maxDeflection, maxEdgeLength, discretizeMethod );
 			m_CraftData = new CraftData();
 			m_ContourCache = new ContourCache( m_ContourGeomData, m_CraftData );
@@ -95,27 +95,6 @@ namespace MyCAM.Data
 				return;
 			}
 			m_CraftData.StartPntToolVecData.EndPnt = modifyData;
-		}
-
-		bool DetermineIfClosed( TopoDS_Shape shapeData )
-		{
-			if( shapeData == null || shapeData.IsNull() )
-				return false;
-
-			try {
-				TopoDS_Vertex startVertex = new TopoDS_Vertex();
-				TopoDS_Vertex endVertex = new TopoDS_Vertex();
-				TopExp.Vertices( TopoDS.ToWire( shapeData ), ref startVertex, ref endVertex );
-
-				gp_Pnt startPoint = BRep_Tool.Pnt( TopoDS.ToVertex( startVertex ) );
-				gp_Pnt endPoint = BRep_Tool.Pnt( TopoDS.ToVertex( endVertex ) );
-
-				return startPoint.IsEqual( endPoint, 1e-3 );
-			}
-			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "DetermineClosedPathError", DETERMINE_CLOSED_PATH_ERROR ), ex.Message ), MyApp.NoticeType.Warning );
-				return false;
-			}
 		}
 
 		ContourGeomData m_ContourGeomData;
