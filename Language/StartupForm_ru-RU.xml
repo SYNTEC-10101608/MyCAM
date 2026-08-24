@@ -10,7 +10,7 @@
 	<Message ID="m_tsmiCAM" Content="CAM" />
 	<Message ID="m_tsmiSimulation" Content="Симуляция" />
 	<Message ID="m_tsbSetting" Content="Параметры" />
-	<Message ID="m_tsbVNCConnection" Content="Параметры подключения VNC" />
+	<Message ID="m_tsbCNCConnection" Content="Параметры подключения CNC" />
 	<Message ID="m_tsmiLanguage" Content="Переключение языка" />
 	<Message ID="m_tsbController" Content="Контроллер" />
 
@@ -149,8 +149,13 @@
 	<Message ID="Log_VNCConnectFailed" Content="Не удалось подключиться к указанному IP-адресу" />
 	<Message ID="Log_VNCUnknownError" Content="Неизвестная ошибка при подключении VNC" />
 	<Message ID="Log_RevolutionFailed" Content="Ошибка создания тела вращения" />
+	<Message ID="Log_CNCConnectFailed" Content="Сбой подключения ЧПУ" />
+	<Message ID="Log_CNCConnectSuccess" Content="Подключение ЧПУ успешно" />
+	<Message ID="Log_CNCReconnecting" Content="Переподключение ЧПУ..." />
+	<Message ID="Log_CNCReconnected" Content="Успешное переподключение ЧПУ" />
+	<Message ID="Log_CNCReconnectFailed" Content="Переподключение ЧПУ не удалось, пожалуйста, проверьте состояние сети или ЧПУ" />
+	<Message ID="Log_CNCPleaseConnectFirst" Content="Сначала подключитесь к ЧПУ. Пожалуйста, проверьте соединение ЧПУ и повторите попытку." />
 
-	
 	<Message ID="Msg_SaveBeforeExitTitle" Content="Подтверждение сохранения" />
 	<Message ID="Msg_SaveBeforeExitWithData" Content="Хотите ли вы сохранить перед закрытием?" />
 </ResMap>

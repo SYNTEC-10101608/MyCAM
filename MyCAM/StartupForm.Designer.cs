@@ -34,7 +34,7 @@
 			this.m_tsmiCAM = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiSimulation = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsbSetting = new System.Windows.Forms.ToolStripMenuItem();
-			this.m_tsbVNCConnection = new System.Windows.Forms.ToolStripMenuItem();
+			this.m_tsbCNCConnection = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsmiLanguage = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsbController = new System.Windows.Forms.ToolStripMenuItem();
 			this.m_tsCAMFunction = new System.Windows.Forms.ToolStrip();
@@ -187,18 +187,18 @@
 			// m_tsbSetting
 			// 
 			this.m_tsbSetting.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tsbVNCConnection,
+            this.m_tsbCNCConnection,
             this.m_tsmiLanguage});
 			this.m_tsbSetting.Name = "m_tsbSetting";
 			this.m_tsbSetting.Size = new System.Drawing.Size(53, 23);
 			this.m_tsbSetting.Text = "設定";
 			// 
-			// m_tsbVNCConnection
+			// m_tsbCNCConnection
 			// 
-			this.m_tsbVNCConnection.Name = "m_tsbVNCConnection";
-			this.m_tsbVNCConnection.Size = new System.Drawing.Size(184, 26);
-			this.m_tsbVNCConnection.Text = "VNC連線設定";
-			this.m_tsbVNCConnection.Click += new System.EventHandler(this.m_tsbVNCConnection_Click);
+			this.m_tsbCNCConnection.Name = "m_tsbCNCConnection";
+			this.m_tsbCNCConnection.Size = new System.Drawing.Size(184, 26);
+			this.m_tsbCNCConnection.Text = "CNC連線設定";
+			this.m_tsbCNCConnection.Click += new System.EventHandler(this.m_tsbCNCConnection_Click);
 			// 
 			// m_tsmiLanguage
 			// 
@@ -1410,7 +1410,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbShowTraverse;
 		private System.Windows.Forms.TableLayoutPanel m_panBackGround;
 		private System.Windows.Forms.ToolStripMenuItem m_tsbSetting;
-		private System.Windows.Forms.ToolStripMenuItem m_tsbVNCConnection;
+		private System.Windows.Forms.ToolStripMenuItem m_tsbCNCConnection;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSimulation;
 		private System.Windows.Forms.ToolStrip m_tsSimuFunc;
 		private System.Windows.Forms.ToolStripButton m_btnPlay;
