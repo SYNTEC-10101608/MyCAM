@@ -10,7 +10,7 @@
 	<Message ID="m_tsmiCAM" Content="CAM" />
 	<Message ID="m_tsmiSimulation" Content="模拟" />
 	<Message ID="m_tsbSetting" Content="设定" />
-	<Message ID="m_tsbVNCConnection" Content="VNC连线设定" />
+	<Message ID="m_tsbCNCConnection" Content="CNC连线设定" />
 	<Message ID="m_tsmiLanguage" Content="语系切换" />
 	<Message ID="m_tsbController" Content="控制器" />
 
@@ -149,6 +149,12 @@
 	<Message ID="Log_VNCConnectFailed" Content="无法连线到指定IP位置" />
 	<Message ID="Log_VNCUnknownError" Content="VNC连线过程发生未知错误" />
 	<Message ID="Log_RevolutionFailed" Content="回转体建立失败" />
+	<Message ID="Log_CNCConnectFailed" Content="CNC 连线失败" />
+	<Message ID="Log_CNCConnectSuccess" Content="CNC 连线成功" />
+	<Message ID="Log_CNCReconnecting" Content="CNC 重新连线中..." />
+	<Message ID="Log_CNCReconnected" Content="CNC 重新连线成功" />
+	<Message ID="Log_CNCReconnectFailed" Content="CNC 重新连线失败，请检查网路或 CNC 状态" />
+	<Message ID="Log_CNCPleaseConnectFirst" Content="尚未和CNC连线，请先进行CNC连线" />
 
 	<!-- 存檔提示 -->
 	<Message ID="Msg_SaveBeforeExitTitle" Content="存档确认" />

@@ -1,4 +1,6 @@
-﻿using MyCAM.App;
+﻿using CncManager;
+using CncManager.Definition;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using MyCAM.Editor.Dialog;
@@ -207,6 +209,12 @@ namespace MyCAM
 		const string LOG_VNC_FILE_NOT_FOUND = "找不到VNC執行檔，請確認VNC執行檔與程式執行檔在同一資料夾下";
 		const string LOG_VNC_CONNECT_FAILED = "無法連線到指定IP位置";
 		const string LOG_VNC_UNKNOWN_ERROR = "VNC連線過程發生未知錯誤";
+		const string LOG_CNC_CONNECT_FAILED = "CNC 連線失敗";
+		const string LOG_CNC_CONNECT_SUCCESS = "CNC 連線成功";
+		const string LOG_CNC_RECONNECTING = "CNC 重新連線中...";
+		const string LOG_CNC_RECONNECTED = "CNC 重新連線成功";
+		const string LOG_CNC_RECONNECT_FAILED = "CNC 重新連線失敗，請檢查網路或 CNC 狀態";
+		const string LOG_CNC_PLEASE_CONNECT_FIRST = "尚未和CNC連線，請先進行CNC連線";
 		const string MSG_SAVE_BEFORE_EXIT_TITLE = "存檔確認";
 		const string MSG_SAVE_BEFORE_EXIT_WITH_DATA = "是否要在關閉前存檔？";
 
@@ -1119,6 +1127,9 @@ namespace MyCAM
 					case VNCConnectionResult.Success:
 						MyApp.CNCIP = ip;
 						isConnectSuccess = true;
+
+						// connect CNC after VNC success
+						ConnectCncByManager( ip );
 						break;
 					case VNCConnectionResult.FileNotFound:
 						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_VNCFileNotFound", LOG_VNC_FILE_NOT_FOUND ), MyApp.NoticeType.Error, true );
@@ -1137,7 +1148,7 @@ namespace MyCAM
 			return isConnectSuccess;
 		}
 
-		void m_tsbVNCConnection_Click( object sender, EventArgs e )
+		void m_tsbCNCConnection_Click( object sender, EventArgs e )
 		{
 			bool isConnectSuccess = SetAndDoConnect();
 
@@ -1245,6 +1256,14 @@ namespace MyCAM
 			}
 
 			CleanupVNCConnections();
+
+			// disconnect CNC
+			try {
+				CncClient.Instance.Disconnect();
+			}
+			catch( Exception ) {
+				// ignore, closing anyway
+			}
 		}
 
 		#endregion
@@ -1325,11 +1344,9 @@ namespace MyCAM
 
 		void m_tsbController_Click( object sender, EventArgs e )
 		{
-			bool isConnectSuccess = true;
-			if( string.IsNullOrWhiteSpace( MyApp.CNCIP ) ) {
-				isConnectSuccess = SetAndDoConnect();
-			}
-			if( isConnectSuccess == false ) {
+			// no valid VNC connection, ask user to connect first
+			if( MyApp.VNCScreen == null || MyApp.VNCScreen.IsDisposed || !MyApp.VNCScreen.IsConnected ) {
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCPleaseConnectFirst", LOG_CNC_PLEASE_CONNECT_FIRST ), MyApp.NoticeType.Warning, true );
 				return;
 			}
 
@@ -1373,6 +1390,57 @@ namespace MyCAM
 
 			// show as modeless dialog (allows main form interaction)
 			m_CNCDlg.Show( MyApp.MainForm );
+		}
+
+		void ConnectCncByManager( string ip )
+		{
+			try {
+				// set UI thread context for event callback
+				CncClient.Instance.SetSynchronizationContext( System.Threading.SynchronizationContext.Current );
+
+				// subscribe connect-failed event to log the reason
+				CncClient.Instance.ConnectFailed -= OnCncConnectFailed;
+				CncClient.Instance.ConnectFailed += OnCncConnectFailed;
+
+				bool isSuccess = CncClient.Instance.Connect( ip );
+				if( !isSuccess ) {
+					// Error message show by event
+					return;
+				}
+
+				// subscribe cnc event after connect (unsubscribe first to avoid duplicate)
+				CncClient.Instance.ReconnectStatusChanged -= OnCncReconnectEvent;
+				CncClient.Instance.ReconnectStatusChanged += OnCncReconnectEvent;
+
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCConnectSuccess", LOG_CNC_CONNECT_SUCCESS ), MyApp.NoticeType.Hint );
+			}
+			catch( Exception ex ) {
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCConnectFailed", LOG_CNC_CONNECT_FAILED ) + ": " + ex.Message, MyApp.NoticeType.Error );
+			}
+		}
+
+		void OnCncConnectFailed( string errorMessage )
+		{
+			string message = m_LanguageManager.TryGetString( "Log_CNCConnectFailed", LOG_CNC_CONNECT_FAILED );
+			if( !string.IsNullOrEmpty( errorMessage ) ) {
+				message += ": " + errorMessage;
+			}
+			MyApp.Logger.ShowOnLogPanel( message, MyApp.NoticeType.Error );
+		}
+
+		void OnCncReconnectEvent( ERecconectStage eventType )
+		{
+			switch( eventType ) {
+				case ERecconectStage.Reconnecting:
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCReconnecting", LOG_CNC_RECONNECTING ), MyApp.NoticeType.Hint );
+					break;
+				case ERecconectStage.Reconnected:
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCReconnected", LOG_CNC_RECONNECTED ), MyApp.NoticeType.Hint );
+					break;
+				case ERecconectStage.ReconnectFailed:
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCReconnectFailed", LOG_CNC_RECONNECT_FAILED ), MyApp.NoticeType.Error );
+					break;
+			}
 		}
 
 		void m_tsbLayer1_Click( object sender, EventArgs e )
@@ -1441,7 +1509,7 @@ namespace MyCAM
 			m_tsmiCAM.Text = m_LanguageManager.TryGetString( "m_tsmiCAM", m_tsmiCAM.Text );
 			m_tsmiSimulation.Text = m_LanguageManager.TryGetString( "m_tsmiSimulation", m_tsmiSimulation.Text );
 			m_tsbSetting.Text = m_LanguageManager.TryGetString( "m_tsbSetting", m_tsbSetting.Text );
-			m_tsbVNCConnection.Text = m_LanguageManager.TryGetString( "m_tsbVNCConnection", m_tsbVNCConnection.Text );
+			m_tsbCNCConnection.Text = m_LanguageManager.TryGetString( "m_tsbCNCConnection", m_tsbCNCConnection.Text );
 			m_tsmiLanguage.Text = m_LanguageManager.TryGetString( "m_tsmiLanguage", m_tsmiLanguage.Text );
 			m_tsbController.Text = m_LanguageManager.TryGetString( "m_tsbController", m_tsbController.Text );
 

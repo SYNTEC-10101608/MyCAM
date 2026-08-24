@@ -507,6 +507,10 @@
       <Project>{b70d417c-8417-49ee-ac5f-dc0bcfd2e38e}</Project>
       <Name>OCCViewer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CncManager\CncManager.csproj">
+      <Project>{F7A30260-B445-48EB-8218-B7231D88FDF5}</Project>
+      <Name>CncManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\Axo.png" />

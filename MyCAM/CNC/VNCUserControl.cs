@@ -26,10 +26,18 @@ namespace VNCFormsApp
 			private set;
 		}
 
+		// true only when the VNC connection was established successfully
+		internal bool IsConnected
+		{
+			get;
+			private set;
+		}
+
 		public VNCUserControl( string szIP )
 		{
 			InitializeComponent();
 			ConnectionResult = StartUltraVNC( CONTROLLER_WIDTH, CONTROLLER_HEIGHT, szIP );
+			IsConnected = ConnectionResult == VNCConnectionResult.Success;
 		}
 
 		public void ScreenResizeByParentSize( int nParentWidth, int nParentHeight, out int nVNCStartX, out int nVNCStartY )
