@@ -300,27 +300,39 @@ namespace MyCAM.Data
 		// determine if a path is closed by comparing first and last edge endpoints
 		bool DetermineIfClosed( List<PathEdge5D> pathElements )
 		{
-			if( pathElements == null ) {
+			if( pathElements == null || pathElements.Count == 0 ) {
+				return false;
+			}
+			if( !GetEdgeStartAndEndPoints( pathElements[ 0 ].PathEdge, out gp_Pnt firstStart, out gp_Pnt firstEnd ) ) {
 				return false;
 			}
 
-			// a valid path must have at least two edges to be considered closed
-			if( pathElements.Count < 2 ) {
-				return false;
+			// single edge, closed if its own start and end points coincide
+			if( pathElements.Count == 1 ) {
+				return firstStart.IsEqual( firstEnd, CONNECT_TOLERANCE );
 			}
 
+			// multi edges, closed if the last edge end point goes back to the first edge start point
+			if( !GetEdgeStartAndEndPoints( pathElements[ pathElements.Count - 1 ].PathEdge, out _, out gp_Pnt lastEnd ) ) {
+				return false;
+			}
+			return firstStart.IsEqual( lastEnd, CONNECT_TOLERANCE );
+		}
+
+		bool GetEdgeStartAndEndPoints( TopoDS_Edge edge, out gp_Pnt startPnt, out gp_Pnt endPnt )
+		{
+			startPnt = null;
+			endPnt = null;
 			try {
-				TopoDS_Vertex firstStart = new TopoDS_Vertex();
-				TopoDS_Vertex firstEnd = new TopoDS_Vertex();
-				TopExp.Vertices( pathElements[ 0 ].PathEdge, ref firstStart, ref firstEnd );
-
-				TopoDS_Vertex lastStart = new TopoDS_Vertex();
-				TopoDS_Vertex lastEnd = new TopoDS_Vertex();
-				TopExp.Vertices( pathElements[ pathElements.Count - 1 ].PathEdge, ref lastStart, ref lastEnd );
-
-				gp_Pnt firstPnt = BRep_Tool.Pnt( firstStart );
-				gp_Pnt lastPnt = BRep_Tool.Pnt( lastEnd );
-				return firstPnt.IsEqual( lastPnt, CONNECT_TOLERANCE );
+				TopoDS_Vertex startVertex = new TopoDS_Vertex();
+				TopoDS_Vertex endVertex = new TopoDS_Vertex();
+				TopExp.Vertices( edge, ref startVertex, ref endVertex, true );
+				if( startVertex == null || startVertex.IsNull() || endVertex == null || endVertex.IsNull() ) {
+					return false;
+				}
+				startPnt = BRep_Tool.Pnt( startVertex );
+				endPnt = BRep_Tool.Pnt( endVertex );
+				return startPnt != null && endPnt != null;
 			}
 			catch {
 				return false;
