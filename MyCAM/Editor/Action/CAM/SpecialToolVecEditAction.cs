@@ -720,13 +720,11 @@ namespace MyCAM.Editor
 		void RefreshSimuResult()
 		{
 			if( m_CurrentPathIDList.Count() == 0 ) {
-				HideMachine?.Invoke();
-				m_ToolVecEditRender?.Show();
-				ResetPartUI?.Invoke();
-				m_Viewer.UpdateView();
+				OnlyShowSelectedToolVec();
 				return;
 			}
 
+			// protection
 			bool isGotMachineData = DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData );
 			if( !isGotMachineData ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotGetMachineData", CANNOT_GET_MACHINE_DATA ), MyApp.NoticeType.Warning );
@@ -742,49 +740,51 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			if( specialToolVecData.Type == ESpecialToolVecType.Normal ) {
-				HideMachine?.Invoke();
-				m_ToolVecEditRender?.Show();
-				ResetPartUI?.Invoke();
-				m_Viewer.UpdateView();
-				return;
-			}
-
-			// multi select with diff dir
-			if( m_IsSingleSelcet == false && specialToolVecData.Type != ESpecialToolVecType.AssignMS ) {
-				HideMachine?.Invoke();
-				m_ToolVecEditRender?.Show();
-				ResetPartUI?.Invoke();
-				m_Viewer.UpdateView();
-				return;
-			}
-
 			CAMPoint startPnt = CacheHelper.GetMainPathStartPoint( m_CurrentPathIDList.First() );
 			bool isGotSpecialToolVecData = GetSimulationData( machineData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransMap, startPnt );
-			if( !isGotSpecialToolVecData ) {
-				return;
-			}
-			if( !ValidateFrameTransformMap( frameTransMap ) ) {
+			if( isGotSpecialToolVecData == false || ValidateFrameTransformMap( frameTransMap ) == false ) {
 				return;
 			}
 
+			// single select mode
 			if( m_IsSingleSelcet ) {
+
+				// do not need to simulation
+				if( specialToolVecData.Type == ESpecialToolVecType.Normal ) {
+					OnlyShowSelectedToolVec();
+					return;
+				}
 
 				// false means pause the viewer, because m_ToolVecEditRender will cause viewer flash
 				RaiseTrans?.Invoke( frameTransMap, false );
 				m_ToolVecEditRender.ShowTrans( frameTransMap[ MachineComponentType.WorkPiece ].Last() );
 				EnableViewImmediateUpdate();
+				m_Viewer.UpdateView();
+				return;
 			}
-			else {
 
-				// multi and assignMS as same param
-				if( IsPathSameParam() ) {
-					// false means pause the viewer, because m_ToolVecEditRender will cause viewer flash
-					RaiseTrans?.Invoke( frameTransMap, false );
-					m_ToolVecEditRender.ShowTrans( frameTransMap[ MachineComponentType.WorkPiece ].Last() );
-					EnableViewImmediateUpdate();
-				}
+			// multi and assignMS as same param
+			if( IsPathSameParam() ) {
+
+				// false means pause the viewer, because m_ToolVecEditRender will cause viewer flash
+				RaiseTrans?.Invoke( frameTransMap, false );
+				m_ToolVecEditRender.ShowTrans( frameTransMap[ MachineComponentType.WorkPiece ].Last() );
+				EnableViewImmediateUpdate();
+				m_Viewer.UpdateView();
+				return;
 			}
+
+			// multi select with diff param or all paths are normal type
+			OnlyShowSelectedToolVec();
+		}
+
+		void OnlyShowSelectedToolVec()
+		{
+			HideMachine?.Invoke();
+			m_ToolVecEditRender?.Show();
+
+			// put workpiece back to untrasform location
+			ResetPartUI?.Invoke();
 			m_Viewer.UpdateView();
 		}
 
