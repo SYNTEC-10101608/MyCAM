@@ -13,6 +13,7 @@ using OCC.BRepProj;
 using OCC.GCPnts;
 using OCC.GeomAbs;
 using OCC.gp;
+using OCC.IntCurvesFace;
 using OCC.ShapeAnalysis;
 using OCC.TopAbs;
 using OCC.TopExp;
@@ -213,6 +214,10 @@ namespace MyCAM.Helper
 
 	public static class SupportDesignHelper
 	{
+		const double GEOMETRY_TOLERANCE = 1e-3;
+		const double CHORD_ERROR_TOLERANCE = 1e-2;
+		const double INTERSECTION_TOLERANCE = 1e-6;
+
 		public static bool FillShellHoles( TopoDS_Shell inputShell, out TopoDS_Shape filledShape, double offset = 0.0 )
 		{
 			filledShape = null;
@@ -638,36 +643,33 @@ namespace MyCAM.Helper
 						double xPos = xPosList[ j ];
 						double yPos = yPosList[ i ];
 
-						// build vertical ray from top to bottom
-						const double RAY_LENGTH = 1e6; // sufficiently long to intersect the shell
-						gp_Pnt rayStart = new gp_Pnt( xPos, yPos, RAY_LENGTH );
-						gp_Pnt rayEnd = new gp_Pnt( xPos, yPos, -RAY_LENGTH );
-						BRepBuilderAPI_MakeEdge rayMaker = new BRepBuilderAPI_MakeEdge( rayStart, rayEnd );
-						if( !rayMaker.IsDone() ) {
-							intersectionMatrix[ i, j ] = zbottom + zBase;
-							continue;
-						}
-						TopoDS_Edge rayEdge = rayMaker.Edge();
-
-						// compute intersection with shell
-						BRepAlgoAPI_Section section = new BRepAlgoAPI_Section( inputShell, rayEdge );
-						section.Build();
+						// build vertical ray from bottom to top
+						gp_Lin rayLine = new gp_Lin( new gp_Pnt( xPos, yPos, 0 ), new gp_Dir( 0, 0, 1 ) );
 
 						double maxZ = double.MinValue;
 						bool found = false;
 
-						if( section.IsDone() ) {
-							TopExp_Explorer vExp = new TopExp_Explorer( section.Shape(), TopAbs_ShapeEnum.TopAbs_VERTEX );
-							for( ; vExp.More(); vExp.Next() ) {
-								TopoDS_Vertex vertex = TopoDS.ToVertex( vExp.Current() );
-								gp_Pnt pt = BRep_Tool.Pnt( vertex );
-								if( pt.Z() > maxZ ) {
-									maxZ = pt.Z();
-									found = true;
+						try {
+							IntCurvesFace_ShapeIntersector intersector = new IntCurvesFace_ShapeIntersector();
+							intersector.Load( inputShell, INTERSECTION_TOLERANCE );
+							intersector.Perform( rayLine, double.MinValue, double.MaxValue );
+
+							if( intersector.IsDone() && intersector.NbPnt() > 0 ) {
+								// find the maximum Z intersection point
+								for( int IntersectionPt = 1; IntersectionPt <= intersector.NbPnt(); IntersectionPt++ ) {
+									gp_Pnt pt = intersector.Pnt( IntersectionPt );
+									if( pt.Z() > maxZ ) {
+										maxZ = pt.Z();
+										found = true;
+									}
 								}
 							}
 						}
+						catch {
+							// IntCurvesFace failed
+						}
 
+						// if no intersection found, use zbottom + zBase as default
 						intersectionMatrix[ i, j ] = found ? maxZ : ( zbottom + zBase );
 					}
 				}
@@ -2132,10 +2134,6 @@ namespace MyCAM.Helper
 				return false;
 			}
 		}
-
-		const double GEOMETRY_TOLERANCE = 0.001;
-
-		private const double CHORD_ERROR_TOLERANCE = 0.01;
 
 		public static bool ComputePreviewPlanes(
 				TopoDS_Shape workpieceShape,
