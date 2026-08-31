@@ -171,16 +171,19 @@ namespace MyCAM.Data
 			if( newShape == null || newShape.IsNull() ) {
 				return;
 			}
-			List<PartObject> newPartObjectList = ArrangePartObject( newShape );
-			if( newPartObjectList.Count == 0 ) {
+
+			// Check shapelist count first
+			List<TopoDS_Shape> partShapeList = CollectPartShapes( newShape );
+			if( partShapeList.Count == 0 ) {
 				return;
 			}
 
-			List<string> newIDs = new List<string>( newPartObjectList.Count );
-			foreach( var objectData in newPartObjectList ) {
-				ObjectMap[ objectData.UID ] = objectData;
-				PartIDList.Add( objectData.UID );
-				newIDs.Add( objectData.UID );
+			List<string> newIDs = new List<string>( partShapeList.Count );
+			foreach( TopoDS_Shape partShape in partShapeList ) {
+				string szID = GetNewPartID( partShape );
+				ObjectMap[ szID ] = new PartObject( szID, partShape );
+				PartIDList.Add( szID );
+				newIDs.Add( szID );
 			}
 
 			RaiseFeatureAdded( newIDs, false );
@@ -388,8 +391,10 @@ namespace MyCAM.Data
 			if( newShape == null || newShape.IsNull() ) {
 				return;
 			}
-			List<PartObject> newPartObjectList = ArrangePartObject( newShape );
-			if( newPartObjectList.Count == 0 ) {
+
+			// Check shapelist count before clear
+			List<TopoDS_Shape> partShapeList = CollectPartShapes( newShape );
+			if( partShapeList.Count == 0 ) {
 				return;
 			}
 
@@ -399,9 +404,11 @@ namespace MyCAM.Data
 			PathIDList.Clear();
 			ClearObjectCommandData();
 
-			foreach( var objectData in newPartObjectList ) {
-				ObjectMap[ objectData.UID ] = objectData;
-				PartIDList.Add( objectData.UID );
+			// add each part shape to the object map and part ID list
+			foreach( TopoDS_Shape partShape in partShapeList ) {
+				string szID = GetNewPartID( partShape );
+				ObjectMap[ szID ] = new PartObject( szID, partShape );
+				PartIDList.Add( szID );
 				partCount++;
 			}
 			if( shouldTriggerEvent ) {
@@ -422,55 +429,76 @@ namespace MyCAM.Data
 			m_PathID = structShapeIDs.Path_ID;
 		}
 
-		List<PartObject> ArrangePartObject( TopoDS_Shape oneShape )
+		List<TopoDS_Shape> CollectPartShapes( TopoDS_Shape oneShape )
 		{
+			List<TopoDS_Shape> result = new List<TopoDS_Shape>();
 			if( oneShape == null || oneShape.IsNull() ) {
-				return new List<PartObject>();
+				return result;
 			}
 			if( oneShape.ShapeType() != TopAbs_ShapeEnum.TopAbs_COMPOUND ) {
-				string szID = GetNewPartID( oneShape );
-				return new List<PartObject>() { new PartObject( szID, oneShape ) };
+				result.Add( oneShape );
+				return result;
 			}
-			List<PartObject> result = new List<PartObject>();
 			foreach( TopoDS_Shape subShape in oneShape.elementsAsList ) {
-				result.AddRange( ArrangePartObject( subShape ) );
+				result.AddRange( CollectPartShapes( subShape ) );
 			}
 			return result;
 		}
 
 		string GetNewPartID( TopoDS_Shape shape )
 		{
-			int nID = 0;
-			string szType = string.Empty;
-			switch( shape.ShapeType() ) {
-				case TopAbs_ShapeEnum.TopAbs_SOLID:
-					nID = ++m_SolidID;
-					szType = "Solid";
-					break;
-				case TopAbs_ShapeEnum.TopAbs_SHELL:
-					nID = ++m_ShellID;
-					szType = "Shell";
-					break;
-				case TopAbs_ShapeEnum.TopAbs_FACE:
-					nID = ++m_FaceID;
-					szType = "Face";
-					break;
-				case TopAbs_ShapeEnum.TopAbs_WIRE:
-					nID = ++m_WireID;
-					szType = "Wire";
-					break;
-				case TopAbs_ShapeEnum.TopAbs_EDGE:
-					nID = ++m_EdgeID;
-					szType = "Edge";
-					break;
-				case TopAbs_ShapeEnum.TopAbs_VERTEX:
-					nID = ++m_VertexID;
-					szType = "Vertex";
-					break;
-				default:
-					return szType; // not a valid shape type
+			TopAbs_ShapeEnum shapeType = shape.ShapeType();
+			string szType = GetShapeTypeName( shapeType );
+			if( string.IsNullOrEmpty( szType ) ) {
+				return string.Empty; // not a valid shape type
 			}
-			return szType + "_" + nID.ToString();
+
+			// find an ID that is not taken yet
+			string szNewID;
+			do {
+				szNewID = szType + "_" + BumpShapeIDCounter( shapeType ).ToString();
+			} while( ObjectMap.ContainsKey( szNewID ) );
+			return szNewID;
+		}
+
+		string GetShapeTypeName( TopAbs_ShapeEnum shapeType )
+		{
+			switch( shapeType ) {
+				case TopAbs_ShapeEnum.TopAbs_SOLID:
+					return "Solid";
+				case TopAbs_ShapeEnum.TopAbs_SHELL:
+					return "Shell";
+				case TopAbs_ShapeEnum.TopAbs_FACE:
+					return "Face";
+				case TopAbs_ShapeEnum.TopAbs_WIRE:
+					return "Wire";
+				case TopAbs_ShapeEnum.TopAbs_EDGE:
+					return "Edge";
+				case TopAbs_ShapeEnum.TopAbs_VERTEX:
+					return "Vertex";
+				default:
+					return string.Empty;
+			}
+		}
+
+		int BumpShapeIDCounter( TopAbs_ShapeEnum shapeType )
+		{
+			switch( shapeType ) {
+				case TopAbs_ShapeEnum.TopAbs_SOLID:
+					return ++m_SolidID;
+				case TopAbs_ShapeEnum.TopAbs_SHELL:
+					return ++m_ShellID;
+				case TopAbs_ShapeEnum.TopAbs_FACE:
+					return ++m_FaceID;
+				case TopAbs_ShapeEnum.TopAbs_WIRE:
+					return ++m_WireID;
+				case TopAbs_ShapeEnum.TopAbs_EDGE:
+					return ++m_EdgeID;
+				case TopAbs_ShapeEnum.TopAbs_VERTEX:
+					return ++m_VertexID;
+				default:
+					return 0;
+			}
 		}
 
 		void ResetShapeIDs()
