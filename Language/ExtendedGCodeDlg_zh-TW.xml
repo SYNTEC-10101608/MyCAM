@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="ExtendedGCodeDlg" Content="編輯G碼" />
+    
+    <Message ID="m_lblInsertPosition" Content="插入位置" />
+    
+    <Message ID="m_rbtnTraverseStart" Content="空移開始" />
+    <Message ID="m_rbtnTraverseEnd" Content="空移結束" />
+    <Message ID="m_rbtnPathStart" Content="路徑開始" />
+    <Message ID="m_rbtnPathEnd" Content="路徑結束" />
+    <Message ID="m_rbtnControlPoint" Content="控制點" />
+    
+    <Message ID="m_lblToStartOrEnd" Content="起終點切換" />
+    <Message ID="m_btnToStartOrEnd" Content="起／終點" />
+    <Message ID="m_lblIsStartOrEnd" Content="目前位置：起點" />
+
+    <Message ID="IS_START_POINT" Content="目前位置：起點" />
+    <Message ID="IS_END_POINT" Content="目前位置：終點" />
+
+    <Message ID="m_lblGCode" Content="G碼" />
+    
+    <Message ID="m_btnDelete" Content="刪除" />
+    <Message ID="m_btnAdd" Content="新增" />
+    <Message ID="m_btnDone" Content="完成" />
+</ResMap>
+

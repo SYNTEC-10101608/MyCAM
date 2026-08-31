@@ -17,7 +17,6 @@ namespace MyCAM.Editor
 	internal class PathRenderer : CAMRendererBase
 	{
 		readonly Dictionary<string, AIS_Shape> m_OriginalPathAISDict = new Dictionary<string, AIS_Shape>();
-		readonly Dictionary<string, List<AIS_TextLabel>> m_MicroJointLabelsDict = new Dictionary<string, List<AIS_TextLabel>>();
 
 		public PathRenderer( Viewer viewer, DataManager dataManager )
 			: base( viewer, dataManager )
@@ -34,22 +33,11 @@ namespace MyCAM.Editor
 				foreach( var kvp in m_OriginalPathAISDict ) {
 					m_Viewer.GetAISContext().Erase( kvp.Value, false );
 				}
-				foreach( var kvp in m_MicroJointLabelsDict ) {
-					foreach( var label in kvp.Value ) {
-						m_Viewer.GetAISContext().Erase( label, false );
-					}
-				}
 			}
 			else {
 				foreach( var kvp in m_OriginalPathAISDict ) {
 					m_Viewer.GetAISContext().Display( kvp.Value, false );
 					m_Viewer.GetAISContext().Deactivate( kvp.Value );
-				}
-				foreach( var kvp in m_MicroJointLabelsDict ) {
-					foreach( var label in kvp.Value ) {
-						m_Viewer.GetAISContext().Display( label, false );
-						m_Viewer.GetAISContext().Deactivate( label );
-					}
 				}
 			}
 		}
@@ -98,7 +86,6 @@ namespace MyCAM.Editor
 
 			foreach( string pathID in pathIDList ) {
 				ShowOriginalPath( pathID, trsf );
-				ShowMicroJointMarkers( pathID, trsf );
 			}
 
 			if( bUpdate ) {
@@ -121,15 +108,6 @@ namespace MyCAM.Editor
 				if( m_OriginalPathAISDict.TryGetValue( pathID, out AIS_Shape oriPathAIS ) ) {
 					m_Viewer.GetAISContext().Remove( oriPathAIS, false );
 					m_OriginalPathAISDict.Remove( pathID );
-				}
-			}
-
-			foreach( string pathID in pathIDList ) {
-				if( m_MicroJointLabelsDict.TryGetValue( pathID, out List<AIS_TextLabel> labels ) ) {
-					foreach( var label in labels ) {
-						m_Viewer.GetAISContext().Remove( label, false );
-					}
-					m_MicroJointLabelsDict.Remove( pathID );
 				}
 			}
 		}
@@ -192,79 +170,6 @@ namespace MyCAM.Editor
 			m_OriginalPathAISDict.Add( pathID, oriPathAIS );
 			m_Viewer.GetAISContext().Display( oriPathAIS, false );
 			m_Viewer.GetAISContext().Deactivate( oriPathAIS );
-		}
-
-		void ShowMicroJointMarkers( string pathID, gp_Trsf trsf = null )
-		{
-			// get CAMPoint list with MicroJoint information
-			List<CAMPoint> camPointList = GetCAMPointList( pathID );
-			if( camPointList == null || camPointList.Count == 0 ) {
-				return;
-			}
-			List<AIS_TextLabel> microJointLabels = new List<AIS_TextLabel>();
-
-			// create markers for MicroJoint start points
-			for( int i = 0; i < camPointList.Count; i++ ) {
-				CAMPoint camPoint = camPointList[ i ];
-				if( camPoint.IsMicroJointStart ) {
-					DrawMicroJointMarrk( camPoint.Point, "MJ¡¶", Quantity_NameOfColor.Quantity_NOC_GREEN,
-						trsf, microJointLabels );
-				}
-				if( camPoint.IsMicroJointEnd ) {
-					DrawMicroJointMarrk( camPoint.Point, "MJ¡¿", Quantity_NameOfColor.Quantity_NOC_RED,
-						trsf, microJointLabels );
-				}
-			}
-			if( microJointLabels.Count > 0 ) {
-				m_MicroJointLabelsDict.Add( pathID, microJointLabels );
-			}
-		}
-
-		void DrawMicroJointMarrk( gp_Pnt point, string labelText, Quantity_NameOfColor color,
-			gp_Trsf trsf, List<AIS_TextLabel> labelsList )
-		{
-			if( point == null ) {
-				return;
-			}
-
-			// create text label
-			AIS_TextLabel label = new AIS_TextLabel();
-			label.SetText( new TCollection_ExtendedString( labelText ) );
-			label.SetColor( new Quantity_Color( color ) );
-			label.SetPosition( point );
-			label.SetZLayer( (int)Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost );
-			if( trsf != null ) {
-				label.SetLocalTransformation( trsf );
-			}
-
-			// add to list and display
-			labelsList.Add( label );
-			m_Viewer.GetAISContext().Display( label, false );
-
-			// label should not be selectable
-			m_Viewer.GetAISContext().Deactivate( label );
-		}
-
-		List<CAMPoint> GetCAMPointList( string pathID )
-		{
-			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) ) {
-				return null;
-			}
-
-			if( pathType == PathType.Contour ) {
-				if( !DataGettingHelper.GetContourCacheByID( pathID, out ContourCache contourCache ) ) {
-					return null;
-				}
-				return contourCache.MainPathPointList;
-			}
-			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
-				if( !DataGettingHelper.GetStdPatternCacheByID( pathID, out IStdPatternCache stdPatternCache ) ) {
-					return null;
-				}
-				return stdPatternCache.KeyCAMPointList?.Cast<CAMPoint>().ToList();
-			}
-
-			return null;
 		}
 
 		static bool IsIdentityTransform( gp_Trsf trsf )

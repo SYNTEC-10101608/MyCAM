@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="ExtendedGCodeDlg" Content="Редактирование G-кода" />
+    
+    <Message ID="m_lblInsertPosition" Content="Позиция вставки" />
+    
+    <Message ID="m_rbtnTraverseStart" Content="Начало перемещения" />
+    <Message ID="m_rbtnTraverseEnd" Content="Конец перемещения" />
+    <Message ID="m_rbtnPathStart" Content="Начало пути" />
+    <Message ID="m_rbtnPathEnd" Content="Конец пути" />
+    <Message ID="m_rbtnControlPoint" Content="Контрольная точка" />
+    
+    <Message ID="m_lblToStartOrEnd" Content="Переключение начала и конца" />
+    <Message ID="m_btnToStartOrEnd" Content="Начало/Конец" />
+    <Message ID="m_lblIsStartOrEnd" Content="Текущее положение: начало" />
+
+    <Message ID="IS_START_POINT" Content="Текущее положение: начало" />
+    <Message ID="IS_END_POINT" Content="Текущее положение: конец" />
+
+    <Message ID="m_lblGCode" Content="G-код" />
+    
+    <Message ID="m_btnDelete" Content="Удалить" />
+    <Message ID="m_btnAdd" Content="Добавить" />
+    <Message ID="m_btnDone" Content="Готово" />
+</ResMap>
+
+
+

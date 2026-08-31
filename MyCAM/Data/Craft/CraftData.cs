@@ -1,6 +1,7 @@
 ﻿using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace MyCAM.Data
 {
@@ -112,6 +113,15 @@ namespace MyCAM.Data
 		}
 	}
 
+	public enum ExtendedGCodeType
+	{
+		TraverseHead,
+		TraverseTail,
+		PathHead,
+		PathTail,
+		ControlPoint,
+	}
+
 	public class CraftData
 	{
 		public CraftData()
@@ -132,6 +142,7 @@ namespace MyCAM.Data
 			TraverseData traverseData,
 			Dictionary<int, ContourEditData> contourEditMap,
 			Dictionary<int, double> microJointStartIdxMap,
+			Dictionary<Tuple<ExtendedGCodeType, int?>, string> extendedGCodeMap,
 			SpecialToolVecData specialToolVecData = null )
 		{
 			m_TechLayer = techLayer;
@@ -140,6 +151,7 @@ namespace MyCAM.Data
 			m_LeadData = leadData;
 			m_OverCutLength = overCutLength;
 			m_MicroJointStartIdxMap = microJointStartIdxMap;
+			m_extendedGCodeMap = extendedGCodeMap;
 			if( toolVecModifyMap2 != null ) {
 				foreach( var kvp in toolVecModifyMap2 ) {
 					m_ToolVecModifyMap.Add( kvp.Key, kvp.Value.Clone() );
@@ -584,6 +596,52 @@ namespace MyCAM.Data
 				CAMFactorChanged?.Invoke();
 			}
 		}
+
+		#region ExtendedGCode
+
+		public Dictionary<Tuple<ExtendedGCodeType, int?>, string> ExtendedGCodeMap
+		{
+			get
+			{
+				if( m_extendedGCodeMap == null ) {
+					m_extendedGCodeMap = new Dictionary<Tuple<ExtendedGCodeType, int?>, string>();
+				}
+				return m_extendedGCodeMap;
+			}
+		}
+
+		// the int? is the CAMIndex, is null when gCodeType is not ControlPoint
+		Dictionary<Tuple<ExtendedGCodeType, int?>, string> m_extendedGCodeMap = new Dictionary<Tuple<ExtendedGCodeType, int?>, string>();
+
+		public void SetExtendedGCode( ExtendedGCodeType gCodeType, int? pointIdx, string content )
+		{
+			if( gCodeType != ExtendedGCodeType.ControlPoint ) {
+				pointIdx = null;
+			}
+
+			if( m_extendedGCodeMap.ContainsKey( Tuple.Create( gCodeType, pointIdx ) ) ) {
+				m_extendedGCodeMap[ Tuple.Create( gCodeType, pointIdx ) ] = content;
+			}
+			else {
+				m_extendedGCodeMap.Add( Tuple.Create( gCodeType, pointIdx ), content );
+			}
+
+			CAMFactorChanged?.Invoke();
+		}
+
+		public void RemoveExtendedGCode( ExtendedGCodeType gCodeType, int? pointIdx )
+		{
+			if( gCodeType != ExtendedGCodeType.ControlPoint ) {
+				pointIdx = null;
+			}
+
+			if( m_extendedGCodeMap.ContainsKey( Tuple.Create( gCodeType, pointIdx ) ) ) {
+				m_extendedGCodeMap.Remove( Tuple.Create( gCodeType, pointIdx ) );
+				CAMFactorChanged?.Invoke();
+			}
+		}
+
+		#endregion
 
 		void SubscribeSubParamChanged()
 		{

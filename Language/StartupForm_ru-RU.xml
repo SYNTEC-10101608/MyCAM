@@ -67,6 +67,8 @@
 	<Message ID="m_tsbOverCut_ToolTip" Content="Избыточный рез" />
 	<Message ID="m_tsbMicroJoint" Content="Микросвязь" />
 	<Message ID="m_tsbMicroJoint_ToolTip" Content="Микросвязь" />
+	<Message ID="m_tsbExtendedGCode" Content="Расширенный G-код" />
+	<Message ID="m_tsbExtendedGCode_ToolTip" Content="Вставить расширенный G-код в указанное место выбранного пути" />
 	<Message ID="m_tsbToolVecReverse" Content="Разворот позы" />
 	<Message ID="m_tsbToolVecReverse_ToolTip" Content="Разворот позы" />
 	<Message ID="m_tsbToolVec" Content="Регулировка позы" />
@@ -137,6 +139,7 @@
 	<Message ID="ShowOrder" Content="Показать порядок" />
 	<Message ID="ShowOrientation" Content="Показать направление пути" />
 	<Message ID="ShowTraverse" Content="Показать путь поднятия/опускания ножа" />
+	<Message ID="ShowMarker" Content="Показать технологические значки на пути" />
 	<Message ID="Layer" Content="Слой {0}" />
 
 	<Message ID="Log_UseDefaultMachineProject" Content="Используется файл проекта механизма по умолчанию" />

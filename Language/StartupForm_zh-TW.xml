@@ -67,6 +67,8 @@
 	<Message ID="m_tsbOverCut_ToolTip" Content="設定選擇路徑的過切" />
 	<Message ID="m_tsbMicroJoint" Content="微連" />
 	<Message ID="m_tsbMicroJoint_ToolTip" Content="設定選擇路徑的微連" />
+	<Message ID="m_tsbExtendedGCode" Content="擴充G碼" />
+	<Message ID="m_tsbExtendedGCode_ToolTip" Content="在選擇路徑的指定位置插入擴充G碼" />
 	<Message ID="m_tsbToolVecReverse" Content="姿態反向" />
 	<Message ID="m_tsbToolVecReverse_ToolTip" Content="反向選擇路徑的姿態方向" />
 	<Message ID="m_tsbToolVec" Content="飛邊姿態" />
@@ -137,6 +139,7 @@
 	<Message ID="ShowOrder" Content="顯示順序" />
 	<Message ID="ShowOrientation" Content="顯示路徑方向" />
 	<Message ID="ShowTraverse" Content="顯示抬下刀路徑" />
+	<Message ID="ShowMarker" Content="顯示路徑上的工藝圖示" />
 	<Message ID="Layer" Content="圖層{0}" />
 
 	<Message ID="Log_UseDefaultMachineProject" Content="使用默認機構專案檔" />

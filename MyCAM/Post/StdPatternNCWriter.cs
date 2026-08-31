@@ -228,21 +228,25 @@ namespace MyCAM.Post
 
 			// traverse header
 			CustPostWriter.WriteCustomizedSection( writer, MyApp.CustomizedPostInfo?.TraverseHeader, varDict );
+			ExtendedGCodeWriter.WriteExtendedGCode( writer, craftData, ExtendedGCodeType.TraverseHead );
 
 			// write traverse section
 			NCWriterHelper.WriteTraverse( writer, postData, masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
 
 			// traverse tail
+			ExtendedGCodeWriter.WriteExtendedGCode( writer, craftData, ExtendedGCodeType.TraverseTail );
 			CustPostWriter.WriteCustomizedSection( writer, MyApp.CustomizedPostInfo?.TraverseTail, varDict );
 
 			// header
 			CustPostWriter.WriteCustomizedSection( writer, MyApp.CustomizedPostInfo?.StdPathHeader, varDict );
+			ExtendedGCodeWriter.WriteExtendedGCode( writer, craftData, ExtendedGCodeType.PathHead );
 
 			// get strategy and write cutting code
 			IStdPatternNCStrategy strategy = StandardPatternNCStrategyFactory.GetStrategy( pathType );
 			strategy.WriteNCCode( writer, postData, craftData, geomData, masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
 
 			// tail
+			ExtendedGCodeWriter.WriteExtendedGCode( writer, craftData, ExtendedGCodeType.PathTail );
 			CustPostWriter.WriteCustomizedSection( writer, MyApp.CustomizedPostInfo?.StdPathTail, varDict );
 		}
 	}

@@ -45,6 +45,7 @@ namespace MyCAM.Editor
 		CalibrationREF,
 		ContourEdit,
 		MicroJoint,
+		ExtendedGCode,
 		ManualOrder,
 		AutoSortPath,
 		SpecialToolVecEdit,

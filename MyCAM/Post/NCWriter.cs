@@ -130,7 +130,7 @@ namespace MyCAM.Post
 					if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
 						return false;
 					}
-					WriteCutting( postData, i + 1, nPathLayer );
+					WriteCutting( postData, m_PathIDList[ i ], pathObject.CraftData, i + 1, nPathLayer );
 				}
 				else {
 					if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData postData, out StdPatternNCPackage package, out errorMessage ) ) {
@@ -263,30 +263,35 @@ namespace MyCAM.Post
 
 		#region Write Cutting
 
-		void WriteCutting( PostData currentPathPostData, int N_Index, int nLayIndex = 1 )
+		void WriteCutting( PostData currentPathPostData, string szPathID, CraftData craftData, int N_Index, int nLayIndex = 1 )
 		{
 			// Header
 			Dictionary<string, string> varDict = BuildPathDict( N_Index, nLayIndex );
 			// traverse header
 			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.TraverseHeader, varDict );
+			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.TraverseHead );
 
 			// traverse from previous path to current path
 			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData,
 				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
 
 			// traverse tail
+			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.TraverseTail );
 			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.TraverseTail, varDict );
 
 			// path header			
 			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.PathHeader, varDict );
+			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.PathHead );
 
 			// start cutting, write each process path
 			WriteOneProcessPath( currentPathPostData.LeadInPostPointList );
-			WriteOneProcessPath( currentPathPostData.MainPathPostPointList );
+			WriteOneProcessPath( currentPathPostData.MainPathPostPointList,
+				ExtendedGCodeWriter.BuildControlPointGCodeMap( szPathID, craftData, currentPathPostData.MainPathPostPointList.Count ) );
 			WriteOneProcessPath( currentPathPostData.OverCutPostPointList );
 			WriteOneProcessPath( currentPathPostData.LeadOutPostPointList );
 
 			// path tail
+			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.PathTail );
 			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.PathTail, varDict );
 			return;
 		}
@@ -297,11 +302,12 @@ namespace MyCAM.Post
 				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
 		}
 
-		void WriteOnePoint( PostPoint postPoint )
+		void WriteOnePoint( PostPoint postPoint, string szExtendedGCode = null )
 		{
 			if( postPoint == null ) {
 				return;
 			}
+			ExtendedGCodeWriter.WriteContent( m_StreamWriter, szExtendedGCode );
 			string szX = postPoint.X.ToString( "F3" );
 			string szY = postPoint.Y.ToString( "F3" );
 			string szZ = postPoint.Z.ToString( "F3" );
@@ -317,14 +323,16 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteOneProcessPath( List<PostPoint> postPointList )
+		void WriteOneProcessPath( List<PostPoint> postPointList, Dictionary<int, string> controlPointGCodeMap = null )
 		{
 			if( postPointList == null || postPointList.Count == 0 ) {
 				return;
 			}
 			for( int i = 0; i < postPointList.Count; i++ ) {
 				var onePostPoint = postPointList[ i ];
-				WriteOnePoint( onePostPoint );
+				string szExtendedGCode = null;
+				controlPointGCodeMap?.TryGetValue( i, out szExtendedGCode );
+				WriteOnePoint( onePostPoint, szExtendedGCode );
 			}
 		}
 
