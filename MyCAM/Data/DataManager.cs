@@ -49,17 +49,17 @@ namespace MyCAM.Data
 			List<string> checkedPartIDList = new List<string>();
 			List<string> checkedPathIDList = new List<string>();
 
-			// read part in sequence
+			// read part in sequence, skip duplicates
 			foreach( var partDataID in partIDList ) {
-				if( objectMap.ContainsKey( partDataID ) ) {
+				if( objectMap.ContainsKey( partDataID ) && !checkedPartIDList.Contains( partDataID ) ) {
 					checkedObjectMap[ partDataID ] = objectMap[ partDataID ];
 					checkedPartIDList.Add( partDataID );
 				}
 			}
 
-			// read path in sequence
+			// read path in sequence, skip duplicates
 			foreach( var pathDataID in pathIDList ) {
-				if( objectMap.ContainsKey( pathDataID ) ) {
+				if( objectMap.ContainsKey( pathDataID ) && !checkedPathIDList.Contains( pathDataID ) ) {
 					checkedObjectMap[ pathDataID ] = objectMap[ pathDataID ];
 					checkedPathIDList.Add( pathDataID );
 				}
@@ -261,7 +261,10 @@ namespace MyCAM.Data
 				bool isClosed = DetermineIfClosed( pathElements );
 
 				// add valid path
-				string szID = "Path_" + ++m_PathID;
+				string szID;
+				do {
+					szID = "Path_" + ++m_PathID;
+				} while( ObjectMap.ContainsKey( szID ) );
 				ContourPathObject contourPathObject = new ContourPathObject( szID, pathElements, isClosed,
 					maxDeflection, maxEdgeLength, discretizeMethod );
 				contourPathObject.CraftData.TraverseData = new TraverseData();
