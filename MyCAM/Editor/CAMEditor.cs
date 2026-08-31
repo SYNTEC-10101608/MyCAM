@@ -30,6 +30,7 @@ namespace MyCAM.Editor
 			IsAutoOrderEditable = true;
 			IsPathCompensateEditable = true;
 			IsMicroJointEditable = true;
+			IsExtendedGCodeEditable = true;
 			IsContourEditable = true;
 		}
 
@@ -44,6 +45,7 @@ namespace MyCAM.Editor
 		public bool IsAutoOrderEditable;
 		public bool IsPathCompensateEditable;
 		public bool IsMicroJointEditable;
+		public bool IsExtendedGCodeEditable;
 		public bool IsContourEditable;
 	}
 
@@ -76,6 +78,7 @@ namespace MyCAM.Editor
 			m_TraverseRenderer = new TraverseRenderer( m_Viewer, m_DataManager );
 			m_MainPathRenderer = new PathRenderer( m_Viewer, m_DataManager );
 			m_MachineRender = MachineRenderFactory.Create( m_Viewer, m_DataManager );
+			m_MarkerRenderer = new MarkerRenderer( m_Viewer, m_DataManager );
 		}
 
 		public const string PATH_NODE_PREFIX = "Path_";
@@ -89,6 +92,7 @@ namespace MyCAM.Editor
 		TraverseRenderer m_TraverseRenderer;
 		PathRenderer m_MainPathRenderer;
 		MachineRenderBase m_MachineRender;
+		MarkerRenderer m_MarkerRenderer;
 
 		// editor
 		public override EEditorType Type
@@ -142,6 +146,12 @@ namespace MyCAM.Editor
 		{
 			m_TraverseRenderer.SetShow( isShowTraversePath );
 			m_TraverseRenderer.Show( true );
+		}
+
+		public void SetShowMarker( bool isShowMarker )
+		{
+			m_MarkerRenderer.SetShow( isShowMarker );
+			m_MarkerRenderer.Show( true );
 		}
 
 		// add/ remove path API
@@ -305,6 +315,7 @@ namespace MyCAM.Editor
 				m_TraverseRenderer.Reset();
 				m_OrientationRenderer.Reset();
 				m_IndexRenderer.Reset();
+				m_MarkerRenderer.Reset();
 				m_ViewManager.ShowPathTrsf( new gp_Trsf() );
 				m_MainPathRenderer.Reset();
 				m_CraftRenderer.Reset();
@@ -559,6 +570,21 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetExtendedGCode()
+		{
+			if( IsSameAction( EditActionType.ExtendedGCode ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
+				return;
+			}
+			EndActionIfNotDefault();
+			ExtendedGCodeAction action = new ExtendedGCodeAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First(), m_DefaultAction as SelectPathAction );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
+		}
+
 		#endregion
 
 		// sort API
@@ -584,6 +610,7 @@ namespace MyCAM.Editor
 				m_TraverseRenderer.SetPauseRefreshAndHide( true );
 				m_CraftRenderer.SetPauseRefreshAndHide( true );
 				m_OrientationRenderer.SetPauseRefreshAndHide( true );
+				m_MarkerRenderer.SetPauseRefreshAndHide( true );
 			}
 			else {
 
@@ -593,6 +620,7 @@ namespace MyCAM.Editor
 				m_TraverseRenderer.SetPauseRefreshAndHide( false );
 				m_CraftRenderer.SetPauseRefreshAndHide( false );
 				m_OrientationRenderer.SetPauseRefreshAndHide( false );
+				m_MarkerRenderer.SetPauseRefreshAndHide( false );
 
 				// traverse will change during order change
 				m_TraverseRenderer.Show();
@@ -749,6 +777,7 @@ namespace MyCAM.Editor
 				editableInfo.IsStartPointEditable = false;
 				editableInfo.IsToolVecEditable = false;
 				editableInfo.IsMicroJointEditable = false;
+				editableInfo.IsExtendedGCodeEditable = false;
 				editableInfo.IsContourEditable = false;
 				editableInfo.IsAutoOrderEditable = false;
 			}
@@ -771,6 +800,7 @@ namespace MyCAM.Editor
 					editableInfo.IsToolVecReverseEditable = false;
 					editableInfo.IsFixedToolVecEditable = false;
 					editableInfo.IsMicroJointEditable = false;
+					editableInfo.IsExtendedGCodeEditable = false;
 					editableInfo.IsContourEditable = false;
 				}
 				if( IsSelectSpecialPath( szPathIDList ) ) {
@@ -840,6 +870,7 @@ namespace MyCAM.Editor
 		{
 			m_ViewManager.UpdatePaths( pathIDList );
 			m_MainPathRenderer.Show( pathIDList );
+			m_MarkerRenderer.Show( pathIDList );
 			m_ToolVecRenderer.Show( pathIDList );
 			m_OrientationRenderer.Show( pathIDList );
 			m_IndexRenderer.Show();
@@ -860,6 +891,7 @@ namespace MyCAM.Editor
 			m_OrientationRenderer.Trans( trsf );
 			m_CraftRenderer.Trans( trsf );
 			m_TraverseRenderer.Trans( trsf );
+			m_MarkerRenderer.Trans( trsf );
 		}
 
 		void SetTrans( Dictionary<MachineComponentType, List<gp_Trsf>> transMap, bool isUnLockViewerUpdate = true )
@@ -897,6 +929,7 @@ namespace MyCAM.Editor
 		void RemoveCAMData( List<string> pathIDList )
 		{
 			m_MainPathRenderer.Remove();
+			m_MarkerRenderer.Remove();
 			m_ToolVecRenderer.Remove( pathIDList );
 			m_CraftRenderer.Remove( pathIDList );
 			m_OrientationRenderer.Remove( pathIDList );
@@ -908,6 +941,7 @@ namespace MyCAM.Editor
 		void RemovePathCAMData( List<string> pathIDList )
 		{
 			m_MainPathRenderer.Remove( pathIDList );
+			m_MarkerRenderer.Remove( pathIDList );
 			m_ToolVecRenderer.Remove( pathIDList );
 			m_CraftRenderer.Remove( pathIDList );
 			m_OrientationRenderer.Remove( pathIDList );
@@ -985,6 +1019,7 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.PathEdit
 				|| action.ActionType == EditActionType.ToolVec
 				|| action.ActionType == EditActionType.MicroJoint
+				|| action.ActionType == EditActionType.ExtendedGCode
 				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// lock main form
@@ -1015,6 +1050,7 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.PathEdit
 				|| action.ActionType == EditActionType.ToolVec
 				|| action.ActionType == EditActionType.MicroJoint
+				|| action.ActionType == EditActionType.ExtendedGCode
 				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// unlock main form

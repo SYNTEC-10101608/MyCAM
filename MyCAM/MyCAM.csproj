@@ -93,6 +93,7 @@
     <Compile Include="Editor\Action\CAM\AutoSortPathAction.cs" />
     <Compile Include="Editor\Action\CAM\CalibrationREFAction.cs" />
     <Compile Include="Editor\Action\CAM\ContourEditAction.cs" />
+    <Compile Include="Editor\Action\CAM\ExtendedGCodeAction.cs" />
     <Compile Include="Editor\Action\CAM\ManualOrderAction.cs" />
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
@@ -149,6 +150,12 @@
     <Compile Include="Editor\Dialog\MeasureDlg.Designer.cs">
       <DependentUpon>MeasureDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Dialog\ExtendedGCodeDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\ExtendedGCodeDlg.Designer.cs">
+      <DependentUpon>ExtendedGCodeDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Dialog\MicroJointDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -170,6 +177,7 @@
     <Compile Include="Editor\Dialog\SupportPositionRow.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Editor\Renderer\MarkerRenderer.cs" />
     <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Editor\Dialog\ContourEditDlg.cs">
       <SubType>Form</SubType>
@@ -363,6 +371,7 @@
     <Compile Include="Helper\CAM\OverCutHelper.cs" />
     <Compile Include="Post\AxisConfig.cs" />
     <Compile Include="Post\CustPostWriter.cs" />
+    <Compile Include="Post\ExtendedGCodeWriter.cs" />
     <Compile Include="Post\FiveAxisSolver.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="CNC\FTPTransmission.cs" />
@@ -417,6 +426,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\AutoSortPathDlg.resx">
       <DependentUpon>AutoSortPathDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\ExtendedGCodeDlg.resx">
+      <DependentUpon>ExtendedGCodeDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\MicroJointDlg.resx">
       <DependentUpon>MicroJointDlg.cs</DependentUpon>

@@ -29,6 +29,7 @@ namespace MyCAM
 		public Action<bool> RaiseShowOrderStatusChange;
 		public Action<bool> RaiseShowOrientStatusChange;
 		public Action<bool> RaiseShowTraverseStatusChange;
+		public Action<bool> RaiseShowMarkerStatusChange;
 
 		public StartupForm()
 		{
@@ -112,6 +113,7 @@ namespace MyCAM
 			RaiseShowOrderStatusChange += m_CAMEditor.SetShowOrder;
 			RaiseShowOrientStatusChange += m_CAMEditor.SetShowOrientation;
 			RaiseShowTraverseStatusChange += m_CAMEditor.SetShowTraversePath;
+			RaiseShowMarkerStatusChange += m_CAMEditor.SetShowMarker;
 
 			// simu editor
 			m_SimuEditor = new SimuEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -518,6 +520,12 @@ namespace MyCAM
 			m_CAMEditor.SetMicroJoint();
 		}
 
+		// extended G Code
+		void m_tsbExtendedGCode_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetExtendedGCode();
+		}
+
 		#region Viewer tool bar click action
 
 		void m_tsbShowVec_CheckedChanged( object sender, EventArgs e )
@@ -538,6 +546,11 @@ namespace MyCAM
 		void m_tsbShowTraverse_CheckedChanged( object sender, EventArgs e )
 		{
 			RaiseShowTraverseStatusChange( m_tsbShowTraverse.Checked );
+		}
+
+		void m_tsbShowMarker_CheckedChanged( object sender, EventArgs e )
+		{
+			RaiseShowMarkerStatusChange( m_tsbShowMarker.Checked );
 		}
 
 		void m_tsbAXO_Click( object sender, EventArgs e )
@@ -713,6 +726,9 @@ namespace MyCAM
 					case EditActionType.MicroJoint:
 						m_tsbMicroJoint.BackColor = DEFAULT_BtnColor;
 						break;
+					case EditActionType.ExtendedGCode:
+						m_tsbExtendedGCode.BackColor = DEFAULT_BtnColor;
+						break;
 					case EditActionType.SetLead:
 						m_tsbSetLead.BackColor = DEFAULT_BtnColor;
 
@@ -761,6 +777,9 @@ namespace MyCAM
 					break;
 				case EditActionType.MicroJoint:
 					m_tsbMicroJoint.BackColor = ON_ButtonColor;
+					break;
+				case EditActionType.ExtendedGCode:
+					m_tsbExtendedGCode.BackColor = ON_ButtonColor;
 					break;
 				case EditActionType.SetLead:
 					m_tsbSetLead.BackColor = ON_ButtonColor;
@@ -811,6 +830,7 @@ namespace MyCAM
 			m_tsbReverse.Enabled = editableInfo.IsPathReverseEditable;
 			m_tsbPathCompensation.Enabled = editableInfo.IsPathCompensateEditable;
 			m_tsbMicroJoint.Enabled = editableInfo.IsMicroJointEditable;
+			m_tsbExtendedGCode.Enabled = editableInfo.IsExtendedGCodeEditable;
 			m_btnContourEdit.Enabled = editableInfo.IsContourEditable;
 		}
 
@@ -940,6 +960,7 @@ namespace MyCAM
 			m_tsbShowOrder.Visible = isVisible;
 			m_tsbShowOrientation.Visible = isVisible;
 			m_tsbShowTraverse.Visible = isVisible;
+			m_tsbShowMarker.Visible = isVisible;
 		}
 
 		void VisibleTechLayerButtons( bool isVisible )
@@ -1588,6 +1609,9 @@ namespace MyCAM
 			m_tsbMicroJoint.Text = m_LanguageManager.TryGetString( "m_tsbMicroJoint", m_tsbMicroJoint.Text );
 			m_tsbMicroJoint.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMicroJoint_ToolTip", m_tsbMicroJoint.ToolTipText );
 
+			m_tsbExtendedGCode.Text = m_LanguageManager.TryGetString( "m_tsbExtendedGCode", m_tsbExtendedGCode.Text );
+			m_tsbExtendedGCode.ToolTipText = m_LanguageManager.TryGetString( "m_tsbExtendedGCode_ToolTip", m_tsbExtendedGCode.ToolTipText );
+
 			m_tsbToolVecReverse.Text = m_LanguageManager.TryGetString( "m_tsbToolVecReverse", m_tsbToolVecReverse.Text );
 			m_tsbToolVecReverse.ToolTipText = m_LanguageManager.TryGetString( "m_tsbToolVecReverse_ToolTip", m_tsbToolVecReverse.ToolTipText );
 
@@ -1674,6 +1698,7 @@ namespace MyCAM
 			m_tsbShowOrder.ToolTipText = m_LanguageManager.TryGetString( "ShowOrder", m_tsbShowOrder.ToolTipText );
 			m_tsbShowOrientation.ToolTipText = m_LanguageManager.TryGetString( "ShowOrientation", m_tsbShowOrientation.ToolTipText );
 			m_tsbShowTraverse.ToolTipText = m_LanguageManager.TryGetString( "ShowTraverse", m_tsbShowTraverse.ToolTipText );
+			m_tsbShowMarker.ToolTipText = m_LanguageManager.TryGetString( "ShowMarker", m_tsbShowMarker.ToolTipText );
 
 			m_tsbLayer1.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 1 );
 			m_tsbLayer2.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 2 );
