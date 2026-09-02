@@ -45,9 +45,16 @@ namespace MyCAM.Editor
 			m_gbxSwitchDir.Enabled = enableSwitchDir;
 		}
 
+		public bool GetMSAngleFromDialog( out double master_deg, out double slave_deg )
+		{
+			master_deg = (double)m_dbtnMaster.Value;
+			slave_deg = (double)m_dbtnSlave.Value;
+			return true;
+		}
+
 		#region Set textbox value silently
 
-		public void SetMSAngleSilent( double master_deg, double slave_deg )
+		public void ResetMSAngle( double master_deg, double slave_deg )
 		{
 			m_dbtnMaster.SilentSetValue = (decimal)master_deg;
 			m_dbtnSlave.SilentSetValue = (decimal)slave_deg;
@@ -119,7 +126,6 @@ namespace MyCAM.Editor
 			TypeChange();
 			m_IsUpdatingTypeUI = false;
 		}
-
 
 		void m_rbtnZ_CheckedChanged( object sender, EventArgs e )
 		{
@@ -202,13 +208,6 @@ namespace MyCAM.Editor
 
 		#region Data synchronization
 
-		bool GetMSAngleFromDialog( out double master_deg, out double slave_deg )
-		{
-			master_deg = (double)m_dbtnMaster.Value;
-			slave_deg = (double)m_dbtnSlave.Value;
-			return true;
-		}
-
 		void HandleMSAngleChanged()
 		{
 			if( !GetMSAngleFromDialog( out double master_deg, out double slave_deg ) ) {
@@ -237,7 +236,6 @@ namespace MyCAM.Editor
 		{
 			HandleMSAngleChanged();
 		}
-
 
 		#endregion
 

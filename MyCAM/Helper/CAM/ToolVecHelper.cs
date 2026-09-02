@@ -16,13 +16,23 @@ namespace MyCAM.Helper
 			ModifyToolVec( ref toolVecPointList, regionTypeList, camToolVecModifyMap, isLastPntControlPoint );
 		}
 
-		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint )
+		public static Tuple<double, double> GetMSAngleFromToolVec( gp_Dir toolVec, ISetToolVecPoint toolVecPoint, bool isSolveByInit = true )
 		{
 			if( toolVec == null || toolVecPoint == null ) {
 				return new Tuple<double, double>( 0, 0 );
 			}
-			double dM_In = toolVecPoint.ModMaster_rad;
-			double dS_In = toolVecPoint.ModSlave_rad;
+			double dM_In;
+			double dS_In;
+
+			// use init / modified angles to solve IK
+			if( isSolveByInit ) {
+				dM_In = toolVecPoint.InitMaster_rad;
+				dS_In = toolVecPoint.InitSlave_rad;
+			}
+			else {
+				dM_In = toolVecPoint.ModMaster_rad;
+				dS_In = toolVecPoint.ModSlave_rad;
+			}
 
 			// Get machine data
 			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
@@ -108,6 +118,43 @@ namespace MyCAM.Helper
 			return postSolver.SolveToolVec( dMaster_rad, dSlave_rad );
 		}
 
+		public static Tuple<double, double> FlipRotaryAxis( double master_deg, double slave_deg, bool isPositive )
+		{
+			// Get machine data to determine which axis is rotary (±180)
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
+				return new Tuple<double, double>( master_deg, slave_deg );
+			}
+
+			// check if current tool vector is at singular point
+			bool isSingular = IsSingular( master_deg, slave_deg );
+
+			// Spindle: master ±180, Table/Mix: slave ±180
+			bool isMasterAxis = machineData.FiveAxisType == FiveAxisType.Spindle;
+
+			// Determine if ToolDir is parallel to the rotary axis direction
+			gp_Dir rotaryDir = isMasterAxis ? machineData.MasterRotateDir : machineData.SlaveRotateDir;
+			bool isToolDirParallelToRotary = machineData.ToolDir.IsParallel( rotaryDir, PARALLEL_TOLERANCE );
+
+			double offset = isPositive ? 180 : -180;
+			if( isMasterAxis ) {
+				master_deg += offset;
+
+				// at singular point, the non-rotating axis keeps its value
+				if( !isSingular ) {
+					slave_deg = FlipNonRotatingAxis( slave_deg, isToolDirParallelToRotary );
+				}
+			}
+			else {
+				slave_deg += offset;
+
+				// at singular point, the non-rotating axis keeps its value
+				if( !isSingular ) {
+					master_deg = FlipNonRotatingAxis( master_deg, isToolDirParallelToRotary );
+				}
+			}
+			return new Tuple<double, double>( master_deg, slave_deg );
+		}
+
 		#region Special case of tool vector edit
 
 		public static void SetToolVecByAssignedMS( ref List<ISetToolVecPoint> toolVecPointList, double dMaster_deg, double dSlave_deg )
@@ -120,23 +167,6 @@ namespace MyCAM.Helper
 				pnt.ModSlave_rad = dSlave_rad;
 				pnt.ToolVec = toolVec;
 			}
-		}
-
-		public static void SetByAssignedMSWithAutoIK( ref List<ISetToolVecPoint> toolVecPointList, double dMaster_deg, double dSlave_deg, double dLastProcessPathM, double dLastProcessPathS )
-		{
-			// Get machine data
-			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
-				return;
-			}
-			// Create PostSolver
-			PostSolver postSolver = new PostSolver( machineData );
-			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
-			foreach( var pnt in toolVecPointList ) {
-				pnt.ToolVec = toolVec;
-			}
-			int nStartIdx = 0;
-			int nEndIdx = toolVecPointList.Count - 1;
-			SolveIKAndFilterSingularity( ref toolVecPointList, postSolver, machineData, nStartIdx, nEndIdx, dLastProcessPathM, dLastProcessPathS, false );
 		}
 
 		// this bevel do not joint auto optimize
@@ -505,7 +535,7 @@ namespace MyCAM.Helper
 
 		static void SolveIKAndFilterSingularity( ref List<ISetToolVecPoint> toolVecPointList, PostSolver postSolver, FiveAxisMachineData machineData, int nStartIdx, int nEndIdx, double dM, double dS, bool endPointIsCtrlPnt )
 		{
-			// sigularity tag list
+			// singularity tag list
 			List<bool> singularTagList = new List<bool>();
 			nEndIdx = endPointIsCtrlPnt ? nEndIdx - 1 : nEndIdx;
 			for( int i = nStartIdx; i <= nEndIdx; i++ ) {
@@ -886,43 +916,6 @@ namespace MyCAM.Helper
 			ToolVecModifyData closedPointData = toolVecModifyMap[ CLOSED_POINT_INDEX ];
 			toolVecModifyMap.Remove( CLOSED_POINT_INDEX );
 			toolVecModifyMap[ toolVecPointList.Count - 1 ] = closedPointData;
-		}
-
-		public static Tuple<double, double> FlipRotaryAxis( double master_deg, double slave_deg, bool isPositive )
-		{
-			// Get machine data to determine which axis is rotary (±180)
-			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
-				return new Tuple<double, double>( master_deg, slave_deg );
-			}
-
-			// check if current tool vector is at singular point
-			bool isSingular = IsSingular( master_deg, slave_deg );
-
-			// Spindle: master ±180, Table/Mix: slave ±180
-			bool isMasterAxis = machineData.FiveAxisType == FiveAxisType.Spindle;
-
-			// Determine if ToolDir is parallel to the rotary axis direction
-			gp_Dir rotaryDir = isMasterAxis ? machineData.MasterRotateDir : machineData.SlaveRotateDir;
-			bool isToolDirParallelToRotary = machineData.ToolDir.IsParallel( rotaryDir, PARALLEL_TOLERANCE );
-
-			double offset = isPositive ? 180 : -180;
-			if( isMasterAxis ) {
-				master_deg += offset;
-
-				// at singular point, the non-rotating axis keeps its value
-				if( !isSingular ) {
-					slave_deg = FlipNonRotatingAxis( slave_deg, isToolDirParallelToRotary );
-				}
-			}
-			else {
-				slave_deg += offset;
-
-				// at singular point, the non-rotating axis keeps its value
-				if( !isSingular ) {
-					master_deg = FlipNonRotatingAxis( master_deg, isToolDirParallelToRotary );
-				}
-			}
-			return new Tuple<double, double>( master_deg, slave_deg );
 		}
 
 		static bool IsSingular( double master_deg, double slave_deg )
