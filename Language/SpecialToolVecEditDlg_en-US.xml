@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="FormTitle" Content="Special Tool Orientation" />
+	<Message ID="m_gbxType" Content="Special Tool Orientation Type" />
+	<Message ID="m_rbtNormal" Content="Default" />
+	<Message ID="m_rbtnFixDir" Content="Surface-Normal Cutting" />
+	<Message ID="m_rbtnZ" Content="Z-Axis Facing" />
+	<Message ID="m_rbtnAssignMS" Content="Locked-Axis Cutting" />
+	<Message ID="m_gbxMSDeg" Content="Start-Point Rotary Axis Angle" />
+	<Message ID="m_gbxCRotate" Content="Spindle Direction Adjustment" />
+	<Message ID="m_gbxSwitchDir" Content="Switch to Default Angle" />
+	<Message ID="m_btnZ" Content="Switch to Z-Axis Facing" />
+	<Message ID="m_btnFixDir" Content="Switch to Surface Normal" />
+	<Message ID="m_lblMDeg_Format" Content="{0}-Axis Rotation Angle" />
+	<Message ID="m_lblSDeg_Format" Content="{0}-Axis Rotation Angle" />
+	<Message ID="m_btnConfirm" Content="Done" />
+</ResMap>

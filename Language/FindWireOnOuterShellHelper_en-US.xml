@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="NoIntersectedFace" Content="[Operation Alert] No intersected face found" />
+	<Message ID="NoD1ContinuousFaces" Content="[Operation Alert] No D1 continuous face found" />
+	<Message ID="SewFaceGroupFailed" Content="[Operation Alert] Sew face group creation failed" />
+	<Message ID="NoClosedBoundaries" Content="[Operation Alert] No closed boundary found" />
+	<Message ID="UnknownError" Content="[Operation Alert] Unknown error" />
+</ResMap>

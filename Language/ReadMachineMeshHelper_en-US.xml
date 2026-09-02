@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="MeshFolderPathError" Content="Machine folder path error" />
+	<Message ID="MeshFileMissing" Content="{0} mesh file missing" />
+	<Message ID="MeshFileReadFailed" Content="{0} file read failed" />
+	<Message ID="MeshFileUnknownError" Content="{0} STL read failed, unknown error occurred" />
+</ResMap>

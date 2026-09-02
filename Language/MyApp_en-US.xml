@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="LoggerNotInitialized" Content="Logger not initialized; please set MainForm first." />
+	<Message ID="MainFormNotInitialized" Content="MainForm not initialized; please set MainForm first." />
+	<Message ID="CustPostFileNotExist" Content="Custom post-processor file not found" />
+	<Message ID="ReadCustPostFileFailed" Content="Failed to read custom post-processor file" />
+	<Message ID="CustPostFileContentError" Content="Custom post-processor file content incomplete or format error; please verify file content." />
+</ResMap>

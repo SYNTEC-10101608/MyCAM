@@ -163,6 +163,3 @@
 	<Message ID="Msg_SaveBeforeExitTitle" Content="存檔確認" />
 	<Message ID="Msg_SaveBeforeExitWithData" Content="是否要在關閉前存檔？" />
 </ResMap>
-
-
-

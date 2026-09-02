@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="NoSolidObjectInFile" Content="[Operation reminder] No solid objects in the file" />
+	<Message ID="RevolutionPlaceFailed" Content="[Operation reminder] Revolution body placement failed" />
+	<Message ID="ImportFailed" Content="Import failed" />
+</ResMap>

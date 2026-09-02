@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="MeasureDlg" Content="Measurement" />
+	<Message ID="m_lblMethod" Content="Measurement Method" />
+	<Message ID="m_lblResult" Content="Measurement Result" />
+	<Message ID="Method_PointCoordinate" Content="Point Coordinates" />
+	<Message ID="Method_LineLength" Content="Line Length" />
+	<Message ID="Method_CircleArcRadius" Content="Arc Radius" />
+	<Message ID="Method_DistanceBetweenTwoPoints" Content="Distance Between Points" />
+	<Message ID="Method_AngleBetweenLines" Content="Angle Between Lines" />
+	<Message ID="Guide_PointCoordinate" Content="Click a vertex on the workpiece to measure its coordinates" />
+	<Message ID="Guide_LineLength" Content="Click an edge to measure its length" />
+	<Message ID="Guide_CircleArcRadius" Content="Click a circle or arc edge to measure its radius" />
+	<Message ID="Guide_DistanceBetweenTwoPoints" Content="Click two vertices in sequence to measure the distance" />
+	<Message ID="Guide_AngleBetweenLines" Content="Click two line segments in sequence to measure the angle" />
+	<Message ID="m_lblGuide_Default" Content="Please select a measurement method" />
+</ResMap>

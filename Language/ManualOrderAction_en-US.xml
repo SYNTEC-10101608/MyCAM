@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="InvalidFlagPosition" Content="[Operation reminder] Invalid flag position" />
+	<Message ID="NoPathSelected" Content="[Operation reminder] No toolpath selected" />
+	<Message ID="OnlySinglePathSelection" Content="[Operation reminder] This function only supports single toolpath selection" />
+</ResMap>

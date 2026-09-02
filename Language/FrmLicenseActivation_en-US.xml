@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="FrmLicenseActivation_Title" Content="Product Activation" />
+	<Message ID="FrmLicenseActivation_Hint" Content="Enter activation code" />
+	<Message ID="FrmLicenseActivation_ActivateButton" Content="Activate" />
+</ResMap>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="m_lblWidth" Content="Micro-joint Width" />
+	<Message ID="m_chkStartPointFirst" Content="Add at Start Point First" />
+	<Message ID="m_btnOK" Content="OK" />
+	<Message ID="InvalidValue" Content="Invalid input value!" />
+</ResMap>

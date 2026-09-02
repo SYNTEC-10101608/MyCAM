@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="PatternSettingDlg" Content="Standard Pattern Settings" />
+	<Message ID="m_lblPathType" Content="Path Type" />
+	<Message ID="PathType_Contour" Content="Contour" />
+	<Message ID="PathType_Circle" Content="Circle" />
+	<Message ID="PathType_Rectangle" Content="Rectangle" />
+	<Message ID="PathType_Runway" Content="Stadium" />
+	<Message ID="PathType_Triangle" Content="Triangle" />
+	<Message ID="PathType_Square" Content="Square" />
+	<Message ID="PathType_Pentagon" Content="Pentagon" />
+	<Message ID="PathType_Hexagon" Content="Hexagon" />
+	<Message ID="m_chkCoordReverse" Content="Reverse Coordinates" />
+	<Message ID="m_btnOK" Content="OK" />
+	<Message ID="m_btnCancel" Content="Cancel" />
+	<Message ID="m_lblDiameter" Content="Diameter" />
+	<Message ID="m_lblLength" Content="Length" />
+	<Message ID="m_lblWidth" Content="Width" />
+	<Message ID="m_lblCornerRadius" Content="Corner Radius" />
+	<Message ID="m_lblSideLength" Content="Side Length" />
+	<Message ID="m_lblRotatedAngle" Content="Rotation Angle" />
+</ResMap>

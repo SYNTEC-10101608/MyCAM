@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="AddPathDlg" Content="Добавить путь" />
+	<Message ID="m_grpStep1" Content="Способ создания пути" />
+	<Message ID="m_rdoAutoHat" Content="Автоматически — нестандартная крышка" />
+	<Message ID="m_rdoAutoTube" Content="Автоматически — тянутая труба" />
+	<Message ID="m_rdoManual" Content="Ручное создание" />
+	<Message ID="m_grpStep3" Content="Способ создания пути" />
+	<Message ID="m_rdoAutoFromFace" Content="Автоматическое создание" />
+	<Message ID="m_rdoManualWire" Content="Ручной выбор" />
+	<Message ID="m_chkShowAdvanced" Content="Расширенные параметры" />
+	<Message ID="m_grpAdvanced" Content="Расширенные параметры" />
+	<Message ID="m_lblD1Threshold" Content="Порог непрерывности D1:" />
+	<Message ID="m_lblDiscreteMode" Content="Метод дискретизации:" />
+	<Message ID="m_lblMaxChordError" Content="Хордальная погрешность:" />
+	<Message ID="m_lblMaxLineLength" Content="Шаг дискретизации прямой:" />
+	<Message ID="m_lblD1Unit" Content="deg" />
+	<Message ID="m_lblChordUnit" Content="mm" />
+	<Message ID="m_lblLineUnit" Content="mm" />
+	<Message ID="m_btnOK" Content="Создать путь" />
+	<Message ID="m_btnNext" Content="Далее" />
+	<Message ID="DiscreteMode_QuasiUniformDeflection" Content="Стандартная дискретизация" />
+	<Message ID="DiscreteMode_UniformDeflection" Content="Точная дискретизация" />
+	<Message ID="Desc_Step2_Title" Content="Выберите грани для создания пути" />
+	<Message ID="Desc_Step2_Hints" Content="Двойной щелчок мышью: непрерывные грани&#13;&#10;Ctrl: множественный выбор" />
+	<Message ID="Desc_Step4_Title" Content="Выберите пути для создания" />
+	<Message ID="Desc_Step4_Hints" Content="Двойной щелчок мышью: непрерывные пути&#13;&#10;Ctrl: множественный выбор" />
+</ResMap>

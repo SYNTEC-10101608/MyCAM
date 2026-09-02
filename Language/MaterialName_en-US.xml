@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="0" Content="Default Material" />
+	<Message ID="1" Content="Stainless Steel" />
+	<Message ID="2" Content="Low Carbon Steel" />
+	<Message ID="3" Content="Medium Carbon Steel" />
+	<Message ID="4" Content="High Carbon Steel" />
+	<Message ID="5" Content="Aluminum Alloy" />
+	<Message ID="6" Content="Copper" />
+	<Message ID="7" Content="Brass" />
+	<Message ID="8" Content="Wood" />
+	<Message ID="9" Content="Fabric" />
+	<Message ID="10" Content="Acrylic" />
+	<Message ID="11" Content="Custom 11" />
+	<Message ID="12" Content="Custom 12" />
+	<Message ID="13" Content="Custom 13" />
+	<Message ID="14" Content="Custom 14" />
+	<Message ID="15" Content="Custom 15" />
+	<Message ID="16" Content="Custom 16" />
+	<Message ID="17" Content="Custom 17" />
+	<Message ID="18" Content="Custom 18" />
+	<Message ID="19" Content="Custom 19" />
+	<Message ID="20" Content="Custom 20" />
+</ResMap>

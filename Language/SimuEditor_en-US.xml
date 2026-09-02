@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="MachineFileReadFailed" Content="Machine file read failed" />
+	<Message ID="ReachedFirstCollision" Content="Reached first collision point" />
+	<Message ID="ReachedLastCollision" Content="Reached last collision point" />
+	<Message ID="PathHasCollision" Content="Toolpath has a collision; please check the simulation results" />
+	<Message ID="PathNoCollision" Content="Toolpath has no collision" />
+	<Message ID="PostProcessFailed" Content="Post-processing failed; cannot generate simulation: " />
+	<Message ID="SimuFrameCalcFailed" Content="Simulation frame {0} calculation failed" />
+	<Message ID="NoPathForSimulation" Content="No toolpath available for simulation" />
+	<Message ID="SimuCalcFailed" Content="Simulation calculation failed; please verify the machine configuration and toolpath settings" />
+	<Message ID="SimuCalcDoneCollisionFailed" Content="Simulation calculation completed but collision detection failed" />
+</ResMap>

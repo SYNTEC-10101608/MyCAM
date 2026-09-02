@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="DesignSupportBracketDlg" Content="Design Support Fixture" />
+	<Message ID="m_lblHint" Content="Click to select the bottom or side face of the workpiece for fixture placement&#13;&#10;(Ctrl: multi-select; double-click: select continuous faces)" />
+	<Message ID="m_btnNext" Content="Next" />
+	<Message ID="m_lblSectionBase" Content="Base Size" />
+	<Message ID="m_lblXExtension" Content="X-Direction Extension Distance" />
+	<Message ID="m_lblYExtension" Content="Y-Direction Extension Distance" />
+	<Message ID="m_lblSectionBracket" Content="Support Fixture Position" />
+	<Message ID="m_lblXPositionsTitle" Content="X-Direction Support Fixture Position" />
+	<Message ID="m_lblYPositionsTitle" Content="Y-Direction Support Fixture Position" />
+	<Message ID="m_btnAddXPosition" Content="+ Add X Support Fixture Position" />
+	<Message ID="m_btnAddYPosition" Content="+ Add Y Support Fixture Position" />
+	<Message ID="m_lblSectionBracketHeight" Content="Support Fixture Height" />
+	<Message ID="m_lblBaseThickness" Content="Connection Height (D - Base Plate Thickness)" />
+	<Message ID="m_lblEngagementDepth" Content="Support Fixture Engagement Depth (A)" />
+	<Message ID="m_lblXPinCount" Content="X-Direction Connection Quantity" />
+	<Message ID="m_lblYPinCount" Content="Y-Direction Connection Quantity" />
+	<Message ID="m_lblWallThickness" Content="Connection Width (C - Support Fixture Thickness)" />
+	<Message ID="m_lblRibHeight" Content="Support Fixture Base Height" />
+	<Message ID="m_lblZExtension" Content="Workpiece Clearance Height" />
+	<Message ID="m_lblPinLength" Content="Connection Length (B)" />
+	<Message ID="m_lblSectionCrossFit" Content="Engagement Design" />
+	<Message ID="m_lblSectionBracketCount" Content="Base Connection Quantity" />
+	<Message ID="m_lblSectionBottomPinSize" Content="Base Pin Size" />
+	<Message ID="m_btnBack" Content="Back" />
+	<Message ID="m_btnGenerate" Content="Generate" />
+	<Message ID="m_lblSaveDxfHint" Content="Select DXF save path" />
+	<Message ID="m_btnBrowseSavePath" Content="Browse..." />
+	<Message ID="m_btnSaveDxf" Content="Save DXF" />
+	<Message ID="m_dlgBrowseSavePath_Description" Content="Select save folder" />
+	<Message ID="m_btnSkipSave" Content="Skip" />
+	<Message ID="m_btnDeletePosition" Content="Delete" />
+	<Message ID="Warn_BelowMinimum" Content="{0} is below minimum {1}" />
+	<Message ID="Warn_AboveMaximum" Content="{0} exceeds maximum {1}" />
+</ResMap>

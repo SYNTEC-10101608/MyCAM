@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="FormatPointCoordinate" Content="X: {0:F3}mm&#13;&#10;Y: {1:F3}mm&#13;&#10;Z: {2:F3}mm" />
+	<Message ID="FormatLineLength" Content="Length: {0:F3}mm" />
+	<Message ID="FormatCircleRadius" Content="Radius: {0:F3}mm" />
+	<Message ID="FormatDistance" Content="Distance: {0:F3}mm" />
+	<Message ID="FormatAngle" Content="Angle: {0:F3} deg" />
+	<Message ID="NotCircularArc" Content="The selected edge is not a circle or circular arc" />
+	<Message ID="FirstPointSelected" Content="First point selected. Please select the second point." />
+	<Message ID="FirstLineSelected" Content="First line selected. Please select the second line." />
+	<Message ID="NotStraightLine" Content="The selected edge is not a straight line" />
+	<Message ID="LinesNotIntersect" Content="The two lines do not intersect. Cannot calculate angle." />
+</ResMap>

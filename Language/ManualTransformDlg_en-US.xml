@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="ManualTransformDlg" Content="Workpiece Alignment" />
+	<Message ID="m_lblMethod" Content="Alignment Method" />
+	<Message ID="m_lblAxisPlane" Content="Alignment Point" />
+	<Message ID="m_lblAxisPlane_Axis" Content="Alignment Axis" />
+	<Message ID="m_lblAxisPlane_Plane" Content="Alignment Plane" />
+	<Message ID="m_lblMoveStatus_Selected" Content="✔ Workpiece" />
+	<Message ID="m_lblMoveStatus_NotSelected" Content="✘ Workpiece" />
+	<Message ID="m_lblGuide_Default" Content="Please select an alignment method first" />
+	<Message ID="m_btnConfirm" Content="OK" />
+	<Message ID="Method_Point" Content="Point Alignment" />
+	<Message ID="Method_Axial" Content="Axial Alignment" />
+	<Message ID="Method_AxialParallel" Content="Axial Parallel" />
+	<Message ID="Method_Plane" Content="Plane Alignment" />
+	<Message ID="Method_PlaneParallel" Content="Plane Parallel" />
+	<Message ID="AxisPlane_Origin" Content="Origin" />
+	<Message ID="AxisPlane_XAxis" Content="X Axis" />
+	<Message ID="AxisPlane_YAxis" Content="Y Axis" />
+	<Message ID="AxisPlane_ZAxis" Content="Z Axis" />
+	<Message ID="AxisPlane_XYPlane" Content="XY Plane" />
+	<Message ID="AxisPlane_YZPlane" Content="YZ Plane" />
+	<Message ID="AxisPlane_XZPlane" Content="XZ Plane" />
+	<Message ID="Guide_Point" Content="Select a workpiece point on the canvas to align with the origin" />
+	<Message ID="Guide_Axial" Content="Select a workpiece edge on the canvas to align with the coordinate system axis" />
+	<Message ID="Guide_AxialParallel" Content="Select a workpiece edge on the canvas to align parallel with the coordinate system axis" />
+	<Message ID="Guide_Plane" Content="Select a workpiece plane on the canvas to align with the coordinate system plane" />
+	<Message ID="Guide_PlaneParallel" Content="Select a workpiece plane on the canvas to align parallel with the coordinate system plane" />
+	<Message ID="ShowConstraintError" Content="Alignment invalid. The selected object is not a plane, line, or circular arc. Please select again." />
+</ResMap>

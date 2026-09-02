@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="CannotGetGeomData" Content="Cannot obtain geometric information for toolpath {0}" />
+	<Message ID="CannotGetCraftData" Content="Cannot obtain machining information for toolpath {0}" />
+	<Message ID="CannotGetMachineData" Content="Cannot obtain machine information" />
+	<Message ID="PleaseSelectPath" Content="Please select a toolpath first" />
+	<Message ID="CannotSimulatePosture" Content="Unable to simulate tool orientation at this point" />
+	<Message ID="CannotGetToolVectorInfo" Content="Unable to obtain tool vector information for the target point" />
+	<Message ID="CannotGetMachineInfo" Content="Unable to obtain machine information" />
+	<Message ID="MutiPathCantSetSameMSForFixDir" Content="The same surface-normal angle cannot be assigned to multiple toolpaths; please select one toolpath" />
+	<Message ID="PathCannotSelect" Content="The selected toolpath does not support special tool orientation" />
+</ResMap>

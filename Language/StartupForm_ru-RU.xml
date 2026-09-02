@@ -4,7 +4,7 @@
 	<Message ID="Log_LicenseInvalid" Content="Неправильный процесс лицензирования" />
 	<Message ID="Log_LicenseInvalidTitle" Content="Ошибка лицензирования" />
 
-	
+	<!-- 選單列 -->
 	<Message ID="m_tsmiFile" Content="Файл" />
 	<Message ID="m_tsmiCAD" Content="CAD" />
 	<Message ID="m_tsmiCAM" Content="CAM" />
@@ -14,7 +14,7 @@
 	<Message ID="m_tsmiLanguage" Content="Переключение языка" />
 	<Message ID="m_tsbController" Content="Контроллер" />
 
-	
+	<!-- 檔案工具列 -->
 	<Message ID="m_tsbImport3DFile" Content="3D модель" />
 	<Message ID="m_tsbImport3DFile_ToolTip" Content="3D модель" />
 	<Message ID="m_tsbAddRevolution" Content="Тело вращения" />
@@ -26,7 +26,7 @@
 	<Message ID="m_tsbAddTube" Content="Проектирование трубок" />
 	<Message ID="m_tsbAddTube_ToolTip" Content="Проектирование трубок" />
 
-	
+	<!-- CAD工具列 -->
 	<Message ID="m_tsbSewPart" Content="Восстановление модели" />
 	<Message ID="m_tsbSewPart_ToolTip" Content="Восстановление модели" />
 	<Message ID="m_tsbDesignSupportBracket" Content="Проектирование приспособлений" />
@@ -52,7 +52,7 @@
 	<Message ID="m_tsbWireDiscreteVertex" Content="Создать характерные точки" />
 	<Message ID="m_tsbWireDiscreteVertex_ToolTip" Content="После выбора контура детали создаёт характерные точки на линиях контура" />
 
-	
+	<!-- CAM工具列 -->
 	<Message ID="m_tsbAddPath" Content="Добавить путь" />
 	<Message ID="m_tsbAddPath_ToolTip" Content="Добавить путь" />
 	<Message ID="m_tsbDeletePath" Content="Удалить путь" />
@@ -100,7 +100,7 @@
 	<Message ID="m_tsbMeasureCAM" Content="Измерение" />
 	<Message ID="m_tsbMeasureCAM_ToolTip" Content="Измерение" />
 
-	
+	<!-- 新增路徑子工具列 -->
 	<Message ID="m_tsAddPathForHat" Content="Нестандартная крышка-генерация пути" />
 	<Message ID="m_tsAddPathForTube" Content="Трубная тяга-генерация пути" />
 	<Message ID="m_tsbSelectD1ContFace" Content="D1 непрерывность" />
@@ -108,7 +108,7 @@
 	<Message ID="m_tsbSelPath_Manual" Content="Ручной выбор" />
 	<Message ID="m_tsbManualSelectPathOK" Content="Подтвердить выделение" />
 
-	
+	<!-- 模擬工具列 -->
 	<Message ID="m_btnPlay" Content="Воспроизведение" />
 	<Message ID="m_btnPlay_ToolTip" Content="Воспроизведение" />
 	<Message ID="m_btnPause" Content="Пауза" />
@@ -134,7 +134,7 @@
 	<Message ID="m_btnCheck" Content="Проверка столкновения" />
 	<Message ID="m_btnCheck_ToolTip" Content="Проверка столкновения" />
 	
-	
+	<!-- 提示字串 -->
 	<Message ID="ShowVec" Content="Показать позу" />
 	<Message ID="ShowOrder" Content="Показать порядок" />
 	<Message ID="ShowOrientation" Content="Показать направление пути" />
@@ -159,6 +159,7 @@
 	<Message ID="Log_CNCReconnectFailed" Content="Переподключение ЧПУ не удалось, пожалуйста, проверьте состояние сети или ЧПУ" />
 	<Message ID="Log_CNCPleaseConnectFirst" Content="Сначала подключитесь к ЧПУ. Пожалуйста, проверьте соединение ЧПУ и повторите попытку." />
 
+	<!-- 存檔提示 -->
 	<Message ID="Msg_SaveBeforeExitTitle" Content="Подтверждение сохранения" />
 	<Message ID="Msg_SaveBeforeExitWithData" Content="Хотите ли вы сохранить перед закрытием?" />
 </ResMap>

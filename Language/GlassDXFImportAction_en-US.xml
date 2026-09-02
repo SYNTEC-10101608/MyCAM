@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="DXFImportFailedNoGeom" Content="DXF import failed: no valid geometry" />
+	<Message ID="BuildSurfaceFailed" Content="Failed to build surface" />
+	<Message ID="DXFProjectionFailed" Content="DXF projection failed: no valid projection result" />
+	<Message ID="DXFImportException" Content="DXF import failed: " />
+</ResMap>

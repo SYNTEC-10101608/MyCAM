@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="NotContourPath" Content="Toolpath {0} is not a contour path and cannot be edited" />
+	<Message ID="CannotGetPathCraftInfo" Content="Unable to retrieve processing information for toolpath {0}" />
+</ResMap>
