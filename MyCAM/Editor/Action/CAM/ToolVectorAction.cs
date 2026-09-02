@@ -500,7 +500,7 @@ namespace MyCAM.Editor
 			if( m_SelectedPoint == null ) {
 				return;
 			}
-			Tuple<double, double> msAngles_deg = ToolVecHelper.GetMSAngleFromToolVec( new gp_Dir( 0, 0, 1 ), m_SelectedPoint );
+			Tuple<double, double> msAngles_deg = ToolVecHelper.GetMSAngleFromToolVec( new gp_Dir( 0, 0, 1 ), m_SelectedPoint, false );
 
 			// calculate AB angles from MS angles
 			Tuple<double, double> abAngles_deg = ToolVecHelper.GetABAngleFromMSAngle( msAngles_deg.Item1, msAngles_deg.Item2, m_SelectedPoint );
@@ -1314,7 +1314,7 @@ namespace MyCAM.Editor
 				}
 			}
 			while( step < maxSteps &&
-				(SpecialPointIndex.IsGeneratedPointIndex( m_PathCache.MainPathPointList[ camIndex ].InitPathIndex )) );
+				( SpecialPointIndex.IsGeneratedPointIndex( m_PathCache.MainPathPointList[ camIndex ].InitPathIndex ) ) );
 
 			// convert back to cad index
 			if( IsClosed() && camIndex == m_PathCache.MainPathPointList.Count - 1 ) {
