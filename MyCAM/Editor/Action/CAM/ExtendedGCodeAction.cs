@@ -227,36 +227,22 @@ namespace MyCAM.Editor
 			}
 		}
 
-		int? GetCurrentCAMIndex()
+		int? GetCurrentStoredIndex()
 		{
 			if( m_Param.GCodeType != ExtendedGCodeType.ControlPoint || m_nSelectCADIndex == null ) {
 				return null;
 			}
-
-			TryGetCAMIndex( m_nSelectCADIndex.Value, m_Param.IsPathStartPoint, out int? camIndex );
-			return camIndex;
+			return GetStoredIndex( m_nSelectCADIndex.Value, m_Param.IsPathStartPoint );
 		}
 
-		bool TryGetCAMIndex( int cadIndex, bool? isPathStartPoint, out int? camIndex )
+		int GetStoredIndex( int cadIndex, bool? isPathStartPoint )
 		{
-			camIndex = null;
-
-			if( m_PathCache.MainPathPointList.Count <= 0 ) {
-				return false;
+			// end point and start point share the same CAD index,
+			// use closed point index to distinguish the end point
+			if( isPathStartPoint == false ) {
+				return SpecialPointIndex.CLOSED_POINT_INDEX;
 			}
-
-			// end point and start point share the same CAD index 
-			if( isPathStartPoint == false || SpecialPointIndex.IsClosedPointIndex( cadIndex ) ) {
-				camIndex = m_PathCache.MainPathPointList.Count - 1;
-				return true;
-			}
-
-			if( m_PathCache.CADToCAMIndexMap.ContainsKey( cadIndex ) ) {
-				camIndex = m_PathCache.CADToCAMIndexMap[ cadIndex ];
-				return true;
-			}
-
-			return false;
+			return cadIndex;
 		}
 
 		#endregion
@@ -271,8 +257,6 @@ namespace MyCAM.Editor
 			if( m_CraftData == null ) {
 				return false;
 			}
-
-			int? camIndex = null;
 
 			if( gCodeType != ExtendedGCodeType.ControlPoint ) {
 				m_Param = BuildExtendedGCodeParameter( gCodeType, null, null );
@@ -292,18 +276,15 @@ namespace MyCAM.Editor
 				isPathStartPoint = true;
 			}
 
-			if( !TryGetCAMIndex( cadIndex.Value, isPathStartPoint, out camIndex ) ) {
-				return false;
-			}
-
-			m_Param = BuildExtendedGCodeParameter( gCodeType, camIndex, isPathStartPoint );
+			int nStoredIndex = GetStoredIndex( cadIndex.Value, isPathStartPoint );
+			m_Param = BuildExtendedGCodeParameter( gCodeType, nStoredIndex, isPathStartPoint );
 
 			return true;
 		}
 
-		ExtendedGCodeParam BuildExtendedGCodeParameter( ExtendedGCodeType gCodeType, int? camIndex, bool? isPathStartPoint )
+		ExtendedGCodeParam BuildExtendedGCodeParameter( ExtendedGCodeType gCodeType, int? cadIndex, bool? isPathStartPoint )
 		{
-			Tuple<ExtendedGCodeType, int?> key = Tuple.Create( gCodeType, camIndex );
+			Tuple<ExtendedGCodeType, int?> key = Tuple.Create( gCodeType, cadIndex );
 
 			if( m_CraftData.ExtendedGCodeMap.TryGetValue( key, out string content ) ) {
 				return new ExtendedGCodeParam( true, gCodeType, content, isPathStartPoint );
@@ -329,7 +310,7 @@ namespace MyCAM.Editor
 			}
 
 			m_Param.IsModified = true;
-			m_CraftData.SetExtendedGCode( m_Param.GCodeType, GetCurrentCAMIndex(), m_Param.Content );
+			m_CraftData.SetExtendedGCode( m_Param.GCodeType, GetCurrentStoredIndex(), m_Param.Content );
 			PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
 		}
 
@@ -339,7 +320,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			m_CraftData.RemoveExtendedGCode( m_Param.GCodeType, GetCurrentCAMIndex() );
+			m_CraftData.RemoveExtendedGCode( m_Param.GCodeType, GetCurrentStoredIndex() );
 			m_Param.IsModified = false;
 			m_Param.Content = string.Empty;
 			PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
@@ -377,7 +358,7 @@ namespace MyCAM.Editor
 			}
 
 			m_Param.Content = content;
-			m_CraftData.SetExtendedGCode( m_Param.GCodeType, GetCurrentCAMIndex(), m_Param.Content );
+			m_CraftData.SetExtendedGCode( m_Param.GCodeType, GetCurrentStoredIndex(), m_Param.Content );
 			PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
 		}
 
@@ -391,9 +372,6 @@ namespace MyCAM.Editor
 			if( m_PathCache.MainPathPointList.Count <= 0 ) {
 				return;
 			}
-
-			// must flush before the map key changes
-			m_Dlg?.FlushContent();
 
 			bool toStart = ( m_Param.IsPathStartPoint != true );
 			if( TryBuildExtendedGCodeParameter( ExtendedGCodeType.ControlPoint, m_nSelectCADIndex, toStart ) ) {
