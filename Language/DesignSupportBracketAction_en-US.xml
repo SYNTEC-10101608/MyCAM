@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Error_NoFaceSelected" Content="Please select a face first" />
+	<Message ID="Error_PositionCount" Content="Support fixture count cannot be 0" />
+	<Message ID="Error_BuildShellFailed" Content="Failed to create support surface. Ensure sufficient and connected faces are selected" />
+	<Message ID="Error_FillShellFailed" Content="Failed to fill holes. This workpiece does not support this function" />
+	<Message ID="Error_FillShellBBoxDiverged" Content="Geometric range after filling holes exceeds limits. This workpiece does not support this function" />
+	<Message ID="Error_ExtractShellFailed" Content="Failed to extract surface after filling holes. This workpiece does not support this function" />
+	<Message ID="Error_SectionCalculationFailed" Content="Section calculation failed. Adjust X/Y support fixture coordinates to avoid holes or depressions" />
+	<Message ID="Error_SupportBuildFailed" Content="Current face selection cannot generate support fixtures. Please select different faces" />
+	<Message ID="Error_NoSavePath" Content="Please specify a save path" />
+	<Message ID="Error_DxfExportFailed" Content="DXF export failed" />
+	<Message ID="Log_DxfSaved" Content="DXF saved to: {0}" />
+	<Message ID="Error_ComputeBBoxFailed" Content="Failed to compute workpiece bounds" />
+	<Message ID="Error_XPositionDuplicate" Content="X-direction support fixture coordinates have duplicates" />
+	<Message ID="Error_YPositionDuplicate" Content="Y-direction support fixture coordinates have duplicates" />
+	<Message ID="Error_XPositionOutOfRange" Content="X-direction support fixture coordinates exceed workpiece bounds" />
+	<Message ID="Error_YPositionOutOfRange" Content="Y-direction support fixture coordinates exceed workpiece bounds" />
+	<Message ID="Error_PositionSuffix" Content=", please correct and try again." />
+	<Message ID="Error_InvalidParamFormat" Content="Parameter format error: {0}" />
+	<Message ID="Error_InvalidIntParamFormat" Content="Parameter format error: {0} (must be positive integer)" />
+	<Message ID="Error_BuildShellException" Content="Exception during face welding: {0}" />
+</ResMap>

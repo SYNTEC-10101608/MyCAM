@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Circle" Content="Circle" />
+	<Message ID="Rectangle" Content="Rectangle" />
+	<Message ID="Oval" Content="Oval" />
+	<Message ID="FlatOval" Content="Stadium" />
+	<Message ID="DShape" Content="D-Shape" />
+	<Message ID="VShape" Content="Sharp V-Groove" />
+	<Message ID="BothSide" Content="Round V-Groove" />
+	<Message ID="OneSide" Content="Single-Sided Round V-Groove" />
+	<Message ID="MainTube" Content="Main Tube" />
+	<Message ID="EndCutter" Content="Cut-off" />
+	<Message ID="BranchTube" Content="Branch Tube" />
+	<Message ID="BendingNotch" Content="V-Groove" />
+	<Message ID="ErrorCode_OK" Content="Complete" />
+	<Message ID="ErrorCode_NullParam" Content="Processing error - null parameter" />
+	<Message ID="ErrorCode_NoMainTube" Content="Processing error - main tube is null" />
+	<Message ID="ErrorCode_NoSelectedObject" Content="Processing error - feature is null" />
+	<Message ID="ErrorCode_InvalidParam" Content="Invalid parameter" />
+	<Message ID="ErrorCode_MakeShapeFailed" Content="Feature generation failed" />
+	<Message ID="ErrorCode_CanNotRemoveMainTube" Content="Main tube cannot be removed" />
+	<Message ID="ErrorCode_ImportFileFailed" Content="Import failed" />
+	<Message ID="ErrorCode_SaveFileFailed" Content="Save failed" />
+	<Message ID="CADConstraint_FailCreateMainTube" Content="Unable to create this main tube type due to the maximum tube envelope diameter constraint" />
+	<Message ID="CADConstraint_TubeLengthTooLong" Content="Tube length must not exceed the maximum machining length" />
+	<Message ID="CADConstraint_DiameterTooLarge" Content="Diameter must not exceed the maximum tube envelope diameter" />
+	<Message ID="CADConstraint_DiagonalTooLarge" Content="Diagonal length must not exceed the maximum tube envelope diameter" />
+	<Message ID="CADConstraint_HeightTooLarge" Content="Height must not exceed the maximum tube envelope diameter" />
+	<Message ID="CADConstraint_TwoTimesRadiusTooLarge" Content="Twice the radius must not exceed the maximum tube envelope diameter" />
+	<Message ID="CADConstraint_WidthTooLarge" Content="Width must not exceed the maximum tube envelope diameter" />
+</ResMap>

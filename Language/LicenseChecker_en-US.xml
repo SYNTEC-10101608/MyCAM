@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Error_Title" Content="Error" />
+	<Message ID="Error_IsLicenseActivatedException" Content="License verification exception occurred: {0}" />
+	<Message ID="Error_LicenseFileEmpty" Content="License file is empty or cannot be read" />
+	<Message ID="Error_LicenseFileSignatureFailed" Content="License file signature verification failed" />
+	<Message ID="Error_LicenseFileNoSignature" Content="License file missing signature field" />
+	<Message ID="Error_LicenseMissingFields" Content="License file missing required fields (Customer/HWID)" />
+	<Message ID="Error_EntryAssemblyNull_Version" Content="Unable to retrieve assembly information; version verification failed" />
+	<Message ID="Error_ProductMismatch" Content="License product name mismatch. Expected: {0}, Current: {1}" />
+	<Message ID="Error_MinVersionNotMet" Content="License minimum version requirement not met. Required: {0}, Current: {1}" />
+	<Message ID="Error_MaxVersionExceeded" Content="License version exceeds limit. Allowed up to: {0}, Current: {1}" />
+	<Message ID="Error_ReadLicenseFileFailed" Content="License file read failed: {0}" />
+	<Message ID="Error_InstallLicenseFailed" Content="License installation failed: {0}" />
+	<Message ID="Error_LicenseCodeEmpty" Content="License code cannot be empty" />
+	<Message ID="Error_LicenseCodeNoSignature" Content="License code does not contain signature" />
+	<Message ID="Error_LicenseCodeInvalidBase64" Content="License code format invalid (not Base64)" />
+	<Message ID="Error_EntryAssemblyNull_Request" Content="Unable to retrieve assembly information; cannot generate activation request" />
+	<Message ID="Error_ProductEmpty_Request" Content="Product name cannot be empty; cannot generate activation request" />
+	<Message ID="Error_VersionEmpty_Request" Content="Version cannot be empty; cannot generate activation request" />
+	<Message ID="Error_Machine_Info_Lack" Content="Insufficient machine information; cannot generate activation request" />
+	<Message ID="Info_ActivationRequestGenerated" Content="License activation request file generated at:&#10;{0}&#10;&#10;Please send this file to the vendor to obtain the license code." />
+	<Message ID="Info_ActivationRequestGeneratedTitle" Content="License request generated" />
+	<Message ID="Error_LicenseExpired" Content="License expired: expiration date {0} (UTC), current {1} (UTC)" />
+	<Message ID="Error_ExpireDateInvalid" Content="License expiration date format error: {0}" />
+</ResMap>

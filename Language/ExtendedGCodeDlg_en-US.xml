@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+    <Message ID="ExtendedGCodeDlg" Content="Extended G-code" />
+    
+    <Message ID="m_lblInsertPosition" Content="Insert Position" />
+    
+    <Message ID="m_rbtnTraverseStart" Content="Traverse Start" />
+    <Message ID="m_rbtnTraverseEnd" Content="Traverse End" />
+    <Message ID="m_rbtnPathStart" Content="Path Start" />
+    <Message ID="m_rbtnPathEnd" Content="Path End" />
+    <Message ID="m_rbtnControlPoint" Content="Control Point" />
+    
+    <Message ID="m_lblToStartOrEnd" Content="Start/End Point Switch" />
+    <Message ID="m_btnToStartOrEnd" Content="Start/End Point" />
+    <Message ID="m_lblIsStartOrEnd" Content="Current Position: Start Point" />
+
+    <Message ID="IS_START_POINT" Content="Current Position: Start Point" />
+    <Message ID="IS_END_POINT" Content="Current Position: End Point" />
+
+    <Message ID="m_lblGCode" Content="G-code" />
+    
+    <Message ID="m_btnDelete" Content="Delete" />
+    <Message ID="m_btnAdd" Content="Add" />
+    <Message ID="m_btnDone" Content="Done" />
+</ResMap>
+

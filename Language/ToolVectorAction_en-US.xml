@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="CannotGetPathCraftInfo" Content="Unable to obtain machining information for toolpath {0}" />
+	<Message ID="TiltAngleTooLarge" Content="Tilt angle exceeds the acceptable range" />
+	<Message ID="CannotSimulatePose" Content="Unable to simulate tool orientation" />
+	<Message ID="NoNextControlPoint" Content="No next control point" />
+	<Message ID="NoPreControlPoint" Content="No previous control point" />
+	<Message ID="CannotGetMachineInfo" Content="Unable to obtain machine information" />
+	<Message ID="CannotCalculateLaserHeadPosition" Content="Unable to calculate laser head position" />
+	<Message ID="PathCannotSelect" Content="The selected toolpath does not support edge tool orientation" />
+</ResMap>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="CannotGetPathCraftInfo" Content="Cannot obtain toolpath {0} machining information" />
+	<Message ID="CannotGetPathGeomInfo" Content="Cannot obtain toolpath {0} geometry information" />
+	<Message ID="PathNotClosed" Content="Toolpath {0} is not closed" />
+</ResMap>

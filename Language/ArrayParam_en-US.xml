@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="LinearCount" Content="Linear Array Count" />
+	<Message ID="LinearDistance" Content="Linear Array Spacing" />
+	<Message ID="LinearDirection" Content="Linear Array Direction" />
+	<Message ID="AngularCount" Content="Circular Array Count" />
+	<Message ID="AngularDistance" Content="Circular Array Spacing" />
+	<Message ID="AngularDirection" Content="Circular Array Direction" />
+</ResMap>

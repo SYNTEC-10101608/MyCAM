@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="PathEditDlg" Content="Toolpath Edit" />
+	<Message ID="m_lblRefCoordType" Content="Coordinate System" />
+	<Message ID="RefCoordType_Local" Content="Local Coordinate System" />
+	<Message ID="RefCoordType_World" Content="World Coordinate System" />
+	<Message ID="m_lblX" Content="X Offset" />
+	<Message ID="m_lblY" Content="Y Offset" />
+	<Message ID="m_lblZ" Content="Z Offset" />
+	<Message ID="m_btnConfirm" Content="Confirm" />
+	<Message ID="m_btnClear" Content="Clear" />
+	<Message ID="m_btnReset" Content="Reset" />
+</ResMap>

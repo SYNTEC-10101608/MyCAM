@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="EntryAndExitDlg" Content="Lead-in/Lead-out" />
+	<Message ID="m_lblEntryDistance" Content="Lead-in Distance" />
+	<Message ID="m_lblExitDistance" Content="Lead-out Distance" />
+	<Message ID="m_lblFollowSafeDistance" Content="Follow-up Safe Distance" />
+	<Message ID="m_btnConfirm" Content="Confirm" />
+</ResMap>

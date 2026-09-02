@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="MissingRotationCenter" Content="Missing rotation center setting" />
+	<Message ID="MissingRotationDirection" Content="Missing rotation direction setting" />
+	<Message ID="FrameCalcFailed" Content="Frame calculation failed" />
+	<Message ID="MissingChainMapEntry" Content="Missing mapping entry for {0} in chain list" />
+</ResMap>

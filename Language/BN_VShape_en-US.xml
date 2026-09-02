@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="BendingAngle_deg" Content="Bending Angle" />
+	<Message ID="JointGapLength" Content="Joint Gap Length" />
+	<Message ID="ReliefHoleType" Content="Relief Hole Type" />
+	<Message ID="ReliefHole" Content="Relief Hole Parameters" />
+</ResMap>

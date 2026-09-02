@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="FormTitle" Content="Shindai Laser 5-Axis Cutting {0}" />
+	<Message ID="Log_LicenseInvalid" Content="License authentication process failed" />
+	<Message ID="Log_LicenseInvalidTitle" Content="License error" />
+
+	<!-- 選單列 -->
+	<Message ID="m_tsmiFile" Content="File" />
+	<Message ID="m_tsmiCAD" Content="CAD" />
+	<Message ID="m_tsmiCAM" Content="CAM" />
+	<Message ID="m_tsmiSimulation" Content="Simulation" />
+	<Message ID="m_tsbSetting" Content="Settings" />
+	<Message ID="m_tsbCNCConnection" Content="CNC Connection" />
+	<Message ID="m_tsmiLanguage" Content="Language" />
+	<Message ID="m_tsbController" Content="Controller" />
+
+	<!-- 檔案工具列 -->
+	<Message ID="m_tsbImport3DFile" Content="3D Model" />
+	<Message ID="m_tsbImport3DFile_ToolTip" Content="Import 3D model part" />
+	<Message ID="m_tsbAddRevolution" Content="Revolved Part" />
+	<Message ID="m_tsbAddRevolution_ToolTip" Content="Import revolved part" />
+	<Message ID="m_tsbReadProjectFile" Content="Open Project" />
+	<Message ID="m_tsbReadProjectFile_ToolTip" Content="Open project file" />
+	<Message ID="m_tsbSaveProjectFile" Content="Save Project" />
+	<Message ID="m_tsbSaveProjectFile_ToolTip" Content="Save project file" />
+	<Message ID="m_tsbAddTube" Content="Design Tube" />
+	<Message ID="m_tsbAddTube_ToolTip" Content="Design tube part" />
+	
+	<!-- CAD工具列 -->
+	<Message ID="m_tsbSewPart" Content="Sew Model" />
+	<Message ID="m_tsbSewPart_ToolTip" Content="Sew gaps in the part" />
+	<Message ID="m_tsbDesignSupportBracket" Content="Design Support Fixture" />
+	<Message ID="m_tsbDesignSupportBracket_ToolTip" Content="Design a support fixture for a custom cover" />
+	<Message ID="m_tsbAddPoint_AcrCenter" Content="Arc Center" />
+	<Message ID="m_tsbAddPoint_AcrCenter_ToolTip" Content="Create the center point of the selected arc" />
+	<Message ID="m_tsbAddPoint_EdgeCenter" Content="Edge Midpoint" />
+	<Message ID="m_tsbAddPoint_EdgeCenter_ToolTip" Content="Create the midpoint of the selected edge" />
+	<Message ID="m_tsbAddPoint_PointCenter" Content="Two-Point Center" />
+	<Message ID="m_tsbAddPoint_PointCenter_ToolTip" Content="Create the midpoint of two selected points" />
+	<Message ID="m_tsbAddPoint_BoundingBoxCenter" Content="Bounding Box Center" />
+	<Message ID="m_tsbAddPoint_BoundingBoxCenter_ToolTip" Content="Create the bounding-box center and move the part to the origin" />
+	<Message ID="m_tsbAddLine_TwoVertexConnect" Content="Two-Point Line" />
+	<Message ID="m_tsbAddLine_TwoVertexConnect_ToolTip" Content="Create a line between two selected points" />
+	<Message ID="m_tsbManualTransform" Content="Workpiece Alignment" />
+	<Message ID="m_tsbManualTransform_ToolTip" Content="Align the part with the coordinate axes" />
+	<Message ID="m_tsb3PntTransform" Content="Three-Point Transform" />
+	<Message ID="m_tsb3PntTransform_ToolTip" Content="Position the workpiece using three selected points" />
+	<Message ID="m_tsbAxisTransform" Content="Axis Transform" />
+	<Message ID="m_tsbAxisTransform_ToolTip" Content="Translate and rotate the part" />
+	<Message ID="m_tsbMeasureCAD" Content="Measure" />
+	<Message ID="m_tsbMeasureCAD_ToolTip" Content="Measure distance or angle" />
+	<Message ID="m_tsbWireDiscreteVertex" Content="Create Feature Points" />
+	<Message ID="m_tsbWireDiscreteVertex_ToolTip" Content="Create feature points on the selected contour" />
+	
+	<!-- CAM工具列 -->
+	<Message ID="m_tsbAddPath" Content="New Toolpath" />
+	<Message ID="m_tsbAddPath_ToolTip" Content="Select a method for creating a toolpath" />
+	<Message ID="m_tsbDeletePath" Content="Delete Toolpath" />
+	<Message ID="m_tsbDeletePath_ToolTip" Content="Delete the selected toolpath" />
+	<Message ID="m_tsbStartPoint" Content="Start Point" />
+	<Message ID="m_tsbStartPoint_ToolTip" Content="Set the toolpath start point" />
+	<Message ID="m_tsbReverse" Content="Reverse" />
+	<Message ID="m_tsbReverse_ToolTip" Content="Reverse the selected toolpath direction" />
+	<Message ID="m_tsbSetLead" Content="Lead-in/Lead-out" />
+	<Message ID="m_tsbSetLead_ToolTip" Content="Set lead-in and lead-out parameters for the toolpath" />
+	<Message ID="m_tsbOverCut" Content="Overcut" />
+	<Message ID="m_tsbOverCut_ToolTip" Content="Set overcut for the selected toolpath" />
+	<Message ID="m_tsbMicroJoint" Content="Micro-joint" />
+	<Message ID="m_tsbMicroJoint_ToolTip" Content="Set micro-joints for the selected toolpath" />
+	<Message ID="m_tsbExtendedGCode" Content="Extended G-code" />
+	<Message ID="m_tsbExtendedGCode_ToolTip" Content="Insert extended G-code at the specified position of the selected toolpath" />
+	<Message ID="m_tsbToolVecReverse" Content="Reverse Orientation" />
+	<Message ID="m_tsbToolVecReverse_ToolTip" Content="Reverse the tool orientation of the selected toolpath" />
+	<Message ID="m_tsbToolVec" Content="Edge Tool Orientation" />
+	<Message ID="m_tsbToolVec_ToolTip" Content="Adjust the edge toolpath orientation" />
+	<Message ID="m_tsbFixedToolVec" Content="Hole Orientation" />
+	<Message ID="m_tsbFixedToolVec_ToolTip" Content="Adjust the hole toolpath orientation" />
+	<Message ID="m_tsbOptimizeIK" Content="Optimize Axes" />
+	<Message ID="m_tsbOptimizeIK_ToolTip" Content="Optimize rotary-axis angles between all toolpaths" />
+	<Message ID="m_tsbManualOrder" Content="Manual Sequence" />
+	<Message ID="m_tsbManualOrder_ToolTip" Content="Manually sequence toolpaths" />
+	<Message ID="m_tsbAutoOrder" Content="Auto Sequence" />
+	<Message ID="m_tsbAutoOrder_ToolTip" Content="Select an automatic toolpath sequencing method" />
+	<Message ID="m_tsbSetTraverseData" Content="Traverse" />
+	<Message ID="m_tsbSetTraverseData_ToolTip" Content="Adjust traverse parameters for the selected toolpath" />
+	<Message ID="m_tsbEntryAndExitSetting" Content="Entry/Exit" />
+	<Message ID="m_tsbEntryAndExitSetting_ToolTip" Content="Adjust entry and exit distances" />
+	<Message ID="m_tsbPatternSetting" Content="Standard Pattern" />
+	<Message ID="m_tsbPatternSetting_ToolTip" Content="Set the selected toolpath as a standard pattern" />
+	<Message ID="m_tsbPathEdit" Content="Position Compensation" />
+	<Message ID="m_tsbPathEdit_ToolTip" Content="Set position compensation for the selected toolpath" />
+	<Message ID="m_BtnContourEdit" Content="Contour Edit" />
+	<Message ID="m_BtnContourEdit_ToolTip" Content="Adjust the local contour of the selected toolpath" />
+	<Message ID="m_tsbPathCompensation" Content="Dimension Compensation" />
+	<Message ID="m_tsbPathCompensation_ToolTip" Content="Set dimension compensation for the selected toolpath" />
+	<Message ID="m_tsbCalibrationPnt" Content="Three-Point Calibration" />
+	<Message ID="m_tsbCalibrationPnt_ToolTip" Content="Set three-point calibration references for machining" />
+	<Message ID="m_tsbConvertNC" Content="Export NC" />
+	<Message ID="m_tsbConvertNC_ToolTip" Content="Export NC machining code" />
+	<Message ID="m_tsbMeasureCAM" Content="Measure" />
+	<Message ID="m_tsbMeasureCAM_ToolTip" Content="Measure distance or angle" />
+	
+	<!-- 新增路徑子工具列 -->
+	<Message ID="m_tsAddPathForHat" Content="Custom Cover - Generate Toolpath" />
+	<Message ID="m_tsAddPathForTube" Content="Drawn Tube - Generate Toolpath" />
+	<Message ID="m_tsbSelectD1ContFace" Content="D1 Continuous" />
+	<Message ID="m_tsbSelPath_FreeBound" Content="All Face Boundaries" />
+	<Message ID="m_tsbSelPath_Manual" Content="Manual Selection" />
+	<Message ID="m_tsbManualSelectPathOK" Content="Confirm Selection" />
+	
+	<!-- 模擬工具列 -->
+	<Message ID="m_btnPlay" Content="Play" />
+	<Message ID="m_btnPlay_ToolTip" Content="Play simulation" />
+	<Message ID="m_btnPause" Content="Pause" />
+	<Message ID="m_btnPause_ToolTip" Content="Pause simulation" />
+	<Message ID="m_btnStop" Content="Stop" />
+	<Message ID="m_btnStop_ToolTip" Content="Stop simulation and return to the start" />
+	<Message ID="m_btnPreviousPath" Content="Previous Toolpath" />
+	<Message ID="m_btnPreviousPath_ToolTip" Content="Jump to the previous toolpath" />
+	<Message ID="m_btnNextPath" Content="Next Toolpath" />
+	<Message ID="m_btnNextPath_ToolTip" Content="Jump to the next toolpath" />
+	<Message ID="m_btnPreCollision" Content="Previous Collision Point" />
+	<Message ID="m_btnPreCollision_ToolTip" Content="Jump to the previous collision point" />
+	<Message ID="m_btnNextCol" Content="Next Collision Point" />
+	<Message ID="m_btnNextCol_ToolTip" Content="Jump to the next collision point" />
+	<Message ID="m_btnPrePoint" Content="Previous Step" />
+	<Message ID="m_btnPrePoint_ToolTip" Content="Move back one step" />
+	<Message ID="m_btnNextPoint" Content="Next Step" />
+	<Message ID="m_btnNextPoint_ToolTip" Content="Move forward one step" />
+	<Message ID="m_btnSpeedUp" Content="Speed Up" />
+	<Message ID="m_btnSpeedUp_ToolTip" Content="Increase simulation speed" />
+	<Message ID="m_btnSlowDonw" Content="Slow Down" />
+	<Message ID="m_btnSlowDonw_ToolTip" Content="Decrease simulation speed" />
+	<Message ID="m_btnCheck" Content="Collision Check" />
+	<Message ID="m_btnCheck_ToolTip" Content="Check for collisions" />
+	
+	<!-- 提示字串 -->
+	<Message ID="ShowVec" Content="Show Orientation" />
+	<Message ID="ShowOrder" Content="Show Sequence" />
+	<Message ID="ShowOrientation" Content="Show Toolpath Direction" />
+	<Message ID="ShowTraverse" Content="Show Traverse Path" />
+	<Message ID="ShowMarker" Content="Show Process Markers on Toolpath" />
+	<Message ID="Layer" Content="Layer {0}" />
+
+	<Message ID="Log_UseDefaultMachineProject" Content="Using default machine project" />
+	<Message ID="Log_MachineNodeNull" Content="Machine parameter node is null; using default machine parameters" />
+	<Message ID="Log_MachineFileNull" Content="Machine file is null; using default machine parameters" />
+	<Message ID="Log_MachineParamError" Content="Machine parameter error (Pr: {0}); using default machine parameters" />
+	<Message ID="Log_MachineTreeInvalid" Content="Machine tree structure error; using default machine tree" />
+	<Message ID="Log_MachineFileReadFailed" Content="Failed to read machine file:&#10; {0}; using default machine parameters" />
+	<Message ID="Log_VNCFileNotFound" Content="VNC executable not found. Ensure it is in the same directory as the application" />
+	<Message ID="Log_VNCConnectFailed" Content="Failed to connect to the specified IP address" />
+	<Message ID="Log_VNCUnknownError" Content="Unknown error occurred during VNC connection" />
+	<Message ID="Log_RevolutionFailed" Content="Revolved part creation failed" />
+	<Message ID="Log_CNCConnectFailed" Content="CNC connection failed" />
+	<Message ID="Log_CNCConnectSuccess" Content="CNC connection successful" />
+	<Message ID="Log_CNCReconnecting" Content="Reconnecting to CNC..." />
+	<Message ID="Log_CNCReconnected" Content="CNC reconnection successful" />
+	<Message ID="Log_CNCReconnectFailed" Content="CNC reconnection failed. Check the network or CNC status" />
+	<Message ID="Log_CNCPleaseConnectFirst" Content="CNC is not connected. Establish a CNC connection first" />
+	
+	<!-- 存檔提示 -->
+	<Message ID="Msg_SaveBeforeExitTitle" Content="Save Confirmation" />
+	<Message ID="Msg_SaveBeforeExitWithData" Content="Save before closing?" />
+</ResMap>

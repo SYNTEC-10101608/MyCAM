@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="PathCompensateDlg" Content="Toolpath Compensation" />
+	<Message ID="m_lblCompensate" Content="Compensation Distance (Increment)" />
+	<Message ID="m_btnConfirm" Content="Confirm" />
+	<Message ID="m_btnClear" Content="Clear" />
+	<Message ID="m_btnReset" Content="Reset" />
+</ResMap>

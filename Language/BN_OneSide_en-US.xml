@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="IsOverCut" Content="Wall-Thickness Overcut" />
+	<Message ID="Side" Content="V-Notch Direction" />
+</ResMap>

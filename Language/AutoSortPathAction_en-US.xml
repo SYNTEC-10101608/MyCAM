@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Log_InsufficientPaths" Content="[Toolpath Sequencing] Insufficient paths, minimum 2 required" />
+	<Message ID="Log_SortFailed" Content="[Toolpath Sequencing] {0} sequencing failed to generate results, please verify the toolpath data" />
+	<Message ID="SortMethod_ShortestPath" Content="Shortest Path" />
+	<Message ID="SortMethod_CylinderVertical" Content="Round Tube Vertical" />
+	<Message ID="SortMethod_CylinderHorizontal" Content="Round Tube Horizontal" />
+	<Message ID="SortMethod_Unknown" Content="Unknown" />
+</ResMap>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Title" Content="Hole Shredding Settings" />
+	<Message ID="m_lblShreddingInterval" Content="Shredding Interval" />
+	<Message ID="m_btnOK" Content="OK" />
+	<Message ID="m_btnCancel" Content="Cancel" />
+	<Message ID="ApplyToAllCuttingPaths" Content="Apply to all toolpaths" />
+	<Message ID="ApplyToSelectedCuttingPaths" Content="Apply to selected toolpaths only" />
+	<Message ID="Error_InvalidInput" Content="Invalid input value. Please enter an integer greater than or equal to 0" />
+	<Message ID="Error_NoCuttingPath" Content="No toolpaths exist. This function cannot be used" />
+</ResMap>

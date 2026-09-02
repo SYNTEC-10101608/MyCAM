@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Center_X_Y" Content="X Position" />
+	<Message ID="Center_X_X" Content="Y Position" />
+	<Message ID="Center_Y_Y" Content="Y Position" />
+	<Message ID="Center_Y_X" Content="X Position" />
+	<Message ID="Center_Z" Content="Z Position" />
+	<Message ID="TiltAngle_deg" Content="Tilt Angle" />
+	<Message ID="RotateAngle_deg" Content="Rotation Angle" />
+	<Message ID="Side" Content="Cut Direction" />
+</ResMap>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="AddPathDlg" Content="Add Toolpath" />
+	<Message ID="m_grpStep1" Content="Toolpath Generation Method" />
+	<Message ID="m_rdoAutoHat" Content="Auto Generate - Custom Cover" />
+	<Message ID="m_rdoAutoTube" Content="Auto Generate - Drawn Tube" />
+	<Message ID="m_rdoManual" Content="Manual Generation" />
+	<Message ID="m_grpStep3" Content="Toolpath Generation Method" />
+	<Message ID="m_rdoAutoFromFace" Content="Auto Generate" />
+	<Message ID="m_rdoManualWire" Content="Manual Selection" />
+	<Message ID="m_chkShowAdvanced" Content="Advanced Parameters" />
+	<Message ID="m_grpAdvanced" Content="Advanced Parameters" />
+	<Message ID="m_lblD1Threshold" Content="D1 Continuity Threshold:" />
+	<Message ID="m_lblDiscreteMode" Content="Discretization Method:" />
+	<Message ID="m_lblMaxChordError" Content="Chordal Deviation:" />
+	<Message ID="m_lblMaxLineLength" Content="Line Discretization Distance:" />
+	<Message ID="m_lblD1Unit" Content="deg" />
+	<Message ID="m_lblChordUnit" Content="mm" />
+	<Message ID="m_lblLineUnit" Content="mm" />
+	<Message ID="m_btnOK" Content="Generate Toolpath" />
+	<Message ID="m_btnNext" Content="Next" />
+	<Message ID="DiscreteMode_QuasiUniformDeflection" Content="Standard Discretization" />
+	<Message ID="DiscreteMode_UniformDeflection" Content="Precise Discretization" />
+	<Message ID="Desc_Step2_Title" Content="Select Faces for Toolpath Generation" />
+	<Message ID="Desc_Step2_Hints" Content="Double-click with mouse: Continuous faces&#13;&#10;Ctrl: Multiple selection" />
+	<Message ID="Desc_Step4_Title" Content="Select Toolpaths to Generate" />
+	<Message ID="Desc_Step4_Hints" Content="Double-click with mouse: Continuous paths&#13;&#10;Ctrl: Multiple selection" />
+</ResMap>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="TraverseDlg" Content="Traverse Parameters" />
+	<Message ID="m_lblLiftUpDistance" Content="Lift Distance" />
+	<Message ID="m_lblCutDownDistance" Content="Cut-down Distance" />
+	<Message ID="m_lblFollowSaveDistance" Content="Follow Safe Distance" />
+	<Message ID="m_chkSafePlane" Content="Enable Safe Plane" />
+	<Message ID="m_lblFrogLeapDistance" Content="Hop Distance" />
+	<Message ID="m_lblSafePlaneDistance" Content="Z Plane Height" />
+	<Message ID="m_btnConfirm" Content="Confirm" />
+</ResMap>

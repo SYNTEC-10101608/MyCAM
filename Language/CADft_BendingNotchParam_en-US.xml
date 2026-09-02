@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Shape" Content="Geometry Parameters" />
+	<Message ID="YPos_Y" Content="Y Position" />
+	<Message ID="YPos_X" Content="X Position" />
+	<Message ID="GapFromButtom" Content="Distance from Bottom Edge" />
+	<Message ID="BAngle_deg_Y" Content="B Angle (Y Rotation)" />
+	<Message ID="BAngle_deg_X" Content="A Angle (X Rotation)" />
+	<Message ID="ArrayParam" Content="Array Parameters" />
+</ResMap>

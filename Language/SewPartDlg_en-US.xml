@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="SewPartDlg" Content="Sew Settings" />
+	<Message ID="m_lblSewTol" Content="Sew Tolerance:" />
+	<Message ID="m_btnOK" Content="OK" />
+</ResMap>

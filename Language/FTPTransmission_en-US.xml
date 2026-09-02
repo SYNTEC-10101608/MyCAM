@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Error_LocalFileNotFound" Content="Local file not found or path is invalid" />
+	<Message ID="Error_FTPServerIPInvalid" Content="FTP server IP address is invalid" />
+	<Message ID="Error_ConnectionFailed" Content="Connection failed" />
+	<Message ID="Error_UploadFailed" Content="Upload failed, status code: {0}" />
+	<Message ID="Error_NetworkError" Content="Network error: {0}" />
+	<Message ID="Error_UploadException" Content="Upload exception: {0}" />
+</ResMap>

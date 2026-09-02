@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="PleaseAddWorkpiece" Content="[Action Reminder] Please add a workpiece first" />
+	<Message ID="PleaseSelectFace" Content="[Action Reminder] Please select a face first" />
+	<Message ID="NoClosedBoundaryFound" Content="[Action Reminder] No closed boundary found" />
+	<Message ID="OnlyContourPathSupported" Content="[Action Reminder] This function only supports contour toolpaths" />
+	<Message ID="PleaseSelectPath" Content="[Action Reminder] Please select a toolpath first" />
+	<Message ID="OnlySinglePathEdit" Content="[Action Reminder] Only one toolpath can be selected for editing" />
+	<Message ID="AutoOptimizeIKDone" Content="[Operation Complete] Completed automatic optimization of starting point rotation axis" />
+	<Message ID="NCExportFailedAndTransferFailed" Content="[NC Export Status] NC export failed: {0}&#xA;[File Transfer Status] NC file transfer failed" />
+	<Message ID="TempFileDeleteFailed" Content="[Temporary File Cleanup] Delete failed: {0}" />
+	<Message ID="NCFileSaveFailed" Content="[NC Export Status] File save failed: {0}" />
+	<Message ID="NCExportSuccessNoController" Content="[NC Export Status] NC export successful&#xA;[File Transfer Status] Not connected to controller, file cannot be transferred" />
+	<Message ID="NCExportAndTransferSuccess" Content="[NC Export Status] NC export successful&#xA;[File Transfer Status] NC file transfer successful" />
+	<Message ID="NCExportSuccessTransferFailed" Content="[NC Export Status] NC export successful&#xA;[File Transfer Status] NC file transfer failed: {0}" />
+	<Message ID="SaveNCFileTitle" Content="Save NC File" />
+	<Message ID="NoIntersectingFaceFound" Content="[Action Reminder] No intersecting face found" />
+	<Message ID="NoD1ContinuousFaceFound" Content="[Action Reminder] No D1 continuous face found" />
+	<Message ID="FaceGroupBuildFailed" Content="[Action Reminder] Face group build failed" />
+	<Message ID="CAMEditor_OptimizeIKContinuityCompleted" Content="[Operation Complete] Completed automatic optimization of starting point rotation axis" />
+</ResMap>

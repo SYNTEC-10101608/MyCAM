@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="FormTitle" Content="Connection Settings" />
+	<Message ID="m_lblIP" Content="IP:" />
+	<Message ID="m_btnConfirm" Content="OK" />
+	<Message ID="m_lblTips_Default" Content="Enter in IPv4 format" />
+	<Message ID="Error_InvalidIPFormat" Content="Invalid format, please enter in IPv4 format" />
+</ResMap>

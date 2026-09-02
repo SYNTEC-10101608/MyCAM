@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="CoincidentSecondPoint" Content="Coincident second point" />
+	<Message ID="CoincidentThirdPoint" Content="Coincident third point" />
+	<Message ID="ThreePointsCollinear" Content="Three points are collinear" />
+	<Message ID="InvalidAxisParam" Content="Invalid axis parameter" />
+	<Message ID="CannotCreate3PCoordSystem" Content="Cannot create three-point coordinate system" />
+</ResMap>

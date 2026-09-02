@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Center_X_Y" Content="X Position" />
+	<Message ID="Center_X_X" Content="Y Position" />
+	<Message ID="Center_Y_Y" Content="Y Position" />
+	<Message ID="Center_Y_X" Content="X Position" />
+	<Message ID="Center_Z" Content="Z Position" />
+	<Message ID="SelfRotateAngle_deg" Content="Self Rotation Angle" />
+	<Message ID="AAngle_deg_Y" Content="A Angle (X Rotation)" />
+	<Message ID="AAngle_deg_X" Content="B Angle (Y Rotation)" />
+	<Message ID="BAngle_deg_Y" Content="B Angle (Y Rotation)" />
+	<Message ID="BAngle_deg_X" Content="A Angle (X Rotation)" />
+	<Message ID="Shape" Content="Geometry Parameters" />
+	<Message ID="IntersectDir" Content="Intersection Direction" />
+	<Message ID="IsCutThrough" Content="Complete Penetration" />
+	<Message ID="Length" Content="Branch Tube Length" />
+	<Message ID="ArrayParam" Content="Array Parameters" />
+</ResMap>

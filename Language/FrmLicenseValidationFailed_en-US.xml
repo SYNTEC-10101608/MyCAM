@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="FormTitle" Content="Activation Validation Failed" />
+	<Message ID="m_btnExit" Content="Exit Program" />
+	<Message ID="ButtonText_Retry" Content="Re-enter" />
+	<Message ID="ButtonText_RestartActivation" Content="Restart Product Activation" />
+	<Message ID="Hint_LicenseCodeInvalid" Content="Invalid or unrecognized activation code. Please verify the entry or contact support" />
+	<Message ID="Hint_LicenseFileInvalid" Content="Activation data is corrupted or has been tampered with. Verification cannot be completed" />
+	<Message ID="Hint_MachineMismatch" Content="This activation is bound to another computer. The local hardware ID does not match" />
+	<Message ID="Hint_VersionMismatch" Content="The current software version does not meet the activation requirements" />
+	<Message ID="Hint_CheckerVersionMismatch" Content="Activation file version mismatch" />
+	<Message ID="Hint_LicenseExpired" Content="Activation has expired. Please reactivate or contact support" />
+</ResMap>
