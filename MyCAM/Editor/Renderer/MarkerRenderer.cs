@@ -195,10 +195,20 @@ namespace MyCAM.Editor.Renderer
 			if( nIndex == null ) {
 				return false;
 			}
+
+			List<CAMPoint> mainPathPointList = contourCache.MainPathPointList;
+			if( mainPathPointList == null || mainPathPointList.Count == 0 ) {
+				return false;
+			}
+
+			if( SpecialPointIndex.IsClosedPointIndex( nIndex.Value ) ) {
+				point = mainPathPointList.Last().Point;
+				return true;
+			}
+
 			if( !contourCache.CADToCAMIndexMap.TryGetValue( nIndex.Value, out int nCAMIndex ) ) {
 				return false;
 			}
-			List<CAMPoint> mainPathPointList = contourCache.MainPathPointList;
 			if( nCAMIndex < 0 || nCAMIndex >= mainPathPointList.Count ) {
 				return false;
 			}

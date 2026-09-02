@@ -43,6 +43,7 @@ namespace MyCAM.Post
 		}
 
 		// relies on PostPointList being one-to-one with CAMPointList
+		// the stored index is the original CAD index, need to convert to CAM index
 		public static Dictionary<int, string> BuildControlPointGCodeMap( string szPathID, CraftData craftData, int nMainPathPointCount )
 		{
 			Dictionary<int, string> resultMap = new Dictionary<int, string>();
@@ -51,14 +52,17 @@ namespace MyCAM.Post
 				return resultMap;
 			}
 
+			// need contour cache to convert CAD index to CAM index
+			if( !DataGettingHelper.GetContourCacheByID( szPathID, out ContourCache contourCache ) ) {
+				return resultMap;
+			}
+
 			foreach( KeyValuePair<Tuple<ExtendedGCodeType, int?>, string> kvp in craftData.ExtendedGCodeMap ) {
 				if( kvp.Key.Item1 != ExtendedGCodeType.ControlPoint || kvp.Key.Item2 == null ) {
 					continue;
 				}
-				int camIndex = kvp.Key.Item2.Value;
 
-				// should not happen, CAM index should be remapped after CAMPoint changed
-				if( camIndex < 0 || camIndex >= nMainPathPointCount ) {
+				if( !TryGetCAMIndex( contourCache, kvp.Key.Item2.Value, nMainPathPointCount, out int camIndex ) ) {
 					continue;
 				}
 
@@ -66,6 +70,23 @@ namespace MyCAM.Post
 			}
 
 			return resultMap;
+		}
+
+		static bool TryGetCAMIndex( ContourCache contourCache, int nStoredIndex, int nMainPathPointCount, out int camIndex )
+		{
+			camIndex = -1;
+
+			// closed path end point maps to the last main path point
+			if( SpecialPointIndex.IsClosedPointIndex( nStoredIndex ) ) {
+				camIndex = nMainPathPointCount - 1;
+				return true;
+			}
+
+			if( !contourCache.CADToCAMIndexMap.TryGetValue( nStoredIndex, out camIndex ) ) {
+				return false;
+			}
+
+			return camIndex >= 0 && camIndex < nMainPathPointCount;
 		}
 	}
 }

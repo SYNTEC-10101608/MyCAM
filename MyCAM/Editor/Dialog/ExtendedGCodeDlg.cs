@@ -150,6 +150,7 @@ namespace MyCAM.Editor
 
 		private void m_btnToStartOrEnd_Click( object sender, EventArgs e )
 		{
+			FlushContent();
 			ToStartOrEnd?.Invoke();
 		}
 

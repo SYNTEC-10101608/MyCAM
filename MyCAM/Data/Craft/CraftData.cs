@@ -219,6 +219,7 @@ namespace MyCAM.Data
 				StartPointIndex = index;
 				ClearToolVecModify();
 				ClearSpecialToolVecData();
+				ClearExtendedGCode();
 			}
 		}
 		public void SetToolVecReverse( bool isPathReverse )
@@ -252,6 +253,7 @@ namespace MyCAM.Data
 				if( m_IsPathReverse != value ) {
 					m_IsPathReverse = value;
 					ClearToolVecModify();
+					ClearExtendedGCode();
 					CAMFactorChanged?.Invoke();
 				}
 			}
@@ -522,6 +524,24 @@ namespace MyCAM.Data
 			CAMFactorChanged?.Invoke();
 		}
 
+		public void ClearExtendedGCode()
+		{
+			Dictionary<Tuple<ExtendedGCodeType, int?>, string> keepMap = new Dictionary<Tuple<ExtendedGCodeType, int?>, string>();
+
+			foreach( KeyValuePair<Tuple<ExtendedGCodeType, int?>, string> pair in m_extendedGCodeMap ) {
+				if( pair.Key.Item1 != ExtendedGCodeType.ControlPoint ) {
+					keepMap.Add( pair.Key, pair.Value );
+				}
+			}
+
+			m_extendedGCodeMap.Clear();
+			foreach( KeyValuePair<Tuple<ExtendedGCodeType, int?>, string> pair in keepMap ) {
+				m_extendedGCodeMap.Add( pair.Key, pair.Value );
+			}
+
+			CAMFactorChanged?.Invoke();
+		}
+
 		public bool IsStartPntModified( bool isStartIdx, out ToolVecAngleData toolVecAngleData, out EToolVecInterpolateType type )
 		{
 			toolVecAngleData = null;
@@ -610,7 +630,7 @@ namespace MyCAM.Data
 			}
 		}
 
-		// the int? is the CAMIndex, is null when gCodeType is not ControlPoint
+		// the int? is the CADIndex, is null when gCodeType is not ControlPoint
 		Dictionary<Tuple<ExtendedGCodeType, int?>, string> m_extendedGCodeMap = new Dictionary<Tuple<ExtendedGCodeType, int?>, string>();
 
 		public void SetExtendedGCode( ExtendedGCodeType gCodeType, int? pointIdx, string content )
