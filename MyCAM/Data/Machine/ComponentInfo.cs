@@ -158,9 +158,9 @@ namespace MyCAM.Data
         }
     }
 
-    public abstract class CommonInfo : IComponentInfo
+    public abstract class ComponentInfoBase : IComponentInfo
     {
-        protected CommonInfo( MachineComponentType type, IAxisDef axisDef = null )
+        protected ComponentInfoBase( MachineComponentType type, IAxisDef axisDef = null )
         {
             ComponentType = type;
             AxisDef = axisDef;
@@ -190,7 +190,7 @@ namespace MyCAM.Data
         }
     }
 
-    public class FiveAxisComponentInfo : CommonInfo
+    public class FiveAxisComponentInfo : ComponentInfoBase
     {
         public FiveAxisComponentInfo( MachineComponentType type, IAxisDef axisDef = null )
             : base( type, axisDef )
@@ -206,7 +206,7 @@ namespace MyCAM.Data
         }
     }
 
-    public class ArticRobotComponentInfo : CommonInfo
+    public class ArticRobotComponentInfo : ComponentInfoBase
     {
         public ArticRobotComponentInfo( MachineComponentType type, IAxisDef axisDef = null )
             : base( type, axisDef )

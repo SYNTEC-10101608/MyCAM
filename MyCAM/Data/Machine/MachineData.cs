@@ -1,6 +1,8 @@
-﻿using OCC.gp;
+﻿using MyCAM.Helper;
+using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace MyCAM.Data
@@ -50,6 +52,9 @@ namespace MyCAM.Data
 			// chain structures, filled by chain builder
 			ChainListMap = new Dictionary<MachineComponentType, List<MachineComponentType>>();
 			WorkPieceChain = new HashSet<MachineComponentType>();
+
+			// per component meshes loaded from stl, not serialized
+			MachineMeshes = new MachineMeshes();
 		}
 
 		public abstract Product Product
@@ -82,6 +87,13 @@ namespace MyCAM.Data
 		}
 
 		public gp_Vec SimulationOffset
+		{
+			get; set;
+		}
+
+		// per component meshes loaded from stl, runtime resource ( not serialized / not in DTO )
+		[XmlIgnore]
+		public MachineMeshes MachineMeshes
 		{
 			get; set;
 		}
@@ -274,10 +286,57 @@ namespace MyCAM.Data
 
 		protected abstract gp_Pnt GetSlaveRotateCenter();
 
-		// five-axis needs a default tree when running partial simulation as well
 		public override bool NeedBuildDefaultTree()
 		{
-			return FullMachineSimulation == false || base.NeedBuildDefaultTree();
+			// partial simulation always uses the default tree
+			if( FullMachineSimulation == false ) {
+				return true;
+			}
+
+			// root must be the Base node
+			if( RootNode == null || RootNode.Type != MachineComponentType.Base ) {
+				return true;
+			}
+
+			// base must have exactly two branches ( tool side / workpiece side )
+			if( RootNode.Children.Count != 2 ) {
+				return true;
+			}
+
+			// each branch must be a single non-branching chain ending at its expected leaf
+			MachineComponentType leaf0 = GetSingleChainLeaf( RootNode.Children[ 0 ] );
+			MachineComponentType leaf1 = GetSingleChainLeaf( RootNode.Children[ 1 ] );
+
+			// the two leaves must be Laser ( tool ) and WorkPiece, order independent
+			bool isValid = ( leaf0 == ToolChainLeaf && leaf1 == WorkPieceChainLeaf )
+				|| ( leaf0 == WorkPieceChainLeaf && leaf1 == ToolChainLeaf );
+			return isValid == false;
+		}
+
+		// walk a single non-branching chain and return its end leaf type
+		MachineComponentType GetSingleChainLeaf( MachineTreeNode node )
+		{
+			MachineComponentType leaf = MachineComponentType.UnKnow;
+			while( node != null ) {
+				leaf = node.Type;
+
+				// every node type must be a known machine component
+				if( ComponentTypes.Contains( node.Type ) == false ) {
+					break;
+				}
+
+				// no child means we reached the leaf
+				if( node.Children.Count == 0 ) {
+					break;
+				}
+
+				// branching is not allowed
+				if( node.Children.Count > 1 ) {
+					return MachineComponentType.UnKnow;
+				}
+				node = node.Children[ 0 ];
+			}
+			return leaf;
 		}
 
 		// build the default tree based on the five-axis machine type
