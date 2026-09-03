@@ -92,15 +92,15 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				if( m_MachineMeshes == null ) {
+				if( MachineData.MachineMeshes == null ) {
 					return new MachineMeshes();
 				}
-				return m_MachineMeshes;
+				return MachineData.MachineMeshes;
 			}
 			set
 			{
 				if( value != null ) {
-					m_MachineMeshes = value;
+					MachineData.MachineMeshes = value;
 				}
 			}
 		}
@@ -541,8 +541,5 @@ namespace MyCAM.Data
 
 		// calibration data
 		CalibrationData m_CalibrationData = new CalibrationData();
-
-		// machine meshes
-		MachineMeshes m_MachineMeshes = new MachineMeshes();
 	}
 }

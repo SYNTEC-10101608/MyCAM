@@ -20,7 +20,11 @@ namespace MyCAM.Editor.Renderer
 {
 	internal abstract class MachineRenderBase : CAMRendererBase
 	{
-		readonly Dictionary<MachineComponentType, List<AIS_InteractiveObject>> m_MachineAISDict = new Dictionary<MachineComponentType, List<AIS_InteractiveObject>>();
+		// AIS converted from the machine stl meshes
+		readonly Dictionary<MachineComponentType, List<AIS_InteractiveObject>> m_MachineMeshAISDict = new Dictionary<MachineComponentType, List<AIS_InteractiveObject>>();
+
+		// product-specific AIS ( five-axis: laser / articulated robot: flange frame )
+		readonly Dictionary<MachineComponentType, List<AIS_InteractiveObject>> m_ComponentSpecificAISDict = new Dictionary<MachineComponentType, List<AIS_InteractiveObject>>();
 		readonly Dictionary<MachineComponentType, List<gp_Trsf>> m_FrameTransformMap = new Dictionary<MachineComponentType, List<gp_Trsf>>();
 		readonly Dictionary<MachineComponentType, List<bool>> m_FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
 
@@ -34,21 +38,35 @@ namespace MyCAM.Editor.Renderer
 		// product-specific display ( five-axis: laser / articulated robot: flange frame )
 		protected abstract void BuildComponentSpecificAIS();
 
-		// expose AIS dictionary so subclasses can add product-specific components
+		// expose the product-specific AIS dictionary so subclasses can add their own components
 		protected Dictionary<MachineComponentType, List<AIS_InteractiveObject>> MachineAISDict
 		{
 			get
 			{
-				return m_MachineAISDict;
+				return m_ComponentSpecificAISDict;
 			}
 		}
 
-		// let outer know if we have valid AIS to display
+		// walk both the machine mesh AIS and the product-specific AIS
+		IEnumerable<KeyValuePair<MachineComponentType, List<AIS_InteractiveObject>>> AllAISPairs
+		{
+			get
+			{
+				foreach( var keyValue in m_MachineMeshAISDict ) {
+					yield return keyValue;
+				}
+				foreach( var keyValue in m_ComponentSpecificAISDict ) {
+					yield return keyValue;
+				}
+			}
+		}
+
+		// let outer know if we have valid machine mesh AIS to display ( product-specific AIS excluded )
 		public bool IsWithMachineAIS
 		{
 			get
 			{
-				return m_MachineAISDict != null && m_MachineAISDict.Count >= MIN_Machine_Part;
+				return m_MachineMeshAISDict != null && m_MachineMeshAISDict.Count >= MIN_Machine_Part;
 			}
 		}
 
@@ -78,10 +96,7 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Show( bool bUpdate = false )
 		{
-			if( m_MachineAISDict == null || m_MachineAISDict.Count == 0 ) {
-				return;
-			}
-			foreach( KeyValuePair<MachineComponentType, List<AIS_InteractiveObject>> keyValue in m_MachineAISDict ) {
+			foreach( KeyValuePair<MachineComponentType, List<AIS_InteractiveObject>> keyValue in AllAISPairs ) {
 				if( keyValue.Key == MachineComponentType.UnKnow ) {
 					continue;
 				}
@@ -116,7 +131,7 @@ namespace MyCAM.Editor.Renderer
 
 		public void ShowToolVecEditResult( Dictionary<MachineComponentType, List<gp_Trsf>> transMap, bool bUpdate = false )
 		{
-			foreach( var keyValue in m_MachineAISDict ) {
+			foreach( var keyValue in AllAISPairs ) {
 				MachineComponentType componentType = keyValue.Key;
 				if( transMap.TryGetValue( componentType, out var transList ) ) {
 					if( transList != null && transList.Count > 0 ) {
@@ -129,7 +144,7 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Remove( bool bUpdate = false )
 		{
-			foreach( KeyValuePair<MachineComponentType, List<AIS_InteractiveObject>> keyValue in m_MachineAISDict ) {
+			foreach( KeyValuePair<MachineComponentType, List<AIS_InteractiveObject>> keyValue in AllAISPairs ) {
 				foreach( AIS_InteractiveObject aisObject in keyValue.Value ) {
 					if( aisObject == null ) {
 						continue;
@@ -144,7 +159,7 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		const int MIN_Machine_Part = 3;
+		const int MIN_Machine_Part = 1;
 		const double TRANSPARENCY = 0.5;
 
 		// set back to initial position and color
@@ -173,17 +188,14 @@ namespace MyCAM.Editor.Renderer
 
 		void SetColor( int frameIndex )
 		{
-			foreach( var keyValue in m_MachineAISDict ) {
+			foreach( var keyValue in AllAISPairs ) {
 				RefreshComponentColor( keyValue.Key, frameIndex );
 			}
 		}
 
 		void TransForm( int frameIndex )
 		{
-			if( m_MachineAISDict == null || m_MachineAISDict.Count == 0 ) {
-				return;
-			}
-			foreach( var keyValue in m_MachineAISDict ) {
+			foreach( var keyValue in AllAISPairs ) {
 				MachineComponentType componentType = keyValue.Key;
 				if( m_FrameTransformMap.TryGetValue( componentType, out var transList ) ) {
 					if( frameIndex >= 0 && frameIndex < transList.Count ) {
@@ -251,8 +263,11 @@ namespace MyCAM.Editor.Renderer
 
 		IEnumerable<AIS_InteractiveObject> GetMachineShapes( MachineComponentType type )
 		{
-			if( m_MachineAISDict.TryGetValue( type, out var list ) ) {
-				return list;
+			if( m_MachineMeshAISDict.TryGetValue( type, out var meshList ) ) {
+				return meshList;
+			}
+			if( m_ComponentSpecificAISDict.TryGetValue( type, out var specificList ) ) {
+				return specificList;
 			}
 			return Enumerable.Empty<AIS_InteractiveObject>();
 		}
@@ -277,7 +292,7 @@ namespace MyCAM.Editor.Renderer
 					AnnounceWrning( MeshesToAISResult.InvalidMesh, keyValue.Key );
 					continue;
 				}
-				m_MachineAISDict[ keyValue.Key ] = new List<AIS_InteractiveObject> { ConvertMeshToAIS( keyValue.Value, keyValue.Key ) };
+				m_MachineMeshAISDict[ keyValue.Key ] = new List<AIS_InteractiveObject> { ConvertMeshToAIS( keyValue.Value, keyValue.Key ) };
 			}
 		}
 

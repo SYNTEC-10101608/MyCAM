@@ -220,10 +220,10 @@ namespace MyCAM.Helper
 				return machineData;
 			}
 
-			// it contains machine data infomation
+			// it contains machine data information
 			XElement machineDataElement = root.Element( "MachineData" );
 
-			// it contains machine tree infomation
+			// it contains machine tree information
 			XElement machineTreeElement = root.Element( "MachineTree" );
 
 			// can be no tree, because it is only used for simulation
@@ -232,7 +232,7 @@ namespace MyCAM.Helper
 				return machineData;
 			}
 
-			// turn maxhineData XML to DTO
+			// turn machineData XML to DTO
 			MachineDataDTOContainer container = ConvertXML2MachineData( machineDataElement, out EFilePrValueStatus prValueStatus, out nErrorPrIndex );
 			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
 				status = EMachineDataLoadStatus.InvalidPrValue;
