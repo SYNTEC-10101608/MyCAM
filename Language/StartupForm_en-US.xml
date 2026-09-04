@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
-	<Message ID="FormTitle" Content="Shindai Laser 5-Axis Cutting {0}" />
+	<Message ID="FormTitle" Content="SYNTEC Laser 5-Axis Cutting {0}" />
 	<Message ID="Log_LicenseInvalid" Content="License authentication process failed" />
 	<Message ID="Log_LicenseInvalidTitle" Content="License error" />
 
