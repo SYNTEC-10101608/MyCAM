@@ -2,15 +2,22 @@
 <ResMap>
 	<Message ID="ContourEditDlg" Content="轮廓编辑" />
 	<Message ID="m_gbxIndexParam" Content="控制点参数" />
+
+	<Message ID="m_lblRefCoordType" Content="坐标系" />
+	<Message ID="m_rbtnWorldCoord" Content="世界坐标系" />
+	<Message ID="m_rbtnLocalCoord" Content="区域坐标系" />
+
+	<Message ID="m_lblToStartOrEnd" Content="起终点切换" />
+	<Message ID="m_rbtnToStart" Content="起点" />
+	<Message ID="m_rbtnToEnd" Content="终点" />
+
 	<Message ID="m_lblDX" Content="X偏移" />
 	<Message ID="m_lblDY" Content="Y偏移" />
 	<Message ID="m_lblDZ" Content="Z偏移" />
 	<Message ID="m_lblUnit" Content="(单位：mm)" />
+	
 	<Message ID="m_btnReset" Content="重置数据" />
 	<Message ID="m_btnClear" Content="清除数据" />
 	<Message ID="m_btnAdd" Content="新增控制点" />
 	<Message ID="m_btnRemove" Content="移除控制点" />
-	<Message ID="m_lblRefCoordType" Content="坐标系" />
-	<Message ID="RefCoordType_Local" Content="区域坐标系" />
-	<Message ID="RefCoordType_World" Content="世界坐标系" />
 </ResMap>

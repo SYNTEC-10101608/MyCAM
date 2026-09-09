@@ -83,11 +83,11 @@ namespace MyCAM.Helper
 					connectPointMap[ cadPoint ] = lastPoint;
 					oneSegmentPointList.Add( cadPoint );
 				}
-				else if( bLast && i == segmentParamList.Count - 1 && cadPointList.Count > 0 ) {
+				else if( bLast && i == segmentParamList.Count - 1 && ( cadPointList.Count > 0 || oneSegmentPointList.Count > 0 ) ) {
 
 					// map the last point to the start point
 					if( isClosed ) {
-						CADPoint firstPoint = cadPointList[ 0 ];
+						CADPoint firstPoint = cadPointList.Count > 0 ? cadPointList[ 0 ] : oneSegmentPointList[ 0 ];
 						connectPointMap[ firstPoint ] = cadPoint;
 					}
 

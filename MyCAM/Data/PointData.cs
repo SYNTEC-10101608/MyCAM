@@ -277,6 +277,18 @@ namespace MyCAM.Data
 				return m_CADPoint.TangentVec;
 			}
 		}
+		public gp_Dir NormalVec_1st
+		{
+			get
+			{
+				return m_CADPoint.NormalVec_1st;
+			}
+		}
+
+		public void Translate( gp_Vec vec )
+		{
+			m_CADPoint.Translate( vec );
+		}
 
 		public bool IsToolVecModPoint
 		{

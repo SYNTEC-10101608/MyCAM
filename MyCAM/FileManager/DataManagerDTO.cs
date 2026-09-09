@@ -1092,6 +1092,12 @@ namespace MyCAM.FileManager
 			set;
 		} = new List<ContourEditMapDTO>();
 
+		public StartPntContourEditParamDTO StartPntContourEditData
+		{
+			get;
+			set;
+		} = new StartPntContourEditParamDTO();
+
 		[XmlArray( "MicroJointStartIdxDict" )]
 		[XmlArrayItem( "MicroJointItem" )]
 		public List<MicroJointItemDTO> MicroJointStartIdxDict
@@ -1171,6 +1177,9 @@ namespace MyCAM.FileManager
 			ToolVecModifyMap_New = craftData.ToolVecModifyMap.ToDictionary()
 				.Select( kvp => new ToolVecMap2DTO( kvp.Key, kvp.Value.AngleData, kvp.Value.InterpolateType ) )
 				.ToList();
+
+			StartPntContourEditData = new StartPntContourEditParamDTO( craftData.StartPntContourEditData );
+
 			if( craftData.StartPntToolVecData != null ) {
 				StartPntToolVecData = new StartPntToolVecParamDTO( craftData.StartPntToolVecData );
 				ContourEditMap = ( craftData.ContourEditMap ?? new Dictionary<int, ContourEditData>() )
@@ -1203,6 +1212,9 @@ namespace MyCAM.FileManager
 					dto => dto.Index.Value,
 					dto => new ContourEditData( dto.DX.Value, dto.DY.Value, dto.DZ.Value )
 			);
+
+			StartPntContourEditParam startPntContourEditParam = StartPntContourEditData.ToStartPntContourEditParam();
+
 			LeadData leadData = LeadData.ToLeadData();
 			TraverseData traverseData = TraverseData.ToTraverseData();
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion );
@@ -1213,7 +1225,8 @@ namespace MyCAM.FileManager
 			SpecialToolVecData specialToolVecData = BuildSpecialToolVecData();
 			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value,
 																 leadData, OverCutLength.Value, toolVecModifyMap,
-																 startPntToolVecParam, IsToolVecReverse.Value, traverseData, contourEditMap,
+																 startPntToolVecParam, IsToolVecReverse.Value, traverseData,
+																 startPntContourEditParam, contourEditMap,
 																 microJointStartIdxMap, extendedGCodeMap, specialToolVecData, rCornerMap );
 
 			// old version may have start/end point in ToolVecModifyMap, those are move to StartPntToolVecData
@@ -2193,6 +2206,56 @@ public class StartPntToolVecParamDTO
 	}
 }
 
+public class StartPntContourEditParamDTO
+{
+	public ContourEditMapDTO StartPnt
+	{
+		get;
+		set;
+	}
+
+	public ContourEditMapDTO EndPnt
+	{
+		get;
+		set;
+	}
+
+	// parameterless constructor (for XmlSerializer)
+	internal StartPntContourEditParamDTO()
+	{
+	}
+
+	internal StartPntContourEditParamDTO( StartPntContourEditParam param )
+	{
+		if( param == null ) {
+			StartPnt = new ContourEditMapDTO();
+			EndPnt = new ContourEditMapDTO();
+			return;
+		}
+
+		if( param.StartPnt == null ) {
+			StartPnt = new ContourEditMapDTO();
+		}
+		else {
+			StartPnt = new ContourEditMapDTO( 0, param.StartPnt.DX, param.StartPnt.DY, param.StartPnt.DZ );
+		}
+
+		if( param.EndPnt == null ) {
+			EndPnt = new ContourEditMapDTO();
+		}
+		else {
+			EndPnt = new ContourEditMapDTO( 0, param.EndPnt.DX, param.EndPnt.DY, param.EndPnt.DZ );
+		}
+	}
+
+	internal StartPntContourEditParam ToStartPntContourEditParam()
+	{
+		ContourEditData startPnt = StartPnt == null ? new ContourEditData() : StartPnt.ToContourEditData();
+		ContourEditData endPnt = EndPnt == null ? new ContourEditData() : EndPnt.ToContourEditData();
+		return new StartPntContourEditParam( startPnt, endPnt );
+	}
+}
+
 public class ContourEditMapDTO
 {
 	public int? Index
@@ -2230,6 +2293,15 @@ public class ContourEditMapDTO
 		DX = dx;
 		DY = dy;
 		DZ = dz;
+	}
+
+	internal ContourEditData ToContourEditData()
+	{
+		if( !Index.HasValue ) {
+			throw new ArgumentException( "ContourEditMapDTO deserialization failed: Index is required." );
+		}
+
+		return new ContourEditData( DX.Value, DY.Value, DZ.Value );
 	}
 }
 

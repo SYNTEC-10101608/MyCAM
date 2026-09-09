@@ -8,6 +8,8 @@ namespace MyCAM.Helper
 {
 	public static class ContourEditHelper
 	{
+		#region CAD Point
+
 		public static List<CADPoint> ApplyContourEdit(
 			List<CADPoint> cadPointList,
 			IReadOnlyDictionary<int, ContourEditData> contourEditMap,
@@ -210,6 +212,140 @@ namespace MyCAM.Helper
 				a.DY + ( b.DY - a.DY ) * t,
 				a.DZ + ( b.DZ - a.DZ ) * t );
 		}
+
+		#endregion
+
+		#region CAM Point
+
+		public static void ApplyStartPntContourEdit(
+			List<CAMPoint> camPointList,
+			ContourEditData startPnt,
+			ContourEditData endPnt,
+			IReadOnlyCollection<int> contourEditControlPointIndices )
+		{
+			// at least two points are needed to interpolate
+			if( camPointList == null || camPointList.Count < 2 ) {
+				return;
+			}
+
+			// nothing to do when both endpoints have no displacement
+			if( IsZeroDisplacement( startPnt ) && IsZeroDisplacement( endPnt ) ) {
+				return;
+			}
+
+			Dictionary<int, ContourEditData> workMap = CreateStartPntContourEditMap(
+				camPointList.Count, startPnt, endPnt, contourEditControlPointIndices );
+			ApplyDisplacementInterpolation( camPointList, workMap );
+		}
+
+		static Dictionary<int, ContourEditData> CreateStartPntContourEditMap(
+			int pointCount,
+			ContourEditData startPnt,
+			ContourEditData endPnt,
+			IReadOnlyCollection<int> contourEditControlPointIndices )
+		{
+			Dictionary<int, ContourEditData> workMap = new Dictionary<int, ContourEditData>();
+			if( pointCount < 2 ) {
+				return workMap;
+			}
+			int lastIndex = pointCount - 1;
+
+			// zero displacement anchors, endpoints are handled afterwards so they always win
+			if( contourEditControlPointIndices != null ) {
+				foreach( int oneIndex in contourEditControlPointIndices ) {
+
+					// skip the indices not on the current CAM path
+					if( oneIndex <= 0 || oneIndex >= lastIndex ) {
+						continue;
+					}
+					workMap[ oneIndex ] = new ContourEditData( 0, 0, 0 );
+				}
+			}
+
+			// endpoints always exist and take priority over the anchors
+			workMap[ 0 ] = startPnt != null ? startPnt.Clone() : new ContourEditData( 0, 0, 0 );
+			workMap[ lastIndex ] = endPnt != null ? endPnt.Clone() : new ContourEditData( 0, 0, 0 );
+			return workMap;
+		}
+
+		static void ApplyDisplacementInterpolation(
+			List<CAMPoint> pointList,
+			IReadOnlyDictionary<int, ContourEditData> workMap )
+		{
+			List<int> sortedKeys = workMap.Keys.ToList();
+			sortedKeys.Sort();
+
+			// Interpolate interior points of every interval first (control points are not touched here).
+			for( int k = 0; k < sortedKeys.Count - 1; k++ ) {
+				InterpolateInterval( pointList, workMap, sortedKeys[ k ], sortedKeys[ k + 1 ] );
+			}
+
+			// Apply the recorded displacement to every control point after all interpolation is done.
+			foreach( KeyValuePair<int, ContourEditData> entry in workMap ) {
+				ApplyDisplacement( pointList[ entry.Key ], entry.Value );
+			}
+		}
+
+		static void InterpolateInterval(
+			List<CAMPoint> pointList,
+			IReadOnlyDictionary<int, ContourEditData> workMap,
+			int startIdx,
+			int endIdx )
+		{
+			// No interior points when the interval spans one step or less.
+			if( endIdx - startIdx < 2 ) {
+				return;
+			}
+			ContourEditData startData = workMap[ startIdx ];
+			ContourEditData endData = workMap[ endIdx ];
+
+			// Step 1: accumulate total arc length using original (not yet translated) positions.
+			double totalDist = AccumulatedDistance( pointList, startIdx, endIdx );
+
+			// Step 2: pre-compute t for every interior index using original positions.
+			int interiorCount = endIdx - startIdx - 1;
+			double[] tValues = new double[ interiorCount ];
+			double accumulated = 0.0;
+			for( int i = startIdx; i < endIdx - 1; i++ ) {
+				accumulated += pointList[ i ].Point.Distance( pointList[ i + 1 ].Point );
+				tValues[ i - startIdx ] = ( totalDist > GEOM_TOLERANCE ) ? accumulated / totalDist : 0.0;
+			}
+
+			// Step 3: apply interpolated displacement to interior points only.
+			for( int i = startIdx + 1; i < endIdx; i++ ) {
+				double t = tValues[ i - startIdx - 1 ];
+				ApplyDisplacement( pointList[ i ], Lerp( startData, endData, t ) );
+			}
+		}
+
+		static void ApplyDisplacement( CAMPoint camPoint, ContourEditData disp )
+		{
+			if( IsZeroDisplacement( disp ) ) {
+				return;
+			}
+			camPoint.Translate( new gp_Vec( disp.DX, disp.DY, disp.DZ ) );
+		}
+
+		static bool IsZeroDisplacement( ContourEditData disp )
+		{
+			if( disp == null ) {
+				return true;
+			}
+			return Math.Abs( disp.DX ) < GEOM_TOLERANCE
+				&& Math.Abs( disp.DY ) < GEOM_TOLERANCE
+				&& Math.Abs( disp.DZ ) < GEOM_TOLERANCE;
+		}
+
+		static double AccumulatedDistance( List<CAMPoint> pointList, int a, int b )
+		{
+			double dist = 0.0;
+			for( int i = a; i < b; i++ ) {
+				dist += pointList[ i ].Point.Distance( pointList[ i + 1 ].Point );
+			}
+			return dist;
+		}
+
+		#endregion
 
 		const double GEOM_TOLERANCE = 1e-3;
 	}

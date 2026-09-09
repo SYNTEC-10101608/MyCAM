@@ -112,6 +112,33 @@ namespace MyCAM.Data
 		}
 	}
 
+	public class StartPntContourEditParam
+	{
+		public ContourEditData StartPnt 
+		{
+			get; 
+			set; 
+		}
+
+		public ContourEditData EndPnt 
+		{ 
+			get; 
+			set; 
+		}
+
+		public StartPntContourEditParam()
+		{
+			StartPnt = new ContourEditData();
+			EndPnt = new ContourEditData();
+		}
+
+		public StartPntContourEditParam( ContourEditData startPntData, ContourEditData endPntData )
+		{
+			StartPnt = startPntData;
+			EndPnt = endPntData;
+		}
+	}
+
 	public enum ExtendedGCodeType
 	{
 		TraverseHead,
@@ -163,6 +190,7 @@ namespace MyCAM.Data
 			StartPntToolVecParam startPntToolVecData,
 			bool isToolVecReverse,
 			TraverseData traverseData,
+			StartPntContourEditParam startPntContourEditData,
 			Dictionary<int, ContourEditData> contourEditMap,
 			Dictionary<int, double> microJointStartIdxMap,
 			Dictionary<Tuple<ExtendedGCodeType, int?>, string> extendedGCodeMap,
@@ -181,6 +209,7 @@ namespace MyCAM.Data
 					m_ToolVecModifyMap.Add( kvp.Key, kvp.Value.Clone() );
 				}
 			}
+			m_StartPntContourEditData = startPntContourEditData;
 			if( startPntToolVecData != null ) {
 				m_StartPntToolVecData = startPntToolVecData;
 			}
@@ -245,6 +274,7 @@ namespace MyCAM.Data
 		public void SetStartPntIndex( int index )
 		{
 			if( StartPointIndex != index ) {
+				ClearStartPntContourEditParam();
 				StartPointIndex = index;
 				ClearToolVecModify();
 				ClearSpecialToolVecData();
@@ -293,6 +323,7 @@ namespace MyCAM.Data
 			set
 			{
 				if( m_IsPathReverse != value ) {
+					ClearStartPntContourEditParam();
 					m_IsPathReverse = value;
 					ClearToolVecModify();
 					ClearExtendedGCode();
@@ -607,6 +638,8 @@ namespace MyCAM.Data
 			return false;
 		}
 
+		#region ContourEdit
+
 		public Dictionary<int, ContourEditData> ContourEditMap
 		{
 			get
@@ -614,6 +647,7 @@ namespace MyCAM.Data
 				return m_ContourEditMap;
 			}
 		}
+		Dictionary<int, ContourEditData> m_ContourEditMap = new Dictionary<int, ContourEditData>();
 
 		public void SetContourEditPoint( int index, double dx, double dy, double dz )
 		{
@@ -639,6 +673,46 @@ namespace MyCAM.Data
 			m_ContourEditMap.Clear();
 			CADFactorChanged?.Invoke();
 		}
+
+		public StartPntContourEditParam StartPntContourEditData
+		{
+			get
+			{
+				if( m_StartPntContourEditData == null ) {
+					m_StartPntContourEditData = new StartPntContourEditParam();
+				}
+
+				return m_StartPntContourEditData;
+			}
+		}
+		StartPntContourEditParam m_StartPntContourEditData;
+
+		public void SetStartPntContourEdit(bool isStartPnt, double dx, double dy, double dz )
+		{
+			if( m_StartPntContourEditData == null ) {
+				m_StartPntContourEditData = new StartPntContourEditParam();
+			}
+
+			if( isStartPnt ) {
+				m_StartPntContourEditData.StartPnt = new ContourEditData( dx, dy, dz );
+			}
+			else {
+				m_StartPntContourEditData.EndPnt = new ContourEditData( dx, dy, dz );
+			}
+
+			CADFactorChanged?.Invoke();
+		}
+
+		public void ClearStartPntContourEditParam()
+		{
+			if( m_StartPntContourEditData == null ) {
+				return;
+			}
+			m_StartPntContourEditData = null;
+			CADFactorChanged?.Invoke();
+		}
+
+		#endregion
 
 		public void ClearMicroJointStartIdx()
 		{
@@ -806,6 +880,5 @@ namespace MyCAM.Data
 		double m_CompensatedDistance = 0;
 		double m_InitMaster_rad = 0;
 		double m_InitSlave_rad = 0;
-		Dictionary<int, ContourEditData> m_ContourEditMap = new Dictionary<int, ContourEditData>();
 	}
 }

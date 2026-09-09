@@ -15,11 +15,11 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal class IndexSelectAction : KeyMouseActionBase
+	internal abstract class IndexSelectActionBase : KeyMouseActionBase
 	{
 		public Action<int, TopoDS_Shape> IndexChanged;
 
-		public IndexSelectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
+		public IndexSelectActionBase( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
 			: base( dataManager, viewer, treeView, viewManager )
 		{
 			if( string.IsNullOrEmpty( pathID ) ) {
@@ -48,9 +48,9 @@ namespace MyCAM.Editor
 				return;
 
 			// translate original highlight index to offset index when OriginalIndexMap is available
-			if( m_OriginalIndexMap != null ) {
-				for( int i = 0; i < m_OriginalIndexMap.Count; i++ ) {
-					if( m_OriginalIndexMap[ i ] == oriHighLightIdx ) {
+			if( m_ToCADIndexMap != null ) {
+				for( int i = 0; i < m_ToCADIndexMap.Count; i++ ) {
+					if( m_ToCADIndexMap[ i ] == oriHighLightIdx ) {
 						oriHighLightIdx = i;
 						break;
 					}
@@ -145,8 +145,8 @@ namespace MyCAM.Editor
 			int offsetIndex = m_VertexMap.Find( selectedVertex );
 
 			// translate offset index to ori CAD index when OriginalIndexMap is available
-			if( m_OriginalIndexMap != null && offsetIndex >= 0 && offsetIndex < m_OriginalIndexMap.Count ) {
-				int oriIndex = m_OriginalIndexMap[ offsetIndex ];
+			if( m_ToCADIndexMap != null && offsetIndex >= 0 && offsetIndex < m_ToCADIndexMap.Count ) {
+				int oriIndex = m_ToCADIndexMap[ offsetIndex ];
 				if( SpecialPointIndex.IsGeneratedPointIndex( oriIndex ) ) {
 					return null;
 				}
@@ -175,7 +175,7 @@ namespace MyCAM.Editor
 		void RebuildSelectionPoints()
 		{
 			m_PathPointList = GetPathPointList( m_PathID );
-			m_OriginalIndexMap = GetOriginalIndexMap( m_PathID );
+			m_ToCADIndexMap = GetIndexMap( m_PathID );
 			m_VertexMap = new TopTools_DataMapOfShapeInteger();
 			m_SelectedPointAIS = null;
 
@@ -203,49 +203,113 @@ namespace MyCAM.Editor
 			m_SelectedPointAIS.SetWidth( 1e-3 );
 		}
 
-		List<gp_Pnt> GetPathPointList( string szPathID )
+		protected abstract List<gp_Pnt> GetPathPointList( string szPathID );
+
+		protected abstract List<int> GetIndexMap( string szPathID );
+
+		protected string m_PathID;
+		protected List<gp_Pnt> m_PathPointList;
+		List<int> m_ToCADIndexMap;
+
+		// map point on view to index on CAMData
+		protected TopTools_DataMapOfShapeInteger m_VertexMap;
+		protected AIS_Shape m_SelectedPointAIS;
+	}
+
+	internal sealed class IndexSelectAction : IndexSelectActionBase
+	{
+		public IndexSelectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
+			: base( dataManager, viewer, treeView, viewManager, pathID )
+		{
+		}
+
+		protected override List<gp_Pnt> GetPathPointList( string szPathID )
 		{
 			// get path type
 			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType ) ) {
 				return new List<gp_Pnt>();
 			}
+
 			if( pathType == PathType.Contour ) {
 				if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache pathCache ) ) {
 					return new List<gp_Pnt>();
 				}
 				return ( pathCache as ContourCache )?.TrsfCADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
 			}
-			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
+
+			if( DataGettingHelper.IsStdPattern( pathType ) ) {
 				if( !DataGettingHelper.GetStdPatternCacheByID( szPathID, out IStdPatternCache stdPatternCache ) ) {
 					return new List<gp_Pnt>();
 				}
 				return stdPatternCache.KeyCADPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
 			}
-			else {
-				return new List<gp_Pnt>();
-			}
+
+			return new List<gp_Pnt>();
 		}
 
-		List<int> GetOriginalIndexMap( string szPathID )
+		protected override List<int> GetIndexMap( string szPathID )
 		{
 			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType ) || pathType != PathType.Contour ) {
 				return null;
 			}
+
 			if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache pathCache ) ) {
 				return null;
 			}
-			ContourCache contourCache = pathCache as ContourCache;
-			return contourCache?.OriginalIndexMap;
+
+			return ( pathCache as ContourCache )?.OriginalIndexMap ?? new List<int>();
+		}
+	}
+
+	internal sealed class CAMIndexSelectAction : IndexSelectActionBase
+	{
+		public CAMIndexSelectAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID )
+			: base( dataManager, viewer, treeView, viewManager, pathID )
+		{
 		}
 
-		protected string m_PathID;
-		protected List<gp_Pnt> m_PathPointList;
-		List<int> m_OriginalIndexMap;
+		protected override List<gp_Pnt> GetPathPointList( string szPathID )
+		{
+			// get path type
+			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType ) ) {
+				return new List<gp_Pnt>();
+			}
 
-		// map point on view to index on CAMData
-		protected TopTools_DataMapOfShapeInteger m_VertexMap;
-		protected AIS_Shape m_SelectedPointAIS;
+			if( pathType == PathType.Contour ) {
+				if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache pathCache ) ) {
+					return new List<gp_Pnt>();
+				}
 
+				return ( pathCache as ContourCache )?.MainPathPointList
+					.Where( p => !SpecialPointIndex.IsGeneratedPointIndex( p.InitPathIndex ) )
+					.Select( p => p.Point )
+					.ToList() ?? new List<gp_Pnt>();
+			}
 
+			if( DataGettingHelper.IsStdPattern( pathType ) ) {
+				if( !DataGettingHelper.GetStdPatternCacheByID( szPathID, out IStdPatternCache stdPatternCache ) ) {
+					return new List<gp_Pnt>();
+				}
+				return stdPatternCache.KeyCAMPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
+			}
+
+			return new List<gp_Pnt>();
+		}
+
+		protected override List<int> GetIndexMap( string szPathID )
+		{
+			if( !DataGettingHelper.GetPathType( szPathID, out PathType pathType ) || pathType != PathType.Contour ) {
+				return null;
+			}
+
+			if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache pathCache ) ) {
+				return null;
+			}
+
+			return ( pathCache as ContourCache )?.MainPathPointList
+					.Where( p => !SpecialPointIndex.IsGeneratedPointIndex( p.InitPathIndex ) )
+					.Select( p => p.InitPathIndex )
+					.ToList() ?? new List<int>();
+		}
 	}
 }
