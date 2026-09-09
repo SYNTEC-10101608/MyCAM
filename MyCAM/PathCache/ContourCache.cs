@@ -450,6 +450,12 @@ namespace MyCAM.PathCache
 				m_CAMPointList.Add( closedCAMPoint );
 			}
 
+			ContourEditHelper.ApplyStartPntContourEdit(
+				m_CAMPointList,
+				m_CraftData.StartPntContourEditData?.StartPnt,
+				m_CraftData.StartPntContourEditData?.EndPnt,
+				GetCAMContourEditControlPointIndices() );
+
 			// set tool vector
 			List<ISetToolVecPoint> toolVecPointList = m_CAMPointList.Cast<ISetToolVecPoint>().ToList();
 			CalMSForEachPoint( toolVecPointList );
@@ -580,6 +586,28 @@ namespace MyCAM.PathCache
 			//clone start pnt angle data to end pnt
 			toolVecModifyMap[ nLastIndex ].AngleData = m_CraftData.StartPntToolVecData.StartPnt.AngleData.Clone();
 		}
+
+		// add index of contorl point to CAM ContourEditData 
+		List<int> GetCAMContourEditControlPointIndices()
+		{
+			List<int> camIndexList = new List<int>();
+			if( m_CraftData.ContourEditMap == null || m_CraftData.ContourEditMap.Count == 0 ) {
+				return camIndexList;
+			}
+
+			foreach( int oneOriIndex in m_CraftData.ContourEditMap.Keys ) {
+
+				// the control point may be removed by offset, just skip it
+				if( !m_CADToCAMIndexMap.ContainsKey( oneOriIndex ) ) {
+					continue;
+				}
+				camIndexList.Add( m_CADToCAMIndexMap[ oneOriIndex ] );
+			}
+
+			camIndexList.Sort();
+			return camIndexList;
+		}
+
 
 		#endregion
 

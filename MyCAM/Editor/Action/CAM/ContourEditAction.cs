@@ -42,7 +42,7 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// setup initial path
-			if( !SetupPath( m_CurrentPathID ) ) {
+			if( !TryChangePath( m_CurrentPathID ) ) {
 				End();
 				return;
 			}
@@ -53,6 +53,7 @@ namespace MyCAM.Editor
 			m_Dlg.RemoveEditIndex += OnRemoveEditIndex;
 			m_Dlg.DisplacementChanged += OnDisplacementChanged;
 			m_Dlg.ResetDisplacement += OnResetDisplacement;
+			m_Dlg.ToStartOrEnd += OnToStartOrEnd;
 			m_Dlg.Cancel += End;
 			m_Dlg.Show( MyApp.MainForm );
 
@@ -89,7 +90,41 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
-		bool SetupPath( string pathID )
+		#region Path Selection
+
+		// path index control
+		string m_CurrentPathID = null;
+		SelectPathAction m_PathIndexAction = null;
+
+		CraftData m_CraftData = null;
+		ContourCache m_PathCache = null;
+
+		const string NOT_CONTOUR_PATH = "Ë∑ØÂæë {0} ‰∏çÊòØËº™ÂªìË∑ØÂæëÔºåÁÑ°Ê≥ïÁ∑®ËºØ";
+		const string CANNOT_GET_PATH_CRAFT_INFO = "ÁÑ°Ê≥ïÁç≤ÂèñË∑ØÂæë {0} ÁöÑÂä†Â∑•Ë≥áË®ä";
+
+		void OnPathIndexChanged()
+		{
+			List<string> selectedIDs = m_PathIndexAction.GetSelectedIDs();
+			if( selectedIDs.Count != 1 ) {
+				return;
+			}
+			string newPathID = selectedIDs.First();
+			if( newPathID == m_CurrentPathID ) {
+				return;
+			}
+			string szOldPathID = m_CurrentPathID;
+			if( !TryChangePath( newPathID ) ) {
+				return;
+			}
+
+			// cleanup old state
+			DeactivatePointSelection( szOldPathID );
+
+			// activate point selection for new path
+			ActivatePointSelection();
+		}
+
+		bool TryChangePath( string pathID )
 		{
 			if( string.IsNullOrEmpty( pathID ) ) {
 				return false;
@@ -108,12 +143,30 @@ namespace MyCAM.Editor
 				return false;
 			}
 
+			// init ContourCache data for current path
+			if( !DataGettingHelper.GetContourCacheByID( pathID, out ContourCache pathCache ) ) {
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathID ), MyApp.NoticeType.Warning );
+				return false;
+			}
+			m_PathCache = pathCache;
+
 			// show edit point marks
-			m_EditPointRenderer?.Remove( true );
+			m_EditPointRenderer?.Remove();
 			m_EditPointRenderer = new EditPointRenderer( m_Viewer, m_CurrentPathID );
 			m_EditPointRenderer.Show( true );
 			return true;
 		}
+
+		#endregion
+
+		#region Point Selection
+
+		// point index control
+		int m_nSelectIndex = NULL_SELECT_INDEX;
+		CAMIndexSelectAction m_PointIndexAction = null;
+
+		// null point index as -999, -1 is used for closed point index
+		const int NULL_SELECT_INDEX = -999;
 
 		void ActivatePointSelection()
 		{
@@ -123,7 +176,15 @@ namespace MyCAM.Editor
 			m_nSelectIndex = NULL_SELECT_INDEX;
 			m_Param = null;
 
-			OnSelectedPointIndexChanged( 0 );
+			List<CAMPoint> camPointList = m_PathCache.MainPathPointList;
+			OnSelectedPointIndexChanged( camPointList.First().InitPathIndex );
+		}
+
+		void CreatePointIndexAction( string pathID )
+		{
+			m_PointIndexAction = new CAMIndexSelectAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathID );
+			m_PointIndexAction.IndexChanged += OnPointIndexChanged;
+			m_PointIndexAction.Start();
 		}
 
 		void DeactivatePointSelection( string szOldPathID )
@@ -135,13 +196,6 @@ namespace MyCAM.Editor
 			m_PathIndexAction.RestoreFromExclusion( szOldPathID );
 		}
 
-		void CreatePointIndexAction( string pathID )
-		{
-			m_PointIndexAction = new IndexSelectAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, pathID );
-			m_PointIndexAction.IndexChanged += OnPointIndexChanged;
-			m_PointIndexAction.Start();
-		}
-
 		void DestroyPointIndexAction()
 		{
 			if( m_PointIndexAction != null ) {
@@ -151,43 +205,17 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void OnPathIndexChanged()
-		{
-			List<string> selectedIDs = m_PathIndexAction.GetSelectedIDs();
-			if( selectedIDs.Count != 1 ) {
-				return;
-			}
-			string newPathID = selectedIDs.First();
-			if( newPathID == m_CurrentPathID ) {
-				return;
-			}
-			string szOldPathID = m_CurrentPathID;
-			if( !SetupPath( newPathID ) ) {
-				return;
-			}
-
-			// cleanup old state
-			DeactivatePointSelection( szOldPathID );
-
-			// activate point selection for new path
-			ActivatePointSelection();
-		}
-
 		void OnPointIndexChanged( int nSelectIndex, TopoDS_Shape selectedVertex )
 		{
 			if( nSelectIndex == m_nSelectIndex ) {
 				return;
 			}
+
 			OnSelectedPointIndexChanged( nSelectIndex );
 		}
 
 		void OnSelectedPointIndexChanged( int nSelectIndex )
 		{
-			if( m_nSelectIndex == nSelectIndex ) {
-				return;
-			}
-			m_nSelectIndex = nSelectIndex;
-
 			// should not happen, but just in case
 			if( nSelectIndex == NULL_SELECT_INDEX ) {
 				m_Param = null;
@@ -195,54 +223,85 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// refresh dialog
-			GetParamFormIndex( nSelectIndex, out m_BaseWorldDX, out m_BaseWorldDY, out m_BaseWorldDZ, out bool isModified );
-			m_Param = new ContourEditParam( RefCoordinateType.Local, isModified );
-			m_Dlg.ResetParam( m_Param );
-
-			UpdateCoordinate();
-		}
-
-		void OnAddEditIndex()
-		{
-			if( m_nSelectIndex == NULL_SELECT_INDEX ) {
+			if( m_nSelectIndex == nSelectIndex ) {
 				return;
 			}
-			if( m_Param != null ) {
-				m_Param.IsModified = true;
+
+			m_nSelectIndex = nSelectIndex;
+
+			bool? isPathStartPoint = IsStartOrEndPoint( m_nSelectIndex );
+
+			if( TryBuildContourEditParameter( RefCoordinateType.Local, m_nSelectIndex, isPathStartPoint ) ) {
+				m_Dlg.ResetParam( m_Param );
+				UpdateCoordinate();
 			}
 
-			// commit to data with current (zero) displacement
-			m_BaseWorldDX = 0;
-			m_BaseWorldDY = 0;
-			m_BaseWorldDZ = 0;
-			m_CraftData.SetContourEditPoint( m_nSelectIndex, m_BaseWorldDX, m_BaseWorldDY, m_BaseWorldDZ );
-			UpdatePath();
-			UpdateCoordinate();
-
-			// refresh dialog
-			m_Dlg.ResetParam( m_Param );
 		}
 
-		void OnRemoveEditIndex()
+		bool TryBuildContourEditParameter( RefCoordinateType refCoordinateType, int cadIndex, bool? isPathStartPoint )
 		{
-			if( m_nSelectIndex == NULL_SELECT_INDEX ) {
-				return;
-			}
-			if( m_Param != null ) {
-				m_Param.IsModified = false;
+			if( m_CraftData == null || cadIndex == NULL_SELECT_INDEX ) {
+				return false;
 			}
 
-			m_BaseWorldDX = 0;
-			m_BaseWorldDY = 0;
-			m_BaseWorldDZ = 0;
-			m_CraftData.RemoveContourEditPoint( m_nSelectIndex );
-			UpdatePath();
-			UpdateCoordinate();
+			bool isModified = false;
+			ContourEditData data = new ContourEditData();
 
-			// refresh dialog
-			m_Dlg.ResetParam( m_Param );
+			if( isPathStartPoint != null ) {
+
+				// startpoint always exists
+				isModified = true;
+
+				data = ( isPathStartPoint == true )
+					? m_CraftData.StartPntContourEditData.StartPnt
+					: m_CraftData.StartPntContourEditData.EndPnt;
+			}
+			else {
+				isModified = m_CraftData.ContourEditMap.ContainsKey( cadIndex );
+
+				if( isModified ) {
+					data = m_CraftData.ContourEditMap[ cadIndex ];
+				}
+			}
+
+			m_BaseWorldDX = data.DX;
+			m_BaseWorldDY = data.DY;
+			m_BaseWorldDZ = data.DZ;
+
+			m_Param = new ContourEditParam( refCoordinateType, isModified, isPathStartPoint );
+
+			return true;
 		}
+
+		bool? IsStartOrEndPoint( int cadIndex )
+		{
+			List<CAMPoint> camPointList = m_PathCache.MainPathPointList;
+
+			if( camPointList == null || camPointList.Count == 0 ) {
+				return null;
+			}
+
+			if( cadIndex == camPointList.First().InitPathIndex ) {
+				return true;
+			}
+
+			if( cadIndex == camPointList.Last().InitPathIndex ) {
+				return false;
+			}
+
+			return null;
+		}
+
+		#endregion
+
+		#region Dialog Handling
+
+		ContourEditDlg m_Dlg = null;
+
+		ContourEditParam m_Param = null;
+		double m_BaseWorldDX = 0;
+		double m_BaseWorldDY = 0;
+		double m_BaseWorldDZ = 0;
 
 		void OnDisplacementChanged( double dx, double dy, double dz, RefCoordinateType refCoordType )
 		{
@@ -261,9 +320,33 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			m_CraftData.SetContourEditPoint( m_nSelectIndex, m_BaseWorldDX + worldDisplacement.x, m_BaseWorldDY + worldDisplacement.y, m_BaseWorldDZ + worldDisplacement.z );
+			double worldDX = m_BaseWorldDX + worldDisplacement.x;
+			double worldDY = m_BaseWorldDY + worldDisplacement.y;
+			double worldDZ = m_BaseWorldDZ + worldDisplacement.z;
+
+			if( m_Param.IsPathStartPoint == null ) {
+				m_CraftData.SetContourEditPoint( m_nSelectIndex, worldDX, worldDY, worldDZ );
+			}
+			else {
+				m_CraftData.SetStartPntContourEdit( m_Param.IsPathStartPoint.Value, worldDX, worldDY, worldDZ );
+			}
+
 			UpdatePath();
 			UpdateCoordinate();
+		}
+
+		void OnToStartOrEnd( bool toStart )
+		{
+			if( m_Param == null ) {
+				return;
+			}
+
+			List<CAMPoint> camPointList = m_PathCache.MainPathPointList;
+			if( camPointList == null || camPointList.Count == 0 ) {
+				return;
+			}
+
+			OnSelectedPointIndexChanged( toStart ? camPointList.First().InitPathIndex : camPointList.Last().InitPathIndex );
 		}
 
 		void OnResetDisplacement()
@@ -275,27 +358,202 @@ namespace MyCAM.Editor
 			m_BaseWorldDX = 0;
 			m_BaseWorldDY = 0;
 			m_BaseWorldDZ = 0;
-			m_CraftData.SetContourEditPoint( m_nSelectIndex, 0, 0, 0 );
+
+			if( m_Param.IsPathStartPoint == null ) {
+				m_CraftData.SetContourEditPoint( m_nSelectIndex, 0, 0, 0 );
+			}
+			else {
+				m_CraftData.SetStartPntContourEdit( m_Param.IsPathStartPoint.Value, 0, 0, 0 );
+			}
+
 			UpdatePath();
 			UpdateCoordinate();
 		}
 
-		void GetParamFormIndex( int nSelectIndex, out double dx, out double dy, out double dz, out bool isModified )
+		void OnAddEditIndex()
 		{
-			dx = 0;
-			dy = 0;
-			dz = 0;
-			isModified = false;
-			if( nSelectIndex == NULL_SELECT_INDEX ) {
+			if( m_nSelectIndex == NULL_SELECT_INDEX || m_Param == null ) {
 				return;
 			}
-			isModified = m_CraftData.ContourEditMap.ContainsKey( nSelectIndex );
-			if( isModified ) {
-				ContourEditData data = m_CraftData.ContourEditMap[ nSelectIndex ];
-				dx = data.DX;
-				dy = data.DY;
-				dz = data.DZ;
+
+			m_Param.IsModified = true;
+
+			m_BaseWorldDX = 0;
+			m_BaseWorldDY = 0;
+			m_BaseWorldDZ = 0;
+			m_CraftData.SetContourEditPoint( m_nSelectIndex, m_BaseWorldDX, m_BaseWorldDY, m_BaseWorldDZ );
+			UpdatePath();
+			UpdateCoordinate();
+
+			// refresh dialog
+			m_Dlg.ResetParam( m_Param );
+		}
+
+		void OnRemoveEditIndex()
+		{
+			if( m_nSelectIndex == NULL_SELECT_INDEX || m_Param == null ) {
+				return;
 			}
+
+			m_Param.IsModified = false;
+
+			m_BaseWorldDX = 0;
+			m_BaseWorldDY = 0;
+			m_BaseWorldDZ = 0;
+			m_CraftData.RemoveContourEditPoint( m_nSelectIndex );
+			UpdatePath();
+			UpdateCoordinate();
+
+			// refresh dialog
+			m_Dlg.ResetParam( m_Param );
+		}
+
+		#endregion
+
+		#region UI Render
+
+		const double GEOM_TOLERANCE = 1e-3;
+
+		EditPointRenderer m_EditPointRenderer = null;
+		CoordIconRenderer m_CoordIconRenderer = null;
+
+		bool TryGetCAMPointIndex( int selectIndex, out int camIndex )
+		{
+			camIndex = -1;
+			List<CAMPoint> camPointList = m_PathCache.MainPathPointList;
+			if( camPointList == null || camPointList.Count == 0 ) {
+				return false;
+			}
+
+			// closed point always maps to the last CAM point
+			if( SpecialPointIndex.IsClosedPointIndex( selectIndex ) ) {
+				camIndex = camPointList.Count - 1;
+				return true;
+			}
+			if( !m_PathCache.CADToCAMIndexMap.ContainsKey( selectIndex ) ) {
+				return false;
+			}
+			int index = m_PathCache.CADToCAMIndexMap[ selectIndex ];
+			if( index < 0 || index >= camPointList.Count ) {
+				return false;
+			}
+			camIndex = index;
+			return true;
+		}
+
+		bool TryGetCAMPoint( int selectIndex, out CAMPoint camPoint )
+		{
+			camPoint = null;
+			if( !TryGetCAMPointIndex( selectIndex, out int camIndex ) ) {
+				return false;
+			}
+			camPoint = m_PathCache.MainPathPointList[ camIndex ];
+			return true;
+		}
+
+		bool TryGetLocalCoordinate( int selectIndex, out gp_Ax2 localCoordinate )
+		{
+			localCoordinate = null;
+			if( !TryGetCAMPointIndex( selectIndex, out int camIndex ) ) {
+				return false;
+			}
+			List<CAMPoint> camPointList = m_PathCache.MainPathPointList;
+			CAMPoint camPoint = camPointList[ camIndex ];
+
+			// Use the normal as the local Z-axis
+			gp_Vec normalVec = new gp_Vec( camPoint.NormalVec_1st );
+			if( normalVec.Magnitude() < GEOM_TOLERANCE ) {
+				return false;
+			}
+			normalVec.Normalize();
+
+			// Use the tangent as the local X-axis if possible
+			// Else, use a neighbor point direction ( should not happen, but just in case)
+			gp_Vec yVec = normalVec.Crossed( new gp_Vec( camPoint.TangentVec ) );
+			gp_Dir xDirection;
+			if( yVec.Magnitude() < GEOM_TOLERANCE ) {
+				List<gp_Pnt> pointList = camPointList.Select( p => p.Point ).ToList();
+				if( !TryGetNextPointXDirection( pointList, camIndex, normalVec, out xDirection ) ) {
+					return false;
+				}
+			}
+			else {
+				yVec.Normalize();
+				gp_Vec xVec = yVec.Crossed( normalVec );
+				if( xVec.Magnitude() < GEOM_TOLERANCE ) {
+					return false;
+				}
+				xVec.Normalize();
+				xDirection = new gp_Dir( xVec );
+			}
+
+			localCoordinate = new gp_Ax2( camPoint.Point, new gp_Dir( normalVec ), xDirection );
+			return true;
+		}
+
+		bool TryConvertToWorldDisplacement( double dx, double dy, double dz, out gp_Vec worldDisplacement )
+		{
+			// WorldCoord can be used directly
+			if( m_Param.RefCoordinateType != RefCoordinateType.Local ) {
+				worldDisplacement = new gp_Vec( dx, dy, dz );
+				return true;
+			}
+
+			worldDisplacement = null;
+			if( m_nSelectIndex == NULL_SELECT_INDEX ) {
+				m_CoordIconRenderer?.Remove( true );
+				return false;
+			}
+
+			// Build LocalCoord at the selected point
+			if( !TryGetLocalCoordinate( m_nSelectIndex, out gp_Ax2 localCoordinate ) ) {
+				m_CoordIconRenderer?.Remove( true );
+				return false;
+			}
+
+			gp_Dir xDirection = localCoordinate.XDirection();
+			gp_Dir yDirection = localCoordinate.YDirection();
+			gp_Dir zDirection = localCoordinate.Direction();
+			worldDisplacement = new gp_Vec(
+				dx * xDirection.X() + dy * yDirection.X() + dz * zDirection.X(),
+				dx * xDirection.Y() + dy * yDirection.Y() + dz * zDirection.Y(),
+				dx * xDirection.Z() + dy * yDirection.Z() + dz * zDirection.Z() );
+			return true;
+		}
+
+		// derive the local X-axis from a neighbor point direction
+		bool TryGetNextPointXDirection( List<gp_Pnt> pointList, int index, gp_Vec normalVec, out gp_Dir xDirection )
+		{
+			xDirection = null;
+			gp_Pnt currentPoint = pointList[ index ];
+			int pointCount = pointList.Count;
+
+			// search forward first and wrap around for closed contours
+			for( int step = 1; step < pointCount; step++ ) {
+				int nextIndex = ( index + step ) % pointCount;
+
+				gp_Vec yVec = normalVec.Crossed( new gp_Vec( currentPoint, pointList[ nextIndex ] ) );
+				if( yVec.Magnitude() >= GEOM_TOLERANCE ) {
+					yVec.Normalize();
+					gp_Vec xVec = yVec.Crossed( normalVec );
+					xVec.Normalize();
+					xDirection = new gp_Dir( xVec );
+					return true;
+				}
+			}
+
+			// search backward when no valid point in forward
+			for( int previousIndex = index - 1; previousIndex >= 0; previousIndex-- ) {
+				gp_Vec yVec = normalVec.Crossed( new gp_Vec( pointList[ previousIndex ], currentPoint ) );
+				if( yVec.Magnitude() >= GEOM_TOLERANCE ) {
+					yVec.Normalize();
+					gp_Vec xVec = yVec.Crossed( normalVec );
+					xVec.Normalize();
+					xDirection = new gp_Dir( xVec );
+					return true;
+				}
+			}
+			return false;
 		}
 
 		void UpdatePath()
@@ -311,36 +569,23 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			// Get the selected point's contourCache
-			if( m_nSelectIndex == NULL_SELECT_INDEX
-				|| !DataGettingHelper.GetPathCacheByID( m_CurrentPathID, out IPathCache pathCache )
-				|| !( pathCache is ContourCache contourCache ) ) {
-				m_CoordIconRenderer.Remove( true );
-				return;
-			}
-
-			// Convert the selected point index to its corresponding index in TrsfCADPointList (offsetIndex)
-			List<int> originalIndexMap = contourCache.OriginalIndexMap;
-			int offsetIndex = originalIndexMap != null ? originalIndexMap.IndexOf( m_nSelectIndex ) : m_nSelectIndex;
-			List<CADPoint> cadPointList = contourCache.TrsfCADPointList;
-			if( offsetIndex < 0 || offsetIndex >= cadPointList.Count ) {
+			if( m_nSelectIndex == NULL_SELECT_INDEX || m_Param == null ) {
 				m_CoordIconRenderer.Remove( true );
 				return;
 			}
 
 			// Show the icon directly when using world coordinates
-			CADPoint cadPoint = cadPointList[ offsetIndex ];
-			RefCoordinateType refCoordType = m_Param.RefCoordinateType;
-			if( refCoordType == RefCoordinateType.World ) {
-				m_CoordIconRenderer.Show( cadPoint.Point, true );
+			if( m_Param.RefCoordinateType == RefCoordinateType.World ) {
+				if( !TryGetCAMPoint( m_nSelectIndex, out CAMPoint camPoint ) ) {
+					m_CoordIconRenderer.Remove( true );
+					return;
+				}
+				m_CoordIconRenderer.Show( camPoint.Point, true );
 				return;
 			}
 
 			// Build the LocalCoord
-			gp_Ax2 coordinate = refCoordType == RefCoordinateType.World
-				? new gp_Ax2( cadPoint.Point, new gp_Dir( 0, 0, 1 ), new gp_Dir( 1, 0, 0 ) )
-				: TryGetLocalCoordinate( cadPointList, offsetIndex, out gp_Ax2 localCoordinate ) ? localCoordinate : null;
-			if( coordinate == null ) {
+			if( !TryGetLocalCoordinate( m_nSelectIndex, out gp_Ax2 coordinate ) ) {
 				m_CoordIconRenderer.Remove( true );
 				return;
 			}
@@ -354,151 +599,12 @@ namespace MyCAM.Editor
 			m_Viewer.UpdateView();
 		}
 
-		bool TryGetLocalCoordinate( List<CADPoint> cadPointList, int pointIndex, out gp_Ax2 localCoordinate )
-		{
-			localCoordinate = null;
-			if( cadPointList == null || pointIndex < 0 || pointIndex >= cadPointList.Count ) {
-				return false;
-			}
-
-			// Use the normal as the local Z-axis
-			CADPoint cadPoint = cadPointList[ pointIndex ];
-			gp_Vec normalVec = new gp_Vec( cadPoint.NormalVec_1st );
-			if( normalVec.Magnitude() < GEOM_TOLERANCE ) {
-				return false;
-			}
-			normalVec.Normalize();
-
-			// Use the tangent as the local X-axis if possible
-			// Else, use a neighbor point direction ( should not happen, but just in case)
-			gp_Vec yVec = normalVec.Crossed( new gp_Vec( cadPoint.TangentVec ) );
-			gp_Dir xDirection;
-			if( yVec.Magnitude() < GEOM_TOLERANCE ) {
-				if( !TryGetNextPointXDirection( cadPointList, pointIndex, normalVec, out xDirection ) ) {
-					return false;
-				}
-			}
-			else {
-				yVec.Normalize();
-				gp_Vec xVec = yVec.Crossed( normalVec );
-				if( xVec.Magnitude() < GEOM_TOLERANCE ) {
-					return false;
-				}
-				xVec.Normalize();
-				xDirection = new gp_Dir( xVec );
-			}
-
-			localCoordinate = new gp_Ax2( cadPoint.Point, new gp_Dir( normalVec ), xDirection );
-			return true;
-		}
-
-		bool TryConvertToWorldDisplacement( double dx, double dy, double dz, out gp_Vec worldDisplacement )
-		{
-			// WorldCoord can be used directly
-			if( m_Param.RefCoordinateType != RefCoordinateType.Local ) {
-				worldDisplacement = new gp_Vec( dx, dy, dz );
-				return true;
-			}
-
-			// Get the selected point's contourCache
-			if( m_nSelectIndex == NULL_SELECT_INDEX
-			|| !DataGettingHelper.GetPathCacheByID( m_CurrentPathID, out IPathCache pathCache )
-			|| !( pathCache is ContourCache contourCache ) ) {
-				m_CoordIconRenderer?.Remove( true );
-				worldDisplacement = null;
-				return false;
-			}
-
-			// Convert the selected point index to its corresponding index in TrsfCADPointList (offsetIndex)
-			List<CADPoint> cadPointList = contourCache.TrsfCADPointList;
-			List<int> originalIndexMap = contourCache.OriginalIndexMap;
-			int offsetIndex = originalIndexMap != null ? originalIndexMap.IndexOf( m_nSelectIndex ) : m_nSelectIndex;
-
-			// Build LocalCoord at the selected point
-			if( !TryGetLocalCoordinate( cadPointList, offsetIndex, out gp_Ax2 localCoordinate ) ) {
-				m_CoordIconRenderer?.Remove( true );
-				worldDisplacement = null;
-				return false;
-			}
-
-			gp_Dir xDirection = localCoordinate.XDirection();
-			gp_Dir yDirection = localCoordinate.YDirection();
-			gp_Dir zDirection = localCoordinate.Direction();
-			worldDisplacement = new gp_Vec(
-				dx * xDirection.X() + dy * yDirection.X() + dz * zDirection.X(),
-				dx * xDirection.Y() + dy * yDirection.Y() + dz * zDirection.Y(),
-				dx * xDirection.Z() + dy * yDirection.Z() + dz * zDirection.Z() );
-			return true;
-		}
-
-		bool TryGetNextPointXDirection( List<CADPoint> cadPointList, int pointIndex, gp_Vec normalVec, out gp_Dir xDirection )
-		{
-			xDirection = null;
-			CADPoint currentPoint = cadPointList[ pointIndex ];
-			int pointCount = cadPointList.Count;
-
-			// Search forward first and wrap around for closed contours
-			for( int step = 1; step < pointCount; step++ ) {
-				int nextIndex = pointIndex + step;
-				if( nextIndex >= pointCount ) {
-					nextIndex %= pointCount;
-				}
-
-				gp_Vec yVec = normalVec.Crossed( new gp_Vec( currentPoint.Point, cadPointList[ nextIndex ].Point ) );
-				if( yVec.Magnitude() >= GEOM_TOLERANCE ) {
-					yVec.Normalize();
-					gp_Vec xVec = yVec.Crossed( normalVec );
-					xVec.Normalize();
-					xDirection = new gp_Dir( xVec );
-					return true;
-				}
-			}
-
-			// Search backward when no valid point in forward
-			for( int previousIndex = pointIndex - 1; previousIndex >= 0; previousIndex-- ) {
-				gp_Vec yVec = normalVec.Crossed( new gp_Vec( cadPointList[ previousIndex ].Point, currentPoint.Point ) );
-				if( yVec.Magnitude() >= GEOM_TOLERANCE ) {
-					yVec.Normalize();
-					gp_Vec xVec = yVec.Crossed( normalVec );
-					xVec.Normalize();
-					xDirection = new gp_Dir( xVec );
-					return true;
-				}
-			}
-			return false;
-		}
-
-		// path index control
-		string m_CurrentPathID;
-		CraftData m_CraftData;
-
-		// point index control
-		int m_nSelectIndex = NULL_SELECT_INDEX;
-
-		ContourEditParam m_Param = null;
-		double m_BaseWorldDX = 0;
-		double m_BaseWorldDY = 0;
-		double m_BaseWorldDZ = 0;
-
-		// action utility
-		EditPointRenderer m_EditPointRenderer = null;
-		CoordIconRenderer m_CoordIconRenderer = null;
-		ContourEditDlg m_Dlg = null;
-
-		// null point index as -999, -1 is used for closed point index
-		const int NULL_SELECT_INDEX = -999;
-
-		const double GEOM_TOLERANCE = 1e-3;
-
-		const string NOT_CONTOUR_PATH = "∏ÙÆ| {0} §£¨OΩ¸π¯∏ÙÆ|°AµL™kΩsøË";
-		const string CANNOT_GET_PATH_CRAFT_INFO = "µL™k¿Ú®˙∏ÙÆ| {0} ™∫•[§u∏Í∞T";
+		#endregion
 
 		// composition references
-		Viewer m_Viewer;
-		TreeView m_TreeView;
-		ViewManager m_ViewManager;
-		SelectPathAction m_PathIndexAction;
-		IndexSelectAction m_PointIndexAction;
+		Viewer m_Viewer = null;
+		TreeView m_TreeView = null;
+		ViewManager m_ViewManager = null;
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ContourEditAction" );
 	}
 }
