@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="RCornerDlg" Content="R角" />
+  <Message ID="m_btnDelete" Content="刪除" />
+  <Message ID="m_btnSwitchStartOrEnd" Content="切換起終點" />
+  <Message ID="m_btnDone" Content="完成" />
+</ResMap>

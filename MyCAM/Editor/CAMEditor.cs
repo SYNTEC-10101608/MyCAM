@@ -31,6 +31,7 @@ namespace MyCAM.Editor
 			IsPathCompensateEditable = true;
 			IsMicroJointEditable = true;
 			IsExtendedGCodeEditable = true;
+			IsRCornerEditable = true;
 			IsContourEditable = true;
 		}
 
@@ -46,6 +47,7 @@ namespace MyCAM.Editor
 		public bool IsPathCompensateEditable;
 		public bool IsMicroJointEditable;
 		public bool IsExtendedGCodeEditable;
+		public bool IsRCornerEditable;
 		public bool IsContourEditable;
 	}
 
@@ -585,6 +587,21 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetRCorner()
+		{
+			if( IsSameAction( EditActionType.RCorner ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false, true ) ) {
+				return;
+			}
+			EndActionIfNotDefault();
+			RCornerAction action = new RCornerAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.FirstOrDefault(), m_DefaultAction as SelectPathAction );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
+		}
+
 		#endregion
 
 		// sort API
@@ -778,6 +795,7 @@ namespace MyCAM.Editor
 				editableInfo.IsToolVecEditable = false;
 				editableInfo.IsMicroJointEditable = false;
 				editableInfo.IsExtendedGCodeEditable = false;
+				editableInfo.IsRCornerEditable = false;
 				editableInfo.IsContourEditable = false;
 				editableInfo.IsAutoOrderEditable = false;
 			}
@@ -801,6 +819,7 @@ namespace MyCAM.Editor
 					editableInfo.IsFixedToolVecEditable = false;
 					editableInfo.IsMicroJointEditable = false;
 					editableInfo.IsExtendedGCodeEditable = false;
+					editableInfo.IsRCornerEditable = false;
 					editableInfo.IsContourEditable = false;
 				}
 				if( IsSelectSpecialPath( szPathIDList ) ) {
@@ -969,12 +988,12 @@ namespace MyCAM.Editor
 			return false;
 		}
 
-		bool ValidateBeforeActionEdit( out List<string> szIDList, bool isMutiEditable )
+		bool ValidateBeforeActionEdit( out List<string> szIDList, bool isMutiEditable, bool isNoSelectable = false )
 		{
 			szIDList = GetSelectedIDList();
 
 			// nothing selected
-			if( szIDList.Count == 0 ) {
+			if( isNoSelectable == false && szIDList.Count == 0 ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PleaseSelectPath", PLEASE_SELECT_PATH ), MyApp.NoticeType.Hint );
 				EndActionIfNotDefault();
 				return false;
@@ -1020,6 +1039,7 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.ToolVec
 				|| action.ActionType == EditActionType.MicroJoint
 				|| action.ActionType == EditActionType.ExtendedGCode
+				|| action.ActionType == EditActionType.RCorner
 				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// lock main form
@@ -1051,6 +1071,7 @@ namespace MyCAM.Editor
 				|| action.ActionType == EditActionType.ToolVec
 				|| action.ActionType == EditActionType.MicroJoint
 				|| action.ActionType == EditActionType.ExtendedGCode
+				|| action.ActionType == EditActionType.RCorner
 				|| action.ActionType == EditActionType.ContourEdit ) {
 
 				// unlock main form

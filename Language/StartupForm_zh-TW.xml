@@ -69,6 +69,8 @@
 	<Message ID="m_tsbMicroJoint_ToolTip" Content="設定選擇路徑的微連" />
 	<Message ID="m_tsbExtendedGCode" Content="擴充G碼" />
 	<Message ID="m_tsbExtendedGCode_ToolTip" Content="在選擇路徑的指定位置插入擴充G碼" />
+	<Message ID="m_tsbRCorner" Content="R角" />
+	<Message ID="m_tsbRCorner_ToolTip" Content="設定選擇路徑的R角工藝" />
 	<Message ID="m_tsbToolVecReverse" Content="姿態反向" />
 	<Message ID="m_tsbToolVecReverse_ToolTip" Content="反向選擇路徑的姿態方向" />
 	<Message ID="m_tsbToolVec" Content="飛邊姿態" />

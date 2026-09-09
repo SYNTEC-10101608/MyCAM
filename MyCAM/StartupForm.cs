@@ -526,6 +526,11 @@ namespace MyCAM
 			m_CAMEditor.SetExtendedGCode();
 		}
 
+		void m_tsbRCorner_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetRCorner();
+		}
+
 		#region Viewer tool bar click action
 
 		void m_tsbShowVec_CheckedChanged( object sender, EventArgs e )
@@ -726,6 +731,9 @@ namespace MyCAM
 					case EditActionType.MicroJoint:
 						m_tsbMicroJoint.BackColor = DEFAULT_BtnColor;
 						break;
+					case EditActionType.RCorner:
+						m_tsbRCorner.BackColor = DEFAULT_BtnColor;
+						break;
 					case EditActionType.ExtendedGCode:
 						m_tsbExtendedGCode.BackColor = DEFAULT_BtnColor;
 						break;
@@ -777,6 +785,9 @@ namespace MyCAM
 					break;
 				case EditActionType.MicroJoint:
 					m_tsbMicroJoint.BackColor = ON_ButtonColor;
+					break;
+				case EditActionType.RCorner:
+					m_tsbRCorner.BackColor = ON_ButtonColor;
 					break;
 				case EditActionType.ExtendedGCode:
 					m_tsbExtendedGCode.BackColor = ON_ButtonColor;
@@ -830,6 +841,7 @@ namespace MyCAM
 			m_tsbReverse.Enabled = editableInfo.IsPathReverseEditable;
 			m_tsbPathCompensation.Enabled = editableInfo.IsPathCompensateEditable;
 			m_tsbMicroJoint.Enabled = editableInfo.IsMicroJointEditable;
+			m_tsbRCorner.Enabled = editableInfo.IsRCornerEditable;
 			m_tsbExtendedGCode.Enabled = editableInfo.IsExtendedGCodeEditable;
 			m_btnContourEdit.Enabled = editableInfo.IsContourEditable;
 		}
@@ -1611,6 +1623,9 @@ namespace MyCAM
 
 			m_tsbExtendedGCode.Text = m_LanguageManager.TryGetString( "m_tsbExtendedGCode", m_tsbExtendedGCode.Text );
 			m_tsbExtendedGCode.ToolTipText = m_LanguageManager.TryGetString( "m_tsbExtendedGCode_ToolTip", m_tsbExtendedGCode.ToolTipText );
+
+			m_tsbRCorner.Text = m_LanguageManager.TryGetString( "m_tsbRCorner", m_tsbRCorner.Text );
+			m_tsbRCorner.ToolTipText = m_LanguageManager.TryGetString( "m_tsbRCorner_ToolTip", m_tsbRCorner.ToolTipText );
 
 			m_tsbToolVecReverse.Text = m_LanguageManager.TryGetString( "m_tsbToolVecReverse", m_tsbToolVecReverse.Text );
 			m_tsbToolVecReverse.ToolTipText = m_LanguageManager.TryGetString( "m_tsbToolVecReverse_ToolTip", m_tsbToolVecReverse.ToolTipText );

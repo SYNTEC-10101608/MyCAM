@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+ <Message ID="NotContourPath" Content="Путь {0} не является контурным и не подлежит редактированию" />
+ <Message ID="CannotGetPathCraftInfo" Content="Не удалось получить информацию об обработке для пути {0}" />
+ <Message ID="RCornerAddFail" Content="Ошибка добавления: наложение на существующий сегмент" />
+ <Message ID="StatusSelectMode" Content="Щелкните конечную точку для добавления; щелкните середину сегмента для выбора" />
+ <Message ID="StatusAddSecond" Content="Выберите вторую точку" />
+ <Message ID="StatusSelectPath" Content="Сначала выберите контурный путь" />
+</ResMap>

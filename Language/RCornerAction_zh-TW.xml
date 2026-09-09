@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+ <Message ID="NotContourPath" Content="路徑 {0} 不是輪廓路徑，無法編輯" />
+ <Message ID="CannotGetPathCraftInfo" Content="無法取得路徑 {0} 的加工資訊" />
+ <Message ID="RCornerAddFail" Content="無法新增：與現有區段重疊" />
+ <Message ID="StatusSelectMode" Content="點選端點新增，點選區段中間選取" />
+ <Message ID="StatusAddSecond" Content="請點選第二點" />
+ <Message ID="StatusSelectPath" Content="請先選擇一條輪廓路徑" />
+</ResMap>

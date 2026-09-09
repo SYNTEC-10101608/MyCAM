@@ -69,6 +69,8 @@
 	<Message ID="m_tsbMicroJoint_ToolTip" Content="Set micro-joints for the selected toolpath" />
 	<Message ID="m_tsbExtendedGCode" Content="Extended G-code" />
 	<Message ID="m_tsbExtendedGCode_ToolTip" Content="Insert extended G-code at the specified position of the selected toolpath" />
+	<Message ID="m_tsbRCorner" Content="R-corner" />
+	<Message ID="m_tsbRCorner_ToolTip" Content="Set the R-corner process for the selected path" />
 	<Message ID="m_tsbToolVecReverse" Content="Reverse Orientation" />
 	<Message ID="m_tsbToolVecReverse_ToolTip" Content="Reverse the tool orientation of the selected toolpath" />
 	<Message ID="m_tsbToolVec" Content="Edge Tool Orientation" />

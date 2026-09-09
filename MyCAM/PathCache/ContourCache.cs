@@ -136,6 +136,238 @@ namespace MyCAM.PathCache
 			return m_interpolateTypeRegion;
 		}
 
+		// convert a stored RCorner endpoint to a CAM index
+		public bool TryGetRCornerCAMIndex( int nCADIndex, out int camIndex )
+		{
+			camIndex = -1;
+			if( MainPathPointList.Count == 0 ) {
+				return false;
+			}
+
+			// machining end point: the tail of the CAM point list
+			if( nCADIndex == SpecialPointIndex.CLOSED_POINT_INDEX ) {
+				camIndex = MainPathPointList.Count - 1;
+				return true;
+			}
+
+			// real CAD index (including the machining start point)
+			return CADToCAMIndexMap.TryGetValue( nCADIndex, out camIndex );
+		}
+
+		// convert to a valid ordered CAM interval [startCam, endCam]
+		public bool TryGetRCornerCAMRange( RCornerData range, out int startCam, out int endCam )
+		{
+			startCam = -1;
+			endCam = -1;
+			if( range == null ) {
+				return false;
+			}
+			if( !TryGetRCornerCAMIndex( range.StartIndex, out int cam1 ) ) {
+				return false;
+			}
+			if( !TryGetRCornerCAMIndex( range.EndIndex, out int cam2 ) ) {
+				return false;
+			}
+			startCam = Math.Min( cam1, cam2 );
+			endCam = Math.Max( cam1, cam2 );
+			return startCam != endCam;
+		}
+
+		public bool ValidateRCornerData()
+		{
+			List<RCornerData> validatedRanges = new List<RCornerData>();
+			foreach( KeyValuePair<int, RCornerData> item in m_CraftData.RCornerMap ) {
+				RCornerData range = item.Value;
+				if( range == null || item.Key != range.StartIndex
+				   || !TryGetRCornerCAMRange( range, out int startCam, out int endCam ) ) {
+					return false;
+				}
+
+				foreach( RCornerData existingRange in validatedRanges ) {
+					TryGetRCornerCAMRange( existingRange, out int existingStartCam, out int existingEndCam );
+					if( IsRCornerCAMRangeOverlap( startCam, endCam, existingStartCam, existingEndCam ) ) {
+						return false;
+					}
+				}
+				validatedRanges.Add( range );
+			}
+			return true;
+		}
+
+		public bool TryBuildAddRCornerChange( RCornerData range, out List<RCornerData> rangesToRemove, out RCornerData rangeToAdd )
+		{
+			return TryBuildRCornerChange( range, null, out rangesToRemove, out rangeToAdd );
+		}
+
+		// validate whether the range can be added, ignoring an optional range that is about to be replaced
+		public bool CanAddRCorner( RCornerData range, RCornerData rangeToIgnore = null )
+		{
+			if( !TryGetRCornerCAMRange( range, out int newStart, out int newEnd ) ) {
+				return false;
+			}
+
+			// overlap / containment check against existing ranges, in CAM space
+			foreach( RCornerData existingRange in m_CraftData.RCornerMap.Values ) {
+				if( existingRange == rangeToIgnore ) {
+					continue;
+				}
+				if( !TryGetRCornerCAMRange( existingRange, out int existStart, out int existEnd ) ) {
+					continue;
+				}
+
+				if( IsRCornerCAMRangeOverlap( newStart, newEnd, existStart, existEnd ) ) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		bool IsRCornerCAMRangeOverlap( int startCam, int endCam, int otherStartCam, int otherEndCam )
+		{
+			return startCam < otherEndCam && endCam > otherStartCam;
+		}
+
+		bool TryBuildRCornerChange( RCornerData range, RCornerData rangeToIgnore,
+			 out List<RCornerData> rangesToRemove, out RCornerData rangeToAdd )
+		{
+			rangesToRemove = new List<RCornerData>();
+			rangeToAdd = null;
+			if( range == null || !CanAddRCorner( range, rangeToIgnore ) ) {
+				return false;
+			}
+			if( rangeToIgnore != null ) {
+				rangesToRemove.Add( rangeToIgnore );
+			}
+			rangeToAdd = BuildMergedRCornerRange( range, rangeToIgnore, rangesToRemove );
+			return true;
+		}
+
+		// switch a range touching the path start/end to the other side
+		public bool TryBuildSwitchRCornerChange( RCornerData range, int pathStartIndex,
+			 out List<RCornerData> rangesToRemove, out RCornerData rangeToAdd )
+		{
+			rangesToRemove = new List<RCornerData>();
+			rangeToAdd = null;
+			if( range == null ) {
+				return false;
+			}
+
+			// whole path cannot be switched
+			if( range.StartIndex == pathStartIndex && range.EndIndex == SpecialPointIndex.CLOSED_POINT_INDEX ) {
+				return false;
+			}
+
+			RCornerData newRange = null;
+
+			// starts from the path start => switch to end at the path end
+			if( range.StartIndex == pathStartIndex ) {
+				newRange = new RCornerData( range.EndIndex, SpecialPointIndex.CLOSED_POINT_INDEX );
+			}
+
+			// ends at the path end => switch to start from the path start
+			else if( range.EndIndex == SpecialPointIndex.CLOSED_POINT_INDEX ) {
+				newRange = new RCornerData( pathStartIndex, range.StartIndex );
+			}
+
+			if( newRange == null ) {
+				return false;
+			}
+			return TryBuildRCornerChange( newRange, range, out rangesToRemove, out rangeToAdd );
+		}
+
+		// find the range containing the point, and whether the point is one of its endpoints
+		public bool TryGetRCornerSelectionInfo( int nCADIndex, out RCornerData range, out RCornerData endPointRange )
+		{
+			range = null;
+			endPointRange = null;
+			if( !TryGetRCornerCAMIndex( nCADIndex, out int nCam ) ) {
+				return false;
+			}
+
+			foreach( RCornerData currentRange in m_CraftData.RCornerMap.Values ) {
+				if( !TryGetRCornerCAMRange( currentRange, out int startCam, out int endCam ) ) {
+					continue;
+				}
+				if( nCam < startCam || nCam > endCam ) {
+					continue;
+				}
+
+				range = currentRange;
+				if( nCam == startCam || nCam == endCam ) {
+					endPointRange = currentRange;
+				}
+				break;
+			}
+			return range != null;
+		}
+
+		// build a merged range without modifying CraftData
+		RCornerData BuildMergedRCornerRange( RCornerData start, RCornerData rangeToIgnore, List<RCornerData> rangesToRemove )
+		{
+			int nMergeCount = 0;
+			int nMergeLimit = m_CraftData.RCornerMap.Count + 1;
+			RCornerData current = start;
+			while( nMergeCount < nMergeLimit ) {
+				nMergeCount++;
+				if( !TryGetRCornerCAMRange( current, out int curStart, out int curEnd ) ) {
+					return current;
+				}
+
+				RCornerData mergeTarget = null;
+				bool isTargetPreceding = false;
+
+				foreach( RCornerData other in m_CraftData.RCornerMap.Values ) {
+					if( other == rangeToIgnore || rangesToRemove.Contains( other ) ) {
+						continue;
+					}
+					if( !TryGetRCornerCAMRange( other, out int otherStart, out int otherEnd ) ) {
+						continue;
+					}
+
+					// other's end touches current's start
+					if( otherEnd == curStart ) {
+						mergeTarget = other;
+						isTargetPreceding = true;
+						break;
+					}
+
+					// other's start touches current's end
+					if( otherStart == curEnd ) {
+						mergeTarget = other;
+						isTargetPreceding = false;
+						break;
+					}
+				}
+
+				if( mergeTarget == null ) {
+					return current;
+				}
+
+				// build the merged range: keep the outer stored endpoints of the two ranges
+				int mergedStartStored = GetStoredEndpointByCAM( isTargetPreceding ? mergeTarget : current, true );
+				int mergedEndStored = GetStoredEndpointByCAM( isTargetPreceding ? current : mergeTarget, false );
+				RCornerData merged = new RCornerData( mergedStartStored, mergedEndStored );
+
+				rangesToRemove.Add( mergeTarget );
+				current = merged;
+			}
+			return current;
+		}
+
+		// the stored endpoint whose CAM index is smaller (takeMin=true) or larger (takeMin=false)
+		int GetStoredEndpointByCAM( RCornerData range, bool takeMin )
+		{
+			if( TryGetRCornerCAMIndex( range.StartIndex, out int nCamStart )
+				&& TryGetRCornerCAMIndex( range.EndIndex, out int nCamEnd ) ) {
+				bool startIsMin = nCamStart <= nCamEnd;
+				if( startIsMin == takeMin ) {
+					return range.StartIndex;
+				}
+				return range.EndIndex;
+			}
+			return takeMin ? range.StartIndex : range.EndIndex;
+		}
+
 		#endregion
 
 		#region API

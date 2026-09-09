@@ -97,6 +97,7 @@
     <Compile Include="Editor\Action\CAM\ManualOrderAction.cs" />
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
+    <Compile Include="Editor\Action\CAM\RCornerAction.cs" />
     <Compile Include="Editor\Action\MeasureAction.cs" />
     <Compile Include="Editor\Dialog\AddPathDlg.cs">
       <SubType>Form</SubType>
@@ -168,6 +169,12 @@
     <Compile Include="Editor\Dialog\OrderDialog.Designer.cs">
       <DependentUpon>OrderDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Dialog\RCornerDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\RCornerDlg.Designer.cs">
+      <DependentUpon>RCornerDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Dialog\SpecialToolVecEditDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -186,6 +193,7 @@
       <DependentUpon>ContourEditDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Renderer\EditPointRenderer.cs" />
+    <Compile Include="Editor\Renderer\RCornerRenderer.cs" />
     <Compile Include="Editor\Renderer\REFPointRenderer.cs" />
     <Compile Include="Editor\Dialog\CNCDlg.cs">
       <SubType>Form</SubType>
@@ -380,6 +388,7 @@
     <Compile Include="Post\PostInterfaceDefine.cs" />
     <Compile Include="Post\PostSolver.cs" />
     <Compile Include="Post\PostTraverseBuilder.cs" />
+    <Compile Include="Post\RCornerWriter.cs" />
     <Compile Include="Post\StdPatternNCWriter.cs" />
     <Compile Include="Post\StdPatternPostHelper.cs" />
     <Compile Include="Post\NCWriterHelper.cs" />
@@ -447,6 +456,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\PatternSettingDlg.resx">
       <DependentUpon>PatternSettingDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\RCornerDlg.resx">
+      <DependentUpon>RCornerDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\SewPartDlg.resx">
       <DependentUpon>SewPartDlg.cs</DependentUpon>

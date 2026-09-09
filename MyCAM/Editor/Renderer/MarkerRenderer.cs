@@ -1,23 +1,21 @@
 ﻿using MyCAM.Data;
-using MyCAM.Helper;
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.gp;
-using OCC.Graphic3d;
 using OCC.Quantity;
 using OCC.TCollection;
+using OCCTool;
 using OCCViewer;
 using System.Collections.Generic;
 using System.Linq;
-using OCC;
-using OCCTool;
 
 namespace MyCAM.Editor.Renderer
 {
 	public enum MarkerType
 	{
 		MicroJoint,
-		ExtendedGCode
+		ExtendedGCode,
+		RCorner
 	}
 
 	public class MarkerData
@@ -108,6 +106,62 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 			return markerDataList;
+		}
+	}
+
+	public class RCornerMarkerProvider : IMarkerProvider
+	{
+		public MarkerType Type
+		{
+			get
+			{
+				return MarkerType.RCorner;
+			}
+		}
+
+		public IEnumerable<MarkerData> GetMarkers( MarkerContext context )
+		{
+			List<MarkerData> markerDataList = new List<MarkerData>();
+			if( context?.CAMPointList == null || context?.CraftData == null || context?.ContourCache == null ) {
+				return markerDataList;
+			}
+
+			// use RCornerMap and the cache's CAM-range conversion to find R corner positions
+			foreach( RCornerData range in context.CraftData.RCornerMap.Values ) {
+				if( !context.ContourCache.TryGetRCornerCAMRange( range, out int machiningStartCamIdx, out int machiningEndCamIdx ) ) {
+					continue;
+				}
+
+				if( machiningStartCamIdx >= 0 && machiningStartCamIdx < context.CAMPointList.Count ) {
+					AddStartMarker( markerDataList, context.CAMPointList[ machiningStartCamIdx ].Point );
+				}
+				if( machiningEndCamIdx >= 0 && machiningEndCamIdx < context.CAMPointList.Count ) {
+					AddEndMarker( markerDataList, context.CAMPointList[ machiningEndCamIdx ].Point );
+				}
+			}
+			return markerDataList;
+		}
+
+		static void AddStartMarker( List<MarkerData> list, gp_Pnt position )
+		{
+			list.Add( new MarkerData()
+			{
+				Type = MarkerType.RCorner,
+				Position = position,
+				LabelText = "RC▲",
+				Color = Quantity_NameOfColor.Quantity_NOC_GREEN
+			} );
+		}
+
+		static void AddEndMarker( List<MarkerData> list, gp_Pnt position )
+		{
+			list.Add( new MarkerData()
+			{
+				Type = MarkerType.RCorner,
+				Position = position,
+				LabelText = "RC▼",
+				Color = Quantity_NameOfColor.Quantity_NOC_RED
+			} );
 		}
 	}
 
@@ -309,6 +363,7 @@ namespace MyCAM.Editor.Renderer
 		{
 			RegisterProvider( new MicroJointMarkerProvider() );
 			RegisterProvider( new ExtendedGCodeMarkerProvider() );
+			RegisterProvider( new RCornerMarkerProvider() );
 		}
 
 		public void RegisterProvider( IMarkerProvider provider )

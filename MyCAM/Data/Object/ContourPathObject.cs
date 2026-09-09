@@ -1,8 +1,5 @@
-﻿using MyCAM.App;
-using MyCAM.PathCache;
-using OCC.BRep;
+﻿using MyCAM.PathCache;
 using OCC.gp;
-using OCC.TopExp;
 using OCC.TopoDS;
 using System;
 using System.Collections.Generic;
@@ -40,6 +37,9 @@ namespace MyCAM.Data
 			m_ContourGeomData = geomData;
 			m_CraftData = craftData;
 			m_ContourCache = new ContourCache( m_ContourGeomData, m_CraftData );
+			if( !m_ContourCache.ValidateRCornerData() ) {
+				m_CraftData.ClearRCorner();
+			}
 			BuildUnClosePathStartEndPntParam();
 		}
 

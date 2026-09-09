@@ -1,7 +1,6 @@
-﻿using OCC.gp;
+using OCC.gp;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace MyCAM.Data
 {
@@ -122,6 +121,30 @@ namespace MyCAM.Data
 		ControlPoint,
 	}
 
+	public class RCornerData
+	{
+		public int StartIndex
+		{
+			get; set;
+		}
+
+		public int EndIndex
+		{
+			get; set;
+		}
+
+		public RCornerData( int startIndex, int endIndex )
+		{
+			StartIndex = startIndex;
+			EndIndex = endIndex;
+		}
+
+		public RCornerData Clone()
+		{
+			return new RCornerData( StartIndex, EndIndex );
+		}
+	}
+
 	public class CraftData
 	{
 		public CraftData()
@@ -143,7 +166,8 @@ namespace MyCAM.Data
 			Dictionary<int, ContourEditData> contourEditMap,
 			Dictionary<int, double> microJointStartIdxMap,
 			Dictionary<Tuple<ExtendedGCodeType, int?>, string> extendedGCodeMap,
-			SpecialToolVecData specialToolVecData = null )
+			SpecialToolVecData specialToolVecData = null,
+			Dictionary<int, RCornerData> rCornerMap = null )
 		{
 			m_TechLayer = techLayer;
 			m_StartPointIndex = startPoint;
@@ -173,6 +197,11 @@ namespace MyCAM.Data
 			}
 			else {
 				m_SpecialToolVecData = new SpecialToolVecData();
+			}
+			if( rCornerMap != null ) {
+				foreach( var kvp in rCornerMap ) {
+					m_RCornerMap.Add( kvp.Key, kvp.Value.Clone() );
+				}
 			}
 			SubscribeSubParamChanged();
 		}
@@ -220,6 +249,7 @@ namespace MyCAM.Data
 				ClearToolVecModify();
 				ClearSpecialToolVecData();
 				ClearExtendedGCode();
+				ClearRCorner();
 			}
 		}
 		public void SetToolVecReverse( bool isPathReverse )
@@ -242,6 +272,18 @@ namespace MyCAM.Data
 			}
 		}
 
+		// R corner ranges, keyed by StartIndex; endpoints are real CAD indices, or PATH_END for the machining end point
+		public IReadOnlyDictionary<int, RCornerData> RCornerMap
+		{
+			get
+			{
+				if( m_RCornerMap == null ) {
+					m_RCornerMap = new Dictionary<int, RCornerData>();
+				}
+				return m_RCornerMap;
+			}
+		}
+
 		public bool IsPathReverse
 		{
 			get
@@ -254,6 +296,7 @@ namespace MyCAM.Data
 					m_IsPathReverse = value;
 					ClearToolVecModify();
 					ClearExtendedGCode();
+					ClearRCorner();
 					CAMFactorChanged?.Invoke();
 				}
 			}
@@ -663,6 +706,52 @@ namespace MyCAM.Data
 
 		#endregion
 
+		#region RCorner
+
+		public bool ApplyRCornerChange( IEnumerable<RCornerData> rangesToRemove, RCornerData rangeToAdd )
+		{
+			if( rangeToAdd == null ) {
+				return false;
+			}
+
+			HashSet<int> keysToRemove = new HashSet<int>();
+			if( rangesToRemove != null ) {
+				foreach( RCornerData range in rangesToRemove ) {
+					if( range != null ) {
+						keysToRemove.Add( range.StartIndex );
+					}
+				}
+			}
+
+			if( m_RCornerMap.ContainsKey( rangeToAdd.StartIndex ) && !keysToRemove.Contains( rangeToAdd.StartIndex ) ) {
+				return false;
+			}
+
+			foreach( int key in keysToRemove ) {
+				m_RCornerMap.Remove( key );
+			}
+			m_RCornerMap[ rangeToAdd.StartIndex ] = rangeToAdd;
+			CAMFactorChanged?.Invoke();
+			return true;
+		}
+
+		public bool RemoveRCorner( RCornerData range )
+		{
+			if( range != null && m_RCornerMap.Remove( range.StartIndex ) ) {
+				CAMFactorChanged?.Invoke();
+				return true;
+			}
+			return false;
+		}
+
+		public void ClearRCorner()
+		{
+			m_RCornerMap.Clear();
+			CAMFactorChanged?.Invoke();
+		}
+
+		#endregion
+
 		void SubscribeSubParamChanged()
 		{
 			m_LeadData.PropertyChanged += SubParamChanged;
@@ -704,6 +793,7 @@ namespace MyCAM.Data
 		int m_TechLayer = DEFAULT_TECH_LAYER;
 		int m_StartPointIndex = 0;
 		Dictionary<int, double> m_MicroJointStartIdxMap = new Dictionary<int, double>();
+		Dictionary<int, RCornerData> m_RCornerMap = new Dictionary<int, RCornerData>();
 		bool m_IsPathReverse = false;
 		LeadData m_LeadData = new LeadData();
 		double m_OverCutLength = 0;

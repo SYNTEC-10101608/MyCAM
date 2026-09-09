@@ -1,4 +1,4 @@
-﻿using MyCAM.Data;
+using MyCAM.Data;
 using OCC.BRep;
 using OCC.BRepTools;
 using OCC.gp;
@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Xml.Serialization;
 
 namespace MyCAM.FileManager
@@ -1101,6 +1100,14 @@ namespace MyCAM.FileManager
 			set;
 		} = new List<MicroJointItemDTO>();
 
+		[XmlArray( "RCornerDict" )]
+		[XmlArrayItem( "RCornerItem" )]
+		public List<RCornerItemDTO> RCornerDict
+		{
+			get;
+			set;
+		} = new List<RCornerItemDTO>();
+
 		public List<ExtendedGCodeDataDTO> ExtendedGCodeDict
 		{
 			get;
@@ -1155,6 +1162,9 @@ namespace MyCAM.FileManager
 			MicroJointStartIdxDict = craftData.MicroJointStartIdxMap
 				.Select( kvp => new MicroJointItemDTO { Index = kvp.Key, Value = kvp.Value } )
 				.ToList();
+			RCornerDict = craftData.RCornerMap.Values
+				.Select( range => new RCornerItemDTO( range ) )
+				.ToList();
 			ExtendedGCodeDict = craftData.ExtendedGCodeMap
 				.Select( kvp => new ExtendedGCodeDataDTO { GCodeType = kvp.Key.Item1, Index = kvp.Key.Item2, Content = kvp.Value } )
 				.ToList();
@@ -1198,12 +1208,13 @@ namespace MyCAM.FileManager
 			Dictionary<int, ToolVecModifyData> toolVecModifyMap = BuildToolVecModifyMap( out List<ToolVecMapDTO> sourceMap_OldVersion );
 			Dictionary<int, double> microJointStartIdxMap = BuildMicroJointIdxMap();
 			Dictionary<Tuple<ExtendedGCodeType, int?>, string> extendedGCodeMap = BuildExtendedGCodeMap();
+			Dictionary<int, RCornerData> rCornerMap = BuildRCornerMap();
 			StartPntToolVecParam startPntToolVecParam = BuildStartPntToolVecParam( sourceMap_OldVersion, IsPathReverse.Value );
 			SpecialToolVecData specialToolVecData = BuildSpecialToolVecData();
 			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value,
 																 leadData, OverCutLength.Value, toolVecModifyMap,
 																 startPntToolVecParam, IsToolVecReverse.Value, traverseData, contourEditMap,
-																 microJointStartIdxMap, extendedGCodeMap, specialToolVecData );
+																 microJointStartIdxMap, extendedGCodeMap, specialToolVecData, rCornerMap );
 
 			// old version may have start/end point in ToolVecModifyMap, those are move to StartPntToolVecData
 			RemoveOldMapStartEndPoint( craftData );
@@ -1352,6 +1363,12 @@ namespace MyCAM.FileManager
 		Dictionary<Tuple<ExtendedGCodeType, int?>, string> BuildExtendedGCodeMap()
 		{
 			return ExtendedGCodeDict?.ToDictionary( item => new Tuple<ExtendedGCodeType, int?>( item.GCodeType, item.Index ), item => item.Content ) ?? new Dictionary<Tuple<ExtendedGCodeType, int?>, string>();
+		}
+
+		Dictionary<int, RCornerData> BuildRCornerMap()
+		{
+			return RCornerDict?.Where( item => item != null )
+				.ToDictionary( item => item.StartIndex, item => item.ToRCornerData() ) ?? new Dictionary<int, RCornerData>();
 		}
 
 		SpecialToolVecData BuildSpecialToolVecData()
@@ -2269,6 +2286,35 @@ public class ExtendedGCodeDataDTO
 		this.GCodeType = gCodeType;
 		this.Index = index;
 		this.Content = content;
+	}
+}
+
+public class RCornerItemDTO
+{
+	public int StartIndex
+	{
+		get; set;
+	}
+
+	public int EndIndex
+	{
+		get; set;
+	}
+
+	// parameterless constructor (for XmlSerializer)
+	public RCornerItemDTO()
+	{
+	}
+
+	public RCornerItemDTO( RCornerData data )
+	{
+		StartIndex = data.StartIndex;
+		EndIndex = data.EndIndex;
+	}
+
+	public RCornerData ToRCornerData()
+	{
+		return new RCornerData( StartIndex, EndIndex );
 	}
 }
 

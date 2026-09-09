@@ -46,6 +46,7 @@ namespace MyCAM.Editor
 		ContourEdit,
 		MicroJoint,
 		ExtendedGCode,
+		RCorner,
 		ManualOrder,
 		AutoSortPath,
 		SpecialToolVecEdit,
