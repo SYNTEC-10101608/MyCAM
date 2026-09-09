@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="NotContourPath" Content="Path {0} is not a contour path and cannot be edited" />
+	<Message ID="CannotGetPathCraftInfo" Content="Unable to retrieve processing information for path {0}" />
+	<Message ID="RCornerAddFail" Content="Unable to add: Overlapping with an existing segment" />
+	<Message ID="StatusSelectMode" Content="Add by clicking the endpoint, select the middle of the segment" />
+	<Message ID="StatusAddSecond" Content="Please click the second point" />
+	<Message ID="StatusSelectPath" Content="Please select a contour path first" />
+</ResMap>

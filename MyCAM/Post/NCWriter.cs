@@ -283,10 +283,15 @@ namespace MyCAM.Post
 			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.PathHeader, varDict );
 			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.PathHead );
 
+			// build R corner map for main path
+			Dictionary<int, RCornerData> rCornerMap = RCornerWriter.BuildRCornerCAMIndexMap(
+				szPathID, craftData, currentPathPostData.MainPathPostPointList.Count );
+
 			// start cutting, write each process path
 			WriteOneProcessPath( currentPathPostData.LeadInPostPointList );
 			WriteOneProcessPath( currentPathPostData.MainPathPostPointList,
-				ExtendedGCodeWriter.BuildControlPointGCodeMap( szPathID, craftData, currentPathPostData.MainPathPostPointList.Count ) );
+				ExtendedGCodeWriter.BuildControlPointGCodeMap( szPathID, craftData, currentPathPostData.MainPathPostPointList.Count ),
+				rCornerMap );
 			WriteOneProcessPath( currentPathPostData.OverCutPostPointList );
 			WriteOneProcessPath( currentPathPostData.LeadOutPostPointList );
 
@@ -302,19 +307,30 @@ namespace MyCAM.Post
 				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
 		}
 
-		void WriteOnePoint( PostPoint postPoint, string szExtendedGCode = null )
+		void WriteOnePoint( PostPoint postPoint, string szExtendedGCode = null, bool isRCornerStart = false, bool isRCornerEnd = false )
 		{
 			if( postPoint == null ) {
 				return;
 			}
-			ExtendedGCodeWriter.WriteContent( m_StreamWriter, szExtendedGCode );
 			string szX = postPoint.X.ToString( "F3" );
 			string szY = postPoint.Y.ToString( "F3" );
 			string szZ = postPoint.Z.ToString( "F3" );
 			string szRotaryAxisCommand = NCWriterHelper.GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI,
 				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
+
 			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand};" );
 
+			ExtendedGCodeWriter.WriteContent( m_StreamWriter, szExtendedGCode );
+
+			// R corner end is written after moving to the point
+			if( isRCornerEnd ) {
+				m_StreamWriter.WriteLine( $"G65 P\"CornerEnd\";" );
+			}
+
+			// R corner start is written after moving to the point
+			if( isRCornerStart ) {
+				m_StreamWriter.WriteLine( $"G65 P\"CornerStart\";" );
+			}
 			if( postPoint.IsMicroJointEnd ) {
 				m_StreamWriter.WriteLine( $"G65 P\"FlyCut\" X{szX} Y{szY} Z{szZ} S1;" );
 			}
@@ -323,16 +339,43 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteOneProcessPath( List<PostPoint> postPointList, Dictionary<int, string> controlPointGCodeMap = null )
+		void WriteOneProcessPath( List<PostPoint> postPointList, Dictionary<int, string> controlPointGCodeMap = null, Dictionary<int, RCornerData> rCornerMap = null )
 		{
 			if( postPointList == null || postPointList.Count == 0 ) {
 				return;
 			}
+
+			// sort ranges by start index for sequential access
+			List<RCornerData> sortedRanges = new List<RCornerData>();
+			if( rCornerMap != null ) {
+				foreach( RCornerData range in rCornerMap.Values ) {
+					sortedRanges.Add( range );
+				}
+				sortedRanges.Sort( CompareRCornerByStartIndex );
+			}
+			int rangeIndex = 0;
+			RCornerData currentRange = null;
+
 			for( int i = 0; i < postPointList.Count; i++ ) {
 				var onePostPoint = postPointList[ i ];
+
+				// move to next range if current point is past current range
+				if( currentRange != null && i > currentRange.EndIndex ) {
+					currentRange = null;
+					rangeIndex++;
+				}
+
+				// activate next range if current point reaches its start
+				if( currentRange == null && rangeIndex < sortedRanges.Count && i == sortedRanges[ rangeIndex ].StartIndex ) {
+					currentRange = sortedRanges[ rangeIndex ];
+				}
+
+				bool isRCornerStart = currentRange != null && i == currentRange.StartIndex;
+				bool isRCornerEnd = currentRange != null && i == currentRange.EndIndex;
+
 				string szExtendedGCode = null;
 				controlPointGCodeMap?.TryGetValue( i, out szExtendedGCode );
-				WriteOnePoint( onePostPoint, szExtendedGCode );
+				WriteOnePoint( onePostPoint, szExtendedGCode, isRCornerStart, isRCornerEnd );
 			}
 		}
 
@@ -344,6 +387,11 @@ namespace MyCAM.Post
 				return true;
 			}
 			return false;
+		}
+
+		static int CompareRCornerByStartIndex( RCornerData a, RCornerData b )
+		{
+			return a.StartIndex.CompareTo( b.StartIndex );
 		}
 
 		#endregion

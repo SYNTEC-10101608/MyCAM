@@ -49,6 +49,7 @@
 			this.m_tsbSetLead = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbOverCut = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbMicroJoint = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbRCorner = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbExtendedGCode = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbToolVec = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbToolVecReverse = new System.Windows.Forms.ToolStripButton();
@@ -239,6 +240,7 @@
 			this.m_tsbSetLead,
 			this.m_tsbOverCut,
 			this.m_tsbMicroJoint,
+			this.m_tsbRCorner,
 			this.m_tsbExtendedGCode,
 			new System.Windows.Forms.ToolStripSeparator(),
 			// 5. tool vector
@@ -385,6 +387,17 @@
 			this.m_tsbMicroJoint.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbMicroJoint.ToolTipText = "設定選擇路徑的微連";
 			this.m_tsbMicroJoint.Click += new System.EventHandler( this.m_tsbMicroJoint_Click );
+			// 
+			// m_tsbRCorner
+			// 
+			this.m_tsbRCorner.Image = global::MyCAM.Properties.Resources.CAM_RCorner;
+			this.m_tsbRCorner.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbRCorner.Name = "m_tsbRCorner";
+			this.m_tsbRCorner.Size = new System.Drawing.Size( 44, 47 );
+			this.m_tsbRCorner.Text = "R角";
+			this.m_tsbRCorner.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbRCorner.ToolTipText = "設定選擇路徑的R角工藝";
+			this.m_tsbRCorner.Click += new System.EventHandler( this.m_tsbRCorner_Click );
 			// 
 			// m_tsbExtendedGCode
 			// 
@@ -1472,6 +1485,7 @@
 		private System.Windows.Forms.ToolStripButton m_btnContourEdit;
 		private System.Windows.Forms.ToolStripButton m_tsbOptimizeIK;
 		private System.Windows.Forms.ToolStripButton m_tsbMicroJoint;
+		private System.Windows.Forms.ToolStripButton m_tsbRCorner;
 		private System.Windows.Forms.ToolStripButton m_tsbExtendedGCode;
 		private System.Windows.Forms.ToolStripButton m_tsbManualOrder;
 		private System.Windows.Forms.ToolStripButton m_tsbAddTube;

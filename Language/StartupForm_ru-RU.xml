@@ -69,6 +69,8 @@
 	<Message ID="m_tsbMicroJoint_ToolTip" Content="Микросвязь" />
 	<Message ID="m_tsbExtendedGCode" Content="Расширенный G-код" />
 	<Message ID="m_tsbExtendedGCode_ToolTip" Content="Вставить расширенный G-код в указанное место выбранного пути" />
+	<Message ID="m_tsbRCorner" Content="R-угол" />
+	<Message ID="m_tsbRCorner_ToolTip" Content="Настроить обработку R-угла для выбранного контура" />
 	<Message ID="m_tsbToolVecReverse" Content="Разворот позы" />
 	<Message ID="m_tsbToolVecReverse_ToolTip" Content="Разворот позы" />
 	<Message ID="m_tsbToolVec" Content="Регулировка позы" />
