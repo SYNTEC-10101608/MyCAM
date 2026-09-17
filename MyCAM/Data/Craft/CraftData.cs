@@ -507,7 +507,8 @@ namespace MyCAM.Data
 			}
 			if( specialToolVecData.Type == m_SpecialToolVecData.Type &&
 				 specialToolVecData.MasterAngle_deg == m_SpecialToolVecData.MasterAngle_deg &&
-				 specialToolVecData.SlaveAngle_deg == m_SpecialToolVecData.SlaveAngle_deg ) {
+				 specialToolVecData.SlaveAngle_deg == m_SpecialToolVecData.SlaveAngle_deg &&
+				 specialToolVecData.MachiningDir == m_SpecialToolVecData.MachiningDir ) {
 				return;
 			}
 			m_SpecialToolVecData = specialToolVecData;

@@ -1419,6 +1419,13 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		// stored as int so an unknown value from a newer file can be degraded safely
+		public int? MachiningDir
+		{
+			get;
+			set;
+		}
+
 		internal SpecialToolVecDataDTO()
 		{
 		}
@@ -1431,12 +1438,14 @@ namespace MyCAM.FileManager
 			Type = data.Type;
 			MasterAngle_deg = data.MasterAngle_deg;
 			SlaveAngle_deg = data.SlaveAngle_deg;
+			MachiningDir = (int)data.MachiningDir;
 		}
 
 		internal SpecialToolVecData ToSpecialToolVecData()
 		{
 			bool isHasAnyValue = Type.HasValue || IsAxisOptimized.HasValue ||
-						  MasterAngle_deg.HasValue || SlaveAngle_deg.HasValue;
+						  MasterAngle_deg.HasValue || SlaveAngle_deg.HasValue ||
+						  MachiningDir.HasValue;
 
 			// no node in XML (old file without SpecialToolVecData), return default
 			if( !isHasAnyValue ) {
@@ -1447,11 +1456,22 @@ namespace MyCAM.FileManager
 				!MasterAngle_deg.HasValue || !SlaveAngle_deg.HasValue ) {
 				throw new ArgumentException( "TraverseData deserialization failed." );
 			}
+
 			return new SpecialToolVecData(
 				Type.Value,
 				MasterAngle_deg.Value,
-				SlaveAngle_deg.Value
+				SlaveAngle_deg.Value,
+				ToMachiningDir( MachiningDir )
 			);
+		}
+
+		// an old file has no such node and an unknown value is degraded to None
+		static EMachiningDir ToMachiningDir( int? nValue )
+		{
+			if( !nValue.HasValue || !Enum.IsDefined( typeof( EMachiningDir ), nValue.Value ) ) {
+				return EMachiningDir.None;
+			}
+			return (EMachiningDir)nValue.Value;
 		}
 	}
 

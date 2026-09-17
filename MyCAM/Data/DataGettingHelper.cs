@@ -39,6 +39,17 @@ namespace MyCAM.Data
 			return pathObject != null;
 		}
 
+		// the machining order of the path, this is tree view node number shows ( 0 based )
+		public static bool GetPathOrderIndex( string szPathID, out int nOrderIndex )
+		{
+			nOrderIndex = -1;
+			if( string.IsNullOrEmpty( szPathID ) || m_DataManager?.PathIDList == null ) {
+				return false;
+			}
+			nOrderIndex = m_DataManager.PathIDList.IndexOf( szPathID );
+			return nOrderIndex != -1;
+		}
+
 		public static bool GetPathType( string szPathID, out PathType pathType )
 		{
 			pathType = PathType.Contour;

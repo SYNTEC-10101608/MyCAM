@@ -4,14 +4,20 @@
 	<Message ID="m_gbxType" Content="孔姿態類型" />
 	<Message ID="m_rbtNormal" Content="默認" />
 	<Message ID="m_rbtnFixDir" Content="垂直曲面切割" />
-	<Message ID="m_rbtnZ" Content="朝Z" />
+	<Message ID="m_rbtnZ" Content="朝{0}" />
 	<Message ID="m_rbtnAssignMS" Content="鎖軸切割" />
+	<Message ID="m_rbtnLockMaster" Content="{0}軸鎖定" />
+	<Message ID="m_rbtnLockSlave" Content="{0}軸鎖定" />
 	<Message ID="m_gbxMSDeg" Content="起點旋轉軸角度" />
 	<Message ID="m_gbxCRotate" Content="主軸方向調整" />
 	<Message ID="m_gbxSwitchDir" Content="轉至默認角度" />
-	<Message ID="m_btnZ" Content="轉至朝Z" />
+	<Message ID="m_btnZ" Content="轉至朝{0}" />
 	<Message ID="m_btnFixDir" Content="轉至垂直曲面" />
 	<Message ID="m_lblMDeg_Format" Content="{0}軸旋轉角度" />
 	<Message ID="m_lblSDeg_Format" Content="{0}軸旋轉角度" />
 	<Message ID="m_btnConfirm" Content="完成" />
+	<Message ID="m_gbxMachiningDir" Content="指定加工方位" />
+	<Message ID="m_lblMachiningDir" Content="方向" />
+	<Message ID="MachiningDir_None" Content="無" />
+	<Message ID="m_lblMachiningDirHint" Content="Spindle Type 不支援此功能" />
 </ResMap>

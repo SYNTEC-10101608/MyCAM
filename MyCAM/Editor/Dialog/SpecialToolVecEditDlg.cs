@@ -1,5 +1,7 @@
 using MyCAM.Data;
+using MyCAM.Helper;
 using System;
+using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {
@@ -10,12 +12,14 @@ namespace MyCAM.Editor
 		public Action<bool> FlipRotaryAxis;
 		public Action RotateToFixDir;
 		public Action RotateToZDir;
+		public Action<EMachiningDir> MachiningDirChanged;
 
 		public SpecialToolVecEditDlg( RotaryAxisConfig config )
 		{
 			InitializeComponent();
 			m_RotaryAxisConfig = config;
 			ApplyResourcesToUI();
+			BuildMachiningDirItems();
 		}
 
 		public void SwitchType( ESpecialToolVecType type )
@@ -31,6 +35,12 @@ namespace MyCAM.Editor
 				case ESpecialToolVecType.ZDir:
 					m_rbtnZ.Checked = true;
 					break;
+				case ESpecialToolVecType.LockMaster:
+					m_rbtnLockMaster.Checked = true;
+					break;
+				case ESpecialToolVecType.LockSlave:
+					m_rbtnLockSlave.Checked = true;
+					break;
 				case ESpecialToolVecType.Normal:
 				default:
 					m_rbtNormal.Checked = true;
@@ -39,10 +49,33 @@ namespace MyCAM.Editor
 			m_IsUpdatingTypeUI = false;
 		}
 
-		public void SetUIPermissions( bool enableMSDeg, bool enableSwitchDir )
+		// the assigned machining direction is only meaningful for the ZDir type
+		public void ResetMachiningDir( EMachiningDir dir )
+		{
+			if( m_cbxMachiningDir.Items.Count == 0 ) {
+				return;
+			}
+			int nIndex = m_MachiningDirList.IndexOf( dir );
+			if( nIndex < 0 || nIndex >= m_cbxMachiningDir.Items.Count ) {
+				return;
+			}
+			m_IsUpdatingMachiningDirUI = true;
+			m_cbxMachiningDir.SelectedIndex = nIndex;
+			m_IsUpdatingMachiningDirUI = false;
+		}
+
+		public void SetUIPermissions( bool enableMSDeg, bool enableSwitchDir, bool enableMachiningDir )
 		{
 			m_gbxMSDeg.Enabled = enableMSDeg;
 			m_gbxSwitchDir.Enabled = enableSwitchDir;
+			m_lblMachiningDir.Enabled = enableMachiningDir;
+			m_cbxMachiningDir.Enabled = enableMachiningDir;
+		}
+
+		// show the hint under the combobox when the machining direction is not supported by the spindle type machine
+		public void SetMachiningDirHintVisible( bool isVisible )
+		{
+			m_lblMachiningDirHint.Visible = isVisible;
 		}
 
 		public bool GetMSAngleFromDialog( out double master_deg, out double slave_deg )
@@ -70,31 +103,80 @@ namespace MyCAM.Editor
 			m_gbxType.Text = m_LanguageManager.TryGetString( "m_gbxType", m_gbxType.Text );
 			m_rbtNormal.Text = m_LanguageManager.TryGetString( "m_rbtNormal", m_rbtNormal.Text );
 			m_rbtnFixDir.Text = m_LanguageManager.TryGetString( "m_rbtnFixDir", m_rbtnFixDir.Text );
-			m_rbtnZ.Text = m_LanguageManager.TryGetString( "m_rbtnZ", m_rbtnZ.Text );
 			m_rbtnAssignMS.Text = m_LanguageManager.TryGetString( "m_rbtnAssignMS", m_rbtnAssignMS.Text );
 			m_gbxMSDeg.Text = m_LanguageManager.TryGetString( "m_gbxMSDeg", m_gbxMSDeg.Text );
 			m_gbxCRotate.Text = m_LanguageManager.TryGetString( "m_gbxCRotate", m_gbxCRotate.Text );
 			m_gbxSwitchDir.Text = m_LanguageManager.TryGetString( "m_gbxSwitchDir", m_gbxSwitchDir.Text );
-			m_btnZ.Text = m_LanguageManager.TryGetString( "m_btnZ", m_btnZ.Text );
 			m_btnFixDir.Text = m_LanguageManager.TryGetString( "m_btnFixDir", m_btnFixDir.Text );
 			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
+			m_gbxMachiningDir.Text = m_LanguageManager.TryGetString( "m_gbxMachiningDir", m_gbxMachiningDir.Text );
+			m_lblMachiningDir.Text = m_LanguageManager.TryGetString( "m_lblMachiningDir", m_lblMachiningDir.Text );
+			m_lblMachiningDirHint.Text = m_LanguageManager.TryGetString( "m_lblMachiningDirHint", m_lblMachiningDirHint.Text );
 
 			// dynamic labels depend on RotaryAxisConfig
 			string szMDegFormat = m_LanguageManager.TryGetString( "m_lblMDeg_Format", "{0}軸旋轉角度" );
 			string szSDegFormat = m_LanguageManager.TryGetString( "m_lblSDeg_Format", "{0}軸旋轉角度" );
 			m_lblMDeg.Text = string.Format( szMDegFormat, m_RotaryAxisConfig.MasterName );
 			m_lblSDeg.Text = string.Format( szSDegFormat, m_RotaryAxisConfig.SlaveName );
+			string szLockMasterFormat = m_LanguageManager.TryGetString( "m_rbtnLockMaster", m_rbtnLockMaster.Text );
+			string szLockSlaveFormat = m_LanguageManager.TryGetString( "m_rbtnLockSlave", m_rbtnLockSlave.Text );
+			m_rbtnLockMaster.Text = string.Format( szLockMasterFormat, m_RotaryAxisConfig.MasterName );
+			m_rbtnLockSlave.Text = string.Format( szLockSlaveFormat, m_RotaryAxisConfig.SlaveName );
 			m_btnRotaryPos.Text = m_RotaryAxisConfig.RotaryAxisName + " +";
 			m_btnRotaryNeg.Text = m_RotaryAxisConfig.RotaryAxisName + " -";
+
+			// set rotary axis name
+			string szRotaryDirName = RotaryAxisHelper.ConvertRotaryAxisDirName( m_RotaryAxisConfig.RotaryAxisType );
+			string szrbtZFormat = m_LanguageManager.TryGetString( "m_rbtnZ", m_rbtnZ.Text );
+			string szBtnZFormat = m_LanguageManager.TryGetString( "m_btnZ", m_btnZ.Text );
+			m_rbtnZ.Text = string.Format( szrbtZFormat, szRotaryDirName );
+			m_btnZ.Text = string.Format( szBtnZFormat, szRotaryDirName );
+		}
+
+		// the RefAxis and CrossAxis name depend on the rotary axis, so build the items after the config is ready
+		void BuildMachiningDirItems()
+		{
+			m_IsUpdatingMachiningDirUI = true;
+			m_cbxMachiningDir.Items.Clear();
+			foreach( EMachiningDir dir in m_MachiningDirList ) {
+				string szName = ( dir == EMachiningDir.None )
+					? m_LanguageManager.TryGetString( "MachiningDir_None", "無" )
+					: RotaryAxisHelper.ConvertMachiningDirName( dir, m_RotaryAxisConfig.RotaryAxisType );
+				m_cbxMachiningDir.Items.Add( szName );
+			}
+			m_cbxMachiningDir.SelectedIndex = 0;
+			m_IsUpdatingMachiningDirUI = false;
+		}
+
+		void m_cbxMachiningDir_SelectedIndexChanged( object sender, EventArgs e )
+		{
+			if( m_IsUpdatingMachiningDirUI ) {
+				return;
+			}
+			int nIndex = m_cbxMachiningDir.SelectedIndex;
+			if( nIndex < 0 || nIndex >= m_MachiningDirList.Count ) {
+				return;
+			}
+			MachiningDirChanged?.Invoke( m_MachiningDirList[ nIndex ] );
 		}
 
 		#endregion
 
-		const double DOUBLE_COMPARISON_EPSILON = 1e-6;
+		const double DOUBLE_COMPARISON_EPSILON = 1e-3;
 		SpecialToolVecData m_ToolVecData;
 		RotaryAxisConfig m_RotaryAxisConfig;
-		const double DEFAULT_Angle_Deg = 0;
 		bool m_IsUpdatingTypeUI = false;
+		bool m_IsUpdatingMachiningDirUI = false;
+
+		// defines the combo box order
+		readonly List<EMachiningDir> m_MachiningDirList = new List<EMachiningDir>
+		{
+			EMachiningDir.None,
+			EMachiningDir.RefAxisPositive,
+			EMachiningDir.CrossAxisPositive,
+			EMachiningDir.RefAxisNegative,
+			EMachiningDir.CrossAxisNegative
+		};
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SpecialToolVecEditDlg" );
 
 		void m_btnCancel_Click( object sender, EventArgs e )
@@ -150,6 +232,30 @@ namespace MyCAM.Editor
 			m_IsUpdatingTypeUI = false;
 		}
 
+		void m_rbtnLockMaster_CheckedChanged( object sender, EventArgs e )
+		{
+			// only process when this radio button is checked (not unchecked)
+			if( !m_rbtnLockMaster.Checked || m_IsUpdatingTypeUI ) {
+				return;
+			}
+			m_IsUpdatingTypeUI = true;
+			SetAsLockMasterMode();
+			TypeChange();
+			m_IsUpdatingTypeUI = false;
+		}
+
+		void m_rbtnLockSlave_CheckedChanged( object sender, EventArgs e )
+		{
+			// only process when this radio button is checked (not unchecked)
+			if( !m_rbtnLockSlave.Checked || m_IsUpdatingTypeUI ) {
+				return;
+			}
+			m_IsUpdatingTypeUI = true;
+			SetAsLockSlaveMode();
+			TypeChange();
+			m_IsUpdatingTypeUI = false;
+		}
+
 		#region UI protection m_btnSet_Click
 
 		void CheckRadioButton( ESpecialToolVecType type )
@@ -163,6 +269,12 @@ namespace MyCAM.Editor
 					break;
 				case ESpecialToolVecType.AssignMS:
 					m_rbtnAssignMS.Checked = true;
+					break;
+				case ESpecialToolVecType.LockMaster:
+					m_rbtnLockMaster.Checked = true;
+					break;
+				case ESpecialToolVecType.LockSlave:
+					m_rbtnLockSlave.Checked = true;
 					break;
 			}
 		}
@@ -187,6 +299,16 @@ namespace MyCAM.Editor
 			CheckRadioButton( ESpecialToolVecType.ZDir );
 		}
 
+		void SetAsLockMasterMode()
+		{
+			CheckRadioButton( ESpecialToolVecType.LockMaster );
+		}
+
+		void SetAsLockSlaveMode()
+		{
+			CheckRadioButton( ESpecialToolVecType.LockSlave );
+		}
+
 		void TypeChange()
 		{
 			if( m_rbtnFixDir.Checked ) {
@@ -197,6 +319,12 @@ namespace MyCAM.Editor
 			}
 			else if( m_rbtnZ.Checked ) {
 				TypeChanged?.Invoke( ESpecialToolVecType.ZDir );
+			}
+			else if( m_rbtnLockMaster.Checked ) {
+				TypeChanged?.Invoke( ESpecialToolVecType.LockMaster );
+			}
+			else if( m_rbtnLockSlave.Checked ) {
+				TypeChanged?.Invoke( ESpecialToolVecType.LockSlave );
 			}
 			else {
 				TypeChanged?.Invoke( ESpecialToolVecType.Normal );

@@ -19,6 +19,8 @@ namespace MyCAM.Editor
 			this.m_rbtnZ = new System.Windows.Forms.RadioButton();
 			this.m_rbtnFixDir = new System.Windows.Forms.RadioButton();
 			this.m_gbxType = new System.Windows.Forms.GroupBox();
+			this.m_rbtnLockSlave = new System.Windows.Forms.RadioButton();
+			this.m_rbtnLockMaster = new System.Windows.Forms.RadioButton();
 			this.m_rbtNormal = new System.Windows.Forms.RadioButton();
 			this.m_rbtnAssignMS = new System.Windows.Forms.RadioButton();
 			this.m_gbxMSDeg = new System.Windows.Forms.GroupBox();
@@ -34,6 +36,10 @@ namespace MyCAM.Editor
 			this.m_lblSDeg = new System.Windows.Forms.Label();
 			this.m_lblMDeg = new System.Windows.Forms.Label();
 			this.m_btnConfirm = new System.Windows.Forms.Button();
+			this.m_gbxMachiningDir = new System.Windows.Forms.GroupBox();
+			this.m_cbxMachiningDir = new System.Windows.Forms.ComboBox();
+			this.m_lblMachiningDir = new System.Windows.Forms.Label();
+			this.m_lblMachiningDirHint = new System.Windows.Forms.Label();
 			this.m_gbxType.SuspendLayout();
 			this.m_gbxMSDeg.SuspendLayout();
 			this.m_gbxSwitchDir.SuspendLayout();
@@ -41,17 +47,18 @@ namespace MyCAM.Editor
 			this.tableLayoutPanel2.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.m_dbtnSlave)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_dbtnMaster)).BeginInit();
+			this.m_gbxMachiningDir.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// m_rbtnZ
 			// 
 			this.m_rbtnZ.Anchor = System.Windows.Forms.AnchorStyles.Left;
 			this.m_rbtnZ.AutoSize = true;
-			this.m_rbtnZ.Location = new System.Drawing.Point(168, 21);
+			this.m_rbtnZ.Location = new System.Drawing.Point(202, 33);
 			this.m_rbtnZ.Name = "m_rbtnZ";
-			this.m_rbtnZ.Size = new System.Drawing.Size(42, 16);
+			this.m_rbtnZ.Size = new System.Drawing.Size(51, 16);
 			this.m_rbtnZ.TabIndex = 2;
-			this.m_rbtnZ.Text = "朝Z";
+			this.m_rbtnZ.Text = "朝{0}";
 			this.m_rbtnZ.UseVisualStyleBackColor = true;
 			this.m_rbtnZ.CheckedChanged += new System.EventHandler(this.m_rbtnZ_CheckedChanged);
 			// 
@@ -59,7 +66,7 @@ namespace MyCAM.Editor
 			// 
 			this.m_rbtnFixDir.Anchor = System.Windows.Forms.AnchorStyles.Left;
 			this.m_rbtnFixDir.AutoSize = true;
-			this.m_rbtnFixDir.Location = new System.Drawing.Point(57, 21);
+			this.m_rbtnFixDir.Location = new System.Drawing.Point(91, 33);
 			this.m_rbtnFixDir.Name = "m_rbtnFixDir";
 			this.m_rbtnFixDir.Size = new System.Drawing.Size(95, 16);
 			this.m_rbtnFixDir.TabIndex = 1;
@@ -69,23 +76,49 @@ namespace MyCAM.Editor
 			// 
 			// m_gbxType
 			// 
+			this.m_gbxType.Controls.Add(this.m_rbtnLockSlave);
+			this.m_gbxType.Controls.Add(this.m_rbtnLockMaster);
 			this.m_gbxType.Controls.Add(this.m_rbtNormal);
 			this.m_gbxType.Controls.Add(this.m_rbtnAssignMS);
 			this.m_gbxType.Controls.Add(this.m_rbtnFixDir);
 			this.m_gbxType.Controls.Add(this.m_rbtnZ);
 			this.m_gbxType.Location = new System.Drawing.Point(10, 10);
 			this.m_gbxType.Name = "m_gbxType";
-			this.m_gbxType.Size = new System.Drawing.Size(307, 47);
+			this.m_gbxType.Size = new System.Drawing.Size(347, 93);
 			this.m_gbxType.TabIndex = 3;
 			this.m_gbxType.TabStop = false;
 			this.m_gbxType.Text = "孔姿態類型";
+			// 
+			// m_rbtnLockSlave
+			// 
+			this.m_rbtnLockSlave.Anchor = System.Windows.Forms.AnchorStyles.Left;
+			this.m_rbtnLockSlave.AutoSize = true;
+			this.m_rbtnLockSlave.Location = new System.Drawing.Point(91, 62);
+			this.m_rbtnLockSlave.Name = "m_rbtnLockSlave";
+			this.m_rbtnLockSlave.Size = new System.Drawing.Size(75, 16);
+			this.m_rbtnLockSlave.TabIndex = 6;
+			this.m_rbtnLockSlave.Text = "{0}軸鎖定";
+			this.m_rbtnLockSlave.UseVisualStyleBackColor = true;
+			this.m_rbtnLockSlave.CheckedChanged += new System.EventHandler(this.m_rbtnLockSlave_CheckedChanged);
+			// 
+			// m_rbtnLockMaster
+			// 
+			this.m_rbtnLockMaster.Anchor = System.Windows.Forms.AnchorStyles.Left;
+			this.m_rbtnLockMaster.AutoSize = true;
+			this.m_rbtnLockMaster.Location = new System.Drawing.Point(6, 62);
+			this.m_rbtnLockMaster.Name = "m_rbtnLockMaster";
+			this.m_rbtnLockMaster.Size = new System.Drawing.Size(75, 16);
+			this.m_rbtnLockMaster.TabIndex = 5;
+			this.m_rbtnLockMaster.Text = "{0}軸鎖定";
+			this.m_rbtnLockMaster.UseVisualStyleBackColor = true;
+			this.m_rbtnLockMaster.CheckedChanged += new System.EventHandler(this.m_rbtnLockMaster_CheckedChanged);
 			// 
 			// m_rbtNormal
 			// 
 			this.m_rbtNormal.Anchor = System.Windows.Forms.AnchorStyles.Left;
 			this.m_rbtNormal.AutoSize = true;
 			this.m_rbtNormal.Checked = true;
-			this.m_rbtNormal.Location = new System.Drawing.Point(6, 21);
+			this.m_rbtNormal.Location = new System.Drawing.Point(6, 33);
 			this.m_rbtNormal.Name = "m_rbtNormal";
 			this.m_rbtNormal.Size = new System.Drawing.Size(47, 16);
 			this.m_rbtNormal.TabIndex = 4;
@@ -98,7 +131,7 @@ namespace MyCAM.Editor
 			// 
 			this.m_rbtnAssignMS.Anchor = System.Windows.Forms.AnchorStyles.Left;
 			this.m_rbtnAssignMS.AutoSize = true;
-			this.m_rbtnAssignMS.Location = new System.Drawing.Point(226, 21);
+			this.m_rbtnAssignMS.Location = new System.Drawing.Point(270, 33);
 			this.m_rbtnAssignMS.Name = "m_rbtnAssignMS";
 			this.m_rbtnAssignMS.Size = new System.Drawing.Size(71, 16);
 			this.m_rbtnAssignMS.TabIndex = 3;
@@ -111,9 +144,9 @@ namespace MyCAM.Editor
 			this.m_gbxMSDeg.Controls.Add(this.m_gbxSwitchDir);
 			this.m_gbxMSDeg.Controls.Add(this.m_gbxCRotate);
 			this.m_gbxMSDeg.Controls.Add(this.tableLayoutPanel2);
-			this.m_gbxMSDeg.Location = new System.Drawing.Point(10, 63);
+			this.m_gbxMSDeg.Location = new System.Drawing.Point(10, 109);
 			this.m_gbxMSDeg.Name = "m_gbxMSDeg";
-			this.m_gbxMSDeg.Size = new System.Drawing.Size(216, 196);
+			this.m_gbxMSDeg.Size = new System.Drawing.Size(225, 196);
 			this.m_gbxMSDeg.TabIndex = 5;
 			this.m_gbxMSDeg.TabStop = false;
 			this.m_gbxMSDeg.Text = "起點旋轉軸角度";
@@ -133,15 +166,15 @@ namespace MyCAM.Editor
 			// 
 			this.m_btnZ.Location = new System.Drawing.Point(7, 16);
 			this.m_btnZ.Name = "m_btnZ";
-			this.m_btnZ.Size = new System.Drawing.Size(63, 26);
+			this.m_btnZ.Size = new System.Drawing.Size(75, 26);
 			this.m_btnZ.TabIndex = 8;
-			this.m_btnZ.Text = "轉至朝Z";
+			this.m_btnZ.Text = "轉至朝{0}";
 			this.m_btnZ.UseVisualStyleBackColor = true;
 			this.m_btnZ.Click += new System.EventHandler(this.m_btnZ_Click);
 			// 
 			// m_btnFixDir
 			// 
-			this.m_btnFixDir.Location = new System.Drawing.Point(76, 16);
+			this.m_btnFixDir.Location = new System.Drawing.Point(88, 16);
 			this.m_btnFixDir.Name = "m_btnFixDir";
 			this.m_btnFixDir.Size = new System.Drawing.Size(93, 26);
 			this.m_btnFixDir.TabIndex = 9;
@@ -263,7 +296,7 @@ namespace MyCAM.Editor
 			// 
 			// m_btnConfirm
 			// 
-			this.m_btnConfirm.Location = new System.Drawing.Point(244, 233);
+			this.m_btnConfirm.Location = new System.Drawing.Point(296, 359);
 			this.m_btnConfirm.Name = "m_btnConfirm";
 			this.m_btnConfirm.Size = new System.Drawing.Size(63, 26);
 			this.m_btnConfirm.TabIndex = 7;
@@ -271,11 +304,54 @@ namespace MyCAM.Editor
 			this.m_btnConfirm.UseVisualStyleBackColor = true;
 			this.m_btnConfirm.Click += new System.EventHandler(this.m_btnConfirm_Click);
 			// 
+			// m_gbxMachiningDir
+			// 
+			this.m_gbxMachiningDir.Controls.Add(this.m_cbxMachiningDir);
+			this.m_gbxMachiningDir.Controls.Add(this.m_lblMachiningDir);
+			this.m_gbxMachiningDir.Controls.Add(this.m_lblMachiningDirHint);
+			this.m_gbxMachiningDir.Location = new System.Drawing.Point(10, 311);
+			this.m_gbxMachiningDir.Name = "m_gbxMachiningDir";
+			this.m_gbxMachiningDir.Size = new System.Drawing.Size(225, 74);
+			this.m_gbxMachiningDir.TabIndex = 8;
+			this.m_gbxMachiningDir.TabStop = false;
+			this.m_gbxMachiningDir.Text = "指定加工方位";
+			// 
+			// m_cbxMachiningDir
+			// 
+			this.m_cbxMachiningDir.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.m_cbxMachiningDir.FormattingEnabled = true;
+			this.m_cbxMachiningDir.Location = new System.Drawing.Point(50, 21);
+			this.m_cbxMachiningDir.Name = "m_cbxMachiningDir";
+			this.m_cbxMachiningDir.Size = new System.Drawing.Size(74, 20);
+			this.m_cbxMachiningDir.TabIndex = 1;
+			this.m_cbxMachiningDir.SelectedIndexChanged += new System.EventHandler(this.m_cbxMachiningDir_SelectedIndexChanged);
+			// 
+			// m_lblMachiningDir
+			// 
+			this.m_lblMachiningDir.AutoSize = true;
+			this.m_lblMachiningDir.Location = new System.Drawing.Point(15, 26);
+			this.m_lblMachiningDir.Name = "m_lblMachiningDir";
+			this.m_lblMachiningDir.Size = new System.Drawing.Size(29, 12);
+			this.m_lblMachiningDir.TabIndex = 0;
+			this.m_lblMachiningDir.Text = "方向";
+			// 
+			// m_lblMachiningDirHint
+			// 
+			this.m_lblMachiningDirHint.AutoSize = true;
+			this.m_lblMachiningDirHint.ForeColor = System.Drawing.Color.Red;
+			this.m_lblMachiningDirHint.Location = new System.Drawing.Point(15, 50);
+			this.m_lblMachiningDirHint.Name = "m_lblMachiningDirHint";
+			this.m_lblMachiningDirHint.Size = new System.Drawing.Size(142, 12);
+			this.m_lblMachiningDirHint.TabIndex = 2;
+			this.m_lblMachiningDirHint.Text = "Spindle Type 不支援此功能";
+			this.m_lblMachiningDirHint.Visible = false;
+			// 
 			// SpecialToolVecEditDlg
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(323, 267);
+			this.ClientSize = new System.Drawing.Size(369, 393);
+			this.Controls.Add(this.m_gbxMachiningDir);
 			this.Controls.Add(this.m_btnConfirm);
 			this.Controls.Add(this.m_gbxMSDeg);
 			this.Controls.Add(this.m_gbxType);
@@ -292,6 +368,8 @@ namespace MyCAM.Editor
 			this.tableLayoutPanel2.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.m_dbtnSlave)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_dbtnMaster)).EndInit();
+			this.m_gbxMachiningDir.ResumeLayout(false);
+			this.m_gbxMachiningDir.PerformLayout();
 			this.ResumeLayout(false);
 
         }
@@ -315,5 +393,11 @@ namespace MyCAM.Editor
 		private System.Windows.Forms.Button m_btnZ;
 		private System.Windows.Forms.GroupBox m_gbxSwitchDir;
 		private System.Windows.Forms.GroupBox m_gbxCRotate;
+		private System.Windows.Forms.GroupBox m_gbxMachiningDir;
+		private System.Windows.Forms.Label m_lblMachiningDirHint;
+		private System.Windows.Forms.ComboBox m_cbxMachiningDir;
+		private System.Windows.Forms.Label m_lblMachiningDir;
+		private System.Windows.Forms.RadioButton m_rbtnLockSlave;
+		private System.Windows.Forms.RadioButton m_rbtnLockMaster;
 	}
 }

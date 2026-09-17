@@ -169,6 +169,37 @@ namespace MyCAM.Helper
 			}
 		}
 
+		// keep the solved IK result of every point and lock one rotary axis to the value of the first point
+		public static void SetToolVecByLockedAxis( ref List<ISetToolVecPoint> toolVecPointList, bool isLockMaster )
+		{
+			if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
+				return;
+			}
+
+			// get machine data
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
+				return;
+			}
+
+			// create PostSolver once and reuse it for every point
+			PostSolver postSolver = new PostSolver( machineData );
+
+			// the locked value comes from the first point of the solved IK result
+			double dLockedMaster_rad = toolVecPointList.First().ModMaster_rad;
+			double dLockedSlave_rad = toolVecPointList.First().ModSlave_rad;
+			foreach( var pnt in toolVecPointList ) {
+				if( isLockMaster ) {
+					pnt.ModMaster_rad = dLockedMaster_rad;
+				}
+				else {
+					pnt.ModSlave_rad = dLockedSlave_rad;
+				}
+
+				// the master / slave angle changed, the tool vector must be solved again
+				pnt.ToolVec = postSolver.SolveToolVec( pnt.ModMaster_rad, pnt.ModSlave_rad );
+			}
+		}
+
 		// this bevel do not joint auto optimize
 		public static void SetBevelByStartMS( ref List<ISetToolVecPoint> toolVecPointList, double dMaster_deg, double dSlave_deg )
 		{

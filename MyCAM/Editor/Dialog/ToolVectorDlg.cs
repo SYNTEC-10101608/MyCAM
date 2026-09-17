@@ -447,5 +447,10 @@ namespace MyCAM.Editor
 		{
 			get; set;
 		}
+
+		public RotaryAxis RotaryAxisType
+		{
+			get; set;
+		}
 	}
 }

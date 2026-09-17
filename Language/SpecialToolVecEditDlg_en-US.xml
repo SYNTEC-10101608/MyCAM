@@ -4,14 +4,20 @@
 	<Message ID="m_gbxType" Content="Special Tool Orientation Type" />
 	<Message ID="m_rbtNormal" Content="Default" />
 	<Message ID="m_rbtnFixDir" Content="Surface-Normal Cutting" />
-	<Message ID="m_rbtnZ" Content="Z-Axis Facing" />
+	<Message ID="m_rbtnZ" Content="{0}-Axis Facing" />
 	<Message ID="m_rbtnAssignMS" Content="Locked-Axis Cutting" />
+	<Message ID="m_rbtnLockMaster" Content="Lock {0}-Axis" />
+	<Message ID="m_rbtnLockSlave" Content="Lock {0}-Axis" />
 	<Message ID="m_gbxMSDeg" Content="Start-Point Rotary Axis Angle" />
 	<Message ID="m_gbxCRotate" Content="Spindle Direction Adjustment" />
 	<Message ID="m_gbxSwitchDir" Content="Switch to Default Angle" />
-	<Message ID="m_btnZ" Content="Switch to Z-Axis Facing" />
+	<Message ID="m_btnZ" Content="Switch to {0}-Axis Facing" />
 	<Message ID="m_btnFixDir" Content="Switch to Surface Normal" />
 	<Message ID="m_lblMDeg_Format" Content="{0}-Axis Rotation Angle" />
 	<Message ID="m_lblSDeg_Format" Content="{0}-Axis Rotation Angle" />
 	<Message ID="m_btnConfirm" Content="Done" />
+	<Message ID="m_gbxMachiningDir" Content="Assigned Machining Direction" />
+	<Message ID="m_lblMachiningDir" Content="Direction" />
+	<Message ID="MachiningDir_None" Content="None" />
+	<Message ID="m_lblMachiningDirHint" Content="Spindle type does not support this function" />
 </ResMap>
