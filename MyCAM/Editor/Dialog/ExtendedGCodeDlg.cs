@@ -25,7 +25,7 @@ namespace MyCAM.Editor
 			m_rbtnControlPoint.Tag = ExtendedGCodeType.ControlPoint;
 		}
 
-		public void ApplyResourcesToUI()
+		void ApplyResourcesToUI()
 		{
 			this.Text = m_LanguageManager.TryGetString( "ExtendedGCodeDlg", this.Text );
 
@@ -55,31 +55,44 @@ namespace MyCAM.Editor
 
 			m_bContentDirty = false;
 
-			// should not happen, but just in case
+			// non selected
 			if( m_Param == null ) {
+				m_flpnlRadioButton.Enabled = false;
+				foreach( RadioButton rbtn in m_flpnlRadioButton.Controls.OfType<RadioButton>() ) {
+					rbtn.Checked = false;
+				}
+
+				m_lblIsStartOrEnd.Text = string.Empty;
+				m_flpnlToStartOrEnd.Enabled = false;
+
+				m_lblIsMixData.Text = string.Empty;
 				m_txtGCode.Text = string.Empty;
-				SetInputEnabled( false );
+				m_txtGCode.Enabled = false;
+
+				m_btnAdd.Enabled = false;
+				m_btnDelete.Enabled = false;
+
 				m_bSuppressValueChanged = false;
 				return;
 			}
 
 			SetInputEnabled( m_Param.IsModified );
 
-			bool isControlPoint = ( m_Param.GCodeType == ExtendedGCodeType.ControlPoint );
-
-			m_rbtnControlPoint.Enabled = isControlPoint;
+			m_flpnlRadioButton.Enabled = true;
+			m_rbtnControlPoint.Enabled = m_Param.IsSingleSelectMode;
 			foreach( RadioButton rbtn in m_flpnlRadioButton.Controls.OfType<RadioButton>() ) {
 				rbtn.Checked = rbtn.Tag is ExtendedGCodeType gCodeType && gCodeType == m_Param.GCodeType;
 			}
 
+			m_flpnlToStartOrEnd.Enabled = true;
 			m_btnToStartOrEnd.Enabled = ( m_Param.IsPathStartPoint != null );
-
-			m_lblIsStartOrEnd.Text = ( !isControlPoint || m_Param.IsPathStartPoint == null ) ?
+			m_lblIsStartOrEnd.Text = ( m_Param.GCodeType != ExtendedGCodeType.ControlPoint || m_Param.IsPathStartPoint == null ) ?
 				string.Empty
 				: ( m_Param.IsPathStartPoint == true ?
 				m_LanguageManager.TryGetString( "IsStartPOINT", IS_START_POINT )
 				: m_LanguageManager.TryGetString( "IsEndPOINT", IS_END_POINT ) );
 
+			m_lblIsMixData.Text = m_Param.IsMixData ? m_LanguageManager.TryGetString( "IsMixData", IS_MIX_DATA ) : string.Empty;
 			m_txtGCode.Text = m_Param.Content;
 
 			m_bSuppressValueChanged = false;
@@ -97,12 +110,12 @@ namespace MyCAM.Editor
 
 		#region UI events
 
-		private void ExtendedGCodeDlg_Deactivate( object sender, EventArgs e )
+		void ExtendedGCodeDlg_Deactivate( object sender, EventArgs e )
 		{
 			FlushContent();
 		}
 
-		private void RadioButtonCheckedhanged( object sender, EventArgs e )
+		void RadioButtonCheckedhanged( object sender, EventArgs e )
 		{
 			if( m_bSuppressValueChanged || m_Param == null ) {
 				return;
@@ -114,13 +127,13 @@ namespace MyCAM.Editor
 			}
 		}
 
-		private void m_btnAdd_Click( object sender, EventArgs e )
+		void m_btnAdd_Click( object sender, EventArgs e )
 		{
 			AddRequest?.Invoke();
 			SetInputEnabled( true );
 		}
 
-		private void m_btnDelete_Click( object sender, EventArgs e )
+		void m_btnDelete_Click( object sender, EventArgs e )
 		{
 			m_bContentDirty = false;
 			m_txtGCode.Text = string.Empty;
@@ -129,13 +142,13 @@ namespace MyCAM.Editor
 			SetInputEnabled( false );
 		}
 
-		private void m_btnDone_Click( object sender, EventArgs e )
+		void m_btnDone_Click( object sender, EventArgs e )
 		{
 			// trigger FormClosing -> RaiseCancel
 			Close();
 		}
 
-		private void m_txtGCode_TextChanged( object sender, EventArgs e )
+		void m_txtGCode_TextChanged( object sender, EventArgs e )
 		{
 			if( m_bSuppressValueChanged || m_Param == null ) {
 				return;
@@ -143,12 +156,12 @@ namespace MyCAM.Editor
 			m_bContentDirty = m_txtGCode.Text != m_Param.Content;
 		}
 
-		private void m_txtGCode_Leave( object sender, EventArgs e )
+		void m_txtGCode_Leave( object sender, EventArgs e )
 		{
 			FlushContent();
 		}
 
-		private void m_btnToStartOrEnd_Click( object sender, EventArgs e )
+		void m_btnToStartOrEnd_Click( object sender, EventArgs e )
 		{
 			FlushContent();
 			ToStartOrEnd?.Invoke();
@@ -156,7 +169,7 @@ namespace MyCAM.Editor
 
 		#endregion
 
-		private void SetInputEnabled( bool enabled )
+		void SetInputEnabled( bool enabled )
 		{
 			m_txtGCode.Enabled = enabled;
 
@@ -170,8 +183,9 @@ namespace MyCAM.Editor
 
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ExtendedGCodeDlg" );
 
-		const string IS_START_POINT = "•ÿ´e¶Ï∏m°G∞_¬I";
-		const string IS_END_POINT = "•ÿ´e¶Ï∏m°G≤◊¬I";
+		const string IS_MIX_DATA = "ÊâÄÈÅ∏Ë∑ØÂæëÁöÑGÁ¢º‰∏ç‰∏ÄËá¥";
+		const string IS_START_POINT = "ÁõÆÂâç‰ΩçÁΩÆÔºöËµ∑Èªû";
+		const string IS_END_POINT = "ÁõÆÂâç‰ΩçÁΩÆÔºöÁµÇÈªû";
 	}
 
 	internal class ExtendedGCodeParam
@@ -185,12 +199,18 @@ namespace MyCAM.Editor
 		// true: path start point, false: path end point, null: cannot toggle
 		public bool? IsPathStartPoint { get; set; }
 
-		public ExtendedGCodeParam( bool isModified, ExtendedGCodeType gCodeType, string content, bool? isPathStartPoint )
+		public bool IsSingleSelectMode { get; set; }
+
+		public bool IsMixData { get; set; }
+
+		public ExtendedGCodeParam( bool isModified, ExtendedGCodeType gCodeType, string content, bool? isPathStartPoint, bool isSingleSelectMode, bool isMixData = false )
 		{
 			IsModified = isModified;
 			GCodeType = gCodeType;
 			Content = content;
 			IsPathStartPoint = isPathStartPoint;
+			IsSingleSelectMode = isSingleSelectMode;
+			IsMixData = isMixData;
 		}
 	}
 }

@@ -17,6 +17,7 @@
     <Message ID="IS_START_POINT" Content="目前位置：起点" />
     <Message ID="IS_END_POINT" Content="目前位置：终点" />
 
+    <Message ID="IS_MIX_DATA" Content="所选路径的G码不一致" />
     <Message ID="m_lblGCode" Content="G码" />
     
     <Message ID="m_btnDelete" Content="删除" />

@@ -788,8 +788,8 @@ namespace MyCAM.Editor
 			// build path tree and view
 			for( int i = 0; i < dataManager.PathIDList.Count; i++ ) {
 				string pathID = dataManager.PathIDList[ i ];
-				string szNodeText = PATH_NODE_PREFIX + ( i + 1 ).ToString();
-				AddPathNode( szNodeText );
+				string nodeID = dataManager.GetPathName( i );
+				AddPathNode( nodeID );
 				AddPath( pathID );
 			}
 
@@ -887,8 +887,6 @@ namespace MyCAM.Editor
 			}
 			return nColorIdx;
 		}
-
-		const string PATH_NODE_PREFIX = "Path_";
 
 		#endregion
 	}

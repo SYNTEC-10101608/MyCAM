@@ -83,7 +83,6 @@ namespace MyCAM.Editor
 			m_MarkerRenderer = new MarkerRenderer( m_Viewer, m_DataManager );
 		}
 
-		public const string PATH_NODE_PREFIX = "Path_";
 		public const int PATH_NODE_PREFIX_LENGTH = 5;
 
 		// Renderers
@@ -578,11 +577,11 @@ namespace MyCAM.Editor
 				m_CurrentAction.End();
 				return;
 			}
-			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
 			EndActionIfNotDefault();
-			ExtendedGCodeAction action = new ExtendedGCodeAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First(), m_DefaultAction as SelectPathAction );
+			ExtendedGCodeAction action = new ExtendedGCodeAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList, m_DefaultAction as SelectPathAction );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -766,12 +765,12 @@ namespace MyCAM.Editor
 				}
 
 				// add a new node to the tree view
-				int nodeIndex = m_DataManager.PathIDList.IndexOf( szID ) + 1; // 1 based index
-				if( nodeIndex == -1 ) {
+				int pathOrderIndex = m_DataManager.PathIDList.IndexOf( szID );
+				if( pathOrderIndex == -1 ) {
 					continue;
 				}
-				string szNodeID = PATH_NODE_PREFIX + nodeIndex.ToString();
-				m_ViewManager.AddPathNode( szNodeID );
+				string nodeID = m_DataManager.GetPathName( pathOrderIndex );
+				m_ViewManager.AddPathNode( nodeID );
 			}
 
 			// update tree view and viewer
@@ -794,7 +793,6 @@ namespace MyCAM.Editor
 				editableInfo.IsStartPointEditable = false;
 				editableInfo.IsToolVecEditable = false;
 				editableInfo.IsMicroJointEditable = false;
-				editableInfo.IsExtendedGCodeEditable = false;
 				editableInfo.IsRCornerEditable = false;
 				editableInfo.IsContourEditable = false;
 				editableInfo.IsAutoOrderEditable = false;

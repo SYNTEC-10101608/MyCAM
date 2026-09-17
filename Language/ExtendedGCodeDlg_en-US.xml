@@ -17,6 +17,7 @@
     <Message ID="IS_START_POINT" Content="Current Position: Start Point" />
     <Message ID="IS_END_POINT" Content="Current Position: End Point" />
 
+    <Message ID="IS_MIX_DATA" Content="G-codes of the selected paths are inconsistent" />
     <Message ID="m_lblGCode" Content="G-code" />
     
     <Message ID="m_btnDelete" Content="Delete" />
