@@ -4,14 +4,20 @@
     <Message ID="m_gbxType" Content="Тип позы отверстия" />
     <Message ID="m_rbtNormal" Content="По умолчанию" />
     <Message ID="m_rbtnFixDir" Content="Резка по средней нормали" />
-    <Message ID="m_rbtnZ" Content="К Z" />
+    <Message ID="m_rbtnZ" Content="К {0}" />
     <Message ID="m_rbtnAssignMS" Content="Резка с фиксированной осью" />
+    <Message ID="m_rbtnLockMaster" Content="Фиксация оси {0}" />
+    <Message ID="m_rbtnLockSlave" Content="Фиксация оси {0}" />
     <Message ID="m_gbxMSDeg" Content="Угол оси вращения начальной точки" />
     <Message ID="m_gbxCRotate" Content="Регулировка направления главной оси" />
     <Message ID="m_gbxSwitchDir" Content="Повернуть к углу по умолчанию" />
-    <Message ID="m_btnZ" Content="Повернуть к Z" />
+    <Message ID="m_btnZ" Content="Повернуть к {0}" />
     <Message ID="m_btnFixDir" Content="Повернуть к нормали поверхности" />
     <Message ID="m_lblMDeg_Format" Content="Угол вращения оси {0}" />
     <Message ID="m_lblSDeg_Format" Content="Угол вращения оси {0}" />
     <Message ID="m_btnConfirm" Content="Готово" />
+    <Message ID="m_gbxMachiningDir" Content="Заданное направление обработки" />
+    <Message ID="m_lblMachiningDir" Content="Направление" />
+    <Message ID="MachiningDir_None" Content="Нет" />
+    <Message ID="m_lblMachiningDirHint" Content="Тип шпинделя не поддерживает эту функцию" />
 </ResMap>

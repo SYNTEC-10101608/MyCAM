@@ -2,7 +2,6 @@
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
-using MyCAM.Helper.CAM;
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.Aspect;
@@ -31,9 +30,6 @@ namespace MyCAM.Editor
 			// for path index control
 			m_PathIndexAction = pathIndexAction;
 			m_CurrentPathID = pathID;
-
-			// for edit action
-			m_RotaryAxisConfig = RotaryAxisHelper.CreateRotaryAxisConfig();
 			m_CoordIconRenderer = new CoordIconRenderer( viewer, dataManager );
 		}
 
@@ -59,6 +55,14 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			// for edit action
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotGetMachineInfo", CANNOT_GET_MACHINE_INFO ), MyApp.NoticeType.Warning );
+				End();
+				return;
+			}
+			m_RotaryAxisConfig = RotaryAxisHelper.CreateRotaryAxisConfig( machineData );
+
 			// init dialog
 			m_ToolVecDlg = new ToolVectorDlg( m_InterpolateType, ref m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );
 			m_ToolVecDlg.SetKeep += () => OnSetKeep();
@@ -79,16 +83,8 @@ namespace MyCAM.Editor
 			m_ToolVecDlg.Cancel += End;
 			m_ToolVecDlg.Show( MyApp.MainForm );
 
-			// draw new trihedron for G54 must before change to start point
-			// because change to start point will trigger coord trasform
-			bool isGetMachineData = DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData );
-			if( isGetMachineData ) {
-				gp_Pnt position = new gp_Pnt( machineData.SimulationOffset.x, machineData.SimulationOffset.y, machineData.SimulationOffset.z );
-				m_CoordIconRenderer.Show( position );
-			}
-			else {
-				m_CoordIconRenderer.Show();
-			}
+			gp_Pnt position = new gp_Pnt( machineData.SimulationOffset.x, machineData.SimulationOffset.y, machineData.SimulationOffset.z );
+			m_CoordIconRenderer.Show( position );
 
 			// start path index action
 			m_PathIndexAction.AddLockedPaths( CreatLockList() );

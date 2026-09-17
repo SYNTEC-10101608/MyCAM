@@ -42,6 +42,8 @@ namespace MyCAM.Editor
 		{
 			set
 			{
+				// the UI value is set by user, stop timer do not need to wait
+				m_DebounceTimer.Stop();
 				m_IsProgrammaticChange = true;
 				Value = value;
 				m_LastValue = value;
@@ -103,7 +105,10 @@ namespace MyCAM.Editor
 			if( RevertOnOutOfRange && !m_IsProgrammaticChange && string.IsNullOrWhiteSpace( Text ) ) {
 				RevertToLastValue( 0m, Minimum, isBelowMin: true );
 			}
+
+			// this will trigger onValueChange -> timer start
 			base.OnLostFocus( e );
+			RaiseValueChangeImmediately();
 		}
 
 		protected override void OnKeyDown( KeyEventArgs e )
@@ -136,6 +141,14 @@ namespace MyCAM.Editor
 				}
 			}
 			base.ValidateEditText();
+		}
+
+		void RaiseValueChangeImmediately()
+		{
+			if( !m_DebounceTimer.Enabled ) {
+				return;
+			}
+			OnDebounceTimerTick( this, EventArgs.Empty );
 		}
 
 		void RevertToLastValue( decimal inputValue, decimal limit, bool isBelowMin )

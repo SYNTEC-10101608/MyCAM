@@ -335,6 +335,7 @@
             0,
             -2147483648});
 			this.m_tbxSlave.Name = "m_tbxSlave";
+			this.m_tbxSlave.RestrictInvalidCharacters = false;
 			this.m_tbxSlave.Size = new System.Drawing.Size(55, 22);
 			this.m_tbxSlave.TabIndex = 14;
 			this.m_tbxSlave.DebouncedValueChanged += new System.EventHandler(this.m_tbxSlave_DebouncedValueChanged);
@@ -355,6 +356,7 @@
             0,
             -2147483648});
 			this.m_tbxAngleA.Name = "m_tbxAngleA";
+			this.m_tbxAngleA.RestrictInvalidCharacters = false;
 			this.m_tbxAngleA.Size = new System.Drawing.Size(55, 22);
 			this.m_tbxAngleA.TabIndex = 4;
 			this.m_tbxAngleA.DebouncedValueChanged += new System.EventHandler(this.m_tbxAngleA_DebouncedValueChanged);
@@ -385,6 +387,7 @@
             0,
             -2147483648});
 			this.m_tbxAngleB.Name = "m_tbxAngleB";
+			this.m_tbxAngleB.RestrictInvalidCharacters = false;
 			this.m_tbxAngleB.Size = new System.Drawing.Size(55, 22);
 			this.m_tbxAngleB.TabIndex = 4;
 			this.m_tbxAngleB.DebouncedValueChanged += new System.EventHandler(this.m_tbxAngleB_DebouncedValueChanged);
@@ -405,6 +408,7 @@
             0,
             -2147483648});
 			this.m_tbxMaster.Name = "m_tbxMaster";
+			this.m_tbxMaster.RestrictInvalidCharacters = false;
 			this.m_tbxMaster.Size = new System.Drawing.Size(55, 22);
 			this.m_tbxMaster.TabIndex = 15;
 			this.m_tbxMaster.DebouncedValueChanged += new System.EventHandler(this.m_tbxMaster_DebouncedValueChanged);

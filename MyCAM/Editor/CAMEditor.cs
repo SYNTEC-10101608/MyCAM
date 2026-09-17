@@ -408,17 +408,16 @@ namespace MyCAM.Editor
 
 		public void SetFixedToolVec()
 		{
-			// action edit, no multi edit supported
-			if( IsSameAction( EditActionType.ToolVec ) ) {
+			// action edit, multi edit supported
+			if( IsSameAction( EditActionType.SpecialToolVecEdit ) ) {
 				m_CurrentAction.End();
 				return;
 			}
 			EndActionIfNotDefault();
-			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
-				return;
-			}
+
+			// an empty selection is allowed, the action asks the user to pick a path by itself
+			List<string> szPathIDList = GetSelectedIDList();
 			SpecialToolVecEditAction action = new SpecialToolVecEditAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList, m_DefaultAction as SelectPathAction );
-			action.PropertyChanged += ShowCAMData;
 			action.RaiseTrans += SetTrans;
 			action.RaiseActionStart += ToolVecActionStartIO;
 			action.HideMachine += HideMachine;

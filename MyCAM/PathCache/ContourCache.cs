@@ -615,40 +615,32 @@ namespace MyCAM.PathCache
 
 		void CalMSForEachPoint( List<ISetToolVecPoint> toolVecPointList )
 		{
-			const double DEG_to_Rad = Math.PI / 180;
 			SolveInitIK();
+			m_interpolateTypeRegion = new List<Tuple<int, int, EToolVecInterpolateType>>();
 
-			// assign ms set ModMS directly, no need to solve IK
-			if( m_CraftData.SpecialToolVecData.Type == ESpecialToolVecType.AssignMS ) {
-				ToolVecHelper.SetToolVecByAssignedMS( ref toolVecPointList, m_CraftData.SpecialToolVecData.MasterAngle_deg, m_CraftData.SpecialToolVecData.SlaveAngle_deg );
-				m_interpolateTypeRegion = new List<Tuple<int, int, EToolVecInterpolateType>>();
-			}
-			else {
+			switch( m_CraftData.SpecialToolVecData.Type ) {
+
+				// lock one rotary axis, keep the solved IK result of the other axis
+				case ESpecialToolVecType.LockMaster:
+				case ESpecialToolVecType.LockSlave:
+					ToolVecHelper.SetToolVecByLockedAxis( ref toolVecPointList, m_CraftData.SpecialToolVecData.Type == ESpecialToolVecType.LockMaster );
+					break;
+
+				// assign ms set ModMS directly, no need to solve IK
+				case ESpecialToolVecType.AssignMS:
+					ToolVecHelper.SetToolVecByAssignedMS( ref toolVecPointList, m_CraftData.SpecialToolVecData.MasterAngle_deg, m_CraftData.SpecialToolVecData.SlaveAngle_deg );
+					break;
 
 				// FixDir and ZDir need init IK then use the solved start point to set the tool vec for all points
-				if( m_CraftData.SpecialToolVecData.Type != ESpecialToolVecType.Normal ) {
-					gp_Dir targetDir = new gp_Dir();
+				case ESpecialToolVecType.FixDir:
+					SetToolVecByAssignDir( ref toolVecPointList, m_CraftData.IsToolVecReverse ? m_ContourGeomData.RefCenterDir.Direction().Reversed() : m_ContourGeomData.RefCenterDir.Direction() );
+					break;
+				case ESpecialToolVecType.ZDir:
+					SetToolVecByAssignDir( ref toolVecPointList, RotaryAxisHelper.GetRotaryAxisDir() );
+					break;
 
-					// get init solve IK startPnt
-					CAMPoint FirstPntCAMPoint = MainPathPointList.First().Clone();
-
-					// get direction
-					switch( m_CraftData.SpecialToolVecData.Type ) {
-						case ESpecialToolVecType.FixDir:
-							targetDir = m_CraftData.IsToolVecReverse ? m_ContourGeomData.RefCenterDir.Direction().Reversed() : m_ContourGeomData.RefCenterDir.Direction();
-							break;
-						case ESpecialToolVecType.ZDir:
-						default:
-							targetDir = new gp_Dir( 0, 0, 1 );
-							break;
-					}
-
-					// get ms angle ( apply tool vec reverse then solve, unified in ToolVecHelper )
-					Tuple<double, double> avgMS_deg = ToolVecHelper.GetMSAngleFromToolVec( targetDir, FirstPntCAMPoint );
-					ToolVecHelper.SetToolVecByAssignedMS( ref toolVecPointList, avgMS_deg.Item1, avgMS_deg.Item2 );
-					m_interpolateTypeRegion = new List<Tuple<int, int, EToolVecInterpolateType>>();
-				}
-				else {
+				case ESpecialToolVecType.Normal:
+				default:
 
 					// get the info for tool vec interpolation
 					InterpolatePreprocessingResult preprocessingResult = InterpolatePreprocessing( ref toolVecPointList );
@@ -658,8 +650,71 @@ namespace MyCAM.PathCache
 
 					// for tool vec dialog select action to no current index interpolate type
 					m_interpolateTypeRegion = preprocessingResult.RegionTypeList;
-				}
+					break;
 			}
+		}
+
+		// use the init solved start point to get the ms angle of the target direction, then apply it to all points
+		void SetToolVecByAssignDir( ref List<ISetToolVecPoint> toolVecPointList, gp_Dir targetDir )
+		{
+			// get init solve IK startPnt
+			CAMPoint FirstPntCAMPoint = MainPathPointList.First().Clone();
+
+			// get ms angle ( apply tool vec reverse then solve, unified in ToolVecHelper )
+			Tuple<double, double> avgMS_deg = ToolVecHelper.GetMSAngleFromToolVec( targetDir, FirstPntCAMPoint );
+
+			// assign machining direction the rotary axis is decided by the start point phase
+			if( TryGetAssignedMachiningDirRotaryAngle_deg( out double dAlignedRotary_deg ) ) {
+				avgMS_deg = new Tuple<double, double>( avgMS_deg.Item1, dAlignedRotary_deg );
+			}
+			ToolVecHelper.SetToolVecByAssignedMS( ref toolVecPointList, avgMS_deg.Item1, avgMS_deg.Item2 );
+		}
+
+		// turns the start point of this contour onto the assigned world direction
+		bool TryGetAssignedMachiningDirRotaryAngle_deg( out double dRotaryAngle_deg )
+		{
+			dRotaryAngle_deg = 0;
+			if( m_CraftData.SpecialToolVecData.Type != ESpecialToolVecType.ZDir
+				|| m_CraftData.SpecialToolVecData.MachiningDir == EMachiningDir.None ) {
+				return false;
+			}
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
+				return false;
+			}
+
+			if( machineData.FiveAxisType != FiveAxisType.Mix && machineData.FiveAxisType != FiveAxisType.Table ) {
+				return false;
+			}
+
+			// get the start point phase in G54
+			double dStartPhase_deg = GetStartPointAngleAtRotaryCenterInG54_deg( machineData );
+
+			// world phase = start point phase + rotary angle, the target world phase is assigned by the user
+			double dTargetWorldPhase_deg = RotaryAxisHelper.GetMachiningDirPhase_deg( m_CraftData.SpecialToolVecData.MachiningDir );
+			double dTargetRotaryAngle = dTargetWorldPhase_deg - dStartPhase_deg;
+
+			// pre path end rotary deg
+			double dPrevRotaryAngle_deg = m_CraftData.InitSlave_rad * 180.0 / Math.PI;
+
+			// get the nearest angle
+			dRotaryAngle_deg = RotaryAxisHelper.GetNearestEquivalentAngle_deg( dTargetRotaryAngle, dPrevRotaryAngle_deg );
+
+			return true;
+		}
+
+		// the phase of the path start point about the G54 origin
+		double GetStartPointAngleAtRotaryCenterInG54_deg( FiveAxisMachineData machineData )
+		{
+			if( machineData == null || MainPathPointList.Count == 0 ) {
+				return 0;
+			}
+			RotaryAxis rotaryAxis = RotaryAxisHelper.GetRotaryAxis( machineData );
+
+			// the start point already carries the placement transform, otherwise it would not sit where it is machined
+			gp_Pnt startPnt = MainPathPointList.First().Point;
+
+			// get startPnt angle about the axis of rotation
+			return RotaryAxisHelper.GetPhaseAngle_deg( startPnt, null, rotaryAxis );
 		}
 
 		InterpolatePreprocessingResult InterpolatePreprocessing( ref List<ISetToolVecPoint> toolVecPointList )
