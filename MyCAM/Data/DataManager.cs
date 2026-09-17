@@ -484,6 +484,12 @@ namespace MyCAM.Data
 			}
 		}
 
+		public string GetPathName( int pathOrderIndex )
+		{
+			// 1 based index
+			return PATH_NAME_PREFIX + ( pathOrderIndex + 1 ).ToString();
+		}
+
 		int BumpShapeIDCounter( TopAbs_ShapeEnum shapeType )
 		{
 			switch( shapeType ) {
@@ -528,6 +534,8 @@ namespace MyCAM.Data
 		int m_EdgeID = 0;
 		int m_VertexID = 0;
 		int m_PathID = 0;
+
+		const string PATH_NAME_PREFIX = "Path_";
 
 		// tolerance to judge if two path edge end points are at the same position
 		const double CONNECT_TOLERANCE = 1e-3;

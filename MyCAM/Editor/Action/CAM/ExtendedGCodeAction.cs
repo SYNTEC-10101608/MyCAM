@@ -5,17 +5,14 @@ using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
 using System.Windows.Forms;
+
 namespace MyCAM.Editor
 {
 	internal class ExtendedGCodeAction : EditActionBase
 	{
-		public ExtendedGCodeAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, string pathID, SelectPathAction pathIndexAction )
+		public ExtendedGCodeAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, List<string> pathIDList, SelectPathAction pathIndexAction )
 			: base( dataManager )
 		{
 			m_Viewer = viewer;
@@ -23,7 +20,7 @@ namespace MyCAM.Editor
 			m_ViewManager = viewManager;
 
 			// for path index control
-			m_CurrentPathID = pathID;
+			m_PathIDList = pathIDList;
 			m_PathIndexAction = pathIndexAction;
 		}
 
@@ -42,7 +39,7 @@ namespace MyCAM.Editor
 			base.Start();
 
 			// setup initial path
-			if( !TryChangePath( m_CurrentPathID ) ) {
+			if( !TryChangePath( m_PathIDList ) ) {
 				End();
 				return;
 			}
@@ -58,20 +55,23 @@ namespace MyCAM.Editor
 			m_Dlg.Show( MyApp.MainForm );
 
 			// start path index action
+			m_PathIndexAction.AddLockedPaths( CreateLockList() );
 			m_PathIndexAction.Start();
 			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
 
-			// activate point selection for initial path
-			ActivatePointSelection();
-			m_PathIndexAction.EnterSingleSelectMode();
+			if( TryBuildExtendedGCodeParameter( ExtendedGCodeType.TraverseHead, null ) ) {
+				m_Dlg.ResetParam( m_Param );
+			}
 		}
 
 		public override void End()
 		{
 			m_Dlg?.FlushContent();
 
-			m_PathIndexAction.ExitSingleSelectMode();
-			DeactivatePointSelection( m_CurrentPathID );
+			if( IsPointSelectionMode ) {
+				string pointPathID = m_PathIDList.First();
+				DeactivatePointSelection( pointPathID );
+			}
 
 			// cleanup path index action
 			m_PathIndexAction.SelectionChange -= OnPathIndexChanged;
@@ -87,10 +87,32 @@ namespace MyCAM.Editor
 			base.End();
 		}
 
+		IEnumerable<string> CreateLockList()
+		{
+			List<string> lockList = new List<string>();
+			foreach( string pathID in m_DataManager.PathIDList ) {
+
+				// is std pattern path, lock it
+				if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
+					lockList.Add( pathID );
+				}
+			}
+			return lockList;
+		}
+
 		#region Path Selection
 
 		// path index control
-		string m_CurrentPathID = null;
+		bool IsNonPathSelected { get { return m_PathIDList.Count == 0; } }
+
+		bool IsSinglePathSelected { get { return m_PathIDList?.Count == 1; } }
+
+		bool m_SuppressPathSelectionChanged = false;
+
+		List<string> m_PathIDList = null;
+		List<CraftData> m_CraftDataList = null;
+		List<ContourCache> m_PathCacheList = null;
+
 		SelectPathAction m_PathIndexAction = null;
 
 		const string NOT_CONTOUR_PATH = "路徑 {0} 不是輪廓路徑，無法編輯";
@@ -99,61 +121,105 @@ namespace MyCAM.Editor
 		void OnPathIndexChanged()
 		{
 			List<string> selectedIDs = m_PathIndexAction.GetSelectedIDs();
-			if( selectedIDs.Count != 1 ) {
-				return;
-			}
-			string newPathID = selectedIDs.First();
-			if( newPathID == m_CurrentPathID ) {
-				return;
-			}
 
-			m_Dlg?.FlushContent();
-
-			string szOldPathID = m_CurrentPathID;
-			if( !TryChangePath( newPathID ) ) {
+			// construct/ destruct point selection
+			if( m_SuppressPathSelectionChanged ) {
 				return;
 			}
 
-			// cleanup old state
-			DeactivatePointSelection( szOldPathID );
+			ExtendedGCodeType gCodeType = IsNonPathSelected
+				? ExtendedGCodeType.TraverseHead
+				: IsPointSelectionMode
+					? ExtendedGCodeType.ControlPoint
+					: m_Param.GCodeType;
 
-			// activate point selection for new path
-			ActivatePointSelection();
+			if( IsPointSelectionMode ) {
+				// cannot change to non selected mode while point selection mode
+				if( selectedIDs.Count == 0 ) {
+					return;
+				}
+
+				string oldPathID = m_PathIDList.First();
+				DeactivatePointSelection( oldPathID );
+			}
+
+			if( !TryChangePath( selectedIDs ) ) {
+				m_PathIDList.Clear();
+				m_PathCacheList.Clear();
+				m_CraftDataList.Clear();
+			}
+
+			m_Dlg.FlushContent();
+
+			if( IsNonPathSelected ) {
+				m_Param = null;
+				m_Dlg.ResetParam( m_Param );
+				return;
+			}
+
+			if( gCodeType == ExtendedGCodeType.ControlPoint ) {
+				ActivatePointSelection();
+				return;
+			}
+
+			if( TryBuildExtendedGCodeParameter( gCodeType, null ) ) {
+				m_Dlg.ResetParam( m_Param );
+			}
 		}
 
-		bool TryChangePath( string pathID )
+		bool TryChangePath( List<string> pathIDList )
 		{
-			if( string.IsNullOrEmpty( pathID ) ) {
+			if( pathIDList == null ) {
 				return false;
 			}
 
-			// validate new path (contour only)
-			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
-				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NotContourPath", NOT_CONTOUR_PATH ), pathID ), MyApp.NoticeType.Warning );
-				return false;
+			List<string> newPathIDList = pathIDList;
+			List<CraftData> newCraftDataList = new List<CraftData>();
+			List<ContourCache> newPathCacheList = new List<ContourCache>();
+
+
+			foreach( string pathID in newPathIDList ) {
+
+				int pathOrderIndex = m_DataManager.PathIDList.IndexOf( pathID );
+				string pathName = m_DataManager.GetPathName( pathOrderIndex );
+
+				// validate new path (contour only)
+				if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
+					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NotContourPath", NOT_CONTOUR_PATH ), pathName ), MyApp.NoticeType.Warning );
+					return false;
+				}
+
+				// init data for current path
+				if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
+					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathName ), MyApp.NoticeType.Warning );
+					return false;
+				}
+				newCraftDataList.Add( craftData );
+
+				// init ContourCache data for current path
+				if( !DataGettingHelper.GetContourCacheByID( pathID, out ContourCache pathCache ) ) {
+					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathName ), MyApp.NoticeType.Warning );
+					return false;
+				}
+				newPathCacheList.Add( pathCache );
 			}
 
-			// init data for current path
-			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
-				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathID ), MyApp.NoticeType.Warning );
-				return false;
-			}
-			m_CraftData = craftData;
+			m_PathIDList = newPathIDList;
+			m_CraftDataList = newCraftDataList;
+			m_PathCacheList = newPathCacheList;
 
-			// init ContourCache data for current path
-			if( !DataGettingHelper.GetContourCacheByID( pathID, out ContourCache pathCache ) ) {
-				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetPathCraftInfo", CANNOT_GET_PATH_CRAFT_INFO ), pathID ), MyApp.NoticeType.Warning );
-				return false;
-			}
-			m_PathCache = pathCache;
-
-			m_CurrentPathID = pathID;
 			return true;
 		}
+
+
 
 		#endregion
 
 		#region Point Selection
+
+		bool IsPointSelectionMode { get { return m_PointIndexAction != null; } }
+
+		bool IsNonPointSelected { get { return m_nSelectCADIndex == null; } }
 
 		// point index control
 		int? m_nSelectCADIndex = null;
@@ -161,14 +227,20 @@ namespace MyCAM.Editor
 
 		void ActivatePointSelection()
 		{
-			m_PathIndexAction.ExcludeFromSelection( m_CurrentPathID );
-			CreatePointIndexAction( m_CurrentPathID );
-
-			m_nSelectCADIndex = null;
-
-			if( TryBuildExtendedGCodeParameter( ExtendedGCodeType.PathHead, null ) ) {
-				m_Dlg.ResetParam( m_Param );
+			if( IsPointSelectionMode || !IsSinglePathSelected ) {
+				return;
 			}
+
+			string pathID = m_PathIDList.First();
+
+			CreatePointIndexAction( pathID );
+
+			m_SuppressPathSelectionChanged = true;
+			m_PathIndexAction.EnterSingleSelectMode();
+			m_PathIndexAction.ExcludeFromSelection( pathID );
+			m_SuppressPathSelectionChanged = false;
+
+			OnSelectedPointIndexChanged( null );
 		}
 
 		void CreatePointIndexAction( string pathID )
@@ -180,11 +252,15 @@ namespace MyCAM.Editor
 
 		void DeactivatePointSelection( string szOldPathID )
 		{
-			m_nSelectCADIndex = null;
-			m_Param = null;
-
 			DestroyPointIndexAction();
+
+			m_SuppressPathSelectionChanged = true;
 			m_PathIndexAction.RestoreFromExclusion( szOldPathID );
+			m_PathIndexAction.SelectPathByID( szOldPathID );
+			m_PathIndexAction.ExitSingleSelectMode();
+			m_SuppressPathSelectionChanged = false;
+
+			m_nSelectCADIndex = null;
 		}
 
 		void DestroyPointIndexAction()
@@ -206,18 +282,18 @@ namespace MyCAM.Editor
 
 		void OnSelectedPointIndexChanged( int? nSelectIndex )
 		{
-			if( m_nSelectCADIndex == nSelectIndex && m_Param.GCodeType == ExtendedGCodeType.ControlPoint ) {
+			if( nSelectIndex != null && m_nSelectCADIndex == nSelectIndex && m_Param.GCodeType == ExtendedGCodeType.ControlPoint ) {
 				return;
 			}
 
-			m_Dlg?.FlushContent();
+			m_Dlg.FlushContent();
 
 			m_nSelectCADIndex = nSelectIndex;
 
 			// should not happen, but just in case
-			if( nSelectIndex == null ) {
+			if( IsNonPointSelected ) {
 				m_Param = null;
-				m_Dlg?.ResetParam( null );
+				m_Dlg.ResetParam( m_Param );
 				return;
 			}
 
@@ -254,10 +330,6 @@ namespace MyCAM.Editor
 
 		bool TryBuildExtendedGCodeParameter( ExtendedGCodeType gCodeType, int? cadIndex, bool? isPathStartPoint = null )
 		{
-			if( m_CraftData == null ) {
-				return false;
-			}
-
 			if( gCodeType != ExtendedGCodeType.ControlPoint ) {
 				m_Param = BuildExtendedGCodeParameter( gCodeType, null, null );
 				return true;
@@ -286,66 +358,103 @@ namespace MyCAM.Editor
 		{
 			Tuple<ExtendedGCodeType, int?> key = Tuple.Create( gCodeType, cadIndex );
 
-			if( m_CraftData.ExtendedGCodeMap.TryGetValue( key, out string content ) ) {
-				return new ExtendedGCodeParam( true, gCodeType, content, isPathStartPoint );
+			if( IsSinglePathSelected ) {
+				CraftData craftData = m_CraftDataList.First();
+
+				if( craftData.ExtendedGCodeMap.TryGetValue( key, out string content ) ) {
+					return new ExtendedGCodeParam( true, gCodeType, content, isPathStartPoint, true );
+				}
+
+				return new ExtendedGCodeParam( false, gCodeType, string.Empty, isPathStartPoint, true );
 			}
 
-			return new ExtendedGCodeParam( false, gCodeType, string.Empty, isPathStartPoint );
+			// mixed multi path values are blank but remain editable when any path has data
+			bool hasAnyValue = false;
+			bool allHaveValue = true;
+			string firstContent = null;
+			bool hasSameContent = true;
+			foreach( CraftData data in m_CraftDataList ) {
+				if( data.ExtendedGCodeMap.TryGetValue( key, out string content ) ) {
+					if( !hasAnyValue ) {
+						firstContent = content;
+					}
+					else if( firstContent != content ) {
+						hasSameContent = false;
+						break;
+					}
+					hasAnyValue = true;
+				}
+				else {
+					allHaveValue = false;
+				}
+			}
+
+			string displayContnet = ( hasAnyValue && allHaveValue && hasSameContent ) ? firstContent : string.Empty;
+			bool isMixData = hasAnyValue && ( !allHaveValue || !hasSameContent );
+			return new ExtendedGCodeParam( hasAnyValue, gCodeType, displayContnet, isPathStartPoint, false, isMixData );
 		}
 
 		bool IsClosedPathStartPoint( int cadIndex )
 		{
-			if( m_PathCache.MainPathPointList.Count == 0 ) {
+			if( m_PathCacheList.First().MainPathPointList.Count == 0 ) {
 				return false;
 			}
 
-			return SpecialPointIndex.IsClosedPointIndex( m_PathCache.MainPathPointList.Last().InitPathIndex )
-				&& ( cadIndex == m_PathCache.MainPathPointList.First().InitPathIndex );
+			return SpecialPointIndex.IsClosedPointIndex( m_PathCacheList.First().MainPathPointList.Last().InitPathIndex )
+				&& ( cadIndex == m_PathCacheList.First().MainPathPointList.First().InitPathIndex );
 		}
 
 		void OnAddRequest()
 		{
-			if( m_CraftData == null || m_Param == null ) {
+			if( m_CraftDataList == null || m_Param == null ) {
 				return;
 			}
 
 			m_Param.IsModified = true;
-			m_CraftData.SetExtendedGCode( m_Param.GCodeType, GetCurrentStoredIndex(), m_Param.Content );
-			PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
+			foreach( CraftData craftData in m_CraftDataList ) {
+				craftData.SetExtendedGCode( m_Param.GCodeType, GetCurrentStoredIndex(), m_Param.Content );
+			}
+			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
 		void OnDeleteRequest()
 		{
-			if( m_CraftData == null || m_Param == null ) {
+			if( m_CraftDataList == null || m_Param == null ) {
 				return;
 			}
 
-			m_CraftData.RemoveExtendedGCode( m_Param.GCodeType, GetCurrentStoredIndex() );
+			foreach( CraftData craftData in m_CraftDataList ) {
+				craftData.RemoveExtendedGCode( m_Param.GCodeType, GetCurrentStoredIndex() );
+			}
 			m_Param.IsModified = false;
 			m_Param.Content = string.Empty;
-			PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
+			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
 		void OnPositionChanged( ExtendedGCodeType gCodeType )
 		{
-			if( m_CraftData == null || m_Param == null ) {
+			if( m_Param == null ) {
 				return;
 			}
 
-			bool isControlPoint = ( gCodeType == ExtendedGCodeType.ControlPoint );
-
-			if( !isControlPoint ) {
-				m_Viewer.GetAISContext().ClearSelected( true );
+			if( gCodeType == ExtendedGCodeType.ControlPoint ) {
+				ActivatePointSelection();
+				return;
 			}
 
-			if( TryBuildExtendedGCodeParameter( gCodeType, isControlPoint ? m_nSelectCADIndex : null ) ) {
+			if( IsPointSelectionMode ) {
+				string oldPathID = m_PathIDList.First();
+				DeactivatePointSelection( oldPathID );
+			}
+
+			if( TryBuildExtendedGCodeParameter( gCodeType, null ) ) {
 				m_Dlg.ResetParam( m_Param );
 			}
 		}
 
 		void OnContentChanged( string content )
 		{
-			if( m_CraftData == null || m_Param == null ) {
+			if( m_CraftDataList == null || m_Param == null ) {
 				return;
 			}
 
@@ -358,18 +467,22 @@ namespace MyCAM.Editor
 			}
 
 			m_Param.Content = content;
-			m_CraftData.SetExtendedGCode( m_Param.GCodeType, GetCurrentStoredIndex(), m_Param.Content );
-			PropertyChanged?.Invoke( new List<string>() { m_CurrentPathID } );
+
+			foreach( CraftData craftData in m_CraftDataList ) {
+				craftData.SetExtendedGCode( m_Param.GCodeType, GetCurrentStoredIndex(), m_Param.Content );
+			}
+			PropertyChanged?.Invoke( m_PathIDList );
 		}
 
+		// only single path selection
 		void OnToStartOrEnd()
 		{
-			if( m_Param == null || m_Param.IsPathStartPoint == null ) {
+			if( !IsPointSelectionMode || !IsSinglePathSelected || m_Param == null || m_Param.IsPathStartPoint == null ) {
 				return;
 			}
 
 			// should not happen, but just in case
-			if( m_PathCache.MainPathPointList.Count <= 0 ) {
+			if( m_PathCacheList == null || m_PathCacheList.Count != 1 || m_PathCacheList.First().MainPathPointList.Count <= 0 ) {
 				return;
 			}
 
@@ -380,9 +493,6 @@ namespace MyCAM.Editor
 		}
 
 		#endregion
-
-		CraftData m_CraftData;
-		ContourCache m_PathCache;
 
 		// composition references
 		Viewer m_Viewer;

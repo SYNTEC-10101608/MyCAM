@@ -321,7 +321,7 @@ namespace MyCAM.Editor
 				if( index == -1 ) {
 					continue;
 				}
-				string szNodeID = CAMEditor.PATH_NODE_PREFIX + ( index + 1 ).ToString();
+				string szNodeID = m_DataManager.GetPathName( index );
 				if( !m_ViewManager.TreeNodeMap.ContainsKey( szNodeID ) ) {
 					continue;
 				}

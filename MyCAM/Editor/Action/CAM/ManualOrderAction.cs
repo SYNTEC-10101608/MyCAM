@@ -296,8 +296,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			// get node idx
-			int displayIndex = m_CurrentFlagIndex + 1;
-			string nodeID = CAMEditor.PATH_NODE_PREFIX + displayIndex.ToString();
+			string nodeID = m_DataManager.GetPathName( m_CurrentFlagIndex );
 
 			// find node by id
 			if( m_ViewManager?.TreeNodeMap == null || !m_ViewManager.TreeNodeMap.ContainsKey( nodeID ) ) {

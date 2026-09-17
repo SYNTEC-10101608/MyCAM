@@ -17,6 +17,7 @@
     <Message ID="IS_START_POINT" Content="Текущее положение: начало" />
     <Message ID="IS_END_POINT" Content="Текущее положение: конец" />
 
+    <Message ID="IS_MIX_DATA" Content="G-коды выбранных путей не совпадают" />
     <Message ID="m_lblGCode" Content="G-код" />
     
     <Message ID="m_btnDelete" Content="Удалить" />
