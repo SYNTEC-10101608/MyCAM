@@ -1,4 +1,5 @@
 using MyCAM.Helper;
+using MyCAM.Helper.CAM;
 using OCC.BRep;
 using OCC.gp;
 using OCC.TopAbs;
@@ -268,6 +269,14 @@ namespace MyCAM.Data
 				ContourPathObject contourPathObject = new ContourPathObject( szID, pathElements, isClosed,
 					maxDeflection, maxEdgeLength, discretizeMethod );
 				contourPathObject.CraftData.TraverseData = new TraverseData();
+
+				// intialize start point to lognest edge mid
+				if( isClosed ) {
+					int camIndex = StartPointHelper.ChooseLongestSegmentMiddlePoint( contourPathObject.ContourCache.MainPathPointList );
+					int cadIndex = contourPathObject.ContourCache.MainPathPointList[ camIndex ].InitPathIndex;
+					contourPathObject.CraftData.SetStartPntIndex( cadIndex );
+				}
+
 				ObjectMap[ szID ] = contourPathObject;
 				newPathIDList.Add( szID );
 			}
