@@ -251,13 +251,14 @@ namespace MyCAM.Editor
 
 			// get the selected ID
 			foreach( TreeNode node in ( m_TreeView as MultiSelectTreeView ).SelectedNodes ) {
-				if( node == null || string.IsNullOrEmpty( node.Text ) ) {
+
+				// Tag holds the real data ID; display text is renumbered on every refresh and must not be used as an ID
+				string dataID = node?.Tag as string;
+				if( string.IsNullOrEmpty( dataID ) ) {
 					continue;
 				}
-				bool hasShape = m_ViewManager.GetShapeByUID( node.Text ) != null;
-
-				if( hasShape ) {
-					m_SelectedIDSet.Add( node.Text );
+				if( m_ViewManager.GetShapeByUID( dataID ) != null ) {
+					m_SelectedIDSet.Add( dataID );
 				}
 			}
 			SyncSelectionFromSet();

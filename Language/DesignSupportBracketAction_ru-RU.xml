@@ -20,4 +20,7 @@
   <Message ID="Error_InvalidParamFormat" Content="Неверный формат параметра: {0}" />
   <Message ID="Error_InvalidIntParamFormat" Content="Неверный формат параметра: {0} (требуется положительное целое число)" />
   <Message ID="Error_BuildShellException" Content="Исключительная ошибка при сшивании граней: {0}" />
+  <Message ID="Hint_BracketShellOutdated" Content="Заготовка изменилась; пожалуйста, выберите опорную поверхность заново." />
+  <Message ID="m_dlgOverwrite_Title" Content="Подтверждение перезаписи" />
+  <Message ID="m_dlgOverwrite_Message" Content="В целевой папке уже существуют файлы с такими именами. Перезаписать?" />
 </ResMap>

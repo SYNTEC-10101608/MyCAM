@@ -20,4 +20,7 @@
 	<Message ID="Error_InvalidParamFormat" Content="Parameter format error: {0}" />
 	<Message ID="Error_InvalidIntParamFormat" Content="Parameter format error: {0} (must be positive integer)" />
 	<Message ID="Error_BuildShellException" Content="Exception during face welding: {0}" />
+	<Message ID="Hint_BracketShellOutdated" Content="The workpiece has been changed; please reselect support surface." />
+	<Message ID="m_dlgOverwrite_Title" Content="Confirm Overwrite" />
+	<Message ID="m_dlgOverwrite_Message" Content="Files with the same name already exist in the target folder. Overwrite?" />
 </ResMap>

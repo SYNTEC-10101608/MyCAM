@@ -1,4 +1,5 @@
 ﻿using MyCAM.App;
+using MyCAM.Data;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -11,10 +12,11 @@ namespace MyCAM.Editor.Dialog
 
 		internal Action NextStep;
 		internal Action BackStep;
-		internal Action<SupportBracketParams> Generate;
-		internal Action<SupportBracketParams> ParameterChanged;
+		internal Action<SupportBracketData> Generate;
+		internal Action<SupportBracketData> ParameterChanged;
 		internal Action<string> SaveDxf;
 		internal Action SkipSave;
+		internal Action ResetPositions;
 
 		public DesignSupportBracketDlg()
 		{
@@ -23,7 +25,6 @@ namespace MyCAM.Editor.Dialog
 			ApplyResourcesToUI();
 			LoadImages();
 			RegisterDebouncedHandlers();
-			ShowSelectFacePanel();
 		}
 
 		internal string XExtensionName => m_lblXExtension.Text;
@@ -46,6 +47,8 @@ namespace MyCAM.Editor.Dialog
 
 		internal string PinLengthName => m_lblPinLength.Text;
 
+		internal string FilletRadiusName => m_lblFilletRadius.Text;
+
 		void ApplyResourcesToUI()
 		{
 			Text = m_LanguageManager.TryGetString( "DesignSupportBracketDlg", Text );
@@ -55,6 +58,7 @@ namespace MyCAM.Editor.Dialog
 			m_lblXExtension.Text = m_LanguageManager.TryGetString( "m_lblXExtension", m_lblXExtension.Text );
 			m_lblYExtension.Text = m_LanguageManager.TryGetString( "m_lblYExtension", m_lblYExtension.Text );
 			m_lblSectionBracket.Text = m_LanguageManager.TryGetString( "m_lblSectionBracket", m_lblSectionBracket.Text );
+			m_btnResetPositions.Text = m_LanguageManager.TryGetString( "m_btnResetPositions", m_btnResetPositions.Text );
 			m_lblXPositionsTitle.Text = m_LanguageManager.TryGetString( "m_lblXPositionsTitle", m_lblXPositionsTitle.Text );
 			m_lblYPositionsTitle.Text = m_LanguageManager.TryGetString( "m_lblYPositionsTitle", m_lblYPositionsTitle.Text );
 			m_btnAddXPosition.Text = m_LanguageManager.TryGetString( "m_btnAddXPosition", m_btnAddXPosition.Text );
@@ -68,6 +72,7 @@ namespace MyCAM.Editor.Dialog
 			m_lblRibHeight.Text = m_LanguageManager.TryGetString( "m_lblRibHeight", m_lblRibHeight.Text );
 			m_lblZExtension.Text = m_LanguageManager.TryGetString( "m_lblZExtension", m_lblZExtension.Text );
 			m_lblPinLength.Text = m_LanguageManager.TryGetString( "m_lblPinLength", m_lblPinLength.Text );
+			m_lblFilletRadius.Text = m_LanguageManager.TryGetString( "m_lblFilletRadius", m_lblFilletRadius.Text );
 			m_lblSectionCrossFit.Text = m_LanguageManager.TryGetString( "m_lblSectionCrossFit", m_lblSectionCrossFit.Text );
 			m_lblSectionBracketCount.Text = m_LanguageManager.TryGetString( "m_lblSectionBracketCount", m_lblSectionBracketCount.Text );
 			m_lblSectionBottomPinSize.Text = m_LanguageManager.TryGetString( "m_lblSectionBottomPinSize", m_lblSectionBottomPinSize.Text );
@@ -86,7 +91,7 @@ namespace MyCAM.Editor.Dialog
 			m_picPinDimension.Image = Properties.Resources.Support_PinDimension;
 		}
 
-		internal void ResetPositionListsFromBBox( double[] xDefaults, double[] yDefaults )
+		internal void ResetPositionListsFromBBox( double[] xDefaults, double[] yDefaults, bool raiseChanged = true )
 		{
 			// Remove existing rows
 			foreach( var row in m_XRows ) {
@@ -108,6 +113,9 @@ namespace MyCAM.Editor.Dialog
 			m_pnlXPositions.Controls.Clear();
 			m_pnlYPositions.Controls.Clear();
 			InitializePositionListsCore( xDefaults, yDefaults );
+			if( raiseChanged ) {
+				RaiseParameterChanged();
+			}
 		}
 
 		void InitializePositionListsCore( double[] xDefaults, double[] yDefaults )
@@ -143,6 +151,11 @@ namespace MyCAM.Editor.Dialog
 
 		void ShowPanel( Panel activePanel )
 		{
+			// hide the dialog during the switch so user won't see the intermediate states
+			bool isShown = Visible;
+			if( isShown ) {
+				Hide();
+			}
 			SuspendLayout();
 
 			// Hide all panels first so the window resizes without showing stale content
@@ -158,6 +171,15 @@ namespace MyCAM.Editor.Dialog
 
 			// Show the target panel only after the window has been resized
 			activePanel.Visible = true;
+
+			// keep the dialog centered on the main form after the size change
+			// (dialog may be hidden at this point, so calculate and set location directly)
+			Location = MyApp.CalculateDialogCenterLocation( this );
+
+			// show the dialog when everything is ready
+			if( isShown ) {
+				Show();
+			}
 			Refresh();
 		}
 
@@ -171,9 +193,9 @@ namespace MyCAM.Editor.Dialog
 			m_btnNext.Enabled = hasSelection;
 		}
 
-		SupportBracketParams CollectParams()
+		SupportBracketData CollectParams()
 		{
-			return new SupportBracketParams
+			return new SupportBracketData
 			{
 				XExtension = (double)m_txbXExtension.Value,
 				YExtension = (double)m_txbYExtension.Value,
@@ -187,6 +209,7 @@ namespace MyCAM.Editor.Dialog
 				RibHeight = (double)m_txbRibHeight.Value,
 				ZExtension = (double)m_txbZExtension.Value,
 				PinLength = (double)m_txbPinLength.Value,
+				FilletRadius = (double)m_txbFilletRadius.Value,
 			};
 		}
 
@@ -227,6 +250,36 @@ namespace MyCAM.Editor.Dialog
 		void m_btnSkipSave_Click( object sender, EventArgs e )
 		{
 			SkipSave?.Invoke();
+		}
+
+		void m_btnResetPositions_Click( object sender, EventArgs e )
+		{
+			ResetPositions?.Invoke();
+		}
+
+		// Apply imported parameters to UI only
+		internal void ApplyParams( SupportBracketData parameters, bool raiseChanged = true )
+		{
+			if( parameters == null ) {
+				return;
+			}
+
+			m_txbXExtension.SilentSetValue = (decimal)parameters.XExtension;
+			m_txbYExtension.SilentSetValue = (decimal)parameters.YExtension;
+			m_txbBaseThickness.SilentSetValue = (decimal)parameters.BaseThick;
+			m_txbEngagementDepth.SilentSetValue = (decimal)parameters.CrossGap;
+			m_txbXPinCount.SilentSetValue = (decimal)parameters.XPinCount;
+			m_txbYPinCount.SilentSetValue = (decimal)parameters.YPinCount;
+			m_txbWallThickness.SilentSetValue = (decimal)parameters.WallThick;
+			m_txbRibHeight.SilentSetValue = (decimal)parameters.RibHeight;
+			m_txbZExtension.SilentSetValue = (decimal)parameters.ZExtension;
+			m_txbPinLength.SilentSetValue = (decimal)parameters.PinLength;
+			m_txbFilletRadius.SilentSetValue = (decimal)parameters.FilletRadius;
+
+			ResetPositionListsFromBBox( parameters.XPositions, parameters.YPositions );
+			if( raiseChanged ) {
+				RaiseParameterChanged();
+			}
 		}
 
 		void m_btnAddXPosition_Click( object sender, EventArgs e )
@@ -339,6 +392,7 @@ namespace MyCAM.Editor.Dialog
 					m_txbZExtension, m_txbRibHeight,
 					m_txbEngagementDepth, m_txbBaseThickness,
 					m_txbWallThickness, m_txbPinLength,
+					m_txbFilletRadius,
 					m_txbXPinCount, m_txbYPinCount } ) {
 				nud.RestrictInvalidCharacters = true;
 				nud.ValueRejected += OnValueRejected;

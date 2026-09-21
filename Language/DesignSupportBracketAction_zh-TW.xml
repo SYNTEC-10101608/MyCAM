@@ -20,4 +20,7 @@
   <Message ID="Error_InvalidParamFormat" Content="參數格式錯誤：{0}" />
   <Message ID="Error_InvalidIntParamFormat" Content="參數格式錯誤：{0}（需為正整數）" />
   <Message ID="Error_BuildShellException" Content="面縫合時發生例外錯誤：{0}" />
+  <Message ID="Hint_BracketShellOutdated" Content="工件已變更，請重新選取支撐面" />
+  <Message ID="m_dlgOverwrite_Title" Content="確認覆寫" />
+  <Message ID="m_dlgOverwrite_Message" Content="目標資料夾已有相同檔案，是否覆寫？" />
 </ResMap>

@@ -34,6 +34,7 @@ namespace MyCAM.Editor
 		{
 			m_DataManager.PartChanged += OnPartChanged;
 			m_DataManager.FeatureAdded += OnFeatureAdded;
+			m_DataManager.PartRemoved += OnPartRemoved;
 
 			// default action is select object action
 			m_DefaultAction = new SelectPartAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -317,6 +318,20 @@ namespace MyCAM.Editor
 
 			// update tree view and viewer
 			m_ViewManager.PartNode.ExpandAll();
+			m_Viewer.UpdateView();
+		}
+
+		void OnPartRemoved( List<string> removedPartIDs )
+		{
+			foreach( string szID in removedPartIDs ) {
+				if( string.IsNullOrEmpty( szID ) ) {
+					continue;
+				}
+				m_ViewManager.RemovePart( szID );
+			}
+
+			// removed part may be under selection
+			m_DefaultAction.ClearSelection();
 			m_Viewer.UpdateView();
 		}
 

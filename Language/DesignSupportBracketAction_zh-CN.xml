@@ -20,4 +20,7 @@
 	<Message ID="Error_InvalidParamFormat" Content="参数格式错误：{0}" />
 	<Message ID="Error_InvalidIntParamFormat" Content="参数格式错误：{0}（需为正整数）" />
 	<Message ID="Error_BuildShellException" Content="面缝合时发生例外错误：{0}" />
+	<Message ID="Hint_BracketShellOutdated" Content="工件已变更，请重新选取支撑面" />
+	<Message ID="m_dlgOverwrite_Title" Content="确认覆盖" />
+	<Message ID="m_dlgOverwrite_Message" Content="目标文件夹已有相同文件，是否覆盖？" />
 </ResMap>

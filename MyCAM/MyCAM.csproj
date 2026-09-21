@@ -82,6 +82,7 @@
     <Compile Include="Data\Craft\CalibrationData.cs" />
     <Compile Include="Data\Craft\SpecialToolVecData.cs" />
     <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
+    <Compile Include="Data\SupportBracket\SupportBracketData.cs" />
     <Compile Include="Editor\Action\CAD\DesignSupportBracketAction.cs" />
     <Compile Include="Data\Machine\ComponentInfo.cs" />
     <Compile Include="Data\Machine\MachineChainBuilder.cs" />
@@ -219,6 +220,7 @@
     <Compile Include="Editor\Renderer\ToolVecAndPathVisibleHelper.cs" />
     <Compile Include="Editor\Renderer\ToolVecEditRender.cs" />
     <Compile Include="Editor\Renderer\ToolVecRenderer.cs" />
+    <Compile Include="FileManager\SupportBracketParamsDTO.cs" />
     <Compile Include="Helper\CAD\StdPatternDiscreteFactory.cs" />
     <Compile Include="Helper\CAD\SupportDesignHelper.cs" />
     <Compile Include="Helper\CAM\ContourEditHelper.cs" />

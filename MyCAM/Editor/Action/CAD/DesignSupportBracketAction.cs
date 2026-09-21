@@ -41,14 +41,11 @@ namespace MyCAM.Editor
 			m_Dialog.Cancel += OnDialogCancel;
 			m_Dialog.SaveDxf += OnSaveDxf;
 			m_Dialog.SkipSave += OnSkipSaveAndFinish;
-			m_Dialog.Show( MyApp.MainForm );
+			m_Dialog.ResetPositions += OnResetPositions;
 
-			m_Dialog.BeginInvoke( new MethodInvoker( delegate
-			{
-				if( m_Dialog != null && !m_Dialog.IsDisposed ) {
-					GoToStep( EStep.SelectFace );
-				}
-			} ) );
+			// decide the initial step while the dialog is still hidden, so it opens directly on the correct panel
+			GoToInitialStep();
+			m_Dialog.Show( MyApp.MainForm );
 		}
 
 		public override void End()
@@ -64,6 +61,7 @@ namespace MyCAM.Editor
 				m_Dialog.Cancel -= OnDialogCancel;  // unsubscribe before Close() so base.RaiseCancel won't re-enter
 				m_Dialog.SaveDxf -= OnSaveDxf;
 				m_Dialog.SkipSave -= OnSkipSaveAndFinish;
+				m_Dialog.ResetPositions -= OnResetPositions;
 
 				if( !m_Dialog.IsDisposed ) {
 					m_Dialog.Close();
@@ -83,12 +81,58 @@ namespace MyCAM.Editor
 					StartSelectFaceSubAction();
 					break;
 				case EStep.InputParameters:
-					m_Dialog?.ShowInputParametersPanel();
+					ApplyLastParamsOrDefaults();
 					m_Dialog?.TriggerInitialParameterChanged();
+					m_Dialog?.ShowInputParametersPanel();
 					break;
 				default:
 					break;
 			}
+		}
+
+		// decide the entry step: jump straight to parameter input when a previously generated bracket shell is still valid
+		void GoToInitialStep()
+		{
+			if( m_DataManager.TryGetValidSupportBracketShell( out m_InputShell ) ) {
+				GoToStep( EStep.InputParameters );
+				return;
+			}
+			if( m_DataManager.HasSupportBracketShell ) {
+
+				// a shell was cached but part geometry changed afterwards: force re-selection
+				MyApp.Logger.ShowOnLogPanel(
+					m_LanguageManager.TryGetString( "Hint_BracketShellOutdated", DefaultHint_BracketShellOutdated ),
+					MyApp.NoticeType.Hint );
+			}
+			GoToStep( EStep.SelectFace );
+		}
+
+		void ApplyLastParamsOrDefaults()
+		{
+			// repeat design: pre-fill step 2 with previously generated params
+			if( m_DataManager.SupportBracketParams != null ) {
+				m_Dialog?.ApplyParams( m_DataManager.SupportBracketParams, raiseChanged: false );
+				return;
+			}
+			// fill default positions without raising: GoToStep already triggers the initial ParameterChanged
+			ResetPositionsToDefault( raiseChanged: false );
+		}
+
+		void ResetPositionsToDefault( bool raiseChanged = true )
+		{
+			// fill default positions from the input shell bbox
+			if( m_InputShell == null || m_InputShell.IsNull() ) {
+				return;
+			}
+			double[] xDefaults = ComputeQuarterPositions( m_InputShell, isX: true );
+			double[] yDefaults = ComputeQuarterPositions( m_InputShell, isX: false );
+			m_Dialog?.ResetPositionListsFromBBox( xDefaults, yDefaults, raiseChanged );
+		}
+
+		void OnResetPositions()
+		{
+			// dialog raises ParameterChanged itself, which refreshes the preview
+			ResetPositionsToDefault();
 		}
 
 		void StartSelectFaceSubAction()
@@ -132,11 +176,11 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			EndSubAction();
+			// cache the sewed shell together with the current part-geometry version,
+			// so a re-entered bracket action can skip face selection if nothing changed
+			m_DataManager.RestoreSupportBracketShell( m_InputShell );
 
-			double[] xDefaults = ComputeQuarterPositions( m_InputShell, isX: true );
-			double[] yDefaults = ComputeQuarterPositions( m_InputShell, isX: false );
-			m_Dialog?.ResetPositionListsFromBBox( xDefaults, yDefaults );
+			EndSubAction();
 
 			GoToStep( EStep.InputParameters );
 		}
@@ -174,7 +218,7 @@ namespace MyCAM.Editor
 			m_Dialog?.SetFaceSelected( false );
 		}
 
-		void OnParameterChanged( SupportBracketParams parameters )
+		void OnParameterChanged( SupportBracketData parameters )
 		{
 			if( m_CurrentStep != EStep.InputParameters ) {
 				return;
@@ -203,7 +247,7 @@ namespace MyCAM.Editor
 				parameters.XExtension, parameters.YExtension, parameters.ZExtension, parameters.RibHeight );
 		}
 
-		void OnGenerate( SupportBracketParams parameters )
+		void OnGenerate( SupportBracketData parameters )
 		{
 			// Validate parameters and prepare for support generation
 			ValidatedGenerateParams validated;
@@ -216,10 +260,15 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			// persist params for repeat design (auto-fill step 2 when re-entering support design)
+			m_DataManager.SupportBracketParams = parameters;
+
 			// Remove any existing preview visualization before generating the final support structure
 			RemovePreviewVisualization();
 
-			m_DataManager.AddAdditionalPart( outputCompound );
+			// remove all previously generated support brackets, then add the new one
+			m_DataManager.RemovePartsByRole( PartRole.Support );
+			m_DataManager.AddAdditionalPart( outputCompound, PartRole.Support );
 
 			// If support generation was successful, prompt the user to save the DXF files; otherwise, end the action
 			if( m_LastSupportResult != null ) {
@@ -233,9 +282,13 @@ namespace MyCAM.Editor
 			}
 		}
 
-		bool TryValidateGenerateParams( SupportBracketParams parameters, out ValidatedGenerateParams validated )
+		bool TryValidateGenerateParams( SupportBracketData parameters, out ValidatedGenerateParams validated )
 		{
 			validated = default( ValidatedGenerateParams );
+
+			if( m_Dialog == null || m_Dialog.IsDisposed ) {
+				return false;
+			}
 
 			if( m_InputShell == null || m_InputShell.IsNull() ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Error_NoFaceSelected", DefaultError_NoFaceSelected ), MyApp.NoticeType.Error, true );
@@ -244,6 +297,7 @@ namespace MyCAM.Editor
 
 			double xExtension, yExtension, baseThickness;
 			double engagementDepth, wallThickness, ribHeight, zExtension, pinLength;
+			double filletRadius;
 			int xPinCount, yPinCount;
 
 			// Validate all parameters and report errors if any are invalid
@@ -278,6 +332,9 @@ namespace MyCAM.Editor
 			if( !ValidateDouble( parameters.PinLength, m_Dialog.PinLengthName, out pinLength ) ) {
 				return false;
 			}
+			if( !ValidateDouble( parameters.FilletRadius, m_Dialog.FilletRadiusName, out filletRadius ) ) {
+				return false;
+			}
 
 			double[] xPositions = parameters.XPositions ?? new double[ 0 ];
 			double[] yPositions = parameters.YPositions ?? new double[ 0 ];
@@ -288,12 +345,8 @@ namespace MyCAM.Editor
 				return false;
 			}
 
-			// Validate the input shell and ensure it is not null or invalid; otherwise, report an error
+			// shell already validated at method entry
 			TopoDS_Shell inputShell = m_InputShell;
-			if( inputShell == null || inputShell.IsNull() ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Error_BuildShellFailed", DefaultError_BuildShellFailed ), MyApp.NoticeType.Error, true );
-				return false;
-			}
 
 			Array.Sort( xPositions );
 			Array.Sort( yPositions );
@@ -306,7 +359,7 @@ namespace MyCAM.Editor
 				inputShell, xPositions, yPositions,
 				xExtension, yExtension, zExtension,
 				baseThickness, engagementDepth, wallThickness,
-				ribHeight, pinLength, xPinCount, yPinCount );
+				ribHeight, pinLength, filletRadius, xPinCount, yPinCount );
 			return true;
 		}
 
@@ -343,7 +396,7 @@ namespace MyCAM.Editor
 				filledShell, p.XPositions, p.YPositions,
 				p.ZExtension, p.XExtension, p.YExtension,
 				p.WallThickness, p.EngagementDepth, p.RibHeight,
-				FILLET_RADIUS, p.BaseThickness, p.PinLength,
+				p.FilletRadius, p.BaseThickness, p.PinLength,
 				p.XPinCount, p.YPinCount,
 				out result, out buildError ) ) {
 				string msg = ( buildError == SupportBuildError.XZWallsFailed
@@ -372,13 +425,60 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			// Overwrite check: if any file we are about to output already exists, confirm with the user once
+			if( HasExistingOutputFile( outputDir ) ) {
+				string title = m_LanguageManager.TryGetString( "m_dlgOverwrite_Title", DefaultOverwriteTitle );
+				string message = m_LanguageManager.TryGetString( "m_dlgOverwrite_Message", DefaultOverwriteMessage );
+				if( MessageBox.Show( m_Dialog, message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning ) != DialogResult.Yes ) {
+					// stay on the save step so the user can pick a different folder and retry
+					return;
+				}
+			}
+
 			if( !SupportDesignHelper.ExportSupportsToDxf( m_LastSupportResult, outputDir ) ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Error_DxfExportFailed", DefaultError_DxfExportFailed ), MyApp.NoticeType.Error, true );
 				return;
 			}
-
 			MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Log_DxfSaved", DefaultLog_DxfSaved ), outputDir ), MyApp.NoticeType.Hint );
+
 			End();
+		}
+
+		bool HasExistingOutputFile( string outputDir )
+		{
+			if( !Directory.Exists( outputDir ) ) {
+				return false;
+			}
+			foreach( string fileName in GetPlannedOutputFileNames() ) {
+				if( File.Exists( Path.Combine( outputDir, fileName ) ) ) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		// Build the list of file names we are about to write, using the same conditions as ExportSupportsToDxf
+		List<string> GetPlannedOutputFileNames()
+		{
+			var fileNames = new List<string>();
+			if( m_LastSupportResult != null ) {
+				for( int i = 0; i < m_LastSupportResult.XZWalls.Count; i++ ) {
+					var wall = m_LastSupportResult.XZWalls[ i ];
+					if( wall.FilletedPath2D != null && wall.FilletedPath2D.Count >= 3 ) {
+						fileNames.Add( "XZ_Wall_" + i + ".dxf" );
+					}
+				}
+				for( int j = 0; j < m_LastSupportResult.YZWalls.Count; j++ ) {
+					var wall = m_LastSupportResult.YZWalls[ j ];
+					if( wall.FilletedPath2D != null && wall.FilletedPath2D.Count >= 3 ) {
+						fileNames.Add( "YZ_Wall_" + j + ".dxf" );
+					}
+				}
+				if( m_LastSupportResult.BasePlate != null ) {
+					fileNames.Add( "Base.dxf" );
+				}
+			}
+			return fileNames;
 		}
 
 		void OnSkipSaveAndFinish()
@@ -535,10 +635,10 @@ namespace MyCAM.Editor
 			return false;
 		}
 
-		// Reports an error and returns false when value is NaN
+		// Reports an error and returns false when value is not finite
 		bool ValidateDouble( double value, string fieldName, out double validated )
 		{
-			if( double.IsNaN( value ) ) {
+			if( double.IsNaN( value ) || double.IsInfinity( value ) ) {
 				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Error_InvalidParamFormat", DefaultError_InvalidParamFormat ), fieldName ), MyApp.NoticeType.Error, true );
 				validated = 0;
 				return false;
@@ -563,7 +663,7 @@ namespace MyCAM.Editor
 
 		void RemovePreviewVisualization( bool updateView = true )
 		{
-			if( m_PreviewAISList == null || m_PreviewAISList.Count == 0 ) {
+			if( m_PreviewAISList.Count == 0 ) {
 				return;
 			}
 
@@ -586,10 +686,6 @@ namespace MyCAM.Editor
 				out List<PreviewPlaneData> yzWallPlanes,
 				out PreviewPlaneData basePlanePreview ) ) {
 				return;
-			}
-
-			if( m_PreviewAISList == null ) {
-				m_PreviewAISList = new List<AIS_Shape>();
 			}
 
 			foreach( PreviewPlaneData plane in xzWallPlanes ) {
@@ -642,6 +738,7 @@ namespace MyCAM.Editor
 			public double WallThickness;
 			public double RibHeight;
 			public double PinLength;
+			public double FilletRadius;
 			public int XPinCount;
 			public int YPinCount;
 
@@ -650,7 +747,7 @@ namespace MyCAM.Editor
 				double[] xPositions, double[] yPositions,
 				double xExtension, double yExtension, double zExtension,
 				double baseThickness, double engagementDepth, double wallThickness,
-				double ribHeight, double pinLength, int xPinCount, int yPinCount )
+				double ribHeight, double pinLength, double filletRadius, int xPinCount, int yPinCount )
 			{
 				InputShell = inputShell;
 				XPositions = xPositions;
@@ -663,6 +760,7 @@ namespace MyCAM.Editor
 				WallThickness = wallThickness;
 				RibHeight = ribHeight;
 				PinLength = pinLength;
+				FilletRadius = filletRadius;
 				XPinCount = xPinCount;
 				YPinCount = yPinCount;
 			}
@@ -679,15 +777,17 @@ namespace MyCAM.Editor
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "DesignSupportBracketAction" );
 		SelectFaceAction m_FaceSelectionAction;
 		TopoDS_Shell m_InputShell;
-		List<AIS_Shape> m_PreviewAISList;
+		readonly List<AIS_Shape> m_PreviewAISList = new List<AIS_Shape>();
 
-		const double FILLET_RADIUS = 1.0;
 		const double POSITION_DUPLICATE_TOL = 1e-3;
 		const double GEOMETRY_TOLERANCE = 1e-3;
 		const double BBOX_MAX_EXPAND_RATIO = 0.10;  // allow up to 10% bbox growth per axis after hole filling
 
 		const string CUSTOM_ROOT_FOLDER_NAME = "Custom";
 		const string SUPPORT_BRACKET_FOLDER_NAME = "SupportBracket";
+
+		const string DefaultOverwriteTitle = "確認覆寫";
+		const string DefaultOverwriteMessage = "目標資料夾已有相同檔案，是否覆寫？";
 
 		const string DefaultError_NoFaceSelected = "請先選擇面";
 		const string DefaultError_PositionCount = "支架數量不能為0";
@@ -699,7 +799,7 @@ namespace MyCAM.Editor
 		const string DefaultError_SupportBuildFailed = "目前曲面的選擇無法生成支架，請更換所選的面";
 		const string DefaultError_NoSavePath = "請指定儲存路徑";
 		const string DefaultError_DxfExportFailed = "DXF 匯出失敗";
-		const string DefaultLog_DxfSaved = "DXF 已儲存至：{0}";
+		const string DefaultLog_DxfSaved = "支架DXF 已儲存至：{0}";
 		const string DefaultError_ComputeBBoxFailed = "無法計算工件範圍";
 		const string DefaultError_XPositionDuplicate = "X方向支架座標有重複";
 		const string DefaultError_YPositionDuplicate = "Y方向支架座標有重複";
@@ -709,71 +809,7 @@ namespace MyCAM.Editor
 		const string DefaultError_InvalidParamFormat = "參數格式錯誤：{0}";
 		const string DefaultError_InvalidIntParamFormat = "參數格式錯誤：{0}（需為正整數）";
 		const string DefaultError_BuildShellException = "面縫合時發生例外錯誤：{0}";
+		const string DefaultHint_BracketShellOutdated = "工件已變更，請重新選取支撐面";
 	}
 
-	internal class SupportBracketParams
-	{
-		// --- Bottom section ---
-		public double XExtension
-		{
-			get; set;
-		} = 50.0;
-
-		public double YExtension
-		{
-			get; set;
-		} = 50.0;
-
-		public double BaseThick
-		{
-			get; set;
-		} = 5.0;
-
-		// --- Bracket positions ---
-		public double[] XPositions
-		{
-			get; set;
-		} = new double[ 0 ];
-
-		public double[] YPositions
-		{
-			get; set;
-		} = new double[ 0 ];
-
-		// --- Bracket section ---
-		public double CrossGap
-		{
-			get; set;
-		} = 5.0;
-
-		public int XPinCount
-		{
-			get; set;
-		} = 8;
-
-		public int YPinCount
-		{
-			get; set;
-		} = 2;
-
-		public double WallThick
-		{
-			get; set;
-		} = 3.0;
-
-		public double RibHeight
-		{
-			get; set;
-		} = 50.0;
-
-		public double ZExtension
-		{
-			get; set;
-		} = 100.0;
-
-		public double PinLength
-		{
-			get; set;
-		} = 20.0;
-	}
 }
