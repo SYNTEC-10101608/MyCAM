@@ -1,6 +1,7 @@
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.FileManager;
+using OCC.TopoDS;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -65,10 +66,13 @@ namespace MyCAM.Editor
 					}
 
 					// turn DTO to data
-					dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, IObject> ObjectMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData, out CalibrationData calibrationData );
+					dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, IObject> ObjectMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData, out CalibrationData calibrationData, out SupportBracketData supportBracketParams, out TopoDS_Shell bracketShell );
 
 					// set back to data manager
-					m_DataManager.ResetDataManger( ObjectMap, partIDList, pathIDList, shapeIDs, entryAndExitData, calibrationData );
+					m_DataManager.ResetDataManger( ObjectMap, partIDList, pathIDList, shapeIDs, entryAndExitData, calibrationData, supportBracketParams );
+
+					// restore bracket shell if .sfa has one (version aligned inside)
+					m_DataManager.RestoreSupportBracketShell( bracketShell );
 					UpdateAllViewData();
 
 					// set import success and file name

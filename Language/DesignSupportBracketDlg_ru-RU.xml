@@ -22,6 +22,7 @@
   <Message ID="m_lblPinLength" Content="Длина соединения (B)" />
   <Message ID="m_lblSectionCrossFit" Content="Конструкция пазового соединения" />
   <Message ID="m_lblSectionBracketCount" Content="Количество соединений основания" />
+  <Message ID="m_btnResetPositions" Content="Сбросить положение" />
   <Message ID="m_lblSectionBottomPinSize" Content="Размер нижнего штифта" />
   <Message ID="m_btnBack" Content="Назад" />
   <Message ID="m_btnGenerate" Content="Создать" />
@@ -33,4 +34,6 @@
   <Message ID="m_btnDeletePosition" Content="Удалить" />
   <Message ID="Warn_BelowMinimum" Content="{0} меньше минимума {1}, восстановлено предыдущее значение" />
   <Message ID="Warn_AboveMaximum" Content="{0} больше максимума {1}, восстановлено предыдущее значение" />
+  <Message ID="m_lblFilletRadius" Content="Радиус скругления угла" />
+  <Message ID="m_btnImportParams" Content="Импорт параметров" />
 </ResMap>

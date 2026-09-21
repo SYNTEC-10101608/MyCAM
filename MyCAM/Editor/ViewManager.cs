@@ -10,8 +10,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCViewer;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -222,10 +220,12 @@ namespace MyCAM.Editor
 			ViewObjectMap.Add( partID, new ViewObject( aisShape ) );
 			m_Viewer.GetAISContext().Display( aisShape, false );
 
-			// add tree node under PartNode
-			TreeNode node = new TreeNode( partID );
+			// keep the actual part ID for data lookup; display numbering is rebuilt separately by shape type
+			TreeNode node = new TreeNode();
+			node.Tag = partID;
 			PartNode.Nodes.Add( node );
 			TreeNodeMap.Add( partID, node );
+			RefreshPartNodeTexts();
 		}
 
 		public void RemovePart( string partID )
@@ -255,7 +255,35 @@ namespace MyCAM.Editor
 				TreeNode node = TreeNodeMap[ partID ];
 				PartNode.Nodes.Remove( node );
 				TreeNodeMap.Remove( partID );
+				RefreshPartNodeTexts();
 			}
+		}
+
+		void RefreshPartNodeTexts()
+		{
+			Dictionary<string, int> typeCounts = new Dictionary<string, int>();
+			for( int i = 0; i < PartNode.Nodes.Count; i++ ) {
+				TreeNode node = PartNode.Nodes[ i ];
+				string partID = node.Tag as string;
+				string typePrefix = GetPartNodeTypePrefix( partID );
+				if( !typeCounts.ContainsKey( typePrefix ) ) {
+					typeCounts[ typePrefix ] = 0;
+				}
+				typeCounts[ typePrefix ]++;
+				node.Text = typePrefix + "_" + typeCounts[ typePrefix ].ToString();
+			}
+		}
+
+		string GetPartNodeTypePrefix( string partID )
+		{
+			if( string.IsNullOrEmpty( partID ) ) {
+				return "Part";
+			}
+			int separatorIndex = partID.LastIndexOf( '_' );
+			if( separatorIndex <= 0 ) {
+				return partID;
+			}
+			return partID.Substring( 0, separatorIndex );
 		}
 
 		// origin shape need to be change
@@ -277,10 +305,18 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			// remember selection before replacing shape
+			bool wasSelected = m_Viewer.GetAISContext().IsSelected( partAIS );
+
 			// unregister old shape-ID mapping
 			TopoDS_Shape oldShape = partAIS.Shape();
 			if( oldShape != null && !oldShape.IsNull() ) {
 				UnregisterShapeIDMapping( oldShape );
+
+				// detach selection to avoid orphan residue
+				if( wasSelected ) {
+					m_Viewer.GetAISContext().AddOrRemoveSelected( partAIS, false );
+				}
 			}
 
 			// update shape and register new mapping
@@ -289,6 +325,11 @@ namespace MyCAM.Editor
 
 			// redisplay in viewer
 			m_Viewer.GetAISContext().Redisplay( partAIS, false );
+
+			// reattach selection
+			if( wasSelected ) {
+				m_Viewer.GetAISContext().AddOrRemoveSelected( partAIS, false );
+			}
 		}
 
 		public void UpdateParts( List<string> partIDList )

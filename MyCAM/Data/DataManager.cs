@@ -24,12 +24,41 @@ namespace MyCAM.Data
 		public int Path_ID;
 	}
 
+	// support-bracket shell + the part version it was captured at; internal detail of DataManager
+	struct SupportBracketShellRecord
+	{
+		public static readonly SupportBracketShellRecord Empty = new SupportBracketShellRecord( null, -1 );
+
+		public SupportBracketShellRecord( TopoDS_Shell shell, long partVersion )
+		{
+			Shell = shell;
+			PartVersion = partVersion;
+		}
+
+		public TopoDS_Shell Shell
+		{
+			get;
+		}
+
+		public long PartVersion
+		{
+			get;
+		}
+
+		// usable only when shell exists and version matches current part geometry
+		public bool IsValid( long currentPartVersion )
+		{
+			return Shell != null && !Shell.IsNull() && PartVersion == currentPartVersion;
+		}
+	}
+
 	// part data, reference data
 	internal class DataManager
 	{
 		public Action PartChanged;
 		public Action<List<string>, bool> FeatureAdded;
 		public Action<List<string>> PathAdded;
+		public Action<List<string>> PartRemoved;
 
 		// TODO: this is temp solution
 		public DataManager()
@@ -43,7 +72,7 @@ namespace MyCAM.Data
 			BuildChain();
 		}
 
-		public void ResetDataManger( Dictionary<string, IObject> objectMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData, CalibrationData calibration )
+		public void ResetDataManger( Dictionary<string, IObject> objectMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData, CalibrationData calibration, SupportBracketData supportBracketParams = null )
 		{
 			// check shape map is mach with partList & pathList
 			Dictionary<string, IObject> checkedObjectMap = new Dictionary<string, IObject>();
@@ -70,7 +99,76 @@ namespace MyCAM.Data
 			PathIDList = checkedPathIDList;
 			EntryAndExitData = entryAndExitData;
 			CalibrationData = calibration;
+			SupportBracketParams = supportBracketParams;
 			ResetShapeIDsByDTO( shapeIDs );
+
+			// part set rebuilt from file: drop part-derived records, then re-hook notifications
+			NotifyPartSetRebuilt();
+			HookPartShapeReplacedEvents();
+		}
+
+		public SupportBracketData SupportBracketParams
+		{
+			get; set;
+		}
+
+		// store the shell together with the current part-geometry version
+		public void RestoreSupportBracketShell( TopoDS_Shell shell )
+		{
+			if( shell == null || shell.IsNull() ) {
+				return;
+			}
+			m_SupportBracketShellRecord = new SupportBracketShellRecord( shell, PartGeometryVersion );
+		}
+
+		// get the stored shell only when it still matches the current part geometry
+		public bool TryGetValidSupportBracketShell( out TopoDS_Shell shell )
+		{
+			shell = m_SupportBracketShellRecord.IsValid( PartGeometryVersion ) ? m_SupportBracketShellRecord.Shell : null;
+			return shell != null;
+		}
+
+		// any shell stored in this project, regardless of validity
+		public bool HasSupportBracketShell
+		{
+			get
+			{
+				return m_SupportBracketShellRecord.Shell != null;
+			}
+		}
+
+		// bumped whenever part geometry changes (transform / sew / rebuild)
+		long PartGeometryVersion
+		{
+			get; set;
+		}
+
+		// bump version to signal part change; the stored shell is kept so we can tell the user it went stale
+		void NotifyPartGeometryChanged()
+		{
+			PartGeometryVersion++;
+		}
+
+		// whole part set is replaced (import model / open project): part-derived records no longer belong here
+		void NotifyPartSetRebuilt()
+		{
+			NotifyPartGeometryChanged();
+			m_SupportBracketShellRecord = SupportBracketShellRecord.Empty;
+		}
+
+		// subscribe ShapeReplaced for every part currently in ObjectMap
+		void HookPartShapeReplacedEvents()
+		{
+			foreach( IObject obj in ObjectMap.Values ) {
+				if( obj is PartObject part ) {
+					part.ShapeReplaced += OnPartShapeReplaced;
+				}
+			}
+		}
+
+		void OnPartShapeReplaced()
+		{
+			NotifyPartGeometryChanged();
 		}
 
 		public Dictionary<string, IObject> ObjectMap
@@ -167,7 +265,7 @@ namespace MyCAM.Data
 		}
 
 		// add a new part shape to the existing data without clearing existing parts/paths
-		public void AddAdditionalPart( TopoDS_Shape newShape )
+		public void AddAdditionalPart( TopoDS_Shape newShape, PartRole role = PartRole.Workpiece )
 		{
 			if( newShape == null || newShape.IsNull() ) {
 				return;
@@ -182,7 +280,9 @@ namespace MyCAM.Data
 			List<string> newIDs = new List<string>( partShapeList.Count );
 			foreach( TopoDS_Shape partShape in partShapeList ) {
 				string szID = GetNewPartID( partShape );
-				ObjectMap[ szID ] = new PartObject( szID, partShape );
+				PartObject newPart = new PartObject( szID, partShape, role );
+				newPart.ShapeReplaced += OnPartShapeReplaced;
+				ObjectMap[ szID ] = newPart;
 				PartIDList.Add( szID );
 				newIDs.Add( szID );
 			}
@@ -196,7 +296,8 @@ namespace MyCAM.Data
 				return;
 			}
 			string szID = "Ref_" + GetNewPartID( newFeature );
-			PartObject newData = new PartObject( szID, newFeature );
+			PartObject newData = new PartObject( szID, newFeature, PartRole.Reference );
+			newData.ShapeReplaced += OnPartShapeReplaced;
 			ObjectMap[ szID ] = newData;
 			PartIDList.Add( szID );
 			RaiseFeatureAdded( new List<string>() { szID } );
@@ -372,6 +473,27 @@ namespace MyCAM.Data
 			ObjectMap.Remove( pathID );
 		}
 
+		// remove all parts of the given role (e.g. all support brackets); paths are untouched
+		public void RemovePartsByRole( PartRole role )
+		{
+			List<string> removedIDs = new List<string>();
+			foreach( string partID in PartIDList ) {
+				if( ObjectMap.TryGetValue( partID, out IObject obj )
+					&& obj is PartObject part
+					&& part.Role == role ) {
+					removedIDs.Add( partID );
+				}
+			}
+			if( removedIDs.Count == 0 ) {
+				return;
+			}
+			foreach( string partID in removedIDs ) {
+				PartIDList.Remove( partID );
+				ObjectMap.Remove( partID );
+			}
+			PartRemoved?.Invoke( removedIDs );
+		}
+
 		public ShapeIDsStruct GetShapeIDsForDTO()
 		{
 			return new ShapeIDsStruct()
@@ -410,6 +532,9 @@ namespace MyCAM.Data
 				return;
 			}
 
+			// whole part set is replaced: part geometry changed
+			NotifyPartSetRebuilt();
+
 			ResetShapeIDs();
 			ObjectMap.Clear();
 			PartIDList.Clear();
@@ -419,7 +544,9 @@ namespace MyCAM.Data
 			// add each part shape to the object map and part ID list
 			foreach( TopoDS_Shape partShape in partShapeList ) {
 				string szID = GetNewPartID( partShape );
-				ObjectMap[ szID ] = new PartObject( szID, partShape );
+				PartObject newPart = new PartObject( szID, partShape );
+				newPart.ShapeReplaced += OnPartShapeReplaced;
+				ObjectMap[ szID ] = newPart;
 				PartIDList.Add( szID );
 				partCount++;
 			}
@@ -558,5 +685,7 @@ namespace MyCAM.Data
 
 		// calibration data
 		CalibrationData m_CalibrationData = new CalibrationData();
+
+		SupportBracketShellRecord m_SupportBracketShellRecord = SupportBracketShellRecord.Empty;
 	}
 }

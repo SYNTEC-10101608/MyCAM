@@ -22,6 +22,7 @@
 	<Message ID="m_lblPinLength" Content="Connection Length (B)" />
 	<Message ID="m_lblSectionCrossFit" Content="Engagement Design" />
 	<Message ID="m_lblSectionBracketCount" Content="Base Connection Quantity" />
+	<Message ID="m_btnResetPositions" Content="Reset Position" />
 	<Message ID="m_lblSectionBottomPinSize" Content="Base Pin Size" />
 	<Message ID="m_btnBack" Content="Back" />
 	<Message ID="m_btnGenerate" Content="Generate" />
@@ -33,4 +34,6 @@
 	<Message ID="m_btnDeletePosition" Content="Delete" />
 	<Message ID="Warn_BelowMinimum" Content="{0} is below minimum {1}" />
 	<Message ID="Warn_AboveMaximum" Content="{0} exceeds maximum {1}" />
+	<Message ID="m_lblFilletRadius" Content="Fillet Radius" />
+	<Message ID="m_btnImportParams" Content="Import Parameters" />
 </ResMap>

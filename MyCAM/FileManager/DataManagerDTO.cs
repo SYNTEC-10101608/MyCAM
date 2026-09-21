@@ -66,6 +66,13 @@ namespace MyCAM.FileManager
 			set;
 		} = new CalibrationDataDTO();
 
+		// support bracket design params; null means never designed (backward compatible with old .sfa)
+		public SupportBracketParamsDTO SupportBracketParams
+		{
+			get;
+			set;
+		}
+
 		#endregion
 
 		// constructor for XmlSerializer
@@ -84,9 +91,11 @@ namespace MyCAM.FileManager
 			ToShapeIDDTO( dataManager.GetShapeIDsForDTO() );
 			ToEntryAndExitDataDTO( dataManager.EntryAndExitData );
 			ToPartCalibrationDataDTO( dataManager.CalibrationData );
+			dataManager.TryGetValidSupportBracketShell( out TopoDS_Shell bracketShell );
+			ToSupportBracketParamsDTO( dataManager.SupportBracketParams, bracketShell );
 		}
 
-		internal void DataMgrDTO2Data( out Dictionary<string, IObject> objectDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData, out CalibrationData calibrationData )
+		internal void DataMgrDTO2Data( out Dictionary<string, IObject> objectDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData, out CalibrationData calibrationData, out SupportBracketData supportBracketParams, out TopoDS_Shell bracketShell )
 		{
 			objectDataMap = ObjectMapDTOToObjectMap();
 			partIDList = PartIDListDTOToPartList();
@@ -94,6 +103,23 @@ namespace MyCAM.FileManager
 			shapeIDs = ShapeIDDTOToShapeIDStruct();
 			entryAndExitData = EntryAndExitDTOToEntryAndExitData();
 			calibrationData = PartCalibrationDTOToCalibrationData();
+			supportBracketParams = SupportBracketParamsDTOToParams();
+			bracketShell = SupportBracketParams?.GetInputShell();
+		}
+
+		// only a valid shell is passed in, so it can be persisted as is
+		void ToSupportBracketParamsDTO( SupportBracketData parameters, TopoDS_Shell inputShell )
+		{
+			if( parameters == null ) {
+				SupportBracketParams = null;
+				return;
+			}
+			SupportBracketParams = new SupportBracketParamsDTO( parameters, inputShell );
+		}
+
+		SupportBracketData SupportBracketParamsDTOToParams()
+		{
+			return SupportBracketParams?.ToData();
 		}
 
 		#region Generate DTO
@@ -297,6 +323,12 @@ namespace MyCAM.FileManager
 			get; set;
 		}
 
+		// nullable so that old project files without this field fall back to Workpiece
+		public PartRole? Role
+		{
+			get; set;
+		}
+
 		// constructor for XmlSerializer
 		internal PartObjectDTO()
 		{
@@ -311,6 +343,7 @@ namespace MyCAM.FileManager
 			UID = partData.UID;
 			Shape = new TopoShapeDTO( partData.Shape );
 			ObjectType = ObjectType.Part;
+			Role = partData.Role;
 		}
 
 		// DTO → PartData
@@ -321,7 +354,7 @@ namespace MyCAM.FileManager
 				throw new ArgumentNullException( "PartData deserialization failed." );
 			}
 			TopoDS_Shape topoShape = TopoShapeDTO.BRepStringToShape( Shape.TopoShapeBRepData );
-			return new PartObject( UID, topoShape );
+			return new PartObject( UID, topoShape, Role ?? PartRole.Workpiece );
 		}
 	}
 

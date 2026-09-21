@@ -22,6 +22,7 @@
   <Message ID="m_lblPinLength" Content="拼接長度(B)" />
   <Message ID="m_lblSectionCrossFit" Content="咬合設計" />
   <Message ID="m_lblSectionBracketCount" Content="底部拼接數量" />
+  <Message ID="m_btnResetPositions" Content="重設位置" />
   <Message ID="m_lblSectionBottomPinSize" Content="底部插腳尺寸" />
   <Message ID="m_btnBack" Content="上一步" />
   <Message ID="m_btnGenerate" Content="產生" />
@@ -33,4 +34,6 @@
   <Message ID="m_btnDeletePosition" Content="刪除" />
   <Message ID="Warn_BelowMinimum" Content="{0} 小於最小值 {1}" />
   <Message ID="Warn_AboveMaximum" Content="{0} 大於最大值 {1}" />
+  <Message ID="m_lblFilletRadius" Content="導圓角半徑" />
+  <Message ID="m_btnImportParams" Content="匯入參數" />
 </ResMap>

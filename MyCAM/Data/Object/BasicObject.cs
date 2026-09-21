@@ -2,6 +2,7 @@
 using OCC.gp;
 using OCC.TopoDS;
 using OCCTool;
+using System;
 using System.Collections.Generic;
 
 namespace MyCAM.Data
@@ -39,10 +40,14 @@ namespace MyCAM.Data
 
 	public class PartObject : IObject, IShapeObject, ITransformableObject, ISewableObject
 	{
-		public PartObject( string szUID, TopoDS_Shape shape )
+		// raised after Shape has been replaced by a new geometric object (transform / sew)
+		public event Action ShapeReplaced;
+
+		public PartObject( string szUID, TopoDS_Shape shape, PartRole role = PartRole.Workpiece )
 		{
 			UID = szUID;
 			Shape = shape;
+			Role = role;
 		}
 
 		public string UID
@@ -51,6 +56,11 @@ namespace MyCAM.Data
 		}
 
 		public TopoDS_Shape Shape
+		{
+			get; private set;
+		}
+
+		public PartRole Role
 		{
 			get; private set;
 		}
@@ -70,6 +80,7 @@ namespace MyCAM.Data
 				return;
 			}
 			Shape = result;
+			ShapeReplaced?.Invoke();
 		}
 
 		public virtual void DoTransform( gp_Trsf transform )
@@ -79,6 +90,7 @@ namespace MyCAM.Data
 				return;
 			}
 			Shape = shapeTransform.Shape();
+			ShapeReplaced?.Invoke();
 		}
 	}
 
@@ -157,5 +169,12 @@ namespace MyCAM.Data
 		Square = 5,
 		Pentagon = 6,
 		Hexagon = 7,
+	}
+
+	public enum PartRole
+	{
+		Workpiece = 0,
+		Support = 1,
+		Reference = 2,
 	}
 }
