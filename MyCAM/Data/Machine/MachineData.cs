@@ -36,6 +36,31 @@ namespace MyCAM.Data
 		}
 	}
 
+	// the rotary axis information of a five-axis machine, derived from FiveAxisMachineData
+	public class RotaryAxisConfig
+	{
+		// the one can be flipped by +-180
+		public string RotaryAxisName
+		{
+			get; set;
+		}
+
+		public string MasterName
+		{
+			get; set;
+		}
+
+		public string SlaveName
+		{
+			get; set;
+		}
+
+		public RotaryAxis RotaryAxisType
+		{
+			get; set;
+		}
+	}
+
 	// abstract base holding only shared machine info across products (five-axis / articulated robot)
 	public abstract class IMachineDataBase
 	{
@@ -203,7 +228,6 @@ namespace MyCAM.Data
 			get; set;
 		}
 
-
 		// to show A/B/C axis in the UI or NC file
 		public RotaryAxis MasterRotaryAxis
 		{
@@ -213,6 +237,28 @@ namespace MyCAM.Data
 		public RotaryAxis SlaveRotaryAxis
 		{
 			get; set;
+		}
+
+		// the tube axial direction, falls back to the rotary axis when the machine file does not assign it
+		public RotaryAxis TubeDir
+		{
+			get; set;
+		} = RotaryAxis.Z;
+
+		// the rotary axis naming info used by the UI and the NC file
+		public RotaryAxisConfig RotaryAxisConfig
+		{
+			get
+			{
+				RotaryAxis rotaryAxis = RotaryAxisType;
+				return new RotaryAxisConfig
+				{
+					MasterName = RotaryAxisHelper.ConvertRotaryAxisName( MasterRotaryAxis ),
+					SlaveName = RotaryAxisHelper.ConvertRotaryAxisName( SlaveRotaryAxis ),
+					RotaryAxisType = rotaryAxis,
+					RotaryAxisName = RotaryAxisHelper.ConvertRotaryAxisName( rotaryAxis ),
+				};
+			}
 		}
 
 		public RotateAxisDef MasterAxis
@@ -281,10 +327,13 @@ namespace MyCAM.Data
 				slaveStart_deg, slaveEnd_deg, slaveRotaryDirection );
 		}
 
-		// compute the rotate center used to init MasterAxis / SlaveAxis ( from each machine type's own vectors )
-		protected abstract gp_Pnt GetMasterRotateCenter();
-
-		protected abstract gp_Pnt GetSlaveRotateCenter();
+		// file do not assign TubeDir, use the rotary axis as the tube direction
+		public void InitTubeDir()
+		{
+			if( TubeDir == RotaryAxis.None ) {
+				TubeDir = RotaryAxisType;
+			}
+		}
 
 		public override bool NeedBuildDefaultTree()
 		{
@@ -313,6 +362,25 @@ namespace MyCAM.Data
 			return isValid == false;
 		}
 
+		// build the default tree based on the five-axis machine type
+		public override MachineTreeNode BuildDefaultTree()
+		{
+			switch( FiveAxisType ) {
+				case FiveAxisType.Table:
+					return BuildTree( SimuData.TreeData.DefaultTableTreeDef );
+				case FiveAxisType.Mix:
+					return BuildTree( SimuData.TreeData.DefaultMixTreeDef );
+				case FiveAxisType.Spindle:
+				default:
+					return BuildTree( SimuData.TreeData.DefaultSpindleTreeDef );
+			}
+		}
+
+		// compute the rotate center used to init MasterAxis / SlaveAxis ( from each machine type's own vectors )
+		protected abstract gp_Pnt GetMasterRotateCenter();
+
+		protected abstract gp_Pnt GetSlaveRotateCenter();
+
 		// walk a single non-branching chain and return its end leaf type
 		MachineComponentType GetSingleChainLeaf( MachineTreeNode node )
 		{
@@ -339,17 +407,14 @@ namespace MyCAM.Data
 			return leaf;
 		}
 
-		// build the default tree based on the five-axis machine type
-		public override MachineTreeNode BuildDefaultTree()
+		// the axis that can be flipped by +-180, table and mix type are driven by the slave one
+		RotaryAxis RotaryAxisType
 		{
-			switch( FiveAxisType ) {
-				case FiveAxisType.Table:
-					return BuildTree( SimuData.TreeData.DefaultTableTreeDef );
-				case FiveAxisType.Mix:
-					return BuildTree( SimuData.TreeData.DefaultMixTreeDef );
-				case FiveAxisType.Spindle:
-				default:
-					return BuildTree( SimuData.TreeData.DefaultSpindleTreeDef );
+			get
+			{
+				return ( FiveAxisType == FiveAxisType.Table || FiveAxisType == FiveAxisType.Mix )
+					? SlaveRotaryAxis
+					: MasterRotaryAxis;
 			}
 		}
 

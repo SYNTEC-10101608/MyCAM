@@ -84,6 +84,12 @@ namespace MyCAM.FileManager
 			get; set;
 		} = new RotaryAxis();
 
+		// None means the machine file does not assign it, the rotary axis is used instead
+		public RotaryAxis TubeDir
+		{
+			get; set;
+		} = RotaryAxis.None;
+
 		public RotaryDirection MasterRotaryDirection
 		{
 			get; set;
@@ -155,6 +161,7 @@ namespace MyCAM.FileManager
 			ToolDirection = data.ToolDirection;
 			MasterRotaryAxis = data.MasterRotaryAxis;
 			SlaveRotaryAxis = data.SlaveRotaryAxis;
+			TubeDir = data.TubeDir;
 			MasterRotaryDirection = data.MasterAxis != null ? data.MasterAxis.RotaryDirection : RotaryDirection.None;
 			SlaveRotaryDirection = data.SlaveAxis != null ? data.SlaveAxis.RotaryDirection : RotaryDirection.None;
 			MasterTiltedVec_deg = new gp_XYZDTO( data.MasterTiltedVec_deg );
@@ -210,8 +217,12 @@ namespace MyCAM.FileManager
 				FullMachineSimulation = FullMachineSimulation,
 				ToolLength = ToolLength,
 				ToolToSlaveVec = ToolToSlaveVec.ToVec(),
-				SlaveToMasterVec = SlaveToMasterVec.ToVec()
+				SlaveToMasterVec = SlaveToMasterVec.ToVec(),
+				TubeDir = TubeDir
 			};
+
+			// the machine file may not assign the tube direction
+			spindleTypeData.InitTubeDir();
 
 			// cal rotate center by itself
 			spindleTypeData.InitRotateAxes(
@@ -263,8 +274,12 @@ namespace MyCAM.FileManager
 				FullMachineSimulation = FullMachineSimulation,
 				ToolLength = ToolLength,
 				MasterToSlaveVec = MasterToSlaveVec.ToVec(),
-				MCSToMasterVec = MCSToMasterVec.ToVec()
+				MCSToMasterVec = MCSToMasterVec.ToVec(),
+				TubeDir = TubeDir
 			};
+
+			// the machine file may not assign the tube direction
+			tableTypeData.InitTubeDir();
 
 			// cal rotate center by itself
 			tableTypeData.InitRotateAxes(
@@ -316,8 +331,12 @@ namespace MyCAM.FileManager
 				FullMachineSimulation = FullMachineSimulation,
 				ToolLength = ToolLength,
 				ToolToMasterVec = ToolToMasterVec.ToVec(),
-				MCSToSlaveVec = MCSToSlaveVec.ToVec()
+				MCSToSlaveVec = MCSToSlaveVec.ToVec(),
+				TubeDir = TubeDir
 			};
+
+			// the machine file may not assign the tube direction
+			mixTypeData.InitTubeDir();
 
 			// cal rotate center by itself
 			mixTypeData.InitRotateAxes(

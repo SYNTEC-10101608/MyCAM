@@ -1,33 +1,12 @@
 using MyCAM.Data;
-using MyCAM.Editor;
 using OCC.gp;
+using OCCTool;
 using System;
 
 namespace MyCAM.Helper
 {
 	public static class RotaryAxisHelper
 	{
-		public static RotaryAxisConfig CreateRotaryAxisConfig( FiveAxisMachineData machineData )
-		{
-			RotaryAxisConfig config = new RotaryAxisConfig();
-			config.MasterName = ConvertRotaryAxisName( machineData.MasterRotaryAxis );
-			config.SlaveName = ConvertRotaryAxisName( machineData.SlaveRotaryAxis );
-			config.RotaryAxisType = GetRotaryAxis( machineData );
-			config.RotaryAxisName = ConvertRotaryAxisName( config.RotaryAxisType );
-			return config;
-		}
-
-		// the axis that can be flipped by +-180, table and mix type are driven by the slave one
-		public static RotaryAxis GetRotaryAxis( FiveAxisMachineData machineData )
-		{
-			if( machineData == null ) {
-				return RotaryAxis.Z;
-			}
-			return ( machineData.FiveAxisType == FiveAxisType.Table || machineData.FiveAxisType == FiveAxisType.Mix )
-				? machineData.SlaveRotaryAxis
-				: machineData.MasterRotaryAxis;
-		}
-
 		public static string ConvertRotaryAxisName( RotaryAxis axis )
 		{
 			switch( axis ) {
@@ -57,18 +36,24 @@ namespace MyCAM.Helper
 			}
 		}
 
+		// the linear direction the rotary axis points to, None falls back to Z
 		public static gp_Dir GetRotaryAxisDir( RotaryAxis axis )
 		{
 			return RotateAxisDef.RotaryAxisToDir( axis );
 		}
 
-		// the rotary axis that the ZDir type actually faces, falls back to Z when machine data is absent
-		public static gp_Dir GetRotaryAxisDir()
+		// map the machine rotary axis to the geometry align axis used by OCCTool, None falls back to Z
+		public static EAlignAxis ConvertToAlignAxis( RotaryAxis axis )
 		{
-			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
-				return new gp_Dir( 0, 0, 1 );
+			switch( axis ) {
+				case RotaryAxis.X:
+					return EAlignAxis.X;
+				case RotaryAxis.Y:
+					return EAlignAxis.Y;
+				case RotaryAxis.Z:
+				default:
+					return EAlignAxis.Z;
 			}
-			return RotateAxisDef.RotaryAxisToDir( GetRotaryAxis( machineData ) );
 		}
 
 		// the phase angle of a point around the rotary axis, measured with the left hand rule as the machine does

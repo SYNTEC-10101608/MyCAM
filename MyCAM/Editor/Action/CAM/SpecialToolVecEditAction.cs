@@ -50,7 +50,7 @@ namespace MyCAM.Editor
 				End();
 				return;
 			}
-			m_RotaryAxisConfig = RotaryAxisHelper.CreateRotaryAxisConfig( m_MachineData );
+			m_RotaryAxisConfig = m_MachineData.RotaryAxisConfig;
 
 			// subscribe to path selection changes
 			m_Dlg = new SpecialToolVecEditDlg( m_RotaryAxisConfig );

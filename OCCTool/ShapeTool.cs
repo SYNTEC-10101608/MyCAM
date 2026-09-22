@@ -42,7 +42,8 @@ namespace OCCTool
 			return compound;
 		}
 
-		public static bool FlipShapeUpsideDown( TopoDS_Shape shape, out TopoDS_Shape flippedShape, out gp_Trsf trsf, gp_Pnt rotationCenter = null )
+		// rotate 180 degrees around a direction perpendicular to axis, so the shape is flipped along axis
+		public static bool FlipShapeAlongAxis( TopoDS_Shape shape, EAlignAxis axis, out TopoDS_Shape flippedShape, out gp_Trsf trsf, gp_Pnt rotationCenter = null )
 		{
 			flippedShape = null;
 			trsf = new gp_Trsf();
@@ -55,9 +56,10 @@ namespace OCCTool
 					rotationCenter = new gp_Pnt( 0, 0, 0 );
 				}
 
-				// rotate 180 degrees around X-axis
-				gp_Ax1 xAxis = new gp_Ax1( rotationCenter, new gp_Dir( 1, 0, 0 ) );
-				trsf.SetRotation( xAxis, Math.PI );
+				// rotate 180 degrees around the first radial direction of the given axis
+				GetRadialDirs( axis, out gp_Dir radialDir1, out _ );
+				gp_Ax1 flipAxis = new gp_Ax1( rotationCenter, radialDir1 );
+				trsf.SetRotation( flipAxis, Math.PI );
 				BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( shape, trsf, true );
 				if( !transform.IsDone() ) {
 					return false;
@@ -70,7 +72,9 @@ namespace OCCTool
 			}
 		}
 
-		public static bool MoveShapeBottomToZ0( TopoDS_Shape shape, out TopoDS_Shape movedShape, out gp_Trsf trsf )
+		// move the lowest point along the given axis onto the plane passing through the origin,
+		// the position on the other two directions is kept unchanged
+		public static bool MoveShapeBottomToAxisZero( TopoDS_Shape shape, EAlignAxis axis, out TopoDS_Shape movedShape, out gp_Trsf trsf )
 		{
 			movedShape = null;
 			trsf = new gp_Trsf();
@@ -80,7 +84,7 @@ namespace OCCTool
 					return false;
 				}
 
-				// step 1: get bounding box and find minimum Z
+				// step 1: get bounding box
 				Bnd_Box bbox = new Bnd_Box();
 				BRepBndLib.AddOptimal( shape, ref bbox );
 
@@ -91,8 +95,19 @@ namespace OCCTool
 				double xmin = 0, ymin = 0, zmin = 0, xmax = 0, ymax = 0, zmax = 0;
 				bbox.Get( ref xmin, ref ymin, ref zmin, ref xmax, ref ymax, ref zmax );
 
-				// step 2: create translation vector to move minimum Z to 0
-				gp_Vec translation = new gp_Vec( 0, 0, -zmin );
+				// step 2: create translation vector to move the minimum of the given axis to 0
+				gp_Vec translation;
+				switch( axis ) {
+					case EAlignAxis.X:
+						translation = new gp_Vec( -xmin, 0, 0 );
+						break;
+					case EAlignAxis.Y:
+						translation = new gp_Vec( 0, -ymin, 0 );
+						break;
+					default:
+						translation = new gp_Vec( 0, 0, -zmin );
+						break;
+				}
 
 				// step 3: apply translation
 				trsf.SetTranslation( translation );
@@ -108,12 +123,41 @@ namespace OCCTool
 			}
 		}
 
-		public static bool AlignOBBToXYAxes( TopoDS_Shape shape, out TopoDS_Shape alignedShape )
+		// the two radial directions perpendicular to axis,
+		// radialDir1 x radialDir2 = axis direction, so the frame stays right handed
+		public static void GetRadialDirs( EAlignAxis axis, out gp_Dir radialDir1, out gp_Dir radialDir2 )
 		{
-			return AlignOBBToXYAxes( shape, out alignedShape, out _ );
+			switch( axis ) {
+				case EAlignAxis.X:
+					radialDir1 = new gp_Dir( 0, 1, 0 );
+					radialDir2 = new gp_Dir( 0, 0, 1 );
+					break;
+				case EAlignAxis.Y:
+					radialDir1 = new gp_Dir( 0, 0, 1 );
+					radialDir2 = new gp_Dir( 1, 0, 0 );
+					break;
+				default:
+					radialDir1 = new gp_Dir( 1, 0, 0 );
+					radialDir2 = new gp_Dir( 0, 1, 0 );
+					break;
+			}
 		}
 
-		public static bool AlignOBBToXYAxes( TopoDS_Shape shape, out TopoDS_Shape alignedShape, out gp_Trsf trsf )
+		// the direction of the given axis
+		public static gp_Dir GetAxisDir( EAlignAxis axis )
+		{
+			switch( axis ) {
+				case EAlignAxis.X:
+					return new gp_Dir( 1, 0, 0 );
+				case EAlignAxis.Y:
+					return new gp_Dir( 0, 1, 0 );
+				default:
+					return new gp_Dir( 0, 0, 1 );
+			}
+		}
+
+		// make the OBB edge line completely perpendicular to the axis
+		public static bool AlignOBBToRadialAxes( TopoDS_Shape shape, EAlignAxis axis, out TopoDS_Shape alignedShape, out gp_Trsf trsf )
 		{
 			alignedShape = null;
 			trsf = new gp_Trsf();
@@ -131,18 +175,28 @@ namespace OCCTool
 					return false;
 				}
 
-				// Step 2: Get OBB X direction (principal axis)
+				// Step 2: Get OBB principal direction
 				gp_XYZ xDirectionXYZ = obb.XDirection();
 				gp_Dir xDirection = new gp_Dir( xDirectionXYZ );
 
-				// Step 3: Calculate rotation angle to align X direction to coordinate X axis
-				// atan2(y, x) returns the angle between the vector and X axis
-				double angle = Math.Atan2( xDirection.Y(), xDirection.X() );
+				// Step 3: Project the OBB onto the two radial directions
+				GetRadialDirs( axis, out gp_Dir radialDir1, out gp_Dir radialDir2 );
+				double radialComponent1 = xDirection.Dot( radialDir1 );
+				double radialComponent2 = xDirection.Dot( radialDir2 );
 
-				// Step 4: Rotate around Z-axis at origin by -angle to align OBB X direction to coordinate X axis
-				gp_Ax1 zAxisAtOrigin = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
+				// the projection is too short to give a stable angle, keep the shape as it is
+				if( Math.Sqrt( radialComponent1 * radialComponent1 + radialComponent2 * radialComponent2 ) < RADIAL_PROJECTION_Threshold ) {
+					alignedShape = shape;
+					return true;
+				}
 
-				trsf.SetRotation( zAxisAtOrigin, -angle );
+				// cal the angle between the projected vector and the first radial direction	
+				double angle = Math.Atan2( radialComponent2, radialComponent1 );
+
+				// Step 4: Rotate around the given axis at origin by -angle
+				gp_Ax1 axisAtOrigin = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), GetAxisDir( axis ) );
+
+				trsf.SetRotation( axisAtOrigin, -angle );
 
 				// Step 5: Apply transformation
 				BRepBuilderAPI_Transform transform = new BRepBuilderAPI_Transform( shape, trsf, true );
@@ -159,84 +213,8 @@ namespace OCCTool
 			}
 		}
 
-		public static bool AlignOBBToXYAxesKeepAxisCentered( TopoDS_Shape shape, out TopoDS_Shape alignedShape )
-		{
-			alignedShape = null;
-
-			try {
-				if( shape == null || shape.IsNull() ) {
-					return false;
-				}
-
-				// Step 1: Calculate OBB
-				Bnd_OBB obb = new Bnd_OBB();
-				BRepBndLib.AddOBB( shape, ref obb, true, true, true );
-
-				if( obb.IsVoid() ) {
-					return false;
-				}
-
-				// Step 2: Get OBB X direction (principal axis)
-				gp_XYZ xDirectionXYZ = obb.XDirection();
-				gp_Dir xDirection = new gp_Dir( xDirectionXYZ );
-
-				// Step 3: Calculate rotation angle to align X direction to coordinate X axis
-				// Project OBB X-direction onto XY plane and calculate angle
-				double angle = Math.Atan2( xDirection.Y(), xDirection.X() );
-
-				// Step 4: Rotate around Z-axis at ORIGIN (0,0,0), not OBB center
-				// This keeps the revolution axis at (0,0,z)
-				gp_Ax1 zAxisAtOrigin = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) );
-
-				gp_Trsf rotationTrsf = new gp_Trsf();
-				rotationTrsf.SetRotation( zAxisAtOrigin, -angle );
-
-				// Step 5: Apply rotation
-				BRepBuilderAPI_Transform transform1 = new BRepBuilderAPI_Transform( shape, rotationTrsf, true );
-
-				if( !transform1.IsDone() ) {
-					return false;
-				}
-
-				TopoDS_Shape rotatedShape = transform1.Shape();
-
-				// Step 6: Re-center to (0,0) in case rotation caused slight drift
-				// Calculate bounding box to find current center
-				Bnd_Box bbox = new Bnd_Box();
-				BRepBndLib.AddOptimal( rotatedShape, ref bbox );
-
-				if( bbox.IsVoid() ) {
-					alignedShape = rotatedShape;
-					return true;
-				}
-
-				double xmin = 0, ymin = 0, zmin = 0, xmax = 0, ymax = 0, zmax = 0;
-				bbox.Get( ref xmin, ref ymin, ref zmin, ref xmax, ref ymax, ref zmax );
-
-				// Calculate XY center
-				double xCenter = ( xmin + xmax ) / 2.0;
-				double yCenter = ( ymin + ymax ) / 2.0;
-
-				// Step 7: Translate to center XY at origin (keep Z unchanged)
-				gp_Vec recenterVec = new gp_Vec( -xCenter, -yCenter, 0 );
-				gp_Trsf recenterTrsf = new gp_Trsf();
-				recenterTrsf.SetTranslation( recenterVec );
-
-				BRepBuilderAPI_Transform transform2 = new BRepBuilderAPI_Transform( rotatedShape, recenterTrsf, true );
-
-				if( !transform2.IsDone() ) {
-					alignedShape = rotatedShape;
-					return true;
-				}
-
-				alignedShape = transform2.Shape();
-				return true;
-			}
-			catch {
-				return false;
-			}
-		}
-
+		// minimum radial projection length that gives a stable angle
+		const double RADIAL_PROJECTION_Threshold = 1e-3;
 	}
 
 

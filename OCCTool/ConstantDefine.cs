@@ -27,4 +27,12 @@
 		Cuboid = 2,
 		FaceAndWireFrame = 3,
 	}
+
+	// target axis a shape should be aligned to
+	public enum EAlignAxis
+	{
+		X,
+		Y,
+		Z,
+	}
 }

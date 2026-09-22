@@ -130,7 +130,7 @@ namespace MyCAM.Helper
 			};
 		}
 
-		public static bool TubeStrategies( BoundingBox bbox, out gp_Pnt bboxCenter, out List<gp_Ax1> stretchedStrategies )
+		public static bool TubeStrategies( BoundingBox bbox, EAlignAxis axis, out gp_Pnt bboxCenter, out List<gp_Ax1> stretchedStrategies )
 		{
 			stretchedStrategies = new List<gp_Ax1>();
 			bboxCenter = null;
@@ -139,19 +139,22 @@ namespace MyCAM.Helper
 			}
 			bboxCenter = new gp_Pnt( bbox.XCenter, bbox.YCenter, bbox.ZCenter );
 
-			// Build strategies along +X then +Y, interleaved by priority
-			// (center along X, center along Y, then corner midpoints for both)
-			List<gp_Ax1> strategiesX = GeometryTool.BuildRayAxesFromBBox( new gp_Dir( 1, 0, 0 ), bbox );
-			List<gp_Ax1> strategiesY = GeometryTool.BuildRayAxesFromBBox( new gp_Dir( 0, 1, 0 ), bbox );
+			// Build strategies along the two radial directions of the revolution axis, interleaved by priority
+			// (center along the first radial dir, center along the second one, then corner midpoints for both)
+			ShapeTool.GetRadialDirs( axis, out gp_Dir radialDir1, out gp_Dir radialDir2 );
+			List<gp_Ax1> strategiesRadial1 = GeometryTool.BuildRayAxesFromBBox( radialDir1, bbox );
+			List<gp_Ax1> strategiesRadial2 = GeometryTool.BuildRayAxesFromBBox( radialDir2, bbox );
+			if( strategiesRadial1.Count == 0 && strategiesRadial2.Count == 0 ) {
+				return false;
+			}
 
-			stretchedStrategies = new List<gp_Ax1>();
-			int maxCount = Math.Max( strategiesX.Count, strategiesY.Count );
+			int maxCount = Math.Max( strategiesRadial1.Count, strategiesRadial2.Count );
 			for( int i = 0; i < maxCount; i++ ) {
-				if( i < strategiesX.Count ) {
-					stretchedStrategies.Add( strategiesX[ i ] );
+				if( i < strategiesRadial1.Count ) {
+					stretchedStrategies.Add( strategiesRadial1[ i ] );
 				}
-				if( i < strategiesY.Count ) {
-					stretchedStrategies.Add( strategiesY[ i ] );
+				if( i < strategiesRadial2.Count ) {
+					stretchedStrategies.Add( strategiesRadial2[ i ] );
 				}
 			}
 			return true;

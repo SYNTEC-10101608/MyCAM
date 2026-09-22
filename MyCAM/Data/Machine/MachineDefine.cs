@@ -114,5 +114,6 @@
 		public const string SIMULATION_OFFSET_Y = "Simulation_Offset_Y";
 		public const string SIMULATION_OFFSET_Z = "Simulation_Offset_Z";
 		public const string FULL_MACHINE_SIMULATION = "Full_Machine_Simulation";
+		public const string TUBE_DIR = "Tube_Dir";
 	}
 }

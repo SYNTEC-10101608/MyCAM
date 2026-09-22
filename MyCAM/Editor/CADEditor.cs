@@ -275,14 +275,19 @@ namespace MyCAM.Editor
 
 		public void ImportTube( TopoDS_Shape tubeShape )
 		{
-			// rotate the tube around X+ by 90deg to make a Z+ direction
-			gp_Ax1 rotationAxis = new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 1, 0, 0 ) );
-			gp_Trsf rotation = new gp_Trsf();
-			rotation.SetRotation( rotationAxis, Math.PI / 2 );
-			BRepBuilderAPI_Transform transformer = new BRepBuilderAPI_Transform( tubeShape, rotation );
-			tubeShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { transformer.Shape() } );
+			// stop current action
+			EndActionIfNotDefault();
+			tubeShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { tubeShape } );
 			m_DataManager.AddPart( tubeShape );
-			RaiseFileImported?.Invoke( true, null );
+
+			// place it by the machine tube direction and build the paths, the same way the ring part import does
+			PlaceRingShapeAction action = new PlaceRingShapeAction( m_DataManager, m_Viewer, m_ViewManager, tubeShape );
+			action.ActionCompleted += () =>
+			{
+				m_DefaultAction.ClearSelection();
+				RaiseFileImported?.Invoke( action.IsImportSuccess, action.ImportedFileName );
+			};
+			StartEditAction( action );
 		}
 
 		// manager events

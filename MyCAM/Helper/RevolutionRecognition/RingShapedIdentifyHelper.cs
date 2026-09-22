@@ -17,7 +17,7 @@ namespace MyCAM.Helper
 {
 	internal static class RingShapedIdentifyHelper
 	{
-		public static bool ComputeRevolutionToG54Transform( TopoDS_Shape oneShape, out gp_Trsf accumulatedTrsf )
+		public static bool ComputeRevolutionToG54Transform( TopoDS_Shape oneShape, out gp_Trsf accumulatedTrsf, EAlignAxis targetAxis )
 		{
 			accumulatedTrsf = new gp_Trsf();
 			bool isSuccess = GetRevolutionDirAndCenter( oneShape, out gp_Dir axisDir, out gp_Pnt centerPnt, out bool isFittingByCircle );
@@ -26,17 +26,17 @@ namespace MyCAM.Helper
 				return false;
 			}
 
-			// Step 1: Align axis to Z and center to XY
-			bool isDone = AlignAxisToZAndCenterXYWithTransform( oneShape, axisDir, centerPnt, out TopoDS_Shape shape, out gp_Trsf trsf1 );
+			// Step 1: Align axis to the target axis and center to the target plane
+			bool isDone = AlignAxisToTargetAndCenterWithTransform( oneShape, axisDir, centerPnt, targetAxis, out TopoDS_Shape shape, out gp_Trsf trsf1 );
 			if( !isDone ) {
 				return false;
 			}
 			accumulatedTrsf = trsf1;
 
 			// Step 2: Check if need to flip upside down
-			bool isSliceDone = AnalyzeRevolutionShapeTaper( shape, out bool isTopWiderThanBottom );
+			bool isSliceDone = AnalyzeRevolutionShapeTaper( shape, targetAxis, out bool isTopWiderThanBottom );
 			if( isSliceDone && isTopWiderThanBottom ) {
-				if( ShapeTool.FlipShapeUpsideDown( shape, out TopoDS_Shape flippedShape, out gp_Trsf trsf2, null ) ) {
+				if( ShapeTool.FlipShapeAlongAxis( shape, targetAxis, out TopoDS_Shape flippedShape, out gp_Trsf trsf2, null ) ) {
 					if( flippedShape != null ) {
 						shape = flippedShape;
 						accumulatedTrsf = trsf2.Multiplied( accumulatedTrsf );
@@ -44,15 +44,15 @@ namespace MyCAM.Helper
 				}
 			}
 
-			// Step 3: Move bottom to Z=0
-			if( ShapeTool.MoveShapeBottomToZ0( shape, out TopoDS_Shape MovedShape, out gp_Trsf trsf3 ) ) {
+			// Step 3: Move bottom to the zero plane of the target axis
+			if( ShapeTool.MoveShapeBottomToAxisZero( shape, targetAxis, out TopoDS_Shape MovedShape, out gp_Trsf trsf3 ) ) {
 				shape = MovedShape;
 				accumulatedTrsf = trsf3.Multiplied( accumulatedTrsf );
 			}
 
-			// Step 4: Align OBB to XY axes if not fitting by circle
+			// Step 4: Align OBB to the radial axes if not fitting by circle
 			if( isFittingByCircle == false ) {
-				if( ShapeTool.AlignOBBToXYAxes( shape, out _, out gp_Trsf trsf4 ) ) {
+				if( ShapeTool.AlignOBBToRadialAxes( shape, targetAxis, out _, out gp_Trsf trsf4 ) ) {
 					accumulatedTrsf = trsf4.Multiplied( accumulatedTrsf );
 				}
 			}
@@ -76,7 +76,7 @@ namespace MyCAM.Helper
 			List<TopoDS_Wire> wireOrderList = new List<TopoDS_Wire>();
 
 			bool bGetDirSuccess = GetRevolutionDirSuccess( partShape, out axisDir, out TopoDS_Wire majorWire, out wireOrderList, out isFittingByCircle, out gp_Pnt circleCenter );
-			if( !bGetDirSuccess ) {
+			if( !bGetDirSuccess || axisDir == null ) {
 				return false;
 			}
 
@@ -84,16 +84,13 @@ namespace MyCAM.Helper
 				centerPnt = circleCenter;
 				return true;
 			}
-			TopoDS_Wire minerWire = new TopoDS_Wire();
-			if( wireOrderList != null && wireOrderList.Count > 1 ) {
-				minerWire = wireOrderList[ 1 ];
+			if( wireOrderList == null || wireOrderList.Count == 0 ) {
+				return false;
 			}
-			else {
-				minerWire = wireOrderList.First();
-			}
+			TopoDS_Wire minerWire = wireOrderList.Count > 1 ? wireOrderList[ 1 ] : wireOrderList.First();
 
 			bool isGetCenterSuccess = FindRevolutionCenter( majorWire, minerWire, axisDir, out centerPnt, out isFittingByCircle );
-			if( isGetCenterSuccess == false ) {
+			if( isGetCenterSuccess == false || centerPnt == null ) {
 				return false;
 			}
 			return true;
@@ -272,11 +269,13 @@ namespace MyCAM.Helper
 
 			List<List<TopoDS_Face>> D1ContFaceList = new List<List<TopoDS_Face>>();
 			// try to find the outer face by using the extreme face
-			while( nUnCheckedExtermeFaceCount > 0 ) {
+			while( nUnCheckedExtermeFaceCount > 0 && extremeFaceList.Count > 0 ) {
 				TopoDS_Face face = extremeFaceList.First();
 
-				// protection
-				if( face.IsNull() || face == null ) {
+				// protection, this face can never be used as a start face
+				if( face == null || face.IsNull() ) {
+					extremeFaceList.RemoveAt( 0 );
+					nUnCheckedExtermeFaceCount--;
 					continue;
 				}
 
@@ -287,13 +286,24 @@ namespace MyCAM.Helper
 				if( isGetOuterFaceSuccess && isClosedShell ) {
 					colsedShellList.Add( closedShell );
 				}
+
 				// because these D1ContinueFace can't get closed outer face, so if extremeface list include some face of this must be removed
-				foreach( TopoDS_Face faceInG1List in D1ContinueFace ) {
-					TopoDS_Face matchedFace = extremeFaceList.FirstOrDefault( extremeface => extremeface.IsEqual( faceInG1List ) );
-					if( matchedFace != null ) {
-						extremeFaceList.Remove( matchedFace );
-						nUnCheckedExtermeFaceCount--;
+				int nRemovedCount = 0;
+				if( D1ContinueFace != null ) {
+					foreach( TopoDS_Face faceInG1List in D1ContinueFace ) {
+						TopoDS_Face matchedFace = extremeFaceList.FirstOrDefault( extremeface => extremeface.IsEqual( faceInG1List ) );
+						if( matchedFace != null ) {
+							extremeFaceList.Remove( matchedFace );
+							nUnCheckedExtermeFaceCount--;
+							nRemovedCount++;
+						}
 					}
+				}
+
+				// the start face is not removed, drop it to avoid infinite loop
+				if( nRemovedCount == 0 ) {
+					extremeFaceList.RemoveAt( 0 );
+					nUnCheckedExtermeFaceCount--;
 				}
 			}
 			if( colsedShellList.Count > 0 ) {
@@ -809,38 +819,70 @@ namespace MyCAM.Helper
 
 		#region Analyse Part Up or Down 
 
-		enum ProjectionPlane
+		// get the coordinate of a gp_Pnt along the given axis
+		static double GetCoord( gp_Pnt point, EAlignAxis axis )
 		{
-			XZ,  // project to xz plane (use x coord)
-			YZ   // project to yz plane (use y coord)
+			switch( axis ) {
+				case EAlignAxis.X:
+					return point.X();
+				case EAlignAxis.Y:
+					return point.Y();
+				default:
+					return point.Z();
+			}
+		}
+
+		// the revolution axis is aligned to targetAxis,
+		// the other two axes are the radial ones used to measure the width
+		static void GetRadialAxes( EAlignAxis targetAxis, out EAlignAxis radialAxis1, out EAlignAxis radialAxis2 )
+		{
+			switch( targetAxis ) {
+				case EAlignAxis.X:
+					radialAxis1 = EAlignAxis.Y;
+					radialAxis2 = EAlignAxis.Z;
+					break;
+				case EAlignAxis.Y:
+					radialAxis1 = EAlignAxis.X;
+					radialAxis2 = EAlignAxis.Z;
+					break;
+				default:
+					radialAxis1 = EAlignAxis.X;
+					radialAxis2 = EAlignAxis.Y;
+					break;
+			}
 		}
 
 		static bool AnalyzeRevolutionShapeTaper(
 		   TopoDS_Shape shape,
+		   EAlignAxis targetAxis,
 		   out bool isTopWiderThanBottom )
 		{
 			isTopWiderThanBottom = false;
-			bool isXZDone = AnalyzeRevolutionShapeTaperByExtremePoints(
+			GetRadialAxes( targetAxis, out EAlignAxis widthAxis1, out EAlignAxis widthAxis2 );
+
+			bool isWidth1Done = AnalyzeRevolutionShapeTaperByExtremePoints(
 				shape,
-				ProjectionPlane.XZ,
-				out bool isTopWiderThanBottomXZ
+				targetAxis,
+				widthAxis1,
+				out bool isTopWiderThanBottomWidth1
 			);
-			bool isYZDone = AnalyzeRevolutionShapeTaperByExtremePoints(
+			bool isWidth2Done = AnalyzeRevolutionShapeTaperByExtremePoints(
 				shape,
-				ProjectionPlane.YZ,
-				out bool isTopWiderThanBottom_YZ
+				targetAxis,
+				widthAxis2,
+				out bool isTopWiderThanBottomWidth2
 			);
-			if( isXZDone && isYZDone ) {
-				// combine xz and yz projection results
-				isTopWiderThanBottom = isTopWiderThanBottomXZ || isTopWiderThanBottom_YZ;
+			if( isWidth1Done && isWidth2Done ) {
+				// combine both radial projection results
+				isTopWiderThanBottom = isTopWiderThanBottomWidth1 || isTopWiderThanBottomWidth2;
 				return true;
 			}
-			if( isXZDone ) {
-				isTopWiderThanBottom = isTopWiderThanBottomXZ;
+			if( isWidth1Done ) {
+				isTopWiderThanBottom = isTopWiderThanBottomWidth1;
 				return true;
 			}
-			if( isYZDone ) {
-				isTopWiderThanBottom = isTopWiderThanBottom_YZ;
+			if( isWidth2Done ) {
+				isTopWiderThanBottom = isTopWiderThanBottomWidth2;
 				return true;
 			}
 			return false;
@@ -848,7 +890,8 @@ namespace MyCAM.Helper
 
 		static bool AnalyzeRevolutionShapeTaperByExtremePoints(
 			TopoDS_Shape shape,
-			ProjectionPlane plane,
+			EAlignAxis heightAxis,
+			EAlignAxis widthAxis,
 			out bool isTopWiderThanBottom
 		)
 		{
@@ -858,8 +901,8 @@ namespace MyCAM.Helper
 				return false;
 			}
 
-			// step 1: collect all projection points (h, z) by sampling edges
-			List<(double h, double z)> points = new List<(double, double)>();
+			// step 1: collect the axial and radial coordinate of the sampled edge points
+			List<(double radialCoord, double axialCoord)> points = new List<(double, double)>();
 
 			// sample points from all edges instead of only using vertices
 			TopExp_Explorer edgeExp = new TopExp_Explorer( shape, TopAbs_ShapeEnum.TopAbs_EDGE );
@@ -871,9 +914,9 @@ namespace MyCAM.Helper
 					List<gp_Pnt> edgeSamples = SamplePointsOnEdge( edge, 10 );
 
 					foreach( gp_Pnt point in edgeSamples ) {
-						double h = ( plane == ProjectionPlane.XZ ) ? point.X() : point.Y();
-						double z = point.Z();
-						points.Add( (h, z) );
+						double radialCoord = GetCoord( point, widthAxis );
+						double axialCoord = GetCoord( point, heightAxis );
+						points.Add( (radialCoord, axialCoord) );
 					}
 				}
 				edgeExp.Next();
@@ -883,30 +926,30 @@ namespace MyCAM.Helper
 				return false;
 			}
 
-			// step 2: find z range
-			double zMin = points.Min( p => p.z );
-			double zMax = points.Max( p => p.z );
-			double zRange = zMax - zMin;
+			// step 2: find range along the revolution axis
+			double axialMin = points.Min( p => p.axialCoord );
+			double axialMax = points.Max( p => p.axialCoord );
+			double axialRange = axialMax - axialMin;
 
-			if( zRange < ACCURACY_Threshold ) {
+			if( axialRange < ACCURACY_Threshold ) {
 				return false;
 			}
 
-			// step 3: get points at zMin and zMax (with small tolerance)
-			double tolerance = zRange * 0.01; // 1% tolerance for numerical precision
+			// step 3: get points at axialMin and axialMax (with small tolerance)
+			double tolerance = axialRange * 0.01; // 1% tolerance for numerical precision
 
-			var bottomPoints = points.Where( p => Math.Abs( p.z - zMin ) <= tolerance ).ToList();
-			var topPoints = points.Where( p => Math.Abs( p.z - zMax ) <= tolerance ).ToList();
+			var bottomPoints = points.Where( p => Math.Abs( p.axialCoord - axialMin ) <= tolerance ).ToList();
+			var topPoints = points.Where( p => Math.Abs( p.axialCoord - axialMax ) <= tolerance ).ToList();
 
 			if( bottomPoints.Count == 0 || topPoints.Count == 0 ) {
 				return false;
 			}
 
-			// step 4: calculate bottom width (max |h| at zMin)
-			double bottomWidth = bottomPoints.Max( p => Math.Abs( p.h ) );
+			// step 4: calculate bottom width (max |radialCoord| at axialMin)
+			double bottomWidth = bottomPoints.Max( p => Math.Abs( p.radialCoord ) );
 
-			// step 5: calculate top width (max |h| at zMax)
-			double topWidth = topPoints.Max( p => Math.Abs( p.h ) );
+			// step 5: calculate top width (max |radialCoord| at axialMax)
+			double topWidth = topPoints.Max( p => Math.Abs( p.radialCoord ) );
 
 			// step 6: compare top and bottom widths
 			// need significant difference (at least 5%)
@@ -991,6 +1034,11 @@ namespace MyCAM.Helper
 			axisDir = null;
 			if( points == null || normals == null || points.Count != normals.Count || points.Count < 2 ) {
 				return false;
+			}
+
+			// the sample size can never be larger than the point count, otherwise the sampling loop never ends
+			if( sampleRatio <= 0 || sampleRatio > 1 ) {
+				sampleRatio = 1;
 			}
 
 			int n = points.Count;
@@ -1090,7 +1138,7 @@ namespace MyCAM.Helper
 					}
 				}
 			}
-			return true;
+			return axisDir != null;
 		}
 
 		static bool FitAxisDirectionByPCA( List<gp_Dir> normals, out gp_Dir axisDir )
@@ -1360,10 +1408,12 @@ namespace MyCAM.Helper
 
 		#endregion
 
-		static bool AlignAxisToZAndCenterXYWithTransform(
+		// align axisDir to the target axis and move the axis line onto it
+		static bool AlignAxisToTargetAndCenterWithTransform(
 			TopoDS_Shape shape,
 			gp_Dir axisDir,
 			gp_Pnt axisPoint,
+			EAlignAxis targetAxis,
 			out TopoDS_Shape transformedShape,
 			out gp_Trsf combinedTrsf
 			)
@@ -1375,26 +1425,32 @@ namespace MyCAM.Helper
 				return false;
 			}
 
-			// step 1: create rotation to align axis to z
+			// step 1: create rotation to align axis to the target axis
 			gp_Trsf rotationTrsf = new gp_Trsf();
-			gp_Dir zAxis = new gp_Dir( 0, 0, 1 );
+			gp_Dir targetDir = ShapeTool.GetAxisDir( targetAxis );
 
-			double dotProduct = axisDir.Dot( zAxis );
+			double dotProduct = axisDir.Dot( targetDir );
 
 			// check if already aligned
 			if( Math.Abs( Math.Abs( dotProduct ) - 1.0 ) < ACCURACY_Threshold ) {
-				// already parallel to z axis
+				// already parallel to the target axis
 				if( dotProduct < 0 ) {
-					// opposite direction, rotate 180 degrees
-					gp_Ax1 rotAxis = new gp_Ax1( axisPoint, new gp_Dir( 1, 0, 0 ) );
+					// opposite direction, rotate 180 degrees around a perpendicular axis
+					ShapeTool.GetRadialDirs( targetAxis, out gp_Dir perpendicularDir, out _ );
+					gp_Ax1 rotAxis = new gp_Ax1( axisPoint, perpendicularDir );
 					rotationTrsf.SetRotation( rotAxis, Math.PI );
 				}
 				// no rotation needed
 			}
 			else {
-				// calculate rotation axis (axisDir x z)
-				gp_Vec cross = new gp_Vec( axisDir ).Crossed( new gp_Vec( zAxis ) );
-				double angle = axisDir.Angle( zAxis );
+				// calculate rotation axis (axisDir x targetDir)
+				gp_Vec cross = new gp_Vec( axisDir ).Crossed( new gp_Vec( targetDir ) );
+
+				// the cross product is degenerated, gp_Dir can not be built from it
+				if( cross.Magnitude() < ACCURACY_Threshold ) {
+					return false;
+				}
+				double angle = axisDir.Angle( targetDir );
 
 				gp_Ax1 rotationAxis = new gp_Ax1( axisPoint, new gp_Dir( cross ) );
 				rotationTrsf.SetRotation( rotationAxis, angle );
@@ -1403,10 +1459,19 @@ namespace MyCAM.Helper
 			// step 2: calculate rotated axis point position
 			gp_Pnt rotatedPoint = axisPoint.Transformed( rotationTrsf );
 
-			// step 3: create translation for x=0, y=0
+			// step 3: move pnt to target axis line
+			// get the distance to move
+			double alongTarget = rotatedPoint.X() * targetDir.X()
+				+ rotatedPoint.Y() * targetDir.Y()
+				+ rotatedPoint.Z() * targetDir.Z();
+
+			// distance combined with direction
 			gp_Trsf translationTrsf = new gp_Trsf();
 			translationTrsf.SetTranslation(
-					new gp_Vec( -rotatedPoint.X(), -rotatedPoint.Y(), 0 )
+					new gp_Vec(
+						-( rotatedPoint.X() - alongTarget * targetDir.X() ),
+						-( rotatedPoint.Y() - alongTarget * targetDir.Y() ),
+						-( rotatedPoint.Z() - alongTarget * targetDir.Z() ) )
 			);
 
 			// step 4: combine transforms (rotate then translate)
