@@ -61,7 +61,7 @@ namespace MyCAM.Editor
 				End();
 				return;
 			}
-			m_RotaryAxisConfig = RotaryAxisHelper.CreateRotaryAxisConfig( machineData );
+			m_RotaryAxisConfig = machineData.RotaryAxisConfig;
 
 			// init dialog
 			m_ToolVecDlg = new ToolVectorDlg( m_InterpolateType, ref m_ToolVecParam, m_CraftData.IsPathReverse, m_RotaryAxisConfig );

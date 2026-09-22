@@ -429,28 +429,4 @@ namespace MyCAM.Editor
 			InterpolateType = interpolateType;
 		}
 	}
-
-	public class RotaryAxisConfig
-	{
-		// the one can be flipped by +-180
-		public string RotaryAxisName
-		{
-			get; set;
-		}
-
-		public string MasterName
-		{
-			get; set;
-		}
-
-		public string SlaveName
-		{
-			get; set;
-		}
-
-		public RotaryAxis RotaryAxisType
-		{
-			get; set;
-		}
-	}
 }

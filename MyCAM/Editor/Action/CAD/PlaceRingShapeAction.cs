@@ -42,6 +42,18 @@ namespace MyCAM.Editor
 			ImportedFileName = string.Empty;
 		}
 
+		// the shape is already added to the data manager by the caller, only place it and build the paths
+		public PlaceRingShapeAction( DataManager dataManager, Viewer viewer, ViewManager viewManager, TopoDS_Shape addedShape )
+			: this( dataManager, viewer, viewManager )
+		{
+			if( addedShape != null && addedShape.IsNull() == false ) {
+				m_AddedShape = addedShape;
+			}
+
+			// the caller already added the part, placing or path building failure does not revert it
+			IsImportSuccess = true;
+		}
+
 		public override EditActionType ActionType
 		{
 			get { return EditActionType.PlaceRingShape; }
@@ -51,20 +63,35 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 
-			Import3DFile( out TopoDS_Shape fileShape );
+			// the shape comes from the caller, otherwise read it from a file
+			TopoDS_Shape fileShape = m_AddedShape;
 			if( fileShape == null ) {
-				End();
-				return;
+				Import3DFile( out fileShape );
+				if( fileShape == null ) {
+					End();
+					return;
+				}
 			}
 			if( m_DataManager.PartIDList.Count == 0 ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoSolidObjectInFile", NO_SOLID_OBJECT_IN_FILE ), MyApp.NoticeType.Hint );
 				End();
 				return;
 			}
-			bool isSuccess = RingShapedIdentifyHelper.ComputeRevolutionToG54Transform( fileShape, out gp_Trsf trsf );
+
+			// add part success
+			IsImportSuccess = true;
+
+			// the tube direction of the machine decides how the ring shape is placed, fall back to Z when it is absent
+			EAlignAxis targetAxis = EAlignAxis.Z;
+			if( DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
+				targetAxis = RotaryAxisHelper.ConvertToAlignAxis( machineData.TubeDir );
+			}
+
+			// the shape may not be a revolution one, then it is kept as it is
+			bool isSuccess = RingShapedIdentifyHelper.ComputeRevolutionToG54Transform( fileShape, out gp_Trsf trsf, targetAxis );
 			if( isSuccess == false ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "RevolutionPlaceFailed", REVOLUTION_PLACE_FAILED ), MyApp.NoticeType.Warning );
-				End();
+				EndWithViewUpdate();
 				return;
 			}
 			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, trsf );
@@ -72,17 +99,17 @@ namespace MyCAM.Editor
 			// do not refresh viewer right now
 			transformHelper.TransformData( false );
 
-			// get transformedvisible part shapes
+			// get transformed visible part shapes
 			List<TopoDS_Shape> partShapes = GetVisiblePartShapes();
 			if( partShapes.Count == 0 ) {
-				End();
+				EndWithViewUpdate();
 				return;
 			}
 
 			BoundingBox bbox = GetVisibleWorkpieceBBox();
-			bool isGetSuccess = FindWireOnOuterShellHelper.TubeStrategies( bbox, out gp_Pnt bboxCenter, out List<gp_Ax1> stretchedStrategies );
+			bool isGetSuccess = FindWireOnOuterShellHelper.TubeStrategies( bbox, targetAxis, out gp_Pnt bboxCenter, out List<gp_Ax1> stretchedStrategies );
 			if( isGetSuccess == false ) {
-				End();
+				EndWithViewUpdate();
 				return;
 			}
 
@@ -93,7 +120,7 @@ namespace MyCAM.Editor
 			if( !result.IsSuccess ) {
 				string errorMessage = FindWireOnOuterShellHelper.GetWireFindingErrorMessage( result.Error );
 				MyApp.Logger.ShowOnLogPanel( errorMessage, MyApp.NoticeType.Hint );
-				End();
+				EndWithViewUpdate();
 				return;
 			}
 
@@ -110,6 +137,13 @@ namespace MyCAM.Editor
 		{
 			ActionCompleted?.Invoke();
 			base.End();
+		}
+
+		// the part is already in the data manager, refresh the viewer before leaving
+		void EndWithViewUpdate()
+		{
+			UpdateAllViewData();
+			End();
 		}
 
 		void UpdateAllViewData()
@@ -236,6 +270,9 @@ namespace MyCAM.Editor
 
 		Viewer m_Viewer;
 		ViewManager m_ViewManager;
+
+		// not null when the shape is supplied by the caller instead of read from a file
+		TopoDS_Shape m_AddedShape;
 
 		const string NO_SOLID_OBJECT_IN_FILE = "[操作提醒]圖檔內沒有實體物件";
 		const string REVOLUTION_PLACE_FAILED = "[操作提醒]迴轉體放置失敗";

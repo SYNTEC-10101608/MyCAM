@@ -198,7 +198,16 @@ namespace MyCAM.Editor
 			m_SelectedFaceGroupList = null;
 		}
 
-		// Auto find top face along Z axis, then process D1 continuous faces and free boundaries
+		// the geometry align axis the workpiece is placed along, follows the machine tube direction
+		EAlignAxis GetTargetAlignAxis()
+		{
+			if( DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
+				return RotaryAxisHelper.ConvertToAlignAxis( machineData.TubeDir );
+			}
+			return EAlignAxis.Z;
+		}
+
+		// Auto find top face along the target axis, then process D1 continuous faces and free boundaries
 		void AutoFindHatPath()
 		{
 			BoundingBox bbox = GetVisibleWorkpieceBBox();
@@ -207,11 +216,11 @@ namespace MyCAM.Editor
 			}
 
 			gp_Pnt bboxCenter = new gp_Pnt( bbox.XCenter, bbox.YCenter, bbox.ZCenter );
-			List<gp_Ax1> alienatedStrategies = GeometryTool.BuildRayAxesFromBBox( new gp_Dir( 0, 0, 1 ), bbox );
+			List<gp_Ax1> alienatedStrategies = GeometryTool.BuildRayAxesFromBBox( ShapeTool.GetAxisDir( GetTargetAlignAxis() ), bbox );
 			AutoFindOutermostFaceAndAddPath( alienatedStrategies, bboxCenter );
 		}
 
-		// Auto find outermost face along X/Y axis, then process D1 continuous faces and free boundaries
+		// Auto find outermost face along the radial axes of the target axis, then process D1 continuous faces and free boundaries
 		void AutoFindTubePath()
 		{
 			BoundingBox bbox = GetVisibleWorkpieceBBox();
@@ -219,7 +228,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			bool isGetSuccess = FindWireOnOuterShellHelper.TubeStrategies( bbox, out gp_Pnt bboxCenter, out List<gp_Ax1> stretchedStrategies );
+			bool isGetSuccess = FindWireOnOuterShellHelper.TubeStrategies( bbox, GetTargetAlignAxis(), out gp_Pnt bboxCenter, out List<gp_Ax1> stretchedStrategies );
 			if( isGetSuccess == false ) {
 				return;
 			}

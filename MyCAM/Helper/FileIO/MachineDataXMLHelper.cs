@@ -86,6 +86,7 @@ namespace MyCAM.Helper
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.ToolDirection, (int)machineDataDTO.ToolDirection );
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.MasterRotaryAxis, (int)machineDataDTO.MasterRotaryAxis );
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.SlaveRotaryAxis, (int)machineDataDTO.SlaveRotaryAxis );
+			ConvertPropertyToPrNode( root, MachineParamName.TUBE_DIR, (int)machineDataDTO.TubeDir );
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.MasterRotaryDirection, (int)machineDataDTO.MasterRotaryDirection );
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.SlaveRotaryDirection, (int)machineDataDTO.SlaveRotaryDirection );
 
@@ -306,6 +307,12 @@ namespace MyCAM.Helper
 			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
 				nErrorPrIndex = (int)MachinePrValue.SlaveRotaryAxis;
 				return machineDTOContainer;
+			}
+
+			// optional, old machine files have no this node, the rotary axis is used instead
+			machineDataDTO.TubeDir = GetPrValue<RotaryAxis>( machineData, MachineParamName.TUBE_DIR, out prValueStatus );
+			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+				machineDataDTO.TubeDir = RotaryAxis.None;
 			}
 			machineDataDTO.MasterRotaryDirection = GetPrValue<RotaryDirection>( machineData, (int)MachinePrValue.MasterRotaryDirection, out prValueStatus );
 			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {

@@ -636,7 +636,10 @@ namespace MyCAM.PathCache
 					SetToolVecByAssignDir( ref toolVecPointList, m_CraftData.IsToolVecReverse ? m_ContourGeomData.RefCenterDir.Direction().Reversed() : m_ContourGeomData.RefCenterDir.Direction() );
 					break;
 				case ESpecialToolVecType.ZDir:
-					SetToolVecByAssignDir( ref toolVecPointList, RotaryAxisHelper.GetRotaryAxisDir() );
+					if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) || machineData == null ) {
+						break;
+					}
+					SetToolVecByAssignDir( ref toolVecPointList, RotaryAxisHelper.GetRotaryAxisDir( machineData.RotaryAxisConfig.RotaryAxisType ) );
 					break;
 
 				case ESpecialToolVecType.Normal:
@@ -708,7 +711,7 @@ namespace MyCAM.PathCache
 			if( machineData == null || MainPathPointList.Count == 0 ) {
 				return 0;
 			}
-			RotaryAxis rotaryAxis = RotaryAxisHelper.GetRotaryAxis( machineData );
+			RotaryAxis rotaryAxis = machineData.RotaryAxisConfig.RotaryAxisType;
 
 			// the start point already carries the placement transform, otherwise it would not sit where it is machined
 			gp_Pnt startPnt = MainPathPointList.First().Point;
