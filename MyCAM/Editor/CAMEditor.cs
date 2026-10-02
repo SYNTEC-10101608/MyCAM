@@ -215,17 +215,17 @@ namespace MyCAM.Editor
 
 		public void SetStartPoint()
 		{
-			// action edit, no multi edit supported
+			// action edit, multi edit supported
 			if( IsSameAction( EditActionType.StartPoint ) ) {
 				m_CurrentAction.End();
 				return;
 			}
-			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, false ) ) {
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
 
 			EndActionIfNotDefault();
-			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList.First(), m_DefaultAction as SelectPathAction );
+			StartPointAction action = new StartPointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList, m_DefaultAction as SelectPathAction );
 			action.PropertyChanged += ShowCAMData;
 			StartEditAction( action );
 		}
@@ -789,7 +789,6 @@ namespace MyCAM.Editor
 
 			// no multi edit: start point, tool vec, sort
 			if( szPathIDList.Count > 1 ) {
-				editableInfo.IsStartPointEditable = false;
 				editableInfo.IsToolVecEditable = false;
 				editableInfo.IsMicroJointEditable = false;
 				editableInfo.IsRCornerEditable = false;

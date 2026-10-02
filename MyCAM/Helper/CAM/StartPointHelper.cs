@@ -6,6 +6,17 @@ using System.Linq;
 
 namespace MyCAM.Helper.CAM
 {
+	public enum StartPointSelectStrategy
+	{
+		LongestSegmentMidpoint,
+		XNegative,
+		XPositive,
+		YNegative,
+		YPositive,
+		ZNegative,
+		ZPositive
+	}
+
 	internal class StartPointHelper
 	{
 		public static List<CADPoint> EnsureStartPointsIncluded( gp_Ax3 coordinate, List<CADPoint> discretizedPoints, List<CADPoint> startPoints, IStdPatternGeomData geomData )
@@ -273,25 +284,170 @@ namespace MyCAM.Helper.CAM
 			}
 		}
 
-		public static int ChooseLongestSegmentMiddlePoint( List<CAMPoint> camPointList )
+		public static bool TryChooseByPriority( List<CAMPoint> camPointList, IReadOnlyList<StartPointSelectStrategy> strategies, double tolerance, out int camIndex )
+		{
+			camIndex = -1;
+			if( camPointList == null || strategies == null || strategies.Count() == 0 ) {
+				return false;
+			}
+
+			List<int> candidateCAMIndices = new List<int>();
+			for( int i = 0; i < camPointList.Count; ++i ) {
+				int cadIndex = camPointList[ i ].InitPathIndex;
+				if( SpecialPointIndex.IsClosedPointIndex( cadIndex ) || SpecialPointIndex.IsGeneratedPointIndex( cadIndex ) ) {
+					continue;
+				}
+				candidateCAMIndices.Add( i );
+			}
+			if( candidateCAMIndices.Count == 0 ) {
+				return false;
+			}
+
+			List<int> longestMidpointCAMIndices = strategies.Contains( StartPointSelectStrategy.LongestSegmentMidpoint )
+				? GetLongestSegmentMidpointCAMIndices( camPointList )
+				: null;
+
+			foreach( StartPointSelectStrategy strategy in strategies ) {
+
+				switch( strategy ) {
+					case StartPointSelectStrategy.LongestSegmentMidpoint:
+						candidateCAMIndices = FilterLongestSegmentMidpoints( camPointList, candidateCAMIndices, longestMidpointCAMIndices, tolerance );
+						break;
+
+					case StartPointSelectStrategy.XNegative:
+						candidateCAMIndices = FilterAxisExtreme( camPointList, candidateCAMIndices, new gp_Dir( -1, 0, 0 ), tolerance );
+						break;
+
+					case StartPointSelectStrategy.XPositive:
+						candidateCAMIndices = FilterAxisExtreme( camPointList, candidateCAMIndices, new gp_Dir( 1, 0, 0 ), tolerance );
+						break;
+
+					case StartPointSelectStrategy.YNegative:
+						candidateCAMIndices = FilterAxisExtreme( camPointList, candidateCAMIndices, new gp_Dir( 0, -1, 0 ), tolerance );
+						break;
+
+					case StartPointSelectStrategy.YPositive:
+						candidateCAMIndices = FilterAxisExtreme( camPointList, candidateCAMIndices, new gp_Dir( 0, 1, 0 ), tolerance );
+						break;
+
+					case StartPointSelectStrategy.ZNegative:
+						candidateCAMIndices = FilterAxisExtreme( camPointList, candidateCAMIndices, new gp_Dir( 0, 0, -1 ), tolerance );
+						break;
+
+					case StartPointSelectStrategy.ZPositive:
+						candidateCAMIndices = FilterAxisExtreme( camPointList, candidateCAMIndices, new gp_Dir( 0, 0, 1 ), tolerance );
+						break;
+
+					default:
+						return false;
+				}
+
+				if( candidateCAMIndices.Count == 0 ) {
+					return false;
+				}
+				if( candidateCAMIndices.Count == 1 ) {
+					break;
+				}
+			}
+
+			if( candidateCAMIndices.Count > 1 ) {
+				bool hasCalculateAxisExtreme = strategies.Any( strategy =>
+					strategy == StartPointSelectStrategy.XNegative ||
+					strategy == StartPointSelectStrategy.XPositive ||
+					strategy == StartPointSelectStrategy.YNegative ||
+					strategy == StartPointSelectStrategy.YPositive ||
+					strategy == StartPointSelectStrategy.ZNegative ||
+					strategy == StartPointSelectStrategy.ZPositive );
+
+				camIndex = hasCalculateAxisExtreme
+					? FilterCandidateGroupCenter( camPointList, candidateCAMIndices )
+					: FilterOriginalStartPoint( camPointList, candidateCAMIndices );
+			}
+			else {
+				camIndex = candidateCAMIndices.First();
+			}
+
+			return true;
+		}
+
+		static List<int> GetLongestSegmentMidpointCAMIndices( List<CAMPoint> camPointList )
 		{
 			List<GeometrySegment> segments = BuildGeometrySegments( camPointList );
 			int bestGroupCount = SortGeometrySegments( segments );
+			return segments
+				.Take( bestGroupCount )
+				.Select( segment => segment.MiddleCAMIndex )
+				.ToList();
+		}
 
-			// return 0 if no valid segments
-			if( bestGroupCount == 0 ) {
-				return 0;
+		static List<int> FilterLongestSegmentMidpoints( List<CAMPoint> camPointList, IReadOnlyList<int> candidateCAMIndices,
+			IReadOnlyList<int> longestMidpointCAMIndices, double tolerance )
+		{
+			if( longestMidpointCAMIndices == null || longestMidpointCAMIndices.Count == 0 ) {
+				return new List<int>();
 			}
 
-			// select by InitPathIndex in the best group
-			int selectedIndex = segments.First().MiddleCAMIndex;
-			for( int i = 1; i < bestGroupCount; ++i ) {
-				int candidateIndex = segments[ i ].MiddleCAMIndex;
-				if( camPointList[ candidateIndex ].InitPathIndex < camPointList[ selectedIndex ].InitPathIndex ) {
-					selectedIndex = candidateIndex;
+			double effectiveTolerance = Math.Max( tolerance, 0 );
+			double toleranceSquared = effectiveTolerance * effectiveTolerance;
+
+			return candidateCAMIndices.Where( candidateIndex =>
+			{
+				gp_Pnt candidatePoint = camPointList[ candidateIndex ].Point;
+
+				return longestMidpointCAMIndices.Any( midpointIndex =>
+				{
+					gp_Pnt midpoint = camPointList[ midpointIndex ].Point;
+					return candidatePoint.SquareDistance( midpoint ) <= toleranceSquared;
+				} );
+			} )
+				.ToList();
+		}
+
+		static List<int> FilterAxisExtreme( List<CAMPoint> camPointList, IReadOnlyList<int> candidateCAMIndices, gp_Dir searchDir, double tolerance )
+		{
+			gp_Pnt fp = camPointList[ candidateCAMIndices[ 0 ] ].Point;
+			double maximumProjection = fp.X() * searchDir.X() + fp.Y() * searchDir.Y() + fp.Z() * searchDir.Z();
+
+			for( int i = 1; i < candidateCAMIndices.Count(); ++i ) {
+				gp_Pnt p = camPointList[ candidateCAMIndices[ i ] ].Point;
+				double projection = p.X() * searchDir.X() + p.Y() * searchDir.Y() + p.Z() * searchDir.Z();
+				maximumProjection = Math.Max( maximumProjection, projection );
+			}
+
+			List<int> result = new List<int>();
+
+			double effectiveTolerance = Math.Max( tolerance, 0 );
+
+			for( int i = 0; i < candidateCAMIndices.Count(); ++i ) {
+				gp_Pnt p = camPointList[ candidateCAMIndices[ i ] ].Point;
+				double projection = p.X() * searchDir.X() + p.Y() * searchDir.Y() + p.Z() * searchDir.Z();
+
+				if( ( maximumProjection - projection ) <= effectiveTolerance ) {
+					result.Add( candidateCAMIndices[ i ] );
 				}
 			}
-			return selectedIndex;
+
+			return result;
+		}
+
+		static int FilterOriginalStartPoint( List<CAMPoint> camPointList, IReadOnlyList<int> candidateCAMIndices )
+		{
+			return candidateCAMIndices
+				.OrderBy( candidateIndex => camPointList[ candidateIndex ].InitPathIndex )
+				.First();
+		}
+
+		static int FilterCandidateGroupCenter( List<CAMPoint> camPointList, IReadOnlyList<int> candidateCAMIndices )
+		{
+			double centerX = candidateCAMIndices.Average( index => camPointList[ index ].Point.X() );
+			double centerY = candidateCAMIndices.Average( index => camPointList[ index ].Point.Y() );
+			double centerZ = candidateCAMIndices.Average( index => camPointList[ index ].Point.Z() );
+			gp_Pnt center = new gp_Pnt( centerX, centerY, centerZ );
+
+			return candidateCAMIndices
+				.OrderBy( index => camPointList[ index ].Point.SquareDistance( center ) )
+				.ThenBy( index => camPointList[ index ].InitPathIndex )
+				.First();
 		}
 
 		static List<GeometrySegment> BuildGeometrySegments( List<CAMPoint> camPointList )
@@ -400,7 +556,7 @@ namespace MyCAM.Helper.CAM
 				gp_Vec incoming = new gp_Vec( previous, current );
 				gp_Vec outgoing = new gp_Vec( current, next );
 
-				if( ( incoming.Magnitude() > POINT_TOLERENCE ) && ( outgoing.Magnitude() > POINT_TOLERENCE ) ) {
+				if( ( incoming.SquareMagnitude() > POINT_TOLERENCE * POINT_TOLERENCE ) && ( outgoing.SquareMagnitude() > POINT_TOLERENCE * POINT_TOLERENCE ) ) {
 					turningAngles[ i ] = incoming.Angle( outgoing );
 				}
 			}
@@ -504,29 +660,31 @@ namespace MyCAM.Helper.CAM
 
 			gp_Vec firstSegment = new gp_Vec( point0, point1 );
 			gp_Vec secondSegment = new gp_Vec( point1, point2 );
+			double toleranceSquared = tolerance * tolerance;
 
-			if( ( firstSegment.Magnitude() <= tolerance ) || ( secondSegment.Magnitude() <= tolerance ) ) {
+			if( firstSegment.SquareMagnitude() <= toleranceSquared || secondSegment.SquareMagnitude() <= toleranceSquared ) {
 				return false;
 			}
 
-			gp_Vec chord01 = new gp_Vec( point0, point1 );
 			gp_Vec chord02 = new gp_Vec( point0, point2 );
-			gp_Vec planeNormal = chord01.Crossed( chord02 );
+			double chordLengthSquared = chord02.SquareMagnitude();
+			if( chordLengthSquared <= toleranceSquared ) {
+				return false;
+			}
 
-			double normalSquared = planeNormal.SquareMagnitude();
-
-			if( normalSquared <= ( tolerance * tolerance ) ) {
+			gp_Vec planeNormal = firstSegment.Crossed( chord02 );
+			double distanceToChordSquared = planeNormal.SquareMagnitude() / chordLengthSquared;
+			if( distanceToChordSquared <= toleranceSquared ) {
 				tangent = evaluateAtStart ? firstSegment : secondSegment;
 				return true;
 			}
 
-			gp_Pnt center = CalculateCircumcenter( point0, chord01, chord02, planeNormal );
-
+			gp_Pnt center = CalculateCircumcenter( point0, firstSegment, chord02, planeNormal );
 			gp_Pnt endpoint = evaluateAtStart ? point0 : point2;
 			gp_Vec centerToEndpoint = new gp_Vec( center, endpoint );
 			double radiusSquared = centerToEndpoint.SquareMagnitude();
 
-			if( radiusSquared <= ( tolerance * tolerance ) ) {
+			if( radiusSquared <= toleranceSquared ) {
 				return false;
 			}
 
@@ -536,8 +694,7 @@ namespace MyCAM.Helper.CAM
 				-centerToEndpoint.Z() / radiusSquared );
 
 			tangent = planeNormal.Crossed( centerToEndpoint );
-
-			return tangent.Magnitude() > tolerance;
+			return true;
 		}
 
 		static gp_Pnt CalculateCircumcenter( gp_Pnt origin, gp_Vec chord01, gp_Vec chord02, gp_Vec planeNormal )
@@ -586,15 +743,15 @@ namespace MyCAM.Helper.CAM
 			}
 
 			gp_Vec baseVector = new gp_Vec( first, second );
-			double baseLength = baseVector.Magnitude();
-			if( baseLength <= POINT_TOLERENCE ) {
+			double baseLengthSquared = baseVector.SquareMagnitude();
+			if( baseLengthSquared <= POINT_TOLERENCE * POINT_TOLERENCE ) {
 				return GeometryEdgeType.Curve;
 			}
 
 			bool isLine = true;
 			for( int offset = 0; offset <= edgeCount; ++offset ) {
 				gp_Vec toPoint = new gp_Vec( first, points[ ( startIndex + offset ) % points.Count ] );
-				if( ( baseVector.Crossed( toPoint ).Magnitude() / baseLength ) > LINE_DISTANCE_TOLERANCE ) {
+				if( ( baseVector.Crossed( toPoint ).SquareMagnitude() / baseLengthSquared ) > LINE_DISTANCE_TOLERANCE * LINE_DISTANCE_TOLERANCE ) {
 					isLine = false;
 					break;
 				}
@@ -603,16 +760,17 @@ namespace MyCAM.Helper.CAM
 				return GeometryEdgeType.Line;
 			}
 
-			if( ( edgeCount < 2 ) || !TryCreateReferenceCircle( points, startIndex, edgeCount, first, baseVector, baseLength,
+			if( ( edgeCount < 2 ) || !TryCreateReferenceCircle( points, startIndex, edgeCount, first, baseVector, baseLengthSquared,
 				out gp_Pnt center, out gp_Vec planeNormal, out double radius ) ) {
 				return GeometryEdgeType.Curve;
 			}
 
-			double normalMagnitude = planeNormal.Magnitude();
+			double normalSquared = planeNormal.SquareMagnitude();
 			for( int offset = 0; offset <= edgeCount; ++offset ) {
 				gp_Vec fromCenter = new gp_Vec( center, points[ ( startIndex + offset ) % points.Count ] );
-				double planeDistance = Math.Abs( fromCenter.Dot( planeNormal ) ) / normalMagnitude;
-				if( planeDistance > ARC_DISTANCE_TOLERANCE ) {
+				double normalProjection = fromCenter.Dot( planeNormal );
+				double planeDistanceSquared = normalProjection * normalProjection / normalSquared;
+				if( planeDistanceSquared > ARC_DISTANCE_TOLERANCE * ARC_DISTANCE_TOLERANCE ) {
 					return GeometryEdgeType.Curve;
 				}
 				double radiusError = Math.Abs( fromCenter.Magnitude() - radius );
@@ -661,33 +819,33 @@ namespace MyCAM.Helper.CAM
 			return first != null && maximumSquareDistance > POINT_TOLERENCE * POINT_TOLERENCE;
 		}
 
-		static bool TryCreateReferenceCircle( List<gp_Pnt> points, int startIndex, int edgeCount, gp_Pnt first, gp_Vec baseVector, double baseLength,
+		static bool TryCreateReferenceCircle( List<gp_Pnt> points, int startIndex, int edgeCount, gp_Pnt first, gp_Vec baseVector, double baseLengthSquared,
 			out gp_Pnt center, out gp_Vec planeNormal, out double radius )
 		{
 			center = null;
 			planeNormal = null;
 			radius = 0.0;
 			gp_Pnt third = null;
-			double maximumDistance = 0.0;
+			double maximumDistanceSquared = 0.0;
 
 			for( int offset = 0; offset <= edgeCount; ++offset ) {
 				gp_Pnt candidate = points[ ( startIndex + offset ) % points.Count ];
 				gp_Vec toCandidate = new gp_Vec( first, candidate );
-				double distance = baseVector.Crossed( toCandidate ).Magnitude() / baseLength;
-				if( distance > maximumDistance ) {
-					maximumDistance = distance;
+				double distanceSquared = baseVector.Crossed( toCandidate ).SquareMagnitude() / baseLengthSquared;
+				if( distanceSquared > maximumDistanceSquared ) {
+					maximumDistanceSquared = distanceSquared;
 					third = candidate;
 				}
 			}
 
-			if( ( third == null ) || ( maximumDistance <= ARC_DISTANCE_TOLERANCE ) ) {
+			if( ( third == null ) || ( maximumDistanceSquared <= ARC_DISTANCE_TOLERANCE * ARC_DISTANCE_TOLERANCE ) ) {
 				return false;
 			}
 
 			gp_Vec chord02 = new gp_Vec( first, third );
 			planeNormal = baseVector.Crossed( chord02 );
 			double normalSquared = planeNormal.SquareMagnitude();
-			if( normalSquared <= ( POINT_TOLERENCE * POINT_TOLERENCE ) ) {
+			if( normalSquared / baseLengthSquared <= POINT_TOLERENCE * POINT_TOLERENCE ) {
 				return false;
 			}
 
@@ -765,11 +923,11 @@ namespace MyCAM.Helper.CAM
 		// STEP 3 sort the priority
 
 		const double ABSOLUTE_PATH_LENGTH_GROUP_TOLERENCE = 0.01;
-		const double RELATIVE_PATH_LENGTH_GROUP_TOLERENCE = 0.05;
+		const double RELATIVE_PATH_LENGTH_GROUP_TOLERENCE = 0.2;
 		const double ABSOLUTE_AVERAGE_CURVATURE_GROUP_TOLERANCE = 1e-4;
-		const double RELATIVE_AVERAGE_CURVATURE_GROUP_TOLERANCE = 0.05;
+		const double RELATIVE_AVERAGE_CURVATURE_GROUP_TOLERANCE = 0.2;
 		const double ABSOLUTE_CURVATURE_VARIATION_GROUP_TOLERANCE = 1e-4;
-		const double RELATIVE_CURVATURE_VARIATION_GROUP_TOLERANCE = 0.05;
+		const double RELATIVE_CURVATURE_VARIATION_GROUP_TOLERANCE = 0.2;
 
 		// return the top priority group [0, bestGroupCount)
 		static int SortGeometrySegments( List<GeometrySegment> segments )

@@ -371,12 +371,7 @@ namespace MyCAM.Data
 					maxDeflection, maxEdgeLength, discretizeMethod );
 				contourPathObject.CraftData.TraverseData = new TraverseData();
 
-				// intialize start point to lognest edge mid
-				if( isClosed ) {
-					int camIndex = StartPointHelper.ChooseLongestSegmentMiddlePoint( contourPathObject.ContourCache.MainPathPointList );
-					int cadIndex = contourPathObject.ContourCache.MainPathPointList[ camIndex ].InitPathIndex;
-					contourPathObject.CraftData.SetStartPntIndex( cadIndex );
-				}
+				InitializeStartPoint( contourPathObject, isClosed );
 
 				ObjectMap[ szID ] = contourPathObject;
 				newPathIDList.Add( szID );
@@ -388,6 +383,17 @@ namespace MyCAM.Data
 			// trigger event if needed
 			if( shouldTriggerEvent && newPathIDList.Count > 0 ) {
 				PathAdded?.Invoke( newPathIDList );
+			}
+		}
+
+		// intialize start point to lognest edge mid
+		void InitializeStartPoint( ContourPathObject contourPathObject, bool isClosed )
+		{
+			List<StartPointSelectStrategy> strategy = new List<StartPointSelectStrategy> { StartPointSelectStrategy.LongestSegmentMidpoint };
+			List<CAMPoint> camPointList = contourPathObject.ContourCache.MainPathPointList;
+
+			if( isClosed && StartPointHelper.TryChooseByPriority( camPointList, strategy, 0.0, out int camIndex ) ) {
+				contourPathObject.CraftData.SetStartPntIndex( camPointList[ camIndex ].InitPathIndex );
 			}
 		}
 

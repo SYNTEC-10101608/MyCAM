@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="StartPointDlg" Content="Start Point" />
+
+	<Message ID="m_rbtnManualSelect" Content="Manual Select" />
+	<Message ID="m_rbtnAutoSelect" Content="Auto Batch Select" />
+
+	<Message ID="m_lblTolerance" Content="Tolerance" />
+	<Message ID="m_btnIncreasePriority" Content="Increase Priority" />
+	<Message ID="m_btnDecreasePriority" Content="Decrease Priority" />
+
+	<Message ID="m_btnApply" Content="Apply" />
+
+	<Message ID="LongestSegmentMidpoint" Content="Longest Segment Midpoint" />
+	<Message ID="XNegative" Content="Min X Coordinate" />
+	<Message ID="XPositive" Content="Max X Coordinate" />
+	<Message ID="YNegative" Content="Min Y Coordinate" />
+	<Message ID="YPositive" Content="Max Y Coordinate" />
+	<Message ID="ZNegative" Content="Min Z Coordinate" />
+	<Message ID="ZPositive" Content="Max Z Coordinate" />
+</ResMap>

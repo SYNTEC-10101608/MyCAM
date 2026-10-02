@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="StartPointDlg" Content="起点" />
+
+	<Message ID="m_rbtnManualSelect" Content="手动选取" />
+	<Message ID="m_rbtnAutoSelect" Content="自动批量选取" />
+
+	<Message ID="m_lblTolerance" Content="相等精度" />
+	<Message ID="m_btnIncreasePriority" Content="增加优先级" />
+	<Message ID="m_btnDecreasePriority" Content="减少优先级" />
+
+	<Message ID="m_btnApply" Content="应用" />
+
+	<Message ID="LongestSegmentMidpoint" Content="长边中点" />
+	<Message ID="XNegative" Content="最小X坐标" />
+	<Message ID="XPositive" Content="最大X坐标" />
+	<Message ID="YNegative" Content="最小Y坐标" />
+	<Message ID="YPositive" Content="最大Y坐标" />
+	<Message ID="ZNegative" Content="最小Z坐标" />
+	<Message ID="ZPositive" Content="最大Z坐标" />
+</ResMap>

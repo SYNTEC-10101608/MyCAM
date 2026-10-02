@@ -126,6 +126,9 @@ namespace MyCAM.PathCache
 				if( m_IsCADFactorDirty ) {
 					BuildCADCAMPointList();
 				}
+				else if( m_IsCAMFactorDirty ) {
+					BuildCAMPointList();
+				}
 				return m_StartCAMPointList;
 			}
 		}
@@ -247,6 +250,10 @@ namespace MyCAM.PathCache
 
 			List<CADPoint> resortedList = ResortCADPointList( m_StartCADPointList, m_CraftData.StartPointIndex );
 			m_StartCAMPointList = ConvertToCAMPoints( resortedList );
+
+			for( int pointIndex = 0; pointIndex < m_StartCAMPointList.Count; ++pointIndex ) {
+				m_StartCAMPointList[ pointIndex ].InitPathIndex = ( pointIndex + m_CraftData.StartPointIndex ) % m_StartCAMPointList.Count;
+			}
 		}
 
 		protected void SetPathCAMPoint()
