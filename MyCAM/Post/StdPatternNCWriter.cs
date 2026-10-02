@@ -9,14 +9,12 @@ namespace MyCAM.Post
 {
 	internal interface IStdPatternNCStrategy
 	{
-		void WriteNCCode( StreamWriter writer, StdPatternPostData postData, CraftData craftData, IGeomData geomData,
-			string masterAxisName, string slaveAxisName, RotaryAxis masterRotaryAxis, RotaryAxis slaveRotaryAxis );
+		void WriteNCCode( StreamWriter writer, StdPatternPostData postData, CraftData craftData, IGeomData geomData, AxisConfig axisConfig );
 	}
 
 	internal abstract class StdPatternNCStrategyBase : IStdPatternNCStrategy
 	{
-		public void WriteNCCode( StreamWriter writer, StdPatternPostData postData, CraftData craftData, IGeomData geomData,
-			string masterAxisName, string slaveAxisName, RotaryAxis masterRotaryAxis, RotaryAxis slaveRotaryAxis )
+		public void WriteNCCode( StreamWriter writer, StdPatternPostData postData, CraftData craftData, IGeomData geomData, AxisConfig axisConfig )
 		{
 			// Validate and cast geometry data
 			if( !ValidateAndCastGeometry( geomData ) ) {
@@ -24,7 +22,7 @@ namespace MyCAM.Post
 			}
 
 			// Build common parameters
-			string commonParams = BuildCommonParameters( postData, craftData, masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
+			string commonParams = BuildCommonParameters( postData, craftData, axisConfig );
 
 			// Build pattern-specific parameters
 			string specificParams = BuildSpecificParameters( geomData, craftData );
@@ -46,8 +44,7 @@ namespace MyCAM.Post
 		protected abstract string GetPatternName();
 
 		// build common parameters shared by all standard patterns.
-		protected string BuildCommonParameters( StdPatternPostData postData, CraftData craftData,
-			string masterAxisName, string slaveAxisName, RotaryAxis masterRotaryAxis, RotaryAxis slaveRotaryAxis )
+		protected string BuildCommonParameters( StdPatternPostData postData, CraftData craftData, AxisConfig axisConfig )
 		{
 			var sb = new StringBuilder();
 
@@ -61,7 +58,7 @@ namespace MyCAM.Post
 			sb.Append( NCWriterHelper.GetRotaryAxisCommand(
 				postData.RefPoint.Master / Math.PI * 180,
 				postData.RefPoint.Slave / Math.PI * 180,
-				masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis ) );
+				axisConfig ) );
 
 			return sb.ToString();
 		}
@@ -214,10 +211,9 @@ namespace MyCAM.Post
 	internal static class StdPatternNCWriter
 	{
 		public static void WriteStandardPatternCutting( StreamWriter writer, PathType pathType, StdPatternPostData postData,
-			CraftData craftData, IStdPatternGeomData geomData, int nIndex,
-			string masterAxisName, string slaveAxisName, RotaryAxis masterRotaryAxis, RotaryAxis slaveRotaryAxis )
+			CraftData craftData, IStdPatternGeomData geomData, int nIndex, AxisConfig axisConfig )
 		{
-			if( writer == null || postData == null || craftData == null || geomData == null ) {
+			if( writer == null || postData == null || craftData == null || geomData == null || axisConfig == null ) {
 				throw new ArgumentNullException( "StandardPatternNCWriter arguments cannot be null" );
 			}
 
@@ -231,7 +227,7 @@ namespace MyCAM.Post
 			ExtendedGCodeWriter.WriteExtendedGCode( writer, craftData, ExtendedGCodeType.TraverseHead );
 
 			// write traverse section
-			NCWriterHelper.WriteTraverse( writer, postData, masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
+			NCWriterHelper.WriteTraverse( writer, postData, axisConfig );
 
 			// traverse tail
 			ExtendedGCodeWriter.WriteExtendedGCode( writer, craftData, ExtendedGCodeType.TraverseTail );
@@ -243,7 +239,7 @@ namespace MyCAM.Post
 
 			// get strategy and write cutting code
 			IStdPatternNCStrategy strategy = StandardPatternNCStrategyFactory.GetStrategy( pathType );
-			strategy.WriteNCCode( writer, postData, craftData, geomData, masterAxisName, slaveAxisName, masterRotaryAxis, slaveRotaryAxis );
+			strategy.WriteNCCode( writer, postData, craftData, geomData, axisConfig );
 
 			// tail
 			ExtendedGCodeWriter.WriteExtendedGCode( writer, craftData, ExtendedGCodeType.PathTail );

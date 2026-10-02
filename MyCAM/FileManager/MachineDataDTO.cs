@@ -291,6 +291,11 @@ namespace MyCAM.FileManager
 
 	public class MixTypeMachineDataDTO : MachineDataDTO
 	{
+		public MixTypeVariant MixTypeVariant
+		{
+			get; set;
+		} = MixTypeVariant.Mix;
+
 		public gp_Vec_DTO ToolToMasterVec
 		{
 			get; set;
@@ -313,6 +318,7 @@ namespace MyCAM.FileManager
 			if( data == null ) {
 				return;
 			}
+			MixTypeVariant = data.MixTypeVariant;
 			ToolToMasterVec = new gp_Vec_DTO( data.ToolToMasterVec );
 			MCSToSlaveVec = new gp_Vec_DTO( data.MCSToSlaveVec );
 		}
@@ -322,6 +328,7 @@ namespace MyCAM.FileManager
 		{
 			MixTypeMachineData mixTypeData = new MixTypeMachineData
 			{
+				MixTypeVariant = MixTypeVariant,
 				ToolDirection = ToolDirection,
 				MasterRotaryAxis = MasterRotaryAxis,
 				SlaveRotaryAxis = SlaveRotaryAxis,

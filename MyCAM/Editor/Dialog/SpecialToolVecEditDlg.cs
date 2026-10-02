@@ -18,6 +18,11 @@ namespace MyCAM.Editor
 		{
 			InitializeComponent();
 			m_RotaryAxisConfig = config;
+
+			// single rotary axis machine has fewer degrees of freedom, adjust UI
+			if( m_RotaryAxisConfig.IsSingleAxis ) {
+				ApplySingleAxisUI();
+			}
 			ApplyResourcesToUI();
 			BuildMachiningDirItems();
 		}
@@ -70,19 +75,17 @@ namespace MyCAM.Editor
 			m_gbxSwitchDir.Enabled = enableSwitchDir;
 			m_lblMachiningDir.Enabled = enableMachiningDir;
 			m_cbxMachiningDir.Enabled = enableMachiningDir;
+
+			// single-axis protection takes precedence over general UI permissions
+			if( m_RotaryAxisConfig.IsSingleAxis ) {
+				ApplySingleAxisUI();
+			}
 		}
 
 		// show the hint under the combobox when the machining direction is not supported by the spindle type machine
 		public void SetMachiningDirHintVisible( bool isVisible )
 		{
 			m_lblMachiningDirHint.Visible = isVisible;
-		}
-
-		public bool GetMSAngleFromDialog( out double master_deg, out double slave_deg )
-		{
-			master_deg = (double)m_dbtnMaster.Value;
-			slave_deg = (double)m_dbtnSlave.Value;
-			return true;
 		}
 
 		#region Set textbox value silently
@@ -96,6 +99,21 @@ namespace MyCAM.Editor
 		#endregion
 
 		#region UI Setting
+
+		public bool GetMSAngleFromDialog( out double master_deg, out double slave_deg )
+		{
+			master_deg = (double)m_dbtnMaster.Value;
+			slave_deg = (double)m_dbtnSlave.Value;
+
+			// single rotary axis machine: force the locked axis to 0, prevent legacy data from leaking in
+			if( m_RotaryAxisConfig.Variant == MixTypeVariant.MasterOnly ) {
+				slave_deg = 0;
+			}
+			else if( m_RotaryAxisConfig.Variant == MixTypeVariant.SlaveOnly ) {
+				master_deg = 0;
+			}
+			return true;
+		}
 
 		void ApplyResourcesToUI()
 		{
@@ -256,7 +274,26 @@ namespace MyCAM.Editor
 			m_IsUpdatingTypeUI = false;
 		}
 
-		#region UI protection m_btnSet_Click
+		#region UI protection
+
+		void ApplySingleAxisUI()
+		{
+			// disable the locked axis, it does not physically exist
+			if( m_RotaryAxisConfig.Variant == MixTypeVariant.MasterOnly ) {
+				m_lblSDeg.Enabled = false;
+				m_dbtnSlave.Enabled = false;
+				m_rbtnLockSlave.Enabled = false;
+			}
+			else if( m_RotaryAxisConfig.Variant == MixTypeVariant.SlaveOnly ) {
+				m_lblMDeg.Enabled = false;
+				m_dbtnMaster.Enabled = false;
+				m_rbtnLockMaster.Enabled = false;
+			}
+
+			// single axis machine has only one IK solution, disable flip controls
+			m_gbxCRotate.Enabled = false;
+			m_gbxMachiningDir.Enabled = false;
+		}
 
 		void CheckRadioButton( ESpecialToolVecType type )
 		{
@@ -330,7 +367,6 @@ namespace MyCAM.Editor
 				TypeChanged?.Invoke( ESpecialToolVecType.Normal );
 			}
 		}
-
 
 		#endregion
 

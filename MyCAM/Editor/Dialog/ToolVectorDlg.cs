@@ -1,5 +1,6 @@
 ﻿using MyCAM.Data;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -26,7 +27,6 @@ namespace MyCAM.Editor
 			// struct would not be null
 			InitializeComponent();
 			m_IsPathRevese = isPathReverse;
-			ResetType();
 			ResetToolVecParam( param );
 
 			// update rotary axis name
@@ -36,41 +36,18 @@ namespace MyCAM.Editor
 			m_btnRotaryPos.Text = m_RotaryAxisConfig.RotaryAxisName + " +";
 			m_btnRotaryNeg.Text = m_RotaryAxisConfig.RotaryAxisName + " -";
 
+			// build available interpolate types by machine variant
+			BuildAvailableInterpolateTypes();
+
+			// single rotary axis machine has fewer degrees of freedom, adjust UI
+			if( m_RotaryAxisConfig.IsSingleAxis ) {
+				ApplySingleAxisUI();
+			}
+
 			// update interpolation type combo box with actual axis names
 			ApplyResourcesToUI();
 			UpdateInterpolateTypeNames();
-		}
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "ToolVectorDlg", this.Text );
-			m_lblOnePntToolVecAdjust.Text = m_LanguageManager.TryGetString( "m_lblOnePntToolVecAdjust", m_lblOnePntToolVecAdjust.Text );
-			m_lblADeg.Text = m_LanguageManager.TryGetString( "m_lblADeg", m_lblADeg.Text );
-			m_lblBDeg.Text = m_LanguageManager.TryGetString( "m_lblBDeg", m_lblBDeg.Text );
-			m.Text = m_LanguageManager.TryGetString( "m", m.Text );
-			m_lblToolDirQuickSetBtn.Text = m_LanguageManager.TryGetString( "m_lblToolDirQuickSetBtn", m_lblToolDirQuickSetBtn.Text );
-			m_btnZDir.Text = m_LanguageManager.TryGetString( "m_btnZDir", m_btnZDir.Text );
-			m_btnKeep.Text = m_LanguageManager.TryGetString( "m_btnKeep", m_btnKeep.Text );
-			m_btnRevert.Text = m_LanguageManager.TryGetString( "m_btnRevert", m_btnRevert.Text );
-			m_lblStartEnd.Text = m_LanguageManager.TryGetString( "m_lblStartEnd", m_lblStartEnd.Text );
-			m_btnSwitchStartEnd.Text = m_LanguageManager.TryGetString( "m_btnSwitchStartEnd", m_btnSwitchStartEnd.Text );
-			m_lblSetBtn.Text = m_LanguageManager.TryGetString( "m_lblSetBtn", m_lblSetBtn.Text );
-			m_btnAdd.Text = m_LanguageManager.TryGetString( "m_btnAdd", m_btnAdd.Text );
-			m_btnRemove.Text = m_LanguageManager.TryGetString( "m_btnRemove", m_btnRemove.Text );
-			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
-			m_gpbStartPnt.Text = m_LanguageManager.TryGetString( "m_gpbStartPnt", m_gpbStartPnt.Text );
-			m_btnToStart.Text = m_LanguageManager.TryGetString( "m_btnToStart", m_btnToStart.Text );
-			m_gpbPnt.Text = m_LanguageManager.TryGetString( "m_gpbPnt", m_gpbPnt.Text );
-			m_btnPrev.Text = m_LanguageManager.TryGetString( "m_btnPrev", m_btnPrev.Text );
-			m_btnNext.Text = m_LanguageManager.TryGetString( "m_btnNext", m_btnNext.Text );
-			m_btnToEnd.Text = m_LanguageManager.TryGetString( "m_btnToEnd", m_btnToEnd.Text );
-			m_gpbCtrlPnt.Text = m_LanguageManager.TryGetString( "m_gpbCtrlPnt", m_gpbCtrlPnt.Text );
-			m_btnPreCtrlPnt.Text = m_LanguageManager.TryGetString( "m_btnPreCtrlPnt", m_btnPreCtrlPnt.Text );
-			m_btnNextCtrlPnt.Text = m_LanguageManager.TryGetString( "m_btnNextCtrlPnt", m_btnNextCtrlPnt.Text );
-			m_gbxColorLegend.Text = m_LanguageManager.TryGetString( "m_gbxColorLegend", m_gbxColorLegend.Text );
-			m_lblLegendNormal.Text = m_LanguageManager.TryGetString( "m_lblLegendNormal", m_lblLegendNormal.Text );
-			m_lblLegendRotary.Text = m_LanguageManager.TryGetString( "m_lblLegendRotary", m_lblLegendRotary.Text );
-			m_lblLegendBevel.Text = m_LanguageManager.TryGetString( "m_lblLegendBevel", m_lblLegendBevel.Text );
+			ResetType();
 		}
 
 		public void ResetPathReverse( bool isReverse )
@@ -80,7 +57,7 @@ namespace MyCAM.Editor
 
 		public void ResetType()
 		{
-			m_cbxInterpolateType.SelectedIndex = (int)EToolVecInterpolateType.Normal;
+			m_cbxInterpolateType.SelectedIndex = m_AvailableTypes.IndexOf( EToolVecInterpolateType.Normal );
 		}
 
 		public void ResetToolVecParam( ToolVecParam toolVecParam )
@@ -127,19 +104,110 @@ namespace MyCAM.Editor
 				}
 				else {
 					m_cbxInterpolateType.Enabled = true;
-					m_cbxInterpolateType.SelectedIndex = (int)interpolateType;
+
+					// type not in available list ( e.g. legacy data on single axis machine ) results in -1, no selection
+					m_cbxInterpolateType.SelectedIndex = m_AvailableTypes.IndexOf( interpolateType );
 				}
 			}
 		}
 
+		#region UI Setting
+
+		void BuildAvailableInterpolateTypes()
+		{
+			if( m_RotaryAxisConfig != null && m_RotaryAxisConfig.IsSingleAxis ) {
+
+				// single axis machine has no master/slave pairing issue and can not cut bevel
+				m_AvailableTypes = new List<EToolVecInterpolateType>()
+				{
+					EToolVecInterpolateType.Normal,
+					EToolVecInterpolateType.VectorInterpolation,
+				};
+			}
+			else {
+				m_AvailableTypes = new List<EToolVecInterpolateType>()
+				{
+					EToolVecInterpolateType.Normal,
+					EToolVecInterpolateType.VectorInterpolation,
+					EToolVecInterpolateType.TiltAngleInterpolation,
+					EToolVecInterpolateType.MasterNormalSlaveInterpolation,
+					EToolVecInterpolateType.MasterInterpolationSlaveNormal,
+				};
+			}
+		}
+
+		void ApplySingleAxisUI()
+		{
+			// hide the locked axis, it does not physically exist
+			if( m_RotaryAxisConfig.Variant == MixTypeVariant.MasterOnly ) {
+				m_lblSlave.Enabled = false;
+				m_tbxSlave.Enabled = false;
+			}
+			else if( m_RotaryAxisConfig.Variant == MixTypeVariant.SlaveOnly ) {
+				m_lblMaster.Enabled = false;
+				m_tbxMaster.Enabled = false;
+			}
+
+			// A/B tilt angles need two degrees of freedom, disable them
+			m_lblADeg.Enabled = false;
+			m_lblBDeg.Enabled = false;
+			m_tbxAngleA.Enabled = false;
+			m_tbxAngleB.Enabled = false;
+
+			// single axis machine has only one IK solution, no flip
+			m_btnRotaryPos.Enabled = false;
+			m_btnRotaryNeg.Enabled = false;
+
+			// hide legend of unavailable interpolate types
+			m_pnlColorBevel.Enabled = false;
+			m_lblLegendBevel.Enabled = false;
+			m_pnlColorSlave.Enabled = false;
+			m_lblLegendSlave.Enabled = false;
+			m_pnlColorMaster.Enabled = false;
+			m_lblLegendMaster.Enabled = false;
+		}
+
+		void ApplyResourcesToUI()
+		{
+			this.Text = m_LanguageManager.TryGetString( "ToolVectorDlg", this.Text );
+			m_lblOnePntToolVecAdjust.Text = m_LanguageManager.TryGetString( "m_lblOnePntToolVecAdjust", m_lblOnePntToolVecAdjust.Text );
+			m_lblADeg.Text = m_LanguageManager.TryGetString( "m_lblADeg", m_lblADeg.Text );
+			m_lblBDeg.Text = m_LanguageManager.TryGetString( "m_lblBDeg", m_lblBDeg.Text );
+			m.Text = m_LanguageManager.TryGetString( "m", m.Text );
+			m_lblToolDirQuickSetBtn.Text = m_LanguageManager.TryGetString( "m_lblToolDirQuickSetBtn", m_lblToolDirQuickSetBtn.Text );
+			m_btnZDir.Text = m_LanguageManager.TryGetString( "m_btnZDir", m_btnZDir.Text );
+			m_btnKeep.Text = m_LanguageManager.TryGetString( "m_btnKeep", m_btnKeep.Text );
+			m_btnRevert.Text = m_LanguageManager.TryGetString( "m_btnRevert", m_btnRevert.Text );
+			m_lblStartEnd.Text = m_LanguageManager.TryGetString( "m_lblStartEnd", m_lblStartEnd.Text );
+			m_btnSwitchStartEnd.Text = m_LanguageManager.TryGetString( "m_btnSwitchStartEnd", m_btnSwitchStartEnd.Text );
+			m_lblSetBtn.Text = m_LanguageManager.TryGetString( "m_lblSetBtn", m_lblSetBtn.Text );
+			m_btnAdd.Text = m_LanguageManager.TryGetString( "m_btnAdd", m_btnAdd.Text );
+			m_btnRemove.Text = m_LanguageManager.TryGetString( "m_btnRemove", m_btnRemove.Text );
+			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
+			m_gpbStartPnt.Text = m_LanguageManager.TryGetString( "m_gpbStartPnt", m_gpbStartPnt.Text );
+			m_btnToStart.Text = m_LanguageManager.TryGetString( "m_btnToStart", m_btnToStart.Text );
+			m_gpbPnt.Text = m_LanguageManager.TryGetString( "m_gpbPnt", m_gpbPnt.Text );
+			m_btnPrev.Text = m_LanguageManager.TryGetString( "m_btnPrev", m_btnPrev.Text );
+			m_btnNext.Text = m_LanguageManager.TryGetString( "m_btnNext", m_btnNext.Text );
+			m_btnToEnd.Text = m_LanguageManager.TryGetString( "m_btnToEnd", m_btnToEnd.Text );
+			m_gpbCtrlPnt.Text = m_LanguageManager.TryGetString( "m_gpbCtrlPnt", m_gpbCtrlPnt.Text );
+			m_btnPreCtrlPnt.Text = m_LanguageManager.TryGetString( "m_btnPreCtrlPnt", m_btnPreCtrlPnt.Text );
+			m_btnNextCtrlPnt.Text = m_LanguageManager.TryGetString( "m_btnNextCtrlPnt", m_btnNextCtrlPnt.Text );
+			m_gbxColorLegend.Text = m_LanguageManager.TryGetString( "m_gbxColorLegend", m_gbxColorLegend.Text );
+			m_lblLegendNormal.Text = m_LanguageManager.TryGetString( "m_lblLegendNormal", m_lblLegendNormal.Text );
+			m_lblLegendRotary.Text = m_LanguageManager.TryGetString( "m_lblLegendRotary", m_lblLegendRotary.Text );
+			m_lblLegendBevel.Text = m_LanguageManager.TryGetString( "m_lblLegendBevel", m_lblLegendBevel.Text );
+		}
+
+		#endregion
 
 		// UI event - interpolate type changed
 		void m_cbxInterpolateType_SelectedIndexChanged( object sender, EventArgs e )
 		{
-			if( m_cbxInterpolateType.SelectedIndex < 0 ) {
+			if( m_cbxInterpolateType.SelectedIndex < 0 || m_cbxInterpolateType.SelectedIndex >= m_AvailableTypes.Count ) {
 				return;
 			}
-			EToolVecInterpolateType selectedType = (EToolVecInterpolateType)m_cbxInterpolateType.SelectedIndex;
+			EToolVecInterpolateType selectedType = m_AvailableTypes[ m_cbxInterpolateType.SelectedIndex ];
 			TypeChanged?.Invoke( selectedType );
 		}
 
@@ -279,6 +347,16 @@ namespace MyCAM.Editor
 
 		RotaryAxisConfig m_RotaryAxisConfig;
 
+		// combo box item index maps to this list, content depends on machine variant
+		List<EToolVecInterpolateType> m_AvailableTypes = new List<EToolVecInterpolateType>()
+		{
+			EToolVecInterpolateType.Normal,
+			EToolVecInterpolateType.VectorInterpolation,
+			EToolVecInterpolateType.TiltAngleInterpolation,
+			EToolVecInterpolateType.MasterNormalSlaveInterpolation,
+			EToolVecInterpolateType.MasterInterpolationSlaveNormal,
+		};
+
 		Timer m_Timer;
 		const int TIMER_INTERVAL = 10;
 
@@ -348,33 +426,34 @@ namespace MyCAM.Editor
 			}
 			string masterName = m_RotaryAxisConfig.MasterName;
 			string slaveName = m_RotaryAxisConfig.SlaveName;
-
-			// Ensure we have enough items in the combo box
-			while( m_cbxInterpolateType.Items.Count < 5 ) {
-				m_cbxInterpolateType.Items.Add( "" );
-			}
-
-			// index 0~2: fixed types, update via language manager
-			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.Normal ] =
-				m_LanguageManager.TryGetString( "InterpolateType_Normal", INTERPOLATE_TYPE_NORMAL );
-			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.VectorInterpolation ] =
-				m_LanguageManager.TryGetString( "InterpolateType_Rotary", INTERPOLATE_TYPE_ROTARY );
-			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.TiltAngleInterpolation ] =
-				m_LanguageManager.TryGetString( "InterpolateType_Bevel", INTERPOLATE_TYPE_BEVEL );
-
 			string szAxisSmooth = m_LanguageManager.TryGetString( "ToolVectorDlg_AxisSmooth", AXIS_SMOOTH );
 
-			// index 3: MasterNormalSlaveInterpolation
-			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterNormalSlaveInterpolation ] =
-				 slaveName + szAxisSmooth;
-
-			// index 4: MasterInterpolationSlaveNormal
-			m_cbxInterpolateType.Items[ (int)EToolVecInterpolateType.MasterInterpolationSlaveNormal ] =
-				masterName + szAxisSmooth;
+			// rebuild items by available types, item index maps to m_AvailableTypes
+			m_cbxInterpolateType.Items.Clear();
+			foreach( EToolVecInterpolateType type in m_AvailableTypes ) {
+				m_cbxInterpolateType.Items.Add( GetInterpolateTypeName( type, masterName, slaveName, szAxisSmooth ) );
+			}
 
 			// update color legend labels
 			m_lblLegendSlave.Text = slaveName + szAxisSmooth;
 			m_lblLegendMaster.Text = masterName + szAxisSmooth;
+		}
+
+		string GetInterpolateTypeName( EToolVecInterpolateType type, string masterName, string slaveName, string szAxisSmooth )
+		{
+			switch( type ) {
+				case EToolVecInterpolateType.VectorInterpolation:
+					return m_LanguageManager.TryGetString( "InterpolateType_Rotary", INTERPOLATE_TYPE_ROTARY );
+				case EToolVecInterpolateType.TiltAngleInterpolation:
+					return m_LanguageManager.TryGetString( "InterpolateType_Bevel", INTERPOLATE_TYPE_BEVEL );
+				case EToolVecInterpolateType.MasterNormalSlaveInterpolation:
+					return slaveName + szAxisSmooth;
+				case EToolVecInterpolateType.MasterInterpolationSlaveNormal:
+					return masterName + szAxisSmooth;
+				case EToolVecInterpolateType.Normal:
+				default:
+					return m_LanguageManager.TryGetString( "InterpolateType_Normal", INTERPOLATE_TYPE_NORMAL );
+			}
 		}
 
 		const double DOUBLE_COMPARISON_EPSILON = 1e-6;

@@ -45,6 +45,20 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		// mix type specialization, MasterOnly / SlaveOnly means single rotary axis machine
+		public MixTypeVariant Variant
+		{
+			get; set;
+		} = MixTypeVariant.Mix;
+
+		public bool IsSingleAxis
+		{
+			get
+			{
+				return Variant != MixTypeVariant.Mix;
+			}
+		}
+
 		public string MasterName
 		{
 			get; set;
@@ -251,12 +265,19 @@ namespace MyCAM.Data
 			get
 			{
 				RotaryAxis rotaryAxis = RotaryAxisType;
+
+				// single rotary axis machine is a specialized mix type
+				MixTypeVariant variant = MixTypeVariant.Mix;
+				if( this is MixTypeMachineData mixTypeMachineData ) {
+					variant = mixTypeMachineData.MixTypeVariant;
+				}
 				return new RotaryAxisConfig
 				{
 					MasterName = RotaryAxisHelper.ConvertRotaryAxisName( MasterRotaryAxis ),
 					SlaveName = RotaryAxisHelper.ConvertRotaryAxisName( SlaveRotaryAxis ),
 					RotaryAxisType = rotaryAxis,
 					RotaryAxisName = RotaryAxisHelper.ConvertRotaryAxisName( rotaryAxis ),
+					Variant = variant
 				};
 			}
 		}
@@ -517,6 +538,12 @@ namespace MyCAM.Data
 				return FiveAxisType.Mix;
 			}
 		}
+
+		// mix type specialization, MasterOnly / SlaveOnly means single rotary axis machine
+		public MixTypeVariant MixTypeVariant
+		{
+			get; set;
+		} = MixTypeVariant.Mix;
 
 		public gp_Vec ToolToMasterVec
 		{
