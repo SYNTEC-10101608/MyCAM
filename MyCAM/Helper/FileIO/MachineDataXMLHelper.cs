@@ -1,4 +1,5 @@
-﻿using MyCAM.Data;
+﻿using MyCAM.App;
+using MyCAM.Data;
 using MyCAM.FileManager;
 using System;
 using System.Linq;
@@ -30,30 +31,36 @@ namespace MyCAM.Helper
 
 		internal static XDocument ConvertMachineDataAndTree2XML( FiveAxisMachineData machineData )
 		{
-			if( machineData == null ) {
-				throw new ArgumentNullException( nameof( machineData ) );
+			try {
+				if( machineData == null ) {
+					throw new ArgumentNullException( nameof( machineData ) );
+				}
+
+				// transform to DTO
+				MachineDataDTOContainer container = MachineDataDTOManager.ToDTOContainer( machineData );
+
+				// machineDataDTOContainer to XML node
+				XElement machineDataXml = ConvertMachineDTO2XML( container );
+
+				// machineTreeNode to XML node
+				XElement treeXml = ConvertMachineTreeNode2XML( machineData.RootNode );
+
+				// set base node as default
+				if( treeXml == null ) {
+					treeXml = new XElement( "Child", new XAttribute( "Type", MachineComponentType.Base.ToString() ) );
+				}
+
+				// build outer root
+				XElement fileRootNode = new XElement( "MachineDataFile",
+										new XElement( "MachineData", machineDataXml.Nodes() ),
+										new XElement( "MachineTree", treeXml )
+										);
+				return new XDocument( new XDeclaration( "1.0", "utf-8", null ), fileRootNode );
 			}
-
-			// transform to DTO
-			MachineDataDTOContainer container = MachineDataDTOManager.ToDTOContainer( machineData );
-
-			// machineDataDTOContainer to XML node
-			XElement machineDataXml = ConvertMachineDTO2XML( container );
-
-			// machineTreeNode to XML node
-			XElement treeXml = ConvertMachineTreeNode2XML( machineData.RootNode );
-
-			// set base node as default
-			if( treeXml == null ) {
-				treeXml = new XElement( "Child", new XAttribute( "Type", MachineComponentType.Base.ToString() ) );
+			catch( Exception ex ) {
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "MachineDataXMLGenerationFailed", MACHINE_DATA_XML_GENERATION_FAILED ), ex.Message ), MyApp.NoticeType.Error );
+				return null;
 			}
-
-			// build outer root
-			XElement fileRootNode = new XElement( "MachineDataFile",
-									new XElement( "MachineData", machineDataXml.Nodes() ),
-									new XElement( "MachineTree", treeXml )
-									);
-			return new XDocument( new XDeclaration( "1.0", "utf-8", null ), fileRootNode );
 		}
 
 		static XElement ConvertMachineDTO2XML( MachineDataDTOContainer container )
@@ -67,19 +74,7 @@ namespace MyCAM.Helper
 			XElement root = new XElement( "MachineData" );
 
 			// five axis Type node pr3001
-			int machineTypeValue;
-			if( machineDataDTO is SpindleTypeMachineDataDTO ) {
-				machineTypeValue = 1;
-			}
-			else if( machineDataDTO is TableTypeMachineDataDTO ) {
-				machineTypeValue = 2;
-			}
-			else if( machineDataDTO is MixTypeMachineDataDTO ) {
-				machineTypeValue = 3;
-			}
-			else {
-				throw new ArgumentException( "Unsupported machine configuration." );
-			}
+			int machineTypeValue = ConvertMachineDTO2Pr3001( machineDataDTO );
 			ConvertPropertyToPrNode( root, (int)MachinePrValue.FiveAxisType, machineTypeValue );
 
 			// common properties
@@ -167,6 +162,30 @@ namespace MyCAM.Helper
 				ConvertPropertyToPrNode( root, (int)MachinePrValue.ToolToMasterVec_X + i, mixValues[ i ] * dRatioMMToBlu );
 			}
 			return root;
+		}
+
+		static int ConvertMachineDTO2Pr3001( MachineDataDTO machineDataDTO )
+		{
+			if( machineDataDTO == null ) {
+				throw new ArgumentNullException( nameof( machineDataDTO ) );
+			}
+			if( machineDataDTO is SpindleTypeMachineDataDTO ) {
+				return (int)FiveAxisType.Spindle;
+			}
+			if( machineDataDTO is TableTypeMachineDataDTO ) {
+				return (int)FiveAxisType.Table;
+			}
+			if( machineDataDTO is MixTypeMachineDataDTO mixDTO ) {
+				switch( mixDTO.MixTypeVariant ) {
+					case MixTypeVariant.MasterOnly:
+						return (int)FiveAxisType.SingleSpindle;
+					case MixTypeVariant.SlaveOnly:
+						return (int)FiveAxisType.SingleTable;
+					default:
+						return (int)FiveAxisType.Mix;
+				}
+			}
+			throw new ArgumentException( "Unsupported machine configuration.", nameof( machineDataDTO ) );
 		}
 
 		static XElement ConvertMachineTreeNode2XML( MachineTreeNode treeNode )
@@ -282,6 +301,14 @@ namespace MyCAM.Helper
 					break;
 				case FiveAxisType.Mix:
 					machineDataDTO = new MixTypeMachineDataDTO();
+					break;
+
+				// single rotary axis machine is a specialized mix type
+				case FiveAxisType.SingleSpindle:
+					machineDataDTO = new MixTypeMachineDataDTO { MixTypeVariant = MixTypeVariant.MasterOnly };
+					break;
+				case FiveAxisType.SingleTable:
+					machineDataDTO = new MixTypeMachineDataDTO { MixTypeVariant = MixTypeVariant.SlaveOnly };
 					break;
 				default:
 
@@ -630,5 +657,9 @@ namespace MyCAM.Helper
 		}
 
 		#endregion
+
+		static readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "MachineDataXMLHelper" );
+
+		const string MACHINE_DATA_XML_GENERATION_FAILED = "機台資料 XML 產生失敗：{0}";
 	}
 }

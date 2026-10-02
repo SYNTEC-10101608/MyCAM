@@ -6,6 +6,18 @@
 		Spindle = 1,
 		Table = 2,
 		Mix = 3,
+
+		// single rotary axis machine, file format code only, runtime uses MixTypeMachineData with MixTypeVariant
+		SingleSpindle = 4,
+		SingleTable = 5,
+	}
+
+	// mix type specialization: MasterOnly locks slave axis at 0, SlaveOnly locks master axis at 0
+	public enum MixTypeVariant
+	{
+		Mix = 0,
+		MasterOnly = 1,
+		SlaveOnly = 2,
 	}
 
 	public enum ToolDirection

@@ -399,6 +399,11 @@ namespace MyCAM.Post
 			m_FKSolver = solverBuilder.BuildFKSolver();
 			m_IKSolver = solverBuilder.BuildIKSolver();
 
+			// single rotary axis machine is a specialized mix type with one axis locked at 0
+			if( machineData is MixTypeMachineData mixTypeMachineData ) {
+				m_MixTypeVariant = mixTypeMachineData.MixTypeVariant;
+			}
+
 			// for type with table, the mathematical master and slave axis are reversed
 			if( machineData.FiveAxisType == FiveAxisType.Table || machineData.FiveAxisType == FiveAxisType.Mix ) {
 				m_MathmeticalMasterDir = machineData.SlaveRotateDir;
@@ -433,6 +438,14 @@ namespace MyCAM.Post
 				else if( ikResult == IKSolveResult.SlaveInfinityOfSolution ) {
 					ikResult = IKSolveResult.MasterInfinityOfSolution;
 				}
+			}
+
+			// single rotary axis machine: force the locked axis to 0 ( in machine coordinate, after MS swap )
+			if( m_MixTypeVariant == MixTypeVariant.MasterOnly ) {
+				dS_Out = 0;
+			}
+			else if( m_MixTypeVariant == MixTypeVariant.SlaveOnly ) {
+				dM_Out = 0;
 			}
 			return ikResult;
 		}
@@ -486,6 +499,9 @@ namespace MyCAM.Post
 
 		IKSolver m_IKSolver;
 		FKSolver m_FKSolver;
+
+		// mix type specialization, MasterOnly / SlaveOnly locks one axis at 0
+		MixTypeVariant m_MixTypeVariant = MixTypeVariant.Mix;
 
 		// u can say: mathmatical master, the rotary axus, the one may have infinity of solution...
 		gp_Dir m_MathmeticalMasterDir;

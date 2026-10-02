@@ -112,8 +112,7 @@ namespace MyCAM.Post
 			}
 			PostTraverseBuilder.CalculateExit( endInfoOfLastPath, m_EntryAndExitData, out PostPoint exitPoint );
 			m_StreamWriter.WriteLine( "// Exit" );
-			NCWriterHelper.WriteLinearTraverse( m_StreamWriter, exitPoint, 0,
-				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
+			NCWriterHelper.WriteLinearTraverse( m_StreamWriter, exitPoint, 0, m_AxisConfig );
 		}
 
 		bool ProcessAllPaths( out PathEndInfo endInfoOfLastPath, out string errorMessage )
@@ -272,8 +271,7 @@ namespace MyCAM.Post
 			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.TraverseHead );
 
 			// traverse from previous path to current path
-			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData,
-				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
+			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData, m_AxisConfig );
 
 			// traverse tail
 			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.TraverseTail );
@@ -303,8 +301,7 @@ namespace MyCAM.Post
 
 		void WriteStandardPatternCutting( PathType type, StdPatternPostData currentPathPostData, CraftData craftData, IStdPatternGeomData geomData, int N_Index )
 		{
-			StdPatternNCWriter.WriteStandardPatternCutting( m_StreamWriter, type, currentPathPostData, craftData, geomData, N_Index,
-				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
+			StdPatternNCWriter.WriteStandardPatternCutting( m_StreamWriter, type, currentPathPostData, craftData, geomData, N_Index, m_AxisConfig );
 		}
 
 		void WriteOnePoint( PostPoint postPoint, string szExtendedGCode = null, bool isRCornerStart = false, bool isRCornerEnd = false )
@@ -315,8 +312,7 @@ namespace MyCAM.Post
 			string szX = postPoint.X.ToString( "F3" );
 			string szY = postPoint.Y.ToString( "F3" );
 			string szZ = postPoint.Z.ToString( "F3" );
-			string szRotaryAxisCommand = NCWriterHelper.GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI,
-				m_AxisConfig.MasterAxisName, m_AxisConfig.SlaveAxisName, m_AxisConfig.MasterRotaryAxis, m_AxisConfig.SlaveRotaryAxis );
+			string szRotaryAxisCommand = NCWriterHelper.GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI, m_AxisConfig );
 
 			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand};" );
 

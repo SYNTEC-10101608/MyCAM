@@ -835,6 +835,7 @@ namespace MyCAM.PathCache
 			camPoint.InitSlave_rad = dOutLastProcessPathS;
 			camPoint.ModMaster_rad = dOutLastProcessPathM;
 			camPoint.ModSlave_rad = dOutLastProcessPathS;
+			camPoint.ToolVec = postSolver.SolveToolVec( dOutLastProcessPathM, dOutLastProcessPathS );
 		}
 
 		#endregion
