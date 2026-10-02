@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="StartPointDlg" Content="отправная точка" />
+
+	<Message ID="m_rbtnManualSelect" Content="Ручной выбор" />
+	<Message ID="m_rbtnAutoSelect" Content="Автоматический пакетный выбор" />
+
+	<Message ID="m_lblTolerance" Content="Допуск" />
+	<Message ID="m_btnIncreasePriority" Content="Повысить приоритет" />
+	<Message ID="m_btnDecreasePriority" Content="Понизить приоритет" />
+
+	<Message ID="m_btnApply" Content="Применить" />
+
+	<Message ID="LongestSegmentMidpoint" Content="Середина наибольшего сегмента" />
+	<Message ID="XNegative" Content="Мин. X координата" />
+	<Message ID="XPositive" Content="Макс. X координата" />
+	<Message ID="YNegative" Content="Мин. Y координата" />
+	<Message ID="YPositive" Content="Макс. Y координата" />
+	<Message ID="ZNegative" Content="Мин. Z координата" />
+	<Message ID="ZPositive" Content="Макс. Z координата" />
+</ResMap>

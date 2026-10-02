@@ -2,5 +2,6 @@
 <ResMap>
 	<Message ID="CannotGetPathCraftInfo" Content="无法获取路径 {0} 的加工资讯" />
 	<Message ID="CannotGetPathGeomInfo" Content="无法获取路径 {0} 的几何资讯" />
+	<Message ID="CannotGetAutoStartPoint" Content="无法计算路径 {0} 的自动起点" />
 	<Message ID="PathNotClosed" Content="路径 {0} 不是封闭路径" />
 </ResMap>
