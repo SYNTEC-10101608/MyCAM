@@ -50,10 +50,11 @@ namespace MyCAM.PathCache
 
 			// set over cut using unified method
 			IReadOnlyList<CAMPoint> copyedCAMPntList = m_CAMPointList.Select( p => p.Clone() ).ToList();
-			OverCutHelper.SetOverCut( copyedCAMPntList, out m_OverCutCAMPointList, m_CraftData.OverCutLength, isClosed: true );
+			OverCutHelper.SetOverCut( copyedCAMPntList, out m_OverCutCAMPointList, m_CraftData.OverCutLength, isClosed: true, isToolVecReverse: IsToolVecReverse );
 
 			// set lead
-			LeadHelper.SetLeadIn( m_StartCAMPointList.First().Clone(), out m_LeadInCAMPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
+			LeadHelper.SetLeadIn( m_StartCAMPointList.First().Clone(), out m_LeadInCAMPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse, isToolVecReverse: IsToolVecReverse );
+			UpdateTiltAngles();
 		}
 
 		protected override void SetCenterDir()

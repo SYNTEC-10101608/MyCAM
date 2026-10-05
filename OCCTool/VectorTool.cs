@@ -74,5 +74,10 @@ namespace OCCTool
 			coordSys = new gp_Ax3( p1, new gp_Dir( vZ ), new gp_Dir( v12 ) );
 			return true;
 		}
+
+		public static double GetAngle_deg( gp_Dir firstDirection, gp_Dir secondDirection )
+		{
+			return System.Math.Abs( firstDirection.Angle( secondDirection ) * 180.0 / System.Math.PI );
+		}
 	}
 }

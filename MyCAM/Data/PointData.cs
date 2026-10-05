@@ -183,6 +183,16 @@ namespace MyCAM.Data
 			get;
 		}
 
+		gp_Dir InitToolVec
+		{
+			get;
+		}
+
+		double TiltAngle_deg
+		{
+			get;
+		}
+
 		double ModMaster_rad
 		{
 			get;
@@ -270,6 +280,11 @@ namespace MyCAM.Data
 			}
 		}
 
+		public double TiltAngle_deg
+		{
+			get; set;
+		}
+
 		public gp_Dir TangentVec
 		{
 			get
@@ -282,6 +297,14 @@ namespace MyCAM.Data
 			get
 			{
 				return m_CADPoint.NormalVec_1st;
+			}
+		}
+
+		public gp_Dir NormalVec_2nd
+		{
+			get
+			{
+				return m_CADPoint.NormalVec_2nd;
 			}
 		}
 
@@ -336,6 +359,7 @@ namespace MyCAM.Data
 			CAMPoint newPoint = new CAMPoint( m_CADPoint.Clone() );
 			newPoint.InitToolVec = new gp_Dir( m_InitToolVec.XYZ() );
 			newPoint.ToolVec = new gp_Dir( m_ToolVec.XYZ() );
+			newPoint.TiltAngle_deg = TiltAngle_deg;
 			newPoint.InitMaster_rad = InitMaster_rad;
 			newPoint.InitSlave_rad = InitSlave_rad;
 			newPoint.ModMaster_rad = ModMaster_rad;

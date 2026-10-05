@@ -7,7 +7,7 @@ G65 P"FileEnd";
 M30;
 
 <PathHeader>
-G65 P"LASER_ON";
+G65 P"LASER_ON" T{EnterTiltAngle};
 
 <PathTail>
 G65 P"LASER_OFF";
@@ -18,7 +18,7 @@ G65 P"LASER_OFF";
 
 <TraverseHeader>
 // Cutting{PathIndex}
-N{PathIndex}
+N{PathIndex};
 G65 P"LoadParameter" H{LayerIndex};
 
 <TraverseTail>

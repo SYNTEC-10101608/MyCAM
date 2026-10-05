@@ -465,14 +465,15 @@ namespace MyCAM.PathCache
 
 			// set over cut
 			IReadOnlyList<CAMPoint> copyedCAMPointList = m_CAMPointList.Select( p => p.Clone() ).ToList();
-			OverCutHelper.SetOverCut( copyedCAMPointList, out m_OverCutPointList, m_CraftData.OverCutLength, m_IsClose );
+			OverCutHelper.SetOverCut( copyedCAMPointList, out m_OverCutPointList, m_CraftData.OverCutLength, m_IsClose, m_CraftData.IsToolVecReverse );
 
 			// set lead
-			LeadHelper.SetLeadIn( m_CAMPointList.First().Clone(), out m_LeadInCAMPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
+			LeadHelper.SetLeadIn( m_CAMPointList.First().Clone(), out m_LeadInCAMPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse, m_CraftData.IsToolVecReverse );
 
 			// get lead out start point (last over cut pnt if exist, otherwise last main path pnt)
 			CAMPoint leadOutStartPoint = GetLeadOutStartPnt();
-			LeadHelper.SetLeadOut( leadOutStartPoint, out m_LeadOutCAMPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse );
+			LeadHelper.SetLeadOut( leadOutStartPoint, out m_LeadOutCAMPointList, m_CraftData.LeadData, m_CraftData.IsPathReverse, m_CraftData.IsToolVecReverse );
+			ToolVecHelper.UpdateTiltAngles( m_CAMPointList, m_OverCutPointList, m_LeadInCAMPointList, m_LeadOutCAMPointList );
 		}
 
 		#endregion

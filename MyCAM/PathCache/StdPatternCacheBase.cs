@@ -214,6 +214,20 @@ namespace MyCAM.PathCache
 
 		protected abstract void BuildCAMPointList();
 
+		// Standard patterns currently do not apply tool direction reversal.
+		protected bool IsToolVecReverse
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		protected void UpdateTiltAngles()
+		{
+			MyCAM.Helper.ToolVecHelper.UpdateTiltAngles( new[] { m_RefPoint }, m_StartCAMPointList, m_CAMPointList, m_OverCutCAMPointList, m_LeadInCAMPointList );
+		}
+
 		protected void SetCAMFactorDirty()
 		{
 			if( !m_IsCAMFactorDirty ) {
@@ -324,7 +338,7 @@ namespace MyCAM.PathCache
 			// set each point MS same as reference point
 			foreach( CADPoint cadPoint in cadPointList ) {
 				CADPoint point = cadPoint.Clone();
-				CAMPoint camPoint = new CAMPoint( point );
+				CAMPoint camPoint = new CAMPoint( point, IsToolVecReverse );
 				camPoint.InitMaster_rad = m_RefPoint.InitMaster_rad;
 				camPoint.InitSlave_rad = m_RefPoint.InitSlave_rad;
 				camPoint.ModMaster_rad = m_RefPoint.ModMaster_rad;

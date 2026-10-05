@@ -155,6 +155,21 @@ namespace MyCAM.Helper
 			return new Tuple<double, double>( master_deg, slave_deg );
 		}
 
+		public static void UpdateTiltAngles( params IEnumerable<CAMPoint>[] pointLists )
+		{
+			foreach( IEnumerable<CAMPoint> pointList in pointLists ) {
+				if( pointList == null ) {
+					continue;
+				}
+				foreach( CAMPoint point in pointList ) {
+					if( point == null ) {
+						continue;
+					}
+					point.TiltAngle_deg = OCCTool.VectorTool.GetAngle_deg( point.ToolVec, point.InitToolVec );
+				}
+			}
+		}
+
 		#region Special case of tool vector edit
 
 		public static void SetToolVecByAssignedMS( ref List<ISetToolVecPoint> toolVecPointList, double dMaster_deg, double dSlave_deg )
