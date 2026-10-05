@@ -264,14 +264,16 @@ namespace MyCAM.Post
 
 		void WriteCutting( PostData currentPathPostData, string szPathID, CraftData craftData, int N_Index, int nLayIndex = 1 )
 		{
+			double enterTiltAngle_deg = GetStartOrEndTiltAngle_deg( currentPathPostData, isStartPoint: true );
+
 			// Header
-			Dictionary<string, string> varDict = BuildPathDict( N_Index, nLayIndex );
+			Dictionary<string, string> varDict = BuildPathDict( N_Index, nLayIndex, enterTiltAngle_deg );
 			// traverse header
 			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.TraverseHeader, varDict );
 			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.TraverseHead );
 
 			// traverse from previous path to current path
-			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData, m_AxisConfig );
+			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData, m_AxisConfig, enterTiltAngle_deg );
 
 			// traverse tail
 			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.TraverseTail );
@@ -288,8 +290,8 @@ namespace MyCAM.Post
 			// start cutting, write each process path
 			WriteOneProcessPath( currentPathPostData.LeadInPostPointList );
 			WriteOneProcessPath( currentPathPostData.MainPathPostPointList,
-				ExtendedGCodeWriter.BuildControlPointGCodeMap( szPathID, craftData, currentPathPostData.MainPathPostPointList.Count ),
-				rCornerMap );
+				controlPointGCodeMap: ExtendedGCodeWriter.BuildControlPointGCodeMap( szPathID, craftData, currentPathPostData.MainPathPostPointList.Count ),
+				rCornerMap: rCornerMap );
 			WriteOneProcessPath( currentPathPostData.OverCutPostPointList );
 			WriteOneProcessPath( currentPathPostData.LeadOutPostPointList );
 
@@ -304,7 +306,7 @@ namespace MyCAM.Post
 			StdPatternNCWriter.WriteStandardPatternCutting( m_StreamWriter, type, currentPathPostData, craftData, geomData, N_Index, m_AxisConfig );
 		}
 
-		void WriteOnePoint( PostPoint postPoint, string szExtendedGCode = null, bool isRCornerStart = false, bool isRCornerEnd = false )
+		void WriteOnePoint( PostPoint postPoint, double? tiltAngle_deg = null, string szExtendedGCode = null, bool isRCornerStart = false, bool isRCornerEnd = false )
 		{
 			if( postPoint == null ) {
 				return;
@@ -313,8 +315,9 @@ namespace MyCAM.Post
 			string szY = postPoint.Y.ToString( "F3" );
 			string szZ = postPoint.Z.ToString( "F3" );
 			string szRotaryAxisCommand = NCWriterHelper.GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI, m_AxisConfig );
+			string szTiltAngle = tiltAngle_deg.HasValue ? " T" + tiltAngle_deg.Value.ToString( "F3" ) : string.Empty;
 
-			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand};" );
+			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand}{szTiltAngle};" );
 
 			ExtendedGCodeWriter.WriteContent( m_StreamWriter, szExtendedGCode );
 
@@ -371,8 +374,29 @@ namespace MyCAM.Post
 
 				string szExtendedGCode = null;
 				controlPointGCodeMap?.TryGetValue( i, out szExtendedGCode );
-				WriteOnePoint( onePostPoint, szExtendedGCode, isRCornerStart, isRCornerEnd );
+				double? tiltAngle_deg = onePostPoint?.TiltAngle_deg;
+				WriteOnePoint( onePostPoint, tiltAngle_deg, szExtendedGCode, isRCornerStart, isRCornerEnd );
 			}
+		}
+
+		double GetStartOrEndTiltAngle_deg( PostData postData, bool isStartPoint )
+		{
+			// if postData is null, return 0.0 as a fallback
+			if( postData == null ) {
+				return 0.0;
+			}
+
+			// if the main path post point list is null or empty, return 0.0
+			if( postData.MainPathPostPointList == null || postData.MainPathPostPointList.Count == 0 ) {
+				return 0.0;
+			}
+
+			int pointIndex = isStartPoint ? 0 : postData.MainPathPostPointList.Count - 1;
+			PostPoint boundaryPoint = postData.MainPathPostPointList[ pointIndex ];
+			if( boundaryPoint == null ) {
+				return 0.0;
+			}
+			return boundaryPoint.TiltAngle_deg;
 		}
 
 		bool NeedToWriteCalibrationPnt( out CalibrationData calibrationData )
@@ -409,12 +433,13 @@ namespace MyCAM.Post
 			};
 		}
 
-		Dictionary<string, string> BuildPathDict( int N_Index, int nLayIndex )
+		Dictionary<string, string> BuildPathDict( int N_Index, int nLayIndex, double enterTiltAngle_deg )
 		{
 			// Header
 			Dictionary<string, string> varDict = new Dictionary<string, string> {
 				{ "PathIndex", N_Index.ToString() },
-				{ "LayerIndex", nLayIndex.ToString() }
+				{ "LayerIndex", nLayIndex.ToString() },
+				{ "EnterTiltAngle", enterTiltAngle_deg.ToString( "F3" ) }
 			};
 			return varDict;
 		}

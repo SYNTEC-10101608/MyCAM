@@ -9,7 +9,7 @@ namespace MyCAM.Helper
 	public static class OverCutHelper
 	{
 		public static void SetOverCut( IReadOnlyList<CAMPoint> mainPointList, out List<CAMPoint> overCutPointList,
-			double overCutLength, bool isClosed, double overCutTolerance = OVERCUT_MATH_TOLERANCE )
+			double overCutLength, bool isClosed, bool isToolVecReverse, double overCutTolerance = OVERCUT_MATH_TOLERANCE )
 		{
 			overCutPointList = new List<CAMPoint>();
 			if( mainPointList.Count == 0 || overCutLength == 0 || !isClosed ) {
@@ -19,7 +19,7 @@ namespace MyCAM.Helper
 
 			// end point is the start of over cut
 			CAMPoint endOfMain = mainPointList.Last().Clone();
-			overCutPointList.Add( BuildOverCutPoint( endOfMain, endOfMain.Point, endOfMain.TangentVec ) );
+			overCutPointList.Add( BuildOverCutPoint( endOfMain, endOfMain.Point, endOfMain.TangentVec, isToolVecReverse ) );
 			for( int i = 0; i < mainPointList.Count - 1; i++ ) {
 
 				// get this edge distance
@@ -27,7 +27,7 @@ namespace MyCAM.Helper
 				if( dTotalOverCutLength + dDistance < overCutLength ) {
 
 					// still within overcut length → take next point directly
-					overCutPointList.Add( BuildOverCutPoint( endOfMain, mainPointList[ i + 1 ].Point, mainPointList[ i + 1 ].TangentVec ) );
+					overCutPointList.Add( BuildOverCutPoint( endOfMain, mainPointList[ i + 1 ].Point, mainPointList[ i + 1 ].TangentVec, isToolVecReverse ) );
 					dTotalOverCutLength += dDistance;
 				}
 				else {
@@ -45,7 +45,7 @@ namespace MyCAM.Helper
 					DiscreteUtility.InterpolateVecBetween2Point( mainPointList[ i ], mainPointList[ i + 1 ], overCutEndLocation, out _, out gp_Dir overCutEndTangentVec );
 
 					// create new cam point
-					overCutPointList.Add( BuildOverCutPoint( endOfMain, overCutEndLocation, overCutEndTangentVec ) );
+					overCutPointList.Add( BuildOverCutPoint( endOfMain, overCutEndLocation, overCutEndTangentVec, isToolVecReverse ) );
 					return;
 				}
 			}
@@ -87,11 +87,14 @@ namespace MyCAM.Helper
 			return 0;
 		}
 
-		static CAMPoint BuildOverCutPoint( CAMPoint endOfMain, gp_Pnt location, gp_Dir tangentVec )
+		static CAMPoint BuildOverCutPoint( CAMPoint endOfMain, gp_Pnt location, gp_Dir tangentVec, bool isToolVecReverse )
 		{
 			gp_Dir toolVec = endOfMain.ToolVec;
-			CADPoint cadPoint = new CADPoint( location, toolVec, toolVec, tangentVec );
-			CAMPoint camPoint = new CAMPoint( cadPoint, toolVec );
+			CADPoint cadPoint = new CADPoint( location, endOfMain.NormalVec_1st, endOfMain.NormalVec_2nd, tangentVec );
+			CAMPoint camPoint = new CAMPoint( cadPoint, isToolVecReverse );
+
+			// copy the tool vector from the end of main point
+			camPoint.ToolVec = toolVec;
 			SetOverPntMS( ref camPoint, endOfMain );
 			return camPoint;
 		}

@@ -6,7 +6,7 @@ namespace MyCAM.Post
 {
 	internal static class NCWriterHelper
 	{
-		public static void WriteTraverse( StreamWriter writer, ITraversePostData postData, AxisConfig axisConfig )
+		public static void WriteTraverse( StreamWriter writer, ITraversePostData postData, AxisConfig axisConfig, double? enterTiltAngle_deg = null )
 		{
 			if( writer == null || postData == null || axisConfig == null ) {
 				throw new ArgumentNullException( "NCWriterHelper.WriteTraverse arguments cannot be null" );
@@ -20,12 +20,12 @@ namespace MyCAM.Post
 			// frog leap with cut down
 			if( postData.FrogLeapMidPostPoint != null ) {
 				if( postData.CutDownPostPoint != null ) {
-					WriteFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.CutDownPostPoint, 0, axisConfig );
+					WriteFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.CutDownPostPoint, 0, axisConfig, enterTiltAngle_deg );
 					WriteLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance, axisConfig );
 					return;
 				}
 				else {
-					WriteFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.ProcessStartPoint, postData.FollowSafeDistance, axisConfig );
+					WriteFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.ProcessStartPoint, postData.FollowSafeDistance, axisConfig, enterTiltAngle_deg );
 					return;
 				}
 			}
@@ -58,7 +58,7 @@ namespace MyCAM.Post
 			writer.WriteLine( $"G00 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand} {szFollow};" );
 		}
 
-		public static void WriteFrogLeap( StreamWriter writer, PostPoint midPoint, PostPoint endPoint, double followSafeDistance, AxisConfig axisConfig )
+		public static void WriteFrogLeap( StreamWriter writer, PostPoint midPoint, PostPoint endPoint, double followSafeDistance, AxisConfig axisConfig, double? enterTiltAngle_deg = null )
 		{
 			if( midPoint == null || endPoint == null ) {
 				return;
@@ -75,9 +75,10 @@ namespace MyCAM.Post
 			string szY2 = endPoint.Y.ToString( "F3" );
 			string szZ2 = endPoint.Z.ToString( "F3" );
 			string szRotaryAxisCommand2 = GetRotaryAxisCommand( endPoint.Master * 180 / Math.PI, endPoint.Slave * 180 / Math.PI, axisConfig, "2=" );
-			string szFollow = followSafeDistance == 0 ? string.Empty : FOLLOW_SAFE_DISTANCE_COMMAND + followSafeDistance.ToString( "F3" );
+			string szFollow = followSafeDistance == 0 ? string.Empty : " " + FOLLOW_SAFE_DISTANCE_COMMAND + followSafeDistance.ToString( "F3" );
+			string szTiltAngle = enterTiltAngle_deg.HasValue ? " T" + enterTiltAngle_deg.Value.ToString( "F3" ) : string.Empty;
 			writer.WriteLine( $"G65 P\"FROG_LEAP\" X1={szX1} Y1={szY1} Z1={szZ1} {szRotaryAxisCommand1} " +
-				$"X2={szX2} Y2={szY2} Z2={szZ2} {szRotaryAxisCommand2} {szFollow};" );
+				$"X2={szX2} Y2={szY2} Z2={szZ2} {szRotaryAxisCommand2}{szFollow}{szTiltAngle};" );
 		}
 
 		public static string GetRotaryAxisCommand( double master_deg, double slave_deg, AxisConfig axisConfig,

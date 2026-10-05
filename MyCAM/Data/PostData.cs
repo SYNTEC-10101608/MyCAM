@@ -166,6 +166,11 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		public double TiltAngle_deg
+		{
+			get; set;
+		}
+
 		public PostPoint Clone()
 		{
 			PostPoint newPoint = new PostPoint();
@@ -174,6 +179,7 @@ namespace MyCAM.Data
 			newPoint.Z = Z;
 			newPoint.Master = Master;
 			newPoint.Slave = Slave;
+			newPoint.TiltAngle_deg = TiltAngle_deg;
 			newPoint.IsMicroJointStart = IsMicroJointStart;
 			newPoint.IsMicroJointEnd = IsMicroJointEnd;
 			return newPoint;
