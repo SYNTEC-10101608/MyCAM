@@ -7,7 +7,7 @@ G65 P"FileEnd";
 M30;
 
 <PathHeader>
-G65 P"LASER_ON" S3={EnterTiltAngle};
+G65 P"LASER_ON";
 
 <PathTail>
 G65 P"LASER_OFF";
