@@ -87,7 +87,7 @@ namespace CommonData
 
 		public const string DEFAULT_Header = "G43.4 P1;\nG65 P\"FileStart\" X\"Material1\" Y\"1.0\";";
 		public const string DEFAULT_Tail = "G65 P\"FileEnd\";\nM30;";
-		public const string DEFAULT_PathHeader = "G65 P\"LASER_ON\" S3={EnterTiltAngle};";
+		public const string DEFAULT_PathHeader = "G65 P\"LASER_ON\";";
 		public const string DEFAULT_PathTail = "G65 P\"LASER_OFF\";";
 		public const string DEFAULT_StdPathHeader = "";
 		public const string DEFAULT_StdPathTail = "";

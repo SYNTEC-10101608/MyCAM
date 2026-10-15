@@ -76,9 +76,9 @@ namespace MyCAM.Post
 			string szZ2 = endPoint.Z.ToString( "F3" );
 			string szRotaryAxisCommand2 = GetRotaryAxisCommand( endPoint.Master * 180 / Math.PI, endPoint.Slave * 180 / Math.PI, axisConfig, "2=" );
 			string szFollow = followSafeDistance == 0 ? string.Empty : " " + FOLLOW_SAFE_DISTANCE_COMMAND + followSafeDistance.ToString( "F3" );
-			string szTiltAngle = enterTiltAngle_deg.HasValue ? " S3=" + enterTiltAngle_deg.Value.ToString( "F3" ) : string.Empty;
+			//string szTiltAngle = enterTiltAngle_deg.HasValue ? " S3=" + enterTiltAngle_deg.Value.ToString( "F3" ) : string.Empty;
 			writer.WriteLine( $"G65 P\"FROG_LEAP\" X1={szX1} Y1={szY1} Z1={szZ1} {szRotaryAxisCommand1} " +
-				$"X2={szX2} Y2={szY2} Z2={szZ2} {szRotaryAxisCommand2}{szFollow}{szTiltAngle};" );
+				$"X2={szX2} Y2={szY2} Z2={szZ2} {szRotaryAxisCommand2}{szFollow};" );
 		}
 
 		public static string GetRotaryAxisCommand( double master_deg, double slave_deg, AxisConfig axisConfig,

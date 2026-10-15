@@ -315,9 +315,9 @@ namespace MyCAM.Post
 			string szY = postPoint.Y.ToString( "F3" );
 			string szZ = postPoint.Z.ToString( "F3" );
 			string szRotaryAxisCommand = NCWriterHelper.GetRotaryAxisCommand( postPoint.Master * 180 / Math.PI, postPoint.Slave * 180 / Math.PI, m_AxisConfig );
-			string szTiltAngle = tiltAngle_deg.HasValue ? " S3=" + tiltAngle_deg.Value.ToString( "F3" ) : string.Empty;
+			//string szTiltAngle = tiltAngle_deg.HasValue ? " S3=" + tiltAngle_deg.Value.ToString( "F3" ) : string.Empty;
 
-			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand}{szTiltAngle};" );
+			m_StreamWriter.WriteLine( $"G01 X{szX} Y{szY} Z{szZ} {szRotaryAxisCommand};" );
 
 			ExtendedGCodeWriter.WriteContent( m_StreamWriter, szExtendedGCode );
 
