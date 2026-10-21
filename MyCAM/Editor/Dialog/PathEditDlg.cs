@@ -21,6 +21,7 @@ namespace MyCAM.Editor.Dialog
 			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
 			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
 			m_btnReset.Text = m_LanguageManager.TryGetString( "m_btnReset", m_btnReset.Text );
+			m_lblTotalDiff.Text = m_LanguageManager.TryGetString( "m_lblTotalDiff", m_lblTotalDiff.Text );
 
 			// Update combo box items
 			m_cmbRefCoordType.Items.Clear();
@@ -59,6 +60,13 @@ namespace MyCAM.Editor.Dialog
 		void PathEditDlg_Shown( object sender, EventArgs e )
 		{
 			Initialization();
+		}
+
+		public void SetTotaloffset( double? x, double? y, double? z )
+		{
+			m_lblTotalDX.Text = x.HasValue ? x.Value.ToString( "F3" ) : m_LanguageManager.TryGetString( "IsMixData", IS_MIX_DATA );
+			m_lblTotalDY.Text = y.HasValue ? y.Value.ToString( "F3" ) : m_LanguageManager.TryGetString( "IsMixData", IS_MIX_DATA );
+			m_lblTotalDZ.Text = z.HasValue ? z.Value.ToString( "F3" ) : m_LanguageManager.TryGetString( "IsMixData", IS_MIX_DATA );
 		}
 
 		void m_cmbRefCoordType_SelectedIndexChanged( object sender, EventArgs e )
@@ -153,5 +161,6 @@ namespace MyCAM.Editor.Dialog
 
 		const string REF_COORD_TYPE_LOCAL = "區域座標系";
 		const string REF_COORD_TYPE_WORLD = "世界座標系";
+		const string IS_MIX_DATA = "偏移不一致";
 	}
 }

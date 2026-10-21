@@ -10,4 +10,6 @@
 	<Message ID="m_btnConfirm" Content="确认" />
 	<Message ID="m_btnClear" Content="清除" />
 	<Message ID="m_btnReset" Content="重置" />
+	<Message ID="m_lblTotalDiff" Content="总偏移" />
+	<Message ID="IsMixData" Content="偏移不一致" />
 </ResMap>

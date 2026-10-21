@@ -15,9 +15,14 @@
 	<Message ID="m_lblDY" Content="Y偏移" />
 	<Message ID="m_lblDZ" Content="Z偏移" />
 	<Message ID="m_lblUnit" Content="(单位：mm)" />
-	
-	<Message ID="m_btnReset" Content="重置数据" />
-	<Message ID="m_btnClear" Content="清除数据" />
+
+	<Message ID="m_lblRelativeCurrentPath" Content="（相对当前路径）" />
+	<Message ID="m_lblTotalDiff" Content="总偏移" />
+
 	<Message ID="m_btnAdd" Content="新增控制点" />
 	<Message ID="m_btnRemove" Content="移除控制点" />
+
+	<Message ID="m_btnSave" Content="保存数据" />
+	<Message ID="m_btnReset" Content="重置数据" />
+	<Message ID="m_btnClear" Content="清除数据" />
 </ResMap>

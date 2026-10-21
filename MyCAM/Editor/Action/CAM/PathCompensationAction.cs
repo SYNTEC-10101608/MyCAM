@@ -4,6 +4,7 @@ using MyCAM.Editor.Dialog;
 using MyCAM.PathCache;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Editor
 {
@@ -61,6 +62,8 @@ namespace MyCAM.Editor
 			m_Dlg.IsGeomConstraintExceedsLimit = IsGeomConstraintExceedsLimit;
 			m_Dlg.Show( MyApp.MainForm );
 			PropertyChanged?.Invoke( m_PathIDList );
+
+			UpdateDialog();
 		}
 
 		public override void End()
@@ -90,6 +93,8 @@ namespace MyCAM.Editor
 			}
 			PropertyChanged?.Invoke( m_PathIDList );
 			isResetClicked = false;
+
+			UpdateDialog();
 		}
 
 		void ConfirmCompensatedDist( double compensatedDist )
@@ -116,6 +121,8 @@ namespace MyCAM.Editor
 				m_CraftDataList[ i ].CompensatedDistance = m_BackupCompensatedDistList[ i ];
 			}
 			PropertyChanged?.Invoke( m_PathIDList );
+
+			UpdateDialog();
 		}
 
 		void RestoreCompensatedDist( double compensatedDist )
@@ -125,6 +132,8 @@ namespace MyCAM.Editor
 			}
 			PropertyChanged?.Invoke( m_PathIDList );
 			isResetClicked = true;
+
+			UpdateDialog();
 		}
 
 		bool IsGeomConstraintExceedsLimit( double compensatedDist )
@@ -140,6 +149,13 @@ namespace MyCAM.Editor
 				}
 			}
 			return false;
+		}
+
+		void UpdateDialog()
+		{
+			double reference = m_CraftDataList.First().CompensatedDistance;
+			bool isAllSame = m_CraftDataList.All( craftData => Math.Abs( craftData.CompensatedDistance - reference ) <= GEOMETRY_TOLERANCE );
+			m_Dlg.SetTotalCompsensation( isAllSame ? m_CraftDataList.First().CompensatedDistance : (double?)null );
 		}
 
 		double GetGeomDataMinCompensation( IStdPatternGeomData geomData )
@@ -171,5 +187,7 @@ namespace MyCAM.Editor
 		PathCompensateDlg m_Dlg;
 		const string COMPENSATION_EXCEEDS_LIMIT = "路徑超出補償範圍，請調整補償數值";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "PathCompensationAction" );
+
+		const double GEOMETRY_TOLERANCE = 1e-3;
 	}
 }

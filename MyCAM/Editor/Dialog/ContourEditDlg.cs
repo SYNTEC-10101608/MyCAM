@@ -1,4 +1,3 @@
-using MyCAM.Data;
 using System;
 using System.Windows.Forms;
 
@@ -9,6 +8,7 @@ namespace MyCAM.Editor
 		// --- events raised to Action ---
 		public Action AddEditIndex;
 		public Action RemoveEditIndex;
+		public Action SaveEditIndex;
 		public Action<double, double, double, RefCoordinateType> DisplacementChanged;
 		public Action ResetDisplacement;
 		public Action<bool> ToStartOrEnd;
@@ -40,10 +40,15 @@ namespace MyCAM.Editor
 			m_lblDZ.Text = m_LanguageManager.TryGetString( "m_lblDZ", m_lblDZ.Text );
 			m_lblUnit.Text = m_LanguageManager.TryGetString( "m_lblUnit", m_lblUnit.Text );
 
-			m_btnReset.Text = m_LanguageManager.TryGetString( "m_btnReset", m_btnReset.Text );
-			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
+			m_lblRelativeCurrentPath.Text = m_LanguageManager.TryGetString( "m_lblRelativeCurrentPath", m_lblRelativeCurrentPath.Text );
+			m_lblTotalDiff.Text = m_LanguageManager.TryGetString( "m_lblTotalDiff", m_lblTotalDiff.Text );
+
 			m_btnAdd.Text = m_LanguageManager.TryGetString( "m_btnAdd", m_btnAdd.Text );
 			m_btnRemove.Text = m_LanguageManager.TryGetString( "m_btnRemove", m_btnRemove.Text );
+
+			m_btnSave.Text = m_LanguageManager.TryGetString( "m_btnSave", m_btnSave.Text );
+			m_btnReset.Text = m_LanguageManager.TryGetString( "m_btnReset", m_btnReset.Text );
+			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
 		}
 
 		// Refresh the dialog UI to reflect the given param.
@@ -59,6 +64,7 @@ namespace MyCAM.Editor
 				m_tbxDX.Value = 0;
 				m_tbxDY.Value = 0;
 				m_tbxDZ.Value = 0;
+				m_lblRelativeCurrentPath.Visible = false;
 				m_bSuppressValueChanged = false;
 				return;
 			}
@@ -77,15 +83,39 @@ namespace MyCAM.Editor
 			m_rbtnToStart.Checked = m_Param.IsPathStartPoint == true;
 			m_rbtnToEnd.Checked = m_Param.IsPathStartPoint == false;
 
+			m_lblRelativeCurrentPath.Visible = m_Param.IsPathStartPoint.HasValue;
+
 			if( m_Param.IsPathStartPoint != null ) {
 				m_btnAdd.Enabled = false;
 				m_btnRemove.Enabled = false;
 			}
 
+			UpdateTotalDisplacement();
 			m_bSuppressValueChanged = false;
 		}
 
-		// ---- UI events ----
+		void SetInputEnabled( bool enabled )
+		{
+			m_tbxDX.Enabled = enabled;
+			m_tbxDY.Enabled = enabled;
+			m_tbxDZ.Enabled = enabled;
+
+			m_btnReset.Enabled = enabled;
+			m_btnClear.Enabled = enabled;
+
+			m_btnSave.Enabled = enabled;
+			m_btnAdd.Enabled = !enabled;
+			m_btnRemove.Enabled = enabled;
+		}
+
+		public void UpdateTotalDisplacement()
+		{
+			m_lblTotalDX.Text = ( m_Param?.TotalDX ?? 0 ).ToString( "F3" );
+			m_lblTotalDY.Text = ( m_Param?.TotalDY ?? 0 ).ToString( "F3" );
+			m_lblTotalDZ.Text = ( m_Param?.TotalDZ ?? 0 ).ToString( "F3" );
+		}
+
+		#region UI Events
 
 		void m_tbxDX_DebouncedValueChanged( object sender, EventArgs e )
 		{
@@ -155,6 +185,11 @@ namespace MyCAM.Editor
 			DisplacementChanged?.Invoke( 0, 0, 0, m_Param.RefCoordinateType );
 		}
 
+		void m_btnSave_Click( object sender, EventArgs e )
+		{
+			SaveEditIndex?.Invoke();
+		}
+
 		void m_btnAdd_Click( object sender, EventArgs e )
 		{
 			AddEditIndex?.Invoke();
@@ -173,18 +208,7 @@ namespace MyCAM.Editor
 			return true;
 		}
 
-		void SetInputEnabled( bool enabled )
-		{
-			m_tbxDX.Enabled = enabled;
-			m_tbxDY.Enabled = enabled;
-			m_tbxDZ.Enabled = enabled;
-
-			m_btnReset.Enabled = enabled;
-			m_btnClear.Enabled = enabled;
-
-			m_btnAdd.Enabled = !enabled;
-			m_btnRemove.Enabled = enabled;
-		}
+		#endregion
 
 		bool m_bSuppressValueChanged = false;
 		ContourEditParam m_Param = null;
@@ -211,11 +235,30 @@ namespace MyCAM.Editor
 			get; set;
 		}
 
-		public ContourEditParam( RefCoordinateType refCoordinateType, bool isModified, bool? isPathStartPoint )
+		public double TotalDX
+		{
+			get; set;
+		}
+
+		public double TotalDY
+		{
+			get; set;
+		}
+
+		public double TotalDZ
+		{
+			get; set;
+		}
+
+		public ContourEditParam( RefCoordinateType refCoordinateType, bool isModified, bool? isPathStartPoint,
+			double totalDX, double totalDY, double totalDZ )
 		{
 			RefCoordinateType = refCoordinateType;
 			IsModified = isModified;
 			IsPathStartPoint = isPathStartPoint;
+			TotalDX = totalDX;
+			TotalDY = totalDY;
+			TotalDZ = totalDZ;
 		}
 	}
 }

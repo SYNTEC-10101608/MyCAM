@@ -19,6 +19,7 @@ namespace MyCAM.Editor.Dialog
 			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
 			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
 			m_btnReset.Text = m_LanguageManager.TryGetString( "m_btnReset", m_btnReset.Text );
+			m_lblTotalCompensate.Text = m_LanguageManager.TryGetString( "m_lblTotalCompensate", m_lblTotalCompensate.Text );
 		}
 
 		public Func<double, bool> IsGeomConstraintExceedsLimit;
@@ -35,6 +36,17 @@ namespace MyCAM.Editor.Dialog
 		void m_NumUpDownCompensate_DebouncedValueChanged( object sender, System.EventArgs e )
 		{
 			SetCompensateValue();
+		}
+
+		public void SetTotalCompsensation(double? totalCompsensation)
+		{
+			if( totalCompsensation  == null ) {
+				m_lblTotalCompensateValue.Text = m_LanguageManager.TryGetString( "IsMixData", IS_MIX_DATA );
+			}
+			else {
+				m_lblTotalCompensateValue.Text = totalCompsensation.Value.ToString( "F3" );
+			}
+
 		}
 
 		void SetCompensateValue()
@@ -75,5 +87,7 @@ namespace MyCAM.Editor.Dialog
 
 		double m_CompensateData = 0.0;
 		readonly LanguageManager.LanguageManager m_LanguageManager;
+
+		const string IS_MIX_DATA = "補償不一致";
 	}
 }
