@@ -10,4 +10,6 @@
 	<Message ID="m_btnConfirm" Content="Подтвердить" />
 	<Message ID="m_btnClear" Content="Очистить" />
 	<Message ID="m_btnReset" Content="Сброс" />
+	<Message ID="m_lblTotalDiff" Content="Общее смещение" />
+	<Message ID="IsMixData" Content="Несоответствие смещения" />
 </ResMap>

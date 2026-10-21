@@ -15,9 +15,14 @@
 	<Message ID="m_lblDY" Content="Y Offset" />
 	<Message ID="m_lblDZ" Content="Z Offset" />
 	<Message ID="m_lblUnit" Content="(Unit: mm)" />
+
+	<Message ID="m_lblRelativeCurrentPath" Content="(Relative to Current Path)" />
+	<Message ID="m_lblTotalDiff" Content="Total Offset" />
 	
-	<Message ID="m_btnReset" Content="Reset Data" />
-	<Message ID="m_btnClear" Content="Clear Data" />
 	<Message ID="m_btnAdd" Content="Add Control Point" />
 	<Message ID="m_btnRemove" Content="Remove Control Point" />
+
+	<Message ID="m_btnSave" Content="Save Data" />
+	<Message ID="m_btnReset" Content="Reset Data" />
+	<Message ID="m_btnClear" Content="Clear Data" />
 </ResMap>

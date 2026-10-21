@@ -28,6 +28,10 @@
 		private void InitializeComponent()
 		{
 			this.m_gpbMove = new System.Windows.Forms.GroupBox();
+			this.m_lblTotalDZ = new System.Windows.Forms.Label();
+			this.m_lblTotalDY = new System.Windows.Forms.Label();
+			this.m_lblTotalDX = new System.Windows.Forms.Label();
+			this.m_lblTotalDiff = new System.Windows.Forms.Label();
 			this.m_NumUpDownZ = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_NumUpDownY = new MyCAM.Editor.DebouncedNumericUpDown();
 			this.m_NumUpDownX = new MyCAM.Editor.DebouncedNumericUpDown();
@@ -47,6 +51,10 @@
 			// 
 			// m_gpbMove
 			// 
+			this.m_gpbMove.Controls.Add(this.m_lblTotalDZ);
+			this.m_gpbMove.Controls.Add(this.m_lblTotalDY);
+			this.m_gpbMove.Controls.Add(this.m_lblTotalDX);
+			this.m_gpbMove.Controls.Add(this.m_lblTotalDiff);
 			this.m_gpbMove.Controls.Add(this.m_NumUpDownZ);
 			this.m_gpbMove.Controls.Add(this.m_NumUpDownY);
 			this.m_gpbMove.Controls.Add(this.m_NumUpDownX);
@@ -57,10 +65,46 @@
 			this.m_gpbMove.Controls.Add(this.m_cmbRefCoordType);
 			this.m_gpbMove.Location = new System.Drawing.Point(12, 12);
 			this.m_gpbMove.Name = "m_gpbMove";
-			this.m_gpbMove.Size = new System.Drawing.Size(255, 204);
+			this.m_gpbMove.Size = new System.Drawing.Size(411, 204);
 			this.m_gpbMove.TabIndex = 0;
 			this.m_gpbMove.TabStop = false;
 			this.m_gpbMove.Text = "平移";
+			// 
+			// m_lblTotalDZ
+			// 
+			this.m_lblTotalDZ.AutoSize = true;
+			this.m_lblTotalDZ.Location = new System.Drawing.Point(295, 147);
+			this.m_lblTotalDZ.Name = "m_lblTotalDZ";
+			this.m_lblTotalDZ.Size = new System.Drawing.Size(48, 19);
+			this.m_lblTotalDZ.TabIndex = 11;
+			this.m_lblTotalDZ.Text = "0.000";
+			// 
+			// m_lblTotalDY
+			// 
+			this.m_lblTotalDY.AutoSize = true;
+			this.m_lblTotalDY.Location = new System.Drawing.Point(295, 112);
+			this.m_lblTotalDY.Name = "m_lblTotalDY";
+			this.m_lblTotalDY.Size = new System.Drawing.Size(48, 19);
+			this.m_lblTotalDY.TabIndex = 10;
+			this.m_lblTotalDY.Text = "0.000";
+			// 
+			// m_lblTotalDX
+			// 
+			this.m_lblTotalDX.AutoSize = true;
+			this.m_lblTotalDX.Location = new System.Drawing.Point(295, 71);
+			this.m_lblTotalDX.Name = "m_lblTotalDX";
+			this.m_lblTotalDX.Size = new System.Drawing.Size(48, 19);
+			this.m_lblTotalDX.TabIndex = 9;
+			this.m_lblTotalDX.Text = "0.000";
+			// 
+			// m_lblTotalDiff
+			// 
+			this.m_lblTotalDiff.AutoSize = true;
+			this.m_lblTotalDiff.Location = new System.Drawing.Point(289, 38);
+			this.m_lblTotalDiff.Name = "m_lblTotalDiff";
+			this.m_lblTotalDiff.Size = new System.Drawing.Size(54, 19);
+			this.m_lblTotalDiff.TabIndex = 8;
+			this.m_lblTotalDiff.Text = "總偏移";
 			// 
 			// m_NumUpDownZ
 			// 
@@ -77,6 +121,7 @@
             0,
             -2147483648});
 			this.m_NumUpDownZ.Name = "m_NumUpDownZ";
+			this.m_NumUpDownZ.RestrictInvalidCharacters = false;
 			this.m_NumUpDownZ.Size = new System.Drawing.Size(120, 27);
 			this.m_NumUpDownZ.TabIndex = 7;
 			this.m_NumUpDownZ.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -97,6 +142,7 @@
             0,
             -2147483648});
 			this.m_NumUpDownY.Name = "m_NumUpDownY";
+			this.m_NumUpDownY.RestrictInvalidCharacters = false;
 			this.m_NumUpDownY.Size = new System.Drawing.Size(120, 27);
 			this.m_NumUpDownY.TabIndex = 6;
 			this.m_NumUpDownY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -117,6 +163,7 @@
             0,
             -2147483648});
 			this.m_NumUpDownX.Name = "m_NumUpDownX";
+			this.m_NumUpDownX.RestrictInvalidCharacters = false;
 			this.m_NumUpDownX.Size = new System.Drawing.Size(120, 27);
 			this.m_NumUpDownX.TabIndex = 5;
 			this.m_NumUpDownX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -127,27 +174,27 @@
 			this.m_lblZ.AutoSize = true;
 			this.m_lblZ.Location = new System.Drawing.Point(31, 147);
 			this.m_lblZ.Name = "m_lblZ";
-			this.m_lblZ.Size = new System.Drawing.Size(73, 19);
+			this.m_lblZ.Size = new System.Drawing.Size(48, 19);
 			this.m_lblZ.TabIndex = 4;
-			this.m_lblZ.Text = "Z(增量)：";
+			this.m_lblZ.Text = "Z偏移";
 			// 
 			// m_lblY
 			// 
 			this.m_lblY.AutoSize = true;
 			this.m_lblY.Location = new System.Drawing.Point(31, 112);
 			this.m_lblY.Name = "m_lblY";
-			this.m_lblY.Size = new System.Drawing.Size(73, 19);
+			this.m_lblY.Size = new System.Drawing.Size(48, 19);
 			this.m_lblY.TabIndex = 3;
-			this.m_lblY.Text = "Y(增量)：";
+			this.m_lblY.Text = "Y偏移";
 			// 
 			// m_lblX
 			// 
 			this.m_lblX.AutoSize = true;
 			this.m_lblX.Location = new System.Drawing.Point(31, 71);
 			this.m_lblX.Name = "m_lblX";
-			this.m_lblX.Size = new System.Drawing.Size(74, 19);
+			this.m_lblX.Size = new System.Drawing.Size(49, 19);
 			this.m_lblX.TabIndex = 2;
-			this.m_lblX.Text = "X(增量)：";
+			this.m_lblX.Text = "X偏移";
 			// 
 			// m_lblRefCoordType
 			// 
@@ -204,7 +251,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(283, 257);
+			this.ClientSize = new System.Drawing.Size(501, 264);
 			this.Controls.Add(this.m_btnReset);
 			this.Controls.Add(this.m_btnClear);
 			this.Controls.Add(this.m_btnConfirm);
@@ -237,5 +284,9 @@
 		private System.Windows.Forms.Button m_btnConfirm;
 		private System.Windows.Forms.Button m_btnClear;
 		private System.Windows.Forms.Button m_btnReset;
+		private System.Windows.Forms.Label m_lblTotalDZ;
+		private System.Windows.Forms.Label m_lblTotalDY;
+		private System.Windows.Forms.Label m_lblTotalDX;
+		private System.Windows.Forms.Label m_lblTotalDiff;
 	}
 }

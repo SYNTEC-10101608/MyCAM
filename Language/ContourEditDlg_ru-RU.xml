@@ -15,9 +15,14 @@
 	<Message ID="m_lblDY" Content="Смещение по Y" />
 	<Message ID="m_lblDZ" Content="Смещение по Z" />
 	<Message ID="m_lblUnit" Content="(единица: мм)" />
-	
-	<Message ID="m_btnReset" Content="Сброс данных" />
-	<Message ID="m_btnClear" Content="Очистить данные" />
+
+	<Message ID="m_lblRelativeCurrentPath" Content="(Относительно текущего пути)" />
+	<Message ID="m_lblTotalDiff" Content="Общее смещение" />
+
 	<Message ID="m_btnAdd" Content="Добавить контрольную точку" />
 	<Message ID="m_btnRemove" Content="Удалить контрольную точку" />
+	
+	<Message ID="m_btnSave" Content="Сохранить данные" />
+	<Message ID="m_btnReset" Content="Сброс данных" />
+	<Message ID="m_btnClear" Content="Очистить данные" />
 </ResMap>

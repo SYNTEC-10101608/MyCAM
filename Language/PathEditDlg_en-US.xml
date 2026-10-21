@@ -10,4 +10,6 @@
 	<Message ID="m_btnConfirm" Content="Confirm" />
 	<Message ID="m_btnClear" Content="Clear" />
 	<Message ID="m_btnReset" Content="Reset" />
+	<Message ID="m_lblTotalDiff" Content="Total Offset" />
+	<Message ID="IsMixData" Content="Inconsistent Offset" />
 </ResMap>
