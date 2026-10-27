@@ -63,6 +63,11 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		public List<PostPoint> SafeBoundaryPostPointList
+		{
+			get; set;
+		}
+
 		public PostData()
 		{
 			LeadInPostPointList = new List<PostPoint>();
@@ -119,6 +124,11 @@ namespace MyCAM.Data
 		}
 
 		public PostPoint CutDownPostSafePlanePoint
+		{
+			get; set;
+		}
+
+		public List<PostPoint> SafeBoundaryPostPointList
 		{
 			get; set;
 		}

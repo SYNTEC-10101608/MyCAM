@@ -191,6 +191,7 @@
     <Compile Include="Editor\Dialog\SupportPositionRow.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Editor\Renderer\Shape3DRenderer.cs" />
     <Compile Include="Editor\Renderer\MarkerRenderer.cs" />
     <Compile Include="Editor\Renderer\PathRenderer.cs" />
     <Compile Include="Editor\Dialog\ContourEditDlg.cs">

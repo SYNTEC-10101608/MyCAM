@@ -196,7 +196,7 @@ namespace MyCAM.Editor.Renderer
 				List<AIS_Shape> frogLeapShapeList = new List<AIS_Shape>();
 
 				// frog leap 
-				if( !currentTraverseData.IsSafePlaneEnable && currentTraverseData.FrogLeapDistance > 0 && result.FrogLeapMiddlePoint != null && result.LiftUpPoint.Point != null && result.CutDownPoint.Point != null ) {
+				if( currentTraverseData.TraverseMode == TraverseData.TraverseType.FrogLeap && currentTraverseData.FrogLeapDistance > 0 && result.FrogLeapMiddlePoint != null && result.LiftUpPoint.Point != null && result.CutDownPoint.Point != null ) {
 					GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( result.LiftUpPoint.Point, result.FrogLeapMiddlePoint.Point, result.CutDownPoint.Point );
 					if( makeCircle.IsDone() ) {
 						Geom_TrimmedCurve arcCurve = makeCircle.Value();
@@ -402,6 +402,9 @@ namespace MyCAM.Editor.Renderer
 
 		void AddOneLinearTraverseWithTrans( List<AIS_Line> lineList, gp_Pnt startPnt, gp_Pnt endPnt, gp_Trsf trsf )
 		{
+			if( startPnt == null || endPnt == null || startPnt.Distance( endPnt ) <= 1e-7 ) {
+				return;
+			}
 			AIS_Line traverseAIS = DrawHelper.GetLineAIS( startPnt, endPnt, Quantity_NameOfColor.Quantity_NOC_RED, 1, true );
 			if( trsf != null ) {
 				traverseAIS.SetLocalTransformation( trsf );
@@ -438,10 +441,20 @@ namespace MyCAM.Editor.Renderer
 			}
 
 			// traverse (depends on mode)
-			if( traverseData.IsSafePlaneEnable ) {
+			if( traverseData.TraverseMode == TraverseData.TraverseType.SafePlane ) {
 				segments.Add( (traverseResult.LiftUpPoint.Point, traverseResult.SafePlaneLiftUpProjPoint) );
 				segments.Add( (traverseResult.SafePlaneLiftUpProjPoint, traverseResult.SafePlaneCutDownProjPoint) );
 				segments.Add( (traverseResult.SafePlaneCutDownProjPoint, traverseResult.CutDownPoint.Point) );
+			}
+			else if( traverseData.TraverseMode == TraverseData.TraverseType.SafeCylinder ||
+				traverseData.TraverseMode == TraverseData.TraverseType.SafeSphere ) {
+				List<gp_Pnt> points = traverseResult.SafeBoundaryPointList;
+				if( points == null || points.Count == 0 ) {
+					return new List<(gp_Pnt, gp_Pnt)>();
+				}
+				for( int index = 1; index < points.Count; index++ ) {
+					segments.Add( (points[ index - 1 ], points[ index ]) );
+				}
 			}
 			else {
 				if( traverseData.FrogLeapDistance == 0 || traverseResult.FrogLeapMiddlePoint == null ) {

@@ -1,11 +1,9 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
 using MyCAM.PathCache;
-using OCC.AIS;
 using OCC.gp;
-using OCC.Quantity;
-using OCC.TCollection;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -60,9 +58,9 @@ namespace MyCAM.Editor
 		{
 			if( m_IsConfirmed == false ) {
 				RestoreBackupTraverseDatas();
-				PropertyChanged?.Invoke( m_PathIDList );
 			}
-			RemoveSafePlaneVisualization();
+			RemoveSafeBoundaryVisualization();
+			PropertyChanged?.Invoke( m_PathIDList );
 			if( m_Dlg != null ) {
 				m_Dlg.Preview = null;
 				m_Dlg.Confirm = null;
@@ -77,12 +75,10 @@ namespace MyCAM.Editor
 		{
 			SetTraverseData( data );
 
-			// Remove previous safe plane visualization
-			RemoveSafePlaneVisualization();
+			RemoveSafeBoundaryVisualization();
 
-			// show safe plane visualization
-			if( data.IsSafePlaneEnable ) {
-				DrawSafePlaneVisualization( data );
+			if( data.TraverseMode != TraverseData.TraverseType.FrogLeap ) {
+				DrawSafeBoundaryVisualization( data );
 			}
 
 			PropertyChanged?.Invoke( m_PathIDList );
@@ -91,7 +87,6 @@ namespace MyCAM.Editor
 		void ConfirmTraverseData( TraverseData data )
 		{
 			SetTraverseData( data );
-			PropertyChanged?.Invoke( m_PathIDList );
 			m_IsConfirmed = true;
 			End();
 		}
@@ -115,240 +110,70 @@ namespace MyCAM.Editor
 			}
 		}
 
-		#region Safe Plane Visualization
-
-		void RemoveSafePlaneVisualization()
+		void RemoveSafeBoundaryVisualization()
 		{
-			if( m_SafePlaneAIS != null ) {
-				m_Viewer.GetAISContext().Remove( m_SafePlaneAIS, false );
-				m_SafePlaneAIS = null;
-			}
-			if( m_SafePlaneArrow != null ) {
-				m_Viewer.GetAISContext().Remove( m_SafePlaneArrow, false );
-				m_SafePlaneArrow = null;
-			}
-			if( m_SafePlaneLine != null ) {
-				m_Viewer.GetAISContext().Remove( m_SafePlaneLine, false );
-				m_SafePlaneLine = null;
-			}
-			if( m_SafePlaneText != null ) {
-				m_Viewer.GetAISContext().Remove( m_SafePlaneText, false );
-				m_SafePlaneText = null;
-			}
-
-			m_Viewer.UpdateView();
+			m_ShapeRenderer?.Remove();
+			m_ShapeRenderer = null;
+			m_ShapeRendererMode = null;
 		}
 
-		void DrawSafePlaneVisualization( TraverseData currentData )
+		void DrawSafeBoundaryVisualization( TraverseData data )
 		{
-			(List<gp_Pnt> projectionPoints, List<double> safePlaneDistances) = CollectProjectionPointsAndSafePlaneDistances( m_PathIDList );
-			if( safePlaneDistances.Count == 0 || projectionPoints.Count == 0 ) {
-				return;
-			}
+			gp_Ax3 axes = data.TraverseMode == TraverseData.TraverseType.SafePlane
+				? null : new gp_Ax3( new gp_Pnt( 0, 0, 0 ), TraverseHelper.GetSafeBoundaryAxis() );
+			List<TraversePathResult> results = CollectTraverseResults( data, axes?.Direction() );
 
-			double finalSafePlaneZ = DecideFinalSafePlaneZ( safePlaneDistances );
-			DrawUnifiedSafePlane( projectionPoints, finalSafePlaneZ );
-			AddOriginToPlaneArrowAndDistance( finalSafePlaneZ );
-			m_Viewer.UpdateView();
+			switch( data.TraverseMode ) {
+				case TraverseData.TraverseType.SafePlane:
+					if( !TraverseHelper.TryGetPlanePreviewBounds( results,
+						out double minX, out double maxX, out double minY, out double maxY ) ) {
+						return;
+					}
+					PlaneShape3DRenderer plane = new PlaneShape3DRenderer( m_Viewer );
+					plane.SetGeometry( data.SafePlaneDistance, minX, maxX, minY, maxY );
+					m_ShapeRenderer = plane;
+					break;
+
+				case TraverseData.TraverseType.SafeCylinder:
+				case TraverseData.TraverseType.SafeSphere:
+					bool isSphere = data.TraverseMode == TraverseData.TraverseType.SafeSphere;
+					double radius = isSphere ? data.SafeSphereRadius : data.SafeCylinderRadius;
+
+					if( !TraverseHelper.TryGetRadialPreviewBounds( results, axes, radius, isSphere,
+						out double minU, out double maxU, out double minV, out double maxV ) ) {
+						return;
+					}
+					RadialShape3DRendererBase radial = new RadialShape3DRendererBase( m_Viewer, isSphere );
+
+					radial.SetGeometry( axes, radius, minU, maxU, minV, maxV );
+					m_ShapeRenderer = radial;
+
+					break;
+			}
+			m_ShapeRendererMode = data.TraverseMode;
+			m_ShapeRenderer.Show();
 		}
 
-		(List<gp_Pnt> projectionPoints, List<double> safePlaneDistances) CollectProjectionPointsAndSafePlaneDistances( List<string> pathIDList )
+		List<TraversePathResult> CollectTraverseResults( TraverseData data, gp_Dir boundaryAxis )
 		{
-			List<gp_Pnt> projectionPoints = new List<gp_Pnt>();
-			List<double> safePlaneDistances = new List<double>();
-
-			foreach( string currentPathID in pathIDList ) {
-				string previousPathID = GetPreviousPathIDInAllPaths( currentPathID );
-				if( previousPathID == null ) {
+			var results = new List<TraversePathResult>();
+			foreach( string pathID in m_PathIDList ) {
+				int pathIndex = m_DataManager.PathIDList.IndexOf( pathID );
+				if( pathIndex <= 0 ) {
 					continue;
 				}
-
-				TraverseData traverseData = GetTraverseData( currentPathID );
-				if( !traverseData.IsSafePlaneEnable ) {
-					continue;
-				}
-
-				double safePlaneZ = (double)traverseData.SafePlaneDistance;
-				safePlaneDistances.Add( safePlaneZ );
-
-				if( TryGetProjectedPoints( previousPathID, currentPathID, safePlaneZ, traverseData, out gp_Pnt p8, out gp_Pnt p9 ) ) {
-					projectionPoints.Add( p8 );
-					projectionPoints.Add( p9 );
+				string previousPathID = m_DataManager.PathIDList[ pathIndex - 1 ];
+				if( TraverseHelper.TryCalculateTraversePoints( CacheHelper.GetProcessEndPoint( previousPathID ),
+					CacheHelper.GetProcessStartPoint( pathID ), data, boundaryAxis, out TraversePathResult result ) ) {
+					results.Add( result );
 				}
 			}
-
-			return (projectionPoints, safePlaneDistances);
+			return results;
 		}
 
-		string GetPreviousPathIDInAllPaths( string currentPathID )
-		{
-			int indexInAllPaths = m_DataManager.PathIDList.IndexOf( currentPathID );
-			if( indexInAllPaths > 0 ) {
-				return m_DataManager.PathIDList[ indexInAllPaths - 1 ];
-			}
-			return null;
-		}
-
-		bool TryGetProjectedPoints( string previousPathID, string currentPathID, double safePlaneZ, TraverseData traverseData, out gp_Pnt outP6, out gp_Pnt outP7 )
-		{
-			outP6 = null;
-			outP7 = null;
-
-			IProcessPoint previousEndPoint = GetProcessEndPoint( previousPathID );
-			IProcessPoint currentStartPoint = GetProcessStartPoint( currentPathID );
-
-			if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, traverseData, out TraversePathResult result ) ) {
-				return false;
-			}
-			outP6 = result.SafePlaneLiftUpProjPoint;
-			outP7 = result.SafePlaneCutDownProjPoint;
-			return true;
-		}
-
-		double DecideFinalSafePlaneZ( List<double> safePlaneDistances )
-		{
-			double tolorance = 0.001;
-			if( safePlaneDistances == null || safePlaneDistances.Count == 0 )
-				return TraverseData.SAFE_PLANE_DISTANCE;
-
-			double firstDistance = safePlaneDistances[ 0 ];
-			for( int i = 1; i < safePlaneDistances.Count; i++ ) {
-				if( Math.Abs( safePlaneDistances[ i ] - firstDistance ) > tolorance ) {
-
-					// not same safe plane distance, use default
-					return TraverseData.SAFE_PLANE_DISTANCE;
-				}
-			}
-			return firstDistance;
-		}
-
-		void DrawUnifiedSafePlane( List<gp_Pnt> projectionPoints, double safePlaneZ )
-		{
-			if( projectionPoints == null || projectionPoints.Count == 0 ) {
-				return;
-			}
-
-			var (minX, maxX, minY, maxY) = ComputeBounds( projectionPoints );
-			ExpandBounds( ref minX, ref maxX, ref minY, ref maxY, minMargin: 10.0, marginFactor: 0.2 );
-			m_SafePlaneAIS = DrawHelper.CreatePlaneAIS( minX, maxX, minY, maxY, safePlaneZ );
-			if( m_SafePlaneAIS != null ) {
-				m_Viewer.GetAISContext().Display( m_SafePlaneAIS, false );
-				m_Viewer.GetAISContext().Deactivate( m_SafePlaneAIS );
-			}
-		}
-
-		(double minX, double maxX, double minY, double maxY) ComputeBounds( List<gp_Pnt> points )
-		{
-			double minX = points[ 0 ].X();
-			double maxX = minX;
-			double minY = points[ 0 ].Y();
-			double maxY = minY;
-
-			for( int i = 1; i < points.Count; i++ ) {
-				var p = points[ i ];
-				minX = Math.Min( minX, p.X() );
-				maxX = Math.Max( maxX, p.X() );
-				minY = Math.Min( minY, p.Y() );
-				maxY = Math.Max( maxY, p.Y() );
-			}
-
-			maxX = maxX < 0 ? 0 : maxX;
-			maxY = maxY < 0 ? 0 : maxY;
-			minX = minX > 0 ? 0 : minX;
-			minY = minY > 0 ? 0 : minY;
-
-			return (minX, maxX, minY, maxY);
-		}
-
-		void ExpandBounds( ref double minX, ref double maxX, ref double minY, ref double maxY, double minMargin, double marginFactor )
-		{
-			double rangeX = maxX - minX;
-			double rangeY = maxY - minY;
-			double margin = Math.Max( rangeX, rangeY ) * marginFactor;
-			if( margin < minMargin ) {
-				margin = minMargin;
-			}
-			minX -= margin;
-			maxX += margin;
-			minY -= margin;
-			maxY += margin;
-		}
-
-		void AddOriginToPlaneArrowAndDistance( double safePlaneZ )
-		{
-			gp_Pnt origin = new gp_Pnt( 0, 0, 0 );
-			gp_Pnt planePoint = new gp_Pnt( 0, 0, safePlaneZ );
-
-			m_SafePlaneLine = DrawHelper.GetLineAIS( origin, planePoint, Quantity_NameOfColor.Quantity_NOC_ORANGE, 2, false );
-			m_Viewer.GetAISContext().Display( m_SafePlaneLine, false );
-			m_Viewer.GetAISContext().Deactivate( m_SafePlaneLine );
-
-			AddArrowHead( origin, planePoint );
-			AddDistanceText( origin, planePoint, safePlaneZ );
-		}
-
-		void AddArrowHead( gp_Pnt startPoint, gp_Pnt endPoint )
-		{
-			gp_Vec direction = new gp_Vec( startPoint, endPoint );
-			double length = direction.Magnitude();
-			if( length < 1e-6 )
-				return;
-			direction.Normalize();
-			gp_Pnt arrowStartPoint = new gp_Pnt( endPoint.X(), endPoint.Y(), endPoint.Z() - direction.Z() * arrowHeight );
-
-			m_SafePlaneArrow = DrawHelper.GetOrientationAIS( arrowStartPoint, new gp_Dir( direction ), arrowRadius, arrowHeight, Quantity_NameOfColor.Quantity_NOC_ORANGE, AIS_DisplayMode.AIS_Shaded );
-			m_SafePlaneArrow.SetWidth( 3 );
-			m_Viewer.GetAISContext().Display( m_SafePlaneArrow, false );
-			m_Viewer.GetAISContext().Deactivate( m_SafePlaneArrow );
-		}
-
-		void AddDistanceText( gp_Pnt startPoint, gp_Pnt endPoint, double distance )
-		{
-			gp_Pnt textPosition = new gp_Pnt(
-				endPoint.X(),
-				endPoint.Y(),
-				( endPoint.Z() + 5 )
-			);
-			string distanceText = string.Format( "Z={0:F2}", distance );
-
-			m_SafePlaneText = new AIS_TextLabel();
-			m_SafePlaneText.SetText( new TCollection_ExtendedString( distanceText ) );
-			m_SafePlaneText.SetPosition( textPosition );
-			m_SafePlaneText.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_BROWN ) );
-			m_SafePlaneText.SetHeight( 15 );
-
-			m_Viewer.GetAISContext().Display( m_SafePlaneText, false );
-			m_Viewer.GetAISContext().Deactivate( m_SafePlaneText );
-		}
-
-		IProcessPoint GetProcessStartPoint( string pathID )
-		{
-			return CacheHelper.GetProcessStartPoint( pathID );
-		}
-
-		IProcessPoint GetProcessEndPoint( string pathID )
-		{
-			return CacheHelper.GetProcessEndPoint( pathID );
-		}
-
-		// TODO: data protection
-		TraverseData GetTraverseData( string pathID )
-		{
-			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
-				return new TraverseData();
-			}
-			return craftData.TraverseData;
-		}
-
-		#endregion
-
-		AIS_Shape m_SafePlaneAIS = null;
-		AIS_Shape m_SafePlaneArrow = null;
-		AIS_Line m_SafePlaneLine = null;
-		AIS_TextLabel m_SafePlaneText = null;
 		Viewer m_Viewer;
-		double arrowHeight = 5.0;
-		double arrowRadius = 2.0;
+		Shape3DRendererBase m_ShapeRenderer;
+		TraverseData.TraverseType? m_ShapeRendererMode;
 		List<TraverseData> m_BackupTraverseDataList;
 		TraverseDlg m_Dlg;
 		bool m_IsConfirmed = false;

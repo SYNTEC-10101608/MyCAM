@@ -104,7 +104,9 @@ namespace MyCAM.Post
 			else {
 
 				// traverse from previous path to current path
-				PostTraverseBuilder.CalculateTraverse( endInfoOfPreviousPath, currentPathNCPack, pathG54PostData );
+				if( !PostTraverseBuilder.CalculateTraverse( endInfoOfPreviousPath, currentPathNCPack, pathG54PostData ) ) {
+					return false;
+				}
 			}
 
 			// end info of current path
