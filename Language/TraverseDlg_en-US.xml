@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="TraverseDlg" Content="Traverse Parameters" />
+
 	<Message ID="m_lblLiftUpDistance" Content="Lift Distance" />
 	<Message ID="m_lblCutDownDistance" Content="Cut-down Distance" />
 	<Message ID="m_lblFollowSaveDistance" Content="Follow Safe Distance" />
-	<Message ID="m_chkSafePlane" Content="Enable Safe Plane" />
+
+	<Message ID="m_rbtnFrogLeap" Content="Frog Leap" />
+	<Message ID="m_rbtnSafePlane" Content="Safe Plane" />
+	<Message ID="m_rbtnSafeCylinder" Content="Safe Cylinder" />
+	<Message ID="m_rbtnSafeSphere" Content="Safe Sphere" />
+
+    <Message ID="m_gbxTraverse" Content="Traverse Parameters" />
+
 	<Message ID="m_lblFrogLeapDistance" Content="Hop Distance" />
 	<Message ID="m_lblSafePlaneDistance" Content="Z Plane Height" />
+	<Message ID="m_lblSafeCylinderRadius" Content="Cylinder Radius" />
+	<Message ID="m_lblSafeSphereRadius" Content="Sphere Radius" />
+
 	<Message ID="m_btnConfirm" Content="Confirm" />
 </ResMap>

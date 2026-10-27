@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using System.Collections.Generic;
 
 namespace MyCAM.Post
 {
@@ -48,6 +49,11 @@ namespace MyCAM.Post
 		}
 
 		PostPoint CutDownPostSafePlanePoint
+		{
+			get; set;
+		}
+
+		List<PostPoint> SafeBoundaryPostPointList
 		{
 			get; set;
 		}

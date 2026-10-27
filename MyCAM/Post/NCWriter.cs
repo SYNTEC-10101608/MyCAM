@@ -75,11 +75,12 @@ namespace MyCAM.Post
 						postDataList.Add( postData );
 					}
 					else {
+						PathEndInfo previousPathEndInfo = endInfoOfLastPath;
 						if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData stdPostData, out _, out errorMessage ) ) {
 							return false;
 						}
 
-						if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
+						if( !GetContourPostData( i, ref previousPathEndInfo, out PostData postData, out errorMessage ) ) {
 							return false;
 						}
 
@@ -125,17 +126,18 @@ namespace MyCAM.Post
 				}
 				PathType pathType = pathObject.PathType;
 				int nPathLayer = pathObject.CraftData.TechLayer;
+				bool isEntry = endInfoOfLastPath == null;
 				if( pathType == PathType.Contour ) {
 					if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
 						return false;
 					}
-					WriteCutting( postData, m_PathIDList[ i ], pathObject.CraftData, i + 1, nPathLayer );
+					WriteCutting( postData, m_PathIDList[ i ], pathObject.CraftData, i + 1, isEntry, nPathLayer );
 				}
 				else {
 					if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData postData, out StdPatternNCPackage package, out errorMessage ) ) {
 						return false;
 					}
-					WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, package.GeomData, i + 1 );
+					WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, package.GeomData, i + 1, isEntry );
 				}
 			}
 			return true;
@@ -238,6 +240,7 @@ namespace MyCAM.Post
 			}
 
 			// Update traverse points
+			postData.SafeBoundaryPostPointList = stdPostData.SafeBoundaryPostPointList;
 			if( postData.LiftUpPostPoint != null ) {
 				postData.LiftUpPostPoint = stdPostData.LiftUpPostPoint;
 			}
@@ -262,7 +265,7 @@ namespace MyCAM.Post
 
 		#region Write Cutting
 
-		void WriteCutting( PostData currentPathPostData, string szPathID, CraftData craftData, int N_Index, int nLayIndex = 1 )
+		void WriteCutting( PostData currentPathPostData, string szPathID, CraftData craftData, int N_Index, bool isEntry, int nLayIndex = 1 )
 		{
 			double enterTiltAngle_deg = GetStartOrEndTiltAngle_deg( currentPathPostData, isStartPoint: true );
 
@@ -273,7 +276,12 @@ namespace MyCAM.Post
 			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.TraverseHead );
 
 			// traverse from previous path to current path
-			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData, m_AxisConfig, enterTiltAngle_deg );
+			if( isEntry ) {
+				NCWriterHelper.WriteEntry( m_StreamWriter, currentPathPostData, m_AxisConfig );
+			}
+			else {
+				NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData, m_AxisConfig, enterTiltAngle_deg );
+			}
 
 			// traverse tail
 			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.TraverseTail );
@@ -301,9 +309,9 @@ namespace MyCAM.Post
 			return;
 		}
 
-		void WriteStandardPatternCutting( PathType type, StdPatternPostData currentPathPostData, CraftData craftData, IStdPatternGeomData geomData, int N_Index )
+		void WriteStandardPatternCutting( PathType type, StdPatternPostData currentPathPostData, CraftData craftData, IStdPatternGeomData geomData, int N_Index, bool isEntry )
 		{
-			StdPatternNCWriter.WriteStandardPatternCutting( m_StreamWriter, type, currentPathPostData, craftData, geomData, N_Index, m_AxisConfig );
+			StdPatternNCWriter.WriteStandardPatternCutting( m_StreamWriter, type, currentPathPostData, craftData, geomData, N_Index, m_AxisConfig, isEntry );
 		}
 
 		void WriteOnePoint( PostPoint postPoint, double? tiltAngle_deg = null, string szExtendedGCode = null, bool isRCornerStart = false, bool isRCornerEnd = false )

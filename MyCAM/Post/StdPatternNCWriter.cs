@@ -211,7 +211,7 @@ namespace MyCAM.Post
 	internal static class StdPatternNCWriter
 	{
 		public static void WriteStandardPatternCutting( StreamWriter writer, PathType pathType, StdPatternPostData postData,
-			CraftData craftData, IStdPatternGeomData geomData, int nIndex, AxisConfig axisConfig )
+			CraftData craftData, IStdPatternGeomData geomData, int nIndex, AxisConfig axisConfig, bool isEntry )
 		{
 			if( writer == null || postData == null || craftData == null || geomData == null || axisConfig == null ) {
 				throw new ArgumentNullException( "StandardPatternNCWriter arguments cannot be null" );
@@ -227,7 +227,12 @@ namespace MyCAM.Post
 			ExtendedGCodeWriter.WriteExtendedGCode( writer, craftData, ExtendedGCodeType.TraverseHead );
 
 			// write traverse section
-			NCWriterHelper.WriteTraverse( writer, postData, axisConfig );
+			if( isEntry ) {
+				NCWriterHelper.WriteEntry( writer, postData, axisConfig );
+			}
+			else {
+				NCWriterHelper.WriteTraverse( writer, postData, axisConfig );
+			}
 
 			// traverse tail
 			ExtendedGCodeWriter.WriteExtendedGCode( writer, craftData, ExtendedGCodeType.TraverseTail );

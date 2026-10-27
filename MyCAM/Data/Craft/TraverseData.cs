@@ -45,14 +45,25 @@ namespace MyCAM.Data
 
 	public class TraverseData
 	{
-		public TraverseData( double liftUpDistance, double cutDownDistance, double followSafeDistance, double frogLeapDistance, bool isSafePlaneChecked, double safePlaneDistance )
+		public enum TraverseType
+		{
+			FrogLeap,
+			SafePlane,
+			SafeCylinder,
+			SafeSphere
+		}
+
+		public TraverseData( double liftUpDistance, double cutDownDistance, double followSafeDistance,
+			TraverseType traverseMode, double frogLeapDistance, double safePlaneDistance, double safeCylinderRadius, double safeSphereRadius )
 		{
 			m_LiftUpDistance = liftUpDistance;
 			m_CutDownDistance = cutDownDistance;
 			m_FollowSafeDistance = followSafeDistance;
+			m_TraverseMode = traverseMode;
 			m_FrogLeapDistance = frogLeapDistance;
-			m_IsSafePlaneEnable = isSafePlaneChecked;
 			m_SafePlaneDistance = safePlaneDistance;
+			m_SafeCylinderRadius = safeCylinderRadius;
+			m_SafeSphereRadius = safeSphereRadius;
 		}
 
 		public TraverseData()
@@ -61,6 +72,21 @@ namespace MyCAM.Data
 		}
 
 		public Action PropertyChanged;
+
+		public TraverseType TraverseMode
+		{
+			get
+			{
+				return m_TraverseMode;
+			}
+			set
+			{
+				if( m_TraverseMode != value ) {
+					m_TraverseMode = value;
+					PropertyChanged?.Invoke();
+				}
+			}
+		}
 
 		public double LiftUpDistance
 		{
@@ -122,21 +148,6 @@ namespace MyCAM.Data
 			}
 		}
 
-		public bool IsSafePlaneEnable
-		{
-			get
-			{
-				return m_IsSafePlaneEnable;
-			}
-			set
-			{
-				if( m_IsSafePlaneEnable != value ) {
-					m_IsSafePlaneEnable = value;
-					PropertyChanged?.Invoke();
-				}
-			}
-		}
-
 		public double SafePlaneDistance
 		{
 			get
@@ -152,22 +163,57 @@ namespace MyCAM.Data
 			}
 		}
 
+		public double SafeCylinderRadius
+		{
+			get
+			{
+				return m_SafeCylinderRadius;
+			}
+			set
+			{
+				if( m_SafeCylinderRadius != value ) {
+					m_SafeCylinderRadius = value;
+					PropertyChanged?.Invoke();
+				}
+			}
+		}
+
+		public double SafeSphereRadius
+		{
+			get
+			{
+				return m_SafeSphereRadius;
+			}
+			set
+			{
+				if( m_SafeSphereRadius != value ) {
+					m_SafeSphereRadius = value;
+					PropertyChanged?.Invoke();
+				}
+			}
+		}
+
 		public TraverseData Clone()
 		{
-			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, FrogLeapDistance, IsSafePlaneEnable, SafePlaneDistance );
+			return new TraverseData( LiftUpDistance, CutDownDistance, FollowSafeDistance, TraverseMode, FrogLeapDistance, SafePlaneDistance, SafeCylinderRadius, SafeSphereRadius );
 		}
 
 		public static double LIFT_UP_DISTANCE = 0.0;
 		public static double CUT_DOWN_DISTANCE = 0.0;
 		public static double FOLLOW_SAFE_DISTANCE = 0.0;
+		public static TraverseType TRAVERSE_MODE = TraverseType.FrogLeap;
 		public static double FROG_LEAP_DISTANCE = 10.0;
 		public static double SAFE_PLANE_DISTANCE = 20.0;
-		public static bool IS_SAFE_PLANE_CHECKED = false;
+		public static double SAFE_CYLINDER_RADIUS = 20.0;
+		public static double SAFE_SPHERE_RADIUS = 20.0;
 		double m_LiftUpDistance = LIFT_UP_DISTANCE;
 		double m_CutDownDistance = CUT_DOWN_DISTANCE;
 		double m_FollowSafeDistance = FOLLOW_SAFE_DISTANCE;
+		TraverseType m_TraverseMode = TRAVERSE_MODE;
 		double m_FrogLeapDistance = FROG_LEAP_DISTANCE;
 		double m_SafePlaneDistance = SAFE_PLANE_DISTANCE;
-		bool m_IsSafePlaneEnable = IS_SAFE_PLANE_CHECKED;
+		double m_SafeCylinderRadius = SAFE_CYLINDER_RADIUS;
+		double m_SafeSphereRadius = SAFE_SPHERE_RADIUS;
+
 	}
 }

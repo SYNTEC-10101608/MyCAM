@@ -1543,6 +1543,21 @@ namespace MyCAM.FileManager
 			get; set;
 		}
 
+		public TraverseData.TraverseType? TraverseMode
+		{
+			get; set;
+		}
+
+		public double? SafeCylinderRadius
+		{
+			get; set;
+		}
+
+		public double? SafeSphereRadius
+		{
+			get; set;
+		}
+
 		// parameterless constructor (for XmlSerializer)
 		internal TraverseDataDTO()
 		{
@@ -1557,17 +1572,29 @@ namespace MyCAM.FileManager
 			CutDownDistance = traverseData.CutDownDistance;
 			FollowSafeDistance = traverseData.FollowSafeDistance;
 			FrogLeapDistance = traverseData.FrogLeapDistance;
-			IsSafePlaneChecked = traverseData.IsSafePlaneEnable;
+			IsSafePlaneChecked = traverseData.TraverseMode == TraverseData.TraverseType.SafePlane;
 			SafePlaneDistance = traverseData.SafePlaneDistance;
+			TraverseMode = traverseData.TraverseMode;
+			SafeCylinderRadius = traverseData.SafeCylinderRadius;
+			SafeSphereRadius = traverseData.SafeSphereRadius;
 		}
 
 		internal TraverseData ToTraverseData()
 		{
 			if( !LiftUpDistance.HasValue || !CutDownDistance.HasValue || !FollowSafeDistance.HasValue ||
-				!FrogLeapDistance.HasValue || !IsSafePlaneChecked.HasValue || !SafePlaneDistance.HasValue ) {
+				!FrogLeapDistance.HasValue || !SafePlaneDistance.HasValue ||
+				( !TraverseMode.HasValue && !IsSafePlaneChecked.HasValue ) ) {
 				throw new ArgumentException( "TraverseData deserialization failed." );
 			}
-			return new TraverseData( LiftUpDistance.Value, CutDownDistance.Value, FollowSafeDistance.Value, FrogLeapDistance.Value, IsSafePlaneChecked.Value, SafePlaneDistance.Value );
+			TraverseData.TraverseType mode = TraverseMode ??
+				( IsSafePlaneChecked.Value ? TraverseData.TraverseType.SafePlane : TraverseData.TraverseType.FrogLeap );
+			if( !Enum.IsDefined( typeof( TraverseData.TraverseType ), mode ) ) {
+				throw new ArgumentException( "TraverseData deserialization failed: Invalid TraverseMode." );
+			}
+			return new TraverseData( LiftUpDistance.Value, CutDownDistance.Value, FollowSafeDistance.Value,
+				mode, FrogLeapDistance.Value, SafePlaneDistance.Value,
+				SafeCylinderRadius ?? TraverseData.SAFE_CYLINDER_RADIUS,
+				SafeSphereRadius ?? TraverseData.SAFE_SPHERE_RADIUS );
 		}
 	}
 
@@ -2618,4 +2645,3 @@ public class gp_TrsfDTO
 		return trsf;
 	}
 }
-
