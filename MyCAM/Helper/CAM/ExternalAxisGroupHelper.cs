@@ -40,7 +40,7 @@ namespace MyCAM.Helper.CAM
 			if( currentGroup == null || currentGroup.Count == 0 ) {
 				return;
 			}
-			groups.Add( currentGroup );
+			groups.Add( new List<string>( currentGroup ) );
 			currentGroup.Clear();
 		}
 

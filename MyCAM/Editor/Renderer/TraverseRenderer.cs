@@ -1,5 +1,6 @@
 using MyCAM.Data;
 using MyCAM.Helper;
+using MyCAM.Helper.CAM;
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.Aspect;
@@ -175,9 +176,9 @@ namespace MyCAM.Editor.Renderer
 
 		void ShowTraversePathWithTrans( List<string> pathIDList, gp_Trsf trsf )
 		{
+			Dictionary<string, string> previousPathInGroupMap = BuildPreviousPathInGroupMap();
 			foreach( string currentPathID in pathIDList ) {
-				string previousPathID = GetPreviousPathIDInAllPaths( currentPathID );
-				if( previousPathID == null ) {
+				if( !previousPathInGroupMap.TryGetValue( currentPathID, out string previousPathID ) || previousPathID == null ) {
 					continue;
 				}
 
@@ -254,45 +255,58 @@ namespace MyCAM.Editor.Renderer
 		void ShowEntryAndExitWithTrans( gp_Trsf trsf )
 		{
 			if( m_DataManager.PathIDList.Count == 0 ) {
+				RemoveGroupEntryAndExitLines();
 				return;
 			}
 
-			// entry
-			if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
-				string firstPathID = m_DataManager.PathIDList.First();
-				IProcessPoint firstPathStartPoint = GetProcessStartPoint( firstPathID );
-				if( firstPathStartPoint != null ) {
-					IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
-					if( entryPoint != null ) {
-						List<AIS_Line> entryLineList = new List<AIS_Line>();
-						AddOneLinearTraverseWithTrans( entryLineList, entryPoint.Point, firstPathStartPoint.Point, trsf );
-						m_TraverseAISDict[ KEY_ENTRY ] = entryLineList;
+			RemoveGroupEntryAndExitLines();
+			List<List<string>> groups = ExternalAxisGroupHelper.BuildContiguousGroups( m_DataManager.PathIDList, EXTERNAL_AXIS_GROUP_TOLERANCE_DEG );
+			foreach( List<string> group in groups ) {
+				if( group == null || group.Count == 0 ) {
+					continue;
+				}
+
+				string firstPathID = group.First();
+				string lastPathID = group.Last();
+
+				// entry
+				if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
+					IProcessPoint firstPathStartPoint = GetProcessStartPoint( firstPathID );
+					if( firstPathStartPoint != null ) {
+						IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
+						if( entryPoint != null ) {
+							List<AIS_Line> entryLineList = new List<AIS_Line>();
+							AddOneLinearTraverseWithTrans( entryLineList, entryPoint.Point, firstPathStartPoint.Point, trsf );
+							m_TraverseAISDict[ KEY_ENTRY_PREFIX + firstPathID ] = entryLineList;
+						}
 					}
 				}
-			}
 
-			// exit
-			if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
-				string lastPathID = m_DataManager.PathIDList.Last();
-				IProcessPoint lastPathEndPoint = GetProcessEndPoint( lastPathID );
-				if( lastPathEndPoint != null ) {
-					IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
-					if( exitPoint != null ) {
-						List<AIS_Line> exitLineList = new List<AIS_Line>();
-						AddOneLinearTraverseWithTrans( exitLineList, lastPathEndPoint.Point, exitPoint.Point, trsf );
-						m_TraverseAISDict[ KEY_EXIT ] = exitLineList;
+				// exit
+				if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
+					IProcessPoint lastPathEndPoint = GetProcessEndPoint( lastPathID );
+					if( lastPathEndPoint != null ) {
+						IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
+						if( exitPoint != null ) {
+							List<AIS_Line> exitLineList = new List<AIS_Line>();
+							AddOneLinearTraverseWithTrans( exitLineList, lastPathEndPoint.Point, exitPoint.Point, trsf );
+							m_TraverseAISDict[ KEY_EXIT_PREFIX + lastPathID ] = exitLineList;
+						}
 					}
 				}
 			}
 		}
 
-		string GetPreviousPathIDInAllPaths( string currentPathID )
+		Dictionary<string, string> BuildPreviousPathInGroupMap()
 		{
-			int indexInAllPaths = m_DataManager.PathIDList.IndexOf( currentPathID );
-			if( indexInAllPaths > 0 ) {
-				return m_DataManager.PathIDList[ indexInAllPaths - 1 ];
+			Dictionary<string, string> map = new Dictionary<string, string>();
+			List<List<string>> groups = ExternalAxisGroupHelper.BuildContiguousGroups( m_DataManager.PathIDList, EXTERNAL_AXIS_GROUP_TOLERANCE_DEG );
+			foreach( List<string> group in groups ) {
+				for( int i = 1; i < group.Count; i++ ) {
+					map[ group[ i ] ] = group[ i - 1 ];
+				}
 			}
-			return null;
+			return map;
 		}
 
 		List<string> GetPathsToUpdate( List<string> pathIDList )
@@ -346,14 +360,8 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 
-			if( m_TraverseAISDict.ContainsKey( KEY_ENTRY ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_ENTRY ] ) {
-					m_Viewer.GetAISContext().Display( lineAIS, false );
-					m_Viewer.GetAISContext().Deactivate( lineAIS );
-				}
-			}
-			if( m_TraverseAISDict.ContainsKey( KEY_EXIT ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_EXIT ] ) {
+			foreach( var kvp in m_TraverseAISDict.Where( p => p.Key.StartsWith( KEY_ENTRY_PREFIX ) || p.Key.StartsWith( KEY_EXIT_PREFIX ) ) ) {
+				foreach( AIS_Line lineAIS in kvp.Value ) {
 					m_Viewer.GetAISContext().Display( lineAIS, false );
 					m_Viewer.GetAISContext().Deactivate( lineAIS );
 				}
@@ -379,19 +387,21 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 
-			if( m_TraverseAISDict.ContainsKey( KEY_ENTRY ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_ENTRY ] ) {
+			RemoveGroupEntryAndExitLines();
+		}
+
+		void RemoveGroupEntryAndExitLines()
+		{
+			List<string> keysToRemove = m_TraverseAISDict.Keys
+				.Where( k => k.StartsWith( KEY_ENTRY_PREFIX ) || k.StartsWith( KEY_EXIT_PREFIX ) )
+				.ToList();
+
+			foreach( string key in keysToRemove ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ key ] ) {
 					m_Viewer.GetAISContext().Remove( lineAIS, false );
 				}
-				m_TraverseAISDict[ KEY_ENTRY ].Clear();
-				m_TraverseAISDict.Remove( KEY_ENTRY );
-			}
-			if( m_TraverseAISDict.ContainsKey( KEY_EXIT ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_EXIT ] ) {
-					m_Viewer.GetAISContext().Remove( lineAIS, false );
-				}
-				m_TraverseAISDict[ KEY_EXIT ].Clear();
-				m_TraverseAISDict.Remove( KEY_EXIT );
+				m_TraverseAISDict[ key ].Clear();
+				m_TraverseAISDict.Remove( key );
 			}
 		}
 
@@ -461,7 +471,8 @@ namespace MyCAM.Editor.Renderer
 
 		readonly Dictionary<string, List<AIS_Line>> m_TraverseAISDict = new Dictionary<string, List<AIS_Line>>();
 		readonly Dictionary<string, List<AIS_Shape>> m_FrogLeapAISDict = new Dictionary<string, List<AIS_Shape>>();
-		const string KEY_ENTRY = "KEY_ENTRY";
-		const string KEY_EXIT = "KEY_EXIT";
+		const string KEY_ENTRY_PREFIX = "KEY_ENTRY_";
+		const string KEY_EXIT_PREFIX = "KEY_EXIT_";
+		const double EXTERNAL_AXIS_GROUP_TOLERANCE_DEG = 1e-3;
 	}
 }
