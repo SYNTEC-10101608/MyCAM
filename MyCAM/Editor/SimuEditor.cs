@@ -2,6 +2,7 @@
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
+using MyCAM.Helper.CAM;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.AIS;
@@ -517,12 +518,27 @@ namespace MyCAM.Editor
 				return calNeedData;
 			}
 
-			// need last path end point's vector to calculate exit pnt
-			IProcessPoint lastPathLastPoint = GetProcessEndPoint( m_DataManager.PathIDList.Last() );
+			List<List<string>> groups = ExternalAxisGroupHelper.BuildContiguousGroups( m_DataManager.PathIDList );
+			List<int> groupStartPathIndices = new List<int>();
+			List<IProcessPoint> groupLastPathLastPointList = new List<IProcessPoint>();
+			foreach( List<string> group in groups ) {
+				if( group == null || group.Count == 0 ) {
+					continue;
+				}
+				string firstPathID = group.First();
+				string lastPathID = group.Last();
+				int firstPathIndex = m_DataManager.PathIDList.IndexOf( firstPathID );
+				if( firstPathIndex >= 0 ) {
+					groupStartPathIndices.Add( firstPathIndex );
+				}
+				groupLastPathLastPointList.Add( GetProcessEndPoint( lastPathID ) );
+			}
+
 			calNeedData = new SimuData.SimuRequiredData.SimuInputSet()
 			{
 				EachPathIKPostDataList = m_PostDataList,
-				LastPathLastPnt = lastPathLastPoint,
+				GroupStartPathIndices = groupStartPathIndices,
+				GroupLastPathLastPntList = groupLastPathLastPointList,
 				EntryAndExitData = m_DataManager.EntryAndExitData,
 				PostSolver = m_PostSolver,
 				MachineData = m_MachineData,

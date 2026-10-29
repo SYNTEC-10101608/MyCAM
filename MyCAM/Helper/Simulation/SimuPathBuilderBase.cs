@@ -25,7 +25,8 @@ namespace MyCAM.Helper
         // build whole-path IK point list ( traverse + main path + exit ) with product-specific interpolation
         protected abstract bool GetWholePathIKPnt(
             List<PostData> postDataList,
-            IProcessPoint lastPathLastPnt,
+            List<int> groupStartPathIndices,
+            List<IProcessPoint> groupLastPathLastPntList,
             EntryAndExitData entryAndExitData,
             PostSolver postSolver,
             out List<PathSimuIKData> pathSimuPntList );
@@ -57,7 +58,7 @@ namespace MyCAM.Helper
 
         // build exit-path IK point list with product-specific interpolation
         protected abstract List<PostPointBase> GetExitPathIKPnt(
-            IProcessPoint lastPathLastPnt,
+            IProcessPoint groupLastPathLastPnt,
             EntryAndExitData entryAndExitData,
             PostPointBase pathEndPoint,
             PostSolver postSolver );

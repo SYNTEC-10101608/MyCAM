@@ -260,7 +260,7 @@ namespace MyCAM.Editor.Renderer
 			}
 
 			RemoveGroupEntryAndExitLines();
-			List<List<string>> groups = ExternalAxisGroupHelper.BuildContiguousGroups( m_DataManager.PathIDList, EXTERNAL_AXIS_GROUP_TOLERANCE_DEG );
+			List<List<string>> groups = ExternalAxisGroupHelper.BuildContiguousGroups( m_DataManager.PathIDList, ExternalAxisHelper.DEFAULT_GROUP_TOLERANCE_DEG );
 			foreach( List<string> group in groups ) {
 				if( group == null || group.Count == 0 ) {
 					continue;
@@ -300,7 +300,7 @@ namespace MyCAM.Editor.Renderer
 		Dictionary<string, string> BuildPreviousPathInGroupMap()
 		{
 			Dictionary<string, string> map = new Dictionary<string, string>();
-			List<List<string>> groups = ExternalAxisGroupHelper.BuildContiguousGroups( m_DataManager.PathIDList, EXTERNAL_AXIS_GROUP_TOLERANCE_DEG );
+			List<List<string>> groups = ExternalAxisGroupHelper.BuildContiguousGroups( m_DataManager.PathIDList, ExternalAxisHelper.DEFAULT_GROUP_TOLERANCE_DEG );
 			foreach( List<string> group in groups ) {
 				for( int i = 1; i < group.Count; i++ ) {
 					map[ group[ i ] ] = group[ i - 1 ];
@@ -473,6 +473,5 @@ namespace MyCAM.Editor.Renderer
 		readonly Dictionary<string, List<AIS_Shape>> m_FrogLeapAISDict = new Dictionary<string, List<AIS_Shape>>();
 		const string KEY_ENTRY_PREFIX = "KEY_ENTRY_";
 		const string KEY_EXIT_PREFIX = "KEY_EXIT_";
-		const double EXTERNAL_AXIS_GROUP_TOLERANCE_DEG = 1e-3;
 	}
 }

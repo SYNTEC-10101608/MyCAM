@@ -27,7 +27,7 @@ namespace MyCAM.Helper
 			}
 
 			// build full path IK point list ( each path is connected )
-			bool bGetWholePathIK = GetWholePathIKPnt( calNeedData.EachPathIKPostDataList, calNeedData.LastPathLastPnt, calNeedData.EntryAndExitData, calNeedData.PostSolver, out List<PathSimuIKData> pathIKPntList );
+			bool bGetWholePathIK = GetWholePathIKPnt( calNeedData.EachPathIKPostDataList, calNeedData.GroupStartPathIndices, calNeedData.GroupLastPathLastPntList, calNeedData.EntryAndExitData, calNeedData.PostSolver, out List<PathSimuIKData> pathIKPntList );
 			if( !bGetWholePathIK ) {
 				return false;
 			}
@@ -125,21 +125,37 @@ namespace MyCAM.Helper
 		// build whole-path IK point list with five-axis master / slave interpolation
 		protected override bool GetWholePathIKPnt(
 			List<PostData> postDataList,
-			IProcessPoint lastPathLastPnt,
+			List<int> groupStartPathIndices,
+			List<IProcessPoint> groupLastPathLastPntList,
 			EntryAndExitData entryAndExitData,
 			PostSolver postSolver,
 			out List<PathSimuIKData> pathSimuPntList )
 		{
 			pathSimuPntList = new List<PathSimuIKData>();
-			if( postDataList == null || postDataList.Count == 0 || lastPathLastPnt == null || entryAndExitData == null || postSolver == null ) {
+			if( postDataList == null || postDataList.Count == 0 || groupStartPathIndices == null || groupLastPathLastPntList == null
+				|| groupStartPathIndices.Count == 0 || groupStartPathIndices.Count != groupLastPathLastPntList.Count
+				|| entryAndExitData == null || postSolver == null ) {
 				return false;
 			}
 			PostPoint prePathLastPnt = new PostPoint();
-			foreach( PostData currentPostData in postDataList ) {
+			int currentGroupIndex = -1;
+			for( int pathIndex = 0; pathIndex < postDataList.Count; pathIndex++ ) {
+				PostData currentPostData = postDataList[ pathIndex ];
+				if( groupStartPathIndices.Contains( pathIndex ) ) {
+					currentGroupIndex = groupStartPathIndices.IndexOf( pathIndex );
+				}
+				if( currentGroupIndex < 0 || currentGroupIndex >= groupLastPathLastPntList.Count ) {
+					return false;
+				}
+
+				int nextGroupStartIndex = currentGroupIndex + 1 < groupStartPathIndices.Count ? groupStartPathIndices[ currentGroupIndex + 1 ] : postDataList.Count;
+				bool isGroupFirstPath = pathIndex == groupStartPathIndices[ currentGroupIndex ];
+				bool isGroupLastPath = pathIndex == nextGroupStartIndex - 1;
+
 				List<PostPointBase> traverseIKPntList;
 
 				// traverse path
-				if( currentPostData == postDataList.First() ) {
+				if( isGroupFirstPath ) {
 					traverseIKPntList = GetTraversIKPnt( currentPostData, postSolver, true, null );
 				}
 				else {
@@ -152,8 +168,8 @@ namespace MyCAM.Helper
 
 				// exit path
 				PathSimuIKData pathSimuIKPnt;
-				if( currentPostData == postDataList.Last() ) {
-					List<PostPointBase> exitIKPntList = GetExitPathIKPnt( lastPathLastPnt, entryAndExitData, prePathLastPnt, postSolver );
+				if( isGroupLastPath ) {
+					List<PostPointBase> exitIKPntList = GetExitPathIKPnt( groupLastPathLastPntList[ currentGroupIndex ], entryAndExitData, prePathLastPnt, postSolver );
 					pathSimuIKPnt = new PathSimuIKData( traverseIKPntList, processPathIKPntList, exitIKPntList );
 				}
 				else {
@@ -256,15 +272,18 @@ namespace MyCAM.Helper
 			return postData.MainPathPostPointList.Last().Clone();
 		}
 
-		protected override List<PostPointBase> GetExitPathIKPnt( IProcessPoint lastPathLastPnt, EntryAndExitData entryAndExitData, PostPointBase pathEndPoint, PostSolver postSolver )
+		protected override List<PostPointBase> GetExitPathIKPnt( IProcessPoint groupLastPathLastPnt, EntryAndExitData entryAndExitData, PostPointBase pathEndPoint, PostSolver postSolver )
 		{
 			// five-axis exit needs master / slave from the path end point
-			if( !( pathEndPoint is PostPoint pathEndPost ) ) {
+			if( !( pathEndPoint is PostPoint pathEndPost ) || groupLastPathLastPnt == null || entryAndExitData == null || entryAndExitData.ExitDistance <= 0 ) {
 				return new List<PostPointBase>();
 			}
 
 			// calculate exit point
-			IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathLastPnt, entryAndExitData.ExitDistance );
+			IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( groupLastPathLastPnt, entryAndExitData.ExitDistance );
+			if( exitPoint == null ) {
+				return new List<PostPointBase>();
+			}
 			PostPoint exitPostPnt = new PostPoint()
 			{
 				X = exitPoint.Point.X(),

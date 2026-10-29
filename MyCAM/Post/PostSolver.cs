@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using MyCAM.Helper.CAM;
 using OCC.gp;
 using PostTool.Interop;
 using System;
@@ -421,7 +422,7 @@ namespace MyCAM.Post
 				return IKSolveResult.InvalidInput;
 			}
 
-			gp_Dir toolVec_Ext = RotateToolVecByExternalAxis( toolVec, externalAxis_deg );
+			gp_Dir toolVec_Ext = ExternalAxisHelper.RotateDirAroundG54Z( toolVec, externalAxis_deg );
 
 			// swap the input master and slave axis if needed
 			if( m_IKSolver.IsReverseMS ) {
@@ -458,7 +459,7 @@ namespace MyCAM.Post
 				return new gp_Vec();
 			}
 
-			gp_Pnt pointG54_Ext = RotatePointByExternalAxis( pointG54, externalAxis_deg );
+			gp_Pnt pointG54_Ext = ExternalAxisHelper.RotatePointAroundG54Z( pointG54, externalAxis_deg );
 			gp_Vec g54ToG54Ext = new gp_Vec( pointG54_Ext.XYZ() - pointG54.XYZ() );
 
 			gp_Vec rtcpVec_Ext;
@@ -474,7 +475,7 @@ namespace MyCAM.Post
 		public gp_Dir SolveToolVec( double dM, double dS, double externalAxis_deg = 0 )
 		{
 			gp_Dir toolVec_Ext = m_FKSolver.SolveToolVec( dM, dS );
-			return RotateToolVecByExternalAxis( toolVec_Ext, -externalAxis_deg );
+			return ExternalAxisHelper.RotateDirAroundG54Z( toolVec_Ext, -externalAxis_deg );
 		}
 
 		public bool IsToolVecSingular( double dM_rad, double dS_rad, double externalAxis_deg = 0 )
@@ -510,38 +511,6 @@ namespace MyCAM.Post
 
 		IKSolver m_IKSolver;
 		FKSolver m_FKSolver;
-
-		gp_Dir RotateToolVecByExternalAxis( gp_Dir toolVec, double externalAxis_deg )
-		{
-			if( toolVec == null ) {
-				return null;
-			}
-			double angle_rad = externalAxis_deg * Math.PI / 180.0;
-			if( Math.Abs( angle_rad ) <= 1e-12 ) {
-				return new gp_Dir( toolVec.XYZ() );
-			}
-
-			gp_Dir transformedToolVec = new gp_Dir( toolVec.XYZ() );
-			gp_Trsf rotation = new gp_Trsf();
-			rotation.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), angle_rad );
-			transformedToolVec.Transform( rotation );
-			return transformedToolVec;
-		}
-
-		gp_Pnt RotatePointByExternalAxis( gp_Pnt point, double externalAxis_deg )
-		{
-			if( point == null ) {
-				return null;
-			}
-			double angle_rad = externalAxis_deg * Math.PI / 180.0;
-			if( Math.Abs( angle_rad ) <= 1e-12 ) {
-				return new gp_Pnt( point.XYZ() );
-			}
-
-			gp_Trsf rotation = new gp_Trsf();
-			rotation.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), angle_rad );
-			return point.Transformed( rotation );
-		}
 
 		// mix type specialization, MasterOnly / SlaveOnly locks one axis at 0
 		MixTypeVariant m_MixTypeVariant = MixTypeVariant.Mix;

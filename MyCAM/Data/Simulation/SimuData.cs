@@ -91,9 +91,10 @@ namespace MyCAM.Data
 			internal struct SimuInputSet
 			{
 				public List<PostData> EachPathIKPostDataList;
+				public List<int> GroupStartPathIndices;
 
-				// lastPathLastPnt is for exit path calculation
-				public IProcessPoint LastPathLastPnt;
+				// each group's last path end point is for per-group exit path calculation
+				public List<IProcessPoint> GroupLastPathLastPntList;
 				public EntryAndExitData EntryAndExitData;
 				public PostSolver PostSolver;
 				public FiveAxisMachineData MachineData;
@@ -102,10 +103,11 @@ namespace MyCAM.Data
 				// it will be used before collision calculation, use AABB to filter out some impossible collision pairs
 				public Dictionary<string, (double[] Min, double[] Max)> AABBMap;
 
-				public SimuInputSet( List<PostData> eachPathIKPostDataList, IProcessPoint lastPathLastPnt, EntryAndExitData entryAndExitData, PostSolver postSolver, FiveAxisMachineData machineData, CollisionSolver fCLTest )
+				public SimuInputSet( List<PostData> eachPathIKPostDataList, List<int> groupStartPathIndices, List<IProcessPoint> groupLastPathLastPntList, EntryAndExitData entryAndExitData, PostSolver postSolver, FiveAxisMachineData machineData, CollisionSolver fCLTest )
 				{
 					EachPathIKPostDataList = eachPathIKPostDataList;
-					LastPathLastPnt = lastPathLastPnt;
+					GroupStartPathIndices = groupStartPathIndices;
+					GroupLastPathLastPntList = groupLastPathLastPntList;
 					EntryAndExitData = entryAndExitData;
 					PostSolver = postSolver;
 					MachineData = machineData;

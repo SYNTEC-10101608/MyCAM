@@ -1,6 +1,8 @@
 using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Helper.CAM;
 using OCC.gp;
+using System;
 using System.Collections.Generic;
 
 namespace MyCAM.Helper
@@ -117,6 +119,10 @@ namespace MyCAM.Helper
 			SetBuf( ref outBuf, MachineComponentType.Laser, new gp_Trsf() );
 			gp_Trsf trsfWorkPiece = new gp_Trsf();
 			trsfWorkPiece.SetTranslation( g54 );
+
+			// apply external-axis rotation on workpiece for simulation
+			gp_Trsf trsfExternalAxis = ExternalAxisHelper.CreateRotationTransformAroundG54Z( fiveAxisPoint.ExternalAxis_deg );
+			trsfWorkPiece.Multiply( trsfExternalAxis );
 			SetBuf( ref outBuf, MachineComponentType.WorkPiece, trsfWorkPiece );
 		}
 
