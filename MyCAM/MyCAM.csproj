@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -354,6 +354,7 @@
     </Compile>
     <Compile Include="Helper\CAD\DisctereContourHelper.cs" />
     <Compile Include="Helper\FileIO\MachineDataXMLHelper.cs" />
+    <Compile Include="Helper\CAM\ExternalAxisGroupHelper.cs" />
     <Compile Include="Helper\CAM\ToolVecHelper.cs" />
     <Compile Include="Helper\CAM\TraverseHelper.cs" />
     <Compile Include="FileManager\MachineDataDTO.cs" />
@@ -614,5 +615,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
+
 
 
