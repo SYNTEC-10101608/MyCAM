@@ -1165,6 +1165,12 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public double? ExternalAxis_deg
+		{
+			get;
+			set;
+		}
+
 		public SpecialToolVecDataDTO SpecialToolVecData
 		{
 			get;
@@ -1225,6 +1231,7 @@ namespace MyCAM.FileManager
 			}
 			InitMaster_rad = craftData.InitMaster_rad;
 			InitSlave_rad = craftData.InitSlave_rad;
+			ExternalAxis_deg = craftData.ExternalAxis_deg;
 		}
 
 		internal CraftData ToCraftData()
@@ -1260,7 +1267,8 @@ namespace MyCAM.FileManager
 																 leadData, OverCutLength.Value, toolVecModifyMap,
 																 startPntToolVecParam, IsToolVecReverse.Value, traverseData,
 																 startPntContourEditParam, contourEditMap,
-																 microJointStartIdxMap, extendedGCodeMap, specialToolVecData, rCornerMap );
+																 microJointStartIdxMap, extendedGCodeMap, specialToolVecData, rCornerMap,
+																 ExternalAxis_deg ?? 0.0 );
 
 			// old version may have start/end point in ToolVecModifyMap, those are move to StartPntToolVecData
 			RemoveOldMapStartEndPoint( craftData );

@@ -195,7 +195,8 @@ namespace MyCAM.Data
 			Dictionary<int, double> microJointStartIdxMap,
 			Dictionary<Tuple<ExtendedGCodeType, int?>, string> extendedGCodeMap,
 			SpecialToolVecData specialToolVecData = null,
-			Dictionary<int, RCornerData> rCornerMap = null )
+			Dictionary<int, RCornerData> rCornerMap = null,
+			double externalAxis_deg = 0 )
 		{
 			m_TechLayer = techLayer;
 			m_StartPointIndex = startPoint;
@@ -232,6 +233,7 @@ namespace MyCAM.Data
 					m_RCornerMap.Add( kvp.Key, kvp.Value.Clone() );
 				}
 			}
+			m_ExternalAxis_deg = externalAxis_deg;
 			SubscribeSubParamChanged();
 		}
 
@@ -252,6 +254,21 @@ namespace MyCAM.Data
 						return;
 					}
 					m_TechLayer = value;
+				}
+			}
+		}
+
+		public double ExternalAxis_deg
+		{
+			get
+			{
+				return m_ExternalAxis_deg;
+			}
+			set
+			{
+				if( m_ExternalAxis_deg != value ) {
+					m_ExternalAxis_deg = value;
+					CAMFactorChanged?.Invoke();
 				}
 			}
 		}
@@ -881,5 +898,6 @@ namespace MyCAM.Data
 		double m_CompensatedDistance = 0;
 		double m_InitMaster_rad = 0;
 		double m_InitSlave_rad = 0;
+		double m_ExternalAxis_deg = 0;
 	}
 }
