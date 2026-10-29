@@ -446,6 +446,11 @@ namespace MyCAM
 			m_CAMEditor.SetOverCut();
 		}
 
+		void m_tsbExternalAxis_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetExternalAxis();
+		}
+
 		// tool vector
 		void m_tsbToolVec_Click( object sender, EventArgs e )
 		{
@@ -768,6 +773,10 @@ namespace MyCAM
 					case EditActionType.SpecialToolVecEdit:
 						m_tsbFixedToolVec.BackColor = DEFAULT_BtnColor;
 						break;
+					case EditActionType.ExternalAxis:
+						m_tsbExternalAxis.BackColor = DEFAULT_BtnColor;
+						OnCAMDlgActionStatusChange( actionStatus );
+						break;
 					default:
 						break;
 				}
@@ -823,6 +832,10 @@ namespace MyCAM
 				case EditActionType.SpecialToolVecEdit:
 					m_tsbFixedToolVec.BackColor = ON_ButtonColor;
 					break;
+				case EditActionType.ExternalAxis:
+					m_tsbExternalAxis.BackColor = ON_ButtonColor;
+					OnCAMDlgActionStatusChange( actionStatus );
+					break;
 				default:
 					break;
 			}
@@ -844,6 +857,7 @@ namespace MyCAM
 			m_tsbRCorner.Enabled = editableInfo.IsRCornerEditable;
 			m_tsbExtendedGCode.Enabled = editableInfo.IsExtendedGCodeEditable;
 			m_btnContourEdit.Enabled = editableInfo.IsContourEditable;
+			m_tsbExternalAxis.Enabled = editableInfo.IsExternalAxisEditable;
 		}
 
 		// path type change event
@@ -1618,6 +1632,9 @@ namespace MyCAM
 			m_tsbOverCut.Text = m_LanguageManager.TryGetString( "m_tsbOverCut", m_tsbOverCut.Text );
 			m_tsbOverCut.ToolTipText = m_LanguageManager.TryGetString( "m_tsbOverCut_ToolTip", m_tsbOverCut.ToolTipText );
 
+			m_tsbExternalAxis.Text = m_LanguageManager.TryGetString( "m_tsbExternalAxis", m_tsbExternalAxis.Text );
+			m_tsbExternalAxis.ToolTipText = m_LanguageManager.TryGetString( "m_tsbExternalAxis_ToolTip", m_tsbExternalAxis.ToolTipText );
+
 			m_tsbMicroJoint.Text = m_LanguageManager.TryGetString( "m_tsbMicroJoint", m_tsbMicroJoint.Text );
 			m_tsbMicroJoint.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMicroJoint_ToolTip", m_tsbMicroJoint.ToolTipText );
 
@@ -1680,7 +1697,7 @@ namespace MyCAM
 			m_btnPause.ToolTipText = m_LanguageManager.TryGetString( "m_btnPause_ToolTip", m_btnPause.ToolTipText );
 
 			m_btnStop.Text = m_LanguageManager.TryGetString( "m_btnStop", m_btnStop.Text );
-			m_btnStop.ToolTipText = m_LanguageManager.TryGetString( "m_btnStop_ToolTip", m_btnStop.ToolTipText );
+		 m_btnStop.ToolTipText = m_LanguageManager.TryGetString( "m_btnStop_ToolTip", m_btnStop.ToolTipText );
 
 			m_btnPreviousPath.Text = m_LanguageManager.TryGetString( "m_btnPreviousPath", m_btnPreviousPath.Text );
 			m_btnPreviousPath.ToolTipText = m_LanguageManager.TryGetString( "m_btnPreviousPath_ToolTip", m_btnPreviousPath.ToolTipText );

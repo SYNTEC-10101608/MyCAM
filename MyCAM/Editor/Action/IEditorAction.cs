@@ -37,6 +37,7 @@ namespace MyCAM.Editor
 		ToolVec,
 		SetLead,
 		OverCut,
+		ExternalAxis,
 		SetTraverse,
 		SetEntryAndExitParam,
 		SetPattern,

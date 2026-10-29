@@ -33,6 +33,7 @@ namespace MyCAM.Editor
 			IsExtendedGCodeEditable = true;
 			IsRCornerEditable = true;
 			IsContourEditable = true;
+			IsExternalAxisEditable = true;
 		}
 
 		public bool IsStartPointEditable;
@@ -49,6 +50,7 @@ namespace MyCAM.Editor
 		public bool IsExtendedGCodeEditable;
 		public bool IsRCornerEditable;
 		public bool IsContourEditable;
+		public bool IsExternalAxisEditable;
 	}
 
 	internal class CAMEditor : EditorBase
@@ -600,6 +602,21 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetExternalAxis()
+		{
+			// action edit, multi edit supported
+			if( IsSameAction( EditActionType.ExternalAxis ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
+			ExternalAxisAction action = new ExternalAxisAction( m_DataManager, szPathIDList );
+			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
+		}
+
 		#endregion
 
 		// sort API
@@ -805,6 +822,7 @@ namespace MyCAM.Editor
 					editableInfo.IsStartPointEditable = false;
 					editableInfo.IsOverCutEditable = false;
 					editableInfo.IsLeadLineEditable = false;
+					editableInfo.IsExternalAxisEditable = false;
 					break;
 				}
 

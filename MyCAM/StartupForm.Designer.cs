@@ -48,6 +48,7 @@
 			this.m_tsbSetTraverseData = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSetLead = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbOverCut = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbExternalAxis = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbMicroJoint = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbRCorner = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbExtendedGCode = new System.Windows.Forms.ToolStripButton();
@@ -239,6 +240,7 @@
 			// 4. lead / overcut / microjoint / extendedGcode
 			this.m_tsbSetLead,
 			this.m_tsbOverCut,
+			this.m_tsbExternalAxis,
 			this.m_tsbMicroJoint,
 			this.m_tsbRCorner,
 			this.m_tsbExtendedGCode,
@@ -376,6 +378,17 @@
 			this.m_tsbOverCut.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
 			this.m_tsbOverCut.ToolTipText = "設定選擇路徑的過切";
 			this.m_tsbOverCut.Click += new System.EventHandler( this.m_tsbOverCut_Click );
+			// 
+			// m_tsbExternalAxis
+			// 
+			this.m_tsbExternalAxis.Image = global::MyCAM.Properties.Resources.CAM_Overcut;
+			this.m_tsbExternalAxis.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbExternalAxis.Name = "m_tsbExternalAxis";
+			this.m_tsbExternalAxis.Size = new System.Drawing.Size( 44, 47 );
+			this.m_tsbExternalAxis.Text = "變位";
+			this.m_tsbExternalAxis.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbExternalAxis.ToolTipText = "設定選擇路徑的變位機角度";
+			this.m_tsbExternalAxis.Click += new System.EventHandler( this.m_tsbExternalAxis_Click );
 			// 
 			// m_tsbMicroJoint
 			// 
@@ -1402,6 +1415,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbReverse;
 		private System.Windows.Forms.ToolStripButton m_tsbSetLead;
 		private System.Windows.Forms.ToolStripButton m_tsbOverCut;
+		private System.Windows.Forms.ToolStripButton m_tsbExternalAxis;
 		private System.Windows.Forms.ToolStripButton m_tsbToolVecReverse;
 		private System.Windows.Forms.ToolStripButton m_tsbToolVec;
 		private System.Windows.Forms.ToolStripButton m_tsbAutoOrder;
