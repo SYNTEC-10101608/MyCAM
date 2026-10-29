@@ -460,6 +460,7 @@ namespace MyCAM.Helper
 			}
 			double dMasterStep = ( endPost.Master - startPost.Master ) / DiscretizePntList.Count();
 			double dSlaveStep = ( endPost.Slave - startPost.Slave ) / DiscretizePntList.Count();
+			double dExternalAxisStep = ( endPost.ExternalAxis_deg - startPost.ExternalAxis_deg ) / DiscretizePntList.Count();
 			for( int i = 0; i < DiscretizePntList.Count; i++ ) {
 				PostPoint pnt = new PostPoint();
 				pnt.X = DiscretizePntList[ i ].X();
@@ -469,6 +470,7 @@ namespace MyCAM.Helper
 				// interpolate master and slave values
 				pnt.Master = startPost.Master + dMasterStep * i;
 				pnt.Slave = startPost.Slave + dSlaveStep * i;
+				pnt.ExternalAxis_deg = startPost.ExternalAxis_deg + dExternalAxisStep * i;
 				IKpostPointList.Add( pnt );
 			}
 			return true;
@@ -485,7 +487,7 @@ namespace MyCAM.Helper
 			if( arcPntList == null || arcPntList.Count == 0 || arcPntList[ 0 ] == null || arcPntList[ 1 ] == null ) {
 				return false;
 			}
-			bool bSuccess = AddInterpolatedPoints( arcPntList[ 0 ], startPost.Master, startPost.Slave, midPost.Master, midPost.Slave, out List<PostPoint> FrogLeapFirstHalfList );
+			bool bSuccess = AddInterpolatedPoints( arcPntList[ 0 ], startPost.Master, startPost.Slave, startPost.ExternalAxis_deg, midPost.Master, midPost.Slave, midPost.ExternalAxis_deg, out List<PostPoint> FrogLeapFirstHalfList );
 			if( !bSuccess ) {
 				return false;
 			}
@@ -496,7 +498,7 @@ namespace MyCAM.Helper
 
 			// remove duplicated mid point
 			frogLeapIKPostPnt.RemoveAt( frogLeapIKPostPnt.Count() - 1 );
-			bSuccess = AddInterpolatedPoints( arcPntList[ 1 ], midPost.Master, midPost.Slave, endPost.Master, endPost.Slave, out List<PostPoint> FrogLeapSecondHalfList );
+			bSuccess = AddInterpolatedPoints( arcPntList[ 1 ], midPost.Master, midPost.Slave, midPost.ExternalAxis_deg, endPost.Master, endPost.Slave, endPost.ExternalAxis_deg, out List<PostPoint> FrogLeapSecondHalfList );
 			if( !bSuccess ) {
 				return false;
 			}
@@ -505,7 +507,10 @@ namespace MyCAM.Helper
 		}
 
 		// interpolate master / slave over a set of arc points
-		static bool AddInterpolatedPoints( List<gp_Pnt> arcPoints, double startMaster, double startSlave, double endMaster, double endSlave, out List<PostPoint> interpolatedPoints )
+		static bool AddInterpolatedPoints( List<gp_Pnt> arcPoints,
+			double startMaster, double startSlave, double startExternalAxis_deg,
+			double endMaster, double endSlave, double endExternalAxis_deg,
+			out List<PostPoint> interpolatedPoints )
 		{
 			interpolatedPoints = new List<PostPoint>();
 			if( arcPoints == null || arcPoints.Count == 0 ) {
@@ -513,6 +518,7 @@ namespace MyCAM.Helper
 			}
 			double dMasterStep = ( endMaster - startMaster ) / arcPoints.Count;
 			double dSlaveStep = ( endSlave - startSlave ) / arcPoints.Count;
+			double dExternalAxisStep = ( endExternalAxis_deg - startExternalAxis_deg ) / arcPoints.Count;
 
 			for( int i = 0; i < arcPoints.Count; i++ ) {
 				PostPoint pnt = new PostPoint();
@@ -521,6 +527,7 @@ namespace MyCAM.Helper
 				pnt.Z = arcPoints[ i ].Z();
 				pnt.Master = startMaster + dMasterStep * i;
 				pnt.Slave = startSlave + dSlaveStep * i;
+				pnt.ExternalAxis_deg = startExternalAxis_deg + dExternalAxisStep * i;
 				interpolatedPoints.Add( pnt );
 			}
 			return true;

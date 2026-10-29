@@ -95,12 +95,12 @@ namespace MyCAM.Helper
 				return new Tuple<double, double>( BIG_AB_ANGLE, BIG_AB_ANGLE );
 			}
 
-			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
+			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg, toolVecPoint.ExternalAxis_deg );
 			Tuple<double, double> abAngle_deg = GetABAngleFromToolVec( toolVec, toolVecPoint );
 			return abAngle_deg;
 		}
 
-		public static gp_Dir ConvertMSAngleToToolVec( double dMaster_deg, double dSlave_deg )
+		public static gp_Dir ConvertMSAngleToToolVec( double dMaster_deg, double dSlave_deg, double externalAxis_deg = 0 )
 		{
 			// Get machine data
 			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
@@ -115,7 +115,7 @@ namespace MyCAM.Helper
 			double dSlave_rad = dSlave_deg * Math.PI / 180.0;
 
 			// Use PostSolver API to get the tool vector from master/slave angles
-			return postSolver.SolveToolVec( dMaster_rad, dSlave_rad, 0 );
+			return postSolver.SolveToolVec( dMaster_rad, dSlave_rad, externalAxis_deg );
 		}
 
 		public static Tuple<double, double> FlipRotaryAxis( double master_deg, double slave_deg, bool isPositive )
@@ -174,10 +174,10 @@ namespace MyCAM.Helper
 
 		public static void SetToolVecByAssignedMS( ref List<ISetToolVecPoint> toolVecPointList, double dMaster_deg, double dSlave_deg )
 		{
-			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
 			double dMaster_rad = dMaster_deg * Math.PI / 180.0;
 			double dSlave_rad = dSlave_deg * Math.PI / 180.0;
 			foreach( var pnt in toolVecPointList ) {
+				gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg, pnt.ExternalAxis_deg );
 				pnt.ModMaster_rad = dMaster_rad;
 				pnt.ModSlave_rad = dSlave_rad;
 				pnt.ToolVec = toolVec;
@@ -226,7 +226,7 @@ namespace MyCAM.Helper
 			PostSolver postSolver = new PostSolver( machineData );
 
 			// use MS data to cal dir
-			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
+			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg, toolVecPointList.First().ExternalAxis_deg );
 
 			// use dir to cal AB angle
 			Tuple<double, double> abAngle_deg = GetABAngleFromToolVec( toolVec, toolVecPointList.First() );
@@ -332,7 +332,7 @@ namespace MyCAM.Helper
 				}
 				double dStart_Master_deg = toolVecModifyMap[ interpolateIntervalList[ i ].Item1 ].AngleData.Master_deg;
 				double dStart_Slave_deg = toolVecModifyMap[ interpolateIntervalList[ i ].Item1 ].AngleData.Slave_deg;
-				gp_Dir toolVec = ConvertMSAngleToToolVec( dStart_Master_deg, dStart_Slave_deg );
+				gp_Dir toolVec = ConvertMSAngleToToolVec( dStart_Master_deg, dStart_Slave_deg, toolVecPointList[ interpolateIntervalList[ i ].Item1 ].ExternalAxis_deg );
 				if( toolVec != null ) {
 					toolVecPointList[ interpolateIntervalList[ i ].Item1 ].ToolVec = toolVec;
 					toolVecPointList[ interpolateIntervalList[ i ].Item1 ].ModMaster_rad = dStart_Master_deg * Math.PI / 180.0;
@@ -351,7 +351,7 @@ namespace MyCAM.Helper
 			}
 			double dEnd_Master_deg = toolVecModifyMap[ lastIndex ].AngleData.Master_deg;
 			double dEnd_Slave_deg = toolVecModifyMap[ lastIndex ].AngleData.Slave_deg;
-			gp_Dir lastToolVec = ConvertMSAngleToToolVec( dEnd_Master_deg, dEnd_Slave_deg );
+			gp_Dir lastToolVec = ConvertMSAngleToToolVec( dEnd_Master_deg, dEnd_Slave_deg, toolVecPointList[ toolVecPointList.Count - 1 ].ExternalAxis_deg );
 			if( lastToolVec != null ) {
 				toolVecPointList[ toolVecPointList.Count - 1 ].ToolVec = lastToolVec;
 				toolVecPointList[ toolVecPointList.Count - 1 ].ModMaster_rad = dEnd_Master_deg * Math.PI / 180.0;
@@ -433,7 +433,7 @@ namespace MyCAM.Helper
 				double dInterpSlave_deg = dStartSlave_deg + ( dEndSlave_deg - dStartSlave_deg ) * t;
 
 				// Convert M/S to ToolVec
-				gp_Dir toolVec = ConvertMSAngleToToolVec( dInterpMaster_deg, dInterpSlave_deg );
+				gp_Dir toolVec = ConvertMSAngleToToolVec( dInterpMaster_deg, dInterpSlave_deg, toolVecPointList[ i ].ExternalAxis_deg );
 				if( toolVec != null ) {
 					toolVecPointList[ i ].ToolVec = toolVec;
 					toolVecPointList[ i ].ModMaster_rad = dInterpMaster_deg * Math.PI / 180.0;
@@ -526,7 +526,8 @@ namespace MyCAM.Helper
 				// update ToolVec from the resulting ModMaster_rad and ModSlave_rad
 				gp_Dir toolVec = ConvertMSAngleToToolVec(
 					toolVecPointList[ i ].ModMaster_rad * 180.0 / Math.PI,
-					toolVecPointList[ i ].ModSlave_rad * 180.0 / Math.PI );
+					toolVecPointList[ i ].ModSlave_rad * 180.0 / Math.PI,
+					toolVecPointList[ i ].ExternalAxis_deg );
 				if( toolVec != null ) {
 					toolVecPointList[ i ].ToolVec = toolVec;
 				}
@@ -966,13 +967,20 @@ namespace MyCAM.Helper
 
 		static bool IsSingular( double master_deg, double slave_deg )
 		{
+			// keep backward-compatible behavior:
+			// when no point context is available, use deterministic external axis = 0
+			return IsSingular( master_deg, slave_deg, 0 );
+		}
+
+		static bool IsSingular( double master_deg, double slave_deg, double externalAxis_deg )
+		{
 			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				return false;
 			}
 			PostSolver postSolver = new PostSolver( machineData );
 			double dM_rad = master_deg * Math.PI / 180.0;
 			double dS_rad = slave_deg * Math.PI / 180.0;
-			return postSolver.IsToolVecSingular( dM_rad, dS_rad, 0 );
+			return postSolver.IsToolVecSingular( dM_rad, dS_rad, externalAxis_deg );
 		}
 
 		// flip non-rotating axis based on ToolDir and rotary axis relationship
