@@ -1,9 +1,11 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Helper.CAM;
 using MyCAM.PathCache;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace MyCAM.Post
 {
@@ -17,12 +19,14 @@ namespace MyCAM.Post
 			}
 			m_DataManager = dataManager;
 			m_PathIDList = dataManager.PathIDList;
+			m_PathIndexMap = BuildPathIndexMap( m_PathIDList );
 			m_AxisConfig = new AxisConfig( dataManager.MachineData as FiveAxisMachineData );
 			m_EntryAndExitData = dataManager.EntryAndExitData;
 		}
 
 		DataManager m_DataManager;
 		IReadOnlyList<string> m_PathIDList;
+		Dictionary<string, int> m_PathIndexMap;
 		StreamWriter m_StreamWriter;
 		AxisConfig m_AxisConfig;
 		EntryAndExitData m_EntryAndExitData;
@@ -39,12 +43,10 @@ namespace MyCAM.Post
 					CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.Header,
 						BuildFileHeaderDict() );
 
-					// process all paths
-					if( !ProcessAllPaths( out PathEndInfo endInfoOfLastPath, out errorMessage ) ) {
+					// process all paths by external-axis contiguous groups
+					if( !ProcessAllPaths( out errorMessage ) ) {
 						return false;
 					}
-
-					WriteExitSection( endInfoOfLastPath );
 
 					// file tail
 					CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.Tail, new Dictionary<string, string> { } );
@@ -62,30 +64,37 @@ namespace MyCAM.Post
 			errorMessage = string.Empty;
 			postDataList = new List<PostData>();
 			try {
-				PathEndInfo endInfoOfLastPath = null;
-				for( int i = 0; i < m_PathIDList.Count; i++ ) {
-					if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
-						continue;
-					}
-					PathType pathType = pathObject.PathType;
-					if( pathType == PathType.Contour ) {
-						if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
-							return false;
-						}
-						postDataList.Add( postData );
-					}
-					else {
-						if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData stdPostData, out _, out errorMessage ) ) {
-							return false;
+				List<List<string>> groups = ExternalAxisGroupHelper.BuildContiguousGroups( m_PathIDList );
+				foreach( List<string> group in groups ) {
+					PathEndInfo endInfoOfLastPath = null;
+					foreach( string pathID in group ) {
+						if( !m_PathIndexMap.TryGetValue( pathID, out int i ) ) {
+							continue;
 						}
 
-						if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
-							return false;
+						if( !DataGettingHelper.GetPathObject( pathID, out PathObject pathObject ) ) {
+							continue;
 						}
+						PathType pathType = pathObject.PathType;
+						if( pathType == PathType.Contour ) {
+							if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
+								return false;
+							}
+							postDataList.Add( postData );
+						}
+						else {
+							if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData stdPostData, out _, out errorMessage ) ) {
+								return false;
+							}
 
-						// TODO：this is temporary solution to make standard pattern post data compatible with std pattern contour post data, which is used for tool path display in process setting form. We will refactor the code structure later to avoid this kind of workaround.
-						ApplyStdPatternPostDataToPostData( postData, stdPostData );
-						postDataList.Add( postData );
+							if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
+								return false;
+							}
+
+							// TODO：this is temporary solution to make standard pattern post data compatible with std pattern contour post data, which is used for tool path display in process setting form. We will refactor the code structure later to avoid this kind of workaround.
+							ApplyStdPatternPostDataToPostData( postData, stdPostData );
+							postDataList.Add( postData );
+						}
 					}
 				}
 				return true;
@@ -107,7 +116,7 @@ namespace MyCAM.Post
 
 		void WriteExitSection( PathEndInfo endInfoOfLastPath )
 		{
-			if( m_PathIDList.Count == 0 ) {
+			if( m_PathIDList.Count == 0 || endInfoOfLastPath == null ) {
 				return;
 			}
 			PostTraverseBuilder.CalculateExit( endInfoOfLastPath, m_EntryAndExitData, out PostPoint exitPoint );
@@ -115,30 +124,77 @@ namespace MyCAM.Post
 			NCWriterHelper.WriteLinearTraverse( m_StreamWriter, exitPoint, 0, m_AxisConfig );
 		}
 
-		bool ProcessAllPaths( out PathEndInfo endInfoOfLastPath, out string errorMessage )
+		bool ProcessAllPaths( out string errorMessage )
 		{
 			errorMessage = string.Empty;
-			endInfoOfLastPath = null;
-			for( int i = 0; i < m_PathIDList.Count; i++ ) {
-				if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
+			List<List<string>> groups = ExternalAxisGroupHelper.BuildContiguousGroups( m_PathIDList );
+			foreach( List<string> group in groups ) {
+				if( group == null || group.Count == 0 ) {
 					continue;
 				}
-				PathType pathType = pathObject.PathType;
-				int nPathLayer = pathObject.CraftData.TechLayer;
-				if( pathType == PathType.Contour ) {
-					if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
-						return false;
-					}
-					WriteCutting( postData, m_PathIDList[ i ], pathObject.CraftData, i + 1, nPathLayer );
+
+				if( !WriteExternalAxisSection( group.First(), out errorMessage ) ) {
+					return false;
 				}
-				else {
-					if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData postData, out StdPatternNCPackage package, out errorMessage ) ) {
-						return false;
+
+				PathEndInfo endInfoOfLastPathInGroup = null;
+				foreach( string pathID in group ) {
+					if( !m_PathIndexMap.TryGetValue( pathID, out int i ) ) {
+						continue;
 					}
-					WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, package.GeomData, i + 1 );
+					if( !DataGettingHelper.GetPathObject( pathID, out PathObject pathObject ) ) {
+						continue;
+					}
+
+					PathType pathType = pathObject.PathType;
+					int nPathLayer = pathObject.CraftData.TechLayer;
+					if( pathType == PathType.Contour ) {
+						if( !GetContourPostData( i, ref endInfoOfLastPathInGroup, out PostData postData, out errorMessage ) ) {
+							return false;
+						}
+						WriteCutting( postData, pathID, pathObject.CraftData, i + 1, nPathLayer );
+					}
+					else {
+						if( !GetStdPostData( i, ref endInfoOfLastPathInGroup, out StdPatternPostData postData, out StdPatternNCPackage package, out errorMessage ) ) {
+							return false;
+						}
+						WriteStandardPatternCutting( pathType, postData, pathObject.CraftData, package.GeomData, i + 1 );
+					}
 				}
+
+				WriteExitSection( endInfoOfLastPathInGroup );
 			}
 			return true;
+		}
+
+		bool WriteExternalAxisSection( string pathID, out string errorMessage )
+		{
+			errorMessage = string.Empty;
+			if( string.IsNullOrEmpty( pathID ) ) {
+				errorMessage = "ExternalAxis path id is empty.";
+				return false;
+			}
+			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) || craftData == null ) {
+				errorMessage = "ExternalAxis craft data is missing.";
+				return false;
+			}
+
+			m_StreamWriter.WriteLine( "// ExternalAxis Start" );
+			m_StreamWriter.WriteLine( $"C = {craftData.ExternalAxis_deg.ToString( "F3" )};" );
+			m_StreamWriter.WriteLine( "// ExternalAxis End" );
+			return true;
+		}
+
+		static Dictionary<string, int> BuildPathIndexMap( IReadOnlyList<string> pathIDList )
+		{
+			Dictionary<string, int> map = new Dictionary<string, int>();
+			if( pathIDList == null ) {
+				return map;
+			}
+			for( int i = 0; i < pathIDList.Count; i++ ) {
+				map[ pathIDList[ i ] ] = i;
+			}
+			return map;
 		}
 
 		#region NC Package Builder
