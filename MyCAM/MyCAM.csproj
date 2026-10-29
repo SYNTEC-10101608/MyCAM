@@ -292,7 +292,8 @@
     <Compile Include="Editor\Action\CAM\PatternAction.cs" />
     <Compile Include="Editor\Action\CAM\EntryAndExitAction.cs" />
     <Compile Include="Editor\Action\CAM\LeadAction.cs" />
-    <Compile Include="Editor\\Action\\CAM\\OverCutAction.cs" />`r`n    <Compile Include="Editor\\Action\\CAM\\ExternalAxisAction.cs" />
+    <Compile Include="Editor\\Action\\CAM\\OverCutAction.cs" />
+	<Compile Include="Editor\\Action\\CAM\\ExternalAxisAction.cs" />
     <Compile Include="Editor\Action\CAM\SelectPathAction.cs" />
     <Compile Include="Editor\Action\CAM\TraverseAction.cs" />
     <Compile Include="Editor\Action\CAD\ReadProjectFileAction.cs" />
@@ -342,7 +343,15 @@
     <Compile Include="Editor\Dialog\OverCutDlg.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editor\\Dialog\\OverCutDlg.Designer.cs">`r`n      <DependentUpon>OverCutDlg.cs</DependentUpon>`r`n    </Compile>`r`n    <Compile Include="Editor\\Dialog\\ExternalAxisDlg.cs">`r`n      <SubType>Form</SubType>`r`n    </Compile>`r`n    <Compile Include="Editor\\Dialog\\ExternalAxisDlg.Designer.cs">`r`n      <DependentUpon>ExternalAxisDlg.cs</DependentUpon>`r`n    </Compile>
+    <Compile Include="Editor\\Dialog\\OverCutDlg.Designer.cs">
+		<DependentUpon>OverCutDlg.cs</DependentUpon>
+	</Compile>
+	<Compile Include="Editor\\Dialog\\ExternalAxisDlg.cs">
+		<SubType>Form</SubType>
+	</Compile>
+	<Compile Include="Editor\\Dialog\\ExternalAxisDlg.Designer.cs">
+		<DependentUpon>ExternalAxisDlg.cs</DependentUpon>
+	</Compile>
     <Compile Include="Helper\CAD\DisctereContourHelper.cs" />
     <Compile Include="Helper\FileIO\MachineDataXMLHelper.cs" />
     <Compile Include="Helper\CAM\ToolVecHelper.cs" />
@@ -485,7 +494,12 @@
     <EmbeddedResource Include="Editor\Dialog\LeadDlg.resx">
       <DependentUpon>LeadDlg.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editor\\Dialog\\OverCutDlg.resx">`r`n      <DependentUpon>OverCutDlg.cs</DependentUpon>`r`n    </EmbeddedResource>`r`n    <EmbeddedResource Include="Editor\\Dialog\\ExternalAxisDlg.resx">`r`n      <DependentUpon>ExternalAxisDlg.cs</DependentUpon>`r`n    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\\Dialog\\OverCutDlg.resx">
+		<DependentUpon>OverCutDlg.cs</DependentUpon>
+	</EmbeddedResource>
+	  <EmbeddedResource Include="Editor\\Dialog\\ExternalAxisDlg.resx">
+		<DependentUpon>ExternalAxisDlg.cs</DependentUpon>
+	</EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\ThreePtTransformDlg.resx">
       <DependentUpon>ThreePtTransformDlg.cs</DependentUpon>
     </EmbeddedResource>
