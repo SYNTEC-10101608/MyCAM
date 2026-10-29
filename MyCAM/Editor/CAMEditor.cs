@@ -1,6 +1,7 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
+using MyCAM.Helper.CAM;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.gp;
@@ -865,25 +866,28 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			double prevMaster_rad = 0;
-			double prevSlave_rad = 0;
+			List<List<string>> groups = ExternalAxisGroupHelper.BuildContiguousGroups( pathIDList );
+			foreach( List<string> group in groups ) {
+				double prevMaster_rad = 0;
+				double prevSlave_rad = 0;
 
-			foreach( string szPathID in pathIDList ) {
-				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
-					continue;
-				}
+				foreach( string szPathID in group ) {
+					if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+						continue;
+					}
 
-				// write previous path end MS as initial value for this path's IK solve
-				craftData.InitMaster_rad = prevMaster_rad;
-				craftData.InitSlave_rad = prevSlave_rad;
+					// group start resets IK continuity to (0,0), group internal keeps continuity
+					craftData.InitMaster_rad = prevMaster_rad;
+					craftData.InitSlave_rad = prevSlave_rad;
 
-				// trigger cache rebuild
-				craftData.CAMFactorChanged?.Invoke();
+					// trigger cache rebuild
+					craftData.CAMFactorChanged?.Invoke();
 
-				// read this path's end MS for next path
-				if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
-					prevMaster_rad = endMaster_rad;
-					prevSlave_rad = endSlave_rad;
+					// read this path's end MS for next path in the same group
+					if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
+						prevMaster_rad = endMaster_rad;
+						prevSlave_rad = endSlave_rad;
+					}
 				}
 			}
 			ShowAllCAMData();
