@@ -413,7 +413,7 @@ namespace MyCAM.Post
 			}
 		}
 
-		public IKSolveResult SolveIK( gp_Dir toolVec, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
+		public IKSolveResult SolveIK( gp_Dir toolVec, double dM_In, double dS_In, out double dM_Out, out double dS_Out, double externalAxis_deg = 0 )
 		{
 			dM_Out = 0;
 			dS_Out = 0;
@@ -421,11 +421,13 @@ namespace MyCAM.Post
 				return IKSolveResult.InvalidInput;
 			}
 
+			gp_Dir toolVec_Ext = RotateToolVecByExternalAxis( toolVec, externalAxis_deg );
+
 			// swap the input master and slave axis if needed
 			if( m_IKSolver.IsReverseMS ) {
 				(dS_In, dM_In) = (dM_In, dS_In);
 			}
-			IKSolveResult ikResult = m_IKSolver.Solve( toolVec, dM_In, dS_In, out dM_Out, out dS_Out );
+			IKSolveResult ikResult = m_IKSolver.Solve( toolVec_Ext, dM_In, dS_In, out dM_Out, out dS_Out );
 
 			// swap the output master and slave axis if needed
 			if( m_IKSolver.IsReverseMS ) {
@@ -450,25 +452,34 @@ namespace MyCAM.Post
 			return ikResult;
 		}
 
-		public gp_Vec SolveFK( double dM, double dS, gp_Pnt pointG54, gp_Vec offset )
+		public gp_Vec SolveFK( double dM, double dS, gp_Pnt pointG54, gp_Vec offset, double externalAxis_deg = 0 )
 		{
 			if( pointG54 == null ) {
 				return new gp_Vec();
 			}
+
+			gp_Pnt pointG54_Ext = RotatePointByExternalAxis( pointG54, externalAxis_deg );
+			gp_Vec g54ToG54Ext = new gp_Vec( pointG54_Ext.XYZ() - pointG54.XYZ() );
+
+			gp_Vec rtcpVec_Ext;
 			if( offset != null ) {
-				return m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54.XYZ() ), offset );
+				rtcpVec_Ext = m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54_Ext.XYZ() ), offset );
 			}
-			return m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54.XYZ() ), new gp_Vec() );
+			else {
+				rtcpVec_Ext = m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54_Ext.XYZ() ), new gp_Vec() );
+			}
+			return rtcpVec_Ext + g54ToG54Ext;
 		}
 
-		public gp_Dir SolveToolVec( double dM, double dS )
+		public gp_Dir SolveToolVec( double dM, double dS, double externalAxis_deg = 0 )
 		{
-			return m_FKSolver.SolveToolVec( dM, dS );
+			gp_Dir toolVec_Ext = m_FKSolver.SolveToolVec( dM, dS );
+			return RotateToolVecByExternalAxis( toolVec_Ext, -externalAxis_deg );
 		}
 
-		public bool IsToolVecSingular( double dM_rad, double dS_rad )
+		public bool IsToolVecSingular( double dM_rad, double dS_rad, double externalAxis_deg = 0 )
 		{
-			gp_Dir toolVec = SolveToolVec( dM_rad, dS_rad );
+			gp_Dir toolVec = SolveToolVec( dM_rad, dS_rad, externalAxis_deg );
 			if( toolVec == null || m_MathmeticalMasterDir == null ) {
 				return false;
 			}
@@ -499,6 +510,38 @@ namespace MyCAM.Post
 
 		IKSolver m_IKSolver;
 		FKSolver m_FKSolver;
+
+		gp_Dir RotateToolVecByExternalAxis( gp_Dir toolVec, double externalAxis_deg )
+		{
+			if( toolVec == null ) {
+				return null;
+			}
+			double angle_rad = externalAxis_deg * Math.PI / 180.0;
+			if( Math.Abs( angle_rad ) <= 1e-12 ) {
+				return new gp_Dir( toolVec.XYZ() );
+			}
+
+			gp_Dir transformedToolVec = new gp_Dir( toolVec.XYZ() );
+			gp_Trsf rotation = new gp_Trsf();
+			rotation.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), angle_rad );
+			transformedToolVec.Transform( rotation );
+			return transformedToolVec;
+		}
+
+		gp_Pnt RotatePointByExternalAxis( gp_Pnt point, double externalAxis_deg )
+		{
+			if( point == null ) {
+				return null;
+			}
+			double angle_rad = externalAxis_deg * Math.PI / 180.0;
+			if( Math.Abs( angle_rad ) <= 1e-12 ) {
+				return new gp_Pnt( point.XYZ() );
+			}
+
+			gp_Trsf rotation = new gp_Trsf();
+			rotation.SetRotation( new gp_Ax1( new gp_Pnt( 0, 0, 0 ), new gp_Dir( 0, 0, 1 ) ), angle_rad );
+			return point.Transformed( rotation );
+		}
 
 		// mix type specialization, MasterOnly / SlaveOnly locks one axis at 0
 		MixTypeVariant m_MixTypeVariant = MixTypeVariant.Mix;

@@ -21,6 +21,11 @@ namespace MyCAM.Post
 		{
 			get; set;
 		}
+
+		public double ExternalAxis_deg
+		{
+			get; set;
+		}
 	}
 
 	internal class ContourNCPackage : INCPackage
@@ -151,6 +156,7 @@ namespace MyCAM.Post
 				EndCAMPoint = currentPathNCPack.ProcessEndPoint,
 				Master = currentPathNCPack.ProcessEndPoint.ModMaster_rad,
 				Slave = currentPathNCPack.ProcessEndPoint.ModSlave_rad,
+				ExternalAxis_deg = currentPathNCPack.ProcessEndPoint.ExternalAxis_deg,
 			};
 			return true;
 		}
@@ -174,6 +180,7 @@ namespace MyCAM.Post
 			// build post data
 			for( int i = 0; i < pointList.Count; i++ ) {
 				gp_Pnt pointG54 = pointList[ i ].Point;
+				double externalAxisDeg = pointList[ i ].ExternalAxis_deg;
 
 				// add G54 frame data
 				PostPoint frameDataG54 = new PostPoint()
@@ -183,6 +190,7 @@ namespace MyCAM.Post
 					Z = pointG54.Z(),
 					Master = rotateAngleList[ i ].Item1,
 					Slave = rotateAngleList[ i ].Item2,
+					ExternalAxis_deg = externalAxisDeg,
 					TiltAngle_deg = pointList[ i ].TiltAngle_deg,
 					IsMicroJointEnd = pointList[ i ].IsMicroJointEnd,
 					IsMicroJointStart = pointList[ i ].IsMicroJointStart

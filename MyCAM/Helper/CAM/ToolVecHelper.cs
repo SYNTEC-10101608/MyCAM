@@ -41,7 +41,7 @@ namespace MyCAM.Helper
 
 			// Create PostSolver
 			PostSolver postSolver = new PostSolver( machineData );
-			IKSolveResult result = postSolver.SolveIK( toolVec, dM_In, dS_In, out double dMaster_rad, out double dSlave_rad );
+			IKSolveResult result = postSolver.SolveIK( toolVec, dM_In, dS_In, out double dMaster_rad, out double dSlave_rad, toolVecPoint.ExternalAxis_deg );
 			if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution ) {
 				return new Tuple<double, double>( 0, 0 );
 			}
@@ -115,7 +115,7 @@ namespace MyCAM.Helper
 			double dSlave_rad = dSlave_deg * Math.PI / 180.0;
 
 			// Use PostSolver API to get the tool vector from master/slave angles
-			return postSolver.SolveToolVec( dMaster_rad, dSlave_rad );
+			return postSolver.SolveToolVec( dMaster_rad, dSlave_rad, 0 );
 		}
 
 		public static Tuple<double, double> FlipRotaryAxis( double master_deg, double slave_deg, bool isPositive )
@@ -211,7 +211,7 @@ namespace MyCAM.Helper
 				}
 
 				// the master / slave angle changed, the tool vector must be solved again
-				pnt.ToolVec = postSolver.SolveToolVec( pnt.ModMaster_rad, pnt.ModSlave_rad );
+				pnt.ToolVec = postSolver.SolveToolVec( pnt.ModMaster_rad, pnt.ModSlave_rad, pnt.ExternalAxis_deg );
 			}
 		}
 
@@ -586,7 +586,7 @@ namespace MyCAM.Helper
 			nEndIdx = endPointIsCtrlPnt ? nEndIdx - 1 : nEndIdx;
 			for( int i = nStartIdx; i <= nEndIdx; i++ ) {
 
-				IKSolveResult result = postSolver.SolveIK( toolVecPointList[ i ].ToolVec, dM, dS, out dM, out dS );
+				IKSolveResult result = postSolver.SolveIK( toolVecPointList[ i ].ToolVec, dM, dS, out dM, out dS, toolVecPointList[ i ].ExternalAxis_deg );
 				if( result == IKSolveResult.InvalidInput || result == IKSolveResult.NoSolution ) {
 					continue;
 				}
@@ -972,7 +972,7 @@ namespace MyCAM.Helper
 			PostSolver postSolver = new PostSolver( machineData );
 			double dM_rad = master_deg * Math.PI / 180.0;
 			double dS_rad = slave_deg * Math.PI / 180.0;
-			return postSolver.IsToolVecSingular( dM_rad, dS_rad );
+			return postSolver.IsToolVecSingular( dM_rad, dS_rad, 0 );
 		}
 
 		// flip non-rotating axis based on ToolDir and rotary axis relationship

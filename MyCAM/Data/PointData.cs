@@ -133,6 +133,11 @@ namespace MyCAM.Data
 			set;
 		}
 
+		double ExternalAxis_deg
+		{
+			get;
+		}
+
 		bool IsToolVecModPoint
 		{
 			get; set;
@@ -199,6 +204,11 @@ namespace MyCAM.Data
 		}
 
 		double ModSlave_rad
+		{
+			get;
+		}
+
+		double ExternalAxis_deg
 		{
 			get;
 		}
@@ -339,6 +349,11 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		public double ExternalAxis_deg
+		{
+			get; set;
+		} = 0;
+
 		public int InitPathIndex
 		{
 			get; set;
@@ -364,6 +379,7 @@ namespace MyCAM.Data
 			newPoint.InitSlave_rad = InitSlave_rad;
 			newPoint.ModMaster_rad = ModMaster_rad;
 			newPoint.ModSlave_rad = ModSlave_rad;
+			newPoint.ExternalAxis_deg = ExternalAxis_deg;
 			newPoint.IsToolVecModPoint = IsToolVecModPoint;
 			newPoint.InitPathIndex = InitPathIndex;
 			newPoint.IsMicroJointStart = IsMicroJointStart;

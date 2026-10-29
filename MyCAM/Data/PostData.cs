@@ -171,6 +171,11 @@ namespace MyCAM.Data
 			get; set;
 		}
 
+		public double ExternalAxis_deg
+		{
+			get; set;
+		}
+
 		public PostPoint Clone()
 		{
 			PostPoint newPoint = new PostPoint();
@@ -179,6 +184,7 @@ namespace MyCAM.Data
 			newPoint.Z = Z;
 			newPoint.Master = Master;
 			newPoint.Slave = Slave;
+			newPoint.ExternalAxis_deg = ExternalAxis_deg;
 			newPoint.TiltAngle_deg = TiltAngle_deg;
 			newPoint.IsMicroJointStart = IsMicroJointStart;
 			newPoint.IsMicroJointEnd = IsMicroJointEnd;

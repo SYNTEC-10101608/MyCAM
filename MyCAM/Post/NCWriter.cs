@@ -219,6 +219,7 @@ namespace MyCAM.Post
 			for( int j = 0; j < postData.MainPathPostPointList.Count; j++ ) {
 				postData.MainPathPostPointList[ j ].Master = stdPostData.RefPoint.Master;
 				postData.MainPathPostPointList[ j ].Slave = stdPostData.RefPoint.Slave;
+				postData.MainPathPostPointList[ j ].ExternalAxis_deg = stdPostData.RefPoint.ExternalAxis_deg;
 			}
 
 			// Update lead-in points
@@ -226,6 +227,7 @@ namespace MyCAM.Post
 				foreach( var postPoint in postData.LeadInPostPointList ) {
 					postPoint.Master = stdPostData.RefPoint.Master;
 					postPoint.Slave = stdPostData.RefPoint.Slave;
+					postPoint.ExternalAxis_deg = stdPostData.RefPoint.ExternalAxis_deg;
 				}
 			}
 
@@ -234,6 +236,7 @@ namespace MyCAM.Post
 				foreach( var postPoint in postData.OverCutPostPointList ) {
 					postPoint.Master = stdPostData.RefPoint.Master;
 					postPoint.Slave = stdPostData.RefPoint.Slave;
+					postPoint.ExternalAxis_deg = stdPostData.RefPoint.ExternalAxis_deg;
 				}
 			}
 

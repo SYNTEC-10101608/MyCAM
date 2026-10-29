@@ -83,7 +83,8 @@ namespace MyCAM.Helper
 				Y = position.Y(),
 				Z = position.Z(),
 				Master = postPoint.Master,
-				Slave = postPoint.Slave
+				Slave = postPoint.Slave,
+				ExternalAxis_deg = postPoint.ExternalAxis_deg
 			};
 
 			// create PostSolver and solve FK
@@ -210,7 +211,7 @@ namespace MyCAM.Helper
 			}
 			PostPoint temPostPnt = IKpostPoint.Clone();
 			gp_Pnt pointG54 = new gp_Pnt( temPostPnt.X, temPostPnt.Y, temPostPnt.Z );
-			gp_Vec tcpOffset = postSolver.SolveFK( temPostPnt.Master, temPostPnt.Slave, pointG54, simuOffset );
+			gp_Vec tcpOffset = postSolver.SolveFK( temPostPnt.Master, temPostPnt.Slave, pointG54, simuOffset, temPostPnt.ExternalAxis_deg );
 			gp_Pnt pointMCS = pointG54.Translated( tcpOffset );
 			FKPoint = new PostPoint()
 			{
@@ -218,7 +219,8 @@ namespace MyCAM.Helper
 				Y = pointMCS.Y(),
 				Z = pointMCS.Z(),
 				Master = temPostPnt.Master,
-				Slave = temPostPnt.Slave
+				Slave = temPostPnt.Slave,
+				ExternalAxis_deg = temPostPnt.ExternalAxis_deg
 			};
 			return true;
 		}
@@ -269,7 +271,8 @@ namespace MyCAM.Helper
 				Y = exitPoint.Point.Y(),
 				Z = exitPoint.Point.Z(),
 				Master = pathEndPost.Master,
-				Slave = pathEndPost.Slave
+				Slave = pathEndPost.Slave,
+				ExternalAxis_deg = pathEndPost.ExternalAxis_deg
 			};
 			bool bSuccess = BuildLinearTraverseIKPnt( pathEndPost, exitPostPnt, out List<PostPointBase> IKPntList );
 			if( bSuccess == false ) {

@@ -183,6 +183,7 @@ namespace MyCAM.PathCache
 		protected void SolveRefPntInitIK()
 		{
 			const double DEFAULT_RAD = 0;
+
 			// arrange solver
 			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
 				throw new Exception( "ContourCache SolveInitIK get machine data failed" );
@@ -193,7 +194,7 @@ namespace MyCAM.PathCache
 			double dLastProcessPathM = m_CraftData.InitMaster_rad;
 			double dLastProcessPathS = m_CraftData.InitSlave_rad;
 
-			IKSolveResult ikResult = postSolver.SolveIK( m_RefPoint.InitToolVec, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
+			IKSolveResult ikResult = postSolver.SolveIK( m_RefPoint.InitToolVec, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS, m_CraftData.ExternalAxis_deg );
 			if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
 				m_RefPoint.InitMaster_rad = DEFAULT_RAD;
 				m_RefPoint.InitSlave_rad = DEFAULT_RAD;
@@ -339,6 +340,7 @@ namespace MyCAM.PathCache
 			foreach( CADPoint cadPoint in cadPointList ) {
 				CADPoint point = cadPoint.Clone();
 				CAMPoint camPoint = new CAMPoint( point, IsToolVecReverse );
+				camPoint.ExternalAxis_deg = m_CraftData.ExternalAxis_deg;
 				camPoint.InitMaster_rad = m_RefPoint.InitMaster_rad;
 				camPoint.InitSlave_rad = m_RefPoint.InitSlave_rad;
 				camPoint.ModMaster_rad = m_RefPoint.ModMaster_rad;

@@ -26,7 +26,8 @@ namespace MyCAM.Post
 					Y = result.LiftUpPoint.Point.Y(),
 					Z = result.LiftUpPoint.Point.Z(),
 					Master = endInfoOfPreviousPath.Master,
-					Slave = endInfoOfPreviousPath.Slave
+					Slave = endInfoOfPreviousPath.Slave,
+					ExternalAxis_deg = endInfoOfPreviousPath.ExternalAxis_deg
 				};
 			}
 
@@ -38,7 +39,8 @@ namespace MyCAM.Post
 					Y = result.FrogLeapMiddlePoint.Point.Y(),
 					Z = result.FrogLeapMiddlePoint.Point.Z(),
 					Master = ( endInfoOfPreviousPath.Master + pathG54PostData.ProcessStartPoint.Master ) / 2.0,
-					Slave = ( endInfoOfPreviousPath.Slave + pathG54PostData.ProcessStartPoint.Slave ) / 2.0
+					Slave = ( endInfoOfPreviousPath.Slave + pathG54PostData.ProcessStartPoint.Slave ) / 2.0,
+					ExternalAxis_deg = pathG54PostData.ProcessStartPoint.ExternalAxis_deg
 				};
 			}
 
@@ -50,7 +52,8 @@ namespace MyCAM.Post
 					Y = result.SafePlaneLiftUpProjPoint.Y(),
 					Z = result.SafePlaneLiftUpProjPoint.Z(),
 					Master = endInfoOfPreviousPath.Master,
-					Slave = endInfoOfPreviousPath.Slave
+					Slave = endInfoOfPreviousPath.Slave,
+					ExternalAxis_deg = endInfoOfPreviousPath.ExternalAxis_deg
 				};
 			}
 			if( result.SafePlaneCutDownProjPoint != null ) {
@@ -60,7 +63,8 @@ namespace MyCAM.Post
 					Y = result.SafePlaneCutDownProjPoint.Y(),
 					Z = result.SafePlaneCutDownProjPoint.Z(),
 					Master = pathG54PostData.ProcessStartPoint.Master,
-					Slave = pathG54PostData.ProcessStartPoint.Slave
+					Slave = pathG54PostData.ProcessStartPoint.Slave,
+					ExternalAxis_deg = pathG54PostData.ProcessStartPoint.ExternalAxis_deg
 				};
 			}
 
@@ -72,7 +76,8 @@ namespace MyCAM.Post
 					Y = result.CutDownPoint.Point.Y(),
 					Z = result.CutDownPoint.Point.Z(),
 					Master = pathG54PostData.ProcessStartPoint.Master,
-					Slave = pathG54PostData.ProcessStartPoint.Slave
+					Slave = pathG54PostData.ProcessStartPoint.Slave,
+					ExternalAxis_deg = pathG54PostData.ProcessStartPoint.ExternalAxis_deg
 				};
 			}
 			pathG54PostData.FollowSafeDistance = currentPathNCPack.TraverseData.FollowSafeDistance;
@@ -101,7 +106,8 @@ namespace MyCAM.Post
 				Y = entryPoint.Point.Y(),
 				Z = entryPoint.Point.Z(),
 				Master = pathG54PostData.ProcessStartPoint.Master,
-				Slave = pathG54PostData.ProcessStartPoint.Slave
+				Slave = pathG54PostData.ProcessStartPoint.Slave,
+				ExternalAxis_deg = pathG54PostData.ProcessStartPoint.ExternalAxis_deg
 			};
 			pathG54PostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 		}
@@ -124,7 +130,8 @@ namespace MyCAM.Post
 				Y = exitPoint.Point.Y(),
 				Z = exitPoint.Point.Z(),
 				Master = endInfoOfLastPath.Master,
-				Slave = endInfoOfLastPath.Slave
+				Slave = endInfoOfLastPath.Slave,
+				ExternalAxis_deg = endInfoOfLastPath.ExternalAxis_deg
 			};
 		}
 	}

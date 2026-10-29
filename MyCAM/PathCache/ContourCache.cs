@@ -429,6 +429,7 @@ namespace MyCAM.PathCache
 				// build CAM point
 				CADPoint cadPoint = m_CADPointList[ i ];
 				CAMPoint camPoint = new CAMPoint( cadPoint, m_CraftData.IsToolVecReverse );
+				camPoint.ExternalAxis_deg = m_CraftData.ExternalAxis_deg;
 				camPoint.InitPathIndex = ( m_OriginalIndexMap != null && i < m_OriginalIndexMap.Count )
 					? m_OriginalIndexMap[ i ]
 					: i;
@@ -821,7 +822,7 @@ namespace MyCAM.PathCache
 
 		void SolvIK( PostSolver postSolver, CAMPoint camPoint, double dLastProcessPathM, double dLastProcessPathS, out double dOutLastProcessPathM, out double dOutLastProcessPathS )
 		{
-			IKSolveResult ikResult = postSolver.SolveIK( camPoint.InitToolVec, dLastProcessPathM, dLastProcessPathS, out dOutLastProcessPathM, out dOutLastProcessPathS );
+			IKSolveResult ikResult = postSolver.SolveIK( camPoint.InitToolVec, dLastProcessPathM, dLastProcessPathS, out dOutLastProcessPathM, out dOutLastProcessPathS, camPoint.ExternalAxis_deg );
 			if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
 				camPoint.InitMaster_rad = 0;
 				camPoint.InitSlave_rad = 0;
@@ -836,7 +837,7 @@ namespace MyCAM.PathCache
 			camPoint.InitSlave_rad = dOutLastProcessPathS;
 			camPoint.ModMaster_rad = dOutLastProcessPathM;
 			camPoint.ModSlave_rad = dOutLastProcessPathS;
-			camPoint.ToolVec = postSolver.SolveToolVec( dOutLastProcessPathM, dOutLastProcessPathS );
+			camPoint.ToolVec = postSolver.SolveToolVec( dOutLastProcessPathM, dOutLastProcessPathS, camPoint.ExternalAxis_deg );
 		}
 
 		#endregion

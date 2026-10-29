@@ -112,7 +112,8 @@ namespace MyCAM.Post
 			{
 				EndCAMPoint = currentPathNCPack.ProcessEndPoint,
 				Master = currentPathNCPack.ProcessEndPoint.ModMaster_rad,
-				Slave = currentPathNCPack.ProcessEndPoint.ModSlave_rad
+				Slave = currentPathNCPack.ProcessEndPoint.ModSlave_rad,
+				ExternalAxis_deg = currentPathNCPack.ProcessEndPoint.ExternalAxis_deg
 			};
 			return true;
 		}
@@ -130,7 +131,8 @@ namespace MyCAM.Post
 				Y = pointG54.Y(),
 				Z = pointG54.Z(),
 				Master = point.ModMaster_rad,
-				Slave = point.ModSlave_rad
+				Slave = point.ModSlave_rad,
+				ExternalAxis_deg = point.ExternalAxis_deg
 			};
 			resultG54 = frameDataG54;
 			return true;
