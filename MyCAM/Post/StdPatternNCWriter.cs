@@ -47,11 +47,12 @@ namespace MyCAM.Post
 		protected string BuildCommonParameters( StdPatternPostData postData, CraftData craftData, AxisConfig axisConfig )
 		{
 			var sb = new StringBuilder();
+			PostPoint refPoint = NCWriterHelper.TransformPointForNCOutput( postData.RefPoint );
 
 			// Reference point (X/Y/Z)
-			sb.Append( $" X{postData.RefPoint.X.ToString( "F3" )}" );
-			sb.Append( $" Y{postData.RefPoint.Y.ToString( "F3" )}" );
-			sb.Append( $" Z{postData.RefPoint.Z.ToString( "F3" )}" );
+			sb.Append( $" X{refPoint.X.ToString( "F3" )}" );
+			sb.Append( $" Y{refPoint.Y.ToString( "F3" )}" );
+			sb.Append( $" Z{refPoint.Z.ToString( "F3" )}" );
 
 			// Rotary axes
 			sb.Append( " " );

@@ -1,4 +1,6 @@
 using MyCAM.Data;
+using MyCAM.Helper.CAM;
+using OCC.gp;
 using System;
 using System.IO;
 
@@ -6,6 +8,20 @@ namespace MyCAM.Post
 {
 	internal static class NCWriterHelper
 	{
+		public static PostPoint TransformPointForNCOutput( PostPoint postPoint )
+		{
+			if( postPoint == null ) {
+				return null;
+			}
+			PostPoint outputPoint = postPoint.Clone();
+			gp_Pnt position = ExternalAxisHelper.RotatePointAroundG54Z(
+				new gp_Pnt( postPoint.X, postPoint.Y, postPoint.Z ), postPoint.ExternalAxis_deg );
+			outputPoint.X = position.X();
+			outputPoint.Y = position.Y();
+			outputPoint.Z = position.Z();
+			return outputPoint;
+		}
+
 		public static void WriteTraverse( StreamWriter writer, ITraversePostData postData, AxisConfig axisConfig, double? enterTiltAngle_deg = null )
 		{
 			if( writer == null || postData == null || axisConfig == null ) {
@@ -50,6 +66,7 @@ namespace MyCAM.Post
 			if( postPoint == null ) {
 				return;
 			}
+			postPoint = TransformPointForNCOutput( postPoint );
 			string szX = postPoint.X.ToString( "F3" );
 			string szY = postPoint.Y.ToString( "F3" );
 			string szZ = postPoint.Z.ToString( "F3" );
@@ -63,6 +80,8 @@ namespace MyCAM.Post
 			if( midPoint == null || endPoint == null ) {
 				return;
 			}
+			midPoint = TransformPointForNCOutput( midPoint );
+			endPoint = TransformPointForNCOutput( endPoint );
 
 			// mid point
 			string szX1 = midPoint.X.ToString( "F3" );

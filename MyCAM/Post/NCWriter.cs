@@ -370,6 +370,7 @@ namespace MyCAM.Post
 			if( postPoint == null ) {
 				return;
 			}
+			postPoint = NCWriterHelper.TransformPointForNCOutput( postPoint );
 			string szX = postPoint.X.ToString( "F3" );
 			string szY = postPoint.Y.ToString( "F3" );
 			string szZ = postPoint.Z.ToString( "F3" );
