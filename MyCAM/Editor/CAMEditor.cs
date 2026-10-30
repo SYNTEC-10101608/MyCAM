@@ -523,7 +523,7 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
-		public void SetProcessPath(bool isNeedProcess)
+		public void SetProcessPath( bool isNeedProcess )
 		{
 			// one shot edit, multi edit supported
 			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
@@ -853,7 +853,7 @@ namespace MyCAM.Editor
 				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
-				if (craftData.ProcessPath == false ) {
+				if( craftData.ProcessPath == false ) {
 					craftData.InitMaster_rad = 0;
 					craftData.InitSlave_rad = 0;
 				}
@@ -861,14 +861,15 @@ namespace MyCAM.Editor
 					// write previous path end MS as initial value for this path's IK solve
 					craftData.InitMaster_rad = prevMaster_rad;
 					craftData.InitSlave_rad = prevSlave_rad;
-				}
-				// trigger cache rebuild
-				craftData.CAMFactorChanged?.Invoke();
 
-				// read this path's end MS for next path
-				if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
-					prevMaster_rad = endMaster_rad;
-					prevSlave_rad = endSlave_rad;
+					// trigger cache rebuild
+					craftData.CAMFactorChanged?.Invoke();
+
+					// read this path's end MS for next path
+					if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
+						prevMaster_rad = endMaster_rad;
+						prevSlave_rad = endSlave_rad;
+					}
 				}
 			}
 			ShowAllCAMData();

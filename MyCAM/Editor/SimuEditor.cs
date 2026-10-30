@@ -522,12 +522,12 @@ namespace MyCAM.Editor
 			SimuData.SimuRequiredData.SimuInputSet calNeedData = new SimuData.SimuRequiredData.SimuInputSet();
 
 			// protection
-			if( m_DataManager == null || m_DataManager.PathIDList == null || m_DataManager.PathIDList.Count == 0 ) {
+			if( m_DataManager == null || m_SimuPathList.Count == 0 ) {
 				return calNeedData;
 			}
 
 			// need last path end point's vector to calculate exit pnt
-			IProcessPoint lastPathLastPoint = GetProcessEndPoint( m_DataManager.PathIDList.Last() );
+			IProcessPoint lastPathLastPoint = GetProcessEndPoint( m_SimuPathList.Last() );
 			calNeedData = new SimuData.SimuRequiredData.SimuInputSet()
 			{
 				EachPathIKPostDataList = m_PostDataList,
