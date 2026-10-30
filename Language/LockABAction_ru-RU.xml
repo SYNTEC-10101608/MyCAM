@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="CannotGetMachineInfo" Content="Не удалось получить информацию о станке" />
+  <Message ID="CannotGetCraftData" Content="Не удалось получить информацию об обработке пути {0}" />
+  <Message ID="PleaseSelectPath" Content="Пожалуйста, сначала выберите путь" />
+  <Message ID="CannotSimulatePosture" Content="Не удалось успешно смоделировать позу в этой точке" />
+  <Message ID="CannotGetToolVectorInfo" Content="Не удалось получить информацию о векторе инструмента в целевой точке" />
+  <Message ID="PathCannotSelect" Content="Выбранный путь не поддерживает позу отверстия" />
+</ResMap>

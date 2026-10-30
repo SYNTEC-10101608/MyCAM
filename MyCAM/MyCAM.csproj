@@ -95,6 +95,7 @@
     <Compile Include="Editor\Action\CAM\CalibrationREFAction.cs" />
     <Compile Include="Editor\Action\CAM\ContourEditAction.cs" />
     <Compile Include="Editor\Action\CAM\ExtendedGCodeAction.cs" />
+    <Compile Include="Editor\Action\CAM\LockABAction.cs" />
     <Compile Include="Editor\Action\CAM\ManualOrderAction.cs" />
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
@@ -139,6 +140,12 @@
     <Compile Include="Editor\Dialog\AutoSortPathDlg.Designer.cs">
       <DependentUpon>AutoSortPathDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Dialog\LockABDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\LockABDlg.Designer.cs">
+      <DependentUpon>LockABDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Dialog\ManualTransformDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -175,12 +182,6 @@
     </Compile>
     <Compile Include="Editor\Dialog\RCornerDlg.Designer.cs">
       <DependentUpon>RCornerDlg.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editor\Dialog\SpecialToolVecEditDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editor\Dialog\SpecialToolVecEditDlg.Designer.cs">
-      <DependentUpon>SpecialToolVecEditDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Dialog\StartPointDlg.cs">
       <SubType>Form</SubType>
@@ -362,7 +363,6 @@
     <Compile Include="Editor\Action\CAD\ThreePtTransformAction.cs" />
     <Compile Include="Editor\Action\CAD\AddPointAction.cs" />
     <Compile Include="Editor\Action\CAM\ToolVectorAction.cs" />
-    <Compile Include="Editor\Action\CAM\SpecialToolVecEditAction.cs" />
     <Compile Include="Editor\Action\SelectObjectAction.cs" />
     <Compile Include="Editor\Action\IEditorAction.cs" />
     <Compile Include="Editor\Action\CAD\ManualTransformAction.cs" />
@@ -448,6 +448,9 @@
     <EmbeddedResource Include="Editor\Dialog\ExtendedGCodeDlg.resx">
       <DependentUpon>ExtendedGCodeDlg.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\LockABDlg.resx">
+      <DependentUpon>LockABDlg.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\MicroJointDlg.resx">
       <DependentUpon>MicroJointDlg.cs</DependentUpon>
     </EmbeddedResource>
@@ -475,9 +478,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\ManualTransformDlg.resx">
       <DependentUpon>ManualTransformDlg.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editor\Dialog\SpecialToolVecEditDlg.resx">
-      <DependentUpon>SpecialToolVecEditDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\StartPointDlg.resx">
       <DependentUpon>StartPointDlg.cs</DependentUpon>

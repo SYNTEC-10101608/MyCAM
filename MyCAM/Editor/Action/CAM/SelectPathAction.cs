@@ -167,7 +167,7 @@ namespace MyCAM.Editor
 			if( specialToolVecData == null ) {
 				return false;
 			}
-			return specialToolVecData.Type != ESpecialToolVecType.Normal;
+			return specialToolVecData.Mode != ToolVecMode.Interpolate;
 		}
 
 		public override void Start()

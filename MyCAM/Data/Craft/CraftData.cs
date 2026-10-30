@@ -511,6 +511,8 @@ namespace MyCAM.Data
 				// to prevent null value
 				if( m_SpecialToolVecData == null ) {
 					m_SpecialToolVecData = new SpecialToolVecData();
+					m_IsSpecialToolVecMode = false;
+					m_SpecialToolVecData.PropertyChanged += SpecialToolVecChanged;
 				}
 				return m_SpecialToolVecData;
 			}
@@ -521,14 +523,18 @@ namespace MyCAM.Data
 			if( specialToolVecData == null ) {
 				return;
 			}
-			if( specialToolVecData.Type == m_SpecialToolVecData.Type &&
-				 specialToolVecData.MasterAngle_deg == m_SpecialToolVecData.MasterAngle_deg &&
+			if( specialToolVecData.MasterAngle_deg == m_SpecialToolVecData.MasterAngle_deg &&
 				 specialToolVecData.SlaveAngle_deg == m_SpecialToolVecData.SlaveAngle_deg &&
+				 specialToolVecData.LockMaster == m_SpecialToolVecData.LockMaster &&
+				 specialToolVecData.LockSlave == m_SpecialToolVecData.LockSlave &&
 				 specialToolVecData.MachiningDir == m_SpecialToolVecData.MachiningDir ) {
 				return;
 			}
+			m_SpecialToolVecData.PropertyChanged -= SpecialToolVecChanged;
 			m_SpecialToolVecData = specialToolVecData;
-			if( m_SpecialToolVecData.Type != ESpecialToolVecType.Normal ) {
+			m_SpecialToolVecData.PropertyChanged += SpecialToolVecChanged;
+			m_IsSpecialToolVecMode = m_SpecialToolVecData.Mode != ToolVecMode.Interpolate;
+			if( m_IsSpecialToolVecMode ) {
 				ClearToolVecModify();
 			}
 			CAMFactorChanged?.Invoke();
@@ -611,7 +617,12 @@ namespace MyCAM.Data
 
 		public void ClearSpecialToolVecData()
 		{
+			if( m_SpecialToolVecData != null ) {
+				m_SpecialToolVecData.PropertyChanged -= SpecialToolVecChanged;
+			}
 			m_SpecialToolVecData = new SpecialToolVecData();
+			m_IsSpecialToolVecMode = false;
+			m_SpecialToolVecData.PropertyChanged += SpecialToolVecChanged;
 			CAMFactorChanged?.Invoke();
 		}
 
@@ -849,6 +860,24 @@ namespace MyCAM.Data
 			m_TraverseData.PropertyChanged += SubParamChanged;
 			m_StartPntToolVecData.PropertyChanged += SubParamChanged;
 			m_ToolVecModifyMap.PropertyChanged += SubParamChanged;
+			m_IsSpecialToolVecMode = m_SpecialToolVecData.Mode != ToolVecMode.Interpolate;
+			m_SpecialToolVecData.PropertyChanged += SpecialToolVecChanged;
+		}
+
+		void SpecialToolVecChanged()
+		{
+			// current is special
+			bool isSpecial = m_SpecialToolVecData.Mode != ToolVecMode.Interpolate;
+
+			//  m_IsSpecialToolVecMode is the previous state
+			bool enteredSpecialMode = isSpecial && !m_IsSpecialToolVecMode;
+			m_IsSpecialToolVecMode = isSpecial;
+
+			// change from normal to special mode, clear tool vec modify
+			if( enteredSpecialMode ) {
+				ClearToolVecModify();
+			}
+			CAMFactorChanged?.Invoke();
 		}
 
 		void SubParamChanged()
@@ -894,6 +923,7 @@ namespace MyCAM.Data
 		bool m_IsToolVecReverse = false;
 		TraverseData m_TraverseData = new TraverseData();
 		SpecialToolVecData m_SpecialToolVecData = new SpecialToolVecData();
+		bool m_IsSpecialToolVecMode;
 		gp_Trsf m_CumulativeTrsfMatrix = new gp_Trsf();
 		double m_CompensatedDistance = 0;
 		double m_InitMaster_rad = 0;
