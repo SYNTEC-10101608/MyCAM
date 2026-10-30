@@ -10,4 +10,5 @@
 	<Message ID="NoPathForSimulation" Content="Нет путей для участия в симуляции" />
 	<Message ID="SimuCalcFailed" Content="Ошибка расчета симуляции, пожалуйста, проверьте правильность настроек станка и пути" />
 	<Message ID="SimuCalcDoneCollisionFailed" Content="Расчет симуляции завершен, но расчет столкновения не удался" />
+	<Message ID="PathCannotSelect" Content="Выбранный путь не используется для обработки и не может быть смоделирован" />
 </ResMap>

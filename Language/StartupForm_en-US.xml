@@ -143,6 +143,8 @@
 	<Message ID="ShowTraverse" Content="Show Traverse Path" />
 	<Message ID="ShowMarker" Content="Show Process Markers on Toolpath" />
 	<Message ID="Layer" Content="Layer {0}" />
+	<Message ID="m_tsbLayerNone_ToolTip" Content="Do Not Machine" />
+	<Message ID="m_tsbNeedProcess_ToolTip" Content="Machine" />
 
 	<Message ID="Log_UseDefaultMachineProject" Content="Using default machine project" />
 	<Message ID="Log_MachineNodeNull" Content="Machine parameter node is null; using default machine parameters" />

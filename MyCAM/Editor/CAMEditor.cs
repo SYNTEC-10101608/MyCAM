@@ -451,7 +451,9 @@ namespace MyCAM.Editor
 				return;
 			}
 			EntryAndExitAction action = new EntryAndExitAction( m_DataManager );
-			action.PropertyChanged += ShowAllCAMData;
+
+			// false means no need to refresh tree, because set entry dose not need to change tree node color
+			action.PropertyChanged += () => ShowAllCAMData( false );
 			StartEditAction( action );
 		}
 
@@ -521,6 +523,26 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetProcessPath(bool isNeedProcess)
+		{
+			// one shot edit, multi edit supported
+			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
+			foreach( string szPathID in szPathIDList ) {
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+					continue;
+				}
+				craftData.ProcessPath = isNeedProcess;
+			}
+
+			// will trigger showallcamdata, but tree node color dosen't change
+			AutoOptimizeIKContinuity();
+
+			// update tree node color to reflect layer change
+			UpdatePathTreeNodeColors( szPathIDList );
+		}
+
 		public void SetPathLayer( int nTechLayer )
 		{
 			// one shot edit, multi edit supported
@@ -536,6 +558,7 @@ namespace MyCAM.Editor
 				}
 				craftData.TechLayer = nTechLayer;
 			}
+
 			m_ViewManager.UpdatePaths( szPathIDList );
 			m_MainPathRenderer.Show( szPathIDList );
 		}
@@ -611,36 +634,13 @@ namespace MyCAM.Editor
 			}
 			EndActionIfNotDefault();
 			ManualOrderAction action = new ManualOrderAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, m_DefaultAction as SelectPathAction );
-			action.ShowOrderData += ShowAllCAMData;
+
+			// change order will cause tree node color change, so need to refresh tree
+			action.ShowOrderData += () => ShowAllCAMData( true );
 			action.RaiseActionStart += ManualStartIO;
+			action.NeedDoOptimized += DoOptimizeIKContinuity;
 
 			StartEditAction( action );
-		}
-
-		void ManualStartIO( bool isStart )
-		{
-			if( isStart ) {
-				m_ToolVecRenderer.SetPauseRefreshAndHide( true );
-				m_MainPathRenderer.SetPauseRefresh( true );
-				m_TraverseRenderer.SetPauseRefreshAndHide( true );
-				m_CraftRenderer.SetPauseRefreshAndHide( true );
-				m_OrientationRenderer.SetPauseRefreshAndHide( true );
-				m_MarkerRenderer.SetPauseRefreshAndHide( true );
-			}
-			else {
-
-				// re-display all data
-				m_ToolVecRenderer.SetPauseRefreshAndHide( false );
-				m_MainPathRenderer.SetPauseRefresh( false );
-				m_TraverseRenderer.SetPauseRefreshAndHide( false );
-				m_CraftRenderer.SetPauseRefreshAndHide( false );
-				m_OrientationRenderer.SetPauseRefreshAndHide( false );
-				m_MarkerRenderer.SetPauseRefreshAndHide( false );
-
-				// traverse will change during order change
-				m_TraverseRenderer.Show();
-			}
-			m_Viewer.UpdateView();
 		}
 
 		public void AutoSortProcess()
@@ -667,7 +667,6 @@ namespace MyCAM.Editor
 					selectAction.ClearSelection();
 					selectAction.SelectPathByID( m_DataManager.PathIDList.First() );
 				}
-				ShowAllCAMData();
 			};
 
 			StartEditAction( action );
@@ -769,7 +768,7 @@ namespace MyCAM.Editor
 					continue;
 				}
 				string nodeID = m_DataManager.GetPathName( pathOrderIndex );
-				m_ViewManager.AddPathNode( nodeID );
+				m_ViewManager.AddPathNode( nodeID, szID );
 			}
 
 			// update tree view and viewer
@@ -854,11 +853,15 @@ namespace MyCAM.Editor
 				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
-
-				// write previous path end MS as initial value for this path's IK solve
-				craftData.InitMaster_rad = prevMaster_rad;
-				craftData.InitSlave_rad = prevSlave_rad;
-
+				if (craftData.ProcessPath == false ) {
+					craftData.InitMaster_rad = 0;
+					craftData.InitSlave_rad = 0;
+				}
+				else {
+					// write previous path end MS as initial value for this path's IK solve
+					craftData.InitMaster_rad = prevMaster_rad;
+					craftData.InitSlave_rad = prevSlave_rad;
+				}
 				// trigger cache rebuild
 				craftData.CAMFactorChanged?.Invoke();
 
@@ -874,11 +877,14 @@ namespace MyCAM.Editor
 
 		#region Show CAM
 
-		void ShowAllCAMData()
+		void ShowAllCAMData( bool needUpdateTreeColor = false )
 		{
 			// take all path IDs
 			List<string> pathIDList = m_DataManager.PathIDList;
 			ShowCAMData( pathIDList );
+			if( needUpdateTreeColor ) {
+				UpdatePathTreeNodeColors( pathIDList );
+			}
 		}
 
 		void ShowCAMData( List<string> pathIDList )
@@ -892,6 +898,49 @@ namespace MyCAM.Editor
 			m_CraftRenderer.Show( pathIDList );
 			m_TraverseRenderer.Show( pathIDList );
 			m_Viewer.UpdateView();
+		}
+
+		void ManualStartIO( bool isStart )
+		{
+			if( isStart ) {
+				m_ToolVecRenderer.SetPauseRefreshAndHide( true );
+				m_MainPathRenderer.SetPauseRefresh( true );
+				m_TraverseRenderer.SetPauseRefreshAndHide( true );
+				m_CraftRenderer.SetPauseRefreshAndHide( true );
+				m_OrientationRenderer.SetPauseRefreshAndHide( true );
+				m_MarkerRenderer.SetPauseRefreshAndHide( true );
+			}
+			else {
+
+				// re-display all data
+				m_ToolVecRenderer.SetPauseRefreshAndHide( false );
+				m_MainPathRenderer.SetPauseRefresh( false );
+				m_TraverseRenderer.SetPauseRefreshAndHide( false );
+				m_CraftRenderer.SetPauseRefreshAndHide( false );
+				m_OrientationRenderer.SetPauseRefreshAndHide( false );
+				m_MarkerRenderer.SetPauseRefreshAndHide( false );
+
+				// traverse will change during order change
+				m_TraverseRenderer.Show();
+			}
+			m_Viewer.UpdateView();
+		}
+
+		void UpdatePathTreeNodeColors( List<string> pathIDList )
+		{
+			if( pathIDList == null ) {
+				return;
+			}
+			foreach( string pathID in pathIDList ) {
+				int pathOrderIndex = m_DataManager.PathIDList.IndexOf( pathID );
+				if( pathOrderIndex == -1 ) {
+					continue;
+				}
+				string nodeID = m_DataManager.GetPathName( pathOrderIndex );
+				bool isNoneProcess = DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) &&
+					craftData != null && craftData.ProcessPath == false;
+				m_ViewManager.UpdatePathNodeForeColor( nodeID, isNoneProcess );
+			}
 		}
 
 		void ShowTransedCAMData( gp_Trsf trsf )

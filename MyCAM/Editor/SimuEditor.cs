@@ -42,6 +42,7 @@ namespace MyCAM.Editor
 
 			// user change tree node will change which frame index to show
 			( m_DefaultAction as SelectPathAction ).SelectionChange += OnPathSelectionChange;
+			( m_DefaultAction as SelectPathAction ).WithPathCantSelect += SelectPathAlert;
 			m_collisionEngine = new CollisionSolver();
 
 			// import machine stl
@@ -70,6 +71,9 @@ namespace MyCAM.Editor
 		Dictionary<MachineComponentType, List<bool>> m_FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
 		List<SimuData.ResultData.PathStartEndIndex> m_PathStartEndIndex = new List<SimuData.ResultData.PathStartEndIndex>();
 		List<bool> m_CollisionFrame = new List<bool>();
+
+		// not all path need to be simulated, only process path need
+		List<string> m_SimuPathList = new List<string>();
 
 		// frame control
 		const int INIT_FRAME_INDEX = 0;
@@ -128,8 +132,6 @@ namespace MyCAM.Editor
 
 		public override void EditStart()
 		{
-			base.EditStart();
-
 			// init tree
 			m_TreeView.Nodes.Add( m_ViewManager.PathNode );
 			m_ViewManager.PathNode.ExpandAll();
@@ -163,6 +165,13 @@ namespace MyCAM.Editor
 			// draw new trihedron for G54
 			gp_Pnt position = new gp_Pnt( machineData.SimulationOffset.x, machineData.SimulationOffset.y, machineData.SimulationOffset.z );
 			m_CoordIconRender.Show( position );
+			BuildSimuPathIDList();
+
+			// none process path do not need to be simulated, sot lock it on tree and viewer
+			( m_DefaultAction as SelectPathAction ).AddLockedPaths( CreatLockList() );
+
+			// will trigger m_DefaultAction.Start() to set none process decative on viewer, so need to be call at last
+			base.EditStart();
 		}
 
 		public override void EditEnd()
@@ -646,6 +655,11 @@ namespace MyCAM.Editor
 			ChangeSimuPath();
 		}
 
+		void SelectPathAlert()
+		{
+			MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "PathCannotSelect", PATH_CANNOT_SELECT ) ), MyApp.NoticeType.Warning );
+		}
+
 		void RegisterWorkpieceForCollision()
 		{
 			// workpiece may change, remove the old workpiece AABB before re-registering
@@ -802,11 +816,39 @@ namespace MyCAM.Editor
 		{
 			if( m_DefaultAction is SelectPathAction selectAction ) {
 				selectAction.ClearSelection();
-				if( CurrentPath < INIT_PATH_INDEX || CurrentPath >= m_DataManager.PathIDList.Count ) {
+				if( CurrentPath < INIT_PATH_INDEX || CurrentPath >= m_SimuPathList.Count ) {
 					return;
 				}
-				selectAction.SelectPathByID( m_DataManager.PathIDList[ CurrentPath ] );
+				selectAction.SelectPathByID( m_SimuPathList[ CurrentPath ] );
 			}
+		}
+
+		void BuildSimuPathIDList()
+		{
+			m_SimuPathList.Clear();
+			foreach( string pathID in m_DataManager.PathIDList ) {
+				if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
+					continue;
+				}
+				if( craftData.ProcessPath ) {
+					m_SimuPathList.Add( pathID );
+				}
+			}
+		}
+
+		IEnumerable<string> CreatLockList()
+		{
+			List<string> lockList = new List<string>();
+			foreach( string pathID in m_DataManager.PathIDList ) {
+
+				// is none process path, lock it
+				if( DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
+					if( craftData.ProcessPath == false ) {
+						lockList.Add( pathID );
+					}
+				}
+			}
+			return lockList;
 		}
 
 		#endregion
@@ -893,12 +935,18 @@ namespace MyCAM.Editor
 			}
 			string selectedID = selectedIDs.First();
 
-			for( int i = 0; i < m_DataManager.PathIDList.Count; i++ ) {
-				if( string.Equals( m_DataManager.PathIDList[ i ], selectedID, StringComparison.Ordinal ) ) {
-					m_CurrentFrameIndex = FindStartIndex( i );
-					break;
-				}
+			// get this path is which index in simu path list, then find the start index of this path
+			int pathSimuIdx = GetSimuPathIndex( selectedID );
+			m_CurrentFrameIndex = FindStartIndex( pathSimuIdx );
+		}
+
+		int GetSimuPathIndex( string selectedId )
+		{
+			int simuIdx = m_SimuPathList.IndexOf( selectedId );
+			if( simuIdx < 0 ) {
+				simuIdx = 1;
 			}
+			return simuIdx;
 		}
 
 		int FindStartIndex( int pathIndex )
@@ -914,7 +962,8 @@ namespace MyCAM.Editor
 
 		void CalSimulationResult()
 		{
-			if( m_DataManager == null || m_DataManager.PathIDList == null || m_DataManager.PathIDList.Count == 0 ) {
+			if( m_DataManager == null || m_DataManager.PathIDList == null || m_DataManager.PathIDList.Count == 0 ||
+				m_SimuPathList == null || m_SimuPathList.Count == 0 ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoPathForSimulation", NO_PATH_FOR_SIMULATION ), MyApp.NoticeType.Hint );
 				return;
 			}
@@ -1010,6 +1059,7 @@ namespace MyCAM.Editor
 		const string NO_PATH_FOR_SIMULATION = "尚無路徑能夠參與模擬";
 		const string SIMU_CALC_FAILED = "模擬計算失敗，請確認機台設定及路徑設定是否正確";
 		const string SIMU_CALC_DONE_COLLISION_FAILED = "模擬計算完成，但碰撞計算失敗";
+		const string PATH_CANNOT_SELECT = "選取到的路徑不加工，無法進行模擬";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SimuEditor" );
 	}
 }

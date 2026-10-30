@@ -13,6 +13,7 @@ namespace MyCAM.Editor
 	{
 		public Action ShowOrderData;
 		public Action<bool> RaiseActionStart;
+		public Action NeedDoOptimized;
 
 		public ManualOrderAction( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager, SelectPathAction selectPathAction )
 			: base( dataManager, viewer, treeView, viewManager )
@@ -85,6 +86,11 @@ namespace MyCAM.Editor
 			m_SelectPathAction.End();
 
 			ClearFlagPath();
+
+			// IK optimization before UI update
+			NeedDoOptimized?.Invoke();
+
+			// trigger UI update
 			RaiseActionStart?.Invoke( false );
 			base.End();
 		}

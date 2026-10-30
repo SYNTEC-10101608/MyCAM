@@ -11,7 +11,6 @@ using OCC.Prs3d;
 using OCC.Quantity;
 using OCCViewer;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -176,7 +175,11 @@ namespace MyCAM.Editor.Renderer
 		void ShowTraversePathWithTrans( List<string> pathIDList, gp_Trsf trsf )
 		{
 			foreach( string currentPathID in pathIDList ) {
-				string previousPathID = GetPreviousPathIDInAllPaths( currentPathID );
+				if( !DataGettingHelper.GetCraftDataByID( currentPathID, out CraftData craftData ) ||
+					craftData.TraverseData == null || craftData.ProcessPath == false ) {
+					continue;
+				}
+				string previousPathID = GetPreviousProcessPathID( currentPathID );
 				if( previousPathID == null ) {
 					continue;
 				}
@@ -259,38 +262,65 @@ namespace MyCAM.Editor.Renderer
 
 			// entry
 			if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
-				string firstPathID = m_DataManager.PathIDList.First();
-				IProcessPoint firstPathStartPoint = GetProcessStartPoint( firstPathID );
-				if( firstPathStartPoint != null ) {
-					IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
-					if( entryPoint != null ) {
-						List<AIS_Line> entryLineList = new List<AIS_Line>();
-						AddOneLinearTraverseWithTrans( entryLineList, entryPoint.Point, firstPathStartPoint.Point, trsf );
-						m_TraverseAISDict[ KEY_ENTRY ] = entryLineList;
+				string firstPathID = GetFirstProcessPathID( true );
+				if( firstPathID != null ) {
+					IProcessPoint firstPathStartPoint = GetProcessStartPoint( firstPathID );
+					if( firstPathStartPoint != null ) {
+						IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
+						if( entryPoint != null ) {
+							List<AIS_Line> entryLineList = new List<AIS_Line>();
+							AddOneLinearTraverseWithTrans( entryLineList, entryPoint.Point, firstPathStartPoint.Point, trsf );
+							m_TraverseAISDict[ KEY_ENTRY ] = entryLineList;
+						}
 					}
 				}
 			}
 
 			// exit
 			if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
-				string lastPathID = m_DataManager.PathIDList.Last();
-				IProcessPoint lastPathEndPoint = GetProcessEndPoint( lastPathID );
-				if( lastPathEndPoint != null ) {
-					IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
-					if( exitPoint != null ) {
-						List<AIS_Line> exitLineList = new List<AIS_Line>();
-						AddOneLinearTraverseWithTrans( exitLineList, lastPathEndPoint.Point, exitPoint.Point, trsf );
-						m_TraverseAISDict[ KEY_EXIT ] = exitLineList;
+				string lastPathID = GetFirstProcessPathID( false );
+				if( lastPathID != null ) {
+					IProcessPoint lastPathEndPoint = GetProcessEndPoint( lastPathID );
+					if( lastPathEndPoint != null ) {
+						IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
+						if( exitPoint != null ) {
+							List<AIS_Line> exitLineList = new List<AIS_Line>();
+							AddOneLinearTraverseWithTrans( exitLineList, lastPathEndPoint.Point, exitPoint.Point, trsf );
+							m_TraverseAISDict[ KEY_EXIT ] = exitLineList;
+						}
 					}
 				}
 			}
 		}
 
-		string GetPreviousPathIDInAllPaths( string currentPathID )
+		string GetFirstProcessPathID( bool isFirst )
+		{
+			int nCount = m_DataManager.PathIDList.Count;
+			int nStart = isFirst ? 0 : nCount - 1;
+			int nEnd = isFirst ? nCount : -1;
+			int nStep = isFirst ? 1 : -1;
+			for( int i = nStart; i != nEnd; i += nStep ) {
+				string pathID = m_DataManager.PathIDList[ i ];
+				if( DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) &&
+					craftData.ProcessPath ) {
+					return pathID;
+				}
+			}
+			return null;
+		}
+
+		string GetPreviousProcessPathID( string currentPathID )
 		{
 			int indexInAllPaths = m_DataManager.PathIDList.IndexOf( currentPathID );
-			if( indexInAllPaths > 0 ) {
-				return m_DataManager.PathIDList[ indexInAllPaths - 1 ];
+			if( indexInAllPaths <= 0 ) {
+				return null;
+			}
+			for( int i = indexInAllPaths - 1; i >= 0; i-- ) {
+				string pathID = m_DataManager.PathIDList[ i ];
+				if( DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) &&
+					craftData.ProcessPath ) {
+					return pathID;
+				}
 			}
 			return null;
 		}

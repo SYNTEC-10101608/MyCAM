@@ -37,6 +37,9 @@ namespace MyCAM.Editor
 			if( pathIDs == null ) {
 				return;
 			}
+
+			// reset List before restart
+			m_LockedIDSet.Clear();
 			foreach( string pathID in pathIDs ) {
 				if( string.IsNullOrEmpty( pathID ) ) {
 					continue;
