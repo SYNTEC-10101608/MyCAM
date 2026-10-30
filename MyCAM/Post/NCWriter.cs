@@ -68,6 +68,9 @@ namespace MyCAM.Post
 						continue;
 					}
 					PathType pathType = pathObject.PathType;
+					if( pathObject.CraftData.ProcessPath == false ) {
+						continue;
+					}
 					if( pathType == PathType.Contour ) {
 						if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
 							return false;
@@ -121,17 +124,20 @@ namespace MyCAM.Post
 			errorMessage = string.Empty;
 			endInfoOfLastPath = null;
 			for( int i = 0; i < m_PathIDList.Count; i++ ) {
-				if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
+				if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) || !DataGettingHelper.GetCraftDataByID( m_PathIDList[ i ], out CraftData craftData ) ) {
 					continue;
 				}
 				PathType pathType = pathObject.PathType;
-				int nPathLayer = pathObject.CraftData.TechLayer;
+				if( craftData.ProcessPath == false ) {
+					WriteNonProcessingPath( i + 1 );
+					continue;
+				}
 				bool isEntry = endInfoOfLastPath == null;
 				if( pathType == PathType.Contour ) {
 					if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
 						return false;
 					}
-					WriteCutting( postData, m_PathIDList[ i ], pathObject.CraftData, i + 1, isEntry, nPathLayer );
+					WriteCutting( postData, m_PathIDList[ i ], pathObject.CraftData, i + 1, isEntry, craftData.TechLayer );
 				}
 				else {
 					if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData postData, out StdPatternNCPackage package, out errorMessage ) ) {
@@ -141,6 +147,14 @@ namespace MyCAM.Post
 				}
 			}
 			return true;
+		}
+
+		void WriteNonProcessingPath( int pathNumber )
+		{
+			m_StreamWriter.WriteLine( $"// Cutting{pathNumber}" );
+			m_StreamWriter.WriteLine( $"N{pathNumber};" );
+			m_StreamWriter.WriteLine( "// None Process Path" );
+			m_StreamWriter.WriteLine();
 		}
 
 		#region NC Package Builder

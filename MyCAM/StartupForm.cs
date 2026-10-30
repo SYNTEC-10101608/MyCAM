@@ -1476,6 +1476,16 @@ namespace MyCAM
 			}
 		}
 
+		void m_tsbNeedProcess_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetProcessPath( true );
+		}
+
+		void m_tsbLayerNone_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetProcessPath( false );
+		}
+
 		void m_tsbLayer1_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SetPathLayer( 1 );
@@ -1725,6 +1735,8 @@ namespace MyCAM
 			m_tsbLayer8.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 8 );
 			m_tsbLayer9.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 9 );
 			m_tsbLayer10.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 10 );
+			m_tsbLayerNone.ToolTipText = m_LanguageManager.TryGetString( "m_tsbLayerNone_ToolTip", NOT_NEED_PROCESS );
+			m_tsbNeedProcess.ToolTipText = m_LanguageManager.TryGetString( "m_tsbNeedProcess_ToolTip", NEED_PROCESS );
 		}
 
 		void InitLanguageMenu()
@@ -1772,5 +1784,7 @@ namespace MyCAM
 		}
 
 		const string LAYER = "圖層";
+		const String NEED_PROCESS = "加工";
+		const string NOT_NEED_PROCESS = "不加工";
 	}
 }

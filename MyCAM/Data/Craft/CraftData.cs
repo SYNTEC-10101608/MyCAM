@@ -114,16 +114,16 @@ namespace MyCAM.Data
 
 	public class StartPntContourEditParam
 	{
-		public ContourEditData StartPnt 
+		public ContourEditData StartPnt
 		{
-			get; 
-			set; 
+			get;
+			set;
 		}
 
-		public ContourEditData EndPnt 
-		{ 
-			get; 
-			set; 
+		public ContourEditData EndPnt
+		{
+			get;
+			set;
 		}
 
 		public StartPntContourEditParam()
@@ -182,6 +182,7 @@ namespace MyCAM.Data
 		// this constructor is used when reading from file
 		public CraftData(
 			int techLayer,
+			bool processPath,
 			int startPoint,
 			bool isPathReverse,
 			LeadData leadData,
@@ -198,6 +199,7 @@ namespace MyCAM.Data
 			Dictionary<int, RCornerData> rCornerMap = null )
 		{
 			m_TechLayer = techLayer;
+			m_ProcessPath = processPath;
 			m_StartPointIndex = startPoint;
 			m_IsPathReverse = isPathReverse;
 			m_LeadData = leadData;
@@ -252,6 +254,20 @@ namespace MyCAM.Data
 						return;
 					}
 					m_TechLayer = value;
+				}
+			}
+		}
+
+		public bool ProcessPath
+		{
+			get
+			{
+				return m_ProcessPath;
+			}
+			 set
+			{
+				if( m_ProcessPath != value ) {
+					m_ProcessPath = value;
 				}
 			}
 		}
@@ -688,7 +704,7 @@ namespace MyCAM.Data
 		}
 		StartPntContourEditParam m_StartPntContourEditData;
 
-		public void SetStartPntContourEdit(bool isStartPnt, double dx, double dy, double dz )
+		public void SetStartPntContourEdit( bool isStartPnt, double dx, double dy, double dz )
 		{
 			if( m_StartPntContourEditData == null ) {
 				m_StartPntContourEditData = new StartPntContourEditParam();
@@ -866,6 +882,7 @@ namespace MyCAM.Data
 
 		const int DEFAULT_TECH_LAYER = 1;
 		int m_TechLayer = DEFAULT_TECH_LAYER;
+		bool m_ProcessPath = true;
 		int m_StartPointIndex = 0;
 		Dictionary<int, double> m_MicroJointStartIdxMap = new Dictionary<int, double>();
 		Dictionary<int, RCornerData> m_RCornerMap = new Dictionary<int, RCornerData>();

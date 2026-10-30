@@ -10,4 +10,5 @@
 	<Message ID="NoPathForSimulation" Content="尚无路径能够参与模拟" />
 	<Message ID="SimuCalcFailed" Content="模拟计算失败，请确认机台设定及路径设定是否正确" />
 	<Message ID="SimuCalcDoneCollisionFailed" Content="模拟计算完成，但碰撞计算失败" />
+	<Message ID="PathCannotSelect" Content="选取到的路径不加工，无法进行模拟" />
 </ResMap>

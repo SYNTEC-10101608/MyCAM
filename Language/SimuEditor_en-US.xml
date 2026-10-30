@@ -10,4 +10,5 @@
 	<Message ID="NoPathForSimulation" Content="No toolpath available for simulation" />
 	<Message ID="SimuCalcFailed" Content="Simulation calculation failed; please verify the machine configuration and toolpath settings" />
 	<Message ID="SimuCalcDoneCollisionFailed" Content="Simulation calculation completed but collision detection failed" />
+	<Message ID="PathCannotSelect" Content="The selected toolpath is not used for machining and cannot be simulated" />
 </ResMap>

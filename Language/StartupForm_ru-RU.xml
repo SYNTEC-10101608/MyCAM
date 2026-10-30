@@ -143,6 +143,8 @@
 	<Message ID="ShowTraverse" Content="Показать путь поднятия/опускания ножа" />
 	<Message ID="ShowMarker" Content="Показать технологические значки на пути" />
 	<Message ID="Layer" Content="Слой {0}" />
+	<Message ID="m_tsbLayerNone_ToolTip" Content="Не обрабатывать" />
+	<Message ID="m_tsbNeedProcess_ToolTip" Content="Обрабатывать" />
 
 	<Message ID="Log_UseDefaultMachineProject" Content="Используется файл проекта механизма по умолчанию" />
 	<Message ID="Log_MachineNodeNull" Content="Узел параметров механизма пуст, используются параметры механизма по умолчанию" />

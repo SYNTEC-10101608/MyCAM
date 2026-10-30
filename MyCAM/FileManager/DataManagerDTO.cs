@@ -1047,6 +1047,12 @@ namespace MyCAM.FileManager
 			set;
 		}
 
+		public bool? ProcessPath
+		{
+			get;
+			set;
+		}
+
 		public bool? IsPathReverse
 		{
 			get;
@@ -1181,6 +1187,7 @@ namespace MyCAM.FileManager
 				return;
 			}
 			TechLayer = craftData.TechLayer;
+			ProcessPath = craftData.ProcessPath;
 			IsPathReverse = craftData.IsPathReverse;
 			IsToolVecReverse = craftData.IsToolVecReverse;
 			StartPoint = craftData.StartPointIndex;
@@ -1241,6 +1248,11 @@ namespace MyCAM.FileManager
 				TechLayer = DEFAULT_TECH_LAYER;
 			}
 
+			// Backward compatibility for ProcessPath
+			if( !ProcessPath.HasValue ) {
+				ProcessPath = true;
+			}
+
 			Dictionary<int, ContourEditData> contourEditMap = ContourEditMap.ToDictionary(
 					dto => dto.Index.Value,
 					dto => new ContourEditData( dto.DX.Value, dto.DY.Value, dto.DZ.Value )
@@ -1256,7 +1268,7 @@ namespace MyCAM.FileManager
 			Dictionary<int, RCornerData> rCornerMap = BuildRCornerMap();
 			StartPntToolVecParam startPntToolVecParam = BuildStartPntToolVecParam( sourceMap_OldVersion, IsPathReverse.Value );
 			SpecialToolVecData specialToolVecData = BuildSpecialToolVecData();
-			CraftData craftData = new CraftData( TechLayer.Value, StartPoint.Value, IsPathReverse.Value,
+			CraftData craftData = new CraftData( TechLayer.Value, ProcessPath.Value, StartPoint.Value, IsPathReverse.Value,
 																 leadData, OverCutLength.Value, toolVecModifyMap,
 																 startPntToolVecParam, IsToolVecReverse.Value, traverseData,
 																 startPntContourEditParam, contourEditMap,

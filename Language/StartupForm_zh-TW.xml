@@ -143,6 +143,8 @@
 	<Message ID="ShowTraverse" Content="顯示抬下刀路徑" />
 	<Message ID="ShowMarker" Content="顯示路徑上的工藝圖示" />
 	<Message ID="Layer" Content="圖層{0}" />
+	<Message ID="m_tsbLayerNone_ToolTip" Content="不加工" />
+	<Message ID="m_tsbNeedProcess_ToolTip" Content="加工" />
 
 	<Message ID="Log_UseDefaultMachineProject" Content="使用默認機構專案檔" />
 	<Message ID="Log_MachineNodeNull" Content="機構參數節點為空,使用默認機構參數" />

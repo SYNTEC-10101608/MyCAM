@@ -10,6 +10,7 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCViewer;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -117,6 +118,7 @@ namespace MyCAM.Editor
 	internal class ViewManager
 	{
 		static readonly List<Quantity_NameOfColor> TECH_Layer_Color_List = new List<Quantity_NameOfColor> {
+			Quantity_NameOfColor.Quantity_NOC_GRAY50,
 			Quantity_NameOfColor.Quantity_NOC_BLUE,
 			Quantity_NameOfColor.Quantity_NOC_DARKORANGE2,
 			Quantity_NameOfColor.Quantity_NOC_PURPLE,
@@ -766,7 +768,7 @@ namespace MyCAM.Editor
 
 		#region Tree Node Management
 
-		public void AddPathNode( string nodeID )
+		public void AddPathNode( string nodeID, string pathID )
 		{
 			if( TreeNodeMap.ContainsKey( nodeID ) ) {
 				return;
@@ -775,6 +777,22 @@ namespace MyCAM.Editor
 			node.Tag = nodeID;
 			PathNode.Nodes.Add( node );
 			TreeNodeMap.Add( nodeID, node );
+			bool isNoneProcess = DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) &&
+				craftData != null && craftData.ProcessPath == false;
+			UpdatePathNodeForeColor( nodeID, isNoneProcess );
+		}
+
+		public void UpdatePathNodeForeColor( string nodeID, bool isNoneProcess )
+		{
+			if( string.IsNullOrEmpty( nodeID ) || !TreeNodeMap.TryGetValue( nodeID, out TreeNode node ) || node == null ) {
+				return;
+			}
+
+			// keep manual-order flag style
+			if( node.Text != null && node.Text.EndsWith( " 🚩" ) ) {
+				return;
+			}
+			node.ForeColor = isNoneProcess ? Color.Gray : Color.Black;
 		}
 
 		public void RemovePathNodes( int count )
@@ -830,7 +848,7 @@ namespace MyCAM.Editor
 			for( int i = 0; i < dataManager.PathIDList.Count; i++ ) {
 				string pathID = dataManager.PathIDList[ i ];
 				string nodeID = dataManager.GetPathName( i );
-				AddPathNode( nodeID );
+				AddPathNode( nodeID, pathID );
 				AddPath( pathID );
 			}
 
@@ -914,20 +932,25 @@ namespace MyCAM.Editor
 
 		int GetPathColorIndex( string pathID )
 		{
-			int nColorIdx = 0;
+			int nColorIdx = DEFAULT_PATH_COLOR_INDEX;
 			if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
 				return nColorIdx;
 			}
 			if( craftData == null ) {
 				return nColorIdx;
 			}
-			int nTechLayer = craftData.TechLayer;
-			nColorIdx = nTechLayer - 1;
+			if( craftData.ProcessPath == false ) {
+				return NONE_PROCESS_PATH_COLOR_INDEX;
+			}
+			nColorIdx = craftData.TechLayer;
 			if( nColorIdx < 0 || nColorIdx >= TECH_Layer_Color_List.Count ) {
-				nColorIdx = 0;
+				nColorIdx = DEFAULT_PATH_COLOR_INDEX;
 			}
 			return nColorIdx;
 		}
+
+		const int DEFAULT_PATH_COLOR_INDEX = 1;
+		const int NONE_PROCESS_PATH_COLOR_INDEX = 0;
 
 		#endregion
 	}

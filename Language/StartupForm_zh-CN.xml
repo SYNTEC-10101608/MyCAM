@@ -143,6 +143,8 @@
 	<Message ID="ShowTraverse" Content="显示抬下刀路径" />
 	<Message ID="ShowMarker" Content="显示路径上的工艺图示" />
 	<Message ID="Layer" Content="图层{0}" />
+	<Message ID="m_tsbLayerNone_ToolTip" Content="不加工" />
+	<Message ID="m_tsbNeedProcess_ToolTip" Content="加工" />
 
 	<Message ID="Log_UseDefaultMachineProject" Content="使用默认机构专案档" />
 	<Message ID="Log_MachineNodeNull" Content="机构参数节点为空,使用默认机构参数" />

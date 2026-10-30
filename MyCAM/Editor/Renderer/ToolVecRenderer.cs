@@ -112,9 +112,21 @@ namespace MyCAM.Editor.Renderer
 			foreach( string szPathID in pathIDList ) {
 				DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData );
 				if( craftData != null && craftData.SpecialToolVecData != null && craftData.SpecialToolVecData.Type != ESpecialToolVecType.Normal ) {
+					
+					// none process path do not show tool vec
+					if( craftData == null || craftData.ProcessPath == false ) {
+						m_ToolVecAISDict.Remove( szPathID );
+						continue;
+					}
 					specialPathIDList.Add( szPathID );
 				}
 				else {
+
+					// none process path do not show tool vec
+					if( craftData == null || craftData.ProcessPath == false ) {
+						m_ToolVecAISDict.Remove( szPathID );
+						continue;
+					}
 					normalPathIDList.Add( szPathID );
 				}
 			}
