@@ -1438,12 +1438,43 @@ namespace MyCAM.FileManager
 		const int LAST_POINT_INDEX = -1;
 	}
 
+	internal static class SpecialToolVecDataCompatibilityHelper
+	{
+		internal static SpecialToolVecData Convert( ESpecialToolVecType? legacyType, SpecialToolVecData data )
+		{
+			if( !legacyType.HasValue || data.Mode != ToolVecMode.Interpolate ) {
+				return data;
+			}
+
+			switch( legacyType.Value ) {
+				case ESpecialToolVecType.FixDir:
+					return new SpecialToolVecData( lockMaster: true, lockSlave: true );
+				case ESpecialToolVecType.AssignMS:
+					return new SpecialToolVecData( data.MasterAngle_deg, data.SlaveAngle_deg, lockMaster: true, lockSlave: true );
+				case ESpecialToolVecType.ZDir:
+					return new SpecialToolVecData( machiningDir: EMachiningDir.RefAxisPositive );
+				case ESpecialToolVecType.LockMaster:
+					return new SpecialToolVecData( lockMaster: true );
+				case ESpecialToolVecType.LockSlave:
+					return new SpecialToolVecData( lockSlave: true );
+				default:
+					return data;
+			}
+		}
+	}
+
 	public class SpecialToolVecDataDTO
 	{
 		public ESpecialToolVecType? Type
 		{
 			get;
 			set;
+		}
+
+		// type do not need to be serialized, it is only for backward compatibility with old files
+		public bool ShouldSerializeType()
+		{
+			return false;
 		}
 
 		public bool? IsAxisOptimized
@@ -1459,6 +1490,18 @@ namespace MyCAM.FileManager
 		}
 
 		public double? SlaveAngle_deg
+		{
+			get;
+			set;
+		}
+
+		public bool? LockMaster
+		{
+			get;
+			set;
+		}
+
+		public bool? LockSlave
 		{
 			get;
 			set;
@@ -1480,34 +1523,23 @@ namespace MyCAM.FileManager
 			if( data == null ) {
 				return;
 			}
-			Type = data.Type;
 			MasterAngle_deg = data.MasterAngle_deg;
 			SlaveAngle_deg = data.SlaveAngle_deg;
+			LockMaster = data.LockMaster;
+			LockSlave = data.LockSlave;
 			MachiningDir = (int)data.MachiningDir;
 		}
 
 		internal SpecialToolVecData ToSpecialToolVecData()
 		{
-			bool isHasAnyValue = Type.HasValue || IsAxisOptimized.HasValue ||
-						  MasterAngle_deg.HasValue || SlaveAngle_deg.HasValue ||
-						  MachiningDir.HasValue;
-
-			// no node in XML (old file without SpecialToolVecData), return default
-			if( !isHasAnyValue ) {
-				return new SpecialToolVecData();
-			}
-
-			if( !Type.HasValue ||
-				!MasterAngle_deg.HasValue || !SlaveAngle_deg.HasValue ) {
-				throw new ArgumentException( "TraverseData deserialization failed." );
-			}
-
-			return new SpecialToolVecData(
-				Type.Value,
-				MasterAngle_deg.Value,
-				SlaveAngle_deg.Value,
-				ToMachiningDir( MachiningDir )
+			SpecialToolVecData data = new SpecialToolVecData(
+				MasterAngle_deg,
+				SlaveAngle_deg,
+				ToMachiningDir( MachiningDir ),
+				LockMaster ?? false,
+				LockSlave ?? false
 			);
+			return SpecialToolVecDataCompatibilityHelper.Convert( Type, data );
 		}
 
 		// an old file has no such node and an unknown value is degraded to None

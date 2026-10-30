@@ -111,7 +111,7 @@ namespace MyCAM.Editor.Renderer
 
 			foreach( string szPathID in pathIDList ) {
 				DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData );
-				if( craftData != null && craftData.SpecialToolVecData != null && craftData.SpecialToolVecData.Type != ESpecialToolVecType.Normal ) {
+				if( craftData != null && craftData.SpecialToolVecData != null && craftData.SpecialToolVecData.Mode != ToolVecMode.Interpolate ) {
 					
 					// none process path do not show tool vec
 					if( craftData == null || craftData.ProcessPath == false ) {

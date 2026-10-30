@@ -57,6 +57,7 @@ namespace MyCAM.Editor
 		SaveProjectFile,
 		ImportDxfGlass,
 		PlaceRingShape,
+		LockAB,
 	}
 
 	internal interface IEditorAction

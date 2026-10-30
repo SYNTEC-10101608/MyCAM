@@ -459,7 +459,7 @@ namespace MyCAM
 
 		void m_tsbFixedToolVec_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.SetFixedToolVec();
+			m_CAMEditor.SetFixedToolVec2();
 		}
 
 		void m_tsbOptimizeIK_Click( object sender, EventArgs e )

@@ -151,7 +151,7 @@ namespace MyCAM.Editor
 
 				// is special tool vector path, lock it
 				if( DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
-					if( craftData.SpecialToolVecData != null && craftData.SpecialToolVecData.Type != ESpecialToolVecType.Normal ) {
+					if( craftData.SpecialToolVecData != null && craftData.SpecialToolVecData.Mode != ToolVecMode.Interpolate ) {
 						lockList.Add( pathID );
 					}
 				}
@@ -188,7 +188,7 @@ namespace MyCAM.Editor
 		void TempRemoveSpecialToolVecData()
 		{
 			m_BackupData = m_CraftData.SpecialToolVecData.Clone();
-			if( m_CraftData.SpecialToolVecData != null && m_CraftData.SpecialToolVecData.Type != ESpecialToolVecType.Normal ) {
+			if( m_CraftData.SpecialToolVecData != null && m_CraftData.SpecialToolVecData.Mode != ToolVecMode.Interpolate ) {
 				m_CraftData.SetSpecialToolVecData( new SpecialToolVecData() );
 			}
 		}
@@ -618,7 +618,7 @@ namespace MyCAM.Editor
 
 		void ClearSpecialToolVecData()
 		{
-			if( m_CraftData.SpecialToolVecData == null || m_CraftData.SpecialToolVecData.Type == ESpecialToolVecType.Normal ) {
+			if( m_CraftData.SpecialToolVecData == null || m_CraftData.SpecialToolVecData.Mode == ToolVecMode.Interpolate ) {
 				return;
 			}
 			m_CraftData.SetSpecialToolVecData( new SpecialToolVecData() );

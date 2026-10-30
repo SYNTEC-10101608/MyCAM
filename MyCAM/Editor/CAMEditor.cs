@@ -406,7 +406,7 @@ namespace MyCAM.Editor
 			ShowCAMData( szPathIDList );
 		}
 
-		public void SetFixedToolVec()
+		public void SetFixedToolVec2()
 		{
 			// action edit, multi edit supported
 			if( IsSameAction( EditActionType.SpecialToolVecEdit ) ) {
@@ -417,13 +417,12 @@ namespace MyCAM.Editor
 
 			// an empty selection is allowed, the action asks the user to pick a path by itself
 			List<string> szPathIDList = GetSelectedIDList();
-			SpecialToolVecEditAction action = new SpecialToolVecEditAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList, m_DefaultAction as SelectPathAction );
+			LockABAction action = new LockABAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList, m_DefaultAction as SelectPathAction );
 			action.RaiseTrans += SetTrans;
 			action.RaiseActionStart += ToolVecActionStartIO;
 			action.HideMachine += HideMachine;
 			action.ResetPartUI += ResetPartDisplay;
 			action.NeedOptimizedIK += DoOptimizeIKContinuity;
-
 			// trigger translate machine
 			StartEditAction( action );
 		}

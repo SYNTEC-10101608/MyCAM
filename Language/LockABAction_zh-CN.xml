@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+  <Message ID="CannotGetMachineInfo" Content="无法获取机台信息" />
+  <Message ID="CannotGetCraftData" Content="无法获取路径 {0} 的加工信息" />
+  <Message ID="PleaseSelectPath" Content="请先选择路径" />
+  <Message ID="CannotSimulatePosture" Content="无法顺利模拟该点姿态" />
+  <Message ID="CannotGetToolVectorInfo" Content="无法获取目标点的工具向量信息" />
+  <Message ID="PathCannotSelect" Content="选取到的路径不支持孔姿态" />
+</ResMap>

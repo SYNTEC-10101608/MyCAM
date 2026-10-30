@@ -108,7 +108,7 @@ namespace MyCAM.Editor.Renderer
 			Dictionary<string, List<AIS_Line>> result = new Dictionary<string, List<AIS_Line>>();
 			foreach( string szPathID in pathIDList ) {
 				DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData );
-				if ( craftData == null || craftData.SpecialToolVecData == null || craftData.SpecialToolVecData.Type == ESpecialToolVecType.Normal ) {
+				if ( craftData == null || craftData.SpecialToolVecData == null || craftData.SpecialToolVecData.Mode == ToolVecMode.Interpolate ) {
 					continue;
 				}
 				List<AIS_Line> toolVecAISList = new List<AIS_Line>();

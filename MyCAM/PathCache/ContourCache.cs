@@ -120,6 +120,17 @@ namespace MyCAM.PathCache
 			}
 		}
 
+		public Tuple<double, double> DefaultLockABAngle_deg
+		{
+			get
+			{
+				if( m_IsCADFactorDirty ) {
+					BuildCADCAMPointList();
+				}
+				return m_DefaultLockABAngle_deg;
+			}
+		}
+
 		public List<int> OriginalIndexMap
 		{
 			get
@@ -614,38 +625,51 @@ namespace MyCAM.PathCache
 
 		#region Tool Vector Calculation
 
+		void SaveDefaultLockABValue()
+		{
+			gp_Dir targetDir = m_CraftData.IsToolVecReverse ? m_ContourGeomData.RefCenterDir.Direction().Reversed() : m_ContourGeomData.RefCenterDir.Direction();
+
+			// get init solve IK startPnt
+			CAMPoint FirstPntCAMPoint = MainPathPointList.First().Clone();
+
+			// get ms angle ( apply tool vec reverse then solve, unified in ToolVecHelper )
+			Tuple<double, double> avgMS_deg = ToolVecHelper.GetMSAngleFromToolVec( targetDir, FirstPntCAMPoint );
+			m_DefaultLockABAngle_deg = avgMS_deg;
+		}
+
 		void CalMSForEachPoint( List<ISetToolVecPoint> toolVecPointList )
 		{
+			SpecialToolVecData specialToolVecData = m_CraftData.SpecialToolVecData;
+
 			SolveInitIK();
+			SaveDefaultLockABValue();
+
 			m_interpolateTypeRegion = new List<Tuple<int, int, EToolVecInterpolateType>>();
 
-			switch( m_CraftData.SpecialToolVecData.Type ) {
-
-				// lock one rotary axis, keep the solved IK result of the other axis
-				case ESpecialToolVecType.LockMaster:
-				case ESpecialToolVecType.LockSlave:
-					ToolVecHelper.SetToolVecByLockedAxis( ref toolVecPointList, m_CraftData.SpecialToolVecData.Type == ESpecialToolVecType.LockMaster );
+			switch( specialToolVecData.Mode ) {
+				case ToolVecMode.MachiningDirection:
+					if( DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) && machineData != null ) {
+						SetToolVecByAssignDir( ref toolVecPointList, RotaryAxisHelper.GetRotaryAxisDir( machineData.RotaryAxisConfig.RotaryAxisType ) );
+					}
 					break;
-
-				// assign ms set ModMS directly, no need to solve IK
-				case ESpecialToolVecType.AssignMS:
-					ToolVecHelper.SetToolVecByAssignedMS( ref toolVecPointList, m_CraftData.SpecialToolVecData.MasterAngle_deg, m_CraftData.SpecialToolVecData.SlaveAngle_deg );
-					break;
-
-				// FixDir and ZDir need init IK then use the solved start point to set the tool vec for all points
-				case ESpecialToolVecType.FixDir:
+				case ToolVecMode.LockDueAxisWithoutAssign:
 					SetToolVecByAssignDir( ref toolVecPointList, m_CraftData.IsToolVecReverse ? m_ContourGeomData.RefCenterDir.Direction().Reversed() : m_ContourGeomData.RefCenterDir.Direction() );
 					break;
-				case ESpecialToolVecType.ZDir:
-					if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) || machineData == null ) {
-						break;
-					}
-					SetToolVecByAssignDir( ref toolVecPointList, RotaryAxisHelper.GetRotaryAxisDir( machineData.RotaryAxisConfig.RotaryAxisType ) );
+				case ToolVecMode.LockMasterWithoutAssign:
+					ToolVecHelper.SetToolVecByLockedAxis( ref toolVecPointList, true, m_DefaultLockABAngle_deg );
 					break;
-
-				case ESpecialToolVecType.Normal:
+				case ToolVecMode.LockSlaveWithoutAssign:
+					ToolVecHelper.SetToolVecByLockedAxis( ref toolVecPointList, false, m_DefaultLockABAngle_deg );
+					break;
+				case ToolVecMode.AssignMS:
+				case ToolVecMode.LockMasterWithAssign:
+				case ToolVecMode.LockSlaveWithAssign:
+				case ToolVecMode.LockMasterWithoutAssignButAssignSlave:
+				case ToolVecMode.LockSlaveWithoutAssignButAssignMaster:
+					ToolVecHelper.SetToolVecByAssignedMS( ref toolVecPointList, specialToolVecData.MasterAngle_deg, specialToolVecData.SlaveAngle_deg );
+					break;
+				case ToolVecMode.Interpolate:
 				default:
-
 					// get the info for tool vec interpolation
 					InterpolatePreprocessingResult preprocessingResult = InterpolatePreprocessing( ref toolVecPointList );
 
@@ -678,8 +702,7 @@ namespace MyCAM.PathCache
 		bool TryGetAssignedMachiningDirRotaryAngle_deg( out double dRotaryAngle_deg )
 		{
 			dRotaryAngle_deg = 0;
-			if( m_CraftData.SpecialToolVecData.Type != ESpecialToolVecType.ZDir
-				|| m_CraftData.SpecialToolVecData.MachiningDir == EMachiningDir.None ) {
+			if( m_CraftData.SpecialToolVecData.MachiningDir == EMachiningDir.None ) {
 				return false;
 			}
 			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
@@ -983,6 +1006,7 @@ namespace MyCAM.PathCache
 		CraftData m_CraftData;
 		List<CADPoint> m_CADPointList = new List<CADPoint>();     // offset + global transform + local edit, used by CAM pipeline
 		List<int> m_OriginalIndexMap = null;                      // offset idx -> ori CAD idx mapping
+		Tuple<double, double> m_DefaultLockABAngle_deg = new Tuple<double, double>( 0, 0 );
 
 		// flag to indicate craft data changed
 		bool m_IsCAMFactorDirty = false;

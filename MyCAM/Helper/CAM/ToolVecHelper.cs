@@ -172,20 +172,24 @@ namespace MyCAM.Helper
 
 		#region Special case of tool vector edit
 
-		public static void SetToolVecByAssignedMS( ref List<ISetToolVecPoint> toolVecPointList, double dMaster_deg, double dSlave_deg )
+		public static void SetToolVecByAssignedMS( ref List<ISetToolVecPoint> toolVecPointList, double? dMaster_deg, double? dSlave_deg )
 		{
-			gp_Dir toolVec = ConvertMSAngleToToolVec( dMaster_deg, dSlave_deg );
-			double dMaster_rad = dMaster_deg * Math.PI / 180.0;
-			double dSlave_rad = dSlave_deg * Math.PI / 180.0;
 			foreach( var pnt in toolVecPointList ) {
-				pnt.ModMaster_rad = dMaster_rad;
-				pnt.ModSlave_rad = dSlave_rad;
+				if( dMaster_deg.HasValue ) {
+					double dMaster_rad = dMaster_deg.Value * Math.PI / 180.0;
+					pnt.ModMaster_rad = dMaster_rad;
+				}
+				if( dSlave_deg.HasValue ) {
+					double dSlave_rad = dSlave_deg.Value * Math.PI / 180.0;
+					pnt.ModSlave_rad = dSlave_rad;
+				}
+				gp_Dir toolVec = ConvertMSAngleToToolVec( pnt.ModMaster_rad * 180 / Math.PI, pnt.ModSlave_rad * 180 / Math.PI );
 				pnt.ToolVec = toolVec;
 			}
 		}
 
 		// keep the solved IK result of every point and lock one rotary axis to the value of the first point
-		public static void SetToolVecByLockedAxis( ref List<ISetToolVecPoint> toolVecPointList, bool isLockMaster )
+		public static void SetToolVecByLockedAxis( ref List<ISetToolVecPoint> toolVecPointList, bool isLockMaster, Tuple<double, double> defaultLockMSDeg )
 		{
 			if( toolVecPointList == null || toolVecPointList.Count == 0 ) {
 				return;
@@ -200,8 +204,8 @@ namespace MyCAM.Helper
 			PostSolver postSolver = new PostSolver( machineData );
 
 			// the locked value comes from the first point of the solved IK result
-			double dLockedMaster_rad = toolVecPointList.First().ModMaster_rad;
-			double dLockedSlave_rad = toolVecPointList.First().ModSlave_rad;
+			double dLockedMaster_rad = defaultLockMSDeg.Item1 * Math.PI / 180.0;
+			double dLockedSlave_rad = defaultLockMSDeg.Item2 * Math.PI / 180.0;
 			foreach( var pnt in toolVecPointList ) {
 				if( isLockMaster ) {
 					pnt.ModMaster_rad = dLockedMaster_rad;
