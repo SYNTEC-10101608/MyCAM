@@ -66,6 +66,7 @@ namespace MyCAM.Editor
 			: base( dataManager, viewer, treeView, viewManager )
 		{
 			m_DataManager.PathAdded += OnPathAdded;
+			m_DataManager.NeedOptimizedIK += OptimizeIKContinuityData;
 
 			// default action is select object action
 			m_DefaultAction = new SelectPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -208,10 +209,46 @@ namespace MyCAM.Editor
 
 			// clear selection after remove path
 			m_DefaultAction.ClearSelection();
+			OptimizeIKContinuityData();
 			RemovePathCAMData( szPathIDList );
 		}
 
 		#region Set CAM
+
+		public void OptimizeIKContinuityData()
+		{
+			List<string> pathIDList = m_DataManager.PathIDList;
+			if( pathIDList.Count == 0 ) {
+				return;
+			}
+
+			double prevMaster_rad = 0;
+			double prevSlave_rad = 0;
+
+			foreach( string szPathID in pathIDList ) {
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+					continue;
+				}
+				if( craftData.ProcessPath == false ) {
+					craftData.InitMaster_rad = 0;
+					craftData.InitSlave_rad = 0;
+				}
+				else {
+					// write previous path end MS as initial value for this path's IK solve
+					craftData.InitMaster_rad = prevMaster_rad;
+					craftData.InitSlave_rad = prevSlave_rad;
+
+					// trigger cache rebuild
+					craftData.CAMFactorChanged?.Invoke();
+
+					// read this path's end MS for next path
+					if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
+						prevMaster_rad = endMaster_rad;
+						prevSlave_rad = endSlave_rad;
+					}
+				}
+			}
+		}
 
 		public void SetStartPoint()
 		{
@@ -840,37 +877,10 @@ namespace MyCAM.Editor
 
 		void DoOptimizeIKContinuity()
 		{
-			List<string> pathIDList = m_DataManager.PathIDList;
-			if( pathIDList.Count == 0 ) {
+			if( m_DataManager.PathIDList.Count == 0 ) {
 				return;
 			}
-
-			double prevMaster_rad = 0;
-			double prevSlave_rad = 0;
-
-			foreach( string szPathID in pathIDList ) {
-				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
-					continue;
-				}
-				if( craftData.ProcessPath == false ) {
-					craftData.InitMaster_rad = 0;
-					craftData.InitSlave_rad = 0;
-				}
-				else {
-					// write previous path end MS as initial value for this path's IK solve
-					craftData.InitMaster_rad = prevMaster_rad;
-					craftData.InitSlave_rad = prevSlave_rad;
-
-					// trigger cache rebuild
-					craftData.CAMFactorChanged?.Invoke();
-
-					// read this path's end MS for next path
-					if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
-						prevMaster_rad = endMaster_rad;
-						prevSlave_rad = endSlave_rad;
-					}
-				}
-			}
+			OptimizeIKContinuityData();
 			ShowAllCAMData();
 			MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CAMEditor_OptimizeIKContinuityCompleted", OPTIMIZE_IK_CONTINUITY_COMPLETED ), MyApp.NoticeType.Hint );
 		}

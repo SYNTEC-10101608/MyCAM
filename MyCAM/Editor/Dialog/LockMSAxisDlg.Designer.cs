@@ -1,6 +1,6 @@
 namespace MyCAM.Editor
 {
-	partial class LockABDlg
+	partial class LockMSAxisDlg
 	{
 		private System.ComponentModel.IContainer components = null;
 
@@ -404,7 +404,7 @@ namespace MyCAM.Editor
 			this.m_lblMode.TabIndex = 0;
 			this.m_lblMode.Text = "模式";
 			// 
-			// LockABDlg
+			// LockMSAxisDlg
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -416,7 +416,7 @@ namespace MyCAM.Editor
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.Name = "LockABDlg";
+			this.Name = "LockMSAxisDlg";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.m_gbxLockAB.ResumeLayout(false);
 			this.m_gbxLockAB.PerformLayout();
