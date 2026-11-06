@@ -1442,7 +1442,7 @@ namespace MyCAM.FileManager
 	{
 		internal static SpecialToolVecData Convert( ESpecialToolVecType? legacyType, SpecialToolVecData data )
 		{
-			if( !legacyType.HasValue || data.Mode != ToolVecMode.Interpolate ) {
+			if( !legacyType.HasValue ) {
 				return data;
 			}
 
@@ -1452,7 +1452,7 @@ namespace MyCAM.FileManager
 				case ESpecialToolVecType.AssignMS:
 					return new SpecialToolVecData( data.MasterAngle_deg, data.SlaveAngle_deg, lockMaster: true, lockSlave: true );
 				case ESpecialToolVecType.ZDir:
-					return new SpecialToolVecData( machiningDir: EMachiningDir.RefAxisPositive );
+					return new SpecialToolVecData( machiningDir: GetLegacyZDirMachiningDir(), lockMaster: true, lockSlave: true );
 				case ESpecialToolVecType.LockMaster:
 					return new SpecialToolVecData( lockMaster: true );
 				case ESpecialToolVecType.LockSlave:
@@ -1460,6 +1460,29 @@ namespace MyCAM.FileManager
 				default:
 					return data;
 			}
+		}
+
+		static EMachiningDir GetLegacyZDirMachiningDir()
+		{
+			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
+				return EMachiningDir.RefAxisPositive;
+			}
+
+			gp_Dir toolDir = machineData.ToolDir;
+			bool isCrossAxisPositive;
+			switch( machineData.RotaryAxisConfig.RotaryAxisType ) {
+				case RotaryAxis.X:
+					isCrossAxisPositive = toolDir.Z() > 0;
+					break;
+				case RotaryAxis.Y:
+					isCrossAxisPositive = toolDir.X() > 0;
+					break;
+				case RotaryAxis.Z:
+				default:
+					isCrossAxisPositive = toolDir.Y() > 0;
+					break;
+			}
+			return isCrossAxisPositive ? EMachiningDir.CrossAxisPositive : EMachiningDir.RefAxisPositive;
 		}
 	}
 

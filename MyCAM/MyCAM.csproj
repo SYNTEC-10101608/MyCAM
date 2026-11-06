@@ -140,11 +140,11 @@
     <Compile Include="Editor\Dialog\AutoSortPathDlg.Designer.cs">
       <DependentUpon>AutoSortPathDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Dialog\LockABDlg.cs">
+    <Compile Include="Editor\Dialog\LockMSAxisDlg.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editor\Dialog\LockABDlg.Designer.cs">
-      <DependentUpon>LockABDlg.cs</DependentUpon>
+    <Compile Include="Editor\Dialog\LockMSAxisDlg.Designer.cs">
+      <DependentUpon>LockMSAxisDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Dialog\ManualTransformDlg.cs">
       <SubType>Form</SubType>
@@ -448,8 +448,8 @@
     <EmbeddedResource Include="Editor\Dialog\ExtendedGCodeDlg.resx">
       <DependentUpon>ExtendedGCodeDlg.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editor\Dialog\LockABDlg.resx">
-      <DependentUpon>LockABDlg.cs</DependentUpon>
+    <EmbeddedResource Include="Editor\Dialog\LockMSAxisDlg.resx">
+      <DependentUpon>LockMSAxisDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\MicroJointDlg.resx">
       <DependentUpon>MicroJointDlg.cs</DependentUpon>

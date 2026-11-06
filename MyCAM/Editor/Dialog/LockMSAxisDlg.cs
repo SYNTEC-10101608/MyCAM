@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace MyCAM.Editor
 {
-	internal partial class LockABDlg : EditDialogBase<object>
+	internal partial class LockMSAxisDlg : EditDialogBase<object>
 	{
 		public event Action<bool> OnNormalMode;
 		public Action<bool> FlipRotaryAxis;
@@ -16,7 +16,7 @@ namespace MyCAM.Editor
 		public event Action<double> SlaveChanged;
 		public Action<EMachiningDir> MachiningDirChanged;
 
-		public LockABDlg( RotaryAxisConfig config, FiveAxisType machineType )
+		public LockMSAxisDlg( RotaryAxisConfig config, FiveAxisType machineType )
 		{
 			InitializeComponent();
 			m_RotaryAxisConfig = config;
@@ -269,7 +269,7 @@ namespace MyCAM.Editor
 			m_rbtnDefault.Text = m_LanguageManager.TryGetString( "m_rbtnDefault", m_rbtnDefault.Text );
 			m_rbtnLockAB.Text = m_LanguageManager.TryGetString( "m_rbtnLockAB", m_rbtnLockAB.Text );
 			m_gbxLockAB.Text = m_LanguageManager.TryGetString( "m_gbxLockAB", m_gbxLockAB.Text );
-			m_gbxRotaryDirection.Text = string.Format( m_LanguageManager.TryGetString( "m_gbxRotaryDirection", "{0}軸方向調整" ), m_RotaryAxisConfig.SlaveName );
+			m_gbxRotaryDirection.Text = string.Format( m_LanguageManager.TryGetString( "m_gbxRotaryDirection", "{0}軸方向調整" ), m_RotaryAxisConfig.RotaryAxisName );
 			m_gbxMachiningDir.Text = m_LanguageManager.TryGetString( "m_gbxMachiningDir", m_gbxMachiningDir.Text );
 			m_lblMachiningDir.Text = m_LanguageManager.TryGetString( "m_lblMachiningDir", m_lblMachiningDir.Text );
 			m_lblMachiningDirHint.Text = m_LanguageManager.TryGetString( "m_lblMachiningDirHint", m_lblMachiningDirHint.Text );

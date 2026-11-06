@@ -50,7 +50,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			m_RotaryAxisConfig = m_MachineData.RotaryAxisConfig;
-			m_Dlg = new LockABDlg( m_RotaryAxisConfig, m_MachineData.FiveAxisType );
+			m_Dlg = new LockMSAxisDlg( m_RotaryAxisConfig, m_MachineData.FiveAxisType );
 			m_Dlg.Cancel += End;
 			m_Dlg.OnNormalMode += OnModeChanged;
 			m_Dlg.MasterChanged += ( master_deg ) => OnMasterChange( master_deg );
@@ -266,7 +266,7 @@ namespace MyCAM.Editor
 			}
 			else {
 				CAMPoint startPnt = CacheHelper.GetMainPathStartPoint( m_CurrentPathIDList.First() );
-				m_Dlg.ResetMSAngle( startPnt.ModMaster_rad, startPnt.ModSlave_rad );
+				m_Dlg.ResetMSAngle( startPnt.ModMaster_rad * 180.0 / Math.PI, startPnt.ModSlave_rad * 180.0 / Math.PI );
 			}
 		}
 
@@ -711,7 +711,7 @@ namespace MyCAM.Editor
 
 		FiveAxisMachineData m_MachineData = null;
 
-		LockABDlg m_Dlg = null;
+		LockMSAxisDlg m_Dlg = null;
 
 		#region Language string
 

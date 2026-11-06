@@ -58,6 +58,7 @@ namespace MyCAM.Data
 		public Action PartChanged;
 		public Action<List<string>, bool> FeatureAdded;
 		public Action<List<string>> PathAdded;
+		public Action NeedOptimizedIK;
 		public Action<List<string>> PartRemoved;
 
 		// TODO: this is temp solution
@@ -379,6 +380,10 @@ namespace MyCAM.Data
 
 			// add to path ID list
 			PathIDList.AddRange( newPathIDList );
+
+			if( newPathIDList.Count > 0 ) {
+				NeedOptimizedIK?.Invoke();
+			}
 
 			// trigger event if needed
 			if( shouldTriggerEvent && newPathIDList.Count > 0 ) {
