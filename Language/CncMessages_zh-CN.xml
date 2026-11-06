@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="InvalidConnection" Content="CNC IP 地址或超时设置无效。" />
+	<Message ID="LifecycleBusy" Content="CNC 连接生命周期操作忙碌中。" />
+	<Message ID="ConnectionCancelled" Content="CNC 连接已取消。" />
+	<Message ID="PreviousOperationRunning" Content="先前的 SDK 操作仍在执行。" />
+	<Message ID="SessionEnded" Content="CNC 连接会话已结束。" />
+	<Message ID="ConnectionRejected" Content="OpenCNC 拒绝连接。" />
+	<Message ID="DisconnectPending" Content="SDK 操作仍在执行，尚未确认断开连接。" />
+	<Message ID="NotConnected" Content="CNC 未连接。" />
+	<Message ID="ResourceBusy" Content="CNC 资源操作仍在执行。" />
+	<Message ID="OperationBusy" Content="CNC 操作仍在执行。" />
+	<Message ID="OperationCancelled" Content="操作已取消。" />
+	<Message ID="WaitStopped" Content="已停止等待；SDK 操作可能仍在执行。" />
+	<Message ID="CalibrationCancelled" Content="校正已取消。" />
+	<Message ID="CalibrationTimeout" Content="三点校正等待超过 5 秒。" />
+	<Message ID="InvalidCalibrationResult" Content="校正结果标志无效。" />
+	<Message ID="ReadProgramCoordinates" Content="程序坐标读取失败。" />
+	<Message ID="ReadTolerance" Content="误差容忍读取失败（@78406）。" />
+	<Message ID="IncompletePoints" Content="必须提供三组完整的 XYZ 坐标点。" />
+	<Message ID="InvalidMachineParameter" Content="Pr{0}={1}，预期为 1、2 或 3。" />
+	<Message ID="InvalidRotaryParameter" Content="Pr{0}={1}，预期为 400、500 或 600。" />
+	<Message ID="AmbiguousHeadAxis" Content="Pr3005={0} 指定摆头 {1}，无法唯一对应旋转轴 {2}／{3}。" />
+	<Message ID="ReadMachineCoordinate" Content="无法读取机械坐标 #{0}。" />
+	<Message ID="ClearOffset" Content="清除 #{0} 失败，部分偏置可能已清除：{1}" />
+	<Message ID="AlarmUnavailable" Content="CNC 当前警报数据无法获取，待处理数量：{0}。" />
+	<Message ID="AlarmCountRead" Content="CNC 当前警报数量读取失败。传输状态：{0}，控制器状态：{1}。" />
+	<Message ID="InvalidAlarmCount" Content="CNC 当前警报数量无效：{0}。" />
+</ResMap>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Title" Content="三点校正" />
+	<Message ID="PickDrawing" Content="重选图纸点" />
+	<Message ID="Reset" Content="重设" />
+	<Message ID="Cancel" Content="取消" />
+	<Message ID="DrawingPoints" Content="图纸点" />
+	<Message ID="WorkpiecePoints" Content="工作点" />
+	<Message ID="Point" Content="点 {0}" />
+	<Message ID="Capture" Content="带入" />
+	<Message ID="Tolerance" Content="误差容忍" />
+	<Message ID="Error" Content="误差" />
+	<Message ID="Calculate" Content="计算" />
+	<Message ID="DrawingOnly" Content="仅输出图纸点" />
+	<Message ID="DrawingOnly_Offline" Content="仅输出图纸点（离线）" />
+	<Message ID="Error_Unavailable" Content="未获取" />
+	<Message ID="Validation_DrawingIncomplete" Content="请完整设置三个图纸点。" />
+	<Message ID="Validation_WorkpieceIncomplete" Content="请完整设置三个工作点。" />
+	<Message ID="Validation_Tolerance" Content="误差容忍必须是大于或等于 0 的有效数值。" />
+	<Message ID="Validation_Input" Content="请输入有效数值；误差容忍不可小于 0。" />
+	<Message ID="Validation_Point" Content="{0} {1} 的 X、Y、Z 必须完整且为有效数值。" />
+	<Message ID="Step_Drawing" Content="步骤一：设置图纸点" />
+	<Message ID="Step_Workpiece" Content="步骤二：设置工作点" />
+	<Message ID="Step_Calculation" Content="步骤三：设置误差与计算" />
+	<Message ID="Drawing_Repicking" Content="请到主画面画布重新点选图纸点 {0}。" />
+	<Message ID="Drawing_Picking" Content="请到主画面画布点选第 {0} 个图纸点（已选 {1}／3 点）。" />
+	<Message ID="Drawing_Complete" Content="图纸点已完成；需要重新选取时，请按“重选图纸点”。" />
+	<Message ID="Drawing_Initial" Content="请在主画面的画布上依序选取三个图纸点。" />
+	<Message ID="Workpiece_Waiting" Content="请先在主画面画布选满三个图纸点。" />
+	<Message ID="Workpiece_Complete" Content="工作点已完整；可设置误差容忍并按“计算”。" />
+	<Message ID="Workpiece_Initial" Content="请依序移动至三个工作点，按“带入”或输入坐标。" />
+	<Message ID="Step_Current" Content="当前步骤" />
+	<Message ID="Step_Complete" Content="已完成" />
+	<Message ID="Step_WaitDrawing" Content="等待步骤一完成" />
+	<Message ID="Step_WaitBoth" Content="等待前两步完成" />
+	<Message ID="Step_Format" Content="{0}（{1}）" />
+	<Message ID="Error_Initialization" Content="请在 WinForms UI 线程初始化三点校正，且仅能初始化一次。" />
+	<Message ID="Error_Subscription" Content="无法初始化校正误差容忍订阅。" />
+	<Message ID="Error_NoHost" Content="尚未设置校正数据宿主。" />
+	<Message ID="Confirm_Close" Content="{0}&#10;是否仍要关闭？本次修改将不保存。" />
+	<Message ID="Error_ReadTolerance" Content="读取误差容忍失败：{0}" />
+	<Message ID="Error_WriteTolerance" Content="写入误差容忍失败：{0}" />
+	<Message ID="Error_PickingUnsupported" Content="当前宿主不支持画布选点。" />
+	<Message ID="Error_PickingStart" Content="无法开始画布选点。" />
+	<Message ID="Error_DrawingUnavailable" Content="请先加入工件，并完成当前的图纸选点。" />
+	<Message ID="Error_EditorUnavailable" Content="画布编辑器尚未就绪。" />
+	<Message ID="Error_InputOffline" Content="CNC 未连接，输入尚未写入控制器。" />
+	<Message ID="Error_WriteInput" Content="写入 @{0} 失败：{1}" />
+	<Message ID="Error_Capture" Content="带入程序坐标失败：{0}" />
+	<Message ID="Error_CalculateOffline" Content="CNC 未连接，无法计算。" />
+	<Message ID="Error_NoSaveHost" Content="尚未设置校正数据宿主，无法保存结果。" />
+	<Message ID="Validation_AllPoints" Content="请完整填入三组图纸点及工作点。" />
+	<Message ID="Error_Calculation" Content="校正计算失败、误差超过容忍，或未取得有效误差；已保留本次计算数据。" />
+	<Message ID="Error_ProjectChanged" Content="项目或图纸校正数据已改变，本次修改将不保存。" />
+	<Message ID="Confirm_DiscardUncalculated" Content="当前数据尚未取得计算结果，或修改后尚未重新计算；关闭将还原上次计算数据。" />
+	<Message ID="Confirm_DiscardAndClose" Content="是否放弃本次未计算的修改并关闭？" />
+	<Message ID="Error_ReadResult" Content="校正误差读取失败。" />
+	<Message ID="Error_CalculationDetails" Content="计算失败或是误差过大：{0}" />
+</ResMap>

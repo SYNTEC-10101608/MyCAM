@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::ENIP::ID=1" Content="建立連線失敗"/>
+	<Message ID="AlarmMsg::ENIP::ID=2" Content="指令發送失敗"/>
+	<Message ID="AlarmMsg::ENIP::ID=3" Content="指令回覆逾時"/>
+	<Message ID="AlarmMsg::ENIP::ID=4" Content="封裝信息錯誤"/>
+	<Message ID="AlarmMsg::ENIP::ID=5" Content="網路連線中斷"/>
+	<Message ID="AlarmMsg::ENIP::ID=6" Content="建立隱文連線失敗"/>
+	<Message ID="AlarmMsg::ENIP::ID=7" Content="隱文連線中斷"/>
+	<Message ID="AlarmMsg::ENIP::ID=8" Content="不支援設定的隱文連線速度"/>
+	<Message ID="AlarmMsg::ENIP::ID=9" Content="隱文連線暫存器起始編號設定錯誤"/>
+</ResMap>

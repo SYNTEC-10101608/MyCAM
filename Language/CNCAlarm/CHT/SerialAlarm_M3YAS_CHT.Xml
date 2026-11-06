@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=20h" Content="參數Checksum異常。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=21h" Content="參數格式異常。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=22h" Content="系統Checksum異常。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=24h" Content="系統警報"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=25h" Content="系統警報"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=30h" Content="主回路檢出部故障。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=40h" Content="參數設定錯誤1。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=41h" Content="分周脈波輸出設定故障。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=42h" Content="參數組合故障。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=44h" Content="半閉回路/全閉回路參數設定故障。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=46h" Content="Σ-LINK II指令/響應參數設定異常。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=4Ah" Content="參數設定錯誤2。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=50h" Content="容量選配錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=51h" Content="產品不支援警報。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=70h" Content="偵測到馬達類型改變"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=80h" Content="線性編碼器pitch設定錯誤"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B0h" Content="伺服ON指令無效警報。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=100h" Content="過電流或過熱檢出。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=101h" Content="電機過電流檢出。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=102h" Content="電機過電流檢出2。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=300h" Content="回生故障。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=320h" Content="回生過載。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=330h" Content="主回路電源接線故障。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=400h" Content="電壓過大。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=410h" Content="低電壓。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=450h" Content="主電路電容過電壓。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=510h" Content="速度過大。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=511h" Content="編碼器脈波輸出過速度"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=520h" Content="振動警報。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=521h" Content="Autotuning警報。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=550h" Content="最大速度設定錯誤"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=710h" Content="過載（瞬間最大負載）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=720h" Content="過載（連續最大負載）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=729h" Content="過載2。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=730h" Content="動態制動（DB）過載。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=731h" Content="動態制動（DB） 過載。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=740h" Content="衝擊電流限制電阻過載。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=7A0h" Content="散熱片過熱。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=7A1h" Content="內部溫度異常(控制板溫度異常)。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=7A2h" Content="內部溫度異常(電源板溫度異常)。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=7A3h" Content="內部溫度感應器異常。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=7ABh" Content="伺服驅動器內部風扇停止。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=810h" Content="絕對式資料遺失，請參考絕對式電池保養須知，更換電池，並重開系統。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=820h" Content="編碼器Checksum警報。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=830h" Content="編碼器電池警報。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=840h" Content="編碼器資料錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=850h" Content="編碼器過速。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=860h" Content="編碼器過熱。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=861h" Content="馬達過熱。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=862h" Content="過熱警報。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=890h" Content="編碼器Scale錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=891h" Content="編碼器模組錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A0h" Content="外部編碼器Scale錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A1h" Content="外部編碼器模組故障。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A2h" Content="外部編碼器感測器故障（增量型）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A3h" Content="外部編碼器位置錯誤（絕對值）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A5h" Content="編碼器過速度。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A6h" Content="編碼器過熱錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=900h" Content="位置偏差過大。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=901h" Content="伺服ON 時位置偏差過大。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=910h" Content="過載。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=911h" Content="振動。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=912h" Content="內部溫度異常警告1（控制板溫度異常）。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=913h" Content="內部溫度異常警告2（電源板溫度異常）。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=920h" Content="回生超載。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=921h" Content="動態煞車(DB) 過載。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=923h" Content="SERVOPACK內建風扇停止轉動。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=930h" Content="絕對值編碼器的電池異常。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=942h" Content="速度波紋補償異常。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=94Ah" Content="數據設置警告1（參數編號錯誤）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=94Bh" Content="數據設置警告2（數值超出範圍）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=94Ch" Content="數據設置警告3（計算錯誤）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=94Dh" Content="數據設置警告4（參數尺寸錯誤）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=94Eh" Content="數據設置警告5（鎖存模式錯誤）。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=95Ah" Content="命令警告1（驅動器無法執行當前命令）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=95Bh" Content="命令警告2（不支持的命令）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=95Dh" Content="命令警告4（命令干擾）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=95Eh" Content="命令警告5（子命令禁用）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=95Fh" Content="命令警告6（未定義的命令）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=960h" Content="MECHATROLINK通訊警告。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=962h" Content="MECHATROLINK 通訊錯誤（FCS錯誤)。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=963h" Content="MECHATROLINK 通訊錯誤（同步偵未收到）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=971h" Content="低電壓警告。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=97Ah" Content="命令警報（Phase錯誤）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=97Bh" Content="Data Clamp錯誤（超過範圍）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=9A0h" Content="過行程"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=9B0h" Content="預防性維護警告。請使用急停以清除警告。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B31h" Content="電流檢出故障1。（U 相）"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B32h" Content="電流檢出故障2。（V相）"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B33h" Content="電流檢出錯誤3。（電流檢測）"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B6Ah" Content="MECHATROLINK通信ASIC錯誤 1。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B6Bh" Content="MECHATROLINK通信ASIC錯誤 2。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BE2h" Content="韌體故障。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF0h" Content="系統警報0。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF1h" Content="系統警報1。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF2h" Content="系統警報2。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF3h" Content="系統警報3。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF4h" Content="系統警報4。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF5h" Content="系統警報5。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF6h" Content="系統警報6。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF7h" Content="系統警報7。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF8h" Content="系統警報8。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BFDh" Content="系統警報D。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C10h" Content="伺服暴走。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C20h" Content="相位檢測錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C21h" Content="霍爾感測器錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C22h" Content="相位資料不匹配。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C50h" Content="極性檢測失敗1。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C51h" Content="在極性檢測時發生過行程。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C52h" Content="極性檢測未完成。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C53h" Content="極性檢測超出範圍。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C54h" Content="極性檢測失敗2。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C80h" Content="編碼器清除錯誤（多回轉圈數上限值設定錯誤）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C90h" Content="編碼器通信錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C91h" Content="編碼器通信位置資料加速度異常。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C92h" Content="編碼器通信計時器錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CA0h" Content="編碼器參數錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CB0h" Content="編碼器回波錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CC0h" Content="多回轉圈數上限值不一致。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD1h" Content="Σ-LINK II節點配置異常。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD2h" Content="Σ-LINK II電源短路檢出。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD3h" Content="Σ-LINK II配置數據和校驗異常。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD4h" Content="Σ-LINK II節點變更檢出。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD7h" Content="Σ-LINK II I/O設備通訊異常。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD8h" Content="Σ-LINK II I/O設備狀態異常。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CF1h" Content="回授選購卡通信故障*1（接收失敗）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CF2h" Content="回授選購卡通信故障*1（計時器停止）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D00h" Content="位置偏差過大。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D01h" Content="伺服ON 時位置偏差過大警報。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D02h" Content="伺服ON 時速度限制引起的位置偏差過大警報。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D04h" Content="超程警報。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D10h" Content="馬達-負載位置間偏差過大。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D30h" Content="位置資料溢位。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E02h" Content="MECHATROLINK- III 內同步錯誤 1。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E40h" Content="MECHATROLINK- III 傳輸週期設定錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E41h" Content="MECHATROLINK- III 傳輸資料大小設定錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E42h" Content="MECHATROLINK- III 站號設定錯誤。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E43h" Content="MECHATROLINK 通訊設定異常。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E50h" Content="MECHATROLINK- III 同步錯誤 1。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E51h" Content="MECHATROLINK- III 同步失敗。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E60h" Content="MECHATROLINK- III 通訊錯誤（接收錯誤）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E61h" Content="MECHATROLINK- III 傳輸週期錯誤（同步間隔誤差）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E62h" Content="MECHATROLINK 通訊錯誤（FCS錯誤)。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E63h" Content="MECHATROLINK同步幀未收到"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E71h" Content="安全選項模組檢測故障。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E72h" Content="回饋選項模組檢測故障。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E74h" Content="不支援的安全選項的模組。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E75h" Content="不支援的回授選項模組。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E81h" Content="安全模組警報。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=EA2h" Content="DRV報警 2（SERVOPACK WDT錯誤）。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=EB1h" Content="SERVOPACK: 安全模組報警。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=EC8h" Content="Gate Drive錯誤 1。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=EC9h" Content="Gate Drive錯誤 2。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=ED1h" Content="命令執行超時。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=F10h" Content="電源線欠相。"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=F50h" Content="馬達動力線斷線或毀損。"/>
+</ResMap>

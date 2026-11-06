@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<!-- Alarm -->
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_STEP_ALM::ID=1" Content="Short Circuit"/>
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_STEP_ALM::ID=2" Content="Amp over voltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_STEP_ALM::ID=9" Content="Feedback error"/>
+</ResMap>

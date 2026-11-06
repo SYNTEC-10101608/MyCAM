@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::CIP::ID=1" Content="Connection Failure"/>
+	<Message ID="AlarmMsg::CIP::ID=2" Content="Resource Unavailable"/>
+	<Message ID="AlarmMsg::CIP::ID=3" Content="Invalid Parameter Value"/>
+	<Message ID="AlarmMsg::CIP::ID=4" Content="Path Segment Error"/>
+	<Message ID="AlarmMsg::CIP::ID=5" Content="Path Destination Unknown"/>
+	<Message ID="AlarmMsg::CIP::ID=6" Content="Partial Transfer"/>
+	<Message ID="AlarmMsg::CIP::ID=7" Content="Connection Lost"/>
+	<Message ID="AlarmMsg::CIP::ID=8" Content="Service Not Supported"/>
+	<Message ID="AlarmMsg::CIP::ID=9" Content="Invalid Attribute Value"/>
+	<Message ID="AlarmMsg::CIP::ID=10" Content="Attribute List Error"/>
+	<Message ID="AlarmMsg::CIP::ID=11" Content="Already In Requested Mode/State"/>
+	<Message ID="AlarmMsg::CIP::ID=12" Content="Object State Conflict"/>
+	<Message ID="AlarmMsg::CIP::ID=13" Content="Object Already Exists"/>
+	<Message ID="AlarmMsg::CIP::ID=14" Content="Attribute Not Settable"/>
+	<Message ID="AlarmMsg::CIP::ID=15" Content="Privilege Violation"/>
+	<Message ID="AlarmMsg::CIP::ID=16" Content="Device State Conflict"/>
+	<Message ID="AlarmMsg::CIP::ID=17" Content="Reply Data Too Large"/>
+	<Message ID="AlarmMsg::CIP::ID=18" Content="Fragmentation Of A Primitive Value"/>
+	<Message ID="AlarmMsg::CIP::ID=19" Content="Not Enough Data"/>
+	<Message ID="AlarmMsg::CIP::ID=20" Content="Attribute Not Supported"/>
+	<Message ID="AlarmMsg::CIP::ID=21" Content="Too Much Data"/>
+	<Message ID="AlarmMsg::CIP::ID=22" Content="Object Does Not Exist"/>
+	<Message ID="AlarmMsg::CIP::ID=23" Content="Service Fragmentation Sequence Not In Progress"/>
+	<Message ID="AlarmMsg::CIP::ID=24" Content="No Stored Attribute Data"/>
+	<Message ID="AlarmMsg::CIP::ID=25" Content="Store Operation Failure"/>
+	<Message ID="AlarmMsg::CIP::ID=26" Content="Routing Failure, Request Packet Too Large"/>
+	<Message ID="AlarmMsg::CIP::ID=27" Content="Routing Failure, Response Packet Too Large"/>
+	<Message ID="AlarmMsg::CIP::ID=28" Content="Missing Attribute List Entry Data"/>
+	<Message ID="AlarmMsg::CIP::ID=29" Content="Invalid Attribute Value List"/>
+	<Message ID="AlarmMsg::CIP::ID=30" Content="Embedded Service Error"/>
+	<Message ID="AlarmMsg::CIP::ID=31" Content="Vendor Specific Error"/>
+	<Message ID="AlarmMsg::CIP::ID=32" Content="Invalid Parameter"/>
+	<Message ID="AlarmMsg::CIP::ID=33" Content="Write-once Value Or Medium Already Written"/>
+	<Message ID="AlarmMsg::CIP::ID=34" Content="Invalid Reply Received"/>
+	<Message ID="AlarmMsg::CIP::ID=35" Content="Buffer Overflow"/>
+	<Message ID="AlarmMsg::CIP::ID=36" Content="Message Format Error"/>
+	<Message ID="AlarmMsg::CIP::ID=37" Content="Key Failure In Path"/>
+	<Message ID="AlarmMsg::CIP::ID=38" Content="Path Size Invalid"/>
+	<Message ID="AlarmMsg::CIP::ID=39" Content="Unexpected Attribute In List"/>
+	<Message ID="AlarmMsg::CIP::ID=40" Content="Invalid Member ID"/>
+	<Message ID="AlarmMsg::CIP::ID=41" Content="Member Not Settable"/>
+	<Message ID="AlarmMsg::CIP::ID=42" Content="Group 2 Only Server General Failure"/>
+	<Message ID="AlarmMsg::CIP::ID=43" Content="Unknown Modbus Error"/>
+	<Message ID="AlarmMsg::CIP::ID=44" Content="Attribute Not Gettable"/>
+	<Message ID="AlarmMsg::CIP::ID=45" Content="Instance Not Deletable"/>
+	<Message ID="AlarmMsg::CIP::ID=46" Content="Service Not Supported For Specified Path"/>
+</ResMap>

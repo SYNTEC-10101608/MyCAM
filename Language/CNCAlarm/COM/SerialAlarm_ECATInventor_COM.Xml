@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=100" Content="IGBT fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=101" Content="Brake IGBT fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=102" Content="Phase U IGBT fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=103" Content="Phase V IGBT fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=104" Content="Phase W IGBT fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=200" Content="Encoder fault - disconnect"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=201" Content="Encoder fault - feedback error over high"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=202" Content="Encoder fault - parity verification error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=203" Content="Encoder fault - CRC verification error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=204" Content="Encoder fault - frame error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=205" Content="Encoder fault - short frame error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=206" Content="Encoder fault - encoder timeout"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=207" Content="Encoder fault - FPGA timeout"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=208" Content="Encoder fault - Battery low voltage alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=209" Content="Encoder fault - Battery under voltage error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=210" Content="Encoder fault - Encoder over-heat error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=211" Content="Encoder fault - Encoder EEPROM write error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=212" Content="Encoder fault - Encoder EEPROM no data"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=213" Content="Encoder fault - Encoder EEPROM CRC error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=214" Content="Encoder fault - Encoder Identification error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=215" Content="Encoder fault - Encoder Theta Setting error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=300" Content="Current sensor fault - U phase"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=301" Content="Current sensor fault - V phase"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=302" Content="Current sensor fault - W phase"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=400" Content="System initialization fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=500" Content="Inverter type setting fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=501" Content="Motor type setting fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=502" Content="Matched motor and drive failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=503" Content="Position Limit setting fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=504" Content="Homing Mode setting fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=505" Content="PTP position overflow setting fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=506" Content="P9.37 setting fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=600" Content="Brake fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=700" Content="Regenerative resistor fault - overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=800" Content="Analog input fault - channel 1 over voltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=801" Content="Analog input fault - channel 2 over voltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=802" Content="Analog input fault - channel 3 over voltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=900" Content="EEPROM fault - access error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=901" Content="EEPROM fault - data verification error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1000" Content="Hardware fault - FPGA"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1001" Content="Hardware fault - communication board"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1002" Content="Hardware fault - short circuit"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1003" Content="Hardware fault - external fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1004" Content="Hardware fault - Emergency stop fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1005" Content="Hardware fault - RS485 fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1100" Content="Software fault - task reentrance"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1101" Content="Software fault - illegal operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1102" Content="Software fault - illegal operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1200" Content="IO fault - digital input repeat"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1201" Content="IO fault - Reserved"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1202" Content="Pulse frequency fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1300" Content="DC bus voltage fault - over voltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1301" Content="DC bus voltage fault - lack voltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1400" Content="Control cicuit DC voltage fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1500" Content="Driver over current fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1600" Content="Reserved"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1700" Content="Inverter overload fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1701" Content="Inverter overload fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1800" Content="Motor overload fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1801" Content="Motor Temperature over fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1900" Content="Over speed fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1901" Content="Over speed fault - positive direction"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1902" Content="Over speed fault - negative direction"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1903" Content="Over speed parameter-setting fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=1904" Content="Over speed parameter-Control fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2000" Content="Speed error over high fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2100" Content="Over position - positive direction"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2101" Content="Over position - negative direction"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2200" Content="Position error over high fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2201" Content="Mix position error fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2202" Content="Position increment overflow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2203" Content="CANopen fault - Sync Timeout"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2204" Content="CANopen fault - Position command buffer full"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2300" Content="Over temperature fault - driver"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2301" Content="Over temperature fault - motor"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2302" Content="Over temperature fault - regenerative IGBT"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2303" Content="Over temperature fault - regenerative resistor"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2400" Content="Profibus-DP fault - PWK parameter ID fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2401" Content="Profibus-DP fault - PWK parameter over range"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2402" Content="Profibus-DP fault - PWK parameter read only"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2403" Content="Profibus-DP fault - PZD config parameter Not Exist"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2404" Content="Profibus-DP fault - PZD config parameter Attr. Not match"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2408" Content="EtherCAT fault - ET1100 initialization fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2409" Content="EtherCAT fault - EEPROM fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2410" Content="EtherCAT fault - DC Sync0 signal fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2411" Content="EtherCAT fault - Disconnected"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2412" Content="EtherCAT fault - PDO data missing fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2500" Content="Application fault - Encoder PowerUp Time Out"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2501" Content="Application fault - Encoder PowerUp Failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2502" Content="Application fault - Phase Order Test Time Out"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2503" Content="Application fault - Phase Order Test Failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2504" Content="Application fault - Encoder Offset Test Time Out"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2505" Content="Application fault - Encoder Offset Test Failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2506" Content="Application fault - Homing Failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2507" Content="Application fault - Inertia Identification Failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2600" Content="CANopen fault - Heartbeat Time Out"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2601" Content="CANopen fault - SDO Index Not Exist"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2602" Content="CANopen fault - SDO SubIndex Not Exist"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2603" Content="CANopen fault - SDO Length Error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2604" Content="CANopen fault - SDO Out of Range"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2605" Content="CANopen fault - ReadOnly"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2606" Content="CANopen fault - PDO Map Length Error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2607" Content="CANopen fault - PDO Map Not Exist"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2608" Content="CANopen fault - PDO Modified Under OP Mode"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2609" Content="CANopen fault - PDO Map Not Allowed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2610" Content="CANopen fault - Sync Too Fast"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2611" Content="CANopen fault - Receive Fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2612" Content="CANopen fault - Transmit Fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2613" Content="CANopen fault - Sync Duplicated"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2614" Content="CANopen fault - Bus Overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INVENTOR_ALM::ID=2615" Content="CANopen fault - Device state error"/>
+</ResMap>

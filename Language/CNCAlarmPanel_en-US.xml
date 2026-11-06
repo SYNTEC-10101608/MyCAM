@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Title_Current" Content="Current Alarms ({0})" />
+	<Message ID="Title_Stale" Content="Current Alarms (not updated)" />
+	<Message ID="m_colCode" Content="Code" />
+	<Message ID="m_colText" Content="Alarm Message" />
+	<Message ID="Status_Updating" Content="Updating alarms; data is not yet confirmed." />
+	<Message ID="Status_Disconnected" Content="Disconnected; alarm data has not been updated." />
+	<Message ID="Status_ReadFailed" Content="Unable to read alarms; data has not been updated: {0}" />
+	<Message ID="Format_AxisName" Content="{0} axis" />
+	<Message ID="Format_AxisNumber" Content="Axis {0}" />
+	<Message ID="Format_SpindleNumber" Content="Spindle {0}" />
+	<Message ID="Format_StationNumber" Content="Station {0}h" />
+</ResMap>

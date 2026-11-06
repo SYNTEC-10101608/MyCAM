@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::ROT::ID=1" Content="未完成绝对式原点设定"/>
+	<Message ID="AlarmMsg::ROT::ID=2" Content="绝对式相关参数异动，请重开机并重设原点"/>
+	<Message ID="AlarmMsg::ROT::ID=3" Content="不支持增量式电机"/>
+	<Message ID="AlarmMsg::ROT::ID=4" Content="目标刀号超出范围"/>
+	<Message ID="AlarmMsg::ROT::ID=5" Content="驱动器站号不存在"/>
+	<Message ID="AlarmMsg::ROT::ID=6" Content="ROT轴驱动器站号与其他轴重复设定"/>
+	<Message ID="AlarmMsg::ROT::ID=7" Content="寄存器位于系统保护区或不支持位存取"/>
+	<Message ID="AlarmMsg::ROT::ID=8" Content="ROT定位偏差过大"/>
+	<Message ID="AlarmMsg::ROT::ID=9" Content="驱动器通讯异常"/>
+	<Message ID="AlarmMsg::ROT::ID=10" Content="加减速或速度设定错误"/>
+	<Message ID="AlarmMsg::ROT::ID=11" Content="驱动器电源异常"/>
+	<Message ID="AlarmMsg::ROT::ID=12" Content="不支持此驱动器类型"/>
+	<Message ID="AlarmMsg::ROT::ID=13" Content="参数设定导致定位异常"/>
+	<Message ID="AlarmMsg::ROT::ID=14" Content="新代编码器韧件升级结束，请重启驱动器"/>
+	<Message ID="AlarmMsg::ROT::ID=15" Content="新代编码器信息读取逾时"/>
+	<Message ID="AlarmMsg::ROT::ID=16" Content="轴向回授值异常"/>
+	<Message ID="AlarmMsg::ROT::ID=17" Content="自定义刀具位置设定错误"/>
+	<Message ID="AlarmMsg::ROT::ID=18" Content="通讯线材接触不良" />
+	<Message ID="AlarmMsg::ROT::ID=19" Content="硬件未收到通讯封包" />
+	<Message ID="AlarmMsg::ROT::ID=20" Content="通讯封包受噪声干扰" />
+	<Message ID="AlarmMsg::ROT::ID=21" Content="驱动器软件遗漏通讯封包" />
+	<Message ID="AlarmMsg::ROT::ID=22" Content="驱动器后级电未供给" />
+</ResMap>

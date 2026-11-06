@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::ROT::ID=1" Content="turret no home setting"/>
+	<Message ID="AlarmMsg::ROT::ID=2" Content="Important parameter changed, please reboot the CNC controller and reset home position"/>
+	<Message ID="AlarmMsg::ROT::ID=3" Content="Turret not absolute encorder"/>
+	<Message ID="AlarmMsg::ROT::ID=4" Content="Turret target tool number setting out of range"/>
+	<Message ID="AlarmMsg::ROT::ID=5" Content="Turret station ID does not exist"/>
+	<Message ID="AlarmMsg::ROT::ID=6" Content="Turret station ID repeated with other devices"/>
+	<Message ID="AlarmMsg::ROT::ID=7" Content="Start R Register setting out of range, please reassign another R register!"/>
+	<Message ID="AlarmMsg::ROT::ID=8" Content="Turret not correct posing"/>
+	<Message ID="AlarmMsg::ROT::ID=9" Content="Drive communication error"/>
+	<Message ID="AlarmMsg::ROT::ID=10" Content="Acceleration, deceleration or velocity setting error"/>
+	<Message ID="AlarmMsg::ROT::ID=11" Content="Power status of servo driver error"/>
+	<Message ID="AlarmMsg::ROT::ID=12" Content="Not support this driver type"/>
+	<Message ID="AlarmMsg::ROT::ID=13" Content="Param setting causes posing failure."/>
+	<Message ID="AlarmMsg::ROT::ID=14" Content="The firmware update of Syntec encoder is finished. Please reboot the driver."/>
+	<Message ID="AlarmMsg::ROT::ID=15" Content="Syntec encoder information reading timeout."/>
+	<Message ID="AlarmMsg::ROT::ID=16" Content="Feedback of axis is anomalous."/>
+	<Message ID="AlarmMsg::ROT::ID=17" Content="User-defined tool position setting error."/>
+	<Message ID="AlarmMsg::ROT::ID=18" Content="Poor contact of communication wire" />
+	<Message ID="AlarmMsg::ROT::ID=19" Content="The hardware doesn't receive communication packet" />
+	<Message ID="AlarmMsg::ROT::ID=20" Content="The communication packet is disturbed by noise" />
+	<Message ID="AlarmMsg::ROT::ID=21" Content="Driver software misses communication packet" />
+	<Message ID="AlarmMsg::ROT::ID=22" Content="The driver is not 'power on', please check the power connection status" />
+</ResMap>

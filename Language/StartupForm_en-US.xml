@@ -13,6 +13,12 @@
 	<Message ID="m_tsbCNCConnection" Content="CNC Connection" />
 	<Message ID="m_tsmiLanguage" Content="Language" />
 	<Message ID="m_tsbController" Content="Controller" />
+	<Message ID="m_tsmiControllerAdvancedSettings" Content="Advanced Controller Settings" />
+	<Message ID="m_tsmiMachining" Content="Machining" />
+	<Message ID="m_tsbSetOffset" Content="Set Offset" />
+	<Message ID="m_tsbSetOffset_ToolTip" Content="Set program coordinate offset" />
+	<Message ID="m_tsbProcessSettings" Content="Process Settings" />
+	<Message ID="m_tsbProcessSettings_ToolTip" Content="Open controller process settings" />
 
 	<!-- 檔案工具列 -->
 	<Message ID="m_tsbImport3DFile" Content="3D Model" />
@@ -146,6 +152,7 @@
 	<Message ID="m_tsbLayerNone_ToolTip" Content="Do Not Machine" />
 	<Message ID="m_tsbNeedProcess_ToolTip" Content="Machine" />
 
+	<Message ID="Log_ViewerInitFailed" Content="Viewer initialization failed" />
 	<Message ID="Log_UseDefaultMachineProject" Content="Using default machine project" />
 	<Message ID="Log_MachineNodeNull" Content="Machine parameter node is null; using default machine parameters" />
 	<Message ID="Log_MachineFileNull" Content="Machine file is null; using default machine parameters" />
@@ -162,6 +169,10 @@
 	<Message ID="Log_CNCReconnected" Content="CNC reconnection successful" />
 	<Message ID="Log_CNCReconnectFailed" Content="CNC reconnection failed. Check the network or CNC status" />
 	<Message ID="Log_CNCPleaseConnectFirst" Content="CNC is not connected. Establish a CNC connection first" />
+	<Message ID="Log_VNCConnectionError" Content="VNC connection failed: {0}" />
+	<Message ID="Log_CNCConnectionError" Content="CNC connection process failed: {0}" />
+	<Message ID="Log_CNCShutdownUnconfirmed" Content="CNC shutdown not confirmed: {0}" />
+	<Message ID="Log_ShutdownFailed" Content="Shutdown process failed: {0}" />
 	
 	<!-- 存檔提示 -->
 	<Message ID="Msg_SaveBeforeExitTitle" Content="Save Confirmation" />

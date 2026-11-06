@@ -1,4 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ResMap>
   <Message ID="Error_PostProcessing" Content="Ошибка вычисления постобработки, путь: {0}" />
+  <Message ID="Error_CalibrationRequired" Content="Нет корректных данных расчёта трёхточечной калибровки. Выполните расчёт или явно выберите вывод только точек чертежа." />
 </ResMap>

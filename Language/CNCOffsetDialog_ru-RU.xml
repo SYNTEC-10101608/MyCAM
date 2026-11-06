@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Title" Content="Смещение координат программы" />
+	<Message ID="SetZero" Content="В ноль" />
+	<Message ID="ClearAll" Content="Сбросить всё" />
+	<Message ID="Error_Unavailable" Content="Окно настройки смещения недоступно." />
+	<Message ID="Error_UIThread" Content="Инициализируйте окно настройки смещения в потоке WinForms UI." />
+	<Message ID="Error_Subscription" Content="Не удалось инициализировать подписку на координаты смещения." />
+	<Message ID="Error_Operation" Content="Ошибка операции «{0}». Смещения могли обновиться не полностью: {1}" />
+</ResMap>

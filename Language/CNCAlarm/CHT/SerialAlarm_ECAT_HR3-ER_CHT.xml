@@ -1,0 +1,347 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0100h" Content="軟體參數故障 - 廠商參數校驗異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0100h::AlarmID" Content="E.010.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0101h" Content="軟體參數故障 - 機型參數校驗異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0101h::AlarmID" Content="E.010.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0110h" Content="軟體內部通訊初始化故障 - 軟體內部通訊初始化異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0110h::AlarmID" Content="E.011.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0120h" Content="軟體版本與產品型號不符故障 - 軟體版本與產品型號不匹配" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0120h::AlarmID" Content="E.012.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0130h" Content="軟體內部中斷逾時故障 - FPGA中斷訊號遺失" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0130h::AlarmID" Content="E.013.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0131h" Content="軟體內部中斷逾時故障 - 電流環或位置環中斷運轉逾時" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0131h::AlarmID" Content="E.013.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0140h" Content="軟體內部通訊逾時故障 - MCU與FPGA通訊逾時" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0140h::AlarmID" Content="E.014.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0150h" Content="電流取樣超時故障 - 電流晶片取樣逾時" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0150h::AlarmID" Content="E.015.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0151h" Content="電流取樣超時故障 - 電流取樣轉換逾時" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0151h::AlarmID" Content="E.015.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0152h" Content="電流取樣超時故障 - 電流取樣計算逾時" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0152h::AlarmID" Content="E.015.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0160h" Content="轉矩指令更新逾時故障 - 轉矩指令更新逾時" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0160h::AlarmID" Content="E.016.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0180h" Content="參數超出範圍故障 - 廠商參數超出範圍" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0180h::AlarmID" Content="E.018.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0181h" Content="參數超出範圍故障 - 軟體內部變數超範圍" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0181h::AlarmID" Content="E.018.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0190h" Content="產品匹配故障 - 編碼器匹配故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0190h::AlarmID" Content="E.019.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0191h" Content="產品匹配故障 - 馬達匹配故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0191h::AlarmID" Content="E.019.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0192h" Content="產品匹配故障 - 驅動器參數匹配故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0192h::AlarmID" Content="E.019.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0193h" Content="產品匹配故障 - 馬達額定電流大於驅動器額定電流" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0193h::AlarmID" Content="E.019.3" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0194h" Content="產品匹配故障 - 機型參數錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0194h::AlarmID" Content="E.019.4" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0210h" Content="主機角度給定超範圍故障 - 主機給定角度超範圍" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0210h::AlarmID" Content="E.021.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0220h" Content="編碼器更新逾時故障 - 編碼器更新逾時故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0220h::AlarmID" Content="E.022.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2100h" Content="硬體過流故障 - P、N相過流" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2100h::AlarmID" Content="E.210.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2101h" Content="硬體過流故障 - U相過流" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2101h::AlarmID" Content="E.210.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2102h" Content="硬體過流故障 - V相過流" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2102h::AlarmID" Content="E.210.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2110h" Content="輸出對地短路故障 - 輸出對地短路引起N相過流" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2110h::AlarmID" Content="E.211.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2111h" Content="輸出對地短路故障 - 輸出對地短路引起母線電壓過壓" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2111h::AlarmID" Content="E.211.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2120h" Content="UVW相序接錯故障 - UVW相序錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2120h::AlarmID" Content="E.212.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2130h" Content="飛車故障 - 飛車故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2130h::AlarmID" Content="E.213.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2140h" Content="控制電源欠電壓故障 - 控制電源欠電壓" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2140h::AlarmID" Content="E.214.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2141h" Content="控制電源欠電壓故障 - 控制電源欠電壓" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2141h::AlarmID" Content="E.214.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2150h" Content="AI採樣故障 - AI取樣電壓過高" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2150h::AlarmID" Content="E.215.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2151h" Content="AI採樣故障 - 高精度AI採樣故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2151h::AlarmID" Content="E.215.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2160h" Content="STO故障 - STO端子未連接" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2160h::AlarmID" Content="E.216.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2161h" Content="STO故障 - STO輸入保護有效" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2161h::AlarmID" Content="E.216.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9100h" Content="編碼器參數故障 - 上電時編碼器參數校驗異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9100h::AlarmID" Content="E.910.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9101h" Content="編碼器參數故障 - 上電時編碼器通訊異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9101h::AlarmID" Content="E.910.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9110h" Content="編碼器通訊故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9110h::AlarmID" Content="E.911.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9111h" Content="編碼器通訊故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9111h::AlarmID" Content="E.911.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9112h" Content="編碼器通訊故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9112h::AlarmID" Content="E.911.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9113h" Content="編碼器通訊故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9113h::AlarmID" Content="E.911.3" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9114h" Content="編碼器通訊故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9114h::AlarmID" Content="E.911.4" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9115h" Content="編碼器通訊故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9115h::AlarmID" Content="E.911.5" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9116h" Content="編碼器通訊故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9116h::AlarmID" Content="E.911.6" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9117h" Content="編碼器通訊故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9117h::AlarmID" Content="E.911.7" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9118h" Content="編碼器通訊故障 - 編碼器AB訊號受到干擾" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9118h::AlarmID" Content="E.911.8" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9120h" Content="編碼器參數校驗錯誤故障 - 編碼器參數校驗錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9120h::AlarmID" Content="E.912.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9130h" Content="編碼器三相霍爾邏輯錯誤故障 - 上電初始化讀取初始角度錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9130h::AlarmID" Content="E.913.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9140h" Content="編碼器斷線故障 - Z訊號線斷線" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9140h::AlarmID" Content="E.914.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2190h" Content="驅動器溫度過高故障 - 驅動器溫度過高故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2190h::AlarmID" Content="E.219.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2280h" Content="預充異常故障 - 預充繼電器未吸合" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2280h::AlarmID" Content="E.228.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2281h" Content="預充異常故障 - 預充充電超時故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2281h::AlarmID" Content="E.228.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2282h" Content="預充異常故障 - 繼電器異常動作導致預充異常接取/預充電路異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2282h::AlarmID" Content="E.228.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2283h" Content="預充異常故障 - 洩放異常預充" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2283h::AlarmID" Content="E.228.3" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4110h" Content="DI功能分配故障 - DI功能分配重複" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4110h::AlarmID" Content="E.411.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4111h" Content="DI功能分配故障 - DI功能分配超出定義範圍" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4111h::AlarmID" Content="E.411.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4120h" Content="DO功能分配故障 - DO功能分配超出定義範圍" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4120h::AlarmID" Content="E.412.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4130h" Content="電流計算溢位故障 - 電流計算溢位故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4130h::AlarmID" Content="E.413.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4140h" Content="直流母線欠壓故障 - 直流母線欠壓故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4140h::AlarmID" Content="E.414.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4150h" Content="直流母線過壓故障 - 直流母線過壓故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4150h::AlarmID" Content="E.415.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4160h" Content="超速故障 - 速度超過最高轉速" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4160h::AlarmID" Content="E.416.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4170h" Content="啟動轉速過高故障 - 啟動轉速大於額定轉速" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4170h::AlarmID" Content="E.417.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7100h" Content="超速故障 - FPGA內部測速溢出" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7100h::AlarmID" Content="E.710.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7110h" Content="慣量辨識故障 - 離線慣量辨識故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7110h::AlarmID" Content="E.711.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7111h" Content="慣量辨識故障 - 直線電機慣量辨識結果為0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7111h::AlarmID" Content="E.711.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7112h" Content="慣量辨識故障 - 增益自調整過程中慣量辨識錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7112h::AlarmID" Content="E.711.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7120h" Content="磁極辨識故障 - 磁極辨識故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7120h::AlarmID" Content="E.712.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7121h" Content="磁極辨識故障 - 磁極辨識中超程" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7121h::AlarmID" Content="E.712.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7122h" Content="磁極辨識故障 - 磁極辨識中超出可運作範圍" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7122h::AlarmID" Content="E.712.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7123h" Content="磁極辨識故障 - 磁極辨識結果異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7123h::AlarmID" Content="E.712.3" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7124h" Content="磁極辨識故障 - 磁極辨識超時" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7124h::AlarmID" Content="E.712.4" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7125h" Content="磁極辨識故障 - 編碼器跳動大" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7125h::AlarmID" Content="E.712.5" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7126h" Content="磁極辨識故障 - 負載太重拉不動" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7126h::AlarmID" Content="E.712.6" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7127h" Content="磁極辨識故障 - 磁極辨識故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7127h::AlarmID" Content="E.712.7" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7160h" Content="增益自調整故障 - 自調整增益過小" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7160h::AlarmID" Content="E.716.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9160h" Content="編碼器斷線故障 - 全閉環光柵尺斷線" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9160h::AlarmID" Content="E.916.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9161h" Content="編碼器斷線故障 - 直線馬達編碼器光柵尺斷線" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9161h::AlarmID" Content="E.916.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9220h" Content="編碼器過熱警告 - 編碼器過熱警告" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9220h::AlarmID" Content="E.922.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B100h" Content="馬達過載故障 - 馬達過載故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B100h::AlarmID" Content="E.B10.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B110h" Content="馬達堵轉故障 - 馬達堵轉保護" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B110h::AlarmID" Content="E.B11.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B150h" Content="馬達PTC故障 - 熱敏電阻斷線或熱敏電阻未連接" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B150h::AlarmID" Content="E.B15.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B151h" Content="馬達PTC故障 - 電動機過溫" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B151h::AlarmID" Content="E.B15.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B152h" Content="馬達PTC故障 - 熱敏電阻偵測馬達過溫時，警報閾值和清除閾值參數設定不合理" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B152h::AlarmID" Content="E.B15.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0170h" Content="參數儲存故障 - 參數儲存寫入異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0170h::AlarmID" Content="E.017.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0171h" Content="參數儲存故障 - 參數儲存讀取異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=0171h::AlarmID" Content="E.017.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2170h" Content="輸入缺相故障 - 三相輸入缺一相" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2170h::AlarmID" Content="E.217.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2171h" Content="輸入缺相故障 - 缺相檢測電路異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2171h::AlarmID" Content="E.217.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2180h" Content="伺服急停故障 - 伺服急停故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2180h::AlarmID" Content="E.218.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2270h" Content="輸出缺相故障 - UVW輸出缺相" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2270h::AlarmID" Content="E.227.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2271h" Content="輸出缺相故障 - U相輸出缺相" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2271h::AlarmID" Content="E.227.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2272h" Content="輸出缺相故障 - V相輸出缺相" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2272h::AlarmID" Content="E.227.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2273h" Content="輸出缺相故障 - W相輸出缺相" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2273h::AlarmID" Content="E.227.3" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2280h" Content="預充異常故障 - 預充電阻斷路" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2280h::AlarmID" Content="E.228.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2281h" Content="預充異常故障 - 繼電器異常動作導致預充異常切除" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2281h::AlarmID" Content="E.228.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2282h" Content="預充異常故障 - 繼電器異常動作導致預充異常接入" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2282h::AlarmID" Content="E.228.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2283h" Content="預充異常故障 - 洩放異常預充" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=2283h::AlarmID" Content="E.228.3" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4180h" Content="伺服重複上啟用故障（外部） - 伺服重複上使能" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4180h::AlarmID" Content="E.418.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4181h" Content="伺服重複上使能故障（內部） - 伺服重複上使能" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4181h::AlarmID" Content="E.418.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4190h" Content="驅動器過載故障 - 驅動器過載故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4190h::AlarmID" Content="E.419.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4200h" Content="分頻輸出頻率過高故障 - 分頻輸出頻率過高故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4200h::AlarmID" Content="E.420.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4210h" Content="電子齒輪比設定錯誤 - 本地電子齒輪比設定錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4210h::AlarmID" Content="E.421.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4211h" Content="電子齒輪比設定錯誤 - 本地電子齒輪比設定錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4211h::AlarmID" Content="E.421.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4212h" Content="電子齒輪比設定錯誤 - 本地電子齒輪比設定錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4212h::AlarmID" Content="E.421.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4213h" Content="電子齒輪比設定錯誤 - 通訊電子齒輪比設定錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4213h::AlarmID" Content="E.421.3" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4220h" Content="全閉環參數設定錯誤 - 全閉環使用多段絕對位置模式時無法進行內外環切換" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4220h::AlarmID" Content="E.422.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4230h" Content="位置偏差過大故障 - 內環位置偏差過大" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4230h::AlarmID" Content="E.423.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4231h" Content="位置偏差過大故障 - 外環位置偏差過大" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4231h::AlarmID" Content="E.423.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4240h" Content="位置指令過速故障 - 位置指令多次一倍過速" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4240h::AlarmID" Content="E.424.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4241h" Content="位置指令過速故障 - 位置指令一次多倍過速" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4241h::AlarmID" Content="E.424.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4290h" Content="龍門同步偏差過大 - 龍門同步過程中產生的偏差過大" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4290h::AlarmID" Content="E.429.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4300h" Content="龍門補償資料溢出 - 龍門補償資料寫溢出" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4300h::AlarmID" Content="E.430.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4301h" Content="龍門補償資料溢出 - 龍門補償資料讀取溢出" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=4301h::AlarmID" Content="E.430.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7150h" Content="馬達參數辨識失敗 - 參數辨識結果異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7150h::AlarmID" Content="E.715.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7151h" Content="馬達參數辨識失敗 - 電阻辨識失敗" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7151h::AlarmID" Content="E.715.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7152h" Content="馬達參數辨識失敗 - 電感辨識失敗" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7152h::AlarmID" Content="E.715.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7153h" Content="馬達參數辨識失敗 - 線反電動勢辨識失敗" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=7153h::AlarmID" Content="E.715.3" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9170h" Content="編碼器電池故障 - 編碼器電池故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9170h::AlarmID" Content="E.917.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9180h" Content="編碼器多圈計數錯誤 - 編碼器多圈計數錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9180h::AlarmID" Content="E.918.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9190h" Content="編碼器多圈計數器溢位故障 - 編碼器多圈計數器溢出" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9190h::AlarmID" Content="E.919.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9191h" Content="編碼器多圈計數器溢位故障 - 編碼器多圈計數器溢出" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=9191h::AlarmID" Content="E.919.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B130h" Content="馬達振動故障 - 馬達振動過大" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B130h::AlarmID" Content="E.B13.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B131h" Content="馬達振動故障 - 自適應陷波器振動過大故障" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B131h::AlarmID" Content="E.B13.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B140h" Content="運行異常檢測 - 位置異常檢測" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B140h::AlarmID" Content="E.B14.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B141h" Content="運行異常檢測 - 速度異常檢測" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B141h::AlarmID" Content="E.B14.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B142h" Content="運行異常檢測 - 轉矩異常檢測" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=B142h::AlarmID" Content="E.B14.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D100h" Content="CANopen通訊逾時 - CANopen通訊逾時" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D100h::AlarmID" Content="E.D10.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D110h" Content="CANopen通訊恢復初始化 - CANopen通訊恢復初始化" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D110h::AlarmID" Content="E.D11.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D140h" Content="CANopen通訊PDO設定錯誤 - CANopen通訊PDO設定錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D140h::AlarmID" Content="E.D14.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D150h" Content="軟限位上下限設定錯誤 - 軟限位上下限設定錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D150h::AlarmID" Content="E.D15.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D160h" Content="原點偏壓超出軟限位範圍 - 原點偏壓超出軟限位範圍" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D160h::AlarmID" Content="E.D16.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D200h" Content="EtherCAT通訊斷線 - EtherCAT通訊斷線" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D200h::AlarmID" Content="E.D20.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D210h" Content="EtherCAT通訊禁止 - EtherCAT通訊禁止" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D210h::AlarmID" Content="E.D21.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D220h" Content="EtherCAT通訊連線逾時 - EtherCAT通訊連線逾時" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D220h::AlarmID" Content="E.D22.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D230h" Content="EtherCAT擴充卡通訊逾時 - EtherCAT擴充卡通訊逾時" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D230h::AlarmID" Content="E.D23.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D240h" Content="EtherCAT站點名衝突 - EtherCAT站點名衝突" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D240h::AlarmID" Content="E.D24.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D250h" Content="EtherCAT站點名設定錯誤 - EtherCAT站點名設定錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D250h::AlarmID" Content="E.D25.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D260h" Content="EtherCAT通訊異常 - EtherCAT通訊異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D260h::AlarmID" Content="E.D26.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D261h" Content="EtherCAT通訊異常 - EtherCAT通訊異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D261h::AlarmID" Content="E.D26.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D270h" Content="EtherCAT系統參數錯誤 - EtherCAT系統參數錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D270h::AlarmID" Content="E.D27.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D280h" Content="EtherCAT組態錯誤 - EtherCAT組態錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D280h::AlarmID" Content="E.D28.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D290h" Content="EtherCAT未燒錄XML文件 - EtherCAT未燒錄XML文件" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D290h::AlarmID" Content="E.D29.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D300h" Content="EtherCAT通訊初始化失敗 - EtherCAT通訊初始化失敗" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D300h::AlarmID" Content="E.D30.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D310h" Content="EtherCAT同步週期設定錯誤 - EtherCAT同步週期設定錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D310h::AlarmID" Content="E.D31.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D320h" Content="EtherCAT同步訊號偏差過大 - EtherCAT同步訊號偏差過大" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D320h::AlarmID" Content="E.D32.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D400h" Content="PN通訊同步狀態異常 - 網路線無連接" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D400h::AlarmID" Content="E.D40.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D401h" Content="PN通訊同步狀態異常 - 掉線" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D401h::AlarmID" Content="E.D40.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D402h" Content="PN通訊同步狀態異常 - 心跳監控異常" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D402h::AlarmID" Content="E.D40.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D410h" Content="PN同步訊號偏差過大" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D410h::AlarmID" Content="E.D41.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D420h" Content="PN並口偵測錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D420h::AlarmID" Content="E.D42.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D430h" Content="系統參數錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_AL::ID=D430h::AlarmID" Content="E.D43.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2200h" Content="正向超程警告 - 正向超程警告" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2200h::AlarmID" Content="A.220.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2210h" Content="負向超程警告 - 負向超程警告" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2210h::AlarmID" Content="A.221.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2220h" Content="輸入缺相警告 - 輸入缺相警告" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2220h::AlarmID" Content="A.222.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2230h" Content="AI零偏過大警告" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2230h::AlarmID" Content="A.223.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2240h" Content="煞車電阻過載警告 - 煞車電阻過載" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2240h::AlarmID" Content="A.224.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2250h" Content="煞車電阻未接警告 - 軟體偵測煞車電阻未接" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2250h::AlarmID" Content="A.225.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2251h" Content="煞車電阻未接警告 - 硬體偵測煞車電阻未接" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2251h::AlarmID" Content="A.225.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2260h" Content="外接煞車電阻阻值過小警告 - 外接煞車電阻阻值過小" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=2260h::AlarmID" Content="A.226.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=4250h" Content="原點回零超時警告 - 原點回零超時警告" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=4250h::AlarmID" Content="A.425.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=4260h" Content="需重新上電警告 - 需重新上電警告" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=4260h::AlarmID" Content="A.426.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=4270h" Content="參數存儲異常警告 - 參數存儲異常警告" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=4270h::AlarmID" Content="A.427.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=4280h" Content="分頻輸出設定錯誤警告 - 分頻輸出設定錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=4280h::AlarmID" Content="A.428.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=7132h" Content="參數辨識失敗警告 - 採樣錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=7132h::AlarmID" Content="A.713.2" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=7133h" Content="參數辨識失敗警告 - 檢驗上升時間錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=7133h::AlarmID" Content="A.713.3" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=7134h" Content="參數辨識失敗警告 - 檢定超調量錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=7134h::AlarmID" Content="A.713.4" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=7135h" Content="參數辨識失敗警告 - Q軸電流穩態誤差檢驗" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=7135h::AlarmID" Content="A.713.5" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=7136h" Content="參數辨識失敗警告 - D軸電流穩態誤差檢驗" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=7136h::AlarmID" Content="A.713.6" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9200h" Content="編碼器異常警告 - 編碼器內部演算法錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9200h::AlarmID" Content="A.920.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9210h" Content="編碼器電池電壓過低警告 - 編碼器電池電壓過低" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9210h::AlarmID" Content="A.921.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9280h" Content="ABZ編碼器回饋超頻 - ABZ編碼器回饋超頻" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9280h::AlarmID" Content="A.928.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=D350h" Content="回零方式設定錯誤警告 - 回零模式6098h參數設定錯誤" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=D350h::AlarmID" Content="A.D35.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9150h" Content="旋變編碼器訊號故障 - 訊號遺失（LOS：0 0）" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9150h::AlarmID" Content="A.915.0" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9151h" Content="旋變編碼器訊號故障 - 訊號降級（DOS：0 1）" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9151h::AlarmID" Content="A.915.1" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9152h" Content="旋變編碼器訊號故障 - 追蹤遺失（LOT：1 0）" />
+	<Message ID="AlarmMsg::Drv_ECAT_HR3-ER_WR::ID=9152h::AlarmID" Content="A.915.2" />
+</ResMap>

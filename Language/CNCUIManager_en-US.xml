@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Error_Unavailable" Content="The CNC UI module is not available." />
+	<Message ID="Error_AlreadyInitialized" Content="The CNC UI module is already initialized." />
+	<Message ID="Error_UIThread" Content="Initialize the CNC UI module on the WinForms UI thread after the host loads." />
+	<Message ID="Error_Resources" Content="Unable to initialize CNC resources." />
+	<Message ID="Error_CalibrationSync" Content="Unable to synchronize three-point calibration data: {0}" />
+	<Message ID="Error_PreparationBusy" Content="NC machining preparation is still running." />
+	<Message ID="Error_PreparationUnavailable" Content="The NC machining preparation workflow is not configured." />
+	<Message ID="Error_NotInitialized" Content="The CNC UI module is not initialized." />
+	<Message ID="Error_InvalidIP" Content="Enter a valid CNC IP address." />
+	<Message ID="Error_ConnectionBusy" Content="A CNC connection operation is in progress." />
+	<Message ID="Notice_Connected" Content="CNC connected successfully." />
+	<Message ID="Error_Connect" Content="CNC connection was not completed: {0}" />
+	<Message ID="Notice_Disconnected" Content="CNC disconnected." />
+	<Message ID="Error_Disconnect" Content="CNC disconnection is not confirmed: {0}" />
+	<Message ID="Error_ClientUnavailable" Content="The CNC client is not available." />
+	<Message ID="Error_ReadAxes" Content="Unable to read CNC axis settings: {0}" />
+	<Message ID="Error_Initialization" Content="CNC initialization failed: {0}" />
+	<Message ID="Error_Operation" Content="CNC operation failed: {0}" />
+	<Message ID="Error_Offset" Content="Unable to open program coordinate offsets: {0}" />
+	<Message ID="Notice_Reconnecting" Content="Reconnecting to CNC…" />
+	<Message ID="Notice_Reconnected" Content="CNC reconnected successfully." />
+	<Message ID="Error_Reconnect" Content="CNC reconnection failed. Check the network or CNC status." />
+	<Message ID="Error_PanelUnavailable" Content="The CNC control panel is not available." />
+	<Message ID="Error_PanelInitialized" Content="The CNC control panel is already initialized." />
+	<Message ID="Error_PanelUIThread" Content="Initialize the CNC control panel on the WinForms UI thread." />
+	<Message ID="Error_PanelSubscription" Content="Unable to initialize CNC control panel resource subscriptions." />
+	<Message ID="Error_MonitorUnavailable" Content="The CNC information panel is not available." />
+	<Message ID="Error_MonitorInitialized" Content="The CNC information panel is already initialized." />
+	<Message ID="Error_MonitorUIThread" Content="Initialize the CNC information panel on the WinForms UI thread." />
+	<Message ID="Error_MonitorSubscription" Content="Unable to initialize CNC information panel resource subscriptions." />
+	<Message ID="Error_AlarmUnavailable" Content="The CNC alarm monitor is not available." />
+	<Message ID="Error_AlarmUIThread" Content="Initialize the CNC alarm monitor on the WinForms UI thread." />
+</ResMap>

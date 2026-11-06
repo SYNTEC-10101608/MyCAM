@@ -12,6 +12,8 @@
 	<Message ID="NCFileSaveFailed" Content="[NC Export Status] File save failed: {0}" />
 	<Message ID="NCExportSuccessNoController" Content="[NC Export Status] NC export successful&#xA;[File Transfer Status] Not connected to controller, file cannot be transferred" />
 	<Message ID="NCExportAndTransferSuccess" Content="[NC Export Status] NC export successful&#xA;[File Transfer Status] NC file transfer successful" />
+	<Message ID="MainProgramAssignSuccess" Content="[Main Program Assignment Status] Assigned main program: {0}" />
+	<Message ID="MainProgramAssignFailed" Content="[Main Program Assignment Status] Failed to assign main program: {0}" />
 	<Message ID="NCExportSuccessTransferFailed" Content="[NC Export Status] NC export successful&#xA;[File Transfer Status] NC file transfer failed: {0}" />
 	<Message ID="SaveNCFileTitle" Content="Save NC File" />
 	<Message ID="NoIntersectingFaceFound" Content="[Action Reminder] No intersecting face found" />

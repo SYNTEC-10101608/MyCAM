@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Title_Current" Content="当前警报（{0}）" />
+	<Message ID="Title_Stale" Content="当前警报（未更新）" />
+	<Message ID="m_colCode" Content="代码" />
+	<Message ID="m_colText" Content="警报内容" />
+	<Message ID="Status_Updating" Content="正在更新警报，数据尚未确认" />
+	<Message ID="Status_Disconnected" Content="连接中断，警报数据未更新" />
+	<Message ID="Status_ReadFailed" Content="警报读取失败，数据未更新：{0}" />
+	<Message ID="Format_AxisName" Content="{0}轴" />
+	<Message ID="Format_AxisNumber" Content="第{0}轴" />
+	<Message ID="Format_SpindleNumber" Content="第{0}主轴" />
+	<Message ID="Format_StationNumber" Content="Station {0}h" />
+</ResMap>

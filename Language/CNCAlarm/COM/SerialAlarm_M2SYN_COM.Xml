@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=10h" Content="IGBT Overheat."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=11h" Content="Motor Overheat."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=12h" Content="DC BUS Over voltage."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=13h" Content="Low voltage."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=14h" Content="Motor Over Speed."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=15h" Content="Over current."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=16h" Content="Overload."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=17h" Content="Auto-tuning over current."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=18h" Content="DSP Watchdog Reset."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=19h" Content="Servo On Timeout."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=1Ah" Content="Power Module Over Current."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=1Ch" Content="Encoder error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=1Dh" Content="Hall sensor error 1."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=1Eh" Content="Hall sensor error 2."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=1Fh" Content="Excessive Following Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=20h" Content="Zero Speed Check Fail."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=21h" Content="Regenerative resistance error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=22h" Content="Cooling Fan error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=23h" Content="Encoder Index Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=24h" Content="Encoder Direction Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=25h" Content="Encoder Resolution Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=26h" Content="Motor Pole Number Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=27h" Content="Encoder No Feedback."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=28h" Content="Encoder Pulse Loss."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=29h" Content="Identification Error of Induction Motor Parameter 1."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=2Ah" Content="Identification Error Of Induction Motor Parameter 2."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=2Bh" Content="Acceleration Limit Too Large."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=2Ch" Content="Initial Value of Inertia is Set Unsuitable."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=2Dh" Content="Voltage Saturation."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=2Eh" Content="Control board error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=2Fh" Content="Incorrect setting of operational curve for V/f control."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=30h" Content="V/f Overcurrent."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=31h" Content="Over Torque 1."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=32h" Content="Over Torque 2."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=33h" Content="2nd Encoder Index Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=34h" Content="2nd Encoder Direction Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=35h" Content="2nd Encoder resolution error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=36h" Content="2nd Encoder no feedback."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=37h" Content="Encoder2 error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=38h" Content="Over position error between 1st and 2nd feedback."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=39h" Content="2nd Encoder Pulse Loss."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=3Ah" Content="Syntec Encoder Pitch Compensation Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=3Ch" Content="Posing Failure."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=3Dh" Content="Encoder Offset Searching Failure."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=3Eh" Content="Inertia Tuning Startup Failure."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=3Fh" Content="Parameter Saving Command is Illegal."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=40h" Content="Encoder Internal KTY84 Over Temperature."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=41h" Content="Encoder External(1) KTY84 Over Temperature."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=42h" Content="Encoder External(2) KTY84 Over Temperature."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=44h" Content="2nd Encoder Internal KTY84 Over Temperature."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=45h" Content="2nd Encoder External(1) KTY84 Over Temperature."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=46h" Content="2nd Encoder External(2) KTY84 Over Temperature."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=48h" Content="Encoder Packet Successive Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=49h" Content="2nd Encoder Packet Successive Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=4Ah" Content="Syntec Encoder Runs in Bootloader Mode."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=4Bh" Content="2nd Syntec Encoder Runs in Bootloader Mode."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=4Ch" Content="Serial Encoder Communication Type is Wrong."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=4Dh" Content="2nd Serial Encoder Communication Type is Wrong."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=4Fh" Content="Encoder Calibration Stall Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=50h" Content="Current Tuning Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=51h" Content="Encoder Halt Alarm."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=52h" Content="2nd Encoder Halt Alarm."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=53h" Content="Inverter Type Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=54h" Content="Encoder Z Index Shift."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=55h" Content="2nd Encoder Z Index Shift."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=56h" Content="2nd Encoder Battery Low Voltage Position Loss."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=57h" Content="Absolute Type 2nd Encoder battery Low Voltage Alarm."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=58h" Content="Encoder Download Parameters Fail."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=59h" Content="2nd Encoder Download Parameters Fail."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=5Ah" Content="Encoder Internal KTY84 Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=5Bh" Content="Encoder External(1) KTY84 is Unplugged."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=5Ch" Content="Encoder External(2) KTY84 is Unplugged."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=5Eh" Content="2nd Encoder internal KTY84 Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=5Fh" Content="2nd Encoder External(1) KTY84 is Unplugged."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=60h" Content="2nd Encoder External(2) KTY84 is Unplugged."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=62h" Content="Posing Deviate."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=63h" Content="Servo On Command Conflict."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=6Ah" Content="Encoder not recognized."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=6Bh" Content="2nd Encoder not recognized."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=70h" Content="The Software Version Is Not Supported."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=71h" Content="FPGA Download Failed."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=72h" Content="Drive Overload."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=73h" Content="Rotor Position Detection Fail."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=74h" Content="Inertia Tuning Loading Too Large."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=75h" Content="Encoder Register Access Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=76h" Content="2nd Encoder Register Access Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=77h" Content="Rotor Position Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=78h" Content="Load Inertia Value Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=79h" Content="Linear Motor Sensor Test Fail."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=80h" Content="Linear Motor Magnetic Pitch Setting Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=81h" Content="Serious Belt slip."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=810h" Content="Encoder Battery Low Voltage Position Loss."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=830h" Content="ABS Type Encoder Battery Low Voltage Alarm."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=850h" Content="Encoder Over Speed."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=860h" Content="Encoder Internal Over Temperature."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=8A5h" Content="2nd Encoder Over Speed."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=8A6h" Content="2nd Encoder Internal Over Temperature."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=920h" Content="Servo On Command Conflict ."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=923h" Content="Cooling Fan Error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=930h" Content="ABS Type Encoder Battery Low Voltage."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=931h" Content="Encoder Voltage Warning."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=932h" Content="Encoder Noise Warning."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=935h" Content="ABS Type 2nd Encoder Battery Low Voltage."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=936h" Content="2nd Encoder Voltage Warning."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=937h" Content="2nd Encoder Noise Warning."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=981h" Content="Belt slip."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=E30h" Content="Mechatrolink position command error."/>
+	<Message ID="AlarmMsg::Drv_M2_SYNTEC::ID=E50h" Content="Mechatrolink Synchronization Error."/>
+</ResMap>

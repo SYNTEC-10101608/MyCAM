@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ResMap>
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=1h" Content="过电流" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=2h" Content="过电压" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3h" Content="低电压" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=4h" Content="马达匹配异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=5h" Content="回生异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=6h" Content="过负荷" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=7h" Content="过速度" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=8h" Content="异常脉波控制命令" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=9h" Content="位置控制误差过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=11h" Content="位置检出器异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=12h" Content="校正异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=13h" Content="紧急停止" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=14h" Content="反向极限异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=15h" Content="正向极限异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=16h" Content="IGBT过热" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=17h" Content="参数内存异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=18h" Content="检出器输出异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=19h" Content="串行通讯异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=20h" Content="串行通讯逾时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=22h" Content="主回路电源异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=23h" Content="预先过负载警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=24h" Content="编码器初始磁场错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=25h" Content="编码器内部错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=26h" Content="编码器内部数据可靠度错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=27h" Content="编码器内部重置错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=28h" Content="编码器高电压错误或编码器内部错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=29h" Content="格雷码错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=30h" Content="马达碰撞错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=31h" Content="马达U, V, W接线错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=34h" Content="编码器内部通讯异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=35h" Content="编码器温度超过保护上限" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=40h" Content="全死循环位置控制误差过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=41h" Content="光学尺断线" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=42h" Content="模拟速度电压输入过高" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=44h" Content="驱动器功能使用率警报" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=45h" Content="电子齿轮比设定错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=60h" Content="绝对位置遗失" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=61h" Content="编码器低电压错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=62h" Content="绝对式位置圈数溢位" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=68h" Content="绝对型数据I/O传输错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=69h" Content="马达型式错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=6Ah" Content="绝对位置未初始化" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=70h" Content="编码器处置未完成警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=83h" Content="电流侦测范围异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=85h" Content="回生异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=95h" Content="回生电阻断线" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=99h" Content="DSP韧体升级" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=111h" Content="CANopen SDO 接收溢位" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=112h" Content="CANopen PDO 接收溢位" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=121h" Content="CANopen PDO 存取时，Index 错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=122h" Content="CANopen PDO 存取时，Sub-Index 错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=123h" Content="CANopen PDO 存取时，数据Size 错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=124h" Content="CANopen PDO 存取时，数据范围错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=125h" Content="CANopen PDO 对象是只读，不可写入" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=126h" Content="CANopen PDO 对象无法支持 PDO" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=127h" Content="CANopen PDO 对象在 Servo On 时，不允许写入" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=128h" Content="CANopen PDO 对象，由EEPROM 读取时错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=129h" Content="CANopen PDO 对象，写入EEPROM 时错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=130h" Content="CANopen PDO 对象，EEPROM 的地址超过限制" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=131h" Content="CANopen PDO 对象，EEPROM 的CRC 计算错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=132h" Content="CANopen PDO 对象，写入密码错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=170h" Content="CANopen Heartbeat 或NodeGuarding 错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=180h" Content="CANopen Heartbeat 或NodeGuarding 错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=185h" Content="CAN Bus 硬件异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=186h" Content="CAN Bus off" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=201h" Content="CANopen 数据初始错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=207h" Content="PR 命令Type 8 来源参数群组超出范围" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=209h" Content="PR 命令Type 8 来源参数编号超出范围" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=213h" Content="PR 命令Type 8 指令参数设定错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=215h" Content="写入参数:只读" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=217h" Content="写入参数:参数锁定" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=231h" Content="PR 命令Type 8 来源监视项目超出范围" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=235h" Content="PR 命令溢位" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=237h" Content="分度坐标未定义" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=245h" Content="PR 定位超时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=249h" Content="PR 路径编号太大" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=261h" Content="CAN 对象存取时，Index错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=263h" Content="CAN 对象存取时，Sub-Index错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=265h" Content="CAN 对象存取时，数据Size错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=267h" Content="CAN 对象存取时，数据范围错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=269h" Content="CAN 对象是只读，不可写入" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=26Bh" Content="CAN 对象，不允许PDO" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=26Dh" Content="CAN 对象，Servo On 时，不允许写入" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=26Fh" Content="CAN 对象，由EE-PROM 读取时错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=271h" Content="CAN 对象，写入EE-PROM时错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=273h" Content="CAN 对象，EE-PROM 的地址超过限制" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=275h" Content="CAN 对象，EE-PROM 的CRC 计算错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=277h" Content="CAN 对象，写入密码错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=283h" Content="软件正向极限" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=285h" Content="软件负向极限" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=289h" Content="位置计数器溢位" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=291h" Content="Servo OFF 异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=301h" Content="CANopen 同步失效" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=302h" Content="CANopen 同步信号太快" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=303h" Content="CANopen 同步信号超时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=304h" Content="CANopen IP 命令失效" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=305h" Content="SYNC Period 错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=380h" Content="位置偏移警报" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3E1h" Content="CANopen 同步失败" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3E2h" Content="CANopen 同步讯号错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3E3h" Content="CANopen 同步讯号逾时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3E4h" Content="CANopen IP 命令失效" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3E5h" Content="同步讯号周期错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=400h" Content="分度坐标错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=401h" Content="Servo On 时收到NMT Reset 命令" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=404h" Content="PR 特殊滤波器设定过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=500h" Content="STO 功能被启动" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=501h" Content="STO_A lost (信号遗失或错误)" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=502h" Content="STO_B lost (信号遗失或错误)" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=503h" Content="STO_error" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=555h" Content="系统故障" />
+</ResMap>

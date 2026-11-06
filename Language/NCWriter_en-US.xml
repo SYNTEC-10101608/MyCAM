@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="Error_PostProcessing" Content="Post-processing calculation error, path: {0}" />
+	<Message ID="Error_CalibrationRequired" Content="No valid calculated three-point calibration inputs are available. Calculate first or explicitly select drawing-point-only output." />
 </ResMap>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Title_Current" Content="Текущие аварии ({0})" />
+	<Message ID="Title_Stale" Content="Текущие аварии (не обновлены)" />
+	<Message ID="m_colCode" Content="Код" />
+	<Message ID="m_colText" Content="Сообщение аварии" />
+	<Message ID="Status_Updating" Content="Обновление аварий; данные ещё не подтверждены." />
+	<Message ID="Status_Disconnected" Content="Нет связи; данные аварий не обновлены." />
+	<Message ID="Status_ReadFailed" Content="Не удалось прочитать аварии; данные не обновлены: {0}" />
+	<Message ID="Format_AxisName" Content="Ось {0}" />
+	<Message ID="Format_AxisNumber" Content="Ось {0}" />
+	<Message ID="Format_SpindleNumber" Content="Шпиндель {0}" />
+	<Message ID="Format_StationNumber" Content="Станция {0}h" />
+</ResMap>

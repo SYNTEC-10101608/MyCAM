@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Macro::ID=1" Content="轮廓中最低点低于平台" />
+	<Message ID="AlarmMsg::Macro::ID=2" Content="垂直轴或延伸轴的每次的进刀量小于或等于0" />
+	<Message ID="AlarmMsg::Macro::ID=3" Content="最大圆弧弦长小于或等于0" />
+	<Message ID="AlarmMsg::Macro::ID=4" Content="最大圆弧半径小于或等于0" />
+	<Message ID="AlarmMsg::Macro::ID=5" Content="指定的轮廓路径有误" />
+	<Message ID="AlarmMsg::Macro::ID=6" Content="轮廓中G02或G03的指定有误" />
+	<Message ID="AlarmMsg::Macro::ID=7" Content="最小圆弧半径小于或等于0" />
+	<Message ID="AlarmMsg::Macro::ID=11" Content="钻(塘)孔循环进刀平面R低于孔底平面" />
+	<Message ID="AlarmMsg::Macro::ID=12" Content="钻(塘)孔循环未指定欲钻(塘)孔方向之深度" />
+	<Message ID="AlarmMsg::Macro::ID=13" Content="啄式钻孔循环未指定进刀量Q" />
+	<Message ID="AlarmMsg::Macro::ID=15" Content="多孔钻孔孔数不可为零" />
+	<Message ID="AlarmMsg::Macro::ID=16" Content="快钻G81更改上拉速度的F2自变量必须为整数" />
+	<Message ID="AlarmMsg::Macro::ID=17" Content="G41、G42模式下不可启动G12.1" />
+	<Message ID="AlarmMsg::Macro::ID=18" Content="G96模式下不可启动G12.1" />
+	<Message ID="AlarmMsg::Macro::ID=19" Content="G12.1轴向不存在" />
+	<Message ID="AlarmMsg::Macro::ID=20" Content="G41、G42模式下不可结束G12.1" />
+	<Message ID="AlarmMsg::Macro::ID=31" Content="XY平面进给深度太小" />
+	<Message ID="AlarmMsg::Macro::ID=32" Content="Z轴进给深度太小" />
+	<Message ID="AlarmMsg::Macro::ID=40" Content="加工方向未指定" />
+	<Message ID="AlarmMsg::Macro::ID=41" Content="刀具直径太大，超出加工物" />
+	<Message ID="AlarmMsg::Macro::ID=42" Content="圆角半径太小比刀径小，或太大无法加入角隅" />
+	<Message ID="AlarmMsg::Macro::ID=51" Content="X轴步进值超过限定值" />
+	<Message ID="AlarmMsg::Macro::ID=52" Content="Y轴步进值超过限定值" />
+	<Message ID="AlarmMsg::Macro::ID=53" Content="Z轴步进值超过限定值" />
+	<Message ID="AlarmMsg::Macro::ID=54" Content="X轴长度小于0" />
+	<Message ID="AlarmMsg::Macro::ID=55" Content="Y轴宽度小于0" />
+	<Message ID="AlarmMsg::Macro::ID=56" Content="Z轴最大深度小于0" />
+	<Message ID="AlarmMsg::Macro::ID=57" Content="棋盘孔X轴起始孔不可小于等于0" />
+	<Message ID="AlarmMsg::Macro::ID=58" Content="棋盘孔Y轴起始孔不可小于等于0" />
+	<Message ID="AlarmMsg::Macro::ID=59" Content="棋盘孔自动补偿孔数不可小于等于0" />
+	<Message ID="AlarmMsg::Macro::ID=405" Content="非一般铣床请使用自定义暂停点回归程序" />
+	<Message ID="AlarmMsg::Macro::ID=406" Content="G53.6需在G40模式下启用" />
+	<Message ID="AlarmMsg::Macro::ID=407" Content="G53.6选用刀号不可为0" />
+	<Message ID="AlarmMsg::Macro::ID=408" Content="刀具对正失效或失败" />
+	<Message ID="AlarmMsg::Macro::ID=499" Content="攻牙回退使用时机错误" />
+	<Message ID="AlarmMsg::Macro::ID=500" Content="攻牙回退自变量错误" />
+</ResMap>

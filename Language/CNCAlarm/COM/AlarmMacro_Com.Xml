@@ -1,0 +1,50 @@
+﻿<ResMap>
+  <!--========================= MACRO Alarm =========================-->
+  <Message ID="AlarmMsg::Macro::ID=100" Content="Gas control argument error. Please check the numerical range and enter again."/>
+  <Message ID="AlarmMsg::Macro::ID=101" Content="Test pressure must be greater than zero, please enter again."/>
+  <Message ID="AlarmMsg::Macro::ID=102" Content="The set pressure exceeds the maximum calibration pressure."/>
+  <Message ID="AlarmMsg::Macro::ID=110" Content="Rapid positioning argument error. Z axis target height must be entered"/>
+  <Message ID="AlarmMsg::Macro::ID=115" Content="Workpiece Coordinate number is out of range. Please check the numerical range and enter again"/>
+  <Message ID="AlarmMsg::Macro::ID=116" Content="Plate Coordinate number is out of range. Please check the numerical range and enter again"/>
+  <Message ID="AlarmMsg::Macro::ID=120" Content="Piercing height and target piercing height must be larger than zero, please enter again."/>
+  <Message ID="AlarmMsg::Macro::ID=121" Content="Gradual piercing feedrate must be larger than zero, please enter again."/>
+  <Message ID="AlarmMsg::Macro::ID=122" Content="Plate lenghts must be larger than zero to use seek edge function, please enter again."/>
+  <Message ID="AlarmMsg::Macro::ID=130" Content="Tracking-axis height setting error, please confirm NCprogram Z command is larger than zero." />
+  <Message ID="AlarmMsg::Macro::ID=133" Content="Auto Focal position command exceeds limit, please check Z1 command in NC program" />
+  <Message ID="AlarmMsg::Macro::ID=134" Content="DA focal axis is not calibrated, please check Machine Maker setting" />
+  <Message ID="AlarmMsg::Macro::ID=135" Content="Tracking-axis has not returned Home yet, other axial movement commands are issued." />
+  <Message ID="AlarmMsg::Macro::ID=140" Content="Calibration table does not exist, please do the calibration first."/>
+  <Message ID="AlarmMsg::Macro::ID=141" Content="Unsupported calibration angle."/>
+  <Message ID="AlarmMsg::Macro::ID=142" Content="A, B axis not at origin."/>
+  <Message ID="AlarmMsg::Macro::ID=143" Content="Positioning not support this machine type"/>
+  <Message ID="AlarmMsg::Macro::ID=144" Content="Input argument of five axis positioning module is incomplete"/>
+  <Message ID="AlarmMsg::Macro::ID=146" Content="Not able to touch workpiece. Please adjust calibration position or tracking axis's negative limit."/>
+  <Message ID="AlarmMsg::Macro::ID=151" Content="The process parameter does not exist, please check it in NC program."/>
+  <Message ID="AlarmMsg::Macro::ID=160" Content="Tube profile not entered"/>
+  <Message ID="AlarmMsg::Macro::ID=161" Content="B axis not returning to origin"/>
+  <Message ID="AlarmMsg::Macro::ID=162" Content="The starting position of the support table is not calibrated"/>
+  <Message ID="AlarmMsg::Macro::ID=163" Content="The rotation axis is not posing right"/>
+  <Message ID="AlarmMsg::Macro::ID=164" Content="Unable to detect the tube"/>
+  <Message ID="AlarmMsg::Macro::ID=170" Content="Can't find material front tip"/>
+  <Message ID="AlarmMsg::Macro::ID=171" Content="Can't find material back tip"/>
+  <Message ID="AlarmMsg::Macro::ID=172" Content="Material not long enough"/>
+  <Message ID="AlarmMsg::Macro::ID=173" Content="Multi-Point calibration file does not exist, please complete calibration settings first"/>
+  <Message ID="AlarmMsg::Macro::ID=174" Content="Process can not start due to calibration failure. Please clear calibration values."/>
+  <Message ID="AlarmMsg::Macro::ID=177" Content="Multiple calibration reference points format error."/>
+  <Message ID="AlarmMsg::Macro::ID=178" Content="Multiple calibration points format error."/>
+  <Message ID="AlarmMsg::Macro::ID=179" Content="Five-axis mechanism parameter setting error"/>
+  <Message ID="AlarmMsg::Macro::ID=180" Content="The parameters are not completed hence unable to calculate tool vector, please check NC"/>
+  <Message ID="AlarmMsg::Macro::ID=181" Content="The input parameter of standard circle pattern is not correct"/>
+  <Message ID="AlarmMsg::Macro::ID=182" Content="The input parameter of standard slot pattern is not correct"/>
+  <Message ID="AlarmMsg::Macro::ID=183" Content="The input parameter of standard rectangle pattern is not correct"/>
+  <Message ID="AlarmMsg::Macro::ID=184" Content="The input parameter of standard polygon pattern is not correct"/>
+  <Message ID="AlarmMsg::Macro::ID=185" Content="Please contact the manufacturer regarding the issue with the resume cut calculation."/>
+  <Message ID="AlarmMsg::Macro::ID=186" Content="The input of the circle shrinkage calculation parameter is wrong."/>
+  <Message ID="AlarmMsg::Macro::ID=187" Content="Please confirm that the process param. and SY_CIRC param. circle compensations are correct."/>
+  <Message ID="AlarmMsg::Macro::ID=189" Content="Calibration failed: beyond tolerance limit."/>
+  <Message ID="AlarmMsg::Macro::ID=191" Content="Angle calculation is not defined for parallel vectors. Please confirm that the argument vectors are not parallel."/>
+  <Message ID="AlarmMsg::Macro::ID=198" Content="Layer max acceleration exceeds 1% of motion set.Please check parameters."/>
+  <Message ID="AlarmMsg::Macro::ID=202" Content="Executed G-Code is out of range. Please ensure it is between G600 and G999."/>
+  <Message ID="AlarmMsg::Macro::ID=1000" Content="Process can not start due to calibration failure. Please clear calibration values."/>
+  <Message ID="AlarmMsg::Macro::ID=1008" Content="Multi-Point calibration file does not exist, please complete calibration settings first"/>
+</ResMap>

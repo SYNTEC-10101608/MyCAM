@@ -13,6 +13,12 @@
 	<Message ID="m_tsbCNCConnection" Content="CNC連線設定" />
 	<Message ID="m_tsmiLanguage" Content="語系切換" />
 	<Message ID="m_tsbController" Content="控制器" />
+	<Message ID="m_tsmiControllerAdvancedSettings" Content="控制器進階設定" />
+	<Message ID="m_tsmiMachining" Content="加工" />
+	<Message ID="m_tsbSetOffset" Content="設定偏置" />
+	<Message ID="m_tsbSetOffset_ToolTip" Content="設定程式座標偏置" />
+	<Message ID="m_tsbProcessSettings" Content="工藝設置" />
+	<Message ID="m_tsbProcessSettings_ToolTip" Content="開啟控制器工藝設置" />
 
 	<!-- 檔案工具列 -->
 	<Message ID="m_tsbImport3DFile" Content="3D模型" />
@@ -146,6 +152,7 @@
 	<Message ID="m_tsbLayerNone_ToolTip" Content="不加工" />
 	<Message ID="m_tsbNeedProcess_ToolTip" Content="加工" />
 
+	<Message ID="Log_ViewerInitFailed" Content="顯示器初始化失敗" />
 	<Message ID="Log_UseDefaultMachineProject" Content="使用默認機構專案檔" />
 	<Message ID="Log_MachineNodeNull" Content="機構參數節點為空,使用默認機構參數" />
 	<Message ID="Log_MachineFileNull" Content="機構檔案為空,使用默認機構參數" />
@@ -162,6 +169,10 @@
 	<Message ID="Log_CNCReconnected" Content="CNC 重新連線成功" />
 	<Message ID="Log_CNCReconnectFailed" Content="CNC 重新連線失敗，請檢查網路或 CNC 狀態" />
 	<Message ID="Log_CNCPleaseConnectFirst" Content="尚未和CNC連線，請先進行CNC連線" />
+	<Message ID="Log_VNCConnectionError" Content="VNC 連線失敗：{0}" />
+	<Message ID="Log_CNCConnectionError" Content="CNC 連線流程失敗：{0}" />
+	<Message ID="Log_CNCShutdownUnconfirmed" Content="CNC 關閉未確認：{0}" />
+	<Message ID="Log_ShutdownFailed" Content="關閉流程失敗：{0}" />
 
 	<!-- 存檔提示 -->
 	<Message ID="Msg_SaveBeforeExitTitle" Content="存檔確認" />

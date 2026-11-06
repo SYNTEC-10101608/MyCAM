@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ResMap>
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0001h" Content="过电流 1" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0001h::AlarmID" Content="AL.001" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0002h" Content="过电流 2" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0002h::AlarmID" Content="AL.002" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0003h" Content="过电流 3" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0003h::AlarmID" Content="AL.003" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0004h" Content="超速" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0004h::AlarmID" Content="AL.004" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0005h" Content="控制电源欠电压" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0005h::AlarmID" Content="AL.005" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0006h" Content="过电压" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0006h::AlarmID" Content="AL.006" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0007h" Content="编码器异常 1" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0007h::AlarmID" Content="AL.007" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0008h" Content="编码器异常 2" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0008h::AlarmID" Content="AL.008" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0009h" Content="( 控制电源基板 )控制电路异常 1" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0009h::AlarmID" Content="AL.009" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=000Bh" Content="( 驱动器基板 )控制电路异常 1" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=000Bh::AlarmID" Content="AL.11" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=000Ch" Content="( 驱动器基板 )控制电路异常 2" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=000Ch::AlarmID" Content="AL.012" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=000Dh" Content="( 电机 )控制电路异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=000Dh::AlarmID" Content="AL.013" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=000Eh" Content="内存异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=000Eh::AlarmID" Content="AL.014" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=000Fh" Content="( 主电路 )保险丝断开" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=000Fh::AlarmID" Content="AL.015" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0011h" Content="电机组合异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0011h::AlarmID" Content="AL.017" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0012h" Content="编码器设定异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0012h::AlarmID" Content="AL.018" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0014h" Content="编码器通信超时异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0014h::AlarmID" Content="AL.020" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0015h" Content="编码器初始化异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0015h::AlarmID" Content="AL.021" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0016h" Content="编码器传输异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0016h::AlarmID" Content="AL.022" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0017h" Content="编码器 2通信超时异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0017h::AlarmID" Content="AL.023" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0018h" Content="编码器 2异常 1" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0018h::AlarmID" Content="AL.024" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0019h" Content="编码器 2传输异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0019h::AlarmID" Content="AL.025" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=001Ah" Content="全死循环偏差过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=001Ah::AlarmID" Content="AL.026" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=001Bh" Content="编码器 2 CRC 异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=001Bh::AlarmID" Content="AL.027" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0025h" Content="超载 1" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0025h::AlarmID" Content="AL.037" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0026h" Content="超载 2" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0026h::AlarmID" Content="AL.038" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0027h" Content="主电路电源欠电压 1" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0027h::AlarmID" Content="AL.039" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0028h" Content="主电路电源欠电压 2" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0028h::AlarmID" Content="AL.040" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=002Ah" Content="再生超载" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=002Ah::AlarmID" Content="AL.042" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=002Bh" Content="再生晶体管异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=002Bh::AlarmID" Content="AL.043" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=002Ch" Content="偏差过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=002Ch::AlarmID" Content="AL.044" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=002Fh" Content="编码器过热" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=002Fh::AlarmID" Content="AL.047" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0030h" Content="ABS 资料丢失 1" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0030h::AlarmID" Content="AL.048" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0031h" Content="ABS 资料丢失 2" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0031h::AlarmID" Content="AL.049" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0032h" Content="ABS 资料丢失 3" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0032h::AlarmID" Content="AL.050" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0033h" Content="多圈溢出" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0033h::AlarmID" Content="AL.051" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0035h" Content="再生 ON 时间异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0035h::AlarmID" Content="AL.053" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0036h" Content="IPM 过热" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0036h::AlarmID" Content="AL.054" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0039h" Content="STO 检出" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0039h::AlarmID" Content="AL.057" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=003Fh" Content="FPGA 初始化异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=003Fh::AlarmID" Content="AL.063" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0050h" Content="轴通信异常 1 WD 异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0050h::AlarmID" Content="AL.080" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0051h" Content="轴通信异常 2 Stata change 异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0051h::AlarmID" Content="AL.081" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0052h" Content="轴通信异常 3 不正确的 Stata" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0052h::AlarmID" Content="AL.082" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0054h" Content="轴通信异常 5 同步异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0054h::AlarmID" Content="AL.084" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0055h" Content="轴通信异常 6 初始化异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0055h::AlarmID" Content="AL.085" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0057h" Content="轴通信异常 8 EEPROM 异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0057h::AlarmID" Content="AL.087" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0058h" Content="轴通信异常 9 设定异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0058h::AlarmID" Content="AL.088" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0059h" Content="轴通信异常 10 指令异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_AL::ID=0059h::AlarmID" Content="AL.089" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_WR::ID=005Fh" Content="驱动器冷却扇停止警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_WR::ID=005Fh::AlarmID" Content="AL.095" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_WR::ID=0078h" Content="限位开关警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_WR::ID=0078h::AlarmID" Content="AL.120" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_WR::ID=0096h" Content="电池电压低下警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_MORIKAWA_WR::ID=0096h::AlarmID" Content="AL.150" />
+</ResMap>

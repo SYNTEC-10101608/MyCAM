@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="m_lblAuxiliaryTitle" Content="Auxiliary" />
+	<Message ID="m_btnOuterEquipParameters" Content="Parameters" />
+	<Message ID="m_btnShutter" Content="Shutter" />
+	<Message ID="m_btnAir" Content="Air" />
+	<Message ID="m_btnFollow" Content="Follow" />
+	<Message ID="m_btnLaser" Content="Laser" />
+	<Message ID="m_btnFocus" Content="Focus" />
+	<Message ID="m_btnCalibration" Content="Calibrate" />
+	<Message ID="m_lblJogTitle" Content="Jog axes" />
+	<Message ID="JogMode_Continuous" Content="Jog" />
+	<Message ID="JogMode_Inching" Content="Step" />
+	<Message ID="m_btnEndpoint" Content="ManualRTCP" />
+	<Message ID="m_lblHomeTitle" Content="Homing" />
+	<Message ID="m_btnHomeProgram" Content="Program zero" />
+	<Message ID="m_btnHomeMachine" Content="Machine zero" />
+	<Message ID="m_btnSafePosition" Content="Safe pos." />
+	<Message ID="m_lblStrategyTitle" Content="Strategy" />
+	<Message ID="m_btnResumeCutParameters" Content="Parameters" />
+	<Message ID="m_btnDryRun" Content="Dry run" />
+	<Message ID="m_btnResumeCutting" Content="Resume cut" />
+	<Message ID="m_btnHandwheelSimulation" Content="Handwheel" />
+	<Message ID="m_lblMachiningTitle" Content="Machining" />
+	<Message ID="m_chbThreePointCalibration" Content="Three-point calibration" />
+	<Message ID="m_lblFeedOverrideTitle" Content="Feed override" />
+	<Message ID="m_btnStart" Content="Start" />
+	<Message ID="m_btnPause" Content="Pause" />
+	<Message ID="m_btnContinue" Content="Continue" />
+	<Message ID="m_btnStop" Content="Stop" />
+	<Message ID="Confirm_Calibration" Content="Move the nozzle to within 1–5 mm of the target. Keep the machine stationary and free from vibration." />
+	<Message ID="Confirm_Home" Content="The axes are about to move. Make sure the travel paths are clear of obstacles." />
+	<Message ID="Title_HomeProgram" Content="Return to program zero" />
+	<Message ID="Title_HomeMachine" Content="Return to machine zero" />
+	<Message ID="Error_Parameters" Content="Failed to write the parameter settings command." />
+	<Message ID="Error_ThreePointCalibration" Content="Failed to write the three-point calibration enable state." />
+	<Message ID="Error_ThreePointCalibrationDetails" Content="Failed to write the three-point calibration enable state: {0}" />
+</ResMap>

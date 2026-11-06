@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="m_lblAxisHeader" Content="Ось" />
+	<Message ID="m_lblCoordinateHeader" Content="Коорд." />
+	<Message ID="m_lblHeightGroupTitle" Content="Ось высоты" />
+	<Message ID="m_lblCapacitanceTitle" Content="Ёмкость" />
+	<Message ID="m_lblHeightTitle" Content="Коорд. оси" />
+	<Message ID="m_lblFollowHeightTitle" Content="Выс. слеж." />
+	<Message ID="m_lblActualHeightTitle" Content="Факт. выс." />
+	<Message ID="m_lblMachiningTitle" Content="Состояние" />
+	<Message ID="m_lblMainProgramTitle" Content="Имя файла" />
+	<Message ID="m_lblSpeedTitle" Content="Подача" />
+	<Message ID="m_lblPowerTitle" Content="Мощность" />
+	<Message ID="m_lblFrequencyTitle" Content="Частота" />
+	<Message ID="m_lblDutyCycleTitle" Content="Заполнение" />
+	<Message ID="m_lblFocusTitle" Content="Фокус" />
+	<Message ID="m_lblTimeTitle" Content="Время" />
+	<Message ID="AxisRole_Head" Content="Гол." />
+	<Message ID="AxisRole_Table" Content="Стол" />
+	<Message ID="CoordinateMode_Machine" Content="Станок ⇄" />
+	<Message ID="CoordinateMode_Program" Content="Программа ⇄" />
+	<Message ID="Status_NotReady" Content="Не готов" />
+	<Message ID="Status_Ready" Content="Готов" />
+	<Message ID="Status_Machining" Content="Обработка" />
+	<Message ID="Status_Paused" Content="Пауза" />
+	<Message ID="Status_Alarm" Content="Авария" />
+	<Message ID="Status_Record" Content="Запись" />
+	<Message ID="Error_Offset" Content="Не удалось открыть смещение координат программы: {0}" />
+	<Message ID="Error_ThreePointCalibration" Content="Не удалось открыть калибровку по трём точкам: {0}" />
+</ResMap>

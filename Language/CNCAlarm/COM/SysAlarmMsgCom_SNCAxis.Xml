@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=1" Content="Setpoint axis station ID is repeated with other devices"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=2" Content="Start R Register setting is out of range, please reassign R register"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=3" Content="Acceleration time or speed setting error"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=4" Content="Check window setting error"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=5" Content="Incremental encoder is not supported"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=6" Content="Home position is not set, please set home position first"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=7" Content="Absolute encoder related parameter changed, please reboot the CNC controller and reset home position"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=8" Content="Drive station ID does not exist"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=9" Content="Drive communication error"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=10" Content="Drive parameter writing failed"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=11" Content="Drive power is abnormal"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=12" Content="Setpoint axis command exceeds limit"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=13" Content="The firmware update of Syntec encoder is finished, please reboot the drive"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=14" Content="Syntec encoder information reading timeout"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=15" Content="Axial feedback is abnormal"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=16" Content="Poor contact of communication wire" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=17" Content="The hardware doesn't receive communication packet" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=18" Content="The communication packet is disturbed by noise" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=19" Content="Driver software misses communication packet" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=20" Content="Exceeding the positive software stroke limit" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=21" Content="Exceeding the negative software stroke limit" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=22" Content="The driver is not 'power on', please check the power connection status" />
+</ResMap>

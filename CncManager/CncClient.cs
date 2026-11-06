@@ -1,216 +1,328 @@
 using CncManager.CNCCore;
 using CncManager.Definition;
 using System;
+using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CncManager
 {
-	// CNC connection client facade for MyCAM.
+	// Shared connection lifecycle. Events may be raised on background threads.
 	public class CncClient : IDisposable
 	{
-		public static CncClient Instance
-		{
-			get
-			{
-				if( m_Instance == null ) {
-					m_Instance = new CncClient();
-				}
-				return m_Instance;
-			}
-		}
-
-		// state
+		public static CncClient Instance => m_Instance.Value;
 		public bool IsConnected
 		{
 			get
 			{
-				return CNCCore.CncApi.IsConnected;
+				return ConnectionState == CncConnectionState.Connected && CncApi.IsConnected;
 			}
 		}
 
-		// events for MyCAM UI
+		public CncConnectionState ConnectionState
+		{
+			get
+			{
+				lock( m_StateLock ) {
+					return m_ConnectionState;
+				}
+			}
+		}
+
+		public string IP
+		{
+			get
+			{
+				lock( m_StateLock ) {
+					return m_IP;
+				}
+			}
+		}
+
+		public event Action<CncConnectionState> ConnectionStateChanged;
 		public event Action<ERecconectStage> ReconnectStatusChanged;
 		public event Action<CncStatus> CncStatusChanged;
 		public event Action<int, int> RRegisterChanged;
-
-		// raised when connect fails, carries error message for logging
 		public event Action<string> ConnectFailed;
+		public event Action<string> OperationFailed;
+		public event Action ResetHappened;
+		public event Action AlarmChanged;
+		public event Action ParameterChanged;
 
 		CncClient()
 		{
 		}
 
-		// set UI thread context for event callback
-		public void SetSynchronizationContext( SynchronizationContext context )
-		{
-			m_SyncContext = context;
-		}
-
 		public bool Connect( string ip, int timeoutMs = CncConstants.DEFAULT_CONNECT_TIMEOUT_MS )
 		{
-			if( IsConnected ) {
-				return true;
-			}
-
-			// drop leftovers from a previous failed attempt before creating new instances
-			ReleaseConnectionResources();
-
-			// create ConnectChecker and CncApi instances
-			m_CncApi = new CncApi( ip, timeoutMs );
-			m_Checker = new CncConnectChecker( m_CncApi );
-
-			// wire events
-			m_CncApi.OnCncStatusChanged += OnCncStatusChanged;
-			m_CncApi.RRegisterChanged += OnRRegisterChanged;
-			m_CncApi.ConnectFailed += OnConnectFailed;
-
-			m_Checker.Reconnecting += OnCheckerReconnecting;
-			m_Checker.Reconnected += OnCheckerReconnected;
-			m_Checker.ReconnectFailed += OnCheckerReconnectFailed;
-
-			// try connect
-			bool isSuccess = m_CncApi.Connect();
-			if( !isSuccess ) {
-				// roll back so the next Connect() starts from a clean state
-				ReleaseConnectionResources();
-				return false;
-			}
-
-			// only after a successful connect: subscribe OpenCNC events and start the heartbeat
-			m_CncApi.SubscribeAllEvents();
-			m_Checker.Start();
-			return true;
+			return ConnectAsync( ip, timeoutMs ).GetAwaiter().GetResult().IsSuccess;
 		}
 
-		public void Dispose()
+		public async Task<CncResult<bool>> ConnectAsync( string ip,
+			int timeoutMs = CncConstants.DEFAULT_CONNECT_TIMEOUT_MS, CancellationToken cancellationToken = default( CancellationToken ) )
 		{
-			// Disconnect() stops the connection and releases the api/checker instances
-			Disconnect();
+			ip = ip?.Trim();
+			if( !IPAddress.TryParse( ip, out IPAddress address ) || timeoutMs <= 0 ) {
+				return CncResult<bool>.Failure( CncResultStatus.Failed, CncMessages.InvalidConnection );
+			}
+			if( !await m_Lifecycle.WaitAsync( 0 ).ConfigureAwait( false ) ) {
+				return CncResult<bool>.Failure( CncResultStatus.Busy, CncMessages.LifecycleBusy );
+			}
+			try {
+				if( cancellationToken.IsCancellationRequested ) {
+					return CncResult<bool>.Failure( CncResultStatus.Cancelled, CncMessages.ConnectionCancelled );
+				}
+				if( IsConnected && IP == ip ) {
+					return CncResult<bool>.Success( true );
+				}
+				var cleanup = await DisconnectCoreAsync().ConfigureAwait( false );
+				if( !cleanup.IsSuccess || CncApi.HasPendingOperation ) {
+					return cleanup.IsSuccess ? CncResult<bool>.Failure( CncResultStatus.Busy, CncMessages.PreviousOperationRunning ) : cleanup;
+				}
+				lock( m_StateLock ) {
+					m_ConnectionCancellation = CancellationTokenSource.CreateLinkedTokenSource( cancellationToken );
+				}
+				CancellationToken token = m_ConnectionCancellation.Token;
+				SetConnectionState( CncConnectionState.Connecting, ip );
+				m_CncApi = new CncApi( ip, timeoutMs );
+				WireApi( m_CncApi );
+				m_Checker = new CncConnectChecker( m_CncApi );
+				m_Checker.Reconnecting += OnCheckerReconnecting;
+				m_Checker.Reconnected += OnCheckerReconnected;
+				m_Checker.ReconnectFailed += OnCheckerReconnectFailed;
+				var result = await m_CncApi.ConnectAsync( token ).ConfigureAwait( false );
+				if( result.IsSuccess ) {
+					result = await m_CncApi.SubscribeAllEventsAsync().ConfigureAwait( false );
+				}
+				if( token.IsCancellationRequested ) {
+					result = CncResult<bool>.Failure( CncResultStatus.Cancelled, CncMessages.ConnectionCancelled );
+				}
+				if( !result.IsSuccess ) {
+					await DisconnectCoreAsync().ConfigureAwait( false );
+					SetConnectionState( result.Status == CncResultStatus.Cancelled ? CncConnectionState.Disconnected : CncConnectionState.Error, ip );
+					if( result.Status != CncResultStatus.Cancelled ) {
+						Raise( ConnectFailed, result.ErrorMessage );
+					}
+					return result;
+				}
+				SetConnectionState( CncConnectionState.Connected, ip );
+				await RefreshStatusAsync().ConfigureAwait( false );
+				if( !token.IsCancellationRequested && IsConnected ) {
+					m_Checker.Start();
+					return CncResult<bool>.Success( true );
+				}
+				await DisconnectCoreAsync().ConfigureAwait( false );
+				return CncResult<bool>.Failure( CncResultStatus.Cancelled, CncMessages.SessionEnded );
+			}
+			catch( Exception ex ) {
+				await DisconnectCoreAsync().ConfigureAwait( false );
+				SetConnectionState( CncConnectionState.Error, ip );
+				Raise( ConnectFailed, ex.Message );
+				return CncResult<bool>.Failure( CncResultStatus.Failed, ex.Message );
+			}
+			finally {
+				m_Lifecycle.Release();
+			}
 		}
 
 		public void Disconnect()
 		{
-			// stop the heartbeat/reconnect loops first
-			if( m_Checker != null ) {
-				try {
-					m_Checker.StopConnectLoop();
-				}
-				catch( Exception ) {
-					// ignore
-				}
-			}
-			if( m_CncApi != null ) {
-				try {
-					m_CncApi.UnsubscribeAllEvents();
-					m_CncApi.Disconnect();
-				}
-				catch( Exception ) {
-					// ignore
-				}
-			}
-			// release instances so the next Connect() creates fresh ones
-			ReleaseConnectionResources();
+			DisconnectAsync().GetAwaiter().GetResult();
 		}
 
-		// Releases the CncApi and CncConnectChecker instances and unwires all events
-		void ReleaseConnectionResources()
+		public async Task<CncResult<bool>> DisconnectAsync()
 		{
+			lock( m_StateLock ) {
+				m_ConnectionCancellation?.Cancel();
+			}
+			await m_Lifecycle.WaitAsync().ConfigureAwait( false );
+			try {
+				return await DisconnectCoreAsync().ConfigureAwait( false );
+			}
+			finally {
+				m_Lifecycle.Release();
+			}
+		}
+
+		public void Dispose()
+		{
+			Disconnect();
+		}
+
+		async Task<CncResult<bool>> DisconnectCoreAsync()
+		{
+			m_CncApi?.Invalidate();
+			lock( m_StateLock ) {
+				m_ConnectionCancellation?.Cancel();
+			}
 			if( m_Checker != null ) {
+				await m_Checker.StopConnectLoopAsync().ConfigureAwait( false );
 				m_Checker.Reconnecting -= OnCheckerReconnecting;
 				m_Checker.Reconnected -= OnCheckerReconnected;
 				m_Checker.ReconnectFailed -= OnCheckerReconnectFailed;
-
-				// Dispose() also unsubscribes from CncApi.ConnectionError
 				m_Checker.Dispose();
 				m_Checker = null;
 			}
+			m_UnwireApi?.Invoke();
+			m_UnwireApi = null;
+			var result = CncResult<bool>.Success( true );
 			if( m_CncApi != null ) {
-				m_CncApi.OnCncStatusChanged -= OnCncStatusChanged;
-				m_CncApi.RRegisterChanged -= OnRRegisterChanged;
-				m_CncApi.ConnectFailed -= OnConnectFailed;
-				m_CncApi = null;
+				result = await m_CncApi.DisconnectAsync().ConfigureAwait( false );
+				if( result.IsSuccess ) {
+					m_CncApi = null;
+				}
 			}
+			lock( m_StateLock ) {
+				m_ConnectionCancellation?.Dispose();
+				m_ConnectionCancellation = null;
+			}
+			SetConnectionState( result.IsSuccess ? CncConnectionState.Disconnected : CncConnectionState.Error, IP );
+			return result;
+		}
+
+		void WireApi( CncApi api )
+		{
+			Action<CncStatus> status = value => { if( m_CncApi == api ) { OnCncStatusChanged( value ); } };
+			Action<int, int> register = ( index, value ) => { if( m_CncApi == api ) { Raise( RRegisterChanged, handler => ( (Action<int, int>)handler )( index, value ) ); } };
+			Action<string> error = value => { if( m_CncApi == api ) { Raise( OperationFailed, value ); } };
+			Action lost = () => { if( m_CncApi == api ) { SetConnectionState( CncConnectionState.Reconnecting, IP ); } };
+			EventHandler reset = ( sender, args ) => Raise( ResetHappened, handler => ( (Action)handler )() );
+			EventHandler alarm = ( sender, args ) => Raise( AlarmChanged, handler => ( (Action)handler )() );
+			EventHandler param = ( sender, args ) => Raise( ParameterChanged, handler => ( (Action)handler )() );
+			api.OnCncStatusChanged += status;
+			api.RRegisterChanged += register;
+			api.OperationFailed += error;
+			api.ConnectionError += lost;
+			api.OnCNCResetHappen += reset;
+			api.OnCNCAlarmChanged += alarm;
+			api.OnParamChanged += param;
+			m_UnwireApi = () =>
+			{
+				api.OnCncStatusChanged -= status;
+				api.RRegisterChanged -= register;
+				api.OperationFailed -= error;
+				api.ConnectionError -= lost;
+				api.OnCNCResetHappen -= reset;
+				api.OnCNCAlarmChanged -= alarm;
+				api.OnParamChanged -= param;
+			};
 		}
 
 		void OnCncStatusChanged( CncStatus status )
 		{
-			try {
-				CncStatusChanged?.Invoke( status );
+			lock( m_StateLock ) {
+				if( !CncApi.IsConnected || m_ConnectionCancellation == null || m_ConnectionCancellation.IsCancellationRequested ||
+					( m_ConnectionState != CncConnectionState.Connected && m_ConnectionState != CncConnectionState.Connecting ) ) {
+					return;
+				}
 			}
-			catch( Exception ) {
-				// ignore
-			}
+			Raise( CncStatusChanged, status );
 		}
 
-		void OnRRegisterChanged( int index, int value )
+		public async Task<CncResult<CncStatus>> RefreshStatusAsync()
 		{
-			try {
-				RRegisterChanged?.Invoke( index, value );
+			CncApi api = m_CncApi;
+			CncResult<CncStatus> result;
+			do {
+				result = await CncApi.GetCncStatusAsync().ConfigureAwait( false );
+				if( result.Status == CncResultStatus.Busy ) {
+					await Task.Delay( CncConstants.PLC_SCANNING_TIME_MS ).ConfigureAwait( false );
+				}
+			} while( m_CncApi == api && IsConnected && result.Status == CncResultStatus.Busy );
+			if( api != null && m_CncApi == api && IsConnected && result.IsSuccess ) {
+				OnCncStatusChanged( result.Data );
 			}
-			catch( Exception ) {
-				// ignore
-			}
+			return result;
 		}
 
-		void OnConnectFailed( string errorMessage )
+		void SetConnectionState( CncConnectionState state, string ip )
 		{
-			try {
-				ConnectFailed?.Invoke( errorMessage );
+			bool changed;
+			lock( m_StateLock ) {
+				changed = m_ConnectionState != state;
+				m_ConnectionState = state;
+				m_IP = ip;
 			}
-			catch( Exception ) {
-				// ignore
+			if( changed ) {
+				Raise( ConnectionStateChanged, state );
 			}
 		}
 
 		// checker -> manager -> UI: forward reconnect events to subscribers
 		void OnCheckerReconnecting()
 		{
-			NotifyUi( ERecconectStage.Reconnecting );
+			if( IsStopping ) {
+				return;
+			}
+			SetConnectionState( CncConnectionState.Reconnecting, IP );
+			Raise( ReconnectStatusChanged, ERecconectStage.Reconnecting );
 		}
 
-		void OnCheckerReconnected()
+		async void OnCheckerReconnected()
 		{
-			NotifyUi( ERecconectStage.Reconnected );
+			try {
+				if( IsStopping || !CncApi.IsConnected ) {
+					return;
+				}
+				SetConnectionState( CncConnectionState.Connected, IP );
+				Raise( ReconnectStatusChanged, ERecconectStage.Reconnected );
+				await RefreshStatusAsync().ConfigureAwait( false );
+			}
+			catch( Exception ex ) {
+				System.Diagnostics.Trace.TraceError( "CNC reconnect status refresh failed: {0}", ex );
+				if( !IsStopping ) {
+					Raise( OperationFailed, ex.Message );
+				}
+			}
 		}
 
 		void OnCheckerReconnectFailed()
 		{
-			NotifyUi( ERecconectStage.ReconnectFailed );
-		}
-
-		void NotifyUi( ERecconectStage eventType )
-		{
-			if( ReconnectStatusChanged == null ) {
+			if( IsStopping ) {
 				return;
 			}
-
-			// switch to UI thread if context set
-			if( m_SyncContext != null ) {
-				m_SyncContext.Post( RaiseReconnectStatusChangedOnUiThread, eventType );
-			}
-			else {
-				try {
-					ReconnectStatusChanged.Invoke( eventType );
-				}
-				catch( Exception ) {
-					// ignore
-				}
-			}
+			SetConnectionState( CncConnectionState.Error, IP );
+			Raise( ReconnectStatusChanged, ERecconectStage.ReconnectFailed );
 		}
 
-		void RaiseReconnectStatusChangedOnUiThread( object state )
+		static void Raise<T>( Action<T> handlers, T value )
 		{
-			try {
-				ReconnectStatusChanged?.Invoke( (ERecconectStage)state );
+			Raise( handlers, handler => ( (Action<T>)handler )( value ) );
+		}
+
+		static void Raise( Delegate handlers, Action<Delegate> invoke )
+		{
+			if( handlers == null ) {
+				return;
 			}
-			catch( Exception ) {
-				// ignore
+			foreach( Delegate handler in handlers.GetInvocationList() ) {
+				try {
+					invoke( handler );
+				}
+				catch( Exception ex ) {
+					System.Diagnostics.Trace.TraceError( "CNC subscriber failed: {0}", ex );
+				}
 			}
 		}
 
-		static CncClient m_Instance;
+		static readonly Lazy<CncClient> m_Instance = new Lazy<CncClient>( () => new CncClient() );
+		bool IsStopping
+		{
+			get
+			{
+				lock( m_StateLock ) {
+					return m_ConnectionCancellation == null || m_ConnectionCancellation.IsCancellationRequested;
+				}
+			}
+		}
+
+		readonly SemaphoreSlim m_Lifecycle = new SemaphoreSlim( 1, 1 );
+		readonly object m_StateLock = new object();
+		CncConnectionState m_ConnectionState = CncConnectionState.Disconnected;
+		string m_IP;
+		CancellationTokenSource m_ConnectionCancellation;
 		CncApi m_CncApi;
 		CncConnectChecker m_Checker;
-		SynchronizationContext m_SyncContext;
+		Action m_UnwireApi;
 	}
 }

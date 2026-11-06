@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Error_Unavailable" Content="CNC UI 模組無法使用。" />
+	<Message ID="Error_AlreadyInitialized" Content="CNC UI 模組已初始化。" />
+	<Message ID="Error_UIThread" Content="請在宿主載入後，於 WinForms UI 執行緒初始化 CNC UI 模組。" />
+	<Message ID="Error_Resources" Content="無法初始化 CNC 資源。" />
+	<Message ID="Error_CalibrationSync" Content="三點校正資料同步失敗：{0}" />
+	<Message ID="Error_PreparationBusy" Content="NC 加工準備仍在執行。" />
+	<Message ID="Error_PreparationUnavailable" Content="尚未設定 NC 加工準備流程。" />
+	<Message ID="Error_NotInitialized" Content="CNC UI 模組尚未初始化。" />
+	<Message ID="Error_InvalidIP" Content="請輸入有效的 CNC IP 位址。" />
+	<Message ID="Error_ConnectionBusy" Content="CNC 連線流程正在執行。" />
+	<Message ID="Notice_Connected" Content="CNC 連線成功。" />
+	<Message ID="Error_Connect" Content="CNC 連線未完成：{0}" />
+	<Message ID="Notice_Disconnected" Content="CNC 已斷線。" />
+	<Message ID="Error_Disconnect" Content="CNC 斷線未確認：{0}" />
+	<Message ID="Error_ClientUnavailable" Content="CNC 用戶端無法使用。" />
+	<Message ID="Error_ReadAxes" Content="CNC 軸設定讀取失敗：{0}" />
+	<Message ID="Error_Initialization" Content="CNC 初始化失敗：{0}" />
+	<Message ID="Error_Operation" Content="CNC 操作失敗：{0}" />
+	<Message ID="Error_Offset" Content="無法開啟程式座標偏置：{0}" />
+	<Message ID="Notice_Reconnecting" Content="CNC 重新連線中…" />
+	<Message ID="Notice_Reconnected" Content="CNC 重新連線成功。" />
+	<Message ID="Error_Reconnect" Content="CNC 重新連線失敗，請檢查網路或 CNC 狀態。" />
+	<Message ID="Error_PanelUnavailable" Content="CNC 控制面板無法使用。" />
+	<Message ID="Error_PanelInitialized" Content="CNC 控制面板已初始化。" />
+	<Message ID="Error_PanelUIThread" Content="請在 WinForms UI 執行緒初始化 CNC 控制面板。" />
+	<Message ID="Error_PanelSubscription" Content="無法初始化 CNC 控制面板資源訂閱。" />
+	<Message ID="Error_MonitorUnavailable" Content="CNC 監控面板無法使用。" />
+	<Message ID="Error_MonitorInitialized" Content="CNC 監控面板已初始化。" />
+	<Message ID="Error_MonitorUIThread" Content="請在 WinForms UI 執行緒初始化 CNC 監控面板。" />
+	<Message ID="Error_MonitorSubscription" Content="無法初始化 CNC 監控面板資源訂閱。" />
+	<Message ID="Error_AlarmUnavailable" Content="CNC 警報監控無法使用。" />
+	<Message ID="Error_AlarmUIThread" Content="請在 WinForms UI 執行緒初始化 CNC 警報監控。" />
+</ResMap>

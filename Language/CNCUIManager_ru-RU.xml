@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Error_Unavailable" Content="Модуль интерфейса ЧПУ недоступен." />
+	<Message ID="Error_AlreadyInitialized" Content="Модуль интерфейса ЧПУ уже инициализирован." />
+	<Message ID="Error_UIThread" Content="Инициализируйте модуль интерфейса ЧПУ в потоке WinForms UI после загрузки хоста." />
+	<Message ID="Error_Resources" Content="Не удалось инициализировать ресурсы ЧПУ." />
+	<Message ID="Error_CalibrationSync" Content="Не удалось синхронизировать данные калибровки по трём точкам: {0}" />
+	<Message ID="Error_PreparationBusy" Content="Подготовка обработки NC ещё выполняется." />
+	<Message ID="Error_PreparationUnavailable" Content="Процесс подготовки обработки NC не настроен." />
+	<Message ID="Error_NotInitialized" Content="Модуль интерфейса ЧПУ не инициализирован." />
+	<Message ID="Error_InvalidIP" Content="Введите допустимый IP-адрес ЧПУ." />
+	<Message ID="Error_ConnectionBusy" Content="Выполняется операция подключения к ЧПУ." />
+	<Message ID="Notice_Connected" Content="Подключение к ЧПУ установлено." />
+	<Message ID="Error_Connect" Content="Подключение к ЧПУ не завершено: {0}" />
+	<Message ID="Notice_Disconnected" Content="ЧПУ отключено." />
+	<Message ID="Error_Disconnect" Content="Отключение ЧПУ не подтверждено: {0}" />
+	<Message ID="Error_ClientUnavailable" Content="Клиент ЧПУ недоступен." />
+	<Message ID="Error_ReadAxes" Content="Не удалось прочитать настройки осей ЧПУ: {0}" />
+	<Message ID="Error_Initialization" Content="Ошибка инициализации ЧПУ: {0}" />
+	<Message ID="Error_Operation" Content="Ошибка операции ЧПУ: {0}" />
+	<Message ID="Error_Offset" Content="Не удалось открыть окно смещений программных координат: {0}" />
+	<Message ID="Notice_Reconnecting" Content="Повторное подключение к ЧПУ…" />
+	<Message ID="Notice_Reconnected" Content="Повторное подключение к ЧПУ установлено." />
+	<Message ID="Error_Reconnect" Content="Не удалось восстановить связь с ЧПУ. Проверьте сеть и состояние ЧПУ." />
+	<Message ID="Error_PanelUnavailable" Content="Панель управления ЧПУ недоступна." />
+	<Message ID="Error_PanelInitialized" Content="Панель управления ЧПУ уже инициализирована." />
+	<Message ID="Error_PanelUIThread" Content="Инициализируйте панель управления ЧПУ в потоке WinForms UI." />
+	<Message ID="Error_PanelSubscription" Content="Не удалось инициализировать подписки на ресурсы панели управления ЧПУ." />
+	<Message ID="Error_MonitorUnavailable" Content="Панель информации ЧПУ недоступна." />
+	<Message ID="Error_MonitorInitialized" Content="Панель информации ЧПУ уже инициализирована." />
+	<Message ID="Error_MonitorUIThread" Content="Инициализируйте панель информации ЧПУ в потоке WinForms UI." />
+	<Message ID="Error_MonitorSubscription" Content="Не удалось инициализировать подписки на ресурсы панели информации ЧПУ." />
+	<Message ID="Error_AlarmUnavailable" Content="Монитор аварий ЧПУ недоступен." />
+	<Message ID="Error_AlarmUIThread" Content="Инициализируйте монитор аварий ЧПУ в потоке WinForms UI." />
+</ResMap>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Title" Content="Калибровка по трём точкам" />
+	<Message ID="PickDrawing" Content="Выбрать заново" />
+	<Message ID="Reset" Content="Сброс" />
+	<Message ID="Cancel" Content="Отмена" />
+	<Message ID="DrawingPoints" Content="Точки чертежа" />
+	<Message ID="WorkpiecePoints" Content="Точки детали" />
+	<Message ID="Point" Content="Т. {0}" />
+	<Message ID="Capture" Content="Ввести" />
+	<Message ID="Tolerance" Content="Допуск" />
+	<Message ID="Error" Content="Ошибка" />
+	<Message ID="Calculate" Content="Расчёт" />
+	<Message ID="DrawingOnly" Content="Выводить только точки чертежа" />
+	<Message ID="DrawingOnly_Offline" Content="Только точки чертежа (нет связи)" />
+	<Message ID="Error_Unavailable" Content="Нет данных" />
+	<Message ID="Validation_DrawingIncomplete" Content="Полностью задайте все три точки чертежа." />
+	<Message ID="Validation_WorkpieceIncomplete" Content="Полностью задайте все три точки детали." />
+	<Message ID="Validation_Tolerance" Content="Допуск должен быть допустимым числом не меньше 0." />
+	<Message ID="Validation_Input" Content="Введите допустимое число. Допуск не может быть отрицательным." />
+	<Message ID="Validation_Point" Content="{0} {1}: X, Y и Z должны быть заданы допустимыми числами." />
+	<Message ID="Step_Drawing" Content="Шаг 1: Точки чертежа" />
+	<Message ID="Step_Workpiece" Content="Шаг 2: Точки детали" />
+	<Message ID="Step_Calculation" Content="Шаг 3: Допуск и расчёт" />
+	<Message ID="Drawing_Repicking" Content="Выберите заново точку чертежа {0} на главном холсте." />
+	<Message ID="Drawing_Picking" Content="Выберите точку чертежа {0} на главном холсте (выбрано {1}/3)." />
+	<Message ID="Drawing_Complete" Content="Точки чертежа заданы. Для повторного выбора нажмите «Выбрать заново»." />
+	<Message ID="Drawing_Initial" Content="Выберите по порядку три точки чертежа на главном холсте." />
+	<Message ID="Workpiece_Waiting" Content="Сначала выберите все три точки чертежа на главном холсте." />
+	<Message ID="Workpiece_Complete" Content="Точки детали заданы. Укажите допуск и нажмите «Расчёт»." />
+	<Message ID="Workpiece_Initial" Content="Переместитесь к каждой точке детали, нажмите «Ввести» или введите координаты." />
+	<Message ID="Step_Current" Content="Текущий" />
+	<Message ID="Step_Complete" Content="Готово" />
+	<Message ID="Step_WaitDrawing" Content="Ожидание шага 1" />
+	<Message ID="Step_WaitBoth" Content="Ожидание шагов 1 и 2" />
+	<Message ID="Step_Format" Content="{0} ({1})" />
+	<Message ID="Error_Initialization" Content="Инициализируйте калибровку по трём точкам один раз в потоке WinForms UI." />
+	<Message ID="Error_Subscription" Content="Не удалось инициализировать подписку на допуск калибровки." />
+	<Message ID="Error_NoHost" Content="Хост данных калибровки не настроен." />
+	<Message ID="Confirm_Close" Content="{0}&#10;Всё равно закрыть? Изменения этого сеанса не будут сохранены." />
+	<Message ID="Error_ReadTolerance" Content="Не удалось прочитать допуск: {0}" />
+	<Message ID="Error_WriteTolerance" Content="Не удалось записать допуск: {0}" />
+	<Message ID="Error_PickingUnsupported" Content="Текущий хост не поддерживает выбор точек на холсте." />
+	<Message ID="Error_PickingStart" Content="Не удалось начать выбор точек на холсте." />
+	<Message ID="Error_DrawingUnavailable" Content="Сначала добавьте деталь и завершите текущий выбор точек чертежа." />
+	<Message ID="Error_EditorUnavailable" Content="Редактор холста ещё не готов." />
+	<Message ID="Error_InputOffline" Content="Нет связи с ЧПУ. Введённые данные не записаны в контроллер." />
+	<Message ID="Error_WriteInput" Content="Не удалось записать @{0}: {1}" />
+	<Message ID="Error_Capture" Content="Не удалось получить координаты программы: {0}" />
+	<Message ID="Error_CalculateOffline" Content="Нет связи с ЧПУ. Расчёт недоступен." />
+	<Message ID="Error_NoSaveHost" Content="Хост данных калибровки не настроен. Результаты нельзя сохранить." />
+	<Message ID="Validation_AllPoints" Content="Полностью задайте три точки чертежа и три точки детали." />
+	<Message ID="Error_Calculation" Content="Калибровка не выполнена, ошибка превышает допуск или корректное значение ошибки не получено. Данные расчёта сохранены." />
+	<Message ID="Error_ProjectChanged" Content="Проект или данные калибровки чертежа изменились. Эти изменения не будут сохранены." />
+	<Message ID="Confirm_DiscardUncalculated" Content="Расчёт для этих данных не выполнен или данные изменены после расчёта. При закрытии будут восстановлены данные последнего расчёта." />
+	<Message ID="Confirm_DiscardAndClose" Content="Отменить изменения без расчёта и закрыть окно?" />
+	<Message ID="Error_ReadResult" Content="Не удалось прочитать ошибку калибровки." />
+	<Message ID="Error_CalculationDetails" Content="Расчёт не выполнен или ошибка превышает допуск: {0}" />
+</ResMap>

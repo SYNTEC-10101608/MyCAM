@@ -1,0 +1,181 @@
+namespace CncUI.Dialog
+{
+	partial class CNCOffsetDialog
+	{
+		private System.ComponentModel.IContainer components = null;
+
+		protected override void Dispose( bool disposing )
+		{
+			if( disposing && components != null ) {
+				components.Dispose();
+			}
+			base.Dispose( disposing );
+		}
+
+		private void InitializeComponent()
+		{
+			this.m_pnlOffset = new System.Windows.Forms.Panel();
+			this.m_lblX = new System.Windows.Forms.Label();
+			this.m_lblY = new System.Windows.Forms.Label();
+			this.m_lblZ = new System.Windows.Forms.Label();
+			this.m_lblRotary1 = new System.Windows.Forms.Label();
+			this.m_lblRotary2 = new System.Windows.Forms.Label();
+			this.m_lblXValue = new System.Windows.Forms.Label();
+			this.m_lblYValue = new System.Windows.Forms.Label();
+			this.m_lblZValue = new System.Windows.Forms.Label();
+			this.m_lblRotary1Value = new System.Windows.Forms.Label();
+			this.m_lblRotary2Value = new System.Windows.Forms.Label();
+			this.m_btnXZero = new CommonUI.Controls.PanelButton();
+			this.m_btnYZero = new CommonUI.Controls.PanelButton();
+			this.m_btnZZero = new CommonUI.Controls.PanelButton();
+			this.m_btnRotary1Zero = new CommonUI.Controls.PanelButton();
+			this.m_btnRotary2Zero = new CommonUI.Controls.PanelButton();
+			this.m_btnClear = new CommonUI.Controls.PanelButton();
+			this.m_pnlOffset.SuspendLayout();
+			this.SuspendLayout();
+			this.m_pnlOffset.Location = new System.Drawing.Point( 0, 0 );
+			this.m_pnlOffset.Name = "m_pnlOffset";
+			this.m_pnlOffset.Size = new System.Drawing.Size( 300, 232 );
+			this.m_pnlOffset.TabIndex = 0;
+			this.m_lblX.Location = new System.Drawing.Point( 12, 14 );
+			this.m_lblX.Name = "m_lblX";
+			this.m_lblX.Size = new System.Drawing.Size( 22, 28 );
+			this.m_lblX.Text = "X";
+			this.m_lblX.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.m_lblX.Font = new System.Drawing.Font( "Microsoft JhengHei", 10F, System.Drawing.FontStyle.Bold );
+			this.m_lblY.Location = new System.Drawing.Point( 12, 48 );
+			this.m_lblY.Name = "m_lblY";
+			this.m_lblY.Size = new System.Drawing.Size( 22, 28 );
+			this.m_lblY.Text = "Y";
+			this.m_lblY.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.m_lblY.Font = new System.Drawing.Font( "Microsoft JhengHei", 10F, System.Drawing.FontStyle.Bold );
+			this.m_lblZ.Location = new System.Drawing.Point( 12, 82 );
+			this.m_lblZ.Name = "m_lblZ";
+			this.m_lblZ.Size = new System.Drawing.Size( 22, 28 );
+			this.m_lblZ.Text = "Z";
+			this.m_lblZ.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.m_lblZ.Font = new System.Drawing.Font( "Microsoft JhengHei", 10F, System.Drawing.FontStyle.Bold );
+			this.m_lblRotary1.Location = new System.Drawing.Point( 12, 116 );
+			this.m_lblRotary1.Name = "m_lblRotary1";
+			this.m_lblRotary1.Size = new System.Drawing.Size( 22, 28 );
+			this.m_lblRotary1.Text = "—";
+			this.m_lblRotary1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.m_lblRotary1.Font = new System.Drawing.Font( "Microsoft JhengHei", 10F, System.Drawing.FontStyle.Bold );
+			this.m_lblRotary2.Location = new System.Drawing.Point( 12, 150 );
+			this.m_lblRotary2.Name = "m_lblRotary2";
+			this.m_lblRotary2.Size = new System.Drawing.Size( 22, 28 );
+			this.m_lblRotary2.Text = "—";
+			this.m_lblRotary2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.m_lblRotary2.Font = new System.Drawing.Font( "Microsoft JhengHei", 10F, System.Drawing.FontStyle.Bold );
+			this.m_lblXValue.Location = new System.Drawing.Point( 38, 14 );
+			this.m_lblXValue.Name = "m_lblXValue";
+			this.m_lblXValue.Size = new System.Drawing.Size( 160, 28 );
+			this.m_lblXValue.Text = "— mm";
+			this.m_lblXValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblXValue.Font = new System.Drawing.Font( "Consolas", 10F );
+			this.m_lblYValue.Location = new System.Drawing.Point( 38, 48 );
+			this.m_lblYValue.Name = "m_lblYValue";
+			this.m_lblYValue.Size = new System.Drawing.Size( 160, 28 );
+			this.m_lblYValue.Text = "— mm";
+			this.m_lblYValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblYValue.Font = new System.Drawing.Font( "Consolas", 10F );
+			this.m_lblZValue.Location = new System.Drawing.Point( 38, 82 );
+			this.m_lblZValue.Name = "m_lblZValue";
+			this.m_lblZValue.Size = new System.Drawing.Size( 160, 28 );
+			this.m_lblZValue.Text = "— mm";
+			this.m_lblZValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblZValue.Font = new System.Drawing.Font( "Consolas", 10F );
+			this.m_lblRotary1Value.Location = new System.Drawing.Point( 38, 116 );
+			this.m_lblRotary1Value.Name = "m_lblRotary1Value";
+			this.m_lblRotary1Value.Size = new System.Drawing.Size( 160, 28 );
+			this.m_lblRotary1Value.Text = "— deg";
+			this.m_lblRotary1Value.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblRotary1Value.Font = new System.Drawing.Font( "Consolas", 10F );
+			this.m_lblRotary2Value.Location = new System.Drawing.Point( 38, 150 );
+			this.m_lblRotary2Value.Name = "m_lblRotary2Value";
+			this.m_lblRotary2Value.Size = new System.Drawing.Size( 160, 28 );
+			this.m_lblRotary2Value.Text = "— deg";
+			this.m_lblRotary2Value.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.m_lblRotary2Value.Font = new System.Drawing.Font( "Consolas", 10F );
+			this.m_btnXZero.Location = new System.Drawing.Point( 210, 14 );
+			this.m_btnXZero.Name = "m_btnXZero";
+			this.m_btnXZero.Size = new System.Drawing.Size( 78, 28 );
+			this.m_btnXZero.Text = "設為 0";
+			this.m_btnXZero.TabIndex = 0;
+			this.m_btnYZero.Location = new System.Drawing.Point( 210, 48 );
+			this.m_btnYZero.Name = "m_btnYZero";
+			this.m_btnYZero.Size = new System.Drawing.Size( 78, 28 );
+			this.m_btnYZero.Text = "設為 0";
+			this.m_btnYZero.TabIndex = 1;
+			this.m_btnZZero.Location = new System.Drawing.Point( 210, 82 );
+			this.m_btnZZero.Name = "m_btnZZero";
+			this.m_btnZZero.Size = new System.Drawing.Size( 78, 28 );
+			this.m_btnZZero.Text = "設為 0";
+			this.m_btnZZero.TabIndex = 2;
+			this.m_btnRotary1Zero.Location = new System.Drawing.Point( 210, 116 );
+			this.m_btnRotary1Zero.Name = "m_btnRotary1Zero";
+			this.m_btnRotary1Zero.Size = new System.Drawing.Size( 78, 28 );
+			this.m_btnRotary1Zero.Text = "設為 0";
+			this.m_btnRotary1Zero.TabIndex = 3;
+			this.m_btnRotary2Zero.Location = new System.Drawing.Point( 210, 150 );
+			this.m_btnRotary2Zero.Name = "m_btnRotary2Zero";
+			this.m_btnRotary2Zero.Size = new System.Drawing.Size( 78, 28 );
+			this.m_btnRotary2Zero.Text = "設為 0";
+			this.m_btnRotary2Zero.TabIndex = 4;
+			this.m_btnClear.Location = new System.Drawing.Point( 194, 190 );
+			this.m_btnClear.Name = "m_btnClear";
+			this.m_btnClear.Size = new System.Drawing.Size( 94, 30 );
+			this.m_btnClear.Text = "全部清除";
+			this.m_btnClear.TabIndex = 5;
+			this.AutoScaleDimensions = new System.Drawing.SizeF( 7F, 16F );
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.BackColor = System.Drawing.Color.FromArgb( 240, 240, 240 );
+			this.ClientSize = new System.Drawing.Size( 300, 232 );
+			this.Font = new System.Drawing.Font( "Microsoft JhengHei", 9F );
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
+			this.ShowInTaskbar = false;
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+			this.Text = "程式座標偏置";
+			this.m_pnlOffset.Controls.Add( this.m_lblX );
+			this.m_pnlOffset.Controls.Add( this.m_lblY );
+			this.m_pnlOffset.Controls.Add( this.m_lblZ );
+			this.m_pnlOffset.Controls.Add( this.m_lblRotary1 );
+			this.m_pnlOffset.Controls.Add( this.m_lblRotary2 );
+			this.m_pnlOffset.Controls.Add( this.m_lblXValue );
+			this.m_pnlOffset.Controls.Add( this.m_lblYValue );
+			this.m_pnlOffset.Controls.Add( this.m_lblZValue );
+			this.m_pnlOffset.Controls.Add( this.m_lblRotary1Value );
+			this.m_pnlOffset.Controls.Add( this.m_lblRotary2Value );
+			this.m_pnlOffset.Controls.Add( this.m_btnXZero );
+			this.m_pnlOffset.Controls.Add( this.m_btnYZero );
+			this.m_pnlOffset.Controls.Add( this.m_btnZZero );
+			this.m_pnlOffset.Controls.Add( this.m_btnRotary1Zero );
+			this.m_pnlOffset.Controls.Add( this.m_btnRotary2Zero );
+			this.m_pnlOffset.Controls.Add( this.m_btnClear );
+			this.Controls.Add( this.m_pnlOffset );
+			this.Name = "CNCOffsetDialog";
+			this.m_pnlOffset.ResumeLayout( false );
+			this.ResumeLayout( false );
+		}
+
+		private System.Windows.Forms.Panel m_pnlOffset;
+		private System.Windows.Forms.Label m_lblX;
+		private System.Windows.Forms.Label m_lblY;
+		private System.Windows.Forms.Label m_lblZ;
+		private System.Windows.Forms.Label m_lblRotary1;
+		private System.Windows.Forms.Label m_lblRotary2;
+		private System.Windows.Forms.Label m_lblXValue;
+		private System.Windows.Forms.Label m_lblYValue;
+		private System.Windows.Forms.Label m_lblZValue;
+		private System.Windows.Forms.Label m_lblRotary1Value;
+		private System.Windows.Forms.Label m_lblRotary2Value;
+		private CommonUI.Controls.PanelButton m_btnXZero;
+		private CommonUI.Controls.PanelButton m_btnYZero;
+		private CommonUI.Controls.PanelButton m_btnZZero;
+		private CommonUI.Controls.PanelButton m_btnRotary1Zero;
+		private CommonUI.Controls.PanelButton m_btnRotary2Zero;
+		private CommonUI.Controls.PanelButton m_btnClear;
+	}
+}

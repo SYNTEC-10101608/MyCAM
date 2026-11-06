@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ResMap>
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=101h" Content="参数异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=102h" Content="可程序设计逻辑配置故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=103h" Content="FPGA 软件版本过低" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=104h" Content="可程序设计逻辑中断故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=105h" Content="内部程序异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=108h" Content="参数存储故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=111h" Content="2000h/2001h 组参数出现异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=120h" Content="产品匹配故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=121h" Content="伺服 ON 指令无效故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=122h" Content="绝对位置模式产品匹配故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=130h" Content="DI 功能重复分配" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=131h" Content="DO 分配超限" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=136h" Content="电机 ROM 中数据校验错误或未存入参数" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=200h" Content="过流 1" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=201h" Content="过流 2" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=207h" Content="D/Q 轴电流溢出故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=208h" Content="FPGA 系统采样运算超时" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=210h" Content="输出对地短路" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=220h" Content="UVW 相序错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=234h" Content="飞车" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=400h" Content="主回路电过压" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=410h" Content="主回路电欠压" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=420h" Content="主回路电缺相" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=430h" Content="控制电欠压" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=500h" Content="电机超速" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=510h" Content="脉冲输出过速" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=602h" Content="角度辨识失败" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=610h" Content="驱动器超载" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=620h" Content="电机超载" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=630h" Content="电机堵转" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=650h" Content="散热器过热" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=731h" Content="编码器电池失效" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=733h" Content="编码器多圈计数错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=735h" Content="编码器多圈计数溢出" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=740h" Content="编码器干扰" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=770h" Content="外部编码器标尺故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=A33h" Content="编码器数据异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=A34h" Content="编码器回送校验异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=A35h" Content="Z 信号丢失" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=B00h" Content="位置偏差过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=B01h" Content="位置指令过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=B02h" Content="全死循环位置偏差过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=B03h" Content="电子齿轮比设定超限" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=B04h" Content="全死循环使用错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=D09h" Content="软件位置上下限设置错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=D10h" Content="原点偏置设置错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E07h" Content="网络状态异常切换" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E08h" Content="同步丢失" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E11h" Content="未刻录 XML 配置文件" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E12h" Content="网络初始化失败" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E13h" Content="同步周期设定错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E15h" Content="同步周期误差过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=110h" Content="分频脉冲输出设定故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=601h" Content="回原点超时故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=730h" Content="编码器电池警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=900h" Content="DI 紧急?车" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=909h" Content="电机超载警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=920h" Content="制动电阻超载" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=922h" Content="外接制动电阻过小" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=939h" Content="电机动力线断线" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=941h" Content="变更参数需重新上电生效" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=942h" Content="参数存储频繁" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=950h" Content="正向超程警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=952h" Content="反向超程警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=980h" Content="编码器内部故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=990h" Content="输入缺相警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=998h" Content="回零模式设置错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=A40h" Content="参数辨识失败" />
+</ResMap>

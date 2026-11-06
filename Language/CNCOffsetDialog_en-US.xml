@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Title" Content="Program Coordinate Offset" />
+	<Message ID="SetZero" Content="Set to 0" />
+	<Message ID="ClearAll" Content="Clear all" />
+	<Message ID="Error_Unavailable" Content="The offset settings dialog is not available." />
+	<Message ID="Error_UIThread" Content="Initialize the offset settings dialog on the WinForms UI thread." />
+	<Message ID="Error_Subscription" Content="Unable to initialize the offset coordinate subscription." />
+	<Message ID="Error_Operation" Content="{0} failed. Offsets may not be fully updated: {1}" />
+</ResMap>

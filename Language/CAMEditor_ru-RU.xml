@@ -12,6 +12,8 @@
 	<Message ID="NCFileSaveFailed" Content="[Статус вывода NC] Ошибка сохранения файла: {0}" />
 	<Message ID="NCExportSuccessNoController" Content="[Статус вывода NC] Успешный вывод NC&#10;[Статус передачи файла] Не подключено к контроллеру, файл не может быть передан" />
 	<Message ID="NCExportAndTransferSuccess" Content="[Статус вывода NC] Успешный вывод NC&#10;[Статус передачи файла] Успешная передача файла NC" />
+	<Message ID="MainProgramAssignSuccess" Content="[Статус назначения файла обработки] Назначен файл обработки: {0}" />
+	<Message ID="MainProgramAssignFailed" Content="[Статус назначения файла обработки] Сбой назначения файла обработки: {0}" />
 	<Message ID="NCExportSuccessTransferFailed" Content="[Статус вывода NC] Успешный вывод NC&#10;[Статус передачи файла] Ошибка передачи файла NC: {0}" />
 	<Message ID="SaveNCFileTitle" Content="Сохранить файл NC" />
 	<Message ID="NoIntersectingFaceFound" Content="[Напоминание об операции] Пересекающаяся грань не найдена" />

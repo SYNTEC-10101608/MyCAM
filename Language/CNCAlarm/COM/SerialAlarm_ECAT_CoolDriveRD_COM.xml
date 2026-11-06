@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2250h" Content="Driver Short Circuit"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2250h::AlarmID" Content="ALCD-2250h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2310h" Content="Phase U Output Current Too High"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2310h::AlarmID" Content="ALCD-2310h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2311h" Content="Phase V Output Current Too High"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2311h::AlarmID" Content="ALCD-2311h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2312h" Content="Phase W Output Current Too High"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2312h::AlarmID" Content="ALCD-2312h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2320h" Content="Driver Hardware Overcurrent"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2320h::AlarmID" Content="ALCD-2320h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2330h" Content="Driver Output Short Circuit to Ground"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2330h::AlarmID" Content="ALCD-2330h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=3210h" Content="DC Bus Overvoltage"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=3210h::AlarmID" Content="ALCD-3210h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=3220h" Content="DC Bus Undervoltage"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=3220h::AlarmID" Content="ALCD-3220h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=4210h" Content="Power Module Overheat"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=4210h::AlarmID" Content="ALCD-4210h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=6010h" Content="CPU1 Watchdog Overflow"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=6010h::AlarmID" Content="ALCD-6010h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=6011h" Content="CPU2 Watchdog Overflow"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=6011h::AlarmID" Content="ALCD-6011h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=7112h" Content="Energy Consumption Braking Resistor Overload"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=7112h::AlarmID" Content="ALCD-7112h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8311h" Content="Motor Continuous Overload"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8311h::AlarmID" Content="ALCD-8311h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8611h" Content="Position Follow Error Too High"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8611h::AlarmID" Content="ALCD-8611h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8612h" Content="Positive Soft Limit"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8612h::AlarmID" Content="ALCD-8612h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8613h" Content="Negative Soft Limit"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8613h::AlarmID" Content="ALCD-8613h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8800h" Content="Encoder Data Overflow"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8800h::AlarmID" Content="ALCD-8800h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF00h" Content="CPU1 Malfunction"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF00h::AlarmID" Content="ALCD-FF00h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF01h" Content="CPU2 Malfunction"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF01h::AlarmID" Content="ALCD-FF01h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF02h" Content="CPU1 Memory Exception"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF02h::AlarmID" Content="ALCD-FF02h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF03h" Content="CPU2 Memory Exception"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF03h::AlarmID" Content="ALCD-FF03h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF04h" Content="CPU Memory Conflict"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF04h::AlarmID" Content="ALCD-FF04h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF05h" Content="Pole Positioning Error"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF05h::AlarmID" Content="ALCD-FF05h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF06h" Content="Encoder Data Abnormal"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF06h::AlarmID" Content="ALCD-FF06h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF07h" Content="Encoder Communication Abnormal"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF07h::AlarmID" Content="ALCD-FF07h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF08h" Content="Encoder Communication Timeout"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF08h::AlarmID" Content="ALCD-FF08h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF09h" Content="Encoder Internal Exception"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF09h::AlarmID" Content="ALCD-FF09h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF10h" Content="Other Axis in Driver Malfunction"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF10h::AlarmID" Content="ALCD-FF10h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF14h" Content="Control Encoder Over Speed"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF14h::AlarmID" Content="ALCD-FF14h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF15h" Content="Driver Continuous Overload"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF15h::AlarmID" Content="ALCD-FF15h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF17h" Content="Driver Output Phase Loss"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF17h::AlarmID" Content="ALCD-FF17h"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF18h" Content="Motor stall"/>
+    <Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF18h::AlarmID" Content="ALCD-FF18h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF21h" Content="Current following error is too large"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF21h::AlarmID" Content="ALCD-FF21h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF22h" Content="Position target value abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF22h::AlarmID" Content="ALCD-FF22h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF23h" Content="Encoder power-on data overflow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF23h::AlarmID" Content="ALCD-FF23h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF24h" Content="Position target value overflow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF24h::AlarmID" Content="ALCD-FF24h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF25h" Content="Motor brake fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF25h::AlarmID" Content="ALCD-FF25h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF26h" Content="Control power undervoltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF26h::AlarmID" Content="ALCD-FF26h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF27h" Content="STO1 trigger"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF27h::AlarmID" Content="ALCD-FF27h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF28h" Content="STO2 trigger"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF28h::AlarmID" Content="ALCD-FF28h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF29h" Content="Positive hard limit switch triggered"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF29h::AlarmID" Content="ALCD-FF29h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF30h" Content="Negative hard limit switch triggered"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF30h::AlarmID" Content="ALCD-FF30h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF31h" Content="Motor overspeed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF31h::AlarmID" Content="ALCD-FF31h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF32h" Content="Emergency stop switch triggered"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF32h::AlarmID" Content="ALCD-FF32h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF33h" Content="Torque monitoring saturation fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF33h::AlarmID" Content="ALCD-FF33h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF34h" Content="Speed following error is too large"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF34h::AlarmID" Content="ALCD-FF34h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF35h" Content="Drive short circuit"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF35h::AlarmID" Content="ALCD-FF35h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF36h" Content="Home position search failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF36h::AlarmID" Content="ALCD-FF36h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF37h" Content="EtherCAT process data error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF37h::AlarmID" Content="ALCD-FF37h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF38h" Content="EtherCAT bus command illegal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF38h::AlarmID" Content="ALCD-FF38h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF39h" Content="EtherCAT communication cycle error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF39h::AlarmID" Content="ALCD-FF39h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF40h" Content="Position planning runtime error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF40h::AlarmID" Content="ALCD-FF40h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF41h" Content="EtherCAT illegal sync mode"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF41h::AlarmID" Content="ALCD-FF41h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF42h" Content="Position target value exceeds set range"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF42h::AlarmID" Content="ALCD-FF42h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF45h" Content="Motor U phase instantaneous overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF45h::AlarmID" Content="ALCD-FF45h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF46h" Content="Motor V phase instantaneous overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF46h::AlarmID" Content="ALCD-FF46h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF47h" Content="Motor W phase instantaneous overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF47h::AlarmID" Content="ALCD-FF47h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF48h" Content="Dynamic braking overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF48h::AlarmID" Content="ALCD-FF48h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF49h" Content="Drive internal fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF49h::AlarmID" Content="ALCD-FF49h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF50h" Content="Limit switch fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF50h::AlarmID" Content="ALCD-FF50h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF51h" Content="EtherCAT bus communication fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF51h::AlarmID" Content="ALCD-FF51h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF52h" Content="Interface encoder resolution change"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF52h::AlarmID" Content="ALCD-FF52h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF53h" Content="Encoder overheating"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF53h::AlarmID" Content="ALCD-FF53h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF54h" Content="Encoder battery undervoltage fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF54h::AlarmID" Content="ALCD-FF54h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF57h" Content="Control mode setting error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF57h::AlarmID" Content="ALCD-FF57h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF58h" Content="Power-on position deviation too large"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF58h::AlarmID" Content="ALCD-FF58h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF59h" Content="Encoder acceleration abnormal fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF59h::AlarmID" Content="ALCD-FF59h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF60h" Content="Motor stall"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF60h::AlarmID" Content="ALCD-FF60h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF63h" Content="Write EEPROM data abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF63h::AlarmID" Content="ALCD-FF63h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF64h" Content="Read EEPROM data abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF64h::AlarmID" Content="ALCD-FF64h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF66h" Content="Brake control circuit abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF66h::AlarmID" Content="ALCD-FF66h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF68h" Content="CPU1 overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF68h::AlarmID" Content="ALCD-FF68h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF69h" Content="CPU2 overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF69h::AlarmID" Content="ALCD-FF69h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF70h" Content="CPU1 handshake failed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF70h::AlarmID" Content="ALCD-FF70h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF71h" Content="DriveMaster communication timeout"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF71h::AlarmID" Content="ALCD-FF71h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF75h" Content="ESC configuration EEPROM abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF75h::AlarmID" Content="ALCD-FF75h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF76h" Content="ESC internal access error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF76h::AlarmID" Content="ALCD-FF76h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF77h" Content="Servo enable not ready"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF77h::AlarmID" Content="ALCD-FF77h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF78h" Content="CPU2 handshake failed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF78h::AlarmID" Content="ALCD-FF78h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF79h" Content="CPU1 main task timeout"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF79h::AlarmID" Content="ALCD-FF79h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF81h" Content="DC bus charging relay abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF81h::AlarmID" Content="ALCD-FF81h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF82h" Content="CPU internal error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF82h::AlarmID" Content="ALCD-FF82h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF83h" Content="Position actual value overflow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF83h::AlarmID" Content="ALCD-FF83h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF85h" Content="Encoder internal exception 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF85h::AlarmID" Content="ALCD-FF85h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF87h" Content="Encoder internal exception 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF87h::AlarmID" Content="ALCD-FF87h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF8Eh" Content="Second position follow-up error too large"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF8Eh::AlarmID" Content="ALCD-FF8Eh"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF8Fh" Content="STO wiring abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF8Fh::AlarmID" Content="ALCD-FF8Fh"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF90h" Content="Second speed follow-up error too large"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF90h::AlarmID" Content="ALCD-FF90h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E000h" Content="Power Supply Undervoltage Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E000h::AlarmID" Content="WRCD-E000h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E002h" Content="STO Triggered"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E002h::AlarmID" Content="WRCD-E002h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E003h" Content="Torque Monitoring Saturation Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E003h::AlarmID" Content="WRCD-E003h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E004h" Content="CPU1 Overload Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E004h::AlarmID" Content="WRCD-E004h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E005h" Content="CPU2 Overload Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E005h::AlarmID" Content="WRCD-E005h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E006h" Content="Changed Power-On Valid Parameters"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E006h::AlarmID" Content="WRCD-E006h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E007h" Content="Emergency Stop Switch Triggered"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E007h::AlarmID" Content="WRCD-E007h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E008h" Content="Mechanical Home Position Not Calibrated"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E008h::AlarmID" Content="WRCD-E008h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E009h" Content="Motor Overload Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E009h::AlarmID" Content="WRCD-E009h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E010h" Content="Speed Limit Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E010h::AlarmID" Content="WRCD-E010h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E011h" Content="DC Bus Undervoltage Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E011h::AlarmID" Content="WRCD-E011h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E012h" Content="Fault History Record Exception"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E012h::AlarmID" Content="WRCD-E012h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E013h" Content="AD Calibration Coefficient Invalid"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E013h::AlarmID" Content="WRCD-E013h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E014h" Content="CoE Communication Parameter Exception"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E014h::AlarmID" Content="WRCD-E014h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E015h" Content="Servo Parameters Restored to Default"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E015h::AlarmID" Content="WRCD-E015h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E016h" Content="Control Mode Setting Not Supported"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E016h::AlarmID" Content="WRCD-E016h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E017h" Content="Encoder Battery Undervoltage Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E017h::AlarmID" Content="WRCD-E017h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E019h" Content="Internal Drive Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E019h::AlarmID" Content="WRCD-E019h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E020h" Content="Encoder Communication Exception Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E020h::AlarmID" Content="WRCD-E020h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E022h" Content="Encoder Communication Timeout Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E022h::AlarmID" Content="WRCD-E022h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E024h" Content="Encoder Data Exception Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E024h::AlarmID" Content="WRCD-E024h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E026h" Content="Position Limit Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E026h::AlarmID" Content="WRCD-E026h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E027h" Content="Position Planning Parameter Exception Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E027h::AlarmID" Content="WRCD-E027h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E028h" Content="SDO Write Failure Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E028h::AlarmID" Content="WRCD-E028h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E029h" Content="Homing Configuration Error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E029h::AlarmID" Content="WRCD-E029h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E030h" Content="Internal Encoder Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E030h::AlarmID" Content="WRCD-E030h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E031h" Content="Energy Dissipation Brake Resistor Overload Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E031h::AlarmID" Content="WRCD-E031h"/>
+
+</ResMap>

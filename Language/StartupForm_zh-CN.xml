@@ -13,6 +13,12 @@
 	<Message ID="m_tsbCNCConnection" Content="CNC连线设定" />
 	<Message ID="m_tsmiLanguage" Content="语系切换" />
 	<Message ID="m_tsbController" Content="控制器" />
+	<Message ID="m_tsmiControllerAdvancedSettings" Content="控制器高级设置" />
+	<Message ID="m_tsmiMachining" Content="加工" />
+	<Message ID="m_tsbSetOffset" Content="设置偏置" />
+	<Message ID="m_tsbSetOffset_ToolTip" Content="设置程序坐标偏置" />
+	<Message ID="m_tsbProcessSettings" Content="工艺设置" />
+	<Message ID="m_tsbProcessSettings_ToolTip" Content="打开控制器工艺设置" />
 
 	<!-- 文件工具列 -->
 	<Message ID="m_tsbImport3DFile" Content="3D模型" />
@@ -146,6 +152,7 @@
 	<Message ID="m_tsbLayerNone_ToolTip" Content="不加工" />
 	<Message ID="m_tsbNeedProcess_ToolTip" Content="加工" />
 
+	<Message ID="Log_ViewerInitFailed" Content="显示器初始化失败" />
 	<Message ID="Log_UseDefaultMachineProject" Content="使用默认机构专案档" />
 	<Message ID="Log_MachineNodeNull" Content="机构参数节点为空,使用默认机构参数" />
 	<Message ID="Log_MachineFileNull" Content="机构档案为空,使用默认机构参数" />
@@ -162,6 +169,10 @@
 	<Message ID="Log_CNCReconnected" Content="CNC 重新连线成功" />
 	<Message ID="Log_CNCReconnectFailed" Content="CNC 重新连线失败，请检查网路或 CNC 状态" />
 	<Message ID="Log_CNCPleaseConnectFirst" Content="尚未和CNC连线，请先进行CNC连线" />
+	<Message ID="Log_VNCConnectionError" Content="VNC 连接失败：{0}" />
+	<Message ID="Log_CNCConnectionError" Content="CNC 连接流程失败：{0}" />
+	<Message ID="Log_CNCShutdownUnconfirmed" Content="CNC 关闭未确认：{0}" />
+	<Message ID="Log_ShutdownFailed" Content="关闭流程失败：{0}" />
 
 	<!-- 存檔提示 -->
 	<Message ID="Msg_SaveBeforeExitTitle" Content="存档确认" />

@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=20h" Content="Parameter Checksum Error 1."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=21h" Content="Parameter Format Error 1."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=22h" Content="System Checksum Error 1."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=24h" Content="System Alarm."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=25h" Content="System Alarm."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=30h" Content="Main Circuit Detector Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=40h" Content="Parameter Setting Error 1."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=41h" Content="Encoder Output Pulse SettingError."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=42h" Content="Parameter Combination Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=44h" Content="Fully-closed Loop Control Parameter Setting Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=46h" Content="Σ-LINK II Command/Response Parameter Setting Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=4Ah" Content="Parameter Setting Error 2."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=50h" Content="Combination Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=51h" Content="Unsupported Device Alarm."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=70h" Content="Motor Type Change Detected."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=80h" Content="Linear Encoder Pitch Setting Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B0h" Content="Cancelled Servo ON Command Alarm."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=100h" Content="Overcurrent or Heat Sink Overheated."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=101h" Content="Motor Overcurrent Detected"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=102h" Content="Motor Overcurrent Detected 2"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=300h" Content="Regeneration Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=320h" Content="Regenerative Overload."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=330h" Content="Main Circuit Power Supply Wiring Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=400h" Content="Overvoltage."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=410h" Content="Undervoltage."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=450h" Content="Main-Circuit Capacitor Overvoltage"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=510h" Content="Overspeed."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=511h" Content="Overspeed of Encoder Output Pulse Rate."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=520h" Content="Vibration Alarm."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=521h" Content="Autotuning Alarm."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=550h" Content="Maximum Speed Setting Error"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=710h" Content="Overload: High Load."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=720h" Content="Overload: Low Load."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=729h" Content="Overload 2."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=730h" Content="Dynamic Brake Overload."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=731h" Content="Dynamic Brake Overload."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=740h" Content="Overload of Surge Current Limit Resistor."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=7A0h" Content="Heat Sink Overheated."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=7A1h" Content="Internal Temperature Error1 (Control Board Temperature Error)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=7A2h" Content="Internal Temperature Error 2 (Power Board Temperature Error)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=7A3h" Content="Internal Temperature Sensor Error"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=7ABh" Content="Built-in Fan in SERVOPACK Stopped."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=810h" Content="Encoder Backup Battery Error. Please repleace the battery and reboot the system."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=820h" Content="Encoder Checksum Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=830h" Content="Encoder Battery Alarm."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=840h" Content="Encoder Data Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=850h" Content="Encoder Overspeed."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=860h" Content="Encoder Overheat."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=861h" Content="Motor Overheated"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=862h" Content="Overheat Alarm"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=890h" Content="Encoder Scale Error"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=891h" Content="External Encoder Error"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A0h" Content="External Encoder Scale Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A1h" Content="External Encoder Module Failure."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A2h" Content="External Encoder Sensor Failure.(Incremental)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A3h" Content="External Encoder Position Error.(Absolute Value)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A5h" Content="Encoder Over Speed."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=8A6h" Content="Encoder Overheat Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=900h" Content="Position Deviation Overflow. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=901h" Content="Position Deviation Overflow at Servo ON. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=910h" Content="Overload.Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=911h" Content="Vibration. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=912h" Content="Internal Temperature Warning 1 Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=913h" Content="Internal Temperature Warning 2 Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=920h" Content="Regenerative Overload. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=921h" Content="Dynamic Brake Overload. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=923h" Content="SERVOPACK Built-in Fan Stopped. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=930h" Content="AAB. Encoder Battery Err. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=942h" Content="Speed Ripple Compensation Info. Disagreement. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=94Ah" Content="Data Setting Warning 1.(Parameter Number Error)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=94Bh" Content="Data Setting Warning 2.(Out of Range)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=94Ch" Content="Data Setting Warning 3.(Calculation Error)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=94Dh" Content="Data Setting Warning 4.(Parameter Size)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=94Eh" Content="Latch Mode Error. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=95Ah" Content="Command Warning 1.(Unsatisfied Command Conditionsd)."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=95Bh" Content="Command Warning 2.(Unsupported Command)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=95Dh" Content="Command Warning 4.(Command Interference)."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=95Eh" Content="Command Warning 5.(Subcommand Disable)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=95Fh" Content="Command Warning 6.(Undefined Command)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=960h" Content="MECHATROLINK Communications Warning. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=962h" Content="MECHATROLINK Communications Warning (FCS Error)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=963h" Content="MECHATROLINK Communications Warning (Synchronization Frame Not Received)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=971h" Content="Undervoltage. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=97Ah" Content="Command Warning 7(Phase Error)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=97Bh" Content="Data Clamp (Out of Range)."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=9A0h" Content="Overtravel. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=9B0h" Content="Preventative Maintenance Warning. Use EStop to clear warning."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B31h" Content="Current Detection Error 1.(Phase U)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B32h" Content="Current Detection Error 2.(Phase-V)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B33h" Content="Current Detection Error 3.(Current detector)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B6Ah" Content="MECHATROLINK Communications ASIC Error 1."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=B6Bh" Content="MECHATROLINK Communications ASIC Error 2."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BE2h" Content="Firmware Error"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF0h" Content="System Alarm 0."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF1h" Content="System Alarm 1."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF2h" Content="System Alarm 2."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF3h" Content="System Alarm 3."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF4h" Content="System Alarm 4."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF5h" Content="System Alarm 5."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF6h" Content="System Alarm 6."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF7h" Content="System Alarm 7."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BF8h" Content="System Alarm 8."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=BFDh" Content="System Alarm D."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C10h" Content="Servomotor Out of Control."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C20h" Content="Phase Detection Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C21h" Content="Polarity Sensor Error"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C22h" Content="Phase Information Disagreement."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C50h" Content="Polarity Detection Failure."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C51h" Content="Overtravel Detected during Polarity Detection."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C52h" Content="Polarity Detection Not Completed."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C53h" Content="Out of Range of Motion for Polarity Detection."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C54h" Content="Polarity Detection Failure 2."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C80h" Content="Absolute Encoder Clear Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C90h" Content="Encoder Communications Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C91h" Content="Encoder Communications Position Data Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=C92h" Content="Encoder Communications Timer Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CA0h" Content="Encoder Parameter Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CB0h" Content="Encoder Echoback Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CC0h" Content="Multiturn Limit Disagreement."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD1h" Content="Σ-LINK II Node Configuration Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD2h" Content="Σ-LINK II Power Supply Short-Circuit Detected."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD3h" Content="Σ-LINK II Configuration Data Checksum Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD4h" Content="Σ-LINK II Node Change Detected."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD7h" Content="Σ-LINK II I/O Device Communications Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CD8h" Content="Σ-LINK II I/O Device Status Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CF1h" Content="Reception Failed Error in Feedback Option Module Communications."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=CF2h" Content="Timer Stopped Error in Feedback Option Module Communications"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D00h" Content="Position Error Pulse Overflow."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D01h" Content="Position Deviation Overflow Alarm at Servo ON."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D02h" Content="Position Deviation Overflow Alarm for Speed Limit at Servo ON."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D04h" Content="Overtravel Alarm."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D10h" Content="Motor-Load Position Deviation Overflow."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=D30h" Content="Position Data Overflow."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E02h" Content="MECHATROLINK- III Internal Synchronization Error 1."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E40h" Content="MECHATROLINK- III Transmission Cycle Setting Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E41h" Content="MECHATROLINK Communications Data Size Setting Error"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E42h" Content="MECHATROLINK Station Address Setting Error"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E43h" Content="MECHATROLINK Communications Setting Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E50h" Content="MECHATROLINK- III Synchronization Error."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E51h" Content="MECHATROLINK- III Synchronization Failed."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E60h" Content="MECHATROLINK- III Communications Error.(Reception error)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E61h" Content="MECHATROLINK- III Transmission Cycle Error.(Synchronization interval error)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E62h" Content="MECHATROLINK Communications Error (FCS error)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E63h" Content="MECHATROLINK Synchronization Frame Not Received"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E71h" Content="MECHATROLINK Communications Error (FCS error)"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E72h" Content="MECHATROLINK Synchronization Frame Not Received"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E74h" Content="Safety Option Module Detection Failure."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E75h" Content="Feedback Option Module Detection Failure."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=E81h" Content="Unsupported Safety Option Module."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=EA2h" Content="Unsupported Feedback Option Module"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=EB1h" Content="SERVOPACK: Safety Module Alarm"/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=EC8h" Content="Gate Drive Error 1."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=EC9h" Content="Gate Drive Error 2."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=ED1h" Content="Command Execution Timeout."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=F10h" Content="Main Circuit Cable Open Phase."/>
+	<Message ID="AlarmMsg::Drv_M3_YASKAWA::ID=F50h" Content="Servomotor Main Circuit Cable Disconnection."/>
+</ResMap>

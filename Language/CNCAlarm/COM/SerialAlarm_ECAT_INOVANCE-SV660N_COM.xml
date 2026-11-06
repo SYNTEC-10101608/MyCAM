@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0101h" Content="H00/01/02 Group parameter anomaly"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0101h::AlarmID" Content="E101"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0102h" Content="FPGA anomaly"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0102h::AlarmID" Content="E102"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0104h" Content="MCU/FPGA operation timeout"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0104h::AlarmID" Content="E104"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0108h" Content="Parameter read/write error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0108h::AlarmID" Content="E108"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0120h" Content="Unable to identify drive/motor/encoder model"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0120h::AlarmID" Content="E120"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0121h" Content="Servo enable command repeated"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0121h::AlarmID" Content="E121"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0122h" Content="Multi-turn absolute encoder setting error/DIDO function allocation fault "/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0122h::AlarmID" Content="E122"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0136h" Content="Encoder ROM motor parameter read/write anomaly"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0136h::AlarmID" Content="E136"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0140h" Content="Encryption chip error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0140h::AlarmID" Content="E140"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0150h" Content="STO status anomaly/PWM Buffer anomaly"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0150h::AlarmID" Content="E150"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0201h" Content="P/U/V/N phase overcurrent"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0201h::AlarmID" Content="E201"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0208h" Content="Encoder communication/current loop computation timeout"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0208h::AlarmID" Content="E208"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0210h" Content="Output short circuit to ground"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0210h::AlarmID" Content="E210"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0234h" Content="Flying speed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0234h::AlarmID" Content="E234"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0320h" Content="Braking resistor overload/discharge fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0320h::AlarmID" Content="E320"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0321h" Content="Dynamic braking resistor overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0321h::AlarmID" Content="E321"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0400h" Content="Main circuit overvoltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0400h::AlarmID" Content="E400"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0410h" Content="Main circuit undervoltage/power-off"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0410h::AlarmID" Content="E410"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0420h" Content="Main circuit phase loss"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0420h::AlarmID" Content="E420"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0430h" Content="Control power undervoltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0430h::AlarmID" Content="E430"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0500h" Content="Motor overspeed/speed feedback overflow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0500h::AlarmID" Content="E500"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0600h" Content="Inertia identification failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0600h::AlarmID" Content="E600"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0601h" Content="Home return warning/home mode setting anomaly"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0601h::AlarmID" Content="E601"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0602h" Content="Angle identification failure/UVW three-phase sequence reversal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0602h::AlarmID" Content="E602"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0605h" Content="Enable speed too fast"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0605h::AlarmID" Content="E605"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0620h" Content="Motor overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0620h::AlarmID" Content="E620"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0630h" Content="Locked rotor motor overheat protection"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0630h::AlarmID" Content="E630"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0640h" Content="Inverter IGBT/freewheeling diode junction temperature too high"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0640h::AlarmID" Content="E640"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0650h" Content="Heat sink temperature too high"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0650h::AlarmID" Content="E650"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0661h" Content="STune adjustment failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0661h::AlarmID" Content="E661"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0662h" Content="ETune adjustment failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0662h::AlarmID" Content="E662"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0663h" Content="ITune adjustment failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0663h::AlarmID" Content="E663"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0664h" Content="Excessive resonance"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0664h::AlarmID" Content="E664"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0730h" Content="Encoder battery warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0730h::AlarmID" Content="E730"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0731h" Content="Encoder battery failure and multi-turn count loss"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0731h::AlarmID" Content="E731"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0733h" Content="Encoder multi-turn count error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0733h::AlarmID" Content="E733"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0735h" Content="Encoder multi-turn count overflow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0735h::AlarmID" Content="E735"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0740h" Content="Absolute encoder error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0740h::AlarmID" Content="E740"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0760h" Content="Encoder overheat"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0760h::AlarmID" Content="E760"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0765h" Content="Nikon encoder overheat or overspeed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0765h::AlarmID" Content="E765"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0900h" Content="DI emergency brake"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0900h::AlarmID" Content="E900"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0901h" Content="Invalid stop method warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0901h::AlarmID" Content="E901"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0902h" Content="DIDO/torque achieved/position comparison target invalid"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0902h::AlarmID" Content="E902"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0908h" Content="Machine type identification checksum failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0908h::AlarmID" Content="E908"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0909h" Content="Motor overload warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0909h::AlarmID" Content="E909"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0910h" Content="Control power overvoltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0910h::AlarmID" Content="E910"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0920h" Content="External braking resistor resistance too low"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0920h::AlarmID" Content="E920"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0921h" Content="Dynamic braking resistor overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0921h::AlarmID" Content="E921"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0922h" Content="External braking resistor resistance too low"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0922h::AlarmID" Content="E922"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0924h" Content="Discharge tube overtemperature"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0924h::AlarmID" Content="E924"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0939h" Content="Motor power cable disconnection"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0939h::AlarmID" Content="E939"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0941h" Content="Parameter changes require a power cycle to take effect"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0941h::AlarmID" Content="E941"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0942h" Content="Parameter storage frequency high"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0942h::AlarmID" Content="E942"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0950h" Content="Positive overtravel warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0950h::AlarmID" Content="E950"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0952h" Content="Negative overtravel warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0952h::AlarmID" Content="E952"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0A33h" Content="Encoder read/write checksum anomaly"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0A33h::AlarmID" Content="EA33"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0A41h" Content="Torque ripple compensation failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_WR::ID=0A41h::AlarmID" Content="EA41"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0B00h" Content="Position deviation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0B00h::AlarmID" Content="EB00"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0B01h" Content="Command overflow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0B01h::AlarmID" Content="EB01"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0B03h" Content="Electronic gear ratio setting exceeds limit (first group)"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0B03h::AlarmID" Content="EB03"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E08h" Content="Unreliable Ethernet cable connection/data frame loss"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E08h::AlarmID" Content="EE08"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E09h" Content="Soft limit position setting error/origin position setting error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E09h::AlarmID" Content="EE09"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E10h" Content="SM2 configuration anomaly/PDO watchdog setting anomaly"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E10h::AlarmID" Content="EE10"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E11h" Content="Bus update EEPROM read failure/ESI checksum error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E11h::AlarmID" Content="EE11"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E12h" Content="EtherCAT initialization failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E12h::AlarmID" Content="EE12"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E13h" Content="EtherCAT synchronization cycle setting error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E13h::AlarmID" Content="EE13"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E15h" Content="EtherCAT synchronization cycle error too large"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E15h::AlarmID" Content="EE15"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E16h" Content="MCU and ESC communication anomaly"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE-SV660N_AL::ID=0E16h::AlarmID" Content="EE16"/>
+</ResMap>

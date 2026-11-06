@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="m_lblAxisHeader" Content="Axis" />
+	<Message ID="m_lblCoordinateHeader" Content="Coord." />
+	<Message ID="m_lblHeightGroupTitle" Content="Height axis info" />
+	<Message ID="m_lblCapacitanceTitle" Content="Capacitance" />
+	<Message ID="m_lblHeightTitle" Content="Height pos." />
+	<Message ID="m_lblFollowHeightTitle" Content="Follow height" />
+	<Message ID="m_lblActualHeightTitle" Content="Actual height" />
+	<Message ID="m_lblMachiningTitle" Content="Status" />
+	<Message ID="m_lblMainProgramTitle" Content="Program file" />
+	<Message ID="m_lblSpeedTitle" Content="Feed rate" />
+	<Message ID="m_lblPowerTitle" Content="Power" />
+	<Message ID="m_lblFrequencyTitle" Content="Frequency" />
+	<Message ID="m_lblDutyCycleTitle" Content="Duty cycle" />
+	<Message ID="m_lblFocusTitle" Content="Focus pos." />
+	<Message ID="m_lblTimeTitle" Content="Run time" />
+	<Message ID="AxisRole_Head" Content="Head" />
+	<Message ID="AxisRole_Table" Content="Table" />
+	<Message ID="CoordinateMode_Machine" Content="Machine ⇄" />
+	<Message ID="CoordinateMode_Program" Content="Program ⇄" />
+	<Message ID="Status_NotReady" Content="Not ready" />
+	<Message ID="Status_Ready" Content="Ready" />
+	<Message ID="Status_Machining" Content="Machining" />
+	<Message ID="Status_Paused" Content="Paused" />
+	<Message ID="Status_Alarm" Content="Alarm" />
+	<Message ID="Status_Record" Content="Recording" />
+	<Message ID="Error_Offset" Content="Unable to open program coordinate offset: {0}" />
+	<Message ID="Error_ThreePointCalibration" Content="Unable to open three-point calibration: {0}" />
+</ResMap>

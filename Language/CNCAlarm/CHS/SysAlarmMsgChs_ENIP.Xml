@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::ENIP::ID=1" Content="建立联机失败"/>
+	<Message ID="AlarmMsg::ENIP::ID=2" Content="指令发送失败"/>
+	<Message ID="AlarmMsg::ENIP::ID=3" Content="指令回复逾时"/>
+	<Message ID="AlarmMsg::ENIP::ID=4" Content="封装信息错误"/>
+	<Message ID="AlarmMsg::ENIP::ID=5" Content="网络联机中断"/>
+	<Message ID="AlarmMsg::ENIP::ID=6" Content="建立隐文联机失败"/>
+	<Message ID="AlarmMsg::ENIP::ID=7" Content="隐文联机中断"/>
+	<Message ID="AlarmMsg::ENIP::ID=8" Content="不支持设定的隐文连接速度"/>
+	<Message ID="AlarmMsg::ENIP::ID=9" Content="隐文联机缓存器起始编号设定错误"/>
+</ResMap>

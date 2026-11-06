@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=1" Content="Serial PLC axis station ID repeated with other devices"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=2" Content="Start R Register setting out of range, please reassign another R register!"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=3" Content="Acceleration, deceleration or velocity setting error"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=4" Content="Check window setting error"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=7" Content="Home offset setting error"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=8" Content="Cannot use home searching mode in absolute encoder mode"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=9" Content="Please set zero position when using absolute encoder for the first time"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=10" Content="Important parameter changed, please reboot the CNC controller and reset zero position"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=11" Content="Station ID does not exist"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=12" Content="The target position of serial PLC axis exceed positive software stroke limit"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=13" Content="The target position of serial PLC axis exceed negative software stroke limit"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=14" Content="Drive communication error"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=15" Content="Fail in Driver parameter writing"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=16" Content="Miss index in homing"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=17" Content="Zero speed timeout in homing"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=18" Content="Can't leave home dog"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=19" Content="Power status of servo driver error"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=20" Content="Not support this driver type"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=21" Content="Posing distance exceed upper bound"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=22" Content="This driver type can not use MPG function"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=23" Content="The firmware update of Syntec encoder is finished. Please reboot the driver."/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=24" Content="Syntec encoder information reading timeout."/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=25" Content="Feedback of axis is anomalous."/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=26" Content="Poor contact of communication wire" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=27" Content="The hardware doesn't receive communication packet" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=28" Content="The communication packet is disturbed by noise" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=29" Content="Driver software misses communication packet" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=30" Content="The driver is not 'power on', please check the power connection status" />
+</ResMap>

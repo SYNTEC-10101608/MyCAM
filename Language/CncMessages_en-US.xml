@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="InvalidConnection" Content="Invalid CNC IP address or timeout setting." />
+	<Message ID="LifecycleBusy" Content="The CNC connection lifecycle is busy." />
+	<Message ID="ConnectionCancelled" Content="CNC connection cancelled." />
+	<Message ID="PreviousOperationRunning" Content="A previous SDK operation is still running." />
+	<Message ID="SessionEnded" Content="The CNC connection session has ended." />
+	<Message ID="ConnectionRejected" Content="OpenCNC rejected the connection." />
+	<Message ID="DisconnectPending" Content="The SDK operation is still running; disconnection is not confirmed." />
+	<Message ID="NotConnected" Content="CNC is not connected." />
+	<Message ID="ResourceBusy" Content="A CNC resource operation is still running." />
+	<Message ID="OperationBusy" Content="A CNC operation is still running." />
+	<Message ID="OperationCancelled" Content="Operation cancelled." />
+	<Message ID="WaitStopped" Content="Stopped waiting; the SDK operation may still be running." />
+	<Message ID="CalibrationCancelled" Content="Calibration cancelled." />
+	<Message ID="CalibrationTimeout" Content="Three-point calibration exceeded the 5-second wait limit." />
+	<Message ID="InvalidCalibrationResult" Content="The calibration result flag is invalid." />
+	<Message ID="ReadProgramCoordinates" Content="Unable to read program coordinates." />
+	<Message ID="ReadTolerance" Content="Unable to read tolerance (@78406)." />
+	<Message ID="IncompletePoints" Content="Three complete XYZ points are required." />
+	<Message ID="InvalidMachineParameter" Content="Pr{0}={1}; expected 1, 2 or 3." />
+	<Message ID="InvalidRotaryParameter" Content="Pr{0}={1}; expected 400, 500 or 600." />
+	<Message ID="AmbiguousHeadAxis" Content="Pr3005={0} specifies head {1}, which cannot be uniquely matched to rotary axes {2}/{3}." />
+	<Message ID="ReadMachineCoordinate" Content="Unable to read machine coordinate #{0}." />
+	<Message ID="ClearOffset" Content="Unable to clear #{0}. Some offsets may already be cleared: {1}" />
+	<Message ID="AlarmUnavailable" Content="CNC pending alarm data is unavailable. Pending count: {0}." />
+	<Message ID="AlarmCountRead" Content="Unable to read the CNC pending alarm count. Transport status: {0}, controller status: {1}." />
+	<Message ID="InvalidAlarmCount" Content="The CNC pending alarm count is invalid: {0}." />
+</ResMap>

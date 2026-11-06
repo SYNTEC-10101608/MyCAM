@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::ROT::ID=1" Content="未完成絕對式原點設定"/>
+	<Message ID="AlarmMsg::ROT::ID=2" Content="絕對式相關參數異動，請重開機並重設原點"/>
+	<Message ID="AlarmMsg::ROT::ID=3" Content="不支援增量式電機"/>
+	<Message ID="AlarmMsg::ROT::ID=4" Content="目標刀號超出範圍"/>
+	<Message ID="AlarmMsg::ROT::ID=5" Content="驅動器站號不存在"/>
+	<Message ID="AlarmMsg::ROT::ID=6" Content="ROT軸驅動器站號與其他軸重複設定"/>
+	<Message ID="AlarmMsg::ROT::ID=7" Content="寄存器位於系統保護區或不支援位元存取"/>
+	<Message ID="AlarmMsg::ROT::ID=8" Content="ROT定位偏差過大"/>
+	<Message ID="AlarmMsg::ROT::ID=9" Content="驅動器通訊異常"/>
+	<Message ID="AlarmMsg::ROT::ID=10" Content="加減速或速度設定錯誤"/>
+	<Message ID="AlarmMsg::ROT::ID=11" Content="驅動器電源異常"/>
+	<Message ID="AlarmMsg::ROT::ID=12" Content="不支援此驅動器類型"/>
+	<Message ID="AlarmMsg::ROT::ID=13" Content="參數設定導致定位異常"/>
+	<Message ID="AlarmMsg::ROT::ID=14" Content="新代編碼器韌件升級結束，請重啟驅動器"/>
+	<Message ID="AlarmMsg::ROT::ID=15" Content="新代編碼器資訊讀取逾時"/>
+	<Message ID="AlarmMsg::ROT::ID=16" Content="軸向迴授值異常"/>
+	<Message ID="AlarmMsg::ROT::ID=17" Content="自定義刀具位置設定錯誤"/>
+	<Message ID="AlarmMsg::ROT::ID=18" Content="通訊線材接觸不良" />
+	<Message ID="AlarmMsg::ROT::ID=19" Content="硬件未收到通訊封包" />
+	<Message ID="AlarmMsg::ROT::ID=20" Content="通訊封包受雜訊干擾" />
+	<Message ID="AlarmMsg::ROT::ID=21" Content="驅動器軟件遺漏通訊封包" />
+	<Message ID="AlarmMsg::ROT::ID=22" Content="驅動器後級電未供給" />
+</ResMap>

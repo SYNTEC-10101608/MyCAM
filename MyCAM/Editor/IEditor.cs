@@ -86,6 +86,24 @@ namespace MyCAM.Editor
 			}
 		}
 
+		public void EndAction( bool resumeDefaultAction = true )
+		{
+			if( m_CurrentAction == null ) return;
+			if( resumeDefaultAction ) {
+				EndActionIfNotDefault();
+				return;
+			}
+			bool wasNextAction = m_IsNextAction;
+			m_IsNextAction = true;
+			try {
+				m_CurrentAction.End();
+			}
+			finally {
+				m_CurrentAction = null;
+				m_IsNextAction = wasNextAction;
+			}
+		}
+
 		protected virtual void OnEditActionStart( IEditorAction action )
 		{
 			// currently for notifying main form
