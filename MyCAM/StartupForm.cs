@@ -259,7 +259,8 @@ namespace MyCAM
 
 		void CloseCNCPanels()
 		{
-			if( m_CurrentEditor == m_CAMEditor ) m_CAMEditor?.EndAction();
+			if( m_CurrentEditor == m_CAMEditor )
+				m_CAMEditor?.EndAction();
 			if( Height > Width ) {
 				m_CNCUIManager?.CloseOffsetDialog();
 			}
@@ -350,7 +351,7 @@ namespace MyCAM
 		readonly Color DEFAULT_BtnColor = SystemColors.Control;
 		readonly Color ON_ButtonColor = Color.FromArgb( 233, 180, 159 );
 
-		const string SOFTWARE_Version = "0.45.0";
+		const string SOFTWARE_Version = "0.46.0";
 		const string SOFTWARE_Name = "新代雷射五軸切割 " + SOFTWARE_Version;
 
 		string m_currentImportedFileName = string.Empty;
@@ -1177,7 +1178,8 @@ namespace MyCAM
 		// switch editor
 		void SwitchEditor( EEditorType type, bool closePanels = true )
 		{
-			if( closePanels ) CloseCNCPanels();
+			if( closePanels )
+				CloseCNCPanels();
 			// no current editor
 			if( m_CurrentEditor == null ) {
 				m_CurrentEditor = GetEditor( type );
