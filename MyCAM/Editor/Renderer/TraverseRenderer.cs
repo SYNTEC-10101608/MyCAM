@@ -11,6 +11,7 @@ using OCC.Prs3d;
 using OCC.Quantity;
 using OCCViewer;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -174,6 +175,7 @@ namespace MyCAM.Editor.Renderer
 
 		void ShowTraversePathWithTrans( List<string> pathIDList, gp_Trsf trsf )
 		{
+			TraverseCalculationInfo calculationInfo = TraverseHelper.BuildTraverseCalculationInfo( m_DataManager );
 			foreach( string currentPathID in pathIDList ) {
 				if( !DataGettingHelper.GetCraftDataByID( currentPathID, out CraftData craftData ) ||
 					craftData.TraverseData == null || craftData.ProcessPath == false ) {
@@ -191,7 +193,7 @@ namespace MyCAM.Editor.Renderer
 				IProcessPoint currentStartPoint = GetProcessStartPoint( currentPathID );
 
 				// Calculate all traverse points using helper
-				if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, currentTraverseData, out TraversePathResult result ) ) {
+				if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, currentTraverseData, calculationInfo, out TraversePathResult result ) ) {
 					continue;
 				}
 
@@ -199,7 +201,8 @@ namespace MyCAM.Editor.Renderer
 				List<AIS_Shape> frogLeapShapeList = new List<AIS_Shape>();
 
 				// frog leap 
-				if( currentTraverseData.TraverseMode == TraverseData.TraverseType.FrogLeap && currentTraverseData.FrogLeapDistance > 0 && result.FrogLeapMiddlePoint != null && result.LiftUpPoint.Point != null && result.CutDownPoint.Point != null ) {
+				if( currentTraverseData.TraverseMode == TraverseData.TraverseType.FrogLeap && currentTraverseData.FrogLeapDistance > 0
+					&& result.FrogLeapMiddlePoint != null && result.LiftUpPoint.Point != null && result.CutDownPoint.Point != null ) {
 					GC_MakeArcOfCircle makeCircle = new GC_MakeArcOfCircle( result.LiftUpPoint.Point, result.FrogLeapMiddlePoint.Point, result.CutDownPoint.Point );
 					if( makeCircle.IsDone() ) {
 						Geom_TrimmedCurve arcCurve = makeCircle.Value();
@@ -432,7 +435,7 @@ namespace MyCAM.Editor.Renderer
 
 		void AddOneLinearTraverseWithTrans( List<AIS_Line> lineList, gp_Pnt startPnt, gp_Pnt endPnt, gp_Trsf trsf )
 		{
-			if( startPnt == null || endPnt == null || startPnt.Distance( endPnt ) <= 1e-7 ) {
+			if( startPnt == null || endPnt == null || startPnt.Distance( endPnt ) <= 1e-6 ) {
 				return;
 			}
 			AIS_Line traverseAIS = DrawHelper.GetLineAIS( startPnt, endPnt, Quantity_NameOfColor.Quantity_NOC_RED, 1, true );
@@ -480,10 +483,14 @@ namespace MyCAM.Editor.Renderer
 				traverseData.TraverseMode == TraverseData.TraverseType.SafeSphere ) {
 				List<gp_Pnt> points = traverseResult.SafeBoundaryPointList;
 				if( points == null || points.Count == 0 ) {
-					return new List<(gp_Pnt, gp_Pnt)>();
+					segments.Add( (traverseResult.LiftUpPoint.Point, traverseResult.CutDownPoint.Point) );
 				}
-				for( int index = 1; index < points.Count; index++ ) {
-					segments.Add( (points[ index - 1 ], points[ index ]) );
+				else {
+					segments.Add( (traverseResult.LiftUpPoint.Point, points.First()) );
+					for( int i = 1; i < points.Count; ++i ) {
+						segments.Add( (points[ i - 1 ], points[ i ]) );
+					}
+					segments.Add( (points.Last(), traverseResult.CutDownPoint.Point) );
 				}
 			}
 			else {

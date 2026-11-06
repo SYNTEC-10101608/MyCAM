@@ -144,9 +144,6 @@ namespace MyCAM.Helper
 				else {
 					traverseIKPntList = GetTraversIKPnt( currentPostData, postSolver, false, prePathLastPnt );
 				}
-				if( currentPostData.SafeBoundaryPostPointList != null && traverseIKPntList.Count == 0 ) {
-					return false;
-				}
 
 				// main path
 				List<PostPointBase> processPathIKPntList = GetPathIKPnt( currentPostData );
@@ -353,30 +350,6 @@ namespace MyCAM.Helper
 			List<PostPointBase> traverseIKPoints = new List<PostPointBase>();
 			bool bSuccess;
 
-			if( pathPostData.SafeBoundaryPostPointList != null ) {
-				List<PostPoint> boundaryPoints = pathPostData.SafeBoundaryPostPointList;
-				if( boundaryPoints.Count < 2 ) {
-					return new List<PostPointBase>();
-				}
-				PostPointBase segmentStart = traversStartPnt;
-				for( int index = 1; index < boundaryPoints.Count; index++ ) {
-					if( !BuildLinearTraverseIKPnt( segmentStart, boundaryPoints[ index ], out List<PostPointBase> boundarySegmentIKList ) ) {
-						return new List<PostPointBase>();
-					}
-					if( traverseIKPoints.Count > 0 ) {
-						boundarySegmentIKList.RemoveAt( 0 );
-					}
-					traverseIKPoints.AddRange( boundarySegmentIKList );
-					segmentStart = boundaryPoints[ index ];
-				}
-				if( !BuildLinearTraverseIKPnt( segmentStart, pathPostData.ProcessStartPoint, out List<PostPointBase> boundaryCutDownIKList ) ) {
-					return new List<PostPointBase>();
-				}
-				boundaryCutDownIKList.RemoveAt( 0 );
-				traverseIKPoints.AddRange( boundaryCutDownIKList );
-				return traverseIKPoints;
-			}
-
 			// frog leap
 			if( pathPostData.FrogLeapMidPostPoint != null ) {
 
@@ -397,6 +370,36 @@ namespace MyCAM.Helper
 				bSuccess = BuildFrogLeapTraverseIKPnt( traversStartPnt, pathPostData.FrogLeapMidPostPoint, pathPostData.ProcessStartPoint, out List<PostPointBase> justFrogLeapIKList );
 				if( bSuccess ) {
 					traverseIKPoints.AddRange( justFrogLeapIKList );
+				}
+				return traverseIKPoints;
+			}
+
+			// safe cylinder or safe sphere
+			if( pathPostData.SafeBoundaryPostPointList != null ) {
+				List<PostPoint> boundaryPoints = pathPostData.SafeBoundaryPostPointList;
+
+				if( boundaryPoints.Count != 0 ) {
+					bSuccess = BuildLinearTraverseIKPnt( traversStartPnt, boundaryPoints.First(), out List<PostPointBase> toProjectIKLIst );
+					if( bSuccess ) {
+						traverseIKPoints.AddRange( toProjectIKLIst );
+					}
+				}
+
+				traverseIKPoints.AddRange( boundaryPoints );
+
+				if( boundaryPoints.Count != 0 ) {
+					PostPoint targetPoint = pathPostData.CutDownPostPoint ?? pathPostData.ProcessStartPoint;
+					bSuccess = BuildLinearTraverseIKPnt( boundaryPoints.Last(), targetPoint, out List<PostPointBase> fromProjectIKLIst );
+					if( bSuccess ) {
+						traverseIKPoints.AddRange( fromProjectIKLIst );
+					}
+				}
+
+				if( pathPostData.CutDownPostPoint != null ) {
+					bSuccess = BuildLinearTraverseIKPnt( pathPostData.CutDownPostPoint, pathPostData.ProcessStartPoint, out List<PostPointBase> cutDownIKLIst );
+					if( bSuccess ) {
+						traverseIKPoints.AddRange( cutDownIKLIst );
+					}
 				}
 				return traverseIKPoints;
 			}
@@ -459,32 +462,23 @@ namespace MyCAM.Helper
 				return false;
 			}
 
-			gp_Pnt startPoint = new gp_Pnt( startPost.X, startPost.Y, startPost.Z );
-			gp_Pnt endPoint = new gp_Pnt( endPost.X, endPost.Y, endPost.Z );
-			List<gp_Pnt> discretePoints = SimulationHelper.DiscretizeLine( startPoint, endPoint );
-			if( discretePoints == null ) {
+			List<gp_Pnt> DiscretizePntList = SimulationHelper.DiscretizeLine( new gp_Pnt( startPost.X, startPost.Y, startPost.Z ), new gp_Pnt( endPost.X, endPost.Y, endPost.Z ) );
+			if( DiscretizePntList == null || DiscretizePntList.Count == 0 ) {
 				return false;
 			}
-			if( discretePoints.Count < 2 ) {
-				IKpostPointList.Add( startPost.Clone() );
-				IKpostPointList.Add( endPost.Clone() );
-				return true;
+			double dMasterStep = ( endPost.Master - startPost.Master ) / DiscretizePntList.Count();
+			double dSlaveStep = ( endPost.Slave - startPost.Slave ) / DiscretizePntList.Count();
+			for( int i = 0; i < DiscretizePntList.Count; i++ ) {
+				PostPoint pnt = new PostPoint();
+				pnt.X = DiscretizePntList[ i ].X();
+				pnt.Y = DiscretizePntList[ i ].Y();
+				pnt.Z = DiscretizePntList[ i ].Z();
+
+				// interpolate master and slave values
+				pnt.Master = startPost.Master + dMasterStep * i;
+				pnt.Slave = startPost.Slave + dSlaveStep * i;
+				IKpostPointList.Add( pnt );
 			}
-			double totalLength = startPoint.Distance( endPoint );
-			for( int index = 0; index < discretePoints.Count; index++ ) {
-				double ratio = startPoint.Distance( discretePoints[ index ] ) / totalLength;
-				PostPoint point = new PostPoint()
-				{
-					X = discretePoints[ index ].X(),
-					Y = discretePoints[ index ].Y(),
-					Z = discretePoints[ index ].Z(),
-					Master = startPost.Master + ratio * ( endPost.Master - startPost.Master ),
-					Slave = startPost.Slave + ratio * ( endPost.Slave - startPost.Slave )
-				};
-				IKpostPointList.Add( point );
-			}
-			IKpostPointList[ 0 ] = startPost.Clone();
-			IKpostPointList[ IKpostPointList.Count - 1 ] = endPost.Clone();
 			return true;
 		}
 
@@ -496,10 +490,10 @@ namespace MyCAM.Helper
 				return false;
 			}
 			List<List<gp_Pnt>> arcPntList = SimulationHelper.DiscretizeArcSegments( new gp_Pnt( startPost.X, startPost.Y, startPost.Z ), new gp_Pnt( midPost.X, midPost.Y, midPost.Z ), new gp_Pnt( endPost.X, endPost.Y, endPost.Z ) );
-			if( arcPntList == null || arcPntList.Count < 2 || arcPntList[ 0 ] == null || arcPntList[ 1 ] == null ) {
+			if( arcPntList == null || arcPntList.Count == 0 || arcPntList[ 0 ] == null || arcPntList[ 1 ] == null ) {
 				return false;
 			}
-			bool bSuccess = AddInterpolatedPoints( arcPntList[ 0 ], startPost, midPost, out List<PostPoint> FrogLeapFirstHalfList );
+			bool bSuccess = AddInterpolatedPoints( arcPntList[ 0 ], startPost.Master, startPost.Slave, midPost.Master, midPost.Slave, out List<PostPoint> FrogLeapFirstHalfList );
 			if( !bSuccess ) {
 				return false;
 			}
@@ -510,7 +504,7 @@ namespace MyCAM.Helper
 
 			// remove duplicated mid point
 			frogLeapIKPostPnt.RemoveAt( frogLeapIKPostPnt.Count() - 1 );
-			bSuccess = AddInterpolatedPoints( arcPntList[ 1 ], midPost, endPost, out List<PostPoint> FrogLeapSecondHalfList );
+			bSuccess = AddInterpolatedPoints( arcPntList[ 1 ], midPost.Master, midPost.Slave, endPost.Master, endPost.Slave, out List<PostPoint> FrogLeapSecondHalfList );
 			if( !bSuccess ) {
 				return false;
 			}
@@ -519,36 +513,24 @@ namespace MyCAM.Helper
 		}
 
 		// interpolate master / slave over a set of arc points
-		static bool AddInterpolatedPoints( List<gp_Pnt> arcPoints, PostPoint startPost, PostPoint endPost, out List<PostPoint> interpolatedPoints )
+		static bool AddInterpolatedPoints( List<gp_Pnt> arcPoints, double startMaster, double startSlave, double endMaster, double endSlave, out List<PostPoint> interpolatedPoints )
 		{
 			interpolatedPoints = new List<PostPoint>();
 			if( arcPoints == null || arcPoints.Count == 0 ) {
 				return false;
 			}
-			if( arcPoints.Count < 2 ) {
-				interpolatedPoints.Add( startPost.Clone() );
-				interpolatedPoints.Add( endPost.Clone() );
-				return true;
-			}
-			double[] cumulativeLengths = new double[ arcPoints.Count ];
-			for( int i = 1; i < arcPoints.Count; i++ ) {
-				cumulativeLengths[ i ] = cumulativeLengths[ i - 1 ] + arcPoints[ i - 1 ].Distance( arcPoints[ i ] );
-			}
-			double totalLength = cumulativeLengths[ arcPoints.Count - 1 ];
+			double dMasterStep = ( endMaster - startMaster ) / arcPoints.Count;
+			double dSlaveStep = ( endSlave - startSlave ) / arcPoints.Count;
 
 			for( int i = 0; i < arcPoints.Count; i++ ) {
-				// Preserve angular motion even when all positions coincide.
-				double ratio = totalLength > 0 ? cumulativeLengths[ i ] / totalLength : (double)i / ( arcPoints.Count - 1 );
 				PostPoint pnt = new PostPoint();
 				pnt.X = arcPoints[ i ].X();
 				pnt.Y = arcPoints[ i ].Y();
 				pnt.Z = arcPoints[ i ].Z();
-				pnt.Master = startPost.Master + ratio * ( endPost.Master - startPost.Master );
-				pnt.Slave = startPost.Slave + ratio * ( endPost.Slave - startPost.Slave );
+				pnt.Master = startMaster + dMasterStep * i;
+				pnt.Slave = startSlave + dSlaveStep * i;
 				interpolatedPoints.Add( pnt );
 			}
-			interpolatedPoints[ 0 ] = startPost.Clone();
-			interpolatedPoints[ interpolatedPoints.Count - 1 ] = endPost.Clone();
 			return true;
 		}
 

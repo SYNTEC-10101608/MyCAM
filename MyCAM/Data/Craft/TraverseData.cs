@@ -204,8 +204,8 @@ namespace MyCAM.Data
 		public static TraverseType TRAVERSE_MODE = TraverseType.FrogLeap;
 		public static double FROG_LEAP_DISTANCE = 10.0;
 		public static double SAFE_PLANE_DISTANCE = 20.0;
-		public static double SAFE_CYLINDER_RADIUS = 20.0;
-		public static double SAFE_SPHERE_RADIUS = 20.0;
+		public static double SAFE_CYLINDER_RADIUS = 0.0;
+		public static double SAFE_SPHERE_RADIUS = 0.0;
 		double m_LiftUpDistance = LIFT_UP_DISTANCE;
 		double m_CutDownDistance = CUT_DOWN_DISTANCE;
 		double m_FollowSafeDistance = FOLLOW_SAFE_DISTANCE;

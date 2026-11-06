@@ -1,5 +1,6 @@
 ﻿using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Helper;
 using MyCAM.PathCache;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace MyCAM.Post
 			m_DataManager = dataManager;
 			m_PathIDList = dataManager.PathIDList;
 			m_AxisConfig = new AxisConfig( dataManager.MachineData as FiveAxisMachineData );
+			m_TraverseCalculationInfo = TraverseHelper.BuildTraverseCalculationInfo( dataManager );
 			m_EntryAndExitData = dataManager.EntryAndExitData;
 		}
 
@@ -25,6 +27,7 @@ namespace MyCAM.Post
 		IReadOnlyList<string> m_PathIDList;
 		StreamWriter m_StreamWriter;
 		AxisConfig m_AxisConfig;
+		TraverseCalculationInfo m_TraverseCalculationInfo;
 		EntryAndExitData m_EntryAndExitData;
 
 		public bool ConvertSuccess( string fileName, string szTempFilePath, out string errorMessage )
@@ -116,7 +119,7 @@ namespace MyCAM.Post
 			}
 			PostTraverseBuilder.CalculateExit( endInfoOfLastPath, m_EntryAndExitData, out PostPoint exitPoint );
 			m_StreamWriter.WriteLine( "// Exit" );
-			NCWriterHelper.WriteLinearTraverse( m_StreamWriter, exitPoint, 0, m_AxisConfig );
+			NCWriterHelper.WriteLinearTraverse( m_StreamWriter, exitPoint, m_AxisConfig );
 		}
 
 		bool ProcessAllPaths( out PathEndInfo endInfoOfLastPath, out string errorMessage )
@@ -209,7 +212,7 @@ namespace MyCAM.Post
 			errorMessage = string.Empty;
 			postData = null;
 			if( !ContourPostHelper.GetPostData( BuildPackageByID( m_PathIDList[ pathIndex ] ),
-				endInfo, m_EntryAndExitData, out postData, out endInfo ) ) {
+				endInfo, m_EntryAndExitData, m_TraverseCalculationInfo, out postData, out endInfo ) ) {
 				errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), pathIndex );
 				return false;
 			}
@@ -221,8 +224,7 @@ namespace MyCAM.Post
 			errorMessage = string.Empty;
 			postData = null;
 			package = BuildPackageByID_StandardPattern( m_PathIDList[ pathIndex ] );
-			if( !StdPatternPostHelper.GetPostData( package, endInfo, m_EntryAndExitData,
-				out postData, out endInfo ) ) {
+			if( !StdPatternPostHelper.GetPostData( package, endInfo, m_EntryAndExitData, m_TraverseCalculationInfo, out postData, out endInfo ) ) {
 				errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), pathIndex );
 				return false;
 			}
@@ -254,7 +256,6 @@ namespace MyCAM.Post
 			}
 
 			// Update traverse points
-			postData.SafeBoundaryPostPointList = stdPostData.SafeBoundaryPostPointList;
 			if( postData.LiftUpPostPoint != null ) {
 				postData.LiftUpPostPoint = stdPostData.LiftUpPostPoint;
 			}
@@ -272,6 +273,9 @@ namespace MyCAM.Post
 			}
 			if( postData.ProcessStartPoint != null ) {
 				postData.ProcessStartPoint = stdPostData.ProcessStartPoint;
+			}
+			if( postData.SafeBoundaryPostPointList != null ) {
+				postData.SafeBoundaryPostPointList = stdPostData.SafeBoundaryPostPointList;
 			}
 		}
 

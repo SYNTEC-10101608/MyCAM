@@ -1,11 +1,21 @@
-﻿using MyCAM.Data;
-using System;
+using LanguageManager;
+using MyCAM.App;
+using MyCAM.Data;
 using OCC.gp;
 using OCC.TopoDS;
+using OCCTool;
+using System;
 using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
+	public struct TraverseCalculationInfo
+	{
+		public gp_Ax3 SafeBoundaryAxes;
+
+		public bool? RotaryAxisIsMaster;
+	}
+
 	public struct TraversePathResult
 	{
 		public IProcessPoint PreviousPathEnd;
@@ -16,12 +26,64 @@ namespace MyCAM.Helper
 		public gp_Pnt SafePlaneLiftUpProjPoint;
 		public gp_Pnt SafePlaneCutDownProjPoint;
 		public List<gp_Pnt> SafeBoundaryPointList;
-		public int SafeBoundaryEntryIndex;
-		public int SafeBoundaryExitIndex;
 	}
 
 	public static class TraverseHelper
 	{
+		const double TWO_PI = 2 * Math.PI;
+		const double PREVIEW_MARGIN = 10;
+		const double PREVIEW_MARGIN_RATIO = 0.2;
+
+		internal static TraverseCalculationInfo BuildTraverseCalculationInfo( DataManager dataManager )
+		{
+			TraverseCalculationInfo result = new TraverseCalculationInfo();
+
+			if( dataManager == null ) {
+				return result;
+			}
+			if( !( dataManager.MachineData is FiveAxisMachineData machineData ) ) {
+				return result;
+			}
+
+			List<TopoDS_Shape> shapeList = new List<TopoDS_Shape>();
+			foreach( string partID in dataManager.PartIDList ) {
+				if( !dataManager.ObjectMap.TryGetValue( partID, out IObject obj ) ||
+					!( obj is PartObject partObject ) ||
+					partObject.Role != PartRole.Workpiece ) {
+					continue;
+				}
+				if( partObject.Shape == null || partObject.Shape.IsNull() ) {
+					continue;
+				}
+				shapeList.Add( partObject.Shape );
+			}
+			if( shapeList.Count == 0 ) {
+				return result;
+			}
+
+			TopoDS_Shape workpieceCompound = ShapeTool.MakeCompound( shapeList );
+			if( workpieceCompound == null || workpieceCompound.IsNull() ) {
+				return result;
+			}
+
+			BoundingBox boundingBox = new BoundingBox( workpieceCompound );
+			gp_Pnt bottomCenter = ( machineData.TubeDir == RotaryAxis.X )
+				? new gp_Pnt( boundingBox.Xmin, boundingBox.YCenter, boundingBox.ZCenter )
+				: ( machineData.TubeDir == RotaryAxis.Y )
+					? new gp_Pnt( boundingBox.XCenter, boundingBox.Ymin, boundingBox.ZCenter )
+					: new gp_Pnt( boundingBox.XCenter, boundingBox.YCenter, boundingBox.Zmin );
+
+			result.SafeBoundaryAxes = new gp_Ax3( bottomCenter, RotateAxisDef.RotaryAxisToDir( machineData.TubeDir ) );
+
+			result.RotaryAxisIsMaster = ( machineData.RotaryAxisConfig.RotaryAxisType == machineData.MasterRotaryAxis )
+				? true
+				: ( machineData.RotaryAxisConfig.RotaryAxisType == machineData.SlaveRotaryAxis )
+					? false
+					: (bool?)null;
+
+			return result;
+		}
+
 		public static IProcessPoint GetCutDownOrLiftUpPoint( IProcessPoint pathPoint, double dDistance )
 		{
 			if( pathPoint == null ) {
@@ -41,10 +103,12 @@ namespace MyCAM.Helper
 			return BuildTraversePoint( resultPoint, pathPoint.ToolVec );
 		}
 
-		public static IProcessPoint GetFrogLeapMiddlePoint( IProcessPoint frogLeapStartPoint, IProcessPoint frogLeapEndPoint, double frogLeapDistance )
+		static bool GetFrogLeapMiddlePoint( IProcessPoint frogLeapStartPoint, IProcessPoint frogLeapEndPoint, double frogLeapDistance, out IProcessPoint middlePoint )
 		{
+			middlePoint = null;
+
 			if( frogLeapStartPoint == null || frogLeapEndPoint == null ) {
-				return null;
+				return false;
 			}
 
 			// get middle point of traverse
@@ -56,13 +120,19 @@ namespace MyCAM.Helper
 
 			// if frog leap distance is zero, return middle point between start and end point
 			if( frogLeapDistance == 0 ) {
-				return BuildTraversePoint( moveMidP, new gp_Dir() ); // tool vector doesn't matter
+				middlePoint = BuildTraversePoint( moveMidP, new gp_Dir() ); // tool vector doesn't matter
+				return true;
 			}
 
 			// if tool vectors are parallel, use Z axis as moving direction
 			gp_Dir arcMidDir;
 			if( frogLeapStartPoint.ToolVec.IsOpposite( frogLeapEndPoint.ToolVec, 1e-3 ) ) {
 				arcMidDir = new gp_Dir( 0, 0, 1 );
+
+				// use X when Z would be parallel to either tool vector.
+				if( frogLeapStartPoint.ToolVec.IsEqual( arcMidDir, 1e-3 ) || frogLeapEndPoint.ToolVec.IsEqual( arcMidDir, 1e-3 ) ) {
+					arcMidDir = new gp_Dir( 1, 0, 0 );
+				}
 			}
 
 			// get moving direction vector by average of tool vector
@@ -81,10 +151,11 @@ namespace MyCAM.Helper
 			gp_Pnt frogLeapMidP = moveMidP.Translated( scaledMoveToArcMidVec );
 
 			// create frog leap middle point info
-			return BuildTraversePoint( frogLeapMidP, arcMidDir );
+			middlePoint = BuildTraversePoint( frogLeapMidP, arcMidDir );
+			return true;
 		}
 
-		public static gp_Pnt ProjectPointToPlane( gp_Pnt point, gp_Pln plane )
+		static gp_Pnt ProjectPointToPlane( gp_Pnt point, gp_Pln plane )
 		{
 			gp_Pnt planeLocation = plane.Location();
 			double distance = planeLocation.Z() - point.Z();
@@ -92,19 +163,27 @@ namespace MyCAM.Helper
 			return projectedPoint;
 		}
 
-		public static bool TryCalculateTraversePoints( IProcessPoint previousPathEnd, IProcessPoint currentPathStart, 
-			TraverseData traverseData, out TraversePathResult result )
+		// this method is now for building a CAMPoint as ITraversePoint
+		static IProcessPoint BuildTraversePoint( gp_Pnt point, gp_Dir toolVec )
 		{
-			gp_Dir boundaryAxis = null;
-			if( traverseData != null && ( traverseData.TraverseMode == TraverseData.TraverseType.SafeCylinder ||
-				traverseData.TraverseMode == TraverseData.TraverseType.SafeSphere ) ) {
-				boundaryAxis = GetSafeBoundaryAxis();
-			}
-			return TryCalculateTraversePoints( previousPathEnd, currentPathStart, traverseData, boundaryAxis, out result );
+			CADPoint cadPoint = new CADPoint(
+				point,
+				new gp_Dir(), // doesn't matter
+				new gp_Dir(), // doesn't matter
+				new gp_Dir() // doesn't matter
+			);
+			return new CAMPoint( cadPoint, toolVec );
+		}
+
+		static gp_Pln CreateSafePlane( double safePlaneZ )
+		{
+			gp_Pnt safePlaneOrigin = new gp_Pnt( 0, 0, safePlaneZ );
+			gp_Dir safePlaneNormal = new gp_Dir( 0, 0, 1 );
+			return new gp_Pln( safePlaneOrigin, safePlaneNormal );
 		}
 
 		public static bool TryCalculateTraversePoints( IProcessPoint previousPathEnd, IProcessPoint currentPathStart,
-			TraverseData traverseData, gp_Dir boundaryAxis, out TraversePathResult result )
+			TraverseData traverseData, TraverseCalculationInfo calculationData, out TraversePathResult result )
 		{
 			result = new TraversePathResult();
 
@@ -129,340 +208,314 @@ namespace MyCAM.Helper
 			}
 
 			switch( traverseData.TraverseMode ) {
-				// frog leap middle point (if frog leap mode)
+				// middle point for frog leap
 				case TraverseData.TraverseType.FrogLeap:
 					if( traverseData.FrogLeapDistance > 0 ) {
-						result.FrogLeapMiddlePoint = GetFrogLeapMiddlePoint( result.LiftUpPoint, result.CutDownPoint, traverseData.FrogLeapDistance );
+						if( !GetFrogLeapMiddlePoint( result.LiftUpPoint, result.CutDownPoint, traverseData.FrogLeapDistance, out result.FrogLeapMiddlePoint ) ) {
+							result.FrogLeapMiddlePoint = null;
+						}
 					}
 					return true;
 
+				// project points for safe plane
 				case TraverseData.TraverseType.SafePlane:
 					gp_Pln safePlane = CreateSafePlane( traverseData.SafePlaneDistance );
 					result.SafePlaneLiftUpProjPoint = ProjectPointToPlane( result.LiftUpPoint.Point, safePlane );
 					result.SafePlaneCutDownProjPoint = ProjectPointToPlane( result.CutDownPoint.Point, safePlane );
 					return true;
 
+				// radial traverse for safe cylinder and sphere
 				case TraverseData.TraverseType.SafeCylinder:
 				case TraverseData.TraverseType.SafeSphere:
-					return TryCalculateSafeBoundaryTraverse( previousPathEnd, currentPathStart, traverseData, boundaryAxis,
-						out result.SafeBoundaryPointList, out _,
-						OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION, OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
-						traverseData.TraverseMode,
-						out result.SafeBoundaryEntryIndex, out result.SafeBoundaryExitIndex );
+					if( !TryCalculateRadialTraverse( previousPathEnd, currentPathStart, result.LiftUpPoint, result.CutDownPoint,
+						traverseData, calculationData, out result.SafeBoundaryPointList ) ) {
+						result.SafeBoundaryPointList = null;
+					}
+					return true;
 
 				default:
 					return false;
 			}
 		}
 
-		// this method is now for building a CAMPoint as ITraversePoint
-		static IProcessPoint BuildTraversePoint( gp_Pnt point, gp_Dir toolVec )
-		{
-			CADPoint cadPoint = new CADPoint(
-				point,
-				new gp_Dir(), // doesn't matter
-				new gp_Dir(), // doesn't matter
-				new gp_Dir() // doesn't matter
-			);
-			return new CAMPoint( cadPoint, toolVec );
-		}
+		#region Safe cylinder and sphere
 
-		static gp_Pln CreateSafePlane( double safePlaneZ )
+		public static double GetBoundingMaxValue( List<IShapeObject> shapeObjects, gp_Ax3 axes, bool isSphere )
 		{
-			gp_Pnt safePlaneOrigin = new gp_Pnt( 0, 0, safePlaneZ );
-			gp_Dir safePlaneNormal = new gp_Dir( 0, 0, 1 );
-			return new gp_Pln( safePlaneOrigin, safePlaneNormal );
-		}
+			if( shapeObjects == null || axes == null ) {
+				return 0;
+			}
 
-		public static gp_Dir GetSafeBoundaryAxis()
-		{
-			if( DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
-				if( machineData.TubeDir == RotaryAxis.X ) {
-					return new gp_Dir( 1, 0, 0 );
+			List<TopoDS_Shape> shapeList = new List<TopoDS_Shape>();
+			foreach( IShapeObject shapeObject in shapeObjects ) {
+				if( shapeObject?.Shape == null || shapeObject.Shape.IsNull() ) {
+					continue;
 				}
-				if( machineData.TubeDir == RotaryAxis.Y ) {
-					return new gp_Dir( 0, 1, 0 );
+				shapeList.Add( shapeObject.Shape );
+			}
+			if( shapeList.Count == 0 ) {
+				return 0;
+			}
+
+			TopoDS_Shape compound = ShapeTool.MakeCompound( shapeList );
+			BoundingBox bbox = new BoundingBox( compound );
+
+			gp_Pnt center = axes.Location();
+			gp_Vec axis = new gp_Vec( axes.Direction() );
+			double maxDistance = 0;
+			double[] xValues = { bbox.Xmin, bbox.Xmax };
+			double[] yValues = { bbox.Ymin, bbox.Ymax };
+			double[] zValues = { bbox.Zmin, bbox.Zmax };
+
+			foreach( double x in xValues ) {
+				foreach( double y in yValues ) {
+					foreach( double z in zValues ) {
+						gp_Pnt corner = new gp_Pnt( x, y, z );
+						double distance;
+						if( isSphere ) {
+							distance = corner.Distance( center );
+						}
+						else {
+							gp_Vec offset = new gp_Vec( center, corner );
+							distance = offset.Subtracted( axis.Scaled( offset.Dot( axis ) ) ).Magnitude();
+						}
+						maxDistance = Math.Max( maxDistance, distance );
+					}
 				}
 			}
-			return new gp_Dir( 0, 0, 1 );
+
+			return Math.Ceiling( maxDistance );
 		}
 
-		public static bool TryCalculateSafeCylinderTraverse( IProcessPoint previousPathEnd, IProcessPoint currentPathStart,
-			TraverseData traverseData, gp_Dir cylinderAxis,
-			out System.Collections.Generic.List<gp_Pnt> points, out OCC.TopoDS.TopoDS_Edge surfaceEdge,
-			double maxDeflection = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
-			double maxEdgeLength = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH )
+		static bool TryCalculateRadialTraverse( IProcessPoint previousPathEnd, IProcessPoint currentPathStart, IProcessPoint liftUpPoint, IProcessPoint cutDownPoint,
+			TraverseData traverseData, TraverseCalculationInfo calculationData, out List<gp_Pnt> points )
 		{
-			return TryCalculateSafeBoundaryTraverse( previousPathEnd, currentPathStart, traverseData,
-				cylinderAxis, out points, out surfaceEdge, maxDeflection, maxEdgeLength,
-				TraverseData.TraverseType.SafeCylinder );
-		}
+			points = new List<gp_Pnt>();
 
-		public static bool TryCalculateSafeSphereTraverse( IProcessPoint previousPathEnd, IProcessPoint currentPathStart,
-			TraverseData traverseData,
-			out System.Collections.Generic.List<gp_Pnt> points, out OCC.TopoDS.TopoDS_Edge surfaceEdge,
-			double maxDeflection = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
-			double maxEdgeLength = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH )
-		{
-			return TryCalculateSafeSphereTraverse( previousPathEnd, currentPathStart, traverseData,
-				new gp_Dir( 0, 0, 1 ), out points, out surfaceEdge, maxDeflection, maxEdgeLength );
-		}
-
-		public static bool TryCalculateSafeSphereTraverse( IProcessPoint previousPathEnd, IProcessPoint currentPathStart,
-			TraverseData traverseData, gp_Dir latitudeAxis,
-			out System.Collections.Generic.List<gp_Pnt> points, out OCC.TopoDS.TopoDS_Edge surfaceEdge,
-			double maxDeflection = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
-			double maxEdgeLength = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH )
-		{
-			return TryCalculateSafeBoundaryTraverse( previousPathEnd, currentPathStart, traverseData,
-				latitudeAxis, out points, out surfaceEdge, maxDeflection, maxEdgeLength,
-				TraverseData.TraverseType.SafeSphere );
-		}
-
-		public static bool TryCalculateSafeBoundaryTraverse( IProcessPoint previousPathEnd, IProcessPoint currentPathStart,
-			TraverseData traverseData, gp_Dir cylinderAxis,
-			out System.Collections.Generic.List<gp_Pnt> points, out OCC.TopoDS.TopoDS_Edge surfaceEdge,
-			double maxDeflection = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
-			double maxEdgeLength = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH )
-		{
-			return TryCalculateSafeBoundaryTraverse( previousPathEnd, currentPathStart, traverseData,
-				cylinderAxis, out points, out surfaceEdge, maxDeflection, maxEdgeLength,
-				traverseData == null ? TraverseData.TraverseType.FrogLeap : traverseData.TraverseMode );
-		}
-
-		static bool TryCalculateSafeBoundaryTraverse( IProcessPoint previousPathEnd, IProcessPoint currentPathStart,
-			TraverseData traverseData, gp_Dir cylinderAxis,
-			out System.Collections.Generic.List<gp_Pnt> points, out OCC.TopoDS.TopoDS_Edge surfaceEdge,
-			double maxDeflection, double maxEdgeLength, TraverseData.TraverseType requiredMode )
-		{
-			return TryCalculateSafeBoundaryTraverse( previousPathEnd, currentPathStart, traverseData, cylinderAxis,
-				out points, out surfaceEdge, maxDeflection, maxEdgeLength, requiredMode, out _, out _ );
-		}
-
-		static bool TryCalculateSafeBoundaryTraverse( IProcessPoint previousPathEnd, IProcessPoint currentPathStart,
-			TraverseData traverseData, gp_Dir cylinderAxis,
-			out System.Collections.Generic.List<gp_Pnt> points, out OCC.TopoDS.TopoDS_Edge surfaceEdge,
-			double maxDeflection, double maxEdgeLength, TraverseData.TraverseType requiredMode,
-			out int entryIndex, out int exitIndex )
-		{
-			points = new System.Collections.Generic.List<gp_Pnt>();
-			surfaceEdge = null;
-			entryIndex = 0;
-			exitIndex = 0;
-			if( previousPathEnd == null || currentPathStart == null || traverseData == null ||
-				traverseData.TraverseMode != requiredMode ||
-				( requiredMode != TraverseData.TraverseType.SafeCylinder && requiredMode != TraverseData.TraverseType.SafeSphere ) ||
-				!IsPositiveFinite( maxDeflection ) || !IsPositiveFinite( maxEdgeLength ) ) {
+			if( previousPathEnd == null || currentPathStart == null || traverseData == null || calculationData.SafeBoundaryAxes == null ) {
 				return false;
 			}
-			bool isSphere = requiredMode == TraverseData.TraverseType.SafeSphere;
+
+			bool isSphere = traverseData.TraverseMode == TraverseData.TraverseType.SafeSphere;
 			double radius = isSphere ? traverseData.SafeSphereRadius : traverseData.SafeCylinderRadius;
-			if( !IsPositiveFinite( radius ) || radius <= 1e-6 || ( !isSphere && cylinderAxis == null ) ) {
-				return false;
-			}
-			gp_Ax3 axes = new gp_Ax3( new gp_Pnt( 0, 0, 0 ), cylinderAxis ?? new gp_Dir( 0, 0, 1 ) );
-			IProcessPoint liftUpPoint = GetCutDownOrLiftUpPoint( previousPathEnd, traverseData.LiftUpDistance );
-			IProcessPoint cutDownPoint = GetCutDownOrLiftUpPoint( currentPathStart, traverseData.CutDownDistance );
-			if( liftUpPoint == null || cutDownPoint == null ||
-				!TryProjectTraversePoint( liftUpPoint, axes, radius, isSphere, out gp_Pnt arcStart ) ||
-				!TryProjectTraversePoint( cutDownPoint, axes, radius, isSphere, out gp_Pnt arcEnd ) ) {
+
+			// chack radius valid 
+			if( !IsPositiveFinite( radius ) || radius <= 1e-6 ) {
 				return false;
 			}
 
-			if( !TryBuildBoundaryPath( arcStart, arcEnd, axes, radius, isSphere,
-				maxDeflection, maxEdgeLength, out points, out surfaceEdge ) ) {
+			gp_Ax3 axes = calculationData.SafeBoundaryAxes;
+
+			// project the lift-up and cut-down points to get the boundary path endpoints
+			if( !TryProjectToRadialPlane( liftUpPoint, axes, radius, isSphere, out gp_Pnt arcStart ) ||
+				!TryProjectToRadialPlane( cutDownPoint, axes, radius, isSphere, out gp_Pnt arcEnd ) ) {
 				return false;
 			}
-			if( liftUpPoint.Point.Distance( points[ 0 ] ) > 0 ) {
-				points.Insert( 0, liftUpPoint.Point );
-				entryIndex = 1;
+
+			double previousLongitudeAngle = 0;
+			double currentLongitudeAngle = 0;
+			if( calculationData.RotaryAxisIsMaster == true ) {
+				previousLongitudeAngle = previousPathEnd.ModMaster_rad;
+				currentLongitudeAngle = currentPathStart.ModMaster_rad;
 			}
-			exitIndex = points.Count - 1;
-			if( cutDownPoint.Point.Distance( points[ points.Count - 1 ] ) > 0 ) {
-				points.Add( cutDownPoint.Point );
+			else if( calculationData.RotaryAxisIsMaster == false ) {
+				previousLongitudeAngle = previousPathEnd.ModSlave_rad;
+				currentLongitudeAngle = currentPathStart.ModSlave_rad;
 			}
+			else {
+				// machine doesnt have rotaryAxis, always use clockwise direction
+			}
+
+			// use angles to determine the rotate direction
+			bool clockwise = previousLongitudeAngle >= currentLongitudeAngle;
+
+			// Generate the sampled points and matching geometry edge for the boundary path
+			if( !TryBuildBoundaryPath( arcStart, arcEnd, axes, radius, isSphere,
+				OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION, OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
+				clockwise, out points ) ) {
+				return false;
+			}
+
 			return true;
 		}
 
-		public static bool TryProjectToSafeRadialBoundary( gp_Pnt point, gp_Ax3 axes, double radius,
-			bool isSphere, out gp_Pnt projectedPoint )
+		static bool TryProjectToRadialPlane( IProcessPoint point, gp_Ax3 axes, double radius, bool isSphere, out gp_Pnt projectedPoint )
 		{
 			projectedPoint = null;
-			if( point == null || axes == null || !IsPositiveFinite( radius ) || radius <= 1e-6 ||
-				double.IsNaN( point.X() ) || double.IsInfinity( point.X() ) ||
-				double.IsNaN( point.Y() ) || double.IsInfinity( point.Y() ) ||
-				double.IsNaN( point.Z() ) || double.IsInfinity( point.Z() ) ) {
-				return false;
-			}
-			gp_Vec offset = new gp_Vec( axes.Location(), point );
-			gp_Vec radial = isSphere ? offset : offset.Subtracted(
-				new gp_Vec( axes.Direction() ).Scaled( offset.Dot( new gp_Vec( axes.Direction() ) ) ) );
-			if( radial.Magnitude() <= 1e-6 ) {
-				return false;
-			}
-			if( !IsPositiveFinite( radial.Magnitude() ) ) {
-				return false;
-			}
-			gp_Pnt center = isSphere ? axes.Location() : point.Translated( radial.Reversed() );
-			projectedPoint = center.Translated( radial.Scaled( radius / radial.Magnitude() ) );
-			return IsFinitePoint( projectedPoint );
-		}
 
-		static bool TryProjectTraversePoint( IProcessPoint point, gp_Ax3 axes, double radius, bool isSphere,
-			out gp_Pnt projectedPoint )
-		{
-			if( TryProjectToSafeRadialBoundary( point.Point, axes, radius, isSphere, out projectedPoint ) ) {
-				return true;
-			}
-			if( !IsFinitePoint( point.Point ) ) {
-				return false;
-			}
-			gp_Vec offset = new gp_Vec( axes.Location(), point.Point );
 			gp_Vec axis = new gp_Vec( axes.Direction() );
-			gp_Vec radial = isSphere ? offset : offset.Subtracted( axis.Scaled( offset.Dot( axis ) ) );
-			if( radial.Magnitude() > 1e-6 ) {
+
+			gp_Vec radial = new gp_Vec( axes.Location(), point.Point );
+
+			// subtract axial vector if cylinder
+			if( !isSphere ) {
+				radial = radial.Subtracted( axis.Scaled( radial.Dot( axis ) ) );
+			}
+
+			double radialLength = radial.Magnitude();
+
+			if( !IsPositiveFinite( radialLength ) ) {
 				return false;
 			}
-			// On the cylinder axis / sphere center, the nearest point is not unique.
-			// Use the outward lift/cut-down tool direction, not the inward cutting motion.
-			gp_Vec direction = new gp_Vec( point.ToolVec );
-			if( !isSphere ) {
-				direction = direction.Subtracted( axis.Scaled( direction.Dot( axis ) ) );
-			}
-			if( direction.Magnitude() <= 1e-12 ) {
-				direction = GetBoundaryReferenceDirection( axis, axes.Direction() );
-			}
-			direction.Normalize();
-			gp_Pnt center = isSphere ? axes.Location() :
-				axes.Location().Translated( axis.Scaled( offset.Dot( axis ) ) );
-			projectedPoint = center.Translated( direction.Scaled( radius ) );
-			return IsFinitePoint( projectedPoint );
-		}
 
-		static gp_Vec GetBoundaryReferenceDirection( gp_Vec radial, gp_Dir boundaryAxis )
-		{
-			var candidates = new List<gp_Dir>() { boundaryAxis };
-			if( DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
-				candidates.Add( machineData.MasterRotateDir );
-				candidates.Add( machineData.SlaveRotateDir );
-			}
-			foreach( gp_Dir candidate in candidates ) {
-				gp_Vec reference = new gp_Vec( candidate );
-				gp_Vec tangent = reference.Subtracted( radial.Scaled( reference.Dot( radial ) ) );
-				if( tangent.Magnitude() > 1e-12 ) {
-					tangent.Normalize();
-					return tangent;
+			// cannot project, the point is on the axis or at the sphere center
+			if( radialLength <= 1e-6 ) {
+
+				//for spherer,  use Z axis as moving direction
+				if( isSphere ) {
+					radial = new gp_Vec( 0, 0, 1 );
 				}
+
+				//for cylinder, try X Y Z axis as moving direction
+				else {
+					gp_Vec[] directions = {
+						new gp_Vec( 1, 0, 0 ),
+						new gp_Vec( 0, 1, 0 ),
+						new gp_Vec( 0, 0, 1 )
+					};
+
+					foreach( gp_Vec direction in directions ) {
+						gp_Vec candidate = direction.Subtracted( axis.Scaled( direction.Dot( axis ) ) );
+						if( candidate.Magnitude() > 1e-6 ) {
+							radial = candidate;
+							break;
+						}
+					}
+				}
+				radialLength = radial.Magnitude();
 			}
-			gp_Vec fallback = new gp_Vec( 1, 0, 0 );
-			if( Math.Abs( radial.Y() ) < Math.Abs( radial.X() ) ) {
-				fallback = new gp_Vec( 0, 1, 0 );
-			}
-			if( Math.Abs( radial.Z() ) < Math.Abs( fallback.Dot( radial ) ) ) {
-				fallback = new gp_Vec( 0, 0, 1 );
-			}
-			gp_Vec result = fallback.Subtracted( radial.Scaled( fallback.Dot( radial ) ) );
-			result.Normalize();
-			return result;
+
+			gp_Pnt center = isSphere ? axes.Location() : point.Point.Translated( radial.Reversed() );
+			projectedPoint = center.Translated( radial.Scaled( radius / radialLength ) );
+			return IsFinitePoint( projectedPoint );
 		}
 
 		static bool TryBuildBoundaryPath( gp_Pnt start, gp_Pnt end, gp_Ax3 axes, double radius, bool isSphere,
-			double maxDeflection, double maxEdgeLength, out List<gp_Pnt> points, out TopoDS_Edge surfaceEdge )
+			double maxDeflection, double maxEdgeLength, bool isClockWise, out List<gp_Pnt> points )
 		{
 			points = new List<gp_Pnt>();
-			surfaceEdge = null;
-			gp_Vec axis = new gp_Vec( axes.Direction() );
-			gp_Vec startOffset = new gp_Vec( axes.Location(), start );
-			gp_Vec endOffset = new gp_Vec( axes.Location(), end );
-			double startHeight = isSphere ? 0 : startOffset.Dot( axis );
-			double heightChange = isSphere ? 0 : endOffset.Dot( axis ) - startHeight;
-			gp_Pnt center = axes.Location().Translated( axis.Scaled( startHeight ) );
-			gp_Vec entry = new gp_Vec( center, start );
-			gp_Vec exit = endOffset.Subtracted( axis.Scaled( isSphere ? 0 : endOffset.Dot( axis ) ) );
-			entry.Normalize();
-			exit.Normalize();
-			gp_Vec normal;
-			double sweep;
-			if( isSphere ) {
-				normal = entry.Crossed( exit );
-				double sine = normal.Magnitude();
-				double cosine = Math.Max( -1, Math.Min( 1, entry.Dot( exit ) ) );
-				sweep = Math.Atan2( sine, cosine );
-				if( sine <= 1e-12 ) {
-					if( cosine >= 0 ) {
-						sweep = 0;
-					}
-					// Antipodal endpoints admit infinitely many equal-length semicircles.
-					// Prefer TubeDir, then the machine axes, then a stable world-axis fallback.
-					// TODO: Consider collision constraints when choosing an antipodal plane.
-					normal = entry.Crossed( GetBoundaryReferenceDirection( entry, axes.Direction() ) );
-				}
-				normal.Normalize();
-			}
-			else {
-				double signedAngle = Math.Atan2( axis.Dot( entry.Crossed( exit ) ), entry.Dot( exit ) );
-				// Clockwise viewed from the positive boundary axis towards the origin.
-				// Equal azimuths move axially without adding a full revolution.
-				sweep = Math.Abs( signedAngle ) <= 1e-12 ? 0 :
-					( signedAngle > 0 ? 2 * Math.PI - signedAngle : -signedAngle );
-				normal = axis.Reversed();
-			}
-			gp_Vec tangent = normal.Crossed( entry );
-			double length = Math.Sqrt( radius * sweep * ( radius * sweep ) + heightChange * heightChange );
-			// The axial component is linear; only the circular component contributes chord error.
-			double maxAngle = Math.Min( Math.PI, 4 * Math.Asin( Math.Sqrt( Math.Min( 0.5, maxDeflection / ( 2 * radius ) ) ) ) );
-			double segmentCount = Math.Max( 1, Math.Max( Math.Ceiling( length / maxEdgeLength ),
-				Math.Ceiling( sweep / maxAngle ) ) );
-			if( !IsPositiveFinite( segmentCount ) || segmentCount >= int.MaxValue ) {
+			if( start == null || end == null || axes == null ||
+				!IsFinitePoint( start ) || !IsFinitePoint( end ) ||
+				!IsPositiveFinite( radius ) || radius <= 1e-6 ||
+				!IsPositiveFinite( maxDeflection ) || !IsPositiveFinite( maxEdgeLength ) ) {
 				return false;
 			}
-			int count = (int)segmentCount;
-			for( int index = 0; index <= count; index++ ) {
-				double ratio = (double)index / count;
-				double angle = sweep * ratio;
-				points.Add( center.Translated( entry.Scaled( radius * Math.Cos( angle ) )
-					.Added( tangent.Scaled( radius * Math.Sin( angle ) ) )
-					.Added( axis.Scaled( heightChange * ratio ) ) ) );
+
+			gp_Vec axis = new gp_Vec( axes.Direction() );
+			gp_Vec xDirection = new gp_Vec( axes.XDirection() );
+			gp_Vec yDirection = new gp_Vec( axes.YDirection() );
+			gp_Vec startOffset = new gp_Vec( axes.Location(), start );
+			gp_Vec endOffset = new gp_Vec( axes.Location(), end );
+
+			// U is longitude; V is axial height for a cylinder or latitude for a sphere
+			double startLongitude = Math.Atan2( startOffset.Dot( yDirection ), startOffset.Dot( xDirection ) );
+			double endLongitude = Math.Atan2( endOffset.Dot( yDirection ), endOffset.Dot( xDirection ) );
+			double longitudeChange = GetBoundaryAngleChange( startLongitude, endLongitude, isClockWise );
+			double startPosition = startOffset.Dot( axis );
+			double endPosition = endOffset.Dot( axis );
+
+			if( isSphere ) {
+				// Clamp the normalized height to avoid asin domain errors from rounding
+				startPosition = Math.Asin( Math.Max( -1, Math.Min( 1, startPosition / radius ) ) );
+				endPosition = Math.Asin( Math.Max( -1, Math.Min( 1, endPosition / radius ) ) );
 			}
-			// Keep both endpoints even when coincident so stage 3 can rotate in place.
-			points[ 0 ] = start;
-			points[ count ] = end;
-			if( sweep == 0 && heightChange == 0 ) {
+
+			double positionChange = endPosition - startPosition;
+
+			// Preserve the existing in-place path behavior without constructing a zero-direction 2D line
+			if( longitudeChange == 0 && positionChange == 0 ) {
+				points.Add( start );
+				points.Add( end );
 				return true;
 			}
-			OCC.BRepBuilderAPI.BRepBuilderAPI_MakeEdge maker;
-			if( sweep == 0 ) {
-				maker = new OCC.BRepBuilderAPI.BRepBuilderAPI_MakeEdge( start, end );
-			}
-			else if( heightChange == 0 ) {
-				maker = new OCC.BRepBuilderAPI.BRepBuilderAPI_MakeEdge(
-					new gp_Circ( new gp_Ax2( center, new gp_Dir( normal ), new gp_Dir( entry ) ), radius ), 0, sweep );
+
+			OCC.Geom.Geom_Surface surface;
+			if( isSphere ) {
+				surface = new OCC.Geom.Geom_SphericalSurface( axes, radius );
 			}
 			else {
-				double startAngle = Math.Atan2( entry.Dot( new gp_Vec( axes.YDirection() ) ),
-					entry.Dot( new gp_Vec( axes.XDirection() ) ) );
-				var line = new OCC.Geom2d.Geom2d_Line( new gp_Pnt2d( startAngle, startHeight ),
-					new gp_Dir2d( -sweep, heightChange ) );
-				maker = new OCC.BRepBuilderAPI.BRepBuilderAPI_MakeEdge( line,
-					new OCC.Geom.Geom_CylindricalSurface( axes, radius ), 0,
-					Math.Sqrt( sweep * sweep + heightChange * heightChange ) );
+				surface = new OCC.Geom.Geom_CylindricalSurface( axes, radius );
 			}
+
+			// The 2D line uses a unit direction, so its parameter range must equal the UV distance
+			double lastParameter = Math.Sqrt( longitudeChange * longitudeChange + positionChange * positionChange );
+			if( !IsPositiveFinite( lastParameter ) ) {
+				return false;
+			}
+
+			// Linear UV interpolation preserves the existing path, not necessarily a spherical geodesic
+			OCC.Geom2d.Geom2d_Line parameterCurve = new OCC.Geom2d.Geom2d_Line(
+				new gp_Pnt2d( startLongitude, startPosition ),
+				new gp_Dir2d( longitudeChange, positionChange ) );
+
+			// Map the bounded UV line onto the surface to obtain the boundary edge
+			var maker = new OCC.BRepBuilderAPI.BRepBuilderAPI_MakeEdge( parameterCurve, surface, 0, lastParameter );
 			if( !maker.IsDone() ) {
 				return false;
 			}
-			surfaceEdge = maker.Edge();
-			if( heightChange != 0 && sweep != 0 && !OCC.BRepLib.BRepLib.BuildCurve3d( surfaceEdge ) ) {
+
+			// Reuse the shared discretization policy to evaluate points on the surface curve
+			TopoDS_Edge edge = maker.Edge();
+			var curveAdaptor = new OCC.BRepAdaptor.BRepAdaptor_Curve( edge );
+			List<double> parameters = GeometryTool.DiscretizeEdgeParameters( curveAdaptor, edge, maxDeflection, maxEdgeLength );
+
+			if( parameters == null || parameters.Count < 2 ) {
 				return false;
 			}
+
+			List<gp_Pnt> sampledPoints = new List<gp_Pnt>( parameters.Count );
+			foreach( double parameter in parameters ) {
+				if( double.IsNaN( parameter ) || double.IsInfinity( parameter ) ) {
+					return false;
+				}
+
+				gp_Pnt point = curveAdaptor.Value( parameter );
+				if( !IsFinitePoint( point ) ) {
+					return false;
+				}
+				sampledPoints.Add( point );
+			}
+
+			// Align the sampled order with the requested start and end before restoring exact endpoints
+			int lastIndex = sampledPoints.Count - 1;
+			double forwardDistance = sampledPoints[ 0 ].Distance( start ) + sampledPoints[ lastIndex ].Distance( end );
+			double reverseDistance = sampledPoints[ 0 ].Distance( end ) + sampledPoints[ lastIndex ].Distance( start );
+			if( reverseDistance < forwardDistance ) {
+				sampledPoints.Reverse();
+			}
+
+			// Preserve the exact projected endpoints
+			sampledPoints[ 0 ] = start;
+			sampledPoints[ sampledPoints.Count - 1 ] = end;
+			points = sampledPoints;
 			return true;
 		}
 
-		internal static bool TryGetPlanePreviewBounds( IReadOnlyList<TraversePathResult> results,
+		// calculate traverse angle by rotate direction
+		static double GetBoundaryAngleChange( double startAngle, double endAngle, bool isClockWise )
+		{
+			double signedAngle = Math.Atan2( Math.Sin( endAngle - startAngle ), Math.Cos( endAngle - startAngle ) );
+			if( Math.Abs( signedAngle ) < 1e-6 ) {
+				return 0;
+			}
+
+			if( isClockWise == false ) {
+				return signedAngle > 0 ? signedAngle : signedAngle + TWO_PI;
+			}
+			return signedAngle < 0 ? signedAngle : signedAngle - TWO_PI;
+		}
+
+		#endregion
+
+		#region Preview Bounds
+
+		public static bool TryGetPlanePreviewBounds( IReadOnlyList<TraversePathResult> results,
 			out double minX, out double maxX, out double minY, out double maxY )
 		{
 			minX = maxX = minY = maxY = 0;
 			bool hasPoints = false;
 			foreach( TraversePathResult result in results ) {
+
 				if( result.SafePlaneLiftUpProjPoint == null || result.SafePlaneCutDownProjPoint == null ) {
 					continue;
 				}
@@ -477,7 +530,9 @@ namespace MyCAM.Helper
 			if( !hasPoints ) {
 				return false;
 			}
-			double margin = Math.Max( 10, Math.Max( maxX - minX, maxY - minY ) * 0.2 );
+
+			// Add padding around the XY bounds so the preview does not sit against the edge
+			double margin = Math.Max( PREVIEW_MARGIN, Math.Max( maxX - minX, maxY - minY ) * PREVIEW_MARGIN_RATIO );
 			minX -= margin;
 			maxX += margin;
 			minY -= margin;
@@ -485,23 +540,28 @@ namespace MyCAM.Helper
 			return true;
 		}
 
-		internal static bool TryGetRadialPreviewBounds( IReadOnlyList<TraversePathResult> results, gp_Ax3 axes,
+		public static bool TryGetRadialPreviewBounds( IReadOnlyList<TraversePathResult> results, gp_Ax3 axes,
 			double radius, bool isSphere, out double minU, out double maxU, out double minV, out double maxV )
 		{
-			if( axes == null ) {
-				throw new ArgumentNullException( nameof( axes ) );
-			}
-			if( double.IsNaN( radius ) || double.IsInfinity( radius ) || radius <= 1e-6 ) {
-				throw new ArgumentOutOfRangeException( nameof( radius ) );
-			}
-			minU = maxU = 0;
+			minU = 0;
+			maxU = 0;
 			minV = double.MaxValue;
 			maxV = double.MinValue;
+
+			if( results == null || axes == null ) {
+				return false;
+			}
+			if( double.IsNaN( radius ) || double.IsInfinity( radius ) || radius <= 1e-6 ) {
+				return false;
+			}
+
 			var intervals = new List<(double start, double end)>();
 			gp_Vec xDirection = new gp_Vec( axes.XDirection() );
 			gp_Vec yDirection = new gp_Vec( axes.YDirection() );
 			gp_Vec axis = new gp_Vec( axes.Direction() );
 			double maxAngularStep = 0;
+
+			// Process each safe-boundary path and inspect only its boundary segment
 			foreach( TraversePathResult result in results ) {
 				List<gp_Pnt> points = result.SafeBoundaryPointList;
 				if( points == null || points.Count == 0 ) {
@@ -512,16 +572,19 @@ namespace MyCAM.Helper
 				double pathMin = double.MaxValue;
 				double pathMax = double.MinValue;
 				gp_Vec previousOffset = null;
-				for( int index = result.SafeBoundaryEntryIndex; index <= result.SafeBoundaryExitIndex; index++ ) {
-					gp_Vec offset = new gp_Vec( axes.Location(), points[ index ] );
+
+				// Unwrap angles along the path so crossing 0 and 2π does not split the bounds
+				for( int i = 0; i < points.Count; i++ ) {
+					gp_Vec offset = new gp_Vec( axes.Location(), points[ i ] );
 					double angle = Math.Atan2( offset.Dot( yDirection ), offset.Dot( xDirection ) );
 					if( previousOffset == null ) {
 						unwrappedAngle = angle;
 					}
 					else {
 						double delta = Math.Atan2( Math.Sin( angle - previousAngle ), Math.Cos( angle - previousAngle ) );
-						// Cylinder paths are clockwise, including a possible half-turn segment.
-						if( !isSphere && delta > 1e-12 ) {
+
+						// Unwrap cylinder paths clockwise, including segments that span exactly half a turn
+						if( !isSphere && delta > 1e-6 ) {
 							delta -= TWO_PI;
 						}
 						unwrappedAngle += delta;
@@ -543,29 +606,37 @@ namespace MyCAM.Helper
 				}
 				AddCircularInterval( intervals, pathMin, pathMax );
 			}
+
+			// Cannot calculate preview bounds when there are no valid boundary points
 			if( intervals.Count == 0 ) {
 				return false;
 			}
 
+			// Combine the angular intervals and find the smallest range that covers the paths
 			GetCircularBounds( intervals, out minU, out maxU );
 			bool includesPole = false;
+
+			// Use latitude for the sphere's V bounds and account for angles between sampled points
 			if( isSphere ) {
-				// Latitude changes by at most the central angle of each sampled great-circle segment.
 				minV = Math.Max( -Math.PI / 2, minV - maxAngularStep );
 				maxV = Math.Min( Math.PI / 2, maxV + maxAngularStep );
 				includesPole = minV <= -Math.PI / 2 || maxV >= Math.PI / 2;
-				double margin = Math.Max( 10.0 / radius, ( maxV - minV ) * 0.2 );
+				double margin = Math.Max( PREVIEW_MARGIN / radius, ( maxV - minV ) * PREVIEW_MARGIN_RATIO );
 				minV = Math.Max( -Math.PI / 2, minV - margin );
 				maxV = Math.Min( Math.PI / 2, maxV + margin );
 			}
+
+			// Use axial position for the cylinder's V bounds and add preview padding
 			else {
 				minV = Math.Min( 0, minV );
 				maxV = Math.Max( 0, maxV );
-				double margin = Math.Max( 10, ( maxV - minV ) * 0.2 );
+				double margin = Math.Max( PREVIEW_MARGIN, ( maxV - minV ) * PREVIEW_MARGIN_RATIO );
 				minV -= margin;
 				maxV += margin;
 			}
-			double angularMargin = Math.Max( 10.0 / radius, ( maxU - minU ) * 0.2 );
+			double angularMargin = Math.Max( PREVIEW_MARGIN / radius, ( maxU - minU ) * PREVIEW_MARGIN_RATIO );
+
+			// Show the full angular range when the path reaches a pole or the padded range covers a full turn
 			if( includesPole || maxU - minU + 2 * angularMargin >= TWO_PI ) {
 				minU = 0;
 				maxU = TWO_PI;
@@ -574,9 +645,11 @@ namespace MyCAM.Helper
 				minU -= angularMargin;
 				maxU += angularMargin;
 			}
+
 			return true;
 		}
 
+		// Normalize an angular range to 0 through 2π and split it if it crosses the seam
 		static void AddCircularInterval( List<(double start, double end)> intervals, double min, double max )
 		{
 			double width = Math.Min( TWO_PI, max - min );
@@ -591,12 +664,15 @@ namespace MyCAM.Helper
 			}
 		}
 
+		// Find the largest gap on the circle so the remaining range is the smallest one covering all intervals
 		static void GetCircularBounds( List<(double start, double end)> intervals, out double min, out double max )
 		{
 			intervals.Sort( ( left, right ) => left.start.CompareTo( right.start ) );
 			double end = intervals[ 0 ].end;
 			double largestGap = 0;
 			min = intervals[ 0 ].start;
+
+			// Compare gaps between adjacent intervals to find the largest one to skip
 			for( int index = 1; index < intervals.Count; index++ ) {
 				double gap = intervals[ index ].start - end;
 				if( gap > largestGap ) {
@@ -605,15 +681,19 @@ namespace MyCAM.Helper
 				}
 				end = Math.Max( end, intervals[ index ].end );
 			}
+
+			// The seam between the last and first intervals may also be the largest gap
 			double seamGap = intervals[ 0 ].start + TWO_PI - end;
 			if( seamGap > largestGap ) {
 				largestGap = seamGap;
 				min = intervals[ 0 ].start;
 			}
+
+			// Start after the largest gap and cover all remaining angular intervals
 			max = min + TWO_PI - largestGap;
 		}
 
-		const double TWO_PI = 2 * Math.PI;
+		#endregion
 
 		static bool IsFinitePoint( gp_Pnt point )
 		{

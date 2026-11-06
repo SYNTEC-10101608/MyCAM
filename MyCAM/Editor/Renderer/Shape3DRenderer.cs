@@ -1,4 +1,5 @@
-﻿using MyCAM.Helper;
+using MyCAM.Data;
+using MyCAM.Helper;
 using OCC.AIS;
 using OCC.gp;
 using OCC.Quantity;
@@ -9,30 +10,19 @@ using System.Collections.Generic;
 
 namespace MyCAM.Editor.Renderer
 {
-	internal abstract class Shape3DRendererBase : ICAMRenderer
+	internal abstract class Shape3DRendererBase : CAMRendererBase
 	{
-		protected Shape3DRendererBase( Viewer viewer )
+		protected Shape3DRendererBase( Viewer viewer, DataManager dataManager )
+			: base( viewer, dataManager )
 		{
-			m_Viewer = viewer;
 		}
 
-		public void SetShow( bool isShow )
-		{
-			m_IsShow = isShow;
-		}
-
-		public void SetPauseRefresh( bool isPause )
-		{
-			m_IsPauseRefresh = isPause;
-		}
-
-		public void SetPauseRefreshAndHide( bool isPause )
+		public override void SetPauseRefreshAndHide( bool isPause )
 		{
 			if( m_IsPauseRefreshAndHide == isPause ) {
 				return;
 			}
-			m_IsPauseRefreshAndHide = isPause;
-			m_IsPauseRefresh = isPause;
+			base.SetPauseRefreshAndHide( isPause );
 			if( isPause ) {
 				foreach( AIS_InteractiveObject ais in GetDisplayObjects() ) {
 
@@ -44,12 +34,7 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		public void UpdateView()
-		{
-			m_Viewer.UpdateView();
-		}
-
-		public void Show( bool bUpdate = false )
+		public override void Show( bool bUpdate = false )
 		{
 			if( m_IsPauseRefresh || m_IsPauseRefreshAndHide ) {
 				return;
@@ -63,7 +48,7 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		public void Remove( bool bUpdate = false )
+		public override void Remove( bool bUpdate = false )
 		{
 			if( m_ShapeAIS != null ) {
 				m_Viewer.GetAISContext().Remove( m_ShapeAIS, false );
@@ -104,20 +89,23 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		protected static void ValidateFinite( double value, string name )
+		protected static bool ValidateFinite( double value )
 		{
 			if( double.IsNaN( value ) || double.IsInfinity( value ) ) {
-				throw new ArgumentOutOfRangeException( name, "Geometry must be finite." );
+				return false;
 			}
+			return true;
 		}
 
-		protected static void ValidateRange( double min, double max, string name )
+		protected static bool ValidateRange( double min, double max )
 		{
-			ValidateFinite( min, name );
-			ValidateFinite( max, name );
-			if( min >= max ) {
-				throw new ArgumentOutOfRangeException( name, "Geometry bounds must be increasing." );
+			if( !ValidateFinite( min ) || !ValidateFinite( max ) ) {
+				return false;
 			}
+			if( min >= max ) {
+				return false;
+			}
+			return true;
 		}
 
 		protected void DisplayShape( AIS_Shape shape )
@@ -190,13 +178,9 @@ namespace MyCAM.Editor.Renderer
 			m_Viewer.GetAISContext().Deactivate( m_DimensionText );
 		}
 
-		protected readonly Viewer m_Viewer;
 		protected bool m_HasGeometry;
 		protected const double ARROW_HEIGHT = 5.0;
 		protected const double ARROW_RADIUS = 2.0;
-		bool m_IsShow = true;
-		bool m_IsPauseRefresh;
-		bool m_IsPauseRefreshAndHide;
 		AIS_Shape m_ShapeAIS;
 		AIS_Line m_DimensionLine;
 		AIS_Shape m_DimensionArrow;
@@ -205,22 +189,25 @@ namespace MyCAM.Editor.Renderer
 
 	internal class PlaneShape3DRenderer : Shape3DRendererBase
 	{
-		public PlaneShape3DRenderer( Viewer viewer )
-			: base( viewer )
+		public PlaneShape3DRenderer( Viewer viewer, DataManager dataManager )
+			: base( viewer, dataManager )
 		{
 		}
 
-		public void SetGeometry( double z, double minX, double maxX, double minY, double maxY )
+		public bool SetGeometry( double z, double minX, double maxX, double minY, double maxY )
 		{
-			ValidateFinite( z, nameof( z ) );
-			ValidateRange( minX, maxX, nameof( minX ) );
-			ValidateRange( minY, maxY, nameof( minY ) );
+			if( !ValidateFinite( z ) || !ValidateRange( minX, maxX ) || !ValidateRange( minY, maxY ) ) {
+				return false;
+			}
+
 			m_Z = z;
 			m_MinX = minX;
 			m_MaxX = maxX;
 			m_MinY = minY;
 			m_MaxY = maxY;
 			m_HasGeometry = true;
+
+			return true;
 		}
 
 		protected override void Draw()
@@ -237,25 +224,24 @@ namespace MyCAM.Editor.Renderer
 		double m_MaxY;
 	}
 
-	internal class RadialShape3DRendererBase : Shape3DRendererBase
+	internal class RadialShape3DRenderer : Shape3DRendererBase
 	{
-		public RadialShape3DRendererBase( Viewer viewer, bool isSphere )
-			: base( viewer )
+		public RadialShape3DRenderer( Viewer viewer, DataManager dataManager, bool isSphere )
+			: base( viewer, dataManager )
 		{
 			m_IsSphere = isSphere;
 		}
 
-		public void SetGeometry( gp_Ax3 axes, double radius, double minU, double maxU, double minV, double maxV )
+		public bool SetGeometry( gp_Ax3 axes, double radius, double minU, double maxU, double minV, double maxV )
 		{
 			if( axes == null ) {
-				throw new ArgumentNullException( nameof( axes ) );
+				return false;
 			}
-			ValidateFinite( radius, nameof( radius ) );
-			ValidateRange( minU, maxU, nameof( minU ) );
-			ValidateRange( minV, maxV, nameof( minV ) );
-			if( radius <= 1e-6 || maxU - minU > 2 * Math.PI + 1e-9 ||
-				( m_IsSphere && ( minV < -Math.PI / 2 || maxV > Math.PI / 2 ) ) ) {
-				throw new ArgumentOutOfRangeException( nameof( radius ), "Invalid radial surface geometry." );
+			if( !ValidateFinite( radius ) || !ValidateRange( minU, maxU ) || !ValidateRange( minV, maxV ) ) {
+				return false;
+			}
+			if( radius <= 1e-6 || maxU - minU > 2 * Math.PI + 1e-6 || ( m_IsSphere && ( minV < -Math.PI / 2 || maxV > Math.PI / 2 ) ) ) {
+				return false;
 			}
 			m_Axes = new gp_Ax3( axes.Location(), axes.Direction(), axes.XDirection() );
 			m_Radius = radius;
@@ -264,6 +250,8 @@ namespace MyCAM.Editor.Renderer
 			m_MinV = minV;
 			m_MaxV = maxV;
 			m_HasGeometry = true;
+
+			return true;
 		}
 
 		protected override void Draw()

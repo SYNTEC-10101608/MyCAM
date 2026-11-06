@@ -1,61 +1,26 @@
 ﻿using MyCAM.Data;
 using MyCAM.Helper;
+using OCC.gp;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Post
 {
 	internal static class PostTraverseBuilder
 	{
-		public static bool CalculateTraverse( PathEndInfo endInfoOfPreviousPath, INCPackage currentPathNCPack, ITraversePostData pathG54PostData )
+		public static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, INCPackage currentPathNCPack, ITraversePostData pathG54PostData,
+			TraverseCalculationInfo calculationData )
 		{
-			if( endInfoOfPreviousPath == null || currentPathNCPack == null ||
-				pathG54PostData == null || pathG54PostData.ProcessStartPoint == null ) {
-				return false;
+			if( endInfoOfPreviousPath == null || currentPathNCPack == null ) {
+				return;
 			}
 
 			IProcessPoint previousEndPoint = endInfoOfPreviousPath.EndCAMPoint;
 			IProcessPoint currentStartPoint = currentPathNCPack.ProcessStartPoint;
 
-			if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint, currentPathNCPack.TraverseData, out TraversePathResult result ) ) {
-				return false;
-			}
-
-			if( currentPathNCPack.TraverseData.TraverseMode == TraverseData.TraverseType.SafeCylinder ||
-				currentPathNCPack.TraverseData.TraverseMode == TraverseData.TraverseType.SafeSphere ) {
-				var boundaryPoints = result.SafeBoundaryPointList;
-				int entryIndex = result.SafeBoundaryEntryIndex;
-				int exitIndex = result.SafeBoundaryExitIndex;
-				if( boundaryPoints == null || entryIndex < 0 || exitIndex <= entryIndex || exitIndex >= boundaryPoints.Count ) {
-					return false;
-				}
-				double[] cumulativeLengths = new double[ boundaryPoints.Count ];
-				for( int index = entryIndex + 1; index <= exitIndex; index++ ) {
-					cumulativeLengths[ index ] = cumulativeLengths[ index - 1 ] +
-						boundaryPoints[ index - 1 ].Distance( boundaryPoints[ index ] );
-				}
-				double totalLength = cumulativeLengths[ exitIndex ];
-				if( double.IsNaN( totalLength ) || double.IsInfinity( totalLength ) ) {
-					return false;
-				}
-				var boundaryPostPoints = new List<PostPoint>( boundaryPoints.Count );
-				for( int index = 0; index < boundaryPoints.Count; index++ ) {
-					// Hold the old/new angles on the approach/departure; rotate only on the surface.
-					// Coincident surface endpoints still carry distinct angles for rotation in place.
-					double ratio = index <= entryIndex ? 0 : index >= exitIndex ? 1 :
-						( totalLength > 0 ? cumulativeLengths[ index ] / totalLength :
-							(double)( index - entryIndex ) / ( exitIndex - entryIndex ) );
-					boundaryPostPoints.Add( new PostPoint()
-					{
-						X = boundaryPoints[ index ].X(),
-						Y = boundaryPoints[ index ].Y(),
-						Z = boundaryPoints[ index ].Z(),
-						Master = endInfoOfPreviousPath.Master + ratio *
-							( pathG54PostData.ProcessStartPoint.Master - endInfoOfPreviousPath.Master ),
-						Slave = endInfoOfPreviousPath.Slave + ratio *
-							( pathG54PostData.ProcessStartPoint.Slave - endInfoOfPreviousPath.Slave )
-					} );
-				}
-				pathG54PostData.SafeBoundaryPostPointList = boundaryPostPoints;
+			if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint,
+				currentPathNCPack.TraverseData, calculationData, out TraversePathResult result ) ) {
+				return;
 			}
 
 			// lift up
@@ -104,6 +69,37 @@ namespace MyCAM.Post
 				};
 			}
 
+			// safe cylinder or safe sphere
+			if( result.SafeBoundaryPointList != null ) {
+
+				List<gp_Pnt> boundaryPoints = result.SafeBoundaryPointList;
+
+				// using distance ratio to interpolate MS
+				double[] cumulativeLengths = new double[ boundaryPoints.Count ];
+
+				cumulativeLengths[ 0 ] = 0;
+				for( int i = 1; i < boundaryPoints.Count; ++i ) {
+					cumulativeLengths[ i ] = cumulativeLengths[ i - 1 ] + boundaryPoints[ i - 1 ].Distance( boundaryPoints[ i ] );
+				}
+				double totalLength = cumulativeLengths.Last();
+
+				var boundaryPostPoints = new List<PostPoint>( boundaryPoints.Count );
+				for( int i = 0; i < boundaryPoints.Count; ++i ) {
+
+					double ratio = cumulativeLengths[ i ] / totalLength;
+
+					boundaryPostPoints.Add( new PostPoint()
+					{
+						X = boundaryPoints[ i ].X(),
+						Y = boundaryPoints[ i ].Y(),
+						Z = boundaryPoints[ i ].Z(),
+						Master = endInfoOfPreviousPath.Master + ratio * ( pathG54PostData.ProcessStartPoint.Master - endInfoOfPreviousPath.Master ),
+						Slave = endInfoOfPreviousPath.Slave + ratio * ( pathG54PostData.ProcessStartPoint.Slave - endInfoOfPreviousPath.Slave )
+					} );
+				}
+				pathG54PostData.SafeBoundaryPostPointList = boundaryPostPoints;
+			}
+
 			// cut down
 			if( currentPathNCPack.TraverseData.CutDownDistance > 0 && result.CutDownPoint != null ) {
 				pathG54PostData.CutDownPostPoint = new PostPoint()
@@ -116,7 +112,6 @@ namespace MyCAM.Post
 				};
 			}
 			pathG54PostData.FollowSafeDistance = currentPathNCPack.TraverseData.FollowSafeDistance;
-			return true;
 		}
 
 		public static void CalculateEntry( INCPackage currentPathNCPack, EntryAndExitData entryAndExitData, ITraversePostData pathG54PostData )
