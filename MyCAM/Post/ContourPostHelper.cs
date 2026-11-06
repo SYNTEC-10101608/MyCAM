@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using MyCAM.Helper;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
@@ -82,8 +83,8 @@ namespace MyCAM.Post
 
 	internal static class ContourPostHelper
 	{
-		public static bool  GetPostData( ContourNCPackage currentPathNCPack,
-			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
+		public static bool GetPostData( ContourNCPackage currentPathNCPack,
+			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData, TraverseCalculationInfo calculationData,
 			out PostData pathG54PostData, out PathEndInfo currentPathEndInfo )
 		{
 			// for write NC file
@@ -142,9 +143,7 @@ namespace MyCAM.Post
 			else {
 
 				// traverse from previous path to current path
-				if( !PostTraverseBuilder.CalculateTraverse( endInfoOfPreviousPath, currentPathNCPack, pathG54PostData ) ) {
-					return false;
-				}
+				PostTraverseBuilder.CalculateTraverse( endInfoOfPreviousPath, currentPathNCPack, pathG54PostData, calculationData );
 			}
 
 			// end info of current path

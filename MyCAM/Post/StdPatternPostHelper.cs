@@ -1,4 +1,5 @@
 ﻿using MyCAM.Data;
+using MyCAM.Helper;
 using OCC.gp;
 using System;
 using System.Collections.Generic;
@@ -64,7 +65,7 @@ namespace MyCAM.Post
 	internal static class StdPatternPostHelper
 	{
 		public static bool GetPostData( StdPatternNCPackage currentPathNCPack,
-			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData,
+			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData, TraverseCalculationInfo calculationData,
 			out StdPatternPostData pathG54PostData, out PathEndInfo currentPathtEndInfo )
 		{
 			// for write NC file
@@ -104,9 +105,7 @@ namespace MyCAM.Post
 			else {
 
 				// traverse from previous path to current path
-				if( !PostTraverseBuilder.CalculateTraverse( endInfoOfPreviousPath, currentPathNCPack, pathG54PostData ) ) {
-					return false;
-				}
+				PostTraverseBuilder.CalculateTraverse( endInfoOfPreviousPath, currentPathNCPack, pathG54PostData, calculationData );
 			}
 
 			// end info of current path

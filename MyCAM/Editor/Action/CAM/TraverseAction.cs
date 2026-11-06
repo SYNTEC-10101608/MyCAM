@@ -1,4 +1,5 @@
-﻿using MyCAM.App;
+﻿using LanguageManager;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
@@ -17,6 +18,8 @@ namespace MyCAM.Editor
 		{
 			m_Viewer = viewer;
 
+			m_CalculationInfo = TraverseHelper.BuildTraverseCalculationInfo( dataManager );
+
 			// checked in base constructor
 			// when user cancel the traverse setting, need to turn path back
 			m_BackupTraverseDataList = new List<TraverseData>();
@@ -24,12 +27,38 @@ namespace MyCAM.Editor
 				if( craftData == null ) {
 					throw new ArgumentNullException( "TraverseAction constructing argument craftData contains null craftData" );
 				}
-				if( craftData.TraverseData == null ) {
-					m_BackupTraverseDataList.Add( new TraverseData() );
+				TraverseData backup = ( craftData.TraverseData == null ) ? new TraverseData() : craftData.TraverseData.Clone();
+				InitializeSafeRadial( backup );
+				m_BackupTraverseDataList.Add( backup );
+			}
+		}
+
+		void InitializeSafeRadial( TraverseData traverseData )
+		{
+			bool initializeCylinder = traverseData.SafeCylinderRadius <= GEOMETRY_TOLERANCE;
+			bool initializeSphere = traverseData.SafeSphereRadius <= GEOMETRY_TOLERANCE;
+			if( !initializeCylinder && !initializeSphere ) {
+				return;
+			}
+
+			List<IShapeObject> workpieceShapes = new List<IShapeObject>();
+			foreach( string partID in m_DataManager.PartIDList ) {
+				if( !DataGettingHelper.GetShapeObject( partID, out IShapeObject shapeObject ) ||
+					( shapeObject as PartObject )?.Role != PartRole.Workpiece ) {
+					continue;
 				}
-				else {
-					m_BackupTraverseDataList.Add( craftData.TraverseData.Clone() );
-				}
+				workpieceShapes.Add( shapeObject );
+			}
+
+			if( workpieceShapes.Count == 0 ) {
+				return;
+			}
+
+			if( initializeCylinder ) {
+				traverseData.SafeCylinderRadius = TraverseHelper.GetBoundingMaxValue( workpieceShapes, m_CalculationInfo.SafeBoundaryAxes, false );
+			}
+			if( initializeSphere ) {
+				traverseData.SafeSphereRadius = TraverseHelper.GetBoundingMaxValue( workpieceShapes, m_CalculationInfo.SafeBoundaryAxes, true );
 			}
 		}
 
@@ -87,7 +116,7 @@ namespace MyCAM.Editor
 		void ConfirmTraverseData( TraverseData data )
 		{
 			SetTraverseData( data );
-			m_IsConfirmed = true;
+			m_IsConfirmed = CollectTraverseResults( data, m_CalculationInfo, out _ );
 			End();
 		}
 
@@ -114,24 +143,27 @@ namespace MyCAM.Editor
 		{
 			m_ShapeRenderer?.Remove();
 			m_ShapeRenderer = null;
-			m_ShapeRendererMode = null;
 		}
 
 		void DrawSafeBoundaryVisualization( TraverseData data )
 		{
-			gp_Ax3 axes = data.TraverseMode == TraverseData.TraverseType.SafePlane
-				? null : new gp_Ax3( new gp_Pnt( 0, 0, 0 ), TraverseHelper.GetSafeBoundaryAxis() );
-			List<TraversePathResult> results = CollectTraverseResults( data, axes?.Direction() );
+			if( !CollectTraverseResults( data, m_CalculationInfo, out List<TraversePathResult> results ) ) {
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotBuildTraverse", CANNOT_BUILD_TRAVERSE ), MyApp.NoticeType.Warning );
+				return;
+			}
 
 			switch( data.TraverseMode ) {
 				case TraverseData.TraverseType.SafePlane:
-					if( !TraverseHelper.TryGetPlanePreviewBounds( results,
-						out double minX, out double maxX, out double minY, out double maxY ) ) {
-						return;
+					if( !TraverseHelper.TryGetPlanePreviewBounds( results, out double minX, out double maxX, out double minY, out double maxY ) ) {
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotBuildTraverse", CANNOT_BUILD_TRAVERSE ), MyApp.NoticeType.Warning );
 					}
-					PlaneShape3DRenderer plane = new PlaneShape3DRenderer( m_Viewer );
-					plane.SetGeometry( data.SafePlaneDistance, minX, maxX, minY, maxY );
+					PlaneShape3DRenderer plane = new PlaneShape3DRenderer( m_Viewer, m_DataManager );
+
+					if( !plane.SetGeometry( data.SafePlaneDistance, minX, maxX, minY, maxY ) ) {
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotBuildTraverse", CANNOT_BUILD_TRAVERSE ), MyApp.NoticeType.Warning );
+					}
 					m_ShapeRenderer = plane;
+
 					break;
 
 				case TraverseData.TraverseType.SafeCylinder:
@@ -139,24 +171,25 @@ namespace MyCAM.Editor
 					bool isSphere = data.TraverseMode == TraverseData.TraverseType.SafeSphere;
 					double radius = isSphere ? data.SafeSphereRadius : data.SafeCylinderRadius;
 
-					if( !TraverseHelper.TryGetRadialPreviewBounds( results, axes, radius, isSphere,
+					if( !TraverseHelper.TryGetRadialPreviewBounds( results, m_CalculationInfo.SafeBoundaryAxes, radius, isSphere,
 						out double minU, out double maxU, out double minV, out double maxV ) ) {
-						return;
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotBuildTraverse", CANNOT_BUILD_TRAVERSE ), MyApp.NoticeType.Warning );
 					}
-					RadialShape3DRendererBase radial = new RadialShape3DRendererBase( m_Viewer, isSphere );
+					RadialShape3DRenderer radial = new RadialShape3DRenderer( m_Viewer, m_DataManager, isSphere );
 
-					radial.SetGeometry( axes, radius, minU, maxU, minV, maxV );
+					if( !radial.SetGeometry( m_CalculationInfo.SafeBoundaryAxes, radius, minU, maxU, minV, maxV ) ) {
+						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "CannotBuildTraverse", CANNOT_BUILD_TRAVERSE ), MyApp.NoticeType.Warning );
+					}
 					m_ShapeRenderer = radial;
 
 					break;
 			}
-			m_ShapeRendererMode = data.TraverseMode;
 			m_ShapeRenderer.Show();
 		}
 
-		List<TraversePathResult> CollectTraverseResults( TraverseData data, gp_Dir boundaryAxis )
+		bool CollectTraverseResults( TraverseData data, TraverseCalculationInfo calculationData, out List<TraversePathResult> traverseResults )
 		{
-			var results = new List<TraversePathResult>();
+			traverseResults = new List<TraversePathResult>();
 			foreach( string pathID in m_PathIDList ) {
 				int pathIndex = m_DataManager.PathIDList.IndexOf( pathID );
 				if( pathIndex <= 0 ) {
@@ -164,18 +197,27 @@ namespace MyCAM.Editor
 				}
 				string previousPathID = m_DataManager.PathIDList[ pathIndex - 1 ];
 				if( TraverseHelper.TryCalculateTraversePoints( CacheHelper.GetProcessEndPoint( previousPathID ),
-					CacheHelper.GetProcessStartPoint( pathID ), data, boundaryAxis, out TraversePathResult result ) ) {
-					results.Add( result );
+					CacheHelper.GetProcessStartPoint( pathID ), data, calculationData, out TraversePathResult result ) ) {
+					traverseResults.Add( result );
+				}
+				else {
+					return false;
 				}
 			}
-			return results;
+
+			return true;
 		}
+
+		const double GEOMETRY_TOLERANCE = 1e-6;
 
 		Viewer m_Viewer;
 		Shape3DRendererBase m_ShapeRenderer;
-		TraverseData.TraverseType? m_ShapeRendererMode;
 		List<TraverseData> m_BackupTraverseDataList;
+		TraverseCalculationInfo m_CalculationInfo;
 		TraverseDlg m_Dlg;
 		bool m_IsConfirmed = false;
+
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "TraverseAction" );
+		const string CANNOT_BUILD_TRAVERSE = "無法產生空移";
 	}
 }
