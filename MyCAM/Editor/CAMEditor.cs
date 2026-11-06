@@ -1,4 +1,6 @@
-﻿using MyCAM.App;
+﻿using CncManager;
+using CncManager.CNCCore;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.PathCache;
@@ -10,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -154,6 +158,17 @@ namespace MyCAM.Editor
 		{
 			m_MarkerRenderer.SetShow( isShowMarker );
 			m_MarkerRenderer.Show( true );
+		}
+
+		public void StartThreePointCalibration( Form owner, params Control[] editingControls )
+		{
+			if( m_DataManager.PartIDList.Count == 0 ) return;
+			if( m_CurrentAction is CNCThreePointAction current ) {
+				current.Activate();
+				return;
+			}
+			StartEditAction( new CNCThreePointAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager,
+				CncManager.CncClient.Instance, owner, editingControls ) );
 		}
 
 		// add/ remove path API
@@ -716,7 +731,7 @@ namespace MyCAM.Editor
 		}
 
 		// convert NC
-		public void ConverNC()
+		public async Task ConvertNCAsync()
 		{
 			// stop current action
 			EndActionIfNotDefault();
@@ -734,57 +749,65 @@ namespace MyCAM.Editor
 
 				string szSaveFilePath = saveFileDialog.FileName;
 				string szFileName = Path.GetFileName( szSaveFilePath );
-				string szTempFilePath = Path.Combine( Path.GetTempPath(), NC_FILE_DEFAULT_NAME );
-				NCWriter writer = new NCWriter( m_DataManager );
-				bool bNCCreateSuccess = writer.ConvertSuccess( szFileName, szTempFilePath, out string szCreateErrorMessage );
-
-				if( !bNCCreateSuccess ) {
+				if( !ExportNC( szSaveFilePath, out string szCreateErrorMessage ) ) {
 					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NCExportFailedAndTransferFailed", NC_EXPORT_FAILED_AND_TRANSFER_FAILED ), szCreateErrorMessage ), MyApp.NoticeType.Error );
-
-					if( File.Exists( szTempFilePath ) ) {
-						try {
-							File.Delete( szTempFilePath );
-						}
-						catch {
-
-							// this would not happen often, but still need to handle
-							MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "TempFileDeleteFailed", TEMP_FILE_DELETE_FAILED ), szTempFilePath ), MyApp.NoticeType.Warning );
-						}
-					}
-					return;
-				}
-
-				try {
-					File.Copy( szTempFilePath, szSaveFilePath, true );
-					File.Delete( szTempFilePath );
-				}
-				catch( Exception ex ) {
-					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NCFileSaveFailed", NC_FILE_SAVE_FAILED ), ex.Message ), MyApp.NoticeType.Error );
-					if( File.Exists( szTempFilePath ) ) {
-						try {
-							File.Delete( szTempFilePath );
-						}
-						catch {
-
-							// this would not happen often, but still need to handle
-							MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "TempFileDeleteFailed", TEMP_FILE_DELETE_FAILED ), szTempFilePath ), MyApp.NoticeType.Warning );
-						}
-					}
 					return;
 				}
 
 				// transmit file
-				if( string.IsNullOrWhiteSpace( MyApp.CNCIP ) ) {
+				string szCncIP = MyApp.CNCIP;
+				if( string.IsNullOrWhiteSpace( szCncIP ) ) {
 					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NCExportSuccessNoController", NC_EXPORT_SUCCESS_NO_CONTROLLER ), MyApp.NoticeType.Warning, true );
 				}
 				else {
-					bool bTransmitSuccess = FTPTransmission.FileTransmit( szSaveFilePath, MyApp.CNCIP, szFileName, out string szTransmitErrorMessage );
+					bool bTransmitSuccess = FTPTransmission.FileTransmit( szSaveFilePath, szCncIP, szFileName, out string szTransmitErrorMessage );
 
 					if( bTransmitSuccess ) {
+						CncClient client = CncClient.Instance;
+						if( client.IsConnected && client.IP == szCncIP ) {
+							var assignment = await CncApi.AssignMainProgramAsync( szFileName, CancellationToken.None );
+							string szTransferMessage = m_LanguageManager.TryGetString( "NCExportAndTransferSuccess", NC_EXPORT_AND_TRANSFER_SUCCESS );
+							string szAssignmentMessage = assignment.IsSuccess
+								? string.Format( m_LanguageManager.TryGetString( "MainProgramAssignSuccess", MAIN_PROGRAM_ASSIGN_SUCCESS ), szFileName )
+								: string.Format( m_LanguageManager.TryGetString( "MainProgramAssignFailed", MAIN_PROGRAM_ASSIGN_FAILED ), assignment.ErrorMessage );
+							MyApp.Logger.ShowOnLogPanel( szTransferMessage + Environment.NewLine + szAssignmentMessage,
+								assignment.IsSuccess ? MyApp.NoticeType.Hint : MyApp.NoticeType.Warning, true );
+							return;
+						}
 						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NCExportAndTransferSuccess", NC_EXPORT_AND_TRANSFER_SUCCESS ), MyApp.NoticeType.Hint, true );
 					}
 					else {
 						MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "NCExportSuccessTransferFailed", NC_EXPORT_SUCCESS_TRANSFER_FAILED ), szTransmitErrorMessage ), MyApp.NoticeType.Warning, true );
+					}
+				}
+			}
+		}
+
+		public bool ExportNC( string filePath, out string error )
+		{
+			error = null;
+			string tempPath = null;
+			try {
+				bool drawingOnly = m_DataManager.CalibrationData.DrawingOnly;
+				tempPath = Path.GetTempFileName();
+				NCWriter writer = new NCWriter( m_DataManager );
+				if( !writer.ConvertSuccess( Path.GetFileName( filePath ), tempPath, drawingOnly, out error ) ) {
+					return false;
+				}
+				File.Copy( tempPath, filePath, true );
+				return true;
+			}
+			catch( Exception ex ) {
+				error = ex.Message;
+				return false;
+			}
+			finally {
+				if( tempPath != null ) {
+					try {
+						File.Delete( tempPath );
+					}
+					catch( Exception ex ) {
+						System.Diagnostics.Trace.TraceWarning( "NC temporary file cleanup failed: {0}", ex );
 					}
 				}
 			}
@@ -1086,6 +1109,9 @@ namespace MyCAM.Editor
 		protected override void OnEditActionStart( IEditorAction action )
 		{
 			base.OnEditActionStart( action );
+			if( action.ActionType == EditActionType.ThreePointCalibration ) {
+				return;
+			}
 			if( action.ActionType == EditActionType.OverCut
 				|| action.ActionType == EditActionType.SetLead
 				|| action.ActionType == EditActionType.SetTraverse
@@ -1117,6 +1143,10 @@ namespace MyCAM.Editor
 
 		protected override void OnEditActionEnd( IEditorAction action )
 		{
+			if( action.ActionType == EditActionType.ThreePointCalibration ) {
+				base.OnEditActionEnd( action );
+				return;
+			}
 			// these action will show dialog, need to lock ui
 			if( action.ActionType == EditActionType.OverCut
 				|| action.ActionType == EditActionType.SetLead
@@ -1152,10 +1182,10 @@ namespace MyCAM.Editor
 		const string ONLY_SINGLE_PATH_EDIT = "[操作提醒]只能選擇一個路徑進行編輯";
 		const string ONLY_CONTOUR_PATH_SUPPORTED = "[操作提醒]此功能僅支援輪廓路徑";
 		const string NC_EXPORT_FAILED_AND_TRANSFER_FAILED = "[NC轉出狀態]轉出NC失敗: {0}\n[檔案傳輸狀態]傳輸NC檔案失敗";
-		const string TEMP_FILE_DELETE_FAILED = "[清理臨時檔案] 刪除失敗: {0}";
-		const string NC_FILE_SAVE_FAILED = "[NC轉出狀態]儲存檔案失敗: {0}";
 		const string NC_EXPORT_SUCCESS_NO_CONTROLLER = "[NC轉出狀態]成功轉出NC\n[檔案傳輸狀態]未與控制器進行連線，檔案無法傳輸";
 		const string NC_EXPORT_AND_TRANSFER_SUCCESS = "[NC轉出狀態]成功轉出NC\n[檔案傳輸狀態]傳輸NC檔案成功";
+		const string MAIN_PROGRAM_ASSIGN_SUCCESS = "[加工檔指定狀態]已指定加工檔：{0}";
+		const string MAIN_PROGRAM_ASSIGN_FAILED = "[加工檔指定狀態]指定加工檔失敗：{0}";
 		const string NC_EXPORT_SUCCESS_TRANSFER_FAILED = "[NC轉出狀態]成功轉出NC\n[檔案傳輸狀態]傳輸NC檔案失敗：{0}";
 		const string OPTIMIZE_IK_CONTINUITY_COMPLETED = "[操作完成]已完成起點旋轉軸自動優化";
 		const string SAVE_NC_FILE_TITLE = "儲存 NC 檔案";

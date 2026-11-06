@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2250h" Content="驅動器短路"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2250h::AlarmID" Content="ALCD-2250h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2310h" Content="U 相輸出電流過大"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2310h::AlarmID" Content="ALCD-2310h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2311h" Content="V 相輸出電流過大"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2311h::AlarmID" Content="ALCD-2311h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2312h" Content="W 相輸出電流過大"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2312h::AlarmID" Content="ALCD-2312h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2320h" Content="驅動器硬體過流"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2320h::AlarmID" Content="ALCD-2320h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2330h" Content="驅動器輸出對地短路"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=2330h::AlarmID" Content="ALCD-2330h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=3210h" Content="直流母線過壓"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=3210h::AlarmID" Content="ALCD-3210h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=3220h" Content="直流母線欠壓"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=3220h::AlarmID" Content="ALCD-3220h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=4210h" Content="功率模組過熱"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=4210h::AlarmID" Content="ALCD-4210h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=6010h" Content="CPU1 看門狗溢出"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=6010h::AlarmID" Content="ALCD-6010h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=6011h" Content="CPU2 看門狗溢出"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=6011h::AlarmID" Content="ALCD-6011h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=7112h" Content="能耗制動電阻過載"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=7112h::AlarmID" Content="ALCD-7112h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8311h" Content="電機持續過載"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8311h::AlarmID" Content="ALCD-8311h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8611h" Content="位置跟隨誤差過大"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8611h::AlarmID" Content="ALCD-8611h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8612h" Content="正向軟限位"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8612h::AlarmID" Content="ALCD-8612h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8613h" Content="負向軟限位"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8613h::AlarmID" Content="ALCD-8613h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8800h" Content="編碼器數據溢出"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=8800h::AlarmID" Content="ALCD-8800h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF00h" Content="CPU1 工作異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF00h::AlarmID" Content="ALCD-FF00h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF01h" Content="CPU2 工作異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF01h::AlarmID" Content="ALCD-FF01h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF02h" Content="CPU1 記憶體異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF02h::AlarmID" Content="ALCD-FF02h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF03h" Content="CPU2 記憶體異常 "/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF03h::AlarmID" Content="ALCD-FF03h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF04h" Content="CPU 記憶體衝突"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF04h::AlarmID" Content="ALCD-FF04h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF05h" Content="磁極定位錯誤"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF05h::AlarmID" Content="ALCD-FF05h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF06h" Content="編碼器數據異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF06h::AlarmID" Content="ALCD-FF06h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF07h" Content="編碼器通信異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF07h::AlarmID" Content="ALCD-FF07h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF08h" Content="編碼器通信超時"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF08h::AlarmID" Content="ALCD-FF08h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF09h" Content="編碼器內部異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF09h::AlarmID" Content="ALCD-FF09h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF10h" Content="驅動器其他軸異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF10h::AlarmID" Content="ALCD-FF10h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF14h" Content="控制編碼器超速"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF14h::AlarmID" Content="ALCD-FF14h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF15h" Content="驅動器持續過載"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF15h::AlarmID" Content="ALCD-FF15h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF17h" Content="驅動器輸出缺相"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF17h::AlarmID" Content="ALCD-FF17h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF18h" Content="電機失速"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF18h::AlarmID" Content="ALCD-FF18h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF21h" Content="電流跟隨誤差過大"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF21h::AlarmID" Content="ALCD-FF21h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF22h" Content="位置目標值異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF22h::AlarmID" Content="ALCD-FF22h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF23h" Content="編碼器上電數據溢出"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF23h::AlarmID" Content="ALCD-FF23h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF24h" Content="位置目標值溢出"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF24h::AlarmID" Content="ALCD-FF24h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF25h" Content="電機抱閘異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF25h::AlarmID" Content="ALCD-FF25h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF26h" Content="控制電源欠壓"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF26h::AlarmID" Content="ALCD-FF26h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF27h" Content="STO1 觸發"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF27h::AlarmID" Content="ALCD-FF27h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF28h" Content="STO2 觸發"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF28h::AlarmID" Content="ALCD-FF28h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF29h" Content="正向硬限位開關觸發"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF29h::AlarmID" Content="ALCD-FF29h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF30h" Content="負向硬限位開關觸發"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF30h::AlarmID" Content="ALCD-FF30h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF31h" Content="電機超速"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF31h::AlarmID" Content="ALCD-FF31h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF32h" Content="急停輸入開關觸發"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF32h::AlarmID" Content="ALCD-FF32h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF33h" Content="轉矩監測飽和故障"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF33h::AlarmID" Content="ALCD-FF33h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF34h" Content="速度跟隨誤差過大"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF34h::AlarmID" Content="ALCD-FF34h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF35h" Content="驅動器短路"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF35h::AlarmID" Content="ALCD-FF35h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF36h" Content="尋原點失敗"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF36h::AlarmID" Content="ALCD-FF36h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF37h" Content="EtherCAT 過程數據錯誤"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF37h::AlarmID" Content="ALCD-FF37h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF38h" Content="EtherCAT 總線指令非法"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF38h::AlarmID" Content="ALCD-FF38h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF39h" Content="EtherCAT 通訊週期錯誤"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF39h::AlarmID" Content="ALCD-FF39h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF40h" Content="位置規劃運行錯誤"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF40h::AlarmID" Content="ALCD-FF40h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF41h" Content="EtherCAT 非法同步模式"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF41h::AlarmID" Content="ALCD-FF41h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF42h" Content="位置目標值超出設定範圍"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF42h::AlarmID" Content="ALCD-FF42h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF45h" Content="電機 U 相瞬時過載"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF45h::AlarmID" Content="ALCD-FF45h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF46h" Content="電機 V 相瞬時過載"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF46h::AlarmID" Content="ALCD-FF46h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF47h" Content="電機 W 相瞬時過載"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF47h::AlarmID" Content="ALCD-FF47h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF48h" Content="動態制動過載"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF48h::AlarmID" Content="ALCD-FF48h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF49h" Content="驅動器內部異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF49h::AlarmID" Content="ALCD-FF49h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF50h" Content="限位開關異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF50h::AlarmID" Content="ALCD-FF50h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF51h" Content="EtherCAT 總線通訊異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF51h::AlarmID" Content="ALCD-FF51h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF52h" Content="接口編碼器分辨率變更"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF52h::AlarmID" Content="ALCD-FF52h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF53h" Content="編碼器過熱"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF53h::AlarmID" Content="ALCD-FF53h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF54h" Content="編碼器電池欠電壓故障"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF54h::AlarmID" Content="ALCD-FF54h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF57h" Content="控制模式設定錯誤"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF57h::AlarmID" Content="ALCD-FF57h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF58h" Content="上電位置偏差過大"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF58h::AlarmID" Content="ALCD-FF58h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF59h" Content="編碼器加速度異常故障"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF59h::AlarmID" Content="ALCD-FF59h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF60h" Content="電機堵轉"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF60h::AlarmID" Content="ALCD-FF60h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF63h" Content="寫 EEPROM 數據異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF63h::AlarmID" Content="ALCD-FF63h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF64h" Content="讀 EEPROM 數據異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF64h::AlarmID" Content="ALCD-FF64h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF66h" Content="抱閘控制電路異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF66h::AlarmID" Content="ALCD-FF66h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF68h" Content="CPU1 過載"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF68h::AlarmID" Content="ALCD-FF68h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF69h" Content="CPU2 過載"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF69h::AlarmID" Content="ALCD-FF69h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF70h" Content="CPU1 握手失敗"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF70h::AlarmID" Content="ALCD-FF70h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF71h" Content="DriveMaster 通訊超時"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF71h::AlarmID" Content="ALCD-FF71h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF75h" Content="ESC 配置 EEPROM 異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF75h::AlarmID" Content="ALCD-FF75h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF76h" Content="ESC 內部訪問錯誤"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF76h::AlarmID" Content="ALCD-FF76h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF77h" Content="伺服使能未準備好"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF77h::AlarmID" Content="ALCD-FF77h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF78h" Content="CPU2 握手失敗"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF78h::AlarmID" Content="ALCD-FF78h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF79h" Content="CPU1 主任務超時"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF79h::AlarmID" Content="ALCD-FF79h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF81h" Content="直流母線充電繼電器異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF81h::AlarmID" Content="ALCD-FF81h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF82h" Content="CPU 內部錯誤"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF82h::AlarmID" Content="ALCD-FF82h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF83h" Content="位置實際值溢出"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF83h::AlarmID" Content="ALCD-FF83h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF85h" Content="編碼器內部異常 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF85h::AlarmID" Content="ALCD-FF85h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF87h" Content="編碼器內部異常 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF87h::AlarmID" Content="ALCD-FF87h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF8Eh" Content="第 2 位置跟隨誤差過大"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF8Eh::AlarmID" Content="ALCD-FF8Eh"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF8Fh" Content="STO 接線異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF8Fh::AlarmID" Content="ALCD-FF8Fh"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF90h" Content="第 2 速度跟隨誤差過大"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_AL::ID=FF90h::AlarmID" Content="ALCD-FF90h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E000h" Content="控制電源欠壓告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E000h::AlarmID" Content="WRCD-E000h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E002h" Content="STO 觸發"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E002h::AlarmID" Content="WRCD-E002h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E003h" Content="轉矩監測飽和告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E003h::AlarmID" Content="WRCD-E003h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E004h" Content="CPU1 過載告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E004h::AlarmID" Content="WRCD-E004h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E005h" Content="CPU2 過載告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E005h::AlarmID" Content="WRCD-E005h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E006h" Content="更改了重上電有效參數"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E006h::AlarmID" Content="WRCD-E006h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E007h" Content="急停開關觸發"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E007h::AlarmID" Content="WRCD-E007h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E008h" Content="機械原點未標定"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E008h::AlarmID" Content="WRCD-E008h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E009h" Content="電機過載告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E009h::AlarmID" Content="WRCD-E009h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E010h" Content="轉速限制告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E010h::AlarmID" Content="WRCD-E010h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E011h" Content="直流母線欠壓告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E011h::AlarmID" Content="WRCD-E011h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E012h" Content="故障歷史記錄異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E012h::AlarmID" Content="WRCD-E012h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E013h" Content="AD 校正係數無效"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E013h::AlarmID" Content="WRCD-E013h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E014h" Content="CoE 通訊參數異常"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E014h::AlarmID" Content="WRCD-E014h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E015h" Content="伺服參數恢復默認值"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E015h::AlarmID" Content="WRCD-E015h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E016h" Content="不支持設定控制模式"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E016h::AlarmID" Content="WRCD-E016h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E017h" Content="編碼器電池欠電壓告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E017h::AlarmID" Content="WRCD-E017h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E019h" Content="驅動器內部告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E019h::AlarmID" Content="WRCD-E019h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E020h" Content="編碼器通訊異常告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E020h::AlarmID" Content="WRCD-E020h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E022h" Content="編碼器通訊超時告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E022h::AlarmID" Content="WRCD-E022h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E024h" Content="編碼器數據異常告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E024h::AlarmID" Content="WRCD-E024h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E026h" Content="位置限位告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E026h::AlarmID" Content="WRCD-E026h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E027h" Content="位置規劃參數異常告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E027h::AlarmID" Content="WRCD-E027h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E028h" Content="SDO 寫入失敗告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E028h::AlarmID" Content="WRCD-E028h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E029h" Content="尋原點配置錯誤"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E029h::AlarmID" Content="WRCD-E029h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E030h" Content="編碼器內部告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E030h::AlarmID" Content="WRCD-E030h"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E031h" Content="能耗煞車電阻過載告警"/>
+	<Message ID="AlarmMsg::Drv_ECAT_CoolDriveRD_WR::ID=E031h::AlarmID" Content="WRCD-E031h"/>
+</ResMap>

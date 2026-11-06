@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Macro::ID=1" Content="輪廓中最低點低於平台" />
+	<Message ID="AlarmMsg::Macro::ID=2" Content="垂直軸或延伸軸的每次的進刀量小於或等於0" />
+	<Message ID="AlarmMsg::Macro::ID=3" Content="最大圓弧弦長小於或等於0" />
+	<Message ID="AlarmMsg::Macro::ID=4" Content="最大圓弧半徑小於或等於0" />
+	<Message ID="AlarmMsg::Macro::ID=5" Content="指定的輪廓路徑有誤" />
+	<Message ID="AlarmMsg::Macro::ID=6" Content="輪廓中G02或G03的指定有誤" />
+	<Message ID="AlarmMsg::Macro::ID=7" Content="最小圓弧半徑小於或等於0" />
+	<Message ID="AlarmMsg::Macro::ID=11" Content="鑽(塘)孔循環進刀平面R低於孔底平面" />
+	<Message ID="AlarmMsg::Macro::ID=12" Content="鑽(塘)孔循環未指定欲鑽(塘)孔方向之深度" />
+	<Message ID="AlarmMsg::Macro::ID=13" Content="啄式鑽孔循環未指定進刀量Q" />
+	<Message ID="AlarmMsg::Macro::ID=15" Content="多孔鑽孔孔數不可為零" />
+	<Message ID="AlarmMsg::Macro::ID=16" Content="快鑽G81更改上拉速度的F2引數必須為整數" />
+	<Message ID="AlarmMsg::Macro::ID=17" Content="刀徑補償下不可啟動G12.1" />
+	<Message ID="AlarmMsg::Macro::ID=18" Content="G96模式下不可啟動G12.1" />
+	<Message ID="AlarmMsg::Macro::ID=19" Content="G12.1軸向不存在" />
+	<Message ID="AlarmMsg::Macro::ID=20" Content="G41、G42模式下不可結束G12.1" />
+	<Message ID="AlarmMsg::Macro::ID=31" Content="XY平面進給深度太小" />
+	<Message ID="AlarmMsg::Macro::ID=32" Content="Z軸進給深度太小" />
+	<Message ID="AlarmMsg::Macro::ID=40" Content="加工方向未指定" />
+	<Message ID="AlarmMsg::Macro::ID=41" Content="刀具直徑太大，超出加工物" />
+	<Message ID="AlarmMsg::Macro::ID=42" Content="圓角半徑太小比刀徑小，或太大無法加入角隅" />
+	<Message ID="AlarmMsg::Macro::ID=51" Content="X軸步進值超過限定值" />
+	<Message ID="AlarmMsg::Macro::ID=52" Content="Y軸步進值超過限定值" />
+	<Message ID="AlarmMsg::Macro::ID=53" Content="Z軸步進值超過限定值" />
+	<Message ID="AlarmMsg::Macro::ID=54" Content="X軸長度小於0" />
+	<Message ID="AlarmMsg::Macro::ID=55" Content="Y軸寬度小於0" />
+	<Message ID="AlarmMsg::Macro::ID=56" Content="Z軸最大深度小於0" />
+	<Message ID="AlarmMsg::Macro::ID=57" Content="棋盤孔X軸起始孔不可小於等於0" />
+	<Message ID="AlarmMsg::Macro::ID=58" Content="棋盤孔Y軸起始孔不可小於等於0" />
+	<Message ID="AlarmMsg::Macro::ID=59" Content="棋盤孔自動補償孔數不可小於等於0" />
+	<Message ID="AlarmMsg::Macro::ID=405" Content="非一般銑床請使用自訂暫停點回歸程式" />
+	<Message ID="AlarmMsg::Macro::ID=406" Content="G53.6需在G40模式下啟用" />
+	<Message ID="AlarmMsg::Macro::ID=407" Content="G53.6選用刀號不可為0" />
+	<Message ID="AlarmMsg::Macro::ID=408" Content="刀具對正失效或失敗" />
+	<Message ID="AlarmMsg::Macro::ID=497" Content="G901.1不合法的P引數" />
+	<Message ID="AlarmMsg::Macro::ID=498" Content="智慧進給參數組未指定或超出範圍" />
+	<Message ID="AlarmMsg::Macro::ID=499" Content="攻牙回退使用時機錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=500" Content="攻牙回退引數錯誤" />
+</ResMap>

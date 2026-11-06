@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Macro::ID=1" Content="the lowest point of side profile below table" />
+	<Message ID="AlarmMsg::Macro::ID=2" Content="cutting incremental must be positive" />
+	<Message ID="AlarmMsg::Macro::ID=3" Content="max arc length can not be negative" />
+	<Message ID="AlarmMsg::Macro::ID=4" Content="max arc radius can not be negative" />
+	<Message ID="AlarmMsg::Macro::ID=5" Content="invalid side profile" />
+	<Message ID="AlarmMsg::Macro::ID=6" Content="wrong G02/G03 in side profile" />
+	<Message ID="AlarmMsg::Macro::ID=7" Content="min arc radius can not be negative" />
+	<Message ID="AlarmMsg::Macro::ID=11" Content="the R level is lower the bottom level of hole" />
+	<Message ID="AlarmMsg::Macro::ID=12" Content="absent bottom level of corresponding working plane, in canned cycle" />
+	<Message ID="AlarmMsg::Macro::ID=13" Content="absent depth of cut, Q, in peck drilling cycle" />
+	<Message ID="AlarmMsg::Macro::ID=15" Content="hole number cannot zero in multi-hole drill cycle" />
+	<Message ID="AlarmMsg::Macro::ID=16" Content="G81 fastdrill upward feedrate F2 argument is not integer" />
+	<Message ID="AlarmMsg::Macro::ID=17" Content="G12.1 Can't start under G41 or G42 mode" />
+	<Message ID="AlarmMsg::Macro::ID=18" Content="G12.1 Can't start under G96 mode" />
+	<Message ID="AlarmMsg::Macro::ID=19" Content="G12.1 Axis not exist" />
+	<Message ID="AlarmMsg::Macro::ID=20" Content="G12.1 Can't stop under G41 or G42 mode" />
+	<Message ID="AlarmMsg::Macro::ID=31" Content="incremental depth of XY plane too small" />
+	<Message ID="AlarmMsg::Macro::ID=32" Content="incremental depth in Z too small" />
+	<Message ID="AlarmMsg::Macro::ID=40" Content="unassigned cutting direction" />
+	<Message ID="AlarmMsg::Macro::ID=41" Content="tool diameter too large, exceed workpiece" />
+	<Message ID="AlarmMsg::Macro::ID=42" Content="invalid corner round radius" />
+	<Message ID="AlarmMsg::Macro::ID=51" Content="the step of X excess than limit" />
+	<Message ID="AlarmMsg::Macro::ID=52" Content="the step of Y excess than limit" />
+	<Message ID="AlarmMsg::Macro::ID=53" Content="the step of Z excess than limit" />
+	<Message ID="AlarmMsg::Macro::ID=54" Content="the length of X less than 0" />
+	<Message ID="AlarmMsg::Macro::ID=55" Content="the length of Y less than 0" />
+	<Message ID="AlarmMsg::Macro::ID=56" Content="the max depth of Z less than 0" />
+	<Message ID="AlarmMsg::Macro::ID=57" Content="Grid Position X start hole No. can't less or equal 0" />
+	<Message ID="AlarmMsg::Macro::ID=58" Content="Grid Position Y start hole No. can't less or equal 0" />
+	<Message ID="AlarmMsg::Macro::ID=59" Content="Grid Position auto tool length compensation hole number can't less or equal 0" />
+	<Message ID="AlarmMsg::Macro::ID=405" Content="Non-general mill needs to use customized macro for halted point returning." />
+	<Message ID="AlarmMsg::Macro::ID=406" Content="G53.6 must be enabled in G40 mode" />
+	<Message ID="AlarmMsg::Macro::ID=407" Content="Tool number can not be 0 while using G53.6" />
+	<Message ID="AlarmMsg::Macro::ID=408" Content="Tool alignment invalid or failed." />
+	<Message ID="AlarmMsg::Macro::ID=499" Content="Using G84.48 in the wrong time" />
+	<Message ID="AlarmMsg::Macro::ID=500" Content="Tapping retract argument error" />
+</ResMap>

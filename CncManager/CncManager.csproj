@@ -39,12 +39,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CncMessages.cs" />
     <Compile Include="CncClient.cs" />
+    <Compile Include="ResourceMgr\ResourcePool.cs" />
+    <Compile Include="ResourceMgr\RRegisterPool.cs" />
+    <Compile Include="ResourceMgr\SystemVarPool.cs" />
+    <Compile Include="ResourceMgr\QVarPool.cs" />
+    <Compile Include="ResourceMgr\GlobalVarPool.cs" />
+    <Compile Include="ResourceMgr\KVarPool.cs" />
+    <Compile Include="ResourceMgr\MainProgramPool.cs" />
+    <Compile Include="ResourceMgr\ResourceMgr.cs" />
     <Compile Include="CNCCore\CncApi.cs" />
     <Compile Include="CNCCore\CncApiTimeoutGuard.cs" />
     <Compile Include="CNCCore\CncConnectChecker.cs" />
     <Compile Include="Definition\CncDefine.cs" />
+    <Compile Include="Definition\CncAlarm.cs" />
+    <Compile Include="Definition\CncResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LanguageManager\LanguageManager.csproj">
+      <Project>{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}</Project>
+      <Name>LanguageManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

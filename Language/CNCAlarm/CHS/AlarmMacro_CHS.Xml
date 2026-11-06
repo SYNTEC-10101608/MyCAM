@@ -1,0 +1,50 @@
+﻿<ResMap>
+  <!--========================= MACRO Alarm =========================-->
+  <Message ID="AlarmMsg::Macro::ID=100" Content="气体控制输入引数错误，请检查数值范围再重新输入"/>
+  <Message ID="AlarmMsg::Macro::ID=101" Content="测试气压需大于零，请重新输入"/>
+  <Message ID="AlarmMsg::Macro::ID=102" Content="设定的吹气气压大于最大校正气压"/>
+  <Message ID="AlarmMsg::Macro::ID=110" Content="空移目标高度Z引数必须输入"/>
+  <Message ID="AlarmMsg::Macro::ID=115" Content="工件座标系选择错误，请检查数值范围再重新输入"/>
+  <Message ID="AlarmMsg::Macro::ID=116" Content="板材座标系选择错误，请检查数值范围再重新输入"/>
+  <Message ID="AlarmMsg::Macro::ID=120" Content="穿孔高度及目标高度需大于零，请重新输入"/>
+  <Message ID="AlarmMsg::Macro::ID=121" Content="渐进穿孔速度需大于零，请重新输入"/>
+  <Message ID="AlarmMsg::Macro::ID=122" Content="寻边钣材尺寸需大于零，请重新输入"/>
+  <Message ID="AlarmMsg::Macro::ID=130" Content="随动轴高度异常，请确认加工档随动轴高度设定为大于零之数值" />
+  <Message ID="AlarmMsg::Macro::ID=133" Content="变焦轴位置命令超过范围，请确认加工档内Z1轴命令" />
+  <Message ID="AlarmMsg::Macro::ID=134" Content="DA调焦轴未校正，请至机械厂参数页面设定" />
+  <Message ID="AlarmMsg::Macro::ID=135" Content="随动轴尚回到机械原点，即发出其他轴向移动命令" />
+  <Message ID="AlarmMsg::Macro::ID=140" Content="校正表不存在，请重新执行校正"/>
+  <Message ID="AlarmMsg::Macro::ID=141" Content="不支援的校正角度"/>
+  <Message ID="AlarmMsg::Macro::ID=142" Content="A、B轴未回零"/>
+  <Message ID="AlarmMsg::Macro::ID=143" Content="空移不支援此机型"/>
+  <Message ID="AlarmMsg::Macro::ID=144" Content="五轴空移模组输入引数不完全"/>
+  <Message ID="AlarmMsg::Macro::ID=146" Content="未找到板材，请调整校正位置或随动轴负行程极限"/>
+  <Message ID="AlarmMsg::Macro::ID=151" Content="使用不存在的工艺，请确认加工档工艺"/>
+  <Message ID="AlarmMsg::Macro::ID=160" Content="管轮廓未输入。"/>
+  <Message ID="AlarmMsg::Macro::ID=161" Content="B轴未回原点。"/>
+  <Message ID="AlarmMsg::Macro::ID=162" Content="支撑台起始位置未校正。"/>
+  <Message ID="AlarmMsg::Macro::ID=163" Content="旋转轴未回正。"/>
+  <Message ID="AlarmMsg::Macro::ID=164" Content="侦测不到管。"/>
+  <Message ID="AlarmMsg::Macro::ID=170" Content="找不到料头。"/>
+  <Message ID="AlarmMsg::Macro::ID=171" Content="找不到料尾。"/>
+  <Message ID="AlarmMsg::Macro::ID=172" Content="材料不足。"/>
+  <Message ID="AlarmMsg::Macro::ID=173" Content="多点校正档案不存在，请先完成多点校正设定"/>
+  <Message ID="AlarmMsg::Macro::ID=174" Content="校正失败，无法加工，请先清空校正值并重新校正"/>
+  <Message ID="AlarmMsg::Macro::ID=177" Content="多点校正参考坐标格式错误"/>
+  <Message ID="AlarmMsg::Macro::ID=178" Content="多点校正校正坐标格式错误"/>
+  <Message ID="AlarmMsg::Macro::ID=179" Content="五轴机构参数设置错误"/>
+  <Message ID="AlarmMsg::Macro::ID=180" Content="参数输入不完全无法计算刀具向量，请检查加工档"/>
+  <Message ID="AlarmMsg::Macro::ID=181" Content="标准圆引数输入错误"/>
+  <Message ID="AlarmMsg::Macro::ID=182" Content="标准腰圆引数输入错误"/>
+  <Message ID="AlarmMsg::Macro::ID=183" Content="标准矩形引数输入错误"/>
+  <Message ID="AlarmMsg::Macro::ID=184" Content="标准多边形引数输入错误"/>
+  <Message ID="AlarmMsg::Macro::ID=185" Content="圆弧断点续切计算错误，请连络原厂"/>
+  <Message ID="AlarmMsg::Macro::ID=186" Content="圆内缩计算引数输入錯誤"/>
+  <Message ID="AlarmMsg::Macro::ID=187" Content="请确认工艺参数与SY_CIRC引数圆补偿参数正确"/>
+  <Message ID="AlarmMsg::Macro::ID=189" Content="校正失败，校正误差超过容许误差"/>
+  <Message ID="AlarmMsg::Macro::ID=191" Content="平行向量无法计算夹角，请检查输入引数向量是否平行"/>
+  <Message ID="AlarmMsg::Macro::ID=198" Content="使用图层最大加速度设定小于动程参数的1%，请确认参数"/>
+  <Message ID="AlarmMsg::Macro::ID=202" Content="外扩G码超过客制范围，请检查外扩G码范围在G600~G999"/>
+  <Message ID="AlarmMsg::Macro::ID=1000" Content="校正失败，无法加工，请先清空校正值并重新校正"/>
+  <Message ID="AlarmMsg::Macro::ID=1008" Content="多点校正档案不存在，请先完成多点校正设定"/>
+</ResMap>

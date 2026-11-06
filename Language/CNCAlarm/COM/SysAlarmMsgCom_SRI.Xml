@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::SRI::ID=1" Content="Hint: Scan time is not enough." />
+	<Message ID="AlarmMsg::SRI::ID=2" Content="Communication exceed."/>
+	<Message ID="AlarmMsg::SRI::ID=3" Content="Package CRC error or Byte error."/>
+	<Message ID="AlarmMsg::SRI::ID=4" Content="Module configuration is changed, please check the device settings."/>
+	<Message ID="AlarmMsg::SRI::ID=5" Content="Failed to update firmware."/>
+	<Message ID="AlarmMsg::SRI::ID=6" Content="Module is in Boot loader mode."/>
+	<Message ID="AlarmMsg::SRI::ID=7" Content="Abnormal communication between modules."/>
+	<Message ID="AlarmMsg::SRI::ID=8" Content="Module hardware configuration error."/>
+	<Message ID="AlarmMsg::SRI::ID=9" Content="Firmware update is successful, it will work after restart."/>
+	<Message ID="AlarmMsg::SRI::ID=10" Content="Controller command sending timeout."/>
+</ResMap>

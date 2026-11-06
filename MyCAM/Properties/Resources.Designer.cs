@@ -309,6 +309,26 @@ namespace MyCAM.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap CAM_SetOffset {
+            get {
+                object obj = ResourceManager.GetObject("CAM_SetOffset", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap CAM_ProcessSetting {
+            get {
+                object obj = ResourceManager.GetObject("CAM_ProcessSetting", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
         
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。

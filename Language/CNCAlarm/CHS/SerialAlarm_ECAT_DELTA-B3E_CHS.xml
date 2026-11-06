@@ -1,0 +1,295 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ResMap>
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0001h" Content="过电流" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0001h::AlarmID" Content="AL.001" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0002h" Content="过电压" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0002h::AlarmID" Content="AL.002" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0003h" Content="低电压" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0003h::AlarmID" Content="AL.003" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0004h" Content="马达匹配异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0004h::AlarmID" Content="AL.004" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0005h" Content="回生错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0005h::AlarmID" Content="AL.005" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0006h" Content="过负载" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0006h::AlarmID" Content="AL.006" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0007h" Content="速度控制误差过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0007h::AlarmID" Content="AL.007" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0008h" Content="异常脉波控制命令" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0008h::AlarmID" Content="AL.008" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0009h" Content="位置控制误差过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0009h::AlarmID" Content="AL.009" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0010h" Content="回生状态下电压异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0010h::AlarmID" Content="AL.010" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0011h" Content="CN2通讯失败" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0011h::AlarmID" Content="AL.11" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0012h" Content="校正异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0012h::AlarmID" Content="AL.012" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0013h" Content="紧急停止" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0013h::AlarmID" Content="AL.013" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0014h" Content="反向极限异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0014h::AlarmID" Content="AL.014" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0015h" Content="正向极限异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0015h::AlarmID" Content="AL.015" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0016h" Content="IGBT 温度异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0016h::AlarmID" Content="AL.016" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0017h" Content="内存异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0017h::AlarmID" Content="AL.017" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0018h" Content="OA与OB输出异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0018h::AlarmID" Content="AL.018" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0020h" Content="串行通讯逾时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0020h::AlarmID" Content="AL.020" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0022h" Content="主回路电源异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0022h::AlarmID" Content="AL.022" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0023h" Content="预先过负载警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0023h::AlarmID" Content="AL.023" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0024h" Content="编码器初始磁场错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0024h::AlarmID" Content="AL.024" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0025h" Content="编码器内部错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0025h::AlarmID" Content="AL.025" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0026h" Content="编码器内部数据可靠度错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0026h::AlarmID" Content="AL.026" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0027h" Content="编码器内部重制错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0027h::AlarmID" Content="AL.027" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0028h" Content="电池电压异常或编码器内部错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0028h::AlarmID" Content="AL.028" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0029h" Content="格雷码错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0029h::AlarmID" Content="AL.029" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=002Ah" Content="编码器圈数计数错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=002Ah::AlarmID" Content="AL.02A" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=002Bh" Content="马达数据异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=002Bh::AlarmID" Content="AL.02B" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=002Ch" Content="驱动器过负载" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=002Ch::AlarmID" Content="AL.02C" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=002Fh" Content="防堵转保护" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=002Fh::AlarmID" Content="AL.02F" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0030h" Content="马达碰撞错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0030h::AlarmID" Content="AL.030" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0031h" Content="马达动力线错线侦测" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0031h::AlarmID" Content="AL.031" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0032h" Content="编码器振动异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0032h::AlarmID" Content="AL.032" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0033h" Content="马达异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0033h::AlarmID" Content="AL.033" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0034h" Content="编码器内部通讯异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0034h::AlarmID" Content="AL.034" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0035h" Content="编码器温度超过保护上限" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0035h::AlarmID" Content="AL.035" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0036h" Content="编码器异警状态错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0036h::AlarmID" Content="AL.036" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0042h" Content="模拟速度指令的电压输入过高" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0042h::AlarmID" Content="AL.042" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0044h" Content="驱动器功能使用率警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0044h::AlarmID" Content="AL.044" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0045h" Content="电子齿轮比设定错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0045h::AlarmID" Content="AL.045" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0048h" Content="OA与OB输出异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0048h::AlarmID" Content="AL.048" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0053h" Content="马达参数异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0053h::AlarmID" Content="AL.053" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0056h" Content="马达速度过高" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0056h::AlarmID" Content="AL.056" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=005Ch" Content="马达位置回授异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=005Ch::AlarmID" Content="AL.05C" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0060h" Content="绝对位置遗失" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0060h::AlarmID" Content="AL.060" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0061h" Content="编码器电压过低" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0061h::AlarmID" Content="AL.061" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0062h" Content="绝对型位置圈数溢位(编码器)" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0062h::AlarmID" Content="AL.062" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0064h" Content="编码器振动警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0064h::AlarmID" Content="AL.064" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0066h" Content="绝对型位置圈数溢位(驱动器)" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0066h::AlarmID" Content="AL.066" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0067h" Content="编码器温度警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0067h::AlarmID" Content="AL.067" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0068h" Content="编码器数据I/O传输错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0068h::AlarmID" Content="AL.068" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0069h" Content="马达型式错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0069h::AlarmID" Content="AL.069" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=006Ah" Content="绝对位置遗失" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=006Ah::AlarmID" Content="AL.06A" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=006Bh" Content="驱动器内部坐标与编码器坐标误差过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=006Bh::AlarmID" Content="AL.06B" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=006Eh" Content="编码器型态无法识别" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=006Eh::AlarmID" Content="AL.06E" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=006Fh" Content="绝对位置建立未完成" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=006Fh::AlarmID" Content="AL.06F" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0070h" Content="编码器读写未完成警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0070h::AlarmID" Content="AL.070" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0071h" Content="编码器圈数错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0071h::AlarmID" Content="AL.071" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0072h" Content="编码器过速度" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0072h::AlarmID" Content="AL.072" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0073h" Content="编码器内存错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0073h::AlarmID" Content="AL.073" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0074h" Content="编码器单圈绝对位置错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0074h::AlarmID" Content="AL.074" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0075h" Content="编码器绝对圈数错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0075h::AlarmID" Content="AL.075" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0077h" Content="编码器内部错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0077h::AlarmID" Content="AL.077" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0079h" Content="编码器参数设置未完成错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0079h::AlarmID" Content="AL.079" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=007Ah" Content="编码器Z相位置遗失" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=007Ah::AlarmID" Content="AL.07A" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=007Bh" Content="编码器内存忙碌" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=007Bh::AlarmID" Content="AL.07B" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=007Ch" Content="马达转速超过200rpm时，下达清除绝对位置命令" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=007Ch::AlarmID" Content="AL.07C" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=007Dh" Content="没有解除AL07C就重新上电，马达停止运转" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=007Dh::AlarmID" Content="AL.07D" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=007Eh" Content="编码器清除程序错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=007Eh::AlarmID" Content="AL.07E" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=007Fh" Content="编码器版号异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=007Fh::AlarmID" Content="AL.07F" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0083h" Content="驱动器输出电流过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0083h::AlarmID" Content="AL.083" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0085h" Content="回生设定异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0085h::AlarmID" Content="AL.085" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0086h" Content="回生电阻过负载" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0086h::AlarmID" Content="AL.086" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0088h" Content="驱动器功能使用率报警" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0088h::AlarmID" Content="AL.088" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0089h" Content="电流感测遭受干扰" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0089h::AlarmID" Content="AL.089" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=008Ah" Content="自动增益调整命令异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=008Ah::AlarmID" Content="AL.08A" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=008Bh" Content="自动增益调整停止时间过短" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=008Bh::AlarmID" Content="AL.08B" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=008Ch" Content="自动增益调整惯量估测异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=008Ch::AlarmID" Content="AL.08C" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0095h" Content="回生电阻断线" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0095h::AlarmID" Content="AL.095" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0099h" Content="DSP韧体错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0099h::AlarmID" Content="AL.099" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=009Ch" Content="参数重置失败" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=009Ch::AlarmID" Content="AL.09C" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=009Fh" Content="电容充电异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=009Fh::AlarmID" Content="AL.09F" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=00A6h" Content="驱动器与马达的绝对位置坐标不匹配" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=00A6h::AlarmID" Content="AL.0A6" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=035Fh" Content="紧急停止(减速过程中)" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=035Fh::AlarmID" Content="AL.35F" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=03CFh" Content="紧急停止" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=03CFh::AlarmID" Content="AL.3CF" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0422h" Content="控制电源断电造成写入失败" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0422h::AlarmID" Content="AL.422" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0521h" Content="挠性补偿参数异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0521h::AlarmID" Content="AL.521" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0C31h" Content="马达动力线断线侦测" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0C31h::AlarmID" Content="AL.C31" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0CDBh" Content="驱动器机种码异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0CDBh::AlarmID" Content="AL.CDB" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0207h" Content="PR命令Type[8]指令-参数群组超出范围" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0207h::AlarmID" Content="AL.207" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0209h" Content="PR命令Type[8]指令-参数编号超出范围" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0209h::AlarmID" Content="AL.209" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0211h" Content="PR命令Type[8]指令-参数格式设定错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0211h::AlarmID" Content="AL.211" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0213h" Content="PR命令Type[8]指令-参数设定错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0213h::AlarmID" Content="AL.213" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0215h" Content="PR命令Type[8]指令-写入只读参数" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0215h::AlarmID" Content="AL.215" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0217h" Content="PR命令Type[8]指令-Servo On 时不可写入参数" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0217h::AlarmID" Content="AL.217" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0219h" Content="PR命令Type[8]指令-无法写入已锁定的参数" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0219h::AlarmID" Content="AL.219" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0231h" Content="PR命令Type[8]指令-监视变量代码超出范围" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0231h::AlarmID" Content="AL.231" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0235h" Content="位置计数器溢位警告" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0235h::AlarmID" Content="AL.235" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0237h" Content="分度坐标未定义" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0237h::AlarmID" Content="AL.237" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0245h" Content="PR定位超时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0245h::AlarmID" Content="AL.245" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0249h" Content="PR路径编号超出范围" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0249h::AlarmID" Content="AL.249" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0283h" Content="软件正向极限" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0283h::AlarmID" Content="AL.283" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0285h" Content="软件反向极限" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0285h::AlarmID" Content="AL.285" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0289h" Content="位置计数器溢位" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0289h::AlarmID" Content="AL.289" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0380h" Content="DO.MC_OK之位置偏移警报" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0380h::AlarmID" Content="AL.380" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=03F1h" Content="通讯型绝对位置命令错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=03F1h::AlarmID" Content="AL.3F1" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0400h" Content="分度坐标设定错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0400h::AlarmID" Content="AL.400" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0404h" Content="PR特殊滤波器设定过大" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0404h::AlarmID" Content="AL.404" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0510h" Content="驱动器内部更新参数程序异常" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0510h::AlarmID" Content="AL.510" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0520h" Content="计算程序逾时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0520h::AlarmID" Content="AL.520" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0555h" Content="系统故障" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0555h::AlarmID" Content="AL.555" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0809h" Content="PR基础动作设定或指令解译错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0809h::AlarmID" Content="AL.809" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0500h" Content="STO 功能启动" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0500h::AlarmID" Content="AL.500" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0501h" Content="SF1 无讯号(讯号遗失或发生错误)" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0501h::AlarmID" Content="AL.501" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0502h" Content="SF2 无讯号(讯号遗失或发生错误)" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0502h::AlarmID" Content="AL.502" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0503h" Content="STO 自我诊断错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0503h::AlarmID" Content="AL.502" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0111h" Content="SDO 接收溢位" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0111h::AlarmID" Content="AL.111" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0112h" Content="PDO 接收溢位" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0112h::AlarmID" Content="AL.112" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0113h" Content="TxPDO 传送失败" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0113h::AlarmID" Content="AL.113" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0121h" Content="PDO 所欲存取的对象字典Index错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0121h::AlarmID" Content="AL.121" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0122h" Content="PDO 所欲存取的对象字典Sub-index错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0122h::AlarmID" Content="AL.122" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0123h" Content="PDO 所欲存取的对象字典长度错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0123h::AlarmID" Content="AL.123" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0124h" Content="PDO 所欲存取的对象字典范围错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0124h::AlarmID" Content="AL.124" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0125h" Content="PDO 所欲存取的对象字典属性为只读，不允许写入" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0125h::AlarmID" Content="AL.125" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0126h" Content="指定的对象字典无法映像到 PDO" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0126h::AlarmID" Content="AL.126" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0127h" Content="PDO 所欲存取的对象字典在 Servo On 时，不允许写入" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0127h::AlarmID" Content="AL.127" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0128h" Content="于 EEPROM 读取 PDO 对象字典时发生错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0128h::AlarmID" Content="AL.128" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0129h" Content="将 PDO 对象字典写入 EEPROM 时发生错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0129h::AlarmID" Content="AL.129" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0130h" Content="EEPROM 的地址超过限制" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0130h::AlarmID" Content="AL.130" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0131h" Content="EEPROM 的 CRC 计算错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0131h::AlarmID" Content="AL.131" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0132h" Content="写入参数功能受限" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0132h::AlarmID" Content="AL.132" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0170h" Content="总线通讯逾时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0170h::AlarmID" Content="AL.170" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0180h" Content="总线通讯逾时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0180h::AlarmID" Content="AL.180" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0185h" Content="总线硬件逾时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0185h::AlarmID" Content="AL.185" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0186h" Content="总线数据传输错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0186h::AlarmID" Content="AL.186" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0201h" Content="对象字典数据初始错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0201h::AlarmID" Content="AL.201" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0301h" Content="CANopen 同步失效" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0301h::AlarmID" Content="AL.301" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0302h" Content="CANopen 同步信号太快" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0302h::AlarmID" Content="AL.302" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0303h" Content="CANopen 同步信号超时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0303h::AlarmID" Content="AL.303" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0304h" Content="插补模式命令失效" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0304h::AlarmID" Content="AL.304" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0305h" Content="SYNC Period 错误" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=0305h::AlarmID" Content="AL.305" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=03E1h" Content="通讯同步失效" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=03E1h::AlarmID" Content="AL.3E1" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=03E2h" Content="通讯同步信号太快" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_WR::ID=03E2h::AlarmID" Content="AL.3E2" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=03E3h" Content="通讯同步信号超时" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=03E3h::AlarmID" Content="AL.3E3" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0401h" Content="Servo On 时收到 NMT Reset 命令" />
+  <Message ID="AlarmMsg::Drv_ECAT_DELTA-B3E_AL::ID=0401h::AlarmID" Content="AL.401" />
+</ResMap>

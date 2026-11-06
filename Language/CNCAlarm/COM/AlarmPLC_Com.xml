@@ -1,0 +1,84 @@
+﻿<ResMap>
+  <!--========================= R44 Alarm =========================-->
+  <Message ID="AlarmMsg::MLC::ID=67" Content="N2 pressure low" />
+  <Message ID="AlarmMsg::MLC::ID=68" Content="O2 pressure low" />
+  <Message ID="AlarmMsg::MLC::ID=69" Content="Air pressure low" />
+  <Message ID="AlarmMsg::MLC::ID=70" Content="Chiller fault" />
+  <Message ID="AlarmMsg::MLC::ID=71" Content="Laser alarm" />
+  <Message ID="AlarmMsg::MLC::ID=72" Content="Safety door sensor alarm" />
+  <Message ID="AlarmMsg::MLC::ID=73" Content="Emergency Stop" />
+  <Message ID="AlarmMsg::MLC::ID=74" Content="Slug detected" />
+  <Message ID="AlarmMsg::MLC::ID=77" Content="Light curtain is triggered while station is moving" />
+  <Message ID="AlarmMsg::MLC::ID=315" Content="Write file exception, please confirm the permission of nc file path." />
+  <Message ID="AlarmMsg::MLC::ID=322" Content="Required number of workpieces reached" />
+  <Message ID="AlarmMsg::MLC::ID=323" Content="Station not in position, processing cannot start" />
+  <Message ID="AlarmMsg::MLC::ID=324" Content="No processing file enable at the station" />
+  <!--========================= R46 Alarm =========================-->
+  <Message ID="AlarmMsg::MLC::ID=97" Content="Auto focus axis find home process not finish yet" />
+  <Message ID="AlarmMsg::MLC::ID=98" Content="Auto focus axis error, please check the error message on focal module" />
+  <Message ID="AlarmMsg::MLC::ID=99" Content="The incremental lift of the tracking axis exceeds the positive software stroke limit" />
+  <!--========================= R47 Alarm =========================-->
+  <Message ID="AlarmMsg::MLC::ID=113" Content="ADDA initialization failed, please check the driver parameter" />
+  <Message ID="AlarmMsg::MLC::ID=114" Content="Setting tracking speed times out, please check the driver status" />
+  <Message ID="AlarmMsg::MLC::ID=115" Content="The cutting head moves over the workpiece area" />
+  <Message ID="AlarmMsg::MLC::ID=116" Content="Turn on tracking above hollow place" />
+  <Message ID="AlarmMsg::MLC::ID=117" Content="The cutting head is touched" />
+  <Message ID="AlarmMsg::MLC::ID=118" Content="The cutting head collision during cutting" />
+  <Message ID="AlarmMsg::MLC::ID=119" Content="The cutting head collision during piercing" />
+  <Message ID="AlarmMsg::MLC::ID=120" Content="The distance between plates 01 and 02 is less than the safety distance" />
+  <Message ID="AlarmMsg::MLC::ID=121" Content="The distance between plates 02 and 03 is less than the safety distance" />
+  <Message ID="AlarmMsg::MLC::ID=122" Content="The distance between plate 02 and floating platform is less than the safety distance" />
+  <Message ID="AlarmMsg::MLC::ID=123" Content="The distance between plate 03 and floating platform is less than the safety distance" />
+  <Message ID="AlarmMsg::MLC::ID=124" Content="Focal Control Out Of Time" />
+  <Message ID="AlarmMsg::MLC::ID=125" Content="Stroke exceed software limit" />
+  <Message ID="AlarmMsg::MLC::ID=126" Content="The tracking device type does not support the system communication protocol" />
+  <Message ID="AlarmMsg::MLC::ID=127" Content="The tracking-axis driver in error" />
+  <Message ID="AlarmMsg::MLC::ID=128" Content="tracking-axis Negative hardware limit exceed" />
+  <Message ID="AlarmMsg::MLC::ID=363" Content="Auto focus axis is finding home..." />
+  <Message ID="AlarmMsg::MLC::ID=364" Content="The focal voltage exceeds the upper/lower limit, the maximum/minimum voltage will be output." />
+  <Message ID="AlarmMsg::MLC::ID=365" Content="Handheld remote controller connection timed out" />
+  <!--========================= R49 Alarm =========================-->
+  <Message ID="AlarmMsg::MLC::ID=145" Content="Controller not in Auto Mode" />
+  <Message ID="AlarmMsg::MLC::ID=146" Content="Inner platform unlock failed" />
+  <Message ID="AlarmMsg::MLC::ID=147" Content="Hydraulic lift not raise in place" />
+  <Message ID="AlarmMsg::MLC::ID=148" Content="Hydraulic lift not down in place" />
+  <Message ID="AlarmMsg::MLC::ID=149" Content="Outer platform unlock failed" />
+  <Message ID="AlarmMsg::MLC::ID=150" Content="Outer-down platform not in place" />
+  <Message ID="AlarmMsg::MLC::ID=151" Content="Outer-up platform not in place" />
+  <Message ID="AlarmMsg::MLC::ID=152" Content="Hydraulic lift not raise in place" />
+  <Message ID="AlarmMsg::MLC::ID=153" Content="Hydraulic lift not down in place" />
+  <Message ID="AlarmMsg::MLC::ID=154" Content="Inner platform not in place " />
+  <Message ID="AlarmMsg::MLC::ID=155" Content="Failed to lock inner platform" />
+  <Message ID="AlarmMsg::MLC::ID=156" Content="Failed to lock outer platform" />
+  <Message ID="AlarmMsg::MLC::ID=157" Content="Hydraulic lift not down in place" />
+  <Message ID="AlarmMsg::MLC::ID=158" Content="All three platform are not empty, can't switch" />
+  <Message ID="AlarmMsg::MLC::ID=159" Content="Hydraulic lift not align to V-axis when V-axis is moving, stop switching" />
+  <Message ID="AlarmMsg::MLC::ID=160" Content="platform slides when hydraulic lift is moving, outer-up platform not in place, stop switching" />
+  <Message ID="AlarmMsg::MLC::ID=395" Content="platform slides when hydraulic lift is moving, outer-down platform not in place, stop switching" />
+  <Message ID="AlarmMsg::MLC::ID=396" Content="Both outer up and down platform are not in place, stop switching" />
+  <Message ID="AlarmMsg::MLC::ID=397" Content="Platform may be on the intersection of the track and the lift, stop switching" />
+  <!--========================= R44 Warning =========================-->
+  <Message ID="AlarmMsg::MLC::ID=316" Content="Oil lubricator warning" />
+  <!--========================= R45 Alarm =========================-->
+  <Message ID="AlarmMsg::MLC::ID=81" Content="Following error range is exceeded." />
+  <Message ID="AlarmMsg::MLC::ID=82" Content="Loss of capacitance in cutting process." />
+  <Message ID="AlarmMsg::MLC::ID=83" Content="Capacitance cannot be detected." />
+  <Message ID="AlarmMsg::MLC::ID=84" Content="Touch workpiece alarm" />
+  <Message ID="AlarmMsg::MLC::ID=85" Content="Lower limit switch is triggered." />
+  <Message ID="AlarmMsg::MLC::ID=86" Content="Upper limit switch is triggered." />
+  <Message ID="AlarmMsg::MLC::ID=87" Content="Encoder alarm." />
+  <Message ID="AlarmMsg::MLC::ID=88" Content="Servo alarm." />
+  <Message ID="AlarmMsg::MLC::ID=89" Content="tracking-axis positon error." />
+  <Message ID="AlarmMsg::MLC::ID=90" Content="tracking-axis stroke limitation is exceeded." />
+  <Message ID="AlarmMsg::MLC::ID=91" Content="Capacitance becomes too small." />
+  <!--========================= R45 Warning =========================-->
+  <Message ID="AlarmMsg::MLC::ID=346" Content="Communication Error." />  
+  <!--========================= R590 Hint =========================-->
+  <Message ID="AlarmMsg::MLCHint::ID=1" Content="The switchboard is not ready, processing is prohibited" />
+  <Message ID="AlarmMsg::MLCHint::ID=2" Content="The inner table is not in place, processing is prohibited" />
+  <Message ID="AlarmMsg::MLCHint::ID=3" Content="The inner table is unlocked, processing is prohibited" />
+  <Message ID="AlarmMsg::MLCHint::ID=5" Content="This function is not currently supported." />
+  <Message ID="AlarmMsg::MLCHint::ID=6" Content="Set origin function does not support floating coordinate system or non-plate machine type." />
+</ResMap>
+
+

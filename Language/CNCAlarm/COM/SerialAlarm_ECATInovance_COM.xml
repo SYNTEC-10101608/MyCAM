@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=101h" Content="Parameter abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=102h" Content="Programmable logic configuration fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=103h" Content="FPGA software version too early"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=104h" Content="Programmable logic interruption fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=105h" Content="Internal program abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=108h" Content="Parameter storage fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=111h" Content="Group 2000h/2001h parameter abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=120h" Content="Product model matching fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=121h" Content="Invalid S-ON command"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=122h" Content="Product matching fault in absolute position mode"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=130h" Content="Different DIs allocated with the same function"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=131h" Content="DO function No. exceeding the number of functions"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=136h" Content="Data check error or no parameter stored in the motor ROM"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=200h" Content="Overcurrent 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=201h" Content="Overcurrent 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=207h" Content="Shaft D/Q current overflow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=208h" Content="FPGA sampling operation timeout"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=210h" Content="Output short-circuit to ground"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=220h" Content="Phase sequence incorrect"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=234h" Content="Runaway"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=400h" Content="Main circuit overvoltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=410h" Content="Main circuit undervoltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=420h" Content="Main circuit phase loss"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=430h" Content="Control power undervoltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=500h" Content="Motor overspeed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=510h" Content="Pulse output overspeed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=602h" Content="Angle auto-tuning failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=610h" Content="Servo drive overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=620h" Content="Motor overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=630h" Content="Motor rotor locked"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=650h" Content="Heatsink overheat"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=731h" Content="Encoder battery failed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=733h" Content="Encoder multi-turn counting error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=735h" Content="Encoder multi-turn counting overflow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=740h" Content="Encoder interference"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=770h" Content="External encoder scale fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=A33h" Content="Encoder data abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=A34h" Content="Encoder communication check abnormal"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=A35h" Content="Z signal lost"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=B00h" Content="Position deviation excess"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=B01h" Content="Position reference excess"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=B02h" Content="Position deviation exceeding threshold in fully closed-loop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=B03h" Content="Electronic gear ratio setting exceeding limit"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=B04h" Content="Parameter setting error with fully closed-loop function"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=D09h" Content="Software upper/lower limit setting incorrect"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=D10h" Content="Home offset setting incorrect"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E07h" Content="Network state abnormal switchover"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E08h" Content="Synchronization loss"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E11h" Content="XML configuration file not burnt"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E12h" Content="Network initialization failure"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E13h" Content="Synchronization cycle setting incorrect"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_ALM::ID=E15h" Content="Synchronization cycle error being large"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=110h" Content="Setting error of frequency-division pulse output"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=601h" Content="Homing timeout"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=730h" Content="Encoder battery warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=900h" Content="DI emergency braking"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=909h" Content="Motor overload warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=920h" Content="Regenerative resistor overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=922h" Content="Resistance of external braking resistor too small"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=939h" Content="Motor power cable breaking"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=941h" Content="Parameter modification taking effect only after power-on again"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=942h" Content="Parameter storage too frequent"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=950h" Content="Positive limit switch warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=952h" Content="Negative limit switch warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=980h" Content="Encoder internal fault"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=990h" Content="Power input phase loss warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=998h" Content="Homing mode setting incorrect"/>
+	<Message ID="AlarmMsg::Drv_ECAT_INOVANCE_WRN::ID=A40h" Content="Parameter auto-tuning failure"/>
+</ResMap>

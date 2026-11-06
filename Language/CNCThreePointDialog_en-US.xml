@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Title" Content="Three-Point Calibration" />
+	<Message ID="PickDrawing" Content="Reselect points" />
+	<Message ID="Reset" Content="Reset" />
+	<Message ID="Cancel" Content="Cancel" />
+	<Message ID="DrawingPoints" Content="Drawing points" />
+	<Message ID="WorkpiecePoints" Content="Workpiece points" />
+	<Message ID="Point" Content="Pt. {0}" />
+	<Message ID="Capture" Content="Capture" />
+	<Message ID="Tolerance" Content="Tolerance" />
+	<Message ID="Error" Content="Error" />
+	<Message ID="Calculate" Content="Calculate" />
+	<Message ID="DrawingOnly" Content="Output drawing points only" />
+	<Message ID="DrawingOnly_Offline" Content="Output drawing points only (offline)" />
+	<Message ID="Error_Unavailable" Content="Unavailable" />
+	<Message ID="Validation_DrawingIncomplete" Content="Set all three drawing points completely." />
+	<Message ID="Validation_WorkpieceIncomplete" Content="Set all three workpiece points completely." />
+	<Message ID="Validation_Tolerance" Content="Tolerance must be a valid number greater than or equal to 0." />
+	<Message ID="Validation_Input" Content="Enter a valid number. Tolerance cannot be negative." />
+	<Message ID="Validation_Point" Content="{0} {1}: X, Y and Z must all be valid numbers." />
+	<Message ID="Step_Drawing" Content="Step 1: Drawing points" />
+	<Message ID="Step_Workpiece" Content="Step 2: Workpiece points" />
+	<Message ID="Step_Calculation" Content="Step 3: Tolerance and calculation" />
+	<Message ID="Drawing_Repicking" Content="Reselect drawing point {0} on the main canvas." />
+	<Message ID="Drawing_Picking" Content="Select drawing point {0} on the main canvas ({1}/3 selected)." />
+	<Message ID="Drawing_Complete" Content="Drawing points are complete. Click Reselect points to select them again." />
+	<Message ID="Drawing_Initial" Content="Select three drawing points in order on the main canvas." />
+	<Message ID="Workpiece_Waiting" Content="Select all three drawing points on the main canvas first." />
+	<Message ID="Workpiece_Complete" Content="Workpiece points are complete. Set the tolerance and click Calculate." />
+	<Message ID="Workpiece_Initial" Content="Move to each workpiece point, then click Capture or enter coordinates." />
+	<Message ID="Step_Current" Content="Current" />
+	<Message ID="Step_Complete" Content="Complete" />
+	<Message ID="Step_WaitDrawing" Content="Waiting for step 1" />
+	<Message ID="Step_WaitBoth" Content="Waiting for steps 1 and 2" />
+	<Message ID="Step_Format" Content="{0} ({1})" />
+	<Message ID="Error_Initialization" Content="Initialize three-point calibration once on the WinForms UI thread." />
+	<Message ID="Error_Subscription" Content="Unable to initialize the calibration tolerance subscription." />
+	<Message ID="Error_NoHost" Content="No calibration data host is configured." />
+	<Message ID="Confirm_Close" Content="{0}&#10;Close anyway? Changes made in this session will not be saved." />
+	<Message ID="Error_ReadTolerance" Content="Unable to read tolerance: {0}" />
+	<Message ID="Error_WriteTolerance" Content="Unable to write tolerance: {0}" />
+	<Message ID="Error_PickingUnsupported" Content="The current host does not support canvas point selection." />
+	<Message ID="Error_PickingStart" Content="Unable to start canvas point selection." />
+	<Message ID="Error_DrawingUnavailable" Content="Add a workpiece first and complete any current drawing point selection." />
+	<Message ID="Error_EditorUnavailable" Content="The canvas editor is not ready." />
+	<Message ID="Error_InputOffline" Content="CNC is disconnected. The input has not been written to the controller." />
+	<Message ID="Error_WriteInput" Content="Unable to write @{0}: {1}" />
+	<Message ID="Error_Capture" Content="Unable to capture program coordinates: {0}" />
+	<Message ID="Error_CalculateOffline" Content="CNC is disconnected. Calculation is unavailable." />
+	<Message ID="Error_NoSaveHost" Content="No calibration data host is configured. Results cannot be saved." />
+	<Message ID="Validation_AllPoints" Content="Complete all three drawing points and workpiece points." />
+	<Message ID="Error_Calculation" Content="Calibration failed, the error exceeds tolerance, or no valid error was received. The calculated inputs have been retained." />
+	<Message ID="Error_ProjectChanged" Content="The project or drawing calibration data has changed. These edits will not be saved." />
+	<Message ID="Confirm_DiscardUncalculated" Content="These inputs have not been calculated or have changed since calculation. Closing restores the last calculated inputs." />
+	<Message ID="Confirm_DiscardAndClose" Content="Discard the uncalculated edits and close?" />
+	<Message ID="Error_ReadResult" Content="Unable to read the calibration error." />
+	<Message ID="Error_CalculationDetails" Content="Calculation failed or the error exceeds tolerance: {0}" />
+</ResMap>

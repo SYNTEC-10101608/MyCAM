@@ -30,13 +30,13 @@ namespace MyCAM.Post
 		TraverseCalculationInfo m_TraverseCalculationInfo;
 		EntryAndExitData m_EntryAndExitData;
 
-		public bool ConvertSuccess( string fileName, string szTempFilePath, out string errorMessage )
+		public bool ConvertSuccess( string fileName, string szTempFilePath, bool drawingOnly, out string errorMessage )
 		{
 			errorMessage = string.Empty;
 			try {
 				using( m_StreamWriter = new StreamWriter( szTempFilePath ) ) {
 					m_StreamWriter.WriteLine( "%@MACRO" );
-					WriteCalibrationSection();
+					WriteCalibrationSection( drawingOnly );
 
 					// file header
 					CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.Header,
@@ -103,13 +103,18 @@ namespace MyCAM.Post
 			}
 		}
 
-		void WriteCalibrationSection()
+		void WriteCalibrationSection( bool drawingOnly )
 		{
+			if( !drawingOnly && !m_DataManager.CalibrationData.HasCalculatedSnapshot ) {
+				throw new InvalidOperationException( m_LanguageManager.TryGetString( "Error_CalibrationRequired", CALIBRATION_REQUIRED ) );
+			}
 			if( !NeedToWriteCalibrationPnt( out CalibrationData calibrationData ) ) {
 				return;
 			}
-			m_StreamWriter.WriteLine( $"G65 P\"REFPOINT_SET\" X1={calibrationData.Ref_Pnt1.x.ToString( "F3" )} Y1={calibrationData.Ref_Pnt1.y.ToString( "F3" )} Z1={calibrationData.Ref_Pnt1.z.ToString( "F3" )} X2={calibrationData.Ref_Pnt2.x.ToString( "F3" )} Y2={calibrationData.Ref_Pnt2.y.ToString( "F3" )} Z2={calibrationData.Ref_Pnt2.z.ToString( "F3" )} X3={calibrationData.Ref_Pnt3.x.ToString( "F3" )} Y3={calibrationData.Ref_Pnt3.y.ToString( "F3" )} Z3={calibrationData.Ref_Pnt3.z.ToString( "F3" )};" );
-			m_StreamWriter.WriteLine( $"G65 P\"CALPOINT_SET\" X1=0.000 Y1=0.000 Z1=0.000 X2=0.000 Y2=0.000 Z2=0.000 X3=0.000 Y3=0.000 Z3=0.000;" );
+			m_StreamWriter.WriteLine( FormattableString.Invariant( $"G65 P\"REFPOINT_SET\" X1={calibrationData.Ref_Pnt1.x:F3} Y1={calibrationData.Ref_Pnt1.y:F3} Z1={calibrationData.Ref_Pnt1.z:F3} X2={calibrationData.Ref_Pnt2.x:F3} Y2={calibrationData.Ref_Pnt2.y:F3} Z2={calibrationData.Ref_Pnt2.z:F3} X3={calibrationData.Ref_Pnt3.x:F3} Y3={calibrationData.Ref_Pnt3.y:F3} Z3={calibrationData.Ref_Pnt3.z:F3};" ) );
+			if( !drawingOnly && calibrationData.HasCalibrationInputs ) {
+				m_StreamWriter.WriteLine( FormattableString.Invariant( $"G65 P\"CALPOINT_SET\" X1={calibrationData.Work_Pnt1.x:F3} Y1={calibrationData.Work_Pnt1.y:F3} Z1={calibrationData.Work_Pnt1.z:F3} X2={calibrationData.Work_Pnt2.x:F3} Y2={calibrationData.Work_Pnt2.y:F3} Z2={calibrationData.Work_Pnt2.z:F3} X3={calibrationData.Work_Pnt3.x:F3} Y3={calibrationData.Work_Pnt3.y:F3} Z3={calibrationData.Work_Pnt3.z:F3} E{calibrationData.Tolerance.Value:F3};" ) );
+			}
 		}
 
 		void WriteExitSection( PathEndInfo endInfoOfLastPath )
@@ -473,6 +478,7 @@ namespace MyCAM.Post
 		#endregion
 
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "NCWriter" );
+		const string CALIBRATION_REQUIRED = "目前沒有有效的三點校正計算資料。請先按「計算」取得結果，或明確選擇僅輸出圖紙點。";
 		const string ERROR_POST_PROCESSING = "後處理運算錯誤，路徑：{0}";
 	}
 }

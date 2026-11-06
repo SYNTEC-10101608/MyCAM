@@ -1711,6 +1711,16 @@ namespace MyCAM.FileManager
 
 	public class CalibrationDataDTO
 	{
+		public bool? DrawingOnly { get; set; }
+		public bool? CalculationCompleted { get; set; }
+		public bool? CalculationSucceeded { get; set; }
+		public bool? HasTransmitted { get; set; }
+		public gp_PntDTO WorkPnt1 { get; set; }
+		public gp_PntDTO WorkPnt2 { get; set; }
+		public gp_PntDTO WorkPnt3 { get; set; }
+		public double? Tolerance { get; set; }
+		public double? CalibrationError { get; set; }
+
 		public gp_PntDTO REFPnt1
 		{
 			get;
@@ -1736,20 +1746,40 @@ namespace MyCAM.FileManager
 
 		internal CalibrationDataDTO( CalibrationData calibrationData )
 		{
+			DrawingOnly = calibrationData?.DrawingOnly ?? true;
+			HasTransmitted = calibrationData?.HasTransmitted ?? false;
 			if( calibrationData == null || calibrationData.IsBeenSet == false ) {
 				return;
 			}
 			REFPnt1 = new gp_PntDTO( calibrationData.Ref_Pnt1 );
 			REFPnt2 = new gp_PntDTO( calibrationData.Ref_Pnt2 );
 			REFPnt3 = new gp_PntDTO( calibrationData.Ref_Pnt3 );
+			WorkPnt1 = calibrationData.Work_Pnt1 == null ? null : new gp_PntDTO( calibrationData.Work_Pnt1 );
+			WorkPnt2 = calibrationData.Work_Pnt2 == null ? null : new gp_PntDTO( calibrationData.Work_Pnt2 );
+			WorkPnt3 = calibrationData.Work_Pnt3 == null ? null : new gp_PntDTO( calibrationData.Work_Pnt3 );
+			Tolerance = calibrationData.Tolerance;
+			CalibrationError = calibrationData.CalibrationError;
+			CalculationCompleted = calibrationData.CalculationCompleted;
+			CalculationSucceeded = calibrationData.CalculationSucceeded;
 		}
 
 		internal CalibrationData ToCalibrationData()
 		{
 			if( REFPnt1 == null || REFPnt2 == null || REFPnt3 == null ) {
-				return new CalibrationData();
+				CalibrationData empty = new CalibrationData { DrawingOnly = DrawingOnly ?? true };
+				if( HasTransmitted == true ) {
+					empty.MarkTransmitted();
+				}
+				return empty;
 			}
-			return new CalibrationData( REFPnt1.ToPnt(), REFPnt2.ToPnt(), REFPnt3.ToPnt() );
+			CalibrationData data = new CalibrationData( REFPnt1.ToPnt(), REFPnt2.ToPnt(), REFPnt3.ToPnt() );
+			data.DrawingOnly = DrawingOnly ?? true;
+			data.SetWorkpieceData( WorkPnt1?.ToPnt(), WorkPnt2?.ToPnt(), WorkPnt3?.ToPnt(), Tolerance );
+			data.SetCalibrationError( CalibrationError, CalculationCompleted, CalculationSucceeded );
+			if( HasTransmitted == true || data.CalculationCompleted ) {
+				data.MarkTransmitted();
+			}
+			return data;
 		}
 	}
 

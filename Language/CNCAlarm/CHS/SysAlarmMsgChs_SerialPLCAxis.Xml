@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=1" Content="串行PLC轴驱动器站号与其他轴重复设定"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=2" Content="寄存器位于系统保护区或不支持位存取"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=3" Content="加减速或速度设定错误"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=4" Content="检查窗口设定错误"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=7" Content="寻原点偏移量设定过大"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=8" Content="绝对式电机不支持增量寻原点功能"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=9" Content="未完成绝对式原点设定"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=10" Content="绝对式相关参数异动，请重开机并重设原点"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=11" Content="驱动器站号不存在"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=12" Content="超过正向软件行程极限"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=13" Content="超过负向软件行程极限"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=14" Content="驱动器通讯异常"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=15" Content="驱动器参数写入失败"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=16" Content="找不到原点索引讯号"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=17" Content="寻原点零速检查失败"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=18" Content="离不开原点开关"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=19" Content="驱动器电源异常"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=20" Content="不支持此驱动器类型"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=21" Content="定位移动距离超过上限"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=22" Content="此驱动器类型不支持手轮功能"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=23" Content="新代编码器韧件升级结束，请重启驱动器"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=24" Content="新代编码器信息读取逾时"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=25" Content="轴向回授值异常"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=26" Content="通讯线材接触不良" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=27" Content="硬件未收到通讯封包" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=28" Content="通讯封包受噪声干扰" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=29" Content="驱动器软件遗漏通讯封包" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=30" Content="驱动器后级电未供给" />
+</ResMap>

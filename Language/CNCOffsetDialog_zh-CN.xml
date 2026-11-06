@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Title" Content="程序坐标偏置" />
+	<Message ID="SetZero" Content="设为 0" />
+	<Message ID="ClearAll" Content="全部清除" />
+	<Message ID="Error_Unavailable" Content="偏置设置窗口无法使用。" />
+	<Message ID="Error_UIThread" Content="请在 WinForms UI 线程初始化偏置设置窗口。" />
+	<Message ID="Error_Subscription" Content="无法初始化偏置坐标订阅。" />
+	<Message ID="Error_Operation" Content="{0}失败，偏置可能尚未完整更新：{1}" />
+</ResMap>

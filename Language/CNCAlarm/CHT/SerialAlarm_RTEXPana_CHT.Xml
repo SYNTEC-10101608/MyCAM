@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=110" Content="控制電源不足電壓保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=120" Content="過電壓保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=130" Content="主電源不足電壓保護(​​PN 間電壓不足)"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=131" Content="主電源不足電壓保護(​​AC 關閉檢出)"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=140" Content="過電流保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=141" Content="IPM 異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=150" Content="過熱保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=151" Content="編碼器過熱異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=160" Content="過載保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=161" Content="轉矩飽和異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=180" Content="回生過負載保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=181" Content="回生 Tr 異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=210" Content="編碼器通信斷線異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=211" Content="編碼器通信異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=230" Content="編碼器通信數據異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=240" Content="位置偏差過大保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=241" Content="速度偏差過大保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=250" Content="混合偏差過大保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=260" Content="過速度保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=261" Content="第 2 過速度保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=271" Content="絕對式清零保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=274" Content="指令異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=275" Content="指令生成異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=276" Content="位置信息初始化異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=277" Content="脈衝再生限制保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=280" Content="脈衝再生限制保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=291" Content="計數器溢出保護 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=292" Content="計數器溢出保護 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=310" Content="安全功能異常保護 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=312" Content="安全功能異常保護 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=330" Content="輸入重複分配異常 1 保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=331" Content="輸入重複分配異常 2 保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=332" Content="輸入功能編號異常 1 保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=333" Content="輸入功能編號異常 2 保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=334" Content="輸出功能編號異常 1 保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=335" Content="輸出功能編號異常 2 保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=338" Content="嵌位輸入分配異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=340" Content="電機可動範圍設定異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=341" Content="單圈絕對式可動範圍異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=360" Content="EEPROM 參數異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=361" Content="EEPROM 參數異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=362" Content="EEPROM 參數異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=370" Content="EEPROM 檢驗代碼異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=371" Content="EEPROM 檢驗代碼異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=372" Content="EEPROM 檢驗代碼異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=380" Content="驅動禁止輸入保護 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=381" Content="驅動禁止輸入保護 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=382" Content="驅動禁止輸入保護 3"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=400" Content="絕對式系統停止保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=410" Content="絕對式計數器溢出保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=420" Content="絕對式過速保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=430" Content="編碼器初始化異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=440" Content="單圈轉計數異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=450" Content="多圈計數異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=470" Content="絕對式狀態異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=480" Content="編碼器 Z 相異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=490" Content="編碼器 CS 相異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=500" Content="外部位移傳感器接線異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=501" Content="外部位移傳感器通信異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=502" Content="外部位移傳感器通信數據異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=510" Content="外部位移傳感器 ST 異常保護 0"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=511" Content="外部位移傳感器 ST 異常保護 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=512" Content="外部位移傳感器 ST 異常保護 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=513" Content="外部位移傳感器 ST 異常保護 3"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=514" Content="外部位移傳感器 ST 異常保護 4"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=515" Content="外部位移傳感器 ST 異常保護 5"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=550" Content="A 相接線異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=551" Content="B 相接線異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=552" Content="Z 相接線異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=700" Content="U 相電流檢出器異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=701" Content="W 相電流檢出器異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=720" Content="熱保護器異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=803" Content="PLL 未完成異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=820" Content="RTEX軸地址設定異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=830" Content="RTEX連續通信異常保護 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=831" Content="RTEX連續通信異常保護 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=840" Content="RTEX超時異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=843" Content="RTEX通信同步異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=845" Content="RTEX通信週期異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=860" Content="RTEX Cyclic數據異常保護 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=861" Content="RTEX Cyclic數據異常保護 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=862" Content="RTEX Update Counter異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=870" Content="強制報警輸入保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=871" Content="回退動作完成(I/O)"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=873" Content="回退動作異常"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=902" Content="RTEX多軸間同步確立異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=911" Content="RTEX指令異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=913" Content="RTEX指令異常保護2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=920" Content="編碼器數據復原異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=921" Content="外部位移傳感器數據復原異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=923" Content="多圈數據上限値不一致異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=930" Content="參數設定異常保護 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=932" Content="參數設定異常保護 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=933" Content="外部位移傳感器連接異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=935" Content="參數設定異常保護 4"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=938" Content="參數設定異常保護 6"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=942" Content="原點復位異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=943" Content="原點復位異常保護 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=950" Content="電機自動識別異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=951" Content="電機自動識別異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=952" Content="電機自動識別異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=953" Content="電機自動識別異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=954" Content="電機自動識別異常保護"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=962" Content="控制單元異常保護 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=963" Content="控制單元異常保護 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=964" Content="控制單元異常保護 3"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=965" Content="控制單元異常保護 4"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=966" Content="控制單元異常保護 5"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=967" Content="控制單元異常保護 6"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=981" Content="RTEX硬體異常保護 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=982" Content="RTEX硬體異常保護 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=983" Content="RTEX硬體異常保護 3"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A0h" Content="過載警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A1h" Content="過再生警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A2h" Content="電池警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A3h" Content="風扇警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A4h" Content="編碼器通信警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A5h" Content="編碼器過熱警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A6h" Content="發振檢出警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A7h" Content="壽命檢出警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A8h" Content="外部位移傳感器異常警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A9h" Content="外部位移傳感器通信警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=ACh" Content="劣化診斷警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=C0h" Content="RTEX連續通信異常警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=C1h" Content="RTEX累積通信異常警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=C2h" Content="RTEX Update_Counter異常警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=C3h" Content="主電源關閉警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=D2h" Content="PANATERM命令執行警告"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=352h" Content="回退動作完成(I/O)"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=354h" Content="回退動作異常"/>
+</ResMap>

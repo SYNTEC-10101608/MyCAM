@@ -1,0 +1,294 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024h" Content="Driver Internal Operation Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024-1h" Content="FSIA communication error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024-2h" Content="FSIB communication error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024-3h" Content="SPI1 communication error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024-4h" Content="SPI2 communication error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024-5h" Content="ADC read error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024-6h" Content="CPU handshake error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024-7h" Content="Pos/Vel cmd buffer full" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024-8h" Content="Encoder1 package update fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024-9h" Content="Encoder2 package update fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024-Ah" Content="SDFM package update fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=024-Bh" Content="FSIA application conflict" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=025h" Content="Driver Hardware Computation Failure" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=100h" Content="IGBT Overheat" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=101h" Content="Drive Overload" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=110h" Content="Critical Over Voltage" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=111h" Content="Low Voltage" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=112h" Content="UVW Cable Disconnected" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=113h" Content="PowerFailure" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=114h" Content="Severely Low Voltage" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=120h" Content="Driver Over Current" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=121h" Content="Power Module Failure" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=122h" Content="Hall Sensor Error 1" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=123h" Content="Hall Sensor Error 2" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=124h" Content="Drive Ground Fault" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=125h" Content="Driver Over Current (Software)" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=126h" Content="Current Sensor Module Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=129h" Content="This axis is not supported by this driver type" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=130h" Content="Drive Regenerator Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=131h" Content="Cooling Fan Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=132h" Content="Control Board Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=133h" Content="Power Stage Information Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=134h" Content="FRAM Operating Fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=135h" Content="DSP WatchDog Reset" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=136h" Content="FRAM CRC Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=137h" Content="Calculation sequential error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=137-1h" Content="CLA/PRU calculation timeout" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=137-2h" Content="CPU Ctrl calculation timeout" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=137-3h" Content="CPU SlowCtrl calculation timeout" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=137-4h" Content="CPU FastPLC calculation timeout" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=137-5h" Content="CPU PLC calculation timeout" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=137-6h" Content="CPU Remain calculation timeout" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=138h" Content="Parameters saving failed in permanent memory" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=139h" Content="PowerStage Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=13Ah" Content="Module ID Data Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=13Bh" Content="RTD Add-on Card SPI Communication Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=13Ch" Content="Front Stage Information Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=13Dh" Content="FRAM Read Fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=13Eh" Content="Restore Syntec Driver Parameters" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=13Fh" Content="Memory Information Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=150h" Content="Extreme Regenerative Overload" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=151h" Content="Regenerator Instant Overload" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=152h" Content="Voltage Regeneration Function Abnormal" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=160h" Content="Voltage Protection Module(VPM) Abnormal" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=160-1h" Content="VPM not powered on when servo off" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=160-2h" Content="The UVW line from the driver to the motor is not properly connected when servo on" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=160-3h" Content="VPM operates prematurely due to unreasonable configuration of the regenerative resistor or mechanism eccentricity, causing the DC BUS voltage to oscillate violently." />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=200h" Content="Motor Overheat" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=201h" Content="Motor Over Speed" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=202h" Content="Overload" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=203h" Content="Over Torque 1" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=204h" Content="Over Torque 2" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=205h" Content="Motor stuck" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=206h" Content="Over Torque 3" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=207h" Content="Over Torque 4" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=210h" Content="Motor Pole Number Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=230h" Content="Rotor-Encoder Offset Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=231h" Content="Command Direction Not Allowed" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=235h" Content="Wrong Estimated Speed" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=236h" Content="RTD Over Temperature Detection" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=237h" Content="RTD Thermal Sensor is Unplugged" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=238h" Content="Over Speed When Dualwinding Switch" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=300h" Content="Encoder Halt Alarm" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=301h" Content="Encoder Index Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=302h" Content="Encoder Direction Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=303h" Content="Encoder Resolution Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=304h" Content="Encoder No Feedback" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=305h" Content="Encoder Pulse Loss" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=306h" Content="Encoder Z Index Shift" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=307h" Content="Encoder Status Extreme Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=308h" Content="Encoder over speed when power on" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=309h" Content="Serial Encoder Communication Type is Wrong" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=30Ah" Content="Encoder Over Speed" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=30Bh" Content="Encoder Position Feedback Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=30Ch" Content="Encoder Multi-Turn Data Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=30Dh" Content="Encoder Unable to Finish Operation Configuration" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=310h" Content="2nd Encoder Halt Alarm" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=311h" Content="2nd Encoder Index Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=312h" Content="2nd Encoder Direction Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=313h" Content="2nd Encoder Resolution Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=314h" Content="2nd Encoder No Feedback" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=315h" Content="2nd Encoder Pulse Loss" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=316h" Content="2nd Encoder Z Index Shift." />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=317h" Content="2nd Encoder Communication or Status Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=318h" Content="2nd Encoder Over Speed When Power On" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=319h" Content="2nd Serial Encoder Communication Type is Wrong" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=31Ah" Content="2nd Encoder Over Speed" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=31Bh" Content="2nd Encoder Position Feedback Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=31Ch" Content="2nd Encoder Multi-Turn Data Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=31Dh" Content="2nd Encoder Unable to Finish Operation Configuration" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=31Eh" Content="2nd Encoder Battery Low Voltage Position Loss" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=31Fh" Content="2nd Encoder Battery Low Voltage Alarm" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=320h" Content="Encoder Internal Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=321h" Content="Encoder External(1) Thermal Sensor Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=322h" Content="Encoder External(2) Thermal Sensor Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=324h" Content="2nd Encoder Internal Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=325h" Content="2nd Encoder External(1) Thermal Sensor Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=326h" Content="2nd Encoder External(2) Thermal Sensor Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=328h" Content="Encoder Internal Thermal Sensor Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=329h" Content="Encoder External(1) Thermal Sensor is Unplugged" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=32Ah" Content="Encoder External(2) Thermal Sensor is Unplugged" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=32Ch" Content="2nd Encoder Internal Thermal Sensor Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=32Dh" Content="2nd Encoder External(1) Thermal Sensor is Unplugged" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=32Eh" Content="2nd Encoder External(2) Thermal Sensor is Unplugged" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=330h" Content="Encoder Port Setting Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=331h" Content="2nd Encoder Port Setting Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=332h" Content="Encoder Not Recognized" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=333h" Content="2nd Encoder Not Recognized" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=334h" Content="Encoder Download Parameters Fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=335h" Content="2nd Encoder Download Parameters Fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=336h" Content="Syntec Encoder Runs in Bootloader Mode" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=337h" Content="2nd Syntec Encoder Runs in Bootloader Mode" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=338h" Content="Encoder Register Access Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=339h" Content="2nd Encoder Register Access Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=33Ah" Content="Encoder not support type auto detection" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=33Bh" Content="2nd Encoder not support type auto detection" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=33Ch" Content="Encoder Initialization Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=33Dh" Content="2nd Encoder Initialization Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=33Eh" Content="Encoder Hardware Identity Unknown" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=33Fh" Content="2nd Encoder Hardware Identity Unknown" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=340h" Content="Motor over temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=341h" Content="Encoder Extremely Internal Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=342h" Content="Encoder Extremely External(1) Thermal Sensor Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=343h" Content="Encoder Extremely External(2) Thermal Sensor Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=344h" Content="Encoder Signal Noise Interference" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=345h" Content="Encoder Feedback Abnormal" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=346h" Content="Motor Rear Cover Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=347h" Content="Motor Rear Cover Thermal Sensor Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=348h" Content="Motor Coil Thermal Sensor Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=34Ah" Content="Motor Coil Thermal Sensor is Unplugged" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=350h" Content="Spindle over temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=351h" Content="2nd Encoder Extremely Internal Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=352h" Content="2nd Encoder Extremely External(1) Thermal Sensor Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=353h" Content="2nd Encoder Extremely External(2) Thermal Sensor Over Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=354h" Content="2nd Encoder Signal Noise Interference" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=355h" Content="2nd Encoder Feedback Abnormal" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=400h" Content="Motor Parameter Estimation Failure - Abnormal Output Command" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=401h" Content="Motor Parameter Estimation Failure - Abnormal Motor Speed" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=402h" Content="Current Tuning Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=403h" Content="Motor Rotor Time Const. Estimation Failure" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=404h" Content="PM Motor Parameter Tuning Fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=405h" Content="Zero Current Check Fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=412h" Content="Rotor Inertia Estimation Failure - No Rotation" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=413h" Content="Gravity Displacement Over Limit during Inertia Tuning" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=414h" Content="Inertia Value Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=420h" Content="Encoder-Rotor Offset Searching Failure" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=421h" Content="Initail electrical angle detection fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=430h" Content="Encoder Calibration Stall Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=431h" Content="Encoder Pitch Compensation Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=440h" Content="Dead Time Calibrate Initial Failure" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=450h" Content="Sensor Test Fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=451h" Content="Linear Motor Magnetic Pitch Setting Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=452h" Content="Proximity Switch Spindle Posing Tuning Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=453h" Content="Global tuning failure" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=454h" Content="Motor max speed exceeds the encoder limitation speed" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=454-1h" Content="Motor's max speed exceeds the limit of the first encoder" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=454-2h" Content="Motor's max speed exceeds the limit of the second encoder" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=500h" Content="Incorrect Setting of Operational Curve for V/f Control" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=501h" Content="V/f Overcurrent Fault" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=502h" Content="Current Loop Command Saturation" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=505h" Content="Control mode not set properly" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=510h" Content="Spindle Posing Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=511h" Content="Spindle Posing Deviation" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=512h" Content="Error Digital Input Signal Index Position" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=513h" Content="Dual Feedback Parameter Setting Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=520h" Content="Excessive Position Error Between 1st and 2nd Feedback" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=521h" Content="Excessive Position Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=522h" Content="Servo On Command Conflict" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=523h" Content="Parameter Saving Command is Illegal" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=524h" Content="Serious Belt Slip" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=525h" Content="Electrical Gear Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=526h" Content="Extremely Excessive Position Error Between 1st and 2nd Feedback" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=527h" Content="Gantry control position feedback critical deviation" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=528h" Content="No origin point for gantry control" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=529h" Content="Excessive Position Error Overflow Under Torque Limit" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52Ah" Content="Seriously Excessive Position Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52Fh" Content="Servo On Timeout" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52F-1h" Content="There are currently other alarms" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52F-2h" Content="DC bus voltage is too low or main supply voltage parameter incorrect (Pn-640)" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52F-3h" Content="Soft-start status error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52F-4h" Content="Encoder communication type parameters incorrect" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52F-5h" Content="Encoder not ready" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52F-6h" Content="Parameter not synchronized" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52F-7h" Content="Gantry axis alarm" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52F-8h" Content="Current ADC not ready" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52F-9h" Content="Dynamic braking in progress" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52F-Ah" Content="Driver information error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=52F-Bh" Content="Voltage Regeneration Function Abnormal" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=530h" Content="Zero Speed Check Fail" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=531h" Content="Drive Parameter Loaded to Defaults" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=532h" Content="STO Function Execution" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=533h" Content="Hardware STO Function Execution" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=542h" Content="Laser Cruise Mode Failure" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=543h" Content="The Proximity Spindle Position DI setting error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=544h" Content="Linear Sensor Overflow" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=550h" Content="Unexpected disturbance torque" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=551h" Content="Excessive Dynamic Following Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=690h" Content="Not support winding selection function" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=810h" Content="Encoder Battery Low Voltage Position Loss" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=812h" Content="2nd Encoder Battery Low Voltage Position Loss" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=830h" Content="ABS Type Encoder Battery Low Voltage" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=910h" Content="IGBT High Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=911h" Content="Power Stage Regenerative Resistor High Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=912h" Content="Power Supply Line Open Phase" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=913h" Content="Driver External Motor Thermal Sensor is Unplugged" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=914h" Content="Power Stage Fan Abnormal" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=915h" Content="Power Stage Fan Low Speed" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=920h" Content="Servo On Command Conflict" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=921h" Content="Power off pull-up function is not supported" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=922h" Content="Posing by proximity switch function is not supported" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=925h" Content="Control mode not applicable with tuning function" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=928h" Content="No Permission" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=929h" Content="Power Stage MCU not Burned-In" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=930h" Content="ABS Type Encoder Battery Low Voltage" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=931h" Content="Encoder Voltage Warning" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=932h" Content="Encoder Signal Abnormal" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=933h" Content="Encoder Z Index Abnormal" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=935h" Content="ABS Type 2nd Encoder Battery Low Voltage" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=936h" Content="2nd Encoder Voltage Warning" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=937h" Content="2nd Encoder Signal Abnormal" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=938h" Content="2nd Encoder Z Index Abnormal." />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=93Ah" Content="Encoder Setting Wrong" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=93Bh" Content="Motor Rear Cover High Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=93Ch" Content="Motor Coil Thermal Sensor High Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=93Dh" Content="Encoder External(2) Thermal Sensor High Temperature" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=940h" Content="Parameter Modified in Servo-on State" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=941h" Content="Motor Brake Method Unsupported" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=942h" Content="Abnormal Motor Parameter Estimation - Too Large Test Current" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=943h" Content="Save Parameters Failed" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947h" Content="Parameter Setting Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-1h" Content="Using torque control mode with improper VLIM (Pn-003)" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-2h" Content="STO conflict with the corresponding IO interface settings" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-3h" Content="Speed control mode set wrongly (Pn-330)" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-4h" Content="Regenerator protection parameters set wrongly" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-5h" Content="RTD protection parameters set wrongly" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-6h" Content="Gantry control setting error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-7h" Content="Unexpected disturbance torque protection is incorrectly enabled (Pn-852)" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-8h" Content="Friction compensation setting error." />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-9h" Content="DTC current command parameters not complete set" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-Ah" Content="1st encoder is not set when extended monitor with semi-closed loop function is enabled" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-Bh" Content="Enable SVON Gravity Compensation function in spindle application or induction motor" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-Ch" Content="Smart end point vibration control (Pn-234) not support current application" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-Dh" Content="Enable O-bit VPM function in incorrect application." />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=947-Eh" Content="Host interface setting error." />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=948h" Content="STO Function Not Support" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=949h" Content="RTD Function Not Support" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=94Ah" Content="Optional Monitor Not Support" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=94Bh" Content="Host Position Command Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=950h" Content="Regenerative Overload" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=95Ah" Content="Unsatisfied Command Condition" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=95Fh" Content="Driver Receive Illegal Command" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=961h" Content="I2C Communication Timeout" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=970h" Content="Over Voltage" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=97Ah" Content="Host Command Inexecutable" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=97Bh" Content="Command or Clamp Setting Beyond Limit" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=980h" Content="Speed Estimator Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=981h" Content="Belt Slip" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=982h" Content="Gantry control position feedback deviation is too large" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=983h" Content="Gear ratio incorrect" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=984h" Content="Rotor Position Deviation" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=990h" Content="Initialization Fail When Tuning" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=991h" Content="Unable to enable High Cycle Calculation." />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=99Ah" Content="Unexpected disturbance torque protection function is not supported" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_WRN::ID=9A0h" Content="Over Travel" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E02h" Content="Host Communication Synchronization Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E30h" Content="Host Position Command Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E40h" Content="Driver Command Calculation Timeout" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E50h" Content="Host command not updated" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E60h" Content="Host communication disturbed by noise(Checked by hardware)" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E61h" Content="Host Transmission Cycle Error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E62h" Content="Host communication disturbed by noise(Checked by software)" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E63h" Content="Host communication sequence error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E65h" Content="Host communication disconnect" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E68h" Content="Host communication continuous error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E69h" Content="Host communication incorrect connect port" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E70h" Content="Host servo-off timeout" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E70-1h" Content="Controller behavior error" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E70-2h" Content="Deceleration time is too long" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=E70-3h" Content="Controller not correctly set driver to servo-off after press EMG" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=B6Bh" Content="Mechatrolink ASIC Malfunction" />
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_ALM::ID=F10h" Content="Power Supply Line Open Phase" />
+</ResMap>

@@ -13,6 +13,12 @@
 	<Message ID="m_tsbCNCConnection" Content="Параметры подключения CNC" />
 	<Message ID="m_tsmiLanguage" Content="Переключение языка" />
 	<Message ID="m_tsbController" Content="Контроллер" />
+	<Message ID="m_tsmiControllerAdvancedSettings" Content="Расширенные настройки контроллера" />
+	<Message ID="m_tsmiMachining" Content="Обработка" />
+	<Message ID="m_tsbSetOffset" Content="Смещение" />
+	<Message ID="m_tsbSetOffset_ToolTip" Content="Задать смещение координат программы" />
+	<Message ID="m_tsbProcessSettings" Content="Технология" />
+	<Message ID="m_tsbProcessSettings_ToolTip" Content="Открыть настройки технологии контроллера" />
 
 	<!-- 檔案工具列 -->
 	<Message ID="m_tsbImport3DFile" Content="3D модель" />
@@ -146,6 +152,7 @@
 	<Message ID="m_tsbLayerNone_ToolTip" Content="Не обрабатывать" />
 	<Message ID="m_tsbNeedProcess_ToolTip" Content="Обрабатывать" />
 
+	<Message ID="Log_ViewerInitFailed" Content="Ошибка инициализации средства просмотра" />
 	<Message ID="Log_UseDefaultMachineProject" Content="Используется файл проекта механизма по умолчанию" />
 	<Message ID="Log_MachineNodeNull" Content="Узел параметров механизма пуст, используются параметры механизма по умолчанию" />
 	<Message ID="Log_MachineFileNull" Content="Файл механизма пуст, используются параметры механизма по умолчанию" />
@@ -162,6 +169,10 @@
 	<Message ID="Log_CNCReconnected" Content="Успешное переподключение ЧПУ" />
 	<Message ID="Log_CNCReconnectFailed" Content="Переподключение ЧПУ не удалось, пожалуйста, проверьте состояние сети или ЧПУ" />
 	<Message ID="Log_CNCPleaseConnectFirst" Content="Сначала подключитесь к ЧПУ. Пожалуйста, проверьте соединение ЧПУ и повторите попытку." />
+	<Message ID="Log_VNCConnectionError" Content="Ошибка подключения VNC: {0}" />
+	<Message ID="Log_CNCConnectionError" Content="Ошибка процесса подключения к ЧПУ: {0}" />
+	<Message ID="Log_CNCShutdownUnconfirmed" Content="Завершение работы ЧПУ не подтверждено: {0}" />
+	<Message ID="Log_ShutdownFailed" Content="Ошибка процесса завершения работы: {0}" />
 
 	<!-- 存檔提示 -->
 	<Message ID="Msg_SaveBeforeExitTitle" Content="Подтверждение сохранения" />

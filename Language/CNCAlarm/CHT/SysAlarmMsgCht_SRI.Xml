@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::SRI::ID=1" Content="掃描時間設定太短"/>
+	<Message ID="AlarmMsg::SRI::ID=2" Content="通訊逾時"/>
+	<Message ID="AlarmMsg::SRI::ID=3" Content="封包CRC或字元逾時錯誤"/>
+	<Message ID="AlarmMsg::SRI::ID=4" Content="模組組態與參數設定不符"/>
+	<Message ID="AlarmMsg::SRI::ID=4-1" Content="模組數量超過參數設定"/>
+	<Message ID="AlarmMsg::SRI::ID=4-2" Content="模組數量少於參數設定"/>
+	<Message ID="AlarmMsg::SRI::ID=4-3" Content="取得主站模組資訊逾時"/>
+	<Message ID="AlarmMsg::SRI::ID=4-4" Content="取得主站模組資訊失敗"/>
+	<Message ID="AlarmMsg::SRI::ID=4-5" Content="取得子站模組資訊逾時"/>
+	<Message ID="AlarmMsg::SRI::ID=4-6" Content="取得子站模組資訊失敗"/>
+	<Message ID="AlarmMsg::SRI::ID=4-7" Content="模組資訊與參數設定不符"/>
+	<Message ID="AlarmMsg::SRI::ID=5" Content="韌件更新失敗"/>
+	<Message ID="AlarmMsg::SRI::ID=5-1" Content="韌件更新-系統異常"/>
+	<Message ID="AlarmMsg::SRI::ID=5-2" Content="韌件更新-模組狀態異常"/>
+	<Message ID="AlarmMsg::SRI::ID=5-3" Content="韌件更新-通訊逾時"/>
+	<Message ID="AlarmMsg::SRI::ID=5-4" Content="韌件更新-通訊受雜訊干擾"/>
+	<Message ID="AlarmMsg::SRI::ID=6" Content="模組處於燒錄模式"/>
+	<Message ID="AlarmMsg::SRI::ID=7" Content="模組通訊異常"/>
+	<Message ID="AlarmMsg::SRI::ID=8" Content="模組硬件配置錯誤"/>
+	<Message ID="AlarmMsg::SRI::ID=9" Content="韌件更新成功，請斷電重開"/>
+	<Message ID="AlarmMsg::SRI::ID=10" Content="控制器命令發送逾時"/>
+</ResMap>

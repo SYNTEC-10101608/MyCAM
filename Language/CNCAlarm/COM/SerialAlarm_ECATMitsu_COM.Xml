@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<!-- Alarm -->
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=101h" Content="Voltage drop in the control circuit power"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=102h" Content="Voltage drop in the main circuit power"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=121h" Content="RAM error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=122h" Content="RAM error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=123h" Content="RAM error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=124h" Content="RAM error 4"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=125h" Content="RAM error 5"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=131h" Content="Clock error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=132h" Content="Clock error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=141h" Content="Control process error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=142h" Content="Control process error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=143h" Content="Control process error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=144h" Content="Control process error 4"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=145h" Content="Control process error 5"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=146h" Content="Control process error 6"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=147h" Content="Control process error 7"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=148h" Content="Control process error 8"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=149h" Content="Control process error 9"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=14Ah" Content="Control process error 10"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=151h" Content="EEP-ROM error at power on"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=152h" Content="EEP-ROM error during operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=154h" Content="Home position information read error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=161h" Content="Encoder initial communication - Receive data error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=162h" Content="Encoder initial communication - Receive data error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=163h" Content="Encoder initial communication - Receive data error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=165h" Content="Encoder initial communication - Transmission data error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=166h" Content="Encoder initial communication - Transmission data error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=167h" Content="Encoder initial communication - Transmission data error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=16Ah" Content="Encoder initial communication - Process error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=16Bh" Content="Encoder initial communication - Process error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=16Ch" Content="Encoder initial communication - Process error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=16Dh" Content="Encoder initial communication - Process error 4"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=16Eh" Content="Encoder initial communication - Process error 5"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=16Fh" Content="Encoder initial communication - Process error 6"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=171h" Content="Board error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=173h" Content="Board error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=174h" Content="Board error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=177h" Content="Board error 7"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=191h" Content="Flash-ROM error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=192h" Content="Flash-ROM error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=1A1h" Content="Servo motor combination error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=1A2h" Content="Servo motor control mode combination error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=1A4h" Content="Servo motor combination error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=1E1h" Content="Encoder malfunction"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=1E2h" Content="Load-side encoder malfunction"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=1F1h" Content="Incompatible encoder"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=1F2h" Content="Incompatible load-side encoder"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=201h" Content="Encoder normal communication - Receive data error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=202h" Content="Encoder normal communication - Receive data error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=203h" Content="Encoder normal communication - Receive data error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=205h" Content="Encoder normal communication - Transmission data error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=206h" Content="Encoder normal communication - Transmission data error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=207h" Content="Encoder normal communication - Transmission data error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=209h" Content="Encoder normal communication - Receive data error 4"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=20Ah" Content="Encoder normal communication - Receive data error 5"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=211h" Content="Encoder data error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=212h" Content="Encoder data update error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=213h" Content="Encoder data waveform error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=214h" Content="Encoder non-signal error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=215h" Content="Encoder hardware error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=216h" Content="Encoder hardware error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=219h" Content="Encoder data error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=241h" Content="Ground fault detected at hardware detection circuit"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=242h" Content="Ground fault detected by software detection function"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=251h" Content="Servo motor encoder - Absolute position erased"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=252h" Content="Scale measurement encoder - Absolute position erased"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=271h" Content="Magnetic pole detection - Abnormal termination"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=272h" Content="Magnetic pole detection - Time out error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=273h" Content="Magnetic pole detection - Limit switch error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=274h" Content="Magnetic pole detection - Estimated error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=275h" Content="Magnetic pole detection - Position deviation error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=276h" Content="Magnetic pole detection - Speed deviation error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=277h" Content="Magnetic pole detection - Current error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=281h" Content="Linear encoder - Environment error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=2A1h" Content="Linear encoder error 1-1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=2A2h" Content="Linear encoder error 1-2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=2A3h" Content="Linear encoder error 1-3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=2A4h" Content="Linear encoder error 1-4"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=2A5h" Content="Linear encoder error 1-5"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=2A6h" Content="Linear encoder error 1-6"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=2A7h" Content="Linear encoder error 1-7"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=2A8h" Content="Linear encoder error 1-8"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=2B1h" Content="Encoder counter error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=2B2h" Content="Encoder counter error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=301h" Content="Regeneration heat error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=302h" Content="Regeneration signal error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=303h" Content="Regeneration feedback signal error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=311h" Content="Abnormal motor speed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=321h" Content="Overcurrent detected at hardware detection circuit (during operation)"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=322h" Content="Overcurrent detected at software detection function (during operation)"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=323h" Content="Overcurrent detected at hardware detection circuit (during a stop)"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=324h" Content="Overcurrent detected at software detection function (during a stop)"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=331h" Content="Main circuit voltage error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=351h" Content="Command frequency error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=371h" Content="Parameter setting range error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=372h" Content="Parameter combination error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=3A1h" Content="Inrush current suppression circuit error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=421h" Content="Servo control error by position deviation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=422h" Content="Servo control error by speed deviation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=423h" Content="Servo control error by torque/thrust deviation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=428h" Content="Fully closed loop control error by position deviation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=429h" Content="Fully closed loop control error by speed deviation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=42Ah" Content="Fully closed loop control error by position deviation during command stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=451h" Content="Main circuit device overheat error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=452h" Content="Main circuit device overheat error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=461h" Content="Abnormal temperature of servo motor 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=462h" Content="Abnormal temperature of servo motor 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=463h" Content="Thermistor disconnected error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=464h" Content="Thermistor circuit error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=465h" Content="Abnormal temperature of servo motor 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=466h" Content="Abnormal temperature of servo motor 4"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=471h" Content="Cooling fan stop error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=472h" Content="Cooling fan speed reduction error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=501h" Content="Thermal overload error 1 during operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=502h" Content="Thermal overload error 2 during operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=503h" Content="Thermal overload error 4 during operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=504h" Content="Thermal overload error 1 during a stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=505h" Content="Thermal overload error 2 during a stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=506h" Content="Thermal overload error 4 during a stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=511h" Content="Thermal overload error 3 during operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=512h" Content="Thermal overload error 3 during a stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=521h" Content="Excess droop pulse 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=523h" Content="Excess droop pulse 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=524h" Content="Error excessive during 0 torque limit"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=525h" Content="Excess droop pulse 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=541h" Content="Oscillation detection error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=562h" Content="Over speed during forced stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=563h" Content="Estimated distance over during forced stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=631h" Content="STO1 off"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=632h" Content="STO2 off"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=681h" Content="Mismatched STO signal error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=691h" Content="Forward rotation-side software limit detection - Command excess error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=692h" Content="Reverse rotation-side software limit detection - Command excess error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=693h" Content="Forward rotation stroke end detection - Command excess error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=694h" Content="Reverse rotation stroke end detection - Command excess error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=701h" Content="Load-side encoder initial communication - Receive data error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=702h" Content="Load-side encoder initial communication - Receive data error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=703h" Content="Load-side encoder initial communication - Receive data error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=705h" Content="Load-side encoder initial communication - Transmission data error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=706h" Content="Load-side encoder initial communication - Transmission data error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=707h" Content="Load-side encoder initial communication - Transmission data error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=70Ah" Content="Load-side encoder initial communication - Process error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=70Bh" Content="Load-side encoder initial communication - Process error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=70Ch" Content="Load-side encoder initial communication - Process error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=70Dh" Content="Load-side encoder initial communication - Process error 4"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=70Eh" Content="Load-side encoder initial communication - Process error 5"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=70Fh" Content="Load-side encoder initial communication - Process error 6"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=711h" Content="Load-side encoder normal communication - Receive data error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=712h" Content="Load-side encoder normal communication - Receive data error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=713h" Content="Load-side encoder normal communication - Receive data error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=715h" Content="Load-side encoder normal communication - Transmission data error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=716h" Content="Load-side encoder normal communication - Transmission data error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=717h" Content="Load-side encoder normal communication - Transmission data error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=719h" Content="Load-side encoder normal communication - Transmission data error 4"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=71Ah" Content="Load-side encoder normal communication - Transmission data error 5"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=721h" Content="Load-side encoder data error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=722h" Content="Load-side encoder data update error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=723h" Content="Load-side encoder data waveform error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=724h" Content="Load-side encoder non-signal error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=725h" Content="Load-side encoder hardware error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=726h" Content="Load-side encoder hardware error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=729h" Content="Load-side encoder data error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=841h" Content="Network module undetected error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=842h" Content="Network module initialization error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=843h" Content="Network module initialization error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=851h" Content="Network module error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=852h" Content="Network module error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=853h" Content="Network module error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=861h" Content="Network communication error 1"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=862h" Content="Network communication error 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=863h" Content="Network communication error 3"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=8A1h" Content="USB communication time-out error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=8E1h" Content="USB communication receive error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=8E2h" Content="USB communication checksum error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=8E3h" Content="USB communication character error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=8E4h" Content="USB communication command error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_ALM::ID=8E5h" Content="USB communication data number error"/>
+	<!-- Warning -->
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=901h" Content="Home position return incomplete"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=902h" Content="Home position return abnormal termination"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=905h" Content="Z-phase unpassed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=911h" Content="Main circuit device overheat warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=921h" Content="Encoder battery cable disconnection warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=923h" Content="Battery degradation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=951h" Content="STO1 off detection"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=952h" Content="STO2 off detection"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=961h" Content="In-position warning at home positioning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=962h" Content="Command input warning at home positioning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=964h" Content="Magnetic pole detection incomplete warning at home positioning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=981h" Content="Forward rotation-side software limit reached"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=982h" Content="Reverse rotation-side software limit reached"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=991h" Content="Forward rotation stroke end off"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=992h" Content="Reverse rotation stroke end off"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=9B1h" Content="Excess droop pulse 1 warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=9B3h" Content="Excess droop pulse 2 warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=9B4h" Content="Error excessive warning during 0 torque limit"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=9F1h" Content="Low battery"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=9F2h" Content="Battery degradation warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E01h" Content="Excessive regeneration warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E11h" Content="Thermal overload warning 1 during operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E12h" Content="Thermal overload warning 2 during operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E13h" Content="Thermal overload warning 3 during operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E14h" Content="Thermal overload warning 4 during operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E15h" Content="Thermal overload warning 1 during a stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E16h" Content="Thermal overload warning 2 during a stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E17h" Content="Thermal overload warning 3 during a stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E18h" Content="Thermal overload warning 4 during a stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E21h" Content="Servo motor temperature warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E31h" Content="Multi-revolution counter travel distance excess warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E32h" Content="Absolute position counter warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E34h" Content="Absolute positioning counter EEP-ROM writing frequency warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E35h" Content="Encoder absolute positioning counter warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E41h" Content="Parameter setting range error warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E61h" Content="Forced stop warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E81h" Content="Decreased cooling fan speed warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E82h" Content="Cooling fan stop"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E91h" Content="Servo-on signal on during main circuit off"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E92h" Content="Bus voltage drop during low speed operation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=E93h" Content="Ready-on signal on during main circuit off"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=EC1h" Content="Overload warning 2"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=ED1h" Content="Output watt excess warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=F01h" Content="Instantaneous power failure tough drive warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=F03h" Content="Vibration tough drive warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=F21h" Content="Drive recorder - Area writing time-out warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=F22h" Content="Drive recorder - Data miswriting warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=F31h" Content="Oscillation detection warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=F44h" Content="Target position setting range error warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=F46h" Content="Acceleration time constant setting range error warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=F47h" Content="Deceleration time constant setting range error warning"/>
+	<Message ID="AlarmMsg::Drv_ECAT_MITSU_WRN::ID=F48h" Content="Control command input error warning"/>
+	</ResMap>

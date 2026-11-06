@@ -1,0 +1,1083 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Coordinate::ID=1" Content="陣列變數為空" />
+	<Message ID="AlarmMsg::Coordinate::ID=2" Content="檔案不存在" />
+	<Message ID="AlarmMsg::Coordinate::ID=3" Content="除零錯誤 " />
+	<Message ID="AlarmMsg::Coordinate::ID=4" Content="運算域錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=5" Content="程序載入失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=6" Content="圓弧不在工作平面上" />
+	<Message ID="AlarmMsg::Coordinate::ID=7" Content="圓弧半徑太短" />
+	<Message ID="AlarmMsg::Coordinate::ID=8" Content="圓弧終點不在圓弧上" />
+	<Message ID="AlarmMsg::Coordinate::ID=9" Content="G65宏程序呼叫層次太深" />
+	<Message ID="AlarmMsg::Coordinate::ID=10" Content="G66宏程序呼叫層次太深" />
+	<Message ID="AlarmMsg::Coordinate::ID=11" Content="副程序呼叫層次太深" />
+	<Message ID="AlarmMsg::Coordinate::ID=12" Content="G66模式未被G67取消" />
+	<Message ID="AlarmMsg::Coordinate::ID=13" Content="G65、G66須寫在單節最後" />
+	<Message ID="AlarmMsg::Coordinate::ID=14" Content="沒有程序號碼" />
+	<Message ID="AlarmMsg::Coordinate::ID=15" Content="M碼過多" />
+	<Message ID="AlarmMsg::Coordinate::ID=16" Content="不合法的變數存取" />
+	<Message ID="AlarmMsg::Coordinate::ID=17" Content="找不到順序號" />
+	<Message ID="AlarmMsg::Coordinate::ID=18" Content="找不到行號" />
+	<Message ID="AlarmMsg::Coordinate::ID=19" Content="副程序無M99" />
+	<Message ID="AlarmMsg::Coordinate::ID=20" Content="G碼過多" />
+	<Message ID="AlarmMsg::Coordinate::ID=21" Content="I、J、K參數過多" />
+	<Message ID="AlarmMsg::Coordinate::ID=22" Content="使用未定義G54座標系" />
+	<Message ID="AlarmMsg::Coordinate::ID=23" Content="語義錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=24" Content="圓弧半徑錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=25" Content="宏程序棧過溢或STKTOP[]引數錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=26" Content="系統程序錯誤，堆棧下溢" />
+	<Message ID="AlarmMsg::Coordinate::ID=27" Content="宏程序發出警告" />
+	<Message ID="AlarmMsg::Coordinate::ID=28" Content="系統程序錯誤，導致無法正常加工" />
+	<Message ID="AlarmMsg::Coordinate::ID=29" Content="在圓弧時變更刀長補償" />
+	<Message ID="AlarmMsg::Coordinate::ID=30" Content="切削速度命令為零" />
+	<Message ID="AlarmMsg::Coordinate::ID=31" Content="在圓弧時取消半徑補償" />
+	<Message ID="AlarmMsg::Coordinate::ID=32" Content="在圓弧時啟動半徑補償" />
+	<Message ID="AlarmMsg::Coordinate::ID=33" Content=",A、,R或,C命令用法不當" />
+	<Message ID="AlarmMsg::Coordinate::ID=34" Content="路徑擴充引數不存在" />
+	<Message ID="AlarmMsg::Coordinate::ID=35" Content="角隅太小無法插入圓角倒角" />
+	<Message ID="AlarmMsg::Coordinate::ID=36" Content="不適當的,A角度命令" />
+	<Message ID="AlarmMsg::Coordinate::ID=37" Content="倒角值超過前後單節長度" />
+	<Message ID="AlarmMsg::Coordinate::ID=38" Content="不正確的單節跳躍開關號碼" />
+	<Message ID="AlarmMsg::Coordinate::ID=39" Content="跳越功能不可以啟動刀具半徑補償" />
+	<Message ID="AlarmMsg::Coordinate::ID=40" Content="單節終點超過軟件行程極限" />
+	<Message ID="AlarmMsg::Coordinate::ID=41" Content="GOTO引數非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=42" Content="邏輯運算元非整數或空的" />
+	<Message ID="AlarmMsg::Coordinate::ID=43" Content="ASIN、ACOS運算元未介於±1.0間" />
+	<Message ID="AlarmMsg::Coordinate::ID=44" Content="SQRT運算元非正數或零" />
+	<Message ID="AlarmMsg::Coordinate::ID=45" Content="號碼L非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=46" Content="號碼O非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=47" Content="號碼M非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=48" Content="主軸速度號碼S非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=49" Content="刀長補償號碼H非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=50" Content="刀徑補償號碼D非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=51" Content="刀號號碼T非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=52" Content="副程序號碼P非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=53" Content="重複次數號碼L非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=54" Content="資料型別不相容" />
+	<Message ID="AlarmMsg::Coordinate::ID=55" Content="刀長補償號碼H超出範圍" />
+	<Message ID="AlarmMsg::Coordinate::ID=56" Content="G10填值號碼P超出範圍" />
+	<Message ID="AlarmMsg::Coordinate::ID=57" Content="刀徑號碼D超出範圍" />
+	<Message ID="AlarmMsg::Coordinate::ID=58" Content="刀鼻補償號碼D超出範圍" />
+	<Message ID="AlarmMsg::Coordinate::ID=59" Content="副程序呼叫號碼H非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=60" Content="M99返回號碼P非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=61" Content="工件座標號碼超出範圍" />
+	<Message ID="AlarmMsg::Coordinate::ID=62" Content="跳躍機能來源號碼Q非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=63" Content="跳躍機能來源號碼Q超出範圍" />
+	<Message ID="AlarmMsg::Coordinate::ID=64" Content="不合法的號碼P" />
+	<Message ID="AlarmMsg::Coordinate::ID=65" Content=",A指令格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=66" Content="增量與絕對衝突" />
+	<Message ID="AlarmMsg::Coordinate::ID=67" Content="圓弧圓心向量與半徑衝突" />
+	<Message ID="AlarmMsg::Coordinate::ID=68" Content="Quiet Mode不支援公英制轉換" />
+	<Message ID="AlarmMsg::Coordinate::ID=69" Content="倒角與圓角命令衝突" />
+	<Message ID="AlarmMsg::Coordinate::ID=70" Content="不合法G碼指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=71" Content="未指定主程序名稱" />
+	<Message ID="AlarmMsg::Coordinate::ID=72" Content="車牙超出最高切削速度" />
+	<Message ID="AlarmMsg::Coordinate::ID=73" Content="攻牙超出最高切削速度" />
+	<Message ID="AlarmMsg::Coordinate::ID=74" Content="刀具半徑太大路徑過切" />
+	<Message ID="AlarmMsg::Coordinate::ID=75" Content="準確停止等待過久" />
+	<Message ID="AlarmMsg::Coordinate::ID=76" Content="G04暫停時間非正數或零" />
+	<Message ID="AlarmMsg::Coordinate::ID=77" Content="NURBS曲線格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=78" Content="NURBS曲線記憶體不足" />
+	<Message ID="AlarmMsg::Coordinate::ID=79" Content="NURBS曲線點數超過上限" />
+	<Message ID="AlarmMsg::Coordinate::ID=80" Content="車牙牙距非正數" />
+	<Message ID="AlarmMsg::Coordinate::ID=81" Content="刀具偏置功能下使用圓弧插補，圓弧指令未使用指定角度" />
+	<Message ID="AlarmMsg::Coordinate::ID=82" Content="刀徑補償功能不能與刀具偏置功能同時使用" />
+	<Message ID="AlarmMsg::Coordinate::ID=83" Content="刀具拉回暫停點時，又手動帶開軸向位置" />
+	<Message ID="AlarmMsg::Coordinate::ID=84" Content="使用快鑽未下P引數" />
+	<Message ID="AlarmMsg::Coordinate::ID=85" Content="反時間進給模式未指定F引数" />
+	<Message ID="AlarmMsg::Coordinate::ID=86" Content="G10 L1501模式未指定R或I引數" />
+	<Message ID="AlarmMsg::Coordinate::ID=87" Content="G10 L1501模式P、Q引數不可相同" />
+	<Message ID="AlarmMsg::Coordinate::ID=88" Content="G10 L1501模式I引數後不能有時間軸指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=89" Content="G10 L1501模式主軸非增量指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=90" Content="極座標插補下C軸零速檢查失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=91" Content="主軸同步功能下，基礎主軸號碼錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=92" Content="主軸同步功能下，同步主軸號碼錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=93" Content="主軸同步功能下，主軸型態錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=94" Content="主軸承載剛性攻牙下，主軸轉速超過" />
+	<Message ID="AlarmMsg::Coordinate::ID=95" Content="多邊形切削功能下，基礎主軸轉速比率錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=96" Content="多邊形切削功能下，同步主軸轉速比率錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=97" Content="軸耦合功能啟用或解除失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=98" Content="參數學習引數錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=99" Content="攻牙學習條件不符合" />
+	<Message ID="AlarmMsg::Coordinate::ID=100" Content="不支援此G碼指令或軟體選配功能未開啟" />
+	<Message ID="AlarmMsg::Coordinate::ID=101" Content="主軸同步功能下，兩主軸螺距設定不一致" />
+	<Message ID="AlarmMsg::Coordinate::ID=102" Content="主軸同步功能下，同步指令重複或衝突" />
+	<Message ID="AlarmMsg::Coordinate::ID=103" Content="多組高速高精參數組數不存在" />
+	<Message ID="AlarmMsg::Coordinate::ID=104" Content="虛擬軸功能啟用失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=105" Content="軸耦合功能設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=106" Content="G61、G63、G63.2模式下禁用G5.1" />
+	<Message ID="AlarmMsg::Coordinate::ID=107" Content="G5.1、G05指令格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=108" Content="G10 L1501、L1502指令格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=109" Content="第二軟件行程極限指令錯誤，啟動失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=110" Content="彈簧機動程加工檔超過500行" />
+	<Message ID="AlarmMsg::Coordinate::ID=111" Content="軸交換功能下，軸向設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=112" Content="軸交換功能下，直、半徑軸設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=113" Content="軸交換功能下，啟用或解除時機錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=114" Content="軸交換功能下，軸群設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=115" Content="G92.1功能軸向參數設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=116" Content="絕對座標同步失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=117" Content="中斷型副程序未下關閉M碼" />
+	<Message ID="AlarmMsg::Coordinate::ID=118" Content="刀尖點控制模式下不可使用G53指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=119" Content="G10 L16指令格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=120" Content="超過最大切削同動軸數錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=121" Content="LN運算元非正數" />
+	<Message ID="AlarmMsg::Coordinate::ID=122" Content="POW第一個運算元非正數或零" />
+	<Message ID="AlarmMsg::Coordinate::ID=123" Content="STR2INT不合法輸入或字串太長" />
+	<Message ID="AlarmMsg::Coordinate::ID=124" Content="該機型不支援S碼指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=125" Content="T碼指令不合法" />
+	<Message ID="AlarmMsg::Coordinate::ID=126" Content="該機型不支援H碼指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=127" Content="該機型不支援D碼指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=131" Content="單節中M、T碼太多" />
+	<Message ID="AlarmMsg::Coordinate::ID=132" Content="程序名稱含有不合法字元" />
+	<Message ID="AlarmMsg::Coordinate::ID=133" Content="三點圓弧插補模式不支援此命令" />
+	<Message ID="AlarmMsg::Coordinate::ID=134" Content="三點圓弧插補指令格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=135" Content="R值讀寫指令格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=136" Content="軸向調機失敗請重啟控制器" />
+	<Message ID="AlarmMsg::Coordinate::ID=137" Content="軸群同步等待P引數順序錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=138" Content="I、O、A值讀寫指令格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=139" Content="多項式解根錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=140" Content="高精軌跡控制功能使用錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=141" Content="G68.3指令格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=142" Content="主軸同步功能下，K引數輸入錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=143" Content="可程式資料輸入指定軸不存在" />
+	<Message ID="AlarmMsg::Coordinate::ID=144" Content="軸群同步等待Q引數內容錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=145" Content="主軸定位功能啟動失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=146" Content="單節引數型態錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=147" Content="軸群加工主軸未開啟" />
+	<Message ID="AlarmMsg::Coordinate::ID=148" Content="刀具回退功能使用錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=149" Content="斜平面加工刀具對正P引數超出範圍" />
+	<Message ID="AlarmMsg::Coordinate::ID=151" Content="第一旋轉軸進入不合法範圍" />
+	<Message ID="AlarmMsg::Coordinate::ID=152" Content="第二旋轉軸進入不合法範圍" />
+	<Message ID="AlarmMsg::Coordinate::ID=153" Content="此刀具方向無解" />
+	<Message ID="AlarmMsg::Coordinate::ID=154" Content="無五軸功能" />
+	<Message ID="AlarmMsg::Coordinate::ID=155" Content="五軸刀具方向未設定" />
+	<Message ID="AlarmMsg::Coordinate::ID=156" Content="五軸軸向設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=157" Content="五軸刀具方向與旋轉軸方向不相容" />
+	<Message ID="AlarmMsg::Coordinate::ID=158" Content="G43.5模式不可執行第一、二旋轉軸指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=159" Content="刀具向量不合法" />
+	<Message ID="AlarmMsg::Coordinate::ID=160" Content="啟用五軸功能時不可切換五軸機構鏈" />
+	<Message ID="AlarmMsg::Coordinate::ID=161" Content="未啟用選擇的五軸機構鏈" />
+	<Message ID="AlarmMsg::Coordinate::ID=162" Content="四軸刀尖點控制參數設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=163" Content="多組機構練指令Q引數設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=164" Content="多組機構練指令對應五軸構型參數設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=165" Content="多組機構鍊指令不合法使用" />
+	<Message ID="AlarmMsg::Coordinate::ID=166" Content="不支援特徵座標系功能" />
+	<Message ID="AlarmMsg::Coordinate::ID=167" Content="NcFiles程序檔名衝突" />
+	<Message ID="AlarmMsg::Coordinate::ID=168" Content="不合法的刀具補償" />
+	<Message ID="AlarmMsg::Coordinate::ID=169" Content="軸向交疊功能作用在同一軸" />
+	<Message ID="AlarmMsg::Coordinate::ID=170" Content="G43.4 L2引數錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=171" Content="啟用傾斜軸控制時不可使用非線性機構鍊轉換" />
+	<Message ID="AlarmMsg::Coordinate::ID=172" Content="G43.4/G43.5 I 引數錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=180" Content="切法線控制參數設定有誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=180-1" Content="切法線控制進給軸不存在" />
+	<Message ID="AlarmMsg::Coordinate::ID=180-2" Content="切法線控制旋轉軸軸號對應軸向不存在" />
+	<Message ID="AlarmMsg::Coordinate::ID=180-3" Content="切法線控制旋轉軸的軸型態，設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=180-4" Content="切法線控制旋轉軸模式不正確，請將主軸模式切換為C軸模式" />
+	<Message ID="AlarmMsg::Coordinate::ID=180-5" Content="切法線控制旋轉軸方向或位置未設定" />
+	<Message ID="AlarmMsg::Coordinate::ID=180-6" Content="G41.1、G42.1 指令格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=180-7" Content="長度閥值設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=181" Content="切法線控制平面衝突" />
+	<Message ID="AlarmMsg::Coordinate::ID=182" Content="切法線控制功能下不支援此指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=182-1" Content="禁止對切法線控制下的旋轉軸下移動指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=182-2" Content="不可使用 G41、G42、G43.4、G43.5 等刀補指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=182-3" Content="禁止使用 G02/G03 L_ 引數指定多圈圓插補" />
+	<Message ID="AlarmMsg::Coordinate::ID=182-4" Content="禁止使用 G10L1150 寫入切法線控制運動鍊參數" />
+	<Message ID="AlarmMsg::Coordinate::ID=182-5" Content="禁止對切法線控制下的軸下擺盪指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=182-6" Content="禁止使用 G05 指令開啟高精軌跡控制功能" />
+	<Message ID="AlarmMsg::Coordinate::ID=182-7" Content="禁止使用 G53 做機械座標定位" />
+	<Message ID="AlarmMsg::Coordinate::ID=182-8" Content="禁止使用 G10L1500 旋轉軸輔助煞車功能" />
+	<Message ID="AlarmMsg::Coordinate::ID=182-9" Content="禁止使用 G02.4、G03.4 三點圓弧插補指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=182-10" Content="禁止使用 G31、G31.10、G31.11 跳越機能指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=182-11" Content="禁止使用 G33、G34 螺牙切削指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=183" Content="刀具向量插補，起終點向量夾角接近180" />
+	<Message ID="AlarmMsg::Coordinate::ID=201" Content="程式不存在" />
+	<Message ID="AlarmMsg::Coordinate::ID=202" Content="傳檔通訊線路錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=203" Content="加工程序格式不符" />
+	<Message ID="AlarmMsg::Coordinate::ID=204" Content="檔案太大" />
+	<Message ID="AlarmMsg::Coordinate::ID=205" Content="檔案是空的" />
+	<Message ID="AlarmMsg::Coordinate::ID=206" Content="工作頁無法取得寫入權利" />
+	<Message ID="AlarmMsg::Coordinate::ID=207" Content="指定序號不存在" />
+	<Message ID="AlarmMsg::Coordinate::ID=208" Content="順序檔不可使用跳躍指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=209" Content="檔案格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=210" Content="軸群辨識符號($1~$4)存在於程序執行範圍(兩相隔%)之外" />
+	<Message ID="AlarmMsg::Coordinate::ID=250" Content="機構軸向設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=251" Content="關節未設定旋轉方向為右手、左手法則" />
+	<Message ID="AlarmMsg::Coordinate::ID=252" Content="二維機構轉換，目標位置無法到達，請輸入合理的目標位置" />
+	<Message ID="AlarmMsg::Coordinate::ID=253" Content="不可行的平行機構姿態" />
+	<Message ID="AlarnMsg::Coordinate::ID=254" Content="解順向運動學失敗，目標點或機構參數為不合理數值" />
+	<Message ID="AlarmMsg::Coordinate::ID=255" Content="無法到達目標動作，請輸入合理的目標位置與姿態(逆運動學無解)" />
+	<Message ID="AlarmMsg::Coordinate::ID=256" Content="奇異點姿態, 請使用軸運動模式離開此姿態(順運動學奇異點)" />
+	<Message ID="AlarmMsg::Coordinate::ID=301" Content="OPEN指令格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=302" Content="G10 L1150指令格式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=303" Content="基礎主軸不可在位置控制模式下使用主軸同期功能" />
+	<Message ID="AlarmMsg::Coordinate::ID=304" Content="螺紋切削幾何軸之軸名稱錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=305" Content="當前模式禁用增量指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=306" Content="高速預解功能，沒有下指定的M碼" />
+	<Message ID="AlarmMsg::Coordinate::ID=307" Content="高速預解M碼，P引數指定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=308" Content="高速預解功能，系統記憶體不足，請加大單節步距" />
+	<Message ID="AlarmMsg::Coordinate::ID=309" Content="高速預解功能，執行失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=310" Content="預解加工檔執行失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=311" Content="硬碟儲存空間不足以放置預解加工檔" />
+	<Message ID="AlarmMsg::Coordinate::ID=320" Content="G10 L1711，G10 L1712，P引數錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=321" Content="I值位置擷取的P、Q、R引數必須為整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=322" Content="I點位置擷取，啟動失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=323" Content="驅動器訊號位置擷取的P、R、I、J、K引數非整數" />
+	<Message ID="AlarmMsg::Coordinate::ID=324" Content="驅動器訊號位置擷取，啟動失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=325" Content="極座標插補模式中，禁止使用直半徑軸編程指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=326" Content="直半徑軸編程指令引數錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=330" Content="不合法的中斷訊號格式" />
+	<Message ID="AlarmMsg::Coordinate::ID=331" Content="該產品限制T碼功能" />
+	<Message ID="AlarmMsg::Coordinate::ID=332" Content="中斷型副程式(M96、M97)執行失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=333" Content="單節終點超過硬件行程極限" />
+	<Message ID="AlarmMsg::Coordinate::ID=334" Content="G10 L1810不合法的訊號條件指令格式" />
+	<Message ID="AlarmMsg::Coordinate::ID=335" Content="G10 L1810訊號等待條件數量過多或是重複設定相同訊號" />
+	<Message ID="AlarmMsg::Coordinate::ID=336" Content="G10 L1820不合法的等待訊號條件指令格式" />
+	<Message ID="AlarmMsg::Coordinate::ID=337" Content="G10 L1820前無G10 L1810指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=338" Content="訊號條件等待逾時" />	<!-- 警報格式："G10 L1820 [訊號源] 訊號條件等待逾時" -->
+	<Message ID="AlarmMsg::Coordinate::ID=339" Content="Chopping軸禁止移動指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=340" Content="Chopping軸禁止改變座標系" />
+	<Message ID="AlarmMsg::Coordinate::ID=341" Content="Chopping軸向切換錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=342" Content="Chopping軸禁止使用非線性機構鍊轉換" />
+	<Message ID="AlarmMsg::Coordinate::ID=343" Content="主程序未使用結尾M碼" />
+	<Message ID="AlarmMsg::Coordinate::ID=344" Content="加工程序中存在無效段落" />
+	<Message ID="AlarmMsg::Coordinate::ID=345" Content="可程式資料輸入不合法的指令格式" />
+	<Message ID="AlarmMsg::Coordinate::ID=346" Content="可程式資料輸入不合法的使用" />
+	<Message ID="AlarmMsg::Coordinate::ID=347" Content="此功能僅支援新代軸向" />
+	<Message ID="AlarmMsg::Coordinate::ID=348" Content="APP指令錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=349" Content="此功能僅支援新代磁環或齒環編碼器" />
+	<Message ID="AlarmMsg::Coordinate::ID=350" Content="無效的EnIP宏程序" />
+	<Message ID="AlarmMsg::Coordinate::ID=351" Content="通訊命令異常" />
+	<Message ID="AlarmMsg::Coordinate::ID=352" Content="通訊命令回覆資料過長" />
+	<Message ID="AlarmMsg::Coordinate::ID=353" Content="CHKINF 參數輸入錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=354" Content="在刀尖點控制啟用下，禁止使用G10 L1150寫入五軸機構參數" />
+	<Message ID="AlarmMsg::Coordinate::ID=356" Content="無效的Modbus指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=357" Content="不合法的Modbus封包內容" />
+	<Message ID="AlarmMsg::Coordinate::ID=358" Content="Modbus通訊逾時" />
+	<Message ID="AlarmMsg::Coordinate::ID=359" Content="Modbus通訊異常" />
+	<Message ID="AlarmMsg::Coordinate::ID=361" Content="刀徑補償開啟時，非移動單節個數超過上限" />
+	<Message ID="AlarmMsg::Coordinate::ID=362" Content="多軸多訊號跳躍機能(G31.10、G31.11)指令錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=363" Content="軸移除或軸借用功能使用錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=364" Content="軸借用功能借用不成功" />
+	<Message ID="AlarmMsg::Coordinate::ID=365" Content="對未借用的漫遊軸，發出移動指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=366" Content="旋轉軸輔助煞車參數設定錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=367" Content="旋轉軸輔助煞車不支援此指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=368" Content="分度軸指令位置不精確" />
+	<Message ID="AlarmMsg::Coordinate::ID=369" Content="不合法的分度軸指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=370" Content="擺盪循環功能啟用錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=371" Content="同一單節內禁止兩個以上巨集同時讀取 M 碼作為引數" />
+	<Message ID="AlarmMsg::Coordinate::ID=375" Content="分度軸下增量指令前未先進行定位" />
+	<Message ID="AlarmMsg::Coordinate::ID=376" Content="伺服尾座軸禁止移動指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=377" Content="伺服尾座軸向切換錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=378" Content="伺服尾座功能重複啟用" />
+	<Message ID="AlarmMsg::Coordinate::ID=379" Content="伺服尾座控制模式錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=380" Content="RTCP啟用中，跳躍機能(G31)不可指令旋轉軸或刀具向量" />
+	<Message ID="AlarmMsg::Coordinate::ID=381" Content="G68.3 功能使用錯誤" />
+	<Message ID="AlarmMsg::Coordinate::ID=401" Content="路徑處理外掛異常" />
+	<Message ID="AlarmMsg::Coordinate::ID=402" Content="控制器使用期限到期，無法執行加工程式" />
+	<Message ID="AlarmMsg::Coordinate::ID=471" Content="加工程式1" />
+	<Message ID="AlarmMsg::Coordinate::ID=472" Content="加工程式2" />
+	<Message ID="AlarmMsg::Coordinate::ID=473" Content="加工程式3" />
+	<Message ID="AlarmMsg::Coordinate::ID=474" Content="加工程式4" />
+	<Message ID="AlarmMsg::Coordinate::ID=475" Content="加工程式5" />
+	<Message ID="AlarmMsg::Coordinate::ID=476" Content="加工程式6" />
+	<Message ID="AlarmMsg::Coordinate::ID=491" Content="模擬程式" />
+	<Message ID="AlarmMsg::Coordinate::ID=501" Content="記憶體不足，程式執行失敗" />
+	<Message ID="AlarmMsg::Coordinate::ID=502" Content="不合法的程式指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=503" Content="不合法的G碼引數" />
+	<Message ID="AlarmMsg::Coordinate::ID=504" Content="BGND元件不支援S碼指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=505" Content="BGND元件不支援F碼指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=506" Content="BGND元件不支援H碼指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=507" Content="BGND元件不支援D碼指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=508" Content="BGND元件不支援T碼指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=509" Content="BGND元件不支援M碼指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=510" Content="BGND元件數量超過20個" />
+	<Message ID="AlarmMsg::Coordinate::ID=601" Content="執行3D刀徑補償時未正確啟用RTCP" />
+	<Message ID="AlarmMsg::Coordinate::ID=602" Content="3D刀徑補償啟用時，使用不支援的指令" />
+	<Message ID="AlarmMsg::Coordinate::ID=603" Content="3D刀徑補償啟用時，變更座標系" />
+	<Message ID="AlarmMsg::Coordinate::ID=604" Content="3D刀徑補償啟用時，不允許改變加工平面" />
+	<Message ID="AlarmMsg::Coordinate::ID=605" Content="刀徑補償模式衝突" />
+	<Message ID="AlarmMsg::Coordinate::ID=606" Content="座標轉換啟用中，禁止使用3D刀徑補償" />
+	<Message ID="AlarmMsg::Coordinate::ID=607" Content="本單節無法解算3D刀補補償量" />
+	<Message ID="AlarmMsg::Coordinate::ID=608" Content="3D刀補啟用時，指定錯誤的刀徑號碼" />
+	<Message ID="AlarmMsg::Coordinate::ID=609" Content="輪廓單節之間含有太多無效補償單節" />
+	<Message ID="AlarmMsg::Coordinate::ID=610" Content="刀具旋轉導致轉角類型變化" />
+	<Message ID="AlarmMsg::BackgndExe::ID=1" Content="陣列變數為空" />
+	<Message ID="AlarmMsg::BackgndExe::ID=2" Content="檔案不存在" />
+	<Message ID="AlarmMsg::BackgndExe::ID=3" Content="除零錯誤 " />
+	<Message ID="AlarmMsg::BackgndExe::ID=4" Content="運算域錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=5" Content="程序載入失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=6" Content="圓弧不在工作平面上" />
+	<Message ID="AlarmMsg::BackgndExe::ID=7" Content="圓弧半徑太短" />
+	<Message ID="AlarmMsg::BackgndExe::ID=8" Content="圓弧終點不在圓弧上" />
+	<Message ID="AlarmMsg::BackgndExe::ID=9" Content="G65宏程序呼叫層次太深" />
+	<Message ID="AlarmMsg::BackgndExe::ID=10" Content="G66宏程序呼叫層次太深" />
+	<Message ID="AlarmMsg::BackgndExe::ID=11" Content="副程序呼叫層次太深" />
+	<Message ID="AlarmMsg::BackgndExe::ID=12" Content="G66模式未被G67取消" />
+	<Message ID="AlarmMsg::BackgndExe::ID=13" Content="G65、G66須寫在單節最後" />
+	<Message ID="AlarmMsg::BackgndExe::ID=14" Content="沒有程序號碼" />
+	<Message ID="AlarmMsg::BackgndExe::ID=15" Content="M碼過多" />
+	<Message ID="AlarmMsg::BackgndExe::ID=16" Content="不合法的變數存取" />
+	<Message ID="AlarmMsg::BackgndExe::ID=17" Content="找不到順序號" />
+	<Message ID="AlarmMsg::BackgndExe::ID=18" Content="找不到行號" />
+	<Message ID="AlarmMsg::BackgndExe::ID=19" Content="副程序無M99" />
+	<Message ID="AlarmMsg::BackgndExe::ID=20" Content="G碼過多" />
+	<Message ID="AlarmMsg::BackgndExe::ID=21" Content="I、J、K參數過多" />
+	<Message ID="AlarmMsg::BackgndExe::ID=22" Content="使用未定義G54座標系" />
+	<Message ID="AlarmMsg::BackgndExe::ID=23" Content="語義錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=24" Content="圓弧半徑錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=25" Content="宏程序棧過溢或STKTOP[]引數錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=26" Content="系統程序錯誤，堆棧下溢" />
+	<Message ID="AlarmMsg::BackgndExe::ID=27" Content="宏程序發出警告" />
+	<Message ID="AlarmMsg::BackgndExe::ID=28" Content="系統程序錯誤，導致無法正常加工" />
+	<Message ID="AlarmMsg::BackgndExe::ID=29" Content="在圓弧時變更刀長補償" />
+	<Message ID="AlarmMsg::BackgndExe::ID=30" Content="切削速度命令為零" />
+	<Message ID="AlarmMsg::BackgndExe::ID=31" Content="在圓弧時取消半徑補償" />
+	<Message ID="AlarmMsg::BackgndExe::ID=32" Content="在圓弧時啟動半徑補償" />
+	<Message ID="AlarmMsg::BackgndExe::ID=33" Content=",A、,R或,C命令用法不當" />
+	<Message ID="AlarmMsg::BackgndExe::ID=34" Content="路徑擴充引數不存在" />
+	<Message ID="AlarmMsg::BackgndExe::ID=35" Content="角隅太小無法插入圓角倒角" />
+	<Message ID="AlarmMsg::BackgndExe::ID=36" Content="不適當的,A角度命令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=37" Content="倒角值超過前後單節長度" />
+	<Message ID="AlarmMsg::BackgndExe::ID=38" Content="不正確的單節跳躍開關號碼" />
+	<Message ID="AlarmMsg::BackgndExe::ID=39" Content="跳越功能不可以啟動刀具半徑補償" />
+	<Message ID="AlarmMsg::BackgndExe::ID=40" Content="單節終點超過軟件行程極限" />
+	<Message ID="AlarmMsg::BackgndExe::ID=41" Content="GOTO引數非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=42" Content="邏輯運算元非整數或空的" />
+	<Message ID="AlarmMsg::BackgndExe::ID=43" Content="ASIN、ACOS運算元未介於±1.0間" />
+	<Message ID="AlarmMsg::BackgndExe::ID=44" Content="SQRT運算元非正數或零" />
+	<Message ID="AlarmMsg::BackgndExe::ID=45" Content="號碼L非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=46" Content="號碼O非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=47" Content="號碼M非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=48" Content="主軸速度號碼S非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=49" Content="刀長補償號碼H非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=50" Content="刀徑補償號碼D非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=51" Content="刀號號碼T非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=52" Content="副程序號碼P非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=53" Content="重複次數號碼L非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=54" Content="資料型別不相容" />
+	<Message ID="AlarmMsg::BackgndExe::ID=55" Content="刀長補償號碼H超出範圍" />
+	<Message ID="AlarmMsg::BackgndExe::ID=56" Content="G10填值號碼P超出範圍" />
+	<Message ID="AlarmMsg::BackgndExe::ID=57" Content="刀徑號碼D超出範圍" />
+	<Message ID="AlarmMsg::BackgndExe::ID=58" Content="刀鼻補償號碼D超出範圍" />
+	<Message ID="AlarmMsg::BackgndExe::ID=59" Content="副程序呼叫號碼H非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=60" Content="M99返回號碼P非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=61" Content="工件座標號碼超出範圍" />
+	<Message ID="AlarmMsg::BackgndExe::ID=62" Content="跳躍機能來源號碼Q非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=63" Content="跳躍機能來源號碼Q超出範圍" />
+	<Message ID="AlarmMsg::BackgndExe::ID=64" Content="不合法的號碼P" />
+	<Message ID="AlarmMsg::BackgndExe::ID=65" Content=",A指令格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=66" Content="增量與絕對衝突" />
+	<Message ID="AlarmMsg::BackgndExe::ID=67" Content="圓弧圓心向量與半徑衝突" />
+	<Message ID="AlarmMsg::BackgndExe::ID=68" Content="Quiet Mode不支援公英制轉換" />
+	<Message ID="AlarmMsg::BackgndExe::ID=69" Content="倒角與圓角命令衝突" />
+	<Message ID="AlarmMsg::BackgndExe::ID=70" Content="不合法G碼指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=71" Content="未指定主程序名稱" />
+	<Message ID="AlarmMsg::BackgndExe::ID=72" Content="車牙超出最高切削速度" />
+	<Message ID="AlarmMsg::BackgndExe::ID=73" Content="攻牙超出最高切削速度" />
+	<Message ID="AlarmMsg::BackgndExe::ID=74" Content="刀具半徑太大路徑過切" />
+	<Message ID="AlarmMsg::BackgndExe::ID=75" Content="準確停止等待過久" />
+	<Message ID="AlarmMsg::BackgndExe::ID=76" Content="G04暫停時間非正數或零" />
+	<Message ID="AlarmMsg::BackgndExe::ID=77" Content="NURBS曲線格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=78" Content="NURBS曲線記憶體不足" />
+	<Message ID="AlarmMsg::BackgndExe::ID=79" Content="NURBS曲線點數超過上限" />
+	<Message ID="AlarmMsg::BackgndExe::ID=80" Content="車牙牙距非正數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=81" Content="刀具偏置功能下使用圓弧插補，圓弧指令未使用指定角度" />
+	<Message ID="AlarmMsg::BackgndExe::ID=82" Content="刀徑補償功能不能與刀具偏置功能同時使用" />
+	<Message ID="AlarmMsg::BackgndExe::ID=83" Content="刀具拉回暫停點時，又手動帶開軸向位置" />
+	<Message ID="AlarmMsg::BackgndExe::ID=84" Content="使用快鑽未下P引數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=85" Content="反時間進給模式未指定F引数" />
+	<Message ID="AlarmMsg::BackgndExe::ID=86" Content="G10 L1501模式未指定R或I引數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=87" Content="G10 L1501模式P、Q引數不可相同" />
+	<Message ID="AlarmMsg::BackgndExe::ID=88" Content="G10 L1501模式I引數後不能有時間軸指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=89" Content="G10 L1501模式主軸非增量指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=90" Content="極座標插補下C軸零速檢查失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=91" Content="主軸同步功能下，基礎主軸號碼錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=92" Content="主軸同步功能下，同步主軸號碼錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=93" Content="主軸同步功能下，主軸型態錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=94" Content="主軸承載剛性攻牙下，主軸轉速超過" />
+	<Message ID="AlarmMsg::BackgndExe::ID=95" Content="多邊形切削功能下，基礎主軸轉速比率錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=96" Content="多邊形切削功能下，同步主軸轉速比率錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=97" Content="軸耦合功能啟用或解除失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=98" Content="參數學習引數錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=99" Content="攻牙學習條件不符合" />
+	<Message ID="AlarmMsg::BackgndExe::ID=100" Content="不支援此G碼指令或軟體選配功能未開啟" />
+	<Message ID="AlarmMsg::BackgndExe::ID=101" Content="主軸同步功能下，兩主軸螺距設定不一致" />
+	<Message ID="AlarmMsg::BackgndExe::ID=102" Content="主軸同步功能下，同步指令重複或衝突" />
+	<Message ID="AlarmMsg::BackgndExe::ID=103" Content="多組高速高精參數組數不存在" />
+	<Message ID="AlarmMsg::BackgndExe::ID=104" Content="虛擬軸功能啟用失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=105" Content="軸耦合功能設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=106" Content="G61、G63、G63.2模式下禁用G5.1" />
+	<Message ID="AlarmMsg::BackgndExe::ID=107" Content="G5.1、G05指令格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=108" Content="G10 L1501、L1502指令格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=109" Content="第二軟件行程極限指令錯誤，啟動失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=110" Content="彈簧機動程加工檔超過500行" />
+	<Message ID="AlarmMsg::BackgndExe::ID=111" Content="軸交換功能下，軸向設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=112" Content="軸交換功能下，直、半徑軸設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=113" Content="軸交換功能下，啟用或解除時機錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=114" Content="軸交換功能下，軸群設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=115" Content="G92.1功能軸向參數設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=116" Content="絕對座標同步失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=117" Content="中斷型副程序未下關閉M碼" />
+	<Message ID="AlarmMsg::BackgndExe::ID=118" Content="刀尖點控制模式下不可使用G53指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=119" Content="G10 L16指令格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=120" Content="超過最大切削同動軸數錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=121" Content="LN運算元非正數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=122" Content="POW第一個運算元非正數或零" />
+	<Message ID="AlarmMsg::BackgndExe::ID=123" Content="STR2INT不合法輸入或字串太長" />
+	<Message ID="AlarmMsg::BackgndExe::ID=124" Content="該機型不支援S碼指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=125" Content="T碼指令不合法" />
+	<Message ID="AlarmMsg::BackgndExe::ID=126" Content="該機型不支援H碼指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=127" Content="該機型不支援D碼指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=131" Content="單節中M、T碼太多" />
+	<Message ID="AlarmMsg::BackgndExe::ID=132" Content="程序名稱含有不合法字元" />
+	<Message ID="AlarmMsg::BackgndExe::ID=133" Content="三點圓弧插補模式不支援此命令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=134" Content="三點圓弧插補指令格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=135" Content="R值讀寫指令格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=136" Content="軸向調機失敗請重啟控制器" />
+	<Message ID="AlarmMsg::BackgndExe::ID=137" Content="軸群同步等待P引數順序錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=138" Content="I、O、A值讀寫指令格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=139" Content="多項式解根錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=140" Content="高精軌跡控制功能使用錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=141" Content="G68.3指令格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=142" Content="主軸同步功能下，K引數輸入錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=143" Content="可程式資料輸入指定軸不存在" />
+	<Message ID="AlarmMsg::BackgndExe::ID=144" Content="軸群同步等待Q引數內容錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=145" Content="主軸定位功能啟動失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=146" Content="單節引數型態錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=147" Content="軸群加工主軸未開啟" />
+	<Message ID="AlarmMsg::BackgndExe::ID=148" Content="刀具回退功能使用錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=149" Content="斜平面加工刀具對正P引數超出範圍" />
+	<Message ID="AlarmMsg::BackgndExe::ID=151" Content="第一旋轉軸進入不合法範圍" />
+	<Message ID="AlarmMsg::BackgndExe::ID=152" Content="第二旋轉軸進入不合法範圍" />
+	<Message ID="AlarmMsg::BackgndExe::ID=153" Content="此刀具方向無解" />
+	<Message ID="AlarmMsg::BackgndExe::ID=154" Content="無五軸功能" />
+	<Message ID="AlarmMsg::BackgndExe::ID=155" Content="五軸刀具方向未設定" />
+	<Message ID="AlarmMsg::BackgndExe::ID=156" Content="五軸軸向設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=157" Content="五軸刀具方向與旋轉軸方向不相容" />
+	<Message ID="AlarmMsg::BackgndExe::ID=158" Content="G43.5模式不可執行第一、二旋轉軸指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=159" Content="刀具向量不合法" />
+	<Message ID="AlarmMsg::BackgndExe::ID=160" Content="啟用五軸功能時不可切換五軸機構鏈" />
+	<Message ID="AlarmMsg::BackgndExe::ID=161" Content="未啟用選擇的五軸機構鏈" />
+	<Message ID="AlarmMsg::BackgndExe::ID=162" Content="四軸刀尖點控制參數設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=163" Content="多組機構練指令Q引數設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=164" Content="多組機構練指令對應五軸構型參數設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=165" Content="多組機構鍊指令不合法使用" />
+	<Message ID="AlarmMsg::BackgndExe::ID=166" Content="不支援特徵座標系功能" />
+	<Message ID="AlarmMsg::BackgndExe::ID=167" Content="NcFiles程序檔名衝突" />
+	<Message ID="AlarmMsg::BackgndExe::ID=168" Content="不合法的刀具補償" />
+	<Message ID="AlarmMsg::BackgndExe::ID=169" Content="軸向交疊功能作用在同一軸" />
+	<Message ID="AlarmMsg::BackgndExe::ID=170" Content="G43.4 L2引數錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=171" Content="啟用傾斜軸控制時不可使用非線性機構鍊轉換" />
+	<Message ID="AlarmMsg::BackgndExe::ID=172" Content="G43.4/G43.5 I 引數錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=180" Content="切法線控制參數設定有誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=180-1" Content="切法線控制進給軸不存在" />
+	<Message ID="AlarmMsg::BackgndExe::ID=180-2" Content="切法線控制旋轉軸軸號對應軸向不存在" />
+	<Message ID="AlarmMsg::BackgndExe::ID=180-3" Content="切法線控制旋轉軸的軸型態，設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=180-4" Content="切法線控制旋轉軸模式不正確，請將主軸模式切換為C軸模式" />
+	<Message ID="AlarmMsg::BackgndExe::ID=180-5" Content="切法線控制旋轉軸方向或位置未設定" />
+	<Message ID="AlarmMsg::BackgndExe::ID=180-6" Content="G41.1、G42.1 指令格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=180-7" Content="長度閥值設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=181" Content="切法線控制平面衝突" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182" Content="切法線控制功能下不支援此指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182-1" Content="禁止對切法線控制下的旋轉軸下移動指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182-2" Content="不可使用 G41、G42、G43.4、G43.5 等刀補指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182-3" Content="禁止使用 G02/G03 L_ 引數指定多圈圓插補" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182-4" Content="禁止使用 G10L1150 寫入切法線控制運動鍊參數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182-5" Content="禁止對切法線控制下的軸下擺盪指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182-6" Content="禁止使用 G05 指令開啟高精軌跡控制功能" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182-7" Content="禁止使用 G53 做機械座標定位" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182-8" Content="禁止使用 G10L1500 旋轉軸輔助煞車功能" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182-9" Content="禁止使用 G02.4、G03.4 三點圓弧插補指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182-10" Content="禁止使用 G31、G31.10、G31.11 跳越機能指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=182-11" Content="禁止使用 G33、G34 螺牙切削指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=183" Content="刀具向量插補，起終點向量夾角接近180" />
+	<Message ID="AlarmMsg::BackgndExe::ID=201" Content="程式不存在" />
+	<Message ID="AlarmMsg::BackgndExe::ID=202" Content="傳檔通訊線路錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=203" Content="加工程序格式不符" />
+	<Message ID="AlarmMsg::BackgndExe::ID=204" Content="檔案太大" />
+	<Message ID="AlarmMsg::BackgndExe::ID=205" Content="檔案是空的" />
+	<Message ID="AlarmMsg::BackgndExe::ID=206" Content="工作頁無法取得寫入權利" />
+	<Message ID="AlarmMsg::BackgndExe::ID=207" Content="指定序號不存在" />
+	<Message ID="AlarmMsg::BackgndExe::ID=208" Content="順序檔不可使用跳躍指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=209" Content="檔案格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=210" Content="軸群辨識符號($1~$4)存在於程序執行範圍(兩相隔%)之外" />
+	<Message ID="AlarmMsg::BackgndExe::ID=250" Content="機構軸向設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=251" Content="關節未設定旋轉方向為右手、左手法則" />
+	<Message ID="AlarmMsg::BackgndExe::ID=252" Content="二維機構轉換，目標位置無法到達，請輸入合理的目標位置" />
+	<Message ID="AlarmMsg::BackgndExe::ID=253" Content="不可行的平行機構姿態" />
+	<Message ID="AlarnMsg::BackgndExe::ID=254" Content="解順向運動學失敗，目標點或機構參數為不合理數值" />
+	<Message ID="AlarmMsg::BackgndExe::ID=255" Content="無法到達目標動作，請輸入合理的目標位置與姿態(逆運動學無解)" />
+	<Message ID="AlarmMsg::BackgndExe::ID=256" Content="奇異點姿態, 請使用軸運動模式離開此姿態(順運動學奇異點)" />
+	<Message ID="AlarmMsg::BackgndExe::ID=301" Content="OPEN指令格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=302" Content="G10 L1150指令格式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=303" Content="基礎主軸不可在位置控制模式下使用主軸同期功能" />
+	<Message ID="AlarmMsg::BackgndExe::ID=304" Content="螺紋切削幾何軸之軸名稱錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=305" Content="當前模式禁用增量指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=306" Content="高速預解功能，沒有下指定的M碼" />
+	<Message ID="AlarmMsg::BackgndExe::ID=307" Content="高速預解M碼，P引數指定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=308" Content="高速預解功能，系統記憶體不足，請加大單節步距" />
+	<Message ID="AlarmMsg::BackgndExe::ID=309" Content="高速預解功能，執行失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=310" Content="預解加工檔執行失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=311" Content="硬碟儲存空間不足以放置預解加工檔" />
+	<Message ID="AlarmMsg::BackgndExe::ID=320" Content="G10 L1711，G10 L1712，P引數錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=321" Content="I值位置擷取的P、Q、R引數必須為整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=322" Content="I點位置擷取，啟動失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=323" Content="驅動器訊號位置擷取的P、R、I、J、K引數非整數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=324" Content="驅動器訊號位置擷取，啟動失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=325" Content="極座標插補模式中，禁止使用直半徑軸編程指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=326" Content="直半徑軸編程指令引數錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=330" Content="不合法的中斷訊號格式" />
+	<Message ID="AlarmMsg::BackgndExe::ID=331" Content="該產品限制T碼功能" />
+	<Message ID="AlarmMsg::BackgndExe::ID=332" Content="中斷型副程式(M96、M97)執行失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=333" Content="單節終點超過硬件行程極限" />
+	<Message ID="AlarmMsg::BackgndExe::ID=334" Content="G10 L1810不合法的訊號條件指令格式" />
+	<Message ID="AlarmMsg::BackgndExe::ID=335" Content="G10 L1810訊號等待條件數量過多或是重複設定相同訊號" />
+	<Message ID="AlarmMsg::BackgndExe::ID=336" Content="G10 L1820不合法的等待訊號條件指令格式" />
+	<Message ID="AlarmMsg::BackgndExe::ID=337" Content="G10 L1820前無G10 L1810指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=338" Content="訊號條件等待逾時" />	<!-- 警報格式："G10 L1820 [訊號源] 訊號條件等待逾時" -->
+	<Message ID="AlarmMsg::BackgndExe::ID=339" Content="Chopping軸禁止移動指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=340" Content="Chopping軸禁止改變座標系" />
+	<Message ID="AlarmMsg::BackgndExe::ID=341" Content="Chopping軸向切換錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=342" Content="Chopping軸禁止使用非線性機構鍊轉換" />
+	<Message ID="AlarmMsg::BackgndExe::ID=343" Content="主程序未使用結尾M碼" />
+	<Message ID="AlarmMsg::BackgndExe::ID=344" Content="加工程序中存在無效段落" />
+	<Message ID="AlarmMsg::BackgndExe::ID=345" Content="可程式資料輸入不合法的指令格式" />
+	<Message ID="AlarmMsg::BackgndExe::ID=346" Content="可程式資料輸入不合法的使用" />
+	<Message ID="AlarmMsg::BackgndExe::ID=347" Content="此功能僅支援新代軸向" />
+	<Message ID="AlarmMsg::BackgndExe::ID=348" Content="APP指令錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=349" Content="此功能僅支援新代磁環或齒環編碼器" />
+	<Message ID="AlarmMsg::BackgndExe::ID=350" Content="無效的EnIP宏程序" />
+	<Message ID="AlarmMsg::BackgndExe::ID=351" Content="通訊命令異常" />
+	<Message ID="AlarmMsg::BackgndExe::ID=352" Content="通訊命令回覆資料過長" />
+	<Message ID="AlarmMsg::BackgndExe::ID=353" Content="CHKINF 參數輸入錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=354" Content="在刀尖點控制啟用下，禁止使用G10 L1150寫入五軸機構參數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=356" Content="無效的Modbus指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=357" Content="不合法的Modbus封包內容" />
+	<Message ID="AlarmMsg::BackgndExe::ID=358" Content="Modbus通訊逾時" />
+	<Message ID="AlarmMsg::BackgndExe::ID=359" Content="Modbus通訊異常" />
+	<Message ID="AlarmMsg::BackgndExe::ID=361" Content="刀徑補償開啟時，非移動單節個數超過上限" />
+	<Message ID="AlarmMsg::BackgndExe::ID=362" Content="多軸多訊號跳躍機能(G31.10、G31.11)指令錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=363" Content="軸移除或軸借用功能使用錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=364" Content="軸借用功能借用不成功" />
+	<Message ID="AlarmMsg::BackgndExe::ID=365" Content="對未借用的漫遊軸，發出移動指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=366" Content="旋轉軸輔助煞車參數設定錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=367" Content="旋轉軸輔助煞車不支援此指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=368" Content="分度軸指令位置不精確" />
+	<Message ID="AlarmMsg::BackgndExe::ID=369" Content="不合法的分度軸指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=370" Content="擺盪循環功能啟用錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=371" Content="同一單節內禁止兩個以上巨集同時讀取 M 碼作為引數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=375" Content="分度軸下增量指令前未先進行定位" />
+	<Message ID="AlarmMsg::BackgndExe::ID=376" Content="伺服尾座軸禁止移動指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=377" Content="伺服尾座軸向切換錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=378" Content="伺服尾座功能重複啟用" />
+	<Message ID="AlarmMsg::BackgndExe::ID=379" Content="伺服尾座控制模式錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=380" Content="RTCP啟用中，跳躍機能(G31)不可指令旋轉軸或刀具向量" />
+	<Message ID="AlarmMsg::BackgndExe::ID=381" Content="G68.3 功能使用錯誤" />
+	<Message ID="AlarmMsg::BackgndExe::ID=401" Content="路徑處理外掛異常" />
+	<Message ID="AlarmMsg::BackgndExe::ID=402" Content="控制器使用期限到期，無法執行加工程式" />
+	<Message ID="AlarmMsg::BackgndExe::ID=471" Content="加工程式1" />
+	<Message ID="AlarmMsg::BackgndExe::ID=472" Content="加工程式2" />
+	<Message ID="AlarmMsg::BackgndExe::ID=473" Content="加工程式3" />
+	<Message ID="AlarmMsg::BackgndExe::ID=474" Content="加工程式4" />
+	<Message ID="AlarmMsg::BackgndExe::ID=475" Content="加工程式5" />
+	<Message ID="AlarmMsg::BackgndExe::ID=476" Content="加工程式6" />
+	<Message ID="AlarmMsg::BackgndExe::ID=491" Content="模擬程式" />
+	<Message ID="AlarmMsg::BackgndExe::ID=501" Content="記憶體不足，程式執行失敗" />
+	<Message ID="AlarmMsg::BackgndExe::ID=502" Content="不合法的程式指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=503" Content="不合法的G碼引數" />
+	<Message ID="AlarmMsg::BackgndExe::ID=504" Content="BGND元件不支援S碼指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=505" Content="BGND元件不支援F碼指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=506" Content="BGND元件不支援H碼指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=507" Content="BGND元件不支援D碼指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=508" Content="BGND元件不支援T碼指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=509" Content="BGND元件不支援M碼指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=510" Content="BGND元件數量超過20個" />
+	<Message ID="AlarmMsg::BackgndExe::ID=601" Content="執行3D刀徑補償時未正確啟用RTCP" />
+	<Message ID="AlarmMsg::BackgndExe::ID=602" Content="3D刀徑補償啟用時，使用不支援的指令" />
+	<Message ID="AlarmMsg::BackgndExe::ID=603" Content="3D刀徑補償啟用時，變更座標系" />
+	<Message ID="AlarmMsg::BackgndExe::ID=604" Content="3D刀徑補償啟用時，不允許改變加工平面" />
+	<Message ID="AlarmMsg::BackgndExe::ID=605" Content="刀徑補償模式衝突" />
+	<Message ID="AlarmMsg::BackgndExe::ID=606" Content="座標轉換啟用中，禁止使用3D刀徑補償" />
+	<Message ID="AlarmMsg::BackgndExe::ID=607" Content="本單節無法解算3D刀補補償量" />
+	<Message ID="AlarmMsg::BackgndExe::ID=608" Content="3D刀補啟用時，指定錯誤的刀徑號碼" />
+	<Message ID="AlarmMsg::BackgndExe::ID=609" Content="輪廓單節之間含有太多無效補償單節" />
+	<Message ID="AlarmMsg::BackgndExe::ID=610" Content="刀具旋轉導致轉角類型變化" />
+	<Message ID="AlarmMsg::Motion::ID=1" Content="A、B編碼器反饋訊號錯誤" />
+	<Message ID="AlarmMsg::Motion::ID=2" Content="錯誤計數器溢位" />
+	<Message ID="AlarmMsg::Motion::ID=3" Content="編碼器模組錯誤" />
+	<Message ID="AlarmMsg::Motion::ID=4" Content="無索引中斷信號" />
+	<Message ID="AlarmMsg::Motion::ID=5" Content="脈衝訊號超過額定值" />
+	<Message ID="AlarmMsg::Motion::ID=6" Content="驅動器電源狀態錯誤" />
+	<Message ID="AlarmMsg::Motion::ID=7" Content="驅動器斷電" />
+	<Message ID="AlarmMsg::Motion::ID=8" Content="遺失位置命令" />
+	<Message ID="AlarmMsg::Motion::ID=9" Content="驅動器警報" />
+	<Message ID="AlarmMsg::Motion::ID=10" Content="軸向位置命令通訊異常" />
+	<Message ID="AlarmMsg::Motion::ID=12" Content="驅動器尋原點失敗" />
+	<Message ID="AlarmMsg::Motion::ID=13" Content="軸向調機失敗，請重啟控制器" />
+	<Message ID="AlarmMsg::Motion::ID=14" Content="開啟過多總線軸向" />
+	<Message ID="AlarmMsg::Motion::ID=16" Content="絕對式資料異常，請檢查編碼器電源並重啟驅動器" />
+	<Message ID="AlarmMsg::Motion::ID=17" Content="超過第一正向軟件行程極限" />
+	<Message ID="AlarmMsg::Motion::ID=18" Content="超過第一負向軟件行程極限" />
+	<Message ID="AlarmMsg::Motion::ID=19" Content="追隨誤差超過" />
+	<Message ID="AlarmMsg::Motion::ID=20" Content="移動中禁止切回控制模式" />
+	<Message ID="AlarmMsg::Motion::ID=21" Content="必須重新尋原點" />
+	<Message ID="AlarmMsg::Motion::ID=22" Content="原點位置不準確" />
+	<Message ID="AlarmMsg::Motion::ID=23" Content="嚴重追隨誤差超過" />
+	<Message ID="AlarmMsg::Motion::ID=24" Content="嚴重雙反饋位置誤差超過" />
+	<Message ID="AlarmMsg::Motion::ID=25" Content="超過正向硬件行程極限" />
+	<Message ID="AlarmMsg::Motion::ID=26" Content="超過負向硬件行程極限" />
+	<Message ID="AlarmMsg::Motion::ID=27" Content="PLC軸程式錯誤" />
+	<Message ID="AlarmMsg::Motion::ID=28" Content="系統剩餘記憶體太低" />
+	<Message ID="AlarmMsg::Motion::ID=29" Content="找不到原點索引訊號" />
+	<Message ID="AlarmMsg::Motion::ID=30" Content="尋原點零速檢查失敗" />
+	<Message ID="AlarmMsg::Motion::ID=31" Content="靜態雙反饋位置誤差超過" />
+	<Message ID="AlarmMsg::Motion::ID=32" Content="Z軸追隨主軸誤差超過" />
+	<Message ID="AlarmMsg::Motion::ID=33" Content="絕對位置讀取失敗" />
+	<Message ID="AlarmMsg::Motion::ID=34" Content="未設定絕對式原點，請重新進行設定" />
+	<Message ID="AlarmMsg::Motion::ID=35" Content="絕對式電池異常，請更換電池並重設原點" />
+	<Message ID="AlarmMsg::Motion::ID=36" Content="離不開原點開關" />
+	<Message ID="AlarmMsg::Motion::ID=37" Content="超過第二正向軟件行程極限" />
+	<Message ID="AlarmMsg::Motion::ID=38" Content="超過第二負向軟件行程極限" />
+	<Message ID="AlarmMsg::Motion::ID=39" Content="攻牙嚴重過行程" />
+	<Message ID="AlarmMsg::Motion::ID=40" Content="雙反饋自我檢測誤差超過" />
+	<Message ID="AlarmMsg::Motion::ID=41" Content="超過第三正向軟件行程極限" />
+	<Message ID="AlarmMsg::Motion::ID=42" Content="超過第三負向軟件行程極限" />
+	<Message ID="AlarmMsg::Motion::ID=43" Content="進入第一軟件行程極限保護範圍" />
+	<Message ID="AlarmMsg::Motion::ID=44" Content="進入第二軟件行程極限保護範圍" />
+	<Message ID="AlarmMsg::Motion::ID=45" Content="進入第三軟件行程極限保護範圍" />
+	<Message ID="AlarmMsg::Motion::ID=46" Content="原點開關訊號異常" />
+	<Message ID="AlarmMsg::Motion::ID=50" Content="不合法的控制模式切換" />
+	<Message ID="AlarmMsg::Motion::ID=51" Content="移動中禁止啟動加工" />
+	<Message ID="AlarmMsg::Motion::ID=52" Content="驅動器後級電未供給" />
+	<Message ID="AlarmMsg::Motion::ID=53" Content="增量式編碼器無法啟用絕對式功能" />
+	<Message ID="AlarmMsg::Motion::ID=54" Content="編碼器型態變更" />
+	<Message ID="AlarmMsg::Motion::ID=55" Content="絕對式不支援旋轉軸型態C與雙反饋控制模式" />
+	<Message ID="AlarmMsg::Motion::ID=56" Content="單圈絕對式編碼器無法當增量式使用，請重設編碼器參數" />
+	<Message ID="AlarmMsg::Motion::ID=57" Content="驅動器無法伺服使能" />
+	<Message ID="AlarmMsg::Motion::ID=58" Content="驅動器參數永久儲存請在未就緒執行" />
+	<Message ID="AlarmMsg::Motion::ID=59" Content="解析度相關參數請從串列參數頁面修改" />
+	<Message ID="AlarmMsg::Motion::ID=60" Content="扭力應用設定與驅動器參數設定衝突" />
+	<Message ID="AlarmMsg::Motion::ID=61" Content="軸向不支援追高模式" />
+	<Message ID="AlarmMsg::Motion::ID=62" Content="軸向移動中無法切換追高模式" />
+	<Message ID="AlarmMsg::Motion::ID=63" Content="軸向傳感器型態與尋原點方法不匹配" />
+	<Message ID="AlarmMsg::Motion::ID=64" Content="軸向驅動器不支援選定的摩擦力補償" />
+	<Message ID="AlarmMsg::Motion::ID=65" Content="軸向驅動器不支援斷電回退" />
+	<Message ID="AlarmMsg::Motion::ID=66" Content="不支援軸向驅動器韌件版本" />
+	<Message ID="AlarmMsg::Motion::ID=67" Content="新代編碼器韌件升級結束，請重啟驅動器" />
+	<Message ID="AlarmMsg::Motion::ID=68" Content="新代編碼器資訊讀取逾時" />
+	<Message ID="AlarmMsg::Motion::ID=69" Content="軸向迴授值異常" />
+	<Message ID="AlarmMsg::Motion::ID=70" Content="軸向命令值異常" />
+	<Message ID="AlarmMsg::Motion::ID=71" Content="插補嚴重逾時" />
+	<Message ID="AlarmMsg::Motion::ID=72" Content="使用單圈絕對式編碼器時，軟件行程極限設定錯誤" />
+	<Message ID="AlarmMsg::Motion::ID=73" Content="驅動器參數預讀失敗" />
+	<Message ID="AlarmMsg::Motion::ID=74" Content="驅動器絕對位置讀取失敗" />
+	<Message ID="AlarmMsg::Motion::ID=75" Content="驅動器初始化時間過長" />
+	<Message ID="AlarmMsg::Motion::ID=76" Content="驅動器參數預讀時間過長" />
+	<Message ID="AlarmMsg::Motion::ID=77" Content="機械座標回復失敗" />
+	<Message ID="AlarmMsg::Motion::ID=78" Content="耦合誤差超過容許值" />
+	<Message ID="AlarmMsg::Motion::ID=79" Content="編碼器分辨率設定不一致" />
+	<Message ID="AlarmMsg::Motion::ID=84" Content="控制器和驅動器的摩擦力補償模式不一致" />
+	<Message ID="AlarmMsg::Motion::ID=85" Content="對借用中的漫遊軸，觸發PLC MoveAx元件" />
+	<Message ID="AlarmMsg::Motion::ID=86" Content="驅動器運行中異常進入伺服未始能狀態" />
+	<Message ID="AlarmMsg::Motion::ID=87" Content="機台停止定位不準確，請檢查是否有機構卡住" />
+	<Message ID="AlarmMsg::Motion::ID=89" Content="禁止PLC軸控制分度軸" />
+	<Message ID="AlarmMsg::Motion::ID=90" Content="使用單圈絕對式編碼器時，禁止軸向軸型態設定為線性軸型態" />
+	<Message ID="AlarmMsg::Motion::ID=91" Content="讀取絕對式編碼器 64 位元位置資訊失敗"/>
+	<Message ID="AlarmMsg::Motion::ID=91-1" Content="新代驅動器讀取絕對式編碼器64位元位置資訊失敗"/>
+	<Message ID="AlarmMsg::Motion::ID=91-3" Content="驅動器型號異動請重新設定絕對式原點"/>
+	<Message ID="AlarmMsg::Motion::ID=92" Content="軟體行程極限超過絕對式編碼器多圈資訊範圍"/>
+	<Message ID="AlarmMsg::Motion::ID=93" Content="切換溫度補償精度時，軸向溫度補償量應為零"/>
+	<Message ID="AlarmMsg::Motion::ID=94" Content="當前軸向應用不可搭配 PLC 軸"/>
+	<Message ID="AlarmMsg::Motion::ID=902" Content="絕對式位置有溢位風險"/>
+	<Message ID="AlarmMsg::Motion::ID=902-1" Content="軟體行程內可能發生溢位"/>
+	<Message ID="AlarmMsg::Motion::ID=902-2" Content="未設定軸向斷電中位置偏移量檢查視窗"/>
+	<Message ID="AlarmMsg::Spindle::ID=1" Content="A、B編碼器反饋訊號錯誤" />
+	<Message ID="AlarmMsg::Spindle::ID=2" Content="錯誤計數器溢位" />
+	<Message ID="AlarmMsg::Spindle::ID=3" Content="編碼器模組錯誤" />
+	<Message ID="AlarmMsg::Spindle::ID=4" Content="無索引中斷信號" />
+	<Message ID="AlarmMsg::Spindle::ID=5" Content="脈衝訊號超過額定值" />
+	<Message ID="AlarmMsg::Spindle::ID=6" Content="索引狀態無法清除" />
+	<Message ID="AlarmMsg::Spindle::ID=9" Content="驅動器警報" />
+	<Message ID="AlarmMsg::Spindle::ID=17" Content="主軸定位位置檢查錯誤" />
+	<Message ID="AlarmMsg::Spindle::ID=18" Content="找不到主軸定位索引信號" />
+	<Message ID="AlarmMsg::Spindle::ID=20" Content="主軸無法參考到正確的索引訊號" />
+	<Message ID="AlarmMsg::Spindle::ID=21" Content="空檔下進行攻牙" />
+	<Message ID="AlarmMsg::Spindle::ID=22" Content="Pr1791~設定4僅支援新代變頻器" />
+	<Message ID="AlarmMsg::Spindle::ID=23" Content="主軸轉速未到達，請檢查參數設定" />
+	<Message ID="AlarmMsg::Spindle::ID=24" Content="主軸零速檢查失敗" />
+	<Message ID="AlarmMsg::Spindle::ID=25" Content="解析度相關參數請從串列參數頁面修改" />
+	<Message ID="AlarmMsg::Spindle::ID=26" Content="主軸定位偏移，新代主軸此參數請修正為零" />
+	<Message ID="AlarmMsg::Spindle::ID=27" Content="此主軸型態不支援主軸定位功能" />
+	<Message ID="AlarmMsg::Spindle::ID=28" Content="此主軸型態不支援主軸攻牙功能" />
+	<Message ID="AlarmMsg::Spindle::ID=29" Content="此主軸型態不支援C軸模式" />
+	<Message ID="AlarmMsg::Spindle::ID=30" Content="此產品不支援新代主軸" />
+	<Message ID="AlarmMsg::Spindle::ID=31" Content="主軸不支援雙線圈切換功能" />
+	<Message ID="AlarmMsg::Spindle::ID=32" Content="雙線圈切換失敗" />
+	<Message ID="AlarmMsg::Spindle::ID=33" Content="星三角零速啟動檢查失敗" />
+	<Message ID="AlarmMsg::Spindle::ID=34" Content="動平衡功能設定錯誤" />
+	<Message ID="AlarmMsg::Spindle::ID=35" Content="動平衡功能逾時" />
+	<Message ID="AlarmMsg::Spindle::ID=36" Content="驅動器通訊異常" />
+	<Message ID="AlarmMsg::Spindle::ID=37" Content="編碼器分辨率設定不一致" />
+	<Message ID="AlarmMsg::Spindle::ID=38" Content="通訊線材接觸不良" />
+	<Message ID="AlarmMsg::Spindle::ID=39" Content="硬件未收到通訊封包" />
+	<Message ID="AlarmMsg::Spindle::ID=40" Content="通訊封包受雜訊干擾" />
+	<Message ID="AlarmMsg::Spindle::ID=41" Content="驅動器軟件遺漏通訊封包" />
+	<Message ID="AlarmMsg::Spindle::ID=43" Content="多組控制增益切換失敗" />
+	<Message ID="AlarmMsg::Spindle::ID=44" Content="主軸發生堵轉，請檢查環境及參數設定" />
+	<Message ID="AlarmMsg::Spindle::ID=45" Content="不支援所使用的驅動器廠牌" />
+	<Message ID="AlarmMsg::Spindle::ID=45-1" Content="不支援使用新代EtherCAT驅動器" />
+	<Message ID="AlarmMsg::Spindle::ID=45-2" Content="僅支援使用新代M3驅動器" />
+	<Message ID="AlarmMsg::Spindle::ID=46" Content="主軸驅動器快速定位失敗" />
+	<Message ID="AlarmMsg::Compiler::ID=1" Content="在註解中遇到檔案結束的符號" />
+	<Message ID="AlarmMsg::Compiler::ID=2" Content="沒有字串符號結尾的字串" />
+	<Message ID="AlarmMsg::Compiler::ID=3" Content="句法錯誤" />
+	<Message ID="AlarmMsg::Compiler::ID=4" Content="無效的變數" />
+	<Message ID="AlarmMsg::Compiler::ID=5" Content="數學式太複雜" />
+	<Message ID="AlarmMsg::Compiler::ID=6" Content="EXIT子句在重覆迴圈之外" />
+	<Message ID="AlarmMsg::Compiler::ID=7" Content="重覆語法層數太深" />
+	<Message ID="AlarmMsg::Compiler::ID=8" Content="子句中沒有結束的符號';'" />
+	<Message ID="AlarmMsg::Compiler::ID=9" Content="錯誤的給值符號':='" />
+	<Message ID="AlarmMsg::Compiler::ID=10" Content="沒有右邊的')'" />
+	<Message ID="AlarmMsg::Compiler::ID=11" Content="沒有右邊的']'" />
+	<Message ID="AlarmMsg::Compiler::ID=12" Content="FOR宏程序子句找不到'TO'" />
+	<Message ID="AlarmMsg::Compiler::ID=13" Content="FOR宏程序子句找不到'FOR'或'DO'" />
+	<Message ID="AlarmMsg::Compiler::ID=14" Content="FOR宏程序子句找不到'END_FOR'" />
+	<Message ID="AlarmMsg::Compiler::ID=15" Content="REPEAT宏程序子句找不到'UNTIL'" />
+	<Message ID="AlarmMsg::Compiler::ID=16" Content="REPEAT宏程序子句找不到'END_REPEAT'" />
+	<Message ID="AlarmMsg::Compiler::ID=17" Content="WHILE宏程序子句找不到'WHILE'或'DO'" />
+	<Message ID="AlarmMsg::Compiler::ID=18" Content="WHILE宏程序子句找不到'END_WHILE'" />
+	<Message ID="AlarmMsg::Compiler::ID=19" Content="IF宏程序子句找不到'IF'或'THEN'" />
+	<Message ID="AlarmMsg::Compiler::ID=20" Content="IF宏程序子句找不到'ELSE'或'END_IF'" />
+	<Message ID="AlarmMsg::Compiler::ID=21" Content="IF宏程序子句找不到'END_IF'" />
+	<Message ID="AlarmMsg::Compiler::ID=22" Content="CASE宏程序子句找不到'CASE'或'OF'" />
+	<Message ID="AlarmMsg::Compiler::ID=23" Content="CASE宏程序子句找不到'ELSE'或'END_CASE'" />
+	<Message ID="AlarmMsg::Compiler::ID=24" Content="CASE宏程序子句找不到'END_CASE'" />
+	<Message ID="AlarmMsg::Compiler::ID=25" Content="CASE宏程序子句找不到':'或','" />
+	<Message ID="AlarmMsg::Compiler::ID=26" Content="不合法的MOVJ指令輸入" />
+	<Message ID="AlarmMsg::Compiler::ID=27" Content="無效的字元" />
+	<Message ID="AlarmMsg::Compiler::ID=28" Content="不合法地使用'/'" />
+	<Message ID="AlarmMsg::Compiler::ID=29" Content="CASE宏程序超過支援上限" />
+	<Message ID="AlarmMsg::Compiler::ID=30" Content="IF宏程序超過支援上限" />
+	<Message ID="AlarmMsg::Compiler::ID=31" Content="REPEAT宏程序超過支援上限" />
+	<Message ID="AlarmMsg::Compiler::ID=32" Content="WHILE宏程序超過支援上限" />
+	<Message ID="AlarmMsg::Compiler::ID=33" Content="FOR宏程序超過支援上限" />
+	<Message ID="AlarmMsg::Compiler::ID=34" Content="REPEAT宏程序子句找不到'REPEAT'" />
+	<Message ID="AlarmMsg::Operation::ID=2" Content="系統參數檔存取失敗" />
+	<Message ID="AlarmMsg::Operation::ID=3" Content="加工資料檔存取失敗" />
+	<Message ID="AlarmMsg::Operation::ID=4" Content="加工資料遺失，請重校加工資料" />
+	<Message ID="AlarmMsg::Operation::ID=5" Content="I/O傳輸錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=6" Content="永久記憶體錯誤，請重校加工資料" />
+	<Message ID="AlarmMsg::Operation::ID=7" Content="記憶體空間不足，小於1MB" />
+	<Message ID="AlarmMsg::Operation::ID=8" Content="記憶體空間嚴重不足，小於100KB" />
+	<Message ID="AlarmMsg::Operation::ID=9" Content="插值計算時間超過30ms" />
+	<Message ID="AlarmMsg::Operation::ID=10" Content="軸群編號參數設定錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=11" Content="暫停點偏移量錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=13" Content="該軟體版本與機床代碼無法驅動此控制器硬體" />
+	<Message ID="AlarmMsg::Operation::ID=13-1" Content="硬體配置不支援雙核心功能" />
+	<Message ID="AlarmMsg::Operation::ID=13-2" Content="EEPROM資訊錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=13-3" Content="軸版型態( 參數9 )設定錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=13-4" Content="FPGA檔案不存在" />
+	<Message ID="AlarmMsg::Operation::ID=13-5" Content="FPGA載入失敗" />
+	<Message ID="AlarmMsg::Operation::ID=13-6" Content="Hardware ID 無法辨識" />
+	<Message ID="AlarmMsg::Operation::ID=15" Content="輸出接點過載，請確認配線是否異常" />
+	<Message ID="AlarmMsg::Operation::ID=16" Content="直線度補償功能參數設定錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=17" Content="手輪對應的端口號碼或I點參數設定錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=18" Content="端口參數設定錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=19" Content="加工中/未就緒下不可切換公英制" />
+	<Message ID="AlarmMsg::Operation::ID=20" Content="M碼相關參數設定衝突" />
+	<Message ID="AlarmMsg::Operation::ID=21" Content="使用備份使用者資料檔，請檢查使用者資料" />
+	<Message ID="AlarmMsg::Operation::ID=22" Content="使用者資料檔重建，請重校使用者資料" />
+	<Message ID="AlarmMsg::Operation::ID=23" Content="加工中斷電，請重校加工資料" />
+	<Message ID="AlarmMsg::Operation::ID=24" Content="加工資料檔寫入失敗，請重校加工資料" />
+	<Message ID="AlarmMsg::Operation::ID=25" Content="加工資料檔多次寫入失敗，請重校加工資料" />
+	<Message ID="AlarmMsg::Operation::ID=26" Content="加工資料檔嚴重寫入失敗，請重校加工資料" />
+	<Message ID="AlarmMsg::Operation::ID=27" Content="未選擇欲執行的CNC主系統軸群" />
+	<Message ID="AlarmMsg::Operation::ID=28" Content="加工中不可切換CNC主系統軸群" />
+	<Message ID="AlarmMsg::Operation::ID=29" Content="超過系統支援的系統軸數" />
+	<Message ID="AlarmMsg::Operation::ID=30" Content="除錯模式啟用中，欲恢復正常使用，請關閉除錯模式" />
+	<Message ID="AlarmMsg::Operation::ID=31" Content="未開啟GANTRY機器人Option" />
+	<Message ID="AlarmMsg::Operation::ID=32" Content="機構型態設定衝突" />
+	<Message ID="AlarmMsg::Operation::ID=33" Content="加工中禁止設定機械座標" />
+	<Message ID="AlarmMsg::Operation::ID=41" Content="加工檔不存在於指定路徑" />
+	<Message ID="AlarmMsg::Operation::ID=42" Content="加工程式資料錯誤，請檢查加工檔案" />
+	<Message ID="AlarmMsg::Operation::ID=43" Content="電子凸輪組數超過8組" />
+	<Message ID="AlarmMsg::Operation::ID=44" Content="凸輪曲線數量超過32條" />
+	<Message ID="AlarmMsg::Operation::ID=45" Content="凸輪曲線速度規畫失敗" />
+	<Message ID="AlarmMsg::Operation::ID=46" Content="電子凸輪-找不到軸向名稱" />
+	<Message ID="AlarmMsg::Operation::ID=47" Content="使用非自定義R值或R值數量超過" />
+	<Message ID="AlarmMsg::Operation::ID=48" Content="曲線插入點重讀R值失敗" />
+	<Message ID="AlarmMsg::Operation::ID=50" Content="SRI狀態異常" />
+	<Message ID="AlarmMsg::Operation::ID=51" Content="M3-IO通訊異常" />
+	<Message ID="AlarmMsg::Operation::ID=52" Content="M3-IO裝置狀態異常" />
+	<Message ID="AlarmMsg::Operation::ID=55" Content="驅動器資訊讀取異常" />
+	<Message ID="AlarmMsg::Operation::ID=57" Content="刀具回退功能，手輪移開僅支援R518、R519設為0" />
+	<Message ID="AlarmMsg::Operation::ID=58" Content="系統已進入燒錄模式，中斷所有伺服與IO連線" />
+	<Message ID="AlarmMsg::Operation::ID=59" Content="運動控制模組載入失敗，請重新安裝軟件" />
+	<Message ID="AlarmMsg::Operation::ID=60" Content="M3-IO裝置站號設定錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=61" Content="M3外部裝置狀態異常" />
+	<Message ID="AlarmMsg::Operation::ID=62" Content="客製IO對照表版本不符或檔案損毀" />
+	<Message ID="AlarmMsg::Operation::ID=63" Content="客製IO對照表設定衝突" />
+	<Message ID="AlarmMsg::Operation::ID=64" Content="設定為客製IO，請校閱IO對照表內容" />
+	<Message ID="AlarmMsg::Operation::ID=65" Content="雷射打標狀態異常" />
+	<Message ID="AlarmMsg::Operation::ID=66" Content="無法多軸同時進入巡弋控制" />
+	<Message ID="AlarmMsg::Operation::ID=67" Content="無線手持盒裝置狀態異常" />
+	<Message ID="AlarmMsg::Operation::ID=68" Content="M3-IO裝置異常" />
+	<Message ID="AlarmMsg::Operation::ID=68-1" Content="非新代M3-IO装置" />
+	<Message ID="AlarmMsg::Operation::ID=68-2" Content="軟件版本不支援此M3-IO裝置" />
+	<Message ID="AlarmMsg::Operation::ID=69" Content="超過插補時間可支援的軸數上限" />
+	<Message ID="AlarmMsg::Operation::ID=70" Content="產品不支援此Pr9設定" />
+	<Message ID="AlarmMsg::Operation::ID=71" Content="驅動器斷電，執行斷電回退" />
+	<Message ID="AlarmMsg::Operation::ID=73" Content="Pr3816或Pr3829異動，重開機刀具補償值清零" />
+	<Message ID="AlarmMsg::Operation::ID=74" Content="刀具補償值清零，請重新設定" />
+	<Message ID="AlarmMsg::Operation::ID=75" Content="無線手持盒按鍵封包遺失" />
+	<Message ID="AlarmMsg::Operation::ID=76" Content="無線手持盒封包CRC異常" />
+	<Message ID="AlarmMsg::Operation::ID=77" Content="驅動器參數讀寫權限改變" />
+	<Message ID="AlarmMsg::Operation::ID=78" Content="未預期的錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=79" Content="指定連線設備不存在" />
+	<Message ID="AlarmMsg::Operation::ID=81" Content="ATC發生重要警報" />
+	<Message ID="AlarmMsg::Operation::ID=82" Content="使用者ESI檔案讀取失敗" />
+	<Message ID="AlarmMsg::Operation::ID=83" Content="雙核心系統插補時間若設定低於2ms，會以2ms進行運作" />
+	<Message ID="AlarmMsg::Operation::ID=84" Content="PLC階梯圖檔案異常" />
+	<Message ID="AlarmMsg::Operation::ID=85" Content="PLC階梯圖語法錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=87" Content="不支援動平衡功能" />
+	<Message ID="AlarmMsg::Operation::ID=88" Content="動平衡功能發生錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=89" Content="訂閱頻道寄存器位於系統保護區" />
+	<Message ID="AlarmMsg::Operation::ID=90" Content="雙反饋檢測訂閱資訊種類錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=92" Content="雙反饋端口設定不支援雙反饋控制模式" />
+	<Message ID="AlarmMsg::Operation::ID=93" Content="雙反饋端口設定錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=94" Content="定點控制軸發生重要警報" />
+	<Message ID="AlarmMsg::Operation::ID=95" Content="系統發生異常，請重新啟動系統" />
+	<Message ID="AlarmMsg::Operation::ID=96" Content="Loader軸群使用非新代M3驅動器" />
+	<Message ID="AlarmMsg::Operation::ID=97" Content="非主系統獨立軸群(Pr741=1)檢查錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=98" Content="驅動器的串列參數定義檔版本不相容" />
+	<Message ID="AlarmMsg::Operation::ID=99" Content="獨立軸群(Pr732=2)檢查錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=100" Content="多個軸群同時執行客製暫停點回歸" />
+	<Message ID="AlarmMsg::Operation::ID=102" Content="EtherCAT裝置超過支援站數" />
+	<Message ID="AlarmMsg::Operation::ID=103" Content="系統不支援SPA3.0" />
+	<Message ID="AlarmMsg::Operation::ID=104" Content="傾斜軸設置失敗" />
+	<Message ID="AlarmMsg::Operation::ID=105" Content="分度軸設置失敗" />
+	<Message ID="AlarmMsg::Operation::ID=106" Content="張力控制軸號衝突" />
+	<Message ID="AlarmMsg::Operation::ID=107" Content="EtherCAT 連接狀態衝突" />
+	<Message ID="AlarmMsg::Operation::ID=107-1" Content="EtherCAT 參數檔遺失" />
+	<Message ID="AlarmMsg::Operation::ID=107-2" Content="EtherCAT 參數檔損毀" />
+	<Message ID="AlarmMsg::Operation::ID=107-3" Content="EtherCAT 連接狀態衝突" />
+	<Message ID="AlarmMsg::Operation::ID=108" Content="自動龍門校正無法啟用"/>
+	<Message ID="AlarmMsg::Operation::ID=109" Content="張力控制啟用失敗"/>
+	<Message ID="AlarmMsg::Operation::ID=110" Content="主軸導套耦合功能，參數設定錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=110-1" Content="主軸導套耦合功能，主軸設定錯誤" />
+	<Message ID="AlarmMsg::Operation::ID=110-2" Content="主軸導套耦合功能，主軸型態設定錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=300" Content="自動分中起始點錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=301" Content="自動分中長度或安全距離輸入錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=302" Content="自動分中寬度或安全距離輸入錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=303" Content="自動分中安全高度輸入錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=304" Content="自動分中速度輸入錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=305" Content="自動分中安全距離輸入錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=306" Content="自動分中長度或寬度輸入錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=307" Content="自動分中時發生錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=320" Content="主軸至對刀儀距離輸入錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=321" Content="預估刀長輸入錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=322" Content="主軸至對刀儀距離或預估刀長輸入錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=323" Content="第一、二次探測的誤差超過容許範圍" />
+	<Message ID="AlarmMsg::Macro::ID=324" Content="刀具量測時發生錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=330" Content="Z軸最低點錯誤警報" />
+	<Message ID="AlarmMsg::Macro::ID=331" Content="刀具量測時發生錯誤警報" />
+	<Message ID="AlarmMsg::Macro::ID=332" Content="第二、三次探測誤差超過設定範圍，或量刀訊號異常" />
+	<Message ID="AlarmMsg::Macro::ID=333" Content="Z方向起始點錯誤警報" />
+	<Message ID="AlarmMsg::Macro::ID=334" Content="G37.3未設定補償刀號" />
+	<Message ID="AlarmMsg::Macro::ID=335" Content="量測位置設定錯誤，刀長量測訊號已被觸發" />
+	<Message ID="AlarmMsg::Macro::ID=336" Content="量測位置設定錯誤，刀長量測訊號未被觸發" />
+	<Message ID="AlarmMsg::Macro::ID=401" Content="輸入錯誤的工件座標系設定" />
+	<Message ID="AlarmMsg::Macro::ID=402" Content="輸入錯誤的刀具設定" />
+	<Message ID="AlarmMsg::Macro::ID=403" Content="輸入錯誤的對刀模式" />
+	<Message ID="AlarmMsg::Macro::ID=404" Content="使用錯誤參考點設定" />
+	<Message ID="AlarmMsg::Macro::ID=411" Content="指令格式錯誤" />
+	<Message ID="AlarmMsg::Macro::ID=412" Content="引數設定超過範圍" />
+	<Message ID="AlarmMsg::Macro::ID=451" Content="主軸刀號與斷刀點刀號不同" />
+	<Message ID="AlarmMsg::Macro::ID=452" Content="刀具回退功能僅支援收回轴为 X、Y、Z 任一軸或是沿刀具向量回退" />
+	<Message ID="AlarmMsg::Macro::ID=453" Content="斷點回歸程式不支援G91模式" />
+	<Message ID="AlarmMsg::Macro::ID=454" Content="刀具回退功能僅支援回退距離R大於0" />
+	<Message ID="AlarmMsg::Servo::ID=10h" Content="電源電壓不足(AL.10)" />
+	<Message ID="AlarmMsg::Servo::ID=12h" Content="記憶體異常1(RAM)(AL.12)" />
+	<Message ID="AlarmMsg::Servo::ID=13h" Content="列印基版異常(AL.13)" />
+	<Message ID="AlarmMsg::Servo::ID=15h" Content="記憶體異常2(EEP-ROM)(AL.15)" />
+	<Message ID="AlarmMsg::Servo::ID=16h" Content="編碼器通信異常1(AL.16)" />
+	<Message ID="AlarmMsg::Servo::ID=17h" Content="CPU異常(AL.17)" />
+	<Message ID="AlarmMsg::Servo::ID=19h" Content="記憶體異常3(Flash ROM)(AL.19)" />
+	<Message ID="AlarmMsg::Servo::ID=1Ah" Content="馬達組合異常(AL.1A)" />
+	<Message ID="AlarmMsg::Servo::ID=20h" Content="編碼器通信異常2(AL.20)" />
+	<Message ID="AlarmMsg::Servo::ID=24h" Content="馬達輸出接地(AL.24)" />
+	<Message ID="AlarmMsg::Servo::ID=25h" Content="絕對位置資料異常(AL.25)" />
+	<Message ID="AlarmMsg::Servo::ID=30h" Content="回生異常(AL.30)" />
+	<Message ID="AlarmMsg::Servo::ID=31h" Content="迴轉速度超過瞬間容許值(AL.31)" />
+	<Message ID="AlarmMsg::Servo::ID=32h" Content="電流超過容許值(AL.32)" />
+	<Message ID="AlarmMsg::Servo::ID=33h" Content="電壓超過容許值(AL.33)" />
+	<Message ID="AlarmMsg::Servo::ID=35h" Content="指令脈衝周波數過高(AL.35)" />
+	<Message ID="AlarmMsg::Servo::ID=37h" Content="參數設定異常(AL.37)" />
+	<Message ID="AlarmMsg::Servo::ID=45h" Content="主迴路元件過熱(AL.45)" />
+	<Message ID="AlarmMsg::Servo::ID=46h" Content="馬達過熱(AL.46)" />
+	<Message ID="AlarmMsg::Servo::ID=47h" Content="冷卻風扇異常(AL.47)" />
+	<Message ID="AlarmMsg::Servo::ID=50h" Content="過負載1(AL.50)" />
+	<Message ID="AlarmMsg::Servo::ID=51h" Content="過負載2(AL.51)" />
+	<Message ID="AlarmMsg::Servo::ID=52h" Content="誤差過大(AL.52)" />
+	<Message ID="AlarmMsg::Servo::ID=8Ah" Content="串列通信逾時(AL.8A)" />
+	<Message ID="AlarmMsg::Servo::ID=8Eh" Content="串列通信異常(AL.8E)" />
+	<Message ID="AlarmMsg::Servo::ID=92h" Content="絕對位置編碼器電池斷線(AL.92)" />
+	<Message ID="AlarmMsg::Servo::ID=96h" Content="原點設定錯誤(AL.96)" />
+	<Message ID="AlarmMsg::Servo::ID=99h" Content="衝程極限警告(AL.99)" />
+	<Message ID="AlarmMsg::Servo::ID=9Fh" Content="絕對位置編碼器電池電壓過低(AL.9F)" />
+	<Message ID="AlarmMsg::Servo::ID=E0h" Content="過回生警告(AL.E0)" />
+	<Message ID="AlarmMsg::Servo::ID=E1h" Content="過負載警告(AL.E1)" />
+	<Message ID="AlarmMsg::Servo::ID=E3h" Content="絕對位置計數器警告(AL.E3)" />
+	<Message ID="AlarmMsg::Servo::ID=E5h" Content="ABS逾時警告(AL.E5)" />
+	<Message ID="AlarmMsg::Servo::ID=E6h" Content="緊急停止(AL.E6)" />
+	<Message ID="AlarmMsg::Servo::ID=E8h" Content="冷卻風扇速度異常警告(AL.E8)" />
+	<Message ID="AlarmMsg::Servo::ID=E9h" Content="主迴路OFF警告(AL.E9)" />
+	<Message ID="AlarmMsg::Servo::ID=EAh" Content="ABS SV ON警告(AL.EA)" />
+	<Message ID="AlarmMsg::Servo::ID=ECh" Content="過負載警告2(AL.EC)" />
+	<Message ID="AlarmMsg::Servo::ID=EDh" Content="輸出過大警告(AL.ED)" />
+	<Message ID="AlarmMsg::MLC::ID=1" Content="R40.0：X軸超過正向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=2" Content="R40.1：X軸超過負向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=3" Content="R40.2：X軸尚未原點復歸" />
+	<Message ID="AlarmMsg::MLC::ID=4" Content="R40.3：X軸伺服驅動器警報" />
+	<Message ID="AlarmMsg::MLC::ID=9" Content="R40.8：Y軸超過正向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=10" Content="R40.9：Y軸超過負向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=11" Content="R40.10：Y軸尚未原點復歸" />
+	<Message ID="AlarmMsg::MLC::ID=12" Content="R40.11：Y軸伺服驅動器警報" />
+	<Message ID="AlarmMsg::MLC::ID=17" Content="R41.0：Z軸超過正向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=18" Content="R41.1：Z軸超過負向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=19" Content="R41.2：Z軸尚未原點復歸" />
+	<Message ID="AlarmMsg::MLC::ID=20" Content="R41.3：Z軸伺服驅動器警報" />
+	<Message ID="AlarmMsg::MLC::ID=25" Content="R41.8：A軸超過正向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=26" Content="R41.9：A軸超過負向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=27" Content="R41.10：A軸尚未原點復歸" />
+	<Message ID="AlarmMsg::MLC::ID=28" Content="R41.11：A軸伺服驅動器警報" />
+	<Message ID="AlarmMsg::MLC::ID=33" Content="R42.0：B軸超過正向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=34" Content="R42.1：B軸超過負向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=35" Content="R42.2：B軸尚未原點復歸" />
+	<Message ID="AlarmMsg::MLC::ID=36" Content="R42.3：B軸伺服驅動器警報" />
+	<Message ID="AlarmMsg::MLC::ID=41" Content="R42.8：C軸超過正向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=42" Content="R42.9：C軸超過負向硬件行程極限" />
+	<Message ID="AlarmMsg::MLC::ID=43" Content="R42.10：C軸尚未原點復歸" />
+	<Message ID="AlarmMsg::MLC::ID=44" Content="R42.11：C軸伺服驅動器警報" />
+	<Message ID="AlarmMsg::MLC::ID=49" Content="R43.0：主軸伺服驅動器警報" />
+	<Message ID="AlarmMsg::MLC::ID=50" Content="R43.1：切削液馬達過載" />
+	<Message ID="AlarmMsg::MLC::ID=51" Content="R43.2：油壓系統警報" />
+	<Message ID="AlarmMsg::MLC::ID=52" Content="R43.3：風壓不足" />
+	<Message ID="AlarmMsg::MLC::ID=53" Content="R43.4：潤滑油不足" />
+	<Message ID="AlarmMsg::MLC::ID=54" Content="R43.5：切削液液位不足" />
+	<Message ID="AlarmMsg::MLC::ID=55" Content="R43.6：夾爪未關" />
+	<Message ID="AlarmMsg::MLC::ID=58" Content="系統剩餘存儲器空間不足" />
+	<Message ID="AlarmMsg::MLC::ID=299" Content="R43.16：切削液馬達過載" />
+	<Message ID="AlarmMsg::MLC::ID=300" Content="R43.17：油壓系統警報" />
+	<Message ID="AlarmMsg::MLC::ID=301" Content="R43.18：風壓不足" />
+	<Message ID="AlarmMsg::MLC::ID=302" Content="R43.19：潤滑油不足" />
+	<Message ID="AlarmMsg::MLC::ID=303" Content="R43.20：切削液液位不足" />
+	<Message ID="AlarmMsg::MLC::ID=313" Content="R43.30：啟動保護，請按正向試跑移動到目標點" />
+	<Message ID="AlarmMsg::MLC::ID=314" Content="R43.31：啟動保護完成，按下啟動按鈕以啟動程式" />
+	<Message ID="AlarmMsg::Station::ID=1h" Content="M3信息異常：功能命令錯誤" />
+	<Message ID="AlarmMsg::Station::ID=2h" Content="M3信息異常：記憶體位置錯誤" />
+	<Message ID="AlarmMsg::Station::ID=3h" Content="M3信息異常：資料長度錯誤" />
+	<Message ID="AlarmMsg::Station::ID=4h" Content="M3信息異常：資料型別錯誤" />
+	<Message ID="AlarmMsg::Station::ID=5h" Content="M3信息異常：存取權限錯誤" />
+	<Message ID="AlarmMsg::Station::ID=6h" Content="M3信息異常：數據設置錯誤" />
+	<Message ID="AlarmMsg::Station::ID=7h" Content="M3信息異常：資料範圍選擇錯誤" />
+	<Message ID="AlarmMsg::Station::ID=8h" Content="M3信息異常：狀態環境錯誤" />
+	<Message ID="AlarmMsg::Station::ID=9h" Content="M3信息異常：程序處理發生衝突" />
+	<Message ID="AlarmMsg::Station::ID=41h" Content="FRAM讀寫失敗" />
+	<Message ID="AlarmMsg::Station::ID=42h" Content="前級板FPGA無法使用" />
+	<Message ID="AlarmMsg::Station::ID=43h" Content="燒錄失敗：驅動器無法在伺服使能狀態下進行燒錄" />
+	<Message ID="AlarmMsg::Station::ID=44h" Content="DSP程式檢查錯誤" />
+	<Message ID="AlarmMsg::Station::ID=45h" Content="DSP韌件版本檢查錯誤" />
+	<Message ID="AlarmMsg::Station::ID=46h" Content="驅動器需重新上電" />
+	<Message ID="AlarmMsg::Station::ID=47h" Content="模組ID讀取資料異常" />
+	<Message ID="AlarmMsg::Station::ID=51h" Content="燒錄失敗：封包計數不連續" />
+	<Message ID="AlarmMsg::Station::ID=52h" Content="遺漏封包搜尋失敗" />
+	<Message ID="AlarmMsg::Station::ID=61h" Content="遺漏封包紀錄失敗" />
+	<Message ID="AlarmMsg::Station::ID=71h" Content="燒錄失敗：命令無效" />
+	<Message ID="AlarmMsg::Station::ID=72h" Content="燒錄失敗：未執行燒錄初始化" />
+	<Message ID="AlarmMsg::Station::ID=73h" Content="燒錄失敗：未通知檔案傳輸完畢" />
+	<Message ID="AlarmMsg::Station::ID=81h" Content="燒錄失敗：元件損毀或不存在" />
+	<Message ID="AlarmMsg::Station::ID=82h" Content="燒錄失敗：無法抹除記憶體空間" />
+	<Message ID="AlarmMsg::Station::ID=83h" Content="燒錄失敗：資料大小與記憶體空間不匹配" />
+	<Message ID="AlarmMsg::Station::ID=84h" Content="燒錄失敗：寫入地址錯誤" />
+	<Message ID="AlarmMsg::Station::ID=85h" Content="燒錄失敗：記憶體寫入時發生錯誤" />
+	<Message ID="AlarmMsg::Station::ID=86h" Content="燒錄失敗：資料封包錯誤" />
+	<Message ID="AlarmMsg::Station::ID=87h" Content="燒錄失敗：檔案檢查錯誤" />
+	<Message ID="AlarmMsg::Station::ID=100h" Content="燒錄失敗：驅動器通訊逾時" />
+	<Message ID="AlarmMsg::Station::ID=101h" Content="燒錄失敗：所有伺服軸向需為伺服未使能狀態才可進行燒錄" />
+	<Message ID="AlarmMsg::Station::ID=102h" Content="燒錄失敗：驅動器軔體更新失敗" />
+	<Message ID="AlarmMsg::Station::ID=103h" Content="燒錄失敗：前一次燒錄過程中發生不正常中斷" />
+	<Message ID="AlarmMsg::Station::ID=104h" Content="燒錄失敗：檢查燒錄環境時發生錯誤" />
+	<Message ID="AlarmMsg::Station::ID=105h" Content="燒錄失敗：驅動器無法進入燒錄模式" />
+	<Message ID="AlarmMsg::Station::ID=106h" Content="控制器無法識別驅動器的裝置資訊" />
+	<Message ID="AlarmMsg::Station::ID=107h" Content="驅動器開機載入程式的版本不支援遠端燒錄功能" />
+	<Message ID="AlarmMsg::EXTSTROKELIMIT::ID=1" Content="擴充軟體行程極限禁止進入"/>
+	<Message ID="AlarmMsg::EXTSTROKELIMIT::ID=2" Content="擴充軟體行程極限保護範圍錯誤"/>
+	<Message ID="AlarmMsg::System::ID=1" Content="嚴重系統異常"/>
+	<Message ID="AlarmMsg::System::ID=2" Content="重要檔案發生錯誤"/>
+	<Message ID="AlarmMsg::System::ID=2-1" Content="伺服通訊驅動模組載入失敗"/>
+	<Message ID="AlarmMsg::System::ID=2-2" Content="I/O驅動載入失敗"/>
+	<Message ID="AlarmMsg::System::ID=2-3" Content="其他驅動模組載入失敗"/>
+	<Message ID="AlarmMsg::System::ID=2-4" Content="系統ORX模組載入失敗"/>
+	<Message ID="AlarmMsg::System::ID=2-5" Content="系統資料載入失敗"/>
+	<Message ID="AlarmMsg::System::ID=2-6" Content="運動控制相關模組載入失敗"/>
+	<Message ID="AlarmMsg::System::ID=2-10" Content="高速高精參數資料載入失敗"/>
+	<Message ID="AlarmMsg::System::ID=3" Content="此控制器硬體無法支援該軟體版本"/>
+	<Message ID="AlarmMsg::System::ID=3-1" Content="記憶體不足"/>
+	<Message ID="AlarmMsg::System::ID=4" Content="嚴重CPU溫度過高"/>
+	<Message ID="AlarmMsg::System::ID=5" Content="APP 模組載入失敗"/>
+	<Message ID="AlarmMsg::System::ID=5-1" Content="APP 設定載入失敗"/>
+	<Message ID="AlarmMsg::System::ID=5-2" Content="APP ORX模組載入失敗"/>
+	<Message ID="AlarmMsg::System::ID=6" Content="系統執行發生嚴重異常" />
+	<Message ID="AlarmMsg::System::ID=6-1" Content="系統執行軸卡資料交換發生異常" />
+	<Message ID="AlarmMsg::System::ID=6-2" Content="系統執行插補計算發生異常" />
+	<Message ID="AlarmMsg::System::ID=6-3" Content="系統執行PLC掃描發生異常" />
+	<Message ID="AlarmMsg::System::ID=21" Content="總線通訊初始化失敗" />
+	<Message ID="AlarmMsg::System::ID=22-1" Content="EtherCAT通訊-從站初始化配置失敗" />
+	<Message ID="AlarmMsg::System::ID=23" Content="EtherCAT通訊-控制器初始化配置錯誤" />
+	<Message ID="AlarmMsg::System::ID=23-1" Content="EtherCAT通讯-未設定PDO配置數量" />
+	<Message ID="AlarmMsg::System::ID=23-2" Content="EtherCAT通讯-PDO配置数量不足" />
+	<Message ID="AlarmMsg::System::ID=26" Content="控制器無法和裝置建立通訊" />
+	<Message ID="AlarmMsg::System::ID=26-1" Content="M3通訊-控制器無法和驅動器建立通訊" />
+	<Message ID="AlarmMsg::System::ID=26-2" Content="EtherCAT通訊-控制器無法和驅動器建立通訊" />
+	<Message ID="AlarmMsg::System::ID=26-3" Content="EtherCAT通訊-控制器無法和IO裝置建立通訊" />
+	<Message ID="AlarmMsg::System::ID=30" Content="裝置斷線" />
+	<Message ID="AlarmMsg::System::ID=30-1" Content="M3通訊-驅動器斷線" />
+	<Message ID="AlarmMsg::System::ID=30-2" Content="EtherCAT通訊-驅動器斷線" />
+	<Message ID="AlarmMsg::System::ID=30-3" Content="EtherCAT通訊-IO裝置斷線" />
+	<Message ID="AlarmMsg::System::ID=31" Content="通訊線材接觸不良" />
+	<Message ID="AlarmMsg::System::ID=31-1" Content="M3通訊-通訊線材接觸不良或驅動器封包受雜訊干擾" />
+	<Message ID="AlarmMsg::System::ID=31-2" Content="EtherCAT通訊-通訊線材接觸不良或驅動器軟件遺漏通訊封包" />
+	<Message ID="AlarmMsg::System::ID=31-3" Content="EtherCAT通訊-通訊線材接觸不良或IO裝置軟件遺漏通訊封包" />
+	<Message ID="AlarmMsg::System::ID=32" Content="裝置封包受雜訊干擾" />
+	<Message ID="AlarmMsg::System::ID=32-1" Content="M3通訊-驅動器封包受雜訊干擾" />
+	<Message ID="AlarmMsg::System::ID=32-2" Content="EtherCAT通訊-驅動器封包受雜訊干擾" />
+	<Message ID="AlarmMsg::System::ID=32-3" Content="EtherCAT通訊-IO裝置封包受雜訊干擾" />
+	<Message ID="AlarmMsg::System::ID=33" Content="裝置軟件遺漏通訊封包" />
+	<Message ID="AlarmMsg::System::ID=33-1" Content="M3通訊-驅動器軟件遺漏通訊封包" />
+	<Message ID="AlarmMsg::System::ID=33-2" Content="EtherCAT通訊-驅動器軟件遺漏通訊封包" />
+	<Message ID="AlarmMsg::System::ID=34" Content="裝置通訊異常" />
+	<Message ID="AlarmMsg::System::ID=34-1" Content="M3通訊-驅動器通訊異常" />
+	<Message ID="AlarmMsg::System::ID=34-2" Content="EtherCAT通訊-驅動器通訊異常" />
+	<Message ID="AlarmMsg::System::ID=34-3" Content="EtherCAT通訊-IO裝置通訊異常" />
+	<Message ID="AlarmMsg::System::ID=41" Content="RIO1通訊異常" />
+	<Message ID="AlarmMsg::System::ID=42" Content="RIO2通訊異常" />
+	<Message ID="AlarmMsg::System::ID=46" Content="MCU韌件處於燒錄模式"/>
+	<Message ID="AlarmMsg::System::ID=46-1" Content="功能鍵-MCU韌件處於燒錄模式"/>
+	<Message ID="AlarmMsg::System::ID=46-2" Content="文字鍵-MCU韌件處於燒錄模式"/>
+	<Message ID="AlarmMsg::System::ID=61" Content="ENC參數設定錯誤" />
+	<Message ID="AlarmMsg::System::ID=61-1" Content="ENC參數設定互相衝突" />
+	<Message ID="AlarmMsg::System::ID=61-2" Content="ENC寄存器位於系統保護區" />
+	<Message ID="AlarmMsg::Compiler::ID=200" Content="載入檔案過大" />
+	<Message ID="AlarmMsg::Compiler::ID=201" Content="XML載入失敗" />
+	<Message ID="AlarmMsg::Compiler::ID=202" Content="前處理器初始化失敗" />
+	<Message ID="AlarmMsg::RoutineScript::ID=1" Content="檔案過大"/>
+	<Message ID="AlarmMsg::RoutineScript::ID=2" Content="腳本數目過多"/>
+	<Message ID="AlarmMsg::RoutineScript::ID=3" Content="腳本載入失敗"/>
+	<Message ID="AlarmMsg::RoutineScript::ID=4" Content="非支援的語法"/>
+	<Message ID="AlarmMsg::RoutineScript::ID=5" Content="不合法的變數存取"/>
+	<Message ID="AlarmMsg::RoutineScript::ID=6" Content="陣列變數型態錯誤"/>
+	<Message ID="AlarmMsg::RoutineScript::ID=7" Content="引數型態錯誤"/>
+	<Message ID="AlarmMsg::RoutineScript::ID=8" Content="值域錯誤"/>
+	<Message ID="AlarmMsg::RoutineScript::ID=9" Content="除零錯誤"/>
+</ResMap>

@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
   <Message ID="Error_PostProcessing" Content="後處理運算錯誤，路徑：{0}" />
+  <Message ID="Error_CalibrationRequired" Content="目前沒有有效的三點校正計算資料。請先按「計算」取得結果，或明確選擇僅輸出圖紙點。" />
 </ResMap>

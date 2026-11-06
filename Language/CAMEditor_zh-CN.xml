@@ -12,6 +12,8 @@
 	<Message ID="NCFileSaveFailed" Content="[NC转出状态]储存文件失败: {0}" />
 	<Message ID="NCExportSuccessNoController" Content="[NC转出状态]成功转出NC&#xA;[文件传输状态]未与控制器进行连线，文件无法传输" />
 	<Message ID="NCExportAndTransferSuccess" Content="[NC转出状态]成功转出NC&#xA;[文件传输状态]传输NC文件成功" />
+	<Message ID="MainProgramAssignSuccess" Content="[加工文件指定状态]已指定加工文件：{0}" />
+	<Message ID="MainProgramAssignFailed" Content="[加工文件指定状态]指定加工文件失败：{0}" />
 	<Message ID="NCExportSuccessTransferFailed" Content="[NC转出状态]成功转出NC&#xA;[文件传输状态]传输NC文件失败：{0}" />
 	<Message ID="SaveNCFileTitle" Content="储存 NC 文件" />
 	<Message ID="NoIntersectingFaceFound" Content="[操作提醒]找不到相交的面" />

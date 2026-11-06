@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="m_lblAuxiliaryTitle" Content="Управление" />
+	<Message ID="m_btnOuterEquipParameters" Content="Парам." />
+	<Message ID="m_btnShutter" Content="Затвор" />
+	<Message ID="m_btnAir" Content="Обдув" />
+	<Message ID="m_btnFollow" Content="Слежение" />
+	<Message ID="m_btnLaser" Content="Лазер" />
+	<Message ID="m_btnFocus" Content="Фокус" />
+	<Message ID="m_btnCalibration" Content="Калибр." />
+	<Message ID="m_lblJogTitle" Content="Перемещение осей" />
+	<Message ID="JogMode_Continuous" Content="Джог" />
+	<Message ID="JogMode_Inching" Content="Шаг" />
+	<Message ID="m_btnEndpoint" Content="Конечная точка" />
+	<Message ID="m_lblHomeTitle" Content="Возврат в ноль" />
+	<Message ID="m_btnHomeProgram" Content="Ноль прогр." />
+	<Message ID="m_btnHomeMachine" Content="Ноль станка" />
+	<Message ID="m_btnSafePosition" Content="Безоп. поз." />
+	<Message ID="m_lblStrategyTitle" Content="Стратегия" />
+	<Message ID="m_btnResumeCutParameters" Content="Парам." />
+	<Message ID="m_btnDryRun" Content="Хол. ход" />
+	<Message ID="m_btnResumeCutting" Content="Прод. рез" />
+	<Message ID="m_btnHandwheelSimulation" Content="Маховик" />
+	<Message ID="m_lblMachiningTitle" Content="Обработка" />
+	<Message ID="m_chbThreePointCalibration" Content="Калибровка по 3 точкам" />
+	<Message ID="m_lblFeedOverrideTitle" Content="Коррекция подачи" />
+	<Message ID="m_btnStart" Content="Пуск" />
+	<Message ID="m_btnPause" Content="Пауза" />
+	<Message ID="m_btnContinue" Content="Продолжить" />
+	<Message ID="m_btnStop" Content="Стоп" />
+	<Message ID="Confirm_Calibration" Content="Подведите сопло на расстояние 1–5 мм от поверхности. Станок должен оставаться неподвижным, без вибраций." />
+	<Message ID="Confirm_Home" Content="Оси начнут движение. Убедитесь, что на пути нет препятствий." />
+	<Message ID="Title_HomeProgram" Content="Возврат в программный ноль" />
+	<Message ID="Title_HomeMachine" Content="Возврат в машинный ноль" />
+	<Message ID="Error_Parameters" Content="Не удалось записать команду настройки параметров." />
+	<Message ID="Error_ThreePointCalibration" Content="Не удалось записать состояние включения калибровки по трём точкам." />
+	<Message ID="Error_ThreePointCalibrationDetails" Content="Не удалось записать состояние включения калибровки по трём точкам: {0}" />
+</ResMap>

@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=1" Content="定点控制轴驱动器站号与其他轴重复设定"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=2" Content="寄存器位于系统保护区或不支持位存取"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=3" Content="加减速或速度设定错误"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=4" Content="检查窗口设定错误"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=5" Content="不支持增量式编码器"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=6" Content="未完成绝对式原点设定"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=7" Content="绝对式相关参数异动，请重开机并重设原点"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=8" Content="驱动器站号不存在"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=9" Content="驱动器通讯异常"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=10" Content="驱动器参数写入失败"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=11" Content="驱动器电源异常"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=12" Content="定位移动距离超过上限"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=13" Content="新代编码器韧体升级结束，请重启驱动器"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=14" Content="新代编码器信息读取逾时"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=15" Content="定点控制轴反馈值异常"/>
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=16" Content="通讯线材接触不良" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=17" Content="硬件未收到通讯封包" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=18" Content="通讯封包受噪声干扰" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=19" Content="驱动器软件遗漏通讯封包" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=20" Content="超过正向软件行程极限" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=21" Content="超过负向软件行程极限" />
+	<Message ID="AlarmMsg::SETPOINTAXIS::ID=22" Content="驱动器后级电未供给" />
+</ResMap>

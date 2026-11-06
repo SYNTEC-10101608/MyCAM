@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="m_lblAxisHeader" Content="軸" />
+	<Message ID="m_lblCoordinateHeader" Content="座標" />
+	<Message ID="m_lblHeightGroupTitle" Content="調高軸資訊" />
+	<Message ID="m_lblCapacitanceTitle" Content="電容" />
+	<Message ID="m_lblHeightTitle" Content="調高軸座標" />
+	<Message ID="m_lblFollowHeightTitle" Content="跟隨高度" />
+	<Message ID="m_lblActualHeightTitle" Content="實際高度" />
+	<Message ID="m_lblMachiningTitle" Content="加工狀態" />
+	<Message ID="m_lblMainProgramTitle" Content="加工檔名" />
+	<Message ID="m_lblSpeedTitle" Content="進給速度" />
+	<Message ID="m_lblPowerTitle" Content="功率" />
+	<Message ID="m_lblFrequencyTitle" Content="頻率" />
+	<Message ID="m_lblDutyCycleTitle" Content="占空比" />
+	<Message ID="m_lblFocusTitle" Content="焦點位置" />
+	<Message ID="m_lblTimeTitle" Content="加工時間" />
+	<Message ID="AxisRole_Head" Content="擺頭" />
+	<Message ID="AxisRole_Table" Content="轉台" />
+	<Message ID="CoordinateMode_Machine" Content="機械座標 ⇄" />
+	<Message ID="CoordinateMode_Program" Content="程式座標 ⇄" />
+	<Message ID="Status_NotReady" Content="未就緒" />
+	<Message ID="Status_Ready" Content="就緒" />
+	<Message ID="Status_Machining" Content="加工中" />
+	<Message ID="Status_Paused" Content="暫停" />
+	<Message ID="Status_Alarm" Content="警報" />
+	<Message ID="Status_Record" Content="紀錄" />
+	<Message ID="Error_Offset" Content="無法開啟程式座標偏置：{0}" />
+	<Message ID="Error_ThreePointCalibration" Content="無法開啟三點校正：{0}" />
+</ResMap>

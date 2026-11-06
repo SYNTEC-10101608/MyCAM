@@ -27,14 +27,19 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Show( bool bUpdate = false )
 		{
+			DataGettingHelper.GetREFPnt( out CalibrationData calibrationData );
+			Show( calibrationData, bUpdate );
+		}
+
+		public void Show( CalibrationData calibrationData, bool bUpdate = false )
+		{
 			Remove();
 
 			// clear selection
 			m_Viewer.GetAISContext().ClearSelected( false );
 
 			// show point ais
-			bool isGetREFPntSuccess = DataGettingHelper.GetREFPnt( out CalibrationData calibrationData );
-			if( !isGetREFPntSuccess || calibrationData == null ) {
+			if( calibrationData == null ) {
 				return;
 			}
 			if( calibrationData.Ref_Pnt1 != null ) {

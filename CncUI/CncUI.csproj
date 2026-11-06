@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{71A7782F-5F50-489E-A7C1-D5CA844EAC39}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>CncUI</RootNamespace>
+    <AssemblyName>CncUI</AssemblyName>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Helper\ResponsiveLayout.cs" />
+    <Compile Include="Panel\CNCInfoPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panel\CNCInfoPanel.Designer.cs">
+      <DependentUpon>CNCInfoPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panel\CNCPanel.Designer.cs">
+      <DependentUpon>CNCPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Panel\CNCPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controller\CNCInfoPanelController.cs" />
+    <Compile Include="Dialog\CNCOffsetDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialog\CNCOffsetDialog.Designer.cs">
+      <DependentUpon>CNCOffsetDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controller\CNCOffsetController.cs" />
+    <Compile Include="Controller\CNCAlarmMonitor.cs" />
+    <Compile Include="Helper\CNCAlarmTextResolver.cs" />
+    <Compile Include="Panel\CNCAlarmPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panel\CNCAlarmPanel.Designer.cs">
+      <DependentUpon>CNCAlarmPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controller\CNCPanelController.cs" />
+    <Compile Include="CNCUIManager.cs" />
+    <EmbeddedResource Include="Panel\CNCPanel.resx">
+      <DependentUpon>CNCPanel.cs</DependentUpon>
+      <LogicalName>CncUI.CNCPanel.resources</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CommonUI\CommonUI.csproj">
+      <Project>{1D99CD54-83D4-4D12-86A7-1635A8B8729F}</Project>
+      <Name>CommonUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CncManager\CncManager.csproj">
+      <Project>{F7A30260-B445-48EB-8218-B7231D88FDF5}</Project>
+      <Name>CncManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LanguageManager\LanguageManager.csproj">
+      <Project>{6AA4DE88-E3B9-4A29-8DF8-DC5DCD0A70CD}</Project>
+      <Name>LanguageManager</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

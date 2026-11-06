@@ -51,6 +51,7 @@ namespace MyCAM.Editor
 		AutoSortPath,
 		SpecialToolVecEdit,
 		AddPath,
+		ThreePointCalibration,
 
 		// File
 		ImportProjectFile,

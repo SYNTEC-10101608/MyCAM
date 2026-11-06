@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=1" Content="串列PLC軸驅動器站號與其他軸重複設定"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=2" Content="寄存器位於系統保護區或不支援位元存取"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=3" Content="加減速或速度設定錯誤"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=4" Content="檢查視窗設定錯誤"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=7" Content="尋原點偏移量設定過大"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=8" Content="絕對式電機不支援增量尋原點功能"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=9" Content="未完成絕對式原點設定"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=10" Content="絕對式相關參數異動，請重開機並重設原點"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=11" Content="驅動器站號不存在"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=12" Content="超過正向軟件行程極限"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=13" Content="超過負向軟件行程極限"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=14" Content="驅動器通訊異常"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=15" Content="驅動器參數寫入失敗"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=16" Content="找不到原點索引訊號"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=17" Content="尋原點零速檢查失敗"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=18" Content="離不開原點開關"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=19" Content="驅動器電源異常"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=20" Content="不支援此驅動器類型"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=20-1" Content="此驅動器類型不支援速度模式"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=21" Content="定位移動距離超過上限"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=23" Content="新代編碼器韌件升級結束，請重啟驅動器"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=24" Content="新代編碼器資訊讀取逾時"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=25" Content="軸向迴授值異常"/>
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=26" Content="通訊線材接觸不良" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=27" Content="硬件未收到通訊封包" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=28" Content="通訊封包受雜訊干擾" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=29" Content="驅動器軟件遺漏通訊封包" />
+	<Message ID="AlarmMsg::SERIALPLCAXIS::ID=30" Content="驅動器後級電未供給" />
+</ResMap>

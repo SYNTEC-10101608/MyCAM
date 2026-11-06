@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<!-- Alarm -->
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_STEP_ALM::ID=1" Content="過流或相間短路故障"/>
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_STEP_ALM::ID=2" Content="過壓故障"/>
+	<Message ID="AlarmMsg::Drv_ECAT_SYNTEC_STEP_ALM::ID=9" Content="相位故障或電流採集故障"/>
+</ResMap>

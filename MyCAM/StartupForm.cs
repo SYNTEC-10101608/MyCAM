@@ -1,10 +1,12 @@
 ﻿using CncManager;
-using CncManager.Definition;
+using CncUI;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor;
 using MyCAM.Editor.Dialog;
 using MyCAM.Helper;
+using MyCAM.Helper.FormShow;
+using MyCAM.Layout;
 using OCC.AIS;
 using OCC.Geom;
 using OCC.gp;
@@ -15,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using TpCADCore;
@@ -49,10 +52,14 @@ namespace MyCAM
 
 			// need to init befor myapp because myapp will use LogPanel
 			InitializeComponent();
+			m_MainLayout = new MainLayout( m_panBackGround, m_tlpBottom, m_panCNC, m_panCNCInfo,
+				m_pnlMessages, m_pnlLog, m_panCNCVertical, m_panVerticalAlarm, m_tsmiCNC, m_tsbController );
+			m_panBackGround.SizeChanged += OnMainLayoutSizeChanged;
 
 			// app
 			MyApp.MainForm = this;
 			UIListSetting();
+			InitCNCModule();
 
 			// create the viewer
 			m_Viewer = new Viewer();
@@ -97,6 +104,9 @@ namespace MyCAM
 				m_DataManager.MachineMeshes = machineMeshes;
 			}
 			DataGettingHelper.Initialize( m_DataManager );
+			m_DataManager.PartChanged += UpdateThreePointCalibrationEntry;
+			m_DataManager.PartRemoved += OnCalibrationPartsRemoved;
+			UpdateThreePointCalibrationEntry();
 
 			// CAD Editor
 			m_CADEditor = new CADEditor( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -142,6 +152,147 @@ namespace MyCAM
 			}
 		}
 
+		protected override void OnLoad( EventArgs e )
+		{
+			base.OnLoad( e );
+			m_CNCUIManager?.Init();
+			UpdateMainLayout();
+		}
+
+		void InitCNCModule()
+		{
+			MachiningPreparation preparation = new MachiningPreparation( () => m_CAMEditor );
+			m_CNCUIManager = new CNCUIManager( CncClient.Instance,
+				MyApp.AppSetting.ApplyCNCIP, preparation.PrepareAsync,
+				DialogShowHelper.ShowCentered );
+			m_CNCUIManager.Notice += OnCNCNotice;
+			m_CNCUIManager.ControllerRequested += ShowController;
+			m_CNCUIManager.ThreePointCalibrationRequested += ShowThreePointCalibration;
+			m_CNCUIManager.AlarmsChanged += OnCNCAlarmsChanged;
+			m_CNCUIManager.ConnectionChanged += OnCNCConnectionChanged;
+			OnCNCConnectionChanged( m_CNCUIManager.IsConnected );
+			UpdateMainLayout();
+		}
+
+		void OnCNCConnectionChanged( bool connected )
+		{
+			if( IsDisposed || Disposing ) {
+				return;
+			}
+			m_tsbSetOffset.Enabled = connected;
+			m_tsbProcessSettings.Enabled = connected;
+			if( connected && ( Height > Width || m_CurrentUIStatus == EUIStatus.Machining ) && !m_CNCUIManager.HasPanels ) {
+				ShowCNCPanels( false );
+			}
+		}
+
+		void OnCNCAlarmsChanged()
+		{
+			if( IsDisposed || Disposing ) {
+				return;
+			}
+			UpdateAlarmLayout();
+		}
+
+		void OnMessagesSizeChanged( object sender, EventArgs e )
+		{
+			UpdateAlarmLayout();
+		}
+
+		void UpdateAlarmLayout()
+		{
+			if( IsDisposed || Disposing ) {
+				return;
+			}
+			m_MainLayout?.UpdateMessages( Size, m_CNCUIManager?.AlarmPanel, m_CNCUIManager?.HasAlarmContent == true );
+		}
+
+		void m_tsmiCNC_Click( object sender, EventArgs e )
+		{
+			ShowCNCPanels();
+		}
+
+		void ShowCNCPanels( bool activateMachining = true )
+		{
+			if( m_CNCUIManager == null ) {
+				return;
+			}
+			if( activateMachining ) {
+				SwitchEditor( EEditorType.CAM, false );
+			}
+			if( m_CNCUIManager.HasPanels ) {
+				if( activateMachining ) {
+					RefreshToolStripLayout( EUIStatus.Machining );
+				}
+				return;
+			}
+			m_panBackGround.SuspendLayout();
+			try {
+				if( !m_CNCUIManager.CreatePanels() ) {
+					if( activateMachining ) {
+						RefreshToolStripLayout( EUIStatus.Machining );
+						VisibleCAMQuickToolBarButtons( false );
+						VisibleTechLayerButtons( false );
+					}
+					return;
+				}
+				m_CNCUIManager.Panel.Visible = false;
+				m_CNCUIManager.InfoPanel.Visible = false;
+				m_CNCUIManager.Panel.Dock = DockStyle.Fill;
+				m_panCNC.Controls.Add( m_CNCUIManager.Panel );
+				m_CNCUIManager.InfoPanel.Dock = DockStyle.Fill;
+				m_panCNCInfo.Controls.Add( m_CNCUIManager.InfoPanel );
+				UpdateMainLayout();
+				if( activateMachining ) {
+					RefreshToolStripLayout( EUIStatus.Machining );
+					VisibleCAMQuickToolBarButtons( false );
+					VisibleTechLayerButtons( false );
+				}
+			}
+			finally {
+				m_panBackGround.ResumeLayout( true );
+			}
+			m_MainLayout.FitPanels( m_CNCUIManager.Panel, m_CNCUIManager.InfoPanel );
+			m_CNCUIManager.Panel.Visible = true;
+			m_CNCUIManager.InfoPanel.Visible = true;
+		}
+
+		void CloseCNCPanels()
+		{
+			if( m_CurrentEditor == m_CAMEditor ) m_CAMEditor?.EndAction();
+			if( Height > Width ) {
+				m_CNCUIManager?.CloseOffsetDialog();
+			}
+			else {
+				m_CNCUIManager?.ClosePanels();
+			}
+			UpdateMainLayout();
+		}
+
+		void UpdateMainLayout()
+		{
+			if( IsDisposed || Disposing ) {
+				return;
+			}
+			if( m_CNCUIManager?.InfoPanel != null ) {
+				m_CNCUIManager.InfoPanel.VerticalLayout = Height > Width;
+			}
+			m_MainLayout?.Update( Size, m_CNCUIManager != null, m_CurrentUIStatus == EUIStatus.Machining,
+				CNCPanel.GetPreferredSizeForDpi( m_panCNC.DeviceDpi ),
+				m_CNCUIManager?.Panel, m_CNCUIManager?.InfoPanel,
+				m_CNCUIManager?.AlarmPanel, m_CNCUIManager?.HasAlarmContent == true );
+		}
+
+		void OnMainLayoutSizeChanged( object sender, EventArgs e )
+		{
+			UpdateMainLayout();
+		}
+
+		void OnCNCNotice( string message, bool isError )
+		{
+			MyApp.Logger.ShowOnLogPanel( message, isError ? MyApp.NoticeType.Warning : MyApp.NoticeType.Hint );
+		}
+
 		protected override void WndProc( ref Message m )
 		{
 			// prevent dragging main form when CNCDlg is open
@@ -185,10 +336,15 @@ namespace MyCAM
 
 		// controller dialog
 		CNCDlg m_CNCDlg;
+		CNCUIManager m_CNCUIManager;
+		bool m_CNCShutdownPending;
+		bool m_CNCShutdownComplete;
 
 		// UI list
+		readonly MainLayout m_MainLayout;
 		Dictionary<EUIStatus, List<Control>> m_UIStatusDic;
 		List<ToolStripContainer> m_ToolStripLevelList;
+		EUIStatus m_CurrentUIStatus = EUIStatus.File;
 
 		// UI color
 		readonly Color DEFAULT_BtnColor = SystemColors.Control;
@@ -211,6 +367,10 @@ namespace MyCAM
 		const string LOG_VNC_FILE_NOT_FOUND = "找不到VNC執行檔，請確認VNC執行檔與程式執行檔在同一資料夾下";
 		const string LOG_VNC_CONNECT_FAILED = "無法連線到指定IP位置";
 		const string LOG_VNC_UNKNOWN_ERROR = "VNC連線過程發生未知錯誤";
+		const string LOG_VNC_CONNECTION_ERROR = "VNC 連線失敗：{0}";
+		const string LOG_CNC_CONNECTION_ERROR = "CNC 連線流程失敗：{0}";
+		const string LOG_CNC_SHUTDOWN_UNCONFIRMED = "CNC 關閉未確認：{0}";
+		const string LOG_SHUTDOWN_FAILED = "關閉流程失敗：{0}";
 		const string LOG_CNC_CONNECT_FAILED = "CNC 連線失敗";
 		const string LOG_CNC_CONNECT_SUCCESS = "CNC 連線成功";
 		const string LOG_CNC_RECONNECTING = "CNC 重新連線中...";
@@ -226,6 +386,7 @@ namespace MyCAM
 			CAD,
 			CAM,
 			Simulation,
+			Machining,
 		}
 
 		void ShowG54Trihedron()
@@ -510,9 +671,26 @@ namespace MyCAM
 		}
 
 		// convert NC
-		void m_tsbConvertNC_Click( object sender, EventArgs e )
+		async void m_tsbConvertNC_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.ConverNC();
+			if( !m_tsbConvertNC.Enabled ) {
+				return;
+			}
+			m_tsbConvertNC.Enabled = false;
+			try {
+				await m_CAMEditor.ConvertNCAsync();
+			}
+			catch( Exception ex ) {
+				System.Diagnostics.Trace.TraceError( "NC export workflow failed: {0}", ex );
+				if( !IsDisposed && !Disposing ) {
+					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Log_NCExportError", LOG_NC_EXPORT_ERROR ), ex.Message ), MyApp.NoticeType.Warning );
+				}
+			}
+			finally {
+				if( !IsDisposed && !Disposing ) {
+					m_tsbConvertNC.Enabled = true;
+				}
+			}
 		}
 
 		void m_tsbMicroJoint_Click( object sender, EventArgs e )
@@ -696,6 +874,7 @@ namespace MyCAM
 
 		void OnProjectFileImported( bool isSuccess, string fileName )
 		{
+			UpdateThreePointCalibrationEntry();
 			if( isSuccess == false ) {
 				return;
 			}
@@ -864,9 +1043,14 @@ namespace MyCAM
 		// ui display
 		void RefreshToolStripLayout( EUIStatus uiStatus )
 		{
+			UpdateThreePointCalibrationEntry();
+			if( Height <= Width && m_CNCUIManager != null && m_CNCUIManager.HasPanels ) {
+				uiStatus = EUIStatus.Machining;
+			}
 			if( !m_UIStatusDic.ContainsKey( uiStatus ) || m_UIStatusDic[ uiStatus ] == null ) {
 				return;
 			}
+			m_CurrentUIStatus = uiStatus;
 
 			// get which tool strip need to show on container
 			List<Control> ShownToolStripList = m_UIStatusDic[ uiStatus ];
@@ -908,6 +1092,7 @@ namespace MyCAM
 			if( bToolStirpShownCountChange ) {
 				ReLayOutUIZorder();
 			}
+			UpdateMainLayout();
 		}
 
 		List<ToolStrip> GetAllToolStrips( ToolStripContainer container )
@@ -990,8 +1175,9 @@ namespace MyCAM
 		#endregion
 
 		// switch editor
-		void SwitchEditor( EEditorType type )
+		void SwitchEditor( EEditorType type, bool closePanels = true )
 		{
+			if( closePanels ) CloseCNCPanels();
 			// no current editor
 			if( m_CurrentEditor == null ) {
 				m_CurrentEditor = GetEditor( type );
@@ -1048,6 +1234,7 @@ namespace MyCAM
 				{ EUIStatus.File, new List<Control>() { m_tsFileFunction } },
 				{ EUIStatus.CAD , new List<Control>() { m_tsCADFunction } },
 				{ EUIStatus.CAM, new List<Control>() { m_tsCAMFunction } },
+				{ EUIStatus.Machining, new List<Control>() { m_tsMachiningFunction } },
 				{ EUIStatus.Simulation, new List<Control>() { m_tsSimuFunc } },
 			};
 			m_ToolStripLevelList = new List<ToolStripContainer>()
@@ -1135,34 +1322,28 @@ namespace MyCAM
 
 		#region VNC Connection
 
-		bool SetAndDoConnect()
+		async Task SetAndDoConnectAsync()
 		{
-			bool isConnectSuccess = false;
+			string ip = null;
+			using( ConnectDlg connectDlg = new ConnectDlg() ) {
+				connectDlg.ConfirmEvent += confirmedIP =>
+				{
+					ip = confirmedIP;
+					connectDlg.Close();
+				};
+				connectDlg.ShowDialog( this );
+			}
+			if( ip == null ) {
+				return;
+			}
 
-			// Create new ConnectDlg
-			ConnectDlg ConnectDlg = new ConnectDlg();
-
-			// Handle form closed event to clear reference
-			ConnectDlg.FormClosed += ( s, args ) =>
-			{
-				ConnectDlg = null;
-			};
-
-			// Handle confirm event
-			ConnectDlg.ConfirmEvent += ( ip ) =>
-			{
+			MyApp.CNCIP = null;
+			try {
 				CleanupVNCConnections();
-				MyApp.CNCIP = null;
 				VNCUserControl newVNCControl = new VNCUserControl( ip );
 				MyApp.VNCScreen = newVNCControl;
-				ConnectDlg.Close();
 				switch( newVNCControl.ConnectionResult ) {
 					case VNCConnectionResult.Success:
-						MyApp.CNCIP = ip;
-						isConnectSuccess = true;
-
-						// connect CNC after VNC success
-						ConnectCncByManager( ip );
 						break;
 					case VNCConnectionResult.FileNotFound:
 						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_VNCFileNotFound", LOG_VNC_FILE_NOT_FOUND ), MyApp.NoticeType.Error, true );
@@ -1174,22 +1355,32 @@ namespace MyCAM
 						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_VNCUnknownError", LOG_VNC_UNKNOWN_ERROR ), MyApp.NoticeType.Error, true );
 						break;
 				}
-			};
-
-			// Show the dialog and set focus
-			ConnectDlg.ShowDialog( this );
-			return isConnectSuccess;
+			}
+			catch( Exception ex ) {
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Log_VNCConnectionError", LOG_VNC_CONNECTION_ERROR ), ex.Message ), MyApp.NoticeType.Warning );
+			}
+			var result = await m_CNCUIManager.ConnectAsync( ip );
+			MyApp.CNCIP = result.IsSuccess ? ip : null;
 		}
 
-		void m_tsbCNCConnection_Click( object sender, EventArgs e )
+		async void m_tsbCNCConnection_Click( object sender, EventArgs e )
 		{
-			bool isConnectSuccess = SetAndDoConnect();
-
-			// if connect success and in vertical screen, show vnc screen
-			if( isConnectSuccess && m_panVNC.Visible ) {
-				MyApp.VNCScreen.ScreenResizeByParentSize( m_panVNC.Width, m_panVNC.Height, out int nVNCStartX, out int nVNCStartY );
-				MyApp.VNCScreen.Location = new Point( nVNCStartX, nVNCStartY );
-				m_panVNC.Controls.Add( MyApp.VNCScreen );
+			if( !m_tsbCNCConnection.Enabled ) {
+				return;
+			}
+			m_tsbCNCConnection.Enabled = false;
+			try {
+				await SetAndDoConnectAsync();
+			}
+			catch( Exception ex ) {
+				if( !IsDisposed && !Disposing ) {
+					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Log_CNCConnectionError", LOG_CNC_CONNECTION_ERROR ), ex.Message ), MyApp.NoticeType.Warning );
+				}
+			}
+			finally {
+				if( !IsDisposed && !Disposing ) {
+					m_tsbCNCConnection.Enabled = true;
+				}
 			}
 		}
 
@@ -1202,66 +1393,33 @@ namespace MyCAM
 			}
 		}
 
-		void SetVerticalScreenMode( bool isVertical )
-		{
-			if( isVertical ) {
-				m_panVNC.Visible = true;
-				m_tsbController.Visible = false;
-				m_panVNC.Controls.Add( MyApp.VNCScreen );
-			}
-
-			// hide VNC screen and show controller entrance when in horizontal screen
-			else {
-				m_panVNC.Visible = false;
-				m_tsbController.Visible = true;
-				m_panVNC.Controls.Remove( MyApp.VNCScreen );
-			}
-		}
-
 		void StartupForm_Resize( object sender, EventArgs e )
 		{
-			bool isVertical = Height > Width;
-			if( isVertical ) {
-				SetVerticalScreenMode( isVertical );
-
-				// CADCAM
-				m_panBackGround.RowStyles[ 0 ].SizeType = SizeType.Percent;
-				m_panBackGround.RowStyles[ 0 ].Height = 47;
-
-				// Log
-				m_panBackGround.RowStyles[ 1 ].SizeType = SizeType.Percent;
-				m_panBackGround.RowStyles[ 1 ].Height = 6;
-
-				// VNC
-				m_panBackGround.RowStyles[ 2 ].SizeType = SizeType.Percent;
-				m_panBackGround.RowStyles[ 2 ].Height = 47;
-
-				// resize VNC and reset position 
-				if( m_panVNC.Controls.Count != 0 ) {
-					( (VNCUserControl)m_panVNC.Controls[ 0 ] ).ScreenResizeByParentSize( m_panVNC.Width, m_panVNC.Height, out int nVNCStartX, out int nVNCStartY );
-					m_panVNC.Controls[ 0 ].Location = new Point( nVNCStartX, nVNCStartY );
-				}
+			if( IsDisposed || Disposing ) {
 				return;
 			}
-			else {
-				SetVerticalScreenMode( isVertical );
-
-				// VNC
-				m_panBackGround.RowStyles[ 2 ].SizeType = SizeType.Absolute;
-				m_panBackGround.RowStyles[ 2 ].Height = 0;
-
-				// CADCAM
-				m_panBackGround.RowStyles[ 0 ].SizeType = SizeType.Percent;
-				m_panBackGround.RowStyles[ 0 ].Height = 90;
-
-				// Log
-				m_panBackGround.RowStyles[ 1 ].SizeType = SizeType.Percent;
-				m_panBackGround.RowStyles[ 1 ].Height = 10;
+			if( Height > Width && m_CNCUIManager?.IsConnected == true && !m_CNCUIManager.HasPanels ) {
+				ShowCNCPanels( false );
 			}
+			else if( Height <= Width && m_CurrentUIStatus != EUIStatus.Machining && m_CNCUIManager?.HasPanels == true ) {
+				CloseCNCPanels();
+			}
+			UpdateMainLayout();
 		}
 
-		void StartupForm_FormClosing( object sender, FormClosingEventArgs e )
+		async void StartupForm_FormClosing( object sender, FormClosingEventArgs e )
 		{
+			if( m_CNCShutdownComplete ) {
+				return;
+			}
+			if( m_CNCShutdownPending ) {
+				e.Cancel = true;
+				return;
+			}
+			if( e.Cancel ) {
+				return;
+			}
+			m_CAMEditor?.EndAction();
 			// check if there are any workpieces
 			if( m_DataManager != null && m_DataManager.PartIDList.Count > 0 ) {
 				string message = string.Format(
@@ -1288,14 +1446,31 @@ namespace MyCAM
 				// if No, continue closing without saving
 			}
 
-			CleanupVNCConnections();
-
-			// disconnect CNC
+			e.Cancel = true;
+			m_CNCShutdownPending = true;
+			Enabled = false;
 			try {
-				CncClient.Instance.Disconnect();
+				if( m_CNCUIManager != null ) {
+					try {
+						var result = await m_CNCUIManager.StopAsync();
+						if( !result.IsSuccess ) {
+							OnCNCNotice( string.Format( m_LanguageManager.TryGetString( "Log_CNCShutdownUnconfirmed", LOG_CNC_SHUTDOWN_UNCONFIRMED ), result.ErrorMessage ), true );
+						}
+					}
+					finally {
+						m_CNCUIManager.Dispose();
+					}
+				}
+				CleanupVNCConnections();
 			}
-			catch( Exception ) {
-				// ignore, closing anyway
+			catch( Exception ex ) {
+				OnCNCNotice( string.Format( m_LanguageManager.TryGetString( "Log_ShutdownFailed", LOG_SHUTDOWN_FAILED ), ex.Message ), true );
+			}
+			finally {
+				m_CNCShutdownComplete = true;
+				if( !IsDisposed ) {
+					BeginInvoke( new Action( Close ) );
+				}
 			}
 		}
 
@@ -1377,6 +1552,14 @@ namespace MyCAM
 
 		void m_tsbController_Click( object sender, EventArgs e )
 		{
+			ShowController();
+		}
+
+		void ShowController()
+		{
+			if( IsDisposed || Disposing ) {
+				return;
+			}
 			// no valid VNC connection, ask user to connect first
 			if( MyApp.VNCScreen == null || MyApp.VNCScreen.IsDisposed || !MyApp.VNCScreen.IsConnected ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCPleaseConnectFirst", LOG_CNC_PLEASE_CONNECT_FIRST ), MyApp.NoticeType.Warning, true );
@@ -1390,8 +1573,7 @@ namespace MyCAM
 				m_CNCDlg.Activate();
 				m_CNCDlg.BringToFront();
 
-				// set at middle of main form
-				m_CNCDlg.Location = MyApp.CalculateDialogCenterLocation( m_CNCDlg );
+				m_CNCDlg.PositionInArea( m_panCNCVertical.RectangleToScreen( m_panCNCVertical.ClientRectangle ) );
 				return;
 			}
 
@@ -1407,9 +1589,9 @@ namespace MyCAM
 			// set owner to keep z order
 			m_CNCDlg.Owner = MyApp.MainForm;
 
-			// show dialog at center of main form
+			// position dialog in the lower panel area for portrait mode
 			m_CNCDlg.StartPosition = FormStartPosition.Manual;
-			m_CNCDlg.Location = MyApp.CalculateDialogCenterLocation( m_CNCDlg );
+			m_CNCDlg.PositionInArea( m_panCNCVertical.RectangleToScreen( m_panCNCVertical.ClientRectangle ) );
 			m_CNCDlg.PutVNCOnDlg();
 
 			// subscribe to FormClosed event to clean up reference and restore main form state
@@ -1423,57 +1605,6 @@ namespace MyCAM
 
 			// show as modeless dialog (allows main form interaction)
 			m_CNCDlg.Show( MyApp.MainForm );
-		}
-
-		void ConnectCncByManager( string ip )
-		{
-			try {
-				// set UI thread context for event callback
-				CncClient.Instance.SetSynchronizationContext( System.Threading.SynchronizationContext.Current );
-
-				// subscribe connect-failed event to log the reason
-				CncClient.Instance.ConnectFailed -= OnCncConnectFailed;
-				CncClient.Instance.ConnectFailed += OnCncConnectFailed;
-
-				bool isSuccess = CncClient.Instance.Connect( ip );
-				if( !isSuccess ) {
-					// Error message show by event
-					return;
-				}
-
-				// subscribe cnc event after connect (unsubscribe first to avoid duplicate)
-				CncClient.Instance.ReconnectStatusChanged -= OnCncReconnectEvent;
-				CncClient.Instance.ReconnectStatusChanged += OnCncReconnectEvent;
-
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCConnectSuccess", LOG_CNC_CONNECT_SUCCESS ), MyApp.NoticeType.Hint );
-			}
-			catch( Exception ex ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCConnectFailed", LOG_CNC_CONNECT_FAILED ) + ": " + ex.Message, MyApp.NoticeType.Error );
-			}
-		}
-
-		void OnCncConnectFailed( string errorMessage )
-		{
-			string message = m_LanguageManager.TryGetString( "Log_CNCConnectFailed", LOG_CNC_CONNECT_FAILED );
-			if( !string.IsNullOrEmpty( errorMessage ) ) {
-				message += ": " + errorMessage;
-			}
-			MyApp.Logger.ShowOnLogPanel( message, MyApp.NoticeType.Error );
-		}
-
-		void OnCncReconnectEvent( ERecconectStage eventType )
-		{
-			switch( eventType ) {
-				case ERecconectStage.Reconnecting:
-					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCReconnecting", LOG_CNC_RECONNECTING ), MyApp.NoticeType.Hint );
-					break;
-				case ERecconectStage.Reconnected:
-					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCReconnected", LOG_CNC_RECONNECTED ), MyApp.NoticeType.Hint );
-					break;
-				case ERecconectStage.ReconnectFailed:
-					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_CNCReconnectFailed", LOG_CNC_RECONNECT_FAILED ), MyApp.NoticeType.Error );
-					break;
-			}
 		}
 
 		void m_tsbNeedProcess_Click( object sender, EventArgs e )
@@ -1538,7 +1669,46 @@ namespace MyCAM
 
 		void m_tsbCalibrationPnt_Click( object sender, EventArgs e )
 		{
-			m_CAMEditor.SetCalibrationREF();
+			ShowThreePointCalibration();
+		}
+
+		bool HasCalibrationPart => m_DataManager != null && m_DataManager.PartIDList.Count > 0;
+
+		void UpdateThreePointCalibrationEntry()
+		{
+			m_tsbCalibrationPnt.Enabled = HasCalibrationPart;
+		}
+
+		void OnCalibrationPartsRemoved( List<string> removedParts ) => UpdateThreePointCalibrationEntry();
+
+		void ShowThreePointCalibration()
+		{
+			UpdateThreePointCalibrationEntry();
+			if( !HasCalibrationPart ) {
+				return;
+			}
+			ShowCNCPanels();
+			if( m_CurrentEditor != m_CAMEditor ) {
+				return;
+			}
+			try {
+				m_CAMEditor.StartThreePointCalibration( this,
+					m_msMode, m_tsCADFunction, m_tsCAMFunction, m_tsMachiningFunction, m_tsSimuFunc, m_tsFileFunction, m_tsLayer );
+			}
+			catch( Exception ex ) {
+				System.Diagnostics.Trace.TraceError( "CNC calibration initialization failed: {0}", ex );
+				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Log_CalibrationError", LOG_CALIBRATION_ERROR ), ex.Message ), MyApp.NoticeType.Warning );
+			}
+		}
+
+		void m_tsbSetOffset_Click( object sender, EventArgs e )
+		{
+			m_CNCUIManager?.ShowOffset( this );
+		}
+
+		void m_tsbProcessSettings_Click( object sender, EventArgs e )
+		{
+			m_CNCUIManager?.ShowProcessSettings();
 		}
 
 		void ApplyResourcesToUI()
@@ -1554,7 +1724,9 @@ namespace MyCAM
 			m_tsbSetting.Text = m_LanguageManager.TryGetString( "m_tsbSetting", m_tsbSetting.Text );
 			m_tsbCNCConnection.Text = m_LanguageManager.TryGetString( "m_tsbCNCConnection", m_tsbCNCConnection.Text );
 			m_tsmiLanguage.Text = m_LanguageManager.TryGetString( "m_tsmiLanguage", m_tsmiLanguage.Text );
-			m_tsbController.Text = m_LanguageManager.TryGetString( "m_tsbController", m_tsbController.Text );
+			m_tsbController.Text = m_LanguageManager.TryGetString( "m_tsmiControllerAdvancedSettings", m_tsbController.Text );
+			m_tsmiCNC.Text = m_LanguageManager.TryGetString( "m_tsmiMachining", m_tsmiCNC.Text );
+			m_CNCUIManager?.ApplyResources();
 
 			// file toolbar
 			m_tsbImport3DFile.Text = m_LanguageManager.TryGetString( "m_tsbImport3DFile", m_tsbImport3DFile.Text );
@@ -1678,6 +1850,10 @@ namespace MyCAM
 
 			m_tsbConvertNC.Text = m_LanguageManager.TryGetString( "m_tsbConvertNC", m_tsbConvertNC.Text );
 			m_tsbConvertNC.ToolTipText = m_LanguageManager.TryGetString( "m_tsbConvertNC_ToolTip", m_tsbConvertNC.ToolTipText );
+			m_tsbSetOffset.Text = m_LanguageManager.TryGetString( "m_tsbSetOffset", SET_OFFSET );
+			m_tsbSetOffset.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSetOffset_ToolTip", SET_OFFSET_TOOLTIP );
+			m_tsbProcessSettings.Text = m_LanguageManager.TryGetString( "m_tsbProcessSettings", PROCESS_SETTINGS );
+			m_tsbProcessSettings.ToolTipText = m_LanguageManager.TryGetString( "m_tsbProcessSettings_ToolTip", PROCESS_SETTINGS_TOOLTIP );
 
 			m_tsbMeasureCAM.Text = m_LanguageManager.TryGetString( "m_tsbMeasureCAM", m_tsbMeasureCAM.Text );
 			m_tsbMeasureCAM.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMeasureCAM_ToolTip", m_tsbMeasureCAM.ToolTipText );
@@ -1784,6 +1960,12 @@ namespace MyCAM
 		}
 
 		const string LAYER = "圖層";
+		const string SET_OFFSET = "設定偏置";
+		const string SET_OFFSET_TOOLTIP = "設定程式座標偏置";
+		const string PROCESS_SETTINGS = "工藝設置";
+		const string PROCESS_SETTINGS_TOOLTIP = "開啟控制器工藝設置";
+		const string LOG_CALIBRATION_ERROR = "無法開啟三點校正：{0}";
+		const string LOG_NC_EXPORT_ERROR = "NC 轉出流程失敗：{0}";
 		const String NEED_PROCESS = "加工";
 		const string NOT_NEED_PROCESS = "不加工";
 	}

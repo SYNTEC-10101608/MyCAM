@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -40,6 +41,17 @@ namespace VNCFormsApp
 			IsConnected = ConnectionResult == VNCConnectionResult.Success;
 		}
 
+		public static Size GetScreenSize( Size availableSize )
+		{
+			if( availableSize.Width <= 0 || availableSize.Height <= 0 ) {
+				return Size.Empty;
+			}
+			const int WIDTH_RATIO = 4;
+			const int HEIGHT_RATIO = 3;
+			int scale = Math.Min( availableSize.Width / WIDTH_RATIO, availableSize.Height / HEIGHT_RATIO );
+			return new Size( WIDTH_RATIO * scale, HEIGHT_RATIO * scale );
+		}
+
 		public void ScreenResizeByParentSize( int nParentWidth, int nParentHeight, out int nVNCStartX, out int nVNCStartY )
 		{
 			if( nParentWidth <= 0 || nParentHeight <= 0 ) {
@@ -47,26 +59,14 @@ namespace VNCFormsApp
 				nVNCStartY = 0;
 				return;
 			}
-			const int CONTROLLER_Width = 4;
-			const int CONTROLLER_Height = 3;
-			int nVNCWidth;
-			int nVNCHeight;
-
-			// calculate the scaling ratio based on parent size and controller aspect ratio
-			int dWidthRatio = nParentWidth / CONTROLLER_Width;
-			int dHeightRatio = nParentHeight / CONTROLLER_Height;
-			int baseRatio = Math.Min( dWidthRatio, dHeightRatio );
-
-			// cal VNC screen resized size
-			nVNCWidth = CONTROLLER_Width * baseRatio;
-			nVNCHeight = CONTROLLER_Height * baseRatio;
+			Size screenSize = GetScreenSize( new Size( nParentWidth, nParentHeight ) );
 
 			// resize VNC screen
-			VNCScreenResize( nVNCWidth, nVNCHeight );
+			VNCScreenResize( screenSize.Width, screenSize.Height );
 
 			// screen start position (to set on parent)
-			nVNCStartX = ( nParentWidth - nVNCWidth ) / 2;
-			nVNCStartY = ( nParentHeight - nVNCHeight ) / 2;
+			nVNCStartX = ( nParentWidth - screenSize.Width ) / 2;
+			nVNCStartY = ( nParentHeight - screenSize.Height ) / 2;
 		}
 
 		public void VNCScreenResize( int nWidth, int nHeight )

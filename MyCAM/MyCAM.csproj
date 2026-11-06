@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -100,6 +100,7 @@
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
     <Compile Include="Editor\Action\CAM\RCornerAction.cs" />
+    <Compile Include="Editor\Action\CAM\CNCThreePointAction.cs" />
     <Compile Include="Editor\Action\MeasureAction.cs" />
     <Compile Include="Editor\Dialog\AddPathDlg.cs">
       <SubType>Form</SubType>
@@ -384,6 +385,7 @@
     <Compile Include="Editor\ViewManager.cs" />
     <Compile Include="Data\Object\BasicObject.cs" />
     <Compile Include="Editor\CAMEditor.cs" />
+    <Compile Include="Layout\MainLayout.cs" />
     <Compile Include="LogManager\LogHandler.cs" />
     <Compile Include="Helper\CAM\OverCutHelper.cs" />
     <Compile Include="Post\AxisConfig.cs" />
@@ -392,6 +394,13 @@
     <Compile Include="Post\FiveAxisSolver.cs" />
     <Compile Include="Post\CollisionSolver.cs" />
     <Compile Include="CNC\FTPTransmission.cs" />
+    <Compile Include="CNC\MachiningPreparation.cs" />
+    <Compile Include="Editor\Dialog\CNCThreePointDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\CNCThreePointDlg.Designer.cs">
+      <DependentUpon>CNCThreePointDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="Post\ContourPostHelper.cs" />
     <Compile Include="Post\PostInterfaceDefine.cs" />
@@ -520,6 +529,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonUI\CommonUI.csproj">
+      <Project>{1D99CD54-83D4-4D12-86A7-1635A8B8729F}</Project>
+      <Name>CommonUI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CommonData\CommonData.csproj">
       <Project>{c5376e98-c3ea-4cf1-839c-122eb0a9300b}</Project>
       <Name>CommonData</Name>
@@ -543,6 +556,10 @@
     <ProjectReference Include="..\OCCViewer\OCCViewer.csproj">
       <Project>{b70d417c-8417-49ee-ac5f-dc0bcfd2e38e}</Project>
       <Name>OCCViewer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CncUI\CncUI.csproj">
+      <Project>{71A7782F-5F50-489E-A7C1-D5CA844EAC39}</Project>
+      <Name>CncUI</Name>
     </ProjectReference>
     <ProjectReference Include="..\CncManager\CncManager.csproj">
       <Project>{F7A30260-B445-48EB-8218-B7231D88FDF5}</Project>

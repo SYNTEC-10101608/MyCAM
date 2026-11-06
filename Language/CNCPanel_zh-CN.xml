@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="m_lblAuxiliaryTitle" Content="功能控制" />
+	<Message ID="m_btnOuterEquipParameters" Content="参数设置" />
+	<Message ID="m_btnShutter" Content="光闸" />
+	<Message ID="m_btnAir" Content="吹气" />
+	<Message ID="m_btnFollow" Content="随动" />
+	<Message ID="m_btnLaser" Content="激光" />
+	<Message ID="m_btnFocus" Content="调焦" />
+	<Message ID="m_btnCalibration" Content="电容标定" />
+	<Message ID="m_lblJogTitle" Content="轴向移动" />
+	<Message ID="JogMode_Continuous" Content="点动" />
+	<Message ID="JogMode_Inching" Content="寸动" />
+	<Message ID="m_btnEndpoint" Content="控端点" />
+	<Message ID="m_lblHomeTitle" Content="回零" />
+	<Message ID="m_btnHomeProgram" Content="回程序零" />
+	<Message ID="m_btnHomeMachine" Content="回机械零" />
+	<Message ID="m_btnSafePosition" Content="回安全位置" />
+	<Message ID="m_lblStrategyTitle" Content="加工策略" />
+	<Message ID="m_btnResumeCutParameters" Content="参数设置" />
+	<Message ID="m_btnDryRun" Content="空走" />
+	<Message ID="m_btnResumeCutting" Content="断点续切" />
+	<Message ID="m_btnHandwheelSimulation" Content="手轮模拟" />
+	<Message ID="m_lblMachiningTitle" Content="加工控制" />
+	<Message ID="m_chbThreePointCalibration" Content="三点校正" />
+	<Message ID="m_lblFeedOverrideTitle" Content="进给倍率" />
+	<Message ID="m_btnStart" Content="开始" />
+	<Message ID="m_btnPause" Content="暂停" />
+	<Message ID="m_btnContinue" Content="继续" />
+	<Message ID="m_btnStop" Content="停止" />
+	<Message ID="Confirm_Calibration" Content="请先将喷头移至距离目标1~5mm处，并保持机床静止，不要振动。" />
+	<Message ID="Confirm_Home" Content="轴即将移动，请确认路径无障碍物。" />
+	<Message ID="Title_HomeProgram" Content="回程序零" />
+	<Message ID="Title_HomeMachine" Content="回机械零" />
+	<Message ID="Error_Parameters" Content="参数设置指令写入失败。" />
+	<Message ID="Error_ThreePointCalibration" Content="三点校正启用状态写入失败。" />
+	<Message ID="Error_ThreePointCalibrationDetails" Content="三点校正启用状态写入失败：{0}" />
+</ResMap>

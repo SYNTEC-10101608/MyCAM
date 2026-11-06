@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=110" Content="Control power supply undervoltage protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=120" Content="Over-voltage protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=130" Content="Main power supply undervoltage protection (PN)"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=131" Content="Main power supply undervoltage protection (AC)"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=140" Content="Over-current protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=141" Content="Intelligent Power Module error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=150" Content="Over-heat protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=151" Content="Encoder overheat error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=160" Content="Over-load protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=161" Content="Torque saturation error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=180" Content="Over-regeneration load protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=181" Content="Regenerative transistor error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=210" Content="Encoder communication disconnection error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=211" Content="Encoder communication error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=230" Content="Encoder communication data error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=240" Content="Position deviation excess protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=241" Content="Speed deviation excess protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=250" Content="Hybrid deviation excess error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=260" Content="Over-speed protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=261" Content="2nd Overspeed protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=271" Content="Absolute clear protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=274" Content="Command error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=275" Content="Command generation error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=276" Content="Operation commands contention protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=277" Content="Position information initialization error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=280" Content="Pulse regeneration limit protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=291" Content="Counter overflow protection 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=292" Content="Counter overflow protection 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=310" Content="Safety function error protection 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=312" Content="Safety function error protection 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=330" Content="Input duplicated allocation error 1 protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=331" Content="Input duplicated allocation error 2 protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=332" Content="Input function number error 1 protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=333" Content="Input function number error 2 protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=334" Content="Output function number error 1 protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=335" Content="Output function number error 2 protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=338" Content="Latch input allocation error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=340" Content="Software limit protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=341" Content="One revolution absolute working range error"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=360" Content="EEPROM parameter error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=361" Content="EEPROM parameter error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=362" Content="EEPROM parameter error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=370" Content="EEPROM check code error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=371" Content="EEPROM check code error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=372" Content="EEPROM check code error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=380" Content="Over-travel inhibit input protection 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=381" Content="Over-travel inhibit input protection 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=382" Content="Over-travel inhibit input protection 3"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=400" Content="Absolute system down error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=410" Content="Absolute counter over error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=420" Content="Absolute overspeed error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=430" Content="Incremantal encoder initialization error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=440" Content="Single turn counter error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=450" Content="multi-turn counter error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=470" Content="Absolute status error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=480" Content="Encoder Z-phase error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=490" Content="Encoder CS signal error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=500" Content="External scale connection error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=501" Content="External scale communication error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=502" Content="External scale communication data error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=510" Content="External scale ST error protection 0"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=511" Content="External scale ST error protection 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=512" Content="External scale ST error protection 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=513" Content="External scale ST error protection 3"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=514" Content="External scale ST error protection 4"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=515" Content="External scale ST error protection 5"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=550" Content="A-phase wiring error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=551" Content="B-phase wiring error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=552" Content="Z-phase wiring error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=700" Content="U-phase current detector error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=701" Content="W-phase current detector error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=720" Content="Thermal error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=803" Content="PLL incomplete error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=820" Content="RTEX node addressing error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=830" Content="RTEX continues communication error protection 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=831" Content="RTEX continues communication error protection 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=840" Content="RTEX communication timeout error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=843" Content="RTEX synchronization error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=845" Content="RTEX communication cycle error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=860" Content="RTEX cyclic data error protection 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=861" Content="RTEX cyclic data error protection 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=862" Content="RTEX Update Counter error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=870" Content="Forced alarm input protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=871" Content="Retracting operation completion (I/O)"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=873" Content="Retracting operation error"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=902" Content="RTEX multi-axis synchronization establishment error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=911" Content="RTEX command error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=913" Content="RTEX command error protection 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=920" Content="Encoder data recovery error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=921" Content="External scale data recovery error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=923" Content="Multi-turn data upper-limit value disagreement error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=930" Content="Parameter setup error protection 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=932" Content="Parameter setup error protection 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=933" Content="External scale connection error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=935" Content="Parameter setup error protection 4"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=938" Content="Parameter setup error protection 6"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=942" Content="Home position return error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=943" Content="Home position return error protection 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=950" Content="Motor automatic recognition error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=951" Content="Motor automatic recognition error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=952" Content="Motor automatic recognition error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=953" Content="Motor automatic recognition error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=954" Content="Motor automatic recognition error protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=962" Content="Control unit error protection 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=963" Content="Control unit error protection 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=964" Content="Control unit error protection 3"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=965" Content="Control unit error protection 4"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=966" Content="Control unit error protection 5"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=967" Content="Control unit error protection 6"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=981" Content="RTEX hardware error protection 1"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=982" Content="RTEX hardware error protection 2"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_ALM::ID=983" Content="RTEX hardware error protection 3"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A0h" Content="Overload protection"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A1h" Content="Over-regeneration alarm"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A2h" Content="Battery alarm"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A3h" Content="Fan alarm"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A4h" Content="Encoder communication alarm"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A5h" Content="Encoder overheat alarm"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A6h" Content="Oscillation detection alarm"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A7h" Content="Lifetime detection alarm"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A8h" Content="External scale error warning"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=A9h" Content="External scale communication warning"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=ACh" Content="Deterioration diagnosis warning"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=C0h" Content="RTEX continuous communication error warning"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=C1h" Content="RTEX accumulated communication error warning"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=C2h" Content="RTEX Update Counter error warning"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=C3h" Content="Main power off warning"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=D2h" Content="PANATERM command execution warning"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=352h" Content="Retracting operation completion (I/O)"/>
+	<Message ID="AlarmMsg::Drv_RTEX_PSONIC_WARN::ID=354h" Content="Retracting operation error"/>
+</ResMap>

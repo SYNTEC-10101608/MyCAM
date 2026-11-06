@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="InvalidConnection" Content="Недопустимый IP-адрес ЧПУ или время ожидания." />
+	<Message ID="LifecycleBusy" Content="Выполняется операция жизненного цикла подключения ЧПУ." />
+	<Message ID="ConnectionCancelled" Content="Подключение к ЧПУ отменено." />
+	<Message ID="PreviousOperationRunning" Content="Предыдущая операция SDK ещё выполняется." />
+	<Message ID="SessionEnded" Content="Сеанс подключения к ЧПУ завершён." />
+	<Message ID="ConnectionRejected" Content="OpenCNC отклонил подключение." />
+	<Message ID="DisconnectPending" Content="Операция SDK ещё выполняется; отключение не подтверждено." />
+	<Message ID="NotConnected" Content="Нет связи с ЧПУ." />
+	<Message ID="ResourceBusy" Content="Операция с ресурсами ЧПУ ещё выполняется." />
+	<Message ID="OperationBusy" Content="Операция ЧПУ ещё выполняется." />
+	<Message ID="OperationCancelled" Content="Операция отменена." />
+	<Message ID="WaitStopped" Content="Ожидание остановлено; операция SDK может ещё выполняться." />
+	<Message ID="CalibrationCancelled" Content="Калибровка отменена." />
+	<Message ID="CalibrationTimeout" Content="Время ожидания калибровки по трём точкам превысило 5 секунд." />
+	<Message ID="InvalidCalibrationResult" Content="Недопустимый флаг результата калибровки." />
+	<Message ID="ReadProgramCoordinates" Content="Не удалось прочитать координаты программы." />
+	<Message ID="ReadTolerance" Content="Не удалось прочитать допуск (@78406)." />
+	<Message ID="IncompletePoints" Content="Необходимо задать три полные точки XYZ." />
+	<Message ID="InvalidMachineParameter" Content="Pr{0}={1}; ожидается 1, 2 или 3." />
+	<Message ID="InvalidRotaryParameter" Content="Pr{0}={1}; ожидается 400, 500 или 600." />
+	<Message ID="AmbiguousHeadAxis" Content="Pr3005={0} задаёт головку {1}, которую нельзя однозначно сопоставить с поворотными осями {2}/{3}." />
+	<Message ID="ReadMachineCoordinate" Content="Не удалось прочитать машинную координату #{0}." />
+	<Message ID="ClearOffset" Content="Не удалось сбросить #{0}. Часть смещений уже могла быть сброшена: {1}" />
+	<Message ID="AlarmUnavailable" Content="Данные текущих аварий ЧПУ недоступны. Количество: {0}." />
+	<Message ID="AlarmCountRead" Content="Не удалось прочитать количество текущих аварий ЧПУ. Статус транспорта: {0}, статус контроллера: {1}." />
+	<Message ID="InvalidAlarmCount" Content="Недопустимое количество текущих аварий ЧПУ: {0}." />
+</ResMap>

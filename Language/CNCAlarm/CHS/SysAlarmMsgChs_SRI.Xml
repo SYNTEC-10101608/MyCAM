@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::SRI::ID=1" Content="扫描时间设定太短"/>
+	<Message ID="AlarmMsg::SRI::ID=2" Content="通讯逾时"/>
+	<Message ID="AlarmMsg::SRI::ID=3" Content="封包CRC或字符超时错误"/>
+	<Message ID="AlarmMsg::SRI::ID=4" Content="模块站号或排序与参数不符"/>
+	<Message ID="AlarmMsg::SRI::ID=5" Content="韧件更新失败"/>
+	<Message ID="AlarmMsg::SRI::ID=6" Content="模块处于刻录模式"/>
+	<Message ID="AlarmMsg::SRI::ID=7" Content="模块通讯异常"/>
+	<Message ID="AlarmMsg::SRI::ID=8" Content="模块硬件配置错误"/>
+	<Message ID="AlarmMsg::SRI::ID=9" Content="韧件更新成功，请断电重开"/>
+	<Message ID="AlarmMsg::SRI::ID=10" Content="控制器命令发送逾时"/>
+</ResMap>

@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=1h" Content="Overcurrent"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=2h" Content="Overvoltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3h" Content="Undervoltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=4h" Content="Motor error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=5h" Content="Regeneration error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=6h" Content="Overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=7h" Content="Overspeed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=8h" Content="Abnormal pulse control command"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=9h" Content="Excessive deviation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=11h" Content="Encoder error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=12h" Content="Adjustment error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=13h" Content="Emergency stop activated"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=14h" Content="Reverse limit switch error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=15h" Content="Forward limit switch error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=16h" Content="IGBT temperature error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=17h" Content="Memory error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=18h" Content="Encoder output error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=19h" Content="Serial communication error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=20h" Content="Serial communication time out"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=22h" Content="Input power phase loss"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=23h" Content="Early warning for overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=24h" Content="Encoder initial magnetic field error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=25h" Content="Encoder internal error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=26h" Content="Encoder internal error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=27h" Content="Encoder data error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=28h" Content="Encoder voltage error or encoder internal error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=29h" Content="Gray code error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=30h" Content="Motor protection error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=31h" Content="U,V,W wiring error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=34h" Content="Internal communication of the encoder is in error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=35h" Content="Encoder temperature exceeds the protective range"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=40h" Content="Full-closed loop excessive deviation"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=41h" Content="Communication of CN5 is breakdown"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=42h" Content="Analog input voltage error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=44h" Content="Warning of servo drive function overload"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=45h" Content="Wrong setting of E-gear ratio"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=60h" Content="The absolute position is lost"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=61h" Content="Encoder under voltage"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=62h" Content="The multi-turn of absolute encoder overflows"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=68h" Content="Absolute data transmitted via I/O is in error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=69h" Content="Wrong motor type"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=6Ah" Content="The absolute coordinate has not been initialized"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=70h" Content="Encoder does not complete the command which is issued by servo drive"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=83h" Content="Servo drive outputs excessive current"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=85h" Content="The absolute coordinate has not been initialized"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=95h" Content="The servo drive does not connect to external regenerative resistor"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=99h" Content="DSP Firmware Upgrade"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=111h" Content="CANopen SDO receives buffer overflow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=112h" Content="CANopen PDO receives buffer overflow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=121h" Content="Index error occurs when accessing CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=122h" Content="Sub-Index error occurs when accessing CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=123h" Content="Data Size error occurs when accessing CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=124h" Content="Data range error occurs when accessing CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=125h" Content="CANopen PDO is read-only and write-protected"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=126h" Content="CANopen PDO is not allowed in PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=127h" Content="CANopen PDO is write-protected when Servo On"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=128h" Content="Error occurs when reading CANopen PDO via EEPROM"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=129h" Content="Error occurs when writing CANopen PDO via EEPROM"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=130h" Content="The accessing address of EEPROM is out of range when using CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=131h" Content="CRC of EEPROM calculation error occurs when using CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=132h" Content="Enter the incorrect password when using CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=170h" Content="CANopen Heartbeat or NodeGuarding error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=180h" Content="CANopen Heartbeat or NodeGuarding error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=185h" Content="Abnormal CAN Bus hardware"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=186h" Content="CAN Bus off"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=201h" Content="CANopen Data Initial Error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=207h" Content="Parameter group of PR#8 is out of range"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=209h" Content="The parameter number of PR#8 is out of range"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=213h" Content="The parameter setting of PR#8 is wrong"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=215h" Content="Write parameters: read-only"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=217h" Content="Write parameters: parameter locked"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=231h" Content="The setting of monitor item of PR#8 is out of range"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=235h" Content="PR command overflows"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=237h" Content="Indexing coordinate is undefined"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=245h" Content="PR positioning time out"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=249h" Content="PR path no. too large"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=261h" Content="Index error occurs when accessing CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=263h" Content="Sub-Index error occurs when accessing CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=265h" Content="Data Size error occurs when accessing CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=267h" Content="Data range error occurs when accessing CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=269h" Content="CANopen PDO is read-only and write-protected"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=26Bh" Content="CANopen PDO is not allowed in PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=26Dh" Content="CANopen PDO is write-protected when Servo On"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=26Fh" Content="Error occurs when reading CANopen PDO via EEPROM"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=271h" Content="Error occurs when writing CANopen PDO via EEPROM"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=273h" Content="The accessing address of EEPROM is out of range when using CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=275h" Content="CRC of EEPROM calculation error occurs when using CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=277h" Content="Enter the incorrect password when using CANopen PDO"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=283h" Content="Forward software limit"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=285h" Content="Reverse software limit 5445"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=289h" Content="Feedback position counter overflows"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=291h" Content="Servo OFF error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=301h" Content="CANopen fails to synchronize"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=302h" Content="The synchronized signal of CANopen is sent too fast"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=303h" Content="The synchronized signal of CANopen is sent too slow"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=304h" Content="CANopen IP command is failed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=305h" Content="SYNC Period is in error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=380h" Content="Position Deviation Alarm"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3E1h" Content="CANopen SYNC failed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3E2h" Content="CANopen SYNC signal error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3E3h" Content="CANopen SYNC time out"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3E4h" Content="CANopen IP command failed"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=3E5h" Content="SYNC period error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=400h" Content="Index coordinates error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=401h" Content="NMT Reset command is received when Servo On"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=404h" Content="Value of PR special filter setting is too big"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=500h" Content="STO function is enabled"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=501h" Content="STO_A lost (signal lost or error)"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=502h" Content="STO_B lost (signal lost or error)"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=503h" Content="STO_error"/>
+	<Message ID="AlarmMsg::Drv_ECAT_DELTA::ID=555h" Content="System Failure"/>
+</ResMap>

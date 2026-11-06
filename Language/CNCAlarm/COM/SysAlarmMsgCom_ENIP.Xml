@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResMap>
+	<Message ID="AlarmMsg::ENIP::ID=1" Content="Connection Error"/>
+	<Message ID="AlarmMsg::ENIP::ID=2" Content="Send Request Error"/>
+	<Message ID="AlarmMsg::ENIP::ID=3" Content="Receive Response Timeout"/>
+	<Message ID="AlarmMsg::ENIP::ID=4" Content="Encapsulation Message Error"/>
+	<Message ID="AlarmMsg::ENIP::ID=5" Content="Internet Exception Error"/>
+	<Message ID="AlarmMsg::ENIP::ID=6" Content="Establish Implicit Connection Failure"/>
+	<Message ID="AlarmMsg::ENIP::ID=7" Content="Implicit Connection Exception"/>
+	<Message ID="AlarmMsg::ENIP::ID=8" Content="Unsupported Request Packet Interval"/>
+	<Message ID="AlarmMsg::ENIP::ID=9" Content="Invalid Start Registry Settings"/>
+</ResMap>
