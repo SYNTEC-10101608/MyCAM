@@ -40,6 +40,9 @@ namespace FileTranslator
 					isAllExist = false;
 				}
 			}
+			if( GetCustPostValue( CustPostContentDict, CustPost.EPostSection.ExternalAxisHeader.ToString(), out var externalAxisHeader ) ) {
+				defaultContentDict[ CustPost.EPostSection.ExternalAxisHeader.ToString() ] = externalAxisHeader;
+			}
 			custPost = new CustPost( defaultContentDict );
 			return isAllExist;
 		}

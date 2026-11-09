@@ -2,8 +2,10 @@
 using MyCAM.Data;
 using MyCAM.Helper;
 using MyCAM.PathCache;
+using OCC.gp;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 namespace MyCAM.Post
@@ -18,7 +20,8 @@ namespace MyCAM.Post
 			}
 			m_DataManager = dataManager;
 			m_PathIDList = dataManager.PathIDList;
-			m_AxisConfig = new AxisConfig( dataManager.MachineData as FiveAxisMachineData );
+			m_MachineData = dataManager.MachineData as FiveAxisMachineData;
+			m_AxisConfig = new AxisConfig( m_MachineData );
 			m_TraverseCalculationInfo = TraverseHelper.BuildTraverseCalculationInfo( dataManager );
 			m_EntryAndExitData = dataManager.EntryAndExitData;
 		}
@@ -29,11 +32,19 @@ namespace MyCAM.Post
 		AxisConfig m_AxisConfig;
 		TraverseCalculationInfo m_TraverseCalculationInfo;
 		EntryAndExitData m_EntryAndExitData;
+		FiveAxisMachineData m_MachineData;
+		PostSolver m_NCPostSolver;
+		bool HasExternalAxes => m_MachineData != null && m_MachineData.ExternalAxes.Type != ExternalAxisType.None;
 
 		public bool ConvertSuccess( string fileName, string szTempFilePath, bool drawingOnly, out string errorMessage )
 		{
 			errorMessage = string.Empty;
 			try {
+				if( HasExternalAxes && string.IsNullOrWhiteSpace( MyApp.CustomizedPostInfo?.ExternalAxisHeader ) ) {
+					errorMessage = "External axes require a non-empty <ExternalAxisHeader> customized post section.";
+					return false;
+				}
+				m_NCPostSolver = HasExternalAxes ? new PostSolver( m_MachineData ) : null;
 				using( m_StreamWriter = new StreamWriter( szTempFilePath ) ) {
 					m_StreamWriter.WriteLine( "%@MACRO" );
 					WriteCalibrationSection( drawingOnly );
@@ -128,18 +139,24 @@ namespace MyCAM.Post
 
 		void WriteExitSection( PathEndInfo endInfoOfLastPath )
 		{
-			if( m_PathIDList.Count == 0 ) {
+			if( endInfoOfLastPath == null ) {
 				return;
 			}
 			PostTraverseBuilder.CalculateExit( endInfoOfLastPath, m_EntryAndExitData, out PostPoint exitPoint );
 			m_StreamWriter.WriteLine( "// Exit" );
-			NCWriterHelper.WriteLinearTraverse( m_StreamWriter, exitPoint, m_AxisConfig );
+			NCWriterHelper.WriteLinearTraverse( m_StreamWriter, TransformNCPoint( exitPoint ), m_AxisConfig );
 		}
 
 		bool ProcessAllPaths( out PathEndInfo endInfoOfLastPath, out string errorMessage )
 		{
 			errorMessage = string.Empty;
 			endInfoOfLastPath = null;
+			Dictionary<int, ProcessPathGroup> groupStarts = new Dictionary<int, ProcessPathGroup>();
+			if( HasExternalAxes ) {
+				foreach( ProcessPathGroup group in CacheHelper.GetProcessPathGroups( m_PathIDList, m_MachineData ) ) {
+					groupStarts.Add( group.PathIndices[ 0 ], group );
+				}
+			}
 			for( int i = 0; i < m_PathIDList.Count; i++ ) {
 				if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) || !DataGettingHelper.GetCraftDataByID( m_PathIDList[ i ], out CraftData craftData ) ) {
 					continue;
@@ -148,6 +165,17 @@ namespace MyCAM.Post
 				if( craftData.ProcessPath == false ) {
 					WriteNonProcessingPath( i + 1 );
 					continue;
+				}
+				if( groupStarts.TryGetValue( i, out ProcessPathGroup groupStart ) ) {
+					if( endInfoOfLastPath != null ) {
+						WriteExitSection( endInfoOfLastPath );
+					}
+					endInfoOfLastPath = null;
+					CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo.ExternalAxisHeader,
+						new Dictionary<string, string> {
+							{ "ExtAxisPos1", groupStart.ExternalAxisPos.Ext1.ToString( "G17", CultureInfo.InvariantCulture ) },
+							{ "ExtAxisPos2", groupStart.ExternalAxisPos.Ext2.ToString( "G17", CultureInfo.InvariantCulture ) }
+						} );
 				}
 				bool isEntry = endInfoOfLastPath == null;
 				if( pathType == PathType.Contour ) {
@@ -302,6 +330,7 @@ namespace MyCAM.Post
 
 		void WriteCutting( PostData currentPathPostData, string szPathID, CraftData craftData, int N_Index, bool isEntry, int nLayIndex = 1 )
 		{
+			TransformNCTraverse( currentPathPostData );
 			double enterTiltAngle_deg = GetStartOrEndTiltAngle_deg( currentPathPostData, isStartPoint: true );
 
 			// Header
@@ -346,7 +375,39 @@ namespace MyCAM.Post
 
 		void WriteStandardPatternCutting( PathType type, StdPatternPostData currentPathPostData, CraftData craftData, IStdPatternGeomData geomData, int N_Index, bool isEntry )
 		{
+			TransformNCTraverse( currentPathPostData );
 			StdPatternNCWriter.WriteStandardPatternCutting( m_StreamWriter, type, currentPathPostData, craftData, geomData, N_Index, m_AxisConfig, isEntry );
+		}
+
+		PostPoint TransformNCPoint( PostPoint point )
+		{
+			if( point == null || m_NCPostSolver == null ) {
+				return point;
+			}
+			gp_Pnt positioned = m_NCPostSolver.TransformExternalPosition( new gp_Pnt( point.X, point.Y, point.Z ),
+				point.ExternalAxisPos, m_MachineData.SimulationOffset );
+			PostPoint result = point.Clone();
+			result.X = positioned.X();
+			result.Y = positioned.Y();
+			result.Z = positioned.Z();
+			return result;
+		}
+
+		void TransformNCTraverse( ITraversePostData postData )
+		{
+			if( m_NCPostSolver == null ) {
+				return;
+			}
+			// Replace NC-only points, leaving shared machining points and macro reference data in G54.
+			postData.ProcessStartPoint = TransformNCPoint( postData.ProcessStartPoint );
+			postData.LiftUpPostPoint = TransformNCPoint( postData.LiftUpPostPoint );
+			postData.CutDownPostPoint = TransformNCPoint( postData.CutDownPostPoint );
+			postData.FrogLeapMidPostPoint = TransformNCPoint( postData.FrogLeapMidPostPoint );
+			postData.LiftUpPostSafePlanePoint = TransformNCPoint( postData.LiftUpPostSafePlanePoint );
+			postData.CutDownPostSafePlanePoint = TransformNCPoint( postData.CutDownPostSafePlanePoint );
+			if( postData.SafeBoundaryPostPointList != null ) {
+				postData.SafeBoundaryPostPointList = postData.SafeBoundaryPostPointList.ConvertAll( TransformNCPoint );
+			}
 		}
 
 		void WriteOnePoint( PostPoint postPoint, double? tiltAngle_deg = null, string szExtendedGCode = null, bool isRCornerStart = false, bool isRCornerEnd = false )
@@ -354,6 +415,7 @@ namespace MyCAM.Post
 			if( postPoint == null ) {
 				return;
 			}
+			postPoint = TransformNCPoint( postPoint );
 			string szX = postPoint.X.ToString( "F3" );
 			string szY = postPoint.Y.ToString( "F3" );
 			string szZ = postPoint.Z.ToString( "F3" );

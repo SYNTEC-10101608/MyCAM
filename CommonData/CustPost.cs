@@ -44,6 +44,11 @@ namespace CommonData
 			get;
 		} = string.Empty;
 
+		public string ExternalAxisHeader
+		{
+			get;
+		} = string.Empty;
+
 		// constructor with default content
 		public CustPost()
 		{
@@ -83,6 +88,9 @@ namespace CommonData
 			if( custPostMap.TryGetValue( EPostSection.TraverseTail.ToString(), out var traverseTailContent ) ) {
 				TraverseTail = traverseTailContent;
 			}
+			if( custPostMap.TryGetValue( EPostSection.ExternalAxisHeader.ToString(), out var externalAxisHeaderContent ) ) {
+				ExternalAxisHeader = externalAxisHeaderContent;
+			}
 		}
 
 		public const string DEFAULT_Header = "G43.4 P1;\nG65 P\"FileStart\" X\"Material1\" Y\"1.0\";";
@@ -103,7 +111,8 @@ namespace CommonData
 			StdPathHeader,
 			StdPathTail,
 			TraverseHeader,
-			TraverseTail
+			TraverseTail,
+			ExternalAxisHeader
 		}
 	}
 }
