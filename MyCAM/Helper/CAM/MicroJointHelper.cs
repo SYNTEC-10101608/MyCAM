@@ -161,6 +161,7 @@ namespace MyCAM.Helper.CAM
 
 			// create new CAMPoint
 			CAMPoint camPoint = new CAMPoint( newCADPoint, averageToolVec );
+			camPoint.ExternalAxisPos = startPoint.ExternalAxisPos;
 
 			// interpolate master/slave angle by distance ratio
 			camPoint.ModMaster_rad = startPoint.ModMaster_rad + ( endPoint.ModMaster_rad - startPoint.ModMaster_rad ) * ( dLength / startPnt.Distance( endPnt ) );

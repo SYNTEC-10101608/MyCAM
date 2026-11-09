@@ -92,6 +92,7 @@ namespace MyCAM.Helper
 			gp_Dir toolVec = endOfMain.ToolVec;
 			CADPoint cadPoint = new CADPoint( location, endOfMain.NormalVec_1st, endOfMain.NormalVec_2nd, tangentVec );
 			CAMPoint camPoint = new CAMPoint( cadPoint, isToolVecReverse );
+			camPoint.ExternalAxisPos = endOfMain.ExternalAxisPos;
 
 			// copy the tool vector from the end of main point
 			camPoint.ToolVec = toolVec;

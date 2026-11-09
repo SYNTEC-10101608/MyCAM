@@ -166,6 +166,11 @@ namespace MyCAM.Data
 	// five-axis post point: shared point + master / slave rotary values
 	public class PostPoint : PostPointBase
 	{
+		public ExternalAxisPos ExternalAxisPos
+		{
+			get; set;
+		}
+
 		public double Master
 		{
 			get; set;
@@ -192,6 +197,7 @@ namespace MyCAM.Data
 			newPoint.TiltAngle_deg = TiltAngle_deg;
 			newPoint.IsMicroJointStart = IsMicroJointStart;
 			newPoint.IsMicroJointEnd = IsMicroJointEnd;
+			newPoint.ExternalAxisPos = ExternalAxisPos;
 			return newPoint;
 		}
 	}

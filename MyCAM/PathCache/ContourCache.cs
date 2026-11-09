@@ -440,6 +440,7 @@ namespace MyCAM.PathCache
 				// build CAM point
 				CADPoint cadPoint = m_CADPointList[ i ];
 				CAMPoint camPoint = new CAMPoint( cadPoint, m_CraftData.IsToolVecReverse );
+				camPoint.ExternalAxisPos = m_CraftData.ExternalAxisPos;
 				camPoint.InitPathIndex = ( m_OriginalIndexMap != null && i < m_OriginalIndexMap.Count )
 					? m_OriginalIndexMap[ i ]
 					: i;

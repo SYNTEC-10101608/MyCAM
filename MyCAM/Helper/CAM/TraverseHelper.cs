@@ -100,7 +100,7 @@ namespace MyCAM.Helper
 			gp_Pnt resultPoint = pathPoint.Point.Translated( scaledToolVec );
 
 			// create tool up/down point info
-			return BuildTraversePoint( resultPoint, pathPoint.ToolVec );
+			return BuildTraversePoint( resultPoint, pathPoint.ToolVec, pathPoint.ExternalAxisPos );
 		}
 
 		static bool GetFrogLeapMiddlePoint( IProcessPoint frogLeapStartPoint, IProcessPoint frogLeapEndPoint, double frogLeapDistance, out IProcessPoint middlePoint )
@@ -120,7 +120,7 @@ namespace MyCAM.Helper
 
 			// if frog leap distance is zero, return middle point between start and end point
 			if( frogLeapDistance == 0 ) {
-				middlePoint = BuildTraversePoint( moveMidP, new gp_Dir() ); // tool vector doesn't matter
+				middlePoint = BuildTraversePoint( moveMidP, new gp_Dir(), frogLeapStartPoint.ExternalAxisPos ); // tool vector doesn't matter
 				return true;
 			}
 
@@ -151,7 +151,7 @@ namespace MyCAM.Helper
 			gp_Pnt frogLeapMidP = moveMidP.Translated( scaledMoveToArcMidVec );
 
 			// create frog leap middle point info
-			middlePoint = BuildTraversePoint( frogLeapMidP, arcMidDir );
+			middlePoint = BuildTraversePoint( frogLeapMidP, arcMidDir, frogLeapStartPoint.ExternalAxisPos );
 			return true;
 		}
 
@@ -164,7 +164,7 @@ namespace MyCAM.Helper
 		}
 
 		// this method is now for building a CAMPoint as ITraversePoint
-		static IProcessPoint BuildTraversePoint( gp_Pnt point, gp_Dir toolVec )
+		static IProcessPoint BuildTraversePoint( gp_Pnt point, gp_Dir toolVec, ExternalAxisPos externalAxisPos )
 		{
 			CADPoint cadPoint = new CADPoint(
 				point,
@@ -172,7 +172,7 @@ namespace MyCAM.Helper
 				new gp_Dir(), // doesn't matter
 				new gp_Dir() // doesn't matter
 			);
-			return new CAMPoint( cadPoint, toolVec );
+			return new CAMPoint( cadPoint, toolVec ) { ExternalAxisPos = externalAxisPos };
 		}
 
 		static gp_Pln CreateSafePlane( double safePlaneZ )

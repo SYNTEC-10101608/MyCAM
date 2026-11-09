@@ -131,7 +131,8 @@ namespace MyCAM.Post
 				Y = pointG54.Y(),
 				Z = pointG54.Z(),
 				Master = point.ModMaster_rad,
-				Slave = point.ModSlave_rad
+				Slave = point.ModSlave_rad,
+				ExternalAxisPos = point.ExternalAxisPos
 			};
 			resultG54 = frameDataG54;
 			return true;

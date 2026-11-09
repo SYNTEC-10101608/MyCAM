@@ -421,6 +421,7 @@ namespace MyCAM.Helper
 			leadPnt.InitSlave_rad = msComparisonPnt.InitSlave_rad;
 			leadPnt.ModMaster_rad = msComparisonPnt.ModMaster_rad;
 			leadPnt.ModSlave_rad = msComparisonPnt.ModSlave_rad;
+			leadPnt.ExternalAxisPos = msComparisonPnt.ExternalAxisPos;
 		}
 
 		const double DISCRETE_MAX_DEFLECTION = 0.01;

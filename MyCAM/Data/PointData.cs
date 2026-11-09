@@ -90,6 +90,11 @@ namespace MyCAM.Data
 
 	public interface ISetToolVecPoint
 	{
+		ExternalAxisPos ExternalAxisPos
+		{
+			get;
+		}
+
 		gp_Pnt Point
 		{
 			get;
@@ -153,6 +158,11 @@ namespace MyCAM.Data
 
 	public interface IOrientationPoint
 	{
+		ExternalAxisPos ExternalAxisPos
+		{
+			get;
+		}
+
 		gp_Pnt Point
 		{
 			get;
@@ -173,6 +183,11 @@ namespace MyCAM.Data
 
 	public interface IProcessPoint
 	{
+		ExternalAxisPos ExternalAxisPos
+		{
+			get;
+		}
+
 		gp_Pnt Point
 		{
 			get;
@@ -224,6 +239,11 @@ namespace MyCAM.Data
 
 	public class CAMPoint : ISetToolVecPoint, IOrientationPoint, IProcessPoint
 	{
+		public ExternalAxisPos ExternalAxisPos
+		{
+			get; set;
+		}
+
 		public CAMPoint( CADPoint cadPoint )
 		{
 			m_CADPoint = cadPoint.Clone();
@@ -368,6 +388,7 @@ namespace MyCAM.Data
 			newPoint.InitPathIndex = InitPathIndex;
 			newPoint.IsMicroJointStart = IsMicroJointStart;
 			newPoint.IsMicroJointEnd = IsMicroJointEnd;
+			newPoint.ExternalAxisPos = ExternalAxisPos;
 			return newPoint;
 		}
 

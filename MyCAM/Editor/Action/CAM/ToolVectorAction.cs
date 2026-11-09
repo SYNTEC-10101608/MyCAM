@@ -1066,7 +1066,7 @@ namespace MyCAM.Editor
 			}
 
 			// call the product builder api
-			PostPoint orientationPoint = new PostPoint() { Master = masterAngle_rad, Slave = slaveAngle_rad };
+			PostPoint orientationPoint = new PostPoint() { Master = masterAngle_rad, Slave = slaveAngle_rad, ExternalAxisPos = m_SelectedPoint.ExternalAxisPos };
 			SimuPathBuilderBase simuPathBuilder = SimuPathBuilderFactory.Create( machineData );
 			bool calSuccess = simuPathBuilder.BuildSinglePointFrameTransform(
 				machineData,

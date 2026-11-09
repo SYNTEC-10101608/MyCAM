@@ -31,7 +31,8 @@ namespace MyCAM.Post
 					Y = result.LiftUpPoint.Point.Y(),
 					Z = result.LiftUpPoint.Point.Z(),
 					Master = endInfoOfPreviousPath.Master,
-					Slave = endInfoOfPreviousPath.Slave
+					Slave = endInfoOfPreviousPath.Slave,
+					ExternalAxisPos = previousEndPoint.ExternalAxisPos
 				};
 			}
 
@@ -43,7 +44,8 @@ namespace MyCAM.Post
 					Y = result.FrogLeapMiddlePoint.Point.Y(),
 					Z = result.FrogLeapMiddlePoint.Point.Z(),
 					Master = ( endInfoOfPreviousPath.Master + pathG54PostData.ProcessStartPoint.Master ) / 2.0,
-					Slave = ( endInfoOfPreviousPath.Slave + pathG54PostData.ProcessStartPoint.Slave ) / 2.0
+					Slave = ( endInfoOfPreviousPath.Slave + pathG54PostData.ProcessStartPoint.Slave ) / 2.0,
+					ExternalAxisPos = previousEndPoint.ExternalAxisPos
 				};
 			}
 
@@ -55,7 +57,8 @@ namespace MyCAM.Post
 					Y = result.SafePlaneLiftUpProjPoint.Y(),
 					Z = result.SafePlaneLiftUpProjPoint.Z(),
 					Master = endInfoOfPreviousPath.Master,
-					Slave = endInfoOfPreviousPath.Slave
+					Slave = endInfoOfPreviousPath.Slave,
+					ExternalAxisPos = previousEndPoint.ExternalAxisPos
 				};
 			}
 			if( result.SafePlaneCutDownProjPoint != null ) {
@@ -65,12 +68,13 @@ namespace MyCAM.Post
 					Y = result.SafePlaneCutDownProjPoint.Y(),
 					Z = result.SafePlaneCutDownProjPoint.Z(),
 					Master = pathG54PostData.ProcessStartPoint.Master,
-					Slave = pathG54PostData.ProcessStartPoint.Slave
+					Slave = pathG54PostData.ProcessStartPoint.Slave,
+					ExternalAxisPos = currentStartPoint.ExternalAxisPos
 				};
 			}
 
 			// safe cylinder or safe sphere
-			if( result.SafeBoundaryPointList != null ) {
+			if( result.SafeBoundaryPointList != null && result.SafeBoundaryPointList.Count > 0 ) {
 
 				List<gp_Pnt> boundaryPoints = result.SafeBoundaryPointList;
 
@@ -86,7 +90,8 @@ namespace MyCAM.Post
 				var boundaryPostPoints = new List<PostPoint>( boundaryPoints.Count );
 				for( int i = 0; i < boundaryPoints.Count; ++i ) {
 
-					double ratio = cumulativeLengths[ i ] / totalLength;
+					double ratio = totalLength > 0 ? cumulativeLengths[ i ] / totalLength :
+						( boundaryPoints.Count > 1 ? (double)i / ( boundaryPoints.Count - 1 ) : 0 );
 
 					boundaryPostPoints.Add( new PostPoint()
 					{
@@ -94,7 +99,8 @@ namespace MyCAM.Post
 						Y = boundaryPoints[ i ].Y(),
 						Z = boundaryPoints[ i ].Z(),
 						Master = endInfoOfPreviousPath.Master + ratio * ( pathG54PostData.ProcessStartPoint.Master - endInfoOfPreviousPath.Master ),
-						Slave = endInfoOfPreviousPath.Slave + ratio * ( pathG54PostData.ProcessStartPoint.Slave - endInfoOfPreviousPath.Slave )
+						Slave = endInfoOfPreviousPath.Slave + ratio * ( pathG54PostData.ProcessStartPoint.Slave - endInfoOfPreviousPath.Slave ),
+						ExternalAxisPos = previousEndPoint.ExternalAxisPos
 					} );
 				}
 				pathG54PostData.SafeBoundaryPostPointList = boundaryPostPoints;
@@ -108,7 +114,8 @@ namespace MyCAM.Post
 					Y = result.CutDownPoint.Point.Y(),
 					Z = result.CutDownPoint.Point.Z(),
 					Master = pathG54PostData.ProcessStartPoint.Master,
-					Slave = pathG54PostData.ProcessStartPoint.Slave
+					Slave = pathG54PostData.ProcessStartPoint.Slave,
+					ExternalAxisPos = currentStartPoint.ExternalAxisPos
 				};
 			}
 			pathG54PostData.FollowSafeDistance = currentPathNCPack.TraverseData.FollowSafeDistance;
@@ -137,7 +144,8 @@ namespace MyCAM.Post
 				Y = entryPoint.Point.Y(),
 				Z = entryPoint.Point.Z(),
 				Master = pathG54PostData.ProcessStartPoint.Master,
-				Slave = pathG54PostData.ProcessStartPoint.Slave
+				Slave = pathG54PostData.ProcessStartPoint.Slave,
+				ExternalAxisPos = currentPathNCPack.ProcessStartPoint.ExternalAxisPos
 			};
 			pathG54PostData.FollowSafeDistance = entryAndExitData.FollowSafeDistance;
 		}
@@ -160,7 +168,8 @@ namespace MyCAM.Post
 				Y = exitPoint.Point.Y(),
 				Z = exitPoint.Point.Z(),
 				Master = endInfoOfLastPath.Master,
-				Slave = endInfoOfLastPath.Slave
+				Slave = endInfoOfLastPath.Slave,
+				ExternalAxisPos = endInfoOfLastPath.EndCAMPoint.ExternalAxisPos
 			};
 		}
 	}

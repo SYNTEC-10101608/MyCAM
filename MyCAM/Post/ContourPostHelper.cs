@@ -184,6 +184,7 @@ namespace MyCAM.Post
 					Z = pointG54.Z(),
 					Master = rotateAngleList[ i ].Item1,
 					Slave = rotateAngleList[ i ].Item2,
+					ExternalAxisPos = pointList[ i ].ExternalAxisPos,
 					TiltAngle_deg = pointList[ i ].TiltAngle_deg,
 					IsMicroJointEnd = pointList[ i ].IsMicroJointEnd,
 					IsMicroJointStart = pointList[ i ].IsMicroJointStart

@@ -1038,8 +1038,50 @@ namespace MyCAM.FileManager
 		}
 	}
 
+	public class ExternalAxisPosDTO
+	{
+		public double? Ext1
+		{
+			get; set;
+		}
+
+		public double? Ext2
+		{
+			get; set;
+		}
+
+		public ExternalAxisPosDTO()
+		{
+		}
+
+		internal ExternalAxisPosDTO( ExternalAxisPos position )
+		{
+			Ext1 = position.Ext1;
+			Ext2 = position.Ext2;
+		}
+
+		internal ExternalAxisPos ToExternalAxisPos()
+		{
+			if( !Ext1.HasValue || !Ext2.HasValue ) {
+				throw new ArgumentException( "ExternalAxisPos deserialization failed: Missing required fields." );
+			}
+			if( double.IsNaN( Ext1.Value ) || double.IsInfinity( Ext1.Value ) ) {
+				throw new ArgumentException( "ExternalAxisPos.Ext1 deserialization failed: Value must be finite." );
+			}
+			if( double.IsNaN( Ext2.Value ) || double.IsInfinity( Ext2.Value ) ) {
+				throw new ArgumentException( "ExternalAxisPos.Ext2 deserialization failed: Value must be finite." );
+			}
+			return new ExternalAxisPos( Ext1.Value, Ext2.Value );
+		}
+	}
+
 	public class CraftDataDTO
 	{
+		public ExternalAxisPosDTO ExternalAxisPos
+		{
+			get; set;
+		}
+
 		// properties
 		public int? TechLayer
 		{
@@ -1187,6 +1229,7 @@ namespace MyCAM.FileManager
 				return;
 			}
 			TechLayer = craftData.TechLayer;
+			ExternalAxisPos = new ExternalAxisPosDTO( craftData.ExternalAxisPos );
 			ProcessPath = craftData.ProcessPath;
 			IsPathReverse = craftData.IsPathReverse;
 			IsToolVecReverse = craftData.IsToolVecReverse;
@@ -1285,6 +1328,7 @@ namespace MyCAM.FileManager
 			craftData.CompensatedDistance = CompensatedDistance.Value;
 			craftData.InitMaster_rad = InitMaster_rad ?? 0.0;
 			craftData.InitSlave_rad = InitSlave_rad ?? 0.0;
+			craftData.ExternalAxisPos = ExternalAxisPos?.ToExternalAxisPos() ?? default( ExternalAxisPos );
 
 			return craftData;
 		}

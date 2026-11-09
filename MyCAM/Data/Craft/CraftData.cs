@@ -172,6 +172,47 @@ namespace MyCAM.Data
 		}
 	}
 
+	// Assigned external rotary positions, in degrees; copied by value between paths and points.
+	public struct ExternalAxisPos : IEquatable<ExternalAxisPos>
+	{
+		public ExternalAxisPos( double ext1, double ext2 )
+		{
+			if( double.IsNaN( ext1 ) || double.IsInfinity( ext1 ) ) {
+				throw new ArgumentOutOfRangeException( nameof( ext1 ), ext1, "External axis angle must be finite." );
+			}
+			if( double.IsNaN( ext2 ) || double.IsInfinity( ext2 ) ) {
+				throw new ArgumentOutOfRangeException( nameof( ext2 ), ext2, "External axis angle must be finite." );
+			}
+			Ext1 = ext1;
+			Ext2 = ext2;
+		}
+
+		public double Ext1
+		{
+			get;
+		}
+
+		public double Ext2
+		{
+			get;
+		}
+
+		public bool Equals( ExternalAxisPos other )
+		{
+			return Ext1.Equals( other.Ext1 ) && Ext2.Equals( other.Ext2 );
+		}
+
+		public override bool Equals( object obj )
+		{
+			return obj is ExternalAxisPos other && Equals( other );
+		}
+
+		public override int GetHashCode()
+		{
+			return Ext1.GetHashCode() ^ Ext2.GetHashCode();
+		}
+	}
+
 	public class CraftData
 	{
 		public CraftData()
@@ -239,6 +280,21 @@ namespace MyCAM.Data
 
 		public Action CAMFactorChanged;
 		public Action CADFactorChanged;
+
+		public ExternalAxisPos ExternalAxisPos
+		{
+			get
+			{
+				return m_ExternalAxisPos;
+			}
+			set
+			{
+				if( !m_ExternalAxisPos.Equals( value ) ) {
+					m_ExternalAxisPos = value;
+					CAMFactorChanged?.Invoke();
+				}
+			}
+		}
 
 		public int TechLayer
 		{
@@ -928,5 +984,6 @@ namespace MyCAM.Data
 		double m_CompensatedDistance = 0;
 		double m_InitMaster_rad = 0;
 		double m_InitSlave_rad = 0;
+		ExternalAxisPos m_ExternalAxisPos;
 	}
 }

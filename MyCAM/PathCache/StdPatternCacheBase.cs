@@ -182,6 +182,7 @@ namespace MyCAM.PathCache
 
 		protected void SolveRefPntInitIK()
 		{
+			m_RefPoint.ExternalAxisPos = m_CraftData.ExternalAxisPos;
 			const double DEFAULT_RAD = 0;
 			// arrange solver
 			if( !DataGettingHelper.GetMachineData( out FiveAxisMachineData machineData ) ) {
@@ -339,6 +340,7 @@ namespace MyCAM.PathCache
 			foreach( CADPoint cadPoint in cadPointList ) {
 				CADPoint point = cadPoint.Clone();
 				CAMPoint camPoint = new CAMPoint( point, IsToolVecReverse );
+				camPoint.ExternalAxisPos = m_RefPoint.ExternalAxisPos;
 				camPoint.InitMaster_rad = m_RefPoint.InitMaster_rad;
 				camPoint.InitSlave_rad = m_RefPoint.InitSlave_rad;
 				camPoint.ModMaster_rad = m_RefPoint.ModMaster_rad;
