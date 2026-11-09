@@ -26,8 +26,11 @@ namespace MyCAM.Helper
 				return false;
 			}
 
-			// build full path IK point list ( each path is connected )
-			bool bGetWholePathIK = GetWholePathIKPnt( calNeedData.EachPathIKPostDataList, calNeedData.LastPathLastPnt, calNeedData.EntryAndExitData, calNeedData.PostSolver, out List<PathSimuIKData> pathIKPntList );
+			// Each group has its own entry / exit; do not connect groups.
+			List<PathSimuIKData> pathIKPntList;
+			bool bGetWholePathIK = calNeedData.ProcessGroups != null
+				? GetGroupedPathIKPnt( calNeedData.ProcessGroups, calNeedData.EntryAndExitData, calNeedData.PostSolver, out pathIKPntList )
+				: GetWholePathIKPnt( calNeedData.EachPathIKPostDataList, calNeedData.LastPathLastPnt, calNeedData.EntryAndExitData, calNeedData.PostSolver, out pathIKPntList );
 			if( !bGetWholePathIK ) {
 				return false;
 			}
@@ -118,6 +121,25 @@ namespace MyCAM.Helper
 			// materialize into the output Dictionary once
 			for( int i = 0; i < componentCount; i++ ) {
 				frameTransformMap[ builder.ComponentTypes[ i ] ] = lists[ i ];
+			}
+			return true;
+		}
+
+		internal bool GetGroupedPathIKPnt(
+			IReadOnlyList<SimuData.ProcessGroupPostData> processGroups,
+			EntryAndExitData entryAndExitData,
+			PostSolver postSolver,
+			out List<PathSimuIKData> pathSimuPntList )
+		{
+			pathSimuPntList = new List<PathSimuIKData>();
+			if( processGroups == null || processGroups.Count == 0 ) {
+				return false;
+			}
+			foreach( SimuData.ProcessGroupPostData group in processGroups ) {
+				if( group == null || !GetWholePathIKPnt( group.PostDataList.ToList(), group.ProcessEndPoint, entryAndExitData, postSolver, out List<PathSimuIKData> groupPoints ) ) {
+					return false;
+				}
+				pathSimuPntList.AddRange( groupPoints );
 			}
 			return true;
 		}

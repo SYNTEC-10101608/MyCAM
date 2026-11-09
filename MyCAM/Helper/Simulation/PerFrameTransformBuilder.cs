@@ -1,5 +1,6 @@
 using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Post;
 using OCC.gp;
 using System.Collections.Generic;
 
@@ -88,6 +89,7 @@ namespace MyCAM.Helper
 			: base( machineData )
 		{
 			m_MachineData = machineData;
+			m_PostSolver = machineData == null ? null : new PostSolver( machineData );
 		}
 
 		public override void BuildFrameTransforms( PostPointBase framePoint, gp_Vec g54,
@@ -113,9 +115,9 @@ namespace MyCAM.Helper
 			SetBuf( ref outBuf, MachineComponentType.Master, CreateAxisRotation( m_MachineData.MasterAxis.RotateCenter, m_MachineData.MasterAxis.RotateDir, fiveAxisPoint.Master, workPiecesChainSet.Contains( MachineComponentType.Master ) ) );
 			SetBuf( ref outBuf, MachineComponentType.Slave, CreateAxisRotation( m_MachineData.SlaveAxis.RotateCenter, m_MachineData.SlaveAxis.RotateDir, fiveAxisPoint.Slave, workPiecesChainSet.Contains( MachineComponentType.Slave ) ) );
 
-			// External axes stay at zero until their motion is connected to frame points.
-			SetBuf( ref outBuf, MachineComponentType.Ext1, new gp_Trsf() );
-			SetBuf( ref outBuf, MachineComponentType.Ext2, new gp_Trsf() );
+			// Shared transforms already use the workpiece-side rotation convention.
+			SetBuf( ref outBuf, MachineComponentType.Ext1, m_PostSolver.GetExternalAxis1Transform( fiveAxisPoint.ExternalAxisPos ) );
+			SetBuf( ref outBuf, MachineComponentType.Ext2, m_PostSolver.GetExternalAxis2Transform( fiveAxisPoint.ExternalAxisPos ) );
 
 			// laser / workpiece
 			SetBuf( ref outBuf, MachineComponentType.Laser, new gp_Trsf() );
@@ -135,6 +137,7 @@ namespace MyCAM.Helper
 		}
 
 		readonly FiveAxisMachineData m_MachineData;
+		readonly PostSolver m_PostSolver;
 	}
 
 	// articulated robot per-frame transform builder ( skeleton, FK filled in later step )

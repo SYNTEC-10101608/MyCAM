@@ -10,6 +10,7 @@ using OCC.gp;
 using OCC.Prs3d;
 using OCC.Quantity;
 using OCCViewer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -88,7 +89,7 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Remove( bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList, bUpdate );
+			Remove( m_TraverseAISDict.Keys.Concat( m_FrogLeapAISDict.Keys ).Distinct().ToList(), bUpdate );
 		}
 
 		public void Remove( List<string> pathIDList, bool bUpdate = false )
@@ -176,13 +177,13 @@ namespace MyCAM.Editor.Renderer
 		void ShowTraversePathWithTrans( List<string> pathIDList, gp_Trsf trsf )
 		{
 			TraverseCalculationInfo calculationInfo = TraverseHelper.BuildTraverseCalculationInfo( m_DataManager );
+			Dictionary<string, string> previousPathMap = GetPreviousProcessPathMap();
 			foreach( string currentPathID in pathIDList ) {
 				if( !DataGettingHelper.GetCraftDataByID( currentPathID, out CraftData craftData ) ||
 					craftData.TraverseData == null || craftData.ProcessPath == false ) {
 					continue;
 				}
-				string previousPathID = GetPreviousProcessPathID( currentPathID );
-				if( previousPathID == null ) {
+				if( !previousPathMap.TryGetValue( currentPathID, out string previousPathID ) ) {
 					continue;
 				}
 
@@ -259,73 +260,48 @@ namespace MyCAM.Editor.Renderer
 
 		void ShowEntryAndExitWithTrans( gp_Trsf trsf )
 		{
-			if( m_DataManager.PathIDList.Count == 0 ) {
-				return;
-			}
-
-			// entry
-			if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
-				string firstPathID = GetFirstProcessPathID( true );
-				if( firstPathID != null ) {
+			foreach( ProcessPathGroup group in GetProcessPathGroups() ) {
+				string firstPathID = group.PathIDs[ 0 ];
+				string lastPathID = group.PathIDs[ group.PathIDs.Count - 1 ];
+				if( m_DataManager.EntryAndExitData.EntryDistance > 0 ) {
 					IProcessPoint firstPathStartPoint = GetProcessStartPoint( firstPathID );
 					if( firstPathStartPoint != null ) {
 						IProcessPoint entryPoint = TraverseHelper.GetCutDownOrLiftUpPoint( firstPathStartPoint.Clone(), m_DataManager.EntryAndExitData.EntryDistance );
 						if( entryPoint != null ) {
 							List<AIS_Line> entryLineList = new List<AIS_Line>();
 							AddOneLinearTraverseWithTrans( entryLineList, entryPoint.Point, firstPathStartPoint.Point, trsf );
-							m_TraverseAISDict[ KEY_ENTRY ] = entryLineList;
+							m_TraverseAISDict[ KEY_ENTRY + ":" + firstPathID ] = entryLineList;
 						}
 					}
 				}
-			}
-
-			// exit
-			if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
-				string lastPathID = GetFirstProcessPathID( false );
-				if( lastPathID != null ) {
+				if( m_DataManager.EntryAndExitData.ExitDistance > 0 ) {
 					IProcessPoint lastPathEndPoint = GetProcessEndPoint( lastPathID );
 					if( lastPathEndPoint != null ) {
 						IProcessPoint exitPoint = TraverseHelper.GetCutDownOrLiftUpPoint( lastPathEndPoint.Clone(), m_DataManager.EntryAndExitData.ExitDistance );
 						if( exitPoint != null ) {
 							List<AIS_Line> exitLineList = new List<AIS_Line>();
 							AddOneLinearTraverseWithTrans( exitLineList, lastPathEndPoint.Point, exitPoint.Point, trsf );
-							m_TraverseAISDict[ KEY_EXIT ] = exitLineList;
+							m_TraverseAISDict[ KEY_EXIT + ":" + lastPathID ] = exitLineList;
 						}
 					}
 				}
 			}
 		}
 
-		string GetFirstProcessPathID( bool isFirst )
+		List<ProcessPathGroup> GetProcessPathGroups()
 		{
-			int nCount = m_DataManager.PathIDList.Count;
-			int nStart = isFirst ? 0 : nCount - 1;
-			int nEnd = isFirst ? nCount : -1;
-			int nStep = isFirst ? 1 : -1;
-			for( int i = nStart; i != nEnd; i += nStep ) {
-				string pathID = m_DataManager.PathIDList[ i ];
-				if( DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) &&
-					craftData.ProcessPath ) {
-					return pathID;
-				}
-			}
-			return null;
+			return CacheHelper.GetProcessPathGroups( m_DataManager.PathIDList, m_DataManager.MachineData as FiveAxisMachineData );
 		}
 
-		string GetPreviousProcessPathID( string currentPathID )
+		Dictionary<string, string> GetPreviousProcessPathMap()
 		{
-			int indexInAllPaths = m_DataManager.PathIDList.IndexOf( currentPathID );
-			if( indexInAllPaths <= 0 ) {
-				return null;
-			}
-			for( int i = indexInAllPaths - 1; i >= 0; i-- ) {
-				string pathID = m_DataManager.PathIDList[ i ];
-				if( DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) &&
-					craftData.ProcessPath ) {
-					return pathID;
+			Dictionary<string, string> previousPathMap = new Dictionary<string, string>();
+			foreach( ProcessPathGroup group in GetProcessPathGroups() ) {
+				for( int i = 1; i < group.PathIDs.Count; i++ ) {
+					previousPathMap[ group.PathIDs[ i ] ] = group.PathIDs[ i - 1 ];
 				}
 			}
-			return null;
+			return previousPathMap;
 		}
 
 		List<string> GetPathsToUpdate( List<string> pathIDList )
@@ -333,6 +309,10 @@ namespace MyCAM.Editor.Renderer
 			HashSet<string> pathsToUpdate = new HashSet<string>();
 
 			foreach( string pathID in pathIDList ) {
+				// A removed path's former successor is no longer available from the current order.
+				if( !m_DataManager.PathIDList.Contains( pathID ) ) {
+					return new List<string>( m_DataManager.PathIDList );
+				}
 				pathsToUpdate.Add( pathID );
 
 				// add next path
@@ -356,8 +336,14 @@ namespace MyCAM.Editor.Renderer
 		string GetNextPathIDInAllPaths( string currentPathID )
 		{
 			int indexInAllPaths = m_DataManager.PathIDList.IndexOf( currentPathID );
-			if( indexInAllPaths >= 0 && indexInAllPaths < m_DataManager.PathIDList.Count - 1 ) {
-				return m_DataManager.PathIDList[ indexInAllPaths + 1 ];
+			if( indexInAllPaths < 0 ) {
+				return null;
+			}
+			for( int i = indexInAllPaths + 1; i < m_DataManager.PathIDList.Count; i++ ) {
+				string pathID = m_DataManager.PathIDList[ i ];
+				if( DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) && craftData.ProcessPath ) {
+					return pathID;
+				}
 			}
 			return null;
 		}
@@ -379,14 +365,8 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 
-			if( m_TraverseAISDict.ContainsKey( KEY_ENTRY ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_ENTRY ] ) {
-					m_Viewer.GetAISContext().Display( lineAIS, false );
-					m_Viewer.GetAISContext().Deactivate( lineAIS );
-				}
-			}
-			if( m_TraverseAISDict.ContainsKey( KEY_EXIT ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_EXIT ] ) {
+			foreach( string key in m_TraverseAISDict.Keys.Where( IsEntryOrExitKey ) ) {
+				foreach( AIS_Line lineAIS in m_TraverseAISDict[ key ] ) {
 					m_Viewer.GetAISContext().Display( lineAIS, false );
 					m_Viewer.GetAISContext().Deactivate( lineAIS );
 				}
@@ -395,7 +375,7 @@ namespace MyCAM.Editor.Renderer
 
 		void RemoveTraverseLines( List<string> pathIDList )
 		{
-			foreach( string pathID in pathIDList ) {
+			foreach( string pathID in GetKeysToRemove( pathIDList ) ) {
 				if( m_TraverseAISDict.ContainsKey( pathID ) ) {
 					foreach( AIS_Line lineAIS in m_TraverseAISDict[ pathID ] ) {
 						m_Viewer.GetAISContext().Remove( lineAIS, false );
@@ -412,20 +392,23 @@ namespace MyCAM.Editor.Renderer
 				}
 			}
 
-			if( m_TraverseAISDict.ContainsKey( KEY_ENTRY ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_ENTRY ] ) {
-					m_Viewer.GetAISContext().Remove( lineAIS, false );
+		}
+
+		static bool IsEntryOrExitKey( string key )
+		{
+			return key.StartsWith( KEY_ENTRY + ":", StringComparison.Ordinal ) || key.StartsWith( KEY_EXIT + ":", StringComparison.Ordinal );
+		}
+
+		List<string> GetKeysToRemove( List<string> pathIDList )
+		{
+			HashSet<string> processingPaths = new HashSet<string>( GetProcessPathGroups().SelectMany( group => group.PathIDs ) );
+			HashSet<string> keys = new HashSet<string>( pathIDList );
+			foreach( string key in m_TraverseAISDict.Keys.Concat( m_FrogLeapAISDict.Keys ) ) {
+				if( IsEntryOrExitKey( key ) || !processingPaths.Contains( key ) ) {
+					keys.Add( key );
 				}
-				m_TraverseAISDict[ KEY_ENTRY ].Clear();
-				m_TraverseAISDict.Remove( KEY_ENTRY );
 			}
-			if( m_TraverseAISDict.ContainsKey( KEY_EXIT ) ) {
-				foreach( AIS_Line lineAIS in m_TraverseAISDict[ KEY_EXIT ] ) {
-					m_Viewer.GetAISContext().Remove( lineAIS, false );
-				}
-				m_TraverseAISDict[ KEY_EXIT ].Clear();
-				m_TraverseAISDict.Remove( KEY_EXIT );
-			}
+			return keys.ToList();
 		}
 
 		void AddOneLinearTraverse( List<AIS_Line> lineList, gp_Pnt startPnt, gp_Pnt endPnt )

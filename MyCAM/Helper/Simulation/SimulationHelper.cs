@@ -104,29 +104,17 @@ namespace MyCAM.Helper
 			List<SimuData.ResultData.PathStartEndIndex> pathIndexList = new List<SimuData.ResultData.PathStartEndIndex>();
 			foreach( IPathSimuData pathData in pathFKPntList ) {
 				int tempStartIndex = nCurrentIndex;
-				if( pathData.TraversePoints != null && pathData.TraversePoints.Count > 0 ) {
-					if( nCurrentIndex == 0 ) {
-						nCurrentIndex += pathData.TraversePoints.Count - 1;
-					}
-					else {
-						nCurrentIndex += pathData.TraversePoints.Count;
-					}
+				if( pathData.TraversePoints != null ) {
+					nCurrentIndex += pathData.TraversePoints.Count;
 				}
-				if( pathData.PathPoints != null && pathData.PathPoints.Count > 0 ) {
-
-					if( nCurrentIndex == 0 ) {
-						nCurrentIndex += pathData.PathPoints.Count - 1;
-					}
-					else {
-						nCurrentIndex += pathData.PathPoints.Count;
-					}
+				if( pathData.PathPoints != null ) {
+					nCurrentIndex += pathData.PathPoints.Count;
 				}
-				if( pathData.ExitPoints != null && pathData.ExitPoints.Count > 0 ) {
+				if( pathData.ExitPoints != null ) {
 					nCurrentIndex += pathData.ExitPoints.Count;
 				}
-				SimuData.ResultData.PathStartEndIndex pathStartEndIndex = new SimuData.ResultData.PathStartEndIndex( tempStartIndex, nCurrentIndex );
+				SimuData.ResultData.PathStartEndIndex pathStartEndIndex = new SimuData.ResultData.PathStartEndIndex( tempStartIndex, nCurrentIndex - 1 );
 				pathIndexList.Add( pathStartEndIndex );
-				nCurrentIndex++;
 			}
 			return pathIndexList;
 		}
