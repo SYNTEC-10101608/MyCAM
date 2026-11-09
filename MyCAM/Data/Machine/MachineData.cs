@@ -75,6 +75,130 @@ namespace MyCAM.Data
 		}
 	}
 
+	public class ExternalAxisMachineData
+	{
+		public ExternalAxisType Type
+		{
+			get; set;
+		} = ExternalAxisType.None;
+
+		public RotaryAxis Ext1RotaryAxis
+		{
+			get; set;
+		} = RotaryAxis.None;
+
+		public RotaryAxis Ext2RotaryAxis
+		{
+			get; set;
+		} = RotaryAxis.None;
+
+		public gp_Vec MCSToExt1Vec
+		{
+			get; set;
+		} = new gp_Vec( 0, 0, 0 );
+
+		public gp_Vec Ext1ToExt2Vec
+		{
+			get; set;
+		} = new gp_Vec( 0, 0, 0 );
+
+		public gp_XYZ Ext1TiltedVec_deg
+		{
+			get; set;
+		} = new gp_XYZ( 0, 0, 0 );
+
+		public gp_XYZ Ext2TiltedVec_deg
+		{
+			get; set;
+		} = new gp_XYZ( 0, 0, 0 );
+
+		public RotaryDirection Ext1RotaryDirection
+		{
+			get; set;
+		} = RotaryDirection.None;
+
+		public RotaryDirection Ext2RotaryDirection
+		{
+			get; set;
+		} = RotaryDirection.None;
+
+		public double Ext1Start_deg
+		{
+			get; set;
+		}
+
+		public double Ext1End_deg
+		{
+			get; set;
+		}
+
+		public double Ext2Start_deg
+		{
+			get; set;
+		}
+
+		public double Ext2End_deg
+		{
+			get; set;
+		}
+
+		public RotateAxisDef Ext1Axis
+		{
+			get; private set;
+		}
+
+		public RotateAxisDef Ext2Axis
+		{
+			get; private set;
+		}
+
+		public void ValidateFor( FiveAxisType fiveAxisType )
+		{
+			if( !Enum.IsDefined( typeof( ExternalAxisType ), Type ) ) {
+				throw new ArgumentException( "Invalid external axis type." );
+			}
+			if( Type == ExternalAxisType.None ) {
+				return;
+			}
+			if( fiveAxisType != FiveAxisType.Spindle
+				&& !( fiveAxisType == FiveAxisType.Mix && Type == ExternalAxisType.Single ) ) {
+				throw new ArgumentException( "Unsupported external axis configuration." );
+			}
+			ValidateAxis( Ext1RotaryAxis, Ext1RotaryDirection, MCSToExt1Vec, Ext1TiltedVec_deg, Ext1Start_deg, Ext1End_deg );
+			if( Type == ExternalAxisType.Dual ) {
+				ValidateAxis( Ext2RotaryAxis, Ext2RotaryDirection, Ext1ToExt2Vec, Ext2TiltedVec_deg, Ext2Start_deg, Ext2End_deg );
+			}
+		}
+
+		public void InitRotateAxes()
+		{
+			Ext1Axis = null;
+			Ext2Axis = null;
+			if( Type == ExternalAxisType.None ) {
+				return;
+			}
+			// Tilt parameters are retained but not applied in this stage, as with five-axis InitRotateAxes.
+			Ext1Axis = new RotateAxisDef( new gp_Pnt( MCSToExt1Vec.XYZ() ), RotateAxisDef.RotaryAxisToDir( Ext1RotaryAxis ),
+				Ext1Start_deg, Ext1End_deg, Ext1RotaryDirection );
+			if( Type == ExternalAxisType.Dual ) {
+				Ext2Axis = new RotateAxisDef( new gp_Pnt( MCSToExt1Vec.XYZ() + Ext1ToExt2Vec.XYZ() ), RotateAxisDef.RotaryAxisToDir( Ext2RotaryAxis ),
+					Ext2Start_deg, Ext2End_deg, Ext2RotaryDirection );
+			}
+		}
+
+		static void ValidateAxis( RotaryAxis axis, RotaryDirection direction, gp_Vec offset, gp_XYZ tilt, double start, double end )
+		{
+			if( axis == RotaryAxis.None || !Enum.IsDefined( typeof( RotaryAxis ), axis )
+				|| !Enum.IsDefined( typeof( RotaryDirection ), direction ) || offset == null || tilt == null ) {
+				throw new ArgumentException( "Invalid external rotary axis definition." );
+			}
+			double[] values = { offset.X(), offset.Y(), offset.Z(), tilt.X(), tilt.Y(), tilt.Z(), start, end };
+			if( values.Any( value => double.IsNaN( value ) || double.IsInfinity( value ) ) || start > end ) {
+				throw new ArgumentException( "Invalid external rotary axis geometry or limits." );
+			}
+		}
+	}
+
 	// abstract base holding only shared machine info across products (five-axis / articulated robot)
 	public abstract class IMachineDataBase
 	{
@@ -201,7 +325,14 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return s_ComponentTypes;
+				switch( ExternalAxes.Type ) {
+					case ExternalAxisType.Single:
+						return s_SingleExternalComponentTypes;
+					case ExternalAxisType.Dual:
+						return s_DualExternalComponentTypes;
+					default:
+						return s_ComponentTypes;
+				}
 			}
 		}
 
@@ -228,7 +359,15 @@ namespace MyCAM.Data
 		{
 			get
 			{
-				return s_MeshFileNameMap;
+				if( ExternalAxes.Type == ExternalAxisType.None ) {
+					return s_MeshFileNameMap;
+				}
+				Dictionary<MachineComponentType, string> map = s_MeshFileNameMap.ToDictionary( entry => entry.Key, entry => entry.Value );
+				map.Add( MachineComponentType.Ext1, "Ext1" );
+				if( ExternalAxes.Type == ExternalAxisType.Dual ) {
+					map.Add( MachineComponentType.Ext2, "Ext2" );
+				}
+				return map;
 			}
 		}
 
@@ -236,6 +375,11 @@ namespace MyCAM.Data
 		{
 			get;
 		}
+
+		public ExternalAxisMachineData ExternalAxes
+		{
+			get; set;
+		} = new ExternalAxisMachineData();
 
 		public ToolDirection ToolDirection
 		{
@@ -346,6 +490,8 @@ namespace MyCAM.Data
 			SlaveAxis = new RotateAxisDef(
 				GetSlaveRotateCenter(), RotateAxisDef.RotaryAxisToDir( SlaveRotaryAxis ),
 				slaveStart_deg, slaveEnd_deg, slaveRotaryDirection );
+			ExternalAxes.ValidateFor( FiveAxisType );
+			ExternalAxes.InitRotateAxes();
 		}
 
 		// file do not assign TubeDir, use the rotary axis as the tube direction
@@ -358,6 +504,7 @@ namespace MyCAM.Data
 
 		public override bool NeedBuildDefaultTree()
 		{
+			ExternalAxes.ValidateFor( FiveAxisType );
 			// partial simulation always uses the default tree
 			if( FullMachineSimulation == false ) {
 				return true;
@@ -380,21 +527,83 @@ namespace MyCAM.Data
 			// the two leaves must be Laser ( tool ) and WorkPiece, order independent
 			bool isValid = ( leaf0 == ToolChainLeaf && leaf1 == WorkPieceChainLeaf )
 				|| ( leaf0 == WorkPieceChainLeaf && leaf1 == ToolChainLeaf );
-			return isValid == false;
+			return isValid == false || !HasValidExternalAxisPlacement();
 		}
 
 		// build the default tree based on the five-axis machine type
 		public override MachineTreeNode BuildDefaultTree()
 		{
+			ExternalAxes.ValidateFor( FiveAxisType );
+			MachineTreeNode root;
 			switch( FiveAxisType ) {
 				case FiveAxisType.Table:
-					return BuildTree( SimuData.TreeData.DefaultTableTreeDef );
+					root = BuildTree( SimuData.TreeData.DefaultTableTreeDef );
+					break;
 				case FiveAxisType.Mix:
-					return BuildTree( SimuData.TreeData.DefaultMixTreeDef );
+					root = BuildTree( SimuData.TreeData.DefaultMixTreeDef );
+					break;
 				case FiveAxisType.Spindle:
 				default:
-					return BuildTree( SimuData.TreeData.DefaultSpindleTreeDef );
+					root = BuildTree( SimuData.TreeData.DefaultSpindleTreeDef );
+					break;
 			}
+			if( ExternalAxes.Type != ExternalAxisType.None ) {
+				InsertExternalAxes( root );
+			}
+			return root;
+		}
+
+		void InsertExternalAxes( MachineTreeNode parent )
+		{
+			for( int i = 0; i < parent.Children.Count; i++ ) {
+				MachineTreeNode child = parent.Children[ i ];
+				if( child.Type != MachineComponentType.WorkPiece ) {
+					InsertExternalAxes( child );
+					continue;
+				}
+				MachineTreeNode ext1 = new MachineTreeNode( MachineComponentType.Ext1 );
+				if( ExternalAxes.Type == ExternalAxisType.Dual ) {
+					MachineTreeNode ext2 = new MachineTreeNode( MachineComponentType.Ext2 );
+					ext2.AddChild( child );
+					ext1.AddChild( ext2 );
+				}
+				else {
+					ext1.AddChild( child );
+				}
+				parent.Children[ i ] = ext1;
+			}
+		}
+
+		bool HasValidExternalAxisPlacement()
+		{
+			foreach( MachineTreeNode branch in RootNode.Children ) {
+				List<MachineComponentType> chain = new List<MachineComponentType>();
+				MachineTreeNode node = branch;
+				while( node != null ) {
+					chain.Add( node.Type );
+					node = node.Children.Count == 0 ? null : node.Children[ 0 ];
+				}
+				bool carriesWorkPiece = chain.Last() == MachineComponentType.WorkPiece;
+				int ext1Count = chain.Count( type => type == MachineComponentType.Ext1 );
+				int ext2Count = chain.Count( type => type == MachineComponentType.Ext2 );
+				if( !carriesWorkPiece || ExternalAxes.Type == ExternalAxisType.None ) {
+					if( ext1Count != 0 || ext2Count != 0 ) {
+						return false;
+					}
+					continue;
+				}
+				bool dual = ExternalAxes.Type == ExternalAxisType.Dual;
+				if( ext1Count != 1 || ext2Count != ( dual ? 1 : 0 )
+					|| chain.Count < ( dual ? 3 : 2 )
+					|| chain[ chain.Count - 2 ] != ( dual ? MachineComponentType.Ext2 : MachineComponentType.Ext1 )
+					|| ( dual && chain[ chain.Count - 3 ] != MachineComponentType.Ext1 ) ) {
+					return false;
+				}
+				if( FiveAxisType == FiveAxisType.Mix && !chain.Contains( MachineComponentType.Slave ) ) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		// compute the rotate center used to init MasterAxis / SlaveAxis ( from each machine type's own vectors )
@@ -450,6 +659,9 @@ namespace MyCAM.Data
 			MachineComponentType.Laser,
 			MachineComponentType.WorkPiece,
 		};
+
+		static readonly MachineComponentType[] s_SingleExternalComponentTypes = s_ComponentTypes.Concat( new[] { MachineComponentType.Ext1 } ).ToArray();
+		static readonly MachineComponentType[] s_DualExternalComponentTypes = s_ComponentTypes.Concat( new[] { MachineComponentType.Ext1, MachineComponentType.Ext2 } ).ToArray();
 
 		// component -> stl base file name ( Laser / WorkPiece have no mesh file )
 		static readonly IReadOnlyDictionary<MachineComponentType, string> s_MeshFileNameMap = new Dictionary<MachineComponentType, string>

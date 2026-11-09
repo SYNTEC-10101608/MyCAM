@@ -67,8 +67,122 @@ namespace MyCAM.FileManager
 
 	#region DTO
 
+	public class ExternalAxisMachineDataDTO
+	{
+		public ExternalAxisType Type
+		{
+			get; set;
+		}
+
+		public RotaryAxis Ext1RotaryAxis
+		{
+			get; set;
+		}
+
+		public RotaryAxis Ext2RotaryAxis
+		{
+			get; set;
+		}
+
+		public gp_Vec_DTO MCSToExt1Vec
+		{
+			get; set;
+		} = new gp_Vec_DTO();
+
+		public gp_Vec_DTO Ext1ToExt2Vec
+		{
+			get; set;
+		} = new gp_Vec_DTO();
+
+		public gp_XYZDTO Ext1TiltedVec_deg
+		{
+			get; set;
+		} = new gp_XYZDTO();
+
+		public gp_XYZDTO Ext2TiltedVec_deg
+		{
+			get; set;
+		} = new gp_XYZDTO();
+
+		public RotaryDirection Ext1RotaryDirection
+		{
+			get; set;
+		}
+
+		public RotaryDirection Ext2RotaryDirection
+		{
+			get; set;
+		}
+
+		public double Ext1Start_deg
+		{
+			get; set;
+		}
+
+		public double Ext1End_deg
+		{
+			get; set;
+		}
+
+		public double Ext2Start_deg
+		{
+			get; set;
+		}
+
+		public double Ext2End_deg
+		{
+			get; set;
+		}
+
+		public ExternalAxisMachineDataDTO()
+		{
+		}
+
+		internal ExternalAxisMachineDataDTO( ExternalAxisMachineData data )
+		{
+			Type = data.Type;
+			Ext1RotaryAxis = data.Ext1RotaryAxis;
+			Ext2RotaryAxis = data.Ext2RotaryAxis;
+			MCSToExt1Vec = new gp_Vec_DTO( data.MCSToExt1Vec );
+			Ext1ToExt2Vec = new gp_Vec_DTO( data.Ext1ToExt2Vec );
+			Ext1TiltedVec_deg = new gp_XYZDTO( data.Ext1TiltedVec_deg );
+			Ext2TiltedVec_deg = new gp_XYZDTO( data.Ext2TiltedVec_deg );
+			Ext1RotaryDirection = data.Ext1RotaryDirection;
+			Ext2RotaryDirection = data.Ext2RotaryDirection;
+			Ext1Start_deg = data.Ext1Start_deg;
+			Ext1End_deg = data.Ext1End_deg;
+			Ext2Start_deg = data.Ext2Start_deg;
+			Ext2End_deg = data.Ext2End_deg;
+		}
+
+		internal ExternalAxisMachineData ToMachineData()
+		{
+			return new ExternalAxisMachineData
+			{
+				Type = Type,
+				Ext1RotaryAxis = Ext1RotaryAxis,
+				Ext2RotaryAxis = Ext2RotaryAxis,
+				MCSToExt1Vec = MCSToExt1Vec.ToVec(),
+				Ext1ToExt2Vec = Ext1ToExt2Vec.ToVec(),
+				Ext1TiltedVec_deg = Ext1TiltedVec_deg.ToXYZ(),
+				Ext2TiltedVec_deg = Ext2TiltedVec_deg.ToXYZ(),
+				Ext1RotaryDirection = Ext1RotaryDirection,
+				Ext2RotaryDirection = Ext2RotaryDirection,
+				Ext1Start_deg = Ext1Start_deg,
+				Ext1End_deg = Ext1End_deg,
+				Ext2Start_deg = Ext2Start_deg,
+				Ext2End_deg = Ext2End_deg
+			};
+		}
+	}
+
 	public class MachineDataDTO
 	{
+		public ExternalAxisMachineDataDTO ExternalAxes
+		{
+			get; set;
+		} = new ExternalAxisMachineDataDTO();
+
 		public ToolDirection ToolDirection
 		{
 			get; set;
@@ -159,6 +273,8 @@ namespace MyCAM.FileManager
 				return;
 			}
 			ToolDirection = data.ToolDirection;
+			data.ExternalAxes.ValidateFor( data.FiveAxisType );
+			ExternalAxes = new ExternalAxisMachineDataDTO( data.ExternalAxes );
 			MasterRotaryAxis = data.MasterRotaryAxis;
 			SlaveRotaryAxis = data.SlaveRotaryAxis;
 			TubeDir = data.TubeDir;
@@ -208,6 +324,7 @@ namespace MyCAM.FileManager
 		{
 			SpindleTypeMachineData spindleTypeData = new SpindleTypeMachineData
 			{
+				ExternalAxes = ExternalAxes?.ToMachineData() ?? new ExternalAxisMachineData(),
 				ToolDirection = ToolDirection,
 				MasterRotaryAxis = MasterRotaryAxis,
 				SlaveRotaryAxis = SlaveRotaryAxis,
@@ -265,6 +382,7 @@ namespace MyCAM.FileManager
 		{
 			TableTypeMachineData tableTypeData = new TableTypeMachineData
 			{
+				ExternalAxes = ExternalAxes?.ToMachineData() ?? new ExternalAxisMachineData(),
 				ToolDirection = ToolDirection,
 				MasterRotaryAxis = MasterRotaryAxis,
 				SlaveRotaryAxis = SlaveRotaryAxis,
@@ -328,6 +446,7 @@ namespace MyCAM.FileManager
 		{
 			MixTypeMachineData mixTypeData = new MixTypeMachineData
 			{
+				ExternalAxes = ExternalAxes?.ToMachineData() ?? new ExternalAxisMachineData(),
 				MixTypeVariant = MixTypeVariant,
 				ToolDirection = ToolDirection,
 				MasterRotaryAxis = MasterRotaryAxis,

@@ -113,6 +113,10 @@ namespace MyCAM.Helper
 			SetBuf( ref outBuf, MachineComponentType.Master, CreateAxisRotation( m_MachineData.MasterAxis.RotateCenter, m_MachineData.MasterAxis.RotateDir, fiveAxisPoint.Master, workPiecesChainSet.Contains( MachineComponentType.Master ) ) );
 			SetBuf( ref outBuf, MachineComponentType.Slave, CreateAxisRotation( m_MachineData.SlaveAxis.RotateCenter, m_MachineData.SlaveAxis.RotateDir, fiveAxisPoint.Slave, workPiecesChainSet.Contains( MachineComponentType.Slave ) ) );
 
+			// External axes stay at zero until their motion is connected to frame points.
+			SetBuf( ref outBuf, MachineComponentType.Ext1, new gp_Trsf() );
+			SetBuf( ref outBuf, MachineComponentType.Ext2, new gp_Trsf() );
+
 			// laser / workpiece
 			SetBuf( ref outBuf, MachineComponentType.Laser, new gp_Trsf() );
 			gp_Trsf trsfWorkPiece = new gp_Trsf();

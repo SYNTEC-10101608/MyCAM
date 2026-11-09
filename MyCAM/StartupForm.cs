@@ -1269,7 +1269,8 @@ namespace MyCAM
 				XDocument machineDataDoc = XDocument.Load( filePath );
 
 				// turn back to MachineData
-				machineData = MachineDataXMLHelper.ConvertMachineDataFileToMachineData( machineDataDoc, out EMachineDataLoadStatus status, out int nErrorPrIndex );
+				machineData = MachineDataXMLHelper.ConvertMachineDataFileToMachineData( machineDataDoc, out EMachineDataLoadStatus status,
+					out int nErrorPrIndex, out string errorParameterId );
 				switch( status ) {
 					case EMachineDataLoadStatus.NullMachineDataNode:
 						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_MachineNodeNull", LOG_MACHINE_NODE_NULL ), MyApp.NoticeType.Warning );
@@ -1278,7 +1279,8 @@ namespace MyCAM
 						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_MachineFileNull", LOG_MACHINE_FILE_NULL ), MyApp.NoticeType.Warning );
 						return false;
 					case EMachineDataLoadStatus.InvalidPrValue:
-						MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Log_MachineParamError", LOG_MACHINE_PARAM_ERROR ), nErrorPrIndex ), MyApp.NoticeType.Warning );
+						MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "Log_MachineParamError", LOG_MACHINE_PARAM_ERROR ),
+							string.IsNullOrEmpty( errorParameterId ) ? nErrorPrIndex.ToString() : errorParameterId ), MyApp.NoticeType.Warning );
 						return false;
 					case EMachineDataLoadStatus.TreeInvalid:
 						MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "Log_MachineTreeInvalid", LOG_MACHINE_TREE_INVALID ), MyApp.NoticeType.Warning );

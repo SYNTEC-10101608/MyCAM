@@ -20,6 +20,13 @@
 		SlaveOnly = 2,
 	}
 
+	public enum ExternalAxisType
+	{
+		None = 0,
+		Single = 1,
+		Dual = 2,
+	}
+
 	public enum ToolDirection
 	{
 		None = 0,
@@ -70,6 +77,9 @@
 
 		// T1: tool coordinate frame (ax3)
 		T1_ToolFrame = 17,   
+
+		Ext1 = 18,
+		Ext2 = 19,
 	}
 
 	public enum MachinePrValue
@@ -127,5 +137,6 @@
 		public const string SIMULATION_OFFSET_Z = "Simulation_Offset_Z";
 		public const string FULL_MACHINE_SIMULATION = "Full_Machine_Simulation";
 		public const string TUBE_DIR = "Tube_Dir";
+		public const string EXTERNAL_AXIS_TYPE = "ExternalAxis_Type";
 	}
 }

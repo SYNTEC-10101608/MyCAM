@@ -2,6 +2,7 @@
 using MyCAM.Data;
 using MyCAM.FileManager;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -161,7 +162,37 @@ namespace MyCAM.Helper
 			for( int i = 0; i < 6; i++ ) {
 				ConvertPropertyToPrNode( root, (int)MachinePrValue.ToolToMasterVec_X + i, mixValues[ i ] * dRatioMMToBlu );
 			}
+			WriteExternalAxisData( root, machineDataDTO.ExternalAxes );
 			return root;
+		}
+
+		static void WriteExternalAxisData( XElement root, ExternalAxisMachineDataDTO data )
+		{
+			if( data == null || data.Type == ExternalAxisType.None ) {
+				return;
+			}
+			ConvertPropertyToPrNode( root, MachineParamName.EXTERNAL_AXIS_TYPE, (int)data.Type );
+			WriteExternalAxisProperties( root, "Ext1", data.Ext1RotaryAxis, data.Ext1RotaryDirection,
+				data.MCSToExt1Vec, data.Ext1TiltedVec_deg, data.Ext1Start_deg, data.Ext1End_deg );
+			if( data.Type == ExternalAxisType.Dual ) {
+				WriteExternalAxisProperties( root, "Ext2", data.Ext2RotaryAxis, data.Ext2RotaryDirection,
+					data.Ext1ToExt2Vec, data.Ext2TiltedVec_deg, data.Ext2Start_deg, data.Ext2End_deg );
+			}
+		}
+
+		static void WriteExternalAxisProperties( XElement root, string prefix, RotaryAxis axis, RotaryDirection direction,
+			gp_Vec_DTO offset, gp_XYZDTO tilt, double start, double end )
+		{
+			ConvertPropertyToPrNode( root, prefix + "_Axis", (int)axis );
+			ConvertPropertyToPrNode( root, prefix + "_Direction", (int)direction );
+			ConvertPropertyToPrNode( root, prefix + "_Start", start );
+			ConvertPropertyToPrNode( root, prefix + "_End", end );
+			ConvertPropertyToPrNode( root, prefix + "_Offset_X", offset.X * 1000 );
+			ConvertPropertyToPrNode( root, prefix + "_Offset_Y", offset.Y * 1000 );
+			ConvertPropertyToPrNode( root, prefix + "_Offset_Z", offset.Z * 1000 );
+			ConvertPropertyToPrNode( root, prefix + "_Tilt_X", tilt.X * 1000 );
+			ConvertPropertyToPrNode( root, prefix + "_Tilt_Y", tilt.Y * 1000 );
+			ConvertPropertyToPrNode( root, prefix + "_Tilt_Z", tilt.Z * 1000 );
 		}
 
 		static int ConvertMachineDTO2Pr3001( MachineDataDTO machineDataDTO )
@@ -224,9 +255,16 @@ namespace MyCAM.Helper
 
 		internal static FiveAxisMachineData ConvertMachineDataFileToMachineData( XDocument machineDataDoc, out EMachineDataLoadStatus status, out int nErrorPrIndex )
 		{
+			return ConvertMachineDataFileToMachineData( machineDataDoc, out status, out nErrorPrIndex, out _ );
+		}
+
+		internal static FiveAxisMachineData ConvertMachineDataFileToMachineData( XDocument machineDataDoc, out EMachineDataLoadStatus status,
+			out int nErrorPrIndex, out string errorParameterId )
+		{
 			// default status
 			status = EMachineDataLoadStatus.ReadSuccess;
 			nErrorPrIndex = -1;
+			errorParameterId = string.Empty;
 
 			// default machine data
 			FiveAxisMachineData machineData = MachineDataFactory.CreateDefaultSpindle();
@@ -253,9 +291,13 @@ namespace MyCAM.Helper
 			}
 
 			// turn machineData XML to DTO
-			MachineDataDTOContainer container = ConvertXML2MachineData( machineDataElement, out EFilePrValueStatus prValueStatus, out nErrorPrIndex );
+			MachineDataDTOContainer container = ConvertXML2MachineData( machineDataElement, out EFilePrValueStatus prValueStatus,
+				out nErrorPrIndex, out errorParameterId );
 			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
 				status = EMachineDataLoadStatus.InvalidPrValue;
+				if( string.IsNullOrEmpty( errorParameterId ) && nErrorPrIndex >= 0 ) {
+					errorParameterId = nErrorPrIndex.ToString( CultureInfo.InvariantCulture );
+				}
 				return machineData;
 			}
 
@@ -273,9 +315,11 @@ namespace MyCAM.Helper
 			return machineData;
 		}
 
-		static MachineDataDTOContainer ConvertXML2MachineData( XElement machineData, out EFilePrValueStatus prValueStatus, out int nErrorPrIndex )
+		static MachineDataDTOContainer ConvertXML2MachineData( XElement machineData, out EFilePrValueStatus prValueStatus,
+			out int nErrorPrIndex, out string errorParameterId )
 		{
 			nErrorPrIndex = -1;
+			errorParameterId = string.Empty;
 			prValueStatus = EFilePrValueStatus.GetSuccess;
 
 			// blu is um
@@ -536,7 +580,113 @@ namespace MyCAM.Helper
 					return machineDTOContainer;
 				}
 			}
+			prValueStatus = ReadExternalAxisData( machineData, machineDataDTO, out errorParameterId );
 			return machineDTOContainer;
+		}
+
+		static EFilePrValueStatus ReadExternalAxisData( XElement root, MachineDataDTO machineDataDTO, out string errorParameterId )
+		{
+			errorParameterId = string.Empty;
+			ExternalAxisMachineDataDTO data = machineDataDTO.ExternalAxes;
+			data.Type = GetPrValue<ExternalAxisType>( root, MachineParamName.EXTERNAL_AXIS_TYPE, out EFilePrValueStatus status );
+			if( status == EFilePrValueStatus.PrNodeMissing ) {
+				return EFilePrValueStatus.GetSuccess;
+			}
+			if( status != EFilePrValueStatus.GetSuccess || data.Type == ExternalAxisType.None ) {
+				if( status != EFilePrValueStatus.GetSuccess ) {
+					errorParameterId = MachineParamName.EXTERNAL_AXIS_TYPE;
+				}
+				return status;
+			}
+			if( machineDataDTO is TableTypeMachineDataDTO
+				|| ( machineDataDTO is MixTypeMachineDataDTO && data.Type == ExternalAxisType.Dual ) ) {
+				errorParameterId = MachineParamName.EXTERNAL_AXIS_TYPE;
+				return EFilePrValueStatus.PrValueInvalid;
+			}
+			ReadExternalAxisProperties( root, "Ext1", data.MCSToExt1Vec, data.Ext1TiltedVec_deg, ref status, ref errorParameterId,
+				out RotaryAxis ext1Axis, out RotaryDirection ext1Direction, out double ext1Start, out double ext1End );
+			data.Ext1RotaryAxis = ext1Axis;
+			data.Ext1RotaryDirection = ext1Direction;
+			data.Ext1Start_deg = ext1Start;
+			data.Ext1End_deg = ext1End;
+			if( data.Type == ExternalAxisType.Dual ) {
+				ReadExternalAxisProperties( root, "Ext2", data.Ext1ToExt2Vec, data.Ext2TiltedVec_deg, ref status, ref errorParameterId,
+					out RotaryAxis ext2Axis, out RotaryDirection ext2Direction, out double ext2Start, out double ext2End );
+				data.Ext2RotaryAxis = ext2Axis;
+				data.Ext2RotaryDirection = ext2Direction;
+				data.Ext2Start_deg = ext2Start;
+				data.Ext2End_deg = ext2End;
+			}
+			if( status != EFilePrValueStatus.GetSuccess ) {
+				return status;
+			}
+			try {
+				FiveAxisType type = machineDataDTO is SpindleTypeMachineDataDTO ? FiveAxisType.Spindle
+					: machineDataDTO is MixTypeMachineDataDTO ? FiveAxisType.Mix : FiveAxisType.Table;
+				data.ToMachineData().ValidateFor( type );
+			}
+			catch( ArgumentException ) {
+				errorParameterId = MachineParamName.EXTERNAL_AXIS_TYPE;
+				return EFilePrValueStatus.PrValueInvalid;
+			}
+			return EFilePrValueStatus.GetSuccess;
+		}
+
+		static void ReadExternalAxisProperties( XElement root, string prefix, gp_Vec_DTO offset, gp_XYZDTO tilt,
+			ref EFilePrValueStatus status, ref string errorParameterId,
+			out RotaryAxis axis, out RotaryDirection direction, out double start, out double end )
+		{
+			axis = ReadExternalAxisValue<RotaryAxis>( root, prefix + "_Axis", ref status, ref errorParameterId );
+			direction = ReadExternalAxisValue<RotaryDirection>( root, prefix + "_Direction", ref status, ref errorParameterId );
+			start = ReadExternalAxisValue<double>( root, prefix + "_Start", ref status, ref errorParameterId );
+			end = ReadExternalAxisValue<double>( root, prefix + "_End", ref status, ref errorParameterId );
+			offset.X = ReadExternalAxisValue<double>( root, prefix + "_Offset_X", ref status, ref errorParameterId, 0.001 );
+			offset.Y = ReadExternalAxisValue<double>( root, prefix + "_Offset_Y", ref status, ref errorParameterId, 0.001 );
+			offset.Z = ReadExternalAxisValue<double>( root, prefix + "_Offset_Z", ref status, ref errorParameterId, 0.001 );
+			tilt.X = ReadExternalAxisValue<double>( root, prefix + "_Tilt_X", ref status, ref errorParameterId, 0.001 );
+			tilt.Y = ReadExternalAxisValue<double>( root, prefix + "_Tilt_Y", ref status, ref errorParameterId, 0.001 );
+			tilt.Z = ReadExternalAxisValue<double>( root, prefix + "_Tilt_Z", ref status, ref errorParameterId, 0.001 );
+			if( status == EFilePrValueStatus.GetSuccess && start > end ) {
+				status = EFilePrValueStatus.PrValueInvalid;
+				errorParameterId = prefix + "_Start";
+			}
+		}
+
+		static T ReadExternalAxisValue<T>( XElement root, string name, ref EFilePrValueStatus status,
+			ref string errorParameterId, double ratio = 1 ) where T : struct
+		{
+			if( status != EFilePrValueStatus.GetSuccess ) {
+				return default( T );
+			}
+			T value = default( T );
+			if( typeof( T ) == typeof( double ) ) {
+				XElement node = root.Elements( "Pr" ).FirstOrDefault( element => (string)element.Attribute( "ID" ) == name );
+				if( node == null ) {
+					status = EFilePrValueStatus.PrNodeMissing;
+				}
+				else if( double.TryParse( (string)node.Attribute( "Value" ), NumberStyles.Float, CultureInfo.InvariantCulture, out double number ) ) {
+					number *= ratio;
+					if( double.IsNaN( number ) || double.IsInfinity( number ) ) {
+						status = EFilePrValueStatus.PrValueInvalid;
+					}
+					else {
+						value = (T)(object)number;
+					}
+				}
+				else {
+					status = EFilePrValueStatus.PrValueInvalid;
+				}
+			}
+			else {
+				value = GetPrValue<T>( root, name, out status, ratio );
+				if( status == EFilePrValueStatus.GetSuccess && typeof( T ) == typeof( RotaryAxis ) && (RotaryAxis)(object)value == RotaryAxis.None ) {
+					status = EFilePrValueStatus.PrValueInvalid;
+				}
+			}
+			if( status != EFilePrValueStatus.GetSuccess ) {
+				errorParameterId = name;
+			}
+			return value;
 		}
 
 		static T GetPrValue<T>( XElement parent, int nPrId, out EFilePrValueStatus prValueStatus, double dRatio = 1 ) where T : struct
