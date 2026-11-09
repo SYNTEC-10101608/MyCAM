@@ -62,38 +62,47 @@ namespace MyCAM.Post
 
 		public bool ConvertPostDataListSuccess( out string errorMessage, out List<PostData> postDataList )
 		{
+			return ConvertPostDataListSuccess( out errorMessage, out postDataList, out _ );
+		}
+
+		public bool ConvertPostDataListSuccess( out string errorMessage, out List<PostData> postDataList, out List<SimuData.ProcessGroupPostData> processGroups )
+		{
 			errorMessage = string.Empty;
 			postDataList = new List<PostData>();
+			processGroups = new List<SimuData.ProcessGroupPostData>();
 			try {
-				PathEndInfo endInfoOfLastPath = null;
-				for( int i = 0; i < m_PathIDList.Count; i++ ) {
-					if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
-						continue;
-					}
-					PathType pathType = pathObject.PathType;
-					if( pathObject.CraftData.ProcessPath == false ) {
-						continue;
-					}
-					if( pathType == PathType.Contour ) {
-						if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
+				foreach( ProcessPathGroup group in CacheHelper.GetProcessPathGroups( m_PathIDList, m_DataManager.MachineData as FiveAxisMachineData ) ) {
+					PathEndInfo endInfoOfLastPath = null;
+					List<PostData> groupPostData = new List<PostData>();
+					foreach( int i in group.PathIndices ) {
+						if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
+							errorMessage = "Processing path not found: " + m_PathIDList[ i ];
 							return false;
 						}
+						PostData postData;
+						if( pathObject.PathType == PathType.Contour ) {
+							if( !GetContourPostData( i, ref endInfoOfLastPath, out postData, out errorMessage ) ) {
+								return false;
+							}
+						}
+						else {
+							PathEndInfo previousPathEndInfo = endInfoOfLastPath;
+							if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData stdPostData, out _, out errorMessage )
+								|| !GetContourPostData( i, ref previousPathEndInfo, out postData, out errorMessage ) ) {
+								return false;
+							}
+							ApplyStdPatternPostDataToPostData( postData, stdPostData );
+						}
+						groupPostData.Add( postData );
 						postDataList.Add( postData );
 					}
-					else {
-						PathEndInfo previousPathEndInfo = endInfoOfLastPath;
-						if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData stdPostData, out _, out errorMessage ) ) {
-							return false;
-						}
-
-						if( !GetContourPostData( i, ref previousPathEndInfo, out PostData postData, out errorMessage ) ) {
-							return false;
-						}
-
-						// TODO：this is temporary solution to make standard pattern post data compatible with std pattern contour post data, which is used for tool path display in process setting form. We will refactor the code structure later to avoid this kind of workaround.
-						ApplyStdPatternPostDataToPostData( postData, stdPostData );
-						postDataList.Add( postData );
+					CAMPoint startPoint = CacheHelper.GetProcessStartPoint( group.PathIDs[ 0 ] );
+					CAMPoint endPoint = CacheHelper.GetProcessEndPoint( group.PathIDs[ group.PathIDs.Count - 1 ] );
+					if( startPoint == null || endPoint == null ) {
+						errorMessage = "Processing group endpoint not found: " + group.Index;
+						return false;
 					}
+					processGroups.Add( new SimuData.ProcessGroupPostData( group, groupPostData, startPoint, endPoint ) );
 				}
 				return true;
 			}

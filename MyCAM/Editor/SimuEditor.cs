@@ -91,6 +91,7 @@ namespace MyCAM.Editor
 
 		// been solved IK point
 		List<PostData> m_PostDataList = new List<PostData>();
+		List<SimuData.ProcessGroupPostData> m_ProcessGroups = new List<SimuData.ProcessGroupPostData>();
 
 		// render
 		TraverseRenderer m_TraverseRender;
@@ -463,11 +464,13 @@ namespace MyCAM.Editor
 		List<PostData> GetPostDataList()
 		{
 			NCWriter writer = new NCWriter( m_DataManager );
-			bool bSuccess = writer.ConvertPostDataListSuccess( out string szErrorMessage, out List<PostData> postDataList );
+			bool bSuccess = writer.ConvertPostDataListSuccess( out string szErrorMessage, out List<PostData> postDataList, out List<SimuData.ProcessGroupPostData> processGroups );
 			if( !bSuccess ) {
+				m_ProcessGroups = new List<SimuData.ProcessGroupPostData>();
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PostProcessFailed", POST_PROCESS_FAILED ) + szErrorMessage, MyApp.NoticeType.Warning );
 				return new List<PostData>();
 			}
+			m_ProcessGroups = processGroups;
 			return postDataList;
 		}
 
@@ -527,10 +530,11 @@ namespace MyCAM.Editor
 			}
 
 			// need last path end point's vector to calculate exit pnt
-			IProcessPoint lastPathLastPoint = GetProcessEndPoint( m_SimuPathList.Last() );
+			IProcessPoint lastPathLastPoint = m_ProcessGroups.Count > 0 ? m_ProcessGroups.Last().ProcessEndPoint.Clone() : null;
 			calNeedData = new SimuData.SimuRequiredData.SimuInputSet()
 			{
 				EachPathIKPostDataList = m_PostDataList,
+				ProcessGroups = m_ProcessGroups.AsReadOnly(),
 				LastPathLastPnt = lastPathLastPoint,
 				EntryAndExitData = m_DataManager.EntryAndExitData,
 				PostSolver = m_PostSolver,

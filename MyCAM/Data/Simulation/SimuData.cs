@@ -1,4 +1,5 @@
 ﻿using MyCAM.Post;
+using MyCAM.PathCache;
 using OCC.gp;
 using System.Collections.Generic;
 
@@ -6,6 +7,22 @@ namespace MyCAM.Data
 {
 	public class SimuData
 	{
+		internal class ProcessGroupPostData
+		{
+			public ProcessGroupPostData( ProcessPathGroup group, List<PostData> postDataList, CAMPoint startPoint, CAMPoint endPoint )
+			{
+				Group = group;
+				PostDataList = postDataList.AsReadOnly();
+				ProcessStartPoint = startPoint.Clone();
+				ProcessEndPoint = endPoint.Clone();
+			}
+
+			public ProcessPathGroup Group { get; }
+			public IReadOnlyList<PostData> PostDataList { get; }
+			public CAMPoint ProcessStartPoint { get; }
+			public CAMPoint ProcessEndPoint { get; }
+		}
+
 		public class TreeData
 		{
 			public class MachineTreeDef
@@ -91,6 +108,7 @@ namespace MyCAM.Data
 			internal struct SimuInputSet
 			{
 				public List<PostData> EachPathIKPostDataList;
+				public IReadOnlyList<ProcessGroupPostData> ProcessGroups;
 
 				// lastPathLastPnt is for exit path calculation
 				public IProcessPoint LastPathLastPnt;
@@ -105,6 +123,7 @@ namespace MyCAM.Data
 				public SimuInputSet( List<PostData> eachPathIKPostDataList, IProcessPoint lastPathLastPnt, EntryAndExitData entryAndExitData, PostSolver postSolver, FiveAxisMachineData machineData, CollisionSolver fCLTest )
 				{
 					EachPathIKPostDataList = eachPathIKPostDataList;
+					ProcessGroups = null;
 					LastPathLastPnt = lastPathLastPnt;
 					EntryAndExitData = entryAndExitData;
 					PostSolver = postSolver;

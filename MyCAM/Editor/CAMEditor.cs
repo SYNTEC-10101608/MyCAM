@@ -236,33 +236,7 @@ namespace MyCAM.Editor
 			if( pathIDList.Count == 0 ) {
 				return;
 			}
-
-			double prevMaster_rad = 0;
-			double prevSlave_rad = 0;
-
-			foreach( string szPathID in pathIDList ) {
-				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
-					continue;
-				}
-				if( craftData.ProcessPath == false ) {
-					craftData.InitMaster_rad = 0;
-					craftData.InitSlave_rad = 0;
-				}
-				else {
-					// write previous path end MS as initial value for this path's IK solve
-					craftData.InitMaster_rad = prevMaster_rad;
-					craftData.InitSlave_rad = prevSlave_rad;
-
-					// trigger cache rebuild
-					craftData.CAMFactorChanged?.Invoke();
-
-					// read this path's end MS for next path
-					if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
-						prevMaster_rad = endMaster_rad;
-						prevSlave_rad = endSlave_rad;
-					}
-				}
-			}
+			CacheHelper.OptimizeIKContinuity( pathIDList, m_DataManager.MachineData as FiveAxisMachineData );
 		}
 
 		public void SetStartPoint()
