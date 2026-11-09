@@ -59,6 +59,7 @@ namespace MyCAM.Editor
 		ImportDxfGlass,
 		PlaceRingShape,
 		LockAB,
+		ExternalAxis,
 	}
 
 	internal interface IEditorAction

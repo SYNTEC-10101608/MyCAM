@@ -453,6 +453,31 @@ namespace MyCAM.Editor
 			StartEditAction( action );
 		}
 
+		public void SetExternalAxisPos()
+		{
+			if( IsSameAction( EditActionType.ExternalAxis ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !( m_DataManager.MachineData is FiveAxisMachineData machineData ) || machineData.ExternalAxes.Type == ExternalAxisType.None ) {
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ExternalAxisNotEnabled", "[操作提醒]此機台未啟用變位機" ), MyApp.NoticeType.Hint );
+				return;
+			}
+			EndActionIfNotDefault();
+			if( !ValidateBeforeActionEdit( out List<string> pathIDs, true ) ) {
+				return;
+			}
+			ExternalAxisAction action = new ExternalAxisAction( m_DataManager, pathIDs );
+			action.RaiseTrans += SetTrans;
+			action.NeedOptimizedIK += DoOptimizeIKContinuity;
+			action.PropertyChanged += paths => {
+				ResetPartDisplay();
+				m_MachineRender.Remove();
+				ShowAllCAMData();
+			};
+			StartEditAction( action );
+		}
+
 		public void SetTraverseData()
 		{
 			// action edit, multi edit supported
@@ -1087,6 +1112,7 @@ namespace MyCAM.Editor
 				return;
 			}
 			if( action.ActionType == EditActionType.OverCut
+				|| action.ActionType == EditActionType.ExternalAxis
 				|| action.ActionType == EditActionType.SetLead
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern
@@ -1102,6 +1128,7 @@ namespace MyCAM.Editor
 			}
 
 			if( action.ActionType == EditActionType.OverCut
+				|| action.ActionType == EditActionType.ExternalAxis
 				|| action.ActionType == EditActionType.SetLead
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern
@@ -1123,6 +1150,7 @@ namespace MyCAM.Editor
 			}
 			// these action will show dialog, need to lock ui
 			if( action.ActionType == EditActionType.OverCut
+				|| action.ActionType == EditActionType.ExternalAxis
 				|| action.ActionType == EditActionType.SetLead
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern
@@ -1138,6 +1166,7 @@ namespace MyCAM.Editor
 			}
 
 			if( action.ActionType == EditActionType.OverCut
+				|| action.ActionType == EditActionType.ExternalAxis
 				|| action.ActionType == EditActionType.SetLead
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern

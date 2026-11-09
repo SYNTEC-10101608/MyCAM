@@ -94,6 +94,7 @@
     <Compile Include="Editor\Action\CAM\AutoSortPathAction.cs" />
     <Compile Include="Editor\Action\CAM\CalibrationREFAction.cs" />
     <Compile Include="Editor\Action\CAM\ContourEditAction.cs" />
+    <Compile Include="Editor\Action\CAM\ExternalAxisAction.cs" />
     <Compile Include="Editor\Action\CAM\ExtendedGCodeAction.cs" />
     <Compile Include="Editor\Action\CAM\LockABAction.cs" />
     <Compile Include="Editor\Action\CAM\ManualOrderAction.cs" />
@@ -126,6 +127,8 @@
     <Compile Include="Editor\Dialog\EditDialogBase.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Editor\Dialog\ExternalAxisDlg.cs"><SubType>Form</SubType></Compile>
+    <Compile Include="Editor\Dialog\ExternalAxisDlg.Designer.cs"><DependentUpon>ExternalAxisDlg.cs</DependentUpon></Compile>
     <Compile Include="Editor\Dialog\FormBase.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -629,6 +629,11 @@ namespace MyCAM
 			m_CAMEditor.AutoOptimizeIKContinuity();
 		}
 
+		void m_tsbExternalAxis_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetExternalAxisPos();
+		}
+
 		// sort
 		void m_tsbManualOrder_Click( object sender, EventArgs e )
 		{
@@ -948,6 +953,9 @@ namespace MyCAM
 					case EditActionType.SpecialToolVecEdit:
 						m_tsbFixedToolVec.BackColor = DEFAULT_BtnColor;
 						break;
+					case EditActionType.ExternalAxis:
+						m_tsbExternalAxis.BackColor = DEFAULT_BtnColor;
+						break;
 					default:
 						break;
 				}
@@ -1003,6 +1011,9 @@ namespace MyCAM
 				case EditActionType.SpecialToolVecEdit:
 					m_tsbFixedToolVec.BackColor = ON_ButtonColor;
 					break;
+				case EditActionType.ExternalAxis:
+					m_tsbExternalAxis.BackColor = ON_ButtonColor;
+					break;
 				default:
 					break;
 			}
@@ -1011,6 +1022,8 @@ namespace MyCAM
 		// path property change event
 		void OnCAMPathPropertyChanged( EditableInfo editableInfo )
 		{
+			m_tsbExternalAxis.Enabled = m_DataManager.MachineData is FiveAxisMachineData machineData
+				&& machineData.ExternalAxes.Type != ExternalAxisType.None;
 			m_tsbStartPoint.Enabled = editableInfo.IsStartPointEditable;
 			m_tsbOverCut.Enabled = editableInfo.IsOverCutEditable;
 			m_tsbSetLead.Enabled = editableInfo.IsLeadLineEditable;
@@ -1821,6 +1834,9 @@ namespace MyCAM
 
 			m_tsbFixedToolVec.Text = m_LanguageManager.TryGetString( "m_tsbFixedToolVec", m_tsbFixedToolVec.Text );
 			m_tsbFixedToolVec.ToolTipText = m_LanguageManager.TryGetString( "m_tsbFixedToolVec_ToolTip", m_tsbFixedToolVec.ToolTipText );
+
+			m_tsbExternalAxis.Text = m_LanguageManager.TryGetString( "m_tsbExternalAxis", m_tsbExternalAxis.Text );
+			m_tsbExternalAxis.ToolTipText = m_LanguageManager.TryGetString( "m_tsbExternalAxis_ToolTip", m_tsbExternalAxis.ToolTipText );
 
 			m_tsbOptimizeIK.Text = m_LanguageManager.TryGetString( "m_tsbOptimizeIK", m_tsbOptimizeIK.Text );
 			m_tsbOptimizeIK.ToolTipText = m_LanguageManager.TryGetString( "m_tsbOptimizeIK_ToolTip", m_tsbOptimizeIK.ToolTipText );
