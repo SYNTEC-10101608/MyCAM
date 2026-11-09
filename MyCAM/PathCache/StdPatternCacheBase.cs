@@ -194,7 +194,7 @@ namespace MyCAM.PathCache
 			double dLastProcessPathM = m_CraftData.InitMaster_rad;
 			double dLastProcessPathS = m_CraftData.InitSlave_rad;
 
-			IKSolveResult ikResult = postSolver.SolveIK( m_RefPoint.InitToolVec, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS );
+			IKSolveResult ikResult = postSolver.SolveIK( m_RefPoint.InitToolVec, dLastProcessPathM, dLastProcessPathS, out dLastProcessPathM, out dLastProcessPathS, m_RefPoint.ExternalAxisPos );
 			if( ikResult == IKSolveResult.InvalidInput || ikResult == IKSolveResult.NoSolution ) {
 				m_RefPoint.InitMaster_rad = DEFAULT_RAD;
 				m_RefPoint.InitSlave_rad = DEFAULT_RAD;

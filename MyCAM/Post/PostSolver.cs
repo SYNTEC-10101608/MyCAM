@@ -398,6 +398,7 @@ namespace MyCAM.Post
 			ISolverBuilder solverBuilder = CreateSolverBuilder( machineData );
 			m_FKSolver = solverBuilder.BuildFKSolver();
 			m_IKSolver = solverBuilder.BuildIKSolver();
+			m_ExternalAxes = machineData.ExternalAxes;
 
 			// single rotary axis machine is a specialized mix type with one axis locked at 0
 			if( machineData is MixTypeMachineData mixTypeMachineData ) {
@@ -415,11 +416,17 @@ namespace MyCAM.Post
 
 		public IKSolveResult SolveIK( gp_Dir toolVec, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
 		{
+			return SolveIK( toolVec, dM_In, dS_In, out dM_Out, out dS_Out, default( ExternalAxisPos ) );
+		}
+
+		public IKSolveResult SolveIK( gp_Dir toolVec, double dM_In, double dS_In, out double dM_Out, out double dS_Out, ExternalAxisPos externalAxisPos )
+		{
 			dM_Out = 0;
 			dS_Out = 0;
 			if( toolVec == null ) {
 				return IKSolveResult.InvalidInput;
 			}
+			toolVec = TransformExternalDirection( toolVec, externalAxisPos );
 
 			// swap the input master and slave axis if needed
 			if( m_IKSolver.IsReverseMS ) {
@@ -452,13 +459,25 @@ namespace MyCAM.Post
 
 		public gp_Vec SolveFK( double dM, double dS, gp_Pnt pointG54, gp_Vec offset )
 		{
-			if( pointG54 == null ) {
+			return SolveFKAtPositionedPoint( dM, dS, pointG54, offset );
+		}
+
+		// Returns only five-axis RTCP compensation, not external-axis displacement.
+		public gp_Vec SolveFK( double dM, double dS, gp_Pnt pointG54, gp_Vec offset, ExternalAxisPos externalAxisPos )
+		{
+			return SolveFKAtPositionedPoint( dM, dS, TransformExternalPosition( pointG54, externalAxisPos, offset ), offset );
+		}
+
+		// The input is already positioned and still expressed relative to G54.
+		public gp_Vec SolveFKAtPositionedPoint( double dM, double dS, gp_Pnt positionedPointG54, gp_Vec offset )
+		{
+			if( positionedPointG54 == null ) {
 				return new gp_Vec();
 			}
 			if( offset != null ) {
-				return m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54.XYZ() ), offset );
+				return m_FKSolver.Solve( dM, dS, new gp_Vec( positionedPointG54.XYZ() ), offset );
 			}
-			return m_FKSolver.Solve( dM, dS, new gp_Vec( pointG54.XYZ() ), new gp_Vec() );
+			return m_FKSolver.Solve( dM, dS, new gp_Vec( positionedPointG54.XYZ() ), new gp_Vec() );
 		}
 
 		public gp_Dir SolveToolVec( double dM, double dS )
@@ -466,8 +485,117 @@ namespace MyCAM.Post
 			return m_FKSolver.SolveToolVec( dM, dS );
 		}
 
+		public gp_Dir SolveToolVec( double dM, double dS, ExternalAxisPos externalAxisPos )
+		{
+			return InverseTransformExternalDirection( m_FKSolver.SolveToolVec( dM, dS ), externalAxisPos );
+		}
+
+		// MCS zero-pose axes: Ext1 is the parent of Ext2. Positive angles use the
+		// workpiece-side left-hand convention; RotaryDirection does not change it.
+		public gp_Trsf GetExternalAxisTransform( ExternalAxisPos externalAxisPos )
+		{
+			gp_Trsf transform = GetExternalAxis1Transform( externalAxisPos );
+			transform.Multiply( GetExternalAxis2Transform( externalAxisPos ) );
+			return transform;
+		}
+
+		public gp_Trsf GetExternalAxis1Transform( ExternalAxisPos externalAxisPos )
+		{
+			return m_ExternalAxes == null || m_ExternalAxes.Type == ExternalAxisType.None
+				? new gp_Trsf() : BuildExternalRotation( m_ExternalAxes.Ext1Axis, externalAxisPos.Ext1 );
+		}
+
+		public gp_Trsf GetExternalAxis2Transform( ExternalAxisPos externalAxisPos )
+		{
+			return m_ExternalAxes == null || m_ExternalAxes.Type != ExternalAxisType.Dual
+				? new gp_Trsf() : BuildExternalRotation( m_ExternalAxes.Ext2Axis, externalAxisPos.Ext2 );
+		}
+
+		static gp_Trsf BuildExternalRotation( RotateAxisDef axis, double angle_deg )
+		{
+			if( axis == null ) {
+				throw new InvalidOperationException( "External axes must be initialized before solving." );
+			}
+			gp_Trsf transform = new gp_Trsf();
+			if( angle_deg != 0 ) {
+				transform.SetRotation( axis.RotateAxis, -angle_deg * ( Math.PI / 180.0 ) );
+			}
+			return transform;
+		}
+
+		bool HasExternalMotion( ExternalAxisPos externalAxisPos )
+		{
+			return m_ExternalAxes != null && m_ExternalAxes.Type != ExternalAxisType.None
+				&& ( externalAxisPos.Ext1 != 0 || ( m_ExternalAxes.Type == ExternalAxisType.Dual && externalAxisPos.Ext2 != 0 ) );
+		}
+
+		public gp_Pnt TransformExternalPosition( gp_Pnt pointG54, ExternalAxisPos externalAxisPos, gp_Vec offset = null )
+		{
+			return TransformExternalPositionCore( pointG54, externalAxisPos, offset, false );
+		}
+
+		public gp_Pnt InverseTransformExternalPosition( gp_Pnt positionedPointG54, ExternalAxisPos externalAxisPos, gp_Vec offset = null )
+		{
+			return TransformExternalPositionCore( positionedPointG54, externalAxisPos, offset, true );
+		}
+
+		gp_Pnt TransformExternalPositionCore( gp_Pnt pointG54, ExternalAxisPos externalAxisPos, gp_Vec offset, bool inverse )
+		{
+			if( pointG54 == null ) {
+				return null;
+			}
+			gp_Pnt point = new gp_Pnt( pointG54.XYZ() );
+			if( !HasExternalMotion( externalAxisPos ) ) {
+				return point;
+			}
+			gp_Trsf transform = GetExternalAxisTransform( externalAxisPos );
+			if( inverse ) {
+				transform.Invert();
+			}
+			// Axis centers are MCS zero-pose data, not G54-relative pivots.
+			if( offset != null ) {
+				point.Translate( offset );
+			}
+			point.Transform( transform );
+			if( offset != null ) {
+				point.Translate( offset.Reversed() );
+			}
+			return point;
+		}
+
+		public gp_Vec GetExternalDisplacement( gp_Pnt pointG54, ExternalAxisPos externalAxisPos, gp_Vec offset = null )
+		{
+			return pointG54 == null ? new gp_Vec() : new gp_Vec( pointG54, TransformExternalPosition( pointG54, externalAxisPos, offset ) );
+		}
+
+		public gp_Dir TransformExternalDirection( gp_Dir direction, ExternalAxisPos externalAxisPos )
+		{
+			return direction == null ? null : direction.Transformed( GetExternalAxisTransform( externalAxisPos ) );
+		}
+
+		public gp_Dir InverseTransformExternalDirection( gp_Dir direction, ExternalAxisPos externalAxisPos )
+		{
+			gp_Trsf transform = GetExternalAxisTransform( externalAxisPos );
+			transform.Invert();
+			return direction == null ? null : direction.Transformed( transform );
+		}
+
+		public gp_Vec TransformExternalVector( gp_Vec vector, ExternalAxisPos externalAxisPos )
+		{
+			return vector == null ? null : vector.Transformed( GetExternalAxisTransform( externalAxisPos ) );
+		}
+
+		public gp_Vec InverseTransformExternalVector( gp_Vec vector, ExternalAxisPos externalAxisPos )
+		{
+			gp_Trsf transform = GetExternalAxisTransform( externalAxisPos );
+			transform.Invert();
+			return vector == null ? null : vector.Transformed( transform );
+		}
+
 		public bool IsToolVecSingular( double dM_rad, double dS_rad )
 		{
+			// Singularity and axis flipping are evaluated in the existing five-axis
+			// frame, before undoing external rotation into the original workpiece frame.
 			gp_Dir toolVec = SolveToolVec( dM_rad, dS_rad );
 			if( toolVec == null || m_MathmeticalMasterDir == null ) {
 				return false;
@@ -499,6 +627,7 @@ namespace MyCAM.Post
 
 		IKSolver m_IKSolver;
 		FKSolver m_FKSolver;
+		readonly ExternalAxisMachineData m_ExternalAxes;
 
 		// mix type specialization, MasterOnly / SlaveOnly locks one axis at 0
 		MixTypeVariant m_MixTypeVariant = MixTypeVariant.Mix;
