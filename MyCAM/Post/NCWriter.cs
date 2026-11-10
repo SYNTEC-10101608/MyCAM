@@ -40,10 +40,6 @@ namespace MyCAM.Post
 		{
 			errorMessage = string.Empty;
 			try {
-				if( HasExternalAxes && string.IsNullOrWhiteSpace( MyApp.CustomizedPostInfo?.ExternalAxisHeader ) ) {
-					errorMessage = "External axes require a non-empty <ExternalAxisHeader> customized post section.";
-					return false;
-				}
 				m_NCPostSolver = HasExternalAxes ? new PostSolver( m_MachineData ) : null;
 				using( m_StreamWriter = new StreamWriter( szTempFilePath ) ) {
 					m_StreamWriter.WriteLine( "%@MACRO" );
@@ -171,11 +167,7 @@ namespace MyCAM.Post
 						WriteExitSection( endInfoOfLastPath );
 					}
 					endInfoOfLastPath = null;
-					CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo.ExternalAxisHeader,
-						new Dictionary<string, string> {
-							{ "ExtAxisPos1", groupStart.ExternalAxisPos.Ext1.ToString( "G17", CultureInfo.InvariantCulture ) },
-							{ "ExtAxisPos2", groupStart.ExternalAxisPos.Ext2.ToString( "G17", CultureInfo.InvariantCulture ) }
-						} );
+					WriteExternalAxisSection( groupStart.ExternalAxisPos );
 				}
 				bool isEntry = endInfoOfLastPath == null;
 				if( pathType == PathType.Contour ) {
@@ -192,6 +184,29 @@ namespace MyCAM.Post
 				}
 			}
 			return true;
+		}
+
+		void WriteExternalAxisSection( ExternalAxisPos position )
+		{
+			m_StreamWriter.WriteLine( "// External axis move" );
+			string ext1 = position.Ext1.ToString( "G17", CultureInfo.InvariantCulture );
+			string ext2 = position.Ext2.ToString( "G17", CultureInfo.InvariantCulture );
+			string content = MyApp.CustomizedPostInfo?.ExternalAxisHeader;
+			if( content != null ) {
+				CustPostWriter.WriteCustomizedSection( m_StreamWriter, content, new Dictionary<string, string> {
+					{ "ExtAxisPos1", ext1 },
+					{ "ExtAxisPos2", ext2 }
+				} );
+				return;
+			}
+			List<KeyValuePair<string, string>> axes = new List<KeyValuePair<string, string>> {
+				new KeyValuePair<string, string>( RotaryAxisHelper.ConvertRotaryAxisName( m_MachineData.ExternalAxes.Ext1RotaryAxis ), ext1 )
+			};
+			if( m_MachineData.ExternalAxes.Type == ExternalAxisType.Dual ) {
+				axes.Add( new KeyValuePair<string, string>( RotaryAxisHelper.ConvertRotaryAxisName( m_MachineData.ExternalAxes.Ext2RotaryAxis ), ext2 ) );
+			}
+			axes.Sort( ( first, second ) => StringComparer.Ordinal.Compare( first.Key, second.Key ) );
+			m_StreamWriter.WriteLine( string.Join( " ", axes.ConvertAll( axis => axis.Key + " = " + axis.Value ) ) + ";" );
 		}
 
 		void WriteNonProcessingPath( int pathNumber )

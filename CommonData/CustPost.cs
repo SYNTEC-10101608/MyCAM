@@ -44,10 +44,11 @@ namespace CommonData
 			get;
 		} = string.Empty;
 
+		// null means the section is missing; an empty string suppresses output.
 		public string ExternalAxisHeader
 		{
 			get;
-		} = string.Empty;
+		}
 
 		// constructor with default content
 		public CustPost()
