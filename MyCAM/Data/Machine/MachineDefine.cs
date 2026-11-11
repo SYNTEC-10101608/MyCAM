@@ -78,8 +78,9 @@
 		// T1: tool coordinate frame (ax3)
 		T1_ToolFrame = 17,   
 
-		Ext1 = 18,
-		Ext2 = 19,
+		// external axes (18-29 reserved)
+		Ext1 = 30,
+		Ext2 = 31,
 	}
 
 	public enum MachinePrValue

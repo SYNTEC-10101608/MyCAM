@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MachineDataFile>
+  <MachineData>
+	<!-- Example only: replace the five-axis geometry and limits with actual machine values. -->
+	<!-- Spindle = 1; ToolDirection / RotaryAxis: X = 1, Y = 2, Z = 3. -->
+	<Pr ID="3001" Value="1" />
+	<Pr ID="3002" Value="3" />
+	<Pr ID="3005" Value="3" />
+	<Pr ID="3006" Value="1" />
+	<!-- RotaryDirection: None = 0, RightHand = 1, LeftHand = 2. -->
+	<Pr ID="3007" Value="1" />
+	<Pr ID="3008" Value="2" />
+	<Pr ID="3013" Value="0" />
+	<Pr ID="Master_Start" Value="-360" />
+	<Pr ID="Master_End" Value="360" />
+	<Pr ID="Slave_Start" Value="-90" />
+	<Pr ID="Slave_End" Value="90" />
+	<Pr ID="3015" Value="0" />
+	<Pr ID="3016" Value="0" />
+	<Pr ID="3017" Value="0" />
+	<Pr ID="3018" Value="0" />
+	<Pr ID="3019" Value="0" />
+	<Pr ID="3020" Value="0" />
+	<Pr ID="3021" Value="0" />
+	<Pr ID="3022" Value="0" />
+	<Pr ID="3023" Value="0" />
+	<Pr ID="3024" Value="0" />
+	<Pr ID="3025" Value="0" />
+	<Pr ID="3026" Value="0" />
+	<Pr ID="Tube_Dir" Value="3" />
+	<Pr ID="Simulation_Offset_X" Value="0" />
+	<Pr ID="Simulation_Offset_Y" Value="0" />
+	<Pr ID="Simulation_Offset_Z" Value="0" />
+	<Pr ID="Full_Machine_Simulation" Value="1" />
+
+	<!-- ExternalAxis_Type: None = 0, Single = 1, Dual = 2. -->
+	<Pr ID="ExternalAxis_Type" Value="2" />
+
+	<!-- Ext1: nominal Z axis; MCS zero center = (100, 200, 300) mm. -->
+	<!-- Offsets are micrometers; limits are degrees; tilts are millidegrees. -->
+	<Pr ID="Ext1_Axis" Value="3" />
+	<Pr ID="Ext1_Direction" Value="1" />
+	<Pr ID="Ext1_Start" Value="-360" />
+	<Pr ID="Ext1_End" Value="360" />
+	<Pr ID="Ext1_Offset_X" Value="100000" />
+	<Pr ID="Ext1_Offset_Y" Value="200000" />
+	<Pr ID="Ext1_Offset_Z" Value="300000" />
+	<Pr ID="Ext1_Tilt_X" Value="0" />
+	<Pr ID="Ext1_Tilt_Y" Value="0" />
+	<Pr ID="Ext1_Tilt_Z" Value="0" />
+
+	<!-- Ext2: nominal X axis; Ext1-to-Ext2 zero vector = (0, 0, 50) mm. -->
+	<!-- Therefore Ext2 MCS zero center = (100, 200, 350) mm. -->
+	<Pr ID="Ext2_Axis" Value="1" />
+	<Pr ID="Ext2_Direction" Value="2" />
+	<Pr ID="Ext2_Start" Value="-90" />
+	<Pr ID="Ext2_End" Value="90" />
+	<Pr ID="Ext2_Offset_X" Value="0" />
+	<Pr ID="Ext2_Offset_Y" Value="0" />
+	<Pr ID="Ext2_Offset_Z" Value="50000" />
+	<Pr ID="Ext2_Tilt_X" Value="0" />
+	<Pr ID="Ext2_Tilt_Y" Value="0" />
+	<Pr ID="Ext2_Tilt_Z" Value="0" />
+  </MachineData>
+
+  <MachineTree>
+	<Child Type="Base">
+	  <Child Type="XAxis">
+		<Child Type="YAxis">
+		  <Child Type="ZAxis">
+			<Child Type="Master">
+			  <Child Type="Slave">
+				<Child Type="Laser" />
+			  </Child>
+			</Child>
+		  </Child>
+		</Child>
+	  </Child>
+	  <Child Type="Ext1">
+		<Child Type="Ext2">
+		  <Child Type="WorkPiece" />
+		</Child>
+	  </Child>
+	</Child>
+  </MachineTree>
+</MachineDataFile>

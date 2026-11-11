@@ -115,8 +115,12 @@ try {
 		Assert-True ([int](Get-Enum 'MachineComponentType' 'WorkPiece') -eq 6) 'WorkPiece id changed.'
 		Assert-True ([int](Get-Enum 'MachineComponentType' 'Base') -eq 7) 'Base id changed.'
 		Assert-True ([int](Get-Enum 'MachineComponentType' 'T1_ToolFrame') -eq 17) 'Robot component id changed.'
-		Assert-True ([int](Get-Enum 'MachineComponentType' 'Ext1') -eq 18) 'Unexpected Ext1 id.'
-		Assert-True ([int](Get-Enum 'MachineComponentType' 'Ext2') -eq 19) 'Unexpected Ext2 id.'
+		Assert-True ([int](Get-Enum 'MachineComponentType' 'Ext1') -eq 30) 'Unexpected Ext1 id.'
+		Assert-True ([int](Get-Enum 'MachineComponentType' 'Ext2') -eq 31) 'Unexpected Ext2 id.'
+		$componentType = $script:assembly.GetType('MyCAM.Data.MachineComponentType', $true)
+		foreach ($reservedId in 18..29) {
+			Assert-True (-not [Enum]::IsDefined($componentType, $reservedId)) 'Reserved component id is already used.'
+		}
 		$machine = New-Machine 'Spindle'
 		Assert-True (($machine.ComponentTypes -join ',') -eq 'XAxis,YAxis,ZAxis,Master,Slave,Laser,WorkPiece') 'Legacy component order changed.'
 		Assert-True (-not $machine.MeshFileNameMap.ContainsKey((Get-Enum 'MachineComponentType' 'Ext1'))) 'Disabled external mesh is included.'

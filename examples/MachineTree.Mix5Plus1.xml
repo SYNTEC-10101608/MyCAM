@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MachineTree>
+  <Child Type="Base">
+	<Child Type="XAxis">
+	  <Child Type="YAxis">
+		<Child Type="ZAxis">
+		  <Child Type="Master">
+			<Child Type="Laser" />
+		  </Child>
+		</Child>
+	  </Child>
+	</Child>
+	<Child Type="Slave">
+	  <Child Type="Ext1">
+		<Child Type="WorkPiece" />
+	  </Child>
+	</Child>
+  </Child>
+</MachineTree>
