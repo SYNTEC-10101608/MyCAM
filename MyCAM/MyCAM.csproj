@@ -82,6 +82,7 @@
     <Compile Include="Data\Craft\CalibrationData.cs" />
     <Compile Include="Data\Craft\SpecialToolVecData.cs" />
     <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
+    <Compile Include="Data\ProcessPathGroup.cs" />
     <Compile Include="Data\SupportBracket\SupportBracketData.cs" />
     <Compile Include="Editor\Action\CAD\DesignSupportBracketAction.cs" />
     <Compile Include="Data\Machine\ComponentInfo.cs" />
@@ -239,6 +240,7 @@
     <Compile Include="Helper\CAM\ContourOffsetHelper.cs" />
     <Compile Include="Helper\CAM\FindWireOnOuterShellHelper.cs" />
     <Compile Include="Helper\CAM\MicroJointHelper.cs" />
+    <Compile Include="Helper\CAM\ProcessPathGroupHelper.cs" />
     <Compile Include="Helper\CAM\RotaryAxisHelper.cs" />
     <Compile Include="Helper\CAM\StartPointHelper.cs" />
     <Compile Include="Helper\Canvas\DrawHelper.cs" />

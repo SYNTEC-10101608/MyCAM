@@ -103,8 +103,8 @@ public static class ExternalAxisProgrammingTests
 			PathObject path = (PathObject)New( "MyCAM.Data." + objectType + "PathObject", id, geometry, new CraftData { LeadData = new LeadData( 2 ) }, source );
 			IDs.Add( id ); Map.Add( id, path ); return path;
 		}
-		public void Optimize() { Call( "MyCAM.PathCache.CacheHelper", "OptimizeIKContinuity", null, IDs, Machine ); }
-		public object[] Groups() { return Items( Call( "MyCAM.PathCache.CacheHelper", "GetProcessPathGroups", null, IDs, Machine ) ); }
+		public void Optimize() { ExternalAxisEditorTestHelper.Optimize( Manager ); }
+		public object[] Groups() { return Items( Call( "MyCAM.Helper.ProcessPathGroupHelper", "GetProcessPathGroups", null, IDs, Machine ) ); }
 	}
 
 	public static void FiniteAnglesCultureAndFullTurns()

@@ -22,7 +22,7 @@ try {
 		$parameters = New-Object System.CodeDom.Compiler.CompilerParameters
 		$parameters.GenerateInMemory = $true
 		$parameters.ReferencedAssemblies.AddRange([string[]]@($AssemblyPath, (Join-Path $bin 'OCCCSharp.dll'), (Join-Path $bin 'OCCTool.dll'), (Join-Path $bin 'CommonData.dll'), 'System.dll', 'System.Core.dll', 'System.Xml.dll', 'System.Drawing.dll', 'System.Windows.Forms.dll'))
-		$result = $provider.CompileAssemblyFromFile($parameters, [string[]]@(Join-Path $PSScriptRoot 'ExternalAxisProgramming.Tests.cs'))
+		$result = $provider.CompileAssemblyFromFile($parameters, [string[]]@((Join-Path $PSScriptRoot 'ExternalAxisProgramming.Tests.cs'), (Join-Path $PSScriptRoot 'ExternalAxisEditorTestHelper.cs')))
 		if ($result.Errors.HasErrors) {
 			throw (($result.Errors | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine)
 		}

@@ -278,8 +278,8 @@ namespace MyCAM.Data
 			SubscribeSubParamChanged();
 		}
 
-		public Action CAMFactorChanged;
-		public Action CADFactorChanged;
+		public event Action CAMFactorChanged;
+		public event Action CADFactorChanged;
 
 		public ExternalAxisPos ExternalAxisPos
 		{
@@ -949,7 +949,10 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				m_InitMaster_rad = value;
+				if( Math.Abs( m_InitMaster_rad - value ) > INIT_ANGLE_TOLERANCE_RAD ) {
+					m_InitMaster_rad = value;
+					CAMFactorChanged?.Invoke();
+				}
 			}
 		}
 
@@ -961,10 +964,14 @@ namespace MyCAM.Data
 			}
 			set
 			{
-				m_InitSlave_rad = value;
+				if( Math.Abs( m_InitSlave_rad - value ) > INIT_ANGLE_TOLERANCE_RAD ) {
+					m_InitSlave_rad = value;
+					CAMFactorChanged?.Invoke();
+				}
 			}
 		}
 
+		const double INIT_ANGLE_TOLERANCE_RAD = 1e-3;
 		const int DEFAULT_TECH_LAYER = 1;
 		int m_TechLayer = DEFAULT_TECH_LAYER;
 		bool m_ProcessPath = true;

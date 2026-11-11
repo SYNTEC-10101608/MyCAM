@@ -3,6 +3,7 @@ using CncManager.CNCCore;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
+using MyCAM.Helper;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.gp;
@@ -236,7 +237,29 @@ namespace MyCAM.Editor
 			if( pathIDList.Count == 0 ) {
 				return;
 			}
-			CacheHelper.OptimizeIKContinuity( pathIDList, m_DataManager.MachineData as FiveAxisMachineData );
+
+			foreach( string pathID in pathIDList ) {
+				if( DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) && !craftData.ProcessPath ) {
+					craftData.InitMaster_rad = 0;
+					craftData.InitSlave_rad = 0;
+				}
+			}
+			foreach( ProcessPathGroup group in ProcessPathGroupHelper.GetProcessPathGroups( pathIDList, m_DataManager.MachineData as FiveAxisMachineData ) ) {
+				double master = 0;
+				double slave = 0;
+				foreach( string pathID in group.PathIDs ) {
+					if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
+						continue;
+					}
+					craftData.InitMaster_rad = master;
+					craftData.InitSlave_rad = slave;
+					CAMPoint endPoint = CacheHelper.GetProcessEndPoint( pathID );
+					if( endPoint != null ) {
+						master = endPoint.ModMaster_rad;
+						slave = endPoint.ModSlave_rad;
+					}
+				}
+			}
 		}
 
 		public void SetStartPoint()

@@ -1,57 +1,10 @@
 ﻿using MyCAM.Data;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace MyCAM.PathCache
 {
 	public static class CacheHelper
 	{
-		internal static List<ProcessPathGroup> GetProcessPathGroups( IReadOnlyList<string> pathIDList, FiveAxisMachineData machineData )
-		{
-			List<ProcessPathGroup> groups = new List<ProcessPathGroup>();
-			ExternalAxisType type = machineData?.ExternalAxes.Type ?? ExternalAxisType.None;
-			for( int i = 0; i < pathIDList.Count; i++ ) {
-				if( !DataGettingHelper.GetCraftDataByID( pathIDList[ i ], out CraftData craftData ) || !craftData.ProcessPath ) {
-					continue;
-				}
-				ExternalAxisPos assigned = craftData.ExternalAxisPos;
-				ExternalAxisPos effective = type == ExternalAxisType.None ? default( ExternalAxisPos )
-					: new ExternalAxisPos( assigned.Ext1, type == ExternalAxisType.Dual ? assigned.Ext2 : 0 );
-				if( groups.Count == 0 || !groups.Last().ExternalAxisPos.Equals( effective ) ) {
-					groups.Add( new ProcessPathGroup( groups.Count, effective ) );
-				}
-				groups.Last().AddPath( pathIDList[ i ], i );
-			}
-			return groups;
-		}
-
-		internal static void OptimizeIKContinuity( IReadOnlyList<string> pathIDList, FiveAxisMachineData machineData )
-		{
-			foreach( string pathID in pathIDList ) {
-				if( DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) && !craftData.ProcessPath ) {
-					craftData.InitMaster_rad = 0;
-					craftData.InitSlave_rad = 0;
-				}
-			}
-			foreach( ProcessPathGroup group in GetProcessPathGroups( pathIDList, machineData ) ) {
-				double master = 0;
-				double slave = 0;
-				foreach( string pathID in group.PathIDs ) {
-					if( !DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) ) {
-						continue;
-					}
-					craftData.InitMaster_rad = master;
-					craftData.InitSlave_rad = slave;
-					craftData.CAMFactorChanged?.Invoke();
-					CAMPoint endPoint = GetProcessEndPoint( pathID );
-					if( endPoint != null ) {
-						master = endPoint.ModMaster_rad;
-						slave = endPoint.ModSlave_rad;
-					}
-				}
-			}
-		}
-
 		public static CAMPoint GetProcessStartPoint( string szPathID )
 		{
 			if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache pathCache ) ) {
@@ -170,29 +123,6 @@ namespace MyCAM.PathCache
 			master_rad = endPoint.ModMaster_rad;
 			slave_rad = endPoint.ModSlave_rad;
 			return true;
-		}
-	}
-
-	internal class ProcessPathGroup
-	{
-		readonly List<string> m_PathIDs = new List<string>();
-		readonly List<int> m_PathIndices = new List<int>();
-
-		public ProcessPathGroup( int index, ExternalAxisPos externalAxisPos )
-		{
-			Index = index;
-			ExternalAxisPos = externalAxisPos;
-		}
-
-		public int Index { get; }
-		public ExternalAxisPos ExternalAxisPos { get; }
-		public IReadOnlyList<string> PathIDs => m_PathIDs.AsReadOnly();
-		public IReadOnlyList<int> PathIndices => m_PathIndices.AsReadOnly();
-
-		internal void AddPath( string pathID, int pathIndex )
-		{
-			m_PathIDs.Add( pathID );
-			m_PathIndices.Add( pathIndex );
 		}
 	}
 }

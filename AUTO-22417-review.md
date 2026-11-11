@@ -126,7 +126,7 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 | [ContourPostHelper.cs](MyCAM/Post/ContourPostHelper.cs)、[StdPatternPostHelper.cs](MyCAM/Post/StdPatternPostHelper.cs)、[PostTraverseBuilder.cs](MyCAM/Post/PostTraverseBuilder.cs) | 加工點／標準圖元參考點轉裝時保留角度；Entry／Exit、抬刀／下刀、蛙跳及安全面 PostPoint 使用相應端點的角度。 |
 
 **注意：**
-- 組內空移維持固定外部角度，不插補外部軸。
+- 組內空移沿用對應來源加工點的原始外部角度，不插補外部軸；M4 容差分組不會將點上角度覆寫為組首值。
 - 暫時空移 CAMPoint 在此階段只帶入變位機角度；空移 M/S 仍由後處理沿用或插補。模擬新建點的傳遞接點歸 M6，既有姿態編輯預覽接點歸 M8。
 
 ## M3 共用變位轉換與五軸求解
@@ -237,7 +237,10 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 | [NCWriter.cs](MyCAM/Post/NCWriter.cs) 的 `TransformNCPoint`／`TransformNCTraverse`（M7） | 呼叫共用位置轉換，逐點 Clone 後改寫 XYZ；Traverse 容器以新點替換欄位，不可再次套用變位。 |
 
 **注意：**
-- 原工件編程基準保持不變；IK 只前轉刀向、刀向正解只反轉回原工件；FK 使用 Pₑ 但只回傳 Δtcp；模擬組裝 Pₑ＋Δtcp 並建立外部軸影格；NC 只輸出 Pₑ。
+- 原工件編程基準保持不變。
+- IK 只前轉刀向、刀向正解只反轉回原工件。
+- FK 使用 Pₑ 但只回傳 Δtcp，模擬組裝 Pₑ＋Δtcp 並建立外部軸影格。
+- NC 只輸出 Pₑ。
 
 ## M4 連續分組、組端點與 IK 連續性
 
@@ -245,12 +248,33 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 
 | 施工對象 | 施工內容 |
 | --- | --- |
-| [CacheHelper.cs](MyCAM/PathCache/CacheHelper.cs) | 新增 `ProcessPathGroup`、`GetProcessPathGroups` 及分組版 `OptimizeIKContinuity`；過濾不加工路徑，保留原始路徑索引，依有效軸精確值連續分組。每組 M/S 種子從零開始，組內承接前一加工終點的修改後角度；起終點沿用既有 CacheHelper 規則。 |
-| [SimuData.cs](MyCAM/Data/Simulation/SimuData.cs) | 新增 `ProcessGroupPostData`，保存組資訊、組內 PostData 及 Clone 後的完整首末 CAMPoint；模擬輸入增加 `ProcessGroups`。 |
-| [NCWriter.cs](MyCAM/Post/NCWriter.cs)（後處理組裝） | `ConvertPostDataListSuccess` 逐組重設前一路徑狀態，產生組內後處理資料與組端點；保留原扁平輸出介面，標準圖元模擬仍取得完整加工點。 |
-| [CAMEditor.cs](MyCAM/Editor/CAMEditor.cs)、[SimuEditor.cs](MyCAM/Editor/SimuEditor.cs)（協調接點） | 前者將既有全域 IK 最佳化導向共用分組；後者取得並傳送組資料與完整組末點到模擬輸入。 |
+| [ProcessPathGroupHelper.cs](MyCAM/Helper/CAM/ProcessPathGroupHelper.cs) | 專責 `GetProcessPathGroups`：略過不加工或缺少工藝資料的路徑，保留原始順序／索引；依有效軸與當前組首的 1e-3° 容差連續分組，不讀取快取或改寫工藝資料。 |
+| [ProcessPathGroup.cs](MyCAM/Data/ProcessPathGroup.cs) | 獨立的分組描述：`Index` 為從 0 開始的組序號，`ExternalAxisPos` 為組首的有效角度，`PathIDs`／`PathIndices` 一一對應組內路徑與輸入清單原始索引；本身不包含加工點或 PostData。 |
+| [CraftData.cs](MyCAM/Data/Craft/CraftData.cs) (順手修改) | InitMaster_rad／InitSlave_rad setter 使用 `INIT_ANGLE_TOLERANCE_RAD = 1e-3`，超過容差才寫入並觸發 CAMFactorChanged；容差內不寫入、不通知。CAMFactorChanged／CADFactorChanged 改為 `event Action`，外部只能訂閱／取消訂閱。 |
+| [CAMEditor.cs](MyCAM/Editor/CAMEditor.cs) | 既有 `DoOptimizeIKContinuity` 使用「組 → 路徑」迴圈，每組參考 M/S 從零開始，組內承接前一加工終點的修改後角度。 |
+| [TraverseRenderer.cs](MyCAM/Editor/Renderer/TraverseRenderer.cs)（M5） | 使用共用分組建立組內前一路徑對應、各組 Entry／Exit，並判定失效圖元清理範圍；不自行判斷角度或建立跨組 Traverse。 |
+| [SimuEditor.cs](MyCAM/Editor/SimuEditor.cs)（M6） | 取得並傳送組資料與完整組末點到模擬輸入。 |
+| [SimuData.cs](MyCAM/Data/Simulation/SimuData.cs)（M6） | 新增 `ProcessGroupPostData`，保存組資訊、組內 PostData 及 Clone 後的完整首末 CAMPoint；模擬輸入增加 `ProcessGroups`。 |
+| [NCWriter.cs](MyCAM/Post/NCWriter.cs)（M6／M7 接點） | `ConvertPostDataListSuccess` 供 M6 組裝資料：逐組重設前一路徑狀態，產生組內 PostData 與組端點，保留扁平輸出及標準圖元完整加工點。M7 實際寫出則由 `ProcessAllPaths` 使用同一 Helper 建立組首索引表，在原路徑迴圈處理切組及變位指令。 |
 
-**責任界線：** 不排序、不合併不相鄰的同角度組、不做近似比較或週期正規化，0°／360° 是不同位置。加工起點優先 LeadIn；終點優先 LeadOut，其次 OverCut，否則 MainPath。各組均有 Entry／Exit，不能只留不帶 ToolVec 的 PostPoint 來重建組末退刀。
+### 分組計算流程
+
+`GetProcessPathGroups` 接收原順序的路徑 ID 清單與機台資料，每次呼叫重新計算，不保存共用分組快取。
+
+1. **決定有效軸：** 依機台的 ExternalAxisType 決定比較方式；未提供機台資料時視為 None。
+2. **依序取得工藝資料：** 逐條讀取 CraftData，取不到或 ProcessPath 為 false 時略過，不因此結束當前組；保留該路徑在輸入清單的原始索引。
+3. **建立比較用角度：** None 使用 `(0, 0)`、Single 使用 `(Ext1, 0)`、Dual 使用 `(Ext1, Ext2)`；這只是分組用值，不回寫原始工藝角度。
+4. **判定沿用或開新組：** 只與最後一組保存的「組首有效角度」比較。尚無組，或任一有效軸差值超過 1e-3°，就建立新組；否則加入當前組。不與前一路徑連鎖比較，例如 `0、0.0008、0.0016` 分為 `[0、0.0008]`、`[0.0016]` 兩組。
+5. **記錄並回傳：** 同步加入路徑 ID 與原始索引，組序號依建立順序從 0 開始。輸入為空或所有路徑皆被略過時，回傳空清單；加工點、PostData 與進退刀由各使用端後續取得或建立。
+
+**分組與原值界線：**
+- 無變位機且有有效加工路徑時為一組。
+- 單轉台只比較 Ext1，雙轉台逐軸比較 Ext1／Ext2。
+- 與當前組首的差值均不超過 `EXTERNAL_AXIS_TOLERANCE_DEG = 1e-3`（degree）時歸同組。
+- 不排序、不合併不相鄰的同角度組，也不做週期正規化；0°／360° 仍為不同組。
+- 不加工或缺少工藝資料的路徑不造成切組，因此組內原始索引不一定連續。
+- 容差只影響分組邊界；工藝、CAM／Post 點及後續求解保留各自原始角度，ExternalAxisPos 的精確相等規則不變。
+- NC 變位指令每組一次，採組首路徑的有效原值，不將組內角度全部改為該值。
 
 ## M5 空移與進退刀顯示
 
@@ -258,7 +282,7 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 
 | 施工對象 | 施工內容 |
 | --- | --- |
-| [TraverseRenderer.cs](MyCAM/Editor/Renderer/TraverseRenderer.cs) | 使用同組前一路徑對應，只建立組內 Traverse；每組 Entry／Exit 使用含首／末路徑 ID 的獨立鍵；重建時清除舊組端點及刪除／停用路徑圖元，局部更新略過不加工路徑，已刪除 ID 則全量失效重建。 |
+| [TraverseRenderer.cs](MyCAM/Editor/Renderer/TraverseRenderer.cs) | 自身 `GetProcessPathGroups` 轉呼叫 M4 的 ProcessPathGroupHelper；`GetPreviousProcessPathMap` 只建立組內前一路徑對應，`ShowEntryAndExitWithTrans` 逐組建立進退刀，不連接跨組 Traverse。每組 Entry／Exit 使用含首／末路徑 ID 的獨立鍵；重建時清除舊組端點及刪除／停用路徑圖元，局部更新略過不加工路徑，已刪除 ID 則全量失效重建。 |
 
 **責任界線：** AIS 在原工件座標建立，預覽／播放再套用 WorkPiece 影格；不在 Renderer 重算變位或 RTCP。`TraverseHelper` 的幾何計算仍在原工件座標，該檔本次主要是 M2 的角度傳遞；安全面設定預覽不要求與正式組內空移具有相同相鄰關係。
 

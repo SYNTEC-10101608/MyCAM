@@ -76,7 +76,7 @@ public static class ExternalAxisNCTests
 			CraftData craft = new CraftData { ExternalAxisPos = new ExternalAxisPos( angle, 19 ), LeadData = new LeadData( 2 ) };
 			PathObject path = (PathObject)New( "MyCAM.Data.CirclePathObject", "Circle" + IDs.Count, geom, craft, source ); IDs.Add( path.UID ); Map.Add( path.UID, path ); return path;
 		}
-		public object[] Groups() { return Items( Call( "MyCAM.PathCache.CacheHelper", "GetProcessPathGroups", null, IDs, Machine ) ); }
+		public object[] Groups() { return Items( Call( "MyCAM.Helper.ProcessPathGroupHelper", "GetProcessPathGroups", null, IDs, Machine ) ); }
 		public string Export( CustPost custom )
 		{
 			object old = PostField.GetValue( null ); string path = Path.GetTempFileName();
@@ -251,6 +251,27 @@ public static class ExternalAxisNCTests
 			}
 		}
 	}
+	public static void ToleranceGroupsEmitFirstOriginalPositionOnce()
+	{
+		foreach( ExternalAxisType type in new[] { ExternalAxisType.Single, ExternalAxisType.Dual } ) {
+			foreach( bool mix in type == ExternalAxisType.Single ? new[] { false, true } : new[] { false } ) {
+				Fixture f = new Fixture( type, mix );
+				ContourPathObject first = f.Add( 12.3456, -23.4567 ), nearby = f.Add( 12.3464, -23.4559 );
+				f.Add( 12.3472, -23.4551 ); f.Add( 12.3456, -23.4567 );
+				string output = f.Export( Custom( "// POSITION {ExtAxisPos1} {ExtAxisPos2}" ) );
+				string[] sections = Lines( output ).Where( s => s.StartsWith( "// POSITION " ) ).ToArray();
+				Assert( sections.Length == 3 && Lines( output ).Count( s => s == "// External axis move" ) == 3, "Tolerance groups did not emit once per group." );
+				double[] starts = { 12.3456, 12.3472, 12.3456 }, second = { -23.4567, -23.4551, -23.4567 };
+				for( int i = 0; i < sections.Length; i++ ) {
+					string[] values = sections[i].Substring( "// POSITION ".Length ).Split( ' ' );
+					Assert( double.Parse( values[0], CultureInfo.InvariantCulture ) == starts[i], "Group start angle was rounded or replaced by a nearby path." );
+					Assert( double.Parse( values[1], CultureInfo.InvariantCulture ) == ( type == ExternalAxisType.Dual ? second[i] : 0 ), "Wrong effective second-axis group value." );
+				}
+				Assert( nearby.CraftData.ExternalAxisPos.Equals( new ExternalAxisPos( 12.3464, -23.4559 ) ), "NC changed the nearby path's original angles." );
+				CheckNC( f );
+			}
+		}
+	}
 	public static void DefaultOutputMapsAxisNamesAndKeepsSortedValues()
 	{
 		RotaryAxis[] axes = { RotaryAxis.X, RotaryAxis.Y, RotaryAxis.Z }; string[] names = { "A", "B", "C" };
@@ -300,12 +321,13 @@ public static class ExternalAxisNCTests
 		CheckNC( f ); string[] relevant = Lines( f.Export( Custom( "// POSITION {ExtAxisPos1} {ExtAxisPos2}" ) ) ).Where( s => s.StartsWith( "// POSITION" ) || s.StartsWith( "// PATH" ) || s == "// Exit" || s == "// External axis move" ).ToArray();
 		Assert( relevant.SequenceEqual( new[] { "// External axis move", "// POSITION 0 0", "// PATH 1", "// PATH 2", "// Exit", "// External axis move", "// POSITION 180 0", "// PATH 3", "// PATH 4", "// Exit", "// External axis move", "// POSITION 0 0", "// PATH 5", "// Exit" } ), "Wrong grouped NC ordering." );
 	}
-	public static void FullTurnsAndExactGroupAngles()
+	public static void FullTurnsToleranceAndOriginalGroupAngles()
 	{
-		Fixture f = new Fixture( ExternalAxisType.Single, false ); foreach( double a in new[] { 0.0, 360, 0, 1e-12 } ) { f.Add( a, 0 ); }
+		Fixture f = new Fixture( ExternalAxisType.Single, false ); foreach( double a in new[] { 1e-12, 360, 0, 1e-12 } ) { f.Add( a, 0 ); }
 		CheckNC( f ); string[] sections = Lines( f.Export( Custom( "POSITION {ExtAxisPos1}" ) ) ).Where( s => s.StartsWith( "POSITION " ) ).ToArray();
-		Assert( sections.Length == 4 && sections[1] == "POSITION 360", "Full turns merged." );
-		Assert( double.Parse( sections[3].Substring( 9 ), CultureInfo.InvariantCulture ) == 1e-12, "Assigned small angle was rounded away." );
+		Assert( sections.Length == 3 && sections[1] == "POSITION 360" && sections[2] == "POSITION 0", "Full turns merged or nearby angles split." );
+		Assert( double.Parse( sections[0].Substring( 9 ), CultureInfo.InvariantCulture ) == 1e-12, "Small original group start was rounded away." );
+		Assert( ( (PathObject)f.Map[f.IDs[3]] ).CraftData.ExternalAxisPos.Ext1 == 1e-12, "Tolerance grouping replaced a path's small original angle." );
 	}
 	public static void SingleIgnoresInactiveSecondAndDualUsesBoth()
 	{

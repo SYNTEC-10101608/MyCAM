@@ -290,7 +290,7 @@ namespace MyCAM.Editor.Renderer
 
 		List<ProcessPathGroup> GetProcessPathGroups()
 		{
-			return CacheHelper.GetProcessPathGroups( m_DataManager.PathIDList, m_DataManager.MachineData as FiveAxisMachineData );
+			return ProcessPathGroupHelper.GetProcessPathGroups( m_DataManager.PathIDList, m_DataManager.MachineData as FiveAxisMachineData );
 		}
 
 		Dictionary<string, string> GetPreviousProcessPathMap()

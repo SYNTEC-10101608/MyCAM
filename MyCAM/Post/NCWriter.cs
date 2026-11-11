@@ -78,7 +78,7 @@ namespace MyCAM.Post
 			postDataList = new List<PostData>();
 			processGroups = new List<SimuData.ProcessGroupPostData>();
 			try {
-				foreach( ProcessPathGroup group in CacheHelper.GetProcessPathGroups( m_PathIDList, m_DataManager.MachineData as FiveAxisMachineData ) ) {
+				foreach( ProcessPathGroup group in ProcessPathGroupHelper.GetProcessPathGroups( m_PathIDList, m_DataManager.MachineData as FiveAxisMachineData ) ) {
 					PathEndInfo endInfoOfLastPath = null;
 					List<PostData> groupPostData = new List<PostData>();
 					foreach( int i in group.PathIndices ) {
@@ -149,7 +149,7 @@ namespace MyCAM.Post
 			endInfoOfLastPath = null;
 			Dictionary<int, ProcessPathGroup> groupStarts = new Dictionary<int, ProcessPathGroup>();
 			if( HasExternalAxes ) {
-				foreach( ProcessPathGroup group in CacheHelper.GetProcessPathGroups( m_PathIDList, m_MachineData ) ) {
+				foreach( ProcessPathGroup group in ProcessPathGroupHelper.GetProcessPathGroups( m_PathIDList, m_MachineData ) ) {
 					groupStarts.Add( group.PathIndices[ 0 ], group );
 				}
 			}

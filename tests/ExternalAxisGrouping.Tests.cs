@@ -37,6 +37,7 @@ public static class ExternalAxisGroupingTests
 			Machine = mix ? (FiveAxisMachineData)new MixTypeMachineData { ToolToMasterVec = new gp_Vec(), MCSToSlaveVec = new gp_Vec() }
 				: new SpindleTypeMachineData { ToolToSlaveVec = new gp_Vec(), SlaveToMasterVec = new gp_Vec() };
 			Machine.ToolDirection = ToolDirection.Z;
+			Machine.ToolLength = 12;
 			Machine.MasterRotaryAxis = mix ? RotaryAxis.X : RotaryAxis.Z;
 			Machine.SlaveRotaryAxis = mix ? RotaryAxis.Z : RotaryAxis.X;
 			Machine.MasterTiltedVec_deg = new gp_XYZ();
@@ -67,7 +68,7 @@ public static class ExternalAxisGroupingTests
 			ContourPathObject path = new ContourPathObject( id, null, geom, craft );
 			IDs.Add( id ); Map.Add( id, path ); return path;
 		}
-		public object[] Groups() { return Items( Call( "MyCAM.PathCache.CacheHelper", "GetProcessPathGroups", null, IDs, Machine ) ); }
+		public object[] Groups() { return Items( Call( "MyCAM.Helper.ProcessPathGroupHelper", "GetProcessPathGroups", null, IDs, Machine ) ); }
 		public object[] Convert( out List<PostData> flat )
 		{
 			object writer = New( "MyCAM.Post.NCWriter", Manager );
@@ -87,13 +88,96 @@ public static class ExternalAxisGroupingTests
 		Assert( Items( Get( groups[0], "PathIDs" ) ).Length == 2 && Items( Get( groups[1], "PathIDs" ) ).Length == 2, "Wrong run sizes." );
 		for( int i = 0; i < groups.Length; i++ ) { Assert( (int)Get( groups[i], "Index" ) == i, "Wrong group index." ); }
 	}
-	public static void ExactAnglesAndFullTurns()
+	public static void AngleToleranceAndFullTurns()
 	{
 		Fixture f = new Fixture( ExternalAxisType.Single, false );
 		f.Add( 0, 0 ); f.Add( 360, 0 ); f.Add( 0, 0 );
 		Assert( f.Groups().Length == 3, "Full turns were merged." );
 		f.Add( 1e-12, 0 );
-		Assert( f.Groups().Length == 4, "Close angles were approximately merged." );
+		Assert( f.Groups().Length == 3, "Angles within tolerance were split." );
+	}
+	public static void ToleranceComparesWithGroupStart()
+	{
+		Fixture f = new Fixture( ExternalAxisType.Single, false );
+		foreach( double angle in new[] { 0.0, 0.0008, 0.0016, 0.0024, 360, 360.0008 } ) { f.Add( angle, 0 ); }
+		object[] groups = f.Groups();
+		Assert( groups.Length == 3, "Tolerance chained through previous paths instead of group starts." );
+		Assert( groups.All( g => Items( Get( g, "PathIDs" ) ).Length == 2 ), "Wrong tolerance group sizes." );
+		Assert( ( (ExternalAxisPos)Get( groups[1], "ExternalAxisPos" ) ).Ext1 == 0.0016, "Group start angle was rounded." );
+	}
+	public static void ToleranceBoundaryAndDualAxes()
+	{
+		Fixture single = new Fixture( ExternalAxisType.Single, false );
+		single.Add( 0, 99 ); single.Add( 1e-3, -99 ); single.Add( 0.001001, 0 );
+		Assert( single.Groups().Length == 2 && Items( Get( single.Groups()[0], "PathIDs" ) ).Length == 2, "Single-axis tolerance boundary changed." );
+		Fixture dual = new Fixture( ExternalAxisType.Dual, false );
+		dual.Add( 0, 0 ); dual.Add( 0.0008, -0.0008 ); dual.Add( 0.0008, 0.0011 );
+		Assert( dual.Groups().Length == 2 && Items( Get( dual.Groups()[0], "PathIDs" ) ).Length == 2, "Dual axes did not apply tolerance independently." );
+	}
+	public static void TolerancePreservesOriginalPointAndFKAngles()
+	{
+		Fixture f = new Fixture( ExternalAxisType.Single, false );
+		ContourPathObject first = f.Add( 30, 91 ), second = f.Add( 30.0008, -83 );
+		List<PostData> flat; object[] groups = f.Convert( out flat );
+		Assert( groups.Length == 1, "Tolerance did not combine nearby processing positions." );
+		Assert( ( (ExternalAxisPos)Get( Get( groups[0], "Group" ), "ExternalAxisPos" ) ).Equals( new ExternalAxisPos( 30, 0 ) ), "Group representative is not the first effective assignment." );
+		ContourPathObject[] paths = { first, second };
+		object solver = New( "MyCAM.Post.PostSolver", f.Machine );
+		for( int i = 0; i < paths.Length; i++ ) {
+			ExternalAxisPos original = new ExternalAxisPos( i == 0 ? 30 : 30.0008, i == 0 ? 91 : -83 );
+			Assert( paths[i].CraftData.ExternalAxisPos.Equals( original ), "Grouping changed original craft angles." );
+			Assert( paths[i].ContourCache.MainPathPointList.All( p => p.ExternalAxisPos.Equals( original ) ), "Grouping replaced original CAM angles." );
+			Assert( flat[i].MainPathPostPointList.All( p => p.ExternalAxisPos.Equals( original ) ), "Grouping replaced original Post angles." );
+			object[] args = { solver, flat[i].MainPathPostPointList[0], null, f.Machine.SimulationOffset };
+			Assert( (bool)Call( "MyCAM.Helper.FiveAxisSimuPathBuilder", "BuildFKPostPntFiveAxis", null, args ), "FK conversion failed." );
+			Assert( ( (PostPoint)args[2] ).ExternalAxisPos.Equals( original ), "FK discarded original angles within tolerance." );
+		}
+	}
+	public static void IKSeedSettersOwnNotificationsAndTolerance()
+	{
+		CraftData craft = new CraftData(); int changes = 0;
+		Action handler = delegate { changes++; };
+		craft.CAMFactorChanged += handler;
+		craft.InitMaster_rad = 0; craft.InitSlave_rad = 0;
+		craft.InitMaster_rad = 1e-3; craft.InitSlave_rad = -1e-3;
+		Assert( changes == 0 && craft.InitMaster_rad == 0 && craft.InitSlave_rad == 0, "Tolerance boundary wrote or notified." );
+		craft.InitMaster_rad = 0.2; craft.InitSlave_rad = -0.3;
+		Assert( changes == 2, "Seed changes did not notify internally." );
+		craft.InitMaster_rad = 0.2005; craft.InitSlave_rad = -0.3005;
+		Assert( changes == 2 && craft.InitMaster_rad == 0.2 && craft.InitSlave_rad == -0.3, "Close seeds wrote or notified." );
+		craft.InitMaster_rad = 0.202; craft.InitSlave_rad = -0.302;
+		Assert( changes == 4 && craft.InitMaster_rad == 0.202 && craft.InitSlave_rad == -0.302, "Seed changes beyond tolerance were ignored." );
+		craft.CAMFactorChanged -= handler;
+		craft.InitMaster_rad = 0;
+		Assert( changes == 4, "Event unsubscription failed." );
+	}
+	public static void CraftFactorNotificationsAreEvents()
+	{
+		foreach( string name in new[] { "CAMFactorChanged", "CADFactorChanged" } ) {
+			EventInfo notification = typeof( CraftData ).GetEvent( name );
+			Assert( notification != null && notification.GetAddMethod().IsPublic && notification.GetRemoveMethod().IsPublic, "Notification cannot be subscribed to." );
+			Assert( notification.GetRaiseMethod() == null && typeof( CraftData ).GetField( name ) == null, "Notification can be invoked externally." );
+		}
+	}
+	public static void SeedChangesInvalidateCacheWithoutExternalNotification()
+	{
+		Fixture f = new Fixture( ExternalAxisType.Single, false ); ContourPathObject path = f.Add( 0, 0 );
+		CAMPoint initial = path.ContourCache.MainPathPointList[0];
+		path.CraftData.InitMaster_rad = 0.2;
+		CAMPoint changed = path.ContourCache.MainPathPointList[0];
+		Assert( !ReferenceEquals( initial, changed ), "Changed master seed did not dirty cache." );
+		path.CraftData.InitMaster_rad = 0.2005;
+		Assert( ReferenceEquals( changed, path.ContourCache.MainPathPointList[0] ), "Close master seed rebuilt cache." );
+		path.CraftData.InitSlave_rad = -0.3;
+		Assert( !ReferenceEquals( changed, path.ContourCache.MainPathPointList[0] ), "Changed slave seed did not dirty cache." );
+	}
+	public static void OptimizationDoesNotRebuildUnchangedSeeds()
+	{
+		Fixture f = new Fixture( ExternalAxisType.None, false ); ContourPathObject path = f.Add( 0, 0 );
+		CAMPoint initial = path.ContourCache.MainPathPointList[0]; int changes = 0;
+		path.CraftData.CAMFactorChanged += delegate { changes++; };
+		ExternalAxisEditorTestHelper.Optimize( f.Manager );
+		Assert( changes == 0 && ReferenceEquals( initial, path.ContourCache.MainPathPointList[0] ), "Unchanged optimization forced a rebuild." );
 	}
 	public static void EnabledPathSubsetMatrixKeepsExactRunsAndOriginalIndices()
 	{
@@ -212,7 +296,7 @@ public static class ExternalAxisGroupingTests
 			List<ContourPathObject> paths = new List<ContourPathObject>();
 			foreach( double angle in new[] { 0.0, 0, 180, 180, 0 } ) { paths.Add( f.Add( angle, 0 ) ); }
 			foreach( ContourPathObject path in paths ) { path.CraftData.InitMaster_rad = 19; path.CraftData.InitSlave_rad = 23; }
-			Call( "MyCAM.PathCache.CacheHelper", "OptimizeIKContinuity", null, f.IDs, f.Machine );
+			ExternalAxisEditorTestHelper.Optimize( f.Manager );
 			foreach( int index in new[] { 0, 2, 4 } ) {
 				Assert( paths[index].CraftData.InitMaster_rad == 0 && paths[index].CraftData.InitSlave_rad == 0, "Group seed did not reset to M=S=0." );
 			}
