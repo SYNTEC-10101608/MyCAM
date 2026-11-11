@@ -133,13 +133,111 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 
 **權責：** 統一處理外部軸幾何影響，並與既有五軸姿態求解、RTCP 位置補償分開。
 
-| 施工對象 | 施工內容 |
-| --- | --- |
-| [PostSolver.cs](MyCAM/Post/PostSolver.cs) | 新增各軸／組合變換、位置／方向／向量正反轉換與 `GetExternalDisplacement`。`SolveIK` 先旋轉刀向；帶外部角度的 `SolveToolVec` 反轉變位旋轉；`SolveFK` 先取得已變位位置，`SolveFKAtPositionedPoint` 則明確接收已變位點，兩者均只回傳五軸 RTCP 補償。 |
-| [ContourCache.cs](MyCAM/PathCache/ContourCache.cs)、[StdPatternCacheBase.cs](MyCAM/PathCache/StdPatternCacheBase.cs)（求解接點） | 將點上的外部角度傳入初始姿態及刀向回算流程；不在 Cache 預先變位幾何。 |
-| [ToolVecHelper.cs](MyCAM/Helper/CAM/ToolVecHelper.cs) | 指定／鎖軸、局部 AB、傾角與插補相關求解傳入角度；局部幾何仍以原工件座標處理，翻轉與奇異判斷保持既有五軸求解座標。 |
+### 前情提要：SimulationOffset 與 Pₑ 的座標語意
 
-**責任界線：** 外部正角度採工件側左手慣例，即 OCC 負 radian；`RotaryDirection` 不再額外改變外部旋轉正負。位置轉換為 `Pₑ＝T_ext(P＋O)－O`，組合變換為 `T_Ext1 × T_Ext2`；方向不帶平移。外部角度為 degree，M/S 維持 radian。變位位移不混入 RTCP 補償回傳值。
+**SimulationOffset（O）是機構零位時，由 MCS 原點指向原 G54 原點的位置向量，以 MCS 基底表示，單位 mm。** 目前只描述平移，MCS 與原 G54 的基底方向一致。
+
+- P 是變位前加工點在原 G54 中的座標，其零位 MCS 位置為 P＋O。
+- **G54′** 是隨外部軸變位帶動的虛擬工件座標系。同一實體點與此座標系一起運動，因此變位後在 G54′ 中的座標仍是 P。
+- **Pₑ** 是同一實體點變位後，**以固定原 G54 表示的座標**。
+- **Pₑ** 可以理解為將變位後的加工點改以固定原 G54 描述，供既有五軸計算使用；這是座標表示的等效，不代表省略外部軸機構或將變位位移併入五軸補償。
+
+`Tₑ` 是以 MCS 零位軸中心、方向與外部角度建立的變換，**本身不依賴 O**。
+先由 P＋O 取得變位前 MCS 位置，套用 Tₑ 得到變位後 MCS 位置，再減 O 換回固定原 G54，因此 **Pₑ＝Tₑ(P＋O)－O**。
+以原 G54 表示的等效矩陣為 `T(－O) × Tₑ × T(O)`，這個矩陣才依賴 O；T(O) 表示平移。
+
+無變位機時，O 用於模擬放置及依構型參與 RTCP 補償，不改寫 NC 的原 G54 座標。
+有變位機時，NC 位置預轉換也使用 O，但仍輸出固定原 G54 下的 Pₑ。
+**O 必須與實機 G54／旋轉中心基準一致，不能只為調整模擬畫面而任意修改。**
+
+### 算法調整總覽：無變位機／有變位機
+
+主要實作位於 [PostSolver.cs](MyCAM/Post/PostSolver.cs)。
+本次是在既有五軸求解器外側加入變位轉換，**不是將外部軸加入五軸逆解，改成六／七軸聯動求解器**。
+外部角度由路徑指派，求解結果仍只有 M/S；支援 Spindle＋Single／Dual、Mix＋Single，不擴充 Table＋變位機。
+
+以下沿用上述 P、Pₑ、O、Tₑ 定義；`v` 表示原工件刀向、`E` 表示 ExternalAxisPos，`Rₑ` 是 Tₑ 的旋轉部分；`IK₅`、`V₅`、`F₅` 分別代表既有五軸姿態逆解、刀向正解、RTCP 補償算法。
+
+| 計算環節 | 無變位機 | 有變位機 | 調整的責任 |
+| --- | --- | --- | --- |
+| 編程幾何／局部刀向 | 使用 P、v | 仍使用 P、v，不預先改寫 Cache 幾何 | 保留原工件座標的編程基準。 |
+| 變位後位置 | Pₑ＝P | Pₑ＝Tₑ(P＋O)－O | 只處理外部軸造成的位置變化，結果仍以固定原 G54 表示。 |
+| `SolveIK` | IK₅(v, 參考 M/S) | IK₅(Rₑv, 參考 M/S) | 先轉換目標刀向，再求五軸 M/S；不求 E。 |
+| `SolveToolVec` | v＝V₅(M,S) | v＝Rₑ⁻¹V₅(M,S)（帶 E 入口） | 把五軸回算刀向還原到原工件座標。 |
+| `SolveFK` | Δtcp＝F₅(M,S,P,O) | Δtcp＝F₅(M,S,Pₑ,O) | 依變位後位置求五軸 RTCP 補償。 |
+| 模擬 FK 中間點 | P＋Δtcp | Pₑ＋Δtcp＝P＋Δext＋Δtcp | 由模擬 Builder 組裝位置，不由 `SolveFK` 回傳絕對點。 |
+| NC 路徑位置 | 輸出 P | 輸出 Pₑ | CAM 處理變位。 |
+
+### 共用變位轉換：軸、位置、方向與位移
+
+`GetExternalAxis1Transform`／`GetExternalAxis2Transform` 以 M1 初始化的 `Ext1Axis`／`Ext2Axis` 建立旋轉，中心與方向均為 **MCS 零位共用座標**：
+
+| 外部軸型別 | `GetExternalAxisTransform` 的結果 |
+| --- | --- |
+| None | 單位變換 I，不使用任何外部角度。 |
+| Single | T₁；Ext2 為單位變換，不使用 E.Ext2。 |
+| Dual | T₁ × T₂；Ext1 是 Ext2 的父軸。 |
+
+- 第一軸中心 `C₁＝MCSToExt1Vec`；第二軸零位中心 `C₂＝MCSToExt1Vec＋Ext1ToExt2Vec`。
+- 每軸變換為 `Tᵢ(Q)＝Cᵢ＋Rᵢ(Q－Cᵢ)`；外部指派角度 θᵢ 為 degree，交給 OCC 的旋轉角為 `－θᵢ × π／180`，**固定採工件側左手慣例**。
+- `RotaryDirection` 不再乘一次正負號；傾斜角只保存，本版本不參與實際軸方向計算。啟用的軸須先完成初始化，否則建立旋轉時拋出例外。
+
+| API | 算法／輸出 | 對應環節 |
+| --- | --- | --- |
+| `TransformExternalPosition` | Pₑ＝Tₑ(P＋O)－O | NC 與模擬共用的位置變位；先加 O 進入 MCS 零位基準，旋轉後減 O，回到固定原 G54 表示。 |
+| `InverseTransformExternalPosition` | P＝Tₑ⁻¹(Pₑ＋O)－O | 位置還原；反轉整個組合矩陣，不能保留原乘法順序而只改兩軸角度正負。 |
+| `TransformExternalDirection`／`InverseTransformExternalDirection` | vₑ＝Rₑv／v＝Rₑ⁻¹vₑ | 姿態 IK 的前置轉換／刀向正解的後置還原；不帶中心平移或 O。 |
+| `GetExternalDisplacement` | Δext＝Pₑ－P | 單獨取得外部軸位移，與 Δtcp 分開。 |
+
+- 位置轉換建立新點，不修改輸入；O 未傳入時按零偏移處理。
+- None 或有效角度全零時回傳同座標的新點；Single 的非零 Ext2 不會造成運動。
+- **幾何上 360° 可回到同位置，不代表分組會把 0°／360° 合併。**
+
+### 姿態求解：前置旋轉、後置還原與保留的五軸規則
+
+`SolveIK`：原工件刀向 v → **變位後刀向 v₅＝Rₑv** → 五軸 M/S。
+
+`SolveToolVec`：五軸 M/S → 五軸刀向 v₅＝V₅(M,S) → **原工件刀向 v**。
+
+- 公開的 `SolveIK` 與 `SolveToolVec` 均須明確傳入 E；無變位機或零角度時傳入零值。
+- 私有的 `SolveToolVec(M,S)` 直接回傳 `m_FKSolver.SolveToolVec(M,S)`，保留五軸求解座標的刀向。
+- 公開的 `SolveToolVec(M,S,E)` 對上述結果套用 `InverseTransformExternalDirection`，即 Rₑ⁻¹V₅(M,S)。
+- `IsToolVecSingular` **使用私有的五軸刀向正解**，將 v₅ 與數學主旋轉軸比較，不反轉回原工件座標。
+
+**公開入口的輸入階段固定如下，PostSolver 不會自行取得目前路徑的外部角度：**
+
+| 公開入口 | 實際語意／呼叫注意事項 |
+| --- | --- |
+| `SolveIK(v, 參考 M/S, out M/S, E)` | 接收原工件刀向與外部角度，先旋轉刀向，再求五軸 M/S。 |
+| `SolveToolVec(M,S,E)` | 回算五軸刀向，再反轉外部旋轉，回到原工件座標。 |
+| `SolveFK(M,S,Pₑ,O)` | 接收已變位、仍以固定原 G54 表示的 Pₑ，只求五軸 RTCP 補償；無變位機或零角度時 Pₑ＝P。 |
+
+### RTCP 補償：變位位置與五軸補償不得混算
+
+既有 `FKSolver` 內部流程無異動。
+變位機的效應已於使用端轉換 P → Pₑ 傳入，`SolveFK` 仍專注於五軸 Δtcp 運算。使用端實際呼叫邏輯如下：
+
+- `SolveFK(M,S,Pₑ,O)` 接收**已變位點**，直接呼叫既有 `m_FKSolver.Solve`，只回傳 Δtcp，不再套用外部變位。
+- 模擬與單點預覽共用 `BuildFKPostPntFiveAxis`，順序為 `TransformExternalPosition(P,E,O) → SolveFK(M,S,Pₑ,O) → Pₑ＋Δtcp`。
+- 固定 M/S 時，Spindle 的 Δtcp 不依賴 Pₑ，Mix 的工件側補償則須使用 Pₑ；但 E 仍可能透過 IK 改變 M/S，間接改變 Spindle 補償。Table＋變位機不在支援範圍。
+
+### 新增／修改內容對應的實際環節
+
+| 施工位置／方法 | 新增或修改內容 |
+| --- | --- |
+| `PostSolver` 建構子、`GetExternalAxis1/2Transform`、`GetExternalAxisTransform`、`BuildExternalRotation` | 持有機台 ExternalAxes；建立各軸與組合變換。 |
+| `TransformExternalPosition`／`InverseTransformExternalPosition`、`GetExternalDisplacement` | 新增 G54／MCS 基準轉換、位置還原與獨立變位位移。 |
+| `TransformExternalDirection`／`InverseTransformExternalDirection` | 只旋轉、不帶平移的刀向正反轉換。 |
+| `SolveIK`、`SolveToolVec`、`SolveFK` | 公開姿態入口必須傳 E；FK 接收已變位 Pₑ，保留既有五軸內層求解。 |
+| [ContourCache.cs](MyCAM/PathCache/ContourCache.cs) 的 `SolvIK`、[StdPatternCacheBase.cs](MyCAM/PathCache/StdPatternCacheBase.cs) 的 `SolveRefPntInitIK` | 初始 IK 傳入點上 E；輪廓回算 ToolVec 也傳 E。 |
+| [ToolVecHelper.cs](MyCAM/Helper/CAM/ToolVecHelper.cs) 的 `GetMSAngleFromToolVec`、`ConvertMSAngleToToolVec`、`SetToolVecByLockedAxis`、`SolveIKAndFilterSingularity` 等 | 將點上 E 傳入姿態求解與回算。 |
+| `IsToolVecSingular`、`ToolVecHelper.IsSingular`／`FlipRotaryAxis` | 保留五軸刀向與數學主軸的判斷座標。 |
+| [FiveAxisSimuPathBuilder.cs](MyCAM/Helper/Simulation/FiveAxisSimuPathBuilder.cs) 的 `BuildFKPostPntFiveAxis`（M6） | 使用共用 Pₑ 與已變位點 RTCP 入口，保留 M/S、E。 |
+| [PerFrameTransformBuilder.cs](MyCAM/Helper/Simulation/PerFrameTransformBuilder.cs) 的 `BuildFrameTransforms`（M6） | Ext1／Ext2 分別取得單軸共用變換。 |
+| [NCWriter.cs](MyCAM/Post/NCWriter.cs) 的 `TransformNCPoint`／`TransformNCTraverse`（M7） | 呼叫共用位置轉換，逐點 Clone 後改寫 XYZ；Traverse 容器以新點替換欄位，不可再次套用變位。 |
+
+**注意：**
+- 原工件編程基準保持不變；IK 只前轉刀向、刀向正解只反轉回原工件；FK 使用 Pₑ 但只回傳 Δtcp；模擬組裝 Pₑ＋Δtcp 並建立外部軸影格；NC 只輸出 Pₑ。
 
 ## M4 連續分組、組端點與 IK 連續性
 

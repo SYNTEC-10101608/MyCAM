@@ -163,26 +163,27 @@ G54 PostPoint 的來源：
 `CAMEditor.ConverNC → NCWriter.ConvertSuccess → 讀取 PathCache / 建立 NCPackage → PostHelper + PostTraverseBuilder → 寫 NC`
 
 - 每次輸出建立所需後處理資料；輪廓加工段逐點寫 G01，不經模擬細插或模擬 FK。
+- 無變位機時直接輸出原 G54 座標，不因 SimulationOffset 改寫 NC；有變位機時，輪廓與 CAM 空移由 TransformNCPoint 使用 SimulationOffset 轉成 Pₑ，仍以固定原 G54 描述，不加入五軸 RTCP 補償，也不因此重設 CNC 的 G54。座標定義見「FK / IK 責任與運算鏈」第 4 節。
 - **標準圖形分流**：使用 StdPatternPostData（參考點、加工起點與空移），由 StdPatternNCWriter 寫 SY_CIRC/SY_RECT/SY_RUNWAY 等巨集及幾何參數，不逐一輸出完整離散加工點。
 
 #### 模擬
 
 1. 進入 SimuEditor.EditStart：SetPostDataList → NCWriter.ConvertPostDataListSuccess → m_PostDataList。
 2. 需要重算時：CalSimulationResult → BuildSimuData → FiveAxisSimuPathBuilder.BuildFrameTransMap。
-3. GetWholePathIKPnt 串接各路徑前空移、加工段及最後 Exit，補空移細插點，組成 PathSimuIKData。IK 命名表示 FK 前資料，不能據此認定每個點重新求 IK。
-4. BuildPathFKList → BuildFKPostPntFiveAxis → PostSolver.SolveFK：對空移、加工、退刀點求 RTCP 補償向量，以「G54 點＋補償」建立 FK PostPoint，組成 PathSimuFKData；SimulationOffset 依構型參與補償計算，但尚未直接加到 XYZ。
+3. GetGroupedPathIKPnt 逐組串接 Entry、組內空移、加工段與 Exit，補空移細插點，組成 PathSimuIKData；保留 GetWholePathIKPnt 相容入口。IK 命名表示 FK 前資料，不能據此認定每個點重新求 IK。
+4. BuildPathFKList → BuildFKPostPntFiveAxis：先以 TransformExternalPosition 求 Pₑ，再由 SolveFK 求五軸 RTCP 補償 Δtcp，以 Pₑ＋Δtcp 建立 FK PostPoint，組成 PathSimuFKData；無變位機時 Pₑ＝P。SimulationOffset 參與座標轉換及依構型參與補償計算，但 FK 中間點尚未直接加上該平移量。
 5. SimulationHelper.BuildFrame → FiveAxisPerFrameTransformBuilder 建立各元件自身變換（含 SimulationOffset）→ 依機構鏈相乘產生最終 gp_Trsf → 碰撞計算 → MachineRender 播放。碰撞使用這些影格，不另建立碰撞專用細插點。
 
-- 順序是 **G54 點列 → 空移細插與角度插補 → FK → 機構影格**，不是 FK 後才細插。
+- 順序是 **原 G54 點列 → 組內空移細插與角度插補 → 變位與五軸 RTCP → 機構影格**，不是 FK 後才細插；組間不插補變位運動。
 - 標準圖形模擬另取完整離散加工 PostData，再由 ApplyStdPatternPostDataToPostData 套用標準圖形參考角度與空移資料；與 NC 巨集輸出不同。
 - 模擬不是解譯輸出的 NC；不可據此宣稱完整重現控制器巨集、自訂 G-code、速度或加減速插補。
-- ToolVectorAction / LockABAction 也建立僅帶 Master/Slave 的暫時 PostPoint，再透過 BuildSinglePointFrameTransform 結合位置與 FK，預覽單點機構姿態。
+- ToolVectorAction / LockABAction 也建立帶 Master/Slave 與 ExternalAxisPos 的暫時 PostPoint，再透過 BuildSinglePointFrameTransform 結合位置與 FK，預覽單點機構姿態。
 
 ### 7. 修改界線與已知限制
 
 - 不要混用 LeadIn/LeadOut 與 Entry/Exit；不要將前一路徑抬刀誤放回前一路徑 PostData。
 - 不要把暫時空移 CAMPoint 的預設角度當成已求解姿態，也不要把所有 PostPoint 當成同一座標系。
-- 目前 FK 新建 PostPoint 只填 XYZ、Master、Slave，未複製傾角／微接點標記；不能視為完整加工 PostPoint 的等價替代物。
+- 目前 FK 新建 PostPoint 只填 XYZ、Master、Slave、ExternalAxisPos，未複製傾角／微接點標記；不能視為完整加工 PostPoint 的等價替代物。
 - 細插主要依位置距離。位置重合的直線段只保留起終姿態，未依旋轉量加密；原地／大角度旋轉及碰撞精度需另評估，現有取樣不等於連續掃掠碰撞保證。
 - 若未來統一離散，可考慮「共用 XYZ 幾何取樣 → 顯示；另補角度／必要姿態加密 → 模擬 FK」，但**這是可能的重構方向，不是現況或既定實作要求**。
 
@@ -205,14 +206,16 @@ G54 PostPoint 的來源：
 
 | API / 流程 | 輸入 → 輸出 | 責任 |
 | --- | --- | --- |
-| PostSolver.SolveIK | ToolVec＋參考 M/S → M/S＋IKSolveResult | 姿態逆解；不求線性軸位置 |
-| PostSolver.SolveToolVec | M/S → ToolVec | 姿態正解；不求位置補償 |
-| PostSolver.IsToolVecSingular | M/S → bool | 回算 ToolVec，判斷是否接近數學上的主旋轉軸方向 |
-| PostSolver.SolveFK | M/S＋G54 點＋offset → gp_Vec | RTCP 位置補償向量；不是絕對 MCS 點或元件最終位置 |
-| BuildFKPostPntFiveAxis | G54 PostPoint＋補償向量 → FK PostPoint | 保留 M/S，XYZ 改為 G54 點＋補償 |
+| PostSolver.SolveIK | 原工件 ToolVec＋參考 M/S＋外部角度 → M/S＋IKSolveResult | 外部角度必填；先旋轉刀向，再求五軸姿態，外部角度不參與逆解 |
+| PostSolver.SolveToolVec（公開） | M/S＋外部角度 → 原工件 ToolVec | 外部角度必填；先回算五軸刀向，再反轉變位旋轉，不求位置補償 |
+| PostSolver.IsToolVecSingular | M/S → bool | 使用私有的五軸刀向正解，判斷是否接近數學上的主旋轉軸方向 |
+| PostSolver.TransformExternalPosition | 原 G54 點 P＋外部角度＋O → Pₑ | 套用外部軸位置變化，結果仍以固定原 G54 表示 |
+| PostSolver.SolveFK | M/S＋已變位點 Pₑ＋O → gp_Vec | 不再變位，只回傳五軸 RTCP 補償，不含變位位移；不是絕對 MCS 點或元件最終位置 |
+| BuildFKPostPntFiveAxis | 原 G54 PostPoint＋O → FK PostPoint | 依點上外部角度求 Pₑ，XYZ 改為 Pₑ＋Δtcp，保留 M/S 與外部角度 |
 | BuildFrame / FKToFrameTranfResult | FK PostPoint＋offset＋機台／機構鏈 → 各元件 gp_Trsf | 建立自身運動變換，再依祖先鏈相乘 |
 
-- PostSolver 的 M/S 輸入輸出均為 **radian**；ToolVecHelper 與編輯 UI 的部分 API 使用 **degree**，須依方法確認轉換。
+- PostSolver 的 M/S 輸入輸出均為 **radian**；ExternalAxisPos 為 **degree**。ToolVecHelper 與編輯 UI 的部分 API 也使用 degree，須依方法確認轉換。
+- 公開的 SolveIK 與 SolveToolVec 必須明確傳入 ExternalAxisPos，無變位機或零角度時也須傳入零值。不帶外部角度的 SolveToolVec 僅供內部五軸刀向計算與奇異判斷；SolveFK 一律接收 Pₑ，無變位機或零角度時 Pₑ＝P。
 - 姿態求解使用機台零角度刀向 ToolDir、旋轉軸方向、構型；IK 另使用軸範圍及參考角度選解，不需要加工點 XYZ 或 SimulationOffset。
 - PostSolver 依 Spindle / Table / Mix 建立求解器，內部處理 M/S 交換與旋轉慣例；單旋轉軸 Mix 變體會將鎖定軸的 IK 輸出設為 0。呼叫端不要自行重複交換。
 
@@ -229,6 +232,7 @@ G54 PostPoint 的來源：
 
 - 輪廓初始 IK 種子來自 CraftData.InitMaster_rad / InitSlave_rad，後續傳遞上一點解以維持選解連續性；CalMSForEachPoint 後續仍可能依刀向模式再次修改姿態，初始回算結果不一定是最終 ToolVec。
 - SolveRefPntInitIK 本身沒有像輪廓 SolvIK 一樣再呼叫 SolveToolVec。
+- 加工姿態建立及 ToolVecHelper 的求解／回算傳入點上 ExternalAxisPos；Cache 幾何、局部 AB／傾角與加工方向相位仍以變位前原工件座標處理，不因 SimulationOffset 或變位角度重定義編程基準。
 - SolveIK 內部走 IKSolver.Solve → FiveAxisSolver.IJKtoMS → ChooseSolution(ShortestDist)。先依軸範圍選解，失敗後可能不限範圍重選並回傳 OutOfRange；**有輸出角度不代表在行程內或保證安全**，須檢查結果碼。奇異區域亦有容差處理，不應假設輸入刀向與回算刀向完全一致。
 - LeadIn / LeadOut / OverCut 沿用相接點姿態；空移角度由 PostTraverseBuilder 沿用或插補，均不能概括為重新逐點 IK。
 - NC 寫出使用 Cache 的既有修改後角度；讀取 dirty Cache 可間接觸發重算，但 NC 不經模擬 SolveFK 或機構影格。
@@ -246,33 +250,51 @@ G54 PostPoint 的來源：
 
 AB ↔ ToolVec 的局部幾何轉換由 ToolVecHelper 負責；PostSolver 只負責 ToolVec ↔ 機台 M/S。GetMSAngleFromToolVec 依參數選 Init 或 Mod 角度作為 IK 種子，預設使用 Init。
 
-### 4. RTCP 補償與機構位置：三個階段
+### 4. SimulationOffset、座標基準與機構位置
 
-定義 P＝G54 加工點、O＝machineData.SimulationOffset、Δtcp＝SolveFK(M, S, P, O)。
+**SimulationOffset（O）是機構零位時，由 MCS 原點指向原 G54 原點的位置向量，以 MCS 基底表示，單位 mm。** MCS 是固定機台座標系；本節的原 G54 也是固定的編程／輸出參考，不隨外部軸旋轉。目前 O 僅描述平移，兩者基底方向一致，不包含 G54 的旋轉／傾斜；O 預設為零，此時兩者在零位重合。
+
+O 是初始放置關係，不是機構運動後持續更新的工件位置；後續位置與方向由機構鏈計算。它來自機台設定，不是即時讀取 CNC 的 G54。**有變位機時 O 也影響 NC 位置預轉換，必須與實機 G54／旋轉中心基準一致，不能只為調整模擬畫面而任意修改。**
+
+- P：變位前，同一實體加工點在原 G54 中的座標；零位 MCS 位置為 P＋O。
+- G54′：隨外部軸變位帶動的虛擬工件座標系，同一點在其中仍具有原座標 P；僅供解釋，不代表另建程式座標系或重設 CNC G54。
+- Pₑ：該實體點變位後，**以固定原 G54 表示的座標**，不是它在 G54′ 中的座標，也不是 MCS 座標。
+- Tₑ：以 MCS 零位軸中心、方向及外部角度建立的變換，本身不依賴 O；以原 G54 表示的等效變換才是 `T(－O) × Tₑ × T(O)`，其中 T(O) 表示平移。
+
+位置關係為 **Pₑ＝Tₑ(P＋O)－O**：先加 O 換到 MCS 基準，施加變位，再減 O 回到固定原 G54；方向只使用 Tₑ 的旋轉部分，不受 O 影響。
+
+| 使用情境 | O 的用途與輸出 |
+| --- | --- |
+| 無變位機的模擬 | Pₑ＝P；依構型影響 RTCP 補償，並用於線性軸位置及工件初始放置。 |
+| 無變位機的 NC | 仍輸出原 G54 的 P，不因 O 改寫輸出位置。 |
+| 有變位機的模擬 | 以 O 求 Pₑ，再求五軸補償與元件影格；O 的初始放置語意不變。 |
+| 有變位機的 NC | CAM 寫出的輪廓與空移輸出 Pₑ，不加 Δtcp；仍以固定原 G54 描述。標準圖元參考資料與 SY_* 巨集契約不變，巨集的變位能力仍是未驗證假設。 |
+
+令 Δext＝Pₑ－P、Δtcp＝SolveFK(M,S,Pₑ,O)，實際模擬分三個階段：
 
 | 階段 | 計算／輸出 | 注意事項 |
 | --- | --- | --- |
-| 1. RTCP 位置補償 | BuildFKPostPntFiveAxis 建立 FKPoint.XYZ＝P＋Δtcp，保留 M/S | 程式變數名 pointMCS；尚未直接加 O，也不是各部件最終位置 |
-| 2. 元件自身運動 | 線性軸平移輸入＝FKPoint.XYZ＋O；旋轉軸依中心／方向／M/S 建立旋轉；WorkPiece 自身變換＝T(O)，Laser 自身為單位變換 | 工件鏈上的軸運動變換取反；不能將線性軸公式套用至所有元件 |
+| 1. 變位與 RTCP 位置補償 | BuildFKPostPntFiveAxis 先求 Pₑ，再求 Δtcp，建立 FKPoint.XYZ＝Pₑ＋Δtcp＝P＋Δext＋Δtcp，保留 M/S 與外部角度；無變位機時為 P＋Δtcp | 程式變數名 pointMCS；尚未直接加 O，也不是各部件最終位置。已取得 Pₑ 就不能再加 Δext 或再次變位 |
+| 2. 元件自身運動 | 線性軸平移輸入＝FKPoint.XYZ＋O；Master／Slave 依中心、方向及 M/S 旋轉，Ext1／Ext2 各取共用單軸變換；WorkPiece 自身變換＝T(O)，Laser 自身為單位變換 | 工件鏈上的既有軸運動變換依規則取反；外部軸共用變換已採工件側左手慣例，不再反向。不能將線性軸公式套用至所有元件 |
 | 3. 機構鏈疊加 | T元件最終＝T祖先1 × … × T祖先n × T元件自身 | 得到作用於原始模型幾何的變換，不是單一位置點；乘法順序不可任意交換 |
 
 SolveFK 補償考慮旋轉角度、樞軸幾何及刀長；依構型使用不同公式：
 - Spindle：刀頭側補償，內部位置補償公式不使用 P / O。
-- Table：加工點相對轉台樞軸的位置影響補償，使用 P / O。
-- Mix：合併刀頭側與工作台側補償，工作台側使用 P / O。
+- Table：加工點相對轉台樞軸的位置影響補償，使用 P / O；本版本不支援 Table＋外部軸。
+- Mix：合併刀頭側與工作台側補償，工作台側使用 P / O；有外部軸時改用 Pₑ / O。
 
-**O 必須繼續傳入影格流程**：它在 SolveFK 中影響補償幾何，不等於已直接加到 FKPoint。影格階段還要用於線性軸平移及工件放置；這是不同用途，不是重算一次 RTCP 或可任意刪除的重複加值。工件最終變換為「工件祖先鏈 × T(O)」，偏移也會受祖先旋轉影響。
+**O 必須繼續傳入影格流程**：它參與變位位置轉換及依構型參與 RTCP 補償，不等於已直接加到 FKPoint。影格階段還要用於線性軸平移及工件放置；這是不同用途，不是重算一次 RTCP 或可任意刪除的重複加值。工件最終變換為「工件祖先鏈（含啟用的外部軸）× T(O)」，偏移也會受祖先旋轉影響。
 
 ### 5. 誰使用位置補償與影格？
 
 | 使用者 | 呼叫鏈／輸入 |
 | --- | --- |
-| 整條路徑模擬 | SimuEditor.CalSimulationResult → BuildSimuData → FiveAxisSimuPathBuilder.BuildFrameTransMap → GetWholePathIKPnt → BuildPathFKList → ConvertIKPntToFKPnt → BuildFKPostPntFiveAxis → SolveFK；再 BuildFrame → FKToFrameTranfResult |
+| 整條路徑模擬 | SimuEditor.CalSimulationResult → BuildSimuData → FiveAxisSimuPathBuilder.BuildFrameTransMap → GetGroupedPathIKPnt（保留 GetWholePathIKPnt 相容入口）→ BuildPathFKList → ConvertIKPntToFKPnt → BuildFKPostPntFiveAxis → TransformExternalPosition＋SolveFK；再 BuildFrame → FKToFrameTranfResult |
 | 刀向編輯單點預覽 | ToolVectorAction.RefreshSimuResult → CalSimuTranfResult → BuildSinglePointFrameTransform；位置取 selected point，角度取修改點 Mod M/S 或 UI M/S（degree 轉 rad） |
 | 鎖軸單點預覽 | LockABAction.GetSimulationData → BuildSinglePointFrameTransform；傳入 MainPath 起點位置與 Mod M/S |
 
 - 單點 Builder 將分別傳入的位置與姿態組成 G54 PostPoint，走相同 BuildFKPostPntFiveAxis 與 FKToFrameTranfResult；**位置補償不只由 SimuEditor 使用，也服務 CAM 編輯預覽**。
-- 目前 SolveFK 的直接呼叫集中於 BuildFKPostPntFiveAxis；新增用途應先確認要的是補償向量、中間 FK 點，還是完整元件影格。
+- BuildFKPostPntFiveAxis 使用 TransformExternalPosition 與 SolveFK，NCWriter 只共用前者；新增用途應先確認要的是變位位置、RTCP 補償向量、FK 中間點，還是完整元件影格，不要混用或重複套用。
 - MachineChainBuilder 從 RootNode 建立 ChainListMap（祖先清單，不含自己）及 WorkPieceChain（承載工件的祖先集合）。SimulationHelper 依鏈順序累乘自身變換。
 - 最終 FrameTransformMap 同時供 MachineRender 顯示與 CollisionHelper 碰撞使用；SimuEditor.SetWorkPieceTransform 將 WorkPiece 影格套用至零件及加工路徑。
 

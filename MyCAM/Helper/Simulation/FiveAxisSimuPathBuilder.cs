@@ -234,7 +234,7 @@ namespace MyCAM.Helper
 			PostPoint temPostPnt = IKpostPoint.Clone();
 			gp_Pnt pointG54 = new gp_Pnt( temPostPnt.X, temPostPnt.Y, temPostPnt.Z );
 			gp_Pnt positionedPointG54 = postSolver.TransformExternalPosition( pointG54, temPostPnt.ExternalAxisPos, simuOffset );
-			gp_Vec tcpOffset = postSolver.SolveFKAtPositionedPoint( temPostPnt.Master, temPostPnt.Slave, positionedPointG54, simuOffset );
+			gp_Vec tcpOffset = postSolver.SolveFK( temPostPnt.Master, temPostPnt.Slave, positionedPointG54, simuOffset );
 			gp_Pnt pointMCS = positionedPointG54.Translated( tcpOffset );
 			FKPoint = new PostPoint()
 			{

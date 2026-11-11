@@ -80,6 +80,20 @@ public static class ExternalAxisKinematicsTests
 		return (PostSolver)New( "MyCAM.Post.PostSolver", machine );
 	}
 
+	static gp_Dir FiveAxisToolVec( PostSolver solver, double masterAngle, double slaveAngle )
+	{
+		return solver.SolveToolVec( masterAngle, slaveAngle, default( ExternalAxisPos ) );
+	}
+
+	static gp_Vec TransformVector( PostSolver solver, gp_Vec vector, ExternalAxisPos position, bool inverse )
+	{
+		gp_Trsf transform = solver.GetExternalAxisTransform( position );
+		if( inverse ) {
+			transform.Invert();
+		}
+		return vector.Transformed( transform );
+	}
+
 	// Independent principal-axis reference, not the production OCC transform.
 	static gp_Pnt Rotate( gp_Pnt point, gp_Vec center, RotaryAxis axis, double degrees )
 	{
@@ -102,22 +116,46 @@ public static class ExternalAxisKinematicsTests
 		return expected.Translated( offset.Reversed() );
 	}
 
+	public static void PublicSolverAPIRequiresExplicitCoordinateStages()
+	{
+		MethodInfo[] methods = typeof( PostSolver ).GetMethods( BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly );
+		MethodInfo[] ik = methods.Where( m => m.Name == "SolveIK" ).ToArray();
+		Assert( ik.Length == 1 && ik[0].GetParameters().Length == 6
+			&& ik[0].GetParameters()[5].ParameterType == typeof( ExternalAxisPos )
+			&& !ik[0].GetParameters()[5].IsOptional, "SolveIK must require external-axis angles." );
+		MethodInfo[] fk = methods.Where( m => m.Name == "SolveFK" ).ToArray();
+		Assert( fk.Length == 1 && fk[0].GetParameters().Length == 4
+			&& fk[0].GetParameters()[2].ParameterType == typeof( gp_Pnt ), "SolveFK must accept only a positioned point and offset." );
+		MethodInfo[] toolVec = methods.Where( m => m.Name == "SolveToolVec" ).ToArray();
+		Assert( toolVec.Length == 1 && toolVec[0].GetParameters().Length == 3
+			&& toolVec[0].GetParameters()[2].ParameterType == typeof( ExternalAxisPos )
+			&& !toolVec[0].GetParameters()[2].IsOptional, "Public SolveToolVec must require external-axis angles." );
+		MethodInfo rawToolVec = typeof( PostSolver ).GetMethods( BindingFlags.NonPublic | BindingFlags.Instance )
+			.Single( m => m.Name == "SolveToolVec" && m.GetParameters().Length == 2 );
+		Assert( rawToolVec.IsPrivate, "Five-axis tool-vector calculation must remain private." );
+		foreach( string name in new[] { "SolveFKAtPositionedPoint", "TransformExternalVector", "InverseTransformExternalVector" } ) {
+			Assert( typeof( PostSolver ).GetMethod( name, Flags ) == null, "Unexpected solver API: " + name );
+		}
+	}
+
 	public static void NoExternalAxisAndZeroRegression()
 	{
 		foreach( string kind in new[] { "Spindle", "Mix", "Table" } ) {
 			FiveAxisMachineData machine = Machine( kind, ExternalAxisType.None );
 			PostSolver solver = Solver( machine );
 			gp_Pnt point = new gp_Pnt( 1, 2, 3 );
-			Point( solver.TransformExternalPosition( point, Assigned, Offset ), point );
+			gp_Pnt positioned = solver.TransformExternalPosition( point, Assigned, Offset );
+			Point( positioned, point );
 			Vector( solver.GetExternalDisplacement( point, Assigned, Offset ), new gp_Vec() );
-			Vector( solver.SolveFK( .4, .6, point, Offset, Assigned ), solver.SolveFK( .4, .6, point, Offset ) );
-			Direction( solver.SolveToolVec( .4, .6, Assigned ), solver.SolveToolVec( .4, .6 ) );
+			Vector( solver.SolveFK( .4, .6, positioned, Offset ), solver.SolveFK( .4, .6, point, Offset ) );
+			Direction( solver.SolveToolVec( .4, .6, Assigned ), FiveAxisToolVec( solver, .4, .6 ) );
 		}
 		foreach( string kind in new[] { "Spindle", "Mix" } ) {
 			PostSolver solver = Solver( Machine( kind, ExternalAxisType.Single ) );
 			gp_Pnt point = new gp_Pnt( 1, 2, 3 );
-			Point( solver.TransformExternalPosition( point, new ExternalAxisPos( 0, 123 ), Offset ), point );
-			Vector( solver.SolveFK( .4, .6, point, Offset, default( ExternalAxisPos ) ), solver.SolveFK( .4, .6, point, Offset ) );
+			gp_Pnt positioned = solver.TransformExternalPosition( point, new ExternalAxisPos( 0, 123 ), Offset );
+			Point( positioned, point );
+			Vector( solver.SolveFK( .4, .6, positioned, Offset ), solver.SolveFK( .4, .6, point, Offset ) );
 		}
 	}
 
@@ -169,8 +207,9 @@ public static class ExternalAxisKinematicsTests
 				gp_Dir direction = new gp_Dir( 2, 3, 5 );
 				Direction( solver.InverseTransformExternalDirection( solver.TransformExternalDirection( direction, position ), position ), direction );
 				gp_Vec vector = new gp_Vec( 2, 3, 5 );
-				Vector( solver.InverseTransformExternalVector( solver.TransformExternalVector( vector, position ), position ), vector );
-				Close( solver.TransformExternalVector( vector, position ).Magnitude(), vector.Magnitude() );
+				gp_Vec transformed = TransformVector( solver, vector, position, false );
+				Vector( TransformVector( solver, transformed, position, true ), vector );
+				Close( transformed.Magnitude(), vector.Magnitude() );
 			}
 		}
 	}
@@ -193,14 +232,14 @@ public static class ExternalAxisKinematicsTests
 		foreach( string kind in new[] { "Spindle", "Mix" } ) {
 			foreach( ExternalAxisType type in kind == "Mix" ? new[] { ExternalAxisType.Single } : new[] { ExternalAxisType.Single, ExternalAxisType.Dual } ) {
 				PostSolver solver = Solver( Machine( kind, type ) );
-				gp_Dir fiveAxisVector = solver.SolveToolVec( .4, .6 );
+				gp_Dir fiveAxisVector = FiveAxisToolVec( solver, .4, .6 );
 				gp_Dir originalVector = solver.InverseTransformExternalDirection( fiveAxisVector, Assigned );
 				double expectedM, expectedS, actualM, actualS;
-				IKSolveResult expected = solver.SolveIK( fiveAxisVector, .4, .6, out expectedM, out expectedS );
+				IKSolveResult expected = solver.SolveIK( fiveAxisVector, .4, .6, out expectedM, out expectedS, default( ExternalAxisPos ) );
 				IKSolveResult actual = solver.SolveIK( originalVector, .4, .6, out actualM, out actualS, Assigned );
 				Assert( actual == expected && actual != IKSolveResult.InvalidInput && actual != IKSolveResult.NoSolution, "IK result differs from five-axis input." );
 				Close( actualM, expectedM ); Close( actualS, expectedS );
-				Direction( solver.SolveToolVec( actualM, actualS, Assigned ), solver.InverseTransformExternalDirection( solver.SolveToolVec( expectedM, expectedS ), Assigned ) );
+				Direction( solver.SolveToolVec( actualM, actualS, Assigned ), solver.InverseTransformExternalDirection( FiveAxisToolVec( solver, expectedM, expectedS ), Assigned ) );
 				Direction( solver.SolveToolVec( .4, .6, Assigned ), originalVector );
 			}
 		}
@@ -211,20 +250,24 @@ public static class ExternalAxisKinematicsTests
 		foreach( string kind in new[] { "Spindle", "Mix" } ) {
 			FiveAxisMachineData machine = Machine( kind, ExternalAxisType.Single );
 			PostSolver solver = Solver( machine );
+			PostSolver fiveAxisSolver = Solver( Machine( kind, ExternalAxisType.None ) );
 			gp_Pnt original = new gp_Pnt( 2, 3, 5 );
-			gp_Pnt positioned = Positioned( machine, original, Assigned, Offset );
-			gp_Vec expected = solver.SolveFK( .4, .6, positioned, Offset );
-			gp_Vec actual = solver.SolveFK( .4, .6, original, Offset, Assigned );
+			gp_Pnt expectedPositioned = Positioned( machine, original, Assigned, Offset );
+			gp_Pnt positioned = solver.TransformExternalPosition( original, Assigned, Offset );
+			Point( positioned, expectedPositioned );
+			gp_Vec expected = fiveAxisSolver.SolveFK( .4, .6, expectedPositioned, Offset );
+			gp_Vec actual = solver.SolveFK( .4, .6, positioned, Offset );
 			Vector( actual, expected );
-			Vector( actual, solver.SolveFKAtPositionedPoint( .4, .6, positioned, Offset ) );
 			Assert( ( actual - ( expected + solver.GetExternalDisplacement( original, Assigned, Offset ) ) ).Magnitude() > 1, "RTCP includes external displacement." );
 			if( kind == "Mix" ) {
-				Assert( ( actual - solver.SolveFK( .4, .6, original, Offset ) ).Magnitude() > 1, "Mix did not use positioned point." );
+				Assert( ( actual - fiveAxisSolver.SolveFK( .4, .6, original, Offset ) ).Magnitude() > 1, "Mix did not use positioned point." );
 				MixTypeMachineData mix = (MixTypeMachineData)machine;
 				gp_Pnt mcs = positioned.Translated( Offset );
 				gp_Pnt turned = Rotate( mcs, mix.MCSToSlaveVec, mix.SlaveRotaryAxis, .6 * 180 / Math.PI );
 				gp_Vec tableDelta = new gp_Vec( mcs, turned );
-				Vector( actual, tableDelta + solver.SolveFK( .4, 0, positioned, Offset ) );
+				Vector( actual, tableDelta + fiveAxisSolver.SolveFK( .4, 0, positioned, Offset ) );
+			} else {
+				Vector( actual, fiveAxisSolver.SolveFK( .4, .6, original, Offset ) );
 			}
 		}
 	}
@@ -240,7 +283,7 @@ public static class ExternalAxisKinematicsTests
 				Assert( (bool)Invoke( "MyCAM.Helper.FiveAxisSimuPathBuilder", "BuildFKPostPntFiveAxis", null, args ), "FK point failed." );
 				PostPoint output = (PostPoint)args[2];
 				gp_Pnt positioned = Positioned( machine, new gp_Pnt( 2, 3, 5 ), Assigned, Offset );
-				gp_Pnt expected = positioned.Translated( solver.SolveFKAtPositionedPoint( .4, .6, positioned, Offset ) );
+				gp_Pnt expected = positioned.Translated( solver.SolveFK( .4, .6, positioned, Offset ) );
 				Point( new gp_Pnt( output.X, output.Y, output.Z ), expected );
 				Assert( output.ExternalAxisPos.Equals( Assigned ), "FK angles lost." );
 				Close( output.Master, input.Master ); Close( output.Slave, input.Slave );

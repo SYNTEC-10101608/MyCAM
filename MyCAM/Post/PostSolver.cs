@@ -414,11 +414,6 @@ namespace MyCAM.Post
 			}
 		}
 
-		public IKSolveResult SolveIK( gp_Dir toolVec, double dM_In, double dS_In, out double dM_Out, out double dS_Out )
-		{
-			return SolveIK( toolVec, dM_In, dS_In, out dM_Out, out dS_Out, default( ExternalAxisPos ) );
-		}
-
 		public IKSolveResult SolveIK( gp_Dir toolVec, double dM_In, double dS_In, out double dM_Out, out double dS_Out, ExternalAxisPos externalAxisPos )
 		{
 			dM_Out = 0;
@@ -457,19 +452,9 @@ namespace MyCAM.Post
 			return ikResult;
 		}
 
-		public gp_Vec SolveFK( double dM, double dS, gp_Pnt pointG54, gp_Vec offset )
-		{
-			return SolveFKAtPositionedPoint( dM, dS, pointG54, offset );
-		}
-
 		// Returns only five-axis RTCP compensation, not external-axis displacement.
-		public gp_Vec SolveFK( double dM, double dS, gp_Pnt pointG54, gp_Vec offset, ExternalAxisPos externalAxisPos )
-		{
-			return SolveFKAtPositionedPoint( dM, dS, TransformExternalPosition( pointG54, externalAxisPos, offset ), offset );
-		}
-
-		// The input is already positioned and still expressed relative to G54.
-		public gp_Vec SolveFKAtPositionedPoint( double dM, double dS, gp_Pnt positionedPointG54, gp_Vec offset )
+		// The input must be Pe: already positioned by external axes, expressed in the fixed original G54.
+		public gp_Vec SolveFK( double dM, double dS, gp_Pnt positionedPointG54, gp_Vec offset )
 		{
 			if( positionedPointG54 == null ) {
 				return new gp_Vec();
@@ -480,14 +465,14 @@ namespace MyCAM.Post
 			return m_FKSolver.Solve( dM, dS, new gp_Vec( positionedPointG54.XYZ() ), new gp_Vec() );
 		}
 
-		public gp_Dir SolveToolVec( double dM, double dS )
+		gp_Dir SolveToolVec( double dM, double dS )
 		{
 			return m_FKSolver.SolveToolVec( dM, dS );
 		}
 
 		public gp_Dir SolveToolVec( double dM, double dS, ExternalAxisPos externalAxisPos )
 		{
-			return InverseTransformExternalDirection( m_FKSolver.SolveToolVec( dM, dS ), externalAxisPos );
+			return InverseTransformExternalDirection( SolveToolVec( dM, dS ), externalAxisPos );
 		}
 
 		// MCS zero-pose axes: Ext1 is the parent of Ext2. Positive angles use the
@@ -578,18 +563,6 @@ namespace MyCAM.Post
 			gp_Trsf transform = GetExternalAxisTransform( externalAxisPos );
 			transform.Invert();
 			return direction == null ? null : direction.Transformed( transform );
-		}
-
-		public gp_Vec TransformExternalVector( gp_Vec vector, ExternalAxisPos externalAxisPos )
-		{
-			return vector == null ? null : vector.Transformed( GetExternalAxisTransform( externalAxisPos ) );
-		}
-
-		public gp_Vec InverseTransformExternalVector( gp_Vec vector, ExternalAxisPos externalAxisPos )
-		{
-			gp_Trsf transform = GetExternalAxisTransform( externalAxisPos );
-			transform.Invert();
-			return vector == null ? null : vector.Transformed( transform );
 		}
 
 		public bool IsToolVecSingular( double dM_rad, double dS_rad )

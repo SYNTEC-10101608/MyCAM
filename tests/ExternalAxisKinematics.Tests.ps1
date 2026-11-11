@@ -31,6 +31,7 @@ try {
 		$provider.Dispose()
 	}
 	$tests = @(
+		'PublicSolverAPIRequiresExplicitCoordinateStages',
 		'NoExternalAxisAndZeroRegression',
 		'LeftHandConventionAndDirectionMetadata',
 		'OffsetAndBiasedPivot',
