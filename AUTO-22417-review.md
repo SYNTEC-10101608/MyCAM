@@ -115,6 +115,8 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 
 **權責：** 將「路徑指派的外部角度」當作加工資料傳遞，不在資料複製或轉裝時改寫 XYZ，也不自行重求姿態。
 
+**Review：OK。**
+
 | 施工對象 | 施工內容 |
 | --- | --- |
 | [CraftData.cs](MyCAM/Data/Craft/CraftData.cs)、[DataManagerDTO.cs](MyCAM/FileManager/DataManagerDTO.cs) | 新增 degree 單位的 `ExternalAxisPos` 值型資料、工藝屬性與 DTO；拒絕非有限值、保留多圈角度，異動觸發 `CAMFactorChanged`，支援舊加工專案缺節點時預設零。 |
@@ -123,7 +125,9 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 | [LeadHelper.cs](MyCAM/Helper/CAM/LeadHelper.cs)、[OverCutHelper.cs](MyCAM/Helper/CAM/OverCutHelper.cs)、[MicroJointHelper.cs](MyCAM/Helper/CAM/MicroJointHelper.cs)、[TraverseHelper.cs](MyCAM/Helper/CAM/TraverseHelper.cs) | 加工補點沿用參考加工點角度；暫時空移 CAMPoint 及零距離 Clone 保留來源角度。 |
 | [ContourPostHelper.cs](MyCAM/Post/ContourPostHelper.cs)、[StdPatternPostHelper.cs](MyCAM/Post/StdPatternPostHelper.cs)、[PostTraverseBuilder.cs](MyCAM/Post/PostTraverseBuilder.cs) | 加工點／標準圖元參考點轉裝時保留角度；Entry／Exit、抬刀／下刀、蛙跳及安全面 PostPoint 使用相應端點的角度。 |
 
-**責任界線：** 保存的 Ext2 不因單軸編程而清除，但實際取用依有效軸規則；組內空移維持固定外部角度，不插補外部軸。暫時空移 CAMPoint 不因新增角度欄位就成為完整加工姿態；空移 M/S 仍由後處理沿用或插補。模擬新建點的傳遞接點歸 M6，既有姿態編輯預覽接點歸 M8。
+**注意：**
+- 組內空移維持固定外部角度，不插補外部軸。
+- 暫時空移 CAMPoint 在此階段只帶入變位機角度；空移 M/S 仍由後處理沿用或插補。模擬新建點的傳遞接點歸 M6，既有姿態編輯預覽接點歸 M8。
 
 ## M3 共用變位轉換與五軸求解
 
