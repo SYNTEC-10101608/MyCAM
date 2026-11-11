@@ -284,7 +284,9 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 | --- | --- |
 | [TraverseRenderer.cs](MyCAM/Editor/Renderer/TraverseRenderer.cs) | 自身 `GetProcessPathGroups` 轉呼叫 M4 的 ProcessPathGroupHelper；`GetPreviousProcessPathMap` 只建立組內前一路徑對應，`ShowEntryAndExitWithTrans` 逐組建立進退刀，不連接跨組 Traverse。每組 Entry／Exit 使用含首／末路徑 ID 的獨立鍵；重建時清除舊組端點及刪除／停用路徑圖元，局部更新略過不加工路徑，已刪除 ID 則全量失效重建。 |
 
-**責任界線：** AIS 在原工件座標建立，預覽／播放再套用 WorkPiece 影格；不在 Renderer 重算變位或 RTCP。`TraverseHelper` 的幾何計算仍在原工件座標，該檔本次主要是 M2 的角度傳遞；安全面設定預覽不要求與正式組內空移具有相同相鄰關係。
+**責任界線：**
+- AIS 在原工件座標建立，預覽／播放再套用 WorkPiece 影格；不在 Renderer 重算變位或 RTCP。
+- `TraverseHelper` 的幾何計算仍在原工件座標，該檔本次主要是 M2 的角度傳遞；安全面設定預覽不要求與正式組內空移具有相同相鄰關係。
 
 ## M6 模擬點列、FK 與機構影格
 
@@ -297,7 +299,9 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 | [SimulationHelper.cs](MyCAM/Helper/Simulation/SimulationHelper.cs) | 修正既有 `GetPathStartEndIndex` 累積偏移：統一以「下一可用索引」計數，包含式末索引為累積值減一；不新增虛構影格或修改播放端掩蓋偏移。 |
 | [SimuEditor.cs](MyCAM/Editor/SimuEditor.cs)（模擬協調） | 將 M4 組資料送進 Builder；播放／碰撞仍使用同一份最終元件影格。 |
 
-**責任界線：** 原工件點列 → 組內空移細插及 M/S 插補 → 變位與五軸 RTCP → 元件自身運動 → 祖先鏈組合。各組僅依序串接，不在組間插補變位影格；碰撞也不保證組間掃掠安全。FK 新建點仍不是完整加工 PostPoint 的等價替代物，不能推論已複製傾角／微接點標記。
+**責任界線：**
+- 原工件點列 → 組內空移細插及 M/S 插補 → 變位與五軸 RTCP → 元件自身運動 → 祖先鏈組合。
+- 各組僅依序串接，不在組間插補變位影格；碰撞也不保證組間掃掠安全。
 
 ## M7 NC 與客製後處理
 
@@ -306,12 +310,18 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 | 施工對象 | 施工內容 |
 | --- | --- |
 | [CustPost.cs](CommonData/CustPost.cs)、[TxtToCustPostTranslator.cs](FileTranslator/TxtToCustPostTranslator.cs) | 新增可選 `ExternalAxisHeader` 區段與資料接線，不納入舊客製檔必要區段；保留缺漏 null、明確空字串及客製內容的差異。 |
-| [NCWriter.cs](MyCAM/Post/NCWriter.cs)（NC 輸出） | 使用 M4 分組，每組一次輸出變位 block，包含第一組與零角度組；順序為上一組 Exit → 本組變位 → Entry。`TransformNCPoint`／`TransformNCTraverse` 使用共用位置轉換並 Clone，轉換輪廓與 CAM 空移座標，不使用模擬 FK、不重算 M/S、不累積修改共用點。 |
+| [NCWriter.cs](MyCAM/Post/NCWriter.cs)（NC 輸出） | 使用 M4 分組，每組一次輸出變位 block，包含第一組與零角度組；順序為上一組 Exit → 本組變位 → Entry。`TransformNCPoint`／`TransformNCTraverse` 使用共用位置轉換並 Clone，轉換輪廓與 CAM 空移座標。 |
 | [NCWriter.cs](MyCAM/Post/NCWriter.cs)（既有缺陷修正） | `WriteExitSection` 以實際末加工資料是否存在判斷是否退刀，修正全不加工輸入的多餘 Exit／空參考；未擴大重構 counter 或路徑編號。 |
 
-**目前輸出契約：** 每個實際加工組固定先輸出 `// External axis move`。區段缺漏時，依有效軸名義 X／Y／Z 映射 A／B／C，軸名與 degree 角度成對排序，同列輸出且以分號結尾；明確留空僅保留註解；有客製內容則替換 `ExtAxisPos1`／`ExtAxisPos2`，不自動追加預設指令或分號。無變位機／無有效加工路徑不建立變位 block。
+**目前輸出契約：**
+- 每個實際加工組固定先輸出 `// External axis move`。
+- 區段缺漏時，依有效軸名義 X／Y／Z 映射 A／B／C，軸名與 degree 角度成對排序，同列輸出且以分號結尾。
+- 明確留空僅保留註解；有客製內容則替換 `ExtAxisPos1`／`ExtAxisPos2`，不自動追加預設指令或分號。
+- 無變位機／無有效加工路徑不建立變位 block。
 
-**責任界線：** 標準圖元只轉換 CAM 寫出的空移，參考點與 SY_* 巨集契約不變；巨集已有變位能力仍是未驗證假設。預設輸出不包含 RTCP 關閉／恢復、M/S 回位或等待，也不等同實機安全驗證。
+**責任界線：**
+- 標準圖元只轉換 CAM 寫出的空移，標準圖元 SY_* MACRO 不變。
+- 預設輸出不包含 RTCP 關閉／恢復、M/S 回位或等待，也不等同實機安全驗證。
 
 ## M8 編程介面與編輯生命週期
 
