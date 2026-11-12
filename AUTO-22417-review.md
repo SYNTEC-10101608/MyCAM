@@ -10,7 +10,7 @@
 | M5 空移與進退刀顯示 | 只連接同組路徑，管理各組 Entry／Exit 圖元及失效清理 |
 | M6 模擬點列、FK 與機構影格 | 逐組建立模擬資料，套用變位與補償，再建立元件影格 |
 | M7 NC 與客製後處理 | 逐組輸出變位區段，轉換 CAM 寫出的路徑位置，維持控制器契約邊界 |
-| M8 編程介面與編輯生命週期 | 單／雙軸與多選編輯、預覽、取消還原，以及確認後串接最佳化 |
+| M8 編程介面與編輯生命週期 | 單／雙軸、動態單／多選編輯、即時保留、Enter 預覽與最佳化接線 |
 | M9 驗證、範例與施工文件 | 提供各責任層的可重複驗證及交付依據 |
 
 ## M1 機台定義、拓樸與機台持久化
@@ -325,17 +325,23 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 
 ## M8 編程介面與編輯生命週期
 
-**權責：** 提供路徑角度編輯與預覽，管理暫存、提交、取消和顯示清理；求解與影格計算委由 M3／M6。
+**權責：** 提供可持續切換選取對象的路徑角度編輯與預覽，管理即時套用及結束後的顯示清理；求解與影格計算委由 M3／M6。
 
 | 施工對象 | 施工內容 |
 | --- | --- |
-| [ExternalAxisAction.cs](MyCAM/Editor/Action/CAM/ExternalAxisAction.cs) | 新增 `ExternalAxisEditData`／`ExternalAxisAction`；固定選取範圍、保存原值、暫時套用角度並用加工起點預覽；未確認 End 還原，確認後先結束編輯，再發出最佳化通知。 |
-| [ExternalAxisDlg.cs](MyCAM/Editor/Dialog/ExternalAxisDlg.cs)、[ExternalAxisDlg.Designer.cs](MyCAM/Editor/Dialog/ExternalAxisDlg.Designer.cs) | 新增單／雙軸、多選混合值、預覽路徑及預覽／確認／取消介面；依目前文化解析有限數值，留白保留各路徑開啟前原值，單軸不清除非有效 Ext2。 |
-| [IEditorAction.cs](MyCAM/Editor/Action/IEditorAction.cs)、[CAMEditor.cs](MyCAM/Editor/CAMEditor.cs) | 新增 Action 類型與 `SetExternalAxisPos`；接上選取驗證、編輯期間鎖定、WorkPiece 預覽、顯示重建／清理及全域 `DoOptimizeIKContinuity`。 |
-| [StartupForm.cs](MyCAM/StartupForm.cs)、[StartupForm.Designer.cs](MyCAM/StartupForm.Designer.cs)、[MyCAM.csproj](MyCAM/MyCAM.csproj) | 加入工具列入口、事件及依機台啟用條件；將新 Action／Dialog 納入專案編譯。 |
-| [ToolVectorAction.cs](MyCAM/Editor/Action/CAM/ToolVectorAction.cs)、[LockABAction.cs](MyCAM/Editor/Action/CAM/LockABAction.cs) | 既有姿態編輯的單點預覽補傳外部角度，沿用同一單點 Builder；沒有重寫其編輯生命週期。 |
+| [ExternalAxisAction.cs](MyCAM/Editor/Action/CAM/ExternalAxisAction.cs) | 共用 `SelectPathAction`，允許空選取開啟及單／多選切換；只對當前選取即時套用已編輯軸，以當前 ID 清單第一條路徑的加工起點預覽。切換至非空選取時通知最佳化；End 解除選取回呼、清理顯示並結束編輯後，再通知最佳化。 |
+| [ExternalAxisDlg.cs](MyCAM/Editor/Dialog/ExternalAxisDlg.cs)、[ExternalAxisDlg.Designer.cs](MyCAM/Editor/Dialog/ExternalAxisDlg.Designer.cs) | 沿用 LockAB 的 `DebouncedNumericUpDown`：±99999°、3 位小數。ValueChanged 即套用並預覽，Enter 解析輸入並預覽而不結束；確定、取消或關閉皆保留已套用角度。混合值靜默顯示 0，未編輯軸不覆寫；空選取停用輸入。 |
+| [IEditorAction.cs](MyCAM/Editor/Action/IEditorAction.cs)、[CAMEditor.cs](MyCAM/Editor/CAMEditor.cs) | Action 類型與 `SetExternalAxisPos` 入口負責機台能力檢查、WorkPiece 預覽、顯示重建／清理及全域 `DoOptimizeIKContinuity`；編輯期間不鎖主工具列、主選單或路徑樹，結束後恢復預設選取 Action。變位機預覽與清理不追蹤視角，ToolVec／鎖軸預覽維持追蹤行為。 |
+| [StartupForm.cs](MyCAM/StartupForm.cs)、[StartupForm.Designer.cs](MyCAM/StartupForm.Designer.cs)、[MyCAM.csproj](MyCAM/MyCAM.csproj) | 提供工具列入口、事件及依機台啟用條件；Action／Dialog 納入專案編譯。 |
+| [ToolVectorAction.cs](MyCAM/Editor/Action/CAM/ToolVectorAction.cs)、[LockABAction.cs](MyCAM/Editor/Action/CAM/LockABAction.cs) | 姿態編輯的單點預覽傳遞外部角度，共用單點 Builder。 |
 
-**責任界線：** 不依外部軸行程裁切或正規化輸入；取消不執行最佳化，不清除既有刀向／鎖軸設定。確認編輯與最佳化為兩個前後串接的獨立流程：最佳化例外向上傳遞，但不撤銷已確認角度。
+**責任界線：** UI 輸入範圍不是外部軸行程限制，不正規化多圈角度，也不清除既有刀向／鎖軸設定或單軸構型的非有效 Ext2。既有有效軸角度超出 UI 範圍時顯示 0 並提示，未編輯不覆寫；資料層仍接受任意有限角度。修改即保留，取消不回復；最佳化為獨立流程，例外向上傳遞但不撤銷已套用角度。
+
+**預覽規格：** 開啟、切換選取及有效數值變更時刷新，Enter 只觸發預覽。固定取當前選中 ID 清單的第一個，不依加工順序另排序；加工起點沿用 CacheHelper（優先 LeadIn），不提供額外預覽路徑選擇或預覽按鈕。文字依目前文化解析，無效、空白或超出範圍時不套用；切換對象以目前資料靜默同步，不將前一批輸入帶入新對象。
+
+**畫布刷新：** 有效預覽沿用 ToolVec AB／MS 的順序：暫停即時更新 → 共用 `SetTrans` 套用機台、工件與 CAM 變換 → 啟用即時更新 → `UpdateView`。不另加 `Redraw`，不先還原工件、移除機台或刷新全體 CAM 顯示；視角跟隨停用。空選取、預覽失敗與 End 才清理既有預覽；套用例外時恢復先前的更新狀態。
+
+**工具列分組：** File、CAD、CAM、模擬工具列分別使用 1、3、7、5 條具名分隔線區分功能群組，變位機按鈕位於 CAM 刀向群組。視圖側欄保有 1 條分隔線；加工層、主選單與設定選單不設分隔線。
 
 ## M9 驗證、範例與施工文件
 
@@ -349,10 +355,10 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 | [ExternalAxisGrouping.Tests.cs](tests/ExternalAxisGrouping.Tests.cs)／[.ps1](tests/ExternalAxisGrouping.Tests.ps1) | M4／M6：有效軸、連續組、端點、種子及影格索引。 |
 | [ExternalAxisSimulation.Tests.cs](tests/ExternalAxisSimulation.Tests.cs)／[.ps1](tests/ExternalAxisSimulation.Tests.ps1) | M5／M6：圖元清理、逐組點列、機構影格、單點一致性及取樣碰撞接線。 |
 | [ExternalAxisNC.Tests.cs](tests/ExternalAxisNC.Tests.cs)／[.ps1](tests/ExternalAxisNC.Tests.ps1) | M7：變位區段、預設／空白／客製契約、位置轉換、標準圖元及不加工回歸。 |
-| [ExternalAxisProgramming.Tests.cs](tests/ExternalAxisProgramming.Tests.cs)／[.ps1](tests/ExternalAxisProgramming.Tests.ps1) | M8 與整合：多選、取消／確認、預覽、最佳化順序，以及指派角度到模擬／NC 的端到端接線。 |
+| [ExternalAxisProgramming.Tests.cs](tests/ExternalAxisProgramming.Tests.cs)／[.ps1](tests/ExternalAxisProgramming.Tests.ps1)、[ExternalAxisEditorTestHelper.cs](tests/ExternalAxisEditorTestHelper.cs) | M8 與整合：NumericUpDown、Enter 預覽、真實選取 Action 與 CAMEditor 的空／單／多選切換、關閉保留、相機追蹤界線、工具列分組、最佳化順序，以及指派角度到模擬／NC 的端到端接線。 |
 | [SpindleDual.MachineData.xml](examples/ExternalAxis/SpindleDual.MachineData.xml)、[MachineTree.Mix5Plus1.xml](examples/MachineTree.Mix5Plus1.xml) | 機台設定與機構樹範例；輔助檢視支援構型，不等同實機設定或 Mesh 資源交付。 |
 
-測試沿用 .NET Framework、64 位元 Windows PowerShell 與既有 OCC／FCL，相依已建置產物，未新增測試套件。施工與 M1 編號調整的七套回歸均記錄 **139 項通過**，詳細結果保留於施工紀錄，不在本報告重複列述。
+測試使用 .NET Framework、64 位元 Windows PowerShell 與既有 OCC／FCL，相依已建置產物，不需額外測試套件。Debug 方案建置成功；MachineData 18、PointData 22、Kinematics 15、Grouping 23、Simulation 17、NC 26、Programming 35，共 **156 項通過、0 項失敗**。Programming 另驗證有效預覽不觸發全畫布清理、完成後啟用即時更新、例外時恢復更新狀態，以及真實機構 AIS 在連續角度更新後保持顯示並套用正確姿態。自動驗證不代表人工畫面排版、控制器或實機已驗收。
 
 **交付範圍：** 本報告引用的七套測試與兩份 examples XML 一併納入版本控制；IDE 暫存、個人專案設定及建置產物不列入交付。原施工紀錄與架構指引保留既有歷史內容。
 

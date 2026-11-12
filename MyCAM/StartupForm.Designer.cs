@@ -82,8 +82,19 @@
 			this.m_tsbMeasureCAM = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbCalibrationPnt = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbConvertNC = new System.Windows.Forms.ToolStripButton();
+			this.m_tssCAMPath = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssCAMOrder = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssCAMTraverse = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssCAMCraft = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssCAMToolVec = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssCAMPathEdit = new System.Windows.Forms.ToolStripSeparator();
 			this.m_tscLevel1Container = new System.Windows.Forms.ToolStripContainer();
 			this.m_tsSimuFunc = new System.Windows.Forms.ToolStrip();
+			this.m_tssSimuPlayback = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssSimuPath = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssSimuCollision = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssSimuPoint = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssSimuSpeed = new System.Windows.Forms.ToolStripSeparator();
 			this.m_btnPlay = new System.Windows.Forms.ToolStripButton();
 			this.m_btnPause = new System.Windows.Forms.ToolStripButton();
 			this.m_btnStop = new System.Windows.Forms.ToolStripButton();
@@ -97,12 +108,16 @@
 			this.m_btnSlowDonw = new System.Windows.Forms.ToolStripButton();
 			this.m_btnCheck = new System.Windows.Forms.ToolStripButton();
 			this.m_tsFileFunction = new System.Windows.Forms.ToolStrip();
+			this.m_tssFileGeometry = new System.Windows.Forms.ToolStripSeparator();
 			this.m_tsbImport3DFile = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAddRevolution = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAddTube = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbReadProjectFile = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSaveProjectFile = new System.Windows.Forms.ToolStripButton();
 			this.m_tsCADFunction = new System.Windows.Forms.ToolStrip();
+			this.m_tssCADModel = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssCADGeometry = new System.Windows.Forms.ToolStripSeparator();
+			this.m_tssCADTransform = new System.Windows.Forms.ToolStripSeparator();
 			this.m_tsbSewPart = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbDesignSupportBracket = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbAddPoint_BoundingBoxCenter = new System.Windows.Forms.ToolStripButton();
@@ -263,32 +278,44 @@
 			this.m_tsCAMFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsbAddPath,
             this.m_tsbDeletePath,
+			this.m_tssCAMPath,
             this.m_tsbAutoOrder,
             this.m_tsbManualOrder,
+			this.m_tssCAMOrder,
             this.m_tsbStartPoint,
             this.m_tsbReverse,
             this.m_tsbEntryAndExitSetting,
             this.m_tsbSetTraverseData,
+			this.m_tssCAMTraverse,
             this.m_tsbSetLead,
             this.m_tsbOverCut,
             this.m_tsbMicroJoint,
             this.m_tsbRCorner,
             this.m_tsbExtendedGCode,
+			this.m_tssCAMCraft,
             this.m_tsbToolVec,
             this.m_tsbFixedToolVec,
             this.m_tsbToolVecReverse,
 			this.m_tsbExternalAxis,
             this.m_tsbOptimizeIK,
+			this.m_tssCAMToolVec,
             this.m_tsbPatternSetting,
             this.m_tsbPathEdit,
             this.m_tsbPathCompensation,
             this.m_btnContourEdit,
-            this.m_tsbMeasureCAM});
+			this.m_tssCAMPathEdit,
+			this.m_tsbMeasureCAM});
 			this.m_tsCAMFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCAMFunction.Name = "m_tsCAMFunction";
 			this.m_tsCAMFunction.Size = new System.Drawing.Size(1596, 50);
 			this.m_tsCAMFunction.TabIndex = 2;
 			this.m_tsCAMFunction.Text = "toolStrip1";
+			this.m_tssCAMPath.Name = "m_tssCAMPath";
+			this.m_tssCAMOrder.Name = "m_tssCAMOrder";
+			this.m_tssCAMTraverse.Name = "m_tssCAMTraverse";
+			this.m_tssCAMCraft.Name = "m_tssCAMCraft";
+			this.m_tssCAMToolVec.Name = "m_tssCAMToolVec";
+			this.m_tssCAMPathEdit.Name = "m_tssCAMPathEdit";
 			//
 			// m_tsMachiningFunction
 			//
@@ -631,20 +658,30 @@
             this.m_btnPlay,
             this.m_btnPause,
             this.m_btnStop,
+			this.m_tssSimuPlayback,
             this.m_btnPreviousPath,
             this.m_btnNextPath,
+			this.m_tssSimuPath,
             this.m_btnPreCollision,
             this.m_btnNextCol,
+			this.m_tssSimuCollision,
             this.m_btnPrePoint,
             this.m_btnNextPoint,
+			this.m_tssSimuPoint,
             this.m_btnSpeedUp,
             this.m_btnSlowDonw,
+			this.m_tssSimuSpeed,
             this.m_btnCheck});
 			this.m_tsSimuFunc.Location = new System.Drawing.Point(0, 0);
 			this.m_tsSimuFunc.Name = "m_tsSimuFunc";
 			this.m_tsSimuFunc.Size = new System.Drawing.Size(1596, 50);
 			this.m_tsSimuFunc.TabIndex = 5;
 			this.m_tsSimuFunc.Text = "模擬功能";
+			this.m_tssSimuPlayback.Name = "m_tssSimuPlayback";
+			this.m_tssSimuPath.Name = "m_tssSimuPath";
+			this.m_tssSimuCollision.Name = "m_tssSimuCollision";
+			this.m_tssSimuPoint.Name = "m_tssSimuPoint";
+			this.m_tssSimuSpeed.Name = "m_tssSimuSpeed";
 			// 
 			// m_btnPlay
 			// 
@@ -786,6 +823,7 @@
             this.m_tsbImport3DFile,
             this.m_tsbAddRevolution,
             this.m_tsbAddTube,
+			this.m_tssFileGeometry,
             this.m_tsbReadProjectFile,
             this.m_tsbSaveProjectFile});
 			this.m_tsFileFunction.Location = new System.Drawing.Point(0, 0);
@@ -793,6 +831,7 @@
 			this.m_tsFileFunction.Size = new System.Drawing.Size(1596, 50);
 			this.m_tsFileFunction.TabIndex = 4;
 			this.m_tsFileFunction.Text = "匯入3D模型";
+			this.m_tssFileGeometry.Name = "m_tssFileGeometry";
 			// 
 			// m_tsbImport3DFile
 			// 
@@ -856,21 +895,27 @@
 			this.m_tsCADFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tsbSewPart,
             this.m_tsbDesignSupportBracket,
+			this.m_tssCADModel,
             this.m_tsbAddPoint_BoundingBoxCenter,
             this.m_tsbAddPoint_EdgeCenter,
             this.m_tsbAddPoint_PointCenter,
             this.m_tsbAddPoint_AcrCenter,
             this.m_tsbAddLine_TwoVertexConnect,
             this.m_tsbWireDiscreteVertex,
+			this.m_tssCADGeometry,
             this.m_tsbAxisTransform,
             this.m_tsbManualTransform,
             this.m_tsb3PntTransform,
+			this.m_tssCADTransform,
             this.m_tsbMeasureCAD});
 			this.m_tsCADFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCADFunction.Name = "m_tsCADFunction";
 			this.m_tsCADFunction.Size = new System.Drawing.Size(1596, 50);
 			this.m_tsCADFunction.TabIndex = 3;
 			this.m_tsCADFunction.Text = "CAD功能";
+			this.m_tssCADModel.Name = "m_tssCADModel";
+			this.m_tssCADGeometry.Name = "m_tssCADGeometry";
+			this.m_tssCADTransform.Name = "m_tssCADTransform";
 			// 
 			// m_tsbSewPart
 			// 
@@ -1542,6 +1587,12 @@
 		private System.Windows.Forms.ToolStrip m_tsMachiningFunction;
 		private System.Windows.Forms.ToolStripButton m_tsbSetOffset;
 		private System.Windows.Forms.ToolStripButton m_tsbProcessSettings;
+		private System.Windows.Forms.ToolStripSeparator m_tssCAMPath;
+		private System.Windows.Forms.ToolStripSeparator m_tssCAMOrder;
+		private System.Windows.Forms.ToolStripSeparator m_tssCAMTraverse;
+		private System.Windows.Forms.ToolStripSeparator m_tssCAMCraft;
+		private System.Windows.Forms.ToolStripSeparator m_tssCAMToolVec;
+		private System.Windows.Forms.ToolStripSeparator m_tssCAMPathEdit;
 		private System.Windows.Forms.ToolStripButton m_tsbAddPath;
 		private System.Windows.Forms.ToolStripButton m_tsbDeletePath;
 		private System.Windows.Forms.ToolStripButton m_tsbStartPoint;
@@ -1555,6 +1606,9 @@
 		private System.Windows.Forms.ToolStripContainer m_tscLevel1Container;
 		private System.Windows.Forms.ToolStripContainer m_tscLevel2Container;
 		private System.Windows.Forms.ToolStrip m_tsCADFunction;
+		private System.Windows.Forms.ToolStripSeparator m_tssCADModel;
+		private System.Windows.Forms.ToolStripSeparator m_tssCADGeometry;
+		private System.Windows.Forms.ToolStripSeparator m_tssCADTransform;
 		private System.Windows.Forms.ToolStripContainer m_tscLevel3Container;
 		private System.Windows.Forms.ToolStripButton m_tsbSetTraverseData;
 		private System.Windows.Forms.ToolStripButton m_tsbConvertNC;
@@ -1570,6 +1624,7 @@
 		private System.Windows.Forms.ToolStripButton m_tsbWireDiscreteVertex;
 		private System.Windows.Forms.ToolStripButton m_tsbAxisTransform;
 		private System.Windows.Forms.ToolStrip m_tsFileFunction;
+		private System.Windows.Forms.ToolStripSeparator m_tssFileGeometry;
 		private System.Windows.Forms.ToolStripButton m_tsbImport3DFile;
 		private System.Windows.Forms.ToolStripButton m_tsbReadProjectFile;
 		private System.Windows.Forms.ToolStripButton m_tsbSaveProjectFile;
@@ -1606,6 +1661,11 @@
 		private System.Windows.Forms.ToolStripMenuItem m_tsbCNCConnection;
 		private System.Windows.Forms.ToolStripMenuItem m_tsmiSimulation;
 		private System.Windows.Forms.ToolStrip m_tsSimuFunc;
+		private System.Windows.Forms.ToolStripSeparator m_tssSimuPlayback;
+		private System.Windows.Forms.ToolStripSeparator m_tssSimuPath;
+		private System.Windows.Forms.ToolStripSeparator m_tssSimuCollision;
+		private System.Windows.Forms.ToolStripSeparator m_tssSimuPoint;
+		private System.Windows.Forms.ToolStripSeparator m_tssSimuSpeed;
 		private System.Windows.Forms.ToolStripButton m_btnPlay;
 		private System.Windows.Forms.ToolStripButton m_btnPause;
 		private System.Windows.Forms.ToolStripButton m_btnStop;

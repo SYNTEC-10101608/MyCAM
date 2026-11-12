@@ -377,7 +377,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void SetWorkPieceDisplayTransform( gp_Trsf trsf = null, bool isUnLockViewerUpdate = true )
+		void SetWorkPieceDisplayTransform( gp_Trsf trsf = null, bool isUnLockViewerUpdate = true, bool followCamera = true )
 		{
 			if( trsf == null ) {
 				return;
@@ -394,6 +394,9 @@ namespace MyCAM.Editor
 
 			// transform the workpiece display
 			m_ViewManager.ShowPartsTrsf( m_DataManager.PartIDList, trsf );
+			if( !followCamera ) {
+				return;
+			}
 
 			// apply camera follow
 			V3d_View view = m_Viewer.GetView();
@@ -487,14 +490,12 @@ namespace MyCAM.Editor
 				return;
 			}
 			EndActionIfNotDefault();
-			if( !ValidateBeforeActionEdit( out List<string> pathIDs, true ) ) {
-				return;
-			}
-			ExternalAxisAction action = new ExternalAxisAction( m_DataManager, pathIDs );
-			action.RaiseTrans += SetTrans;
+			List<string> pathIDs = GetSelectedIDList();
+			ExternalAxisAction action = new ExternalAxisAction( m_DataManager, pathIDs, m_DefaultAction as SelectPathAction );
+			action.RaiseTrans += SetExternalAxisPreview;
 			action.NeedOptimizedIK += DoOptimizeIKContinuity;
 			action.PropertyChanged += paths => {
-				ResetPartDisplay();
+				ResetPartDisplay( false );
 				m_MachineRender.Remove();
 				ShowAllCAMData();
 			};
@@ -1015,13 +1016,32 @@ namespace MyCAM.Editor
 
 		void SetTrans( Dictionary<MachineComponentType, List<gp_Trsf>> transMap, bool isUnLockViewerUpdate = true )
 		{
+			SetTrans( transMap, isUnLockViewerUpdate, true );
+		}
+
+		void SetTrans( Dictionary<MachineComponentType, List<gp_Trsf>> transMap, bool isUnLockViewerUpdate, bool followCamera )
+		{
 			// update camera FIRST before setting any transformations
 			gp_Trsf workPieceTrsf = transMap[ MachineComponentType.WorkPiece ].Last();
 
 			// show
 			m_MachineRender.ShowToolVecEditResult( transMap );
 			ShowTransedCAMData( workPieceTrsf );
-			SetWorkPieceDisplayTransform( workPieceTrsf, isUnLockViewerUpdate );
+			SetWorkPieceDisplayTransform( workPieceTrsf, isUnLockViewerUpdate, followCamera );
+			m_Viewer.UpdateView();
+		}
+
+		void SetExternalAxisPreview( Dictionary<MachineComponentType, List<gp_Trsf>> transMap, bool isUnLockViewerUpdate )
+		{
+			V3d_View view = m_Viewer.GetView();
+			bool previousImmediateUpdate = view.SetImmediateUpdate( false );
+			try {
+				SetTrans( transMap, false, false );
+			}
+			finally {
+				view.SetImmediateUpdate( previousImmediateUpdate );
+			}
+			view.SetImmediateUpdate( true );
 			m_Viewer.UpdateView();
 		}
 
@@ -1034,9 +1054,14 @@ namespace MyCAM.Editor
 		// reset Part display (path / workpiece) back to un-transformed state without touching machine render
 		void ResetPartDisplay()
 		{
+			ResetPartDisplay( true );
+		}
+
+		void ResetPartDisplay( bool followCamera )
+		{
 			gp_Trsf identity = new gp_Trsf();
 			ShowTransedCAMData( identity );
-			SetWorkPieceDisplayTransform( identity, true );
+			SetWorkPieceDisplayTransform( identity, true, followCamera );
 		}
 
 		void RemoveAllCAMData()
@@ -1135,7 +1160,6 @@ namespace MyCAM.Editor
 				return;
 			}
 			if( action.ActionType == EditActionType.OverCut
-				|| action.ActionType == EditActionType.ExternalAxis
 				|| action.ActionType == EditActionType.SetLead
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern
@@ -1151,7 +1175,6 @@ namespace MyCAM.Editor
 			}
 
 			if( action.ActionType == EditActionType.OverCut
-				|| action.ActionType == EditActionType.ExternalAxis
 				|| action.ActionType == EditActionType.SetLead
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern
@@ -1173,7 +1196,6 @@ namespace MyCAM.Editor
 			}
 			// these action will show dialog, need to lock ui
 			if( action.ActionType == EditActionType.OverCut
-				|| action.ActionType == EditActionType.ExternalAxis
 				|| action.ActionType == EditActionType.SetLead
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern
@@ -1189,7 +1211,6 @@ namespace MyCAM.Editor
 			}
 
 			if( action.ActionType == EditActionType.OverCut
-				|| action.ActionType == EditActionType.ExternalAxis
 				|| action.ActionType == EditActionType.SetLead
 				|| action.ActionType == EditActionType.SetTraverse
 				|| action.ActionType == EditActionType.SetPattern
