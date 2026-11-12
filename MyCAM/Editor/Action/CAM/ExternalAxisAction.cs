@@ -37,6 +37,7 @@ namespace MyCAM.Editor
 		}
 
 		public Action<Dictionary<MachineComponentType, List<gp_Trsf>>, bool> RaiseTrans;
+		public Action<bool> RaiseActionStart;
 		public Action NeedOptimizedIK;
 		public Action<List<string>> PropertyChanged;
 
@@ -46,15 +47,16 @@ namespace MyCAM.Editor
 		{
 			base.Start();
 			m_Dlg = new ExternalAxisDlg( m_MachineData.ExternalAxes.Type, GetPositions() );
-			m_Dlg.Preview = PreviewPositions;
-			m_Dlg.Confirm = ConfirmPositions;
-			m_Dlg.Cancel = End;
+			m_Dlg.PositionsChanged += OnPositionsChanged;
+			m_Dlg.PreviewRequested += RefreshPreview;
+			m_Dlg.Cancel += End;
 			m_PathIndexAction.ExitSingleSelectMode();
 			m_PathIndexAction.Start();
 			m_IsSelectionStarted = true;
 			m_PathIndexAction.SelectionChange += OnPathSelectionChanged;
 			m_CurrentPathIDList = GetEditablePaths( m_PathIndexAction.GetSelectedIDs() );
 			m_Dlg.SetPositions( GetPositions() );
+			RaiseActionStart?.Invoke( true );
 			m_Dlg.Show( MyApp.MainForm );
 			RefreshPreview();
 		}
@@ -71,13 +73,14 @@ namespace MyCAM.Editor
 				m_IsSelectionStarted = false;
 			}
 			if( m_Dlg != null ) {
-				m_Dlg.Preview = null;
-				m_Dlg.Confirm = null;
-				m_Dlg.Cancel = null;
+				m_Dlg.PositionsChanged -= OnPositionsChanged;
+				m_Dlg.PreviewRequested -= RefreshPreview;
+				m_Dlg.Cancel -= End;
 				m_Dlg.Close();
 				m_Dlg.Dispose();
 				m_Dlg = null;
 			}
+			RaiseActionStart?.Invoke( false );
 			PropertyChanged?.Invoke( m_CurrentPathIDList );
 			base.End();
 			NeedOptimizedIK?.Invoke();
@@ -122,7 +125,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void PreviewPositions( ExternalAxisEditData data )
+		void OnPositionsChanged( ExternalAxisEditData data )
 		{
 			ApplyPositions( data );
 			RefreshPreview();
@@ -154,12 +157,6 @@ namespace MyCAM.Editor
 			}
 			PostPoint orientation = new PostPoint { Master = point.ModMaster_rad, Slave = point.ModSlave_rad, ExternalAxisPos = point.ExternalAxisPos };
 			return SimuPathBuilderFactory.Create( m_MachineData ).BuildSinglePointFrameTransform( m_MachineData, point.Point, orientation, out frames );
-		}
-
-		void ConfirmPositions( ExternalAxisEditData data )
-		{
-			ApplyPositions( data );
-			End();
 		}
 
 		readonly FiveAxisMachineData m_MachineData;

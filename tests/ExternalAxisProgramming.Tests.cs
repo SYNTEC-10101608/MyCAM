@@ -34,6 +34,17 @@ public static class ExternalAxisProgrammingTests
 	static void Click( object dialog, string button ) { Call( DialogType, "m_btn" + button + "_Click", dialog, null, EventArgs.Empty ); }
 	static NumericUpDown Number( object dialog, string name ) { return (NumericUpDown)Field( dialog, "m_dbtn" + name ); }
 	static void Input( object dialog, string name, string text ) { Number( dialog, name ).Controls.OfType<TextBox>().Single().Text = text; }
+	static void LoseFocus( object dialog, string name ) { Number( dialog, name ).GetType().GetMethod( "OnLostFocus", Flags ).Invoke( Number( dialog, name ), new object[] { EventArgs.Empty } ); }
+	static void EditAndClose( object action, decimal ext1, decimal? ext2 )
+	{
+		Call( ActionType, "Start", action ); object dialog = Field( action, "m_Dlg" );
+		try {
+			Number( dialog, "Ext1" ).Value = ext1;
+			if( ext2.HasValue ) { Number( dialog, "Ext2" ).Value = ext2.Value; }
+			Click( dialog, "Confirm" );
+		}
+		finally { Call( ActionType, "End", action ); }
+	}
 	static void Matrix( gp_Trsf a, gp_Trsf b )
 	{
 		for( int r = 1; r <= 3; r++ ) { for( int c = 1; c <= 4; c++ ) { Assert( Math.Abs( a.Value( r, c ) - b.Value( r, c ) ) < 1e-8, "Preview transform differs." ); } }
@@ -153,7 +164,7 @@ public static class ExternalAxisProgrammingTests
 			}
 		}
 	}
-	public static void DialogInvalidInputDoesNotPreviewOrConfirm()
+	public static void DialogInvalidInputDoesNotApplyOrPreview()
 	{
 		Fixture f = new Fixture( ExternalAxisType.Dual, false ); ContourPathObject a = f.Add( 12, 34 ); object action = f.Action();
 		int previews = 0;
@@ -164,17 +175,90 @@ public static class ExternalAxisProgrammingTests
 				foreach( string invalid in new[] { "-", "NaN", "Infinity", "bad", "", "100000", "-100000" } ) {
 					int before = previews; ExternalAxisPos position = a.CraftData.ExternalAxisPos;
 					Input( dialog, axis, invalid );
-					Call( DialogType, "ProcessDialogKey", dialog, Keys.Enter ); Click( dialog, "Confirm" );
+					Call( DialogType, "ProcessDialogKey", dialog, Keys.Enter );
 					Assert( previews == before && a.CraftData.ExternalAxisPos.Equals( position ), "Invalid input changed the preview or data: " + axis + " '" + invalid + "', previews " + before + " -> " + previews + ", text '" + Number( dialog, axis ).Text + "'." );
 					Assert( !(bool)Field( dialog, "m_ConfirmCheck" ), "Invalid input confirmed." );
 					Assert( ( (Label)Field( dialog, "m_lblError" ) ).Text.Length > 0, "No validation feedback." );
 				}
 				Input( dialog, axis, "12" );
 			}
+			Input( dialog, "Ext1", "bad" ); LoseFocus( dialog, "Ext1" );
+			Input( dialog, "Ext2", "bad" ); LoseFocus( dialog, "Ext2" );
+			ExternalAxisPos beforeClose = a.CraftData.ExternalAxisPos;
+			Click( dialog, "Confirm" );
+			Assert( ( (Form)dialog ).IsDisposed && a.CraftData.ExternalAxisPos.Equals( beforeClose ), "Closing must not submit rejected input." );
 		}
 		finally { Call( ActionType, "End", action ); }
 	}
 
+	public static void SelectionSynchronizationDiscardsUncommittedText()
+	{
+		foreach( string axis in new[] { "Ext1", "Ext2" } ) {
+			foreach( string text in new[] { "123", "", "bad" } ) {
+				Fixture f = new Fixture( ExternalAxisType.Dual, false );
+				ContourPathObject a = f.Add( 10, 20 ), b = f.Add( 30, 40 ), c = f.Add( 50, 60 ), d = f.Add( 70, 80 );
+				object action = f.Action( a.UID, b.UID ); Call( ActionType, "Start", action ); object dialog = Field( action, "m_Dlg" );
+				try {
+					Input( dialog, axis, text );
+					Call( DialogType, "SetPositions", dialog, new List<ExternalAxisPos> { c.CraftData.ExternalAxisPos, d.CraftData.ExternalAxisPos } );
+					Assert( decimal.Parse( Number( dialog, axis ).Text, CultureInfo.CurrentCulture ) == 0, "Silent synchronization did not replace pending text." );
+					ExternalAxisEditorTestHelper.ChangeSelection( action, c.UID, d.UID );
+					Assert( decimal.Parse( Number( dialog, axis ).Text, CultureInfo.CurrentCulture ) == 0, "Selection synchronization retained pending text: " + axis + " '" + text + "'." );
+					LoseFocus( dialog, axis ); Call( DialogType, "ProcessDialogKey", dialog, Keys.Enter );
+					Assert( a.CraftData.ExternalAxisPos.Equals( new ExternalAxisPos( 10, 20 ) ) && b.CraftData.ExternalAxisPos.Equals( new ExternalAxisPos( 30, 40 ) ), "Uncommitted text was applied to the old selection." );
+					Assert( c.CraftData.ExternalAxisPos.Equals( new ExternalAxisPos( 50, 60 ) ) && d.CraftData.ExternalAxisPos.Equals( new ExternalAxisPos( 70, 80 ) ), "Uncommitted text leaked into the new selection." );
+				}
+				finally { Call( ActionType, "End", action ); }
+			}
+		}
+	}
+	public static void NumericSilentSynchronizationDoesNotCommitPendingText()
+	{
+		using( NumericUpDown number = (NumericUpDown)New( "MyCAM.Editor.DebouncedNumericUpDown" ) ) {
+			int changes = 0; number.ValueChanged += delegate { changes++; };
+			foreach( string text in new[] { "123", "", "bad" } ) {
+				number.Controls.OfType<TextBox>().Single().Text = text;
+				Set( number, "SilentSetValue", 0m );
+				number.GetType().GetMethod( "OnLostFocus", Flags ).Invoke( number, new object[] { EventArgs.Empty } );
+				Assert( number.Value == 0 && decimal.Parse( number.Text, CultureInfo.CurrentCulture ) == 0 && changes == 0, "Silent same-value synchronization committed or retained pending text." );
+			}
+		}
+	}
+	public static void RejectedInputDoesNotAssignMixedOrOutOfRangeValues()
+	{
+		foreach( string axis in new[] { "Ext1", "Ext2" } ) {
+			foreach( bool outOfRange in new[] { false, true } ) {
+				foreach( string text in new[] { "bad", "", "-", "100000" } ) {
+					Fixture f = new Fixture( ExternalAxisType.Dual, false );
+					ContourPathObject a = f.Add( outOfRange ? 1e100 : 10, outOfRange ? -1e100 : 20 ), b = f.Add( 30, 40 );
+					ExternalAxisPos beforeA = a.CraftData.ExternalAxisPos, beforeB = b.CraftData.ExternalAxisPos;
+					object action = f.Action(); Call( ActionType, "Start", action ); object dialog = Field( action, "m_Dlg" );
+					try {
+						Input( dialog, axis, text ); LoseFocus( dialog, axis );
+						Assert( a.CraftData.ExternalAxisPos.Equals( beforeA ) && b.CraftData.ExternalAxisPos.Equals( beforeB ), "Focus loss assigned rejected text: " + axis + " '" + text + "'." );
+						Assert( !(bool)Field( dialog, "m_" + axis + "Edited" ), "Focus loss retained an edit flag after rejecting " + axis + " '" + text + "', text '" + Number( dialog, axis ).Text + "'." );
+						Call( DialogType, "ProcessDialogKey", dialog, Keys.Enter ); Click( dialog, "Confirm" );
+						Assert( a.CraftData.ExternalAxisPos.Equals( beforeA ) && b.CraftData.ExternalAxisPos.Equals( beforeB ), "Rejected input assigned the display fallback: " + axis + " '" + text + "'." );
+						Assert( ( (Form)dialog ).IsDisposed, "Confirm did not end the immediate-edit dialog." );
+					}
+					finally { Call( ActionType, "End", action ); }
+				}
+			}
+		}
+	}
+	public static void ExplicitZeroOnFocusLossChangesOnlyTheEditedAxis()
+	{
+		foreach( string axis in new[] { "Ext1", "Ext2" } ) {
+			Fixture f = new Fixture( ExternalAxisType.Dual, false ); ContourPathObject a = f.Add( 10, 20 ), b = f.Add( 30, 40 );
+			object action = f.Action(); Call( ActionType, "Start", action ); object dialog = Field( action, "m_Dlg" );
+			try {
+				Input( dialog, axis, "0" ); LoseFocus( dialog, axis );
+				Assert( a.CraftData.ExternalAxisPos.Equals( axis == "Ext1" ? new ExternalAxisPos( 0, 20 ) : new ExternalAxisPos( 10, 0 ) )
+					&& b.CraftData.ExternalAxisPos.Equals( axis == "Ext1" ? new ExternalAxisPos( 0, 40 ) : new ExternalAxisPos( 30, 0 ) ), "Explicit zero was lost or overwrote the other axis." );
+			}
+			finally { Call( ActionType, "End", action ); }
+		}
+	}
 	public static void SelectionCopiedAndUnselectedPathsUntouched()
 	{
 		Fixture f = new Fixture( ExternalAxisType.Dual, false ); ContourPathObject a = f.Add( 1, 2 ), b = f.Add( 3, 4 );
@@ -370,6 +454,11 @@ public static class ExternalAxisProgrammingTests
 		Fixture f = new Fixture( ExternalAxisType.Dual, false ); f.Add( 0, 0 ); f.Add( 21, 33 );
 		ExternalAxisEditorTestHelper.VerifyEditableSelection( f.Manager );
 	}
+	public static void ExternalAxisEditingPausesNormalRenderersAndRestoresDisplay()
+	{
+		Fixture f = new Fixture( ExternalAxisType.Dual, false ); ContourPathObject a = f.Add( 0, 0 ); f.Add( 21, 33 ); f.Circle( a, 0 );
+		ExternalAxisEditorTestHelper.VerifyRendererPause( f.Manager );
+	}
 
 	static void PreviewCase( ExternalAxisType type, bool mix, bool circle )
 	{
@@ -472,7 +561,7 @@ public static class ExternalAxisProgrammingTests
 		Fixture f = new Fixture( type, mix ); ContourPathObject a = f.Add( 0, 0 ); f.Add( 0, 0 );
 		if( pattern != 0 ) { f.Pattern( pattern ); } else if( mixed ) { f.Circle( a, 0 ); }
 		object action = f.Action(); SetField( action, "NeedOptimizedIK", (Action)f.Optimize );
-		Call( ActionType, "ConfirmPositions", action, Edit( zero ? 0 : 73, zero ? 0 : -29 ) );
+		EditAndClose( action, zero ? 0 : 73, type == ExternalAxisType.Dual ? (decimal?)( zero ? 0 : -29 ) : null );
 		Assert( f.Groups().Length == 1, "Single assignment did not produce one group." );
 		object writer = New( "MyCAM.Post.NCWriter", f.Manager ); object[] postArgs = { null, null, null };
 		Assert( (bool)Call( "MyCAM.Post.NCWriter", "ConvertPostDataListSuccess", writer, postArgs ), "Post conversion failed: " + postArgs[0] );
@@ -521,7 +610,7 @@ public static class ExternalAxisProgrammingTests
 	{
 		Fixture f = new Fixture( ExternalAxisType.Single, false ); ContourPathObject a = f.Add( 0, 0 ), b = f.Add( 0, 0 ), c = f.Add( 0, 0 );
 		object action = f.Action( b.UID ); SetField( action, "NeedOptimizedIK", (Action)f.Optimize );
-		Call( ActionType, "ConfirmPositions", action, Edit( 360, null ) );
+		EditAndClose( action, 360, null );
 		Assert( f.Groups().Length == 3, "0/360/0 merged or reordered." );
 		foreach( var path in new[] { a, b, c } ) { Assert( path.CraftData.InitMaster_rad == 0 && path.CraftData.InitSlave_rad == 0, "New group boundary did not reset global seeds." ); }
 	}
@@ -530,7 +619,7 @@ public static class ExternalAxisProgrammingTests
 		Fixture f = new Fixture( ExternalAxisType.Dual, false ); ContourPathObject a = f.Add( 0, 0 ); f.Circle( a, 0 );
 		PartObject part = new PartObject( "Part0", new OCC.BRepPrimAPI.BRepPrimAPI_MakeBox( 10, 20, 30 ).Shape() );
 		f.Map.Add( part.UID, part ); ( (List<string>)Get( f.Manager, "PartIDList" ) ).Add( part.UID );
-		object action = f.Action(); SetField( action, "NeedOptimizedIK", (Action)f.Optimize ); Call( ActionType, "ConfirmPositions", action, Edit( 360, -29 ) );
+		object action = f.Action(); SetField( action, "NeedOptimizedIK", (Action)f.Optimize ); EditAndClose( action, 360, -29 );
 		DataManagerDTO dto = (DataManagerDTO)New( "MyCAM.FileManager.DataManagerDTO", f.Manager ); XmlSerializer serializer = new XmlSerializer( typeof( DataManagerDTO ) );
 		DataManagerDTO restored;
 		using( StringWriter writer = new StringWriter() ) { serializer.Serialize( writer, dto ); restored = (DataManagerDTO)serializer.Deserialize( new StringReader( writer.ToString() ) ); }

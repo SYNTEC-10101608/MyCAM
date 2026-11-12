@@ -493,6 +493,7 @@ namespace MyCAM.Editor
 			List<string> pathIDs = GetSelectedIDList();
 			ExternalAxisAction action = new ExternalAxisAction( m_DataManager, pathIDs, m_DefaultAction as SelectPathAction );
 			action.RaiseTrans += SetExternalAxisPreview;
+			action.RaiseActionStart += ExternalAxisActionStartIO;
 			action.NeedOptimizedIK += DoOptimizeIKContinuity;
 			action.PropertyChanged += paths => {
 				ResetPartDisplay( false );
@@ -500,6 +501,13 @@ namespace MyCAM.Editor
 				ShowAllCAMData();
 			};
 			StartEditAction( action );
+		}
+
+		void ExternalAxisActionStartIO( bool isStart )
+		{
+			m_MainPathRenderer.SetPauseRefreshAndHide( isStart );
+			m_ToolVecRenderer.SetPauseRefreshAndHide( isStart );
+			m_TraverseRenderer.SetPauseRefreshAndHide( isStart );
 		}
 
 		public void SetTraverseData()

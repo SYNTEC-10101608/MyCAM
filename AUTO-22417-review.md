@@ -329,9 +329,9 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 
 | 施工對象 | 施工內容 |
 | --- | --- |
-| [ExternalAxisAction.cs](MyCAM/Editor/Action/CAM/ExternalAxisAction.cs) | 共用 `SelectPathAction`，允許空選取開啟及單／多選切換；只對當前選取即時套用已編輯軸，以當前 ID 清單第一條路徑的加工起點預覽。切換至非空選取時通知最佳化；End 解除選取回呼、清理顯示並結束編輯後，再通知最佳化。 |
-| [ExternalAxisDlg.cs](MyCAM/Editor/Dialog/ExternalAxisDlg.cs)、[ExternalAxisDlg.Designer.cs](MyCAM/Editor/Dialog/ExternalAxisDlg.Designer.cs) | 沿用 LockAB 的 `DebouncedNumericUpDown`：±99999°、3 位小數。ValueChanged 即套用並預覽，Enter 解析輸入並預覽而不結束；確定、取消或關閉皆保留已套用角度。混合值靜默顯示 0，未編輯軸不覆寫；空選取停用輸入。 |
-| [IEditorAction.cs](MyCAM/Editor/Action/IEditorAction.cs)、[CAMEditor.cs](MyCAM/Editor/CAMEditor.cs) | Action 類型與 `SetExternalAxisPos` 入口負責機台能力檢查、WorkPiece 預覽、顯示重建／清理及全域 `DoOptimizeIKContinuity`；編輯期間不鎖主工具列、主選單或路徑樹，結束後恢復預設選取 Action。變位機預覽與清理不追蹤視角，ToolVec／鎖軸預覽維持追蹤行為。 |
+| [ExternalAxisAction.cs](MyCAM/Editor/Action/CAM/ExternalAxisAction.cs) | 共用 `SelectPathAction`，允許空選取開啟及單／多選切換；由 `PositionsChanged` 寫入當前選取、`PreviewRequested` 單純重畫，以第一條選取路徑的加工起點預覽。切換至非空選取時通知最佳化；End 解除回呼、恢復 Renderer、清理顯示並結束編輯後，再通知最佳化，重複 End 不重做。 |
+| [ExternalAxisDlg.cs](MyCAM/Editor/Dialog/ExternalAxisDlg.cs)、[ExternalAxisDlg.Designer.cs](MyCAM/Editor/Dialog/ExternalAxisDlg.Designer.cs) | 沿用 LockAB 的 `DebouncedNumericUpDown`：±99999°、3 位小數，訂閱 `ValueChanged` 而非防抖事件。有效數值變更即通知 Action；Enter／失焦處理待輸入文字，Enter 不結束。確定與取消共用結束通知，不再額外解析或提交角度；關閉也保留已套用角度。混合值逐軸靜默顯示 0，未編輯軸不覆寫；空選取停用輸入。 |
+| [IEditorAction.cs](MyCAM/Editor/Action/IEditorAction.cs)、[CAMEditor.cs](MyCAM/Editor/CAMEditor.cs) | Action 類型與 `SetExternalAxisPos` 入口負責機台能力檢查、WorkPiece 預覽、顯示重建／清理及全域 `DoOptimizeIKContinuity`。編輯期間暫停並隱藏一般 Path／ToolVec／Traverse Renderer 的圖元，不建立 `ToolVecEditRender`；不鎖主工具列、主選單或路徑樹。結束先恢復 Renderer，最後恢復預設選取 Action。變位機預覽與清理不追蹤視角，ToolVec／鎖軸預覽維持追蹤行為。 |
 | [StartupForm.cs](MyCAM/StartupForm.cs)、[StartupForm.Designer.cs](MyCAM/StartupForm.Designer.cs)、[MyCAM.csproj](MyCAM/MyCAM.csproj) | 提供工具列入口、事件及依機台啟用條件；Action／Dialog 納入專案編譯。 |
 | [ToolVectorAction.cs](MyCAM/Editor/Action/CAM/ToolVectorAction.cs)、[LockABAction.cs](MyCAM/Editor/Action/CAM/LockABAction.cs) | 姿態編輯的單點預覽傳遞外部角度，共用單點 Builder。 |
 
@@ -340,6 +340,13 @@ Spindle＋Dual 的 WorkPiece 祖先為 Base、Ext1、Ext2；Mix＋Single 為 Bas
 **預覽規格：** 開啟、切換選取及有效數值變更時刷新，Enter 只觸發預覽。固定取當前選中 ID 清單的第一個，不依加工順序另排序；加工起點沿用 CacheHelper（優先 LeadIn），不提供額外預覽路徑選擇或預覽按鈕。文字依目前文化解析，無效、空白或超出範圍時不套用；切換對象以目前資料靜默同步，不將前一批輸入帶入新對象。
 
 **畫布刷新：** 有效預覽沿用 ToolVec AB／MS 的順序：暫停即時更新 → 共用 `SetTrans` 套用機台、工件與 CAM 變換 → 啟用即時更新 → `UpdateView`。不另加 `Redraw`，不先還原工件、移除機台或刷新全體 CAM 顯示；視角跟隨停用。空選取、預覽失敗與 End 才清理既有預覽；套用例外時恢復先前的更新狀態。
+
+**與 LockAB 的對齊界線：** 共用「數值變更通知 → Action 寫入 → 刷新預覽；關閉只結束」語意，不另建共用 Action 基底。保留逐軸混合值、輪廓與標準圖形支援、優先 LeadIn 的預覽起點、Single／Dual 有效軸及不跟隨視角等差異；不引入一般／鎖軸、AUTO／指定、翻轉或加工方向設定，也不照搬 LockAB 的事件解除或結束順序。
+
+**本輪修正與驗證：**
+- 共用 `SilentSetValue` 即使數值相同也清除待輸入文字及 `UserEdit`，避免切換選取後將舊文字帶入新對象。失焦先驗證輸入，拒絕後靜默還原；Dialog 不把程式還原算成編輯，避免混合值或超出 UI 範圍的既有角度被覆寫為 0。明確輸入 0 仍可於 Enter／失焦套用該軸。
+- 確定與取消直接通知結束，不透過額外提交流程；既有「最佳化在編輯結束後執行、失敗不撤銷角度且例外向上傳遞」測試維持通過。
+- 全方案 Debug 建置成功。七套回歸合計 **161 項通過、0 項失敗**，其中 Programming 為 40 項；新增邊界測試及實際 CAMEditor／OCC 的 Renderer 暫停、AIS 不重建與結束恢復驗證。未執行人工 UI／控制器／實機驗收；本節記錄實作結果，M8 最終 review 結論仍待確認。
 
 **工具列分組：** File、CAD、CAM、模擬工具列分別使用 1、3、7、5 條具名分隔線區分功能群組，變位機按鈕位於 CAM 刀向群組。視圖側欄保有 1 條分隔線；加工層、主選單與設定選單不設分隔線。
 

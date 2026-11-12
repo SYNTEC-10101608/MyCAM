@@ -45,11 +45,22 @@ namespace MyCAM.Editor
 				// the UI value is set by user, stop timer do not need to wait
 				m_DebounceTimer.Stop();
 				m_IsProgrammaticChange = true;
-				Value = value;
-				m_LastValue = value;
-				m_IsProgrammaticChange = false;
+				try {
+					UserEdit = false;
+					Value = value;
+					// Discard pending text even when the numeric value is unchanged.
+					Text = value.ToString( System.Globalization.CultureInfo.CurrentCulture );
+					UserEdit = false;
+					UpdateEditText();
+					m_LastValue = value;
+				}
+				finally {
+					m_IsProgrammaticChange = false;
+				}
 			}
 		}
+
+		internal bool IsProgrammaticChange => m_IsProgrammaticChange;
 
 		public DebouncedNumericUpDown()
 		{
@@ -102,8 +113,8 @@ namespace MyCAM.Editor
 
 		protected override void OnLostFocus( EventArgs e )
 		{
-			if( RevertOnOutOfRange && !m_IsProgrammaticChange && string.IsNullOrWhiteSpace( Text ) ) {
-				RevertToLastValue( 0m, Minimum, isBelowMin: true );
+			if( RevertOnOutOfRange && !m_IsProgrammaticChange && UserEdit ) {
+				ValidateEditText();
 			}
 
 			// this will trigger onValueChange -> timer start
@@ -154,13 +165,7 @@ namespace MyCAM.Editor
 		void RevertToLastValue( decimal inputValue, decimal limit, bool isBelowMin )
 		{
 			ValueRejected?.Invoke( this, new ValueRejectedEventArgs( inputValue, limit, isBelowMin ) );
-			// Directly set Text to bypass NumericUpDown's internal userEdit/ParseEditText/clamp flow.
-			string formatted = m_LastValue.ToString( "F" + DecimalPlaces,
-				System.Globalization.CultureInfo.CurrentCulture );
-			m_IsProgrammaticChange = true;
-			Text = formatted;
-			Value = m_LastValue;
-			m_IsProgrammaticChange = false;
+			SilentSetValue = m_LastValue;
 		}
 
 		protected override void OnValueChanged( EventArgs e )

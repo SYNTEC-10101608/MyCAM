@@ -7,8 +7,11 @@ using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
-	internal partial class ExternalAxisDlg : EditDialogBase<ExternalAxisEditData>
+	internal partial class ExternalAxisDlg : EditDialogBase<object>
 	{
+		public event Action<ExternalAxisEditData> PositionsChanged;
+		public event Action PreviewRequested;
+
 		public ExternalAxisDlg( ExternalAxisType type, List<ExternalAxisPos> positions )
 		{
 			if( type != ExternalAxisType.Single && type != ExternalAxisType.Dual ) {
@@ -25,6 +28,8 @@ namespace MyCAM.Editor
 			m_dbtnExt2.ValueChanged += OnAngleValueChanged;
 			m_dbtnExt1.KeyDown += OnAngleKeyDown;
 			m_dbtnExt2.KeyDown += OnAngleKeyDown;
+			m_dbtnExt1.LostFocus += OnAngleLostFocus;
+			m_dbtnExt2.LostFocus += OnAngleLostFocus;
 			m_dbtnExt1.ValueRejected += OnValueRejected;
 			m_dbtnExt2.ValueRejected += OnValueRejected;
 		}
@@ -107,7 +112,7 @@ namespace MyCAM.Editor
 
 		void OnAngleTextChanged( object sender, EventArgs e )
 		{
-			if( m_IsUpdatingUI ) {
+			if( m_IsUpdatingUI || ( (DebouncedNumericUpDown)sender ).IsProgrammaticChange ) {
 				return;
 			}
 			if( sender == m_dbtnExt1 ) {
@@ -120,24 +125,34 @@ namespace MyCAM.Editor
 
 		void OnAngleValueChanged( object sender, EventArgs e )
 		{
-			if( m_IsUpdatingUI ) {
+			DebouncedNumericUpDown control = (DebouncedNumericUpDown)sender;
+			if( m_IsUpdatingUI || control.IsProgrammaticChange || !control.Enabled ) {
 				return;
 			}
+			decimal value = control.Value;
+			control.SilentSetValue = value;
 			m_lblError.Text = string.Empty;
 			if( sender == m_dbtnExt1 ) {
-				m_Ext1Edited = true;
-				RaisePreview( new ExternalAxisEditData( (double)m_dbtnExt1.Value, null ) );
+				m_Ext1Edited = false;
+				PositionsChanged?.Invoke( new ExternalAxisEditData( (double)value, null ) );
 			}
 			else if( m_Type == ExternalAxisType.Dual ) {
-				m_Ext2Edited = true;
-				RaisePreview( new ExternalAxisEditData( null, (double)m_dbtnExt2.Value ) );
+				m_Ext2Edited = false;
+				PositionsChanged?.Invoke( new ExternalAxisEditData( null, (double)value ) );
+			}
+		}
+
+		void OnAngleLostFocus( object sender, EventArgs e )
+		{
+			if( !m_IsUpdatingUI && ( m_Ext1Edited || m_Ext2Edited ) ) {
+				ApplyEnteredValues( false );
 			}
 		}
 
 		void OnAngleKeyDown( object sender, KeyEventArgs e )
 		{
 			if( e.KeyCode == Keys.Enter ) {
-				PreviewEnteredValues();
+				ApplyEnteredValues( true );
 				e.Handled = e.SuppressKeyPress = true;
 			}
 		}
@@ -145,21 +160,32 @@ namespace MyCAM.Editor
 		protected override bool ProcessDialogKey( Keys keyData )
 		{
 			if( ( keyData & Keys.KeyCode ) == Keys.Enter ) {
-				PreviewEnteredValues();
+				ApplyEnteredValues( true );
 				return true;
 			}
 			return base.ProcessDialogKey( keyData );
 		}
 
-		void PreviewEnteredValues()
+		void ApplyEnteredValues( bool refreshPreview )
 		{
 			if( TryGetEditData( out ExternalAxisEditData data ) ) {
-				RaisePreview( data );
+				if( data.Ext1.HasValue || data.Ext2.HasValue ) {
+					PositionsChanged?.Invoke( data );
+				}
+				else if( refreshPreview ) {
+					PreviewRequested?.Invoke();
+				}
 			}
 		}
 
 		void OnValueRejected( object sender, ValueRejectedEventArgs e )
 		{
+			if( sender == m_dbtnExt1 ) {
+				m_Ext1Edited = false;
+			}
+			else {
+				m_Ext2Edited = false;
+			}
 			ShowInputError();
 		}
 
@@ -170,13 +196,17 @@ namespace MyCAM.Editor
 
 		void m_btnConfirm_Click( object sender, EventArgs e )
 		{
-			if( TryGetEditData( out ExternalAxisEditData data ) ) {
-				RaiseConfirm( data );
-			}
+			CloseEditor();
 		}
 
 		void m_btnCancel_Click( object sender, EventArgs e )
 		{
+			CloseEditor();
+		}
+
+		void CloseEditor()
+		{
+			Cancel?.Invoke();
 			Close();
 		}
 

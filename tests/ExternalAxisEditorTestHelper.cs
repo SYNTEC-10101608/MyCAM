@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -113,6 +114,60 @@ internal static class ExternalAxisEditorTestHelper
 			}
 			finally { type.GetMethod( "EditEnd" ).Invoke( editor, null ); }
 		} );
+	}
+
+	public static void VerifyRendererPause( object manager )
+	{
+		WithEditor( manager, delegate( object editor, object viewer ) {
+			Type type = editor.GetType();
+			FieldInfo status = type.GetField( "RaiseCAMActionStatusChange", Flags );
+			ParameterExpression[] parameters = status.FieldType.GetMethod( "Invoke" ).GetParameters().Select( p => Expression.Parameter( p.ParameterType ) ).ToArray();
+			status.SetValue( editor, Expression.Lambda( status.FieldType, Expression.Empty(), parameters ).Compile() );
+			type.GetMethod( "EditStart" ).Invoke( editor, null );
+			try {
+				string[] names = { "m_MainPathRenderer", "m_ToolVecRenderer", "m_TraverseRenderer" };
+				string[] dictionaries = { "m_OriginalPathAISDict", "m_ToolVecAISDict", "m_TraverseAISDict" };
+				object[] renderers = names.Select( name => type.GetField( name, Flags ).GetValue( editor ) ).ToArray();
+				AIS_InteractiveObject[][] before = new AIS_InteractiveObject[renderers.Length][];
+				for( int i = 0; i < renderers.Length; i++ ) {
+					renderers[i].GetType().GetMethod( "SetShow" ).Invoke( renderers[i], new object[] { true } );
+					renderers[i].GetType().GetMethods().Single( method => method.Name == "Show" && method.GetParameters().Length == 1 ).Invoke( renderers[i], new object[] { false } );
+					before[i] = RendererAIS( renderers[i], dictionaries[i] );
+					if( before[i].Length == 0 ) { throw new Exception( "Renderer pause fixture has no AIS: " + names[i] ); }
+				}
+				type.GetMethod( "SetExternalAxisPos" ).Invoke( editor, null );
+				object action = type.GetField( "m_CurrentAction", Flags ).GetValue( editor );
+				object dialog = action.GetType().GetField( "m_Dlg", Flags ).GetValue( action );
+				ChangeSelection( action, "Path0" );
+				( (NumericUpDown)dialog.GetType().GetField( "m_dbtnExt1", Flags ).GetValue( dialog ) ).Value = 73;
+				ChangeSelection( action );
+				ChangeSelection( action, "Path1" );
+				AIS_InteractiveContext context = (AIS_InteractiveContext)viewer.GetType().GetMethod( "GetAISContext" ).Invoke( viewer, null );
+				for( int i = 0; i < renderers.Length; i++ ) {
+					if( !(bool)renderers[i].GetType().BaseType.GetField( "m_IsPauseRefreshAndHide", Flags ).GetValue( renderers[i] ) ) { throw new Exception( "Renderer was not paused during external-axis editing: " + names[i] ); }
+					AIS_InteractiveObject[] after = RendererAIS( renderers[i], dictionaries[i] );
+					if( after.Length != before[i].Length || !before[i].Zip( after, ReferenceEquals ).All( same => same ) || after.Any( context.IsDisplayed ) ) { throw new Exception( "Paused renderer rebuilt or displayed its AIS: " + names[i] ); }
+				}
+				( (Form)dialog ).Close();
+				for( int i = 0; i < renderers.Length; i++ ) {
+					if( (bool)renderers[i].GetType().BaseType.GetField( "m_IsPauseRefreshAndHide", Flags ).GetValue( renderers[i] ) ) { throw new Exception( "Renderer remained paused after editing: " + names[i] ); }
+					AIS_InteractiveObject[] after = RendererAIS( renderers[i], dictionaries[i] );
+					if( after.Length == 0 || !after.All( context.IsDisplayed ) ) { throw new Exception( "Renderer display was not restored after editing: " + names[i] ); }
+				}
+			}
+			finally { type.GetMethod( "EditEnd" ).Invoke( editor, null ); }
+		} );
+	}
+
+	static AIS_InteractiveObject[] RendererAIS( object renderer, string field )
+	{
+		List<AIS_InteractiveObject> result = new List<AIS_InteractiveObject>();
+		foreach( object value in ( (IDictionary)renderer.GetType().GetField( field, Flags ).GetValue( renderer ) ).Values ) {
+			AIS_InteractiveObject shape = value as AIS_InteractiveObject;
+			if( shape != null ) { result.Add( shape ); }
+			else { result.AddRange( ( (IEnumerable)value ).Cast<AIS_InteractiveObject>() ); }
+		}
+		return result.ToArray();
 	}
 
 	public static void VerifyCamera( object manager )
