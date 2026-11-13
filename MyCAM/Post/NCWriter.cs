@@ -582,7 +582,18 @@ namespace MyCAM.Post
 				return new Dictionary<string, string>();
 			}
 
-			IProcessPoint startPoint = CacheHelper.GetProcessStartPoint( m_DataManager.PathIDList.First() );
+			string firstPathID = null;
+			for( int i = 0; i < m_PathIDList.Count; ++i ) {
+				if( !DataGettingHelper.GetCraftDataByID( m_PathIDList[ i ], out CraftData craftData ) ) {
+					continue;
+				}
+				if( craftData.ProcessPath ) {
+					firstPathID = m_PathIDList[ i ];
+					break;
+				}
+			}
+
+			IProcessPoint startPoint = CacheHelper.GetProcessStartPoint( firstPathID );
 			if( startPoint == null ) {
 				return new Dictionary<string, string>();
 			}

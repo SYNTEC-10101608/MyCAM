@@ -463,11 +463,11 @@ namespace MyCAM.Helper
 			}
 
 			List<gp_Pnt> DiscretizePntList = SimulationHelper.DiscretizeLine( new gp_Pnt( startPost.X, startPost.Y, startPost.Z ), new gp_Pnt( endPost.X, endPost.Y, endPost.Z ) );
-			if( DiscretizePntList == null || DiscretizePntList.Count == 0 ) {
+			if( DiscretizePntList == null || DiscretizePntList.Count < 2 ) {
 				return false;
 			}
-			double dMasterStep = ( endPost.Master - startPost.Master ) / DiscretizePntList.Count();
-			double dSlaveStep = ( endPost.Slave - startPost.Slave ) / DiscretizePntList.Count();
+			double dMasterStep = ( endPost.Master - startPost.Master ) / ( DiscretizePntList.Count - 1 );
+			double dSlaveStep = ( endPost.Slave - startPost.Slave ) / ( DiscretizePntList.Count - 1 );
 			for( int i = 0; i < DiscretizePntList.Count; i++ ) {
 				PostPoint pnt = new PostPoint();
 				pnt.X = DiscretizePntList[ i ].X();
@@ -516,11 +516,11 @@ namespace MyCAM.Helper
 		static bool AddInterpolatedPoints( List<gp_Pnt> arcPoints, double startMaster, double startSlave, double endMaster, double endSlave, out List<PostPoint> interpolatedPoints )
 		{
 			interpolatedPoints = new List<PostPoint>();
-			if( arcPoints == null || arcPoints.Count == 0 ) {
+			if( arcPoints == null || arcPoints.Count < 2 ) {
 				return false;
 			}
-			double dMasterStep = ( endMaster - startMaster ) / arcPoints.Count;
-			double dSlaveStep = ( endSlave - startSlave ) / arcPoints.Count;
+			double dMasterStep = ( endMaster - startMaster ) / ( arcPoints.Count - 1 );
+			double dSlaveStep = ( endSlave - startSlave ) / ( arcPoints.Count - 1 );
 
 			for( int i = 0; i < arcPoints.Count; i++ ) {
 				PostPoint pnt = new PostPoint();
