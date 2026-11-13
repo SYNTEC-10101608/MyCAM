@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <MachineDataFile>
   <MachineData>
+    <!--3001: 3 = five-axis Mix; 4 = single spindle (Slave locked); 5 = single table (Master locked).-->
     <Pr ID="3001" Value="3" />
     <Pr ID="3002" Value="3" />
     <Pr ID="3005" Value="2" />
@@ -15,6 +16,8 @@
     <Pr ID="3019" Value="0" />
     <Pr ID="3020" Value="0" />
 	<!--Axial Limit-->
+    <!--For type 4/5, locked-axis limits are forced to -90..90 degrees during initialization;
+        their file values are ignored and may be omitted. Active-axis and five-axis limits remain required.-->
 	<Pr ID="Master_Start" Value="0" />
 	<Pr ID="Master_End" Value="0" />
 	<Pr ID="Slave_Start" Value="0" />

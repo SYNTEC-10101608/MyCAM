@@ -336,7 +336,7 @@ namespace MyCAM.Data
 		}
 
 		// build MasterAxis / SlaveAxis from the rotary axis / direction / limit info,
-		public void InitRotateAxes(
+		public virtual void InitRotateAxes(
 			RotaryDirection masterRotaryDirection, double masterStart_deg, double masterEnd_deg,
 			RotaryDirection slaveRotaryDirection, double slaveStart_deg, double slaveEnd_deg )
 		{
@@ -553,6 +553,24 @@ namespace MyCAM.Data
 		public gp_Vec MCSToSlaveVec
 		{
 			get; set;
+		}
+
+		public override void InitRotateAxes(
+			RotaryDirection masterRotaryDirection, double masterStart_deg, double masterEnd_deg,
+			RotaryDirection slaveRotaryDirection, double slaveStart_deg, double slaveEnd_deg )
+		{
+			// Restrict the virtual locked axis so IK does not select the unrealizable alternative solution.
+			if( MixTypeVariant == MixTypeVariant.MasterOnly ) {
+				slaveStart_deg = -90;
+				slaveEnd_deg = 90;
+			}
+			else if( MixTypeVariant == MixTypeVariant.SlaveOnly ) {
+				masterStart_deg = -90;
+				masterEnd_deg = 90;
+			}
+			base.InitRotateAxes(
+				masterRotaryDirection, masterStart_deg, masterEnd_deg,
+				slaveRotaryDirection, slaveStart_deg, slaveEnd_deg );
 		}
 
 		protected override gp_Pnt GetMasterRotateCenter()

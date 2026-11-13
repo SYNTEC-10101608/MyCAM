@@ -360,25 +360,31 @@ namespace MyCAM.Helper
 			}
 
 			// axis range (degrees, no conversion needed)
-			machineDataDTO.MasterAxisStart_deg = GetPrValue<double>( machineData, MachineParamName.MASTER_LIMIMT_START_PARAM_NAME, out prValueStatus );
-			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
-				nErrorPrIndex = (int)MachinePrValue.AxialLimit;
-				return machineDTOContainer;
+			// Locked-axis limits are supplied by MixTypeMachineData.InitRotateAxes, not by the file.
+			MixTypeVariant mixTypeVariant = machineDataDTO is MixTypeMachineDataDTO mixTypeDTO ? mixTypeDTO.MixTypeVariant : MixTypeVariant.Mix;
+			if( mixTypeVariant != MixTypeVariant.SlaveOnly ) {
+				machineDataDTO.MasterAxisStart_deg = GetPrValue<double>( machineData, MachineParamName.MASTER_LIMIMT_START_PARAM_NAME, out prValueStatus );
+				if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+					nErrorPrIndex = (int)MachinePrValue.AxialLimit;
+					return machineDTOContainer;
+				}
+				machineDataDTO.MasterAxisEnd_deg = GetPrValue<double>( machineData, MachineParamName.MASTER_LIMIMT_END_PARAM_NAME, out prValueStatus );
+				if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+					nErrorPrIndex = (int)MachinePrValue.AxialLimit;
+					return machineDTOContainer;
+				}
 			}
-			machineDataDTO.MasterAxisEnd_deg = GetPrValue<double>( machineData, MachineParamName.MASTER_LIMIMT_END_PARAM_NAME, out prValueStatus );
-			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
-				nErrorPrIndex = (int)MachinePrValue.AxialLimit;
-				return machineDTOContainer;
-			}
-			machineDataDTO.SlaveAxisStart_deg = GetPrValue<double>( machineData, MachineParamName.SLAVE_LIMIMT_START_PARAM_NAME, out prValueStatus );
-			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
-				nErrorPrIndex = (int)MachinePrValue.AxialLimit;
-				return machineDTOContainer;
-			}
-			machineDataDTO.SlaveAxisEnd_deg = GetPrValue<double>( machineData, MachineParamName.SLAVE_LIMIMT_END_PARAM_NAME, out prValueStatus );
-			if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
-				nErrorPrIndex = (int)MachinePrValue.AxialLimit;
-				return machineDTOContainer;
+			if( mixTypeVariant != MixTypeVariant.MasterOnly ) {
+				machineDataDTO.SlaveAxisStart_deg = GetPrValue<double>( machineData, MachineParamName.SLAVE_LIMIMT_START_PARAM_NAME, out prValueStatus );
+				if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+					nErrorPrIndex = (int)MachinePrValue.AxialLimit;
+					return machineDTOContainer;
+				}
+				machineDataDTO.SlaveAxisEnd_deg = GetPrValue<double>( machineData, MachineParamName.SLAVE_LIMIMT_END_PARAM_NAME, out prValueStatus );
+				if( prValueStatus != EFilePrValueStatus.GetSuccess ) {
+					nErrorPrIndex = (int)MachinePrValue.AxialLimit;
+					return machineDTOContainer;
+				}
 			}
 
 			// simulation offset
