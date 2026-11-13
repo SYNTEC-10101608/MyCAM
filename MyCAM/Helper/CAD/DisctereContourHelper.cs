@@ -11,6 +11,78 @@ namespace MyCAM.Helper
 {
 	public static class DisctereContourHelper
 	{
+		public static bool BuildContourGeomData( TopoDS_Edge edge, bool isClosed,
+			CAMPoint start, CAMPoint end,
+			out List<CADPoint> cadPointList, out Dictionary<CADPoint, CADPoint> connectPointMap,
+			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION, double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
+			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD )
+		{
+			cadPointList = new List<CADPoint>();
+			connectPointMap = new Dictionary<CADPoint, CADPoint>();
+
+			// go through the contour edges
+			if( !GetEdgeSegmentPoints( edge, isClosed,
+				start, end,
+				ref cadPointList, ref connectPointMap,
+				maxDeflection, maxEdgeLength, discretizeMethod ) ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		static bool GetEdgeSegmentPoints(
+			TopoDS_Edge edge, bool isClosed,
+			CAMPoint start, CAMPoint end,
+			ref List<CADPoint> cadPointList, ref Dictionary<CADPoint, CADPoint> connectPointMap,
+			double maxDeflection, double maxEdgeLength, EDiscretizeMethod discretizeMethod )
+		{
+			// get curve parameters
+			BRepAdaptor_Curve adC = new BRepAdaptor_Curve( edge );
+
+			// discretization logic (deflection + max length + orientation)
+			List<double> segmentParamList = GeometryTool.DiscretizeEdgeParameters( adC, edge, maxDeflection, maxEdgeLength, discretizeMethod );
+			double length = segmentParamList.Last() - segmentParamList.First();
+
+			for( int i = 0; i < segmentParamList.Count; i++ ) {
+				double U = segmentParamList[ i ];
+				double ratio = ( U - segmentParamList.First() ) / length;
+
+				gp_Dir normalVec_1st = new gp_Dir( new gp_Vec( start.NormalVec_1st ).Multiplied( 1 - ratio )
+					.Added( new gp_Vec( end.NormalVec_1st ).Multiplied( ratio ) ).XYZ() );
+
+				gp_Dir normalVec_2nd = new gp_Dir( new gp_Vec( start.NormalVec_2nd ).Multiplied( 1 - ratio )
+					.Added( new gp_Vec( end.NormalVec_2nd ).Multiplied( ratio ) ).XYZ() );
+
+				// get point
+				gp_Pnt point = adC.Value( U );
+
+				// get tangent
+				gp_Vec tangentVec = new gp_Vec();
+				gp_Pnt _p = new gp_Pnt();
+				adC.D1( U, ref _p, ref tangentVec );
+				if( edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED ) {
+					tangentVec.Reverse();
+				}
+
+				// build
+				CADPoint cadPoint = new CADPoint( point, normalVec_1st, normalVec_2nd, new gp_Dir( tangentVec ) );
+
+
+				// map the last point to the start point
+				if( i == segmentParamList.Count - 1 && isClosed ) {
+					CADPoint firstPoint = cadPointList[ 0 ];
+					connectPointMap[ firstPoint ] = cadPoint;
+				}
+				else {
+					cadPointList.Add( cadPoint );
+				}
+			}
+
+			return true;
+		}
+
+
 		public static bool BuildContourGeomData( List<PathEdge5D> pathEdge5DList, bool isClosed,
 			out List<CADPoint> cadPointList, out Dictionary<CADPoint, CADPoint> connectPointMap,
 			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION, double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,

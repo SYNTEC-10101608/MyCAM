@@ -82,6 +82,7 @@
     <Compile Include="Data\Craft\CalibrationData.cs" />
     <Compile Include="Data\Craft\SpecialToolVecData.cs" />
     <Compile Include="Data\Craft\ToolVecModifyMap.cs" />
+    <Compile Include="Data\Object\FlyCutGroupPathObject.cs" />
     <Compile Include="Data\SupportBracket\SupportBracketData.cs" />
     <Compile Include="Editor\Action\CAD\DesignSupportBracketAction.cs" />
     <Compile Include="Data\Machine\ComponentInfo.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Editor\Action\CAM\ContourEditAction.cs" />
     <Compile Include="Editor\Action\CAM\ExtendedGCodeAction.cs" />
     <Compile Include="Editor\Action\CAM\LockABAction.cs" />
+    <Compile Include="Editor\Action\CAM\FlyCutAction.cs" />
     <Compile Include="Editor\Action\CAM\ManualOrderAction.cs" />
     <Compile Include="Editor\Action\CAM\PathCompensationAction.cs" />
     <Compile Include="Editor\Action\CAM\PathEditAction.cs" />
@@ -125,6 +127,12 @@
     </Compile>
     <Compile Include="Editor\Dialog\EditDialogBase.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\FlyCutDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\Dialog\FlyCutDlg.Designer.cs">
+      <DependentUpon>FlyCutDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Editor\Dialog\FormBase.cs">
       <SubType>Form</SubType>
@@ -236,6 +244,7 @@
     <Compile Include="Helper\CAM\ContourOffsetHelper.cs" />
     <Compile Include="Helper\CAM\FindWireOnOuterShellHelper.cs" />
     <Compile Include="Helper\CAM\GeometrySegmentHelper.cs" />
+    <Compile Include="Helper\CAM\FlyCutHelper.cs" />
     <Compile Include="Helper\CAM\MicroJointHelper.cs" />
     <Compile Include="Helper\CAM\PatternRecognizeHelper.cs" />
     <Compile Include="Helper\CAM\RotaryAxisHelper.cs" />
@@ -258,6 +267,7 @@
     <Compile Include="PathCache\CircleCache.cs" />
     <Compile Include="PathCache\ContourCache.cs" />
     <Compile Include="Helper\CAD\StdPatternStartPointListFactory.cs" />
+    <Compile Include="PathCache\FlyCutGroupPathCache.cs" />
     <Compile Include="PathCache\IPathCache.cs" />
     <Compile Include="PathCache\PolygonCache.cs" />
     <Compile Include="PathCache\RectangleCache.cs" />
@@ -403,6 +413,7 @@
     <Compile Include="Editor\Dialog\CNCThreePointDlg.Designer.cs">
       <DependentUpon>CNCThreePointDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Post\FlyCutPostHelper.cs" />
     <Compile Include="Post\NCWriter.cs" />
     <Compile Include="Post\ContourPostHelper.cs" />
     <Compile Include="Post\PostInterfaceDefine.cs" />
@@ -448,6 +459,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\ContourEditDlg.resx">
       <DependentUpon>ContourEditDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\Dialog\FlyCutDlg.resx">
+      <DependentUpon>FlyCutDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\Dialog\GlassDXFImportDlg.resx">
       <DependentUpon>GlassDXFImportDlg.cs</DependentUpon>

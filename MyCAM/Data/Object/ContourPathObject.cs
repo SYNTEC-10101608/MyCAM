@@ -59,6 +59,13 @@ namespace MyCAM.Data
 			}
 		}
 
+		internal void SetCraftData( CraftData craftData )
+		{
+			ContourCache cache = new ContourCache( m_ContourGeomData, craftData );
+			m_CraftData = craftData;
+			m_ContourCache = cache;
+		}
+
 		public override PathType PathType
 		{
 			get

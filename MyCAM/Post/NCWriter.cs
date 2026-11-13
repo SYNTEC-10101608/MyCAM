@@ -4,7 +4,9 @@ using MyCAM.Helper;
 using MyCAM.PathCache;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace MyCAM.Post
 {
@@ -60,14 +62,14 @@ namespace MyCAM.Post
 			}
 		}
 
-		public bool ConvertPostDataListSuccess( out string errorMessage, out List<PostData> postDataList )
+		public bool ConvertPostDataListSuccess( out string errorMessage, out List<PostData> postDataList, out PathEndInfo endInfoOfLastPath )
 		{
 			errorMessage = string.Empty;
 			postDataList = new List<PostData>();
+			endInfoOfLastPath = null;
 			try {
-				PathEndInfo endInfoOfLastPath = null;
 				for( int i = 0; i < m_PathIDList.Count; i++ ) {
-					if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) ) {
+					if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out IPathObject pathObject ) ) {
 						continue;
 					}
 					PathType pathType = pathObject.PathType;
@@ -78,6 +80,13 @@ namespace MyCAM.Post
 						if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
 							return false;
 						}
+						postDataList.Add( postData );
+					}
+					else if( pathType == PathType.FlyCutGroup ) {
+						if( !GetFlyCutPostData( i, ref endInfoOfLastPath, out FlyCutPostData flyCutPostData, out _, out errorMessage ) ) {
+							return false;
+						}
+						ConvertFlyCutPostDataToPostData( flyCutPostData, out PostData postData );
 						postDataList.Add( postData );
 					}
 					else {
@@ -132,20 +141,33 @@ namespace MyCAM.Post
 			errorMessage = string.Empty;
 			endInfoOfLastPath = null;
 			for( int i = 0; i < m_PathIDList.Count; i++ ) {
-				if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out PathObject pathObject ) || !DataGettingHelper.GetCraftDataByID( m_PathIDList[ i ], out CraftData craftData ) ) {
+				if( !DataGettingHelper.GetPathObject( m_PathIDList[ i ], out IPathObject pathObject ) ) {
 					continue;
 				}
+
+				if( !DataGettingHelper.GetCraftDataByID( m_PathIDList[ i ], out CraftData craftData ) ) {
+					continue;
+				}
+				int nPathLayer = craftData.TechLayer;
+
 				PathType pathType = pathObject.PathType;
 				if( craftData.ProcessPath == false ) {
 					WriteNonProcessingPath( i + 1 );
 					continue;
 				}
+
 				bool isEntry = endInfoOfLastPath == null;
 				if( pathType == PathType.Contour ) {
 					if( !GetContourPostData( i, ref endInfoOfLastPath, out PostData postData, out errorMessage ) ) {
 						return false;
 					}
-					WriteCutting( postData, m_PathIDList[ i ], pathObject.CraftData, i + 1, isEntry, craftData.TechLayer );
+					WriteCutting( postData, m_PathIDList[ i ], pathObject.CraftData, i + 1, isEntry, nPathLayer );
+				}
+				else if( pathType == PathType.FlyCutGroup ) {
+					if( !GetFlyCutPostData( i, ref endInfoOfLastPath, out FlyCutPostData postData, out FlyCutNCPackage package, out errorMessage ) ) {
+
+					}
+					WriteFlyCutCuttting( postData, i + 1, nPathLayer );
 				}
 				else {
 					if( !GetStdPostData( i, ref endInfoOfLastPath, out StdPatternPostData postData, out StdPatternNCPackage package, out errorMessage ) ) {
@@ -208,6 +230,28 @@ namespace MyCAM.Post
 			);
 		}
 
+		FlyCutNCPackage BuildPackageByID_FlyCut( string szID )
+		{
+			if( !DataGettingHelper.GetPathCacheByID( szID, out IPathCache pathCache ) ) {
+				return null;
+			}
+			if( !( pathCache is FlyCutGroupPathCache flyCutCache ) ) {
+				return null;
+			}
+			if( !DataGettingHelper.GetCraftDataByID( szID, out CraftData craftData ) ) {
+				return null;
+			}
+
+			return new FlyCutNCPackage(
+				flyCutCache.FlyCutStepCacheList,
+				flyCutCache.LeadInPointList,
+				flyCutCache.LeadOutPointList,
+				craftData.TraverseData,
+				flyCutCache.GetProcessStartPoint(),
+				flyCutCache.GetProcessEndPoint()
+			);
+		}
+
 		#endregion
 
 		#region Build Post Data
@@ -221,6 +265,21 @@ namespace MyCAM.Post
 				errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), pathIndex );
 				return false;
 			}
+			return true;
+		}
+
+		bool GetFlyCutPostData( int pathIndex, ref PathEndInfo endInfo, out FlyCutPostData postData, out FlyCutNCPackage package, out string errorMessage )
+		{
+
+			errorMessage = string.Empty;
+			postData = null;
+			package = BuildPackageByID_FlyCut( m_PathIDList[ pathIndex ] );
+			if( !FlyCutPostHelper.GetPostData( package, endInfo, m_EntryAndExitData, m_TraverseCalculationInfo,
+				out postData, out endInfo ) ) {
+				errorMessage = string.Format( m_LanguageManager.TryGetString( "Error_PostProcessing", ERROR_POST_PROCESSING ), pathIndex );
+				return false;
+			}
+
 			return true;
 		}
 
@@ -284,6 +343,41 @@ namespace MyCAM.Post
 			}
 		}
 
+		void ConvertFlyCutPostDataToPostData( FlyCutPostData flyCutPostData, out PostData postData )
+		{
+			postData = new PostData();
+			postData.LeadInPostPointList.AddRange( flyCutPostData.LeadInPostPointList );
+			postData.LeadOutPostPointList.AddRange( flyCutPostData.LeadOutPostPointList );
+
+			// Update main path points
+			for( int i = 0; i < flyCutPostData.StepPostPointList.Count; i++ ) {
+				postData.MainPathPostPointList.AddRange( flyCutPostData.StepPostPointList[ i ] );
+			}
+
+			// Update traverse points
+			if( flyCutPostData.LiftUpPostPoint != null ) {
+				postData.LiftUpPostPoint = flyCutPostData.LiftUpPostPoint;
+			}
+			if( flyCutPostData.CutDownPostPoint != null ) {
+				postData.CutDownPostPoint = flyCutPostData.CutDownPostPoint;
+			}
+			if( flyCutPostData.LiftUpPostSafePlanePoint != null ) {
+				postData.LiftUpPostSafePlanePoint = flyCutPostData.LiftUpPostSafePlanePoint;
+			}
+			if( flyCutPostData.CutDownPostSafePlanePoint != null ) {
+				postData.CutDownPostSafePlanePoint = flyCutPostData.CutDownPostSafePlanePoint;
+			}
+			if( flyCutPostData.FrogLeapMidPostPoint != null ) {
+				postData.FrogLeapMidPostPoint = flyCutPostData.FrogLeapMidPostPoint;
+			}
+			if( flyCutPostData.ProcessStartPoint != null ) {
+				postData.ProcessStartPoint = flyCutPostData.ProcessStartPoint;
+			}
+			if( flyCutPostData.SafeBoundaryPostPointList != null ) {
+				postData.SafeBoundaryPostPointList = flyCutPostData.SafeBoundaryPostPointList;
+			}
+		}
+
 		#endregion
 
 		#region Write Cutting
@@ -330,6 +424,39 @@ namespace MyCAM.Post
 			ExtendedGCodeWriter.WriteExtendedGCode( m_StreamWriter, craftData, ExtendedGCodeType.PathTail );
 			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.PathTail, varDict );
 			return;
+		}
+
+		void WriteFlyCutCuttting( FlyCutPostData currentPathPostData, int N_Index, int nLayIndex = 1 )
+		{
+			// Header
+			Dictionary<string, string> varDict = BuildPathDict( N_Index, nLayIndex, 0 );
+
+			// traverse header
+			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.TraverseHeader, varDict );
+
+			// traverse from previous path to current path
+			NCWriterHelper.WriteTraverse( m_StreamWriter, currentPathPostData, m_AxisConfig );
+
+			// traverse tail
+			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.TraverseTail, varDict );
+
+			// path header			
+			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.PathHeader, varDict );
+
+
+			// start cutting, write each process path
+			WriteOneProcessPath( currentPathPostData.LeadInPostPointList );
+			WriteOneProcessPath( currentPathPostData.StepPostPointList[ 0 ] );
+
+			for( int i = 1; i < currentPathPostData.StepPostPointList.Count; i += 2 ) {
+
+				WriteOneProcessPath( currentPathPostData.StepPostPointList[ i ] );
+				WriteOneProcessPath( currentPathPostData.StepPostPointList[ i + 1 ] );
+			}
+			WriteOneProcessPath( currentPathPostData.LeadOutPostPointList );
+
+			// path tail
+			CustPostWriter.WriteCustomizedSection( m_StreamWriter, MyApp.CustomizedPostInfo?.PathTail, varDict );
 		}
 
 		void WriteStandardPatternCutting( PathType type, StdPatternPostData currentPathPostData, CraftData craftData, IStdPatternGeomData geomData, int N_Index, bool isEntry )
@@ -454,7 +581,8 @@ namespace MyCAM.Post
 			if( m_PathIDList.Count == 0 ) {
 				return new Dictionary<string, string>();
 			}
-			IProcessPoint startPoint = CacheHelper.GetProcessStartPoint( m_PathIDList[ 0 ] );
+
+			IProcessPoint startPoint = CacheHelper.GetProcessStartPoint( m_DataManager.PathIDList.First() );
 			if( startPoint == null ) {
 				return new Dictionary<string, string>();
 			}

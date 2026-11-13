@@ -63,6 +63,8 @@ namespace MyCAM.Editor
 			m_CoordIconRenderer.SetAppearance( Quantity_NameOfColor.Quantity_NOC_RED, 10.0 );
 
 			// start path index action
+			m_PathIndexAction.AddLockedPaths( m_DataManager.PathIDList.Where(
+				id => !DataGettingHelper.GetPathType( id, out PathType type ) || type != PathType.Contour ) );
 			m_PathIndexAction.Start();
 			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
 

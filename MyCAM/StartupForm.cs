@@ -351,8 +351,8 @@ namespace MyCAM
 		readonly Color DEFAULT_BtnColor = SystemColors.Control;
 		readonly Color ON_ButtonColor = Color.FromArgb( 233, 180, 159 );
 
-		const string SOFTWARE_Version = "0.46.0";
-		const string SOFTWARE_Name = "新代雷射五軸切割 " + SOFTWARE_Version;
+		const string SOFTWARE_Version = "22661.0.3 (0.41.0)";
+		const string SOFTWARE_Name = "飛切特別版 " + SOFTWARE_Version;
 
 		string m_currentImportedFileName = string.Empty;
 
@@ -646,6 +646,11 @@ namespace MyCAM
 			m_CAMEditor.SetTraverseData();
 		}
 
+		void m_tsbFlyCut_Click( object sender, EventArgs e )
+		{
+			m_CAMEditor.SetFlyCut();
+		}
+
 		void m_tsbEntryAndExitSetting_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SetEntryAndExitParam();
@@ -661,7 +666,7 @@ namespace MyCAM
 			m_CAMEditor.SetPathEdit();
 		}
 
-		void m_BtnContourEdit_Click( object sender, EventArgs e )
+		void m_tsbContourEdit_Click( object sender, EventArgs e )
 		{
 			m_CAMEditor.SetContourEdit();
 		}
@@ -934,6 +939,10 @@ namespace MyCAM
 						m_tsbSetTraverseData.BackColor = DEFAULT_BtnColor;
 						OnCAMDlgActionStatusChange( actionStatus );
 						break;
+					case EditActionType.FlyCut:
+						m_tsbFlyCut.BackColor = DEFAULT_BtnColor;
+						OnCAMDlgActionStatusChange( actionStatus );
+						break;
 					case EditActionType.SetEntryAndExitParam:
 						m_tsbEntryAndExitSetting.BackColor = DEFAULT_BtnColor;
 						OnCAMDlgActionStatusChange( actionStatus );
@@ -989,6 +998,10 @@ namespace MyCAM
 					m_tsbSetTraverseData.BackColor = ON_ButtonColor;
 					OnCAMDlgActionStatusChange( actionStatus );
 					break;
+				case EditActionType.FlyCut:
+					m_tsbFlyCut.BackColor = ON_ButtonColor;
+					OnCAMDlgActionStatusChange( actionStatus );
+					break;
 				case EditActionType.SetEntryAndExitParam:
 					m_tsbEntryAndExitSetting.BackColor = ON_ButtonColor;
 					OnCAMDlgActionStatusChange( actionStatus );
@@ -1023,7 +1036,11 @@ namespace MyCAM
 			m_tsbMicroJoint.Enabled = editableInfo.IsMicroJointEditable;
 			m_tsbRCorner.Enabled = editableInfo.IsRCornerEditable;
 			m_tsbExtendedGCode.Enabled = editableInfo.IsExtendedGCodeEditable;
-			m_btnContourEdit.Enabled = editableInfo.IsContourEditable;
+			m_tsbContourEdit.Enabled = editableInfo.IsContourEditable;
+			m_tsbSetTraverseData.Enabled = editableInfo.IsTraverseEditable;
+			m_tsbFlyCut.Enabled = editableInfo.IsFlyCutEditable;
+			m_tsbPatternSetting.Enabled = editableInfo.IsStandardPatternEditable;
+			m_tsbPathEdit.Enabled = editableInfo.IsPathEditEditable;
 		}
 
 		// path type change event
@@ -1832,6 +1849,9 @@ namespace MyCAM
 			m_tsbSetTraverseData.Text = m_LanguageManager.TryGetString( "m_tsbSetTraverseData", m_tsbSetTraverseData.Text );
 			m_tsbSetTraverseData.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSetTraverseData_ToolTip", m_tsbSetTraverseData.ToolTipText );
 
+			m_tsbFlyCut.Text = m_LanguageManager.TryGetString( "m_tsbFlyCut", m_tsbFlyCut.Text );
+			m_tsbFlyCut.ToolTipText = m_LanguageManager.TryGetString( "m_tsbFlyCut_ToolTip", m_tsbFlyCut.ToolTipText );
+
 			m_tsbEntryAndExitSetting.Text = m_LanguageManager.TryGetString( "m_tsbEntryAndExitSetting", m_tsbEntryAndExitSetting.Text );
 			m_tsbEntryAndExitSetting.ToolTipText = m_LanguageManager.TryGetString( "m_tsbEntryAndExitSetting_ToolTip", m_tsbEntryAndExitSetting.ToolTipText );
 
@@ -1841,8 +1861,8 @@ namespace MyCAM
 			m_tsbPathEdit.Text = m_LanguageManager.TryGetString( "m_tsbPathEdit", m_tsbPathEdit.Text );
 			m_tsbPathEdit.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPathEdit_ToolTip", m_tsbPathEdit.ToolTipText );
 
-			m_btnContourEdit.Text = m_LanguageManager.TryGetString( "m_BtnContourEdit", m_btnContourEdit.Text );
-			m_btnContourEdit.ToolTipText = m_LanguageManager.TryGetString( "m_BtnContourEdit_ToolTip", m_btnContourEdit.ToolTipText );
+			m_tsbContourEdit.Text = m_LanguageManager.TryGetString( "m_BtnContourEdit", m_tsbContourEdit.Text );
+			m_tsbContourEdit.ToolTipText = m_LanguageManager.TryGetString( "m_BtnContourEdit_ToolTip", m_tsbContourEdit.ToolTipText );
 
 			m_tsbPathCompensation.Text = m_LanguageManager.TryGetString( "m_tsbPathCompensation", m_tsbPathCompensation.Text );
 			m_tsbPathCompensation.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPathCompensation_ToolTip", m_tsbPathCompensation.ToolTipText );

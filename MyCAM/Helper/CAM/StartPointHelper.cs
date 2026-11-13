@@ -234,6 +234,42 @@ namespace MyCAM.Helper
 
 		#region Auto Select
 
+		public static bool TryChooseByDirection( List<CAMPoint> camPointList, gp_Dir searchDir, double tolerance, out int camIndex )
+		{
+			camIndex = -1;
+			if( camPointList == null || camPointList.Count == 0
+				|| searchDir == null || double.IsNaN( tolerance )
+				|| double.IsInfinity( tolerance ) || tolerance < 0 ) {
+				return false;
+			}
+
+			List<int> candidates = new List<int>();
+			for( int index = 0; index < camPointList.Count; index++ ) {
+				CAMPoint point = camPointList[ index ];
+				if( point == null || point.Point == null ) {
+					return false;
+				}
+				if( SpecialPointIndex.IsClosedPointIndex( point.InitPathIndex ) || SpecialPointIndex.IsGeneratedPointIndex( point.InitPathIndex ) ) {
+					continue;
+				}
+				candidates.Add( index );
+			}
+			if( candidates.Count == 0 ) {
+				return false;
+			}
+
+			candidates = FilterAxisExtreme(
+				camPointList, candidates, searchDir, tolerance );
+			if( candidates.Count == 0 ) {
+				return false;
+			}
+
+			camIndex = candidates.Count == 1
+				? candidates[ 0 ]
+				: FilterCandidateGroupCenter( camPointList, candidates );
+			return true;
+		}
+
 		public static bool TryChooseByPriority( List<CAMPoint> camPointList, IReadOnlyList<StartPointSelectStrategy> strategies, double tolerance, out int camIndex )
 		{
 			camIndex = -1;

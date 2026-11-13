@@ -9,7 +9,7 @@ namespace MyCAM.Post
 	internal static class PostTraverseBuilder
 	{
 		public static void CalculateTraverse( PathEndInfo endInfoOfPreviousPath, INCPackage currentPathNCPack, ITraversePostData pathG54PostData,
-			TraverseCalculationInfo calculationData )
+			TraverseCalculationInfo traverseCalculationInfo )
 		{
 			if( endInfoOfPreviousPath == null || currentPathNCPack == null ) {
 				return;
@@ -19,7 +19,7 @@ namespace MyCAM.Post
 			IProcessPoint currentStartPoint = currentPathNCPack.ProcessStartPoint;
 
 			if( !TraverseHelper.TryCalculateTraversePoints( previousEndPoint, currentStartPoint,
-				currentPathNCPack.TraverseData, calculationData, out TraversePathResult result ) ) {
+				currentPathNCPack.TraverseData, traverseCalculationInfo, out TraversePathResult result ) ) {
 				return;
 			}
 

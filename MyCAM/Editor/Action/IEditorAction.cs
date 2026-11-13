@@ -38,6 +38,7 @@ namespace MyCAM.Editor
 		SetLead,
 		OverCut,
 		SetTraverse,
+		FlyCut,
 		SetEntryAndExitParam,
 		SetPattern,
 		PathEdit,

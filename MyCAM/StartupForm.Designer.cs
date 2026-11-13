@@ -65,6 +65,7 @@
 			this.m_tsbReverse = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbEntryAndExitSetting = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSetTraverseData = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbFlyCut = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbSetLead = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbOverCut = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbMicroJoint = new System.Windows.Forms.ToolStripButton();
@@ -77,7 +78,7 @@
 			this.m_tsbPatternSetting = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbPathEdit = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbPathCompensation = new System.Windows.Forms.ToolStripButton();
-			this.m_btnContourEdit = new System.Windows.Forms.ToolStripButton();
+			this.m_tsbContourEdit = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbMeasureCAM = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbCalibrationPnt = new System.Windows.Forms.ToolStripButton();
 			this.m_tsbConvertNC = new System.Windows.Forms.ToolStripButton();
@@ -258,8 +259,8 @@
 			// 
 			this.m_tsCAMFunction.BackColor = System.Drawing.SystemColors.Control;
 			this.m_tsCAMFunction.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.m_tsCAMFunction.ImageScalingSize = new System.Drawing.Size(40, 40);
-			this.m_tsCAMFunction.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.m_tsCAMFunction.ImageScalingSize = new System.Drawing.Size( 40, 40 );
+			this.m_tsCAMFunction.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
             this.m_tsbAddPath,
             this.m_tsbDeletePath,
             this.m_tsbAutoOrder,
@@ -274,13 +275,14 @@
             this.m_tsbRCorner,
             this.m_tsbExtendedGCode,
             this.m_tsbToolVec,
+			this.m_tsbFlyCut,
             this.m_tsbFixedToolVec,
             this.m_tsbToolVecReverse,
             this.m_tsbOptimizeIK,
             this.m_tsbPatternSetting,
             this.m_tsbPathEdit,
             this.m_tsbPathCompensation,
-            this.m_btnContourEdit,
+            this.m_tsbContourEdit,
             this.m_tsbMeasureCAM});
 			this.m_tsCAMFunction.Location = new System.Drawing.Point(0, 0);
 			this.m_tsCAMFunction.Name = "m_tsCAMFunction";
@@ -414,6 +416,17 @@
 			this.m_tsbSetTraverseData.ToolTipText = "調整選擇路徑的空移方式";
 			this.m_tsbSetTraverseData.Click += new System.EventHandler(this.m_tsbSetTraverseData_Click);
 			// 
+			// m_tsbFlyCut
+			// 
+			this.m_tsbFlyCut.Image = global::MyCAM.Properties.Resources.CAM_FlyCut;
+			this.m_tsbFlyCut.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbFlyCut.Name = "m_tsbFlyCut";
+			this.m_tsbFlyCut.Size = new System.Drawing.Size( 44, 47 );
+			this.m_tsbFlyCut.Text = "飛切";
+			this.m_tsbFlyCut.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbFlyCut.ToolTipText = "將一組路徑的空移方式轉為飛切";
+			this.m_tsbFlyCut.Click += new System.EventHandler( this.m_tsbFlyCut_Click );
+			// 
 			// m_tsbSetLead
 			// 
 			this.m_tsbSetLead.Image = global::MyCAM.Properties.Resources.CAM_Lead;
@@ -546,16 +559,16 @@
 			this.m_tsbPathCompensation.ToolTipText = "設定選擇路徑的尺寸補償量";
 			this.m_tsbPathCompensation.Click += new System.EventHandler(this.m_tsbPathCompensation_Click);
 			// 
-			// m_btnContourEdit
+			// m_tsbContourEdit
 			// 
-			this.m_btnContourEdit.Image = global::MyCAM.Properties.Resources.CAM_ContourEdit;
-			this.m_btnContourEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.m_btnContourEdit.Name = "m_btnContourEdit";
-			this.m_btnContourEdit.Size = new System.Drawing.Size(59, 47);
-			this.m_btnContourEdit.Text = "輪廓編輯";
-			this.m_btnContourEdit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-			this.m_btnContourEdit.ToolTipText = "調整選擇路徑的局部輪廓";
-			this.m_btnContourEdit.Click += new System.EventHandler(this.m_BtnContourEdit_Click);
+			this.m_tsbContourEdit.Image = global::MyCAM.Properties.Resources.CAM_ContourEdit;
+			this.m_tsbContourEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.m_tsbContourEdit.Name = "m_tsbContourEdit";
+			this.m_tsbContourEdit.Size = new System.Drawing.Size(59, 47);
+			this.m_tsbContourEdit.Text = "輪廓編輯";
+			this.m_tsbContourEdit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.m_tsbContourEdit.ToolTipText = "調整選擇路徑的局部輪廓";
+			this.m_tsbContourEdit.Click += new System.EventHandler(this.m_tsbContourEdit_Click);
 			// 
 			// m_tsbMeasureCAM
 			// 
@@ -1542,6 +1555,7 @@
 		private System.Windows.Forms.ToolStrip m_tsCADFunction;
 		private System.Windows.Forms.ToolStripContainer m_tscLevel3Container;
 		private System.Windows.Forms.ToolStripButton m_tsbSetTraverseData;
+		private System.Windows.Forms.ToolStripButton m_tsbFlyCut;
 		private System.Windows.Forms.ToolStripButton m_tsbConvertNC;
 		private System.Windows.Forms.ToolStripButton m_tsbMeasureCAM;
 		private System.Windows.Forms.ToolStripButton m_tsbAddPoint_AcrCenter;
@@ -1604,6 +1618,7 @@
 		private System.Windows.Forms.ToolStripButton m_btnCheck;
 		private System.Windows.Forms.ToolStripButton m_tsbPathEdit;
 		private System.Windows.Forms.ToolStripButton m_tsbPathCompensation;
+		private System.Windows.Forms.ToolStripButton m_tsbContourEdit;
 		private System.Windows.Forms.ToolStripButton m_btnPrePoint;
 		private System.Windows.Forms.ToolStripButton m_btnNextPoint;
 		private System.Windows.Forms.ToolStripMenuItem m_tsbController;
@@ -1620,7 +1635,6 @@
 		private System.Windows.Forms.ToolStripButton m_tsbLayer9;
 		private System.Windows.Forms.ToolStripButton m_tsbLayer10;
 		private System.Windows.Forms.ToolStripButton m_tsbCalibrationPnt;
-		private System.Windows.Forms.ToolStripButton m_btnContourEdit;
 		private System.Windows.Forms.ToolStripButton m_tsbOptimizeIK;
 		private System.Windows.Forms.ToolStripButton m_tsbMicroJoint;
 		private System.Windows.Forms.ToolStripButton m_tsbRCorner;

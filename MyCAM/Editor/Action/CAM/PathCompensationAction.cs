@@ -11,8 +11,9 @@ namespace MyCAM.Editor
 	internal class PathCompensationAction : EditCAMActionBase
 	{
 		public PathCompensationAction( DataManager dataManager, List<string> pathIDList )
-			: base( dataManager, pathIDList )
+			: base( dataManager, dataManager.GetEditablePathIDList( pathIDList ) )
 		{
+			m_SelectedPathIDList = new List<string>( pathIDList );
 			BackupCompensatedDist();
 			BackupGeomData();
 		}
@@ -61,7 +62,7 @@ namespace MyCAM.Editor
 			m_Dlg.Reset = RestoreCompensatedDist;
 			m_Dlg.IsGeomConstraintExceedsLimit = IsGeomConstraintExceedsLimit;
 			m_Dlg.Show( MyApp.MainForm );
-			PropertyChanged?.Invoke( m_PathIDList );
+			PropertyChanged?.Invoke( m_SelectedPathIDList );
 
 			UpdateDialog();
 		}
@@ -91,7 +92,7 @@ namespace MyCAM.Editor
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
 				m_CraftDataList[ i ].CompensatedDistance += compensatedDist;
 			}
-			PropertyChanged?.Invoke( m_PathIDList );
+			PropertyChanged?.Invoke( m_SelectedPathIDList );
 			isResetClicked = false;
 
 			UpdateDialog();
@@ -105,7 +106,7 @@ namespace MyCAM.Editor
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
 				m_CraftDataList[ i ].CompensatedDistance += compensatedDist;
 			}
-			PropertyChanged?.Invoke( m_PathIDList );
+			PropertyChanged?.Invoke( m_SelectedPathIDList );
 			m_IsConfirmed = true;
 			End();
 		}
@@ -120,7 +121,7 @@ namespace MyCAM.Editor
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
 				m_CraftDataList[ i ].CompensatedDistance = m_BackupCompensatedDistList[ i ];
 			}
-			PropertyChanged?.Invoke( m_PathIDList );
+			PropertyChanged?.Invoke( m_SelectedPathIDList );
 
 			UpdateDialog();
 		}
@@ -130,7 +131,7 @@ namespace MyCAM.Editor
 			for( int i = 0; i < m_CraftDataList.Count; i++ ) {
 				m_CraftDataList[ i ].CompensatedDistance = 0;
 			}
-			PropertyChanged?.Invoke( m_PathIDList );
+			PropertyChanged?.Invoke( m_SelectedPathIDList );
 			isResetClicked = true;
 
 			UpdateDialog();
@@ -180,6 +181,7 @@ namespace MyCAM.Editor
 			return 0;
 		}
 
+		List<string> m_SelectedPathIDList;
 		List<double> m_BackupCompensatedDistList = new List<double>();
 		List<IStdPatternGeomData> m_BackupGeomDataList = new List<IStdPatternGeomData>();
 		bool isResetClicked = false;

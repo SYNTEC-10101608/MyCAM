@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="FlyCutDlg" Content="飞行切割" />
+
+	<Message ID="m_lblFlyCut" Content="类型" />
+	<Message ID="m_rbtnCircularFlyCut" Content="圆弧飞切" />
+
+	<Message ID="m_gbxSetting" Content="飞切参数" />
+
+	<Message ID="m_lblStartPosition" Content="起刀位置" />
+	<Message ID="m_rbtnLeftTop" Content="左上" />
+	<Message ID="m_rbtnLeftBottom" Content="左下" />
+	<Message ID="m_rbtnRightTop" Content="右上" />
+	<Message ID="m_rbtnRightBottom" Content="右下" />
+
+	<Message ID="m_lblDirection" Content="方向" />
+	<Message ID="m_rbtnVertical" Content="直排" />
+	<Message ID="m_rbtnHorizontal" Content="横排" />
+	<Message ID="GroupWidth" Content="分组间距" />
+	<Message ID="GroupAngle" Content="分组角度" />
+
+	<Message ID="m_btnAdd" Content="新增" />
+	<Message ID="m_btnRemove" Content="移除" />
+</ResMap>

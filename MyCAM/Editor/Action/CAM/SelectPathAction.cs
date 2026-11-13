@@ -3,6 +3,7 @@ using MyCAM.Data;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -280,24 +281,16 @@ namespace MyCAM.Editor
 				}
 
 				// use Tag for ID mapping to avoid dependency on display text
-				string nodeID = node.Tag as string;
-				if( string.IsNullOrEmpty( nodeID ) ) {
+				string szPathID = node.Tag as string;
+				if( string.IsNullOrEmpty( szPathID ) ) {
 					continue;
 				}
-				if( int.TryParse( nodeID.Substring( CAMEditor.PATH_NODE_PREFIX_LENGTH ), out int index ) ) {
 
-					// check index, note that index is 1 based
-					if( index < 1 || index > m_DataManager.PathIDList.Count ) {
-						continue;
-					}
-					string szPathID = m_DataManager.PathIDList[ index - 1 ];
-
-					// this path is editing
-					if( !IsSelectable( szPathID ) ) {
-						continue;
-					}
-					m_SelectedIDSet.Add( szPathID );
+				// this path is editing
+				if( !IsSelectable( szPathID ) ) {
+					continue;
 				}
+				m_SelectedIDSet.Add( szPathID );
 			}
 
 			if( isSingleSelectMode && m_SelectedIDSet.Count > 1 ) {
@@ -318,17 +311,7 @@ namespace MyCAM.Editor
 			m_bSuppressTreeViewSync = true;
 			( m_TreeView as MultiSelectTreeView ).ClearSelection();
 			foreach( string szUID in m_SelectedIDSet ) {
-
-				// convert path ID to order
-				int index = m_DataManager.PathIDList.IndexOf( szUID );
-				if( index == -1 ) {
-					continue;
-				}
-				string szNodeID = m_DataManager.GetPathName( index );
-				if( !m_ViewManager.TreeNodeMap.ContainsKey( szNodeID ) ) {
-					continue;
-				}
-				( m_TreeView as MultiSelectTreeView ).SelectNode( m_ViewManager.TreeNodeMap[ szNodeID ] );
+				( m_TreeView as MultiSelectTreeView ).SelectNode( m_ViewManager.TreeNodeMap[ szUID ] );
 			}
 			m_bSuppressTreeViewSync = false;
 			// sync to view

@@ -58,6 +58,8 @@ namespace MyCAM.Editor
 			m_Dlg.Show( MyApp.MainForm );
 
 			// start path index action
+			m_PathIndexAction.AddLockedPaths( m_DataManager.PathIDList.Where(
+				id => !DataGettingHelper.GetPathType( id, out PathType type ) || type != PathType.Contour ) );
 			m_PathIndexAction.Start();
 			m_PathIndexAction.SelectionChange += OnPathIndexChanged;
 			m_PathIndexAction.EnterSingleSelectMode();

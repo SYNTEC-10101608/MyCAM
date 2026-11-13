@@ -1,10 +1,8 @@
-﻿using LanguageManager;
-using MyCAM.App;
+﻿using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
 using MyCAM.PathCache;
-using OCC.gp;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
@@ -152,6 +150,10 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			if( results == null || results.Count == 0 ) {
+				return;
+			}
+
 			switch( data.TraverseMode ) {
 				case TraverseData.TraverseType.SafePlane:
 					if( !TraverseHelper.TryGetPlanePreviewBounds( results, out double minX, out double maxX, out double minY, out double maxY ) ) {
@@ -190,19 +192,23 @@ namespace MyCAM.Editor
 		bool CollectTraverseResults( TraverseData data, TraverseCalculationInfo calculationData, out List<TraversePathResult> traverseResults )
 		{
 			traverseResults = new List<TraversePathResult>();
-			foreach( string pathID in m_PathIDList ) {
-				int pathIndex = m_DataManager.PathIDList.IndexOf( pathID );
-				if( pathIndex <= 0 ) {
+
+			List<string> processIDs = m_DataManager.GetProcessPathIDList( m_DataManager.PathIDList );
+			HashSet<string> targetIDs = new HashSet<string>( m_PathIDList );
+
+			for( int i = 1; i < processIDs.Count; ++i ) {
+				string currentPathID = processIDs[ i ];
+				if( !targetIDs.Contains( currentPathID ) ) {
 					continue;
 				}
-				string previousPathID = m_DataManager.PathIDList[ pathIndex - 1 ];
-				if( TraverseHelper.TryCalculateTraversePoints( CacheHelper.GetProcessEndPoint( previousPathID ),
-					CacheHelper.GetProcessStartPoint( pathID ), data, calculationData, out TraversePathResult result ) ) {
-					traverseResults.Add( result );
-				}
-				else {
+
+				string previousPathID = processIDs[ i - 1 ];
+				if( !TraverseHelper.TryCalculateTraversePoints( CacheHelper.GetProcessEndPoint( previousPathID ),
+					CacheHelper.GetProcessStartPoint( currentPathID ), data, calculationData, out TraversePathResult result ) ) {
 					return false;
 				}
+
+				traverseResults.Add( result );
 			}
 
 			return true;

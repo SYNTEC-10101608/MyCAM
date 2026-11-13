@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="FlyCutDlg" Content="FlyCut" />
+
+	<Message ID="m_lblFlyCut" Content="Type" />
+	<Message ID="m_rbtnCircularFlyCut" Content="Circular FlyCut" />
+
+	<Message ID="m_gbxSetting" Content="FlyCut Parameters" />
+
+	<Message ID="m_lblStartPosition" Content="Start Position" />
+	<Message ID="m_rbtnLeftTop" Content="Top Left" />
+	<Message ID="m_rbtnLeftBottom" Content="Bottom Left" />
+	<Message ID="m_rbtnRightTop" Content="Top Right" />
+	<Message ID="m_rbtnRightBottom" Content="Bottom Right" />
+
+	<Message ID="m_lblDirection" Content="Direction" />
+	<Message ID="m_rbtnVertical" Content="Vertical" />
+	<Message ID="m_rbtnHorizontal" Content="Horizontal" />
+	<Message ID="GroupWidth" Content="Spacing" />
+	<Message ID="GroupAngle" Content="Angle" />
+
+	<Message ID="m_btnAdd" Content="Add" />
+	<Message ID="m_btnRemove" Content="Remove" />
+</ResMap>

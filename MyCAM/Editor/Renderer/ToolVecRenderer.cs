@@ -3,6 +3,7 @@ using OCC.AIS;
 using OCC.gp;
 using OCCViewer;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -45,20 +46,35 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Show( bool bUpdate = false )
 		{
+			if( m_IsPauseRefreshAndHide ) {
+				return;
+			}
+			Remove();
 			Show( m_DataManager.PathIDList, bUpdate );
 		}
 
-		public void Show( List<string> pathIDList, bool bUpdate = false )
+		public void Show( IReadOnlyList<string> pathIDList, bool bUpdate = false )
 		{
 			BuildAndDisplay( pathIDList, null, bUpdate );
 		}
 
 		public override void Remove( bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList, bUpdate );
+			RemoveToolVecs( m_ToolVecAISDict.Keys.ToList() );
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
-		public void Remove( List<string> pathIDList, bool bUpdate = false )
+		public void Remove( IReadOnlyList<string> pathIDList, bool bUpdate = false )
+		{
+			RemoveToolVecs( m_DataManager.GetEditablePathIDList( pathIDList.ToList() ).Union( pathIDList ).ToList() );
+			if( bUpdate ) {
+				UpdateView();
+			}
+		}
+
+		void RemoveToolVecs( IReadOnlyList<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
 				if( m_ToolVecAISDict.ContainsKey( szPathID ) ) {
@@ -69,9 +85,6 @@ namespace MyCAM.Editor.Renderer
 					m_ToolVecAISDict[ szPathID ].Clear();
 					m_ToolVecAISDict.Remove( szPathID );
 				}
-			}
-			if( bUpdate ) {
-				UpdateView();
 			}
 		}
 
@@ -89,13 +102,15 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		void BuildAndDisplay( List<string> pathIDList, gp_Trsf trsf, bool bUpdate )
+		void BuildAndDisplay( IReadOnlyList<string> pathIDList, gp_Trsf trsf, bool bUpdate )
 		{
 			// paused, do not rebuild or display
 			if( m_IsPauseRefreshAndHide ) {
 				return;
 			}
 			Remove( pathIDList );
+
+			pathIDList = m_DataManager.GetEditablePathIDList( m_DataManager.GetProcessPathIDList( pathIDList.ToList() ) );
 
 			// no need to show
 			if( !m_IsShow ) {
@@ -112,9 +127,9 @@ namespace MyCAM.Editor.Renderer
 			foreach( string szPathID in pathIDList ) {
 				DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData );
 				if( craftData != null && craftData.SpecialToolVecData != null && craftData.SpecialToolVecData.Mode != ToolVecMode.Interpolate ) {
-					
+
 					// none process path do not show tool vec
-					if( craftData == null || craftData.ProcessPath == false ) {
+					if( craftData == null ) {
 						m_ToolVecAISDict.Remove( szPathID );
 						continue;
 					}
@@ -123,7 +138,7 @@ namespace MyCAM.Editor.Renderer
 				else {
 
 					// none process path do not show tool vec
-					if( craftData == null || craftData.ProcessPath == false ) {
+					if( craftData == null ) {
 						m_ToolVecAISDict.Remove( szPathID );
 						continue;
 					}

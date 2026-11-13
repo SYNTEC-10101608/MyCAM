@@ -401,16 +401,22 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Show( bool bUpdate = false )
 		{
+			if( m_IsPauseRefreshAndHide || m_IsPauseRefresh ) {
+				return;
+			}
+			Remove();
 			Show( m_DataManager.PathIDList, bUpdate );
 		}
 
-		public void Show( List<string> pathIDList, bool bUpdate = false )
+		public void Show( IReadOnlyList<string> pathIDList, bool bUpdate = false )
 		{
+			List<string> detailIDs = m_DataManager.GetEditablePathIDList( pathIDList.ToList() );
+
 			if( m_IsPauseRefreshAndHide || m_IsPauseRefresh ) {
 				return;
 			}
 
-			Remove( pathIDList );
+			Remove( detailIDs );
 			if( !m_IsShow ) {
 				if( bUpdate ) {
 					UpdateView();
@@ -418,7 +424,7 @@ namespace MyCAM.Editor.Renderer
 				return;
 			}
 
-			foreach( string pathID in pathIDList ) {
+			foreach( string pathID in detailIDs ) {
 				RefreshPathMarkers( pathID );
 			}
 
@@ -429,12 +435,20 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Remove( bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList, bUpdate );
+			foreach( MarkerType type in m_MarkerAISDict.Keys ) {
+				foreach( string pathID in m_MarkerAISDict[ type ].Keys.ToList() ) {
+					RemovePathMarkers( pathID, type );
+				}
+			}
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
-		public void Remove( List<string> pathIDList, bool bUpdate = false )
+		public void Remove( IReadOnlyList<string> pathIDList, bool bUpdate = false )
 		{
-			foreach( string pathID in pathIDList ) {
+			List<string> detailIDs = m_DataManager.GetEditablePathIDList( pathIDList.ToList() ).Union( pathIDList ).ToList();
+			foreach( string pathID in detailIDs ) {
 				RemovePathMarkers( pathID );
 			}
 			if( bUpdate ) {

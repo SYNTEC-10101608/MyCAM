@@ -8,6 +8,7 @@ using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -25,10 +26,11 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Show( bool bUpdate = false )
 		{
-			Show( m_DataManager.PathIDList, bUpdate );
+			List<string> detailIDs = m_DataManager.GetEditablePathIDList( m_DataManager.PathIDList.ToList() );
+			Show( detailIDs, bUpdate );
 		}
 
-		public void Show( List<string> pathIDList, bool bUpdate = false )
+		public void Show( IReadOnlyList<string> pathIDList, bool bUpdate = false )
 		{
 			if( m_IsPauseRefreshAndHide || m_IsPauseRefresh ) {
 				return;
@@ -53,10 +55,11 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Remove( bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList, bUpdate );
+			List<string> detailIDs = m_DataManager.GetEditablePathIDList( m_DataManager.PathIDList.ToList() );
+			Remove( detailIDs, bUpdate );
 		}
 
-		public void Remove( List<string> pathIDList, bool bUpdate = false )
+		public void Remove( IReadOnlyList<string> pathIDList, bool bUpdate = false )
 		{
 			foreach( string pathID in pathIDList ) {
 				if( m_PathAISDict.TryGetValue( pathID, out List<AIS_Shape> aisList ) ) {

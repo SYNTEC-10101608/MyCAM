@@ -134,6 +134,80 @@ namespace MyCAM.Data
 		}
 	}
 
+	internal class FlyCutPostData : ITraversePostData
+	{
+		public List<PostPoint> LeadInPostPointList
+		{
+			get; set;
+		}
+
+		public List<PostPoint> LeadOutPostPointList
+		{
+			get; set;
+		}
+
+		public List<List<PostPoint>> StepPostPointList
+		{
+			get; set;
+		}
+
+		public PostPoint ProcessStartPoint
+		{
+			get; set;
+		}
+
+		// lift up of previous path, null meaning lift up distance is 0
+		public PostPoint LiftUpPostPoint
+		{
+			get; set;
+		}
+
+		// cut down of current path, null meaning cut down distance is 0
+		public PostPoint CutDownPostPoint
+		{
+			get; set;
+		}
+
+		public double FollowSafeDistance
+		{
+			get; set;
+		}
+
+		// the center and end point of frog leap
+		public PostPoint FrogLeapMidPostPoint
+		{
+			get; set;
+		}
+
+		public PostPoint LiftUpPostSafePlanePoint
+		{
+			get; set;
+		}
+
+		public PostPoint CutDownPostSafePlanePoint
+		{
+			get; set;
+		}
+
+		public List<PostPoint> SafeBoundaryPostPointList
+		{
+			get; set;
+		}
+
+		public FlyCutPostData()
+		{
+			LeadInPostPointList = new List<PostPoint>();
+			LeadOutPostPointList = new List<PostPoint>();
+			StepPostPointList = new List<List<PostPoint>>();
+			CutDownPostPoint = null;
+			LiftUpPostPoint = null;
+			FollowSafeDistance = 0;
+			FrogLeapMidPostPoint = null;
+			LiftUpPostSafePlanePoint = null;
+			CutDownPostSafePlanePoint = null;
+		}
+	}
+
 	// shared per-point data across products ( machine coordinate point + microjoint flags )
 	public abstract class PostPointBase
 	{

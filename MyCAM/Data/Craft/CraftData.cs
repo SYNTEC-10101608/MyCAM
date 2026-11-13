@@ -137,6 +137,11 @@ namespace MyCAM.Data
 			StartPnt = startPntData;
 			EndPnt = endPntData;
 		}
+
+		public StartPntContourEditParam Clone()
+		{
+			return new StartPntContourEditParam( StartPnt?.Clone(), EndPnt?.Clone() );
+		}
 	}
 
 	public enum ExtendedGCodeType
@@ -235,6 +240,47 @@ namespace MyCAM.Data
 				}
 			}
 			SubscribeSubParamChanged();
+		}
+
+		CraftData( CraftData source )
+		{
+			m_TechLayer = source.m_TechLayer;
+			m_ProcessPath = source.m_ProcessPath;
+			m_StartPointIndex = source.m_StartPointIndex;
+			m_IsPathReverse = source.m_IsPathReverse;
+			m_LeadData = source.LeadData.Clone();
+			m_OverCutLength = source.m_OverCutLength;
+			m_StartPntToolVecData = source.m_StartPntToolVecData?.Clone();
+			m_IsToolVecReverse = source.m_IsToolVecReverse;
+			m_TraverseData = source.TraverseData.Clone();
+			m_StartPntContourEditData = source.m_StartPntContourEditData?.Clone();
+			m_SpecialToolVecData = source.SpecialToolVecData.Clone();
+			m_CumulativeTrsfMatrix = source.CumulativeTrsfMatrix.Multiplied( new gp_Trsf() );
+			m_CompensatedDistance = source.m_CompensatedDistance;
+			m_InitMaster_rad = source.m_InitMaster_rad;
+			m_InitSlave_rad = source.m_InitSlave_rad;
+			m_MicroJointStartIdxMap = new Dictionary<int, double>( source.MicroJointStartIdxMap );
+			m_extendedGCodeMap = new Dictionary<Tuple<ExtendedGCodeType, int?>, string>( source.ExtendedGCodeMap );
+			if( source.m_ToolVecModifyMap == null ) {
+				m_ToolVecModifyMap = null;
+			}
+			else {
+				foreach( KeyValuePair<int, ToolVecModifyData> pair in source.m_ToolVecModifyMap ) {
+					m_ToolVecModifyMap.Add( pair.Key, pair.Value.Clone() );
+				}
+			}
+			foreach( KeyValuePair<int, ContourEditData> pair in source.m_ContourEditMap ) {
+				m_ContourEditMap.Add( pair.Key, pair.Value.Clone() );
+			}
+			foreach( KeyValuePair<int, RCornerData> pair in source.RCornerMap ) {
+				m_RCornerMap.Add( pair.Key, pair.Value.Clone() );
+			}
+			SubscribeSubParamChanged();
+		}
+
+		public CraftData Clone()
+		{
+			return new CraftData( this );
 		}
 
 		public Action CAMFactorChanged;
@@ -858,8 +904,12 @@ namespace MyCAM.Data
 		{
 			m_LeadData.PropertyChanged += SubParamChanged;
 			m_TraverseData.PropertyChanged += SubParamChanged;
-			m_StartPntToolVecData.PropertyChanged += SubParamChanged;
-			m_ToolVecModifyMap.PropertyChanged += SubParamChanged;
+			if( m_StartPntToolVecData != null ) {
+				m_StartPntToolVecData.PropertyChanged += SubParamChanged;
+			}
+			if( m_ToolVecModifyMap != null ) {
+				m_ToolVecModifyMap.PropertyChanged += SubParamChanged;
+			}
 			m_IsSpecialToolVecMode = m_SpecialToolVecData.Mode != ToolVecMode.Interpolate;
 			m_SpecialToolVecData.PropertyChanged += SpecialToolVecChanged;
 		}

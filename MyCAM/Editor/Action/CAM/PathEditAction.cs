@@ -15,8 +15,9 @@ namespace MyCAM.Editor
 	internal class PathEditAction : EditCAMActionBase
 	{
 		public PathEditAction( DataManager dataManager, List<string> pathIDList, Viewer viewer )
-			: base( dataManager, pathIDList )
+			: base( dataManager, dataManager.GetEditablePathIDList( pathIDList ) )
 		{
+			m_SelectedPathIDList = new List<string>( pathIDList );
 			m_Viewer = viewer;
 			m_BackupTrsfMatrixList = new List<gp_Trsf>();
 			BackupTransformMatrices();
@@ -39,7 +40,7 @@ namespace MyCAM.Editor
 			m_Dlg.Cancel = CancelPathEditData;
 			m_Dlg.Reset = ResetPathEditData;
 			m_Dlg.Show( MyApp.MainForm );
-			PropertyChanged?.Invoke( m_PathIDList );
+			PropertyChanged?.Invoke( m_SelectedPathIDList );
 		}
 
 		public override void End()
@@ -90,7 +91,7 @@ namespace MyCAM.Editor
 			for( int i = 0; i < m_BackupTrsfMatrixList.Count; i++ ) {
 				m_CraftDataList[ i ].CumulativeTrsfMatrix = m_BackupTrsfMatrixList[ i ];
 			}
-			PropertyChanged?.Invoke( m_PathIDList );
+			PropertyChanged?.Invoke( m_SelectedPathIDList );
 		}
 
 		void ResetPathEditData( PathEditData data )
@@ -100,7 +101,7 @@ namespace MyCAM.Editor
 			}
 			RemoveTrihedron();
 			DisplayRefCoordinates( new PathEditData( data.RefCoordType, 0, 0, 0 ) );
-			PropertyChanged?.Invoke( m_PathIDList );
+			PropertyChanged?.Invoke( m_SelectedPathIDList );
 			m_IsResetClicked = true;
 			UpdateDialog( data );
 		}
@@ -177,7 +178,7 @@ namespace MyCAM.Editor
 		void RefreshViewer()
 		{
 			m_Viewer.UpdateView();
-			PropertyChanged?.Invoke( m_PathIDList );
+			PropertyChanged?.Invoke( m_SelectedPathIDList );
 		}
 
 		void UpdateDialog( PathEditData data )
@@ -277,6 +278,7 @@ namespace MyCAM.Editor
 			return null;
 		}
 
+		readonly List<string> m_SelectedPathIDList;
 		List<gp_Trsf> m_BackupTrsfMatrixList;
 		List<AIS_Trihedron> m_RefCoordTrihedronList = new List<AIS_Trihedron>();
 		Viewer m_Viewer;

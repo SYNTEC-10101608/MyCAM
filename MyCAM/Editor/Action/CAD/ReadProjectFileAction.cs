@@ -125,8 +125,8 @@ namespace MyCAM.Editor
 
 		Viewer m_Viewer;
 		ViewManager m_ViewManager;
-		const string READ_PROJECT_FILE_FAILED = "Åª¨ú±M®×ÀÉ®×¥¢±Ñ¡G\n{0}";
-		const string OPEN_PROJECT_TITLE = "¶}±Ò±M®×";
+		const string READ_PROJECT_FILE_FAILED = "è®€å–å°ˆæ¡ˆæª”æ¡ˆå¤±æ•—ï¼š\n{0}";
+		const string OPEN_PROJECT_TITLE = "é–‹å•Ÿå°ˆæ¡ˆ";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ReadProjectFileAction" );
 	}
 }

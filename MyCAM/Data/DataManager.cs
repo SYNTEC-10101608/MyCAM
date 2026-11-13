@@ -9,6 +9,7 @@ using OCC.TopTools;
 using OCCTool;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -52,6 +53,25 @@ namespace MyCAM.Data
 		}
 	}
 
+	internal class PathTreeItem
+	{
+		public string UID
+		{
+			get;
+		}
+
+		public string Name
+		{
+			get;
+		}
+
+		public PathTreeItem( string uid, string name )
+		{
+			UID = uid;
+			Name = name;
+		}
+	}
+
 	// part data, reference data
 	internal class DataManager
 	{
@@ -59,6 +79,7 @@ namespace MyCAM.Data
 		public Action<List<string>, bool> FeatureAdded;
 		public Action<List<string>> PathAdded;
 		public Action NeedOptimizedIK;
+		public Action<List<string>> PathRemoved;
 		public Action<List<string>> PartRemoved;
 
 		// TODO: this is temp solution
@@ -66,14 +87,15 @@ namespace MyCAM.Data
 		{
 			ObjectMap = new Dictionary<string, IObject>();
 			PartIDList = new List<string>();
-			PathIDList = new List<string>();
+			m_PathIDList = new List<string>();
 			m_MachineData = m_DefaultMachineData;
 
 			// get machine data trigger chain rebuild
 			BuildChain();
 		}
 
-		public void ResetDataManger( Dictionary<string, IObject> objectMap, List<string> partIDList, List<string> pathIDList, ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData, CalibrationData calibration, SupportBracketData supportBracketParams = null )
+		public void ResetDataManger( Dictionary<string, IObject> objectMap, List<string> partIDList, List<string> pathIDList,
+			ShapeIDsStruct shapeIDs, EntryAndExitData entryAndExitData, CalibrationData calibration, SupportBracketData supportBracketParams = null )
 		{
 			// check shape map is mach with partList & pathList
 			Dictionary<string, IObject> checkedObjectMap = new Dictionary<string, IObject>();
@@ -81,7 +103,7 @@ namespace MyCAM.Data
 			List<string> checkedPathIDList = new List<string>();
 
 			// read part in sequence, skip duplicates
-			foreach( var partDataID in partIDList ) {
+			foreach( string partDataID in partIDList ) {
 				if( objectMap.ContainsKey( partDataID ) && !checkedPartIDList.Contains( partDataID ) ) {
 					checkedObjectMap[ partDataID ] = objectMap[ partDataID ];
 					checkedPartIDList.Add( partDataID );
@@ -89,15 +111,25 @@ namespace MyCAM.Data
 			}
 
 			// read path in sequence, skip duplicates
-			foreach( var pathDataID in pathIDList ) {
-				if( objectMap.ContainsKey( pathDataID ) && !checkedPathIDList.Contains( pathDataID ) ) {
-					checkedObjectMap[ pathDataID ] = objectMap[ pathDataID ];
-					checkedPathIDList.Add( pathDataID );
+			foreach( string pathDataID in pathIDList ) {
+				if( !objectMap.TryGetValue( pathDataID, out IObject path ) || checkedPathIDList.Contains( pathDataID ) ) {
+					continue;
+				}
+
+				checkedObjectMap[ pathDataID ] = objectMap[ pathDataID ];
+				checkedPathIDList.Add( pathDataID );
+
+				if( path is GroupPathObject group ) {
+					foreach( IPathObject member in group.PathList ) {
+						if( objectMap.TryGetValue( member.UID, out IObject memberPath ) ) {
+							checkedObjectMap.Add( member.UID, memberPath );
+						}
+					}
 				}
 			}
 			ObjectMap = checkedObjectMap;
 			PartIDList = checkedPartIDList;
-			PathIDList = checkedPathIDList;
+			m_PathIDList = checkedPathIDList;
 			EntryAndExitData = entryAndExitData;
 			CalibrationData = calibration;
 			SupportBracketParams = supportBracketParams;
@@ -182,9 +214,117 @@ namespace MyCAM.Data
 			get; private set;
 		}
 
-		public List<string> PathIDList
+		public IReadOnlyList<string> PathIDList
 		{
-			get; private set;
+			get
+			{
+				return m_PathIDList;
+			}
+		}
+
+		public List<string> GetEditablePathIDList( List<string> pathIDList )
+		{
+			List<string> editablePathIDList = new List<string>();
+			foreach( string pathID in pathIDList ) {
+				if( !DataGettingHelper.GetPathObject( pathID, out IPathObject path ) ) {
+					continue;
+				}
+
+				if( path is GroupPathObject group ) {
+					editablePathIDList.AddRange( group.PathIDList );
+				}
+				else {
+					editablePathIDList.Add( pathID );
+				}
+			}
+			return editablePathIDList;
+		}
+
+		public List<string> GetProcessPathIDList( IReadOnlyList<string> pathIDList )
+		{
+			List<string> processPathIDList = new List<string>();
+			for( int i = 0; i < pathIDList.Count; ++i ) {
+				if( !DataGettingHelper.GetCraftDataByID( pathIDList[ i ], out CraftData craftData ) ) {
+					continue;
+				}
+				if( craftData.ProcessPath ) {
+					processPathIDList.Add( pathIDList[ i ] );
+				}
+			}
+			return processPathIDList;
+		}
+
+		public string GetPreviousPath( string pathID )
+		{
+			int indexInAllPaths = m_PathIDList.IndexOf( pathID );
+			if( indexInAllPaths > 0 ) {
+				return m_PathIDList[ indexInAllPaths - 1 ];
+			}
+			return null;
+		}
+
+		public FlyCutGroupPathObject AddFlyCutGroup( List<string> pathIDList )
+		{
+			if( pathIDList == null || pathIDList.Count < 2 ) {
+				return null;
+			}
+
+			int firstIndex = int.MaxValue;
+			HashSet<string> memberIDs = new HashSet<string>();
+			List<ContourPathObject> pathList = new List<ContourPathObject>();
+			foreach( string pathID in pathIDList ) {
+				int index = m_PathIDList.IndexOf( pathID );
+				if( string.IsNullOrEmpty( pathID ) || index < 0 || !memberIDs.Add( pathID )
+					|| !ObjectMap.TryGetValue( pathID, out IObject obj ) || !( obj is ContourPathObject contour )
+					|| contour.UID != pathID ) {
+					return null;
+				}
+				firstIndex = Math.Min( firstIndex, index );
+				pathList.Add( contour );
+			}
+
+			string szID = PATH_NAME_PREFIX + ( ++m_PathID );
+			FlyCutGroupPathObject group = new FlyCutGroupPathObject( szID, pathList );
+
+			ObjectMap.Add( szID, group );
+			m_PathIDList.RemoveAll( memberIDs.Contains );
+			m_PathIDList.Insert( firstIndex, szID );
+
+			return group;
+		}
+
+		public IReadOnlyList<PathTreeItem> GetPathTree()
+		{
+			List<PathTreeItem> result = new List<PathTreeItem>();
+
+			int pathCount = 0;
+
+			for( int i = 0; i < PathIDList.Count; ++i ) {
+				string pathName = PATH_NAME_PREFIX + ++pathCount;
+				result.Add( new PathTreeItem( PathIDList[ i ], pathName ) );
+			}
+			return result;
+		}
+
+		public void SetSortedPathIDList( List<string> pathIDList )
+		{
+			m_PathIDList.Clear();
+			m_PathIDList.AddRange( pathIDList );
+		}
+
+		public void PathInsert( int index, string pathID )
+		{
+			m_PathIDList.Insert( index, pathID );
+		}
+
+		public void PathRemoveAt( int index )
+		{
+			m_PathIDList.RemoveAt( index );
+		}
+
+		public int PathIndexOf( string pathID )
+		{
+			return m_PathIDList.IndexOf( pathID );
 		}
 
 		// for machine render to get
@@ -379,7 +519,7 @@ namespace MyCAM.Data
 			}
 
 			// add to path ID list
-			PathIDList.AddRange( newPathIDList );
+			m_PathIDList.AddRange( newPathIDList );
 
 			if( newPathIDList.Count > 0 ) {
 				NeedOptimizedIK?.Invoke();
@@ -480,7 +620,23 @@ namespace MyCAM.Data
 			if( string.IsNullOrEmpty( pathID ) || !PathIDList.Contains( pathID ) ) {
 				return;
 			}
-			PathIDList.Remove( pathID );
+
+			// cannot remove the path in group
+			int index = m_PathIDList.IndexOf( pathID );
+			if( index == -1 || !ObjectMap.TryGetValue( pathID, out IObject obj ) ) {
+				return;
+			}
+
+			IReadOnlyList<string> memberIDs = null;
+			if( obj is GroupPathObject group ) {
+				memberIDs = group.PathIDList;
+				group.Dispose();
+			}
+
+			m_PathIDList.RemoveAt( index );
+			if( memberIDs != null ) {
+				m_PathIDList.InsertRange( index, memberIDs );
+			}
 			ObjectMap.Remove( pathID );
 		}
 
@@ -549,7 +705,7 @@ namespace MyCAM.Data
 			ResetShapeIDs();
 			ObjectMap.Clear();
 			PartIDList.Clear();
-			PathIDList.Clear();
+			m_PathIDList.Clear();
 			ClearObjectCommandData();
 
 			// add each part shape to the object map and part ID list
@@ -631,9 +787,10 @@ namespace MyCAM.Data
 			}
 		}
 
-		public string GetPathName( int pathOrderIndex )
+		public string GetPathName( string pathID )
 		{
 			// 1 based index
+			int pathOrderIndex = m_PathIDList.IndexOf( pathID );
 			return PATH_NAME_PREFIX + ( pathOrderIndex + 1 ).ToString();
 		}
 
@@ -690,6 +847,9 @@ namespace MyCAM.Data
 		// machine data
 		IMachineDataBase m_MachineData = null;
 		readonly SpindleTypeMachineData m_DefaultMachineData = MachineDataFactory.CreateDefaultSpindle();
+
+		// path data
+		List<string> m_PathIDList;
 
 		// entry & exit data
 		EntryAndExitData m_EntryAndExitData = new EntryAndExitData();

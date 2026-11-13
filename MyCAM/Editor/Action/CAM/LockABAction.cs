@@ -30,7 +30,7 @@ namespace MyCAM.Editor
 
 			// for path index control
 			m_PathIndexAction = pathIndexAction;
-			m_CurrentPathIDList = pathIDList ?? new List<string>();
+			m_CurrentPathIDList = m_DataManager.GetEditablePathIDList( pathIDList );
 		}
 
 		public override EditActionType ActionType
@@ -118,7 +118,7 @@ namespace MyCAM.Editor
 			m_ToolVecEditRender = null;
 
 			// get current selected path IDs from SelectPathAction
-			List<string> selectedPathIDs = m_PathIndexAction.GetSelectedIDs();
+			List<string> selectedPathIDs = m_DataManager.GetEditablePathIDList( m_PathIndexAction.GetSelectedIDs() );
 
 			// update current path ID list
 			m_CurrentPathIDList = selectedPathIDs;
@@ -470,8 +470,7 @@ namespace MyCAM.Editor
 			}
 			bool isGotCraftData = DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData );
 			if( !isGotCraftData ) {
-				int pathOrderIndex = m_DataManager.PathIDList.IndexOf( pathID );
-				string pathName = m_DataManager.GetPathName( pathOrderIndex );
+				string pathName = m_DataManager.GetPathName( pathID );
 				MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "CannotGetCraftData", CANNOT_GET_CRAFT_DATA ), pathName ), MyApp.NoticeType.Warning );
 				return false;
 			}
@@ -688,7 +687,8 @@ namespace MyCAM.Editor
 			foreach( string pathID in m_DataManager.PathIDList ) {
 
 				// is std pattern path, lock it
-				if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {
+				if( !DataGettingHelper.GetPathType( pathID, out PathType pathType )
+					|| ( pathType != PathType.Contour && pathType != PathType.FlyCutGroup ) ) {
 					lockList.Add( pathID );
 				}
 			}

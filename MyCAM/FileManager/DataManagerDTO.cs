@@ -26,6 +26,8 @@ namespace MyCAM.FileManager
 		[XmlArrayItem( "RectanglePathObjectDTO", typeof( RectanglePathObjectDTO ) )]
 		[XmlArrayItem( "PolygonPathObjectDTO", typeof( PolygonPathObjectDTO ) )]
 		[XmlArrayItem( "RunwayPathObjectDTO", typeof( RunwayPathObjectDTO ) )]
+		[XmlArrayItem( "GroupPathObjectDTO", typeof( GroupPathObjectDTO ) )]
+		[XmlArrayItem( "FlyCutGroupPathObjectDTO", typeof( FlyCutGroupPathObjectDTO ) )]
 		public List<IObjectDTO> ObjectDataMap
 		{
 			get;
@@ -134,7 +136,7 @@ namespace MyCAM.FileManager
 			foreach( var objectData in objectDataMap ) {
 
 				// current index is path data
-				if( objectData.Value is PathObject path ) {
+				if( objectData.Value is IPathObject path ) {
 					switch( path.PathType ) {
 						case PathType.Contour:
 							if( path is ContourPathObject contourPath ) {
@@ -169,6 +171,12 @@ namespace MyCAM.FileManager
 								ObjectDataMap.Add( runwayDTO );
 							}
 							break;
+						case PathType.FlyCutGroup:
+							if( path is FlyCutGroupPathObject flyCutGroupPath ) {
+								FlyCutGroupPathObjectDTO flyCutGroupDTO = new FlyCutGroupPathObjectDTO( flyCutGroupPath );
+								ObjectDataMap.Add( flyCutGroupDTO );
+							}
+							break;
 					}
 					continue;
 				}
@@ -191,7 +199,7 @@ namespace MyCAM.FileManager
 		}
 
 		// PathIDList → PathIDListDTO
-		void ToPathIDListDTO( List<string> pathIDList )
+		void ToPathIDListDTO( IReadOnlyList<string> pathIDList )
 		{
 			PathIDList = new List<string>();
 			if( pathIDList != null ) {
@@ -248,6 +256,15 @@ namespace MyCAM.FileManager
 				if( entry is PartObjectDTO partDataDTO ) {
 					PartObject partObject = partDataDTO.PartDTOToPartData();
 					objectMap.Add( partDataDTO.UID, partObject );
+				}
+			}
+			foreach( var entry in ObjectDataMap ) {
+
+				// need to identify objectMap first, because groupData include pathdata
+				if( entry is GroupPathObjectDTO groupDataDTO ) {
+					if( groupDataDTO is FlyCutGroupPathObjectDTO flyCutGroupPathObject ) {
+						objectMap.Add( groupDataDTO.UID, flyCutGroupPathObject.PathDTOToFlyCutGroupPathObject( objectMap ) );
+					}
 				}
 			}
 			return objectMap;
@@ -363,7 +380,22 @@ namespace MyCAM.FileManager
 	[XmlInclude( typeof( RectanglePathObjectDTO ) )]
 	[XmlInclude( typeof( PolygonPathObjectDTO ) )]
 	[XmlInclude( typeof( RunwayPathObjectDTO ) )]
-	public abstract class PathObjectDTO : IObjectDTO
+
+	public abstract class IPathObjectDTO : IObjectDTO
+	{
+		// constructor for XmlSerializer
+		internal IPathObjectDTO()
+		{
+		}
+
+		public PathType PathType
+		{
+			get;
+			set;
+		}
+	}
+
+	public abstract class PathObjectDTO : IPathObjectDTO
 	{
 		// constructor for XmlSerializer
 		internal PathObjectDTO()
@@ -371,12 +403,6 @@ namespace MyCAM.FileManager
 		}
 
 		public CraftDataDTO CraftData
-		{
-			get;
-			set;
-		}
-
-		public PathType PathType
 		{
 			get;
 			set;
@@ -627,6 +653,124 @@ namespace MyCAM.FileManager
 			RunwayGeomData geomData = GeomData.ToRunwayGeomData();
 			ContourPathObject contourPathObject = ContourPathObject.PathDTOToContourPathObject();
 			return new RunwayPathObject( UID, geomData, craftData, contourPathObject );
+		}
+	}
+
+	[XmlInclude( typeof( GroupPathObjectDTO ) )]
+	[XmlInclude( typeof( FlyCutGroupPathObjectDTO ) )]
+
+	public abstract class GroupPathObjectDTO : IPathObjectDTO
+	{
+		// constructor for XmlSerializer
+		internal GroupPathObjectDTO()
+		{
+		}
+
+		public List<string> pathIDList
+		{
+			get;
+			set;
+		} = new List<string>();
+
+	}
+
+	public class FlyCutGroupPathObjectDTO : GroupPathObjectDTO
+	{
+		public CraftDataDTO CraftData
+		{
+			get; set;
+		}
+
+		public List<FlyCutMemberCraftDataDTO> OriginalCraftData
+		{
+			get;
+			set;
+		}
+
+		// An absent field is legacy data; a present empty list is an invalid backup.
+		[XmlIgnore]
+		public bool OriginalCraftDataSpecified
+		{
+			get;
+			set;
+		}
+
+		// constructor for XmlSerializer
+		internal FlyCutGroupPathObjectDTO()
+		{
+		}
+
+		internal FlyCutGroupPathObjectDTO( FlyCutGroupPathObject groupObject )
+		{
+			if( groupObject == null ) {
+				return;
+			}
+			UID = groupObject.UID;
+			ObjectType = groupObject.ObjectType;
+			PathType = groupObject.PathType;
+			pathIDList = groupObject.PathIDList.ToList();
+			CraftData = new CraftDataDTO( groupObject.CraftData );
+			Dictionary<ContourPathObject, CraftData> snapshots = groupObject.GetOriginalCraftDataSnapshots();
+			if( snapshots != null ) {
+				OriginalCraftData = groupObject.PathList.OfType<ContourPathObject>().Select( path => new FlyCutMemberCraftDataDTO
+				{
+					UID = path.UID,
+					CraftData = new CraftDataDTO( snapshots[ path ] )
+				} ).ToList();
+				OriginalCraftDataSpecified = true;
+			}
+		}
+
+		// DTO → FlyCutGroupPathObject
+		internal FlyCutGroupPathObject PathDTOToFlyCutGroupPathObject( Dictionary<string, IObject> objectMap )
+		{
+			// protection
+			if( string.IsNullOrEmpty( UID ) || pathIDList == null || pathIDList.Count == 0 || objectMap == null ) {
+				throw new ArgumentNullException( "FlyCutGroupPathObject deserialization failed." );
+			}
+			Dictionary<string, ContourPathObject> membersByID = new Dictionary<string, ContourPathObject>();
+			List<ContourPathObject> pathList = new List<ContourPathObject>();
+			for( int i = 0; i < pathIDList.Count; ++i ) {
+				if( string.IsNullOrEmpty( pathIDList[ i ] ) || membersByID.ContainsKey( pathIDList[ i ] )
+					|| !objectMap.TryGetValue( pathIDList[ i ], out IObject member ) || !( member is ContourPathObject contour ) ) {
+					throw new ArgumentException( $"Invalid member: {UID}/{pathIDList[ i ]}" );
+				}
+				membersByID.Add( pathIDList[ i ], contour );
+				pathList.Add( contour );
+			}
+			Dictionary<ContourPathObject, CraftData> snapshots = null;
+			if( OriginalCraftDataSpecified || ( OriginalCraftData != null && OriginalCraftData.Count > 0 ) ) {
+				if( OriginalCraftData == null || OriginalCraftData.Count != membersByID.Count ) {
+					throw new ArgumentException( $"Incomplete original craft snapshots: {UID}" );
+				}
+				snapshots = new Dictionary<ContourPathObject, CraftData>();
+				foreach( FlyCutMemberCraftDataDTO entry in OriginalCraftData ) {
+					if( entry == null || string.IsNullOrEmpty( entry.UID )
+						|| !membersByID.TryGetValue( entry.UID, out ContourPathObject contour )
+						|| snapshots.ContainsKey( contour ) || entry.CraftData == null
+						|| entry.CraftData.ContourEditMap == null || entry.CraftData.StartPntContourEditData == null ) {
+						throw new ArgumentException( $"Invalid original craft snapshot: {UID}/{entry?.UID}" );
+					}
+					snapshots.Add( contour, entry.CraftData.ToCraftData() );
+				}
+			}
+			CraftData craftData = ( CraftData == null ) ? new CraftData() : CraftData.ToCraftData();
+			return new FlyCutGroupPathObject( UID, pathList, craftData, snapshots );
+		}
+	}
+
+	public class FlyCutMemberCraftDataDTO
+	{
+		public string UID
+		{
+			get;
+			set;
+		}
+
+		public CraftDataDTO CraftData
+		{
+			get;
+			set;
 		}
 	}
 
@@ -1219,12 +1363,12 @@ namespace MyCAM.FileManager
 				.ToList();
 
 			StartPntContourEditData = new StartPntContourEditParamDTO( craftData.StartPntContourEditData );
+			ContourEditMap = ( craftData.ContourEditMap ?? new Dictionary<int, ContourEditData>() )
+				.Select( kvp => new ContourEditMapDTO( kvp.Key, kvp.Value.DX, kvp.Value.DY, kvp.Value.DZ ) )
+				.ToList();
 
 			if( craftData.StartPntToolVecData != null ) {
 				StartPntToolVecData = new StartPntToolVecParamDTO( craftData.StartPntToolVecData );
-				ContourEditMap = ( craftData.ContourEditMap ?? new Dictionary<int, ContourEditData>() )
-					.Select( kvp => new ContourEditMapDTO( kvp.Key, kvp.Value.DX, kvp.Value.DY, kvp.Value.DZ ) )
-					.ToList();
 			}
 			else {
 				// create empty node
@@ -1275,7 +1419,9 @@ namespace MyCAM.FileManager
 																 microJointStartIdxMap, extendedGCodeMap, specialToolVecData, rCornerMap );
 
 			// old version may have start/end point in ToolVecModifyMap, those are move to StartPntToolVecData
-			RemoveOldMapStartEndPoint( craftData );
+			if( sourceMap_OldVersion != null ) {
+				RemoveOldMapStartEndPoint( craftData );
+			}
 
 			// Set properties not in constructor
 			if( CumulativeTrsfMatrix == null ) {
@@ -1899,6 +2045,19 @@ namespace MyCAM.FileManager
 				throw new ArgumentException( "LeadData deserialization failed." );
 			}
 			return new LeadData( LeadInStraightLength.Value, LeadInArcLength.Value, LeadInAngle.Value, LeadOutStraightLength.Value, LeadOutArcLength.Value, LeadOutAngle.Value, IsChangeLeadDirection.Value );
+		}
+
+		internal LeadData ToLeadDataWithDefaults()
+		{
+			LeadData defaults = new LeadData();
+			return new LeadData(
+				LeadInStraightLength ?? defaults.LeadIn.StraightLength,
+				LeadInArcLength ?? defaults.LeadIn.ArcLength,
+				LeadInAngle ?? defaults.LeadIn.Angle_deg,
+				LeadOutStraightLength ?? defaults.LeadOut.StraightLength,
+				LeadOutArcLength ?? defaults.LeadOut.ArcLength,
+				LeadOutAngle ?? defaults.LeadOut.Angle_deg,
+				IsChangeLeadDirection ?? defaults.IsChangeLeadDirection );
 		}
 	}
 

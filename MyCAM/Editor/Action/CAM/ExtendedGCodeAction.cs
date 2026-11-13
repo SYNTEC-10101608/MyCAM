@@ -179,9 +179,7 @@ namespace MyCAM.Editor
 
 
 			foreach( string pathID in newPathIDList ) {
-
-				int pathOrderIndex = m_DataManager.PathIDList.IndexOf( pathID );
-				string pathName = m_DataManager.GetPathName( pathOrderIndex );
+				string pathName = m_DataManager.GetPathName( pathID );
 
 				// validate new path (contour only)
 				if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) || pathType != PathType.Contour ) {

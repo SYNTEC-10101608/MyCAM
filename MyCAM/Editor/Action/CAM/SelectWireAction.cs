@@ -358,7 +358,7 @@ namespace MyCAM.Editor
 		// True when at least one edge is currently selected.
 		public bool HasSelection => GetSelectedEdge().Size() > 0;
 
-		const string NO_PATH_SELECTED = "[¾Ş§@´£¿ô]¥¼¿ï¨ú¥ô¦ó¸ô®|";
+		const string NO_PATH_SELECTED = "[æ“ä½œæé†’]æœªé¸å–ä»»ä½•è·¯å¾‘";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SelectWireAction" );
 	}
 }
