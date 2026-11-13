@@ -28,13 +28,19 @@ namespace MyCAM.Post
 			
 			// frog leap
 			if( postData.FrogLeapMidPostPoint != null ) {
-				WriteFrogLeap( writer, postData.FrogLeapMidPostPoint, postData.CutDownPostPoint, 0, axisConfig, enterTiltAngle_deg );
+
+				PostPoint frogLeapEndPoint = postData.CutDownPostPoint ?? postData.ProcessStartPoint;
+				WriteFrogLeap( writer, postData.FrogLeapMidPostPoint, frogLeapEndPoint, 0, axisConfig, enterTiltAngle_deg );
+
+				if( postData.CutDownPostPoint != null ) {
+					WriteLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance, axisConfig );
+				}
 			}
 			else {
 
 				//safe cylinder, sphere
 				if( postData.SafeBoundaryPostPointList != null ) {
-					for( int i = 1; i < postData.SafeBoundaryPostPointList.Count; ++i ) {
+					for( int i = 0; i < postData.SafeBoundaryPostPointList.Count; ++i ) {
 						WriteLinearTraverse( writer, postData.SafeBoundaryPostPointList[ i ], 0, axisConfig );
 					}
 				}
@@ -47,10 +53,9 @@ namespace MyCAM.Post
 				if( postData.CutDownPostPoint != null ) {
 					WriteLinearTraverse( writer, postData.CutDownPostPoint, 0, axisConfig );
 				}
-			}
 
-			//cut down
-			WriteLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance, axisConfig );
+				WriteLinearTraverse( writer, postData.ProcessStartPoint, postData.FollowSafeDistance, axisConfig );
+			}
 		}
 
 		public static void WriteLinearTraverse( StreamWriter writer, PostPoint postPoint, double followSafeDistance, AxisConfig axisConfig )

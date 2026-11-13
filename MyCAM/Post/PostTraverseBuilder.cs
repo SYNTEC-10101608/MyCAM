@@ -145,6 +145,10 @@ namespace MyCAM.Post
 		public static void CalculateExit( PathEndInfo endInfoOfLastPath, EntryAndExitData entryAndExitData, out PostPoint G54ExitPoint )
 		{
 			G54ExitPoint = null;
+			if(endInfoOfLastPath == null || entryAndExitData == null ) {
+				return;
+			}
+
 			if( entryAndExitData.ExitDistance <= 0 ) {
 				return;
 			}
