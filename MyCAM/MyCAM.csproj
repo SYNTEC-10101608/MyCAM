@@ -235,7 +235,9 @@
     <Compile Include="Helper\CAM\ContourEditHelper.cs" />
     <Compile Include="Helper\CAM\ContourOffsetHelper.cs" />
     <Compile Include="Helper\CAM\FindWireOnOuterShellHelper.cs" />
+    <Compile Include="Helper\CAM\GeometrySegmentHelper.cs" />
     <Compile Include="Helper\CAM\MicroJointHelper.cs" />
+    <Compile Include="Helper\CAM\PatternRecognizeHelper.cs" />
     <Compile Include="Helper\CAM\RotaryAxisHelper.cs" />
     <Compile Include="Helper\CAM\StartPointHelper.cs" />
     <Compile Include="Helper\Canvas\DrawHelper.cs" />

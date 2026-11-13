@@ -2,6 +2,7 @@
 <ResMap>
 	<Message ID="PatternSettingDlg" Content="Standard Pattern Settings" />
 	<Message ID="m_lblPathType" Content="Path Type" />
+	<Message ID="m_btnAutoRecognize" Content="Auto Recognize" />
 	<Message ID="PathType_Contour" Content="Contour" />
 	<Message ID="PathType_Circle" Content="Circle" />
 	<Message ID="PathType_Rectangle" Content="Rectangle" />

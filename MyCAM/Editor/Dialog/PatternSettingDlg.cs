@@ -20,6 +20,9 @@ namespace MyCAM.Editor.Dialog
 		{
 			this.Text = m_LanguageManager.TryGetString( "PatternSettingDlg", this.Text );
 			label1.Text = m_LanguageManager.TryGetString( "m_lblPathType", label1.Text );
+
+			m_btnAutoRecognize.Text = m_LanguageManager.TryGetString( "m_btnAutoRecognize", m_btnAutoRecognize.Text );
+
 			m_chkCoordReverse.Text = m_LanguageManager.TryGetString( "m_chkCoordReverse", m_chkCoordReverse.Text );
 			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnOK", m_btnConfirm.Text );
 
@@ -113,6 +116,12 @@ namespace MyCAM.Editor.Dialog
 			if( m_StandardPatternGeomData != null ) {
 				m_chkCoordReverse.Checked = m_StandardPatternGeomData.IsCoordinateReversed;
 			}
+		}
+
+		public Action AutoRecognizeAction;
+		void m_btnAutoRecognize_Click( object sender, EventArgs e )
+		{
+			AutoRecognizeAction?.Invoke();
 		}
 
 		void m_cmbPathType_SelectedIndexChanged( object sender, EventArgs e )

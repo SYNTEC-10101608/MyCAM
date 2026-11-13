@@ -2,6 +2,7 @@
 <ResMap>
 	<Message ID="PatternSettingDlg" Content="标准图元设定" />
 	<Message ID="m_lblPathType" Content="路径类型" />
+	<Message ID="m_btnAutoRecognize" Content="自动识别" />
 	<Message ID="PathType_Contour" Content="轮廓" />
 	<Message ID="PathType_Circle" Content="圆形" />
 	<Message ID="PathType_Rectangle" Content="矩形" />
