@@ -12,7 +12,8 @@ namespace MyCAM.Data
 		public ContourPathObject( string szUID, List<PathEdge5D> pathDataList, bool isClosed,
 			double maxDeflection = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
 			double maxEdgeLength = OCCTool.GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
-			OCCTool.EDiscretizeMethod discretizeMethod = OCCTool.GeometryTool.DEFAULT_DISCRETIZE_METHOD )
+			OCCTool.EDiscretizeMethod discretizeMethod = OCCTool.GeometryTool.DEFAULT_DISCRETIZE_METHOD,
+			Action<LoadingBarInfo> reportProgress = null )
 			: base( szUID )
 		{
 			if( string.IsNullOrEmpty( szUID ) || pathDataList == null ) {
@@ -22,8 +23,9 @@ namespace MyCAM.Data
 				throw new ArgumentException( "ContourPathObject constructing argument empty pathDataList" );
 			}
 
-			m_ContourGeomData = new ContourGeomData( pathDataList, isClosed, maxDeflection, maxEdgeLength, discretizeMethod );
+			m_ContourGeomData = new ContourGeomData( pathDataList, isClosed, maxDeflection, maxEdgeLength, discretizeMethod, reportProgress );
 			m_CraftData = new CraftData();
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.BuildPathCache ) );
 			m_ContourCache = new ContourCache( m_ContourGeomData, m_CraftData );
 		}
 

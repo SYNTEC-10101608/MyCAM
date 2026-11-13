@@ -636,5 +636,14 @@
   <ItemGroup>
     <None Include="Resource\SupportBracket.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Editor\Dialog\LoadingBarDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Helper\LoadingBar\LoadingHelper.cs" />
+    <Compile Include="Helper\FileIO\CadFileReader.cs" />
+    <Compile Include="Data\LoadingBar\LoadingBarInfo.cs" />
+    <Compile Include="LoadingManager\LoadingBarManager.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

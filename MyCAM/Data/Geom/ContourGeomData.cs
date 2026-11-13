@@ -11,7 +11,8 @@ namespace MyCAM.Data
 		public ContourGeomData( List<PathEdge5D> pathDataList, bool isClosed,
 			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
 			double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
-			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD )
+			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD,
+			Action<LoadingBarInfo> reportProgress = null )
 		{
 			if( pathDataList == null ) {
 				throw new ArgumentNullException( "ContourGeomData constructing argument null" );
@@ -22,7 +23,7 @@ namespace MyCAM.Data
 			m_IsClosed = isClosed;
 			DisctereContourHelper.BuildContourGeomData( pathDataList, isClosed,
 				out m_CADPointList, out m_ConnectPointMap,
-				maxDeflection, maxEdgeLength, discretizeMethod );
+				maxDeflection, maxEdgeLength, discretizeMethod, reportProgress );
 			DisctereContourHelper.GetRefCenterDirFromContour( m_CADPointList, out m_RefCenterDir );
 		}
 

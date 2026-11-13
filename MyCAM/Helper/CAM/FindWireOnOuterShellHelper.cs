@@ -8,6 +8,7 @@ using OCCTool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MyCAM.Data;
 
 namespace MyCAM.Helper
 {
@@ -47,10 +48,11 @@ namespace MyCAM.Helper
 			List<TopoDS_Shape> partShapes,
 			List<gp_Ax1> rayStrategies,
 			gp_Pnt referenceCenter,
-			double d1Tolerance = GeometryTool.DEFAULT_D1_CONTINUOUS_TOLERANCE )
+			double d1Tolerance = GeometryTool.DEFAULT_D1_CONTINUOUS_TOLERANCE,
+			Action<LoadingBarInfo> reportProgress = null )
 		{
 			// step 1: find outermost face using ray strategies
-			TopoDS_Face outerFace = FindOutermostFaceByStrategies( partShapes, rayStrategies, referenceCenter );
+			TopoDS_Face outerFace = FindOutermostFaceByStrategies( partShapes, rayStrategies, referenceCenter, reportProgress );
 
 			if( outerFace == null || outerFace.IsNull() ) {
 				return new WireFindingResult
@@ -59,6 +61,9 @@ namespace MyCAM.Helper
 					Error = WireFindingError.NoIntersectedFace
 				};
 			}
+
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.FindConnectedFaces ) );
 
 			// step 2: find D1 continuous faces from the outermost face
 			List<TopoDS_Face> d1FaceList = FindD1ContinuousFaces( outerFace, partShapes, d1Tolerance );
@@ -72,6 +77,8 @@ namespace MyCAM.Helper
 			}
 
 			// step 3: sew faces into groups (shells or individual faces)
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.SewOuterFaces ) );
 			List<TopoDS_Shape> sewedGroups = SewFaceGroups( d1FaceList );
 
 			if( sewedGroups.Count == 0 ) {
@@ -83,15 +90,20 @@ namespace MyCAM.Helper
 			}
 
 			// step 4: extract free boundaries from face groups
-			return ExtractFreeBoundariesFromFaceGroups( sewedGroups );
+			return ExtractFreeBoundariesFromFaceGroups( sewedGroups, reportProgress );
 		}
 
 		// extract free boundaries from face groups and return as wires
-		public static WireFindingResult ExtractFreeBoundariesFromFaceGroups( List<TopoDS_Shape> faceGroupList )
+		public static WireFindingResult ExtractFreeBoundariesFromFaceGroups( List<TopoDS_Shape> faceGroupList,
+			Action<LoadingBarInfo> reportProgress = null )
 		{
 			List<TopoDS_Wire> wires = new List<TopoDS_Wire>();
 			TopTools_IndexedDataMapOfShapeListOfShape edgeMap = new TopTools_IndexedDataMapOfShapeListOfShape();
 
+			int nCompleted = 0;
+
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.ExtractContours, 0, faceGroupList.Count ) );
 			foreach( TopoDS_Shape faceGroup in faceGroupList ) {
 				ShapeAnalysis_FreeBounds freeBounds = new ShapeAnalysis_FreeBounds( faceGroup );
 
@@ -111,6 +123,10 @@ namespace MyCAM.Helper
 					wires.Add( TopoDS.ToWire( wireExp.Current() ) );
 					wireExp.Next();
 				}
+
+				// Report progress to the loading bar.
+				nCompleted++;
+				reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.ExtractContours, nCompleted, faceGroupList.Count ) );
 			}
 
 			if( wires.Count == 0 ) {
@@ -187,12 +203,18 @@ namespace MyCAM.Helper
 		static TopoDS_Face FindOutermostFaceByStrategies(
 			List<TopoDS_Shape> partShapes,
 			List<gp_Ax1> strategies,
-			gp_Pnt referenceCenter )
+			gp_Pnt referenceCenter,
+			Action<LoadingBarInfo> reportProgress )
 		{
+			int nCompleted = 0;
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.FindOuterFace, 0, strategies.Count ) );
 			foreach( gp_Ax1 strategy in strategies ) {
 				List<TopoDS_Face> candidates = GetFaceCandidatesByRay( partShapes, strategy );
 
 				if( candidates.Count == 0 ) {
+					// Report progress to the loading bar.
+					nCompleted++;
+					reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.FindOuterFace, nCompleted, strategies.Count ) );
 					continue;
 				}
 
@@ -202,8 +224,15 @@ namespace MyCAM.Helper
 					strategy.Direction(),
 					referenceCenter,
 					out TopoDS_Face outerFace ) ) {
+					// Report progress to the loading bar.
+					nCompleted++;
+					reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.FindOuterFace, nCompleted, strategies.Count ) );
 					return outerFace;
 				}
+
+				// Report progress to the loading bar.
+				nCompleted++;
+				reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.FindOuterFace, nCompleted, strategies.Count ) );
 			}
 			return null;
 		}

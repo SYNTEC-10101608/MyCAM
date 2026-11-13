@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Preparing" Content="Preparing" />
+	<Message ID="ImportTitle" Content="Import file" />
+	<Message ID="PlacementTopic" Content="Positioning workpiece" />
+	<Message ID="FileTopicFormat" Content="File: {0}" />
+	<Message ID="SimulationTitle" Content="Simulation" />
+	<Message ID="SimulationTopic" Content="Calculating simulation results" />
+	<Message ID="ReadStage" Content="Read file" />
+	<Message ID="TransferStage" Content="Convert shape" />
+	<Message ID="SewStage" Content="Join surfaces" />
+	<Message ID="PlacementStage" Content="Position workpiece" />
+	<Message ID="PathStage" Content="Build toolpaths" />
+	<Message ID="CollisionStage" Content="Collision results" />
+	<Message ID="PrepareReader" Content="Preparing to read file" />
+	<Message ID="ReadFile" Content="Reading file" />
+	<Message ID="TransferFile" Content="Converting file contents" />
+	<Message ID="CombineShape" Content="Combining workpiece shapes" />
+	<Message ID="ValidateShape" Content="Checking conversion results" />
+	<Message ID="SewShape" Content="Processing workpiece shape" />
+	<Message ID="AddPart" Content="Completing workpiece import" />
+	<Message ID="AnalyzeWorkpiece" Content="Analyze workpiece" />
+	<Message ID="PrepareWorkpiece" Content="Prepare workpiece data" />
+	<Message ID="InspectWorkpiece" Content="Check workpiece outline" />
+	<Message ID="FindWorkpieceOutline" Content="Identify workpiece outline" />
+	<Message ID="CompareWorkpieceOutlines" Content="Compare workpiece outlines" />
+	<Message ID="DetermineWorkpieceDirection" Content="Determine placement direction" />
+	<Message ID="FindWorkpieceCenter" Content="Find workpiece center" />
+	<Message ID="AdjustPlacement" Content="Adjust workpiece position" />
+	<Message ID="ApplyPlacement" Content="Complete positioning" />
+	<Message ID="PreparePaths" Content="Prepare toolpaths" />
+	<Message ID="AnalyzePathWorkpiece" Content="Analyze workpiece" />
+	<Message ID="ProcessPathWorkpiece" Content="Process workpiece" />
+	<Message ID="IdentifyPaths" Content="Identify toolpaths" />
+	<Message ID="CalculatePaths" Content="Calculate toolpaths" />
+	<Message ID="UpdateDisplay" Content="Update display" />
+	<Message ID="PathsComplete" Content="Toolpath display complete" />
+	<Message ID="PrepareSimulation" Content="Preparing simulation data" />
+	<Message ID="CalculateSimulation" Content="Calculating simulation results" />
+	<Message ID="CheckCollision" Content="Check collisions" />
+	<Message ID="ApplySimulation" Content="Applying simulation results" />
+	<Message ID="SummarizeCollisions" Content="Collecting collision results" />
+	<Message ID="DisplaySimulation" Content="Updating simulation display" />
+	<Message ID="SimulationComplete" Content="Simulation ready" />
+	<Message ID="StageFormat" Content="{0} ({1}/{2}): {3}" />
+	<Message ID="AnalysisFormat" Content="{0} ({1}/{2}): {3}" />
+	<Message ID="AnalysisPercentFormat" Content="Step progress ({0}): {1}%" />
+	<Message ID="PathCountFormat" Content="Toolpaths processed: {0:N0}/{1:N0}" />
+	<Message ID="CollisionPercentFormat" Content="Check progress: {0}%" />
+	<Message ID="SubmitStage" Content="Add model" />
+	<Message ID="DisplayStage" Content="Update display" />
+	<Message ID="DxfStage" Content="Convert geometry" />
+	<Message ID="SurfaceStage" Content="Build target surface" />
+	<Message ID="ProjectionStage" Content="Project contours" />
+	<Message ID="ProjectStage" Content="Restore project" />
+	<Message ID="ConvertDxf" Content="Convert entities" />
+	<Message ID="ConnectDxfContours" Content="Connect contours" />
+	<Message ID="BuildTargetSurface" Content="Build target surface" />
+	<Message ID="ProjectContours" Content="Project contours" />
+	<Message ID="BuildEdgeMap" Content="Build contour associations" />
+	<Message ID="ReadProject" Content="Read project file" />
+	<Message ID="RestoreObjects" Content="Restore model and toolpath" />
+	<Message ID="RestoreSettings" Content="Restore machining and calibration settings" />
+	<Message ID="ApplyProject" Content="Apply project data" />
+	<Message ID="RestoreSupportBracket" Content="Restore support bracket data" />
+	<Message ID="ImportComplete" Content="Import complete" />
+	<Message ID="ItemCountFormat" Content="Items processed: {0:N0}/{1:N0}" />
+	<Message ID="ProjectTitle" Content="Import project" />
+	<Message ID="TubeTopic" Content="Import designed tube" />
+	<Message ID="ProjectContourEdges" Content="Project contours edge by edge" />
+	<Message ID="DisplayParts" Content="Display models" />
+	<Message ID="DisplayPaths" Content="Display toolpaths" />
+</ResMap>

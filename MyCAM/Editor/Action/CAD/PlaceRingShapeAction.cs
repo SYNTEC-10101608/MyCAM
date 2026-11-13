@@ -1,12 +1,10 @@
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Helper;
+using MyCAM.Helper.FileIO;
+using MyCAM.LoadingManager;
 using OCC.gp;
-using OCC.IFSelect;
-using OCC.IGESControl;
-using OCC.STEPControl;
 using OCC.TopoDS;
-using OCC.XSControl;
 using OCCTool;
 using OCCViewer;
 using System;
@@ -19,6 +17,10 @@ namespace MyCAM.Editor
 	internal class PlaceRingShapeAction : EditActionBase
 	{
 		public event Action ActionCompleted;
+
+		LoadingBarManager m_LoadingBarManager;
+		bool m_IsRunning;
+		bool m_IsExternalLoading;
 
 		public bool IsImportSuccess
 		{
@@ -43,9 +45,11 @@ namespace MyCAM.Editor
 		}
 
 		// the shape is already added to the data manager by the caller, only place it and build the paths
-		public PlaceRingShapeAction( DataManager dataManager, Viewer viewer, ViewManager viewManager, TopoDS_Shape addedShape )
+		public PlaceRingShapeAction( DataManager dataManager, Viewer viewer, ViewManager viewManager, TopoDS_Shape addedShape, LoadingBarManager loadingBarManager = null )
 			: this( dataManager, viewer, viewManager )
 		{
+			m_LoadingBarManager = loadingBarManager;
+			m_IsExternalLoading = loadingBarManager != null;
 			if( addedShape != null && addedShape.IsNull() == false ) {
 				m_AddedShape = addedShape;
 			}
@@ -61,8 +65,22 @@ namespace MyCAM.Editor
 
 		public override void Start()
 		{
+			if( m_IsRunning ) {
+				return;
+			}
 			base.Start();
+			m_IsRunning = true;
+			try {
+				ImportAndPlaceShape();
+			}
+			finally {
+				CloseLoadingBar();
+				m_IsRunning = false;
+			}
+		}
 
+		void ImportAndPlaceShape()
+		{
 			// the shape comes from the caller, otherwise read it from a file
 			TopoDS_Shape fileShape = m_AddedShape;
 			if( fileShape == null ) {
@@ -71,6 +89,10 @@ namespace MyCAM.Editor
 					End();
 					return;
 				}
+			}
+			else if( m_LoadingBarManager == null ) {
+				m_LoadingBarManager = new LoadingBarManager( MyApp.MainForm );
+				m_LoadingBarManager.ShowPlacement();
 			}
 			if( m_DataManager.PartIDList.Count == 0 ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoSolidObjectInFile", NO_SOLID_OBJECT_IN_FILE ), MyApp.NoticeType.Hint );
@@ -87,8 +109,10 @@ namespace MyCAM.Editor
 				targetAxis = RotaryAxisHelper.ConvertToAlignAxis( machineData.TubeDir );
 			}
 
+			ReportProgress( LoadingStep.PrepareWorkpiece );
+
 			// the shape may not be a revolution one, then it is kept as it is
-			bool isSuccess = RingShapedIdentifyHelper.ComputeRevolutionToG54Transform( fileShape, out gp_Trsf trsf, targetAxis );
+			bool isSuccess = RingShapedIdentifyHelper.ComputeRevolutionToG54Transform( fileShape, out gp_Trsf trsf, targetAxis, ReportProgress );
 			if( isSuccess == false ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "RevolutionPlaceFailed", REVOLUTION_PLACE_FAILED ), MyApp.NoticeType.Warning );
 				EndWithViewUpdate();
@@ -97,6 +121,7 @@ namespace MyCAM.Editor
 			TransformHelper transformHelper = new TransformHelper( m_Viewer, m_DataManager, m_ViewManager, trsf );
 
 			// do not refresh viewer right now
+			ReportProgress( LoadingStep.ApplyPlacement );
 			transformHelper.TransformData( false );
 
 			// get transformed visible part shapes
@@ -106,6 +131,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
+			ReportProgress( LoadingStep.PreparePaths );
 			BoundingBox bbox = GetVisibleWorkpieceBBox();
 			bool isGetSuccess = FindWireOnOuterShellHelper.TubeStrategies( bbox, targetAxis, out gp_Pnt bboxCenter, out List<gp_Ax1> stretchedStrategies );
 			if( isGetSuccess == false ) {
@@ -115,7 +141,8 @@ namespace MyCAM.Editor
 
 			// use FindWireOnOuterShellHelper to find wires on outer shell
 			FindWireOnOuterShellHelper.WireFindingResult result =
-				FindWireOnOuterShellHelper.FindWiresOnOuterShell( partShapes, stretchedStrategies, bboxCenter );
+				FindWireOnOuterShellHelper.FindWiresOnOuterShell( partShapes, stretchedStrategies, bboxCenter,
+					reportProgress: ReportProgress );
 
 			if( !result.IsSuccess ) {
 				string errorMessage = FindWireOnOuterShellHelper.GetWireFindingErrorMessage( result.Error );
@@ -125,8 +152,10 @@ namespace MyCAM.Editor
 			}
 
 			// add paths to data manager
-			m_DataManager.AddPath( result.Wires, result.EdgeFaceMap, false );
+			ReportProgress( LoadingStep.CalculatePaths );
+			m_DataManager.AddPath( result.Wires, result.EdgeFaceMap, false, reportProgress: ReportProgress );
 			UpdateAllViewData();
+			ReportProgress( LoadingStep.PathsComplete );
 
 			// set import success
 			IsImportSuccess = true;
@@ -135,8 +164,28 @@ namespace MyCAM.Editor
 
 		public override void End()
 		{
+			CloseLoadingBar();
 			ActionCompleted?.Invoke();
 			base.End();
+		}
+
+		void CloseLoadingBar()
+		{
+			if( m_IsExternalLoading ) {
+				return;
+			}
+			m_LoadingBarManager?.Dispose();
+			m_LoadingBarManager = null;
+		}
+
+		void ReportProgress( LoadingStep step )
+		{
+			m_LoadingBarManager?.Report( step );
+		}
+
+		void ReportProgress( LoadingBarInfo progress )
+		{
+			m_LoadingBarManager?.Report( progress );
 		}
 
 		// the part is already in the data manager, refresh the viewer before leaving
@@ -148,7 +197,7 @@ namespace MyCAM.Editor
 
 		void UpdateAllViewData()
 		{
-			m_ViewManager.RebuildAllViews( m_DataManager, true );
+			m_ViewManager.RebuildAllViews( m_DataManager, true, ReportProgress );
 			m_Viewer.UpdateView();
 		}
 
@@ -188,14 +237,9 @@ namespace MyCAM.Editor
 			}
 
 			// get this file format
-			string szFileExtension = Path.GetExtension( szFileName ).ToLowerInvariant();
-			FileFormat format = FileFormat.STEP;
-			if( szFileExtension == ".igs" || szFileExtension == ".iges" ) {
-				format = FileFormat.IGES;
-			}
-			if( szFileExtension == ".stp" || szFileExtension == ".step" ) {
-				format = FileFormat.STEP;
-			}
+			FileFormat format = CadFileReader.GetFormat( szFileName );
+			m_LoadingBarManager = new LoadingBarManager( MyApp.MainForm );
+			m_LoadingBarManager.ShowImport( Path.GetFileName( szFileName ) );
 			ReadFileData( format, szFileName, out fileShape );
 
 			// store file name
@@ -225,46 +269,14 @@ namespace MyCAM.Editor
 
 		void ReadFileData( FileFormat format, string szFileName, out TopoDS_Shape oneShape )
 		{
-			oneShape = null;
-
-			// read the file
-			XSControl_Reader Reader;
-			switch( format ) {
-				case FileFormat.BREP:
-					Reader = new XSControl_Reader();
-					break;
-				case FileFormat.STEP:
-					Reader = new STEPControl_Reader();
-					break;
-				case FileFormat.IGES:
-					Reader = new IGESControl_Reader();
-					break;
-				default:
-					Reader = new XSControl_Reader();
-					break;
-			}
-			IFSelect_ReturnStatus status = Reader.ReadFile( szFileName );
-
-			// check the status
-			if( status != IFSelect_ReturnStatus.IFSelect_RetDone ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
-				return;
-			}
-			Reader.TransferRoots();
-
-			// prevent from empty shape or null shape
-			if( Reader.NbShapes() == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
-				return;
-			}
-			oneShape = Reader.OneShape();
+			oneShape = CadFileReader.Read( format, szFileName, ReportProgress );
 			if( oneShape == null || oneShape.IsNull() ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
 				return;
 			}
-			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape } );
 
 			// add the read shape to the manager
+			ReportProgress( LoadingStep.AddPart );
 			m_DataManager.AddPart( oneShape );
 		}
 

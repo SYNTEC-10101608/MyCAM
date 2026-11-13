@@ -448,7 +448,8 @@ namespace MyCAM.Data
 		public void AddPath( List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap, bool shouldTriggerEvent = true,
 			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
 			double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
-			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD )
+			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD,
+			Action<LoadingBarInfo> reportProgress = null )
 		{
 			if( pathWireList == null || pathWireList.Count == 0 || allEdgeMap == null ) {
 				return;
@@ -459,7 +460,7 @@ namespace MyCAM.Data
 			foreach( var pathWire in pathWireList ) {
 				pathEdgeGroupList.Add( ExplodeWireToEdgeList( pathWire ) );
 			}
-			AddPath( pathEdgeGroupList, allEdgeMap, shouldTriggerEvent, maxDeflection, maxEdgeLength, discretizeMethod );
+			AddPath( pathEdgeGroupList, allEdgeMap, shouldTriggerEvent, maxDeflection, maxEdgeLength, discretizeMethod, reportProgress );
 		}
 
 		// explode a wire into its ordered edge list
@@ -481,7 +482,8 @@ namespace MyCAM.Data
 		public void AddPath( List<List<TopoDS_Edge>> pathEdgeGroupList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap, bool shouldTriggerEvent = true,
 			double maxDeflection = GeometryTool.DEFAULT_DISCRETE_MAX_DEFLECTION,
 			double maxEdgeLength = GeometryTool.DEFAULT_DISCRETE_MAX_LENGTH,
-			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD )
+			EDiscretizeMethod discretizeMethod = GeometryTool.DEFAULT_DISCRETIZE_METHOD,
+			Action<LoadingBarInfo> reportProgress = null )
 		{
 			if( pathEdgeGroupList == null || pathEdgeGroupList.Count == 0 || allEdgeMap == null ) {
 				return;
@@ -489,14 +491,28 @@ namespace MyCAM.Data
 
 			// validate each edge group, build path elements, and add to the data manager
 			List<string> newPathIDList = new List<string>();
-			foreach( var edgeGroup in pathEdgeGroupList ) {
+			for( int nPathIndex = 0; nPathIndex < pathEdgeGroupList.Count; nPathIndex++ ) {
+				int nPathNumber = nPathIndex + 1;
+				List<TopoDS_Edge> edgeGroup = pathEdgeGroupList[ nPathIndex ];
 				if( edgeGroup == null || edgeGroup.Count == 0 ) {
+					// Report progress to the loading bar.
+					reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.CalculatePaths, nPathNumber, pathEdgeGroupList.Count ) );
 					continue;
 				}
+
+				// Report progress to the loading bar.
+				Action<LoadingBarInfo> reportPathProgress = null;
+				if( reportProgress != null ) {
+					reportPathProgress = progress =>
+						reportProgress( new LoadingBarInfo( LoadingStep.CalculatePaths, nPathIndex, pathEdgeGroupList.Count ) );
+				}
+				reportPathProgress?.Invoke( new LoadingBarInfo( LoadingStep.ValidatePath ) );
 
 				// validate edges and build path elements
 				List<PathEdge5D> pathElements = ValidateAndBuildPathElements( edgeGroup, allEdgeMap );
 				if( pathElements == null ) {
+					// Report progress to the loading bar.
+					reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.CalculatePaths, nPathNumber, pathEdgeGroupList.Count ) );
 					continue;
 				}
 
@@ -509,13 +525,18 @@ namespace MyCAM.Data
 					szID = "Path_" + ++m_PathID;
 				} while( ObjectMap.ContainsKey( szID ) );
 				ContourPathObject contourPathObject = new ContourPathObject( szID, pathElements, isClosed,
-					maxDeflection, maxEdgeLength, discretizeMethod );
+					maxDeflection, maxEdgeLength, discretizeMethod, reportPathProgress );
 				contourPathObject.CraftData.TraverseData = new TraverseData();
 
+				// Report progress to the loading bar.
+				reportPathProgress?.Invoke( new LoadingBarInfo( LoadingStep.SetPathStart ) );
 				InitializeStartPoint( contourPathObject, isClosed );
 
 				ObjectMap[ szID ] = contourPathObject;
 				newPathIDList.Add( szID );
+
+				// Report progress to the loading bar.
+				reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.CalculatePaths, nPathNumber, pathEdgeGroupList.Count ) );
 			}
 
 			// add to path ID list
@@ -606,13 +627,14 @@ namespace MyCAM.Data
 			}
 		}
 
-		public void AddPartAndPathsSilently( TopoDS_Shape newPartShape, List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap )
+		public void AddPartAndPathsSilently( TopoDS_Shape newPartShape, List<TopoDS_Wire> pathWireList, TopTools_IndexedDataMapOfShapeListOfShape allEdgeMap, Action<LoadingBarInfo> reportProgress = null )
 		{
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.AddPart ) );
 			ResetWithNewPart( newPartShape, out int nPartCount, false );
 			if( nPartCount == 0 ) {
 				return;
 			}
-			AddPath( pathWireList, allEdgeMap, false );
+			AddPath( pathWireList, allEdgeMap, false, reportProgress: reportProgress );
 		}
 
 		public void RemovePath( string pathID )
