@@ -59,6 +59,7 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.m_cmbPathType = new System.Windows.Forms.ComboBox();
 			this.m_chkCoordReverse = new System.Windows.Forms.CheckBox();
+			this.m_btnAutoRecognize = new System.Windows.Forms.Button();
 			this.m_panelCircle.SuspendLayout();
 			this.m_panelRunway.SuspendLayout();
 			this.m_panelPolygon.SuspendLayout();
@@ -73,16 +74,16 @@
 			this.m_panelCircle.Controls.Add(this.label6);
 			this.m_panelCircle.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_panelCircle.Location = new System.Drawing.Point(29, 68);
-			this.m_panelCircle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_panelCircle.Margin = new System.Windows.Forms.Padding(4);
 			this.m_panelCircle.Name = "m_panelCircle";
-			this.m_panelCircle.Size = new System.Drawing.Size(347, 325);
+			this.m_panelCircle.Size = new System.Drawing.Size(374, 325);
 			this.m_panelCircle.TabIndex = 31;
 			this.m_panelCircle.Visible = false;
 			// 
 			// m_txbCircleRotatedAngle
 			// 
 			this.m_txbCircleRotatedAngle.Location = new System.Drawing.Point(187, 100);
-			this.m_txbCircleRotatedAngle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbCircleRotatedAngle.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbCircleRotatedAngle.Name = "m_txbCircleRotatedAngle";
 			this.m_txbCircleRotatedAngle.Size = new System.Drawing.Size(132, 26);
 			this.m_txbCircleRotatedAngle.TabIndex = 19;
@@ -103,7 +104,7 @@
 			// m_txbCircleDiameter
 			// 
 			this.m_txbCircleDiameter.Location = new System.Drawing.Point(187, 38);
-			this.m_txbCircleDiameter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbCircleDiameter.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbCircleDiameter.Name = "m_txbCircleDiameter";
 			this.m_txbCircleDiameter.Size = new System.Drawing.Size(132, 26);
 			this.m_txbCircleDiameter.TabIndex = 17;
@@ -131,7 +132,7 @@
 			this.m_panelRunway.Controls.Add(this.label15);
 			this.m_panelRunway.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_panelRunway.Location = new System.Drawing.Point(29, 68);
-			this.m_panelRunway.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_panelRunway.Margin = new System.Windows.Forms.Padding(4);
 			this.m_panelRunway.Name = "m_panelRunway";
 			this.m_panelRunway.Size = new System.Drawing.Size(347, 325);
 			this.m_panelRunway.TabIndex = 30;
@@ -140,7 +141,7 @@
 			// m_txbRunwayRotatedAngle
 			// 
 			this.m_txbRunwayRotatedAngle.Location = new System.Drawing.Point(187, 162);
-			this.m_txbRunwayRotatedAngle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbRunwayRotatedAngle.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbRunwayRotatedAngle.Name = "m_txbRunwayRotatedAngle";
 			this.m_txbRunwayRotatedAngle.Size = new System.Drawing.Size(132, 26);
 			this.m_txbRunwayRotatedAngle.TabIndex = 23;
@@ -161,7 +162,7 @@
 			// m_txbRunwayWidth
 			// 
 			this.m_txbRunwayWidth.Location = new System.Drawing.Point(187, 100);
-			this.m_txbRunwayWidth.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbRunwayWidth.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbRunwayWidth.Name = "m_txbRunwayWidth";
 			this.m_txbRunwayWidth.Size = new System.Drawing.Size(132, 26);
 			this.m_txbRunwayWidth.TabIndex = 21;
@@ -182,7 +183,7 @@
 			// m_txbRunwayLength
 			// 
 			this.m_txbRunwayLength.Location = new System.Drawing.Point(187, 38);
-			this.m_txbRunwayLength.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbRunwayLength.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbRunwayLength.Name = "m_txbRunwayLength";
 			this.m_txbRunwayLength.Size = new System.Drawing.Size(132, 26);
 			this.m_txbRunwayLength.TabIndex = 19;
@@ -210,7 +211,7 @@
 			this.m_panelPolygon.Controls.Add(this.label13);
 			this.m_panelPolygon.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_panelPolygon.Location = new System.Drawing.Point(29, 68);
-			this.m_panelPolygon.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_panelPolygon.Margin = new System.Windows.Forms.Padding(4);
 			this.m_panelPolygon.Name = "m_panelPolygon";
 			this.m_panelPolygon.Size = new System.Drawing.Size(347, 325);
 			this.m_panelPolygon.TabIndex = 29;
@@ -219,7 +220,7 @@
 			// m_txbPolygonCornerRadius
 			// 
 			this.m_txbPolygonCornerRadius.Location = new System.Drawing.Point(187, 100);
-			this.m_txbPolygonCornerRadius.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbPolygonCornerRadius.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbPolygonCornerRadius.Name = "m_txbPolygonCornerRadius";
 			this.m_txbPolygonCornerRadius.Size = new System.Drawing.Size(132, 26);
 			this.m_txbPolygonCornerRadius.TabIndex = 19;
@@ -240,7 +241,7 @@
 			// m_txbPolygonRotatedAngle
 			// 
 			this.m_txbPolygonRotatedAngle.Location = new System.Drawing.Point(187, 162);
-			this.m_txbPolygonRotatedAngle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbPolygonRotatedAngle.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbPolygonRotatedAngle.Name = "m_txbPolygonRotatedAngle";
 			this.m_txbPolygonRotatedAngle.Size = new System.Drawing.Size(132, 26);
 			this.m_txbPolygonRotatedAngle.TabIndex = 17;
@@ -261,7 +262,7 @@
 			// m_txbPolygonSideLength
 			// 
 			this.m_txbPolygonSideLength.Location = new System.Drawing.Point(187, 38);
-			this.m_txbPolygonSideLength.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbPolygonSideLength.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbPolygonSideLength.Name = "m_txbPolygonSideLength";
 			this.m_txbPolygonSideLength.Size = new System.Drawing.Size(132, 26);
 			this.m_txbPolygonSideLength.TabIndex = 13;
@@ -282,8 +283,8 @@
 			// m_btnConfirm
 			// 
 			this.m_btnConfirm.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_btnConfirm.Location = new System.Drawing.Point(271, 400);
-			this.m_btnConfirm.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_btnConfirm.Location = new System.Drawing.Point(296, 399);
+			this.m_btnConfirm.Margin = new System.Windows.Forms.Padding(4);
 			this.m_btnConfirm.Name = "m_btnConfirm";
 			this.m_btnConfirm.Size = new System.Drawing.Size(107, 38);
 			this.m_btnConfirm.TabIndex = 28;
@@ -295,7 +296,7 @@
 			// 
 			this.label1.AutoSize = true;
 			this.label1.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label1.Location = new System.Drawing.Point(41, 22);
+			this.label1.Location = new System.Drawing.Point(25, 20);
 			this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(95, 22);
@@ -314,7 +315,7 @@
 			this.m_panelRectangle.Controls.Add(this.label2);
 			this.m_panelRectangle.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_panelRectangle.Location = new System.Drawing.Point(29, 68);
-			this.m_panelRectangle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_panelRectangle.Margin = new System.Windows.Forms.Padding(4);
 			this.m_panelRectangle.Name = "m_panelRectangle";
 			this.m_panelRectangle.Size = new System.Drawing.Size(347, 325);
 			this.m_panelRectangle.TabIndex = 26;
@@ -323,7 +324,7 @@
 			// m_txbRecRotatedAngle
 			// 
 			this.m_txbRecRotatedAngle.Location = new System.Drawing.Point(187, 225);
-			this.m_txbRecRotatedAngle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbRecRotatedAngle.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbRecRotatedAngle.Name = "m_txbRecRotatedAngle";
 			this.m_txbRecRotatedAngle.Size = new System.Drawing.Size(132, 26);
 			this.m_txbRecRotatedAngle.TabIndex = 16;
@@ -333,7 +334,7 @@
 			// m_txbRecCornerRadius
 			// 
 			this.m_txbRecCornerRadius.Location = new System.Drawing.Point(187, 162);
-			this.m_txbRecCornerRadius.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbRecCornerRadius.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbRecCornerRadius.Name = "m_txbRecCornerRadius";
 			this.m_txbRecCornerRadius.Size = new System.Drawing.Size(132, 26);
 			this.m_txbRecCornerRadius.TabIndex = 10;
@@ -343,7 +344,7 @@
 			// m_txbRecWidth
 			// 
 			this.m_txbRecWidth.Location = new System.Drawing.Point(187, 100);
-			this.m_txbRecWidth.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbRecWidth.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbRecWidth.Name = "m_txbRecWidth";
 			this.m_txbRecWidth.Size = new System.Drawing.Size(132, 26);
 			this.m_txbRecWidth.TabIndex = 9;
@@ -353,7 +354,7 @@
 			// m_txbRecLength
 			// 
 			this.m_txbRecLength.Location = new System.Drawing.Point(187, 38);
-			this.m_txbRecLength.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_txbRecLength.Margin = new System.Windows.Forms.Padding(4);
 			this.m_txbRecLength.Name = "m_txbRecLength";
 			this.m_txbRecLength.Size = new System.Drawing.Size(132, 26);
 			this.m_txbRecLength.TabIndex = 8;
@@ -417,10 +418,10 @@
             "正方形",
             "五邊形",
             "六邊形"});
-			this.m_cmbPathType.Location = new System.Drawing.Point(151, 20);
-			this.m_cmbPathType.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_cmbPathType.Location = new System.Drawing.Point(128, 20);
+			this.m_cmbPathType.Margin = new System.Windows.Forms.Padding(4);
 			this.m_cmbPathType.Name = "m_cmbPathType";
-			this.m_cmbPathType.Size = new System.Drawing.Size(197, 26);
+			this.m_cmbPathType.Size = new System.Drawing.Size(165, 26);
 			this.m_cmbPathType.TabIndex = 25;
 			this.m_cmbPathType.SelectedIndexChanged += new System.EventHandler(this.m_cmbPathType_SelectedIndexChanged);
 			// 
@@ -429,7 +430,7 @@
 			this.m_chkCoordReverse.AutoSize = true;
 			this.m_chkCoordReverse.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.m_chkCoordReverse.Location = new System.Drawing.Point(45, 411);
-			this.m_chkCoordReverse.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.m_chkCoordReverse.Margin = new System.Windows.Forms.Padding(4);
 			this.m_chkCoordReverse.Name = "m_chkCoordReverse";
 			this.m_chkCoordReverse.Size = new System.Drawing.Size(132, 26);
 			this.m_chkCoordReverse.TabIndex = 32;
@@ -437,11 +438,22 @@
 			this.m_chkCoordReverse.UseVisualStyleBackColor = true;
 			this.m_chkCoordReverse.CheckedChanged += new System.EventHandler(this.m_chkCoordReverse_CheckedChanged);
 			// 
+			// m_btnAutoRecognize
+			// 
+			this.m_btnAutoRecognize.Location = new System.Drawing.Point(309, 12);
+			this.m_btnAutoRecognize.Name = "m_btnAutoRecognize";
+			this.m_btnAutoRecognize.Size = new System.Drawing.Size(94, 41);
+			this.m_btnAutoRecognize.TabIndex = 33;
+			this.m_btnAutoRecognize.Text = "自動識別";
+			this.m_btnAutoRecognize.UseVisualStyleBackColor = true;
+			this.m_btnAutoRecognize.Click += new System.EventHandler(this.m_btnAutoRecognize_Click);
+			// 
 			// PatternSettingDlg
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(407, 458);
+			this.ClientSize = new System.Drawing.Size(434, 458);
+			this.Controls.Add(this.m_btnAutoRecognize);
 			this.Controls.Add(this.m_chkCoordReverse);
 			this.Controls.Add(this.m_panelCircle);
 			this.Controls.Add(this.m_panelRunway);
@@ -452,7 +464,7 @@
 			this.Controls.Add(this.m_cmbPathType);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Location = new System.Drawing.Point(22, 54);
-			this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "PatternSettingDlg";
 			this.Text = "設定圖元";
 			this.m_panelCircle.ResumeLayout(false);
@@ -502,5 +514,6 @@
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.ComboBox m_cmbPathType;
 		private System.Windows.Forms.CheckBox m_chkCoordReverse;
+		private System.Windows.Forms.Button m_btnAutoRecognize;
 	}
 }

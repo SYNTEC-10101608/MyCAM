@@ -8,6 +8,7 @@ using OCC.gp;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Editor
 {
@@ -56,6 +57,7 @@ namespace MyCAM.Editor
 			base.Start();
 			IStdPatternGeomData standardPatternGeomData = ( m_GeomData is IStdPatternGeomData ) ? (IStdPatternGeomData)m_GeomData.Clone() : null;
 			m_Dlg = new PatternSettingDlg( standardPatternGeomData );
+			m_Dlg.AutoRecognizeAction = OnAutoRecognize;
 			m_Dlg.Confirm = ConfirmPatternSetting;
 			m_Dlg.Preview = PreviewPatternSetting;
 			m_Dlg.Cancel = CancelPatternSetting;
@@ -70,6 +72,7 @@ namespace MyCAM.Editor
 			}
 			RemoveTrihedron();
 			if( m_Dlg != null ) {
+				m_Dlg.AutoRecognizeAction = null;
 				m_Dlg.Preview = null;
 				m_Dlg.Confirm = null;
 				m_Dlg.Cancel = null;
@@ -381,6 +384,109 @@ namespace MyCAM.Editor
 				case PathType.Contour:
 				default:
 					return contourPathObject;
+			}
+		}
+
+		void OnAutoRecognize()
+		{
+			if( !TryBuildRecognizedGeomDataMap(
+				out Dictionary<string, IStdPatternGeomData> geomDataMap ) ) {
+				return;
+			}
+
+			foreach( var item in geomDataMap ) {
+				ProcessSinglePath( item.Key, item.Value );
+			}
+
+			m_Viewer.UpdateView();
+
+			foreach( var typeGroup in geomDataMap
+				.GroupBy( item => item.Value.PathType ) ) {
+				List<string> pathIDList = typeGroup
+					.Select( item => item.Key )
+					.ToList();
+
+				PropertyChanged?.Invoke( typeGroup.Key, pathIDList );
+			}
+
+			m_IsConfirmed = true;
+			End();
+		}
+
+		bool TryBuildRecognizedGeomDataMap( out Dictionary<string, IStdPatternGeomData> geomDataMap )
+		{
+			geomDataMap = new Dictionary<string, IStdPatternGeomData>();
+
+			foreach( string pathID in m_szPathIDList ) {
+				if( !DataGettingHelper.GetPathObject( pathID, out PathObject pathObject ) ||
+					!GetContourPathObject( pathObject, out ContourPathObject contourPathObject ) ||
+					contourPathObject?.GeomData == null ||
+					contourPathObject.ContourCache == null ) {
+					continue;
+				}
+
+				ContourCache contourCache = contourPathObject.ContourCache;
+
+				if( !PatternRecognizeHelper.TryAnalyzeShape( contourCache.MainPathPointList, contourCache.RefCoord,
+					out PatternRecognizeHelper.ShapeRecognitionResult result ) ||
+					result == null ) {
+					continue;
+				}
+
+				if( !TryCreateStdPatternGeomData( result, contourPathObject.GeomData.RefCenterDir, out IStdPatternGeomData geomData ) ) {
+					continue;
+				}
+
+				geomDataMap.Add( pathID, geomData );
+			}
+
+			return geomDataMap.Count > 0;
+		}
+
+		bool TryCreateStdPatternGeomData( PatternRecognizeHelper.ShapeRecognitionResult result, gp_Ax1 refCenterDir, out IStdPatternGeomData geomData )
+		{
+			geomData = null;
+			const bool isCoordinateReversed = false;
+
+			switch( result.PathType ) {
+				case PathType.Circle:
+					if( result.Radius <= 0 ) {
+						return false;
+					}
+					geomData = new CircleGeomData( refCenterDir, result.Radius * 2.0, result.RotatedAngle_deg, isCoordinateReversed );
+					return true;
+
+				case PathType.Rectangle:
+					if( result.Width <= 0 || result.Length <= 0 || result.CornerRadius < 0 ) {
+						return false;
+					}
+					geomData = new RectangleGeomData( refCenterDir, result.Width, result.Length,
+						result.CornerRadius, result.RotatedAngle_deg, isCoordinateReversed );
+					return true;
+
+				case PathType.Runway:
+					if( result.Width <= 0 || result.Length < result.Width ) {
+						return false;
+					}
+					geomData = new RunwayGeomData( refCenterDir, result.Length, result.Width,
+						result.RotatedAngle_deg, isCoordinateReversed );
+					return true;
+
+				case PathType.Triangle:
+				case PathType.Square:
+				case PathType.Pentagon:
+				case PathType.Hexagon:
+					if( result.Sides < 3 || result.Sides > 6 ||
+						result.SideLength <= 0 || result.CornerRadius < 0 ) {
+						return false;
+					}
+
+					geomData = new PolygonGeomData( refCenterDir, result.Sides, result.SideLength,
+						result.CornerRadius, result.RotatedAngle_deg, isCoordinateReversed );
+					return true;
+
+				default:
+					return false;
 			}
 		}
 

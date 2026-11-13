@@ -1,4 +1,4 @@
-﻿using MyCAM.Helper.CAM;
+﻿using MyCAM.Helper;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
