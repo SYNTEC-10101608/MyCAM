@@ -6,6 +6,7 @@ using OCC.gp;
 using OCC.Quantity;
 using OCCViewer;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -46,16 +47,20 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Show( bool bUpdate = false )
 		{
+			if( m_IsPauseRefreshAndHide ) {
+				return;
+			}
+			Remove();
 			Show( m_DataManager.PathIDList, bUpdate );
 		}
 
-		public void Show( List<string> pathIDList, bool bUpdate = false )
+		public void Show( IReadOnlyList<string> pathIDList, bool bUpdate = false )
 		{
 			// paused, do not rebuild or display
 			if( m_IsPauseRefreshAndHide ) {
 				return;
 			}
-			Remove( pathIDList );
+			Remove( pathIDList, bUpdate );
 			if( !m_IsShow ) {
 				if( bUpdate ) {
 					UpdateView();
@@ -72,10 +77,15 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Remove( bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList, bUpdate );
+			RemoveLines( m_LeadInAISDict, m_LeadInAISDict.Keys.ToList() );
+			RemoveLines( m_LeadOutAISDict, m_LeadOutAISDict.Keys.ToList() );
+			RemoveLines( m_OverCutAISDict, m_OverCutAISDict.Keys.ToList() );
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
-		public void Remove( List<string> pathIDList, bool bUpdate = false )
+		public void Remove( IReadOnlyList<string> pathIDList, bool bUpdate = false )
 		{
 			RemoveLeadInLine( pathIDList );
 			RemoveLeadOutLine( pathIDList );
@@ -125,33 +135,34 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		void ShowLeadInLine( List<string> pathIDList )
+		void ShowLeadInLine( IReadOnlyList<string> pathIDList )
 		{
 			ShowLeadLine( pathIDList, m_LeadInAISDict, GetLeadInPointList );
 		}
 
-		void ShowLeadOutLine( List<string> pathIDList )
+		void ShowLeadOutLine( IReadOnlyList<string> pathIDList )
 		{
 			ShowLeadLine( pathIDList, m_LeadOutAISDict, GetLeadOutPointList );
 		}
 
-		void RemoveLeadInLine( List<string> pathIDList )
+		void RemoveLeadInLine( IReadOnlyList<string> pathIDList )
 		{
 			RemoveLines( m_LeadInAISDict, pathIDList );
 		}
 
-		void RemoveLeadOutLine( List<string> pathIDList )
+		void RemoveLeadOutLine( IReadOnlyList<string> pathIDList )
 		{
 			RemoveLines( m_LeadOutAISDict, pathIDList );
 		}
 
-		void ShowLeadLine( List<string> pathIDList, Dictionary<string, List<AIS_Line>> lineDict, System.Func<string, IReadOnlyList<IProcessPoint>> getPointListFunc )
+		void ShowLeadLine( IReadOnlyList<string> pathIDList, Dictionary<string, List<AIS_Line>> lineDict, System.Func<string, IReadOnlyList<IProcessPoint>> getPointListFunc )
 		{
 			foreach( string szPathID in pathIDList ) {
 				LeadData leadData = GetLeadData( szPathID );
-				if( leadData == null || ( leadData.LeadIn.StraightLength == 0 && leadData.LeadIn.ArcLength == 0 ) ) {
+				if( leadData == null ) {
 					continue;
 				}
+
 				IReadOnlyList<IProcessPoint> pointList = getPointListFunc( szPathID );
 				if( pointList == null || pointList.Count == 0 ) {
 					continue;
@@ -170,7 +181,7 @@ namespace MyCAM.Editor.Renderer
 			DisplayLines( lineDict, pathIDList );
 		}
 
-		void ShowOverCut( List<string> pathIDList )
+		void ShowOverCut( IReadOnlyList<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
 				double overCutLength = GetOverCutLength( szPathID );
@@ -195,12 +206,12 @@ namespace MyCAM.Editor.Renderer
 			DisplayLines( m_OverCutAISDict, pathIDList );
 		}
 
-		void RemoveOverCut( List<string> pathIDList )
+		void RemoveOverCut( IReadOnlyList<string> pathIDList )
 		{
 			RemoveLines( m_OverCutAISDict, pathIDList );
 		}
 
-		void DisplayLines( Dictionary<string, List<AIS_Line>> lineDict, List<string> pathIDList )
+		void DisplayLines( Dictionary<string, List<AIS_Line>> lineDict, IReadOnlyList<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
 				if( lineDict.ContainsKey( szPathID ) ) {
@@ -213,7 +224,7 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		void RemoveLines( Dictionary<string, List<AIS_Line>> lineDict, List<string> pathIDList )
+		void RemoveLines( Dictionary<string, List<AIS_Line>> lineDict, IReadOnlyList<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
 				if( lineDict.ContainsKey( szPathID ) ) {

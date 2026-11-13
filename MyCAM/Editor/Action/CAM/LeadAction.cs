@@ -53,7 +53,7 @@ namespace MyCAM.Editor
 			}
 			m_LeadDialog.Preview = PreviewLeadData;
 			m_LeadDialog.Confirm = ConfirmLeadData;
-			m_LeadDialog.Cancel  = CancelLeadData;
+			m_LeadDialog.Cancel = CancelLeadData;
 			PropertyChanged?.Invoke( m_PathIDList );
 			m_LeadDialog.Show( MyApp.MainForm );
 		}
@@ -66,7 +66,7 @@ namespace MyCAM.Editor
 			if( m_LeadDialog != null ) {
 				m_LeadDialog.Preview = null;
 				m_LeadDialog.Confirm = null;
-				m_LeadDialog.Cancel  = null;
+				m_LeadDialog.Cancel = null;
 				m_LeadDialog.Close();
 				m_LeadDialog = null;
 			}

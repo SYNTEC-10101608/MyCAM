@@ -5,6 +5,7 @@ using OCC.AIS;
 using OCC.gp;
 using OCCViewer;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -44,16 +45,22 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Show( bool bUpdate = false )
 		{
+			if( m_IsPauseRefreshAndHide ) {
+				return;
+			}
+			Remove();
 			Show( m_DataManager.PathIDList, bUpdate );
 		}
 
-		public void Show( List<string> pathIDList, bool bUpdate = false )
+		public void Show( IReadOnlyList<string> pathIDList, bool bUpdate = false )
 		{
+			List<string> detailIDs = m_DataManager.GetEditablePathIDList( pathIDList.ToList() );
+
 			// paused, do not rebuild or display
 			if( m_IsPauseRefreshAndHide ) {
 				return;
 			}
-			Remove( pathIDList );
+			Remove( detailIDs );
 
 			// no need to show
 			if( !m_IsShow ) {
@@ -62,9 +69,9 @@ namespace MyCAM.Editor.Renderer
 				}
 				return;
 			}
-			ShowPathOrientation( pathIDList );
-			ShowLeadInOrientation( pathIDList );
-			ShowLeadOutOrientation( pathIDList );
+			ShowPathOrientation( detailIDs );
+			ShowLeadInOrientation( detailIDs );
+			ShowLeadOutOrientation( detailIDs );
 			if( bUpdate ) {
 				UpdateView();
 			}
@@ -72,14 +79,21 @@ namespace MyCAM.Editor.Renderer
 
 		public override void Remove( bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList, bUpdate );
+			RemoveOrientations( m_OrientationAISDict, m_OrientationAISDict.Keys.ToList() );
+			RemoveOrientations( m_LeadInOrientationAISDict, m_LeadInOrientationAISDict.Keys.ToList() );
+			RemoveOrientations( m_LeadOutOrientationAISDict, m_LeadOutOrientationAISDict.Keys.ToList() );
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
-		public void Remove( List<string> pathIDList, bool bUpdate = false )
+		public void Remove( IReadOnlyList<string> pathIDList, bool bUpdate = false )
 		{
-			RemovePathOrientation( pathIDList );
-			RemoveLeadInOrientation( pathIDList );
-			RemoveLeadOutOrientation( pathIDList );
+			List<string> detailIDs = m_DataManager.GetEditablePathIDList( pathIDList.ToList() ).Union( pathIDList ).ToList();
+
+			RemovePathOrientation( detailIDs );
+			RemoveLeadInOrientation( detailIDs );
+			RemoveLeadOutOrientation( detailIDs );
 			if( bUpdate ) {
 				UpdateView();
 			}
@@ -119,7 +133,7 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		void ShowPathOrientation( List<string> pathIDList )
+		void ShowPathOrientation( IReadOnlyList<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
 				IOrientationPoint firstPoint = GetFirstCAMPoint( szPathID );
@@ -143,33 +157,33 @@ namespace MyCAM.Editor.Renderer
 			DisplayOrientations( m_OrientationAISDict, pathIDList );
 		}
 
-		void RemovePathOrientation( List<string> pathIDList )
+		void RemovePathOrientation( IReadOnlyList<string> pathIDList )
 		{
 			RemoveOrientations( m_OrientationAISDict, pathIDList );
 		}
 
-		void ShowLeadInOrientation( List<string> pathIDList )
+		void ShowLeadInOrientation( IReadOnlyList<string> pathIDList )
 		{
 			ShowLeadOrientation( pathIDList, m_LeadInOrientationAISDict, GetLeadInFirstPoint );
 		}
 
-		void ShowLeadOutOrientation( List<string> pathIDList )
+		void ShowLeadOutOrientation( IReadOnlyList<string> pathIDList )
 		{
 			ShowLeadOrientation( pathIDList, m_LeadOutOrientationAISDict, GetLeadOutLastPoint );
 		}
 
-		void RemoveLeadInOrientation( List<string> pathIDList )
+		void RemoveLeadInOrientation( IReadOnlyList<string> pathIDList )
 		{
 			RemoveOrientations( m_LeadInOrientationAISDict, pathIDList );
 		}
 
-		void RemoveLeadOutOrientation( List<string> pathIDList )
+		void RemoveLeadOutOrientation( IReadOnlyList<string> pathIDList )
 		{
 			RemoveOrientations( m_LeadOutOrientationAISDict, pathIDList );
 		}
 
 		void ShowLeadOrientation(
-			List<string> pathIDList,
+			IReadOnlyList<string> pathIDList,
 			Dictionary<string, AIS_Shape> orientationDict,
 			System.Func<string, IOrientationPoint> getPointFunc )
 		{
@@ -191,7 +205,7 @@ namespace MyCAM.Editor.Renderer
 			DisplayOrientations( orientationDict, pathIDList );
 		}
 
-		void DisplayOrientations( Dictionary<string, AIS_Shape> orientationDict, List<string> pathIDList )
+		void DisplayOrientations( Dictionary<string, AIS_Shape> orientationDict, IReadOnlyList<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
 				if( orientationDict.ContainsKey( szPathID ) ) {
@@ -201,7 +215,7 @@ namespace MyCAM.Editor.Renderer
 			}
 		}
 
-		void RemoveOrientations( Dictionary<string, AIS_Shape> orientationDict, List<string> pathIDList )
+		void RemoveOrientations( Dictionary<string, AIS_Shape> orientationDict, IReadOnlyList<string> pathIDList )
 		{
 			foreach( string szPathID in pathIDList ) {
 				if( orientationDict.ContainsKey( szPathID ) ) {

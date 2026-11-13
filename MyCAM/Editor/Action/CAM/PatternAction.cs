@@ -118,7 +118,7 @@ namespace MyCAM.Editor
 			IStdPatternGeomData stdPatternGeomDataClone = ( standardPatternGeomData != null ) ? (IStdPatternGeomData)standardPatternGeomData.Clone() : null;
 
 			// get path object
-			if( !DataGettingHelper.GetPathObject( szID, out PathObject pathObject ) ) {
+			if( !DataGettingHelper.GetPathObject( szID, out IPathObject pathObject ) ) {
 				return;
 			}
 
@@ -266,7 +266,7 @@ namespace MyCAM.Editor
 			m_TrihedronList.Clear();
 		}
 
-		bool GetContourPathObject( PathObject pathObject, out ContourPathObject contourPathObj )
+		bool GetContourPathObject( IPathObject pathObject, out ContourPathObject contourPathObj )
 		{
 			contourPathObj = null;
 			if( pathObject == null ) {
@@ -418,7 +418,7 @@ namespace MyCAM.Editor
 			geomDataMap = new Dictionary<string, IStdPatternGeomData>();
 
 			foreach( string pathID in m_szPathIDList ) {
-				if( !DataGettingHelper.GetPathObject( pathID, out PathObject pathObject ) ||
+				if( !DataGettingHelper.GetPathObject( pathID, out IPathObject pathObject ) ||
 					!GetContourPathObject( pathObject, out ContourPathObject contourPathObject ) ||
 					contourPathObject?.GeomData == null ||
 					contourPathObject.ContourCache == null ) {

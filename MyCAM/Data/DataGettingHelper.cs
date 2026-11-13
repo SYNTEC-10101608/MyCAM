@@ -1,5 +1,6 @@
 ﻿using MyCAM.PathCache;
 using System;
+using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -18,7 +19,7 @@ namespace MyCAM.Data
 			m_DataManager = dataManager;
 		}
 
-		public static bool GetPathObject( string szPathID, out PathObject pathObject )
+		public static bool GetPathObject( string szPathID, out IPathObject pathObject )
 		{
 			pathObject = null;
 
@@ -28,32 +29,20 @@ namespace MyCAM.Data
 			}
 
 			// check if the object exists and is a PathObject
-			if( !m_DataManager.PathIDList.Contains( szPathID )
-				|| !m_DataManager.ObjectMap.ContainsKey( szPathID )
+			if( !m_DataManager.ObjectMap.ContainsKey( szPathID )
 				|| m_DataManager.ObjectMap[ szPathID ] == null
 				|| !( m_DataManager.ObjectMap[ szPathID ].ObjectType == ObjectType.Path ) ) {
 				return false;
 			}
 
-			pathObject = m_DataManager.ObjectMap[ szPathID ] as PathObject;
+			pathObject = m_DataManager.ObjectMap[ szPathID ] as IPathObject;
 			return pathObject != null;
-		}
-
-		// the machining order of the path, this is tree view node number shows ( 0 based )
-		public static bool GetPathOrderIndex( string szPathID, out int nOrderIndex )
-		{
-			nOrderIndex = -1;
-			if( string.IsNullOrEmpty( szPathID ) || m_DataManager?.PathIDList == null ) {
-				return false;
-			}
-			nOrderIndex = m_DataManager.PathIDList.IndexOf( szPathID );
-			return nOrderIndex != -1;
 		}
 
 		public static bool GetPathType( string szPathID, out PathType pathType )
 		{
 			pathType = PathType.Contour;
-			if( !GetPathObject( szPathID, out PathObject pathObject ) ) {
+			if( !GetPathObject( szPathID, out IPathObject pathObject ) ) {
 				return false;
 			}
 			pathType = pathObject.PathType;
@@ -63,7 +52,7 @@ namespace MyCAM.Data
 		public static bool GetGeomDataByID( string pathID, out IGeomData geomData )
 		{
 			geomData = null;
-			if( !GetPathObject( pathID, out PathObject pathObject ) ) {
+			if( !GetPathObject( pathID, out IPathObject pathObject ) ) {
 				return false;
 			}
 			if( pathObject.PathType == PathType.Contour ) {
@@ -79,21 +68,26 @@ namespace MyCAM.Data
 		public static bool GetCraftDataByID( string szPathID, out CraftData craftData )
 		{
 			craftData = null;
-			if( !GetPathObject( szPathID, out PathObject pathObject ) ) {
+			if( !GetPathObject( szPathID, out IPathObject pathObject ) ) {
 				return false;
 			}
+
 			craftData = pathObject.CraftData;
+
 			return craftData != null;
 		}
 
 		public static bool GetPathCacheByID( string szPathID, out IPathCache contourCache )
 		{
 			contourCache = null;
-			if( !GetPathObject( szPathID, out PathObject pathObject ) ) {
+			if( !GetPathObject( szPathID, out IPathObject pathObject ) ) {
 				return false;
 			}
 			if( pathObject.PathType == PathType.Contour ) {
 				contourCache = ( pathObject as ContourPathObject )?.ContourCache;
+			}
+			else if( pathObject.PathType == PathType.FlyCutGroup ) {
+				contourCache = ( pathObject as FlyCutGroupPathObject )?.FlyCutCache;
 			}
 			else if( IsStdPattern( pathObject.PathType ) ) {
 				contourCache = ( pathObject as StdPatternObjectBase )?.StdPatternCache;
@@ -104,7 +98,7 @@ namespace MyCAM.Data
 		public static bool GetContourCacheByID( string szPathID, out ContourCache contourCache )
 		{
 			contourCache = null;
-			if( !GetPathObject( szPathID, out PathObject pathObject ) ) {
+			if( !GetPathObject( szPathID, out IPathObject pathObject ) ) {
 				return false;
 			}
 			if( pathObject.PathType != PathType.Contour ) {
@@ -117,7 +111,7 @@ namespace MyCAM.Data
 		public static bool GetStdPatternCacheByID( string szPathID, out IStdPatternCache stdPatternCache )
 		{
 			stdPatternCache = null;
-			if( !GetPathObject( szPathID, out PathObject pathObject ) ) {
+			if( !GetPathObject( szPathID, out IPathObject pathObject ) ) {
 				return false;
 			}
 			if( !IsStdPattern( pathObject.PathType ) ) {

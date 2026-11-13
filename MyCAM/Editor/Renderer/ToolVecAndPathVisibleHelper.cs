@@ -26,6 +26,12 @@ namespace MyCAM.Editor.Renderer
 				}
 				return ( contourCache as ContourCache )?.MainPathPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
 			}
+			else if( pathType == PathType.FlyCutGroup ) {
+				if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache contourCache ) ) {
+					return new List<gp_Pnt>();
+				}
+				return ( contourCache as FlyCutGroupPathCache )?.MainPathPointList.Select( p => p.Point ).ToList() ?? new List<gp_Pnt>();
+			}
 			else if( DataGettingHelper.IsStdPattern( pathType ) ) {
 				if( !DataGettingHelper.GetStdPatternCacheByID( szPathID, out IStdPatternCache stdPatternCache ) ) {
 					return new List<gp_Pnt>();
@@ -90,7 +96,7 @@ namespace MyCAM.Editor.Renderer
 					AIS_Line toolVecAIS = CreateVecAIS( point.Point, point.ToolVec );
 					// first and last points are always highlighted red
 					bool isModifiedStartEndPnt = i == 0 && craftData.StartPntToolVecData.StartPnt.AngleData != null || i == toolVecPointList.Count - 1 && craftData.StartPntToolVecData.EndPnt.AngleData != null;
-					if(( isModifiedStartEndPnt && isStartEndWithSpecialColor) || point.IsToolVecModPoint ) {
+					if( ( isModifiedStartEndPnt && isStartEndWithSpecialColor ) || point.IsToolVecModPoint ) {
 						toolVecAIS.SetColor( new Quantity_Color( Quantity_NameOfColor.Quantity_NOC_RED ) );
 						toolVecAIS.SetWidth( 4 );
 					}
@@ -118,7 +124,7 @@ namespace MyCAM.Editor.Renderer
 				if( trsf != null ) {
 					toolVecAIS.SetLocalTransformation( trsf );
 				}
-				toolVecAISList.Add( toolVecAIS );			
+				toolVecAISList.Add( toolVecAIS );
 			}
 			return result;
 		}

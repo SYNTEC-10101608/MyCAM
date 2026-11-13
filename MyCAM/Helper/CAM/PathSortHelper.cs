@@ -1,15 +1,201 @@
 using MyCAM.Data;
 using MyCAM.PathCache;
+using OCC.Geom;
 using OCC.gp;
+using OCC.ShapeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 
 namespace MyCAM.Helper
 {
 	// pure sorting algorithms for path ordering, no UI dependency
 	internal static class PathSortHelper
 	{
+		const double GEOMETRY_TOLERANCE = 1e-6;
+
+		public static List<gp_Pnt2d> ConvertCylinderToUV( List<gp_Pnt> points, gp_Ax3 cylinderCoordinate, double radius,
+			out double usedSeamAngle_rad, double? seamAngle_rad = null )
+		{
+			double fullTurn = 2 * Math.PI;
+			Func<double, double> normalize = angle => ( angle % fullTurn + fullTurn ) % fullTurn;
+
+			Geom_CylindricalSurface surface = new Geom_CylindricalSurface( cylinderCoordinate, radius );
+			ShapeAnalysis_Surface analysis = new ShapeAnalysis_Surface( surface );
+			List<gp_Pnt2d> uvPoints = points.Select( point => analysis.ValueOfUV( point, GEOMETRY_TOLERANCE ) ).ToList();
+
+			double seam = normalize( seamAngle_rad ?? 0 );
+			if( !seamAngle_rad.HasValue && uvPoints.Count > 0 ) {
+				List<double> angles = uvPoints.Select( point => normalize( point.X() ) ).OrderBy( angle => angle ).ToList();
+				double largestGap = -1;
+				for( int index = 0; index < angles.Count; ++index ) {
+					double next = index + 1 < angles.Count
+						? angles[ index + 1 ] : angles[ 0 ] + fullTurn;
+					double gap = next - angles[ index ];
+					if( gap > largestGap ) {
+						largestGap = gap;
+						seam = normalize( angles[ index ] + gap / 2 );
+					}
+				}
+			}
+			usedSeamAngle_rad = seam;
+			return uvPoints.Select( point => new gp_Pnt2d( normalize( point.X() - seam ), point.Y() ) ).ToList();
+		}
+
+
+		#region FlyCut
+
+		public static List<string> SortFlyCutOnPlane( List<string> pathIDList, gp_Ax3 planeCoordinate,
+			bool leftOrRight, bool topOrBottom, bool verticalOrHorizontal, double bandwidth_mm,
+			out Dictionary<string, int> groupIndexByPathID )
+		{
+			groupIndexByPathID = new Dictionary<string, int>();
+			if( pathIDList == null || pathIDList.Count < 2 || planeCoordinate == null
+				|| pathIDList.Distinct().Count() != pathIDList.Count ) {
+				return new List<string>();
+			}
+
+			// Project contour centers onto the plane's horizontal and vertical axes
+			gp_Vec planeU = new gp_Vec( planeCoordinate.XDirection() );
+			gp_Vec planeV = new gp_Vec( planeCoordinate.YDirection() );
+			Dictionary<string, gp_Pnt2d> coordinates = new Dictionary<string, gp_Pnt2d>();
+			foreach( string pathID in pathIDList ) {
+				if( !DataGettingHelper.GetPathCacheByID( pathID, out IPathCache cache ) ) {
+					return new List<string>();
+				}
+				gp_Pnt center = cache.ComputeRefCenterDir?.Location();
+				if( center == null ) {
+					return new List<string>();
+				}
+				gp_Vec offset = new gp_Vec( planeCoordinate.Location(), center );
+				double horizontal = offset.Dot( planeU );
+				double vertical = offset.Dot( planeV );
+				if( double.IsNaN( horizontal ) || double.IsInfinity( horizontal )
+					|| double.IsNaN( vertical ) || double.IsInfinity( vertical ) ) {
+					return new List<string>();
+				}
+				coordinates.Add( pathID, new gp_Pnt2d( horizontal, vertical ) );
+			}
+
+			// Choose the grouping axis and the initial snake direction
+			Func<string, double> groupKey = pathID => verticalOrHorizontal
+				? coordinates[ pathID ].X() : coordinates[ pathID ].Y();
+			Func<string, double> snakeKey = pathID => verticalOrHorizontal
+				? coordinates[ pathID ].Y() : coordinates[ pathID ].X();
+			bool groupDescending = verticalOrHorizontal ? !leftOrRight : topOrBottom;
+			bool firstSnakeDescending = verticalOrHorizontal ? topOrBottom : !leftOrRight;
+
+			// Use a fixed group anchor to prevent chained tolerance expansion
+			List<string> groupedOrder = pathIDList.OrderBy( groupKey ).ToList();
+			List<List<string>> groups = new List<List<string>>();
+			double anchor = groupKey( groupedOrder[ 0 ] );
+			foreach( string pathID in groupedOrder ) {
+				double groupValue = groupKey( pathID );
+				if( groups.Count == 0 || ( groupValue - anchor ) > bandwidth_mm ) {
+					groups.Add( new List<string>() );
+					anchor = groupValue;
+				}
+				groups.Last().Add( pathID );
+			}
+			if( groupDescending ) {
+				groups.Reverse();
+			}
+
+			// Alternate the snake direction and record each path's visit-group index
+			List<string> result = new List<string>();
+			for( int i = 0; i < groups.Count; ++i ) {
+				bool descending = ( i % 2 ) == 0 ? firstSnakeDescending : !firstSnakeDescending;
+				IOrderedEnumerable<string> ordered = descending
+					? groups[ i ].OrderByDescending( snakeKey ) : groups[ i ].OrderBy( snakeKey );
+				ordered = groupDescending ? ordered.ThenByDescending( groupKey ) : ordered.ThenBy( groupKey );
+				foreach( string pathID in ordered.ThenBy( pathID => pathID, StringComparer.Ordinal ) ) {
+					groupIndexByPathID.Add( pathID, i );
+					result.Add( pathID );
+				}
+			}
+			return result;
+		}
+
+		// groupWidth input: degrees vertically, mm horizontally.
+		public static List<string> SortFlyCut( List<string> pathIDList, gp_Dir axisDir, gp_Pnt axisLocation,
+			bool leftOrRight, bool topOrBottom, bool verticalOrHorizontal, double groupWidth,
+			out Dictionary<string, int> groupIndexByPathID )
+		{
+			groupIndexByPathID = new Dictionary<string, int>();
+			if( pathIDList == null || pathIDList.Count < 2 || axisDir == null || axisLocation == null
+				|| pathIDList.Distinct().Count() != pathIDList.Count ) {
+				return new List<string>();
+			}
+
+			// Obtain each contour's axial position and circumferential angle
+			List<CylinderPathInfo> infos = BuildCylinderPathInfoList( pathIDList, axisDir, axisLocation );
+			if( infos.Count != pathIDList.Count ) {
+				return new List<string>();
+			}
+
+			// Unroll at the largest angular gap so nearby paths do not straddle the seam
+			List<CylinderPathInfo> angular = infos.OrderBy( info => info.Rotation ).ToList();
+
+			double fullTurn = 2 * Math.PI;
+			double largestGap = -1;
+			double seam = 0;
+
+			for( int i = 0; i < angular.Count; ++i ) {
+				double next = i + 1 < angular.Count
+					? angular[ i + 1 ].Rotation : angular[ 0 ].Rotation + fullTurn;
+				double gap = next - angular[ i ].Rotation;
+				if( gap > largestGap ) {
+					largestGap = gap;
+					seam = ( angular[ i ].Rotation + gap / 2 ) % fullTurn;
+				}
+			}
+			infos = infos
+				.Select( info => new CylinderPathInfo( info.PathID, info.Extrusion, ( info.Rotation - seam + fullTurn ) % fullTurn ) )
+				.ToList();
+
+			// Choose the grouping axis, traversal directions, and matching tolerance units
+			bool groupByExtrusion = !verticalOrHorizontal;
+			bool groupDescending = groupByExtrusion ? topOrBottom : !leftOrRight;
+			bool firstSnakeDescending = groupByExtrusion ? !leftOrRight : topOrBottom;
+
+			double tolerance = verticalOrHorizontal ? ( groupWidth * Math.PI / 180.0 ) : groupWidth;
+
+			// Use a fixed group anchor to prevent chained tolerance expansion
+			List<CylinderPathInfo> groupedOrder = infos
+				.OrderBy( info => groupByExtrusion ? info.Extrusion : info.Rotation )
+				.ThenBy( info => info.Rotation )
+				.ToList();
+			List<List<CylinderPathInfo>> groups = new List<List<CylinderPathInfo>>();
+			double anchor = groupByExtrusion ? groupedOrder[ 0 ].Extrusion : groupedOrder[ 0 ].Rotation;
+			foreach( CylinderPathInfo info in groupedOrder ) {
+				double groupValue = groupByExtrusion ? info.Extrusion : info.Rotation;
+				if( groups.Count == 0 || ( groupValue - anchor ) > tolerance ) {
+					groups.Add( new List<CylinderPathInfo>() );
+					anchor = groupValue;
+				}
+				groups.Last().Add( info );
+			}
+			if( groupDescending ) {
+				groups.Reverse();
+			}
+
+			// Alternate snake traversal while preserving the within-group floating-point tolerance
+			List<string> result = new List<string>();
+			for( int i = 0; i < groups.Count; ++i ) {
+				bool descending = ( i % 2 ) == 0 ? firstSnakeDescending : !firstSnakeDescending;
+				List<CylinderPathInfo> ordered = OrderGroupBySnakeAxis(
+					groups[ i ], groupByExtrusion, descending, groupDescending );
+				foreach( CylinderPathInfo info in ordered ) {
+					groupIndexByPathID.Add( info.PathID, i );
+					result.Add( info.PathID );
+				}
+			}
+			return result;
+		}
+
+		#endregion
+
 		// greedy nearest neighbor sort
 		public static List<string> SortByShortestPath( List<string> pathIDList, string startPathID )
 		{
@@ -220,7 +406,6 @@ namespace MyCAM.Helper
 				double projY = radialX * refY.X() + radialY * refY.Y() + radialZ * refY.Z();
 				double rotation = 0;
 				double radialLength = Math.Sqrt( projX * projX + projY * projY );
-
 				if( radialLength > RADIAL_EPSILON ) {
 					rotation = Math.Atan2( projY, projX );
 					if( rotation < 0 ) {

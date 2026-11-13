@@ -176,25 +176,22 @@ namespace MyCAM.Editor
 			}
 
 			// insert the selected path after the flag position
-			m_DataManager.PathIDList.RemoveAt( selectedIndex );
+			m_DataManager.PathRemoveAt( selectedIndex );
 			if( selectedIndex <= m_CurrentFlagIndex ) {
-				m_DataManager.PathIDList.Insert( m_CurrentFlagIndex, uniquePathID );
+				m_DataManager.PathInsert( m_CurrentFlagIndex, uniquePathID );
 			}
 			else {
-				m_DataManager.PathIDList.Insert( m_CurrentFlagIndex + 1, uniquePathID );
+				m_DataManager.PathInsert( m_CurrentFlagIndex + 1, uniquePathID );
 			}
 
 			// find index by ID
-			int newIndex = m_DataManager.PathIDList.IndexOf( uniquePathID );
+			int newIndex = m_DataManager.PathIndexOf( uniquePathID );
 			m_CurrentFlagIndex = newIndex;
-
-			// update flag display
-			HighLightFlagPath();
 
 			// re-select the moved path to sync tree view
 			m_SelectPathAction.ClearSelection();
 			m_SelectPathAction.SelectPathByID( uniquePathID );
-			ShowOrderData?.Invoke();
+			RefreshOrderDataAndFlag();
 		}
 
 		void MoveToTop()
@@ -213,16 +210,13 @@ namespace MyCAM.Editor
 			}
 
 			// move the selected path to top of the list
-			m_DataManager.PathIDList.RemoveAt( selectedIndex );
-			m_DataManager.PathIDList.Insert( START_Indx, uniquePathID );
+			m_DataManager.PathRemoveAt( selectedIndex );
+			m_DataManager.PathInsert( START_Indx, uniquePathID );
 			m_CurrentFlagIndex = START_Indx;
-			if( m_OrderMode == OrderMode.Sequential ) {
-				HighLightFlagPath();
-			}
 			// re-select the moved path to sync tree view
 			m_SelectPathAction.ClearSelection();
 			m_SelectPathAction.SelectPathByID( uniquePathID );
-			ShowOrderData?.Invoke();
+			RefreshOrderDataAndFlag();
 		}
 
 		void MoveProcess( bool bUp )
@@ -244,21 +238,29 @@ namespace MyCAM.Editor
 			}
 
 			// move process
-			m_DataManager.PathIDList.RemoveAt( selectIndex );
+			m_DataManager.PathRemoveAt( selectIndex );
 			int newIndex;
 			if( bUp ) {
 				newIndex = selectIndex - 1;
-				m_DataManager.PathIDList.Insert( newIndex, uniquePathID );
+				m_DataManager.PathInsert( newIndex, uniquePathID );
 			}
 			else {
 				newIndex = selectIndex + 1;
-				m_DataManager.PathIDList.Insert( newIndex, uniquePathID );
+				m_DataManager.PathInsert( newIndex, uniquePathID );
 			}
 
 			// re-select the moved path to sync tree view
 			m_SelectPathAction.ClearSelection();
 			m_SelectPathAction.SelectPathByID( uniquePathID );
+			RefreshOrderDataAndFlag();
+		}
+
+		void RefreshOrderDataAndFlag()
+		{
 			ShowOrderData?.Invoke();
+			if( m_OrderMode == OrderMode.Sequential ) {
+				HighLightFlagPath();
+			}
 		}
 
 		bool GetSelectUniqueIDAndOrderIdx( out string uniquePathID, out int pathOrderIdx )
@@ -282,7 +284,7 @@ namespace MyCAM.Editor
 				return false;
 			}
 			uniquePathID = selectedIDs.First();
-			pathOrderIdx = m_DataManager.PathIDList.IndexOf( uniquePathID );
+			pathOrderIdx = m_DataManager.PathIndexOf( uniquePathID );
 			if( pathOrderIdx == -1 ) {
 				return false;
 			}
@@ -302,14 +304,14 @@ namespace MyCAM.Editor
 				return;
 			}
 			// get node idx
-			string nodeID = m_DataManager.GetPathName( m_CurrentFlagIndex );
+			string pathID = m_DataManager.PathIDList[ m_CurrentFlagIndex ];
 
 			// find node by id
-			if( m_ViewManager?.TreeNodeMap == null || !m_ViewManager.TreeNodeMap.ContainsKey( nodeID ) ) {
+			if( m_ViewManager?.TreeNodeMap == null || !m_ViewManager.TreeNodeMap.ContainsKey( pathID ) ) {
 				return;
 			}
 
-			TreeNode node = m_ViewManager.TreeNodeMap[ nodeID ];
+			TreeNode node = m_ViewManager.TreeNodeMap[ pathID ];
 			if( node == null ) {
 				return;
 			}
@@ -336,9 +338,9 @@ namespace MyCAM.Editor
 		int m_CurrentFlagIndex;
 		const int START_Indx = 0;
 
-		const string INVALID_FLAG_POSITION = "[¾Þ§@´£¿ô]ºX¼Ð¦ì¸mµL®Ä";
-		const string NO_PATH_SELECTED = "[¾Þ§@´£¿ô]¥¼¿ï¨ú¥ô¦ó¸ô®|";
-		const string ONLY_SINGLE_PATH_SELECTION = "[¾Þ§@´£¿ô]¥»¥\¯à¶È¤ä´©³æ¸ô®|¿ï¾Ü";
+		const string INVALID_FLAG_POSITION = "[æ“ä½œæé†’]æ——æ¨™ä½ç½®ç„¡æ•ˆ";
+		const string NO_PATH_SELECTED = "[æ“ä½œæé†’]æœªé¸å–ä»»ä½•è·¯å¾‘";
+		const string ONLY_SINGLE_PATH_SELECTION = "[æ“ä½œæé†’]æœ¬åŠŸèƒ½åƒ…æ”¯æ´å–®è·¯å¾‘é¸æ“‡";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ManualOrderAction" );
 	}
 }

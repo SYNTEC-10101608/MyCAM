@@ -84,7 +84,7 @@ namespace MyCAM.Post
 	internal static class ContourPostHelper
 	{
 		public static bool GetPostData( ContourNCPackage currentPathNCPack,
-			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData, TraverseCalculationInfo calculationData,
+			PathEndInfo endInfoOfPreviousPath, EntryAndExitData entryAndExitData, TraverseCalculationInfo traverseCalculationInfo,
 			out PostData pathG54PostData, out PathEndInfo currentPathEndInfo )
 		{
 			// for write NC file
@@ -143,7 +143,7 @@ namespace MyCAM.Post
 			else {
 
 				// traverse from previous path to current path
-				PostTraverseBuilder.CalculateTraverse( endInfoOfPreviousPath, currentPathNCPack, pathG54PostData, calculationData );
+				PostTraverseBuilder.CalculateTraverse( endInfoOfPreviousPath, currentPathNCPack, pathG54PostData, traverseCalculationInfo );
 			}
 
 			// end info of current path

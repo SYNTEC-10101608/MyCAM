@@ -4,6 +4,7 @@ using OCC.TopoDS;
 using OCCTool;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyCAM.Data
 {
@@ -94,7 +95,20 @@ namespace MyCAM.Data
 		}
 	}
 
-	public abstract class PathObject : IObject, ITransformableObject
+	public interface IPathObject : IObject, ITransformableObject
+	{
+		PathType PathType
+		{
+			get;
+		}
+
+		CraftData CraftData
+		{
+			get;
+		}
+	}
+
+	public abstract class PathObject : IPathObject
 	{
 		protected PathObject( string szUID )
 		{
@@ -134,6 +148,61 @@ namespace MyCAM.Data
 		protected CraftData m_CraftData;
 	}
 
+	public abstract class GroupPathObject : IPathObject, IDisposable
+	{
+		protected GroupPathObject( string szUID )
+		{
+			UID = szUID;
+		}
+
+		public string UID
+		{
+			get; private set;
+		}
+
+		public ObjectType ObjectType
+		{
+			get
+			{
+				return ObjectType.Path;
+			}
+		}
+
+		public CraftData CraftData
+		{
+			get
+			{
+				return m_CraftData;
+			}
+		}
+
+		public abstract PathType PathType
+		{
+			get;
+		}
+
+		public void DoTransform( gp_Trsf transform )
+		{
+			foreach( IPathObject pathObject in PathList ) {
+				pathObject.DoTransform( transform );
+			}
+		}
+
+		public abstract void Dispose();
+
+		public IReadOnlyList<string> PathIDList
+		{
+			get
+			{
+				return PathList.Select( path => path.UID ).ToList();
+			}
+		}
+
+		public List<PathObject> PathList;
+
+		protected CraftData m_CraftData;
+	}
+
 	public class PathEdge5D
 	{
 		public PathEdge5D( TopoDS_Edge pathEdge, TopoDS_Face componentFace )
@@ -169,6 +238,7 @@ namespace MyCAM.Data
 		Square = 5,
 		Pentagon = 6,
 		Hexagon = 7,
+		FlyCutGroup = 8,
 	}
 
 	public enum PartRole

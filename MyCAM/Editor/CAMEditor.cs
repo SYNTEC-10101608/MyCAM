@@ -31,12 +31,15 @@ namespace MyCAM.Editor
 			IsToolVecReverseEditable = true;
 			IsFixedToolVecEditable = true;
 			IsTraverseEditable = true;
+			IsFlyCutEditable = true;
 			IsAutoOrderEditable = true;
 			IsPathCompensateEditable = true;
 			IsMicroJointEditable = true;
 			IsExtendedGCodeEditable = true;
 			IsRCornerEditable = true;
 			IsContourEditable = true;
+			IsStandardPatternEditable = true;
+			IsPathEditEditable = true;
 		}
 
 		public bool IsStartPointEditable;
@@ -47,12 +50,15 @@ namespace MyCAM.Editor
 		public bool IsToolVecReverseEditable;
 		public bool IsFixedToolVecEditable;
 		public bool IsTraverseEditable;
+		public bool IsFlyCutEditable;
 		public bool IsAutoOrderEditable;
 		public bool IsPathCompensateEditable;
 		public bool IsMicroJointEditable;
 		public bool IsExtendedGCodeEditable;
 		public bool IsRCornerEditable;
 		public bool IsContourEditable;
+		public bool IsStandardPatternEditable;
+		public bool IsPathEditEditable;
 	}
 
 	internal class CAMEditor : EditorBase
@@ -71,6 +77,7 @@ namespace MyCAM.Editor
 		{
 			m_DataManager.PathAdded += OnPathAdded;
 			m_DataManager.NeedOptimizedIK += OptimizeIKContinuityData;
+			m_DataManager.PathRemoved += OnPathRemoved;
 
 			// default action is select object action
 			m_DefaultAction = new SelectPathAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager );
@@ -162,7 +169,9 @@ namespace MyCAM.Editor
 
 		public void StartThreePointCalibration( Form owner, params Control[] editingControls )
 		{
-			if( m_DataManager.PartIDList.Count == 0 ) return;
+			if( m_DataManager.PartIDList.Count == 0 ) {
+				return;
+			}
 			if( m_CurrentAction is CNCThreePointAction current ) {
 				current.Activate();
 				return;
@@ -207,8 +216,7 @@ namespace MyCAM.Editor
 				return;
 			}
 
-			int removeCount = szPathIDList.Count;
-
+			RemovePathCAMData( szPathIDList, false );
 			foreach( var item in szPathIDList ) {
 				string szPathID = item;
 
@@ -219,20 +227,21 @@ namespace MyCAM.Editor
 				m_ViewManager.RemovePath( szPathID );
 			}
 
-			// remove path tree nodes from the end
-			m_ViewManager.RemovePathNodes( removeCount );
+			// remove path tree nodes
+			m_ViewManager.SyncPathTree( m_DataManager.GetPathTree() );
 
 			// clear selection after remove path
 			m_DefaultAction.ClearSelection();
 			OptimizeIKContinuityData();
-			RemovePathCAMData( szPathIDList );
+			ShowAllCAMData();
 		}
 
 		#region Set CAM
 
 		public void OptimizeIKContinuityData()
 		{
-			List<string> pathIDList = m_DataManager.PathIDList;
+			List<string> pathIDList = m_DataManager.PathIDList.ToList();
+
 			if( pathIDList.Count == 0 ) {
 				return;
 			}
@@ -240,27 +249,49 @@ namespace MyCAM.Editor
 			double prevMaster_rad = 0;
 			double prevSlave_rad = 0;
 
+			List<string> nonProcessPathList = new List<string>();
+			List<string> processPathList = new List<string>();
+
 			foreach( string szPathID in pathIDList ) {
 				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
 				if( craftData.ProcessPath == false ) {
-					craftData.InitMaster_rad = 0;
-					craftData.InitSlave_rad = 0;
+					nonProcessPathList.AddRange( m_DataManager.GetEditablePathIDList( new List<string> { szPathID } ) );
 				}
 				else {
-					// write previous path end MS as initial value for this path's IK solve
-					craftData.InitMaster_rad = prevMaster_rad;
-					craftData.InitSlave_rad = prevSlave_rad;
+					processPathList.AddRange( m_DataManager.GetEditablePathIDList( new List<string> { szPathID } ) );
+				}
+			}
 
-					// trigger cache rebuild
-					craftData.CAMFactorChanged?.Invoke();
+			foreach( string szPathID in nonProcessPathList ) {
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+					continue;
+				}
 
-					// read this path's end MS for next path
-					if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
-						prevMaster_rad = endMaster_rad;
-						prevSlave_rad = endSlave_rad;
-					}
+				craftData.InitMaster_rad = 0;
+				craftData.InitSlave_rad = 0;
+
+				// trigger cache rebuild
+				craftData.CAMFactorChanged?.Invoke();
+			}
+
+			foreach( string szPathID in processPathList ) {
+				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
+					continue;
+				}
+
+				// write previous path end MS as initial value for this path's IK solve
+				craftData.InitMaster_rad = prevMaster_rad;
+				craftData.InitSlave_rad = prevSlave_rad;
+
+				// trigger cache rebuild
+				craftData.CAMFactorChanged?.Invoke();
+
+				// read this path's end MS for next path
+				if( CacheHelper.GetMainPathEndMS( szPathID, out double endMaster_rad, out double endSlave_rad ) ) {
+					prevMaster_rad = endMaster_rad;
+					prevSlave_rad = endSlave_rad;
 				}
 			}
 		}
@@ -447,7 +478,10 @@ namespace MyCAM.Editor
 			if( !ValidateBeforeOneShotEdit( out List<string> szPathIDList, true ) ) {
 				return;
 			}
-			foreach( string szPathID in szPathIDList ) {
+
+			List<string> editablePathIDs = m_DataManager.GetEditablePathIDList( szPathIDList );
+
+			foreach( string szPathID in editablePathIDs ) {
 				if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 					continue;
 				}
@@ -491,6 +525,35 @@ namespace MyCAM.Editor
 			}
 			TraverseAction action = new TraverseAction( m_DataManager, szPathIDList, m_Viewer );
 			action.PropertyChanged += ShowCAMData;
+			StartEditAction( action );
+		}
+
+		public void SetFlyCut()
+		{
+			// action edit, multi edit supported
+			if( IsSameAction( EditActionType.FlyCut ) ) {
+				m_CurrentAction.End();
+				return;
+			}
+			if( !ValidateBeforeActionEdit( out List<string> szPathIDList, true ) ) {
+				return;
+			}
+			FlyCutAction action = new FlyCutAction( m_DataManager, m_Viewer, m_TreeView, m_ViewManager, szPathIDList, m_DefaultAction as SelectPathAction );
+			action.PropertyChanged += ShowCAMData;
+			action.SortCompleted += () =>
+			{
+				// optimize IK continuity after sorting
+				DoOptimizeIKContinuity();
+
+				// reset select to first path after sort, to avoid confusion, and also trigger select related data refresh
+				if( m_DefaultAction is SelectPathAction selectAction ) {
+					selectAction.ClearSelection();
+					selectAction.SelectPathByID( m_DataManager.PathIDList.FirstOrDefault() );
+				}
+				ShowAllCAMData();
+			};
+
+
 			StartEditAction( action );
 		}
 
@@ -706,9 +769,8 @@ namespace MyCAM.Editor
 			AutoSortPathAction action = new AutoSortPathAction( m_DataManager, m_DefaultAction as SelectPathAction );
 			action.SortCompleted += ( newPathIDList ) =>
 			{
-				// apply new order
-				m_DataManager.PathIDList.Clear();
-				m_DataManager.PathIDList.AddRange( newPathIDList );
+				//apply new order
+				m_DataManager.SetSortedPathIDList( newPathIDList );
 
 				// optimize IK continuity after sorting
 				DoOptimizeIKContinuity();
@@ -816,24 +878,21 @@ namespace MyCAM.Editor
 		// path added
 		void OnPathAdded( List<string> newPathIDs )
 		{
-			foreach( string szID in newPathIDs ) {
-				if( string.IsNullOrEmpty( szID ) ) {
-					continue;
-				}
-
-				// add a new node to the tree view
-				int pathOrderIndex = m_DataManager.PathIDList.IndexOf( szID );
-				if( pathOrderIndex == -1 ) {
-					continue;
-				}
-				string nodeID = m_DataManager.GetPathName( pathOrderIndex );
-				m_ViewManager.AddPathNode( nodeID, szID );
-			}
+			m_ViewManager.SyncPathTree( m_DataManager.GetPathTree() );
 
 			// update tree view and viewer
 			m_ViewManager.PathNode.ExpandAll();
 			ShowAllCAMData();
 			m_Viewer.UpdateView();
+		}
+
+		void OnPathRemoved( List<string> newPathIDs )
+		{
+			m_ViewManager.SyncPathTree( m_DataManager.GetPathTree() );
+
+			// clear selection after remove path
+			m_DefaultAction.ClearSelection();
+			RemovePathCAMData( newPathIDs );
 		}
 
 		// selection changed
@@ -844,6 +903,21 @@ namespace MyCAM.Editor
 			}
 			List<string> szPathIDList = GetSelectedIDList();
 			EditableInfo editableInfo = new EditableInfo();
+			if( szPathIDList.Any( id => DataGettingHelper.GetPathType( id, out PathType type ) && type == PathType.FlyCutGroup ) ) {
+				editableInfo.IsStartPointEditable = false;
+				editableInfo.IsPathReverseEditable = false;
+				editableInfo.IsOverCutEditable = false;
+				editableInfo.IsLeadLineEditable = !szPathIDList.Any( id =>
+					DataGettingHelper.GetGeomDataByID( id, out IGeomData geomData ) && !geomData.IsClosed );
+				editableInfo.IsToolVecEditable = false;
+				editableInfo.IsMicroJointEditable = false;
+				editableInfo.IsExtendedGCodeEditable = false;
+				editableInfo.IsRCornerEditable = false;
+				editableInfo.IsContourEditable = false;
+				editableInfo.IsStandardPatternEditable = false;
+				PathPropertyChanged?.Invoke( editableInfo );
+				return;
+			}
 
 			// no multi edit: start point, tool vec, sort
 			if( szPathIDList.Count > 1 ) {
@@ -900,7 +974,8 @@ namespace MyCAM.Editor
 
 		void DoOptimizeIKContinuity()
 		{
-			if( m_DataManager.PathIDList.Count == 0 ) {
+			IReadOnlyList<string> IDList = m_DataManager.PathIDList;
+			if( IDList.Count == 0 ) {
 				return;
 			}
 			OptimizeIKContinuityData();
@@ -913,23 +988,36 @@ namespace MyCAM.Editor
 		void ShowAllCAMData( bool needUpdateTreeColor = false )
 		{
 			// take all path IDs
-			List<string> pathIDList = m_DataManager.PathIDList;
-			ShowCAMData( pathIDList );
+			List<string> pathIDList = m_DataManager.PathIDList.ToList();
+			m_ViewManager.SyncPaths( pathIDList );
+			m_ViewManager.SyncPathTree( m_DataManager.GetPathTree() );
+			m_ViewManager.UpdatePaths( pathIDList );
+			m_MainPathRenderer.Show();
+			m_MarkerRenderer.Show();
+			m_ToolVecRenderer.Show();
+			m_OrientationRenderer.Show();
+			m_IndexRenderer.Show();
+			m_CraftRenderer.Show();
+			m_TraverseRenderer.Show();
 			if( needUpdateTreeColor ) {
 				UpdatePathTreeNodeColors( pathIDList );
 			}
+			m_Viewer.UpdateView();
+
+			m_ViewManager.PathNode.ExpandAll();
 		}
 
-		void ShowCAMData( List<string> pathIDList )
+		void ShowCAMData( IReadOnlyList<string> pathIDList )
 		{
 			m_ViewManager.UpdatePaths( pathIDList );
+
 			m_MainPathRenderer.Show( pathIDList );
 			m_MarkerRenderer.Show( pathIDList );
 			m_ToolVecRenderer.Show( pathIDList );
 			m_OrientationRenderer.Show( pathIDList );
 			m_IndexRenderer.Show();
 			m_CraftRenderer.Show( pathIDList );
-			m_TraverseRenderer.Show( pathIDList );
+			m_TraverseRenderer.Show();
 			m_Viewer.UpdateView();
 		}
 
@@ -953,8 +1041,8 @@ namespace MyCAM.Editor
 				m_OrientationRenderer.SetPauseRefreshAndHide( false );
 				m_MarkerRenderer.SetPauseRefreshAndHide( false );
 
-				// traverse will change during order change
-				m_TraverseRenderer.Show();
+				ShowAllCAMData();
+				return;
 			}
 			m_Viewer.UpdateView();
 		}
@@ -965,14 +1053,9 @@ namespace MyCAM.Editor
 				return;
 			}
 			foreach( string pathID in pathIDList ) {
-				int pathOrderIndex = m_DataManager.PathIDList.IndexOf( pathID );
-				if( pathOrderIndex == -1 ) {
-					continue;
-				}
-				string nodeID = m_DataManager.GetPathName( pathOrderIndex );
 				bool isNoneProcess = DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) &&
 					craftData != null && craftData.ProcessPath == false;
-				m_ViewManager.UpdatePathNodeForeColor( nodeID, isNoneProcess );
+				m_ViewManager.UpdatePathNodeForeColor( pathID, isNoneProcess );
 			}
 		}
 
@@ -1019,31 +1102,28 @@ namespace MyCAM.Editor
 
 		void RemoveAllCAMData()
 		{
-			List<string> pathIDList = m_DataManager.PathIDList;
-			RemoveCAMData( pathIDList );
-		}
-
-		void RemoveCAMData( List<string> pathIDList )
-		{
 			m_MainPathRenderer.Remove();
 			m_MarkerRenderer.Remove();
-			m_ToolVecRenderer.Remove( pathIDList );
-			m_CraftRenderer.Remove( pathIDList );
-			m_OrientationRenderer.Remove( pathIDList );
+			m_ToolVecRenderer.Remove();
+			m_CraftRenderer.Remove();
+			m_OrientationRenderer.Remove();
 			m_IndexRenderer.Remove();
-			m_TraverseRenderer.Remove( pathIDList );
+			m_TraverseRenderer.Remove();
 			m_Viewer.UpdateView();
 		}
 
-		void RemovePathCAMData( List<string> pathIDList )
+		void RemovePathCAMData( IReadOnlyList<string> pathIDList, bool refresh = true )
 		{
 			m_MainPathRenderer.Remove( pathIDList );
 			m_MarkerRenderer.Remove( pathIDList );
 			m_ToolVecRenderer.Remove( pathIDList );
 			m_CraftRenderer.Remove( pathIDList );
 			m_OrientationRenderer.Remove( pathIDList );
-			m_TraverseRenderer.Remove( pathIDList );
+			m_TraverseRenderer.Remove();
 
+			if( !refresh ) {
+				return;
+			}
 			// those info are not recorded on each path, need to refresh all not remove
 			m_IndexRenderer.Show();
 			m_TraverseRenderer.Show();

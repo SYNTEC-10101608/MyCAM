@@ -44,22 +44,31 @@ namespace MyCAM.Editor
 
 		public override void Show( bool bUpdate = false )
 		{
+			if( m_IsPauseRefreshAndHide || m_IsPauseRefresh ) {
+				return;
+			}
+			Remove();
 			Show( m_DataManager.PathIDList, bUpdate );
 		}
 
-		public void Show( List<string> pathIDList, bool bUpdate = false )
+		public void Show( IReadOnlyList<string> pathIDList, bool bUpdate = false )
 		{
-			ShowSpecifyPath( pathIDList, bUpdate );
+			List<string> detailIDs = m_DataManager.GetEditablePathIDList( pathIDList.ToList() );
+			ShowSpecifyPath( detailIDs, bUpdate );
 		}
 
 		public override void Remove( bool bUpdate = false )
 		{
-			Remove( m_DataManager.PathIDList, bUpdate );
+			RemovePaths( m_OriginalPathAISDict.Keys.ToList() );
+			if( bUpdate ) {
+				UpdateView();
+			}
 		}
 
-		public void Remove( List<string> pathIDList, bool bUpdate = false )
+		public void Remove( IReadOnlyList<string> pathIDList, bool bUpdate = false )
 		{
-			RemovePaths( pathIDList );
+			List<string> detailIDs = m_DataManager.GetEditablePathIDList( pathIDList.ToList() ).Union( pathIDList ).ToList();
+			RemovePaths( detailIDs );
 			if( bUpdate ) {
 				UpdateView();
 			}
@@ -67,10 +76,11 @@ namespace MyCAM.Editor
 
 		public void ShowTrans( gp_Trsf trsf, bool bUpdate = false )
 		{
-			ShowSpecifyPath( m_DataManager.PathIDList, bUpdate, trsf );
+			List<string> detailIDs = m_DataManager.GetEditablePathIDList( m_DataManager.PathIDList.ToList() );
+			ShowSpecifyPath( detailIDs, bUpdate, trsf );
 		}
 
-		void ShowSpecifyPath( List<string> pathIDList, bool bUpdate, gp_Trsf trsf = null )
+		void ShowSpecifyPath( IReadOnlyList<string> pathIDList, bool bUpdate, gp_Trsf trsf = null )
 		{
 			if( m_IsPauseRefreshAndHide || m_IsPauseRefresh ) {
 				return;
@@ -102,7 +112,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		void RemovePaths( List<string> pathIDList )
+		void RemovePaths( IReadOnlyList<string> pathIDList )
 		{
 			foreach( string pathID in pathIDList ) {
 				if( m_OriginalPathAISDict.TryGetValue( pathID, out AIS_Shape oriPathAIS ) ) {
@@ -118,7 +128,7 @@ namespace MyCAM.Editor
 			if( !DataGettingHelper.GetPathType( pathID, out PathType pathType ) ) {
 				return new List<gp_Pnt>();
 			}
-			if( !DataGettingHelper.GetPathObject( pathID, out PathObject pathObject ) ) {
+			if( !DataGettingHelper.GetPathObject( pathID, out IPathObject pathObject ) ) {
 				return new List<gp_Pnt>();
 			}
 			if( pathType == PathType.Contour ) {

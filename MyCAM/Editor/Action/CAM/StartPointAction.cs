@@ -117,8 +117,7 @@ namespace MyCAM.Editor
 
 			foreach( string pathID in newPathIDList ) {
 
-				int pathOrderIndex = m_DataManager.PathIDList.IndexOf( pathID );
-				string pathName = m_DataManager.GetPathName( pathOrderIndex );
+				string pathName = m_DataManager.GetPathName( pathID );
 
 				// check is closed path
 				if( !DataGettingHelper.GetGeomDataByID( pathID, out IGeomData geomData ) ) {
@@ -299,8 +298,7 @@ namespace MyCAM.Editor
 				IPathCache pathCache = m_PathCacheList[ i ];
 				CraftData craftdata = m_CraftDataList[ i ];
 
-				int pathOrderIndex = m_DataManager.PathIDList.IndexOf( pathID );
-				string pathName = m_DataManager.GetPathName( pathOrderIndex );
+				string pathName = m_DataManager.GetPathName( pathID );
 
 				List<CAMPoint> camPointList = null;
 				List<StartPointSelectStrategy> strategies = m_Param.Strategies;

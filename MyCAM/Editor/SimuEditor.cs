@@ -91,6 +91,7 @@ namespace MyCAM.Editor
 
 		// been solved IK point
 		List<PostData> m_PostDataList = new List<PostData>();
+		PathEndInfo m_EndInfoOfLastPath = null;
 
 		// render
 		TraverseRenderer m_TraverseRender;
@@ -241,7 +242,7 @@ namespace MyCAM.Editor
 			}
 
 			// it is already last path
-			if( CurrentPath >= m_DataManager.PathIDList.Count - 1 ) {
+			if( CurrentPath >= m_SimuPathList.Count - 1 ) {
 
 				// change index to last path start index
 				m_CurrentFrameIndex = m_PathStartEndIndex[ CurrentPath ].StartIndex;
@@ -456,19 +457,18 @@ namespace MyCAM.Editor
 
 		void SetPostDataList()
 		{
-			List<PostData> postDataList = GetPostDataList();
+			GetPostDataList( out List<PostData> postDataList, out PathEndInfo endInfoOfLastPath );
 			m_PostDataList = postDataList;
+			m_EndInfoOfLastPath = endInfoOfLastPath;
 		}
 
-		List<PostData> GetPostDataList()
+		void GetPostDataList( out List<PostData> postDataList, out PathEndInfo endInfoOfLastPath )
 		{
 			NCWriter writer = new NCWriter( m_DataManager );
-			bool bSuccess = writer.ConvertPostDataListSuccess( out string szErrorMessage, out List<PostData> postDataList );
+			bool bSuccess = writer.ConvertPostDataListSuccess( out string szErrorMessage, out postDataList, out endInfoOfLastPath );
 			if( !bSuccess ) {
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "PostProcessFailed", POST_PROCESS_FAILED ) + szErrorMessage, MyApp.NoticeType.Warning );
-				return new List<PostData>();
 			}
-			return postDataList;
 		}
 
 		#endregion
@@ -527,11 +527,10 @@ namespace MyCAM.Editor
 			}
 
 			// need last path end point's vector to calculate exit pnt
-			IProcessPoint lastPathLastPoint = GetProcessEndPoint( m_SimuPathList.Last() );
 			calNeedData = new SimuData.SimuRequiredData.SimuInputSet()
 			{
 				EachPathIKPostDataList = m_PostDataList,
-				LastPathLastPnt = lastPathLastPoint,
+				LastPathLastPnt = m_EndInfoOfLastPath.EndCAMPoint,
 				EntryAndExitData = m_DataManager.EntryAndExitData,
 				PostSolver = m_PostSolver,
 				MachineData = m_MachineData,
@@ -539,11 +538,6 @@ namespace MyCAM.Editor
 				AABBMap = m_LocalAabbMap,
 			};
 			return calNeedData;
-		}
-
-		IProcessPoint GetProcessEndPoint( string pathID )
-		{
-			return CacheHelper.GetProcessEndPoint( pathID );
 		}
 
 		void RecordCollisionFrame()

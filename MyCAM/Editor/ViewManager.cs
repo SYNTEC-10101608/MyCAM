@@ -2,6 +2,7 @@
 using MyCAM.Editor.Renderer;
 using OCC.AIS;
 using OCC.Aspect;
+using OCC.BRep;
 using OCC.gp;
 using OCC.Quantity;
 using OCC.TopAbs;
@@ -11,6 +12,7 @@ using OCC.TopTools;
 using OCCViewer;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -508,31 +510,65 @@ namespace MyCAM.Editor
 
 		#region Path Management
 
+		TopoDS_Shape BuildPathWire( string pathID )
+		{
+			if( !DataGettingHelper.GetPathObject( pathID, out IPathObject pathObject ) ) {
+				return null;
+			}
+
+			List<string> pathIDList = new List<string>();
+			if( pathObject is GroupPathObject group ) {
+				pathIDList.AddRange( group.PathIDList );
+			}
+			else {
+				pathIDList.Add( pathID );
+			}
+
+			BRep_Builder builder = new BRep_Builder();
+			TopoDS_Compound compound = new TopoDS_Compound();
+
+			builder.MakeCompound( ref compound );
+			TopoDS_Shape compoundShape = compound;
+			bool hasPathWire = false;
+			for( int i = 0; i < pathIDList.Count; i++ ) {
+
+				// get path point data
+				IReadOnlyList<gp_Pnt> pointList = ToolVecAndPathVisibleHelper.GetMainPathPointList( pathIDList[ i ] );
+				if( pointList == null || pointList.Count < 2 ) {
+					continue;
+				}
+
+				// create polyline wire geometry
+				TopoDS_Wire pathWire = ToolVecAndPathVisibleHelper.CreatePolylineWire( pointList );
+				if( pathWire == null || pathWire.IsNull() ) {
+					continue;
+				}
+
+				builder.Add( ref compoundShape, pathWire );
+				hasPathWire = true;
+			}
+
+			return hasPathWire ? compoundShape : null;
+		}
+
 		public void AddPath( string pathID )
 		{
 			// ensure no duplicate entry
 			RemovePath( pathID );
 
-			// get path point data
-			IReadOnlyList<gp_Pnt> pointList = ToolVecAndPathVisibleHelper.GetMainPathPointList( pathID );
-			if( pointList == null || pointList.Count < 2 ) {
-				return;
-			}
-
-			// create polyline wire geometry
-			TopoDS_Wire pathWire = ToolVecAndPathVisibleHelper.CreatePolylineWire( pointList );
-			if( pathWire == null || pathWire.IsNull() ) {
+			TopoDS_Shape shape = BuildPathWire( pathID );
+			if( shape == null ) {
 				return;
 			}
 
 			// create AIS with TechLayer color
-			AIS_Shape pathAIS = new AIS_Shape( pathWire );
+			AIS_Shape pathAIS = new AIS_Shape( shape );
 			int nPathColorIdx = GetPathColorIndex( pathID );
 			pathAIS.SetColor( new Quantity_Color( TECH_Layer_Color_List[ nPathColorIdx ] ) );
 			pathAIS.SetWidth( 3.0 );
 
 			// register shape-ID mapping for selection lookup
-			RegisterShapeIDMapping( pathWire, pathID );
+			RegisterShapeIDMapping( shape, pathID );
 			m_PathIDSet.Add( pathID );
 
 			// add to view object map and display in viewer
@@ -619,16 +655,9 @@ namespace MyCAM.Editor
 				}
 			}
 
-			// get updated path point data
-			IReadOnlyList<gp_Pnt> pointList = ToolVecAndPathVisibleHelper.GetMainPathPointList( pathID );
-			if( pointList == null || pointList.Count < 2 ) {
-				RemovePath( pathID );
-				return;
-			}
-
 			// create new wire geometry
-			TopoDS_Wire pathWire = ToolVecAndPathVisibleHelper.CreatePolylineWire( pointList );
-			if( pathWire == null || pathWire.IsNull() ) {
+			TopoDS_Shape shape = BuildPathWire( pathID );
+			if( shape == null ) {
 				RemovePath( pathID );
 				return;
 			}
@@ -638,8 +667,8 @@ namespace MyCAM.Editor
 			pathAIS.SetColor( new Quantity_Color( TECH_Layer_Color_List[ nPathColorIdx ] ) );
 
 			// replace geometry and register new mapping
-			pathAIS.Set( pathWire );
-			RegisterShapeIDMapping( pathWire, pathID );
+			pathAIS.Set( shape );
+			RegisterShapeIDMapping( shape, pathID );
 			m_Viewer.GetAISContext().Redisplay( pathAIS, false );
 
 			// restore selection using the freshly built owner (clears the orphan residue)
@@ -650,12 +679,21 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void UpdatePaths( List<string> pathIDList )
+		public void UpdatePaths( IReadOnlyList<string> pathIDList )
 		{
 			foreach( string pathID in pathIDList ) {
 				UpdatePath( pathID );
 			}
 		}
+
+
+		public void SyncPaths( IReadOnlyList<string> pathIDs )
+		{
+			foreach( string obsoleteID in m_PathIDSet.Where( id => !pathIDs.Contains( id ) ).ToList() ) {
+				RemovePath( obsoleteID );
+			}
+		}
+
 
 		public void ShowPathTrsf( gp_Trsf trsf )
 		{
@@ -682,7 +720,7 @@ namespace MyCAM.Editor
 			}
 		}
 
-		public void DisplayPaths( List<string> pathIDList )
+		public void DisplayPaths( IReadOnlyList<string> pathIDList )
 		{
 			foreach( string pathID in pathIDList ) {
 				DisplayPath( pathID );
@@ -720,7 +758,7 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
 		}
 
-		public void ActivePaths( List<string> pathIDList )
+		public void ActivePaths( IReadOnlyList<string> pathIDList )
 		{
 			foreach( string pathID in pathIDList ) {
 				ActivePath( pathID );
@@ -742,7 +780,7 @@ namespace MyCAM.Editor
 			m_Viewer.GetAISContext().Activate( viewObject.AISHandle );
 		}
 
-		public void DeactivePaths( List<string> pathIDList )
+		public void DeactivePaths( IReadOnlyList<string> pathIDList )
 		{
 			foreach( string pathID in pathIDList ) {
 				DeactivePath( pathID );
@@ -767,19 +805,50 @@ namespace MyCAM.Editor
 		#endregion
 
 		#region Tree Node Management
-
-		public void AddPathNode( string nodeID, string pathID )
+		public void SyncPathTree( IReadOnlyList<PathTreeItem> nodesList )
 		{
-			if( TreeNodeMap.ContainsKey( nodeID ) ) {
+			foreach( string id in TreeNodeMap.Where( pair => IsPathNode( pair.Value ) ).Select( pair => pair.Key ).ToList() ) {
+				TreeNodeMap.Remove( id );
+			}
+			PathNode.Nodes.Clear();
+			AddPathNode( PathNode, nodesList );
+
+		}
+
+		bool IsPathNode( TreeNode node )
+		{
+			return node != PathNode && GetPathSelectionNode( node ) != null;
+		}
+
+		public TreeNode GetPathSelectionNode( TreeNode node )
+		{
+			if( node == null || node == PathNode ) {
+				return null;
+			}
+			while( node.Parent != null && node.Parent != PathNode ) {
+				node = node.Parent;
+			}
+			return node.Parent == PathNode ? node : null;
+		}
+
+
+		void AddPathNode( TreeNode root, IReadOnlyList<PathTreeItem> nodesList )
+		{
+			if( nodesList == null ) {
 				return;
 			}
-			TreeNode node = new TreeNode( nodeID );
-			node.Tag = nodeID;
-			PathNode.Nodes.Add( node );
-			TreeNodeMap.Add( nodeID, node );
-			bool isNoneProcess = DataGettingHelper.GetCraftDataByID( pathID, out CraftData craftData ) &&
-				craftData != null && craftData.ProcessPath == false;
-			UpdatePathNodeForeColor( nodeID, isNoneProcess );
+
+			for( int i = 0; i < nodesList.Count; ++i ) {
+
+				TreeNode node = new TreeNode( nodesList[ i ].Name );
+				node.Tag = nodesList[ i ].UID;
+				root.Nodes.Add( node );
+				TreeNodeMap[ nodesList[ i ].UID ] = node;
+
+				bool isNoneProcess = DataGettingHelper.GetCraftDataByID( nodesList[ i ].UID, out CraftData craftData ) &&
+					craftData != null && craftData.ProcessPath == false;
+				UpdatePathNodeForeColor( nodesList[ i ].UID, isNoneProcess );
+			}
 		}
 
 		public void UpdatePathNodeForeColor( string nodeID, bool isNoneProcess )
@@ -847,10 +916,10 @@ namespace MyCAM.Editor
 			// build path tree and view
 			for( int i = 0; i < dataManager.PathIDList.Count; i++ ) {
 				string pathID = dataManager.PathIDList[ i ];
-				string nodeID = dataManager.GetPathName( i );
-				AddPathNode( nodeID, pathID );
 				AddPath( pathID );
 			}
+			// build path tree
+			SyncPathTree( dataManager.GetPathTree() );
 
 			DeactiveAll();
 

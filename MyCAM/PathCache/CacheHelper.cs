@@ -10,6 +10,9 @@ namespace MyCAM.PathCache
 			if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache pathCache ) ) {
 				return null;
 			}
+			if( pathCache is FlyCutGroupPathCache flyCutCache ) {
+				return flyCutCache.GetProcessStartPoint();
+			}
 			if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 				return null;
 			}
@@ -20,6 +23,9 @@ namespace MyCAM.PathCache
 		{
 			if( !DataGettingHelper.GetPathCacheByID( szPathID, out IPathCache pathCache ) ) {
 				return null;
+			}
+			if( pathCache is FlyCutGroupPathCache flyCutCache ) {
+				return flyCutCache.GetProcessEndPoint();
 			}
 			if( !DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData ) ) {
 				return null;
