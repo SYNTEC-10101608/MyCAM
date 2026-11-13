@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using MyCAM.LoadingManager;
 
 namespace MyCAM.Editor
 {
@@ -85,6 +86,7 @@ namespace MyCAM.Editor
 		int m_CurrentPathValue;
 		bool m_IsNeedReCal = true;
 		Timer m_PlayTimer;
+		LoadingBarManager m_LoadingBarManager;
 
 		// machinal UI
 		bool m_IsImportMachine = false;
@@ -481,6 +483,8 @@ namespace MyCAM.Editor
 			simuCalResult = new SimuData.ResultData.SimuCalResult();
 
 			// get data to cal traverse path and all FK result
+			// Report progress to the loading bar.
+			m_LoadingBarManager?.Report( LoadingStep.PrepareSimulation );
 			SimuData.SimuRequiredData.SimuInputSet calNeedData = GetSimulationInputData();
 
 			// protection
@@ -496,6 +500,8 @@ namespace MyCAM.Editor
 			}
 
 			// get frame transformation map
+			// Report progress to the loading bar.
+			m_LoadingBarManager?.Report( LoadingStep.CalculateSimulation );
 			SimuPathBuilderBase simuPathBuilder = SimuPathBuilderFactory.Create( calNeedData.MachineData );
 			bool bFrameCalDone = simuPathBuilder.BuildFrameTransMap( calNeedData, out Dictionary<MachineComponentType, List<gp_Trsf>> frameTransformMap, out List<SimuData.ResultData.PathStartEndIndex> pathStartEndIndexList, out int frameCount );
 			if( !bFrameCalDone ) {
@@ -508,7 +514,8 @@ namespace MyCAM.Editor
 			simuCalResult.PathStartEndIdxList = pathStartEndIndexList;
 
 			// get collision result
-			bool bCollisionCalDone = CollisionHelper.CalCollisionResult( frameCount, calNeedData, frameTransformMap, out Dictionary<MachineComponentType, List<bool>> frameCollisionMap );
+			bool bCollisionCalDone = CollisionHelper.CalCollisionResult( frameCount, calNeedData, frameTransformMap,
+				out Dictionary<MachineComponentType, List<bool>> frameCollisionMap, progress => m_LoadingBarManager?.Report( progress ) );
 			if( !bCollisionCalDone ) {
 				return SimuCalStatus.FrameCalDone;
 				;
@@ -961,17 +968,36 @@ namespace MyCAM.Editor
 				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "NoPathForSimulation", NO_PATH_FOR_SIMULATION ), MyApp.NoticeType.Hint );
 				return;
 			}
-			if( m_IsNeedReCal ) {
-				ClearCash();
-				SimuCalStatus status = BuildSimuData( out SimuData.ResultData.SimuCalResult simuCalResult );
+			if( m_IsNeedReCal && m_LoadingBarManager == null ) {
+				m_LoadingBarManager = new LoadingBarManager( MyApp.MainForm );
+				try {
+					// Show loading bar.
+					m_LoadingBarManager.ShowSimulation();
 
-				// set result to m_
-				SetSimuResult( status, simuCalResult );
+					ClearCash();
+					SimuCalStatus status = BuildSimuData( out SimuData.ResultData.SimuCalResult simuCalResult );
 
-				// after all data is ready
-				RecordCollisionFrame();
-				m_MachineRender.SetSimuData( m_FrameTransformMap, m_FrameCollisionMap );
-				m_IsNeedReCal = false;
+					// set result to m_
+					// Report progress to the loading bar.
+					m_LoadingBarManager?.Report( LoadingStep.ApplySimulation );
+					SetSimuResult( status, simuCalResult );
+
+					// after all data is ready
+					// Report progress to the loading bar.
+					m_LoadingBarManager?.Report( LoadingStep.SummarizeCollisions );
+					RecordCollisionFrame();
+					m_LoadingBarManager?.Report( LoadingStep.DisplaySimulation );
+					m_MachineRender.SetSimuData( m_FrameTransformMap, m_FrameCollisionMap );
+					m_IsNeedReCal = false;
+					if( status != SimuCalStatus.Failed ) {
+						// Report progress to the loading bar.
+						m_LoadingBarManager?.Report( LoadingStep.SimulationComplete );
+					}
+				}
+				finally {
+					m_LoadingBarManager.Dispose();
+					m_LoadingBarManager = null;
+				}
 			}
 		}
 

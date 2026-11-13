@@ -10,6 +10,7 @@ using OCC.TopLoc;
 using OCC.TopoDS;
 using OCC.TopTools;
 using OCCViewer;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -901,26 +902,47 @@ namespace MyCAM.Editor
 			PathNode.Nodes.Clear();
 		}
 
-		public void RebuildAllViews( DataManager dataManager, bool shouldExpandPartNode = true )
+		public void RebuildAllViews( DataManager dataManager, bool shouldExpandPartNode = true,
+			Action<LoadingBarInfo> reportProgress = null )
 		{
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.ClearDisplay ) );
 			ClearAll();
 
 			// build part
+			int nCompleted = 0;
+
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.DisplayParts, 0, dataManager.PartIDList.Count ) );
 			foreach( var szNewDataID in dataManager.PartIDList ) {
 				if( !DataGettingHelper.GetShapeObject( szNewDataID, out IShapeObject shapeObject ) ) {
+					nCompleted++;
+
+					// Report progress to the loading bar.
+					reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.DisplayParts, nCompleted, dataManager.PartIDList.Count ) );
 					continue;
 				}
 				AddPart( szNewDataID, shapeObject.Shape );
+				nCompleted++;
+
+				// Report progress to the loading bar.
+				reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.DisplayParts, nCompleted, dataManager.PartIDList.Count ) );
 			}
 
 			// build path tree and view
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.DisplayPaths, 0, dataManager.PathIDList.Count ) );
 			for( int i = 0; i < dataManager.PathIDList.Count; i++ ) {
 				string pathID = dataManager.PathIDList[ i ];
 				AddPath( pathID );
+
+				// Report progress to the loading bar.
+				reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.DisplayPaths, i + 1, dataManager.PathIDList.Count ) );
 			}
 			// build path tree
 			SyncPathTree( dataManager.GetPathTree() );
 
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.UpdateDisplayTree ) );
 			DeactiveAll();
 
 			// update tree view

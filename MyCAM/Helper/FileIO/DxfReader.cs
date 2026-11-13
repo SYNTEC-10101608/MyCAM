@@ -1,5 +1,6 @@
 using netDxf;
 using netDxf.Entities;
+using MyCAM.Data;
 using OCC.BRepBuilderAPI;
 using OCC.Geom;
 using OCC.gp;
@@ -27,34 +28,54 @@ namespace MyCAM.Helper.FileIO
 		/// </summary>
 		/// <param name="szFileName">DXF 檔案路徑</param>
 		/// <returns>成功時回傳 TopoDS_Shape，失敗時回傳 null</returns>
-		public TopoDS_Shape Read( string szFileName )
+		public TopoDS_Shape Read( string szFileName, Action<LoadingBarInfo> reportProgress = null )
 		{
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.ReadFile ) );
 			DxfDocument dxfDoc = DxfDocument.Load( szFileName );
 			if( dxfDoc == null )
 				return null;
 
 			List<TopoDS_Shape> shapes = new List<TopoDS_Shape>();
 
-			ConvertLines( dxfDoc, shapes );
-			ConvertArcs( dxfDoc, shapes );
-			ConvertCircles( dxfDoc, shapes );
-			ConvertEllipses( dxfDoc, shapes );
-			ConvertPoints( dxfDoc, shapes );
-			ConvertPolylines2D( dxfDoc, shapes );
-			ConvertPolylines3D( dxfDoc, shapes );
-			ConvertSplines( dxfDoc, shapes );
+			int total = dxfDoc.Entities.Lines.Count() + dxfDoc.Entities.Arcs.Count() + dxfDoc.Entities.Circles.Count()
+				+ dxfDoc.Entities.Ellipses.Count() + dxfDoc.Entities.Points.Count() + dxfDoc.Entities.Polylines2D.Count()
+				+ dxfDoc.Entities.Polylines3D.Count() + dxfDoc.Entities.Splines.Count();
+			int completed = 0;
+			Action entityProcessed = () => reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.ConvertDxf, ++completed, total ) );
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.ConvertDxf, 0, total ) );
+			ConvertLines( dxfDoc, shapes, entityProcessed );
+			ConvertArcs( dxfDoc, shapes, entityProcessed );
+			ConvertCircles( dxfDoc, shapes, entityProcessed );
+			ConvertEllipses( dxfDoc, shapes, entityProcessed );
+			ConvertPoints( dxfDoc, shapes, entityProcessed );
+			ConvertPolylines2D( dxfDoc, shapes, entityProcessed );
+			ConvertPolylines3D( dxfDoc, shapes, entityProcessed );
+			ConvertSplines( dxfDoc, shapes, entityProcessed );
 
 			if( shapes.Count == 0 )
 				return null;
 
 			// Connect edges into wires (closed and open)
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.ConnectDxfContours ) );
 			TopoDS_Shape edgeCompound = ShapeTool.MakeCompound( shapes );
 			return ConnectEdgesToWires( edgeCompound );
 		}
 
-		void ConvertLines( DxfDocument dxfDoc, List<TopoDS_Shape> shapes )
+		static IEnumerable<T> TrackEntities<T>( IEnumerable<T> entities, Action entityProcessed )
 		{
-			foreach( netDxf.Entities.Line line in dxfDoc.Entities.Lines ) {
+			foreach( T entity in entities ) {
+				yield return entity;
+
+				// Report progress to the loading bar.
+				entityProcessed();
+			}
+		}
+
+		void ConvertLines( DxfDocument dxfDoc, List<TopoDS_Shape> shapes, Action entityProcessed )
+		{
+			foreach( netDxf.Entities.Line line in TrackEntities( dxfDoc.Entities.Lines, entityProcessed ) ) {
 				gp_Pnt p0 = new gp_Pnt( line.StartPoint.X, line.StartPoint.Y, line.StartPoint.Z );
 				gp_Pnt p1 = new gp_Pnt( line.EndPoint.X, line.EndPoint.Y, line.EndPoint.Z );
 				if( p0.Distance( p1 ) < 1e-8 )
@@ -65,9 +86,9 @@ namespace MyCAM.Helper.FileIO
 			}
 		}
 
-		void ConvertArcs( DxfDocument dxfDoc, List<TopoDS_Shape> shapes )
+		void ConvertArcs( DxfDocument dxfDoc, List<TopoDS_Shape> shapes, Action entityProcessed )
 		{
-			foreach( Arc arc in dxfDoc.Entities.Arcs ) {
+			foreach( Arc arc in TrackEntities( dxfDoc.Entities.Arcs, entityProcessed ) ) {
 				gp_Pnt center = new gp_Pnt( arc.Center.X, arc.Center.Y, arc.Center.Z );
 				gp_Dir normal = new gp_Dir( arc.Normal.X, arc.Normal.Y, arc.Normal.Z );
 				gp_Ax2 ax2 = new gp_Ax2( center, normal );
@@ -80,9 +101,9 @@ namespace MyCAM.Helper.FileIO
 			}
 		}
 
-		void ConvertCircles( DxfDocument dxfDoc, List<TopoDS_Shape> shapes )
+		void ConvertCircles( DxfDocument dxfDoc, List<TopoDS_Shape> shapes, Action entityProcessed )
 		{
-			foreach( Circle circle in dxfDoc.Entities.Circles ) {
+			foreach( Circle circle in TrackEntities( dxfDoc.Entities.Circles, entityProcessed ) ) {
 				gp_Pnt center = new gp_Pnt( circle.Center.X, circle.Center.Y, circle.Center.Z );
 				gp_Dir normal = new gp_Dir( circle.Normal.X, circle.Normal.Y, circle.Normal.Z );
 				gp_Ax2 ax2 = new gp_Ax2( center, normal );
@@ -93,9 +114,9 @@ namespace MyCAM.Helper.FileIO
 			}
 		}
 
-		void ConvertEllipses( DxfDocument dxfDoc, List<TopoDS_Shape> shapes )
+		void ConvertEllipses( DxfDocument dxfDoc, List<TopoDS_Shape> shapes, Action entityProcessed )
 		{
-			foreach( Ellipse ellipse in dxfDoc.Entities.Ellipses ) {
+			foreach( Ellipse ellipse in TrackEntities( dxfDoc.Entities.Ellipses, entityProcessed ) ) {
 				gp_Pnt center = new gp_Pnt( ellipse.Center.X, ellipse.Center.Y, ellipse.Center.Z );
 				gp_Dir normal = new gp_Dir( ellipse.Normal.X, ellipse.Normal.Y, ellipse.Normal.Z );
 				gp_Dir majorDir = new gp_Dir( Math.Cos( ellipse.Rotation * Math.PI / 180.0 ), Math.Sin( ellipse.Rotation * Math.PI / 180.0 ), 0 );
@@ -111,18 +132,18 @@ namespace MyCAM.Helper.FileIO
 			}
 		}
 
-		void ConvertPoints( DxfDocument dxfDoc, List<TopoDS_Shape> shapes )
+		void ConvertPoints( DxfDocument dxfDoc, List<TopoDS_Shape> shapes, Action entityProcessed )
 		{
-			foreach( netDxf.Entities.Point pt in dxfDoc.Entities.Points ) {
+			foreach( netDxf.Entities.Point pt in TrackEntities( dxfDoc.Entities.Points, entityProcessed ) ) {
 				gp_Pnt pnt = new gp_Pnt( pt.Position.X, pt.Position.Y, pt.Position.Z );
 				BRepBuilderAPI_MakeVertex vtxMaker = new BRepBuilderAPI_MakeVertex( pnt );
 				shapes.Add( vtxMaker.Shape() );
 			}
 		}
 
-		void ConvertPolylines2D( DxfDocument dxfDoc, List<TopoDS_Shape> shapes )
+		void ConvertPolylines2D( DxfDocument dxfDoc, List<TopoDS_Shape> shapes, Action entityProcessed )
 		{
-			foreach( Polyline2D poly2d in dxfDoc.Entities.Polylines2D ) {
+			foreach( Polyline2D poly2d in TrackEntities( dxfDoc.Entities.Polylines2D, entityProcessed ) ) {
 				List<EntityObject> exploded = poly2d.Explode();
 				foreach( EntityObject ent in exploded ) {
 					TopoDS_Edge edge = EntityToEdge( ent );
@@ -132,9 +153,9 @@ namespace MyCAM.Helper.FileIO
 			}
 		}
 
-		void ConvertPolylines3D( DxfDocument dxfDoc, List<TopoDS_Shape> shapes )
+		void ConvertPolylines3D( DxfDocument dxfDoc, List<TopoDS_Shape> shapes, Action entityProcessed )
 		{
-			foreach( Polyline3D poly3d in dxfDoc.Entities.Polylines3D ) {
+			foreach( Polyline3D poly3d in TrackEntities( dxfDoc.Entities.Polylines3D, entityProcessed ) ) {
 				List<EntityObject> exploded = poly3d.Explode();
 				foreach( EntityObject ent in exploded ) {
 					TopoDS_Edge edge = EntityToEdge( ent );
@@ -144,9 +165,9 @@ namespace MyCAM.Helper.FileIO
 			}
 		}
 
-		void ConvertSplines( DxfDocument dxfDoc, List<TopoDS_Shape> shapes )
+		void ConvertSplines( DxfDocument dxfDoc, List<TopoDS_Shape> shapes, Action entityProcessed )
 		{
-			foreach( Spline spline in dxfDoc.Entities.Splines ) {
+			foreach( Spline spline in TrackEntities( dxfDoc.Entities.Splines, entityProcessed ) ) {
 				TopoDS_Edge edge = SplineToEdge( spline );
 				if( edge != null && !edge.IsNull() )
 					shapes.Add( edge );

@@ -45,17 +45,21 @@ namespace MyCAM.Helper
 			return (new[] { minX, minY, minZ }, new[] { maxX, maxY, maxZ });
 		}
 
-		internal static bool CalCollisionResult( int frameCount, SimuData.SimuRequiredData.SimuInputSet calNeedData, Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap, out Dictionary<MachineComponentType, List<bool>> frameCollisionMap )
+		internal static bool CalCollisionResult( int frameCount, SimuData.SimuRequiredData.SimuInputSet calNeedData, Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap,
+			out Dictionary<MachineComponentType, List<bool>> frameCollisionMap, Action<LoadingBarInfo> reportProgress = null )
 		{
-			bool bCollisionOk = BuildCollision( frameCount, calNeedData.MachineData, calNeedData.MachineData.ChainListMap, calNeedData.CollisionEngine, calNeedData.AABBMap, FrameTransformMap, out frameCollisionMap );
+			bool bCollisionOk = BuildCollision( frameCount, calNeedData.MachineData, calNeedData.MachineData.ChainListMap, calNeedData.CollisionEngine, calNeedData.AABBMap, FrameTransformMap, out frameCollisionMap, reportProgress );
 			return bCollisionOk;
 		}
 
 		static bool BuildCollision( int FrameCount, IMachineDataBase MachineData, Dictionary<MachineComponentType, List<MachineComponentType>> ChainListMap,
 			CollisionSolver FCLTest, Dictionary<string, (double[] Min, double[] Max)> AABBMap,
 			Dictionary<MachineComponentType, List<gp_Trsf>> FrameTransformMap,
-			out Dictionary<MachineComponentType, List<bool>> FrameCollisionMap )
+			out Dictionary<MachineComponentType, List<bool>> FrameCollisionMap,
+			Action<LoadingBarInfo> reportProgress )
 		{
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.PrepareCollision ) );
 			FrameCollisionMap = new Dictionary<MachineComponentType, List<bool>>();
 			if( MachineData == null || ChainListMap == null || ChainListMap.Count == 0 ) {
 				return false;
@@ -113,14 +117,25 @@ namespace MyCAM.Helper
 
 			// each component trsf matrix => trsfCache[componentIdx] = double[12]  
 			double[][] trsfCache = new double[ componentCount ][];
+
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.CheckCollision, 0, FrameCount ) );
 			for( int i = 0; i < FrameCount; i++ ) {
 				BuildPerFrameCollision( i, toolChainIdx, workChainIdx, toolLeafIdx, FCLTest,
 					aabbByIdx, componentNameByIdx, frameTrsfByIdx, trsfCache, collisionByIdx );
+
+				// Report progress to the loading bar.
+				reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.CheckCollision, i + 1, FrameCount ) );
 			}
 
 			// build output Dictionary once
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.CollectCollisionResults, 0, componentCount ) );
 			for( int i = 0; i < componentCount; i++ ) {
 				FrameCollisionMap[ componentTypes[ i ] ] = collisionByIdx[ i ];
+
+				// Report progress to the loading bar.
+				reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.CollectCollisionResults, i + 1, componentCount ) );
 			}
 			return true;
 		}

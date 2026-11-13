@@ -12,19 +12,24 @@ using OCCTool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MyCAM.Data;
 
 namespace MyCAM.Helper
 {
 	internal static class RingShapedIdentifyHelper
 	{
-		public static bool ComputeRevolutionToG54Transform( TopoDS_Shape oneShape, out gp_Trsf accumulatedTrsf, EAlignAxis targetAxis )
+		public static bool ComputeRevolutionToG54Transform( TopoDS_Shape oneShape, out gp_Trsf accumulatedTrsf, EAlignAxis targetAxis,
+			Action<LoadingBarInfo> reportProgress = null )
 		{
 			accumulatedTrsf = new gp_Trsf();
-			bool isSuccess = GetRevolutionDirAndCenter( oneShape, out gp_Dir axisDir, out gp_Pnt centerPnt, out bool isFittingByCircle );
+			bool isSuccess = GetRevolutionDirAndCenter( oneShape, out gp_Dir axisDir, out gp_Pnt centerPnt, out bool isFittingByCircle, reportProgress );
 
 			if( !isSuccess ) {
 				return false;
 			}
+
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.AlignWorkpieceAxis ) );
 
 			// Step 1: Align axis to the target axis and center to the target plane
 			bool isDone = AlignAxisToTargetAndCenterWithTransform( oneShape, axisDir, centerPnt, targetAxis, out TopoDS_Shape shape, out gp_Trsf trsf1 );
@@ -34,6 +39,8 @@ namespace MyCAM.Helper
 			accumulatedTrsf = trsf1;
 
 			// Step 2: Check if need to flip upside down
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.OrientWorkpiece ) );
 			bool isSliceDone = AnalyzeRevolutionShapeTaper( shape, targetAxis, out bool isTopWiderThanBottom );
 			if( isSliceDone && isTopWiderThanBottom ) {
 				if( ShapeTool.FlipShapeAlongAxis( shape, targetAxis, out TopoDS_Shape flippedShape, out gp_Trsf trsf2, null ) ) {
@@ -45,12 +52,16 @@ namespace MyCAM.Helper
 			}
 
 			// Step 3: Move bottom to the zero plane of the target axis
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.SetWorkpieceBase ) );
 			if( ShapeTool.MoveShapeBottomToAxisZero( shape, targetAxis, out TopoDS_Shape MovedShape, out gp_Trsf trsf3 ) ) {
 				shape = MovedShape;
 				accumulatedTrsf = trsf3.Multiplied( accumulatedTrsf );
 			}
 
 			// Step 4: Align OBB to the radial axes if not fitting by circle
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.AlignWorkpieceOutline ) );
 			if( isFittingByCircle == false ) {
 				if( ShapeTool.AlignOBBToRadialAxes( shape, targetAxis, out _, out gp_Trsf trsf4 ) ) {
 					accumulatedTrsf = trsf4.Multiplied( accumulatedTrsf );
@@ -70,16 +81,19 @@ namespace MyCAM.Helper
 		static bool GetRevolutionDirAndCenter( TopoDS_Shape partShape,
 			out gp_Dir axisDir,
 			out gp_Pnt centerPnt,
-			out bool isFittingByCircle )
+			out bool isFittingByCircle,
+			Action<LoadingBarInfo> reportProgress )
 		{
 			centerPnt = null;
 			List<TopoDS_Wire> wireOrderList = new List<TopoDS_Wire>();
 
-			bool bGetDirSuccess = GetRevolutionDirSuccess( partShape, out axisDir, out TopoDS_Wire majorWire, out wireOrderList, out isFittingByCircle, out gp_Pnt circleCenter );
+			bool bGetDirSuccess = GetRevolutionDirSuccess( partShape, out axisDir, out TopoDS_Wire majorWire, out wireOrderList, out isFittingByCircle, out gp_Pnt circleCenter, reportProgress );
 			if( !bGetDirSuccess || axisDir == null ) {
 				return false;
 			}
 
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.FindWorkpieceCenter ) );
 			if( isFittingByCircle && circleCenter != null ) {
 				centerPnt = circleCenter;
 				return true;
@@ -101,7 +115,8 @@ namespace MyCAM.Helper
 			out TopoDS_Wire majorWire,
 			out List<TopoDS_Wire> wireOrderList,
 			out bool isFittingByCircle,
-			out gp_Pnt circleCenter )
+			out gp_Pnt circleCenter,
+			Action<LoadingBarInfo> reportProgress )
 		{
 			axisDir = new gp_Dir();
 			majorWire = new TopoDS_Wire();
@@ -113,17 +128,19 @@ namespace MyCAM.Helper
 			if( partShape == null || partShape.IsNull() ) {
 				return false;
 			}
-			bool isGetRingSuccess = GetRingFace( partShape, out List<TopoDS_Shape> closedShellList );
+			bool isGetRingSuccess = GetRingFace( partShape, out List<TopoDS_Shape> closedShellList, reportProgress );
 			if( !isGetRingSuccess || closedShellList == null || closedShellList.Count == 0 ) {
 				return false;
 			}
-			bool GetBiggestShellSuccess = GetBiggestShell( closedShellList, out TopoDS_Shape biggestShell );
+			bool GetBiggestShellSuccess = GetBiggestShell( closedShellList, out TopoDS_Shape biggestShell, reportProgress );
 
 			if( !GetBiggestShellSuccess || biggestShell == null || biggestShell.IsNull() ) {
 				return false;
 			}
 
 			// get longest wire
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.DetermineWorkpieceDirection ) );
 			if( !GetSortedWiresInShell( biggestShell, out wireOrderList ) ) {
 				return false;
 			}
@@ -153,18 +170,22 @@ namespace MyCAM.Helper
 			return isSuccess;
 		}
 
-		static bool GetRingFace( TopoDS_Shape rawShape, out List<TopoDS_Shape> closedShellList )
+		static bool GetRingFace( TopoDS_Shape rawShape, out List<TopoDS_Shape> closedShellList,
+			Action<LoadingBarInfo> reportProgress )
 		{
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.PrepareWorkpiece ) );
 			TopoDS_Shape sewedShape = ShapeTool.SewShape( rawShape );
 
 			// get sewedFace
 			List<TopoDS_Face> sewedFaceList = GetFaceList( sewedShape );
 
 			// face with XYZ max/min point might be outer face
-			List<TopoDS_Face> extremeFaceList = GetCoordExtremeFace( sewedFaceList );
+			List<TopoDS_Face> extremeFaceList = GetCoordExtremeFace( sewedFaceList, reportProgress );
 
 			// get tube outer faces
-			if( !GetShellListFromPart( rawShape, extremeFaceList, out closedShellList ) ) {
+			// Report progress to the loading bar.
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.FindWorkpieceOutline ) );
+			if( !GetShellListFromPart( rawShape, extremeFaceList, out closedShellList, reportProgress ) ) {
 				return false;
 			}
 			return true;
@@ -185,7 +206,8 @@ namespace MyCAM.Helper
 			return faceList;
 		}
 
-		static List<TopoDS_Face> GetCoordExtremeFace( List<TopoDS_Face> tubeFaceList )
+		static List<TopoDS_Face> GetCoordExtremeFace( List<TopoDS_Face> tubeFaceList,
+			Action<LoadingBarInfo> reportProgress )
 		{
 			double xmin = double.MaxValue, xmax = double.MinValue;
 			double ymin = double.MaxValue, ymax = double.MinValue;
@@ -196,6 +218,10 @@ namespace MyCAM.Helper
 
 			// list for return, do not need extreme key because any extreme face may be the outer face
 			List<TopoDS_Face> extremeFaceList = new List<TopoDS_Face>();
+
+			// Report progress to the loading bar.
+			int nCompleted = 0;
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.InspectWorkpiece, 0, tubeFaceList.Count ) );
 			foreach( TopoDS_Face face in tubeFaceList ) {
 				// get the bounding box of the face
 				BoundingBox faceBoundingBox = new BoundingBox( face );
@@ -207,6 +233,10 @@ namespace MyCAM.Helper
 				UpdateExtremeFace( result, AxisExtreme.YMax, faceBoundingBox.Ymax, face, false, ref ymax );
 				UpdateExtremeFace( result, AxisExtreme.ZMin, faceBoundingBox.Zmin, face, true, ref zmin );
 				UpdateExtremeFace( result, AxisExtreme.ZMax, faceBoundingBox.Zmax, face, false, ref zmax );
+
+				// Report progress to the loading bar.
+				nCompleted++;
+				reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.InspectWorkpiece, nCompleted, tubeFaceList.Count ) );
 			}
 
 			// remove key to return
@@ -248,7 +278,8 @@ namespace MyCAM.Helper
 			extremeFaceList[ extremeValueKey ].Add( face );
 		}
 
-		static bool GetShellListFromPart( TopoDS_Shape sewedShape, List<TopoDS_Face> extremeFaceList, out List<TopoDS_Shape> colsedShellList )
+		static bool GetShellListFromPart( TopoDS_Shape sewedShape, List<TopoDS_Face> extremeFaceList,
+			out List<TopoDS_Shape> colsedShellList, Action<LoadingBarInfo> reportProgress )
 		{
 			// map each edge and the corresponding face in the sew shape
 			TopTools_IndexedDataMapOfShapeListOfShape indexedDataMapOfShapeListOfShape = new TopTools_IndexedDataMapOfShapeListOfShape();
@@ -261,6 +292,10 @@ namespace MyCAM.Helper
 
 			// the remaining number which may be the starting of outer face
 			int nUnCheckedExtermeFaceCount = extremeFaceList.Count;
+
+			// Report progress to the loading bar.
+			int nTotal = nUnCheckedExtermeFaceCount;
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.FindWorkpieceOutline, 0, nTotal ) );
 
 			TopTools_IndexedDataMapOfShapeListOfShape m_EdgeFaceMap = new TopTools_IndexedDataMapOfShapeListOfShape();
 
@@ -276,6 +311,7 @@ namespace MyCAM.Helper
 				if( face == null || face.IsNull() ) {
 					extremeFaceList.RemoveAt( 0 );
 					nUnCheckedExtermeFaceCount--;
+					reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.FindWorkpieceOutline, nTotal - nUnCheckedExtermeFaceCount, nTotal ) );
 					continue;
 				}
 
@@ -305,6 +341,9 @@ namespace MyCAM.Helper
 					extremeFaceList.RemoveAt( 0 );
 					nUnCheckedExtermeFaceCount--;
 				}
+
+				// Report progress to the loading bar.
+				reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.FindWorkpieceOutline, nTotal - nUnCheckedExtermeFaceCount, nTotal ) );
 			}
 			if( colsedShellList.Count > 0 ) {
 				return true;
@@ -504,7 +543,8 @@ namespace MyCAM.Helper
 			return sumRadius / arcInfoList.Count;
 		}
 
-		static bool GetBiggestShell( List<TopoDS_Shape> closedShellList, out TopoDS_Shape biggestShell )
+		static bool GetBiggestShell( List<TopoDS_Shape> closedShellList, out TopoDS_Shape biggestShell,
+			Action<LoadingBarInfo> reportProgress )
 		{
 			biggestShell = null;
 			double maxVolume = 0.0;
@@ -514,8 +554,14 @@ namespace MyCAM.Helper
 			}
 
 			// traverse each shell candidate
+			// Report progress to the loading bar.
+			int nCompleted = 0;
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.CompareWorkpieceOutlines, 0, closedShellList.Count ) );
 			foreach( TopoDS_Shape Shell in closedShellList ) {
 				if( Shell == null ) {
+					// Report progress to the loading bar.
+					nCompleted++;
+					reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.CompareWorkpieceOutlines, nCompleted, closedShellList.Count ) );
 					continue;
 				}
 
@@ -527,6 +573,10 @@ namespace MyCAM.Helper
 					maxVolume = volume;
 					biggestShell = Shell;
 				}
+
+				// Report progress to the loading bar.
+				nCompleted++;
+				reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.CompareWorkpieceOutlines, nCompleted, closedShellList.Count ) );
 			}
 
 			// check if found valid shell

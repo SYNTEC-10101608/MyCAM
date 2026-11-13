@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Preparing" Content="Подготовка" />
+	<Message ID="ImportTitle" Content="Импорт файла" />
+	<Message ID="PlacementTopic" Content="Размещение заготовки" />
+	<Message ID="FileTopicFormat" Content="Файл: {0}" />
+	<Message ID="SimulationTitle" Content="Моделирование" />
+	<Message ID="SimulationTopic" Content="Расчёт результатов моделирования" />
+	<Message ID="ReadStage" Content="Чтение файла" />
+	<Message ID="TransferStage" Content="Преобразование модели" />
+	<Message ID="SewStage" Content="Соединение поверхностей" />
+	<Message ID="PlacementStage" Content="Размещение заготовки" />
+	<Message ID="PathStage" Content="Создание траекторий" />
+	<Message ID="CollisionStage" Content="Результаты проверки столкновений" />
+	<Message ID="PrepareReader" Content="Подготовка к чтению файла" />
+	<Message ID="ReadFile" Content="Чтение файла" />
+	<Message ID="TransferFile" Content="Преобразование содержимого файла" />
+	<Message ID="CombineShape" Content="Объединение частей заготовки" />
+	<Message ID="ValidateShape" Content="Проверка результата преобразования" />
+	<Message ID="SewShape" Content="Обработка модели заготовки" />
+	<Message ID="AddPart" Content="Завершение импорта заготовки" />
+	<Message ID="AnalyzeWorkpiece" Content="Анализ заготовки" />
+	<Message ID="PrepareWorkpiece" Content="Подготовка данных заготовки" />
+	<Message ID="InspectWorkpiece" Content="Проверка формы заготовки" />
+	<Message ID="FindWorkpieceOutline" Content="Определение формы заготовки" />
+	<Message ID="CompareWorkpieceOutlines" Content="Сравнение форм заготовки" />
+	<Message ID="DetermineWorkpieceDirection" Content="Определение ориентации" />
+	<Message ID="FindWorkpieceCenter" Content="Расчёт центра заготовки" />
+	<Message ID="AdjustPlacement" Content="Коррекция положения заготовки" />
+	<Message ID="ApplyPlacement" Content="Завершение размещения" />
+	<Message ID="PreparePaths" Content="Подготовка траекторий" />
+	<Message ID="AnalyzePathWorkpiece" Content="Анализ заготовки" />
+	<Message ID="ProcessPathWorkpiece" Content="Обработка заготовки" />
+	<Message ID="IdentifyPaths" Content="Определение траекторий" />
+	<Message ID="CalculatePaths" Content="Расчёт траекторий" />
+	<Message ID="UpdateDisplay" Content="Обновление отображения" />
+	<Message ID="PathsComplete" Content="Отображение траекторий готово" />
+	<Message ID="PrepareSimulation" Content="Подготовка моделирования" />
+	<Message ID="CalculateSimulation" Content="Расчёт результатов моделирования" />
+	<Message ID="CheckCollision" Content="Проверка столкновений" />
+	<Message ID="ApplySimulation" Content="Применение результатов моделирования" />
+	<Message ID="SummarizeCollisions" Content="Сбор результатов проверки столкновений" />
+	<Message ID="DisplaySimulation" Content="Обновление отображения моделирования" />
+	<Message ID="SimulationComplete" Content="Моделирование готово" />
+	<Message ID="StageFormat" Content="{0} ({1}/{2}): {3}" />
+	<Message ID="AnalysisFormat" Content="{0} ({1}/{2}): {3}" />
+	<Message ID="AnalysisPercentFormat" Content="Прогресс ({0}): {1}%" />
+	<Message ID="PathCountFormat" Content="Обработано траекторий: {0:N0}/{1:N0}" />
+	<Message ID="CollisionPercentFormat" Content="Прогресс проверки: {0}%" />
+	<Message ID="SubmitStage" Content="Добавление модели" />
+	<Message ID="DisplayStage" Content="Обновление отображения" />
+	<Message ID="DxfStage" Content="Преобразование геометрии" />
+	<Message ID="SurfaceStage" Content="Построение целевой поверхности" />
+	<Message ID="ProjectionStage" Content="Проецирование контуров" />
+	<Message ID="ProjectStage" Content="Восстановление проекта" />
+	<Message ID="ConvertDxf" Content="Преобразование объектов" />
+	<Message ID="ConnectDxfContours" Content="Соединение контуров" />
+	<Message ID="BuildTargetSurface" Content="Построение целевой поверхности" />
+	<Message ID="ProjectContours" Content="Проецирование контуров" />
+	<Message ID="BuildEdgeMap" Content="Построение связей контуров" />
+	<Message ID="ReadProject" Content="Чтение файла проекта" />
+	<Message ID="RestoreObjects" Content="Восстановление модели и траекторий" />
+	<Message ID="RestoreSettings" Content="Восстановление моделей и путей" />
+	<Message ID="ApplyProject" Content="Применение данных проекта" />
+	<Message ID="RestoreSupportBracket" Content="Восстановление данных опор" />
+	<Message ID="ImportComplete" Content="Импорт завершён" />
+	<Message ID="ItemCountFormat" Content="Обработано объектов: {0:N0}/{1:N0}" />
+	<Message ID="ProjectTitle" Content="Импорт проекта" />
+	<Message ID="TubeTopic" Content="Импорт спроектированной трубы" />
+	<Message ID="ProjectContourEdges" Content="Проецирование отдельных рёбер" />
+	<Message ID="DisplayParts" Content="Отображение моделей" />
+	<Message ID="DisplayPaths" Content="Отображение траекторий" />
+</ResMap>

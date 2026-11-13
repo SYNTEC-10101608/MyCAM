@@ -43,5 +43,16 @@
 	<Compile Include="Controls\RoundDrawing.cs" />
 	<Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+	<Compile Include="Controls\LoadingBar.cs">
+	  <SubType>UserControl</SubType>
+	</Compile>
+	<Compile Include="Controls\LoadingBar.Designer.cs">
+	  <DependentUpon>LoadingBar.cs</DependentUpon>
+	</Compile>
+	<Compile Include="Controls\RoundedProgressBar.cs">
+	  <SubType>Component</SubType>
+	</Compile>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

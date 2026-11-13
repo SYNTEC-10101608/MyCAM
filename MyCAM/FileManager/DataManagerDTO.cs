@@ -97,9 +97,10 @@ namespace MyCAM.FileManager
 			ToSupportBracketParamsDTO( dataManager.SupportBracketParams, bracketShell );
 		}
 
-		internal void DataMgrDTO2Data( out Dictionary<string, IObject> objectDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData, out CalibrationData calibrationData, out SupportBracketData supportBracketParams, out TopoDS_Shell bracketShell )
+		internal void DataMgrDTO2Data( out Dictionary<string, IObject> objectDataMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData, out CalibrationData calibrationData, out SupportBracketData supportBracketParams, out TopoDS_Shell bracketShell, Action<LoadingBarInfo> reportProgress = null )
 		{
-			objectDataMap = ObjectMapDTOToObjectMap();
+			objectDataMap = ObjectMapDTOToObjectMap( reportProgress );
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.RestoreSettings ) );
 			partIDList = PartIDListDTOToPartList();
 			pathIDList = PathIDListDTOToPathList();
 			shapeIDs = ShapeIDDTOToShapeIDStruct();
@@ -226,12 +227,14 @@ namespace MyCAM.FileManager
 
 		#region Generate Data by DTO
 
-		Dictionary<string, IObject> ObjectMapDTOToObjectMap()
+		Dictionary<string, IObject> ObjectMapDTOToObjectMap( Action<LoadingBarInfo> reportProgress = null )
 		{
 			if( ObjectDataMap == null || ObjectDataMap.Count == 0 ) {
 				throw new ArgumentException( "ObjectMap deserialization failed." );
 			}
 			Dictionary<string, IObject> objectMap = new Dictionary<string, IObject>();
+			int completed = 0;
+			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.RestoreObjects, 0, ObjectDataMap.Count ) );
 			foreach( var entry in ObjectDataMap ) {
 
 				// need to identify pathDataDTO first, because partdata include pathdata
@@ -251,12 +254,12 @@ namespace MyCAM.FileManager
 					else if( pathDataDTO is RunwayPathObjectDTO runwayPathObject ) {
 						objectMap.Add( pathDataDTO.UID, runwayPathObject.PathDTOToRunwayPathObject() );
 					}
-					continue;
 				}
-				if( entry is PartObjectDTO partDataDTO ) {
+				else if( entry is PartObjectDTO partDataDTO ) {
 					PartObject partObject = partDataDTO.PartDTOToPartData();
 					objectMap.Add( partDataDTO.UID, partObject );
 				}
+				reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.RestoreObjects, ++completed, ObjectDataMap.Count ) );
 			}
 			foreach( var entry in ObjectDataMap ) {
 

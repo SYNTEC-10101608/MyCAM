@@ -2,32 +2,25 @@
 using MyCAM.Data;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
-using OCC.IFSelect;
-using OCC.IGESControl;
-using OCC.STEPControl;
 using OCC.TopoDS;
-using OCC.XSControl;
 using OCCTool;
 using OCCViewer;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using MyCAM.LoadingManager;
+using MyCAM.Helper.FileIO;
 
 namespace MyCAM.Editor
 {
-	internal enum FileFormat
-	{
-		BREP = 0,
-		STEP = 1,
-		IGES = 2,
-		DXF = 3
-	}
-
 	internal class CADEditor : EditorBase
 	{
 		public Action<EditActionType, EActionStatus> RaiseCADActionStatusChange;
 		public Action<bool, string> RaiseFileImported;
+
+		bool m_IsImporting = false;
+		LoadingBarManager m_PartLoading;
 
 		public CADEditor( DataManager dataManager, Viewer viewer, TreeView treeView, ViewManager viewManager )
 			: base( dataManager, viewer, treeView, viewManager )
@@ -68,6 +61,10 @@ namespace MyCAM.Editor
 		// APIs
 		public void Import3DFile()
 		{
+			if( m_IsImporting ) {
+				return;
+			}
+
 			// stop current action
 			EndActionIfNotDefault();
 			OpenFileDialog openDialog = new OpenFileDialog();
@@ -86,17 +83,7 @@ namespace MyCAM.Editor
 				return;
 
 			// get this file format
-			string szFileExtension = Path.GetExtension( szFileName ).ToLowerInvariant();
-			FileFormat format = FileFormat.STEP;
-			if( szFileExtension == ".igs" || szFileExtension == ".iges" ) {
-				format = FileFormat.IGES;
-			}
-			if( szFileExtension == ".stp" || szFileExtension == ".step" ) {
-				format = FileFormat.STEP;
-			}
-			if( szFileExtension == ".dxf" ) {
-				format = FileFormat.DXF;
-			}
+			FileFormat format = CadFileReader.GetFormat( szFileName, allowDxf: true );
 
 			if( format == FileFormat.DXF ) {
 				GlassDXFImportAction action = new GlassDXFImportAction( m_DataManager, m_Viewer, m_ViewManager, szFileName );
@@ -105,15 +92,19 @@ namespace MyCAM.Editor
 					m_DefaultAction.ClearSelection();
 					RaiseFileImported?.Invoke( action.IsImportSuccess, action.ImportedFileName );
 				};
-				StartEditAction( action );
+				StartImportAction( action );
 			}
 			else {
-				ReadFileData( format, szFileName );
+				ImportFile( format, szFileName );
 			}
 		}
 
 		public void ImportProjectFile()
 		{
+			if( m_IsImporting ) {
+				return;
+			}
+
 			// stop current action
 			EndActionIfNotDefault();
 			ReadProjectFileAction action = new ReadProjectFileAction( m_DataManager, m_Viewer, m_ViewManager );
@@ -122,11 +113,15 @@ namespace MyCAM.Editor
 				m_DefaultAction.ClearSelection();
 				RaiseFileImported?.Invoke( action.IsImportSuccess, action.ImportedFileName );
 			};
-			StartEditAction( action );
+			StartImportAction( action );
 		}
 
 		public void ImportRingPart()
 		{
+			if( m_IsImporting ) {
+				return;
+			}
+
 			// stop current action
 			EndActionIfNotDefault();
 			PlaceRingShapeAction action = new PlaceRingShapeAction( m_DataManager, m_Viewer, m_ViewManager );
@@ -135,11 +130,15 @@ namespace MyCAM.Editor
 				m_DefaultAction.ClearSelection();
 				RaiseFileImported?.Invoke( action.IsImportSuccess, action.ImportedFileName );
 			};
-			StartEditAction( action );
+			StartImportAction( action );
 		}
 
 		public void SaveProjectFile()
 		{
+			if( m_IsImporting ) {
+				return;
+			}
+
 			// stop current action
 			EndActionIfNotDefault();
 			SaveProjectFileAction action = new SaveProjectFileAction( m_DataManager );
@@ -275,34 +274,54 @@ namespace MyCAM.Editor
 
 		public void ImportTube( TopoDS_Shape tubeShape )
 		{
-			// stop current action
-			EndActionIfNotDefault();
-			tubeShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { tubeShape } );
-			m_DataManager.AddPart( tubeShape );
+			if( m_IsImporting ) {
+				return;
+			}
+			m_IsImporting = true;
+			LoadingBarManager loadingBarManager = new LoadingBarManager( Form.ActiveForm ?? MyApp.MainForm );
+			try {
+				// stop current action
+				EndActionIfNotDefault();
+				loadingBarManager.ShowTubeImport();
+				tubeShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { tubeShape } );
+				loadingBarManager.Report( LoadingStep.AddPart );
+				m_DataManager.AddPart( tubeShape );
 
-			// place it by the machine tube direction and build the paths, the same way the ring part import does
-			PlaceRingShapeAction action = new PlaceRingShapeAction( m_DataManager, m_Viewer, m_ViewManager, tubeShape );
-			action.ActionCompleted += () =>
-			{
-				m_DefaultAction.ClearSelection();
-				RaiseFileImported?.Invoke( action.IsImportSuccess, action.ImportedFileName );
-			};
-			StartEditAction( action );
+				// Reuse placement and path building without submitting the part twice.
+				PlaceRingShapeAction action = new PlaceRingShapeAction( m_DataManager, m_Viewer, m_ViewManager, tubeShape, loadingBarManager );
+				action.ActionCompleted += () =>
+				{
+					loadingBarManager.Dispose();
+					m_DefaultAction.ClearSelection();
+					RaiseFileImported?.Invoke( action.IsImportSuccess, action.ImportedFileName );
+				};
+				StartEditAction( action );
+			}
+			finally {
+				loadingBarManager.Dispose();
+				m_IsImporting = false;
+			}
 		}
 
 		// manager events
 		void OnPartChanged()
 		{
+			m_PartLoading?.Report( LoadingStep.ClearDisplay );
 			m_ViewManager.ClearAll();
 
+			int completed = 0;
+			m_PartLoading?.Report( new LoadingBarInfo( LoadingStep.DisplayParts, 0, m_DataManager.PartIDList.Count ) );
 			foreach( var szNewDataID in m_DataManager.PartIDList ) {
 				if( !DataGettingHelper.GetShapeObject( szNewDataID, out IShapeObject shapeObject ) ) {
+					m_PartLoading?.Report( new LoadingBarInfo( LoadingStep.DisplayParts, ++completed, m_DataManager.PartIDList.Count ) );
 					continue;
 				}
 				m_ViewManager.AddPart( szNewDataID, shapeObject.Shape );
+				m_PartLoading?.Report( new LoadingBarInfo( LoadingStep.DisplayParts, ++completed, m_DataManager.PartIDList.Count ) );
 			}
 
 			// update tree view and viewer
+			m_PartLoading?.Report( LoadingStep.UpdateDisplayTree );
 			m_ViewManager.PartNode.ExpandAll();
 			m_Viewer.UpdateView();
 			m_DefaultAction.ClearSelection();
@@ -341,51 +360,55 @@ namespace MyCAM.Editor
 		}
 
 		// private methods
-		void ReadFileData( FileFormat format, string szFileName )
+		void StartImportAction( IEditorAction action )
 		{
-			TopoDS_Shape oneShape = null;
-
-			// read the file
-			XSControl_Reader Reader;
-			switch( format ) {
-				case FileFormat.BREP:
-					Reader = new XSControl_Reader();
-					break;
-				case FileFormat.STEP:
-					Reader = new STEPControl_Reader();
-					break;
-				case FileFormat.IGES:
-					Reader = new IGESControl_Reader();
-					break;
-				default:
-					Reader = new XSControl_Reader();
-					break;
-			}
-			IFSelect_ReturnStatus status = Reader.ReadFile( szFileName );
-
-			// check the status
-			if( status != IFSelect_ReturnStatus.IFSelect_RetDone ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
+			if( m_IsImporting ) {
 				return;
 			}
-			Reader.TransferRoots();
+			m_IsImporting = true;
+			try {
+				StartEditAction( action );
+			}
+			finally {
+				m_IsImporting = false;
+			}
+		}
 
-			// prevent from empty shape or null shape
-			if( Reader.NbShapes() == 0 ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
+		void ImportFile( FileFormat format, string szFileName )
+		{
+			if( m_IsImporting ) {
 				return;
 			}
-			oneShape = Reader.OneShape();
-			if( oneShape == null || oneShape.IsNull() ) {
-				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
-				return;
-			}
-			oneShape = ShapeTool.SewShape( new List<TopoDS_Shape>() { oneShape } );
-
-			// add the read shape to the manager
-			m_DataManager.AddPart( oneShape );
+			m_IsImporting = true;
 			string szJustFileName = Path.GetFileName( szFileName );
-			RaiseFileImported?.Invoke( true, szJustFileName );
+			LoadingBarManager loadingBarManager = new LoadingBarManager( MyApp.MainForm );
+			bool bIsAdded = false;
+			try {
+				loadingBarManager.ShowImport( szJustFileName, LoadingWorkflow.ModelImport );
+				TopoDS_Shape oneShape = CadFileReader.Read( format, szFileName, loadingBarManager.Report );
+				if( oneShape == null ) {
+					MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
+					return;
+				}
+
+				loadingBarManager.Report( LoadingStep.AddPart );
+				m_PartLoading = loadingBarManager;
+				m_DataManager.AddPart( oneShape );
+				bIsAdded = true;
+				loadingBarManager.Report( LoadingStep.ImportComplete );
+			}
+			catch( Exception ) {
+				MyApp.Logger.ShowOnLogPanel( m_LanguageManager.TryGetString( "ImportFailed", IMPORT_FAILED ), MyApp.NoticeType.Error );
+			}
+			finally {
+				m_PartLoading = null;
+				loadingBarManager.Dispose();
+				m_IsImporting = false;
+			}
+
+			if( bIsAdded ) {
+				RaiseFileImported?.Invoke( true, szJustFileName );
+			}
 		}
 
 		List<string> GetSelectedIDList()

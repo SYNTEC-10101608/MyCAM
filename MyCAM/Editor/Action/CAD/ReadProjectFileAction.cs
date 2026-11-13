@@ -1,6 +1,7 @@
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.FileManager;
+using MyCAM.LoadingManager;
 using OCC.TopoDS;
 using OCCViewer;
 using System;
@@ -47,56 +48,74 @@ namespace MyCAM.Editor
 
 		public override void Start()
 		{
-			// get file path
-			string filePath = OpenProjectFile();
-			if( filePath != null ) {
-				if( string.IsNullOrEmpty( filePath ) ) {
-					End();
-					return;
-				}
-
-				// IO protection
-				try {
-					XmlSerializer serializer = new XmlSerializer( typeof( DataManagerDTO ) );
-					DataManagerDTO dataManagerDTO;
-
-					// get DTO from xml file
-					using( FileStream fileStream = new FileStream( filePath, FileMode.Open ) ) {
-						dataManagerDTO = (DataManagerDTO)serializer.Deserialize( fileStream );
+			if( m_IsRunning ) {
+				return;
+			}
+			m_IsRunning = true;
+			try {
+				// get file path
+				string filePath = OpenProjectFile();
+				if( filePath != null ) {
+					if( string.IsNullOrEmpty( filePath ) ) {
+						End();
+						return;
 					}
 
-					// turn DTO to data
-					dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, IObject> ObjectMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData, out CalibrationData calibrationData, out SupportBracketData supportBracketParams, out TopoDS_Shell bracketShell );
+					// IO protection
+					try {
+						m_LoadingBarManager = new LoadingBarManager( MyApp.MainForm );
+						m_LoadingBarManager.ShowImport( Path.GetFileName( filePath ), LoadingWorkflow.ProjectImport );
+						XmlSerializer serializer = new XmlSerializer( typeof( DataManagerDTO ) );
+						DataManagerDTO dataManagerDTO;
 
-					// set back to data manager
-					m_DataManager.ResetDataManger( ObjectMap, partIDList, pathIDList, shapeIDs, entryAndExitData, calibrationData, supportBracketParams );
+						// get DTO from xml file
+						using( FileStream fileStream = new FileStream( filePath, FileMode.Open ) ) {
+							dataManagerDTO = (DataManagerDTO)serializer.Deserialize( fileStream );
+						}
 
-					// restore bracket shell if .sfa has one (version aligned inside)
-					m_DataManager.RestoreSupportBracketShell( bracketShell );
-					UpdateAllViewData();
+						// turn DTO to data
+						dataManagerDTO.DataMgrDTO2Data( out Dictionary<string, IObject> ObjectMap, out List<string> partIDList, out List<string> pathIDList, out ShapeIDsStruct shapeIDs, out EntryAndExitData entryAndExitData, out CalibrationData calibrationData, out SupportBracketData supportBracketParams, out TopoDS_Shell bracketShell, m_LoadingBarManager.Report );
 
-					// set import success and file name
-					IsImportSuccess = true;
-					ImportedFileName = Path.GetFileName( filePath );
+						// set back to data manager
+						m_LoadingBarManager.Report( LoadingStep.ApplyProject );
+						m_DataManager.ResetDataManger( ObjectMap, partIDList, pathIDList, shapeIDs, entryAndExitData, calibrationData, supportBracketParams );
+
+						// restore bracket shell if .sfa has one (version aligned inside)
+						m_LoadingBarManager.Report( LoadingStep.RestoreSupportBracket );
+						m_DataManager.RestoreSupportBracketShell( bracketShell );
+						UpdateAllViewData();
+
+						// set import success and file name
+						IsImportSuccess = true;
+						ImportedFileName = Path.GetFileName( filePath );
+						m_LoadingBarManager.Report( LoadingStep.ImportComplete );
+					}
+					catch( Exception ex ) {
+						MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "ReadProjectFileFailed", READ_PROJECT_FILE_FAILED ), ex.Message ), MyApp.NoticeType.Error );
+						IsImportSuccess = false;
+						ImportedFileName = string.Empty;
+					}
 				}
-				catch( Exception ex ) {
-					MyApp.Logger.ShowOnLogPanel( string.Format( m_LanguageManager.TryGetString( "ReadProjectFileFailed", READ_PROJECT_FILE_FAILED ), ex.Message ), MyApp.NoticeType.Error );
-					IsImportSuccess = false;
-					ImportedFileName = string.Empty;
-				}
+				End();
 			}
-			End();
+			finally {
+				m_LoadingBarManager?.Dispose();
+				m_LoadingBarManager = null;
+				m_IsRunning = false;
+			}
 		}
 
 		public override void End()
 		{
+			m_LoadingBarManager?.Dispose();
+			m_LoadingBarManager = null;
 			ActionCompleted?.Invoke();
 			base.End();
 		}
 
 		void UpdateAllViewData()
 		{
-			m_ViewManager.RebuildAllViews( m_DataManager, true );
+			m_ViewManager.RebuildAllViews( m_DataManager, true, m_LoadingBarManager.Report );
 			m_Viewer.UpdateView();
 		}
 
@@ -125,6 +144,8 @@ namespace MyCAM.Editor
 
 		Viewer m_Viewer;
 		ViewManager m_ViewManager;
+		LoadingBarManager m_LoadingBarManager;
+		bool m_IsRunning;
 		const string READ_PROJECT_FILE_FAILED = "讀取專案檔案失敗：\n{0}";
 		const string OPEN_PROJECT_TITLE = "開啟專案";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ReadProjectFileAction" );
