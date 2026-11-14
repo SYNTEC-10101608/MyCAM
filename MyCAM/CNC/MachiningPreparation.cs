@@ -1,10 +1,10 @@
-using CncManager.Definition;
-using MyCAM.Editor;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CncManager.Definition;
+using MyCAM.Editor;
 
 namespace MyCAM
 {

@@ -1,0 +1,21 @@
+# 文字檔：repo 內統一存 LF，checkout 到工作目錄一律轉 CRLF（Windows 開發／部署）
+# 不依賴各人 core.autocrlf 設定
+* text=auto eol=crlf
+
+# CAD 模型：ASCII 文字格式但 diff 無閱讀價值
+*.stp   -diff
+*.step  -diff
+*.igs   -diff
+*.iges  -diff
+
+# 二進位（明確標示，避免被誤判為文字而遭換行轉換）
+*.dll   binary
+*.exe   binary
+*.lib   binary
+*.pdb   binary
+*.stl   binary
+*.png   binary
+*.jpg   binary
+*.ico   binary
+*.bmp   binary
+*.zip   binary

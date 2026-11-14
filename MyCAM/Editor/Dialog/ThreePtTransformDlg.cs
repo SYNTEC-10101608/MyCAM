@@ -1,6 +1,6 @@
+ï»¿using System;
 using MyCAM.App;
 using OCC.gp;
-using System;
 
 namespace MyCAM.Editor
 {
@@ -105,9 +105,9 @@ namespace MyCAM.Editor
 		gp_Pnt m_MachineP2;
 		gp_Pnt m_MachineP3;
 
-		const string INVALID_MACHINE_COORD = "¾÷±ñÂI®y¼ĞµL®Ä";
-		const string MACHINE_POINTS_COINCIDENT = "¾÷±ñÂI¤£¯à­«¦X";
-		const string MACHINE_POINTS_COLLINEAR = "¾÷±ñÂI¤£¯à¦@½u";
+		const string INVALID_MACHINE_COORD = "æ©Ÿæ¢°é»åº§æ¨™ç„¡æ•ˆ";
+		const string MACHINE_POINTS_COINCIDENT = "æ©Ÿæ¢°é»ä¸èƒ½é‡åˆ";
+		const string MACHINE_POINTS_COLLINEAR = "æ©Ÿæ¢°é»ä¸èƒ½å…±ç·š";
 		readonly LanguageManager.LanguageManager m_LanguageManager;
 	}
 }

@@ -1,32 +1,58 @@
-# Remove the line below if you want to inherit .editorconfig settings from higher directories
+# MyCAM .editorconfig
+# 規範說明見 .github/instructions/coding-style-*.instructions.md
 root = true
 
-# C# files
-[*.cs]
-
-#### Core EditorConfig Options ####
-
-# Indentation and spacing
-indent_size = 4
-indent_style = tab
-tab_width = 4
-
-# New line preferences
+# ============================================================
+# 全部檔案
+# ============================================================
+[*]
+charset = utf-8
 end_of_line = crlf
 insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = tab
+indent_size = 4
+tab_width = 4
 
-#### C# Formatting Rules ####
+[*.md]
+trim_trailing_whitespace = false
 
-# New line preferences
-csharp_new_line_before_catch = true
+# 批次檔：UTF-8 不可帶 BOM（cmd 會把 BOM 當成第一行指令的一部分）
+[*.{bat,cmd}]
+charset = utf-8
+
+# XML 類：VS 預設帶 BOM
+[*.{xml,resx,config,settings,csproj,vcxproj,filters,props,targets,sln}]
+charset = utf-8-bom
+
+[*.{json,yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# ============================================================
+# C#
+# ============================================================
+[*.cs]
+charset = utf-8-bom
+max_line_length = 120
+
+#### using ####
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+csharp_using_directive_placement = outside_namespace:warning
+
+#### 換行 ####
+csharp_new_line_before_open_brace = types,methods,properties,anonymous_methods,anonymous_types,object_collection_array_initializers,lambdas,accessors
 csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
 csharp_new_line_before_finally = true
 csharp_new_line_before_members_in_anonymous_types = true
 csharp_new_line_before_members_in_object_initializers = true
-csharp_new_line_before_open_brace = types,methods,properties,anonymous_methods,anonymous_types,object_collection_array_initializers,lambdas,accessors
 csharp_new_line_between_query_expression_clauses = true
+csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = false
 
-# Indentation preferences
+#### 縮排 ####
 csharp_indent_block_contents = true
 csharp_indent_braces = false
 csharp_indent_case_contents = true
@@ -34,7 +60,7 @@ csharp_indent_case_contents_when_block = true
 csharp_indent_labels = one_less_than_current
 csharp_indent_switch_labels = true
 
-# Space preferences
+#### 空白 ####
 csharp_space_after_cast = false
 csharp_space_after_colon_in_inheritance_clause = true
 csharp_space_after_comma = true
@@ -58,6 +84,128 @@ csharp_space_between_method_declaration_parameter_list_parentheses = true
 csharp_space_between_parentheses = expressions,control_flow_statements
 csharp_space_between_square_brackets = true
 
-# Wrapping preferences
-csharp_preserve_single_line_blocks = true
-csharp_preserve_single_line_statements = false
+#### 程式風格 ####
+# 不使用 this. 存取成員
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+# 使用 int / string 等關鍵字，而非 Int32 / String
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
+
+# 成員一律明確寫出存取修飾詞
+dotnet_style_require_accessibility_modifiers = always:suggestion
+dotnet_style_readonly_field = true:suggestion
+
+# var：僅在右側型別一眼可見時使用
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# if / for / while 一律加大括號
+csharp_prefer_braces = true:warning
+
+# expression-bodied：屬性 / 存取子可單行，方法與建構子不使用
+csharp_style_expression_bodied_methods = false:suggestion
+csharp_style_expression_bodied_constructors = false:suggestion
+csharp_style_expression_bodied_operators = false:suggestion
+csharp_style_expression_bodied_properties = when_on_single_line:suggestion
+csharp_style_expression_bodied_indexers = when_on_single_line:suggestion
+csharp_style_expression_bodied_accessors = when_on_single_line:suggestion
+csharp_style_expression_bodied_lambdas = true:silent
+
+# 允許 `x == false` 與 `!x` 兩種寫法
+dotnet_diagnostic.IDE0100.severity = none
+
+# 括號：運算優先序不明顯時加括號
+dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:silent
+dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:silent
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:silent
+dotnet_style_parentheses_in_other_operators = never_if_unnecessary:silent
+
+#### 命名 ####
+# 介面：I 前綴 + PascalCase
+dotnet_naming_rule.interface_should_be_i_pascal.severity = warning
+dotnet_naming_rule.interface_should_be_i_pascal.symbols = interface_symbols
+dotnet_naming_rule.interface_should_be_i_pascal.style = i_pascal_style
+dotnet_naming_symbols.interface_symbols.applicable_kinds = interface
+dotnet_naming_symbols.interface_symbols.applicable_accessibilities = *
+dotnet_naming_style.i_pascal_style.required_prefix = I
+dotnet_naming_style.i_pascal_style.capitalization = pascal_case
+
+# 型別、方法、屬性、事件：PascalCase
+dotnet_naming_rule.types_and_members_should_be_pascal.severity = warning
+dotnet_naming_rule.types_and_members_should_be_pascal.symbols = types_and_members_symbols
+dotnet_naming_rule.types_and_members_should_be_pascal.style = pascal_style
+dotnet_naming_symbols.types_and_members_symbols.applicable_kinds = class,struct,enum,delegate,method,property,event,local_function
+dotnet_naming_symbols.types_and_members_symbols.applicable_accessibilities = *
+dotnet_naming_style.pascal_style.capitalization = pascal_case
+
+# 常數：全大寫 + 底線分隔（STATUS_TYPE）
+dotnet_naming_rule.const_should_be_upper_snake.severity = suggestion
+dotnet_naming_rule.const_should_be_upper_snake.symbols = const_symbols
+dotnet_naming_rule.const_should_be_upper_snake.style = upper_snake_style
+dotnet_naming_symbols.const_symbols.applicable_kinds = field,local
+dotnet_naming_symbols.const_symbols.applicable_accessibilities = *
+dotnet_naming_symbols.const_symbols.required_modifiers = const
+dotnet_naming_style.upper_snake_style.capitalization = all_upper
+dotnet_naming_style.upper_snake_style.word_separator = _
+
+# 區域變數、參數：camelCase（含型別前綴，如 nCount、szName）
+dotnet_naming_rule.locals_should_be_camel.severity = suggestion
+dotnet_naming_rule.locals_should_be_camel.symbols = local_symbols
+dotnet_naming_rule.locals_should_be_camel.style = camel_style
+dotnet_naming_symbols.local_symbols.applicable_kinds = local,parameter
+dotnet_naming_style.camel_style.capitalization = camel_case
+
+# 產生的程式碼（WinForms Designer）不檢查風格
+[*.Designer.cs]
+generated_code = true
+
+# ============================================================
+# C / C++
+# ============================================================
+[*.{c,cpp,h,hpp}]
+charset = utf-8-bom
+max_line_length = 120
+
+cpp_indent_braces = false
+cpp_indent_multi_line_relative_to = innermost_parenthesis
+cpp_indent_case_labels = false
+cpp_indent_case_contents = true
+cpp_indent_access_specifiers = false
+cpp_indent_namespace_contents = true
+cpp_indent_preprocessor = leftmost_column
+
+cpp_new_line_before_open_brace_namespace = new_line
+cpp_new_line_before_open_brace_type = new_line
+cpp_new_line_before_open_brace_function = new_line
+cpp_new_line_before_open_brace_block = same_line
+cpp_new_line_before_open_brace_lambda = same_line
+cpp_new_line_before_else = true
+cpp_new_line_before_catch = true
+cpp_new_line_before_while_in_do_while = false
+
+cpp_space_before_function_open_parenthesis = remove
+cpp_space_within_parameter_list_parentheses = true
+cpp_space_between_empty_parameter_list_parentheses = false
+cpp_space_after_keywords_in_control_flow_statements = false
+cpp_space_within_control_flow_statement_parentheses = true
+cpp_space_before_lambda_open_parenthesis = false
+cpp_space_within_cast_parentheses = true
+cpp_space_after_cast_close_parenthesis = false
+cpp_space_within_expression_parentheses = true
+cpp_space_before_block_open_brace = true
+cpp_space_before_open_square_bracket = false
+cpp_space_within_square_brackets = true
+cpp_space_between_empty_square_brackets = false
+cpp_space_before_comma = false
+cpp_space_after_comma = true
+cpp_space_before_semicolon_in_for_statement = false
+cpp_space_after_semicolon_in_for_statement = true
+cpp_space_remove_around_member_operators = true
+cpp_space_around_binary_operator = insert
+cpp_space_around_ternary_operator = insert
+cpp_space_pointer_reference_alignment = right

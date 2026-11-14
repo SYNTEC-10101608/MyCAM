@@ -1,9 +1,9 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {

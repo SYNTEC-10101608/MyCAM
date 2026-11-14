@@ -1,7 +1,7 @@
-﻿using MyCAM.Data;
+﻿using System;
+using MyCAM.Data;
 using OCC.gp;
 using PostTool.Interop;
-using System;
 
 namespace MyCAM.Post
 {

@@ -1,7 +1,7 @@
-﻿using MyCAM.Data;
+﻿using System;
+using MyCAM.Data;
 using OCC.gp;
 using OCC.TopoDS;
-using System;
 
 namespace MyCAM.Helper
 {

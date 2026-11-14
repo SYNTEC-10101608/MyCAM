@@ -1,8 +1,8 @@
-﻿using MyCAM.Data;
-using OCC.gp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MyCAM.Data;
+using OCC.gp;
 
 namespace MyCAM.Helper.CAM
 {

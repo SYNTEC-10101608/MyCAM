@@ -1,10 +1,10 @@
-using MyCAM.Data;
-using MyCAM.Editor;
-using MyCAM.Helper.LoadingBar;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
+using MyCAM.Data;
+using MyCAM.Editor;
+using MyCAM.Helper.LoadingBar;
 
 namespace MyCAM.LoadingManager
 {

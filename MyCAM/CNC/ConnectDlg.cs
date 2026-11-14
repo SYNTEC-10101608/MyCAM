@@ -1,5 +1,5 @@
-﻿using MyCAM.App;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
+using MyCAM.App;
 
 namespace MyCAM.Editor.Dialog
 {

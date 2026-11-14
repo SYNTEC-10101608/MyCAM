@@ -1,4 +1,4 @@
-namespace CncManager
+﻿namespace CncManager
 {
 	internal static class CncMessages
 	{

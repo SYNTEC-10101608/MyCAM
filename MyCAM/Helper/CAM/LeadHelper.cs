@@ -1,11 +1,11 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using MyCAM.Data;
 using OCC.GCPnts;
 using OCC.Geom;
 using OCC.GeomAdaptor;
 using OCC.gp;
 using OCC.Precision;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
@@ -364,8 +364,10 @@ namespace MyCAM.Helper
 
 				// according to the target arc length to get u param
 				GCPnts_AbscissaPoint arcParam = new GCPnts_AbscissaPoint( gac, targetLen, first, 1.0e-7, 1000 );
-				if( !arcParam.IsDone() )
+				if( !arcParam.IsDone() ) {
 					break;
+				}
+
 				double dCurveParamU = arcParam.Parameter();
 
 				// get point

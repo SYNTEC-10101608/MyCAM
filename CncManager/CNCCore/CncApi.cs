@@ -1,9 +1,9 @@
-using CncManager.Definition;
-using Syntec.OpenCNC;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using CncManager.Definition;
+using Syntec.OpenCNC;
 
 namespace CncManager.CNCCore
 {
@@ -243,7 +243,8 @@ namespace CncManager.CNCCore
 
 		public static bool WriteRRegister( int index, int value )
 		{
-			return ExecuteResource( delegate { Cnc.PLC.RRegister[ index ] = value; return true; } ).IsSuccess;
+			return ExecuteResource( delegate
+			{ Cnc.PLC.RRegister[ index ] = value; return true; } ).IsSuccess;
 		}
 
 		#endregion
@@ -496,7 +497,8 @@ namespace CncManager.CNCCore
 
 		public static Task<CncResult<int>> ReadKVariableAsync( int index )
 		{
-			return ExecuteResourceAsync( delegate { return Cnc.State[ index ]; } );
+			return ExecuteResourceAsync( delegate
+			{ return Cnc.State[ index ]; } );
 		}
 
 		#endregion
@@ -609,7 +611,8 @@ namespace CncManager.CNCCore
 
 		public static bool ResetCnc()
 		{
-			return ExecuteResource( delegate { Cnc.SWP.ResetCnc(); return true; } ).IsSuccess;
+			return ExecuteResource( delegate
+			{ Cnc.SWP.ResetCnc(); return true; } ).IsSuccess;
 		}
 
 		#endregion

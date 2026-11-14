@@ -1,12 +1,12 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyCAM.Data;
 using OCC.BRepAdaptor;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Helper
 {

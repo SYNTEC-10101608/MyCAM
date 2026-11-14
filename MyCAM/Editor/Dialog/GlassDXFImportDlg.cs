@@ -1,5 +1,5 @@
+ï»¿using System;
 using MyCAM.App;
-using System;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -65,8 +65,8 @@ namespace MyCAM.Editor.Dialog
 		}
 
 		const double MAX_RADIUS = 10000.0;
-		const string RADIUS_RANGE_ERROR = "¶ê²y¥b®|»İ¤¶©ó 0 ~ {0} mm";
-		const string HEIGHT_RANGE_ERROR = "¦±­±°ª«×»İ¬°¤j©ó 0 ¥B¤p©ó R({0}) ªº¥¿¼Æ";
+		const string RADIUS_RANGE_ERROR = "åœ“çƒåŠå¾‘éœ€ä»‹æ–¼ 0 ~ {0} mm";
+		const string HEIGHT_RANGE_ERROR = "æ›²é¢é«˜åº¦éœ€ç‚ºå¤§æ–¼ 0 ä¸”å°æ–¼ R({0}) çš„æ­£æ•¸";
 		readonly LanguageManager.LanguageManager m_LanguageManager;
 	}
 }

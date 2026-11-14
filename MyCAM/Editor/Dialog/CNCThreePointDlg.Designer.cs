@@ -1,4 +1,4 @@
-namespace MyCAM.Editor.Dialog
+﻿namespace MyCAM.Editor.Dialog
 {
 	partial class CNCThreePointDlg
 	{

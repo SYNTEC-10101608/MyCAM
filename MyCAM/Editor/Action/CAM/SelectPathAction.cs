@@ -1,10 +1,10 @@
-using MyCAM.App;
-using MyCAM.Data;
-using OCCViewer;
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using MyCAM.App;
+using MyCAM.Data;
+using OCCViewer;
 
 namespace MyCAM.Editor
 {
@@ -334,7 +334,7 @@ namespace MyCAM.Editor
 		HashSet<string> m_ExcludedIDSet;
 		HashSet<string> m_LockedIDSet = new HashSet<string>();
 		LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "SelectPathAction" );
-		const string LOG_MULTI_SELECT_ERROR_VIEW = "[¿ï¨ú²§±`] ¸ô®|³æ¿ï¼Ò¦¡¤U°»´ú¨ì¦h­«¿ï¨ú ({0} ­Ó¶µ¥Ø)¡A¤w¦Û°Ê²M°£";
-		const string LOG_MULTI_SELECT_ERROR_TREE = "[¿ï¨ú²§±`] ¸ô®|³æ¿ï¼Ò¦¡¤U±q¸ô®|¾ğ°»´ú¨ì¦h­«¿ï¨ú ({0} ­Ó¶µ¥Ø)¡A¤w¦Û°Ê²M°£";
+		const string LOG_MULTI_SELECT_ERROR_VIEW = "[é¸å–ç•°å¸¸] è·¯å¾‘å–®é¸æ¨¡å¼ä¸‹åµæ¸¬åˆ°å¤šé‡é¸å– ({0} å€‹é …ç›®)ï¼Œå·²è‡ªå‹•æ¸…é™¤";
+		const string LOG_MULTI_SELECT_ERROR_TREE = "[é¸å–ç•°å¸¸] è·¯å¾‘å–®é¸æ¨¡å¼ä¸‹å¾è·¯å¾‘æ¨¹åµæ¸¬åˆ°å¤šé‡é¸å– ({0} å€‹é …ç›®)ï¼Œå·²è‡ªå‹•æ¸…é™¤";
 	}
 }

@@ -1,4 +1,7 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using OCC.AIS;
@@ -6,9 +9,6 @@ using OCC.BRep;
 using OCC.gp;
 using OCC.TopoDS;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {

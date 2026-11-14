@@ -1,8 +1,8 @@
-using MyCAM.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using MyCAM.Data;
 
 namespace MyCAM.Helper.LoadingBar
 {

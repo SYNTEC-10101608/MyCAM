@@ -1,3 +1,6 @@
+ï»¿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
@@ -7,9 +10,6 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -197,9 +197,9 @@ namespace MyCAM.Editor
 
 		AddPointType m_AddPointType;
 
-		const string NOT_CIRCULAR_ARC = "[¾Ş§@´£¿ô]¿ï¨úªºÃä¤£¬O¶ê©·";
-		const string INVALID_EDGE = "[¾Ş§@´£¿ô]¿ï¨úªºÃäµL®Ä";
-		const string INVALID_POINT = "[¾Ş§@´£¿ô]¿ï¨úªºÂI¦ìµL®Ä";
+		const string NOT_CIRCULAR_ARC = "[æ“ä½œæé†’]é¸å–çš„é‚Šä¸æ˜¯åœ“å¼§";
+		const string INVALID_EDGE = "[æ“ä½œæé†’]é¸å–çš„é‚Šç„¡æ•ˆ";
+		const string INVALID_POINT = "[æ“ä½œæé†’]é¸å–çš„é»ä½ç„¡æ•ˆ";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "AddPointAction" );
 	}
 }

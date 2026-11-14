@@ -1,11 +1,11 @@
-using CncManager.Definition;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using CncManager.Definition;
 
 namespace CncManager.CNCCore
 {
-		// One background loop owns heartbeat and reconnect for this connection session.
+	// One background loop owns heartbeat and reconnect for this connection session.
 	public class CncConnectChecker : IDisposable
 	{
 		// Raised after every check (true = alive)

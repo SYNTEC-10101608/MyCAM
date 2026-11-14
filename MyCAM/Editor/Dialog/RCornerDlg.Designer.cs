@@ -1,4 +1,4 @@
-namespace MyCAM.Editor
+Ôªønamespace MyCAM.Editor
 {
     partial class RCornerDlg
     {
@@ -37,7 +37,7 @@ namespace MyCAM.Editor
             this.m_btnDelete.Name = "m_btnDelete";
             this.m_btnDelete.Size = new System.Drawing.Size(130, 33);
             this.m_btnDelete.TabIndex = 1;
-            this.m_btnDelete.Text = "ßR∞£R®§§u√¿";
+            this.m_btnDelete.Text = "Âà™Èô§RËßíÂ∑•Ëóù";
             this.m_btnDelete.UseVisualStyleBackColor = true;
             this.m_btnDelete.Click += new System.EventHandler(this.m_btnDelete_Click);
             //
@@ -48,7 +48,7 @@ namespace MyCAM.Editor
             this.m_btnSwitchStartOrEnd.Name = "m_btnSwitchStartOrEnd";
             this.m_btnSwitchStartOrEnd.Size = new System.Drawing.Size(130, 33);
             this.m_btnSwitchStartOrEnd.TabIndex = 2;
-            this.m_btnSwitchStartOrEnd.Text = "§¡¥´∞_≤◊¬I";
+            this.m_btnSwitchStartOrEnd.Text = "ÂàáÊèõËµ∑ÁµÇÈªû";
             this.m_btnSwitchStartOrEnd.UseVisualStyleBackColor = true;
             this.m_btnSwitchStartOrEnd.Click += new System.EventHandler(this.m_btnSwitchStartOrEnd_Click);
             //
@@ -59,7 +59,7 @@ namespace MyCAM.Editor
             this.m_btnDone.Name = "m_btnDone";
             this.m_btnDone.Size = new System.Drawing.Size(130, 33);
             this.m_btnDone.TabIndex = 3;
-            this.m_btnDone.Text = "ßπ¶®";
+            this.m_btnDone.Text = "ÂÆåÊàê";
             this.m_btnDone.UseVisualStyleBackColor = true;
             this.m_btnDone.Click += new System.EventHandler(this.m_btnDone_Click);
             //
@@ -77,7 +77,7 @@ namespace MyCAM.Editor
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "RCornerDlg";
             this.Padding = new System.Windows.Forms.Padding(9);
-            this.Text = "ΩsøËR®§";
+            this.Text = "Á∑®ËºØRËßí";
             this.ResumeLayout(false);
             this.PerformLayout();
 

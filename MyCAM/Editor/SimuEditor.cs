@@ -1,7 +1,12 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
+using MyCAM.LoadingManager;
 using MyCAM.PathCache;
 using MyCAM.Post;
 using OCC.AIS;
@@ -15,11 +20,6 @@ using OCC.TopExp;
 using OCC.TopLoc;
 using OCC.TopoDS;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using MyCAM.LoadingManager;
 
 namespace MyCAM.Editor
 {

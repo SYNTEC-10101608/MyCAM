@@ -69,7 +69,7 @@
 		T0_Flange = 16,
 
 		// T1: tool coordinate frame (ax3)
-		T1_ToolFrame = 17,   
+		T1_ToolFrame = 17,
 	}
 
 	public enum MachinePrValue

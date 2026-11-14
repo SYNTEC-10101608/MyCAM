@@ -1,8 +1,8 @@
-﻿using MyCAM.PathCache;
+﻿using System;
+using System.Collections.Generic;
+using MyCAM.PathCache;
 using OCC.gp;
 using OCC.TopoDS;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Data
 {

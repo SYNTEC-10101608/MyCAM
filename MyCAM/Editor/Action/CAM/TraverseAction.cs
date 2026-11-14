@@ -1,11 +1,11 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using MyCAM.Helper;
 using MyCAM.PathCache;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {

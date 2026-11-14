@@ -1,8 +1,8 @@
+ï»¿using System;
 using MyCAM.Data;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopoDS;
-using System;
 
 namespace MyCAM.Helper
 {
@@ -350,7 +350,7 @@ namespace MyCAM.Helper
 				return false;
 			}
 
-			// calculate circumradius R = sideLength / (2 * sin(£k/n))
+			// calculate circumradius R = sideLength / (2 * sin(Ï€/n))
 			double angleStep = 2 * Math.PI / sides;
 			double radius = sideLength / ( 2 * Math.Sin( Math.PI / sides ) );
 
@@ -424,7 +424,7 @@ namespace MyCAM.Helper
 		{
 			gp_Dir localZ = new gp_Dir( LOCAL_Z_DIRECTION_X, LOCAL_Z_DIRECTION_Y, LOCAL_Z_DIRECTION_Z );
 
-			// for regular polygons, the interior angle is fixed: (n-2) * £k / n
+			// for regular polygons, the interior angle is fixed: (n-2) * Ï€ / n
 			double interiorAngle = ( sides - INTERIOR_ANGLE_NUMERATOR_OFFSET ) * Math.PI / sides;
 			double halfAngle = interiorAngle / 2.0;
 			double tangentDistance = cornerRadius / Math.Tan( halfAngle );

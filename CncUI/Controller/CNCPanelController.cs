@@ -1,9 +1,9 @@
+﻿using System;
+using System.Threading;
+using System.Windows.Forms;
 using CncManager;
 using CncManager.CNCCore;
 using CncManager.Definition;
-using System;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace CncUI
 {
@@ -350,16 +350,26 @@ namespace CncUI
 			}
 			int slot;
 			switch( axis ) {
-				case "X": slot = 0; break;
-				case "Y": slot = 1; break;
-				case "Z": slot = 2; break;
-				case "Rotary1": slot = 3; break;
-				case "Rotary2": slot = 4; break;
+				case "X":
+					slot = 0;
+					break;
+				case "Y":
+					slot = 1;
+					break;
+				case "Z":
+					slot = 2;
+					break;
+				case "Rotary1":
+					slot = 3;
+					break;
+				case "Rotary2":
+					slot = 4;
+					break;
 				default:
 					return;
 			}
 			int axisNumber = slot + 1;
-			int command = checked( 2 * axisNumber - ( positive ? 1 : 0 ) );
+			int command = checked(2 * axisNumber - ( positive ? 1 : 0 ));
 			m_JogActive = true;
 			CncApi.WriteRRegister( CncConstants.R_JOG_COMMAND, command );
 		}

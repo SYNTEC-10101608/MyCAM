@@ -1,8 +1,8 @@
+﻿using System;
+using System.Xml.Serialization;
 using MyCAM.Data;
 using OCC.TopAbs;
 using OCC.TopoDS;
-using System;
-using System.Xml.Serialization;
 
 namespace MyCAM.FileManager
 {

@@ -1,8 +1,8 @@
-using CommonUI.Controls;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
+using CommonUI.Controls;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -19,12 +19,12 @@ namespace MyCAM.Editor.Dialog
 		public CNCThreePointDlg()
 		{
 			InitializeComponent();
-			m_DrawingFields = new[,] {
+			m_DrawingFields = new[ , ] {
 				{ m_txtDrawing1X, m_txtDrawing1Y, m_txtDrawing1Z },
 				{ m_txtDrawing2X, m_txtDrawing2Y, m_txtDrawing2Z },
 				{ m_txtDrawing3X, m_txtDrawing3Y, m_txtDrawing3Z }
 			};
-			m_WorkpieceFields = new[,] {
+			m_WorkpieceFields = new[ , ] {
 				{ m_txtWorkpiece1X, m_txtWorkpiece1Y, m_txtWorkpiece1Z },
 				{ m_txtWorkpiece2X, m_txtWorkpiece2Y, m_txtWorkpiece2Z },
 				{ m_txtWorkpiece3X, m_txtWorkpiece3Y, m_txtWorkpiece3Z }
@@ -40,15 +40,24 @@ namespace MyCAM.Editor.Dialog
 					WireInput( m_WorkpieceFields[ point, axis ], () => PointInputCommitRequested?.Invoke( index, axisIndex ) );
 				}
 			}
-			foreach( TextBox field in m_WorkpieceFields ) field.TextChanged += OnInputChanged;
-			foreach( TextBox field in m_DrawingFields ) field.TextChanged += OnInputChanged;
+			foreach( TextBox field in m_WorkpieceFields ) {
+				field.TextChanged += OnInputChanged;
+			}
+
+			foreach( TextBox field in m_DrawingFields ) {
+				field.TextChanged += OnInputChanged;
+			}
+
 			m_txtTolerance.TextChanged += OnInputChanged;
 			WireInput( m_txtTolerance, () => ToleranceCommitRequested?.Invoke() );
 			m_btnCalculate.Click += ( sender, e ) => CalculateRequested?.Invoke();
 			m_btnPickDrawing.Click += ( sender, e ) => DrawingPickRequested?.Invoke();
 			m_btnPickCancel.Click += ( sender, e ) => DrawingPickCancelRequested?.Invoke();
-			m_chbDrawingOnly.CheckedChanged += ( sender, e ) => {
-				if( !m_Loading ) DrawingOnlyChanged?.Invoke();
+			m_chbDrawingOnly.CheckedChanged += ( sender, e ) =>
+			{
+				if( !m_Loading ) {
+					DrawingOnlyChanged?.Invoke();
+				}
 			};
 			ApplyResources();
 		}
@@ -92,7 +101,9 @@ namespace MyCAM.Editor.Dialog
 		{
 			string[,] values = new string[ fields.GetLength( 0 ), fields.GetLength( 1 ) ];
 			for( int point = 0; point < fields.GetLength( 0 ); point++ ) {
-				for( int axis = 0; axis < fields.GetLength( 1 ); axis++ ) values[ point, axis ] = fields[ point, axis ].Text;
+				for( int axis = 0; axis < fields.GetLength( 1 ); axis++ ) {
+					values[ point, axis ] = fields[ point, axis ].Text;
+				}
 			}
 			return values;
 		}
@@ -101,7 +112,9 @@ namespace MyCAM.Editor.Dialog
 		{
 			m_Loading = true;
 			try {
-				for( int axis = 0; axis < fields.GetLength( 1 ); axis++ ) fields[ point, axis ].Text = coordinates[ axis ];
+				for( int axis = 0; axis < fields.GetLength( 1 ); axis++ ) {
+					fields[ point, axis ].Text = coordinates[ axis ];
+				}
 			}
 			finally { m_Loading = false; }
 			InputChanged?.Invoke();
@@ -109,13 +122,16 @@ namespace MyCAM.Editor.Dialog
 
 		void OnInputChanged( object sender, EventArgs e )
 		{
-			if( !m_Loading ) InputChanged?.Invoke();
+			if( !m_Loading ) {
+				InputChanged?.Invoke();
+			}
 		}
 
 		void WireInput( TextBox field, Action commit )
 		{
 			field.Leave += ( sender, e ) => commit();
-			field.KeyDown += ( sender, e ) => {
+			field.KeyDown += ( sender, e ) =>
+			{
 				if( e.KeyCode == Keys.Enter ) {
 					e.SuppressKeyPress = true;
 					e.Handled = true;
@@ -164,7 +180,10 @@ namespace MyCAM.Editor.Dialog
 				: Language.TryGetString( "DrawingOnly_Offline", DRAWING_ONLY_OFFLINE );
 			bool enabled = !busy && !picking;
 			m_pnlDrawing.Enabled = !busy;
-			foreach( TextBox field in m_DrawingFields ) field.Enabled = enabled;
+			foreach( TextBox field in m_DrawingFields ) {
+				field.Enabled = enabled;
+			}
+
 			m_btnPickDrawing.Enabled = enabled && !capturing;
 			m_btnReset1.Enabled = m_btnReset2.Enabled = m_btnReset3.Enabled = enabled && !capturing;
 			m_btnPickCancel.Visible = picking;
@@ -189,7 +208,10 @@ namespace MyCAM.Editor.Dialog
 
 		void SetCalibrationVisible( bool visible )
 		{
-			if( m_CalibrationVisible == visible ) return;
+			if( m_CalibrationVisible == visible ) {
+				return;
+			}
+
 			int heightChange = m_btnCalculate.Bottom - m_chbDrawingOnly.Bottom;
 			m_CalibrationVisible = visible;
 			if( visible ) {

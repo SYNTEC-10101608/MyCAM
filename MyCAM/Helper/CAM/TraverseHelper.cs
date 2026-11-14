@@ -1,11 +1,11 @@
+﻿using System;
+using System.Collections.Generic;
 using LanguageManager;
 using MyCAM.App;
 using MyCAM.Data;
 using OCC.gp;
 using OCC.TopoDS;
 using OCCTool;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {

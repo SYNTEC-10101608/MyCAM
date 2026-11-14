@@ -1,4 +1,8 @@
-﻿using OCC.Bnd;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyCAM.Data;
+using OCC.Bnd;
 using OCC.BRepAdaptor;
 using OCC.BRepBndLib;
 using OCC.BRepBuilderAPI;
@@ -9,10 +13,6 @@ using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using MyCAM.Data;
 
 namespace MyCAM.Helper
 {

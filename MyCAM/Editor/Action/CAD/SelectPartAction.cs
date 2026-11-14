@@ -1,6 +1,6 @@
-﻿using MyCAM.Data;
+﻿using System.Windows.Forms;
+using MyCAM.Data;
 using OCCViewer;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {

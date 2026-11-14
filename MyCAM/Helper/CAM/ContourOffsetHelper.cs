@@ -1,9 +1,9 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using MyCAM.Data;
 using OCC.gp;
 using OCCTool;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Helper
 {
@@ -378,7 +378,7 @@ namespace MyCAM.Helper
 					gp_Pnt p3 = points[ i ].Point.Point;
 					gp_Pnt p4 = points[ nextOfOutgoing ].Point.Point;
 
-					// for the definition of API�Awe need to put line2 as P4-P3
+					// for the definition of API，we need to put line2 as P4-P3
 					gp_Pnt intersection = GeometryTool.FindIntersectPoint(
 						p1, p2, p4, p3,
 						out IntersectType typeL1, out IntersectType typeL2 );

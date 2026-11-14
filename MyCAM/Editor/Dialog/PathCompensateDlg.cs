@@ -38,9 +38,9 @@ namespace MyCAM.Editor.Dialog
 			SetCompensateValue();
 		}
 
-		public void SetTotalCompsensation(double? totalCompsensation)
+		public void SetTotalCompsensation( double? totalCompsensation )
 		{
-			if( totalCompsensation  == null ) {
+			if( totalCompsensation == null ) {
 				m_lblTotalCompensateValue.Text = m_LanguageManager.TryGetString( "IsMixData", IS_MIX_DATA );
 			}
 			else {

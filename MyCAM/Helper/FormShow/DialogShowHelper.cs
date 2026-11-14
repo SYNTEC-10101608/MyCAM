@@ -1,6 +1,6 @@
-﻿using MyCAM.App;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
+using MyCAM.App;
 
 namespace MyCAM.Helper.FormShow
 {

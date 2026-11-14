@@ -1,4 +1,4 @@
-namespace MyCAM.Editor.Dialog
+ï»¿namespace MyCAM.Editor.Dialog
 {
     partial class AddPathDlg
     {
@@ -59,7 +59,7 @@ namespace MyCAM.Editor.Dialog
 			// 
 			// m_lblStepDescription
 			// 
-			this.m_lblStepDescription.Font = new System.Drawing.Font("·s²Ó©úÅé", 9F, System.Drawing.FontStyle.Bold);
+			this.m_lblStepDescription.Font = new System.Drawing.Font("æ–°ç´°æ˜é«”", 9F, System.Drawing.FontStyle.Bold);
 			this.m_lblStepDescription.Location = new System.Drawing.Point(20, 12);
 			this.m_lblStepDescription.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.m_lblStepDescription.Name = "m_lblStepDescription";
@@ -78,7 +78,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_grpStep1.Size = new System.Drawing.Size(360, 119);
 			this.m_grpStep1.TabIndex = 1;
 			this.m_grpStep1.TabStop = false;
-			this.m_grpStep1.Text = "¸ô®|¥Í¦¨¤è¦¡";
+			this.m_grpStep1.Text = "è·¯å¾‘ç”Ÿæˆæ–¹å¼";
 			// 
 			// m_rdoAutoHat
 			// 
@@ -90,7 +90,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_rdoAutoHat.Size = new System.Drawing.Size(183, 19);
 			this.m_rdoAutoHat.TabIndex = 0;
 			this.m_rdoAutoHat.TabStop = true;
-			this.m_rdoAutoHat.Text = "¦Û°Ê¥Í¦¨¸ô®|-²§§Î»\¥ó";
+			this.m_rdoAutoHat.Text = "è‡ªå‹•ç”Ÿæˆè·¯å¾‘-ç•°å½¢è“‹ä»¶";
 			this.m_rdoAutoHat.UseVisualStyleBackColor = true;
 			this.m_rdoAutoHat.CheckedChanged += new System.EventHandler(this.OnStep1RadioChanged);
 			// 
@@ -102,7 +102,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_rdoAutoTube.Name = "m_rdoAutoTube";
 			this.m_rdoAutoTube.Size = new System.Drawing.Size(168, 19);
 			this.m_rdoAutoTube.TabIndex = 1;
-			this.m_rdoAutoTube.Text = "¦Û°Ê¥Í¦¨¸ô®|-ºŞ©Ô¥ó";
+			this.m_rdoAutoTube.Text = "è‡ªå‹•ç”Ÿæˆè·¯å¾‘-ç®¡æ‹‰ä»¶";
 			this.m_rdoAutoTube.UseVisualStyleBackColor = true;
 			this.m_rdoAutoTube.CheckedChanged += new System.EventHandler(this.OnStep1RadioChanged);
 			// 
@@ -114,7 +114,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_rdoManual.Name = "m_rdoManual";
 			this.m_rdoManual.Size = new System.Drawing.Size(118, 19);
 			this.m_rdoManual.TabIndex = 2;
-			this.m_rdoManual.Text = "¤â°Ê¥Í¦¨¸ô®|";
+			this.m_rdoManual.Text = "æ‰‹å‹•ç”Ÿæˆè·¯å¾‘";
 			this.m_rdoManual.UseVisualStyleBackColor = true;
 			this.m_rdoManual.CheckedChanged += new System.EventHandler(this.OnStep1RadioChanged);
 			// 
@@ -129,7 +129,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_grpStep3.Size = new System.Drawing.Size(360, 88);
 			this.m_grpStep3.TabIndex = 2;
 			this.m_grpStep3.TabStop = false;
-			this.m_grpStep3.Text = "¸ô®|¥Í¦¨¤è¦¡";
+			this.m_grpStep3.Text = "è·¯å¾‘ç”Ÿæˆæ–¹å¼";
 			this.m_grpStep3.Visible = false;
 			// 
 			// m_rdoAutoFromFace
@@ -142,7 +142,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_rdoAutoFromFace.Size = new System.Drawing.Size(118, 19);
 			this.m_rdoAutoFromFace.TabIndex = 0;
 			this.m_rdoAutoFromFace.TabStop = true;
-			this.m_rdoAutoFromFace.Text = "¦Û°Ê¥Í¦¨¸ô®|";
+			this.m_rdoAutoFromFace.Text = "è‡ªå‹•ç”Ÿæˆè·¯å¾‘";
 			this.m_rdoAutoFromFace.UseVisualStyleBackColor = true;
 			this.m_rdoAutoFromFace.CheckedChanged += new System.EventHandler(this.OnStep3RadioChanged);
 			// 
@@ -154,7 +154,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_rdoManualWire.Name = "m_rdoManualWire";
 			this.m_rdoManualWire.Size = new System.Drawing.Size(118, 19);
 			this.m_rdoManualWire.TabIndex = 1;
-			this.m_rdoManualWire.Text = "¤â°Ê¿ï¾Ü¸ô®|";
+			this.m_rdoManualWire.Text = "æ‰‹å‹•é¸æ“‡è·¯å¾‘";
 			this.m_rdoManualWire.UseVisualStyleBackColor = true;
 			this.m_rdoManualWire.CheckedChanged += new System.EventHandler(this.OnStep3RadioChanged);
 			// 
@@ -175,7 +175,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_btnNext.Name = "m_btnNext";
 			this.m_btnNext.Size = new System.Drawing.Size(107, 34);
 			this.m_btnNext.TabIndex = 4;
-			this.m_btnNext.Text = "¤U¤@¨B";
+			this.m_btnNext.Text = "ä¸‹ä¸€æ­¥";
 			this.m_btnNext.UseVisualStyleBackColor = true;
 			this.m_btnNext.Click += new System.EventHandler(this.m_btnNext_Click);
 			// 
@@ -186,7 +186,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_btnConfirm.Name = "m_btnConfirm";
 			this.m_btnConfirm.Size = new System.Drawing.Size(100, 34);
 			this.m_btnConfirm.TabIndex = 5;
-			this.m_btnConfirm.Text = "¥Í¦¨¸ô®|";
+			this.m_btnConfirm.Text = "ç”Ÿæˆè·¯å¾‘";
 			this.m_btnConfirm.UseVisualStyleBackColor = true;
 			this.m_btnConfirm.Click += new System.EventHandler(this.m_btnConfirm_Click);
 			// 
@@ -198,7 +198,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_chkShowAdvanced.Name = "m_chkShowAdvanced";
 			this.m_chkShowAdvanced.Size = new System.Drawing.Size(89, 19);
 			this.m_chkShowAdvanced.TabIndex = 6;
-			this.m_chkShowAdvanced.Text = "¶i¶¥¿ï¶µ";
+			this.m_chkShowAdvanced.Text = "é€²éšé¸é …";
 			this.m_chkShowAdvanced.UseVisualStyleBackColor = true;
 			this.m_chkShowAdvanced.CheckedChanged += new System.EventHandler(this.m_chkShowAdvanced_CheckedChanged);
 			// 
@@ -252,7 +252,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_lblD1Unit.Name = "m_lblD1Unit";
 			this.m_lblD1Unit.Size = new System.Drawing.Size(22, 15);
 			this.m_lblD1Unit.TabIndex = 2;
-			this.m_lblD1Unit.Text = "«×";
+			this.m_lblD1Unit.Text = "åº¦";
 			// 
 			// m_txbMaxLineLength
 			// 
@@ -271,7 +271,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_lblMaxLineLength.Name = "m_lblMaxLineLength";
 			this.m_lblMaxLineLength.Size = new System.Drawing.Size(142, 15);
 			this.m_lblMaxLineLength.TabIndex = 8;
-			this.m_lblMaxLineLength.Text = "³Ìªøª½½uÂ÷´²¶ZÂ÷¡G";
+			this.m_lblMaxLineLength.Text = "æœ€é•·ç›´ç·šé›¢æ•£è·é›¢ï¼š";
 			// 
 			// m_txbMaxChordError
 			// 
@@ -290,7 +290,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_lblMaxChordError.Name = "m_lblMaxChordError";
 			this.m_lblMaxChordError.Size = new System.Drawing.Size(112, 15);
 			this.m_lblMaxChordError.TabIndex = 5;
-			this.m_lblMaxChordError.Text = "³Ì¤j©¶°ª»~®t¡G";
+			this.m_lblMaxChordError.Text = "æœ€å¤§å¼¦é«˜èª¤å·®ï¼š";
 			// 
 			// m_cmbDiscreteMode
 			// 
@@ -310,7 +310,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_lblDiscreteMode.Name = "m_lblDiscreteMode";
 			this.m_lblDiscreteMode.Size = new System.Drawing.Size(82, 15);
 			this.m_lblDiscreteMode.TabIndex = 3;
-			this.m_lblDiscreteMode.Text = "Â÷´²¤è¦¡¡G";
+			this.m_lblDiscreteMode.Text = "é›¢æ•£æ–¹å¼ï¼š";
 			// 
 			// m_txbD1Threshold
 			// 
@@ -329,7 +329,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_lblD1Threshold.Name = "m_lblD1Threshold";
 			this.m_lblD1Threshold.Size = new System.Drawing.Size(103, 15);
 			this.m_lblD1Threshold.TabIndex = 0;
-			this.m_lblD1Threshold.Text = "D1 ³sÄò»Ö­È¡G";
+			this.m_lblD1Threshold.Text = "D1 é€£çºŒé–¥å€¼ï¼š";
 			// 
 			// m_lblStepHints
 			// 
@@ -361,7 +361,7 @@ namespace MyCAM.Editor.Dialog
 			this.MinimizeBox = false;
 			this.Name = "AddPathDlg";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "·s¼W¸ô®|";
+			this.Text = "æ–°å¢è·¯å¾‘";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AddPathDlg_FormClosing);
 			this.m_grpStep1.ResumeLayout(false);
 			this.m_grpStep1.PerformLayout();

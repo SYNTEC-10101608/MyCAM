@@ -1,4 +1,4 @@
-namespace MyCAM.Editor
+ï»¿namespace MyCAM.Editor
 {
     partial class MeasureDlg
     {
@@ -31,7 +31,7 @@ namespace MyCAM.Editor
             this.m_lblMethod.Name = "m_lblMethod";
             this.m_lblMethod.Size = new System.Drawing.Size(72, 17);
             this.m_lblMethod.TabIndex = 0;
-            this.m_lblMethod.Text = "¶q´ú¤è¦¡";
+            this.m_lblMethod.Text = "é‡æ¸¬æ–¹å¼";
             // 
             // m_cmbMethod
             // 
@@ -52,7 +52,7 @@ namespace MyCAM.Editor
             this.m_lblGuide.Name = "m_lblGuide";
             this.m_lblGuide.Size = new System.Drawing.Size(269, 40);
             this.m_lblGuide.TabIndex = 2;
-            this.m_lblGuide.Text = "½Ğ¥ı¿ï¾Ü¶q´ú¤è¦¡";
+            this.m_lblGuide.Text = "è«‹å…ˆé¸æ“‡é‡æ¸¬æ–¹å¼";
             // 
             // m_lblResult
             // 
@@ -62,7 +62,7 @@ namespace MyCAM.Editor
             this.m_lblResult.Name = "m_lblResult";
             this.m_lblResult.Size = new System.Drawing.Size(72, 17);
             this.m_lblResult.TabIndex = 3;
-            this.m_lblResult.Text = "¶q´úµ²ªG";
+            this.m_lblResult.Text = "é‡æ¸¬çµæœ";
             // 
             // m_txtResult
             // 
@@ -87,7 +87,7 @@ namespace MyCAM.Editor
             this.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "MeasureDlg";
-            this.Text = "¶q´ú";
+            this.Text = "é‡æ¸¬";
             this.ResumeLayout(false);
             this.PerformLayout();
 

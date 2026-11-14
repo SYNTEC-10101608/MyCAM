@@ -1,4 +1,4 @@
-namespace CncManager.Definition
+﻿namespace CncManager.Definition
 {
 	// Controller calibration result carried by CncResult<T>.
 	public sealed class CncCalibrationResult

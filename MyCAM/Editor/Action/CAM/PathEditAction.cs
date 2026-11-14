@@ -1,4 +1,7 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using MyCAM.Helper;
@@ -6,9 +9,6 @@ using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.gp;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Editor
 {

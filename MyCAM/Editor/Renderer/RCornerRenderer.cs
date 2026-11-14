@@ -1,3 +1,5 @@
+﻿using System.Collections.Generic;
+using System.Linq;
 using MyCAM.Data;
 using MyCAM.PathCache;
 using OCC.AIS;
@@ -7,8 +9,6 @@ using OCC.Quantity;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {

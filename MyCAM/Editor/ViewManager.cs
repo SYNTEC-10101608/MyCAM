@@ -1,4 +1,9 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using OCC.AIS;
 using OCC.Aspect;
@@ -10,11 +15,6 @@ using OCC.TopLoc;
 using OCC.TopoDS;
 using OCC.TopTools;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {

@@ -1,4 +1,4 @@
-namespace CncUI.Dialog
+﻿namespace CncUI.Dialog
 {
 	partial class CNCOffsetDialog
 	{

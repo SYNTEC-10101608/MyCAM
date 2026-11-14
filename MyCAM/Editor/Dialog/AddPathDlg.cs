@@ -1,7 +1,7 @@
+ï»¿using System;
+using System.Windows.Forms;
 using MyCAM.App;
 using OCCTool;
-using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -376,13 +376,13 @@ namespace MyCAM.Editor.Dialog
 		const double D1_THRESHOLD_MIN = 0.001;
 		const double D1_THRESHOLD_MAX = 90.0;
 
-		const string DESC_STEP2_TITLE = "¿ï¾Ü±ı¥Í¦¨¸ô®|ªº­±";
-		const string DESC_STEP2_HINTS = "·Æ¹«ÂùÀ»¡G³sÄò­±\r\nCtrl¡G¦h¿ï";
-		const string DESC_STEP4_TITLE = "¿ï¾Ü±ı¥Í¦¨ªº¸ô®|";
-		const string DESC_STEP4_HINTS = "·Æ¹«ÂùÀ»¡G³sÄò¸ô®|\r\nCtrl¡G¦h¿ï";
+		const string DESC_STEP2_TITLE = "é¸æ“‡æ¬²ç”Ÿæˆè·¯å¾‘çš„é¢";
+		const string DESC_STEP2_HINTS = "æ»‘é¼ é›™æ“Šï¼šé€£çºŒé¢\r\nCtrlï¼šå¤šé¸";
+		const string DESC_STEP4_TITLE = "é¸æ“‡æ¬²ç”Ÿæˆçš„è·¯å¾‘";
+		const string DESC_STEP4_HINTS = "æ»‘é¼ é›™æ“Šï¼šé€£çºŒè·¯å¾‘\r\nCtrlï¼šå¤šé¸";
 
-		const string DISCRETE_MODE_QUASI = "´¶³qÂ÷´²";
-		const string DISCRETE_MODE_CHORD = "ºë½TÂ÷´²";
+		const string DISCRETE_MODE_QUASI = "æ™®é€šé›¢æ•£";
+		const string DISCRETE_MODE_CHORD = "ç²¾ç¢ºé›¢æ•£";
 
 		readonly LanguageManager.LanguageManager m_LanguageManager;
 	}

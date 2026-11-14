@@ -1,8 +1,8 @@
-﻿using MyCAM.Helper;
+﻿using System;
+using System.Collections.Generic;
+using MyCAM.Helper;
 using OCC.gp;
 using OCCTool;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Data
 {

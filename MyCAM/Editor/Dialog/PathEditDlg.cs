@@ -28,8 +28,9 @@ namespace MyCAM.Editor.Dialog
 
 			m_cmbRefCoordType.Items.Add( m_LanguageManager.TryGetString( "RefCoordType_Local", REF_COORD_TYPE_LOCAL ) );
 			m_cmbRefCoordType.Items.Add( m_LanguageManager.TryGetString( "RefCoordType_World", REF_COORD_TYPE_WORLD ) );
-			if( m_cmbRefCoordType.SelectedIndex < 0 )
+			if( m_cmbRefCoordType.SelectedIndex < 0 ) {
 				m_cmbRefCoordType.SelectedIndex = 0;
+			}
 		}
 
 		void Initialization()

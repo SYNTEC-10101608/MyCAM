@@ -1,3 +1,5 @@
+﻿using System.Collections.Generic;
+using System.Linq;
 using MyCAM.Data;
 using MyCAM.PathCache;
 using OCC.AIS;
@@ -6,8 +8,6 @@ using OCC.Geom;
 using OCC.gp;
 using OCC.Quantity;
 using OCC.TopoDS;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Editor.Renderer
 {
@@ -114,7 +114,7 @@ namespace MyCAM.Editor.Renderer
 			Dictionary<string, List<AIS_Line>> result = new Dictionary<string, List<AIS_Line>>();
 			foreach( string szPathID in pathIDList ) {
 				DataGettingHelper.GetCraftDataByID( szPathID, out CraftData craftData );
-				if ( craftData == null || craftData.SpecialToolVecData == null || craftData.SpecialToolVecData.Mode == ToolVecMode.Interpolate ) {
+				if( craftData == null || craftData.SpecialToolVecData == null || craftData.SpecialToolVecData.Mode == ToolVecMode.Interpolate ) {
 					continue;
 				}
 				List<AIS_Line> toolVecAISList = new List<AIS_Line>();

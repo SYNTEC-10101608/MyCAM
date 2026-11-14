@@ -1,8 +1,8 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {
@@ -38,7 +38,7 @@ namespace MyCAM.Editor
 			m_Dlg.CheckValueGeomRestriction += IsValidOverCut;
 			m_Dlg.Preview = PreviewOverCutLength;
 			m_Dlg.Confirm = ConfirmOverCutLength;
-			m_Dlg.Cancel  = CancelOverCutLength;
+			m_Dlg.Cancel = CancelOverCutLength;
 			PropertyChanged?.Invoke( m_PathIDList );
 			m_Dlg.Show( MyApp.MainForm );
 		}
@@ -50,9 +50,9 @@ namespace MyCAM.Editor
 				PropertyChanged?.Invoke( m_PathIDList );
 			}
 			if( m_Dlg != null ) {
-				m_Dlg.Preview  = null;
-				m_Dlg.Confirm  = null;
-				m_Dlg.Cancel   = null;
+				m_Dlg.Preview = null;
+				m_Dlg.Confirm = null;
+				m_Dlg.Cancel = null;
 				m_Dlg.Close();
 				m_Dlg = null;
 			}

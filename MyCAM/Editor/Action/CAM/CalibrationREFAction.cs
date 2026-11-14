@@ -1,4 +1,5 @@
-﻿using MyCAM.App;
+﻿using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using MyCAM.Editor.Renderer;
@@ -8,7 +9,6 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {

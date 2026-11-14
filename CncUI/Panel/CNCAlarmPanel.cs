@@ -1,9 +1,9 @@
-using CncManager.Definition;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
+using CncManager.Definition;
 
 namespace CncUI
 {
@@ -123,9 +123,12 @@ namespace CncUI
 		string GetAxisName( int id )
 		{
 			switch( id ) {
-				case 1: return "X";
-				case 2: return "Y";
-				case 3: return "Z";
+				case 1:
+					return "X";
+				case 2:
+					return "Y";
+				case 3:
+					return "Z";
 				case 4:
 				case 5:
 					foreach( CncAxis axis in m_Axes ) {

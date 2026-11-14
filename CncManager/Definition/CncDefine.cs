@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace CncManager.Definition
 {
@@ -93,10 +93,14 @@ namespace CncManager.Definition
 		public static string GetRotaryName( int parameterIndex, int value )
 		{
 			switch( value ) {
-				case 400: return "A";
-				case 500: return "B";
-				case 600: return "C";
-				default: throw new ArgumentOutOfRangeException( nameof( value ), CncMessages.InvalidRotaryParameter( parameterIndex, value ) );
+				case 400:
+					return "A";
+				case 500:
+					return "B";
+				case 600:
+					return "C";
+				default:
+					throw new ArgumentOutOfRangeException( nameof( value ), CncMessages.InvalidRotaryParameter( parameterIndex, value ) );
 			}
 		}
 	}

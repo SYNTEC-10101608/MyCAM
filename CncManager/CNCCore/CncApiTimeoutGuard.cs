@@ -1,7 +1,7 @@
-using CncManager.Definition;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using CncManager.Definition;
 
 namespace CncManager.CNCCore
 {
@@ -18,7 +18,8 @@ namespace CncManager.CNCCore
 
 		public bool HasPendingOperation
 		{
-			get {
+			get
+			{
 				lock( m_Lock ) {
 					return m_Pending != null && !m_Pending.IsCompleted;
 				}

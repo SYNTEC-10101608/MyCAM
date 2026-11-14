@@ -1,5 +1,5 @@
-﻿using CommonData;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using CommonData;
 
 namespace FileTranslator
 {

@@ -1,8 +1,8 @@
-using MyCAM.Data;
-using MyCAM.Helper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using MyCAM.Data;
+using MyCAM.Helper;
 
 namespace MyCAM.Editor
 {

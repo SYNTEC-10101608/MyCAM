@@ -1,3 +1,4 @@
+ï»¿using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
@@ -9,7 +10,6 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -217,11 +217,11 @@ namespace MyCAM.Editor
 		AIS_TextLabel m_LabelX;
 		ThreePtTransformDlg m_dialog;
 
-		const string COINCIDENT_SECOND_POINT = "­«¦Xªº²Ä¤G­ÓÂI";
-		const string COINCIDENT_THIRD_POINT = "­«¦Xªº²Ä¤T­ÓÂI";
-		const string THREE_POINTS_COLLINEAR = "3ÂI¦@½u";
-		const string INVALID_AXIS_PARAM = "µL®Äªº¶b¦V°Ñ¼Æ";
-		const string CANNOT_CREATE_3P_COORD_SYSTEM = "µLªk³Ğ«Ø¤TÂI®y¼Ğ¨t";
+		const string COINCIDENT_SECOND_POINT = "é‡åˆçš„ç¬¬äºŒå€‹é»";
+		const string COINCIDENT_THIRD_POINT = "é‡åˆçš„ç¬¬ä¸‰å€‹é»";
+		const string THREE_POINTS_COLLINEAR = "3é»å…±ç·š";
+		const string INVALID_AXIS_PARAM = "ç„¡æ•ˆçš„è»¸å‘åƒæ•¸";
+		const string CANNOT_CREATE_3P_COORD_SYSTEM = "ç„¡æ³•å‰µå»ºä¸‰é»åº§æ¨™ç³»";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ThreePtTransformAction" );
 	}
 }

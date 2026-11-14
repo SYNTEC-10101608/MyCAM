@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -210,25 +210,25 @@ namespace MyCAM.Editor
 		}
 
 		const int DEFAULT_AXIS_PLANE_INDEX = 0;
-		const string GUIDE_POINT = "½Ğ¥ı±qÄ²±±¿ï¤@­Ó¤u¥ó­±ÂI¡A§@¬°°Ñ¦ÒÂI¦ì¸m";
-		const string GUIDE_AXIAL = "½Ğ¥ı±qÄ²±±¿ï¤@±ø¤u¥óÃä¡A§@¬°°Ñ¦Ò¤è¦V¶b";
-		const string GUIDE_AXIAL_PARALLEL = "½Ğ¥ı±qÄ²±±¿ï¤@±ø¤u¥óÃä¡A§@¬°°Ñ¦Ò¤è¦V¶b¡]¥­¦æ¡^";
-		const string GUIDE_PLANE = "½Ğ¥ı±qÄ²±±¿ï¤@­Ó¤u¥ó­±¡A§@¬°°Ñ¦Ò­±";
-		const string GUIDE_PLANE_PARALLEL = "½Ğ¥ı±qÄ²±±¿ï¤@­Ó¤u¥ó­±¡A§@¬°°Ñ¦Ò­±¡]¥­¦æ¡^";
-		const string GUIDE_DEFAULT = "½Ğ¿ï¾Ü¿é¤J¤è¦¡";
-		const string METHOD_POINT = "ÂI¹ï»ô";
-		const string METHOD_AXIAL = "¶b¦V¹ï»ô";
-		const string METHOD_AXIAL_PARALLEL = "¶b¦V¥­¦æ";
-		const string METHOD_PLANE = "¥­­±¹ï»ô";
-		const string METHOD_PLANE_PARALLEL = "¥­­±¥­¦æ";
-		const string AXIS_PLANE_ORIGIN = "­ìÂI";
-		const string AXIS_PLANE_X_AXIS = "X ¶b";
-		const string AXIS_PLANE_Y_AXIS = "Y ¶b";
-		const string AXIS_PLANE_Z_AXIS = "Z ¶b";
-		const string AXIS_PLANE_XY_PLANE = "XY ¥­­±";
-		const string AXIS_PLANE_YZ_PLANE = "YZ ¥­­±";
-		const string AXIS_PLANE_XZ_PLANE = "XZ ¥­­±";
-		const string ALIGNMENT_INVALID = "¹ï»ôµL®Ä¡A¿ï¨úªºª«¥ó¨Ã«D¥­­±¡Bª½½u¡B©Î¥¿¶ê©·¡A½Ğ­«·s¿ï¾Ü";
+		const string GUIDE_POINT = "è«‹å…ˆå¾è§¸æ§é¸ä¸€å€‹å·¥ä»¶é¢é»ï¼Œä½œç‚ºåƒè€ƒé»ä½ç½®";
+		const string GUIDE_AXIAL = "è«‹å…ˆå¾è§¸æ§é¸ä¸€æ¢å·¥ä»¶é‚Šï¼Œä½œç‚ºåƒè€ƒæ–¹å‘è»¸";
+		const string GUIDE_AXIAL_PARALLEL = "è«‹å…ˆå¾è§¸æ§é¸ä¸€æ¢å·¥ä»¶é‚Šï¼Œä½œç‚ºåƒè€ƒæ–¹å‘è»¸ï¼ˆå¹³è¡Œï¼‰";
+		const string GUIDE_PLANE = "è«‹å…ˆå¾è§¸æ§é¸ä¸€å€‹å·¥ä»¶é¢ï¼Œä½œç‚ºåƒè€ƒé¢";
+		const string GUIDE_PLANE_PARALLEL = "è«‹å…ˆå¾è§¸æ§é¸ä¸€å€‹å·¥ä»¶é¢ï¼Œä½œç‚ºåƒè€ƒé¢ï¼ˆå¹³è¡Œï¼‰";
+		const string GUIDE_DEFAULT = "è«‹é¸æ“‡è¼¸å…¥æ–¹å¼";
+		const string METHOD_POINT = "é»å°é½Š";
+		const string METHOD_AXIAL = "è»¸å‘å°é½Š";
+		const string METHOD_AXIAL_PARALLEL = "è»¸å‘å¹³è¡Œ";
+		const string METHOD_PLANE = "å¹³é¢å°é½Š";
+		const string METHOD_PLANE_PARALLEL = "å¹³é¢å¹³è¡Œ";
+		const string AXIS_PLANE_ORIGIN = "åŸé»";
+		const string AXIS_PLANE_X_AXIS = "X è»¸";
+		const string AXIS_PLANE_Y_AXIS = "Y è»¸";
+		const string AXIS_PLANE_Z_AXIS = "Z è»¸";
+		const string AXIS_PLANE_XY_PLANE = "XY å¹³é¢";
+		const string AXIS_PLANE_YZ_PLANE = "YZ å¹³é¢";
+		const string AXIS_PLANE_XZ_PLANE = "XZ å¹³é¢";
+		const string ALIGNMENT_INVALID = "å°é½Šç„¡æ•ˆï¼Œé¸å–çš„ç‰©ä»¶ä¸¦éå¹³é¢ã€ç›´ç·šã€æˆ–æ­£åœ“å¼§ï¼Œè«‹é‡æ–°é¸æ“‡";
 
 		// Event handlers are enabled by default
 		bool m_enableEventHandlers = true;

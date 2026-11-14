@@ -1,6 +1,6 @@
+﻿using System.Threading.Tasks;
 using CncManager.CNCCore;
 using CncManager.Definition;
-using System.Threading.Tasks;
 
 namespace CncManager
 {

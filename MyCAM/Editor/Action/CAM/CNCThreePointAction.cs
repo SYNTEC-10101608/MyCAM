@@ -1,3 +1,9 @@
+﻿using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using CncManager;
 using CncManager.CNCCore;
 using CncManager.Definition;
@@ -12,12 +18,6 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -38,7 +38,10 @@ namespace MyCAM.Editor
 
 		public override void Start()
 		{
-			if( m_Started || m_Finished ) return;
+			if( m_Started || m_Finished ) {
+				return;
+			}
+
 			m_Started = true;
 			base.Start();
 			try {
@@ -62,7 +65,9 @@ namespace MyCAM.Editor
 				m_Baseline = GetInputSnapshot();
 				m_Client.ConnectionStateChanged += OnConnectionChanged;
 				DialogShowHelper.ShowCentered( m_Dialog, m_Owner );
-				if( !IsDrawingComplete ) BeginPicking( ALL_POINTS );
+				if( !IsDrawingComplete ) {
+					BeginPicking( ALL_POINTS );
+				}
 			}
 			catch {
 				End();
@@ -93,7 +98,10 @@ namespace MyCAM.Editor
 
 		void RefreshDisplay()
 		{
-			if( m_Dialog == null || m_Dialog.IsDisposed ) return;
+			if( m_Dialog == null || m_Dialog.IsDisposed ) {
+				return;
+			}
+
 			bool drawingComplete = IsDrawingComplete;
 			bool workpieceComplete = ArePointsComplete( m_Dialog.WorkpieceInput );
 			ThreePointStep step = m_Picking || !drawingComplete ? ThreePointStep.Drawing : EffectiveDrawingOnly ? ThreePointStep.None
@@ -115,9 +123,15 @@ namespace MyCAM.Editor
 
 		void CommitPointInput( int point, int axis )
 		{
-			if( m_Calculating || m_Capturing || m_Picking || EffectiveDrawingOnly || !IsDrawingComplete ) return;
+			if( m_Calculating || m_Capturing || m_Picking || EffectiveDrawingOnly || !IsDrawingComplete ) {
+				return;
+			}
+
 			string text = m_Dialog.WorkpieceInput[ point, axis ];
-			if( string.IsNullOrWhiteSpace( text ) ) return;
+			if( string.IsNullOrWhiteSpace( text ) ) {
+				return;
+			}
+
 			if( !TryReadNumber( text, out double value ) ) {
 				Report( Text( "Validation_Input", INVALID_INPUT ) );
 				return;
@@ -127,7 +141,10 @@ namespace MyCAM.Editor
 
 		void CommitTolerance()
 		{
-			if( m_Calculating || m_Picking || EffectiveDrawingOnly || string.IsNullOrWhiteSpace( m_Dialog.ToleranceText ) ) return;
+			if( m_Calculating || m_Picking || EffectiveDrawingOnly || string.IsNullOrWhiteSpace( m_Dialog.ToleranceText ) ) {
+				return;
+			}
+
 			if( !TryGetTolerance( out double tolerance ) ) {
 				Report( Text( "Validation_Input", INVALID_INPUT ) );
 				return;
@@ -137,7 +154,10 @@ namespace MyCAM.Editor
 
 		bool TryGetTolerance( out double value )
 		{
-			if( !TryReadNumber( m_Dialog.ToleranceText, out value ) || value < 0 ) return false;
+			if( !TryReadNumber( m_Dialog.ToleranceText, out value ) || value < 0 ) {
+				return false;
+			}
+
 			value = CalibrationData.Round( value );
 			return true;
 		}
@@ -157,7 +177,10 @@ namespace MyCAM.Editor
 		bool TryGetDraft( out CalibrationData data, out string error, bool drawingOnly = false )
 		{
 			data = null;
-			if( !TryReadPoints( m_Dialog.DrawingInput, Text( "DrawingPoints", DRAWING_POINTS ), out gp_Pnt[] drawing, out error ) ) return false;
+			if( !TryReadPoints( m_Dialog.DrawingInput, Text( "DrawingPoints", DRAWING_POINTS ), out gp_Pnt[] drawing, out error ) ) {
+				return false;
+			}
+
 			if( !IsDrawingComplete || m_Picking ) {
 				error = Text( "Validation_DrawingIncomplete", DRAWING_INCOMPLETE );
 				return false;
@@ -188,7 +211,10 @@ namespace MyCAM.Editor
 			data = new CalibrationData( drawing[ 0 ], drawing[ 1 ], drawing[ 2 ] ) { DrawingOnly = m_DrawingOnly };
 			data.SetWorkpieceData( workpiece[ 0 ], workpiece[ 1 ], workpiece[ 2 ], hasTolerance ? (double?)tolerance : null );
 			data.SetCalibrationError( m_CalibrationError, m_CalculationCompleted, m_CalculationSucceeded );
-			if( m_Accepted.HasTransmitted ) data.MarkTransmitted();
+			if( m_Accepted.HasTransmitted ) {
+				data.MarkTransmitted();
+			}
+
 			return true;
 		}
 
@@ -197,7 +223,10 @@ namespace MyCAM.Editor
 			points = new gp_Pnt[ fields.GetLength( 0 ) ];
 			error = null;
 			for( int point = 0; point < points.Length; point++ ) {
-				if( string.IsNullOrWhiteSpace( fields[ point, X_AXIS ] ) && string.IsNullOrWhiteSpace( fields[ point, Y_AXIS ] ) && string.IsNullOrWhiteSpace( fields[ point, Z_AXIS ] ) ) continue;
+				if( string.IsNullOrWhiteSpace( fields[ point, X_AXIS ] ) && string.IsNullOrWhiteSpace( fields[ point, Y_AXIS ] ) && string.IsNullOrWhiteSpace( fields[ point, Z_AXIS ] ) ) {
+					continue;
+				}
+
 				if( !TryReadNumber( fields[ point, X_AXIS ], out double x ) || !TryReadNumber( fields[ point, Y_AXIS ], out double y ) || !TryReadNumber( fields[ point, Z_AXIS ], out double z ) ) {
 					error = string.Format( Text( "Validation_Point", INVALID_POINT ), name, point + 1 );
 					return false;
@@ -224,23 +253,35 @@ namespace MyCAM.Editor
 			string[,] values = new string[ points.Length, AXIS_COUNT ];
 			for( int point = 0; point < points.Length; point++ ) {
 				string[] text = PointText( points[ point ] );
-				for( int axis = 0; axis < AXIS_COUNT; axis++ ) values[ point, axis ] = text[ axis ];
+				for( int axis = 0; axis < AXIS_COUNT; axis++ ) {
+					values[ point, axis ] = text[ axis ];
+				}
 			}
 			return values;
 		}
 
 		void OnFormClosing( object sender, FormClosingEventArgs e )
 		{
-			if( e.Cancel || m_Closing ) return;
+			if( e.Cancel || m_Closing ) {
+				return;
+			}
+
 			m_PendingSave = null;
-			if( e.CloseReason != CloseReason.UserClosing ) return;
+			if( e.CloseReason != CloseReason.UserClosing ) {
+				return;
+			}
+
 			if( m_ClosePrompt ) { e.Cancel = true; return; }
 			bool valid = TryGetDraft( out CalibrationData draft, out string message );
 			bool sameProject = ReferenceEquals( m_Original, m_DataManager.CalibrationData ) && m_Original.HasSameInputs( m_OriginalSnapshot ) && m_Original.DrawingOnly == m_OriginalSnapshot.DrawingOnly;
 			CalibrationData saved = null;
 			bool discardUncalculated = false;
-			if( !sameProject ) message = Text( "Error_ProjectChanged", PROJECT_CHANGED );
-			else if( m_DrawingOnly && valid ) saved = draft;
+			if( !sameProject ) {
+				message = Text( "Error_ProjectChanged", PROJECT_CHANGED );
+			}
+			else if( m_DrawingOnly && valid ) {
+				saved = draft;
+			}
 			else if( !m_DrawingOnly && m_Accepted.HasCalculatedSnapshot && valid && draft.HasSameInputs( m_Accepted ) && !m_Picking && !m_Calculating ) {
 				saved = m_Accepted.Clone();
 				saved.DrawingOnly = false;
@@ -295,20 +336,37 @@ namespace MyCAM.Editor
 
 		void BeginPicking( int point )
 		{
-			if( m_Dialog == null || m_Closing || m_Calculating || m_Capturing || m_Picking ) return;
-			if( point < ALL_POINTS || point >= POINT_COUNT ) throw new ArgumentOutOfRangeException( nameof( point ) );
-			if( point < 0 ) {
-				for( int index = 0; index < POINT_COUNT; index++ ) m_Dialog.SetDrawingPoint( index, PointText( null ) );
+			if( m_Dialog == null || m_Closing || m_Calculating || m_Capturing || m_Picking ) {
+				return;
 			}
-			else m_Dialog.SetDrawingPoint( point, PointText( null ) );
+
+			if( point < ALL_POINTS || point >= POINT_COUNT ) {
+				throw new ArgumentOutOfRangeException( nameof( point ) );
+			}
+
+			if( point < 0 ) {
+				for( int index = 0; index < POINT_COUNT; index++ ) {
+					m_Dialog.SetDrawingPoint( index, PointText( null ) );
+				}
+			}
+			else {
+				m_Dialog.SetDrawingPoint( point, PointText( null ) );
+			}
+
 			m_Picking = true;
 			m_PickCount = 0;
 			m_PickIndex = point;
 			RefreshDisplay();
 			try {
-				if( m_DataManager.PartIDList.Count == 0 ) throw new InvalidOperationException( Text( "Error_DrawingUnavailable", DRAWING_UNAVAILABLE ) );
+				if( m_DataManager.PartIDList.Count == 0 ) {
+					throw new InvalidOperationException( Text( "Error_DrawingUnavailable", DRAWING_UNAVAILABLE ) );
+				}
+
 				m_EditingStates = m_EditingControls.Select( control => control.Enabled ).ToArray();
-				foreach( Control control in m_EditingControls ) control.Enabled = false;
+				foreach( Control control in m_EditingControls ) {
+					control.Enabled = false;
+				}
+
 				m_TreeEnabled = m_TreeView.Enabled;
 				m_PickingStarted = true;
 				m_TreeView.Enabled = false;
@@ -330,7 +388,10 @@ namespace MyCAM.Editor
 
 		void EndPicking()
 		{
-			if( !m_Picking ) return;
+			if( !m_Picking ) {
+				return;
+			}
+
 			m_Picking = false;
 			try {
 				if( m_PickingStarted ) {
@@ -351,7 +412,9 @@ namespace MyCAM.Editor
 				m_PickDraft = null;
 				if( m_EditingStates != null ) {
 					for( int index = 0; index < m_EditingControls.Length; index++ ) {
-						if( !m_EditingControls[ index ].IsDisposed ) m_EditingControls[ index ].Enabled = m_EditingStates[ index ];
+						if( !m_EditingControls[ index ].IsDisposed ) {
+							m_EditingControls[ index ].Enabled = m_EditingStates[ index ];
+						}
 					}
 					m_EditingStates = null;
 				}
@@ -361,41 +424,73 @@ namespace MyCAM.Editor
 
 		void OnDrawingMouseClick( MouseEventArgs e )
 		{
-			if( !m_Picking || m_Closing || e.Button != MouseButtons.Left ) return;
+			if( !m_Picking || m_Closing || e.Button != MouseButtons.Left ) {
+				return;
+			}
+
 			m_Viewer.Select();
 			var context = m_Viewer.GetAISContext();
 			context.InitSelected();
-			if( !context.MoreSelected() ) return;
+			if( !context.MoreSelected() ) {
+				return;
+			}
+
 			TopoDS_Shape shape = context.SelectedShape();
-			if( shape == null || shape.IsNull() || shape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) return;
+			if( shape == null || shape.IsNull() || shape.ShapeType() != TopAbs_ShapeEnum.TopAbs_VERTEX ) {
+				return;
+			}
+
 			AcceptDrawingPoint( BRep_Tool.Pnt( TopoDS.ToVertex( shape ) ) );
 		}
 
 		void AcceptDrawingPoint( gp_Pnt point )
 		{
-			if( !m_Picking || m_Closing || point == null ) return;
+			if( !m_Picking || m_Closing || point == null ) {
+				return;
+			}
+
 			int index = m_PickIndex == ALL_POINTS ? m_PickCount : m_PickIndex;
-			if( index == 0 ) m_PickDraft.Ref_Pnt1 = point;
-			else if( index == 1 ) m_PickDraft.Ref_Pnt2 = point;
-			else m_PickDraft.Ref_Pnt3 = point;
+			if( index == 0 ) {
+				m_PickDraft.Ref_Pnt1 = point;
+			}
+			else if( index == 1 ) {
+				m_PickDraft.Ref_Pnt2 = point;
+			}
+			else {
+				m_PickDraft.Ref_Pnt3 = point;
+			}
+
 			m_PointRenderer?.Show( m_PickDraft, true );
 			m_Dialog.SetDrawingPoint( index, PointText( point ) );
 			m_PickCount++;
-			if( m_PickCount == ( m_PickIndex == ALL_POINTS ? POINT_COUNT : 1 ) ) EndPicking();
-			else RefreshDisplay();
+			if( m_PickCount == ( m_PickIndex == ALL_POINTS ? POINT_COUNT : 1 ) ) {
+				EndPicking();
+			}
+			else {
+				RefreshDisplay();
+			}
 		}
 
 		void OnDrawingKeyDown( KeyEventArgs e )
 		{
-			if( m_Picking && e.KeyCode == Keys.Escape ) CancelPicking();
+			if( m_Picking && e.KeyCode == Keys.Escape ) {
+				CancelPicking();
+			}
 		}
 
 		void SetVertexSelection( bool active )
 		{
 			foreach( string id in m_DataManager.PartIDList ) {
-				if( !m_ViewManager.ViewObjectMap.ContainsKey( id ) || !m_ViewManager.ViewObjectMap[ id ].Visible ) continue;
-				if( active ) m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ id ].AISHandle, (int)AISActiveMode.Vertex );
-				else m_Viewer.GetAISContext().Deactivate( m_ViewManager.ViewObjectMap[ id ].AISHandle, (int)AISActiveMode.Vertex );
+				if( !m_ViewManager.ViewObjectMap.ContainsKey( id ) || !m_ViewManager.ViewObjectMap[ id ].Visible ) {
+					continue;
+				}
+
+				if( active ) {
+					m_Viewer.GetAISContext().Activate( m_ViewManager.ViewObjectMap[ id ].AISHandle, (int)AISActiveMode.Vertex );
+				}
+				else {
+					m_Viewer.GetAISContext().Deactivate( m_ViewManager.ViewObjectMap[ id ].AISHandle, (int)AISActiveMode.Vertex );
+				}
 			}
 		}
 
@@ -412,7 +507,10 @@ namespace MyCAM.Editor
 
 		async Task CapturePointAsync( int point )
 		{
-			if( !CanOperate || m_Calculating || m_Capturing || m_Picking || point < 0 || point >= POINT_COUNT ) return;
+			if( !CanOperate || m_Calculating || m_Capturing || m_Picking || point < 0 || point >= POINT_COUNT ) {
+				return;
+			}
+
 			CNCThreePointDlg dialog = m_Dialog;
 			CancellationTokenSource operation = new CancellationTokenSource();
 			m_Operation = operation;
@@ -420,15 +518,30 @@ namespace MyCAM.Editor
 			try {
 				RefreshDisplay();
 				var result = await CncApi.ReadCalibrationPositionAsync( operation.Token );
-				if( !IsCurrent( dialog, operation ) ) return;
-				if( result.IsSuccess ) dialog.SetWorkpiecePoint( point, PointText( new gp_Pnt( result.Data[ 0 ], result.Data[ 1 ], result.Data[ 2 ] ) ) );
-				else Report( result.ErrorMessage );
+				if( !IsCurrent( dialog, operation ) ) {
+					return;
+				}
+
+				if( result.IsSuccess ) {
+					dialog.SetWorkpiecePoint( point, PointText( new gp_Pnt( result.Data[ 0 ], result.Data[ 1 ], result.Data[ 2 ] ) ) );
+				}
+				else {
+					Report( result.ErrorMessage );
+				}
 			}
 			finally {
-				if( ReferenceEquals( m_Dialog, dialog ) ) m_Capturing = false;
-				if( ReferenceEquals( m_Operation, operation ) ) m_Operation = null;
+				if( ReferenceEquals( m_Dialog, dialog ) ) {
+					m_Capturing = false;
+				}
+
+				if( ReferenceEquals( m_Operation, operation ) ) {
+					m_Operation = null;
+				}
+
 				operation.Dispose();
-				if( ReferenceEquals( m_Dialog, dialog ) ) RefreshDisplay();
+				if( ReferenceEquals( m_Dialog, dialog ) ) {
+					RefreshDisplay();
+				}
 			}
 		}
 
@@ -445,7 +558,10 @@ namespace MyCAM.Editor
 
 		async Task CalculateAsync()
 		{
-			if( !CanOperate || m_Calculating || m_Capturing || m_Picking ) return;
+			if( !CanOperate || m_Calculating || m_Capturing || m_Picking ) {
+				return;
+			}
+
 			if( !TryGetDraft( out CalibrationData draft, out string error ) ) { Report( error ); return; }
 			CNCThreePointDlg dialog = m_Dialog;
 			CalibrationData project = m_Original;
@@ -456,8 +572,14 @@ namespace MyCAM.Editor
 				OnInputChanged();
 				var result = await CncApi.CalculateCalibrationAsync( Flatten( draft.Ref_Pnt1, draft.Ref_Pnt2, draft.Ref_Pnt3 ),
 					Flatten( draft.Work_Pnt1, draft.Work_Pnt2, draft.Work_Pnt3 ), draft.Tolerance.Value, operation.Token, project.MarkTransmitted );
-				while( m_ClosePrompt && !operation.IsCancellationRequested ) await Task.Delay( 50 );
-				if( !IsCurrent( dialog, operation ) || !ReferenceEquals( m_DataManager.CalibrationData, project ) ) return;
+				while( m_ClosePrompt && !operation.IsCancellationRequested ) {
+					await Task.Delay( 50 );
+				}
+
+				if( !IsCurrent( dialog, operation ) || !ReferenceEquals( m_DataManager.CalibrationData, project ) ) {
+					return;
+				}
+
 				if( !result.IsSuccess ) { Report( result.ErrorMessage ); return; }
 				draft.MarkTransmitted();
 				draft.SetCalibrationError( result.Data.Deviation, true, result.Data.Succeeded );
@@ -467,13 +589,23 @@ namespace MyCAM.Editor
 				m_CalculationCompleted = draft.CalculationCompleted;
 				m_CalculationSucceeded = draft.CalculationSucceeded;
 				RefreshDisplay();
-				if( !draft.IsCalculationSuccessful ) Report( Text( "Error_Calculation", CALCULATION_ERROR ) );
+				if( !draft.IsCalculationSuccessful ) {
+					Report( Text( "Error_Calculation", CALCULATION_ERROR ) );
+				}
 			}
 			finally {
-				if( ReferenceEquals( m_Dialog, dialog ) ) m_Calculating = false;
-				if( ReferenceEquals( m_Operation, operation ) ) m_Operation = null;
+				if( ReferenceEquals( m_Dialog, dialog ) ) {
+					m_Calculating = false;
+				}
+
+				if( ReferenceEquals( m_Operation, operation ) ) {
+					m_Operation = null;
+				}
+
 				operation.Dispose();
-				if( ReferenceEquals( m_Dialog, dialog ) ) RefreshDisplay();
+				if( ReferenceEquals( m_Dialog, dialog ) ) {
+					RefreshDisplay();
+				}
 			}
 		}
 
@@ -483,9 +615,13 @@ namespace MyCAM.Editor
 		{
 			CNCThreePointDlg dialog = m_Dialog;
 			try {
-				m_Context?.Post( ignored => {
+				m_Context?.Post( ignored =>
+				{
 					try {
-						if( dialog == null || !ReferenceEquals( m_Dialog, dialog ) || m_Closing ) return;
+						if( dialog == null || !ReferenceEquals( m_Dialog, dialog ) || m_Closing ) {
+							return;
+						}
+
 						m_Operation?.Cancel();
 						CancelPicking();
 						RefreshDisplay();
@@ -506,7 +642,10 @@ namespace MyCAM.Editor
 
 		void Report( string message )
 		{
-			if( m_Dialog == null || m_Closing ) return;
+			if( m_Dialog == null || m_Closing ) {
+				return;
+			}
+
 			try {
 				MyApp.Logger?.ShowOnLogPanel( message, MyApp.NoticeType.Warning );
 				MessageBox.Show( m_Dialog, message, Text( "Title", CNCThreePointDlg.TITLE ), MessageBoxButtons.OK, MessageBoxIcon.Warning );
@@ -519,7 +658,10 @@ namespace MyCAM.Editor
 		void OnFormClosed( object sender, FormClosedEventArgs e )
 		{
 			if( e.CloseReason == CloseReason.UserClosing && m_PendingSave != null ) {
-				if( m_Original.HasTransmitted ) m_PendingSave.MarkTransmitted();
+				if( m_Original.HasTransmitted ) {
+					m_PendingSave.MarkTransmitted();
+				}
+
 				m_Original.CopyFrom( m_PendingSave );
 			}
 			End();
@@ -527,7 +669,10 @@ namespace MyCAM.Editor
 
 		public override void End()
 		{
-			if( m_Finished ) return;
+			if( m_Finished ) {
+				return;
+			}
+
 			m_Finished = true;
 			m_Closing = true;
 			m_PendingSave = null;
@@ -541,7 +686,9 @@ namespace MyCAM.Editor
 				dialog.FormClosed -= OnFormClosed;
 				dialog.Dispose();
 			}
-			if( m_Started ) base.End();
+			if( m_Started ) {
+				base.End();
+			}
 		}
 
 		public void Dispose() => End();

@@ -1,8 +1,8 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {

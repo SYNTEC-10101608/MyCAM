@@ -1,10 +1,10 @@
-﻿using OCC.BRepBuilderAPI;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopoDS;
 using OCCTool;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Data
 {

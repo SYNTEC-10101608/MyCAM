@@ -1,6 +1,9 @@
+ï»¿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyCAM.Data;
 using netDxf;
 using netDxf.Entities;
-using MyCAM.Data;
 using OCC.BRepBuilderAPI;
 using OCC.Geom;
 using OCC.gp;
@@ -12,29 +15,27 @@ using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Helper.FileIO
 {
 	/// <summary>
-	/// Åª¨ú DXF ÀÉ®×¨ÃÂà´«¬° OCCT TopoDS_Shape
+	/// è®€å– DXF æª”æ¡ˆä¸¦è½‰æ›ç‚º OCCT TopoDS_Shape
 	/// </summary>
 	internal class DxfReader
 	{
 		/// <summary>
-		/// Åª¨ú DXF ÀÉ®×¡A¦^¶Ç¦X¨Ö«áªº TopoDS_Shape (Compound)
+		/// è®€å– DXF æª”æ¡ˆï¼Œå›å‚³åˆä½µå¾Œçš„ TopoDS_Shape (Compound)
 		/// </summary>
-		/// <param name="szFileName">DXF ÀÉ®×¸ô®|</param>
-		/// <returns>¦¨¥\®É¦^¶Ç TopoDS_Shape¡A¥¢±Ñ®É¦^¶Ç null</returns>
+		/// <param name="szFileName">DXF æª”æ¡ˆè·¯å¾‘</param>
+		/// <returns>æˆåŠŸæ™‚å›å‚³ TopoDS_Shapeï¼Œå¤±æ•—æ™‚å›å‚³ null</returns>
 		public TopoDS_Shape Read( string szFileName, Action<LoadingBarInfo> reportProgress = null )
 		{
 			// Report progress to the loading bar.
 			reportProgress?.Invoke( new LoadingBarInfo( LoadingStep.ReadFile ) );
 			DxfDocument dxfDoc = DxfDocument.Load( szFileName );
-			if( dxfDoc == null )
+			if( dxfDoc == null ) {
 				return null;
+			}
 
 			List<TopoDS_Shape> shapes = new List<TopoDS_Shape>();
 
@@ -53,8 +54,9 @@ namespace MyCAM.Helper.FileIO
 			ConvertPolylines3D( dxfDoc, shapes, entityProcessed );
 			ConvertSplines( dxfDoc, shapes, entityProcessed );
 
-			if( shapes.Count == 0 )
+			if( shapes.Count == 0 ) {
 				return null;
+			}
 
 			// Connect edges into wires (closed and open)
 			// Report progress to the loading bar.
@@ -78,11 +80,14 @@ namespace MyCAM.Helper.FileIO
 			foreach( netDxf.Entities.Line line in TrackEntities( dxfDoc.Entities.Lines, entityProcessed ) ) {
 				gp_Pnt p0 = new gp_Pnt( line.StartPoint.X, line.StartPoint.Y, line.StartPoint.Z );
 				gp_Pnt p1 = new gp_Pnt( line.EndPoint.X, line.EndPoint.Y, line.EndPoint.Z );
-				if( p0.Distance( p1 ) < 1e-8 )
+				if( p0.Distance( p1 ) < 1e-8 ) {
 					continue;
+				}
+
 				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( p0, p1 );
-				if( edgeMaker.IsDone() )
+				if( edgeMaker.IsDone() ) {
 					shapes.Add( edgeMaker.Edge() );
+				}
 			}
 		}
 
@@ -96,8 +101,9 @@ namespace MyCAM.Helper.FileIO
 				double startRad = arc.StartAngle * Math.PI / 180.0;
 				double endRad = arc.EndAngle * Math.PI / 180.0;
 				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( circ, startRad, endRad );
-				if( edgeMaker.IsDone() )
+				if( edgeMaker.IsDone() ) {
 					shapes.Add( edgeMaker.Edge() );
+				}
 			}
 		}
 
@@ -109,8 +115,9 @@ namespace MyCAM.Helper.FileIO
 				gp_Ax2 ax2 = new gp_Ax2( center, normal );
 				gp_Circ circ = new gp_Circ( ax2, circle.Radius );
 				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( circ );
-				if( edgeMaker.IsDone() )
+				if( edgeMaker.IsDone() ) {
 					shapes.Add( edgeMaker.Edge() );
+				}
 			}
 		}
 
@@ -123,12 +130,15 @@ namespace MyCAM.Helper.FileIO
 				gp_Ax2 ax2 = new gp_Ax2( center, normal, majorDir );
 				double majorRadius = ellipse.MajorAxis * 0.5;
 				double minorRadius = ellipse.MinorAxis * 0.5;
-				if( majorRadius < 1e-9 || minorRadius < 1e-9 )
+				if( majorRadius < 1e-9 || minorRadius < 1e-9 ) {
 					continue;
+				}
+
 				gp_Elips elips = new gp_Elips( ax2, majorRadius, minorRadius );
 				BRepBuilderAPI_MakeEdge edgeMaker = new BRepBuilderAPI_MakeEdge( elips );
-				if( edgeMaker.IsDone() )
+				if( edgeMaker.IsDone() ) {
 					shapes.Add( edgeMaker.Edge() );
+				}
 			}
 		}
 
@@ -147,8 +157,9 @@ namespace MyCAM.Helper.FileIO
 				List<EntityObject> exploded = poly2d.Explode();
 				foreach( EntityObject ent in exploded ) {
 					TopoDS_Edge edge = EntityToEdge( ent );
-					if( edge != null && !edge.IsNull() )
+					if( edge != null && !edge.IsNull() ) {
 						shapes.Add( edge );
+					}
 				}
 			}
 		}
@@ -159,8 +170,9 @@ namespace MyCAM.Helper.FileIO
 				List<EntityObject> exploded = poly3d.Explode();
 				foreach( EntityObject ent in exploded ) {
 					TopoDS_Edge edge = EntityToEdge( ent );
-					if( edge != null && !edge.IsNull() )
+					if( edge != null && !edge.IsNull() ) {
 						shapes.Add( edge );
+					}
 				}
 			}
 		}
@@ -169,8 +181,9 @@ namespace MyCAM.Helper.FileIO
 		{
 			foreach( Spline spline in TrackEntities( dxfDoc.Entities.Splines, entityProcessed ) ) {
 				TopoDS_Edge edge = SplineToEdge( spline );
-				if( edge != null && !edge.IsNull() )
+				if( edge != null && !edge.IsNull() ) {
 					shapes.Add( edge );
+				}
 			}
 		}
 
@@ -183,15 +196,17 @@ namespace MyCAM.Helper.FileIO
 				edgeSeq.Append( edgeExp.Current() );
 			}
 
-			if( edgeSeq.Length() == 0 )
+			if( edgeSeq.Length() == 0 ) {
 				return edgeCompound;
+			}
 
 			// Use static ConnectEdgesToWires to build wires
 			TopTools_HSequenceOfShape wireSeq = new TopTools_HSequenceOfShape();
 			ShapeAnalysis_FreeBounds.ConnectEdgesToWires( edgeSeq, 1e-3, false, wireSeq );
 
-			if( wireSeq.Length() == 0 )
+			if( wireSeq.Length() == 0 ) {
 				return edgeCompound;
+			}
 
 			List<TopoDS_Shape> wires = new List<TopoDS_Shape>();
 			for( int i = 1; i <= wireSeq.Length(); i++ ) {
@@ -206,8 +221,10 @@ namespace MyCAM.Helper.FileIO
 			if( entity is netDxf.Entities.Line line ) {
 				gp_Pnt p0 = new gp_Pnt( line.StartPoint.X, line.StartPoint.Y, line.StartPoint.Z );
 				gp_Pnt p1 = new gp_Pnt( line.EndPoint.X, line.EndPoint.Y, line.EndPoint.Z );
-				if( p0.Distance( p1 ) < 1e-8 )
+				if( p0.Distance( p1 ) < 1e-8 ) {
 					return null;
+				}
+
 				BRepBuilderAPI_MakeEdge maker = new BRepBuilderAPI_MakeEdge( p0, p1 );
 				return maker.IsDone() ? maker.Edge() : null;
 			}
@@ -228,8 +245,9 @@ namespace MyCAM.Helper.FileIO
 		{
 			try {
 				var ctrlPts = spline.ControlPoints;
-				if( ctrlPts == null || ctrlPts.Length < 2 )
+				if( ctrlPts == null || ctrlPts.Length < 2 ) {
 					return null;
+				}
 
 				int nbPoles = ctrlPts.Length;
 				TColgp_Array1OfPnt poles = new TColgp_Array1OfPnt( 1, nbPoles );

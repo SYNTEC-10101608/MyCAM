@@ -1,10 +1,10 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using MyCAM.App;
 using MyCAM.Data;
 using OCC.Poly;
 using OCC.RWStl;
-using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace MyCAM.Helper
 {

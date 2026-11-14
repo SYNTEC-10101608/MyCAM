@@ -1,6 +1,6 @@
+ï»¿using System;
 using MyCAM.App;
 using MyCAM.Data;
-using System;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -141,7 +141,7 @@ namespace MyCAM.Editor.Dialog
 		const double DEFAULT_VALUE = 0;
 		LeadData m_LeadData;
 
-		const string ERROR_ANGLE_RANGE = "¨¤«×¥²¶·¦b0 ~ 180½d³ò¤º";
+		const string ERROR_ANGLE_RANGE = "è§’åº¦å¿…é ˆåœ¨0 ~ 180ç¯„åœå…§";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "LeadDlg" );
 	}
 }

@@ -1,3 +1,7 @@
+ï»¿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyCAM.Data;
 using OCC.gp;
 using OCC.ShapeAnalysis;
 using OCC.TopAbs;
@@ -5,10 +9,6 @@ using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using MyCAM.Data;
 
 namespace MyCAM.Helper
 {
@@ -193,11 +193,11 @@ namespace MyCAM.Helper
 			}
 		}
 
-		const string NO_INTERSECTED_FACE = "[¾Ş§@´£¿ô]§ä¤£¨ì¬Û¥æªº­±";
-		const string NO_D1_CONTINUOUS_FACES = "[¾Ş§@´£¿ô]§ä¤£¨ì D1 ³sÄò­±";
-		const string SEW_FACE_GROUP_FAILED = "[¾Ş§@´£¿ô]­±¸s²Õ«Ø¥ß¥¢±Ñ";
-		const string NO_CLOSED_BOUNDARIES = "[¾Ş§@´£¿ô]§ä¤£¨ì«Ê³¬Ãä¬É";
-		const string UNKNOWN_ERROR = "[¾Ş§@´£¿ô]¥¼ª¾¿ù»~";
+		const string NO_INTERSECTED_FACE = "[æ“ä½œæé†’]æ‰¾ä¸åˆ°ç›¸äº¤çš„é¢";
+		const string NO_D1_CONTINUOUS_FACES = "[æ“ä½œæé†’]æ‰¾ä¸åˆ° D1 é€£çºŒé¢";
+		const string SEW_FACE_GROUP_FAILED = "[æ“ä½œæé†’]é¢ç¾¤çµ„å»ºç«‹å¤±æ•—";
+		const string NO_CLOSED_BOUNDARIES = "[æ“ä½œæé†’]æ‰¾ä¸åˆ°å°é–‰é‚Šç•Œ";
+		const string UNKNOWN_ERROR = "[æ“ä½œæé†’]æœªçŸ¥éŒ¯èª¤";
 
 		// use multiple ray strategies to find the outermost face
 		static TopoDS_Face FindOutermostFaceByStrategies(

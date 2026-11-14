@@ -1,7 +1,7 @@
+ï»¿using System.Collections.Generic;
 using MyCAM.App;
 using MyCAM.Data;
 using OCC.gp;
-using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
@@ -78,7 +78,7 @@ namespace MyCAM.Helper
 
 		readonly IMachineDataBase m_MachineDataBase;
 		protected static readonly LanguageManager.LanguageManager m_LangMgr = new LanguageManager.LanguageManager( "PerFrameTransformBuilder" );
-		protected const string FRAME_CALC_FAILED = "¼ÒÀÀ­pºâ¥¢±Ñ";
+		protected const string FRAME_CALC_FAILED = "æ¨¡æ“¬è¨ˆç®—å¤±æ•—";
 	}
 
 	// five-axis per-frame transform builder ( logic moved from SimulationHelper )

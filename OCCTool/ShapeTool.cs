@@ -1,12 +1,12 @@
-﻿using OCC.Bnd;
+﻿using System;
+using System.Collections.Generic;
+using OCC.Bnd;
 using OCC.BRep;
 using OCC.BRepBndLib;
 using OCC.BRepBuilderAPI;
 using OCC.BRepPrimAPI;
 using OCC.gp;
 using OCC.TopoDS;
-using System;
-using System.Collections.Generic;
 
 namespace OCCTool
 {

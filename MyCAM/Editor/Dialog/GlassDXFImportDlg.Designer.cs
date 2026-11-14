@@ -1,4 +1,4 @@
-namespace MyCAM.Editor.Dialog
+ï»¿namespace MyCAM.Editor.Dialog
 {
     partial class GlassDXFImportDlg
     {
@@ -45,7 +45,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_lblRadius.Name = "m_lblRadius";
 			this.m_lblRadius.Size = new System.Drawing.Size(127, 15);
 			this.m_lblRadius.TabIndex = 0;
-			this.m_lblRadius.Text = "¶ê²y¥b®| (R | mm):";
+			this.m_lblRadius.Text = "åœ“çƒåŠå¾‘ (R | mm):";
 			// 
 			// m_tbxRadius
 			// 
@@ -74,7 +74,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_lblHeight.Name = "m_lblHeight";
 			this.m_lblHeight.Size = new System.Drawing.Size(128, 15);
 			this.m_lblHeight.TabIndex = 2;
-			this.m_lblHeight.Text = "¦±­±°ª«× (H | mm):";
+			this.m_lblHeight.Text = "æ›²é¢é«˜åº¦ (H | mm):";
 			// 
 			// m_tbxHeight
 			// 
@@ -107,7 +107,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_btnOK.Name = "m_btnOK";
 			this.m_btnOK.Size = new System.Drawing.Size(107, 38);
 			this.m_btnOK.TabIndex = 4;
-			this.m_btnOK.Text = "½T©w";
+			this.m_btnOK.Text = "ç¢ºå®š";
 			this.m_btnOK.UseVisualStyleBackColor = true;
 			this.m_btnOK.Click += new System.EventHandler(this.BtnOK_Click);
 			// 
@@ -118,7 +118,7 @@ namespace MyCAM.Editor.Dialog
 			this.m_btnCancel.Name = "m_btnCancel";
 			this.m_btnCancel.Size = new System.Drawing.Size(107, 38);
 			this.m_btnCancel.TabIndex = 5;
-			this.m_btnCancel.Text = "¨ú®ø";
+			this.m_btnCancel.Text = "å–æ¶ˆ";
 			this.m_btnCancel.UseVisualStyleBackColor = true;
 			this.m_btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
 			// 
@@ -140,7 +140,7 @@ namespace MyCAM.Editor.Dialog
 			this.MinimizeBox = false;
 			this.Name = "GlassDXFImportDlg";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "¬Á¼ş¦±­±§ë¼v";
+			this.Text = "ç»ç’ƒæ›²é¢æŠ•å½±";
 			((System.ComponentModel.ISupportInitialize)(this.m_tbxRadius)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_tbxHeight)).EndInit();
 			this.ResumeLayout(false);

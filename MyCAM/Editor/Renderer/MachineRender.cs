@@ -1,4 +1,7 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Helper;
 using MyCAM.Helper.Simulation;
@@ -11,9 +14,6 @@ using OCC.Poly;
 using OCC.Quantity;
 using OCC.TColStd;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 
 namespace MyCAM.Editor.Renderer

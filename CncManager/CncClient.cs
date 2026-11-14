@@ -1,9 +1,9 @@
-using CncManager.CNCCore;
-using CncManager.Definition;
-using System;
+﻿using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using CncManager.CNCCore;
+using CncManager.Definition;
 
 namespace CncManager
 {

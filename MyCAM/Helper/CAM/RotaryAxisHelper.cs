@@ -1,7 +1,7 @@
+﻿using System;
 using MyCAM.Data;
 using OCC.gp;
 using OCCTool;
-using System;
 
 namespace MyCAM.Helper
 {

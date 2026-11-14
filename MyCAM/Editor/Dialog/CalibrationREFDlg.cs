@@ -1,8 +1,8 @@
+ï»¿using System;
+using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
 using OCC.gp;
-using System;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -321,9 +321,9 @@ namespace MyCAM.Editor.Dialog
 			RaiseConfirm( m_CalibrationData );
 		}
 
-		const string NEED_THREE_REF_POINTS = "»İ­n¤T­Ó°Ñ¦ÒÂI";
-		const string REF_POINTS_DUPLICATE = "°Ñ¦ÒÂI­«ÂĞ";
-		const string THREE_POINTS_COLLINEAR = "3ÂI¦@½u";
+		const string NEED_THREE_REF_POINTS = "éœ€è¦ä¸‰å€‹åƒè€ƒé»";
+		const string REF_POINTS_DUPLICATE = "åƒè€ƒé»é‡è¦†";
+		const string THREE_POINTS_COLLINEAR = "3é»å…±ç·š";
 		readonly LanguageManager.LanguageManager m_LanguageManager;
 	}
 }
