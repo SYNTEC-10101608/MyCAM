@@ -1,14 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
+using System.Xml.Serialization;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.FileManager;
 using MyCAM.LoadingManager;
 using OCC.TopoDS;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace MyCAM.Editor
 {

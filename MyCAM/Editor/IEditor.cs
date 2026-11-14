@@ -1,7 +1,7 @@
-﻿using MyCAM.Data;
-using OCCViewer;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using MyCAM.Data;
+using OCCViewer;
 
 namespace MyCAM.Editor
 {
@@ -88,7 +88,10 @@ namespace MyCAM.Editor
 
 		public void EndAction( bool resumeDefaultAction = true )
 		{
-			if( m_CurrentAction == null ) return;
+			if( m_CurrentAction == null ) {
+				return;
+			}
+
 			if( resumeDefaultAction ) {
 				EndActionIfNotDefault();
 				return;

@@ -1,4 +1,4 @@
-namespace MyCAM.Data
+﻿namespace MyCAM.Data
 {
 	// support bracket design parameters
 	public class SupportBracketData

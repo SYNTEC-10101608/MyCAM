@@ -1,4 +1,4 @@
-namespace CommonUI.Controls
+﻿namespace CommonUI.Controls
 {
 	partial class LoadingBar
 	{

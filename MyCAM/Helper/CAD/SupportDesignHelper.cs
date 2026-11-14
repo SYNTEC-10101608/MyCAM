@@ -1,4 +1,8 @@
-﻿using Clipper2Lib;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Clipper2Lib;
 using netDxf;
 using netDxf.Entities;
 using netDxf.Tables;
@@ -19,10 +23,6 @@ using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace MyCAM.Helper
 {

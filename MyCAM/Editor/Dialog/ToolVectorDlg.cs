@@ -1,7 +1,7 @@
-﻿using MyCAM.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using MyCAM.Data;
 
 namespace MyCAM.Editor
 {

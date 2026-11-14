@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Windows.Forms;
 
 namespace MyCAM.Editor
@@ -99,17 +99,17 @@ namespace MyCAM.Editor
 			}
 		}
 
-		const string GUIDE_POINT_COORDINATE = "½ĞÂIÀ»¤@­Ó¤u¥ó¤Wªº³»ÂI¡A¥H¶q´ú¨ä®y¼Ğ";
-		const string GUIDE_LINE_LENGTH = "½ĞÂIÀ»¤@±øÃä¡A¥H¶q´ú¨äªø«×";
-		const string GUIDE_CIRCLE_ARC_RADIUS = "½ĞÂIÀ»¤@­Ó¶ê©Î¶ê©·Ãä¡A¥H¶q´ú¨ä¥b®|";
-		const string GUIDE_DISTANCE_BETWEEN_TWO_POINTS = "½Ğ¨Ì§ÇÂIÀ»¨â­Ó³»ÂI¡A¥H¶q´ú¨ä¶ZÂ÷";
-		const string GUIDE_ANGLE_BETWEEN_LINES = "½Ğ¨Ì§ÇÂIÀ»¨â±ø½u¬q¡A¥H¶q´ú¨ä§¨¨¤";
-		const string GUIDE_DEFAULT = "½Ğ¿ï¾Ü¶q´ú¤è¦¡";
-		const string METHOD_POINT_COORDINATE = "ÂIªº®y¼Ğ";
-		const string METHOD_LINE_LENGTH = "½u¬qªø«×";
-		const string METHOD_CIRCLE_ARC_RADIUS = "¶ê©·¥b®|";
-		const string METHOD_DISTANCE_BETWEEN_TWO_POINTS = "¨âÂI¶ZÂ÷";
-		const string METHOD_ANGLE_BETWEEN_LINES = "¨â½u§¨¨¤";
+		const string GUIDE_POINT_COORDINATE = "è«‹é»æ“Šä¸€å€‹å·¥ä»¶ä¸Šçš„é ‚é»ï¼Œä»¥é‡æ¸¬å…¶åº§æ¨™";
+		const string GUIDE_LINE_LENGTH = "è«‹é»æ“Šä¸€æ¢é‚Šï¼Œä»¥é‡æ¸¬å…¶é•·åº¦";
+		const string GUIDE_CIRCLE_ARC_RADIUS = "è«‹é»æ“Šä¸€å€‹åœ“æˆ–åœ“å¼§é‚Šï¼Œä»¥é‡æ¸¬å…¶åŠå¾‘";
+		const string GUIDE_DISTANCE_BETWEEN_TWO_POINTS = "è«‹ä¾åºé»æ“Šå…©å€‹é ‚é»ï¼Œä»¥é‡æ¸¬å…¶è·é›¢";
+		const string GUIDE_ANGLE_BETWEEN_LINES = "è«‹ä¾åºé»æ“Šå…©æ¢ç·šæ®µï¼Œä»¥é‡æ¸¬å…¶å¤¾è§’";
+		const string GUIDE_DEFAULT = "è«‹é¸æ“‡é‡æ¸¬æ–¹å¼";
+		const string METHOD_POINT_COORDINATE = "é»çš„åº§æ¨™";
+		const string METHOD_LINE_LENGTH = "ç·šæ®µé•·åº¦";
+		const string METHOD_CIRCLE_ARC_RADIUS = "åœ“å¼§åŠå¾‘";
+		const string METHOD_DISTANCE_BETWEEN_TWO_POINTS = "å…©é»è·é›¢";
+		const string METHOD_ANGLE_BETWEEN_LINES = "å…©ç·šå¤¾è§’";
 
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "MeasureDlg" );
 	}

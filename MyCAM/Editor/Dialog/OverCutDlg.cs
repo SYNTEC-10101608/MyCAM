@@ -1,5 +1,5 @@
+ï»¿using System;
 using MyCAM.App;
-using System;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -59,8 +59,8 @@ namespace MyCAM.Editor.Dialog
 
 		double m_OverCutLength = 0;
 
-		const string ERROR_NEGATIVE_LENGTH = "ªø«×»İ­n¤j©ó0";
-		const string ERROR_EXCEED_GEOMETRY = "¹L¤Áªø«×¶W¥X´X¦ó­­¨î";
+		const string ERROR_NEGATIVE_LENGTH = "é•·åº¦éœ€è¦å¤§æ–¼0";
+		const string ERROR_EXCEED_GEOMETRY = "éåˆ‡é•·åº¦è¶…å‡ºå¹¾ä½•é™åˆ¶";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "OverCutDlg" );
 	}
 }

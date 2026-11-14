@@ -1,10 +1,10 @@
+ï»¿using System;
+using System.Collections.Generic;
+using System.Linq;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using MyCAM.PathCache;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Editor
 {
@@ -187,7 +187,7 @@ namespace MyCAM.Editor
 		bool isResetClicked = false;
 		bool m_IsConfirmed = false;
 		PathCompensateDlg m_Dlg;
-		const string COMPENSATION_EXCEEDS_LIMIT = "¸ô®|¶W¥X¸ÉÀv½d³ò¡A½Ğ½Õ¾ã¸ÉÀv¼Æ­È";
+		const string COMPENSATION_EXCEEDS_LIMIT = "è·¯å¾‘è¶…å‡ºè£œå„Ÿç¯„åœï¼Œè«‹èª¿æ•´è£œå„Ÿæ•¸å€¼";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "PathCompensationAction" );
 
 		const double GEOMETRY_TOLERANCE = 1e-3;

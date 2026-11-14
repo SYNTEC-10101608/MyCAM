@@ -1,7 +1,7 @@
-﻿using MyCAM.Data;
+﻿using System.Collections.Generic;
+using MyCAM.Data;
 using OCC.gp;
 using OCCViewer;
-using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {

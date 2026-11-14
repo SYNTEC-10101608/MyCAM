@@ -1,3 +1,4 @@
+ï»¿using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
@@ -9,7 +10,6 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -401,15 +401,15 @@ namespace MyCAM.Editor
 		TopoDS_Shape m_FirstShape;
 
 		const string FORMAT_POINT_COORDINATE = "X: {0:F3}mm\r\nY: {1:F3}mm\r\nZ: {2:F3}mm";
-		const string FORMAT_LINE_LENGTH = "ªø«×: {0:F3}mm";
-		const string FORMAT_CIRCLE_RADIUS = "¥b®|: {0:F3}mm";
-		const string FORMAT_DISTANCE = "¶ZÂ÷: {0:F3}mm";
-		const string FORMAT_ANGLE = "§¨¨¤: {0:F3}¢X";
-		const string NOT_CIRCULAR_ARC = "¿ï¨úªºÃä¤£¬O¶ê©Î¶ê©·";
-		const string FIRST_POINT_SELECTED = "¤w¿ï¨ú²Ä¤@­ÓÂI¡A½Ğ¿ï¨ú²Ä¤G­ÓÂI";
-		const string FIRST_LINE_SELECTED = "¤w¿ï¨ú²Ä¤@±ø½u¡A½Ğ¿ï¨ú²Ä¤G±ø½u";
-		const string NOT_STRAIGHT_LINE = "¿ï¨úªºÃä¤£¬Oª½½u";
-		const string LINES_NOT_INTERSECT = "¨â±ø½u¤£¬Û¥æ¡AµLªk­pºâ§¨¨¤";
+		const string FORMAT_LINE_LENGTH = "é•·åº¦: {0:F3}mm";
+		const string FORMAT_CIRCLE_RADIUS = "åŠå¾‘: {0:F3}mm";
+		const string FORMAT_DISTANCE = "è·é›¢: {0:F3}mm";
+		const string FORMAT_ANGLE = "å¤¾è§’: {0:F3}Â°";
+		const string NOT_CIRCULAR_ARC = "é¸å–çš„é‚Šä¸æ˜¯åœ“æˆ–åœ“å¼§";
+		const string FIRST_POINT_SELECTED = "å·²é¸å–ç¬¬ä¸€å€‹é»ï¼Œè«‹é¸å–ç¬¬äºŒå€‹é»";
+		const string FIRST_LINE_SELECTED = "å·²é¸å–ç¬¬ä¸€æ¢ç·šï¼Œè«‹é¸å–ç¬¬äºŒæ¢ç·š";
+		const string NOT_STRAIGHT_LINE = "é¸å–çš„é‚Šä¸æ˜¯ç›´ç·š";
+		const string LINES_NOT_INTERSECT = "å…©æ¢ç·šä¸ç›¸äº¤ï¼Œç„¡æ³•è¨ˆç®—å¤¾è§’";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "MeasureAction" );
 	}
 }

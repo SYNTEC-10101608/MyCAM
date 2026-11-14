@@ -1,3 +1,7 @@
+ï»¿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
@@ -10,10 +14,6 @@ using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -786,30 +786,30 @@ namespace MyCAM.Editor
 		const string CUSTOM_ROOT_FOLDER_NAME = "Custom";
 		const string SUPPORT_BRACKET_FOLDER_NAME = "SupportBracket";
 
-		const string DefaultOverwriteTitle = "½T»{ÂĞ¼g";
-		const string DefaultOverwriteMessage = "¥Ø¼Ğ¸ê®Æ§¨¤w¦³¬Û¦PÀÉ®×¡A¬O§_ÂĞ¼g¡H";
+		const string DefaultOverwriteTitle = "ç¢ºèªè¦†å¯«";
+		const string DefaultOverwriteMessage = "ç›®æ¨™è³‡æ–™å¤¾å·²æœ‰ç›¸åŒæª”æ¡ˆï¼Œæ˜¯å¦è¦†å¯«ï¼Ÿ";
 
-		const string DefaultError_NoFaceSelected = "½Ğ¥ı¿ï¾Ü­±";
-		const string DefaultError_PositionCount = "¤ä¬[¼Æ¶q¤£¯à¬°0";
-		const string DefaultError_BuildShellFailed = "µLªk«Ø¥ß¤ä¼µ­±¡A½Ğ½T»{¤w¿ï¨ú¨¬°÷¥B¬Û³sªº­±";
-		const string DefaultError_FillShellFailed = "¶ñ¸É¤Õ¬}¥¢±Ñ¡A¦¹¤u¥ó¼È¤£¤ä´©¦¹¥\¯à";
-		const string DefaultError_FillShellBBoxDiverged = "¶ñ¸É¤Õ¬}«á´X¦ó½d³ò¸¨®t¹L¤j¡A¦¹¤u¥ó¼È¤£¤ä´©¦¹¥\¯à";
-		const string DefaultError_ExtractShellFailed = "¶ñ¸É¤Õ¬}«áµLªk¨ú±o¦±­±¡A¦¹¤u¥ó¼È¤£¤ä´©¦¹¥\¯à";
-		const string DefaultError_SectionCalculationFailed = "ºI­±­pºâ¥¢±Ñ¡A½Ğ½Õ¾ã X¡şY ¤ä¬[®y¼Ğ¡AÁ×¶}¤Õ¬}©Î¥W³´³B";
-		const string DefaultError_SupportBuildFailed = "¥Ø«e¦±­±ªº¿ï¾ÜµLªk¥Í¦¨¤ä¬[¡A½Ğ§ó´«©Ò¿ïªº­±";
-		const string DefaultError_NoSavePath = "½Ğ«ü©wÀx¦s¸ô®|";
-		const string DefaultError_DxfExportFailed = "DXF ¶×¥X¥¢±Ñ";
-		const string DefaultLog_DxfSaved = "¤ä¬[DXF ¤wÀx¦s¦Ü¡G{0}";
-		const string DefaultError_ComputeBBoxFailed = "µLªk­pºâ¤u¥ó½d³ò";
-		const string DefaultError_XPositionDuplicate = "X¤è¦V¤ä¬[®y¼Ğ¦³­«½Æ";
-		const string DefaultError_YPositionDuplicate = "Y¤è¦V¤ä¬[®y¼Ğ¦³­«½Æ";
-		const string DefaultError_XPositionOutOfRange = "X¤è¦V¤ä¬[®y¼Ğ¶W¥X¤u¥ó½d³ò";
-		const string DefaultError_YPositionOutOfRange = "Y¤è¦V¤ä¬[®y¼Ğ¶W¥X¤u¥ó½d³ò";
-		const string DefaultError_PositionSuffix = "¡A½Ğ­×¥¿«á¦A¸Õ¡C";
-		const string DefaultError_InvalidParamFormat = "°Ñ¼Æ®æ¦¡¿ù»~¡G{0}";
-		const string DefaultError_InvalidIntParamFormat = "°Ñ¼Æ®æ¦¡¿ù»~¡G{0}¡]»İ¬°¥¿¾ã¼Æ¡^";
-		const string DefaultError_BuildShellException = "­±Á_¦X®Éµo¥Í¨Ò¥~¿ù»~¡G{0}";
-		const string DefaultHint_BracketShellOutdated = "¤u¥ó¤wÅÜ§ó¡A½Ğ­«·s¿ï¨ú¤ä¼µ­±";
+		const string DefaultError_NoFaceSelected = "è«‹å…ˆé¸æ“‡é¢";
+		const string DefaultError_PositionCount = "æ”¯æ¶æ•¸é‡ä¸èƒ½ç‚º0";
+		const string DefaultError_BuildShellFailed = "ç„¡æ³•å»ºç«‹æ”¯æ’é¢ï¼Œè«‹ç¢ºèªå·²é¸å–è¶³å¤ ä¸”ç›¸é€£çš„é¢";
+		const string DefaultError_FillShellFailed = "å¡«è£œå­”æ´å¤±æ•—ï¼Œæ­¤å·¥ä»¶æš«ä¸æ”¯æ´æ­¤åŠŸèƒ½";
+		const string DefaultError_FillShellBBoxDiverged = "å¡«è£œå­”æ´å¾Œå¹¾ä½•ç¯„åœè½å·®éå¤§ï¼Œæ­¤å·¥ä»¶æš«ä¸æ”¯æ´æ­¤åŠŸèƒ½";
+		const string DefaultError_ExtractShellFailed = "å¡«è£œå­”æ´å¾Œç„¡æ³•å–å¾—æ›²é¢ï¼Œæ­¤å·¥ä»¶æš«ä¸æ”¯æ´æ­¤åŠŸèƒ½";
+		const string DefaultError_SectionCalculationFailed = "æˆªé¢è¨ˆç®—å¤±æ•—ï¼Œè«‹èª¿æ•´ Xï¼Y æ”¯æ¶åº§æ¨™ï¼Œé¿é–‹å­”æ´æˆ–å‡¹é™·è™•";
+		const string DefaultError_SupportBuildFailed = "ç›®å‰æ›²é¢çš„é¸æ“‡ç„¡æ³•ç”Ÿæˆæ”¯æ¶ï¼Œè«‹æ›´æ›æ‰€é¸çš„é¢";
+		const string DefaultError_NoSavePath = "è«‹æŒ‡å®šå„²å­˜è·¯å¾‘";
+		const string DefaultError_DxfExportFailed = "DXF åŒ¯å‡ºå¤±æ•—";
+		const string DefaultLog_DxfSaved = "æ”¯æ¶DXF å·²å„²å­˜è‡³ï¼š{0}";
+		const string DefaultError_ComputeBBoxFailed = "ç„¡æ³•è¨ˆç®—å·¥ä»¶ç¯„åœ";
+		const string DefaultError_XPositionDuplicate = "Xæ–¹å‘æ”¯æ¶åº§æ¨™æœ‰é‡è¤‡";
+		const string DefaultError_YPositionDuplicate = "Yæ–¹å‘æ”¯æ¶åº§æ¨™æœ‰é‡è¤‡";
+		const string DefaultError_XPositionOutOfRange = "Xæ–¹å‘æ”¯æ¶åº§æ¨™è¶…å‡ºå·¥ä»¶ç¯„åœ";
+		const string DefaultError_YPositionOutOfRange = "Yæ–¹å‘æ”¯æ¶åº§æ¨™è¶…å‡ºå·¥ä»¶ç¯„åœ";
+		const string DefaultError_PositionSuffix = "ï¼Œè«‹ä¿®æ­£å¾Œå†è©¦ã€‚";
+		const string DefaultError_InvalidParamFormat = "åƒæ•¸æ ¼å¼éŒ¯èª¤ï¼š{0}";
+		const string DefaultError_InvalidIntParamFormat = "åƒæ•¸æ ¼å¼éŒ¯èª¤ï¼š{0}ï¼ˆéœ€ç‚ºæ­£æ•´æ•¸ï¼‰";
+		const string DefaultError_BuildShellException = "é¢ç¸«åˆæ™‚ç™¼ç”Ÿä¾‹å¤–éŒ¯èª¤ï¼š{0}";
+		const string DefaultHint_BracketShellOutdated = "å·¥ä»¶å·²è®Šæ›´ï¼Œè«‹é‡æ–°é¸å–æ”¯æ’é¢";
 	}
 
 }

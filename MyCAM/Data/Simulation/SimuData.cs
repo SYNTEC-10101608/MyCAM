@@ -1,6 +1,6 @@
-﻿using MyCAM.Post;
+﻿using System.Collections.Generic;
+using MyCAM.Post;
 using OCC.gp;
-using System.Collections.Generic;
 
 namespace MyCAM.Data
 {

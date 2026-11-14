@@ -1,7 +1,7 @@
-using MyCAM.App;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using MyCAM.App;
 using VNCFormsApp;
 
 namespace MyCAM.Editor.Dialog

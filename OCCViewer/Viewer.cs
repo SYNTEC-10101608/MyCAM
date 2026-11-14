@@ -1,4 +1,4 @@
-// Created: 2006-06-22 
+﻿// Created: 2006-06-22 
 // 
 // Copyright (c) 2006-2013 OPEN CASCADE SAS 
 // 
@@ -19,6 +19,8 @@
  * C# code. Compare it with the C++ OCCViewer class in standard C# sample.
  * ----------------------------------------------------------------------------- */
 
+using System;
+using System.Windows.Forms;
 using OCC.AIS;
 using OCC.Aspect;
 using OCC.gp;
@@ -30,8 +32,6 @@ using OCC.Standard;
 using OCC.V3d;
 using OCC.WNT;
 using OCCTool;
-using System;
-using System.Windows.Forms;
 
 namespace OCCViewer
 {

@@ -1,4 +1,4 @@
-namespace MyCAM.Editor
+﻿namespace MyCAM.Editor
 {
 	partial class LockMSAxisDlg
 	{

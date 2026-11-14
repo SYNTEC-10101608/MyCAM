@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
@@ -329,10 +329,13 @@ namespace MyCAM.Editor.Dialog
 
 		IEnumerable<NumericUpDown> GetAllNumericControls()
 		{
-			foreach( var nud in GetDisplacementControls() )
+			foreach( var nud in GetDisplacementControls() ) {
 				yield return nud;
-			foreach( var nud in GetRotationControls() )
+			}
+
+			foreach( var nud in GetRotationControls() ) {
 				yield return nud;
+			}
 		}
 
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "AxisTransformDlg" );

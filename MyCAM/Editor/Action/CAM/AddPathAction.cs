@@ -1,3 +1,5 @@
+ï»¿using System.Collections.Generic;
+using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
@@ -6,8 +8,6 @@ using OCC.gp;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -310,6 +310,6 @@ namespace MyCAM.Editor
 		SelectWireAction m_SelectWireAction;
 		List<TopoDS_Shape> m_SelectedFaceGroupList;
 
-		const string PLEASE_SELECT_FACE = "[¾Ş§@´£¿ô]½Ğ¥ı¿ï¾Ü­±";
+		const string PLEASE_SELECT_FACE = "[æ“ä½œæé†’]è«‹å…ˆé¸æ“‡é¢";
 	}
 }

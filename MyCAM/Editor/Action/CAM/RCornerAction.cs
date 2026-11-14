@@ -1,3 +1,7 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
@@ -8,10 +12,6 @@ using OCC.Prs3d;
 using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {

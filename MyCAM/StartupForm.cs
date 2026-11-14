@@ -1,4 +1,11 @@
-﻿using CncManager;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml.Linq;
+using CncManager;
 using CncUI;
 using MyCAM.App;
 using MyCAM.Data;
@@ -13,13 +20,6 @@ using OCC.gp;
 using OCC.Quantity;
 using OCC.TopoDS;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Xml.Linq;
 using TpCADCore;
 using TpCADUI;
 using VNCFormsApp;
@@ -259,8 +259,10 @@ namespace MyCAM
 
 		void CloseCNCPanels()
 		{
-			if( m_CurrentEditor == m_CAMEditor )
+			if( m_CurrentEditor == m_CAMEditor ) {
 				m_CAMEditor?.EndAction();
+			}
+
 			if( Height > Width ) {
 				m_CNCUIManager?.CloseOffsetDialog();
 			}
@@ -1195,8 +1197,9 @@ namespace MyCAM
 		// switch editor
 		void SwitchEditor( EEditorType type, bool closePanels = true )
 		{
-			if( closePanels )
+			if( closePanels ) {
 				CloseCNCPanels();
+			}
 			// no current editor
 			if( m_CurrentEditor == null ) {
 				m_CurrentEditor = GetEditor( type );

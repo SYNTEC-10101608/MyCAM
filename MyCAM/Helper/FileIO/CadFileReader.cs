@@ -1,3 +1,8 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Threading;
 using MyCAM.Data;
 using OCC.IFSelect;
 using OCC.IGESControl;
@@ -6,11 +11,6 @@ using OCC.STEPControl;
 using OCC.TopoDS;
 using OCC.XSControl;
 using OCCTool;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
 
 namespace MyCAM.Helper.FileIO
 {

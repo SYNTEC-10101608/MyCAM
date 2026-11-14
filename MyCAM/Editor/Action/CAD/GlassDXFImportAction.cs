@@ -1,3 +1,5 @@
+ï»¿using System;
+using System.Collections.Generic;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
@@ -11,8 +13,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Editor
 {
@@ -289,10 +289,10 @@ namespace MyCAM.Editor
 		// Half-size of the flat plane
 		const double FLAT_PLANE_SIZE = 5000.0;
 
-		const string DXF_IMPORT_FAILED_NO_GEOM = "DXF ¶×¤J¥¢±Ñ: µL¦³®Ä´X¦ó";
-		const string BUILD_SURFACE_FAILED = "«Øºc¦±­±¥¢±Ñ";
-		const string DXF_PROJECTION_FAILED = "DXF §ë¼v¥¢±Ñ: µL¦³®Ä§ë¼vµ²ªG";
-		const string DXF_IMPORT_EXCEPTION = "DXF ¶×¤J¥¢±Ñ: ";
+		const string DXF_IMPORT_FAILED_NO_GEOM = "DXF åŒ¯å…¥å¤±æ•—: ç„¡æœ‰æ•ˆå¹¾ä½•";
+		const string BUILD_SURFACE_FAILED = "å»ºæ§‹æ›²é¢å¤±æ•—";
+		const string DXF_PROJECTION_FAILED = "DXF æŠ•å½±å¤±æ•—: ç„¡æœ‰æ•ˆæŠ•å½±çµæœ";
+		const string DXF_IMPORT_EXCEPTION = "DXF åŒ¯å…¥å¤±æ•—: ";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "GlassDXFImportAction" );
 	}
 }

@@ -1,3 +1,7 @@
+ï»¿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Helper;
@@ -7,10 +11,6 @@ using OCC.gp;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -286,9 +286,9 @@ namespace MyCAM.Editor
 		// not null when the shape is supplied by the caller instead of read from a file
 		TopoDS_Shape m_AddedShape;
 
-		const string NO_SOLID_OBJECT_IN_FILE = "[¾Ş§@´£¿ô]¹ÏÀÉ¤º¨S¦³¹êÅéª«¥ó";
-		const string REVOLUTION_PLACE_FAILED = "[¾Ş§@´£¿ô]°jÂàÅé©ñ¸m¥¢±Ñ";
-		const string IMPORT_FAILED = "¶×¤J¥¢±Ñ";
+		const string NO_SOLID_OBJECT_IN_FILE = "[æ“ä½œæé†’]åœ–æª”å…§æ²’æœ‰å¯¦é«”ç‰©ä»¶";
+		const string REVOLUTION_PLACE_FAILED = "[æ“ä½œæé†’]è¿´è½‰é«”æ”¾ç½®å¤±æ•—";
+		const string IMPORT_FAILED = "åŒ¯å…¥å¤±æ•—";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "PlaceRingShapeAction" );
 	}
 }

@@ -1,9 +1,9 @@
-﻿using OCC.BRep;
+﻿using System;
+using OCC.BRep;
 using OCC.gp;
 using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
-using System;
 
 namespace MyCAM.Editor
 {

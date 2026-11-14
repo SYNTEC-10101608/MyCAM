@@ -1,7 +1,7 @@
-﻿using MyCAM.Helper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using MyCAM.Helper;
 
 namespace MyCAM.Editor.Dialog
 {

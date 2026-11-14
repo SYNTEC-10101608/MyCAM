@@ -1,4 +1,4 @@
-namespace MyCAM.Editor.Renderer
+﻿namespace MyCAM.Editor.Renderer
 {
 	/// <summary>
 	/// Base interface for all CAM renderers

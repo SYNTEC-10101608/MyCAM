@@ -1,13 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Serialization;
 using MyCAM.Data;
 using OCC.BRep;
 using OCC.BRepTools;
 using OCC.gp;
 using OCC.TopoDS;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml.Serialization;
 
 namespace MyCAM.FileManager
 {
@@ -2259,8 +2259,9 @@ namespace MyCAM.FileManager
 			}
 			finally {
 				// clean up the temporary file
-				if( File.Exists( tempFile ) )
+				if( File.Exists( tempFile ) ) {
 					File.Delete( tempFile );
+				}
 			}
 		}
 	}

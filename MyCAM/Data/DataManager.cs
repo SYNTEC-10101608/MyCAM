@@ -1,3 +1,6 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using MyCAM.Helper;
 using MyCAM.Helper.CAM;
 using OCC.BRep;
@@ -7,9 +10,6 @@ using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Data
 {

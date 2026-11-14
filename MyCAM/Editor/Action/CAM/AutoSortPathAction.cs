@@ -1,11 +1,11 @@
+ï»¿using System;
+using System.Collections.Generic;
+using System.Linq;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Dialog;
 using MyCAM.Helper;
 using OCC.gp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Editor
 {
@@ -159,12 +159,12 @@ namespace MyCAM.Editor
 
 		SelectPathAction m_SelectPathAction;
 		AutoSortPathDlg m_Dialog;
-		const string LOG_INSUFFICIENT_PATHS = "[¸ô®|±Æ§Ç] ¸ô®|¼Æ¶q¤£¨¬¡A¦Ü¤Ö»İ­n 2 ±ø¸ô®|";
-		const string LOG_SORT_FAILED = "[¸ô®|±Æ§Ç] {0}±Æ§Ç¥¼²£¥Í¦³®Äµ²ªG¡A½Ğ½T»{¸ô®|¸ê®Æ¬O§_¥¿½T";
-		const string SORT_METHOD_SHORTEST_PATH = "³Ìµu¸ô®|";
-		const string SORT_METHOD_CYLINDER_VERTICAL = "¶êµ©ª½±Æ";
-		const string SORT_METHOD_CYLINDER_HORIZONTAL = "¶êµ©¾î±Æ";
-		const string SORT_METHOD_UNKNOWN = "¥¼ª¾";
+		const string LOG_INSUFFICIENT_PATHS = "[è·¯å¾‘æ’åº] è·¯å¾‘æ•¸é‡ä¸è¶³ï¼Œè‡³å°‘éœ€è¦ 2 æ¢è·¯å¾‘";
+		const string LOG_SORT_FAILED = "[è·¯å¾‘æ’åº] {0}æ’åºæœªç”¢ç”Ÿæœ‰æ•ˆçµæœï¼Œè«‹ç¢ºèªè·¯å¾‘è³‡æ–™æ˜¯å¦æ­£ç¢º";
+		const string SORT_METHOD_SHORTEST_PATH = "æœ€çŸ­è·¯å¾‘";
+		const string SORT_METHOD_CYLINDER_VERTICAL = "åœ“ç­’ç›´æ’";
+		const string SORT_METHOD_CYLINDER_HORIZONTAL = "åœ“ç­’æ©«æ’";
+		const string SORT_METHOD_UNKNOWN = "æœªçŸ¥";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "AutoSortPathAction" );
 	}
 }

@@ -1,4 +1,7 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Post;
 using OCC.AIS;
@@ -15,9 +18,6 @@ using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopLoc;
 using OCC.TopoDS;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Helper
 {
@@ -414,12 +414,14 @@ namespace MyCAM.Helper
 			int vertexOffset = 0;
 
 			foreach( AIS_Shape ais in aisShapes ) {
-				if( ais == null )
+				if( ais == null ) {
 					continue;
+				}
 
 				TopoDS_Shape shape = ais.Shape();
-				if( shape == null )
+				if( shape == null ) {
 					continue;
+				}
 
 				// Ensure triangulation
 				new BRepMesh_IncrementalMesh( shape, deflection );
@@ -433,8 +435,9 @@ namespace MyCAM.Helper
 					TopLoc_Location loc = new TopLoc_Location();
 					Poly_Triangulation tri = BRep_Tool.Triangulation( face, ref loc );
 
-					if( tri == null || tri.IsNull() )
+					if( tri == null || tri.IsNull() ) {
 						continue;
+					}
 
 					gp_Trsf trsf = loc.Transformation();
 
@@ -468,8 +471,9 @@ namespace MyCAM.Helper
 				}
 			}
 
-			if( globalVertices.Count == 0 || globalTriangles.Count == 0 )
+			if( globalVertices.Count == 0 || globalTriangles.Count == 0 ) {
 				throw new InvalidOperationException( "No triangulation generated from AIS_Shapes." );
+			}
 
 			// -----------------------
 			// Build merged Poly_Triangulation

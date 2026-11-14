@@ -1,4 +1,11 @@
-﻿using CncManager;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using CncManager;
 using CncManager.CNCCore;
 using MyCAM.App;
 using MyCAM.Data;
@@ -8,13 +15,6 @@ using MyCAM.Post;
 using OCC.gp;
 using OCC.V3d;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {

@@ -1,8 +1,8 @@
-﻿using MyCAM.Data;
+﻿using System.Collections.Generic;
+using System.Linq;
+using MyCAM.Data;
 using MyCAM.Helper;
 using OCC.gp;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyCAM.Post
 {
@@ -145,7 +145,7 @@ namespace MyCAM.Post
 		public static void CalculateExit( PathEndInfo endInfoOfLastPath, EntryAndExitData entryAndExitData, out PostPoint G54ExitPoint )
 		{
 			G54ExitPoint = null;
-			if(endInfoOfLastPath == null || entryAndExitData == null ) {
+			if( endInfoOfLastPath == null || entryAndExitData == null ) {
 				return;
 			}
 

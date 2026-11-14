@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Windows.Forms;
 
@@ -233,16 +233,20 @@ namespace MyCAM.Editor
 			}
 
 			if( e.Delta > 0 ) {
-				if( Value + Increment <= Maximum )
+				if( Value + Increment <= Maximum ) {
 					Value += Increment;
-				else
+				}
+				else {
 					Value = Maximum;
+				}
 			}
 			else if( e.Delta < 0 ) {
-				if( Value - Increment >= Minimum )
+				if( Value - Increment >= Minimum ) {
 					Value -= Increment;
-				else
+				}
+				else {
 					Value = Minimum;
+				}
 			}
 		}
 

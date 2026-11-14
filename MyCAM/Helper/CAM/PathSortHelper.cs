@@ -1,11 +1,11 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using MyCAM.Data;
 using MyCAM.PathCache;
 using OCC.Geom;
 using OCC.gp;
 using OCC.ShapeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 
 namespace MyCAM.Helper

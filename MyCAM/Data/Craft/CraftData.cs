@@ -1,6 +1,6 @@
-using OCC.gp;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using OCC.gp;
 
 namespace MyCAM.Data
 {
@@ -310,7 +310,7 @@ namespace MyCAM.Data
 			{
 				return m_ProcessPath;
 			}
-			 set
+			set
 			{
 				if( m_ProcessPath != value ) {
 					m_ProcessPath = value;

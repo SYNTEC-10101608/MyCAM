@@ -1,7 +1,7 @@
+ï»¿using System;
+using System.Collections.Generic;
 using MyCAM.Data;
 using OCC.gp;
-using System;
-using System.Collections.Generic;
 
 namespace MyCAM.Helper
 {
@@ -152,7 +152,7 @@ namespace MyCAM.Helper
 			int sides = polygonData.Sides;
 			double sideLength = polygonData.SideLength;
 
-			// calculate circumradius R = sideLength / (2 * sin(£k/n))
+			// calculate circumradius R = sideLength / (2 * sin(Ï€/n))
 			double angleStep = 2.0 * Math.PI / sides;
 			double radius = sideLength / ( 2.0 * Math.Sin( Math.PI / sides ) );
 
@@ -254,12 +254,12 @@ namespace MyCAM.Helper
 				double vertex1Angle = angleOffset + i * angleStep;
 				double vertex2Angle = angleOffset + ( ( i + 1 ) % sides ) * angleStep;
 
-				// normalize angles to [0, 2£k] range
+				// normalize angles to [0, 2Ï€] range
 				vertex1Angle = NormalizeAngle( vertex1Angle );
 				vertex2Angle = NormalizeAngle( vertex2Angle );
 
-				// check if this edge crosses 270¢X (3£k/2, which is negative Y-axis)
-				double targetAngle = 3.0 * Math.PI / 2.0; // 270¢X
+				// check if this edge crosses 270Â° (3Ï€/2, which is negative Y-axis)
+				double targetAngle = 3.0 * Math.PI / 2.0; // 270Â°
 
 				if( IsAngleBetween( targetAngle, vertex1Angle, vertex2Angle ) ) {
 					return i;
@@ -288,10 +288,14 @@ namespace MyCAM.Helper
 
 		static double NormalizeAngle( double angle )
 		{
-			while( angle < 0 )
+			while( angle < 0 ) {
 				angle += 2 * Math.PI;
-			while( angle >= 2 * Math.PI )
+			}
+
+			while( angle >= 2 * Math.PI ) {
 				angle -= 2 * Math.PI;
+			}
+
 			return angle;
 		}
 
@@ -303,11 +307,11 @@ namespace MyCAM.Helper
 			endAngle = NormalizeAngle( endAngle );
 
 			if( startAngle <= endAngle ) {
-				// no crossing of 0¢X
+				// no crossing of 0Â°
 				return targetAngle >= startAngle && targetAngle <= endAngle;
 			}
 			else {
-				// crossing 0¢X
+				// crossing 0Â°
 				return targetAngle >= startAngle || targetAngle <= endAngle;
 			}
 		}

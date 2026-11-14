@@ -216,10 +216,13 @@ namespace MyCAM.Editor
 					else if( ctrl ) {
 
 						// toggle
-						if( m_SelectedNodes.Contains( next ) )
+						if( m_SelectedNodes.Contains( next ) ) {
 							UnselectNode( next );
-						else
+						}
+						else {
 							SelectNode( next );
+						}
+
 						m_AnchorNode = next;
 					}
 					else if( shift ) {
@@ -259,8 +262,9 @@ namespace MyCAM.Editor
 			List<TreeNode> visible = GetAllNodes( this.Nodes ).ToList();
 			int idx1 = visible.IndexOf( anchor );
 			int idx2 = visible.IndexOf( current );
-			if( idx1 < 0 || idx2 < 0 )
+			if( idx1 < 0 || idx2 < 0 ) {
 				return;
+			}
 
 			int start = Math.Min( idx1, idx2 );
 			int end = Math.Max( idx1, idx2 );
@@ -341,8 +345,10 @@ namespace MyCAM.Editor
 			}
 			TreeNode p = node.Parent;
 			while( p != null ) {
-				if( p.NextNode != null )
+				if( p.NextNode != null ) {
 					return p.NextNode;
+				}
+
 				p = p.Parent;
 			}
 			return null;

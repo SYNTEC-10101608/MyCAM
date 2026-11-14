@@ -1,5 +1,5 @@
-﻿using OCC.gp;
-using System;
+﻿using System;
+using OCC.gp;
 
 namespace MyCAM.Data
 {

@@ -1,6 +1,6 @@
-using MyCAM.Data;
-using System;
+﻿using System;
 using System.IO;
+using MyCAM.Data;
 
 namespace MyCAM.Post
 {
@@ -25,7 +25,7 @@ namespace MyCAM.Post
 			if( postData.LiftUpPostPoint != null ) {
 				WriteLinearTraverse( writer, postData.LiftUpPostPoint, 0, axisConfig );
 			}
-			
+
 			// frog leap
 			if( postData.FrogLeapMidPostPoint != null ) {
 

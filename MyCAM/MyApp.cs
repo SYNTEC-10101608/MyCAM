@@ -1,11 +1,11 @@
+ï»¿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
 using CommonData;
 using FileTranslator;
 using MyCAM.LogManager;
 using MyCAM.SettingManager;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 using VNCFormsApp;
 
 namespace MyCAM.App
@@ -18,9 +18,9 @@ namespace MyCAM.App
 		const string CUSTOM_root_Folder_Name = "Custom";
 		const string CUST_post_file_Name = "CustPost.cpf";
 
-		const string LOG_CUST_POST_FILE_NOT_EXIST = "«È»s«á³B²zÀÉ®×¤£¦s¦b";
-		const string LOG_READ_CUST_POST_FILE_FAILED = "Åª¨ú«È»s¤Æ«á³B²z¾¹ÀÉ®×¥¢±Ñ";
-		const string LOG_CUST_POST_FILE_CONTENT_ERROR = "«È»s¤Æ«á³B²z¾¹ÀÉ®×¤º®e¤£§¹¾ã©Î®æ¦¡¿ù»~,½Ğ½T»{ÀÉ®×¤º®e¡C";
+		const string LOG_CUST_POST_FILE_NOT_EXIST = "å®¢è£½å¾Œè™•ç†æª”æ¡ˆä¸å­˜åœ¨";
+		const string LOG_READ_CUST_POST_FILE_FAILED = "è®€å–å®¢è£½åŒ–å¾Œè™•ç†å™¨æª”æ¡ˆå¤±æ•—";
+		const string LOG_CUST_POST_FILE_CONTENT_ERROR = "å®¢è£½åŒ–å¾Œè™•ç†å™¨æª”æ¡ˆå…§å®¹ä¸å®Œæ•´æˆ–æ ¼å¼éŒ¯èª¤,è«‹ç¢ºèªæª”æ¡ˆå…§å®¹ã€‚";
 
 		public enum NoticeType
 		{
@@ -226,8 +226,8 @@ namespace MyCAM.App
 		static readonly List<DialogEventInfo> m_RegisteredDialogs = new List<DialogEventInfo>();
 		static CustPost m_CustPost = null;
 		static readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "MyApp" );
-		const string MAIN_FORM_NOT_INITIALIZED = "MainFormÁÙ¨Sªì©l¤Æ,½Ğ¥ı³]©w MainForm¡C";
-		const string LOGGER_NOT_INITIALIZED = "LoggerÁÙ¨Sªì©l¤Æ,½Ğ¥ı³]©w Logger¡C";
+		const string MAIN_FORM_NOT_INITIALIZED = "MainFormé‚„æ²’åˆå§‹åŒ–,è«‹å…ˆè¨­å®š MainFormã€‚";
+		const string LOGGER_NOT_INITIALIZED = "Loggeré‚„æ²’åˆå§‹åŒ–,è«‹å…ˆè¨­å®š Loggerã€‚";
 
 		class DialogEventInfo
 		{

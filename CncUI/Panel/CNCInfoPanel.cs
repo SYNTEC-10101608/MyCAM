@@ -1,12 +1,12 @@
-using CncManager.Definition;
-using CncUI.Controls;
-using CommonUI.Controls;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using CncManager.Definition;
+using CncUI.Controls;
+using CommonUI.Controls;
 
 namespace CncUI
 {
@@ -230,9 +230,12 @@ namespace CncUI
 		string GetAxisRoleText( CncAxisRole? role )
 		{
 			switch( role ) {
-				case CncAxisRole.Head: return Language.TryGetString( "AxisRole_Head", AXIS_ROLE_HEAD );
-				case CncAxisRole.Table: return Language.TryGetString( "AxisRole_Table", AXIS_ROLE_TABLE );
-				default: return "—";
+				case CncAxisRole.Head:
+					return Language.TryGetString( "AxisRole_Head", AXIS_ROLE_HEAD );
+				case CncAxisRole.Table:
+					return Language.TryGetString( "AxisRole_Table", AXIS_ROLE_TABLE );
+				default:
+					return "—";
 			}
 		}
 

@@ -1,4 +1,8 @@
-﻿using MyCAM.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using MyCAM.Data;
 using MyCAM.PathCache;
 using OCC.AIS;
 using OCC.BRepBuilderAPI;
@@ -8,10 +12,6 @@ using OCC.TopoDS;
 using OCC.TopTools;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -44,8 +44,9 @@ namespace MyCAM.Editor
 		{
 			// rebuild transformed vertex map, and get the original vertex for selected index
 			oriHighLightVtx = new TopoDS_Shape();
-			if( m_PathPointList == null || m_PathPointList.Count == 0 )
+			if( m_PathPointList == null || m_PathPointList.Count == 0 ) {
 				return;
+			}
 
 			// translate original highlight index to offset index when OriginalIndexMap is available
 			if( m_ToCADIndexMap != null ) {

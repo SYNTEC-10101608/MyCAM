@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.IO;
 using System.Net;
 
@@ -8,12 +8,12 @@ namespace MyCAM
 	{
 		static readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "FTPTransmission" );
 
-		const string ERROR_LOCAL_FILE_NOT_FOUND = "¥»¾÷ÀÉ®×¤£¦s¦b©Î¸ô®|µL®Ä";
-		const string ERROR_FTP_SERVER_IP_INVALID = "FTP ¦øªA¾¹ IP ¦ì§}µL®Ä";
-		const string ERROR_CONNECTION_FAILED = "³s½u¥¢±Ñ";
-		const string ERROR_UPLOAD_FAILED = "¤W¶Ç¥¢±Ñ¡Aª¬ºA½X¡G{0}";
-		const string ERROR_NETWORK_ERROR = "ºô¸ô¿ù»~¡G{0}";
-		const string ERROR_UPLOAD_EXCEPTION = "¤W¶Ç²§±`¡G{0}";
+		const string ERROR_LOCAL_FILE_NOT_FOUND = "æœ¬æ©Ÿæª”æ¡ˆä¸å­˜åœ¨æˆ–è·¯å¾‘ç„¡æ•ˆ";
+		const string ERROR_FTP_SERVER_IP_INVALID = "FTP ä¼ºæœå™¨ IP ä½å€ç„¡æ•ˆ";
+		const string ERROR_CONNECTION_FAILED = "é€£ç·šå¤±æ•—";
+		const string ERROR_UPLOAD_FAILED = "ä¸Šå‚³å¤±æ•—ï¼Œç‹€æ…‹ç¢¼ï¼š{0}";
+		const string ERROR_NETWORK_ERROR = "ç¶²è·¯éŒ¯èª¤ï¼š{0}";
+		const string ERROR_UPLOAD_EXCEPTION = "ä¸Šå‚³ç•°å¸¸ï¼š{0}";
 
 		public static bool FileTransmit( string szLocalFilePath, string szFTPServerIP, string szFileName, out string szErrorMessage )
 		{

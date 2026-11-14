@@ -1,3 +1,6 @@
+ï»¿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using MyCAM.App;
 using MyCAM.Data;
 using OCC.AIS;
@@ -5,9 +8,6 @@ using OCC.TopAbs;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace MyCAM.Editor
 {
@@ -119,7 +119,7 @@ namespace MyCAM.Editor
 
 		AddLineType m_AddLineType;
 
-		const string INVALID_TWO_POINTS = "[¾Ş§@´£¿ô]¿ï¨úªº¨âÂIµL®Ä¡AµLªk«Ø¥ß³s½u";
+		const string INVALID_TWO_POINTS = "[æ“ä½œæé†’]é¸å–çš„å…©é»ç„¡æ•ˆï¼Œç„¡æ³•å»ºç«‹é€£ç·š";
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "AddLineAction" );
 	}
 }

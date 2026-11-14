@@ -567,8 +567,9 @@ namespace FALicenseChecker
 				var obj = results.Cast<ManagementObject>().FirstOrDefault();
 				if( obj != null ) {
 					var v = obj[ szProp ] as string;
-					if( string.IsNullOrWhiteSpace( v ) == false )
+					if( string.IsNullOrWhiteSpace( v ) == false ) {
 						return v.Trim();
+					}
 				}
 			}
 			return string.Empty;

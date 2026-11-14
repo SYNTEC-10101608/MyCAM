@@ -1,4 +1,4 @@
-namespace CncUI
+﻿namespace CncUI
 {
     partial class CNCPanel
     {

@@ -1,4 +1,4 @@
-namespace MyCAM.Data
+﻿namespace MyCAM.Data
 {
 	// A snapshot of one progress report, independent of the manager instance.
 	public struct LoadingBarInfo

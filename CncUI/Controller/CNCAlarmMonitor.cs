@@ -1,11 +1,11 @@
-using CncManager;
-using CncManager.CNCCore;
-using CncManager.Definition;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CncManager;
+using CncManager.CNCCore;
+using CncManager.Definition;
 
 namespace CncUI
 {

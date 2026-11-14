@@ -1,6 +1,6 @@
-using MyCAM.Data;
-using System;
+ï»¿using System;
 using System.Windows.Forms;
+using MyCAM.Data;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -63,8 +63,9 @@ namespace MyCAM.Editor.Dialog
 			m_cmbPathType.Items.Add( m_LanguageManager.TryGetString( "PathType_Square", PATH_TYPE_SQUARE ) );
 			m_cmbPathType.Items.Add( m_LanguageManager.TryGetString( "PathType_Pentagon", PATH_TYPE_PENTAGON ) );
 			m_cmbPathType.Items.Add( m_LanguageManager.TryGetString( "PathType_Hexagon", PATH_TYPE_HEXAGON ) );
-			if( selectedIndex >= 0 && selectedIndex < m_cmbPathType.Items.Count )
+			if( selectedIndex >= 0 && selectedIndex < m_cmbPathType.Items.Count ) {
 				m_cmbPathType.SelectedIndex = selectedIndex;
+			}
 		}
 
 		void InitializeControlsValue()
@@ -731,7 +732,7 @@ namespace MyCAM.Editor.Dialog
 			const double EDGE_TANGENT_MULTIPLIER = 2.0;
 
 			// calculate interior angle and tangent distance
-			// interior angle = (n-2) * £k / n
+			// interior angle = (n-2) * Ï€ / n
 			double interiorAngle = ( sides - INTERIOR_ANGLE_NUMERATOR_OFFSET ) * Math.PI / sides;
 			double halfAngle = interiorAngle / EDGE_TANGENT_MULTIPLIER;
 			double tangentDistance = cornerRadius / Math.Tan( halfAngle );
@@ -766,13 +767,13 @@ namespace MyCAM.Editor.Dialog
 
 		readonly LanguageManager.LanguageManager m_LanguageManager;
 
-		const string PATH_TYPE_CONTOUR = "½ü¹ø";
-		const string PATH_TYPE_CIRCLE = "¶ê§Î";
-		const string PATH_TYPE_RECTANGLE = "ªø¤è§Î";
-		const string PATH_TYPE_RUNWAY = "¶]¹D§Î";
-		const string PATH_TYPE_TRIANGLE = "¤T¨¤§Î";
-		const string PATH_TYPE_SQUARE = "¥¿¤è§Î";
-		const string PATH_TYPE_PENTAGON = "¤­¨¤§Î";
-		const string PATH_TYPE_HEXAGON = "¤»¨¤§Î";
+		const string PATH_TYPE_CONTOUR = "è¼ªå»“";
+		const string PATH_TYPE_CIRCLE = "åœ“å½¢";
+		const string PATH_TYPE_RECTANGLE = "é•·æ–¹å½¢";
+		const string PATH_TYPE_RUNWAY = "è·‘é“å½¢";
+		const string PATH_TYPE_TRIANGLE = "ä¸‰è§’å½¢";
+		const string PATH_TYPE_SQUARE = "æ­£æ–¹å½¢";
+		const string PATH_TYPE_PENTAGON = "äº”è§’å½¢";
+		const string PATH_TYPE_HEXAGON = "å…­è§’å½¢";
 	}
 }

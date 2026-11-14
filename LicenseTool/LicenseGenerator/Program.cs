@@ -25,7 +25,7 @@ namespace LicenseGenerator
 				return;
 			}
 
-			if (CheckMachineMashIsNotEmpty( reqDict ) == false ) {
+			if( CheckMachineMashIsNotEmpty( reqDict ) == false ) {
 				return;
 			}
 

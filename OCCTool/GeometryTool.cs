@@ -1,4 +1,6 @@
-﻿using OCC.Bnd;
+﻿using System;
+using System.Collections.Generic;
+using OCC.Bnd;
 using OCC.BRep;
 using OCC.BRepAdaptor;
 using OCC.BRepBndLib;
@@ -22,8 +24,6 @@ using OCC.TopAbs;
 using OCC.TopExp;
 using OCC.TopoDS;
 using OCC.TopTools;
-using System;
-using System.Collections.Generic;
 
 namespace OCCTool
 {

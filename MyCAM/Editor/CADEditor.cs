@@ -1,16 +1,16 @@
-﻿using MyCAM.App;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
+using MyCAM.App;
 using MyCAM.Data;
+using MyCAM.Helper.FileIO;
+using MyCAM.LoadingManager;
 using OCC.BRepBuilderAPI;
 using OCC.gp;
 using OCC.TopoDS;
 using OCCTool;
 using OCCViewer;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
-using MyCAM.LoadingManager;
-using MyCAM.Helper.FileIO;
 
 namespace MyCAM.Editor
 {
@@ -76,11 +76,14 @@ namespace MyCAM.Editor
 			openDialog.Filter = filter;
 
 			// show file dialog
-			if( openDialog.ShowDialog( MyApp.MainForm ) != DialogResult.OK )
+			if( openDialog.ShowDialog( MyApp.MainForm ) != DialogResult.OK ) {
 				return;
+			}
+
 			string szFileName = openDialog.FileName;
-			if( string.IsNullOrEmpty( szFileName ) )
+			if( string.IsNullOrEmpty( szFileName ) ) {
 				return;
+			}
 
 			// get this file format
 			FileFormat format = CadFileReader.GetFormat( szFileName, allowDxf: true );

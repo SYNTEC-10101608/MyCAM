@@ -1,0 +1,38 @@
+# ===== Visual Studio =====
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ===== Build output (C#) =====
+[Bb]in/
+[Oo]bj/
+
+# reference/ 下的第三方二進位需要進版控
+!reference/**/bin/
+!reference/**/bin/**
+
+# ===== Build output (C++: PostTool / FCLTool) =====
+x64/
+[Ww]in32/
+*.ilk
+*.ipch
+*.iobj
+*.ipdb
+*.tlog
+*.lastbuildstate
+*.idb
+ipch/
+
+# ===== Misc =====
+*.log
+*.tmp
+*~
+Thumbs.db
+Desktop.ini
+
+# ===== AI 工具個人設定（不進版控）=====
+.claude/settings.local.json
+CLAUDE.local.md
+.worktreeinclude
