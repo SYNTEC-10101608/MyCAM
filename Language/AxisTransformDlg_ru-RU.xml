@@ -11,7 +11,4 @@
 	<Message ID="m_lblRz" Content="RZ" />
 	<Message ID="m_lblStepDis" Content="Шаг смещения" />
 	<Message ID="m_lblStapAngle" Content="Шаг вращения" />
-	<Message ID="m_btnOK" Content="Подтвердить" />
-	<Message ID="m_btnCancel" Content="Отмена" />
-	<Message ID="m_btnReset" Content="Сброс" />
 </ResMap>

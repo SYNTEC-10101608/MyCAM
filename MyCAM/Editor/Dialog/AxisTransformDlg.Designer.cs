@@ -27,125 +27,196 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_lblX = new System.Windows.Forms.Label();
-			this.m_lblY = new System.Windows.Forms.Label();
-			this.m_lblZ = new System.Windows.Forms.Label();
-			this.m_lblRx = new System.Windows.Forms.Label();
-			this.m_lblRy = new System.Windows.Forms.Label();
-			this.m_lblRz = new System.Windows.Forms.Label();
-			this.m_nudX = new System.Windows.Forms.NumericUpDown();
-			this.m_nudY = new System.Windows.Forms.NumericUpDown();
-			this.m_nudRx = new System.Windows.Forms.NumericUpDown();
-			this.m_nudZ = new System.Windows.Forms.NumericUpDown();
-			this.m_nudRy = new System.Windows.Forms.NumericUpDown();
-			this.m_nudRz = new System.Windows.Forms.NumericUpDown();
-			this.m_btnOK = new System.Windows.Forms.Button();
-			this.m_btnCancel = new System.Windows.Forms.Button();
-			this.m_btnReset = new System.Windows.Forms.Button();
+			this.m_grpDisplacement = new CommonUI.Controls.SectionPanel();
 			this.m_lblStepDis = new System.Windows.Forms.Label();
-			this.m_grpDisplacement = new System.Windows.Forms.GroupBox();
-			this.m_txbStepDistance = new System.Windows.Forms.TextBox();
-			this.m_grpRotation = new System.Windows.Forms.GroupBox();
-			this.m_txbStepAngle = new System.Windows.Forms.TextBox();
+			this.m_txbStepDistance = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblX = new CommonUI.Controls.ThemedLabel();
+			this.m_nudX = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblY = new CommonUI.Controls.ThemedLabel();
+			this.m_nudY = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblZ = new CommonUI.Controls.ThemedLabel();
+			this.m_nudZ = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_grpRotation = new CommonUI.Controls.SectionPanel();
 			this.m_lblStapAngle = new System.Windows.Forms.Label();
+			this.m_txbStepAngle = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblRx = new CommonUI.Controls.ThemedLabel();
+			this.m_nudRx = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblRy = new CommonUI.Controls.ThemedLabel();
+			this.m_nudRy = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_lblRz = new CommonUI.Controls.ThemedLabel();
+			this.m_nudRz = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_btnReset = new CommonUI.Controls.ThemedButton();
+			this.m_btnCancel = new CommonUI.Controls.ThemedButton();
+			this.m_btnOK = new CommonUI.Controls.ThemedButton();
+			this.m_grpDisplacement.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_txbStepDistance)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_nudX)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_nudY)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRx)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_nudZ)).BeginInit();
+			this.m_grpRotation.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_txbStepAngle)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_nudRx)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_nudRy)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_nudRz)).BeginInit();
-			this.m_grpDisplacement.SuspendLayout();
-			this.m_grpRotation.SuspendLayout();
 			this.SuspendLayout();
-			// 
+			//
+			// m_grpDisplacement
+			//
+			this.m_grpDisplacement.Controls.Add(this.m_lblStepDis);
+			this.m_grpDisplacement.Controls.Add(this.m_txbStepDistance);
+			this.m_grpDisplacement.Controls.Add(this.m_lblX);
+			this.m_grpDisplacement.Controls.Add(this.m_nudX);
+			this.m_grpDisplacement.Controls.Add(this.m_lblY);
+			this.m_grpDisplacement.Controls.Add(this.m_nudY);
+			this.m_grpDisplacement.Controls.Add(this.m_lblZ);
+			this.m_grpDisplacement.Controls.Add(this.m_nudZ);
+			this.m_grpDisplacement.Location = new System.Drawing.Point(12, 12);
+			this.m_grpDisplacement.Name = "m_grpDisplacement";
+			this.m_grpDisplacement.Size = new System.Drawing.Size(296, 159);
+			this.m_grpDisplacement.TabIndex = 0;
+			this.m_grpDisplacement.Text = "平移";
+			//
+			// m_lblStepDis
+			//
+			this.m_lblStepDis.AutoSize = true;
+			this.m_lblStepDis.Location = new System.Drawing.Point(10, 40);
+			this.m_lblStepDis.Name = "m_lblStepDis";
+			this.m_lblStepDis.Size = new System.Drawing.Size(55, 16);
+			this.m_lblStepDis.TabIndex = 0;
+			this.m_lblStepDis.Text = "步進距離";
+			//
+			// m_txbStepDistance
+			//
+			this.m_txbStepDistance.DecimalPlaces = 3;
+			this.m_txbStepDistance.Location = new System.Drawing.Point(100, 36);
+			this.m_txbStepDistance.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_txbStepDistance.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            196608});
+			this.m_txbStepDistance.Name = "m_txbStepDistance";
+			this.m_txbStepDistance.Size = new System.Drawing.Size(150, 23);
+			this.m_txbStepDistance.TabIndex = 1;
+			this.m_txbStepDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbStepDistance_KeyDown);
+			this.m_txbStepDistance.Leave += new System.EventHandler(this.m_txbStepDistance_Leave);
+			//
 			// m_lblX
-			// 
+			//
 			this.m_lblX.AutoSize = true;
-			this.m_lblX.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_lblX.Location = new System.Drawing.Point(15, 95);
-			this.m_lblX.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+			this.m_lblX.Location = new System.Drawing.Point(10, 70);
 			this.m_lblX.Name = "m_lblX";
-			this.m_lblX.Size = new System.Drawing.Size(23, 22);
+			this.m_lblX.Role = CommonUI.Theme.TextRole.Emphasis;
+			this.m_lblX.Size = new System.Drawing.Size(15, 16);
 			this.m_lblX.TabIndex = 2;
 			this.m_lblX.Text = "X";
-			// 
-			// m_lblY
-			// 
-			this.m_lblY.AutoSize = true;
-			this.m_lblY.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_lblY.Location = new System.Drawing.Point(15, 154);
-			this.m_lblY.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.m_lblY.Name = "m_lblY";
-			this.m_lblY.Size = new System.Drawing.Size(22, 22);
-			this.m_lblY.TabIndex = 3;
-			this.m_lblY.Text = "Y";
-			// 
-			// m_lblZ
-			// 
-			this.m_lblZ.AutoSize = true;
-			this.m_lblZ.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_lblZ.Location = new System.Drawing.Point(15, 215);
-			this.m_lblZ.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.m_lblZ.Name = "m_lblZ";
-			this.m_lblZ.Size = new System.Drawing.Size(22, 22);
-			this.m_lblZ.TabIndex = 4;
-			this.m_lblZ.Text = "Z";
-			// 
-			// m_lblRx
-			// 
-			this.m_lblRx.AutoSize = true;
-			this.m_lblRx.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_lblRx.Location = new System.Drawing.Point(26, 95);
-			this.m_lblRx.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.m_lblRx.Name = "m_lblRx";
-			this.m_lblRx.Size = new System.Drawing.Size(37, 22);
-			this.m_lblRx.TabIndex = 5;
-			this.m_lblRx.Text = "RX";
-			// 
-			// m_lblRy
-			// 
-			this.m_lblRy.AutoSize = true;
-			this.m_lblRy.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_lblRy.Location = new System.Drawing.Point(26, 154);
-			this.m_lblRy.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.m_lblRy.Name = "m_lblRy";
-			this.m_lblRy.Size = new System.Drawing.Size(36, 22);
-			this.m_lblRy.TabIndex = 6;
-			this.m_lblRy.Text = "RY";
-			// 
-			// m_lblRz
-			// 
-			this.m_lblRz.AutoSize = true;
-			this.m_lblRz.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_lblRz.Location = new System.Drawing.Point(26, 215);
-			this.m_lblRz.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.m_lblRz.Name = "m_lblRz";
-			this.m_lblRz.Size = new System.Drawing.Size(36, 22);
-			this.m_lblRz.TabIndex = 7;
-			this.m_lblRz.Text = "RZ";
-			// 
+			//
 			// m_nudX
-			// 
-			this.m_nudX.Location = new System.Drawing.Point(59, 95);
-			this.m_nudX.Margin = new System.Windows.Forms.Padding(4);
+			//
+			this.m_nudX.Location = new System.Drawing.Point(100, 66);
 			this.m_nudX.Name = "m_nudX";
-			this.m_nudX.Size = new System.Drawing.Size(110, 26);
-			this.m_nudX.TabIndex = 8;
+			this.m_nudX.Size = new System.Drawing.Size(150, 23);
+			this.m_nudX.TabIndex = 3;
 			this.m_nudX.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudX_MouseWheel);
-			// 
+			//
+			// m_lblY
+			//
+			this.m_lblY.AutoSize = true;
+			this.m_lblY.Location = new System.Drawing.Point(10, 100);
+			this.m_lblY.Name = "m_lblY";
+			this.m_lblY.Role = CommonUI.Theme.TextRole.Emphasis;
+			this.m_lblY.Size = new System.Drawing.Size(15, 16);
+			this.m_lblY.TabIndex = 4;
+			this.m_lblY.Text = "Y";
+			//
 			// m_nudY
-			// 
-			this.m_nudY.Location = new System.Drawing.Point(59, 154);
-			this.m_nudY.Margin = new System.Windows.Forms.Padding(4);
+			//
+			this.m_nudY.Location = new System.Drawing.Point(100, 96);
 			this.m_nudY.Name = "m_nudY";
-			this.m_nudY.Size = new System.Drawing.Size(110, 26);
-			this.m_nudY.TabIndex = 9;
+			this.m_nudY.Size = new System.Drawing.Size(150, 23);
+			this.m_nudY.TabIndex = 5;
 			this.m_nudY.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudY_MouseWheel);
-			// 
+			//
+			// m_lblZ
+			//
+			this.m_lblZ.AutoSize = true;
+			this.m_lblZ.Location = new System.Drawing.Point(10, 130);
+			this.m_lblZ.Name = "m_lblZ";
+			this.m_lblZ.Role = CommonUI.Theme.TextRole.Emphasis;
+			this.m_lblZ.Size = new System.Drawing.Size(15, 16);
+			this.m_lblZ.TabIndex = 6;
+			this.m_lblZ.Text = "Z";
+			//
+			// m_nudZ
+			//
+			this.m_nudZ.Location = new System.Drawing.Point(100, 126);
+			this.m_nudZ.Name = "m_nudZ";
+			this.m_nudZ.Size = new System.Drawing.Size(150, 23);
+			this.m_nudZ.TabIndex = 7;
+			this.m_nudZ.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudZ_MouseWheel);
+			//
+			// m_grpRotation
+			//
+			this.m_grpRotation.Controls.Add(this.m_lblStapAngle);
+			this.m_grpRotation.Controls.Add(this.m_txbStepAngle);
+			this.m_grpRotation.Controls.Add(this.m_lblRx);
+			this.m_grpRotation.Controls.Add(this.m_nudRx);
+			this.m_grpRotation.Controls.Add(this.m_lblRy);
+			this.m_grpRotation.Controls.Add(this.m_nudRy);
+			this.m_grpRotation.Controls.Add(this.m_lblRz);
+			this.m_grpRotation.Controls.Add(this.m_nudRz);
+			this.m_grpRotation.Location = new System.Drawing.Point(12, 179);
+			this.m_grpRotation.Name = "m_grpRotation";
+			this.m_grpRotation.Size = new System.Drawing.Size(296, 159);
+			this.m_grpRotation.TabIndex = 1;
+			this.m_grpRotation.Text = "旋轉";
+			//
+			// m_lblStapAngle
+			//
+			this.m_lblStapAngle.AutoSize = true;
+			this.m_lblStapAngle.Location = new System.Drawing.Point(10, 40);
+			this.m_lblStapAngle.Name = "m_lblStapAngle";
+			this.m_lblStapAngle.Size = new System.Drawing.Size(55, 16);
+			this.m_lblStapAngle.TabIndex = 0;
+			this.m_lblStapAngle.Text = "步進角度";
+			//
+			// m_txbStepAngle
+			//
+			this.m_txbStepAngle.DecimalPlaces = 3;
+			this.m_txbStepAngle.Location = new System.Drawing.Point(100, 36);
+			this.m_txbStepAngle.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+			this.m_txbStepAngle.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            196608});
+			this.m_txbStepAngle.Name = "m_txbStepAngle";
+			this.m_txbStepAngle.Size = new System.Drawing.Size(150, 23);
+			this.m_txbStepAngle.TabIndex = 1;
+			this.m_txbStepAngle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbStepAngle_KeyDown);
+			this.m_txbStepAngle.Leave += new System.EventHandler(this.m_txbStepAngle_Leave);
+			//
+			// m_lblRx
+			//
+			this.m_lblRx.AutoSize = true;
+			this.m_lblRx.Location = new System.Drawing.Point(10, 70);
+			this.m_lblRx.Name = "m_lblRx";
+			this.m_lblRx.Role = CommonUI.Theme.TextRole.Emphasis;
+			this.m_lblRx.Size = new System.Drawing.Size(24, 16);
+			this.m_lblRx.TabIndex = 2;
+			this.m_lblRx.Text = "RX";
+			//
 			// m_nudRx
-			// 
-			this.m_nudRx.Location = new System.Drawing.Point(76, 95);
-			this.m_nudRx.Margin = new System.Windows.Forms.Padding(4);
+			//
+			this.m_nudRx.Location = new System.Drawing.Point(100, 66);
 			this.m_nudRx.Maximum = new decimal(new int[] {
             360,
             0,
@@ -157,23 +228,23 @@
             0,
             -2147483648});
 			this.m_nudRx.Name = "m_nudRx";
-			this.m_nudRx.Size = new System.Drawing.Size(110, 26);
-			this.m_nudRx.TabIndex = 10;
+			this.m_nudRx.Size = new System.Drawing.Size(150, 23);
+			this.m_nudRx.TabIndex = 3;
 			this.m_nudRx.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudRx_MouseWheel);
-			// 
-			// m_nudZ
-			// 
-			this.m_nudZ.Location = new System.Drawing.Point(59, 215);
-			this.m_nudZ.Margin = new System.Windows.Forms.Padding(4);
-			this.m_nudZ.Name = "m_nudZ";
-			this.m_nudZ.Size = new System.Drawing.Size(110, 26);
-			this.m_nudZ.TabIndex = 11;
-			this.m_nudZ.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudZ_MouseWheel);
-			// 
+			//
+			// m_lblRy
+			//
+			this.m_lblRy.AutoSize = true;
+			this.m_lblRy.Location = new System.Drawing.Point(10, 100);
+			this.m_lblRy.Name = "m_lblRy";
+			this.m_lblRy.Role = CommonUI.Theme.TextRole.Emphasis;
+			this.m_lblRy.Size = new System.Drawing.Size(24, 16);
+			this.m_lblRy.TabIndex = 4;
+			this.m_lblRy.Text = "RY";
+			//
 			// m_nudRy
-			// 
-			this.m_nudRy.Location = new System.Drawing.Point(76, 154);
-			this.m_nudRy.Margin = new System.Windows.Forms.Padding(4);
+			//
+			this.m_nudRy.Location = new System.Drawing.Point(100, 96);
 			this.m_nudRy.Maximum = new decimal(new int[] {
             360,
             0,
@@ -185,14 +256,23 @@
             0,
             -2147483648});
 			this.m_nudRy.Name = "m_nudRy";
-			this.m_nudRy.Size = new System.Drawing.Size(110, 26);
-			this.m_nudRy.TabIndex = 12;
+			this.m_nudRy.Size = new System.Drawing.Size(150, 23);
+			this.m_nudRy.TabIndex = 5;
 			this.m_nudRy.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudRy_MouseWheel);
-			// 
+			//
+			// m_lblRz
+			//
+			this.m_lblRz.AutoSize = true;
+			this.m_lblRz.Location = new System.Drawing.Point(10, 130);
+			this.m_lblRz.Name = "m_lblRz";
+			this.m_lblRz.Role = CommonUI.Theme.TextRole.Emphasis;
+			this.m_lblRz.Size = new System.Drawing.Size(24, 16);
+			this.m_lblRz.TabIndex = 6;
+			this.m_lblRz.Text = "RZ";
+			//
 			// m_nudRz
-			// 
-			this.m_nudRz.Location = new System.Drawing.Point(76, 215);
-			this.m_nudRz.Margin = new System.Windows.Forms.Padding(4);
+			//
+			this.m_nudRz.Location = new System.Drawing.Point(100, 126);
 			this.m_nudRz.Maximum = new decimal(new int[] {
             360,
             0,
@@ -204,175 +284,90 @@
             0,
             -2147483648});
 			this.m_nudRz.Name = "m_nudRz";
-			this.m_nudRz.Size = new System.Drawing.Size(110, 26);
-			this.m_nudRz.TabIndex = 13;
+			this.m_nudRz.Size = new System.Drawing.Size(150, 23);
+			this.m_nudRz.TabIndex = 7;
 			this.m_nudRz.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.m_nudRz_MouseWheel);
-			// 
-			// m_btnOK
-			// 
-			this.m_btnOK.Location = new System.Drawing.Point(387, 287);
-			this.m_btnOK.Margin = new System.Windows.Forms.Padding(4);
-			this.m_btnOK.Name = "m_btnOK";
-			this.m_btnOK.Size = new System.Drawing.Size(78, 29);
-			this.m_btnOK.TabIndex = 24;
-			this.m_btnOK.Text = "確認";
-			this.m_btnOK.UseVisualStyleBackColor = true;
-			this.m_btnOK.Click += new System.EventHandler(this.m_btnOK_Click);
-			// 
-			// m_btnCancel
-			// 
-			this.m_btnCancel.Location = new System.Drawing.Point(473, 287);
-			this.m_btnCancel.Margin = new System.Windows.Forms.Padding(4);
-			this.m_btnCancel.Name = "m_btnCancel";
-			this.m_btnCancel.Size = new System.Drawing.Size(78, 29);
-			this.m_btnCancel.TabIndex = 25;
-			this.m_btnCancel.Text = "取消";
-			this.m_btnCancel.UseVisualStyleBackColor = true;
-			this.m_btnCancel.Click += new System.EventHandler(this.m_btnCancel_Click);
-			// 
+			//
 			// m_btnReset
-			// 
-			this.m_btnReset.Location = new System.Drawing.Point(15, 287);
-			this.m_btnReset.Margin = new System.Windows.Forms.Padding(4);
+			//
+			this.m_btnReset.CommonText = CommonUI.Controls.CommonButtonText.Reset;
+			this.m_btnReset.Location = new System.Drawing.Point(12, 354);
 			this.m_btnReset.Name = "m_btnReset";
-			this.m_btnReset.Size = new System.Drawing.Size(78, 29);
-			this.m_btnReset.TabIndex = 26;
+			this.m_btnReset.Size = new System.Drawing.Size(80, 28);
+			this.m_btnReset.TabIndex = 2;
 			this.m_btnReset.Text = "重設";
-			this.m_btnReset.UseVisualStyleBackColor = true;
 			this.m_btnReset.Click += new System.EventHandler(this.m_btnReset_Click);
-			// 
-			// m_lblStepDis
-			// 
-			this.m_lblStepDis.AutoSize = true;
-			this.m_lblStepDis.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_lblStepDis.Location = new System.Drawing.Point(9, 42);
-			this.m_lblStepDis.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.m_lblStepDis.Name = "m_lblStepDis";
-			this.m_lblStepDis.Size = new System.Drawing.Size(71, 16);
-			this.m_lblStepDis.TabIndex = 21;
-			this.m_lblStepDis.Text = "步進距離";
-			// 
-			// m_grpDisplacement
-			// 
-			this.m_grpDisplacement.Controls.Add(this.m_txbStepDistance);
-			this.m_grpDisplacement.Controls.Add(this.m_lblStepDis);
-			this.m_grpDisplacement.Controls.Add(this.m_nudZ);
-			this.m_grpDisplacement.Controls.Add(this.m_nudY);
-			this.m_grpDisplacement.Controls.Add(this.m_lblX);
-			this.m_grpDisplacement.Controls.Add(this.m_nudX);
-			this.m_grpDisplacement.Controls.Add(this.m_lblZ);
-			this.m_grpDisplacement.Controls.Add(this.m_lblY);
-			this.m_grpDisplacement.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_grpDisplacement.Location = new System.Drawing.Point(12, 12);
-			this.m_grpDisplacement.Name = "m_grpDisplacement";
-			this.m_grpDisplacement.Size = new System.Drawing.Size(259, 268);
-			this.m_grpDisplacement.TabIndex = 22;
-			this.m_grpDisplacement.TabStop = false;
-			this.m_grpDisplacement.Text = "平移";
-			// 
-			// m_txbStepDistance
-			// 
-			this.m_txbStepDistance.Location = new System.Drawing.Point(83, 37);
-			this.m_txbStepDistance.Name = "m_txbStepDistance";
-			this.m_txbStepDistance.Size = new System.Drawing.Size(100, 26);
-			this.m_txbStepDistance.TabIndex = 22;
-			this.m_txbStepDistance.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbStepDistance_KeyDown);
-			this.m_txbStepDistance.Leave += new System.EventHandler(this.m_txbStepDistance_Leave);
-			// 
-			// m_grpRotation
-			// 
-			this.m_grpRotation.Controls.Add(this.m_txbStepAngle);
-			this.m_grpRotation.Controls.Add(this.m_lblStapAngle);
-			this.m_grpRotation.Controls.Add(this.m_lblRx);
-			this.m_grpRotation.Controls.Add(this.m_lblRy);
-			this.m_grpRotation.Controls.Add(this.m_lblRz);
-			this.m_grpRotation.Controls.Add(this.m_nudRx);
-			this.m_grpRotation.Controls.Add(this.m_nudRy);
-			this.m_grpRotation.Controls.Add(this.m_nudRz);
-			this.m_grpRotation.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_grpRotation.Location = new System.Drawing.Point(288, 12);
-			this.m_grpRotation.Name = "m_grpRotation";
-			this.m_grpRotation.Size = new System.Drawing.Size(271, 268);
-			this.m_grpRotation.TabIndex = 23;
-			this.m_grpRotation.TabStop = false;
-			this.m_grpRotation.Text = "旋轉";
-			// 
-			// m_txbStepAngle
-			// 
-			this.m_txbStepAngle.Location = new System.Drawing.Point(111, 40);
-			this.m_txbStepAngle.Name = "m_txbStepAngle";
-			this.m_txbStepAngle.Size = new System.Drawing.Size(100, 26);
-			this.m_txbStepAngle.TabIndex = 24;
-			this.m_txbStepAngle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.m_txbStepAngle_KeyDown);
-			this.m_txbStepAngle.Leave += new System.EventHandler(this.m_txbStepAngle_Leave);
-			// 
-			// m_lblStapAngle
-			// 
-			this.m_lblStapAngle.AutoSize = true;
-			this.m_lblStapAngle.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.m_lblStapAngle.Location = new System.Drawing.Point(26, 45);
-			this.m_lblStapAngle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.m_lblStapAngle.Name = "m_lblStapAngle";
-			this.m_lblStapAngle.Size = new System.Drawing.Size(71, 16);
-			this.m_lblStapAngle.TabIndex = 23;
-			this.m_lblStapAngle.Text = "步進角度";
-			// 
+			//
+			// m_btnCancel
+			//
+			this.m_btnCancel.CommonText = CommonUI.Controls.CommonButtonText.Cancel;
+			this.m_btnCancel.Location = new System.Drawing.Point(140, 354);
+			this.m_btnCancel.Name = "m_btnCancel";
+			this.m_btnCancel.Size = new System.Drawing.Size(80, 28);
+			this.m_btnCancel.TabIndex = 3;
+			this.m_btnCancel.Text = "取消";
+			this.m_btnCancel.Click += new System.EventHandler(this.m_btnCancel_Click);
+			//
+			// m_btnOK
+			//
+			this.m_btnOK.CommonText = CommonUI.Controls.CommonButtonText.Confirm;
+			this.m_btnOK.Kind = CommonUI.Controls.ButtonKind.Primary;
+			this.m_btnOK.Location = new System.Drawing.Point(228, 354);
+			this.m_btnOK.Name = "m_btnOK";
+			this.m_btnOK.Size = new System.Drawing.Size(80, 28);
+			this.m_btnOK.TabIndex = 4;
+			this.m_btnOK.Text = "確定";
+			this.m_btnOK.Click += new System.EventHandler(this.m_btnOK_Click);
+			//
 			// AxisTransformDlg
-			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(585, 328);
-			this.Controls.Add(this.m_grpRotation);
+			//
+			this.ClientSize = new System.Drawing.Size(320, 394);
 			this.Controls.Add(this.m_grpDisplacement);
-			this.Controls.Add(this.m_btnOK);
-			this.Controls.Add(this.m_btnCancel);
+			this.Controls.Add(this.m_grpRotation);
 			this.Controls.Add(this.m_btnReset);
-			this.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-			this.Margin = new System.Windows.Forms.Padding(4);
+			this.Controls.Add(this.m_btnCancel);
+			this.Controls.Add(this.m_btnOK);
 			this.Name = "AxisTransformDlg";
 			this.Text = "軸向轉換";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AxisTransformDlg_FormClosing);
-			((System.ComponentModel.ISupportInitialize)(this.m_nudX)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudY)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRx)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudZ)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRy)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.m_nudRz)).EndInit();
 			this.m_grpDisplacement.ResumeLayout(false);
 			this.m_grpDisplacement.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_txbStepDistance)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_nudX)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_nudY)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_nudZ)).EndInit();
 			this.m_grpRotation.ResumeLayout(false);
 			this.m_grpRotation.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.m_txbStepAngle)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_nudRx)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_nudRy)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.m_nudRz)).EndInit();
 			this.ResumeLayout(false);
 
 		}
 
-		private void M_nudRx_MouseWheel( object sender, System.Windows.Forms.MouseEventArgs e )
-		{
-			throw new System.NotImplementedException();
-		}
-
 		#endregion
-		private System.Windows.Forms.Label m_lblX;
-		private System.Windows.Forms.Label m_lblY;
-		private System.Windows.Forms.Label m_lblZ;
-		private System.Windows.Forms.Label m_lblRx;
-		private System.Windows.Forms.Label m_lblRy;
-		private System.Windows.Forms.Label m_lblRz;
-		private System.Windows.Forms.NumericUpDown m_nudX;
-		private System.Windows.Forms.NumericUpDown m_nudY;
-		private System.Windows.Forms.NumericUpDown m_nudRx;
-		private System.Windows.Forms.NumericUpDown m_nudZ;
-		private System.Windows.Forms.NumericUpDown m_nudRy;
-		private System.Windows.Forms.NumericUpDown m_nudRz;
+
+		private CommonUI.Controls.SectionPanel m_grpDisplacement;
 		private System.Windows.Forms.Label m_lblStepDis;
-		private System.Windows.Forms.GroupBox m_grpDisplacement;
-		private System.Windows.Forms.GroupBox m_grpRotation;
-		private System.Windows.Forms.TextBox m_txbStepDistance;
-		private System.Windows.Forms.TextBox m_txbStepAngle;
+		private CommonUI.Controls.DebouncedNumericUpDown m_txbStepDistance;
+		private CommonUI.Controls.ThemedLabel m_lblX;
+		private CommonUI.Controls.DebouncedNumericUpDown m_nudX;
+		private CommonUI.Controls.ThemedLabel m_lblY;
+		private CommonUI.Controls.DebouncedNumericUpDown m_nudY;
+		private CommonUI.Controls.ThemedLabel m_lblZ;
+		private CommonUI.Controls.DebouncedNumericUpDown m_nudZ;
+		private CommonUI.Controls.SectionPanel m_grpRotation;
 		private System.Windows.Forms.Label m_lblStapAngle;
-		private System.Windows.Forms.Button m_btnOK;
-		private System.Windows.Forms.Button m_btnCancel;
-		private System.Windows.Forms.Button m_btnReset;
+		private CommonUI.Controls.DebouncedNumericUpDown m_txbStepAngle;
+		private CommonUI.Controls.ThemedLabel m_lblRx;
+		private CommonUI.Controls.DebouncedNumericUpDown m_nudRx;
+		private CommonUI.Controls.ThemedLabel m_lblRy;
+		private CommonUI.Controls.DebouncedNumericUpDown m_nudRy;
+		private CommonUI.Controls.ThemedLabel m_lblRz;
+		private CommonUI.Controls.DebouncedNumericUpDown m_nudRz;
+		private CommonUI.Controls.ThemedButton m_btnReset;
+		private CommonUI.Controls.ThemedButton m_btnCancel;
+		private CommonUI.Controls.ThemedButton m_btnOK;
 	}
 }

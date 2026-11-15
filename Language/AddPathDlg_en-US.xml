@@ -17,7 +17,7 @@
 	<Message ID="m_lblD1Unit" Content="deg" />
 	<Message ID="m_lblChordUnit" Content="mm" />
 	<Message ID="m_lblLineUnit" Content="mm" />
-	<Message ID="m_btnOK" Content="Generate Toolpath" />
+	<Message ID="m_btnConfirm" Content="Generate Toolpath" />
 	<Message ID="m_btnNext" Content="Next" />
 	<Message ID="DiscreteMode_QuasiUniformDeflection" Content="Standard Discretization" />
 	<Message ID="DiscreteMode_UniformDeflection" Content="Precise Discretization" />

@@ -17,7 +17,7 @@
     <Message ID="m_lblD1Unit" Content="deg" />
     <Message ID="m_lblChordUnit" Content="mm" />
     <Message ID="m_lblLineUnit" Content="mm" />
-    <Message ID="m_btnOK" Content="生成路徑" />
+    <Message ID="m_btnConfirm" Content="生成路徑" />
     <Message ID="m_btnNext" Content="下一步" />
     <Message ID="DiscreteMode_QuasiUniformDeflection" Content="普通離散" />
     <Message ID="DiscreteMode_UniformDeflection" Content="精確離散" />
