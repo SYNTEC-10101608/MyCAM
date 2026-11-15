@@ -49,16 +49,6 @@ namespace MyCAM.Editor
 			tbxCADY3.Text = transParam.MachineP3.Y().ToString( "F3" );
 			tbxCADZ3.Text = transParam.MachineP3.Z().ToString( "F3" );
 
-			ApplyResourcesToUI();
-		}
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "ThreePtTransformDlg", this.Text );
-			label1.Text = m_LanguageManager.TryGetString( "label1", label1.Text );
-			label2.Text = m_LanguageManager.TryGetString( "label2", label2.Text );
-			label3.Text = m_LanguageManager.TryGetString( "label3", label3.Text );
-			btnOK.Text = m_LanguageManager.TryGetString( "btnOK", btnOK.Text );
 		}
 
 		void btnOK_Click( object sender, EventArgs e )

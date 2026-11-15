@@ -182,7 +182,12 @@ namespace UICheck
 				return Array.CreateInstance( type.GetElementType(), 0 );
 			}
 			if( type.IsValueType ) {
-				return Activator.CreateInstance( type );
+				// a struct with a constructor gets its members filled, e.g. points that must not be null
+				ConstructorInfo structCtor = type.GetConstructors().OrderByDescending( c => c.GetParameters().Length ).FirstOrDefault();
+				if( structCtor == null || nDepth > 3 ) {
+					return Activator.CreateInstance( type );
+				}
+				return structCtor.Invoke( structCtor.GetParameters().Select( p => CreateArgument( p.ParameterType, nDepth + 1 ) ).ToArray() );
 			}
 			if( type.IsInterface || type.IsAbstract || nDepth > 3 ) {
 				return FindImplementation( type, nDepth );

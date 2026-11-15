@@ -6,8 +6,10 @@
 	<Message ID="label1" Content="First Point" />
 	<Message ID="label2" Content="Second Point" />
 	<Message ID="label3" Content="Third Point" />
-	<Message ID="btnOK" Content="Confirm" />
 	<Message ID="InvalidMachineCoord" Content="Invalid machine point coordinates" />
 	<Message ID="MachinePointsCoincident" Content="Machine points cannot coincide" />
 	<Message ID="MachinePointsCollinear" Content="Machine points cannot be collinear" />
+	<Message ID="m_lblMachinePoint1" Content="First Point" />
+	<Message ID="m_lblMachinePoint2" Content="Second Point" />
+	<Message ID="m_lblMachinePoint3" Content="Third Point" />
 </ResMap>

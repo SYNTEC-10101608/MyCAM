@@ -23,3 +23,5 @@ B6 ToolVectorDlg m renamed to m_lblInterpolateType (its language ID)
 B6 CNCThreePointDlg m_txtDrawing* TextBox -> Label, confirmed read-only (ReadOnly, TabStop false, code only sets Text / Enabled)
 B6 CNCThreePointDlg m_lbl*Step step labels become the titles of their sections (Highlighted marks the current step)
 B6 CNCThreePointDlg m_lbl*Title section title labels removed; the step title names the section
+B6 ThreePtTransformDlg tbxCAD* TextBox -> Label, confirmed display only (disabled, code only sets Text)
+B6 ThreePtTransformDlg tbxMachine* TextBox -> DebouncedNumericUpDown (3 decimals, same default values); an empty field can no longer occur, so the "invalid coordinate" warning is only reached by non-numeric input that the box already rejects
