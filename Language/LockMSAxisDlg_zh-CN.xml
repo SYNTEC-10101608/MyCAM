@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
-  <Message ID="FormTitle" Content="锁轴设置" />
+  <Message ID="LockMSAxisDlg" Content="锁轴设置" />
   <Message ID="m_lblMode" Content="模式" />
   <Message ID="m_rbtnDefault" Content="默认" />
   <Message ID="m_rbtnLockAB" Content="锁轴切割" />
   <Message ID="m_gbxLockAB" Content="锁轴切割" />
-  <Message ID="m_gbxRotaryDirection" Content="{0}轴方向调整" />
+  <Message ID="Format_RotaryDirection" Content="{0}轴方向调整" />
   <Message ID="m_gbxMachiningDir" Content="指定加工方位" />
   <Message ID="m_lblMachiningDir" Content="方向" />
   <Message ID="MachiningDir_None" Content="无" />
   <Message ID="m_lblMachiningDirHint" Content="Spindle Type 不支持此功能" />
   <Message ID="RotaryAngleOutOfRange" Content="调整后的角度超出输入范围。" />
-  <Message ID="m_chkLockSlave" Content="锁{0}轴" />
-  <Message ID="m_chkLockMaster" Content="锁{0}轴" />
-  <Message ID="m_lblSlaveAngle" Content="{0}轴角度" />
+  <Message ID="Format_LockSlave" Content="锁{0}轴" />
+  <Message ID="Format_LockMaster" Content="锁{0}轴" />
+  <Message ID="Format_SlaveAngle" Content="{0}轴角度" />
   <Message ID="m_rbtnSlaveAuto" Content="自动计算" />
   <Message ID="m_rbtnSlaveManual" Content="手动设置" />
-  <Message ID="m_lblMasterAngle" Content="{0}轴角度" />
+  <Message ID="Format_MasterAngle" Content="{0}轴角度" />
   <Message ID="m_rbtnMasterAuto" Content="自动计算" />
   <Message ID="m_rbtnMasterManual" Content="手动设置" />
-  <Message ID="m_btnConfirm" Content="确认" />
-  <Message ID="m_btnCancel" Content="取消" />
 </ResMap>

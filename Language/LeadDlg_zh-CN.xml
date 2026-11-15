@@ -1,12 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="LeadDlg" Content="引线设置" />
-	<Message ID="m_lblLeadIn" Content="进入引线" />
-	<Message ID="m_lblLeadOut" Content="退出引线" />
+	<Message ID="m_secLeadIn" Content="进入引线" />
+	<Message ID="m_secLeadOut" Content="退出引线" />
 	<Message ID="m_lblLeadLineLength" Content="直线长度" />
 	<Message ID="m_lblAngle" Content="角度" />
 	<Message ID="m_lblRadius" Content="半径" />
-	<Message ID="m_btnOK" Content="OK" />
 	<Message ID="Error_AngleRange" Content="角度必须在0 ~ 180范围内" />
 	<Message ID="m_chkFlip" Content="引线反向" />
 </ResMap>
