@@ -6,8 +6,10 @@
 	<Message ID="label1" Content="第一點" />
 	<Message ID="label2" Content="第二點" />
 	<Message ID="label3" Content="第三點" />
-	<Message ID="btnOK" Content="確認" />
 	<Message ID="InvalidMachineCoord" Content="機械點座標無效" />
 	<Message ID="MachinePointsCoincident" Content="機械點不能重合" />
 	<Message ID="MachinePointsCollinear" Content="機械點不能共線" />
+	<Message ID="m_lblMachinePoint1" Content="第一點" />
+	<Message ID="m_lblMachinePoint2" Content="第二點" />
+	<Message ID="m_lblMachinePoint3" Content="第三點" />
 </ResMap>
