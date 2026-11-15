@@ -18,5 +18,4 @@
     <Message ID="m_lblSafeCylinderRadius" Content="圓柱半徑" />
     <Message ID="m_lblSafeSphereRadius" Content="球半徑" />
 
-    <Message ID="m_btnConfirm" Content="確認" />
 </ResMap>

@@ -14,3 +14,5 @@ B6 AddPathDlg m_txb* TextBox -> DebouncedNumericUpDown (D1 0.001 to 90 / 3 decim
 # section title labels become SectionPanel titles (decision 2026-11-15 "區塊標題")
 B6 LeadDlg m_lblLeadIn title moved to m_secLeadIn
 B6 LeadDlg label3 title moved to m_secLeadOut
+B6 PatternSettingDlg label1 renamed to m_lblPathType (its language ID)
+B6 PatternSettingDlg m_txb* TextBox -> DebouncedNumericUpDown (default range, 3 decimals); the Leave / Enter handlers still validate the text
