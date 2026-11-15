@@ -2,7 +2,7 @@
 <ResMap>
     <Message ID="ExtendedGCodeDlg" Content="Редактирование G-кода" />
     
-    <Message ID="m_lblInsertPosition" Content="Позиция вставки" />
+    <Message ID="m_lblInsertType" Content="Позиция вставки" />
     
     <Message ID="m_rbtnTraverseStart" Content="Начало перемещения" />
     <Message ID="m_rbtnTraverseEnd" Content="Конец перемещения" />
@@ -14,15 +14,14 @@
     <Message ID="m_btnToStartOrEnd" Content="Начало/Конец" />
     <Message ID="m_lblIsStartOrEnd" Content="Текущее положение: начало" />
 
-    <Message ID="IS_START_POINT" Content="Текущее положение: начало" />
-    <Message ID="IS_END_POINT" Content="Текущее положение: конец" />
+    <Message ID="IsStartPOINT" Content="Текущее положение: начало" />
+    <Message ID="IsEndPOINT" Content="Текущее положение: конец" />
 
-    <Message ID="IS_MIX_DATA" Content="G-коды выбранных путей не совпадают" />
+    <Message ID="IsMixData" Content="G-коды выбранных путей не совпадают" />
     <Message ID="m_lblGCode" Content="G-код" />
     
     <Message ID="m_btnDelete" Content="Удалить" />
     <Message ID="m_btnAdd" Content="Добавить" />
-    <Message ID="m_btnDone" Content="Готово" />
 </ResMap>
 
 

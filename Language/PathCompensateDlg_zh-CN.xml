@@ -2,9 +2,7 @@
 <ResMap>
 	<Message ID="PathCompensateDlg" Content="路径补偿" />
 	<Message ID="m_lblCompensate" Content="补偿距离" />
-	<Message ID="m_btnConfirm" Content="确认" />
 	<Message ID="m_btnClear" Content="清除" />
-	<Message ID="m_btnReset" Content="重置" />
 	<Message ID="m_lblTotalCompensate" Content="总补偿" />
 	<Message ID="IsMixData" Content="补偿不一致" />
 </ResMap>

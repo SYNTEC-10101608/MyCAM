@@ -2,7 +2,7 @@
 <ResMap>
     <Message ID="ExtendedGCodeDlg" Content="编辑G码" />
     
-    <Message ID="m_lblInsertPosition" Content="插入位置" />
+    <Message ID="m_lblInsertType" Content="插入位置" />
     
     <Message ID="m_rbtnTraverseStart" Content="空移开始" />
     <Message ID="m_rbtnTraverseEnd" Content="空移结束" />
@@ -14,14 +14,13 @@
     <Message ID="m_btnToStartOrEnd" Content="起／终点" />
     <Message ID="m_lblIsStartOrEnd" Content="目前位置：起点" />
 
-    <Message ID="IS_START_POINT" Content="目前位置：起点" />
-    <Message ID="IS_END_POINT" Content="目前位置：终点" />
+    <Message ID="IsStartPOINT" Content="目前位置：起点" />
+    <Message ID="IsEndPOINT" Content="目前位置：终点" />
 
-    <Message ID="IS_MIX_DATA" Content="所选路径的G码不一致" />
+    <Message ID="IsMixData" Content="所选路径的G码不一致" />
     <Message ID="m_lblGCode" Content="G码" />
     
     <Message ID="m_btnDelete" Content="删除" />
     <Message ID="m_btnAdd" Content="新增" />
-    <Message ID="m_btnDone" Content="完成" />
 </ResMap>
 

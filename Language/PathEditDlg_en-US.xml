@@ -7,9 +7,8 @@
 	<Message ID="m_lblX" Content="X Offset" />
 	<Message ID="m_lblY" Content="Y Offset" />
 	<Message ID="m_lblZ" Content="Z Offset" />
-	<Message ID="m_btnConfirm" Content="Confirm" />
 	<Message ID="m_btnClear" Content="Clear" />
-	<Message ID="m_btnReset" Content="Reset" />
 	<Message ID="m_lblTotalDiff" Content="Total Offset" />
 	<Message ID="IsMixData" Content="Inconsistent Offset" />
+	<Message ID="m_gpbMove" Content="Offset" />
 </ResMap>

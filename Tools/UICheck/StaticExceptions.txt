@@ -8,3 +8,8 @@ S6 ManualTransformDlg m_lblGuide guide text is set by Initialize() for the selec
 S6 ManualTransformDlg m_lblMoveStatus status text is set by UpdateSelectionStatusAndEnableConfirm()
 S6 OrderDialog m_gbxContent section title depends on the order mode (m_gbxContent_Sequential / _Swap)
 S7 ConnectDlg m_lblTips the IP format error replaces the hint only after the user presses confirm (after Load)
+S6 AutoSortPathDlg m_lblSelectedPath status text is set by UpdateSelectedPathStatus()
+S6 AutoSortPathDlg m_lblExtrusionBandwidth shares the text m_lblBandwidth with m_lblRotationBandwidth (set in code)
+S6 AutoSortPathDlg m_lblRotationBandwidth shares the text m_lblBandwidth with m_lblExtrusionBandwidth (set in code)
+S7 ExtendedGCodeDlg m_lblIsStartOrEnd ResetParam() sets the position text only after Show(), when the auto-applied text is already set
+S6 ExtendedGCodeDlg m_lblIsMixData text is set by ResetParam() (IsMixData)

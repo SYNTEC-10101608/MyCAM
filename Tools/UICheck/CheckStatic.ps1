@@ -238,7 +238,7 @@ function Test-SectionRows( $screen, [string]$szContainer, [int]$nTitledTop ) {
 		}
 		$szType = $screen.Fields[$name]
 		$offset = switch -Regex ($szType) {
-			"(DebouncedNumericUpDown|ComboBox|TextBox|ThemedButton|Panel)$" { 0 }
+			"(DebouncedNumericUpDown|ComboBox|TextBox|ThemedButton|Panel|PictureBox|CheckedListBox|DataGridView|TrackBar)$" { 0 }
 			"(Label|ThemedLabel)$" { 4 }
 			"(CheckBox|RadioButton)$" { 2 }
 			default { $null }

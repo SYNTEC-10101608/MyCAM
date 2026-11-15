@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ResMap>
-  <Message ID="FormTitle" Content="Автоматическая сортировка" />
+  <Message ID="AutoSortPathDlg" Content="Автоматическая сортировка" />
   <Message ID="m_lblSortMethod" Content="Способ сортировки:" />
   <Message ID="m_lblPathHint" Content="Начальный путь:" />
   <Message ID="m_lblCylinderAxis" Content="Направление оси круглой трубки:" />
@@ -8,7 +8,6 @@
   <Message ID="m_lblRotationDir" Content="Направление оси вращения:" />
   <Message ID="m_lblBandwidth" Content="Полоса пропускания группировки:" />
   <Message ID="m_lblRotationUnit" Content="°" />
-  <Message ID="m_btnConfirm" Content="ОК" />
   <Message ID="Status_NotSelected" Content="Не выбрано" />
   <Message ID="Status_Selected" Content="Выбрано" />
   <Message ID="SortMethod_ShortestPath" Content="Кратчайший путь" />

@@ -8,24 +8,13 @@ namespace MyCAM.Editor.Dialog
 		{
 			InitializeComponent();
 			m_LanguageManager = new LanguageManager.LanguageManager( "PathEditDlg" );
-			ApplyResourcesToUI();
+			InitRefCoordTypeItems();
 		}
 
-		void ApplyResourcesToUI()
+		// the items are localized at runtime
+		void InitRefCoordTypeItems()
 		{
-			this.Text = m_LanguageManager.TryGetString( "PathEditDlg", this.Text );
-			m_lblRefCoordType.Text = m_LanguageManager.TryGetString( "m_lblRefCoordType", m_lblRefCoordType.Text );
-			m_lblX.Text = m_LanguageManager.TryGetString( "m_lblX", m_lblX.Text );
-			m_lblY.Text = m_LanguageManager.TryGetString( "m_lblY", m_lblY.Text );
-			m_lblZ.Text = m_LanguageManager.TryGetString( "m_lblZ", m_lblZ.Text );
-			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
-			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
-			m_btnReset.Text = m_LanguageManager.TryGetString( "m_btnReset", m_btnReset.Text );
-			m_lblTotalDiff.Text = m_LanguageManager.TryGetString( "m_lblTotalDiff", m_lblTotalDiff.Text );
-
-			// Update combo box items
 			m_cmbRefCoordType.Items.Clear();
-
 			m_cmbRefCoordType.Items.Add( m_LanguageManager.TryGetString( "RefCoordType_Local", REF_COORD_TYPE_LOCAL ) );
 			m_cmbRefCoordType.Items.Add( m_LanguageManager.TryGetString( "RefCoordType_World", REF_COORD_TYPE_WORLD ) );
 			if( m_cmbRefCoordType.SelectedIndex < 0 ) {

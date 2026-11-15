@@ -1,0 +1,6 @@
+# Confirmed behavior differences of CompareBehavior.ps1: <rule> <class> <control|*> <reason>
+# Only items decided in Doc/UIStyleNotes.md may be listed here.
+
+# numeric inputs become DebouncedNumericUpDown (decision 2026-11-15 "數值輸入")
+B6 AutoSortPathDlg m_nudExtrusionBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals
+B6 AutoSortPathDlg m_nudRotationBandwidth NumericUpDown -> DebouncedNumericUpDown, same range and decimals

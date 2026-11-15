@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
-	<Message ID="FormTitle" Content="Auto Sequencing" />
+	<Message ID="AutoSortPathDlg" Content="Auto Sequencing" />
 	<Message ID="m_lblSortMethod" Content="Sequencing Method:" />
 	<Message ID="m_lblPathHint" Content="Starting Toolpath:" />
 	<Message ID="m_lblCylinderAxis" Content="Round Tube Axis:" />
@@ -8,7 +8,6 @@
 	<Message ID="m_lblRotationDir" Content="Rotation Axis Direction:" />
 	<Message ID="m_lblBandwidth" Content="Group Bandwidth:" />
 	<Message ID="m_lblRotationUnit" Content="degree" />
-	<Message ID="m_btnConfirm" Content="OK" />
 	<Message ID="Status_NotSelected" Content="Not Selected" />
 	<Message ID="Status_Selected" Content="Selected" />
 	<Message ID="SortMethod_ShortestPath" Content="Shortest Path" />

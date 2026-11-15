@@ -18,7 +18,6 @@ namespace MyCAM.Editor.Dialog
 			m_tbxTolernece.Maximum = decimal.MaxValue;
 			m_tbxTolernece.Minimum = 0;
 
-			ApplyResourcesToUI();
 		}
 
 		void m_clstStrategy_Format( object sender, ListControlConvertEventArgs e )
@@ -51,20 +50,6 @@ namespace MyCAM.Editor.Dialog
 					e.Value = e.ListItem.ToString();
 					break;
 			}
-		}
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "StartPointDlg", this.Text );
-
-			m_rbtnManualSelect.Text = m_LanguageManager.TryGetString( "m_rbtnManualSelect", m_rbtnManualSelect.Text );
-			m_rbtnAutoSelect.Text = m_LanguageManager.TryGetString( "m_rbtnAutoSelect", m_rbtnAutoSelect.Text );
-
-			m_lblTolerance.Text = m_LanguageManager.TryGetString( "m_lblTolerance", m_lblTolerance.Text );
-			m_btnIncreasePriority.Text = m_LanguageManager.TryGetString( "m_btnIncreasePriority", m_btnIncreasePriority.Text );
-			m_btnDecreasePriority.Text = m_LanguageManager.TryGetString( "m_btnDecreasePriority", m_btnDecreasePriority.Text );
-
-			m_btnApply.Text = m_LanguageManager.TryGetString( "m_btnApply", m_btnApply.Text );
 		}
 
 		public void ResetParam( StartPointParam param )
