@@ -29,7 +29,7 @@ using VNCFormsApp;
 
 namespace MyCAM
 {
-	public partial class StartupForm : Form
+	public partial class StartupForm : MainWindowBase
 	{
 		public Action<bool> RaiseShowVecStatusChange;
 		public Action<bool> RaiseShowOrderStatusChange;
@@ -83,7 +83,6 @@ namespace MyCAM
 			m_TreeView.Location = new System.Drawing.Point( 0, 0 );
 			m_TreeView.Name = "m_TreeView";
 			m_TreeView.TabIndex = 0;
-			m_TreeView.ForeColor = System.Drawing.Color.Black;
 			m_panTreeView.Controls.Add( this.m_TreeView );
 
 			// show G54
@@ -357,8 +356,8 @@ namespace MyCAM
 		EUIStatus m_CurrentUIStatus = EUIStatus.File;
 
 		// UI color
-		readonly Color DEFAULT_BtnColor = SystemColors.Control;
-		readonly Color ON_ButtonColor = Color.FromArgb( 233, 180, 159 );
+		readonly Color DEFAULT_BtnColor = Color.Empty;
+		readonly Color ON_ButtonColor = ThemeColors.ACCENT_TINT_STRONG;
 
 		const string SOFTWARE_Version = "0.49.0";
 		const string SOFTWARE_Name = "飛切特別版 " + SOFTWARE_Version;
@@ -1974,8 +1973,9 @@ namespace MyCAM
 			// switch language
 			LanguageManager.LanguageManager.CurrentUILanguage = szLanguage;
 
-			// screens created from now on use the font family of the new language
+			// the main window and screens created from now on use the font family of the new language
 			ThemeFonts.Initialize( LanguageManager.LanguageManager.CurrentUILanguage );
+			ApplyThemeFont();
 
 			// persist setting to file
 			MyApp.AppSetting.ApplyUILanguage( szLanguage );

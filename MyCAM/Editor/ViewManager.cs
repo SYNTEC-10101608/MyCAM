@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using CommonUI.Theme;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;
 using OCC.AIS;
@@ -862,7 +863,7 @@ namespace MyCAM.Editor
 			if( node.Text != null && node.Text.EndsWith( " 🚩" ) ) {
 				return;
 			}
-			node.ForeColor = isNoneProcess ? Color.Gray : Color.Black;
+			node.ForeColor = isNoneProcess ? ThemeColors.TEXT_DISABLED : ThemeColors.TEXT;
 		}
 
 		public void RemovePathNodes( int count )
