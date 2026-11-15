@@ -26,7 +26,7 @@ namespace CncUI.Dialog
 		public void ApplyResources()
 		{
 			Text = Language.TryGetString( "Title", TITLE );
-			foreach( PanelButton button in m_ZeroButtons ) {
+			foreach( ThemedButton button in m_ZeroButtons ) {
 				button.Text = Language.TryGetString( "SetZero", SET_ZERO );
 			}
 			m_btnClear.Text = Language.TryGetString( "ClearAll", CLEAR_ALL );
@@ -43,7 +43,7 @@ namespace CncUI.Dialog
 
 		internal void SetCommandsEnabled( bool enabled )
 		{
-			foreach( PanelButton button in m_ZeroButtons ) {
+			foreach( ThemedButton button in m_ZeroButtons ) {
 				button.Enabled = enabled;
 			}
 			m_btnClear.Enabled = enabled;
@@ -51,7 +51,7 @@ namespace CncUI.Dialog
 
 		readonly Label[] m_AxisNames;
 		readonly Label[] m_Coordinates;
-		readonly PanelButton[] m_ZeroButtons;
+		readonly ThemedButton[] m_ZeroButtons;
 
 		const string TITLE = "程式座標偏置";
 		internal const string SET_ZERO = "設為 0";
