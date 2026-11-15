@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using CommonUI.Theme;
 namespace CommonUI.Controls
 {
 	public class RoundedProgressBar : Control
@@ -16,7 +17,7 @@ namespace CommonUI.Controls
 		{
 			SetStyle( ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw | ControlStyles.SupportsTransparentBackColor, true );
 			BackColor = Color.Transparent;
-			ForeColor = Color.Yellow;
+			ForeColor = ThemeColors.ACCENT;
 		}
 
 		public int Minimum
@@ -67,10 +68,10 @@ namespace CommonUI.Controls
 			}
 
 			using( GraphicsPath trackPath = RoundDrawing.CreatePath( outer, outer.Height / 2f ) ) {
-				using( SolidBrush trackBrush = new SolidBrush( Color.White ) ) {
+				using( SolidBrush trackBrush = new SolidBrush( ThemeColors.DIVIDER ) ) {
 					e.Graphics.FillPath( trackBrush, trackPath );
 				}
-				using( Pen borderPen = new Pen( Color.White, BORDER_WIDTH ) ) {
+				using( Pen borderPen = new Pen( ThemeColors.DIVIDER, BORDER_WIDTH ) ) {
 					e.Graphics.DrawPath( borderPen, trackPath );
 				}
 			}

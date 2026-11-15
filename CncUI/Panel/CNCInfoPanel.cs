@@ -7,10 +7,12 @@ using System.Windows.Forms;
 using CncManager.Definition;
 using CncUI.Controls;
 using CommonUI.Controls;
+using CommonUI.Forms;
+using CommonUI.Theme;
 
 namespace CncUI
 {
-	public partial class CNCInfoPanel : UserControl
+	public partial class CNCInfoPanel : PanelBase
 	{
 		public CNCInfoPanel()
 		{
@@ -35,11 +37,11 @@ namespace CncUI
 				{ CNCInfoField.MachiningTime, m_lblTimeValue }
 			};
 			m_AxisColors = new Dictionary<Label, Color> {
-				{ m_lblXTitle, Color.FromArgb( 224, 90, 90 ) },
-				{ m_lblYTitle, Color.FromArgb( 155, 225, 93 ) },
-				{ m_lblZTitle, Color.FromArgb( 26, 26, 217 ) },
-				{ m_lblBTitle, Color.FromArgb( 106, 27, 154 ) },
-				{ m_lblCTitle, Color.FromArgb( 230, 149, 0 ) }
+				{ m_lblXTitle, X_AXIS_COLOR },
+				{ m_lblYTitle, Y_AXIS_COLOR },
+				{ m_lblZTitle, Z_AXIS_COLOR },
+				{ m_lblBTitle, B_AXIS_COLOR },
+				{ m_lblCTitle, C_AXIS_COLOR }
 			};
 			m_btnCoordinates.Click += ( sender, e ) => CoordinateModeClicked?.Invoke();
 			m_grpCoordinates.Paint += OnCoordinatesPaint;
@@ -69,21 +71,8 @@ namespace CncUI
 
 		public void ApplyResources()
 		{
-			m_lblAxisHeader.Text = Language.TryGetString( "m_lblAxisHeader", AXIS_HEADER );
-			m_lblCoordinateHeader.Text = Language.TryGetString( "m_lblCoordinateHeader", COORDINATE_HEADER );
-			m_lblHeightGroupTitle.Text = Language.TryGetString( "m_lblHeightGroupTitle", HEIGHT_GROUP_TITLE );
-			m_lblCapacitanceTitle.Text = Language.TryGetString( "m_lblCapacitanceTitle", CAPACITANCE );
-			m_lblHeightTitle.Text = Language.TryGetString( "m_lblHeightTitle", HEIGHT_POSITION );
-			m_lblFollowHeightTitle.Text = Language.TryGetString( "m_lblFollowHeightTitle", FOLLOW_HEIGHT );
-			m_lblActualHeightTitle.Text = Language.TryGetString( "m_lblActualHeightTitle", ACTUAL_HEIGHT );
-			m_lblMachiningTitle.Text = Language.TryGetString( "m_lblMachiningTitle", MACHINING_TITLE );
-			m_lblMainProgramTitle.Text = Language.TryGetString( "m_lblMainProgramTitle", MAIN_PROGRAM_TITLE );
-			m_lblSpeedTitle.Text = Language.TryGetString( "m_lblSpeedTitle", FEED_SPEED );
-			m_lblPowerTitle.Text = Language.TryGetString( "m_lblPowerTitle", POWER );
-			m_lblFrequencyTitle.Text = Language.TryGetString( "m_lblFrequencyTitle", FREQUENCY );
-			m_lblDutyCycleTitle.Text = Language.TryGetString( "m_lblDutyCycleTitle", DUTY_CYCLE );
-			m_lblFocusTitle.Text = Language.TryGetString( "m_lblFocusTitle", FOCUS_POSITION );
-			m_lblTimeTitle.Text = Language.TryGetString( "m_lblTimeTitle", MACHINING_TIME );
+			// captions whose ID is the control name
+			LanguageApplier.Apply( this, Language );
 			SetCoordinateMode( m_MachineCoordinates );
 			SetRotaryAxisRoles( m_FirstAxisRole, m_SecondAxisRole );
 			SetMachiningStatus( m_MachiningStatus );
@@ -271,40 +260,40 @@ namespace CncUI
 		{
 			m_MachiningStatus = status;
 			string text;
-			Color color;
+			TextRole role;
 			switch( status ) {
 				case CncStatus.NOTREADY:
 					text = Language.TryGetString( "Status_NotReady", STATUS_NOT_READY );
-					color = Color.Red;
+					role = TextRole.Error;
 					break;
 				case CncStatus.READY:
 					text = Language.TryGetString( "Status_Ready", STATUS_READY );
-					color = Color.Green;
+					role = TextRole.Success;
 					break;
 				case CncStatus.START:
 				case CncStatus.EXECUTE:
 					text = Language.TryGetString( "Status_Machining", STATUS_MACHINING );
-					color = Color.DarkGoldenrod;
+					role = TextRole.Warning;
 					break;
 				case CncStatus.FEEDHOLD:
 					text = Language.TryGetString( "Status_Paused", STATUS_PAUSED );
-					color = Color.Orange;
+					role = TextRole.Warning;
 					break;
 				case CncStatus.STOP:
 					text = Language.TryGetString( "Status_Alarm", STATUS_ALARM );
-					color = Color.Red;
+					role = TextRole.Error;
 					break;
 				case CncStatus.RECORD:
 					text = Language.TryGetString( "Status_Record", STATUS_RECORD );
-					color = Color.Orange;
+					role = TextRole.Warning;
 					break;
 				default:
 					text = "—";
-					color = Color.Gray;
+					role = TextRole.Secondary;
 					break;
 			}
 			m_lblMachiningStatus.Text = text;
-			m_lblMachiningStatus.ForeColor = color;
+			m_lblMachiningStatus.Role = role;
 		}
 
 		void OnCoordinatesPaint( object sender, PaintEventArgs e )
@@ -322,6 +311,13 @@ namespace CncUI
 
 		readonly Dictionary<CNCInfoField, Label> m_Values;
 		readonly Dictionary<Label, Color> m_AxisColors;
+
+		// data colors of the X / Y / Z / B / C axis markers
+		static readonly Color X_AXIS_COLOR = Color.FromArgb( 224, 90, 90 );
+		static readonly Color Y_AXIS_COLOR = Color.FromArgb( 155, 225, 93 );
+		static readonly Color Z_AXIS_COLOR = Color.FromArgb( 26, 26, 217 );
+		static readonly Color B_AXIS_COLOR = Color.FromArgb( 106, 27, 154 );
+		static readonly Color C_AXIS_COLOR = Color.FromArgb( 230, 149, 0 );
 		readonly ResponsiveLayout m_Layout;
 		readonly ResponsiveLayout m_VerticalLayout;
 		readonly Size m_VerticalDesignSize;

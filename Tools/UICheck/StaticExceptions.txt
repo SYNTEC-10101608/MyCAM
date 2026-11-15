@@ -42,3 +42,7 @@ S1 CNCThreePointDlg m_txtTolerance pending decision: same empty-text semantics a
 S5 DesignSupportBracketDlg m_pnl* the three step panels share the dialog; ShowPanel() sizes the dialog to the shown one
 S6 CNCOffsetDialog * captions use IDs shared with CNCOffsetController (Title / SetZero / ClearAll), set in code
 S6 CNCAlarmPanel m_secAlarm title contains the alarm count, set by ApplyResources() (Title_Current / Title_Stale)
+S6 CNCInfoPanel m_lblBNote text is the role of the rotary axis, set by SetRotaryAxisRoles()
+S6 CNCInfoPanel m_lblCNote text is the role of the rotary axis, set by SetRotaryAxisRoles()
+S6 CNCInfoPanel m_btnCoordinates text depends on the coordinate mode, set by SetCoordinateMode()
+S6 CNCPanel m_btnJog text depends on the jog mode, set by SetJogMode()
