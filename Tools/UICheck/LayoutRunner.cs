@@ -157,7 +157,7 @@ namespace UICheck
 
 		#region Placeholder constructor arguments
 
-		static object CreateInstance( Type type )
+		internal static object CreateInstance( Type type )
 		{
 			ConstructorInfo[] ctorArray = type.GetConstructors( BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
 			ConstructorInfo ctor = ctorArray.OrderBy( c => c.GetParameters().Length ).FirstOrDefault();
