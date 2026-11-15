@@ -60,6 +60,9 @@
 	<Compile Include="Controls\ThemedButton.cs">
 	  <SubType>Component</SubType>
 	</Compile>
+	<Compile Include="Controls\ThemedDataGridView.cs">
+	  <SubType>Component</SubType>
+	</Compile>
 	<Compile Include="Controls\ThemedLabel.cs">
 	  <SubType>Component</SubType>
 	</Compile>

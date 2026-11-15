@@ -26,7 +26,7 @@ $LANGUAGES = @( "zh-TW", "zh-CN", "en-US", "ru-RU" )
 $ALLOWED_TYPES = @(
 	"CommonUI.Controls.SectionPanel", "CommonUI.Controls.ThemedButton", "CommonUI.Controls.ThemedLabel",
 	"CommonUI.Controls.DebouncedNumericUpDown", "CommonUI.Controls.MultiSelectTreeView",
-	"CommonUI.Controls.LoadingBar", "CommonUI.Controls.RoundedProgressBar",
+	"CommonUI.Controls.LoadingBar", "CommonUI.Controls.RoundedProgressBar", "CommonUI.Controls.ThemedDataGridView",
 	"System.Windows.Forms.Label", "System.Windows.Forms.CheckBox", "System.Windows.Forms.RadioButton",
 	"System.Windows.Forms.ComboBox", "System.Windows.Forms.CheckedListBox", "System.Windows.Forms.TrackBar",
 	"System.Windows.Forms.PictureBox", "System.Windows.Forms.DataGridView",
@@ -323,6 +323,10 @@ foreach ($file in $designerFiles) {
 	}
 	foreach ($name in $screen.Props.Keys) {
 		foreach ($prop in $FORBIDDEN_CONTROL_PROPS) {
+			# embedded panels are sized by the main window and may stretch their content
+			if ($isPanel -and ($prop -eq "Anchor" -or $prop -eq "Dock")) {
+				continue
+			}
 			if ($screen.Props[$name].ContainsKey($prop)) {
 				Report "S2" $szClass $name "sets $prop"
 			}

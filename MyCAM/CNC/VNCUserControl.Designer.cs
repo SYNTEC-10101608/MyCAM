@@ -2,12 +2,12 @@
 {
 	partial class VNCUserControl
 	{
-		/// <summary> 
+		/// <summary>
 		/// Required designer variable.
 		/// </summary>
 		private System.ComponentModel.IContainer components = null;
 
-		/// <summary> 
+		/// <summary>
 		/// Clean up any resources being used.
 		/// </summary>
 		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -19,24 +19,22 @@
 
 			// Close external VNC process
 			CloseVNCProcess();
-			
+
 			base.Dispose( disposing );
 		}
 
 		#region Component designer generated code
 
-		/// <summary> 
+		/// <summary>
 		/// Required method for Designer support - do not modify
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent()
 		{
 			this.SuspendLayout();
-			// 
+			//
 			// ControllerUserControl
-			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			//
 			this.Name = "ControllerUserControl";
 			this.Size = new System.Drawing.Size(752, 532);
 			this.ResumeLayout(false);

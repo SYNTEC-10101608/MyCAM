@@ -41,3 +41,4 @@ S1 CNCThreePointDlg m_txtWorkpiece* pending decision: an empty field means the p
 S1 CNCThreePointDlg m_txtTolerance pending decision: same empty-text semantics as the workpiece fields
 S5 DesignSupportBracketDlg m_pnl* the three step panels share the dialog; ShowPanel() sizes the dialog to the shown one
 S6 CNCOffsetDialog * captions use IDs shared with CNCOffsetController (Title / SetZero / ClearAll), set in code
+S6 CNCAlarmPanel m_secAlarm title contains the alarm count, set by ApplyResources() (Title_Current / Title_Stale)

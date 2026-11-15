@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
+using CommonUI.Forms;
+using CommonUI.Theme;
 using CncManager.Definition;
 
 namespace CncUI
 {
-	public partial class CNCAlarmPanel : UserControl
+	public partial class CNCAlarmPanel : PanelBase
 	{
 		public CNCAlarmPanel()
 		{
@@ -19,7 +20,7 @@ namespace CncUI
 
 		public void ApplyResources()
 		{
-			m_lblTitle.Text = m_IsCurrent
+			m_secAlarm.Text = m_IsCurrent
 				? string.Format( Language.TryGetString( "Title_Current", CURRENT_TITLE ), m_AlarmCount )
 				: Language.TryGetString( "Title_Stale", STALE_TITLE );
 			m_colCode.HeaderText = Language.TryGetString( "m_colCode", CODE );
@@ -60,7 +61,7 @@ namespace CncUI
 					int index = m_gridAlarms.Rows.Add( code, GetAlarmText( alarm ) );
 					m_gridAlarms.Rows[ index ].Tag = alarm;
 				}
-				m_gridAlarms.DefaultCellStyle.ForeColor = isCurrent ? Color.Firebrick : Color.DimGray;
+				m_gridAlarms.CellRole = isCurrent ? TextRole.Error : TextRole.Secondary;
 			}
 			finally {
 				m_gridAlarms.ResumeLayout();
@@ -153,7 +154,9 @@ namespace CncUI
 				return;
 			}
 			int top = string.IsNullOrEmpty( m_lblStatus.Text ) ? m_lblStatus.Top : m_lblStatus.Bottom + 4;
-			m_gridAlarms.SetBounds( 8, top, Math.Max( 0, ClientSize.Width - 16 ), Math.Max( 0, ClientSize.Height - top - 8 ) );
+			m_gridAlarms.SetBounds( ThemeMetrics.SECTION_PADDING, top,
+				Math.Max( 0, ClientSize.Width - 2 * ThemeMetrics.SECTION_PADDING ),
+				Math.Max( 0, ClientSize.Height - top - ThemeMetrics.SECTION_PADDING ) );
 		}
 
 		IReadOnlyList<CncAxis> m_Axes = Array.AsReadOnly( new CncAxis[ 0 ] );
