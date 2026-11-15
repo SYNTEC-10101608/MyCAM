@@ -181,8 +181,13 @@ Form
 
 ## 6. 主視窗與嵌入式面板
 
+- 主視窗繼承 `CommonUI.Forms.MainWindowBase`（字型、底色、關閉自動縮放、全域工具列繪製）；`StartupForm.Designer.cs`
+  不寫字型與底色。唯一例外是圖層列色塊與「加工 / 不加工」圖例，屬資料色，留在 Designer。
 - 主視窗的區域配置由 `MainLayout` 計算，維持既有的橫 / 直切換與比例；只調整純視覺的邊距。
-- 選單與工具列使用 `ThemedToolStripRenderer`；工具列「執行中」的底色取自 `ACCENT_TINT_STRONG`，設定的時機不變。
+- 選單與工具列使用 `ThemedToolStripRenderer`（由 `MainWindowBase` 設為 `ToolStripManager.Renderer`）；
+  工具列「執行中」的底色取自 `ACCENT_TINT_STRONG`，取消時設回 `Color.Empty`，設定的時機不變。
+- 樹與日誌的文字色：一般 `TEXT`、隱藏 / 不加工 `TEXT_DISABLED`、錯誤 `ERROR`、警告 `WARNING`。
+- 截圖：`Tools\UICheck\CaptureMainWindow.ps1 -OutFile <png> -Width <寬> -Height <高>`。
 - 圖示：`ImageScalingSize` 功能工具列 40×40，選單、圖層列、視角列、右鍵選單 20×20；
   圖示為透明背景 PNG，由 `MyCAM/Resource/IconSource/RenderIcons.ps1` 產生，不使用 Magenta 透明色。
 - 嵌入式面板（`CNCPanel`、`CNCInfoPanel`、`CNCAlarmPanel`）以 `SectionPanel` 分區、`ThemedButton` 當按鈕，

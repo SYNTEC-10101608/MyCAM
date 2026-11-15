@@ -27,6 +27,10 @@ namespace CommonUI.Controls
 
 		public MultiSelectTreeView()
 		{
+			// appearance of the theme
+			BorderStyle = BorderStyle.FixedSingle;
+			ForeColor = ThemeColors.TEXT;
+
 			// enable keyboard support
 			this.HideSelection = false;
 

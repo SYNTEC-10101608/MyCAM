@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using CommonUI.Theme;
 using MyCAM.App;
 
 namespace MyCAM.LogManager
@@ -40,9 +41,9 @@ namespace MyCAM.LogManager
 		}
 
 		Panel m_PanelShowMessage;
-		readonly Color ERROR_Color = Color.FromArgb( 253, 99, 132 );
-		readonly Color WARNING_Color = Color.YellowGreen;
-		readonly Color NORMAL_HintColor = Color.Black;
+		readonly Color ERROR_Color = ThemeColors.ERROR;
+		readonly Color WARNING_Color = ThemeColors.WARNING;
+		readonly Color NORMAL_HintColor = ThemeColors.TEXT;
 
 		void AddLog( string message, Color color, MessageBoxIcon icon, bool needMessageBox )
 		{

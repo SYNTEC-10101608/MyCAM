@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using CommonUI.Controls;
+using CommonUI.Theme;
 using MyCAM.Data;
 using OCC.AIS;
 using OCC.Aspect;
@@ -208,11 +209,11 @@ namespace MyCAM.Editor
 			// toggle visibility
 			viewObject.Visible = !viewObject.Visible;
 			if( viewObject.Visible ) {
-				node.ForeColor = System.Drawing.Color.Black;
+				node.ForeColor = ThemeColors.TEXT;
 				m_Viewer.GetAISContext().Display( viewObject.AISHandle, false );
 			}
 			else {
-				node.ForeColor = System.Drawing.Color.LightGray;
+				node.ForeColor = ThemeColors.TEXT_DISABLED;
 				m_Viewer.GetAISContext().Erase( viewObject.AISHandle, false );
 			}
 		}
