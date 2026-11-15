@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
-  <Message ID="FormTitle" Content="自动排序" />
+  <Message ID="AutoSortPathDlg" Content="自动排序" />
   <Message ID="m_lblSortMethod" Content="排序方式:" />
   <Message ID="m_lblPathHint" Content="起始路径:" />
   <Message ID="m_lblCylinderAxis" Content="圆管轴向:" />
@@ -8,7 +8,6 @@
   <Message ID="m_lblRotationDir" Content="旋转轴方向:" />
   <Message ID="m_lblBandwidth" Content="分组带宽:" />
   <Message ID="m_lblRotationUnit" Content="度" />
-  <Message ID="m_btnConfirm" Content="确定" />
   <Message ID="Status_NotSelected" Content="未选取" />
   <Message ID="Status_Selected" Content="已选取" />
   <Message ID="SortMethod_ShortestPath" Content="最短路径" />

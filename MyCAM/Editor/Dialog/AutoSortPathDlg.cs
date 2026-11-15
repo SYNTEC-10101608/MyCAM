@@ -8,7 +8,7 @@
 			InitializeComponent();
 			InitializeBandwidthControls();
 			LoadImages();
-			ApplyResourcesToUI();
+			InitLocalizedTexts();
 			UpdateSortMethodState();
 		}
 
@@ -19,27 +19,20 @@
 			m_SelectedPathID = pathID;
 			if( string.IsNullOrEmpty( pathID ) ) {
 				m_lblSelectedPath.Text = m_LanguageManager.TryGetString( "Status_NotSelected", m_lblSelectedPath.Text );
-				m_lblSelectedPath.ForeColor = System.Drawing.Color.Red;
+				m_lblSelectedPath.Role = CommonUI.Theme.TextRole.Error;
 			}
 			else {
 				m_lblSelectedPath.Text = m_LanguageManager.TryGetString( "Status_Selected", m_lblSelectedPath.Text );
-				m_lblSelectedPath.ForeColor = System.Drawing.Color.Green;
+				m_lblSelectedPath.Role = CommonUI.Theme.TextRole.Success;
 			}
 			UpdateSortMethodState();
 		}
 
-		void ApplyResourcesToUI()
+		// texts shared by several controls and combo box items, localized at runtime
+		void InitLocalizedTexts()
 		{
-			this.Text = m_LanguageManager.TryGetString( "FormTitle", this.Text );
-			m_lblSortMethod.Text = m_LanguageManager.TryGetString( "m_lblSortMethod", m_lblSortMethod.Text );
-			m_lblPathHint.Text = m_LanguageManager.TryGetString( "m_lblPathHint", m_lblPathHint.Text );
-			m_lblCylinderAxis.Text = m_LanguageManager.TryGetString( "m_lblCylinderAxis", m_lblCylinderAxis.Text );
-			m_lblExtrusionDir.Text = m_LanguageManager.TryGetString( "m_lblExtrusionDir", m_lblExtrusionDir.Text );
-			m_lblRotationDir.Text = m_LanguageManager.TryGetString( "m_lblRotationDir", m_lblRotationDir.Text );
 			m_lblExtrusionBandwidth.Text = m_LanguageManager.TryGetString( "m_lblBandwidth", m_lblExtrusionBandwidth.Text );
 			m_lblRotationBandwidth.Text = m_LanguageManager.TryGetString( "m_lblBandwidth", m_lblRotationBandwidth.Text );
-			m_lblRotationUnit.Text = m_LanguageManager.TryGetString( "m_lblRotationUnit", m_lblRotationUnit.Text );
-			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
 
 			// Sort method combobox
 			int sortIdx = m_cmbSortMethod.SelectedIndex < 0 ? 0 : m_cmbSortMethod.SelectedIndex;

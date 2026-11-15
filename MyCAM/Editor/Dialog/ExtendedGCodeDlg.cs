@@ -16,36 +16,12 @@ namespace MyCAM.Editor
 		public ExtendedGCodeDlg()
 		{
 			InitializeComponent();
-			ApplyResourcesToUI();
 
 			m_rbtnTraverseStart.Tag = ExtendedGCodeType.TraverseHead;
 			m_rbtnTraverseEnd.Tag = ExtendedGCodeType.TraverseTail;
 			m_rbtnPathStart.Tag = ExtendedGCodeType.PathHead;
 			m_rbtnPathEnd.Tag = ExtendedGCodeType.PathTail;
 			m_rbtnControlPoint.Tag = ExtendedGCodeType.ControlPoint;
-		}
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "ExtendedGCodeDlg", this.Text );
-
-			m_lblInsertType.Text = m_LanguageManager.TryGetString( "m_lblInsertType", m_lblInsertType.Text );
-
-			m_rbtnTraverseStart.Text = m_LanguageManager.TryGetString( "m_rbtnTraverseStart", m_rbtnTraverseStart.Text );
-			m_rbtnTraverseEnd.Text = m_LanguageManager.TryGetString( "m_rbtnTraverseEnd", m_rbtnTraverseEnd.Text );
-			m_rbtnPathStart.Text = m_LanguageManager.TryGetString( "m_rbtnPathStart", m_rbtnPathStart.Text );
-			m_rbtnPathEnd.Text = m_LanguageManager.TryGetString( "m_rbtnPathEnd", m_rbtnPathEnd.Text );
-			m_rbtnControlPoint.Text = m_LanguageManager.TryGetString( "m_rbtnControlPoint", m_rbtnControlPoint.Text );
-
-			m_lblToStartOrEnd.Text = m_LanguageManager.TryGetString( "m_lblToStartOrEnd", m_lblToStartOrEnd.Text );
-			m_btnToStartOrEnd.Text = m_LanguageManager.TryGetString( "m_btnToStartOrEnd", m_btnToStartOrEnd.Text );
-			m_lblIsStartOrEnd.Text = m_LanguageManager.TryGetString( "m_lblIsStartOrEnd", m_lblIsStartOrEnd.Text );
-
-			m_lblGCode.Text = m_LanguageManager.TryGetString( "m_lblGCode", m_lblGCode.Text );
-
-			m_btnDelete.Text = m_LanguageManager.TryGetString( "m_btnDelete", m_btnDelete.Text );
-			m_btnAdd.Text = m_LanguageManager.TryGetString( "m_btnAdd", m_btnAdd.Text );
-			m_btnDone.Text = m_LanguageManager.TryGetString( "m_btnDone", m_btnDone.Text );
 		}
 
 		public void ResetParam( ExtendedGCodeParam param )

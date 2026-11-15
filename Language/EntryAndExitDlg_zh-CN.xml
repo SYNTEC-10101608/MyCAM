@@ -4,5 +4,4 @@
 	<Message ID="m_lblEntryDistance" Content="进入距离" />
 	<Message ID="m_lblExitDistance" Content="退出距离" />
 	<Message ID="m_lblFollowSafeDistance" Content="随动安全距离" />
-	<Message ID="m_btnConfirm" Content="确认" />
 </ResMap>
