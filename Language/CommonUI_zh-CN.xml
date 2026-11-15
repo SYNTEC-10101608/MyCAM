@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Confirm" Content="确定" />
+	<Message ID="Cancel" Content="取消" />
+	<Message ID="Reset" Content="重置" />
+	<Message ID="Preview" Content="预览" />
+	<Message ID="Close" Content="关闭" />
+</ResMap>

@@ -109,53 +109,6 @@ namespace MyCAM.App
 
 		#region Show Dialog at Form Center
 
-		public static Point CalculateDialogCenterLocation( Form dialog )
-		{
-			if( m_MainForm == null ) {
-				return Point.Empty;
-			}
-
-			// cal new form center
-			FromSizeInfo mainFormInfo = GetFormSizeInfo();
-			int centerX = mainFormInfo.FormCenterX + (int)( ( mainFormInfo.FormWidth - dialog.Width ) / 2 );
-			int centerY = mainFormInfo.FormCenterY + (int)( ( mainFormInfo.FormHeight - dialog.Height ) / 2 );
-
-			// make sure dialog is within working area
-			Screen screen = GetMainFormScreen();
-			Rectangle workingArea = screen.WorkingArea;
-			centerX = Math.Max( workingArea.Left,
-					  Math.Min( centerX, workingArea.Right - dialog.Width ) );
-			centerY = Math.Max( workingArea.Top,
-					  Math.Min( centerY, workingArea.Bottom - dialog.Height ) );
-			if( workingArea.Width < workingArea.Height ) {
-				double offsetRatio = 0.5;
-				centerY = (int)( offsetRatio * centerY );
-			}
-			return new Point( centerX, centerY );
-		}
-
-		static FromSizeInfo GetFormSizeInfo()
-		{
-			if( m_MainForm == null ) {
-				throw new InvalidOperationException( m_LanguageManager.TryGetString( "MainFormNotInitialized", MAIN_FORM_NOT_INITIALIZED ) );
-			}
-			FromSizeInfo mainFormInfo = new FromSizeInfo();
-			mainFormInfo.FormWidth = m_MainForm.Width;
-			mainFormInfo.FormHeight = m_MainForm.Height;
-			mainFormInfo.FormCenterX = m_MainForm.Location.X;
-			mainFormInfo.FormCenterY = m_MainForm.Location.Y;
-
-			return mainFormInfo;
-		}
-
-		static Screen GetMainFormScreen()
-		{
-			if( m_MainForm == null ) {
-				throw new InvalidOperationException( m_LanguageManager.TryGetString( "MainFormNotInitialized", MAIN_FORM_NOT_INITIALIZED ) );
-			}
-			return Screen.FromControl( m_MainForm );
-		}
-
 		static void UnRegistDialogMoveWithMainForm( Form dialog )
 		{
 			if( m_MainForm == null || dialog == null ) {
@@ -226,7 +179,6 @@ namespace MyCAM.App
 		static readonly List<DialogEventInfo> m_RegisteredDialogs = new List<DialogEventInfo>();
 		static CustPost m_CustPost = null;
 		static readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "MyApp" );
-		const string MAIN_FORM_NOT_INITIALIZED = "MainForm還沒初始化,請先設定 MainForm。";
 		const string LOGGER_NOT_INITIALIZED = "Logger還沒初始化,請先設定 Logger。";
 
 		class DialogEventInfo
@@ -251,14 +203,5 @@ namespace MyCAM.App
 				get; set;
 			}
 		}
-
-		struct FromSizeInfo
-		{
-			public double FormWidth;
-			public double FormHeight;
-			public int FormCenterX;
-			public int FormCenterY;
-		}
-
 	}
 }

@@ -40,7 +40,43 @@
 	<Compile Include="Controls\GroupPanel.cs">
 	  <SubType>Component</SubType>
 	</Compile>
+	<Compile Include="Controls\ButtonIndicator.cs" />
+	<Compile Include="Controls\ButtonKind.cs" />
+	<Compile Include="Controls\CommonButtonText.cs" />
+	<Compile Include="Controls\DebouncedNumericUpDown.cs">
+	  <SubType>Component</SubType>
+	</Compile>
+	<Compile Include="Controls\MultiSelectTreeView.cs">
+	  <SubType>Component</SubType>
+	</Compile>
+	<Compile Include="Controls\RemovableValueRow.cs">
+	  <SubType>Component</SubType>
+	</Compile>
 	<Compile Include="Controls\RoundDrawing.cs" />
+	<Compile Include="Controls\SectionPanel.cs">
+	  <SubType>Component</SubType>
+	</Compile>
+	<Compile Include="Controls\SectionStack.cs" />
+	<Compile Include="Controls\ThemedButton.cs">
+	  <SubType>Component</SubType>
+	</Compile>
+	<Compile Include="Controls\ThemedLabel.cs">
+	  <SubType>Component</SubType>
+	</Compile>
+	<Compile Include="Forms\CommonTexts.cs" />
+	<Compile Include="Forms\DialogBase.cs">
+	  <SubType>Form</SubType>
+	</Compile>
+	<Compile Include="Forms\DialogPlacement.cs" />
+	<Compile Include="Forms\LanguageApplier.cs" />
+	<Compile Include="Forms\PanelBase.cs">
+	  <SubType>UserControl</SubType>
+	</Compile>
+	<Compile Include="Theme\TextRole.cs" />
+	<Compile Include="Theme\ThemeColors.cs" />
+	<Compile Include="Theme\ThemeFonts.cs" />
+	<Compile Include="Theme\ThemeMetrics.cs" />
+	<Compile Include="Theme\ThemeText.cs" />
 	<Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +89,12 @@
 	<Compile Include="Controls\RoundedProgressBar.cs">
 	  <SubType>Component</SubType>
 	</Compile>
+  </ItemGroup>
+  <ItemGroup>
+	<ProjectReference Include="..\LanguageManager\LanguageManager.csproj">
+	  <Project>{6aa4de88-e3b9-4a29-8df8-dc5dcd0a70cd}</Project>
+	  <Name>LanguageManager</Name>
+	</ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

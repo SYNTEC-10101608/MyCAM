@@ -29,14 +29,14 @@
 		{
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.m_lblSewTol = new System.Windows.Forms.Label();
-			this.m_txbSewTol = new MyCAM.Editor.DebouncedNumericUpDown();
+			this.m_txbSewTol = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_btnOK = new System.Windows.Forms.Button();
 			this.tableLayoutPanel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.m_txbSewTol)).BeginInit();
 			this.SuspendLayout();
-			// 
+			//
 			// tableLayoutPanel1
-			// 
+			//
 			this.tableLayoutPanel1.ColumnCount = 3;
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -52,9 +52,9 @@
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(359, 104);
 			this.tableLayoutPanel1.TabIndex = 0;
-			// 
+			//
 			// m_lblSewTol
-			// 
+			//
 			this.m_lblSewTol.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this.m_lblSewTol.AutoSize = true;
 			this.m_lblSewTol.Location = new System.Drawing.Point(4, 18);
@@ -63,9 +63,9 @@
 			this.m_lblSewTol.Size = new System.Drawing.Size(109, 15);
 			this.m_lblSewTol.TabIndex = 0;
 			this.m_lblSewTol.Text = "縫補精度:";
-			// 
+			//
 			// m_txbSewTol
-			// 
+			//
 			this.m_txbSewTol.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this.m_txbSewTol.DecimalPlaces = 3;
 			this.m_txbSewTol.Increment = new decimal(new int[] {
@@ -93,9 +93,9 @@
             0,
             0,
             196608});
-			// 
+			//
 			// m_btnOK
-			// 
+			//
 			this.m_btnOK.Location = new System.Drawing.Point(238, 56);
 			this.m_btnOK.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
 			this.m_btnOK.Name = "m_btnOK";
@@ -104,9 +104,9 @@
 			this.m_btnOK.Text = "OK";
 			this.m_btnOK.UseVisualStyleBackColor = true;
 			this.m_btnOK.Click += new System.EventHandler(this.m_btnOK_Click);
-			// 
+			//
 			// SewPartDlg
-			// 
+			//
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(387, 122);
@@ -130,7 +130,7 @@
 
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.Label m_lblSewTol;
-		private MyCAM.Editor.DebouncedNumericUpDown m_txbSewTol;
+		private CommonUI.Controls.DebouncedNumericUpDown m_txbSewTol;
 		private System.Windows.Forms.Button m_btnOK;
 	}
 }

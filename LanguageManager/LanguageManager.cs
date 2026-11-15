@@ -225,6 +225,27 @@ namespace LanguageManager
 			}
 		}
 
+		/// <summary>
+		/// Check whether the ID exists in the current UI language, without logging a missing ID.
+		/// </summary>
+		/// <param name="szID">String ID.</param>
+		/// <returns>True if the current UI language has a string for the ID.</returns>
+		public bool HasString( string szID )
+		{
+			string szLanguage = CurrentUILanguage;
+
+			// invalid argument
+			if( string.IsNullOrEmpty( szID ) || string.IsNullOrEmpty( szLanguage ) ) {
+				return false;
+			}
+
+			// the current language is not loaded
+			if( m_ResourceMap.ContainsKey( szLanguage ) == false || m_ResourceMap[ szLanguage ] == null ) {
+				return false;
+			}
+			return m_ResourceMap[ szLanguage ].ContainsKey( szID );
+		}
+
 		public void SetString( string szID, string szNewString )
 		{
 			SetString( szID, CurrentUILanguage, szNewString );

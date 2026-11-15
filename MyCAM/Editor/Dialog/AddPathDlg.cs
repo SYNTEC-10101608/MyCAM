@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Windows.Forms;
+using CommonUI.Forms;
 using MyCAM.App;
 using OCCTool;
 
 namespace MyCAM.Editor.Dialog
 {
-	public partial class AddPathDlg : Form
+	public partial class AddPathDlg : DialogBase
 	{
 		public AddPathDlg()
 		{

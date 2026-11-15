@@ -18,14 +18,14 @@
         {
 			this.m_btnCancel = new System.Windows.Forms.Button();
 			this.m_lblLength = new System.Windows.Forms.Label();
-			this.m_tbxMicroJointLength = new MyCAM.Editor.DebouncedNumericUpDown();
+			this.m_tbxMicroJointLength = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_btnClearAll = new System.Windows.Forms.Button();
 			this.m_btnDelete = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.m_tbxMicroJointLength)).BeginInit();
 			this.SuspendLayout();
-			// 
+			//
 			// m_btnCancel
-			// 
+			//
 			this.m_btnCancel.Location = new System.Drawing.Point(231, 67);
 			this.m_btnCancel.Margin = new System.Windows.Forms.Padding(4);
 			this.m_btnCancel.Name = "m_btnCancel";
@@ -34,18 +34,18 @@
 			this.m_btnCancel.Text = "完成";
 			this.m_btnCancel.UseVisualStyleBackColor = true;
 			this.m_btnCancel.Click += new System.EventHandler(this.m_btnCancel_Click);
-			// 
+			//
 			// m_lblLength
-			// 
+			//
 			this.m_lblLength.AutoSize = true;
 			this.m_lblLength.Location = new System.Drawing.Point(17, 32);
 			this.m_lblLength.Name = "m_lblLength";
 			this.m_lblLength.Size = new System.Drawing.Size(67, 15);
 			this.m_lblLength.TabIndex = 3;
 			this.m_lblLength.Text = "微連長度";
-			// 
+			//
 			// m_tbxMicroJointLength
-			// 
+			//
 			this.m_tbxMicroJointLength.DecimalPlaces = 3;
 			this.m_tbxMicroJointLength.Minimum = 0.001m;
 			this.m_tbxMicroJointLength.Maximum = 99999;
@@ -55,9 +55,9 @@
 			this.m_tbxMicroJointLength.Size = new System.Drawing.Size(100, 25);
 			this.m_tbxMicroJointLength.TabIndex = 4;
 			this.m_tbxMicroJointLength.DebouncedValueChanged += new System.EventHandler(this.m_tbxMicroJointLength_DebouncedValueChanged);
-			// 
+			//
 			// m_btnClearAll
-			// 
+			//
 			this.m_btnClearAll.Location = new System.Drawing.Point(13, 67);
 			this.m_btnClearAll.Margin = new System.Windows.Forms.Padding(4);
 			this.m_btnClearAll.Name = "m_btnClearAll";
@@ -66,9 +66,9 @@
 			this.m_btnClearAll.Text = "刪除所有微連";
 			this.m_btnClearAll.UseVisualStyleBackColor = true;
 			this.m_btnClearAll.Click += new System.EventHandler(this.m_btnClearAll_Click);
-			// 
+			//
 			// m_btnDelete
-			// 
+			//
 			this.m_btnDelete.Location = new System.Drawing.Point(139, 67);
 			this.m_btnDelete.Margin = new System.Windows.Forms.Padding(4);
 			this.m_btnDelete.Name = "m_btnDelete";
@@ -77,9 +77,9 @@
 			this.m_btnDelete.Text = "刪除";
 			this.m_btnDelete.UseVisualStyleBackColor = true;
 			this.m_btnDelete.Click += new System.EventHandler(this.m_btnDelete_Click);
-			// 
+			//
 			// MicroJointDlg
-			// 
+			//
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.m_btnCancel;
@@ -103,7 +103,7 @@
         #endregion
         System.Windows.Forms.Button m_btnCancel;
 		private System.Windows.Forms.Label m_lblLength;
-		private MyCAM.Editor.DebouncedNumericUpDown m_tbxMicroJointLength;
+		private CommonUI.Controls.DebouncedNumericUpDown m_tbxMicroJointLength;
 		private System.Windows.Forms.Button m_btnClearAll;
 		private System.Windows.Forms.Button m_btnDelete;
 	}

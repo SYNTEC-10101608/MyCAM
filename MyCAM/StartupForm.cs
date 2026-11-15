@@ -5,6 +5,9 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using CommonUI.Controls;
+using CommonUI.Forms;
+using CommonUI.Theme;
 using CncManager;
 using CncUI;
 using MyCAM.App;
@@ -42,6 +45,9 @@ namespace MyCAM
 			// apply saved UI language
 			LanguageManager.LanguageManager.CurrentUILanguage = MyApp.AppSetting.UILanguage;
 
+			// the font family follows the UI language, so set it before any screen is created
+			ThemeFonts.Initialize( LanguageManager.LanguageManager.CurrentUILanguage );
+
 			m_LanguageManager = new LanguageManager.LanguageManager( "StartupForm" );
 
 #if !DEBUG
@@ -55,6 +61,7 @@ namespace MyCAM
 			m_MainLayout = new MainLayout( m_panBackGround, m_tlpBottom, m_panCNC, m_panCNCInfo,
 				m_pnlMessages, m_pnlLog, m_panCNCVertical, m_panVerticalAlarm, m_tsmiCNC, m_tsbController );
 			m_panBackGround.SizeChanged += OnMainLayoutSizeChanged;
+			DialogPlacement.AreaProvider = () => m_MainLayout.GetDialogArea( this );
 
 			// app
 			MyApp.MainForm = this;
@@ -927,7 +934,7 @@ namespace MyCAM
 					case EditActionType.SetLead:
 						m_tsbSetLead.BackColor = DEFAULT_BtnColor;
 
-						// unlock form 
+						// unlock form
 						OnCAMDlgActionStatusChange( actionStatus );
 						break;
 					case EditActionType.OverCut:
@@ -1966,6 +1973,9 @@ namespace MyCAM
 		{
 			// switch language
 			LanguageManager.LanguageManager.CurrentUILanguage = szLanguage;
+
+			// screens created from now on use the font family of the new language
+			ThemeFonts.Initialize( LanguageManager.LanguageManager.CurrentUILanguage );
 
 			// persist setting to file
 			MyApp.AppSetting.ApplyUILanguage( szLanguage );

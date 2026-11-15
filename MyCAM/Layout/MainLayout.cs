@@ -105,6 +105,29 @@ namespace MyCAM.Layout
 			}
 		}
 
+		/// <summary>
+		/// Screen rectangle that dialogs are centered in: the whole window in landscape, the CAM area above the
+		/// CNC host in portrait (whether the CNC panels are shown or not).
+		/// </summary>
+		/// <param name="mainForm">Main window.</param>
+		/// <returns>Screen rectangle of the dialog area.</returns>
+		public Rectangle GetDialogArea( Form mainForm )
+		{
+			Rectangle bounds = mainForm.Bounds;
+			bool isVertical = mainForm.Height > mainForm.Width;
+			if( isVertical == false || m_VerticalHost.IsDisposed || m_VerticalHost.Parent == null ) {
+				return bounds;
+			}
+			int nHostTop = m_VerticalHost.Parent.PointToScreen( m_VerticalHost.Location ).Y;
+			int nCAMHeight = nHostTop - bounds.Top;
+
+			// the CNC host is not laid out yet
+			if( nCAMHeight <= 0 || nCAMHeight > bounds.Height ) {
+				return bounds;
+			}
+			return new Rectangle( bounds.Left, bounds.Top, bounds.Width, nCAMHeight );
+		}
+
 		public void FitPanels( Control operationPanel, Control monitorPanel )
 		{
 			operationPanel.Bounds = m_OperationHost.ClientRectangle;

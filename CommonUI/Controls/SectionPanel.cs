@@ -1,0 +1,89 @@
+﻿using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+using CommonUI.Theme;
+
+namespace CommonUI.Controls
+{
+	/// <summary>
+	/// Section card: square white surface with a border; Text is the section title drawn in the title bar.
+	/// Children are placed with fixed coordinates (first row at SECTION_CONTENT_TOP when titled).
+	/// </summary>
+	public class SectionPanel : Panel
+	{
+		public SectionPanel()
+		{
+			SetStyle( ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint |
+				ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true );
+			base.BackColor = ThemeColors.SURFACE;
+		}
+
+		/// <summary>
+		/// Section title; empty for a card without title bar.
+		/// </summary>
+		[Browsable( true )]
+		[EditorBrowsable( EditorBrowsableState.Always )]
+		[DesignerSerializationVisibility( DesignerSerializationVisibility.Visible )]
+		[Category( "Appearance" )]
+		public override string Text
+		{
+			get => base.Text;
+			set
+			{
+				base.Text = value;
+				Invalidate();
+			}
+		}
+
+		[Browsable( false )]
+		[EditorBrowsable( EditorBrowsableState.Never )]
+		[DesignerSerializationVisibility( DesignerSerializationVisibility.Hidden )]
+		public override Color BackColor
+		{
+			get => base.BackColor;
+			set => base.BackColor = value;
+		}
+
+		[Browsable( false )]
+		[EditorBrowsable( EditorBrowsableState.Never )]
+		[DesignerSerializationVisibility( DesignerSerializationVisibility.Hidden )]
+		public new BorderStyle BorderStyle
+		{
+			get => base.BorderStyle;
+			set => base.BorderStyle = value;
+		}
+
+		protected override void OnPaint( PaintEventArgs e )
+		{
+			base.OnPaint( e );
+			Graphics graphics = e.Graphics;
+			using( Pen pen = new Pen( ThemeColors.BORDER ) ) {
+				graphics.DrawRectangle( pen, 0, 0, Width - 1, Height - 1 );
+			}
+
+			// untitled card
+			if( string.IsNullOrEmpty( Text ) ) {
+				return;
+			}
+			int nAccentTop = ( ThemeMetrics.SECTION_TITLE_HEIGHT - ACCENT_HEIGHT ) / 2;
+			using( SolidBrush brush = new SolidBrush( ThemeColors.ACCENT ) ) {
+				graphics.FillRectangle( brush, ThemeMetrics.SECTION_PADDING, nAccentTop, ACCENT_WIDTH, ACCENT_HEIGHT );
+			}
+			int nTextLeft = ThemeMetrics.SECTION_PADDING + ACCENT_WIDTH + ThemeMetrics.CONTROL_GAP;
+			Rectangle textBounds = new Rectangle( nTextLeft, 0,
+				Width - nTextLeft - ThemeMetrics.SECTION_PADDING, ThemeMetrics.SECTION_TITLE_HEIGHT );
+			TextRenderer.DrawText( graphics, Text, ThemeFonts.Emphasis, textBounds, ThemeColors.TEXT,
+				TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine |
+				TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix );
+		}
+
+		protected override void OnTextChanged( System.EventArgs e )
+		{
+			base.OnTextChanged( e );
+			Invalidate();
+		}
+
+		const int ACCENT_WIDTH = 3;
+		const int ACCENT_HEIGHT = 14;
+	}
+}

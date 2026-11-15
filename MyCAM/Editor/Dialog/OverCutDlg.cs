@@ -10,15 +10,6 @@ namespace MyCAM.Editor.Dialog
 			InitializeComponent();
 			m_OverCutLength = overCutLength;
 			m_tbxOverCutLength.SilentSetValue = (decimal)m_OverCutLength;
-			ApplyResourcesToUI();
-		}
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "OverCutDlg", this.Text );
-			m_lblOverCutLength.Text = m_LanguageManager.TryGetString( "m_lblOverCutLength", m_lblOverCutLength.Text );
-			m_OverCutUnit.Text = m_LanguageManager.TryGetString( "m_OverCutUnit", m_OverCutUnit.Text );
-			m_btnSure.Text = m_LanguageManager.TryGetString( "m_btnSure", m_btnSure.Text );
 		}
 
 		public Func<double, bool> CheckValueGeomRestriction;

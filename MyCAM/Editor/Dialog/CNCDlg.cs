@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using CommonUI.Forms;
 using MyCAM.App;
 using VNCFormsApp;
 
 namespace MyCAM.Editor.Dialog
 {
-	public partial class CNCDlg : Form
+	public partial class CNCDlg : DialogBase
 	{
 		public CNCDlg()
 		{
@@ -37,7 +38,7 @@ namespace MyCAM.Editor.Dialog
 		{
 			m_PlacementArea = area;
 			if( Owner == null || Owner.Height <= Owner.Width ) {
-				Location = MyApp.CalculateDialogCenterLocation( this );
+				DialogPlacement.MoveToCenter( this );
 				return;
 			}
 			Rectangle workingArea = Screen.FromControl( Owner ).WorkingArea;

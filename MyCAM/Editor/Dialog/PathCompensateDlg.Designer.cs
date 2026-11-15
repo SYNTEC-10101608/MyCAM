@@ -27,7 +27,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.m_NumUpDownCompensate = new MyCAM.Editor.DebouncedNumericUpDown();
+			this.m_NumUpDownCompensate = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_btnConfirm = new System.Windows.Forms.Button();
 			this.m_btnClear = new System.Windows.Forms.Button();
 			this.m_btnReset = new System.Windows.Forms.Button();
@@ -42,9 +42,9 @@
 			this.m_pnlCompemsate.SuspendLayout();
 			this.m_flpnlEdit.SuspendLayout();
 			this.SuspendLayout();
-			// 
+			//
 			// m_NumUpDownCompensate
-			// 
+			//
 			this.m_NumUpDownCompensate.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.m_NumUpDownCompensate.DecimalPlaces = 3;
 			this.m_NumUpDownCompensate.Location = new System.Drawing.Point(154, 35);
@@ -64,9 +64,9 @@
 			this.m_NumUpDownCompensate.TabIndex = 1;
 			this.m_NumUpDownCompensate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			this.m_NumUpDownCompensate.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownCompensate_DebouncedValueChanged);
-			// 
+			//
 			// m_btnConfirm
-			// 
+			//
 			this.m_btnConfirm.Location = new System.Drawing.Point(115, 3);
 			this.m_btnConfirm.Name = "m_btnConfirm";
 			this.m_btnConfirm.Size = new System.Drawing.Size(109, 35);
@@ -74,9 +74,9 @@
 			this.m_btnConfirm.Text = "確認";
 			this.m_btnConfirm.UseVisualStyleBackColor = true;
 			this.m_btnConfirm.Click += new System.EventHandler(this.m_btnConfirm_Click);
-			// 
+			//
 			// m_btnClear
-			// 
+			//
 			this.m_btnClear.Location = new System.Drawing.Point(230, 3);
 			this.m_btnClear.Name = "m_btnClear";
 			this.m_btnClear.Size = new System.Drawing.Size(109, 35);
@@ -84,9 +84,9 @@
 			this.m_btnClear.Text = "清除";
 			this.m_btnClear.UseVisualStyleBackColor = true;
 			this.m_btnClear.Click += new System.EventHandler(this.m_btnClear_Click);
-			// 
+			//
 			// m_btnReset
-			// 
+			//
 			this.m_btnReset.Location = new System.Drawing.Point(345, 3);
 			this.m_btnReset.Name = "m_btnReset";
 			this.m_btnReset.Size = new System.Drawing.Size(109, 35);
@@ -94,9 +94,9 @@
 			this.m_btnReset.Text = "重置";
 			this.m_btnReset.UseVisualStyleBackColor = true;
 			this.m_btnReset.Click += new System.EventHandler(this.m_btnReset_Click);
-			// 
+			//
 			// m_pnlCompemsateParam
-			// 
+			//
 			this.m_pnlCompemsateParam.AutoSize = true;
 			this.m_pnlCompemsateParam.ColumnCount = 3;
 			this.m_pnlCompemsateParam.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
@@ -113,9 +113,9 @@
 			this.m_pnlCompemsateParam.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
 			this.m_pnlCompemsateParam.Size = new System.Drawing.Size(453, 64);
 			this.m_pnlCompemsateParam.TabIndex = 5;
-			// 
+			//
 			// m_lblTotalCompensateValue
-			// 
+			//
 			this.m_lblTotalCompensateValue.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.m_lblTotalCompensateValue.AutoSize = true;
 			this.m_lblTotalCompensateValue.Location = new System.Drawing.Point(353, 38);
@@ -123,9 +123,9 @@
 			this.m_lblTotalCompensateValue.Size = new System.Drawing.Size(48, 19);
 			this.m_lblTotalCompensateValue.TabIndex = 6;
 			this.m_lblTotalCompensateValue.Text = "0.000";
-			// 
+			//
 			// m_lblTotalCompensate
-			// 
+			//
 			this.m_lblTotalCompensate.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.m_lblTotalCompensate.AutoSize = true;
 			this.m_lblTotalCompensate.Location = new System.Drawing.Point(350, 6);
@@ -133,9 +133,9 @@
 			this.m_lblTotalCompensate.Size = new System.Drawing.Size(54, 19);
 			this.m_lblTotalCompensate.TabIndex = 2;
 			this.m_lblTotalCompensate.Text = "總補償";
-			// 
+			//
 			// m_lblCompensate
-			// 
+			//
 			this.m_lblCompensate.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.m_lblCompensate.AutoSize = true;
 			this.m_lblCompensate.Location = new System.Drawing.Point(41, 38);
@@ -143,9 +143,9 @@
 			this.m_lblCompensate.Size = new System.Drawing.Size(69, 19);
 			this.m_lblCompensate.TabIndex = 1;
 			this.m_lblCompensate.Text = "補償距離";
-			// 
+			//
 			// m_pnlCompemsate
-			// 
+			//
 			this.m_pnlCompemsate.AutoSize = true;
 			this.m_pnlCompemsate.ColumnCount = 1;
 			this.m_pnlCompemsate.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -158,9 +158,9 @@
 			this.m_pnlCompemsate.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 40F));
 			this.m_pnlCompemsate.Size = new System.Drawing.Size(463, 140);
 			this.m_pnlCompemsate.TabIndex = 6;
-			// 
+			//
 			// m_flpnlEdit
-			// 
+			//
 			this.m_flpnlEdit.Controls.Add(this.m_btnReset);
 			this.m_flpnlEdit.Controls.Add(this.m_btnClear);
 			this.m_flpnlEdit.Controls.Add(this.m_btnConfirm);
@@ -169,9 +169,9 @@
 			this.m_flpnlEdit.Name = "m_flpnlEdit";
 			this.m_flpnlEdit.Size = new System.Drawing.Size(457, 45);
 			this.m_flpnlEdit.TabIndex = 6;
-			// 
+			//
 			// PathCompensateDlg
-			// 
+			//
 			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
@@ -193,7 +193,7 @@
 		}
 
 		#endregion
-		private MyCAM.Editor.DebouncedNumericUpDown m_NumUpDownCompensate;
+		private CommonUI.Controls.DebouncedNumericUpDown m_NumUpDownCompensate;
 		private System.Windows.Forms.Button m_btnConfirm;
 		private System.Windows.Forms.Button m_btnClear;
 		private System.Windows.Forms.Button m_btnReset;

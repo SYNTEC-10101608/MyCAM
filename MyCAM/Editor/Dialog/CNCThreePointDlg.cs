@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
 using CommonUI.Controls;
+using CommonUI.Forms;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -14,7 +15,7 @@ namespace MyCAM.Editor.Dialog
 		Calculation,
 	}
 
-	public partial class CNCThreePointDlg : Form
+	public partial class CNCThreePointDlg : DialogBase
 	{
 		public CNCThreePointDlg()
 		{
