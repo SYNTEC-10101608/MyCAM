@@ -35,6 +35,24 @@ namespace CommonUI.Controls
 			}
 		}
 
+		/// <summary>
+		/// Mark the section as the current one (e.g. the current step of a wizard): accent title bar.
+		/// </summary>
+		[Category( "Appearance" )]
+		[DefaultValue( false )]
+		public bool Highlighted
+		{
+			get => m_isHighlighted;
+			set
+			{
+				if( m_isHighlighted == value ) {
+					return;
+				}
+				m_isHighlighted = value;
+				Invalidate();
+			}
+		}
+
 		[Browsable( false )]
 		[EditorBrowsable( EditorBrowsableState.Never )]
 		[DesignerSerializationVisibility( DesignerSerializationVisibility.Hidden )]
@@ -65,6 +83,11 @@ namespace CommonUI.Controls
 			if( string.IsNullOrEmpty( Text ) ) {
 				return;
 			}
+			if( m_isHighlighted ) {
+				using( SolidBrush brush = new SolidBrush( ThemeColors.ACCENT_TINT ) ) {
+					graphics.FillRectangle( brush, 1, 1, Width - 2, ThemeMetrics.SECTION_TITLE_HEIGHT - 1 );
+				}
+			}
 			int nAccentTop = ( ThemeMetrics.SECTION_TITLE_HEIGHT - ACCENT_HEIGHT ) / 2;
 			using( SolidBrush brush = new SolidBrush( ThemeColors.ACCENT ) ) {
 				graphics.FillRectangle( brush, ThemeMetrics.SECTION_PADDING, nAccentTop, ACCENT_WIDTH, ACCENT_HEIGHT );
@@ -72,7 +95,8 @@ namespace CommonUI.Controls
 			int nTextLeft = ThemeMetrics.SECTION_PADDING + ACCENT_WIDTH + ThemeMetrics.CONTROL_GAP;
 			Rectangle textBounds = new Rectangle( nTextLeft, 0,
 				Width - nTextLeft - ThemeMetrics.SECTION_PADDING, ThemeMetrics.SECTION_TITLE_HEIGHT );
-			Color titleColor = Enabled ? ThemeColors.TEXT : ThemeColors.TEXT_DISABLED;
+			Color titleColor = Enabled == false ? ThemeColors.TEXT_DISABLED :
+				m_isHighlighted ? ThemeColors.ACCENT : ThemeColors.TEXT;
 			TextRenderer.DrawText( graphics, Text, ThemeFonts.Emphasis, textBounds, titleColor,
 				TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine |
 				TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix );
@@ -92,5 +116,7 @@ namespace CommonUI.Controls
 
 		const int ACCENT_WIDTH = 3;
 		const int ACCENT_HEIGHT = 14;
+
+		bool m_isHighlighted;
 	}
 }

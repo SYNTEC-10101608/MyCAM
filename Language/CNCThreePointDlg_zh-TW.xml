@@ -4,8 +4,6 @@
 	<Message ID="PickDrawing" Content="重選圖紙點" />
 	<Message ID="Reset" Content="重設" />
 	<Message ID="Cancel" Content="取消" />
-	<Message ID="DrawingPoints" Content="圖紙點" />
-	<Message ID="WorkpiecePoints" Content="工作點" />
 	<Message ID="Point" Content="點 {0}" />
 	<Message ID="Capture" Content="帶入" />
 	<Message ID="Tolerance" Content="誤差容忍" />
