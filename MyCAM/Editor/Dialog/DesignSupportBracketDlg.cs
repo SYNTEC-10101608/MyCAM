@@ -24,7 +24,6 @@ namespace MyCAM.Editor.Dialog
 		{
 			InitializeComponent();
 			m_LanguageManager = new LanguageManager.LanguageManager( "DesignSupportBracketDlg" );
-			ApplyResourcesToUI();
 			LoadImages();
 			RegisterDebouncedHandlers();
 		}
@@ -50,42 +49,6 @@ namespace MyCAM.Editor.Dialog
 		internal string PinLengthName => m_lblPinLength.Text;
 
 		internal string FilletRadiusName => m_lblFilletRadius.Text;
-
-		void ApplyResourcesToUI()
-		{
-			Text = m_LanguageManager.TryGetString( "DesignSupportBracketDlg", Text );
-			m_lblHint.Text = m_LanguageManager.TryGetString( "m_lblHint", m_lblHint.Text );
-			m_btnNext.Text = m_LanguageManager.TryGetString( "m_btnNext", m_btnNext.Text );
-			m_lblSectionBase.Text = m_LanguageManager.TryGetString( "m_lblSectionBase", m_lblSectionBase.Text );
-			m_lblXExtension.Text = m_LanguageManager.TryGetString( "m_lblXExtension", m_lblXExtension.Text );
-			m_lblYExtension.Text = m_LanguageManager.TryGetString( "m_lblYExtension", m_lblYExtension.Text );
-			m_lblSectionBracket.Text = m_LanguageManager.TryGetString( "m_lblSectionBracket", m_lblSectionBracket.Text );
-			m_btnResetPositions.Text = m_LanguageManager.TryGetString( "m_btnResetPositions", m_btnResetPositions.Text );
-			m_lblXPositionsTitle.Text = m_LanguageManager.TryGetString( "m_lblXPositionsTitle", m_lblXPositionsTitle.Text );
-			m_lblYPositionsTitle.Text = m_LanguageManager.TryGetString( "m_lblYPositionsTitle", m_lblYPositionsTitle.Text );
-			m_btnAddXPosition.Text = m_LanguageManager.TryGetString( "m_btnAddXPosition", m_btnAddXPosition.Text );
-			m_btnAddYPosition.Text = m_LanguageManager.TryGetString( "m_btnAddYPosition", m_btnAddYPosition.Text );
-			m_lblSectionBracketHeight.Text = m_LanguageManager.TryGetString( "m_lblSectionBracketHeight", m_lblSectionBracketHeight.Text );
-			m_lblBaseThickness.Text = m_LanguageManager.TryGetString( "m_lblBaseThickness", m_lblBaseThickness.Text );
-			m_lblEngagementDepth.Text = m_LanguageManager.TryGetString( "m_lblEngagementDepth", m_lblEngagementDepth.Text );
-			m_lblXPinCount.Text = m_LanguageManager.TryGetString( "m_lblXPinCount", m_lblXPinCount.Text );
-			m_lblYPinCount.Text = m_LanguageManager.TryGetString( "m_lblYPinCount", m_lblYPinCount.Text );
-			m_lblWallThickness.Text = m_LanguageManager.TryGetString( "m_lblWallThickness", m_lblWallThickness.Text );
-			m_lblRibHeight.Text = m_LanguageManager.TryGetString( "m_lblRibHeight", m_lblRibHeight.Text );
-			m_lblZExtension.Text = m_LanguageManager.TryGetString( "m_lblZExtension", m_lblZExtension.Text );
-			m_lblPinLength.Text = m_LanguageManager.TryGetString( "m_lblPinLength", m_lblPinLength.Text );
-			m_lblFilletRadius.Text = m_LanguageManager.TryGetString( "m_lblFilletRadius", m_lblFilletRadius.Text );
-			m_lblSectionCrossFit.Text = m_LanguageManager.TryGetString( "m_lblSectionCrossFit", m_lblSectionCrossFit.Text );
-			m_lblSectionBracketCount.Text = m_LanguageManager.TryGetString( "m_lblSectionBracketCount", m_lblSectionBracketCount.Text );
-			m_lblSectionBottomPinSize.Text = m_LanguageManager.TryGetString( "m_lblSectionBottomPinSize", m_lblSectionBottomPinSize.Text );
-			m_lblSectionBracketHeight.Text = m_LanguageManager.TryGetString( "m_lblSectionBracketHeight", m_lblSectionBracketHeight.Text );
-			m_btnBack.Text = m_LanguageManager.TryGetString( "m_btnBack", m_btnBack.Text );
-			m_btnGenerate.Text = m_LanguageManager.TryGetString( "m_btnGenerate", m_btnGenerate.Text );
-			m_lblSaveDxfHint.Text = m_LanguageManager.TryGetString( "m_lblSaveDxfHint", m_lblSaveDxfHint.Text );
-			m_btnBrowseSavePath.Text = m_LanguageManager.TryGetString( "m_btnBrowseSavePath", m_btnBrowseSavePath.Text );
-			m_btnSaveDxf.Text = m_LanguageManager.TryGetString( "m_btnSaveDxf", m_btnSaveDxf.Text );
-			m_btnSkipSave.Text = m_LanguageManager.TryGetString( "m_btnSkipSave", m_btnSkipSave.Text );
-		}
 
 		void LoadImages()
 		{
@@ -123,11 +86,11 @@ namespace MyCAM.Editor.Dialog
 		void InitializePositionListsCore( double[] xDefaults, double[] yDefaults )
 		{
 			foreach( double v in xDefaults ) {
-				AddPositionRow( ref m_XRows, m_pnlXPositions, v, System.Drawing.Color.DarkGreen );
+				AddPositionRow( ref m_XRows, m_pnlXPositions, v, X_POSITION_COLOR );
 			}
 
 			foreach( double v in yDefaults ) {
-				AddPositionRow( ref m_YRows, m_pnlYPositions, v, System.Drawing.Color.RoyalBlue );
+				AddPositionRow( ref m_YRows, m_pnlYPositions, v, Y_POSITION_COLOR );
 			}
 
 			RefreshRowIndicesAndLayout( m_XRows, m_pnlXPositions );

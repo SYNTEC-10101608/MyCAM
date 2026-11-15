@@ -3,15 +3,15 @@
   <Message ID="DesignSupportBracketDlg" Content="Проектирование опорного кронштейна" />
   <Message ID="m_lblHint" Content="Выберите нижнюю или боковую поверхность детали для установки зажима&#13;&#10;(удерживайте Ctrl для множественного выбора, двойной клик для непрерывных граней)" />
   <Message ID="m_btnNext" Content="Далее" />
-  <Message ID="m_lblSectionBase" Content="Размер основания" />
+  <Message ID="m_secBase" Content="Размер основания" />
   <Message ID="m_lblXExtension" Content="Расстояние удлинения по X" />
   <Message ID="m_lblYExtension" Content="Расстояние удлинения по Y" />
-  <Message ID="m_lblSectionBracket" Content="Положение кронштейна" />
+  <Message ID="m_secBracket" Content="Положение кронштейна" />
   <Message ID="m_lblXPositionsTitle" Content="Положение кронштейна по X" />
   <Message ID="m_lblYPositionsTitle" Content="Положение кронштейна по Y" />
   <Message ID="m_btnAddXPosition" Content="+ Добавить положение по X" />
   <Message ID="m_btnAddYPosition" Content="+ Добавить положение по Y" />
-  <Message ID="m_lblSectionBracketHeight" Content="Высота кронштейна" />
+  <Message ID="m_secBracketHeight" Content="Высота кронштейна" />
   <Message ID="m_lblBaseThickness" Content="Высота соединения (D Толщина основания)" />
   <Message ID="m_lblEngagementDepth" Content="Глубина паза кронштейна (A)" />
   <Message ID="m_lblXPinCount" Content="Количество соединений по X" />
@@ -20,10 +20,10 @@
   <Message ID="m_lblRibHeight" Content="Базовая высота кронштейна" />
   <Message ID="m_lblZExtension" Content="Расстояние от детали до земли" />
   <Message ID="m_lblPinLength" Content="Длина соединения (B)" />
-  <Message ID="m_lblSectionCrossFit" Content="Конструкция пазового соединения" />
-  <Message ID="m_lblSectionBracketCount" Content="Количество соединений основания" />
+  <Message ID="m_secCrossFit" Content="Конструкция пазового соединения" />
+  <Message ID="m_secBracketCount" Content="Количество соединений основания" />
   <Message ID="m_btnResetPositions" Content="Сбросить положение" />
-  <Message ID="m_lblSectionBottomPinSize" Content="Размер нижнего штифта" />
+  <Message ID="m_secBottomPinSize" Content="Размер нижнего штифта" />
   <Message ID="m_btnBack" Content="Назад" />
   <Message ID="m_btnGenerate" Content="Создать" />
   <Message ID="m_lblSaveDxfHint" Content="Выберите путь для сохранения DXF" />
