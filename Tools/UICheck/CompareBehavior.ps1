@@ -40,6 +40,7 @@ $TYPE_REPLACEMENTS = @{
 	"System.Windows.Forms.TableLayoutPanel" = @( "System.Windows.Forms.Panel", "CommonUI.Controls.SectionPanel" )
 	"System.Windows.Forms.FlowLayoutPanel" = @( "System.Windows.Forms.Panel", "CommonUI.Controls.SectionPanel" )
 	"System.Windows.Forms.Panel" = @( "CommonUI.Controls.SectionPanel" )
+	"System.Windows.Forms.DataGridView" = @( "CommonUI.Controls.ThemedDataGridView" )
 }
 
 $exceptions = @{}

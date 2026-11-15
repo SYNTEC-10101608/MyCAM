@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using CommonUI.Forms;
 
 namespace VNCFormsApp
 {
@@ -15,7 +16,7 @@ namespace VNCFormsApp
 		OtherError
 	}
 
-	public partial class VNCUserControl : UserControl
+	public partial class VNCUserControl : PanelBase
 	{
 		// syntec controller need to set as the same 4:3 aspect ratio
 		const int CONTROLLER_WIDTH = 400;
