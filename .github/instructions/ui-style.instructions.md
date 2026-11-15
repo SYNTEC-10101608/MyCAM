@@ -94,6 +94,7 @@ applyTo: "**/*.cs"
 | 可多選的樹 | `CommonUI.Controls.MultiSelectTreeView` |
 | 可增刪數值列 | `CommonUI.Controls.RemovableValueRow`（執行時建立） |
 | 進度 | `CommonUI.Controls.LoadingBar`、`RoundedProgressBar` |
+| 唯讀清單 | `CommonUI.Controls.ThemedDataGridView`（以 `CellRole` 表示儲存格文字角色） |
 | 原生（外觀由父容器繼承） | `Label`、`CheckBox`、`RadioButton`、`ComboBox`、`CheckedListBox`、`TrackBar`、`PictureBox`、`DataGridView` |
 | 原生（只限非數值文字） | `TextBox`（IP、路徑、G-code、量測結果等） |
 | 原生（無外觀的分組） | `Panel`（只用來把 `RadioButton` 分組或承載執行時的區段，不設底色與框線） |
@@ -149,6 +150,8 @@ Form
 
 - 第一張卡片在 `(12, 12)`；卡片垂直排列，間距 8；同一對話框的卡片等寬。
 - 卡片內：左側標籤 `x = 10`；同一卡片的輸入欄左緣對齊；單位標籤緊接輸入欄右側 6。
+- 卡片內的動作按鈕（只作用於該卡片，或須隨卡片一起停用）放在列上，高 23。
+- RadioButton 群組、會切換 `Enabled` / `Visible` 的區域，用無外觀的 `Panel` 包住；`Panel` 內的列以其頂端為 0 起算。
 - 列：有標題卡片第一列 `y = 36`、無標題 `y = 10`，之後每列 `+30`；標籤 `+4`、`CheckBox` / `RadioButton` `+2`。
 - 卡片高 = 最後一列頂端 + 23 + 10。
 - 按鈕列：在最後一張卡片下方 16，高 28、寬至少 80、間距 8，距底邊 12。
@@ -169,7 +172,8 @@ Form
 | 情況 | 做法 |
 | --- | --- |
 | 狀態文字變色 | `ThemedLabel.Role = TextRole.Error` 等，不直接寫顏色 |
-| 顯示 / 隱藏區段後重新排列 | `SectionStack.Arrange( ... )`，不在對話框內手算座標 |
+| 顯示 / 隱藏區段後重新排列 | `SectionStack.Arrange( ... )` + `SectionStack.PlaceButtonBar( ... )`，不在對話框內手算座標 |
+| 精靈的目前步驟 | `SectionPanel.Highlighted = true`（標題列加強調底色） |
 | 動態增刪的數值列 | `RemovableValueRow` |
 | 改變大小後重新置中 | `DialogPlacement.MoveToCenter( this )` |
 
@@ -190,6 +194,7 @@ Form
 - 截圖：`Tools\UICheck\CaptureMainWindow.ps1 -OutFile <png> -Width <寬> -Height <高>`。
 - 圖示：`ImageScalingSize` 功能工具列 40×40，選單、圖層列、視角列、右鍵選單 20×20；
   圖示為透明背景 PNG，由 `MyCAM/Resource/IconSource/RenderIcons.ps1` 產生，不使用 Magenta 透明色。
+- 嵌入式面板的大小由主視窗決定，可用 `Anchor` / `Dock` 延展內容（對話框仍不可）。
 - 嵌入式面板（`CNCPanel`、`CNCInfoPanel`、`CNCAlarmPanel`）以 `SectionPanel` 分區、`ThemedButton` 當按鈕，
   與對話框使用同一套 token 與規則。
 
