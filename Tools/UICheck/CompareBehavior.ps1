@@ -146,7 +146,12 @@ foreach ($file in $designerFiles) {
 		}
 		$oldProps = if ($old.Props.ContainsKey($name)) { $old.Props[$name] } else { @{} }
 		$newProps = if ($new.Props.ContainsKey($name)) { $new.Props[$name] } else { @{} }
+		$isContainer = $oldType -match "(GroupBox|GroupPanel|\.Panel|TableLayoutPanel|FlowLayoutPanel)$"
 		foreach ($prop in $BEHAVIOR_PROPS) {
+			# containers never take the focus; GroupBox only wrote its default TabStop = false
+			if ($isContainer -and $prop -eq "TabStop") {
+				continue
+			}
 			$oldValue = if ($prop -eq "Items") { $oldItems[$name] } else { $oldProps[$prop] }
 			$newValue = if ($prop -eq "Items") { $newItems[$name] } else { $newProps[$prop] }
 			if ("$oldValue" -ne "$newValue") {

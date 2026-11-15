@@ -10,15 +10,6 @@ namespace MyCAM.Editor
 		public RCornerDlg()
 		{
 			InitializeComponent();
-			ApplyResourcesToUI();
-		}
-
-		public void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "RCornerDlg", this.Text );
-			m_btnDelete.Text = m_LanguageManager.TryGetString( "m_btnDelete", m_btnDelete.Text );
-			m_btnSwitchStartOrEnd.Text = m_LanguageManager.TryGetString( "m_btnSwitchStartOrEnd", m_btnSwitchStartOrEnd.Text );
-			m_btnDone.Text = m_LanguageManager.TryGetString( "m_btnDone", m_btnDone.Text );
 		}
 
 		public void SetStatus( string szStatus )
@@ -50,7 +41,5 @@ namespace MyCAM.Editor
 		{
 			Close();
 		}
-
-		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "RCornerDlg" );
 	}
 }

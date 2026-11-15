@@ -1,93 +1,106 @@
 ﻿namespace MyCAM.Editor
 {
-    partial class RCornerDlg
-    {
-        private System.ComponentModel.IContainer components = null;
+	partial class RCornerDlg
+	{
+		/// <summary>
+		/// Required designer variable.
+		/// </summary>
+		private System.ComponentModel.IContainer components = null;
 
-        protected override void Dispose( bool disposing )
-        {
-            if( disposing && ( components != null ) ) {
-                components.Dispose();
-            }
-            base.Dispose( disposing );
-        }
+		/// <summary>
+		/// Clean up any resources being used.
+		/// </summary>
+		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+		protected override void Dispose( bool disposing )
+		{
+			if( disposing && ( components != null ) ) {
+				components.Dispose();
+			}
+			base.Dispose( disposing );
+		}
 
-        #region Windows Form Designer generated code
+		#region Windows Form Designer generated code
 
-        private void InitializeComponent()
-        {
-            this.m_lblStatus = new System.Windows.Forms.Label();
-            this.m_btnDelete = new System.Windows.Forms.Button();
-            this.m_btnSwitchStartOrEnd = new System.Windows.Forms.Button();
-            this.m_btnDone = new System.Windows.Forms.Button();
-            this.SuspendLayout();
-            //
-            // m_lblStatus
-            //
-            this.m_lblStatus.AutoSize = true;
-            this.m_lblStatus.Location = new System.Drawing.Point(14, 18);
-            this.m_lblStatus.Name = "m_lblStatus";
-            this.m_lblStatus.Size = new System.Drawing.Size(0, 15);
-            this.m_lblStatus.TabIndex = 0;
-            //
-            // m_btnDelete
-            //
-            this.m_btnDelete.Location = new System.Drawing.Point(17, 55);
-            this.m_btnDelete.Margin = new System.Windows.Forms.Padding(4);
-            this.m_btnDelete.Name = "m_btnDelete";
-            this.m_btnDelete.Size = new System.Drawing.Size(130, 33);
-            this.m_btnDelete.TabIndex = 1;
-            this.m_btnDelete.Text = "刪除R角工藝";
-            this.m_btnDelete.UseVisualStyleBackColor = true;
-            this.m_btnDelete.Click += new System.EventHandler(this.m_btnDelete_Click);
-            //
-            // m_btnSwitchStartOrEnd
-            //
-            this.m_btnSwitchStartOrEnd.Location = new System.Drawing.Point(155, 55);
-            this.m_btnSwitchStartOrEnd.Margin = new System.Windows.Forms.Padding(4);
-            this.m_btnSwitchStartOrEnd.Name = "m_btnSwitchStartOrEnd";
-            this.m_btnSwitchStartOrEnd.Size = new System.Drawing.Size(130, 33);
-            this.m_btnSwitchStartOrEnd.TabIndex = 2;
-            this.m_btnSwitchStartOrEnd.Text = "切換起終點";
-            this.m_btnSwitchStartOrEnd.UseVisualStyleBackColor = true;
-            this.m_btnSwitchStartOrEnd.Click += new System.EventHandler(this.m_btnSwitchStartOrEnd_Click);
-            //
-            // m_btnDone
-            //
-            this.m_btnDone.Location = new System.Drawing.Point(155, 96);
-            this.m_btnDone.Margin = new System.Windows.Forms.Padding(4);
-            this.m_btnDone.Name = "m_btnDone";
-            this.m_btnDone.Size = new System.Drawing.Size(130, 33);
-            this.m_btnDone.TabIndex = 3;
-            this.m_btnDone.Text = "完成";
-            this.m_btnDone.UseVisualStyleBackColor = true;
-            this.m_btnDone.Click += new System.EventHandler(this.m_btnDone_Click);
-            //
-            // RCornerDlg
-            //
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this.m_btnDone;
-            this.ClientSize = new System.Drawing.Size(302, 145);
-            this.Controls.Add(this.m_btnDone);
-            this.Controls.Add(this.m_btnSwitchStartOrEnd);
-            this.Controls.Add(this.m_btnDelete);
-            this.Controls.Add(this.m_lblStatus);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "RCornerDlg";
-            this.Padding = new System.Windows.Forms.Padding(9);
-            this.Text = "編輯R角";
-            this.ResumeLayout(false);
-            this.PerformLayout();
+		/// <summary>
+		/// Required method for Designer support - do not modify
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
+			this.m_secStatus = new CommonUI.Controls.SectionPanel();
+			this.m_lblStatus = new System.Windows.Forms.Label();
+			this.m_btnDelete = new CommonUI.Controls.ThemedButton();
+			this.m_btnSwitchStartOrEnd = new CommonUI.Controls.ThemedButton();
+			this.m_btnDone = new CommonUI.Controls.ThemedButton();
+			this.m_secStatus.SuspendLayout();
+			this.SuspendLayout();
+			//
+			// m_secStatus
+			//
+			this.m_secStatus.Controls.Add(this.m_lblStatus);
+			this.m_secStatus.Location = new System.Drawing.Point(12, 12);
+			this.m_secStatus.Name = "m_secStatus";
+			this.m_secStatus.Size = new System.Drawing.Size(296, 43);
+			this.m_secStatus.TabIndex = 0;
+			//
+			// m_lblStatus
+			//
+			this.m_lblStatus.Location = new System.Drawing.Point(10, 14);
+			this.m_lblStatus.Name = "m_lblStatus";
+			this.m_lblStatus.Size = new System.Drawing.Size(276, 19);
+			this.m_lblStatus.TabIndex = 0;
+			//
+			// m_btnDelete
+			//
+			this.m_btnDelete.Kind = CommonUI.Controls.ButtonKind.Danger;
+			this.m_btnDelete.Location = new System.Drawing.Point(12, 71);
+			this.m_btnDelete.Name = "m_btnDelete";
+			this.m_btnDelete.Size = new System.Drawing.Size(96, 28);
+			this.m_btnDelete.TabIndex = 1;
+			this.m_btnDelete.Text = "刪除";
+			this.m_btnDelete.Click += new System.EventHandler(this.m_btnDelete_Click);
+			//
+			// m_btnSwitchStartOrEnd
+			//
+			this.m_btnSwitchStartOrEnd.Location = new System.Drawing.Point(116, 71);
+			this.m_btnSwitchStartOrEnd.Name = "m_btnSwitchStartOrEnd";
+			this.m_btnSwitchStartOrEnd.Size = new System.Drawing.Size(96, 28);
+			this.m_btnSwitchStartOrEnd.TabIndex = 2;
+			this.m_btnSwitchStartOrEnd.Text = "切換起終點";
+			this.m_btnSwitchStartOrEnd.Click += new System.EventHandler(this.m_btnSwitchStartOrEnd_Click);
+			//
+			// m_btnDone
+			//
+			this.m_btnDone.CommonText = CommonUI.Controls.CommonButtonText.Confirm;
+			this.m_btnDone.Kind = CommonUI.Controls.ButtonKind.Primary;
+			this.m_btnDone.Location = new System.Drawing.Point(228, 71);
+			this.m_btnDone.Name = "m_btnDone";
+			this.m_btnDone.Size = new System.Drawing.Size(80, 28);
+			this.m_btnDone.TabIndex = 3;
+			this.m_btnDone.Text = "確定";
+			this.m_btnDone.Click += new System.EventHandler(this.m_btnDone_Click);
+			//
+			// RCornerDlg
+			//
+			this.CancelButton = this.m_btnDone;
+			this.ClientSize = new System.Drawing.Size(320, 111);
+			this.Controls.Add(this.m_secStatus);
+			this.Controls.Add(this.m_btnDelete);
+			this.Controls.Add(this.m_btnSwitchStartOrEnd);
+			this.Controls.Add(this.m_btnDone);
+			this.Name = "RCornerDlg";
+			this.Text = "R角";
+			this.m_secStatus.ResumeLayout(false);
+			this.ResumeLayout(false);
 
-        }
+		}
 
-        #endregion
+		#endregion
 
-        private System.Windows.Forms.Label m_lblStatus;
-        private System.Windows.Forms.Button m_btnDelete;
-        private System.Windows.Forms.Button m_btnSwitchStartOrEnd;
-        private System.Windows.Forms.Button m_btnDone;
-    }
+		private CommonUI.Controls.SectionPanel m_secStatus;
+		private System.Windows.Forms.Label m_lblStatus;
+		private CommonUI.Controls.ThemedButton m_btnDelete;
+		private CommonUI.Controls.ThemedButton m_btnSwitchStartOrEnd;
+		private CommonUI.Controls.ThemedButton m_btnDone;
+	}
 }

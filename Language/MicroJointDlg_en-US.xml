@@ -4,5 +4,4 @@
 	<Message ID="m_lblLength" Content="Micro-joint Length" />
 	<Message ID="m_btnClearAll" Content="Delete All Micro-joints" />
 	<Message ID="m_btnDelete" Content="Delete" />
-	<Message ID="m_btnCancel" Content="Done" />
 </ResMap>

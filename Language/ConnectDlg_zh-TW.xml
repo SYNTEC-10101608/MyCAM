@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResMap>
-  <Message ID="FormTitle" Content="連線設定" />
+  <Message ID="ConnectDlg" Content="連線設定" />
   <Message ID="m_lblIP" Content="IP：" />
-  <Message ID="m_btnConfirm" Content="確認" />
-  <Message ID="m_lblTips_Default" Content="請以IPv4格式輸入" />
+  <Message ID="m_lblTips" Content="請以IPv4格式輸入" />
   <Message ID="Error_InvalidIPFormat" Content="輸入格式錯誤，請以IPv4格式輸入" />
 </ResMap>

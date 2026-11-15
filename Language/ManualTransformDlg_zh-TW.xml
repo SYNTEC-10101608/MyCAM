@@ -2,13 +2,12 @@
 <ResMap>
 	<Message ID="ManualTransformDlg" Content="工件對齊" />
 	<Message ID="m_lblMethod" Content="對齊方式" />
-	<Message ID="m_lblAxisPlane" Content="對齊點" />
+	<Message ID="m_lblAxisPlane_Point" Content="對齊點" />
 	<Message ID="m_lblAxisPlane_Axis" Content="對齊軸" />
 	<Message ID="m_lblAxisPlane_Plane" Content="對齊面" />
 	<Message ID="m_lblMoveStatus_Selected" Content="✔ 工件" />
 	<Message ID="m_lblMoveStatus_NotSelected" Content="✘ 工件" />
 	<Message ID="m_lblGuide_Default" Content="請先選擇對齊方式" />
-	<Message ID="m_btnConfirm" Content="OK" />
 	<Message ID="Method_Point" Content="點對齊" />
 	<Message ID="Method_Axial" Content="軸向對齊" />
 	<Message ID="Method_AxialParallel" Content="軸向平行" />

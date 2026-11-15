@@ -10,5 +10,4 @@
 	<Message ID="m_btnMoveUp" Content="Move Up (Earlier)" />
 	<Message ID="m_btnMoveDown" Content="Move Down (Later)" />
 	<Message ID="m_btnMoveToTop" Content="Move to Top" />
-	<Message ID="m_btnApply" Content="Apply" />
 </ResMap>

@@ -1,0 +1,10 @@
+# Confirmed exceptions of CheckStatic.ps1: <rule> <class> <control|*> <reason>
+# Keep one line per exception and explain why the rule does not apply.
+
+# S6: captions that are always replaced at runtime; the designer text is only a zh-TW placeholder
+S6 ManualTransformDlg m_lblAxisPlane text depends on the alignment method (m_lblAxisPlane_Point / _Axis / _Plane)
+S6 MeasureDlg m_lblGuide guide text is set by Initialize() for the selected method
+S6 ManualTransformDlg m_lblGuide guide text is set by Initialize() for the selected method
+S6 ManualTransformDlg m_lblMoveStatus status text is set by UpdateSelectionStatusAndEnableConfirm()
+S6 OrderDialog m_gbxContent section title depends on the order mode (m_gbxContent_Sequential / _Swap)
+S7 ConnectDlg m_lblTips the IP format error replaces the hint only after the user presses confirm (after Load)

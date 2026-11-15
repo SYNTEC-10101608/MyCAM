@@ -17,25 +17,10 @@ namespace MyCAM.Editor
 		public Action Confirm;
 		public Action Cancel;
 
-		public void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "OrderDialog", this.Text );
-			m_gbxOrderMode.Text = m_LanguageManager.TryGetString( "m_gbxOrderMode", m_gbxOrderMode.Text );
-			m_rbSequentialOrder.Text = m_LanguageManager.TryGetString( "m_rbSequentialOrder", m_rbSequentialOrder.Text );
-			m_rbPathSwap.Text = m_LanguageManager.TryGetString( "m_rbPathSwap", m_rbPathSwap.Text );
-			m_lblSequentialDesc.Text = m_LanguageManager.TryGetString( "m_lblSequentialDesc", m_lblSequentialDesc.Text );
-			m_btnMoveUp.Text = m_LanguageManager.TryGetString( "m_btnMoveUp", m_btnMoveUp.Text );
-			m_btnMoveDown.Text = m_LanguageManager.TryGetString( "m_btnMoveDown", m_btnMoveDown.Text );
-			m_btnMoveToTop.Text = m_LanguageManager.TryGetString( "m_btnMoveToTop", m_btnMoveToTop.Text );
-			m_btnApply.Text = m_LanguageManager.TryGetString( "m_btnApply", m_btnApply.Text );
-			UpdateUIByMode();
-		}
-
 		public OrderDialog()
 		{
 			InitializeComponent();
 			InitializeDialog();
-			ApplyResourcesToUI();
 		}
 
 		public void CloseDialog()

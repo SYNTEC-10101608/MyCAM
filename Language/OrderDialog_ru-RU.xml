@@ -10,5 +10,4 @@
 	<Message ID="m_btnMoveUp" Content="Переместить вперед (порядок уменьшается)" />
 	<Message ID="m_btnMoveDown" Content="Переместить назад (порядок увеличивается)" />
 	<Message ID="m_btnMoveToTop" Content="Переместить в начало" />
-	<Message ID="m_btnApply" Content="ОК" />
 </ResMap>

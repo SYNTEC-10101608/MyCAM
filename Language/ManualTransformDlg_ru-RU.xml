@@ -2,13 +2,12 @@
 <ResMap>
 	<Message ID="ManualTransformDlg" Content="Выравнивание деталей" />
 	<Message ID="m_lblMethod" Content="Способ выравнивания" />
-	<Message ID="m_lblAxisPlane" Content="Точка выравнивания" />
+	<Message ID="m_lblAxisPlane_Point" Content="Точка выравнивания" />
 	<Message ID="m_lblAxisPlane_Axis" Content="Ось выравнивания" />
 	<Message ID="m_lblAxisPlane_Plane" Content="Плоскость выравнивания" />
 	<Message ID="m_lblMoveStatus_Selected" Content="✔ Деталь" />
 	<Message ID="m_lblMoveStatus_NotSelected" Content="✘ Деталь" />
 	<Message ID="m_lblGuide_Default" Content="Пожалуйста, сначала выберите способ выравнивания" />
-	<Message ID="m_btnConfirm" Content="ОК" />
 	<Message ID="Method_Point" Content="Выравнивание точки" />
 	<Message ID="Method_Axial" Content="Осевое выравнивание" />
 	<Message ID="Method_AxialParallel" Content="Осевая параллель" />

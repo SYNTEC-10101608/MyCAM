@@ -13,16 +13,6 @@ namespace MyCAM.Editor.Dialog
 		{
 			InitializeComponent();
 			m_LanguageManager = new LanguageManager.LanguageManager( "GlassDXFImportDlg" );
-			ApplyResourcesToUI();
-		}
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "GlassDXFImportDlg", this.Text );
-			m_lblRadius.Text = m_LanguageManager.TryGetString( "m_lblRadius", m_lblRadius.Text );
-			m_lblHeight.Text = m_LanguageManager.TryGetString( "m_lblHeight", m_lblHeight.Text );
-			m_btnOK.Text = m_LanguageManager.TryGetString( "m_btnOK", m_btnOK.Text );
-			m_btnCancel.Text = m_LanguageManager.TryGetString( "m_btnCancel", m_btnCancel.Text );
 		}
 
 		void BtnOK_Click( object sender, EventArgs e )
