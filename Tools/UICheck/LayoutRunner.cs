@@ -110,6 +110,13 @@ namespace UICheck
 					form = HostPanel( (Control)instance );
 				}
 
+				// wizard dialogs show one step through a method of their own
+				string szPrepare;
+				if( PREPARE_METHOD_MAP.TryGetValue( type.Name, out szPrepare ) ) {
+					BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+					type.GetMethod( szPrepare, flags ).Invoke( instance, null );
+				}
+
 				// show without disturbing the desktop; the layout and the language texts are applied on Load
 				form.Opacity = 0;
 				form.Show();
@@ -321,6 +328,12 @@ namespace UICheck
 		const int CHECK_GLYPH_WIDTH = 18;
 
 		// the main window is checked by screenshots; the remote screen only hosts the VNC view
+		// method called before the check, e.g. to show the main step of a wizard
+		static readonly Dictionary<string, string> PREPARE_METHOD_MAP = new Dictionary<string, string>
+		{
+			{ "DesignSupportBracketDlg", "ShowInputParametersPanel" }
+		};
+
 		static readonly HashSet<string> SKIP_TYPE_LIST = new HashSet<string> { "StartupForm", "CNCDlg" };
 
 		// embedded panels are hosted at a typical size of their area in the main window

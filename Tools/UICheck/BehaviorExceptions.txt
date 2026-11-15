@@ -25,3 +25,4 @@ B6 CNCThreePointDlg m_lbl*Step step labels become the titles of their sections (
 B6 CNCThreePointDlg m_lbl*Title section title labels removed; the step title names the section
 B6 ThreePtTransformDlg tbxCAD* TextBox -> Label, confirmed display only (disabled, code only sets Text)
 B6 ThreePtTransformDlg tbxMachine* TextBox -> DebouncedNumericUpDown (3 decimals, same default values); an empty field can no longer occur, so the "invalid coordinate" warning is only reached by non-numeric input that the box already rejects
+B6 DesignSupportBracketDlg m_lblSection* section title labels moved to the m_sec* section titles
