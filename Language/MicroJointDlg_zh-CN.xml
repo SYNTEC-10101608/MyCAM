@@ -4,5 +4,4 @@
 	<Message ID="m_lblLength" Content="微连长度" />
 	<Message ID="m_btnClearAll" Content="删除所有微连" />
 	<Message ID="m_btnDelete" Content="删除" />
-	<Message ID="m_btnCancel" Content="完成" />
 </ResMap>

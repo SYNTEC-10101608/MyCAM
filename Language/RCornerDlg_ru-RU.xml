@@ -3,5 +3,4 @@
   <Message ID="RCornerDlg" Content="R-угол" />
   <Message ID="m_btnDelete" Content="Удалить" />
   <Message ID="m_btnSwitchStartOrEnd" Content="Изменить начало и конец" />
-  <Message ID="m_btnDone" Content="Готово" />
 </ResMap>

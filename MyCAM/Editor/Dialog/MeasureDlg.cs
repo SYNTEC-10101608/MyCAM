@@ -9,17 +9,9 @@ namespace MyCAM.Editor
 		{
 			InitializeComponent();
 			InitMethodComboBox();
-			ApplyResourcesToUI();
 		}
 
 		public Action<EMeasureType> MeasureMethodChanged;
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "MeasureDlg", this.Text );
-			m_lblMethod.Text = m_LanguageManager.TryGetString( "m_lblMethod", m_lblMethod.Text );
-			m_lblResult.Text = m_LanguageManager.TryGetString( "m_lblResult", m_lblResult.Text );
-		}
 
 		public void Initialize()
 		{

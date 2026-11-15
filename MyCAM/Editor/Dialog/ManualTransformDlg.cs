@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using CommonUI.Theme;
 
 namespace MyCAM.Editor
 {
@@ -9,18 +10,10 @@ namespace MyCAM.Editor
 		{
 			InitializeComponent();
 			InitMethodComboBox();
-			ApplyResourcesToUI();
 		}
 
 		public Action<ETrsfConstraintType> ConstraintMethodChanged;
 		public Action<int> G54AxisPlaneSelectionChanged;
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "ManualTransformDlg", this.Text );
-			m_lblMethod.Text = m_LanguageManager.TryGetString( "m_lblMethod", m_lblMethod.Text );
-			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
-		}
 
 		public void Initialize()
 		{
@@ -55,11 +48,11 @@ namespace MyCAM.Editor
 			// update workpiece hint text
 			if( isWorkpieceSelected ) {
 				m_lblMoveStatus.Text = m_LanguageManager.TryGetString( "m_lblMoveStatus_Selected", m_lblMoveStatus.Text );
-				m_lblMoveStatus.ForeColor = System.Drawing.Color.Green;
+				m_lblMoveStatus.Role = TextRole.Success;
 			}
 			else {
 				m_lblMoveStatus.Text = m_LanguageManager.TryGetString( "m_lblMoveStatus_NotSelected", m_lblMoveStatus.Text );
-				m_lblMoveStatus.ForeColor = System.Drawing.Color.Gray;
+				m_lblMoveStatus.Role = TextRole.Secondary;
 			}
 		}
 
@@ -120,7 +113,7 @@ namespace MyCAM.Editor
 			switch( type ) {
 				case ETrsfConstraintType.Point:
 					m_cmbAxisPlane.Items.Add( m_LanguageManager.TryGetString( "AxisPlane_Origin", AXIS_PLANE_ORIGIN ) );
-					m_lblAxisPlane.Text = m_LanguageManager.TryGetString( "m_lblAxisPlane", m_lblAxisPlane.Text );
+					m_lblAxisPlane.Text = m_LanguageManager.TryGetString( "m_lblAxisPlane_Point", m_lblAxisPlane.Text );
 					break;
 				case ETrsfConstraintType.Axial:
 				case ETrsfConstraintType.AxialParallel:

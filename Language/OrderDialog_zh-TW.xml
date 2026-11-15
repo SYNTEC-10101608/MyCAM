@@ -10,5 +10,4 @@
     <Message ID="m_btnMoveUp" Content="往前移動（順序變小）" />
     <Message ID="m_btnMoveDown" Content="往後移動（順序變大）" />
     <Message ID="m_btnMoveToTop" Content="置頂" />
-    <Message ID="m_btnApply" Content="確定" />
 </ResMap>

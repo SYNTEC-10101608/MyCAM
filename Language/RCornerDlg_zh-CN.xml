@@ -3,5 +3,4 @@
   <Message ID="RCornerDlg" Content="R角" />
   <Message ID="m_btnDelete" Content="删除" />
   <Message ID="m_btnSwitchStartOrEnd" Content="切换起终点" />
-  <Message ID="m_btnDone" Content="完成" />
 </ResMap>

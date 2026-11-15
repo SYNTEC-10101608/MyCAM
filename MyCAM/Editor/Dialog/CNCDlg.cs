@@ -12,12 +12,11 @@ namespace MyCAM.Editor.Dialog
 		public CNCDlg()
 		{
 			InitializeComponent();
-			ApplyResourcesToUI();
+			InitAspectRatio();
 		}
 
-		public void ApplyResourcesToUI()
+		void InitAspectRatio()
 		{
-			this.Text = m_LanguageManager.TryGetString( "CNCDlg", this.Text );
 			// calculate and store original aspect ratio
 			m_DlgHeightAndWidthRatio = (double)ClientSize.Width / ClientSize.Height;
 
@@ -113,7 +112,5 @@ namespace MyCAM.Editor.Dialog
 			UpdateVNCScreen();
 			m_IsResizing = false;
 		}
-
-		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "CNCDlg" );
 	}
 }

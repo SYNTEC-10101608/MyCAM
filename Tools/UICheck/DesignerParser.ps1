@@ -21,7 +21,8 @@ function Read-DesignerText( [string]$szText, [string]$szCode ) {
 	}
 
 	# field declarations at the end of the designer file
-	foreach ($match in [regex]::Matches($szText, "(?m)^\s*(?:private|internal|public|protected)\s+(?:readonly\s+)?([\w.]+)\s+(\w+)\s*;")) {
+	# the access modifier is optional (the default is private)
+	foreach ($match in [regex]::Matches($szText, "(?m)^\s*(?:(?:private|internal|public|protected)\s+)?(?:readonly\s+)?((?:\w+\.)+\w+|\w+(?=\s+m_))\s+(\w+)\s*;")) {
 		$screen.Fields[$match.Groups[2].Value] = $match.Groups[1].Value
 	}
 
@@ -33,7 +34,8 @@ function Read-DesignerText( [string]$szText, [string]$szCode ) {
 	$body = $body -replace "(?m)^\s*//.*$", ""
 	$statements = [regex]::Split(($body -replace "\r?\n\s*", " "), ";(?=\s*(this\.|\(\(|$))")
 	foreach ($statement in $statements) {
-		$s = $statement.Trim()
+		# hand-edited files put spaces inside parentheses
+		$s = $statement.Trim() -replace "\(\s+", "(" -replace "\s+\)", ")"
 		if ($s -match "^this\.Controls\.Add\(this\.(\w+)\)") {
 			Add-Child $screen "(form)" $Matches[1]
 		}

@@ -3,5 +3,4 @@
 	<Message ID="RCornerDlg" Content="RCorner" />
 	<Message ID="m_btnDelete" Content="Delete" />
 	<Message ID="m_btnSwitchStartOrEnd" Content="Switch Start/End" />
-	<Message ID="m_btnDone" Content="Done" />
 </ResMap>

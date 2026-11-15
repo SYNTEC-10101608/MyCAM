@@ -1,5 +1,6 @@
 ﻿using System.Windows.Forms;
 using CommonUI.Forms;
+using CommonUI.Theme;
 using MyCAM.App;
 
 namespace MyCAM.Editor.Dialog
@@ -11,7 +12,6 @@ namespace MyCAM.Editor.Dialog
 		{
 			InitializeComponent();
 			m_txbIP.Text = MyApp.AppSetting.CNCIP;
-			ApplyResourcesToUI();
 		}
 
 		public event System.Action<string> ConfirmEvent;
@@ -21,7 +21,7 @@ namespace MyCAM.Editor.Dialog
 			string ip = m_txbIP.Text?.Trim();
 			if( string.IsNullOrEmpty( ip ) || !IsValidIP( ip ) ) {
 				m_lblTips.Text = m_LanguageManager.TryGetString( "Error_InvalidIPFormat", m_lblTips.Text );
-				m_lblTips.ForeColor = System.Drawing.Color.Red;
+				m_lblTips.Role = TextRole.Error;
 				return;
 			}
 
@@ -70,14 +70,6 @@ namespace MyCAM.Editor.Dialog
 			}
 
 			return true;
-		}
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "FormTitle", this.Text );
-			m_lblIP.Text = m_LanguageManager.TryGetString( "m_lblIP", m_lblIP.Text );
-			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
-			m_lblTips.Text = m_LanguageManager.TryGetString( "m_lblTips_Default", m_lblTips.Text );
 		}
 
 		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ConnectDlg" );

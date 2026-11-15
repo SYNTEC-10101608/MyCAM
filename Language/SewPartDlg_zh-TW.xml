@@ -2,5 +2,4 @@
 <ResMap>
 	<Message ID="SewPartDlg" Content="縫補設置" />
 	<Message ID="m_lblSewTol" Content="縫補精度:" />
-	<Message ID="m_btnOK" Content="OK" />
 </ResMap>
