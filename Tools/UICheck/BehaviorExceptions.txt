@@ -20,3 +20,6 @@ B6 ToolVectorDlg m_lblOnePntToolVecAdjust title moved to m_secToolVecInfo
 B6 ToolVectorDlg m_lblToolDirQuickSetBtn title moved to m_secQuickSet
 B6 ToolVectorDlg m_lblSetBtn title moved to m_secSetting
 B6 ToolVectorDlg m renamed to m_lblInterpolateType (its language ID)
+B6 CNCThreePointDlg m_txtDrawing* TextBox -> Label, confirmed read-only (ReadOnly, TabStop false, code only sets Text / Enabled)
+B6 CNCThreePointDlg m_lbl*Step step labels become the titles of their sections (Highlighted marks the current step)
+B6 CNCThreePointDlg m_lbl*Title section title labels removed; the step title names the section

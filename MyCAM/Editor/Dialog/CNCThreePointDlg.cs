@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Windows.Forms;
 using CommonUI.Controls;
 using CommonUI.Forms;
+using CommonUI.Theme;
 
 namespace MyCAM.Editor.Dialog
 {
@@ -20,7 +21,7 @@ namespace MyCAM.Editor.Dialog
 		public CNCThreePointDlg()
 		{
 			InitializeComponent();
-			m_DrawingFields = new[ , ] {
+			m_DrawingFields = new Control[ , ] {
 				{ m_txtDrawing1X, m_txtDrawing1Y, m_txtDrawing1Z },
 				{ m_txtDrawing2X, m_txtDrawing2Y, m_txtDrawing2Z },
 				{ m_txtDrawing3X, m_txtDrawing3Y, m_txtDrawing3Z }
@@ -30,8 +31,8 @@ namespace MyCAM.Editor.Dialog
 				{ m_txtWorkpiece2X, m_txtWorkpiece2Y, m_txtWorkpiece2Z },
 				{ m_txtWorkpiece3X, m_txtWorkpiece3Y, m_txtWorkpiece3Z }
 			};
-			PanelButton[] captureButtons = { m_btnCapture1, m_btnCapture2, m_btnCapture3 };
-			PanelButton[] resetButtons = { m_btnReset1, m_btnReset2, m_btnReset3 };
+			ThemedButton[] captureButtons = { m_btnCapture1, m_btnCapture2, m_btnCapture3 };
+			ThemedButton[] resetButtons = { m_btnReset1, m_btnReset2, m_btnReset3 };
 			for( int point = 0; point < m_WorkpieceFields.GetLength( 0 ); point++ ) {
 				int index = point;
 				captureButtons[ point ].Click += ( sender, e ) => WorkpiecePointCaptureRequested?.Invoke( index );
@@ -45,7 +46,7 @@ namespace MyCAM.Editor.Dialog
 				field.TextChanged += OnInputChanged;
 			}
 
-			foreach( TextBox field in m_DrawingFields ) {
+			foreach( Control field in m_DrawingFields ) {
 				field.TextChanged += OnInputChanged;
 			}
 
@@ -63,7 +64,7 @@ namespace MyCAM.Editor.Dialog
 			ApplyResources();
 		}
 
-		internal LanguageManager.LanguageManager Language { get; } = new LanguageManager.LanguageManager( "CNCThreePointDialog" );
+		internal LanguageManager.LanguageManager Language { get; } = new LanguageManager.LanguageManager( "CNCThreePointDlg" );
 		internal event Action<int> WorkpiecePointCaptureRequested;
 		internal event Action<int> DrawingPointResetRequested;
 		internal event Action CalculateRequested;
@@ -98,7 +99,7 @@ namespace MyCAM.Editor.Dialog
 		internal void SetWorkpiecePoint( int point, string[] coordinates ) => WritePoint( m_WorkpieceFields, point, coordinates );
 		internal void SetWorkpieceInput( int point, int axis, string value ) => m_WorkpieceFields[ point, axis ].Text = value;
 
-		static string[,] ReadFields( TextBox[,] fields )
+		static string[,] ReadFields( Control[,] fields )
 		{
 			string[,] values = new string[ fields.GetLength( 0 ), fields.GetLength( 1 ) ];
 			for( int point = 0; point < fields.GetLength( 0 ); point++ ) {
@@ -109,7 +110,7 @@ namespace MyCAM.Editor.Dialog
 			return values;
 		}
 
-		void WritePoint( TextBox[,] fields, int point, string[] coordinates )
+		void WritePoint( Control[,] fields, int point, string[] coordinates )
 		{
 			m_Loading = true;
 			try {
@@ -181,7 +182,7 @@ namespace MyCAM.Editor.Dialog
 				: Language.TryGetString( "DrawingOnly_Offline", DRAWING_ONLY_OFFLINE );
 			bool enabled = !busy && !picking;
 			m_pnlDrawing.Enabled = !busy;
-			foreach( TextBox field in m_DrawingFields ) {
+			foreach( Control field in m_DrawingFields ) {
 				field.Enabled = enabled;
 			}
 
@@ -194,17 +195,17 @@ namespace MyCAM.Editor.Dialog
 			m_pnlWorkpiece.Enabled = calibrationEnabled && enabled && drawingComplete && !capturing;
 			m_txtTolerance.Enabled = calibrationEnabled && enabled;
 			m_btnCalculate.Enabled = calibrationEnabled && enabled && drawingComplete && !capturing;
-			SetStepAppearance( m_lblDrawingStep, Language.TryGetString( "Step_Drawing", DRAWING_STEP ), ThreePointStep.Drawing, step );
-			SetStepAppearance( m_lblWorkpieceStep, Language.TryGetString( "Step_Workpiece", WORKPIECE_STEP ), ThreePointStep.Workpiece, step );
-			SetStepAppearance( m_lblCalculationStep, Language.TryGetString( "Step_Calculation", CALCULATION_STEP ), ThreePointStep.Calculation, step );
+			SetStepAppearance( m_pnlDrawing, Language.TryGetString( "Step_Drawing", DRAWING_STEP ), ThreePointStep.Drawing, step );
+			SetStepAppearance( m_pnlWorkpiece, Language.TryGetString( "Step_Workpiece", WORKPIECE_STEP ), ThreePointStep.Workpiece, step );
+			SetStepAppearance( m_secCalculation, Language.TryGetString( "Step_Calculation", CALCULATION_STEP ), ThreePointStep.Calculation, step );
 			m_lblDrawingDescription.Text = picking
 				? pickIndex >= 0 ? string.Format( Language.TryGetString( "Drawing_Repicking", DRAWING_REPICKING ), pickIndex + 1 )
 				: string.Format( Language.TryGetString( "Drawing_Picking", DRAWING_PICKING ), pickCount + 1, pickCount )
 				: drawingComplete ? Language.TryGetString( "Drawing_Complete", DRAWING_COMPLETE ) : Language.TryGetString( "Drawing_Initial", DRAWING_INITIAL );
-			m_lblDrawingDescription.ForeColor = step == ThreePointStep.Drawing ? ACTIVE_FORE_COLOR : Color.DimGray;
+			m_lblDrawingDescription.Role = step == ThreePointStep.Drawing ? TextRole.Body : TextRole.Secondary;
 			m_lblWorkpieceDescription.Text = step == ThreePointStep.Drawing ? Language.TryGetString( "Workpiece_Waiting", WORKPIECE_WAITING )
 				: workpieceComplete ? Language.TryGetString( "Workpiece_Complete", WORKPIECE_COMPLETE ) : Language.TryGetString( "Workpiece_Initial", WORKPIECE_INITIAL );
-			m_lblWorkpieceDescription.ForeColor = step == ThreePointStep.Workpiece ? ACTIVE_FORE_COLOR : Color.DimGray;
+			m_lblWorkpieceDescription.Role = step == ThreePointStep.Workpiece ? TextRole.Body : TextRole.Secondary;
 		}
 
 		void SetCalibrationVisible( bool visible )
@@ -213,24 +214,23 @@ namespace MyCAM.Editor.Dialog
 				return;
 			}
 
-			int heightChange = m_btnCalculate.Bottom - m_chbDrawingOnly.Bottom;
 			m_CalibrationVisible = visible;
-			if( visible ) {
-				ClientSize = new Size( ClientSize.Width, ClientSize.Height + heightChange );
-			}
-			m_lblWorkpieceStep.Visible = m_pnlWorkpiece.Visible = m_lblCalculationStep.Visible = visible;
+			m_pnlWorkpiece.Visible = m_secCalculation.Visible = visible;
 			m_lblTolerance.Visible = m_txtTolerance.Visible = m_lblToleranceUnit.Visible = visible;
 			m_lblError.Visible = m_lblErrorValue.Visible = m_btnCalculate.Visible = visible;
-			if( !visible ) {
-				ClientSize = new Size( ClientSize.Width, ClientSize.Height - heightChange );
-			}
+
+			// the dialog ends below the last shown section
+			int nContentBottom = visible
+				? SectionStack.Arrange( m_pnlDrawing, m_secOption, m_pnlWorkpiece, m_secCalculation )
+				: SectionStack.Arrange( m_pnlDrawing, m_secOption );
+			SectionStack.PlaceButtonBar( this, nContentBottom );
 		}
 
 		void DisplayCalculationError( double? error, bool successful, bool completed )
 		{
 			m_lblErrorValue.Text = error.HasValue ? error.Value.ToString( NUMBER_FORMAT, CultureInfo.InvariantCulture ) + " mm"
 				: completed ? Language.TryGetString( "Error_Unavailable", ERROR_UNAVAILABLE ) : "— mm";
-			m_lblErrorValue.ForeColor = !error.HasValue ? Color.DimGray : successful ? SUCCESS_FORE_COLOR : FAILURE_FORE_COLOR;
+			m_lblErrorValue.Role = !error.HasValue ? TextRole.Secondary : successful ? TextRole.Success : TextRole.Error;
 		}
 
 		public void ApplyResources()
@@ -239,8 +239,6 @@ namespace MyCAM.Editor.Dialog
 			m_btnPickDrawing.Text = Language.TryGetString( "PickDrawing", PICK_DRAWING );
 			m_btnReset1.Text = m_btnReset2.Text = m_btnReset3.Text = Language.TryGetString( "Reset", RESET );
 			m_btnPickCancel.Text = Language.TryGetString( "Cancel", CANCEL );
-			m_lblDrawingTitle.Text = Language.TryGetString( "DrawingPoints", DRAWING_POINTS );
-			m_lblWorkpieceTitle.Text = Language.TryGetString( "WorkpiecePoints", WORKPIECE_POINTS );
 			Label[] drawingLabels = { m_lblDrawing1, m_lblDrawing2, m_lblDrawing3 };
 			Label[] workpieceLabels = { m_lblWorkpiece1, m_lblWorkpiece2, m_lblWorkpiece3 };
 			for( int point = 0; point < drawingLabels.Length; point++ ) {
@@ -252,33 +250,26 @@ namespace MyCAM.Editor.Dialog
 			m_btnCalculate.Text = Language.TryGetString( "Calculate", CALCULATE );
 		}
 
-		void SetStepAppearance( Label label, string title, ThreePointStep step, ThreePointStep current )
+		void SetStepAppearance( SectionPanel section, string title, ThreePointStep step, ThreePointStep current )
 		{
 			bool active = step == current;
 			string status = active ? Language.TryGetString( "Step_Current", STEP_CURRENT )
 				: current == ThreePointStep.None || step < current ? Language.TryGetString( "Step_Complete", STEP_COMPLETE )
 				: step == ThreePointStep.Workpiece ? Language.TryGetString( "Step_WaitDrawing", STEP_WAIT_DRAWING ) : Language.TryGetString( "Step_WaitBoth", STEP_WAIT_BOTH );
-			label.Text = string.Format( Language.TryGetString( "Step_Format", STEP_FORMAT ), title, status );
-			label.BackColor = active ? ACTIVE_BACK_COLOR : BackColor;
-			label.ForeColor = active ? ACTIVE_FORE_COLOR : Color.DimGray;
+			section.Text = string.Format( Language.TryGetString( "Step_Format", STEP_FORMAT ), title, status );
+			section.Highlighted = active;
 		}
 
-		readonly TextBox[,] m_DrawingFields;
+		readonly Control[,] m_DrawingFields;
 		readonly TextBox[,] m_WorkpieceFields;
 		bool m_Loading;
 		bool m_CalibrationVisible = true;
 
 		const string NUMBER_FORMAT = "F3";
-		static readonly Color ACTIVE_FORE_COLOR = Color.FromArgb( 30, 64, 175 );
-		static readonly Color ACTIVE_BACK_COLOR = Color.FromArgb( 219, 234, 254 );
-		static readonly Color SUCCESS_FORE_COLOR = Color.FromArgb( 44, 122, 63 );
-		static readonly Color FAILURE_FORE_COLOR = Color.FromArgb( 210, 60, 60 );
 		internal const string TITLE = "三點校正";
 		const string PICK_DRAWING = "重選圖紙點";
 		const string RESET = "重設";
 		const string CANCEL = "取消";
-		const string DRAWING_POINTS = "圖紙點";
-		const string WORKPIECE_POINTS = "工作點";
 		const string POINT = "點 {0}";
 		const string CAPTURE = "帶入";
 		const string TOLERANCE = "誤差容忍";

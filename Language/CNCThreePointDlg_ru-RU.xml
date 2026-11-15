@@ -4,8 +4,6 @@
 	<Message ID="PickDrawing" Content="Выбрать заново" />
 	<Message ID="Reset" Content="Сброс" />
 	<Message ID="Cancel" Content="Отмена" />
-	<Message ID="DrawingPoints" Content="Точки чертежа" />
-	<Message ID="WorkpiecePoints" Content="Точки детали" />
 	<Message ID="Point" Content="Т. {0}" />
 	<Message ID="Capture" Content="Ввести" />
 	<Message ID="Tolerance" Content="Допуск" />

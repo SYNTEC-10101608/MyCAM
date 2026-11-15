@@ -36,3 +36,6 @@ S5 ToolVectorDlg m_pnlColor* 16 x 16 legend swatches are centered on the text ro
 S6 ToolVectorDlg m_lblStartOrEnd text is set by EnableStartEndSwitch() (m_lblStartOrEnd_Start / _End)
 S6 ToolVectorDlg m_lblLegendMaster text contains the axis name, set by UpdateInterpolateTypeNames()
 S6 ToolVectorDlg m_lblLegendSlave text contains the axis name, set by UpdateInterpolateTypeNames()
+S6 CNCThreePointDlg * captions are set in code: shared with CNCThreePointAction (Title) or formatted / shared by several controls
+S1 CNCThreePointDlg m_txtWorkpiece* pending decision: an empty field means the point is not entered yet, a numeric box cannot stay empty
+S1 CNCThreePointDlg m_txtTolerance pending decision: same empty-text semantics as the workpiece fields

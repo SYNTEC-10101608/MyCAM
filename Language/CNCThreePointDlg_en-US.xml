@@ -4,8 +4,6 @@
 	<Message ID="PickDrawing" Content="Reselect points" />
 	<Message ID="Reset" Content="Reset" />
 	<Message ID="Cancel" Content="Cancel" />
-	<Message ID="DrawingPoints" Content="Drawing points" />
-	<Message ID="WorkpiecePoints" Content="Workpiece points" />
 	<Message ID="Point" Content="Pt. {0}" />
 	<Message ID="Capture" Content="Capture" />
 	<Message ID="Tolerance" Content="Tolerance" />
