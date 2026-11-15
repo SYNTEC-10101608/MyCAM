@@ -31,3 +31,8 @@ S6 LockMSAxisDlg m_chkLockMaster contains the axis name (Format_LockMaster, set 
 S6 LockMSAxisDlg m_lblSlaveAngle contains the axis name (Format_SlaveAngle, set in code)
 S6 LockMSAxisDlg m_lblMasterAngle contains the axis name (Format_MasterAngle, set in code)
 S6 PatternSettingDlg label* labels of the pattern panels share their texts (set in code)
+S2 ToolVectorDlg m_pnlColor* legend swatches use the data colors of the interpolation preview
+S5 ToolVectorDlg m_pnlColor* 16 x 16 legend swatches are centered on the text row
+S6 ToolVectorDlg m_lblStartOrEnd text is set by EnableStartEndSwitch() (m_lblStartOrEnd_Start / _End)
+S6 ToolVectorDlg m_lblLegendMaster text contains the axis name, set by UpdateInterpolateTypeNames()
+S6 ToolVectorDlg m_lblLegendSlave text contains the axis name, set by UpdateInterpolateTypeNames()

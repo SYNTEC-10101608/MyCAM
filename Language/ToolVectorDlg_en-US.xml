@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="ToolVectorDlg" Content="Edge Tool Orientation" />
-	<Message ID="m_lblOnePntToolVecAdjust" Content="Single-Point Tool Orientation" />
+	<Message ID="m_secToolVecInfo" Content="Single-Point Tool Orientation" />
 	<Message ID="m_lblADeg" Content="Forward Tilt Angle" />
 	<Message ID="m_lblBDeg" Content="Lateral Tilt Angle" />
-	<Message ID="m_lblMaster" Content="C" />
-	<Message ID="m_lblSlave" Content="A" />
-	<Message ID="m" Content="Interpolation Method" />
-	<Message ID="m_lblToolDirQuickSetBtn" Content="Quick Tool Orientation Settings" />
+	<Message ID="m_lblInterpolateType" Content="Interpolation Method" />
+	<Message ID="m_secQuickSet" Content="Quick Tool Orientation Settings" />
 	<Message ID="m_btnZDir" Content="Z-Axis Facing" />
 	<Message ID="m_btnKeep" Content="Keep Previous Orientation" />
 	<Message ID="m_btnRevert" Content="Original" />
@@ -15,7 +13,7 @@
 	<Message ID="m_btnSwitchStartEnd" Content="Start/End" />
 	<Message ID="m_lblStartOrEnd_Start" Content="Current Position: Start Point" />
 	<Message ID="m_lblStartOrEnd_End" Content="Current Position: End Point" />
-	<Message ID="m_lblSetBtn" Content="Tool Orientation Settings" />
+	<Message ID="m_secSetting" Content="Tool Orientation Settings" />
 	<Message ID="m_btnAdd" Content="Add" />
 	<Message ID="m_btnRemove" Content="Delete" />
 	<Message ID="m_btnClear" Content="Clear All Control Points" />
@@ -32,8 +30,6 @@
 	<Message ID="m_lblLegendNormal" Content="Maintain" />
 	<Message ID="m_lblLegendRotary" Content="Rotary Axis Smoothing" />
 	<Message ID="m_lblLegendBevel" Content="Tilt-Angle Bevel Cutting" />
-	<Message ID="m_lblLegendMaster" Content="Master Axis" />
-	<Message ID="m_lblLegendSlave" Content="Slave Axis" />
 	<Message ID="InterpolateType_Normal" Content="Maintain Default" />
 	<Message ID="InterpolateType_Rotary" Content="Rotary Axis Smoothing" />
 	<Message ID="InterpolateType_Bevel" Content="Tilt-Angle Bevel Cutting" />
