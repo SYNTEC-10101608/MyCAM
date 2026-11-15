@@ -40,3 +40,4 @@ S6 CNCThreePointDlg * captions are set in code: shared with CNCThreePointAction 
 S1 CNCThreePointDlg m_txtWorkpiece* pending decision: an empty field means the point is not entered yet, a numeric box cannot stay empty
 S1 CNCThreePointDlg m_txtTolerance pending decision: same empty-text semantics as the workpiece fields
 S5 DesignSupportBracketDlg m_pnl* the three step panels share the dialog; ShowPanel() sizes the dialog to the shown one
+S6 CNCOffsetDialog * captions use IDs shared with CNCOffsetController (Title / SetZero / ClearAll), set in code
