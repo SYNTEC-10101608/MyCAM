@@ -42,6 +42,9 @@
 | 2026-11-15 | 區塊標題 | 現有 UI 中語意上是「畫面區塊標題」的元素要盤點並統一處理，可參考舊分支的做法（區塊標題改為卡片標題）。 |
 | 2026-11-15 | 驗收腳本 | P5 驗收要比照舊分支建立檢查腳本，驗證最終結果是否符合設計原則。 |
 | 2026-11-15 | P0 定稿 | 草案 v0.5 定稿為 `.github/instructions/ui-style.instructions.md`。施工時補訂的細節：有標題卡片第一列 `y = 36`、標籤相對列頂下移 4、`CheckBox` / `RadioButton` 下移 2；確定鍵文字統一為「確定」；工具列圖示分兩種尺寸（功能工具列 40×40，選單 / 圖層列 / 視角列 / 右鍵選單 20×20）。 |
+| 2026-11-16 | 施工中訂定的細節（P1～P4） | 1. 卡片內的動作按鈕高 23；只作用於該卡片、或須隨卡片一起停用的按鈕留在卡片內，不移到底部按鈕列（例：`ContourEditDlg` 全部按鈕隨群組停用）。2. RadioButton 群組與會切換 `Enabled` / `Visible` 的容器一律保留原名稱，改為無外觀 `Panel`。3. 多個控制項共用的文字、含 `{0}` 的格式文字、與其他類別共用的 ID，留在程式中取字串；語系檔中與控制項同名、但其實由程式動態組成的 ID 一律刪除或改名，避免被自動套用覆蓋（`ToolVectorDlg` 軸名、`LockMSAxisDlg` 格式字串）。4. 精靈的步驟標籤改為步驟卡片標題，目前步驟以 `SectionPanel.Highlighted` 表示。5. 嵌入式面板可用 `Anchor` / `Dock`。6. 唯讀清單用 `ThemedDataGridView`。 |
+| 2026-11-16 | 「應用」「生成路徑」等動作按鈕 | 確定鍵統一為「確定」只套用在語意為「確定 / 完成」的按鈕；「應用」（StartPointDlg）、「生成路徑」（AddPathDlg）、「儲存 / 生成」等有明確動作的按鈕保留原文字。 |
+| 2026-11-16 | 語系修正（隨遷移處理） | `ExtendedGCodeDlg` 的 `IS_START_POINT` / `IS_END_POINT` / `IS_MIX_DATA` 與程式使用的 ID 不一致（簡中一直顯示繁中預設字），已改為程式使用的 ID。語系檔名與類別名不一致者改名：`LockABDlg` → `LockMSAxisDlg`、`CNCThreePointDialog` → `CNCThreePointDlg`。 |
 
 ## 4. 後續處理項目
 
@@ -54,3 +57,15 @@
 | 2026-11-15 | `Show` / `ShowDialog` 統一 | 自訂對話框大多以 `Show( owner )` 非強制回應開啟，`GlassDXFImportDlg`、`ConnectDlg` 以 `ShowDialog` 強制回應開啟；開啟的入口也不一致（`FormBase.Show` 覆寫、`DialogShowHelper.ShowCentered`、直接 `Form.Show`）。改變強制回應與否會影響操作，本議題不動。 |
 | 2026-11-15 | 橫式人機的警報面板與日誌面板 | 橫式時兩者在訊息區上下分割（日誌 60%、警報 40%，由 `MainLayout.UpdateMessages` 計算），兩邊剩下的空間都很小。希望改成更好的處理方式，例如用一個按鈕讓兩個面板互相切換，同一時間只顯示其中一個並佔滿訊息區。屬於版面行為，本議題不動。 |
 | 2026-11-15 | 主視窗行為重構 | `StartupForm.cs` 約 2000 行，混雜編輯器切換、工具列顯示 / 隱藏、CNC 面板管理、語系套用。拆分（例如抽出工具列控制）屬於行為重構，本議題不動。 |
+| 2026-11-16 | `CalibrationREFDlg` 的 KeyDown 重複訂閱 | Designer 與 `Init()` 都訂閱了 `CalibrationREFDlg_KeyDown`，按 Delete 會觸發兩次 `DeleteKeyDown`。屬於既有行為，本議題保持不動。 |
+| 2026-11-16 | 數值框取代 TextBox 後的細節差異 | 已決議統一為數值框，施工時記錄的差異：可用上下鍵 / 滾輪調整；小數位數固定（`AddPathDlg` 弦高誤差 4 位，其餘 3 位）；`ThreePtTransformDlg` 機械座標不會再出現空白，「座標無效」提示只剩非數字輸入時才會出現。詳見 `Tools/UICheck/BehaviorExceptions.txt`。 |
+| 2026-11-16 | 唯讀座標改文字標籤後無法複製 | `CalibrationREFDlg`、`CNCThreePointDlg`、`ThreePtTransformDlg` 的唯讀座標改為 Label 後，不能再選取複製數值。若現場有複製需求，再評估提供複製按鈕。 |
+| 2026-11-16 | CNC 面板語系切換 | 主視窗切換語系後，已建立的對話框與 CNC 面板中以文字角色設定的字型（粗體、數值字型）仍是舊語系字族，重新開啟畫面即正確。 |
+
+## 5. 待決問題
+
+| 日期 | 問題 | 現況 |
+| --- | --- | --- |
+| 2026-11-16 | `CNCThreePointDlg` 工作點座標 9 欄與誤差容忍欄是否改為數值框 | 這 10 欄目前以「空白」表示尚未輸入，程式依此判斷工作點是否完整、是否可計算；數值框無法保持空白，改了會改變操作。暫維持 TextBox（列於 `StaticExceptions.txt`）。 |
+| 2026-11-16 | CNC 面板內的區塊標題是否改為卡片標題 | `CNCPanel`、`CNCInfoPanel` 的版面依設計時座標等比縮放（`ResponsiveLayout`），程式也以標題 Label 的位置排版；改成卡片標題會牽動版面行為。本次只做外觀（標題為強調文字）。 |
+| 2026-11-16 | 泛型基底在 Designer 的表現 | 22 個對話框繼承 `EditDialogBase<T>`，需在 Visual Studio Designer 確認能開啟且外觀與執行時一致；不行的話為各對話框加非泛型中介類別。 |
