@@ -6,14 +6,6 @@ using System.Windows.Forms;
 
 namespace CommonUI.Controls
 {
-	public enum ButtonIndicator
-	{
-		None,
-		Unknown,
-		Off,
-		On
-	}
-
 	public class PanelButton : Button
 	{
 		public PanelButton()

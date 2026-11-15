@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Windows.Forms;
 using CommonUI.Controls;
+using CommonUI.Forms;
 
 namespace CncUI.Dialog
 {
-	public partial class CNCOffsetDialog : Form
+	public partial class CNCOffsetDialog : DialogBase
 	{
 		public CNCOffsetDialog()
 		{

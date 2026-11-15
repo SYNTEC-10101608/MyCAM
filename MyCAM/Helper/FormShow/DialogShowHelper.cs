@@ -1,6 +1,5 @@
-﻿using System.Drawing;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using System.Windows.Forms;
+using CommonUI.Forms;
 
 namespace MyCAM.Helper.FormShow
 {
@@ -14,34 +13,11 @@ namespace MyCAM.Helper.FormShow
 			if( dialog.Width == 0 || dialog.Height == 0 ) {
 				dialog.PerformLayout();
 			}
-			Point centerLocation = MyApp.CalculateDialogCenterLocation( dialog );
-			if( centerLocation != null ) {
-				dialog.StartPosition = FormStartPosition.Manual;
-				dialog.Location = centerLocation;
-			}
+
+			// a dialog shown again keeps no Load event, so it is centered here every time
+			dialog.StartPosition = FormStartPosition.Manual;
+			dialog.Location = DialogPlacement.GetCenterLocation( dialog );
 			dialog.Show( owner );
-		}
-
-		public static void MoveToCenter( Form dialog )
-		{
-			if( dialog == null || dialog.IsDisposed || !dialog.Visible ) {
-				return;
-			}
-			Point centerLocation = MyApp.CalculateDialogCenterLocation( dialog );
-			if( centerLocation == null ) {
-				return;
-			}
-			dialog.Location = centerLocation;
-		}
-
-		public static void EnsureDialogOnTop( Form dialog )
-		{
-			if( dialog == null || dialog.IsDisposed || !dialog.Visible ) {
-				return;
-			}
-
-			// bring to the front
-			dialog.BringToFront();
 		}
 
 		static void SetFormConfig( Form dialog )

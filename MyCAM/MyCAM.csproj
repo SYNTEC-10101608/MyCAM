@@ -119,9 +119,6 @@
     <Compile Include="Editor\Dialog\CalibrationREFDlg.Designer.cs">
       <DependentUpon>CalibrationREFDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editor\Dialog\DebouncedNumericUpDown.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Editor\Dialog\DesignSupportBracketDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -200,9 +197,6 @@
     </Compile>
     <Compile Include="Editor\Dialog\StartPointDlg.Designer.cs">
       <DependentUpon>StartPointDlg.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editor\Dialog\SupportPositionRow.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Editor\Renderer\Shape3DRenderer.cs" />
     <Compile Include="Editor\Renderer\MarkerRenderer.cs" />
@@ -338,9 +332,6 @@
     </Compile>
     <Compile Include="Editor\Dialog\TraverseDlg.Designer.cs">
       <DependentUpon>TraverseDlg.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editor\MultiSelectTreeView.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Editor\IEditor.cs" />
     <Compile Include="Editor\Renderer\CAMRendererBase.cs" />

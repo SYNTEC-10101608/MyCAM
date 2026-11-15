@@ -1,9 +1,10 @@
 ﻿using System.Windows.Forms;
+using CommonUI.Forms;
 using MyCAM.App;
 
 namespace MyCAM.Editor.Dialog
 {
-	public partial class ConnectDlg : Form
+	public partial class ConnectDlg : DialogBase
 	{
 
 		public ConnectDlg()

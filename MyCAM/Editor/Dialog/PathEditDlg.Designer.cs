@@ -32,9 +32,9 @@
 			this.m_lblTotalDY = new System.Windows.Forms.Label();
 			this.m_lblTotalDX = new System.Windows.Forms.Label();
 			this.m_lblTotalDiff = new System.Windows.Forms.Label();
-			this.m_NumUpDownZ = new MyCAM.Editor.DebouncedNumericUpDown();
-			this.m_NumUpDownY = new MyCAM.Editor.DebouncedNumericUpDown();
-			this.m_NumUpDownX = new MyCAM.Editor.DebouncedNumericUpDown();
+			this.m_NumUpDownZ = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_NumUpDownY = new CommonUI.Controls.DebouncedNumericUpDown();
+			this.m_NumUpDownX = new CommonUI.Controls.DebouncedNumericUpDown();
 			this.m_lblZ = new System.Windows.Forms.Label();
 			this.m_lblY = new System.Windows.Forms.Label();
 			this.m_lblX = new System.Windows.Forms.Label();
@@ -48,9 +48,9 @@
 			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownY)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.m_NumUpDownX)).BeginInit();
 			this.SuspendLayout();
-			// 
+			//
 			// m_gpbMove
-			// 
+			//
 			this.m_gpbMove.Controls.Add(this.m_lblTotalDZ);
 			this.m_gpbMove.Controls.Add(this.m_lblTotalDY);
 			this.m_gpbMove.Controls.Add(this.m_lblTotalDX);
@@ -69,45 +69,45 @@
 			this.m_gpbMove.TabIndex = 0;
 			this.m_gpbMove.TabStop = false;
 			this.m_gpbMove.Text = "平移";
-			// 
+			//
 			// m_lblTotalDZ
-			// 
+			//
 			this.m_lblTotalDZ.AutoSize = true;
 			this.m_lblTotalDZ.Location = new System.Drawing.Point(295, 147);
 			this.m_lblTotalDZ.Name = "m_lblTotalDZ";
 			this.m_lblTotalDZ.Size = new System.Drawing.Size(48, 19);
 			this.m_lblTotalDZ.TabIndex = 11;
 			this.m_lblTotalDZ.Text = "0.000";
-			// 
+			//
 			// m_lblTotalDY
-			// 
+			//
 			this.m_lblTotalDY.AutoSize = true;
 			this.m_lblTotalDY.Location = new System.Drawing.Point(295, 112);
 			this.m_lblTotalDY.Name = "m_lblTotalDY";
 			this.m_lblTotalDY.Size = new System.Drawing.Size(48, 19);
 			this.m_lblTotalDY.TabIndex = 10;
 			this.m_lblTotalDY.Text = "0.000";
-			// 
+			//
 			// m_lblTotalDX
-			// 
+			//
 			this.m_lblTotalDX.AutoSize = true;
 			this.m_lblTotalDX.Location = new System.Drawing.Point(295, 71);
 			this.m_lblTotalDX.Name = "m_lblTotalDX";
 			this.m_lblTotalDX.Size = new System.Drawing.Size(48, 19);
 			this.m_lblTotalDX.TabIndex = 9;
 			this.m_lblTotalDX.Text = "0.000";
-			// 
+			//
 			// m_lblTotalDiff
-			// 
+			//
 			this.m_lblTotalDiff.AutoSize = true;
 			this.m_lblTotalDiff.Location = new System.Drawing.Point(289, 38);
 			this.m_lblTotalDiff.Name = "m_lblTotalDiff";
 			this.m_lblTotalDiff.Size = new System.Drawing.Size(54, 19);
 			this.m_lblTotalDiff.TabIndex = 8;
 			this.m_lblTotalDiff.Text = "總偏移";
-			// 
+			//
 			// m_NumUpDownZ
-			// 
+			//
 			this.m_NumUpDownZ.DecimalPlaces = 3;
 			this.m_NumUpDownZ.Location = new System.Drawing.Point(104, 145);
 			this.m_NumUpDownZ.Maximum = new decimal(new int[] {
@@ -126,9 +126,9 @@
 			this.m_NumUpDownZ.TabIndex = 7;
 			this.m_NumUpDownZ.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			this.m_NumUpDownZ.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownZ_DebouncedValueChanged);
-			// 
+			//
 			// m_NumUpDownY
-			// 
+			//
 			this.m_NumUpDownY.DecimalPlaces = 3;
 			this.m_NumUpDownY.Location = new System.Drawing.Point(104, 110);
 			this.m_NumUpDownY.Maximum = new decimal(new int[] {
@@ -147,9 +147,9 @@
 			this.m_NumUpDownY.TabIndex = 6;
 			this.m_NumUpDownY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			this.m_NumUpDownY.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownY_DebouncedValueChanged);
-			// 
+			//
 			// m_NumUpDownX
-			// 
+			//
 			this.m_NumUpDownX.DecimalPlaces = 3;
 			this.m_NumUpDownX.Location = new System.Drawing.Point(104, 71);
 			this.m_NumUpDownX.Maximum = new decimal(new int[] {
@@ -168,45 +168,45 @@
 			this.m_NumUpDownX.TabIndex = 5;
 			this.m_NumUpDownX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			this.m_NumUpDownX.DebouncedValueChanged += new System.EventHandler(this.m_NumUpDownX_DebouncedValueChanged);
-			// 
+			//
 			// m_lblZ
-			// 
+			//
 			this.m_lblZ.AutoSize = true;
 			this.m_lblZ.Location = new System.Drawing.Point(31, 147);
 			this.m_lblZ.Name = "m_lblZ";
 			this.m_lblZ.Size = new System.Drawing.Size(48, 19);
 			this.m_lblZ.TabIndex = 4;
 			this.m_lblZ.Text = "Z偏移";
-			// 
+			//
 			// m_lblY
-			// 
+			//
 			this.m_lblY.AutoSize = true;
 			this.m_lblY.Location = new System.Drawing.Point(31, 112);
 			this.m_lblY.Name = "m_lblY";
 			this.m_lblY.Size = new System.Drawing.Size(48, 19);
 			this.m_lblY.TabIndex = 3;
 			this.m_lblY.Text = "Y偏移";
-			// 
+			//
 			// m_lblX
-			// 
+			//
 			this.m_lblX.AutoSize = true;
 			this.m_lblX.Location = new System.Drawing.Point(31, 71);
 			this.m_lblX.Name = "m_lblX";
 			this.m_lblX.Size = new System.Drawing.Size(49, 19);
 			this.m_lblX.TabIndex = 2;
 			this.m_lblX.Text = "X偏移";
-			// 
+			//
 			// m_lblRefCoordType
-			// 
+			//
 			this.m_lblRefCoordType.AutoSize = true;
 			this.m_lblRefCoordType.Location = new System.Drawing.Point(31, 24);
 			this.m_lblRefCoordType.Name = "m_lblRefCoordType";
 			this.m_lblRefCoordType.Size = new System.Drawing.Size(84, 19);
 			this.m_lblRefCoordType.TabIndex = 1;
 			this.m_lblRefCoordType.Text = "參考坐標系";
-			// 
+			//
 			// m_cmbRefCoordType
-			// 
+			//
 			this.m_cmbRefCoordType.FormattingEnabled = true;
 			this.m_cmbRefCoordType.Items.AddRange(new object[] {
             "區域坐標系",
@@ -216,9 +216,9 @@
 			this.m_cmbRefCoordType.Size = new System.Drawing.Size(121, 27);
 			this.m_cmbRefCoordType.TabIndex = 0;
 			this.m_cmbRefCoordType.SelectedIndexChanged += new System.EventHandler(this.m_cmbRefCoordType_SelectedIndexChanged);
-			// 
+			//
 			// m_btnConfirm
-			// 
+			//
 			this.m_btnConfirm.Location = new System.Drawing.Point(192, 222);
 			this.m_btnConfirm.Name = "m_btnConfirm";
 			this.m_btnConfirm.Size = new System.Drawing.Size(75, 23);
@@ -226,9 +226,9 @@
 			this.m_btnConfirm.Text = "確認";
 			this.m_btnConfirm.UseVisualStyleBackColor = true;
 			this.m_btnConfirm.Click += new System.EventHandler(this.m_btnConfirm_Click);
-			// 
+			//
 			// m_btnClear
-			// 
+			//
 			this.m_btnClear.Location = new System.Drawing.Point(111, 222);
 			this.m_btnClear.Name = "m_btnClear";
 			this.m_btnClear.Size = new System.Drawing.Size(75, 23);
@@ -236,9 +236,9 @@
 			this.m_btnClear.Text = "清除";
 			this.m_btnClear.UseVisualStyleBackColor = true;
 			this.m_btnClear.Click += new System.EventHandler(this.m_btnClear_Click);
-			// 
+			//
 			// m_btnReset
-			// 
+			//
 			this.m_btnReset.Location = new System.Drawing.Point(26, 222);
 			this.m_btnReset.Name = "m_btnReset";
 			this.m_btnReset.Size = new System.Drawing.Size(75, 23);
@@ -246,9 +246,9 @@
 			this.m_btnReset.Text = "重置";
 			this.m_btnReset.UseVisualStyleBackColor = true;
 			this.m_btnReset.Click += new System.EventHandler(this.m_btnReset_Click);
-			// 
+			//
 			// PathEditDlg
-			// 
+			//
 			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(501, 264);
@@ -275,9 +275,9 @@
 		private System.Windows.Forms.GroupBox m_gpbMove;
 		private System.Windows.Forms.Label m_lblRefCoordType;
 		private System.Windows.Forms.ComboBox m_cmbRefCoordType;
-		private MyCAM.Editor.DebouncedNumericUpDown m_NumUpDownZ;
-		private MyCAM.Editor.DebouncedNumericUpDown m_NumUpDownY;
-		private MyCAM.Editor.DebouncedNumericUpDown m_NumUpDownX;
+		private CommonUI.Controls.DebouncedNumericUpDown m_NumUpDownZ;
+		private CommonUI.Controls.DebouncedNumericUpDown m_NumUpDownY;
+		private CommonUI.Controls.DebouncedNumericUpDown m_NumUpDownX;
 		private System.Windows.Forms.Label m_lblZ;
 		private System.Windows.Forms.Label m_lblY;
 		private System.Windows.Forms.Label m_lblX;

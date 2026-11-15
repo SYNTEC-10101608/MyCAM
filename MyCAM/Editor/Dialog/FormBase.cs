@@ -1,11 +1,11 @@
-﻿using System;
-using System.Windows.Forms;
-using MyCAM.App;
+﻿using System.Windows.Forms;
+using CommonUI.Forms;
 using MyCAM.Helper.FormShow;
 
 namespace MyCAM.Editor
 {
-	public class FormBase : Form
+	// behavior base: how a tool dialog is shown; its appearance comes from DialogBase
+	public class FormBase : DialogBase
 	{
 		protected FormBase()
 		{

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using CommonUI.Controls;
 using MyCAM.App;
 using MyCAM.Data;
 using MyCAM.Editor.Renderer;

@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResMap>
+	<Message ID="Confirm" Content="OK" />
+	<Message ID="Cancel" Content="Cancel" />
+	<Message ID="Reset" Content="Reset" />
+	<Message ID="Preview" Content="Preview" />
+	<Message ID="Close" Content="Close" />
+</ResMap>

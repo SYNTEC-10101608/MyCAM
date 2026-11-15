@@ -40,6 +40,7 @@ applyTo: "**/*.cs"
 | `TEXT_SECONDARY` | `#5E6A79` | 單位、提示 |
 | `TEXT_DISABLED` | `#A0A9B5` | 停用文字 |
 | `ACCENT` / `ACCENT_HOVER` / `ACCENT_PRESSED` | `#0067AD` / `#005A99` / `#004C82` | 主要按鈕、選中、卡片標題短線 |
+| `TEXT_ON_ACCENT` | `#FFFFFF` | 強調色底上的文字 |
 | `ACCENT_TINT` / `ACCENT_TINT_STRONG` | `#E8F1F9` / `#CFE2F3` | 選取列 / 工具執行中 |
 | `HOVER` / `PRESSED` | `#ECF0F5` / `#DFE5EC` | 白底控件的滑過 / 按下 |
 | `ERROR` / `WARNING` / `SUCCESS` | `#C42B1C` / `#A86200` / `#107C41` | 狀態 |
@@ -85,6 +86,7 @@ applyTo: "**/*.cs"
 | 用途 | 型別 |
 | --- | --- |
 | 對話框基底 | `CommonUI.Forms.DialogBase`（直接或經 `FormBase` / `EditDialogBase<T>`） |
+| 嵌入式面板基底 | `CommonUI.Forms.PanelBase`（取代直接繼承 `UserControl`） |
 | 卡片 / 區塊 | `CommonUI.Controls.SectionPanel` |
 | 按鈕 | `CommonUI.Controls.ThemedButton`（`Kind`：`Normal` / `Primary` / `Danger`；CNC 用 `Indicator`、`Active`） |
 | 非內文的文字 | `CommonUI.Controls.ThemedLabel` |
@@ -142,7 +144,8 @@ Form
 
 ### 4.4 版面（Designer 固定座標）
 
-不使用 `TableLayoutPanel`、`FlowLayoutPanel`、`Dock`、`Anchor` 排版；座標依下列規則：
+不使用 `TableLayoutPanel`、`FlowLayoutPanel`、`Dock`、`Anchor` 排版（唯一例外：只承載單一內容的視窗，
+如 `LoadingBarDlg` 的進度條、`CNCDlg` 的遠端畫面，可用 `Dock = Fill`）；座標依下列規則：
 
 - 第一張卡片在 `(12, 12)`；卡片垂直排列，間距 8；同一對話框的卡片等寬。
 - 卡片內：左側標籤 `x = 10`；同一卡片的輸入欄左緣對齊；單位標籤緊接輸入欄右側 6。
@@ -192,15 +195,18 @@ Form
 - 表單標題：以**類別名稱**當 ID，同樣自動套用。
 - 多個控制項共用的文字、執行時才決定的文字：在程式中明確呼叫 `TryGetString`，且該 ID **不可**等於任何控制項名稱
   （避免被自動套用覆蓋）。
-- 共用字串（確定、取消、重設…）放在 `Language/Common_<語系>.xml`，以 `DialogBase.CommonText` 取得。
+- 共用的按鈕文字（確定、取消、重設、預覽、關閉）：在 Designer 設定 `ThemedButton.CommonText`，
+  執行時一律取自 `Language/CommonUI_<語系>.xml`（優先於對話框自己的 ID）。
+- 只套用「標題類」控制項（`Label`、按鈕、`CheckBox`、`RadioButton`、`SectionPanel`）；輸入框的內容不受影響。
 - Designer 上的文字寫 zh-TW；四個語系的 XML 同步維護。
-- 嵌入式面板（`UserControl`）同樣不手寫逐一套用：呼叫 `LanguageApplier.Apply( this, languageManager )`。
+- 嵌入式面板（`PanelBase`）同樣不手寫逐一套用：呼叫 `LanguageApplier.Apply( this, languageManager )`。
 
 ## 8. 檢查腳本（`Tools/UICheck`）
 
 | 指令 | 內容 |
 | --- | --- |
-| `Tools\UICheck\UICheck.bat` | 靜態檢查 + 行為不變比對（與 `master` 比較） |
-| `Tools\UICheck\UICheck.bat runtime` | 另外以 Debug 建置結果開啟所有對話框與 CNC 面板，zh-TW / zh-CN 各跑一次並輸出截圖 |
+| `Tools\UICheck\UICheck.bat` | 靜態檢查（`CheckStatic.ps1`）+ 行為不變比對（`CompareBehavior.ps1`，與 `master` 比較） |
+| `Tools\UICheck\UICheck.bat runtime [截圖資料夾]` | 另外以 Debug 建置結果開啟所有對話框與 CNC 面板，zh-TW / zh-CN 各跑一次（`CheckRuntimeLayout.ps1`） |
 
-修改畫面後必須跑 `UICheck.bat`，全部通過才可提交；新增畫面時一併確認執行時版面檢查。
+- 經確認的例外列在 `StaticExceptions.txt` / `BehaviorExceptions.txt`，每行寫明理由；行為例外必須是已決議的項目。
+- 修改畫面後必須跑 `UICheck.bat`，全部通過才可提交；新增畫面時一併確認執行時版面檢查。

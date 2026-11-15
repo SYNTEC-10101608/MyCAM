@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace MyCAM.Editor
+namespace CommonUI.Controls
 {
 	/// <summary>
 	/// NumericUpDown with configurable increment and debounced ValueChanged event.
@@ -64,6 +64,25 @@ namespace MyCAM.Editor
 
 			m_LastValue = this.Value;
 			RevertOnOutOfRange = true;
+		}
+
+		// font and colors come from the parent (theme), never from the designer file
+		[Browsable( false )]
+		[EditorBrowsable( EditorBrowsableState.Never )]
+		[DesignerSerializationVisibility( DesignerSerializationVisibility.Hidden )]
+		public override System.Drawing.Font Font
+		{
+			get => base.Font;
+			set => base.Font = value;
+		}
+
+		[Browsable( false )]
+		[EditorBrowsable( EditorBrowsableState.Never )]
+		[DesignerSerializationVisibility( DesignerSerializationVisibility.Hidden )]
+		public override System.Drawing.Color ForeColor
+		{
+			get => base.ForeColor;
+			set => base.ForeColor = value;
 		}
 
 		public override void UpButton()

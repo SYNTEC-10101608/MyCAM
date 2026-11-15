@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using CommonUI.Controls;
+using CommonUI.Forms;
 using MyCAM.App;
 using MyCAM.Data;
 
@@ -172,9 +174,8 @@ namespace MyCAM.Editor.Dialog
 			// Show the target panel only after the window has been resized
 			activePanel.Visible = true;
 
-			// keep the dialog centered on the main form after the size change
-			// (dialog may be hidden at this point, so calculate and set location directly)
-			Location = MyApp.CalculateDialogCenterLocation( this );
+			// keep the dialog centered after the size change
+			DialogPlacement.MoveToCenter( this );
 
 			// show the dialog when everything is ready
 			if( isShown ) {
@@ -213,7 +214,7 @@ namespace MyCAM.Editor.Dialog
 			};
 		}
 
-		static double[] CollectPositions( List<SupportPositionRow> rows )
+		static double[] CollectPositions( List<RemovableValueRow> rows )
 		{
 			var list = new List<double>( rows.Count );
 			foreach( var row in rows ) {
@@ -292,12 +293,12 @@ namespace MyCAM.Editor.Dialog
 			AddPositionRowAndUpdate( ref m_YRows, m_pnlYPositions, 0.0 );
 		}
 
-		void AddPositionRowAndUpdate( ref List<SupportPositionRow> targetRows, Panel targetPanel, double defaultValue )
+		void AddPositionRowAndUpdate( ref List<RemovableValueRow> targetRows, Panel targetPanel, double defaultValue )
 		{
 			if( targetRows.Count >= MaxPositionsPerAxis ) {
 				return;
 			}
-			System.Drawing.Color color = ( targetRows == m_XRows ) ? System.Drawing.Color.DarkGreen : System.Drawing.Color.RoyalBlue;
+			System.Drawing.Color color = ( targetRows == m_XRows ) ? X_POSITION_COLOR : Y_POSITION_COLOR;
 			var row = AddPositionRow( ref targetRows, targetPanel, defaultValue, color );
 			RefreshRowIndicesAndLayout( targetRows, targetPanel );
 			UpdateAddButtonsEnabled();
@@ -307,14 +308,14 @@ namespace MyCAM.Editor.Dialog
 			RaiseParameterChanged();
 		}
 
-		SupportPositionRow AddPositionRow(
-			ref List<SupportPositionRow> targetRows,
+		RemovableValueRow AddPositionRow(
+			ref List<RemovableValueRow> targetRows,
 			Panel targetPanel,
 			double defaultValue,
 			System.Drawing.Color? labelColor = null )
 		{
 			string deleteText = m_LanguageManager.TryGetString( "m_btnDeletePosition", DefaultDeletePosition );
-			var row = new SupportPositionRow( defaultValue, labelColor, deleteText );
+			var row = new RemovableValueRow( defaultValue, POSITION_UNIT, deleteText, labelColor );
 			row.DeleteRequested += OnPositionRowDeleteRequested;
 			row.ValueCommitted += OnPositionRowValueCommitted;
 			row.ValueRejected += OnPositionRowValueRejected;
@@ -323,7 +324,7 @@ namespace MyCAM.Editor.Dialog
 			return row;
 		}
 
-		void OnPositionRowDeleteRequested( SupportPositionRow row )
+		void OnPositionRowDeleteRequested( RemovableValueRow row )
 		{
 			var targetRows = m_XRows.Contains( row ) ? m_XRows : m_YRows;
 			var targetPanel = ( targetRows == m_XRows ) ? m_pnlXPositions : m_pnlYPositions;
@@ -341,7 +342,7 @@ namespace MyCAM.Editor.Dialog
 			RaiseParameterChanged();
 		}
 
-		void OnPositionRowValueCommitted( SupportPositionRow row )
+		void OnPositionRowValueCommitted( RemovableValueRow row )
 		{
 			RaiseParameterChanged();
 		}
@@ -351,25 +352,13 @@ namespace MyCAM.Editor.Dialog
 			OnValueRejected( sender, e );
 		}
 
-		void RefreshRowIndicesAndLayout( List<SupportPositionRow> targetRows, Panel targetPanel )
+		void RefreshRowIndicesAndLayout( List<RemovableValueRow> targetRows, Panel targetPanel )
 		{
 			targetPanel.SuspendLayout();
 
 			// Reset scroll position to top-left before re-layout, so that the user sees the first row after adding/removing rows.
 			targetPanel.AutoScrollPosition = new System.Drawing.Point( 0, 0 );
-			int rowWidth = targetPanel.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 4;
-			if( rowWidth < 200 ) {
-				rowWidth = 200;
-			}
-			int y = 2;
-			for( int i = 0; i < targetRows.Count; i++ ) {
-				var row = targetRows[ i ];
-				row.SetIndex( i + 1 );
-				row.SetRowWidth();
-				row.CanDelete = ( targetRows.Count > 1 );
-				row.Location = new System.Drawing.Point( 2, y );
-				y += row.Height + 2;
-			}
+			RemovableValueRow.Arrange( targetRows );
 			targetPanel.ResumeLayout();
 		}
 
@@ -426,9 +415,14 @@ namespace MyCAM.Editor.Dialog
 		}
 
 		readonly LanguageManager.LanguageManager m_LanguageManager;
-		List<SupportPositionRow> m_XRows = new List<SupportPositionRow>();
-		List<SupportPositionRow> m_YRows = new List<SupportPositionRow>();
+		List<RemovableValueRow> m_XRows = new List<RemovableValueRow>();
+		List<RemovableValueRow> m_YRows = new List<RemovableValueRow>();
 
+		const string POSITION_UNIT = "mm";
+
+		// data colors that tell the X / Y position lists apart
+		static readonly System.Drawing.Color X_POSITION_COLOR = System.Drawing.Color.DarkGreen;
+		static readonly System.Drawing.Color Y_POSITION_COLOR = System.Drawing.Color.RoyalBlue;
 		const string DefaultDeletePosition = "刪除";
 		const string DefaultBrowseSavePathDescription = "選擇儲存資料夾";
 		const string WARN_BELOW_MINIMUM = "輸入值 {0} 小於最小值 {1}";

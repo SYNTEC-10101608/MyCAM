@@ -4,8 +4,9 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using CommonUI.Theme;
 
-namespace MyCAM.Editor
+namespace CommonUI.Controls
 {
 	public class MultiSelectTreeView : TreeView
 	{
@@ -287,7 +288,7 @@ namespace MyCAM.Editor
 		void HighlightNode( TreeNode node, bool highlight )
 		{
 			if( highlight ) {
-				node.BackColor = SystemColors.Highlight;
+				node.BackColor = ThemeColors.ACCENT_TINT_STRONG;
 			}
 			else {
 				node.BackColor = this.BackColor;
@@ -309,9 +310,9 @@ namespace MyCAM.Editor
 			if( setFlag ) {
 
 				// change font style
-				node.NodeFont = new Font( this.Font, FontStyle.Bold );
+				node.NodeFont = ThemeFonts.Emphasis;
 				node.Text = originalText + " 🚩";
-				node.ForeColor = Color.Red;
+				node.ForeColor = ThemeColors.ERROR;
 
 			}
 			else {

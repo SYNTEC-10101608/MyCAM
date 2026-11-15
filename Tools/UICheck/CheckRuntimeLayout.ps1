@@ -1,0 +1,54 @@
+﻿param(
+	[string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
+	[string]$Configuration = "Debug",
+	[string[]]$Languages = @( "zh-TW", "zh-CN" ),
+	[string]$ShotDir = "",
+	[string]$Only = ""
+)
+# Runtime layout check (ui-style.instructions.md, section 8).
+# Opens every dialog and CNC panel of the built MyCAM in each language and reports T1-T5 (see LayoutRunner.cs).
+# Build first (Build.bat Debug). Exit code 1 when a problem is found.
+
+$ErrorActionPreference = "Stop"
+$binDir = Join-Path $Root "MyCAM\bin\$Configuration"
+if (-not (Test-Path (Join-Path $binDir "MyCAM.exe"))) {
+	Write-Host "[UICheck] MyCAM.exe not found in $binDir, build first."
+	exit 2
+}
+
+# compile the runner into the output folder, so it finds language files and assemblies like MyCAM.exe
+$vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+$msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" |
+	Select-Object -First 1
+$csc = Join-Path (Split-Path $msbuild) "Roslyn\csc.exe"
+$runner = Join-Path $binDir "UICheckRunner.exe"
+$references = @( "System.dll", "System.Core.dll", "System.Drawing.dll", "System.Windows.Forms.dll",
+	(Join-Path $binDir "CommonUI.dll"), (Join-Path $binDir "LanguageManager.dll") ) | ForEach-Object { "/r:$_" }
+& $csc /nologo /target:exe /platform:anycpu /out:$runner @references (Join-Path $PSScriptRoot "LayoutRunner.cs")
+if ($LASTEXITCODE -ne 0) {
+	Write-Host "[UICheck] failed to compile LayoutRunner.cs"
+	exit 2
+}
+
+if (-not $ShotDir) {
+	$ShotDir = "-"
+}
+$result = 0
+foreach ($szLanguage in $Languages) {
+	Write-Host "## runtime layout: $szLanguage"
+	$arguments = @( $szLanguage, $ShotDir )
+	if ($Only) {
+		$arguments += $Only
+	}
+	Push-Location $binDir
+	try {
+		& $runner @arguments
+		if ($LASTEXITCODE -ne 0) {
+			$result = 1
+		}
+	}
+	finally {
+		Pop-Location
+	}
+}
+exit $result
