@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
-  <Message ID="FormTitle" Content="Axis Lock Settings" />
+  <Message ID="LockMSAxisDlg" Content="Axis Lock Settings" />
   <Message ID="m_lblMode" Content="Mode" />
   <Message ID="m_rbtnDefault" Content="Default" />
   <Message ID="m_rbtnLockAB" Content="Axis Lock Cutting" />
   <Message ID="m_gbxLockAB" Content="Axis Lock Cutting" />
-  <Message ID="m_gbxRotaryDirection" Content="{0} Axis Direction Adjustment" />
+  <Message ID="Format_RotaryDirection" Content="{0} Axis Direction Adjustment" />
   <Message ID="m_gbxMachiningDir" Content="Assigned Machining Direction" />
   <Message ID="m_lblMachiningDir" Content="Direction" />
   <Message ID="MachiningDir_None" Content="None" />
   <Message ID="m_lblMachiningDirHint" Content="Spindle type does not support this function" />
   <Message ID="RotaryAngleOutOfRange" Content="The adjusted angle is outside the input range." />
-  <Message ID="m_chkLockSlave" Content="Lock {0} Axis" />
-  <Message ID="m_chkLockMaster" Content="Lock {0} Axis" />
-  <Message ID="m_lblSlaveAngle" Content="{0} Axis Angle" />
+  <Message ID="Format_LockSlave" Content="Lock {0} Axis" />
+  <Message ID="Format_LockMaster" Content="Lock {0} Axis" />
+  <Message ID="Format_SlaveAngle" Content="{0} Axis Angle" />
   <Message ID="m_rbtnSlaveAuto" Content="Automatic" />
   <Message ID="m_rbtnSlaveManual" Content="Manual" />
-  <Message ID="m_lblMasterAngle" Content="{0} Axis Angle" />
+  <Message ID="Format_MasterAngle" Content="{0} Axis Angle" />
   <Message ID="m_rbtnMasterAuto" Content="Automatic" />
   <Message ID="m_rbtnMasterManual" Content="Manual" />
-  <Message ID="m_btnConfirm" Content="OK" />
-  <Message ID="m_btnCancel" Content="Cancel" />
 </ResMap>

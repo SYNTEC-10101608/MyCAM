@@ -30,22 +30,18 @@ namespace MyCAM.Editor.Dialog
 			// for std pattern lead setting disable lead out controls
 			IsStdPattern += SetLeadOutControlsEnabled;
 
-			ApplyResourcesToUI();
+			InitLocalizedTexts();
 		}
 
-		void ApplyResourcesToUI()
+		// the lead-in and lead-out rows share their texts
+		void InitLocalizedTexts()
 		{
-			this.Text = m_LanguageManager.TryGetString( "LeadDlg", this.Text );
-			m_lblLeadIn.Text = m_LanguageManager.TryGetString( "m_lblLeadIn", m_lblLeadIn.Text );
 			label1.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength", label1.Text );
-			label3.Text = m_LanguageManager.TryGetString( "m_lblLeadOut", label3.Text );
 			label4.Text = m_LanguageManager.TryGetString( "m_lblLeadLineLength", label4.Text );
 			m_lblLeadInAngle.Text = m_LanguageManager.TryGetString( "m_lblAngle", m_lblLeadInAngle.Text );
 			m_lblLeadOutAngle.Text = m_LanguageManager.TryGetString( "m_lblAngle", m_lblLeadOutAngle.Text );
 			m_lblLeadInLength.Text = m_LanguageManager.TryGetString( "m_lblRadius", m_lblLeadInLength.Text );
 			m_lblLeadOutLength.Text = m_LanguageManager.TryGetString( "m_lblRadius", m_lblLeadOutLength.Text );
-			m_chkFlip.Text = m_LanguageManager.TryGetString( "m_chkFlip", m_chkFlip.Text );
-			m_btnOK.Text = m_LanguageManager.TryGetString( "m_btnOK", m_btnOK.Text );
 		}
 
 		public Action<bool> IsStdPattern;

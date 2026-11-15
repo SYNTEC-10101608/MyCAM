@@ -10,3 +10,7 @@ B6 CalibrationREFDlg m_tbxPnt* TextBox -> Label, the value can no longer be sele
 B6 AxisTransformDlg m_nud* NumericUpDown -> DebouncedNumericUpDown; ranges are set in code, one increment per wheel notch as before (the custom MouseWheel handler is no longer needed)
 B6 AxisTransformDlg m_txbStep* TextBox -> DebouncedNumericUpDown (0.001 to 99999, 3 decimals); the Leave / Enter handlers still parse the text
 B6 AddPathDlg m_txb* TextBox -> DebouncedNumericUpDown (D1 0.001 to 90 / 3 decimals, chord error 0.0001 to 99999 / 4 decimals, line length 0.001 to 99999 / 3 decimals); the Validating / Enter / TextChanged handlers still parse the text
+
+# section title labels become SectionPanel titles (decision 2026-11-15 "區塊標題")
+B6 LeadDlg m_lblLeadIn title moved to m_secLeadIn
+B6 LeadDlg label3 title moved to m_secLeadOut

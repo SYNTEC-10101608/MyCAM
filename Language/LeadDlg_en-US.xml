@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResMap>
 	<Message ID="LeadDlg" Content="Lead Line Setup" />
-	<Message ID="m_lblLeadIn" Content="Lead-in" />
-	<Message ID="m_lblLeadOut" Content="Lead-out" />
+	<Message ID="m_secLeadIn" Content="Lead-in" />
+	<Message ID="m_secLeadOut" Content="Lead-out" />
 	<Message ID="m_lblLeadLineLength" Content="Line Length" />
 	<Message ID="m_lblAngle" Content="Angle" />
 	<Message ID="m_lblRadius" Content="Radius" />
-	<Message ID="m_btnOK" Content="OK" />
 	<Message ID="Error_AngleRange" Content="Angle must be in the range 0 ~ 180 degrees" />
 	<Message ID="m_chkFlip" Content="Flip Lead Line" />
 </ResMap>

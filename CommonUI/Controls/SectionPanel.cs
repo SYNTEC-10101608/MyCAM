@@ -72,9 +72,16 @@ namespace CommonUI.Controls
 			int nTextLeft = ThemeMetrics.SECTION_PADDING + ACCENT_WIDTH + ThemeMetrics.CONTROL_GAP;
 			Rectangle textBounds = new Rectangle( nTextLeft, 0,
 				Width - nTextLeft - ThemeMetrics.SECTION_PADDING, ThemeMetrics.SECTION_TITLE_HEIGHT );
-			TextRenderer.DrawText( graphics, Text, ThemeFonts.Emphasis, textBounds, ThemeColors.TEXT,
+			Color titleColor = Enabled ? ThemeColors.TEXT : ThemeColors.TEXT_DISABLED;
+			TextRenderer.DrawText( graphics, Text, ThemeFonts.Emphasis, textBounds, titleColor,
 				TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine |
 				TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix );
+		}
+
+		protected override void OnEnabledChanged( System.EventArgs e )
+		{
+			base.OnEnabledChanged( e );
+			Invalidate();
 		}
 
 		protected override void OnTextChanged( System.EventArgs e )

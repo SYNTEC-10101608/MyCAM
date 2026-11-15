@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using CommonUI.Theme;
 using MyCAM.Data;
 using MyCAM.Helper;
 
@@ -22,7 +22,7 @@ namespace MyCAM.Editor
 			m_RotaryAxisConfig = config;
 			m_IsSpindle = machineType == FiveAxisType.Spindle;
 			m_lblMachiningDirHint.Visible = m_IsSpindle;
-			ApplyResourcesToUI();
+			InitLocalizedTexts();
 			BuildMachiningDirItems();
 		}
 
@@ -111,7 +111,7 @@ namespace MyCAM.Editor
 
 		public void ShowMAngleAsAssignMode( bool isAssigned )
 		{
-			m_dbtnMaster.ForeColor = isAssigned ? ASSIGN_Color : AUTO_Color;
+			ThemeText.SetRole( isAssigned ? TextRole.Body : TextRole.Secondary, m_dbtnMaster );
 			m_IsUpdatingMSAngleUI = true;
 			try {
 				if( isAssigned ) {
@@ -128,7 +128,7 @@ namespace MyCAM.Editor
 
 		public void ShowSAngleAsAssignMode( bool isAssigned )
 		{
-			m_dbtnSlave.ForeColor = isAssigned ? ASSIGN_Color : AUTO_Color;
+			ThemeText.SetRole( isAssigned ? TextRole.Body : TextRole.Secondary, m_dbtnSlave );
 			m_IsUpdatingMSAngleUI = true;
 			try {
 				if( isAssigned ) {
@@ -265,27 +265,14 @@ namespace MyCAM.Editor
 
 		#region UI Setting
 
-		void ApplyResourcesToUI()
+		// texts that contain the axis names of the machine
+		void InitLocalizedTexts()
 		{
-			Text = m_LanguageManager.TryGetString( "FormTitle", Text );
-			m_lblMode.Text = m_LanguageManager.TryGetString( "m_lblMode", m_lblMode.Text );
-			m_rbtnDefault.Text = m_LanguageManager.TryGetString( "m_rbtnDefault", m_rbtnDefault.Text );
-			m_rbtnLockAB.Text = m_LanguageManager.TryGetString( "m_rbtnLockAB", m_rbtnLockAB.Text );
-			m_gbxLockAB.Text = m_LanguageManager.TryGetString( "m_gbxLockAB", m_gbxLockAB.Text );
-			m_gbxRotaryDirection.Text = string.Format( m_LanguageManager.TryGetString( "m_gbxRotaryDirection", "{0}軸方向調整" ), m_RotaryAxisConfig.RotaryAxisName );
-			m_gbxMachiningDir.Text = m_LanguageManager.TryGetString( "m_gbxMachiningDir", m_gbxMachiningDir.Text );
-			m_lblMachiningDir.Text = m_LanguageManager.TryGetString( "m_lblMachiningDir", m_lblMachiningDir.Text );
-			m_lblMachiningDirHint.Text = m_LanguageManager.TryGetString( "m_lblMachiningDirHint", m_lblMachiningDirHint.Text );
-			m_chkLockSlave.Text = string.Format( m_LanguageManager.TryGetString( "m_chkLockSlave", "鎖{0}軸" ), m_RotaryAxisConfig.SlaveName );
-			m_lblSlaveAngle.Text = string.Format( m_LanguageManager.TryGetString( "m_lblSlaveAngle", "{0}軸角度" ), m_RotaryAxisConfig.SlaveName );
-			m_rbtnSlaveAuto.Text = m_LanguageManager.TryGetString( "m_rbtnSlaveAuto", m_rbtnSlaveAuto.Text );
-			m_rbtnSlaveManual.Text = m_LanguageManager.TryGetString( "m_rbtnSlaveManual", m_rbtnSlaveManual.Text );
-			m_chkLockMaster.Text = string.Format( m_LanguageManager.TryGetString( "m_chkLockMaster", "鎖{0}軸" ), m_RotaryAxisConfig.MasterName );
-			m_lblMasterAngle.Text = string.Format( m_LanguageManager.TryGetString( "m_lblMasterAngle", "{0}軸角度" ), m_RotaryAxisConfig.MasterName );
-			m_rbtnMasterAuto.Text = m_LanguageManager.TryGetString( "m_rbtnMasterAuto", m_rbtnMasterAuto.Text );
-			m_rbtnMasterManual.Text = m_LanguageManager.TryGetString( "m_rbtnMasterManual", m_rbtnMasterManual.Text );
-			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
-			m_btnCancel.Text = m_LanguageManager.TryGetString( "m_btnCancel", m_btnCancel.Text );
+			m_gbxRotaryDirection.Text = string.Format( m_LanguageManager.TryGetString( "Format_RotaryDirection", "{0}軸方向調整" ), m_RotaryAxisConfig.RotaryAxisName );
+			m_chkLockSlave.Text = string.Format( m_LanguageManager.TryGetString( "Format_LockSlave", "鎖{0}軸" ), m_RotaryAxisConfig.SlaveName );
+			m_lblSlaveAngle.Text = string.Format( m_LanguageManager.TryGetString( "Format_SlaveAngle", "{0}軸角度" ), m_RotaryAxisConfig.SlaveName );
+			m_chkLockMaster.Text = string.Format( m_LanguageManager.TryGetString( "Format_LockMaster", "鎖{0}軸" ), m_RotaryAxisConfig.MasterName );
+			m_lblMasterAngle.Text = string.Format( m_LanguageManager.TryGetString( "Format_MasterAngle", "{0}軸角度" ), m_RotaryAxisConfig.MasterName );
 			m_btnRotaryPos.Text = m_RotaryAxisConfig.RotaryAxisName + " +";
 			m_btnRotaryNeg.Text = m_RotaryAxisConfig.RotaryAxisName + " -";
 		}
@@ -337,7 +324,7 @@ namespace MyCAM.Editor
 			checkLockMasterChanged?.Invoke( false );
 		}
 
-		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "LockABDlg" );
+		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "LockMSAxisDlg" );
 
 		RotaryAxisConfig m_RotaryAxisConfig;
 		readonly bool m_IsSpindle;
@@ -348,8 +335,6 @@ namespace MyCAM.Editor
 		// to stop MS Change evnet
 		bool m_IsUpdatingMSAngleUI = false;
 
-		static readonly Color ASSIGN_Color = Color.Black;
-		static readonly Color AUTO_Color = Color.Gray;
 
 		// defines the combo box order
 		readonly List<EMachiningDir> m_MachiningDirList = new List<EMachiningDir>

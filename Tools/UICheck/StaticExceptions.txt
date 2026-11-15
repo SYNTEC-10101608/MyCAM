@@ -19,3 +19,14 @@ S5 AddPathDlg m_grpStep3 step sections share the first position; SectionStack sh
 S5 AddPathDlg m_secStepHint step sections share the first position; SectionStack shows one at a time
 S6 AddPathDlg m_lblStepDescription text depends on the step (Desc_Step2_Title / Desc_Step4_Title)
 S5 AddPathDlg m_grpStep1 step sections share the first position; SectionStack shows one at a time
+S6 LeadDlg label1 shared text m_lblLeadLineLength (set in code)
+S6 LeadDlg label4 shared text m_lblLeadLineLength (set in code)
+S6 LeadDlg m_lblLeadInAngle shared text m_lblAngle (set in code)
+S6 LeadDlg m_lblLeadOutAngle shared text m_lblAngle (set in code)
+S6 LeadDlg m_lblLeadInLength shared text m_lblRadius (set in code)
+S6 LeadDlg m_lblLeadOutLength shared text m_lblRadius (set in code)
+S6 LockMSAxisDlg m_gbxRotaryDirection contains the axis name (Format_RotaryDirection, set in code)
+S6 LockMSAxisDlg m_chkLockSlave contains the axis name (Format_LockSlave, set in code)
+S6 LockMSAxisDlg m_chkLockMaster contains the axis name (Format_LockMaster, set in code)
+S6 LockMSAxisDlg m_lblSlaveAngle contains the axis name (Format_SlaveAngle, set in code)
+S6 LockMSAxisDlg m_lblMasterAngle contains the axis name (Format_MasterAngle, set in code)
