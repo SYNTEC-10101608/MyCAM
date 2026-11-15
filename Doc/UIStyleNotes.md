@@ -44,6 +44,7 @@
 | 2026-11-15 | P0 定稿 | 草案 v0.5 定稿為 `.github/instructions/ui-style.instructions.md`。施工時補訂的細節：有標題卡片第一列 `y = 36`、標籤相對列頂下移 4、`CheckBox` / `RadioButton` 下移 2；確定鍵文字統一為「確定」；工具列圖示分兩種尺寸（功能工具列 40×40，選單 / 圖層列 / 視角列 / 右鍵選單 20×20）。 |
 | 2026-11-16 | 施工中訂定的細節（P1～P4） | 1. 卡片內的動作按鈕高 23；只作用於該卡片、或須隨卡片一起停用的按鈕留在卡片內，不移到底部按鈕列（例：`ContourEditDlg` 全部按鈕隨群組停用）。2. RadioButton 群組與會切換 `Enabled` / `Visible` 的容器一律保留原名稱，改為無外觀 `Panel`。3. 多個控制項共用的文字、含 `{0}` 的格式文字、與其他類別共用的 ID，留在程式中取字串；語系檔中與控制項同名、但其實由程式動態組成的 ID 一律刪除或改名，避免被自動套用覆蓋（`ToolVectorDlg` 軸名、`LockMSAxisDlg` 格式字串）。4. 精靈的步驟標籤改為步驟卡片標題，目前步驟以 `SectionPanel.Highlighted` 表示。5. 嵌入式面板可用 `Anchor` / `Dock`。6. 唯讀清單用 `ThemedDataGridView`。 |
 | 2026-11-16 | 「應用」「生成路徑」等動作按鈕 | 確定鍵統一為「確定」只套用在語意為「確定 / 完成」的按鈕；「應用」（StartPointDlg）、「生成路徑」（AddPathDlg）、「儲存 / 生成」等有明確動作的按鈕保留原文字。 |
+| 2026-11-16 | 直式人機的驗證方式 | 橫 / 直式只依主視窗外框長寬比判斷（`MainLayout`、`StartupForm`、`CNCDlg` 皆比較 `Height > Width`），與系統顯示方向無關。因此不旋轉螢幕，改在橫式螢幕上把主視窗開到 1080×1880 截圖並檢查對話框置中（`CaptureMainWindow.ps1`，已併入 `UICheck.bat runtime`）。 |
 | 2026-11-16 | 語系修正（隨遷移處理） | `ExtendedGCodeDlg` 的 `IS_START_POINT` / `IS_END_POINT` / `IS_MIX_DATA` 與程式使用的 ID 不一致（簡中一直顯示繁中預設字），已改為程式使用的 ID。語系檔名與類別名不一致者改名：`LockABDlg` → `LockMSAxisDlg`、`CNCThreePointDialog` → `CNCThreePointDlg`。 |
 
 ## 4. 後續處理項目

@@ -1,0 +1,230 @@
+﻿using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using CommonUI.Forms;
+
+namespace UICheck
+{
+	// Main window screenshot and dialog placement check (ui-style.instructions.md, sections 4.3 and 6).
+	// Compiled by CaptureMainWindow.ps1 into the build output folder together with LayoutRunner.cs.
+	//
+	// Landscape / portrait only depends on the main window's aspect ratio, so a portrait window larger than a
+	// landscape screen is checked by sizing the window beyond the screen (the part outside is still rendered).
+	//
+	//   P1  dialog not centered in DialogPlacement's area (whole window in landscape, CAM area in portrait)
+	//   P2  portrait CAM area is not the part above the CNC host
+	//
+	// Usage: UICheckMainWindow.exe <language> <width> <height> <png> [dialog type name ...]
+	// The first dialog is drawn into the screenshot at its centered location.
+	internal static class MainWindowRunner
+	{
+		[STAThread]
+		static int Main( string[] args )
+		{
+			if( args.Length < 4 ) {
+				Console.WriteLine( "usage: UICheckMainWindow.exe <language> <width> <height> <png> [dialog ...]" );
+				return 2;
+			}
+			string szLanguage = args[ 0 ];
+			Size windowSize = new Size( int.Parse( args[ 1 ] ), int.Parse( args[ 2 ] ) );
+			string szOutFile = Path.GetFullPath( args[ 3 ] );
+			string[] dialogNameArray = new string[ args.Length - 4 ];
+			Array.Copy( args, 4, dialogNameArray, 0, dialogNameArray.Length );
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault( false );
+
+			// the language is taken from the app setting by StartupForm; set it in memory only, the file is untouched
+			string szBinDir = AppDomain.CurrentDomain.BaseDirectory;
+			m_App = Assembly.LoadFrom( Path.Combine( szBinDir, "MyCAM.exe" ) );
+			m_Cnc = Assembly.LoadFrom( Path.Combine( szBinDir, "CncUI.dll" ) );
+			Type myApp = m_App.GetType( "MyCAM.App.MyApp" );
+			myApp.GetMethod( "InitAppSetting" ).Invoke( null, null );
+			object setting = myApp.GetProperty( "AppSetting" ).GetValue( null );
+			setting.GetType().GetProperty( "UILanguage" ).SetValue( setting, szLanguage );
+
+			Form mainForm = (Form)Activator.CreateInstance( m_App.GetType( "MyCAM.StartupForm" ) );
+			mainForm.Shown += ( sender, e ) => mainForm.BeginInvoke( new Action( () =>
+			{
+				m_nResult = Run( mainForm, windowSize, szOutFile, dialogNameArray );
+				mainForm.Close();
+			} ) );
+			Application.Run( mainForm );
+			return m_nResult;
+		}
+
+		static int Run( Form mainForm, Size windowSize, string szOutFile, string[] dialogNameArray )
+		{
+			// Form clamps its size to the screen; raising MaximumSize lets the native resize go beyond it
+			mainForm.WindowState = FormWindowState.Normal;
+			mainForm.MaximumSize = windowSize;
+			SetWindowPos( mainForm.Handle, IntPtr.Zero, 0, 0, windowSize.Width, windowSize.Height,
+				SWP_NOZORDER | SWP_NOACTIVATE );
+			Wait( 3000 );
+			if( mainForm.Size != windowSize ) {
+				Console.WriteLine( "FAIL  main window is {0}, expected {1}", mainForm.Size, windowSize );
+				return 1;
+			}
+			bool isVertical = mainForm.Height > mainForm.Width;
+			Rectangle area = DialogPlacement.AreaProvider();
+			Console.WriteLine( "main window {0}x{1} ({2}), dialog area {3}", mainForm.Width, mainForm.Height,
+				isVertical ? "portrait" : "landscape", area );
+			int nProblemCount = CheckArea( mainForm, isVertical, area );
+
+			using( Bitmap bitmap = Capture( mainForm.Handle, mainForm.Size ) ) {
+				using( Graphics graphics = Graphics.FromImage( bitmap ) ) {
+					DrawArea( graphics, mainForm, area );
+					// only the first dialog is drawn into the screenshot, the others are checked only
+					for( int i = 0; i < dialogNameArray.Length; i++ ) {
+						nProblemCount += CheckDialog( mainForm, dialogNameArray[ i ], area, i == 0 ? graphics : null );
+					}
+				}
+				bitmap.Save( szOutFile, ImageFormat.Png );
+			}
+			Console.WriteLine( "[capture] {0}", szOutFile );
+			Console.WriteLine( "{0} problems", nProblemCount );
+			return nProblemCount == 0 ? 0 : 1;
+		}
+
+		static int CheckArea( Form mainForm, bool isVertical, Rectangle area )
+		{
+			if( isVertical == false ) {
+				if( area != mainForm.Bounds ) {
+					Console.WriteLine( "FAIL  P2 landscape dialog area {0} is not the window {1}", area, mainForm.Bounds );
+					return 1;
+				}
+				return 0;
+			}
+			Control verticalHost = FindControl( mainForm, "m_panCNCVertical" );
+			int nHostTop = verticalHost.Parent.PointToScreen( verticalHost.Location ).Y;
+			bool isCAMArea = area.Top == mainForm.Top && area.Bottom == nHostTop && area.Width == mainForm.Width;
+			if( isCAMArea == false ) {
+				Console.WriteLine( "FAIL  P2 portrait dialog area {0}, CNC host top {1}", area, nHostTop );
+				return 1;
+			}
+			return 0;
+		}
+
+		static int CheckDialog( Form mainForm, string szName, Rectangle area, Graphics graphics )
+		{
+			Type type = FindType( szName );
+			if( type == null ) {
+				Console.WriteLine( "SKIP  {0}: type not found", szName );
+				return 0;
+			}
+			Form dialog = null;
+			try {
+				dialog = (Form)LayoutRunner.CreateInstance( type );
+				dialog.Show( mainForm );
+				Wait( 800 );
+
+				// the dialog may be pushed inside the screen working area, which only matters beyond the screen
+				Point expected = new Point( area.Left + ( area.Width - dialog.Width ) / 2,
+					area.Top + ( area.Height - dialog.Height ) / 2 );
+				Rectangle workingArea = Screen.FromControl( mainForm ).WorkingArea;
+				Rectangle expectedBounds = new Rectangle( expected, dialog.Size );
+				bool isInsideScreen = workingArea.Contains( expectedBounds );
+				int nProblem = 0;
+				if( isInsideScreen && dialog.Location != expected ) {
+					Console.WriteLine( "FAIL  P1 {0} at {1}, expected {2}", szName, dialog.Location, expected );
+					nProblem = 1;
+				}
+				else {
+					Console.WriteLine( "OK    {0} at {1}{2}", szName, dialog.Location,
+						isInsideScreen ? "" : " (expected " + expected + " is outside the screen)" );
+				}
+
+				// draw the dialog where it would be relative to the main window
+				if( graphics == null ) {
+					return nProblem;
+				}
+				using( Bitmap dialogBitmap = Capture( dialog.Handle, dialog.Size ) ) {
+					Point offset = new Point( expected.X - mainForm.Left, expected.Y - mainForm.Top );
+					graphics.DrawImage( dialogBitmap, offset );
+				}
+				return nProblem;
+			}
+			catch( Exception ex ) {
+				Exception inner = ex is TargetInvocationException && ex.InnerException != null ? ex.InnerException : ex;
+				Console.WriteLine( "SKIP  {0}: {1} {2}", szName, inner.GetType().Name, inner.Message.Split( '\n' )[ 0 ].Trim() );
+				return 0;
+			}
+			finally {
+				if( dialog != null && !dialog.IsDisposed ) {
+					dialog.Close();
+					dialog.Dispose();
+				}
+			}
+		}
+
+		static void DrawArea( Graphics graphics, Form mainForm, Rectangle area )
+		{
+			// dashed outline of the area dialogs are centered in
+			using( Pen pen = new Pen( Color.FromArgb( 196, 43, 28 ), 3 ) ) {
+				pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+				Rectangle local = new Rectangle( area.Left - mainForm.Left, area.Top - mainForm.Top, area.Width, area.Height );
+				local.Inflate( -2, -2 );
+				graphics.DrawRectangle( pen, local );
+			}
+		}
+
+		static Bitmap Capture( IntPtr handle, Size size )
+		{
+			Bitmap bitmap = new Bitmap( size.Width, size.Height );
+			using( Graphics graphics = Graphics.FromImage( bitmap ) ) {
+				IntPtr hdc = graphics.GetHdc();
+
+				// PW_RENDERFULLCONTENT also renders the 3D view and the part outside the screen
+				PrintWindow( handle, hdc, 2 );
+				graphics.ReleaseHdc( hdc );
+			}
+			return bitmap;
+		}
+
+		static Type FindType( string szName )
+		{
+			foreach( Assembly assembly in new[] { m_App, m_Cnc } ) {
+				foreach( Type type in assembly.GetTypes() ) {
+					if( type.Name == szName ) {
+						return type;
+					}
+				}
+			}
+			return null;
+		}
+
+		static Control FindControl( Control parent, string szName )
+		{
+			Control[] foundArray = parent.Controls.Find( szName, true );
+			if( foundArray.Length == 0 ) {
+				throw new InvalidOperationException( szName + " not found" );
+			}
+			return foundArray[ 0 ];
+		}
+
+		static void Wait( int nMilliseconds )
+		{
+			DateTime end = DateTime.Now.AddMilliseconds( nMilliseconds );
+			while( DateTime.Now < end ) {
+				Application.DoEvents();
+				System.Threading.Thread.Sleep( 20 );
+			}
+		}
+
+		[DllImport( "user32.dll" )]
+		static extern bool PrintWindow( IntPtr hWnd, IntPtr hdc, uint nFlags );
+
+		[DllImport( "user32.dll" )]
+		static extern bool SetWindowPos( IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags );
+
+		const uint SWP_NOZORDER = 0x0004;
+		const uint SWP_NOACTIVATE = 0x0010;
+
+		static Assembly m_App;
+		static Assembly m_Cnc;
+		static int m_nResult = 2;
+	}
+}
