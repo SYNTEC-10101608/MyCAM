@@ -12,7 +12,6 @@
 	<Message ID="PathType_Pentagon" Content="五角形" />
 	<Message ID="PathType_Hexagon" Content="六角形" />
 	<Message ID="m_chkCoordReverse" Content="坐标反转" />
-	<Message ID="m_btnOK" Content="确认" />
 	<Message ID="m_btnCancel" Content="取消" />
 	<Message ID="m_lblDiameter" Content="直径" />
 	<Message ID="m_lblLength" Content="长度" />

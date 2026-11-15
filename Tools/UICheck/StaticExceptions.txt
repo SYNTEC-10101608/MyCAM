@@ -30,3 +30,4 @@ S6 LockMSAxisDlg m_chkLockSlave contains the axis name (Format_LockSlave, set in
 S6 LockMSAxisDlg m_chkLockMaster contains the axis name (Format_LockMaster, set in code)
 S6 LockMSAxisDlg m_lblSlaveAngle contains the axis name (Format_SlaveAngle, set in code)
 S6 LockMSAxisDlg m_lblMasterAngle contains the axis name (Format_MasterAngle, set in code)
+S6 PatternSettingDlg label* labels of the pattern panels share their texts (set in code)

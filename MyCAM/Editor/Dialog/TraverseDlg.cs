@@ -12,30 +12,6 @@ namespace MyCAM.Editor
 			InitializeControlAndFieldValue( data );
 			UpdateFollowSafeDistanceRange();
 			m_NumericUpDownCutDownDistance.ValueChanged += m_NumericUpDownCutDownDistance_ValueChanged;
-			ApplyResourcesToUI();
-		}
-
-		public void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "TraverseDlg", this.Text );
-
-			m_lblLiftUpDistance.Text = m_LanguageManager.TryGetString( "m_lblLiftUpDistance", m_lblLiftUpDistance.Text );
-			m_lblCutDownDistance.Text = m_LanguageManager.TryGetString( "m_lblCutDownDistance", m_lblCutDownDistance.Text );
-			m_lblFollowSaveDistance.Text = m_LanguageManager.TryGetString( "m_lblFollowSaveDistance", m_lblFollowSaveDistance.Text );
-
-			m_rbtnFrogLeap.Text = m_LanguageManager.TryGetString( "m_rbtnFrogLeap", m_rbtnFrogLeap.Text );
-			m_rbtnSafePlane.Text = m_LanguageManager.TryGetString( "m_rbtnSafePlane", m_rbtnSafePlane.Text );
-			m_rbtnSafeCylinder.Text = m_LanguageManager.TryGetString( "m_rbtnSafeCylinder", m_rbtnSafeCylinder.Text );
-			m_rbtnSafeSphere.Text = m_LanguageManager.TryGetString( "m_rbtnSafeSphere", m_rbtnSafeSphere.Text );
-
-			m_gbxTraverse.Text = m_LanguageManager.TryGetString( "m_gbxTraverse", m_gbxTraverse.Text );
-
-			m_lblFrogLeapDistance.Text = m_LanguageManager.TryGetString( "m_lblFrogLeapDistance", m_lblFrogLeapDistance.Text );
-			m_lblSafePlaneDistance.Text = m_LanguageManager.TryGetString( "m_lblSafePlaneDistance", m_lblSafePlaneDistance.Text );
-			m_lblSafeCylinderRadius.Text = m_LanguageManager.TryGetString( "m_lblSafeCylinderRadius", m_lblSafeCylinderRadius.Text );
-			m_lblSafeSphereRadius.Text = m_LanguageManager.TryGetString( "m_lblSafeSphereRadius", m_lblSafeSphereRadius.Text );
-
-			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnConfirm", m_btnConfirm.Text );
 		}
 
 		void InitializeControlAndFieldValue( TraverseData Data )
@@ -217,6 +193,5 @@ namespace MyCAM.Editor
 		double m_SafeCylinderRadius = TraverseData.SAFE_CYLINDER_RADIUS;
 		double m_SafeSphereRadius = TraverseData.SAFE_SPHERE_RADIUS;
 
-		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "TraverseDlg" );
 	}
 }

@@ -18,5 +18,4 @@
 	<Message ID="m_lblSafeCylinderRadius" Content="Cylinder Radius" />
 	<Message ID="m_lblSafeSphereRadius" Content="Sphere Radius" />
 
-	<Message ID="m_btnConfirm" Content="Confirm" />
 </ResMap>

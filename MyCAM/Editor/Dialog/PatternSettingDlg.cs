@@ -12,20 +12,13 @@ namespace MyCAM.Editor.Dialog
 			m_PathType = standardPatternGeomData == null ? PathType.Contour : standardPatternGeomData.PathType;
 			InitializeComponent();
 			m_LanguageManager = new LanguageManager.LanguageManager( "PatternSettingDlg" );
-			ApplyResourcesToUI();
+			InitLocalizedTexts();
 			InitializeControlsValue();
 		}
 
-		void ApplyResourcesToUI()
+		// the labels of the pattern panels share their texts; the path types are localized at runtime
+		void InitLocalizedTexts()
 		{
-			this.Text = m_LanguageManager.TryGetString( "PatternSettingDlg", this.Text );
-			label1.Text = m_LanguageManager.TryGetString( "m_lblPathType", label1.Text );
-
-			m_btnAutoRecognize.Text = m_LanguageManager.TryGetString( "m_btnAutoRecognize", m_btnAutoRecognize.Text );
-
-			m_chkCoordReverse.Text = m_LanguageManager.TryGetString( "m_chkCoordReverse", m_chkCoordReverse.Text );
-			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnOK", m_btnConfirm.Text );
-
 			// circle panel labels
 			label6.Text = m_LanguageManager.TryGetString( "m_lblDiameter", label6.Text );
 			label7.Text = m_LanguageManager.TryGetString( "m_lblRotatedAngle", label7.Text );
