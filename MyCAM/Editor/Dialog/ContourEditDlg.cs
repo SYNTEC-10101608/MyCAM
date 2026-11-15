@@ -16,39 +16,9 @@ namespace MyCAM.Editor
 		public ContourEditDlg()
 		{
 			InitializeComponent();
-			ApplyResourcesToUI();
 
 			m_rbtnWorldCoord.Tag = RefCoordinateType.World;
 			m_rbtnLocalCoord.Tag = RefCoordinateType.Local;
-		}
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "ContourEditDlg", this.Text );
-			m_gbxIndexParam.Text = m_LanguageManager.TryGetString( "m_gbxIndexParam", m_gbxIndexParam.Text );
-
-			m_lblRefCoordType.Text = m_LanguageManager.TryGetString( "m_lblRefCoordType", m_lblRefCoordType.Text );
-			m_rbtnWorldCoord.Text = m_LanguageManager.TryGetString( "m_rbtnWorldCoord", m_rbtnWorldCoord.Text );
-			m_rbtnLocalCoord.Text = m_LanguageManager.TryGetString( "m_rbtnLocalCoord", m_rbtnLocalCoord.Text );
-
-			m_lblToStartOrEnd.Text = m_LanguageManager.TryGetString( "m_lblToStartOrEnd", m_lblToStartOrEnd.Text );
-			m_rbtnToStart.Text = m_LanguageManager.TryGetString( "m_rbtnToStart", m_rbtnToStart.Text );
-			m_rbtnToEnd.Text = m_LanguageManager.TryGetString( "m_rbtnToEnd", m_rbtnToEnd.Text );
-
-			m_lblDX.Text = m_LanguageManager.TryGetString( "m_lblDX", m_lblDX.Text );
-			m_lblDY.Text = m_LanguageManager.TryGetString( "m_lblDY", m_lblDY.Text );
-			m_lblDZ.Text = m_LanguageManager.TryGetString( "m_lblDZ", m_lblDZ.Text );
-			m_lblUnit.Text = m_LanguageManager.TryGetString( "m_lblUnit", m_lblUnit.Text );
-
-			m_lblRelativeCurrentPath.Text = m_LanguageManager.TryGetString( "m_lblRelativeCurrentPath", m_lblRelativeCurrentPath.Text );
-			m_lblTotalDiff.Text = m_LanguageManager.TryGetString( "m_lblTotalDiff", m_lblTotalDiff.Text );
-
-			m_btnAdd.Text = m_LanguageManager.TryGetString( "m_btnAdd", m_btnAdd.Text );
-			m_btnRemove.Text = m_LanguageManager.TryGetString( "m_btnRemove", m_btnRemove.Text );
-
-			m_btnSave.Text = m_LanguageManager.TryGetString( "m_btnSave", m_btnSave.Text );
-			m_btnReset.Text = m_LanguageManager.TryGetString( "m_btnReset", m_btnReset.Text );
-			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
 		}
 
 		// Refresh the dialog UI to reflect the given param.
@@ -213,7 +183,6 @@ namespace MyCAM.Editor
 		bool m_bSuppressValueChanged = false;
 		ContourEditParam m_Param = null;
 
-		readonly LanguageManager.LanguageManager m_LanguageManager = new LanguageManager.LanguageManager( "ContourEditDlg" );
 	}
 
 	internal class ContourEditParam

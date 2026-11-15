@@ -177,7 +177,7 @@ function Test-DialogLayout( $screen ) {
 	}
 	$clientSize = ConvertTo-Size $client
 	$topLevel = @( $screen.Children["(form)"] | Where-Object { $_ } )
-	$sections = @( $topLevel | Where-Object { $screen.Fields[$_] -eq "CommonUI.Controls.SectionPanel" } |
+	$sections = @( $topLevel | Where-Object { $screen.Fields[$_] -match "(CommonUI.Controls.SectionPanel|System.Windows.Forms.Panel)$" } |
 		ForEach-Object { Get-Bounds $screen $_ } | Sort-Object Top )
 	$buttons = @( $topLevel | Where-Object { $screen.Fields[$_] -eq "CommonUI.Controls.ThemedButton" } |
 		ForEach-Object { Get-Bounds $screen $_ } )
@@ -192,7 +192,9 @@ function Test-DialogLayout( $screen ) {
 		if ($section.Top -ne $expectedTop -and -not (Test-RuntimeStacked $screen $section.Name)) {
 			Report "S5" $szClass $section.Name "section must be at y=$expectedTop (is $($section.Top))"
 		}
-		Test-SectionRows $screen $section.Name 36
+		if ($screen.Fields[$section.Name] -eq "CommonUI.Controls.SectionPanel") {
+			Test-SectionRows $screen $section.Name 36
+		}
 		$previous = $section
 	}
 

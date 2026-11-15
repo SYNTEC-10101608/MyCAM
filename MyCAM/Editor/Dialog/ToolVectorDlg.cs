@@ -45,7 +45,6 @@ namespace MyCAM.Editor
 			}
 
 			// update interpolation type combo box with actual axis names
-			ApplyResourcesToUI();
 			UpdateInterpolateTypeNames();
 			ResetType();
 		}
@@ -165,38 +164,6 @@ namespace MyCAM.Editor
 			m_lblLegendSlave.Enabled = false;
 			m_pnlColorMaster.Enabled = false;
 			m_lblLegendMaster.Enabled = false;
-		}
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "ToolVectorDlg", this.Text );
-			m_lblOnePntToolVecAdjust.Text = m_LanguageManager.TryGetString( "m_lblOnePntToolVecAdjust", m_lblOnePntToolVecAdjust.Text );
-			m_lblADeg.Text = m_LanguageManager.TryGetString( "m_lblADeg", m_lblADeg.Text );
-			m_lblBDeg.Text = m_LanguageManager.TryGetString( "m_lblBDeg", m_lblBDeg.Text );
-			m.Text = m_LanguageManager.TryGetString( "m", m.Text );
-			m_lblToolDirQuickSetBtn.Text = m_LanguageManager.TryGetString( "m_lblToolDirQuickSetBtn", m_lblToolDirQuickSetBtn.Text );
-			m_btnZDir.Text = m_LanguageManager.TryGetString( "m_btnZDir", m_btnZDir.Text );
-			m_btnKeep.Text = m_LanguageManager.TryGetString( "m_btnKeep", m_btnKeep.Text );
-			m_btnRevert.Text = m_LanguageManager.TryGetString( "m_btnRevert", m_btnRevert.Text );
-			m_lblStartEnd.Text = m_LanguageManager.TryGetString( "m_lblStartEnd", m_lblStartEnd.Text );
-			m_btnSwitchStartEnd.Text = m_LanguageManager.TryGetString( "m_btnSwitchStartEnd", m_btnSwitchStartEnd.Text );
-			m_lblSetBtn.Text = m_LanguageManager.TryGetString( "m_lblSetBtn", m_lblSetBtn.Text );
-			m_btnAdd.Text = m_LanguageManager.TryGetString( "m_btnAdd", m_btnAdd.Text );
-			m_btnRemove.Text = m_LanguageManager.TryGetString( "m_btnRemove", m_btnRemove.Text );
-			m_btnClear.Text = m_LanguageManager.TryGetString( "m_btnClear", m_btnClear.Text );
-			m_gpbStartPnt.Text = m_LanguageManager.TryGetString( "m_gpbStartPnt", m_gpbStartPnt.Text );
-			m_btnToStart.Text = m_LanguageManager.TryGetString( "m_btnToStart", m_btnToStart.Text );
-			m_gpbPnt.Text = m_LanguageManager.TryGetString( "m_gpbPnt", m_gpbPnt.Text );
-			m_btnPrev.Text = m_LanguageManager.TryGetString( "m_btnPrev", m_btnPrev.Text );
-			m_btnNext.Text = m_LanguageManager.TryGetString( "m_btnNext", m_btnNext.Text );
-			m_btnToEnd.Text = m_LanguageManager.TryGetString( "m_btnToEnd", m_btnToEnd.Text );
-			m_gpbCtrlPnt.Text = m_LanguageManager.TryGetString( "m_gpbCtrlPnt", m_gpbCtrlPnt.Text );
-			m_btnPreCtrlPnt.Text = m_LanguageManager.TryGetString( "m_btnPreCtrlPnt", m_btnPreCtrlPnt.Text );
-			m_btnNextCtrlPnt.Text = m_LanguageManager.TryGetString( "m_btnNextCtrlPnt", m_btnNextCtrlPnt.Text );
-			m_gbxColorLegend.Text = m_LanguageManager.TryGetString( "m_gbxColorLegend", m_gbxColorLegend.Text );
-			m_lblLegendNormal.Text = m_LanguageManager.TryGetString( "m_lblLegendNormal", m_lblLegendNormal.Text );
-			m_lblLegendRotary.Text = m_LanguageManager.TryGetString( "m_lblLegendRotary", m_lblLegendRotary.Text );
-			m_lblLegendBevel.Text = m_LanguageManager.TryGetString( "m_lblLegendBevel", m_lblLegendBevel.Text );
 		}
 
 		#endregion
