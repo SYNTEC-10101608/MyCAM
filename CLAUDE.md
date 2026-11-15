@@ -9,3 +9,4 @@
 @.github/instructions/coding-style-general.instructions.md
 @.github/instructions/coding-style-csharp.instructions.md
 @.github/instructions/coding-style-cpp.instructions.md
+@.github/instructions/ui-style.instructions.md

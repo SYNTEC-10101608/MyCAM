@@ -11,6 +11,7 @@
 | [Coding Style：通用規則](instructions/coding-style-general.instructions.md) | 編碼、縮排、檔名、註解、修改既有程式碼的原則 | 全部 |
 | [Coding Style：C#](instructions/coding-style-csharp.instructions.md) | C# 格式、命名、程式結構、語言用法 | `*.cs` |
 | [Coding Style：C / C++](instructions/coding-style-cpp.instructions.md) | C / C++ 格式、命名、語言用法 | `*.c` `*.cpp` `*.h` `*.hpp` |
+| [UI 風格](instructions/ui-style.instructions.md) | 主題 token、控制項白名單、對話框外觀層與版面、多語系自動套用、檢查腳本 | `*.cs`（畫面） |
 
 格式類規則同時寫在 repo 根目錄的 `.editorconfig`，衝突時以 `.editorconfig` 為準。
 
