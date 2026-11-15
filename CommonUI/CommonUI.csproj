@@ -34,12 +34,6 @@
 	<Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-	<Compile Include="Controls\PanelButton.cs">
-	  <SubType>Component</SubType>
-	</Compile>
-	<Compile Include="Controls\GroupPanel.cs">
-	  <SubType>Component</SubType>
-	</Compile>
 	<Compile Include="Controls\ButtonIndicator.cs" />
 	<Compile Include="Controls\ButtonKind.cs" />
 	<Compile Include="Controls\CommonButtonText.cs" />

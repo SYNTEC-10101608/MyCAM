@@ -6,15 +6,16 @@ using System.Windows.Forms;
 using CncManager.Definition;
 using CncUI.Controls;
 using CommonUI.Controls;
+using CommonUI.Forms;
 
 namespace CncUI
 {
-	public partial class CNCPanel : UserControl
+	public partial class CNCPanel : PanelBase
 	{
 		public CNCPanel()
 		{
 			InitializeComponent();
-			m_Buttons = new Dictionary<CNCButton, PanelButton> {
+			m_Buttons = new Dictionary<CNCButton, ThemedButton> {
 				{ CNCButton.Start, m_btnStart },
 				{ CNCButton.Continue, m_btnContinue },
 				{ CNCButton.Pause, m_btnPause },
@@ -33,7 +34,7 @@ namespace CncUI
 				{ CNCButton.Endpoint, m_btnEndpoint },
 				{ CNCButton.HandwheelSimulation, m_btnHandwheelSimulation }
 			};
-			m_JogStepButtons = new Dictionary<JogStep, PanelButton> {
+			m_JogStepButtons = new Dictionary<JogStep, ThemedButton> {
 				{ JogStep.Step5, m_btnJogStep5 },
 				{ JogStep.Step10, m_btnJogStep10 },
 				{ JogStep.Step50, m_btnJogStep50 },
@@ -91,32 +92,8 @@ namespace CncUI
 
 		public void ApplyResources()
 		{
-			m_lblAuxiliaryTitle.Text = Language.TryGetString( "m_lblAuxiliaryTitle", AUXILIARY_TITLE );
-			m_btnOuterEquipParameters.Text = Language.TryGetString( "m_btnOuterEquipParameters", PARAMETERS );
-			m_btnShutter.Text = Language.TryGetString( "m_btnShutter", SHUTTER );
-			m_btnAir.Text = Language.TryGetString( "m_btnAir", AIR );
-			m_btnFollow.Text = Language.TryGetString( "m_btnFollow", FOLLOW );
-			m_btnLaser.Text = Language.TryGetString( "m_btnLaser", LASER );
-			m_btnFocus.Text = Language.TryGetString( "m_btnFocus", FOCUS );
-			m_btnCalibration.Text = Language.TryGetString( "m_btnCalibration", CALIBRATION );
-			m_lblJogTitle.Text = Language.TryGetString( "m_lblJogTitle", JOG_TITLE );
-			m_btnEndpoint.Text = Language.TryGetString( "m_btnEndpoint", ENDPOINT );
-			m_lblHomeTitle.Text = Language.TryGetString( "m_lblHomeTitle", HOME_TITLE );
-			m_btnHomeProgram.Text = Language.TryGetString( "m_btnHomeProgram", HOME_PROGRAM );
-			m_btnHomeMachine.Text = Language.TryGetString( "m_btnHomeMachine", HOME_MACHINE );
-			m_btnSafePosition.Text = Language.TryGetString( "m_btnSafePosition", SAFE_POSITION );
-			m_lblStrategyTitle.Text = Language.TryGetString( "m_lblStrategyTitle", STRATEGY_TITLE );
-			m_btnResumeCutParameters.Text = Language.TryGetString( "m_btnResumeCutParameters", PARAMETERS );
-			m_btnDryRun.Text = Language.TryGetString( "m_btnDryRun", DRY_RUN );
-			m_btnResumeCutting.Text = Language.TryGetString( "m_btnResumeCutting", RESUME_CUTTING );
-			m_btnHandwheelSimulation.Text = Language.TryGetString( "m_btnHandwheelSimulation", HANDWHEEL_SIMULATION );
-			m_lblMachiningTitle.Text = Language.TryGetString( "m_lblMachiningTitle", MACHINING_TITLE );
-			m_chbThreePointCalibration.Text = Language.TryGetString( "m_chbThreePointCalibration", THREE_POINT_CALIBRATION );
-			m_lblFeedOverrideTitle.Text = Language.TryGetString( "m_lblFeedOverrideTitle", FEED_OVERRIDE );
-			m_btnStart.Text = Language.TryGetString( "m_btnStart", START );
-			m_btnPause.Text = Language.TryGetString( "m_btnPause", PAUSE );
-			m_btnContinue.Text = Language.TryGetString( "m_btnContinue", CONTINUE );
-			m_btnStop.Text = Language.TryGetString( "m_btnStop", STOP );
+			// captions whose ID is the control name
+			LanguageApplier.Apply( this, Language );
 			SetJogMode( m_Inching );
 		}
 
@@ -364,8 +341,8 @@ namespace CncUI
 		const string CONTINUE = "繼續";
 		const string STOP = "停止";
 
-		readonly Dictionary<CNCButton, PanelButton> m_Buttons;
-		readonly Dictionary<JogStep, PanelButton> m_JogStepButtons;
+		readonly Dictionary<CNCButton, ThemedButton> m_Buttons;
+		readonly Dictionary<JogStep, ThemedButton> m_JogStepButtons;
 		readonly Dictionary<string, Button[]> m_JogButtons;
 		readonly ResponsiveLayout m_Layout;
 		Button m_PressedJogButton;

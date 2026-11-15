@@ -9,7 +9,7 @@ namespace CommonUI.Controls
 		{
 			InitializeComponent();
 			m_TopicLabel.Text = szTopic;
-			m_ProgressBar.ForeColor = System.Drawing.Color.FromArgb( 0, 142, 203 );
+			m_ProgressBar.ForeColor = Theme.ThemeColors.ACCENT;
 		}
 
 		public void SetStage( string szStage, int nPercent )

@@ -363,8 +363,8 @@ foreach ($file in $codeFiles) {
 	$nLine = 0
 	foreach ($line in Get-Content $file.FullName -Encoding UTF8) {
 		$nLine++
-		# Color.Empty resets a color to its default and is allowed
-		if ($line -notmatch "(?<![\w])(Color\.(FromArgb|(?!Empty\b)[A-Z]\w*)|SystemColors\.\w+|new (System\.Drawing\.)?Font\s*\()") {
+		# Color.Empty (default) and Color.Transparent (no fill) are not colors and are allowed
+		if ($line -notmatch "(?<![\w])(Color\.(FromArgb|(?!(Empty|Transparent)\b)[A-Z]\w*)|SystemColors\.\w+|new (System\.Drawing\.)?Font\s*\()") {
 			continue
 		}
 
