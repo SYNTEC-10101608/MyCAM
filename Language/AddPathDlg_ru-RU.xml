@@ -17,7 +17,7 @@
 	<Message ID="m_lblD1Unit" Content="deg" />
 	<Message ID="m_lblChordUnit" Content="mm" />
 	<Message ID="m_lblLineUnit" Content="mm" />
-	<Message ID="m_btnOK" Content="Создать путь" />
+	<Message ID="m_btnConfirm" Content="Создать путь" />
 	<Message ID="m_btnNext" Content="Далее" />
 	<Message ID="DiscreteMode_QuasiUniformDeflection" Content="Стандартная дискретизация" />
 	<Message ID="DiscreteMode_UniformDeflection" Content="Точная дискретизация" />

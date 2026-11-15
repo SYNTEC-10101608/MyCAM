@@ -11,7 +11,4 @@
 	<Message ID="m_lblRz" Content="RZ" />
 	<Message ID="m_lblStepDis" Content="步进距离" />
 	<Message ID="m_lblStapAngle" Content="步进角度" />
-	<Message ID="m_btnOK" Content="确认" />
-	<Message ID="m_btnCancel" Content="取消" />
-	<Message ID="m_btnReset" Content="重设" />
 </ResMap>

@@ -13,3 +13,9 @@ S6 AutoSortPathDlg m_lblExtrusionBandwidth shares the text m_lblBandwidth with m
 S6 AutoSortPathDlg m_lblRotationBandwidth shares the text m_lblBandwidth with m_lblExtrusionBandwidth (set in code)
 S7 ExtendedGCodeDlg m_lblIsStartOrEnd ResetParam() sets the position text only after Show(), when the auto-applied text is already set
 S6 ExtendedGCodeDlg m_lblIsMixData text is set by ResetParam() (IsMixData)
+S6 FlyCutDlg m_lblGroupWidth text depends on the group unit, set by ResetParam() (GroupWidth / GroupAngle)
+S6 CalibrationREFDlg m_btnDelPnt* the three delete buttons share the text m_btnDelete (set in code)
+S5 AddPathDlg m_grpStep3 step sections share the first position; SectionStack shows one at a time
+S5 AddPathDlg m_secStepHint step sections share the first position; SectionStack shows one at a time
+S6 AddPathDlg m_lblStepDescription text depends on the step (Desc_Step2_Title / Desc_Step4_Title)
+S5 AddPathDlg m_grpStep1 step sections share the first position; SectionStack shows one at a time

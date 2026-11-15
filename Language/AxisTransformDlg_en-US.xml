@@ -11,7 +11,4 @@
 	<Message ID="m_lblRz" Content="RZ" />
 	<Message ID="m_lblStepDis" Content="Step Distance" />
 	<Message ID="m_lblStapAngle" Content="Step Angle" />
-	<Message ID="m_btnOK" Content="OK" />
-	<Message ID="m_btnCancel" Content="Cancel" />
-	<Message ID="m_btnReset" Content="Reset" />
 </ResMap>

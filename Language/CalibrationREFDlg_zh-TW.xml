@@ -4,12 +4,8 @@
 	<Message ID="m_gbPnt1" Content="參考點1" />
 	<Message ID="m_gbPnt2" Content="參考點2" />
 	<Message ID="m_gbPnt3" Content="參考點3" />
-	<Message ID="m_lblX" Content="X" />
-	<Message ID="m_lblY" Content="Y" />
-	<Message ID="m_lblZ" Content="Z" />
 	<Message ID="m_btnDelete" Content="刪除" />
 	<Message ID="m_btnDeletAll" Content="全部刪除" />
-	<Message ID="m_btnSure" Content="確認" />
 	<Message ID="NeedThreeRefPoints" Content="需要三個參考點" />
 	<Message ID="RefPointsDuplicate" Content="參考點重覆" />
 	<Message ID="ThreePointsCollinear" Content="3點共線" />

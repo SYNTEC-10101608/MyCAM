@@ -15,29 +15,6 @@ namespace MyCAM.Editor.Dialog
 			InitializeComponent();
 			m_nudGroupWidth.Minimum = 0;
 
-			ApplyResourcesToUI();
-		}
-
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "FlyCutDlg", this.Text );
-
-			m_lblFlyCut.Text = m_LanguageManager.TryGetString( "m_lblFlyCut", m_lblFlyCut.Text );
-			m_rbtnCircularFlyCut.Text = m_LanguageManager.TryGetString( "m_rbtnCircularFlyCut", m_rbtnCircularFlyCut.Text );
-
-			m_gbxSetting.Text = m_LanguageManager.TryGetString( "m_gbxSetting", m_gbxSetting.Text );
-
-			m_lblStartPosition.Text = m_LanguageManager.TryGetString( "m_lblStartPosition", m_lblStartPosition.Text );
-			m_rbtnLeftTop.Text = m_LanguageManager.TryGetString( "m_rbtnLeftTop", m_rbtnLeftTop.Text );
-			m_rbtnLeftBottom.Text = m_LanguageManager.TryGetString( "m_rbtnLeftBottom", m_rbtnLeftBottom.Text );
-			m_rbtnRightTop.Text = m_LanguageManager.TryGetString( "m_rbtnRightTop", m_rbtnRightTop.Text );
-			m_rbtnRightBottom.Text = m_LanguageManager.TryGetString( "m_rbtnRightBottom", m_rbtnRightBottom.Text );
-
-			m_lblDirection.Text = m_LanguageManager.TryGetString( "m_lblDirection", m_lblDirection.Text );
-			m_rbtnVertical.Text = m_LanguageManager.TryGetString( "m_rbtnVertical", m_rbtnVertical.Text );
-			m_rbtnHorizontal.Text = m_LanguageManager.TryGetString( "m_rbtnHorizontal", m_rbtnHorizontal.Text );
-			m_btnAdd.Text = m_LanguageManager.TryGetString( "m_btnAdd", m_btnAdd.Text );
-			m_btnRemove.Text = m_LanguageManager.TryGetString( "m_btnRemove", m_btnRemove.Text );
 		}
 
 		public void ResetParam( FlyCutParam param )

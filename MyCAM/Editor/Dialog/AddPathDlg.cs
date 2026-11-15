@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using CommonUI.Controls;
 using CommonUI.Forms;
 using MyCAM.App;
 using OCCTool;
@@ -12,7 +13,6 @@ namespace MyCAM.Editor.Dialog
 		{
 			InitializeComponent();
 			m_LanguageManager = new LanguageManager.LanguageManager( "AddPathDlg" );
-			ApplyResourcesToUI();
 			InitializeComboBox();
 
 			// track last-known-good values so an invalid edit can be reverted immediately (on leaving
@@ -141,18 +141,27 @@ namespace MyCAM.Editor.Dialog
 			bool isStepWithLabels = ( m_currentStep == EDialogStep.SelectFace || m_currentStep == EDialogStep.SelectWire );
 			m_lblStepDescription.Visible = isStepWithLabels;
 			m_lblStepHints.Visible = isStepWithLabels;
+			m_secStepHint.Visible = isStepWithLabels;
 
 			m_grpAdvanced.Visible = m_chkShowAdvanced.Checked;
-			if( m_chkShowAdvanced.Checked ) {
-				m_grpAdvanced.Location = new System.Drawing.Point( m_grpAdvanced.Left, m_chkShowAdvanced.Bottom + ADVANCED_GROUP_GAP );
-			}
 
-			int clientHeight = m_chkShowAdvanced.Checked
-				? m_grpAdvanced.Bottom + EDGE_MARGIN
-				: m_chkShowAdvanced.Bottom + EDGE_MARGIN;
-			this.ClientSize = new System.Drawing.Size( this.ClientSize.Width, clientHeight );
+			// stack the section of the current step, the options and the advanced parameters
+			Control stepSection = GetStepSection( isStepWithLabels );
+			int nContentBottom = m_chkShowAdvanced.Checked
+				? SectionStack.Arrange( stepSection, m_secOptions, m_grpAdvanced )
+				: SectionStack.Arrange( stepSection, m_secOptions );
+			SectionStack.PlaceButtonBar( this, nContentBottom, m_btnNext, m_btnConfirm );
 
 			this.ResumeLayout( true );
+		}
+
+		Control GetStepSection( bool isStepWithLabels )
+		{
+			// face and wire selection steps only show their description
+			if( isStepWithLabels ) {
+				return m_secStepHint;
+			}
+			return m_currentStep == EDialogStep.ChooseWireMode ? (Control)m_grpStep3 : m_grpStep1;
 		}
 
 		void OnStep1RadioChanged( object sender, EventArgs e )
@@ -282,7 +291,7 @@ namespace MyCAM.Editor.Dialog
 			ValidatePositiveTextBox( m_txbMaxLineLength, ref m_lastValidMaxLineLength );
 		}
 
-		void ValidatePositiveTextBox( TextBox txb, ref double lastValid, Func<double, bool> rangeCheck = null )
+		void ValidatePositiveTextBox( Control txb, ref double lastValid, Func<double, bool> rangeCheck = null )
 		{
 			if( double.TryParse( txb.Text, out double value ) && value > 0
 				&& ( rangeCheck == null || rangeCheck( value ) ) ) {
@@ -336,29 +345,6 @@ namespace MyCAM.Editor.Dialog
 			m_cmbDiscreteMode.SelectedIndex = 0;
 		}
 
-		void ApplyResourcesToUI()
-		{
-			this.Text = m_LanguageManager.TryGetString( "AddPathDlg", this.Text );
-			m_grpStep1.Text = m_LanguageManager.TryGetString( "m_grpStep1", m_grpStep1.Text );
-			m_rdoAutoHat.Text = m_LanguageManager.TryGetString( "m_rdoAutoHat", m_rdoAutoHat.Text );
-			m_rdoAutoTube.Text = m_LanguageManager.TryGetString( "m_rdoAutoTube", m_rdoAutoTube.Text );
-			m_rdoManual.Text = m_LanguageManager.TryGetString( "m_rdoManual", m_rdoManual.Text );
-			m_grpStep3.Text = m_LanguageManager.TryGetString( "m_grpStep3", m_grpStep3.Text );
-			m_rdoAutoFromFace.Text = m_LanguageManager.TryGetString( "m_rdoAutoFromFace", m_rdoAutoFromFace.Text );
-			m_rdoManualWire.Text = m_LanguageManager.TryGetString( "m_rdoManualWire", m_rdoManualWire.Text );
-			m_chkShowAdvanced.Text = m_LanguageManager.TryGetString( "m_chkShowAdvanced", m_chkShowAdvanced.Text );
-			m_grpAdvanced.Text = m_LanguageManager.TryGetString( "m_grpAdvanced", m_grpAdvanced.Text );
-			m_lblD1Threshold.Text = m_LanguageManager.TryGetString( "m_lblD1Threshold", m_lblD1Threshold.Text );
-			m_lblDiscreteMode.Text = m_LanguageManager.TryGetString( "m_lblDiscreteMode", m_lblDiscreteMode.Text );
-			m_lblMaxChordError.Text = m_LanguageManager.TryGetString( "m_lblMaxChordError", m_lblMaxChordError.Text );
-			m_lblMaxLineLength.Text = m_LanguageManager.TryGetString( "m_lblMaxLineLength", m_lblMaxLineLength.Text );
-			m_lblD1Unit.Text = m_LanguageManager.TryGetString( "m_lblD1Unit", m_lblD1Unit.Text );
-			m_lblChordUnit.Text = m_LanguageManager.TryGetString( "m_lblChordUnit", m_lblChordUnit.Text );
-			m_lblLineUnit.Text = m_LanguageManager.TryGetString( "m_lblLineUnit", m_lblLineUnit.Text );
-			m_btnConfirm.Text = m_LanguageManager.TryGetString( "m_btnOK", m_btnConfirm.Text );
-			m_btnNext.Text = m_LanguageManager.TryGetString( "m_btnNext", m_btnNext.Text );
-		}
-
 		double m_lastValidD1Threshold;
 		double m_lastValidMaxChordError;
 		double m_lastValidMaxLineLength;
@@ -368,8 +354,6 @@ namespace MyCAM.Editor.Dialog
 		bool m_hasFaceSelection = false;
 		bool m_hasWireSelection = false;
 
-		const int EDGE_MARGIN = 15;
-		const int ADVANCED_GROUP_GAP = 5;
 
 		// ComboBox index for QuasiUniformDeflection, must match the order items are added in InitializeComboBox
 		const int DISCRETE_MODE_QUASI_INDEX = 0;

@@ -53,7 +53,9 @@ if (Test-Path $exceptionFile) {
 }
 $problems = New-Object System.Collections.Generic.List[string]
 function Report( [string]$szRule, [string]$szClass, [string]$szControl, [string]$szMessage ) {
-	if ($exceptions.ContainsKey("$szRule $szClass $szControl") -or $exceptions.ContainsKey("$szRule $szClass *")) {
+	# an exception may use wildcards, e.g. "B6 CalibrationREFDlg m_tbxPnt*"
+	$key = "$szRule $szClass $szControl"
+	if (@($exceptions.Keys | Where-Object { $key -like $_ }).Count -gt 0) {
 		return
 	}
 	$problems.Add("$szRule $szClass.$szControl $szMessage")
