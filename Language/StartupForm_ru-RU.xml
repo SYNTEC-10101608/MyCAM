@@ -12,9 +12,8 @@
 	<Message ID="m_tsmiSetting" Content="Параметры" />
 	<Message ID="m_tsmiCNCConnection" Content="Параметры подключения CNC" />
 	<Message ID="m_tsmiLanguage" Content="Переключение языка" />
-	<Message ID="m_tsmiController" Content="Контроллер" />
-	<Message ID="m_tsmiControllerAdvancedSettings" Content="Расширенные настройки контроллера" />
-	<Message ID="m_tsmiMachining" Content="Обработка" />
+	<Message ID="m_tsmiController" Content="Расширенные настройки контроллера" />
+	<Message ID="m_tsmiCNC" Content="Обработка" />
 	<Message ID="m_tsbSetOffset" Content="Смещение" />
 	<Message ID="m_tsbSetOffset_ToolTip" Content="Задать смещение координат программы" />
 	<Message ID="m_tsbProcessSettings" Content="Технология" />
@@ -97,8 +96,8 @@
 	<Message ID="m_tsbPatternSetting_ToolTip" Content="Стандартные элементы" />
 	<Message ID="m_tsbPathEdit" Content="Редактирование пути" />
 	<Message ID="m_tsbPathEdit_ToolTip" Content="Редактирование пути" />
-	<Message ID="m_BtnContourEdit" Content="Редактирование контура" />
-	<Message ID="m_BtnContourEdit_ToolTip" Content="Редактирование контура" />
+	<Message ID="m_tsbContourEdit" Content="Редактирование контура" />
+	<Message ID="m_tsbContourEdit_ToolTip" Content="Редактирование контура" />
 	<Message ID="m_tsbPathCompensation" Content="Компенсация пути" />
 	<Message ID="m_tsbPathCompensation_ToolTip" Content="Компенсация пути" />
 	<Message ID="m_tsbCalibrationPnt" Content="Трёхточечная калибровка" />
@@ -137,11 +136,11 @@
 	<Message ID="m_tsbCheck_ToolTip" Content="Проверка столкновения" />
 	
 	<!-- 提示字串 -->
-	<Message ID="ShowVec" Content="Показать позу" />
-	<Message ID="ShowOrder" Content="Показать порядок" />
-	<Message ID="ShowOrientation" Content="Показать направление пути" />
-	<Message ID="ShowTraverse" Content="Показать путь поднятия/опускания ножа" />
-	<Message ID="ShowMarker" Content="Показать технологические значки на пути" />
+	<Message ID="m_tsbShowVec_ToolTip" Content="Показать позу" />
+	<Message ID="m_tsbShowOrder_ToolTip" Content="Показать порядок" />
+	<Message ID="m_tsbShowOrientation_ToolTip" Content="Показать направление пути" />
+	<Message ID="m_tsbShowTraverse_ToolTip" Content="Показать путь поднятия/опускания ножа" />
+	<Message ID="m_tsbShowMarker_ToolTip" Content="Показать технологические значки на пути" />
 	<Message ID="Layer" Content="Слой {0}" />
 	<Message ID="m_tsbLayerNone_ToolTip" Content="Не обрабатывать" />
 	<Message ID="m_tsbNeedProcess_ToolTip" Content="Обрабатывать" />

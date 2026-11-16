@@ -63,5 +63,19 @@ namespace CommonUI.Forms
 			get => base.AutoScaleDimensions;
 			set => base.AutoScaleDimensions = value;
 		}
+
+		/// <summary>
+		/// Apply the language texts to each caption control and list column by its name, like
+		/// <see cref="DialogBase"/>. A panel calls it where it applies its language: in the constructor after
+		/// InitializeComponent() and when the language changes; runtime texts are set after it.
+		/// </summary>
+		protected void ApplyLanguage( LanguageManager.LanguageManager languageManager )
+		{
+			bool isDesignTime = DesignMode || LicenseManager.UsageMode == LicenseUsageMode.Designtime;
+			if( isDesignTime ) {
+				return;
+			}
+			LanguageApplier.Apply( this, languageManager );
+		}
 	}
 }

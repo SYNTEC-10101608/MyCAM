@@ -1735,206 +1735,16 @@ namespace MyCAM
 			// form title
 			UpdateFormTitle();
 
-			// menu bar
-			m_tsmiFile.Text = m_LanguageManager.TryGetString( "m_tsmiFile", m_tsmiFile.Text );
-			m_tsmiCAD.Text = m_LanguageManager.TryGetString( "m_tsmiCAD", m_tsmiCAD.Text );
-			m_tsmiCAM.Text = m_LanguageManager.TryGetString( "m_tsmiCAM", m_tsmiCAM.Text );
-			m_tsmiSimulation.Text = m_LanguageManager.TryGetString( "m_tsmiSimulation", m_tsmiSimulation.Text );
-			m_tsmiSetting.Text = m_LanguageManager.TryGetString( "m_tsmiSetting", m_tsmiSetting.Text );
-			m_tsmiCNCConnection.Text = m_LanguageManager.TryGetString( "m_tsmiCNCConnection", m_tsmiCNCConnection.Text );
-			m_tsmiLanguage.Text = m_LanguageManager.TryGetString( "m_tsmiLanguage", m_tsmiLanguage.Text );
-			m_tsmiController.Text = m_LanguageManager.TryGetString( "m_tsmiControllerAdvancedSettings", m_tsmiController.Text );
-			m_tsmiCNC.Text = m_LanguageManager.TryGetString( "m_tsmiMachining", m_tsmiCNC.Text );
+			// menus, tool bars and captions whose ID is the item / control name (tool tips: <name>_ToolTip)
+			ApplyLanguage( m_LanguageManager );
 			m_CNCUIManager?.ApplyResources();
 
-			// file toolbar
-			m_tsbImport3DFile.Text = m_LanguageManager.TryGetString( "m_tsbImport3DFile", m_tsbImport3DFile.Text );
-			m_tsbImport3DFile.ToolTipText = m_LanguageManager.TryGetString( "m_tsbImport3DFile_ToolTip", m_tsbImport3DFile.ToolTipText );
-
-			m_tsbAddRevolution.Text = m_LanguageManager.TryGetString( "m_tsbAddRevolution", m_tsbAddRevolution.Text );
-			m_tsbAddRevolution.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddRevolution_ToolTip", m_tsbAddRevolution.ToolTipText );
-
-			m_tsbReadProjectFile.Text = m_LanguageManager.TryGetString( "m_tsbReadProjectFile", m_tsbReadProjectFile.Text );
-			m_tsbReadProjectFile.ToolTipText = m_LanguageManager.TryGetString( "m_tsbReadProjectFile_ToolTip", m_tsbReadProjectFile.ToolTipText );
-
-			m_tsbSaveProjectFile.Text = m_LanguageManager.TryGetString( "m_tsbSaveProjectFile", m_tsbSaveProjectFile.Text );
-			m_tsbSaveProjectFile.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSaveProjectFile_ToolTip", m_tsbSaveProjectFile.ToolTipText );
-
-			m_tsbAddTube.Text = m_LanguageManager.TryGetString( "m_tsbAddTube", m_tsbAddTube.Text );
-			m_tsbAddTube.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddTube_ToolTip", m_tsbAddTube.ToolTipText );
-
-			// cad toolbar
-			m_tsbSewPart.Text = m_LanguageManager.TryGetString( "m_tsbSewPart", m_tsbSewPart.Text );
-			m_tsbSewPart.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSewPart_ToolTip", m_tsbSewPart.ToolTipText );
-
-			m_tsbDesignSupportBracket.Text = m_LanguageManager.TryGetString( "m_tsbDesignSupportBracket", m_tsbDesignSupportBracket.Text );
-			m_tsbDesignSupportBracket.ToolTipText = m_LanguageManager.TryGetString( "m_tsbDesignSupportBracket_ToolTip", m_tsbDesignSupportBracket.ToolTipText );
-
-			m_tsbAddPoint_AcrCenter.Text = m_LanguageManager.TryGetString( "m_tsbAddPoint_AcrCenter", m_tsbAddPoint_AcrCenter.Text );
-			m_tsbAddPoint_AcrCenter.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPoint_AcrCenter_ToolTip", m_tsbAddPoint_AcrCenter.ToolTipText );
-
-			m_tsbAddPoint_EdgeCenter.Text = m_LanguageManager.TryGetString( "m_tsbAddPoint_EdgeCenter", m_tsbAddPoint_EdgeCenter.Text );
-			m_tsbAddPoint_EdgeCenter.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPoint_EdgeCenter_ToolTip", m_tsbAddPoint_EdgeCenter.ToolTipText );
-
-			m_tsbAddPoint_PointCenter.Text = m_LanguageManager.TryGetString( "m_tsbAddPoint_PointCenter", m_tsbAddPoint_PointCenter.Text );
-			m_tsbAddPoint_PointCenter.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPoint_PointCenter_ToolTip", m_tsbAddPoint_PointCenter.ToolTipText );
-
-			m_tsbAddPoint_BoundingBoxCenter.Text = m_LanguageManager.TryGetString( "m_tsbAddPoint_BoundingBoxCenter", m_tsbAddPoint_BoundingBoxCenter.Text );
-			m_tsbAddPoint_BoundingBoxCenter.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPoint_BoundingBoxCenter_ToolTip", m_tsbAddPoint_BoundingBoxCenter.ToolTipText );
-
-			m_tsbAddLine_TwoVertexConnect.Text = m_LanguageManager.TryGetString( "m_tsbAddLine_TwoVertexConnect", m_tsbAddLine_TwoVertexConnect.Text );
-			m_tsbAddLine_TwoVertexConnect.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddLine_TwoVertexConnect_ToolTip", m_tsbAddLine_TwoVertexConnect.ToolTipText );
-
-			m_tsbManualTransform.Text = m_LanguageManager.TryGetString( "m_tsbManualTransform", m_tsbManualTransform.Text );
-			m_tsbManualTransform.ToolTipText = m_LanguageManager.TryGetString( "m_tsbManualTransform_ToolTip", m_tsbManualTransform.ToolTipText );
-
-			m_tsb3PntTransform.Text = m_LanguageManager.TryGetString( "m_tsb3PntTransform", m_tsb3PntTransform.Text );
-			m_tsb3PntTransform.ToolTipText = m_LanguageManager.TryGetString( "m_tsb3PntTransform_ToolTip", m_tsb3PntTransform.ToolTipText );
-
-			m_tsbAxisTransform.Text = m_LanguageManager.TryGetString( "m_tsbAxisTransform", m_tsbAxisTransform.Text );
-			m_tsbAxisTransform.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAxisTransform_ToolTip", m_tsbAxisTransform.ToolTipText );
-
-			m_tsbMeasureCAD.Text = m_LanguageManager.TryGetString( "m_tsbMeasureCAD", m_tsbMeasureCAD.Text );
-			m_tsbMeasureCAD.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMeasureCAD_ToolTip", m_tsbMeasureCAD.ToolTipText );
-
-			m_tsbWireDiscreteVertex.Text = m_LanguageManager.TryGetString( "m_tsbWireDiscreteVertex", m_tsbWireDiscreteVertex.Text );
-			m_tsbWireDiscreteVertex.ToolTipText = m_LanguageManager.TryGetString( "m_tsbWireDiscreteVertex_ToolTip", m_tsbWireDiscreteVertex.ToolTipText );
-
-			// cam toolbar
-			m_tsbAddPath.Text = m_LanguageManager.TryGetString( "m_tsbAddPath", m_tsbAddPath.Text );
-			m_tsbAddPath.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAddPath_ToolTip", m_tsbAddPath.ToolTipText );
-
-			m_tsbDeletePath.Text = m_LanguageManager.TryGetString( "m_tsbDeletePath", m_tsbDeletePath.Text );
-			m_tsbDeletePath.ToolTipText = m_LanguageManager.TryGetString( "m_tsbDeletePath_ToolTip", m_tsbDeletePath.ToolTipText );
-
-			m_tsbStartPoint.Text = m_LanguageManager.TryGetString( "m_tsbStartPoint", m_tsbStartPoint.Text );
-			m_tsbStartPoint.ToolTipText = m_LanguageManager.TryGetString( "m_tsbStartPoint_ToolTip", m_tsbStartPoint.ToolTipText );
-
-			m_tsbReverse.Text = m_LanguageManager.TryGetString( "m_tsbReverse", m_tsbReverse.Text );
-			m_tsbReverse.ToolTipText = m_LanguageManager.TryGetString( "m_tsbReverse_ToolTip", m_tsbReverse.ToolTipText );
-
-			m_tsbSetLead.Text = m_LanguageManager.TryGetString( "m_tsbSetLead", m_tsbSetLead.Text );
-			m_tsbSetLead.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSetLead_ToolTip", m_tsbSetLead.ToolTipText );
-
-			m_tsbOverCut.Text = m_LanguageManager.TryGetString( "m_tsbOverCut", m_tsbOverCut.Text );
-			m_tsbOverCut.ToolTipText = m_LanguageManager.TryGetString( "m_tsbOverCut_ToolTip", m_tsbOverCut.ToolTipText );
-
-			m_tsbMicroJoint.Text = m_LanguageManager.TryGetString( "m_tsbMicroJoint", m_tsbMicroJoint.Text );
-			m_tsbMicroJoint.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMicroJoint_ToolTip", m_tsbMicroJoint.ToolTipText );
-
-			m_tsbExtendedGCode.Text = m_LanguageManager.TryGetString( "m_tsbExtendedGCode", m_tsbExtendedGCode.Text );
-			m_tsbExtendedGCode.ToolTipText = m_LanguageManager.TryGetString( "m_tsbExtendedGCode_ToolTip", m_tsbExtendedGCode.ToolTipText );
-
-			m_tsbRCorner.Text = m_LanguageManager.TryGetString( "m_tsbRCorner", m_tsbRCorner.Text );
-			m_tsbRCorner.ToolTipText = m_LanguageManager.TryGetString( "m_tsbRCorner_ToolTip", m_tsbRCorner.ToolTipText );
-
-			m_tsbToolVecReverse.Text = m_LanguageManager.TryGetString( "m_tsbToolVecReverse", m_tsbToolVecReverse.Text );
-			m_tsbToolVecReverse.ToolTipText = m_LanguageManager.TryGetString( "m_tsbToolVecReverse_ToolTip", m_tsbToolVecReverse.ToolTipText );
-
-			m_tsbToolVec.Text = m_LanguageManager.TryGetString( "m_tsbToolVec", m_tsbToolVec.Text );
-			m_tsbToolVec.ToolTipText = m_LanguageManager.TryGetString( "m_tsbToolVec_ToolTip", m_tsbToolVec.ToolTipText );
-
-			m_tsbFixedToolVec.Text = m_LanguageManager.TryGetString( "m_tsbFixedToolVec", m_tsbFixedToolVec.Text );
-			m_tsbFixedToolVec.ToolTipText = m_LanguageManager.TryGetString( "m_tsbFixedToolVec_ToolTip", m_tsbFixedToolVec.ToolTipText );
-
-			m_tsbOptimizeIK.Text = m_LanguageManager.TryGetString( "m_tsbOptimizeIK", m_tsbOptimizeIK.Text );
-			m_tsbOptimizeIK.ToolTipText = m_LanguageManager.TryGetString( "m_tsbOptimizeIK_ToolTip", m_tsbOptimizeIK.ToolTipText );
-
-			m_tsbManualOrder.Text = m_LanguageManager.TryGetString( "m_tsbManualOrder", m_tsbManualOrder.Text );
-			m_tsbManualOrder.ToolTipText = m_LanguageManager.TryGetString( "m_tsbManualOrder_ToolTip", m_tsbManualOrder.ToolTipText );
-
-			m_tsbAutoOrder.Text = m_LanguageManager.TryGetString( "m_tsbAutoOrder", m_tsbAutoOrder.Text );
-			m_tsbAutoOrder.ToolTipText = m_LanguageManager.TryGetString( "m_tsbAutoOrder_ToolTip", m_tsbAutoOrder.ToolTipText );
-
-			m_tsbSetTraverseData.Text = m_LanguageManager.TryGetString( "m_tsbSetTraverseData", m_tsbSetTraverseData.Text );
-			m_tsbSetTraverseData.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSetTraverseData_ToolTip", m_tsbSetTraverseData.ToolTipText );
-
-			m_tsbFlyCut.Text = m_LanguageManager.TryGetString( "m_tsbFlyCut", m_tsbFlyCut.Text );
-			m_tsbFlyCut.ToolTipText = m_LanguageManager.TryGetString( "m_tsbFlyCut_ToolTip", m_tsbFlyCut.ToolTipText );
-
-			m_tsbEntryAndExitSetting.Text = m_LanguageManager.TryGetString( "m_tsbEntryAndExitSetting", m_tsbEntryAndExitSetting.Text );
-			m_tsbEntryAndExitSetting.ToolTipText = m_LanguageManager.TryGetString( "m_tsbEntryAndExitSetting_ToolTip", m_tsbEntryAndExitSetting.ToolTipText );
-
-			m_tsbPatternSetting.Text = m_LanguageManager.TryGetString( "m_tsbPatternSetting", m_tsbPatternSetting.Text );
-			m_tsbPatternSetting.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPatternSetting_ToolTip", m_tsbPatternSetting.ToolTipText );
-
-			m_tsbPathEdit.Text = m_LanguageManager.TryGetString( "m_tsbPathEdit", m_tsbPathEdit.Text );
-			m_tsbPathEdit.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPathEdit_ToolTip", m_tsbPathEdit.ToolTipText );
-
-			m_tsbContourEdit.Text = m_LanguageManager.TryGetString( "m_BtnContourEdit", m_tsbContourEdit.Text );
-			m_tsbContourEdit.ToolTipText = m_LanguageManager.TryGetString( "m_BtnContourEdit_ToolTip", m_tsbContourEdit.ToolTipText );
-
-			m_tsbPathCompensation.Text = m_LanguageManager.TryGetString( "m_tsbPathCompensation", m_tsbPathCompensation.Text );
-			m_tsbPathCompensation.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPathCompensation_ToolTip", m_tsbPathCompensation.ToolTipText );
-
-			m_tsbCalibrationPnt.Text = m_LanguageManager.TryGetString( "m_tsbCalibrationPnt", m_tsbCalibrationPnt.Text );
-			m_tsbCalibrationPnt.ToolTipText = m_LanguageManager.TryGetString( "m_tsbCalibrationPnt_ToolTip", m_tsbCalibrationPnt.ToolTipText );
-
-			m_tsbConvertNC.Text = m_LanguageManager.TryGetString( "m_tsbConvertNC", m_tsbConvertNC.Text );
-			m_tsbConvertNC.ToolTipText = m_LanguageManager.TryGetString( "m_tsbConvertNC_ToolTip", m_tsbConvertNC.ToolTipText );
-			m_tsbSetOffset.Text = m_LanguageManager.TryGetString( "m_tsbSetOffset", SET_OFFSET );
-			m_tsbSetOffset.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSetOffset_ToolTip", SET_OFFSET_TOOLTIP );
-			m_tsbProcessSettings.Text = m_LanguageManager.TryGetString( "m_tsbProcessSettings", PROCESS_SETTINGS );
-			m_tsbProcessSettings.ToolTipText = m_LanguageManager.TryGetString( "m_tsbProcessSettings_ToolTip", PROCESS_SETTINGS_TOOLTIP );
-
-			m_tsbMeasureCAM.Text = m_LanguageManager.TryGetString( "m_tsbMeasureCAM", m_tsbMeasureCAM.Text );
-			m_tsbMeasureCAM.ToolTipText = m_LanguageManager.TryGetString( "m_tsbMeasureCAM_ToolTip", m_tsbMeasureCAM.ToolTipText );
-
-			// simulation toolbar
-			m_tsbPlay.Text = m_LanguageManager.TryGetString( "m_tsbPlay", m_tsbPlay.Text );
-			m_tsbPlay.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPlay_ToolTip", m_tsbPlay.ToolTipText );
-
-			m_tsbPause.Text = m_LanguageManager.TryGetString( "m_tsbPause", m_tsbPause.Text );
-			m_tsbPause.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPause_ToolTip", m_tsbPause.ToolTipText );
-
-			m_tsbStop.Text = m_LanguageManager.TryGetString( "m_tsbStop", m_tsbStop.Text );
-			m_tsbStop.ToolTipText = m_LanguageManager.TryGetString( "m_tsbStop_ToolTip", m_tsbStop.ToolTipText );
-
-			m_tsbPreviousPath.Text = m_LanguageManager.TryGetString( "m_tsbPreviousPath", m_tsbPreviousPath.Text );
-			m_tsbPreviousPath.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPreviousPath_ToolTip", m_tsbPreviousPath.ToolTipText );
-
-			m_tsbNextPath.Text = m_LanguageManager.TryGetString( "m_tsbNextPath", m_tsbNextPath.Text );
-			m_tsbNextPath.ToolTipText = m_LanguageManager.TryGetString( "m_tsbNextPath_ToolTip", m_tsbNextPath.ToolTipText );
-
-			m_tsbPreCollision.Text = m_LanguageManager.TryGetString( "m_tsbPreCollision", m_tsbPreCollision.Text );
-			m_tsbPreCollision.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPreCollision_ToolTip", m_tsbPreCollision.ToolTipText );
-
-			m_tsbNextCol.Text = m_LanguageManager.TryGetString( "m_tsbNextCol", m_tsbNextCol.Text );
-			m_tsbNextCol.ToolTipText = m_LanguageManager.TryGetString( "m_tsbNextCol_ToolTip", m_tsbNextCol.ToolTipText );
-
-			m_tsbPrePoint.Text = m_LanguageManager.TryGetString( "m_tsbPrePoint", m_tsbPrePoint.Text );
-			m_tsbPrePoint.ToolTipText = m_LanguageManager.TryGetString( "m_tsbPrePoint_ToolTip", m_tsbPrePoint.ToolTipText );
-
-			m_tsbNextPoint.Text = m_LanguageManager.TryGetString( "m_tsbNextPoint", m_tsbNextPoint.Text );
-			m_tsbNextPoint.ToolTipText = m_LanguageManager.TryGetString( "m_tsbNextPoint_ToolTip", m_tsbNextPoint.ToolTipText );
-
-			m_tsbSpeedUp.Text = m_LanguageManager.TryGetString( "m_tsbSpeedUp", m_tsbSpeedUp.Text );
-			m_tsbSpeedUp.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSpeedUp_ToolTip", m_tsbSpeedUp.ToolTipText );
-
-			m_tsbSlowDown.Text = m_LanguageManager.TryGetString( "m_tsbSlowDown", m_tsbSlowDown.Text );
-			m_tsbSlowDown.ToolTipText = m_LanguageManager.TryGetString( "m_tsbSlowDown_ToolTip", m_tsbSlowDown.ToolTipText );
-
-			m_tsbCheck.Text = m_LanguageManager.TryGetString( "m_tsbCheck", m_tsbCheck.Text );
-			m_tsbCheck.ToolTipText = m_LanguageManager.TryGetString( "m_tsbCheck_ToolTip", m_tsbCheck.ToolTipText );
-
-			m_tsbShowVec.ToolTipText = m_LanguageManager.TryGetString( "ShowVec", m_tsbShowVec.ToolTipText );
-			m_tsbShowOrder.ToolTipText = m_LanguageManager.TryGetString( "ShowOrder", m_tsbShowOrder.ToolTipText );
-			m_tsbShowOrientation.ToolTipText = m_LanguageManager.TryGetString( "ShowOrientation", m_tsbShowOrientation.ToolTipText );
-			m_tsbShowTraverse.ToolTipText = m_LanguageManager.TryGetString( "ShowTraverse", m_tsbShowTraverse.ToolTipText );
-			m_tsbShowMarker.ToolTipText = m_LanguageManager.TryGetString( "ShowMarker", m_tsbShowMarker.ToolTipText );
-
-			m_tsbLayer1.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 1 );
-			m_tsbLayer2.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 2 );
-			m_tsbLayer3.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 3 );
-			m_tsbLayer4.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 4 );
-			m_tsbLayer5.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 5 );
-			m_tsbLayer6.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 6 );
-			m_tsbLayer7.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 7 );
-			m_tsbLayer8.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 8 );
-			m_tsbLayer9.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 9 );
-			m_tsbLayer10.ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), 10 );
-			m_tsbLayerNone.ToolTipText = m_LanguageManager.TryGetString( "m_tsbLayerNone_ToolTip", NOT_NEED_PROCESS );
-			m_tsbNeedProcess.ToolTipText = m_LanguageManager.TryGetString( "m_tsbNeedProcess_ToolTip", NEED_PROCESS );
+			// layer tool tips share one formatted text
+			ToolStripButton[] layerButtonArray = { m_tsbLayer1, m_tsbLayer2, m_tsbLayer3, m_tsbLayer4, m_tsbLayer5,
+				m_tsbLayer6, m_tsbLayer7, m_tsbLayer8, m_tsbLayer9, m_tsbLayer10 };
+			for( int i = 0; i < layerButtonArray.Length; i++ ) {
+				layerButtonArray[ i ].ToolTipText = string.Format( m_LanguageManager.TryGetString( "Layer", LAYER ), i + 1 );
+			}
 		}
 
 		void InitLanguageMenu()
@@ -1986,13 +1796,7 @@ namespace MyCAM
 		}
 
 		const string LAYER = "圖層";
-		const string SET_OFFSET = "設定偏置";
-		const string SET_OFFSET_TOOLTIP = "設定程式座標偏置";
-		const string PROCESS_SETTINGS = "工藝設置";
-		const string PROCESS_SETTINGS_TOOLTIP = "開啟控制器工藝設置";
 		const string LOG_CALIBRATION_ERROR = "無法開啟三點校正：{0}";
 		const string LOG_NC_EXPORT_ERROR = "NC 轉出流程失敗：{0}";
-		const String NEED_PROCESS = "加工";
-		const string NOT_NEED_PROCESS = "不加工";
 	}
 }

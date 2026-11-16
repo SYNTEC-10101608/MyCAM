@@ -21,6 +21,7 @@ namespace UICheck
 	//   P2  portrait CAM area is not the part above the CNC host
 	//   P3  main window or a control in it does not use the font family of the UI language
 	//   P4  a visible CNC panel at the size the main window gives it fails the T1 / T2 / T4 checks of LayoutRunner
+	//   P5  a menu / tool bar item whose name is a language ID does not show its text (tool tip: "<name>_ToolTip")
 	//   a dialog that cannot be opened is a problem, not a skip
 	//
 	// Usage: UICheckMainWindow.exe <language> <mode> <width> <height> <png> [dialog type name ...]
@@ -60,6 +61,7 @@ namespace UICheck
 			setting.GetType().GetProperty( "UILanguage" ).SetValue( setting, szLanguage );
 			initialize.Invoke( null, null );
 			m_szExpectedFamily = GetExpectedFamily( szLanguage );
+			m_szLanguage = szLanguage;
 
 			Form mainForm = (Form)Activator.CreateInstance( m_App.GetType( "MyCAM.StartupForm" ) );
 			mainForm.Shown += ( sender, e ) => mainForm.BeginInvoke( new Action( () =>
@@ -96,6 +98,7 @@ namespace UICheck
 			int nProblemCount = CheckArea( mainForm, isVertical, area );
 			nProblemCount += CheckFontFamily( mainForm );
 			nProblemCount += CheckPanels( mainForm );
+			nProblemCount += CheckItemTexts( mainForm );
 
 			using( Bitmap bitmap = Capture( mainForm.Handle, mainForm.Size ) ) {
 				using( Graphics graphics = Graphics.FromImage( bitmap ) ) {
@@ -265,6 +268,65 @@ namespace UICheck
 			return nProblemCount;
 		}
 
+		// P5: each menu / tool bar item whose name is an ID shows the text of the language file, its tool tip the
+		// "<name>_ToolTip" text (the main window applies them by name like the dialogs)
+		static int CheckItemTexts( Form mainForm )
+		{
+			string szPath = Path.Combine( AppDomain.CurrentDomain.BaseDirectory, "Resource", "Language",
+				"StartupForm_" + m_szLanguage + ".xml" );
+			if( File.Exists( szPath ) == false ) {
+				Console.WriteLine( "FAIL  P5 language file not found: {0}", szPath );
+				return 1;
+			}
+			Dictionary<string, string> textMap = new Dictionary<string, string>();
+			System.Xml.XmlDocument document = new System.Xml.XmlDocument();
+			document.Load( szPath );
+			foreach( System.Xml.XmlElement message in document.GetElementsByTagName( "Message" ) ) {
+				textMap[ message.GetAttribute( "ID" ) ] = message.GetAttribute( "Content" );
+			}
+			List<ToolStripItem> itemList = new List<ToolStripItem>();
+			CollectItems( mainForm, itemList );
+			int nProblemCount = 0;
+			foreach( ToolStripItem item in itemList ) {
+				string szText;
+				if( textMap.TryGetValue( item.Name, out szText ) && item.Text != szText ) {
+					Console.WriteLine( "FAIL  P5 {0} shows '{1}', language file has '{2}'", item.Name, item.Text, szText );
+					nProblemCount++;
+				}
+				if( textMap.TryGetValue( item.Name + "_ToolTip", out szText ) && item.ToolTipText != szText ) {
+					Console.WriteLine( "FAIL  P5 {0} tool tip '{1}', language file has '{2}'", item.Name, item.ToolTipText, szText );
+					nProblemCount++;
+				}
+			}
+			Console.WriteLine( "items {0} checked against {1}", itemList.Count, Path.GetFileName( szPath ) );
+			return nProblemCount;
+		}
+
+		static void CollectItems( Control parent, List<ToolStripItem> itemList )
+		{
+			foreach( Control child in parent.Controls ) {
+				ToolStrip toolStrip = child as ToolStrip;
+				if( toolStrip != null ) {
+					CollectItems( toolStrip.Items, itemList );
+				}
+				if( child.ContextMenuStrip != null ) {
+					CollectItems( child.ContextMenuStrip.Items, itemList );
+				}
+				CollectItems( child, itemList );
+			}
+		}
+
+		static void CollectItems( ToolStripItemCollection itemCollection, List<ToolStripItem> itemList )
+		{
+			foreach( ToolStripItem item in itemCollection ) {
+				itemList.Add( item );
+				ToolStripDropDownItem dropDownItem = item as ToolStripDropDownItem;
+				if( dropDownItem != null && dropDownItem.HasDropDownItems ) {
+					CollectItems( dropDownItem.DropDownItems, itemList );
+				}
+			}
+		}
+
 		// P4: the embedded panels at the size the main window gives them, not the design size LayoutRunner uses
 		static int CheckPanels( Form mainForm )
 		{
@@ -403,6 +465,7 @@ namespace UICheck
 		const string VALUE_FAMILY = "Consolas";
 
 		static string m_szExpectedFamily;
+		static string m_szLanguage;
 		static Assembly m_App;
 		static Assembly m_Cnc;
 		static int m_nResult = 2;

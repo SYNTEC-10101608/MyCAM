@@ -12,9 +12,8 @@
 	<Message ID="m_tsmiSetting" Content="Settings" />
 	<Message ID="m_tsmiCNCConnection" Content="CNC Connection" />
 	<Message ID="m_tsmiLanguage" Content="Language" />
-	<Message ID="m_tsmiController" Content="Controller" />
-	<Message ID="m_tsmiControllerAdvancedSettings" Content="Advanced Controller Settings" />
-	<Message ID="m_tsmiMachining" Content="Machining" />
+	<Message ID="m_tsmiController" Content="Advanced Controller Settings" />
+	<Message ID="m_tsmiCNC" Content="Machining" />
 	<Message ID="m_tsbSetOffset" Content="Set Offset" />
 	<Message ID="m_tsbSetOffset_ToolTip" Content="Set program coordinate offset" />
 	<Message ID="m_tsbProcessSettings" Content="Process Settings" />
@@ -97,8 +96,8 @@
 	<Message ID="m_tsbPatternSetting_ToolTip" Content="Set the selected toolpath as a standard pattern" />
 	<Message ID="m_tsbPathEdit" Content="Position Compensation" />
 	<Message ID="m_tsbPathEdit_ToolTip" Content="Set position compensation for the selected toolpath" />
-	<Message ID="m_BtnContourEdit" Content="Contour Edit" />
-	<Message ID="m_BtnContourEdit_ToolTip" Content="Adjust the local contour of the selected toolpath" />
+	<Message ID="m_tsbContourEdit" Content="Contour Edit" />
+	<Message ID="m_tsbContourEdit_ToolTip" Content="Adjust the local contour of the selected toolpath" />
 	<Message ID="m_tsbPathCompensation" Content="Dimension Compensation" />
 	<Message ID="m_tsbPathCompensation_ToolTip" Content="Set dimension compensation for the selected toolpath" />
 	<Message ID="m_tsbCalibrationPnt" Content="Three-Point Calibration" />
@@ -137,11 +136,11 @@
 	<Message ID="m_tsbCheck_ToolTip" Content="Check for collisions" />
 	
 	<!-- 提示字串 -->
-	<Message ID="ShowVec" Content="Show Orientation" />
-	<Message ID="ShowOrder" Content="Show Sequence" />
-	<Message ID="ShowOrientation" Content="Show Toolpath Direction" />
-	<Message ID="ShowTraverse" Content="Show Traverse Path" />
-	<Message ID="ShowMarker" Content="Show Process Markers on Toolpath" />
+	<Message ID="m_tsbShowVec_ToolTip" Content="Show Orientation" />
+	<Message ID="m_tsbShowOrder_ToolTip" Content="Show Sequence" />
+	<Message ID="m_tsbShowOrientation_ToolTip" Content="Show Toolpath Direction" />
+	<Message ID="m_tsbShowTraverse_ToolTip" Content="Show Traverse Path" />
+	<Message ID="m_tsbShowMarker_ToolTip" Content="Show Process Markers on Toolpath" />
 	<Message ID="Layer" Content="Layer {0}" />
 	<Message ID="m_tsbLayerNone_ToolTip" Content="Do Not Machine" />
 	<Message ID="m_tsbNeedProcess_ToolTip" Content="Machine" />

@@ -424,7 +424,7 @@ namespace UICheck
 		}
 
 		// T6: the layout after Load is the designer layout ("what the designer shows is what runs");
-		// auto-sized controls may change size because the language text is applied on Load
+		// auto-sized controls may differ from the designer because they size to the language text
 		static void CheckDesignLayout( Form form, Size designClientSize, Dictionary<Control, Rectangle> designBoundsMap,
 			List<string> problemList )
 		{

@@ -11,14 +11,15 @@
 #   S5  dialog layout (section 4.4): margins, section width / gap, row grid, card height, button bar
 #   S6  language: captions written in Chinese have their ID in zh-TW and zh-CN; the four languages have the same
 #       IDs; the language file is named after the class
-#   S7  language: a control whose name is an ID is not given another text in code (auto-applied texts would win)
+#   S7  language: a control whose name is an ID is not applied by hand (ApplyLanguage applies it)
 #   S8  section titles (section 4.5): a card title is SectionPanel.Text; no emphasized label in a card's title bar
 #   S9  control field names start with the prefix of their type (section 3), also in the main window
 #   S10 tab order follows the layout: rows from top to bottom, left to right (FixTabOrder.ps1 renumbers)
 #   S11 dialog code sets no font, color, location or size of its controls (the designer layout is what runs)
 #   S12 no DPI scaling (DeviceDpi): the layout is designed for 96 DPI
 #   S13 language: an ID written like a control name belongs to a control of the class or is used by its code
-#   S14 language: every dialog calls ApplyLanguage() right after InitializeComponent()
+#   S14 language: every dialog calls ApplyLanguage() right after InitializeComponent(); every embedded panel calls
+#       ApplyLanguage( languageManager )
 #   S15 only CommonUI defines control classes (MyCAM and CncUI use the CommonUI controls)
 #   S16 button kinds: Start / Hold / Stop only in the CNC panels; at most one Primary in a container
 #   S17 button bar order (section 4.4): auxiliary buttons from the left margin, the others from the right margin,
@@ -27,6 +28,9 @@
 #   S19 main window designer: white list of types, no appearance except the data color swatches
 #   S20 data colors: every "static readonly Color" constant is a registered data color (StaticExceptions.txt)
 #   S21 every public type of CommonUI is listed in the component catalog (section 9)
+#   S22 title bar of a titled card (section 4.5): button 23 high at y=5, check box at y=5, label 24 high at y=4,
+#       the rightmost control ends at the content edge
+#   S23 code creates no control outside the white list (Button, GroupBox, NumericUpDown, TextBox ...)
 #
 # Exceptions are listed in StaticExceptions.txt: "<rule> <class> <control> <reason>". Exit code 1 on a problem.
 
@@ -100,7 +104,10 @@ function Test-OrphanIds( $screen, [string]$szCodePath ) {
 	$code = if (Test-Path $szCodePath) { Get-Content $szCodePath -Raw -Encoding UTF8 } else { "" }
 	foreach ($id in $ids.Keys) {
 		$isControlName = $id -cmatch "^m_[a-z]+[A-Z0-9]"
-		if ($isControlName -and -not $screen.Fields.ContainsKey($id) -and $code -notmatch "`"$id`"") {
+
+		# "<item>_ToolTip" is the tool tip of a menu / tool bar item, applied by name (section 7)
+		$szOwner = $id -replace "_ToolTip$", ""
+		if ($isControlName -and -not $screen.Fields.ContainsKey($szOwner) -and $code -notmatch "`"$id`"") {
 			Report "S13" $screen.ClassName $id "language ID looks like a control name but no control or code uses it"
 		}
 	}
@@ -274,6 +281,38 @@ function Test-CardAlignment( $screen ) {
 	}
 }
 
+# button 23 high at y = 5, check box at y = 5, label 24 high at y = 4; the rightmost one ends at the content edge
+function Test-TitleBar( $screen ) {
+	foreach ($section in @( $screen.Fields.Keys | Where-Object { $screen.Fields[$_] -eq "CommonUI.Controls.SectionPanel" } )) {
+		$sectionProps = $screen.Props[$section]
+		$isTitled = $sectionProps -and $sectionProps.ContainsKey("Text") -and $sectionProps["Text"] -ne ""
+		if (-not $isTitled) {
+			continue
+		}
+		$sectionBounds = Get-Bounds $screen $section
+		$items = @( $screen.Children[$section] | Where-Object { $_ } | ForEach-Object { Get-Bounds $screen $_ } |
+			Where-Object { $_ -and $_.Top -lt $TITLE_BAR_HEIGHT } )
+		foreach ($item in $items) {
+			$szType = $screen.Fields[$item.Name]
+			$isAutoSize = $screen.Props[$item.Name]["AutoSize"] -eq "true"
+			if ($szType -match "ThemedButton$" -and ($item.Top -ne 5 -or $item.Height -ne 23)) {
+				Report "S22" $screen.ClassName $item.Name "title bar button must be 23 high at y=5 (is y=$($item.Top), h=$($item.Height))"
+			}
+			elseif ($szType -match "CheckBox$" -and $item.Top -ne 5) {
+				Report "S22" $screen.ClassName $item.Name "title bar check box must be at y=5 (is $($item.Top))"
+			}
+			elseif ($szType -match "Label$" -and ($item.Top -ne 4 -or (-not $isAutoSize -and $item.Height -ne 24))) {
+				Report "S22" $screen.ClassName $item.Name "title bar label must be 24 high at y=4 (is y=$($item.Top), h=$($item.Height))"
+			}
+		}
+		$rightmost = $items | Sort-Object { $_.Left + $_.Width } -Descending | Select-Object -First 1
+		$isAutoSize = $rightmost -and $screen.Props[$rightmost.Name]["AutoSize"] -eq "true"
+		if ($rightmost -and -not $isAutoSize -and $rightmost.Left + $rightmost.Width -ne $sectionBounds.Width - 10) {
+			Report "S22" $screen.ClassName $rightmost.Name "title bar controls end at the content edge x=$($sectionBounds.Width - 10) (is $($rightmost.Left + $rightmost.Width))"
+		}
+	}
+}
+
 # ThemeMetrics.SECTION_TITLE_HEIGHT
 $TITLE_BAR_HEIGHT = 32
 
@@ -337,7 +376,8 @@ function Test-ScreenLanguage( $screen, $file ) {
 
 	# captions written in Chinese need a translation, or zh-CN shows the zh-TW designer text
 	$captions = @()
-	if (Test-HasChinese $screen.FormProps["Text"]) {
+	$isTitleSetInCode = $code -match "(?m)^\s*(this\.)?Text\s*="
+	if (-not $isTitleSetInCode -and (Test-HasChinese $screen.FormProps["Text"])) {
 		$captions += [pscustomobject]@{ Name = $szClass; Text = $screen.FormProps["Text"] }
 	}
 	foreach ($name in $screen.Fields.Keys) {
@@ -350,7 +390,12 @@ function Test-ScreenLanguage( $screen, $file ) {
 		if ($props.ContainsKey("CommonText")) {
 			continue
 		}
-		if ($props.ContainsKey("Text") -and (Test-HasChinese $props["Text"])) {
+		# a caption whose text is set in code (shared or runtime text) only has a placeholder in the designer:
+		# directly, or through an array / a helper parameter that the control is passed in
+		$isSetDirectly = $code -match "\b$name\.Text\s*="
+		$isPassedOn = $code -match "[\{\(,]\s*$name\s*[,\}\)]" -and $code -match "(?<![\w\.])(?!m_)[a-z]\w*(\[[^\]]*\])?\.Text\s*="
+		$isSetInCode = $isSetDirectly -or $isPassedOn
+		if (-not $isSetInCode -and $props.ContainsKey("Text") -and (Test-HasChinese $props["Text"])) {
 			$captions += [pscustomobject]@{ Name = $name; Text = $props["Text"] }
 		}
 	}
@@ -384,19 +429,15 @@ function Test-ScreenLanguage( $screen, $file ) {
 		}
 	}
 
-	# S7 a control whose name is an ID gets its text automatically; code must not set another one
+	# S7 a control whose name is an ID gets its text from ApplyLanguage(); code does not apply it again by hand
 	if ($null -ne $zhTW) {
 		foreach ($name in $screen.Fields.Keys) {
 			if (-not $zhTW.ContainsKey($name)) {
 				continue
 			}
-			$pattern = "\b$name\.Text\s*=\s*(?!m_LanguageManager\.TryGetString\(\s*`"$name`")"
+			$pattern = "\b$name\.(Text|HeaderText)\s*=\s*[\w\.]+\.TryGetString\(\s*`"$name`""
 			if ($code -match $pattern) {
-				Report "S7" $szClass $name "text is set in code although '$name' is an auto-applied ID"
-			}
-			$pattern = "\b$name\.Text\s*=\s*m_LanguageManager\.TryGetString\(\s*`"$name`""
-			if ($code -match $pattern) {
-				Report "S7" $szClass $name "text is applied by hand; DialogBase applies it automatically"
+				Report "S7" $szClass $name "text is applied by hand; ApplyLanguage() applies it by the control name"
 			}
 		}
 	}
@@ -412,43 +453,25 @@ function Test-DialogLayout( $screen ) {
 	}
 	$clientSize = ConvertTo-Size $client
 	$topLevel = @( $screen.Children["(form)"] | Where-Object { $_ } )
-	$sections = @( $topLevel | Where-Object { $screen.Fields[$_] -match "(CommonUI.Controls.SectionPanel|System.Windows.Forms.Panel)$" } |
-		ForEach-Object { Get-Bounds $screen $_ } | Sort-Object Top )
-	$buttons = @( $topLevel | Where-Object { $screen.Fields[$_] -eq "CommonUI.Controls.ThemedButton" } |
-		ForEach-Object { Get-Bounds $screen $_ } )
 
-	# sections: one column from the margin, full width, 8 apart
-	$previous = $null
-	foreach ($section in $sections) {
-		if ($section.Left -ne 12 -or $section.Width -ne ($clientSize.Width - 24)) {
-			Report "S5" $szClass $section.Name "section must be at x=12 with width $($clientSize.Width - 24) (is x=$($section.Left), w=$($section.Width))"
+	# a wizard that shows one page at a time (SectionStack.FitToPage): each page at (12, 12) is laid out like a dialog
+	# without margins, and the dialog is fitted to it at runtime
+	$isPaged = $script:CurrentCode -match "SectionStack\.FitToPage\("
+	if ($isPaged) {
+		foreach ($name in $topLevel) {
+			$page = Get-Bounds $screen $name
+			if ($screen.Fields[$name] -ne "System.Windows.Forms.Panel") {
+				Report "S5" $szClass $name "a paged dialog holds only its pages (Panel) on the form"
+				continue
+			}
+			if ($page.Left -ne 12 -or $page.Top -ne 12) {
+				Report "S5" $szClass $name "page must be at (12, 12) (is $($page.Left), $($page.Top))"
+			}
+			Test-CardColumn $screen $name 0 0 $page.Width $page.Height
 		}
-		$expectedTop = if ($null -eq $previous) { 12 } else { $previous.Top + $previous.Height + 8 }
-		if ($section.Top -ne $expectedTop -and -not (Test-RuntimeStacked $screen $section.Name)) {
-			Report "S5" $szClass $section.Name "section must be at y=$expectedTop (is $($section.Top))"
-		}
-		if ($screen.Fields[$section.Name] -eq "CommonUI.Controls.SectionPanel") {
-			Test-SectionRows $screen $section.Name 36
-		}
-		$previous = $section
+		return
 	}
-
-	# button bar
-	$contentBottom = if ($sections.Count -gt 0) { ($sections | ForEach-Object { $_.Top + $_.Height } | Measure-Object -Maximum).Maximum } else { 12 }
-	foreach ($button in $buttons) {
-		if ($button.Height -ne 28 -or $button.Width -lt 80) {
-			Report "S5" $szClass $button.Name "button bar button must be 28 high and at least 80 wide (is $($button.Width)x$($button.Height))"
-		}
-		if ($button.Top -ne ($contentBottom + 16) -and -not (Test-RuntimeStacked $screen $button.Name)) {
-			Report "S5" $szClass $button.Name "button bar must be 16 below the content, y=$($contentBottom + 16) (is $($button.Top))"
-		}
-		if ($button.Top + $button.Height + 12 -ne $clientSize.Height) {
-			Report "S5" $szClass $button.Name "button bar must be 12 above the bottom (client height $($clientSize.Height))"
-		}
-		if ($button.Left + $button.Width -gt $clientSize.Width - 12 -or $button.Left -lt 12) {
-			Report "S5" $szClass $button.Name "button outside the margins"
-		}
-	}
+	Test-CardColumn $screen "(form)" 12 12 ($clientSize.Width - 24) ($clientSize.Height - 12)
 	foreach ($name in $topLevel) {
 		$szType = $screen.Fields[$name]
 		if ($szType -ne "CommonUI.Controls.SectionPanel" -and $szType -ne "CommonUI.Controls.ThemedButton" -and
@@ -458,12 +481,101 @@ function Test-DialogLayout( $screen ) {
 	}
 }
 
-# sections placed by SectionStack at runtime are exempt from the designer position
-function Test-RuntimeStacked( $screen, [string]$name ) {
-	return $exceptions.ContainsKey("S5 $($screen.ClassName) $name")
+# cards of a container (the form, or a wizard page): one column from the left edge, full width, 8 apart; two cards of
+# the same row may stand side by side (equal width, 8 apart); cards at the same location are steps shown one at a
+# time and share the height of the tallest; then the button bar 16 below, 28 high, ending at the bottom edge
+function Test-CardColumn( $screen, [string]$szContainer, [int]$nLeft, [int]$nTop, [int]$nWidth, [int]$nBottom ) {
+	$szClass = $screen.ClassName
+	$children = @( $screen.Children[$szContainer] | Where-Object { $_ } )
+	$sections = @( $children | Where-Object { $screen.Fields[$_] -match "(CommonUI.Controls.SectionPanel|System.Windows.Forms.Panel)$" } |
+		ForEach-Object { Get-Bounds $screen $_ } )
+	$buttons = @( $children | Where-Object { $screen.Fields[$_] -eq "CommonUI.Controls.ThemedButton" } |
+		ForEach-Object { Get-Bounds $screen $_ } )
+
+	# a dialog that stacks its cards at runtime (SectionStack.Arrange) is checked in each state by the runtime check
+	$isStacked = $script:CurrentCode -match "SectionStack\.Arrange\("
+	$nExpectedTop = $nTop
+	$contentBottom = $nTop
+	foreach ($rowGroup in @( $sections | Group-Object Top | Sort-Object { [int]$_.Name } )) {
+		$rowCards = @( $rowGroup.Group | Sort-Object Left )
+		$slots = @( $rowCards | Group-Object Left | Sort-Object { [int]$_.Name } )
+
+		# horizontal: one full-width slot, or two equal slots side by side
+		if ($slots.Count -eq 1) {
+			foreach ($card in $rowCards) {
+				if ($card.Left -ne $nLeft -or $card.Width -ne $nWidth) {
+					Report "S5" $szClass $card.Name "section must be at x=$nLeft with width $nWidth (is x=$($card.Left), w=$($card.Width))"
+				}
+			}
+		}
+		else {
+			$nHalf = ($nWidth - 8) / 2
+			$isPair = $slots.Count -eq 2 -and [int]$slots[0].Name -eq $nLeft -and [int]$slots[1].Name -eq ($nLeft + $nHalf + 8) -and
+				@( $rowCards | Where-Object { $_.Width -ne $nHalf } ).Count -eq 0
+			if (-not $isPair) {
+				Report "S5" $szClass $rowCards[0].Name "side-by-side sections must be two of width $nHalf, 8 apart, filling the width $nWidth"
+			}
+		}
+
+		# vertical: 8 below the previous row
+		if ($rowCards[0].Top -ne $nExpectedTop -and -not $isStacked) {
+			Report "S5" $szClass $rowCards[0].Name "section must be at y=$nExpectedTop (is $($rowCards[0].Top))"
+		}
+
+		# cards of a slot alternate (one step at a time) and have the height of the tallest content
+		$nRowHeight = 0
+		foreach ($slot in $slots) {
+			$expectedMap = @{}
+			foreach ($card in $slot.Group) {
+				# a plain Panel (radio group, runtime area) has no card height of its own
+				$expectedMap[$card.Name] = if ($screen.Fields[$card.Name] -eq "CommonUI.Controls.SectionPanel") {
+					Test-SectionRows $screen $card.Name 36 -NoHeightCheck
+				}
+				else {
+					$card.Height
+				}
+			}
+			$nSlotHeight = ($expectedMap.Values | Measure-Object -Maximum).Maximum
+			foreach ($card in $slot.Group) {
+				$isCard = $screen.Fields[$card.Name] -eq "CommonUI.Controls.SectionPanel"
+				if ($isCard -and $card.Height -ne $nSlotHeight) {
+					$szWhy = if ($slot.Group.Count -gt 1) { " (the tallest of the steps at this location)" } else { "" }
+					Report "S5" $szClass $card.Name "section height must be $nSlotHeight$szWhy (is $($card.Height))"
+				}
+			}
+			$nRowHeight = [math]::Max($nRowHeight, $nSlotHeight)
+		}
+
+		# side-by-side cards share the row height
+		if ($slots.Count -gt 1) {
+			foreach ($card in $rowCards) {
+				if ($card.Height -ne $nRowHeight) {
+					Report "S5" $szClass $card.Name "side-by-side sections share the height $nRowHeight (is $($card.Height))"
+				}
+			}
+		}
+		$nExpectedTop = $rowCards[0].Top + $nRowHeight + 8
+		$contentBottom = [math]::Max($contentBottom, $rowCards[0].Top + $nRowHeight)
+	}
+
+	# button bar
+	foreach ($button in $buttons) {
+		if ($button.Height -ne 28 -or $button.Width -lt 80) {
+			Report "S5" $szClass $button.Name "button bar button must be 28 high and at least 80 wide (is $($button.Width)x$($button.Height))"
+		}
+		if ($button.Top -ne ($contentBottom + 16) -and -not $isStacked) {
+			Report "S5" $szClass $button.Name "button bar must be 16 below the content, y=$($contentBottom + 16) (is $($button.Top))"
+		}
+		if ($button.Top + $button.Height -ne $nBottom) {
+			Report "S5" $szClass $button.Name "button bar must end at y=$nBottom (12 above the dialog bottom)"
+		}
+		if ($button.Left + $button.Width -gt $nLeft + $nWidth -or $button.Left -lt $nLeft) {
+			Report "S5" $szClass $button.Name "button outside the margins"
+		}
+	}
 }
 
-function Test-SectionRows( $screen, [string]$szContainer, [int]$nTitledTop ) {
+function Test-SectionRows( $screen, [string]$szContainer, [int]$nTitledTop, [switch]$NoHeightCheck ) {
 	$szClass = $screen.ClassName
 	$props = $screen.Props[$szContainer]
 	$isTitled = $props -and $props.ContainsKey("Text") -and $props["Text"] -ne ""
@@ -507,11 +619,15 @@ function Test-SectionRows( $screen, [string]$szContainer, [int]$nTitledTop ) {
 		}
 	}
 
-	# card height: last row + 10
+	# card height: last row + 10 (returned to the caller that compares cards sharing a location)
+	$nExpectedHeight = $lastRowBottom + 10
+	if ($NoHeightCheck) {
+		return $nExpectedHeight
+	}
 	if ($isSection) {
 		$section = Get-Bounds $screen $szContainer
-		if ($lastRowBottom -gt 0 -and $section.Height -ne ($lastRowBottom + 10)) {
-			Report "S5" $szClass $szContainer "section height must be $($lastRowBottom + 10) (is $($section.Height))"
+		if ($lastRowBottom -gt 0 -and $section.Height -ne $nExpectedHeight) {
+			Report "S5" $szClass $szContainer "section height must be $nExpectedHeight (is $($section.Height))"
 		}
 	}
 }
@@ -528,6 +644,8 @@ foreach ($file in $designerFiles) {
 	$szClass = $screen.ClassName
 	$isDialog = $screen.BaseType -match "^(DialogBase|FormBase|EditDialogBase<.+>)$"
 	$isPanel = $screen.BaseType -match "^(PanelBase|UserControl)$"
+	$codePath = $file.FullName -replace "\.Designer\.cs$", ".cs"
+	$script:CurrentCode = if (Test-Path $codePath) { Get-Content $codePath -Raw -Encoding UTF8 } else { "" }
 
 	# S3 base class
 	if (-not $isDialog -and -not $isPanel) {
@@ -592,11 +710,20 @@ foreach ($file in $designerFiles) {
 		Test-ApplyLanguage $screen ($file.FullName -replace "\.Designer\.cs$", ".cs")
 	}
 
+	# S14 an embedded panel with a language file applies it through PanelBase.ApplyLanguage
+	$hasLanguageFile = Test-Path (Join-Path $Root "Language\$($szClass)_zh-TW.xml")
+	if ($isPanel -and $hasLanguageFile -and $script:CurrentCode -notmatch "\bApplyLanguage\(\s*\w+\s*\)") {
+		Report "S14" $szClass "*" "an embedded panel applies its language texts with ApplyLanguage( languageManager )"
+	}
+
 	# S16 button kinds, S18 alignment in cards (embedded panels are scaled, their grid is checked at runtime)
 	Test-ButtonKinds $screen ($file.FullName -match "\\CncUI\\Panel\\")
 	if ($isDialog) {
 		Test-CardAlignment $screen
 	}
+
+	# S22 controls in the title bar of a titled card (section 4.5)
+	Test-TitleBar $screen
 
 	# S6 / S7 language
 	Test-ScreenLanguage $screen $file
@@ -693,6 +820,9 @@ foreach ($file in $codeFiles) {
 		$nLine++
 		if ($line -match "\bDeviceDpi\b") {
 			Report "S12" $szClass "line$nLine" "DPI scaling is not used (96 DPI only): $($line.Trim())"
+		}
+		if ($line -match "\bnew (System\.Windows\.Forms\.)?(Button|GroupBox|NumericUpDown|FlowLayoutPanel|TableLayoutPanel|TextBox|ListBox|SplitContainer|TabControl|ProgressBar)\s*[\(\{]") {
+			Report "S23" $szClass "line$nLine" "control type outside the white list created in code: $($line.Trim())"
 		}
 		$isAppearanceCode = $line -match "(\bm_\w+\.|\bthis\.|^\s*)(Font|ForeColor|BackColor|Location|Size|ClientSize|Left|Top|Width|Height|Bounds)\s*=[^=]|\bm_\w+\.SetBounds\("
 		if ($isDialogCode -and $isAppearanceCode) {

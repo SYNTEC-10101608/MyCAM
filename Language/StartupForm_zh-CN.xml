@@ -12,9 +12,8 @@
 	<Message ID="m_tsmiSetting" Content="设定" />
 	<Message ID="m_tsmiCNCConnection" Content="CNC连线设定" />
 	<Message ID="m_tsmiLanguage" Content="语系切换" />
-	<Message ID="m_tsmiController" Content="控制器" />
-	<Message ID="m_tsmiControllerAdvancedSettings" Content="控制器高级设置" />
-	<Message ID="m_tsmiMachining" Content="加工" />
+	<Message ID="m_tsmiController" Content="控制器高级设置" />
+	<Message ID="m_tsmiCNC" Content="加工" />
 	<Message ID="m_tsbSetOffset" Content="设置偏置" />
 	<Message ID="m_tsbSetOffset_ToolTip" Content="设置程序坐标偏置" />
 	<Message ID="m_tsbProcessSettings" Content="工艺设置" />
@@ -97,8 +96,8 @@
 	<Message ID="m_tsbPatternSetting_ToolTip" Content="设定选择路径为标准图元" />
 	<Message ID="m_tsbPathEdit" Content="位置补偿" />
 	<Message ID="m_tsbPathEdit_ToolTip" Content="设定选择路径的位置补偿量" />
-	<Message ID="m_BtnContourEdit" Content="轮廓编辑" />
-	<Message ID="m_BtnContourEdit_ToolTip" Content="调整选择路径的局部轮廓" />
+	<Message ID="m_tsbContourEdit" Content="轮廓编辑" />
+	<Message ID="m_tsbContourEdit_ToolTip" Content="调整选择路径的局部轮廓" />
 	<Message ID="m_tsbPathCompensation" Content="尺寸补偿" />
 	<Message ID="m_tsbPathCompensation_ToolTip" Content="设定选择路径的尺寸补偿量" />
 	<Message ID="m_tsbCalibrationPnt" Content="三点校正" />
@@ -137,11 +136,11 @@
 	<Message ID="m_tsbCheck_ToolTip" Content="检查是否有碰撞" />
 	
 	<!-- 提示字串 -->
-	<Message ID="ShowVec" Content="显示姿态" />
-	<Message ID="ShowOrder" Content="显示顺序" />
-	<Message ID="ShowOrientation" Content="显示路径方向" />
-	<Message ID="ShowTraverse" Content="显示抬下刀路径" />
-	<Message ID="ShowMarker" Content="显示路径上的工艺图示" />
+	<Message ID="m_tsbShowVec_ToolTip" Content="显示姿态" />
+	<Message ID="m_tsbShowOrder_ToolTip" Content="显示顺序" />
+	<Message ID="m_tsbShowOrientation_ToolTip" Content="显示路径方向" />
+	<Message ID="m_tsbShowTraverse_ToolTip" Content="显示抬下刀路径" />
+	<Message ID="m_tsbShowMarker_ToolTip" Content="显示路径上的工艺图示" />
 	<Message ID="Layer" Content="图层{0}" />
 	<Message ID="m_tsbLayerNone_ToolTip" Content="不加工" />
 	<Message ID="m_tsbNeedProcess_ToolTip" Content="加工" />
