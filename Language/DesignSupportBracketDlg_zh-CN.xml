@@ -6,9 +6,8 @@
 	<Message ID="m_pnlBase" Content="底部大小" />
 	<Message ID="m_lblXExtension" Content="X 方向延伸距离" />
 	<Message ID="m_lblYExtension" Content="Y 方向延伸距离" />
-	<Message ID="m_pnlBracket" Content="支架位置" />
-	<Message ID="m_lblXPositionsTitle" Content="X 方向支架位置" />
-	<Message ID="m_lblYPositionsTitle" Content="Y 方向支架位置" />
+	<Message ID="m_pnlXBracket" Content="X 方向支架位置" />
+	<Message ID="m_pnlYBracket" Content="Y 方向支架位置" />
 	<Message ID="m_btnAddXPosition" Content="+ 新增 X 支架位置" />
 	<Message ID="m_btnAddYPosition" Content="+ 新增 Y 支架位置" />
 	<Message ID="m_pnlBracketHeight" Content="支架高度" />

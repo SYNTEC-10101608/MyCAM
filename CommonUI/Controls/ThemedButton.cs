@@ -199,11 +199,11 @@ namespace CommonUI.Controls
 		{
 			switch( m_Kind ) {
 				case ButtonKind.Start:
-					return m_isPressed ? ThemeColors.SUCCESS_PRESSED : m_isHovered ? ThemeColors.SUCCESS_HOVER : ThemeColors.SUCCESS;
+					return m_isPressed ? ThemeColors.CNC_START_PRESSED : m_isHovered ? ThemeColors.CNC_START_HOVER : ThemeColors.CNC_START;
 				case ButtonKind.Hold:
-					return m_isPressed ? ThemeColors.WARNING_PRESSED : m_isHovered ? ThemeColors.WARNING_HOVER : ThemeColors.WARNING;
+					return m_isPressed ? ThemeColors.CNC_HOLD_PRESSED : m_isHovered ? ThemeColors.CNC_HOLD_HOVER : ThemeColors.CNC_HOLD;
 				case ButtonKind.Stop:
-					return m_isPressed ? ThemeColors.ERROR_PRESSED : m_isHovered ? ThemeColors.ERROR_HOVER : ThemeColors.ERROR;
+					return m_isPressed ? ThemeColors.CNC_STOP_PRESSED : m_isHovered ? ThemeColors.CNC_STOP_HOVER : ThemeColors.CNC_STOP;
 				default:
 					throw new InvalidOperationException( "not a machining button kind: " + m_Kind );
 			}
