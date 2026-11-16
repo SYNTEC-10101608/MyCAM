@@ -176,12 +176,12 @@ namespace CommonUI.Controls
 				return;
 			}
 
-			// CNC machining buttons are filled with the status color of their severity
+			// CNC machining buttons: a light tint of their severity color, border and text in the color
 			bool isMachining = m_Kind == ButtonKind.Start || m_Kind == ButtonKind.Hold || m_Kind == ButtonKind.Stop;
 			if( isMachining ) {
 				fill = GetMachiningFill();
-				border = fill;
-				text = ThemeColors.TEXT_ON_ACCENT;
+				border = GetMachiningColor();
+				text = border;
 				return;
 			}
 			fill = m_isPressed ? ThemeColors.PRESSED : m_isHovered ? ThemeColors.HOVER : ThemeColors.SURFACE;
@@ -199,11 +199,28 @@ namespace CommonUI.Controls
 		{
 			switch( m_Kind ) {
 				case ButtonKind.Start:
-					return m_isPressed ? ThemeColors.CNC_START_PRESSED : m_isHovered ? ThemeColors.CNC_START_HOVER : ThemeColors.CNC_START;
+					return m_isPressed ? ThemeColors.CNC_START_TINT_PRESSED
+						: m_isHovered ? ThemeColors.CNC_START_TINT_HOVER : ThemeColors.CNC_START_TINT;
 				case ButtonKind.Hold:
-					return m_isPressed ? ThemeColors.CNC_HOLD_PRESSED : m_isHovered ? ThemeColors.CNC_HOLD_HOVER : ThemeColors.CNC_HOLD;
+					return m_isPressed ? ThemeColors.CNC_HOLD_TINT_PRESSED
+						: m_isHovered ? ThemeColors.CNC_HOLD_TINT_HOVER : ThemeColors.CNC_HOLD_TINT;
 				case ButtonKind.Stop:
-					return m_isPressed ? ThemeColors.CNC_STOP_PRESSED : m_isHovered ? ThemeColors.CNC_STOP_HOVER : ThemeColors.CNC_STOP;
+					return m_isPressed ? ThemeColors.CNC_STOP_TINT_PRESSED
+						: m_isHovered ? ThemeColors.CNC_STOP_TINT_HOVER : ThemeColors.CNC_STOP_TINT;
+				default:
+					throw new InvalidOperationException( "not a machining button kind: " + m_Kind );
+			}
+		}
+
+		Color GetMachiningColor()
+		{
+			switch( m_Kind ) {
+				case ButtonKind.Start:
+					return ThemeColors.CNC_START;
+				case ButtonKind.Hold:
+					return ThemeColors.CNC_HOLD;
+				case ButtonKind.Stop:
+					return ThemeColors.CNC_STOP;
 				default:
 					throw new InvalidOperationException( "not a machining button kind: " + m_Kind );
 			}

@@ -48,26 +48,32 @@ elseif (-not [System.IO.Path]::IsPathRooted($ShotDir)) {
 	$ShotDir = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $ShotDir))
 }
 $result = 0
-foreach ($szLanguage in $Languages) {
-	Write-Host "## runtime layout: $szLanguage"
-	$arguments = @( $szLanguage, $ShotDir )
-	if ($Only) {
-		$arguments += $Only
-	}
-	Push-Location $binDir
-	try {
-		if ($Visible) {
-			& $runner @arguments
+try {
+	foreach ($szLanguage in $Languages) {
+		Write-Host "## runtime layout: $szLanguage"
+		$arguments = @( $szLanguage, $ShotDir )
+		if ($Only) {
+			$arguments += $Only
 		}
-		else {
-			& $hidden $runner @arguments
+		Push-Location $binDir
+		try {
+			if ($Visible) {
+				& $runner @arguments
+			}
+			else {
+				& $hidden $runner @arguments
+			}
+			if ($LASTEXITCODE -ne 0) {
+				$result = 1
+			}
 		}
-		if ($LASTEXITCODE -ne 0) {
-			$result = 1
+		finally {
+			Pop-Location
 		}
 	}
-	finally {
-		Pop-Location
-	}
+}
+finally {
+	# the runners only live in the build output while they run, so they are never shipped with it
+	Remove-Item $runner, $hidden -ErrorAction SilentlyContinue
 }
 exit $result

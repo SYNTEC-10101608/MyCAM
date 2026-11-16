@@ -39,15 +39,18 @@ namespace CommonUI.Theme
 		public static readonly Color WARNING = ColorTranslator.FromHtml( "#A86200" );
 		public static readonly Color SUCCESS = ColorTranslator.FromHtml( "#107C41" );
 
-		// filled CNC machining buttons (ButtonKind.Start / Hold / Stop), lighter than the status text colors
-		public static readonly Color CNC_START = ColorTranslator.FromHtml( "#3A9E62" );
-		public static readonly Color CNC_START_HOVER = ColorTranslator.FromHtml( "#35915A" );
-		public static readonly Color CNC_START_PRESSED = ColorTranslator.FromHtml( "#318552" );
-		public static readonly Color CNC_HOLD = ColorTranslator.FromHtml( "#E8901E" );
-		public static readonly Color CNC_HOLD_HOVER = ColorTranslator.FromHtml( "#D5841C" );
-		public static readonly Color CNC_HOLD_PRESSED = ColorTranslator.FromHtml( "#C37919" );
-		public static readonly Color CNC_STOP = ColorTranslator.FromHtml( "#D6504A" );
-		public static readonly Color CNC_STOP_HOVER = ColorTranslator.FromHtml( "#C54A44" );
-		public static readonly Color CNC_STOP_PRESSED = ColorTranslator.FromHtml( "#B4433E" );
+		// CNC machining buttons (ButtonKind.Start / Hold / Stop): light tint fill, border and text in the color
+		public static readonly Color CNC_START = ColorTranslator.FromHtml( "#2E8452" );
+		public static readonly Color CNC_START_TINT = ColorTranslator.FromHtml( "#E5F3EA" );
+		public static readonly Color CNC_START_TINT_HOVER = ColorTranslator.FromHtml( "#D5ECDE" );
+		public static readonly Color CNC_START_TINT_PRESSED = ColorTranslator.FromHtml( "#C3E3CF" );
+		public static readonly Color CNC_HOLD = ColorTranslator.FromHtml( "#C26E0A" );
+		public static readonly Color CNC_HOLD_TINT = ColorTranslator.FromHtml( "#FDF0DE" );
+		public static readonly Color CNC_HOLD_TINT_HOVER = ColorTranslator.FromHtml( "#FAE3C4" );
+		public static readonly Color CNC_HOLD_TINT_PRESSED = ColorTranslator.FromHtml( "#F6D4A8" );
+		public static readonly Color CNC_STOP = ColorTranslator.FromHtml( "#C2413B" );
+		public static readonly Color CNC_STOP_TINT = ColorTranslator.FromHtml( "#FBE6E4" );
+		public static readonly Color CNC_STOP_TINT_HOVER = ColorTranslator.FromHtml( "#F7D5D2" );
+		public static readonly Color CNC_STOP_TINT_PRESSED = ColorTranslator.FromHtml( "#F1C1BD" );
 	}
 }
