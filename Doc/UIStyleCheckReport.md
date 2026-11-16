@@ -39,9 +39,8 @@
 
 ## 4. 需要人工確認的項目
 
-1. Visual Studio Designer：任選一個繼承 `EditDialogBase<T>` 的對話框（例如 `OverCutDlg`）開啟，確認畫面與執行時一致；另開 `StartPointDlg`、`CNCPanel` 各一。
+1. ~~Visual Studio Designer~~：2026-11-16 已確認顯示正常，含 `EditDialogBase<T>` 的對話框（`UIStyleNotes.md` 第 3 節）。
 2. 直式人機：對話框置中已由腳本確認；`CNCDlg`（需 VNC 連線）是否仍定位到 CNC 區域，以及 CNC 連線時直式下方的面板。
 3. 實機操作：數值框取代 TextBox 的對話框（`AxisTransformDlg`、`AddPathDlg`、`PatternSettingDlg`、`ThreePtTransformDlg`、`AutoSortPathDlg`）的輸入與預覽。
 4. CNC 連線狀態下的 `CNCPanel` / `CNCInfoPanel` / `CNCAlarmPanel` 外觀與燈號（未連線的外觀已有 CNC 頁面截圖）。
-5. 直式 CAM 頁面（寬 1080）的功能工具列放不下，最後幾個按鈕（位置補償、尺寸補償、輪廓編輯、量測）收進右側溢出箭頭。
-   圖示尺寸 40×40 與 `master` 相同；需與 `master` 直式實機比對，確認是既有現象還是字型 / 文字寬度改變造成。
+5. ~~直式 CAM 頁面功能工具列溢出~~：2026-11-16 確認為既有問題，與本議題無關（`UIStyleNotes.md` 第 3 節）。
